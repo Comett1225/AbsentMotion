@@ -1,0 +1,44 @@
+name: build
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  foss-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 170
+    container: debian:trixie
+    env:
+      DEBIAN_FRONTEND: noninteractive
+      ANDROID_HOME: /opt/android-sdk
+      ANDROID_NDK: /opt/android-sdk/ndk/30.0.16248370
+    steps:
+      - name: Install packages
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends git ca-certificates curl unzip xz-utils python3 build-essential clang lld ninja-build openjdk-21-jdk-headless
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Install the Android SDK
+        run: |
+          mkdir -p "$ANDROID_HOME/cmdline-tools"
+          curl -fsSL -o /tmp/cmdline-tools.zip https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+          unzip -q /tmp/cmdline-tools.zip -d /tmp/cmdline-tools
+          mv /tmp/cmdline-tools/cmdline-tools "$ANDROID_HOME/cmdline-tools/latest"
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platform-tools" "platforms;android-37.0" "build-tools;37.0.0" "cmake;3.31.6" "ndk;30.0.16248370"
+      - name: Build Skia
+        run: tools/build_skia.sh
+      - name: Build the foss APK
+        run: |
+          . tools/env.sh
+          ./gradlew :app:assembleFossRelease --no-daemon
+      - uses: actions/upload-artifact@v4
+        with:
+          name: foss-apk
+          path: app/build/outputs/apk/foss/release/*.apk
