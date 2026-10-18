@@ -68,7 +68,6 @@ def svg_marks():
 def write_svg(path):
     with open(path, "w") as fh:
         fh.write('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108" width="108" height="108">\n'
-                 '  <!-- AbsentMotion mark: own geometry, Apache-2.0 like the rest of the project. -->\n'
                  '  <rect width="108" height="108" fill="%s"/>\n  %s\n</svg>\n' % (BG, svg_marks()))
 
 def write_android(root):
