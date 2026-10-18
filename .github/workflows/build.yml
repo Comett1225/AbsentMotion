@@ -2,6 +2,10 @@ name: build
 
 on:
   workflow_dispatch:
+    inputs:
+      subdir:
+        description: Directory to build in, relative to the workspace
+        default: '.'
   pull_request:
   push:
     tags:
@@ -12,18 +16,23 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 170
     container: debian:trixie
+    defaults:
+      run:
+        working-directory: ${{ inputs.subdir || '.' }}
     env:
       DEBIAN_FRONTEND: noninteractive
       ANDROID_HOME: /opt/android-sdk
       ANDROID_NDK: /opt/android-sdk/ndk/30.0.16248370
     steps:
       - name: Install packages
+        working-directory: /
         run: |
           apt-get update
           apt-get install -y --no-install-recommends git ca-certificates curl unzip xz-utils python3 build-essential clang lld ninja-build openjdk-21-jdk-headless
       - uses: actions/checkout@v4
         with:
           submodules: true
+          path: ${{ inputs.subdir || '.' }}
       - name: Install the Android SDK
         run: |
           mkdir -p "$ANDROID_HOME/cmdline-tools"
@@ -44,4 +53,4 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: foss-apk
-          path: app/build/outputs/apk/foss/release/*.apk
+          path: ${{ inputs.subdir || '.' }}/app/build/outputs/apk/foss/release/*.apk
