@@ -22,11 +22,13 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.referentialEqualityPolicy
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clipToBounds
@@ -38,15 +40,20 @@ import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.drawscope.clipRect
+import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.PointerInputScope
+import androidx.compose.ui.input.pointer.changedToDown
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.input.pointer.util.addPointerInputChange
@@ -68,6 +75,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import app.absentmotion.editor.EditorPanel
 import app.absentmotion.editor.MultiSelect
 import app.absentmotion.editor.EditorState
@@ -88,7 +96,9 @@ import kotlin.math.pow
 import kotlin.math.roundToInt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
+import kotlin.coroutines.coroutineContext
 
 private val RulerHeight = 42.dp
 private val RowHeight = 28.dp
@@ -139,6 +149,20 @@ private val GripGap = 1.8.dp
 
 private val HandleInset = 9.dp
 private val HandleZone = 22.dp
+
+private val MultiBarHeight = 48.dp
+
+private const val LIFT_SCALE = 1.02f
+private const val LIFT_DIM = 0.3f
+private const val LIFT_SHADOW_ALPHA = 0.07f
+private val LiftShadowStep = 1.5.dp
+private const val LIFT_MS = 100
+private const val SLIDE_MS = 120
+private const val DROP_MS = 150
+private val PushZone = 56.dp
+private const val PUSH_SLOWEST_ROWS = 1f
+private const val PUSH_FASTEST_ROWS = 12f
+private const val PUSH_MAX_STEP_S = 0.1f
 
 private const val DEFAULT_ZOOM = 100f
 private const val MIN_ZOOM = 10f
@@ -201,31 +225,40 @@ fun Timeline(state: EditorState, modifier: Modifier = Modifier) {
             .pointerInput(view) { timelineGestures(view) { haptic.performHapticFeedback(HapticFeedbackType.LongPress) } }
             .drawBehind { drawTimeline(view, measurer, eye, eyeOff, outline, mediaPictures, appear.value) },
     ) {
-        HeaderPictures(view)
+        HeaderPictures(view) { drawLifted(view, measurer, eye, eyeOff, outline, mediaPictures, appear.value) }
     }
 }
 
 @Composable
-private fun HeaderPictures(view: TimelineView) {
+private fun HeaderPictures(view: TimelineView, drawLift: DrawScope.() -> Unit) {
     val rows by remember(view) { derivedStateOf { view.visibleRows() } }
     Box(Modifier.fillMaxSize().padding(top = RulerHeight).clipToBounds()) {
         for (row in rows) {
             val layer = view.layerAt(row)
             if (layer != null) {
                 key(layer.id) {
+                    val lifted = layer.id == view.liftId
                     LayerThumbnail(
                         layer, view.state.engine,
                         Modifier
+                            .zIndex(if (lifted) 2f else 0f)
                             .offset {
-                                val top = view.rowTop(row) - view.rulerH + (RowHeight - ThumbSize).toPx() / 2
+                                val top = view.shownTop(row, layer.id) - view.rulerH + (RowHeight - ThumbSize).toPx() / 2
                                 IntOffset(ThumbLeft.roundToPx(), top.roundToInt())
                             }
+                            .then(if (lifted) Modifier.graphicsLayer {
+                                val grow = 1 + (LIFT_SCALE - 1) * view.liftAmount
+                                scaleX = grow
+                                scaleY = grow
+                                transformOrigin = TransformOrigin((view.size.width / 2f - ThumbLeft.toPx()) / ThumbSize.toPx(), 0.5f)
+                            } else Modifier)
                             .size(ThumbSize)
                             .alpha(if (layer.hidden) HIDDEN_ALPHA else 1f),
                     )
                 }
             }
         }
+        if (view.liftId != null) Box(Modifier.fillMaxSize().zIndex(1f).drawBehind(drawLift))
     }
 }
 
@@ -263,9 +296,10 @@ private sealed interface Hit {
     data class Header(val id: Long) : Hit
     data class Grip(val id: Long, val start: Boolean) : Hit
     data class Handle(val id: Long) : Hit
+    data class Row(val id: Long) : Hit
 }
 
-private enum class Drag(val edit: Boolean = false) { Scrub, Scroll, Pinch, Spent, TrimStart(true), TrimEnd(true), Reorder(true) }
+private enum class Drag(val edit: Boolean = false) { Scrub, Scroll, Pinch, Spent, TrimStart(true), TrimEnd(true), Reorder(true), Lift(true) }
 
 private class TimelineView(val state: EditorState, density: Density, private val scope: CoroutineScope, private val wide: Boolean) {
     private val scale = density.density
@@ -287,6 +321,25 @@ private class TimelineView(val state: EditorState, density: Density, private val
 
     private var dragId = 0L
     private var edgeMs = 0f
+
+    private class Slide(val from: Float, val at: Long)
+
+    var liftId by mutableStateOf<Long?>(null)
+        private set
+    private var liftTop by mutableFloatStateOf(0f)
+    private var frameMs by mutableLongStateOf(0L)
+    private var liftJob: Job? = null
+    private var liftAt = 0L
+    private var liftGrab = 0f
+    private var liftFinger = 0f
+    private var liftStart = 0f
+    private var liftSlop = 0f
+    private var liftArmed = false
+    private var liftPush = true
+    private var dropping = false
+    private var dropAt = 0L
+    private var dropFrom = 0f
+    private val slides = HashMap<Long, Slide>()
 
     private val layersState = derivedStateOf(referentialEqualityPolicy()) { state.scene.layers }
 
@@ -320,7 +373,9 @@ private class TimelineView(val state: EditorState, density: Density, private val
         scrollPx = scroll.coerceIn(min(top + rowH - (roomBottom - rulerH), top), top)
     }
 
-    fun isCovered(at: Offset): Boolean = (covered && at.y >= PanelTop.px) || (MultiSelect.active && at.y >= size.height - 48.dp.px)
+    fun isCovered(at: Offset): Boolean = (covered && at.y >= PanelTop.px) || (MultiSelect.active && at.y >= size.height - MultiBarHeight.px)
+
+    private val rowsBottom: Float get() = if (MultiSelect.active) min(roomBottom, size.height - MultiBarHeight.px) else roomBottom
 
     fun hitAt(at: Offset): Hit {
         if (at.y < rulerH) {
@@ -339,7 +394,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
             selected && at.x in right..right + GripZone.px -> Hit.Grip(layer.id, start = false)
             !selected && at.x >= size.width - HandleZone.px -> Hit.Handle(layer.id)
             at.x in left..right -> Hit.Bar(layer.id)
-            else -> Hit.Empty
+            else -> Hit.Row(layer.id)
         }
     }
 
@@ -349,7 +404,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
             is Hit.Header -> select(hit.id)
             is Hit.Bar -> select(hit.id)
             Hit.Readout -> state.toggleBookmark()
-            Hit.Empty, Hit.Ruler -> state.clearSelection()
+            Hit.Empty, Hit.Ruler, is Hit.Row -> state.clearSelection()
             is Hit.Grip, is Hit.Handle -> Unit
         }
     }
@@ -394,11 +449,12 @@ private class TimelineView(val state: EditorState, density: Density, private val
             Drag.Scroll -> scrollBy(delta.y)
             Drag.TrimStart, Drag.TrimEnd -> trimBy(delta.x, start = drag == Drag.TrimStart)
             Drag.Reorder -> reorderTo(at.y)
-            Drag.Pinch, Drag.Spent -> Unit
+            Drag.Pinch, Drag.Spent, Drag.Lift -> Unit
         }
     }
 
     fun endDrag(drag: Drag?, velocity: Velocity) {
+        if (drag == Drag.Lift) drop()
         if (drag?.edit == true) return state.endGesture()
         motion = scope.launch {
             if (drag == Drag.Scroll) launch { fling(velocity.y, ::scrollBy) }
@@ -475,6 +531,110 @@ private class TimelineView(val state: EditorState, density: Density, private val
         val id = dragId
         if (layers[index].id != id) state.edit("reorder") { it.move(id, index) }
     }
+
+    fun rowOf(id: Long): Int? = layers.indexOfFirst { it.id == id }.takeIf { it >= 0 }?.let { layers.lastIndex - it }
+
+    private fun progress(ms: Long, total: Int) = Motion.EaseOut.transform((ms / total.toFloat()).coerceIn(0f, 1f))
+
+    val liftAmount: Float
+        get() {
+            val now = frameMs
+            return if (dropping) dropFrom * (1 - progress(now - dropAt, DROP_MS)) else progress(now - liftAt, LIFT_MS)
+        }
+
+    fun shownTop(row: Int, id: Long): Float {
+        val now = frameMs
+        val top = rowTop(row)
+        if (id == liftId) return if (dropping) liftTop + (top - liftTop) * progress(now - dropAt, DROP_MS) else liftTop
+        val slide = slides[id] ?: return top
+        return top + slide.from * (1 - progress(now - slide.at, SLIDE_MS)) * rowH
+    }
+
+    fun lift(id: Long, y: Float, slop: Float): Boolean {
+        val row = rowOf(id) ?: return false
+        liftJob?.cancel()
+        liftAt = SystemClock.uptimeMillis()
+        liftGrab = y - rowTop(row)
+        liftFinger = y
+        liftStart = y
+        liftSlop = slop
+        liftArmed = false
+        liftPush = true
+        dropping = false
+        liftTop = rowTop(row)
+        liftId = id
+        liftJob = scope.launch { liftLoop() }
+        liftUpdate()
+        return true
+    }
+
+    fun liftDrag(y: Float, pushing: Boolean) {
+        liftFinger = y
+        liftPush = pushing
+        if (abs(y - liftStart) > liftSlop) liftArmed = true
+        liftUpdate()
+    }
+
+    fun liftScroll(dy: Float) {
+        scrollBy(dy)
+        liftUpdate()
+    }
+
+    private fun drop() {
+        if (liftId == null || dropping) return
+        dropFrom = liftAmount
+        dropAt = SystemClock.uptimeMillis()
+        dropping = true
+    }
+
+    private fun liftUpdate() {
+        val id = liftId ?: return
+        if (dropping) return
+        val layers = layers
+        val index = layers.indexOfFirst { it.id == id }
+        if (index < 0) return
+        liftTop = RowDrag.clampTop(liftFinger - liftGrab, rowH, rulerH, roomBottom, scroll, layers.size)
+        val from = layers.lastIndex - index
+        val to = RowDrag.slot(liftTop, rowH, rulerH, scroll, layers.size)
+        if (to == from) return
+        val now = SystemClock.uptimeMillis()
+        for ((i, layer) in layers.withIndex()) {
+            val shift = RowDrag.shift(layers.lastIndex - i, from, to)
+            if (shift == 0) continue
+            val left = slides[layer.id]?.let { it.from * (1 - progress(now - it.at, SLIDE_MS)) } ?: 0f
+            slides[layer.id] = Slide(left - shift, now)
+        }
+        state.edit("reorder") { it.move(id, layers.lastIndex - to) }
+    }
+
+    private suspend fun liftLoop() {
+        val me = coroutineContext.job
+        var last = SystemClock.uptimeMillis()
+        try {
+            while (true) {
+                val now = withFrameNanos { SystemClock.uptimeMillis() }
+                val step = min((now - last) / 1000f, PUSH_MAX_STEP_S)
+                last = now
+                frameMs = now
+                slides.values.removeAll { now - it.at >= SLIDE_MS }
+                if (dropping) {
+                    if (now - dropAt >= DROP_MS && slides.isEmpty()) break
+                } else if (liftArmed && liftPush) {
+                    val speed = RowDrag.edgeSpeed(liftFinger, rulerH, rowsBottom, PushZone.px, PUSH_SLOWEST_ROWS * rowH, PUSH_FASTEST_ROWS * rowH)
+                    if (speed != 0f) {
+                        scrollBy(-speed * step)
+                        liftUpdate()
+                    }
+                }
+            }
+        } finally {
+            if (liftJob === me) {
+                liftId = null
+                dropping = false
+                slides.clear()
+            }
+        }
+    }
 }
 
 private val KeyFaint = DpSize(6.4.dp, 9.6.dp)
@@ -490,24 +650,42 @@ private suspend fun PointerInputScope.timelineGestures(view: TimelineView, onLon
     var drag: Drag? = null
     var lifted = false
     var held = false
-    val holdable = hit is Hit.Eye || hit is Hit.Header
+    var finger = down.position
+    var second: PointerId? = null
+    val holdable = hit is Hit.Eye || hit is Hit.Header || hit is Hit.Row
     val deadline = down.uptimeMillis + viewConfiguration.longPressTimeoutMillis
     try {
         while (true) {
             val event = if (holdable && drag == null && !held) {
                 withTimeoutOrNull((deadline - SystemClock.uptimeMillis()).coerceAtLeast(1)) { awaitPointerEvent() }
-                    ?: run {
-                        view.longPress(hit)
-                        onLongPress()
-                        held = true
-                        continue
-                    }
             } else awaitPointerEvent()
+            if (event == null) {
+                if (hit is Hit.Row && view.lift(hit.id, finger.y, viewConfiguration.touchSlop)) drag = Drag.Lift else {
+                    view.longPress(hit)
+                    held = true
+                }
+                onLongPress()
+                continue
+            }
             val fingers = event.changes.count { it.pressed }
             val first = event.changes.firstOrNull { it.id == down.id }
-            if (first != null) tracker.addPointerInputChange(first)
+            if (first != null) {
+                tracker.addPointerInputChange(first)
+                finger = first.position
+            }
             when {
                 fingers == 0 -> break
+                drag == Drag.Lift -> {
+                    if (first == null || !first.pressed) break
+                    for (change in event.changes) {
+                        if (change.id == down.id) continue
+                        if (second == null && change.changedToDown() && change.position.y >= view.rulerH) second = change.id
+                        if (change.id != second) continue
+                        if (change.pressed) view.liftScroll(change.position.y - change.previousPosition.y) else second = null
+                    }
+                    view.liftDrag(first.position.y, pushing = second == null)
+                    event.changes.forEach { it.consume() }
+                }
                 fingers > 1 && drag?.edit != true -> {
                     drag = Drag.Pinch
                     view.zoomBy(event.calculateZoom())
@@ -543,13 +721,36 @@ private fun DrawScope.drawTimeline(view: TimelineView, measurer: TextMeasurer, e
     clipRect(top = view.rulerH) {
         for (row in view.visibleRows()) {
             val layer = view.layerAt(row) ?: continue
-            drawRow(layer, layer.id == state.selectedId, view.rowTop(row), time, stripe, measurer, if (layer.hidden) eyeOff else eye, outline, state.scene, state.frame, pictures[layer.id], appear)
+            if (layer.id == view.liftId) continue
+            drawRow(layer, layer.id == state.selectedId, view.shownTop(row, layer.id), time, stripe, measurer, if (layer.hidden) eyeOff else eye, outline, state.scene, state.frame, pictures[layer.id], appear)
         }
     }
     val marks = state.scene.bookmarks
     val onBookmark = marks.any { state.scene.frameAt(it) == state.frame }
     for (ms in marks) drawBookmark(time.x(ms.toFloat()), outline)
     drawPlayhead(time.originX, TimelineMath.timecode(state.frame, fps), measurer, outline, onBookmark)
+}
+
+private fun DrawScope.drawLifted(view: TimelineView, measurer: TextMeasurer, eye: Painter, eyeOff: Painter, outline: Path, pictures: Map<Long, StripPicture>, appear: Float) {
+    val id = view.liftId ?: return
+    val row = view.rowOf(id) ?: return
+    val layer = view.layerAt(row) ?: return
+    val state = view.state
+    val time = view.timeScale()
+    val stripe = TimelineMath.frameTimeMs(2 * TimelineMath.tickStep(view.fps, view.dpPerSecond), view.fps) * time.pxPerMs
+    val amount = view.liftAmount
+    val rowH = view.rowH
+    drawRect(Am.TimelineBg, alpha = LIFT_DIM * amount)
+    translate(top = -view.rulerH) {
+        val top = view.shownTop(row, id)
+        val grow = 1 + (LIFT_SCALE - 1) * amount
+        scale(grow, grow, Offset(size.width / 2, top + rowH / 2)) {
+            val step = LiftShadowStep.toPx()
+            for (i in 1..4) drawRect(Color.Black, Offset(-i * step, top - i * step + step), Size(size.width + 2 * i * step, rowH + 2 * i * step), alpha = LIFT_SHADOW_ALPHA * amount)
+            drawRect(Am.TimelineBg, Offset(0f, top), Size(size.width, rowH), alpha = amount)
+            drawRow(layer, id == state.selectedId, top, time, stripe, measurer, if (layer.hidden) eyeOff else eye, outline, state.scene, state.frame, pictures[id], appear)
+        }
+    }
 }
 
 private fun DrawScope.drawBookmark(x: Float, outline: Path) {
