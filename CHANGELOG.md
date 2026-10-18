@@ -6,6 +6,13 @@ All notable changes to AbsentMotion are listed here, newest first. The format fo
 Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stands for the feature set as it stood on
 2026-10-12.
 
+## [2.1.1] - 2026-10-18
+
+### Changed
+
+- The app can now be built from source on Linux, which F-Droid needs. Skia is built from pinned sources with `gn` built
+  from source, and a GitHub Actions workflow builds the free (`foss`) APK on Debian. The app itself is unchanged.
+
 ## [2.1.0] - 2026-10-17
 
 ### Added

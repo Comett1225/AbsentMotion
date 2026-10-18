@@ -1,0 +1,1 @@
+Build changes only: the app can now be built from source on Linux, which F-Droid needs. The app itself is unchanged.
