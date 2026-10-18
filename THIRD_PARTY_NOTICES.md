@@ -237,8 +237,7 @@ JUnit 4.13.2 (Eclipse Public License 1.0), kXML 2 2.3.0 (`net.sf.kxml:kxml2`, a 
 
 - Components: ML Kit subject segmentation through Google Play services
   (`com.google.android.gms:play-services-mlkit-subject-segmentation:16.0.0-beta1`, used for "Remove Background" on
-  images) and the Google code scanner (`com.google.android.gms:play-services-code-scanner:16.1.0`, used to scan the
-  QR code of the Wi-Fi transfer).
+  images).
 - Licence: proprietary (Google APIs Terms of Service and the ML Kit terms). These libraries are **not** open source.
   The segmentation model is fetched by Google Play services, not by AbsentMotion.
 - Copyright: Google LLC.

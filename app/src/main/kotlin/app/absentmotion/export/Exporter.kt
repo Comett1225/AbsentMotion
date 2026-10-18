@@ -37,10 +37,13 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
                         exportVideo(engine, scene, xml, s, out, ExportAudio.mixFor?.invoke(scene), progress)
                     }
                     ExportKind.Gif -> viaCache(saved, name, "gif", "image/gif", "Pictures/$AppFolder") { out -> gif(scene, xml, s, out, progress) }
-                    ExportKind.Frame -> single(saved, name, "png", "image/png", "Pictures/$AppFolder") { out ->
-                        engine.exportSession(xml) {
-                            val bytes = still(scene.frameStart(frame), scene.width, scene.height) ?: error("The engine could not draw the frame")
-                            out.write(encode(bytes, scene.width, scene.height, ImageKind.Png, reuse = null))
+                    ExportKind.Frame, ExportKind.FrameAs -> {
+                        val shape = if (kind == ExportKind.Frame) s.copy(image = ImageKind.Png) else s
+                        single(saved, name, shape.image.ext, shape.image.mime, "Pictures/$AppFolder") { out ->
+                            engine.exportSession(xml) {
+                                val bytes = still(scene.frameStart(frame), scene.width, scene.height) ?: error("The engine could not draw the frame")
+                                out.write(encode(bytes, scene.width, scene.height, shape, reuse = null))
+                            }
                         }
                     }
                     ExportKind.Xml -> single(saved, name, "xml", "text/xml", "Documents/$AppFolder") { it.write(xml.toByteArray()) }
@@ -101,7 +104,7 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
                 for (k in 0 until frames) {
                     currentCoroutineContext().ensureActive()
                     val pixels = still(frameTimeMs(scene, s.fps, k), width, height) ?: error("The engine could not draw frame $k")
-                    val bytes = withContext(Dispatchers.Default) { encode(pixels, width, height, s.image, bitmap) }
+                    val bytes = withContext(Dispatchers.Default) { encode(pixels, width, height, s, bitmap) }
                     save(saved, name, "frame_%05d.${s.image.ext}".format(k + 1), s.image.mime) { it.write(bytes) }
                     progress((k + 1f) / frames)
                 }
@@ -116,8 +119,8 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
         writeProjectPackage(scene, xml, out.outputStream(), access, { uri -> runCatching { context.contentResolver.openInputStream(Uri.parse(uri)) }.getOrNull() }, progress)
     }
 
-    private fun encode(pixels: ByteArray, width: Int, height: Int, kind: ImageKind, reuse: Bitmap?): ByteArray {
-        return app.absentmotion.platform.encodeRgba(pixels, width, height, kind, reuse)
+    private fun encode(pixels: ByteArray, width: Int, height: Int, settings: ExportSettings, reuse: Bitmap?): ByteArray {
+        return app.absentmotion.platform.encodeRgba(pixels, width, height, settings, reuse)
     }
 }
 

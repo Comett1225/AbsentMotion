@@ -84,7 +84,6 @@ class MainActivity : ComponentActivity() {
         }
         if (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0) handleTestIntent()
         importShared()
-        if (savedInstanceState == null) takeTransferLink(intent)
         setContent {
             val open = editor
             val light = if (open == null && editingTemplate == null) Am.homeIsLight else Am.editorIsLight
@@ -114,7 +113,6 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                         exportingFromList?.let { ExportScreen(it, 0, engine, fromProjectList = true) { exportingFromList = null } }
-                        transferLink?.let { link -> app.absentmotion.transfer.PhoneTransferDialog(link) { transferLink = null } }
                     }
                 } else {
                     Box(Modifier.fillMaxSize()) {
@@ -128,12 +126,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private var transferLink by mutableStateOf<String?>(null)
 
-    private fun takeTransferLink(from: Intent) {
-        if (!app.absentmotion.transfer.SEND_TO_MAC_ENABLED) return
-        from.data?.takeIf { it.scheme == "absentmotion" && it.host == "transfer" }?.let { transferLink = it.toString() }
-    }
 
     private fun importShared() {
         val uris = ImportHandOff.take().map(Uri::parse)
@@ -235,16 +228,17 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun exportForTest(kindName: String, scene: Scene, frame: Int) {
-        val kind = mapOf("video" to ExportKind.Video, "gif" to ExportKind.Gif, "frame" to ExportKind.Frame, "sequence" to ExportKind.Sequence,
+        val kind = mapOf("video" to ExportKind.Video, "gif" to ExportKind.Gif, "frame" to ExportKind.Frame, "frameas" to ExportKind.FrameAs, "sequence" to ExportKind.Sequence,
             "xml" to ExportKind.Xml, "package" to ExportKind.Package)[kindName] ?: run { Log.e("AMExport", "unknown kind $kindName"); return }
         var s = defaultSettings(kind, scene)
         intent.takeIf { it.hasExtra("short") }?.let { s = s.copy(shortSide = it.getIntExtra("short", s.shortSide)) }
         intent.takeIf { it.hasExtra("fps") }?.let { s = s.copy(fps = it.getIntExtra("fps", s.fps)) }
         intent.getStringExtra("codec")?.let { name -> app.absentmotion.export.Codec.entries.firstOrNull { it.name.equals(name, true) }?.let { s = s.copy(codec = it) } }
         intent.takeIf { it.hasExtra("quality") }?.let { s = s.copy(quality = it.getFloatExtra("quality", s.quality)) }
-        if (intent.getStringExtra("format") == "jpeg") s = s.copy(image = app.absentmotion.export.ImageKind.Jpeg)
+        intent.getStringExtra("format")?.let { name -> app.absentmotion.export.ImageKind.entries.firstOrNull { it.name.equals(name, true) || it.ext == name }?.let { s = s.copy(image = it) } }
+        intent.takeIf { it.hasExtra("iquality") }?.let { s = s.copy(imageQuality = it.getIntExtra("iquality", s.imageQuality)) }
         val dir = getExternalFilesDir(null)!!
-        val ext = mapOf(ExportKind.Video to "mp4", ExportKind.Gif to "gif", ExportKind.Frame to "png", ExportKind.Xml to "xml", ExportKind.Package to "absproj")
+        val ext = mapOf(ExportKind.Video to "mp4", ExportKind.Gif to "gif", ExportKind.Frame to "png", ExportKind.FrameAs to s.image.ext, ExportKind.Xml to "xml", ExportKind.Package to "absproj")
         val name = if (kind == ExportKind.Sequence) "export.seq" else "export"
         lifecycleScope.launch {
             try {
@@ -259,7 +253,6 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         importShared()
-        takeTransferLink(intent)
         if (intent.hasExtra("xml") && applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0) {
             setIntent(intent)
             handleTestIntent()

@@ -21,9 +21,6 @@ typealias ViewConfiguration = android.view.ViewConfiguration
 val LocalContext get() = androidx.compose.ui.platform.LocalContext
 fun Bitmap.asImageBitmap() = this.androidImageBitmap()
 
-@androidx.compose.runtime.Composable
-fun TransferDialog(onClose: () -> Unit) = app.absentmotion.transfer.PhoneTransferDialog(onClose = onClose)
-
 fun xmlParser() = android.util.Xml.newPullParser()
 @androidx.compose.runtime.Composable
 fun BackHandler(enabled: Boolean = true, onBack: () -> Unit) = androidx.activity.compose.BackHandler(enabled, onBack)
@@ -65,7 +62,6 @@ typealias Toast = android.widget.Toast
 
 fun fontFamily(library: app.absentmotion.fonts.FontLibrary, name: String) = androidx.compose.ui.text.font.FontFamily(library.typeface(name))
 
-fun transferLabel() = "Send to Mac"
 
 fun androidx.compose.ui.graphics.drawscope.DrawScope.drawLiveStroke(path: DrawPath, filled: Boolean, color: Int, width: Float, opacity: Float, matrix: Matrix, eraser: Boolean) {
     drawIntoCanvas { canvas ->
@@ -119,12 +115,21 @@ fun wheel(onScroll: (delta: androidx.compose.ui.geometry.Offset, at: androidx.co
 
 fun makeBitmap(width: Int, height: Int): Bitmap = android.graphics.Bitmap.createBitmap(width, height, android.graphics.Bitmap.Config.ARGB_8888)
 fun recycleBitmap(bitmap: Bitmap) = bitmap.recycle()
-fun encodeRgba(pixels: ByteArray, width: Int, height: Int, kind: app.absentmotion.export.ImageKind, reuse: Bitmap?): ByteArray {
+fun encodeRgba(pixels: ByteArray, width: Int, height: Int, settings: app.absentmotion.export.ExportSettings, reuse: Bitmap?): ByteArray {
+    val kind = settings.image
+    val source = if (kind.alpha) pixels else app.absentmotion.export.ImageEncode.flatten(pixels, settings.background)
+    if (kind == app.absentmotion.export.ImageKind.Bmp) return app.absentmotion.export.ImageEncode.bmp(source, width, height)
     val bitmap = reuse ?: makeBitmap(width, height)
     bitmap.isPremultiplied = false
-    bitmap.copyPixelsFromBuffer(java.nio.ByteBuffer.wrap(pixels))
+    bitmap.copyPixelsFromBuffer(java.nio.ByteBuffer.wrap(source))
     val out = java.io.ByteArrayOutputStream(pixels.size / 4)
-    bitmap.compress(if (kind == app.absentmotion.export.ImageKind.Png) android.graphics.Bitmap.CompressFormat.PNG else android.graphics.Bitmap.CompressFormat.JPEG, if (kind == app.absentmotion.export.ImageKind.Png) 100 else 95, out)
+    val format = when (kind) {
+        app.absentmotion.export.ImageKind.Jpeg -> android.graphics.Bitmap.CompressFormat.JPEG
+        app.absentmotion.export.ImageKind.Webp -> android.graphics.Bitmap.CompressFormat.WEBP_LOSSY
+        app.absentmotion.export.ImageKind.WebpLossless -> android.graphics.Bitmap.CompressFormat.WEBP_LOSSLESS
+        else -> android.graphics.Bitmap.CompressFormat.PNG
+    }
+    bitmap.compress(format, if (kind.lossy) settings.imageQuality else 100, out)
     if (reuse == null) bitmap.recycle()
     return out.toByteArray()
 }

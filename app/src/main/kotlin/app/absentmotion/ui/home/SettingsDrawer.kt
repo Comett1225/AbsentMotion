@@ -59,7 +59,6 @@ private val ChosenRow get() = Am.NavyHi
 
 @Composable
 fun SettingsDrawer(settings: AppSettings) {
-    var transfer by remember { mutableStateOf(false) }
     var about by remember { mutableStateOf(false) }
     var demoNote by remember { mutableStateOf(false) }
     ModalDrawerSheet(
@@ -89,15 +88,10 @@ fun SettingsDrawer(settings: AppSettings) {
                 Spacer(Modifier.height(8.dp))
             }
             Spacer(Modifier.height(15.dp))
-            if (app.absentmotion.transfer.SEND_TO_MAC_ENABLED) {
-                LinkRow(app.absentmotion.platform.transferLabel()) { transfer = true }
-                Spacer(Modifier.height(8.dp))
-            }
             LinkRow("About") { about = true }
             CaptionModelRow()
         }
     }
-    if (transfer) app.absentmotion.platform.TransferDialog { transfer = false }
     if (about) AboutScreen { about = false }
     if (demoNote) AlertDialog(
         onDismissRequest = { demoNote = false },

@@ -97,7 +97,7 @@ internal fun ExportMediaPreview(kind: ExportKind, uris: List<Uri>) {
     when(kind) {
         ExportKind.Video -> VideoPreview(uris.first())
         ExportKind.Gif -> GifPreview(uris.first())
-        ExportKind.Frame -> StillImage(uris.first())
+        ExportKind.Frame, ExportKind.FrameAs -> StillImage(uris.first())
         ExportKind.Sequence -> SequencePreview(uris)
         ExportKind.Package, ExportKind.Xml -> FilePreview(uris.first())
     }

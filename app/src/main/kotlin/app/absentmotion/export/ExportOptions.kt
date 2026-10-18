@@ -6,7 +6,7 @@ import java.util.Locale
 import kotlin.math.pow
 import kotlin.math.roundToInt
 
-enum class ExportKind { Video, Package, Frame, Sequence, Gif, Xml }
+enum class ExportKind { Video, Package, Frame, FrameAs, Sequence, Gif, Xml }
 
 data class Resolution(val label: String, val shortSide: Int)
 
@@ -33,9 +33,17 @@ val AvailableCodecs: List<Codec> by lazy {
     app.absentmotion.platform.availableCodecs()
 }
 
-enum class ImageKind(val label: String, val ext: String, val mime: String) {
-    Png("PNG", "png", "image/png"), Jpeg("JPEG", "jpg", "image/jpeg"),
+enum class ImageKind(val label: String, val ext: String, val mime: String, val alpha: Boolean, val lossy: Boolean, val bytesPerPixel: Double) {
+    Png("PNG", "png", "image/png", true, false, 0.8),
+    Jpeg("JPEG", "jpg", "image/jpeg", false, true, 0.2),
+    Webp("WebP", "webp", "image/webp", true, true, 0.12),
+    WebpLossless("WebP lossless", "webp", "image/webp", true, false, 0.5),
+    Bmp("BMP", "bmp", "image/bmp", false, false, 3.0),
 }
+
+val ImageQualities = listOf(50, 70, 85, 95, 100)
+const val BackgroundWhite = 0xFFFFFFFF.toInt()
+const val BackgroundBlack = 0xFF000000.toInt()
 
 data class ExportSettings(
     val shortSide: Int,
@@ -43,6 +51,8 @@ data class ExportSettings(
     val codec: Codec = Codec.H264,
     val quality: Float = 0.5f,
     val image: ImageKind = ImageKind.Png,
+    val imageQuality: Int = 95,
+    val background: Int = BackgroundWhite,
 )
 
 fun defaultSettings(kind: ExportKind, scene: Scene): ExportSettings = when (kind) {
@@ -51,6 +61,7 @@ fun defaultSettings(kind: ExportKind, scene: Scene): ExportSettings = when (kind
         scene.fps,
     )
     ExportKind.Gif -> ExportSettings(360, 15)
+    ExportKind.FrameAs -> ExportSettings(360, 30, image = ImageKind.Jpeg)
     else -> ExportSettings(360, 30)
 }
 
@@ -81,6 +92,7 @@ fun optionNote(kind: ExportKind, scene: Scene, s: ExportSettings): String? = whe
     ExportKind.Package -> "Keeping Original Media"
     ExportKind.Xml -> "for workflow integrations"
     ExportKind.Frame -> null
+    ExportKind.FrameAs -> s.image.label + if (s.image.lossy) " ${s.imageQuality}%" else ""
 }
 
 fun estimateBytes(kind: ExportKind, scene: Scene, s: ExportSettings, hasAudio: Boolean): Long {
@@ -92,9 +104,10 @@ fun estimateBytes(kind: ExportKind, scene: Scene, s: ExportSettings, hasAudio: B
         }.toLong()
         ExportKind.Gif -> exportSize(scene, s.shortSide, false).let { it.first.toLong() * it.second * frames / 8 }
         ExportKind.Sequence -> exportSize(scene, s.shortSide, false).let {
-            it.first.toLong() * it.second * frames * if (s.image == ImageKind.Png) 0.8 else 0.2
+            (it.first.toLong() * it.second * frames * s.image.bytesPerPixel)
         }.toLong()
-        ExportKind.Frame -> (scene.width.toLong() * scene.height * 0.8).toLong()
+        ExportKind.Frame -> (scene.width.toLong() * scene.height * ImageKind.Png.bytesPerPixel).toLong()
+        ExportKind.FrameAs -> (scene.width.toLong() * scene.height * s.image.bytesPerPixel).toLong()
         ExportKind.Xml -> scene.toXml().length.toLong()
         ExportKind.Package -> scene.toXml().length + scene.node.mediaUris().sumOf { (scene.media(it)?.size ?: 0).coerceAtLeast(0) }
     }

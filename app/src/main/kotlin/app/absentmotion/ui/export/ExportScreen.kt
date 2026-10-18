@@ -77,7 +77,10 @@ import app.absentmotion.export.ExportSettings
 import app.absentmotion.export.Exporter
 import app.absentmotion.export.GifFrameRates
 import app.absentmotion.export.GifResolutions
+import app.absentmotion.export.BackgroundBlack
+import app.absentmotion.export.BackgroundWhite
 import app.absentmotion.export.ImageKind
+import app.absentmotion.export.ImageQualities
 import app.absentmotion.export.MediaStoreExport
 import app.absentmotion.export.VideoFrameRates
 import app.absentmotion.export.VideoResolutions
@@ -126,7 +129,7 @@ fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromProjectList
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val exporter = remember { Exporter(context, engine, MediaStoreExport(context)) }
-    val kinds = remember { listOf(ExportKind.Video, ExportKind.Package, ExportKind.Frame, ExportKind.Sequence, ExportKind.Gif) + if (fromProjectList) listOf(ExportKind.Xml) else emptyList() }
+    val kinds = remember { listOf(ExportKind.Video, ExportKind.Package, ExportKind.Frame, ExportKind.FrameAs, ExportKind.Sequence, ExportKind.Gif) + if (fromProjectList) listOf(ExportKind.Xml) else emptyList() }
     var kind by remember { mutableStateOf(ExportKind.Video) }
     val settings = remember { mutableStateMapOf<ExportKind, ExportSettings>().apply { ExportKind.entries.forEach { put(it, defaultSettings(it, scene)) } } }
     var page by remember { mutableStateOf<ExportKind?>(null) }
@@ -209,8 +212,8 @@ fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromProjectList
                     val s = settings.getValue(k)
                     OptionCard(
                         selected = kind == k, icon = k.icon(), title = k.title(), note = optionNote(k, scene, s),
-                        right = when (k) { ExportKind.Package -> ExportIcons.Info; ExportKind.Video, ExportKind.Sequence, ExportKind.Gif -> ExportIcons.ChevronRight; else -> null },
-                        onSelect = { kind = k },
+                        right = when (k) { ExportKind.Package -> ExportIcons.Info; ExportKind.Video, ExportKind.FrameAs, ExportKind.Sequence, ExportKind.Gif -> ExportIcons.ChevronRight; else -> null },
+                        onSelect = { kind = k; if (k == ExportKind.FrameAs) page = k },
                         onRight = { if (k == ExportKind.Package) packageInfo = true else { kind = k; page = k } },
                         modifier = Modifier.enterFade(10.dp, minOf(i, 6) * 30),
                         below = if (k == ExportKind.Video) { { ResolutionDropdown(s.shortSide) { kind = k; settings[k] = s.copy(shortSide = it) } } } else null,
@@ -227,7 +230,7 @@ fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromProjectList
                 { settings[ExportKind.Video] = it }, { page = null }, ::start,
             )
         }
-        Presence(page == ExportKind.Gif || page == ExportKind.Sequence) {
+        Presence(page == ExportKind.Gif || page == ExportKind.Sequence || page == ExportKind.FrameAs) {
             val shown = lastPage
             Box(Modifier.fillMaxSize().presenceScrim(Color(0x66000000)).clickable(indication = null, interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }) { page = null }) {
                 Column(
@@ -286,6 +289,7 @@ private fun ExportKind.title() = when (this) {
     ExportKind.Video -> "Video"
     ExportKind.Package -> "Project Bundle"
     ExportKind.Frame -> "Current Frame as PNG"
+    ExportKind.FrameAs -> "Current Frame as…"
     ExportKind.Sequence -> "Image Sequence"
     ExportKind.Gif -> "GIF"
     ExportKind.Xml -> "XML"
@@ -294,7 +298,7 @@ private fun ExportKind.title() = when (this) {
 private fun ExportKind.icon(): ImageVector? = when (this) {
     ExportKind.Video -> ExportIcons.Video
     ExportKind.Package -> ExportIcons.Package
-    ExportKind.Frame -> ExportIcons.Frame
+    ExportKind.Frame, ExportKind.FrameAs -> ExportIcons.Frame
     ExportKind.Sequence -> ExportIcons.Sequence
     ExportKind.Gif -> null
     ExportKind.Xml -> ExportIcons.Xml
@@ -512,8 +516,17 @@ private fun ExportSlider(value: Float, onChange: (Float) -> Unit) {
 @Composable
 private fun OptionsPage(kind: ExportKind, scene: Scene, s: ExportSettings, onChange: (ExportSettings) -> Unit) {
     val rates = (if (kind == ExportKind.Gif) GifFrameRates else (VideoFrameRates + scene.fps)).distinct().sorted()
-    if (kind == ExportKind.Sequence) {
+    if (kind == ExportKind.Sequence || kind == ExportKind.FrameAs) {
         Group("Format") { ImageKind.entries.forEach { Chip(it.label, s.image == it) { onChange(s.copy(image = it)) } } }
+        if (s.image.lossy) Group("Quality") { ImageQualities.forEach { Chip("$it%", s.imageQuality == it) { onChange(s.copy(imageQuality = it)) } } }
+        if (!s.image.alpha) Group("Transparent areas become") {
+            Chip("White", s.background == BackgroundWhite) { onChange(s.copy(background = BackgroundWhite)) }
+            Chip("Black", s.background == BackgroundBlack) { onChange(s.copy(background = BackgroundBlack)) }
+        }
+    }
+    if (kind == ExportKind.FrameAs) {
+        Text("${scene.width}x${scene.height}", color = NoteGrey, fontSize = 14.sp)
+        return
     }
     Group(if (kind == ExportKind.Gif) "Size" else "Resolution") {
         (if (kind == ExportKind.Gif) GifResolutions else VideoResolutions).forEach { Chip(it.label, s.shortSide == it.shortSide) { onChange(s.copy(shortSide = it.shortSide)) } }

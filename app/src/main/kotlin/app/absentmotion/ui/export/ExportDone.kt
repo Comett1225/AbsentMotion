@@ -44,7 +44,7 @@ private fun shareLabel(kind: ExportKind) = when (kind) {
     ExportKind.Video -> "Share video"
     ExportKind.Gif -> "Share Gif"
     ExportKind.Sequence -> "Share Frame Sequence"
-    ExportKind.Frame -> "Share Image"
+    ExportKind.Frame, ExportKind.FrameAs -> "Share Image"
     ExportKind.Xml -> "Share Project XML"
     ExportKind.Package -> "Share"
 }
