@@ -1,0 +1,27 @@
+{
+ "id": "emboss",
+ "name": "Emboss",
+ "category": "stylize",
+ "description": "Applies an emboss effect using luminance gradients along a specified light angle.",
+ "params": [
+  {
+   "id": "angle",
+   "label": "Light Angle",
+   "type": "float",
+   "default": 45.0,
+   "min": 0.0,
+   "max": 360.0,
+   "step": 1.0
+  },
+  {
+   "id": "strength",
+   "label": "Strength",
+   "type": "float",
+   "default": 1.0,
+   "min": 0.0,
+   "max": 4.0,
+   "step": 0.1
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float angle;\nuniform float strength;\n\nhalf4 main(float2 coord) {\n    half4 current = image.eval(coord);\n    float aCurrent = current.a;\n    if (aCurrent < 1e-5) {\n        return current;\n    }\n    half3 rgbCur = current.rgb / aCurrent;\n\n    float rad = radians(angle);\n    half2 dir = half2(cos(rad), sin(rad));\n    half2 sampleCoord = coord + dir;\n\n    half4 neighbor = image.eval(sampleCoord);\n    half3 rgbNeighbor;\n    float aNeighbor = neighbor.a;\n    if (aNeighbor < 1e-5) {\n        rgbNeighbor = half3(0.0);\n    } else {\n        rgbNeighbor = neighbor.rgb / aNeighbor;\n    }\n\n    half lumCur = dot(rgbCur, half3(0.299, 0.587, 0.114));\n    half lumN = dot(rgbNeighbor, half3(0.299, 0.587, 0.114));\n    half delta = lumN - lumCur;\n    half val = 0.5 + delta * strength;\n    val = clamp(val, 0.0, 1.0);\n\n    half3 outRgb = half3(val);\n    return half4(outRgb * aCurrent, aCurrent);\n}"
+}

@@ -1,0 +1,55 @@
+package app.absentmotion.model
+
+@JvmInline
+value class MediaDeclaration(val node: XmlNode) {
+    val uri: String get() = node["uri"] ?: ""
+    val filename: String get() = node["filename"] ?: ""
+    val title: String get() = node["title"] ?: filename
+    val type: String get() = node["type"] ?: ""
+    val size: Long get() = node["size"]?.toLongOrNull() ?: -1
+    val orientation: Int get() = node["orientation"]?.toIntOrNull() ?: 0
+    val infoUpdated: Long get() = node["infoUpdated"]?.toLongOrNull() ?: 0
+    val width: Int get() = node["width"]?.toIntOrNull() ?: 0
+    val height: Int get() = node["height"]?.toIntOrNull() ?: 0
+    val duration: Long get() = node["duration"]?.toLongOrNull() ?: -1
+    val fps: Float? get() = node["fps"]?.toFloatOrNull()
+}
+
+enum class MediaFillMode(val xml: String) { Fill("fill"), Fit("fit"), Stretch("stretch") }
+
+data class MediaFill(
+    val uri: String,
+    val video: Boolean = false,
+    val mode: MediaFillMode = MediaFillMode.Fill,
+    val inTime: Int = 0,
+    val outTime: Int = Int.MAX_VALUE,
+    val speed: Float = 1f,
+)
+
+fun XmlNode.mediaUris(): Set<String> = buildSet {
+    fun walk(n: XmlNode) {
+        if (n.name != "media") {
+            listOf("fillImage", "fillVideo", "src").forEach { key -> n[key]?.let { add(it) } }
+            n.children.forEach(::walk)
+        }
+    }
+    walk(this@mediaUris)
+}
+
+fun XmlNode.imageUris(): Set<String> = buildSet {
+    fun walk(n: XmlNode) {
+        n["fillImage"]?.let { add(it) }
+        n.children.forEach(::walk)
+    }
+    walk(this@imageUris)
+}
+
+fun XmlNode.mapMediaUris(change: (String) -> String): XmlNode {
+    val keys = if (name == "media") listOf("uri") else listOf("fillImage", "fillVideo", "src")
+    val self = keys.fold(this) { node, key -> node[key]?.let { node.with(key, change(it)) } ?: node }
+    return self.copy(children = children.map { it.mapMediaUris(change) })
+}
+
+fun Scene.replaceMedia(old: String, with: MediaDeclaration): Scene =
+    Scene(node.copy(children = node.children.filterNot { it.name == "media" && it["uri"] == old })
+        .mapMediaUris { if (it == old) with.uri else it }).withMedia(with)

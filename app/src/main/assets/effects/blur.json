@@ -1,0 +1,18 @@
+{
+ "id": "blur",
+ "name": "Blur",
+ "category": "blur",
+ "native": true,
+ "description": "A smooth, even blur.",
+ "params": [
+  {
+   "id": "strength",
+   "label": "Strength",
+   "type": "float",
+   "default": 10,
+   "min": 0,
+   "max": 300,
+   "step": 0.1
+  }
+ ]
+}

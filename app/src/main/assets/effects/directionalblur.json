@@ -1,0 +1,27 @@
+{
+ "id": "directionalblur",
+ "name": "Directional Blur",
+ "category": "blur",
+ "description": "Motion blur by averaging samples along a directional angle.",
+ "params": [
+  {
+   "id": "blurLength",
+   "label": "Length",
+   "type": "float",
+   "default": 20,
+   "min": 0,
+   "max": 200,
+   "step": 1
+  },
+  {
+   "id": "angle",
+   "label": "Angle",
+   "type": "angle",
+   "default": 0,
+   "min": 0,
+   "max": 360,
+   "step": 1
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float blurLength;\nuniform float angle;\n\nhalf4 main(float2 coord) {\n    float rad = radians(angle);\n    float2 dir = float2(cos(rad), sin(rad));\n    half4 accum = half4(0.0);\n    for (int i = 0; i < 32; ++i) {\n        float t = float(i) / 31.0;\n        float2 offset = dir * t * blurLength;\n        float2 sampleCoord = coord - offset;\n        half4 c = image.eval(sampleCoord);\n        float a = c.a;\n        if (a > 0.001) {\n            c.rgb /= a;\n        }\n        accum += c;\n    }\n    accum /= 32.0;\n    accum.rgb *= accum.a;\n    return accum;\n}"
+}

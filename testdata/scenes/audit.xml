@@ -1,0 +1,143 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<scene title="Audit" width="1080" height="1920" exportWidth="1080" exportHeight="1920" precompose="dynamicResolution" bgcolor="#ff101018" totalTime="3015" fps="60" am="app.absentmotion" amplatform="android" retime="freeze" retimeAdaptFPS="false">
+  <bookmark t="500" />
+  <bookmark t="1516" />
+  <bookmark t="2500" />
+  <shape id="4001" label="Backdrop" startTime="0" endTime="3015" fillType="color" mediaFillMode="fill" s=".rect" tag="+gray">
+    <transform>
+      <location value="540.000000,960.000000,0.000000" />
+    </transform>
+    <fillColor value="#ff12151f" />
+    <property name="size" type="vec2" value="540.000000,960.000000" />
+  </shape>
+  <shape id="4002" label="Mover" startTime="0" endTime="3015" fillType="color" mediaFillMode="fill" s=".rect" tag="+red">
+    <transform>
+      <location>
+        <kf t="0.000000" v="200.000000,400.000000,0.000000" />
+        <kf t="0.500000" v="880.000000,400.000000,0.000000" e="cubicBezier 0.42 0 0.58 1" />
+        <kf t="1.000000" v="200.000000,700.000000,0.000000" e="bounce 0.3 0.8" />
+      </location>
+      <pivot>
+        <kf t="0.000000" v="0.000000,0.000000" />
+        <kf t="1.000000" v="20.000000,-20.000000" e="step 0.25 0" />
+      </pivot>
+      <scale>
+        <kf t="0.000000" v="1.000000,1.000000" />
+        <kf t="0.500000" v="1.600000,0.600000" e="elastic 0.25 1 0.5 1" />
+        <kf t="1.000000" v="1.000000,1.000000" e="reverse bounce 0.3 0.8" />
+      </scale>
+      <rotation>
+        <kf t="0.000000" v="0.000000" />
+        <kf t="1.000000" v="-360.000000" e="cyclic 0.2857143 0 0.5 0 0" />
+      </rotation>
+      <skew>
+        <kf t="0.000000" v="0.000000,0.000000" />
+        <kf t="1.000000" v="0.300000,0.000000" e="random 0.5 0.5 0.5 0.5 0.5 0" />
+      </skew>
+      <opacity>
+        <kf t="0.000000" v="1.000000" />
+        <kf t="0.500000" v="0.400000" e="elasticStep 0.2 0.5" />
+        <kf t="1.000000" v="1.000000" e="local cubicBezier 0.25 0.1 0.25 1" />
+      </opacity>
+    </transform>
+    <fillColor value="#ffee4767" />
+    <property name="size" type="vec2" value="100.000000,100.000000" />
+  </shape>
+  <nullobj id="4003" label="Parent" startTime="0" endTime="3015" tag="+blue">
+    <transform>
+      <location>
+        <kf t="0.000000" v="300.000000,1100.000000,0.000000" />
+        <kf t="1.000000" v="780.000000,1100.000000,0.000000" />
+      </location>
+      <rotation>
+        <kf t="0.000000" v="0.000000" />
+        <kf t="1.000000" v="-90.000000" e="cubicBezier 0.42 0 0.58 1" />
+      </rotation>
+    </transform>
+  </nullobj>
+  <shape id="4004" label="Child" startTime="0" endTime="3015" fillType="color" mediaFillMode="fill" s=".circle" tag="+green" parent="4003">
+    <transform>
+      <location value="150.000000,0.000000,0.000000" />
+      <scale>
+        <kf t="0.000000" v="1.000000,1.000000" />
+        <kf t="1.000000" v="0.500000,0.500000" e="step 0.25 0" />
+      </scale>
+    </transform>
+    <fillColor value="#ff52ccbc" />
+    <property name="size" type="vec2" value="40.000000,40.000000" />
+  </shape>
+  <shape id="4005" label="Hidden mover" startTime="0" endTime="3015" fillType="color" mediaFillMode="fill" s=".star" tag="+purple" hidden="true">
+    <transform>
+      <location>
+        <kf t="0.000000" v="540.000000,1300.000000,0.000000" />
+        <kf t="1.000000" v="540.000000,1500.000000,0.000000" e="reverse cubicBezier 0.42 0 1 1" />
+      </location>
+    </transform>
+    <fillColor value="#ff9621f0" />
+  </shape>
+  <shape id="4006" label="Split A" startTime="0" endTime="1515" fillType="color" mediaFillMode="fill" s=".circle" tag="+yellow">
+    <transform>
+      <location>
+        <kf t="0.000000" v="150.000000,1650.000000,0.000000" />
+        <kf t="1.000000" v="540.000000,1650.000000,0.000000" e="cubicBezier 0.42 0 0.58 1" />
+      </location>
+    </transform>
+    <fillColor value="#fffad961" />
+    <property name="size" type="vec2" value="50.000000,50.000000" />
+  </shape>
+  <shape id="4007" label="Split B" startTime="1516" endTime="3015" fillType="color" mediaFillMode="fill" s=".circle" tag="+yellow">
+    <transform>
+      <location>
+        <kf t="0.000000" v="540.000000,1650.000000,0.000000" />
+        <kf t="1.000000" v="930.000000,1650.000000,0.000000" e="cubicBezier 0.42 0 0.58 1" />
+      </location>
+    </transform>
+    <fillColor value="#fffad961" />
+    <property name="size" type="vec2" value="50.000000,50.000000" />
+  </shape>
+  <embedScene id="4008" label="Group" startTime="0" endTime="3015" tag="+orange">
+    <transform>
+      <location value="540.000000,960.000000,0.000000" />
+    </transform>
+    <scene title="" width="1080" height="1920" exportWidth="1080" exportHeight="1920" bgcolor="#00000000" totalTime="3015" fps="60" retime="off">
+      <shape id="5001" label="Inner mover" startTime="0" endTime="3015" fillType="color" mediaFillMode="fill" s=".rect">
+        <transform>
+          <location>
+            <kf t="0.000000" v="300.000000,300.000000,0.000000" />
+            <kf t="1.000000" v="780.000000,300.000000,0.000000" e="cubicBezier 0.42 0 0.58 1" />
+          </location>
+          <rotation>
+            <kf t="0.000000" v="0.000000" />
+            <kf t="1.000000" v="-180.000000" e="bounce 0.3 0.8" />
+          </rotation>
+        </transform>
+        <fillColor value="#fffaa261" />
+        <property name="size" type="vec2" value="60.000000,60.000000" />
+      </shape>
+      <shape id="5002" label="Inner child" startTime="0" endTime="3015" fillType="color" mediaFillMode="fill" s=".circle" parent="5001">
+        <transform>
+          <location value="120.000000,0.000000,0.000000" />
+        </transform>
+        <fillColor value="#ff46a7ee" />
+        <property name="size" type="vec2" value="25.000000,25.000000" />
+      </shape>
+    </scene>
+  </embedScene>
+  <embedScene id="4009" label="Element instance" startTime="0" endTime="3015" link="9a1d3c52-6f1e-4b0b-8a57-3d2f6e0c1a44">
+    <transform>
+      <location value="540.000000,1450.000000,0.000000" />
+    </transform>
+    <scene title="" width="600" height="300" exportWidth="600" exportHeight="300" bgcolor="#00000000" totalTime="1500" fps="60" type="element" retime="loop" retimeIn="500" retimeOut="1000" precompose="dynamicResolution">
+      <shape id="6001" label="Element dot" startTime="0" endTime="1499" fillType="color" mediaFillMode="fill" s=".circle">
+        <transform>
+          <location>
+            <kf t="0.000000" v="100.000000,150.000000,0.000000" />
+            <kf t="1.000000" v="500.000000,150.000000,0.000000" e="bounce 0.3 0.8" />
+          </location>
+        </transform>
+        <fillColor value="#ffd500ff" />
+        <property name="size" type="vec2" value="30.000000,30.000000" />
+      </shape>
+    </scene>
+  </embedScene>
+</scene>

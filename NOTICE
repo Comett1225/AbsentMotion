@@ -1,0 +1,17 @@
+AbsentMotion
+Copyright 2026 The AbsentMotion authors
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+It includes and uses third-party software under its own licences. The components,
+their versions, their licences and their copyright notices are listed in
+THIRD_PARTY_NOTICES.md, which is distributed with the app.
+
+Apache-2.0 components that are bundled or linked (their licence text is the
+LICENSE file of this repository): AndroidX Compose, kotlinx.coroutines, Wuffs
+and the Android NDK's cpu-features.
+Checked on 2026-10-18: Wuffs ships no NOTICE file, so there is no upstream
+NOTICE text to reproduce here.
+Not yet checked: the NOTICE files of the Android build's AndroidX and
+kotlinx.coroutines artifacts and of the Android NDK. Their NOTICE text, if any,
+is not reproduced here.

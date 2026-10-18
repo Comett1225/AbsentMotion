@@ -1,0 +1,286 @@
+package app.absentmotion
+
+import androidx.core.content.FileProvider
+import android.content.ClipData
+import android.content.Intent
+import android.content.pm.ApplicationInfo
+import android.net.Uri
+import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.SystemBarStyle
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.LocalIndication
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.lifecycleScope
+import app.absentmotion.editor.EditorState
+import app.absentmotion.editor.MultiSelect
+import app.absentmotion.engine.EngineThread
+import app.absentmotion.library.AppSettings
+import app.absentmotion.library.ImportReport
+import app.absentmotion.library.Importer
+import app.absentmotion.library.MediaRelink
+import app.absentmotion.library.ProjectStore
+import app.absentmotion.library.TemplateStore
+import app.absentmotion.model.Layer
+import app.absentmotion.model.XmlNode
+import app.absentmotion.model.formatFloats
+import app.absentmotion.ui.home.EmbedRequest
+import app.absentmotion.ui.home.TemplateEditor
+import app.absentmotion.model.Scene
+import app.absentmotion.model.ShapeCatalog
+import app.absentmotion.export.ExportKind
+import app.absentmotion.export.ExportSettings
+import app.absentmotion.export.Exporter
+import app.absentmotion.export.FolderExport
+import app.absentmotion.export.defaultSettings
+import app.absentmotion.ui.editor.EditorScreen
+import app.absentmotion.ui.export.ExportScreen
+import app.absentmotion.ui.home.HomeScreen
+import app.absentmotion.ui.theme.PressIndication
+import app.absentmotion.ui.theme.enterFade
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
+import app.absentmotion.ui.theme.Am
+
+class MainActivity : ComponentActivity() {
+    private lateinit var store: ProjectStore
+    private lateinit var settings: AppSettings
+    private lateinit var templates: TemplateStore
+    private val engine by lazy { EngineThread(background = Am.PreviewBg.toArgb(), context = applicationContext) }
+    private var editor by mutableStateOf<EditorState?>(null)
+    private var closingEditor = false
+    private var cameFromEditor = false
+    private var exportingFromList by mutableStateOf<Scene?>(null)
+    private var imported by mutableStateOf<List<ImportReport>>(emptyList())
+    private var editingTemplate by mutableStateOf<String?>(null)
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
+        super.onCreate(savedInstanceState)
+        store = ProjectStore(this)
+        settings = AppSettings(this)
+        templates = TemplateStore(this)
+        ShapeCatalog.load(this)
+        app.absentmotion.editor.ElementNav.open = { id ->
+            editor?.let { it.playing = false; it.endGesture() }
+            MultiSelect.clear()
+            open(id)
+        }
+        if (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0) handleTestIntent()
+        importShared()
+        if (savedInstanceState == null) takeTransferLink(intent)
+        setContent {
+            val open = editor
+            val light = if (open == null && editingTemplate == null) Am.homeIsLight else Am.editorIsLight
+            LaunchedEffect(light) {
+                val transparent = android.graphics.Color.TRANSPARENT
+                enableEdgeToEdge(if (light) SystemBarStyle.light(transparent, transparent) else SystemBarStyle.dark(transparent))
+            }
+            val density = LocalDensity.current.density
+            val editorPress = remember(Am.PressEditor) { PressIndication(Am.PressEditor) }
+            val homePress = remember(Am.PressHome) { PressIndication(Am.PressHome) }
+            CompositionLocalProvider(LocalIndication provides if (open == null) homePress else editorPress, LocalDensity provides remember(density) { Density(density, 1f) }) {
+                if (open == null) {
+                    val returning = remember { cameFromEditor }
+                    Box(Modifier.fillMaxSize().then(if (returning) Modifier.enterFade() else Modifier)) {
+                        HomeScreen(
+                            store, settings, onOpen = ::open, onExport = { id -> exportingFromList = loadRelinked(id) },
+                            imported = imported, onImportShown = { imported = emptyList() }, onImportFile = { importUris(listOf(it)) },
+                            onTemplate = { editingTemplate = it },
+                        )
+                        editingTemplate?.let { id ->
+                            TemplateEditor(id, engine, settings, onClose = { editingTemplate = null }) { scene ->
+                                lifecycleScope.launch {
+                                    val project = withContext(Dispatchers.IO) { templates.createProject(scene, store) }
+                                    editingTemplate = null
+                                    open(project)
+                                }
+                            }
+                        }
+                        exportingFromList?.let { ExportScreen(it, 0, engine, fromProjectList = true) { exportingFromList = null } }
+                        transferLink?.let { link -> app.absentmotion.transfer.PhoneTransferDialog(link) { transferLink = null } }
+                    }
+                } else {
+                    Box(Modifier.fillMaxSize()) {
+                        val embed = EmbedRequest.templateId
+                        if (embed != null) TemplateEditor(embed, engine, settings, onClose = { endEmbed(open) }) { scene -> embedTemplate(open, scene) }
+                        else EditorScreen(open, onExit = ::closeEditor)
+                        if (open.exportOpen) ExportScreen(open.scene, open.frame, engine, fromProjectList = false) { open.exportOpen = false }
+                    }
+                }
+            }
+        }
+    }
+
+    private var transferLink by mutableStateOf<String?>(null)
+
+    private fun takeTransferLink(from: Intent) {
+        if (!app.absentmotion.transfer.SEND_TO_MAC_ENABLED) return
+        from.data?.takeIf { it.scheme == "absentmotion" && it.host == "transfer" }?.let { transferLink = it.toString() }
+    }
+
+    private fun importShared() {
+        val uris = ImportHandOff.take().map(Uri::parse)
+        if (uris.isNotEmpty()) importUris(uris)
+    }
+
+    private fun importUris(uris: List<Uri>) {
+        lifecycleScope.launch {
+            val reports = ArrayList<ImportReport>()
+            var failure: String? = null
+            withContext(Dispatchers.IO) {
+                val importer = Importer.forApp(applicationContext, store)
+                for (uri in uris) try {
+                    reports += importer.import { contentResolver.openInputStream(uri) }.map {
+                        if (!it.template) it else templates.adopt(store, it.id, engine)?.let { id -> it.copy(id = id) } ?: it.copy(template = false)
+                    }
+                } catch (e: Exception) {
+                    Log.w("AMImport", "cannot import $uri", e)
+                    failure = failure ?: e.message ?: "Unsupported file type"
+                }
+            }
+            failure?.let { Toast.makeText(this@MainActivity, "Import Failed\n$it", Toast.LENGTH_LONG).show() }
+            if (reports.isNotEmpty()) imported = reports
+        }
+    }
+
+    private fun endEmbed(state: EditorState) {
+        EmbedRequest.templateId = null
+        engine.setScene(state.scene.toXml())
+    }
+
+    private fun embedTemplate(state: EditorState, template: Scene) {
+        lifecycleScope.launch {
+            val local = withContext(Dispatchers.IO) { templates.localize(template, store.mediaDir(state.projectId)) }
+            val start = state.scene.frameStart(state.frame)
+            val id = Layer.newId()
+            val inner = local.node.copy(children = local.node.children.filterNot { it.name == "media" })
+            val layer = Layer(XmlNode("embedScene", linkedMapOf("id" to "$id", "label" to local.title.ifBlank { "Template" }, "startTime" to "$start", "endTime" to "${start + local.totalTime}"),
+                listOf(XmlNode("transform", children = listOf(XmlNode("location", mapOf("value" to formatFloats(floatArrayOf(state.scene.width / 2f, state.scene.height / 2f, 0f)))))), inner)))
+            state.edit { it.add(layer, local.media) }
+            state.selectedId = id
+            endEmbed(state)
+        }
+    }
+
+    private fun loadRelinked(id: String): Scene? = store.load(id)?.let { scene ->
+        MediaRelink.relink(this, scene).also { if (it != scene) store.save(id, it) }
+    }
+
+    private fun open(id: String) {
+        cameFromEditor = true
+        editor = loadRelinked(id)?.let { EditorState(id, it, store, engine, settings) }
+    }
+
+    private fun closeEditor() {
+        val closing = editor ?: return
+        if (closingEditor) return
+        closingEditor = true
+        closing.playing = false
+        closing.endGesture()
+        engine.audio?.release()
+        val scene = closing.scene
+        lifecycleScope.launch {
+            try {
+                val longSide = maxOf(scene.width, scene.height, 1)
+                engine.stillPng(scene.toXml(), closing.timeMs, (256 * scene.width / longSide).coerceAtLeast(1), (256 * scene.height / longSide).coerceAtLeast(1), store.thumbnailFile(closing.projectId))
+            } finally {
+                MultiSelect.clear()
+                editor = null
+                closingEditor = false
+            }
+        }
+    }
+
+    private fun handleTestIntent() {
+        if (intent.getBooleanExtra("audiolog", false)) engine.audio?.log = true
+        if (intent.getBooleanExtra("effectcheck", false)) lifecycleScope.launch {
+            engine.effectCheck(getExternalFilesDir(null)!!)
+            Log.i("AMEffects", "effectcheck.json written")
+        }
+        val path = intent.getStringExtra("xml") ?: return
+        val scene = runCatching { Scene.parse(File(path).readText()) }.getOrElse { Log.e("AMTest", "cannot read $path", it); return }
+        val id = "test-" + File(path).nameWithoutExtension
+        store.save(id, scene)
+        open(id)
+        val state = editor ?: return
+        state.frame = intent.getIntExtra("frame", 0).coerceIn(0, scene.lastFrame)
+        val stillName = intent.getStringExtra("still")
+        intent.getStringExtra("export")?.let { exportForTest(it, scene, state.frame) }
+        lifecycleScope.launch {
+            engine.awaitMedia()
+            engine.awaitVideoFrames(scene, state.timeMs)
+            Log.i("AMTest", "media ready $path")
+            stillName?.let { name ->
+                val ok = engine.stillPng(scene.toXml(), state.timeMs, scene.width, scene.height, File(getExternalFilesDir(null), "$name.png"))
+                Log.i("AMTest", "still $name ok=$ok")
+            }
+        }
+    }
+
+    private fun exportForTest(kindName: String, scene: Scene, frame: Int) {
+        val kind = mapOf("video" to ExportKind.Video, "gif" to ExportKind.Gif, "frame" to ExportKind.Frame, "sequence" to ExportKind.Sequence,
+            "xml" to ExportKind.Xml, "package" to ExportKind.Package)[kindName] ?: run { Log.e("AMExport", "unknown kind $kindName"); return }
+        var s = defaultSettings(kind, scene)
+        intent.takeIf { it.hasExtra("short") }?.let { s = s.copy(shortSide = it.getIntExtra("short", s.shortSide)) }
+        intent.takeIf { it.hasExtra("fps") }?.let { s = s.copy(fps = it.getIntExtra("fps", s.fps)) }
+        intent.getStringExtra("codec")?.let { name -> app.absentmotion.export.Codec.entries.firstOrNull { it.name.equals(name, true) }?.let { s = s.copy(codec = it) } }
+        intent.takeIf { it.hasExtra("quality") }?.let { s = s.copy(quality = it.getFloatExtra("quality", s.quality)) }
+        if (intent.getStringExtra("format") == "jpeg") s = s.copy(image = app.absentmotion.export.ImageKind.Jpeg)
+        val dir = getExternalFilesDir(null)!!
+        val ext = mapOf(ExportKind.Video to "mp4", ExportKind.Gif to "gif", ExportKind.Frame to "png", ExportKind.Xml to "xml", ExportKind.Package to "absproj")
+        val name = if (kind == ExportKind.Sequence) "export.seq" else "export"
+        lifecycleScope.launch {
+            try {
+                Exporter(applicationContext, engine, FolderExport(dir)).export(kind, scene, s, frame, name) { }
+                Log.i("AMExport", "done " + File(dir, if (kind == ExportKind.Sequence) name else "$name.${ext[kind]}").path)
+            } catch (e: Throwable) {
+                Log.e("AMExport", "failed", e)
+            }
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        importShared()
+        takeTransferLink(intent)
+        if (intent.hasExtra("xml") && applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0) {
+            setIntent(intent)
+            handleTestIntent()
+            return
+        }
+        val state = editor ?: return
+        if (intent.hasExtra("frame")) state.frame = intent.getIntExtra("frame", 0).coerceIn(0, state.scene.lastFrame)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        editor?.let { it.playing = false; engine.audio?.stop() }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        engine.close()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        engine.refreshMedia()
+    }
+}

@@ -1,0 +1,45 @@
+{
+ "id": "duotone",
+ "name": "Duotone",
+ "category": "color",
+ "description": "Applies a two-color gradient map based on luminance with contrast and amount controls.",
+ "params": [
+  {
+   "id": "contrast",
+   "label": "Contrast",
+   "type": "float",
+   "default": 1.0,
+   "min": 0.0,
+   "max": 2.0,
+   "step": 0.05
+  },
+  {
+   "id": "amount",
+   "label": "Amount",
+   "type": "float",
+   "default": 1.0,
+   "min": 0.0,
+   "max": 1.0,
+   "step": 0.05
+  },
+  {
+   "id": "color1",
+   "label": "Shadow Color",
+   "type": "color",
+   "default": "#000000",
+   "min": 0.0,
+   "max": 1.0,
+   "step": 0.01
+  },
+  {
+   "id": "color2",
+   "label": "Highlight Color",
+   "type": "color",
+   "default": "#FFFFFF",
+   "min": 0.0,
+   "max": 1.0,
+   "step": 0.01
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float contrast;\nuniform float amount;\nlayout(color) uniform half4 color1;\nlayout(color) uniform half4 color2;\n\nhalf4 main(float2 coord) {\n    half4 c = image.eval(coord);\n    half a = c.a;\n    if (a < 0.001) {\n        return half4(0.0);\n    }\n    half3 rgb = c.rgb / a;\n    half luminance = dot(rgb, half3(0.2126, 0.7152, 0.0722));\n    luminance = clamp((luminance - 0.5) * contrast + 0.5, 0.0, 1.0);\n    half3 duotone = mix(color1.rgb, color2.rgb, luminance);\n    rgb = mix(rgb, duotone, amount);\n    return half4(rgb * a, a);\n}"
+}

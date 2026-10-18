@@ -1,0 +1,18 @@
+{
+ "id": "pixelate",
+ "name": "Pixelate",
+ "category": "stylize",
+ "description": "Applies a mosaic pixelation effect by replacing areas with square blocks of the top-left pixel's color.",
+ "params": [
+  {
+   "id": "blockSize",
+   "label": "Block Size",
+   "type": "float",
+   "default": 10.0,
+   "min": 1.0,
+   "max": 200.0,
+   "step": 1.0
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float blockSize;\n\nhalf4 main(float2 coord) {\n    float2 block = floor(coord.xy / blockSize);\n    float2 sampleCoord = block * blockSize;\n    half4 color = image.eval(sampleCoord);\n    if (color.a < 0.001) {\n        return half4(0);\n    }\n    color.rgb /= color.a;\n    color.rgb *= color.a;\n    return color;\n}"
+}

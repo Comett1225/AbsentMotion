@@ -1,0 +1,158 @@
+package app.absentmotion.media
+
+import android.util.Log
+import android.content.ContentUris
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.media.ExifInterface
+import android.net.Uri
+import android.provider.MediaStore
+import android.provider.OpenableColumns
+import android.util.Size
+import app.absentmotion.engine.EngineThread
+import app.absentmotion.model.MediaDeclaration
+import app.absentmotion.model.Scene
+import app.absentmotion.model.XmlNode
+import app.absentmotion.model.imageUris
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+
+class MediaLibrary(context: Context, private val engine: EngineThread) {
+    private val resolver = context.applicationContext.contentResolver
+    private val lock = Mutex()
+    private val loaded = mutableMapOf<String, MediaDeclaration?>()
+
+    suspend fun update(scene: Scene, retry: Boolean = false) = lock.withLock {
+        val wanted = scene.node.imageUris()
+        for (uri in loaded.keys.toList()) {
+            if (uri !in wanted || retry) {
+                withContext(NonCancellable) {
+                    engine.setPicture(uri, null)
+                    loaded.remove(uri)
+                }
+            }
+        }
+        prepareLocked(scene)
+    }
+
+    suspend fun prepare(scene: Scene) = lock.withLock { prepareLocked(scene) }
+
+    private suspend fun prepareLocked(scene: Scene) {
+        val limit = engine.maxPictureSize()
+        for (uri in scene.node.imageUris()) {
+            val info = scene.media(uri)
+            if (loaded.containsKey(uri) && (info == null || loaded[uri] == info)) continue
+            val bitmap = withContext(Dispatchers.IO) { decode(Uri.parse(uri), limit) }
+            Log.i("AMMedia", "picture $uri ${bitmap?.width}x${bitmap?.height} limit $limit")
+            try {
+                withContext(NonCancellable) {
+                    engine.setPicture(uri, bitmap)
+                    loaded[uri] = info
+                }
+            } finally {
+                bitmap?.recycle()
+            }
+        }
+    }
+
+    private fun decode(uri: Uri, limit: Int): Bitmap? = try {
+        val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        resolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, bounds) }
+        if (bounds.outWidth <= 0 || bounds.outHeight <= 0) null else {
+            val ratio = maxOf(bounds.outWidth, bounds.outHeight).toDouble() / limit.coerceAtLeast(1)
+            val options = BitmapFactory.Options().apply {
+                inPreferredConfig = Bitmap.Config.ARGB_8888
+                inPreferredColorSpace = android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.SRGB)
+                inScaled = false
+                inSampleSize = Integer.highestOneBit(ratio.toInt().coerceAtLeast(1))
+            }
+            val raw = resolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, options) }
+            if (raw == null || maxOf(raw.width, raw.height) <= limit) raw else {
+                val scale = limit.toFloat() / maxOf(raw.width, raw.height)
+                Bitmap.createScaledBitmap(raw, (raw.width * scale).toInt().coerceAtLeast(1),
+                    (raw.height * scale).toInt().coerceAtLeast(1), true).also { if (it !== raw) raw.recycle() }
+            }
+        }
+    } catch (e: Exception) {
+        Log.w("AMMedia", "cannot read $uri", e)
+        null
+    } catch (_: OutOfMemoryError) { null }
+}
+
+data class DeviceMedia(val uri: Uri, val name: String, val albumId: String, val album: String,
+                       val video: Boolean, val durationMs: Long, val date: Long, val modified: Long)
+
+suspend fun deviceMedia(context: Context, demoOnly: Boolean = false): List<DeviceMedia> = withContext(Dispatchers.IO) {
+    val resolver = context.contentResolver
+    val found = mutableListOf<DeviceMedia>()
+    for (video in listOf(false, true)) {
+        val collection = if (video) MediaStore.Video.Media.EXTERNAL_CONTENT_URI else MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+        val columns = arrayOf("_id", "_display_name", "bucket_id", "bucket_display_name", "date_added", "date_modified") + if (video) arrayOf("duration") else emptyArray()
+        try {
+            resolver.query(collection, columns, null, null, "date_added DESC, _id DESC")?.use { c ->
+                while (c.moveToNext()) found += DeviceMedia(ContentUris.withAppendedId(collection, c.getLong(0)),
+                    c.getString(1) ?: "", c.getString(2) ?: "", c.getString(3) ?: "", video,
+                    if (video) c.getLong(6) else 0, c.getLong(4), c.getLong(5))
+            }
+        } catch (_: Exception) { }
+    }
+    refreshThumbnailVersions(found)
+    found.filter { !demoOnly || it.album.contains("demo", ignoreCase = true) }.sortedWith(compareByDescending<DeviceMedia> { it.date }.thenByDescending { it.uri.lastPathSegment?.toLongOrNull() ?: 0 })
+}
+
+private val thumbnailCache = object : android.util.LruCache<String, Bitmap>(12 * 1024 * 1024) {
+    override fun sizeOf(key: String, value: Bitmap) = value.allocationByteCount
+}
+private val thumbnailLocks = Array(16) { Mutex() }
+
+private var thumbnailVersions: Map<String, Long> = emptyMap()
+
+@Synchronized
+private fun refreshThumbnailVersions(files: List<DeviceMedia>) {
+    val next = files.associate { it.uri.toString() to it.modified }
+    thumbnailVersions.forEach { (uri, version) -> if (next[uri] != version) thumbnailCache.remove(uri) }
+    thumbnailVersions = next
+}
+
+fun cachedMediaThumbnail(uri: Uri): Bitmap? = thumbnailCache.get(uri.toString())
+
+suspend fun mediaThumbnail(context: Context, uri: Uri): Bitmap? = withContext(Dispatchers.IO) {
+    val key = uri.toString()
+    thumbnailLocks[key.hashCode().mod(thumbnailLocks.size)].withLock {
+        cachedMediaThumbnail(uri) ?: try {
+            context.contentResolver.loadThumbnail(uri, Size(272, 272), null).also { thumbnailCache.put(key, it) }
+        } catch (_: Exception) { null } catch (_: OutOfMemoryError) { null }
+    }
+}
+
+suspend fun imageDeclaration(context: Context, uri: Uri): MediaDeclaration? = withContext(Dispatchers.IO) {
+    try {
+        val resolver = context.contentResolver
+        val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        resolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, bounds) }
+        if (bounds.outWidth <= 0 || bounds.outHeight <= 0) return@withContext null
+        var name = uri.lastPathSegment ?: ""
+        var size = -1L
+        resolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE), null, null, null)?.use { c ->
+            if (c.moveToFirst()) { name = c.getString(0) ?: name; if (!c.isNull(1)) size = c.getLong(1) }
+        }
+        val orientation = runCatching {
+            resolver.openInputStream(uri)?.use { stream ->
+                when (ExifInterface(stream).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)) {
+                    ExifInterface.ORIENTATION_ROTATE_90 -> 90
+                    ExifInterface.ORIENTATION_ROTATE_180 -> 180
+                    ExifInterface.ORIENTATION_ROTATE_270 -> 270
+                    else -> 0
+                }
+            } ?: 0
+        }.getOrDefault(0)
+        MediaDeclaration(XmlNode("media", linkedMapOf("uri" to uri.toString(), "filename" to name, "title" to name,
+            "type" to (bounds.outMimeType ?: resolver.getType(uri) ?: "image/jpeg"), "size" to "$size",
+            "orientation" to "$orientation", "infoUpdated" to "${System.currentTimeMillis()}",
+            "width" to "${bounds.outWidth}", "height" to "${bounds.outHeight}")))
+    } catch (_: Exception) { null } catch (_: OutOfMemoryError) { null }
+}

@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<scene title="Media" width="1080" height="1920" exportWidth="1080" exportHeight="1920" precompose="dynamicResolution" bgcolor="#ff14161f" totalTime="4999" fps="30" am="app.absentmotion" amplatform="android" retime="freeze" retimeAdaptFPS="false">
+  <media uri="testdata/media/test-image.jpg" filename="test-image.jpg" title="test-image.jpg" type="image/jpeg" size="198836" orientation="0" infoUpdated="1760000000000" width="1600" height="1200" />
+  <media uri="testdata/media/test-alpha.png" filename="test-alpha.png" title="test-alpha.png" type="image/png" size="8089" orientation="0" infoUpdated="1760000000000" width="800" height="800" />
+  <media uri="testdata/media/test-video.mp4" filename="test-video.mp4" title="test-video.mp4" type="video/mp4" size="119175" orientation="0" duration="5000000" fps="0.30" infoUpdated="1760000000000" width="1280" height="720" />
+  <media uri="testdata/media/test-audio.m4a" filename="test-audio.m4a" title="test-audio.m4a" type="audio/mp4" duration="10000000" size="160821" infoUpdated="1760000000000" />
+  <shape id="8001" label="Picture fill" startTime="0" endTime="4999" fillType="media" mediaFillMode="fill" s=".rect" fillImage="testdata/media/test-image.jpg">
+    <transform>
+      <location value="540.000000,400.000000,0.000000" />
+    </transform>
+    <property name="size" type="vec2" value="540.000000,405.000000" />
+  </shape>
+  <shape id="8002" label="Picture fit" startTime="0" endTime="4999" fillType="media" mediaFillMode="fit" s=".rect" fillImage="testdata/media/test-image.jpg">
+    <transform>
+      <location value="300.000000,1000.000000,0.000000" />
+    </transform>
+    <property name="size" type="vec2" value="240.000000,160.000000" />
+  </shape>
+  <shape id="8003" label="Picture with alpha" startTime="0" endTime="4999" fillType="media" mediaFillMode="stretch" s=".rect" fillImage="testdata/media/test-alpha.png">
+    <transform>
+      <location value="800.000000,1000.000000,0.000000" />
+      <rotation value="-15.000000" />
+      <opacity value="0.800000" />
+    </transform>
+    <property name="size" type="vec2" value="200.000000,200.000000" />
+    <border direction="outside" id="1">
+      <color value="#ffffffff" />
+      <size value="6.000000" />
+    </border>
+  </shape>
+  <shape id="8004" label="Video" startTime="0" endTime="4999" fillType="media" mediaFillMode="fill" s=".rect" fillVideo="testdata/media/test-video.mp4" inTime="0" outTime="5000" speed="1.000000">
+    <transform>
+      <location value="540.000000,1500.000000,0.000000" />
+    </transform>
+    <property name="size" type="vec2" value="540.000000,303.500000" />
+    <gain value="1.000000" />
+  </shape>
+  <audio id="8005" label="Sound" startTime="0" endTime="4999" src="testdata/media/test-audio.m4a" outTime="5000" mediaFillMode="fill">
+    <gain value="0.800000" />
+  </audio>
+  <text id="8006" label="Picture text" startTime="0" endTime="4999" fillType="media" mediaFillMode="fill" size="60.000000" font="googlefonts?name=Roboto&amp;weight=900" wrapWidth="1000" align="center" fillImage="testdata/media/test-image.jpg">
+    <transform>
+      <location value="540.000000,1800.000000,0.000000" />
+    </transform>
+    <content>MEDIA</content>
+  </text>
+</scene>

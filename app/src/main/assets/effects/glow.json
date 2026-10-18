@@ -1,0 +1,27 @@
+{
+ "id": "glow",
+ "name": "Glow",
+ "category": "stylize",
+ "native": true,
+ "description": "A soft light around the bright parts of the layer.",
+ "params": [
+  {
+   "id": "strength",
+   "label": "Size",
+   "type": "float",
+   "default": 20,
+   "min": 0,
+   "max": 300,
+   "step": 0.1
+  },
+  {
+   "id": "intensity",
+   "label": "Intensity",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 4,
+   "step": 0.01
+  }
+ ]
+}

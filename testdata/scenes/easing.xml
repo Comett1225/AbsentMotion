@@ -1,0 +1,196 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<scene title="Easing" width="1080" height="1920" exportWidth="1080" exportHeight="1920" precompose="dynamicResolution" bgcolor="#ff10131c" totalTime="2015" fps="60" am="app.absentmotion" amplatform="android" retime="freeze" retimeAdaptFPS="false">
+  <shape id="3001" label="linear" startTime="0" endTime="2015" fillType="color" mediaFillMode="fill" s=".circle">
+    <transform>
+      <location>
+        <kf t="0.000000" v="120.000000,110.000000,0.000000" />
+        <kf t="1.000000" v="960.000000,110.000000,0.000000" />
+      </location>
+    </transform>
+    <fillColor value="#fff24949" />
+    <property name="size" type="vec2" value="36.000000,36.000000" />
+  </shape>
+  <shape id="3002" label="cubicBezier ease in" startTime="0" endTime="2015" fillType="color" mediaFillMode="fill" s=".circle">
+    <transform>
+      <location>
+        <kf t="0.000000" v="120.000000,210.000000,0.000000" />
+        <kf t="1.000000" v="960.000000,210.000000,0.000000" e="cubicBezier 0.42 0 1 1" />
+      </location>
+    </transform>
+    <fillColor value="#fff28549" />
+    <property name="size" type="vec2" value="36.000000,36.000000" />
+  </shape>
+  <shape id="3003" label="cubicBezier ease out" startTime="0" endTime="2015" fillType="color" mediaFillMode="fill" s=".circle">
+    <transform>
+      <location>
+        <kf t="0.000000" v="120.000000,310.000000,0.000000" />
+        <kf t="1.000000" v="960.000000,310.000000,0.000000" e="cubicBezier 0 0 0.58 1" />
+      </location>
+    </transform>
+    <fillColor value="#fff2c049" />
+    <property name="size" type="vec2" value="36.000000,36.000000" />
+  </shape>
+  <shape id="3004" label="cubicBezier ease in out" startTime="0" endTime="2015" fillType="color" mediaFillMode="fill" s=".circle">
+    <transform>
+      <location>
+        <kf t="0.000000" v="120.000000,410.000000,0.000000" />
+        <kf t="1.000000" v="960.000000,410.000000,0.000000" e="cubicBezier 0.42 0 0.58 1" />
+      </location>
+    </transform>
+    <fillColor value="#ffe8f249" />
+    <property name="size" type="vec2" value="36.000000,36.000000" />
+  </shape>
+  <shape id="3005" label="cubicBezier overshoot" startTime="0" endTime="2015" fillType="color" mediaFillMode="fill" s=".circle">
+    <transform>
+      <location>
+        <kf t="0.000000" v="120.000000,510.000000,0.000000" />
+        <kf t="1.000000" v="960.000000,510.000000,0.000000" e="cubicBezier 0.25 -0.4 0.75 1.4" />
+      </location>
+    </transform>
+    <fillColor value="#ffacf249" />
+    <property name="size" type="vec2" value="36.000000,36.000000" />
+  </shape>
+  <shape id="3006" label="bounce" startTime="0" endTime="2015" fillType="color" mediaFillMode="fill" s=".circle">
+    <transform>
+      <location>
+        <kf t="0.000000" v="120.000000,610.000000,0.000000" />
+        <kf t="1.000000" v="960.000000,610.000000,0.000000" e="bounce 0.3 0.8" />
+      </location>
+    </transform>
+    <fillColor value="#ff71f249" />
+    <property name="size" type="vec2" value="36.000000,36.000000" />
+  </shape>
+  <shape id="3007" label="elastic" startTime="0" endTime="2015" fillType="color" mediaFillMode="fill" s=".circle">
+    <transform>
+      <location>
+        <kf t="0.000000" v="120.000000,710.000000,0.000000" />
+        <kf t="1.000000" v="960.000000,710.000000,0.000000" e="elastic 0.25 1 0.5 1" />
+      </location>
+    </transform>
+    <fillColor value="#ff49f25d" />
+    <property name="size" type="vec2" value="36.000000,36.000000" />
+  </shape>
+  <shape id="3008" label="cyclic" startTime="0" endTime="2015" fillType="color" mediaFillMode="fill" s=".circle">
+    <transform>
+      <location>
+        <kf t="0.000000" v="120.000000,810.000000,0.000000" />
+        <kf t="1.000000" v="960.000000,810.000000,0.000000" e="cyclic 0.2857143 0 0.5 0 0" />
+      </location>
+    </transform>
+    <fillColor value="#ff49f298" />
+    <property name="size" type="vec2" value="36.000000,36.000000" />
+  </shape>
+  <shape id="3009" label="random (6 numbers)" startTime="0" endTime="2015" fillType="color" mediaFillMode="fill" s=".circle">
+    <transform>
+      <location>
+        <kf t="0.000000" v="120.000000,910.000000,0.000000" />
+        <kf t="1.000000" v="960.000000,910.000000,0.000000" e="random 0.5 0.5 0.5 0.5 0.5 0" />
+      </location>
+    </transform>
+    <fillColor value="#ff49f2d4" />
+    <property name="size" type="vec2" value="36.000000,36.000000" />
+  </shape>
+  <shape id="3010" label="random (3 numbers)" startTime="0" endTime="2015" fillType="color" mediaFillMode="fill" s=".circle">
+    <transform>
+      <location>
+        <kf t="0.000000" v="120.000000,1010.000000,0.000000" />
+        <kf t="1.000000" v="960.000000,1010.000000,0.000000" e="random 0.5 0.5 0.5" />
+      </location>
+    </transform>
+    <fillColor value="#ff49d4f2" />
+    <property name="size" type="vec2" value="36.000000,36.000000" />
+  </shape>
+  <shape id="3011" label="step" startTime="0" endTime="2015" fillType="color" mediaFillMode="fill" s=".circle">
+    <transform>
+      <location>
+        <kf t="0.000000" v="120.000000,1110.000000,0.000000" />
+        <kf t="1.000000" v="960.000000,1110.000000,0.000000" e="step 0.25 0" />
+      </location>
+    </transform>
+    <fillColor value="#ff4998f2" />
+    <property name="size" type="vec2" value="36.000000,36.000000" />
+  </shape>
+  <shape id="3012" label="elasticStep" startTime="0" endTime="2015" fillType="color" mediaFillMode="fill" s=".circle">
+    <transform>
+      <location>
+        <kf t="0.000000" v="120.000000,1210.000000,0.000000" />
+        <kf t="1.000000" v="960.000000,1210.000000,0.000000" e="elasticStep 0.2 0.5" />
+      </location>
+    </transform>
+    <fillColor value="#ff495df2" />
+    <property name="size" type="vec2" value="36.000000,36.000000" />
+  </shape>
+  <shape id="3013" label="reverse bounce" startTime="0" endTime="2015" fillType="color" mediaFillMode="fill" s=".circle">
+    <transform>
+      <location>
+        <kf t="0.000000" v="120.000000,1310.000000,0.000000" />
+        <kf t="1.000000" v="960.000000,1310.000000,0.000000" e="reverse bounce 0.3 0.8" />
+      </location>
+    </transform>
+    <fillColor value="#ff7149f2" />
+    <property name="size" type="vec2" value="36.000000,36.000000" />
+  </shape>
+  <shape id="3014" label="reverse elastic" startTime="0" endTime="2015" fillType="color" mediaFillMode="fill" s=".circle">
+    <transform>
+      <location>
+        <kf t="0.000000" v="120.000000,1410.000000,0.000000" />
+        <kf t="1.000000" v="960.000000,1410.000000,0.000000" e="reverse elastic 0.25 1 0.5 1" />
+      </location>
+    </transform>
+    <fillColor value="#ffac49f2" />
+    <property name="size" type="vec2" value="36.000000,36.000000" />
+  </shape>
+  <shape id="3015" label="reverse elasticStep" startTime="0" endTime="2015" fillType="color" mediaFillMode="fill" s=".circle">
+    <transform>
+      <location>
+        <kf t="0.000000" v="120.000000,1510.000000,0.000000" />
+        <kf t="1.000000" v="960.000000,1510.000000,0.000000" e="reverse elasticStep 0.2 0.5" />
+      </location>
+    </transform>
+    <fillColor value="#ffe849f2" />
+    <property name="size" type="vec2" value="36.000000,36.000000" />
+  </shape>
+  <shape id="3016" label="reverse cubicBezier" startTime="0" endTime="2015" fillType="color" mediaFillMode="fill" s=".circle">
+    <transform>
+      <location>
+        <kf t="0.000000" v="120.000000,1610.000000,0.000000" />
+        <kf t="1.000000" v="960.000000,1610.000000,0.000000" e="reverse cubicBezier 0.42 0 1 1" />
+      </location>
+    </transform>
+    <fillColor value="#fff249c0" />
+    <property name="size" type="vec2" value="36.000000,36.000000" />
+  </shape>
+  <shape id="3017" label="local cubicBezier" startTime="0" endTime="2015" fillType="color" mediaFillMode="fill" s=".circle">
+    <transform>
+      <location>
+        <kf t="0.000000" v="120.000000,1710.000000,0.000000" />
+        <kf t="1.000000" v="960.000000,1710.000000,0.000000" e="local cubicBezier 0.42 0 0.58 1" />
+      </location>
+    </transform>
+    <fillColor value="#fff24985" />
+    <property name="size" type="vec2" value="36.000000,36.000000" />
+  </shape>
+  <shape id="3018" label="Chain" startTime="0" endTime="2015" fillType="color" mediaFillMode="fill" s=".rect">
+    <transform>
+      <location>
+        <kf t="0.000000" v="120.000000,1810.000000,0.000000" />
+        <kf t="0.330000" v="420.000000,1810.000000,0.000000" e="cubicBezier 0.42 0 0.58 1" />
+        <kf t="0.660000" v="700.000000,1810.000000,0.000000" e="elastic 0.25 1 0.5 1" />
+        <kf t="1.000000" v="960.000000,1810.000000,0.000000" e="reverse bounce 0.3 0.8" />
+      </location>
+      <scale>
+        <kf t="0.000000" v="1.000000,1.000000" />
+        <kf t="1.000000" v="1.500000,1.500000" e="step 0.25 0" />
+      </scale>
+      <rotation>
+        <kf t="0.000000" v="0.000000" />
+        <kf t="1.000000" v="-180.000000" e="cyclic 0.2857143 0 0.5 0 0" />
+      </rotation>
+    </transform>
+    <fillColor>
+      <kf t="0.000000" v="#ffff4d4d" />
+      <kf t="1.000000" v="#ff4d9dff" e="bounce 0.3 0.8" />
+    </fillColor>
+    <property name="size" type="vec2" value="32.000000,32.000000" />
+  </shape>
+</scene>

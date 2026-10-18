@@ -1,0 +1,18 @@
+{
+ "id": "edgedetect",
+ "name": "Edge Detect",
+ "category": "stylize",
+ "description": "Bright lines where the picture changes, dark elsewhere.",
+ "params": [
+  {
+   "id": "strength",
+   "label": "Strength",
+   "type": "float",
+   "default": 2,
+   "min": 0,
+   "max": 20,
+   "step": 0.01
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float strength;\nhalf luma(half3 c) { return dot(c, half3(0.2126, 0.7152, 0.0722)); }\nhalf l(float2 p) { return luma(image.eval(p).rgb); }\nhalf4 main(float2 coord) {\n    half gx = l(coord + float2(1, -1)) + 2 * l(coord + float2(1, 0)) + l(coord + float2(1, 1))\n            - l(coord + float2(-1, -1)) - 2 * l(coord + float2(-1, 0)) - l(coord + float2(-1, 1));\n    half gy = l(coord + float2(-1, 1)) + 2 * l(coord + float2(0, 1)) + l(coord + float2(1, 1))\n            - l(coord + float2(-1, -1)) - 2 * l(coord + float2(0, -1)) - l(coord + float2(1, -1));\n    half a = image.eval(coord).a;\n    return half4(half3(saturate(length(half2(gx, gy)) * half(strength))) * a, a);\n}\n"
+}

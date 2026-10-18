@@ -1,0 +1,18 @@
+{
+ "id": "posterize",
+ "name": "Posterize",
+ "category": "color",
+ "description": "Reduces each color channel to a specified number of levels (2-32).",
+ "params": [
+  {
+   "id": "levels",
+   "label": "Levels",
+   "type": "float",
+   "default": 4,
+   "min": 2,
+   "max": 32,
+   "step": 1
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float levels;\n\nhalf4 main(float2 coord) {\n    half4 col = image.eval(coord);\n    if (col.a < 1e-3) {\n        return half4(0);\n    }\n\n    half3 rgb = col.rgb / col.a;\n\n    half lv = levels - 1.0;\n\n    half r = floor(rgb.r * lv) / lv;\n    half g = floor(rgb.g * lv) / lv;\n    half b = floor(rgb.b * lv) / lv;\n\n    return half4(half3(r, g, b) * col.a, col.a);\n}"
+}

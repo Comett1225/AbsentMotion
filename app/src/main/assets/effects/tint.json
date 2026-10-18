@@ -1,0 +1,30 @@
+{
+ "id": "tint",
+ "name": "Tint",
+ "category": "color",
+ "description": "Maps the picture's luminance between a shadow colour and a highlight colour with a blend amount.",
+ "params": [
+  {
+   "id": "amount",
+   "label": "Amount",
+   "type": "float",
+   "default": 1.0,
+   "min": 0.0,
+   "max": 1.0,
+   "step": 0.01
+  },
+  {
+   "id": "shadowColor",
+   "label": "Shadow Colour",
+   "type": "color",
+   "default": "#000000"
+  },
+  {
+   "id": "highlightColor",
+   "label": "Highlight Colour",
+   "type": "color",
+   "default": "#FFFFFF"
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\n\nuniform float amount;\nlayout(color) uniform half4 shadowColor;\nlayout(color) uniform half4 highlightColor;\n\nhalf4 main(float2 coord) {\n    half4 c = image.eval(coord);\n    half a = c.a;\n    if (a < 0.001) {\n        return half4(0.0);\n    }\n    half3 rgb = c.rgb / a;\n    half lum = dot(rgb, half3(0.2126, 0.7152, 0.0722));\n    half3 tint = mix(shadowColor.rgb, highlightColor.rgb, lum);\n    half3 result = mix(rgb, tint, amount);\n    return half4(result * a, a);\n}"
+}

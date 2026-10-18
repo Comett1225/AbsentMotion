@@ -1,0 +1,27 @@
+{
+ "id": "invert",
+ "name": "Invert",
+ "category": "color",
+ "description": "Inverts the color channels of the image with a blend amount and optional alpha inversion.",
+ "params": [
+  {
+   "id": "amount",
+   "label": "Amount",
+   "type": "float",
+   "default": 1.0,
+   "min": 0.0,
+   "max": 1.0,
+   "step": 0.01
+  },
+  {
+   "id": "invert_alpha",
+   "label": "Invert Alpha",
+   "type": "switch",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 1
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float amount;\nuniform float invert_alpha;\n\nhalf4 main(float2 coord) {\n    half4 c = image.eval(coord);\n    half a = c.a;\n    half3 rgb = c.rgb;\n    if (a > 0.001) {\n        rgb = rgb / a;\n    }\n    half3 inv = 1.0 - rgb;\n    half3 out_rgb = mix(rgb, inv, amount);\n    half out_a = c.a;\n    if (invert_alpha == 1.0) {\n        out_a = 1.0 - a;\n    }\n    if (out_a > 0.001) {\n        out_rgb = out_rgb * out_a;\n    }\n    return half4(out_rgb, out_a);\n}"
+}

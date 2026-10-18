@@ -1,0 +1,68 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<scene title="Text" width="1080" height="1920" exportWidth="1080" exportHeight="1920" precompose="dynamicResolution" bgcolor="#ff14161f" totalTime="2999" fps="30" am="app.absentmotion" amplatform="android" retime="freeze" retimeAdaptFPS="false">
+  <text id="2001" label="Title" startTime="0" endTime="2999" fillType="color" mediaFillMode="fill" size="30.000000" font="googlefonts?name=Roboto&amp;weight=700" wrapWidth="1000" align="center">
+    <transform>
+      <location value="540.000000,200.000000,0.000000" />
+    </transform>
+    <fillColor value="#ffffffff" />
+    <content>AbsentMotion</content>
+  </text>
+  <text id="2002" label="Gradient" startTime="0" endTime="2999" fillType="gradient" mediaFillMode="fill" size="36.000000" font="googlefonts?name=Pacifico&amp;weight=400" wrapWidth="1000" align="center">
+    <transform>
+      <location value="540.000000,450.000000,0.000000" />
+    </transform>
+    <gradient type="linear" startColor="#ffff7a00" endColor="#ff00c2ff" start="0.000000,0.500000" end="1.000000,0.500000" />
+    <content>Gradient fill</content>
+  </text>
+  <text id="2003" label="Left" startTime="0" endTime="2999" fillType="color" mediaFillMode="fill" size="14.000000" font="googlefonts?name=Lora&amp;weight=400&amp;italic=1" wrapWidth="900" align="left">
+    <transform>
+      <location value="540.000000,720.000000,0.000000" />
+    </transform>
+    <fillColor value="#ffe6e8f0" />
+    <content>The quick brown fox jumps over the lazy dog.&#10;Pack my box with five dozen liquor jugs.</content>
+  </text>
+  <text id="2004" label="Right" startTime="0" endTime="2999" fillType="color" mediaFillMode="fill" size="20.000000" font="googlefonts?name=Oswald&amp;weight=500" wrapWidth="900" align="right">
+    <transform>
+      <location value="540.000000,1000.000000,0.000000" />
+    </transform>
+    <fillColor value="#fff4c542" />
+    <content>Right aligned&#10;in two lines</content>
+  </text>
+  <text id="2005" label="Justify" startTime="0" endTime="2999" fillType="color" mediaFillMode="fill" size="12.000000" font="googlefonts?name=Playfair Display&amp;weight=400" wrapWidth="700" align="justify">
+    <transform>
+      <location value="540.000000,1250.000000,0.000000" />
+    </transform>
+    <fillColor value="#ffcfd3e0" />
+    <content>Justified text spreads its words across the whole width of the box when a line wraps.</content>
+  </text>
+  <text id="2006" label="Outlined" startTime="0" endTime="2999" fillType="color" mediaFillMode="fill" size="40.000000" font="googlefonts?name=Roboto&amp;weight=900" wrapWidth="1000" align="center">
+    <transform>
+      <location value="540.000000,1500.000000,0.000000" />
+    </transform>
+    <fillColor value="#ff2d9cdb" />
+    <border direction="outside" id="1">
+      <color value="#ffffffff" />
+      <size value="8.000000" />
+    </border>
+    <shadow direction="outside">
+      <color value="#ff000000" />
+      <opacity value="0.700000" />
+      <size value="16.000000" />
+      <hardness value="0.000000" />
+      <offset value="12.000000,12.000000" />
+    </shadow>
+    <content>Border</content>
+  </text>
+  <text id="2007" label="Fading" startTime="0" endTime="2999" fillType="color" mediaFillMode="fill" size="22.000000" font="googlefonts?name=Montserrat&amp;weight=600" wrapWidth="1000" align="center">
+    <transform>
+      <location value="540.000000,1740.000000,0.000000" />
+      <opacity>
+        <kf t="0.000000" v="0.000000" />
+        <kf t="0.500000" v="1.000000" e="cubicBezier 0.42 0 0.58 1" />
+        <kf t="1.000000" v="0.000000" e="cubicBezier 0.42 0 0.58 1" />
+      </opacity>
+    </transform>
+    <fillColor value="#ffffffff" />
+    <content>Fade in and out</content>
+  </text>
+</scene>

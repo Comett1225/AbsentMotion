@@ -1,0 +1,54 @@
+{
+ "id": "levels",
+ "name": "Levels",
+ "category": "color",
+ "description": "Adjusts the levels of the image with input black/white points, gamma, and output black/white points.",
+ "params": [
+  {
+   "id": "inBlack",
+   "label": "Input Black",
+   "type": "float",
+   "default": 0.1,
+   "min": 0.0,
+   "max": 1.0,
+   "step": 0.01
+  },
+  {
+   "id": "inWhite",
+   "label": "Input White",
+   "type": "float",
+   "default": 0.85,
+   "min": 0.0,
+   "max": 1.0,
+   "step": 0.01
+  },
+  {
+   "id": "gamma",
+   "label": "Gamma",
+   "type": "float",
+   "default": 1.0,
+   "min": 0.2,
+   "max": 5.0,
+   "step": 0.1
+  },
+  {
+   "id": "outBlack",
+   "label": "Output Black",
+   "type": "float",
+   "default": 0.0,
+   "min": 0.0,
+   "max": 1.0,
+   "step": 0.01
+  },
+  {
+   "id": "outWhite",
+   "label": "Output White",
+   "type": "float",
+   "default": 1.0,
+   "min": 0.0,
+   "max": 1.0,
+   "step": 0.01
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float inBlack;\nuniform float inWhite;\nuniform float gamma;\nuniform float outBlack;\nuniform float outWhite;\n\nhalf4 main(float2 coord) {\n    half4 color = image.eval(coord);\n    float alpha = color.a;\n    if (alpha < 1e-6) {\n        return half4(0);\n    } else {\n        half3 rgb = color.rgb / half3(alpha);\n        float denom = inWhite - inBlack;\n        denom = max(denom, 1e-5);\n        half3 normalized = (rgb - half3(inBlack)) / half3(denom);\n        normalized = clamp(normalized, half3(0.0), half3(1.0));\n        half3 gammaed = pow(normalized, half3(gamma));\n        gammaed = gammaed * half3(outWhite - outBlack) + half3(outBlack);\n        gammaed = clamp(gammaed, half3(0.0), half3(1.0));\n        return half4(gammaed * half3(alpha), alpha);\n    }\n}"
+}

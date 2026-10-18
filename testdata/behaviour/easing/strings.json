@@ -1,0 +1,12 @@
+{
+ "linear": "",
+ "easeIn": "cubicBezier 0.42 0.0 1.0 1.0",
+ "easeOut": "cubicBezier 0.0 0.0 0.58 1.0",
+ "easeInOut": "cubicBezier 0.42 0.0 0.58 1.0",
+ "bounce": "bounce 0.3 0.8",
+ "elastic": "elastic 0.25 1.0 0.5 1.0",
+ "cyclic": "cyclic 0.2857143 0.0 0.5 0.0 0.0",
+ "random": "random 0.5 0.5 0.5 0.5 0.5 0.0",
+ "steps": "step 0.25 0.0",
+ "elasticSteps": "elasticStep 0.2 0.5"
+}

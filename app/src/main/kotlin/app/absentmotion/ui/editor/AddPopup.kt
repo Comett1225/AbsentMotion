@@ -1,0 +1,221 @@
+package app.absentmotion.ui.editor
+
+import app.absentmotion.platform.BackHandler
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.layout.ContentScale
+import app.absentmotion.platform.LocalContext
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import app.absentmotion.library.SavedTemplate
+import app.absentmotion.library.TemplateStore
+import app.absentmotion.ui.home.EmbedRequest
+import app.absentmotion.ui.home.rememberFileBitmap
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import app.absentmotion.editor.EditorState
+import app.absentmotion.editor.addShape
+import app.absentmotion.editor.addText
+import app.absentmotion.editor.startFreehand
+import app.absentmotion.editor.startVectorDrawing
+import app.absentmotion.model.ShapeCatalog
+import app.absentmotion.ui.theme.Am
+import app.absentmotion.ui.theme.pressScale
+
+private val PopupBar get() = Am.Button
+private val DotIdle get() = Am.Caption
+private val Disc get() = Am.Panel
+
+@Composable
+fun AddButton(state: EditorState, modifier: Modifier = Modifier) {
+    val press = remember { MutableInteractionSource() }
+    Box(modifier.size(73.dp).clickable(interactionSource = press, indication = null) { state.addOpen = true }, contentAlignment = Alignment.Center) {
+        Box(
+            Modifier.size(47.dp).pressScale(press).shadow(4.dp, CircleShape).background(Disc, CircleShape).border(1.8.dp, Am.Accent, CircleShape),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(ChromeIcons.Plus, "Add layer", Modifier.size(24.dp), tint = Am.Accent)
+        }
+    }
+}
+
+private class Tab(val label: String, val icon: ImageVector)
+
+private val Tabs = listOf(
+    Tab("Shape", ChromeIcons.ShapeTab), Tab("Media", ChromeIcons.MediaTab), Tab("Audio", ChromeIcons.AudioTab),
+    Tab("Object / Asset", ChromeIcons.ObjectTab), Tab("Template", ChromeIcons.TemplateTab),
+)
+
+@Composable
+internal fun AddPopup(state: EditorState, modifier: Modifier = Modifier, library: AddLibrary) {
+    var selectedTab by remember { mutableIntStateOf(0) }
+    BackHandler { state.addOpen = false }
+    Row(modifier.clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)).background(PopupBar)) {
+        Column(Modifier.width(326.dp).fillMaxHeight()) {
+            Row(Modifier.padding(start = 6.dp).height(58.dp)) {
+                Tabs.forEachIndexed { i, tab -> TabButton(tab, active = i == selectedTab, enabled = i <= 4) { selectedTab = i } }
+            }
+            val body = Modifier.weight(1f).fillMaxWidth().background(Am.Panel)
+            Box(body) {
+                when (selectedTab) { 0 -> ShapePages(state, Modifier.fillMaxSize()); 1 -> MediaTab(state, Modifier.fillMaxSize(), library); 3 -> ObjectPage(state, Modifier.fillMaxSize()); 4 -> TemplatePage(state, Modifier.fillMaxSize()); else -> AudioTab(state, Modifier.fillMaxSize(), library) }
+            }
+        }
+        QuickBar(state, Modifier.weight(1f).fillMaxHeight())
+    }
+}
+
+@Composable
+private fun TabButton(tab: Tab, active: Boolean, enabled: Boolean, onClick: () -> Unit) {
+    val tint = if (active) Am.Accent else Am.OnDark
+    Column(
+        Modifier.width(64.dp).fillMaxHeight().alpha(if (enabled) 1f else DimAlpha).clickable(enabled = enabled, onClick = onClick),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Spacer(Modifier.height(6.5.dp))
+        Icon(tab.icon, null, Modifier.size(24.dp), tint = tint)
+        Spacer(Modifier.height(5.dp))
+        Text(
+            tab.label, Modifier.fillMaxWidth().padding(horizontal = 2.dp), color = tint,
+            fontSize = 9.sp, lineHeight = 10.5.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, maxLines = 2,
+        )
+    }
+}
+
+@Composable
+private fun ShapePages(state: EditorState, modifier: Modifier) {
+    val pages = ShapeCatalog.all.chunked(18)
+    val pager = rememberPagerState { pages.size }
+    Box(modifier) {
+        HorizontalPager(pager, Modifier.fillMaxSize(), beyondViewportPageCount = 1) { page ->
+            Column(Modifier.padding(start = 9.6.dp, top = 8.9.dp)) {
+                for (row in pages[page].chunked(6)) {
+                    Row {
+                        for (def in row) {
+                            Box(
+                                Modifier.size(50.84.dp, 61.dp).clickable {
+                                    state.addShape(def)
+                                    state.addOpen = false
+                                },
+                                contentAlignment = Alignment.TopCenter,
+                            ) {
+                                ShapeThumbnail(def, state.engine, Modifier.size(40.2.dp))
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        Row(Modifier.align(Alignment.BottomCenter).padding(bottom = 3.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            repeat(pages.size) { Box(Modifier.size(4.dp).background(if (it == pager.currentPage) Am.OnDark else DotIdle, CircleShape)) }
+        }
+    }
+}
+
+@Composable
+private fun TemplatePage(state: EditorState, modifier: Modifier) {
+    val context = LocalContext.current
+    val saved by produceState(emptyList<SavedTemplate>()) { value = withContext(Dispatchers.IO) { TemplateStore(context).list() } }
+    var all by remember { mutableStateOf(false) }
+    fun open(t: SavedTemplate) { all = false; state.addOpen = false; EmbedRequest.templateId = t.id }
+    LazyHorizontalGrid(GridCells.Fixed(2), modifier.clipToBounds()) {
+        item(key = "all") {
+            Column(Modifier.size(80.dp, 96.dp).clickable { all = true }, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+                MediaGridIcon(Modifier.size(24.dp))
+                Text("View All", color = Am.OnDark, fontSize = 16.sp, maxLines = 1)
+            }
+        }
+        items(saved, key = { it.id }) { t -> TemplateCell(t, Modifier.size(80.dp, 96.dp)) { open(t) } }
+    }
+    if (all) Dialog({ all = false }, DialogProperties(usePlatformDefaultWidth = false)) {
+        Column(Modifier.fillMaxSize().background(Am.Panel).systemBarsPadding().padding(8.dp)) {
+            LazyVerticalGrid(GridCells.Fixed(3), Modifier.weight(1f)) {
+                items(saved, key = { it.id }) { t -> TemplateCell(t, Modifier.fillMaxWidth().height(140.dp)) { open(t) } }
+            }
+            Box(Modifier.fillMaxWidth().height(48.dp).clickable { all = false }, Alignment.Center) { Text("Close", color = Am.Accent, fontSize = 18.sp) }
+        }
+    }
+}
+
+@Composable
+private fun TemplateCell(template: SavedTemplate, modifier: Modifier, onClick: () -> Unit) {
+    Box(modifier.padding(horizontal = 2.5.dp, vertical = 10.dp).background(Color.Black).clickable(onClick = onClick)) {
+        rememberFileBitmap(template.thumbnail, template.modified)?.let { Image(it, null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop) }
+        Text(
+            template.title, Modifier.align(Alignment.BottomCenter).fillMaxWidth().background(Color(0x66000000)).padding(horizontal = 3.dp),
+            color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis,
+        )
+    }
+}
+
+@Composable
+private fun QuickBar(state: EditorState, modifier: Modifier) {
+    var captions by remember { mutableStateOf(false) }
+    Column(modifier) {
+        QuickItem("Freehand Brush", ChromeIcons.Freehand, height = 61.dp, iconTop = 7.dp, labelTop = 35.dp, onClick = { state.startFreehand() })
+        QuickItem("Pen Tool", ChromeIcons.VectorDrawing, height = 61.dp, iconTop = 6.5.dp, labelTop = 35.dp, onClick = { state.startVectorDrawing() })
+        QuickItem("Text", ChromeIcons.TextTool, height = 48.dp, iconTop = 4.dp, labelTop = 31.dp, onClick = { state.addText() })
+        QuickItem("Captions", ChromeIcons.Captions, height = 48.dp, iconTop = 4.dp, labelTop = 31.dp, onClick = { captions = true })
+        BarButton(ChromeIcons.CloseThick, "Close", Modifier.fillMaxWidth().weight(1f)) { state.addOpen = false }
+    }
+    if (captions) CaptionsSheet(state) { captions = false }
+}
+
+@Composable
+private fun QuickItem(label: String, icon: ImageVector, height: Dp, iconTop: Dp, labelTop: Dp, onClick: () -> Unit) {
+    Column(Modifier.fillMaxWidth().height(height).clickable(onClick = onClick), horizontalAlignment = Alignment.CenterHorizontally) {
+        Spacer(Modifier.height(iconTop))
+        Icon(icon, null, Modifier.size(24.dp), tint = Am.OnDark)
+        Spacer(Modifier.height(labelTop - iconTop - 24.dp))
+        Text(
+            label, Modifier.fillMaxWidth().padding(horizontal = 2.dp), color = Am.OnDark,
+            fontSize = 9.sp, lineHeight = 10.5.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center,
+        )
+    }
+}

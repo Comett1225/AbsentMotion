@@ -1,0 +1,36 @@
+{
+ "id": "scanlines",
+ "name": "Scanlines",
+ "category": "stylize",
+ "description": "Adds horizontal scanlines for a CRT monitor effect with optional vertical rolling.",
+ "params": [
+  {
+   "id": "spacing",
+   "label": "Line Spacing",
+   "type": "float",
+   "default": 6.0,
+   "min": 2.0,
+   "max": 20.0,
+   "step": 1.0
+  },
+  {
+   "id": "darkness",
+   "label": "Darkness",
+   "type": "float",
+   "default": 0.4,
+   "min": 0.0,
+   "max": 1.0,
+   "step": 0.01
+  },
+  {
+   "id": "roll_speed",
+   "label": "Roll Speed",
+   "type": "float",
+   "default": 0.3,
+   "min": 0.0,
+   "max": 2.0,
+   "step": 0.01
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float spacing;\nuniform float darkness;\nuniform float roll_speed;\nhalf4 main(float2 coord) {\n    float y = coord.y + time * roll_speed * 60.0;\n    float line = fract(y / spacing);\n    float scan = 1.0 - (1.0 - darkness) * (line < 0.5 ? 1.0 : 0.0);\n    half4 c = image.eval(coord);\n    if (c.a <= 0.0) return c;\n    half3 rgb = c.rgb / c.a;\n    rgb *= scan;\n    c.rgb = rgb * c.a;\n    return c;\n}"
+}

@@ -1,0 +1,45 @@
+{
+ "id": "vignette",
+ "name": "Vignette",
+ "category": "stylize",
+ "description": "Applies a vignette effect to darken edges of the image.",
+ "params": [
+  {
+   "id": "amount",
+   "label": "Amount",
+   "type": "float",
+   "default": 0.5,
+   "min": 0.0,
+   "max": 1.0,
+   "step": 0.01
+  },
+  {
+   "id": "radius",
+   "label": "Size",
+   "type": "float",
+   "default": 1.0,
+   "min": 0.0,
+   "max": 1.5,
+   "step": 0.01
+  },
+  {
+   "id": "softness",
+   "label": "Softness",
+   "type": "float",
+   "default": 0.5,
+   "min": 0.0,
+   "max": 1.0,
+   "step": 0.01
+  },
+  {
+   "id": "roundness",
+   "label": "Roundness",
+   "type": "float",
+   "default": 1.0,
+   "min": 0.0,
+   "max": 1.0,
+   "step": 0.01
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float amount;\nuniform float radius;\nuniform float softness;\nuniform float roundness;\n\nhalf4 main(float2 coord) {\n    float2 norm = (coord / size - 0.5) * 2.0;\n    float dx = norm.x, dy = norm.y;\n    float d_sq = dx*dx + dy*dy;\n    float circleDist = sqrt(d_sq);\n    float rectDist = max(abs(dx), abs(dy));\n    float dist = mix(rectDist, circleDist, roundness);\n    float edge = radius;\n    float t = smoothstep(edge - softness, edge + softness, dist);\n    float vignette = 1.0 - (amount * clamp(t, 0, 1));\n    half4 color = image.eval(coord);\n    half a = color.a;\n    if (a > 0.0001) {\n        color.rgb /= a;\n        color.rgb *= vignette;\n        color.rgb *= a;\n    } else {\n        color = half4(0);\n    }\n    return color;\n}"
+}

@@ -1,0 +1,39 @@
+{
+ "id": "twirl",
+ "name": "Twirl",
+ "category": "distort",
+ "description": "Rotates pixels around a center point by an angle that decreases with distance from the center.",
+ "params": [
+  {
+   "id": "center",
+   "label": "Center",
+   "type": "point",
+   "default": [
+    0.5,
+    0.5
+   ],
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  },
+  {
+   "id": "radius",
+   "label": "Radius",
+   "type": "float",
+   "default": 0.25,
+   "min": 0.0,
+   "max": 1.0,
+   "step": 0.01
+  },
+  {
+   "id": "angle",
+   "label": "Angle",
+   "type": "angle",
+   "default": 180.0,
+   "min": -720.0,
+   "max": 720.0,
+   "step": 1.0
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float2 center;\nuniform float radius;\nuniform float angle;\n\nhalf4 main(float2 coord) {\n    float2 centerPixels = center * size;\n    float2 delta = coord - centerPixels;\n    float dist = length(delta);\n    float radiusPixels = radius * min(size.x, size.y);\n    \n    if (dist > radiusPixels) {\n        half4 color = image.eval(coord);\n        if (color.a <= 0.0) {\n            return half4(0.0);\n        }\n        half3 rgb = color.rgb / color.a;\n        return half4(rgb * color.a, color.a);\n    }\n    \n    float t = 1.0 - smoothstep(0.0, radiusPixels, dist);\n    float rotation = angle * t;\n    float s = sin(radians(rotation));\n    float c = cos(radians(rotation));\n    \n    float2x2 mat = float2x2(c, -s, s, c);\n    float2 rotated = mat * delta;\n    float2 sampleCoord = centerPixels + rotated;\n    \n    half4 color = image.eval(sampleCoord);\n    if (color.a <= 0.001) {\n        return half4(0.0);\n    }\n    half3 rgb = color.rgb / color.a;\n    return half4(rgb * color.a, color.a);\n}"
+}

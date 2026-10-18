@@ -1,0 +1,41 @@
+package app.absentmotion.library
+
+import app.absentmotion.platform.Context
+import java.io.File
+import java.net.URI
+
+class MediaAccess private constructor(private val filesDir: File?) {
+    fun allows(uri: String): Boolean {
+        if (filesDir == null) return true
+        return when (uri.substringBefore(':', "").lowercase()) {
+            "content" -> uri.startsWith("content://", ignoreCase = true) && uri.substring("content://".length).substringBefore('/').isNotEmpty()
+            "file" -> inMediaFolder(filesDir, uri)
+            else -> false
+        }
+    }
+
+    fun defused(uri: String): String = if (uri.startsWith("file:", ignoreCase = true) && !allows(uri)) "blocked-$uri" else uri
+
+    companion object {
+        val Unlimited = MediaAccess(null)
+
+        fun forPhone(filesDir: File) = MediaAccess(filesDir)
+
+        fun forApp(context: Context): MediaAccess = if (onPhone) forPhone(context.filesDir) else Unlimited
+
+        private val onPhone = System.getProperty("java.vm.name").orEmpty().contains("Dalvik", ignoreCase = true)
+
+        private fun inMediaFolder(filesDir: File, uri: String): Boolean = try {
+            val base = filesDir.canonicalFile.toPath()
+            val path = File(URI(uri)).canonicalFile.toPath()
+            val inside = if (path.startsWith(base) && path != base) base.relativize(path) else null
+            when (inside?.getName(0)?.toString()) {
+                "media" -> inside.nameCount > 1
+                "templates" -> inside.nameCount > 3 && inside.getName(2).toString() == "media"
+                else -> false
+            }
+        } catch (e: Exception) {
+            false
+        }
+    }
+}

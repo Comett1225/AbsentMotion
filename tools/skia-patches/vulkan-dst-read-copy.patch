@@ -1,0 +1,16 @@
+diff --git a/src/gpu/graphite/vk/VulkanCaps.cpp b/src/gpu/graphite/vk/VulkanCaps.cpp
+index 1e29f4f..10d03d6 100644
+--- a/src/gpu/graphite/vk/VulkanCaps.cpp
++++ b/src/gpu/graphite/vk/VulkanCaps.cpp
+@@ -1274,8 +1274,9 @@ DstReadStrategy VulkanCaps::getDstReadStrategy() const {
+     // not marked as supported and skip checking for it.
+     SkASSERT(!this->shaderCaps()->fFBFetchSupport);
+ 
+-    // All render target textures are expected to have VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT.
+-    return DstReadStrategy::kReadFromInput;
++    // AbsentMotion: copy the destination instead of reading it as an input attachment. On the Adreno 840 input
++    // attachment reads of a blend-mode layer's backdrop came back corrupt, in tile-sized blocks.
++    return DstReadStrategy::kTextureCopy;
+ }
+ 
+ ImmutableSamplerInfo VulkanCaps::getImmutableSamplerInfo(const TextureInfo& textureInfo) const {

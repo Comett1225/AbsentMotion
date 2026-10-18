@@ -1,0 +1,39 @@
+{
+ "id": "bulge",
+ "name": "Bulge",
+ "category": "distort",
+ "description": "Applies a fisheye magnify or pinch distortion around a center point with controllable strength and radius",
+ "params": [
+  {
+   "id": "center",
+   "label": "Center",
+   "type": "point",
+   "default": [
+    0.5,
+    0.5
+   ],
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  },
+  {
+   "id": "strength",
+   "label": "Strength",
+   "type": "float",
+   "default": 0.3,
+   "min": -1,
+   "max": 1,
+   "step": 0.01
+  },
+  {
+   "id": "radius",
+   "label": "Radius",
+   "type": "float",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float2 center;\nuniform float strength;\nuniform float radius;\n\nhalf4 main(float2 coord) {\n    float2 centerPx = center * size;\n    float2 d = coord - centerPx;\n    float dist = length(d);\n    float2 dir = d / max(dist, 0.0001);\n    float radiusPx = radius * min(size.x, size.y);\n    float t = smoothstep(radiusPx, 0.0, dist);\n    float effect = 1.0 + strength * t;\n    float2 sampleCoord = centerPx + dir * (dist * effect);\n    half4 color = image.eval(sampleCoord);\n    if (color.a > 0.001) {\n        color.rgb /= color.a;\n    }\n    return half4(color.rgb * color.a, color.a);\n}"
+}

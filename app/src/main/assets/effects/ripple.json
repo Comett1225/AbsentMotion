@@ -1,0 +1,48 @@
+{
+ "id": "ripple",
+ "name": "Ripple",
+ "category": "distort",
+ "description": "Concentric ripples radiating from a center point with configurable amplitude, wavelength, and speed",
+ "params": [
+  {
+   "id": "center",
+   "label": "Center",
+   "type": "point",
+   "default": [
+    0.5,
+    0.5
+   ],
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  },
+  {
+   "id": "amplitude",
+   "label": "Amplitude",
+   "type": "float",
+   "default": 20.0,
+   "min": 0.0,
+   "max": 100.0,
+   "step": 0.1
+  },
+  {
+   "id": "wavelength",
+   "label": "Wavelength",
+   "type": "float",
+   "default": 30.0,
+   "min": 1.0,
+   "max": 200.0,
+   "step": 0.1
+  },
+  {
+   "id": "speed",
+   "label": "Speed",
+   "type": "float",
+   "default": 2.0,
+   "min": 0.0,
+   "max": 10.0,
+   "step": 0.1
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float2 center;\nuniform float amplitude;\nuniform float wavelength;\nuniform float speed;\nhalf4 main(float2 coord) {\n    float2 centerPx = center * size;\n    float2 d = coord - centerPx;\n    float dist = length(d);\n    float phase = time * speed;\n    float wave = sin(dist / wavelength - phase) * amplitude;\n    float2 offset = normalize(d) * wave;\n    half4 color = image.eval(coord + offset);\n    if (color.a > 0.0) {\n        color.rgb /= color.a;\n    }\n    color.rgb *= color.a;\n    return color;\n}\n"
+}

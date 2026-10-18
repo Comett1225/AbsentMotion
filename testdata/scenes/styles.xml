@@ -1,0 +1,212 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<scene title="Styles" width="1080" height="1920" exportWidth="1080" exportHeight="1920" precompose="dynamicResolution" bgcolor="#ff1b1d27" totalTime="2999" fps="30" am="app.absentmotion" amplatform="android" retime="freeze" retimeAdaptFPS="false">
+  <shape id="7001" label="Border inside" startTime="0" endTime="2999" fillType="color" mediaFillMode="fill" s=".roundrect">
+    <transform>
+      <location value="200.000000,200.000000,0.000000" />
+    </transform>
+    <fillColor value="#ff1d6bd6" />
+    <property name="size" type="vec2" value="70.000000,70.000000" />
+    <property name="cornerRadius" type="float" value="25.000000" />
+    <border direction="inside" id="1">
+      <color value="#fffad961" />
+      <size value="12.000000" />
+    </border>
+  </shape>
+  <shape id="7002" label="Border outside" startTime="0" endTime="2999" fillType="color" mediaFillMode="fill" s=".roundrect">
+    <transform>
+      <location value="540.000000,200.000000,0.000000" />
+    </transform>
+    <fillColor value="#ff1d6bd6" />
+    <property name="size" type="vec2" value="70.000000,70.000000" />
+    <property name="cornerRadius" type="float" value="25.000000" />
+    <border direction="outside" id="1">
+      <color value="#fffad961" />
+      <size value="12.000000" />
+    </border>
+  </shape>
+  <shape id="7003" label="Border centered" startTime="0" endTime="2999" fillType="color" mediaFillMode="fill" s=".roundrect">
+    <transform>
+      <location value="880.000000,200.000000,0.000000" />
+    </transform>
+    <fillColor value="#ff1d6bd6" />
+    <property name="size" type="vec2" value="70.000000,70.000000" />
+    <property name="cornerRadius" type="float" value="25.000000" />
+    <border direction="centered" id="1">
+      <color value="#fffad961" />
+      <size value="12.000000" />
+    </border>
+  </shape>
+  <shape id="7004" label="Shadow" startTime="0" endTime="2999" fillType="color" mediaFillMode="fill" s=".star">
+    <transform>
+      <location value="200.000000,450.000000,0.000000" />
+    </transform>
+    <fillColor value="#ffee4767" />
+    <shadow direction="outside">
+      <color value="#ff000000" />
+      <opacity value="0.700000" />
+      <size value="16.000000" />
+      <hardness value="0.000000" />
+      <offset value="12.000000,12.000000" />
+    </shadow>
+  </shape>
+  <shape id="7005" label="Border and shadow" startTime="0" endTime="2999" fillType="color" mediaFillMode="fill" s=".poly">
+    <transform>
+      <location value="540.000000,450.000000,0.000000" />
+    </transform>
+    <fillColor value="#ff9621f0" />
+    <border direction="outside" id="1">
+      <color value="#ffffffff" />
+      <size value="8.000000" />
+    </border>
+    <shadow direction="outside">
+      <color value="#ff000000" />
+      <opacity value="0.500000" />
+      <size value="24.000000" />
+      <hardness value="0.000000" />
+      <offset value="0.000000,20.000000" />
+    </shadow>
+  </shape>
+  <shape id="7006" label="Animated border" startTime="0" endTime="2999" fillType="color" mediaFillMode="fill" s=".circle">
+    <transform>
+      <location value="880.000000,450.000000,0.000000" />
+    </transform>
+    <fillColor value="#fff0f0f0" />
+    <property name="size" type="vec2" value="70.000000,70.000000" />
+    <border direction="outside" id="1">
+      <color>
+        <kf t="0.000000" v="#ffff0000" />
+        <kf t="1.000000" v="#ff0000ff" e="cubicBezier 0.42 0 0.58 1" />
+      </color>
+      <size>
+        <kf t="0.000000" v="2.000000" />
+        <kf t="1.000000" v="24.000000" e="cubicBezier 0.42 0 0.58 1" />
+      </size>
+    </border>
+  </shape>
+  <shape id="7007" label="Linear gradient" startTime="0" endTime="2999" fillType="gradient" mediaFillMode="fill" s=".roundrect">
+    <transform>
+      <location value="200.000000,700.000000,0.000000" />
+    </transform>
+    <property name="size" type="vec2" value="70.000000,70.000000" />
+    <property name="cornerRadius" type="float" value="25.000000" />
+    <gradient type="linear" startColor="#ffff7a00" endColor="#ff00c2ff" start="0,0" end="1,1" />
+  </shape>
+  <shape id="7008" label="Radial gradient" startTime="0" endTime="2999" fillType="gradient" mediaFillMode="fill" s=".circle">
+    <transform>
+      <location value="540.000000,700.000000,0.000000" />
+    </transform>
+    <property name="size" type="vec2" value="70.000000,70.000000" />
+    <gradient type="radial" startColor="#ffffffff" endColor="#ff1d6bd6" start="0.5,0.5" end="1,0.5" />
+  </shape>
+  <shape id="7009" label="Sweep gradient" startTime="0" endTime="2999" fillType="gradient" mediaFillMode="fill" s=".poly">
+    <transform>
+      <location value="880.000000,700.000000,0.000000" />
+    </transform>
+    <gradient type="sweep" startColor="#ff52ccbc" endColor="#ffd500ff" start="0.5,0.5" end="1,0.5" />
+  </shape>
+  <shape id="7010" label="Arc round cap" startTime="0" endTime="2999" fillType="none" mediaFillMode="fill" s=".arc">
+    <transform>
+      <location value="200.000000,950.000000,0.000000" />
+    </transform>
+    <property name="startAngle" type="float" value="0.000000" />
+    <property name="endAngle" type="float" value="270.000000" />
+    <property name="radius" type="float" value="90.000000" />
+    <property name="closed" type="bool" value="false" />
+    <path-stroke direction="centered" end-size="1.500000" cap="round" join="round">
+      <color value="#fffad961" />
+      <size value="24.000000" />
+    </path-stroke>
+  </shape>
+  <shape id="7011" label="Line arrow ends" startTime="0" endTime="2999" fillType="none" mediaFillMode="fill" s=".line">
+    <transform>
+      <location value="540.000000,950.000000,0.000000" />
+    </transform>
+    <property name="p1" type="vec2" value="-100.000000,80.000000" />
+    <property name="p2" type="vec2" value="100.000000,-80.000000" />
+    <path-stroke direction="centered" end-size="1.500000" cap="butt" start="arrow" end="arrow-filled">
+      <color value="#ff52ccbc" />
+      <size value="14.000000" />
+    </path-stroke>
+  </shape>
+  <shape id="7012" label="Triangle miter join" startTime="0" endTime="2999" fillType="color" mediaFillMode="fill" s=".triangle">
+    <transform>
+      <location value="880.000000,950.000000,0.000000" />
+    </transform>
+    <fillColor value="#ffee4767" />
+    <path-stroke direction="centered" end-size="1.500000" join="miter" cap="square">
+      <color value="#ffffffff" />
+      <size value="12.000000" />
+    </path-stroke>
+  </shape>
+  <shape id="7100" label="Backing" startTime="0" endTime="2999" fillType="color" mediaFillMode="fill" s=".rect">
+    <transform>
+      <location value="540.000000,1450.000000,0.000000" />
+    </transform>
+    <fillColor value="#fff0a040" />
+    <property name="size" type="vec2" value="500.000000,120.000000" />
+  </shape>
+  <shape id="7101" label="Blend multiply" startTime="0" endTime="2999" fillType="color" mediaFillMode="fill" s=".circle" blending="multiply">
+    <transform>
+      <location value="150.000000,1450.000000,0.000000" />
+    </transform>
+    <fillColor value="#ff2d9cdb" />
+    <property name="size" type="vec2" value="90.000000,90.000000" />
+  </shape>
+  <shape id="7102" label="Blend screen" startTime="0" endTime="2999" fillType="color" mediaFillMode="fill" s=".circle" blending="screen">
+    <transform>
+      <location value="345.000000,1450.000000,0.000000" />
+    </transform>
+    <fillColor value="#ff2d9cdb" />
+    <property name="size" type="vec2" value="90.000000,90.000000" />
+  </shape>
+  <shape id="7103" label="Blend overlay" startTime="0" endTime="2999" fillType="color" mediaFillMode="fill" s=".circle" blending="overlay">
+    <transform>
+      <location value="540.000000,1450.000000,0.000000" />
+    </transform>
+    <fillColor value="#ff2d9cdb" />
+    <property name="size" type="vec2" value="90.000000,90.000000" />
+  </shape>
+  <shape id="7104" label="Blend diff" startTime="0" endTime="2999" fillType="color" mediaFillMode="fill" s=".circle" blending="diff">
+    <transform>
+      <location value="735.000000,1450.000000,0.000000" />
+    </transform>
+    <fillColor value="#ff2d9cdb" />
+    <property name="size" type="vec2" value="90.000000,90.000000" />
+  </shape>
+  <shape id="7105" label="Blend lighten" startTime="0" endTime="2999" fillType="color" mediaFillMode="fill" s=".circle" blending="lighten">
+    <transform>
+      <location value="930.000000,1450.000000,0.000000" />
+    </transform>
+    <fillColor value="#ff2d9cdb" />
+    <property name="size" type="vec2" value="90.000000,90.000000" />
+  </shape>
+  <shape id="7201" label="Mask base" startTime="0" endTime="2999" fillType="color" mediaFillMode="fill" s=".circle">
+    <transform>
+      <location value="300.000000,1750.000000,0.000000" />
+    </transform>
+    <fillColor value="#ff52ccbc" />
+    <property name="size" type="vec2" value="100.000000,100.000000" />
+  </shape>
+  <shape id="7202" label="Masked" startTime="0" endTime="2999" fillType="color" mediaFillMode="fill" s=".rect" clippingMask="true">
+    <transform>
+      <location value="350.000000,1750.000000,0.000000" />
+    </transform>
+    <fillColor value="#fffad961" />
+    <property name="size" type="vec2" value="100.000000,40.000000" />
+  </shape>
+  <shape id="7301" label="Half opacity" startTime="0" endTime="2999" fillType="color" mediaFillMode="fill" s=".star">
+    <transform>
+      <location value="700.000000,1750.000000,0.000000" />
+      <opacity value="0.500000" />
+    </transform>
+    <fillColor value="#ffee4767" />
+  </shape>
+  <shape id="7302" label="Flipped" startTime="0" endTime="2999" fillType="color" mediaFillMode="fill" s=".arrow">
+    <transform>
+      <location value="900.000000,1750.000000,0.000000" />
+      <pivot value="125.000000,-125.000000,0.000000" />
+      <scale value="-0.600000,0.600000" />
+    </transform>
+    <fillColor value="#ffffffff" />
+  </shape>
+</scene>

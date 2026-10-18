@@ -1,0 +1,383 @@
+package app.absentmotion.ui.editor.panels
+
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.drag
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.unit.sp
+import app.absentmotion.editor.EditorState
+import app.absentmotion.editor.KeypadField
+import app.absentmotion.editor.KeypadRequest
+import app.absentmotion.engine.SnapGuide
+import app.absentmotion.model.Layer
+import app.absentmotion.ui.editor.PanelIcons
+import app.absentmotion.ui.theme.Am
+import kotlin.math.abs
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
+
+@Composable
+internal fun MoveTransformPanel(state: EditorState, layer: Layer, tab: Int, modifier: Modifier = Modifier) {
+    Box(modifier) {
+        when (tab) {
+            0 -> PositionTab(state, layer)
+            1 -> RotationTab(state, layer)
+            2 -> SizeTab(state, layer)
+            else -> SkewTab(state, layer)
+        }
+    }
+}
+
+@Composable
+private fun PositionTab(state: EditorState, layer: Layer) {
+    val at = layer.location
+    fun openKeypad(active: Int) {
+        val fields = listOf(KeypadField("X", at[0]), KeypadField("Y", at[1]), KeypadField("Z", at[2]))
+        state.keypad = KeypadRequest(fields, active) { v -> state.editSelected { it.withTransform("location", v[0], v[1], v[2]) } }
+    }
+    val others by produceState(emptyList<SnapOther>(), layer.id, state.scene.layers, state.timeMs) {
+        value = state.scene.layers.filter { it.id != layer.id && it.kind != "audio" && it.activeAt(state.sampleMs) }.map { o ->
+            val at = o.at(state.sampleMs, state.scene.fps).location
+            SnapOther(at[0], at[1], state.engine.layerBounds(o.id, state.timeMs))
+        }
+    }
+    val box by produceState<FloatArray?>(null, layer.node, state.timeMs) { value = state.engine.layerBounds(layer.id, state.timeMs) }
+    val start by rememberUpdatedState { snapAxes(state.scene.width.toFloat(), state.scene.height.toFloat(), layer.location, box, others) }
+    val now by rememberUpdatedState(layer)
+    DisposableEffect(Unit) { onDispose { state.snapGuides = emptyList() } }
+    Box(
+        Modifier.fillMaxSize().pointerInput(state) {
+            var axes = SnapAxis(emptyList()) to SnapAxis(emptyList())
+            var origin = now.location
+            var travel = Offset.Zero
+            var shown = Offset.Zero
+            fun done() { state.snapGuides = emptyList(); state.endGesture() }
+            detectDragGestures(
+                onDragStart = { axes = start(); origin = now.location; travel = Offset.Zero; shown = Offset.Zero },
+                onDragEnd = ::done, onDragCancel = ::done,
+            ) { change, drag ->
+                change.consume()
+                travel += drag / density
+                val snapped = Offset(axes.first.map(travel.x), axes.second.map(travel.y))
+                val step = snapped - shown
+                shown = snapped
+                state.snapGuides = (if (step.x == 0f) axes.first.guidesAt(snapped.x) else emptyList()) +
+                    (if (step.y == 0f) axes.second.guidesAt(snapped.y) else emptyList())
+                if (step != Offset.Zero) state.editSelected(key = "move") { l -> l.withTransform("location", origin[0] + snapped.x, origin[1] + snapped.y, l.location[2]) }
+            }
+        },
+    ) {
+        TrackpadCorners()
+        Text("Drag here to move the layer", Modifier.align(Alignment.Center), color = PanelCaption, fontSize = 15.sp, maxLines = 1, softWrap = false)
+        Column(Modifier.align(Alignment.TopCenter).padding(top = 17.px)) {
+            Row {
+                Row(Modifier.width(354.px).height(70.px).clip(PanelShape).background(Am.Field)) {
+                    ValueCell(formatFixed(at[0], 2), Am.Accent, Modifier.weight(1f)) { openKeypad(0) }
+                    ValueCell(formatFixed(at[1], 2), Am.Accent, Modifier.weight(1f)) { openKeypad(1) }
+                }
+                Spacer(Modifier.width(20.px))
+                NumberBox(formatFixed(at[2], 2), Am.OnDark, Modifier.width(177.px).height(70.px), fontSize = 10.5f) { openKeypad(2) }
+            }
+            Row(Modifier.height(23.px)) {
+                Caption("X", Modifier.width(177.px).fillMaxHeight())
+                Caption("Y", Modifier.width(177.px).fillMaxHeight())
+                Spacer(Modifier.width(20.px))
+                Caption("Z", Modifier.width(177.px).fillMaxHeight())
+            }
+        }
+    }
+}
+
+@Composable
+private fun ValueCell(text: String, color: Color, modifier: Modifier, onClick: () -> Unit) {
+    Box(modifier.fillMaxHeight().clickable(onClick = onClick), contentAlignment = Alignment.Center) {
+        Text(text, color = color, fontSize = 10.5.sp, maxLines = 1, softWrap = false)
+    }
+}
+
+internal class SnapOther(val x: Float, val y: Float, val bounds: FloatArray?)
+
+internal class Snap(val distance: Float, val guide: SnapGuide)
+
+internal fun snapAxes(width: Float, height: Float, at: FloatArray, mine: FloatArray?, others: List<SnapOther>): Pair<SnapAxis, SnapAxis> {
+    val xs = arrayListOf(Snap(width / 2 - at[0], SnapGuide(true, width / 2, true)))
+    val ys = arrayListOf(Snap(height / 2 - at[1], SnapGuide(false, height / 2, true)))
+    for (o in others) {
+        xs += Snap(o.x - at[0], SnapGuide(true, o.x, false))
+        ys += Snap(o.y - at[1], SnapGuide(false, o.y, false))
+        val b = o.bounds ?: continue
+        if (mine == null) continue
+        for (axis in 0..1) for (theirs in intArrayOf(axis, axis + 2)) for (own in intArrayOf(axis, axis + 2)) {
+            (if (axis == 0) xs else ys) += Snap(b[theirs] - mine[own], SnapGuide(axis == 0, b[theirs], false))
+        }
+    }
+    return SnapAxis(xs) to SnapAxis(ys)
+}
+
+internal class SnapAxis(snaps: List<Snap>, private val threshold: Float = 25f) {
+    private val stops: List<Pair<Float, List<SnapGuide>>> = snaps.filter { it.distance.isFinite() }.sortedBy { it.distance }
+        .fold(mutableListOf<Pair<Float, MutableList<SnapGuide>>>()) { out, snap ->
+            val last = out.lastOrNull()
+            if (last != null && snap.distance - last.first <= SAME) last.second += snap.guide else out += snap.distance to mutableListOf(snap.guide)
+            out
+        }
+
+    fun map(travel: Float): Float {
+        if (travel.isNaN()) return 0f
+        val sign = if (travel < 0) -1f else 1f
+        val far = abs(travel)
+        var held = 0f
+        stops.firstOrNull { abs(it.first) <= SAME }?.let { (at, _) ->
+            if (far <= threshold / 2) return at
+            held = threshold / 2
+        }
+        val ahead = stops.filter { it.first * sign > SAME }.map { it.first }.sortedBy { abs(it) }
+        for (at in ahead) {
+            val reached = abs(at) + held
+            if (far < reached) break
+            if (far <= reached + threshold) return at
+            held += threshold
+        }
+        return sign * (far - held)
+    }
+
+    fun guidesAt(distance: Float): List<SnapGuide> = stops.firstOrNull { abs(it.first - distance) <= SAME }?.second ?: emptyList()
+
+    private companion object {
+        const val SAME = 0.01f
+    }
+}
+
+@Composable
+private fun TrackpadCorners() {
+    Canvas(Modifier.fillMaxSize()) {
+        val far = 718.5f
+        val near = 24.5f
+        val bottom = 537.5f
+        corner(near, near, 1f, 1f)
+        corner(far, near, -1f, 1f)
+        corner(near, bottom, 1f, -1f)
+        corner(far, bottom, -1f, -1f)
+    }
+}
+
+private fun DrawScope.corner(xPx: Float, yPx: Float, dx: Float, dy: Float) {
+    val x = xPx.px.toPx()
+    val y = yPx.px.toPx()
+    val length = 25.px.toPx()
+    val radius = 9.px.toPx()
+    val mark = Path().apply {
+        moveTo(x, y + dy * length)
+        lineTo(x, y + dy * radius)
+        quadraticTo(x, y, x + dx * radius, y)
+        lineTo(x + dx * length, y)
+    }
+    drawPath(mark, PanelCaption, style = Stroke(3.px.toPx(), cap = StrokeCap.Round))
+}
+
+@Composable
+private fun RotationTab(state: EditorState, layer: Layer) {
+    val angle = layer.rotation
+    Box(
+        Modifier.fillMaxSize().pointerInput(state) {
+            awaitEachGesture {
+                val down = awaitFirstDown()
+                val centre = Offset(size.width / 2f, size.height / 2f)
+                var last = dialAngle(down.position - centre)
+                drag(down.id) { change ->
+                    val now = dialAngle(change.position - centre)
+                    var delta = now - last
+                    if (delta > 180f) delta -= 360f else if (delta < -180f) delta += 360f
+                    last = now
+                    change.consume()
+                    if (delta != 0f) state.editSelected(key = "rotate") { l -> l.withRotation(l.rotation + delta) }
+                }
+                state.endGesture()
+            }
+        },
+    ) {
+        Canvas(Modifier.fillMaxSize()) {
+            val centre = Offset(size.width / 2f, size.height / 2f)
+            val radius = 227.px.toPx()
+            drawCircle(Am.Well, radius, centre, style = Stroke(7.px.toPx()))
+            drawArc(
+                PanelGreen, startAngle = 0f, sweepAngle = -(angle % 360f), useCenter = false,
+                topLeft = centre - Offset(radius, radius), size = Size(radius * 2, radius * 2), style = Stroke(6.px.toPx()),
+            )
+            val radians = Math.toRadians(angle.toDouble())
+            val knob = centre + Offset((radius * cos(radians)).toFloat(), (-radius * sin(radians)).toFloat())
+            drawCircle(Color.Black.copy(alpha = 0.25f), 49.px.toPx(), knob + Offset(0f, 2.px.toPx()))
+            drawCircle(Am.OnDark, 49.px.toPx(), knob)
+        }
+        Box(
+            Modifier.align(Alignment.Center).size(267.px, 140.px).clip(PanelShape).background(Am.Field).clickable {
+                state.keypad = KeypadRequest(listOf(KeypadField(ROTATION_LABEL, angle)), 0) { v ->
+                    state.editSelected { it.withRotation(v[0]) }
+                }
+            },
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(formatFixed(angle, 1).removeSuffix(".0") + "º", color = Am.Accent, fontSize = 32.5.sp, maxLines = 1, softWrap = false)
+        }
+    }
+}
+
+private const val ROTATION_LABEL = ""
+
+private fun dialAngle(fromCentre: Offset): Float = Math.toDegrees(atan2(-fromCentre.y, fromCentre.x).toDouble()).toFloat()
+
+private class BoxAt(val w: Float, val h: Float, val sx: Float, val sy: Float)
+
+@Composable
+private fun SizeTab(state: EditorState, layer: Layer) {
+    var linked by remember { mutableStateOf(true) }
+    var active by remember { mutableIntStateOf(0) }
+    val measured by produceState<BoxAt?>(null, layer.node, state.sampleMs) {
+        value = state.engine.layerQuad(layer.id, state.sampleMs)?.let { q ->
+            val xs = listOf(q[0], q[2], q[4], q[6])
+            val ys = listOf(q[1], q[3], q[5], q[7])
+            BoxAt(xs.max() - xs.min(), ys.max() - ys.min(), layer.scale[0], layer.scale[1])
+        }
+    }
+    val box = measured?.let { m ->
+        val rx = if (m.sx != 0f) abs(layer.scale[0] / m.sx) else 1f
+        val ry = if (m.sy != 0f) abs(layer.scale[1] / m.sy) else 1f
+        if (abs(rx - ry) < 1e-4f || (layer.rotation == 0f && layer.skew.all { it == 0f })) m.w * rx to m.h * ry else m.w to m.h
+    }
+    val (boxW, boxH) = box ?: (0f to 0f)
+
+    fun stretch(factor: Float, isWidth: Boolean, key: Any? = null) = state.editSelected(key) { l ->
+        val s = l.scale
+        val quarter = abs(abs(l.rotation % 180f) - 90f) < 0.01f
+        val first = isWidth != quarter
+        l.withTransform("scale", if (first || linked) s[0] * factor else s[0], if (!first || linked) s[1] * factor else s[1])
+    }
+    fun openKeypad(isWidth: Boolean) {
+        active = if (isWidth) 0 else 1
+        if (box == null) return
+        val old = if (isWidth) boxW else boxH
+        val field = KeypadField(if (isWidth) "Width" else "Height", old)
+        state.keypad = KeypadRequest(listOf(field), 0) { v -> if (old > 0f && v[0] > 0f) stretch(v[0] / old, isWidth) }
+    }
+    fun colour(which: Int) = if (linked || active == which) Am.Accent else Am.OnDark
+
+    Box(Modifier.fillMaxSize()) {
+        Column(Modifier.align(Alignment.TopCenter).padding(top = 42.px)) {
+            Row {
+                NumberBox(formatFixed(boxW, 1), colour(0), Modifier.width(177.px).height(70.px)) { openKeypad(true) }
+                Spacer(Modifier.width(14.px))
+                Box(
+                    Modifier.size(70.px).clip(PanelShape).background(Am.Inactive).clickable { linked = !linked },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    PanelIcon(if (linked) PanelIcons.Link else PanelIcons.Unlink, Am.OnDark, size = 58.px)
+                }
+                Spacer(Modifier.width(14.px))
+                NumberBox(formatFixed(boxH, 1), colour(1), Modifier.width(177.px).height(70.px)) { openKeypad(false) }
+            }
+            Row(Modifier.height(23.px)) {
+                Caption("Width", Modifier.width(177.px).fillMaxHeight())
+                Spacer(Modifier.width(98.px))
+                Caption("Height", Modifier.width(177.px).fillMaxHeight())
+            }
+        }
+        for (which in if (linked) 0..0 else 0..1) {
+            key(linked, which) {
+                RulerSpinner(
+                    colour(which),
+                    onDrag = { dx -> stretch((1f + SIZE_PER_DP * dx).coerceAtLeast(0.05f), which == 0, "size-$which") },
+                    onEnd = { state.endGesture() },
+                    modifier = when {
+                        linked -> Modifier.padding(top = 160.px).fillMaxWidth().height(378.px)
+                        which == 0 -> Modifier.padding(top = 137.px).fillMaxWidth().height(194.px)
+                        else -> Modifier.padding(top = 345.px).fillMaxWidth().height(193.px)
+                    },
+                    onStart = { active = which },
+                )
+            }
+        }
+    }
+}
+
+private const val SIZE_PER_DP = 0.005f
+
+@Composable
+private fun SkewTab(state: EditorState, layer: Layer) {
+    var active by remember { mutableIntStateOf(0) }
+    val skew = layer.skew
+    fun openKeypad(which: Int) {
+        active = which
+        val fields = listOf(KeypadField("X SKEW", skew[0]), KeypadField("Y SKEW", skew[1]))
+        state.keypad = KeypadRequest(fields, which) { v -> state.editSelected { it.withSkew(v[0], v[1]) } }
+    }
+    fun colour(which: Int) = if (active == which) Am.Accent else Am.OnDark
+
+    Box(Modifier.fillMaxSize()) {
+        Column(Modifier.align(Alignment.TopCenter).padding(top = 42.px)) {
+            Row {
+                NumberBox(formatFixed(skew[0], 1) + "º", colour(0), Modifier.width(177.px).height(70.px)) { openKeypad(0) }
+                Spacer(Modifier.width(14.px))
+                NumberBox(formatFixed(skew[1], 1) + "º", colour(1), Modifier.width(177.px).height(70.px)) { openKeypad(1) }
+            }
+            Row(Modifier.height(23.px)) {
+                Caption("X SKEW", Modifier.width(177.px).fillMaxHeight())
+                Spacer(Modifier.width(14.px))
+                Caption("Y SKEW", Modifier.width(177.px).fillMaxHeight())
+            }
+        }
+        for (which in 0..1) {
+            RulerSpinner(
+                colour(which),
+                onDrag = { dx ->
+                    val d = dx * DEGREES_PER_DP
+                    state.editSelected(key = "skew-$which") { l ->
+                        val s = l.skew
+                        l.withSkew(if (which == 0) s[0] + d else s[0], if (which == 1) s[1] + d else s[1])
+                    }
+                },
+                onEnd = { state.endGesture() },
+                modifier = Modifier.padding(top = (if (which == 0) 137 else 345).px).fillMaxWidth().height((if (which == 0) 194 else 193).px),
+                onStart = { active = which },
+            )
+        }
+    }
+}
+
+private const val DEGREES_PER_DP = 0.25f

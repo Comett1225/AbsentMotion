@@ -1,0 +1,45 @@
+{
+ "id": "lensflare",
+ "name": "Light Flare",
+ "category": "stylize",
+ "description": "A bright light with a halo, laid over the picture.",
+ "params": [
+  {
+   "id": "center",
+   "label": "Center",
+   "type": "point",
+   "default": [
+    0.3,
+    0.3
+   ],
+   "min": -1,
+   "max": 2,
+   "step": 0.01
+  },
+  {
+   "id": "radius",
+   "label": "Radius",
+   "type": "float",
+   "default": 0.25,
+   "min": 0.01,
+   "max": 2,
+   "step": 0.01
+  },
+  {
+   "id": "brightness",
+   "label": "Brightness",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 4,
+   "step": 0.01
+  },
+  {
+   "id": "color",
+   "label": "Color",
+   "type": "color",
+   "default": "#ffffe0b0"
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float2 center;\nuniform float radius;\nuniform float brightness;\nlayout(color) uniform half4 color;\nhalf4 main(float2 coord) {\n    half4 c = image.eval(coord);\n    float d = distance(coord, center * size) / (radius * max(size.x, size.y));\n    float light = brightness * (exp(-d * d * 6) + 0.35 * exp(-(d - 1) * (d - 1) * 60));\n    half3 rgb = c.rgb + color.rgb * half(light);\n    return half4(rgb, max(c.a, max(rgb.r, max(rgb.g, rgb.b))));\n}\n"
+}

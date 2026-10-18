@@ -1,0 +1,250 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<scene title="Shapes" width="1080" height="1920" exportWidth="1080" exportHeight="1920" precompose="dynamicResolution" bgcolor="#ff1b1d27" totalTime="2999" fps="30" am="app.absentmotion" amplatform="android" retime="freeze" retimeAdaptFPS="false">
+  <shape id="1001" label="Circle" startTime="0" endTime="2999" fillType="color" mediaFillMode="fill" s=".circle">
+    <transform>
+      <location value="135.000000,170.000000,0.000000" />
+      <scale value="0.600000,0.600000" />
+    </transform>
+    <fillColor value="#fff24949" />
+    <property name="size" type="vec2" value="100.000000,100.000000" />
+  </shape>
+  <shape id="1002" label="Rounded Rectangle" startTime="0" endTime="2999" fillType="color" mediaFillMode="fill" s=".roundrect">
+    <transform>
+      <location value="405.000000,170.000000,0.000000" />
+      <scale value="0.600000,0.600000" />
+    </transform>
+    <fillColor value="#fff27e49" />
+    <property name="size" type="vec2" value="100.000000,100.000000" />
+    <property name="cornerRadius" type="float" value="25.000000" />
+  </shape>
+  <shape id="1003" label="Plus" startTime="0" endTime="2999" fillType="color" mediaFillMode="fill" s=".plus">
+    <transform>
+      <location value="675.000000,170.000000,0.000000" />
+      <scale value="0.600000,0.600000" />
+    </transform>
+    <fillColor value="#fff2b449" />
+    <property name="size" type="vec2" value="100.000000,100.000000" />
+    <property name="stemSize" type="float" value="50.000000" />
+  </shape>
+  <shape id="1004" label="Arc" startTime="0" endTime="2999" fillType="none" mediaFillMode="fill" s=".arc">
+    <transform>
+      <location value="945.000000,170.000000,0.000000" />
+      <scale value="0.600000,0.600000" />
+    </transform>
+    <path-stroke direction="centered" end-size="1.500000">
+      <color value="#ff40d166" />
+      <size value="20.000000" />
+    </path-stroke>
+    <property name="startAngle" type="float" value="0.000000" />
+    <property name="endAngle" type="float" value="90.000000" />
+    <property name="radius" type="float" value="100.000000" />
+    <property name="closed" type="bool" value="false" />
+  </shape>
+  <shape id="1005" label="Triangle" startTime="0" endTime="2999" fillType="color" mediaFillMode="fill" s=".triangle">
+    <transform>
+      <location value="135.000000,470.000000,0.000000" />
+      <scale value="0.600000,0.600000" />
+    </transform>
+    <fillColor value="#ffc6f249" />
+    <property name="p1" type="vec2" value="-100.000000,100.000000" />
+    <property name="p2" type="vec2" value="0.000000,-100.000000" />
+    <property name="p3" type="vec2" value="100.000000,100.000000" />
+    <property name="closed" type="bool" value="true" />
+  </shape>
+  <shape id="1006" label="Callout" startTime="0" endTime="2999" fillType="color" mediaFillMode="fill" s=".callout.roundrect">
+    <transform>
+      <location value="405.000000,470.000000,0.000000" />
+      <scale value="0.600000,0.600000" />
+    </transform>
+    <fillColor value="#ff90f249" />
+    <property name="size" type="vec2" value="100.000000,100.000000" />
+    <property name="tail" type="vec2" value="-50.000000,150.000000" />
+    <property name="cornerRadius" type="float" value="25.000000" />
+    <property name="tailWidth" type="float" value="40.000000" />
+  </shape>
+  <shape id="1007" label="Pie" startTime="0" endTime="2999" fillType="color" mediaFillMode="fill" s=".pie">
+    <transform>
+      <location value="675.000000,470.000000,0.000000" />
+      <scale value="0.600000,0.600000" />
+    </transform>
+    <fillColor value="#ff5bf249" />
+    <property name="startAngle" type="float" value="45.000000" />
+    <property name="endAngle" type="float" value="90.000000" />
+    <property name="radius" type="float" value="100.000000" />
+  </shape>
+  <shape id="1008" label="Polygon" startTime="0" endTime="2999" fillType="color" mediaFillMode="fill" s=".poly">
+    <transform>
+      <location value="945.000000,470.000000,0.000000" />
+      <scale value="0.600000,0.600000" />
+    </transform>
+    <fillColor value="#ff49f26c" />
+    <property name="sideCount" type="float" value="6.000000" />
+    <property name="radius" type="float" value="100.000000" />
+    <property name="offsetAngle" type="float" value="0.000000" />
+  </shape>
+  <shape id="1009" label="Multifoil" startTime="0" endTime="2999" fillType="color" mediaFillMode="fill" s=".multifoil">
+    <transform>
+      <location value="135.000000,770.000000,0.000000" />
+      <scale value="0.600000,0.600000" />
+    </transform>
+    <fillColor value="#ff49f2a2" />
+    <property name="pointCount" type="float" value="5.000000" />
+    <property name="outerRadius" type="float" value="100.000000" />
+    <property name="innerRadius" type="float" value="50.000000" />
+    <property name="offsetAngle" type="float" value="0.000000" />
+  </shape>
+  <shape id="1010" label="Arrow" startTime="0" endTime="2999" fillType="color" mediaFillMode="fill" s=".arrow">
+    <transform>
+      <location value="405.000000,770.000000,0.000000" />
+      <pivot value="125.000000,-125.000000,0.000000" />
+      <scale value="0.600000,0.600000" />
+    </transform>
+    <fillColor value="#ff49f2d7" />
+    <property name="end" type="vec2" value="250.000000,-250.000000" />
+    <property name="lineWidth" type="float" value="40.000000" />
+    <property name="headWidth" type="float" value="120.000000" />
+    <property name="headLength" type="float" value="130.000000" />
+  </shape>
+  <shape id="1011" label="Quad" startTime="0" endTime="2999" fillType="color" mediaFillMode="fill" s=".quad">
+    <transform>
+      <location value="675.000000,770.000000,0.000000" />
+      <scale value="0.600000,0.600000" />
+    </transform>
+    <fillColor value="#ff49d7f2" />
+    <property name="p1" type="vec2" value="-100.000000,-100.000000" />
+    <property name="p2" type="vec2" value="50.000000,-100.000000" />
+    <property name="p3" type="vec2" value="100.000000,100.000000" />
+    <property name="p4" type="vec2" value="-100.000000,100.000000" />
+    <property name="closed" type="bool" value="true" />
+  </shape>
+  <shape id="1012" label="Moon" startTime="0" endTime="2999" fillType="color" mediaFillMode="fill" s=".moon">
+    <transform>
+      <location value="945.000000,770.000000,0.000000" />
+      <scale value="0.600000,0.600000" />
+    </transform>
+    <fillColor value="#ff49a2f2" />
+    <property name="radius" type="float" value="100.000000" />
+    <property name="offset" type="float" value="250.000000" />
+  </shape>
+  <shape id="1013" label="Rectangle" startTime="0" endTime="2999" fillType="color" mediaFillMode="fill" s=".rect">
+    <transform>
+      <location value="135.000000,1070.000000,0.000000" />
+      <scale value="0.600000,0.600000" />
+    </transform>
+    <fillColor value="#ff496cf2" />
+    <property name="size" type="vec2" value="100.000000,100.000000" />
+  </shape>
+  <shape id="1014" label="Star" startTime="0" endTime="2999" fillType="color" mediaFillMode="fill" s=".star">
+    <transform>
+      <location value="405.000000,1070.000000,0.000000" />
+      <scale value="0.600000,0.600000" />
+    </transform>
+    <fillColor value="#ff5b49f2" />
+    <property name="pointCount" type="float" value="5.000000" />
+    <property name="outerRadius" type="float" value="100.000000" />
+    <property name="innerRadius" type="float" value="50.000000" />
+    <property name="offsetAngle" type="float" value="0.000000" />
+  </shape>
+  <shape id="1015" label="Line" startTime="0" endTime="2999" fillType="none" mediaFillMode="fill" s=".line">
+    <transform>
+      <location value="675.000000,1070.000000,0.000000" />
+      <scale value="0.600000,0.600000" />
+    </transform>
+    <path-stroke direction="centered" end-size="1.500000">
+      <color value="#ffb4b3a0" />
+      <size value="20.000000" />
+    </path-stroke>
+    <property name="p1" type="vec2" value="-100.000000,100.000000" />
+    <property name="p2" type="vec2" value="100.000000,-100.000000" />
+  </shape>
+  <shape id="1016" label="Wide Line" startTime="0" endTime="2999" fillType="color" mediaFillMode="fill" s=".wideline">
+    <transform>
+      <location value="945.000000,1070.000000,0.000000" />
+      <pivot value="125.000000,-125.000000,0.000000" />
+      <scale value="0.600000,0.600000" />
+    </transform>
+    <fillColor value="#ffc649f2" />
+    <property name="end" type="vec2" value="250.000000,-250.000000" />
+    <property name="lineWidth" type="float" value="40.000000" />
+  </shape>
+  <shape id="1017" label="Irregular Pentagon" startTime="0" endTime="2999" fillType="color" mediaFillMode="fill" s=".penta">
+    <transform>
+      <location value="135.000000,1370.000000,0.000000" />
+      <scale value="0.600000,0.600000" />
+    </transform>
+    <fillColor value="#fff249e9" />
+    <property name="p1" type="vec2" value="-100.000000,-100.000000" />
+    <property name="p2" type="vec2" value="0.000000,-100.000000" />
+    <property name="p4" type="vec2" value="100.000000,100.000000" />
+    <property name="p5" type="vec2" value="-100.000000,100.000000" />
+    <property name="closed" type="bool" value="true" />
+  </shape>
+  <shape id="1018" label="Stamp" startTime="0" endTime="2999" fillType="color" mediaFillMode="fill" s=".stamp">
+    <transform>
+      <location value="405.000000,1370.000000,0.000000" />
+      <scale value="0.600000,0.600000" />
+    </transform>
+    <fillColor value="#fff249b4" />
+    <property name="size" type="vec2" value="150.000000,150.000000" />
+    <property name="cornerRadius" type="float" value="5.000000" />
+    <property name="perforationSize" type="float" value="40.000000" />
+    <property name="perforationSpacing" type="float" value="20.000000" />
+  </shape>
+  <shape id="1019" label="Teardrop" startTime="0" endTime="2999" fillType="color" mediaFillMode="fill" s=".teardrop">
+    <transform>
+      <location value="675.000000,1370.000000,0.000000" />
+      <scale value="0.600000,0.600000" />
+    </transform>
+    <fillColor value="#fff2497e" />
+    <property name="radius" type="float" value="100.000000" />
+    <property name="tail" type="float" value="200.000000" />
+    <property name="squeeze" type="float" value="2.500000" />
+    <property name="tailWidth" type="float" value="0.000000" />
+  </shape>
+  <shape id="1020" label="Drawn path" startTime="0" endTime="2999" fillType="color" mediaFillMode="fill">
+    <transform>
+      <location value="945.000000,1370.000000,0.000000" />
+      <scale value="0.600000,0.600000" />
+    </transform>
+    <fillColor value="#fff249d3" />
+    <path d="M 0 70 C -120 -30 -60 -110 0 -45 C 60 -110 120 -30 0 70 Z" />
+  </shape>
+  <shape id="1021" label="Drawn contours" startTime="0" endTime="2999" fillType="color" mediaFillMode="fill">
+    <transform>
+      <location value="135.000000,1670.000000,0.000000" />
+      <scale value="0.600000,0.600000" />
+    </transform>
+    <fillColor value="#fff249a5" />
+    <path>
+      <contour d="M -90 -90 L 90 -90 L 90 90 L -90 90 Z" closed="true" />
+      <contour d="M -40 -40 L 40 -40 L 40 40 L -40 40 Z" closed="true" exclude="true" />
+    </path>
+  </shape>
+  <shape id="1022" label="Drawn knots" startTime="0" endTime="2999" fillType="color" mediaFillMode="fill">
+    <transform>
+      <location value="405.000000,1670.000000,0.000000" />
+      <scale value="0.600000,0.600000" />
+    </transform>
+    <fillColor value="#fff24977" />
+    <path closed="true">
+      <knot>
+        <p value="-80.000000,60.000000" />
+        <in value="-30.000000,0.000000" />
+        <out value="30.000000,0.000000" />
+      </knot>
+      <knot>
+        <p value="0.000000,-90.000000" />
+        <in value="-40.000000,0.000000" />
+        <out value="40.000000,0.000000" />
+      </knot>
+      <knot>
+        <p>
+          <kf t="0.000000" v="80.000000,60.000000" />
+          <kf t="1.000000" v="80.000000,-10.000000" e="cubicBezier 0.42 0 0.58 1" />
+        </p>
+        <in value="0.000000,-40.000000" />
+        <out value="0.000000,40.000000" />
+      </knot>
+    </path>
+  </shape>
+</scene>

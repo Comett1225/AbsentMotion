@@ -1,0 +1,27 @@
+{
+ "id": "radialblur",
+ "name": "Zoom Blur",
+ "category": "blur",
+ "description": "Applies a radial zoom blur by averaging samples along rays from a center point with adjustable strength.",
+ "params": [
+  {
+   "id": "center",
+   "label": "Center",
+   "type": "point",
+   "default": [
+    0.5,
+    0.5
+   ]
+  },
+  {
+   "id": "strength",
+   "label": "Strength",
+   "type": "float",
+   "default": 0.5,
+   "min": 0.0,
+   "max": 1.0,
+   "step": 0.01
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float strength;\nuniform float2 center;\n\nhalf4 main(float2 coord) {\n    float2 centerCoord = center * size;\n    float2 dir = coord - centerCoord;\n    half3 sumRGB = half3(0);\n    half sumAlpha = 0.0;\n    half count = 0.0;\n    for (int i = 0; i < 32; ++i) {\n        float t = (float(i) / 31.0) * strength;\n        float2 pos = centerCoord + dir * t;\n        half4 c = image.eval(pos);\n        half a = c.a;\n        if (a <= 1e-4) continue;\n        half invA = 1.0 / a;\n        half3 unprem = c.rgb * invA;\n        sumRGB += unprem;\n        sumAlpha += a;\n        count += 1.0;\n    }\n    if (count == 0) {\n        return half4(0, 0, 0, 0);\n    }\n    half avgAlpha = sumAlpha / count;\n    half3 avg = sumRGB / count;\n    half3 finalRGB = avg * avgAlpha;\n    return half4(finalRGB, avgAlpha);\n}"
+}
