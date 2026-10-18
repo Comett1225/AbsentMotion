@@ -46,7 +46,15 @@ android {
     }
 
     buildTypes {
-        release { signingConfig = signingConfigs.findByName("release") ?: signingConfigs.getByName("debug") }
+        release {
+            signingConfig = signingConfigs.findByName("release")
+            vcsInfo.include = false
+        }
+    }
+
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
     }
 
     compileOptions {

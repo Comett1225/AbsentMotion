@@ -32,12 +32,15 @@ jobs:
           mv /tmp/cmdline-tools/cmdline-tools "$ANDROID_HOME/cmdline-tools/latest"
           yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platform-tools" "platforms;android-37.0" "build-tools;37.0.0" "cmake;3.31.6" "ndk;30.0.16248370"
+      - name: Prepare the source as F-Droid does
+        run: |
+          rm -rf app/src/play third_party/whisper.cpp/models third_party/whisper.cpp/examples third_party/whisper.cpp/bindings
+          sed -i -e '/playImplementation/d' app/build.gradle.kts
+          echo 'org.gradle.java.home=/usr/lib/jvm/java-21-openjdk-amd64' >> gradle.properties
       - name: Build Skia
         run: tools/build_skia.sh
       - name: Build the foss APK
-        run: |
-          . tools/env.sh
-          ./gradlew :app:assembleFossRelease --no-daemon
+        run: ./gradlew :app:assembleFossRelease --no-daemon
       - uses: actions/upload-artifact@v4
         with:
           name: foss-apk

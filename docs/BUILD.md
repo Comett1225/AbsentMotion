@@ -132,8 +132,8 @@ Outputs: `app/build/outputs/apk/<flavour>/<type>/app-<flavour>-<type>.apk`, for 
 - **Requirements of the app:** Android 14 (API 34) or newer (`minSdk = 34`; it builds and passes lint for that level, but it has only been run on Android 17), `targetSdk = 37`, a 64-bit ARM device,
   Vulkan 1.1.
 - **Release signing:** `assemblePlayRelease` and `assembleFossRelease` sign with the key named in a git-ignored `signing.properties` in the project root
-  (`storeFile`, `storePassword`, `keyAlias`, `keyPassword`); without that file it falls back to the *debug* key, which is
-  only fit for installing on your own phone. Make a release key once with
+  (`storeFile`, `storePassword`, `keyAlias`, `keyPassword`); without that file the release APK is left unsigned (`app-<flavour>-release-unsigned.apk`),
+  and you sign it yourself with `apksigner`. Debug builds (`assembleFossDebug`) are signed with the debug key for your own phone. Make a release key once with
   `keytool -genkeypair -v -keystore release.jks -alias absentmotion -keyalg RSA -keysize 4096 -validity 10000`,
   keep it and its passwords offline (losing it means users can never update), and never commit it.
 - Install on a device with `adb install -r <apk>`. An emulator has to meet the same requirements (arm64 image,
