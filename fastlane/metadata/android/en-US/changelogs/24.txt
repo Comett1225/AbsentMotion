@@ -1,0 +1,1 @@
+AbsentMotion 2.4.0: Remove Background now works offline in the free build, with no Google libraries. Many fixes to editing, rendering, templates, project import, export size estimates and AAC audio export, plus smoother thumbnails and clearer menus.

@@ -6,6 +6,34 @@ All notable changes to AbsentMotion are listed here, newest first. The format fo
 Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stands for the feature set as it stood on
 2026-10-12.
 
+## [2.4.0] - 2026-10-19
+
+### Added
+
+- **Offline background removal in the free build.** *Remove Background* now works in the `foss` build without any Google
+  libraries, using a small model (2.9 MB) that runs on the device. The `play` build still uses Google ML Kit.
+
+### Changed
+
+- Video thumbnails are no longer prepared for clips outside the visible timeline, theme files are read off the main
+  thread, and the GIF size estimate measures real encoded samples.
+- The unused *Receive from phone* controls were removed from the home screen code.
+
+### Fixed
+
+- **Editing.** Copying styles, layers, elements and curves keeps their media settings, transforms and identities;
+  applying a preset keeps unrelated text and media properties; retiming a video keeps nested keyframes and clears stale
+  speed maps; canvas gestures and selection handles no longer corrupt a layer's transform; camera rulers add up and
+  effect rulers do not drop a step; wheel scrubbing settles and border colours survive the easing screens.
+- **Rendering.** Warped edges, camera lifetimes, arrow widths and effects on grouped layers are corrected, media in
+  nested scenes is drawn at its local time, and video colour settings and crop bounds are respected.
+- **Projects and templates.** Template media and editing state are kept correctly, replacement slots in sped-up clips
+  are measured correctly, package imports no longer treat XML media as projects, and photos saved with a mirrored
+  orientation before 2.3.0 are corrected when the project is opened.
+- **Export and audio.** Export size estimates cannot overflow and use fresh free storage on retry, AAC audio keeps its
+  priming and tail samples, and audio preview players are released when a source fails to open.
+- **Screens.** Menus and popups stay inside the window, favourite font headers are shown, and labels are consistent.
+
 ## [2.3.0] - 2026-10-19
 
 ### Added
