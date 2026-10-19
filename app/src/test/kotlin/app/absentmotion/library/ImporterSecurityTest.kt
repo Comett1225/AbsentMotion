@@ -107,6 +107,8 @@ class ImporterSecurityTest {
         val manifest = JSONObject().put("media", JSONArray().put(JSONObject().put("uri", "x://a").put("entry", "a.jpg")))
         val bytes = zip(listOf("one.xml" to withPicture(1).toByteArray(), "two.xml" to withPicture(2).toByteArray(), "a.jpg" to ByteArray(60_000), "manifest.json" to manifest.toString().toByteArray()))
         assertTrue(failure(importer(files, ImportLimits(unpacked = 100_000)), bytes).contains("too large"))
+        assertEquals(emptyList<ProjectInfo>(), ProjectStore(files).list())
+        assertEquals(emptyList<String>(), File(files, "media").list().orEmpty().toList())
         assertEquals(2, importer(files, ImportLimits(unpacked = 130_000)).import { ByteArrayInputStream(bytes) }.size)
     }
 
@@ -138,5 +140,15 @@ class ImporterSecurityTest {
         assertTrue("$outcome", outcome is String && (outcome as String).startsWith("Malformed XML"))
         assertEquals(emptyList<ProjectInfo>(), ProjectStore(files).list())
         assertEquals(1, importer(files).import { ByteArrayInputStream(nested(200).toByteArray()) }.size)
+    }
+
+    @Test fun aPackageWhoseLaterProjectIsBrokenLeavesNothingBehind() {
+        val files = tmp.newFolder("files")
+        val manifest = JSONObject().put("media", JSONArray().put(JSONObject().put("uri", "x://a").put("entry", "a.jpg")))
+        val bytes = zip(listOf("ok.xml" to scene("""<shape id="1" fillType="media" fillImage="x://a"/>""").toByteArray(),
+            "bad.xml" to "<scene title=\"Broken\" height=\"10\"/>".toByteArray(), "a.jpg" to "jpg".toByteArray(), "manifest.json" to manifest.toString().toByteArray()))
+        assertTrue(failure(importer(files), bytes).startsWith("Malformed Scene"))
+        assertEquals(emptyList<ProjectInfo>(), ProjectStore(files).list())
+        assertEquals(emptyList<String>(), File(files, "media").list().orEmpty().toList())
     }
 }

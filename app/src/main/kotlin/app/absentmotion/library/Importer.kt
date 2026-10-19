@@ -63,6 +63,7 @@ class Importer(
         var links: Map<String, String>? = null
         var sceneText = 0
         var written = limits.unpacked
+        val saved = ArrayList<ImportReport>()
         try {
             eachEntry(open, limits) { name, input ->
                 files += name
@@ -83,7 +84,7 @@ class Importer(
             }
             if (sigs == null && links == null) throw ImportFailed("Project package missing manifest")
             if (scenes.isEmpty()) throw ImportFailed("Malformed Scene: no project in the package")
-            return scenes.map { text ->
+            return scenes.mapTo(saved) { text ->
                 add(text) { id, root ->
                     val declared = Scene(root).media.associateBy { it.uri }
                     val entries = root.mediaUris().mapNotNull { uri ->
@@ -99,8 +100,10 @@ class Importer(
                     entries.mapValues { (_, entry) -> target.getValue(entry).toURI().toString() }
                 }
             }
-        } catch (e: IOException) {
-            throw ImportFailed("Malformed package: ${e.message}")
+        } catch (t: Throwable) {
+            saved.forEach { store.delete(it.id) }
+            if (t is IOException) throw ImportFailed("Malformed package: ${t.message}")
+            throw t
         }
     }
 
