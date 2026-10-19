@@ -7,9 +7,8 @@ import app.absentmotion.export.FrameInterpolation
 import app.absentmotion.model.FramePair
 import app.absentmotion.model.Layer
 import app.absentmotion.model.Scene
+import app.absentmotion.model.exportFrame
 import app.absentmotion.model.exportFrameMs
-import app.absentmotion.model.framePair
-import app.absentmotion.model.needsFrameInterpolation
 import app.absentmotion.model.videoTimeUs
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CancellationException
@@ -196,9 +195,7 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
         private suspend fun mixed(source: VideoDecoder, request: Request, layer: Layer): Boolean {
             if (request.fps <= 0) return false
             val stamps = source.timestamps
-            val timeMs = exportFrameMs(request.timeMs, request.fps)
-            if (!layer.needsFrameInterpolation(timeMs, request.scene, stamps, request.fps)) return false
-            val pair = layer.framePair(timeMs, request.scene, stamps)
+            val pair = layer.exportFrame(exportFrameMs(request.timeMs, request.fps), request.scene, stamps, request.fps) ?: return false
             val key = pair to request.interpolation
             if (publishedMix == key) return true
             for (pts in setOf(pair.a, pair.b)) {

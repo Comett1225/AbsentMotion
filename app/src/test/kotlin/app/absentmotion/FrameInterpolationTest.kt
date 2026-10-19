@@ -9,11 +9,13 @@ import app.absentmotion.model.Layer
 import app.absentmotion.model.Scene
 import app.absentmotion.model.VideoTiming
 import app.absentmotion.model.XmlNode
+import app.absentmotion.model.exportFrame
 import app.absentmotion.model.exportFrameMs
 import app.absentmotion.model.framePair
 import app.absentmotion.model.needsFrameInterpolation
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import kotlin.math.abs
@@ -91,6 +93,31 @@ class FrameInterpolationTest {
                 for (k in 0 until 120) assertEquals("$rate fps x $speed at $fps fps, frame $k", speed * rate < fps * 0.99, layer.needsAt(project, k, stamps, fps))
             }
         }
+    }
+
+    @Test fun aSixtyFrameClipInAThirtyFrameProjectShowsEverySourceFrameInASixtyFrameExport() {
+        val project = scene(30)
+        for (stamps in listOf(rounded(60.0, 400), truncated(60.0, 400))) {
+            val picked = (0 until 300).map { clip().exportFrame(project.at(it, 60), project, stamps, 60) }
+            for ((k, pair) in picked.withIndex()) assertEquals(FramePair(stamps[k], stamps[k], 0f), pair)
+            assertEquals(300, picked.toSet().size)
+            for (k in 0 until 100) assertNull(clip().exportFrame(project.at(k, 30), project, stamps, 30))
+        }
+        val fast = rounded(120.0, 600)
+        for (k in 0 until 200) assertEquals(FramePair(fast[2 * k], fast[2 * k], 0f), clip().exportFrame(project.at(k, 60), project, fast, 60))
+        val thirty = rounded(30.0, 400)
+        assertPair(thirty[0], thirty[1], 0.5f, clip().exportFrame(project.at(1, 60), project, thirty, 60)!!)
+    }
+
+    @Test fun theExactExportTimePicksTheSourceFrameAtOrJustBeforeIt() {
+        val project = scene(30)
+        val stamps = rounded(60.0, 400)
+        val late = clip(start = 7)
+        for (k in 1 until 200) assertEquals(FramePair(stamps[k - 1], stamps[k - 1], 0f), late.exportFrame(project.at(k, 60), project, stamps, 60))
+        val mixed = listOf(rounded(30.0, 400), stamps)
+        val shown = (0 until 120).map { k -> mixed.map { clip().exportFrame(project.at(k, 60), project, it, 60)!! } }
+        assertEquals(120, shown.map { it[1] }.toSet().size)
+        assertTrue(shown.withIndex().all { (k, frames) -> (frames[0].t > 0f) == (k % 2 == 1) })
     }
 
     @Test fun aNormalSpeedClipAtTheProjectRateLandsOnWholeFrames() {
