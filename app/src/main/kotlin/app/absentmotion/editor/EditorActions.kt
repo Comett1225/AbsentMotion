@@ -85,7 +85,7 @@ fun EditorState.deleteSelected() {
 
 fun EditorState.duplicateSelected() {
     val layer = selected ?: return
-    val copy = layer.withId(Layer.newId()).withLabel(layer.label + " Copy")
+    val copy = copyLayers(listOf(layer), preserveOutsideParents = true).single().withLabel(layer.label + " Copy")
     edit { it.add(copy) }
     selectedId = copy.id
 }
@@ -152,8 +152,7 @@ val EditorState.easing: Easing? get() = keyTarget?.let { keyLayer?.easing(it.ref
 
 fun EditorState.setEasing(easing: Easing, key: Any? = null) {
     val ref = keyTarget?.ref ?: return
-    if (ref == SpeedRef && easing.type !in setOf("linear", "cubicBezier")) return
-    val curve = if (ref == SpeedRef) easing.copy(p = easing.p.map { it.coerceIn(0f, 1f) }) else easing
+    val curve = compatibleCurve(ref, easing) ?: return
     editKeyValue(key) { it.withEasing(ref, curve) }
 }
 
@@ -178,7 +177,7 @@ private fun EditorState.stretchFrame(direction: Int): Int? {
 
 private var copiedCurve: Easing? = null
 
-val EditorState.canPasteCurve: Boolean get() = copiedCurve != null
+val EditorState.canPasteCurve: Boolean get() = keyTarget?.ref?.let { compatibleCurve(it, copiedCurve) } != null
 
 fun EditorState.copyCurve() {
     copiedCurve = easing
@@ -190,8 +189,7 @@ fun EditorState.pasteCurve() {
 
 fun EditorState.pasteCurveToAll() {
     val ref = keyTarget?.ref ?: return
-    val curve = copiedCurve ?: return
-    if (ref == SpeedRef && (curve.type !in setOf("linear", "cubicBezier") || curve.p.any { it < 0 || it > 1 })) return
+    val curve = compatibleCurve(ref, copiedCurve) ?: return
     editKeyValue { it.withEasingEverywhere(ref, curve) }
 }
 
@@ -318,4 +316,11 @@ suspend fun EditorState.compositionArea(mode: String) {
             .withChild("scale", map("scale", floatArrayOf(1f, 1f)) { v -> v[0] *= sx; v[1] *= sy })
         current.copy(node = current.node.withChild("transform", transform))
     } }
+}
+
+internal fun compatibleCurve(ref: PropRef, easing: Easing?): Easing? {
+    if (easing == null) return null
+    if (ref != SpeedRef) return easing
+    if (easing.type !in setOf("linear", "cubicBezier")) return null
+    return easing.copy(p = easing.p.map { it.coerceIn(0f, 1f) })
 }

@@ -253,14 +253,13 @@ internal fun Scene.withPastedStyle(id: Long, timeMs: Int, from: Layer, media: Li
             for (a in attrs) node = node.with(a, from.node[a])
         }
         if (StylePart.ColorFill in parts) {
-            take(listOf("fillColor", "gradient"), listOf("fillType", "fillImage", "fillVideo", "mediaFillMode"))
+            take(listOf("fillColor", "gradient", "speedMap", "gain"), listOf("fillType", "fillImage", "fillVideo", "mediaFillMode", "inTime", "outTime", "speed", "loop"))
         }
         if (StylePart.BorderShadow in parts) take(listOf("border", "shadow", "path-stroke"), emptyList())
         if (StylePart.Blending in parts) {
             take(emptyList(), listOf("blending"))
-            from.node.child("transform")?.child("opacity")?.let { opacity ->
-                node = node.withChild("transform", (node.child("transform") ?: XmlNode("transform")).withChild("opacity", opacity))
-            }
+            val opacity = from.node.child("transform")?.child("opacity")
+            node = node.withChild("transform", (node.child("transform") ?: XmlNode("transform")).withChild("opacity", opacity))
         }
         l.copy(node = node)
     }
