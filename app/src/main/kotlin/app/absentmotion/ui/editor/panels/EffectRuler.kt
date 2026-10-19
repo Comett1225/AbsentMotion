@@ -20,7 +20,6 @@ import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlin.math.abs
-import kotlin.math.floor
 import kotlin.math.roundToInt
 import app.absentmotion.ui.theme.Am
 
@@ -134,7 +133,7 @@ private class EffectRulerView(context: Context, private val scope: CoroutineScop
     }
 
     private fun settle(notify: Boolean = true) {
-        val snapped = floor((position + spacing / 2) / spacing) * spacing - spacing / 2
+        val snapped = rulerSnap(position, spacing)
         move(snapped, notify)
     }
 
@@ -187,7 +186,10 @@ private class EffectRulerView(context: Context, private val scope: CoroutineScop
     }
 
     private fun phase(period: Int): Float {
-        val offset = (position + spacing / 2) % period
+        val offset = (position + spacing / 2f) % period
         return if (offset < 0) offset + period else offset
     }
 }
+
+internal fun rulerSnap(position: Float, spacing: Int): Float =
+    (position / spacing).roundToInt() * spacing.toFloat()
