@@ -40,4 +40,12 @@ class ShapeCatalogTest {
         }
         assertTrue(problems.joinToString("; "), problems.isEmpty())
     }
+
+    @Test fun theXMarkHasNoDoubledCorners() {
+        val def = entries.single { it["name"] == "X Mark" }
+        val knots = Layer(XmlNode("shape", mapOf("id" to "1"), def.children)).contours!!.single().knots
+        val doubled = knots.indices.filter { knots[it].p == knots[(it + 1) % knots.size].p }
+        assertTrue("points $doubled repeat the next one", doubled.isEmpty())
+        assertEquals("four rounded inner corners and eight rounded outer ones", 24, knots.size)
+    }
 }

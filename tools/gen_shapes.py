@@ -260,14 +260,13 @@ def _():
     u, v = (s, -s), (s, s)
     quad = [(0, -t / s)]
     quad += [(length * u[0] + sg * t * v[0], length * u[1] + sg * t * v[1]) for sg in (-1, 1)]
-    quad += [(t / s, 0)]
     pts = []
     for k in range(4):
         for (x, y) in quad:
             for _ in range(k):
                 x, y = -y, x
             pts.append((x, y))
-    return [rpoly(pts, [2, 5, 5, 2] * 4)]
+    return [rpoly(pts, [2, 5, 5] * 4)]
 
 @shape("Ring")
 def _():
