@@ -1,6 +1,7 @@
 package app.absentmotion.ui.home
 
 import app.absentmotion.platform.BitmapFactory
+import app.absentmotion.platform.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -63,6 +64,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.IOException
 import java.util.Locale
 
 private val Grey get() = Am.HomeDim
@@ -98,7 +100,10 @@ fun TemplatesTab(projects: ProjectStore, version: Int, onTemplate: (String) -> U
                             t, menu == t.id, { menu = if (it) t.id else null }, { onTemplate(t.id) },
                             onProject = {
                                 menu = null
-                                scope.launch { onProject(withContext(Dispatchers.IO) { templates.createProject(t.scene, projects) }) }
+                                scope.launch {
+                                    try { onProject(withContext(Dispatchers.IO) { templates.createProject(t.scene, projects) }) }
+                                    catch (e: IOException) { Toast.makeText(context, "Could not create the project. Free some storage space.", Toast.LENGTH_LONG).show() }
+                                }
                             },
                             onRename = { menu = null; renaming = t.id to t.title },
                             onDelete = { menu = null; confirm = "Delete this template?" to { scope.launch { withContext(Dispatchers.IO) { templates.delete(t.id) }; rev++ } } },

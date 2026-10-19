@@ -72,8 +72,10 @@ internal fun rememberSaveToMyElements(state: EditorState): (done: () -> Unit) ->
     val scope = rememberCoroutineScope()
     return { done ->
         scope.launch {
-            if (state.saveToMyElements(store)) {
-                Toast.makeText(context, "Saved to My Assets", Toast.LENGTH_SHORT).show()
+            try {
+                if (state.saveToMyElements(store)) Toast.makeText(context, "Saved to My Assets", Toast.LENGTH_SHORT).show()
+            } catch (e: java.io.IOException) {
+                Toast.makeText(context, "Could not save to My Assets. Free some storage space.", Toast.LENGTH_LONG).show()
             }
             done()
         }
@@ -142,8 +144,12 @@ internal fun ElementProperties(state: EditorState, onBack: () -> Unit, modifier:
         confirmButton = {
             TextButton({
                 missing = false
-                layer.nested?.let { store.save(store.linkOf(layer.link.orEmpty()), it) }
-                Toast.makeText(context, "Saved to My Assets", Toast.LENGTH_SHORT).show()
+                try {
+                    layer.nested?.let { store.save(store.linkOf(layer.link.orEmpty()), it) }
+                    Toast.makeText(context, "Saved to My Assets", Toast.LENGTH_SHORT).show()
+                } catch (e: java.io.IOException) {
+                    Toast.makeText(context, "Could not save to My Assets. Free some storage space.", Toast.LENGTH_LONG).show()
+                }
             }) { Text("Rebuild Source Project", color = Am.Accent) }
         },
         dismissButton = {

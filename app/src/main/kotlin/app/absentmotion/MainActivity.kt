@@ -114,7 +114,11 @@ class MainActivity : ComponentActivity() {
                         editingTemplate?.let { id ->
                             TemplateEditor(id, engine, settings, onClose = { editingTemplate = null }) { scene ->
                                 lifecycleScope.launch {
-                                    val project = withContext(Dispatchers.IO) { templates.createProject(scene, store) }
+                                    val project = try { withContext(Dispatchers.IO) { templates.createProject(scene, store) } }
+                                    catch (e: java.io.IOException) {
+                                        Toast.makeText(this@MainActivity, "Could not create the project. Free some storage space.", Toast.LENGTH_LONG).show()
+                                        return@launch
+                                    }
                                     editingTemplate = null
                                     open(project)
                                 }
