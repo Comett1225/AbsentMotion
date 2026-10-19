@@ -111,7 +111,7 @@ internal fun CameraPanel(state: EditorState, layer: Layer, modifier: Modifier = 
                             Choice("Orthographic", !perspective, Modifier.weight(1f)) { state.editSelected { it.copy(node = it.node.with("type", "orthographic")) } }
                         }
                         val angle = layer.number(Angle)
-                        NumberRow(Angle.label, formatFixed(angle, 1) + "º", active == 0, perspective, { active = 0; write(Angle, it, true) }, { state.endGesture() },
+                        NumberRow(Angle.label, formatFixed(angle, 1) + "º", active == 0, perspective, { active = 0; write(Angle, layer.number(Angle) + it * Angle.perDp, true) }, { state.endGesture() },
                             { active = 0; state.askNumber(Angle.label, angle) { write(Angle, it, false) } })
                         val zoom = zoomOf(angle, size)
                         NumberRow(Zoom.label, "${zoom.toInt()}", active == 1, perspective, { active = 1; writeZoom(zoomOf(layer.number(Angle), size) + it * size / 200f, true) }, { state.endGesture() },

@@ -207,7 +207,7 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
         return
     }
     val move = panel == EditorPanel.MoveTransform
-    var tab by remember { mutableIntStateOf(0) }
+    var tab by remember(selected.kind) { mutableIntStateOf(0) }
     var menuOpen by remember { mutableStateOf(false) }
     var askDeleteSpeed by remember { mutableStateOf(false) }
     val named = panel != EditorPanel.EditShape && panel != EditorPanel.Camera
