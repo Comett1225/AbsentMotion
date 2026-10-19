@@ -176,12 +176,9 @@ internal fun LayerMenu(state: EditorState, onDismiss: () -> Unit) {
     val context = LocalContext.current
     val media = state.selected?.mediaFill
     val video = media?.takeIf { it.video }
-    if (mediaInfo) {
-        media?.let { fill ->
-            state.scene.media(fill.uri)?.let { record ->
-                MediaInfoDialog(record, onReplace = { state.edit("replace") { s -> s.replaceMedia(record.uri, it) } }) { mediaInfo = false; onDismiss() }
-            }
-        }
+    val mediaRecord = media?.let { state.scene.media(it.uri) }
+    if (mediaInfo && mediaRecord != null) {
+        MediaInfoDialog(mediaRecord, onReplace = { state.edit("replace") { s -> s.replaceMedia(mediaRecord.uri, it) } }) { mediaInfo = false; onDismiss() }
         return
     }
     val saveElement = rememberSaveToMyElements(state)
@@ -225,7 +222,7 @@ internal fun LayerMenu(state: EditorState, onDismiss: () -> Unit) {
                 onDismiss()
             }
         }
-        if (media != null) MenuRow("Media Info") { mediaInfo = true }
+        if (mediaRecord != null) MenuRow("Media Info") { mediaInfo = true }
         LabelColours(state, onDismiss)
     }
 }
@@ -597,18 +594,21 @@ private fun Modifier.checkerboard(cell: Dp): Modifier = drawWithCache {
 private fun CustomSize(width: Int, height: Int, onChange: (Int, Int) -> Unit) {
     var w by remember(width) { mutableStateOf(width.toString()) }
     var h by remember(height) { mutableStateOf(height.toString()) }
+    var dirty by remember { mutableStateOf(false) }
     val commit by rememberUpdatedState {
+        val changed = dirty
+        dirty = false
         val newW = w.toIntOrNull()?.coerceIn(MIN_SIDE, MAX_SIDE) ?: width
         val newH = h.toIntOrNull()?.coerceIn(MIN_SIDE, MAX_SIDE) ?: height
         w = newW.toString()
         h = newH.toString()
-        if (newW != width || newH != height) onChange(newW, newH)
+        if (changed && (newW != width || newH != height)) onChange(newW, newH)
     }
     DisposableEffect(Unit) { onDispose { commit() } }
     Row(Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
-        SizeField(w, { w = it.filter(Char::isDigit).take(4) }, { commit() }, Modifier.weight(1f))
+        SizeField(w, { w = it.filter(Char::isDigit).take(4); dirty = true }, { commit() }, Modifier.weight(1f))
         Text("x", Modifier.padding(horizontal = 8.dp), color = Am.OnDark, fontSize = 15.sp)
-        SizeField(h, { h = it.filter(Char::isDigit).take(4) }, { commit() }, Modifier.weight(1f))
+        SizeField(h, { h = it.filter(Char::isDigit).take(4); dirty = true }, { commit() }, Modifier.weight(1f))
     }
 }
 
