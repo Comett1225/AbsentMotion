@@ -1,0 +1,1 @@
+AbsentMotion 2.5.1: bug-fix update. Returning from the picker or another app no longer blanks your videos, speed ramps survive trimming, GIFs get a proper background, failed saves tell you, and imports and opens no longer crash on bad data.

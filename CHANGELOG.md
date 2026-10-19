@@ -6,6 +6,35 @@ All notable changes to AbsentMotion are listed here, newest first. The format fo
 Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stands for the feature set as it stood on
 2026-10-12.
 
+## [2.5.1] - 2026-10-19
+
+### Changed
+
+- **Android Vulkan 1.2 is stated everywhere.** The manifest, README and store text said Vulkan 1.1 while the engine has always
+  needed 1.2; the manifest feature now asks for 1.2, so a phone that only offers 1.1 is no longer listed as compatible.
+- GIFs from a transparent project or an element are flattened onto the background chosen in the export options (white by
+  default) instead of coming out on black.
+- A failed save now shows a message once instead of failing silently, and the project is saved again at the next edit.
+- Deleting a project also deletes the AI results (cut-outs, noise reduction, voices) that no project or template uses.
+- The projects list reuses the details of projects that did not change, and Home keeps at most 64 decoded thumbnails.
+
+### Fixed
+
+- Coming back from the picker, the share sheet or another app no longer reloads every picture and blanks every preview video.
+- A picture that failed to decode is tried again, and a failed video frame keeps the last good frame on screen.
+- A project with a frame rate of 0 no longer crashes when opened; imports with absurd sizes or frame rates are refused, and
+  imported projects with duplicate or missing layer ids get new ids instead of editing the wrong layer.
+- Extending or trimming a clip from the Speed panel keeps a speed ramp instead of flattening it to one speed, and a very
+  long layer at the slowest speed no longer overflows its end time.
+- Extract Audio from a muted video no longer produces a silent audio layer.
+- Replacing a template layer shifts its speed-ramp keys and turns keyframed rotation with the new picture.
+- The MP4 size estimate counts video and nested audio, and the missing-media check no longer runs on the main thread.
+- Text to speech gives up when the system voice never answers, and the eyedropper no longer crashes when the preview closes.
+- The camera ruler fields edit the current layer instead of an older copy of it.
+- Several storage errors (creating a project from a template, saving an asset, renaming or deleting a template or preset)
+  show a message instead of crashing, and template and preset delete and rename no longer block the screen.
+- The edited scene is serialised once per edit instead of twice.
+
 ## [2.5.0] - 2026-10-19
 
 ### Added
