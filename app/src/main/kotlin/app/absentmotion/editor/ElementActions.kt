@@ -5,9 +5,13 @@ import app.absentmotion.model.Layer
 import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
 import app.absentmotion.model.formatFloats
+import app.absentmotion.model.isKeyframed
 import app.absentmotion.model.mediaUris
 import app.absentmotion.model.withCopiedLayerIds
+import kotlin.math.cos
 import kotlin.math.min
+import kotlin.math.roundToInt
+import kotlin.math.sin
 
 object ElementNav {
     var open: ((String) -> Unit)? = null
@@ -22,7 +26,7 @@ internal fun XmlNode.mapTransform(name: String, change: (FloatArray) -> Unit): X
     })
     val transform = child("transform") ?: XmlNode("transform")
     val moved = transform.child(name) ?: XmlNode(name)
-    val next = moved.with("value", value(moved["value"]))
+    val next = (if (moved.isKeyframed) moved else moved.with("value", value(moved["value"])))
         .copy(children = moved.children.map { if (it.name == "kf") it.with("v", value(it["v"])) else it })
     return withChild("transform", transform.withChild(name, next))
 }
@@ -31,34 +35,41 @@ suspend fun EditorState.saveToMyElements(store: ProjectStore): Boolean {
     val layer = selected ?: return false
     val host = scene
     val group = layer.nested
-    val width: Int
-    val height: Int
-    val nodes: List<XmlNode>
-    if (group != null) {
-        width = host.width
-        height = host.height
-        val at = layer.location
-        val pivot = layer.pivot
-        val scale = layer.scale
-        nodes = group.layers.map { inner ->
-            inner.node.mapTransform("location") { v ->
-                v[0] = at[0] + scale[0] * (v[0] - group.width / 2f - pivot[0])
-                v[1] = at[1] + scale[1] * (v[1] - group.height / 2f - pivot[1])
-            }.mapTransform("scale") { v -> v[0] *= scale[0]; v[1] *= scale[1] }
-        }
-    } else {
-        val bounds = lifetimeBounds(layer)
-        width = ((bounds?.let { it[2] - it[0] } ?: host.width.toFloat()) + 2).toInt()
-        height = ((bounds?.let { it[3] - it[1] } ?: host.height.toFloat()) + 2).toInt()
-        val shifted = layer.node.with("startTime", "0").with("endTime", "${layer.endTime - layer.startTime}").with("parent", null)
-        nodes = listOf(if (bounds == null) shifted else shifted.mapTransform("location") { v -> v[0] -= bounds[0]; v[1] -= bounds[1] })
-    }
+    val bounds = if (group == null) lifetimeBounds(layer) else null
+    val width = group?.let { host.width } ?: ((bounds?.let { it[2] - it[0] } ?: host.width.toFloat()) + 2).toInt()
+    val height = group?.let { host.height } ?: ((bounds?.let { it[3] - it[1] } ?: host.height.toFloat()) + 2).toInt()
     val element = Scene(Scene.create(layer.label.ifBlank { "Element" }, width, height, host.fps, 0).node.with("type", "element"))
-    val full = nodes.fold(element) { acc, node ->
+    val full = host.elementNodes(layer, bounds).fold(element) { acc, node ->
         acc.add(Layer(node), node.mediaUris().mapNotNull { host.media(it) })
     }
     store.createElement(full)
     return true
+}
+
+internal fun Scene.elementNodes(layer: Layer, bounds: FloatArray?): List<XmlNode> {
+    val group = layer.nested
+    if (group == null) {
+        val shifted = (rebased(layer, null) ?: layer).node.with("startTime", "0").with("endTime", "${layer.endTime - layer.startTime}")
+        return listOf(if (bounds == null) shifted else shifted.mapTransform("location") { v -> v[0] -= bounds[0]; v[1] -= bounds[1] })
+    }
+    val box = Layer(layer.node)
+    val flat = group.layers.fold(group) { acc, l -> if (l.node["parent"] == null) acc else acc.update(l.id) { acc.rebased(it, null) ?: it } }
+    val speed = (box.node.child("speedMap")?.get("value") ?: box.node["speed"])?.toFloatOrNull()?.takeIf { it > 0 && it.isFinite() } ?: 1f
+    fun hostMs(innerMs: Int) = (box.startTime + innerMs / speed).roundToInt().coerceIn(box.startTime, box.endTime)
+    val outer = chain(box)
+    val outerTimes = outer.flatMap { it.keyframeTimes() }.map { ((it - box.startTime) * speed).roundToInt() }
+    return flat.layers.map { inner ->
+        (inner.rebaked(outer.any { it.moves() }, outerTimes, group.fps) { own, ms ->
+            val g = place(box, hostMs(ms))
+            val vx = (own.x - group.width / 2f - g.px) * g.sx
+            val vy = (own.y - group.height / 2f - g.py) * g.sy
+            val a = Math.toRadians(g.rot.toDouble())
+            own.copy(
+                x = g.x + (vx * cos(a) - vy * sin(a)).toFloat(), y = g.y + (vx * sin(a) + vy * cos(a)).toFloat(),
+                sx = own.sx * g.sx, sy = own.sy * g.sy, rot = own.rot + g.rot,
+            )
+        } ?: inner).node
+    }
 }
 
 private suspend fun EditorState.lifetimeBounds(layer: Layer): FloatArray? {
