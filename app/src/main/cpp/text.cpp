@@ -51,7 +51,7 @@ sk_sp<SkFontMgr> systemFonts() {
     return manager;
 }
 std::unique_ptr<Paragraph> paragraph(TextLayout& text, const std::string& content,
-                                     bool rtl, float wordSpacing, bool prepared) {
+                                     bool rtl, float wordSpacing, bool prepared, float height = 0) {
     TextStyle style;
     style.setColor(SK_ColorWHITE);
     style.setFontSize(text.size);
@@ -60,7 +60,10 @@ std::unique_ptr<Paragraph> paragraph(TextLayout& text, const std::string& conten
     style.setFontFamilies({SkString(text.family)});
     style.setLetterSpacing(text.letterSpacing * text.size);
     style.setWordSpacing(wordSpacing);
-    style.setHeight(text.lineSpacing);
+    if (height > 0) {
+        style.setHeight(height);
+        style.setHeightOverride(true);
+    }
     ParagraphStyle settings;
     settings.setTextStyle(style);
     settings.setTextDirection(rtl ? TextDirection::kRtl : TextDirection::kLtr);
@@ -109,12 +112,14 @@ void layout(TextLayout& text) {
     if (!text.lines.empty()) {
         for (auto& line : text.lines) line.paragraph = paragraph(text, line.content, line.rtl, line.wordSpacing, true);
     } else {
-        text.paragraph = paragraph(text, text.content, false, 0, false);
         if (!face) face = manager->matchFamilyStyle(text.family.c_str(), SkFontStyle(text.weight, 5,
             text.italic ? SkFontStyle::kItalic_Slant : SkFontStyle::kUpright_Slant));
         SkFont font(face, text.size);
         SkFontMetrics metrics;
         font.getMetrics(&metrics);
+        const float natural = metrics.fDescent - metrics.fAscent + metrics.fLeading;
+        text.paragraph = paragraph(text, text.content, false, 0, false,
+            text.lineSpacing != 1 && natural > 0 ? text.lineSpacing * natural / text.size : 0);
         text.padTop = std::max(0.f, metrics.fAscent - metrics.fTop);
         text.height = text.paragraph->getHeight() + text.padTop + std::max(0.f, metrics.fBottom - metrics.fDescent);
     }
