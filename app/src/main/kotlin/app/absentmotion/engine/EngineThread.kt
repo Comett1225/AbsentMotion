@@ -100,6 +100,8 @@ class EngineThread(private val background: Int, context: Context? = null) {
     private var target = 0L
     private var surface: Surface? = null
     private var lost = false
+    @Volatile var generation = 0
+        private set
     @Volatile internal var simulateGpuLoss = false
     private var view: PreviewView? = null
     private var scene: String? = null
@@ -139,6 +141,7 @@ class EngineThread(private val background: Int, context: Context? = null) {
             effects.value.loadInto(next::loadEffect)
             if (lost) {
                 lost = false
+                generation++
                 surface?.takeIf { it.isValid }?.let { target = next.attach(it, forEncoder = false) }
                 Handler(android.os.Looper.getMainLooper()).post(::refreshMedia)
             }
@@ -202,7 +205,7 @@ class EngineThread(private val background: Int, context: Context? = null) {
     fun refreshMedia() {
         val next = mediaScene ?: return
         mediaJob?.cancel()
-        mediaJob = mediaScope.launch { media?.update(next, retry = true); videos?.retry() }
+        mediaJob = mediaScope.launch { media?.update(next); videos?.retry() }
     }
 
     suspend fun awaitMedia() {

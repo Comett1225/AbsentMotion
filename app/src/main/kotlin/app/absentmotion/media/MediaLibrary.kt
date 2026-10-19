@@ -28,9 +28,9 @@ import kotlinx.coroutines.sync.withLock
 class MediaLibrary(context: Context, private val engine: EngineThread) {
     private val resolver = context.applicationContext.contentResolver
     private val lock = Mutex()
-    private val loaded = mutableMapOf<String, Pair<MediaDeclaration?, String?>>()
+    private val loaded = mutableMapOf<String, Triple<MediaDeclaration?, String?, Int>>()
 
-    suspend fun update(scene: Scene, retry: Boolean = false) = lock.withLock {
+    suspend fun update(scene: Scene) = lock.withLock {
         val wanted = scene.node.imageUris()
         for (uri in loaded.keys - wanted) {
             withContext(NonCancellable) {
@@ -38,7 +38,6 @@ class MediaLibrary(context: Context, private val engine: EngineThread) {
                 loaded.remove(uri)
             }
         }
-        if (retry) loaded.clear()
         prepareLocked(scene)
     }
 
@@ -46,8 +45,9 @@ class MediaLibrary(context: Context, private val engine: EngineThread) {
 
     private suspend fun prepareLocked(scene: Scene) {
         val limit = engine.maxPictureSize()
+        val generation = engine.generation
         loadPictures(scene.node.imageUris(), loaded,
-            { uri -> scene.media(uri) to withContext(Dispatchers.IO) { fileVersion(resolver, Uri.parse(uri)) } },
+            { uri -> Triple(scene.media(uri), withContext(Dispatchers.IO) { fileVersion(resolver, Uri.parse(uri)) }, generation) },
             { uri ->
                 withContext(Dispatchers.IO) { decodePicture(resolver, Uri.parse(uri), limit) }
                     .also { Log.i("AMMedia", "picture $uri ${it?.width}x${it?.height} limit $limit") }

@@ -121,8 +121,12 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
     }
 
     suspend fun retry() = lock.withLock {
-        sessions.values.forEach { it.close() }
-        sessions.clear()
+        for ((id, session) in sessions.toMap()) {
+            if (session.failed || session.generation != engine.generation) {
+                sessions.remove(id)
+                session.close()
+            }
+        }
         latest?.let { requests.trySend(it) }
     }
 
@@ -142,7 +146,9 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
         private val decoderLock = Mutex()
         private val queue = Channel<Pair<Request, Sample>>(Channel.CONFLATED)
         private var decoder: VideoDecoder? = null
-        private var retryAt = 0L
+        val generation = engine.generation
+        @Volatile private var retryAt = 0L
+        val failed get() = retryAt != 0L
         @Volatile private var stopped = false
         private var publishedPts: Long? = null
         private var publishedMix: Pair<FramePair, FrameInterpolation>? = null
@@ -205,6 +211,7 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
                     publishedPts = pts
                     publishedMix = null
                     held.clear()
+                    retryAt = 0L
                     if (!exact && request.playing) leadMs = (leadMs * 0.8 + (System.nanoTime() - request.born) / 1e6 * 0.2).coerceIn(0.0, MAX_LEAD_MS)
                 }
             }
