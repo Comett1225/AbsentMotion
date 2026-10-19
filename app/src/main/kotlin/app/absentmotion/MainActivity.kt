@@ -184,7 +184,9 @@ class MainActivity : ComponentActivity() {
     private val migration by lazy { EffectMigration.read(applicationContext) }
 
     private fun loadRelinked(id: String): Scene? = store.load(id)?.let { scene ->
-        migration.migrate(MediaRelink.relink(this, scene)).scene.also { if (it != scene) store.save(id, it) }
+        migration.migrate(MediaRelink.relink(this, scene)).scene.also {
+            if (it != scene) try { store.save(id, it) } catch (e: java.io.IOException) { Log.e("AMStore", "cannot save the updated project $id", e) }
+        }
     }
 
     private fun open(id: String) {
