@@ -15,6 +15,17 @@ value class MediaDeclaration(val node: XmlNode) {
     val fps: Float? get() = node["fps"]?.toFloatOrNull()
 }
 
+fun exifOrientation(tag: Int): Pair<Int, Boolean> = when (tag) {
+    2 -> 0 to true
+    3 -> 180 to false
+    4 -> 180 to true
+    5 -> 270 to true
+    6 -> 90 to false
+    7 -> 90 to true
+    8 -> 270 to false
+    else -> 0 to false
+}
+
 fun fpsText(fps: Float): String = String.format(java.util.Locale.US, "%.2f", fps)
 
 enum class MediaFillMode(val xml: String) { Fill("fill"), Fit("fit"), Stretch("stretch") }

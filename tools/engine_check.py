@@ -14,7 +14,7 @@ ADB = [str(Path.home() / "Library/Android/sdk/platform-tools/adb"), "-s", os.env
 PKG = "app.absentmotion"
 DEVICE_DIR = f"/sdcard/Android/data/{PKG}/files"
 TOLERANCE = 2
-BLACK, RED, HALF = (0, 0, 0), (255, 0, 0), (128, 128, 128)
+BLACK, RED, BLUE, HALF = (0, 0, 0), (255, 0, 0), (0, 0, 255), (128, 128, 128)
 
 
 def scene(body, width=200, height=200, fps=30, bg="#ff000000"):
@@ -31,6 +31,22 @@ def rect(id, cx, cy, hw, hh, argb=0xffffffff, opacity=1.0, extra="", fill="color
             f'{transform(f"{cx},{cy},0", opacity)}<fillColor value="#{argb:08x}"/>'
             f'<property name="size" type="vec2" value="{hw},{hh}"/>{extra}</shape>')
 
+
+def picture(name, rotation, size="100,50"):
+    return (f'<shape id="1" label="p" startTime="0" endTime="1000" fillType="media" mediaFillMode="stretch" s=".rect" '
+            f'fillImage="file://{DEVICE_DIR}/{name}"><transform><location value="100,100,0"/><rotation value="{rotation}"/></transform>'
+            f'<property name="size" type="vec2" value="{size}"/></shape>')
+
+
+def exif_jpeg(path, tag):
+    image = Image.new("RGB", (40, 20), RED)
+    image.paste(BLUE, (20, 0, 40, 20))
+    exif = Image.Exif()
+    exif[0x0112] = tag
+    image.save(path, "JPEG", quality=100, subsampling=0, exif=exif.tobytes())
+
+
+PICTURES = {"exif2.jpg": 2, "exif5.jpg": 5}
 
 CENTRED = '<border direction="centered"><color value="#ffffffff"/><size value="{}"/></border>'
 
@@ -61,6 +77,10 @@ CASES = {
               '<transform><location><kf t="0.03" v="100,100,0"/><kf t="0.5" v="1100,100,0"/></location></transform>'
               '<fillColor value="#ffff0000"/><property name="size" type="vec2" value="10,30"/></shape></scene></embedScene>', fps=60),
         [((52, 100), RED), ((100, 100), BLACK)]),
+    "a picture tagged as mirrored shows unmirrored": (
+        scene(picture("exif2.jpg", 0)), [((50, 100), BLUE), ((150, 100), RED)]),
+    "a picture tagged as transposed shows turned and mirrored": (
+        scene(picture("exif5.jpg", 270)), [((100, 50), RED), ((100, 150), BLUE)]),
 }
 
 HITS = {
@@ -109,6 +129,9 @@ def main():
     work = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "build/engine-check"
     work.mkdir(parents=True, exist_ok=True)
     results = []
+    for name, tag in PICTURES.items():
+        exif_jpeg(work / name, tag)
+        adb("push", work / name, f"{DEVICE_DIR}/{name}")
     for k, (title, (xml, probes)) in enumerate(CASES.items()):
         image = still(f"enginecheck{k}", xml, work)
         results.append((title, [f"{xy} is {tuple(int(v) for v in image[xy[1], xy[0]])}, expected {want}" for xy, want in probes
@@ -119,6 +142,8 @@ def main():
         got = {line.split(" hit ")[1].split()[0]: int(line.split()[-1]) for line in log.splitlines() if " hit " in line}
         results.append((title, [f"{xy} hits {got.get(f'{xy[0]},{xy[1]}')}, expected {want}" for xy, want in probes
                                 if got.get(f"{xy[0]},{xy[1]}") != want]))
+    for name in PICTURES:
+        adb("shell", "rm", f"{DEVICE_DIR}/{name}")
     limit = adb("shell", "getprop", "dalvik.vm.heapgrowthlimit").strip()
     side = math.isqrt(int(limit.rstrip("m")) * 2 ** 20 * 5 // 16) + 1
     pid = adb("shell", "pidof", PKG).strip()

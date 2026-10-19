@@ -1,10 +1,12 @@
 package app.absentmotion.media
 
 import android.util.Log
+import android.content.ContentResolver
 import android.content.ContentUris
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import android.media.ExifInterface
 import android.net.Uri
 import android.provider.MediaStore
@@ -15,6 +17,7 @@ import app.absentmotion.engine.EngineThread
 import app.absentmotion.model.MediaDeclaration
 import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
+import app.absentmotion.model.exifOrientation
 import app.absentmotion.model.imageUris
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
@@ -78,17 +81,23 @@ class MediaLibrary(context: Context, private val engine: EngineThread) {
                 inSampleSize = Integer.highestOneBit(ratio.toInt().coerceAtLeast(1))
             }
             val raw = resolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, options) }
-            if (raw == null || maxOf(raw.width, raw.height) <= limit) raw else {
+            val sized = if (raw == null || maxOf(raw.width, raw.height) <= limit) raw else {
                 val scale = limit.toFloat() / maxOf(raw.width, raw.height)
                 Bitmap.createScaledBitmap(raw, (raw.width * scale).toInt().coerceAtLeast(1),
                     (raw.height * scale).toInt().coerceAtLeast(1), true).also { if (it !== raw) raw.recycle() }
             }
+            if (sized == null || !exifOrientation(exifTag(resolver, uri)).second) sized
+            else Bitmap.createBitmap(sized, 0, 0, sized.width, sized.height, Matrix().apply { setScale(-1f, 1f) }, false).also { if (it !== sized) sized.recycle() }
         }
     } catch (e: Exception) {
         Log.w("AMMedia", "cannot read $uri", e)
         null
     } catch (_: OutOfMemoryError) { null }
 }
+
+private fun exifTag(resolver: ContentResolver, uri: Uri): Int = runCatching {
+    resolver.openInputStream(uri)?.use { ExifInterface(it).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL) }
+}.getOrNull() ?: ExifInterface.ORIENTATION_NORMAL
 
 data class DeviceMedia(val uri: Uri, val name: String, val albumId: String, val album: String,
                        val video: Boolean, val durationMs: Long, val date: Long, val modified: Long)
@@ -147,16 +156,7 @@ suspend fun imageDeclaration(context: Context, uri: Uri): MediaDeclaration? = wi
         resolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE), null, null, null)?.use { c ->
             if (c.moveToFirst()) { name = c.getString(0) ?: name; if (!c.isNull(1)) size = c.getLong(1) }
         }
-        val orientation = runCatching {
-            resolver.openInputStream(uri)?.use { stream ->
-                when (ExifInterface(stream).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)) {
-                    ExifInterface.ORIENTATION_ROTATE_90 -> 90
-                    ExifInterface.ORIENTATION_ROTATE_180 -> 180
-                    ExifInterface.ORIENTATION_ROTATE_270 -> 270
-                    else -> 0
-                }
-            } ?: 0
-        }.getOrDefault(0)
+        val orientation = exifOrientation(exifTag(resolver, uri)).first
         MediaDeclaration(XmlNode("media", linkedMapOf("uri" to uri.toString(), "filename" to name, "title" to name,
             "type" to (bounds.outMimeType ?: resolver.getType(uri) ?: "image/jpeg"), "size" to "$size",
             "orientation" to "$orientation", "infoUpdated" to "${System.currentTimeMillis()}",
