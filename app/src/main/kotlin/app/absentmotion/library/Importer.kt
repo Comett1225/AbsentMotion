@@ -61,6 +61,7 @@ class Importer(
         val files = LinkedHashSet<String>()
         var sigs: Map<String, String>? = null
         var links: Map<String, String>? = null
+        var projectEntry: String? = null
         var sceneText = 0
         var written = limits.unpacked
         val saved = ArrayList<ImportReport>()
@@ -70,19 +71,31 @@ class Importer(
                 when {
                     leaf(name) == "manifest.txt" -> sigs = readText(input, MaxXml).lineSequence().map { it.trim().split(':', limit = 3) }.filter { it.size >= 2 }
                         .associate { p -> p[0] to p.last() }
-                    leaf(name) == "manifest.json" -> links = JSONObject(readText(input, MaxXml)).optJSONArray("media")?.let { list ->
-                        (0 until list.length()).map { list.getJSONObject(it) }.filter { it.has("entry") }.associate { m -> m.getString("uri") to m.getString("entry") }
-                    }.orEmpty()
-                    name.endsWith(".xml", ignoreCase = true) -> {
+                    leaf(name) == "manifest.json" -> {
+                        val manifest = JSONObject(readText(input, MaxXml))
+                        projectEntry = manifest.optString("project").takeIf { it.isNotBlank() }
+                        links = manifest.optJSONArray("media")?.let { list ->
+                            (0 until list.length()).map { list.getJSONObject(it) }.filter { it.has("entry") }
+                                .associate { m -> m.getString("uri") to m.getString("entry") }
+                        }.orEmpty()
+                    }
+                }
+            }
+            if (sigs == null && links == null) throw ImportFailed("Project package missing manifest")
+            val declaredProject = projectEntry?.let { find(it, files) ?: throw ImportFailed("Malformed package: project file is missing") }
+            val mediaEntries = (links.orEmpty().values + sigs.orEmpty().values).mapNotNull { find(it, files) }.toSet()
+            eachEntry(open, limits) { name, input ->
+                if (name == declaredProject || declaredProject == null && name.endsWith(".xml", ignoreCase = true) && name !in mediaEntries) {
+                    val text = readText(input, MaxXml)
+                    val isScene = declaredProject != null || runCatching { XmlNode.parse(text.removePrefix("\uFEFF")).name == "scene" }.getOrDefault(false)
+                    if (isScene) {
                         if (scenes.size >= limits.scenes) throw ImportFailed("The package holds too many projects (more than ${limits.scenes})")
-                        val text = readText(input, MaxXml)
                         sceneText += text.length
                         if (sceneText > limits.sceneText) throw ImportFailed("The package's project files are too large")
                         scenes += text
                     }
                 }
             }
-            if (sigs == null && links == null) throw ImportFailed("Project package missing manifest")
             if (scenes.isEmpty()) throw ImportFailed("Malformed Scene: no project in the package")
             return scenes.mapTo(saved) { text ->
                 add(text) { id, root ->
