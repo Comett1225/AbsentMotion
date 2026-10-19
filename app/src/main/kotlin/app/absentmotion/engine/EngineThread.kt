@@ -178,14 +178,15 @@ class EngineThread(private val background: Int, context: Context? = null) {
 
     fun setScene(xml: String) {
         pendingScene.set(xml)
+        val parsed by lazy { runCatching { Scene.parse(xml) }.getOrNull() }
         fonts?.let { library ->
-            val names = runCatching { Scene.parse(xml).fontNames() }.getOrDefault(emptyList())
+            val names = parsed?.fontNames().orEmpty()
             if (names != fontNames) {
                 fontNames = names
                 fontJob = mediaScope.launch { names.forEach { library.resolve(it) } }
             }
         }
-        if (media != null) runCatching { Scene.parse(xml) }.getOrNull()?.let { next ->
+        if (media != null) parsed?.let { next ->
             val previous = mediaScene
             mediaScene = next
             audio?.setScene(next)
