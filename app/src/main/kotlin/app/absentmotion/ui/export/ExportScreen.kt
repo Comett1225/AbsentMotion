@@ -64,17 +64,18 @@ import androidx.compose.ui.input.pointer.pointerInput
 import app.absentmotion.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.absentmotion.engine.EngineThread
 import app.absentmotion.export.AudioBitrate
 import app.absentmotion.export.AvailableCodecs
-import app.absentmotion.export.Codec
 import app.absentmotion.export.ExportAudio
 import app.absentmotion.export.ExportKind
 import app.absentmotion.export.ExportResult
 import app.absentmotion.export.ExportSettings
 import app.absentmotion.export.Exporter
+import app.absentmotion.export.FrameInterpolation
 import app.absentmotion.export.GifFrameRates
 import app.absentmotion.export.GifResolutions
 import app.absentmotion.export.BackgroundBlack
@@ -441,7 +442,7 @@ private fun VideoPage(
             Spacer(Modifier.height(27.dp))
             Heading("Codec")
             Spacer(Modifier.height(8.dp))
-            CodecControl(s.codec) { onChange(s.copy(codec = it)) }
+            Segments(AvailableCodecs, s.codec, { it.label }, if (AvailableCodecs.size > 3) 12.sp else 15.sp) { onChange(s.copy(codec = it)) }
             Spacer(Modifier.height(55.dp))
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Heading("Frame Rate", Modifier.weight(1f))
@@ -449,6 +450,12 @@ private fun VideoPage(
             }
             Spacer(Modifier.height(34.5.dp))
             ExportSlider(rates.indexOf(s.fps).coerceAtLeast(0).toFloat() / (rates.size - 1)) { onChange(s.copy(fps = rates[(it * (rates.size - 1)).roundToInt()])) }
+            Spacer(Modifier.height(27.dp))
+            Heading("Frame Interpolation")
+            Spacer(Modifier.height(8.dp))
+            Segments(FrameInterpolation.entries, s.interpolation, { it.label }, 13.sp) { onChange(s.copy(interpolation = it)) }
+            Spacer(Modifier.height(6.dp))
+            Text(InterpolationHint, color = NoteGrey, fontSize = 13.sp, lineHeight = 17.sp)
             Spacer(Modifier.height(35.5.dp))
             Row(Modifier.fillMaxWidth()) {
                 Column(Modifier.weight(1f)) { Heading("Quality"); Caption("Low") }
@@ -473,14 +480,16 @@ private fun Caption(text: String, modifier: Modifier = Modifier, align: TextAlig
     Text(text, modifier, color = ValueGrey, fontSize = 14.sp, lineHeight = 19.sp, textAlign = align, maxLines = 1)
 }
 
+private const val InterpolationHint = "Clips with a lower frame rate than the export are smoothed to match, for example 30 to 60 fps."
+
 @Composable
-private fun CodecControl(selected: Codec, onPick: (Codec) -> Unit) {
+private fun <T> Segments(options: List<T>, selected: T, label: (T) -> String, fontSize: TextUnit, onPick: (T) -> Unit) {
     Row(Modifier.fillMaxWidth().height(44.dp).clip(RoundedCornerShape(4.dp)).background(Am.Card).padding(3.dp)) {
-        AvailableCodecs.forEach { c ->
+        options.forEach { c ->
             val fill = animatedColor(if (c == selected) Navy else Am.Card)
             val text = animatedColor(if (c == selected) Am.OnNavyAccent else Navy)
             Box(Modifier.weight(1f).fillMaxHeight().clip(RoundedCornerShape(4.dp)).background(fill).clickable { onPick(c) }, contentAlignment = Alignment.Center) {
-                Text(c.label, color = text, fontSize = if (AvailableCodecs.size > 3) 12.sp else 15.sp, fontWeight = FontWeight.Medium, maxLines = 1)
+                Text(label(c), color = text, fontSize = fontSize, fontWeight = FontWeight.Medium, maxLines = 1)
             }
         }
     }
@@ -534,6 +543,8 @@ private fun OptionsPage(kind: ExportKind, scene: Scene, s: ExportSettings, onCha
     Group("Frame Rate") { rates.forEach { Chip("${it}fps", s.fps == it) { onChange(s.copy(fps = it)) } } }
     val (w, h) = exportSize(scene, s.shortSide, even = false)
     Text("${w}x$h", color = NoteGrey, fontSize = 14.sp)
+    Group("Frame Interpolation") { FrameInterpolation.entries.forEach { Chip(it.label, s.interpolation == it) { onChange(s.copy(interpolation = it)) } } }
+    Text(InterpolationHint, color = NoteGrey, fontSize = 14.sp)
 }
 
 @OptIn(ExperimentalLayoutApi::class)
