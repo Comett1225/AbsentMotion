@@ -140,6 +140,20 @@ class ImporterTest {
         assertTrue(failure("<scene width=\"1\"".toByteArray()).startsWith("Malformed XML"))
     }
 
+    @Test fun aZeroFrameRateFallsBackAndImportRefusesBadRatesAndSizes() {
+        val zero = Scene.parse("""<scene width="10" height="10" fps="0" totalTime="1000"/>""")
+        assertEquals(30, zero.fps)
+        assertEquals(1000, zero.frameStart(30))
+        assertEquals(30, zero.lastFrame)
+        fun failure(xml: String) = try { Importer(store()).import { xml.byteInputStream() }; fail("imported $xml"); "" } catch (e: ImportFailed) { e.message!! }
+        assertTrue(failure("""<scene width="10" height="10" fps="0"/>""").contains("frame rate"))
+        assertTrue(failure("""<scene width="10" height="10" fps="1000"/>""").contains("frame rate"))
+        assertTrue(failure("""<scene width="100000" height="10" fps="30"/>""").contains("size"))
+        assertTrue(failure("""<scene width="10" height="100000"/>""").contains("size"))
+        val store = store()
+        assertEquals(240, store.load(Importer(store).import { """<scene width="16384" height="10" fps="240"/>""".byteInputStream() }.single().id)!!.fps)
+    }
+
     @Test fun aCopyOwnsItsMediaAndReplacingMediaSwapsEveryUse() {
         val scene = """<scene width="10" height="10"><shape id="1" fillType="media" fillImage="x://a" /><shape id="2" fillType="media" fillImage="x://a" /></scene>"""
         val bytes = zip(listOf("p.xml" to scene.toByteArray(), "a.jpg" to "jpg".toByteArray(),

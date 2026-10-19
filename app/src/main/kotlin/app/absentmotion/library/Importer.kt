@@ -126,9 +126,11 @@ class Importer(
 
     private fun add(text: String, copies: (String, XmlNode) -> Map<String, String>): ImportReport {
         val root = try { XmlNode.parse(text.removePrefix("﻿")) } catch (e: Exception) { throw ImportFailed("Malformed XML: ${e.message}") }
-        if (root.name != "scene" || (root["width"]?.toIntOrNull() ?: 0) <= 0 || (root["height"]?.toIntOrNull() ?: 0) <= 0) {
-            throw ImportFailed("Malformed Scene: expected a <scene> with a size")
-        }
+        val width = root["width"]?.toIntOrNull() ?: 0
+        val height = root["height"]?.toIntOrNull() ?: 0
+        if (root.name != "scene" || width <= 0 || height <= 0) throw ImportFailed("Malformed Scene: expected a <scene> with a size")
+        if (width > MaxSide || height > MaxSide) throw ImportFailed("Malformed Scene: the size is larger than $MaxSide pixels")
+        if (root["fps"]?.toIntOrNull()?.let { it !in 1..MaxFps } == true) throw ImportFailed("Malformed Scene: the frame rate must be from 1 to $MaxFps")
         val id = store.newId()
         try {
             val moved = copies(id, root)
@@ -168,6 +170,8 @@ class Importer(
 
     companion object {
         private const val MaxXml = 32 shl 20
+        private const val MaxSide = 16384
+        private const val MaxFps = 240
 
         private val KnownAttributes = setOf(
             "id", "label", "startTime", "endTime", "fillType", "fillImage", "fillVideo", "inTime", "outTime", "speed", "blending",

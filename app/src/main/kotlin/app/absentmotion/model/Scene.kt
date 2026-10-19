@@ -9,7 +9,7 @@ value class Scene(val node: XmlNode) {
     val title: String get() = node["title"] ?: ""
     val width: Int get() = node["width"]?.toIntOrNull() ?: 1080
     val height: Int get() = node["height"]?.toIntOrNull() ?: 1080
-    val fps: Int get() = node["fps"]?.toIntOrNull() ?: 30
+    val fps: Int get() = node["fps"]?.toIntOrNull()?.takeIf { it > 0 } ?: 30
     val bgColor: Int get() = parseColor(node["bgcolor"]) ?: 0
     val totalTime: Int get() = node["totalTime"]?.toIntOrNull() ?: 0
 
