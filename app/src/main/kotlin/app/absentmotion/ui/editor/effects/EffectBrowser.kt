@@ -106,7 +106,7 @@ fun EffectBrowser(state: EditorState) {
                 if (state.effectDetail == null) Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     Text("+ Standard Settings", Modifier.weight(1f).height(48.dp).alpha(if (effect.available) 1f else 0.35f)
                         .clickable(enabled = effect.available) { add(effect) }.padding(12.dp), color = Am.OnDark, fontSize = 15.sp)
-                    Icon(PanelIcons.Star, "Favourite", Modifier.size(32.dp).clickable { favourite(effect) }, tint = if (effect.id in favourites) Am.Accent else Am.OnDark)
+                    Icon(PanelIcons.Star, "Favorite", Modifier.size(32.dp).clickable { favourite(effect) }, tint = if (effect.id in favourites) Am.Accent else Am.OnDark)
                 }
             }
         } else if (searching || category != null) {
@@ -139,7 +139,7 @@ fun EffectBrowser(state: EditorState) {
                     }
                     Row(Modifier.align(Alignment.BottomCenter).padding(bottom = 5.dp)) {
                         Icon(EffectIcons.Recent, "Recent", Modifier.size(12.dp).clickable { favPage = false }, tint = if (!favPage) Am.Accent else Am.OnDarkDim)
-                        Icon(PanelIcons.Star, "Favourite", Modifier.size(12.dp).clickable { favPage = true }, tint = if (favPage) Am.Accent else Am.OnDarkDim)
+                        Icon(PanelIcons.Star, "Favorite", Modifier.size(12.dp).clickable { favPage = true }, tint = if (favPage) Am.Accent else Am.OnDarkDim)
                     }
                 }
                 EffectCategories.chunked(2).forEach { row ->

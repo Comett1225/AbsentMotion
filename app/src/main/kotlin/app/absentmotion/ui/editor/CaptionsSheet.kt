@@ -153,7 +153,7 @@ internal fun CaptionsSheet(state: EditorState, onClose: () -> Unit) {
                     Line("Size") {
                         Steps(style.sizePercent, 50..200, 10, "${style.sizePercent}%") { update(style.copy(sizePercent = it)) }
                     }
-                    Line("Colour") {
+                    Line("Color") {
                         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                             for (argb in Swatches) {
                                 val chosen = argb == style.color

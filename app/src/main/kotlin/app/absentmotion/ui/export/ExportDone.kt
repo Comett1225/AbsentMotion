@@ -41,9 +41,9 @@ fun DoneScreen(kind: ExportKind, result: ExportResult, onClose: () -> Unit, onSh
 }
 
 private fun shareLabel(kind: ExportKind) = when (kind) {
-    ExportKind.Video -> "Share video"
-    ExportKind.Gif -> "Share Gif"
-    ExportKind.Sequence -> "Share Frame Sequence"
+    ExportKind.Video -> "Share Video"
+    ExportKind.Gif -> "Share GIF"
+    ExportKind.Sequence -> "Share Image Sequence"
     ExportKind.Frame, ExportKind.FrameAs -> "Share Image"
     ExportKind.Xml -> "Share Project XML"
     ExportKind.Package -> "Share"

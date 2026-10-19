@@ -137,7 +137,7 @@ private fun FontStrip(library: FontLibrary, current: String, modifier: Modifier,
     Column(modifier.fillMaxWidth()) {
         LazyRow(Modifier.fillMaxWidth().height(68.dp).background(TextControl)) {
             itemsIndexed(recent + favourites) { index, name ->
-                val header = when (index) { 0 -> if (recent.isNotEmpty()) TextIcons.Recent else null; recent.size -> TextIcons.FilledStar; else -> null }
+                val header = when { index == 0 && recent.isNotEmpty() -> TextIcons.Recent; index == recent.size -> TextIcons.FilledStar; else -> null }
                 val active = name == current
                 Row(Modifier.width(if (header != null) 85.dp else 65.dp).fillMaxHeight()
                     .then(if (header != null) Modifier.background(Brush.horizontalGradient(listOf(Am.Chosen.copy(alpha = 0.69f), Am.Chosen.copy(alpha = 0f))), RoundedCornerShape(topStart = 5.dp, bottomStart = 5.dp)) else Modifier)) {
