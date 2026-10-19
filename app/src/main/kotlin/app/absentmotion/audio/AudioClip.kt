@@ -21,7 +21,7 @@ internal class AudioClip(layer: Layer, val uri: String) {
     val startMs = layer.startTime
     val endMs = layer.endTime + 1
     val inMs = layer.node["inTime"]?.toDoubleOrNull() ?: 0.0
-    val outMs = layer.node["outTime"]?.toDoubleOrNull() ?: Double.MAX_VALUE
+    val outMs = layer.node["outTime"]?.toDoubleOrNull() ?: Double.POSITIVE_INFINITY
     val loop = layer.node["loop"] == "true"
     private val timing = VideoTiming(layer)
     private val gainLayer = layer
@@ -33,7 +33,7 @@ internal class AudioClip(layer: Layer, val uri: String) {
     fun mediaAt(projectMs: Double): Double = timing.mediaMs(projectMs - startMs)
 
     fun wrap(media: Double): Double {
-        if (!loop) return media
+        if (!loop || outMs.isInfinite()) return media
         val span = (outMs - inMs).coerceAtLeast(1.0)
         return inMs + ((media - inMs) % span + span) % span
     }
