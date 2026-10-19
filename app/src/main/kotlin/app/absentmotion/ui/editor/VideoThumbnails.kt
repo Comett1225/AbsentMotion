@@ -18,6 +18,7 @@ import app.absentmotion.media.ptsAt
 import app.absentmotion.model.Layer
 import app.absentmotion.model.Scene
 import app.absentmotion.model.videoTimeUs
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -75,5 +76,5 @@ private suspend fun thumbnailsAt(context: Context, uri: String, tiles: List<Pair
             }
             picture?.let { projectTime to it }
         }
-    } catch (_: Exception) { emptyList() } finally { retriever?.release() }
+    } catch (e: CancellationException) { throw e } catch (_: Exception) { emptyList() } finally { retriever?.release() }
 }
