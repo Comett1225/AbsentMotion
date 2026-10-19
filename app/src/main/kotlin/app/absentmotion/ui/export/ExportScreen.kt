@@ -41,6 +41,8 @@ import androidx.compose.material3.TextButton
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.compose.runtime.produceState
+import app.absentmotion.export.measureGifBytes
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.Composable
@@ -150,7 +152,16 @@ fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromProjectList
     if (phase !is Phase.Idle) lastPhase = phase
     var progress by remember { mutableFloatStateOf(0f) }
     val hasAudio = ExportAudio.mixFor != null && scene.layers.any { it.kind == "audio" }
-    val estimate = estimateBytes(kind, scene, settings.getValue(kind), hasAudio)
+    val gifSettings = settings.getValue(ExportKind.Gif)
+    val gifEstimate by produceState<Long?>(null, kind, scene, gifSettings, phase) {
+        value = null
+        if (kind == ExportKind.Gif && phase is Phase.Idle) {
+            try { value = measureGifBytes(engine, scene, gifSettings) }
+            catch (e: CancellationException) { throw e }
+            catch (e: Exception) { Log.w("AMExport", "Cannot sample GIF size", e) }
+        }
+    }
+    val estimate = if (kind == ExportKind.Gif) gifEstimate ?: -1L else estimateBytes(kind, scene, settings.getValue(kind), hasAudio)
     var free by remember { mutableLongStateOf(freeSpace()) }
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     DisposableEffect(lifecycle) {
@@ -186,7 +197,7 @@ fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromProjectList
             }
         }
         free = freeSpace()
-        if (estimate > free) {
+        if (kind != ExportKind.Gif && estimate > free) {
             failure = Failure("Not Enough Storage", "Free up some storage on this device and export again.")
             return
         }
@@ -196,6 +207,15 @@ fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromProjectList
         progress = 0f
         val job = scope.launch {
             try {
+                if (chosen == ExportKind.Gif) {
+                    val measured = measureGifBytes(engine, scene, s)
+                    free = freeSpace()
+                    if (measured > free) {
+                        failure = Failure("Not Enough Storage", "Free up some storage on this device and export again.")
+                        phase = Phase.Idle
+                        return@launch
+                    }
+                }
                 val result = exporter.export(chosen, scene, s, frame, name) { progress = it }
                 if (alsoTemplate) try {
                     TemplateStore(context).add(scene, scene.frameStart(frame), engine)
@@ -341,7 +361,7 @@ private fun TitleBar(title: String, icon: ImageVector, description: String, onCl
 private fun EstimateBlock(free: Long, estimate: Long) {
     Column(Modifier.fillMaxWidth().background(Am.Card).padding(horizontal = 15.dp).height(130.dp)) {
         InfoRow("Available Space", formatBytes(free), Modifier.height(67.dp))
-        InfoRow("Estimated file size", formatBytes(estimate), Modifier.height(63.dp))
+        InfoRow("Estimated file size", if (estimate < 0) "Calculating..." else formatBytes(estimate), Modifier.height(63.dp))
     }
 }
 
