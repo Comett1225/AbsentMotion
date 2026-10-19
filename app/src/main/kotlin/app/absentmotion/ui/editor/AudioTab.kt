@@ -160,7 +160,9 @@ private class SoundPreview(private val context: Context) {
         stop()
         if (same) return
         try {
-            player = MediaPlayer().apply {
+            val nextPlayer = MediaPlayer()
+            player = nextPlayer
+            nextPlayer.apply {
                 setDataSource(context, next)
                 setOnPreparedListener { it.start() }
                 setOnCompletionListener { stop() }
