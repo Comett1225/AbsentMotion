@@ -199,9 +199,10 @@ together with Skia.
   explicit CC BY records were accepted, and each licence was checked at the source before use. 8,391 come from the
   COCO 2017 training set (https://cocodataset.org) and 10,224 from Open Images V7
   (https://storage.googleapis.com/openimages/web/factsfigures_v7.html). Changes: resized; JPEG re-encoded. Image
-  rights remain with individual creators. No picture is part of this repository or the app. The creator, title,
-  source page, licence and changes of every picture were recorded when it was collected; that list is not part of
-  this repository.
+  rights remain with individual creators. No picture is part of this repository or the app. The creator, title, source page and licence of every picture are listed in the file
+  `AbsentMotion-training-image-credits.txt`, attached to each GitHub release that includes the model
+  (https://github.com/Comett1225/AbsentMotion/releases/latest/download/AbsentMotion-training-image-credits.txt); it is
+  not part of this repository.
 - COCO annotations: training/ground-truth masks are based on COCO Consortium annotations under CC BY 4.0 (union of all
   annotated instances, resized). Citation: Tsung-Yi Lin et al., Microsoft COCO: Common Objects in Context, ECCV 2014.
 - Open Images labels and metadata: Google LLC, CC BY 4.0; Kuznetsova et al., The Open Images Dataset V4, IJCV 2020.
