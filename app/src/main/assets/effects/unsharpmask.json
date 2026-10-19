@@ -1,0 +1,42 @@
+{
+ "id": "unsharpmask",
+ "name": "Unsharp Mask",
+ "category": "stylize",
+ "description": "Applies classic unsharp masking with a threshold and an optional grey mask preview.",
+ "params": [
+  {
+   "id": "strength",
+   "label": "Strength",
+   "type": "float",
+   "default": 0.5,
+   "min": 0.0,
+   "max": 2.0,
+   "step": 0.1
+  },
+  {
+   "id": "amount",
+   "label": "Amount",
+   "type": "float",
+   "default": 1.0,
+   "min": 0.0,
+   "max": 4.0,
+   "step": 0.1
+  },
+  {
+   "id": "threshold",
+   "label": "Threshold",
+   "type": "float",
+   "default": 0.0,
+   "min": -1.0,
+   "max": 1.0,
+   "step": 0.01
+  },
+  {
+   "id": "showMask",
+   "label": "Show Mask",
+   "type": "switch",
+   "default": false
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float strength;\nuniform float amount;\nuniform float threshold;\nuniform float showMask;\nhalf3 tap(float2 p)\n{\n    half4 s = image.eval(p);\n    return s.rgb / max(s.a, 0.001);\n}\nhalf softGate(half d, half t)\n{\n    if (t <= 0.0) return 1.0;\n    return smoothstep(t, t + max(t * 0.5, half(0.001)), abs(d));\n}\nhalf4 main(float2 coord)\n{\n    half4 c = image.eval(coord);\n    if (c.a <= 0.001) return half4(0.0);\n    half3 col = c.rgb / c.a;\n    float r = strength * 4.0;\n    half3 blurred = (tap(coord + float2(-r, -r)) + 2.0 * tap(coord + float2(0.0, -r)) + tap(coord + float2(r, -r)) + 2.0 * tap(coord + float2(-r, 0.0)) + 4.0 * col + 2.0 * tap(coord + float2(r, 0.0)) + tap(coord + float2(-r, r)) + 2.0 * tap(coord + float2(0.0, r)) + tap(coord + float2(r, r))) / 16.0;\n    half3 diff = col - blurred;\n    half t = half(max(threshold, 0.0) * 0.25);\n    half3 g = half3(softGate(diff.r, t), softGate(diff.g, t), softGate(diff.b, t));\n    half amt = half(amount);\n    half3 corrected = clamp(col + amt * diff * g, half3(0.0), half3(1.0));\n    half3 ad = abs(diff);\n    half m = clamp((ad.r + ad.g + ad.b) * half(1.3333333), 0.0, 1.0);\n    if (showMask > 0.5) return half4(half3(m) * c.a, c.a);\n    return half4(corrected * c.a, c.a);\n}"
+}

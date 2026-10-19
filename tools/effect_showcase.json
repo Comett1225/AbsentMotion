@@ -60,6 +60,10 @@
     "mirror": {"photo": "colour"},
     "tile": {"photo": "colour"},
     "chromakey": {"photo": "greenscreen", "under": "landscape", "params": {"key": "#00b140"}, "split": 0.4},
-    "lumakey": {"photo": "blackscreen", "under": "landscape", "params": {"threshold": 0.15}, "split": 0.4}
+    "lumakey": {"photo": "blackscreen", "under": "landscape", "params": {"threshold": 0.15}, "split": 0.4},
+    "unsharpmask": {"photo": "detail", "params": {"strength": 0.6, "amount": 2}, "split": 0.4},
+    "highlightshadow": {"photo": "landscape", "params": {"highlights": 0.6, "shadows": 1.6}, "split": 0.4},
+    "denoise": {"photo": "detail", "params": {"strength": 1, "radius": 3}, "split": 0.4},
+    "flicker": {"photo": "colour", "frames": [1, 5, 9, 13]}
   }
 }

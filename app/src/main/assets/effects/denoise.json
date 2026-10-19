@@ -1,0 +1,36 @@
+{
+ "id": "denoise",
+ "name": "Denoise",
+ "category": "blur",
+ "description": "Removes image noise with an edge-preserving bilateral filter that averages nearby pixels only when their colours are similar.",
+ "params": [
+  {
+   "id": "strength",
+   "label": "Strength",
+   "type": "float",
+   "default": 0.5,
+   "min": 0.0,
+   "max": 1.0,
+   "step": 0.01
+  },
+  {
+   "id": "radius",
+   "label": "Radius",
+   "type": "float",
+   "default": 2.0,
+   "min": 1.0,
+   "max": 6.0,
+   "step": 0.5
+  },
+  {
+   "id": "detail",
+   "label": "Detail",
+   "type": "float",
+   "default": 0.5,
+   "min": 0.0,
+   "max": 1.0,
+   "step": 0.01
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float strength;\nuniform float radius;\nuniform float detail;\nhalf4 main(float2 coord)\n{\n    half4 c = image.eval(coord);\n    if (c.a <= 0.001) return half4(0.0);\n    half3 col = c.rgb / c.a;\n    float s = max(radius, 0.5);\n    float rs = mix(0.35, 0.03, clamp(detail, 0.0, 1.0));\n    float inv2s2 = 1.0 / (2.0 * s * s);\n    float inv2r2 = 1.0 / (2.0 * rs * rs);\n    half3 sum = half3(0.0);\n    float wsum = 0.0;\n    for (int y = -2; y <= 2; y++)\n    {\n        for (int x = -2; x <= 2; x++)\n        {\n            float2 off = float2(float(x), float(y)) * s;\n            half4 sc = image.eval(coord + off);\n            if (sc.a <= 0.001) continue;\n            half3 sc3 = sc.rgb / sc.a;\n            float d2 = float(dot(off, off));\n            float ws = exp(-d2 * inv2s2);\n            half3 diff = sc3 - col;\n            float cd2 = float(dot(diff, diff));\n            float wr = exp(-cd2 * inv2r2);\n            float w = ws * wr;\n            sum += sc3 * half(w);\n            wsum += w;\n        }\n    }\n    half3 filtered = col;\n    if (wsum > 0.00001)\n    {\n        filtered = sum / half(wsum);\n    }\n    half3 outc = clamp(mix(col, filtered, half(clamp(strength, 0.0, 1.0))), 0.0, 1.0);\n    return half4(outc * c.a, c.a);\n}"
+}

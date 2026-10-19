@@ -49,5 +49,9 @@
  "mirror",
  "tile",
  "chromakey",
- "lumakey"
+ "lumakey",
+ "unsharpmask",
+ "highlightshadow",
+ "denoise",
+ "flicker"
 ]
