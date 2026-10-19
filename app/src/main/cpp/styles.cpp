@@ -259,7 +259,7 @@ SkPath DrawStrokeEnd(SkCanvas* canvas, SkPaint paint, SkPoint p, SkVector d, flo
     const bool filled = style.size() > 7 && style.compare(style.size() - 7, 7, "-filled") == 0;
     paint.setStyle(filled ? SkPaint::kFill_Style : SkPaint::kStroke_Style);
     const SkPath shape = b.detach();
-    canvas->drawPath(shape, paint);
+    if (canvas) canvas->drawPath(shape, paint);
     return filled ? shape : skpathutils::FillPathWithPaint(shape, paint);
 }
 
@@ -270,7 +270,7 @@ SkPath DrawStroke(SkCanvas* canvas, const Layer& l, const SkPath& path, float t,
     SkPaint paint = StrokePaint(l, width, color);
     const bool ends = (l.stroke.start != "none" || l.stroke.end != "none") && l.stroke.endSize > 0;
     SkPath area = skpathutils::FillPathWithPaint(path, paint);
-    const bool layered = ends && color.fA < 1;
+    const bool layered = canvas && ends && color.fA < 1;
     if (layered) {
         SkPaint opacity;
         opacity.setAlphaf(color.fA);
@@ -278,7 +278,7 @@ SkPath DrawStroke(SkCanvas* canvas, const Layer& l, const SkPath& path, float t,
         canvas->saveLayer(path.getBounds().makeOutset(room, room), &opacity);
         paint.setAlphaf(1);
     }
-    canvas->drawPath(path, paint);
+    if (canvas) canvas->drawPath(path, paint);
     if (ends) {
         const float r = width * l.stroke.endSize;
         SkPathMeasure contours(path, false);
@@ -570,9 +570,8 @@ static bool Contains(const std::vector<Layer>& siblings, const Layer& l, double 
         const float t = l.localTime(timeMs);
         const SkPath path = ShapePath(l, t);
         if (l.fillType != "none" && path.contains(local.fX, local.fY)) return true;
-        const float width = l.stroke.present && l.stroke.enabled ? l.stroke.size.get(0, t, 0) : 0;
-        if (!(width > 0)) return false;
-        return skpathutils::FillPathWithPaint(path.makeTransform(matrix), StrokePaint(l, width, kBlack)).contains(p.fX, p.fY);
+        if (!(l.stroke.present && l.stroke.enabled)) return false;
+        return DrawStroke(nullptr, l, path.makeTransform(matrix), t, 1).contains(p.fX, p.fY);
     }
     const SkPoint inner = {local.fX + l.innerWidth / 2.0f, local.fY + l.innerHeight / 2.0f};
     if (!SkRect::MakeWH(l.innerWidth, l.innerHeight).contains(inner.fX, inner.fY)) return false;

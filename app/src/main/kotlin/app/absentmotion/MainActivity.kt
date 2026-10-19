@@ -236,6 +236,10 @@ class MainActivity : ComponentActivity() {
                 val ok = engine.stillPng(scene.toXml(), state.timeMs, scene.width, scene.height, File(getExternalFilesDir(null), "$name.png"))
                 Log.i("AMTest", "still $name ok=$ok")
             }
+            intent.getStringExtra("hit")?.split(';')?.forEach { point ->
+                val xy = point.split(',').mapNotNull { it.trim().toFloatOrNull() }
+                if (xy.size == 2) Log.i("AMTest", "hit $point ${engine.hitTest(xy[0], xy[1], state.timeMs)}")
+            }
         }
     }
 

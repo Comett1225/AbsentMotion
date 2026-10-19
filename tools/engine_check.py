@@ -62,20 +62,29 @@ CASES = {
         [((52, 100), RED), ((100, 100), BLACK)]),
 }
 
+HITS = {
+    "a stroke end arrow can be tapped": (
+        scene('<shape id="7" label="line" startTime="0" endTime="1000" fillType="none" mediaFillMode="fill">'
+              f'{transform()}<path d="M 40 100 L 140 100"/>'
+              '<path-stroke end="arrow-filled" end-size="3"><color value="#ffffffff"/><size value="10"/></path-stroke></shape>'),
+        [((130, 85), 7), ((60, 100), 7), ((60, 85), 0), ((180, 100), 0)]),
+}
+
 
 def adb(*args):
     return subprocess.run(ADB + [str(a) for a in args], capture_output=True, text=True).stdout
 
 
-def run(name, xml, work):
+def run(name, xml, work, hits=()):
     local = work / f"{name}.xml"
     local.write_text(xml)
     remote = f"{DEVICE_DIR}/{name}.xml"
     adb("push", local, remote)
     adb("logcat", "-c")
-    adb("shell", "am", "start", "-n", f"{PKG}/.MainActivity", "--es", "xml", remote, "--es", "still", name, "--ei", "frame", "0")
+    extras = ["--es", "hit", "'" + ";".join(f"{x},{y}" for x, y in hits) + "'"] if hits else []
+    adb("shell", "am", "start", "-n", f"{PKG}/.MainActivity", "--es", "xml", remote, "--es", "still", name, "--ei", "frame", "0", *extras)
     deadline = time.time() + 120
-    while f"still {name} ok=" not in (log := adb("logcat", "-d", "-s", "AMTest")):
+    while f"still {name} ok=" not in (log := adb("logcat", "-d", "-s", "AMTest")) or log.count(" hit ") < len(hits):
         if time.time() > deadline:
             sys.exit(f"the app did not answer {name} in 120 s")
         time.sleep(0.5)
@@ -99,6 +108,12 @@ def main():
         image = still(f"enginecheck{k}", xml, work)
         results.append((title, [f"{xy} is {tuple(int(v) for v in image[xy[1], xy[0]])}, expected {want}" for xy, want in probes
                                 if np.abs(image[xy[1], xy[0]] - want).max() > TOLERANCE]))
+    for k, (title, (xml, probes)) in enumerate(HITS.items()):
+        log = run(f"enginehit{k}", xml, work, [xy for xy, _ in probes])
+        adb("shell", "rm", f"{DEVICE_DIR}/enginehit{k}.png")
+        got = {line.split(" hit ")[1].split()[0]: int(line.split()[-1]) for line in log.splitlines() if " hit " in line}
+        results.append((title, [f"{xy} hits {got.get(f'{xy[0]},{xy[1]}')}, expected {want}" for xy, want in probes
+                                if got.get(f"{xy[0]},{xy[1]}") != want]))
     failed = 0
     for title, bad in results:
         failed += bool(bad)
