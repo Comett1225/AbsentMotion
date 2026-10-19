@@ -18,7 +18,7 @@ FLAGS="-std=c++20 -O1 -w -fno-exceptions -fno-rtti -DSKSL_STANDALONE -DSK_DISABL
 export SKIA OUT FLAGS
 for f in $SRC; do echo "$f"; done | xargs -P 10 -n 1 sh -c '
   o="$OUT/obj/$(echo "$0" | tr / _).o"
-  [ "$o" -nt "$SKIA/$0" ] || clang++ $FLAGS -c "$SKIA/$0" -o "$o" || echo "FAILED $0"'
+  [ "$o" -nt "$SKIA/$0" ] || clang++ $FLAGS -c "$SKIA/$0" -o "$o"'
 clang++ $FLAGS -c "$HERE/sksl_check.cpp" -o "$OUT/obj/main.o"
 clang++ -o "$OUT/sksl_check" "$OUT"/obj/*.o
 cp "$SKIA"/src/sksl/sksl_*.sksl "$OUT/"

@@ -31,7 +31,16 @@ fi
 
 python3 "$ROOT/tools/skia_sync.py" "$SKIA"
 
-for p in "$ROOT"/tools/skia-patches/*.patch; do git apply --check "$p" 2>/dev/null && git apply "$p"; done
+for p in "$ROOT"/tools/skia-patches/*.patch; do
+    if git apply --check "$p" 2>/dev/null; then
+        git apply "$p"
+    elif git apply --reverse --check "$p" 2>/dev/null; then
+        :
+    else
+        echo "build_skia.sh: cannot apply patch $(basename "$p")" >&2
+        exit 1
+    fi
+done
 
 GN="$("$ROOT/tools/build_gn.sh" | tail -n 1)"
 mkdir -p out/android-arm64
