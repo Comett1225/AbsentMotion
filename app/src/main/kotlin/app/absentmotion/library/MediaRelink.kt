@@ -14,22 +14,25 @@ object MediaRelink {
         runCatching { context.contentResolver.openAssetFileDescriptor(Uri.parse(uri), "r")?.use { true } }.getOrNull() == true
 
     fun find(context: Context, media: MediaDeclaration): String? {
-        if (media.filename.isEmpty()) return null
+        if (media.filename.isEmpty() || media.size <= 0) return null
         val collection = when {
             media.type.startsWith("video") -> MediaStore.Video.Media.EXTERNAL_CONTENT_URI
             media.type.startsWith("image") -> MediaStore.Images.Media.EXTERNAL_CONTENT_URI
             media.type.startsWith("audio") -> MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
             else -> return null
         }
-        val sized = media.size > 0
         return runCatching {
             context.contentResolver.query(
                 collection, arrayOf(MediaStore.MediaColumns._ID),
-                "${MediaStore.MediaColumns.DISPLAY_NAME} = ?" + if (sized) " AND ${MediaStore.MediaColumns.SIZE} = ?" else "",
-                if (sized) arrayOf(media.filename, media.size.toString()) else arrayOf(media.filename), null,
-            )?.use { c -> if (c.moveToFirst()) Uri.withAppendedPath(collection, c.getLong(0).toString()).toString() else null }
+                "${MediaStore.MediaColumns.DISPLAY_NAME} = ? AND ${MediaStore.MediaColumns.SIZE} = ?",
+                arrayOf(media.filename, media.size.toString()), null,
+            )?.use { c -> pick(media, generateSequence { if (c.moveToNext()) c.getLong(0) else null }) }
+                ?.let { Uri.withAppendedPath(collection, it.toString()).toString() }
         }.getOrNull()
     }
+
+    internal fun pick(media: MediaDeclaration, candidates: Sequence<Long>): Long? =
+        if (media.filename.isEmpty() || media.size <= 0) null else candidates.take(2).toList().singleOrNull()
 
     fun relink(context: Context, scene: Scene): Scene = scene.media.fold(scene) { s, m ->
         val uri = if (opens(context, m.uri)) m.uri else find(context, m)
