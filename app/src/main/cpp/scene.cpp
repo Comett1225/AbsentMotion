@@ -230,9 +230,10 @@ void ParseGroup(const XmlNode& scene, int fps, Layer* group) {
     r.out = IntAttr(scene, "retimeOut", 0);
     r.hostFps = fps;
     group->fixedPrecompose = StrAttr(scene, "precompose") == "fixedResolution";
+    const int innerFps = std::max(1, IntAttr(scene, "fps", 30));
     for (const auto& n : scene.children) {
         Layer l;
-        if (ParseLayer(*n, fps, &l)) group->children.push_back(std::move(l));
+        if (ParseLayer(*n, innerFps, &l)) group->children.push_back(std::move(l));
     }
 }
 

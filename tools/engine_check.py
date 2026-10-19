@@ -53,6 +53,13 @@ CASES = {
     "a centred border follows the layer blend mode": (
         scene(rect(1, 100, 100, 100, 100, 0xffff0000) + rect(2, 100, 100, 50, 50, fill="none", extra=CENTRED.format(12), attrs=' blending="multiply"')),
         [((50, 100), RED), ((150, 100), RED), ((100, 100), RED)]),
+    "embedded scene layers use its frame rate": (
+        scene(f'<embedScene id="1" label="g" startTime="0" endTime="1000">{transform("100,100,0")}'
+              '<scene width="200" height="200" fps="24" totalTime="1000" bgcolor="#00000000" retime="off">'
+              '<shape id="2" label="r" startTime="0" endTime="1000" fillType="color" mediaFillMode="fill" s=".rect">'
+              '<transform><location><kf t="0.03" v="100,100,0"/><kf t="0.5" v="1100,100,0"/></location></transform>'
+              '<fillColor value="#ffff0000"/><property name="size" type="vec2" value="10,30"/></shape></scene></embedScene>', fps=60),
+        [((52, 100), RED), ((100, 100), BLACK)]),
 }
 
 
