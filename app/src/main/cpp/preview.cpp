@@ -175,8 +175,11 @@ void RenderPreview(SkCanvas* canvas, int width, int height, const Scene& scene, 
             canvas->save();
             canvas->clipRect(area, true);
             canvas->drawColor(SkColorSetRGB(0xe5, 0xe5, 0xe5));
-            for (int row = 0; row * cell < area.height(); row++) {
-                for (int col = (row + 1) & 1; col * cell < area.width(); col += 2) {
+            const SkRect seen = canvas->getLocalClipBounds();
+            const int firstRow = std::max(0, (int)floorf((area.bottom() - seen.bottom()) / cell));
+            const int firstCol = std::max(0, (int)floorf((seen.left() - area.left()) / cell));
+            for (int row = firstRow; row * cell < area.bottom() - seen.top(); row++) {
+                for (int col = firstCol + ((firstCol + row + 1) & 1); col * cell < seen.right() - area.left(); col += 2) {
                     canvas->drawRect(SkRect::MakeXYWH(area.left() + col * cell, area.bottom() - (row + 1) * cell, cell, cell), dark);
                 }
             }
