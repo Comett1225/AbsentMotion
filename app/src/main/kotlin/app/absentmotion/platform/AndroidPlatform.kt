@@ -201,7 +201,7 @@ class Speech(context: Context) {
     }
 
     suspend fun voices(): List<app.absentmotion.ui.editor.SpeechVoice> {
-        if (!ready.await()) return emptyList()
+        if (kotlinx.coroutines.withTimeoutOrNull(START_MS) { ready.await() } != true) return emptyList()
         val usable = tts.voices.orEmpty().filter {
             !it.isNetworkConnectionRequired && android.speech.tts.TextToSpeech.Engine.KEY_FEATURE_NOT_INSTALLED !in it.features
         }
@@ -223,7 +223,7 @@ class Speech(context: Context) {
     }
 
     suspend fun toFile(text: String, voice: app.absentmotion.ui.editor.SpeechVoice, rate: Float, pitch: Float): Uri {
-        check(ready.await()) { "Text to speech is unavailable on this phone" }
+        check(kotlinx.coroutines.withTimeoutOrNull(START_MS) { ready.await() } == true) { "Text to speech is unavailable on this phone" }
         val file = app.absentmotion.ai.aiFile(context, "wav")
         val id = java.util.UUID.randomUUID().toString()
         val done = kotlinx.coroutines.CompletableDeferred<Boolean>().also { pending[id] = it }
@@ -231,7 +231,7 @@ class Speech(context: Context) {
             tts.stop()
             use(voice, rate, pitch)
             check(tts.synthesizeToFile(text, null, file, id) == android.speech.tts.TextToSpeech.SUCCESS) { "The voice could not be made" }
-            check(done.await() && file.length() > 44) { "The voice could not be made" }
+            check(kotlinx.coroutines.withTimeoutOrNull(START_MS + 50L * text.length) { done.await() } == true && file.length() > 44) { "The voice could not be made" }
         } catch (e: Throwable) {
             pending.remove(id); tts.stop(); file.delete(); throw e
         }
@@ -240,7 +240,10 @@ class Speech(context: Context) {
 
     fun close() = tts.shutdown()
 
-    companion object { val MAX_CHARS = android.speech.tts.TextToSpeech.getMaxSpeechInputLength() }
+    companion object {
+        val MAX_CHARS = android.speech.tts.TextToSpeech.getMaxSpeechInputLength()
+        private const val START_MS = 60_000L
+    }
 }
 
 @androidx.compose.runtime.Composable
