@@ -84,6 +84,17 @@ class ProjectStoreTest {
         assertEquals("a cached", store.load(a)!!.layers.single().nested!!.layers.single().nested!!.layers.single().nested!!.title)
     }
 
+    @Test fun aTemplateThatStillUsesTheProjectsOwnMediaDoesNotReplaceTheProject() {
+        val root = tmp.newFolder()
+        val store = ProjectStore(root)
+        val id = store.create(scene())
+        val own = store.mediaDir(id).resolve("a.jpg").toURI().toString()
+        val copied = root.resolve("templates/t1/media/1_a.jpg").toURI().toString()
+        assertFalse(canReplaceProject(scene(image(copied), image(own)), store))
+        assertTrue(canReplaceProject(scene(image(copied), image("content://media/external/images/media/5")), store))
+        assertFalse(canReplaceProject(null, store))
+    }
+
     @Test fun speedKeyWithoutValueIsIgnored() {
         val map = XmlNode("speedMap", children = listOf(XmlNode("kf", mapOf("t" to "0")), XmlNode("kf", mapOf("t" to "1000000", "v" to "2"))))
         val layer = Layer(XmlNode("shape", linkedMapOf("id" to "1", "startTime" to "0", "endTime" to "999"), listOf(map)))

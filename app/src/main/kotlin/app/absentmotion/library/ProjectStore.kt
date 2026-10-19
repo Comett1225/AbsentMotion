@@ -116,6 +116,8 @@ class ProjectStore(private val root: File) {
         }
     }
 
+    fun inMediaFolder(uri: String): Boolean = ownerOf(uri) != null
+
     private fun ownerOf(uri: String): String? {
         val media = folderUri(File(root, "media"))
         return uri.takeIf { it.startsWith(media) }?.removePrefix(media)?.substringBefore('/')?.takeIf { it.isNotEmpty() && it != "." && it != ".." }

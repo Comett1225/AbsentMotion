@@ -11,6 +11,7 @@ import app.absentmotion.model.mediaUris
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.IOException
 
 data class SavedTemplate(val id: String, val scene: Scene, val thumbnail: File?, val modified: Long) {
     val title: String get() = scene.title
@@ -54,7 +55,11 @@ class TemplateStore(private val root: File, private val resolver: ContentResolve
 
     suspend fun adopt(projects: ProjectStore, id: String, engine: EngineThread): String? {
         val scene = projects.load(id) ?: return null
-        return add(scene, 0, engine).also { withContext(Dispatchers.IO) { projects.delete(id) } }
+        val template = try { add(scene, 0, engine) } catch (_: IOException) { return null }
+        return withContext(Dispatchers.IO) {
+            if (canReplaceProject(load(template), projects)) template.also { projects.delete(id) }
+            else null.also { delete(template) }
+        }
     }
 
     fun createProject(scene: Scene, projects: ProjectStore): String {
@@ -92,3 +97,6 @@ class TemplateStore(private val root: File, private val resolver: ContentResolve
         java.nio.file.Files.move(temp.toPath(), File(dir, "scene.xml").toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING)
     }
 }
+
+internal fun canReplaceProject(template: Scene?, projects: ProjectStore): Boolean =
+    template != null && template.node.mediaUris().none(projects::inMediaFolder)
