@@ -4,6 +4,7 @@ import app.absentmotion.model.Layer
 import app.absentmotion.model.PropRef
 import app.absentmotion.model.Scene
 import app.absentmotion.model.VideoTiming
+import app.absentmotion.model.XmlNode
 import app.absentmotion.model.isKeyframed
 import app.absentmotion.model.valueAt
 import kotlin.math.ceil
@@ -16,6 +17,8 @@ val GainRef = PropRef(PropRef.Kind.Child, "gain")
 const val MAX_GAIN = 1.5f
 
 val Layer.gain: Float get() = element(GainRef)?.valueAt(t)?.toFloatOrNull() ?: 1f
+
+val XmlNode.mutes: Boolean get() = !isKeyframed && (this["value"]?.toFloatOrNull() ?: 1f) <= 0f
 
 val Layer.soundUri: String? get() = if (kind == "audio") node["src"] else mediaFill?.takeIf { it.video }?.uri
 
@@ -101,9 +104,7 @@ internal class AudioClip(layer: Layer, val uri: String, private val track: Layer
         fun of(scene: Scene): List<AudioClip> = scene.layerTracks().mapNotNull { track ->
             val layer = track.layer
             val uri = layer.soundUri
-            val gain = layer.element(GainRef)
-            val silent = gain != null && !gain.isKeyframed && (gain["value"]?.toFloatOrNull() ?: 1f) <= 0f
-            if (uri == null || layer.hidden || silent) null else AudioClip(layer, uri, track.takeIf { it.parents.isNotEmpty() }, (scene.media(uri) ?: track.scene.media(uri))?.duration?.takeIf { it > 0 }?.div(1000.0) ?: Double.POSITIVE_INFINITY)
+            if (uri == null || layer.hidden || layer.element(GainRef)?.mutes == true) null else AudioClip(layer, uri, track.takeIf { it.parents.isNotEmpty() }, (scene.media(uri) ?: track.scene.media(uri))?.duration?.takeIf { it > 0 }?.div(1000.0) ?: Double.POSITIVE_INFINITY)
         }
     }
 }
