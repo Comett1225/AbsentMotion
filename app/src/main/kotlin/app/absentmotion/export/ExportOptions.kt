@@ -87,6 +87,8 @@ fun videoBitrate(width: Int, height: Int, s: ExportSettings): Int {
 
 const val AudioBitrate = 128_000
 
+const val GifBytesPerPixel = 0.6
+
 fun optionNote(kind: ExportKind, scene: Scene, s: ExportSettings): String? = when (kind) {
     ExportKind.Video -> "MP4 ${if (s.codec == Codec.H264) "" else s.codec.short + " "}${resolutionLabel(s.shortSide)} ${s.fps}fps"
     ExportKind.Sequence -> "${s.image.label} ${resolutionLabel(s.shortSide)} ${s.fps}fps"
@@ -104,7 +106,7 @@ fun estimateBytes(kind: ExportKind, scene: Scene, s: ExportSettings, hasAudio: B
         ExportKind.Video -> exportSize(scene, s.shortSide, true).let {
             (videoBitrate(it.first, it.second, s) + if (hasAudio) AudioBitrate else 0) / 8 * seconds
         }.toLong()
-        ExportKind.Gif -> exportSize(scene, s.shortSide, false).let { it.first.toLong() * it.second * frames / 8 }
+        ExportKind.Gif -> exportSize(scene, s.shortSide, false).let { it.first * it.second * frames * GifBytesPerPixel }.toLong()
         ExportKind.Sequence -> exportSize(scene, s.shortSide, false).let {
             (it.first.toLong() * it.second * frames * s.image.bytesPerPixel)
         }.toLong()

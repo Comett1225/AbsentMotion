@@ -3,8 +3,10 @@ package app.absentmotion.export
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.Locale
+import kotlin.math.sin
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class ImageEncodeTest {
@@ -61,5 +63,26 @@ class ImageEncodeTest {
         } finally {
             Locale.setDefault(before)
         }
+    }
+
+    @Test
+    fun theGifSizeEstimateIsCloseForPhotographicFrames() {
+        val (w, h) = 360 to 640
+        val random = java.util.Random(7)
+        val rgba = ByteArray(w * h * 4)
+        for (y in 0 until h) for (x in 0 until w) {
+            val base = doubleArrayOf(128 + 100 * sin(x / 40.0) * sin(y / 70.0), 90 + 80 * sin((x + y) / 90.0), 60 + 50 * sin(y / 30.0 + x / 120.0))
+            for (c in 0 until 3) rgba[(y * w + x) * 4 + c] = (base[c] + random.nextGaussian() * 8).toInt().coerceIn(0, 255).toByte()
+            rgba[(y * w + x) * 4 + 3] = -1
+        }
+        val out = java.io.ByteArrayOutputStream()
+        val writer = GifWriter(out, w, h)
+        val header = out.size()
+        writer.frame(rgba, 100)
+        val frameBytes = out.size() - header
+        val scene = app.absentmotion.model.Scene(app.absentmotion.model.Scene.create("t", w, h, 15, 0).node.with("totalTime", "999"))
+        val frames = frameCount(scene, 15)
+        val ratio = estimateBytes(ExportKind.Gif, scene, ExportSettings(360, 15), false).toDouble() / (frames.toLong() * frameBytes)
+        assertTrue("estimate / encoded = $ratio", ratio in 0.6..1.6)
     }
 }
