@@ -88,6 +88,7 @@ import app.absentmotion.editor.clearSelection
 import app.absentmotion.model.LabelColour
 import app.absentmotion.model.Layer
 import app.absentmotion.model.trimmedTo
+import app.absentmotion.model.trimHitsSourceLimit
 import app.absentmotion.model.withKeyframesMoved
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Motion
@@ -183,6 +184,7 @@ private val TextStripe get() = Am.TextBarStripe
 private val BarShadow get() = Am.PreviewBg
 private val GripColor get() = Am.Inactive
 private val HandleColor get() = Am.Inactive
+private val LimitColor get() = Am.Warning
 
 private val TimecodeStyle get() = TextStyle(color = Am.OnDark, fontSize = 14.sp)
 private val LabelStyle get() = TextStyle(color = Am.OnBar, fontSize = 11.sp)
@@ -193,7 +195,11 @@ fun Timeline(state: EditorState, modifier: Modifier = Modifier) {
     val scope = rememberCoroutineScope()
     val haptic = LocalHapticFeedback.current
     val wide = LocalWide.current
-    val view = remember(state, density, wide) { TimelineView(state, density, scope, wide) }
+    val view = remember(state, density, wide) {
+        TimelineView(state, density, scope, wide).also { v ->
+            v.onLimit = { if (state.settings.trimLimitVibration) haptic.performHapticFeedback(HapticFeedbackType.SegmentFrequentTick) }
+        }
+    }
     val measurer = rememberTextMeasurer(cacheSize = 32)
     val eye = rememberVectorPainter(TimelineIcons.Eye)
     val eyeOff = rememberVectorPainter(TimelineIcons.EyeOff)
@@ -338,6 +344,9 @@ private class TimelineView(val state: EditorState, density: Density, private val
 
     private var dragId = 0L
     private var edgeMs = 0f
+    var limitEdge by mutableStateOf<Boolean?>(null)
+        private set
+    var onLimit: () -> Unit = {}
 
     private class Slide(val from: Float, val at: Long)
 
@@ -514,6 +523,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
     }
 
     fun endDrag(drag: Drag?, velocity: Velocity, lifted: Boolean = true) {
+        limitEdge = null
         if (drag == Drag.Lift) drop()
         if (drag == Drag.Key) dropKey(lifted)
         if (drag?.edit == true) return state.endGesture()
@@ -578,13 +588,16 @@ private class TimelineView(val state: EditorState, density: Density, private val
         val frame = TimelineMath.nearestFrame(edgeMs, fps)
         val id = dragId
         val mediaMs = (layer.mediaFill?.uri ?: layer.node["src"])?.let { scene.media(it)?.duration }?.takeIf { it > 0 }?.let { (it / 1000).toInt() } ?: Int.MAX_VALUE
-        if (start) {
-            val time = scene.frameStart(frame.coerceIn(0, scene.lastShownFrame(layer.endTime).coerceAtLeast(0)))
-            if (time != layer.startTime) state.edit("trim-start") { it.update(id) { l -> l.trimmedTo(time, l.endTime, mediaMs) } }
+        val time = if (start) {
+            scene.frameStart(frame.coerceIn(0, scene.lastShownFrame(layer.endTime).coerceAtLeast(0)))
+                .also { time -> if (time != layer.startTime) state.edit("trim-start") { it.update(id) { l -> l.trimmedTo(time, l.endTime, mediaMs) } } }
         } else {
-            val time = scene.frameEnd((frame - 1).coerceAtLeast(scene.firstShownFrame(layer.startTime)))
-            if (time != layer.endTime) state.edit("trim-end") { it.update(id) { l -> l.trimmedTo(l.startTime, time, mediaMs) } }
+            scene.frameEnd((frame - 1).coerceAtLeast(scene.firstShownFrame(layer.startTime)))
+                .also { time -> if (time != layer.endTime) state.edit("trim-end") { it.update(id) { l -> l.trimmedTo(l.startTime, time, mediaMs) } } }
         }
+        val hit = layer.trimHitsSourceLimit(start, time, mediaMs)
+        if (hit && limitEdge == null) onLimit()
+        limitEdge = start.takeIf { hit }
     }
 
     private fun reorderTo(y: Float) {
@@ -799,7 +812,7 @@ private fun DrawScope.drawTimeline(view: TimelineView, measurer: TextMeasurer, e
         for (row in view.visibleRows()) {
             val layer = view.layerAt(row) ?: continue
             if (layer.id == view.liftId) continue
-            drawRow(layer, layer.id == state.selectedId, view.shownTop(row, layer.id), time, stripe, measurer, if (layer.hidden) eyeOff else eye, outline, state.scene, state.frame, pictures[layer.id], appear, view.keyFrame.takeIf { layer.id == view.keyId })
+            drawRow(layer, layer.id == state.selectedId, view.shownTop(row, layer.id), time, stripe, measurer, if (layer.hidden) eyeOff else eye, outline, state.scene, state.frame, pictures[layer.id], appear, view.keyFrame.takeIf { layer.id == view.keyId }, view.limitEdge.takeIf { layer.id == state.selectedId })
         }
     }
     val marks = state.scene.bookmarks
@@ -875,7 +888,7 @@ private fun DrawScope.drawRetimeMarks(scene: Scene, time: TimeScale) {
 
 private fun DrawScope.drawRow(
     layer: Layer, selected: Boolean, top: Float, time: TimeScale, stripe: Float,
-    measurer: TextMeasurer, eye: Painter, outline: Path, scene: Scene, frame: Int, picture: StripPicture?, appear: Float = 1f, held: Int? = null,
+    measurer: TextMeasurer, eye: Painter, outline: Path, scene: Scene, frame: Int, picture: StripPicture?, appear: Float = 1f, held: Int? = null, limit: Boolean? = null,
 ) {
     val barTop = top + BarInset.toPx()
     val barBottom = top + (RowHeight - BarInset).toPx()
@@ -889,8 +902,8 @@ private fun DrawScope.drawRow(
     drawLabel(layer.label, measurer, left, right, barTop, barBottom, if (layer.kind == "audio") LabelStyle.copy(color = Am.OnAudioBar) else LabelStyle)
     drawKeyframes(layer, scene, selected, frame, time, left, right, centre, outline, appear, held)
     if (selected) {
-        drawGrip(outline, left, barTop, barBottom, start = true, appear)
-        drawGrip(outline, right, barTop, barBottom, start = false, appear)
+        drawGrip(outline, left, barTop, barBottom, start = true, appear, limit == true)
+        drawGrip(outline, right, barTop, barBottom, start = false, appear, limit == false)
     } else {
         drawGrabLines(Offset(size.width - HandleInset.toPx(), centre))
     }
@@ -976,7 +989,7 @@ private fun DrawScope.drawLabel(label: String, measurer: TextMeasurer, left: Flo
     drawText(text, topLeft = Offset(left + inset, (top + bottom - text.size.height) / 2))
 }
 
-private fun DrawScope.drawGrip(outline: Path, edge: Float, top: Float, bottom: Float, start: Boolean, appear: Float = 1f) {
+private fun DrawScope.drawGrip(outline: Path, edge: Float, top: Float, bottom: Float, start: Boolean, appear: Float = 1f, limit: Boolean = false) {
     val width = (GripZone - GripGap * 2).toPx()
     val left = if (start) edge - GripGap.toPx() - width else edge + GripGap.toPx()
     if (left > size.width || left + width < 0) return
@@ -988,7 +1001,7 @@ private fun DrawScope.drawGrip(outline: Path, edge: Float, top: Float, bottom: F
         if (start) RoundRect(rect, topLeft = far, bottomLeft = far, topRight = near, bottomRight = near)
         else RoundRect(rect, topLeft = near, bottomLeft = near, topRight = far, bottomRight = far),
     )
-    drawPath(outline, GripColor, alpha = appear)
+    drawPath(outline, if (limit) LimitColor else GripColor, alpha = appear)
 
     val centre = rect.center
     val reach = 1.95.dp.toPx() * if (start) 1 else -1

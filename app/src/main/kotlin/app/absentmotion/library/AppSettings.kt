@@ -19,6 +19,7 @@ class AppSettings(private val context: Context) {
     private var demoModeState by mutableStateOf(prefs.getBoolean("demoMode", false))
     private var loopingPlayState by mutableStateOf(prefs.getBoolean("loopingPlay", false))
     private var xmlUploadState by mutableStateOf(prefs.getBoolean("xmlUpload", false))
+    private var trimLimitVibrationState by mutableStateOf(prefs.getBoolean("trimLimitVibration", true))
 
     private var themeState by mutableStateOf(prefs.getString("theme", Themes.DEFAULT)!!)
     private var customThemeState by mutableStateOf(Themes.custom(context)?.let { it.name ?: "" })
@@ -52,6 +53,10 @@ class AppSettings(private val context: Context) {
     var xmlUpload: Boolean
         get() = xmlUploadState
         set(value) { xmlUploadState = value; prefs.edit().putBoolean("xmlUpload", value).apply() }
+
+    var trimLimitVibration: Boolean
+        get() = trimLimitVibrationState
+        set(value) { trimLimitVibrationState = value; prefs.edit().putBoolean("trimLimitVibration", value).apply() }
 
     var theme: String
         get() = themeState

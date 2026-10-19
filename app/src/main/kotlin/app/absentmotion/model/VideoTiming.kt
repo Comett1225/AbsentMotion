@@ -162,6 +162,10 @@ fun Layer.trimmedTo(start: Int, end: Int, mediaMs: Int = Int.MAX_VALUE): Layer {
     return trimmed
 }
 
+fun Layer.trimHitsSourceLimit(start: Boolean, wanted: Int, mediaMs: Int = Int.MAX_VALUE): Boolean =
+    if (start) wanted < startTime && trimmedTo(wanted, endTime, mediaMs).startTime > wanted
+    else wanted > endTime && trimmedTo(startTime, wanted, mediaMs).endTime < wanted
+
 fun Scene.trimStartAt(layer: Layer, frame: Int): Layer? =
     frameStart(frame).takeIf { it > layer.startTime && showsAnyFrame(it, layer.endTime) }?.let { layer.trimmedTo(it, layer.endTime) }
 

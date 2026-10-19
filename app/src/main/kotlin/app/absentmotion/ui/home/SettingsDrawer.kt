@@ -81,6 +81,7 @@ fun SettingsDrawer(settings: AppSettings) {
                 SwitchRow("Draft Quality Preview", settings.lowQualityPreview, enabled = true) { settings.lowQualityPreview = it }
                 SwitchRow("Demo Mode", settings.demoMode, enabled = true) { settings.demoMode = it; demoNote = it }
                 SwitchRow("Open XML Projects", settings.xmlUpload, enabled = true) { settings.xmlUpload = it }
+                SwitchRow("Trim Limit Vibration", settings.trimLimitVibration, enabled = true) { settings.trimLimitVibration = it }
                 Divider(15.dp)
                 DurationRow(settings)
                 ThemeRow(settings)
