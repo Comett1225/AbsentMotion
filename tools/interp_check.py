@@ -335,6 +335,16 @@ def rates(folder, height, clips, configs, fit):
             if config != "nearest" and (same_even != len(even) or changed_odd == 0):
                 failures += 1
             print(json.dumps({f"{clip}/{config}": results[f"{clip}/{config}"]}), flush=True)
+        sixty = push_project(base, height, clip, "sixty")
+        steps = {}
+        for config in ("nearest", "flow"):
+            export(sixty, height, 60, CONFIGS[config])
+            local = os.path.join(base, clip, f"sixty-{config}")
+            steps[config] = distinct([load(os.path.join(local, n)) for n in pull(local)[:count]])
+        print(f"{clip} 60 fps clip in a 30 fps project at 60 fps: {steps['nearest'] * 1000 / SPAN_MS:.0f} distinct frames per second "
+              f"with interpolation off, {steps['flow'] * 1000 / SPAN_MS:.0f} with optical flow", flush=True)
+        if steps["nearest"] != count // 2 or steps["flow"] != count:
+            failures += 1
         mixed = push_project(base, height, clip, "mixed")
         halves = {}
         for config in ("nearest", "flow"):
@@ -342,13 +352,14 @@ def rates(folder, height, clips, configs, fit):
             local = os.path.join(base, clip, f"mixed-{config}")
             halves[config] = [load(os.path.join(local, n)) for n in pull(local)[:count]]
         width = halves["flow"][0].shape[1]
-        right_same = sum(np.array_equal(a[:, width // 2 + 2:], b[:, width // 2 + 2:]) for a, b in zip(halves["nearest"], halves["flow"]))
-        left_odd = sum(not np.array_equal(halves["nearest"][k][:, :width // 2 - 2], halves["flow"][k][:, :width // 2 - 2]) for k in range(1, count, 2))
-        left_even = sum(np.array_equal(halves["nearest"][k], halves["flow"][k]) for k in range(0, count, 2))
-        print(f"{clip} mixed 30 and 60 fps at 60 fps with optical flow: 60 fps half unchanged in {right_same}/{count} frames, "
-              f"30 fps half changed in {left_odd}/{count // 2} in-between frames, whole frame unchanged in {left_even}/{(count + 1) // 2} "
-              f"source frames", flush=True)
-        if right_same != count or left_odd == 0 or left_even != (count + 1) // 2:
+        left, right = (lambda f: f[:, :width // 2 - 2]), (lambda f: f[:, width // 2 + 2:])
+        changed = [sum(not np.array_equal(side(halves["nearest"][k]), side(halves["flow"][k])) for k in range(1, count, 2)) for side in (left, right)]
+        even = sum(np.array_equal(halves["nearest"][k], halves["flow"][k]) for k in range(0, count, 2))
+        right_steps = distinct([right(f) for f in halves["flow"]])
+        print(f"{clip} mixed 30 and 60 fps at 60 fps with optical flow: in-between frames changed in {changed[0]}/{count // 2} (30 fps half) "
+              f"and {changed[1]}/{count // 2} (60 fps half), 60 fps half {right_steps * 1000 / SPAN_MS:.0f} distinct frames per second, "
+              f"whole frame unchanged in {even}/{(count + 1) // 2} source frames", flush=True)
+        if changed != [count // 2, count // 2] or right_steps != count or even != (count + 1) // 2:
             failures += 1
     print(f"\n{height}p 30 fps clips exported at 60 fps, in-between frames against a true 60 fps render ({'fitted levels' if fit else 'no level fit'})")
     print("      clip/config            PSNR    SSIM   PSNR-moving  source frames same as off  in-between frames changed")
@@ -359,10 +370,14 @@ def rates(folder, height, clips, configs, fit):
     return failures
 
 
+def distinct(frames):
+    return 1 + sum(not np.array_equal(a, b) for a, b in zip(frames, frames[1:]))
+
+
 def offcheck(folder, height, clips, base_apk, new_apk):
     base = os.path.join(folder, str(height))
     variants = {"slow-off": ("slow", SOURCE_FPS, "off"), "normal-flow": ("normal", SOURCE_FPS, "flow"), "thirty-at-60-off": ("thirty", 60, "off"),
-                "sixty-at-60-flow": ("sixty", 60, "flow"), "mixed-at-60-off": ("mixed", 60, "off")}
+                "sixty-at-30-flow": ("sixty", 30, "flow"), "sixty-at-60-off": ("sixty", 60, "off"), "mixed-at-60-off": ("mixed", 60, "off")}
     for name, apk in (("base", base_apk), ("new", new_apk)):
         adb("install", "-r", apk, check=True)
         adb("shell", "mkdir", "-p", f"{DEVICE_DIR}/interp")
@@ -387,7 +402,8 @@ def main():
     parser = argparse.ArgumentParser(description="make: render the frame interpolation test clips and ground truth into a folder outside "
                                      "the repository. measure: export a slowed 10 fps clip with each interpolation mode and compare every "
                                      "frame with the ground truth. rates: export 30 fps clips at 60 fps and compare the in-between frames "
-                                     "with a true 60 fps render, and check a project that mixes 30 and 60 fps clips. offcheck: export the "
+                                     "with a true 60 fps render, count distinct frames of a 60 fps clip in a 30 fps project, and check a project that mixes 30 "
+                                     "and 60 fps clips. offcheck: export the "
                                      "test projects with interpolation off (and clips that need none set to optical flow) from two builds "
                                      "and compare every frame.")
     parser.add_argument("action", choices=("make", "measure", "rates", "offcheck"))
