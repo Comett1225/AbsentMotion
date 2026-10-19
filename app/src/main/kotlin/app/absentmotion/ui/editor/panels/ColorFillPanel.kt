@@ -101,15 +101,17 @@ private fun FillTabs(state: EditorState, layer: Layer, modifier: Modifier) {
 }
 
 private fun EditorState.fillWithMedia(id: Long, media: MediaDeclaration) {
+    edit { scene -> scene.withMedia(media).update(id) { it.withMediaFill(media) } }
+}
+
+internal fun Layer.withMediaFill(media: MediaDeclaration): Layer {
     val video = media.type.startsWith("video/")
-    edit { scene ->
-        scene.withMedia(media).update(id) { l ->
-            l.copy(
-                node = l.node.with("fillType", "media").with("fillImage", media.uri.takeUnless { video }).with("fillVideo", media.uri.takeIf { video })
-                    .with("mediaFillMode", "fill").with("outTime", if (video) "${media.duration / 1000}" else null),
-            )
-        }
-    }
+    val end = media.duration / 1000
+    val start = node["inTime"]?.toLongOrNull()?.takeIf { video && it in 1 until end }
+    return copy(
+        node = node.with("fillType", "media").with("fillImage", media.uri.takeUnless { video }).with("fillVideo", media.uri.takeIf { video })
+            .with("mediaFillMode", "fill").with("inTime", start?.toString()).with("outTime", if (video) "$end" else null),
+    )
 }
 
 @Composable
