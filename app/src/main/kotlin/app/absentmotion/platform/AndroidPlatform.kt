@@ -217,7 +217,7 @@ class Speech(context: Context) {
     }
 
     fun preview(text: String, voice: app.absentmotion.ui.editor.SpeechVoice, rate: Float, pitch: Float) {
-        if (!ready.isCompleted) return
+        if (!ready.isCompleted || pending.isNotEmpty()) return
         use(voice, rate, pitch)
         tts.speak(text, android.speech.tts.TextToSpeech.QUEUE_FLUSH, null, "preview")
     }
