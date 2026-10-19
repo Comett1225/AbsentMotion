@@ -57,7 +57,7 @@ struct ShaderMode {
 };
 
 const ShaderMode kShaderModes[] = {
-    {"multiply", true, "return s * b / a;"},
+    {"multiply", true, "return s * b;"},
     {"diff", true, "return abs(b - s);"},
     {"exclusion", true, "return s + b - 2.0 * s * b;"},
     {"lighten", true, "return max(s, b);"},
@@ -93,22 +93,22 @@ sk_sp<SkBlender> ShaderBlender(const std::string& id) {
         if (id != mode.id) continue;
         std::string sksl = kBlendHelpers;
         if (mode.separable) {
-            sksl += std::string("float mixChannel(float s, float b, float a) { ") + mode.code + " }\n";
-            sksl += "float3 mixColor(float3 s, float3 b, float a) {\n"
-                    "    return float3(mixChannel(s.r, b.r, a), mixChannel(s.g, b.g, a), mixChannel(s.b, b.b, a));\n}\n";
+            sksl += std::string("float mixChannel(float s, float b) { ") + mode.code + " }\n";
+            sksl += "float3 mixColor(float3 s, float3 b) {\n"
+                    "    return float3(mixChannel(s.r, b.r), mixChannel(s.g, b.g), mixChannel(s.b, b.b));\n}\n";
         } else {
-            sksl += std::string("float3 mixColor(float3 s, float3 b, float a) { ") + mode.code + " }\n";
+            sksl += std::string("float3 mixColor(float3 s, float3 b) { ") + mode.code + " }\n";
         }
         sksl += R"(
 half4 main(half4 src, half4 dst) {
-    float a = float(src.a), da = float(dst.a);
-    if (a <= 0.0) return dst;
-    float3 s = float3(src.rgb);
-    float3 b = da > 0.0 ? a * float3(dst.rgb) / da : float3(0.0);
-    float3 mixed = clamp(mixColor(s, b, a), 0.0, 1.0);
-    float alpha = a + da * (1.0 - a);
-    half3 rgb = half3((1.0 - da) * s + da * mixed) + dst.rgb * half(1.0 - a);
-    return half4(min(rgb, half3(alpha)), half(alpha));
+    float sa = float(src.a), da = float(dst.a);
+    if (sa <= 0.0) return dst;
+    float3 s = clamp(float3(src.rgb) / sa, 0.0, 1.0);
+    float3 b = da > 0.0 ? clamp(float3(dst.rgb) / da, 0.0, 1.0) : float3(0.0);
+    float3 mixed = clamp(mixColor(s, b), 0.0, 1.0);
+    float alpha = sa + da * (1.0 - sa);
+    float3 rgb = (1.0 - da) * float3(src.rgb) + (1.0 - sa) * float3(dst.rgb) + sa * da * mixed;
+    return half4(half3(min(rgb, float3(alpha))), half(alpha));
 })";
         auto result = SkRuntimeEffect::MakeForBlender(SkString(sksl.c_str()));
         if (result.effect) blender = result.effect->makeBlender(nullptr);
