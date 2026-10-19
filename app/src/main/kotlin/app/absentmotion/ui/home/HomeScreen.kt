@@ -224,7 +224,11 @@ private fun ProjectsPane(
     onDelete: (String) -> Unit,
     wide: Boolean = false,
 ) {
-    val thumbs = remember { HashMap<String, ImageBitmap>() }
+    val thumbs = remember {
+        object : LinkedHashMap<String, ImageBitmap>(16, 0.75f, true) {
+            override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, ImageBitmap>?) = size > 64
+        }
+    }
     val seen = remember { HashSet<Any>() }
     var menu by remember { mutableStateOf<OpenMenu?>(null) }
     var deleting by remember { mutableStateOf<ProjectInfo?>(null) }
