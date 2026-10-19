@@ -45,6 +45,8 @@ val ImageQualities = listOf(50, 70, 85, 95, 100)
 const val BackgroundWhite = 0xFFFFFFFF.toInt()
 const val BackgroundBlack = 0xFF000000.toInt()
 
+enum class FrameInterpolation(val label: String) { Off("Off"), Blend("Frame blending"), Flow("Optical flow") }
+
 data class ExportSettings(
     val shortSide: Int,
     val fps: Int,
@@ -53,6 +55,7 @@ data class ExportSettings(
     val image: ImageKind = ImageKind.Png,
     val imageQuality: Int = 95,
     val background: Int = BackgroundWhite,
+    val interpolation: FrameInterpolation = FrameInterpolation.Off,
 )
 
 fun defaultSettings(kind: ExportKind, scene: Scene): ExportSettings = when (kind) {

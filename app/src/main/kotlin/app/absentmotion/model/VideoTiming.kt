@@ -78,10 +78,55 @@ fun Layer.videoTimeUs(timeMs: Int, scene: Scene, atFrameStart: Boolean = false):
     val fill = mediaFill ?: return 0
     val frame = scene.frameAt(timeMs)
     val mapped = mediaTimeMs((if (atFrameStart) scene.frameStart(frame) else scene.frameTime(frame)).toDouble())
-    val span = (fill.outTime.toDouble() - fill.inTime).coerceAtLeast(1.0)
-    val bounded = if (node["loop"] == "true") fill.inTime + ((mapped - fill.inTime) % span + span) % span
-        else mapped.coerceIn(fill.inTime.toDouble(), fill.outTime.toDouble().coerceAtLeast(fill.inTime.toDouble()))
-    return (bounded * 1000).toLong() - 500
+    return (fill.bounded(mapped, node["loop"] == "true") * 1000).toLong() - 500
+}
+
+private fun MediaFill.bounded(mapped: Double, loop: Boolean): Double {
+    val span = (outTime.toDouble() - inTime).coerceAtLeast(1.0)
+    return if (loop) inTime + ((mapped - inTime) % span + span) % span
+        else mapped.coerceIn(inTime.toDouble(), outTime.toDouble().coerceAtLeast(inTime.toDouble()))
+}
+
+fun sourceFps(stamps: LongArray): Double =
+    if (stamps.size < 2 || stamps.last() <= stamps.first()) 0.0 else (stamps.size - 1) * 1e6 / (stamps.last() - stamps.first())
+
+fun exportFrameMs(timeMs: Int, fps: Int): Double = ((((timeMs + 1L) * fps + 999) / 1000) - 1) * 1000.0 / fps
+
+private fun Layer.localMs(timeMs: Double, scene: Scene): Double {
+    val first = scene.frameAt(startTime)
+    return timeMs - if (scene.frameStart(first) == startTime) first * 1000.0 / scene.fps else startTime.toDouble()
+}
+
+fun Layer.needsFrameInterpolation(timeMs: Double, scene: Scene, stamps: LongArray, fps: Int): Boolean =
+    stamps.size >= 2 && VideoTiming(this).speed(localMs(timeMs, scene)) * sourceFps(stamps) < fps * 0.99
+
+data class FramePair(val a: Long, val b: Long, val t: Float)
+
+private const val PAIR_SNAP = 0.005
+
+fun Layer.framePair(timeMs: Double, scene: Scene, stamps: LongArray): FramePair {
+    val fill = mediaFill ?: return FramePair(stamps.first(), stamps.first(), 0f)
+    val loop = node["loop"] == "true"
+    val mapped = VideoTiming(this).mediaMs(localMs(timeMs, scene))
+    if (!loop && mapped >= fill.outTime) {
+        val last = stamps.atOrBefore(fill.outTime * 1000.0 - 500)
+        return FramePair(stamps[last], stamps[last], 0f)
+    }
+    val us = fill.bounded(mapped, loop) * 1000
+    val i = stamps.atOrBefore(us)
+    val a = stamps[i]
+    val b = stamps.getOrNull(i + 1) ?: return FramePair(a, a, 0f)
+    val t = ((us - a) / (b - a)).coerceIn(0.0, 1.0)
+    return when {
+        t < PAIR_SNAP -> FramePair(a, a, 0f)
+        t > 1 - PAIR_SNAP -> FramePair(b, b, 0f)
+        else -> FramePair(a, b, t.toFloat())
+    }
+}
+
+private fun LongArray.atOrBefore(us: Double): Int {
+    val found = binarySearch(kotlin.math.floor(us).toLong())
+    return if (found >= 0) found else (-found - 2).coerceAtLeast(0)
 }
 
 fun Layer.trimmedTo(start: Int, end: Int, mediaMs: Int = Int.MAX_VALUE): Layer {
