@@ -101,6 +101,27 @@ class ProjectStoreTest {
         assertEquals(2.0, VideoTiming(layer).speed(0.0).toDouble(), 1e-6)
     }
 
+    @Test fun listReusesParsedFieldsUntilTheFileChangesButAlwaysLooksForTheThumbnail() {
+        val root = tmp.newFolder()
+        val store = ProjectStore(root)
+        val id = store.create(scene().withTitle("one"))
+        assertEquals("one", store.list().single().title)
+        assertEquals(null, store.list().single().thumbnail)
+        store.thumbnailFile(id).writeText("png")
+        assertEquals(store.thumbnailFile(id), store.list().single().thumbnail)
+        val file = root.resolve("projects/$id.xml")
+        val stamp = file.lastModified()
+        file.writeText(file.readText().replace("title=\"one\"", "title=\"two\""))
+        file.setLastModified(stamp)
+        assertEquals("one", store.list().single().title)
+        file.setLastModified(stamp + 2000)
+        assertEquals("two", store.list().single().title)
+        store.save(id, scene().withTitle("three"))
+        assertEquals("three", store.list().single().title)
+        store.thumbnailFile(id).delete()
+        assertEquals(null, store.list().single().thumbnail)
+    }
+
     @Test fun xmlWithoutAnElementIsRejected() {
         for (text in listOf("", "<?xml version='1.0'?>", "<!-- nothing -->")) {
             try { XmlNode.parse(text); fail("parsed '$text'") } catch (_: Exception) {}

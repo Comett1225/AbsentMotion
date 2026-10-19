@@ -9,6 +9,7 @@ import app.absentmotion.model.mediaUris
 import app.absentmotion.model.withCopiedLayerIds
 import java.io.File
 import java.util.UUID
+import java.util.concurrent.ConcurrentHashMap
 
 data class ProjectInfo(
     val id: String,
@@ -28,14 +29,21 @@ class ProjectStore(private val root: File) {
 
     private val dir = File(root, "projects").apply { mkdirs() }
 
+    private val listed = ConcurrentHashMap<String, ProjectInfo>()
+
     fun list(): List<ProjectInfo> = dir.listFiles { f -> f.extension == "xml" }.orEmpty().mapNotNull { file ->
-        val scene = runCatching { Scene.parse(file.readText()) }.getOrNull() ?: return@mapNotNull null
-        ProjectInfo(
-            id = file.nameWithoutExtension, title = scene.title, width = scene.width, height = scene.height,
-            fps = scene.fps, durationMs = scene.totalTime, sizeBytes = file.length(), modified = file.lastModified(),
-            thumbnail = thumbnailFile(file.nameWithoutExtension).takeIf { it.exists() },
-            isElement = scene.node["type"] == "element",
-        )
+        val id = file.nameWithoutExtension
+        val modified = file.lastModified()
+        val size = file.length()
+        val info = listed[id]?.takeIf { it.modified == modified && it.sizeBytes == size } ?: run {
+            val scene = runCatching { Scene.parse(file.readText()) }.getOrNull() ?: return@mapNotNull null
+            ProjectInfo(
+                id = id, title = scene.title, width = scene.width, height = scene.height,
+                fps = scene.fps, durationMs = scene.totalTime, sizeBytes = size, modified = modified,
+                thumbnail = null, isElement = scene.node["type"] == "element",
+            ).also { listed[id] = it }
+        }
+        info.copy(thumbnail = thumbnailFile(id).takeIf { it.exists() })
     }
 
     fun load(id: String): Scene? = read(id)?.let { withLinkedElements(it, id) }
