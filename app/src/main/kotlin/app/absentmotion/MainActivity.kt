@@ -43,6 +43,7 @@ import app.absentmotion.model.formatFloats
 import app.absentmotion.ui.home.EmbedRequest
 import app.absentmotion.ui.home.TemplateEditor
 import app.absentmotion.model.Scene
+import app.absentmotion.model.withCopiedLayerIds
 import app.absentmotion.model.ShapeCatalog
 import app.absentmotion.export.ExportKind
 import app.absentmotion.export.ExportSettings
@@ -166,7 +167,8 @@ class MainActivity : ComponentActivity() {
             val local = withContext(Dispatchers.IO) { templates.localize(template, store.mediaDir(state.projectId)) }
             val start = state.scene.frameStart(state.frame)
             val id = Layer.newId()
-            val inner = local.node.copy(children = local.node.children.filterNot { it.name == "media" })
+            val copied = local.withCopiedLayerIds().node
+            val inner = copied.copy(children = copied.children.filterNot { it.name == "media" })
             val layer = Layer(XmlNode("embedScene", linkedMapOf("id" to "$id", "label" to local.title.ifBlank { "Template" }, "startTime" to "$start", "endTime" to "${start + local.totalTime}"),
                 listOf(XmlNode("transform", children = listOf(XmlNode("location", mapOf("value" to formatFloats(floatArrayOf(state.scene.width / 2f, state.scene.height / 2f, 0f)))))), inner)))
             state.edit { it.add(layer, local.media) }
@@ -218,6 +220,21 @@ class MainActivity : ComponentActivity() {
             engine.effectCheck(getExternalFilesDir(null)!!)
             Log.i("AMEffects", "effectcheck.json written")
         }
+        if (intent.hasExtra("aaccheck")) {
+            val duration = intent.getLongExtra("aaccheck", 32000L).coerceIn(1L, 10_000_000L)
+            lifecycleScope.launch {
+                try {
+                    withContext(Dispatchers.IO) { app.absentmotion.export.exportAacForTest(File(getExternalFilesDir(null), "aaccheck.m4a"), duration) }
+                    Log.i("AMAac", "done")
+                } catch (e: kotlinx.coroutines.CancellationException) { throw e }
+                catch (e: Exception) { Log.e("AMAac", "failed", e) }
+            }
+        }
+        if (intent.getBooleanExtra("devicecheck", false)) lifecycleScope.launch {
+            try { checkDevice(this@MainActivity) }
+            catch (e: kotlinx.coroutines.CancellationException) { throw e }
+            catch (e: Exception) { Log.e("AMDevice", "failed", e) }
+        }
         val path = intent.getStringExtra("xml") ?: return
         val parsed = runCatching { Scene.parse(File(path).readText()) }.getOrElse { Log.e("AMTest", "cannot read $path", it); return }
         val id = "test-" + File(path).nameWithoutExtension
@@ -229,16 +246,23 @@ class MainActivity : ComponentActivity() {
         val stillName = intent.getStringExtra("still")
         intent.getStringExtra("export")?.let { exportForTest(it, scene, state.frame) }
         lifecycleScope.launch {
-            engine.awaitMedia()
-            engine.awaitVideoFrames(scene, state.timeMs)
-            Log.i("AMTest", "media ready $path")
-            stillName?.let { name ->
-                val ok = engine.stillPng(scene.toXml(), state.timeMs, scene.width, scene.height, File(getExternalFilesDir(null), "$name.png"))
-                Log.i("AMTest", "still $name ok=$ok")
-            }
-            intent.getStringExtra("hit")?.split(';')?.forEach { point ->
-                val xy = point.split(',').mapNotNull { it.trim().toFloatOrNull() }
-                if (xy.size == 2) Log.i("AMTest", "hit $point ${engine.hitTest(xy[0], xy[1], state.timeMs)}")
+            try {
+                engine.awaitMedia()
+                engine.awaitVideoFrames(scene, state.timeMs)
+                Log.i("AMTest", "media ready $path")
+                stillName?.let { name ->
+                    val ok = engine.stillPng(scene.toXml(), state.timeMs, scene.width, scene.height, File(getExternalFilesDir(null), "$name.png"))
+                    Log.i("AMTest", "still $name ok=$ok")
+                }
+                intent.getStringExtra("hit")?.split(';')?.forEach { point ->
+                    val xy = point.split(',').mapNotNull { it.trim().toFloatOrNull() }
+                    if (xy.size == 2) Log.i("AMTest", "hit $point ${engine.hitTest(xy[0], xy[1], state.timeMs)}")
+                }
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
+            } catch (e: IllegalStateException) {
+                if (e.message != "engine closed") throw e
+                Log.i("AMTest", "test capture stopped with the engine")
             }
         }
     }
@@ -270,7 +294,7 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         importShared()
-        if (intent.hasExtra("xml") && applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0) {
+        if ((intent.hasExtra("xml") || intent.hasExtra("aaccheck") || intent.hasExtra("devicecheck")) && applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0) {
             setIntent(intent)
             handleTestIntent()
             return
