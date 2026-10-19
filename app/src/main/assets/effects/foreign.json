@@ -24,12 +24,13 @@
   "params": {
    "strength": {
     "to": "amount",
-    "scale": 0.1,
-    "min": 0
+    "scale": 2.35,
+    "min": 0,
+    "max": 6
    },
    "radius": {
     "to": "radius",
-    "scale": 1
+    "scale": 1.5
    }
   }
  },
@@ -67,7 +68,7 @@
     "values": {
      "0": 0,
      "1": 1,
-     "2": 3
+     "2": 2
     }
    }
   }
@@ -80,7 +81,6 @@
    },
    "gamma": {
     "to": "gamma",
-    "power": -0.5,
     "min": 0.1,
     "max": 10
    },
@@ -168,12 +168,13 @@
     "values": {
      "0": 0,
      "1": 1,
-     "2": 3
+     "2": 2
     }
    }
   },
   "set": {
-   "point4": "0.000000,0.000000"
+   "point4": "0.000000,0.000000",
+   "corner": true
   }
  },
  "com.alightcreative.effects.colortune2": {
@@ -182,13 +183,10 @@
    "lift": [
     {
      "to": "liftHue",
-     "scale": -1,
-     "offset": 270,
      "wrap": 360
     },
     {
      "to": "liftAmount",
-     "scale": 4,
      "min": 0,
      "max": 1
     },
@@ -200,13 +198,10 @@
    "gamma": [
     {
      "to": "gammaHue",
-     "scale": -1,
-     "offset": 270,
      "wrap": 360
     },
     {
      "to": "gammaAmount",
-     "scale": 4,
      "min": 0,
      "max": 1
     },
@@ -218,13 +213,10 @@
    "gain": [
     {
      "to": "gainHue",
-     "scale": -1,
-     "offset": 270,
      "wrap": 360
     },
     {
      "to": "gainAmount",
-     "scale": 4,
      "min": 0,
      "max": 1
     },
@@ -454,7 +446,7 @@
     "values": {
      "0": 0,
      "1": 1,
-     "2": 3
+     "2": 2
     }
    }
   }
