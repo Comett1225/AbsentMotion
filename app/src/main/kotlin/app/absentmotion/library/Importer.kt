@@ -58,7 +58,7 @@ class Importer(
 
     private fun fromPackage(open: () -> InputStream): List<ImportReport> {
         val scenes = ArrayList<String>()
-        val files = HashSet<String>()
+        val files = LinkedHashSet<String>()
         var sigs: Map<String, String>? = null
         var links: Map<String, String>? = null
         var sceneText = 0
@@ -68,10 +68,10 @@ class Importer(
             eachEntry(open, limits) { name, input ->
                 files += name
                 when {
-                    name == "manifest.txt" -> sigs = readText(input, MaxXml).lineSequence().map { it.trim().split(':', limit = 3) }.filter { it.size >= 2 }
-                        .mapNotNull { p -> leaf(p.last())?.let { p[0] to it } }.toMap()
-                    name == "manifest.json" -> links = JSONObject(readText(input, MaxXml)).optJSONArray("media")?.let { list ->
-                        (0 until list.length()).map { list.getJSONObject(it) }.filter { it.has("entry") }.mapNotNull { m -> leaf(m.getString("entry"))?.let { m.getString("uri") to it } }.toMap()
+                    leaf(name) == "manifest.txt" -> sigs = readText(input, MaxXml).lineSequence().map { it.trim().split(':', limit = 3) }.filter { it.size >= 2 }
+                        .associate { p -> p[0] to p.last() }
+                    leaf(name) == "manifest.json" -> links = JSONObject(readText(input, MaxXml)).optJSONArray("media")?.let { list ->
+                        (0 until list.length()).map { list.getJSONObject(it) }.filter { it.has("entry") }.associate { m -> m.getString("uri") to m.getString("entry") }
                     }.orEmpty()
                     name.endsWith(".xml", ignoreCase = true) -> {
                         if (scenes.size >= limits.scenes) throw ImportFailed("The package holds too many projects (more than ${limits.scenes})")
@@ -89,10 +89,14 @@ class Importer(
                     val declared = Scene(root).media.associateBy { it.uri }
                     val entries = root.mediaUris().mapNotNull { uri ->
                         val entry = links?.get(uri) ?: declared[uri]?.node?.get("sig")?.let { sigs?.get(it) }
-                            ?: uri.substringAfter(':').takeIf { uri.startsWith("amproj:") || uri.startsWith("am-docs:") }?.let(::leaf)
-                        entry?.takeIf { it in files }?.let { uri to it }
+                            ?: uri.substringAfter(':').takeIf { uri.startsWith("amproj:") || uri.startsWith("am-docs:") }
+                        entry?.let { find(it, files) }?.let { uri to it }
                     }.toMap()
-                    val target = entries.values.toSet().associateWith { File(store.mediaDir(id), it) }
+                    val names = HashSet<String>()
+                    val target = entries.values.distinct().associateWith { path ->
+                        val name = leaf(path)!!
+                        File(store.mediaDir(id), (sequenceOf(name) + generateSequence(2) { it + 1 }.map { "${it}_$name" }).first { names.add(it) })
+                    }
                     if (target.isNotEmpty()) {
                         store.mediaDir(id).mkdirs()
                         eachEntry(open, limits) { name, input -> target[name]?.let { written -= copy(input, it, written) } }
@@ -163,6 +167,14 @@ class Importer(
 
         private fun leaf(name: String): String? = name.substringAfterLast('/').substringAfterLast('\\').takeIf { it.isNotEmpty() && it != "." && it != ".." }
 
+        private fun entryPath(name: String) = name.replace('\\', '/').trimStart('/')
+
+        private fun find(reference: String, paths: Collection<String>): String? {
+            val path = entryPath(reference)
+            val name = leaf(path) ?: return null
+            return path.takeIf { it in paths } ?: paths.firstOrNull { it.endsWith("/$path") } ?: paths.firstOrNull { leaf(it) == name }
+        }
+
         private fun eachEntry(open: () -> InputStream, limits: ImportLimits, visit: (String, InputStream) -> Unit) {
             var left = limits.unpacked
             var entries = 0
@@ -178,7 +190,7 @@ class Importer(
                 while (true) {
                     val entry = zip.nextEntry ?: break
                     if (++entries > limits.entries) throw ImportFailed("The package has too many files (more than ${limits.entries})")
-                    if (!entry.isDirectory) leaf(entry.name)?.let { visit(it, counted) }
+                    if (!entry.isDirectory) entryPath(entry.name).takeIf { leaf(it) != null }?.let { visit(it, counted) }
                     counted.transferTo(OutputStream.nullOutputStream())
                 }
             }

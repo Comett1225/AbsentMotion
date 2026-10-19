@@ -154,4 +154,19 @@ class ImporterTest {
         assertEquals(setOf("y://b"), swapped.node.mediaUris())
         assertEquals(listOf("y://b"), swapped.media.map { it.uri })
     }
+
+    @Test fun mediaWithTheSameNameInDifferentFoldersStaySeparate() {
+        val scene = """<scene width="10" height="10"><shape id="1" fillType="media" fillImage="x://a" /><shape id="2" fillType="media" fillImage="x://b" /></scene>"""
+        val manifest = JSONObject().put("media", JSONArray().put(JSONObject().put("uri", "x://a").put("entry", "a/clip.jpg"))
+            .put(JSONObject().put("uri", "x://b").put("entry", "b/clip.jpg")))
+        for (top in listOf("", "Top/")) {
+            val bytes = zip(listOf("${top}p.xml" to scene.toByteArray(), "${top}a/clip.jpg" to "one".toByteArray(), "${top}b/clip.jpg" to "two".toByteArray(),
+                "${top}manifest.json" to manifest.toString().toByteArray()))
+            val store = store()
+            val node = saved(store, Importer(store).import { ByteArrayInputStream(bytes) }.single())
+            val files = listOf("1", "2").map { id -> File(java.net.URI(node.children.first { it["id"] == id }["fillImage"]!!)) }
+            assertEquals(listOf("one", "two"), files.map { it.readText() })
+            assertEquals(2, files.toSet().size)
+        }
+    }
 }
