@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <map>
+#include <string_view>
 
 #include "include/core/SkBlender.h"
 #include "include/core/SkCanvas.h"
@@ -304,7 +305,7 @@ bool ShaderBorder(const Layer& l, const Edge& e, float t) {
            !(ShapeKind(l) && e.direction == "centered");
 }
 
-bool ShadowOn(const Layer& l) { return !l.shadow.direction.empty() && l.shadow.enabled && l.kind != "embedScene"; }
+bool ShadowOn(const Layer& l) { return !l.shadow.direction.empty() && l.shadow.enabled; }
 
 SkPath Union(const SkPath& a, const SkPath& b) {
     if (a.isEmpty()) return b;
@@ -339,13 +340,104 @@ void DrawBorder(SkCanvas* canvas, const SkPath& region, const Edge& e, float t) 
     }
 }
 
+sk_sp<SkImageFilter> Morph(float radius, bool grow) {
+    static const sk_sp<SkRuntimeEffect> effect = [] {
+        auto result = SkRuntimeEffect::MakeForShader(SkString(R"(
+uniform shader image;
+uniform float2 stride;
+uniform float count;
+uniform float grow;
+half4 main(float2 xy) {
+    half a = image.eval(xy).a;
+    for (int i = 1; i <= 64; i++) {
+        if (float(i) > count) break;
+        half p = image.eval(xy + stride * float(i)).a, q = image.eval(xy - stride * float(i)).a;
+        a = grow > 0.5 ? max(a, max(p, q)) : min(a, min(p, q));
+    }
+    return half4(a);
+})"));
+        if (!result.effect) __android_log_print(ANDROID_LOG_ERROR, "AMStyles", "morph: %s", result.errorText.c_str());
+        return result.effect;
+    }();
+    if (!effect) return nullptr;
+    const float reach = radius * 3.14159265f / 16;
+    const int count = std::clamp((int)std::ceil(reach * 2), 1, 64);
+    sk_sp<SkImageFilter> f;
+    for (int k = 0; k < 8; k++) {
+        const float angle = k * 3.14159265f / 8;
+        SkRuntimeShaderBuilder b(effect);
+        b.uniform("stride") = SkV2{cosf(angle) * reach / count, sinf(angle) * reach / count};
+        b.uniform("count") = (float)count;
+        b.uniform("grow") = grow ? 1.0f : 0.0f;
+        f = SkImageFilters::RuntimeShader(b, reach, "image", f);
+    }
+    return f;
+}
+
+void DrawGroupBorders(SkCanvas* canvas, const Layer& l, float t) {
+    static const sk_sp<SkRuntimeEffect> effect = [] {
+        auto result = SkRuntimeEffect::MakeForShader(SkString(R"(
+uniform shader image;
+uniform shader grown;
+uniform shader shrunk;
+layout(color) uniform half4 colour;
+uniform float mode;
+uniform float unit;
+half4 main(float2 xy) {
+    half4 c = image.eval(xy);
+    float d = grown.eval(xy).a, e = shrunk.eval(xy).a, dm = d, em = e;
+    for (int i = -1; i <= 1; i++) {
+        for (int j = -1; j <= 1; j++) {
+            float2 o = float2(float(i), float(j)) * 2.0 * unit;
+            dm = max(dm, grown.eval(xy + o).a);
+            em = max(em, shrunk.eval(xy + o).a);
+        }
+    }
+    float outer = clamp((d - 0.5 * dm) * 3.0 + 0.5 * dm, 0.0, dm);
+    float inner = em > 0.0 ? clamp((e / em - 0.5) * 3.0 + 0.5, 0.0, 1.0) : 0.0;
+    half4 paint = half4(colour.rgb * colour.a, colour.a);
+    if (mode < 0.5) {
+        half4 b = paint * half(1.0 - inner);
+        return b * c.a + c * (1.0 - b.a);
+    }
+    if (mode < 1.5) return c + paint * half(outer) * (1.0 - c.a);
+    half4 b = paint * half(outer * (1.0 - inner));
+    return b + c * (1.0 - b.a);
+})"));
+        if (!result.effect) __android_log_print(ANDROID_LOG_ERROR, "AMStyles", "border: %s", result.errorText.c_str());
+        return result.effect;
+    }();
+    if (!effect) return;
+    const SkMatrix& ctm = canvas->getTotalMatrix();
+    const float unit = 1 / std::max(std::sqrt(std::fabs(ctm.getScaleX() * ctm.getScaleY() - ctm.getSkewX() * ctm.getSkewY())), 1e-3f);
+    sk_sp<SkImageFilter> result;
+    for (const Edge& e : l.borders) {
+        if (!ShaderBorder(l, e, t)) continue;
+        const bool outside = e.direction == "outside", centered = e.direction == "centered";
+        const float radius = std::max(e.size.get(0, t, centered ? 4 : 6) / 2, 0.0f);
+        const SkColor4f colour = ColorAt(e.color, t, kWhite);
+        SkRuntimeShaderBuilder b(effect);
+        b.uniform("colour") = SkV4{colour.fR, colour.fG, colour.fB, colour.fA};
+        b.uniform("mode") = outside ? 1.0f : centered ? 2.0f : 0.0f;
+        b.uniform("unit") = unit;
+        std::string_view names[] = {"image", "grown", "shrunk"};
+        const sk_sp<SkImageFilter> inputs[] = {result, outside || centered ? Morph(radius, true) : nullptr, outside ? nullptr : Morph(radius, false)};
+        result = SkImageFilters::RuntimeShader(b, 3 * unit, names, inputs, 3);
+    }
+    if (!result) return;
+    SkPaint replace;
+    replace.setBlendMode(SkBlendMode::kSrc);
+    canvas->saveLayer(SkCanvas::SaveLayerRec(nullptr, &replace, result.get(), 0));
+    canvas->restore();
+}
+
 const LayerEffects* gEffects = nullptr;
 const Scene* gScene = nullptr;
 
 const std::vector<Layer>* gEffectList = nullptr;
 
 bool EffectsApply(const std::vector<Layer>& siblings, const Layer& l) {
-    return gEffects && gScene && &siblings == gEffectList && l.kind != "embedScene" && gEffects->active(l);
+    return gEffects && gScene && &siblings == gEffectList && gEffects->active(l);
 }
 
 struct Override {
@@ -359,8 +451,7 @@ void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& 
 void DrawList(SkCanvas* canvas, const std::vector<Layer>& layers, int width, int height, bool top, double timeMs,
               const MediaPictures& pictures);
 
-void DrawGroup(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& l, double timeMs, const MediaPictures& pictures) {
-    canvas->concat(SiblingMatrix(siblings, l, timeMs));
+void DrawGroup(SkCanvas* canvas, const Layer& l, double timeMs, const MediaPictures& pictures) {
     canvas->translate(-l.innerWidth / 2.0f, -l.innerHeight / 2.0f);
     canvas->clipRect(SkRect::MakeWH((float)l.innerWidth, (float)l.innerHeight), true);
     const double inner = NestedTime(l, timeMs);
@@ -407,6 +498,11 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
     auto picture = [&](SkCanvas* canvas) {
         canvas->save();
         canvas->concat(m);
+        if (l.kind == "embedScene") {
+            DrawGroup(canvas, l, timeMs, pictures);
+            canvas->restore();
+            return;
+        }
         if (l.kind == "drawing") {
             hasFill = !l.strokes.empty();
             DrawDrawing(canvas, l, alpha);
@@ -442,6 +538,7 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
         canvas->drawPath(outside, clear);
     }
     if (!decorate) return;
+    if (l.kind == "embedScene") return DrawGroupBorders(canvas, l, t);
     SkPath region = hasFill ? (l.text ? TextGlyphPath(l).makeTransform(m) : l.kind == "drawing" ? DrawingOutline(l).makeTransform(m) : scenePath) : SkPath();
     region = Union(region, stroked);
     if (region.isEmpty()) return;
@@ -460,7 +557,7 @@ void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& 
     bool decorated = false;
     for (const Edge& e : l.borders) decorated |= ShaderBorder(l, e, t);
     const bool shadow = ShadowOn(l);
-    decorated = (decorated || shadow || EffectsApply(siblings, l)) && !group;
+    decorated = decorated || shadow || EffectsApply(siblings, l);
     const bool blended = ov.blend || !IsNormal(l.blending);
     const bool centred = ShapeKind(l) && std::any_of(l.borders.begin(), l.borders.end(), [](const Edge& e) { return e.enabled && e.direction == "centered"; });
     const bool overlaps = l.kind == "drawing" || (l.stroke.present && l.stroke.enabled) || centred;
@@ -494,16 +591,10 @@ void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& 
             layerPaint.setImageFilter(SkImageFilters::DropShadow(s.offset.get(0, t, 3), s.offset.get(1, t, 3), sigma, sigma,
                                                                  color, nullptr, nullptr));
         }
-        const bool lifted = !group && EffectsApply(siblings, l) && gEffects->lifted(l);
+        const bool lifted = EffectsApply(siblings, l) && gEffects->lifted(l);
         canvas->saveLayer(SkCanvas::SaveLayerRec(nullptr, &layerPaint, lifted ? SkCanvas::kInitWithPrevious_SaveLayerFlag : 0));
-        if (group) {
-            canvas->save();
-            DrawGroup(canvas, siblings, l, timeMs, pictures);
-            canvas->restore();
-        } else {
-            DrawContent(canvas, siblings, l, timeMs, 1, decorated, pictures);
-            centredBorders(1);
-        }
+        DrawContent(canvas, siblings, l, timeMs, 1, decorated, pictures);
+        centredBorders(1);
         canvas->restore();
     }
 }

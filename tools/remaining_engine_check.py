@@ -25,6 +25,14 @@ def cases():
     for alpha in (0x40, 0x80, 0xc0):
         want = tuple(round(c * alpha / 255) for c in (255, 0x99, 0x33))
         yield f'rgb split at distance 0 keeps alpha {alpha:#x}', engine.scene(engine.rect(1, 100, 100, 40, 40, alpha << 24 | 0xff9933, extra=split)), [((100, 100), want), ((5, 5), engine.BLACK)]
+    red = engine.rect(2, 100, 100, 40, 40, 0xffff0000)
+
+    def framed(decoration, opacity=1.0):
+        return engine.scene('<embedScene id="1" startTime="0" endTime="1000">' + engine.transform('100,100,0', opacity) + decoration + '<scene width="200" height="200" fps="30" totalTime="1000" retime="off">' + red + '</scene></embedScene>')
+    yield 'group effects', framed(invert), [((100, 100), (0, 255, 255)), ((5, 5), engine.BLACK)]
+    yield 'group effects keep the group opacity', framed(invert, 0.5), [((100, 100), (0, 128, 128)), ((5, 5), engine.BLACK)]
+    yield 'group border', framed('<border direction="outside"><color value="#ffffffff"/><size value="40"/></border>'), [((100, 100), engine.RED), ((50, 100), (255, 255, 255)), ((100, 45), (255, 255, 255)), ((30, 100), engine.BLACK)]
+    yield 'group shadow', framed('<shadow direction="outside"><color value="#ffffffff"/><size value="0"/><offset value="60,0"/></shadow>'), [((100, 100), engine.RED), ((170, 100), (255, 255, 255)), ((30, 100), engine.BLACK)]
     yield 'vivid neutral', engine.scene(engine.rect(1, 100, 100, 100, 100, 0xff808080) + engine.rect(2, 100, 100, 100, 100, 0xff808080, attrs=' blending="vivid-light"')), [((100, 100), (129, 129, 129))]
     title = "a missing picture draws nothing"
     yield 'placeholder opacity', *engine.CASES[title]
