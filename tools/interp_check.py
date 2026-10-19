@@ -10,10 +10,12 @@ CLIPS = ("shapes", "pan", "line", "occlusion")
 CONFIGS = {
     "nearest": ["--es", "interp", "off"],
     "blend": ["--es", "interp", "blend"],
+    "flow": ["--es", "interp", "flow"],
     "flow2": ["--es", "interp", "flow", "--ei", "interpDivisor", "2"],
-    "flow4": ["--es", "interp", "flow", "--ei", "interpDivisor", "4"],
 }
 SOURCE_FPS, SOURCE_FRAMES, STEPS, SPEED = 10, 12, 4, 0.25
+SOURCES = {fps: round((SOURCE_FRAMES - 1) * fps / SOURCE_FPS) + 1 for fps in (10, 30, 60)}
+SPAN_MS = (SOURCE_FRAMES - 1) * 1000 // SOURCE_FPS
 
 
 @functools.lru_cache(None)
@@ -95,50 +97,110 @@ def remote(height, name):
     return f"{DEVICE_DIR}/interp/{height}-{name}"
 
 
-def scene_xml(clip, height, size):
-    width = round(1920 * height / 1080)
-    uri = "file://" + remote(height, f"{clip}-10fps.mp4")
-    frames = SOURCE_FRAMES * STEPS - STEPS + 1
-    total = frames * 1000 // SOURCE_FPS - 1
-    duration = SOURCE_FRAMES * 1000 // SOURCE_FPS
-    return f"""<?xml version='1.0' encoding='UTF-8' ?>
-<scene title="interp-{clip}-{height}" width="{width}" height="{height}" fps="{SOURCE_FPS}" totalTime="{total}" bgcolor="#ff000000" am="app.absentmotion" amplatform="android">
-  <media uri="{uri}" filename="{height}-{clip}-10fps.mp4" title="{clip}" type="video/mp4" size="{size}" orientation="0" duration="{duration * 1000}" fps="{SOURCE_FPS}" width="{width}" height="{height}" />
-  <shape id="1" label="Clip" startTime="0" endTime="{total}" fillType="media" mediaFillMode="stretch" s=".rect" fillVideo="{uri}" inTime="0" outTime="{duration}" speed="{SPEED}">
-    <transform>
-      <location value="{width / 2:f},{height / 2:f},0.000000" />
-    </transform>
-    <property name="size" type="vec2" value="{width / 2:f},{height / 2:f}" />
-  </shape>
-</scene>
-"""
+def source(base, clip, height, fps):
+    path = os.path.join(base, f"{clip}-{fps}fps.mp4")
+    if not os.path.exists(path):
+        frames = os.path.join(base, clip, f"{fps}fps")
+        os.makedirs(frames, exist_ok=True)
+        for n in range(SOURCES[fps]):
+            render(clip, n / fps, height).save(os.path.join(frames, f"{n:03d}.png"))
+        encode(frames, fps, path)
+        for f in os.listdir(frames):
+            os.remove(os.path.join(frames, f))
+        os.rmdir(frames)
+    return path
+
+
+def truth(base, clip, height, name, fps, count):
+    folder = os.path.join(base, clip, name)
+    if not os.path.isdir(folder) or len(os.listdir(folder)) < count:
+        os.makedirs(folder, exist_ok=True)
+        for j in range(count):
+            render(clip, j / fps, height).save(os.path.join(folder, f"{j:02d}.png"))
+    return [os.path.join(folder, f"{j:02d}.png") for j in range(count)]
 
 
 def make(folder, height):
     base = os.path.join(folder, str(height))
     for clip in CLIPS:
         start = time.time()
-        for name, fps, count in (("10fps", SOURCE_FPS, SOURCE_FRAMES), ("60fps", 60, (SOURCE_FRAMES - 1) * 6 + 1)):
-            frames = os.path.join(base, clip, name)
-            os.makedirs(frames, exist_ok=True)
-            for n in range(count):
-                render(clip, n / fps, height).save(os.path.join(frames, f"{n:03d}.png"))
-            encode(frames, fps, os.path.join(base, f"{clip}-{name}.mp4"))
-            for f in os.listdir(frames):
-                os.remove(os.path.join(frames, f))
-            os.rmdir(frames)
-        truth = os.path.join(base, clip, "truth")
-        os.makedirs(truth, exist_ok=True)
-        for j in range((SOURCE_FRAMES - 1) * STEPS + 1):
-            render(clip, j / (SOURCE_FPS * STEPS), height).save(os.path.join(truth, f"{j:02d}.png"))
-        size = os.path.getsize(os.path.join(base, f"{clip}-10fps.mp4"))
-        with open(os.path.join(base, f"{clip}.xml"), "w") as out:
-            out.write(scene_xml(clip, height, size))
-        print(f"{clip} {height}p: {time.time() - start:.0f} s")
+        for fps in SOURCES:
+            source(base, clip, height, fps)
+        truth(base, clip, height, "truth", SOURCE_FPS * STEPS, (SOURCE_FRAMES - 1) * STEPS + 1)
+        print(f"{clip} {height}p: {time.time() - start:.0f} s", flush=True)
+
+
+def scene_xml(height, fps, total, layers):
+    width = round(1920 * height / 1080)
+    media, shapes = [], []
+    for i, (name, clip_fps, speed, part) in enumerate(layers):
+        uri = "file://" + remote(height, f"{name}.mp4")
+        duration = SOURCES[clip_fps] * 1000 // clip_fps
+        if uri not in "".join(media):
+            media.append(f'  <media uri="{uri}" filename="{height}-{name}.mp4" title="{name}" type="video/mp4" size="1" orientation="0" '
+                         f'duration="{duration * 1000}" fps="{clip_fps}" width="{width}" height="{height}" />\n')
+        left = {None: 0, "left": 0, "right": width / 2}[part]
+        w = width if part is None else width / 2
+        shapes.append(f"""  <shape id="{i + 1}" label="Clip {i + 1}" startTime="0" endTime="{total}" fillType="media" mediaFillMode="stretch" s=".rect" fillVideo="{uri}" inTime="0" outTime="{duration}" speed="{speed:g}">
+    <transform>
+      <location value="{left + w / 2:f},{height / 2:f},0.000000" />
+    </transform>
+    <property name="size" type="vec2" value="{w / 2:f},{height / 2:f}" />
+  </shape>
+""")
+    return (f"""<?xml version='1.0' encoding='UTF-8' ?>
+<scene title="interp-{height}" width="{width}" height="{height}" fps="{fps}" totalTime="{total}" bgcolor="#ff000000" am="app.absentmotion" amplatform="android">
+""" + "".join(media) + "".join(shapes) + "</scene>\n")
+
+
+SLOW = (SOURCE_FPS, round(SPAN_MS / SPEED) + 1000 // SOURCE_FPS - 1)
+PROJECTS = {
+    "slow": (SLOW, lambda clip: [(f"{clip}-10fps", 10, SPEED, None)]),
+    "normal": ((SOURCE_FPS, SPAN_MS + 1000 // SOURCE_FPS - 1), lambda clip: [(f"{clip}-10fps", 10, 1, None)]),
+    "thirty": ((30, SPAN_MS - 1), lambda clip: [(f"{clip}-30fps", 30, 1, None)]),
+    "sixty": ((30, SPAN_MS - 1), lambda clip: [(f"{clip}-60fps", 60, 1, None)]),
+    "mixed": ((30, SPAN_MS - 1), lambda clip: [(f"{clip}-30fps", 30, 1, "left"), (f"{clip}-60fps", 60, 1, "right")]),
+}
+
+
+def push_project(base, height, clip, name):
+    (fps, total), layers = PROJECTS[name][0], PROJECTS[name][1](clip)
+    for layer, clip_fps, _, _ in layers:
+        adb("push", source(base, clip, height, clip_fps), remote(height, f"{layer}.mp4"), check=True)
+    local = os.path.join(base, f"{clip}-{name}.xml")
+    with open(local, "w") as out:
+        out.write(scene_xml(height, fps, total, layers))
+    adb("push", local, remote(height, f"{clip}-{name}.xml"), check=True)
+    return remote(height, f"{clip}-{name}.xml")
 
 
 def adb(*args, check=False):
     return subprocess.run([*ADB, *args], capture_output=True, check=check).stdout.decode("utf-8", "replace")
+
+
+def export(scene, height, fps, extra):
+    adb("shell", "rm", "-rf", f"{DEVICE_DIR}/export.seq")
+    adb("shell", "am", "force-stop", PKG)
+    adb("logcat", "-c")
+    adb("shell", "am", "start", "-n", f"{PKG}/.MainActivity", "--es", "xml", scene, "--es", "export", "sequence",
+        "--ei", "short", str(height), "--ei", "fps", str(fps), "--es", "format", "png", *extra)
+    log = ""
+    for _ in range(3600):
+        time.sleep(1)
+        log = adb("logcat", "-d", "-s", "AMExport", "AMInterp", "AMVideo")
+        if "I AMExport: done" in log or "E AMExport" in log:
+            break
+    if "I AMExport: done" not in log:
+        sys.exit(f"export of {scene} failed:\n{log[-3000:]}")
+    return log
+
+
+def pull(local):
+    os.makedirs(local, exist_ok=True)
+    for f in os.listdir(local):
+        os.remove(os.path.join(local, f))
+    adb("pull", f"{DEVICE_DIR}/export.seq/.", local, check=True)
+    return sorted(os.listdir(local))
 
 
 def luma(a):
@@ -170,60 +232,62 @@ def load(path):
     return np.asarray(Image.open(path).convert("RGB"), np.float64)
 
 
-def export(scene, height, extra):
-    adb("shell", "rm", "-rf", f"{DEVICE_DIR}/export.seq")
-    adb("shell", "am", "force-stop", PKG)
-    adb("logcat", "-c")
-    adb("shell", "am", "start", "-n", f"{PKG}/.MainActivity", "--es", "xml", scene, "--es", "export", "sequence",
-        "--ei", "short", str(height), "--ei", "fps", str(SOURCE_FPS), "--es", "format", "png", *extra)
-    log = ""
-    for _ in range(3600):
-        time.sleep(1)
-        log = adb("logcat", "-d", "-s", "AMExport", "AMInterp", "AMVideo")
-        if "I AMExport: done" in log or "E AMExport" in log:
-            break
-    if "I AMExport: done" not in log:
-        sys.exit(f"export of {scene} failed:\n{log[-3000:]}")
-    return log
-
-
 def timings(log):
-    estimate = [float(v) for v in re.findall(r"estimate=([\d.]+)", log)]
-    synthesis = [float(v) for v in re.findall(r"synthesis=([\d.]+)", log)]
+    flows = re.findall(r"flow a=\d+ b=\d+ size=\S+ field=\S+ levels=(\d+) fuse=\d+ passes=(\d+) recordings=(\d+) estimate=([\d.]+) "
+                       r"held=([\d.]+)MB cache=([\d.]+)MB", log)
+    synthesis = [float(v) for v in re.findall(r"mode=\w+ synthesis=([\d.]+)", log)]
     imports = [float(v) for v in re.findall(r"import pts=\d+ size=\S+ ms=([\d.]+)", log)]
-    passes = [int(v) for v, e in re.findall(r"passes=(\d+) estimate=([\d.]+)", log)]
+    estimate = [float(f[3]) for f in flows]
     median = lambda v: round(statistics.median(v), 1) if v else None
-    return {"estimate_ms": median(estimate[1:] or estimate), "synthesis_ms": median(synthesis[1:] or synthesis),
-            "import_ms": median(imports), "passes": max(passes) if passes else 0, "fallbacks": log.count("Decoder timed out")}
+    return {"estimate_ms": median(estimate[1:] or estimate), "first_estimate_ms": estimate[0] if estimate else None,
+            "synthesis_ms": median(synthesis[1:] or synthesis), "import_ms": median(imports),
+            "passes": max((int(f[1]) for f in flows), default=0), "recordings": max((int(f[2]) for f in flows), default=0),
+            "pyramid_levels": max((int(f[0]) for f in flows), default=0), "held_mb": max((float(f[4]) for f in flows), default=0.0),
+            "cache_mb": max((float(f[5]) for f in flows), default=0.0), "fallbacks": log.count("Decoder timed out")}
 
 
-def measure(folder, height, clips, configs, extra):
+def level_fit(frames, truths, fit):
+    if not fit:
+        return np.ones(3), np.zeros(3)
+    fitted = [np.polyfit(np.concatenate([t[..., c].ravel() for t in truths]), np.concatenate([f[..., c].ravel() for f in frames]), 1)
+              for c in range(3)]
+    return np.float64([f[0] for f in fitted]), np.float64([f[1] for f in fitted])
+
+
+def score(got, want, before, after):
+    moving = (np.abs(want - before).max(-1) > 8) | (np.abs(want - after).max(-1) > 8) | (np.abs(before - after).max(-1) > 8)
+    return psnr(got, want), ssim(got, want), psnr(got, want, moving) if moving.any() else None
+
+
+def print_timings(height, results):
+    print(f"\n{height}p  clip/config            estimate ms  first ms  synthesis ms  import ms  passes  recordings  held MB  cache MB")
+    for key, r in results.items():
+        print(f"      {key:22s} {str(r['estimate_ms']):>11}  {str(r['first_estimate_ms']):>8}  {str(r['synthesis_ms']):>12}  "
+              f"{str(r['import_ms']):>9}  {r['passes']:>6}  {r['recordings']:>10}  {r['held_mb']:>7}  {r['cache_mb']:>8}")
+
+
+def measure(folder, height, clips, configs, extra, fit):
     base = os.path.join(folder, str(height))
     adb("shell", "mkdir", "-p", f"{DEVICE_DIR}/interp")
     results = {}
     for clip in clips:
-        adb("push", os.path.join(base, f"{clip}-10fps.mp4"), remote(height, f"{clip}-10fps.mp4"), check=True)
-        adb("push", os.path.join(base, f"{clip}.xml"), remote(height, f"{clip}.xml"), check=True)
-        truth = [load(os.path.join(base, clip, "truth", f"{j:02d}.png")) for j in range((SOURCE_FRAMES - 1) * STEPS + 1)]
+        truths = [load(p) for p in truth(base, clip, height, "truth", SOURCE_FPS * STEPS, (SOURCE_FRAMES - 1) * STEPS + 1)]
+        scene = push_project(base, height, clip, "slow")
         for config in configs:
-            log = export(remote(height, f"{clip}.xml"), height, CONFIGS[config] + extra)
+            log = export(scene, height, SOURCE_FPS, CONFIGS[config] + extra)
             local = os.path.join(base, clip, config)
-            os.makedirs(local, exist_ok=True)
-            adb("pull", f"{DEVICE_DIR}/export.seq/.", local, check=True)
-            frames = [load(os.path.join(local, f"frame_{j + 1:05d}.png")) for j in range(len(truth))]
-            sources = range(0, len(truth), STEPS)
-            fit = [np.polyfit(np.concatenate([truth[j][..., c].ravel() for j in sources]),
-                              np.concatenate([frames[j][..., c].ravel() for j in sources]), 1) for c in range(3)]
-            gain, offset = np.float64([f[0] for f in fit]), np.float64([f[1] for f in fit])
+            pull(local)
+            frames = [load(os.path.join(local, f"frame_{j + 1:05d}.png")) for j in range(len(truths))]
+            sources = range(0, len(truths), STEPS)
+            gain, offset = level_fit([frames[j] for j in sources], [truths[j] for j in sources], fit)
             rows = {}
-            for j, want in enumerate(truth):
+            for j, want in enumerate(truths):
                 got = np.clip((frames[j] - offset) / gain, 0, 255)
                 k, step = divmod(j, STEPS)
-                moving = None
                 if step:
-                    a, b = truth[k * STEPS], truth[(k + 1) * STEPS]
-                    moving = (np.abs(want - a).max(-1) > 8) | (np.abs(want - b).max(-1) > 8) | (np.abs(a - b).max(-1) > 8)
-                rows.setdefault(step / STEPS, []).append((psnr(got, want), ssim(got, want), psnr(got, want, moving) if moving is not None and moving.any() else None))
+                    rows.setdefault(step / STEPS, []).append(score(got, want, truths[k * STEPS], truths[(k + 1) * STEPS]))
+                else:
+                    rows.setdefault(0.0, []).append((psnr(got, want), ssim(got, want), None))
             for f in os.listdir(local):
                 os.remove(os.path.join(local, f))
             os.rmdir(local)
@@ -232,35 +296,124 @@ def measure(folder, height, clips, configs, extra):
                        for f, v in sorted(rows.items())}
             results[f"{clip}/{config}"] = {"fractions": summary, "levels": [round(float(v), 3) for v in (*gain, *offset)], **timings(log)}
             print(json.dumps({f"{clip}/{config}": results[f"{clip}/{config}"]}), flush=True)
-    with open(os.path.join(base, "results.json"), "w") as out:
+    with open(os.path.join(base, f"results{'' if fit else '-nofit'}.json"), "w") as out:
         json.dump(results, out, indent=1)
-    print(f"\n{height}p  clip/config            f   PSNR    SSIM   PSNR-moving")
+    print(f"\n{height}p slow motion, {'fitted levels' if fit else 'no level fit'}  clip/config            f   PSNR    SSIM   PSNR-moving")
     for key, r in results.items():
         for f, m in r["fractions"].items():
             print(f"      {key:22s} {f}  {m['psnr']:6.2f}  {m['ssim']:.4f}  {m['psnr_moving'] if m['psnr_moving'] is not None else '':>6}")
-    print(f"\n{height}p  clip/config            estimate ms  synthesis ms  import ms  passes")
+    print_timings(height, results)
+
+
+def rates(folder, height, clips, configs, fit):
+    base = os.path.join(folder, str(height))
+    adb("shell", "mkdir", "-p", f"{DEVICE_DIR}/interp")
+    results, failures = {}, 0
+    count = SPAN_MS * 60 // 1000
+    for clip in clips:
+        truths = [load(p) for p in truth(base, clip, height, "truth60", 60, count)]
+        scene = push_project(base, height, clip, "thirty")
+        off = None
+        for config in ["nearest"] + [c for c in configs if c != "nearest"]:
+            log = export(scene, height, 60, CONFIGS[config])
+            local = os.path.join(base, clip, f"thirty-{config}")
+            names = pull(local)
+            frames = [load(os.path.join(local, n)) for n in names[:count]]
+            if off is None:
+                off = frames
+            even = range(0, count, 2)
+            gain, offset = level_fit([frames[k] for k in even], [truths[k] for k in even], fit)
+            odd = [score(np.clip((frames[k] - offset) / gain, 0, 255), truths[k], truths[k - 1], truths[min(k + 1, count - 1)])
+                   for k in range(1, count, 2)]
+            same_even = sum(np.array_equal(frames[k], off[k]) for k in even)
+            changed_odd = sum(not np.array_equal(frames[k], off[k]) for k in range(1, count, 2))
+            results[f"{clip}/{config}"] = {"odd_psnr": round(float(np.mean([r[0] for r in odd])), 2),
+                                          "odd_ssim": round(float(np.mean([r[1] for r in odd])), 4),
+                                          "odd_psnr_moving": round(float(np.mean([r[2] for r in odd if r[2] is not None])), 2),
+                                          "even_same_as_off": f"{same_even}/{len(even)}", "odd_changed": f"{changed_odd}/{count // 2}",
+                                          **timings(log)}
+            if config != "nearest" and (same_even != len(even) or changed_odd == 0):
+                failures += 1
+            print(json.dumps({f"{clip}/{config}": results[f"{clip}/{config}"]}), flush=True)
+        mixed = push_project(base, height, clip, "mixed")
+        halves = {}
+        for config in ("nearest", "flow"):
+            export(mixed, height, 60, CONFIGS[config])
+            local = os.path.join(base, clip, f"mixed-{config}")
+            halves[config] = [load(os.path.join(local, n)) for n in pull(local)[:count]]
+        width = halves["flow"][0].shape[1]
+        right_same = sum(np.array_equal(a[:, width // 2 + 2:], b[:, width // 2 + 2:]) for a, b in zip(halves["nearest"], halves["flow"]))
+        left_odd = sum(not np.array_equal(halves["nearest"][k][:, :width // 2 - 2], halves["flow"][k][:, :width // 2 - 2]) for k in range(1, count, 2))
+        left_even = sum(np.array_equal(halves["nearest"][k], halves["flow"][k]) for k in range(0, count, 2))
+        print(f"{clip} mixed 30 and 60 fps at 60 fps with optical flow: 60 fps half unchanged in {right_same}/{count} frames, "
+              f"30 fps half changed in {left_odd}/{count // 2} in-between frames, whole frame unchanged in {left_even}/{(count + 1) // 2} "
+              f"source frames", flush=True)
+        if right_same != count or left_odd == 0 or left_even != (count + 1) // 2:
+            failures += 1
+    print(f"\n{height}p 30 fps clips exported at 60 fps, in-between frames against a true 60 fps render ({'fitted levels' if fit else 'no level fit'})")
+    print("      clip/config            PSNR    SSIM   PSNR-moving  source frames same as off  in-between frames changed")
     for key, r in results.items():
-        print(f"      {key:22s} {str(r['estimate_ms']):>11}  {str(r['synthesis_ms']):>12}  {str(r['import_ms']):>9}  {r['passes']:>6}")
+        print(f"      {key:22s} {r['odd_psnr']:6.2f}  {r['odd_ssim']:.4f}  {r['odd_psnr_moving']:>11}  {r['even_same_as_off']:>25}  {r['odd_changed']:>25}")
+    print_timings(height, results)
+    print(f"rates: {failures} problems")
+    return failures
+
+
+def offcheck(folder, height, clips, base_apk, new_apk):
+    base = os.path.join(folder, str(height))
+    variants = {"slow-off": ("slow", SOURCE_FPS, "off"), "normal-flow": ("normal", SOURCE_FPS, "flow"), "thirty-at-60-off": ("thirty", 60, "off"),
+                "sixty-at-60-flow": ("sixty", 60, "flow"), "mixed-at-60-off": ("mixed", 60, "off")}
+    for name, apk in (("base", base_apk), ("new", new_apk)):
+        adb("install", "-r", apk, check=True)
+        adb("shell", "mkdir", "-p", f"{DEVICE_DIR}/interp")
+        for clip in clips:
+            for variant, (project, fps, mode) in variants.items():
+                export(push_project(base, height, clip, project), height, fps, ["--es", "interp", mode if name == "new" else "off"])
+                pull(os.path.join(base, "offcheck", name, f"{clip}-{variant}"))
+    failures = 0
+    for clip in clips:
+        for variant in variants:
+            old, new = (os.path.join(base, "offcheck", name, f"{clip}-{variant}") for name in ("base", "new"))
+            names = sorted(os.listdir(old))
+            same = names == sorted(os.listdir(new)) and all(np.array_equal(load(os.path.join(old, f)), load(os.path.join(new, f))) for f in names)
+            files = same and all(open(os.path.join(old, f), "rb").read() == open(os.path.join(new, f), "rb").read() for f in names)
+            print(f"{clip:10s} {variant:17s} {len(names)} frames: {'identical pixels' if same else 'DIFFERENT'}{', identical files' if files else ''}", flush=True)
+            failures += not same
+    print(f"offcheck: {failures} of {len(clips) * len(variants)} sequences differ")
+    return failures
 
 
 def main():
-    parser = argparse.ArgumentParser(description="make: render the frame interpolation test clips, ground truth and test projects into a folder "
-                                     "outside the repository. measure: export them on the emulator with each interpolation mode and "
-                                     "compare every exported frame with the ground truth.")
-    parser.add_argument("action", choices=("make", "measure"))
+    parser = argparse.ArgumentParser(description="make: render the frame interpolation test clips and ground truth into a folder outside "
+                                     "the repository. measure: export a slowed 10 fps clip with each interpolation mode and compare every "
+                                     "frame with the ground truth. rates: export 30 fps clips at 60 fps and compare the in-between frames "
+                                     "with a true 60 fps render, and check a project that mixes 30 and 60 fps clips. offcheck: export the "
+                                     "test projects with interpolation off (and clips that need none set to optical flow) from two builds "
+                                     "and compare every frame.")
+    parser.add_argument("action", choices=("make", "measure", "rates", "offcheck"))
     parser.add_argument("folder")
     parser.add_argument("--height", type=int, default=540)
     parser.add_argument("--clips", default=",".join(CLIPS))
-    parser.add_argument("--configs", default=",".join(CONFIGS))
+    parser.add_argument("--configs", default="nearest,blend,flow")
+    parser.add_argument("--no-fit", action="store_true", help="compute PSNR without the per-channel gain and offset correction")
+    parser.add_argument("--base-apk")
+    parser.add_argument("--new-apk")
     parser.add_argument("--extra", nargs=argparse.REMAINDER, default=[])
     a = parser.parse_args()
     folder = os.path.abspath(a.folder)
     if folder.startswith(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))):
         sys.exit("keep generated files outside the repository")
+    clips = a.clips.split(",")
     if a.action == "make":
         make(folder, a.height)
+    elif a.action == "measure":
+        measure(folder, a.height, clips, a.configs.split(","), a.extra, not a.no_fit)
+    elif a.action == "rates":
+        sys.exit(1 if rates(folder, a.height, clips, a.configs.split(","), not a.no_fit) else 0)
     else:
-        measure(folder, a.height, a.clips.split(","), a.configs.split(","), a.extra)
+        if not (a.base_apk and a.new_apk):
+            sys.exit("offcheck needs --base-apk and --new-apk")
+        sys.exit(1 if offcheck(folder, a.height, clips, a.base_apk, a.new_apk) else 0)
 
 
 if __name__ == "__main__":
