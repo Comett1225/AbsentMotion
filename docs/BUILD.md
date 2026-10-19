@@ -4,19 +4,14 @@ This guide takes you from a fresh checkout to a running Android app and the rele
 Kotlin/Compose user interface with a C++ engine on top of Skia. Skia is built from source and is the slow, disk-hungry
 step.
 
-> **Status of this guide.** It was written from the build scripts and Gradle files, and the build it describes has
-> been run on one machine: an Apple-silicon Mac mini (M4) running macOS, with the Android SDK, the Homebrew packages
-> and the Skia checkout already in place. **Nobody has followed these steps on a clean machine yet.** Sections
-> marked *Not verified* say where that matters. If a step fails for you, please open an issue with the output.
+> macOS builds and the Debian CI build are supported. A fresh checkout still needs the SDK, NDK, JDK and native libraries described below.
 
 ## 1. What you can build, and where
 
 The Android app (`app/`) builds to an APK for `arm64-v8a` only, in two flavours: `play` and `foss` (section 6). The
 maintainer builds it on macOS (Apple silicon).
 
-The build scripts need macOS or Linux with the Android NDK. They hard-code macOS in several places (Homebrew paths, the
-NDK's `darwin-x86_64` tool directory), so building on Linux has not been tried and should not be assumed to work.
-Windows hosts are not supported.
+The build scripts support macOS and Linux with the Android NDK. CI builds the unsigned `foss` APK on Debian. Windows hosts are not supported.
 
 ## 2. Disk space and time
 
@@ -71,7 +66,7 @@ Set `ANDROID_NDK` to the NDK directory if it is not at `~/Library/Android/sdk/nd
 
 | Directory | What | State |
 |---|---|---|
-| `third_party/whisper.cpp` | whisper.cpp / ggml **1.9.5** (MIT), for on-device captions | Vendored copy in the tree. It is meant to become a pinned git submodule. |
+| `third_party/whisper.cpp` | whisper.cpp / ggml **1.9.5** (MIT), for on-device captions | Pinned git submodule; initialise it with `git submodule update --init --recursive`. |
 | `third_party/rnnoise` | RNNoise (BSD-3-Clause), for noise reduction | Vendored copy in the tree. Meant to become a pinned submodule; the upstream commit is not recorded yet. |
 | `third_party/skia` | Skia | **Not in the repository** (git-ignored). Fetched by `tools/build_skia.sh`. |
 
@@ -95,11 +90,10 @@ What the script does, in order:
    pinned commit.
 2. Writes `DEPS.filtered`: Skia's dependency list without the parts an Android Vulkan build does not use (Dawn,
    ANGLE, SwiftShader, emsdk and others).
-3. Runs Skia's `tools/git-sync-deps` against it. This fetches about twenty repositories and **downloads a prebuilt
-   `gn` binary** to `third_party/skia/bin/gn` (Skia's `bin/fetch-gn`).
+3. Fetches the pinned source dependencies with `tools/skia_sync.py`. Builds the pinned `gn` tool from source with `tools/build_gn.sh`.
 4. Applies the patches in `tools/skia-patches/` if they are not applied yet.
 5. Writes `third_party/skia/out/android-arm64/args.gn` (the NDK path plus `tools/skia-args.gn`), runs `gn gen` and
-   `ninja`, then packs the path-operation objects into `libpathops.a` with the NDK's `llvm-ar` (from its `darwin-x86_64`
+   `ninja`, then packs the path-operation objects into `libpathops.a` with the NDK's `llvm-ar` (from the host's `darwin-x86_64` or `linux-x86_64`
    directory).
 
 **Output:** `third_party/skia/out/android-arm64/` holds the static libraries the Android engine links
@@ -149,15 +143,16 @@ runs `tools/check.sh`, and builds the release APKs of both flavours (signed as d
 - `build/release/AbsentMotion-<version>.apk` (the `play` flavour)
 - `build/release/AbsentMotion-<version>-foss.apk` (the `foss` flavour)
 
-## 8. Known gaps on a clean checkout
+## 8. CI and reproducible builds
 
-These are known and not yet fixed in the repository. They are why a clean machine may not pass `tools/check.sh` today:
+`.github/workflows/build.yml` builds the unsigned `foss` release APK in a Debian trixie container on pull requests,
+manual runs and version tags. It installs JDK 21 and the pinned Android SDK, NDK and CMake, builds Skia from source,
+and uploads the `foss-apk` artifact. The workflow removes the Play sources and dependencies before building.
 
-- **Scripts that need a phone.** A few scripts in `tools/` (`shot.sh`, `touch.sh`, `sound_check.py`, `export_check.py`,
-  `export_speed.sh`, `effect_thumbs.py`, `blend_check.py`) drive a device over `adb`. They only talk to the device named by
-  `ANDROID_SERIAL` (default `emulator-5554`). They are not needed to build or test.
-- **Hard-coded paths.** `tools/build_skia.sh` defaults the NDK to `$HOME/Library/Android/sdk/ndk/30.0.16248370`
-  (override with `ANDROID_NDK`) and uses the NDK's `darwin-x86_64` tools.
-- **`third_party/whisper.cpp` and `third_party/rnnoise` are vendored copies**, not pinned submodules, and `rnnoise`
-  has no recorded upstream commit.
-- **No Linux support**, no CI, and no reproducible builds yet.
+Two builds of the same commit must produce byte-identical unsigned APKs. Compare the downloaded artifacts with
+`cmp first.apk second.apk` before a release. Keep the Gradle wrapper, Android plugin, Kotlin, NDK, Skia and native
+source pins stable. The build disables VCS and dependency metadata and maps native source paths to stable values;
+changes to those settings can break reproducibility. Release signing is a separate step.
+
+Device scripts use only the device named by `ANDROID_SERIAL` (default `emulator-5554`). They are optional for the
+build; use an emulator for development checks. RNNoise is still vendored and its upstream commit is not recorded.
