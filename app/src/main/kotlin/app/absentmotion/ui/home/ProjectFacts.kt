@@ -14,4 +14,3 @@ internal fun fileSize(bytes: Long): String {
         else -> unit(bytes / (1024.0 * 1024.0), "MB")
     }
 }
-
