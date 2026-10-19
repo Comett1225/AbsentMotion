@@ -1,6 +1,8 @@
 package app.absentmotion.ui.home
 
 import app.absentmotion.platform.Formatter
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -24,6 +26,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.CancellationException
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
@@ -65,7 +72,7 @@ fun SettingsDrawer(settings: AppSettings) {
         Modifier.width(280.dp), drawerShape = RectangleShape, drawerContainerColor = Am.HomeDrawer,
         windowInsets = WindowInsets(0),
     ) {
-        Column(Modifier.fillMaxWidth().background(Am.Card).statusBarsPadding().padding(bottom = 8.dp)) {
+        Column(Modifier.fillMaxWidth().background(Am.Card).statusBarsPadding().verticalScroll(rememberScrollState()).padding(bottom = 8.dp)) {
             Text(
                 "Settings", Modifier.fillMaxWidth().height(50.dp).wrapContentHeight(Alignment.CenterVertically).padding(start = 11.dp),
                 color = Am.HomeInk, fontSize = 18.sp, fontWeight = FontWeight.Bold,
@@ -186,10 +193,19 @@ private fun ThemeRow(settings: AppSettings) {
     val context = LocalContext.current
     var open by remember { mutableStateOf(false) }
     val shape = RoundedCornerShape(10.dp)
+    val scope = rememberCoroutineScope()
     val picker = rememberDocumentPicker { uri ->
         if (uri != null) {
-            val failure = runCatching { settings.importTheme(readThemeText(context, uri)) }.exceptionOrNull()
-            if (failure != null) Toast.makeText(context, failure.message ?: "Could not read this file", Toast.LENGTH_LONG).show()
+            scope.launch {
+                try {
+                    val text = withContext(Dispatchers.IO) { readThemeText(context, uri) }
+                    settings.importTheme(text)
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    Toast.makeText(context, e.message ?: "Could not read this file", Toast.LENGTH_LONG).show()
+                }
+            }
         }
     }
     Row(Modifier.fillMaxWidth().height(44.dp).padding(horizontal = 15.dp), verticalAlignment = Alignment.CenterVertically) {

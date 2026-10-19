@@ -1,6 +1,8 @@
 package app.absentmotion.ui.home
 
 import app.absentmotion.platform.BackHandler
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -189,7 +191,7 @@ fun NewProjectSheet(
 private fun SheetBody(form: Form, onClose: () -> Unit, onCreate: () -> Unit) {
     Column(
         Modifier.fillMaxWidth().clip(RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp)).background(Am.SheetBg)
-            .windowInsetsPadding(WindowInsets.navigationBars.union(WindowInsets.ime)),
+            .windowInsetsPadding(WindowInsets.navigationBars.union(WindowInsets.ime)).verticalScroll(rememberScrollState()),
     ) {
         Spacer(Modifier.height(30.dp))
         TypeToggle(form)
