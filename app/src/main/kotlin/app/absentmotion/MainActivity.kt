@@ -4,8 +4,10 @@ import androidx.core.content.FileProvider
 import android.content.ClipData
 import android.content.Intent
 import android.content.pm.ApplicationInfo
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
+import android.os.SystemClock
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -26,6 +28,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.lifecycleScope
+import app.absentmotion.ai.AiMedia
+import app.absentmotion.ai.BackgroundRemoval
 import app.absentmotion.compat.EffectMigration
 import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.MultiSelect
@@ -235,6 +239,10 @@ class MainActivity : ComponentActivity() {
             catch (e: kotlinx.coroutines.CancellationException) { throw e }
             catch (e: Exception) { Log.e("AMDevice", "failed", e) }
         }
+        intent.getStringExtra("bgremove")?.let { asset ->
+            val runs = intent.getIntExtra("runs", 3).coerceAtLeast(1)
+            lifecycleScope.launch(Dispatchers.IO) { checkBackgroundRemoval(asset, runs) }
+        }
         val path = intent.getStringExtra("xml") ?: return
         val parsed = runCatching { Scene.parse(File(path).readText()) }.getOrElse { Log.e("AMTest", "cannot read $path", it); return }
         val id = "test-" + File(path).nameWithoutExtension
@@ -264,6 +272,33 @@ class MainActivity : ComponentActivity() {
                 if (e.message != "engine closed") throw e
                 Log.i("AMTest", "test capture stopped with the engine")
             }
+        }
+    }
+
+    private suspend fun checkBackgroundRemoval(asset: String, runs: Int) {
+        try {
+            val input = File(asset).takeIf { it.isFile } ?: File(cacheDir, "bgremove-" + asset.substringAfterLast('/')).also { file ->
+                assets.open(asset).use { source -> file.outputStream().use { source.copyTo(it) } }
+            }
+            val times = mutableListOf<Long>()
+            var output: AiMedia? = null
+            repeat(runs) {
+                output?.file?.delete()
+                val start = SystemClock.elapsedRealtime()
+                output = BackgroundRemoval.run(applicationContext, Uri.fromFile(input).toString(), null, engine.maxPictureSize()) { _, _ -> }
+                times += SystemClock.elapsedRealtime() - start
+            }
+            val result = File(getExternalFilesDir(null), "bgremove.png")
+            checkNotNull(output).file.let { it.copyTo(result, overwrite = true); it.delete() }
+            val source = checkNotNull(BitmapFactory.decodeFile(input.path))
+            val cut = checkNotNull(BitmapFactory.decodeFile(result.path))
+            val pixels = IntArray(cut.width * cut.height).also { cut.getPixels(it, 0, cut.width, 0, 0, cut.width, cut.height) }
+            val clear = pixels.count { it ushr 24 <= 8 }
+            val solid = pixels.count { it ushr 24 >= 247 }
+            val ok = cut.width == source.width && cut.height == source.height && clear > 0 && solid > 0
+            Log.i("AMTest", "bgremove $asset ${source.width}x${source.height} -> ${cut.width}x${cut.height} transparent=$clear opaque=$solid ms=$times ok=$ok")
+        } catch (e: Throwable) {
+            Log.e("AMTest", "bgremove failed", e)
         }
     }
 
