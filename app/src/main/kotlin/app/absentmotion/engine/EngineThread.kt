@@ -46,7 +46,6 @@ class EngineThread(private val background: Int, context: Context? = null) {
     val fonts = context?.let { FontLibrary(it) }
     private var fontJob: Job? = null
     private var fontNames = emptyList<String>()
-    @Volatile private var fontDocument: String? = null
     private val media = context?.let { MediaLibrary(it, this) }
     private val videos = context?.let { VideoLibrary(it, this) }
     val audio = context?.let { AudioEngine(it) }
@@ -99,14 +98,14 @@ class EngineThread(private val background: Int, context: Context? = null) {
     private var view: PreviewView? = null
     private var scene: String? = null
 
-    private val pendingScene = AtomicReference<String?>(null)
+    private val pendingScene = PendingScene()
     private val pendingView = AtomicReference<PreviewView?>(null)
     private val renderPosted = AtomicBoolean(false)
 
     init {
         fonts?.let { library -> mediaScope.launch {
             library.revision.collect {
-                fontDocument?.let { xml -> pendingScene.set(xml); pictureRevision.value++; requestRender() }
+                pendingScene.fontsChanged(); pictureRevision.value++; requestRender()
             }
         } }
     }
@@ -163,7 +162,6 @@ class EngineThread(private val background: Int, context: Context? = null) {
 
     fun setScene(xml: String) {
         pendingScene.set(xml)
-        fontDocument = xml
         fonts?.let { library ->
             val names = runCatching { Scene.parse(xml).layers.filter { it.kind == "text" }.map { it.font }.distinct() }.getOrDefault(emptyList())
             if (names != fontNames) {
@@ -264,7 +262,7 @@ class EngineThread(private val background: Int, context: Context? = null) {
         pendingView.getAndSet(null)?.let { view = it }
         try {
             view?.let { engine().setCameraView(it.camera) }
-            pendingScene.getAndSet(null)?.let { setEngineScene(it) }
+            pendingScene.take(scene)?.let { setEngineScene(it) }
             prepareTextTime(view?.timeMs ?: 0)
         } catch (e: IllegalArgumentException) {
             Log.e("AMEngine", "scene rejected", e)
@@ -472,5 +470,19 @@ class EngineThread(private val background: Int, context: Context? = null) {
                 mediaScope.cancel()
             }
         }
+    }
+}
+
+internal class PendingScene {
+    private val next = AtomicReference<String?>(null)
+    private val fonts = AtomicBoolean(false)
+
+    fun set(xml: String) = next.set(xml)
+
+    fun fontsChanged() = fonts.set(true)
+
+    fun take(shown: String?): String? {
+        val again = fonts.getAndSet(false)
+        return next.getAndSet(null) ?: shown.takeIf { again }
     }
 }
