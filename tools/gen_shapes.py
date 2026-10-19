@@ -1,16 +1,4 @@
 #!/usr/bin/env python3
-"""Writes app/src/main/assets/shapes.xml: the 19 parametric built-in shapes (kept exactly as the file has them, ids and
-parameter names are the project file format) followed by 35 drawn outlines that are built here from geometry:
-formulas, circle arcs and short point tables. Nothing is traced or copied from another app.
-
-  tools/gen_shapes.py                 rewrite the file
-  tools/gen_shapes.py --check         exit 1 when the file differs from what the script writes
-  tools/gen_shapes.py --sheet OUT.png also draw a contact sheet of the 35 outlines, read back from the file (needs PIL)
-
-Every outline is closed, uses +y down, is centred on (0, 0) and fits a SIZE x SIZE box (the circle's default is 200
-across). A shape with holes or separate parts has one contour per part; "exclude" contours flip what they cover, as the
-engine does (a hole when inside, an added part when outside).
-"""
 import math
 import os
 import re
@@ -50,8 +38,6 @@ class P:
         self.cmds.append(("Z",)); return self
 
     def arc(self, cx, cy, r, a0, a1, ry=None):
-        """Circle (or axis-aligned ellipse) arc from angle a0 to a1 in degrees; angles grow clockwise on screen (+y down).
-        Starts with a line to the arc's first point (a move on an empty path)."""
         ry = r if ry is None else ry
         sx, sy = cx + r * math.cos(math.radians(a0)), cy + ry * math.sin(math.radians(a0))
         if self.cur is None:
@@ -69,7 +55,6 @@ class P:
         return self
 
     def tf(self, a, b, c, d, e, f):
-        """A copy mapped by x' = a x + c y + e, y' = b x + d y + f."""
         out = P()
         for cmd in self.cmds:
             v = cmd[1:]
@@ -85,7 +70,6 @@ class P:
         return self.tf(1, 0, 0, 1, dx, dy)
 
     def points(self, steps=24):
-        """The outline as a list of points (curves sampled), for bounds and drawing."""
         pts, cur = [], None
         for cmd in self.cmds:
             if cmd[0] in "ML":
@@ -113,7 +97,6 @@ def poly(pts):
     return p.z()
 
 def rpoly(pts, r):
-    """A polygon with every corner rounded by a quadratic curve that starts r away from the corner (r may be a list)."""
     n = len(pts)
     radii = r if isinstance(r, (list, tuple)) else [r] * n
     p = P()
@@ -149,7 +132,6 @@ def ngon(n, radius, start=0.0):
     return poly([(radius * math.cos(math.radians(start + i * 360.0 / n)), radius * math.sin(math.radians(start + i * 360.0 / n))) for i in range(n)])
 
 def circle_hits(c0, r0, c1, r1):
-    """The two points where circle (c0, r0) meets circle (c1, r1)."""
     dx, dy = c1[0] - c0[0], c1[1] - c0[1]
     d = math.hypot(dx, dy)
     a = (r0 * r0 - r1 * r1 + d * d) / (2 * d)
@@ -161,7 +143,6 @@ def angle(c, p):
     return math.degrees(math.atan2(p[1] - c[1], p[0] - c[0]))
 
 def thick_line(pts, w, round_caps=True):
-    """The outline of an open polyline drawn w wide, with mitred corners and round or flat ends."""
     h = w / 2
     n = len(pts)
     dirs = []
@@ -194,13 +175,12 @@ def thick_line(pts, w, round_caps=True):
     for i in range(1, n):
         p.l(pts[i][0] + offs[i][0], pts[i][1] + offs[i][1])
     cap(pts[-1], offs[-1], dirs[-1], p)
-    for i in range(n - 1, -1, -1):
+    for i in range(n - 2, -1, -1):
         p.l(pts[i][0] - offs[i][0], pts[i][1] - offs[i][1])
     cap(pts[0], (-offs[0][0], -offs[0][1]), (-dirs[0][0], -dirs[0][1]), p)
     return p.z()
 
 def droplet(cx, cy, r, h, up=True, bulge=0.05):
-    """A drop: a circle of radius r with a pointed tip h from its centre (up, or down for a map pin)."""
     tip = (cx, cy - h)
     beta = math.acos(r / h)
     pr = (cx + r * math.sin(beta), cy - r * math.cos(beta))
