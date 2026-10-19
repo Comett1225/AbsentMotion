@@ -129,9 +129,10 @@ private:
     LayerEffects layerEffects() {
         LayerEffects fx;
         fx.active = [this](const Layer& layer) { return fEffects.active(layer); };
-        fx.draw = [this](SkCanvas* canvas, const Scene& scene, const Layer& layer, double time,
+        fx.lifted = [this](const Layer& layer) { return fEffects.lifted(layer); };
+        fx.draw = [this](SkCanvas* canvas, const Scene& scene, const Layer& layer, double time, const SkRect& area,
                          const std::function<void(SkCanvas*)>& source) {
-            return fEffects.draw(canvas, scene, layer, time, source);
+            return fEffects.draw(canvas, scene, layer, time, area, source);
         };
         return fx;
     }

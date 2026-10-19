@@ -1,0 +1,60 @@
+{
+ "id": "gradientmap",
+ "name": "Gradient Map",
+ "category": "color",
+ "description": "Recolours the picture by brightness through three colours, with repeats and a phase.",
+ "params": [
+  {
+   "id": "color1",
+   "label": "Shadows",
+   "type": "color",
+   "default": "#ff1b1464"
+  },
+  {
+   "id": "color2",
+   "label": "Midtones",
+   "type": "color",
+   "default": "#ffd4145a"
+  },
+  {
+   "id": "color3",
+   "label": "Highlights",
+   "type": "color",
+   "default": "#fffbb03b"
+  },
+  {
+   "id": "repeat",
+   "label": "Repeat",
+   "type": "float",
+   "default": 1,
+   "min": 0.1,
+   "max": 10,
+   "step": 0.1
+  },
+  {
+   "id": "phase",
+   "label": "Phase",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  },
+  {
+   "id": "reverse",
+   "label": "Reverse",
+   "type": "switch",
+   "default": false
+  },
+  {
+   "id": "opacity",
+   "label": "Opacity",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nlayout(color) uniform half4 color1;\nlayout(color) uniform half4 color2;\nlayout(color) uniform half4 color3;\nuniform float repeat;\nuniform float phase;\nuniform float reverse;\nuniform float opacity;\nfloat luma(float3 c) { return dot(c, float3(0.2126, 0.7152, 0.0722)); }\nhalf4 main(float2 coord) {\n    half4 c = image.eval(coord);\n    if (c.a <= 0.0) return c;\n    float3 base = float3(c.rgb) / float(c.a);\n    float w = luma(base) * repeat + phase;\n    float u = 1.0 - abs(fract(w * 0.5) * 2.0 - 1.0);\n    if (reverse > 0.5) u = 1.0 - u;\n    float4 g = u < 0.5 ? mix(float4(color1), float4(color2), u * 2.0) : mix(float4(color2), float4(color3), u * 2.0 - 1.0);\n    float3 rgb = mix(base, g.rgb, clamp(opacity, 0.0, 1.0) * g.a);\n    return half4(half3(clamp(rgb, 0.0, 1.0)) * c.a, c.a);\n}"
+}

@@ -1,0 +1,90 @@
+{
+ "id": "colorwheels",
+ "name": "Lift Gamma Gain",
+ "category": "color",
+ "description": "Colour wheels for the shadows (lift), midtones (gamma) and highlights (gain): a hue, how far to push it, and a level.",
+ "params": [
+  {
+   "id": "liftHue",
+   "label": "Lift Hue",
+   "type": "angle",
+   "default": 210,
+   "min": 0,
+   "max": 360,
+   "step": 1
+  },
+  {
+   "id": "liftAmount",
+   "label": "Lift Amount",
+   "type": "float",
+   "default": 0.3,
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  },
+  {
+   "id": "liftLevel",
+   "label": "Lift Level",
+   "type": "float",
+   "default": 0,
+   "min": -1,
+   "max": 1,
+   "step": 0.01
+  },
+  {
+   "id": "gammaHue",
+   "label": "Gamma Hue",
+   "type": "angle",
+   "default": 0,
+   "min": 0,
+   "max": 360,
+   "step": 1
+  },
+  {
+   "id": "gammaAmount",
+   "label": "Gamma Amount",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  },
+  {
+   "id": "gammaLevel",
+   "label": "Gamma Level",
+   "type": "float",
+   "default": 0,
+   "min": -1,
+   "max": 1,
+   "step": 0.01
+  },
+  {
+   "id": "gainHue",
+   "label": "Gain Hue",
+   "type": "angle",
+   "default": 35,
+   "min": 0,
+   "max": 360,
+   "step": 1
+  },
+  {
+   "id": "gainAmount",
+   "label": "Gain Amount",
+   "type": "float",
+   "default": 0.3,
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  },
+  {
+   "id": "gainLevel",
+   "label": "Gain Level",
+   "type": "float",
+   "default": 0,
+   "min": -1,
+   "max": 1,
+   "step": 0.01
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float liftHue;\nuniform float liftAmount;\nuniform float liftLevel;\nuniform float gammaHue;\nuniform float gammaAmount;\nuniform float gammaLevel;\nuniform float gainHue;\nuniform float gainAmount;\nuniform float gainLevel;\nfloat luma(float3 c) { return dot(c, float3(0.2126, 0.7152, 0.0722)); }\nfloat3 chroma(float hue) {\n    float3 k = clamp(abs(fract(hue / 360.0 + float3(1.0, 2.0 / 3.0, 1.0 / 3.0)) * 6.0 - 3.0) - 1.0, 0.0, 1.0);\n    return k - luma(k);\n}\nhalf4 main(float2 coord) {\n    half4 c = image.eval(coord);\n    if (c.a <= 0.0) return c;\n    float3 base = float3(c.rgb) / float(c.a);\n    float3 lift = 0.5 * chroma(liftHue) * liftAmount + liftLevel;\n    float3 gain = 1.0 + chroma(gainHue) * gainAmount + gainLevel;\n    float3 gamma = max(1.0 + chroma(gammaHue) * gammaAmount + gammaLevel, float3(0.01));\n    float3 rgb = pow(max(gain * (base + lift * (1.0 - base)), 0.0), 1.0 / gamma);\n    return half4(half3(clamp(rgb, 0.0, 1.0)) * c.a, c.a);\n}"
+}

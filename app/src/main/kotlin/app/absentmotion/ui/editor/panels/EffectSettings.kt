@@ -44,6 +44,7 @@ internal fun EffectSettings(state: EditorState, layer: Layer, instance: XmlNode,
                 PanelSwitch(raw == "true") { if (enabled) set(it.toString()) }
             }
             "color" -> EffectColor(state, param, raw, enabled, active == param, { select(param) }, { set(it) })
+            "choice" -> EffectChoice(param, raw, enabled) { set(it) }
             else -> EffectNumbers(state, param, raw, enabled, active == param, { select(param) }, { text, gesture -> set(text, gesture) })
         }
     }
@@ -117,6 +118,24 @@ internal fun EffectNumbers(state: EditorState, param: EffectParam, raw: String, 
 internal fun ValueBox(text: String, chosen: Boolean, lit: Boolean, modifier: Modifier, endPadding: Float, enabled: Boolean, onClick: () -> Unit) {
     Box(modifier.clip(PanelShape).background(if (lit) PanelDark else Color(0x33000000)).clickable(enabled = enabled, onClick = onClick), contentAlignment = Alignment.CenterEnd) {
         Text(text, Modifier.padding(start = 2.dp, end = endPadding.dp), color = if (chosen) PanelGreen else Am.OnDark, fontSize = 14.sp, maxLines = 1, softWrap = false)
+    }
+}
+
+@Composable
+private fun EffectChoice(param: EffectParam, raw: String, enabled: Boolean, set: (String) -> Unit) {
+    val chosen = (raw.toFloatOrNull() ?: 0f).roundToInt().coerceIn(param.options.indices)
+    var open by remember(param.id) { mutableStateOf(false) }
+    Row(Modifier.fillMaxWidth().height(38.dp).padding(horizontal = 8.dp).alpha(if (enabled) 1f else 0.35f), verticalAlignment = Alignment.CenterVertically) {
+        Text(param.label, Modifier.weight(1f), color = Am.OnDark, fontSize = 14.sp)
+        Box {
+            Text(param.options[chosen], Modifier.clip(PanelShape).background(Color(0x33000000)).clickable(enabled = enabled) { open = true }
+                .padding(horizontal = 12.dp, vertical = 6.dp), color = Am.OnDark, fontSize = 14.sp, maxLines = 1)
+            Presence(open) {
+                MenuPopup(DropOrRise, { open = false }) {
+                    param.options.forEachIndexed { i, option -> MenuRow(option) { set(formatFloats(floatArrayOf(i.toFloat()))); open = false } }
+                }
+            }
+        }
     }
 }
 

@@ -2,19 +2,21 @@
 
 #include "xml.h"
 #include "include/core/SkCanvas.h"
-#include "include/core/SkColorFilter.h"
 #include "include/core/SkPaint.h"
 #include "include/effects/SkImageFilters.h"
 
 #include <algorithm>
 #include <cmath>
+#include <string_view>
 #include <vector>
 
 namespace am {
 namespace {
 
+const char* const kLift = "absent.backdrop";
+
 bool BuiltIn(const std::string& id) {
-    return id == "absent.blur" || id == "absent.glow" || id == "absent.solid" || id == "absent.motionblur";
+    return id == "absent.blur" || id == "absent.glow" || id == "absent.motionblur" || id == kLift;
 }
 
 float Value(const LayerEffect& e, const std::map<std::string, Anim>* defaults, const std::string& name, int i, float t,
@@ -39,12 +41,6 @@ sk_sp<SkImageFilter> BuiltInFilter(const std::string& id, const std::function<fl
         if (!(sigma > 0) || !(intensity > 0)) return input;
         return SkImageFilters::Arithmetic(0, intensity, 1, 0, true, input,
                                           SkImageFilters::Blur(sigma, sigma, SkTileMode::kDecal, input));
-    }
-    if (id == "absent.solid") {
-        const float amount = std::clamp(v("amount", 0, 1), 0.0f, 1.0f) * std::clamp(v("color", 0, 1), 0.0f, 1.0f);
-        if (!(amount > 0)) return input;
-        const SkColor4f c = {v("color", 1, 1), v("color", 2, 1), v("color", 3, 1), amount};
-        return SkImageFilters::ColorFilter(SkColorFilters::Blend(c, nullptr, SkBlendMode::kSrcATop), input);
     }
     const float length = std::max(v("length", 0, 40), 0.0f), angle = v("angle", 0, 0);
     if (!(length > 0) || !std::isfinite(angle)) return input;
@@ -75,6 +71,7 @@ std::string EffectRuntime::load(const std::string& xml) {
             return "shader error: " + text.substr(0, text.find('\n')) + "\n" + text;
         }
         if (!result.effect->findChild("image")) return "shader error: no 'uniform shader image'";
+        d.blurred = result.effect->findChild("blurred") != nullptr;
         d.shader = std::move(result.effect);
     }
     fDefinitions[id] = std::move(d);
@@ -94,14 +91,25 @@ bool EffectRuntime::active(const Layer& layer) const {
     });
 }
 
-sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer, double timeMs) const {
+int EffectRuntime::liftAt(const Layer& layer) const {
+    int at = -1;
+    for (size_t i = 0; i < layer.effects.size(); i++) {
+        if (!layer.effects[i].hidden && layer.effects[i].id == kLift) at = (int)i;
+    }
+    return at;
+}
+
+bool EffectRuntime::lifted(const Layer& layer) const { return liftAt(layer) >= 0; }
+
+sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer, double timeMs, const SkRect& area) const {
     const float t = layer.localTime(timeMs), seconds = (float)((timeMs - layer.startTime) / 1000.0);
-    const SkRect bounds = SkRect::MakeIWH(scene.width, scene.height);
+    const SkRect bounds = SkRect::MakeIWH(scene.width, scene.height).makeOffset(-area.left(), -area.top());
     const float reach = (float)std::max(scene.width, scene.height);
     sk_sp<SkImageFilter> f;
     bool any = false;
-    for (const LayerEffect& e : layer.effects) {
-        if (e.hidden) continue;
+    for (size_t k = (size_t)(liftAt(layer) + 1); k < layer.effects.size(); k++) {
+        const LayerEffect& e = layer.effects[k];
+        if (e.hidden || e.id == kLift) continue;
         const Definition* d = find(e.id);
         const auto* defaults = d ? &d->defaults : nullptr;
         if (BuiltIn(e.id)) {
@@ -114,7 +122,7 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
                 const std::string name(u.name);
                 const int n = (int)(u.sizeInBytes() / 4);
                 std::vector<float> v(n);
-                if (name == "size") v = {(float)scene.width, (float)scene.height};
+                if (name == "size") v = {area.width(), area.height()};
                 else if (name == "time") v = {seconds};
                 else if (u.isColor() && n == 4) v = {Value(e, defaults, name, 1, t, 0), Value(e, defaults, name, 2, t, 0),
                                                      Value(e, defaults, name, 3, t, 0), Value(e, defaults, name, 0, t, 1)};
@@ -127,25 +135,47 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
                     b.uniform(u.name).set(v.data(), n);
                 }
             }
-            f = SkImageFilters::RuntimeShader(b, reach, "image", f);
+            if (d->blurred) {
+                const float sigma = std::max(Value(e, defaults, "blur", 0, t, 0), 0.0f) / 3;
+                std::string_view names[] = {"image", "blurred"};
+                const sk_sp<SkImageFilter> inputs[] = {f, sigma > 0 ? SkImageFilters::Blur(sigma, sigma, SkTileMode::kDecal, f) : f};
+                f = SkImageFilters::RuntimeShader(b, reach, names, inputs, 2);
+            } else {
+                f = SkImageFilters::RuntimeShader(b, reach, "image", f);
+            }
         } else {
             continue;
         }
         f = SkImageFilters::Crop(bounds, f);
         any = true;
     }
-    return any ? f : nullptr;
+    return any ? f->makeWithLocalMatrix(SkMatrix::Translate(area.left(), area.top())) : nullptr;
 }
 
-bool EffectRuntime::draw(SkCanvas* canvas, const Scene& scene, const Layer& layer, double timeMs,
+bool EffectRuntime::draw(SkCanvas* canvas, const Scene& scene, const Layer& layer, double timeMs, const SkRect& area,
                          const std::function<void(SkCanvas*)>& source) const {
-    sk_sp<SkImageFilter> filter = this->chain(scene, layer, timeMs);
-    if (!filter) return false;
+    const SkRect bounds = SkRect::MakeIWH(scene.width, scene.height);
+    const int lift = liftAt(layer);
+    sk_sp<SkImageFilter> filter = this->chain(scene, layer, timeMs, area.isEmpty() ? bounds : area);
+    if (!filter && lift < 0) return false;
     SkPaint paint;
     paint.setImageFilter(std::move(filter));
-    const SkRect bounds = SkRect::MakeIWH(scene.width, scene.height);
-    canvas->saveLayer(&bounds, &paint);
-    source(canvas);
+    if (lift < 0) {
+        canvas->saveLayer(&bounds, &paint);
+        source(canvas);
+        canvas->restore();
+        return true;
+    }
+    const LayerEffect& e = layer.effects[lift];
+    const Definition* d = find(e.id);
+    const float own = std::clamp(Value(e, d ? &d->defaults : nullptr, "mix", 0, layer.localTime(timeMs), 0), 0.0f, 1.0f);
+    paint.setBlendMode(SkBlendMode::kSrc);
+    canvas->saveLayer(SkCanvas::SaveLayerRec(&bounds, &paint, SkCanvas::kInitWithPrevious_SaveLayerFlag));
+    if (own > 0) {
+        canvas->saveLayerAlphaf(&bounds, own);
+        source(canvas);
+        canvas->restore();
+    }
     canvas->restore();
     return true;
 }

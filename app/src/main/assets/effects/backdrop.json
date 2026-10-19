@@ -1,0 +1,18 @@
+{
+ "id": "backdrop",
+ "name": "Adjustment Layer",
+ "category": "color",
+ "native": true,
+ "description": "Fills the layer with what is drawn beneath it, so the effects after this one change the layers below. Mix brings the layer's own fill back.",
+ "params": [
+  {
+   "id": "mix",
+   "label": "Mix",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  }
+ ]
+}

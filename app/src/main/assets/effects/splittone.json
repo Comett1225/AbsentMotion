@@ -1,0 +1,45 @@
+{
+ "id": "splittone",
+ "name": "Split Tone",
+ "category": "color",
+ "description": "Tints the shadows towards one hue and the highlights towards another, keeping black, white and brightness.",
+ "params": [
+  {
+   "id": "shadowHue",
+   "label": "Shadow Hue",
+   "type": "angle",
+   "default": 200,
+   "min": -360,
+   "max": 360,
+   "step": 1
+  },
+  {
+   "id": "shadowAmount",
+   "label": "Shadow Amount",
+   "type": "float",
+   "default": 0.6,
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  },
+  {
+   "id": "highlightHue",
+   "label": "Highlight Hue",
+   "type": "angle",
+   "default": 35,
+   "min": -360,
+   "max": 360,
+   "step": 1
+  },
+  {
+   "id": "highlightAmount",
+   "label": "Highlight Amount",
+   "type": "float",
+   "default": 0.6,
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float shadowHue;\nuniform float shadowAmount;\nuniform float highlightHue;\nuniform float highlightAmount;\nfloat luma(float3 c) { return dot(c, float3(0.2126, 0.7152, 0.0722)); }\nfloat3 chroma(float hue) {\n    float3 k = clamp(abs(fract(hue / 360.0 + float3(1.0, 2.0 / 3.0, 1.0 / 3.0)) * 6.0 - 3.0) - 1.0, 0.0, 1.0);\n    return k - luma(k);\n}\nhalf4 main(float2 coord) {\n    half4 c = image.eval(coord);\n    if (c.a <= 0.0) return c;\n    float3 base = float3(c.rgb) / float(c.a);\n    float l = luma(base);\n    float reach = 2.0 * min(l, 1.0 - l);\n    float3 dark = clamp(l + chroma(shadowHue) * reach, 0.0, 1.0);\n    float3 light = clamp(l + chroma(highlightHue) * reach, 0.0, 1.0);\n    float3 rgb = mix(base, dark, clamp(shadowAmount, 0.0, 1.0) * (1.0 - l));\n    rgb = mix(rgb, light, clamp(highlightAmount, 0.0, 1.0) * l);\n    return half4(half3(clamp(rgb, 0.0, 1.0)) * c.a, c.a);\n}"
+}

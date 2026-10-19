@@ -420,7 +420,16 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
         canvas->restore();
         if (l.stroke.present && l.stroke.enabled) stroked = DrawStroke(canvas, l, scenePath, t, alpha);
     };
-    if (!EffectsApply(siblings, l) || !gEffects->draw(canvas, *gScene, l, timeMs, picture)) picture(canvas);
+    const bool effects = EffectsApply(siblings, l);
+    if (!effects || !gEffects->draw(canvas, *gScene, l, timeMs, scenePath.getBounds(), picture)) picture(canvas);
+    if (effects && gEffects->lifted(l) && !scenePath.isEmpty()) {
+        SkPath outside = scenePath;
+        outside.toggleInverseFillType();
+        SkPaint clear;
+        clear.setAntiAlias(true);
+        clear.setBlendMode(SkBlendMode::kClear);
+        canvas->drawPath(outside, clear);
+    }
     if (!decorate) return;
     SkPath region = hasFill ? (l.text ? TextGlyphPath(l).makeTransform(m) : l.kind == "drawing" ? DrawingOutline(l).makeTransform(m) : scenePath) : SkPath();
     region = Union(region, stroked);
@@ -456,7 +465,8 @@ void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& 
             layerPaint.setImageFilter(SkImageFilters::DropShadow(s.offset.get(0, t, 3), s.offset.get(1, t, 3), sigma, sigma,
                                                                  color, nullptr, nullptr));
         }
-        canvas->saveLayer(nullptr, &layerPaint);
+        const bool lifted = !group && EffectsApply(siblings, l) && gEffects->lifted(l);
+        canvas->saveLayer(SkCanvas::SaveLayerRec(nullptr, &layerPaint, lifted ? SkCanvas::kInitWithPrevious_SaveLayerFlag : 0));
         if (group) {
             canvas->save();
             DrawGroup(canvas, siblings, l, timeMs, pictures);

@@ -2,7 +2,7 @@
  "id": "huesaturation",
  "name": "Hue & Saturation",
  "category": "color",
- "description": "Turns colours around the colour wheel and makes them stronger or weaker.",
+ "description": "Turns colours around the colour wheel and makes them stronger or weaker; vibrance strengthens the duller colours most.",
  "params": [
   {
    "id": "hue",
@@ -23,6 +23,15 @@
    "step": 0.01
   },
   {
+   "id": "vibrance",
+   "label": "Vibrance",
+   "type": "float",
+   "default": 0,
+   "min": -1,
+   "max": 1,
+   "step": 0.01
+  },
+  {
    "id": "lightness",
    "label": "Lightness",
    "type": "float",
@@ -32,5 +41,5 @@
    "step": 0.01
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float hue;\nuniform float saturation;\nuniform float lightness;\nhalf luma(half3 c) { return dot(c, half3(0.2126, 0.7152, 0.0722)); }\nhalf4 main(float2 coord) {\n    half4 c = unpremul(image.eval(coord));\n    float3 k = float3(0.57735);\n    float a = radians(hue);\n    float3 v = float3(c.rgb);\n    v = v * cos(a) + cross(k, v) * sin(a) + k * dot(k, v) * (1 - cos(a));\n    half3 rgb = half3(v);\n    rgb = mix(half3(luma(rgb)), rgb, half(saturation)) + half(lightness);\n    return half4(saturate(rgb) * c.a, c.a);\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float hue;\nuniform float saturation;\nuniform float vibrance;\nuniform float lightness;\nhalf luma(half3 c) { return dot(c, half3(0.2126, 0.7152, 0.0722)); }\nhalf4 main(float2 coord) {\n    half4 c = unpremul(image.eval(coord));\n    float3 k = float3(0.57735);\n    float a = radians(hue);\n    float3 v = float3(c.rgb);\n    v = v * cos(a) + cross(k, v) * sin(a) + k * dot(k, v) * (1 - cos(a));\n    half3 rgb = half3(v);\n    rgb = mix(half3(luma(rgb)), rgb, half(saturation));\n    half chromaNow = max(rgb.r, max(rgb.g, rgb.b)) - min(rgb.r, min(rgb.g, rgb.b));\n    rgb = mix(half3(luma(rgb)), rgb, half(1.0 + vibrance * (1.0 - saturate(chromaNow)))) + half(lightness);\n    return half4(saturate(rgb) * c.a, c.a);\n}"
 }

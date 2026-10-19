@@ -15,11 +15,13 @@ data class EffectParam(
     val max: Float = Float.MAX_VALUE,
     val step: Float = 0.01f,
     val percent: Boolean = false,
+    val options: List<String> = emptyList(),
+    val pixels: Boolean = false,
 ) {
     val type: String get() = when (kind) { "point" -> "vec2"; "color" -> "color"; "switch" -> "bool"; else -> "float" }
 
     companion object {
-        val Kinds = setOf("float", "angle", "point", "color", "switch")
+        val Kinds = setOf("float", "angle", "point", "color", "switch", "choice")
 
         fun parse(json: JSONObject): EffectParam {
             val id = json.getString("id")
@@ -33,9 +35,14 @@ data class EffectParam(
                 "switch" -> (d == true || (d as? Number)?.toInt() == 1).toString()
                 else -> formatFloats(floatArrayOf((d as Number).toFloat()))
             }
+            if (kind == "choice") {
+                val options = json.getJSONArray("options").let { a -> List(a.length()) { a.getString(it) } }
+                require(options.isNotEmpty() && (d as Number).toInt() in options.indices) { "$id: choice $d" }
+                return EffectParam(id, json.optString("label", id), kind, default, 0f, options.size - 1f, 1f, options = options)
+            }
             return EffectParam(id, json.optString("label", id), kind, default,
                 json.optDouble("min", -Float.MAX_VALUE.toDouble()).toFloat(), json.optDouble("max", Float.MAX_VALUE.toDouble()).toFloat(),
-                json.optDouble("step", 0.01).toFloat())
+                json.optDouble("step", 0.01).toFloat(), pixels = json.optBoolean("pixels"))
         }
     }
 }

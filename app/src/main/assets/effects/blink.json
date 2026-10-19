@@ -1,0 +1,18 @@
+{
+ "id": "blink",
+ "name": "Blink",
+ "category": "stylize",
+ "description": "Switches the layer on and off a number of times per second.",
+ "params": [
+  {
+   "id": "frequency",
+   "label": "Blinks per Second",
+   "type": "float",
+   "default": 4,
+   "min": 0,
+   "max": 30,
+   "step": 0.1
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float frequency;\nhalf4 main(float2 coord) {\n    half4 c = image.eval(coord);\n    return fract(time * frequency) < 0.5 ? c : half4(0.0);\n}"
+}

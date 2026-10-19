@@ -25,16 +25,19 @@ class EffectPackTest {
         val declared = Regex("""(layout\s*\(\s*color\s*\)\s*)?uniform\s+(\w+)\s+(\w+)\s*;""")
         for (effect in catalog.definitions) {
             if (effect.native) {
-                assertTrue("${effect.key} is not a built-in", effect.id in setOf("absent.blur", "absent.glow", "absent.solid", "absent.motionblur"))
+                assertTrue("${effect.key} is not a built-in", effect.id in setOf("absent.blur", "absent.glow", "absent.motionblur", "absent.backdrop"))
                 assertNull(effect.sksl)
                 continue
             }
             val uniforms = declared.findAll(effect.sksl!!).associate { it.groupValues[3] to (it.groupValues[2] to it.groupValues[1].isNotEmpty()) }
+            val blurred = "blurred" in uniforms
             val expected = mapOf("image" to ("shader" to false), "size" to ("float2" to false), "time" to ("float" to false)) +
+                (if (blurred) mapOf("blurred" to ("shader" to false)) else emptyMap()) +
                 effect.params.associate { p ->
                     p.id to when (p.kind) { "point" -> "float2" to false; "color" -> "half4" to true; else -> "float" to false }
                 }
             assertEquals(effect.key, expected, uniforms)
+            assertTrue("${effect.key} takes a blurred copy, so it needs a 'blur' size", !blurred || effect.params.any { it.id == "blur" && it.kind == "float" })
             assertTrue(effect.key, Regex("""half4\s+main\s*\(\s*float2\s+\w+\s*\)""").containsMatchIn(effect.sksl))
             assertTrue("${effect.key} declares 'pos', the name the GPU backend gives main's argument",
                 !Regex("""\b(float2|half2|float|half)\s+pos\b""").containsMatchIn(effect.sksl))
@@ -48,6 +51,15 @@ class EffectPackTest {
             p.default.split(',').forEach {
                 assertTrue("${effect.key}.${p.id} = ${p.default}", it.toFloat() in p.min..p.max)
             }
+        }
+    }
+
+    @Test fun choicesHaveLabelsAndAWholeDefault() {
+        val choices = catalog.definitions.flatMap { e -> e.params.filter { it.kind == "choice" }.map { e.key to it } }
+        assertTrue(choices.isNotEmpty())
+        for ((key, p) in choices) {
+            assertTrue("$key.${p.id}", p.options.size >= 2 && p.min == 0f && p.max == p.options.size - 1f && p.type == "float")
+            assertEquals("$key.${p.id}", p.default.toFloat(), p.default.toFloat().toInt().toFloat())
         }
     }
 

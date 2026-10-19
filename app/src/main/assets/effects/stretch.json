@@ -1,0 +1,45 @@
+{
+ "id": "stretch",
+ "name": "Stretch Segment",
+ "category": "distort",
+ "description": "Cuts the layer along a line and pulls the two halves apart, stretching the pixels on the line into the gap.",
+ "params": [
+  {
+   "id": "angle",
+   "label": "Angle",
+   "type": "angle",
+   "default": 0,
+   "min": -360,
+   "max": 360,
+   "step": 1
+  },
+  {
+   "id": "stretch",
+   "label": "Stretch",
+   "type": "float",
+   "default": 200,
+   "min": 0,
+   "max": 5000,
+   "step": 1
+  },
+  {
+   "id": "offset",
+   "label": "Offset",
+   "type": "float",
+   "default": 0,
+   "min": -5000,
+   "max": 5000,
+   "step": 1
+  },
+  {
+   "id": "spread",
+   "label": "Spread",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 500,
+   "step": 1
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float angle;\nuniform float stretch;\nuniform float offset;\nuniform float spread;\nhalf4 main(float2 coord) {\n    float r = radians(angle);\n    float2 dir = float2(cos(r), sin(r));\n    float d = dot(coord - 0.5 * size, dir) - offset;\n    float gap = 0.5 * max(stretch, 0.0);\n    float2 from = abs(d) <= gap ? coord - dir * d + dir * (d / max(gap, 0.001)) * spread : coord - dir * sign(d) * gap;\n    return image.eval(from);\n}"
+}

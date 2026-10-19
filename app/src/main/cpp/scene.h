@@ -177,7 +177,8 @@ void DrawMedia(SkCanvas* canvas, const Layer& layer, const SkPath& path, float o
                const MediaPictures& pictures);
 struct LayerEffects {
     std::function<bool(const Layer&)> active;
-    std::function<bool(SkCanvas*, const Scene&, const Layer&, double, const std::function<void(SkCanvas*)>&)> draw;
+    std::function<bool(const Layer&)> lifted;
+    std::function<bool(SkCanvas*, const Scene&, const Layer&, double, const SkRect&, const std::function<void(SkCanvas*)>&)> draw;
 };
 void DrawScene(SkCanvas* canvas, const Scene& scene, double timeMs, const MediaPictures& pictures,
                const LayerEffects* effects = nullptr);
