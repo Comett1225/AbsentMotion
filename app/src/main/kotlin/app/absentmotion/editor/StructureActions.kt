@@ -281,8 +281,8 @@ fun EditorState.moveClipEdges(end: Boolean, extend: Boolean) {
     edit { s -> layers.fold(s) { acc, layer ->
         acc.update(layer.id) {
             if (!extend) it.movedTo(if (end) target - (it.endTime - it.startTime) else target)
-            else if (end && target > it.startTime) it.trimmedTo(it.startTime, target)
-            else if (!end && target < it.endTime) it.trimmedTo(target, it.endTime)
+            else if (end && target > it.startTime && s.showsAnyFrame(it.startTime, target)) it.trimmedTo(it.startTime, target)
+            else if (!end && target < it.endTime && s.showsAnyFrame(target, it.endTime)) it.trimmedTo(target, it.endTime)
             else it
         }
     } }

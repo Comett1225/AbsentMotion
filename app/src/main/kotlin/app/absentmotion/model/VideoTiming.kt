@@ -101,6 +101,18 @@ fun Layer.trimmedTo(start: Int, end: Int, mediaMs: Int = Int.MAX_VALUE): Layer {
     return trimmed
 }
 
+fun Scene.trimStartAt(layer: Layer, frame: Int): Layer? =
+    frameStart(frame).takeIf { it > layer.startTime && showsAnyFrame(it, layer.endTime) }?.let { layer.trimmedTo(it, layer.endTime) }
+
+fun Scene.trimEndAt(layer: Layer, frame: Int): Layer? =
+    frameEnd(frame).takeIf { it < layer.endTime && showsAnyFrame(layer.startTime, it) }?.let { layer.trimmedTo(layer.startTime, it) }
+
+fun Scene.splitAt(layer: Layer, frame: Int, newId: Long): Pair<Layer, Layer>? {
+    val cut = frameStart(frame)
+    if (cut <= layer.startTime || !showsAnyFrame(layer.startTime, cut - 1) || !showsAnyFrame(cut, layer.endTime)) return null
+    return layer.trimmedTo(layer.startTime, cut - 1) to layer.withId(newId).trimmedTo(cut, layer.endTime)
+}
+
 fun Layer.withVideoSpeedMap(map: XmlNode): Layer {
     val old = VideoTiming(this)
     var changed = copy(node = node.withChild("speedMap", map).with("speed", null))

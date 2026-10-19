@@ -4,7 +4,9 @@ import app.absentmotion.platform.Color
 import kotlin.math.roundToInt
 import app.absentmotion.model.Scene
 import app.absentmotion.model.copyLayers
-import app.absentmotion.model.trimmedTo
+import app.absentmotion.model.splitAt
+import app.absentmotion.model.trimEndAt
+import app.absentmotion.model.trimStartAt
 import app.absentmotion.model.SpeedRef
 import app.absentmotion.model.VideoTiming
 import app.absentmotion.model.withSpeedKeyframeToggled
@@ -91,23 +93,18 @@ fun EditorState.duplicateSelected() {
 fun EditorState.toggleHidden(id: Long) = edit { it.update(id) { layer -> layer.withHidden(!layer.hidden) } }
 
 fun EditorState.trimStart() {
-    val layer = selected ?: return
-    val start = timeMs
-    if (start in (layer.startTime + 1)..layer.endTime) editSelected { it.trimmedTo(start, it.endTime) }
+    val trimmed = selected?.let { scene.trimStartAt(it, frame) } ?: return
+    editSelected { trimmed }
 }
 
 fun EditorState.trimEnd() {
-    val layer = selected ?: return
-    val end = scene.frameEnd(frame)
-    if (end in layer.startTime until layer.endTime) editSelected { it.trimmedTo(it.startTime, end) }
+    val trimmed = selected?.let { scene.trimEndAt(it, frame) } ?: return
+    editSelected { trimmed }
 }
 
 fun EditorState.split() {
-    val layer = selected ?: return
-    val cut = timeMs
-    if (cut !in (layer.startTime + 1)..layer.endTime) return
-    val second = layer.withId(Layer.newId()).trimmedTo(cut, layer.endTime)
-    edit { it.update(layer.id) { first -> first.trimmedTo(first.startTime, it.frameEnd(frame)) }.add(second) }
+    val (first, second) = selected?.let { scene.splitAt(it, frame, Layer.newId()) } ?: return
+    edit { it.update(first.id) { first }.add(second) }
     selectedId = null
 }
 

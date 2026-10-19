@@ -46,4 +46,33 @@ class LayerCopiesTest {
         assertEquals(700, copyLayers(listOf(source), newId = { 2 }).single().startTime)
         assertTrue(copyLayers(emptyList(), 2500).isEmpty())
     }
+
+    private val thirty = Scene.create("t", 100, 100, 30, 0)
+
+    private fun Scene.shownFrames(l: Layer) = (0..200).filter { f -> frameTime(f) in l.startTime..l.endTime }
+
+    @Test fun splitHalvesMeetWithoutSharingAFrame() {
+        val (first, second) = thirty.splitAt(layer(1, "shape", 0, 2999), 30, 2)!!
+        assertEquals(1000, second.startTime)
+        assertEquals(first.endTime + 1, second.startTime)
+        assertEquals(listOf(0 to 999, 1000 to 2999), listOf(first, second).map { it.startTime to it.endTime })
+        assertEquals((0..29).toList(), thirty.shownFrames(first))
+        assertEquals((30..89).toList(), thirty.shownFrames(second))
+        assertEquals(2L, second.id)
+    }
+
+    @Test fun cutsThatWouldLeaveAPartWithNoFrameAreRefused() {
+        val unalignedEnd = layer(1, "shape", 0, 1005)
+        assertNull(thirty.trimStartAt(unalignedEnd, 30))
+        assertEquals(966 to 1005, thirty.trimStartAt(unalignedEnd, 29)!!.let { it.startTime to it.endTime })
+        assertNull(thirty.splitAt(unalignedEnd, 30, 2))
+        val unalignedStart = layer(1, "shape", 995, 2999)
+        assertNull(thirty.trimEndAt(unalignedStart, 29))
+        assertEquals(995 to 1032, thirty.trimEndAt(unalignedStart, 30)!!.let { it.startTime to it.endTime })
+        assertNull(thirty.splitAt(unalignedStart, 30, 2))
+        assertFalse(thirty.showsAnyFrame(1000, 1015))
+        assertTrue(thirty.showsAnyFrame(1000, 1016))
+        assertEquals(30, thirty.firstShownFrame(984))
+        assertEquals(29, thirty.lastShownFrame(1015))
+    }
 }

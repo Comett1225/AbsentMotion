@@ -59,6 +59,9 @@ value class Scene(val node: XmlNode) {
     fun frameAt(timeMs: Int): Int = (((timeMs + 1L) * fps + 999) / 1000 - 1).toInt()
     fun frameTime(frame: Int): Int = ((2 * frame + 1) * 500L / fps).toInt()
     fun frameEnd(frame: Int): Int = frameStart(frame + 1) - 1
+    fun firstShownFrame(start: Int): Int = frameAt(start).let { if (frameTime(it) < start) it + 1 else it }
+    fun lastShownFrame(end: Int): Int = frameAt(end).let { if (frameTime(it) > end) it - 1 else it }
+    fun showsAnyFrame(start: Int, end: Int): Boolean = firstShownFrame(start) <= lastShownFrame(end)
     val lastFrame: Int get() = frameAt(totalTime)
 
     fun withTitle(title: String) = Scene(node.with("title", title))

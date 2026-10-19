@@ -30,7 +30,7 @@ fun EditorState.retimeVideo(start: Boolean) {
     val newStart = if (start) timeMs else layer.startTime
     val newEnd = if (start) layer.endTime else scene.frameEnd(frame)
     val duration = newEnd - newStart
-    if (duration < 1) return
+    if (duration < 1 || !scene.showsAnyFrame(newStart, newEnd)) return
     val timing = VideoTiming(layer)
     val span = timing.mediaMs((layer.endTime - layer.startTime).toDouble()) - timing.mediaMs(0.0)
     val speed = (span / duration).toFloat().coerceAtLeast(0.001f)

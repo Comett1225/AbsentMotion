@@ -526,10 +526,10 @@ private class TimelineView(val state: EditorState, density: Density, private val
         val id = dragId
         val mediaMs = (layer.mediaFill?.uri ?: layer.node["src"])?.let { scene.media(it)?.duration }?.takeIf { it > 0 }?.let { (it / 1000).toInt() } ?: Int.MAX_VALUE
         if (start) {
-            val time = scene.frameStart(frame.coerceIn(0, scene.frameAt(layer.endTime)))
+            val time = scene.frameStart(frame.coerceIn(0, scene.lastShownFrame(layer.endTime).coerceAtLeast(0)))
             if (time != layer.startTime) state.edit("trim-start") { it.update(id) { l -> l.trimmedTo(time, l.endTime, mediaMs) } }
         } else {
-            val time = scene.frameEnd((frame - 1).coerceAtLeast(scene.frameAt(layer.startTime)))
+            val time = scene.frameEnd((frame - 1).coerceAtLeast(scene.firstShownFrame(layer.startTime)))
             if (time != layer.endTime) state.edit("trim-end") { it.update(id) { l -> l.trimmedTo(l.startTime, time, mediaMs) } }
         }
     }
