@@ -56,7 +56,9 @@ fun Layer.withContours(contours: List<Contour>): Layer {
     return copy(node = node.withChild("path", path))
 }
 
-private fun Knot.toNode() = XmlNode("knot", children = listOf(XmlNode("p", mapOf("value" to formatFloats(floatArrayOf(p.x, p.y))))))
+private fun Knot.toNode() = XmlNode("knot", children = listOfNotNull(vecNode("p", p), inHandle?.let { vecNode("in", it - p) }, outHandle?.let { vecNode("out", it - p) }))
+
+private fun vecNode(name: String, v: Pt) = XmlNode(name, mapOf("value" to formatFloats(floatArrayOf(v.x, v.y))))
 
 private fun num(v: Float): String = String.format(Locale.US, "%.4f", v).trimEnd('0').trimEnd('.').let { if (it == "-0" || it.isEmpty()) "0" else it }
 private fun Pt.svg() = "${num(x)} ${num(y)}"

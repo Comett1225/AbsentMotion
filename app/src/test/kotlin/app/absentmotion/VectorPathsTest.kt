@@ -2,9 +2,13 @@ package app.absentmotion
 
 import app.absentmotion.model.Contour
 import app.absentmotion.model.Knot
+import app.absentmotion.model.Layer
 import app.absentmotion.model.Pt
+import app.absentmotion.model.XmlNode
+import app.absentmotion.model.contours
 import app.absentmotion.model.parseSvgPath
 import app.absentmotion.model.toSvg
+import app.absentmotion.model.withContours
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -27,5 +31,13 @@ class VectorPathsTest {
     @Test fun aCurvedClosingSegmentStillMovesItsHandleToTheFirstPoint() {
         val c = Contour(listOf(Knot(Pt(0f, 0f), Pt(-10f, 5f), Pt(10f, 0f)), Knot(Pt(20f, 0f)), Knot(Pt(20f, 20f))), closed = true)
         roundTrips(c).forEach { assertEquals(c, it) }
+    }
+
+    @Test fun aOnePointContourKeepsItsHandles() {
+        val layer = Layer(XmlNode("shape", mapOf("id" to "1")))
+        val pulled = listOf(Contour(listOf(Knot(Pt(3f, 4f), Pt(-7f, 4f), Pt(13f, 4f))), closed = false))
+        assertEquals(pulled, layer.withContours(pulled).contours)
+        val sharp = listOf(Contour(listOf(Knot(Pt(3f, 4f))), closed = false))
+        assertEquals(sharp, layer.withContours(sharp).contours)
     }
 }
