@@ -36,6 +36,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
@@ -108,7 +109,7 @@ fun PresetScreen(state: EditorState) {
     LaunchedEffect(fit, pos, scene) {
         if (box.width > 0) state.engine.setView(PreviewView(shown.startTime + pos, fit, (box.width - scene.width * fit) / 2, (box.height - scene.height * fit) / 2, 0, -1))
     }
-    LaunchedEffect(playing) {
+    LaunchedEffect(playing, chosen, length) {
         if (!playing) return@LaunchedEffect
         if (pos >= length) pos = 0
         val from = pos
@@ -182,7 +183,7 @@ fun PresetScreen(state: EditorState) {
                                 menuFor = null
                                 store.delete(preset.id)
                                 presets = store.list()
-                                if (chosen == preset.id) chosen = null
+                                if (chosen == preset.id) { chosen = null; pos = pos.coerceAtMost((base.endTime - base.startTime).coerceAtLeast(1)) }
                                 Toast.makeText(context, "Preset deleted", Toast.LENGTH_SHORT).show()
                             }
                         }
@@ -198,6 +199,7 @@ fun PresetScreen(state: EditorState) {
 
 @Composable
 private fun Scrubber(progress: Float, now: String, start: String, end: String, modifier: Modifier, onSeek: (Float) -> Unit) {
+    val seekCurrent by rememberUpdatedState(onSeek)
     val thumb = 10.dp
     var width by remember { mutableIntStateOf(0) }
     Box(modifier.onSizeChanged { width = it.width }) {
@@ -205,8 +207,8 @@ private fun Scrubber(progress: Float, now: String, start: String, end: String, m
             Modifier.fillMaxSize().pointerInput(Unit) {
                 awaitEachGesture {
                     val down = awaitFirstDown()
-                    val room = size.width - thumb.toPx()
-                    fun seek(x: Float) = onSeek(((x - thumb.toPx() / 2) / room).coerceIn(0f, 1f))
+                    val room = (size.width - thumb.toPx()).coerceAtLeast(1f)
+                    fun seek(x: Float) = seekCurrent(((x - thumb.toPx() / 2) / room).coerceIn(0f, 1f))
                     seek(down.position.x)
                     do {
                         val event = awaitPointerEvent()
