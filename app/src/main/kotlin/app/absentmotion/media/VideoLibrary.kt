@@ -1,6 +1,7 @@
 package app.absentmotion.media
 
 import android.content.Context
+import android.net.Uri
 import android.util.Log
 import app.absentmotion.engine.EngineThread
 import app.absentmotion.export.FrameInterpolation
@@ -122,7 +123,7 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
 
     suspend fun retry() = lock.withLock {
         for ((id, session) in sessions.toMap()) {
-            if (session.failed || session.generation != engine.generation) {
+            if (session.failed || session.generation != engine.generation || session.version != fileVersion(context.contentResolver, Uri.parse(session.uri))) {
                 sessions.remove(id)
                 session.close()
             }
@@ -147,6 +148,7 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
         private val queue = Channel<Pair<Request, Sample>>(Channel.CONFLATED)
         private var decoder: VideoDecoder? = null
         val generation = engine.generation
+        val version = fileVersion(context.contentResolver, Uri.parse(uri))
         @Volatile private var retryAt = 0L
         val failed get() = retryAt != 0L
         @Volatile private var stopped = false
