@@ -83,9 +83,12 @@ fun parseSvgPath(d: String): List<Contour> {
     var knots = ArrayList<Knot>()
     var i = 0
     var command = ' '
+    var pen = Pt(0f, 0f)
+    var start = pen
     fun number(): Float = tokens.getOrNull(i++)?.toFloatOrNull() ?: 0f
-    fun point() = Pt(number(), number())
+    fun point(from: Pt) = Pt(number(), number()) + from
     fun add(c1: Pt?, c2: Pt?, p: Pt) {
+        pen = p
         val last = knots.lastOrNull() ?: run { knots.add(Knot(p)); return }
         if (c1 != null && c1 != last.p) knots[knots.lastIndex] = last.copy(outHandle = c1)
         knots.add(Knot(p, inHandle = c2?.takeIf { it != p }))
@@ -102,19 +105,19 @@ fun parseSvgPath(d: String): List<Contour> {
     while (i < tokens.size) {
         val t = tokens[i]
         if (t[0].isLetter()) { command = t[0]; i++ } else if (command == ' ') { i++; continue }
+        val from = if (command.isLowerCase()) pen else Pt(0f, 0f)
         when (command.uppercaseChar()) {
-            'M' -> { finish(false); knots.add(Knot(point())); command = 'L' }
-            'L' -> add(null, null, point())
-            'H' -> { val last = knots.lastOrNull()?.p ?: Pt(0f, 0f); add(null, null, Pt(number(), last.y)) }
-            'V' -> { val last = knots.lastOrNull()?.p ?: Pt(0f, 0f); add(null, null, Pt(last.x, number())) }
-            'C' -> { val c1 = point(); val c2 = point(); add(c1, c2, point()) }
+            'M' -> { finish(false); pen = point(from); start = pen; knots.add(Knot(pen)); command = if (command == 'm') 'l' else 'L' }
+            'L' -> add(null, null, point(from))
+            'H' -> add(null, null, Pt(number() + from.x, pen.y))
+            'V' -> add(null, null, Pt(pen.x, number() + from.y))
+            'C' -> { val c1 = point(from); val c2 = point(from); add(c1, c2, point(from)) }
             'Q' -> {
-                val last = knots.lastOrNull()?.p ?: Pt(0f, 0f)
-                val q = point()
-                val p = point()
-                add(last + (q - last) * (2f / 3f), p + (q - p) * (2f / 3f), p)
+                val q = point(from)
+                val p = point(from)
+                add(pen + (q - pen) * (2f / 3f), p + (q - p) * (2f / 3f), p)
             }
-            'Z' -> { finish(true); command = ' ' }
+            'Z' -> { finish(true); pen = start; command = ' ' }
             else -> i++
         }
     }

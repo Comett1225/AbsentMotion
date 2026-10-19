@@ -40,4 +40,15 @@ class VectorPathsTest {
         val sharp = listOf(Contour(listOf(Knot(Pt(3f, 4f))), closed = false))
         assertEquals(sharp, layer.withContours(sharp).contours)
     }
+
+    @Test fun relativeCommandsAreOffsetFromTheCurrentPoint() {
+        assertEquals(Pt(110f, 100f), parseSvgPath("M 100 100 l 10 0").single().knots[1].p)
+        assertEquals(Pt(10f, 0f), parseSvgPath("M 100 100 L 10 0").single().knots[1].p)
+        val (a, b) = parseSvgPath("m 10 10 20 0 h 5 v 5 c 0 3, 3 6, 6 6 z m 1 1 l 2 0")
+        assertEquals(listOf(Pt(10f, 10f), Pt(30f, 10f), Pt(35f, 10f), Pt(35f, 15f), Pt(41f, 21f)), a.knots.map { it.p })
+        assertEquals(Pt(35f, 18f), a.knots[3].outHandle)
+        assertEquals(Pt(38f, 21f), a.knots[4].inHandle)
+        assertEquals(true, a.closed)
+        assertEquals(listOf(Pt(11f, 11f), Pt(13f, 11f)), b.knots.map { it.p })
+    }
 }
