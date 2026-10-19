@@ -109,7 +109,7 @@ fun estimateBytes(kind: ExportKind, scene: Scene, s: ExportSettings, hasAudio: B
         ExportKind.Video -> exportSize(scene, s.shortSide, true).let {
             (videoBitrate(it.first, it.second, s) + if (hasAudio) AudioBitrate else 0) / 8 * seconds
         }.toLong()
-        ExportKind.Gif -> exportSize(scene, s.shortSide, false).let { it.first * it.second * frames * GifBytesPerPixel }.toLong()
+        ExportKind.Gif -> exportSize(scene, s.shortSide, false).let { it.first.toLong() * it.second * frames * GifBytesPerPixel }.toLong()
         ExportKind.Sequence -> exportSize(scene, s.shortSide, false).let {
             (it.first.toLong() * it.second * frames * s.image.bytesPerPixel)
         }.toLong()
@@ -124,8 +124,8 @@ fun formatBytes(bytes: Long): String {
     fun f(v: Double, unit: String) = String.format(Locale.ROOT, "%.1f%s", v, unit)
     return when {
         bytes < 1024 -> "${bytes}B"
-        bytes < 1024 * 1024 -> f(bytes / 1024.0, "KB")
-        bytes < 1024L * 1024 * 1024 -> f(bytes / (1024.0 * 1024), "MB")
+        bytes < 1024L * 1024 - 51 -> f(bytes / 1024.0, "KB")
+        bytes < 1024L * 1024 * 1024 - 52428 -> f(bytes / (1024.0 * 1024), "MB")
         else -> f(bytes / (1024.0 * 1024 * 1024), "GB")
     }
 }

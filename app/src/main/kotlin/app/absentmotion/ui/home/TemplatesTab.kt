@@ -182,7 +182,7 @@ private fun TemplateCard(
     onProject: () -> Unit, onRename: () -> Unit, onDelete: () -> Unit,
 ) {
     val scene = t.scene
-    val ratio = listOf(16 to 9, 9 to 16, 4 to 5, 1 to 1, 4 to 3).firstOrNull { (a, b) -> scene.width * b == scene.height * a }?.let { (a, b) -> "$a:$b" }
+    val ratio = aspectName(scene.width, scene.height)
     Card(Modifier.height(96.dp), onOpen) {
         Box(Modifier.padding(8.dp).size(80.dp).clip(RoundedCornerShape(8.dp)).checkerboard(5.dp)) {
             rememberFileBitmap(t.thumbnail, t.modified)?.let { Image(it, null, Modifier.fillMaxSize(), contentScale = ContentScale.Fit) }

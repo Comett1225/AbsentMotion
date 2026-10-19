@@ -495,19 +495,6 @@ private fun facts(p: ProjectInfo): List<List<Pair<ImageVector, String>>> {
     return listOf(first, listOf(HomeIcons.Folder to fileSize(p.sizeBytes), HomeIcons.FrameRate to "${p.fps}fps"))
 }
 
-private fun aspectName(w: Int, h: Int): String? =
-    listOf(16 to 9, 9 to 16, 4 to 5, 1 to 1, 4 to 3).firstOrNull { (a, b) -> w * b == h * a }?.let { (a, b) -> "$a:$b" }
-
-private fun fileSize(bytes: Long): String {
-    fun unit(v: Double, suffix: String) =
-        (if (v >= 10) "%.0f".format(Locale.ROOT, v) else "%.1f".format(Locale.ROOT, v).removeSuffix(".0")) + suffix
-    return when {
-        bytes < 1024 -> "${bytes}b"
-        bytes < 1024 * 1024 -> unit(bytes / 1024.0, "KB")
-        else -> unit(bytes / (1024.0 * 1024.0), "MB")
-    }
-}
-
 private fun duration(ms: Int): String {
     val s = (ms + 500) / 1000
     return String.format(Locale.ROOT, "%02d:%02d:%02d", s / 3600, s / 60 % 60, s % 60)
