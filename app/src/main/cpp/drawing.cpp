@@ -218,17 +218,12 @@ std::vector<Sub> Knots(const SkPath& path) {
     auto finish = [&](bool closed) {
         auto& k = cur.knots;
         if (k.empty()) return;
-        if (closed && k.size() > 2 && k.back().p == k.front().p) {
+        if (closed && k.size() > 2 && k.back().p == k.front().p && !k.back().hasOut) {
             const Knot last = k.back();
-            Knot& first = k.front();
-            const bool sameHandles = last.hasIn == first.hasIn && (!last.hasIn || last.in == first.in) &&
-                                     last.hasOut == first.hasOut && (!last.hasOut || last.out == first.out);
-            if (!last.hasOut && last.hasIn && !first.hasIn) {
-                first.in = last.in;
-                first.hasIn = true;
-                k.pop_back();
-            } else if (sameHandles) {
-                k.pop_back();
+            k.pop_back();
+            if (!k.front().hasIn && last.hasIn) {
+                k.front().in = last.in;
+                k.front().hasIn = true;
             }
         }
         cur.closed = closed;

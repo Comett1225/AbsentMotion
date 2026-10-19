@@ -90,15 +90,9 @@ fun parseSvgPath(d: String): List<Contour> {
     }
     fun finish(closed: Boolean) {
         if (knots.isEmpty()) return
-        if (closed && knots.size > 2 && knots.last().p == knots.first().p) {
-            val last = knots.last()
-            val first = knots.first()
-            if (last.outHandle == null && last.inHandle != null && first.inHandle == null) {
-                knots[0] = first.copy(inHandle = last.inHandle)
-                knots.removeAt(knots.lastIndex)
-            } else if (last.inHandle == first.inHandle && last.outHandle == first.outHandle) {
-                knots.removeAt(knots.lastIndex)
-            }
+        if (closed && knots.size > 2 && knots.last().p == knots.first().p && knots.last().outHandle == null) {
+            val last = knots.removeAt(knots.lastIndex)
+            if (knots[0].inHandle == null) knots[0] = knots[0].copy(inHandle = last.inHandle)
         }
         out += Contour(knots, closed)
         knots = ArrayList()
