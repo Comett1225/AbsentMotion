@@ -451,7 +451,8 @@ void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& 
     const bool shadow = ShadowOn(l);
     decorated = (decorated || shadow || EffectsApply(siblings, l)) && !group;
     const bool blended = ov.blend || !IsNormal(l.blending);
-    if (!group && !decorated && !blended) {
+    const bool overlaps = l.kind == "drawing" || (l.stroke.present && l.stroke.enabled);
+    if (!group && !decorated && !blended && (opacity >= 1 || !overlaps)) {
         DrawContent(canvas, siblings, l, timeMs, opacity, false, pictures);
     } else {
         SkPaint layerPaint;
