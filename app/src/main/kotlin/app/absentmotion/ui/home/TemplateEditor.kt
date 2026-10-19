@@ -114,7 +114,7 @@ internal fun slotsOf(scene: Scene): List<Slot> =
         .map { (uri, layers) ->
             fun span(l: XmlNode) = l.int("endTime", 0) - l.int("startTime", 0)
             val video = layers.first()["fillImage"] == null
-            val length = if (video) layers.maxOf { minOf(it.int("outTime", Int.MAX_VALUE), it.int("inTime", 0) + span(it)) } - layers.minOf { it.int("inTime", 0) }
+            val length = if (video) layers.maxOf { minOf(it.int("outTime", Int.MAX_VALUE), app.absentmotion.model.VideoTiming(Layer(it)).mediaMs(span(it).toDouble()).roundToInt()) } - layers.minOf { it.int("inTime", 0) }
                 else layers.maxOf(::span)
             Slot(uri, video, length, layers.minOf { it.int("startTime", 0) }, layers.maxOf { it.int("endTime", 0) },
                 MediaFillMode.entries.firstOrNull { it.xml == layers.first()["mediaFillMode"] } ?: MediaFillMode.Fill)
@@ -185,17 +185,17 @@ fun TemplateEditor(templateId: String, engine: EngineThread, settings: AppSettin
         return
     }
     val slots = remember(template) { slotsOf(template) }
-    var choices by remember { mutableStateOf<Map<String, Choice>>(emptyMap()) }
-    var selected by remember { mutableStateOf<Slot?>(null) }
-    var trimming by remember { mutableStateOf<Trimming?>(null) }
-    var trimStart by remember { mutableIntStateOf(0) }
-    var asking by remember { mutableIntStateOf(0) }
-    var frozen by remember { mutableStateOf(false) }
-    var hints by remember { mutableIntStateOf(settings.templateHints) }
-    var playing by remember { mutableStateOf(false) }
-    var pos by remember { mutableIntStateOf(0) }
-    var box by remember { mutableStateOf(IntSize.Zero) }
-    val working = remember(choices) { applied(template, slots, choices) }
+    var choices by remember(templateId) { mutableStateOf<Map<String, Choice>>(emptyMap()) }
+    var selected by remember(templateId) { mutableStateOf<Slot?>(null) }
+    var trimming by remember(templateId) { mutableStateOf<Trimming?>(null) }
+    var trimStart by remember(templateId) { mutableIntStateOf(0) }
+    var asking by remember(templateId) { mutableIntStateOf(0) }
+    var frozen by remember(templateId) { mutableStateOf(false) }
+    var hints by remember(templateId) { mutableIntStateOf(settings.templateHints) }
+    var playing by remember(templateId) { mutableStateOf(false) }
+    var pos by remember(templateId) { mutableIntStateOf(0) }
+    var box by remember(templateId) { mutableStateOf(IntSize.Zero) }
+    val working = remember(template, slots, choices) { applied(template, slots, choices) }
     val clipScene = remember(trimming) { trimming?.let { clipScene(it.media, template.fps) } }
     val shown = clipScene ?: working
     val total = (if (trimming != null) shown.totalTime else template.totalTime).coerceAtLeast(1)
