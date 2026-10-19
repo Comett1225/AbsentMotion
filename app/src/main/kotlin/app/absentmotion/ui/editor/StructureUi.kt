@@ -135,7 +135,7 @@ private fun SelectionButton(icon: ImageVector, description: String, modifier: Mo
 
 @Composable
 internal fun ChoiceList(items: List<String>, onDismiss: () -> Unit, onPick: (Int) -> Unit) {
-    Popup(alignment = Alignment.BottomStart, onDismissRequest = onDismiss) {
+    Popup(ChoicePosition, onDismissRequest = onDismiss) {
         Column(
             Modifier.width(220.dp).heightIn(max = 280.dp).clip(ItemShape).background(Am.PanelInset).verticalScroll(rememberScrollState()),
         ) {
@@ -163,5 +163,16 @@ internal fun PasteStyleMenu(state: EditorState, onDismiss: () -> Unit) {
     val parts = StylePart.entries
     ChoiceList(parts.map { it.label } + "Paste Style", onDismiss) { i ->
         state.pasteStyle(if (i < parts.size) setOf(parts[i]) else parts.toSet())
+    }
+}
+
+internal object ChoicePosition : androidx.compose.ui.window.PopupPositionProvider {
+    override fun calculatePosition(anchorBounds: androidx.compose.ui.unit.IntRect, windowSize: androidx.compose.ui.unit.IntSize,
+                                   layoutDirection: androidx.compose.ui.unit.LayoutDirection, popupContentSize: androidx.compose.ui.unit.IntSize): androidx.compose.ui.unit.IntOffset {
+        val desired = if (layoutDirection == androidx.compose.ui.unit.LayoutDirection.Rtl) anchorBounds.right - popupContentSize.width else anchorBounds.left
+        return androidx.compose.ui.unit.IntOffset(
+            desired.coerceIn(0, (windowSize.width - popupContentSize.width).coerceAtLeast(0)),
+            (anchorBounds.bottom - popupContentSize.height).coerceIn(0, (windowSize.height - popupContentSize.height).coerceAtLeast(0)),
+        )
     }
 }
