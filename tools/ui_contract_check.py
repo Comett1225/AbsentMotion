@@ -47,6 +47,17 @@ class UiContracts(unittest.TestCase):
         self.assertIn('catch (_: Exception) { stop() }', text)
         self.assertIn('player?.release()', text)
 
+    def test_template_and_preset_files_change_off_the_main_thread(self):
+        tab = source('ui/home/TemplatesTab.kt')
+        self.assertIn('withContext(Dispatchers.IO) { templates.delete(t.id) }', tab)
+        self.assertIn('withContext(Dispatchers.IO) { presets.deleteAll() }', tab)
+        self.assertIn('withContext(Dispatchers.IO) { presets.delete(p.id) }', tab)
+        self.assertIn('runCatching { if (template) templates.rename(id, name) else presets.rename(id, name) }', tab)
+        presets = source('ui/editor/PresetScreen.kt')
+        self.assertIn('produceState<List<SavedPreset>?>(null, rev) { value = withContext(Dispatchers.IO) { store.list() } }', presets)
+        self.assertIn('withContext(Dispatchers.IO) { store.delete(preset.id) }', presets)
+        self.assertEqual(2, presets.count('withContext(Dispatchers.IO) { runCatching { store.rename(preset.id, title) }'))
+
     def test_playback_clock_restarts_when_preset_changes(self):
         text = source('ui/editor/PresetScreen.kt')
         self.assertIn('LaunchedEffect(playing, chosen, length)', text)

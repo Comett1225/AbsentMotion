@@ -101,7 +101,7 @@ fun TemplatesTab(projects: ProjectStore, version: Int, onTemplate: (String) -> U
                                 scope.launch { onProject(withContext(Dispatchers.IO) { templates.createProject(t.scene, projects) }) }
                             },
                             onRename = { menu = null; renaming = t.id to t.title },
-                            onDelete = { menu = null; confirm = "Delete this template?" to { templates.delete(t.id); rev++ } },
+                            onDelete = { menu = null; confirm = "Delete this template?" to { scope.launch { withContext(Dispatchers.IO) { templates.delete(t.id) }; rev++ } } },
                         )
                     }
                 }
@@ -111,7 +111,7 @@ fun TemplatesTab(projects: ProjectStore, version: Int, onTemplate: (String) -> U
                     if (savedPresets.isNotEmpty()) Row(Modifier.fillMaxWidth().height(48.dp).padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
                         Spacer(Modifier.weight(1f))
                         Text(
-                            "Delete all", Modifier.clickable { confirm = "Delete all presets?" to { presets.deleteAll(); rev++ } }.padding(vertical = 12.dp),
+                            "Delete all", Modifier.clickable { confirm = "Delete all presets?" to { scope.launch { withContext(Dispatchers.IO) { presets.deleteAll() }; rev++ } } }.padding(vertical = 12.dp),
                             color = Am.Navy, fontSize = 15.sp,
                         )
                     }
@@ -122,7 +122,7 @@ fun TemplatesTab(projects: ProjectStore, version: Int, onTemplate: (String) -> U
                                 Menu(
                                     menu == p.id, { menu = if (it) p.id else null },
                                     "Rename" to HomeIcons.Pencil to { menu = null; renaming = p.id to p.title },
-                                    "Delete" to HomeIcons.Delete to { menu = null; confirm = "Delete this preset?" to { presets.delete(p.id); rev++ } },
+                                    "Delete" to HomeIcons.Delete to { menu = null; confirm = "Delete this preset?" to { scope.launch { withContext(Dispatchers.IO) { presets.delete(p.id) }; rev++ } } },
                                 )
                             }
                         }
@@ -134,8 +134,12 @@ fun TemplatesTab(projects: ProjectStore, version: Int, onTemplate: (String) -> U
     renaming?.let { (id, title) ->
         RenameDialog(
             title, onDone = { name ->
-                if (sub == 0) templates.rename(id, name) else presets.rename(id, name)
-                rev++
+                val template = sub == 0
+                scope.launch {
+                    val renamed = withContext(Dispatchers.IO) { runCatching { if (template) templates.rename(id, name) else presets.rename(id, name) }.isSuccess }
+                    if (!renamed) app.absentmotion.platform.Toast.makeText(context, "Could not rename", app.absentmotion.platform.Toast.LENGTH_SHORT).show()
+                    rev++
+                }
                 renaming = null
             }, onDismiss = { renaming = null },
         )

@@ -35,7 +35,9 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
@@ -67,6 +69,9 @@ import app.absentmotion.library.PresetStore
 import app.absentmotion.library.SavedPreset
 import app.absentmotion.model.Scene
 import app.absentmotion.ui.theme.Am
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.math.min
 import kotlin.math.roundToInt
 
@@ -79,7 +84,10 @@ private val Chip get() = Am.OnDark
 fun PresetScreen(state: EditorState) {
     val context = LocalContext.current
     val store = remember { PresetStore(context) }
-    var presets by remember { mutableStateOf(store.list()) }
+    val scope = rememberCoroutineScope()
+    var rev by remember { mutableIntStateOf(0) }
+    val loaded by produceState<List<SavedPreset>?>(null, rev) { value = withContext(Dispatchers.IO) { store.list() } }
+    val presets = loaded.orEmpty()
     var chosen by remember { mutableStateOf<String?>(null) }
     var renaming by remember { mutableStateOf<SavedPreset?>(null) }
     var menuFor by remember { mutableStateOf<String?>(null) }
@@ -155,7 +163,7 @@ fun PresetScreen(state: EditorState) {
         ) { playing = false; pos = (it * length).roundToInt() }
         Spacer(Modifier.height(16.dp))
         LazyColumn(Modifier.padding(horizontal = 16.dp).fillMaxWidth().weight(1f)) {
-            if (presets.isEmpty()) item {
+            if (loaded?.isEmpty() == true) item {
                 Column(Modifier.fillMaxWidth().padding(top = 24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                     Text("No presets saved yet", color = Am.OnDark, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                     Text(
@@ -181,8 +189,7 @@ fun PresetScreen(state: EditorState) {
                             MenuRow("Rename") { menuFor = null; renaming = preset }
                             MenuRow("Delete") {
                                 menuFor = null
-                                store.delete(preset.id)
-                                presets = store.list()
+                                scope.launch { withContext(Dispatchers.IO) { store.delete(preset.id) }; rev++ }
                                 if (chosen == preset.id) { chosen = null; pos = pos.coerceAtMost((base.endTime - base.startTime).coerceAtLeast(1)) }
                                 Toast.makeText(context, "Preset deleted", Toast.LENGTH_SHORT).show()
                             }
@@ -193,7 +200,13 @@ fun PresetScreen(state: EditorState) {
         }
     }
     renaming?.let { preset ->
-        RenamePresetDialog(preset.title, onDone = { title -> store.rename(preset.id, title); presets = store.list(); renaming = null }, onDismiss = { renaming = null })
+        RenamePresetDialog(preset.title, onDone = { title ->
+            scope.launch {
+                if (!withContext(Dispatchers.IO) { runCatching { store.rename(preset.id, title) }.isSuccess }) Toast.makeText(context, "Could not rename the preset", Toast.LENGTH_SHORT).show()
+                rev++
+            }
+            renaming = null
+        }, onDismiss = { renaming = null })
     }
 }
 
@@ -259,8 +272,15 @@ internal fun RenamePresetDialog(title: String, onDone: (String) -> Unit, onDismi
 @Composable
 internal fun PresetSavedDialog(preset: SavedPreset, store: PresetStore, onDismiss: () -> Unit) {
     var renaming by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
     if (renaming) {
-        RenamePresetDialog(preset.title, onDone = { store.rename(preset.id, it); onDismiss() }, onDismiss = onDismiss)
+        RenamePresetDialog(preset.title, onDone = { title ->
+            scope.launch {
+                if (!withContext(Dispatchers.IO) { runCatching { store.rename(preset.id, title) }.isSuccess }) Toast.makeText(context, "Could not rename the preset", Toast.LENGTH_SHORT).show()
+                onDismiss()
+            }
+        }, onDismiss = onDismiss)
         return
     }
     AlertDialog(
