@@ -38,6 +38,11 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -146,7 +151,14 @@ fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromProjectList
     var progress by remember { mutableFloatStateOf(0f) }
     val hasAudio = ExportAudio.mixFor != null && scene.layers.any { it.kind == "audio" }
     val estimate = estimateBytes(kind, scene, settings.getValue(kind), hasAudio)
-    val free = remember(phase) { freeSpace() }
+    var free by remember { mutableLongStateOf(freeSpace()) }
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
+    DisposableEffect(lifecycle) {
+        val observer = LifecycleEventObserver { _, event -> if (event == Lifecycle.Event.ON_RESUME) free = freeSpace() }
+        lifecycle.addObserver(observer)
+        onDispose { lifecycle.removeObserver(observer) }
+    }
+    LaunchedEffect(phase) { free = freeSpace() }
 
     app.absentmotion.platform.ExportBars(dark = false, running = phase is Phase.Running)
     BackHandler {
@@ -173,6 +185,7 @@ fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromProjectList
                 return
             }
         }
+        free = freeSpace()
         if (estimate > free) {
             failure = Failure("Not Enough Storage", "Free up some storage on this device and export again.")
             return
