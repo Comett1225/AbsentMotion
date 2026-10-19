@@ -79,8 +79,7 @@ class MediaLibrary(context: Context, private val engine: EngineThread) {
                 Bitmap.createScaledBitmap(raw, (raw.width * scale).toInt().coerceAtLeast(1),
                     (raw.height * scale).toInt().coerceAtLeast(1), true).also { if (it !== raw) raw.recycle() }
             }
-            if (sized == null || !exifOrientation(exifTag(resolver, uri)).second) sized
-            else Bitmap.createBitmap(sized, 0, 0, sized.width, sized.height, Matrix().apply { setScale(-1f, 1f) }, false).also { if (it !== sized) sized.recycle() }
+            sized?.mirroredByExif(resolver, uri)
         }
     } catch (e: Exception) {
         Log.w("AMMedia", "cannot read $uri", e)
@@ -93,6 +92,10 @@ internal fun fileVersion(resolver: ContentResolver, uri: Uri): String? = try {
         Os.fstat(fd.fileDescriptor).run { "$st_dev:$st_ino:$st_size:${st_mtim.tv_sec}.${st_mtim.tv_nsec}" }
     }
 } catch (_: Exception) { null }
+
+internal fun Bitmap.mirroredByExif(resolver: ContentResolver, uri: Uri): Bitmap =
+    if (!exifOrientation(exifTag(resolver, uri)).second) this
+    else Bitmap.createBitmap(this, 0, 0, width, height, Matrix().apply { setScale(-1f, 1f) }, false).also { if (it !== this) recycle() }
 
 private fun exifTag(resolver: ContentResolver, uri: Uri): Int = runCatching {
     resolver.openInputStream(uri)?.use { ExifInterface(it).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL) }

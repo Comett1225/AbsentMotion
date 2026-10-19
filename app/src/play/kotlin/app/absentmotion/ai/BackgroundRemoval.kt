@@ -11,6 +11,7 @@ import com.google.mlkit.common.MlKitException
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.segmentation.subject.SubjectSegmentation
 import com.google.mlkit.vision.segmentation.subject.SubjectSegmenterOptions
+import app.absentmotion.media.mirroredByExif
 import app.absentmotion.model.MediaDeclaration
 import kotlinx.coroutines.ensureActive
 import kotlin.coroutines.coroutineContext
@@ -84,12 +85,13 @@ internal object BackgroundRemoval {
             inSampleSize = Integer.highestOneBit(ratio.toInt().coerceAtLeast(1))
         }
         val raw = checkNotNull(resolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, options) }) { "Cannot decode this image" }
-        if (maxOf(raw.width, raw.height) <= limit) return raw
+        if (maxOf(raw.width, raw.height) <= limit) return raw.mirroredByExif(resolver, uri)
         val scale = limit.toFloat() / maxOf(raw.width, raw.height)
-        return try {
+        val scaled = try {
             Bitmap.createScaledBitmap(raw, (raw.width * scale).toInt().coerceAtLeast(1),
                 (raw.height * scale).toInt().coerceAtLeast(1), true)
         } finally { raw.recycle() }
+        return scaled.mirroredByExif(resolver, uri)
     }
 }
 
