@@ -63,15 +63,7 @@ class AudioEngine(context: Context) {
 
     fun frameShown(frame: Int, ms: Int) { shownFrame = frame; shownMs = ms }
 
-    fun positionMs(): Double? {
-        val s = session ?: return null
-        val now = s.stoppedAt.takeIf { it != 0L } ?: System.nanoTime()
-        val clock = s.clock
-        if (clock != null) return s.startMs + (clock.frames + (now - clock.nanos) * s.rate / 1e9).coerceAtLeast(0.0) * 1000.0 / s.rate
-        val began = s.wallStart
-        if (began > 0 && (s.failed || now - began > 1_500_000_000L)) return s.startMs + (now - began) / 1e6
-        return null
-    }
+    fun positionMs(): Double? = session?.clock?.positionMs()
 
     fun release() {
         releasing = true
@@ -94,19 +86,12 @@ class AudioEngine(context: Context) {
 
     private inner class Session(val startMs: Double, private val previous: Session?) : Thread("am-audio-mixer") {
         @Volatile var stopRequested = false
-        @Volatile var stoppedAt = 0L
-        @Volatile var clock: Clock? = null
-        @Volatile var wallStart = 0L
-        @Volatile var failed = false
-        @Volatile var rate = 48_000
+        val rate = AudioTrack.getNativeOutputSampleRate(AudioManager.STREAM_MUSIC).takeIf { it > 0 } ?: 48_000
+        val clock = AudioClock(startMs, rate)
 
         fun halt() {
-            if (stoppedAt == 0L) stoppedAt = System.nanoTime()
+            clock.stop(System.nanoTime())
             stopRequested = true
-        }
-
-        init {
-            rate = AudioTrack.getNativeOutputSampleRate(AudioManager.STREAM_MUSIC).takeIf { it > 0 } ?: 48_000
         }
 
         override fun run() {
@@ -131,7 +116,7 @@ class AudioEngine(context: Context) {
                     written += BLOCK
                 }
                 track.play()
-                wallStart = System.nanoTime()
+                clock.wallStart = System.nanoTime()
                 val pending = ArrayDeque<Pair<Long, Double>>()
                 val stamp = AudioTimestamp()
                 while (!stopRequested) {
@@ -142,7 +127,7 @@ class AudioEngine(context: Context) {
                     if (log) pending.addLast(written to t0)
                     written += BLOCK
                     if (track.getTimestamp(stamp) && stamp.framePosition >= 0) {
-                        clock = Clock(stamp.framePosition, stamp.nanoTime)
+                        clock.stamp(stamp.framePosition, stamp.nanoTime)
                         while (pending.isNotEmpty() && pending.first().first <= stamp.framePosition) {
                             val (frame, ms) = pending.removeFirst()
                             val plays = stamp.nanoTime + (frame - stamp.framePosition) * 1_000_000_000L / rate
@@ -156,8 +141,8 @@ class AudioEngine(context: Context) {
                 track.flush()
             } catch (e: Exception) {
                 Log.w("AMAudio", "Audio stream failed", e)
-                failed = true
-                if (wallStart == 0L) wallStart = System.nanoTime()
+                clock.failed = true
+                if (clock.wallStart == 0L) clock.wallStart = System.nanoTime()
                 while (!stopRequested) Thread.sleep(20)
             } finally {
                 runCatching { track?.release() }
@@ -231,12 +216,35 @@ class AudioEngine(context: Context) {
         }
     }
 
-    private class Clock(val frames: Long, val nanos: Long)
-
     private companion object {
         const val BLOCK = 1024
         const val AHEAD_MS = 1500.0
         const val BEHIND_MS = 300.0
         const val IDLE_MS = 8000L
+    }
+}
+
+internal class AudioClock(private val startMs: Double, private val rate: Int) {
+    private class Stamp(val frames: Long, val nanos: Long)
+    @Volatile private var stamp: Stamp? = null
+    @Volatile private var stoppedAt = 0L
+    @Volatile private var reached = startMs
+    @Volatile var wallStart = 0L
+    @Volatile var failed = false
+
+    fun stamp(frames: Long, nanos: Long) { stamp = Stamp(frames, nanos) }
+
+    fun stop(now: Long) { if (stoppedAt == 0L) stoppedAt = now }
+
+    fun positionMs(now: Long = System.nanoTime()): Double? {
+        val at = stoppedAt.takeIf { it != 0L } ?: now
+        val s = stamp
+        val began = wallStart
+        val ms = when {
+            s != null -> startMs + (s.frames + (at - s.nanos) * rate / 1e9).coerceAtLeast(0.0) * 1000.0 / rate
+            began > 0 && (failed || at - began > 1_500_000_000L) -> startMs + (at - began) / 1e6
+            else -> return null
+        }
+        return maxOf(ms, reached).also { reached = it }
     }
 }
