@@ -107,7 +107,6 @@ struct Layer {
     std::string kind;
     std::string label, shape, fillType;
     std::string mediaUri, mediaFillMode;
-    bool mediaMissing = false;
     int startTime = 0, endTime = 0;
     bool hidden = false;
     Anim location, pivot, scale, rotation, skew, opacity, fillColor;

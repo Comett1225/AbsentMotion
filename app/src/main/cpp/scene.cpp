@@ -318,21 +318,14 @@ bool ParseScene(const std::string& xml, Scene* scene, std::string* error) {
         if (error) *error = "scene has no size";
         return false;
     }
-    std::set<std::string> missing;
     for (const auto& n : root->children) {
         if (n->name == "media") {
             next.mediaOrientation[StrAttr(*n, "uri")] = IntAttr(*n, "orientation", 0);
-            if (StrAttr(*n, "missing") == "true") missing.insert(StrAttr(*n, "uri"));
             continue;
         }
         Layer l;
         if (ParseLayer(*n, next.fps, &l)) next.layers.push_back(std::move(l));
     }
-    const std::function<void(Layer&)> mark = [&](Layer& l) {
-        l.mediaMissing = missing.count(l.mediaUri) > 0;
-        for (Layer& child : l.children) mark(child);
-    };
-    for (Layer& l : next.layers) mark(l);
     *scene = std::move(next);
     return true;
 }
@@ -403,24 +396,9 @@ SkMatrix LayerMatrix(const Layer& l, float t) {
 void DrawMedia(SkCanvas* canvas, const Layer& layer, const SkPath& path, float opacity,
                const MediaPictures& pictures) {
     auto image = pictures(layer.mediaUri, layer.id);
-    if (!image && !layer.mediaMissing) return;
+    if (!image) return;
     const SkRect bounds = path.getBounds();
     if (bounds.isEmpty()) return;
-    if (!image) {
-        const float cell = std::max(bounds.width(), bounds.height()) / 16;
-        SkPaint paint;
-        canvas->save();
-        canvas->clipPath(path, true);
-        for (int y = 0; y * cell < bounds.height(); y++) {
-            for (int x = 0; x * cell < bounds.width(); x++) {
-                paint.setColor((x + y) % 2 ? 0xFF8A8A8A : 0xFF6E6E6E);
-                paint.setAlphaf(std::clamp(opacity, 0.0f, 1.0f));
-                canvas->drawRect(SkRect::MakeXYWH(bounds.left() + x * cell, bounds.top() + y * cell, cell, cell), paint);
-            }
-        }
-        canvas->restore();
-        return;
-    }
     SkRect dst = bounds;
     if (layer.mediaFillMode != "stretch") {
         const float sx = bounds.width() / image->width(), sy = bounds.height() / image->height();

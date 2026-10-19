@@ -27,6 +27,7 @@ value class Scene(val node: XmlNode) {
     val media: List<MediaDeclaration> get() = node.children.filter { it.name == "media" }.map(::MediaDeclaration)
 
     fun media(uri: String): MediaDeclaration? = media.firstOrNull { it.uri == uri }
+    fun isMissing(uri: String): Boolean = media(uri)?.node?.get("missing") == "true"
 
     val bookmarks: List<Int> get() = node.children.filter { it.name == "bookmark" }.mapNotNull { it["t"]?.toIntOrNull() }.sorted()
 

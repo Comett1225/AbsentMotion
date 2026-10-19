@@ -418,6 +418,9 @@
    "reverse": {
     "to": "reverse"
    },
+   "scaleBrightness": {
+    "to": "scaleBrightness"
+   },
    "saturation": {
     "neutral": 1
    },

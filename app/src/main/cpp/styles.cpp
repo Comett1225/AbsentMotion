@@ -453,7 +453,7 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
 void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& l, double timeMs,
              const MediaPictures& pictures, const Override& ov) {
     if (!l.activeAt(timeMs) || l.kind == "nullobj" || l.kind == "camera") return;
-    if (l.fillType == "media" && !l.mediaMissing && !pictures(l.mediaUri, l.id)) return;
+    if (l.fillType == "media" && !pictures(l.mediaUri, l.id)) return;
     const float t = l.localTime(timeMs);
     const float opacity = ov.unitOpacity ? 1.0f : std::clamp(l.opacity.get(0, t, 1), 0.0f, 1.0f);
     const bool group = l.kind == "embedScene";

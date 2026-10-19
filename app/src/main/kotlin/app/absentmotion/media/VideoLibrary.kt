@@ -76,7 +76,7 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
     }
 
     private fun visible(request: Request) = request.scene.layerTracks().mapNotNull { track ->
-        if (track.layer.mediaFill?.video != true) null else track.timeAt(request.timeMs.toDouble(), true)?.let { Sample(track, it.ms) }
+        if (track.layer.mediaFill?.video != true || request.scene.isMissing(track.layer.mediaFill!!.uri)) null else track.timeAt(request.timeMs.toDouble(), true)?.let { Sample(track, it.ms) }
     }
 
     private suspend fun reconcile(request: Request) {

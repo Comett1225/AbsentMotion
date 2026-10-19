@@ -255,6 +255,7 @@ class EffectMigrationTest {
         assertEquals("true", own("threshold").prop("invert")["value"])
         close(0.4f, own("threshold").number("level"))
         assertEquals("true", own("gradientmap").prop("reverse")["value"])
+        assertEquals("false", own("gradientmap").prop("scaleBrightness")["value"])
         assertEquals("#ff0000ff", own("gradientmap").prop("color1")["value"])
         close(3f, own("blink").number("frequency"))
         close(expected("solid", "blendMode", 1f), own("solid").number("blend"))
@@ -264,7 +265,7 @@ class EffectMigrationTest {
 
     @Test fun droppedSettingsAreReportedUnlessTheyHoldTheirNeutralValue() {
         val dropped = migration.migrate(Scene.parse(scene)).dropped
-        assertTrue(dropped.toString(), dropped.any { it.endsWith(": scaleBrightness") })
+        assertFalse(dropped.toString(), dropped.any { it.endsWith(": scaleBrightness") })
         assertTrue(dropped.toString(), dropped.any { it.endsWith(": mystery") })
         assertFalse(dropped.toString(), dropped.any { it.endsWith(": blendMode") || it.endsWith(": squeeze") || it.endsWith(": halo") })
         assertFalse(dropped.toString(), dropped.any { it.contains("(3)") })

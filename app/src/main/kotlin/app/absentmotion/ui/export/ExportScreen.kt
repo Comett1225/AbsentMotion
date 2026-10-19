@@ -130,7 +130,7 @@ private sealed interface Phase {
     class Done(val kind: ExportKind, val result: ExportResult) : Phase
 }
 
-private class Failure(val title: String, val text: String)
+private class Failure(val title: String, val text: String, val proceed: (() -> Unit)? = null)
 
 @Composable
 fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromProjectList: Boolean, onClose: () -> Unit) {
@@ -180,19 +180,19 @@ fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromProjectList
         }
     }
 
-    fun start() {
+    fun start(ignoreMissing: Boolean = false) {
         val s = settings.getValue(kind)
         if (scene.layers.isEmpty() && kind != ExportKind.Xml && kind != ExportKind.Package) {
             failure = Failure("Export Failed", "There is nothing to export yet. Add a layer or some media, then try again.")
             return
         }
-        if (kind != ExportKind.Xml) {
+        if (kind != ExportKind.Xml && !ignoreMissing) {
             val missing = scene.node.mediaUris().filter { uri ->
                 try { context.contentResolver.openAssetFileDescriptor(app.absentmotion.platform.Uri.parse(uri), "r")?.close() == null } catch (e: Exception) { true }
             }.map { scene.media(it)?.filename?.ifEmpty { null } ?: it }
             if (missing.isNotEmpty()) {
                 failure = Failure("Media Missing", "This project uses files that are not on this device:\n" + missing.joinToString("\n") +
-                    "\n\nExport or share the project as a package (with media) instead of XML.")
+                    "\n\nThe layers that use them are left out if you export anyway.") { start(true) }
                 return
             }
         }
@@ -313,7 +313,8 @@ fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromProjectList
             onDismissRequest = { failure = null },
             title = { Text(f.title, color = Navy) },
             text = { Text(f.text, color = Navy) },
-            confirmButton = { TextButton({ failure = null }) { Text("OK", color = Navy) } },
+            confirmButton = { TextButton({ failure = null; f.proceed?.invoke() }) { Text(if (f.proceed == null) "OK" else "Export Anyway", color = Navy) } },
+            dismissButton = f.proceed?.let { { TextButton({ failure = null }) { Text("Cancel", color = Navy) } } },
             containerColor = Am.Card,
         )
     }
