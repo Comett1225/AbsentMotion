@@ -174,6 +174,21 @@ fun Scene.splitAt(layer: Layer, frame: Int, newId: Long): Pair<Layer, Layer>? {
     return layer.trimmedTo(layer.startTime, cut - 1) to layer.withId(newId).trimmedTo(cut, layer.endTime)
 }
 
+fun Layer.retimedVideo(start: Int, end: Int): Layer {
+    val timing = VideoTiming(this)
+    val length = endTime - startTime
+    val span = timing.mediaMs(length.toDouble()) - timing.mediaMs(0.0)
+    val speed = (span / (end - start)).toFloat().coerceAtLeast(0.001f)
+    val k = length.toFloat() / (end - start)
+    val map = node.child("speedMap")
+    var n = node.with("startTime", "$start").with("endTime", "$end")
+    n = if (map?.isKeyframed == true) n.withChild("speedMap", map.withKeyframes(map.keyframes.map { key ->
+        key.v.toFloatOrNull()?.let { key.copy(v = (it * k).coerceAtLeast(0.001f).toString()) } ?: key
+    })).with("speed", null)
+        else n.withChild("speedMap", null).with("speed", speed.toString())
+    return copy(node = n)
+}
+
 fun Layer.withVideoSpeedMap(map: XmlNode): Layer {
     val old = VideoTiming(this)
     var changed = copy(node = node.withChild("speedMap", map).with("speed", null))

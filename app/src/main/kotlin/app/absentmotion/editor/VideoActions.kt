@@ -31,17 +31,7 @@ fun EditorState.retimeVideo(start: Boolean) {
     val newEnd = if (start) layer.endTime else scene.frameEnd(frame)
     val duration = newEnd - newStart
     if (duration < 1 || !scene.showsAnyFrame(newStart, newEnd)) return
-    val timing = VideoTiming(layer)
-    val span = timing.mediaMs((layer.endTime - layer.startTime).toDouble()) - timing.mediaMs(0.0)
-    val speed = (span / duration).toFloat().coerceAtLeast(0.001f)
-    val map = layer.node.child("speedMap")
-    val adjusted = if (map?.isKeyframed == true) map.withKeyframes(map.keyframes.map { it.copy(v = speed.toString()) })
-        else null
-    edit { it.update(layer.id) { current ->
-        var n = current.node.with("startTime", "$newStart").with("endTime", "$newEnd")
-        n = if (adjusted == null) n.withChild("speedMap", null).with("speed", speed.toString()) else n.withChild("speedMap", adjusted).with("speed", null)
-        current.copy(node = n)
-    } }
+    edit { it.update(layer.id) { current -> current.retimedVideo(newStart, newEnd) } }
 }
 
 fun EditorState.setVideoSpeed(value: Float, mediaTimeNs: Float, original: Layer) {
