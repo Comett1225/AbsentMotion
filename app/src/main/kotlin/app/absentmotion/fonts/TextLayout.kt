@@ -1,5 +1,6 @@
 package app.absentmotion.fonts
 
+import android.graphics.text.LineBreaker
 import android.text.Layout
 import android.text.StaticLayout
 import android.text.TextPaint
@@ -30,7 +31,7 @@ private fun FontLibrary.prepareText(scene: XmlNode, fps: Int, timeMs: Int): XmlN
             else -> Layout.Alignment.ALIGN_NORMAL
         }
         val layout = StaticLayout.Builder.obtain(layer.content, 0, layer.content.length, paint, layer.wrapWidth.coerceAtLeast(1))
-            .setAlignment(alignment).setIncludePad(true).setBreakStrategy(Layout.BREAK_STRATEGY_SIMPLE)
+            .setAlignment(alignment).setIncludePad(true).setBreakStrategy(LineBreaker.BREAK_STRATEGY_SIMPLE)
             .setHyphenationFrequency(Layout.HYPHENATION_FREQUENCY_NONE)
             .setLineSpacing(0f, layer.textSpacing("linespacing", 1f)).build()
         val lines = List(layout.lineCount) { index ->

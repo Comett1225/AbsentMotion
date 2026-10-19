@@ -164,7 +164,7 @@ internal fun loadCaptionLibrary() = System.loadLibrary("whisper_jni")
 internal fun captionTextHeight(fonts: app.absentmotion.fonts.FontLibrary, text: String, font: String, size: Float, wrap: Int): Float {
     val paint = android.text.TextPaint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply { textSize = size * 3f; typeface = fonts.typeface(font) }
     return android.text.StaticLayout.Builder.obtain(text, 0, text.length, paint, wrap).setAlignment(android.text.Layout.Alignment.ALIGN_CENTER)
-        .setIncludePad(true).setBreakStrategy(android.text.Layout.BREAK_STRATEGY_SIMPLE).build().height.toFloat()
+        .setIncludePad(true).setBreakStrategy(android.graphics.text.LineBreaker.BREAK_STRATEGY_SIMPLE).build().height.toFloat()
 }
 internal fun fontPreviewStyle() = androidx.compose.ui.text.PlatformTextStyle(includeFontPadding = false)
 

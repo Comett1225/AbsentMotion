@@ -82,8 +82,10 @@ private fun resetBorderShadow() {
 
 @Composable
 internal fun BorderShadowLifetime(owner: Any, layerId: Long, panel: app.absentmotion.editor.EditorPanel) {
-    androidx.compose.runtime.remember(owner, layerId, panel) { resetBorderShadow() }
-    DisposableEffect(owner, layerId, panel) { onDispose { resetBorderShadow() } }
+    DisposableEffect(owner, layerId, panel) {
+        resetBorderShadow()
+        onDispose { resetBorderShadow() }
+    }
 }
 
 private val StrokeSize = child("path-stroke/size")

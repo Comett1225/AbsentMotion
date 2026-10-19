@@ -126,7 +126,7 @@ class Importer(
     }
 
     private fun add(text: String, copies: (String, XmlNode) -> Map<String, String>): ImportReport {
-        val root = try { XmlNode.parse(text.removePrefix("﻿")) } catch (e: Exception) { throw ImportFailed("Malformed XML: ${e.message}") }
+        val root = try { XmlNode.parse(text.removePrefix("\uFEFF")) } catch (e: Exception) { throw ImportFailed("Malformed XML: ${e.message}") }
         val width = root["width"]?.toIntOrNull() ?: 0
         val height = root["height"]?.toIntOrNull() ?: 0
         if (root.name != "scene" || width <= 0 || height <= 0) throw ImportFailed("Malformed Scene: expected a <scene> with a size")
