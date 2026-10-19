@@ -115,13 +115,16 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
         scope.cancel()
     }
 
-    private companion object { const val MAX_LEAD_MS = 100.0 }
+    private companion object {
+        const val MAX_LEAD_MS = 100.0
+        const val RETRY_NS = 1_000_000_000L
+    }
 
     private inner class Session(val id: Long, val uri: String) {
         private val decoderLock = Mutex()
         private val queue = Channel<Pair<Request, Layer>>(Channel.CONFLATED)
         private var decoder: VideoDecoder? = null
-        private var failed = false
+        private var retryAt = 0L
         @Volatile private var stopped = false
         private var publishedPts: Long? = null
         private var publishedMix: Triple<Long, Long, Float>? = null
@@ -134,8 +137,7 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
                     catch (e: CancellationException) { throw e }
                     catch (e: Exception) {
                         Log.w("AMVideo", "Cannot decode $uri layer $id", e)
-                        decoderLock.withLock { decoder?.close(); decoder = null; failed = true }
-                        engine.setPicture(uri, null, id)
+                        decoderLock.withLock { decoder?.close(); decoder = null; retryAt = System.nanoTime() + RETRY_NS }
                     }
                 }
             } finally {
@@ -154,10 +156,11 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
         }
 
         private suspend fun decode(request: Request, layer: Layer, exact: Boolean) = decoderLock.withLock {
-            if (stopped || failed) {
+            if (stopped) {
                 check(!exact) { "Video is unavailable: $uri" }
                 return@withLock
             }
+            if (!exact && System.nanoTime() < retryAt) return@withLock
             fun obsolete(): Boolean = !exact && latest.let { now ->
                 paused || stopped || ((!request.playing || now?.playing != true) && now !== request) ||
                     now.scene != request.scene || now.scene.layer(id)?.activeAt(now.timeMs) != true
