@@ -1,15 +1,4 @@
 #!/usr/bin/env python3
-"""Draws the AbsentMotion mark and writes every icon file from it. Pure geometry, no third-party artwork.
-
-Run from the project root:  python3 tools/icon/make_icon.py
-Writes:  tools/icon/mark.svg                                      the mark on its background (source of truth, 108 unit grid)
-         app/src/main/res/drawable/ic_launcher_foreground.xml     the Android adaptive-icon foreground (the mark only)
-         app/src/main/res/drawable/ic_launcher_background.xml     the Android adaptive-icon background (flat colour)
-
-The mark: a ring whose motion is partly absent. A long arc leads (the head, top right), behind it the ring
-breaks into shorter and shorter dashes and fades out to a dot, and the quarter ahead of the head is empty.
-A solid core sits in the middle. Everything stays inside the Android safe zone (a circle of 33 units about the centre).
-"""
 import math, os, sys
 
 BG = "#FF5A36"
@@ -26,7 +15,6 @@ def polar(a, r=R):
     return C + r * math.cos(math.radians(a)), C + r * math.sin(math.radians(a))
 
 def dashes():
-    """[(start_angle, end_angle)] clockwise, head first."""
     out, end = [], HEAD
     for length in DASHES:
         out.append((end - length, end))
@@ -42,7 +30,6 @@ def arc_path(a0, a1):
     return "M%s,%s A%s,%s 0 %d 1 %s,%s" % (f(x0), f(y0), f(R), f(R), large, f(x1), f(y1))
 
 def shapes():
-    """The mark as ('arc', pathData) / ('dot', cx, cy, r) items."""
     items = []
     for a0, a1 in dashes():
         if a1 - a0 < 0.01:

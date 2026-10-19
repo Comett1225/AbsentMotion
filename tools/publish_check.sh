@@ -1,5 +1,6 @@
 #!/bin/sh
 set -u
+caller_dir=$PWD
 cd "$(dirname "$0")/.."
 words=tools/publish_forbidden.txt
 tmp=$(mktemp -d); trap 'rm -rf "$tmp"' EXIT
@@ -39,14 +40,7 @@ grep -E '\.(kt|kts|java|cpp|h|mm|gradle)$' "$tmp/files" | while read -r f; do
 done
 grep -E '\.py$' "$tmp/files" | while read -r f; do
     [ -f "$f" ] || continue
-    c=$(python3 - "$f" <<'PY'
-import sys, tokenize
-for t in tokenize.generate_tokens(open(sys.argv[1], encoding="utf-8").readline):
-    if t.type == tokenize.COMMENT and not (t.start[0] <= 2 and (t.string.startswith("#!") or "coding" in t.string)):
-        print("%d:%s" % (t.start[0], t.string[:60]))
-        break
-PY
-)
+    c=$(python3 tools/source_policy.py "$f") || problem "cannot inspect Python source: $f"
     [ -n "$c" ] && problem "comment in $f: $c"
 done
 grep -E '\.(sh|gn|pro|toml)$|CMakeLists\.txt$' "$tmp/files" | while read -r f; do
@@ -68,9 +62,13 @@ EOL
 fi
 
 while [ $# -gt 0 ]; do
-    if [ "$1" = "--apk" ] && [ -f "${2:-}" ]; then
+    if [ "$1" = "--apk" ] && [ $# -ge 2 ]; then
+        case "$2" in
+            /*) apk=$2 ;;
+            *) apk=$caller_dir/$2 ;;
+        esac
+        [ -f "$apk" ] || { echo "publish_check: APK not found: $2" >&2; exit 2; }
         echo "-- inside $2"
-        apk="$(cd "$(dirname "$2")" && pwd)/$(basename "$2")"
         rm -rf "$tmp/apk"; mkdir -p "$tmp/apk"
         (cd "$tmp/apk" && unzip -q -o "$apk") || problem "cannot unpack $2"
         (cd "$tmp/apk" && find . -type f | sed 's|^\./||') > "$tmp/apkfiles"

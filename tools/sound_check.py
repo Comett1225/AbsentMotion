@@ -1,17 +1,4 @@
 #!/usr/bin/env python3
-"""Checks the sound without ears, on the test tone (testdata/media/test-audio.m4a: 440 Hz, loud for 50 ms at
-every whole second).
-
-  tools/sound_check.py file <audio or video file> [beep spacing in seconds, default 1]
-        analyses a file (an export pulled from the phone)
-  tools/sound_check.py export <scene.xml> [spacing]
-        exports the scene as video on the phone (debug intent), pulls it and analyses its sound
-  tools/sound_check.py play <scene.xml> <seconds> [spacing]
-        plays the scene in the editor while scrcpy records what the phone plays, then analyses the recording
-
-Reports: the tone's frequency, how many beeps and the spacing between them (drift, lost or repeated sound), and
-dropouts (stretches where the steady tone between the first and last beep goes quiet).
-"""
 import os, signal, subprocess, sys, time
 import numpy as np
 

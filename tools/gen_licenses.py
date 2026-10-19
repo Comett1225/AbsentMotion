@@ -1,18 +1,4 @@
 #!/usr/bin/env python3
-"""Writes app/src/main/assets/licenses.txt, the text of the app's "Open source licences" page.
-
-  tools/gen_licenses.py            rewrite the asset
-  tools/gen_licenses.py --check    exit 1 (and change nothing) if the asset is out of date
-
-It joins four repository files into one plain-text file that both apps ship (Android: assets, Mac: classpath resource):
-LICENSE and NOTICE as they are, then THIRD_PARTY_NOTICES.md and docs/ICON_SOURCES.md turned from Markdown into plain text.
-Headings become capitals and are underlined with dashes ("=" for the four parts), `code`, **bold** and links lose their
-markup, a wrapped paragraph or list item becomes one line, tables become lines "- Name (source) - licence - where used"
-(URLs and notes are left out; they stay in the .md file), and everything inside a code fence (the licence texts) is copied
-unchanged, line by line. No timestamp, so the same sources always give the same file.
-Run it again whenever one of the four source files changes, and keep the result with them: --check is for scripts.
-Needs only the Python standard library (3.9 or newer).
-"""
 import argparse, re, sys
 from pathlib import Path
 
@@ -35,14 +21,12 @@ NUMBERED = re.compile(r"^(\s*)(\d+[.)])\s+(.*)$")
 LIST_LINE = re.compile(r"^(- |\d+[.)] )")
 
 def inline(s):
-    """Plain text for a line of Markdown prose: no links, bold, code spans or <br>."""
     s = re.sub(r"\[([^\]]+)\]\(([^)]+)\)", lambda m: m.group(1) if m.group(1) == m.group(2) else "%s (%s)" % (m.group(1), m.group(2)), s)
     s = s.replace("<br>", ", ").replace("\\|", "|")
     s = re.sub(r"\*\*(.+?)\*\*", r"\1", s)
     return s.replace("`", "")
 
 def heading(level, text):
-    """The heading's two lines: the text (in capitals for levels 1 and 2) and its underline, '=' for level 1, else '-'."""
     text = inline(text)
     if level <= 2:
         text = text.upper()
@@ -52,7 +36,6 @@ def cells(row):
     return [c.strip() for c in row.strip().strip("|").split("|")]
 
 def table_lines(rows):
-    """A Markdown table (header, separator, rows) as lines 'Name (source) - licence - where used'; a table without such columns, every cell."""
     header = [h.lower() for h in cells(rows[0])]
     out = []
     for row in rows[2:]:
@@ -66,7 +49,6 @@ def table_lines(rows):
     return out
 
 def markdown_to_text(md, skip_h1=False):
-    """The lines of a Markdown document as plain text (rules in the module comment). Ends without a blank line."""
     out = []
     para = []
     item = []

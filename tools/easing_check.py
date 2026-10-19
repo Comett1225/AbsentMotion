@@ -1,17 +1,4 @@
 #!/usr/bin/env python3
-"""Checks the engine's easing curves against numbers measured from the project files' easing behaviour, on the Mac.
-
-  tools/easing_check.py [preset ...]
-  tools/easing_check.py --probe [name ...]     the curves in testdata/behaviour/easing/probe (default: all)
-
-Builds app/src/main/cpp/easing.cpp with the host compiler and compares Ease() with
-testdata/behaviour/easing/samples.json ({"preset": [[progress, eased], ...]}),
-using each preset's easing string from testdata/behaviour/easing/strings.json. The measurements show values to
-two decimals of a 0..10000 travel, so a curve matches when its largest error is about 1e-6;
-anything above 2e-5 fails. Probe curves are read off screenshots, good to about 5e-5; they fail
-above 5e-4 (a sixth of a pixel of the probe's 300 px travel), counted from the curve's range over
-p -+ 1e-4, because on a steep part or at a jump a hair of p is a lot of value.
-"""
 import json, os, subprocess, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

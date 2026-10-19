@@ -1,13 +1,4 @@
 #!/usr/bin/env python3
-"""Writes the sample scenes in testdata/scenes/ (the project's own test projects, in the scene format). Nothing here is read from another app: the layers are made up, the shapes come from
-app/src/main/assets/shapes.xml, the media are the files in testdata/media.
-
-  tools/gen_testscenes.py          rewrite testdata/scenes/*.xml
-  tools/gen_testscenes.py --check  exit 1 when a file on disk differs from what the script writes
-
-The tests (app/src/test, desktop/src/test), desktop/self-check.sh and testdata/golden/README.md read these files.
-Media uris are paths relative to the project root (testdata/media/...): run the Mac renderer from the project root.
-"""
 import colorsys
 import os
 import sys
@@ -55,7 +46,6 @@ def fstart(fps, frame):
     return frame * 1000 // fps
 
 def fend(fps, frame):
-    """The last millisecond of [frame] (a layer's endTime)."""
     return fstart(fps, frame + 1) - 1
 
 def rgb(h, s=0.7, v=0.95, a=255):
@@ -66,7 +56,6 @@ def val(tag, v, /, **attrs):
     return N(tag, {**attrs, "value": v})
 
 def keys(tag, frames, /, **attrs):
-    """Keyframes: [(t, value, easing or None), ...]; t is a fraction of the layer's length."""
     return N(tag, attrs, [N("kf", {"t": "%.6f" % t, "v": v, **({"e": e} if e else {})}) for t, v, e in frames])
 
 def anim(tag, v, /, **attrs):
@@ -116,7 +105,6 @@ def gradient(kind, c0, c1, start="0.000000,0.500000", end="1.000000,0.500000"):
     return N("gradient", {"type": kind, "startColor": c0, "endColor": c1, "start": start, "end": end})
 
 def group_scene(w, h, fps, total, kids, **extra):
-    """The nested scene of a group: as big as the project, transparent."""
     attrs = {"title": "", "width": w, "height": h, "exportWidth": w, "exportHeight": h, "bgcolor": "#00000000", "totalTime": total, "fps": fps}
     attrs.update(extra)
     return N("scene", attrs, kids)
