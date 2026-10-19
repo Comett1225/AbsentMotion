@@ -138,6 +138,17 @@ def render(work, name, xml, frame):
     return Image.open(work / f"{name}.png").convert("RGBA").resize((THUMB, THUMB), Image.LANCZOS)
 
 
+def grid(images):
+    if len(images) == 1:
+        return images[0]
+    side = THUMB // 2
+    out = Image.new("RGBA", (THUMB, THUMB))
+    for i, image in enumerate(images):
+        cell = Image.alpha_composite(Image.new("RGBA", image.size, (0, 0, 0, 255)), image).resize((side - 4, side - 4), Image.LANCZOS)
+        out.paste(cell, (i % 2 * side + 2, i // 2 * side + 2))
+    return out
+
+
 def grain(image, amount):
     rng = random.Random(1)
     noise = Image.new("L", (RENDER, RENDER))
@@ -193,15 +204,16 @@ def main():
                 before(made[show["photo"]], show["split"]).save(opts.work / f"{name}.png")
                 push(opts.work / f"{name}.png", f"{name}.png")
                 pushed.add(name)
-        frame = show.get("frame", 0)
-        base = (show["photo"], show.get("under"), show.get("split"), frame)
+        frames = show.get("frames", [show.get("frame", 0)])
+        base = (show["photo"], show.get("under"), show.get("split"), tuple(frames))
         if show.get("local") == "grain":
             plain.setdefault(base, made[show["photo"]].convert("RGBA").resize((THUMB, THUMB), Image.LANCZOS))
             image = grain(made[show["photo"]], show["params"]["amount"])
         else:
             if base not in plain:
-                plain[base] = render(opts.work, f"plain{len(plain)}", scene(show, None), frame)
-            image = render(opts.work, key, scene(show, json.loads((PACK / f"{key}.json").read_text())), frame)
+                plain[base] = grid([render(opts.work, f"plain{len(plain)}-{f}", scene(show, None), f) for f in frames])
+            effect = json.loads((PACK / f"{key}.json").read_text())
+            image = grid([render(opts.work, f"{key}-{f}", scene(show, effect), f) for f in frames])
         diff = change(image, plain[base])
         thumbs.append((key, image, diff))
         print(f"{key:20} {show['photo']:12} {diff:6.1f}{'   <- hardly visible' if diff < SAME else ''}", flush=True)
