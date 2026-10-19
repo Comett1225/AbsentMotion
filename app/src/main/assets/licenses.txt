@@ -244,7 +244,7 @@ Contents
 2. Speech model downloaded at run time: OpenAI Whisper weights
 3. Kotlin and Compose libraries
 4. Google Play services (proprietary)
-5. Fonts and icons
+5. Fonts, icons and effect thumbnails
 6. Appendix: licence texts
 
 1. ENGINE LIBRARIES
@@ -470,8 +470,8 @@ JUnit 4.13.2 (Eclipse Public License 1.0), kXML 2 2.3.0 (net.sf.kxml:kxml2, a "B
 - Used in: the Android app. Intended to be confined to a Google Play build flavour, with a flavour without them for distribution channels that accept only free software.
 - The free Android build (the foss flavour) includes neither library; only the play build does.
 
-5. FONTS AND ICONS
-------------------
+5. FONTS, ICONS AND EFFECT THUMBNAILS
+-------------------------------------
 
 Google Fonts
 ------------
@@ -482,6 +482,18 @@ Icons
 -----
 
 The icon sets used in the user interface, and their licences, are listed in docs/ICON_SOURCES.md.
+
+Effect thumbnail photos
+-----------------------
+
+The effect thumbnails (app/src/main/assets/effects/thumb/*.webp, 192 x 192 pixels) are rendered by tools/effect_thumbs.py from the six photographs below, all from Wikimedia Commons. Each author released the photograph under CC0 1.0, a public domain dedication (https://creativecommons.org/publicdomain/zero/1.0/), so no credit is required; they are listed for the record. The licence of each was checked on 2026-10-19 on the file's Commons page and in its metadata (License: cc0, Credit: own work); the script checks it again whenever it downloads a photograph. Only the small thumbnails ship; the photographs are not in the repository or the app. Which effect uses which photograph, the crop and the effect settings are in tools/effect_showcase.json. The green and black backgrounds of the Chroma Key and Luma Key thumbnails are drawn by the script.
+
+- "Fishmonger smiling" by Wilfredor, own work, CC0 1.0, https://commons.wikimedia.org/wiki/File:Fishmonger_smiling.jpg (the page records the subject's consent and carries a personality rights notice).
+- "Ruby Mountain refected in Diablo Lake" by Ron Clausen, own work, CC0 1.0, https://commons.wikimedia.org/wiki/File:Ruby_Mountain_refected_in_Diablo_Lake.jpg
+- "Speculum Feather from Pacific Black Duck" by Hallo3800, own work, CC0 1.0, https://commons.wikimedia.org/wiki/File:Speculum_Feather_from_Pacific_Black_Duck.jpg
+- "Sunset rolling waves" by Mingiki, own work, CC0 1.0, https://commons.wikimedia.org/wiki/File:Sunset_rolling_waves.jpg
+- "Ara ararauna portrait Rhodes" by Jebulon, own work, CC0 1.0, https://commons.wikimedia.org/wiki/File:Ara_ararauna_portrait_Rhodes.jpg
+- "Fleabane With Black Background" by Tfbybyhf, own work, CC0 1.0, https://commons.wikimedia.org/wiki/File:Fleabane_With_Black_Background.jpg
 
 6. APPENDIX: LICENCE TEXTS
 --------------------------
@@ -1822,6 +1834,7 @@ Every icon in AbsentMotion is either taken from an open icon set whose licence a
 - Lucide (https://lucide.dev, https://github.com/lucide-icons/lucide), ISC licence, version 1.59.0 (SVG files at https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/<name>.svg, pages at https://lucide.dev/icons/<name>). Lucide's licence file marks a few icons as derived from Feather (https://github.com/feathericons/feather); those are also under the MIT licence below, so both notices apply to them. The Licence column says "ISC and MIT (Feather)" for those.
 - Material Symbols (https://github.com/google/material-design-icons, Apache-2.0): none are used.
 - Own drawing: made for AbsentMotion from circles, lines, rectangles and arcs; Apache-2.0 like the rest of the code.
+- Effect thumbnails are not icons: they are small renders of six CC0 photographs, listed in THIRD_PARTY_NOTICES.md (section 5, "Effect thumbnail photos").
 
 How the Lucide shapes were used: the SVG shapes (path, circle, rect, line) were joined into one path-data string on the same 24 unit grid, written with absolute commands, and tinted and stroked by the app (round caps and joins, 1.2 to 2.5 dp strokes depending on the icon). Where the Notes column says "scaled" or "mirrored" the shape was scaled about the grid centre or flipped left to right; nothing else about the geometry was changed. "Moved" means shifted to sit inside the icon's own viewport (for example a 32 dp speaker). The path strings themselves live in the *Icons.kt files.
 

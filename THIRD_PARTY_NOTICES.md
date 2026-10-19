@@ -18,7 +18,7 @@ dependency is added, removed or upgraded, update this file in the same change.
 2. Speech model downloaded at run time: OpenAI Whisper weights
 3. Kotlin and Compose libraries
 4. Google Play services (proprietary)
-5. Fonts and icons
+5. Fonts, icons and effect thumbnails
 6. Appendix: licence texts
 
 ---
@@ -247,7 +247,7 @@ JUnit 4.13.2 (Eclipse Public License 1.0), kXML 2 2.3.0 (`net.sf.kxml:kxml2`, a 
 
 ---
 
-## 5. Fonts and icons
+## 5. Fonts, icons and effect thumbnails
 
 ### Google Fonts
 
@@ -259,6 +259,29 @@ that family at https://fonts.google.com/. Text a user sets in such a font belong
 ### Icons
 
 The icon sets used in the user interface, and their licences, are listed in `docs/ICON_SOURCES.md`.
+
+### Effect thumbnail photos
+
+The effect thumbnails (`app/src/main/assets/effects/thumb/*.webp`, 192 x 192 pixels) are rendered by
+`tools/effect_thumbs.py` from the six photographs below, all from Wikimedia Commons. Each author released the photograph
+under CC0 1.0, a public domain dedication (https://creativecommons.org/publicdomain/zero/1.0/), so no credit is required;
+they are listed for the record. The licence of each was checked on 2026-10-19 on the file's Commons page and in its
+metadata (`License`: `cc0`, `Credit`: own work); the script checks it again whenever it downloads a photograph. Only the
+small thumbnails ship; the photographs are not in the repository or the app. Which effect uses which photograph, the crop
+and the effect settings are in `tools/effect_showcase.json`. The green and black backgrounds of the Chroma Key and Luma
+Key thumbnails are drawn by the script.
+
+- "Fishmonger smiling" by Wilfredor, own work, CC0 1.0, https://commons.wikimedia.org/wiki/File:Fishmonger_smiling.jpg
+  (the page records the subject's consent and carries a personality rights notice).
+- "Ruby Mountain refected in Diablo Lake" by Ron Clausen, own work, CC0 1.0,
+  https://commons.wikimedia.org/wiki/File:Ruby_Mountain_refected_in_Diablo_Lake.jpg
+- "Speculum Feather from Pacific Black Duck" by Hallo3800, own work, CC0 1.0,
+  https://commons.wikimedia.org/wiki/File:Speculum_Feather_from_Pacific_Black_Duck.jpg
+- "Sunset rolling waves" by Mingiki, own work, CC0 1.0, https://commons.wikimedia.org/wiki/File:Sunset_rolling_waves.jpg
+- "Ara ararauna portrait Rhodes" by Jebulon, own work, CC0 1.0,
+  https://commons.wikimedia.org/wiki/File:Ara_ararauna_portrait_Rhodes.jpg
+- "Fleabane With Black Background" by Tfbybyhf, own work, CC0 1.0,
+  https://commons.wikimedia.org/wiki/File:Fleabane_With_Black_Background.jpg
 
 ---
 

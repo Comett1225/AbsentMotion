@@ -10,6 +10,8 @@ third-party notices file is generated from it.
   under the MIT licence below, so both notices apply to them. The Licence column says "ISC and MIT (Feather)" for those.
 - **Material Symbols** (https://github.com/google/material-design-icons, Apache-2.0): none are used.
 - **Own drawing**: made for AbsentMotion from circles, lines, rectangles and arcs; Apache-2.0 like the rest of the code.
+- **Effect thumbnails** are not icons: they are small renders of six CC0 photographs, listed in `THIRD_PARTY_NOTICES.md`
+  (section 5, "Effect thumbnail photos").
 
 How the Lucide shapes were used: the SVG shapes (`path`, `circle`, `rect`, `line`) were joined into one path-data string on
 the same 24 unit grid, written with absolute commands, and tinted and stroked by the app (round caps and joins, 1.2 to 2.5 dp

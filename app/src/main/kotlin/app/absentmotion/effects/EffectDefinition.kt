@@ -52,7 +52,7 @@ data class EffectDefinition(
     val status: String = "ok",
 ) {
     val available: Boolean get() = status == "ok"
-    val thumbnail: String get() = "thumb/$key.png"
+    val thumbnail: String get() = "thumb/$key.webp"
 
     fun instance(): XmlNode = XmlNode("effect", mapOf("id" to id, "hidden" to "false"), params.map {
         XmlNode("property", mapOf("name" to it.id, "type" to it.type, "value" to it.default))
