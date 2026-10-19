@@ -9,6 +9,7 @@ import android.media.ExifInterface
 import android.net.Uri
 import android.provider.MediaStore
 import android.provider.OpenableColumns
+import android.system.Os
 import android.util.Size
 import app.absentmotion.engine.EngineThread
 import app.absentmotion.model.MediaDeclaration
@@ -24,7 +25,7 @@ import kotlinx.coroutines.sync.withLock
 class MediaLibrary(context: Context, private val engine: EngineThread) {
     private val resolver = context.applicationContext.contentResolver
     private val lock = Mutex()
-    private val loaded = mutableMapOf<String, MediaDeclaration?>()
+    private val loaded = mutableMapOf<String, Pair<MediaDeclaration?, String?>>()
 
     suspend fun update(scene: Scene, retry: Boolean = false) = lock.withLock {
         val wanted = scene.node.imageUris()
@@ -44,20 +45,26 @@ class MediaLibrary(context: Context, private val engine: EngineThread) {
     private suspend fun prepareLocked(scene: Scene) {
         val limit = engine.maxPictureSize()
         for (uri in scene.node.imageUris()) {
-            val info = scene.media(uri)
-            if (loaded.containsKey(uri) && (info == null || loaded[uri] == info)) continue
+            val key = scene.media(uri) to withContext(Dispatchers.IO) { fileVersion(Uri.parse(uri)) }
+            if (loaded[uri] == key) continue
             val bitmap = withContext(Dispatchers.IO) { decode(Uri.parse(uri), limit) }
             Log.i("AMMedia", "picture $uri ${bitmap?.width}x${bitmap?.height} limit $limit")
             try {
                 withContext(NonCancellable) {
                     engine.setPicture(uri, bitmap)
-                    loaded[uri] = info
+                    loaded[uri] = key
                 }
             } finally {
                 bitmap?.recycle()
             }
         }
     }
+
+    private fun fileVersion(uri: Uri): String? = try {
+        resolver.openFileDescriptor(uri, "r")?.use { fd ->
+            Os.fstat(fd.fileDescriptor).run { "$st_dev:$st_ino:$st_size:${st_mtim.tv_sec}.${st_mtim.tv_nsec}" }
+        }
+    } catch (_: Exception) { null }
 
     private fun decode(uri: Uri, limit: Int): Bitmap? = try {
         val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
