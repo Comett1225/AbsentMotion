@@ -66,4 +66,47 @@ class VectorPathsTest {
         val plain = listOf(Contour(listOf(Knot(Pt(0f, 0f), outHandle = Pt(5f, 5f)), Knot(Pt(10f, 0f))), closed = false))
         assertEquals("M 0 0C 5 5, 10 0, 10 0", layer.withContours(plain).node.child("path")!!["d"])
     }
+
+    private fun near(expected: Pt, actual: Pt?) {
+        assertEquals(expected.x, actual!!.x, 1e-3f)
+        assertEquals(expected.y, actual.y, 1e-3f)
+    }
+
+    @Test fun smoothCurvesReflectThePreviousControlPointLikeTheEngine() {
+        val s = parseSvgPath("M 0 0 C 0 10 10 10 10 0 S 20 -10 20 0 s 5 5 10 0").single().knots
+        assertEquals(listOf(Pt(0f, 0f), Pt(10f, 0f), Pt(20f, 0f), Pt(30f, 0f)), s.map { it.p })
+        assertEquals(Pt(10f, -10f), s[1].outHandle)
+        assertEquals(Pt(20f, 10f), s[2].outHandle)
+        assertEquals(Pt(25f, 5f), s[3].inHandle)
+        val t = parseSvgPath("M 0 0 Q 10 10 20 0 T 40 0 t 20 0").single().knots
+        near(Pt(26.667f, -6.667f), t[1].outHandle)
+        near(Pt(33.333f, -6.667f), t[2].inHandle)
+        near(Pt(53.333f, 6.667f), t[3].inHandle)
+        val plain = parseSvgPath("M 0 0 Q 10 20 20 0 S 30 10 40 0 T 60 0").single().knots
+        assertEquals(null, plain[1].outHandle)
+        near(Pt(46.667f, 0f), plain[3].inHandle)
+    }
+
+    @Test fun arcsBecomeTheSamePointsTheEngineShows() {
+        val half = parseSvgPath("M 0 0 A 50 50 0 0 1 100 0").single().knots
+        assertEquals(5, half.size)
+        near(Pt(14.645f, -35.355f), half[1].p)
+        near(Pt(50f, -50f), half[2].p)
+        assertEquals(Pt(100f, 0f), half[4].p)
+        near(Pt(0f, -13.807f), half[0].outHandle)
+        assertEquals(parseSvgPath("M 0 0 a 50 50 0 1 1 50 0"), parseSvgPath("M0 0a50 50 0 1150 0"))
+        assertEquals(7, parseSvgPath("M 0 0 a 50 50 0 1 1 50 0").single().knots.size)
+        val tilted = parseSvgPath("M 10 20 A 30 15 30 0 1 70 60").single().knots
+        assertEquals(5, tilted.size)
+        near(Pt(27.989f, 16.482f), tilted[1].p)
+        near(Pt(70.416f, 44.766f), tilted[3].p)
+        assertEquals(listOf(Knot(Pt(0f, 0f)), Knot(Pt(10f, 10f))), parseSvgPath("M 0 0 A 0 10 0 0 1 10 10").single().knots)
+        assertEquals(8, parseSvgPath("M 0 0 A 40 40 0 0 1 40 40 A 40 40 0 0 1 0 80 A 40 40 0 0 1 -40 40 A 40 40 0 0 1 0 0 Z").single().knots.size)
+    }
+
+    @Test fun aSegmentAfterCloseStartsFromTheClosedContoursStart() {
+        val (a, b) = parseSvgPath("M 10 10 L 20 10 Z L 30 30")
+        assertEquals(true, a.closed)
+        assertEquals(listOf(Pt(10f, 10f), Pt(30f, 30f)), b.knots.map { it.p })
+    }
 }

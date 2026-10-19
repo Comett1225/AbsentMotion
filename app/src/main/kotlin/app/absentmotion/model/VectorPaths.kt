@@ -1,7 +1,17 @@
 package app.absentmotion.model
 
 import java.util.Locale
+import kotlin.math.PI
+import kotlin.math.abs
+import kotlin.math.atan2
+import kotlin.math.ceil
+import kotlin.math.cos
+import kotlin.math.floor
 import kotlin.math.hypot
+import kotlin.math.max
+import kotlin.math.sin
+import kotlin.math.sqrt
+import kotlin.math.tan
 
 data class Pt(val x: Float, val y: Float) {
     operator fun plus(o: Pt) = Pt(x + o.x, y + o.y)
@@ -80,20 +90,37 @@ fun Contour.toSvg(): String {
 }
 
 fun parseSvgPath(d: String): List<Contour> {
-    val tokens = Regex("[MLHVCQZmlhvcqz]|-?\\d*\\.?\\d+(?:[eE][-+]?\\d+)?").findAll(d).map { it.value }.toList()
+    val tokens = Regex("[MLHVCSQTAZmlhvcsqtaz]|-?\\d*\\.?\\d+(?:[eE][-+]?\\d+)?").findAll(d).map { it.value }.toMutableList()
     val out = ArrayList<Contour>()
     var knots = ArrayList<Knot>()
     var i = 0
     var command = ' '
+    var previous = ' '
+    var control = Pt(0f, 0f)
     var pen = Pt(0f, 0f)
     var start = pen
     fun number(): Float = tokens.getOrNull(i++)?.toFloatOrNull() ?: 0f
+    fun flag(): Boolean {
+        val t = tokens.getOrNull(i) ?: return false
+        if (t.length > 1 && (t[0] == '0' || t[0] == '1')) tokens[i] = t.substring(1) else i++
+        return t[0] == '1'
+    }
     fun point(from: Pt) = Pt(number(), number()) + from
     fun add(c1: Pt?, c2: Pt?, p: Pt) {
-        pen = p
-        val last = knots.lastOrNull() ?: run { knots.add(Knot(p)); return }
+        if (knots.isEmpty()) knots.add(Knot(pen))
+        val last = knots.last()
         if (c1 != null && c1 != last.p) knots[knots.lastIndex] = last.copy(outHandle = c1)
         knots.add(Knot(p, inHandle = c2?.takeIf { it != p }))
+        pen = p
+    }
+    fun quad(q: Pt, p: Pt) = add(pen + (q - pen) * (2f / 3f), p + (q - p) * (2f / 3f), p)
+    fun conic(c: Pt, p: Pt, w: Float) {
+        if (w == 1f) return quad(c, p)
+        val scale = 1 / (1 + w)
+        val mid = (pen + c * (2 * w) + p) * (scale * 0.5f)
+        val second = (c * w + p) * scale
+        quad((pen + c * w) * scale, mid)
+        quad(second, p)
     }
     fun finish(closed: Boolean) {
         if (knots.isEmpty()) return
@@ -108,21 +135,75 @@ fun parseSvgPath(d: String): List<Contour> {
         val t = tokens[i]
         if (t[0].isLetter()) { command = t[0]; i++ } else if (command == ' ') { i++; continue }
         val from = if (command.isLowerCase()) pen else Pt(0f, 0f)
-        when (command.uppercaseChar()) {
+        val op = command.uppercaseChar()
+        when (op) {
             'M' -> { finish(false); pen = point(from); start = pen; knots.add(Knot(pen)); command = if (command == 'm') 'l' else 'L' }
             'L' -> add(null, null, point(from))
             'H' -> add(null, null, Pt(number() + from.x, pen.y))
             'V' -> add(null, null, Pt(pen.x, number() + from.y))
-            'C' -> { val c1 = point(from); val c2 = point(from); add(c1, c2, point(from)) }
-            'Q' -> {
-                val q = point(from)
-                val p = point(from)
-                add(pen + (q - pen) * (2f / 3f), p + (q - p) * (2f / 3f), p)
+            'C', 'S' -> {
+                val c1 = if (op == 'C') point(from) else if (previous == 'C' || previous == 'S') pen * 2f - control else pen
+                val c2 = point(from)
+                add(c1, c2, point(from))
+                control = c2
+            }
+            'Q', 'T' -> {
+                val q = if (op == 'Q') point(from) else if (previous == 'Q' || previous == 'T') pen * 2f - control else pen
+                quad(q, point(from))
+                control = q
+            }
+            'A' -> {
+                val rx = number(); val ry = number(); val angle = number()
+                val large = flag(); val sweep = flag()
+                arcConics(pen, rx, ry, angle, large, sweep, point(from))?.forEach { (c, p, w) -> if (w > 0f) conic(c, p, w) else add(null, null, p) }
             }
             'Z' -> { finish(true); pen = start; command = ' ' }
             else -> i++
         }
+        previous = op
     }
     finish(false)
     return out
+}
+
+private fun arcConics(from: Pt, rx0: Float, ry0: Float, angle: Float, large: Boolean, sweep: Boolean, to: Pt): List<Triple<Pt, Pt, Float>>? {
+    val line = listOf(Triple(to, to, 0f))
+    if (rx0 == 0f || ry0 == 0f || from == to) return line
+    fun snap(v: Float) = if (abs(v) <= 1f / 4096) 0f else v
+    fun rotate(v: Pt, degrees: Float): Pt {
+        val r = Math.toRadians(degrees.toDouble()).toFloat()
+        val sin = snap(sin(r)); val cos = snap(cos(r))
+        return Pt(cos * v.x - sin * v.y, sin * v.x + cos * v.y)
+    }
+    var rx = abs(rx0); var ry = abs(ry0)
+    val half = rotate((from - to) * 0.5f, -angle)
+    val radii = half.x * half.x / (rx * rx) + half.y * half.y / (ry * ry)
+    if (radii > 1) { rx *= sqrt(radii); ry *= sqrt(radii) }
+    fun toUnit(p: Pt) = rotate(p, -angle).let { Pt(it.x / rx, it.y / ry) }
+    fun fromUnit(p: Pt) = rotate(Pt(p.x * rx, p.y * ry), angle)
+    var u0 = toUnit(from); var u1 = toUnit(to)
+    val delta = u1 - u0
+    var factor = sqrt(max(1 / (delta.x * delta.x + delta.y * delta.y) - 0.25f, 0f))
+    if (!sweep != large) factor = -factor
+    val centre = (u0 + u1) * 0.5f + Pt(-delta.y * factor, delta.x * factor)
+    u0 -= centre; u1 -= centre
+    val theta1 = atan2(u0.y, u0.x)
+    var arc = atan2(u1.y, u1.x) - theta1
+    if (arc < 0 && sweep) arc += 2 * PI.toFloat() else if (arc > 0 && !sweep) arc -= 2 * PI.toFloat()
+    if (abs(arc) < PI.toFloat() / 1_000_000) return line
+    val segments = ceil(abs(arc / (2 * PI.toFloat() / 3))).toInt()
+    val width = arc / segments
+    val t = tan(0.5f * width)
+    if (!t.isFinite()) return null
+    val w = sqrt(0.5f + cos(width) * 0.5f)
+    fun whole(v: Float) = v == floor(v)
+    val integers = abs(PI.toFloat() / 2 - abs(width)) <= 1f / 4096 && whole(rx) && whole(ry) && whole(to.x) && whole(to.y)
+    fun round(p: Pt) = if (integers) Pt(Math.round(p.x).toFloat(), Math.round(p.y).toFloat()) else p
+    var end = theta1
+    return (1..segments).map { k ->
+        end += width
+        val sin = snap(sin(end)); val cos = snap(cos(end))
+        val onCircle = Pt(cos, sin) + centre
+        Triple(round(fromUnit(onCircle + Pt(t * sin, -t * cos))), if (k == segments) to else round(fromUnit(onCircle)), w)
+    }
 }
