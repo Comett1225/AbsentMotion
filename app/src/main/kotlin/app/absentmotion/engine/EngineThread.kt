@@ -95,6 +95,9 @@ class EngineThread(private val background: Int, context: Context? = null) {
 
     private var engine: NativeEngine? = null
     private var target = 0L
+    private var surface: Surface? = null
+    private var lost = false
+    @Volatile internal var simulateGpuLoss = false
     private var view: PreviewView? = null
     private var scene: String? = null
 
@@ -119,16 +122,23 @@ class EngineThread(private val background: Int, context: Context? = null) {
 
     private fun engine(): NativeEngine {
         check(!closed) { "engine closed" }
-        if (engine?.failed == true) {
+        if (engine?.failed == true || simulateGpuLoss && !capturing) {
             check(!capturing) { "GPU failed during capture" }
+            simulateGpuLoss = false
             target = 0L
             engine?.close()
             engine = null
+            lost = true
         }
         return engine ?: NativeEngine(NativeEngine.Backend.GRAPHITE).also { next ->
             engine = next
             scene?.let { next.setScene(fonts?.prepareText(it, textTime) ?: it) }
             effects.value.loadInto(next::loadEffect)
+            if (lost) {
+                lost = false
+                surface?.takeIf { it.isValid }?.let { target = next.attach(it, forEncoder = false) }
+                Handler(android.os.Looper.getMainLooper()).post(::refreshMedia)
+            }
         }
     }
 
@@ -137,8 +147,10 @@ class EngineThread(private val background: Int, context: Context? = null) {
         try {
             val previous = target
             target = 0L
+            this.surface = null
             if (previous != 0L) engine().detach(previous)
             target = engine().attach(surface, forEncoder = false)
+            this.surface = surface
             mediaScene?.let { videos?.update(it, requestedView?.timeMs ?: 0, playing) }
             renderNow()
         } catch (e: Exception) {
@@ -152,6 +164,7 @@ class EngineThread(private val background: Int, context: Context? = null) {
             try {
                 val previous = target
                 target = 0L
+                surface = null
                 if (previous != 0L) engine?.detach(previous)
             } finally { done.countDown() }
         }
@@ -301,7 +314,7 @@ class EngineThread(private val background: Int, context: Context? = null) {
             if (target != 0L) {
                 val native = engine()
                 if (target != 0L && native.renderScene(target, v.timeMs.toDouble(), v.scale, v.dx, v.dy, background, v.selectedId, v.handles, v) != 0) {
-                    Log.e("AMEngine", "preview rendering failed; surface must be attached again")
+                    Log.e("AMEngine", "preview rendering failed")
                 }
             }
         } catch (e: Exception) {

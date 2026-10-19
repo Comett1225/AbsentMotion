@@ -275,7 +275,10 @@ class MainActivity : ComponentActivity() {
             return
         }
         val state = editor ?: return
-        if (intent.hasExtra("frame")) state.frame = intent.getIntExtra("frame", 0).coerceIn(0, state.scene.lastFrame)
+        val frame = intent.getIntExtra("frame", state.frame).coerceIn(0, state.scene.lastFrame)
+        if (intent.getBooleanExtra("losegpu", false) && applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0) {
+            window.decorView.postDelayed({ engine.simulateGpuLoss = true; state.frame = frame }, 2000)
+        } else if (intent.hasExtra("frame")) state.frame = frame
     }
 
     override fun onStop() {
