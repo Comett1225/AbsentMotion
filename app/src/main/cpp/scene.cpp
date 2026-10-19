@@ -402,15 +402,12 @@ void DrawMedia(SkCanvas* canvas, const Layer& layer, const SkPath& path, float o
     if (!image) {
         const float cell = std::max(bounds.width(), bounds.height()) / 16;
         SkPaint paint;
-        paint.setColor(0xFF8A8A8A);
-        paint.setAlphaf(std::clamp(opacity, 0.0f, 1.0f));
         canvas->save();
         canvas->clipPath(path, true);
-        canvas->drawRect(bounds, paint);
-        paint.setColor(0xFF6E6E6E);
-        paint.setAlphaf(std::clamp(opacity, 0.0f, 1.0f));
         for (int y = 0; y * cell < bounds.height(); y++) {
-            for (int x = (y % 2); x * cell < bounds.width(); x += 2) {
+            for (int x = 0; x * cell < bounds.width(); x++) {
+                paint.setColor((x + y) % 2 ? 0xFF8A8A8A : 0xFF6E6E6E);
+                paint.setAlphaf(std::clamp(opacity, 0.0f, 1.0f));
                 canvas->drawRect(SkRect::MakeXYWH(bounds.left() + x * cell, bounds.top() + y * cell, cell, cell), paint);
             }
         }

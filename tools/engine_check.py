@@ -93,6 +93,10 @@ CASES = {
               '<transform><location><kf t="0.03" v="100,100,0"/><kf t="0.5" v="1100,100,0"/></location></transform>'
               '<fillColor value="#ffff0000"/><property name="size" type="vec2" value="10,30"/></shape></scene></embedScene>', fps=60),
         [((52, 100), RED), ((100, 100), BLACK)]),
+    "a missing picture's placeholder takes the layer opacity once": (
+        scene('<media uri="file:///nonexistent/missing.png" missing="true"/>'
+              + rect(1, 100, 100, 50, 50, opacity=0.5, fill="media", attrs=' fillImage="file:///nonexistent/missing.png"')),
+        [((53, 53), (55, 55, 55)), ((59, 53), (69, 69, 69)), ((53, 59), (69, 69, 69)), ((147, 147), (55, 55, 55)), ((30, 30), BLACK)]),
     "a picture tagged as mirrored shows unmirrored": (
         scene(picture("exif2.jpg", 0)), [((50, 100), BLUE), ((150, 100), RED)]),
     "a picture tagged as transposed shows turned and mirrored": (
