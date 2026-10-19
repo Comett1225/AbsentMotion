@@ -36,6 +36,7 @@ internal fun VideoLayerThumbnail(layer: Layer, modifier: Modifier) {
 internal fun videoStripPicture(layer: Layer, scene: Scene, fromMs: Float, toMs: Float, tileMs: Float): StripPicture? {
     val context = LocalContext.current.applicationContext
     val uri = layer.mediaFill?.uri ?: return null
+    if (fromMs > layer.endTime || toMs < layer.startTime) return null
     val step = tileMs.coerceAtLeast(1f)
     val first = floor(((fromMs - layer.startTime).coerceAtLeast(0f)) / step).toInt()
     val last = floor(((toMs.coerceAtMost(layer.endTime.toFloat()) - layer.startTime).coerceAtLeast(0f)) / step).toInt().coerceAtLeast(first)
