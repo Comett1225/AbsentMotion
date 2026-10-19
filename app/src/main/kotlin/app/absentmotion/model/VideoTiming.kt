@@ -193,7 +193,7 @@ fun Layer.withVideoSpeedMap(map: XmlNode): Layer {
     val old = VideoTiming(this)
     var changed = copy(node = node.withChild("speedMap", map).with("speed", null))
     val timing = VideoTiming(changed)
-    val duration = timing.localMs(old.mediaMs((endTime - startTime).toDouble())).roundToInt().coerceAtLeast(1)
+    val duration = timing.localMs(old.mediaMs((endTime - startTime).toDouble())).coerceIn(1.0, (Int.MAX_VALUE.toLong() - startTime).toDouble()).roundToInt()
     fun adjust(n: XmlNode): XmlNode {
         if (n.name == "speedMap" || n.name == "scene") return n
         if (n.name == "kf") {

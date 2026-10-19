@@ -5,7 +5,9 @@ import app.absentmotion.model.VideoTiming
 import app.absentmotion.model.XmlNode
 import app.absentmotion.model.keyframes
 import app.absentmotion.model.retimedVideo
+import app.absentmotion.model.withVideoSpeedMap
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class VideoSpeedTest {
@@ -35,5 +37,11 @@ class VideoSpeedTest {
         val retimed = layer.retimedVideo(500, 2000)
         assertEquals(span(layer), span(retimed), 0.5)
         assertEquals(null, retimed.node.child("speedMap"))
+    }
+
+    @Test fun aLongClipAtTheLowestSpeedDoesNotWrapItsEnd() {
+        val slowed = video(1000, 1000 + 40 * 60_000).withVideoSpeedMap(XmlNode("speedMap", mapOf("value" to "0.001")))
+        assertTrue(slowed.endTime > slowed.startTime)
+        assertEquals(Int.MAX_VALUE, slowed.endTime)
     }
 }
