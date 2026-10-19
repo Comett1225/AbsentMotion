@@ -105,7 +105,7 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
                     currentCoroutineContext().ensureActive()
                     val pixels = still(frameTimeMs(scene, s.fps, k), width, height) ?: error("The engine could not draw frame $k")
                     val bytes = withContext(Dispatchers.Default) { encode(pixels, width, height, s, bitmap) }
-                    save(saved, name, "frame_%05d.${s.image.ext}".format(k + 1), s.image.mime) { it.write(bytes) }
+                    save(saved, name, sequenceFrameName(k, s.image.ext), s.image.mime) { it.write(bytes) }
                     progress((k + 1f) / frames)
                 }
             }

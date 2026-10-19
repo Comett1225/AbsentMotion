@@ -78,6 +78,8 @@ fun frameCount(scene: Scene, fps: Int): Int =
 
 fun frameTimeMs(scene: Scene, fps: Int, index: Int): Int = if (fps == scene.fps) scene.frameStart(index) else (index * 1000L / fps).toInt()
 
+fun sequenceFrameName(index: Int, ext: String): String = String.format(Locale.ROOT, "frame_%05d.%s", index + 1, ext)
+
 fun videoBitrate(width: Int, height: Int, s: ExportSettings): Int {
     val bitsPerPixel = 0.03 * 10.0.pow(s.quality.coerceIn(0f, 1f).toDouble()) * s.codec.bitsVsH264
     return (width.toDouble() * height * s.fps * bitsPerPixel).coerceAtMost(Int.MAX_VALUE.toDouble()).roundToInt()

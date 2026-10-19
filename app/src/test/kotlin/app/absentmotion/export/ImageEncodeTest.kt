@@ -2,6 +2,7 @@ package app.absentmotion.export
 
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import java.util.Locale
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Test
@@ -44,5 +45,21 @@ class ImageEncodeTest {
         assertFalse(ImageKind.Jpeg.alpha)
         assertFalse(ImageKind.Bmp.alpha)
         assertEquals(listOf("png", "jpg", "webp", "webp", "bmp"), ImageKind.entries.map { it.ext })
+    }
+
+    @Test
+    fun sequenceFrameNamesUseAsciiDigitsInEveryLanguage() {
+        val before = Locale.getDefault()
+        try {
+            for (tag in listOf("ar-SA-u-nu-arab", "fa-IR-u-nu-arabext", "bn-BD-u-nu-beng", "en-US")) {
+                Locale.setDefault(Locale.forLanguageTag(tag))
+                assertEquals(tag, "frame_00001.png", sequenceFrameName(0, "png"))
+                assertEquals(tag, "frame_00120.jpg", sequenceFrameName(119, "jpg"))
+            }
+            Locale.setDefault(Locale.forLanguageTag("ar-SA-u-nu-arab"))
+            assertFalse("%05d".format(1) == "00001")
+        } finally {
+            Locale.setDefault(before)
+        }
     }
 }
