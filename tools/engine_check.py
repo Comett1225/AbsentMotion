@@ -14,7 +14,7 @@ ADB = [str(Path.home() / "Library/Android/sdk/platform-tools/adb"), "-s", os.env
 PKG = "app.absentmotion"
 DEVICE_DIR = f"/sdcard/Android/data/{PKG}/files"
 TOLERANCE = 2
-BLACK, RED, BLUE, HALF = (0, 0, 0), (255, 0, 0), (0, 0, 255), (128, 128, 128)
+BLACK, RED, GREEN, BLUE, HALF = (0, 0, 0), (255, 0, 0), (0, 255, 0), (0, 0, 255), (128, 128, 128)
 
 
 def scene(body, width=200, height=200, fps=30, bg="#ff000000"):
@@ -47,6 +47,22 @@ def exif_jpeg(path, tag):
 
 
 PICTURES = {"exif2.jpg": 2, "exif5.jpg": 5}
+
+
+def video(path, fps, colours):
+    frames = path.parent / "frames"
+    frames.mkdir(exist_ok=True)
+    for k, colour in enumerate(colours):
+        Image.new("RGB", (256, 256), colour).save(frames / f"{k:03d}.png")
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-framerate", str(fps), "-i", str(frames / "%03d.png"), "-pix_fmt", "yuv420p",
+                    "-c:v", "libx264", "-g", "1", str(path)], check=True)
+    for f in frames.iterdir():
+        f.unlink()
+
+
+SWAPPED = scene('<shape id="1" label="v" startTime="0" endTime="1999" fillType="media" mediaFillMode="stretch" s=".rect" '
+                f'fillVideo="file://{DEVICE_DIR}/swap.mp4" outTime="2000"><transform><location value="32,32,0"/></transform>'
+                '<property name="size" type="vec2" value="32,32"/></shape>', 64, 64, 10)
 
 CENTRED = '<border direction="centered"><color value="#ffffffff"/><size value="{}"/></border>'
 
@@ -96,14 +112,14 @@ def adb(*args):
     return subprocess.run(ADB + [str(a) for a in args], capture_output=True, text=True).stdout
 
 
-def run(name, xml, work, hits=()):
+def run(name, xml, work, hits=(), frame=0):
     local = work / f"{name}.xml"
     local.write_text(xml)
     remote = f"{DEVICE_DIR}/{name}.xml"
     adb("push", local, remote)
     adb("logcat", "-c")
     extras = ["--es", "hit", "'" + ";".join(f"{x},{y}" for x, y in hits) + "'"] if hits else []
-    adb("shell", "am", "start", "-n", f"{PKG}/.MainActivity", "--es", "xml", remote, "--es", "still", name, "--ei", "frame", "0", *extras)
+    adb("shell", "am", "start", "-n", f"{PKG}/.MainActivity", "--es", "xml", remote, "--es", "still", name, "--ei", "frame", frame, *extras)
     deadline, pid = time.time() + 120, None
     while f"still {name} ok=" not in (log := adb("logcat", "-d", "-s", "AMTest")) or log.count(" hit ") < len(hits):
         now = adb("shell", "pidof", PKG).strip()
@@ -117,8 +133,8 @@ def run(name, xml, work, hits=()):
     return log
 
 
-def still(name, xml, work):
-    if f"still {name} ok=true" not in run(name, xml, work):
+def still(name, xml, work, frame=0):
+    if f"still {name} ok=true" not in run(name, xml, work, frame=frame):
         sys.exit(f"the app could not render {name}")
     adb("pull", f"{DEVICE_DIR}/{name}.png", work / f"{name}.png")
     adb("shell", "rm", f"{DEVICE_DIR}/{name}.png")
@@ -144,6 +160,15 @@ def main():
                                 if got.get(f"{xy[0]},{xy[1]}") != want]))
     for name in PICTURES:
         adb("shell", "rm", f"{DEVICE_DIR}/{name}")
+    video(work / "swap-a.mp4", 10, [(255, 255, 255)] * 20)
+    video(work / "swap-b.mp4", 2, [RED, GREEN, BLUE, (255, 255, 0)])
+    adb("push", work / "swap-a.mp4", f"{DEVICE_DIR}/swap.mp4")
+    still("engineswap0", SWAPPED, work, 6)
+    adb("push", work / "swap-b.mp4", f"{DEVICE_DIR}/swap.mp4")
+    r, g, b = still("engineswap1", SWAPPED, work, 6)[32, 32]
+    adb("shell", "rm", f"{DEVICE_DIR}/swap.mp4")
+    results.append(("a video replaced in place uses the new file's frame times",
+                    [] if g > 150 and r < 100 and b < 100 else [f"(32, 32) is {(int(r), int(g), int(b))}, expected the green frame at 0.5 s"]))
     limit = adb("shell", "getprop", "dalvik.vm.heapgrowthlimit").strip()
     side = math.isqrt(int(limit.rstrip("m")) * 2 ** 20 * 5 // 16) + 1
     pid = adb("shell", "pidof", PKG).strip()

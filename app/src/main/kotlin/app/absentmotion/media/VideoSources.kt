@@ -9,7 +9,8 @@ import android.util.LruCache
 internal object VideoSources {
     private val indices = LruCache<String, LongArray>(16)
     @Synchronized fun timestamps(context: Context, uri: String): LongArray {
-        indices.get(uri)?.let { return it }
+        val key = uri + "\n" + fileVersion(context.contentResolver, Uri.parse(uri))
+        indices.get(key)?.let { return it }
         val extractor = MediaExtractor()
         try {
             extractor.setDataSource(context, Uri.parse(uri), null)
@@ -17,7 +18,7 @@ internal object VideoSources {
             extractor.selectTrack(track)
             val samples = ArrayList<Long>()
             while (extractor.sampleTime >= 0) { samples += extractor.sampleTime; extractor.advance() }
-            return samples.distinct().sorted().toLongArray().also { check(it.isNotEmpty()); indices.put(uri, it) }
+            return samples.distinct().sorted().toLongArray().also { check(it.isNotEmpty()); indices.put(key, it) }
         } finally { extractor.release() }
     }
 }

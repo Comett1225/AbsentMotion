@@ -47,7 +47,7 @@ class MediaLibrary(context: Context, private val engine: EngineThread) {
     private suspend fun prepareLocked(scene: Scene) {
         val limit = engine.maxPictureSize()
         for (uri in scene.node.imageUris()) {
-            val key = scene.media(uri) to withContext(Dispatchers.IO) { fileVersion(Uri.parse(uri)) }
+            val key = scene.media(uri) to withContext(Dispatchers.IO) { fileVersion(resolver, Uri.parse(uri)) }
             if (loaded[uri] == key) continue
             val bitmap = withContext(Dispatchers.IO) { decode(Uri.parse(uri), limit) }
             Log.i("AMMedia", "picture $uri ${bitmap?.width}x${bitmap?.height} limit $limit")
@@ -61,12 +61,6 @@ class MediaLibrary(context: Context, private val engine: EngineThread) {
             }
         }
     }
-
-    private fun fileVersion(uri: Uri): String? = try {
-        resolver.openFileDescriptor(uri, "r")?.use { fd ->
-            Os.fstat(fd.fileDescriptor).run { "$st_dev:$st_ino:$st_size:${st_mtim.tv_sec}.${st_mtim.tv_nsec}" }
-        }
-    } catch (_: Exception) { null }
 
     private fun decode(uri: Uri, limit: Int): Bitmap? = try {
         val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
@@ -93,6 +87,12 @@ class MediaLibrary(context: Context, private val engine: EngineThread) {
         null
     } catch (_: OutOfMemoryError) { null }
 }
+
+internal fun fileVersion(resolver: ContentResolver, uri: Uri): String? = try {
+    resolver.openFileDescriptor(uri, "r")?.use { fd ->
+        Os.fstat(fd.fileDescriptor).run { "$st_dev:$st_ino:$st_size:${st_mtim.tv_sec}.${st_mtim.tv_nsec}" }
+    }
+} catch (_: Exception) { null }
 
 private fun exifTag(resolver: ContentResolver, uri: Uri): Int = runCatching {
     resolver.openInputStream(uri)?.use { ExifInterface(it).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL) }
