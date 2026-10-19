@@ -243,6 +243,17 @@ class MainActivity : ComponentActivity() {
             val runs = intent.getIntExtra("runs", 3).coerceAtLeast(1)
             lifecycleScope.launch(Dispatchers.IO) { checkBackgroundRemoval(asset, runs) }
         }
+        intent.getStringExtra("batch")?.let { list ->
+            lifecycleScope.launch {
+                for (line in File(list).readLines().filter { it.isNotBlank() }) {
+                    val (path, frame, name) = line.trim().split(' ')
+                    val scene = migration.migrate(Scene.parse(File(path).readText())).scene
+                    val ok = engine.stillPng(scene.toXml(), scene.frameStart(frame.toInt()), scene.width, scene.height, File(getExternalFilesDir(null), "$name.png"))
+                    Log.i("AMTest", "still $name ok=$ok")
+                }
+                Log.i("AMTest", "batch done")
+            }
+        }
         val path = intent.getStringExtra("xml") ?: return
         val parsed = runCatching { Scene.parse(File(path).readText()) }.getOrElse { Log.e("AMTest", "cannot read $path", it); return }
         val id = "test-" + File(path).nameWithoutExtension
