@@ -163,7 +163,7 @@ class MainActivity : ComponentActivity() {
 
     private fun endEmbed(state: EditorState) {
         EmbedRequest.templateId = null
-        engine.setScene(state.scene.toXml())
+        engine.setScene(state.scene)
     }
 
     private fun embedTemplate(state: EditorState, template: Scene) {
@@ -189,7 +189,9 @@ class MainActivity : ComponentActivity() {
 
     private fun open(id: String) {
         cameFromEditor = true
-        editor = loadRelinked(id)?.let { EditorState(id, it, store, engine, settings) }
+        editor = loadRelinked(id)?.let {
+            EditorState(id, it, store, engine, settings) { Toast.makeText(this, "Could not save the project. Free some storage space.", Toast.LENGTH_LONG).show() }
+        }
     }
 
     private fun closeEditor() {

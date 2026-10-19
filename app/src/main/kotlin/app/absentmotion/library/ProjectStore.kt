@@ -66,9 +66,11 @@ class ProjectStore(private val root: File) {
     fun idOfLink(link: String): String? =
         dir.listFiles { f -> f.extension == "xml" }.orEmpty().map { it.nameWithoutExtension }.firstOrNull { linkOf(it) == link }
 
-    fun save(id: String, scene: Scene) {
+    fun save(id: String, scene: Scene) = save(id, scene.toXml())
+
+    fun save(id: String, xml: String) {
         val temp = File(dir, "$id.xml.tmp")
-        temp.writeText(scene.toXml())
+        temp.writeText(xml)
         java.nio.file.Files.move(temp.toPath(), sceneFile(id).toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING)
     }
 

@@ -43,7 +43,9 @@ class RemainingContracts(unittest.TestCase):
 
     def test_nested_fonts_are_resolved_for_preview_and_explicit_exports(self):
         text = kotlin('engine/EngineThread.kt')
-        self.assertIn('Scene.parse(xml).fontNames()', text)
+        body = text.split('fun setScene(next: Scene, xml: String = next.toXml())', 1)[1].split('fun refreshMedia', 1)[0]
+        self.assertIn('next.fontNames()', body)
+        self.assertNotIn('Scene.parse(', body)
         self.assertGreaterEqual(text.count('document.fontNames().forEach'), 2)
         text = kotlin('fonts/TextLayout.kt')
         self.assertIn('scene.mapTimedLayers(fps, timeMs.toDouble())', text)

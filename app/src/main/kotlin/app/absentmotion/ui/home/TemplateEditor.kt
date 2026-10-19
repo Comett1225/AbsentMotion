@@ -228,7 +228,7 @@ fun TemplateEditor(templateId: String, engine: EngineThread, settings: AppSettin
     }
 
     BackHandler { if (trimming != null) trimming = null else if (choices.isEmpty()) onClose() else asking = 1 }
-    LaunchedEffect(shown) { engine.setScene(shown.toXml()) }
+    LaunchedEffect(shown) { engine.setScene(shown) }
     DisposableEffect(Unit) { onDispose { engine.setPlaying(false) } }
     LaunchedEffect(playing) { engine.setPlaying(playing) }
     val fit = if (box.width == 0) 1f else min(box.width.toFloat() / shown.width, box.height.toFloat() / shown.height)

@@ -55,7 +55,7 @@ internal suspend fun checkDevice(context: Context) {
         fontFile.appendBytes(byteArrayOf(0, 1, 2, 3))
         val name = "imported?name=${fontFile.name}"
         val text = """<scene width="300" height="200" totalTime="999"><embedScene id="1" startTime="0" endTime="999"><transform><location value="150,100,0"/></transform><scene width="300" height="200" fps="30" totalTime="999"><text id="2" font="$name" fillType="color" size="25" wrapWidth="250" startTime="0" endTime="999"><transform><location value="10,40,0"/></transform><content>WiWi mmii</content><fillColor value="#ffffffff"/></text></scene></embedScene></scene>"""
-        engine.setScene(text)
+        engine.setScene(Scene.parse(text), text)
         delay(200)
         val before = checkNotNull(engine.previewForTest(300, 200))
         val existing = fonts.importedFonts().map { it.xml }.toSet()

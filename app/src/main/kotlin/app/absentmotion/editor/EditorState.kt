@@ -59,6 +59,7 @@ class EditorState(
     private val store: ProjectStore,
     val engine: EngineThread,
     val settings: AppSettings,
+    private val onSaveFailed: () -> Unit,
 ) {
     var scene by mutableStateOf(initial)
         private set
@@ -159,8 +160,10 @@ class EditorState(
 
     var overshoot by mutableStateOf(false)
 
+    private var saveFailed = false
+
     init {
-        engine.setScene(scene.toXml())
+        engine.setScene(scene)
     }
 
     fun edit(key: Any? = null, change: (Scene) -> Scene) {
@@ -177,7 +180,7 @@ class EditorState(
     }
 
     fun endGesture() {
-        if (lastEditKey != null) persist(scene)
+        if (lastEditKey != null || saveFailed) persist(scene.toXml())
         lastEditKey = null
     }
 
@@ -215,15 +218,19 @@ class EditorState(
         canRedo = redoStack.isNotEmpty()
         if (selectedId != null && next.layer(selectedId!!) == null) selectedId = null
         frame = frame.coerceIn(0, maxOf(next.lastFrame, 0))
-        engine.setScene(next.toXml())
-        if (save) persist(next)
+        val xml = next.toXml()
+        engine.setScene(next, xml)
+        if (save) persist(xml)
     }
 
-    private fun persist(scene: Scene) {
+    private fun persist(xml: String) {
         try {
-            store.save(projectId, scene)
+            store.save(projectId, xml)
+            saveFailed = false
         } catch (e: java.io.IOException) {
             Log.e("AMStore", "cannot save project $projectId", e)
+            if (!saveFailed) onSaveFailed()
+            saveFailed = true
         }
     }
 
