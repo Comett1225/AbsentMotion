@@ -451,9 +451,26 @@ void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& 
     const bool shadow = ShadowOn(l);
     decorated = (decorated || shadow || EffectsApply(siblings, l)) && !group;
     const bool blended = ov.blend || !IsNormal(l.blending);
-    const bool overlaps = l.kind == "drawing" || (l.stroke.present && l.stroke.enabled);
+    const bool centred = ShapeKind(l) && std::any_of(l.borders.begin(), l.borders.end(), [](const Edge& e) { return e.enabled && e.direction == "centered"; });
+    const bool overlaps = l.kind == "drawing" || (l.stroke.present && l.stroke.enabled) || centred;
+    auto centredBorders = [&](float alpha) {
+        if (!centred) return;
+        const SkPath scenePath = ShapePath(l, t).makeTransform(SiblingMatrix(siblings, l, timeMs));
+        for (const Edge& e : l.borders) {
+            if (!e.enabled || e.direction != "centered") continue;
+            const float size = e.size.get(0, t, 4);
+            if (!(size > 0)) continue;
+            SkPaint paint = FillPaint(ColorAt(e.color, t, kWhite, alpha));
+            paint.setStyle(SkPaint::kStroke_Style);
+            paint.setStrokeWidth(size);
+            paint.setStrokeCap(SkPaint::kRound_Cap);
+            paint.setStrokeJoin(SkPaint::kBevel_Join);
+            canvas->drawPath(scenePath, paint);
+        }
+    };
     if (!group && !decorated && !blended && (opacity >= 1 || !overlaps)) {
         DrawContent(canvas, siblings, l, timeMs, opacity, false, pictures);
+        centredBorders(opacity);
     } else {
         SkPaint layerPaint;
         layerPaint.setAlphaf(opacity);
@@ -474,24 +491,9 @@ void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& 
             canvas->restore();
         } else {
             DrawContent(canvas, siblings, l, timeMs, 1, decorated, pictures);
+            centredBorders(1);
         }
         canvas->restore();
-    }
-    if (ShapeKind(l) && !group) {
-        const SkMatrix m = SiblingMatrix(siblings, l, timeMs);
-        const SkPath scenePath = ShapePath(l, t).makeTransform(m);
-        for (const Edge& e : l.borders) {
-            if (!e.enabled || e.direction != "centered") continue;
-            const float size = e.size.get(0, t, 4);
-            if (!(size > 0)) continue;
-            SkPaint paint = FillPaint(ColorAt(e.color, t, kWhite, opacity));
-            paint.setStyle(SkPaint::kStroke_Style);
-            paint.setStrokeWidth(size);
-            paint.setStrokeCap(SkPaint::kRound_Cap);
-            paint.setStrokeJoin(SkPaint::kBevel_Join);
-            if (ov.blend) paint.setBlendMode(ov.mode == SkBlendMode::kSrcATop ? SkBlendMode::kSrcATop : SkBlendMode::kSrcOver);
-            canvas->drawPath(scenePath, paint);
-        }
     }
 }
 

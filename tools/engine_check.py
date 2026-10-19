@@ -13,7 +13,7 @@ ADB = [str(Path.home() / "Library/Android/sdk/platform-tools/adb"), "-s", os.env
 PKG = "app.absentmotion"
 DEVICE_DIR = f"/sdcard/Android/data/{PKG}/files"
 TOLERANCE = 2
-BLACK, HALF = (0, 0, 0), (128, 128, 128)
+BLACK, RED, HALF = (0, 0, 0), (255, 0, 0), (128, 128, 128)
 
 
 def scene(body, width=200, height=200, fps=30, bg="#ff000000"):
@@ -31,6 +31,9 @@ def rect(id, cx, cy, hw, hh, argb=0xffffffff, opacity=1.0, extra="", fill="color
             f'<property name="size" type="vec2" value="{hw},{hh}"/>{extra}</shape>')
 
 
+CENTRED = '<border direction="centered"><color value="#ffffffff"/><size value="{}"/></border>'
+
+
 def fill_stroke(points):
     return '<stroke color="#ffffffff" width="4.0" type="fill" points="' + ";".join(f"{x},{y},1" for x, y in points) + '"/>'
 
@@ -44,6 +47,12 @@ CASES = {
     "fill and stroke share the layer opacity": (
         scene(rect(1, 100, 100, 50, 50, opacity=0.5, extra='<path-stroke><color value="#ffffffff"/><size value="40"/></path-stroke>')),
         [((100, 100), HALF), ((60, 100), HALF), ((40, 100), HALF), ((10, 100), BLACK)]),
+    "a centred border shares the layer opacity": (
+        scene(rect(1, 100, 100, 50, 50, opacity=0.5, extra=CENTRED.format(40))),
+        [((100, 100), HALF), ((60, 100), HALF), ((40, 100), HALF), ((10, 100), BLACK)]),
+    "a centred border follows the layer blend mode": (
+        scene(rect(1, 100, 100, 100, 100, 0xffff0000) + rect(2, 100, 100, 50, 50, fill="none", extra=CENTRED.format(12), attrs=' blending="multiply"')),
+        [((50, 100), RED), ((150, 100), RED), ((100, 100), RED)]),
 }
 
 
