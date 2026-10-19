@@ -32,14 +32,13 @@ class MediaLibrary(context: Context, private val engine: EngineThread) {
 
     suspend fun update(scene: Scene, retry: Boolean = false) = lock.withLock {
         val wanted = scene.node.imageUris()
-        for (uri in loaded.keys.toList()) {
-            if (uri !in wanted || retry) {
-                withContext(NonCancellable) {
-                    engine.setPicture(uri, null)
-                    loaded.remove(uri)
-                }
+        for (uri in loaded.keys - wanted) {
+            withContext(NonCancellable) {
+                engine.setPicture(uri, null)
+                loaded.remove(uri)
             }
         }
+        if (retry) loaded.clear()
         prepareLocked(scene)
     }
 
