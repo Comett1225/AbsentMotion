@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import math
 import os
 import subprocess
 import sys
@@ -83,8 +84,12 @@ def run(name, xml, work, hits=()):
     adb("logcat", "-c")
     extras = ["--es", "hit", "'" + ";".join(f"{x},{y}" for x, y in hits) + "'"] if hits else []
     adb("shell", "am", "start", "-n", f"{PKG}/.MainActivity", "--es", "xml", remote, "--es", "still", name, "--ei", "frame", "0", *extras)
-    deadline = time.time() + 120
+    deadline, pid = time.time() + 120, None
     while f"still {name} ok=" not in (log := adb("logcat", "-d", "-s", "AMTest")) or log.count(" hit ") < len(hits):
+        now = adb("shell", "pidof", PKG).strip()
+        pid = pid or now
+        if pid and now != pid:
+            break
         if time.time() > deadline:
             sys.exit(f"the app did not answer {name} in 120 s")
         time.sleep(0.5)
@@ -114,6 +119,14 @@ def main():
         got = {line.split(" hit ")[1].split()[0]: int(line.split()[-1]) for line in log.splitlines() if " hit " in line}
         results.append((title, [f"{xy} hits {got.get(f'{xy[0]},{xy[1]}')}, expected {want}" for xy, want in probes
                                 if got.get(f"{xy[0]},{xy[1]}") != want]))
+    limit = adb("shell", "getprop", "dalvik.vm.heapgrowthlimit").strip()
+    side = math.isqrt(int(limit.rstrip("m")) * 2 ** 20 * 5 // 16) + 1
+    pid = adb("shell", "pidof", PKG).strip()
+    log = run("enginebig", scene("", side, side), work)
+    alive = adb("shell", "pidof", PKG).strip()
+    adb("shell", "rm", "-f", f"{DEVICE_DIR}/enginebig.png")
+    results.append((f"a {side} x {side} still that does not fit the {limit} heap fails cleanly",
+                    [] if "ok=false" in log and alive == pid else [f"app process {pid} -> {alive or 'gone'}, log: {log.strip().splitlines()[-1:]}"]))
     failed = 0
     for title, bad in results:
         failed += bool(bad)

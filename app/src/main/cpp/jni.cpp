@@ -188,6 +188,10 @@ JNIEXPORT jbyteArray JNICALL JNI_FN(nativeStill)(JNIEnv* env, jclass, jlong engi
     std::vector<uint8_t> rgba;
     if (!engineOf(engine)->still(timeMs, width, height, &rgba)) return nullptr;
     jbyteArray out = env->NewByteArray((jsize)rgba.size());
+    if (!out) {
+        env->ExceptionClear();
+        return nullptr;
+    }
     env->SetByteArrayRegion(out, 0, (jsize)rgba.size(), reinterpret_cast<const jbyte*>(rgba.data()));
     return out;
 }
@@ -199,6 +203,10 @@ JNIEXPORT jbyteArray JNICALL JNI_FN(nativeShapeIcon)(JNIEnv* env, jclass, jlong 
     std::vector<uint8_t> rgba;
     if (!engineOf(engine)->shapeIcon(text, size, (uint32_t)color, &rgba)) return nullptr;
     jbyteArray out = env->NewByteArray((jsize)rgba.size());
+    if (!out) {
+        env->ExceptionClear();
+        return nullptr;
+    }
     env->SetByteArrayRegion(out, 0, (jsize)rgba.size(), reinterpret_cast<const jbyte*>(rgba.data()));
     return out;
 }
