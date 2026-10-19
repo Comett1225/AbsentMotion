@@ -97,7 +97,7 @@ internal fun Bitmap.mirroredByExif(resolver: ContentResolver, uri: Uri): Bitmap 
     if (!exifOrientation(exifTag(resolver, uri)).second) this
     else Bitmap.createBitmap(this, 0, 0, width, height, Matrix().apply { setScale(-1f, 1f) }, false).also { if (it !== this) recycle() }
 
-private fun exifTag(resolver: ContentResolver, uri: Uri): Int = runCatching {
+internal fun exifTag(resolver: ContentResolver, uri: Uri): Int = runCatching {
     resolver.openInputStream(uri)?.use { ExifInterface(it).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL) }
 }.getOrNull() ?: ExifInterface.ORIENTATION_NORMAL
 

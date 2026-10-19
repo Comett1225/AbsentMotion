@@ -6,6 +6,8 @@ import android.provider.MediaStore
 import app.absentmotion.model.MediaDeclaration
 import app.absentmotion.model.Scene
 import app.absentmotion.model.replaceMedia
+import app.absentmotion.model.withLegacyExifOrientation
+import app.absentmotion.media.exifTag
 
 object MediaRelink {
     fun opens(context: Context, uri: String) =
@@ -30,7 +32,10 @@ object MediaRelink {
     }
 
     fun relink(context: Context, scene: Scene): Scene = scene.media.fold(scene) { s, m ->
-        if (opens(context, m.uri)) s
-        else find(context, m)?.let { s.replaceMedia(m.uri, MediaDeclaration(m.node.with("uri", it).with("missing", null))) } ?: s
+        val uri = if (opens(context, m.uri)) m.uri else find(context, m)
+        if (uri == null) s else {
+            val linked = if (uri == m.uri) s else s.replaceMedia(m.uri, MediaDeclaration(m.node.with("uri", uri).with("missing", null)))
+            if (m.type.startsWith("image/") && m.orientation == 0) linked.withLegacyExifOrientation(uri, exifTag(context.contentResolver, Uri.parse(uri))) else linked
+        }
     }
 }
