@@ -154,6 +154,29 @@ class ImporterTest {
         assertEquals(240, store.load(Importer(store).import { """<scene width="16384" height="10" fps="240"/>""".byteInputStream() }.single().id)!!.fps)
     }
 
+    @Test fun duplicateAndMissingLayerIdsAreRenumberedAndParentsKeepTheFirstOwner() {
+        val xml = """<scene width="10" height="10">
+            <shape id="5" startTime="0" endTime="99" />
+            <shape id="5" parent="5" startTime="0" endTime="99" />
+            <shape startTime="0" endTime="99" />
+            <shape id="0" parent="5" startTime="0" endTime="99" />
+            <embedScene id="7" startTime="0" endTime="99"><scene width="10" height="10">
+              <shape id="5" startTime="0" endTime="99" />
+              <shape id="8" parent="5" startTime="0" endTime="99" />
+              <shape id="8" startTime="0" endTime="99" />
+            </scene></embedScene>
+        </scene>"""
+        val store = store()
+        val top = store.load(Importer(store).import { xml.byteInputStream() }.single().id)!!.layers
+        val inner = top[4].nested!!.layers
+        val ids = (top + inner).map { it.id }
+        assertEquals(ids.size, ids.toSet().size)
+        assertFalse(0L in ids)
+        assertEquals(listOf(5L, 7L, 8L), listOf(top[0].id, top[4].id, inner[1].id))
+        assertEquals(listOf("5", "5"), listOf(top[1].node["parent"], top[3].node["parent"]))
+        assertEquals("${inner[0].id}", inner[1].node["parent"])
+    }
+
     @Test fun aCopyOwnsItsMediaAndReplacingMediaSwapsEveryUse() {
         val scene = """<scene width="10" height="10"><shape id="1" fillType="media" fillImage="x://a" /><shape id="2" fillType="media" fillImage="x://a" /></scene>"""
         val bytes = zip(listOf("p.xml" to scene.toByteArray(), "a.jpg" to "jpg".toByteArray(),

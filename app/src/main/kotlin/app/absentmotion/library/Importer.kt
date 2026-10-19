@@ -5,6 +5,7 @@ import app.absentmotion.platform.Uri
 import app.absentmotion.compat.EffectMigration
 import app.absentmotion.effects.EffectCatalog
 import app.absentmotion.fonts.FontLibrary
+import app.absentmotion.model.Layer
 import app.absentmotion.model.MediaDeclaration
 import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
@@ -134,7 +135,7 @@ class Importer(
         val id = store.newId()
         try {
             val moved = copies(id, root)
-            var scene = relink(Scene(root.mapMediaUris { moved[it] ?: access.defused(it) }))
+            var scene = relink(Scene(uniqueLayerIds(root.mapMediaUris { moved[it] ?: access.defused(it) })))
             val migrated = migration?.migrate(scene)
             if (migrated != null) scene = migrated.scene
             if (scene.title.isBlank()) scene = scene.withTitle("Imported Project")
@@ -178,6 +179,33 @@ class Importer(
             "parent", "hidden", "clippingMask", "mediaFillMode", "s", "tag", "align", "font", "size", "wrapWidth", "src", "type", "link",
             "presetId", "templatePPId", "points", "color", "stroke", "style",
         )
+
+        private fun uniqueLayerIds(root: XmlNode): XmlNode {
+            val taken = HashSet<Long>()
+            fun collect(node: XmlNode) {
+                if (node.name in Scene.LAYER_TAGS) node["id"]?.toLongOrNull()?.let(taken::add)
+                node.children.forEach(::collect)
+            }
+            collect(root)
+            val seen = HashSet<Long>()
+            fun scene(node: XmlNode): XmlNode {
+                val owners = HashMap<Long, Long>()
+                val renumbered = node.children.map { child ->
+                    if (child.name !in Scene.LAYER_TAGS) return@map child
+                    val old = child["id"]?.toLongOrNull()?.takeIf { it != 0L }
+                    val id = if (old != null && seen.add(old)) old else generateSequence { Layer.newId() }.first { taken.add(it) }
+                    if (old != null) owners.putIfAbsent(old, id)
+                    if (id == old) child else child.with("id", "$id")
+                }
+                return node.copy(children = renumbered.map { child ->
+                    if (child.name !in Scene.LAYER_TAGS) return@map child
+                    val parent = child["parent"]?.toLongOrNull()?.let(owners::get)
+                    val linked = if (parent == null || child["parent"] == "$parent") child else child.with("parent", "$parent")
+                    if (linked.name == "embedScene") linked.child("scene")?.let { linked.withChild("scene", scene(it)) } ?: linked else linked
+                })
+            }
+            return scene(root)
+        }
 
         private fun allLayers(scene: XmlNode): Sequence<XmlNode> = scene.children.asSequence().filter { it.name in Scene.LAYER_TAGS }
             .flatMap { sequenceOf(it) + (it.child("scene")?.let(::allLayers) ?: emptySequence()) }
