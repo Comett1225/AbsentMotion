@@ -52,6 +52,7 @@ import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.pointer.PointerId
+import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.changedToDown
 import androidx.compose.ui.input.pointer.pointerInput
@@ -89,6 +90,7 @@ import app.absentmotion.model.trimmedTo
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Motion
 import kotlin.math.abs
+import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
@@ -278,6 +280,15 @@ internal object TimelineMath {
 
     fun tickStep(fps: Int, dpPerSecond: Float): Int =
         (1..fps).firstOrNull { fps % it == 0 && it * dpPerSecond / fps >= MIN_TICK_GAP_DP } ?: fps
+
+    fun rowsBottom(height: Float, panelTop: Float?, barHeight: Float): Float = min(panelTop ?: height, height - barHeight)
+
+    fun maxScroll(rows: Int, rowH: Float, top: Float, bottom: Float): Float = max(0f, rows * rowH - (bottom - top))
+
+    fun visibleRows(rows: Int, rowH: Float, top: Float, bottom: Float, scroll: Float): IntRange =
+        max(0, floor(scroll / rowH).toInt())..min(rows - 1, ceil((bottom - top + scroll) / rowH).toInt() - 1)
+
+    fun released(end: PointerInputChange?): Boolean = end == null || !end.isConsumed
 }
 
 private class TimeScale(val nowMs: Float, val originX: Float, val pxPerMs: Float) {
@@ -353,10 +364,11 @@ private class TimelineView(val state: EditorState, density: Density, private val
 
     private val covered: Boolean get() = !wide && state.selectedId != null
 
-    private val roomBottom: Float get() = if (covered) PanelTop.px else size.height.toFloat()
+    private val rowsBottom: Float
+        get() = TimelineMath.rowsBottom(size.height.toFloat(), if (covered) PanelTop.px else null, if (MultiSelect.active) MultiBarHeight.px else 0f)
 
     val scroll: Float
-        get() = scrollPx.coerceIn(0f, max(0f, layers.size * rowH - (roomBottom - rulerH)))
+        get() = scrollPx.coerceIn(0f, TimelineMath.maxScroll(layers.size, rowH, rulerH, rowsBottom))
 
     fun layerAt(row: Int): Layer? = layers.getOrNull(layers.lastIndex - row)
 
@@ -364,18 +376,16 @@ private class TimelineView(val state: EditorState, density: Density, private val
 
     private fun rowAt(y: Float): Int = floor((y - rulerH + scroll) / rowH).toInt()
 
-    fun visibleRows(): IntRange = max(0, rowAt(rulerH))..min(layers.lastIndex, rowAt(size.height.toFloat()))
+    fun visibleRows(): IntRange = TimelineMath.visibleRows(layers.size, rowH, rulerH, rowsBottom, scroll)
 
     fun revealSelected() {
         val index = layers.indexOfFirst { it.id == state.selectedId }
         if (index < 0) return
         val top = (layers.lastIndex - index) * rowH
-        scrollPx = scroll.coerceIn(min(top + rowH - (roomBottom - rulerH), top), top)
+        scrollPx = scroll.coerceIn(min(top + rowH - (rowsBottom - rulerH), top), top)
     }
 
     fun isCovered(at: Offset): Boolean = (covered && at.y >= PanelTop.px) || (MultiSelect.active && at.y >= size.height - MultiBarHeight.px)
-
-    private val rowsBottom: Float get() = if (MultiSelect.active) min(roomBottom, size.height - MultiBarHeight.px) else roomBottom
 
     fun hitAt(at: Offset): Hit {
         if (at.y < rulerH) {
@@ -593,7 +603,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
         val layers = layers
         val index = layers.indexOfFirst { it.id == id }
         if (index < 0) return
-        liftTop = RowDrag.clampTop(liftFinger - liftGrab, rowH, rulerH, roomBottom, scroll, layers.size)
+        liftTop = RowDrag.clampTop(liftFinger - liftGrab, rowH, rulerH, rowsBottom, scroll, layers.size)
         val from = layers.lastIndex - index
         val to = RowDrag.slot(liftTop, rowH, rulerH, scroll, layers.size)
         if (to == from) return
@@ -650,6 +660,7 @@ private suspend fun PointerInputScope.timelineGestures(view: TimelineView, onLon
     var drag: Drag? = null
     var lifted = false
     var held = false
+    var last: PointerInputChange? = null
     var finger = down.position
     var second: PointerId? = null
     val holdable = hit is Hit.Eye || hit is Hit.Header || hit is Hit.Row
@@ -669,6 +680,7 @@ private suspend fun PointerInputScope.timelineGestures(view: TimelineView, onLon
             }
             val fingers = event.changes.count { it.pressed }
             val first = event.changes.firstOrNull { it.id == down.id }
+            last = first
             if (first != null) {
                 tracker.addPointerInputChange(first)
                 finger = first.position
@@ -703,7 +715,7 @@ private suspend fun PointerInputScope.timelineGestures(view: TimelineView, onLon
                 }
             }
         }
-        lifted = true
+        lifted = TimelineMath.released(last)
     } finally {
         if (lifted && drag == null && !held) view.tap(hit)
         view.endDrag(drag, if (lifted) tracker.calculateVelocity() else Velocity.Zero)
