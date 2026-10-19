@@ -46,18 +46,23 @@ class MediaLibrary(context: Context, private val engine: EngineThread) {
 
     private suspend fun prepareLocked(scene: Scene) {
         val limit = engine.maxPictureSize()
-        for (uri in scene.node.imageUris()) {
-            val key = scene.media(uri) to withContext(Dispatchers.IO) { fileVersion(resolver, Uri.parse(uri)) }
-            if (loaded[uri] == key) continue
-            val bitmap = withContext(Dispatchers.IO) { decodePicture(resolver, Uri.parse(uri), limit) }
-            Log.i("AMMedia", "picture $uri ${bitmap?.width}x${bitmap?.height} limit $limit")
-            try {
-                withContext(NonCancellable) {
-                    engine.setPicture(uri, bitmap)
-                    loaded[uri] = key
-                }
-            } finally {
-                bitmap?.recycle()
+        loadPictures(scene.node.imageUris(), loaded,
+            { uri -> scene.media(uri) to withContext(Dispatchers.IO) { fileVersion(resolver, Uri.parse(uri)) } },
+            { uri ->
+                withContext(Dispatchers.IO) { decodePicture(resolver, Uri.parse(uri), limit) }
+                    .also { Log.i("AMMedia", "picture $uri ${it?.width}x${it?.height} limit $limit") }
+            },
+        ) { uri, bitmap -> try { engine.setPicture(uri, bitmap) } finally { bitmap.recycle() } }
+    }
+
+    internal companion object {
+        suspend fun <K, P : Any> loadPictures(uris: Iterable<String>, loaded: MutableMap<String, K>, key: suspend (String) -> K,
+                                              decode: suspend (String) -> P?, install: suspend (String, P) -> Boolean) {
+            for (uri in uris) {
+                val version = key(uri)
+                if (loaded[uri] == version) continue
+                val picture = decode(uri) ?: continue
+                withContext(NonCancellable) { if (install(uri, picture)) loaded[uri] = version }
             }
         }
     }

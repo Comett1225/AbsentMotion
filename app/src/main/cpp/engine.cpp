@@ -622,6 +622,7 @@ bool EngineImpl::setPicture(const std::string& uri, int64_t layerId, AHardwareBu
         image = SkImages::RasterFromPixmapCopy(SkPixmap(info, pixels, rowBytes));
         if (image && fRecorder) image = SkImages::TextureFromImage(fRecorder.get(), image.get(), {});
     }
+    if (!image && buffer) return false;
     fVideoFrames.erase(key);
     if (!image) { fPictures.erase(key); return false; }
     fPictures[key] = std::move(image);
