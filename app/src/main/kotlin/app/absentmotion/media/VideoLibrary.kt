@@ -50,7 +50,7 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
     @Volatile private var leadMs = 0.0
     private data class Request(
         val scene: Scene, val timeMs: Int, val playing: Boolean,
-        val interpolation: FrameInterpolation = FrameInterpolation.Off, val fps: Int = 0,
+        val interpolation: FrameInterpolation = FrameInterpolation.Off, val fps: Int = 0, val warm: Boolean = false,
     ) { val born = System.nanoTime() }
 
     init {
@@ -65,22 +65,15 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
 
     fun update(scene: Scene, timeMs: Int, playing: Boolean = false) {
         if (closed) return
-        val next = Request(scene, timeMs, playing)
+        val next = Request(scene, timeMs, playing, warm = true)
         if (latest == next) return
         latest = next
         if (!paused) requests.trySend(next)
     }
 
-    private data class Sample(val track: LayerTrack, val timeMs: Double) {
-        val layer get() = track.layer
-        val scene get() = track.scene
-    }
+    @Volatile private var shown: Pair<Request, List<VideoSample>>? = null
 
-    @Volatile private var shown: Pair<Request, List<Sample>>? = null
-
-    private fun visible(request: Request) = shown?.takeIf { it.first === request }?.second ?: request.scene.layerTracks().mapNotNull { track ->
-        if (track.layer.mediaFill?.video != true || request.scene.isMissing(track.layer.mediaFill!!.uri)) null else track.timeAt(request.timeMs.toDouble(), true)?.let { Sample(track, it.ms) }
-    }.also { shown = request to it }
+    private fun visible(request: Request) = shown?.takeIf { it.first === request }?.second ?: request.scene.videoSamples(request.timeMs, request.playing, request.warm).also { shown = request to it }
 
     private suspend fun reconcile(request: Request) {
         val wanted = visible(request).associateBy { it.layer.id }
@@ -145,7 +138,7 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
 
     private inner class Session(val id: Long, val uri: String) {
         private val decoderLock = Mutex()
-        private val queue = Channel<Pair<Request, Sample>>(Channel.CONFLATED)
+        private val queue = Channel<Pair<Request, VideoSample>>(Channel.CONFLATED)
         private var decoder: VideoDecoder? = null
         val generation = engine.generation
         val version = fileVersion(context.contentResolver, Uri.parse(uri))
@@ -171,8 +164,8 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
             }
         }
 
-        fun request(request: Request, sample: Sample) { queue.trySend(request to sample) }
-        suspend fun exact(request: Request, sample: Sample) {
+        fun request(request: Request, sample: VideoSample) { queue.trySend(request to sample) }
+        suspend fun exact(request: Request, sample: VideoSample) {
             try { decode(request, sample, exact = true) }
             catch (e: CancellationException) { throw e }
             catch (e: Exception) {
@@ -182,7 +175,7 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
             }
         }
 
-        private suspend fun decode(request: Request, sample: Sample, exact: Boolean) = decoderLock.withLock {
+        private suspend fun decode(request: Request, sample: VideoSample, exact: Boolean) = decoderLock.withLock {
             val layer = sample.layer
             if (stopped) {
                 check(!exact) { "Video is unavailable: $uri" }
@@ -219,7 +212,7 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
             }
         }
 
-        private suspend fun mixed(source: VideoDecoder, request: Request, sample: Sample): Boolean {
+        private suspend fun mixed(source: VideoDecoder, request: Request, sample: VideoSample): Boolean {
             val layer = sample.layer
             if (request.fps <= 0) {
                 Log.w("AMInterp", "Interpolation skipped: export frame rate is unavailable")
@@ -259,4 +252,27 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
             engine.setPicture(uri, null, id)
         }
     }
+}
+
+internal data class VideoSample(val track: LayerTrack, val timeMs: Double) {
+    val layer get() = track.layer
+    val scene get() = track.scene
+}
+
+private const val WARM_MS = 1000
+
+internal fun Scene.videoSamples(timeMs: Int, playing: Boolean, warm: Boolean): List<VideoSample> {
+    val tracks = layerTracks().filter { track -> track.layer.mediaFill?.let { it.video && !isMissing(it.uri) } == true }
+    fun at(ms: Int, among: List<LayerTrack>) = among.mapNotNull { track -> track.timeAt(ms.toDouble(), true)?.let { VideoSample(track, it.ms) } }
+    val now = at(timeMs, tracks)
+    if (!warm) return now
+    val rest = tracks.filter { track -> now.none { it.track === track } && track.endMs > timeMs - WARM_MS && track.startMs <= timeMs + WARM_MS }
+    if (rest.isEmpty()) return now
+    val frame = frameAt(timeMs)
+    val steps = if (playing) listOf(1) else listOf(1, -1)
+    val near = steps.flatMap { step ->
+        (1..fps * WARM_MS / 1000).asSequence().map { frame + step * it }.takeWhile { it >= 0 }
+            .map { at(frameStart(it), rest) }.firstOrNull { it.isNotEmpty() }.orEmpty()
+    }
+    return now + near.distinctBy { it.layer.id }.filter { sample -> now.none { it.layer.id == sample.layer.id } }
 }
