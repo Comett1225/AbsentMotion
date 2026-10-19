@@ -224,7 +224,7 @@ class AudioEngine(context: Context) {
                 val pos = clip.wrap(clip.mediaAt(max(t0, clip.startMs.toDouble())))
                 var s = streams[clip.id]
                 if (s != null && s.uri != clip.uri) { s.close(); s = null }
-                if (s == null) streams[clip.id] = LayerStream(context, clip.uri, pos - LayerStream.LEAD_MS)
+                if (s == null) streams[clip.id] = LayerStream(clip.uri, pos - LayerStream.LEAD_MS) { PcmDecoder(context, clip.uri) }
                 else if (t0 < clip.startMs) s.prepare(pos)
             }
             streams.keys.filter { it !in wanted }.forEach { streams.remove(it)?.close() }

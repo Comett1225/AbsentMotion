@@ -16,7 +16,13 @@ internal class PcmChunk {
     var ptsUs = 0L
 }
 
-internal class PcmDecoder(context: Context, uri: String) : Closeable {
+internal interface PcmSource : Closeable {
+    val durationUs: Long
+    fun seek(us: Long)
+    fun next(): PcmChunk?
+}
+
+internal class PcmDecoder(context: Context, uri: String) : PcmSource {
     private val extractor = MediaExtractor()
     private var codec: MediaCodec? = null
     private val info = MediaCodec.BufferInfo()
@@ -26,7 +32,7 @@ internal class PcmDecoder(context: Context, uri: String) : Closeable {
     private var channels = 2
     private var float = false
 
-    val durationUs: Long
+    override val durationUs: Long
 
     init {
         try {
@@ -47,14 +53,14 @@ internal class PcmDecoder(context: Context, uri: String) : Closeable {
         }
     }
 
-    fun seek(us: Long) {
+    override fun seek(us: Long) {
         codec!!.flush()
         extractor.seekTo(us.coerceAtLeast(0), MediaExtractor.SEEK_TO_PREVIOUS_SYNC)
         inputEnded = false
         outputEnded = false
     }
 
-    fun next(): PcmChunk? {
+    override fun next(): PcmChunk? {
         val decoder = codec ?: return null
         while (!outputEnded) {
             if (!inputEnded) {

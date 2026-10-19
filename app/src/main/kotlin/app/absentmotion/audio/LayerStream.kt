@@ -1,6 +1,5 @@
 package app.absentmotion.audio
 
-import app.absentmotion.platform.Context
 import app.absentmotion.platform.Log
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantLock
@@ -10,7 +9,7 @@ import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.min
 
-internal class LayerStream(private val context: Context, val uri: String, startMs: Double) {
+internal class LayerStream(val uri: String, startMs: Double, private val open: () -> PcmSource) {
     private val lock = ReentrantLock()
     private val changed = lock.newCondition()
     private var ring = ShortArray(0)
@@ -36,9 +35,9 @@ internal class LayerStream(private val context: Context, val uri: String, startM
     private val thread = Thread({ run() }, "am-audio-stream").apply { isDaemon = true; start() }
 
     private fun run() {
-        var decoder: PcmDecoder? = null
+        var decoder: PcmSource? = null
         try {
-            decoder = PcmDecoder(context, uri)
+            decoder = open()
             durationUs = decoder.durationUs
             var handled = 0
             var target = 0.0
@@ -49,7 +48,7 @@ internal class LayerStream(private val context: Context, val uri: String, startM
                     if (seekGen != handled) { handled = seekGen; target = seekMs; fresh = true }
                 }
                 if (fresh) { decoder.seek((target * 1000).toLong()); placed = false }
-                val room = lock.withLock { if (!valid) Long.MAX_VALUE else if (eof) 0L else cap - (endAbs - min(keepFrom, endAbs)) }
+                val room = lock.withLock { if (!valid) Long.MAX_VALUE else if (eof) 0L else room() }
                 if (room < 2048) {
                     lock.withLock { if (seekGen == handled && !closed) changed.await(10, TimeUnit.MILLISECONDS) }
                     continue
@@ -101,8 +100,7 @@ internal class LayerStream(private val context: Context, val uri: String, startM
             var n = 0
             lock.withLock {
                 if (closed || seekGen != gen) return false
-                val room = cap - (endAbs - min(keepFrom, endAbs))
-                n = min(room, (count - done).toLong()).toInt()
+                n = min(room(), (count - done).toLong()).toInt()
                 if (n > 0) {
                     var at = (endAbs % cap).toInt()
                     var left = n
@@ -120,6 +118,8 @@ internal class LayerStream(private val context: Context, val uri: String, startM
         }
         return true
     }
+
+    private fun room(): Long = cap - (endAbs - keepFrom.coerceIn(startAbs, endAbs))
 
     private fun request(ms: Double) {
         seekMs = maxOf(0.0, ms)

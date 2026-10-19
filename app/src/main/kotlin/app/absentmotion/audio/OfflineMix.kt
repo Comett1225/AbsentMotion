@@ -9,8 +9,8 @@ import java.io.Closeable
 import kotlin.math.min
 import kotlin.math.roundToInt
 
-internal class OfflineMix private constructor(
-    private val context: Context, private val clips: List<AudioClip>, private val quality: Int,
+internal class OfflineMix(
+    private val open: (String) -> PcmSource, private val clips: List<AudioClip>, private val quality: Int,
 ) : AudioMix, Closeable {
     private val sources = HashMap<Long, OfflineSource>()
     private val voices = HashMap<Long, Voice>()
@@ -47,14 +47,14 @@ internal class OfflineMix private constructor(
         val t0 = i * BLOCK * dt
         for (clip in clips) {
             if (clip.loop && clip.outMs.isInfinite() && t0 + BLOCK * dt > clip.startMs && t0 <= clip.endMs) {
-                clip.resolveDuration(sources.getOrPut(clip.id) { OfflineSource(context, clip.uri) }.durationUs)
+                clip.resolveDuration(sources.getOrPut(clip.id) { OfflineSource(clip.uri, open) }.durationUs)
             }
             var next = 0
             while (true) {
                 val span = clip.span(t0, BLOCK, dt, next) ?: break
                 next = span.to
                 if (!span.inMedia) { voices[clip.id]?.ready = false; continue }
-                val source = sources.getOrPut(clip.id) { OfflineSource(context, clip.uri) }
+                val source = sources.getOrPut(clip.id) { OfflineSource(clip.uri, open) }
                 val rate = source.open(span.pos)
                 if (rate == 0) break
                 val voice = voices.getOrPut(clip.id) { Voice() }
@@ -81,12 +81,15 @@ internal class OfflineMix private constructor(
         private const val BLOCK = 1024
 
         fun of(context: Context, scene: Scene, quality: Int): AudioMix? =
-            AudioClip.of(scene).takeIf { it.isNotEmpty() }?.let { OfflineMix(context.applicationContext, it, quality) }
+            AudioClip.of(scene).takeIf { it.isNotEmpty() }?.let { clips ->
+                val app = context.applicationContext
+                OfflineMix({ uri -> PcmDecoder(app, uri) }, clips, quality)
+            }
     }
 }
 
-internal class OfflineSource(context: Context, private val uri: String) : Closeable {
-    private val decoder: PcmDecoder? = try { PcmDecoder(context, uri) } catch (e: Exception) { Log.w("AMAudio", "Cannot decode $uri for export", e); null }
+internal class OfflineSource(private val uri: String, open: (String) -> PcmSource) : Closeable {
+    private val decoder: PcmSource? = try { open(uri) } catch (e: Exception) { Log.w("AMAudio", "Cannot decode $uri for export", e); null }
     val durationUs: Long get() = decoder?.durationUs ?: -1
     private var rate = 0
     private var buf = ShortArray(0)
