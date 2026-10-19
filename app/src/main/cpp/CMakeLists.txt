@@ -22,6 +22,10 @@ target_include_directories(rnnoise PUBLIC ${RNNOISE_DIR}/include PRIVATE ${RNNOI
 target_compile_definitions(rnnoise PRIVATE RNNOISE_BUILD)
 target_compile_options(rnnoise PRIVATE -O3 -fvisibility=hidden)
 
+add_library(absent_bg OBJECT absent_bg/absent_bg.cpp absent_bg_jni.cpp)
+set_target_properties(absent_bg PROPERTIES POSITION_INDEPENDENT_CODE ON)
+target_compile_options(absent_bg PRIVATE -O3 -fvisibility=hidden)
+
 add_library(amengine SHARED preview.cpp camera.cpp drawing.cpp effects.cpp easing.cpp engine.cpp interpolation.cpp jni.cpp scene.cpp shapes.cpp styles.cpp text.cpp xml.cpp denoise_jni.cpp)
 target_include_directories(amengine PRIVATE ${SKIA_DIR} ${SKIA_DIR}/third_party/externals/expat/expat/lib)
 target_compile_definitions(amengine PRIVATE
@@ -35,7 +39,7 @@ list(TRANSFORM SKIA_LIBS APPEND .a)
 target_link_libraries(amengine PRIVATE
     -Wl,--start-group ${SKIA_LIBS} -Wl,--end-group
     -Wl,--gc-sections
-    rnnoise m vulkan android nativewindow jnigraphics EGL GLESv3 log)
+    rnnoise absent_bg m vulkan android nativewindow jnigraphics EGL GLESv3 log)
 
 set(WHISPER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../../third_party/whisper.cpp)
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
