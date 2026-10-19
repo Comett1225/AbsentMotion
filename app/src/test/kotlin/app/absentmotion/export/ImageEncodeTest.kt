@@ -27,6 +27,17 @@ class ImageEncodeTest {
     }
 
     @Test
+    fun aTransparentGifFrameTakesTheChosenBackground() {
+        fun firstColour(background: Int): List<Int> {
+            val out = java.io.ByteArrayOutputStream()
+            GifWriter(out, 2, 2).frame(ImageEncode.flatten(ByteArray(16), background), 100)
+            return out.toByteArray().slice(50..52).map { it.toInt() and 255 }
+        }
+        assertEquals(listOf(255, 255, 255), firstColour(BackgroundWhite))
+        assertEquals(listOf(0, 0, 0), firstColour(BackgroundBlack))
+    }
+
+    @Test
     fun bmpHasTheRightHeaderRowPaddingAndBottomUpBgrRows() {
         val rgba = px(1, 2, 3, 255) + px(4, 5, 6, 255) + px(7, 8, 9, 255) + px(10, 11, 12, 255) + px(13, 14, 15, 255) + px(16, 17, 18, 255)
         val bmp = ImageEncode.bmp(rgba, 3, 2)

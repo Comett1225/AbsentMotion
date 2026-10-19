@@ -562,10 +562,10 @@ private fun OptionsPage(kind: ExportKind, scene: Scene, s: ExportSettings, onCha
     if (kind == ExportKind.Sequence || kind == ExportKind.FrameAs) {
         Group("Format") { ImageKind.entries.forEach { Chip(it.label, s.image == it) { onChange(s.copy(image = it)) } } }
         if (s.image.lossy) Group("Quality") { ImageQualities.forEach { Chip("$it%", s.imageQuality == it) { onChange(s.copy(imageQuality = it)) } } }
-        if (!s.image.alpha) Group("Transparent areas become") {
-            Chip("White", s.background == BackgroundWhite) { onChange(s.copy(background = BackgroundWhite)) }
-            Chip("Black", s.background == BackgroundBlack) { onChange(s.copy(background = BackgroundBlack)) }
-        }
+    }
+    if (kind == ExportKind.Gif || !s.image.alpha && (kind == ExportKind.Sequence || kind == ExportKind.FrameAs)) Group("Transparent areas become") {
+        Chip("White", s.background == BackgroundWhite) { onChange(s.copy(background = BackgroundWhite)) }
+        Chip("Black", s.background == BackgroundBlack) { onChange(s.copy(background = BackgroundBlack)) }
     }
     if (kind == ExportKind.FrameAs) {
         Text("${scene.width}x${scene.height}", color = NoteGrey, fontSize = 14.sp)

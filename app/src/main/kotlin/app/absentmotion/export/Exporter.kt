@@ -87,7 +87,7 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
                 for (k in 0 until frames) {
                     currentCoroutineContext().ensureActive()
                     val pixels = still(frameTimeMs(scene, s.fps, k), width, height) ?: error("The engine could not draw frame $k")
-                    withContext(Dispatchers.Default) { writer.frame(pixels, (k + 1) * 1000L / s.fps) }
+                    withContext(Dispatchers.Default) { writer.frame(ImageEncode.flatten(pixels, s.background), (k + 1) * 1000L / s.fps) }
                     progress((k + 1f) / frames)
                 }
                 writer.finish()
