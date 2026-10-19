@@ -37,21 +37,26 @@ class ProjectStore(private val root: File) {
         )
     }
 
-    fun load(id: String): Scene? = read(id)?.let(::withLinkedElements)
+    fun load(id: String): Scene? = read(id)?.let { withLinkedElements(it, id) }
 
     private fun read(id: String): Scene? = runCatching { Scene.parse(sceneFile(id).readText()) }.getOrNull()
 
-    private fun withLinkedElements(scene: Scene): Scene {
+    private fun withLinkedElements(scene: Scene, id: String): Scene {
         val media = ArrayList<MediaDeclaration>()
-        fun follow(layers: List<XmlNode>): List<XmlNode> = layers.map { layer ->
-            val element = layer["link"]?.let(::idOfLink)?.let(::read)
+        fun follow(layers: List<XmlNode>, open: Set<String>): List<XmlNode> = layers.map { layer ->
+            val linked = layer["link"]?.let(::idOfLink)?.takeIf { it !in open }
+            val element = linked?.let(::read)
             when {
-                element != null -> { media += element.media; layer.copy(children = layer.children.map { if (it.name == "scene") element.node else it }) }
-                layer.name == "embedScene" -> layer.copy(children = layer.children.map { if (it.name == "scene") it.copy(children = follow(it.children)) else it })
+                element != null -> {
+                    media += element.media
+                    val inner = element.node.copy(children = follow(element.node.children, open + linked))
+                    layer.copy(children = layer.children.map { if (it.name == "scene") inner else it })
+                }
+                layer.name == "embedScene" -> layer.copy(children = layer.children.map { if (it.name == "scene") it.copy(children = follow(it.children, open)) else it })
                 else -> layer
             }
         }
-        val followed = Scene(scene.node.copy(children = follow(scene.node.children)))
+        val followed = Scene(scene.node.copy(children = follow(scene.node.children, setOf(id))))
         return media.fold(followed) { acc, record -> acc.withMedia(record) }
     }
 

@@ -67,6 +67,23 @@ class ProjectStoreTest {
         assertEquals("90", loaded.media("file:/new.png")?.node?.get("orientation"))
     }
 
+    @Test fun anElementLinkedInsideALinkedElementFollowsItsOriginalToo() {
+        val store = ProjectStore(tmp.newFolder())
+        fun element(title: String, vararg layers: XmlNode) = Scene(scene(*layers).node.with("type", "element").with("title", title))
+        fun link(id: String, cached: String) = XmlNode("embedScene", linkedMapOf("id" to "2", "link" to store.linkOf(id)), listOf(XmlNode("scene", mapOf("title" to cached))))
+        val c = store.createElement(element("c old"))
+        val b = store.createElement(element("b", link(c, "c cached")))
+        val a = store.create(scene(link(b, "b cached")))
+        store.save(c, element("c new").add(Layer(image("file:/c.png")), listOf(app.absentmotion.model.MediaDeclaration(XmlNode("media", mapOf("uri" to "file:/c.png"))))))
+        val loaded = store.load(a)!!
+        val inner = loaded.layers.single().nested!!
+        assertEquals("b", inner.title)
+        assertEquals("c new", inner.layers.single().nested!!.title)
+        assertTrue(loaded.media("file:/c.png") != null)
+        store.save(c, element("c loop", link(a, "a cached")))
+        assertEquals("a cached", store.load(a)!!.layers.single().nested!!.layers.single().nested!!.layers.single().nested!!.title)
+    }
+
     @Test fun speedKeyWithoutValueIsIgnored() {
         val map = XmlNode("speedMap", children = listOf(XmlNode("kf", mapOf("t" to "0")), XmlNode("kf", mapOf("t" to "1000000", "v" to "2"))))
         val layer = Layer(XmlNode("shape", linkedMapOf("id" to "1", "startTime" to "0", "endTime" to "999"), listOf(map)))
