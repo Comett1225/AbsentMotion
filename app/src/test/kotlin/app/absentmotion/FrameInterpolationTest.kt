@@ -263,6 +263,15 @@ class FrameInterpolationTest {
         for (frame in 4..30) assertPair(stamps[2], stamps[2], 0f, layer.pairAt(project, frame, stamps))
     }
 
+    @Test fun aClipWithNoIndexedFramesIsLeftToTheNormalSampling() {
+        val project = scene(30)
+        val layer = clip()
+        for (fps in listOf(30, 60)) {
+            assertFalse(layer.needsAt(project, 7, LongArray(0), fps))
+            assertNull(layer.exportFrame(project.at(7, fps), project, LongArray(0), fps))
+        }
+    }
+
     @Test fun theFirstAndLastSourceFramesAreHeld() {
         val project = scene(30)
         val late = rounded(30.0, 10, first = 40_000)

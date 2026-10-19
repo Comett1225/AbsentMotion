@@ -118,6 +118,7 @@ fun Layer.framePair(timeMs: Double, scene: Scene, stamps: LongArray): FramePair 
 
 private fun Layer.pairAround(timeMs: Double, scene: Scene, stamps: LongArray): Around? {
     val fill = mediaFill ?: return null
+    if (stamps.isEmpty()) return null
     val loop = node["loop"] == "true"
     val first = fill.inTime * 1000.0 - 500
     val last = fill.outTime * 1000.0 - 500
