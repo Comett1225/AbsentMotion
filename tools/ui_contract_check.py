@@ -1,0 +1,136 @@
+#!/usr/bin/env python3
+from pathlib import Path
+import subprocess
+import sys
+import unittest
+
+ROOT = Path(__file__).resolve().parent.parent
+REVISION = None
+if len(sys.argv) > 2 and sys.argv[1] == '--revision':
+    REVISION = sys.argv[2]
+    del sys.argv[1:3]
+
+def source(relative):
+    path = 'app/src/main/kotlin/app/absentmotion/' + relative
+    if REVISION:
+        return subprocess.check_output(['git', 'show', REVISION + ':' + path], cwd=ROOT, text=True)
+    return (ROOT / path).read_text()
+
+class UiContracts(unittest.TestCase):
+    def test_export_rechecks_storage_on_retry_and_resume(self):
+        text = source('ui/export/ExportScreen.kt')
+        self.assertIn('free = freeSpace()\n        if (estimate > free)', text)
+        self.assertIn('Lifecycle.Event.ON_RESUME', text)
+
+    def test_media_info_requires_a_declaration(self):
+        text = source('ui/editor/EditorMenus.kt')
+        self.assertIn('if (mediaRecord != null) MenuRow("Media Info")', text)
+        self.assertIn('if (mediaInfo && mediaRecord != null)', text)
+
+    def test_custom_size_consumes_pending_changes_before_callbacks(self):
+        text = source('ui/editor/EditorMenus.kt').split('private fun CustomSize', 1)[1]
+        self.assertIn('dirty = false', text)
+        self.assertLess(text.index('dirty = false'), text.index('onChange(newW, newH)'))
+        self.assertIn('if (changed &&', text)
+        self.assertEqual(2, text.count('dirty = true'))
+
+    def test_player_is_owned_before_data_source_can_throw(self):
+        text = source('ui/editor/AudioTab.kt').split('private class SoundPreview', 1)[1]
+        self.assertIn('player = nextPlayer', text)
+        self.assertLess(text.index('player = nextPlayer'), text.index('setDataSource(context, next)'))
+        self.assertIn('catch (_: Exception) { stop() }', text)
+        self.assertIn('player?.release()', text)
+
+    def test_playback_clock_restarts_when_preset_changes(self):
+        text = source('ui/editor/PresetScreen.kt')
+        self.assertIn('LaunchedEffect(playing, chosen, length)', text)
+
+    def test_scrubber_uses_the_current_seek_callback(self):
+        text = source('ui/editor/PresetScreen.kt')
+        self.assertIn('val seekCurrent by rememberUpdatedState(onSeek)', text)
+        self.assertIn('fun seek(x: Float) = seekCurrent(', text)
+
+    def test_trailing_canvas_finger_cannot_move_a_layer(self):
+        text = source('ui/editor/Preview.kt')
+        self.assertIn('moved && state.selectedId != null && !(canvasGesture && fingers > 1)', text)
+
+    def test_favorite_header_wins_when_there_are_no_recents(self):
+        text = source('ui/editor/TextEditor.kt')
+        self.assertIn('index == 0 && recent.isNotEmpty() -> TextIcons.Recent', text)
+        self.assertIn('index == recent.size -> TextIcons.FilledStar', text)
+
+    def test_project_sheet_scrolls_above_the_keyboard(self):
+        text = source('ui/home/NewProjectSheet.kt').split('private fun SheetBody', 1)[1]
+        self.assertIn('.windowInsetsPadding(WindowInsets.navigationBars.union(WindowInsets.ime)).verticalScroll(rememberScrollState())', text)
+
+    def test_settings_scroll_to_the_last_control(self):
+        text = source('ui/home/SettingsDrawer.kt')
+        self.assertIn('.statusBarsPadding().verticalScroll(rememberScrollState())', text)
+
+    def test_theme_provider_io_leaves_the_main_thread(self):
+        text = source('ui/home/SettingsDrawer.kt')
+        self.assertIn('withContext(Dispatchers.IO) { readThemeText(context, uri) }', text)
+        self.assertIn('catch (e: CancellationException)', text)
+
+    def test_template_replacement_resets_choices_and_rebuilds_scene(self):
+        text = source('ui/home/TemplateEditor.kt')
+        self.assertIn('var choices by remember(templateId)', text)
+        self.assertIn('var selected by remember(templateId)', text)
+        self.assertIn('val working = remember(template, slots, choices)', text)
+
+    def test_camera_ruler_accumulates_scaled_deltas(self):
+        text = source('ui/editor/panels/CameraPanel.kt')
+        self.assertIn('write(Angle, layer.number(Angle) + it * Angle.perDp, true)', text)
+
+    def test_offscreen_video_skips_decoder_setup(self):
+        text = source('ui/editor/VideoThumbnails.kt')
+        self.assertIn('if (fromMs > layer.endTime || toMs < layer.startTime) return null', text)
+        self.assertLess(text.index('if (fromMs > layer.endTime || toMs < layer.startTime) return null'), text.index('produceState('))
+
+    def test_camera_selection_resets_transform_tabs(self):
+        self.assertIn('var tab by remember(selected.kind)', source('ui/editor/LayerTools.kt'))
+
+    def test_deleting_preview_preset_clamps_the_position(self):
+        text = source('ui/editor/PresetScreen.kt')
+        self.assertIn('chosen = null; pos = pos.coerceAtMost((base.endTime - base.startTime).coerceAtLeast(1))', text)
+
+    def test_scale_handles_guard_collapsed_axes(self):
+        text = source('ui/editor/Preview.kt')
+        self.assertIn('if (grabbed.getDistanceSquared() < 1e-4f) continue', text)
+        self.assertLess(text.index('if (grabbed.getDistanceSquared() < 1e-4f) continue'), text.index('state.editSelected(key = "preview-handle")'))
+
+    def test_camera_view_refreshes_selection_quad(self):
+        text = source('ui/editor/Preview.kt')
+        self.assertIn('LaunchedEffect(state.selectedId, scene, state.frame, mediaRevision, state.cameraMode)', text)
+
+    def test_curve_menu_and_both_paste_paths_share_compatibility_rules(self):
+        text = source('editor/EditorActions.kt')
+        self.assertIn('get() = keyTarget?.ref?.let { compatibleCurve(it, copiedCurve) } != null', text)
+        self.assertIn('val curve = compatibleCurve(ref, copiedCurve) ?: return', text)
+        self.assertIn('val curve = compatibleCurve(ref, easing) ?: return', text)
+
+    def test_projects_and_templates_share_rounded_aspect_matching(self):
+        self.assertIn('aspectName(p.width, p.height)', source('ui/home/HomeScreen.kt'))
+        self.assertIn('aspectName(scene.width, scene.height)', source('ui/home/TemplatesTab.kt'))
+
+    def test_static_retiming_removes_the_overriding_speed_map(self):
+        text = source('editor/VideoActions.kt')
+        self.assertIn('n.withChild("speedMap", null).with("speed", speed.toString())', text)
+
+    def test_single_group_duplicate_remaps_children(self):
+        text = source('editor/EditorActions.kt').split('fun EditorState.duplicateSelected()', 1)[1].split('fun EditorState.toggleHidden', 1)[0]
+        self.assertIn('copyLayers(listOf(layer), preserveOutsideParents = true)', text)
+
+    def test_share_labels_match_export_names(self):
+        text = source('ui/export/ExportDone.kt')
+        for label in ['Share Video', 'Share GIF', 'Share Image Sequence']:
+            self.assertIn('"' + label + '"', text)
+
+    def test_color_and_favorite_labels_use_consistent_spelling(self):
+        for path in ['ui/editor/CaptionsSheet.kt', 'ui/editor/panels/BorderShadowPanel.kt', 'ui/editor/TextIcons.kt', 'ui/editor/effects/EffectBrowser.kt']:
+            text = source(path)
+            for old in ['"Colour"', '"Favourite"', '"Unfavourite"']:
+                self.assertNotIn(old, text)
+
+if __name__ == '__main__':
+    unittest.main()
