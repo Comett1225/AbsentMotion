@@ -69,6 +69,23 @@ private var borderField by mutableIntStateOf(0)
 private var shadowField by mutableIntStateOf(0)
 private var endPicker by mutableIntStateOf(-1)
 
+private fun resetBorderShadow() {
+    tab = 0
+    colourEditing = null
+    colourDefault = StyleColors.Black
+    openBorder = -1
+    strokeField = 0
+    borderField = 0
+    shadowField = 0
+    endPicker = -1
+}
+
+@Composable
+internal fun BorderShadowLifetime(owner: Any, layerId: Long, panel: app.absentmotion.editor.EditorPanel) {
+    androidx.compose.runtime.remember(owner, layerId, panel) { resetBorderShadow() }
+    DisposableEffect(owner, layerId, panel) { onDispose { resetBorderShadow() } }
+}
+
 private val StrokeSize = child("path-stroke/size")
 private val StrokeColour = child("path-stroke/color")
 private val ShadowColour = child("shadow/color")
@@ -112,7 +129,6 @@ private val TabIcons = listOf(PanelIcons.TabStroke, PanelIcons.TabBorder, PanelI
 
 @Composable
 internal fun BorderShadowPanel(state: EditorState, layer: Layer, modifier: Modifier = Modifier) {
-    DisposableEffect(Unit) { onDispose { colourEditing = null; endPicker = -1 } }
     Box(modifier) {
         val editing = colourEditing
         if (editing != null) ColourEditor(state, layer, editing)

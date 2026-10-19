@@ -201,6 +201,7 @@ private fun ToolButton(tool: Tool, modifier: Modifier, enabled: Boolean = true, 
 fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
     val selected = state.selected ?: return
     val panel = state.panel
+    app.absentmotion.ui.editor.panels.BorderShadowLifetime(state, selected.id, panel)
     val layer = if (panel == EditorPanel.Speed) selected.atVideoTime(state.sampleMs, state.scene.fps) else selected
     if (panel == EditorPanel.Effects) {
         app.absentmotion.ui.editor.panels.EffectsPanel(state, modifier)

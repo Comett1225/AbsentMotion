@@ -222,6 +222,7 @@ fun Timeline(state: EditorState, modifier: Modifier = Modifier) {
                 view.stopMotion(); state.playing = false
                 val horizontal = kotlin.math.abs(delta.x) > kotlin.math.abs(delta.y) || at.y < view.rulerH
                 view.dragBy(if (horizontal) Drag.Scrub else Drag.Scroll, if (horizontal) Offset(-(if (delta.x != 0f) delta.x else delta.y) * 18f, 0f) else Offset(0f, -delta.y * 18f), at)
+                if (horizontal) view.finishWheelScrub()
             })
             .onSizeChanged { view.size = it }
             .pointerInput(view) { timelineGestures(view) { haptic.performHapticFeedback(HapticFeedbackType.LongPress) } }
@@ -501,6 +502,8 @@ private class TimelineView(val state: EditorState, density: Density, private val
         scrollPx = wanted
         return scroll == wanted
     }
+
+    fun finishWheelScrub() { motion = scope.launch { kotlinx.coroutines.delay(120); settle() } }
 
     private suspend fun settle() {
         val from = scrubMs ?: return
