@@ -22,6 +22,12 @@ class UiContracts(unittest.TestCase):
         self.assertIn('free = freeSpace()\n        if (kind != ExportKind.Gif && estimate > free)', text)
         self.assertIn('Lifecycle.Event.ON_RESUME', text)
 
+    def test_export_probes_missing_media_inside_the_export_job_on_io(self):
+        before, job = source('ui/export/ExportScreen.kt').split('val job = scope.launch {', 1)
+        self.assertNotIn('openAssetFileDescriptor', before)
+        self.assertIn('val missing = withContext(Dispatchers.IO) {', job)
+        self.assertIn('AudioClip.of(scene).isNotEmpty()', before)
+
     def test_media_info_requires_a_declaration(self):
         text = source('ui/editor/EditorMenus.kt')
         self.assertIn('if (mediaRecord != null) MenuRow("Media Info")', text)

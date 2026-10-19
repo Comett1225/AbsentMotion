@@ -110,9 +110,12 @@ import app.absentmotion.ui.theme.enterFade
 import app.absentmotion.ui.theme.presence
 import app.absentmotion.ui.theme.presenceScrim
 import app.absentmotion.library.TemplateStore
+import app.absentmotion.audio.AudioClip
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -151,7 +154,7 @@ fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromProjectList
     page?.let { if (it != ExportKind.Video) lastPage = it }
     if (phase !is Phase.Idle) lastPhase = phase
     var progress by remember { mutableFloatStateOf(0f) }
-    val hasAudio = ExportAudio.mixFor != null && scene.layers.any { it.kind == "audio" }
+    val hasAudio = remember(scene) { ExportAudio.mixFor != null && AudioClip.of(scene).isNotEmpty() }
     val gifSettings = settings.getValue(ExportKind.Gif)
     val gifEstimate by produceState<Long?>(null, kind, scene, gifSettings, phase) {
         value = null
@@ -186,16 +189,6 @@ fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromProjectList
             failure = Failure("Export Failed", "There is nothing to export yet. Add a layer or some media, then try again.")
             return
         }
-        if (kind != ExportKind.Xml && !ignoreMissing) {
-            val missing = scene.node.mediaUris().filter { uri ->
-                try { context.contentResolver.openAssetFileDescriptor(app.absentmotion.platform.Uri.parse(uri), "r")?.close() == null } catch (e: Exception) { true }
-            }.map { scene.media(it)?.filename?.ifEmpty { null } ?: it }
-            if (missing.isNotEmpty()) {
-                failure = Failure("Media Missing", "This project uses files that are not on this device:\n" + missing.joinToString("\n") +
-                    "\n\nThe layers that use them are left out if you export anyway.") { start(true) }
-                return
-            }
-        }
         free = freeSpace()
         if (kind != ExportKind.Gif && estimate > free) {
             failure = Failure("Not Enough Storage", "Free up some storage on this device and export again.")
@@ -207,6 +200,19 @@ fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromProjectList
         progress = 0f
         val job = scope.launch {
             try {
+                if (chosen != ExportKind.Xml && !ignoreMissing) {
+                    val missing = withContext(Dispatchers.IO) {
+                        scene.node.mediaUris().filter { uri ->
+                            try { context.contentResolver.openAssetFileDescriptor(app.absentmotion.platform.Uri.parse(uri), "r")?.close() == null } catch (e: Exception) { true }
+                        }.map { scene.media(it)?.filename?.ifEmpty { null } ?: it }
+                    }
+                    if (missing.isNotEmpty()) {
+                        failure = Failure("Media Missing", "This project uses files that are not on this device:\n" + missing.joinToString("\n") +
+                            "\n\nThe layers that use them are left out if you export anyway.") { start(true) }
+                        phase = Phase.Idle
+                        return@launch
+                    }
+                }
                 if (chosen == ExportKind.Gif) {
                     val measured = measureGifBytes(engine, scene, s)
                     free = freeSpace()

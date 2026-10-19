@@ -42,4 +42,11 @@ class GroupedAudioTest {
         val hidden = Scene(root.node.withChild("embedScene", group.node.with("hidden", "true")))
         assertTrue(AudioClip.of(hidden).isEmpty())
     }
+
+    @Test fun videoSoundAndGroupedAudioCountAsExportAudio() {
+        val video = Scene.parse("""<scene width="100" height="100" fps="30"><shape id="1" startTime="0" endTime="999" fillType="media" fillVideo="file:/v.mp4" s=".rect"/></scene>""")
+        assertEquals("file:/v.mp4", AudioClip.of(video).single().uri)
+        assertFalse(scene().layers.any { it.kind == "audio" })
+        assertTrue(AudioClip.of(scene()).isNotEmpty())
+    }
 }
