@@ -6,16 +6,22 @@ import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
 import app.absentmotion.model.formatFloats
 import app.absentmotion.model.mediaUris
+import app.absentmotion.model.withCopiedLayerIds
 import kotlin.math.min
 
 object ElementNav {
     var open: ((String) -> Unit)? = null
 }
 
-private fun XmlNode.mapTransform(name: String, change: (FloatArray) -> Unit): XmlNode {
-    fun value(text: String?): String? = text?.let { t -> formatFloats(t.split(',').map { it.trim().toFloatOrNull() ?: 0f }.toFloatArray().also(change)) }
-    val transform = child("transform") ?: return this
-    val moved = transform.child(name) ?: return this
+internal fun XmlNode.mapTransform(name: String, change: (FloatArray) -> Unit): XmlNode {
+    val defaults = if (name == "scale") floatArrayOf(1f, 1f) else floatArrayOf(0f, 0f, 0f)
+    fun value(text: String?): String = formatFloats(defaults.copyOf().also { values ->
+        val parts = text?.split(',').orEmpty()
+        for (i in values.indices) values[i] = parts.getOrNull(i)?.trim()?.toFloatOrNull() ?: values[i]
+        change(values)
+    })
+    val transform = child("transform") ?: XmlNode("transform")
+    val moved = transform.child(name) ?: XmlNode(name)
     val next = moved.with("value", value(moved["value"]))
         .copy(children = moved.children.map { if (it.name == "kf") it.with("v", value(it["v"])) else it })
     return withChild("transform", transform.withChild(name, next))
@@ -64,7 +70,7 @@ private suspend fun EditorState.lifetimeBounds(layer: Layer): FloatArray? {
 }
 
 fun EditorState.addElement(store: ProjectStore, id: String, link: Boolean) {
-    val element = store.load(id) ?: return
+    val element = store.load(id)?.withCopiedLayerIds() ?: return
     val start = timeMs
     val attrs = linkedMapOf(
         "id" to "${Layer.newId()}", "label" to element.title,

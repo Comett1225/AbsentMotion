@@ -18,3 +18,8 @@ fun copyLayers(layers: List<Layer>, startTime: Int? = null, preserveOutsideParen
     val shift = if (startTime == null || layers.isEmpty()) 0 else startTime - layers.minOf { it.startTime }
     return layers.map { Layer(remap(it.node)).movedTo(it.startTime + shift) }
 }
+
+internal fun Scene.withCopiedLayerIds(): Scene {
+    val copies = copyLayers(layers).iterator()
+    return Scene(node.copy(children = node.children.map { if (it.name in Scene.LAYER_TAGS) copies.next().node else it }))
+}

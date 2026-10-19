@@ -6,6 +6,7 @@ import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
 import app.absentmotion.model.mapMediaUris
 import app.absentmotion.model.mediaUris
+import app.absentmotion.model.withCopiedLayerIds
 import java.io.File
 import java.util.UUID
 
@@ -45,7 +46,7 @@ class ProjectStore(private val root: File) {
         val media = ArrayList<MediaDeclaration>()
         fun follow(layers: List<XmlNode>, open: Set<String>): List<XmlNode> = layers.map { layer ->
             val linked = layer["link"]?.let(::idOfLink)?.takeIf { it !in open }
-            val element = linked?.let(::read)
+            val element = linked?.let(::read)?.withCopiedLayerIds()
             when {
                 element != null -> {
                     media += element.media
@@ -107,7 +108,9 @@ class ProjectStore(private val root: File) {
         val owners = (listOf(id) + (read(id)?.node?.mediaUris().orEmpty().mapNotNull(::ownerOf))).distinct()
         sceneFile(id).delete()
         thumbnailFile(id).delete()
-        val used = dir.listFiles { f -> f.extension == "xml" }.orEmpty()
+        val projectFiles = dir.listFiles { f -> f.extension == "xml" }.orEmpty().toList()
+        val templateFiles = File(root, "templates").listFiles { f -> f.isDirectory }.orEmpty().map { File(it, "scene.xml") }
+        val used = (projectFiles + templateFiles)
             .mapNotNull { f -> runCatching { Scene.parse(f.readText()).node.mediaUris() }.getOrNull() }.flatten().toSet()
         for (owner in owners.filter { it == id || !sceneFile(it).exists() }) {
             val folder = mediaDir(owner)
