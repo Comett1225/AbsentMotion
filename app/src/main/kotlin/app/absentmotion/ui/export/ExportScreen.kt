@@ -164,7 +164,7 @@ fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromProjectList
             catch (e: Exception) { Log.w("AMExport", "Cannot sample GIF size", e) }
         }
     }
-    val estimate = if (kind == ExportKind.Gif) gifEstimate ?: -1L else estimateBytes(kind, scene, settings.getValue(kind), hasAudio)
+    val estimate = if (kind == ExportKind.Gif) gifEstimate ?: -1L else remember(kind, scene, settings.getValue(kind), hasAudio) { estimateBytes(kind, scene, settings.getValue(kind), hasAudio) }
     var free by remember { mutableLongStateOf(freeSpace()) }
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     DisposableEffect(lifecycle) {
