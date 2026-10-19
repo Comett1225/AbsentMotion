@@ -59,8 +59,8 @@ fun applyPreset(target: Layer, preset: Layer, presetId: String? = null): Layer {
         for (name in MOVING) p.child("transform")?.child(name)?.takeIf { it.isKeyframed }?.let { n = n.withTransformPart(name, it) }
         n = n.replaced(setOf("effect"), p)
     }
-    if (retimed.kind == "text") for (a in listOf("size", "align", "font")) n = n.with(a, p[a])
-    if (retimed.kind == "audio" || retimed.mediaFill?.video == true) n = n.replaced(setOf("gain"), p)
+    if (retimed.kind == "text" && preset.kind == "text") for (a in listOf("size", "align", "font")) n = n.with(a, p[a])
+    if ((retimed.kind == "audio" || retimed.mediaFill?.video == true) && (preset.kind == "audio" || preset.mediaFill?.video == true)) n = n.replaced(setOf("gain"), p)
     return retimed.copy(node = n.with("presetId", presetId ?: n["presetId"]))
 }
 
@@ -76,6 +76,8 @@ private fun XmlNode.withTransformPart(name: String, part: XmlNode?): XmlNode {
 }
 
 private fun Layer.withPresetSpeed(preset: Layer): Layer {
+    fun domain(layer: Layer) = if (layer.kind == "audio" || layer.mediaFill?.video == true) "media" else layer.kind
+    if (domain(this) != domain(preset)) return this
     fun speedOf(l: Layer) = l.node.child("speedMap") ?: XmlNode("speedMap", mapOf("value" to (l.node["speed"] ?: "1")))
     val map = speedOf(preset)
     if (kind == "embedScene" && map.isKeyframed) return this
