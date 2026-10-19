@@ -113,7 +113,7 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier) {
     }
 
     var quad by remember { mutableStateOf<FloatArray?>(null) }
-    LaunchedEffect(state.selectedId, scene, state.frame, mediaRevision) {
+    LaunchedEffect(state.selectedId, scene, state.frame, mediaRevision, state.cameraMode) {
         quad = state.selectedId?.let { state.engine.layerQuad(it, state.timeMs) }
     }
 
@@ -187,6 +187,7 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier) {
                             val grabbed = handlesOf(startQuad)[handle] - centre
                             val now = position - centre
                             val start = startLayer.scale
+                            if (grabbed.getDistanceSquared() < 1e-4f) continue
                             state.editSelected(key = "preview-handle") { layer ->
                                 if (handle < 4) {
                                     val factor = (now.getDistance() / grabbed.getDistance()).coerceAtLeast(0.01f)
@@ -208,7 +209,7 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier) {
                             state.canvasPan += move
                             state.canvasZoom = (state.canvasZoom * zoom).coerceIn(0.01f, 64f)
                             state.zoomShown++
-                        } else if (moved && state.selectedId != null) {
+                        } else if (moved && state.selectedId != null && !(canvasGesture && fingers > 1)) {
                             gesture = HIDDEN
                             val s = currentScale
                             val move = (pan + held) / s
