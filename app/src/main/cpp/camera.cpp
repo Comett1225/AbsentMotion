@@ -54,14 +54,6 @@ View LayerView(const std::vector<Layer>& layers, const Layer& camera, int width,
     return v;
 }
 
-const Layer* ActiveCamera(const std::vector<Layer>& layers, double timeMs) {
-    const Layer* active = nullptr;
-    for (const Layer& l : layers) {
-        if (l.kind != "camera" || l.hidden) continue;
-        if (!active || (timeMs >= l.startTime && timeMs <= l.endTime)) active = &l;
-    }
-    return active;
-}
 
 struct Seen {
     SkPoint location;

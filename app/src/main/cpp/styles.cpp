@@ -72,7 +72,7 @@ const ShaderMode kShaderModes[] = {
     {"soft-light", true, "return 0.5 * (b + hardChannel(s, b));"},
     {"hard-light", true, "return hardChannel(s, b);"},
     {"soft-overlay", true, "return 0.5 * (b + hardChannel(b, s));"},
-    {"vivid-light", true, "return s <= 0.5 ? b * (1.0 - 2.0 * s) : 1.0 - (1.0 - b) * (2.0 * s - 1.0);"},
+    {"vivid-light", true, "return s <= 0.5 ? (b >= 1.0 ? 1.0 : 1.0 - min(1.0, (1.0 - b) / max(2.0 * s, 1e-6))) : (b <= 0.0 ? 0.0 : min(1.0, b / max(2.0 - 2.0 * s, 1e-6)));"},
     {"linear-light", true, "return b + 2.0 * s - 1.0;"},
     {"pin-light", true, "return s <= 0.5 ? min(b, 2.0 * s) : max(b, 2.0 * s - 1.0);"},
     {"hue", false, "float hi = hiOf(b), lo = loOf(b); return lo + (hi - lo) * hueShape(s);"},
@@ -365,6 +365,17 @@ void DrawGroup(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer
     canvas->clipRect(SkRect::MakeWH((float)l.innerWidth, (float)l.innerHeight), true);
     const double inner = NestedTime(l, timeMs);
     if (inner < 0) return;
+    struct Context {
+        const Scene* previous;
+        Scene scene;
+        explicit Context(const Layer& group) : previous(gScene) {
+            scene.width = group.innerWidth;
+            scene.height = group.innerHeight;
+            scene.fps = std::max(1, (int)group.retiming.fps);
+            gScene = &scene;
+        }
+        ~Context() { gScene = previous; }
+    } context(l);
     if (l.fixedPrecompose && l.innerWidth > 0 && l.innerHeight > 0) {
         if (auto surface = canvas->makeSurface(SkImageInfo::MakeN32Premul(l.innerWidth, l.innerHeight))) {
             surface->getCanvas()->drawColor((SkColor)l.innerBackground);
@@ -621,7 +632,7 @@ void DrawList(SkCanvas* canvas, const std::vector<Layer>& source, int width, int
     const std::vector<Layer>& layers =
         SeeLayers(source, width, height, top, gScene ? gScene->fps : 30, timeMs, &storage) ? storage : source;
     const std::vector<Layer>* const outer = gEffectList;
-    gEffectList = top ? &layers : nullptr;
+    gEffectList = &layers;
     for (size_t i = 0; i < layers.size(); i++) {
         const Layer& base = layers[i];
         if (base.clippingMask && i > 0) continue;

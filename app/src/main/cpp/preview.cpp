@@ -101,10 +101,7 @@ static void DrawGrid(SkCanvas* canvas, const SkISize& size, const Scene& scene, 
 }
 
 static void DrawCameraFrames(SkCanvas* canvas, const Scene& scene, double timeMs, bool seenThrough, const SkMatrix& toTarget, float px) {
-    const Layer* active = nullptr;
-    for (const Layer& l : scene.layers) {
-        if (l.kind == "camera" && !l.hidden && (!active || (timeMs >= l.startTime && timeMs <= l.endTime))) active = &l;
-    }
+    const Layer* active = ActiveCamera(scene.layers, timeMs);
     SkPaint paint;
     paint.setAntiAlias(true);
     paint.setStyle(SkPaint::kStroke_Style);

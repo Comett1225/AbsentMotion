@@ -256,8 +256,8 @@ SkPath ShapePath(const Layer& layer, float t) {
     }
     if (s == ".arrow" || s == ".wideline") {
         const bool arrow = s == ".arrow";
-        return Arrow(p.point("start", 0, 0), p.point("end", 250, -250), p.num("lineWidth", 40),
-                     p.num("headWidth", 120), arrow ? p.num("headLength", 130) : 0);
+        return Arrow(p.point("start", 0, 0), p.point("end", 250, -250), p.num("lineWidth", 40) / 2,
+                     p.num("headWidth", 120) / 2, arrow ? p.num("headLength", 130) : 0);
     }
     return b.addRect(box).detach();
 }

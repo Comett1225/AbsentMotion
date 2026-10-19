@@ -66,7 +66,7 @@ MODES = {
     "soft-light": lambda s, b: 0.5 * (b + hard(s, b)),
     "hard-light": lambda s, b: hard(s, b),
     "soft-overlay": lambda s, b: 0.5 * (b + hard(b, s)),
-    "vivid-light": lambda s, b: np.where(s <= 0.5, b * (1 - 2 * s), 1 - (1 - b) * (2 * s - 1)),
+    "vivid-light": lambda s, b: np.where(s <= 0.5, np.where(b >= 1, 1, 1 - np.minimum(1, (1 - b) / np.maximum(2 * s, 1e-6))), np.where(b <= 0, 0, np.minimum(1, b / np.maximum(2 - 2 * s, 1e-6)))),
     "linear-light": lambda s, b: b + 2 * s - 1,
     "pin-light": lambda s, b: np.where(s <= 0.5, np.minimum(b, 2 * s), np.maximum(b, 2 * s - 1)),
     "hue": lambda s, b: lo(b)[..., None] + (hi(b) - lo(b))[..., None] * hue_shape(s),

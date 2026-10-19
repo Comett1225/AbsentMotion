@@ -159,6 +159,7 @@ bool ParseScene(const std::string& xml, Scene* scene, std::string* error);
 Anim ParseAnimNode(const XmlNode* node);
 void ParseStyle(const XmlNode& node, Layer* layer);
 Placement EffectivePlacement(const std::vector<Layer>& siblings, const Layer& layer, double timeMs);
+const Layer* ActiveCamera(const std::vector<Layer>& layers, double timeMs);
 double NestedTime(const Layer& group, double timeMs);
 double RetimedTime(const Retiming& r, int startTime, int endTime, double at);
 void SetCameraView(bool on);

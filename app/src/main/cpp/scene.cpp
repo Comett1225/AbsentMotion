@@ -245,7 +245,8 @@ bool ParseLayer(const XmlNode& node, int fps, Layer* out) {
     if (l.kind == "text") l.text = ParseText(*n);
     if (l.kind == "embedScene") {
         if (const XmlNode* inner = n->child("scene")) ParseGroup(*inner, fps, &l);
-        const float speed = ParseAnim(n->child("speedMap")).get(0, 0, 1);
+        const float fallbackSpeed = n->attr("speed") ? strtof(n->attr("speed"), nullptr) : 1;
+        const float speed = ParseAnim(n->child("speedMap")).get(0, 0, fallbackSpeed);
         if (speed > 0) l.retiming.speed = speed;
     }
     const char* id = n->attr("id");
@@ -334,6 +335,12 @@ bool ParseScene(const std::string& xml, Scene* scene, std::string* error) {
     for (Layer& l : next.layers) mark(l);
     *scene = std::move(next);
     return true;
+}
+
+const Layer* ActiveCamera(const std::vector<Layer>& layers, double timeMs) {
+    const Layer* active = nullptr;
+    for (const Layer& layer : layers) if (layer.kind == "camera" && layer.activeAt(timeMs)) active = &layer;
+    return active;
 }
 
 double NestedTime(const Layer& group, double timeMs) {
