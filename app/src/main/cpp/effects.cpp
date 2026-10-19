@@ -2,6 +2,7 @@
 
 #include "xml.h"
 #include "include/core/SkCanvas.h"
+#include "include/core/SkColorFilter.h"
 #include "include/core/SkPaint.h"
 #include "include/effects/SkImageFilters.h"
 
@@ -72,6 +73,7 @@ std::string EffectRuntime::load(const std::string& xml) {
         }
         if (!result.effect->findChild("image")) return "shader error: no 'uniform shader image'";
         d.blurred = result.effect->findChild("blurred") != nullptr;
+        d.brightPass = d.blurred && result.effect->findUniform("threshold") != nullptr;
         d.shader = std::move(result.effect);
     }
     fDefinitions[id] = std::move(d);
@@ -137,8 +139,16 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
             }
             if (d->blurred) {
                 const float sigma = std::max(Value(e, defaults, "blur", 0, t, 0), 0.0f) / 3;
+                sk_sp<SkImageFilter> source = f;
+                if (d->brightPass) {
+                    const float cut = Value(e, defaults, "threshold", 0, t, 0);
+                    const float luma[5] = {0.2126f, 0.7152f, 0.0722f, 0.0f, -cut};
+                    const float rows[20] = {luma[0], luma[1], luma[2], luma[3], luma[4], luma[0], luma[1], luma[2], luma[3], luma[4],
+                                            luma[0], luma[1], luma[2], luma[3], luma[4], 0, 0, 0, 1, 0};
+                    source = SkImageFilters::ColorFilter(SkColorFilters::Matrix(rows), f);
+                }
                 std::string_view names[] = {"image", "blurred"};
-                const sk_sp<SkImageFilter> inputs[] = {f, sigma > 0 ? SkImageFilters::Blur(sigma, sigma, SkTileMode::kDecal, f) : f};
+                const sk_sp<SkImageFilter> inputs[] = {f, sigma > 0 ? SkImageFilters::Blur(sigma, sigma, SkTileMode::kDecal, source) : source};
                 f = SkImageFilters::RuntimeShader(b, reach, names, inputs, 2);
             } else {
                 f = SkImageFilters::RuntimeShader(b, reach, "image", f);

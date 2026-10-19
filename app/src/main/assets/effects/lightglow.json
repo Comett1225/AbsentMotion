@@ -8,7 +8,7 @@
    "id": "blur",
    "label": "Size",
    "type": "float",
-   "default": 30,
+   "default": 90,
    "min": 0,
    "max": 300,
    "step": 0.1
@@ -26,7 +26,7 @@
    "id": "intensity",
    "label": "Intensity",
    "type": "float",
-   "default": 1.5,
+   "default": 1.0,
    "min": 0,
    "max": 10,
    "step": 0.01
@@ -47,5 +47,5 @@
    "step": 0.01
   }
  ],
- "sksl": "uniform shader image;\nuniform shader blurred;\nuniform float2 size;\nuniform float time;\nuniform float blur;\nuniform float threshold;\nuniform float intensity;\nlayout(color) uniform half4 color;\nuniform float opacity;\nhalf4 main(float2 coord) {\n    half4 c = image.eval(coord);\n    half4 g = blurred.eval(coord);\n    float3 soft = g.a > 0.0 ? float3(g.rgb) / float(g.a) : float3(0.0);\n    float3 bright = max(soft - threshold, 0.0) / max(1.0 - threshold, 0.001);\n    float3 glow = bright * float3(color.rgb) * intensity * clamp(opacity, 0.0, 1.0) * float(g.a);\n    float a = max(float(c.a), clamp(max(glow.r, max(glow.g, glow.b)), 0.0, 1.0));\n    return half4(half3(min(float3(c.rgb) + glow, float3(a))), half(a));\n}"
+ "sksl": "uniform shader image;\nuniform shader blurred;\nuniform float2 size;\nuniform float time;\nuniform float blur;\nuniform float threshold;\nuniform float intensity;\nlayout(color) uniform half4 color;\nuniform float opacity;\nhalf4 main(float2 coord) {\n    half4 c = image.eval(coord);\n    half4 g = blurred.eval(coord);\n    float3 base = c.a > 0.0 ? float3(c.rgb) / float(c.a) : float3(0.0);\n    float glow = clamp(float(g.r) * intensity * clamp(opacity, 0.0, 1.0) * 4.41, 0.0, 1.0);\n    float3 add = glow * float3(color.rgb);\n    float3 rgb = base + add - base * add;\n    float a = max(float(c.a), glow);\n    return half4(half3(clamp(rgb, 0.0, 1.0)) * half(a), half(a));\n}"
 }

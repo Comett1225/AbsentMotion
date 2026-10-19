@@ -22,6 +22,7 @@ private:
     struct Definition {
         sk_sp<SkRuntimeEffect> shader;
         bool blurred = false;
+        bool brightPass = false;
         std::map<std::string, Anim> defaults;
     };
     const Definition* find(const std::string& id) const;
