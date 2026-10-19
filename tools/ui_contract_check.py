@@ -97,7 +97,12 @@ class UiContracts(unittest.TestCase):
 
     def test_camera_ruler_accumulates_scaled_deltas(self):
         text = source('ui/editor/panels/CameraPanel.kt')
-        self.assertIn('write(Angle, layer.number(Angle) + it * Angle.perDp, true)', text)
+        self.assertIn('write(Angle, true) { it + d * Angle.perDp }', text)
+        self.assertIn('writeZoom(true) { it + d * size / 200f }', text)
+        self.assertIn('write(f, true) { it + d * f.perDp }', text)
+        self.assertIn('{ l -> l.withValue(f.ref, formatNumber(value(l.number(f)).coerceIn(f.min, f.max))) }', text)
+        self.assertNotIn('layer.number(Angle) + it', text)
+        self.assertNotIn('layer.number(f) + it', text)
 
     def test_offscreen_video_skips_decoder_setup(self):
         text = source('ui/editor/VideoThumbnails.kt')

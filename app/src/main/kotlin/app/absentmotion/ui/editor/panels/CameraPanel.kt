@@ -82,14 +82,13 @@ internal fun CameraPanel(state: EditorState, layer: Layer, modifier: Modifier = 
     val target = rows.getOrNull(active.coerceAtMost(rows.lastIndex))
     SideEffect { state.keyTarget = target?.let { KeyTarget(it.ref, formatNumber(it.default)) } }
 
-    fun write(f: Field, value: Float, gesture: Boolean) {
-        val v = value.coerceIn(f.min, f.max)
-        state.editSelected(if (gesture) "camera-${f.path}" else null) { it.withValue(f.ref, formatNumber(v)) }
+    fun write(f: Field, gesture: Boolean, value: (Float) -> Float) {
+        state.editSelected(if (gesture) "camera-${f.path}" else null) { l -> l.withValue(f.ref, formatNumber(value(l.number(f)).coerceIn(f.min, f.max))) }
     }
-    fun writeZoom(zoom: Float, gesture: Boolean) {
+    fun writeZoom(gesture: Boolean, zoom: (Float) -> Float) {
         val lo = zoomOf(Angle.max, size)
         val hi = zoomOf(Angle.min, size)
-        write(Angle, fovOf(zoom.coerceIn(lo, hi), size), gesture)
+        write(Angle, gesture) { fov -> fovOf(zoom(zoomOf(fov, size)).coerceIn(lo, hi), size) }
     }
 
     Column(modifier) {
@@ -111,11 +110,11 @@ internal fun CameraPanel(state: EditorState, layer: Layer, modifier: Modifier = 
                             Choice("Orthographic", !perspective, Modifier.weight(1f)) { state.editSelected { it.copy(node = it.node.with("type", "orthographic")) } }
                         }
                         val angle = layer.number(Angle)
-                        NumberRow(Angle.label, formatFixed(angle, 1) + "º", active == 0, perspective, { active = 0; write(Angle, layer.number(Angle) + it * Angle.perDp, true) }, { state.endGesture() },
-                            { active = 0; state.askNumber(Angle.label, angle) { write(Angle, it, false) } })
+                        NumberRow(Angle.label, formatFixed(angle, 1) + "º", active == 0, perspective, { d -> active = 0; write(Angle, true) { it + d * Angle.perDp } }, { state.endGesture() },
+                            { active = 0; state.askNumber(Angle.label, angle) { v -> write(Angle, false) { v } } })
                         val zoom = zoomOf(angle, size)
-                        NumberRow(Zoom.label, "${zoom.toInt()}", active == 1, perspective, { active = 1; writeZoom(zoomOf(layer.number(Angle), size) + it * size / 200f, true) }, { state.endGesture() },
-                            { active = 1; state.askNumber(Zoom.label, zoom.toInt().toFloat()) { writeZoom(it, false) } })
+                        NumberRow(Zoom.label, "${zoom.toInt()}", active == 1, perspective, { d -> active = 1; writeZoom(true) { it + d * size / 200f } }, { state.endGesture() },
+                            { active = 1; state.askNumber(Zoom.label, zoom.toInt().toFloat()) { v -> writeZoom(false) { v } } })
                     }
                     1 -> {
                         SwitchRow("Focus Blur", layer.blockOn("focus-blur")) { on -> state.editSelected { it.withBlock("focus-blur", on) } }
@@ -144,11 +143,11 @@ internal fun CameraPanel(state: EditorState, layer: Layer, modifier: Modifier = 
 }
 
 @Composable
-private fun FieldRows(state: EditorState, layer: Layer, rows: List<Field>, active: Int, on: Boolean, select: (Int) -> Unit, write: (Field, Float, Boolean) -> Unit) {
+private fun FieldRows(state: EditorState, layer: Layer, rows: List<Field>, active: Int, on: Boolean, select: (Int) -> Unit, write: (Field, Boolean, (Float) -> Float) -> Unit) {
     rows.forEachIndexed { i, f ->
         val v = layer.number(f)
-        NumberRow(f.label, formatFixed(v, f.decimals), active == i, on, { select(i); write(f, layer.number(f) + it * f.perDp, true) }, { state.endGesture() },
-            { select(i); state.askNumber(f.label, v) { write(f, it, false) } })
+        NumberRow(f.label, formatFixed(v, f.decimals), active == i, on, { d -> select(i); write(f, true) { it + d * f.perDp } }, { state.endGesture() },
+            { select(i); state.askNumber(f.label, v) { typed -> write(f, false) { typed } } })
     }
 }
 
