@@ -56,6 +56,7 @@ import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.KeypadRequest
 import app.absentmotion.editor.editDrawing
 import app.absentmotion.editor.editPoints
+import app.absentmotion.editor.moveClipEdges
 import app.absentmotion.editor.split
 import app.absentmotion.editor.stepBack
 import app.absentmotion.editor.trimEnd
@@ -94,9 +95,16 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier) {
             SmallTool(PanelIcons.Speed, Modifier.width(183.px), ToolShape, enabled = state.selected?.mediaFill?.video == true || state.selected?.kind == "audio") { state.panel = EditorPanel.Speed }
             Spacer(Modifier.width(17.px))
             Row(Modifier.weight(1f).fillMaxHeight(), Arrangement.spacedBy(3.px)) {
-                SmallTool(PanelIcons.TrimLeft, Modifier.weight(1f), ToolShape.copy(topEnd = Square, bottomEnd = Square)) { state.trimStart() }
-                SmallTool(PanelIcons.Split, Modifier.weight(1f), RoundedCornerShape(0.dp)) { state.split() }
-                SmallTool(PanelIcons.TrimRight, Modifier.weight(1f), ToolShape.copy(topStart = Square, bottomStart = Square)) { state.trimEnd() }
+                val clip = state.selected
+                val past = clip != null && state.timeMs > clip.endTime
+                if (past || clip != null && state.timeMs < clip.startTime) {
+                    SmallTool(if (past) PanelIcons.TrimRight else PanelIcons.TrimLeft, Modifier.weight(1f), ToolShape.copy(topEnd = Square, bottomEnd = Square)) { state.moveClipEdges(past, true) }
+                    SmallTool(if (past) ChromeIcons.SkipForward else ChromeIcons.SkipBack, Modifier.weight(1f), ToolShape.copy(topStart = Square, bottomStart = Square)) { state.moveClipEdges(past, false) }
+                } else {
+                    SmallTool(PanelIcons.TrimLeft, Modifier.weight(1f), ToolShape.copy(topEnd = Square, bottomEnd = Square)) { state.trimStart() }
+                    SmallTool(PanelIcons.Split, Modifier.weight(1f), RoundedCornerShape(0.dp)) { state.split() }
+                    SmallTool(PanelIcons.TrimRight, Modifier.weight(1f), ToolShape.copy(topStart = Square, bottomStart = Square)) { state.trimEnd() }
+                }
             }
             Spacer(Modifier.width(17.px))
             val sound = state.selected?.let { it.kind == "audio" || it.mediaFill?.video == true } == true
