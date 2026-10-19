@@ -3,6 +3,7 @@
 #include <android/native_window_jni.h>
 #include <jni.h>
 
+#include <algorithm>
 #include <string>
 #include <vector>
 
@@ -92,6 +93,23 @@ JNIEXPORT jboolean JNICALL JNI_FN(nativeSetPicture)(JNIEnv* env, jclass, jlong e
                                                 info.stride, opaque);
     AndroidBitmap_unlockPixels(env, bitmap);
     return ok;
+}
+
+JNIEXPORT jboolean JNICALL JNI_FN(nativeSetVideoFrame)(JNIEnv* env, jclass, jlong engine, jbyteArray uri, jlong layerId,
+                                                       jlong pts, jobject hardwareBuffer) {
+    std::string text((size_t)env->GetArrayLength(uri), '\0');
+    env->GetByteArrayRegion(uri, 0, (jsize)text.size(), reinterpret_cast<jbyte*>(text.data()));
+    return engineOf(engine)->setVideoFrame(text, layerId, pts, AHardwareBuffer_fromHardwareBuffer(env, hardwareBuffer));
+}
+
+JNIEXPORT jboolean JNICALL JNI_FN(nativeInterpolateVideo)(JNIEnv* env, jclass, jlong engine, jbyteArray uri,
+                                                          jlong layerId, jlong a, jlong b, jfloat t, jfloatArray params) {
+    std::string text((size_t)env->GetArrayLength(uri), '\0');
+    env->GetByteArrayRegion(uri, 0, (jsize)text.size(), reinterpret_cast<jbyte*>(text.data()));
+    jfloat p[6] = {};
+    env->GetFloatArrayRegion(params, 0, std::min<jsize>(6, env->GetArrayLength(params)), p);
+    const am::InterpolationParams settings{(int)p[0], (int)p[1], (int)p[2], (int)p[3], (int)p[4], p[5]};
+    return engineOf(engine)->interpolateVideo(text, layerId, a, b, t, settings);
 }
 
 JNIEXPORT jint JNICALL JNI_FN(nativeRenderFrame)(JNIEnv*, jclass, jlong engine, jlong target, jdouble timeMs,

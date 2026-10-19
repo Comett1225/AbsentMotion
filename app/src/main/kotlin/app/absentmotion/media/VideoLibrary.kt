@@ -20,6 +20,19 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
+object DebugFrameInterpolation {
+    enum class Mode { Off, Blend, Flow }
+    @Volatile var mode = Mode.Off
+    @Volatile var divisor = 0
+    @Volatile var levels = 5
+    @Volatile var iterations = 6
+    @Volatile var warps = 1
+    @Volatile var alpha = 0.15f
+
+    internal fun params(exact: Boolean) = floatArrayOf(mode.ordinal.toFloat(),
+        (if (divisor > 0) divisor else if (exact) 2 else 4).toFloat(), levels.toFloat(), iterations.toFloat(), warps.toFloat(), alpha)
+}
+
 class VideoLibrary(context: Context, private val engine: EngineThread) {
     private val context = context.applicationContext
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -111,6 +124,8 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
         private var failed = false
         @Volatile private var stopped = false
         private var publishedPts: Long? = null
+        private var publishedMix: Triple<Long, Long, Float>? = null
+        private val held = mutableSetOf<Long>()
         private val worker = scope.launch {
             try {
                 for ((request, layer) in queue) {
@@ -149,6 +164,7 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
             }
             if (obsolete()) return@withLock
             val source = decoder ?: VideoDecoder(context, uri).also { decoder = it }
+            if (DebugFrameInterpolation.mode != DebugFrameInterpolation.Mode.Off && mixed(source, request, layer, exact, ::obsolete)) return@withLock
             val time = layer.videoTimeUs(request.timeMs + if (request.playing) leadMs.toInt() else 0, request.scene)
             val pts = source.wantedPts(time)
             if (publishedPts == pts) return@withLock
@@ -159,9 +175,37 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
                 if (exact) check(installed) { "Cannot import video frame $pts for $uri" }
                 if (installed) {
                     publishedPts = pts
+                    publishedMix = null
                     if (!exact && request.playing) leadMs = (leadMs * 0.8 + (System.nanoTime() - request.born) / 1e6 * 0.2).coerceIn(0.0, MAX_LEAD_MS)
                 }
             }
+        }
+
+        private suspend fun mixed(source: VideoDecoder, request: Request, layer: Layer, exact: Boolean, obsolete: () -> Boolean): Boolean {
+            val time = layer.videoTimeUs(request.timeMs + if (request.playing) leadMs.toInt() else 0, request.scene, atFrameStart = true) + 500
+            val stamps = source.timestamps
+            val a = stamps.ptsAt(time + 500)
+            var b = stamps.getOrNull(stamps.binarySearch(a) + 1) ?: a
+            var t = if (b == a) 0f else ((time - a).toFloat() / (b - a)).coerceIn(0f, 1f)
+            if (t < 0.005f) { b = a; t = 0f }
+            val key = Triple(a, b, t)
+            if (publishedMix == key) return true
+            for (pts in setOf(a, b)) {
+                if (pts in held) continue
+                val image = source.frame(pts, obsolete) ?: return true
+                if (obsolete()) return true
+                if (image.timestamp / 1000 != pts) return false
+                if (!image.hardwareBuffer!!.use { engine.setVideoFrame(uri, it, id, pts, exact) { !obsolete() } }) return false
+                held += pts
+            }
+            if (!engine.interpolateVideo(uri, id, a, b, t, DebugFrameInterpolation.params(exact), exact) { !obsolete() }) {
+                held.clear()
+                return false
+            }
+            held.retainAll(setOf(a, b))
+            publishedMix = key
+            publishedPts = null
+            return true
         }
 
         suspend fun close() {

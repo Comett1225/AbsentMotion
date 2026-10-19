@@ -22,7 +22,7 @@ target_include_directories(rnnoise PUBLIC ${RNNOISE_DIR}/include PRIVATE ${RNNOI
 target_compile_definitions(rnnoise PRIVATE RNNOISE_BUILD)
 target_compile_options(rnnoise PRIVATE -O3 -fvisibility=hidden)
 
-add_library(amengine SHARED preview.cpp camera.cpp drawing.cpp effects.cpp easing.cpp engine.cpp jni.cpp scene.cpp shapes.cpp styles.cpp text.cpp xml.cpp denoise_jni.cpp)
+add_library(amengine SHARED preview.cpp camera.cpp drawing.cpp effects.cpp easing.cpp engine.cpp interpolation.cpp jni.cpp scene.cpp shapes.cpp styles.cpp text.cpp xml.cpp denoise_jni.cpp)
 target_include_directories(amengine PRIVATE ${SKIA_DIR} ${SKIA_DIR}/third_party/externals/expat/expat/lib)
 target_compile_definitions(amengine PRIVATE
     NDEBUG SK_GANESH SK_GRAPHITE SK_VULKAN SK_GL SK_ENABLE_PRECOMPILE SK_DISABLE_TRACING

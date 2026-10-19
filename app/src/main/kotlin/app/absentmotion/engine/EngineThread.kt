@@ -220,6 +220,18 @@ class EngineThread(private val background: Int, context: Context? = null) {
         }
     }
 
+    internal suspend fun setVideoFrame(uri: String, buffer: HardwareBuffer, layerId: Long, pts: Long,
+                                       exact: Boolean, accept: () -> Boolean): Boolean = withContext(dispatcher) {
+        if (closed || (!exact && capturing) || !accept()) return@withContext false
+        engine().setVideoFrame(uri, layerId, pts, buffer)
+    }
+
+    internal suspend fun interpolateVideo(uri: String, layerId: Long, a: Long, b: Long, t: Float, params: FloatArray,
+                                          exact: Boolean, accept: () -> Boolean): Boolean = withContext(dispatcher) {
+        if (closed || (!exact && capturing) || !accept()) return@withContext false
+        engine().interpolateVideo(uri, layerId, a, b, t, params).also { if (!exact) renderNow() }
+    }
+
     suspend fun maxPictureSize(): Int = withContext(dispatcher) { if (closed) 1 else engine().maxPictureSize }
 
     suspend fun setPicture(uri: String, bitmap: Bitmap?, layerId: Long = 0): Boolean = withContext(dispatcher) {

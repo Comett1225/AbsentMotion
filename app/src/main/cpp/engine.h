@@ -30,6 +30,11 @@ struct PreviewOptions {
 
 struct Target;
 
+struct InterpolationParams {
+    int mode, divisor, levels, iterations, warps;
+    float alpha;
+};
+
 class Engine {
 public:
     static std::unique_ptr<Engine> Make(Backend backend, std::string* error);
@@ -50,6 +55,9 @@ public:
     virtual int maxPictureSize() const = 0;
     virtual bool setPicture(const std::string& uri, int64_t layerId, AHardwareBuffer* buffer,
                             const void* pixels, int width, int height, size_t rowBytes, bool opaque) = 0;
+    virtual bool setVideoFrame(const std::string& uri, int64_t layerId, int64_t pts, AHardwareBuffer* buffer) = 0;
+    virtual bool interpolateVideo(const std::string& uri, int64_t layerId, int64_t a, int64_t b, float t,
+                                  const InterpolationParams& params) = 0;
 
     virtual int renderScene(Target* target, double timeMs, float scale, float dx, float dy,
                             uint32_t background, int64_t selectedId, int handles, const PreviewOptions& view) = 0;

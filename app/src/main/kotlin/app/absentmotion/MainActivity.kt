@@ -36,6 +36,7 @@ import app.absentmotion.library.Importer
 import app.absentmotion.library.MediaRelink
 import app.absentmotion.library.ProjectStore
 import app.absentmotion.library.TemplateStore
+import app.absentmotion.media.DebugFrameInterpolation
 import app.absentmotion.model.Layer
 import app.absentmotion.model.XmlNode
 import app.absentmotion.model.formatFloats
@@ -205,6 +206,13 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun handleTestIntent() {
+        DebugFrameInterpolation.mode = DebugFrameInterpolation.Mode.entries.firstOrNull { it.name.equals(intent.getStringExtra("interp"), true) }
+            ?: DebugFrameInterpolation.Mode.Off
+        DebugFrameInterpolation.divisor = intent.getIntExtra("interpDivisor", 0)
+        DebugFrameInterpolation.levels = intent.getIntExtra("interpLevels", 5)
+        DebugFrameInterpolation.iterations = intent.getIntExtra("interpIterations", 6)
+        DebugFrameInterpolation.warps = intent.getIntExtra("interpWarps", 1)
+        DebugFrameInterpolation.alpha = intent.getFloatExtra("interpAlpha", 0.15f)
         if (intent.getBooleanExtra("audiolog", false)) engine.audio?.log = true
         if (intent.getBooleanExtra("effectcheck", false)) lifecycleScope.launch {
             engine.effectCheck(getExternalFilesDir(null)!!)

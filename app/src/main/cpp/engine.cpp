@@ -3,6 +3,7 @@
 #include "preview.h"
 #include "effects.h"
 #include "drawing.h"
+#include "interpolation.h"
 
 #include <android/hardware_buffer.h>
 #include <android/log.h>
@@ -10,6 +11,7 @@
 #include <vulkan/vulkan.h>
 
 #include <algorithm>
+#include <chrono>
 #include <cinttypes>
 #include <cmath>
 #include <cstring>
@@ -95,6 +97,9 @@ public:
     int maxPictureSize() const override { return fGraphite ? fGraphite->maxTextureSize() : fGanesh->maxTextureSize(); }
     bool setPicture(const std::string& uri, int64_t layerId, AHardwareBuffer* buffer,
                     const void* pixels, int width, int height, size_t rowBytes, bool opaque) override;
+    bool setVideoFrame(const std::string& uri, int64_t layerId, int64_t pts, AHardwareBuffer* buffer) override;
+    bool interpolateVideo(const std::string& uri, int64_t layerId, int64_t a, int64_t b, float t,
+                          const InterpolationParams& params) override;
     int renderScene(Target*, double timeMs, float scale, float dx, float dy, uint32_t background,
                     int64_t selectedId, int handles, const PreviewOptions& view) override;
     void setCameraView(bool on) override { fCameraView = on; }
@@ -110,6 +115,7 @@ private:
     bool initVulkan(std::string* error);
     sk_sp<SkSurface> wrapSwapchainImage(VkImage, VkFormat, VkImageUsageFlags, int w, int h);
     sk_sp<SkImage> importFrame(AHardwareBuffer*, bool opaque = true);
+    sk_sp<SkImage> copyFrame(AHardwareBuffer*, bool opaque);
     sk_sp<SkImage> picture(const std::string& uri, int64_t layerId) const;
     MediaPictures pictures() const {
         return [this](const std::string& uri, int64_t id) { return this->picture(uri, id); };
@@ -163,6 +169,11 @@ private:
     std::vector<std::unique_ptr<Target>> fTargets;
     Scene fScene;
     std::map<std::pair<std::string, int64_t>, sk_sp<SkImage>> fPictures;
+    struct VideoFrames {
+        std::map<int64_t, sk_sp<SkImage>> frames;
+        FrameInterpolator interpolator;
+    };
+    std::map<std::pair<std::string, int64_t>, VideoFrames> fVideoFrames;
     bool fLoggedFrame = false;
 };
 
@@ -320,6 +331,7 @@ bool EngineImpl::init(std::string* error) {
 EngineImpl::~EngineImpl() {
     while (!fTargets.empty()) this->detach(fTargets.back().get());
     fPictures.clear();
+    fVideoFrames.clear();
     this->syncGpu();
     if (fGraphite) {
         auto cleanup = fGraphite->makeRecorder();
@@ -528,30 +540,33 @@ sk_sp<SkImage> EngineImpl::picture(const std::string& uri, int64_t layerId) cons
     return found == fPictures.end() ? nullptr : found->second;
 }
 
+sk_sp<SkImage> EngineImpl::copyFrame(AHardwareBuffer* buffer, bool opaque) {
+    auto imported = this->importFrame(buffer, opaque);
+    if (!imported) return nullptr;
+    const auto info = SkImageInfo::Make(imported->width(), imported->height(),
+            kRGBA_8888_SkColorType, opaque ? kOpaque_SkAlphaType : kPremul_SkAlphaType, SkColorSpace::MakeSRGB());
+    auto surface = fGraphite ? SkSurfaces::RenderTarget(fRecorder.get(), info)
+                            : SkSurfaces::RenderTarget(fGanesh.get(), skgpu::Budgeted::kNo, info);
+    if (!surface) return nullptr;
+    surface->getCanvas()->drawImage(imported, 0, 0);
+    sk_sp<SkImage> image = surface->makeImageSnapshot();
+    if (fGraphite) {
+        const bool ok = fGraphite->insertRecording({fRecorder->snap().get()}) &&
+                        fGraphite->submit(skgpu::graphite::SyncToCpu::kYes);
+        if (!ok) image = nullptr;
+    } else {
+        fGanesh->flushAndSubmit(surface.get(), GrSyncCpu::kYes);
+    }
+    return image;
+}
+
 bool EngineImpl::setPicture(const std::string& uri, int64_t layerId, AHardwareBuffer* buffer,
                             const void* pixels, int width, int height, size_t rowBytes, bool opaque) {
     const auto key = std::make_pair(uri, layerId);
-    if (!buffer && !pixels) { fPictures.erase(key); return true; }
+    if (!buffer && !pixels) { fPictures.erase(key); fVideoFrames.erase(key); return true; }
     sk_sp<SkImage> image;
     if (buffer) {
-        auto imported = this->importFrame(buffer, opaque);
-        if (imported) {
-            const auto info = SkImageInfo::Make(imported->width(), imported->height(),
-                    kRGBA_8888_SkColorType, opaque ? kOpaque_SkAlphaType : kPremul_SkAlphaType, SkColorSpace::MakeSRGB());
-            auto surface = fGraphite ? SkSurfaces::RenderTarget(fRecorder.get(), info)
-                                    : SkSurfaces::RenderTarget(fGanesh.get(), skgpu::Budgeted::kNo, info);
-            if (surface) {
-                surface->getCanvas()->drawImage(imported, 0, 0);
-                image = surface->makeImageSnapshot();
-                if (fGraphite) {
-                    const bool ok = fGraphite->insertRecording({fRecorder->snap().get()}) &&
-                                    fGraphite->submit(skgpu::graphite::SyncToCpu::kYes);
-                    if (!ok) image = nullptr;
-                } else {
-                    fGanesh->flushAndSubmit(surface.get(), GrSyncCpu::kYes);
-                }
-            }
-        }
+        image = this->copyFrame(buffer, opaque);
     }
     else if (width > 0 && height > 0 && width <= maxPictureSize() && height <= maxPictureSize()) {
         const auto info = SkImageInfo::Make(width, height, kRGBA_8888_SkColorType,
@@ -561,6 +576,33 @@ bool EngineImpl::setPicture(const std::string& uri, int64_t layerId, AHardwareBu
     }
     if (!image) { fPictures.erase(key); return false; }
     fPictures[key] = std::move(image);
+    return true;
+}
+
+bool EngineImpl::setVideoFrame(const std::string& uri, int64_t layerId, int64_t pts, AHardwareBuffer* buffer) {
+    const auto start = std::chrono::steady_clock::now();
+    auto image = buffer ? this->copyFrame(buffer, true) : nullptr;
+    if (!image) return false;
+    __android_log_print(ANDROID_LOG_INFO, "AMInterp", "import pts=%" PRId64 " size=%dx%d ms=%.2f", pts, image->width(),
+                        image->height(), std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - start).count());
+    fVideoFrames[{uri, layerId}].frames[pts] = std::move(image);
+    return true;
+}
+
+bool EngineImpl::interpolateVideo(const std::string& uri, int64_t layerId, int64_t a, int64_t b, float t,
+                                  const InterpolationParams& params) {
+    auto found = fVideoFrames.find({uri, layerId});
+    if (found == fVideoFrames.end()) return false;
+    auto& frames = found->second.frames;
+    auto first = frames.find(a), second = frames.find(b);
+    if (first == frames.end() || second == frames.end()) return false;
+    sk_sp<SkImage> image = first->second;
+    if (a != b && t > 0 && fGraphite) {
+        auto mixed = found->second.interpolator.run(fGraphite.get(), fRecorder.get(), first->second, second->second, t, params);
+        if (mixed) image = std::move(mixed);
+    }
+    std::erase_if(frames, [&](const auto& frame) { return frame.first != a && frame.first != b; });
+    fPictures[{uri, layerId}] = std::move(image);
     return true;
 }
 
