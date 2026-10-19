@@ -32,6 +32,10 @@ internal class VideoDecoder(private val context: Context, private val uri: Strin
     private var queued = false
     private var flushable = false
     private lateinit var format: MediaFormat
+    var colorStandard = 0
+        private set
+    var colorRange = 0
+        private set
     var timestamps: LongArray
         private set
 
@@ -40,6 +44,7 @@ internal class VideoDecoder(private val context: Context, private val uri: Strin
             extractor.setDataSource(context, Uri.parse(uri), null)
             val track = (0 until extractor.trackCount).first { extractor.getTrackFormat(it).getString(MediaFormat.KEY_MIME)?.startsWith("video/") == true }
             format = extractor.getTrackFormat(track)
+            readColor(format)
             extractor.selectTrack(track)
             timestamps = VideoSources.timestamps(context, uri)
             extractor.seekTo(0, MediaExtractor.SEEK_TO_PREVIOUS_SYNC)
@@ -82,7 +87,10 @@ internal class VideoDecoder(private val context: Context, private val uri: Strin
                     }
                 }
                 val index = decoder.dequeueOutputBuffer(info, 5_000)
-                if (index == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) flushable = true
+                if (index == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
+                    flushable = true
+                    readColor(decoder.outputFormat)
+                }
                 if (index < 0) continue
                 flushable = true
                 outputEnded = info.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0
@@ -112,6 +120,11 @@ internal class VideoDecoder(private val context: Context, private val uri: Strin
         } finally {
             if (held >= 0) decoder.releaseOutputBuffer(held, false)
         }
+    }
+
+    private fun readColor(format: MediaFormat) {
+        colorStandard = videoColorStandard(format.getInteger(MediaFormat.KEY_COLOR_STANDARD, colorStandard))
+        colorRange = format.getInteger(MediaFormat.KEY_COLOR_RANGE, colorRange)
     }
 
     private fun reposition(decoder: MediaCodec, wanted: Long) {

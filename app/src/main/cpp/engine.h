@@ -30,6 +30,10 @@ struct PreviewOptions {
 
 struct Target;
 
+struct FrameCrop {
+    int left = 0, top = 0, right = 0, bottom = 0;
+};
+
 struct InterpolationParams {
     int divisor = 4, levels = 5, iterations = 6, warps = 1;
     float alpha = 0.15f;
@@ -56,8 +60,8 @@ public:
 
     virtual int maxPictureSize() const = 0;
     virtual bool setPicture(const std::string& uri, int64_t layerId, AHardwareBuffer* buffer,
-                            const void* pixels, int width, int height, size_t rowBytes, bool opaque) = 0;
-    virtual bool setVideoFrame(const std::string& uri, int64_t layerId, int64_t pts, AHardwareBuffer* buffer) = 0;
+                            const void* pixels, int width, int height, size_t rowBytes, bool opaque, int colorStandard = 0, int colorRange = 0, const FrameCrop& crop = {}) = 0;
+    virtual bool setVideoFrame(const std::string& uri, int64_t layerId, int64_t pts, AHardwareBuffer* buffer, int colorStandard = 0, int colorRange = 0, const FrameCrop& crop = {}) = 0;
     virtual bool interpolateVideo(const std::string& uri, int64_t layerId, int64_t a, int64_t b, float t, bool flow,
                                   const InterpolationParams& params) = 0;
 

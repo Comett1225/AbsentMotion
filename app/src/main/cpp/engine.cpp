@@ -23,6 +23,7 @@
 #include "include/android/vk/AndroidVulkanMemoryAllocator.h"
 #include "include/core/SkCanvas.h"
 #include "include/core/SkColorSpace.h"
+#include "include/core/SkColorFilter.h"
 #include "include/core/SkImage.h"
 #include "include/core/SkPaint.h"
 #include "include/core/SkPathBuilder.h"
@@ -40,6 +41,7 @@
 #include "include/gpu/ganesh/vk/GrVkDirectContext.h"
 #include "include/gpu/ganesh/vk/GrVkTypes.h"
 #include "include/gpu/graphite/BackendSemaphore.h"
+#include "src/gpu/graphite/vk/VulkanGraphiteUtils.h"
 #include "include/gpu/graphite/BackendTexture.h"
 #include "include/gpu/graphite/Context.h"
 #include "include/gpu/graphite/ContextOptions.h"
@@ -96,8 +98,8 @@ public:
     std::string loadEffect(const std::string& xml) override { return fEffects.load(xml); }
     int maxPictureSize() const override { return fGraphite ? fGraphite->maxTextureSize() : fGanesh->maxTextureSize(); }
     bool setPicture(const std::string& uri, int64_t layerId, AHardwareBuffer* buffer,
-                    const void* pixels, int width, int height, size_t rowBytes, bool opaque) override;
-    bool setVideoFrame(const std::string& uri, int64_t layerId, int64_t pts, AHardwareBuffer* buffer) override;
+                    const void* pixels, int width, int height, size_t rowBytes, bool opaque, int colorStandard, int colorRange, const FrameCrop& crop) override;
+    bool setVideoFrame(const std::string& uri, int64_t layerId, int64_t pts, AHardwareBuffer* buffer, int colorStandard, int colorRange, const FrameCrop& crop) override;
     bool interpolateVideo(const std::string& uri, int64_t layerId, int64_t a, int64_t b, float t, bool flow,
                           const InterpolationParams& params) override;
     int renderScene(Target*, double timeMs, float scale, float dx, float dy, uint32_t background,
@@ -114,8 +116,8 @@ public:
 private:
     bool initVulkan(std::string* error);
     sk_sp<SkSurface> wrapSwapchainImage(VkImage, VkFormat, VkImageUsageFlags, int w, int h);
-    sk_sp<SkImage> importFrame(AHardwareBuffer*, bool opaque = true);
-    sk_sp<SkImage> copyFrame(AHardwareBuffer*, bool opaque);
+    sk_sp<SkImage> importFrame(AHardwareBuffer*, bool opaque = true, int colorStandard = 0, int colorRange = 0, bool* rawYuv = nullptr);
+    sk_sp<SkImage> copyFrame(AHardwareBuffer*, bool opaque, int colorStandard, int colorRange, const FrameCrop& crop);
     sk_sp<SkImage> picture(const std::string& uri, int64_t layerId) const;
     MediaPictures pictures() const {
         return [this](const std::string& uri, int64_t id) { return this->picture(uri, id); };
@@ -505,7 +507,7 @@ void EngineImpl::detach(Target* target) {
     }
 }
 
-sk_sp<SkImage> EngineImpl::importFrame(AHardwareBuffer* buffer, bool opaque) {
+sk_sp<SkImage> EngineImpl::importFrame(AHardwareBuffer* buffer, bool opaque, int colorStandard, int colorRange, bool* rawYuv) {
     AHardwareBuffer_Desc desc;
     AHardwareBuffer_describe(buffer, &desc);
     if (!fLoggedFrame) {
@@ -521,6 +523,30 @@ sk_sp<SkImage> EngineImpl::importFrame(AHardwareBuffer* buffer, bool opaque) {
                                                false,
                                                {(int)desc.width, (int)desc.height});
     if (!tex.isValid()) return nullptr;
+    skgpu::graphite::VulkanTextureInfo textureInfo;
+    if ((colorStandard == 1 || colorStandard == 2 || colorStandard == 4 || colorStandard == 6) && skgpu::graphite::TextureInfos::GetVulkanTextureInfo(tex.info(), &textureInfo) && textureInfo.fYcbcrConversionInfo.isValid()) {
+        const auto& conversion = textureInfo.fYcbcrConversionInfo;
+        const auto model = VK_SAMPLER_YCBCR_MODEL_CONVERSION_YCBCR_IDENTITY;
+        const auto range = VK_SAMPLER_YCBCR_RANGE_ITU_FULL;
+        VkAndroidHardwareBufferFormatPropertiesANDROID format{VK_STRUCTURE_TYPE_ANDROID_HARDWARE_BUFFER_FORMAT_PROPERTIES_ANDROID};
+        VkAndroidHardwareBufferPropertiesANDROID properties{VK_STRUCTURE_TYPE_ANDROID_HARDWARE_BUFFER_PROPERTIES_ANDROID};
+        properties.pNext = &format;
+        const auto getProperties = reinterpret_cast<PFN_vkGetAndroidHardwareBufferPropertiesANDROID>(vkGetDeviceProcAddr(fDevice, "vkGetAndroidHardwareBufferPropertiesANDROID"));
+        if (getProperties && getProperties(fDevice, buffer, &properties) == VK_SUCCESS) {
+            if (conversion.hasExternalFormat()) {
+                textureInfo.fYcbcrConversionInfo = skgpu::VulkanYcbcrConversionInfo(conversion.externalFormat(), model, range,
+                    conversion.xChromaOffset(), conversion.yChromaOffset(), conversion.chromaFilter(), conversion.forceExplicitReconstruction(), conversion.components(), format.formatFeatures);
+            } else {
+                textureInfo.fYcbcrConversionInfo = skgpu::VulkanYcbcrConversionInfo(conversion.format(), model, range,
+                    conversion.xChromaOffset(), conversion.yChromaOffset(), conversion.chromaFilter(), conversion.forceExplicitReconstruction(), conversion.components(), format.formatFeatures);
+            }
+            if (rawYuv) *rawYuv = true;
+            const auto original = tex;
+            tex = skgpu::graphite::BackendTextures::MakeVulkan(original.dimensions(), textureInfo,
+                skgpu::graphite::BackendTextures::GetVkImageLayout(original), skgpu::graphite::BackendTextures::GetVkQueueFamilyIndex(original),
+                skgpu::graphite::BackendTextures::GetVkImage(original), skgpu::graphite::BackendTextures::GetMemoryAlloc(original));
+        }
+    }
     struct Release {
         EngineImpl* engine;
         skgpu::graphite::BackendTexture tex;
@@ -543,15 +569,34 @@ sk_sp<SkImage> EngineImpl::picture(const std::string& uri, int64_t layerId) cons
     return found == fPictures.end() ? nullptr : found->second;
 }
 
-sk_sp<SkImage> EngineImpl::copyFrame(AHardwareBuffer* buffer, bool opaque) {
-    auto imported = this->importFrame(buffer, opaque);
+sk_sp<SkImage> EngineImpl::copyFrame(AHardwareBuffer* buffer, bool opaque, int colorStandard, int colorRange, const FrameCrop& crop) {
+    bool rawYuv = false;
+    auto imported = this->importFrame(buffer, opaque, colorStandard, colorRange, &rawYuv);
     if (!imported) return nullptr;
-    const auto info = SkImageInfo::Make(imported->width(), imported->height(),
+    auto bounds = SkIRect::MakeWH(imported->width(), imported->height());
+    if (crop.right > crop.left && crop.bottom > crop.top &&
+        !bounds.intersect(SkIRect::MakeLTRB(crop.left, crop.top, crop.right, crop.bottom))) return nullptr;
+    const auto info = SkImageInfo::Make(bounds.width(), bounds.height(),
             kRGBA_8888_SkColorType, opaque ? kOpaque_SkAlphaType : kPremul_SkAlphaType, SkColorSpace::MakeSRGB());
     auto surface = fGraphite ? SkSurfaces::RenderTarget(fRecorder.get(), info)
                             : SkSurfaces::RenderTarget(fGanesh.get(), skgpu::Budgeted::kNo, info);
     if (!surface) return nullptr;
-    surface->getCanvas()->drawImage(imported, 0, 0);
+    SkPaint paint;
+    if (rawYuv) {
+        const float kr = colorStandard == 1 ? 0.2126f : colorStandard == 6 ? 0.2627f : 0.299f;
+        const float kb = colorStandard == 1 ? 0.0722f : colorStandard == 6 ? 0.0593f : 0.114f;
+        const float kg = 1 - kr - kb;
+        const float ys = colorRange == 2 ? 255.f / 219 : 1.f;
+        const float cs = colorRange == 2 ? 255.f / 224 : 1.f;
+        const float yo = colorRange == 2 ? -16.f / 219 : 0.f;
+        const float ro = 2 * (1 - kr) * cs;
+        const float bo = 2 * (1 - kb) * cs;
+        const float gr = -2 * kr * (1 - kr) / kg * cs;
+        const float gb = -2 * kb * (1 - kb) / kg * cs;
+        const float matrix[20] = {ro, ys, 0, 0, yo, gr, ys, gb, 0, yo, 0, ys, bo, 0, yo, 0, 0, 0, 1, 0};
+        paint.setColorFilter(SkColorFilters::Matrix(matrix));
+    }
+    surface->getCanvas()->drawImage(imported, -bounds.left(), -bounds.top(), SkSamplingOptions(), &paint);
     sk_sp<SkImage> image = surface->makeImageSnapshot();
     if (fGraphite) {
         const bool ok = fGraphite->insertRecording({fRecorder->snap().get()}) &&
@@ -564,12 +609,12 @@ sk_sp<SkImage> EngineImpl::copyFrame(AHardwareBuffer* buffer, bool opaque) {
 }
 
 bool EngineImpl::setPicture(const std::string& uri, int64_t layerId, AHardwareBuffer* buffer,
-                            const void* pixels, int width, int height, size_t rowBytes, bool opaque) {
+                            const void* pixels, int width, int height, size_t rowBytes, bool opaque, int colorStandard, int colorRange, const FrameCrop& crop) {
     const auto key = std::make_pair(uri, layerId);
     if (!buffer && !pixels) { fPictures.erase(key); fVideoFrames.erase(key); return true; }
     sk_sp<SkImage> image;
     if (buffer) {
-        image = this->copyFrame(buffer, opaque);
+        image = this->copyFrame(buffer, opaque, colorStandard, colorRange, crop);
     }
     else if (width > 0 && height > 0 && width <= maxPictureSize() && height <= maxPictureSize()) {
         const auto info = SkImageInfo::Make(width, height, kRGBA_8888_SkColorType,
@@ -583,9 +628,9 @@ bool EngineImpl::setPicture(const std::string& uri, int64_t layerId, AHardwareBu
     return true;
 }
 
-bool EngineImpl::setVideoFrame(const std::string& uri, int64_t layerId, int64_t pts, AHardwareBuffer* buffer) {
+bool EngineImpl::setVideoFrame(const std::string& uri, int64_t layerId, int64_t pts, AHardwareBuffer* buffer, int colorStandard, int colorRange, const FrameCrop& crop) {
     const auto start = std::chrono::steady_clock::now();
-    auto image = buffer ? this->copyFrame(buffer, true) : nullptr;
+    auto image = buffer ? this->copyFrame(buffer, true, colorStandard, colorRange, crop) : nullptr;
     if (!image) return false;
     __android_log_print(ANDROID_LOG_INFO, "AMInterp", "import pts=%" PRId64 " size=%dx%d ms=%.2f", pts, image->width(),
                         image->height(), std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - start).count());
@@ -631,14 +676,26 @@ bool EngineImpl::interpolateVideo(const std::string& uri, int64_t layerId, int64
     auto first = video.frames.find(a), second = video.frames.find(b);
     if (first == video.frames.end() || second == video.frames.end()) return false;
     sk_sp<SkImage> image = first->second;
-    if (a != b && t > 0 && fGraphite && !fGpuFailed) {
+    if (a != b && t > 0) {
+        if (!fGraphite || fGpuFailed) {
+            LOGE("interpolation failed: GPU is unavailable");
+            return false;
+        }
         const sk_sp<SkImage> field = flow ? this->flowFor(video, a, b, params) : nullptr;
+        if (flow && !field) {
+            LOGE("interpolation failed: optical flow could not be estimated");
+            return false;
+        }
         double ms = 0;
         auto mixed = SynthesizeFrame(fGraphite.get(), fRecorder.get(), first->second, second->second, field, t,
                                      params.divisor, &ms);
         __android_log_print(ANDROID_LOG_INFO, "AMInterp", "frame a=%" PRId64 " b=%" PRId64 " t=%.4f mode=%s synthesis=%.2f",
                             a, b, t, field ? "flow" : "blend", ms);
-        if (mixed) image = std::move(mixed);
+        if (!mixed) {
+            LOGE("interpolation failed: frame synthesis returned no image");
+            return false;
+        }
+        image = std::move(mixed);
     }
     std::erase_if(video.frames, [&](const auto& frame) { return frame.first != a && frame.first != b; });
     std::erase_if(video.flows, [&](const auto& pair) {

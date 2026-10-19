@@ -1,6 +1,7 @@
 package app.absentmotion.engine
 
 import android.hardware.HardwareBuffer
+import android.graphics.Rect
 import android.graphics.Bitmap
 import android.view.Surface
 
@@ -28,13 +29,13 @@ class NativeEngine(backend: Backend) : AutoCloseable {
     val maxPictureSize: Int get() = nativeMaxPictureSize(handle)
 
     fun setPicture(uri: String, bitmap: Bitmap?, layerId: Long = 0): Boolean =
-        nativeSetPicture(handle, uri.toByteArray(), layerId, bitmap, null, bitmap?.hasAlpha() == false)
+        nativeSetPicture(handle, uri.toByteArray(), layerId, bitmap, null, bitmap?.hasAlpha() == false, 0, 0, 0, 0, 0, 0)
 
-    fun setPicture(uri: String, buffer: HardwareBuffer, layerId: Long = 0, opaque: Boolean = true): Boolean =
-        nativeSetPicture(handle, uri.toByteArray(), layerId, null, buffer, opaque)
+    fun setPicture(uri: String, buffer: HardwareBuffer, layerId: Long = 0, opaque: Boolean = true, standard: Int = 0, range: Int = 0, crop: Rect? = null): Boolean =
+        nativeSetPicture(handle, uri.toByteArray(), layerId, null, buffer, opaque, standard, range, crop?.left ?: 0, crop?.top ?: 0, crop?.right ?: 0, crop?.bottom ?: 0)
 
-    fun setVideoFrame(uri: String, layerId: Long, pts: Long, buffer: HardwareBuffer): Boolean =
-        nativeSetVideoFrame(handle, uri.toByteArray(), layerId, pts, buffer)
+    fun setVideoFrame(uri: String, layerId: Long, pts: Long, buffer: HardwareBuffer, standard: Int = 0, range: Int = 0, crop: Rect? = null): Boolean =
+        nativeSetVideoFrame(handle, uri.toByteArray(), layerId, pts, buffer, standard, range, crop?.left ?: 0, crop?.top ?: 0, crop?.right ?: 0, crop?.bottom ?: 0)
 
     fun interpolateVideo(uri: String, layerId: Long, a: Long, b: Long, t: Float, flow: Boolean, params: FloatArray): Boolean =
         nativeInterpolateVideo(handle, uri.toByteArray(), layerId, a, b, t, flow, params)
@@ -90,8 +91,8 @@ class NativeEngine(backend: Backend) : AutoCloseable {
         @JvmStatic private external fun nativeLoadEffect(engine: Long, xml: ByteArray): String
         @JvmStatic private external fun nativeMaxPictureSize(engine: Long): Int
         @JvmStatic private external fun nativeSetPicture(engine: Long, uri: ByteArray, layerId: Long,
-                                                        bitmap: Bitmap?, buffer: HardwareBuffer?, opaque: Boolean): Boolean
-        @JvmStatic private external fun nativeSetVideoFrame(engine: Long, uri: ByteArray, layerId: Long, pts: Long, buffer: HardwareBuffer): Boolean
+                                                        bitmap: Bitmap?, buffer: HardwareBuffer?, opaque: Boolean, standard: Int, range: Int, left: Int, top: Int, right: Int, bottom: Int): Boolean
+        @JvmStatic private external fun nativeSetVideoFrame(engine: Long, uri: ByteArray, layerId: Long, pts: Long, buffer: HardwareBuffer, standard: Int, range: Int, left: Int, top: Int, right: Int, bottom: Int): Boolean
         @JvmStatic private external fun nativeInterpolateVideo(engine: Long, uri: ByteArray, layerId: Long, a: Long, b: Long, t: Float,
                                                                flow: Boolean, params: FloatArray): Boolean
         @JvmStatic private external fun nativeRenderScene(

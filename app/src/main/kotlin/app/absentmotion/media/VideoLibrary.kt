@@ -6,6 +6,8 @@ import app.absentmotion.engine.EngineThread
 import app.absentmotion.export.FrameInterpolation
 import app.absentmotion.model.FramePair
 import app.absentmotion.model.Layer
+import app.absentmotion.model.LayerTrack
+import app.absentmotion.model.layerTracks
 import app.absentmotion.model.Scene
 import app.absentmotion.model.exportFrame
 import app.absentmotion.model.exportFrameMs
@@ -55,7 +57,7 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
             for (request in requests) lock.withLock {
                 if (paused || request !== latest) return@withLock
                 reconcile(request)
-                for (layer in visible(request)) sessions[layer.id]?.request(request, layer)
+                for (layer in visible(request)) sessions[layer.layer.id]?.request(request, layer)
             }
         }
     }
@@ -68,17 +70,24 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
         if (!paused) requests.trySend(next)
     }
 
-    private fun visible(request: Request) = request.scene.layers.filter { it.activeAt(request.timeMs) && it.mediaFill?.video == true }
+    private data class Sample(val track: LayerTrack, val timeMs: Double) {
+        val layer get() = track.layer
+        val scene get() = track.scene
+    }
+
+    private fun visible(request: Request) = request.scene.layerTracks().mapNotNull { track ->
+        if (track.layer.mediaFill?.video != true) null else track.timeAt(request.timeMs.toDouble(), true)?.let { Sample(track, it.ms) }
+    }
 
     private suspend fun reconcile(request: Request) {
-        val wanted = visible(request).associateBy { it.id }
+        val wanted = visible(request).associateBy { it.layer.id }
         for ((id, session) in sessions.toMap()) {
-            if (wanted[id]?.mediaFill?.uri != session.uri) {
+            if (wanted[id]?.layer?.mediaFill?.uri != session.uri) {
                 sessions.remove(id)
                 session.close()
             }
         }
-        for ((id, layer) in wanted) sessions.getOrPut(id) { Session(id, layer.mediaFill!!.uri) }
+        for ((id, layer) in wanted) sessions.getOrPut(id) { Session(id, layer.layer.mediaFill!!.uri) }
     }
 
     suspend fun <T> withExact(
@@ -89,7 +98,7 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
             val request = Request(scene, timeMs, false, interpolation, fps)
             reconcile(request)
             withContext(Dispatchers.IO) {
-                visible(request).map { layer -> async { sessions.getValue(layer.id).exact(request, layer) } }.awaitAll()
+                visible(request).map { layer -> async { sessions.getValue(layer.layer.id).exact(request, layer) } }.awaitAll()
             }
             draw()
         } finally {
@@ -129,7 +138,7 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
 
     private inner class Session(val id: Long, val uri: String) {
         private val decoderLock = Mutex()
-        private val queue = Channel<Pair<Request, Layer>>(Channel.CONFLATED)
+        private val queue = Channel<Pair<Request, Sample>>(Channel.CONFLATED)
         private var decoder: VideoDecoder? = null
         private var retryAt = 0L
         @Volatile private var stopped = false
@@ -152,17 +161,19 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
             }
         }
 
-        fun request(request: Request, layer: Layer) { queue.trySend(request to layer) }
-        suspend fun exact(request: Request, layer: Layer) {
-            try { decode(request, layer, exact = true) }
+        fun request(request: Request, sample: Sample) { queue.trySend(request to sample) }
+        suspend fun exact(request: Request, sample: Sample) {
+            try { decode(request, sample, exact = true) }
             catch (e: CancellationException) { throw e }
             catch (e: Exception) {
                 Log.w("AMVideo", "Cannot decode $uri layer $id at ${request.timeMs} ms", e)
                 decoderLock.withLock { decoder?.close(); decoder = null }
+                throw e
             }
         }
 
-        private suspend fun decode(request: Request, layer: Layer, exact: Boolean) = decoderLock.withLock {
+        private suspend fun decode(request: Request, sample: Sample, exact: Boolean) = decoderLock.withLock {
+            val layer = sample.layer
             if (stopped) {
                 check(!exact) { "Video is unavailable: $uri" }
                 return@withLock
@@ -170,18 +181,22 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
             if (!exact && System.nanoTime() < retryAt) return@withLock
             fun obsolete(): Boolean = !exact && latest.let { now ->
                 paused || stopped || ((!request.playing || now?.playing != true) && now !== request) ||
-                    now.scene != request.scene || now.scene.layer(id)?.activeAt(now.timeMs) != true
+                    now?.scene != request.scene || visible(now).none { it.layer.id == id }
             }
             if (obsolete()) return@withLock
             val source = decoder ?: VideoDecoder(context, uri).also { decoder = it }
-            if (exact && request.interpolation != FrameInterpolation.Off && mixed(source, request, layer)) return@withLock
-            val time = layer.videoTimeUs(request.timeMs + if (request.playing) leadMs.toInt() else 0, request.scene)
+            if (exact && request.interpolation != FrameInterpolation.Off && mixed(source, request, sample)) return@withLock
+            val ahead = if (request.playing) leadMs * (sample.track.timeAt(request.timeMs.toDouble(), false)?.rate ?: 1.0) else 0.0
+            val time = layer.videoTimeUs((sample.timeMs + ahead).toInt(), sample.scene)
             val pts = source.wantedPts(time)
             if (publishedPts == pts) return@withLock
-            val image = source.frame(time, ::obsolete) ?: return@withLock
+            val image = source.frame(time, ::obsolete) ?: run {
+                check(!exact) { "Cannot decode exact video frame $pts" }
+                return@withLock
+            }
             if (obsolete()) return@withLock
             image.hardwareBuffer!!.use { buffer ->
-                val installed = engine.setVideoPicture(uri, buffer, id, exact) { !obsolete() }
+                val installed = engine.setVideoPicture(uri, buffer, id, exact, source.colorStandard, source.colorRange, image.cropRect) { !obsolete() }
                 if (exact) check(installed) { "Cannot import video frame $pts for $uri" }
                 if (installed) {
                     publishedPts = pts
@@ -192,23 +207,32 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
             }
         }
 
-        private suspend fun mixed(source: VideoDecoder, request: Request, layer: Layer): Boolean {
-            if (request.fps <= 0) return false
+        private suspend fun mixed(source: VideoDecoder, request: Request, sample: Sample): Boolean {
+            val layer = sample.layer
+            if (request.fps <= 0) {
+                Log.w("AMInterp", "Interpolation skipped: export frame rate is unavailable")
+                return false
+            }
             val stamps = source.timestamps
-            val pair = layer.exportFrame(exportFrameMs(request.timeMs, request.fps), request.scene, stamps, request.fps) ?: return false
+            if (stamps.isEmpty()) {
+                Log.w("AMInterp", "Interpolation skipped: source frame timestamps are unavailable for layer $id")
+                return false
+            }
+            val mapped = sample.track.timeAt(exportFrameMs(request.timeMs, request.fps), false) ?: return false
+            val pair = layer.exportFrame(mapped.ms, sample.scene, stamps, request.fps, mapped.rate) ?: return false
             val key = pair to request.interpolation
             if (publishedMix == key) return true
             for (pts in setOf(pair.a, pair.b)) {
                 if (pts in held) continue
-                val image = source.frame(pts) { false } ?: return false
-                if (image.timestamp / 1000 != pts) return false
-                if (!image.hardwareBuffer!!.use { engine.setVideoFrame(uri, it, id, pts) }) return false
+                val image = source.frame(pts) { false } ?: error("Interpolation source frame $pts is unavailable")
+                check(image.timestamp / 1000 == pts) { "Interpolation received the wrong source frame for $pts" }
+                check(image.hardwareBuffer!!.use { engine.setVideoFrame(uri, it, id, pts, source.colorStandard, source.colorRange, image.cropRect) }) { "Cannot import interpolation source frame $pts" }
                 held += pts
             }
             if (!engine.interpolateVideo(uri, id, pair.a, pair.b, pair.t, request.interpolation == FrameInterpolation.Flow,
                     DebugFrameInterpolation.params())) {
                 held.clear()
-                return false
+                error("${request.interpolation.label} could not render the requested video frame")
             }
             held.retainAll(setOf(pair.a, pair.b))
             publishedMix = key

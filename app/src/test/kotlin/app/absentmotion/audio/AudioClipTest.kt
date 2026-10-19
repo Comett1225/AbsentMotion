@@ -10,6 +10,17 @@ class AudioClipTest {
     private fun clip(vararg attrs: Pair<String, String>) =
         AudioClip(Layer(XmlNode("audio", linkedMapOf("id" to "1", "startTime" to "0", "endTime" to "9999", "src" to "a.m4a", *attrs))), "a.m4a")
 
+    @Test fun aLoopWithoutAnEndUsesTheDecoderDurationWhenAvailable() {
+        val open = clip("loop" to "true", "inTime" to "100")
+        open.resolveDuration(400000)
+        assertEquals(400.0, open.outMs, 0.0)
+        assertEquals(150.0, open.wrap(450.0), 0.0)
+        assertEquals(150.0, open.wrap(1050.0), 0.0)
+        val bounded = clip("loop" to "true", "outTime" to "300")
+        bounded.resolveDuration(400000)
+        assertEquals(300.0, bounded.outMs, 0.0)
+    }
+
     @Test fun aLoopWithoutAnEndPlaysOnInsteadOfRepeatingItsFirstBlock() {
         val open = clip("loop" to "true", "inTime" to "200")
         assertEquals(5000.0, open.wrap(5000.0), 1e-9)

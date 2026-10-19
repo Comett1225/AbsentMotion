@@ -82,12 +82,12 @@ JNIEXPORT jint JNICALL JNI_FN(nativeMaxPictureSize)(JNIEnv*, jclass, jlong engin
 
 JNIEXPORT jboolean JNICALL JNI_FN(nativeSetPicture)(JNIEnv* env, jclass, jlong engine, jbyteArray uri,
                                                     jlong layerId, jobject bitmap, jobject hardwareBuffer,
-                                                    jboolean opaque) {
+                                                    jboolean opaque, jint standard, jint range, jint left, jint top, jint right, jint bottom) {
     std::string text((size_t)env->GetArrayLength(uri), '\0');
     env->GetByteArrayRegion(uri, 0, (jsize)text.size(), reinterpret_cast<jbyte*>(text.data()));
     if (!bitmap) {
         auto* buffer = hardwareBuffer ? AHardwareBuffer_fromHardwareBuffer(env, hardwareBuffer) : nullptr;
-        return engineOf(engine)->setPicture(text, layerId, buffer, nullptr, 0, 0, 0, opaque);
+        return engineOf(engine)->setPicture(text, layerId, buffer, nullptr, 0, 0, 0, opaque, standard, range, {left, top, right, bottom});
     }
     AndroidBitmapInfo info;
     void* pixels = nullptr;
@@ -101,10 +101,10 @@ JNIEXPORT jboolean JNICALL JNI_FN(nativeSetPicture)(JNIEnv* env, jclass, jlong e
 }
 
 JNIEXPORT jboolean JNICALL JNI_FN(nativeSetVideoFrame)(JNIEnv* env, jclass, jlong engine, jbyteArray uri, jlong layerId,
-                                                       jlong pts, jobject hardwareBuffer) {
+                                                       jlong pts, jobject hardwareBuffer, jint standard, jint range, jint left, jint top, jint right, jint bottom) {
     std::string text((size_t)env->GetArrayLength(uri), '\0');
     env->GetByteArrayRegion(uri, 0, (jsize)text.size(), reinterpret_cast<jbyte*>(text.data()));
-    return engineOf(engine)->setVideoFrame(text, layerId, pts, AHardwareBuffer_fromHardwareBuffer(env, hardwareBuffer));
+    return engineOf(engine)->setVideoFrame(text, layerId, pts, AHardwareBuffer_fromHardwareBuffer(env, hardwareBuffer), standard, range, {left, top, right, bottom});
 }
 
 JNIEXPORT jboolean JNICALL JNI_FN(nativeInterpolateVideo)(JNIEnv* env, jclass, jlong engine, jbyteArray uri, jlong layerId,

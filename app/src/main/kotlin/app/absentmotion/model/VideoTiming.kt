@@ -95,17 +95,17 @@ private fun Layer.localMs(timeMs: Double, scene: Scene): Double {
 fun Layer.needsFrameInterpolation(timeMs: Double, scene: Scene, stamps: LongArray, fps: Int): Boolean =
     pairAround(timeMs, scene, stamps)?.let { needs(it, timeMs, scene, fps) } == true
 
-fun Layer.exportFrame(timeMs: Double, scene: Scene, stamps: LongArray, fps: Int): FramePair? {
+fun Layer.exportFrame(timeMs: Double, scene: Scene, stamps: LongArray, fps: Int, playbackRate: Double = 1.0): FramePair? {
     val around = pairAround(timeMs, scene, stamps) ?: return null
     return when {
-        needs(around, timeMs, scene, fps) -> around.pair
-        fps == scene.fps -> null
+        needs(around, timeMs, scene, fps, playbackRate) -> around.pair
+        fps == scene.fps && playbackRate == 1.0 -> null
         else -> FramePair(around.pair.a, around.pair.a, 0f)
     }
 }
 
-private fun Layer.needs(around: Around, timeMs: Double, scene: Scene, fps: Int): Boolean =
-    around.gap > 0 && VideoTiming(this).speed(localMs(timeMs, scene)) * 1e6 / around.gap < fps * 0.99
+private fun Layer.needs(around: Around, timeMs: Double, scene: Scene, fps: Int, playbackRate: Double = 1.0): Boolean =
+    around.gap > 0 && VideoTiming(this).speed(localMs(timeMs, scene)) * playbackRate * 1e6 / around.gap < fps * 0.99
 
 data class FramePair(val a: Long, val b: Long, val t: Float)
 

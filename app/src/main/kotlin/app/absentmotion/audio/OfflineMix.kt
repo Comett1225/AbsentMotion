@@ -46,6 +46,9 @@ internal class OfflineMix private constructor(
         val dt = 1000.0 / RATE
         val t0 = i * BLOCK * dt
         for (clip in clips) {
+            if (clip.loop && clip.outMs.isInfinite() && t0 + BLOCK * dt > clip.startMs && t0 <= clip.endMs) {
+                clip.resolveDuration(sources.getOrPut(clip.id) { OfflineSource(context, clip.uri) }.durationUs)
+            }
             var next = 0
             while (true) {
                 val span = clip.span(t0, BLOCK, dt, next) ?: break
@@ -84,6 +87,7 @@ internal class OfflineMix private constructor(
 
 internal class OfflineSource(context: Context, private val uri: String) : Closeable {
     private val decoder: PcmDecoder? = try { PcmDecoder(context, uri) } catch (e: Exception) { Log.w("AMAudio", "Cannot decode $uri for export", e); null }
+    val durationUs: Long get() = decoder?.durationUs ?: -1
     private var rate = 0
     private var buf = ShortArray(0)
     private var start = 0L

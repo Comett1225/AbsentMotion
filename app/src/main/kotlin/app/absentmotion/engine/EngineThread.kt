@@ -1,5 +1,6 @@
 package app.absentmotion.engine
 
+import android.graphics.Rect
 import android.graphics.Bitmap
 import android.content.Context
 import android.hardware.HardwareBuffer
@@ -30,6 +31,7 @@ import org.json.JSONObject
 import app.absentmotion.media.MediaLibrary
 import app.absentmotion.fonts.FontLibrary
 import app.absentmotion.fonts.prepareText
+import app.absentmotion.model.fontNames
 import app.absentmotion.model.font
 import app.absentmotion.model.Scene
 import app.absentmotion.model.imageUris
@@ -177,7 +179,7 @@ class EngineThread(private val background: Int, context: Context? = null) {
     fun setScene(xml: String) {
         pendingScene.set(xml)
         fonts?.let { library ->
-            val names = runCatching { Scene.parse(xml).layers.filter { it.kind == "text" }.map { it.font }.distinct() }.getOrDefault(emptyList())
+            val names = runCatching { Scene.parse(xml).fontNames() }.getOrDefault(emptyList())
             if (names != fontNames) {
                 fontNames = names
                 fontJob = mediaScope.launch { names.forEach { library.resolve(it) } }
@@ -225,15 +227,15 @@ class EngineThread(private val background: Int, context: Context? = null) {
     }
 
     internal suspend fun setVideoPicture(uri: String, buffer: HardwareBuffer, layerId: Long,
-                                         exact: Boolean, accept: () -> Boolean): Boolean = withContext(dispatcher) {
+                                         exact: Boolean, standard: Int, range: Int, crop: Rect, accept: () -> Boolean): Boolean = withContext(dispatcher) {
         if (closed || (!exact && capturing) || !accept()) return@withContext false
-        engine().setPicture(uri, buffer, layerId).also {
+        engine().setPicture(uri, buffer, layerId, standard = standard, range = range, crop = crop).also {
             if (!exact) renderNow()
         }
     }
 
-    internal suspend fun setVideoFrame(uri: String, buffer: HardwareBuffer, layerId: Long, pts: Long): Boolean = withContext(dispatcher) {
-        !closed && engine().setVideoFrame(uri, layerId, pts, buffer)
+    internal suspend fun setVideoFrame(uri: String, buffer: HardwareBuffer, layerId: Long, pts: Long, standard: Int = 0, range: Int = 0, crop: Rect? = null): Boolean = withContext(dispatcher) {
+        !closed && engine().setVideoFrame(uri, layerId, pts, buffer, standard, range, crop)
     }
 
     internal suspend fun interpolateVideo(uri: String, layerId: Long, a: Long, b: Long, t: Float, flow: Boolean,
@@ -352,11 +354,17 @@ class EngineThread(private val background: Int, context: Context? = null) {
         }
     }
 
+    internal suspend fun previewForTest(width: Int, height: Int): ByteArray? = withContext(dispatcher) {
+        applyPending()
+        engine().still(0.0, width, height)
+    }
+
     suspend fun stillPng(xml: String, timeMs: Int, width: Int, height: Int, file: File): Boolean = captureLock.withLock {
         awaitMedia()
         fontJob?.join()
         effectJob?.join()
         val document = Scene.parse(xml)
+        fonts?.let { library -> document.fontNames().forEach { library.resolve(it) } }
         media?.prepare(document)
         var shown: String? = null
         try {
@@ -413,6 +421,7 @@ class EngineThread(private val background: Int, context: Context? = null) {
         fontJob?.join()
         effectJob?.join()
         val document = Scene.parse(xml)
+        fonts?.let { library -> document.fontNames().forEach { library.resolve(it) } }
         media?.prepare(document)
         var shown: String? = null
         try {

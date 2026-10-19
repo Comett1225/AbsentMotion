@@ -23,6 +23,8 @@ internal class LayerStream(private val context: Context, val uri: String, startM
     private var seekGen = 1
     private var seekMs = startMs
 
+    @Volatile var durationUs = -1L
+        private set
     @Volatile var rate = 0
         private set
     @Volatile private var closed = false
@@ -37,6 +39,7 @@ internal class LayerStream(private val context: Context, val uri: String, startM
         var decoder: PcmDecoder? = null
         try {
             decoder = PcmDecoder(context, uri)
+            durationUs = decoder.durationUs
             var handled = 0
             var target = 0.0
             var placed = true

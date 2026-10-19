@@ -172,6 +172,7 @@ class AudioEngine(context: Context) {
                 keepStreams(startMs)
                 val ready = clips.all { clip ->
                     if (clip.endMs <= startMs || clip.startMs >= startMs + 300) return@all true
+                    stream(clip)?.let { clip.resolveDuration(it.durationUs) }
                     val pos = clip.wrap(clip.mediaAt(max(startMs, clip.startMs.toDouble())))
                     if (pos < clip.inMs || pos >= clip.outMs) return@all true
                     stream(clip)?.prepare(pos) ?: true
@@ -196,6 +197,7 @@ class AudioEngine(context: Context) {
             val dt = 1000.0 / rate
             val q = quality
             for (clip in clips) {
+                stream(clip)?.let { clip.resolveDuration(it.durationUs) }
                 var next = 0
                 while (true) {
                     val span = clip.span(t0, BLOCK, dt, next) ?: break

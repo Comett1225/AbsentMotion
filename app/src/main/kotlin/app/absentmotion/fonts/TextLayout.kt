@@ -14,10 +14,10 @@ fun FontLibrary.prepareText(xml: String, timeMs: Int = 0): String {
 private fun hasText(scene: XmlNode): Boolean = scene.children.any { it.name == "text" || it.child("scene")?.let(::hasText) == true }
 
 private fun FontLibrary.prepareText(scene: XmlNode, fps: Int, timeMs: Int): XmlNode {
-    return scene.copy(children = scene.children.map { node ->
-        if (node.name == "embedScene") return@map node.child("scene")?.let { node.withChild("scene", prepareText(it, Scene(it).fps, timeMs)) } ?: node
-        if (node.name != "text") return@map node
-        val layer = Layer(node).at(timeMs, fps)
+    return scene.mapTimedLayers(fps, timeMs.toDouble()) { raw, localFps, localTime ->
+        val node = raw.node
+        if (node.name != "text") return@mapTimedLayers node
+        val layer = raw.at(localTime.toInt(), localFps)
         val name = FontName.parse(layer.font)
         val paint = TextPaint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
             textSize = layer.textSize.coerceAtLeast(0.01f) * 3f
@@ -47,5 +47,5 @@ private fun FontLibrary.prepareText(scene: XmlNode, fps: Int, timeMs: Int): XmlN
             .with("_letterSpacing", "${paint.letterSpacing}").with("_lineSpacing", "${layer.textSpacing("linespacing", 1f)}")
             .with("_fontWeight", "${name.weight}").with("_fontItalic", "${name.italic}")
             .withChild("_layout", XmlNode("_layout", mapOf("height" to "${layout.height}"), lines))
-    })
+    }
 }
