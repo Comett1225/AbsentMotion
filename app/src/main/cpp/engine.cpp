@@ -985,6 +985,7 @@ void EngineImpl::collectTimings(Target* target) {
     uint32_t n = 0;
     fGetPastPresentationTiming(fDevice, target->swapchain, &n, nullptr);
     if (!n) return;
+    if (target->timings.size() > 32768) target->timings.erase(target->timings.begin(), target->timings.begin() + 16384);
     size_t old = target->timings.size();
     target->timings.resize(old + n);
     fGetPastPresentationTiming(fDevice, target->swapchain, &n, target->timings.data() + old);
