@@ -14,7 +14,7 @@ class EffectPackTest {
     @Test fun everyEffectFileIsListedAndLoads() {
         assertNull(catalog.message)
         val index = JSONArray(File(pack, "index.json").readText()).let { a -> List(a.length()) { a.getString(it) } }
-        val files = pack.listFiles()!!.filter { it.extension == "json" && it.name != "index.json" }.map { it.nameWithoutExtension }
+        val files = pack.listFiles()!!.filter { it.extension == "json" && it.name !in setOf("index.json", "foreign.json") }.map { it.nameWithoutExtension }
         assertEquals("index.json and the effect files", files.sorted(), index.sorted())
         assertEquals("ids are unique", index.size, index.toSet().size)
         assertEquals("every listed effect parses", index, catalog.definitions.map { it.key })

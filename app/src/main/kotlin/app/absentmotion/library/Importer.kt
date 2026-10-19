@@ -2,6 +2,7 @@ package app.absentmotion.library
 
 import app.absentmotion.platform.Context
 import app.absentmotion.platform.Uri
+import app.absentmotion.compat.EffectMigration
 import app.absentmotion.effects.EffectCatalog
 import app.absentmotion.fonts.FontLibrary
 import app.absentmotion.model.MediaDeclaration
@@ -40,6 +41,7 @@ class Importer(
     private val canRun: (String) -> Boolean = { true },
     private val hasFont: (String) -> Boolean = { true },
     private val relink: (Scene) -> Scene = { it },
+    private val migration: EffectMigration? = null,
     private val access: MediaAccess = MediaAccess.Unlimited,
     private val limits: ImportLimits = ImportLimits(),
 ) {
@@ -111,19 +113,21 @@ class Importer(
         try {
             val moved = copies(id, root)
             var scene = relink(Scene(root.mapMediaUris { moved[it] ?: access.defused(it) }))
+            val migrated = migration?.migrate(scene)
+            if (migrated != null) scene = migrated.scene
             if (scene.title.isBlank()) scene = scene.withTitle("Imported Project")
             val missing = scene.node.mediaUris().filterNot { access.allows(it) && exists(it) }
             for (uri in missing) scene = scene.withMedia(MediaDeclaration(XmlNode("media", mapOf("uri" to uri))))
             scene = Scene(scene.node.copy(children = scene.node.children.map { if (it.name == "media" && it["uri"] in missing) it.with("missing", "true") else it }))
             store.save(id, scene)
-            return ImportReport(id, scene.title, scene.node["type"] == "element", report(scene, missing))
+            return ImportReport(id, scene.title, scene.node["type"] == "element", report(scene, missing, migrated))
         } catch (t: Throwable) {
             store.mediaDir(id).deleteRecursively()
             throw t
         }
     }
 
-    private fun report(scene: Scene, missing: List<String>): List<Pair<String, List<String>>> {
+    private fun report(scene: Scene, missing: List<String>, migrated: EffectMigration.Result?): List<Pair<String, List<String>>> {
         val layers = allLayers(scene.node).toList()
         val unknown = sortedSetOf<String>()
         scene.node.children.filter { it.name !in Scene.LAYER_TAGS && it.name != "media" && it.name != "bookmark" }.forEach { unknown += "<${it.name}>" }
@@ -136,6 +140,8 @@ class Importer(
         val names = missing.map { uri -> scene.media(uri)?.filename?.takeIf { it.isNotEmpty() } ?: uri.substringAfterLast('/') }
         return listOf(
             "Not recognised, kept in the file" to unknown.toList(), "Effects this version cannot run" to effects,
+            "Effects turned into this app's own" to migrated?.converted?.map { (what, n) -> what + if (n == 1) " (1 effect)" else " ($n effects)" }.orEmpty(),
+            "Effect settings that could not be carried over" to migrated?.dropped?.toList().orEmpty(),
             "Media not found" to names, "Fonts not installed" to fonts,
         ).filter { it.second.isNotEmpty() }
     }
@@ -211,6 +217,7 @@ class Importer(
                 canRun = { catalog.find(it) != null || it.endsWith(".textspacing") },
                 hasFont = { fonts.localFile(it) != null },
                 relink = { MediaRelink.relink(context, it) },
+                migration = EffectMigration.read(context, catalog),
             )
         }
     }

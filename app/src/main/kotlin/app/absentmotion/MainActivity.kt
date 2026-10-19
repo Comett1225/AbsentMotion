@@ -26,6 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.lifecycleScope
+import app.absentmotion.compat.EffectMigration
 import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.MultiSelect
 import app.absentmotion.engine.EngineThread
@@ -172,8 +173,10 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private val migration by lazy { EffectMigration.read(applicationContext) }
+
     private fun loadRelinked(id: String): Scene? = store.load(id)?.let { scene ->
-        MediaRelink.relink(this, scene).also { if (it != scene) store.save(id, it) }
+        migration.migrate(MediaRelink.relink(this, scene)).scene.also { if (it != scene) store.save(id, it) }
     }
 
     private fun open(id: String) {
@@ -208,11 +211,12 @@ class MainActivity : ComponentActivity() {
             Log.i("AMEffects", "effectcheck.json written")
         }
         val path = intent.getStringExtra("xml") ?: return
-        val scene = runCatching { Scene.parse(File(path).readText()) }.getOrElse { Log.e("AMTest", "cannot read $path", it); return }
+        val parsed = runCatching { Scene.parse(File(path).readText()) }.getOrElse { Log.e("AMTest", "cannot read $path", it); return }
         val id = "test-" + File(path).nameWithoutExtension
-        store.save(id, scene)
+        store.save(id, parsed)
         open(id)
         val state = editor ?: return
+        val scene = state.scene
         state.frame = intent.getIntExtra("frame", 0).coerceIn(0, scene.lastFrame)
         val stillName = intent.getStringExtra("still")
         intent.getStringExtra("export")?.let { exportForTest(it, scene, state.frame) }

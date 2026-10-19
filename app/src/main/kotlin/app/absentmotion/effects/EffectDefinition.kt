@@ -65,7 +65,7 @@ data class EffectDefinition(
         XmlNode("property", mapOf("name" to it.id, "type" to it.type, "value" to it.default))
     })
 
-    fun runtimeXml(id: String = this.id): String = XmlNode("effect", listOfNotNull("id" to id, sksl?.let { "sksl" to it }).toMap(),
+    fun runtimeXml(): String = XmlNode("effect", listOfNotNull("id" to id, sksl?.let { "sksl" to it }).toMap(),
         params.map { XmlNode("param", mapOf("name" to it.id, "value" to it.default)) }).toXml()
 
     companion object {

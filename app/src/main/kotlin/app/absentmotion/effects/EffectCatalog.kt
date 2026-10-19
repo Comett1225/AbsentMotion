@@ -1,6 +1,5 @@
 package app.absentmotion.effects
 
-import app.absentmotion.compat.ForeignEffectIds
 import app.absentmotion.platform.Bitmap
 import app.absentmotion.platform.BitmapFactory
 import app.absentmotion.platform.Context
@@ -15,8 +14,7 @@ data class EffectCatalog(
     val message: String? = null,
     private val open: ((String) -> InputStream)? = null,
 ) {
-    fun find(id: String): EffectDefinition? =
-        definitions.firstOrNull { it.id == id } ?: ForeignEffectIds.ids[id]?.let { own -> definitions.firstOrNull { it.id == own } }
+    fun find(id: String): EffectDefinition? = definitions.firstOrNull { it.id == id }
 
     fun listed(category: String? = null): List<EffectDefinition> = definitions.filter { category == null || it.category == category }
 
@@ -24,7 +22,6 @@ data class EffectCatalog(
 
     fun loadInto(load: (String) -> String): EffectCatalog {
         val status = definitions.associate { it.id to load(it.runtimeXml()).substringBefore('\n') }
-        ForeignEffectIds.ids.forEach { (foreign, own) -> definitions.firstOrNull { it.id == own }?.let { load(it.runtimeXml(foreign)) } }
         return copy(definitions = definitions.map { it.copy(status = status.getValue(it.id)) })
     }
 

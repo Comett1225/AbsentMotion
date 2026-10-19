@@ -10,7 +10,7 @@ import json, sys
 from pathlib import Path
 pack, out = Path(sys.argv[1]), Path(sys.argv[2])
 for path in sorted(pack.glob("*.json")):
-    if path.name == "index.json": continue
+    if path.name in ("index.json", "foreign.json"): continue
     effect = json.loads(path.read_text())
     if not effect.get("native"): (out / f"{path.stem}.sksl").write_text(effect["sksl"])
 EOF
