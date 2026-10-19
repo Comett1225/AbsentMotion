@@ -1,7 +1,18 @@
+<p align="center">
+  <img src="fastlane/metadata/android/en-US/images/icon.png" alt="AbsentMotion" width="128" height="128">
+</p>
+
 # AbsentMotion
 
 AbsentMotion is a free, open-source motion graphics and animation editor for Android phones. There is no
 subscription, no account and no advertising. Projects live on your device.
+
+<p align="center">
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" alt="The editor: a photo with a title on the timeline, keyframes shown as diamonds" width="280">
+  &nbsp;&nbsp;
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/2.png" alt="Effect parameters on a layer" width="280">
+</p>
+<p align="center"><sub>Photo: Ruby Mountain reflected in Diablo Lake, public domain (CC0), Wikimedia Commons.</sub></p>
 
 ## What it does
 
