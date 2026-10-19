@@ -73,12 +73,14 @@ import app.absentmotion.model.MediaFillMode
 import app.absentmotion.model.PropRef
 import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
+import app.absentmotion.model.withPath
 import app.absentmotion.ui.editor.ChromeIcons
 import app.absentmotion.ui.editor.TimelineMath
 import app.absentmotion.ui.theme.Am
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Locale
 import kotlin.math.min
 import kotlin.math.roundToInt
 
@@ -150,14 +152,20 @@ private fun swap(layer: XmlNode, slot: Slot, choice: Choice, old: MediaDeclarati
         val start = if (duration < slot.length) min(from, duration) else from + choice.trim
         val end = if (duration < slot.length) min(to, duration) else to + choice.trim
         n = n.with("inTime", start.takeIf { it != 0 }?.toString()).with("outTime", "$end").with("loop", null)
+        n.child("speedMap")?.let { n = n.withChild("speedMap", it.keysShifted("t", (start - layer.int("inTime", 0)) * 1e6)) }
     }
     return turned(n, media.orientation - (old?.orientation ?: 0))
 }
 
+private fun XmlNode.keysShifted(attr: String, by: Double): XmlNode = copy(children = children.map { k ->
+    k[attr]?.toDoubleOrNull()?.takeIf { k.name == "kf" }?.let { k.with(attr, String.format(Locale.US, "%.6f", it + by)) } ?: k
+})
+
 private fun turned(node: XmlNode, degrees: Int): XmlNode {
+    if (degrees % 360 == 0) return node
     val layer = Layer(node)
-    if (degrees % 360 == 0 || layer.keyframes(PropRef.Rotation).isNotEmpty()) return node
-    var out = layer.withTransform("rotation", layer.transform("rotation", 0f)[0] + degrees)
+    var out = if (layer.keyframes(PropRef.Rotation).isEmpty()) layer.withTransform("rotation", layer.transform("rotation", 0f)[0] + degrees)
+        else layer.copy(node = node.withPath("transform/rotation", layer.element(PropRef.Rotation)!!.keysShifted("v", degrees.toDouble())))
     val size = out.prop("size")
     if (degrees % 180 != 0 && out.shape == ".rect" && size != null && size.size >= 2) out = out.withProp("size", "vec2", size[1], size[0])
     return out.node
