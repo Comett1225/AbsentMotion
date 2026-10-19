@@ -181,6 +181,12 @@ class EditorState(
         lastEditKey = null
     }
 
+    fun cancelGesture(key: Any) {
+        if (lastEditKey != key) return
+        lastEditKey = null
+        apply(undoStack.removeLastOrNull() ?: return, save = false)
+    }
+
     fun editSelected(key: Any? = null, change: (Layer) -> Layer) {
         val id = selectedId ?: return
         edit(key) { it.update(id, sampleMs, change) }

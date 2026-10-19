@@ -22,6 +22,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.referentialEqualityPolicy
@@ -87,6 +88,7 @@ import app.absentmotion.editor.clearSelection
 import app.absentmotion.model.LabelColour
 import app.absentmotion.model.Layer
 import app.absentmotion.model.trimmedTo
+import app.absentmotion.model.withKeyframesMoved
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Motion
 import kotlin.math.abs
@@ -305,13 +307,16 @@ private sealed interface Hit {
     data class Eye(val id: Long) : Hit
 
     data class Bar(val id: Long) : Hit
+    data class Key(val id: Long, val frame: Int) : Hit
     data class Header(val id: Long) : Hit
     data class Grip(val id: Long, val start: Boolean) : Hit
     data class Handle(val id: Long) : Hit
     data class Row(val id: Long) : Hit
 }
 
-private enum class Drag(val edit: Boolean = false) { Scrub, Scroll, Pinch, Spent, TrimStart(true), TrimEnd(true), Reorder(true), Lift(true) }
+private enum class Drag(val edit: Boolean = false) { Scrub, Scroll, Pinch, Spent, TrimStart(true), TrimEnd(true), Reorder(true), Lift(true), Key(true) }
+
+private const val KEY_MOVE = "keyframe-move"
 
 private class TimelineView(val state: EditorState, density: Density, private val scope: CoroutineScope, private val wide: Boolean) {
     private val scale = density.density
@@ -352,6 +357,14 @@ private class TimelineView(val state: EditorState, density: Density, private val
     private var dropAt = 0L
     private var dropFrom = 0f
     private val slides = HashMap<Long, Slide>()
+
+    var keyId by mutableStateOf<Long?>(null)
+        private set
+    var keyFrame by mutableIntStateOf(0)
+        private set
+    private var keyFrom = 0
+    private var keyMs = 0f
+    private var keyLayer: Layer? = null
 
     private val layersState = derivedStateOf(referentialEqualityPolicy()) { state.scene.layers }
 
@@ -398,11 +411,13 @@ private class TimelineView(val state: EditorState, density: Density, private val
         val left = time.x(layer.startTime.toFloat())
         val right = time.x(layer.endTime + 1f)
         val selected = layer.id == state.selectedId
+        val key = if (selected && at.x in left..right) keyNear(layer, at.x, time) else null
         return when {
             at.x < EyeZone.px -> Hit.Eye(layer.id)
             at.x < HeaderWidth.px -> Hit.Header(layer.id)
             selected && at.x in left - GripZone.px..left -> Hit.Grip(layer.id, start = true)
             selected && at.x in right..right + GripZone.px -> Hit.Grip(layer.id, start = false)
+            key != null -> Hit.Key(layer.id, key)
             !selected && at.x >= size.width - HandleZone.px -> Hit.Handle(layer.id)
             at.x in left..right -> Hit.Bar(layer.id)
             else -> Hit.Row(layer.id)
@@ -414,6 +429,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
             is Hit.Eye -> if (MultiSelect.active) MultiSelect.toggle(hit.id) else state.toggleHidden(hit.id)
             is Hit.Header -> select(hit.id)
             is Hit.Bar -> select(hit.id)
+            is Hit.Key -> select(hit.id)
             Hit.Readout -> state.toggleBookmark()
             Hit.Empty, Hit.Ruler, is Hit.Row -> state.clearSelection()
             is Hit.Grip, is Hit.Handle -> Unit
@@ -425,6 +441,38 @@ private class TimelineView(val state: EditorState, density: Density, private val
             state.selectedId = id
             state.panel = EditorPanel.Tools
         }
+    }
+
+    private fun keyNear(layer: Layer, x: Float, time: TimeScale): Int? {
+        val scene = state.scene
+        fun distance(frame: Int) = abs(time.x(scene.frameStart(frame).toFloat()) - x)
+        return layer.keyframeTimes().map { scene.frameAt(it) }.minByOrNull(::distance)?.takeIf { distance(it) <= KeyGrab.px }
+    }
+
+    fun grabKey(hit: Hit.Key) {
+        state.playing = false
+        keyLayer = state.scene.layer(hit.id)
+        keyFrom = hit.frame
+        keyFrame = hit.frame
+        keyMs = TimelineMath.frameTimeMs(hit.frame, fps)
+        keyId = hit.id
+    }
+
+    private fun keyBy(dx: Float) {
+        val original = keyLayer ?: return
+        val scene = state.scene
+        keyMs += dx / timeScale().pxPerMs
+        val frame = TimelineMath.nearestFrame(keyMs, fps).coerceIn(scene.frameAt(original.startTime), scene.frameAt(original.endTime))
+        if (frame == keyFrame) return
+        keyFrame = frame
+        state.edit(KEY_MOVE) { s -> s.update(original.id) { original.withKeyframesMoved(keyFrom, frame, s) } }
+    }
+
+    private fun dropKey(commit: Boolean) {
+        val original = keyLayer
+        if (!commit || original == null || state.scene.layer(original.id)?.node == original.node) state.cancelGesture(KEY_MOVE)
+        keyLayer = null
+        keyId = null
     }
 
     fun longPress(hit: Hit) {
@@ -460,12 +508,14 @@ private class TimelineView(val state: EditorState, density: Density, private val
             Drag.Scroll -> scrollBy(delta.y)
             Drag.TrimStart, Drag.TrimEnd -> trimBy(delta.x, start = drag == Drag.TrimStart)
             Drag.Reorder -> reorderTo(at.y)
+            Drag.Key -> keyBy(delta.x)
             Drag.Pinch, Drag.Spent, Drag.Lift -> Unit
         }
     }
 
-    fun endDrag(drag: Drag?, velocity: Velocity) {
+    fun endDrag(drag: Drag?, velocity: Velocity, lifted: Boolean = true) {
         if (drag == Drag.Lift) drop()
+        if (drag == Drag.Key) dropKey(lifted)
         if (drag?.edit == true) return state.endGesture()
         motion = scope.launch {
             if (drag == Drag.Scroll) launch { fling(velocity.y, ::scrollBy) }
@@ -653,6 +703,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
 private val KeyFaint = DpSize(6.4.dp, 9.6.dp)
 private val KeyOther = DpSize(9.25.dp, 14.6.dp)
 private val KeyHere = DpSize(12.1.dp, 18.5.dp)
+private val KeyGrab = 14.dp
 
 private suspend fun PointerInputScope.timelineGestures(view: TimelineView, onLongPress: () -> Unit) = awaitEachGesture {
     val down = awaitFirstDown()
@@ -666,7 +717,7 @@ private suspend fun PointerInputScope.timelineGestures(view: TimelineView, onLon
     var last: PointerInputChange? = null
     var finger = down.position
     var second: PointerId? = null
-    val holdable = hit is Hit.Eye || hit is Hit.Header || hit is Hit.Row
+    val holdable = hit is Hit.Eye || hit is Hit.Header || hit is Hit.Row || hit is Hit.Key
     val deadline = down.uptimeMillis + viewConfiguration.longPressTimeoutMillis
     try {
         while (true) {
@@ -674,9 +725,16 @@ private suspend fun PointerInputScope.timelineGestures(view: TimelineView, onLon
                 withTimeoutOrNull((deadline - SystemClock.uptimeMillis()).coerceAtLeast(1)) { awaitPointerEvent() }
             } else awaitPointerEvent()
             if (event == null) {
-                if (hit is Hit.Row && view.lift(hit.id, finger.y, viewConfiguration.touchSlop)) drag = Drag.Lift else {
-                    view.longPress(hit)
-                    held = true
+                when {
+                    hit is Hit.Key -> {
+                        view.grabKey(hit)
+                        drag = Drag.Key
+                    }
+                    hit is Hit.Row && view.lift(hit.id, finger.y, viewConfiguration.touchSlop) -> drag = Drag.Lift
+                    else -> {
+                        view.longPress(hit)
+                        held = true
+                    }
                 }
                 onLongPress()
                 continue
@@ -701,6 +759,10 @@ private suspend fun PointerInputScope.timelineGestures(view: TimelineView, onLon
                     view.liftDrag(first.position.y, pushing = second == null)
                     event.changes.forEach { it.consume() }
                 }
+                fingers > 1 && drag == Drag.Key -> {
+                    view.endDrag(Drag.Key, Velocity.Zero, lifted = false)
+                    drag = Drag.Spent
+                }
                 fingers > 1 && drag?.edit != true -> {
                     drag = Drag.Pinch
                     view.zoomBy(event.calculateZoom())
@@ -721,7 +783,7 @@ private suspend fun PointerInputScope.timelineGestures(view: TimelineView, onLon
         lifted = TimelineMath.released(last)
     } finally {
         if (lifted && drag == null && !held) view.tap(hit)
-        view.endDrag(drag, if (lifted) tracker.calculateVelocity() else Velocity.Zero)
+        view.endDrag(drag, if (lifted) tracker.calculateVelocity() else Velocity.Zero, lifted)
     }
 }
 
@@ -737,7 +799,7 @@ private fun DrawScope.drawTimeline(view: TimelineView, measurer: TextMeasurer, e
         for (row in view.visibleRows()) {
             val layer = view.layerAt(row) ?: continue
             if (layer.id == view.liftId) continue
-            drawRow(layer, layer.id == state.selectedId, view.shownTop(row, layer.id), time, stripe, measurer, if (layer.hidden) eyeOff else eye, outline, state.scene, state.frame, pictures[layer.id], appear)
+            drawRow(layer, layer.id == state.selectedId, view.shownTop(row, layer.id), time, stripe, measurer, if (layer.hidden) eyeOff else eye, outline, state.scene, state.frame, pictures[layer.id], appear, view.keyFrame.takeIf { layer.id == view.keyId })
         }
     }
     val marks = state.scene.bookmarks
@@ -813,7 +875,7 @@ private fun DrawScope.drawRetimeMarks(scene: Scene, time: TimeScale) {
 
 private fun DrawScope.drawRow(
     layer: Layer, selected: Boolean, top: Float, time: TimeScale, stripe: Float,
-    measurer: TextMeasurer, eye: Painter, outline: Path, scene: Scene, frame: Int, picture: StripPicture?, appear: Float = 1f,
+    measurer: TextMeasurer, eye: Painter, outline: Path, scene: Scene, frame: Int, picture: StripPicture?, appear: Float = 1f, held: Int? = null,
 ) {
     val barTop = top + BarInset.toPx()
     val barBottom = top + (RowHeight - BarInset).toPx()
@@ -825,7 +887,7 @@ private fun DrawScope.drawRow(
     else drawBar(outline, left, right, barTop, barBottom, stripe, picture, layer.startTime, time.pxPerMs, layer.kind == "text")
     layer.labelColour?.let { drawTagCorner(outline, left, barTop, (barBottom - barTop) / 2, Color(it.start)) }
     drawLabel(layer.label, measurer, left, right, barTop, barBottom, if (layer.kind == "audio") LabelStyle.copy(color = Am.OnAudioBar) else LabelStyle)
-    drawKeyframes(layer, scene, selected, frame, time, left, right, centre, outline, appear)
+    drawKeyframes(layer, scene, selected, frame, time, left, right, centre, outline, appear, held)
     if (selected) {
         drawGrip(outline, left, barTop, barBottom, start = true, appear)
         drawGrip(outline, right, barTop, barBottom, start = false, appear)
@@ -868,14 +930,16 @@ private fun DrawScope.drawBar(outline: Path, left: Float, right: Float, top: Flo
     }
 }
 
-private fun DrawScope.drawKeyframes(layer: Layer, scene: Scene, selected: Boolean, frame: Int, time: TimeScale, left: Float, right: Float, centre: Float, outline: Path, appear: Float = 1f) {
+private fun DrawScope.drawKeyframes(layer: Layer, scene: Scene, selected: Boolean, frame: Int, time: TimeScale, left: Float, right: Float, centre: Float, outline: Path, appear: Float = 1f, held: Int? = null) {
     val times = layer.keyframeTimes()
     if (times.isEmpty()) return
+    val frames = times.map { scene.frameAt(it) }.distinct()
+    val grabbed = held?.let { h -> frames.minByOrNull { abs(it - h) } }
     clipRect(left = max(left, 0f), right = min(right, size.width)) {
-        for (keyFrame in times.map { scene.frameAt(it) }.distinct()) {
+        for (keyFrame in frames) {
             val x = time.x(scene.frameStart(keyFrame).toFloat())
             if (x < -KeyHere.width.toPx() || x > size.width + KeyHere.width.toPx()) continue
-            val here = selected && keyFrame == frame
+            val here = selected && (keyFrame == frame || keyFrame == grabbed)
             val grow = if (selected) 0.7f + 0.3f * appear else 1f
             val half = (if (here) KeyHere else if (selected) KeyOther else KeyFaint).let { Offset(it.width.toPx() / 2 * grow, it.height.toPx() / 2 * grow) }
             outline.rewind()
@@ -890,7 +954,7 @@ private fun DrawScope.drawKeyframes(layer: Layer, scene: Scene, selected: Boolea
             }
             if (here) drawPath(outline, Am.Accent, style = Stroke(3.55.dp.toPx()))
             drawPath(outline, Color.Black, style = Stroke(1.4.dp.toPx()))
-            drawPath(outline, Color.White)
+            drawPath(outline, if (keyFrame == grabbed) Am.Accent else Color.White)
         }
     }
 }
