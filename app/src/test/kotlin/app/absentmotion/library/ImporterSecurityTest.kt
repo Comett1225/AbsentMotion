@@ -126,4 +126,17 @@ class ImporterSecurityTest {
         assertEquals(64 * 1024 * 1024, limits.sceneText)
         XmlNode.parse(scene())
     }
+
+    @Test fun aDeeplyNestedFileIsRefusedInsteadOfOverflowingTheStack() {
+        val files = tmp.newFolder("files")
+        fun nested(depth: Int) = scene("<shape id=\"1\">" + "<a>".repeat(depth) + "</a>".repeat(depth) + "</shape>")
+        var outcome: Any? = null
+        val worker = Thread(null, {
+            outcome = try { failure(importer(files), nested(20_000).toByteArray()) } catch (t: Throwable) { t }
+        }, "small-stack", 512L * 1024)
+        worker.start(); worker.join()
+        assertTrue("$outcome", outcome is String && (outcome as String).startsWith("Malformed XML"))
+        assertEquals(emptyList<ProjectInfo>(), ProjectStore(files).list())
+        assertEquals(1, importer(files).import { ByteArrayInputStream(nested(200).toByteArray()) }.size)
+    }
 }
