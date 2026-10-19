@@ -108,7 +108,7 @@ val Layer.stroke: StrokeStyle
     get() {
         val s = node.child("path-stroke")
         return StrokeStyle(s != null, s != null && s["enabled"] != "false", colour("path-stroke/color", StyleColors.Black), number("path-stroke/size", 4f),
-            s?.get("cap") ?: "round", s?.get("join") ?: "bevel", s?.get("start") ?: "none", s?.get("end") ?: "none", s?.get("end-size")?.toFloatOrNull() ?: 1.5f)
+            s?.get("cap") ?: "round", s?.get("join") ?: "bevel", s?.get("start") ?: "none", s?.get("end") ?: "none", s?.get("end-size")?.toFloatOrNull() ?: 1f)
     }
 
 fun Layer.withStrokeEnabled(on: Boolean): Layer {
@@ -161,3 +161,5 @@ fun Layer.withGradient(g: GradientStyle): Layer = copy(
         ),
     ),
 )
+
+internal fun strokeCapIndex(cap: String): Int = listOf("butt", "round", "square").indexOf(cap).takeIf { it >= 0 } ?: 1

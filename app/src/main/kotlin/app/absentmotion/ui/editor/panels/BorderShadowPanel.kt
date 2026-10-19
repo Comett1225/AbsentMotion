@@ -144,7 +144,7 @@ private fun ColourEditor(state: EditorState, layer: Layer, ref: PropRef) {
             Box(Modifier.size(83.px).clickable { colourEditing = null }, contentAlignment = Alignment.Center) {
                 PanelIcon(PanelIcons.Check, Am.Accent)
             }
-            Text("Colour", color = Am.OnDark, fontSize = 15.sp, maxLines = 1, softWrap = false)
+            Text("Color", color = Am.OnDark, fontSize = 15.sp, maxLines = 1, softWrap = false)
         }
         ColorPicker(state, layer, Modifier.offset(28.px, 162.px).size(856.px, 359.px), argb) { c, key -> state.setColour(ref, c, key) }
     }
@@ -187,7 +187,7 @@ private fun StrokeTab(state: EditorState, layer: Layer) {
         }
         val caps = listOf("butt", "round", "square")
         val joins = listOf("bevel", "round", "miter")
-        Choices(3, caps.indexOf(s.cap).coerceAtLeast(1), Modifier.at(23, 302, 338, 84), s.present, { state.editSelected { l -> l.withStrokeAttr("cap", caps[it]) } }) { i, lit -> capGlyph(i, lit) }
+        Choices(3, app.absentmotion.model.strokeCapIndex(s.cap), Modifier.at(23, 302, 338, 84), s.present, { state.editSelected { l -> l.withStrokeAttr("cap", caps[it]) } }) { i, lit -> capGlyph(i, lit) }
         Choices(3, joins.indexOf(s.join).coerceAtLeast(0), Modifier.at(383, 302, 338, 84), s.present, { state.editSelected { l -> l.withStrokeAttr("join", joins[it]) } }) { i, lit -> joinGlyph(i, lit) }
         for (end in 0..1) {
             Box(
