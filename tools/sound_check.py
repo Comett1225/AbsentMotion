@@ -16,14 +16,15 @@ import os, signal, subprocess, sys, time
 import numpy as np
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-ADB = os.path.expanduser("~/Library/Android/sdk/platform-tools/adb")
+SERIAL = os.environ.get("ANDROID_SERIAL") or "emulator-5554"
+ADB = [os.path.expanduser("~/Library/Android/sdk/platform-tools/adb"), "-s", SERIAL]
 PKG = "app.absentmotion"
 DEVICE_DIR = f"/sdcard/Android/data/{PKG}/files"
 OUT = os.path.join(ROOT, "build/sound-check")
 RATE = 48000
 
 def adb(*a):
-    return subprocess.run([ADB, *a], capture_output=True).stdout.decode("utf-8", "replace")
+    return subprocess.run([*ADB, *a], capture_output=True).stdout.decode("utf-8", "replace")
 
 def samples(path):
     raw = subprocess.run(["ffmpeg", "-v", "error", "-i", path, "-vn", "-ac", "1", "-ar", str(RATE), "-f", "f32le", "-"], capture_output=True).stdout
@@ -88,7 +89,7 @@ def play(xml, seconds, spacing):
     local = os.path.join(OUT, "sound-" + os.path.basename(xml)[:-4] + "-play.flac")
     if os.path.exists(local):
         os.remove(local)
-    rec = subprocess.Popen(["scrcpy", "--no-video", "--no-window", "--no-playback", "--audio-codec=flac", f"--record={local}"],
+    rec = subprocess.Popen(["scrcpy", f"--serial={SERIAL}", "--no-video", "--no-window", "--no-playback", "--audio-codec=flac", f"--record={local}"],
                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     time.sleep(4)
     adb("shell", "input", "tap", "540", "1445")

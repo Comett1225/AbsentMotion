@@ -1,15 +1,15 @@
 #!/bin/sh
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-ADB="$HOME/Library/Android/sdk/platform-tools/adb"
+adb() { "$HOME/Library/Android/sdk/platform-tools/adb" -s "${ANDROID_SERIAL:-emulator-5554}" "$@"; }
 OUT="$ROOT/build/shots/lm-$1.png"
 mkdir -p "$(dirname "$OUT")"
-"$ADB" exec-out screencap -p > "$OUT.full.png"
+adb exec-out screencap -p > "$OUT.full.png"
 sips -Z 1170 "$OUT.full.png" --out "$OUT" >/dev/null 2>&1
 rm -f "$OUT.full.png"
-"$ADB" shell dumpsys window | grep mCurrentFocus | tail -1 | sed 's/.* u0 //; s/}//'
+adb shell dumpsys window | grep mCurrentFocus | tail -1 | sed 's/.* u0 //; s/}//'
 if [ "$2" = tree ]; then
-    "$ADB" shell uiautomator dump /sdcard/ui.xml >/dev/null
-    python3 - "$("$ADB" exec-out cat /sdcard/ui.xml)" <<'PY'
+    adb shell uiautomator dump /sdcard/ui.xml >/dev/null
+    python3 - "$(adb exec-out cat /sdcard/ui.xml)" <<'PY'
 import sys
 import xml.etree.ElementTree as ET
 try:

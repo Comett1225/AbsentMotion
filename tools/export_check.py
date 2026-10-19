@@ -18,14 +18,14 @@ import numpy as np
 from PIL import Image
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-ADB = os.path.expanduser("~/Library/Android/sdk/platform-tools/adb")
+ADB = [os.path.expanduser("~/Library/Android/sdk/platform-tools/adb"), "-s", os.environ.get("ANDROID_SERIAL") or "emulator-5554"]
 PKG = "app.absentmotion"
 DEVICE_DIR = f"/sdcard/Android/data/{PKG}/files"
 OUT = os.path.join(ROOT, "build/export-check")
 LIMIT = 400
 
 def adb(*a):
-    return subprocess.run([ADB, *a], capture_output=True).stdout
+    return subprocess.run([*ADB, *a], capture_output=True).stdout
 
 def main():
     if len(sys.argv) < 3:

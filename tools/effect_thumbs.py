@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import json
+import os
 import random
 import subprocess
 import sys
@@ -13,7 +14,7 @@ from PIL import Image, ImageChops, ImageDraw, ImageStat
 ROOT = Path(__file__).resolve().parents[1]
 PACK = ROOT / "app/src/main/assets/effects"
 SHOWCASE = json.loads((ROOT / "tools/effect_showcase.json").read_text())
-ADB = [str(Path.home() / "Library/Android/sdk/platform-tools/adb"), "-s", "emulator-5554"]
+ADB = [str(Path.home() / "Library/Android/sdk/platform-tools/adb"), "-s", os.environ.get("ANDROID_SERIAL") or "emulator-5554"]
 PKG = "app.absentmotion"
 APP_DIR = "files/effect-thumbs"
 APP_PATH = f"/data/user/0/{PKG}/{APP_DIR}"

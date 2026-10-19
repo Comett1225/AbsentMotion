@@ -153,8 +153,9 @@ runs `tools/check.sh`, and builds the release APKs of both flavours (signed as d
 
 These are known and not yet fixed in the repository. They are why a clean machine may not pass `tools/check.sh` today:
 
-- **Scripts that need a phone.** A few scripts in `tools/` (`shot.sh`, `touch.sh`, `sound_check.py`, `export_check.py`)
-  drive a device over `adb`. They are not needed to build or test.
+- **Scripts that need a phone.** A few scripts in `tools/` (`shot.sh`, `touch.sh`, `sound_check.py`, `export_check.py`,
+  `export_speed.sh`, `effect_thumbs.py`, `blend_check.py`) drive a device over `adb`. They only talk to the device named by
+  `ANDROID_SERIAL` (default `emulator-5554`). They are not needed to build or test.
 - **Hard-coded paths.** `tools/build_skia.sh` defaults the NDK to `$HOME/Library/Android/sdk/ndk/30.0.16248370`
   (override with `ANDROID_NDK`) and uses the NDK's `darwin-x86_64` tools.
 - **`third_party/whisper.cpp` and `third_party/rnnoise` are vendored copies**, not pinned submodules, and `rnnoise`
