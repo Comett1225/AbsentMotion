@@ -136,8 +136,9 @@ class UiContracts(unittest.TestCase):
         self.assertIn('aspectName(scene.width, scene.height)', source('ui/home/TemplatesTab.kt'))
 
     def test_static_retiming_removes_the_overriding_speed_map(self):
-        text = source('editor/VideoActions.kt')
+        text = source('model/VideoTiming.kt')
         self.assertIn('n.withChild("speedMap", null).with("speed", speed.toString())', text)
+        self.assertIn('current.retimedVideo(newStart, newEnd)', source('editor/VideoActions.kt'))
 
     def test_single_group_duplicate_remaps_children(self):
         text = source('editor/EditorActions.kt').split('fun EditorState.duplicateSelected()', 1)[1].split('fun EditorState.toggleHidden', 1)[0]
