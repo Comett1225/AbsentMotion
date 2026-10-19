@@ -180,7 +180,7 @@ fun Layer.withVideoSpeedMap(map: XmlNode): Layer {
     val timing = VideoTiming(changed)
     val duration = timing.localMs(old.mediaMs((endTime - startTime).toDouble())).roundToInt().coerceAtLeast(1)
     fun adjust(n: XmlNode): XmlNode {
-        if (n.name == "speedMap") return n
+        if (n.name == "speedMap" || n.name == "scene") return n
         if (n.name == "kf") {
             val local = (n["t"]?.toDoubleOrNull() ?: 0.0) * (endTime - startTime)
             return n.with("t", (timing.localMs(old.mediaMs(local)) / duration).toString())

@@ -39,7 +39,7 @@ fun EditorState.retimeVideo(start: Boolean) {
         else null
     edit { it.update(layer.id) { current ->
         var n = current.node.with("startTime", "$newStart").with("endTime", "$newEnd")
-        n = if (adjusted == null) n.with("speed", speed.toString()) else n.withChild("speedMap", adjusted).with("speed", null)
+        n = if (adjusted == null) n.withChild("speedMap", null).with("speed", speed.toString()) else n.withChild("speedMap", adjusted).with("speed", null)
         current.copy(node = n)
     } }
 }
