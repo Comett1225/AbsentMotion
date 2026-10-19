@@ -1,6 +1,7 @@
 package app.absentmotion.ui.home
 
 import app.absentmotion.platform.BitmapFactory
+import app.absentmotion.platform.LocalContext
 import app.absentmotion.platform.Uri
 import app.absentmotion.platform.rememberLauncherForActivityResult
 import app.absentmotion.platform.ActivityResultContracts
@@ -151,6 +152,7 @@ fun HomeScreen(
     var creating by remember { mutableStateOf(false) }
     val drawer = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
     val navInset = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
     val wide = LocalWide.current
 
@@ -180,7 +182,7 @@ fun HomeScreen(
                     Modifier.weight(1f), shown, tab, { tab = it }, settings, version, onOpen, onExport,
                     onUpload = { picker.launch(arrayOf("text/xml", "application/xml", "application/zip", "application/octet-stream")) },
                     onDuplicate = { id -> scope.launch { withContext(Dispatchers.IO) { store.duplicate(id) }; version++ } },
-                    onDelete = { id -> scope.launch { withContext(Dispatchers.IO) { store.delete(id) }; version++ } },
+                    onDelete = { id -> scope.launch { withContext(Dispatchers.IO) { store.delete(id, context.getExternalFilesDir(null)?.resolve("ai")) }; version++ } },
                     wide = wide,
                 )
                 if (!wide) Spacer(Modifier.height(BarHeight + navInset))

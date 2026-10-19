@@ -34,6 +34,37 @@ class ProjectStoreTest {
         assertFalse(store.mediaDir(a).exists())
     }
 
+    @Test fun deleteRemovesOnlyAiFilesThatNoProjectOrTemplateUses() {
+        val root = tmp.newFolder()
+        val ai = tmp.newFolder("ai")
+        val store = ProjectStore(root)
+        fun aiFile(name: String) = ai.resolve(name).apply { writeText("x") }
+        fun uri(file: java.io.File) = "content://app.absentmotion.files/files/ai/${file.name}"
+        val kept = aiFile("kept.png")
+        val shared = aiFile("shared.png")
+        val orphan = aiFile("orphan.wav")
+        val a = store.create(scene(image(uri(kept))))
+        val b = store.create(scene(image(uri(shared))))
+        val c = store.create(scene(image(uri(shared))))
+        store.delete(b, ai)
+        assertTrue(kept.exists())
+        assertTrue(shared.exists())
+        assertFalse(orphan.exists())
+        val later = aiFile("later.png")
+        store.delete(c)
+        assertTrue(later.exists())
+        assertTrue(shared.exists())
+        root.resolve("templates/t1").apply { mkdirs() }.resolve("scene.xml").writeText(scene(image(uri(kept))).toXml())
+        store.delete(a, ai)
+        assertTrue(kept.exists())
+        assertFalse(shared.exists())
+        assertFalse(later.exists())
+        val loose = aiFile("loose.png")
+        root.resolve("projects/broken.xml").writeText("<scene")
+        store.delete(store.create(scene()), ai)
+        assertTrue(loose.exists())
+    }
+
     @Test fun deleteRemovesOwnFolderWhenNothingElseUsesIt() {
         val store = ProjectStore(tmp.newFolder())
         val a = store.create(scene())

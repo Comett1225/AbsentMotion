@@ -114,19 +114,21 @@ class ProjectStore(private val root: File) {
         return copy
     }
 
-    fun delete(id: String) {
+    fun delete(id: String, aiDir: File? = null) {
         val owners = (listOf(id) + (read(id)?.node?.mediaUris().orEmpty().mapNotNull(::ownerOf))).distinct()
         sceneFile(id).delete()
         thumbnailFile(id).delete()
         val projectFiles = dir.listFiles { f -> f.extension == "xml" }.orEmpty().toList()
         val templateFiles = File(root, "templates").listFiles { f -> f.isDirectory }.orEmpty().map { File(it, "scene.xml") }
-        val used = (projectFiles + templateFiles)
-            .mapNotNull { f -> runCatching { Scene.parse(f.readText()).node.mediaUris() }.getOrNull() }.flatten().toSet()
+        val parsed = (projectFiles + templateFiles).map { f -> runCatching { Scene.parse(f.readText()).node.mediaUris() }.getOrNull() }
+        val used = parsed.filterNotNull().flatten().toSet()
         for (owner in owners.filter { it == id || !sceneFile(it).exists() }) {
             val folder = mediaDir(owner)
             folder.listFiles()?.filter { it.toURI().toString() !in used }?.forEach { it.deleteRecursively() }
             folder.delete()
         }
+        if (null in parsed) return
+        aiDir?.listFiles()?.filter { f -> f.isFile && used.none { it.endsWith("/" + f.name) } }?.forEach { it.delete() }
     }
 
     fun inMediaFolder(uri: String): Boolean = ownerOf(uri) != null
