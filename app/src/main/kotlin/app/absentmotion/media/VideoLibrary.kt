@@ -129,7 +129,14 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
         }
 
         fun request(request: Request, layer: Layer) { queue.trySend(request to layer) }
-        suspend fun exact(request: Request, layer: Layer) { decode(request, layer, exact = true) }
+        suspend fun exact(request: Request, layer: Layer) {
+            try { decode(request, layer, exact = true) }
+            catch (e: CancellationException) { throw e }
+            catch (e: Exception) {
+                Log.w("AMVideo", "Cannot decode $uri layer $id at ${request.timeMs} ms", e)
+                decoderLock.withLock { decoder?.close(); decoder = null }
+            }
+        }
 
         private suspend fun decode(request: Request, layer: Layer, exact: Boolean) = decoderLock.withLock {
             if (stopped || failed) {
