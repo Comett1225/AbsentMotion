@@ -18,7 +18,7 @@ def cases():
     group = '<embedScene id="1" startTime="0" endTime="1000">' + engine.transform('100,100,0') + '<scene width="200" height="200" fps="30" totalTime="1000" retime="off">' + child + '</scene></embedScene>'
     yield 'nested effects', engine.scene(group), [((100, 100), (0, 255, 255))]
     yield 'vivid neutral', engine.scene(engine.rect(1, 100, 100, 100, 100, 0xff808080) + engine.rect(2, 100, 100, 100, 100, 0xff808080, attrs=' blending="vivid-light"')), [((100, 100), (129, 129, 129))]
-    title = "a missing picture's placeholder takes the layer opacity once"
+    title = "a missing picture draws nothing"
     yield 'placeholder opacity', *engine.CASES[title]
 
 

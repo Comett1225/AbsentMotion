@@ -275,7 +275,7 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch {
             try {
                 engine.awaitMedia()
-                engine.awaitVideoFrames(scene, state.timeMs)
+                try { engine.awaitVideoFrames(scene, state.timeMs) } catch (e: java.io.IOException) { Log.i("AMTest", "video unavailable: ${e.message}") }
                 Log.i("AMTest", "media ready $path")
                 stillName?.let { name ->
                     val ok = engine.stillPng(scene.toXml(), state.timeMs, scene.width, scene.height, File(getExternalFilesDir(null), "$name.png"))
