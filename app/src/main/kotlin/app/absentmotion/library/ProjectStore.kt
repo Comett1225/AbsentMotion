@@ -121,13 +121,13 @@ class ProjectStore(private val root: File) {
         val projectFiles = dir.listFiles { f -> f.extension == "xml" }.orEmpty().toList()
         val templateFiles = File(root, "templates").listFiles { f -> f.isDirectory }.orEmpty().map { File(it, "scene.xml") }
         val parsed = (projectFiles + templateFiles).map { f -> runCatching { Scene.parse(f.readText()).node.mediaUris() }.getOrNull() }
+        if (null in parsed) return
         val used = parsed.filterNotNull().flatten().toSet()
         for (owner in owners.filter { it == id || !sceneFile(it).exists() }) {
             val folder = mediaDir(owner)
             folder.listFiles()?.filter { it.toURI().toString() !in used }?.forEach { it.deleteRecursively() }
             folder.delete()
         }
-        if (null in parsed) return
         aiDir?.listFiles()?.filter { f -> f.isFile && used.none { it.endsWith("/" + f.name) } }?.forEach { it.delete() }
     }
 

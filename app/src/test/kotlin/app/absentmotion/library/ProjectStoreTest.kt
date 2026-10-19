@@ -65,6 +65,25 @@ class ProjectStoreTest {
         assertTrue(loose.exists())
     }
 
+    @Test fun deleteKeepsOwnedMediaWhenAnotherProjectOrTemplateCannotBeRead() {
+        val root = tmp.newFolder()
+        val store = ProjectStore(root)
+        val a = store.create(scene())
+        store.mediaDir(a).mkdirs()
+        val shared = store.mediaDir(a).resolve("shared.png").apply { writeText("x") }
+        val b = store.create(scene(image(shared.toURI().toString())))
+        root.resolve("projects/$b.xml").writeText("<scene")
+        store.delete(a)
+        assertTrue(shared.exists())
+        root.resolve("projects/$b.xml").delete()
+        val c = store.create(scene())
+        store.mediaDir(c).mkdirs()
+        val own = store.mediaDir(c).resolve("own.png").apply { writeText("x") }
+        root.resolve("templates/t1").apply { mkdirs() }.resolve("scene.xml").writeText("<scene")
+        store.delete(c)
+        assertTrue(own.exists())
+    }
+
     @Test fun deleteRemovesOwnFolderWhenNothingElseUsesIt() {
         val store = ProjectStore(tmp.newFolder())
         val a = store.create(scene())
