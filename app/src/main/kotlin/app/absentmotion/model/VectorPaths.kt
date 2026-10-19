@@ -47,7 +47,9 @@ private fun XmlNode.vec(name: String): Pt? = child(name)?.get("value")?.split(',
 fun Layer.withContours(contours: List<Contour>): Layer {
     val real = contours.filter { it.knots.isNotEmpty() }
     fun part(name: String, c: Contour, attrs: LinkedHashMap<String, String>): XmlNode =
-        if (c.knots.size == 1) XmlNode(name, attrs.also { it["closed"] = "false" }, listOf(c.knots[0].toNode())) else XmlNode(name, attrs.also { it["d"] = c.toSvg() })
+        if (c.knots.size == 1 || !c.closed && (c.knots.first().inHandle != null || c.knots.last().outHandle != null)) {
+            XmlNode(name, attrs.also { it["closed"] = "false" }, c.knots.map { it.toNode() })
+        } else XmlNode(name, attrs.also { it["d"] = c.toSvg() })
     val path = when {
         real.isEmpty() -> XmlNode("path", linkedMapOf("d" to ""))
         real.size == 1 -> part("path", real[0], linkedMapOf())

@@ -1,5 +1,6 @@
 package app.absentmotion
 
+import app.absentmotion.editor.canToggleClosed
 import app.absentmotion.model.Contour
 import app.absentmotion.model.Knot
 import app.absentmotion.model.Layer
@@ -10,6 +11,7 @@ import app.absentmotion.model.parseSvgPath
 import app.absentmotion.model.toSvg
 import app.absentmotion.model.withContours
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class VectorPathsTest {
@@ -50,5 +52,18 @@ class VectorPathsTest {
         assertEquals(Pt(38f, 21f), a.knots[4].inHandle)
         assertEquals(true, a.closed)
         assertEquals(listOf(Pt(11f, 11f), Pt(13f, 11f)), b.knots.map { it.p })
+    }
+
+    @Test fun aClosedTwoPointPathCanBeOpenedAndClosedAgainWithoutLosingItsCurves() {
+        val layer = Layer(XmlNode("shape", mapOf("id" to "1")))
+        val lens = Contour(listOf(Knot(Pt(0f, 0f), Pt(0f, 20f), Pt(0f, -20f)), Knot(Pt(40f, 0f), Pt(40f, -20f), Pt(40f, 20f))), closed = true)
+        assertTrue(lens.canToggleClosed)
+        assertTrue(lens.copy(closed = false).canToggleClosed)
+        val opened = layer.withContours(listOf(lens.copy(closed = false))).contours!!
+        assertEquals(listOf(lens.copy(closed = false)), opened)
+        assertEquals(listOf(lens), layer.withContours(opened.map { it.copy(closed = true) }).contours)
+        assertEquals(listOf(lens), layer.withContours(listOf(lens)).contours)
+        val plain = listOf(Contour(listOf(Knot(Pt(0f, 0f), outHandle = Pt(5f, 5f)), Knot(Pt(10f, 0f))), closed = false))
+        assertEquals("M 0 0C 5 5, 10 0, 10 0", layer.withContours(plain).node.child("path")!!["d"])
     }
 }

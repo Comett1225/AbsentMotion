@@ -53,12 +53,12 @@ fun EditorState.toggleCurve(mode: PointMode) {
 fun EditorState.toggleClosed(mode: PointMode) {
     change(mode) { list ->
         val c = list.getOrNull(mode.contour) ?: return@change list
-        if (c.knots.size < 2 || (c.closed && c.knots.size <= 2)) return@change list
+        if (!c.canToggleClosed) return@change list
         list.replaced(mode.contour, c.copy(closed = !c.closed))
     }
 }
 
-val Contour.canToggleClosed: Boolean get() = knots.size >= 2 && !(closed && knots.size <= 2)
+val Contour.canToggleClosed: Boolean get() = knots.size >= 2
 
 fun EditorState.deletePoint(mode: PointMode) {
     var selectContour = mode.contour
