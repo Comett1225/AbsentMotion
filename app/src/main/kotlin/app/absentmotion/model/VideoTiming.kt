@@ -105,19 +105,21 @@ private const val PAIR_SNAP = 0.005
 fun Layer.framePair(timeMs: Double, scene: Scene, stamps: LongArray): FramePair {
     val fill = mediaFill ?: return FramePair(stamps.first(), stamps.first(), 0f)
     val loop = node["loop"] == "true"
+    val first = fill.inTime * 1000.0 - 500
+    val last = fill.outTime * 1000.0 - 500
     val mapped = VideoTiming(this).mediaMs(localMs(timeMs, scene))
-    if (!loop && mapped >= fill.outTime) {
-        val last = stamps.atOrBefore(fill.outTime * 1000.0 - 500)
-        return FramePair(stamps[last], stamps[last], 0f)
-    }
-    val us = fill.bounded(mapped, loop) * 1000
+    val us = if (!loop && mapped >= fill.outTime) last else fill.bounded(mapped, loop) * 1000
     val i = stamps.atOrBefore(us)
+    fun held(at: Long) = FramePair(at, at, 0f)
     val a = stamps[i]
-    val b = stamps.getOrNull(i + 1) ?: return FramePair(a, a, 0f)
+    val b = stamps.getOrNull(i + 1)
+    if (a > last) return held(stamps[stamps.atOrBefore(last)])
+    if (b == null || b > last) return held(a)
+    if (a < first) return held(b)
     val t = ((us - a) / (b - a)).coerceIn(0.0, 1.0)
     return when {
-        t < PAIR_SNAP -> FramePair(a, a, 0f)
-        t > 1 - PAIR_SNAP -> FramePair(b, b, 0f)
+        t < PAIR_SNAP -> held(a)
+        t > 1 - PAIR_SNAP -> held(b)
         else -> FramePair(a, b, t.toFloat())
     }
 }

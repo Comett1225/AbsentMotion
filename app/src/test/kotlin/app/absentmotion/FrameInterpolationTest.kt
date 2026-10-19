@@ -168,22 +168,50 @@ class FrameInterpolationTest {
         }
     }
 
-    @Test fun aLoopingClipWrapsToItsStartAndBlendsTowardsTheRealNextFrame() {
+    @Test fun aLoopingClipWrapsToItsStartAndNeverBlendsPastItsEnd() {
         val project = scene(10)
         val stamps = rounded(10.0, 20)
         val layer = clip(outTime = 500, speed = "0.5", loop = true)
-        assertPair(stamps[4], stamps[5], 0.5f, layer.pairAt(project, 9, stamps))
+        assertPair(stamps[3], stamps[4], 0.5f, layer.pairAt(project, 7, stamps))
+        assertPair(stamps[4], stamps[4], 0f, layer.pairAt(project, 9, stamps))
         assertPair(stamps[0], stamps[0], 0f, layer.pairAt(project, 10, stamps))
         assertPair(stamps[0], stamps[1], 0.5f, layer.pairAt(project, 11, stamps))
         assertPair(stamps[2], stamps[2], 0f, layer.pairAt(project, 24, stamps))
+    }
+
+    @Test fun aLoopTrimmedToOneSecondHoldsItsLastFrameInsteadOfBlendingTheFrameAtOneSecond() {
+        val project = scene(30)
+        val stamps = rounded(30.0, 60)
+        val layer = clip(outTime = 1000, loop = true)
+        assertEquals(983.333, project.at(59, 60), 1e-3)
+        assertEquals(966_667L, stamps[29])
+        assertEquals(1_000_000L, stamps[30])
+        assertTrue(layer.needsAt(project, 59, stamps, 60))
+        assertPair(stamps[29], stamps[29], 0f, layer.pairAt(project, 59, stamps, 60))
+        assertPair(stamps[28], stamps[29], 0.5f, layer.pairAt(project, 57, stamps, 60))
+        assertPair(stamps[0], stamps[0], 0f, layer.pairAt(project, 60, stamps, 60))
+        assertPair(stamps[0], stamps[1], 0.5f, layer.pairAt(project, 61, stamps, 60))
+    }
+
+    @Test fun aTrimBetweenSourceFramesNeverBlendsInAFrameOutsideIt() {
+        val project = scene(30)
+        val stamps = rounded(30.0, 60)
+        val end = clip(outTime = 990)
+        assertPair(stamps[29], stamps[29], 0f, end.pairAt(project, 59, stamps, 60))
+        for (frame in 60..70) assertPair(stamps[29], stamps[29], 0f, end.pairAt(project, frame, stamps, 60))
+        assertPair(stamps[28], stamps[29], 0.5f, end.pairAt(project, 57, stamps, 60))
+        val start = clip(inTime = 10)
+        assertPair(stamps[1], stamps[1], 0f, start.pairAt(project, 0, stamps, 60))
+        assertPair(stamps[1], stamps[1], 0f, start.pairAt(project, 1, stamps, 60))
+        assertPair(stamps[1], stamps[2], 0.3f, start.pairAt(project, 2, stamps, 60))
     }
 
     @Test fun pastTheTrimEndTheLastFrameBeforeItIsHeld() {
         val project = scene(10)
         val stamps = rounded(10.0, 20)
         val layer = clip(end = 9999, outTime = 300, speed = "0.5")
-        assertPair(stamps[2], stamps[3], 0.5f, layer.pairAt(project, 5, stamps))
-        for (frame in 6..30) assertPair(stamps[2], stamps[2], 0f, layer.pairAt(project, frame, stamps))
+        assertPair(stamps[1], stamps[2], 0.5f, layer.pairAt(project, 3, stamps))
+        for (frame in 4..30) assertPair(stamps[2], stamps[2], 0f, layer.pairAt(project, frame, stamps))
     }
 
     @Test fun theFirstAndLastSourceFramesAreHeld() {
