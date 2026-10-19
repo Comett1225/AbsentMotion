@@ -8,9 +8,9 @@ import android.net.Uri
 import android.provider.OpenableColumns
 import app.absentmotion.model.MediaDeclaration
 import app.absentmotion.model.XmlNode
+import app.absentmotion.model.fpsText
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.util.Locale
 
 suspend fun mediaDeclaration(context: Context, uri: Uri): MediaDeclaration? =
     if (context.contentResolver.getType(uri)?.startsWith("video/") == true) videoDeclaration(context, uri) else imageDeclaration(context, uri)
@@ -38,7 +38,7 @@ suspend fun videoDeclaration(context: Context, uri: Uri): MediaDeclaration? = wi
         MediaDeclaration(XmlNode("media", linkedMapOf("uri" to uri.toString(), "filename" to name, "title" to name,
             "type" to (context.contentResolver.getType(uri) ?: "video/mp4"), "size" to "$size", "orientation" to "$rotation",
             "duration" to "$duration",
-            "fps" to String.format(Locale.US, "%.2f", fps / 100), "infoUpdated" to "${System.currentTimeMillis()}",
+            "fps" to fpsText(fps), "infoUpdated" to "${System.currentTimeMillis()}",
             "width" to "${format.getInteger(MediaFormat.KEY_WIDTH)}", "height" to "${format.getInteger(MediaFormat.KEY_HEIGHT)}")))
     } catch (_: Exception) { null } finally { extractor.release() }
 }

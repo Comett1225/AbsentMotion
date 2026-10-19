@@ -15,6 +15,8 @@ value class MediaDeclaration(val node: XmlNode) {
     val fps: Float? get() = node["fps"]?.toFloatOrNull()
 }
 
+fun fpsText(fps: Float): String = String.format(java.util.Locale.US, "%.2f", fps)
+
 enum class MediaFillMode(val xml: String) { Fill("fill"), Fit("fit"), Stretch("stretch") }
 
 data class MediaFill(

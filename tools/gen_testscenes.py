@@ -337,7 +337,7 @@ def media():
         N("media", {"uri": uri("test-alpha.png"), "filename": "test-alpha.png", "title": "test-alpha.png", "type": "image/png",
                     "size": size("test-alpha.png", 8089), "orientation": 0, "infoUpdated": 1760000000000, "width": 800, "height": 800}),
         N("media", {"uri": uri("test-video.mp4"), "filename": "test-video.mp4", "title": "test-video.mp4", "type": "video/mp4",
-                    "size": size("test-video.mp4", 119175), "orientation": 0, "duration": 5000000, "fps": "0.30",
+                    "size": size("test-video.mp4", 119175), "orientation": 0, "duration": 5000000, "fps": "30.00",
                     "infoUpdated": 1760000000000, "width": 1280, "height": 720}),
         N("media", {"uri": uri("test-audio.m4a"), "filename": "test-audio.m4a", "title": "test-audio.m4a", "type": "audio/mp4",
                     "duration": 10000000, "size": size("test-audio.m4a", 160821), "infoUpdated": 1760000000000}),
