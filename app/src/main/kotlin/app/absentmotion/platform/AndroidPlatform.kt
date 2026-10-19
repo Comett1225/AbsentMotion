@@ -175,9 +175,11 @@ internal fun readPreviewPixel(surface: Any?, x: Float, y: Float, complete: (Int?
     val px = (x * frame.width()).toInt().coerceIn(0, frame.width() - 1)
     val py = (y * frame.height()).toInt().coerceIn(0, frame.height() - 1)
     val pixel = android.graphics.Bitmap.createBitmap(1, 1, android.graphics.Bitmap.Config.ARGB_8888)
-    android.view.PixelCopy.request(view, android.graphics.Rect(px, py, px + 1, py + 1), pixel, { result ->
-        complete(if (result == android.view.PixelCopy.SUCCESS) pixel.getPixel(0, 0) else null)
-    }, android.os.Handler(android.os.Looper.getMainLooper()))
+    runCatching {
+        android.view.PixelCopy.request(view, android.graphics.Rect(px, py, px + 1, py + 1), pixel, { result ->
+            complete(if (result == android.view.PixelCopy.SUCCESS) pixel.getPixel(0, 0) else null)
+        }, android.os.Handler(android.os.Looper.getMainLooper()))
+    }.onFailure { complete(null) }
 }
 
 internal fun captionDownloadDescription(context: Context, name: String, bytes: Long) =
