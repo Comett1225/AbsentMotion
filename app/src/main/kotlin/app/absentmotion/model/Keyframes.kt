@@ -79,7 +79,8 @@ fun XmlNode.valueAt(t: Float): String? {
     val next = keys.indexOfFirst { it.t > t }
     val a = keys[next - 1]
     val b = keys[next]
-    return blend(a.v, b.v, NativeEngine.ease(b.e ?: "", (t - a.t) / (b.t - a.t)))
+    val u = (t - a.t) / (b.t - a.t)
+    return blend(a.v, b.v, if (b.e.isNullOrEmpty()) u else NativeEngine.ease(b.e, u))
 }
 
 fun XmlNode.withValueAt(t: Float, value: String, snap: Float): XmlNode {

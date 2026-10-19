@@ -29,16 +29,16 @@ fun canSavePreset(layer: Layer): Boolean {
 fun presetTitle(layer: Layer, taken: Collection<String>): String =
     layer.label.takeIf { it.isNotBlank() } ?: (1..1000).map { "Preset $it" }.firstOrNull { it !in taken } ?: "Preset"
 
-fun presetScene(scene: Scene, layer: Layer, title: String, timeMs: Int): Scene {
+fun presetScene(scene: Scene, layer: Layer, title: String): Scene {
     val parent = layer.node["parent"]?.toLongOrNull()
-    val flat = if (parent == null) layer else scene.unparentChildrenOf(setOf(parent), timeMs).layer(layer.id) ?: layer
+    val flat = if (parent == null) layer else scene.unparentChildrenOf(setOf(parent)).layer(layer.id) ?: layer
     val base = Scene.create(title, scene.width, scene.height, 30, 0)
     return Scene(base.node.with("type", "preset").with("ffver", "107")).add(flat.withHidden(false))
 }
 
 fun EditorState.savePreset(store: PresetStore): SavedPreset? {
     val layer = selected?.takeIf { canSavePreset(it) } ?: return null
-    return store.load(store.save(presetScene(scene, layer, presetTitle(layer, store.list().map { it.title }), sampleMs)))
+    return store.load(store.save(presetScene(scene, layer, presetTitle(layer, store.list().map { it.title }))))
 }
 
 fun EditorState.applyPreset(preset: SavedPreset) {

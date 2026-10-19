@@ -35,7 +35,7 @@ class GroupAndSnapTest {
     private fun Scene.group() = layers.single { it.kind == "embedScene" }
 
     @Test fun theChosenLayersMoveIntoAGroupAtTheTopOnesPlace() {
-        val out = project.grouped(setOf(2, 3), null, 0, 77, "Group 1")
+        val out = project.grouped(setOf(2, 3), null, 77, "Group 1")
         assertEquals(listOf(1L, 77L, 4L), out.layers.map { it.id })
         val group = out.group()
         assertEquals("Group 1", group.label)
@@ -56,11 +56,11 @@ class GroupAndSnapTest {
 
     @Test fun maskAndExcludeGoOnTheTopLayerInsideTheGroup() {
         for (mode in listOf("mask", "exclude")) {
-            val nested = project.grouped(setOf(1, 3, 4), mode, 0, 9, "G").group().nested!!
+            val nested = project.grouped(setOf(1, 3, 4), mode, 9, "G").group().nested!!
             assertEquals(listOf("normal", "normal", mode), nested.layers.map { it.blend })
         }
-        assertEquals(listOf("normal", "normal"), project.grouped(setOf(1, 2), null, 0, 9, "G").group().nested!!.layers.map { it.blend })
-        assertEquals("normal", project.grouped(setOf(3), "mask", 0, 9, "G").group().nested!!.layers.single().blend)
+        assertEquals(listOf("normal", "normal"), project.grouped(setOf(1, 2), null, 9, "G").group().nested!!.layers.map { it.blend })
+        assertEquals("normal", project.grouped(setOf(3), "mask", 9, "G").group().nested!!.layers.single().blend)
     }
 
     @Test fun parentLinksAcrossTheGroupEdgeGoAndEveryLayerStaysPut() {
@@ -70,7 +70,7 @@ class GroupAndSnapTest {
             layer(3, 0, 999, 5f, 5f, parent = 1),
             layer(4, 0, 999, 10f, 20f, parent = 2),
         )
-        val out = s.grouped(setOf(2, 3), null, 0, 9, "G")
+        val out = s.grouped(setOf(2, 3), null, 9, "G")
         val inner = out.group().nested!!.layers.associateBy { it.id }
         assertEquals("3", inner.getValue(2).node["parent"])
         assertNull(inner.getValue(3).node["parent"])
@@ -81,8 +81,8 @@ class GroupAndSnapTest {
     }
 
     @Test fun nothingToGroupLeavesTheProjectAlone() {
-        assertEquals(project, project.grouped(emptySet(), null, 0, 9, "G"))
-        assertEquals(project, project.grouped(setOf(42), "mask", 0, 9, "G"))
+        assertEquals(project, project.grouped(emptySet(), null, 9, "G"))
+        assertEquals(project, project.grouped(setOf(42), "mask", 9, "G"))
     }
 
     private val line = SnapGuide(true, 0f, false)

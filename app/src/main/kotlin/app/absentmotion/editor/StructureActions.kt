@@ -8,9 +8,15 @@ import app.absentmotion.model.MediaDeclaration
 import app.absentmotion.model.Scene
 import app.absentmotion.model.mediaUris
 import app.absentmotion.model.XmlNode
+import app.absentmotion.model.Keyframe
+import app.absentmotion.model.floats
 import app.absentmotion.model.formatFloats
+import app.absentmotion.model.isKeyframed
+import app.absentmotion.model.keyframes
+import app.absentmotion.model.withKeyframes
 import app.absentmotion.model.withBlend
 import app.absentmotion.model.trimmedTo
+import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.tan
@@ -94,18 +100,18 @@ fun EditorState.addEmptyGroup() {
 fun EditorState.groupLayers(ids: Set<Long>, blend: String? = null) {
     val id = Layer.newId()
     val label = numbered("Group")
-    edit { it.grouped(ids, blend, sampleMs, id, label) }
+    edit { it.grouped(ids, blend, id, label) }
     if (scene.layer(id) == null) return
     MultiSelect.clear()
     selectedId = id
     panel = EditorPanel.Tools
 }
 
-internal fun Scene.grouped(ids: Set<Long>, blend: String?, timeMs: Int, id: Long, label: String): Scene {
+internal fun Scene.grouped(ids: Set<Long>, blend: String?, id: Long, label: String): Scene {
     val inside = layers.filter { it.id in ids }.map { it.id }.toSet()
     if (inside.isEmpty()) return this
     val flat = layers.filter { it.id in inside && it.node["parent"]?.toLongOrNull().let { p -> p != null && p !in inside } }
-        .fold(unparentChildrenOf(inside, timeMs)) { acc, layer -> acc.update(layer.id, timeMs) { detach(it, timeMs) } }
+        .fold(unparentChildrenOf(inside)) { acc, layer -> acc.update(layer.id) { acc.rebased(it, null) ?: it } }
     val members = flat.layers.filter { it.id in inside }
     val start = members.minOf { it.startTime }
     val end = members.maxOf { it.endTime }
@@ -133,40 +139,123 @@ fun EditorState.toggleClippingMask() {
 
 val EditorState.canClip: Boolean get() = selectedId?.let { id -> scene.layers.indexOfFirst { it.id == id } > 0 } == true
 
-private class Place(val x: Float, val y: Float, val px: Float, val py: Float, val sx: Float, val sy: Float, val rot: Float)
+internal data class Place(val x: Float, val y: Float, val px: Float, val py: Float, val sx: Float, val sy: Float, val rot: Float, val z: Float = 0f) {
+    fun part(name: String): FloatArray = when (name) {
+        "location" -> floatArrayOf(x, y, z)
+        "scale" -> floatArrayOf(sx, sy)
+        else -> floatArrayOf(rot)
+    }
 
-private fun Scene.place(layer: Layer, timeMs: Int, depth: Int = 0): Place {
+    fun withPart(name: String, v: FloatArray): Place = when (name) {
+        "location" -> copy(x = v[0], y = v[1], z = v[2])
+        "scale" -> copy(sx = v[0], sy = v[1])
+        else -> copy(rot = v[0])
+    }
+}
+
+private val MOVED = listOf("location", "scale", "rotation")
+private val PLACED = MOVED + "pivot"
+
+private fun ownPlace(layer: Layer, timeMs: Int, fps: Int): Place {
     val at = layer.at(timeMs, fps)
     val loc = at.location
     val piv = at.pivot
     val scale = at.scale
-    var p = Place(loc[0], loc[1], piv[0], piv[1], scale[0], scale[1], at.transform("rotation", 0f)[0])
-    val parent = at.node["parent"]?.toLongOrNull()?.let { id -> layers.firstOrNull { it.id == id } }
-    if (parent == null || depth > 16) return p
-    val q = place(parent, timeMs, depth + 1)
+    return Place(loc[0], loc[1], piv[0], piv[1], scale[0], scale[1], at.transform("rotation", 0f)[0], loc[2])
+}
+
+private fun compose(p: Place, q: Place?): Place {
+    if (q == null) return p
     val vx = (p.x + p.px - q.px) * q.sx
     val vy = (p.y + p.py - q.py) * q.sy
     val a = Math.toRadians(q.rot.toDouble())
     val rx = (vx * cos(a) - vy * sin(a)).toFloat()
     val ry = (vx * sin(a) + vy * cos(a)).toFloat()
-    p = Place(q.x + rx - p.px + q.px, q.y + ry - p.py + q.py, p.px, p.py, p.sx * q.sx, p.sy * q.sy, p.rot + q.rot)
-    return p
+    return Place(q.x + rx - p.px + q.px, q.y + ry - p.py + q.py, p.px, p.py, p.sx * q.sx, p.sy * q.sy, p.rot + q.rot, p.z + q.z)
 }
 
-private fun Scene.detach(layer: Layer, timeMs: Int): Layer {
-    val here = place(layer, timeMs)
-    return layer.copy(node = layer.node.with("parent", null))
-        .withTransform("location", here.x, here.y, layer.location[2]).withTransform("scale", here.sx, here.sy).withTransform("rotation", here.rot)
+private fun decompose(w: Place, q: Place): Place? {
+    if (q.sx == 0f || q.sy == 0f) return null
+    val a = Math.toRadians(-q.rot.toDouble())
+    val dx = w.x - q.x + w.px - q.px
+    val dy = w.y - q.y + w.py - q.py
+    val vx = (dx * cos(a) - dy * sin(a)).toFloat() / q.sx
+    val vy = (dx * sin(a) + dy * cos(a)).toFloat() / q.sy
+    return Place(vx - w.px + q.px, vy - w.py + q.py, w.px, w.py, w.sx / q.sx, w.sy / q.sy, w.rot - q.rot, w.z - q.z)
 }
 
-internal fun Scene.unparentChildrenOf(ids: Set<Long>, timeMs: Int): Scene =
+private fun Scene.parentOf(layer: Layer): Layer? =
+    layer.node["parent"]?.toLongOrNull()?.takeIf { it != layer.id }?.let { id -> layers.firstOrNull { it.id == id } }
+
+internal fun Scene.place(layer: Layer, timeMs: Int, depth: Int = 0): Place =
+    compose(ownPlace(layer, timeMs, fps), parentOf(layer)?.takeIf { depth <= 16 }?.let { place(it, timeMs, depth + 1) })
+
+internal fun Scene.chain(layer: Layer?): List<Layer> = generateSequence(layer) { parentOf(it) }.take(17).toList()
+
+internal fun Layer.moves(): Boolean = PLACED.any { node.child("transform")?.child(it)?.isKeyframed == true }
+
+private fun XmlNode.withMoved(name: String, element: XmlNode): XmlNode =
+    withChild("transform", (child("transform") ?: XmlNode("transform")).withChild(name, element))
+
+internal fun Layer.rebaked(changing: Boolean, outerTimes: List<Int>, fps: Int, convert: (Place, Int) -> Place?): Layer? {
+    val transform = node.child("transform")
+    fun element(name: String) = transform?.child(name) ?: XmlNode(name)
+    fun plain(name: String, v: FloatArray) = element(name).copy(children = element(name).children.filterNot { it.name == "kf" }).with("value", formatFloats(v))
+    var out = node
+    if (!changing && transform?.child("pivot")?.isKeyframed != true) {
+        val own = ownPlace(this, startTime, fps)
+        for (name in MOVED) {
+            val keys = element(name).keyframes
+            out = out.withMoved(name, if (keys.isEmpty()) plain(name, (convert(own, startTime) ?: return null).part(name)) else {
+                val defaults = own.part(name).let { d -> if (name == "scale") floatArrayOf(1f, 1f) else FloatArray(d.size) }
+                element(name).withKeyframes(keys.map { k ->
+                    k.copy(v = formatFloats((convert(own.withPart(name, floats(k.v, defaults)), startTime) ?: return null).part(name)))
+                })
+            })
+        }
+        return copy(node = out)
+    }
+    val length = (endTime - startTime).coerceAtLeast(1)
+    val marks = (listOf(startTime, endTime) + keyframeTimes() + outerTimes).filter { it in startTime..endTime }.toSortedSet().toList()
+    val frames = generateSequence(((startTime.toLong() * fps) / 1000).toInt()) { it + 1 }
+        .map { ((2L * it + 1) * 500 / fps).toInt() }.dropWhile { it < startTime }.takeWhile { it <= endTime }.toList()
+    val samples = (marks + frames).distinct().associateWith { ms -> convert(ownPlace(this, ms, fps), ms) ?: return null }
+    for (name in MOVED) {
+        fun v(ms: Int) = samples.getValue(ms).part(name)
+        val kept = marks.toMutableList()
+        for ((a, b) in marks.zipWithNext()) {
+            val inside = frames.filter { it > a && it < b }
+            val bent = inside.any { ms ->
+                val u = (ms - a).toFloat() / (b - a)
+                v(ms).indices.any { i -> abs(v(ms)[i] - (v(a)[i] + (v(b)[i] - v(a)[i]) * u)) > 1e-3f * max(1f, abs(v(ms)[i])) }
+            }
+            if (bent) kept += inside
+        }
+        val first = v(startTime)
+        out = out.withMoved(name, if (kept.all { v(it).contentEquals(first) }) plain(name, first)
+            else element(name).withKeyframes(kept.sorted().map { Keyframe((it - startTime).toFloat() / length, formatFloats(v(it))) }))
+    }
+    return copy(node = out)
+}
+
+internal fun Scene.rebased(layer: Layer, parentId: Long?): Layer? {
+    val old = parentOf(layer)
+    val new = parentId?.let { id -> layers.firstOrNull { it.id == id } }
+    val outer = chain(old) + chain(new)
+    val moved = Layer(layer.node).rebaked(outer.any { it.moves() }, outer.flatMap { it.keyframeTimes() }, fps) { own, ms ->
+        val world = compose(own, old?.let { place(it, ms) })
+        if (new == null) world else decompose(world, place(new, ms))
+    } ?: return null
+    return moved.copy(node = moved.node.with("parent", parentId?.toString()))
+}
+
+internal fun Scene.unparentChildrenOf(ids: Set<Long>): Scene =
     layers.filter { it.id !in ids && it.node["parent"]?.toLongOrNull() in ids }
-        .fold(this) { acc, child -> acc.update(child.id, timeMs) { detach(it, timeMs) } }
+        .fold(this) { acc, child -> acc.update(child.id) { acc.rebased(it, null) ?: it } }
 
 fun EditorState.setParent(parentId: Long?) {
     val layer = selected ?: return
     if (parentId == layer.id) return
-    val here = scene.place(layer, sampleMs)
     val old = layer.node["parent"]?.toLongOrNull()
     if (old == parentId) return
     var walk = parentId
@@ -175,24 +264,8 @@ fun EditorState.setParent(parentId: Long?) {
         if (walk == layer.id) return
         walk = scene.layer(walk)?.node?.get("parent")?.toLongOrNull()
     }
-    val q = parentId?.let { id -> scene.layer(id)?.let { scene.place(it, sampleMs) } }
-    if (q != null && (q.sx == 0f || q.sy == 0f)) return
-    editSelected { l ->
-        var next = l.copy(node = l.node.with("parent", parentId?.toString()))
-        val own = scene.place(l.copy(node = l.node.with("parent", null)), sampleMs)
-        if (q != null) {
-            val a = Math.toRadians(-q.rot.toDouble())
-            val dx = here.x - q.x + own.px - q.px
-            val dy = here.y - q.y + own.py - q.py
-            val vx = (dx * cos(a) - dy * sin(a)).toFloat() / q.sx
-            val vy = (dx * sin(a) + dy * cos(a)).toFloat() / q.sy
-            next = next.withTransform("location", vx - own.px + q.px, vy - own.py + q.py, l.location[2])
-                .withTransform("scale", here.sx / q.sx, here.sy / q.sy).withTransform("rotation", here.rot - q.rot)
-        } else {
-            next = scene.detach(l, sampleMs)
-        }
-        next
-    }
+    val next = scene.rebased(layer, parentId) ?: return
+    editSelected { next }
 }
 
 suspend fun EditorState.alignSelection(edge: Int) {

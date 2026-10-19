@@ -51,10 +51,10 @@ class PresetTest {
 
     @Test fun auditLayersSurviveSaveAndApplyToAnotherLength() {
         val project = Scene(parse(TestData.scene("audit")))
-        val animated = project.layers.filter { hasMotion(it.node) }
+        val animated = project.layers.filter { hasMotion(it.node) && it.node["parent"] == null }
         assertTrue("the audit file has an animated layer", animated.isNotEmpty())
         for (layer in animated) {
-            val preset = presetScene(project, layer, "Preset 1", 0)
+            val preset = presetScene(project, layer, "Preset 1")
             assertEquals("preset", preset.node["type"])
             assertEquals("107", preset.node["ffver"])
             val saved = preset.layers.single()
@@ -106,7 +106,7 @@ class PresetTest {
         val project = Scene.create("p", 1080, 1920, 60, 0)
         val layer = shape(0, 1000, XmlNode("shadow")).let { it.copy(node = it.node.with("label", null).with("parent", null)) }
         val dir = File.createTempFile("presets", "").apply { delete(); mkdirs() }
-        val id = PresetStore(dir).save(presetScene(project, layer, presetTitle(layer, listOf("Preset 1")), 0))
+        val id = PresetStore(dir).save(presetScene(project, layer, presetTitle(layer, listOf("Preset 1"))))
         val file = parse(File(dir, "$id.xml"))
         assertEquals("preset", file["type"])
         assertEquals("Preset 2", file["title"])

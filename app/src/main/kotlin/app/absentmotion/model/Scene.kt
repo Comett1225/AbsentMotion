@@ -292,7 +292,7 @@ data class Layer(val node: XmlNode, val t: Float = 0f, val snap: Float = 0f) {
     }
 }
 
-private fun floats(text: String?, defaults: FloatArray): FloatArray {
+internal fun floats(text: String?, defaults: FloatArray): FloatArray {
     val parsed = text?.split(',')?.mapNotNull { it.trim().toFloatOrNull() } ?: emptyList()
     return FloatArray(maxOf(parsed.size, defaults.size)) { parsed.getOrNull(it) ?: defaults[it] }
 }
