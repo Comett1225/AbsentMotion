@@ -83,6 +83,16 @@ class FrameInterpolationTest {
         assertFalse(clip().needsAt(project, 5, longArrayOf(0), 60))
     }
 
+    @Test fun constantRateClipsAreDecidedByTheirFrameRateTimesSpeed() {
+        val project = scene(30)
+        for (rate in listOf(24.0, 25.0, 29.97, 30.0, 50.0, 59.94, 60.0)) for (stamps in listOf(rounded(rate, 400), truncated(rate, 400))) {
+            for (speed in listOf(0.25, 0.5, 1.0, 1.5, 2.0)) for (fps in listOf(24, 25, 30, 50, 60)) {
+                val layer = clip(speed = "$speed")
+                for (k in 0 until 120) assertEquals("$rate fps x $speed at $fps fps, frame $k", speed * rate < fps * 0.99, layer.needsAt(project, k, stamps, fps))
+            }
+        }
+    }
+
     @Test fun aNormalSpeedClipAtTheProjectRateLandsOnWholeFrames() {
         val project = scene(30)
         for (stamps in listOf(rounded(30.0, 400), truncated(30.0, 400))) {
@@ -204,6 +214,18 @@ class FrameInterpolationTest {
         assertPair(stamps[1], stamps[1], 0f, start.pairAt(project, 0, stamps, 60))
         assertPair(stamps[1], stamps[1], 0f, start.pairAt(project, 1, stamps, 60))
         assertPair(stamps[1], stamps[2], 0.3f, start.pairAt(project, 2, stamps, 60))
+    }
+
+    @Test fun aSlowSectionOfAVariableRateClipIsInterpolatedOnItsOwn() {
+        val project = scene(60)
+        val stamps = longArrayOf(0, 100_000) + (200_000L..1_000_000L step 10_000).toList()
+        assertEquals(83, stamps.size)
+        assertTrue(clip().needsAt(project, 3, stamps, 60))
+        assertPair(0, 100_000, 0.5f, clip().pairAt(project, 3, stamps, 60))
+        assertTrue(clip().needsAt(project, 9, stamps, 60))
+        assertPair(100_000, 200_000, 0.5f, clip().pairAt(project, 9, stamps, 60))
+        for (frame in 12..59) assertFalse("frame $frame", clip().needsAt(project, frame, stamps, 60))
+        assertPair(500_000, 500_000, 0f, clip().pairAt(project, 30, stamps, 60))
     }
 
     @Test fun pastTheTrimEndTheLastFrameBeforeItIsHeld() {

@@ -85,9 +85,6 @@ private fun MediaFill.bounded(mapped: Double, loop: Boolean): Double {
         else mapped.coerceIn(inTime.toDouble(), outTime.toDouble().coerceAtLeast(inTime.toDouble()))
 }
 
-fun sourceFps(stamps: LongArray): Double =
-    if (stamps.size < 2 || stamps.last() <= stamps.first()) 0.0 else (stamps.size - 1) * 1e6 / (stamps.last() - stamps.first())
-
 fun exportFrameMs(timeMs: Int, fps: Int): Double = ((((timeMs + 1L) * fps + 999) / 1000) - 1) * 1000.0 / fps
 
 private fun Layer.localMs(timeMs: Double, scene: Scene): Double {
@@ -95,22 +92,30 @@ private fun Layer.localMs(timeMs: Double, scene: Scene): Double {
     return timeMs - if (scene.frameStart(first) == startTime) first * 1000.0 / scene.fps else startTime.toDouble()
 }
 
-fun Layer.needsFrameInterpolation(timeMs: Double, scene: Scene, stamps: LongArray, fps: Int): Boolean =
-    stamps.size >= 2 && VideoTiming(this).speed(localMs(timeMs, scene)) * sourceFps(stamps) < fps * 0.99
+fun Layer.needsFrameInterpolation(timeMs: Double, scene: Scene, stamps: LongArray, fps: Int): Boolean {
+    val gap = pairAround(timeMs, scene, stamps)?.gap ?: return false
+    return gap > 0 && VideoTiming(this).speed(localMs(timeMs, scene)) * 1e6 / gap < fps * 0.99
+}
 
 data class FramePair(val a: Long, val b: Long, val t: Float)
 
+private class Around(val pair: FramePair, val gap: Long)
+
 private const val PAIR_SNAP = 0.005
 
-fun Layer.framePair(timeMs: Double, scene: Scene, stamps: LongArray): FramePair {
-    val fill = mediaFill ?: return FramePair(stamps.first(), stamps.first(), 0f)
+fun Layer.framePair(timeMs: Double, scene: Scene, stamps: LongArray): FramePair =
+    pairAround(timeMs, scene, stamps)?.pair ?: FramePair(stamps.first(), stamps.first(), 0f)
+
+private fun Layer.pairAround(timeMs: Double, scene: Scene, stamps: LongArray): Around? {
+    val fill = mediaFill ?: return null
     val loop = node["loop"] == "true"
     val first = fill.inTime * 1000.0 - 500
     val last = fill.outTime * 1000.0 - 500
     val mapped = VideoTiming(this).mediaMs(localMs(timeMs, scene))
     val us = if (!loop && mapped >= fill.outTime) last else fill.bounded(mapped, loop) * 1000
     val i = stamps.atOrBefore(us)
-    fun held(at: Long) = FramePair(at, at, 0f)
+    val gap = if (i + 1 < stamps.size) stamps[i + 1] - stamps[i] else if (i > 0) stamps[i] - stamps[i - 1] else 0
+    fun held(at: Long) = Around(FramePair(at, at, 0f), gap)
     val a = stamps[i]
     val b = stamps.getOrNull(i + 1)
     if (a > last) return held(stamps[stamps.atOrBefore(last)])
@@ -120,7 +125,7 @@ fun Layer.framePair(timeMs: Double, scene: Scene, stamps: LongArray): FramePair 
     return when {
         t < PAIR_SNAP -> held(a)
         t > 1 - PAIR_SNAP -> held(b)
-        else -> FramePair(a, b, t.toFloat())
+        else -> Around(FramePair(a, b, t.toFloat()), gap)
     }
 }
 
