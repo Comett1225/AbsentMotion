@@ -36,6 +36,8 @@ class EffectPackTest {
                 }
             assertEquals(effect.key, expected, uniforms)
             assertTrue(effect.key, Regex("""half4\s+main\s*\(\s*float2\s+\w+\s*\)""").containsMatchIn(effect.sksl))
+            assertTrue("${effect.key} declares 'pos', the name the GPU backend gives main's argument",
+                !Regex("""\b(float2|half2|float|half)\s+pos\b""").containsMatchIn(effect.sksl))
         }
     }
 

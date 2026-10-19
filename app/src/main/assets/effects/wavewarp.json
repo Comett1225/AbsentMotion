@@ -41,5 +41,5 @@
    "step": 0.1
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float amplitude;\nuniform float wavelength;\nuniform float direction;\nuniform float speed;\n\nhalf4 main(float2 coord) {\n    float phase = time * speed;\n    float rad = radians(direction);\n    float2 dir = float2(cos(rad), sin(rad));\n    float dist = dot(coord, dir);\n    float offset = amplitude * sin(2.0 * 3.14 * dist / wavelength + phase);\n    float2 warp = coord + offset * dir;\n    half4 c = image.eval(warp);\n    float a = c.a;\n    if (a > 0.001) {\n        c.rgb /= a;\n    }\n    c.rgb *= a;\n    return c;\n}"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float amplitude;\nuniform float wavelength;\nuniform float direction;\nuniform float speed;\n\nhalf4 main(float2 coord) {\n    float phase = time * speed;\n    float rad = radians(direction);\n    float2 dir = float2(cos(rad), sin(rad));\n    float dist = dot(coord, dir);\n    float offset = amplitude * sin(6.2831853 * dist / wavelength + phase);\n    float2 warp = coord + offset * float2(-dir.y, dir.x);\n    half4 c = image.eval(warp);\n    float a = c.a;\n    if (a > 0.001) {\n        c.rgb /= a;\n    }\n    c.rgb *= a;\n    return c;\n}"
 }

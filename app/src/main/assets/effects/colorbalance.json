@@ -2,13 +2,13 @@
  "id": "colorbalance",
  "name": "Colour Balance",
  "category": "color",
- "description": "Adds a color cast separately to shadows, midtones, and highlights controlled by three color parameters.",
+ "description": "Pushes the shadows, midtones and highlights towards their own colours (grey leaves a range unchanged).",
  "params": [
   {
    "id": "shadows",
    "label": "Shadows",
    "type": "color",
-   "default": "#808080"
+   "default": "#3060a0"
   },
   {
    "id": "midtones",
@@ -20,7 +20,7 @@
    "id": "highlights",
    "label": "Highlights",
    "type": "color",
-   "default": "#808080"
+   "default": "#ffb070"
   },
   {
    "id": "amount",
@@ -32,5 +32,5 @@
    "step": 0.01
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nlayout(color) uniform half4 shadows;\nlayout(color) uniform half4 midtones;\nlayout(color) uniform half4 highlights;\nuniform float amount;\nhalf luma(half3 c) {\n    return dot(c, half3(0.2126, 0.7152, 0.0722));\n}\nhalf3 applyBalance(half3 rgb, half3 balance, float amt) {\n    half l = luma(rgb);\n    float w = (l < 0.5) ? (1.0 - l * 2.0) : 0.0;\n    float s = (l > 0.5) ? (l * 2.0 - 1.0) : 0.0;\n    half3 b = mix(half3(0.5), balance, amt);\n    half3 r = mix(b, balance, s);\n    return mix(rgb, r, amt);\n}\nhalf4 main(float2 coord) {\n    half4 c = image.eval(coord);\n    half a = c.a;\n    if (a < 0.001) return c;\n    half3 rgb = c.rgb / a;\n    half l = luma(rgb);\n    half3 bc;\n    if (l < 0.33) {\n        bc = shadows.rgb;\n    } else if (l < 0.66) {\n        bc = midtones.rgb;\n    } else {\n        bc = highlights.rgb;\n    }\n    half3 res = applyBalance(rgb, bc, amount);\n    return half4(res * a, a);\n}"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nlayout(color) uniform half4 shadows;\nlayout(color) uniform half4 midtones;\nlayout(color) uniform half4 highlights;\nuniform float amount;\nfloat luma(float3 c) { return dot(c, float3(0.2126, 0.7152, 0.0722)); }\nhalf4 main(float2 coord) {\n    half4 c = image.eval(coord);\n    if (c.a <= 0.0) return c;\n    float3 base = float3(c.rgb) / float(c.a);\n    float l = luma(base);\n    float lows = 1.0 - smoothstep(0.0, 0.5, l);\n    float highs = smoothstep(0.5, 1.0, l);\n    float3 shift = lows * (float3(shadows.rgb) - 0.5) + (1.0 - lows - highs) * (float3(midtones.rgb) - 0.5) + highs * (float3(highlights.rgb) - 0.5);\n    float3 rgb = base + shift * clamp(amount, 0.0, 1.0);\n    return half4(half3(clamp(rgb, 0.0, 1.0)) * c.a, c.a);\n}"
 }
