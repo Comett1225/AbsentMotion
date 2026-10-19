@@ -49,7 +49,7 @@ class MediaLibrary(context: Context, private val engine: EngineThread) {
         for (uri in scene.node.imageUris()) {
             val key = scene.media(uri) to withContext(Dispatchers.IO) { fileVersion(resolver, Uri.parse(uri)) }
             if (loaded[uri] == key) continue
-            val bitmap = withContext(Dispatchers.IO) { decode(Uri.parse(uri), limit) }
+            val bitmap = withContext(Dispatchers.IO) { decodePicture(resolver, Uri.parse(uri), limit) }
             Log.i("AMMedia", "picture $uri ${bitmap?.width}x${bitmap?.height} limit $limit")
             try {
                 withContext(NonCancellable) {
@@ -61,31 +61,31 @@ class MediaLibrary(context: Context, private val engine: EngineThread) {
             }
         }
     }
-
-    private fun decode(uri: Uri, limit: Int): Bitmap? = try {
-        val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-        resolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, bounds) }
-        if (bounds.outWidth <= 0 || bounds.outHeight <= 0) null else {
-            val ratio = maxOf(bounds.outWidth, bounds.outHeight).toDouble() / limit.coerceAtLeast(1)
-            val options = BitmapFactory.Options().apply {
-                inPreferredConfig = Bitmap.Config.ARGB_8888
-                inPreferredColorSpace = android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.SRGB)
-                inScaled = false
-                inSampleSize = Integer.highestOneBit(ratio.toInt().coerceAtLeast(1))
-            }
-            val raw = resolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, options) }
-            val sized = if (raw == null || maxOf(raw.width, raw.height) <= limit) raw else {
-                val scale = limit.toFloat() / maxOf(raw.width, raw.height)
-                Bitmap.createScaledBitmap(raw, (raw.width * scale).toInt().coerceAtLeast(1),
-                    (raw.height * scale).toInt().coerceAtLeast(1), true).also { if (it !== raw) raw.recycle() }
-            }
-            sized?.mirroredByExif(resolver, uri)
-        }
-    } catch (e: Exception) {
-        Log.w("AMMedia", "cannot read $uri", e)
-        null
-    } catch (_: OutOfMemoryError) { null }
 }
+
+internal fun decodePicture(resolver: ContentResolver, uri: Uri, limit: Int): Bitmap? = try {
+    val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+    resolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, bounds) }
+    if (bounds.outWidth <= 0 || bounds.outHeight <= 0) null else {
+        val ratio = maxOf(bounds.outWidth, bounds.outHeight).toDouble() / limit.coerceAtLeast(1)
+        val options = BitmapFactory.Options().apply {
+            inPreferredConfig = Bitmap.Config.ARGB_8888
+            inPreferredColorSpace = android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.SRGB)
+            inScaled = false
+            inSampleSize = Integer.highestOneBit(ratio.toInt().coerceAtLeast(1))
+        }
+        val raw = resolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, options) }
+        val sized = if (raw == null || maxOf(raw.width, raw.height) <= limit) raw else {
+            val scale = limit.toFloat() / maxOf(raw.width, raw.height)
+            Bitmap.createScaledBitmap(raw, (raw.width * scale).toInt().coerceAtLeast(1),
+                (raw.height * scale).toInt().coerceAtLeast(1), true).also { if (it !== raw) raw.recycle() }
+        }
+        sized?.mirroredByExif(resolver, uri)
+    }
+} catch (e: Exception) {
+    Log.w("AMMedia", "cannot read $uri", e)
+    null
+} catch (_: OutOfMemoryError) { null }
 
 internal fun fileVersion(resolver: ContentResolver, uri: Uri): String? = try {
     resolver.openFileDescriptor(uri, "r")?.use { fd ->
