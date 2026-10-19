@@ -1,0 +1,1 @@
+AbsentMotion 2.3.0: hold and drag to reorder timeline layers; Current Frame as JPEG, WebP or BMP; Frame Interpolation (blending or optical flow) in Export for smoother 60 fps video; 51 effects with new thumbnails, and projects from other editors open with editable effects. Many fixes to paths, video, photos, project loading and export. Send to Mac and Wi-Fi transfer removed.

@@ -6,6 +6,48 @@ All notable changes to AbsentMotion are listed here, newest first. The format fo
 Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stands for the feature set as it stood on
 2026-10-12.
 
+## [2.3.0] - 2026-10-19
+
+### Added
+
+- **Timeline layer reordering.** Hold an empty part of a timeline row and drag to reorder layers. Dragging near the top or
+  bottom edge scrolls the timeline, and a second finger can scroll while you drag.
+- **Current Frame as...** On the Export screen, next to Current Frame as PNG, save the current frame as JPEG, WebP
+  (lossy or lossless) or BMP.
+- **More effects and controls.** There are now 51 effects, including 11 new effects (among them an Adjustment Layer) and
+  choice controls. Effect thumbnails use freely licensed photographs.
+- **Projects from other editors.** Projects made in another editor now open with their effects turned into
+  AbsentMotion's own effects, each editable, and effects keep working when the project is opened again.
+- **Smoother exports.** On the Export screen, *Frame Interpolation* can be set to *Frame blending* or *Optical flow*. Video
+  clips whose frame rate is lower than the export frame rate (for example 30 or 40 fps clips in a 60 fps export) get
+  new in-between frames, and every clip is sampled at the export frame rate, so the whole video moves smoothly. Off
+  leaves exports exactly as before. Optical flow can bend thin lines and object edges.
+
+### Fixed
+
+- **Photo orientation and media.** Photos that are mirrored by their orientation data show the right way round, and
+  pictures reload when their files change.
+- **Video playback.** Video frames keep coming at the end of a clip and after a seek, a video retries after a preview
+  decode error instead of disappearing, and a looping clip with no end time plays through.
+- **Paths and shapes.** Path commands are read correctly, closed paths keep their curves when reopened, duplicate
+  closing points are dropped, the X Mark inner corners are rounded, a shape's centred border is drawn inside its layer,
+  and only the visible part of the transparency checkerboard is drawn.
+- **Project loading and safety.** Element links inside linked elements are followed, embedded scenes use their own frame
+  rate, a failed project import no longer leaves saved projects behind, and deeply nested project files are refused
+  cleanly.
+- **Text and timeline.** Line spacing applies to text laid out without a prepared layout, a cancelled timeline touch
+  ends without a tap or a fling, rows stay clear of the multi-select bar, and layers split into adjacent halves without
+  trimming a layer to no frame.
+- **Export and frames.** GIF export size estimates are more accurate, image sequence frames are named with plain digits
+  in every language, and a picture reloads in place when the app resumes during an export.
+- **Stability and effects.** A still whose pixels do not fit in memory fails cleanly, a font change no longer brings
+  back an older scene, several effects show updated thumbnails and work correctly, layers with partial opacity blend
+  correctly, and a layer's opacity is applied once when its parts overlap.
+
+### Removed
+
+- **Send to Mac and Wi-Fi transfer.** Both features have been removed entirely.
+
 ## [2.1.1] - 2026-10-18
 
 ### Changed
