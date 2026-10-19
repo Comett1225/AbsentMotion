@@ -143,7 +143,6 @@ fun HomeScreen(
     onImportShown: () -> Unit = {},
     onImportFile: (Uri) -> Unit = {},
     onTemplate: (String) -> Unit = {},
-    onReceive: (() -> Unit)? = null,
 ) {
     var projects by remember { mutableStateOf<List<ProjectInfo>>(emptyList()) }
     var version by remember { mutableIntStateOf(0) }
@@ -175,8 +174,8 @@ fun HomeScreen(
     ) {
         Box(Modifier.fillMaxSize().background(Am.HomeBg)) {
             Column(Modifier.fillMaxSize().statusBarsPadding()) {
-                if (wide) WideHeader(page, tab, { p, t -> page = p; tab = t }, onSettings = { scope.launch { drawer.open() } }, onReceive, onNew = { creating = true })
-                else TopBar(onMenu = { scope.launch { drawer.open() } }, onReceive = onReceive)
+                if (wide) WideHeader(page, tab, { p, t -> page = p; tab = t }, onSettings = { scope.launch { drawer.open() } }, onNew = { creating = true })
+                else TopBar(onMenu = { scope.launch { drawer.open() } })
                 if (page == 1) TemplatesTab(store, version, onTemplate, onOpen, Modifier.weight(1f).then(if (wide) Modifier.widthIn(max = 760.dp).align(Alignment.CenterHorizontally) else Modifier)) else ProjectsPane(
                     Modifier.weight(1f), shown, tab, { tab = it }, settings, version, onOpen, onExport,
                     onUpload = { picker.launch(arrayOf("text/xml", "application/xml", "application/zip", "application/octet-stream")) },
@@ -199,28 +198,12 @@ fun HomeScreen(
 }
 
 @Composable
-private fun TopBar(onMenu: () -> Unit, onReceive: (() -> Unit)? = null) {
-    if (onReceive == null) {
-        Box(Modifier.fillMaxWidth().height(57.dp)) {
-            Box(Modifier.align(Alignment.CenterStart).size(50.dp).clickable(onClick = onMenu), contentAlignment = Alignment.Center) {
-                Icon(HomeIcons.Menu, "Settings", Modifier.size(24.dp), tint = Am.Navy)
-            }
-            Text("AbsentMotion", Modifier.align(Alignment.Center), color = Am.Navy, fontSize = 22.sp, fontWeight = FontWeight.Medium)
-        }
-    } else Row(Modifier.fillMaxWidth().height(57.dp).padding(end = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-        Box(Modifier.size(46.dp).clickable(onClick = onMenu), contentAlignment = Alignment.Center) {
+private fun TopBar(onMenu: () -> Unit) {
+    Box(Modifier.fillMaxWidth().height(57.dp)) {
+        Box(Modifier.align(Alignment.CenterStart).size(50.dp).clickable(onClick = onMenu), contentAlignment = Alignment.Center) {
             Icon(HomeIcons.Menu, "Settings", Modifier.size(24.dp), tint = Am.Navy)
         }
-        Text("AbsentMotion", Modifier.weight(1f), color = Am.Navy, fontSize = 20.sp, fontWeight = FontWeight.Medium, maxLines = 1)
-        androidx.compose.material3.Button(
-            onClick = onReceive, modifier = Modifier.height(36.dp), shape = RoundedCornerShape(8.dp),
-            colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = Am.Navy, contentColor = Am.OnNavyAccent),
-            contentPadding = PaddingValues(horizontal = 10.dp, vertical = 0.dp),
-        ) {
-            Icon(HomeIcons.Receive, null, Modifier.size(17.dp))
-            Spacer(Modifier.width(6.dp))
-            Text("Receive from phone", fontSize = 11.sp, fontWeight = FontWeight.Medium, maxLines = 1, softWrap = false)
-        }
+        Text("AbsentMotion", Modifier.align(Alignment.Center), color = Am.Navy, fontSize = 22.sp, fontWeight = FontWeight.Medium)
     }
 }
 
