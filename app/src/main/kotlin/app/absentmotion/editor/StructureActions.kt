@@ -4,7 +4,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import app.absentmotion.model.Layer
+import app.absentmotion.model.MediaDeclaration
 import app.absentmotion.model.Scene
+import app.absentmotion.model.mediaUris
 import app.absentmotion.model.XmlNode
 import app.absentmotion.model.formatFloats
 import app.absentmotion.model.withBlend
@@ -239,7 +241,12 @@ enum class StylePart(val label: String) {
 
 fun EditorState.pasteStyle(parts: Set<StylePart>) {
     val from = copiedLayerForStyle ?: return
-    editSelected { l ->
+    val id = selectedId ?: return
+    edit { it.withPastedStyle(id, sampleMs, from, copiedMediaForStyle, parts) }
+}
+
+internal fun Scene.withPastedStyle(id: Long, timeMs: Int, from: Layer, media: List<MediaDeclaration>, parts: Set<StylePart>): Scene {
+    val styled = update(id, timeMs) { l ->
         var node = l.node
         fun take(names: List<String>, attrs: List<String>) {
             node = node.copy(children = node.children.filterNot { it.name in names } + from.node.children.filter { it.name in names })
@@ -257,6 +264,8 @@ fun EditorState.pasteStyle(parts: Set<StylePart>) {
         }
         l.copy(node = node)
     }
+    val used = styled.layer(id)?.node?.mediaUris().orEmpty()
+    return media.filter { it.uri in used }.fold(styled) { scene, record -> scene.withMedia(record) }
 }
 
 fun EditorState.alignClipTimes(mode: Int) {

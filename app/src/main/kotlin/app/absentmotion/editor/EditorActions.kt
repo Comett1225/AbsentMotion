@@ -207,6 +207,7 @@ val EditorState.canPaste: Boolean get() = copiedLayers.isNotEmpty()
 val EditorState.pasteCount: Int get() = copiedLayers.size
 
 internal val copiedLayerForStyle: Layer? get() = copiedLayers.lastOrNull()
+internal val copiedMediaForStyle: List<MediaDeclaration> get() = copiedMedia
 
 val EditorState.chosenLayers: List<Layer>
     get() = if (MultiSelect.active) scene.layers.filter { it.id in MultiSelect.ids }

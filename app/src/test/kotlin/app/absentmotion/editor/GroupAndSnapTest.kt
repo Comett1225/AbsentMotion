@@ -2,6 +2,7 @@ package app.absentmotion.editor
 
 import app.absentmotion.engine.SnapGuide
 import app.absentmotion.model.Layer
+import app.absentmotion.model.MediaDeclaration
 import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
 import app.absentmotion.model.blend
@@ -125,5 +126,17 @@ class GroupAndSnapTest {
             assertTrue("at $t: $last then $now", now >= last && now - last <= 0.5001f)
             last = now
         }
+    }
+
+    @Test fun pastingAMediaFillIntoAnotherProjectDeclaresTheMedia() {
+        val source = layer(2, 0, 999, extra = mapOf("fillType" to "media", "fillImage" to "u1", "mediaFillMode" to "fit"))
+        val media = listOf(MediaDeclaration(XmlNode("media", mapOf("uri" to "u1", "filename" to "pic.png", "width" to "40", "height" to "30"))),
+            MediaDeclaration(XmlNode("media", mapOf("uri" to "u2", "filename" to "other.png"))))
+        val other = scene(layer(5, 0, 999))
+        val pasted = other.withPastedStyle(5, 0, Layer(source), media, setOf(StylePart.ColorFill))
+        assertEquals("u1", pasted.layer(5)!!.node["fillImage"])
+        assertEquals(40, pasted.media("u1")?.width)
+        assertNull(pasted.media("u2"))
+        assertNull(other.withPastedStyle(5, 0, Layer(source), media, setOf(StylePart.Blending)).media("u1"))
     }
 }
