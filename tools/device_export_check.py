@@ -52,6 +52,17 @@ def main():
         if not (frame[128, 128, 0] > 240 and frame[128, 128, 1:].max() < 10):
             sys.exit(name + ' has incorrect video pixels')
         print('ok MP4 ' + name + ': visible video and audible audio through 2.65 seconds', flush=True)
+    for duration in ([] if '--tiny-only' in sys.argv else [1, 32, 100]):
+        audio_layer = '<audio id="2" startTime="0" endTime="' + str(duration - 1) + '" src="file://' + remote + '" loop="true"/>'
+        xml = engine.scene(bg + audio_layer, 256, 256).replace('totalTime="1000"', 'totalTime="' + str(duration - 1) + '"', 1)
+        result = export(xml, work, 'short-' + str(duration))
+        samples = np.frombuffer(subprocess.check_output(['ffmpeg', '-v', 'error', '-i', str(result), '-f', 's16le', '-ac', '1', '-ar', '44100', '-']), dtype='<i2').astype(float)
+        if not len(samples) or np.abs(samples).max() < 50:
+            sys.exit(str(duration) + ' ms MP4 lost its audio')
+        frames = subprocess.check_output(['ffprobe', '-v', 'error', '-select_streams', 'v:0', '-count_frames', '-show_entries', 'stream=nb_read_frames', '-of', 'csv=p=0', str(result)], text=True).strip()
+        if not frames or int(frames) < 1:
+            sys.exit(str(duration) + ' ms MP4 lost its video')
+        print('ok MP4 ' + str(duration) + ' ms: decoded audio and video', flush=True)
     engine.adb('shell', 'rm', remote)
     image = Image.new('RGB', (64, 64), engine.RED)
     image.paste(engine.BLUE, (32, 0, 64, 64))
