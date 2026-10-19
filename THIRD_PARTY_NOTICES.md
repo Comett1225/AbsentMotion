@@ -15,7 +15,7 @@ dependency is added, removed or upgraded, update this file in the same change.
 **Contents**
 
 1. Engine libraries (C and C++): Skia and the libraries it links, whisper.cpp and ggml, RNNoise
-2. Speech model downloaded at run time: OpenAI Whisper weights
+2. Machine learning models: OpenAI Whisper weights (downloaded at run time), background removal model (`foss` build)
 3. Kotlin and Compose libraries
 4. Google Play services (proprietary)
 5. Fonts, icons and effect thumbnails
@@ -167,7 +167,7 @@ together with Skia.
 
 ---
 
-## 2. Speech model downloaded at run time
+## 2. Machine learning models
 
 ### OpenAI Whisper model weights (ggml conversion)
 
@@ -177,6 +177,38 @@ together with Skia.
 - URL: https://huggingface.co/ggerganov/whisper.cpp
 - Used in: Auto Captions. The model is **not** part of the app. It is downloaded the first time a user generates
   captions, after the app has shown its size and asked for confirmation, and it can be removed again in Settings.
+
+### Background removal model (`foss` build only)
+
+- Version: `app/src/foss/assets/absent_bg.abg` (2,943,735 bytes, SHA-256
+  `9bfbfcba996eb0b0b4f5da03d7dcbce704f5b8810101eb92f62b9e6d44465439`), a small segmentation network trained for
+  AbsentMotion; weights stored as 8-bit integers and expanded to 32-bit floats on load. Its inference code,
+  `app/src/main/cpp/absent_bg/`, is part of AbsentMotion.
+- Licence: Apache-2.0 ("Original student architectures, training scripts and C++ runtime: Apache License 2.0."),
+  subject to the source notices and the CC BY attribution below.
+- Copyright: The AbsentMotion authors.
+- Used in: "Remove Background" on images in the `foss` build. It runs on the device and nothing is downloaded. The
+  `play` build uses ML Kit instead (section 4) and does not contain this file.
+- Pretrained encoder: `timm/mobilenetv3_large_100.ra_in1k`, revision `96f46a1c52932f27492dff66c72378eb99b443a7`,
+  Apache-2.0, by Ross Wightman and timm contributors (https://huggingface.co/timm/mobilenetv3_large_100.ra_in1k,
+  https://github.com/huggingface/pytorch-image-models); MobileNetV3: Howard et al., "Searching for MobileNetV3"
+  (https://arxiv.org/abs/1905.02244). ImageNet-pretrained encoder only; classifier discarded; no ImageNet images
+  fetched. The Apache-2.0 text is `LICENSE` in the root of this repository.
+- Training pictures: 18,615 photographs under Creative Commons Attribution licences (18,559 CC BY 2.0,
+  https://creativecommons.org/licenses/by/2.0/, and 56 CC BY 4.0, https://creativecommons.org/licenses/by/4.0/); only
+  explicit CC BY records were accepted, and each licence was checked at the source before use. 8,391 come from the
+  COCO 2017 training set (https://cocodataset.org) and 10,224 from Open Images V7
+  (https://storage.googleapis.com/openimages/web/factsfigures_v7.html). Changes: resized; JPEG re-encoded. Image
+  rights remain with individual creators. No picture is part of this repository or the app. The creator, title,
+  source page, licence and changes of every picture were recorded when it was collected; that list is not part of
+  this repository.
+- COCO annotations: training/ground-truth masks are based on COCO Consortium annotations under CC BY 4.0 (union of all
+  annotated instances, resized). Citation: Tsung-Yi Lin et al., Microsoft COCO: Common Objects in Context, ECCV 2014.
+- Open Images labels and metadata: Google LLC, CC BY 4.0; Kuznetsova et al., The Open Images Dataset V4, IJCV 2020.
+- Teacher: the training masks were made by BiRefNet_lite, revision `aa62cd87eafb9cc43056d08ef3615a14628b831d`
+  (https://huggingface.co/ZhengPeng7/BiRefNet_lite), MIT License, Copyright (c) 2024 ZhengPeng. The teacher only made
+  labels: none of its weights or code are in AbsentMotion. Its card states training on DIS-TR; no DIS images were
+  used.
 
 ---
 
