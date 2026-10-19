@@ -21,6 +21,10 @@ def cases():
     yield 'invert keeps the outside clear', engine.scene(engine.rect(1, 100, 100, 40, 40, 0xffff0000, extra=invert)), [((100, 100), (0, 255, 255)), ((5, 5), engine.BLACK), ((50, 100), engine.BLACK)]
     keep = '<effect id="absent.invert"><property name="invert_alpha" type="float" value="0"/></effect>'
     yield 'invert without alpha keeps the outside clear', engine.scene(engine.rect(1, 100, 100, 40, 40, 0xffff0000, extra=keep)), [((100, 100), (0, 255, 255)), ((5, 5), engine.BLACK)]
+    split = '<effect id="absent.rgbsplit"><property name="splitDistance" type="float" value="0"/></effect>'
+    for alpha in (0x40, 0x80, 0xc0):
+        want = tuple(round(c * alpha / 255) for c in (255, 0x99, 0x33))
+        yield f'rgb split at distance 0 keeps alpha {alpha:#x}', engine.scene(engine.rect(1, 100, 100, 40, 40, alpha << 24 | 0xff9933, extra=split)), [((100, 100), want), ((5, 5), engine.BLACK)]
     yield 'vivid neutral', engine.scene(engine.rect(1, 100, 100, 100, 100, 0xff808080) + engine.rect(2, 100, 100, 100, 100, 0xff808080, attrs=' blending="vivid-light"')), [((100, 100), (129, 129, 129))]
     title = "a missing picture draws nothing"
     yield 'placeholder opacity', *engine.CASES[title]
