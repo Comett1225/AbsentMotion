@@ -6,6 +6,37 @@ All notable changes to AbsentMotion are listed here, newest first. The format fo
 Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stands for the feature set as it stood on
 2026-10-12.
 
+## [2.5.0] - 2026-10-19
+
+### Added
+
+- **Retime keyframes by dragging.** Touch and hold a keyframe diamond on the selected layer's bar, then drag it along the
+  clip. Every keyframe at that frame moves together (transform, fill, effect settings and speed), it snaps to frames, stays
+  inside the clip, and one undo step puts it back.
+- **Extend or move a single clip to the playhead.** When the playhead is off the selected clip, the tool row offers extend
+  and move buttons for the left or right edge, as multi-select already did.
+- **Export anyway.** Exporting a project whose media is missing now asks to export without it instead of refusing.
+- **New effects:** Unsharp Mask, Highlights & Shadows, Denoise and Flicker. Imported Alight Motion projects convert their
+  Unsharp Mask, Brightness & Contrast 2, Denoise, Highlights & Shadows and Flicker 2 effects instead of listing them as
+  effects this version cannot run.
+- **Gradient Map: Scale Brightness** switch, carried over when importing.
+
+### Changed
+
+- **Imported Alight Motion effects match Alight much more closely**, measured layer by layer against Alight Motion: exposure,
+  sharpen, colour temperature, colour tune, saturation and vibrance, brightness and contrast, the blend mode of gradient
+  effects, the four-colour gradient, Light Glow and Soft Glow. Light Glow now keeps the bright parts before blurring. The
+  same effects look different in existing projects where their old maths was wrong.
+- Missing pictures and videos draw nothing instead of a checkerboard over the picture.
+- The timeline thumbnails of a video are prepared only when their frames change, and the preview video keeps updating while
+  you drag speed or trim sliders.
+
+### Fixed
+
+- Sharpen no longer darkens the picture.
+- Editing no longer parses the whole scene twice on the main thread, and the display timing history can no longer grow
+  without limit.
+
 ## [2.4.0] - 2026-10-19
 
 ### Added

@@ -1,0 +1,1 @@
+AbsentMotion 2.5.0: hold a keyframe and drag it along the timeline, extend or move a clip to the playhead, export even when media is missing, four new effects, and imported Alight Motion projects now look much closer to Alight (exposure, glows, sharpen, colour). Smoother video preview while editing.
