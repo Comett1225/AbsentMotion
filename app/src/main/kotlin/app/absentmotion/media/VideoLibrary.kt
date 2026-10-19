@@ -75,9 +75,11 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
         val scene get() = track.scene
     }
 
-    private fun visible(request: Request) = request.scene.layerTracks().mapNotNull { track ->
+    @Volatile private var shown: Pair<Request, List<Sample>>? = null
+
+    private fun visible(request: Request) = shown?.takeIf { it.first === request }?.second ?: request.scene.layerTracks().mapNotNull { track ->
         if (track.layer.mediaFill?.video != true || request.scene.isMissing(track.layer.mediaFill!!.uri)) null else track.timeAt(request.timeMs.toDouble(), true)?.let { Sample(track, it.ms) }
-    }
+    }.also { shown = request to it }
 
     private suspend fun reconcile(request: Request) {
         val wanted = visible(request).associateBy { it.layer.id }
@@ -183,6 +185,7 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
                 paused || stopped || ((!request.playing || now?.playing != true) && now !== request) ||
                     now?.scene != request.scene || visible(now).none { it.layer.id == id }
             }
+            fun abandoned(): Boolean = !exact && latest.let { now -> now == null || paused || stopped || visible(now).none { it.layer.id == id } }
             if (obsolete()) return@withLock
             val source = decoder ?: VideoDecoder(context, uri).also { decoder = it }
             if (exact && request.interpolation != FrameInterpolation.Off && mixed(source, request, sample)) return@withLock
@@ -190,13 +193,13 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
             val time = layer.videoTimeUs((sample.timeMs + ahead).toInt(), sample.scene)
             val pts = source.wantedPts(time)
             if (publishedPts == pts) return@withLock
-            val image = source.frame(time, ::obsolete) ?: run {
+            val image = source.frame(time, ::abandoned) ?: run {
                 check(!exact) { "Cannot decode exact video frame $pts" }
                 return@withLock
             }
-            if (obsolete()) return@withLock
+            if (abandoned()) return@withLock
             image.hardwareBuffer!!.use { buffer ->
-                val installed = engine.setVideoPicture(uri, buffer, id, exact, source.colorStandard, source.colorRange, image.cropRect) { !obsolete() }
+                val installed = engine.setVideoPicture(uri, buffer, id, exact, source.colorStandard, source.colorRange, image.cropRect) { !abandoned() }
                 if (exact) check(installed) { "Cannot import video frame $pts for $uri" }
                 if (installed) {
                     publishedPts = pts
