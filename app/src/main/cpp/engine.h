@@ -31,8 +31,10 @@ struct PreviewOptions {
 struct Target;
 
 struct InterpolationParams {
-    int mode, divisor, levels, iterations, warps;
-    float alpha;
+    int divisor = 4, levels = 5, iterations = 6, warps = 1;
+    float alpha = 0.15f;
+    int fuse = 4;
+    bool operator==(const InterpolationParams&) const = default;
 };
 
 class Engine {
@@ -56,7 +58,7 @@ public:
     virtual bool setPicture(const std::string& uri, int64_t layerId, AHardwareBuffer* buffer,
                             const void* pixels, int width, int height, size_t rowBytes, bool opaque) = 0;
     virtual bool setVideoFrame(const std::string& uri, int64_t layerId, int64_t pts, AHardwareBuffer* buffer) = 0;
-    virtual bool interpolateVideo(const std::string& uri, int64_t layerId, int64_t a, int64_t b, float t,
+    virtual bool interpolateVideo(const std::string& uri, int64_t layerId, int64_t a, int64_t b, float t, bool flow,
                                   const InterpolationParams& params) = 0;
 
     virtual int renderScene(Target* target, double timeMs, float scale, float dx, float dy,

@@ -81,7 +81,7 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
     private suspend fun gif(scene: Scene, xml: String, s: ExportSettings, out: File, progress: (Float) -> Unit) {
         val (width, height) = exportSize(scene, s.shortSide, even = false)
         val frames = frameCount(scene, s.fps)
-        engine.exportSession(xml) {
+        engine.exportSession(xml, s.interpolation, s.fps) {
             out.outputStream().buffered().use { stream ->
                 val writer = GifWriter(stream, width, height)
                 for (k in 0 until frames) {
@@ -100,7 +100,7 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
         val frames = frameCount(scene, s.fps)
         val bitmap = app.absentmotion.platform.makeBitmap(width, height)
         try {
-            engine.exportSession(xml) {
+            engine.exportSession(xml, s.interpolation, s.fps) {
                 for (k in 0 until frames) {
                     currentCoroutineContext().ensureActive()
                     val pixels = still(frameTimeMs(scene, s.fps, k), width, height) ?: error("The engine could not draw frame $k")

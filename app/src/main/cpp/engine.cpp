@@ -98,7 +98,7 @@ public:
     bool setPicture(const std::string& uri, int64_t layerId, AHardwareBuffer* buffer,
                     const void* pixels, int width, int height, size_t rowBytes, bool opaque) override;
     bool setVideoFrame(const std::string& uri, int64_t layerId, int64_t pts, AHardwareBuffer* buffer) override;
-    bool interpolateVideo(const std::string& uri, int64_t layerId, int64_t a, int64_t b, float t,
+    bool interpolateVideo(const std::string& uri, int64_t layerId, int64_t a, int64_t b, float t, bool flow,
                           const InterpolationParams& params) override;
     int renderScene(Target*, double timeMs, float scale, float dx, float dy, uint32_t background,
                     int64_t selectedId, int handles, const PreviewOptions& view) override;
@@ -171,8 +171,11 @@ private:
     std::map<std::pair<std::string, int64_t>, sk_sp<SkImage>> fPictures;
     struct VideoFrames {
         std::map<int64_t, sk_sp<SkImage>> frames;
-        FrameInterpolator interpolator;
+        std::map<std::pair<int64_t, int64_t>, sk_sp<SkImage>> flows;
+        InterpolationParams params;
     };
+    double heldMegabytes() const;
+    sk_sp<SkImage> flowFor(VideoFrames& video, int64_t a, int64_t b, const InterpolationParams& params);
     std::map<std::pair<std::string, int64_t>, VideoFrames> fVideoFrames;
     bool fLoggedFrame = false;
 };
@@ -574,6 +577,7 @@ bool EngineImpl::setPicture(const std::string& uri, int64_t layerId, AHardwareBu
         image = SkImages::RasterFromPixmapCopy(SkPixmap(info, pixels, rowBytes));
         if (image && fRecorder) image = SkImages::TextureFromImage(fRecorder.get(), image.get(), {});
     }
+    fVideoFrames.erase(key);
     if (!image) { fPictures.erase(key); return false; }
     fPictures[key] = std::move(image);
     return true;
@@ -589,20 +593,58 @@ bool EngineImpl::setVideoFrame(const std::string& uri, int64_t layerId, int64_t 
     return true;
 }
 
-bool EngineImpl::interpolateVideo(const std::string& uri, int64_t layerId, int64_t a, int64_t b, float t,
+double EngineImpl::heldMegabytes() const {
+    double bytes = 0;
+    for (const auto& [key, video] : fVideoFrames) {
+        for (const auto& [pts, image] : video.frames) bytes += 4.0 * image->width() * image->height();
+        for (const auto& [pair, image] : video.flows) bytes += 8.0 * image->width() * image->height();
+    }
+    for (const auto& [key, image] : fPictures) bytes += 4.0 * image->width() * image->height();
+    return bytes / (1 << 20);
+}
+
+sk_sp<SkImage> EngineImpl::flowFor(VideoFrames& video, int64_t a, int64_t b, const InterpolationParams& params) {
+    if (!(video.params == params)) {
+        video.flows.clear();
+        video.params = params;
+    }
+    auto cached = video.flows.find({a, b});
+    if (cached != video.flows.end()) return cached->second;
+    FlowStats stats;
+    auto flow = EstimateFlow(fGraphite.get(), fRecorder.get(), video.frames[a], video.frames[b], params, &stats);
+    if (!flow) return nullptr;
+    video.flows[{a, b}] = flow;
+    __android_log_print(ANDROID_LOG_INFO, "AMInterp",
+                        "flow a=%" PRId64 " b=%" PRId64 " size=%dx%d field=%dx%d levels=%d fuse=%d passes=%d recordings=1 estimate=%.2f "
+                        "held=%.1fMB cache=%.1fMB",
+                        a, b, video.frames[a]->width(), video.frames[a]->height(), flow->width(), flow->height(), stats.levels,
+                        params.fuse, stats.passes, stats.ms, this->heldMegabytes(), fRecorder->currentBudgetedBytes() / 1048576.0);
+    return flow;
+}
+
+bool EngineImpl::interpolateVideo(const std::string& uri, int64_t layerId, int64_t a, int64_t b, float t, bool flow,
                                   const InterpolationParams& params) {
-    auto found = fVideoFrames.find({uri, layerId});
+    const auto key = std::make_pair(uri, layerId);
+    auto found = fVideoFrames.find(key);
     if (found == fVideoFrames.end()) return false;
-    auto& frames = found->second.frames;
-    auto first = frames.find(a), second = frames.find(b);
-    if (first == frames.end() || second == frames.end()) return false;
+    VideoFrames& video = found->second;
+    auto first = video.frames.find(a), second = video.frames.find(b);
+    if (first == video.frames.end() || second == video.frames.end()) return false;
     sk_sp<SkImage> image = first->second;
-    if (a != b && t > 0 && fGraphite) {
-        auto mixed = found->second.interpolator.run(fGraphite.get(), fRecorder.get(), first->second, second->second, t, params);
+    if (a != b && t > 0 && fGraphite && !fGpuFailed) {
+        const sk_sp<SkImage> field = flow ? this->flowFor(video, a, b, params) : nullptr;
+        double ms = 0;
+        auto mixed = SynthesizeFrame(fGraphite.get(), fRecorder.get(), first->second, second->second, field, t,
+                                     params.divisor, &ms);
+        __android_log_print(ANDROID_LOG_INFO, "AMInterp", "frame a=%" PRId64 " b=%" PRId64 " t=%.4f mode=%s synthesis=%.2f",
+                            a, b, t, field ? "flow" : "blend", ms);
         if (mixed) image = std::move(mixed);
     }
-    std::erase_if(frames, [&](const auto& frame) { return frame.first != a && frame.first != b; });
-    fPictures[{uri, layerId}] = std::move(image);
+    std::erase_if(video.frames, [&](const auto& frame) { return frame.first != a && frame.first != b; });
+    std::erase_if(video.flows, [&](const auto& pair) {
+        return !video.frames.count(pair.first.first) || !video.frames.count(pair.first.second);
+    });
+    fPictures[key] = std::move(image);
     return true;
 }
 

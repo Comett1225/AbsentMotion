@@ -3,8 +3,13 @@ package app.absentmotion.media
 import android.content.Context
 import android.util.Log
 import app.absentmotion.engine.EngineThread
+import app.absentmotion.export.FrameInterpolation
+import app.absentmotion.model.FramePair
 import app.absentmotion.model.Layer
 import app.absentmotion.model.Scene
+import app.absentmotion.model.exportFrameMs
+import app.absentmotion.model.framePair
+import app.absentmotion.model.needsFrameInterpolation
 import app.absentmotion.model.videoTimeUs
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CancellationException
@@ -21,16 +26,14 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
 object DebugFrameInterpolation {
-    enum class Mode { Off, Blend, Flow }
-    @Volatile var mode = Mode.Off
-    @Volatile var divisor = 0
+    @Volatile var divisor = 4
     @Volatile var levels = 5
     @Volatile var iterations = 6
     @Volatile var warps = 1
     @Volatile var alpha = 0.15f
+    @Volatile var fuse = 4
 
-    internal fun params(exact: Boolean) = floatArrayOf(mode.ordinal.toFloat(),
-        (if (divisor > 0) divisor else if (exact) 2 else 4).toFloat(), levels.toFloat(), iterations.toFloat(), warps.toFloat(), alpha)
+    internal fun params() = floatArrayOf(divisor.toFloat(), levels.toFloat(), iterations.toFloat(), warps.toFloat(), alpha, fuse.toFloat())
 }
 
 class VideoLibrary(context: Context, private val engine: EngineThread) {
@@ -43,7 +46,10 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
     @Volatile private var paused = false
     @Volatile private var closed = false
     @Volatile private var leadMs = 0.0
-    private data class Request(val scene: Scene, val timeMs: Int, val playing: Boolean) { val born = System.nanoTime() }
+    private data class Request(
+        val scene: Scene, val timeMs: Int, val playing: Boolean,
+        val interpolation: FrameInterpolation = FrameInterpolation.Off, val fps: Int = 0,
+    ) { val born = System.nanoTime() }
 
     init {
         scope.launch {
@@ -76,10 +82,12 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
         for ((id, layer) in wanted) sessions.getOrPut(id) { Session(id, layer.mediaFill!!.uri) }
     }
 
-    suspend fun <T> withExact(scene: Scene, timeMs: Int, draw: suspend () -> T): T = lock.withLock {
+    suspend fun <T> withExact(
+        scene: Scene, timeMs: Int, interpolation: FrameInterpolation = FrameInterpolation.Off, fps: Int = 0, draw: suspend () -> T,
+    ): T = lock.withLock {
         paused = true
         try {
-            val request = Request(scene, timeMs, false)
+            val request = Request(scene, timeMs, false, interpolation, fps)
             reconcile(request)
             withContext(Dispatchers.IO) {
                 visible(request).map { layer -> async { sessions.getValue(layer.id).exact(request, layer) } }.awaitAll()
@@ -127,7 +135,7 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
         private var retryAt = 0L
         @Volatile private var stopped = false
         private var publishedPts: Long? = null
-        private var publishedMix: Triple<Long, Long, Float>? = null
+        private var publishedMix: Pair<FramePair, FrameInterpolation>? = null
         private val held = mutableSetOf<Long>()
         private val worker = scope.launch {
             try {
@@ -167,7 +175,7 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
             }
             if (obsolete()) return@withLock
             val source = decoder ?: VideoDecoder(context, uri).also { decoder = it }
-            if (DebugFrameInterpolation.mode != DebugFrameInterpolation.Mode.Off && mixed(source, request, layer, exact, ::obsolete)) return@withLock
+            if (exact && request.interpolation != FrameInterpolation.Off && mixed(source, request, layer)) return@withLock
             val time = layer.videoTimeUs(request.timeMs + if (request.playing) leadMs.toInt() else 0, request.scene)
             val pts = source.wantedPts(time)
             if (publishedPts == pts) return@withLock
@@ -179,33 +187,33 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
                 if (installed) {
                     publishedPts = pts
                     publishedMix = null
+                    held.clear()
                     if (!exact && request.playing) leadMs = (leadMs * 0.8 + (System.nanoTime() - request.born) / 1e6 * 0.2).coerceIn(0.0, MAX_LEAD_MS)
                 }
             }
         }
 
-        private suspend fun mixed(source: VideoDecoder, request: Request, layer: Layer, exact: Boolean, obsolete: () -> Boolean): Boolean {
-            val time = layer.videoTimeUs(request.timeMs + if (request.playing) leadMs.toInt() else 0, request.scene, atFrameStart = true) + 500
+        private suspend fun mixed(source: VideoDecoder, request: Request, layer: Layer): Boolean {
+            if (request.fps <= 0) return false
             val stamps = source.timestamps
-            val a = stamps.ptsAt(time + 500)
-            var b = stamps.getOrNull(stamps.binarySearch(a) + 1) ?: a
-            var t = if (b == a) 0f else ((time - a).toFloat() / (b - a)).coerceIn(0f, 1f)
-            if (t < 0.005f) { b = a; t = 0f }
-            val key = Triple(a, b, t)
+            val timeMs = exportFrameMs(request.timeMs, request.fps)
+            if (!layer.needsFrameInterpolation(timeMs, request.scene, stamps, request.fps)) return false
+            val pair = layer.framePair(timeMs, request.scene, stamps)
+            val key = pair to request.interpolation
             if (publishedMix == key) return true
-            for (pts in setOf(a, b)) {
+            for (pts in setOf(pair.a, pair.b)) {
                 if (pts in held) continue
-                val image = source.frame(pts, obsolete) ?: return true
-                if (obsolete()) return true
+                val image = source.frame(pts) { false } ?: return false
                 if (image.timestamp / 1000 != pts) return false
-                if (!image.hardwareBuffer!!.use { engine.setVideoFrame(uri, it, id, pts, exact) { !obsolete() } }) return false
+                if (!image.hardwareBuffer!!.use { engine.setVideoFrame(uri, it, id, pts) }) return false
                 held += pts
             }
-            if (!engine.interpolateVideo(uri, id, a, b, t, DebugFrameInterpolation.params(exact), exact) { !obsolete() }) {
+            if (!engine.interpolateVideo(uri, id, pair.a, pair.b, pair.t, request.interpolation == FrameInterpolation.Flow,
+                    DebugFrameInterpolation.params())) {
                 held.clear()
                 return false
             }
-            held.retainAll(setOf(a, b))
+            held.retainAll(setOf(pair.a, pair.b))
             publishedMix = key
             publishedPts = null
             return true

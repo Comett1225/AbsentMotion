@@ -74,11 +74,9 @@ class VideoTiming(layer: Layer) {
 
 fun Layer.mediaTimeMs(timeMs: Double): Double = VideoTiming(this).mediaMs(timeMs - startTime)
 
-fun Layer.videoTimeUs(timeMs: Int, scene: Scene, atFrameStart: Boolean = false): Long {
+fun Layer.videoTimeUs(timeMs: Int, scene: Scene): Long {
     val fill = mediaFill ?: return 0
-    val frame = scene.frameAt(timeMs)
-    val mapped = mediaTimeMs((if (atFrameStart) scene.frameStart(frame) else scene.frameTime(frame)).toDouble())
-    return (fill.bounded(mapped, node["loop"] == "true") * 1000).toLong() - 500
+    return (fill.bounded(mediaTimeMs(scene.frameTime(scene.frameAt(timeMs)).toDouble()), node["loop"] == "true") * 1000).toLong() - 500
 }
 
 private fun MediaFill.bounded(mapped: Double, loop: Boolean): Double {

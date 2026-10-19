@@ -84,7 +84,7 @@ internal suspend fun exportVideo(
             worker("audio-out") { drain(aac, mux, stop, AacDelayFrames * 1_000_000L / ExportAudio.SAMPLE_RATE) }
             worker("audio-in") { feedAudio(aac, audio, (scene.totalTime + 1) * 1000L, stop) }
         }
-        engine.exportSession(xml) {
+        engine.exportSession(xml, s.interpolation, s.fps) {
             val target = attach(surface)
             try {
                 for (k in 0 until frames) {

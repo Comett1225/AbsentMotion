@@ -19,6 +19,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import app.absentmotion.audio.AudioEngine
+import app.absentmotion.export.FrameInterpolation
 import app.absentmotion.media.VideoLibrary
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -231,16 +232,13 @@ class EngineThread(private val background: Int, context: Context? = null) {
         }
     }
 
-    internal suspend fun setVideoFrame(uri: String, buffer: HardwareBuffer, layerId: Long, pts: Long,
-                                       exact: Boolean, accept: () -> Boolean): Boolean = withContext(dispatcher) {
-        if (closed || (!exact && capturing) || !accept()) return@withContext false
-        engine().setVideoFrame(uri, layerId, pts, buffer)
+    internal suspend fun setVideoFrame(uri: String, buffer: HardwareBuffer, layerId: Long, pts: Long): Boolean = withContext(dispatcher) {
+        !closed && engine().setVideoFrame(uri, layerId, pts, buffer)
     }
 
-    internal suspend fun interpolateVideo(uri: String, layerId: Long, a: Long, b: Long, t: Float, params: FloatArray,
-                                          exact: Boolean, accept: () -> Boolean): Boolean = withContext(dispatcher) {
-        if (closed || (!exact && capturing) || !accept()) return@withContext false
-        engine().interpolateVideo(uri, layerId, a, b, t, params).also { if (!exact) renderNow() }
+    internal suspend fun interpolateVideo(uri: String, layerId: Long, a: Long, b: Long, t: Float, flow: Boolean,
+                                          params: FloatArray): Boolean = withContext(dispatcher) {
+        !closed && engine().interpolateVideo(uri, layerId, a, b, t, flow, params)
     }
 
     suspend fun maxPictureSize(): Int = withContext(dispatcher) { if (closed) 1 else engine().maxPictureSize }
@@ -392,24 +390,25 @@ class EngineThread(private val background: Int, context: Context? = null) {
         }
     }
 
-    inner class ExportSession internal constructor(private val document: Scene) {
+    inner class ExportSession internal constructor(private val document: Scene, private val interpolation: FrameInterpolation, private val fps: Int) {
         suspend fun still(timeMs: Int, width: Int, height: Int): ByteArray? =
-            atFrame(document, timeMs) { engine().still(timeMs.toDouble(), width, height) }
+            atFrame(document, timeMs, interpolation, fps) { engine().still(timeMs.toDouble(), width, height) }
 
         suspend fun attach(surface: Surface): Long = withContext(dispatcher) { engine().attach(surface, forEncoder = true) }
 
         suspend fun detach(target: Long) = withContext(NonCancellable + dispatcher) { engine?.detach(target) }
 
         suspend fun render(target: Long, timeMs: Int, presentTimeNs: Long): Boolean =
-            atFrame(document, timeMs) { engine().renderFrame(target, timeMs.toDouble(), 0xFF000000.toInt(), presentTimeNs) == 0 }
+            atFrame(document, timeMs, interpolation, fps) { engine().renderFrame(target, timeMs.toDouble(), 0xFF000000.toInt(), presentTimeNs) == 0 }
     }
 
-    private suspend fun <T> atFrame(document: Scene, timeMs: Int, draw: () -> T): T {
+    private suspend fun <T> atFrame(document: Scene, timeMs: Int, interpolation: FrameInterpolation, fps: Int, draw: () -> T): T {
         suspend fun run() = withContext(dispatcher) { prepareTextTime(timeMs); draw() }
-        return if (videos != null) videos.withExact(document, timeMs) { run() } else run()
+        return if (videos != null) videos.withExact(document, timeMs, interpolation, fps) { run() } else run()
     }
 
-    suspend fun <T> exportSession(xml: String, block: suspend ExportSession.() -> T): T = captureLock.withLock {
+    suspend fun <T> exportSession(xml: String, interpolation: FrameInterpolation = FrameInterpolation.Off, fps: Int = 0,
+                                  block: suspend ExportSession.() -> T): T = captureLock.withLock {
         awaitMedia()
         fontJob?.join()
         effectJob?.join()
@@ -425,7 +424,7 @@ class EngineThread(private val background: Int, context: Context? = null) {
                 capturing = true
                 setEngineScene(xml, 0)
             }
-            ExportSession(document).block()
+            ExportSession(document, interpolation, fps).block()
         } finally {
             var noPreview = true
             try {

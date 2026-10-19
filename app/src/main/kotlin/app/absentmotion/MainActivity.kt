@@ -46,6 +46,7 @@ import app.absentmotion.model.Scene
 import app.absentmotion.model.ShapeCatalog
 import app.absentmotion.export.ExportKind
 import app.absentmotion.export.ExportSettings
+import app.absentmotion.export.FrameInterpolation
 import app.absentmotion.export.Exporter
 import app.absentmotion.export.FolderExport
 import app.absentmotion.export.defaultSettings
@@ -206,13 +207,12 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun handleTestIntent() {
-        DebugFrameInterpolation.mode = DebugFrameInterpolation.Mode.entries.firstOrNull { it.name.equals(intent.getStringExtra("interp"), true) }
-            ?: DebugFrameInterpolation.Mode.Off
-        DebugFrameInterpolation.divisor = intent.getIntExtra("interpDivisor", 0)
+        DebugFrameInterpolation.divisor = intent.getIntExtra("interpDivisor", 4)
         DebugFrameInterpolation.levels = intent.getIntExtra("interpLevels", 5)
         DebugFrameInterpolation.iterations = intent.getIntExtra("interpIterations", 6)
         DebugFrameInterpolation.warps = intent.getIntExtra("interpWarps", 1)
         DebugFrameInterpolation.alpha = intent.getFloatExtra("interpAlpha", 0.15f)
+        DebugFrameInterpolation.fuse = intent.getIntExtra("interpFuse", 4)
         if (intent.getBooleanExtra("audiolog", false)) engine.audio?.log = true
         if (intent.getBooleanExtra("effectcheck", false)) lifecycleScope.launch {
             engine.effectCheck(getExternalFilesDir(null)!!)
@@ -253,6 +253,7 @@ class MainActivity : ComponentActivity() {
         intent.takeIf { it.hasExtra("quality") }?.let { s = s.copy(quality = it.getFloatExtra("quality", s.quality)) }
         intent.getStringExtra("format")?.let { name -> app.absentmotion.export.ImageKind.entries.firstOrNull { it.name.equals(name, true) || it.ext == name }?.let { s = s.copy(image = it) } }
         intent.takeIf { it.hasExtra("iquality") }?.let { s = s.copy(imageQuality = it.getIntExtra("iquality", s.imageQuality)) }
+        intent.getStringExtra("interp")?.let { name -> FrameInterpolation.entries.firstOrNull { it.name.equals(name, true) }?.let { s = s.copy(interpolation = it) } }
         val dir = getExternalFilesDir(null)!!
         val ext = mapOf(ExportKind.Video to "mp4", ExportKind.Gif to "gif", ExportKind.Frame to "png", ExportKind.FrameAs to s.image.ext, ExportKind.Xml to "xml", ExportKind.Package to "absproj")
         val name = if (kind == ExportKind.Sequence) "export.seq" else "export"

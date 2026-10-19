@@ -15,6 +15,11 @@
 namespace {
 am::Engine* engineOf(jlong handle) { return reinterpret_cast<am::Engine*>(handle); }
 am::Target* targetOf(jlong handle) { return reinterpret_cast<am::Target*>(handle); }
+am::InterpolationParams interpolationParams(JNIEnv* env, jfloatArray params) {
+    jfloat p[6] = {4, 5, 6, 1, 0.15f, 4};
+    env->GetFloatArrayRegion(params, 0, std::min<jsize>(6, env->GetArrayLength(params)), p);
+    return {(int)p[0], (int)p[1], (int)p[2], (int)p[3], p[4], (int)p[5]};
+}
 }
 
 extern "C" {
@@ -102,14 +107,11 @@ JNIEXPORT jboolean JNICALL JNI_FN(nativeSetVideoFrame)(JNIEnv* env, jclass, jlon
     return engineOf(engine)->setVideoFrame(text, layerId, pts, AHardwareBuffer_fromHardwareBuffer(env, hardwareBuffer));
 }
 
-JNIEXPORT jboolean JNICALL JNI_FN(nativeInterpolateVideo)(JNIEnv* env, jclass, jlong engine, jbyteArray uri,
-                                                          jlong layerId, jlong a, jlong b, jfloat t, jfloatArray params) {
+JNIEXPORT jboolean JNICALL JNI_FN(nativeInterpolateVideo)(JNIEnv* env, jclass, jlong engine, jbyteArray uri, jlong layerId,
+                                                          jlong a, jlong b, jfloat t, jboolean flow, jfloatArray params) {
     std::string text((size_t)env->GetArrayLength(uri), '\0');
     env->GetByteArrayRegion(uri, 0, (jsize)text.size(), reinterpret_cast<jbyte*>(text.data()));
-    jfloat p[6] = {};
-    env->GetFloatArrayRegion(params, 0, std::min<jsize>(6, env->GetArrayLength(params)), p);
-    const am::InterpolationParams settings{(int)p[0], (int)p[1], (int)p[2], (int)p[3], (int)p[4], p[5]};
-    return engineOf(engine)->interpolateVideo(text, layerId, a, b, t, settings);
+    return engineOf(engine)->interpolateVideo(text, layerId, a, b, t, flow, interpolationParams(env, params));
 }
 
 JNIEXPORT jint JNICALL JNI_FN(nativeRenderFrame)(JNIEnv*, jclass, jlong engine, jlong target, jdouble timeMs,

@@ -4,6 +4,8 @@
 
 #include <algorithm>
 #include <chrono>
+#include <cstdlib>
+#include <string>
 #include <vector>
 
 #include "include/core/SkCanvas.h"
@@ -17,11 +19,12 @@
 #include "include/gpu/graphite/Recording.h"
 #include "include/gpu/graphite/Surface.h"
 
-#define LOGI(...) __android_log_print(ANDROID_LOG_INFO, "AMInterp", __VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, "AMInterp", __VA_ARGS__)
 
 namespace am {
 namespace {
+
+using Clock = std::chrono::steady_clock;
 
 const char* const kGrey = R"(
 uniform shader a;
@@ -48,48 +51,53 @@ uniform shader pyramid;
 uniform shader flow;
 uniform float scale;
 uniform float gain;
-uniform float dir;
 uniform float2 size;
-float first(float2 q) { half2 v = pyramid.eval(q).rg; return mix(v.r, v.g, dir); }
-float second(float2 q) { half2 v = pyramid.eval(q).rg; return mix(v.g, v.r, dir); }
-half4 main(float2 p) {
-    float2 w = flow.eval(p * scale).rg * gain;
+float first(float2 q, float dir) { half2 v = pyramid.eval(q).rg; return mix(v.r, v.g, dir); }
+float second(float2 q, float dir) { half2 v = pyramid.eval(q).rg; return mix(v.g, v.r, dir); }
+half4 main(float2 c) {
+    float dir = step(size.x, c.x);
+    float2 p = float2(c.x - size.x * dir, c.y);
+    float4 v = flow.eval(p * scale) * gain;
+    float2 w = mix(v.xy, v.zw, dir);
     float2 q = p + w;
     float2 dx = float2(1, 0);
     float2 dy = float2(0, 1);
-    float ix = 0.25 * (second(q + dx) - second(q - dx) + first(p + dx) - first(p - dx));
-    float iy = 0.25 * (second(q + dy) - second(q - dy) + first(p + dy) - first(p - dy));
-    float it = second(q) - first(p);
+    float ix = 0.25 * (second(q + dx, dir) - second(q - dx, dir) + first(p + dx, dir) - first(p - dx, dir));
+    float iy = 0.25 * (second(q + dy, dir) - second(q - dy, dir) + first(p + dy, dir) - first(p - dy, dir));
+    float it = second(q, dir) - first(p, dir);
     float seen = step(0, q.x) * step(0, q.y) * step(q.x, size.x) * step(q.y, size.y);
     return half4(half3(ix, iy, it - ix * w.x - iy * w.y) * half(seen), 1);
 }
 )";
 
-const char* const kJacobi = R"(
+const char* const kJacobiHead = R"(
 uniform shader flow;
-uniform shader derivatives;
+uniform shader terms;
 uniform float scale;
 uniform float gain;
 uniform float alpha2;
-half4 main(float2 p) {
-    float2 m = (flow.eval((p + float2(1, 0)) * scale).rg + flow.eval((p - float2(1, 0)) * scale).rg +
-                flow.eval((p + float2(0, 1)) * scale).rg + flow.eval((p - float2(0, 1)) * scale).rg) * (0.25 * gain);
-    float3 g = derivatives.eval(p).rgb;
-    float k = (g.x * m.x + g.y * m.y + g.z) / (alpha2 + g.x * g.x + g.y * g.y);
-    return half4(half2(m - g.xy * k), 0, 1);
+uniform float2 size;
+float4 source(float2 q) { return flow.eval(q * scale) * gain; }
+float4 relax(float2 q, float4 m) {
+    float2 c = clamp(q, float2(0.5), size - float2(0.5));
+    float3 f = terms.eval(c).rgb;
+    float3 g = terms.eval(c + float2(size.x, 0)).rgb;
+    float kf = (f.x * m.x + f.y * m.y + f.z) / (alpha2 + f.x * f.x + f.y * f.y);
+    float kb = (g.x * m.z + g.y * m.w + g.z) / (alpha2 + g.x * g.x + g.y * g.y);
+    return float4(m.xy - f.xy * kf, m.zw - g.xy * kb);
 }
+half4 main(float2 p) {
 )";
 
 const char* const kWarp = R"(
 uniform shader a;
 uniform shader b;
-uniform shader forward;
-uniform shader backward;
+uniform shader flow;
 uniform float t;
 uniform float d;
 uniform float2 size;
-float2 fwd(float2 x) { return forward.eval(x / d).rg * d; }
-float2 bwd(float2 x) { return backward.eval(x / d).rg * d; }
+float2 fwd(float2 x) { return flow.eval(x / d).rg * d; }
+float2 bwd(float2 x) { return flow.eval(x / d).ba * d; }
 float inside(float2 x) { return step(0, x.x) * step(0, x.y) * step(x.x, size.x) * step(x.y, size.y); }
 half4 main(float2 p) {
     float2 pa = p - t * fwd(p);
@@ -126,26 +134,58 @@ uniform float t;
 half4 main(float2 p) { return mix(a.eval(p), b.eval(p), half(t)); }
 )";
 
+constexpr int kFused[] = {1, 2, 4};
+
+std::string Name(int step, int x, int y) {
+    auto number = [](int v) { return v < 0 ? "m" + std::to_string(-v) : std::to_string(v); };
+    return "v" + std::to_string(step) + "_" + number(x) + "_" + number(y);
+}
+
+std::string JacobiSource(int steps) {
+    std::string s = kJacobiHead;
+    for (int step = 0; step <= steps; step++) {
+        const int reach = steps - step;
+        for (int y = -reach; y <= reach; y++) {
+            for (int x = -reach; x <= reach; x++) {
+                const int distance = std::abs(x) + std::abs(y);
+                if (distance > reach || (reach - distance) % 2) continue;
+                const std::string at = "p + float2(" + std::to_string(x) + ", " + std::to_string(y) + ")";
+                s += "    float4 " + Name(step, x, y) + " = ";
+                if (step == 0) {
+                    s += "source(" + at + ");\n";
+                } else {
+                    s += "relax(" + at + ", 0.25 * (" + Name(step - 1, x + 1, y) + " + " + Name(step - 1, x - 1, y) + " + " +
+                         Name(step - 1, x, y + 1) + " + " + Name(step - 1, x, y - 1) + "));\n";
+                }
+            }
+        }
+    }
+    return s + "    return half4(" + Name(steps, 0, 0) + ");\n}\n";
+}
+
 struct Effects {
-    sk_sp<SkRuntimeEffect> grey, down, derivatives, jacobi, warp, blend;
-    bool ok() const { return grey && down && derivatives && jacobi && warp && blend; }
+    sk_sp<SkRuntimeEffect> grey, down, derivatives, warp, blend;
+    sk_sp<SkRuntimeEffect> jacobi[3];
+    bool ok() const { return grey && down && derivatives && warp && blend && jacobi[0] && jacobi[1] && jacobi[2]; }
 };
 
-sk_sp<SkRuntimeEffect> Compile(const char* sksl) {
-    auto result = SkRuntimeEffect::MakeForShader(SkString(sksl));
+sk_sp<SkRuntimeEffect> Compile(const std::string& sksl) {
+    auto result = SkRuntimeEffect::MakeForShader(SkString(sksl.c_str()));
     if (!result.effect) LOGE("%s", result.errorText.c_str());
     return result.effect;
 }
 
 const Effects& Shaders() {
-    static const Effects effects{Compile(kGrey), Compile(kDown), Compile(kDerivatives), Compile(kJacobi),
-                                 Compile(kWarp), Compile(kBlend)};
+    static const Effects effects{Compile(kGrey), Compile(kDown), Compile(kDerivatives), Compile(kWarp), Compile(kBlend),
+                                 {Compile(JacobiSource(kFused[0])), Compile(JacobiSource(kFused[1])), Compile(JacobiSource(kFused[2]))}};
     return effects;
 }
 
-sk_sp<SkShader> Sample(const sk_sp<SkImage>& image) {
-    return image->makeShader(SkTileMode::kClamp, SkTileMode::kClamp, SkSamplingOptions(SkFilterMode::kLinear));
+sk_sp<SkShader> Sample(const sk_sp<SkImage>& image, SkFilterMode filter = SkFilterMode::kLinear) {
+    return image->makeShader(SkTileMode::kClamp, SkTileMode::kClamp, SkSamplingOptions(filter));
 }
+
+double Since(Clock::time_point start) { return std::chrono::duration<double, std::milli>(Clock::now() - start).count(); }
 
 class Gpu {
 public:
@@ -166,18 +206,17 @@ public:
         paint.setShader(builder.makeShader());
         paint.setBlendMode(SkBlendMode::kSrc);
         target->getCanvas()->drawPaint(paint);
-        auto recording = fRecorder->snap();
-        if (!recording || !fContext->insertRecording({recording.get()})) fFailed = true;
         fPasses++;
         return SkSurfaces::AsImage(target);
     }
 
-    double finish() {
-        if (!fContext->submit(skgpu::graphite::SyncToCpu::kYes)) fFailed = true;
-        const auto now = std::chrono::steady_clock::now();
-        const double ms = std::chrono::duration<double, std::milli>(now - fStart).count();
-        fStart = now;
-        return ms;
+    bool submit() {
+        auto recording = fRecorder->snap();
+        if (!fFailed && (!recording || !fContext->insertRecording({recording.get()}) ||
+                         !fContext->submit(skgpu::graphite::SyncToCpu::kYes))) {
+            fFailed = true;
+        }
+        return !fFailed;
     }
 
     bool failed() const { return fFailed; }
@@ -186,7 +225,6 @@ public:
 private:
     skgpu::graphite::Context* fContext;
     skgpu::graphite::Recorder* fRecorder;
-    std::chrono::steady_clock::time_point fStart = std::chrono::steady_clock::now();
     bool fFailed = false;
     int fPasses = 0;
 };
@@ -209,102 +247,85 @@ std::vector<sk_sp<SkImage>> Pyramid(Gpu& gpu, const Effects& fx, const sk_sp<SkI
     return pyramid;
 }
 
-sk_sp<SkImage> Estimate(Gpu& gpu, const Effects& fx, const std::vector<sk_sp<SkImage>>& pyramid, float dir,
-                        const InterpolationParams& params) {
+int FusedIndex(int remaining, int most) {
+    for (int i = 2; i > 0; i--) {
+        if (kFused[i] <= std::min(remaining, most)) return i;
+    }
+    return 0;
+}
+
+}
+
+sk_sp<SkImage> EstimateFlow(skgpu::graphite::Context* context, skgpu::graphite::Recorder* recorder, const sk_sp<SkImage>& a,
+                            const sk_sp<SkImage>& b, const InterpolationParams& params, FlowStats* stats) {
+    const Effects& fx = Shaders();
+    if (!fx.ok() || !a || !b) return nullptr;
+    context->submit(skgpu::graphite::SyncToCpu::kYes);
+    const auto start = Clock::now();
+    Gpu gpu(context, recorder);
+    const auto pyramid = Pyramid(gpu, fx, a, b, std::max(params.divisor, 1), std::max(params.levels, 1));
     sk_sp<SkImage> flow;
-    for (int level = (int)pyramid.size() - 1; level >= 0 && !gpu.failed(); level--) {
+    for (int level = (int)pyramid.size() - 1; level >= 0 && !gpu.failed() && pyramid[level]; level--) {
         const sk_sp<SkImage>& grey = pyramid[level];
         const int w = grey->width(), h = grey->height();
-        sk_sp<SkSurface> derivatives = gpu.field(w, h), ping = gpu.field(w, h), pong = gpu.field(w, h);
+        const SkV2 size{(float)w, (float)h};
+        sk_sp<SkSurface> terms = gpu.field(2 * w, h), ping = gpu.field(w, h), pong = gpu.field(w, h);
         float scale = flow ? 0.5f : 1.0f, gain = flow ? 2.0f : 0.0f;
         sk_sp<SkImage> current = flow ? flow : grey;
         const int iterations = std::clamp(params.iterations << level, 1, 64);
-        for (int warp = 0; warp < std::max(params.warps, 1); warp++) {
+        for (int warp = 0; warp < std::max(params.warps, 1) && current; warp++) {
             SkRuntimeShaderBuilder d(fx.derivatives);
             d.child("pyramid") = Sample(grey);
             d.child("flow") = Sample(current);
             d.uniform("scale") = scale;
             d.uniform("gain") = gain;
-            d.uniform("dir") = dir;
-            d.uniform("size") = SkV2{(float)w, (float)h};
-            sk_sp<SkImage> terms = gpu.draw(derivatives, d);
-            for (int i = 0; i < iterations && terms; i++) {
-                SkRuntimeShaderBuilder j(fx.jacobi);
-                j.child("flow") = Sample(current);
-                j.child("derivatives") = Sample(terms);
+            d.uniform("size") = size;
+            const sk_sp<SkImage> derivatives = gpu.draw(terms, d);
+            for (int done = 0; done < iterations && derivatives && current;) {
+                const int fused = FusedIndex(iterations - done, params.fuse);
+                SkRuntimeShaderBuilder j(fx.jacobi[fused]);
+                j.child("flow") = Sample(current, scale == 1.0f ? SkFilterMode::kNearest : SkFilterMode::kLinear);
+                j.child("terms") = Sample(derivatives, SkFilterMode::kNearest);
                 j.uniform("scale") = scale;
                 j.uniform("gain") = gain;
                 j.uniform("alpha2") = params.alpha * params.alpha;
+                j.uniform("size") = size;
                 current = gpu.draw(ping, j);
                 std::swap(ping, pong);
                 scale = 1.0f;
                 gain = 1.0f;
-                if (!current) return nullptr;
+                done += kFused[fused];
             }
         }
         flow = current;
     }
-    return gpu.failed() ? nullptr : flow;
+    const bool ok = gpu.submit() && flow;
+    if (stats) *stats = {gpu.passes(), (int)pyramid.size(), Since(start)};
+    if (!ok) LOGE("flow estimation failed");
+    return ok ? flow : nullptr;
 }
 
-}
-
-sk_sp<SkImage> FrameInterpolator::run(skgpu::graphite::Context* context, skgpu::graphite::Recorder* recorder,
-                                      const sk_sp<SkImage>& a, const sk_sp<SkImage>& b, float t,
-                                      const InterpolationParams& params) {
+sk_sp<SkImage> SynthesizeFrame(skgpu::graphite::Context* context, skgpu::graphite::Recorder* recorder, const sk_sp<SkImage>& a,
+                               const sk_sp<SkImage>& b, const sk_sp<SkImage>& flow, float t, int divisor, double* ms) {
     const Effects& fx = Shaders();
     if (!fx.ok() || !a || !b) return nullptr;
+    const auto start = Clock::now();
     Gpu gpu(context, recorder);
-    gpu.finish();
-    const bool flow = params.mode == 2;
-    const int divisor = std::max(params.divisor, 1);
-    double estimate = -1;
-    int levels = 0;
+    SkRuntimeShaderBuilder builder(flow ? fx.warp : fx.blend);
+    builder.child("a") = Sample(a);
+    builder.child("b") = Sample(b);
+    builder.uniform("t") = t;
     if (flow) {
-        const Key key{a->uniqueID(), b->uniqueID(), divisor, params.levels, params.iterations, params.warps, params.alpha};
-        if (!fForward || !fBackward || key != fKey) {
-            fForward = fBackward = nullptr;
-            auto pyramid = Pyramid(gpu, fx, a, b, divisor, std::max(params.levels, 1));
-            levels = (int)pyramid.size();
-            auto forward = Estimate(gpu, fx, pyramid, 0, params);
-            auto backward = Estimate(gpu, fx, pyramid, 1, params);
-            estimate = gpu.finish();
-            if (gpu.failed() || !forward || !backward) {
-                LOGE("flow estimation failed");
-                return nullptr;
-            }
-            fKey = key;
-            fForward = std::move(forward);
-            fBackward = std::move(backward);
-        }
+        builder.child("flow") = Sample(flow);
+        builder.uniform("d") = (float)std::max(divisor, 1);
+        builder.uniform("size") = SkV2{(float)a->width(), (float)a->height()};
     }
-    const int estimatePasses = gpu.passes();
-    sk_sp<SkImage> out;
-    if (flow) {
-        SkRuntimeShaderBuilder w(fx.warp);
-        w.child("a") = Sample(a);
-        w.child("b") = Sample(b);
-        w.child("forward") = Sample(fForward);
-        w.child("backward") = Sample(fBackward);
-        w.uniform("t") = t;
-        w.uniform("d") = (float)divisor;
-        w.uniform("size") = SkV2{(float)a->width(), (float)a->height()};
-        out = gpu.draw(gpu.picture(a->width(), a->height()), w);
-    } else {
-        SkRuntimeShaderBuilder m(fx.blend);
-        m.child("a") = Sample(a);
-        m.child("b") = Sample(b);
-        m.uniform("t") = t;
-        out = gpu.draw(gpu.picture(a->width(), a->height()), m);
-    }
-    const double synthesis = gpu.finish();
-    if (gpu.failed() || !out) {
+    sk_sp<SkImage> out = gpu.draw(gpu.picture(a->width(), a->height()), builder);
+    if (!gpu.submit() || !out) {
         LOGE("frame synthesis failed");
         return nullptr;
     }
-    LOGI("mode=%d size=%dx%d divisor=%d levels=%d iterations=%d warps=%d alpha=%.4f t=%.4f passes=%d estimate=%.2f synthesis=%.2f",
-         params.mode, a->width(), a->height(), divisor, levels, params.iterations, params.warps, params.alpha, t,
-         estimatePasses, estimate, synthesis);
+    if (ms) *ms = Since(start);
     return out;
 }
 

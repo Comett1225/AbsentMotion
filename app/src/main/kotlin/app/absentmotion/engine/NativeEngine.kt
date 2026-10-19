@@ -36,8 +36,8 @@ class NativeEngine(backend: Backend) : AutoCloseable {
     fun setVideoFrame(uri: String, layerId: Long, pts: Long, buffer: HardwareBuffer): Boolean =
         nativeSetVideoFrame(handle, uri.toByteArray(), layerId, pts, buffer)
 
-    fun interpolateVideo(uri: String, layerId: Long, a: Long, b: Long, t: Float, params: FloatArray): Boolean =
-        nativeInterpolateVideo(handle, uri.toByteArray(), layerId, a, b, t, params)
+    fun interpolateVideo(uri: String, layerId: Long, a: Long, b: Long, t: Float, flow: Boolean, params: FloatArray): Boolean =
+        nativeInterpolateVideo(handle, uri.toByteArray(), layerId, a, b, t, flow, params)
 
     fun renderScene(
         target: Long, timeMs: Double, scale: Float, dx: Float, dy: Float, background: Int, selectedId: Long, handles: Int,
@@ -93,7 +93,7 @@ class NativeEngine(backend: Backend) : AutoCloseable {
                                                         bitmap: Bitmap?, buffer: HardwareBuffer?, opaque: Boolean): Boolean
         @JvmStatic private external fun nativeSetVideoFrame(engine: Long, uri: ByteArray, layerId: Long, pts: Long, buffer: HardwareBuffer): Boolean
         @JvmStatic private external fun nativeInterpolateVideo(engine: Long, uri: ByteArray, layerId: Long, a: Long, b: Long, t: Float,
-                                                               params: FloatArray): Boolean
+                                                               flow: Boolean, params: FloatArray): Boolean
         @JvmStatic private external fun nativeRenderScene(
             engine: Long, target: Long, timeMs: Double, scale: Float, dx: Float, dy: Float, background: Int,
             selectedId: Long, handles: Int, pixels: Boolean, pixelDivisor: Int, gridSpacing: Float, solo: Int, soloIds: LongArray?,
