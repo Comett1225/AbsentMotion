@@ -17,6 +17,10 @@ def cases():
     child = engine.rect(2, 100, 100, 40, 40, 0xffff0000, extra='<effect id="absent.invert"/>')
     group = '<embedScene id="1" startTime="0" endTime="1000">' + engine.transform('100,100,0') + '<scene width="200" height="200" fps="30" totalTime="1000" retime="off">' + child + '</scene></embedScene>'
     yield 'nested effects', engine.scene(group), [((100, 100), (0, 255, 255))]
+    invert = '<effect id="absent.invert"/>'
+    yield 'invert keeps the outside clear', engine.scene(engine.rect(1, 100, 100, 40, 40, 0xffff0000, extra=invert)), [((100, 100), (0, 255, 255)), ((5, 5), engine.BLACK), ((50, 100), engine.BLACK)]
+    keep = '<effect id="absent.invert"><property name="invert_alpha" type="float" value="0"/></effect>'
+    yield 'invert without alpha keeps the outside clear', engine.scene(engine.rect(1, 100, 100, 40, 40, 0xffff0000, extra=keep)), [((100, 100), (0, 255, 255)), ((5, 5), engine.BLACK)]
     yield 'vivid neutral', engine.scene(engine.rect(1, 100, 100, 100, 100, 0xff808080) + engine.rect(2, 100, 100, 100, 100, 0xff808080, attrs=' blending="vivid-light"')), [((100, 100), (129, 129, 129))]
     title = "a missing picture draws nothing"
     yield 'placeholder opacity', *engine.CASES[title]
