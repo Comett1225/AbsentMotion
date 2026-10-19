@@ -152,7 +152,7 @@ JNIEXPORT jfloatArray JNICALL JNI_FN(nativeEase)(JNIEnv* env, jclass, jstring ea
     env->GetFloatArrayRegion(us, 0, n, values.data());
     for (float& v : values) v = am::Ease(e, v);
     jfloatArray out = env->NewFloatArray(n);
-    env->SetFloatArrayRegion(out, 0, n, values.data());
+    if (out) env->SetFloatArrayRegion(out, 0, n, values.data());
     return out;
 }
 
@@ -161,6 +161,10 @@ JNIEXPORT jfloatArray JNICALL JNI_FN(nativeLayerQuad)(JNIEnv* env, jclass, jlong
     float xy[8];
     if (!engineOf(engine)->layerQuad(layerId, timeMs, xy)) return nullptr;
     jfloatArray out = env->NewFloatArray(8);
+    if (!out) {
+        env->ExceptionClear();
+        return nullptr;
+    }
     env->SetFloatArrayRegion(out, 0, 8, xy);
     return out;
 }
@@ -169,6 +173,10 @@ JNIEXPORT jfloatArray JNICALL JNI_FN(nativeLayerBounds)(JNIEnv* env, jclass, jlo
     float bounds[4];
     if (!engineOf(engine)->layerBounds(layerId, timeMs, bounds)) return nullptr;
     jfloatArray out = env->NewFloatArray(4);
+    if (!out) {
+        env->ExceptionClear();
+        return nullptr;
+    }
     env->SetFloatArrayRegion(out, 0, 4, bounds);
     return out;
 }

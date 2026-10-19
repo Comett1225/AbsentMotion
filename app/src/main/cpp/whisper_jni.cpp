@@ -85,6 +85,10 @@ Java_app_absentmotion_ai_Whisper_nativeRun(JNIEnv *env, jobject, jlong handle, j
                whisper_full_get_segment_text(j->ctx, i) + '\n';
     }
     jbyteArray result = env->NewByteArray(static_cast<jsize>(out.size()));
+    if (!result) {
+        env->ExceptionClear();
+        return nullptr;
+    }
     env->SetByteArrayRegion(result, 0, static_cast<jsize>(out.size()), reinterpret_cast<const jbyte *>(out.data()));
     return result;
 }
