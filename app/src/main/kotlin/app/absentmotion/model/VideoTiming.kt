@@ -229,6 +229,46 @@ fun Layer.withSpeedKeyframeToggled(projectTime: Int, fps: Int): Layer {
     return copy(node = node.withChild("speedMap", changed))
 }
 
+fun Layer.withKeyframesMoved(from: Int, to: Int, scene: Scene): Layer {
+    val length = endTime - startTime
+    val target = scene.frameTime(to).coerceIn(startTime, endTime)
+    if (length <= 0 || scene.frameAt(target) == from) return this
+    val timing = VideoTiming(this)
+    val map = node.child("speedMap")
+    fun keyAt(frame: Int) = { t: Float -> scene.frameAt(timeOf(t)) == frame }
+    val speedMoves = { t: Float -> scene.frameAt(startTime + timing.localMs(t / 1e6).roundToInt()) == from }
+    if (map == null || map.keyframes.none { speedMoves(it.t) }) {
+        return copy(node = node.allKeysMoved((target - startTime).toFloat() / length, keyAt(from), keyAt(scene.frameAt(target))))
+    }
+    fun shifted(media: Double) = VideoTiming(copy(node = node.withChild("speedMap", map.keysMoved((media * 1e6).toFloat(), speedMoves) { false })))
+    var lo = timing.mediaMs(0.0)
+    var hi = timing.mediaMs(length.toDouble())
+    repeat(40) {
+        val mid = (lo + hi) / 2
+        if (shifted(mid).localMs(mid) < target - startTime) lo = mid else hi = mid
+    }
+    val media = (lo + hi) / 2
+    val after = shifted(media)
+    fun landing(media: Double) = scene.frameAt(startTime + after.localMs(media).roundToInt())
+    val landed = landing(media)
+    val keys = node.allKeysMoved((timing.localMs(media) / length).toFloat(), keyAt(from)) { landing(timing.mediaMs(it.toDouble() * length)) == landed }
+    return copy(node = keys).withVideoSpeedMap(map.keysMoved((media * 1e6).toFloat(), speedMoves) { landing(it / 1e6) == landed })
+}
+
+private val XmlNode.time: Float get() = this["t"]?.toFloatOrNull() ?: 0f
+
+private fun XmlNode.keysMoved(to: Float, moving: (Float) -> Boolean, colliding: (Float) -> Boolean): XmlNode {
+    val keys = children.filter { it.name == "kf" }
+    val moved = keys.lastOrNull { moving(it.time) } ?: return this
+    val kept = keys.filter { !moving(it.time) && !colliding(it.time) } + moved.with("t", String.format(java.util.Locale.US, "%.6f", to))
+    return copy(children = children.filterNot { it.name == "kf" } + kept.sortedBy { it.time })
+}
+
+private fun XmlNode.allKeysMoved(to: Float, moving: (Float) -> Boolean, colliding: (Float) -> Boolean): XmlNode = when {
+    name == "speedMap" || name == "scene" || children.isEmpty() -> this
+    else -> copy(children = children.map { it.allKeysMoved(to, moving, colliding) }).keysMoved(to, moving, colliding)
+}
+
 private fun splitSpeedBezier(curve: Easing, x: Float): Pair<Easing, Easing> {
     if (curve.type != "cubicBezier" || curve.p.size < 4) return Easing.Linear to Easing.Linear
     data class P(val x: Float, val y: Float)
