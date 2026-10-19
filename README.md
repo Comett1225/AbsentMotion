@@ -37,7 +37,7 @@ subscription, no account and no advertising. Projects live on your device.
 
 ## Requirements
 
-Android 14 (API level 34) or newer (only tested on Android 17 so far), a 64-bit ARM device (`arm64-v8a`), Vulkan 1.1.
+Android 14 (API level 34) or newer (only tested on Android 17 so far), a 64-bit ARM device (`arm64-v8a`), Vulkan 1.2.
 
 There are two builds: `play`, which has background removal on images through Google Play services, and `foss` (for
 F-Droid), which contains no Google libraries at all.
@@ -49,7 +49,7 @@ AbsentMotion is a young project. Please know these before you rely on it:
 - **The effects pack is small at first.** The app ships with a limited set of effects. A project that uses an effect
   AbsentMotion does not have still opens, and the effect stays in the file, but it is not drawn.
 - **Only 64-bit ARM Android devices on Android 14 or newer (tested so far only on Android 17).** Older Android
-  versions are not supported, and the app needs Vulkan 1.1.
+  versions are not supported, and the app needs Vulkan 1.2.
 - **Release signing.** Release APKs are signed with the project's own key. Its SHA-256 certificate fingerprint is
   `5F:AF:34:79:2B:68:1E:88:06:A1:43:E8:A7:1C:3C:C5:50:B4:E5:ED:D3:88:BA:29:2A:46:DC:09:CD:B7:E9:64`; compare it
   with `apksigner verify --print-certs` before you install a file from anywhere other than the project's release page.

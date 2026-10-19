@@ -20,7 +20,7 @@ AbsentMotion can open scene XML files and .amproj packages exported from Alight 
 
 <ul>
 <li>The set of built-in effects is small at first.</li>
-<li>Requires Android 14 or newer and a 64-bit ARM device with Vulkan 1.1.</li>
+<li>Requires Android 14 or newer and a 64-bit ARM device with Vulkan 1.2.</li>
 <li>This build contains no Google libraries, so there is no background removal.</li>
 </ul>
 
