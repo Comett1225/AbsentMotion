@@ -30,6 +30,14 @@ import kotlin.math.*
 internal fun EffectSettings(state: EditorState, layer: Layer, instance: XmlNode, definition: EffectDefinition,
                             active: EffectParam?, select: (EffectParam) -> Unit) {
     val enabled = definition.available
+    if (definition.category != "move" && state.scene.hasChildren(layer)) {
+        Row(Modifier.fillMaxWidth().height(38.dp).padding(horizontal = 8.dp).alpha(if (enabled) 1f else 0.35f), verticalAlignment = Alignment.CenterVertically) {
+            Text("Apply to Children", Modifier.weight(1f), color = Am.OnDark, fontSize = 14.sp)
+            PanelSwitch(instance.appliesToChildren) { on ->
+                if (enabled) state.editSelected { it.withEffect(state.effectIndex) { node -> node.applyingToChildren(on) } }
+            }
+        }
+    }
     definition.params.forEach { param ->
         val raw = instance.effectProperty(param.id)?.valueAt(layer.t) ?: param.default
         fun set(text: String, gesture: Boolean = false) {

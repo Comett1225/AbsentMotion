@@ -36,3 +36,9 @@ fun XmlNode.withEffectProperty(name: String, type: String, value: String, t: Flo
     val property = (old ?: XmlNode("property", mapOf("name" to name, "type" to type))).withValueAt(t, value, snap)
     return copy(children = if (old == null) children + property else children.map { if (it === old) property else it })
 }
+
+val XmlNode.appliesToChildren: Boolean get() = this["applyToChildren"] == "true"
+
+fun XmlNode.applyingToChildren(on: Boolean): XmlNode = with("applyToChildren", if (on) "true" else null)
+
+fun Scene.hasChildren(layer: Layer): Boolean = layers.any { it.id != layer.id && it.node["parent"]?.toLongOrNull() == layer.id }

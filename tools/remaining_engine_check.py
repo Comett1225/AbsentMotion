@@ -76,6 +76,13 @@ def motion_cases():
     yield 'echo behind', engine.scene(keyed(1, 50, 150, fx('echo', seconds=0.5, count=1, alpha=0.5))), [((130, 100), red), ((80, 100), (128, 0, 0)), ((105, 100), black)], 24
     yield 'echo count', engine.scene(keyed(1, 50, 150, fx('echo', seconds=0.6, count=2, alpha=1))), [((130, 100), red), ((100, 100), red), ((70, 100), red), ((115, 100), black)], 24
     yield 'time quantization', engine.scene(keyed(1, 50, 150, fx('timequant', fps=2))), [((100, 100), red), ((117, 100), black)], 20
+    cyan, green = (0, 255, 255), (0, 255, 0)
+    family = lambda shared, own='': (engine.rect(5, 50, 100, 15, 15, 0xffff0000, extra=shared) + engine.rect(6, 100, 0, 15, 15, 0xffff0000, extra=own, attrs=' parent="5"')
+                                     + engine.rect(7, 0, 50, 15, 15, 0xffff0000, attrs=' parent="6"'))
+    yield 'a shared effect reaches children and grandchildren', engine.scene(family('<effect id="absent.invert" applyToChildren="true"/>')), [((50, 100), cyan), ((150, 100), cyan), ((150, 150), cyan)], 0
+    yield 'an unshared effect stays on its layer', engine.scene(family('<effect id="absent.invert"/>')), [((50, 100), cyan), ((150, 100), red), ((150, 150), red)], 0
+    solid = '<effect id="absent.solid" applyToChildren="true"><property name="color" type="color" value="#ff00ff00"/><property name="amount" type="float" value="1"/></effect>'
+    yield 'a shared effect comes after the child\'s own effects', engine.scene(family(solid, '<effect id="absent.invert"/>')), [((150, 100), green)], 0
 
 
 def centre(image):

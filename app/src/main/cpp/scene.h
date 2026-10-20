@@ -75,7 +75,7 @@ struct Camera {
 
 struct LayerEffect {
     std::string id;
-    bool hidden = false, locallyApplied = false;
+    bool hidden = false, locallyApplied = false, toChildren = false;
     std::vector<Property> props;
 };
 

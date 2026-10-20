@@ -739,9 +739,30 @@ Placement EffectivePlacement(const std::vector<Layer>& siblings, const Layer& la
 
 namespace {
 
-void DrawList(SkCanvas* canvas, const std::vector<Layer>& source, int width, int height, bool top, double timeMs,
+bool Shared(const LayerEffect& e) { return e.toChildren && !e.hidden && !MotionEffect(e.id); }
+
+bool InheritEffects(const std::vector<Layer>& layers, std::vector<Layer>* out) {
+    if (std::none_of(layers.begin(), layers.end(), [](const Layer& l) { return std::any_of(l.effects.begin(), l.effects.end(), Shared); }))
+        return false;
+    *out = layers;
+    for (Layer& l : *out) {
+        int64_t up = l.parent;
+        for (int depth = 0; up != 0 && depth < kMaxParentDepth; depth++) {
+            auto parent = std::find_if(layers.begin(), layers.end(), [&](const Layer& p) { return p.id == up && p.id != l.id; });
+            if (parent == layers.end()) break;
+            for (const LayerEffect& e : parent->effects) {
+                if (Shared(e)) l.effects.push_back(e);
+            }
+            up = parent->parent;
+        }
+    }
+    return true;
+}
+
+void DrawList(SkCanvas* canvas, const std::vector<Layer>& listed, int width, int height, bool top, double timeMs,
               const MediaPictures& pictures) {
-    std::vector<Layer> storage;
+    std::vector<Layer> inherited, storage;
+    const std::vector<Layer>& source = InheritEffects(listed, &inherited) ? inherited : listed;
     const std::vector<Layer>& layers =
         SeeLayers(source, width, height, top, gScene ? gScene->fps : 30, timeMs, &storage) ? storage : source;
     const std::vector<Layer>* const outer = gEffectList;

@@ -287,6 +287,7 @@ bool ParseLayer(const XmlNode& node, int fps, Layer* out) {
             effect.id = StrAttr(*c, "id");
             effect.hidden = StrAttr(*c, "hidden") == "true";
             effect.locallyApplied = StrAttr(*c, "locallyApplied") == "true";
+            effect.toChildren = StrAttr(*c, "applyToChildren") == "true";
             for (const auto& p : c->children) if (p->name == "property")
                 effect.props.push_back({StrAttr(*p, "name"), StrAttr(*p, "type"), ParseAnim(p.get())});
             l.effects.push_back(std::move(effect));
