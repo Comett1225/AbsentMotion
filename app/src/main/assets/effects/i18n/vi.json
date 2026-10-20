@@ -4568,20 +4568,29 @@
    }
   },
   "vignette": {
-   "description": "Làm tối các cạnh của hình ảnh.",
+   "description": "Làm tối lớp về phía các cạnh ngoài một hình bo tròn: Kích thước đặt hình dạng, Độ bo quyết định độ tròn, Làm mềm quyết định độ mềm của viền, Cường độ quyết định độ tối và Phủ màu quyết định mức áp màu. Đục lỗ giúp các cạnh trở nên trong suốt thay vào đó.",
    "name": "Tối góc",
    "params": {
-    "amount": {
-     "label": "Mức"
+    "color": {
+     "label": "Màu"
     },
-    "radius": {
+    "extent": {
      "label": "Kích thước"
     },
-    "roundness": {
-     "label": "Độ tròn"
+    "feather": {
+     "label": "Làm mềm"
     },
-    "softness": {
-     "label": "Độ mềm"
+    "punch": {
+     "label": "Đục lỗ"
+    },
+    "rounding": {
+     "label": "Độ bo"
+    },
+    "strength": {
+     "label": "Cường độ"
+    },
+    "tint": {
+     "label": "Phủ màu"
     }
    }
   },

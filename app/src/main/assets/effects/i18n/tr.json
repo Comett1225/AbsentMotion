@@ -4568,20 +4568,29 @@
    }
   },
   "vignette": {
-   "description": "Görselin kenarlarını karartmak için vinyet efekti uygular.",
+   "description": "Katmanı yuvarlak bir şeklin dışında kenarlara doğru karartır; Boyut şekli, Yuvarlaklık yuvarlaklığı, Yumuşatma kenar yumuşaklığını, Güç karanlığı ve Renk tonu renk miktarını belirler. Delik Aç kenarları saydam yapar.",
    "name": "Vinyet",
    "params": {
-    "amount": {
-     "label": "Miktar"
+    "color": {
+     "label": "Renk"
     },
-    "radius": {
+    "extent": {
      "label": "Boyut"
     },
-    "roundness": {
+    "feather": {
+     "label": "Yumuşatma"
+    },
+    "punch": {
+     "label": "Delik Aç"
+    },
+    "rounding": {
      "label": "Yuvarlaklık"
     },
-    "softness": {
-     "label": "Yumuşaklık"
+    "strength": {
+     "label": "Güç"
+    },
+    "tint": {
+     "label": "Renk tonu"
     }
    }
   },

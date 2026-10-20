@@ -4568,20 +4568,29 @@
    }
   },
   "vignette": {
-   "description": "Menerapkan efek vignette untuk menggelapkan tepi gambar.",
+   "description": "Menggelapkan lapisan ke arah tepinya di luar bentuk bulat: Ukuran mengatur bentuknya, Kebulatan mengatur seberapa bulat, Kelembutan mengatur seberapa lembut tepinya, Kekuatan mengatur seberapa gelap, dan Rona mengatur seberapa banyak Warna yang diambil. Lubangi membuat tepinya menjadi transparan.",
    "name": "Vignette",
    "params": {
-    "amount": {
-     "label": "Jumlah"
+    "color": {
+     "label": "Warna"
     },
-    "radius": {
+    "extent": {
      "label": "Ukuran"
     },
-    "roundness": {
+    "feather": {
+     "label": "Kelembutan"
+    },
+    "punch": {
+     "label": "Lubangi"
+    },
+    "rounding": {
      "label": "Kebulatan"
     },
-    "softness": {
-     "label": "Kelembutan"
+    "strength": {
+     "label": "Kekuatan"
+    },
+    "tint": {
+     "label": "Rona"
     }
    }
   },

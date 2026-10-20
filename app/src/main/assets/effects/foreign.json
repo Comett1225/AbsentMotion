@@ -1654,5 +1654,35 @@
     "neutral": 1
    }
   }
+ },
+ "absent.vignette": {
+  "to": "vignette",
+  "params": {
+   "amount": {
+    "to": "strength",
+    "min": 0,
+    "max": 1
+   },
+   "radius": {
+    "to": "extent",
+    "min": 0.001,
+    "max": 2
+   },
+   "softness": {
+    "to": "feather",
+    "min": 0.001,
+    "max": 1
+   },
+   "roundness": {
+    "to": "rounding",
+    "scale": -7.9,
+    "offset": 9.9,
+    "min": 0,
+    "max": 9.9
+   }
+  },
+  "set": {
+   "tint": 0
+  }
  }
 }

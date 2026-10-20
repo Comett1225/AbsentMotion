@@ -4568,20 +4568,29 @@
    }
   },
   "vignette": {
-   "description": "Naglalapat ng vignette para padilimin ang mga gilid ng larawan.",
+   "description": "Pinapadilim ang layer papunta sa mga gilid nito sa labas ng bilugang hugis: itinatakda ng Sukat ang hugis, ng Pagkabilog kung gaano ito kabilog, ng Feather kung gaano kalambot ang gilid, ng Lakas kung gaano ito kadilim at ng Tint kung gaano ito nakakakuha ng Kulay. Ginagawang transparent ang mga gilid kapag Punch Out.",
    "name": "Vignette",
    "params": {
-    "amount": {
-     "label": "Dami"
+    "color": {
+     "label": "Kulay"
     },
-    "radius": {
-     "label": "Laki"
+    "extent": {
+     "label": "Sukat"
     },
-    "roundness": {
+    "feather": {
+     "label": "Feather"
+    },
+    "punch": {
+     "label": "Punch Out"
+    },
+    "rounding": {
      "label": "Pagkabilog"
     },
-    "softness": {
-     "label": "Kalambutan"
+    "strength": {
+     "label": "Lakas"
+    },
+    "tint": {
+     "label": "Tint"
     }
    }
   },

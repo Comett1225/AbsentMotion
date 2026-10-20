@@ -4568,20 +4568,29 @@
    }
   },
   "vignette": {
-   "description": "Menggunakan kesan vignet untuk menggelapkan tepi imej.",
+   "description": "Menggelapkan lapisan ke arah tepinya di luar bentuk bulat: Saiz menetapkan bentuk, Kebulatan betapa bulatnya, Pelembutan betapa lembut tepinya, Kekuatan betapa gelapnya dan Pewarnaan berapa banyak ia mengambil Warna. Tebuk Keluar menjadikan tepi lutsinar.",
    "name": "Vignet",
    "params": {
-    "amount": {
-     "label": "Jumlah"
+    "color": {
+     "label": "Warna"
     },
-    "radius": {
+    "extent": {
      "label": "Saiz"
     },
-    "roundness": {
+    "feather": {
+     "label": "Pelembutan"
+    },
+    "punch": {
+     "label": "Tebuk Keluar"
+    },
+    "rounding": {
      "label": "Kebulatan"
     },
-    "softness": {
-     "label": "Kelembutan"
+    "strength": {
+     "label": "Kekuatan"
+    },
+    "tint": {
+     "label": "Pewarnaan"
     }
    }
   },

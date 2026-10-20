@@ -4568,20 +4568,29 @@
    }
   },
   "vignette": {
-   "description": "Aplica um efeito de vinheta para escurecer as bordas da imagem.",
+   "description": "Escurece a camada em direção às bordas, fora de uma forma arredondada: Tamanho define a forma, Arredondamento o quão redonda ela é, Suavização o quão suave é a borda, Intensidade o quão escuro fica e Matiz o quanto assume a Cor. Perfurar deixa as bordas transparentes.",
    "name": "Vinheta",
    "params": {
-    "amount": {
-     "label": "Intensidade"
+    "color": {
+     "label": "Cor"
     },
-    "radius": {
+    "extent": {
      "label": "Tamanho"
     },
-    "roundness": {
+    "feather": {
+     "label": "Suavização"
+    },
+    "punch": {
+     "label": "Perfurar"
+    },
+    "rounding": {
      "label": "Arredondamento"
     },
-    "softness": {
-     "label": "Suavidade"
+    "strength": {
+     "label": "Intensidade"
+    },
+    "tint": {
+     "label": "Matiz"
     }
    }
   },

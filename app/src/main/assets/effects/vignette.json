@@ -2,44 +2,68 @@
  "id": "vignette",
  "name": "Vignette",
  "category": "stylize",
- "description": "Applies a vignette effect to darken edges of the image.",
+ "description": "Darkens the layer toward its edges outside a rounded shape: Size sets the shape, Roundness how round it is, Feather how soft its edge is, Strength how dark it gets and Tint how much it takes on Color. Punch Out makes the edges transparent instead.",
  "params": [
   {
-   "id": "amount",
-   "label": "Amount",
-   "type": "float",
-   "default": 0.5,
-   "min": 0.0,
-   "max": 1.0,
-   "step": 0.01
-  },
-  {
-   "id": "radius",
+   "id": "extent",
    "label": "Size",
    "type": "float",
-   "default": 1.0,
-   "min": 0.0,
-   "max": 1.5,
-   "step": 0.01
+   "default": 0.95,
+   "min": 0.001,
+   "max": 2,
+   "step": 0.001,
+   "percent": true
   },
   {
-   "id": "softness",
-   "label": "Softness",
-   "type": "float",
-   "default": 0.5,
-   "min": 0.0,
-   "max": 1.0,
-   "step": 0.01
-  },
-  {
-   "id": "roundness",
+   "id": "rounding",
    "label": "Roundness",
    "type": "float",
-   "default": 1.0,
-   "min": 0.0,
-   "max": 1.0,
-   "step": 0.01
+   "default": 1.5,
+   "min": 0,
+   "max": 9.9,
+   "step": 0.01,
+   "percent": true
+  },
+  {
+   "id": "feather",
+   "label": "Feather",
+   "type": "float",
+   "default": 0.5,
+   "min": 0.001,
+   "max": 1,
+   "step": 0.001
+  },
+  {
+   "id": "strength",
+   "label": "Strength",
+   "type": "float",
+   "default": 0.8,
+   "min": 0,
+   "max": 1,
+   "step": 0.001
+  },
+  {
+   "id": "tint",
+   "label": "Tint",
+   "type": "float",
+   "default": 0.2,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "percent": true
+  },
+  {
+   "id": "color",
+   "label": "Color",
+   "type": "color",
+   "default": "#000000"
+  },
+  {
+   "id": "punch",
+   "label": "Punch Out",
+   "type": "switch",
+   "default": false
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float amount;\nuniform float radius;\nuniform float softness;\nuniform float roundness;\n\nhalf4 main(float2 coord) {\n    float2 norm = (coord / size - 0.5) * 2.0;\n    float dx = norm.x, dy = norm.y;\n    float d_sq = dx*dx + dy*dy;\n    float circleDist = sqrt(d_sq);\n    float rectDist = max(abs(dx), abs(dy));\n    float dist = mix(rectDist, circleDist, roundness);\n    float edge = radius;\n    float t = smoothstep(edge - softness, edge + softness, dist);\n    float vignette = 1.0 - (amount * clamp(t, 0, 1));\n    half4 color = image.eval(coord);\n    half a = color.a;\n    if (a > 0.0001) {\n        color.rgb /= a;\n        color.rgb *= vignette;\n        color.rgb *= a;\n    } else {\n        color = half4(0);\n    }\n    return color;\n}"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float extent;\nuniform float strength;\nuniform float rounding;\nuniform float feather;\nuniform float tint;\nlayout(color) uniform half4 color;\nuniform float punch;\n\nhalf4 main(float2 coord) {\n    half4 c = image.eval(coord);\n    if (c.a <= 0.0001) return half4(0);\n    float2 n = abs((coord / max(size, float2(1.0)) - 0.5) * 2.0);\n    float p = max(rounding, 0.5);\n    float d = pow(pow(n.x, p) + pow(n.y, p), 1.0 / p);\n    float s = max(extent, 0.001);\n    float v = smoothstep(s * (1.0 - feather * 0.25), s * (1.0 + feather * 3.0) + 0.001, d) * clamp(strength, 0.0, 1.0);\n    if (punch > 0.5) return c * half(1.0 - v);\n    float3 rgb = float3(c.rgb / c.a);\n    rgb = mix(max(rgb - v * (1.0 - tint), 0.0), float3(color.rgb), tint * v);\n    return half4(half3(rgb) * c.a, c.a);\n}"
 }

@@ -4568,20 +4568,29 @@
    }
   },
   "vignette": {
-   "description": "Aplica un efecto de viñeta para oscurecer los bordes de la imagen.",
+   "description": "Oscurece la capa hacia sus bordes fuera de una forma redondeada: Tamaño establece la forma, Redondez qué tan redonda es, Difuminado qué tan suave es su borde, Intensidad qué tan oscura se vuelve y Tinte cuánto toma del color. Perforar hace que los bordes sean transparentes en su lugar.",
    "name": "Viñeta",
    "params": {
-    "amount": {
-     "label": "Cantidad"
+    "color": {
+     "label": "Color"
     },
-    "radius": {
+    "extent": {
      "label": "Tamaño"
     },
-    "roundness": {
+    "feather": {
+     "label": "Difuminado"
+    },
+    "punch": {
+     "label": "Perforar"
+    },
+    "rounding": {
      "label": "Redondez"
     },
-    "softness": {
-     "label": "Suavidad"
+    "strength": {
+     "label": "Intensidad"
+    },
+    "tint": {
+     "label": "Tinte"
     }
    }
   },

@@ -52,7 +52,7 @@
     "rgbsplit": {"photo": "portrait", "params": {"strength": 0.2}},
     "scanlines": {"photo": "sunset", "params": {"spacing": 8, "darkness": 0.6, "roll_speed": 0.2}, "animate": 16},
     "sharpen": {"photo": "detail", "params": {"amount": 2.5, "radius": 1.5}, "split": 0.4},
-    "vignette": {"photo": "landscape", "params": {"amount": 0.8, "radius": 0.7, "softness": 0.6}},
+    "vignette": {"photo": "landscape", "params": {"strength": 0.8, "extent": 0.6, "feather": 0.3}},
     "filmgrain": {"photo": "portrait", "params": {"amount": 0.4, "speed": 24}, "animate": 8},
     "dissolve": {"photo": "colour", "params": {"progress": 0.45, "grain": 8}},
     "static": {"photo": "landscape", "params": {"amount": 0.4}, "animate": 8},

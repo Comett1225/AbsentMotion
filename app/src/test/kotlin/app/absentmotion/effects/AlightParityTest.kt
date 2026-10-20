@@ -41,6 +41,8 @@ class AlightParityTest {
         assertEquals(listOf("Progress", "angle", "45.000000", "0.0..360.0"), params("radialwipe").getValue("progress").row())
         assertEquals(listOf("Count", "float", "1.000000", "1.0..16.0"), params("radialwipe").getValue("count").row())
         assertEquals(listOf("Clockwise", "Counterclockwise", "Both"), params("radialwipe").getValue("direction").options)
+        assertEquals(listOf("Size", "Roundness", "Feather", "Strength", "Tint", "Color", "Punch Out"), catalog.find("absent.vignette")!!.params.map { it.label })
+        assertEquals(listOf("Strength", "float", "0.800000", "0.0..1.0"), params("vignette").getValue("strength").row())
     }
 
     private fun older(effect: String, vararg values: Pair<String, String>) = XmlNode("effect", mapOf("id" to "absent.$effect", "hidden" to "false"),
@@ -55,6 +57,7 @@ class AlightParityTest {
             older("twirl", "radius" to "0.25", "angle" to "180"),
             older("bulge", "strength" to "0.4", "radius" to "0.5"),
             older("radialwipe", "completion" to "0.25", "start" to "30"),
+            older("vignette", "amount" to "0.5", "radius" to "1", "softness" to "0.5", "roundness" to "1"),
         )
         val scene = Scene(XmlNode("scene", mapOf("width" to "100", "height" to "100", "fps" to "30", "totalTime" to "1000"),
             listOf(XmlNode("shape", mapOf("id" to "1", "startTime" to "0", "endTime" to "1000", "s" to ".rect"), made))))
@@ -68,6 +71,7 @@ class AlightParityTest {
         assertEquals(mapOf("strength" to 0.066f, "radius" to 0.25f), values(4))
         assertEquals(mapOf("amount" to 0.1f, "radius" to 0.5f), values(5))
         assertEquals(mapOf("progress" to 90f, "start" to 30f), values(6))
+        assertEquals(mapOf("extent" to 1f, "rounding" to 2f, "feather" to 0.5f, "strength" to 0.5f, "tint" to 0f), values(7))
         assertTrue(result.dropped.isEmpty())
         assertEquals(result.scene.node, migration.migrate(result.scene).scene.node)
     }
