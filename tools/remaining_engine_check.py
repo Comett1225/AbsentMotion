@@ -231,6 +231,19 @@ def main():
     ok = np.array_equal(still[0], still[1]) and not np.array_equal(drift[0], drift[1])
     print(('ok   ' if ok else 'FAIL ') + 'random displacement holds still until Evolution changes', flush=True)
     failed += not ok
+    turned = lambda magnitude, scale, rotation: engine.scene(
+        f'<shape id="1" label="t" startTime="0" endTime="1000" fillType="color" s=".rect"><transform><location value="100,100,0"/><scale value="{scale}"/>'
+        f'<rotation value="{rotation}"/></transform><fillColor value="#ffff0000"/><property name="size" type="vec2" value="6,6"/>'
+        + fx('randomdisplace', magnitude=magnitude, evolution=0.3) + '</shape>')
+    shifts = [np.subtract(centre(engine.still(f'turned{k}', turned(*case), work)), 99.5) for k, case in enumerate([(20, '1,1', 0), (80, '1,1', 0), (80, '2.4,1.1', 30)])]
+    ok = np.hypot(*shifts[0]) > 2 and np.allclose(shifts[1] / 4, shifts[0], atol=1) and np.allclose(shifts[2], shifts[1], atol=1.5)
+    print(('ok   ' if ok else 'FAIL ') + 'random displacement grows with Magnitude in one direction and ignores the layer\'s own scale and rotation: ' + str([tuple(round(float(v), 1) for v in s) for s in shifts]), flush=True)
+    failed += not ok
+    sizes = [int((engine.still(f'depth{k}', engine.scene(engine.rect(1, 100, 100, 20, 20, 0xffff0000, extra=extra)), work)[:, :, 0] > 128).sum())
+             for k, extra in enumerate(['', fx('oscillate', direction=1, magnitude=150, frequency=0, phase=0.5), fx('autoshake', magnitude=0, zshake=300, evolution=0.3)])]
+    ok = sizes[1] != sizes[0] and sizes[2] != sizes[0]
+    print(('ok   ' if ok else 'FAIL ') + 'depth from Oscillate and Z Shake shows in perspective without a camera: ' + str(sizes), flush=True)
+    failed += not ok
     tape = engine.scene(engine.rect(1, 100, 100, 90, 90, 0xff3366cc, extra=fx('vhs')))
     shots = [engine.still(f'vhs{frame}{again}', tape, work, frame) for frame, again in [(10, 'a'), (10, 'b'), (20, 'a')]]
     ok = np.array_equal(shots[0], shots[1]) and not np.array_equal(shots[0], shots[2]) and np.abs(shots[0][100, 100] - (0x33, 0x66, 0xcc)).max() > 0
