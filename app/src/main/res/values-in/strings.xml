@@ -306,6 +306,7 @@
     <string name="crash_reason_unknown">Aplikasi tertutup karena alasan yang tidak diketahui.</string>
     <string name="crash_logs">Log crash</string>
     <string name="crash_logs_empty">Belum ada crash.</string>
+    <string name="crash_logs_delete_all">Hapus semua log crash?</string>
     <string name="crash_copy">Salin</string>
     <string name="safety_open_failed_with_history">File proyek hilang atau rusak, jadi tidak ada yang diubah. Anda dapat mengembalikan versi sebelumnya dari Riwayat versi.</string>
     <string name="newproject_bg_black">Hitam</string>

@@ -306,6 +306,7 @@
     <string name="crash_reason_unknown">Ứng dụng đã đóng vì lý do không xác định.</string>
     <string name="crash_logs">Nhật ký sự cố</string>
     <string name="crash_logs_empty">Chưa có sự cố nào.</string>
+    <string name="crash_logs_delete_all">Xóa tất cả nhật ký sự cố?</string>
     <string name="crash_copy">Sao chép</string>
     <string name="safety_open_failed_with_history">Tệp dự án bị thiếu hoặc hỏng nên không có gì bị thay đổi. Bạn có thể khôi phục phiên bản trước đó từ Lịch sử phiên bản.</string>
     <string name="newproject_bg_black">Đen</string>

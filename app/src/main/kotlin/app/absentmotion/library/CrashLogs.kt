@@ -146,6 +146,10 @@ object CrashLogs {
 
     fun list(context: Context): List<CrashEntry> = crashEntries(File(context.filesDir, "crashlogs"))
 
+    fun clear(context: Context) {
+        crashEntries(File(context.filesDir, "crashlogs")).forEach { it.file.delete() }
+    }
+
     fun collect(context: Context): CrashEntry? {
         val app = context.applicationContext
         val prefs = app.getSharedPreferences("crashlogs", Context.MODE_PRIVATE)

@@ -308,6 +308,7 @@
     <string name="crash_reason_unknown">Bilinmeyen bir nedenle kapandı.</string>
     <string name="crash_logs">Çökme günlükleri</string>
     <string name="crash_logs_empty">Henüz çökme yok.</string>
+    <string name="crash_logs_delete_all">Tüm çökme günlükleri silinsin mi?</string>
     <string name="crash_copy">Kopyala</string>
     <string name="safety_open_failed_with_history">Proje dosyası eksik veya bozuk, bu yüzden hiçbir şey değiştirilmedi. Sürüm geçmişinden daha eski bir sürümü geri getirebilirsiniz.</string>
     <string name="newproject_bg_black">Siyah</string>

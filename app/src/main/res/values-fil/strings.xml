@@ -308,6 +308,7 @@
     <string name="crash_reason_unknown">Nagsara ito dahil sa hindi kilalang dahilan.</string>
     <string name="crash_logs">Mga crash log</string>
     <string name="crash_logs_empty">Wala pang crash.</string>
+    <string name="crash_logs_delete_all">Burahin ang lahat ng crash log?</string>
     <string name="crash_copy">Kopyahin</string>
     <string name="safety_open_failed_with_history">Nawawala o sira ang file ng proyekto, kaya walang nabago. Maaari mong ibalik ang naunang bersyon mula sa Version history.</string>
     <string name="newproject_bg_black">Itim</string>

@@ -350,6 +350,7 @@
  "crash_closed_yesterday": "It closed yesterday at %1$s.",
  "crash_copy": "Copy",
  "crash_logs": "Crash logs",
+ "crash_logs_delete_all": "Delete all crash logs?",
  "crash_logs_empty": "No crashes so far.",
  "crash_reason_engine": "The video engine stopped unexpectedly.",
  "crash_reason_error": "It hit an error it could not recover from.",

@@ -306,6 +306,7 @@
     <string name="crash_reason_unknown">ปิดโดยไม่ทราบสาเหตุ</string>
     <string name="crash_logs">บันทึกการแครช</string>
     <string name="crash_logs_empty">ยังไม่มีการแครช</string>
+    <string name="crash_logs_delete_all">ลบบันทึกข้อขัดข้องทั้งหมดหรือไม่</string>
     <string name="crash_copy">คัดลอก</string>
     <string name="safety_open_failed_with_history">ไฟล์โปรเจกต์หายไปหรือเสียหาย จึงไม่มีการเปลี่ยนแปลงใด ๆ คุณสามารถเรียกคืนเวอร์ชันก่อนหน้าจากประวัติเวอร์ชันได้</string>
     <string name="newproject_bg_black">สีดำ</string>

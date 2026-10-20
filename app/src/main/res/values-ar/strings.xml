@@ -316,6 +316,7 @@
     <string name="crash_reason_unknown">أُغلق لسبب غير معروف.</string>
     <string name="crash_logs">سجلات الأعطال</string>
     <string name="crash_logs_empty">لا توجد أعطال حتى الآن.</string>
+    <string name="crash_logs_delete_all">حذف جميع سجلات الأعطال؟</string>
     <string name="crash_copy">نسخ</string>
     <string name="safety_open_failed_with_history">ملف المشروع مفقود أو تالف، لذا لم يتم تغيير أي شيء. يمكنك استرجاع إصدار سابق من سجل الإصدارات.</string>
     <string name="newproject_bg_black">أسود</string>

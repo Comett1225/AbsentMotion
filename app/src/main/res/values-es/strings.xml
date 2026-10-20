@@ -308,6 +308,7 @@
     <string name="crash_reason_unknown">Se cerró por un motivo desconocido.</string>
     <string name="crash_logs">Registros de fallos</string>
     <string name="crash_logs_empty">Aún no hay fallos.</string>
+    <string name="crash_logs_delete_all">¿Eliminar todos los registros de fallos?</string>
     <string name="crash_copy">Copiar</string>
     <string name="safety_open_failed_with_history">El archivo del proyecto falta o está dañado, así que no se cambió nada. Puedes recuperar una versión anterior desde el historial de versiones.</string>
     <string name="newproject_bg_black">Negro</string>

@@ -22,13 +22,17 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,6 +55,7 @@ import app.absentmotion.ui.editor.PhoneScreen
 import app.absentmotion.ui.export.ExportIcons
 import app.absentmotion.ui.theme.Am
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @Composable
@@ -70,9 +75,30 @@ fun CrashLogsScreen(onClose: () -> Unit) {
 @Composable
 private fun CrashList(onClose: () -> Unit, onOpen: (CrashEntry) -> Unit) {
     val context = LocalContext.current
-    val logs by produceState<List<CrashEntry>?>(null) { value = withContext(Dispatchers.IO) { CrashLogs.list(context) } }
+    val scope = rememberCoroutineScope()
+    var cleared by remember { mutableIntStateOf(0) }
+    var asking by remember { mutableStateOf(false) }
+    val logs by produceState<List<CrashEntry>?>(null, cleared) { value = withContext(Dispatchers.IO) { CrashLogs.list(context) } }
+    if (asking) AlertDialog(
+        onDismissRequest = { asking = false },
+        title = { Text(stringResource(R.string.crash_logs_delete_all), color = Am.Navy) },
+        confirmButton = {
+            TextButton({
+                asking = false
+                scope.launch {
+                    withContext(Dispatchers.IO) { CrashLogs.clear(context) }
+                    cleared++
+                }
+            }) { Text(stringResource(R.string.delete), color = Am.Navy) }
+        },
+        dismissButton = { TextButton({ asking = false }) { Text(stringResource(R.string.cancel), color = Am.Navy) } },
+        containerColor = Am.Card,
+    )
     Column(Modifier.fillMaxSize().navigationBarsPadding()) {
-        TitleBar(stringResource(R.string.crash_logs), HomeIcons.Close, stringResource(R.string.action_close), onClose)
+        TitleBar(
+            stringResource(R.string.crash_logs), HomeIcons.Close, stringResource(R.string.action_close), onClose,
+            action = HomeIcons.Delete.takeIf { !logs.isNullOrEmpty() }, actionDescription = stringResource(R.string.delete_all),
+        ) { asking = true }
         val list = logs
         if (list != null && list.isEmpty()) Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
             Text(stringResource(R.string.crash_logs_empty), color = Am.HomeMid, fontSize = 14.sp)

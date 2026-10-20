@@ -308,6 +308,7 @@
     <string name="crash_reason_unknown">It closed for a reason that is not known.</string>
     <string name="crash_logs">Crash logs</string>
     <string name="crash_logs_empty">No crashes so far.</string>
+    <string name="crash_logs_delete_all">Delete all crash logs?</string>
     <string name="crash_copy">Copy</string>
     <string name="safety_open_failed_with_history">The project file is missing or damaged, so nothing was changed. You can bring back an earlier version from Version history.</string>
     <string name="newproject_bg_black">Black</string>
