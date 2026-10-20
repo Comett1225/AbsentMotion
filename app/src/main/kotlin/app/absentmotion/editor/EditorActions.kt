@@ -113,9 +113,8 @@ fun EditorState.split() {
 }
 
 internal fun Scene.navigationStops(layer: Layer?): List<Int> {
-    if (layer == null) return listOf(0, lastFrame)
-    val times = listOf(layer.startTime, layer.endTime) + layer.keyframeTimes().filter { it in layer.startTime..layer.endTime }
-    return times.map { frameAt(it).coerceIn(0, maxOf(lastFrame, 0)) }.distinct().sorted()
+    val times = if (layer == null) listOf(0, totalTime) else listOf(layer.startTime, layer.endTime) + layer.keyframeTimes().filter { it in layer.startTime..layer.endTime }
+    return (times + bookmarks).map { frameAt(it).coerceIn(0, maxOf(lastFrame, 0)) }.distinct().sorted()
 }
 
 private fun EditorState.stops(): List<Int> = scene.navigationStops(selected)
