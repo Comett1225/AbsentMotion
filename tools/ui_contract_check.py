@@ -141,6 +141,14 @@ class UiContracts(unittest.TestCase):
         self.assertIn('Icon(PanelIcons.Animate, stringResource(R.string.a11y_animate)', text)
         self.assertIn('state.playing = false', text)
 
+    def test_media_search_opens_from_a_square_over_the_grid(self):
+        text = source('ui/editor/MediaTab.kt')
+        self.assertIn('MediaSquare(TextIcons.Search, stringResource(R.string.search_hint), searching || search.isNotEmpty()) { searching = true }', text)
+        self.assertIn('BackHandler(searching) { focus.clearFocus(); searching = false }', text)
+        self.assertEqual(1, text.count('SearchField('))
+        self.assertLess(text.index('LazyHorizontalGrid('), text.index('SearchField('))
+        self.assertIn('autoFocus = true', text.split('SearchField(', 1)[1])
+
     def test_deleting_preview_preset_clamps_the_position(self):
         text = source('ui/editor/PresetScreen.kt')
         self.assertIn('chosen = null; pos = pos.coerceAtMost((base.endTime - base.startTime).coerceAtLeast(1))', text)
