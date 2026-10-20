@@ -428,7 +428,8 @@ class MainActivity : ComponentActivity() {
 
     private fun restoreVersion(id: String, version: ProjectVersions.Version) {
         val state = editor?.takeIf { it.projectId == id }
-        state?.let { it.playing = false; it.endGesture(); it.historyOpen = false; opening = true }
+        state?.let { it.playing = false; it.endGesture(); it.historyOpen = false }
+        opening = true
         historyFor = null
         openJob = lifecycleScope.launch {
             val restored = try {
