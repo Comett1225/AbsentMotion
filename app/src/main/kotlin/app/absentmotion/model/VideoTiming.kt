@@ -18,10 +18,10 @@ class VideoTiming(layer: Layer) {
 
     init {
         val map = layer.node.child("speedMap")
-        val keys = map?.keyframes.orEmpty().distinctBy { it.t }.filter { it.v.toDoubleOrNull() != null }
+        val keys = map?.keyframes.orEmpty().distinctBy { it.t }.filter { it.v.toDoubleOrNull()?.isFinite() == true }
         val samples = mutableListOf<Pair<Double, Double>>()
         if (keys.isEmpty()) {
-            samples += 0.0 to ((map?.get("value")?.toDoubleOrNull() ?: layer.node["speed"]?.toDoubleOrNull() ?: 1.0).coerceAtLeast(0.001))
+            samples += 0.0 to ((map?.get("value")?.toDoubleOrNull()?.takeIf { it.isFinite() } ?: layer.node["speed"]?.toDoubleOrNull()?.takeIf { it.isFinite() } ?: 1.0).coerceAtLeast(0.001))
         } else {
             samples += keys.first().t.toDouble() / 1_000_000 to keys.first().v.toDouble().coerceAtLeast(MIN_SPEED)
             for ((a, b) in keys.zipWithNext()) {

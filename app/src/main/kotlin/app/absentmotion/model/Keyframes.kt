@@ -60,7 +60,9 @@ data class Easing(val type: String, val p: List<Float> = emptyList(), val prefix
 }
 
 val XmlNode.keyframes: List<Keyframe>
-    get() = children.filter { it.name == "kf" }.map { Keyframe(it["t"]?.toFloatOrNull() ?: 0f, it["v"] ?: "", it["e"], it["gen"]) }.sortedBy { it.t }
+    get() = children.filter { it.name == "kf" }.mapNotNull { n ->
+        (n["t"]?.toFloatOrNull() ?: 0f).takeIf { it.isFinite() }?.let { Keyframe(it, n["v"] ?: "", n["e"], n["gen"]) }
+    }.sortedBy { it.t }
 
 val XmlNode.isKeyframed: Boolean get() = children.any { it.name == "kf" }
 
