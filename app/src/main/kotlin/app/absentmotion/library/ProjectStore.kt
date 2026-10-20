@@ -121,14 +121,20 @@ class ProjectStore(private val root: File) {
         val copy = newId()
         var scene = source.withTitle(AppText.get(R.string.edit_layer_copy_name, source.title))
         val from = mediaDir(id)
-        if (from.isDirectory) {
-            val old = folderUri(from)
-            val new = folderUri(mediaDir(copy))
-            from.copyRecursively(mediaDir(copy))
-            scene = Scene(scene.node.mapMediaUris { if (it.startsWith(old)) new + it.substring(old.length) else it })
+        try {
+            if (from.isDirectory) {
+                val old = folderUri(from)
+                val new = folderUri(mediaDir(copy))
+                from.copyRecursively(mediaDir(copy))
+                scene = Scene(scene.node.mapMediaUris { if (it.startsWith(old)) new + it.substring(old.length) else it })
+            }
+            save(copy, scene)
+        } catch (e: Exception) {
+            mediaDir(copy).deleteRecursively()
+            sceneFile(copy).delete()
+            throw e
         }
-        save(copy, scene)
-        thumbnailFile(id).takeIf { it.exists() }?.copyTo(thumbnailFile(copy), overwrite = true)
+        runCatching { thumbnailFile(id).takeIf { it.exists() }?.copyTo(thumbnailFile(copy), overwrite = true) }
         return copy
     }
 
@@ -179,9 +185,14 @@ class ProjectStore(private val root: File) {
 internal fun writeAtomically(target: File, text: String, sync: Boolean = true) {
     target.parentFile?.mkdirs()
     val temp = File(target.parentFile, target.name + ".tmp")
-    java.io.FileOutputStream(temp).use { out ->
-        out.write(text.toByteArray())
-        if (sync) out.fd.sync()
+    try {
+        java.io.FileOutputStream(temp).use { out ->
+            out.write(text.toByteArray())
+            if (sync) out.fd.sync()
+        }
+        java.nio.file.Files.move(temp.toPath(), target.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING, java.nio.file.StandardCopyOption.ATOMIC_MOVE)
+    } catch (e: java.io.IOException) {
+        temp.delete()
+        throw e
     }
-    java.nio.file.Files.move(temp.toPath(), target.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING, java.nio.file.StandardCopyOption.ATOMIC_MOVE)
 }

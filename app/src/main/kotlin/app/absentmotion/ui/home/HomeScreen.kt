@@ -196,7 +196,11 @@ fun HomeScreen(
                 if (page == 1) TemplatesTab(store, version, onTemplate, onOpen, Modifier.weight(1f).then(if (wide) Modifier.widthIn(max = 760.dp).align(Alignment.CenterHorizontally) else Modifier)) else ProjectsPane(
                     Modifier.weight(1f), shown, tab, { tab = it }, settings, version, onOpen, onExport, query,
                     onUpload = { picker.launch(arrayOf("text/xml", "application/xml", "application/zip", "application/octet-stream")) },
-                    onDuplicate = { id -> scope.launch { withContext(Dispatchers.IO) { store.duplicate(id) }; version++ } },
+                    onDuplicate = { id -> scope.launch {
+                        val copied = withContext(Dispatchers.IO) { runCatching { store.duplicate(id) }.onFailure { app.absentmotion.platform.Log.w("AMStore", "cannot duplicate $id", it) }.isSuccess }
+                        if (!copied) app.absentmotion.platform.Toast.makeText(context, context.getString(R.string.home_create_project_failed), app.absentmotion.platform.Toast.LENGTH_LONG).show()
+                        version++
+                    } },
                     onDelete = { id -> scope.launch { withContext(Dispatchers.IO) { store.delete(id, context.getExternalFilesDir(null)?.resolve("ai")) }; version++ } },
                     onHistory = onHistory,
                     onCollect = onCollect,

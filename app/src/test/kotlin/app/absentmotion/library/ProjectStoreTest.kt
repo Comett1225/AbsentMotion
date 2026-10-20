@@ -94,6 +94,27 @@ class ProjectStoreTest {
         assertFalse(store.mediaDir(a).exists())
     }
 
+    @Test fun aDuplicateThatCannotCopyItsMediaLeavesNothingBehind() {
+        val root = tmp.newFolder()
+        val store = ProjectStore(root)
+        val a = store.create(scene())
+        store.mediaDir(a).mkdirs()
+        store.mediaDir(a).resolve("a.png").writeText("x")
+        val locked = store.mediaDir(a).resolve("b.png").apply { writeText("y"); setReadable(false) }
+        org.junit.Assume.assumeFalse(locked.canRead())
+        try {
+            store.duplicate(a)
+            fail("the copy should fail")
+        } catch (e: java.io.IOException) {
+        }
+        assertEquals(listOf(a), store.list().map { it.id })
+        assertEquals(listOf(a), root.resolve("media").list()!!.toList())
+        assertEquals(setOf("$a.xml"), root.resolve("projects").list()!!.filter { it != "versions" }.toSet())
+        locked.setReadable(true)
+        val copy = store.duplicate(a)!!
+        assertEquals(setOf("a.png", "b.png"), store.mediaDir(copy).list()!!.toSet())
+    }
+
     @Test fun mediaUriLeavingTheMediaFolderIsNeverSwept() {
         val root = tmp.newFolder()
         val store = ProjectStore(root)
