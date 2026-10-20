@@ -85,7 +85,7 @@ class ContainerTest {
             assertEquals(clusters.map { (it.start - segment.dataStart).toLong() }, cues.map { cue -> r.uint(r.children(r.children(cue)[1])[1]) })
             val info = r.children(top[2])
             val duration = info.first { it.id == 0x4489L }
-            assertEquals(3005.0, ByteBuffer.wrap(r.data, duration.dataStart, 8).double, 1.0)
+            assertEquals(3000.0, ByteBuffer.wrap(r.data, duration.dataStart, 8).double, 1.0)
             val blocks = r.children(clusters[1]).filter { it.id == 0xA3L }
             assertEquals(60, blocks.size)
             val second = blocks[1]

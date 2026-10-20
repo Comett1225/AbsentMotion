@@ -504,7 +504,8 @@ class MainActivity : ComponentActivity() {
         intent.getStringExtra("format")?.let { name -> app.absentmotion.export.ImageKind.entries.firstOrNull { it.name.equals(name, true) || it.ext == name }?.let { s = s.copy(image = it) } }
         intent.takeIf { it.hasExtra("iquality") }?.let { s = s.copy(imageQuality = it.getIntExtra("iquality", s.imageQuality)) }
         intent.getStringExtra("interp")?.let { name -> FrameInterpolation.entries.firstOrNull { it.name.equals(name, true) }?.let { s = s.copy(interpolation = it) } }
-        app.absentmotion.export.VideoExportPath.forceBuffers = intent.getBooleanExtra("buffers", false)
+        app.absentmotion.export.ExportDebug.forceBuffers = intent.getBooleanExtra("buffers", false)
+        app.absentmotion.export.ExportDebug.fakeFreeBytes = intent.getLongExtra("fakefree", -1L)
         intent.getStringExtra("container")?.let { name -> app.absentmotion.export.Container.entries.firstOrNull { it.name.equals(name, true) }?.let { s = s.copy(container = it) } }
         intent.getStringExtra("aformat")?.let { name -> app.absentmotion.export.AudioFormat.entries.firstOrNull { it.name.equals(name, true) }?.let { s = s.copy(audioFormat = it) } }
         var a = s.audio
@@ -518,8 +519,13 @@ class MainActivity : ComponentActivity() {
         val name = if (kind == ExportKind.Sequence) "export.seq" else "export"
         lifecycleScope.launch {
             try {
-                Exporter(applicationContext, engine, FolderExport(dir)).export(kind, scene, s, frame, name) { }
-                Log.i("AMExport", "done " + File(dir, if (kind == ExportKind.Sequence) name else "$name.${ext[kind]}").path)
+                if (intent.getBooleanExtra("mediastore", false)) {
+                    val result = Exporter(applicationContext, engine, app.absentmotion.export.MediaStoreExport(applicationContext)).export(kind, scene, s, frame, name) { }
+                    Log.i("AMExport", "done " + result.uris.joinToString(" "))
+                } else {
+                    Exporter(applicationContext, engine, FolderExport(dir)).export(kind, scene, s, frame, name) { }
+                    Log.i("AMExport", "done " + File(dir, if (kind == ExportKind.Sequence) name else "$name.${ext[kind]}").path)
+                }
             } catch (e: Throwable) {
                 Log.e("AMExport", "failed", e)
             }

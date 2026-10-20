@@ -78,6 +78,8 @@ import app.absentmotion.engine.EngineThread
 import app.absentmotion.export.AudioBitrate
 import app.absentmotion.export.AvailableCodecs
 import app.absentmotion.export.ExportPrefs
+import app.absentmotion.export.StorageStatus
+import app.absentmotion.export.storageStatus
 import app.absentmotion.export.ExportAudio
 import app.absentmotion.export.ExportKind
 import app.absentmotion.export.ExportResult
@@ -192,7 +194,7 @@ fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromProjectList
             return
         }
         free = freeSpace()
-        if (kind != ExportKind.Gif && estimate > free) {
+        if (kind != ExportKind.Gif && storageStatus(estimate, free) is StorageStatus.NotEnough) {
             failure = Failure("Not Enough Storage", "Free up some storage on this device and export again.")
             return
         }
@@ -219,7 +221,7 @@ fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromProjectList
                 if (chosen == ExportKind.Gif) {
                     val measured = measureGifBytes(engine, scene, s)
                     free = freeSpace()
-                    if (measured > free) {
+                    if (storageStatus(measured, free) is StorageStatus.NotEnough) {
                         failure = Failure("Not Enough Storage", "Free up some storage on this device and export again.")
                         phase = Phase.Idle
                         return@launch

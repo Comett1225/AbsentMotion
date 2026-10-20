@@ -164,6 +164,7 @@ private suspend fun writeWav(deep: Boolean, rate: Int, channels: Int, totalFrame
         out.write(bytes)
         written += bytes.size
         frame = next
+        ensureStorage()
         progress(frame.toFloat() / totalFrames * 0.99f)
     }
     out.flush()
@@ -181,6 +182,7 @@ private suspend fun writeMp3(rate: Int, channels: Int, kbps: Int, totalFrames: L
             val pcm = toChannels(mix(frame * 1_000_000 / rate, next * 1_000_000 / rate), channels)
             out.write(encoder.encode(pcm, pcm.size / channels))
             frame = next
+            ensureStorage()
             progress(frame.toFloat() / totalFrames * 0.99f)
         }
         out.write(encoder.flush())
@@ -227,6 +229,7 @@ private suspend fun encodeAudio(
         while (workers.any { it.isAlive }) {
             currentCoroutineContext().ensureActive()
             progress(fed.get().toFloat() / total * 0.99f)
+            ensureStorage()
             delay(50)
         }
         failure.get()?.let { throw it }

@@ -34,23 +34,21 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
                 val xml = scene.toXml()
                 when (kind) {
                     ExportKind.Video -> s.fixedFormat().let { f ->
-                        viaCache(saved, name, f.container.ext, f.container.mime, "Movies/$AppFolder") { out ->
-                            java.io.RandomAccessFile(out, "rw").use { file ->
-                                exportVideo(engine, scene, xml, f, file.fd, ExportAudio.mixFor?.invoke(scene, f.audio.effectiveRate), progress)
-                            }
+                        direct(saved, name, f.container.ext, f.container.mime, "Movies/$AppFolder") { fd ->
+                            exportVideo(engine, scene, xml, f, fd, ExportAudio.mixFor?.invoke(scene, f.audio.effectiveRate), progress)
                         }
                     }
                     ExportKind.Audio -> {
                         val mix = ExportAudio.mixFor?.invoke(scene, audioRate(s)) ?: error("This project has no sound to export.")
                         try {
-                            viaCache(saved, name, s.audioFormat.ext, s.audioFormat.mime, "Music/$AppFolder") { out ->
-                                java.io.RandomAccessFile(out, "rw").use { file -> exportAudio(s, (scene.totalTime + 1) * 1000L, mix, file.fd, progress) }
+                            direct(saved, name, s.audioFormat.ext, s.audioFormat.mime, "Music/$AppFolder") { fd ->
+                                exportAudio(s, (scene.totalTime + 1) * 1000L, mix, fd, progress)
                             }
                         } finally {
                             (mix as? java.io.Closeable)?.close()
                         }
                     }
-                    ExportKind.Gif -> viaCache(saved, name, "gif", "image/gif", "Pictures/$AppFolder") { out -> gif(scene, xml, s, out, progress) }
+                    ExportKind.Gif -> direct(saved, name, "gif", "image/gif", "Pictures/$AppFolder") { fd -> gif(scene, xml, s, fdStream(fd), progress) }
                     ExportKind.Frame, ExportKind.FrameAs -> {
                         val shape = if (kind == ExportKind.Frame) s.copy(image = ImageKind.Png) else s
                         single(saved, name, shape.image.ext, shape.image.mime, "Pictures/$AppFolder") { out ->
@@ -61,7 +59,7 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
                         }
                     }
                     ExportKind.Xml -> single(saved, name, "xml", "text/xml", "Documents/$AppFolder") { it.write(xml.toByteArray()) }
-                    ExportKind.Package -> viaCache(saved, name, "absproj", "application/octet-stream", "Documents/$AppFolder") { out -> pack(scene, xml, out, progress) }
+                    ExportKind.Package -> direct(saved, name, "absproj", "application/octet-stream", "Documents/$AppFolder") { fd -> pack(scene, xml, fdStream(fd), progress) }
                     ExportKind.Sequence -> sequence(saved, scene, xml, s, name, progress)
                 }
             }
@@ -81,28 +79,31 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
         return ExportResult(saved, mime, store.location(where))
     }
 
-    private suspend fun viaCache(saved: MutableList<Uri>, name: String, ext: String, mime: String, where: String, make: suspend (File) -> Unit): ExportResult {
-        val temp = File(context.cacheDir, "export-${System.nanoTime()}.$ext")
+    private suspend fun direct(saved: MutableList<Uri>, name: String, ext: String, mime: String, where: String, make: suspend (java.io.FileDescriptor) -> Unit): ExportResult {
+        val file = withContext(Dispatchers.IO) { store.open(null, "$name.$ext", mime) }
         try {
-            make(temp)
-            save(saved, null, "$name.$ext", mime) { out -> temp.inputStream().use { it.copyTo(out) } }
-            return ExportResult(saved, mime, store.location(where))
-        } finally {
-            withContext(NonCancellable) { temp.delete() }
+            make(file.fd)
+            withContext(Dispatchers.IO) { file.publish() }
+        } catch (t: Throwable) {
+            withContext(NonCancellable + Dispatchers.IO) { file.discard() }
+            throw if (t !is kotlinx.coroutines.CancellationException && freeSpace() < MinFreeBytes) StorageFullException() else t
         }
+        saved.add(file.uri)
+        return ExportResult(saved, mime, store.location(where))
     }
 
-    private suspend fun gif(scene: Scene, xml: String, s: ExportSettings, out: File, progress: (Float) -> Unit) {
+    private suspend fun gif(scene: Scene, xml: String, s: ExportSettings, out: OutputStream, progress: (Float) -> Unit) {
         val (width, height) = exportSize(scene, s.shortSide, even = false)
         val frames = frameCount(scene, s.fps)
         engine.exportSession(xml, s.interpolation, s.fps) {
-            out.outputStream().buffered().use { stream ->
+            out.buffered().use { stream ->
                 val writer = GifWriter(stream, width, height)
                 for (k in 0 until frames) {
                     currentCoroutineContext().ensureActive()
                     val pixels = still(frameTimeMs(scene, s.fps, k), width, height) ?: error("The engine could not draw frame $k")
                     withContext(Dispatchers.Default) { writer.frame(ImageEncode.flatten(pixels, s.background), (k + 1) * 1000L / s.fps) }
                     progress((k + 1f) / frames)
+                    if (k % 30 == 0) ensureStorage()
                 }
                 writer.finish()
             }
@@ -129,8 +130,8 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
         return ExportResult(saved, s.image.mime, store.location("Pictures/$AppFolder/$name"))
     }
 
-    private suspend fun pack(scene: Scene, xml: String, out: File, progress: (Float) -> Unit) = withContext(Dispatchers.IO) {
-        writeProjectPackage(scene, xml, out.outputStream(), access, { uri -> runCatching { context.contentResolver.openInputStream(Uri.parse(uri)) }.getOrNull() }, progress)
+    private suspend fun pack(scene: Scene, xml: String, out: OutputStream, progress: (Float) -> Unit) = withContext(Dispatchers.IO) {
+        writeProjectPackage(scene, xml, out, access, { uri -> runCatching { context.contentResolver.openInputStream(Uri.parse(uri)) }.getOrNull() }, progress)
     }
 
     private fun encode(pixels: ByteArray, width: Int, height: Int, settings: ExportSettings, reuse: Bitmap?): ByteArray {

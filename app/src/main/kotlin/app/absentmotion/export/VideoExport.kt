@@ -31,8 +31,9 @@ interface FloatMix {
     fun floats(startUs: Long, endUs: Long): FloatArray
 }
 
-object VideoExportPath {
+object ExportDebug {
     @Volatile var forceBuffers = false
+    @Volatile var fakeFreeBytes = -1L
 }
 
 object ExportAudio {
@@ -102,10 +103,11 @@ internal suspend fun exportVideo(
                     failure.get()?.let { throw it }
                     draw(k, (BASE_US + k * 1_000_000L / s.fps) * 1000)
                     progress((k + 1f) / frames * 0.98f)
+                    if (k % 30 == 0) ensureStorage()
                 }
                 encoder.signalEndOfInputStream()
             }
-            val buffers = VideoExportPath.forceBuffers || !stampsPresentTime()
+            val buffers = ExportDebug.forceBuffers || !stampsPresentTime()
             Log.i("AMExport", "rendering $frames frames at ${width}x$height through ${if (buffers) "encoder buffers" else "the swapchain"}")
             if (buffers) {
                 val writer = ImageWriter.Builder(input).setMaxImages(2).setHardwareBufferFormat(HardwareBuffer.RGBA_8888)

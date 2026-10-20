@@ -167,7 +167,7 @@ internal class MatroskaWriter(private val out: FileChannel, private val docType:
         if (lastUs[track] != Long.MIN_VALUE && timeUs > lastUs[track]) stepUs[track] = timeUs - lastUs[track]
         lastUs[track] = maxOf(lastUs[track], timeUs)
         val step = if (t.frameDurationNs > 0) t.frameDurationNs / 1000 else stepUs[track]
-        endUs = maxOf(endUs, timeUs + step)
+        endUs = maxOf(endUs, timeUs + step - t.codecDelayNs / 1000)
     }
 
     private fun flushCluster() {
