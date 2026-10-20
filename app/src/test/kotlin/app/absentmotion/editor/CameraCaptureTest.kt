@@ -47,12 +47,11 @@ class CameraCaptureTest {
         assertEquals(null, Scene.create("x", 100, 100, 30, 0).fromCapture(media(0, 0, 0, "image/jpeg"), false, 1080, 3))
     }
 
-    @Test fun onlyARealSecondRefusalOrNoDialogAtAllSendsToSettings() {
-        assertFalse(cameraBlocked(granted = false, rationaleBefore = false, rationaleAfter = false, dialogShown = true))
-        assertFalse(cameraBlocked(granted = false, rationaleBefore = false, rationaleAfter = true, dialogShown = true))
-        assertFalse(cameraBlocked(granted = false, rationaleBefore = true, rationaleAfter = true, dialogShown = true))
-        assertTrue(cameraBlocked(granted = false, rationaleBefore = true, rationaleAfter = false, dialogShown = true))
-        assertTrue(cameraBlocked(granted = false, rationaleBefore = false, rationaleAfter = false, dialogShown = false))
-        assertFalse(cameraBlocked(granted = true, rationaleBefore = true, rationaleAfter = false, dialogShown = false))
+    @Test fun onlyARefusalAfterAnEarlierOneSendsToSettings() {
+        assertFalse(cameraBlocked(granted = false, rationale = false, refusedBefore = false))
+        assertFalse(cameraBlocked(granted = false, rationale = true, refusedBefore = false))
+        assertFalse(cameraBlocked(granted = false, rationale = true, refusedBefore = true))
+        assertTrue(cameraBlocked(granted = false, rationale = false, refusedBefore = true))
+        assertFalse(cameraBlocked(granted = true, rationale = false, refusedBefore = true))
     }
 }
