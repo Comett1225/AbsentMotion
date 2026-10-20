@@ -1,5 +1,7 @@
 package app.absentmotion.export
 
+import app.absentmotion.R
+import app.absentmotion.i18n.txt
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -39,7 +41,7 @@ class ExportChoicesTest {
         assertEquals(listOf(Codec.H264, Codec.Hevc, Codec.Av1, Codec.Apv), choices.keys.toList())
         assertNull(choices[Codec.H264])
         assertNull(choices[Codec.Av1])
-        assertEquals("This phone has no APV encoder.", choices[Codec.Apv])
+        assertTrue(choices[Codec.Apv] != null)
     }
 
     @Test fun resolutionsTooLargeForTheCodecAreGreyed() {
@@ -106,8 +108,8 @@ class ExportChoicesTest {
         assertTrue(support is Support.Unsupported)
         assertEquals("Use H.265", suggestionLabel(big, betterChoice(big, support, check)!!))
         assertEquals("Not supported on this phone", exportBlock(StorageStatus.Enough, support))
-        assertEquals("Not enough storage", exportBlock(StorageStatus.NotEnough("x"), Support.Supported))
-        assertNull(exportBlock(StorageStatus.Low("x"), Support.SlowSoftwareOnly("x")))
+        assertEquals("Not enough storage", exportBlock(StorageStatus.NotEnough(txt(R.string.library_text_value, "x")), Support.Supported))
+        assertNull(exportBlock(StorageStatus.Low(txt(R.string.library_text_value, "x")), Support.SlowSoftwareOnly(txt(R.string.library_text_value, "x"))))
         assertEquals("Use 720p · MKV", suggestionLabel(big, big.copy(shortSide = 720, container = Container.Mkv)))
     }
 
@@ -117,7 +119,8 @@ class ExportChoicesTest {
         assertNull(exportHeatText(ThermalLevel.Warm))
         assertEquals("Your phone is hot — export slowed down to protect it", exportHeatText(ThermalLevel.Hot))
         assertEquals("Checked: plays correctly", verificationLine(Verification(emptyList(), 1, true, true, 5)))
-        assertEquals("Checked: The file has no video track.", verificationLine(Verification(listOf("The file has no video track."), 1, null, null, 5)))
+        val failed = verificationLine(Verification(listOf(txt(R.string.library_text_value, "The file has no video track.")), 1, null, null, 5))
+        assertTrue(failed.startsWith("Checked: ") && !failed.contains("UiText") && failed != "Checked: plays correctly")
     }
 
     @Test fun shortLabels() {

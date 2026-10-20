@@ -112,7 +112,7 @@ def effect_units():
             for i, option in enumerate(p.get('options') or []):
                 units[f'fx:{key}:{p["id"]}:option{i}'] = (option, f'choice option of the parameter "{p.get("label", p["id"])}" of the effect "{data.get("name", key)}"')
     text = CATALOG_KT.read_text(encoding='utf-8')
-    for cat, name in re.findall(r'"([a-z]+)" to "([^"]+)"', text):
+    for cat, name in re.findall(r'"([a-z0-9]+)" to "([^"]+)"', text):
         units[f'fxcat:{cat}'] = (name, 'effect category name (one or two words)')
     return units
 

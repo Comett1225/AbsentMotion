@@ -117,4 +117,4 @@ fun exportHeatText(level: ThermalLevel): String? = when (level) {
     else -> null
 }
 
-fun verificationLine(v: Verification): String = if (v.ok) "Checked: plays correctly" else "Checked: " + v.problems.joinToString(" ")
+fun verificationLine(v: Verification): String = if (v.ok) "Checked: plays correctly" else "Checked: " + v.problems.joinToString(" ") { AppText.get(it) }

@@ -68,7 +68,7 @@ class RemainingContracts(unittest.TestCase):
         self.assertIn('if (!mixed)', text)
         self.assertNotIn('if (mixed) image = std::move(mixed)', text)
         text = kotlin('media/VideoLibrary.kt')
-        self.assertIn('throw ExportError(txt(R.string.media_error_interp_render, txt(request.interpolation.label)))', text)
+        self.assertIn('throw ExportError(txt(R.string.media_error_interp_render, request.interpolation.label))', text)
         self.assertIn('could not render the requested video frame', english('media_error_interp_render'))
         exact = text.split('suspend fun exact(', 1)[1].split('private suspend fun decode', 1)[0]
         self.assertIn('throw e', exact)

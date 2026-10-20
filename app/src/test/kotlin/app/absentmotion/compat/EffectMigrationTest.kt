@@ -332,9 +332,9 @@ class EffectMigrationTest {
         val store = ProjectStore(tmp.newFolder())
         val report = Importer(store, migration = migration, canRun = { catalog.find(it) != null }).import { alightMoves.byteInputStream() }.single()
         val sections = report.sections.toMap()
-        assertEquals(listOf("transform (1 layer)", "scaleassist (1 layer)").sorted(), sections["Effects this version cannot run"]!!.sorted())
-        assertEquals(11, sections["Effects turned into this app's own"]!!.size)
-        assertNull(sections["Effect settings that could not be carried over"])
+        assertEquals(setOf(UiText.plural(R.plurals.library_report_effect_layers, 1, "transform", "1"), UiText.plural(R.plurals.library_report_effect_layers, 1, "scaleassist", "1")), sections[txt(R.string.library_report_cannot_run)]!!.toSet())
+        assertEquals(11, sections[txt(R.string.library_report_converted)]!!.size)
+        assertNull(sections[txt(R.string.library_report_dropped)])
         assertEquals(13, effects(store.load(report.id)!!.node).size)
     }
 }
