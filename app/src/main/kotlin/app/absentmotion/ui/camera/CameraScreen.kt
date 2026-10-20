@@ -283,19 +283,25 @@ private fun CameraBody(ui: CameraUi, aspect: Float, mic: Boolean, onClose: () ->
         blink++
         val options = ImageCapture.OutputFileOptions.Builder(context.contentResolver, MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
             mediaValues("image/jpeg", "jpg")).build()
-        controller.takePicture(options, executor, object : ImageCapture.OnImageSavedCallback {
-            override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                ui.busy = false
-                val uri = output.savedUri
-                if (uri == null) failed(R.string.camera_error_save_photo) else if (!ui.closed) onCaptured(uri, false)
-            }
+        try {
+            controller.takePicture(options, executor, object : ImageCapture.OnImageSavedCallback {
+                override fun onImageSaved(output: ImageCapture.OutputFileResults) {
+                    ui.busy = false
+                    val uri = output.savedUri
+                    if (uri == null) failed(R.string.camera_error_save_photo) else if (!ui.closed) onCaptured(uri, false)
+                }
 
-            override fun onError(e: ImageCaptureException) {
-                ui.busy = false
-                Log.w("AMCamera", "photo failed", e)
-                failed(R.string.camera_error_photo)
-            }
-        })
+                override fun onError(e: ImageCaptureException) {
+                    ui.busy = false
+                    Log.w("AMCamera", "photo failed", e)
+                    failed(R.string.camera_error_photo)
+                }
+            })
+        } catch (e: RuntimeException) {
+            ui.busy = false
+            Log.w("AMCamera", "cannot take a photo", e)
+            failed(R.string.camera_error_photo)
+        }
     }
 
     fun record() {
@@ -441,7 +447,7 @@ private fun CameraBody(ui: CameraUi, aspect: Float, mic: Boolean, onClose: () ->
                     Alignment.Center,
                 ) { Icon(if (ui.paused) ChromeIcons.Play else ChromeIcons.Pause, stringResource(if (ui.paused) R.string.camera_resume_recording else R.string.camera_pause_recording), Modifier.size(26.dp), tint = Color.White) }
             }
-            Shutter(ui.video, recording, ui.busy || ui.countdown > 0, ::shutter)
+            Shutter(ui.video, recording, ui.busy || ui.countdown > 0, ready = recording || lenses?.let { it.first || it.second } == true, noCamera = lenses?.let { !it.first && !it.second } == true, ::shutter)
             val canSwitch = lenses?.let { it.first && it.second } == true && !locked
             Box(
                 Modifier.size(64.dp).alpha(if (canSwitch) 1f else 0.35f).clip(CircleShape).clickable(enabled = canSwitch) { ui.front = !ui.front },
@@ -482,9 +488,9 @@ private fun ModeTab(label: String, selected: Boolean, enabled: Boolean, onClick:
 }
 
 @Composable
-private fun Shutter(video: Boolean, recording: Boolean, waiting: Boolean, onClick: () -> Unit) {
+private fun Shutter(video: Boolean, recording: Boolean, waiting: Boolean, ready: Boolean, noCamera: Boolean, onClick: () -> Unit) {
     Box(
-        Modifier.size(76.dp).border(4.dp, Color.White, CircleShape).padding(8.dp).clip(CircleShape).clickable(onClick = onClick)
+        Modifier.size(76.dp).alpha(if (noCamera) 0.35f else 1f).border(4.dp, Color.White, CircleShape).padding(8.dp).clip(CircleShape).clickable(enabled = ready, onClick = onClick)
             .then(if (video || recording) Modifier else Modifier.alpha(if (waiting) 0.6f else 1f)),
         Alignment.Center,
     ) {
