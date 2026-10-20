@@ -53,6 +53,18 @@ import app.absentmotion.editor.setParent
 import app.absentmotion.editor.unparentChildrenOf
 import app.absentmotion.ui.theme.Am
 import kotlinx.coroutines.launch
+import android.content.Context
+import android.net.Uri
+import android.provider.OpenableColumns
+import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.platform.LocalContext
+import app.absentmotion.editor.addSvg
+import app.absentmotion.model.importSvg
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 private val ItemShape = RoundedCornerShape(4.dp)
 
@@ -71,12 +83,50 @@ internal fun ObjectPage(state: EditorState, modifier: Modifier) {
         ElementPicker(state, modifier)
         return
     }
-    Row(modifier.padding(10.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        TextButton("Camera", Modifier.size(70.dp, 80.dp)) { state.addCamera() }
-        TextButton("Null", Modifier.size(70.dp, 80.dp)) { state.addNull() }
-        TextButton("Empty Group", Modifier.size(70.dp, 80.dp)) { state.addEmptyGroup() }
-        TextButton("Asset / Project", Modifier.size(70.dp, 80.dp)) { picking = true }
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val svg = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> if (uri != null) scope.launch { state.importSvgFile(context, uri) } }
+    Column(modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            TextButton("Camera", Modifier.size(70.dp, 80.dp)) { state.addCamera() }
+            TextButton("Null", Modifier.size(70.dp, 80.dp)) { state.addNull() }
+            TextButton("Empty Group", Modifier.size(70.dp, 80.dp)) { state.addEmptyGroup() }
+            TextButton("Asset / Project", Modifier.size(70.dp, 80.dp)) { picking = true }
+        }
+        TextButton("Import SVG", Modifier.size(70.dp, 80.dp)) { svg.launch(arrayOf("image/svg+xml")) }
     }
+}
+
+private const val MaxSvgBytes = 16 shl 20
+
+private suspend fun EditorState.importSvgFile(context: Context, uri: Uri) {
+    val host = scene
+    val start = host.frameStart(frame)
+    val end = host.frameEnd(frame + settings.defaultLayerDuration * host.fps)
+    fun say(text: String) = Toast.makeText(context, text, Toast.LENGTH_LONG).show()
+    val result = try {
+        withContext(Dispatchers.IO) {
+            val name = context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { c ->
+                if (c.moveToFirst()) c.getString(0) else null
+            } ?: uri.lastPathSegment.orEmpty()
+            val bytes = context.contentResolver.openInputStream(uri)?.use { it.readNBytes(MaxSvgBytes + 1) } ?: throw java.io.IOException("unreadable")
+            if (bytes.size > MaxSvgBytes) throw java.io.IOException("too large")
+            importSvg(String(bytes, Charsets.UTF_8), name.substringAfterLast('/').removeSuffix(".svg").removeSuffix(".SVG"), host, start, end)
+        }
+    } catch (e: kotlinx.coroutines.CancellationException) {
+        throw e
+    } catch (e: Exception) {
+        Log.w("AMSvg", "cannot import $uri", e)
+        say("Could not read this SVG file.")
+        return
+    }
+    val layer = result.layer
+    if (layer == null) {
+        say("This SVG file has no shapes that can be imported.")
+        return
+    }
+    addSvg(layer)
+    if (result.skipped.isNotEmpty()) say("Imported ${result.shapes} shapes. Left out: ${result.skipped.joinToString(", ")}.")
 }
 
 @Composable

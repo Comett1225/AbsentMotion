@@ -265,6 +265,13 @@ fun EditorState.addImage(media: MediaDeclaration) {
     addOpen = false
 }
 
+fun EditorState.addSvg(layer: Layer) {
+    edit { it.add(layer) }
+    selectedId = layer.id
+    panel = EditorPanel.Tools
+    addOpen = false
+}
+
 fun Scene.imageLayer(media: MediaDeclaration, frame: Int, seconds: Int): Layer? {
     if (media.width <= 0 || media.height <= 0) return null
     val scene = this
