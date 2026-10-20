@@ -67,6 +67,8 @@ def cases():
     yield 'a child turns in 3D with its parent', engine.scene(parent + engine.rect(2, -40, 0, 20, 20, 0xffff0000, attrs=' parent="5"')), [((50, 100), engine.BLACK), ((75, 100), engine.RED), ((85, 100), engine.RED), ((95, 100), engine.BLACK)]
     title = "a missing picture draws nothing"
     yield 'placeholder opacity', *engine.CASES[title]
+    flat = engine.rect(1, 100, 100, 100, 100, 0x94888888, extra=fx('unsharpmask', radius=2, amount=0.5, threshold=0.5))
+    yield 'unsharp mask leaves a flat see-through grey alone', engine.scene(flat), [((100, 100), (79, 79, 79))]
 
 
 def models():
