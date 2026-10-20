@@ -376,6 +376,7 @@ EngineImpl::~EngineImpl() {
     fBufferSurfaces.clear();
     fPictures.clear();
     fVideoFrames.clear();
+    fMosh.clear();
     while (!fImported.empty()) this->forgetImported(fImported.begin()->first);
     this->syncGpu();
     if (fGraphite) {
