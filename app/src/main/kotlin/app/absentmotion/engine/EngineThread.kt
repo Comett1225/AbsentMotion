@@ -54,6 +54,8 @@ class EngineThread(private val background: Int, context: Context? = null) {
     val audio = context?.let { AudioEngine(it) }
     private val captureLock = Mutex()
     private var capturing = false
+    @Volatile var lastStillMs = 0.0
+        private set
     @Volatile private var requestedView: PreviewView? = null
     @Volatile private var playing = false
     private val effectCatalog = MutableStateFlow(EffectCatalog(message = "Loading effects…"))
@@ -381,7 +383,9 @@ class EngineThread(private val background: Int, context: Context? = null) {
                 setEngineScene(xml, timeMs)
             }
             suspend fun draw(): Boolean = withContext(dispatcher) {
+                val start = System.nanoTime()
                 val pixels = engine().still(timeMs.toDouble(), width, height)
+                lastStillMs = (System.nanoTime() - start) / 1e6
                 pixels != null && writePng(pixels, width, height, file)
             }
             videos?.withExact(document, timeMs) { draw() } ?: draw()

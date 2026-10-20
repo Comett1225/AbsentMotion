@@ -431,7 +431,7 @@ class MainActivity : ComponentActivity() {
                     val (path, frame, name) = line.trim().split(' ')
                     val scene = migration.migrate(Scene.parse(File(path).readText())).scene
                     val ok = engine.stillPng(scene.toXml(), scene.frameStart(frame.toInt()), scene.width, scene.height, File(getExternalFilesDir(null), "$name.png"))
-                    Log.i("AMTest", "still $name ok=$ok")
+                    Log.i("AMTest", "still $name ok=$ok render=${"%.1f".format(java.util.Locale.US, engine.lastStillMs)}ms")
                 }
                 Log.i("AMTest", "batch done")
             }
