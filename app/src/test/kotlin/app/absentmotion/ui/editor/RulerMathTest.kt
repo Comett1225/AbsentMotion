@@ -49,6 +49,18 @@ class RulerMathTest {
         }
     }
 
+    @Test fun rulersWorkLikeATapeMeasureSwipingLeftGrows() {
+        val left = RulerMath.travel(-360f, 2.625f)
+        val right = RulerMath.travel(360f, 2.625f)
+        assertTrue(left > 0f && right < 0f)
+        assertEquals(360f / 2.625f, left, 1e-3f)
+        assertTrue(RulerMath.scale(2f, left) > 2f)
+        assertTrue(RulerMath.scale(2f, right) < 2f)
+        assertTrue(step(Kind.Number, 25f, left, 0) > 25f)
+        assertTrue(step(Kind.Angle, 0f, left, 1) > 0f)
+        assertTrue(step(Kind.Point, 0f, right, 1) < 0f)
+    }
+
     @Test fun shapeRulersMoveFromTheValueAtTheStart() {
         assertEquals(150f, step(Kind.Point, 100f, 50f, 1), 0f)
         assertEquals(125f, step(Kind.Angle, 100f, 50f, 1), 0f)
