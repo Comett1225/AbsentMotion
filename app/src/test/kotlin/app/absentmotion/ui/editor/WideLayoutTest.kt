@@ -1,5 +1,8 @@
 package app.absentmotion.ui.editor
 
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.dp
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -30,5 +33,14 @@ class WideLayoutTest {
         assertFalse(wideEditor(600, 600))
         assertFalse(wideEditor(800, 800))
         assertFalse(wideEditor(673, 839))
+    }
+
+    @Test fun addPanelGridsKeepTwoRowsOnPhonesAndAddRowsWhenTaller() {
+        val cells = AtLeastTwo(96.dp)
+        fun rows(height: Int) = with(cells) { Density(1f).calculateCrossAxisCellSizes(height, 0) }
+        assertEquals(listOf(78, 77), rows(155))
+        assertEquals(listOf(100, 100, 100), rows(300))
+        assertEquals(500, rows(500).sum())
+        assertEquals(5, rows(500).size)
     }
 }
