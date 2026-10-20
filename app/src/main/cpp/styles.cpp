@@ -568,10 +568,12 @@ void DrawShuttered(SkCanvas* canvas, const std::vector<Layer>& siblings, const L
         composite.setImageFilter(SmearFilter(moved));
         if (!composite.getImageFilter()) return DrawOne(canvas, siblings, l, timeMs, pictures, sample);
     }
-    if (ov.blend) composite.setBlendMode(ov.mode);
-    else SetBlend(&composite, l.blending);
-    sample.blend = true;
-    sample.mode = SkBlendMode::kSrcOver;
+    if (ov.blend || !IsNormal(l.blending)) {
+        if (ov.blend) composite.setBlendMode(ov.mode);
+        else SetBlend(&composite, l.blending);
+        sample.blend = true;
+        sample.mode = SkBlendMode::kSrcOver;
+    }
     if (shutter.fast) {
         canvas->saveLayer(nullptr, &composite);
         DrawOne(canvas, siblings, l, timeMs, pictures, sample);
