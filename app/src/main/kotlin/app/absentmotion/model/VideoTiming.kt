@@ -310,16 +310,17 @@ fun Layer.withFreezeFrame(projectTime: Int, holdMs: Int, fps: Int): Layer? {
     return keyed.withVideoSpeedMap(map.withKeyframes(kept + Keyframe(t1, text) + Keyframe(t2, text) + Keyframe(t3, at.v)))
 }
 
-fun Layer.withKeyframesMoved(from: Int, to: Int, scene: Scene): Layer {
+fun Layer.withKeyframesMoved(from: Int, to: Int, scene: Scene, scope: KeyScope? = null): Layer {
     val length = endTime - startTime
     val target = scene.frameTime(to).coerceIn(startTime, endTime)
     if (length <= 0 || scene.frameAt(target) == from) return this
     val timing = VideoTiming(this)
-    val map = node.child("speedMap")
+    val map = node.child("speedMap").takeIf { scope == null || scope.ref == SpeedRef }
     fun keyAt(frame: Int) = { t: Float -> scene.frameAt(timeOf(t)) == frame }
     val speedMoves = { t: Float -> scene.frameAt(startTime + timing.localMs(t / 1e6).roundToInt()) == from }
     if (map == null || map.keyframes.none { speedMoves(it.t) }) {
-        return copy(node = node.allKeysMoved((target - startTime).toFloat() / length, keyAt(from), keyAt(scene.frameAt(target))))
+        if (scope?.ref == SpeedRef) return this
+        return withScopedKeys(scope) { it.allKeysMoved((target - startTime).toFloat() / length, keyAt(from), keyAt(scene.frameAt(target))) }
     }
     fun shifted(media: Double) = VideoTiming(copy(node = node.withChild("speedMap", map.keysMoved((media * 1e6).toFloat(), speedMoves) { false })))
     var lo = timing.mediaMs(0.0)
@@ -332,8 +333,14 @@ fun Layer.withKeyframesMoved(from: Int, to: Int, scene: Scene): Layer {
     val after = shifted(media)
     fun landing(media: Double) = scene.frameAt(startTime + after.localMs(media).roundToInt())
     val landed = landing(media)
-    val keys = node.allKeysMoved((timing.localMs(media) / length).toFloat(), keyAt(from)) { landing(timing.mediaMs(it.toDouble() * length)) == landed }
+    val keys = if (scope == null) node.allKeysMoved((timing.localMs(media) / length).toFloat(), keyAt(from)) { landing(timing.mediaMs(it.toDouble() * length)) == landed } else node
     return copy(node = keys).withVideoSpeedMap(map.keysMoved((media * 1e6).toFloat(), speedMoves) { landing(it / 1e6) == landed })
+}
+
+private fun Layer.withScopedKeys(scope: KeyScope?, change: (XmlNode) -> XmlNode): Layer = when {
+    scope == null -> copy(node = change(node))
+    scope.ref != null -> element(scope.ref)?.let { withElement(scope.ref, change(it)) } ?: this
+    else -> withEffect(scope.effectIndex, change)
 }
 
 private val XmlNode.time: Float get() = this["t"]?.toFloatOrNull() ?: 0f

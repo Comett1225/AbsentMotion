@@ -15,6 +15,7 @@ import app.absentmotion.model.VideoTiming
 import app.absentmotion.model.withSpeedKeyframeToggled
 import app.absentmotion.model.Easing
 import app.absentmotion.model.MediaDeclaration
+import app.absentmotion.model.KeyScope
 import app.absentmotion.model.Layer
 import app.absentmotion.model.PropRef
 import app.absentmotion.model.mediaUris
@@ -112,12 +113,12 @@ fun EditorState.split() {
     selectedId = null
 }
 
-internal fun Scene.navigationStops(layer: Layer?): List<Int> {
-    val times = if (layer == null) listOf(0, totalTime) else listOf(layer.startTime, layer.endTime) + layer.keyframeTimes().filter { it in layer.startTime..layer.endTime }
+internal fun Scene.navigationStops(layer: Layer?, scope: KeyScope? = null): List<Int> {
+    val times = if (layer == null) listOf(0, totalTime) else listOf(layer.startTime, layer.endTime) + layer.keyframeTimes(scope).filter { it in layer.startTime..layer.endTime }
     return (times + bookmarks).map { frameAt(it).coerceIn(0, maxOf(lastFrame, 0)) }.distinct().sorted()
 }
 
-private fun EditorState.stops(): List<Int> = scene.navigationStops(selected)
+private fun EditorState.stops(): List<Int> = scene.navigationStops(selected, keyScope)
 
 fun EditorState.skipBack() {
     frame = stops().lastOrNull { it < frame } ?: frame

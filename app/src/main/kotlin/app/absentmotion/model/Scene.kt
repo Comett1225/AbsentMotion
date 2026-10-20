@@ -279,7 +279,7 @@ data class Layer(val node: XmlNode, val t: Float = 0f, val snap: Float = 0f) {
         return withElement(ref, element.withKeyframes(element.keyframes.mapIndexed { i, k -> if (i == 0) k else k.copy(e = text) }))
     }
 
-    fun keyframeTimes(): List<Int> {
+    fun keyframeTimes(scope: KeyScope? = null): List<Int> {
         val out = sortedSetOf<Int>()
         fun walk(n: XmlNode) {
             if (n.name == "speedMap") {
@@ -288,9 +288,11 @@ data class Layer(val node: XmlNode, val t: Float = 0f, val snap: Float = 0f) {
             } else if (n.name == "kf") n["t"]?.toFloatOrNull()?.let { out.add(timeOf(it)) }
             else if (n.name != "scene") n.children.forEach(::walk)
         }
-        walk(node)
+        walk(if (scope == null) node else scopeNode(scope) ?: return emptyList())
         return out.toList()
     }
+
+    private fun scopeNode(scope: KeyScope): XmlNode? = if (scope.ref != null) element(scope.ref) else effects.getOrNull(scope.effectIndex)
 
     companion object {
         fun newId(): Long = Random.nextLong(10_000_000, 99_999_999)

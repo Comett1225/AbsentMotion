@@ -13,6 +13,7 @@ import app.absentmotion.engine.SnapGuide
 import app.absentmotion.library.AppSettings
 import app.absentmotion.library.ProjectSaver
 import app.absentmotion.library.ProjectStore
+import app.absentmotion.model.KeyScope
 import app.absentmotion.model.Layer
 import app.absentmotion.model.PropRef
 import app.absentmotion.model.Scene
@@ -172,6 +173,9 @@ class EditorState(
     val sampleMs: Int get() = scene.frameTime(frame)
 
     var keyTarget by mutableStateOf<KeyTarget?>(null)
+
+    val keyScope: KeyScope?
+        get() = keyTarget?.let { KeyScope(it.ref) } ?: if (panel == EditorPanel.Effects && effectIndex >= 0) KeyScope(effectIndex = effectIndex) else null
 
     var snapGuides by mutableStateOf<List<SnapGuide>>(emptyList())
 

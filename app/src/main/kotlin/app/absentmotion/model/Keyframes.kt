@@ -28,6 +28,8 @@ data class PropRef(val kind: Kind, val name: String, val effectIndex: Int = -1) 
     }
 }
 
+data class KeyScope(val ref: PropRef? = null, val effectIndex: Int = -1)
+
 data class Easing(val type: String, val p: List<Float> = emptyList(), val prefixes: List<String> = emptyList()) {
     override fun toString(): String = (prefixes + type + p.map { it.toString() }).joinToString(" ")
 

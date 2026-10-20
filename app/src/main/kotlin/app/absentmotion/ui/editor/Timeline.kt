@@ -93,6 +93,7 @@ import app.absentmotion.model.Layer
 import app.absentmotion.model.trimmedTo
 import app.absentmotion.model.trimHitsSourceLimit
 import app.absentmotion.model.mediaLengthMs
+import app.absentmotion.model.KeyScope
 import app.absentmotion.model.withKeyframesMoved
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Motion
@@ -435,6 +436,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
     private var keyFrom = 0
     private var keyMs = 0f
     private var keyLayer: Layer? = null
+    private var keyScope: KeyScope? = null
 
     var moveId by mutableStateOf<Long?>(null)
         private set
@@ -484,11 +486,14 @@ private class TimelineView(val state: EditorState, density: Density, private val
     }
 
     private var keyFramesOf: List<Layer>? = null
-    private val keyFrames = HashMap<Long, List<Int>>()
+    private val keyFrames = HashMap<Pair<Long, KeyScope?>, List<Int>>()
+
+    private fun scopeOf(layer: Layer): KeyScope? = if (layer.id == state.selectedId) state.keyScope else null
 
     fun keyFrames(layer: Layer): List<Int> {
         if (keyFramesOf !== layers) { keyFrames.clear(); keyFramesOf = layers }
-        return keyFrames.getOrPut(layer.id) { layer.keyframeTimes().map { state.scene.frameAt(it) }.distinct() }
+        val scope = scopeOf(layer)
+        return keyFrames.getOrPut(layer.id to scope) { layer.keyframeTimes(scope).map { state.scene.frameAt(it) }.distinct() }
     }
 
     fun revealSelected() {
@@ -545,12 +550,13 @@ private class TimelineView(val state: EditorState, density: Density, private val
     private fun keyNear(layer: Layer, x: Float, time: TimeScale): Int? {
         val scene = state.scene
         fun distance(frame: Int) = abs(time.x(scene.frameStart(frame).toFloat()) - x)
-        return layer.keyframeTimes().map { scene.frameAt(it) }.minByOrNull(::distance)?.takeIf { distance(it) <= KeyGrab.px }
+        return layer.keyframeTimes(scopeOf(layer)).map { scene.frameAt(it) }.minByOrNull(::distance)?.takeIf { distance(it) <= KeyGrab.px }
     }
 
     fun grabKey(hit: Hit.Key) {
         state.playing = false
         keyLayer = state.scene.layer(hit.id)
+        keyScope = state.keyScope
         keyFrom = hit.frame
         keyFrame = hit.frame
         keyMs = TimelineMath.frameTimeMs(hit.frame, fps)
@@ -575,7 +581,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
         showSnap(snap, frame)
         if (frame == keyFrame) return
         keyFrame = frame
-        state.edit(KEY_MOVE) { s -> s.update(original.id) { original.withKeyframesMoved(keyFrom, frame, s) } }
+        state.edit(KEY_MOVE) { s -> s.update(original.id) { original.withKeyframesMoved(keyFrom, frame, s, keyScope) } }
     }
 
     private fun dropKey(commit: Boolean) {
