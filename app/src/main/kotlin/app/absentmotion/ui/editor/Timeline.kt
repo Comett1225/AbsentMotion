@@ -317,6 +317,18 @@ internal object TimelineMath {
         return best.takeIf { abs(frameTimeMs(it, fps) - wantedMs) <= zoneMs }
     }
 
+    fun moveTarget(wantedMs: Float, spanMs: Float, spanFrames: Int, targets: Collection<Int>, fps: Int, zoneMs: Float): MoveTarget {
+        val snapped = listOf(0f to 0, spanMs to spanFrames).mapNotNull { (offsetMs, offsetFrames) ->
+            snapFrame(wantedMs + offsetMs, targets, fps, zoneMs)?.let { hit ->
+                Triple(hit - offsetFrames, hit, abs(frameTimeMs(hit, fps) - wantedMs - offsetMs))
+            }
+        }.filter { it.first >= 0 }.minByOrNull { it.third }
+        return snapped?.let { MoveTarget(it.first, it.second) } ?: MoveTarget(nearestFrame(wantedMs, fps).coerceAtLeast(0), null)
+    }
+
+    fun movedStart(scene: Scene, layer: Layer, frame: Int): Int =
+        if (frame == scene.firstShownFrame(layer.startTime)) layer.startTime else scene.frameStart(frame)
+
     fun snapTargets(scene: Scene, skip: Long, playhead: Int): Set<Int> = buildSet {
         add(playhead)
         scene.bookmarks.forEach { add(scene.firstShownFrame(it)) }
@@ -328,6 +340,8 @@ internal object TimelineMath {
     }
 }
 
+internal data class MoveTarget(val frame: Int, val snap: Int?)
+
 private data class StripWindow(val rows: IntRange, val fromMs: Float, val toMs: Float)
 
 private const val STRIP_WINDOW_MS = 2000f
@@ -335,6 +349,7 @@ private const val STRIP_WINDOW_MS = 2000f
 private class TimeScale(val nowMs: Float, val originX: Float, val pxPerMs: Float) {
     fun x(timeMs: Float) = TimelineMath.timeToX(timeMs, nowMs, originX, pxPerMs)
     fun time(x: Float) = TimelineMath.xToTime(x, nowMs, originX, pxPerMs)
+    fun slid(dx: Float) = TimeScale(nowMs, originX + dx, pxPerMs)
 }
 
 private sealed interface Hit {
@@ -352,9 +367,12 @@ private sealed interface Hit {
     data class Row(val id: Long) : Hit
 }
 
-private enum class Drag(val edit: Boolean = false) { Scrub, Scroll, Pinch, Spent, Select, TrimStart(true), TrimEnd(true), Reorder(true), Lift(true), Key(true) }
+private enum class Drag(val edit: Boolean = false) { Scrub, Scroll, Pinch, Spent, Select, TrimStart(true), TrimEnd(true), Reorder(true), Lift(true), Key(true), Move(true) }
 
 private const val KEY_MOVE = "keyframe-move"
+private const val MOVE_EDIT = "clip-move"
+
+private val Hit.clipId: Long? get() = when (this) { is Hit.Bar -> id; is Hit.Key -> id; else -> null }
 
 private class TimelineView(val state: EditorState, density: Density, private val scope: CoroutineScope, private val wide: Boolean) {
     private val scale = density.density
@@ -419,6 +437,19 @@ private class TimelineView(val state: EditorState, density: Density, private val
     private var keyFrom = 0
     private var keyMs = 0f
     private var keyLayer: Layer? = null
+
+    var moveId by mutableStateOf<Long?>(null)
+        private set
+    var moveSlide by mutableFloatStateOf(0f)
+        private set
+    private var moveLayer: Layer? = null
+    private var moveBase: Scene? = null
+    private var moveDx = 0f
+    private var moveArmed = false
+    private var liftMoves = false
+    private var liftStartX = 0f
+
+    val liftMoved: Boolean get() = liftArmed || moveArmed
 
     private val layersState = derivedStateOf(referentialEqualityPolicy()) { state.scene.layers }
 
@@ -598,23 +629,30 @@ private class TimelineView(val state: EditorState, density: Density, private val
         MultiSelect.ids = RowDrag.slideSelection(selectBase, layers.asReversed().map { it.id }, anchor, finger, selectAdd)
     }
 
-    fun beginDrag(hit: Hit, moved: Offset): Drag = when {
-        hit is Hit.Grip -> {
-            val layer = layers.firstOrNull { it.id == hit.id }
-            dragId = hit.id
-            edgeMs = (if (hit.start) layer?.startTime else layer?.endTime?.plus(1))?.toFloat() ?: 0f
-            snapTargets = TimelineMath.snapTargets(state.scene, hit.id, state.frame)
-            if (hit.start) Drag.TrimStart else Drag.TrimEnd
+    fun beginDrag(hit: Hit, moved: Offset): Drag {
+        val clip = hit.clipId?.takeIf { it == state.selectedId && abs(moved.x) > abs(moved.y) }
+        return when {
+            hit is Hit.Grip -> {
+                val layer = layers.firstOrNull { it.id == hit.id }
+                dragId = hit.id
+                edgeMs = (if (hit.start) layer?.startTime else layer?.endTime?.plus(1))?.toFloat() ?: 0f
+                snapTargets = TimelineMath.snapTargets(state.scene, hit.id, state.frame)
+                if (hit.start) Drag.TrimStart else Drag.TrimEnd
+            }
+            hit is Hit.Handle -> {
+                dragId = hit.id
+                Drag.Reorder
+            }
+            clip != null && moveBegin(clip) -> {
+                moveBy(moved.x)
+                Drag.Move
+            }
+            abs(moved.x) > abs(moved.y) -> {
+                state.playing = false
+                Drag.Scrub
+            }
+            else -> Drag.Scroll
         }
-        hit is Hit.Handle -> {
-            dragId = hit.id
-            Drag.Reorder
-        }
-        abs(moved.x) > abs(moved.y) -> {
-            state.playing = false
-            Drag.Scrub
-        }
-        else -> Drag.Scroll
     }
 
     fun dragBy(drag: Drag, delta: Offset, at: Offset) {
@@ -624,6 +662,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
             Drag.TrimStart, Drag.TrimEnd -> trimBy(delta.x, start = drag == Drag.TrimStart)
             Drag.Reorder -> reorderTo(at.y)
             Drag.Key -> keyBy(delta.x)
+            Drag.Move -> moveBy(delta.x)
             Drag.Pinch, Drag.Spent, Drag.Lift, Drag.Select -> Unit
         }
     }
@@ -632,6 +671,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
         limitEdge = null
         snapAt = null
         if (drag == Drag.Lift) drop()
+        if (drag == Drag.Lift || drag == Drag.Move) dropMove(lifted)
         if (drag == Drag.Select) endSelect()
         if (drag == Drag.Key) dropKey(lifted)
         if (drag?.edit == true) return state.endGesture()
@@ -711,6 +751,48 @@ private class TimelineView(val state: EditorState, density: Density, private val
         showSnap(snap.takeUnless { hit }, edge)
     }
 
+    private fun moveBegin(id: Long): Boolean {
+        val layer = state.scene.layer(id) ?: return false
+        state.playing = false
+        moveLayer = layer
+        moveBase = state.scene
+        moveId = id
+        moveDx = 0f
+        moveSlide = 0f
+        moveArmed = false
+        snapTargets = TimelineMath.snapTargets(state.scene, id, state.frame)
+        return true
+    }
+
+    private fun moveBy(dx: Float) {
+        moveDx += dx
+        moveApply()
+    }
+
+    private fun moveApply() {
+        val original = moveLayer ?: return
+        val scene = state.scene
+        val pxPerMs = timeScale().pxPerMs
+        val wanted = original.startTime + moveDx / pxPerMs
+        val spanFrames = scene.lastShownFrame(original.endTime) + 1 - scene.firstShownFrame(original.startTime)
+        val target = TimelineMath.moveTarget(wanted, (original.endTime + 1 - original.startTime).toFloat(), spanFrames, snapTargets, fps, SnapZone.px / pxPerMs)
+        val start = TimelineMath.movedStart(scene, original, target.frame)
+        showSnap(target.snap, target.snap ?: target.frame)
+        moveSlide = if (target.snap != null || wanted <= 0f) 0f else (wanted - start) * pxPerMs
+        val id = original.id
+        if (scene.layer(id)?.startTime != start) state.edit(MOVE_EDIT) { it.update(id) { l -> l.movedTo(start) } }
+    }
+
+    private fun dropMove(commit: Boolean) {
+        if (!commit || state.scene == moveBase) state.cancelGesture(MOVE_EDIT)
+        moveId = null
+        moveLayer = null
+        moveBase = null
+        moveSlide = 0f
+    }
+
+    fun timeFor(id: Long, time: TimeScale) = if (id == moveId) time.slid(moveSlide) else time
+
     private fun reorderTo(y: Float) {
         val layers = layers
         if (layers.isEmpty()) return
@@ -737,13 +819,16 @@ private class TimelineView(val state: EditorState, density: Density, private val
         return top + slide.from * (1 - progress(now - slide.at, SLIDE_MS)) * rowH
     }
 
-    fun lift(id: Long, y: Float, slop: Float): Boolean {
+    fun lift(id: Long, at: Offset, slop: Float, moves: Boolean): Boolean {
         val row = rowOf(id) ?: return false
+        if (!moveBegin(id)) return false
+        liftMoves = moves
+        liftStartX = at.x
         liftJob?.cancel()
         liftAt = SystemClock.uptimeMillis()
-        liftGrab = y - rowTop(row)
-        liftFinger = y
-        liftStart = y
+        liftGrab = at.y - rowTop(row)
+        liftFinger = at.y
+        liftStart = at.y
         liftSlop = slop
         liftArmed = false
         liftPush = true
@@ -755,10 +840,17 @@ private class TimelineView(val state: EditorState, density: Density, private val
         return true
     }
 
-    fun liftDrag(y: Float, pushing: Boolean) {
-        liftFinger = y
+    fun liftDrag(at: Offset, pushing: Boolean) {
+        liftFinger = at.y
         liftPush = pushing
-        if (abs(y - liftStart) > liftSlop) liftArmed = true
+        if (abs(at.y - liftStart) > liftSlop) liftArmed = true
+        if (liftMoves) {
+            if (abs(at.x - liftStartX) > liftSlop) moveArmed = true
+            if (moveArmed) {
+                moveDx = at.x - liftStartX
+                moveApply()
+            }
+        }
         liftUpdate()
     }
 
@@ -792,7 +884,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
             val left = slides[layer.id]?.let { it.from * (1 - progress(now - it.at, SLIDE_MS)) } ?: 0f
             slides[layer.id] = Slide(left - shift, now)
         }
-        state.edit("reorder") { it.move(id, layers.lastIndex - to) }
+        state.edit(MOVE_EDIT) { it.move(id, layers.lastIndex - to) }
         onTick()
     }
 
@@ -851,7 +943,7 @@ private suspend fun PointerInputScope.timelineGestures(view: TimelineView, onLon
     var last: PointerInputChange? = null
     var finger = down.position
     var second: PointerId? = null
-    val holdable = hit is Hit.Eye || hit is Hit.Header || hit is Hit.Row || hit is Hit.Key
+    val holdable = hit is Hit.Eye || hit is Hit.Header || hit is Hit.Row || hit is Hit.Key || hit is Hit.Bar
     val deadline = down.uptimeMillis + viewConfiguration.longPressTimeoutMillis
     try {
         while (true) {
@@ -864,7 +956,8 @@ private suspend fun PointerInputScope.timelineGestures(view: TimelineView, onLon
                         view.grabKey(hit)
                         drag = Drag.Key
                     }
-                    hit is Hit.Row && view.lift(hit.id, finger.y, viewConfiguration.touchSlop) -> drag = Drag.Lift
+                    hit is Hit.Row && view.lift(hit.id, finger, viewConfiguration.touchSlop, moves = false) -> drag = Drag.Lift
+                    hit is Hit.Bar && view.lift(hit.id, finger, viewConfiguration.touchSlop, moves = true) -> drag = Drag.Lift
                     view.longPress(hit, finger.y, viewConfiguration.touchSlop) -> drag = Drag.Select
                     else -> held = true
                 }
@@ -888,7 +981,7 @@ private suspend fun PointerInputScope.timelineGestures(view: TimelineView, onLon
                         if (change.id != second) continue
                         if (change.pressed) view.liftScroll(change.position.y - change.previousPosition.y) else second = null
                     }
-                    if (drag == Drag.Lift) view.liftDrag(first.position.y, pushing = second == null)
+                    if (drag == Drag.Lift) view.liftDrag(first.position, pushing = second == null)
                     else view.selectDrag(first.position.y, pushing = second == null)
                     event.changes.forEach { it.consume() }
                 }
@@ -915,7 +1008,7 @@ private suspend fun PointerInputScope.timelineGestures(view: TimelineView, onLon
         }
         lifted = TimelineMath.released(last)
     } finally {
-        if (lifted && drag == null && !held) view.tap(hit)
+        if (lifted && (drag == null && !held || drag == Drag.Lift && hit is Hit.Bar && !view.liftMoved)) view.tap(hit)
         view.endDrag(drag, if (lifted) tracker.calculateVelocity() else Velocity.Zero, lifted)
     }
 }
@@ -932,9 +1025,10 @@ private fun DrawScope.drawTimeline(view: TimelineView, measurer: TextMeasurer, e
         for (row in view.visibleRows()) {
             val layer = view.layerAt(row) ?: continue
             if (layer.id == view.liftId) continue
-            drawRow(layer, layer.id == state.selectedId, view.shownTop(row, layer.id), time, stripe, measurer, if (layer.hidden) eyeOff else eye, outline, state.scene, state.frame, pictures[layer.id], view.keyFrames(layer), appear, view.keyFrame.takeIf { layer.id == view.keyId }, view.limitEdge.takeIf { layer.id == state.selectedId })
+            val rowTime = view.timeFor(layer.id, time)
+            drawRow(layer, layer.id == state.selectedId, view.shownTop(row, layer.id), rowTime, stripe, measurer, if (layer.hidden) eyeOff else eye, outline, state.scene, state.frame, pictures[layer.id], view.keyFrames(layer), appear, view.keyFrame.takeIf { layer.id == view.keyId }, view.limitEdge.takeIf { layer.id == state.selectedId })
             layer.mediaFill?.takeIf { it.video }?.let { proxies[it.uri] }?.let { done ->
-                drawProxyProgress(time.x(layer.startTime.toFloat()), time.x(layer.endTime + 1f), view.shownTop(row, layer.id), done)
+                drawProxyProgress(rowTime.x(layer.startTime.toFloat()), rowTime.x(layer.endTime + 1f), view.shownTop(row, layer.id), done)
             }
         }
     }
@@ -965,7 +1059,7 @@ private fun DrawScope.drawLifted(view: TimelineView, measurer: TextMeasurer, eye
             val step = LiftShadowStep.toPx()
             for (i in 1..4) drawRect(Color.Black, Offset(-i * step, top - i * step + step), Size(size.width + 2 * i * step, rowH + 2 * i * step), alpha = LIFT_SHADOW_ALPHA * amount)
             drawRect(Am.TimelineBg, Offset(0f, top), Size(size.width, rowH), alpha = amount)
-            drawRow(layer, id == state.selectedId, top, time, stripe, measurer, if (layer.hidden) eyeOff else eye, outline, state.scene, state.frame, pictures[id], view.keyFrames(layer), appear)
+            drawRow(layer, id == state.selectedId, top, view.timeFor(id, time), stripe, measurer, if (layer.hidden) eyeOff else eye, outline, state.scene, state.frame, pictures[id], view.keyFrames(layer), appear)
         }
     }
 }
