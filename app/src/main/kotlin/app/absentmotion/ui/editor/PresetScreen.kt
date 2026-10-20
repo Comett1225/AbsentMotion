@@ -241,7 +241,7 @@ private fun Scrubber(progress: Float, now: String, start: String, end: String, m
                     seek(down.position.x)
                     do {
                         val event = awaitPointerEvent()
-                        event.changes.first().let { seek(it.position.x); it.consume() }
+                        event.changes.firstOrNull { it.id == down.id }?.let { seek(it.position.x); it.consume() }
                     } while (event.changes.any { it.pressed })
                 }
             },
