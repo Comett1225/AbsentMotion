@@ -80,6 +80,19 @@ class UiContracts(unittest.TestCase):
         text = source('ui/home/NewProjectSheet.kt').split('private fun SheetBody', 1)[1]
         self.assertIn('.windowInsetsPadding(WindowInsets.navigationBars.union(WindowInsets.ime)).verticalScroll(rememberScrollState())', text)
 
+    def test_startup_open_and_save_stay_off_the_main_thread(self):
+        text = source('MainActivity.kt')
+        create = text.split('override fun onCreate', 1)[1].split('setContent {', 1)[0]
+        self.assertNotIn('ShapeCatalog.load(this)', create)
+        self.assertIn('lifecycleScope.launch(Dispatchers.IO) { ShapeCatalog.load(applicationContext) }', create)
+        self.assertIn('withContext(DiskThread.dispatcher) { runCatching { recovery.pending(store) }', create)
+        load = text.split('private suspend fun loadInBackground', 1)[1].split('private fun exportFromList', 1)[0]
+        self.assertIn('withContext(DiskThread.dispatcher)', load)
+        self.assertIn('withContext(Dispatchers.IO)', load)
+        self.assertIn('Log.i("AMStart", "onCreate took', text)
+        self.assertNotIn('store.save(', source('editor/EditorState.kt'))
+        self.assertIn('if (save) saver.commit(xml) else saver.draft(xml)', source('editor/EditorState.kt'))
+
     def test_settings_scroll_to_the_last_control(self):
         text = source('ui/home/SettingsDrawer.kt')
         self.assertIn('.statusBarsPadding().verticalScroll(rememberScrollState())', text)

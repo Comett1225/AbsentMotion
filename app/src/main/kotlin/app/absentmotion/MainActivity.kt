@@ -102,6 +102,7 @@ class MainActivity : ComponentActivity() {
     private var firstRun by mutableStateOf<FirstRun?>(null)
     private var opening by mutableStateOf(false)
     private var openFailed by mutableStateOf<String?>(null)
+    private var openJob: kotlinx.coroutines.Job? = null
     private var closeAnyway = false
     private var historyFor by mutableStateOf<Pair<String, String>?>(null)
     private var projectsChanged by mutableIntStateOf(0)
@@ -109,6 +110,7 @@ class MainActivity : ComponentActivity() {
     private var recovered by mutableStateOf<RecoveryOffer?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val started = SystemClock.elapsedRealtime()
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         followScreenSize(resources.configuration)
@@ -119,7 +121,7 @@ class MainActivity : ComponentActivity() {
         RecoveryHandler.install(recovery) { editor?.let { it.projectId to it.scene.toXml() } }
         lifecycleScope.launch { recovered = withContext(DiskThread.dispatcher) { runCatching { recovery.pending(store) }.getOrNull() } }
         lifecycleScope.launch { kotlinx.coroutines.delay(15_000); autoBackupIfDue(applicationContext, settings) }
-        ShapeCatalog.load(this)
+        lifecycleScope.launch(Dispatchers.IO) { ShapeCatalog.load(applicationContext) }
         app.absentmotion.editor.ElementNav.open = { id ->
             editor?.let { it.playing = false; it.endGesture(); it.saver.snapshot(it.scene.toXml()) }
             MultiSelect.clear()
@@ -179,13 +181,15 @@ class MainActivity : ComponentActivity() {
                         if (open.exportOpen) ExportScreen(open.scene, open.frame, engine, fromProjectList = false) { open.exportOpen = false }
                     }
                 }
-                if (opening) OpeningOverlay()
+                if (opening) OpeningOverlay { openJob?.cancel() }
                 openFailed?.let { id -> OpenFailedDialog({ openFailed = null; historyFor = id to "" }) { openFailed = null } }
                 if (open?.historyOpen == true) VersionHistory(store, open.projectId, open.scene.title, engine, onRestore = { restoreVersion(open.projectId, it) }) { open.historyOpen = false }
                 historyFor?.let { (id, title) -> VersionHistory(store, id, title, engine, onRestore = { restoreVersion(id, it) }) { historyFor = null } }
                 if (open == null && !opening) recovered?.let { offer -> RecoveryDialog(offer.title, onRestore = { answerRecovery(offer, true) }) { answerRecovery(offer, false) } }
             }
         }
+        Log.i("AMStart", "onCreate took ${SystemClock.elapsedRealtime() - started} ms")
+        androidx.core.view.OneShotPreDrawListener.add(window.decorView) { Log.i("AMStart", "first frame after ${SystemClock.elapsedRealtime() - started} ms") }
     }
 
 
@@ -237,19 +241,22 @@ class MainActivity : ComponentActivity() {
 
     private val migration by lazy { EffectMigration.read(applicationContext) }
 
-    private fun loadRelinked(id: String): Scene? = store.load(id)?.let { scene ->
-        migration.migrate(MediaRelink.relink(this, scene)).scene.also {
-            if (it != scene) try { store.save(id, it) } catch (e: java.io.IOException) { Log.e("AMStore", "cannot save the updated project $id", e) }
-        }
-    }
-
     private suspend fun loadInBackground(id: String): Scene? {
         opening = true
+        val started = SystemClock.elapsedRealtime()
         val scene = try {
-            withContext(DiskThread.dispatcher) {
+            val loaded = withContext(DiskThread.dispatcher) {
                 store.text(id)?.let { runCatching { store.versions.snapshot(id, it) } }
-                loadRelinked(id)
+                store.load(id)
             }
+            loaded?.let { scene ->
+                withContext(Dispatchers.IO) {
+                    ShapeCatalog.load(applicationContext)
+                    migration.migrate(MediaRelink.relink(this@MainActivity, scene)).scene.also {
+                        if (it != scene) try { store.save(id, it) } catch (e: java.io.IOException) { Log.e("AMStore", "cannot save the updated project $id", e) }
+                    }
+                }
+            }.also { Log.i("AMStart", "project $id loaded in ${SystemClock.elapsedRealtime() - started} ms") }
         } catch (e: kotlinx.coroutines.CancellationException) {
             throw e
         } catch (e: Throwable) {
@@ -264,12 +271,12 @@ class MainActivity : ComponentActivity() {
 
     private fun exportFromList(id: String) {
         if (opening) return
-        lifecycleScope.launch { exportingFromList = loadInBackground(id) }
+        openJob = lifecycleScope.launch { exportingFromList = loadInBackground(id) }
     }
 
     private fun open(id: String) {
         if (opening) return
-        lifecycleScope.launch { openNow(id) }
+        openJob = lifecycleScope.launch { openNow(id) }
     }
 
     private suspend fun openNow(id: String): EditorState? {
@@ -282,8 +289,8 @@ class MainActivity : ComponentActivity() {
     private fun collectMedia(id: String) {
         if (opening) return
         opening = true
-        lifecycleScope.launch {
-            val result = withContext(Dispatchers.IO) {
+        openJob = lifecycleScope.launch {
+            val result = try { withContext(Dispatchers.IO) {
                 runCatching {
                     store.load(id)?.let { scene ->
                         MediaKeeper(store, { uri -> contentResolver.openInputStream(Uri.parse(uri)) }).collect(id, MediaRelink.relink(this@MainActivity, scene)).also {
@@ -294,8 +301,7 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 }.onFailure { Log.e("AMStore", "cannot collect the media of $id", it) }.getOrNull()
-            }
-            opening = false
+            } } finally { opening = false }
             projectsChanged++
             val message = when {
                 result == null -> "Could not read this project."
@@ -330,11 +336,12 @@ class MainActivity : ComponentActivity() {
         val state = editor?.takeIf { it.projectId == id }
         state?.let { it.playing = false; it.endGesture(); it.historyOpen = false; opening = true }
         historyFor = null
-        lifecycleScope.launch {
-            val restored = withContext(DiskThread.dispatcher) {
-                runCatching { store.restore(id, version) }.onFailure { Log.e("AMStore", "cannot restore a version of $id", it) }.isSuccess
-            }
-            opening = false
+        openJob = lifecycleScope.launch {
+            val restored = try {
+                withContext(DiskThread.dispatcher) {
+                    runCatching { store.restore(id, version) }.onFailure { Log.e("AMStore", "cannot restore a version of $id", it) }.isSuccess
+                }
+            } finally { opening = false }
             projectsChanged++
             when {
                 !restored -> Toast.makeText(this@MainActivity, "Could not restore this version. Free some storage space.", Toast.LENGTH_LONG).show()
