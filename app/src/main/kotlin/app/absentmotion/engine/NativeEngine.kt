@@ -97,6 +97,8 @@ class NativeEngine(backend: Backend) : AutoCloseable {
 
         fun ease(easing: String, u: Float): Float = if (easing.isEmpty()) u else nativeEase(easing, floatArrayOf(u))[0]
 
+        fun fastCaptionCpu(): Boolean = nativeFastCaptionCpu()
+
         @JvmStatic private external fun nativeCreate(backend: Int): Long
         @JvmStatic private external fun nativeDestroy(engine: Long)
         @JvmStatic private external fun nativeInfo(engine: Long): String
@@ -127,6 +129,7 @@ class NativeEngine(backend: Backend) : AutoCloseable {
         @JvmStatic private external fun nativeRenderBuffer(engine: Long, buffer: HardwareBuffer, timeMs: Double, background: Int): Int
         @JvmStatic private external fun nativeReleaseBuffers(engine: Long)
         @JvmStatic private external fun nativeEase(easing: String, us: FloatArray): FloatArray
+        @JvmStatic private external fun nativeFastCaptionCpu(): Boolean
         @JvmStatic private external fun nativeLayerBounds(engine: Long, layerId: Long, timeMs: Double): FloatArray?
         @JvmStatic private external fun nativeLayerQuad(engine: Long, layerId: Long, timeMs: Double): FloatArray?
         @JvmStatic private external fun nativeLayerOutline(engine: Long, layerId: Long, timeMs: Double): String?

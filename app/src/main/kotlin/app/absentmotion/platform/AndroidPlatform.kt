@@ -159,7 +159,20 @@ fun effectsMessageOnHome() = false
 
 internal const val CAPTION_MODEL_NAME = "ggml-base-q5_1.bin"
 internal const val CAPTION_MODEL_BYTES = 59_707_625L
-internal fun loadCaptionLibrary() = System.loadLibrary("whisper_jni")
+internal fun loadCaptionLibrary() {
+    val fast = runCatching { app.absentmotion.engine.NativeEngine.fastCaptionCpu() }
+        .getOrElse { fastCaptionCpu(runCatching { java.io.File("/proc/cpuinfo").readText() }.getOrDefault("")) }
+    android.util.Log.i("AMCaptions", "caption library " + loadCaptionLibrary(fast, System::loadLibrary))
+}
+internal fun loadCaptionLibrary(fast: Boolean, load: (String) -> Unit): String {
+    if (fast) try { load("whisper_jni_fast"); return "whisper_jni_fast" } catch (_: UnsatisfiedLinkError) {}
+    load("whisper_jni")
+    return "whisper_jni"
+}
+internal fun fastCaptionCpu(cpuinfo: String): Boolean {
+    val cores = cpuinfo.lineSequence().filter { it.startsWith("Features") }.map { it.substringAfter(':').trim().split(Regex("\\s+")).toSet() }.toList()
+    return cores.isNotEmpty() && cores.all { it.containsAll(listOf("asimddp", "asimdhp", "fphp", "atomics", "asimdrdm", "crc32")) }
+}
 internal fun captionTextHeight(fonts: app.absentmotion.fonts.FontLibrary, text: String, font: String, size: Float, wrap: Int): Float {
     val paint = android.text.TextPaint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply { textSize = size * 3f; typeface = fonts.typeface(font) }
     return android.text.StaticLayout.Builder.obtain(text, 0, text.length, paint, wrap).setAlignment(android.text.Layout.Alignment.ALIGN_CENTER)

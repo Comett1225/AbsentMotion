@@ -68,6 +68,9 @@ internal suspend fun checkDevice(context: Context) {
             check(after.indices.any { it % 4 != 3 && after[it].toInt() != 0 })
             Log.i("AMDevice", "ok font import redraws nested preview text")
         } finally { if (imported.xml !in existing) fonts.deleteImported(imported.xml) }
+        val refused = runCatching { app.absentmotion.ai.Whisper.transcribe(File(root, "missing.bin"), FloatArray(16000), true) {} }.exceptionOrNull()
+        check(refused is IllegalStateException) { "Captions did not reject a missing model: $refused" }
+        Log.i("AMDevice", "ok the caption library loads and rejects a missing model")
         Log.i("AMDevice", "done")
     } finally {
         engine.close()
