@@ -72,12 +72,14 @@ private val TransformPattern = Regex("(matrix|translate|scale|rotate|skewX|skewY
 private val SelectorPattern = Regex("^([a-zA-Z][\\w-]*|\\*)?((?:[.#][\\w-]+)*)$")
 private const val Kappa = 0.5522848f
 private const val MaxShapes = 1000
+private const val MaxVisits = 100_000
 
 private fun numbers(text: String?): List<Float> = text?.let { NumberPattern.findAll(it).map { m -> m.value.toFloat() }.toList() } ?: emptyList()
 
 private class SvgReader(private val root: XmlNode) {
     val skipped = LinkedHashSet<UiText>()
     var shapeCount = 0
+    private var visits = 0
     private val ids = HashMap<String, XmlNode>()
     private val rules = ArrayList<CssRule>()
     private val counters = HashMap<String, Int>()
@@ -176,6 +178,7 @@ private class SvgReader(private val root: XmlNode) {
 
     private fun element(n: XmlNode, parent: Affine, inherited: Map<String, String>, depth: Int): SvgItem? {
         if (depth > 64) return null
+        if (++visits > MaxVisits) { skipped += txt(R.string.library_text_value, "parts repeated too many times"); return null }
         val tag = n.local
         when (tag) {
             "defs", "symbol", "style", "title", "desc", "metadata", "linearGradient", "radialGradient", "clipPath", "mask",
@@ -241,9 +244,9 @@ private class SvgReader(private val root: XmlNode) {
 
     private fun shape(n: XmlNode, tag: String, m: Affine, style: Map<String, String>, opacity: Float): SvgItem? {
         if (style["visibility"].let { it == "hidden" || it == "collapse" }) return null
+        if (shapeCount >= MaxShapes) { skipped += txt(R.string.model_svg_skipped_shapes, MaxShapes.toString()); return null }
         val local = geometry(n, tag).filter { c -> c.knots.isNotEmpty() && c.knots.all { it.p.x.isFinite() && it.p.y.isFinite() } }
         if (local.isEmpty()) return null
-        if (shapeCount >= MaxShapes) { skipped += txt(R.string.model_svg_skipped_shapes, MaxShapes.toString()); return null }
         val fill = if (tag == "line") null else paint(style["fill"] ?: "black", style, "fill-opacity", local, m)
         val strokePaint = paint(style["stroke"] ?: "none", style, "stroke-opacity", local, m)
         val width = length(style["stroke-width"], diagonal(), 1f) * m.scale

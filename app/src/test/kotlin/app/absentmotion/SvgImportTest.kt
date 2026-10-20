@@ -245,4 +245,18 @@ class SvgImportTest {
         assertNull(parseSvgColor("nonsense"))
         assertNull(parseSvgColor("#12"))
     }
+
+    @Test fun nestedUseFanOutStopsInsteadOfRunningForever() {
+        val defs = StringBuilder("<defs><g id=\"a0\"><path d=\"M0 0L1 1\" stroke=\"black\"/></g>")
+        for (i in 1..9) defs.append("<g id=\"a$i\">").append((1..10).joinToString("") { "<use href=\"#a${i - 1}\"/>" }).append("</g>")
+        defs.append("</defs>")
+        val svg = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"10\" height=\"10\">$defs<use href=\"#a9\"/></svg>"
+        var result: SvgImport? = null
+        val worker = Thread { result = importSvg(svg, "t", host, 0, 1000) }.apply { isDaemon = true; start() }
+        worker.join(15_000)
+        assertTrue("a ${svg.length}-byte SVG is still importing after 15 s", !worker.isAlive)
+        assertEquals(1000, result!!.shapes)
+        assertTrue(result!!.skipped.contains(txt(app.absentmotion.R.string.model_svg_skipped_shapes, "1000")))
+        assertTrue(result!!.skipped.contains(txt(app.absentmotion.R.string.library_text_value, "parts repeated too many times")))
+    }
 }
