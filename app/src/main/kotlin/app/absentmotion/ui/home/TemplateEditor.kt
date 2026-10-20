@@ -190,9 +190,10 @@ private fun clipScene(media: MediaDeclaration, fps: Int): Scene {
 fun TemplateEditor(templateId: String, engine: EngineThread, settings: AppSettings, onClose: () -> Unit, onContinue: (Scene) -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val template = remember(templateId) { TemplateStore(context).load(templateId) }
+    val loaded by produceState<Result<Scene?>?>(null, templateId) { value = Result.success(withContext(Dispatchers.IO) { TemplateStore(context).load(templateId) }) }
+    val template = loaded?.getOrNull()
     if (template == null) {
-        SideEffect(onClose)
+        if (loaded == null) Box(Modifier.fillMaxSize().background(Am.TopBar).pointerInput(Unit) {}) else SideEffect(onClose)
         return
     }
     val slots = remember(template) { slotsOf(template) }

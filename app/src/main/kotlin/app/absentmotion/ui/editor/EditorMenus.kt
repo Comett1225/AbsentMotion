@@ -273,6 +273,7 @@ internal fun CopyPasteMenu(state: EditorState, onDismiss: () -> Unit) {
     var styleOpen by remember { mutableStateOf(false) }
     var saved by remember { mutableStateOf<SavedPreset?>(null) }
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     saved?.let { PresetSavedDialog(it, PresetStore(context), onDismiss); return }
     MenuPopup(position, onDismiss) {
         MenuRow(stringResource(R.string.menu_select_all_layers), enabled = state.scene.layers.isNotEmpty(), icon = ChromeIcons.SelectAll) {
@@ -286,8 +287,16 @@ internal fun CopyPasteMenu(state: EditorState, onDismiss: () -> Unit) {
             onDismiss()
         }
         MenuRow(stringResource(R.string.menu_save_preset), enabled = layer != null && canSavePreset(layer), icon = ChromeIcons.SavePreset) {
-            saved = runCatching { state.savePreset(PresetStore(context)) }.getOrNull()
-            if (saved == null) onDismiss()
+            scope.launch {
+                saved = try {
+                    state.savePreset(PresetStore(context))
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    null
+                }
+                if (saved == null) onDismiss()
+            }
         }
         MenuRow(
             pluralStringResource(R.plurals.menu_copy_layers, count, count.toString()), enabled = count > 0, icon = ChromeIcons.Copy,

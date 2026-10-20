@@ -135,12 +135,12 @@ private fun VersionRow(version: ProjectVersions.Version, engine: EngineThread, o
 
 private suspend fun versionThumbnail(version: ProjectVersions.Version, engine: EngineThread): ImageBitmap? = try {
     val png = version.thumbnail
-    if (!png.exists()) {
-        val xml = withContext(Dispatchers.IO) { version.file.readText() }
-        val scene = Scene.parse(xml)
+    val missing = withContext(Dispatchers.IO) { if (png.exists()) null else version.file.readText().let { it to Scene.parse(it) } }
+    if (missing != null) {
+        val (xml, scene) = missing
         val long = maxOf(scene.width, scene.height, 1)
         val temp = File(png.parentFile, png.name + ".tmp")
-        if (engine.stillPng(xml, scene.totalTime / 2, (160 * scene.width / long).coerceAtLeast(1), (160 * scene.height / long).coerceAtLeast(1), temp)) temp.renameTo(png)
+        if (engine.stillPng(xml, scene.totalTime / 2, (160 * scene.width / long).coerceAtLeast(1), (160 * scene.height / long).coerceAtLeast(1), temp)) withContext(Dispatchers.IO) { temp.renameTo(png) }
     }
     withContext(Dispatchers.IO) { BitmapFactory.decodeFile(png.path)?.asImageBitmap() }
 } catch (e: CancellationException) {

@@ -12,6 +12,8 @@ import app.absentmotion.model.withKeyframes
 import app.absentmotion.model.withVideoSpeedMap
 import app.absentmotion.R
 import app.absentmotion.i18n.AppText
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 private val STYLED = setOf("shape", "text", "drawing", "embedScene")
 private val STROKED = setOf("shape", "text")
@@ -38,9 +40,10 @@ fun presetScene(scene: Scene, layer: Layer, title: String): Scene {
     return Scene(base.node.with("type", "preset").with("ffver", "107")).add(flat.withHidden(false))
 }
 
-fun EditorState.savePreset(store: PresetStore): SavedPreset? {
+suspend fun EditorState.savePreset(store: PresetStore): SavedPreset? {
     val layer = selected?.takeIf { canSavePreset(it) } ?: return null
-    return store.load(store.save(presetScene(scene, layer, presetTitle(layer, store.list().map { it.title }))))
+    val scene = scene
+    return withContext(Dispatchers.IO) { store.load(store.save(presetScene(scene, layer, presetTitle(layer, store.list().map { it.title })))) }
 }
 
 fun EditorState.applyPreset(preset: SavedPreset) {
