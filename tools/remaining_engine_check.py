@@ -81,6 +81,9 @@ def cases():
             + '<scene width="200" height="200" fps="30" totalTime="1000" retime="off">' + engine.rect(2, 100, 100, 100, 100, 0xffff0000)
             + engine.rect(3, 175, 100, 10, 100, 0xff0000ff) + '</scene></embedScene>')
     yield 'a pinch pulls the picture in without folding what lies past its radius back inside', engine.scene(band), [((124, 100), engine.RED), ((175, 100), engine.BLUE), ((100, 100), engine.RED)]
+    dissolve = lambda strength: engine.scene(engine.rect(1, 100, 100, 100, 100, 0xffffffff, extra=fx('blockdissolve', strength=strength, fade=0.5, blockSize=20)))
+    yield 'block dissolve with a fade keeps every block at strength 0', dissolve(0), [((xy, xy), (255, 255, 255)) for xy in (30, 70, 110, 150, 190)]
+    yield 'block dissolve with a fade removes every block at strength 1', dissolve(1), [((xy, xy), engine.BLACK) for xy in (30, 70, 110, 150, 190)]
 
 
 def models():
