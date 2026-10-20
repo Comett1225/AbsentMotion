@@ -3,7 +3,9 @@ package app.absentmotion
 import androidx.core.content.FileProvider
 import android.content.ClipData
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.content.pm.ApplicationInfo
+import android.content.res.Configuration
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
@@ -21,7 +23,11 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import app.absentmotion.ui.editor.LocalWide
+import app.absentmotion.ui.editor.isTablet
+import app.absentmotion.ui.editor.wideEditor
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.runtime.getValue
@@ -81,6 +87,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        followScreenSize(resources.configuration)
         store = ProjectStore(this)
         settings = AppSettings(this)
         templates = TemplateStore(this)
@@ -130,7 +137,12 @@ class MainActivity : ComponentActivity() {
                     Box(Modifier.fillMaxSize()) {
                         val embed = EmbedRequest.templateId
                         if (embed != null) TemplateEditor(embed, engine, settings, onClose = { endEmbed(open) }) { scene -> embedTemplate(open, scene) }
-                        else EditorScreen(open, onExit = ::closeEditor)
+                        else {
+                            val screen = LocalConfiguration.current
+                            CompositionLocalProvider(LocalWide provides wideEditor(screen.smallestScreenWidthDp, screen.screenWidthDp)) {
+                                EditorScreen(open, onExit = ::closeEditor)
+                            }
+                        }
                         if (open.exportOpen) ExportScreen(open.scene, open.frame, engine, fromProjectList = false) { open.exportOpen = false }
                     }
                 }
@@ -343,6 +355,16 @@ class MainActivity : ComponentActivity() {
                 Log.e("AMExport", "failed", e)
             }
         }
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        followScreenSize(newConfig)
+    }
+
+    private fun followScreenSize(config: Configuration) {
+        val wanted = if (isTablet(config.smallestScreenWidthDp)) ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED else ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        if (requestedOrientation != wanted) requestedOrientation = wanted
     }
 
     override fun onNewIntent(intent: Intent) {

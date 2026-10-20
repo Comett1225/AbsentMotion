@@ -8,11 +8,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -31,7 +34,9 @@ import app.absentmotion.ui.theme.enterFade
 
 val LocalWide = compositionLocalOf { false }
 
-val WideMinWidth = 900.dp
+fun isTablet(smallestWidthDp: Int): Boolean = smallestWidthDp >= 600
+
+fun wideEditor(smallestWidthDp: Int, widthDp: Int): Boolean = isTablet(smallestWidthDp) && widthDp >= 840
 
 val PhoneWidth = 384.dp
 val PhoneHeight = 832.dp
@@ -42,7 +47,7 @@ private val SideWidth = 420.dp
 
 @Composable
 internal fun WideEditorBody(state: EditorState, onExit: () -> Unit, addLibrary: AddLibrary) {
-    BoxWithConstraints(Modifier.fillMaxSize().background(Am.TopBar)) {
+    BoxWithConstraints(Modifier.fillMaxSize().background(Am.TopBar).systemBarsPadding().displayCutoutPadding()) {
         val timeline = (maxHeight - 88.dp - 260.dp).coerceIn(140.dp, 320.dp)
         Column(Modifier.fillMaxSize()) {
             EditorTopBar(state, onExit, Modifier.fillMaxWidth().height(42.dp).enterFade())
@@ -54,7 +59,7 @@ internal fun WideEditorBody(state: EditorState, onExit: () -> Unit, addLibrary: 
                 Box(Modifier.width(SideWidth).fillMaxHeight().background(Am.TimelineBg)) { LowerPanels(state, addLibrary, top = true) }
             }
             Box(Modifier.fillMaxWidth().height(46.dp).background(Am.TimelineBg)) {
-                PlayBar(state, Modifier.align(Alignment.Center).width(560.dp).fillMaxHeight())
+                PlayBar(state, Modifier.align(Alignment.Center).widthIn(max = 560.dp).fillMaxSize())
                 LevelMeter(state, Modifier.align(Alignment.BottomStart).fillMaxWidth().height(2.1.dp))
             }
             Timeline(state, Modifier.fillMaxWidth().height(timeline).background(Am.TimelineBg))
@@ -68,7 +73,7 @@ fun PhoneScreen(content: @Composable () -> Unit) {
         content()
         return
     }
-    Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.6f)).pointerInput(Unit) {}.padding(24.dp), contentAlignment = Alignment.Center) {
+    Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.6f)).pointerInput(Unit) {}.systemBarsPadding().padding(24.dp), contentAlignment = Alignment.Center) {
         BoxWithConstraints(Modifier.sizeIn(maxWidth = PhoneWidth * 1.2f, maxHeight = PhoneHeight * 1.2f), contentAlignment = Alignment.Center) {
             val fit = minOf(maxWidth / PhoneWidth, maxHeight / PhoneHeight)
             val density = LocalDensity.current
