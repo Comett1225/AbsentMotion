@@ -95,6 +95,12 @@
     "rasterextrude": {"photo": "colour", "under": "grid", "params": {"rotY": [-35, 325], "scale": 0.7}, "animate": 16},
     "flip": {"photo": "colour", "under": "grid", "params": {"rotY": [0, 360], "scale": 0.75}, "animate": 16},
     "spherize": {"photo": "colour", "under": "grid", "params": {"rotY": [0, 360], "scale": 0.75}, "animate": 16},
-    "tunnel": {"photo": "colour", "params": {"speed": 1.5}, "animate": 16}
+    "tunnel": {"photo": "colour", "params": {"speed": 1.5}, "animate": 16},
+    "repeat": {"photo": "colour", "layout": "repeat", "params": {"count": 12, "offset": [52, 0], "angle": [25, 45], "scale": 0.9, "alpha": 0.15}, "animate": 16},
+    "linearrepeat": {"photo": "colour", "layout": "repeat", "params": {"count": 5, "position": [250, 250], "fillColor": "#7a3cc8", "fillAmount": 0.6, "rangeScale": 0.6}},
+    "radialrepeat": {"photo": "colour", "layout": "repeat", "params": {"radius": 125, "angle": [0, 45], "fillColor": "#7a3cc8", "fillAmount": 0.5}, "animate": 16},
+    "gridrepeat": {"photo": "colour", "layout": "repeat", "params": {"count": 4, "position": [270, 270], "fillColor": "#7a3cc8", "fillAmount": 0.7}},
+    "repeatalongpath": {"photo": "colour", "layout": "repeat", "path": [".circle", 125], "params": {"count": 10, "tangent": true, "phase": [0, 0.1], "rangeScale": 0.5}, "animate": 16},
+    "scatterfield": {"photo": "colour", "layout": "repeat", "params": {"z": [0, 160], "density": 0.4}, "animate": 16}
   }
 }

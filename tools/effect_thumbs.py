@@ -119,7 +119,14 @@ def layer(id, image, effect="", half=RENDER // 2, keys=None, end=999):
 
 
 def backdrops(show):
-    return ["grid"] if show.get("layout") == "move" else [show["under"]] if "under" in show else []
+    return ["grid"] if show.get("layout") in ("move", "repeat") else [show["under"]] if "under" in show else []
+
+
+def path_layer(show, end):
+    c, (shape, half) = RENDER // 2, show["path"]
+    return (f'<shape id="4" label="path" startTime="0" endTime="{end}" fillType="none" s="{shape}"><transform>'
+            f'<location value="{c},{c},0"/></transform><property name="size" type="vec2" value="{half},{half}"/>'
+            '<path-stroke><color value="#66ffffff"/><size value="3"/></path-stroke></shape>')
 
 
 def scene(show, effect):
@@ -133,8 +140,10 @@ def scene(show, effect):
         fx = f'<effect id="absent.{effect["id"]}" hidden="false">' + "".join(prop(p, params[p["id"]]) for p in effect["params"]) + "</effect>"
     fps, total = (ANIM_FPS, round(show["animate"] * 1000 / ANIM_FPS)) if "animate" in show else (30, 1000)
     layers = [layer(1, name, end=total - 1) for name in backdrops(show)]
-    move = show.get("layout") == "move"
-    layers.append(layer(2, show["photo"], fx, RENDER // 4 if move else RENDER // 2, show.get("keys"), total - 1))
+    if "path" in show:
+        layers.append(path_layer(show, total - 1))
+    half = {"move": RENDER // 4, "repeat": RENDER // 12}.get(show.get("layout"), RENDER // 2)
+    layers.append(layer(2, show["photo"], fx, half, show.get("keys"), total - 1))
     if "split" in show:
         layers.append(layer(3, f'{show["photo"]}-before{round(show["split"] * 100)}', end=total - 1))
     return (f'<scene title="thumb" width="{RENDER}" height="{RENDER}" fps="{fps}" totalTime="{total}" bgcolor="#00000000">'
@@ -246,7 +255,8 @@ def main():
                 pushed.add(name)
         animated = show.get("animate", 0)
         frames = list(range(animated)) if animated else show.get("frames", [show.get("frame", 0)])
-        base = (show["photo"], show.get("under"), show.get("split"), tuple(frames), show.get("layout"), json.dumps(show.get("keys")), animated)
+        base = (show["photo"], show.get("under"), show.get("split"), tuple(frames), show.get("layout"), json.dumps(show.get("keys")), animated,
+                json.dumps(show.get("path")))
         if base not in plain:
             plain[base] = batch.add(f"plain{len(plain)}", scene(show, None), frames)
         effect = json.loads((PACK / f"{key}.json").read_text())

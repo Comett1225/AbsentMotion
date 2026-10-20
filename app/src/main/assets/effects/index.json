@@ -83,5 +83,11 @@
  "rasterextrude",
  "flip",
  "spherize",
- "tunnel"
+ "tunnel",
+ "repeat",
+ "linearrepeat",
+ "radialrepeat",
+ "gridrepeat",
+ "repeatalongpath",
+ "scatterfield"
 ]

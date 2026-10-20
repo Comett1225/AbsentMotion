@@ -11,6 +11,8 @@
 #include "easing.h"
 #include "xml.h"
 #include "include/core/SkM44.h"
+#include "include/core/SkBlendMode.h"
+#include "include/core/SkColor.h"
 #include "include/core/SkMatrix.h"
 #include "include/core/SkPath.h"
 #include "include/core/SkImage.h"
@@ -111,7 +113,7 @@ struct Layer {
     std::string label, shape, fillType;
     std::string mediaUri, mediaFillMode;
     int startTime = 0, endTime = 0;
-    bool hidden = false;
+    bool hidden = false, video = false;
     Anim location, pivot, scale, rotation, skew, opacity, fillColor, tilt;
     std::vector<Property> props;
     std::vector<LayerEffect> effects;
@@ -180,6 +182,25 @@ void ApplyMotion(const Layer& layer, double timeMs, Placement* placement);
 float MotionOpacity(const Layer& layer, double timeMs);
 bool EchoOf(const Layer& layer, double timeMs, Echo* echo);
 void ParseSteps(Layer* layer);
+
+struct Copy {
+    SkMatrix outer = SkMatrix::I(), local = SkMatrix::I();
+    double shiftMs = 0;
+    float alpha = 1, tinted = 0;
+    SkColor4f tint = {1, 1, 1, 1};
+    SkBlendMode tintMode = SkBlendMode::kSrcIn, mode = SkBlendMode::kSrcOver;
+};
+
+struct RepeatSpace {
+    SkPoint anchor = {0, 0};
+    SkPath below;
+    float width = 0, height = 0, radius = 0;
+};
+
+bool RepeatEffect(const std::string& id);
+bool HasRepeat(const Layer& layer);
+bool RepeatsAlongPath(const Layer& layer);
+void RepeatCopies(const Layer& layer, double timeMs, const RepeatSpace& space, std::vector<Copy>* copies);
 
 struct Scene {
     int width = 0, height = 0, fps = 30, totalTime = 0;

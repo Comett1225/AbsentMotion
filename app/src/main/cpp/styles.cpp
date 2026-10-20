@@ -9,6 +9,7 @@
 
 #include "include/core/SkBlender.h"
 #include "include/core/SkCanvas.h"
+#include "include/core/SkColorFilter.h"
 #include "include/core/SkPaint.h"
 #include "include/core/SkPathBuilder.h"
 #include "include/core/SkPathMeasure.h"
@@ -502,52 +503,146 @@ SkPaint FillPaint(SkColor4f color) {
     return p;
 }
 
+struct LayerCopy {
+    SkMatrix scene;
+    double timeMs;
+    Copy look;
+};
+
+std::vector<LayerCopy> CopiesOf(const std::vector<Layer>& siblings, const Layer& l, double timeMs, int width, int height) {
+    const float t = l.localTime(timeMs);
+    const SkMatrix m = SiblingMatrix(siblings, l, timeMs);
+    RepeatSpace space;
+    space.anchor = m.mapPoint({l.pivot.get(0, t, 0), l.pivot.get(1, t, 0)});
+    space.width = (float)width;
+    space.height = (float)height;
+    const SkRect box = ShapePath(l, t).makeTransform(m).getBounds();
+    space.radius = std::max({std::fabs(box.left() - space.anchor.fX), std::fabs(box.right() - space.anchor.fX),
+                             std::fabs(box.top() - space.anchor.fY), std::fabs(box.bottom() - space.anchor.fY)}) * 1.415f;
+    if (RepeatsAlongPath(l)) {
+        const Layer* below = nullptr;
+        for (size_t i = 1; i < siblings.size(); i++) {
+            if (&siblings[i] == &l || siblings[i].id == l.id) { below = &siblings[i - 1]; break; }
+        }
+        if (below && below->kind != "nullobj" && below->kind != "camera") {
+            const float tb = below->localTime(timeMs);
+            space.below = (below->text ? TextGlyphPath(*below) : ShapePath(*below, tb)).makeTransform(SiblingMatrix(siblings, *below, timeMs));
+        }
+    }
+    std::vector<Copy> copies;
+    RepeatCopies(l, timeMs, space, &copies);
+    std::vector<LayerCopy> out;
+    out.reserve(copies.size());
+    double at = timeMs;
+    SkMatrix matrix = m, inverse;
+    bool invertible = m.invert(&inverse);
+    for (const Copy& c : copies) {
+        const double when = std::clamp(timeMs + c.shiftMs, (double)l.startTime, (double)l.endTime);
+        if (when != at) {
+            at = when;
+            matrix = SiblingMatrix(siblings, l, when);
+            invertible = matrix.invert(&inverse);
+        }
+        if (!invertible) continue;
+        out.push_back({c.outer * matrix * c.local * inverse, when, c});
+    }
+    return out;
+}
+
+struct Drawn {
+    bool fill = false;
+    SkPath stroked;
+};
+
+Drawn DrawBody(SkCanvas* canvas, const Layer& l, double timeMs, float t, const SkMatrix& m, const SkPath& path, float alpha,
+               const MediaPictures& pictures) {
+    Drawn drawn;
+    if (l.kind == "model") {
+        DrawModel(canvas, l, timeMs, alpha, pictures);
+        return drawn;
+    }
+    const SkColor4f fill = ColorAt(l.fillColor, t, kWhite, alpha);
+    canvas->save();
+    canvas->concat(m);
+    if (l.kind == "embedScene") {
+        DrawGroup(canvas, l, timeMs, pictures);
+        canvas->restore();
+        return drawn;
+    }
+    if (l.kind == "drawing") {
+        drawn.fill = !l.strokes.empty();
+        DrawDrawing(canvas, l, alpha);
+    } else if (l.fillType == "color") {
+        drawn.fill = fill.fA > 0;
+        if (l.text) DrawText(canvas, l, t, FillPaint(fill));
+        else canvas->drawPath(path, FillPaint(fill));
+    } else if (l.fillType == "media" || l.fillType == "gradient") {
+        drawn.fill = true;
+        canvas->save();
+        if (l.text) canvas->clipPath(TextGlyphPath(l), true);
+        if (l.fillType == "media") {
+            DrawMedia(canvas, l, path, alpha, pictures);
+        } else {
+            SkPaint paint;
+            paint.setAntiAlias(true);
+            paint.setShader(GradientShader(l.gradient, path.getBounds(), alpha));
+            if (paint.getShader()) canvas->drawPath(path, paint);
+        }
+        canvas->restore();
+    }
+    canvas->restore();
+    if (l.stroke.present && l.stroke.enabled) drawn.stroked = DrawStroke(canvas, l, path.makeTransform(m), t, alpha);
+    return drawn;
+}
+
+bool SelfOverlaps(const Layer& l) {
+    return l.kind == "drawing" || l.kind == "embedScene" || l.kind == "model" || (l.stroke.present && l.stroke.enabled);
+}
+
 void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& l, double timeMs, float alpha,
-                 bool decorate, const MediaPictures& pictures) {
+                 bool decorate, const MediaPictures& pictures, const std::vector<LayerCopy>* copies) {
     const float t = l.localTime(timeMs);
     const SkMatrix m = SiblingMatrix(siblings, l, timeMs);
     const SkPath path = ShapePath(l, t);
-    const SkColor4f fill = ColorAt(l.fillColor, t, kWhite, alpha);
-    bool hasFill = false;
-    SkPath stroked;
+    Drawn drawn;
     const SkPath scenePath = path.makeTransform(m);
     auto picture = [&](SkCanvas* canvas) {
-        if (l.kind == "model") return DrawModel(canvas, l, timeMs, alpha, pictures);
-        canvas->save();
-        canvas->concat(m);
-        if (l.kind == "embedScene") {
-            DrawGroup(canvas, l, timeMs, pictures);
-            canvas->restore();
+        if (!copies) {
+            drawn = DrawBody(canvas, l, timeMs, t, m, path, alpha, pictures);
             return;
         }
-        if (l.kind == "drawing") {
-            hasFill = !l.strokes.empty();
-            DrawDrawing(canvas, l, alpha);
-        } else if (l.fillType == "color") {
-            hasFill = fill.fA > 0;
-            if (l.text) DrawText(canvas, l, t, FillPaint(fill));
-            else canvas->drawPath(path, FillPaint(fill));
-        } else if (l.fillType == "media" || l.fillType == "gradient") {
-            hasFill = true;
+        const float room = l.stroke.present && l.stroke.enabled ? l.stroke.size.get(0, t, 0) * std::max(l.stroke.endSize, 1.0f) * 3 + 2 : 2;
+        for (const LayerCopy& c : *copies) {
+            const bool now = c.timeMs == timeMs;
+            const float tc = now ? t : l.localTime(c.timeMs);
+            const SkMatrix mc = now ? m : SiblingMatrix(siblings, l, c.timeMs);
+            const SkPath pc = now ? path : ShapePath(l, tc);
+            const bool tinted = c.look.tinted > 0;
+            const bool layered = tinted || c.look.mode != SkBlendMode::kSrcOver || (c.look.alpha < 1 && SelfOverlaps(l));
             canvas->save();
-            if (l.text) canvas->clipPath(TextGlyphPath(l), true);
-            if (l.fillType == "media") {
-                DrawMedia(canvas, l, path, alpha, pictures);
-            } else {
+            canvas->concat(c.scene);
+            if (layered) {
                 SkPaint paint;
-                paint.setAntiAlias(true);
-                paint.setShader(GradientShader(l.gradient, path.getBounds(), alpha));
-                if (paint.getShader()) canvas->drawPath(path, paint);
+                paint.setAlphaf(c.look.alpha);
+                paint.setBlendMode(c.look.mode);
+                if (tinted) paint.setColorFilter(SkColorFilters::Lerp(c.look.tinted, nullptr, SkColorFilters::Blend(c.look.tint, nullptr, c.look.tintMode)));
+                const SkRect bounds = l.kind == "embedScene" || l.text ? SkRect::MakeEmpty() : pc.makeTransform(mc).getBounds().makeOutset(room, room);
+                canvas->saveLayer(bounds.isEmpty() ? nullptr : &bounds, &paint);
             }
+            const Drawn d = DrawBody(canvas, l, c.timeMs, tc, mc, pc, layered ? alpha : alpha * c.look.alpha, pictures);
+            if (layered) canvas->restore();
             canvas->restore();
+            if (now) drawn = d;
         }
-        canvas->restore();
-        if (l.stroke.present && l.stroke.enabled) stroked = DrawStroke(canvas, l, scenePath, t, alpha);
     };
     const bool effects = EffectsApply(siblings, l);
     if (!effects || !gEffects->draw(canvas, *gScene, l, timeMs, scenePath.getBounds(), picture)) picture(canvas);
     if (effects && gEffects->lifted(l) && !scenePath.isEmpty()) {
         SkPath outside = scenePath;
+        if (copies) {
+            outside.reset();
+            for (const LayerCopy& c : *copies) outside = Union(outside, scenePath.makeTransform(c.scene));
+        }
         outside.toggleInverseFillType();
         SkPaint clear;
         clear.setAntiAlias(true);
@@ -556,11 +651,17 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
     }
     if (!decorate) return;
     if (l.kind == "embedScene") return DrawGroupBorders(canvas, l, t);
-    SkPath region = hasFill ? (l.text ? TextGlyphPath(l).makeTransform(m) : l.kind == "drawing" ? DrawingOutline(l).makeTransform(m) : scenePath) : SkPath();
-    region = Union(region, stroked);
+    if (copies) {
+        drawn.fill = l.kind == "drawing" ? !l.strokes.empty() : l.fillType == "color" ? ColorAt(l.fillColor, t, kWhite, alpha).fA > 0 : l.fillType == "media" || l.fillType == "gradient";
+        if (l.stroke.present && l.stroke.enabled) drawn.stroked = DrawStroke(nullptr, l, scenePath, t, alpha);
+    }
+    SkPath region = drawn.fill ? (l.text ? TextGlyphPath(l).makeTransform(m) : l.kind == "drawing" ? DrawingOutline(l).makeTransform(m) : scenePath) : SkPath();
+    region = Union(region, drawn.stroked);
     if (region.isEmpty()) return;
     for (const Edge& e : l.borders) {
-        if (ShaderBorder(l, e, t)) DrawBorder(canvas, region, e, t);
+        if (!ShaderBorder(l, e, t)) continue;
+        if (!copies) DrawBorder(canvas, region, e, t);
+        else for (const LayerCopy& c : *copies) DrawBorder(canvas, region.makeTransform(c.scene), e, t);
     }
 }
 
@@ -634,7 +735,9 @@ void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& 
     decorated = decorated || shadow || EffectsApply(siblings, l);
     const bool blended = ov.blend || !IsNormal(l.blending);
     const bool centred = ShapeKind(l) && std::any_of(l.borders.begin(), l.borders.end(), [](const Edge& e) { return e.enabled && e.direction == "centered"; });
-    const bool overlaps = l.kind == "drawing" || l.kind == "model" || (l.stroke.present && l.stroke.enabled) || centred;
+    const bool repeated = HasRepeat(l);
+    const std::vector<LayerCopy> copies = repeated ? CopiesOf(siblings, l, timeMs, gScene ? gScene->width : 0, gScene ? gScene->height : 0) : std::vector<LayerCopy>();
+    const bool overlaps = l.kind == "drawing" || l.kind == "model" || (l.stroke.present && l.stroke.enabled) || centred || repeated;
     auto centredBorders = [&](float alpha) {
         if (!centred) return;
         const SkPath scenePath = ShapePath(l, t).makeTransform(SiblingMatrix(siblings, l, timeMs));
@@ -647,11 +750,12 @@ void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& 
             paint.setStrokeWidth(size);
             paint.setStrokeCap(SkPaint::kRound_Cap);
             paint.setStrokeJoin(SkPaint::kBevel_Join);
-            canvas->drawPath(scenePath, paint);
+            if (!repeated) canvas->drawPath(scenePath, paint);
+            else for (const LayerCopy& c : copies) canvas->drawPath(scenePath.makeTransform(c.scene), paint);
         }
     };
     if (!group && !decorated && !blended && (opacity >= 1 || !overlaps)) {
-        DrawContent(canvas, siblings, l, timeMs, opacity, false, pictures);
+        DrawContent(canvas, siblings, l, timeMs, opacity, false, pictures, repeated ? &copies : nullptr);
         centredBorders(opacity);
     } else {
         SkPaint layerPaint;
@@ -667,7 +771,7 @@ void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& 
         }
         const bool lifted = EffectsApply(siblings, l) && gEffects->lifted(l);
         canvas->saveLayer(SkCanvas::SaveLayerRec(nullptr, &layerPaint, lifted ? SkCanvas::kInitWithPrevious_SaveLayerFlag : 0));
-        DrawContent(canvas, siblings, l, timeMs, 1, decorated, pictures);
+        DrawContent(canvas, siblings, l, timeMs, 1, decorated, pictures, repeated ? &copies : nullptr);
         centredBorders(1);
         canvas->restore();
     }
@@ -735,8 +839,19 @@ void ParseStyle(const XmlNode& n, Layer* l) {
     }
 }
 
-static bool Contains(const std::vector<Layer>& siblings, const Layer& l, double timeMs, SkPoint p) {
+static bool ContainsOne(const std::vector<Layer>& siblings, const Layer& l, double timeMs, SkPoint p);
+
+static bool Contains(const std::vector<Layer>& siblings, const Layer& l, double timeMs, SkPoint p, int width, int height) {
     if (!l.activeAt(timeMs) || l.kind == "nullobj" || l.kind == "camera") return false;
+    if (!HasRepeat(l)) return ContainsOne(siblings, l, timeMs, p);
+    for (const LayerCopy& c : CopiesOf(siblings, l, timeMs, width, height)) {
+        SkMatrix inverse;
+        if (c.scene.invert(&inverse) && ContainsOne(siblings, l, c.timeMs, inverse.mapPoint(p))) return true;
+    }
+    return false;
+}
+
+static bool ContainsOne(const std::vector<Layer>& siblings, const Layer& l, double timeMs, SkPoint p) {
     const SkMatrix matrix = SiblingMatrix(siblings, l, timeMs);
     SkMatrix inverse;
     if (!matrix.invert(&inverse)) return false;
@@ -753,7 +868,7 @@ static bool Contains(const std::vector<Layer>& siblings, const Layer& l, double 
     if (!SkRect::MakeWH(l.innerWidth, l.innerHeight).contains(inner.fX, inner.fY)) return false;
     const double innerTime = NestedTime(l, timeMs);
     for (auto it = l.children.rbegin(); innerTime >= 0 && it != l.children.rend(); ++it) {
-        if (Contains(l.children, *it, innerTime, inner)) return true;
+        if (Contains(l.children, *it, innerTime, inner, l.innerWidth, l.innerHeight)) return true;
     }
     return false;
 }
@@ -765,7 +880,7 @@ static const std::vector<Layer>& SeenProject(const Scene& scene, double timeMs, 
 bool HitLayer(const Scene& scene, const Layer& layer, double timeMs, float x, float y) {
     std::vector<Layer> storage;
     const std::vector<Layer>& list = SeenProject(scene, timeMs, &storage);
-    for (const Layer& l : list) if (l.id == layer.id) return Contains(list, l, timeMs, {x, y});
+    for (const Layer& l : list) if (l.id == layer.id) return Contains(list, l, timeMs, {x, y}, scene.width, scene.height);
     return false;
 }
 
@@ -773,7 +888,7 @@ int64_t TopLayerAt(const Scene& scene, double timeMs, float x, float y) {
     std::vector<Layer> storage;
     const std::vector<Layer>& list = SeenProject(scene, timeMs, &storage);
     for (auto it = list.rbegin(); it != list.rend(); ++it) {
-        if (Contains(list, *it, timeMs, {x, y})) return it->id;
+        if (Contains(list, *it, timeMs, {x, y}, scene.width, scene.height)) return it->id;
     }
     return 0;
 }
@@ -791,7 +906,7 @@ Placement EffectivePlacement(const std::vector<Layer>& siblings, const Layer& la
 
 namespace {
 
-bool Shared(const LayerEffect& e) { return e.toChildren && !e.hidden && !MotionEffect(e.id); }
+bool Shared(const LayerEffect& e) { return e.toChildren && !e.hidden && !MotionEffect(e.id) && !RepeatEffect(e.id); }
 
 bool InheritEffects(const std::vector<Layer>& layers, std::vector<Layer>* out) {
     if (std::none_of(layers.begin(), layers.end(), [](const Layer& l) { return std::any_of(l.effects.begin(), l.effects.end(), Shared); }))
