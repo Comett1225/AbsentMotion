@@ -1212,6 +1212,9 @@
 
     <string name="transition_title">Transition</string>
     <string name="transition_add_between">Add a transition between the two clips</string>
+    <string name="transition_needs_two">Select two clips to add a transition between them.</string>
+    <string name="transition_needs_visual">Sound, camera and null layers cannot have transitions.</string>
+    <string name="transition_needs_order">No cut here: one clip must start and end later than the other.</string>
     <string name="transition_clip">Clip</string>
     <string name="transition_second_clip">the second clip</string>
     <string name="transition_moved">Moved “%1$s” %2$s earlier so the clips overlap.</string>

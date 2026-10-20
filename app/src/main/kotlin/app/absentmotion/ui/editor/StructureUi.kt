@@ -59,6 +59,7 @@ import android.net.Uri
 import android.provider.OpenableColumns
 import android.util.Log
 import android.widget.Toast
+import app.absentmotion.model.canAnimate
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.ui.platform.LocalContext
@@ -207,8 +208,14 @@ internal fun MultiBar(state: EditorState, modifier: Modifier) {
             state.moveClipEdges(end, false)
         }
         Spacer(Modifier.weight(1f))
-        BarButton(ChromeIcons.Transition, stringResource(R.string.transition_add_between), Modifier.width(48.dp).fillMaxHeight(), cut != null) {
-            cut?.let { (a, b) -> state.playing = false; transition = a.id to b.id }
+        val context = LocalContext.current
+        BarButton(ChromeIcons.Transition, stringResource(R.string.transition_add_between), Modifier.width(48.dp).fillMaxHeight().alpha(if (cut != null) 1f else DimAlpha)) {
+            if (cut != null) { state.playing = false; transition = cut.first.id to cut.second.id }
+            else Toast.makeText(context, context.getString(when {
+                layers.size != 2 -> R.string.transition_needs_two
+                layers.any { !it.canAnimate } -> R.string.transition_needs_visual
+                else -> R.string.transition_needs_order
+            }), Toast.LENGTH_LONG).show()
         }
         Spacer(Modifier.weight(1f))
         BarButton(SelectionIcons.Align[0], stringResource(R.string.structure_align_starts), Modifier.width(40.dp).fillMaxHeight(), layers.size > 1) { state.alignClipTimes(0) }

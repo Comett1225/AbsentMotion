@@ -184,8 +184,13 @@ private fun <T> TileGrid(items: List<T>, tile: @Composable (T, Modifier) -> Unit
 
 @Composable
 private fun Tile(label: String, chosen: Boolean, modifier: Modifier, onClick: () -> Unit, draw: (DrawScope.() -> Unit)?) {
-    Column(modifier.height(94.dp).clip(TileShape).clickable(onClick = onClick).padding(3.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-        Box(Modifier.fillMaxWidth().height(56.dp).clip(TileShape).background(Am.Field).then(if (chosen) Modifier.border(2.dp, Am.Accent, TileShape) else Modifier)) {
+    Column(
+        modifier.height(94.dp).clip(TileShape)
+            .then(if (chosen) Modifier.background(Am.Accent.copy(alpha = 0.16f)).border(2.dp, Am.Accent, TileShape) else Modifier)
+            .clickable(onClick = onClick).padding(4.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Box(Modifier.fillMaxWidth().height(54.dp).clip(TileShape).background(Am.Field)) {
             if (draw == null) Text("—", Modifier.align(Alignment.Center), color = Am.OnDarkDim, fontSize = 18.sp)
             else Canvas(Modifier.fillMaxSize()) { draw() }
         }
@@ -236,32 +241,43 @@ private fun Motion.pose(u: Float, inSide: Boolean, w: Float, h: Float): Pose {
     return pose
 }
 
-private fun DrawScope.drawPose(pose: Pose, color: Color, full: Boolean, clock: Float) {
+private fun DrawScope.drawPose(pose: Pose, color: Color, clip: Boolean, clock: Float) {
     val w = size.width
     val h = size.height
-    val box = if (full) Size(w, h) else Size(w * 0.4f, h * 0.5f)
+    val box = if (clip) Size(w * 0.62f, h * 0.68f) else Size(w * 0.4f, h * 0.5f)
     val at = Offset((w - box.width) / 2, (h - box.height) / 2)
-    val corner = CornerRadius(if (full) 0f else 6f)
-    val jitter = pose.shake * w * 0.06f
+    val corner = CornerRadius(if (clip) 3f else 6f)
+    val jitter = pose.shake * w * 0.08f
     val alpha = pose.alpha.coerceIn(0f, 1f)
     withTransform({
         translate(pose.dx + sin(clock * 191f) * jitter, pose.dy + cos(clock * 157f) * jitter)
         rotate(-pose.turn, center)
         scale(pose.scale, pose.scale, center)
     }) {
-        val side = pose.split * w * 0.06f
+        val side = pose.split * w * 0.09f
         if (side > 0f) {
             drawRoundRect(Color.Red.copy(alpha = 0.7f * alpha), at + Offset(-side, 0f), box, corner)
             drawRoundRect(Color.Cyan.copy(alpha = 0.7f * alpha), at + Offset(side, 0f), box, corner)
         }
-        val trail = pose.smear * w * 0.05f
+        val trail = pose.smear * w * 0.07f
         if (trail > 0f) for (i in 1..3) {
             drawRoundRect(color.copy(alpha = 0.3f * alpha), at + Offset(i * trail, 0f), box, corner)
             drawRoundRect(color.copy(alpha = 0.3f * alpha), at + Offset(-i * trail, 0f), box, corner)
         }
-        drawRoundRect(color.copy(alpha = alpha), at, box, corner)
-        if (pose.tint.alpha > 0f) drawRoundRect(pose.tint.copy(alpha = pose.tint.alpha * alpha), at, box, corner)
+        if (side > 0f) {
+            val band = box.height / 4
+            for (i in 0 until 4) {
+                val shift = (if (i % 2 == 0) 1 else -1) * side * (0.5f + 0.5f * sin(clock * 97f + i))
+                drawRect(color.copy(alpha = alpha), at + Offset(shift, i * band), Size(box.width, band))
+            }
+        } else drawRoundRect(color.copy(alpha = alpha), at, box, corner)
+        if (clip) {
+            val mark = box.minDimension * 0.16f
+            drawCircle(Color.White.copy(alpha = 0.85f * alpha * (1 - pose.smear * 0.6f)), mark, at + Offset(mark * 1.7f, mark * 1.7f))
+        }
+        if (pose.tint.alpha > 0f && !clip) drawRoundRect(pose.tint.copy(alpha = pose.tint.alpha * alpha), at, box, corner)
     }
+    if (clip && pose.tint.alpha > 0f) drawRect(pose.tint)
 }
 
 private fun DrawScope.drawTransition(kind: TransitionKind, clock: Float) {
