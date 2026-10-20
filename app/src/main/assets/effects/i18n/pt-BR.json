@@ -849,7 +849,7 @@
    }
   },
   "datamosh": {
-   "description": "A partir do tempo inicial, a imagem para de atualizar e é arrastada pelo movimento que vem depois, como se faltasse um quadro-chave. Camadas de vídeo são arrastadas pelo movimento real, as demais por blocos em movimento.",
+   "description": "Entre os tempos de início e fim, em segundos desde o início da camada, a imagem para de atualizar e é arrastada pelo movimento seguinte, como se faltasse um quadro-chave. Camadas de vídeo são arrastadas pelo movimento real, as demais por blocos em movimento.",
    "name": "Datamosh",
    "params": {
     "block": {
@@ -861,8 +861,8 @@
     "decay": {
      "label": "Decaimento"
     },
-    "duration": {
-     "label": "Duração"
+    "end": {
+     "label": "Fim"
     },
     "glitch": {
      "label": "Falha"

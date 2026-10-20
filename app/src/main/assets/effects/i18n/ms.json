@@ -849,7 +849,7 @@
    }
   },
   "datamosh": {
-   "description": "Dari masa mula, gambar berhenti dikemas kini dan diseret oleh gerakan berikutnya, seolah-olah bingkai kunci hilang. Lapisan video disapu oleh gerakan sebenar, lapisan lain oleh blok bergerak.",
+   "description": "Antara masa mula dan tamat, dalam saat dari permulaan lapisan, imej berhenti dikemas kini dan diseret oleh gerakan selepasnya, seolah-olah bingkai kunci tiada. Lapisan video dicemar oleh gerakan sebenar, manakala lapisan lain oleh blok bergerak.",
    "name": "Datamosh",
    "params": {
     "block": {
@@ -861,8 +861,8 @@
     "decay": {
      "label": "Pereputan"
     },
-    "duration": {
-     "label": "Tempoh"
+    "end": {
+     "label": "Tamat"
     },
     "glitch": {
      "label": "Glitch"

@@ -849,7 +849,7 @@
    }
   },
   "datamosh": {
-   "description": "Başlangıç zamanından itibaren görüntü yenilenmeyi bırakır ve sanki bir anahtar kare eksikmiş gibi ardından gelen hareketle sürüklenir. Video katmanları gerçek hareketleriyle, diğer katmanlar ise hareket eden bloklarla bulanıklaşır.",
+   "description": "Başlangıç ve bitiş zamanları arasında, katmanın başından itibaren saniye cinsinden, görüntü yenilenmeyi durdurur ve sanki bir anahtar kare eksikmiş gibi ardından gelen hareketle sürüklenir. Video katmanları gerçek hareketleriyle bulanıklaşır, diğer katmanlar ise hareket eden bloklarla.",
    "name": "Datamosh",
    "params": {
     "block": {
@@ -861,8 +861,8 @@
     "decay": {
      "label": "Zayıflama"
     },
-    "duration": {
-     "label": "Uzunluk"
+    "end": {
+     "label": "Bitiş"
     },
     "glitch": {
      "label": "Glitch"

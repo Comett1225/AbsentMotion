@@ -849,7 +849,7 @@
    }
   },
   "datamosh": {
-   "description": "Từ thời điểm bắt đầu, hình ảnh ngừng làm mới và bị kéo theo chuyển động phía sau, như thể thiếu một keyframe. Lớp video bị nhòe theo chuyển động thật, các lớp khác theo các khối di chuyển.",
+   "description": "Trong khoảng từ thời điểm bắt đầu đến kết thúc, tính bằng giây kể từ đầu lớp, hình ảnh ngừng làm mới và bị kéo theo chuyển động phía sau, như thể thiếu một keyframe. Lớp video bị nhòe theo chuyển động thực của nó, các lớp khác bị nhòe bởi những khối chuyển động.",
    "name": "Datamosh",
    "params": {
     "block": {
@@ -861,8 +861,8 @@
     "decay": {
      "label": "Suy giảm"
     },
-    "duration": {
-     "label": "Độ dài"
+    "end": {
+     "label": "Kết thúc"
     },
     "glitch": {
      "label": "Nhiễu"

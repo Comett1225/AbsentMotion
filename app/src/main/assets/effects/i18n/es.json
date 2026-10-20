@@ -849,7 +849,7 @@
    }
   },
   "datamosh": {
-   "description": "Desde el momento de inicio, la imagen deja de actualizarse y el movimiento posterior la arrastra, como si faltara un fotograma clave; las capas de video se difuminan con su movimiento real y las demás, con bloques en movimiento.",
+   "description": "Entre los tiempos de inicio y fin, en segundos desde el inicio de la capa, la imagen deja de actualizarse y es arrastrada por el movimiento posterior, como si faltara un fotograma clave. Las capas de video se emborronan con su movimiento real y las demás, con bloques en movimiento.",
    "name": "Datamosh",
    "params": {
     "block": {
@@ -861,8 +861,8 @@
     "decay": {
      "label": "Decaimiento"
     },
-    "duration": {
-     "label": "Duración"
+    "end": {
+     "label": "Fin"
     },
     "glitch": {
      "label": "Glitch"
