@@ -22,7 +22,7 @@ import java.nio.ByteBuffer
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
-class ExportResult(val uris: List<Uri>, val mime: String, val where: String)
+class ExportResult(val uris: List<Uri>, val mime: String, val where: String, val verification: Verification? = null)
 
 class Exporter(context: Context, private val engine: EngineThread, private val store: ExportStore, private val access: MediaAccess = MediaAccess.forApp(context)) {
     private val context = context.applicationContext
@@ -36,23 +36,23 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
                     ExportKind.Video -> s.fixedFormat().let { f ->
                         val started = android.os.SystemClock.elapsedRealtime()
                         var paused = 0L
+                        val mix = ExportAudio.mixFor?.invoke(scene, f.audio.effectiveRate)
                         direct(saved, name, f.container.ext, f.container.mime, "Movies/$AppFolder") { fd ->
                             cool { thermal ->
-                                exportVideo(engine, scene, xml, f, fd, ExportAudio.mixFor?.invoke(scene, f.audio.effectiveRate), thermal.hot,
-                                    { thermal.pauseMs().also { paused += it } }, progress)
+                                exportVideo(engine, scene, xml, f, fd, mix, thermal.hot, { thermal.pauseMs().also { paused += it } }, progress)
                             }
                         }.also {
                             val (w, h) = exportSize(scene, f.shortSide, even = true)
                             val ms = android.os.SystemClock.elapsedRealtime() - started - paused
                             ExportTimes(context).record(ExportRecord(f.codec, w, h, f.fps, frameCount(scene, f.fps), ms.coerceAtLeast(1), f.interpolation))
-                        }
+                        }.verified(kind, scene, f, mix != null)
                     }
                     ExportKind.Audio -> {
                         val mix = ExportAudio.mixFor?.invoke(scene, audioRate(s)) ?: error("This project has no sound to export.")
                         try {
                             direct(saved, name, s.audioFormat.ext, s.audioFormat.mime, "Music/$AppFolder") { fd ->
                                 exportAudio(s, (scene.totalTime + 1) * 1000L, mix, fd, progress)
-                            }
+                            }.verified(kind, scene, s, true)
                         } finally {
                             (mix as? java.io.Closeable)?.close()
                         }
@@ -100,6 +100,9 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
         saved.add(file.uri)
         return ExportResult(saved, mime, store.location(where))
     }
+
+    private suspend fun ExportResult.verified(kind: ExportKind, scene: Scene, s: ExportSettings, hasAudio: Boolean): ExportResult =
+        expectationFor(kind, scene, s, hasAudio)?.let { ExportResult(uris, mime, where, verifyExport(context, uris.first(), it)) } ?: this
 
     private suspend fun <T> cool(block: suspend (ThermalMonitor) -> T): T {
         val thermal = ThermalMonitor.of(context)

@@ -92,6 +92,9 @@ def main():
                                                     '--ei', 'abitrate', str(kbps)])
                     reason = [line.split('AMExport: ', 1)[1] for line in log.splitlines() if 'Exception' in line][:1]
                     problems = check(path, codec, rate, channels) if path else ['export failed: ' + ''.join(reason)[:160]]
+                    verified = [line.split('AMExport: verify ', 1)[1] for line in log.splitlines() if 'AMExport: verify ' in line]
+                    if path and not (verified and verified[0].startswith('verified')):
+                        problems.append('device verification: ' + (verified[0] if verified else 'missing'))
                     failed += bool(problems)
                     print(('ok   ' if not problems else 'FAIL ') + name + ('' if not problems else ': ' + '; '.join(problems)), flush=True)
     engine.adb('shell', 'rm', click, engine.DEVICE_DIR + '/audiocheck.xml')

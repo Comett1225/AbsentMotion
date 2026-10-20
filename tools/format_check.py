@@ -115,6 +115,9 @@ def main():
         path, log = export(work, name, extras)
         reason = [line.split('AMExport: ', 1)[1] for line in log.splitlines() if 'Exception' in line][:1]
         problems = check(path, container, vcodec, acodec, rate, channels) if path else ['export failed: ' + ''.join(reason)[:160]]
+        verified = [line.split('AMExport: verify ', 1)[1] for line in log.splitlines() if 'AMExport: verify ' in line]
+        if path and not (verified and verified[0].startswith('verified')):
+            problems.append('device verification: ' + (verified[0] if verified else 'missing'))
         failed += bool(problems)
         print(('ok   ' if not problems else 'FAIL ') + name + ('' if not problems else ': ' + '; '.join(problems)), flush=True)
     engine.adb('shell', 'rm', tone, engine.DEVICE_DIR + '/formatcheck.xml')

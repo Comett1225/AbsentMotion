@@ -445,6 +445,14 @@ class MainActivity : ComponentActivity() {
             state.frame = intent.getIntExtra("frame", 0).coerceIn(0, scene.lastFrame)
             val stillName = intent.getStringExtra("still")
             intent.getStringExtra("export")?.let { exportForTest(it, scene, state.frame) }
+            intent.getStringExtra("verify")?.let { file ->
+                launch {
+                    val kind = if (file.endsWith(".mp4") || file.endsWith(".mkv")) ExportKind.Video else ExportKind.Audio
+                    val expect = app.absentmotion.export.expectationFor(kind, scene, defaultSettings(kind, scene), app.absentmotion.audio.AudioClip.of(scene).isNotEmpty())!!
+                    val v = app.absentmotion.export.verifyExport(applicationContext, android.net.Uri.fromFile(File(file)), expect)
+                    Log.i("AMExport", "verify " + app.absentmotion.export.verificationSummary(v))
+                }
+            }
             try {
                 engine.awaitMedia()
                 try { engine.awaitVideoFrames(scene, state.timeMs) } catch (e: java.io.IOException) { Log.i("AMTest", "video unavailable: ${e.message}") }
@@ -526,13 +534,12 @@ class MainActivity : ComponentActivity() {
                     Log.i("AMExport", "estimate ms=${app.absentmotion.export.ExportTimes(applicationContext).estimateMs(s.fixedFormat(), scene, probe)}")
                 }
                 val started = SystemClock.elapsedRealtime()
-                if (intent.getBooleanExtra("mediastore", false)) {
-                    val result = Exporter(applicationContext, engine, app.absentmotion.export.MediaStoreExport(applicationContext)).export(kind, scene, s, frame, name) { }
-                    Log.i("AMExport", "done " + result.uris.joinToString(" "))
-                } else {
-                    Exporter(applicationContext, engine, FolderExport(dir)).export(kind, scene, s, frame, name) { }
-                    Log.i("AMExport", "done " + File(dir, if (kind == ExportKind.Sequence) name else "$name.${ext[kind]}").path + " ms=" + (SystemClock.elapsedRealtime() - started))
-                }
+                val mediaStore = intent.getBooleanExtra("mediastore", false)
+                val result = Exporter(applicationContext, engine, if (mediaStore) app.absentmotion.export.MediaStoreExport(applicationContext) else FolderExport(dir))
+                    .export(kind, scene, s, frame, name) { }
+                result.verification?.let { Log.i("AMExport", "verify " + app.absentmotion.export.verificationSummary(it)) }
+                if (mediaStore) Log.i("AMExport", "done " + result.uris.joinToString(" "))
+                else Log.i("AMExport", "done " + File(dir, if (kind == ExportKind.Sequence) name else "$name.${ext[kind]}").path + " ms=" + (SystemClock.elapsedRealtime() - started))
             } catch (e: Throwable) {
                 Log.e("AMExport", "failed", e)
             }
