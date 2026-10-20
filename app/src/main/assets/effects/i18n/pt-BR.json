@@ -218,17 +218,17 @@
    }
   },
   "bulge": {
-   "description": "Aplica uma distorção de lupa ou de aperto ao redor de um ponto central, com intensidade e raio ajustáveis.",
-   "name": "Distorção esférica",
+   "description": "Incha a camada para fora como uma lente (Intensidade positiva) ou a comprime em direção ao Centro (negativa) dentro de um círculo de Raio, uma fração do tamanho da camada.",
+   "name": "Compressão/Inchaço",
    "params": {
+    "amount": {
+     "label": "Intensidade"
+    },
     "center": {
      "label": "Centro"
     },
     "radius": {
      "label": "Raio"
-    },
-    "strength": {
-     "label": "Intensidade"
     }
    }
   },
@@ -3012,24 +3012,28 @@
    }
   },
   "radialwipe": {
-   "description": "Oculta uma fatia da camada entre duas linhas a partir de um ponto central, como o ponteiro de um relógio girando. Anime a Conclusão para criar uma transição.",
+   "description": "Oculta uma fatia da camada varrida ao redor do Centro a partir do Ângulo inicial, como um ponteiro de relógio. O Progresso é o ângulo varrido, a Contagem repete a fatia ao redor do círculo e Ambos varre nos dois sentidos. Anime o Progresso para criar uma transição.",
    "name": "Transição radial",
    "params": {
     "center": {
      "label": "Centro"
     },
-    "completion": {
-     "label": "Conclusão"
+    "count": {
+     "label": "Contagem"
     },
     "direction": {
      "label": "Direção",
      "options": [
       "Sentido horário",
-      "Sentido anti-horário"
+      "Sentido anti-horário",
+      "Ambos"
      ]
     },
     "feather": {
      "label": "Suavização das bordas"
+    },
+    "progress": {
+     "label": "Progresso"
     },
     "start": {
      "label": "Ângulo inicial"
@@ -4480,17 +4484,17 @@
    }
   },
   "twirl": {
-   "description": "Gira os pixels ao redor de um ponto central em um ângulo que diminui conforme a distância do centro.",
+   "description": "Torce a camada ao redor do Centro como um redemoinho, mais forte no meio e diminuindo até o Raio (uma fração do tamanho da camada). Uma Intensidade negativa torce no sentido oposto.",
    "name": "Redemoinho",
    "params": {
-    "angle": {
-     "label": "Ângulo"
-    },
     "center": {
      "label": "Centro"
     },
     "radius": {
      "label": "Raio"
+    },
+    "strength": {
+     "label": "Intensidade"
     }
    }
   },

@@ -218,17 +218,17 @@
    }
   },
   "bulge": {
-   "description": "Menerapkan distorsi fisheye (memperbesar atau mencubit) di sekitar titik pusat dengan kekuatan dan radius yang dapat diatur.",
-   "name": "Cembung",
+   "description": "Mencembungkan lapisan seperti lensa (Kekuatan positif) atau mencubitnya ke arah Tengah (negatif) di dalam lingkaran Radius, sebagian dari ukuran lapisan.",
+   "name": "Cubit/Cembung",
    "params": {
+    "amount": {
+     "label": "Kekuatan"
+    },
     "center": {
      "label": "Pusat"
     },
     "radius": {
      "label": "Radius"
-    },
-    "strength": {
-     "label": "Kekuatan"
     }
    }
   },
@@ -3012,24 +3012,28 @@
    }
   },
   "radialwipe": {
-   "description": "Menyembunyikan sektor lapisan di antara dua garis dari titik pusat, seperti jarum jam yang berputar. Animasikan Penyelesaian untuk transisi.",
+   "description": "Menyembunyikan sepotong lapisan yang disapu mengelilingi Tengah dari Sudut awal, seperti jarum jam. Progres adalah sudut yang disapu, Jumlah mengulang potongan di sekeliling lingkaran dan Keduanya menyapu ke dua arah. Animasikan Progres untuk transisi.",
    "name": "Sapuan Radial",
    "params": {
     "center": {
      "label": "Pusat"
     },
-    "completion": {
-     "label": "Penyelesaian"
+    "count": {
+     "label": "Jumlah"
     },
     "direction": {
      "label": "Arah",
      "options": [
       "Searah jarum jam",
-      "Berlawanan arah jarum jam"
+      "Berlawanan jarum jam",
+      "Keduanya"
      ]
     },
     "feather": {
      "label": "Feather"
+    },
+    "progress": {
+     "label": "Progres"
     },
     "start": {
      "label": "Sudut Awal"
@@ -4480,17 +4484,17 @@
    }
   },
   "twirl": {
-   "description": "Memutar piksel di sekitar titik pusat dengan sudut yang berkurang seiring jarak dari pusat.",
-   "name": "Pilin",
+   "description": "Memelintir lapisan di sekitar Tengah seperti pusaran air, paling kuat di tengah dan memudar di Radius (sebagian dari ukuran lapisan). Kekuatan negatif memelintir ke arah sebaliknya.",
+   "name": "Pusaran",
    "params": {
-    "angle": {
-     "label": "Sudut"
-    },
     "center": {
      "label": "Pusat"
     },
     "radius": {
      "label": "Radius"
+    },
+    "strength": {
+     "label": "Kekuatan"
     }
    }
   },

@@ -218,17 +218,17 @@
    }
   },
   "bulge": {
-   "description": "Bir merkez noktası çevresinde, ayarlanabilir güç ve yarıçapla balıkgözü büyütme veya sıkıştırma uygular.",
-   "name": "Şişirme",
+   "description": "Katmanı, Yarıçap (katman boyutunun bir oranı) içindeki bir dairede, pozitif Güç ile mercek gibi dışa şişirir veya negatif değerle Merkeze doğru daraltır.",
+   "name": "Daralt/Şişir",
    "params": {
+    "amount": {
+     "label": "Güç"
+    },
     "center": {
      "label": "Merkez"
     },
     "radius": {
      "label": "Yarıçap"
-    },
-    "strength": {
-     "label": "Güç"
     }
    }
   },
@@ -3012,24 +3012,28 @@
    }
   },
   "radialwipe": {
-   "description": "Katmanın bir merkez noktasından iki çizgi arasındaki kamasını gizler; saat ibresi gibi döner. Geçiş için Tamamlanma değerini canlandırın.",
+   "description": "Katmanın bir dilimini, Başlangıç Açısı'ndan itibaren Merkez çevresinde saat kolu gibi süpürerek gizler. İlerleme süpürülen açıdır, Adet dilimi daire çevresinde tekrarlar ve Her ikisi iki yönde de süpürür. Geçiş için İlerleme'yi canlandırın.",
    "name": "Radyal geçiş",
    "params": {
     "center": {
      "label": "Merkez"
     },
-    "completion": {
-     "label": "Tamamlanma"
+    "count": {
+     "label": "Adet"
     },
     "direction": {
      "label": "Yön",
      "options": [
       "Saat yönünde",
-      "Saat yönünün tersine"
+      "Saat yönünün tersine",
+      "Her ikisi"
      ]
     },
     "feather": {
      "label": "Yumuşatma"
+    },
+    "progress": {
+     "label": "İlerleme"
     },
     "start": {
      "label": "Başlangıç açısı"
@@ -4480,17 +4484,17 @@
    }
   },
   "twirl": {
-   "description": "Pikselleri bir merkez noktası etrafında, merkezden uzaklaştıkça azalan bir açıyla döndürür.",
-   "name": "Burgu",
+   "description": "Katmanı Merkez çevresinde bir girdap gibi büker; ortada en güçlü, Yarıçap'ta (katman boyutunun bir oranı) azalır. Negatif Güç ters yönde büker.",
+   "name": "Girdap",
    "params": {
-    "angle": {
-     "label": "Açı"
-    },
     "center": {
      "label": "Merkez"
     },
     "radius": {
      "label": "Yarıçap"
+    },
+    "strength": {
+     "label": "Güç"
     }
    }
   },

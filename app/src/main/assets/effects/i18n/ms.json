@@ -218,17 +218,17 @@
    }
   },
   "bulge": {
-   "description": "Menggunakan herotan pembesaran atau cubitan mata ikan di sekeliling titik pusat dengan kekuatan dan jejari yang boleh dikawal",
-   "name": "Bonjol",
+   "description": "Menonjolkan lapisan seperti kanta (Kekuatan positif) atau mencubitnya ke arah Pusat (negatif) dalam bulatan Jejari, sebahagian saiz lapisan.",
+   "name": "Cubit/Tonjol",
    "params": {
+    "amount": {
+     "label": "Kekuatan"
+    },
     "center": {
      "label": "Pusat"
     },
     "radius": {
      "label": "Jejari"
-    },
-    "strength": {
-     "label": "Kekuatan"
     }
    }
   },
@@ -3012,24 +3012,28 @@
    }
   },
   "radialwipe": {
-   "description": "Menyembunyikan baji lapisan antara dua garis dari titik tengah seperti jarum jam, dan animasikan penyempurnaan untuk transisi.",
+   "description": "Menyembunyikan baji lapisan yang disapu mengelilingi Pusat dari Sudut Mula seperti jarum jam, dengan Kemajuan sebagai sudut yang disapu, Kiraan mengulang baji mengelilingi bulatan dan Kedua-dua menyapu kedua-dua arah; animasi Kemajuan untuk peralihan.",
    "name": "Sapuan radial",
    "params": {
     "center": {
      "label": "Pusat"
     },
-    "completion": {
-     "label": "Penyempurnaan"
+    "count": {
+     "label": "Kiraan"
     },
     "direction": {
      "label": "Arah",
      "options": [
       "Ikut jam",
-      "Lawan jam"
+      "Lawan jam",
+      "Kedua-dua"
      ]
     },
     "feather": {
      "label": "Pelembutan"
+    },
+    "progress": {
+     "label": "Kemajuan"
     },
     "start": {
      "label": "Sudut mula"
@@ -4480,17 +4484,17 @@
    }
   },
   "twirl": {
-   "description": "Memutar piksel di sekeliling titik pusat dengan sudut yang berkurang mengikut jarak dari pusat.",
+   "description": "Memutar lapisan mengelilingi Pusat seperti pusaran air, paling kuat di tengah dan pudar pada Jejari (sebahagian saiz lapisan); Kekuatan negatif memutar ke arah bertentangan.",
    "name": "Pusar",
    "params": {
-    "angle": {
-     "label": "Sudut"
-    },
     "center": {
      "label": "Pusat"
     },
     "radius": {
      "label": "Jejari"
+    },
+    "strength": {
+     "label": "Kekuatan"
     }
    }
   },

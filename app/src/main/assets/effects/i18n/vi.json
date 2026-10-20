@@ -218,17 +218,17 @@
    }
   },
   "bulge": {
-   "description": "Tạo phóng đại mắt cá hoặc bóp méo quanh một tâm với độ mạnh và bán kính điều chỉnh được.",
-   "name": "Phồng",
+   "description": "Làm phồng lớp như thấu kính (Cường độ dương) hoặc chụm vào tâm (âm) trong vòng tròn Bán kính tính theo tỷ lệ kích thước lớp.",
+   "name": "Chụm/Phồng",
    "params": {
+    "amount": {
+     "label": "Cường độ"
+    },
     "center": {
      "label": "Tâm"
     },
     "radius": {
      "label": "Bán kính"
-    },
-    "strength": {
-     "label": "Độ mạnh"
     }
    }
   },
@@ -3012,24 +3012,28 @@
    }
   },
   "radialwipe": {
-   "description": "Ẩn một hình quạt của lớp giữa hai đường từ một điểm giữa, như kim đồng hồ quét. Tạo keyframe cho Độ hoàn thành để làm chuyển cảnh.",
+   "description": "Ẩn một hình quạt của lớp quét quanh Tâm từ Góc bắt đầu, như kim đồng hồ. Tiến độ là góc đã quét, Số lần lặp hình quạt quanh vòng tròn và Cả hai quét cả hai chiều. Tạo hiệu ứng cho Tiến độ để làm chuyển cảnh.",
    "name": "Xóa tỏa tròn",
    "params": {
     "center": {
      "label": "Tâm"
     },
-    "completion": {
-     "label": "Độ hoàn thành"
+    "count": {
+     "label": "Số lần"
     },
     "direction": {
      "label": "Hướng",
      "options": [
       "Theo chiều kim đồng hồ",
-      "Ngược chiều kim đồng hồ"
+      "Ngược chiều kim đồng hồ",
+      "Cả hai"
      ]
     },
     "feather": {
      "label": "Làm mềm viền"
+    },
+    "progress": {
+     "label": "Tiến độ"
     },
     "start": {
      "label": "Góc bắt đầu"
@@ -4480,17 +4484,17 @@
    }
   },
   "twirl": {
-   "description": "Xoay các điểm ảnh quanh một tâm với góc giảm dần theo khoảng cách từ tâm.",
+   "description": "Xoắn lớp quanh Tâm như xoáy nước, mạnh nhất ở giữa và giảm dần tại Bán kính (theo tỷ lệ kích thước lớp). Cường độ âm xoắn theo chiều ngược lại.",
    "name": "Xoáy",
    "params": {
-    "angle": {
-     "label": "Góc"
-    },
     "center": {
      "label": "Tâm"
     },
     "radius": {
      "label": "Bán kính"
+    },
+    "strength": {
+     "label": "Cường độ"
     }
    }
   },

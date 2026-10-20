@@ -218,17 +218,17 @@
    }
   },
   "bulge": {
-   "description": "Aplica una distorsión de ojo de pez o de pinzamiento alrededor de un punto central, con intensidad y radio ajustables.",
-   "name": "Abombamiento",
+   "description": "Abomba la capa hacia afuera como una lente (Fuerza positiva) o la contrae hacia el Centro (negativa) dentro de un círculo de Radio, una parte del tamaño de la capa.",
+   "name": "Pellizco/Abultamiento",
    "params": {
+    "amount": {
+     "label": "Fuerza"
+    },
     "center": {
      "label": "Centro"
     },
     "radius": {
      "label": "Radio"
-    },
-    "strength": {
-     "label": "Intensidad"
     }
    }
   },
@@ -3012,24 +3012,28 @@
    }
   },
   "radialwipe": {
-   "description": "Oculta una cuña de la capa entre dos líneas desde un punto central, como la aguja de un reloj al girar. Anima Finalización para crear una transición.",
+   "description": "Oculta una cuña de la capa que gira alrededor del Centro desde el Ángulo inicial, como la manecilla de un reloj. Progreso es el ángulo recorrido, Cantidad repite la cuña alrededor del círculo y Ambos la barre en ambos sentidos. Anima Progreso para hacer una transición.",
    "name": "Barrido radial",
    "params": {
     "center": {
      "label": "Centro"
     },
-    "completion": {
-     "label": "Finalización"
+    "count": {
+     "label": "Cantidad"
     },
     "direction": {
      "label": "Dirección",
      "options": [
       "Horario",
-      "Antihorario"
+      "Antihorario",
+      "Ambos"
      ]
     },
     "feather": {
      "label": "Difuminado"
+    },
+    "progress": {
+     "label": "Progreso"
     },
     "start": {
      "label": "Ángulo inicial"
@@ -4480,17 +4484,17 @@
    }
   },
   "twirl": {
-   "description": "Rota los píxeles alrededor de un punto central con un ángulo que disminuye según la distancia al centro.",
+   "description": "Retuerce la capa alrededor del Centro como un remolino, con más fuerza en el medio y desvaneciéndose en el Radio (una parte del tamaño de la capa). Una Fuerza negativa la retuerce al otro lado.",
    "name": "Remolino",
    "params": {
-    "angle": {
-     "label": "Ángulo"
-    },
     "center": {
      "label": "Centro"
     },
     "radius": {
      "label": "Radio"
+    },
+    "strength": {
+     "label": "Fuerza"
     }
    }
   },

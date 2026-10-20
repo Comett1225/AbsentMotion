@@ -34,6 +34,13 @@ class AlightParityTest {
         assertEquals(listOf("Strength", "float", "0.150000", "0.0..1.0"), params("radialblur").getValue("amount").row())
         assertEquals(listOf("Strength", "float", "0.020000", "0.0..2.0"), params("unsharpmask").getValue("radius").row())
         assertEquals("5.000000", params("spinblur").getValue("sweep").default)
+        assertEquals(listOf("Strength", "float", "0.100000", "-0.5..0.5"), params("twirl").getValue("strength").row())
+        assertEquals(listOf("Radius", "float", "0.300000", "0.0..0.8"), params("twirl").getValue("radius").row())
+        assertEquals(listOf("Strength", "float", "-0.900000", "-1.0..1.0"), params("bulge").getValue("amount").row())
+        assertEquals(listOf("Radius", "float", "0.300000", "0.0..2.5"), params("bulge").getValue("radius").row())
+        assertEquals(listOf("Progress", "angle", "45.000000", "0.0..360.0"), params("radialwipe").getValue("progress").row())
+        assertEquals(listOf("Count", "float", "1.000000", "1.0..16.0"), params("radialwipe").getValue("count").row())
+        assertEquals(listOf("Clockwise", "Counterclockwise", "Both"), params("radialwipe").getValue("direction").options)
     }
 
     private fun older(effect: String, vararg values: Pair<String, String>) = XmlNode("effect", mapOf("id" to "absent.$effect", "hidden" to "false"),
@@ -45,6 +52,9 @@ class AlightParityTest {
             older("rgbsplit", "splitDistance" to "13.5", "angle" to "0"),
             older("radialblur", "strength" to "0.5"),
             older("unsharpmask", "strength" to "0.5", "amount" to "1", "threshold" to "0"),
+            older("twirl", "radius" to "0.25", "angle" to "180"),
+            older("bulge", "strength" to "0.4", "radius" to "0.5"),
+            older("radialwipe", "completion" to "0.25", "start" to "30"),
         )
         val scene = Scene(XmlNode("scene", mapOf("width" to "100", "height" to "100", "fps" to "30", "totalTime" to "1000"),
             listOf(XmlNode("shape", mapOf("id" to "1", "startTime" to "0", "endTime" to "1000", "s" to ".rect"), made))))
@@ -55,6 +65,9 @@ class AlightParityTest {
         assertEquals(mapOf("strength" to 0.1f, "angle" to 180f, "center" to 1f, "mode" to 2f), values(1))
         assertEquals(mapOf("amount" to 0.1f), values(2))
         assertEquals(mapOf("radius" to 0.056f, "amount" to 1f, "threshold" to 0f), values(3))
+        assertEquals(mapOf("strength" to 0.066f, "radius" to 0.25f), values(4))
+        assertEquals(mapOf("amount" to 0.1f, "radius" to 0.5f), values(5))
+        assertEquals(mapOf("progress" to 90f, "start" to 30f), values(6))
         assertTrue(result.dropped.isEmpty())
         assertEquals(result.scene.node, migration.migrate(result.scene).scene.node)
     }

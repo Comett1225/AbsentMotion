@@ -218,17 +218,17 @@
    }
   },
   "bulge": {
-   "description": "Nagdadagdag ng fisheye na paglaki o pagpisil sa paligid ng isang sentro, na may kontroladong lakas at radius.",
-   "name": "Pag-usli",
+   "description": "Itinutulak palabas ang layer na parang lente (positibong Strength) o pinipisil papasok patungo sa Center (negatibo) sa loob ng bilog na Radius, isang bahagi ng laki ng layer.",
+   "name": "Pinch/Bulge",
    "params": {
+    "amount": {
+     "label": "Strength"
+    },
     "center": {
      "label": "Sentro"
     },
     "radius": {
      "label": "Radius"
-    },
-    "strength": {
-     "label": "Lakas"
     }
    }
   },
@@ -3012,24 +3012,28 @@
    }
   },
   "radialwipe": {
-   "description": "Itinatago ang isang wedge ng layer sa pagitan ng dalawang linya mula sa gitnang punto, parang kamay ng orasan na umiikot. I-animate ang Completion para sa transition.",
+   "description": "Nagtatago ng isang wedge ng layer na umiikot sa Center mula sa Start Angle, parang kamay ng orasan. Ang Progress ay ang anggulong naisweep, inuulit ng Count ang wedge sa bilog at isinasalit ng Both ang dalawang direksyon. I-animate ang Progress para sa transition.",
    "name": "Radial na Wipe",
    "params": {
     "center": {
      "label": "Gitna"
     },
-    "completion": {
-     "label": "Completion"
+    "count": {
+     "label": "Count"
     },
     "direction": {
      "label": "Direksyon",
      "options": [
-      "Paikot",
-      "Kontra-paikot"
+      "Clockwise",
+      "Counterclockwise",
+      "Both"
      ]
     },
     "feather": {
      "label": "Feather"
+    },
+    "progress": {
+     "label": "Progress"
     },
     "start": {
      "label": "Panimulang Anggulo"
@@ -4480,17 +4484,17 @@
    }
   },
   "twirl": {
-   "description": "Iniikot ang mga pixel sa paligid ng sentro sa anggulong bumababa habang lumalayo sa sentro.",
-   "name": "Twirl",
+   "description": "Pinipilipit ang layer sa paligid ng Center na parang whirlpool, pinakamalakas sa gitna at kumukupas sa Radius (isang bahagi ng laki ng layer). Pinipilipit ng negatibong Strength sa kabilang direksyon.",
+   "name": "Swirl",
    "params": {
-    "angle": {
-     "label": "Anggulo"
-    },
     "center": {
      "label": "Sentro"
     },
     "radius": {
      "label": "Radius"
+    },
+    "strength": {
+     "label": "Strength"
     }
    }
   },

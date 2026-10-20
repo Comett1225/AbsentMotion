@@ -1,8 +1,8 @@
 {
  "id": "bulge",
- "name": "Bulge",
+ "name": "Pinch/Bulge",
  "category": "distort",
- "description": "Applies a fisheye magnify or pinch distortion around a center point with controllable strength and radius",
+ "description": "Bulges the layer out like a lens (positive Strength) or pinches it in toward Center (negative) inside a circle of Radius, a share of the layer size.",
  "params": [
   {
    "id": "center",
@@ -17,10 +17,10 @@
    "step": 0.01
   },
   {
-   "id": "strength",
+   "id": "amount",
    "label": "Strength",
    "type": "float",
-   "default": 0.3,
+   "default": -0.9,
    "min": -1,
    "max": 1,
    "step": 0.01
@@ -29,11 +29,11 @@
    "id": "radius",
    "label": "Radius",
    "type": "float",
-   "default": 0.5,
+   "default": 0.3,
    "min": 0,
-   "max": 1,
-   "step": 0.01
+   "max": 2.5,
+   "step": 0.001
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float2 center;\nuniform float strength;\nuniform float radius;\n\nhalf4 main(float2 coord) {\n    float2 centerPx = center * size;\n    float2 d = coord - centerPx;\n    float dist = length(d);\n    float2 dir = d / max(dist, 0.0001);\n    float radiusPx = max(radius * min(size.x, size.y), 0.0001);\n    float t = smoothstep(radiusPx, 0.0, dist);\n    float effect = 1.0 - strength * t;\n    float2 sampleCoord = centerPx + dir * (dist * effect);\n    half4 color = image.eval(clamp(sampleCoord, float2(0.5), max(size - float2(0.5), float2(0.5))));\n    if (color.a > 0.001) {\n        color.rgb /= color.a;\n    }\n    return half4(color.rgb * color.a, color.a);\n}"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float2 center;\nuniform float amount;\nuniform float radius;\n\nhalf4 main(float2 coord) {\n    float2 c = center * size;\n    float2 d = coord - c;\n    float r = max(radius * min(size.x, size.y), 0.0001);\n    float t = clamp(1.0 - length(d) / r, 0.0, 1.0);\n    float k = max(1.0 - clamp(amount, -1.0, 1.0) * t * t, 0.0);\n    k *= k;\n    return image.eval(c + d * k * k);\n}"
 }
