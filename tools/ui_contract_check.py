@@ -159,11 +159,14 @@ class UiContracts(unittest.TestCase):
         text = source('ui/editor/Timeline.kt')
         self.assertIn('val hit = layer.trimHitsSourceLimit(start, time, mediaMs)', text)
         self.assertIn('if (hit && limitEdge == null) onTick()', text)
-        self.assertIn('v.onTick = { if (state.settings.trimLimitVibration) haptic.performHapticFeedback(HapticFeedbackType.SegmentFrequentTick) }', text)
+        self.assertIn('v.onTick = { if (state.settings.vibration) haptic.performHapticFeedback(HapticFeedbackType.SegmentFrequentTick) }', text)
         self.assertIn('drawPath(outline, if (limit) LimitColor else GripColor, alpha = appear)', text)
         self.assertIn('limitEdge = null', text.split('fun endDrag(', 1)[1].split('\n    }\n', 1)[0])
+        self.assertIn('if (shown != null && shown != snapAt) onTick()', text)
+        self.assertIn('if (rows > selectRows) onTick()', text)
+        self.assertEqual(1, text.count('performHapticFeedback(HapticFeedbackType.SegmentFrequentTick)'))
         self.assertIn('prefs.getBoolean("trimLimitVibration", true)', source('library/AppSettings.kt'))
-        self.assertIn('SwitchRow("Trim Limit Vibration", settings.trimLimitVibration', source('ui/home/SettingsDrawer.kt'))
+        self.assertIn('SwitchRow("Vibration", settings.vibration', source('ui/home/SettingsDrawer.kt'))
 
 if __name__ == '__main__':
     unittest.main()

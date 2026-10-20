@@ -81,7 +81,7 @@ fun SettingsDrawer(settings: AppSettings) {
             Column(Modifier.padding(horizontal = 6.dp).fillMaxWidth().clip(PanelShape).background(PanelColor)) {
                 SwitchRow("Demo Mode", settings.demoMode, enabled = true) { settings.demoMode = it; demoNote = it }
                 SwitchRow("Open XML Projects", settings.xmlUpload, enabled = true) { settings.xmlUpload = it }
-                SwitchRow("Trim Limit Vibration", settings.trimLimitVibration, enabled = true) { settings.trimLimitVibration = it }
+                SwitchRow("Vibration", settings.vibration, enabled = true) { settings.vibration = it }
                 Divider(15.dp)
                 DurationRow(settings)
                 ThemeRow(settings)

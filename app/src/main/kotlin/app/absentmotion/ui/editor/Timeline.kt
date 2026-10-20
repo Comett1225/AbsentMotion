@@ -201,7 +201,7 @@ fun Timeline(state: EditorState, modifier: Modifier = Modifier) {
     val wide = LocalWide.current
     val view = remember(state, density, wide) {
         TimelineView(state, density, scope, wide).also { v ->
-            v.onTick = { if (state.settings.trimLimitVibration) haptic.performHapticFeedback(HapticFeedbackType.SegmentFrequentTick) }
+            v.onTick = { if (state.settings.vibration) haptic.performHapticFeedback(HapticFeedbackType.SegmentFrequentTick) }
         }
     }
     val measurer = rememberTextMeasurer(cacheSize = 32)
