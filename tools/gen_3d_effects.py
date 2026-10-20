@@ -96,7 +96,8 @@ float4 front(float3 p, float3 n, float r) {
 
 float4 facet(float3 p, float3 n, float r) {
     float3 f = normalize(sign(n));
-    float3 u = normalize(float3(-f.z, 0.0, f.x));
+    float3 w = float3(-f.z, 0.0, f.x);
+    float3 u = dot(w, w) > 0.0 ? normalize(w) : float3(1.0, 0.0, 0.0);
     return pic(cover(float2(dot(p, u), dot(p, cross(u, f))) / r * 0.5 + 0.5, float2(1.0)));
 }
 """
