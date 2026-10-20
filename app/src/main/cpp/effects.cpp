@@ -118,7 +118,7 @@ bool EffectRuntime::behind(const Layer& layer) const { return needs(layer, &Defi
 
 sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer, double timeMs, const SkRect& area,
                                           sk_sp<SkImageFilter> content, sk_sp<SkImageFilter> below) const {
-    const float t = layer.localTime(timeMs), seconds = (float)((timeMs - layer.startTime) / 1000.0);
+    const float t = layer.localTime(timeMs), seconds = (float)((layer.steppedMs(timeMs) - layer.startTime) / 1000.0);
     const SkRect bounds = SkRect::MakeIWH(scene.width, scene.height).makeOffset(-area.left(), -area.top());
     const float reach = (float)std::max(scene.width, scene.height);
     sk_sp<SkImageFilter> f = std::move(content);
