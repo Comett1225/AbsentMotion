@@ -124,7 +124,7 @@ float Eased(int easing, float x) {
     }
 }
 
-void Ranged(const Layer& l, const LayerEffect& e, float t, std::vector<Spot> spots, std::vector<Copy>* out) {
+void Ranged(const Layer& l, const LayerEffect& e, float t, std::vector<Spot> spots, std::vector<RepeatCopy>* out) {
     const SkPoint shift = {ParamAt(e, "rangePosition", 0, t, 0), ParamAt(e, "rangePosition", 1, t, 0)};
     const float scale = std::max(Param(e, "rangeScale", t, 1), 0.0f), turn = Param(e, "rangeRotation", t, 0);
     const float opacity = std::clamp(Param(e, "rangeOpacity", t, 1), 0.0f, 1.0f);
@@ -143,7 +143,7 @@ void Ranged(const Layer& l, const LayerEffect& e, float t, std::vector<Spot> spo
     for (auto s = spots.rbegin(); s != spots.rend(); ++s) {
         const float x = end - start > 1e-6f ? std::clamp((s->u - start) / (end - start), 0.0f, 1.0f) : (s->u >= start ? 1.0f : 0.0f);
         const float w = Eased(easing, x);
-        Copy c;
+        RepeatCopy c;
         c.outer = s->outer;
         c.local = SkMatrix::Translate(s->at.fX + shift.fX * w, s->at.fY + shift.fY * w);
         c.local.preRotate(s->turn + turn * w);
@@ -158,7 +158,7 @@ void Ranged(const Layer& l, const LayerEffect& e, float t, std::vector<Spot> spo
 
 float Along(int i, int n) { return n > 1 ? (float)i / (n - 1) : 0.5f; }
 
-void Basic(const LayerEffect& e, float t, std::vector<Copy>* out) {
+void Basic(const LayerEffect& e, float t, std::vector<RepeatCopy>* out) {
     const int n = CountOf(e, t, 10, 9999);
     SkMatrix each = SkMatrix::Translate(ParamAt(e, "offset", 0, t, 0), ParamAt(e, "offset", 1, t, 0));
     each.preRotate(Param(e, "angle", t, 0));
@@ -166,7 +166,7 @@ void Basic(const LayerEffect& e, float t, std::vector<Copy>* out) {
     each.preScale(scale, scale);
     const float alpha = std::clamp(Param(e, "alpha", t, 1), 0.0f, 1.0f);
     const double step = std::max(Param(e, "time", t, 0), 0.0f) * 1000.0;
-    std::vector<Copy> copies(n);
+    std::vector<RepeatCopy> copies(n);
     SkMatrix m = SkMatrix::I();
     for (int i = 0; i < n; i++) {
         copies[i].local = m;
@@ -295,7 +295,7 @@ SkColor4f Gradient3(const SkColor4f c[3], float u, bool hue) {
     return SkColor4f::FromColor(SkHSVToColor(mixed));
 }
 
-void Scatter(const Layer& l, const LayerEffect& e, float t, const RepeatSpace& space, std::vector<Copy>* out) {
+void Scatter(const Layer& l, const LayerEffect& e, float t, const RepeatSpace& space, std::vector<RepeatCopy>* out) {
     const float w = std::max(space.width, 1.0f), h = std::max(space.height, 1.0f), focal = std::max(w, h);
     const float cell = focal * 0.2f * std::clamp(Param(e, "scale", t, 1), 0.05f, 20.0f);
     const float density = std::clamp(Param(e, "density", t, 0.3f), 0.0f, 1.0f);
@@ -317,7 +317,7 @@ void Scatter(const Layer& l, const LayerEffect& e, float t, const RepeatSpace& s
     const SkBlendMode tintMode = lockSaturation ? SkBlendMode::kHue : lockLuma ? SkBlendMode::kColor : SkBlendMode::kSrcIn;
     if (!(density > 0) || !(alpha > 0)) return;
     const uint64_t seed = SeedOf(l, e, t, 11);
-    std::vector<std::pair<float, Copy>> found;
+    std::vector<std::pair<float, RepeatCopy>> found;
     const int z0 = (int)std::floor((nearZ + depth) / cell) - 1, z1 = (int)std::ceil((farZ + depth) / cell) + 1;
     for (int iz = z0; iz <= z1 && found.size() < kMaxCopies; iz++) {
         const float reach = ((iz + 1.5f) * cell - depth) / focal;
@@ -341,7 +341,7 @@ void Scatter(const Layer& l, const LayerEffect& e, float t, const RepeatSpace& s
                 const float reachOut = space.radius * scale;
                 if (!(scale > 0) || at.fX + reachOut < 0 || at.fX - reachOut > w || at.fY + reachOut < 0 || at.fY - reachOut > h) continue;
                 const float depthU = (z - nearZ) / (farZ - nearZ);
-                Copy c;
+                RepeatCopy c;
                 c.outer = SkMatrix::Translate(at.fX, at.fY);
                 c.outer.preRotate(angle + angleVariance * 180 * (float)(2 * Unit(k, 5) - 1));
                 c.outer.preScale(scale, scale);
@@ -476,13 +476,13 @@ bool RepeatsAlongPath(const Layer& l) {
     return std::any_of(l.effects.begin(), l.effects.end(), [](const LayerEffect& e) { return !e.hidden && e.id == "absent.repeatalongpath"; });
 }
 
-void RepeatCopies(const Layer& l, double timeMs, const RepeatSpace& space, std::vector<Copy>* copies) {
+void RepeatCopies(const Layer& l, double timeMs, const RepeatSpace& space, std::vector<RepeatCopy>* copies) {
     const float t = l.localTime(timeMs);
-    std::vector<Copy> result(1);
+    std::vector<RepeatCopy> result(1);
     for (const LayerEffect& e : l.effects) {
         if (e.hidden || !RepeatEffect(e.id)) continue;
         const std::string_view id = std::string_view(e.id).substr(7);
-        std::vector<Copy> made;
+        std::vector<RepeatCopy> made;
         std::vector<Spot> spots;
         if (id == "repeat") Basic(e, t, &made);
         else if (id == "scatterfield") Scatter(l, e, t, space, &made);
@@ -493,12 +493,12 @@ void RepeatCopies(const Layer& l, double timeMs, const RepeatSpace& space, std::
             else OnPath(e, t, space, &spots);
             Ranged(l, e, t, std::move(spots), &made);
         }
-        std::vector<Copy> next;
+        std::vector<RepeatCopy> next;
         next.reserve(std::min(kMaxCopies, made.size() * result.size()));
-        for (const Copy& m : made) {
-            for (const Copy& r : result) {
+        for (const RepeatCopy& m : made) {
+            for (const RepeatCopy& r : result) {
                 if (next.size() >= kMaxCopies) break;
-                Copy c = r;
+                RepeatCopy c = r;
                 c.outer = m.outer * r.outer;
                 c.local = m.local * r.local;
                 c.shiftMs = r.shiftMs + m.shiftMs;

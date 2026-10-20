@@ -506,7 +506,7 @@ SkPaint FillPaint(SkColor4f color) {
 struct LayerCopy {
     SkMatrix scene;
     double timeMs;
-    Copy look;
+    RepeatCopy look;
 };
 
 std::vector<LayerCopy> CopiesOf(const std::vector<Layer>& siblings, const Layer& l, double timeMs, int width, int height) {
@@ -529,14 +529,14 @@ std::vector<LayerCopy> CopiesOf(const std::vector<Layer>& siblings, const Layer&
             space.below = (below->text ? TextGlyphPath(*below) : ShapePath(*below, tb)).makeTransform(SiblingMatrix(siblings, *below, timeMs));
         }
     }
-    std::vector<Copy> copies;
+    std::vector<RepeatCopy> copies;
     RepeatCopies(l, timeMs, space, &copies);
     std::vector<LayerCopy> out;
     out.reserve(copies.size());
     double at = timeMs;
     SkMatrix matrix = m, inverse;
     bool invertible = m.invert(&inverse);
-    for (const Copy& c : copies) {
+    for (const RepeatCopy& c : copies) {
         const double when = std::clamp(timeMs + c.shiftMs, (double)l.startTime, (double)l.endTime);
         if (when != at) {
             at = when;

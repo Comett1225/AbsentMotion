@@ -183,7 +183,7 @@ float MotionOpacity(const Layer& layer, double timeMs);
 bool EchoOf(const Layer& layer, double timeMs, Echo* echo);
 void ParseSteps(Layer* layer);
 
-struct Copy {
+struct RepeatCopy {
     SkMatrix outer = SkMatrix::I(), local = SkMatrix::I();
     double shiftMs = 0;
     float alpha = 1, tinted = 0;
@@ -200,7 +200,7 @@ struct RepeatSpace {
 bool RepeatEffect(const std::string& id);
 bool HasRepeat(const Layer& layer);
 bool RepeatsAlongPath(const Layer& layer);
-void RepeatCopies(const Layer& layer, double timeMs, const RepeatSpace& space, std::vector<Copy>* copies);
+void RepeatCopies(const Layer& layer, double timeMs, const RepeatSpace& space, std::vector<RepeatCopy>* copies);
 
 struct Scene {
     int width = 0, height = 0, fps = 30, totalTime = 0;
