@@ -2701,11 +2701,26 @@
    }
   },
   "pixelate": {
-   "description": "Alanları sol üstteki pikselin rengindeki kare bloklarla değiştirerek mozaik pikselleştirme uygular.",
+   "description": "Katmanı, her bloğun ortasından alınan tek renkli bloklara böler; ızgara katmana (Ekran alanı açıkken kareye) ortalanır. Esnetme, Ofset ve Açı ızgarayı şekillendirir, Vinyet her bloğun kenarlarını karartır.",
    "name": "Pikselleştir",
    "params": {
+    "angle": {
+     "label": "Açı"
+    },
     "blockSize": {
-     "label": "Blok Boyutu"
+     "label": "Boyut"
+    },
+    "offset": {
+     "label": "Ofset"
+    },
+    "screenSpace": {
+     "label": "Ekran alanı"
+    },
+    "stretch": {
+     "label": "Esnetme"
+    },
+    "vignette": {
+     "label": "Vinyet"
     }
    }
   },
@@ -2776,11 +2791,14 @@
    }
   },
   "posterize": {
-   "description": "Her renk kanalını belirli sayıda düzeye (2-32) indirir.",
+   "description": "Her renk kanalını belirli sayıda düz Adıma böler; böylece yumuşak gradyanlar bantlara dönüşür. Ofset, bant kenarlarının yerini kaydırır.",
    "name": "Posterleştir",
    "params": {
     "levels": {
-     "label": "Düzeyler"
+     "label": "Adım"
+    },
+    "offset": {
+     "label": "Ofset"
     }
    }
   },
@@ -2874,11 +2892,11 @@
    "description": "Bir merkez noktadan çıkan ışınlar boyunca örnekleri ortalamayla, ayarlanabilir güçte radyal yakınlaştırma bulanıklığı uygular.",
    "name": "Yakınlaştırma Bulanıklığı",
    "params": {
+    "amount": {
+     "label": "Güç"
+    },
     "center": {
      "label": "Merkez"
-    },
-    "strength": {
-     "label": "Güç"
     }
    }
   },
@@ -3244,14 +3262,31 @@
    }
   },
   "rgbsplit": {
-   "description": "Kırmızı ve mavi kanalları bir açı boyunca zıt yönlerde kaydırarak renk sapması oluşturur.",
+   "description": "Kırmızı, yeşil ve mavi kanalları ayırır: Merkez kanalı yerinde kalır, diğer ikisi Açı boyunca zıt yönlere kayar. Açık kaydırılan renkleri toplar, Koyu onları dolu tutar, Maske yalnızca üçünün çakıştığı yeri korur, Luma ise kenarları parlaklıkları kadar opak yapar.",
    "name": "RGB Ayrımı",
    "params": {
     "angle": {
      "label": "Açı"
     },
-    "splitDistance": {
-     "label": "Mesafe"
+    "center": {
+     "label": "Merkez",
+     "options": [
+      "R",
+      "G",
+      "B"
+     ]
+    },
+    "mode": {
+     "label": "Mod",
+     "options": [
+      "Açık",
+      "Koyu",
+      "Maske",
+      "Luma"
+     ]
+    },
+    "strength": {
+     "label": "Güç"
     }
    }
   },
@@ -4119,10 +4154,10 @@
      "label": "Ters çevir"
     },
     "level": {
-     "label": "Seviye"
+     "label": "Eşik"
     },
     "softness": {
-     "label": "Yumuşaklık"
+     "label": "Yumuşatma"
     }
    }
   },
@@ -4460,17 +4495,17 @@
    }
   },
   "unsharpmask": {
-   "description": "Eşik değeri ve isteğe bağlı gri maske önizlemesiyle klasik netlik maskelemesi uygular.",
+   "description": "Katman ile bulanık kopyası arasındaki farkı geri ekleyerek keskinleştirir. Güç bulanıklığın genişliğini, Miktar geri eklenen farkı belirler; %50 üzeri Eşik küçük farkları olduğu gibi bırakır.",
    "name": "Netlik Maskesi",
    "params": {
     "amount": {
      "label": "Miktar"
     },
+    "radius": {
+     "label": "Güç"
+    },
     "showMask": {
      "label": "Maskeyi göster"
-    },
-    "strength": {
-     "label": "Güç"
     },
     "threshold": {
      "label": "Eşik"
@@ -4574,20 +4609,26 @@
    }
   },
   "wavewarp": {
-   "description": "Görsele ayarlanabilir genlik, dalga boyu, yön ve faz hızıyla sinüs dalgası kaydırması uygular.",
+   "description": "Katmanı sinüs dalgasıyla büker: Aralık kaç dalganın geçeceğini, Büyüklük ne kadar iteceklerini, Açı dalgaların yönünü, Büküm açısı ise itme yönünü belirler.",
    "name": "Dalga Bükümü",
    "params": {
-    "amplitude": {
-     "label": "Genlik"
+    "angle": {
+     "label": "Açı"
     },
-    "direction": {
-     "label": "Yön"
+    "magnitude": {
+     "label": "Büyüklük"
+    },
+    "phase": {
+     "label": "Faz"
+    },
+    "spacing": {
+     "label": "Aralık"
     },
     "speed": {
      "label": "Hız"
     },
-    "wavelength": {
-     "label": "Dalga boyu"
+    "warpAngle": {
+     "label": "Büküm açısı"
     }
    }
   },

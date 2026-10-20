@@ -2701,11 +2701,26 @@
    }
   },
   "pixelate": {
-   "description": "Aplica uma pixelização em mosaico, substituindo áreas por blocos quadrados com a cor do pixel superior esquerdo.",
+   "description": "Transforma a camada em blocos de uma cor cada, tirada do meio do bloco, em uma grade centralizada na camada (ou no quadro com Espaço de tela). Alongamento, Deslocamento e Ângulo moldam a grade, e Vinheta escurece cada bloco em direção às bordas.",
    "name": "Pixelizar",
    "params": {
+    "angle": {
+     "label": "Ângulo"
+    },
     "blockSize": {
-     "label": "Tamanho do bloco"
+     "label": "Tamanho"
+    },
+    "offset": {
+     "label": "Deslocamento"
+    },
+    "screenSpace": {
+     "label": "Espaço de tela"
+    },
+    "stretch": {
+     "label": "Alongamento"
+    },
+    "vignette": {
+     "label": "Vinheta"
     }
    }
   },
@@ -2776,11 +2791,14 @@
    }
   },
   "posterize": {
-   "description": "Reduz cada canal de cor para um número definido de níveis (2-32).",
+   "description": "Divide cada canal de cor em um número de Etapas planas, transformando gradientes suaves em faixas. O Deslocamento move onde ficam as bordas das faixas.",
    "name": "Posterizar",
    "params": {
     "levels": {
-     "label": "Níveis"
+     "label": "Etapas"
+    },
+    "offset": {
+     "label": "Deslocamento"
     }
    }
   },
@@ -2874,11 +2892,11 @@
    "description": "Aplica um desfoque radial de zoom a partir de um ponto central, com intensidade ajustável.",
    "name": "Desfoque de zoom",
    "params": {
+    "amount": {
+     "label": "Intensidade"
+    },
     "center": {
      "label": "Centro"
-    },
-    "strength": {
-     "label": "Intensidade"
     }
    }
   },
@@ -3244,14 +3262,31 @@
    }
   },
   "rgbsplit": {
-   "description": "Aberração cromática que desloca os canais vermelho e azul em direções opostas ao longo de um ângulo.",
+   "description": "Separa os canais vermelho, verde e azul: o canal Central fica no lugar e os outros dois se deslocam em direções opostas ao longo do Ângulo. Claro soma as cores deslocadas, Escuro as mantém sólidas, Máscara mantém apenas onde os três se sobrepõem e Luma deixa as franjas tão opacas quanto brilhantes.",
    "name": "Separação RGB",
    "params": {
     "angle": {
      "label": "Ângulo"
     },
-    "splitDistance": {
-     "label": "Distância"
+    "center": {
+     "label": "Central",
+     "options": [
+      "R",
+      "G",
+      "B"
+     ]
+    },
+    "mode": {
+     "label": "Modo",
+     "options": [
+      "Claro",
+      "Escuro",
+      "Máscara",
+      "Luma"
+     ]
+    },
+    "strength": {
+     "label": "Intensidade"
     }
    }
   },
@@ -4119,7 +4154,7 @@
      "label": "Inverter"
     },
     "level": {
-     "label": "Nível"
+     "label": "Limite"
     },
     "softness": {
      "label": "Suavidade"
@@ -4460,17 +4495,17 @@
    }
   },
   "unsharpmask": {
-   "description": "Aplica a máscara de nitidez clássica com um limiar e uma pré-visualização opcional em máscara cinza.",
+   "description": "Aumenta a nitidez adicionando de volta a diferença entre a camada e uma cópia desfocada dela. Intensidade define o tamanho do desfoque, Quantidade quanto é adicionado de volta, e Limite acima de 50% ignora pequenas diferenças.",
    "name": "Máscara de nitidez",
    "params": {
     "amount": {
      "label": "Quantidade"
     },
+    "radius": {
+     "label": "Intensidade"
+    },
     "showMask": {
      "label": "Mostrar máscara"
-    },
-    "strength": {
-     "label": "Intensidade"
     },
     "threshold": {
      "label": "Limiar"
@@ -4574,20 +4609,26 @@
    }
   },
   "wavewarp": {
-   "description": "Aplica um deslocamento de onda senoidal à imagem com amplitude, comprimento de onda, direção e velocidade de fase ajustáveis.",
+   "description": "Curva a camada com uma onda senoidal: Espaçamento define quantas ondas a atravessam, Magnitude o quanto empurram, Ângulo a direção das ondas e Ângulo de distorção a direção do empurrão.",
    "name": "Ondulação",
    "params": {
-    "amplitude": {
-     "label": "Amplitude"
+    "angle": {
+     "label": "Ângulo"
     },
-    "direction": {
-     "label": "Direção"
+    "magnitude": {
+     "label": "Magnitude"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "spacing": {
+     "label": "Espaçamento"
     },
     "speed": {
      "label": "Velocidade"
     },
-    "wavelength": {
-     "label": "Comprimento de onda"
+    "warpAngle": {
+     "label": "Ângulo de distorção"
     }
    }
   },

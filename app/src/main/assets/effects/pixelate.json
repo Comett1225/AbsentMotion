@@ -2,17 +2,67 @@
  "id": "pixelate",
  "name": "Pixelate",
  "category": "stylize",
- "description": "Applies a mosaic pixelation effect by replacing areas with square blocks of the top-left pixel's color.",
+ "description": "Turns the layer into blocks of one colour each, taken from the middle of the block, on a grid centred on the layer (or on the frame with Screen Space). Stretch, Offset and Angle shape the grid and Vignette darkens each block toward its edges.",
  "params": [
   {
    "id": "blockSize",
-   "label": "Block Size",
+   "label": "Size",
    "type": "float",
-   "default": 10.0,
-   "min": 1.0,
-   "max": 200.0,
-   "step": 1.0
+   "default": 20,
+   "min": 1,
+   "max": 500,
+   "step": 1
+  },
+  {
+   "id": "stretch",
+   "label": "Stretch",
+   "type": "point",
+   "default": [
+    1,
+    1
+   ],
+   "min": 0.01,
+   "max": 100,
+   "step": 0.01
+  },
+  {
+   "id": "offset",
+   "label": "Offset",
+   "type": "point",
+   "default": [
+    0,
+    0
+   ],
+   "min": -5000,
+   "max": 5000,
+   "step": 1,
+   "pixels": true
+  },
+  {
+   "id": "angle",
+   "label": "Angle",
+   "type": "angle",
+   "default": 0,
+   "min": -3600,
+   "max": 3600,
+   "step": 1
+  },
+  {
+   "id": "vignette",
+   "label": "Vignette",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "percent": true
+  },
+  {
+   "id": "screenSpace",
+   "label": "Screen Space",
+   "type": "switch",
+   "default": false
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float blockSize;\n\nhalf4 main(float2 coord) {\n    float2 block = floor(coord.xy / blockSize);\n    float2 sampleCoord = block * blockSize;\n    half4 color = image.eval(sampleCoord);\n    if (color.a < 0.001) {\n        return half4(0);\n    }\n    color.rgb /= color.a;\n    color.rgb *= color.a;\n    return color;\n}"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float4 screen;\nuniform float time;\nuniform float blockSize;\nuniform float2 stretch;\nuniform float2 offset;\nuniform float angle;\nuniform float vignette;\nuniform float screenSpace;\n\nhalf4 main(float2 coord) {\n    float2 origin = (screenSpace > 0.5 ? screen.xy + screen.zw * 0.5 : size * 0.5) + offset;\n    float2 cell = max(blockSize * stretch, float2(1.0));\n    float a = radians(angle);\n    float c = cos(a);\n    float s = sin(a);\n    float2 d = coord - origin;\n    float2 p = float2(c * d.x + s * d.y, c * d.y - s * d.x) / cell;\n    float2 b = floor(p);\n    float2 m = (b + 0.5) * cell;\n    half4 col = image.eval(origin + float2(c * m.x - s * m.y, s * m.x + c * m.y));\n    if (vignette > 0.0 && col.a > 0.001) {\n        float2 e = abs(p - b - 0.5) * 2.0;\n        half3 un = col.rgb / col.a;\n        col.rgb = max(un - half(vignette * (0.04 + 0.08 * dot(e, e))), half3(0.0)) * col.a;\n    }\n    return col;\n}"
 }

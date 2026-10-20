@@ -2701,11 +2701,26 @@
    }
   },
   "pixelate": {
-   "description": "Menerapkan efek mozaik piksel dengan mengganti area dengan blok persegi berwarna piksel kiri atas.",
+   "description": "Mengubah lapisan menjadi blok-blok berwarna tunggal yang diambil dari tengah blok, pada grid yang berpusat di lapisan (atau di frame dengan Ruang layar). Regangan, Offset, dan Sudut membentuk grid dan Vignette menggelapkan setiap blok ke arah tepinya.",
    "name": "Pikselasi",
    "params": {
+    "angle": {
+     "label": "Sudut"
+    },
     "blockSize": {
-     "label": "Ukuran blok"
+     "label": "Ukuran"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "screenSpace": {
+     "label": "Ruang layar"
+    },
+    "stretch": {
+     "label": "Regangan"
+    },
+    "vignette": {
+     "label": "Vignette"
     }
    }
   },
@@ -2776,11 +2791,14 @@
    }
   },
   "posterize": {
-   "description": "Mengurangi setiap kanal warna ke jumlah level tertentu (2-32).",
+   "description": "Memotong setiap kanal warna menjadi sejumlah Langkah datar, sehingga gradien halus berubah menjadi pita. Offset menggeser posisi tepi pita.",
    "name": "Posterisasi",
    "params": {
     "levels": {
-     "label": "Levels"
+     "label": "Langkah"
+    },
+    "offset": {
+     "label": "Offset"
     }
    }
   },
@@ -2874,11 +2892,11 @@
    "description": "Memberi blur zoom radial dengan merata-ratakan sampel dari titik pusat, kekuatannya bisa diatur.",
    "name": "Blur Zoom",
    "params": {
+    "amount": {
+     "label": "Kekuatan"
+    },
     "center": {
      "label": "Pusat"
-    },
-    "strength": {
-     "label": "Kekuatan"
     }
    }
   },
@@ -3244,14 +3262,31 @@
    }
   },
   "rgbsplit": {
-   "description": "Aberasi kromatik dengan menggeser kanal merah dan biru ke arah berlawanan sepanjang sudut.",
+   "description": "Memisahkan kanal merah, hijau, dan biru: kanal Pusat tetap di tempat dan dua lainnya bergeser ke arah berlawanan sepanjang Sudut. Terang menambahkan warna yang bergeser, Gelap membuatnya solid, Masker hanya menyisakan area yang ketiganya tumpang tindih, dan Luma membuat pinggiran memiliki opasitas sesuai kecerahannya.",
    "name": "Pemisahan RGB",
    "params": {
     "angle": {
      "label": "Sudut"
     },
-    "splitDistance": {
-     "label": "Jarak"
+    "center": {
+     "label": "Pusat",
+     "options": [
+      "R",
+      "G",
+      "B"
+     ]
+    },
+    "mode": {
+     "label": "Mode",
+     "options": [
+      "Terang",
+      "Gelap",
+      "Masker",
+      "Luma"
+     ]
+    },
+    "strength": {
+     "label": "Kekuatan"
     }
    }
   },
@@ -4119,7 +4154,7 @@
      "label": "Balik"
     },
     "level": {
-     "label": "Level"
+     "label": "Ambang"
     },
     "softness": {
      "label": "Kelembutan"
@@ -4460,17 +4495,17 @@
    }
   },
   "unsharpmask": {
-   "description": "Menerapkan masking unsharp klasik dengan ambang batas dan pratinjau masker abu-abu opsional.",
+   "description": "Mempertajam dengan menambahkan kembali selisih antara lapisan dan salinan buramnya. Kekuatan mengatur lebar blur, Jumlah menentukan seberapa banyak yang ditambahkan kembali, dan Ambang di atas 50% membiarkan selisih kecil.",
    "name": "Masker unsharp",
    "params": {
     "amount": {
      "label": "Jumlah"
     },
+    "radius": {
+     "label": "Kekuatan"
+    },
     "showMask": {
      "label": "Tampilkan masker"
-    },
-    "strength": {
-     "label": "Kekuatan"
     },
     "threshold": {
      "label": "Ambang batas"
@@ -4574,20 +4609,26 @@
    }
   },
   "wavewarp": {
-   "description": "Menerapkan pergeseran gelombang sinus ke gambar dengan amplitudo, panjang gelombang, arah, dan kecepatan fase yang dapat diatur.",
+   "description": "Membengkokkan lapisan dengan gelombang sinus: Jarak mengatur berapa banyak gelombang melintasinya, Magnitudo seberapa jauh dorongannya, Sudut arah gelombang berjalan, dan Sudut warp arah dorongannya.",
    "name": "Distorsi gelombang",
    "params": {
-    "amplitude": {
-     "label": "Amplitudo"
+    "angle": {
+     "label": "Sudut"
     },
-    "direction": {
-     "label": "Arah"
+    "magnitude": {
+     "label": "Magnitudo"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "spacing": {
+     "label": "Jarak"
     },
     "speed": {
      "label": "Kecepatan"
     },
-    "wavelength": {
-     "label": "Panjang gelombang"
+    "warpAngle": {
+     "label": "Sudut warp"
     }
    }
   },

@@ -11,9 +11,10 @@ import engine_check as engine
 
 def cases():
     yield 'top-level effect control', engine.scene(engine.rect(1, 100, 100, 100, 100, 0xffff0000, extra='<effect id="absent.invert"/>')), [((100, 100), (0, 255, 255))]
-    for name, effect in [('wave edges', '<effect id="absent.wavewarp"><property name="amplitude" type="float" value="80"/><property name="direction" type="float" value="45"/></effect>'),
-                         ('bulge edges', '<effect id="absent.bulge"><property name="strength" type="float" value="-1"/><property name="radius" type="float" value="1"/></effect>')]:
-        yield name, engine.scene(engine.rect(1, 100, 100, 100, 100, 0xffff0000, extra=effect)), [((x, y), engine.RED) for x, y in [(1, 1), (198, 1), (1, 198), (198, 198), (1, 100), (100, 198)]]
+    bulge = '<effect id="absent.bulge"><property name="strength" type="float" value="-1"/><property name="radius" type="float" value="1"/></effect>'
+    yield 'bulge edges', engine.scene(engine.rect(1, 100, 100, 100, 100, 0xffff0000, extra=bulge)), [((x, y), engine.RED) for x, y in [(1, 1), (198, 1), (1, 198), (198, 198), (1, 100), (100, 198)]]
+    wave = '<effect id="absent.wavewarp"><property name="magnitude" type="float" value="10"/><property name="spacing" type="float" value="20"/></effect>'
+    yield 'wave warp stays near its layer', engine.scene(engine.rect(1, 100, 100, 50, 50, 0xffff0000, extra=wave)), [((100, 100), engine.RED), ((5, 5), engine.BLACK), ((100, 25), engine.BLACK), ((100, 175), engine.BLACK), ((20, 100), engine.BLACK)]
     arrow = '<shape id="1" s=".arrow" startTime="0" endTime="1000" fillType="color">' + engine.transform('100,100,0') + '<fillColor value="#ffff0000"/><property name="start" type="vec2" value="-60,0"/><property name="end" type="vec2" value="60,0"/><property name="lineWidth" type="float" value="20"/><property name="headWidth" type="float" value="40"/><property name="headLength" type="float" value="30"/></shape>'
     yield 'arrow widths', engine.scene(arrow), [((70, 109), engine.RED), ((70, 111), engine.BLACK), ((70, 119), engine.BLACK)]
     camera = '<camera id="2" startTime="500" endTime="700">' + engine.transform('200,100,-300') + '</camera>'
@@ -25,7 +26,7 @@ def cases():
     yield 'invert keeps the outside clear', engine.scene(engine.rect(1, 100, 100, 40, 40, 0xffff0000, extra=invert)), [((100, 100), (0, 255, 255)), ((5, 5), engine.BLACK), ((50, 100), engine.BLACK)]
     keep = '<effect id="absent.invert"><property name="invert_alpha" type="float" value="0"/></effect>'
     yield 'invert without alpha keeps the outside clear', engine.scene(engine.rect(1, 100, 100, 40, 40, 0xffff0000, extra=keep)), [((100, 100), (0, 255, 255)), ((5, 5), engine.BLACK)]
-    split = '<effect id="absent.rgbsplit"><property name="splitDistance" type="float" value="0"/></effect>'
+    split = '<effect id="absent.rgbsplit"><property name="strength" type="float" value="0"/></effect>'
     for alpha in (0x40, 0x80, 0xc0):
         want = tuple(round(c * alpha / 255) for c in (255, 0x99, 0x33))
         yield f'rgb split at distance 0 keeps alpha {alpha:#x}', engine.scene(engine.rect(1, 100, 100, 40, 40, alpha << 24 | 0xff9933, extra=split)), [((100, 100), want), ((5, 5), engine.BLACK)]

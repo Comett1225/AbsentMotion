@@ -2701,11 +2701,26 @@
    }
   },
   "pixelate": {
-   "description": "Aplica un pixelado en mosaico reemplazando áreas con bloques cuadrados del color del píxel superior izquierdo.",
+   "description": "Convierte la capa en bloques de un solo color cada uno, tomados del centro del bloque, en una cuadrícula centrada en la capa (o en el fotograma con Espacio de pantalla). Estiramiento, Desplazamiento y Ángulo dan forma a la cuadrícula, y Viñeta oscurece cada bloque hacia sus bordes.",
    "name": "Pixelar",
    "params": {
+    "angle": {
+     "label": "Ángulo"
+    },
     "blockSize": {
-     "label": "Tamaño del bloque"
+     "label": "Tamaño"
+    },
+    "offset": {
+     "label": "Desplazamiento"
+    },
+    "screenSpace": {
+     "label": "Espacio de pantalla"
+    },
+    "stretch": {
+     "label": "Estiramiento"
+    },
+    "vignette": {
+     "label": "Viñeta"
     }
    }
   },
@@ -2776,11 +2791,14 @@
    }
   },
   "posterize": {
-   "description": "Reduce cada canal de color a un número determinado de niveles (2-32).",
+   "description": "Divide cada canal de color en varios niveles planos, así que los degradados suaves se convierten en bandas. El desplazamiento mueve dónde caen los bordes de las bandas.",
    "name": "Posterizar",
    "params": {
     "levels": {
      "label": "Niveles"
+    },
+    "offset": {
+     "label": "Desplazamiento"
     }
    }
   },
@@ -2874,11 +2892,11 @@
    "description": "Aplica un desenfoque de zoom radial promediando muestras a lo largo de rayos desde un punto central, con intensidad ajustable.",
    "name": "Desenfoque de zoom",
    "params": {
+    "amount": {
+     "label": "Intensidad"
+    },
     "center": {
      "label": "Centro"
-    },
-    "strength": {
-     "label": "Intensidad"
     }
    }
   },
@@ -3244,14 +3262,31 @@
    }
   },
   "rgbsplit": {
-   "description": "Aberración cromática que desplaza los canales rojo y azul en direcciones opuestas siguiendo un ángulo.",
+   "description": "Separa los canales rojo, verde y azul: el canal central se queda fijo y los otros dos se desplazan en direcciones opuestas a lo largo de Ángulo. Claro suma los colores desplazados, Oscuro los mantiene sólidos, Máscara conserva solo donde se superponen los tres y Luma hace que los bordes tengan opacidad según su brillo.",
    "name": "Separación RGB",
    "params": {
     "angle": {
      "label": "Ángulo"
     },
-    "splitDistance": {
-     "label": "Distancia"
+    "center": {
+     "label": "Centro",
+     "options": [
+      "R",
+      "G",
+      "B"
+     ]
+    },
+    "mode": {
+     "label": "Modo",
+     "options": [
+      "Claro",
+      "Oscuro",
+      "Máscara",
+      "Luma"
+     ]
+    },
+    "strength": {
+     "label": "Intensidad"
     }
    }
   },
@@ -4119,10 +4154,10 @@
      "label": "Invertir"
     },
     "level": {
-     "label": "Nivel"
+     "label": "Umbral"
     },
     "softness": {
-     "label": "Suavidad"
+     "label": "Suavizado"
     }
    }
   },
@@ -4460,17 +4495,17 @@
    }
   },
   "unsharpmask": {
-   "description": "Aplica una máscara de enfoque clásica con un umbral y una vista previa opcional de la máscara en gris.",
+   "description": "Enfoca sumando de nuevo la diferencia entre la capa y una copia desenfocada de ella. Intensidad define el ancho del desenfoque, Cantidad cuánto se suma de nuevo y Umbral por encima del 50% deja intactas las diferencias pequeñas.",
    "name": "Máscara de enfoque",
    "params": {
     "amount": {
      "label": "Cantidad"
     },
+    "radius": {
+     "label": "Intensidad"
+    },
     "showMask": {
      "label": "Mostrar máscara"
-    },
-    "strength": {
-     "label": "Intensidad"
     },
     "threshold": {
      "label": "Umbral"
@@ -4574,20 +4609,26 @@
    }
   },
   "wavewarp": {
-   "description": "Aplica un desplazamiento de onda sinusoidal a la imagen con amplitud, longitud de onda, dirección y velocidad de fase ajustables.",
+   "description": "Curva la capa con una onda sinusoidal: Espaciado define cuántas ondas la cruzan, Magnitud cuánto empujan, Ángulo la dirección en la que avanzan las ondas y Ángulo de deformación la dirección en la que empujan.",
    "name": "Deformación de onda",
    "params": {
-    "amplitude": {
-     "label": "Amplitud"
+    "angle": {
+     "label": "Ángulo"
     },
-    "direction": {
-     "label": "Dirección"
+    "magnitude": {
+     "label": "Magnitud"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "spacing": {
+     "label": "Espaciado"
     },
     "speed": {
      "label": "Velocidad"
     },
-    "wavelength": {
-     "label": "Longitud de onda"
+    "warpAngle": {
+     "label": "Ángulo de deformación"
     }
    }
   },

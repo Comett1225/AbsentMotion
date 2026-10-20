@@ -2701,11 +2701,26 @@
    }
   },
   "pixelate": {
-   "description": "Gunakan kesan piksel mozek dengan menggantikan kawasan dengan blok segi empat sama warna piksel kiri atas.",
+   "description": "Menukar lapisan kepada blok berwarna pada grid berpusat pada lapisan (atau bingkai dengan Ruang Skrin); Regangan, Ofset dan Sudut membentuk grid, manakala Vignet menggelapkan tepi setiap blok.",
    "name": "Pikselkan",
    "params": {
+    "angle": {
+     "label": "Sudut"
+    },
     "blockSize": {
-     "label": "Saiz Blok"
+     "label": "Saiz"
+    },
+    "offset": {
+     "label": "Ofset"
+    },
+    "screenSpace": {
+     "label": "Ruang Skrin"
+    },
+    "stretch": {
+     "label": "Regangan"
+    },
+    "vignette": {
+     "label": "Vignet"
     }
    }
   },
@@ -2776,11 +2791,14 @@
    }
   },
   "posterize": {
-   "description": "Mengurangkan setiap saluran warna kepada bilangan aras yang ditetapkan (2-32).",
+   "description": "Memotong setiap saluran warna kepada beberapa Langkah rata, jadi kecerunan licin menjadi jalur; Ofset mengubah kedudukan tepi jalur.",
    "name": "Posterisasi",
    "params": {
     "levels": {
-     "label": "Aras"
+     "label": "Langkah"
+    },
+    "offset": {
+     "label": "Ofset"
     }
    }
   },
@@ -2874,11 +2892,11 @@
    "description": "Menggunakan kabur zum jejari dengan meratakan sampel sepanjang sinar dari titik pusat dan kekuatan yang boleh dilaraskan.",
    "name": "Kabur zum",
    "params": {
+    "amount": {
+     "label": "Kekuatan"
+    },
     "center": {
      "label": "Pusat"
-    },
-    "strength": {
-     "label": "Kekuatan"
     }
    }
   },
@@ -3244,14 +3262,31 @@
    }
   },
   "rgbsplit": {
-   "description": "Aberasi kromatik dengan mengalihkan saluran merah dan biru ke arah bertentangan pada satu sudut.",
+   "description": "Memisahkan saluran merah, hijau dan biru: saluran Pusat kekal dan dua lagi beralih ke arah bertentangan sepanjang Sudut; Cerah menambah warna beralih, Gelap mengekalkannya pejal, Topeng kekalkan hanya tempat ketiga-tiganya bertindih dan Luma menjadikan pinggir legap mengikut kecerahan.",
    "name": "Pisah RGB",
    "params": {
     "angle": {
      "label": "Sudut"
     },
-    "splitDistance": {
-     "label": "Jarak"
+    "center": {
+     "label": "Pusat",
+     "options": [
+      "R",
+      "G",
+      "B"
+     ]
+    },
+    "mode": {
+     "label": "Mod",
+     "options": [
+      "Cerah",
+      "Gelap",
+      "Topeng",
+      "Luma"
+     ]
+    },
+    "strength": {
+     "label": "Kekuatan"
     }
    }
   },
@@ -4119,7 +4154,7 @@
      "label": "Songsang"
     },
     "level": {
-     "label": "Aras"
+     "label": "Ambang"
     },
     "softness": {
      "label": "Kelembutan"
@@ -4460,17 +4495,17 @@
    }
   },
   "unsharpmask": {
-   "description": "Menggunakan topeng tidak tajam klasik dengan ambang dan pratonton topeng kelabu pilihan.",
+   "description": "Menajamkan dengan menambah semula perbezaan antara lapisan dan salinan kabur; Kekuatan menetapkan lebar kabur, Jumlah berapa banyak ditambah semula, dan Ambang melebihi 50% membiarkan perbezaan kecil.",
    "name": "Topeng Tidak Tajam",
    "params": {
     "amount": {
      "label": "Jumlah"
     },
+    "radius": {
+     "label": "Kekuatan"
+    },
     "showMask": {
      "label": "Tunjuk Topeng"
-    },
-    "strength": {
-     "label": "Kekuatan"
     },
     "threshold": {
      "label": "Ambang"
@@ -4574,20 +4609,26 @@
    }
   },
   "wavewarp": {
-   "description": "Menggunakan sesaran gelombang sinus pada imej dengan amplitud, panjang gelombang, arah dan kelajuan fasa yang boleh dilaras.",
+   "description": "Membengkokkan lapisan dengan gelombang sinus: Jarak menetapkan berapa banyak gelombang melintasinya, Magnitud sejauh mana ia menolak, Sudut arah gelombang bergerak dan Sudut Pelengkungan arah ia menolak.",
    "name": "Herotan Gelombang",
    "params": {
-    "amplitude": {
-     "label": "Amplitud"
+    "angle": {
+     "label": "Sudut"
     },
-    "direction": {
-     "label": "Arah"
+    "magnitude": {
+     "label": "Magnitud"
+    },
+    "phase": {
+     "label": "Fasa"
+    },
+    "spacing": {
+     "label": "Jarak"
     },
     "speed": {
      "label": "Kelajuan"
     },
-    "wavelength": {
-     "label": "Panjang Gelombang"
+    "warpAngle": {
+     "label": "Sudut Pelengkungan"
     }
    }
   },

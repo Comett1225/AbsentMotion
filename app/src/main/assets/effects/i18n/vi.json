@@ -2701,11 +2701,26 @@
    }
   },
   "pixelate": {
-   "description": "Tạo hiệu ứng điểm ảnh dạng khối bằng cách thay vùng ảnh bằng các ô vuông màu của điểm ảnh góc trên bên trái.",
+   "description": "Biến lớp thành các khối mỗi khối một màu, lấy từ giữa khối, trên lưới căn giữa lớp (hoặc khung hình với Không gian màn hình). Kéo giãn, Độ lệch và Góc định hình lưới, còn Viền tối làm tối dần từng khối về phía mép.",
    "name": "Điểm ảnh hóa",
    "params": {
+    "angle": {
+     "label": "Góc"
+    },
     "blockSize": {
-     "label": "Kích thước khối"
+     "label": "Kích thước"
+    },
+    "offset": {
+     "label": "Độ lệch"
+    },
+    "screenSpace": {
+     "label": "Không gian màn hình"
+    },
+    "stretch": {
+     "label": "Kéo giãn"
+    },
+    "vignette": {
+     "label": "Viền tối"
     }
    }
   },
@@ -2776,11 +2791,14 @@
    }
   },
   "posterize": {
-   "description": "Giảm mỗi kênh màu xuống một số mức nhất định (2-32).",
+   "description": "Chia mỗi kênh màu thành một số bậc phẳng, khiến chuyển màu mượt thành các dải. Độ lệch dịch vị trí ranh giới các dải.",
    "name": "Giảm cấp màu",
    "params": {
     "levels": {
-     "label": "Số mức"
+     "label": "Số bậc"
+    },
+    "offset": {
+     "label": "Độ lệch"
     }
    }
   },
@@ -2874,11 +2892,11 @@
    "description": "Tạo nhòe thu phóng tỏa tròn từ một điểm giữa với độ mạnh tùy chỉnh.",
    "name": "Nhòe thu phóng",
    "params": {
+    "amount": {
+     "label": "Cường độ"
+    },
     "center": {
      "label": "Tâm"
-    },
-    "strength": {
-     "label": "Độ mạnh"
     }
    }
   },
@@ -3244,14 +3262,31 @@
    }
   },
   "rgbsplit": {
-   "description": "Tạo quang sai màu bằng cách dịch kênh đỏ và lam ngược chiều nhau theo một góc.",
+   "description": "Tách các kênh đỏ, lục và lam: kênh tâm giữ nguyên, hai kênh còn lại dịch ngược chiều nhau theo Góc. Sáng cộng màu đã dịch, Tối giữ chúng đặc, Mặt nạ chỉ giữ nơi cả ba trùng nhau và Luma làm rìa có độ mờ tương ứng độ sáng.",
    "name": "Tách RGB",
    "params": {
     "angle": {
      "label": "Góc"
     },
-    "splitDistance": {
-     "label": "Khoảng cách"
+    "center": {
+     "label": "Kênh tâm",
+     "options": [
+      "R",
+      "G",
+      "B"
+     ]
+    },
+    "mode": {
+     "label": "Chế độ",
+     "options": [
+      "Sáng",
+      "Tối",
+      "Mặt nạ",
+      "Luma"
+     ]
+    },
+    "strength": {
+     "label": "Cường độ"
     }
    }
   },
@@ -4119,7 +4154,7 @@
      "label": "Đảo ngược"
     },
     "level": {
-     "label": "Mức"
+     "label": "Ngưỡng"
     },
     "softness": {
      "label": "Độ mềm"
@@ -4460,17 +4495,17 @@
    }
   },
   "unsharpmask": {
-   "description": "Áp dụng làm nét cổ điển với ngưỡng và tùy chọn xem trước mặt nạ xám.",
+   "description": "Làm nét bằng cách cộng lại phần chênh lệch giữa lớp và bản sao đã làm mờ của nó. Cường độ đặt độ rộng vùng mờ, Mức đặt mức cộng lại, và Ngưỡng trên 50% sẽ bỏ qua khác biệt nhỏ.",
    "name": "Mặt nạ làm nét",
    "params": {
     "amount": {
      "label": "Mức"
     },
+    "radius": {
+     "label": "Cường độ"
+    },
     "showMask": {
      "label": "Hiện mặt nạ"
-    },
-    "strength": {
-     "label": "Cường độ"
     },
     "threshold": {
      "label": "Ngưỡng"
@@ -4574,20 +4609,26 @@
    }
   },
   "wavewarp": {
-   "description": "Áp dụng dịch chuyển dạng sóng sin cho hình ảnh với biên độ, bước sóng, hướng và tốc độ pha điều chỉnh được.",
+   "description": "Uốn lớp bằng sóng sin: Khoảng cách đặt số sóng cắt qua, Độ lớn đặt độ đẩy, Góc đặt hướng sóng chạy và Góc uốn đặt hướng đẩy.",
    "name": "Biến dạng sóng",
    "params": {
-    "amplitude": {
-     "label": "Biên độ"
+    "angle": {
+     "label": "Góc"
     },
-    "direction": {
-     "label": "Hướng"
+    "magnitude": {
+     "label": "Độ lớn"
+    },
+    "phase": {
+     "label": "Pha"
+    },
+    "spacing": {
+     "label": "Khoảng cách"
     },
     "speed": {
      "label": "Tốc độ"
     },
-    "wavelength": {
-     "label": "Bước sóng"
+    "warpAngle": {
+     "label": "Góc uốn"
     }
    }
   },

@@ -2,26 +2,49 @@
  "id": "rgbsplit",
  "name": "RGB Split",
  "category": "stylize",
- "description": "Chromatic aberration by shifting red and blue channels in opposite directions along an angle.",
+ "description": "Splits the red, green and blue channels: the Center channel stays put and the other two shift in opposite directions along Angle. Light adds the shifted colours, Dark keeps them solid, Mask keeps only where all three overlap and Luma makes the fringes as opaque as they are bright.",
  "params": [
   {
-   "id": "splitDistance",
-   "label": "Distance",
+   "id": "strength",
+   "label": "Strength",
    "type": "float",
-   "default": 12.0,
-   "min": 0.0,
-   "max": 100.0,
-   "step": 1.0
+   "default": 0.15,
+   "min": -8,
+   "max": 8,
+   "step": 0.01
   },
   {
    "id": "angle",
    "label": "Angle",
-   "type": "float",
-   "default": 0.0,
-   "min": 0.0,
-   "max": 360.0,
-   "step": 1.0
+   "type": "angle",
+   "default": 0,
+   "min": -3600,
+   "max": 3600,
+   "step": 1
+  },
+  {
+   "id": "center",
+   "label": "Center",
+   "type": "choice",
+   "default": 1,
+   "options": [
+    "R",
+    "G",
+    "B"
+   ]
+  },
+  {
+   "id": "mode",
+   "label": "Mode",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Light",
+    "Dark",
+    "Mask",
+    "Luma"
+   ]
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float splitDistance;\nuniform float angle;\n\nhalf4 main(float2 coord) {\n    float a = radians(angle);\n    float2 dir = float2(cos(a), sin(a));\n    float2 offset = dir * splitDistance;\n    float2 redCoord = coord + offset;\n    float2 blueCoord = coord - offset;\n    half4 red = image.eval(redCoord);\n    half4 blue = image.eval(blueCoord);\n    half4 green = image.eval(coord);\n    float r = red.a > 0.001 ? red.r / red.a : 0;\n    float b = blue.a > 0.001 ? blue.b / blue.a : 0;\n    float g = green.a > 0.001 ? green.g / green.a : 0;\n    float3 rgb = float3(r, g, b);\n    float alpha = min(red.a, min(blue.a, green.a));\n    return half4(rgb * alpha, alpha);\n}"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float strength;\nuniform float angle;\nuniform float center;\nuniform float mode;\n\nhalf4 main(float2 coord) {\n    float a = radians(angle);\n    float2 o = float2(cos(a), sin(a)) * size * (strength / 8.0);\n    float k = floor(center + 0.5);\n    float2 sr = k < 0.5 ? float2(0.0) : o;\n    float2 sg = k < 0.5 ? o : (k < 1.5 ? float2(0.0) : -o);\n    float2 sb = k < 1.5 ? -o : float2(0.0);\n    half4 r = image.eval(coord - sr);\n    half4 g = image.eval(coord - sg);\n    half4 b = image.eval(coord - sb);\n    half ac = k < 0.5 ? r.a : (k < 1.5 ? g.a : b.a);\n    half3 rgb = half3(r.r, g.g, b.b);\n    float m = floor(mode + 0.5);\n    if (m < 0.5) return half4(rgb, ac);\n    if (m < 1.5) return half4(rgb, max(r.a, max(g.a, b.a)));\n    if (m < 2.5) {\n        half lo = min(r.a, min(g.a, b.a));\n        half3 un = half3(r.a > 0.001 ? r.r / r.a : 0.0, g.a > 0.001 ? g.g / g.a : 0.0, b.a > 0.001 ? b.b / b.a : 0.0);\n        return half4(un * lo, lo);\n    }\n    return half4(rgb, clamp(max(ac, dot(rgb, half3(0.2126, 0.7152, 0.0722))), 0.0, 1.0));\n}"
 }

@@ -3,13 +3,13 @@
  "name": "Unsharp Mask",
  "category": "stylize",
  "since": "2.5.0",
- "description": "Applies classic unsharp masking with a threshold and an optional grey mask preview.",
+ "description": "Sharpens by adding back the difference between the layer and a blurred copy of it. Strength sets how wide the blur is, Amount how much is added back, and Threshold above 50% leaves small differences alone.",
  "params": [
   {
-   "id": "strength",
+   "id": "radius",
    "label": "Strength",
    "type": "float",
-   "default": 0.5,
+   "default": 0.02,
    "min": 0.0,
    "max": 2.0,
    "step": 0.1
@@ -18,19 +18,21 @@
    "id": "amount",
    "label": "Amount",
    "type": "float",
-   "default": 1.0,
+   "default": 0.5,
    "min": 0.0,
-   "max": 4.0,
-   "step": 0.1
+   "max": 2,
+   "step": 0.1,
+   "percent": true
   },
   {
    "id": "threshold",
    "label": "Threshold",
    "type": "float",
-   "default": 0.0,
-   "min": -1.0,
-   "max": 1.0,
-   "step": 0.01
+   "default": 0.5,
+   "min": -0.5,
+   "max": 1,
+   "step": 0.01,
+   "percent": true
   },
   {
    "id": "showMask",
@@ -39,5 +41,5 @@
    "default": false
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float strength;\nuniform float amount;\nuniform float threshold;\nuniform float showMask;\nhalf3 tap(float2 p)\n{\n    half4 s = image.eval(p);\n    return s.rgb / max(s.a, 0.001);\n}\nhalf softGate(half d, half t)\n{\n    if (t <= 0.0) return 1.0;\n    return smoothstep(t, t + max(t * 0.5, half(0.001)), abs(d));\n}\nhalf4 main(float2 coord)\n{\n    half4 c = image.eval(coord);\n    if (c.a <= 0.001) return half4(0.0);\n    half3 col = c.rgb / c.a;\n    float r = strength * 4.0;\n    half3 blurred = (tap(coord + float2(-r, -r)) + 2.0 * tap(coord + float2(0.0, -r)) + tap(coord + float2(r, -r)) + 2.0 * tap(coord + float2(-r, 0.0)) + 4.0 * col + 2.0 * tap(coord + float2(r, 0.0)) + tap(coord + float2(-r, r)) + 2.0 * tap(coord + float2(0.0, r)) + tap(coord + float2(r, r))) / 16.0;\n    half3 diff = col - blurred;\n    half t = half(max(threshold, 0.0) * 0.25);\n    half3 g = half3(softGate(diff.r, t), softGate(diff.g, t), softGate(diff.b, t));\n    half amt = half(amount);\n    half3 corrected = clamp(col + amt * diff * g, half3(0.0), half3(1.0));\n    half3 ad = abs(diff);\n    half m = clamp((ad.r + ad.g + ad.b) * half(1.3333333), 0.0, 1.0);\n    if (showMask > 0.5) return half4(half3(m) * c.a, c.a);\n    return half4(corrected * c.a, c.a);\n}"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float4 screen;\nuniform float time;\nuniform float radius;\nuniform float amount;\nuniform float threshold;\nuniform float showMask;\nhalf softGate(half d, half t)\n{\n    if (t <= 0.0) return 1.0;\n    return smoothstep(t, t + max(t * 0.5, half(0.001)), abs(d));\n}\nhalf4 main(float2 coord)\n{\n    half4 c = image.eval(coord);\n    if (c.a <= 0.001) return half4(0.0);\n    half3 col = c.rgb / c.a;\n    float sigma = max(radius, 0.0) * 25.0 * min(screen.z, screen.w) / 1080.0;\n    half3 blurred = col;\n    if (sigma > 0.05) {\n        float4 sum = float4(c);\n        float total = 1.0;\n        for (int i = 0; i < 64; i++) {\n            float r = sqrt((float(i) + 0.5) / 64.0) * 2.5 * sigma;\n            float t = float(i) * 2.3999632;\n            float w = exp(-0.5 * r * r / (sigma * sigma));\n            sum += w * float4(image.eval(coord + r * float2(cos(t), sin(t))));\n            total += w;\n        }\n        blurred = half3(sum.rgb / total);\n    }\n    half3 diff = col - blurred;\n    half t = half(max(threshold - 0.5, 0.0) * 0.25);\n    half3 g = half3(softGate(diff.r, t), softGate(diff.g, t), softGate(diff.b, t));\n    half3 corrected = clamp(col + half(amount) * diff * g, half3(0.0), half3(1.0));\n    half3 ad = abs(diff);\n    half m = clamp((ad.r + ad.g + ad.b) * half(1.3333333), 0.0, 1.0);\n    if (showMask > 0.5) return half4(half3(m) * c.a, c.a);\n    return half4(corrected * c.a, c.a);\n}"
 }

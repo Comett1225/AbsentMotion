@@ -474,7 +474,7 @@
   "to": "unsharpmask",
   "params": {
    "strength": {
-    "to": "strength",
+    "to": "radius",
     "min": 0
    },
    "amount": {
@@ -878,6 +878,77 @@
    },
    "inset": {
     "to": "inset"
+   }
+  }
+ },
+ "absent.wavewarp": {
+  "to": "wavewarp",
+  "params": {
+   "amplitude": {
+    "to": "magnitude",
+    "scale": 0.0925926,
+    "min": 0,
+    "max": 30
+   },
+   "wavelength": {
+    "to": "spacing",
+    "power": -1,
+    "scale": 6785.84,
+    "min": 0,
+    "max": 500
+   },
+   "direction": [
+    {
+     "to": "angle",
+     "component": 0
+    },
+    {
+     "to": "warpAngle",
+     "component": 0,
+     "offset": 90
+    }
+   ]
+  }
+ },
+ "absent.rgbsplit": {
+  "to": "rgbsplit",
+  "params": {
+   "splitDistance": {
+    "to": "strength",
+    "scale": 0.0074074,
+    "min": -8,
+    "max": 8
+   },
+   "angle": {
+    "to": "angle",
+    "offset": 180,
+    "wrap": 360
+   }
+  },
+  "set": {
+   "center": 1,
+   "mode": 2
+  }
+ },
+ "absent.radialblur": {
+  "to": "radialblur",
+  "params": {
+   "strength": {
+    "to": "amount",
+    "scale": 0.2,
+    "min": 0,
+    "max": 1
+   }
+  }
+ },
+ "absent.unsharpmask": {
+  "to": "unsharpmask",
+  "params": {
+   "strength": {
+    "to": "radius",
+    "scale": 0.112,
+    "min": 0,
+    "max": 2
    }
   }
  }

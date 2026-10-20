@@ -2701,11 +2701,26 @@
    }
   },
   "pixelate": {
-   "description": "Naglalapat ng mosaic pixelation gamit ang mga parisukat na bloke ng kulay ng pinakataas-kaliwang pixel.",
+   "description": "Ginagawang mga bloke ng isang kulay ang layer, mula sa gitna ng bloke, sa grid na nakasentro sa layer (o sa frame gamit ang Screen Space). Hinuhubog ng Stretch, Offset at Anggulo ang grid at pinapadilim ng Vignette ang bawat bloke patungo sa mga gilid nito.",
    "name": "Pixelate",
    "params": {
+    "angle": {
+     "label": "Anggulo"
+    },
     "blockSize": {
-     "label": "Laki ng bloke"
+     "label": "Laki"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "screenSpace": {
+     "label": "Screen Space"
+    },
+    "stretch": {
+     "label": "Stretch"
+    },
+    "vignette": {
+     "label": "Vignette"
     }
    }
   },
@@ -2776,11 +2791,14 @@
    }
   },
   "posterize": {
-   "description": "Binabawasan ang bawat channel ng kulay sa tinukoy na bilang ng antas (2-32).",
+   "description": "Hinahati ang bawat channel ng kulay sa ilang flat na Steps, kaya nagiging banda ang makinis na gradient. Ginagalaw ng Offset kung saan nahuhulog ang mga gilid ng banda.",
    "name": "Posterize",
    "params": {
     "levels": {
-     "label": "Mga antas"
+     "label": "Steps"
+    },
+    "offset": {
+     "label": "Offset"
     }
    }
   },
@@ -2874,11 +2892,11 @@
    "description": "Nagdadagdag ng radial zoom blur gamit ang mga sample sa mga sinag mula sa gitna, na may adjustable na lakas.",
    "name": "Zoom Blur",
    "params": {
+    "amount": {
+     "label": "Lakas"
+    },
     "center": {
      "label": "Gitna"
-    },
-    "strength": {
-     "label": "Lakas"
     }
    }
   },
@@ -3244,14 +3262,31 @@
    }
   },
   "rgbsplit": {
-   "description": "Chromatic aberration sa pamamagitan ng pag-shift ng pula at asul na channel sa magkasalungat na direksyon sa isang anggulo.",
+   "description": "Hinahati ang red, green at blue channels: ang Center channel ay nananatili at ang dalawa ay gumagalaw sa magkasalungat na direksyon kasunod ng Anggulo. Pinagsasama ng Light ang mga shifted na kulay, pinananatiling solid ang Dark, pinananatili ng Mask ang overlap ng tatlo at ginagawang kasing-opaque ng liwanag ang Luma sa mga fringes.",
    "name": "RGB Split",
    "params": {
     "angle": {
      "label": "Anggulo"
     },
-    "splitDistance": {
-     "label": "Distansya"
+    "center": {
+     "label": "Center",
+     "options": [
+      "R",
+      "G",
+      "B"
+     ]
+    },
+    "mode": {
+     "label": "Mode",
+     "options": [
+      "Light",
+      "Dark",
+      "Mask",
+      "Luma"
+     ]
+    },
+    "strength": {
+     "label": "Lakas"
     }
    }
   },
@@ -4119,10 +4154,10 @@
      "label": "Baliktarin"
     },
     "level": {
-     "label": "Antas"
+     "label": "Threshold"
     },
     "softness": {
-     "label": "Kalambutan"
+     "label": "Feather"
     }
    }
   },
@@ -4460,17 +4495,17 @@
    }
   },
   "unsharpmask": {
-   "description": "Naglalapat ng klasikong unsharp masking na may hangganan at opsyonal na preview ng grey na mask.",
+   "description": "Nagpapatalas sa pamamagitan ng pagbabalik ng pagkakaiba ng layer at ng blurred na kopya nito. Itinatakda ng Strength kung gaano kalawak ang blur, ng Amount kung gaano karami ang ibinabalik, at ang Threshold na higit sa 50% ay hindi pinapansin ang maliliit na pagkakaiba.",
    "name": "Unsharp Mask",
    "params": {
     "amount": {
      "label": "Dami"
     },
+    "radius": {
+     "label": "Lakas"
+    },
     "showMask": {
      "label": "Ipakita ang Mask"
-    },
-    "strength": {
-     "label": "Lakas"
     },
     "threshold": {
      "label": "Hangganan"
@@ -4574,20 +4609,26 @@
    }
   },
   "wavewarp": {
-   "description": "Naglalapat ng sine wave displacement sa larawan na may amplitude, wavelength, direksyon at bilis ng phase na maaaring isaayos.",
+   "description": "Binabaluktot ang layer gamit ang sine wave: Itinatakda ng Spacing kung ilang wave ang tumatawid, ng Magnitude kung gaano kalayo ang pagtulak, ng Anggulo ang direksyon ng pagtakbo ng waves at ng Warp Angle ang direksyon ng pagtulak.",
    "name": "Wave Warp",
    "params": {
-    "amplitude": {
-     "label": "Amplitude"
+    "angle": {
+     "label": "Anggulo"
     },
-    "direction": {
-     "label": "Direksyon"
+    "magnitude": {
+     "label": "Magnitude"
+    },
+    "phase": {
+     "label": "Phase"
+    },
+    "spacing": {
+     "label": "Spacing"
     },
     "speed": {
      "label": "Bilis"
     },
-    "wavelength": {
-     "label": "Wavelength"
+    "warpAngle": {
+     "label": "Warp Angle"
     }
    }
   },

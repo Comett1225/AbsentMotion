@@ -2,17 +2,26 @@
  "id": "posterize",
  "name": "Posterize",
  "category": "color",
- "description": "Reduces each color channel to a specified number of levels (2-32).",
+ "description": "Cuts each colour channel into a number of flat Steps, so smooth gradients turn into bands. Offset moves where the band edges fall.",
  "params": [
   {
    "id": "levels",
-   "label": "Levels",
+   "label": "Steps",
    "type": "float",
-   "default": 4,
+   "default": 10,
    "min": 2,
-   "max": 32,
+   "max": 255,
    "step": 1
+  },
+  {
+   "id": "offset",
+   "label": "Offset",
+   "type": "float",
+   "default": 0,
+   "min": -1,
+   "max": 1,
+   "step": 0.001
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float levels;\n\nhalf4 main(float2 coord) {\n    half4 col = image.eval(coord);\n    if (col.a < 1e-3) {\n        return half4(0);\n    }\n\n    half3 rgb = col.rgb / col.a;\n\n    half lv = levels - 1.0;\n\n    half r = floor(rgb.r * lv) / lv;\n    half g = floor(rgb.g * lv) / lv;\n    half b = floor(rgb.b * lv) / lv;\n\n    return half4(half3(r, g, b) * col.a, col.a);\n}"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float levels;\nuniform float offset;\n\nhalf4 main(float2 coord) {\n    half4 col = image.eval(coord);\n    if (col.a < 1e-3) return half4(0);\n    float3 rgb = float3(col.rgb / col.a);\n    float n = max(levels, 1.0);\n    float3 q = clamp((floor(rgb * n + offset) - offset) / n, 0.0, 1.0);\n    return half4(half3(q) * col.a, col.a);\n}"
 }
