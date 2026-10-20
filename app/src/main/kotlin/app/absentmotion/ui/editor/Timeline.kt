@@ -157,6 +157,9 @@ private val HandleZone = 22.dp
 
 private val MultiBarHeight = 48.dp
 
+private val SnapZone = 8.dp
+private val SnapLine = 1.dp
+
 private const val LIFT_SCALE = 1.02f
 private const val LIFT_DIM = 0.3f
 private const val LIFT_SHADOW_ALPHA = 0.07f
@@ -185,6 +188,7 @@ private val BarShadow get() = Am.PreviewBg
 private val GripColor get() = Am.Inactive
 private val HandleColor get() = Am.Inactive
 private val LimitColor get() = Am.Warning
+private val SnapColor get() = Am.Accent
 
 private val TimecodeStyle get() = TextStyle(color = Am.OnDark, fontSize = 14.sp)
 private val LabelStyle get() = TextStyle(color = Am.OnBar, fontSize = 11.sp)
@@ -298,6 +302,21 @@ internal object TimelineMath {
         max(0, floor(scroll / rowH).toInt())..min(rows - 1, ceil((bottom - top + scroll) / rowH).toInt() - 1)
 
     fun released(end: PointerInputChange?): Boolean = end == null || !end.isConsumed
+
+    fun snapFrame(wantedMs: Float, targets: Collection<Int>, fps: Int, zoneMs: Float): Int? {
+        val best = targets.minByOrNull { abs(frameTimeMs(it, fps) - wantedMs) } ?: return null
+        return best.takeIf { abs(frameTimeMs(it, fps) - wantedMs) <= zoneMs }
+    }
+
+    fun snapTargets(scene: Scene, skip: Long, playhead: Int): Set<Int> = buildSet {
+        add(playhead)
+        scene.bookmarks.forEach { add(scene.frameAt(it)) }
+        for (layer in scene.layers) if (layer.id != skip) {
+            add(scene.frameAt(layer.startTime))
+            add(scene.frameAt(layer.endTime + 1))
+            layer.keyframeTimes().forEach { add(scene.frameAt(it)) }
+        }
+    }
 }
 
 private class TimeScale(val nowMs: Float, val originX: Float, val pxPerMs: Float) {
@@ -347,6 +366,9 @@ private class TimelineView(val state: EditorState, density: Density, private val
     var limitEdge by mutableStateOf<Boolean?>(null)
         private set
     var onTick: () -> Unit = {}
+    var snapAt by mutableStateOf<Int?>(null)
+        private set
+    private var snapTargets = emptySet<Int>()
 
     private class Slide(val from: Float, val at: Long)
 
@@ -475,13 +497,24 @@ private class TimelineView(val state: EditorState, density: Density, private val
         keyFrame = hit.frame
         keyMs = TimelineMath.frameTimeMs(hit.frame, fps)
         keyId = hit.id
+        snapTargets = TimelineMath.snapTargets(state.scene, hit.id, state.frame)
+    }
+
+    private fun snapNear(ms: Float): Int? = TimelineMath.snapFrame(ms, snapTargets, fps, SnapZone.px / timeScale().pxPerMs)
+
+    private fun showSnap(snap: Int?, landed: Int) {
+        val shown = snap?.takeIf { it == landed }
+        if (shown != null && shown != snapAt) onTick()
+        snapAt = shown
     }
 
     private fun keyBy(dx: Float) {
         val original = keyLayer ?: return
         val scene = state.scene
         keyMs += dx / timeScale().pxPerMs
-        val frame = TimelineMath.nearestFrame(keyMs, fps).coerceIn(scene.frameAt(original.startTime), scene.frameAt(original.endTime))
+        val snap = snapNear(keyMs)
+        val frame = (snap ?: TimelineMath.nearestFrame(keyMs, fps)).coerceIn(scene.frameAt(original.startTime), scene.frameAt(original.endTime))
+        showSnap(snap, frame)
         if (frame == keyFrame) return
         keyFrame = frame
         state.edit(KEY_MOVE) { s -> s.update(original.id) { original.withKeyframesMoved(keyFrom, frame, s) } }
@@ -541,6 +574,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
             val layer = layers.firstOrNull { it.id == hit.id }
             dragId = hit.id
             edgeMs = (if (hit.start) layer?.startTime else layer?.endTime?.plus(1))?.toFloat() ?: 0f
+            snapTargets = TimelineMath.snapTargets(state.scene, hit.id, state.frame)
             if (hit.start) Drag.TrimStart else Drag.TrimEnd
         }
         hit is Hit.Handle -> {
@@ -567,6 +601,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
 
     fun endDrag(drag: Drag?, velocity: Velocity, lifted: Boolean = true) {
         limitEdge = null
+        snapAt = null
         if (drag == Drag.Lift) drop()
         if (drag == Drag.Select) endSelect()
         if (drag == Drag.Key) dropKey(lifted)
@@ -629,19 +664,22 @@ private class TimelineView(val state: EditorState, density: Density, private val
         edgeMs += dx / timeScale().pxPerMs
         val scene = state.scene
         val layer = layers.firstOrNull { it.id == dragId } ?: return
-        val frame = TimelineMath.nearestFrame(edgeMs, fps)
+        val snap = snapNear(edgeMs)
+        val frame = snap ?: TimelineMath.nearestFrame(edgeMs, fps)
         val id = dragId
         val mediaMs = (layer.mediaFill?.uri ?: layer.node["src"])?.let { scene.media(it)?.duration }?.takeIf { it > 0 }?.let { (it / 1000).toInt() } ?: Int.MAX_VALUE
+        val edge = if (start) frame.coerceIn(0, scene.lastShownFrame(layer.endTime).coerceAtLeast(0)) else (frame - 1).coerceAtLeast(scene.firstShownFrame(layer.startTime)) + 1
         val time = if (start) {
-            scene.frameStart(frame.coerceIn(0, scene.lastShownFrame(layer.endTime).coerceAtLeast(0)))
+            scene.frameStart(edge)
                 .also { time -> if (time != layer.startTime) state.edit("trim-start") { it.update(id) { l -> l.trimmedTo(time, l.endTime, mediaMs) } } }
         } else {
-            scene.frameEnd((frame - 1).coerceAtLeast(scene.firstShownFrame(layer.startTime)))
+            scene.frameEnd(edge - 1)
                 .also { time -> if (time != layer.endTime) state.edit("trim-end") { it.update(id) { l -> l.trimmedTo(l.startTime, time, mediaMs) } } }
         }
         val hit = layer.trimHitsSourceLimit(start, time, mediaMs)
         if (hit && limitEdge == null) onTick()
         limitEdge = start.takeIf { hit }
+        showSnap(snap.takeUnless { hit }, edge)
     }
 
     private fun reorderTo(y: Float) {
@@ -866,6 +904,10 @@ private fun DrawScope.drawTimeline(view: TimelineView, measurer: TextMeasurer, e
             if (layer.id == view.liftId) continue
             drawRow(layer, layer.id == state.selectedId, view.shownTop(row, layer.id), time, stripe, measurer, if (layer.hidden) eyeOff else eye, outline, state.scene, state.frame, pictures[layer.id], appear, view.keyFrame.takeIf { layer.id == view.keyId }, view.limitEdge.takeIf { layer.id == state.selectedId })
         }
+    }
+    view.snapAt?.let { frame ->
+        val half = SnapLine.toPx() / 2
+        drawRect(SnapColor, Offset(time.x(state.scene.frameStart(frame).toFloat()) - half, view.rulerH), Size(2 * half, size.height - view.rulerH))
     }
     val marks = state.scene.bookmarks
     val onBookmark = marks.any { state.scene.frameAt(it) == state.frame }
