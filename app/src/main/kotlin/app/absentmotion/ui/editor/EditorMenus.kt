@@ -318,7 +318,7 @@ internal fun CopyPasteMenu(state: EditorState, onDismiss: () -> Unit) {
             MenuRow(stringResource(R.string.menu_set_outro_start)) { state.markOutroStart(); onDismiss() }
         }
     }
-    if (styleOpen) PasteStyleMenu(state) { styleOpen = false; onDismiss() }
+    Presence(styleOpen) { PasteStyleMenu(state) { styleOpen = false; onDismiss() } }
 }
 
 @Composable

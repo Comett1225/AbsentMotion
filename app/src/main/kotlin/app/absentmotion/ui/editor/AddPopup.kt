@@ -67,6 +67,7 @@ import app.absentmotion.editor.startFreehand
 import app.absentmotion.editor.startVectorDrawing
 import app.absentmotion.model.ShapeCatalog
 import app.absentmotion.ui.theme.Am
+import app.absentmotion.ui.theme.Swap
 import app.absentmotion.ui.theme.TilePress
 import app.absentmotion.ui.theme.pressScale
 import androidx.compose.foundation.LocalIndication
@@ -108,7 +109,7 @@ internal fun AddPopup(state: EditorState, modifier: Modifier = Modifier, library
                 Tabs.forEachIndexed { i, tab -> TabButton(tab, active = i == selectedTab, enabled = i <= 4) { selectedTab = i } }
             }
             val body = Modifier.weight(1f).fillMaxWidth().background(Am.Panel)
-            Box(body) {
+            Swap(selectedTab, body, rise = 0.dp) {
                 when (selectedTab) { 0 -> ShapePages(state, Modifier.fillMaxSize()); 1 -> MediaTab(state, Modifier.fillMaxSize(), library); 3 -> ObjectPage(state, Modifier.fillMaxSize()); 4 -> TemplatePage(state, Modifier.fillMaxSize()); else -> AudioTab(state, Modifier.fillMaxSize(), library) }
             }
         }

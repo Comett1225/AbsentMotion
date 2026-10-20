@@ -141,6 +141,16 @@ class UiContracts(unittest.TestCase):
         self.assertIn('Icon(PanelIcons.Animate, stringResource(R.string.a11y_animate)', text)
         self.assertIn('state.playing = false', text)
 
+    def test_editor_menus_animate_in_and_out(self):
+        root = ROOT / 'app/src/main/kotlin/app/absentmotion/ui/editor'
+        paths = sorted(str(p.relative_to(ROOT / 'app/src/main/kotlin/app/absentmotion')) for p in root.rglob('*.kt'))
+        for path in paths:
+            self.assertIsNone(re.search(r'if \([^\n]*\) (MenuPopup|ChoiceList|ParentMenu|PasteStyleMenu|OverflowMenu)\(', source(path)), path)
+        self.assertIn('Modifier.presence(scaleFrom = 0.92f', source('ui/editor/StructureUi.kt').split('internal fun ChoiceList', 1)[1])
+        self.assertIn('Modifier.presence(scaleFrom = 0.85f, origin = cell.origin)', source('ui/editor/MediaTab.kt'))
+        for path in ['ui/editor/EditorScreen.kt', 'ui/editor/WideEditor.kt']:
+            self.assertIn('Presence(state.previewPanelOpen) { PreviewModePanel(', source(path))
+
     def test_media_search_opens_from_a_square_over_the_grid(self):
         text = source('ui/editor/MediaTab.kt')
         self.assertIn('MediaSquare(TextIcons.Search, stringResource(R.string.search_hint), searching || search.isNotEmpty()) { searching = true }', text)

@@ -53,6 +53,9 @@ import app.absentmotion.ui.editor.panels.px
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
 import app.absentmotion.ui.theme.Am
+import app.absentmotion.ui.theme.Swap
+import app.absentmotion.model.Layer
+import androidx.compose.foundation.layout.fillMaxSize
 import kotlin.math.roundToInt
 
 private val VolumeGreen get() = Am.AccentLit
@@ -69,10 +72,14 @@ internal fun VolumePanel(state: EditorState, modifier: Modifier = Modifier) {
         onDispose { state.volumeOpen = false; state.easingOpen = false; state.keyTarget = null }
     }
     var effects by remember { mutableStateOf(false) }
-    if (effects) {
-        AudioEffectsPanel(state, modifier) { effects = false }
-        return
+    Swap(effects, modifier, rise = 0.dp) {
+        if (effects) AudioEffectsPanel(state, Modifier.fillMaxSize()) { effects = false }
+        else VolumeMain(state, layer, Modifier.fillMaxSize()) { state.easingOpen = false; effects = true }
     }
+}
+
+@Composable
+private fun VolumeMain(state: EditorState, layer: Layer, modifier: Modifier, openEffects: () -> Unit) {
     SideEffect { state.keyTarget = KeyTarget(GainRef, "1.000000") }
     BackHandler { if (state.easingOpen) state.easingOpen = false else state.volumeOpen = false }
     if (state.easingOpen) {
@@ -84,7 +91,7 @@ internal fun VolumePanel(state: EditorState, modifier: Modifier = Modifier) {
     Column(modifier.background(Am.Panel).padding(start = 62.px, top = 42.px, end = 62.px)) {
         Row(Modifier.fillMaxWidth().height(107.px).clip(BarShape).background(Am.Button)) {
             val count = layer.audioEffects.size
-            Box(Modifier.weight(1f).fillMaxHeight().clickable { state.easingOpen = false; effects = true }.padding(start = 14.dp), Alignment.CenterStart) {
+            Box(Modifier.weight(1f).fillMaxHeight().clickable(onClick = openEffects).padding(start = 14.dp), Alignment.CenterStart) {
                 Text(if (count == 0) stringResource(R.string.volume_audio_effects) else stringResource(R.string.volume_audio_effects_count, count.toString()), color = Am.OnDark, fontSize = 14.sp, maxLines = 1)
             }
             Box(Modifier.width(183.px).fillMaxHeight().clickable { state.volumeOpen = false }, Alignment.Center) {

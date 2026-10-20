@@ -69,6 +69,7 @@ import app.absentmotion.library.PresetStore
 import app.absentmotion.library.SavedPreset
 import app.absentmotion.model.Scene
 import app.absentmotion.ui.theme.Am
+import app.absentmotion.ui.theme.Presence
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -187,13 +188,15 @@ fun PresetScreen(state: EditorState) {
                     )
                     Box(Modifier.size(48.dp).clickable { menuFor = preset.id }, Alignment.Center) {
                         Icon(PanelIcons.More, stringResource(R.string.preset_more), Modifier.size(24.dp), tint = Am.OnDark)
-                        if (menuFor == preset.id) MenuPopup(DropOrRise, { menuFor = null }) {
-                            MenuRow(stringResource(R.string.rename)) { menuFor = null; renaming = preset }
-                            MenuRow(stringResource(R.string.delete)) {
-                                menuFor = null
-                                scope.launch { withContext(Dispatchers.IO) { store.delete(preset.id) }; rev++ }
-                                if (chosen == preset.id) { chosen = null; pos = pos.coerceAtMost((base.endTime - base.startTime).coerceAtLeast(1)) }
-                                Toast.makeText(context, context.getString(R.string.preset_deleted), Toast.LENGTH_SHORT).show()
+                        Presence(menuFor == preset.id) {
+                            MenuPopup(DropOrRise, { menuFor = null }) {
+                                MenuRow(stringResource(R.string.rename)) { menuFor = null; renaming = preset }
+                                MenuRow(stringResource(R.string.delete)) {
+                                    menuFor = null
+                                    scope.launch { withContext(Dispatchers.IO) { store.delete(preset.id) }; rev++ }
+                                    if (chosen == preset.id) { chosen = null; pos = pos.coerceAtMost((base.endTime - base.startTime).coerceAtLeast(1)) }
+                                    Toast.makeText(context, context.getString(R.string.preset_deleted), Toast.LENGTH_SHORT).show()
+                                }
                             }
                         }
                     }

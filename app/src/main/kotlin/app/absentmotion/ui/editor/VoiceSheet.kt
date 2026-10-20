@@ -43,6 +43,7 @@ import app.absentmotion.model.MediaDeclaration
 import app.absentmotion.platform.LocalContext
 import app.absentmotion.platform.Speech
 import app.absentmotion.ui.theme.Am
+import app.absentmotion.ui.theme.Presence
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -114,13 +115,13 @@ internal fun VoiceSheet(state: EditorState, onClose: () -> Unit) {
                     }
                     Box {
                         Line(stringResource(R.string.voice_language), Modifier.clickable(enabled = languages.isNotEmpty()) { menu = "language" }) { Picked(voice?.language) }
-                        if (menu == "language") ChoiceList(languages, { menu = null }) { i ->
-                            voiceId = all.first { it.language == languages[i] }.id
+                        Presence(menu == "language") {
+                            ChoiceList(languages, { menu = null }) { i -> voiceId = all.first { it.language == languages[i] }.id }
                         }
                     }
                     Box {
                         Line(stringResource(R.string.voice_voice), Modifier.clickable(enabled = inLanguage.isNotEmpty()) { menu = "voice" }) { Picked(voice?.name) }
-                        if (menu == "voice") ChoiceList(inLanguage.map { it.name }, { menu = null }) { voiceId = inLanguage[it].id }
+                        Presence(menu == "voice") { ChoiceList(inLanguage.map { it.name }, { menu = null }) { voiceId = inLanguage[it].id } }
                     }
                     Line(stringResource(R.string.voice_speed)) { Steps(speed, 50..200, 10, "$speed%") { speed = it } }
                     Line(stringResource(R.string.voice_pitch)) { Steps(pitch, 50..200, 10, "$pitch%") { pitch = it } }

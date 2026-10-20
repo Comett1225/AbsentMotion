@@ -75,6 +75,9 @@ import app.absentmotion.model.handles
 import app.absentmotion.model.reversed
 import app.absentmotion.ui.editor.PanelIcons
 import app.absentmotion.ui.theme.Am
+import app.absentmotion.ui.theme.Presence
+import app.absentmotion.ui.theme.presence
+import androidx.compose.ui.graphics.TransformOrigin
 import kotlin.math.ceil
 import kotlin.math.hypot
 
@@ -136,7 +139,7 @@ private fun LeftColumn(state: EditorState, easing: Easing, basic: Boolean, overs
         }
         Cell(onClick = { menu = true }) {
             PanelIcon(PanelIcons.More, Am.OnDark, size = 26.dp, description = stringResource(R.string.effects_more))
-            if (menu) OverflowMenu(state, basic, overshoot, toggleOvershoot) { menu = false }
+            Presence(menu) { OverflowMenu(state, basic, overshoot, toggleOvershoot) { menu = false } }
         }
     }
 }
@@ -352,7 +355,7 @@ private object AboveAnchor : PopupPositionProvider {
 @Composable
 private fun OverflowMenu(state: EditorState, bezier: Boolean, overshoot: Boolean, toggleOvershoot: () -> Unit, onDismiss: () -> Unit) {
     Popup(AboveAnchor, onDismiss, PopupProperties(focusable = true)) {
-        Column(Modifier.width(250.dp).clip(RoundedCornerShape(8.dp)).background(MenuBg)) {
+        Column(Modifier.presence(scaleFrom = 0.92f, origin = TransformOrigin(0f, 1f)).width(250.dp).clip(RoundedCornerShape(8.dp)).background(MenuBg)) {
             MenuRow(stringResource(R.string.easing_copy_curve), true, false) { state.copyCurve(); onDismiss() }
             MenuRow(stringResource(R.string.easing_paste_curve), state.canPasteCurve, true) { state.pasteCurve(); onDismiss() }
             MenuRow(stringResource(R.string.easing_apply_to_all), state.canPasteCurve, true) { state.pasteCurveToAll(); onDismiss() }

@@ -97,7 +97,7 @@ fun EditorTopBar(state: EditorState, onExit: () -> Unit, modifier: Modifier = Mo
             Spacer(Modifier.width(5.dp))
             Box(cell.enterFade().clickable { act { parentMenuOpen = true } }, contentAlignment = Alignment.Center) {
                 LayerParentIcon()
-                if (parentMenuOpen) ParentMenu(state) { parentMenuOpen = false }
+                Presence(parentMenuOpen) { ParentMenu(state) { parentMenuOpen = false } }
             }
             Spacer(Modifier.width(6.dp))
             BarButton(ChromeIcons.Trash, stringResource(R.string.topbar_delete_layer), cell.enterFade()) { act { state.deleteSelected() } }

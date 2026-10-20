@@ -43,7 +43,9 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.node.DelegatableNode
 import androidx.compose.ui.node.DrawModifierNode
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 
@@ -121,9 +123,11 @@ fun Modifier.presence(
     slide: Float = 0f,
     fade: Boolean = true,
     origin: TransformOrigin = TransformOrigin.Center,
+    slideX: Float = 0f,
 ): Modifier {
     val p = LocalPresence.current ?: return this
     val risePx = with(LocalDensity.current) { rise.toPx() }
+    val towardEnd = if (LocalLayoutDirection.current == LayoutDirection.Rtl) -slideX else slideX
     val moving = this.graphicsLayer {
         val t = p.progress.value
         if (fade) alpha = t
@@ -131,6 +135,7 @@ fun Modifier.presence(
         scaleX = s
         scaleY = s
         transformOrigin = origin
+        translationX = (1f - t) * towardEnd * size.width
         translationY = (1f - t) * (risePx + slide * size.height)
     }
     return if (p.leaving) moving.pointerInput(Unit) { consumeAll() } else moving

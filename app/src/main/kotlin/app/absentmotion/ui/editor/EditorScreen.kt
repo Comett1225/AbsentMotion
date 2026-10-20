@@ -37,8 +37,12 @@ import app.absentmotion.editor.MultiSelect
 import app.absentmotion.editor.stepBack
 import app.absentmotion.ui.editor.panels.FullColorPicker
 import app.absentmotion.ui.theme.Am
+import app.absentmotion.ui.theme.Presence
 import app.absentmotion.ui.theme.Swap
 import app.absentmotion.ui.theme.enterFade
+import app.absentmotion.ui.theme.presence
+import app.absentmotion.editor.FullColor
+import androidx.compose.runtime.remember
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
 
@@ -47,7 +51,8 @@ fun EditorScreen(state: EditorState, onExit: () -> Unit) {
     val scope = rememberCoroutineScope()
     Box(Modifier.fillMaxSize()) {
         EditorBody(state, onExit)
-        state.fullColor?.let { PhoneScreen { Box(Modifier.fillMaxSize().enterFade()) { FullColorPicker(state, it) } } }
+        val color = remember { arrayOfNulls<FullColor>(1) }.also { if (state.fullColor != null) it[0] = state.fullColor }[0]
+        Presence(state.fullColor != null) { color?.let { PhoneScreen { Box(Modifier.fillMaxSize().presence(rise = 16.dp)) { FullColorPicker(state, it) } } } }
         if (state.cameraOpen) EditorCamera(state, scope)
     }
 }
@@ -100,7 +105,7 @@ private fun EditorBody(state: EditorState, onExit: () -> Unit) {
         EditorTopBar(state, onExit, Modifier.fillMaxWidth().height(42.dp).enterFade())
         Box(Modifier.fillMaxWidth().weight(1f)) {
             Preview(state, Modifier.fillMaxSize())
-            if (state.previewPanelOpen) PreviewModePanel(state, Modifier.align(Alignment.CenterEnd).enterFade())
+            Presence(state.previewPanelOpen) { PreviewModePanel(state, Modifier.align(Alignment.CenterEnd).presence(slideX = 0.4f)) }
             AnimateButton(state, Modifier.align(Alignment.BottomEnd))
         }
         Box(Modifier.fillMaxWidth().height(46.dp).enterFade()) {
@@ -123,7 +128,7 @@ internal fun LowerPanels(state: EditorState, addLibrary: AddLibrary, top: Boolea
             state.addOpen -> "add"
             MultiSelect.active -> "multi"
             state.selectedId == null -> "button"
-            state.panel == EditorPanel.Tools -> "tools"
+            state.panel == EditorPanel.Tools -> if (state.volumeOpen) "volume" to state.easingOpen else "tools"
             else -> state.panel to state.easingOpen
         },
         Modifier.fillMaxSize(),
