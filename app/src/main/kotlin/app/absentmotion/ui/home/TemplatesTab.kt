@@ -57,6 +57,8 @@ import app.absentmotion.library.ProjectStore
 import app.absentmotion.library.SavedPreset
 import app.absentmotion.library.SavedTemplate
 import app.absentmotion.library.TemplateStore
+import app.absentmotion.ui.editor.NoMatches
+import app.absentmotion.ui.editor.matchesSearch
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.animatedColor
 import app.absentmotion.ui.theme.enterFade
@@ -73,7 +75,7 @@ private val Grey get() = Am.HomeDim
 private val FactText get() = Am.HomeFaint
 
 @Composable
-fun TemplatesTab(projects: ProjectStore, version: Int, onTemplate: (String) -> Unit, onProject: (String) -> Unit, modifier: Modifier = Modifier) {
+fun TemplatesTab(projects: ProjectStore, version: Int, onTemplate: (String) -> Unit, onProject: (String) -> Unit, modifier: Modifier = Modifier, query: String = "") {
     val context = LocalContext.current
     val templates = remember { TemplateStore(context) }
     val presets = remember { PresetStore(context) }
@@ -85,6 +87,8 @@ fun TemplatesTab(projects: ProjectStore, version: Int, onTemplate: (String) -> U
     var confirm by remember { mutableStateOf<Pair<Int, () -> Unit>?>(null) }
     val savedTemplates by produceState(emptyList<SavedTemplate>(), version, rev) { value = withContext(Dispatchers.IO) { templates.list() } }
     val savedPresets by produceState(emptyList<SavedPreset>(), version, rev) { value = withContext(Dispatchers.IO) { presets.list() } }
+    val shownTemplates = remember(savedTemplates, query) { savedTemplates.filter { matchesSearch(query, it.title) } }
+    val shownPresets = remember(savedPresets, query) { savedPresets.filter { matchesSearch(query, it.title) } }
 
     Column(modifier.fillMaxSize()) {
         Spacer(Modifier.height(24.dp))
@@ -96,8 +100,9 @@ fun TemplatesTab(projects: ProjectStore, version: Int, onTemplate: (String) -> U
         Box(Modifier.weight(1f).fillMaxWidth()) {
             if (sub == 0) {
                 if (savedTemplates.isEmpty()) EmptyText(stringResource(R.string.template_none))
+                else if (shownTemplates.isEmpty()) NoMatches(query, R.string.search_no_templates, Modifier.fillMaxWidth().padding(top = 120.dp), Am.Navy, 17.sp)
                 LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 28.dp)) {
-                    items(savedTemplates, key = { it.id }) { t ->
+                    items(shownTemplates, key = { it.id }) { t ->
                         TemplateCard(
                             t, menu == t.id, { menu = if (it) t.id else null }, { onTemplate(t.id) },
                             onProject = {
@@ -114,6 +119,7 @@ fun TemplatesTab(projects: ProjectStore, version: Int, onTemplate: (String) -> U
                 }
             } else {
                 if (savedPresets.isEmpty()) EmptyText(stringResource(R.string.template_no_presets))
+                else if (shownPresets.isEmpty()) NoMatches(query, R.string.search_no_presets, Modifier.fillMaxWidth().padding(top = 120.dp), Am.Navy, 17.sp)
                 Column(Modifier.fillMaxSize()) {
                     if (savedPresets.isNotEmpty()) Row(Modifier.fillMaxWidth().height(48.dp).padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
                         Spacer(Modifier.weight(1f))
@@ -123,7 +129,7 @@ fun TemplatesTab(projects: ProjectStore, version: Int, onTemplate: (String) -> U
                         )
                     }
                     LazyColumn(Modifier.weight(1f).fillMaxWidth(), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 28.dp)) {
-                        items(savedPresets, key = { it.id }) { p ->
+                        items(shownPresets, key = { it.id }) { p ->
                             Card(Modifier.height(64.dp), onClick = null) {
                                 Text(p.title, Modifier.weight(1f).padding(start = 16.dp), color = Am.Navy, fontSize = 17.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                                 Menu(
