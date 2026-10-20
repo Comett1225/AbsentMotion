@@ -163,9 +163,13 @@ fun EffectBrowser(state: EditorState) {
                     }
                     if (shown.isEmpty() && !favPage) Text(stringResource(R.string.effectbrowser_recent_empty), Modifier.align(Alignment.Center).padding(horizontal = 24.dp),
                         color = Am.OnDarkDim, fontSize = 13.sp, textAlign = TextAlign.Center)
-                    Row(Modifier.align(Alignment.BottomCenter).padding(bottom = 5.dp)) {
-                        Icon(EffectIcons.Recent, stringResource(R.string.effectbrowser_recent), Modifier.size(12.dp).clickable { favPage = false }, tint = if (!favPage) Am.Accent else Am.OnDarkDim)
-                        Icon(PanelIcons.Star, stringResource(R.string.effectbrowser_favorite), Modifier.size(12.dp).clickable { favPage = true }, tint = if (favPage) Am.Accent else Am.OnDarkDim)
+                    Row(Modifier.align(Alignment.BottomCenter)) {
+                        Box(Modifier.size(40.dp, 22.dp).clickable { favPage = false }, Alignment.CenterEnd) {
+                            Icon(EffectIcons.Recent, stringResource(R.string.effectbrowser_recent), Modifier.size(12.dp), tint = if (!favPage) Am.Accent else Am.OnDarkDim)
+                        }
+                        Box(Modifier.size(40.dp, 22.dp).clickable { favPage = true }, Alignment.CenterStart) {
+                            Icon(PanelIcons.Star, stringResource(R.string.effectbrowser_favorite), Modifier.size(12.dp), tint = if (favPage) Am.Accent else Am.OnDarkDim)
+                        }
                     }
                 }
                 catalog.categories.chunked(2).forEach { row ->
