@@ -187,6 +187,8 @@ struct ShutterBlur {
     float angle = 0;
     int samples = 0;
     bool fast = false;
+    bool adaptive = false;
+    bool position = true, scale = true, rotation = true;
 };
 
 bool MotionEffect(const std::string& id);

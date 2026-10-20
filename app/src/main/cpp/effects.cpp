@@ -21,7 +21,7 @@ namespace {
 const char* const kLift = "absent.backdrop";
 
 bool BuiltIn(const std::string& id) {
-    return id == "absent.blur" || id == "absent.glow" || id == "absent.motionblur" || id == kLift;
+    return id == "absent.blur" || id == "absent.glow" || id == "absent.smear" || id == kLift;
 }
 
 float Value(const LayerEffect& e, const std::map<std::string, Anim>* defaults, const std::string& name, int i, float t,

@@ -1906,5 +1906,17 @@
     "to": "tuneTail"
    }
   }
+ },
+ "absent.motionblur": {
+  "to": "smear",
+  "onlyWith": "length",
+  "params": {
+   "angle": {
+    "to": "angle"
+   },
+   "length": {
+    "to": "length"
+   }
+  }
  }
 }

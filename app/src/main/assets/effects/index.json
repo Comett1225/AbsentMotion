@@ -29,6 +29,7 @@
  "innerblur",
  "directionalblur",
  "motionblur",
+ "smear",
  "radialblur",
  "zoomstreaks",
  "spinstreaks",

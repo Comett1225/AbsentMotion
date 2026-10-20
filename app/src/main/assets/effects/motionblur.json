@@ -3,25 +3,34 @@
  "name": "Motion Blur",
  "category": "blur",
  "native": true,
- "description": "Smears the layer in one direction, as if it moved fast.",
+ "description": "Blurs the layer along the way it moves, turns and grows, from its keyframes and from motion effects such as Auto-Shake and Oscillate. Tune scales the blur. The preview shows a quicker blur unless Full Blur is on.",
  "params": [
   {
-   "id": "angle",
-   "label": "Direction",
-   "type": "angle",
-   "default": 0,
-   "min": -360,
-   "max": 360,
-   "step": 1
+   "id": "tune",
+   "label": "Tune",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 4,
+   "step": 0.01
   },
   {
-   "id": "length",
-   "label": "Length",
-   "type": "float",
-   "default": 40,
-   "min": 0,
-   "max": 1000,
-   "step": 1
+   "id": "position",
+   "label": "Position",
+   "type": "switch",
+   "default": true
+  },
+  {
+   "id": "scale",
+   "label": "Scale",
+   "type": "switch",
+   "default": true
+  },
+  {
+   "id": "rotation",
+   "label": "Angle",
+   "type": "switch",
+   "default": true
   }
  ]
 }

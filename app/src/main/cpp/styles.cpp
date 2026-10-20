@@ -178,7 +178,15 @@ half4 main(float2 xy) {
     return builder.makeShader();
 }
 
-Placement Own(const Layer& l, double timeMs) {
+struct Frozen {
+    int64_t id = 0;
+    double at = 0;
+    bool position = true, scale = true, rotation = true;
+};
+
+thread_local const Frozen* gFrozen = nullptr;
+
+Placement OwnAt(const Layer& l, double timeMs) {
     if (Placement seen; SeenPlacement(l, timeMs, &seen)) return seen;
     const float t = l.localTime(timeMs);
     Placement p{{l.location.get(0, t, 0), l.location.get(1, t, 0)},
@@ -189,6 +197,20 @@ Placement Own(const Layer& l, double timeMs) {
     const float tx = l.tilt.get(0, t, 0), ty = l.tilt.get(1, t, 0);
     if (tx != 0 || ty != 0) p.tilt = SkM44::Rotate({0, 1, 0}, -ty * kRadians) * SkM44::Rotate({1, 0, 0}, -tx * kRadians);
     ApplyMotion(l, timeMs, &p);
+    return p;
+}
+
+Placement Own(const Layer& l, double timeMs) {
+    Placement p = OwnAt(l, timeMs);
+    if (gFrozen && gFrozen->id == l.id) {
+        const Placement still = OwnAt(l, gFrozen->at);
+        if (!gFrozen->position) {
+            p.location = still.location;
+            p.z = still.z;
+        }
+        if (!gFrozen->scale) p.scale = still.scale;
+        if (!gFrozen->rotation) p.rotation = still.rotation;
+    }
     return p;
 }
 
@@ -711,11 +733,31 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
     }
 }
 
+struct FrozenScope {
+    const Frozen* saved;
+    explicit FrozenScope(const Frozen* now) : saved(gFrozen) { gFrozen = now; }
+    ~FrozenScope() { gFrozen = saved; }
+};
+
+float Reach(const std::vector<Layer>& siblings, const Layer& l, double timeMs, double open) {
+    const SkRect box = ShapePath(l, l.localTime(timeMs)).getBounds();
+    const SkMatrix from = SiblingMatrix(siblings, l, timeMs - open / 2), to = SiblingMatrix(siblings, l, timeMs + open / 2);
+    SkPoint points[5];
+    box.toQuad(points);
+    points[4] = box.center();
+    float most = 0;
+    for (const SkPoint& p : points) most = std::max(most, (to.mapPoint(p) - from.mapPoint(p)).length());
+    return std::isfinite(most) ? most : 0;
+}
+
 void DrawShuttered(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& l, double timeMs,
                    const MediaPictures& pictures, const Override& ov, const ShutterBlur& shutter) {
     const double open = 1000.0 / std::max(gScene ? gScene->fps : 30, 1) * shutter.angle / 360;
     Override sample = ov;
     sample.shuttered = true;
+    const Frozen frozen{l.id, timeMs, shutter.position, shutter.scale, shutter.rotation};
+    const bool restricted = !(shutter.position && shutter.scale && shutter.rotation);
+    FrozenScope scope(restricted ? &frozen : gFrozen);
     SkPaint composite;
     if (shutter.fast) {
         const SkPoint middle = ShapePath(l, l.localTime(timeMs)).getBounds().center();
@@ -737,12 +779,14 @@ void DrawShuttered(SkCanvas* canvas, const std::vector<Layer>& siblings, const L
         return;
     }
     canvas->saveLayer(SkCanvas::SaveLayerRec(nullptr, &composite, SkCanvas::kF16ColorType));
+    int samples = shutter.samples;
+    if (shutter.adaptive) samples = std::clamp((int)std::ceil(Reach(siblings, l, timeMs, open) / 2), samples, 48);
     SkPaint add;
     add.setBlendMode(SkBlendMode::kPlus);
-    add.setAlphaf(1.0f / shutter.samples);
-    for (int i = 0; i < shutter.samples; i++) {
+    add.setAlphaf(1.0f / samples);
+    for (int i = 0; i < samples; i++) {
         canvas->saveLayer(nullptr, &add);
-        DrawOne(canvas, siblings, l, timeMs + open * ((i + 0.5) / shutter.samples - 0.5), pictures, sample);
+        DrawOne(canvas, siblings, l, timeMs + open * ((i + 0.5) / samples - 0.5), pictures, sample);
         canvas->restore();
     }
     canvas->restore();

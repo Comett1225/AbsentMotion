@@ -263,7 +263,7 @@ private fun Motion.pose(u: Float, inSide: Boolean, w: Float, h: Float): Pose {
         when (effect.id) {
             "absent.solid" -> pose.tint = Color(parseColor(effect.fixed["color"]) ?: 0).copy(alpha = amount)
             "absent.exposure" -> pose.tint = Color.White.copy(alpha = 0.9f * amount)
-            "absent.blur", "absent.motionblur" -> pose.smear = max(pose.smear, amount)
+            "absent.blur", "absent.smear" -> pose.smear = max(pose.smear, amount)
             "absent.glitch", "absent.rgbsplit" -> pose.split = max(pose.split, amount)
             "absent.autoshake" -> pose.shake = max(pose.shake, amount)
         }

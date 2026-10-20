@@ -20,7 +20,7 @@ constexpr double kTau = 6.283185307179586;
 
 const char* const kMotionIds[] = {"absent.autoshake", "absent.randomdisplace", "absent.randomjitter", "absent.oscillate",
                                   "absent.swing", "absent.spin", "absent.pulsesize", "absent.pulseopacity",
-                                  "absent.echo", "absent.timequant", "absent.shutterblur", "absent.movealongpath"};
+                                  "absent.echo", "absent.timequant", "absent.shutterblur", "absent.motionblur", "absent.movealongpath"};
 
 thread_local bool gFastShutter = false;
 
@@ -507,12 +507,22 @@ bool EchoOf(const Layer& l, double timeMs, Echo* echo) {
 
 bool ShutterBlurOf(const Layer& l, double timeMs, ShutterBlur* blur) {
     for (const LayerEffect& e : l.effects) {
-        if (e.hidden || e.id != "absent.shutterblur") continue;
+        if (e.hidden || (e.id != "absent.shutterblur" && e.id != "absent.motionblur")) continue;
         const float t = l.localTime(timeMs);
-        blur->angle = std::clamp(Param(e, "shutter", t, 180), 0.0f, 360.0f);
-        blur->samples = std::clamp((int)std::lround(Param(e, "samples", t, 8)), 2, 32);
         blur->fast = gFastShutter;
-        return blur->angle > 0;
+        if (e.id == "absent.shutterblur") {
+            blur->angle = std::clamp(Param(e, "shutter", t, 180), 0.0f, 360.0f);
+            blur->samples = std::clamp((int)std::lround(Param(e, "samples", t, 8)), 2, 32);
+            return blur->angle > 0;
+        }
+        const float tune = std::clamp(Param(e, "tune", t, 1), 0.0f, 4.0f);
+        blur->angle = 360 * tune;
+        blur->samples = std::clamp((int)std::lround(8 * tune), 8, 32);
+        blur->adaptive = true;
+        blur->position = Param(e, "position", t, 1) >= 0.5f;
+        blur->scale = Param(e, "scale", t, 1) >= 0.5f;
+        blur->rotation = Param(e, "rotation", t, 1) >= 0.5f;
+        return tune > 0 && (blur->position || blur->scale || blur->rotation);
     }
     return false;
 }

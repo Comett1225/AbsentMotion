@@ -236,6 +236,22 @@ def shutter_cases():
         lambda i: red(i, 100, 100) > 150 and 15 < red(i, 116, 100) < 200
     yield 'a camera without motion blur leaves layers sharp', shutter_scene('', '20,20', moves=False, camera=camera.format('')), lambda i: red(i, 116, 100) < 3
     yield 'true motion blur smears evenly under a camera', shutter_scene(blur, camera=EYE), even
+    shake = fx('oscillate', angle=0, frequency=2, magnitude=40)
+    shaken = lambda i: red(i, 100, 100) > 250 and 15 < red(i, 114, 100) < 120 and red(i, 121, 100) < 3
+    yield 'a shaking layer without motion blur stays sharp', shutter_scene(shake, moves=False), lambda i: red(i, 105, 100) > 250 and red(i, 114, 100) < 3
+    yield 'motion blur blurs a shaking layer', shutter_scene(shake + fx('motionblur'), moves=False), shaken
+    yield 'motion blur blurs a shaking layer wherever it sits in the effect list', shutter_scene(fx('motionblur') + shake, moves=False), shaken
+    yield 'motion blur blurs a shaking layer under a camera', shutter_scene(shake + fx('motionblur'), moves=False, camera=EYE), shaken
+    yield 'true motion blur blurs a shaking layer', shutter_scene(shake + fx('shutterblur', shutter=360, samples=16), moves=False), shaken
+    yield 'true motion blur blurs a shaking layer under a camera', shutter_scene(shake + fx('shutterblur', shutter=360, samples=16), moves=False, camera=EYE), shaken
+    yield 'motion blur still follows a keyframed move', shutter_scene(fx('motionblur', tune=0.5)), lambda i: red(i, 100, 100) > 250 and 30 < red(i, 114, 100) < 140 and red(i, 121, 100) < 3
+    yield 'a larger Tune lengthens the trail', shutter_scene(shake + fx('motionblur', tune=2), moves=False), lambda i: 120 < red(i, 100, 100) < 200 and red(i, 121, 100) > 15 and red(i, 135, 100) < 3
+    yield 'a Tune of 0 leaves the layer sharp', shutter_scene(shake + fx('motionblur', tune=0), moves=False), lambda i: red(i, 114, 100) < 3
+    yield 'motion blur with Position off leaves a shaking layer sharp', shutter_scene(shake + fx('motionblur', position=0), moves=False), lambda i: red(i, 114, 100) < 3
+    yield 'motion blur with Position off leaves a moving layer sharp', shutter_scene(fx('motionblur', position=0)), lambda i: red(i, 114, 100) < 3
+    yield 'motion blur follows rotation', shutter_scene(fx('motionblur'), '60,6', moves=False, spins=True), lambda i: red(i, 100, 100) > 250 and red(i, 148, 113) > 10
+    yield 'motion blur with Angle off leaves a spinning layer sharp', shutter_scene(fx('motionblur', rotation=0), '60,6', moves=False, spins=True), lambda i: red(i, 148, 113) < 3
+    yield 'a hidden motion blur leaves a shaking layer sharp', shutter_scene(shake + fx('motionblur').replace('<effect id="absent.motionblur"', '<effect id="absent.motionblur" hidden="true"'), moves=False), lambda i: red(i, 114, 100) < 3
 
 
 def centre(image):

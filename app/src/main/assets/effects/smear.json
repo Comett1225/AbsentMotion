@@ -1,0 +1,27 @@
+{
+ "id": "smear",
+ "name": "Smear",
+ "category": "blur",
+ "native": true,
+ "description": "Smears the layer in one direction by a fixed length, as if it moved fast.",
+ "params": [
+  {
+   "id": "angle",
+   "label": "Direction",
+   "type": "angle",
+   "default": 0,
+   "min": -360,
+   "max": 360,
+   "step": 1
+  },
+  {
+   "id": "length",
+   "label": "Length",
+   "type": "float",
+   "default": 40,
+   "min": 0,
+   "max": 1000,
+   "step": 1
+  }
+ ]
+}

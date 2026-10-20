@@ -28,7 +28,7 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
         val plus: String? = null,
     )
 
-    class Rule(val to: String, val params: Map<String, List<Conversion?>>, val set: Map<String, String>)
+    class Rule(val to: String, val params: Map<String, List<Conversion?>>, val set: Map<String, String>, val onlyWith: String? = null)
 
     data class Result(val scene: Scene, val converted: Map<String, Int>, val dropped: Set<String>) {
         val changed: Boolean get() = converted.isNotEmpty()
@@ -39,7 +39,7 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
         val dropped = sortedSetOf<String>()
         var renamed = false
         fun visit(node: XmlNode): XmlNode {
-            val rule = if (node.name == "effect") rules[node["id"]] else null
+            val rule = if (node.name == "effect") rules[node["id"]]?.takeIf { r -> r.onlyWith == null || node.children.any { c -> c.name == "property" && c["name"] == r.onlyWith } } else null
             val own = rule?.let { catalog.definitions.firstOrNull { d -> d.key == it.to } }
             val older = own != null && node["id"] == own.id
             if (rule != null && own != null && (!older || node.children.any { c -> c.name == "property" && own.params.none { it.id == c["name"] } })) {
@@ -134,6 +134,7 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
                         }
                     },
                     set.keys().asSequence().associateWith { set.get(it).let { v -> if (v is Number) formatFloats(floatArrayOf(v.toFloat())) else v.toString() } },
+                    rule.optString("onlyWith").takeIf { it.isNotEmpty() },
                 )
             }
             return EffectMigration(rules, catalog)

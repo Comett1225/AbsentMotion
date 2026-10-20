@@ -14,8 +14,10 @@ constexpr const char* kFogId = "absent.solid";
 constexpr const char* kFogColor = "color";
 constexpr const char* kFogAmount = "amount";
 constexpr const char* kMotionBlurId = "absent.motionblur";
-constexpr const char* kMotionBlurAngle = "angle";
-constexpr const char* kMotionBlurLength = "length";
+constexpr const char* kMotionBlurTune = "tune";
+constexpr const char* kSmearId = "absent.smear";
+constexpr const char* kSmearAngle = "angle";
+constexpr const char* kSmearLength = "length";
 
 constexpr float kDefaultFov = 60;
 constexpr float kNearest = 1;
@@ -98,11 +100,15 @@ LayerEffect Effect(const char* id, std::vector<std::pair<const char*, std::vecto
     return e;
 }
 
-bool HasMotionBlur(const Layer& camera) {
+float MotionBlurTune(const Layer& camera, float t) {
     for (const LayerEffect& e : camera.effects) {
-        if (!e.hidden && e.id == kMotionBlurId) return true;
+        if (e.hidden || e.id != kMotionBlurId) continue;
+        for (const Property& p : e.props) {
+            if (p.name == kMotionBlurTune) return std::clamp(p.anim.get(0, t, 1), 0.0f, 4.0f);
+        }
+        return 1;
     }
-    return false;
+    return 0;
 }
 
 void AddCameraEffects(const Layer& camera, double timeMs, float depth, SkPoint before, SkPoint now, Layer* seen) {
@@ -122,12 +128,12 @@ void AddCameraEffects(const Layer& camera, double timeMs, float depth, SkPoint b
             seen->effects.push_back(Effect(kFogId, {{kFogColor, color}, {kFogAmount, {amount}}}));
         }
     }
-    if (HasMotionBlur(camera)) {
+    if (const float tune = MotionBlurTune(camera, t); tune > 0) {
         const SkVector moved = now - before;
-        const float length = moved.length();
+        const float length = moved.length() * tune;
         if (length > 0) {
             const float angle = atan2f(moved.fY, moved.fX) * 180 / 3.14159265f;
-            seen->effects.push_back(Effect(kMotionBlurId, {{kMotionBlurAngle, {angle}}, {kMotionBlurLength, {length}}}));
+            seen->effects.push_back(Effect(kSmearId, {{kSmearAngle, {angle}}, {kSmearLength, {length}}}));
         }
     }
 }
