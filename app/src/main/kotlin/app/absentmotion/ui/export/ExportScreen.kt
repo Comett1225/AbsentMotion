@@ -370,6 +370,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
                     throw e
                 } catch (e: Exception) {
                     Log.w("AMExport", "could not store the template", e)
+                    app.absentmotion.platform.Toast.makeText(context, context.getString(R.string.export_template_failed), app.absentmotion.platform.Toast.LENGTH_LONG).show()
                 }
                 phase = Phase.Done(chosen, result)
             } catch (e: CancellationException) {

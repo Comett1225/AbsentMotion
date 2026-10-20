@@ -300,7 +300,11 @@ class MainActivity : ComponentActivity() {
         if (opening) return
         opening = true
         openJob = lifecycleScope.launch {
-            val local = try { withContext(Dispatchers.IO) { templates.localize(template, store.mediaDir(state.projectId)) } } finally { opening = false }
+            val local = try { withContext(Dispatchers.IO) { templates.localize(template, store.mediaDir(state.projectId)) } }
+            catch (e: java.io.IOException) {
+                Toast.makeText(this@MainActivity, getString(R.string.template_add_failed), Toast.LENGTH_LONG).show()
+                return@launch
+            } finally { opening = false }
             val start = state.scene.frameStart(state.frame)
             val id = Layer.newId()
             val copied = local.withCopiedLayerIds().node

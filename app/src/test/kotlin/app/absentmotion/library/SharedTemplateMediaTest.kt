@@ -51,6 +51,13 @@ class SharedTemplateMediaTest {
         assertEquals(setOf("photo.png", "photo-2.png", "photo-3.png"), project.list()!!.toSet())
     }
 
+    @Test fun aCopyThatFailsHalfwayFailsInsteadOfKeepingTheOriginalFile() {
+        val project = File(tmp.newFolder(), "media/p1")
+        val full = TemplateStore(tmp.newFolder()) { object : java.io.InputStream() { override fun read(): Int = throw java.io.IOException("No space left on device") } }
+        assertThrows(java.io.IOException::class.java) { full.localize(template(picture(tmp.newFolder(), "pixels")), project) }
+        assertFalse(project.walkTopDown().any { it.isFile })
+    }
+
     @Test fun aModelIsLocalizedWithItsWholeFolder() {
         val root = tmp.newFolder()
         val source = File(root, "media/p1/model-7").apply { mkdirs() }
