@@ -86,6 +86,7 @@
     <string name="gif">GIF</string>
     <string name="export">Ekspor</string>
     <string name="also_keep_a_copy_as_a">Simpan juga salinannya sebagai Template</string>
+    <string name="export_template_failed">Tidak dapat menyimpan salinan sebagai Template. Kosongkan sebagian ruang penyimpanan.</string>
     <string name="also_keeps_the_project_with_its">Juga menyimpan proyek beserta medianya di Template pada ponsel ini. Buka di sana untuk mengganti medianya dan melanjutkan ke proyek baru.</string>
     <string name="template">Template</string>
     <string name="one_absproj_package_with_the_project">Satu paket .absproj berisi proyek dan media asli yang digunakan, disimpan ke Documents / AbsentMotion. Simpan sebagai cadangan atau pindahkan proyek ke ponsel lain.</string>
@@ -202,13 +203,16 @@
     <string name="home_save_project_failed">Tidak dapat menyimpan proyek. Kosongkan sedikit ruang penyimpanan.</string>
     <string name="home_collect_unreadable_project">Tidak dapat membaca proyek ini.</string>
     <string name="home_collect_already_kept">Semua media sudah tersimpan di proyek.</string>
-    <string name="home_collect_could_not_read">Ada %1$s yang tidak dapat dibaca; mungkin sudah dihapus.</string>
+    <plurals name="home_collect_could_not_read">
+        <item quantity="other">%1$s file tidak ditemukan atau tidak dapat dibaca.</item>
+    </plurals>
     <string name="home_collect_storage_full">Penyimpanan penuh, jadi beberapa file tidak disalin.</string>
     <string name="home_restore_edits_failed">Tidak dapat memulihkan editan Anda. Kosongkan sedikit ruang penyimpanan; Anda akan diminta lagi lain kali.</string>
     <string name="home_restore_version_failed">Tidak dapat memulihkan versi ini. Kosongkan sedikit ruang penyimpanan.</string>
     <string name="home_version_restored">Versi dipulihkan</string>
     <string name="home_close_save_failed">Perubahan terakhir Anda tidak dapat disimpan. Kosongkan sedikit ruang penyimpanan lalu tutup lagi, atau tutup lagi untuk keluar tanpa perubahan tersebut.</string>
     <string name="home_search_hint">Cari proyek dan aset</string>
+    <string name="home_search_templates_hint">Cari template dan preset</string>
     <string name="home_search">Cari</string>
     <string name="home_close_search">Tutup pencarian</string>
     <string name="home_your_projects">Proyek Anda</string>
@@ -286,6 +290,7 @@
     <string name="template_delete_preset">Hapus preset ini?</string>
     <string name="template_open_as_project">Buka sebagai proyek</string>
     <string name="template_rename_failed">Tidak dapat mengganti nama</string>
+    <string name="template_add_failed">Tidak dapat menambahkan template. Kosongkan sebagian ruang penyimpanan.</string>
     <string name="safety_version_today">Hari ini pukul %1$s</string>
     <string name="safety_version_yesterday">Kemarin pukul %1$s</string>
     <string name="safety_version_on_date">Pada %1$s pukul %2$s</string>

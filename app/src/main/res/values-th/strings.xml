@@ -86,6 +86,7 @@
     <string name="gif">GIF</string>
     <string name="export">ส่งออก</string>
     <string name="also_keep_a_copy_as_a">เก็บสำเนาเป็นเทมเพลตด้วย</string>
+    <string name="export_template_failed">ไม่สามารถเก็บสำเนาเป็นเทมเพลตได้ โปรดเพิ่มพื้นที่ว่าง</string>
     <string name="also_keeps_the_project_with_its">จะเก็บโปรเจกต์พร้อมสื่อไว้ในเทมเพลตบนโทรศัพท์นี้ด้วย เปิดที่นั่นเพื่อเปลี่ยนสื่อและทำโปรเจกต์ใหม่ต่อ</string>
     <string name="template">เทมเพลต</string>
     <string name="one_absproj_package_with_the_project">แพ็กเกจ .absproj หนึ่งชุดพร้อมโปรเจกต์และสื่อต้นฉบับที่ใช้ บันทึกไปยัง Documents / AbsentMotion เก็บไว้เป็นแบ็กอัปหรือย้ายโปรเจกต์ไปโทรศัพท์เครื่องอื่น</string>
@@ -202,13 +203,16 @@
     <string name="home_save_project_failed">บันทึกโปรเจกต์ไม่ได้ โปรดเพิ่มพื้นที่ว่าง</string>
     <string name="home_collect_unreadable_project">อ่านโปรเจกต์นี้ไม่ได้</string>
     <string name="home_collect_already_kept">สื่อทั้งหมดถูกเก็บไว้ในโปรเจกต์แล้ว</string>
-    <string name="home_collect_could_not_read">อ่าน %1$s ไม่ได้ อาจถูกลบไปแล้ว</string>
+    <plurals name="home_collect_could_not_read">
+        <item quantity="other">ไฟล์ %1$s ไฟล์หายไปหรืออ่านไม่ได้</item>
+    </plurals>
     <string name="home_collect_storage_full">พื้นที่เต็ม ไฟล์บางส่วนจึงไม่ได้ถูกคัดลอก</string>
     <string name="home_restore_edits_failed">กู้คืนการแก้ไขไม่ได้ โปรดเพิ่มพื้นที่ว่าง แล้วจะถามอีกครั้งในครั้งถัดไป</string>
     <string name="home_restore_version_failed">กู้คืนเวอร์ชันนี้ไม่ได้ โปรดเพิ่มพื้นที่ว่าง</string>
     <string name="home_version_restored">กู้คืนเวอร์ชันแล้ว</string>
     <string name="home_close_save_failed">บันทึกการเปลี่ยนแปลงล่าสุดไม่ได้ โปรดเพิ่มพื้นที่ว่างแล้วปิดอีกครั้ง หรือปิดอีกครั้งเพื่อออกโดยไม่บันทึก</string>
     <string name="home_search_hint">ค้นหาโปรเจกต์และแอสเซท</string>
+    <string name="home_search_templates_hint">ค้นหาเทมเพลตและพรีเซ็ต</string>
     <string name="home_search">ค้นหา</string>
     <string name="home_close_search">ปิดการค้นหา</string>
     <string name="home_your_projects">โปรเจกต์ของคุณ</string>
@@ -286,6 +290,7 @@
     <string name="template_delete_preset">ลบพรีเซ็ตนี้หรือไม่</string>
     <string name="template_open_as_project">เปิดเป็นโปรเจกต์</string>
     <string name="template_rename_failed">เปลี่ยนชื่อไม่ได้</string>
+    <string name="template_add_failed">ไม่สามารถเพิ่มเทมเพลตได้ โปรดเพิ่มพื้นที่ว่าง</string>
     <string name="safety_version_today">วันนี้ เวลา %1$s</string>
     <string name="safety_version_yesterday">เมื่อวาน เวลา %1$s</string>
     <string name="safety_version_on_date">เมื่อ %1$s เวลา %2$s</string>
