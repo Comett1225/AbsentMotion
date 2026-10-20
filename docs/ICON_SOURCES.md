@@ -107,8 +107,8 @@ The launcher icon is an own drawing, made by `tools/icon/make_icon.py` (source o
 | `ui/editor/PanelIcons.kt` | `Back` | Lucide | `arrow-left` | ISC and MIT (Feather) | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/arrow-left.svg | - |
 | `ui/editor/PanelIcons.kt` | `TabStroke` | Lucide | `route` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/route.svg | Border & Shadow, Stroke tab |
 | `ui/editor/PanelIcons.kt` | `TabBorder` | Lucide | `square` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/square.svg | Border & Shadow, Border tab |
-| `ui/editor/PanelIcons.kt` | `Keyframe` | own drawing | - | Apache-2.0 (own) | - | - |
-| `ui/editor/PanelIcons.kt` | `KeyframeRemove` | own drawing | - | Apache-2.0 (own) | - | - |
+| `ui/editor/PanelIcons.kt` | `Keyframe` | own drawing | - | Apache-2.0 (own) | - | hollow tall diamond with a plus, the proportions of the timeline keyframes |
+| `ui/editor/PanelIcons.kt` | `KeyframeRemove` | own drawing | - | Apache-2.0 (own) | - | solid tall diamond with a minus cut out, shown on a keyframe |
 | `ui/editor/PanelIcons.kt` | `Easing` | own drawing | - | Apache-2.0 (own) | - | axes and an ease curve |
 | `ui/editor/PanelIcons.kt` | `More` | Lucide | `ellipsis` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/ellipsis.svg | - |
 | `ui/editor/PanelIcons.kt` | `TabMove` | Lucide | `move` | ISC and MIT (Feather) | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/move.svg | - |
