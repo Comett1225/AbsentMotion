@@ -194,7 +194,7 @@ private fun Playback(state: EditorState) {
             }
         } finally {
             audio?.stop()
-            withContext(NonCancellable) { Log.i("AMPlay", state.engine.timing()) }
+            withContext(NonCancellable) { state.engine.timing().takeUnless { "\"samples\":0," in it || it == "{}" }?.let { Log.i("AMPlay", it) } }
         }
     }
 }
