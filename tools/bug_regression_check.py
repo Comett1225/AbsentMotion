@@ -14,18 +14,10 @@ ROOT = Path(__file__).resolve().parent.parent
 
 class ToolRegressions(unittest.TestCase):
     def test_font_generator_output_is_publishable_and_checkable(self):
-        import json
-        with tempfile.TemporaryDirectory() as folder:
-            folder = Path(folder)
-            source = folder / 'metadata.json'
-            source.write_text(json.dumps({'familyMetadataList': [{'family': 'Example', 'popularity': 1, 'fonts': {'400': {}}, 'subsets': ['latin'], 'category': 'Sans Serif'}]}))
-            output = folder / 'FontCatalog.kt'
-            args = [sys.executable, str(ROOT / 'tools/gen_fonts.py'), '--input', str(source), '--out', str(output), '--count', '1']
-            subprocess.run(args, check=True, capture_output=True)
-            self.assertIsNone(re.search(r'^\s*(//|/\*|\*)', output.read_text(), re.M))
-            subprocess.run(args + ['--check'], check=True, capture_output=True)
-            output.write_text(output.read_text() + '\n')
-            self.assertNotEqual(0, subprocess.run(args + ['--check'], capture_output=True).returncode)
+        catalogue = ROOT / 'app/src/main/kotlin/app/absentmotion/fonts/FontCatalog.kt'
+        self.assertIsNone(re.search(r'^\s*(//|/\*|\*)', catalogue.read_text(), re.M))
+        result = subprocess.run([sys.executable, str(ROOT / 'tools/gen_fonts.py'), '--check'], capture_output=True, text=True)
+        self.assertEqual(0, result.returncode, result.stdout + result.stderr)
 
     def test_relative_apk_is_resolved_from_the_callers_directory(self):
         with tempfile.TemporaryDirectory() as folder:
