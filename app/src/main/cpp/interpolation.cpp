@@ -12,6 +12,7 @@
 #include "include/core/SkColorSpace.h"
 #include "include/core/SkM44.h"
 #include "include/core/SkPaint.h"
+#include "include/core/SkShader.h"
 #include "include/core/SkSurface.h"
 #include "include/effects/SkRuntimeEffect.h"
 #include "include/gpu/graphite/Context.h"
@@ -132,6 +133,37 @@ uniform shader a;
 uniform shader b;
 uniform float t;
 half4 main(float2 p) { return mix(a.eval(p), b.eval(p), half(t)); }
+)";
+
+const char* const kMoshMotion = R"(
+uniform shader flow;
+uniform shader prior;
+uniform float intensity;
+uniform float bloom;
+uniform float glitch;
+uniform float cell;
+uniform float salt;
+float hash(float2 p) { return fract(sin(dot(p, float2(12.9898, 78.233))) * 43758.5453); }
+half4 main(float2 p) {
+    float2 id = floor(p / cell);
+    float2 c = (id + 0.5) * cell;
+    float2 m = float2(flow.eval(c).ba) * intensity + float2(prior.eval(c).rg) * bloom;
+    float h = hash(id + salt);
+    if (h < glitch * 0.15) { m += (float2(hash(id + salt + 17.0), hash(id + salt + 41.0)) - 0.5) * cell * 6.0; }
+    return half4(half2(m), 0, 1);
+}
+)";
+
+const char* const kMoshImage = R"(
+uniform shader state;
+uniform shader frame;
+uniform shader motion;
+uniform float d;
+uniform float decay;
+half4 main(float2 p) {
+    float2 m = floor(float2(motion.eval(p / d).rg) * d + 0.5);
+    return mix(state.eval(p + m), frame.eval(p), half(decay));
+}
 )";
 
 constexpr int kFused[] = {1, 2, 4};
@@ -326,6 +358,40 @@ sk_sp<SkImage> SynthesizeFrame(skgpu::graphite::Context* context, skgpu::graphit
         return nullptr;
     }
     if (ms) *ms = Since(start);
+    return out;
+}
+
+sk_sp<SkImage> MoshStep(skgpu::graphite::Context* context, skgpu::graphite::Recorder* recorder, const sk_sp<SkImage>& state,
+                        const sk_sp<SkImage>& prior, const sk_sp<SkImage>& frame, const sk_sp<SkImage>& flow, const MoshParams& params,
+                        float salt, sk_sp<SkImage>* motion) {
+    static const sk_sp<SkRuntimeEffect> moshMotion = Compile(kMoshMotion), moshImage = Compile(kMoshImage);
+    if (!moshMotion || !moshImage || !state || !frame) return nullptr;
+    const int divisor = std::max(params.flow.divisor, 1);
+    const int fw = flow ? flow->width() : (frame->width() + divisor - 1) / divisor;
+    const int fh = flow ? flow->height() : (frame->height() + divisor - 1) / divisor;
+    const sk_sp<SkShader> none = SkShaders::Color(SK_ColorTRANSPARENT);
+    Gpu gpu(context, recorder);
+    SkRuntimeShaderBuilder field(moshMotion);
+    field.child("flow") = flow ? Sample(flow) : none;
+    field.child("prior") = prior ? Sample(prior, SkFilterMode::kNearest) : none;
+    field.uniform("intensity") = params.intensity;
+    field.uniform("bloom") = params.bloom;
+    field.uniform("glitch") = params.glitch;
+    field.uniform("cell") = std::max(params.block / divisor, 1.0f);
+    field.uniform("salt") = salt;
+    sk_sp<SkImage> moved = gpu.draw(gpu.field(fw, fh), field);
+    SkRuntimeShaderBuilder image(moshImage);
+    image.child("state") = Sample(state);
+    image.child("frame") = Sample(frame);
+    image.child("motion") = moved ? Sample(moved, params.block >= 2 * divisor ? SkFilterMode::kNearest : SkFilterMode::kLinear) : none;
+    image.uniform("d") = (float)divisor;
+    image.uniform("decay") = std::clamp(params.decay, 0.0f, 1.0f);
+    sk_sp<SkImage> out = gpu.draw(gpu.picture(state->width(), state->height()), image);
+    if (!gpu.submit() || !out || !moved) {
+        LOGE("datamosh step failed");
+        return nullptr;
+    }
+    *motion = moved;
     return out;
 }
 

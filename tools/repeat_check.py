@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import subprocess
 import sys
 import time
 from pathlib import Path
@@ -57,6 +58,35 @@ def cases():
     yield 'two repeats multiply', engine.scene(dot(fx('linearrepeat', count=2, position=(100, 0)) + fx('linearrepeat', count=2, position=(0, 100)))), [((50, 50), RED), ((150, 50), RED), ((50, 150), RED), ((150, 150), RED), ((100, 100), BLACK)], 0
 
 
+def moving_video(path, frames=60, width=256, height=256):
+    folder = path.parent / 'mosh-frames'
+    folder.mkdir(exist_ok=True)
+    k = width / 256
+    y, x = np.mgrid[0:height, 0:width]
+    base = np.stack([x * 255 // width, y * 255 // height, 255 - (x * 255 // width + y * 255 // height) // 2], axis=-1).astype(np.uint8)
+    base[((x // round(16 * k) + y // round(16 * k)) % 2 == 0)] //= 2
+    for n in range(frames):
+        image = base.copy()
+        cx, cy = round((30 + n * 3) * k), round(height / 2 + 40 * k * np.sin(n / 9))
+        a, b = round(25 * k), round(10 * k)
+        image[cy - a:cy + a, cx - a:cx + a] = (255, 255, 255)
+        image[cy - b:cy + b, cx - b:cx + b] = (255, 0, 0)
+        Image.fromarray(image).save(folder / f'{n:03d}.png')
+    Image.open(folder / '000.png').save(path.with_suffix('.png'))
+    subprocess.run(['ffmpeg', '-v', 'error', '-y', '-framerate', '30', '-i', str(folder / '%03d.png'), '-pix_fmt', 'yuv420p',
+                    '-c:v', 'libx264', '-g', '30', str(path)], check=True)
+    for f in folder.iterdir():
+        f.unlink()
+
+
+def mosh_scene(effect, video=True):
+    media = f'<media uri="file://{engine.DEVICE_DIR}/mosh.mp4" type="video/mp4" duration="2000000"/>' if video else ''
+    fill = (f'fillVideo="file://{engine.DEVICE_DIR}/mosh.mp4" outTime="2000"' if video else f'fillImage="file://{engine.DEVICE_DIR}/mosh.png"')
+    layer = (f'<shape id="3" label="m" startTime="0" endTime="1999" fillType="media" {fill} mediaFillMode="stretch" s=".rect">'
+             + engine.transform('100,100,0') + '<property name="size" type="vec2" value="100,100"/>' + effect + '</shape>')
+    return engine.scene(media + layer).replace('totalTime="1000"', 'totalTime="2000"', 1)
+
+
 def main():
     work = Path(sys.argv[1]) if len(sys.argv) > 1 else engine.ROOT / 'build/repeat-check'
     work.mkdir(parents=True, exist_ok=True)
@@ -76,18 +106,57 @@ def main():
         print(('ok   ' if ok else 'FAIL ') + title, flush=True)
         failed += not ok
 
-    for k, (title, xml, probes, frame) in enumerate(cases()):
-        image = still(f'repeat{k}', xml, frame)
-        bad = [(xy, tuple(int(v) for v in image[xy[1], xy[0]]), want) for xy, want in probes if np.abs(image[xy[1], xy[0]] - want).max() > engine.TOLERANCE]
-        report(not bad, title + (': ' + str(bad) if bad else ''))
-    hits = engine.run('repeathit', engine.scene(dot(fx('radialrepeat', count=4, radius=50), id=7)), work, [(150, 100), (100, 100), (100, 150)])
-    engine.adb('shell', 'rm', f'{engine.DEVICE_DIR}/repeathit.png')
-    got = [line.split()[-1] for line in hits.splitlines() if ' hit ' in line]
-    report(got == ['7', '0', '7'], 'tapping a copy selects the layer: ' + str(got))
-    field = lambda seed: engine.scene(dot(fx('scatterfield', seed=seed), hw=20))
-    shots = [still(f'scatter{seed}{again}', field(seed)) for seed, again in [(1, 'a'), (1, 'b'), (2, 'a')]]
-    report(np.array_equal(shots[0], shots[1]) and not np.array_equal(shots[0], shots[2]) and shots[0].max() > 200,
-           'scatter field is steady for a seed and changes with it')
+    part = sys.argv[2] if len(sys.argv) > 2 else 'all'
+    if part in ('all', 'repeat'):
+        for k, (title, xml, probes, frame) in enumerate(cases()):
+            image = still(f'repeat{k}', xml, frame)
+            bad = [(xy, tuple(int(v) for v in image[xy[1], xy[0]]), want) for xy, want in probes if np.abs(image[xy[1], xy[0]] - want).max() > engine.TOLERANCE]
+            report(not bad, title + (': ' + str(bad) if bad else ''))
+        hits = engine.run('repeathit', engine.scene(dot(fx('radialrepeat', count=4, radius=50), id=7)), work, [(150, 100), (100, 100), (100, 150)])
+        engine.adb('shell', 'rm', f'{engine.DEVICE_DIR}/repeathit.png')
+        got = [line.split()[-1] for line in hits.splitlines() if ' hit ' in line]
+        report(got == ['7', '0', '7'], 'tapping a copy selects the layer: ' + str(got))
+        field = lambda seed: engine.scene(dot(fx('scatterfield', seed=seed), hw=20))
+        shots = [still(f'scatter{seed}{again}', field(seed)) for seed, again in [(1, 'a'), (1, 'b'), (2, 'a')]]
+        report(np.array_equal(shots[0], shots[1]) and not np.array_equal(shots[0], shots[2]) and shots[0].max() > 200,
+               'scatter field is steady for a seed and changes with it')
+    if part in ('all', 'mosh'):
+        video = work / 'mosh.mp4'
+        moving_video(video)
+        engine.adb('push', video, f'{engine.DEVICE_DIR}/mosh.mp4')
+        engine.adb('push', video.with_suffix('.png'), f'{engine.DEVICE_DIR}/mosh.png')
+        effect = fx('datamosh', start=0.2, duration=1.5)
+
+        def timed(name, xml, frame):
+            image = still(name, xml, frame)
+            lines = [line for line in engine.adb('logcat', '-d', '-s', 'AMMosh').splitlines() if ' step ' in line]
+            totals = [float(line.split('total=')[1].split()[0]) for line in lines]
+            flows = [float(line.split('flow=')[1].split()[0]) for line in lines]
+            size = lines[-1].split('size=')[1].split()[0] if lines else '-'
+            print(f'     {name}: {len(lines)} steps at {size}, flow {np.mean(flows) if flows else 0:.1f} ms, step {np.mean(totals) if totals else 0:.1f} ms', flush=True)
+            return image
+
+        before = [still('moshplain3', mosh_scene(''), 3), still('mosh3', mosh_scene(effect), 3)]
+        report(np.array_equal(*before), 'datamosh leaves the video alone before its start')
+        first = timed('mosh20a', mosh_scene(effect), 20)
+        timed('mosh35', mosh_scene(effect), 35)
+        again = timed('mosh20b', mosh_scene(effect), 20)
+        engine.adb('shell', 'am', 'force-stop', engine.PKG)
+        fresh = timed('mosh20c', mosh_scene(effect), 20)
+        plain = still('moshplain20', mosh_scene(''), 20)
+        smear = float(np.abs(first - plain).mean())
+        report(np.array_equal(first, again) and np.array_equal(first, fresh) and smear > 3,
+               f'datamosh video stills repeat exactly and differ from the plain frame by {smear:.1f}')
+        after = [still('moshplain55', mosh_scene(''), 55), still('mosh55', mosh_scene(effect), 55)]
+        report(np.array_equal(*after), 'datamosh ends after its length')
+        blocks = [still(f'moshpicture{again}', mosh_scene(effect, video=False), 15) for again in 'ab']
+        flat = still('moshpictureplain', mosh_scene('', video=False), 15)
+        early = [still('moshpicture3', mosh_scene(effect, video=False), 3), still('moshpictureplain3', mosh_scene('', video=False), 3)]
+        moved = float(np.abs(blocks[0] - flat).mean())
+        report(np.array_equal(*blocks) and np.array_equal(*early) and moved > 1,
+               f'block datamosh on a picture is steady, starts on time and moves blocks by {moved:.1f}')
+        for name in ('mosh.mp4', 'mosh.png'):
+            engine.adb('shell', 'rm', f'{engine.DEVICE_DIR}/{name}')
     sys.exit(1 if failed else 0)
 
 

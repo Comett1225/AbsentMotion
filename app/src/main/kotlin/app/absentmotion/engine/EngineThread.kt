@@ -250,6 +250,17 @@ class EngineThread(private val background: Int, context: Context? = null) {
         !closed && engine().interpolateVideo(uri, layerId, a, b, t, flow, params)
     }
 
+    internal suspend fun moshStart(uri: String, layerId: Long, pts: LongArray, mosh: FloatArray, flow: FloatArray, exact: Boolean): Int = withContext(dispatcher) {
+        if (closed || (!exact && capturing)) return@withContext -1
+        engine().moshStart(uri, layerId, pts, mosh, flow).also { if (it == pts.size && !exact) renderNow() }
+    }
+
+    internal suspend fun moshFrame(uri: String, buffer: HardwareBuffer, layerId: Long, step: Int, last: Boolean, exact: Boolean,
+                                   standard: Int, range: Int, crop: Rect, accept: () -> Boolean): Boolean = withContext(dispatcher) {
+        if (closed || (!exact && capturing) || !accept()) return@withContext false
+        engine().moshFrame(uri, layerId, step, buffer, standard, range, crop).also { if (it && last && !exact) renderNow() }
+    }
+
     suspend fun maxPictureSize(): Int = withContext(dispatcher) { if (closed) 1 else engine().maxPictureSize }
 
     suspend fun setPicture(uri: String, bitmap: Bitmap?, layerId: Long = 0): Boolean = withContext(dispatcher) {

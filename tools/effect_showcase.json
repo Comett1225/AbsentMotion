@@ -101,6 +101,7 @@
     "radialrepeat": {"photo": "colour", "layout": "repeat", "params": {"radius": 125, "angle": [0, 45], "fillColor": "#7a3cc8", "fillAmount": 0.5}, "animate": 16},
     "gridrepeat": {"photo": "colour", "layout": "repeat", "params": {"count": 4, "position": [270, 270], "fillColor": "#7a3cc8", "fillAmount": 0.7}},
     "repeatalongpath": {"photo": "colour", "layout": "repeat", "path": [".circle", 125], "params": {"count": 10, "tangent": true, "phase": [0, 0.1], "rangeScale": 0.5}, "animate": 16},
-    "scatterfield": {"photo": "colour", "layout": "repeat", "params": {"z": [0, 160], "density": 0.4}, "animate": 16}
+    "scatterfield": {"photo": "colour", "layout": "repeat", "params": {"z": [0, 160], "density": 0.4}, "animate": 16},
+    "datamosh": {"photo": "portrait", "params": {"duration": 10, "block": 24, "intensity": 1.2, "decay": 0}, "animate": 16}
   }
 }

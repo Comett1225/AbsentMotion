@@ -19,6 +19,10 @@ struct FlowStats {
 sk_sp<SkImage> EstimateFlow(skgpu::graphite::Context* context, skgpu::graphite::Recorder* recorder, const sk_sp<SkImage>& a,
                             const sk_sp<SkImage>& b, const InterpolationParams& params, FlowStats* stats);
 
+sk_sp<SkImage> MoshStep(skgpu::graphite::Context* context, skgpu::graphite::Recorder* recorder, const sk_sp<SkImage>& state,
+                        const sk_sp<SkImage>& prior, const sk_sp<SkImage>& frame, const sk_sp<SkImage>& flow, const MoshParams& params,
+                        float salt, sk_sp<SkImage>* motion);
+
 sk_sp<SkImage> SynthesizeFrame(skgpu::graphite::Context* context, skgpu::graphite::Recorder* recorder, const sk_sp<SkImage>& a,
                                const sk_sp<SkImage>& b, const sk_sp<SkImage>& flow, float t, int divisor, double* ms);
 

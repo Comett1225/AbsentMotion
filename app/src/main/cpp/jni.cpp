@@ -115,6 +115,27 @@ JNIEXPORT jboolean JNICALL JNI_FN(nativeInterpolateVideo)(JNIEnv* env, jclass, j
     return engineOf(engine)->interpolateVideo(text, layerId, a, b, t, flow, interpolationParams(env, params));
 }
 
+JNIEXPORT jint JNICALL JNI_FN(nativeMoshStart)(JNIEnv* env, jclass, jlong engine, jbyteArray uri, jlong layerId, jlongArray pts,
+                                                jfloatArray mosh, jfloatArray flow) {
+    std::string text((size_t)env->GetArrayLength(uri), '\0');
+    env->GetByteArrayRegion(uri, 0, (jsize)text.size(), reinterpret_cast<jbyte*>(text.data()));
+    std::vector<int64_t> stamps((size_t)env->GetArrayLength(pts));
+    env->GetLongArrayRegion(pts, 0, (jsize)stamps.size(), reinterpret_cast<jlong*>(stamps.data()));
+    am::MoshParams params;
+    jfloat p[6] = {params.intensity, params.block, params.decay, params.glitch, params.bloom, params.source};
+    env->GetFloatArrayRegion(mosh, 0, std::min<jsize>(6, env->GetArrayLength(mosh)), p);
+    params = {p[0], p[1], p[2], p[3], p[4], p[5], interpolationParams(env, flow)};
+    return engineOf(engine)->moshStart(text, layerId, stamps, params);
+}
+
+JNIEXPORT jboolean JNICALL JNI_FN(nativeMoshFrame)(JNIEnv* env, jclass, jlong engine, jbyteArray uri, jlong layerId, jint step,
+                                                   jobject hardwareBuffer, jint standard, jint range, jint left, jint top, jint right, jint bottom) {
+    std::string text((size_t)env->GetArrayLength(uri), '\0');
+    env->GetByteArrayRegion(uri, 0, (jsize)text.size(), reinterpret_cast<jbyte*>(text.data()));
+    return engineOf(engine)->moshFrame(text, layerId, step, AHardwareBuffer_fromHardwareBuffer(env, hardwareBuffer), standard, range,
+                                       {left, top, right, bottom});
+}
+
 JNIEXPORT jint JNICALL JNI_FN(nativeRenderFrame)(JNIEnv*, jclass, jlong engine, jlong target, jdouble timeMs,
                                                  jint background, jlong presentTimeNs) {
     return engineOf(engine)->renderFrame(targetOf(target), timeMs, (uint32_t)background, presentTimeNs);

@@ -111,7 +111,7 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
     bool any = false;
     for (size_t k = (size_t)(liftAt(layer) + 1); k < layer.effects.size(); k++) {
         const LayerEffect& e = layer.effects[k];
-        if (e.hidden || e.id == kLift) continue;
+        if (e.hidden || e.id == kLift || (layer.video && e.id == "absent.datamosh")) continue;
         const Definition* d = find(e.id);
         const auto* defaults = d ? &d->defaults : nullptr;
         if (BuiltIn(e.id)) {

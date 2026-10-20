@@ -8,7 +8,9 @@ import app.absentmotion.export.FrameInterpolation
 import app.absentmotion.model.FramePair
 import app.absentmotion.model.Layer
 import app.absentmotion.model.LayerTrack
+import app.absentmotion.model.MoshPlan
 import app.absentmotion.model.layerTracks
+import app.absentmotion.model.moshPlan
 import app.absentmotion.model.Scene
 import app.absentmotion.model.exportFrame
 import app.absentmotion.model.exportFrameMs
@@ -158,6 +160,7 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
         @Volatile private var stopped = false
         private var publishedPts: Long? = null
         private var publishedMix: Pair<FramePair, FrameInterpolation>? = null
+        private var publishedMosh: Pair<List<Long>, List<Float>>? = null
         private val held = mutableSetOf<Long>()
         private val worker = scope.launch {
             try {
@@ -206,6 +209,8 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
             val wanted = if (exact) uri else proxy ?: uri
             if (this.source != wanted) { decoder?.close(); decoder = null }
             val source = decoder ?: open(wanted).also { decoder = it }
+            val plan = layer.moshPlan(sample.timeMs, sample.scene)
+            if (plan != null && moshed(source, sample, plan, exact, ::abandoned)) return@withLock
             if (exact && request.interpolation != FrameInterpolation.Off && mixed(source, request, sample)) return@withLock
             val ahead = if (request.playing) leadMs * (sample.track.timeAt(request.timeMs.toDouble(), false)?.rate ?: 1.0) else 0.0
             val time = layer.videoTimeUs((sample.timeMs + ahead).toInt(), sample.scene)
@@ -222,6 +227,7 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
                 if (installed) {
                     publishedPts = pts
                     publishedMix = null
+                    publishedMosh = null
                     held.clear()
                     retryAt = 0L
                     if (!exact && request.playing) leadMs = (leadMs * 0.8 + (System.nanoTime() - request.born) / 1e6 * 0.2).coerceIn(0.0, MAX_LEAD_MS)
@@ -268,6 +274,37 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
             held.retainAll(setOf(pair.a, pair.b))
             publishedMix = key
             publishedPts = null
+            publishedMosh = null
+            return true
+        }
+
+        private suspend fun moshed(source: VideoDecoder, sample: VideoSample, plan: MoshPlan, exact: Boolean, abandoned: () -> Boolean): Boolean {
+            val times = plan.frames.map { sample.layer.videoTimeUs(it, sample.scene) }
+            val pts = times.map { source.wantedPts(it) }.toLongArray()
+            val params = plan.params + if (this.source == uri) 0f else 1f
+            val key = pts.toList() to params.toList()
+            if (publishedMosh == key) return true
+            val from = engine.moshStart(uri, id, pts, params, DebugFrameInterpolation.params(), exact)
+            if (from < 0) return false
+            for (step in from until pts.size) {
+                if (abandoned()) return true
+                val image = source.frame(times[step], abandoned) ?: run {
+                    check(!exact) { "Cannot decode datamosh frame ${pts[step]}" }
+                    return true
+                }
+                val done = image.hardwareBuffer!!.use { buffer ->
+                    engine.moshFrame(uri, buffer, id, step, step == pts.size - 1, exact, source.colorStandard, source.colorRange, image.cropRect) { !abandoned() }
+                }
+                if (!done) {
+                    check(!exact) { "Cannot datamosh video frame ${pts[step]} for $uri" }
+                    return true
+                }
+            }
+            publishedMosh = key
+            publishedPts = null
+            publishedMix = null
+            held.clear()
+            retryAt = 0L
             return true
         }
 
