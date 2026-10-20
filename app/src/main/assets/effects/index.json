@@ -85,5 +85,6 @@
  "spherize",
  "tunnel",
  "textprogress",
- "texttransform"
+ "texttransform",
+ "textrandomizer"
 ]

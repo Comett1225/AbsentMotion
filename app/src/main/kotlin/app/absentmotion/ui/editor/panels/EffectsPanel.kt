@@ -47,7 +47,7 @@ internal fun EffectsPanel(state: EditorState, modifier: Modifier) {
     val shownFor = remember { longArrayOf(layer.id) }
     LaunchedEffect(layer.id) { if (shownFor[0] != layer.id) { shownFor[0] = layer.id; state.effectIndex = -1 } }
     LaunchedEffect(instance == null) { if (instance == null && index >= 0) state.effectIndex = -1 }
-    var active by remember(layer.id, index, definition?.id) { mutableStateOf(definition?.params?.firstOrNull { it.kind != "color" && it.kind != "switch" && it.kind != "choice" }) }
+    var active by remember(layer.id, index, definition?.id) { mutableStateOf(definition?.params?.firstOrNull { it.kind != "color" && it.kind != "switch" && it.kind != "choice" && it.kind != "text" }) }
     var menu by remember { mutableStateOf(false) }
     val usable = instance != null && definition?.available == true
     val target = active?.takeIf { usable }?.let { KeyTarget(PropRef.effect(index, it.id), it.default, it.type) }

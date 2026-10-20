@@ -18,10 +18,10 @@ data class EffectParam(
     val options: List<String> = emptyList(),
     val pixels: Boolean = false,
 ) {
-    val type: String get() = when (kind) { "point" -> "vec2"; "color" -> "color"; "switch" -> "bool"; else -> "float" }
+    val type: String get() = when (kind) { "point" -> "vec2"; "color" -> "color"; "switch" -> "bool"; "text" -> "string"; else -> "float" }
 
     companion object {
-        val Kinds = setOf("float", "angle", "point", "color", "switch", "choice")
+        val Kinds = setOf("float", "angle", "point", "color", "switch", "choice", "text")
 
         fun parse(json: JSONObject): EffectParam {
             val id = json.getString("id")
@@ -33,6 +33,7 @@ data class EffectParam(
                 "color" -> (d as String).lowercase(Locale.US).let { if (it.length == 7) "#ff" + it.drop(1) else it }
                     .also { require(Regex("#[0-9a-f]{8}").matches(it)) { "$id: colour $d" } }
                 "switch" -> (d == true || (d as? Number)?.toInt() == 1).toString()
+                "text" -> d as String
                 else -> formatFloats(floatArrayOf((d as Number).toFloat()))
             }
             if (kind == "choice") {

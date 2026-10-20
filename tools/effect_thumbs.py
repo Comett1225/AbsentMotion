@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import html
 import json
 import os
 import subprocess
@@ -21,7 +22,7 @@ OUT_DIR = f"/sdcard/Android/data/{PKG}/files"
 RENDER, THUMB, SAME = 384, 192, 2.0
 ANIM_FPS, ANIM_BYTES = 12, 150_000
 FREE = {"cc0", "pd"}
-TYPES = {"point": "vec2", "color": "color", "switch": "bool"}
+TYPES = {"point": "vec2", "color": "color", "switch": "bool", "text": "string"}
 UA = {"User-Agent": "AbsentMotion-effect-thumbs/1.0"}
 
 
@@ -98,6 +99,8 @@ def value(kind, v):
         return "#ff" + c[1:] if len(c) == 7 else c
     if kind == "switch":
         return "true" if v is True or v == 1 else "false"
+    if kind == "text":
+        return html.escape(v)
     return f"{float(v):.6f}"
 
 
