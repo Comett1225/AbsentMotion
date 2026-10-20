@@ -56,6 +56,7 @@ import app.absentmotion.editor.EditorPanel
 import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.clearSelection
 import app.absentmotion.editor.MultiSelect
+import app.absentmotion.editor.withWorldLocation
 import app.absentmotion.engine.PreviewView
 import app.absentmotion.model.withGradient
 import app.absentmotion.model.cameraGesture
@@ -227,11 +228,10 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier) {
                             held = Offset.Zero
                             val about = (event.calculateCentroid(useCurrent = false) - currentOffset) / s
                             state.editSelected(key = "preview-gesture") { layer ->
-                                val at = layer.location
                                 if (zoom == 1f || !about.isSpecified) {
-                                    layer.withTransform("location", at[0] + move.x, at[1] + move.y, at[2])
+                                    state.scene.withWorldLocation(layer, state.sampleMs) { x, y -> x + move.x to y + move.y }
                                 } else {
-                                    layer.withTransform("location", about.x + (at[0] - about.x) * zoom + move.x, about.y + (at[1] - about.y) * zoom + move.y, at[2])
+                                    state.scene.withWorldLocation(layer, state.sampleMs) { x, y -> about.x + (x - about.x) * zoom + move.x to about.y + (y - about.y) * zoom + move.y }
                                         .withTransform("scale", layer.scale[0] * zoom, layer.scale[1] * zoom)
                                 }
                             }

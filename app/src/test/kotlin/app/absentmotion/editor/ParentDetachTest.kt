@@ -109,4 +109,19 @@ class ParentDetachTest {
         assertEquals(150f, preset.at(1000, 30).location[0], 1e-3f)
         assertEquals(copied.node, preset.node)
     }
+
+    @Test fun draggingAChildMovesItWithTheFingerInsideATurnedOrScaledParent() {
+        for (parent in listOf(prop("rotation", 0f to "90"), prop("scale", 0f to "2,2"))) {
+            val s = scene(layer(1, null, prop("location", 0f to "200,200,0"), parent), layer(2, 1, prop("location", 0f to "40,10,0")))
+            val child = s.layerAt(2, 500)!!
+            val before = s.place(child, 500)
+            val dragged = s.update(2, 500) { s.withWorldLocation(it, 500) { x, y -> x + 30f to y - 20f } }
+            val after = dragged.place(dragged.layer(2)!!, 500)
+            assertEquals(before.x + 30f, after.x, 1e-3f)
+            assertEquals(before.y - 20f, after.y, 1e-3f)
+        }
+        val alone = scene(layer(3, null, prop("location", 0f to "40,10,0")))
+        val moved = alone.withWorldLocation(alone.layerAt(3, 0)!!, 0) { x, y -> x + 30f to y - 20f }
+        assertEquals(listOf(70f, -10f, 0f), moved.location.toList())
+    }
 }
