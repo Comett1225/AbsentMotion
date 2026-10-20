@@ -1,0 +1,1 @@
+AbsentMotion 2.5.2: audio no longer stops after cutting a clip, no more flicker between clips, quick play and pause stays put, group effects and borders show up, and a red grip with a light vibration (switchable) when a clip can't be dragged longer.

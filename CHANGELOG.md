@@ -6,6 +6,33 @@ All notable changes to AbsentMotion are listed here, newest first. The format fo
 Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stands for the feature set as it stood on
 2026-10-12.
 
+## [2.5.2] - 2026-10-20
+
+### Added
+
+- **A red grip and a light tick when a trim reaches the end of its source.** Dragging the end or start grip of a video or
+  audio clip past what the file has turns the grip red and gives one very light vibration. A new switch, Trim Limit
+  Vibration, in the Home settings turns the vibration off.
+- A privacy policy (`PRIVACY.md`).
+
+### Fixed
+
+- Audio stopped a few seconds into the second half of a split clip, or into any clip that starts later than three seconds in
+  its file.
+- The picture vanished for a moment where one video clip meets the next. The next clip is now prepared before playback or
+  scrubbing reaches it.
+- Pressing Play and Pause quickly could send the playhead back in time instead of stopping where it landed.
+- Effects, borders and shadows on a group are now drawn; they were saved but never shown.
+- Invert no longer paints white outside a layer, and RGB Split no longer changes translucent colours at distance 0.
+- Removing a parent link, deleting a parent, grouping across a parent, copying or saving a preset now keeps the whole
+  animation of the child in place, not just the frame under the playhead.
+- Save to My Assets keeps the rotation, animation and parent chain of the layer or group.
+- Deleting a project no longer removes imported media that another project or template shares when that other file cannot be
+  read at that moment.
+- Missing media is relinked only when exactly one file has the same name and size, instead of the first match.
+- Replacing a trimmed text video fill with a shorter clip keeps a valid trim.
+- Four Android lint errors are fixed.
+
 ## [2.5.1] - 2026-10-19
 
 ### Changed
