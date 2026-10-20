@@ -1,0 +1,55 @@
+{
+ "id": "spotcolor",
+ "name": "Spot Color",
+ "category": "color",
+ "since": "3.0.0",
+ "description": "Keeps one colour and takes the saturation out of every other colour in the layer.",
+ "params": [
+  {
+   "id": "color",
+   "label": "Color",
+   "type": "color",
+   "default": "#ff0000"
+  },
+  {
+   "id": "threshold",
+   "label": "Threshold",
+   "type": "float",
+   "default": 0.35,
+   "min": 0,
+   "max": 2,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "feather",
+   "label": "Feather",
+   "type": "float",
+   "default": 0.25,
+   "min": 0,
+   "max": 2,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "saturation",
+   "label": "Saturation",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "choke",
+   "label": "Choke",
+   "type": "float",
+   "default": 5,
+   "min": 0.5,
+   "max": 20,
+   "step": 0.01
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nlayout(color) uniform half4 color;\nuniform float threshold;\nuniform float feather;\nuniform float saturation;\nuniform float choke;\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return src;\n    float3 rgb = float3(src.rgb) / float(src.a);\n    float d = distance(rgb, float3(color.rgb)) * choke;\n    float keep = 1.0 - smoothstep(threshold, threshold + feather + 0.0001, d);\n    float grey = dot(rgb, float3(0.2126, 0.7152, 0.0722));\n    float3 other = mix(float3(grey), rgb, saturation);\n    return half4(half3(mix(other, rgb, keep)) * src.a, src.a);\n}\n"
+}

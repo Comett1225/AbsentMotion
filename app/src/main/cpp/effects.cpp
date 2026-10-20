@@ -126,6 +126,7 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
                 std::vector<float> v(n);
                 if (name == "size") v = {area.width(), area.height()};
                 else if (name == "time") v = {seconds};
+                else if (name == "duration") v = {(float)((layer.endTime - layer.startTime) / 1000.0)};
                 else if (u.isColor() && n == 4) v = {Value(e, defaults, name, 1, t, 0), Value(e, defaults, name, 2, t, 0),
                                                      Value(e, defaults, name, 3, t, 0), Value(e, defaults, name, 0, t, 1)};
                 else for (int i = 0; i < n; i++) v[i] = Value(e, defaults, name, i, t, 0);

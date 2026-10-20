@@ -1,0 +1,19 @@
+{
+ "id": "feather",
+ "name": "Feather",
+ "category": "key",
+ "since": "3.0.0",
+ "description": "Softens the edges of the opaque parts of the layer by fading them out towards the outline.",
+ "params": [
+  {
+   "id": "blur",
+   "label": "Strength",
+   "type": "float",
+   "default": 20,
+   "min": 0,
+   "max": 300,
+   "step": 0.1
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform shader blurred;\nuniform float blur;\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0 || blur <= 0.0) return src;\n    float soft = clamp((float(blurred.eval(coord).a) - 0.5) * 2.0, 0.0, 1.0);\n    return src * half(soft);\n}\n"
+}

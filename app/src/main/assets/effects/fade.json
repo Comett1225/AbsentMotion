@@ -1,0 +1,28 @@
+{
+ "id": "fade",
+ "name": "Fade In/Out",
+ "category": "stylize",
+ "since": "3.0.0",
+ "description": "Fades the layer in at its start and out again at its end, over the times you set.",
+ "params": [
+  {
+   "id": "fadeIn",
+   "label": "In",
+   "type": "float",
+   "default": 0.5,
+   "min": 0,
+   "max": 10,
+   "step": 0.01
+  },
+  {
+   "id": "fadeOut",
+   "label": "Out",
+   "type": "float",
+   "default": 0.5,
+   "min": 0,
+   "max": 10,
+   "step": 0.01
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float fadeIn;\nuniform float fadeOut;\nuniform float duration;\nhalf4 main(float2 coord) {\n    float a = 1.0;\n    if (fadeIn > 0.0) a *= clamp(time / fadeIn, 0.0, 1.0);\n    if (fadeOut > 0.0) a *= clamp((duration - time) / fadeOut, 0.0, 1.0);\n    return image.eval(coord) * half(a);\n}\n"
+}
