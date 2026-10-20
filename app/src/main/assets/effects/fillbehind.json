@@ -93,7 +93,7 @@
    "id": "edgeColor",
    "label": "Edge Color",
    "type": "color",
-   "default": "#ffffff"
+   "default": "#000000"
   },
   {
    "id": "edgeStrength",

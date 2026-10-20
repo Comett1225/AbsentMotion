@@ -1,0 +1,72 @@
+{
+ "id": "bend",
+ "name": "Bend",
+ "category": "distort",
+ "since": "3.0.0",
+ "description": "Bends the layer along a smooth arc; the Origin side stays put and the far side turns to the angle you set. Best on long, thin layers.",
+ "params": [
+  {
+   "id": "origin",
+   "label": "Origin",
+   "type": "choice",
+   "default": 3,
+   "options": [
+    "Left",
+    "Right",
+    "Top",
+    "Bottom"
+   ]
+  },
+  {
+   "id": "angle",
+   "label": "Angle",
+   "type": "angle",
+   "default": 0,
+   "min": -180,
+   "max": 180,
+   "step": 0.5
+  },
+  {
+   "id": "start",
+   "label": "Start",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "before",
+   "label": "Before Start",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Freeze",
+    "Bend to Same Side",
+    "Bend to Opposite Side"
+   ]
+  },
+  {
+   "id": "tuneHead",
+   "label": "Tune Head",
+   "type": "float",
+   "default": 0.75,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "tuneTail",
+   "label": "Tune Tail",
+   "type": "float",
+   "default": 0.25,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float origin;\nuniform float angle;\nuniform float start;\nuniform float before;\nuniform float tuneHead;\nuniform float tuneTail;\nfloat ramp(float x) {\n    float a = tuneTail > 0.0 ? smoothstep(0.0, tuneTail, x) : 1.0;\n    float b = tuneHead < 1.0 ? 1.0 - smoothstep(tuneHead, 1.0, x) : 1.0;\n    return a * b;\n}\nbool arc(float2 q, float2 p, float a, float k, float du, float w, out float2 hit) {\n    float2 t = float2(cos(a), sin(a));\n    float2 n = float2(-t.y, t.x);\n    float2 d = q - p;\n    if (abs(k) * du < 0.0001) {\n        hit = float2(dot(d, t), dot(d, n));\n    } else {\n        float r = 1.0 / k;\n        float2 c = d - n * r;\n        float sg = sign(k);\n        hit = float2(atan(sg * dot(c, t), -sg * dot(c, n)) / abs(k), r - sg * length(c));\n    }\n    return hit.x >= 0.0 && hit.x < du && abs(hit.y) <= w;\n}\nfloat2 advance(float2 p, float a, float k, float du) {\n    float2 t = float2(cos(a), sin(a));\n    float2 n = float2(-t.y, t.x);\n    if (abs(k) * du < 0.0001) return p + t * du;\n    float phi = k * du;\n    float2 v = -n / k;\n    return p + n / k + float2(v.x * cos(phi) - v.y * sin(phi), v.x * sin(phi) + v.y * cos(phi));\n}\nhalf4 main(float2 coord) {\n    float theta = radians(clamp(angle, -180.0, 180.0));\n    if (abs(theta) < 0.0001) return image.eval(coord);\n    float2 o = float2(size.x * 0.5, size.y);\n    float2 u = float2(0.0, -1.0);\n    float2 v = float2(1.0, 0.0);\n    float len = size.y;\n    float wide = size.x;\n    if (origin < 0.5) {\n        o = float2(0.0, size.y * 0.5); u = float2(1.0, 0.0); v = float2(0.0, 1.0); len = size.x; wide = size.y;\n    } else if (origin < 1.5) {\n        o = float2(size.x, size.y * 0.5); u = float2(-1.0, 0.0); v = float2(0.0, -1.0); len = size.x; wide = size.y;\n    } else if (origin < 2.5) {\n        o = float2(size.x * 0.5, 0.0); u = float2(0.0, 1.0); v = float2(-1.0, 0.0);\n    }\n    float2 q = float2(dot(coord - o, u), dot(coord - o, v));\n    float s = clamp(start, 0.0, 1.0) * len;\n    float w = wide * 0.5 + 1.0;\n    float total = 0.0;\n    for (int i = 0; i < 32; i++) total += ramp((float(i) + 0.5) / 32.0) / 32.0;\n    float du = (len - s) / 32.0;\n    float2 p = float2(s, 0.0);\n    float a = 0.0;\n    float2 hit;\n    for (int i = 0; i < 32; i++) {\n        if (du <= 0.0) break;\n        float k = total > 0.0 ? theta * ramp((float(i) + 0.5) / 32.0) / (total * (len - s)) : 0.0;\n        if (arc(q, p, a, k, du, w, hit)) return image.eval(o + (s + float(i) * du + hit.x) * u + hit.y * v);\n        p = advance(p, a, k, du);\n        a += k * du;\n    }\n    float side = before < 0.5 ? 0.0 : before < 1.5 ? -1.0 : 1.0;\n    du = s / 32.0;\n    p = float2(s, 0.0);\n    a = 3.14159265;\n    for (int i = 0; i < 32; i++) {\n        if (du <= 0.0) break;\n        float k = total > 0.0 ? side * theta * ramp((float(i) + 0.5) / 32.0) / (total * s) : 0.0;\n        if (arc(q, p, a, k, du, w, hit)) return image.eval(o + (s - float(i) * du - hit.x) * u - hit.y * v);\n        p = advance(p, a, k, du);\n        a += k * du;\n    }\n    return half4(0.0);\n}\n"
+}

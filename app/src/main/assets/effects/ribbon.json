@@ -1,0 +1,101 @@
+{
+ "id": "ribbon",
+ "name": "Ribbon",
+ "category": "stylize",
+ "since": "3.0.0",
+ "description": "Draws a twisting ribbon of changing width across the opaque parts of the layer; animate Phase to make it flow, or punch it out of the layer.",
+ "params": [
+  {
+   "id": "magnitude",
+   "label": "Magnitude",
+   "type": "float",
+   "default": 0.2,
+   "min": 0,
+   "max": 1,
+   "step": 0.001
+  },
+  {
+   "id": "frequency",
+   "label": "Frequency",
+   "type": "float",
+   "default": 3,
+   "min": 0.1,
+   "max": 20,
+   "step": 0.01
+  },
+  {
+   "id": "width",
+   "label": "Width",
+   "type": "float",
+   "default": 0.2,
+   "min": 0,
+   "max": 5,
+   "step": 0.001
+  },
+  {
+   "id": "phase",
+   "label": "Phase",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1000,
+   "step": 0.01
+  },
+  {
+   "id": "offset",
+   "label": "Offset",
+   "type": "float",
+   "default": 0,
+   "min": -1,
+   "max": 1,
+   "step": 0.001
+  },
+  {
+   "id": "color",
+   "label": "Color",
+   "type": "color",
+   "default": "#2d1ef6"
+  },
+  {
+   "id": "punch",
+   "label": "Punch Out",
+   "type": "switch",
+   "default": false
+  },
+  {
+   "id": "smoothing",
+   "label": "Smoothing",
+   "type": "float",
+   "default": 0.01,
+   "min": 0,
+   "max": 1,
+   "step": 0.001
+  },
+  {
+   "id": "tint",
+   "label": "Tint",
+   "type": "color",
+   "default": "#88ccff"
+  },
+  {
+   "id": "tintAmount",
+   "label": "Tint Amount",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "angle",
+   "label": "Angle",
+   "type": "angle",
+   "default": 0,
+   "min": -3600,
+   "max": 3600,
+   "step": 0.5
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float magnitude;\nuniform float frequency;\nuniform float width;\nuniform float phase;\nuniform float offset;\nlayout(color) uniform half4 color;\nuniform float punch;\nuniform float smoothing;\nlayout(color) uniform half4 tint;\nuniform float tintAmount;\nuniform float angle;\nfloat hash(float x) { return fract(sin(x * 127.1 + 311.7) * 43758.5453) * 2.0 - 1.0; }\nfloat wobble(float x) {\n    float i = floor(x);\n    float t = x - i;\n    float a = hash(i) * t;\n    float b = hash(i + 1.0) * (t - 1.0);\n    return mix(a, b, t * t * (3.0 - 2.0 * t)) * 2.2;\n}\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return half4(0.0);\n    float ra = radians(angle);\n    float2 ax = float2(cos(ra), sin(ra));\n    float2 ay = float2(-ax.y, ax.x);\n    float span = max(abs(dot(size, abs(ax))), 1.0);\n    float tall = max(abs(dot(size, abs(ay))), 1.0);\n    float2 r = float2(dot(coord - size * 0.5, ax), dot(coord - size * 0.5, ay));\n    float x = r.x / span + 0.5;\n    float f = max(frequency, 0.1);\n    float centre = (clamp(wobble(x * f + phase), -1.0, 1.0) * magnitude + offset) * tall * 0.5;\n    float d = 0.5 / span;\n    float slope = (wobble((x + d) * f + phase) - wobble((x - d) * f + phase)) / (2.0 * d) * magnitude * tall * 0.5 / span;\n    float turn = wobble(x * f * 0.5 + phase * 0.7 + 17.3);\n    float halfWidth = max(width, 0.0) * tall * 0.06 * abs(turn) + 0.25;\n    float off = abs(r.y - centre) / sqrt(1.0 + slope * slope);\n    float soft = 0.75 + max(smoothing, 0.0) * tall * 0.1;\n    float cover = (1.0 - smoothstep(halfWidth - soft, halfWidth + soft, off)) * float(src.a);\n    if (punch > 0.5) return src * half(1.0 - cover);\n    half3 rgb = turn < 0.0 ? half3(mix(float3(color.rgb), float3(tint.rgb), clamp(tintAmount, 0.0, 1.0))) : color.rgb;\n    float a = cover * float(color.a);\n    return half4(rgb * half(a), half(a)) + src * half(1.0 - a);\n}\n"
+}

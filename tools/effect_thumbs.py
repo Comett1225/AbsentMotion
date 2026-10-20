@@ -119,11 +119,12 @@ def prop(p, v):
 
 def layer(id, image, effect="", half=RENDER // 2, keys=None, end=999, shape=".rect"):
     c = RENDER // 2
+    hw, hh = half if isinstance(half, list) else (half, half)
     location = (f'<location value="{c},{c},0"/>' if not keys else
                 "<location>" + "".join(f'<kf t="{k / (len(keys) - 1):.6f}" v="{c + x},{c + y},0"/>' for k, (x, y) in enumerate(keys)) + "</location>")
     return (f'<shape id="{id}" label="{image}" startTime="0" endTime="{end}" s="{shape}" fillType="media" mediaFillMode="fill" '
             f'fillImage="file://{APP_PATH}/{image}.png"><transform>{location}</transform>'
-            f'<property name="size" type="vec2" value="{half},{half}"/>{effect}</shape>')
+            f'<property name="size" type="vec2" value="{hw},{hh}"/>{effect}</shape>')
 
 
 def words(id, content, effect="", end=999):
@@ -302,7 +303,7 @@ def main():
         animated = show.get("animate", 0)
         frames = list(range(animated)) if animated else show.get("frames", [show.get("frame", 0)])
         base = (show.get("photo"), show.get("text"), show.get("under"), show.get("split"), tuple(frames), show.get("layout"),
-                json.dumps(show.get("keys")), animated, json.dumps(show.get("path")), show.get("half"), show.get("shape"))
+                json.dumps(show.get("keys")), animated, json.dumps(show.get("path")), json.dumps(show.get("half")), show.get("shape"))
         if base not in plain:
             plain[base] = batch.add(f"plain{len(plain)}", scene(show, None), frames)
         effect = json.loads((PACK / f"{key}.json").read_text())

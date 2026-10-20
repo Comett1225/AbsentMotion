@@ -1,0 +1,71 @@
+{
+ "id": "glowscan",
+ "name": "Glow Scan",
+ "category": "stylize",
+ "since": "3.0.0",
+ "description": "Blurs and lights up only the parts of the layer whose brightness falls in a band; animate Position to sweep the glow from shadows to highlights.",
+ "params": [
+  {
+   "id": "blur",
+   "label": "Blur",
+   "type": "float",
+   "default": 20,
+   "min": 0,
+   "max": 300,
+   "step": 0.1,
+   "pixels": true
+  },
+  {
+   "id": "position",
+   "label": "Position",
+   "type": "float",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "width",
+   "label": "Width",
+   "type": "float",
+   "default": 0.2,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "softness",
+   "label": "Softness",
+   "type": "float",
+   "default": 0.1,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "intensity",
+   "label": "Intensity",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 5,
+   "step": 0.001
+  },
+  {
+   "id": "color",
+   "label": "Glow Color",
+   "type": "color",
+   "default": "#7fd4ff"
+  },
+  {
+   "id": "show",
+   "label": "Show Band Only",
+   "type": "switch",
+   "default": false
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform shader blurred;\nuniform float blur;\nuniform float position;\nuniform float width;\nuniform float softness;\nuniform float intensity;\nlayout(color) uniform half4 color;\nuniform float show;\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    half4 soft = blurred.eval(coord);\n    float lum = src.a > 0.0 ? dot(float3(src.rgb) / float(src.a), float3(0.2126, 0.7152, 0.0722)) : 0.0;\n    float half_band = max(width, 0.0) * 0.5;\n    float m = 1.0 - smoothstep(half_band, half_band + max(softness, 0.001), abs(lum - position));\n    m *= float(src.a);\n    float3 glowRgb = float3(soft.rgb) * float3(color.rgb) * max(intensity, 0.0) * m;\n    half4 base = show > 0.5 ? src * half(m) : src;\n    half4 mixed = half4(mix(base.rgb, soft.rgb, half(m)), base.a);\n    return half4(min(mixed.rgb + half3(glowRgb), mixed.a), mixed.a);\n}\n"
+}

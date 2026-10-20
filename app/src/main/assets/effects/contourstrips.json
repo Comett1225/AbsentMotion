@@ -1,0 +1,110 @@
+{
+ "id": "contourstrips",
+ "name": "Contour Strips",
+ "category": "stylize",
+ "since": "3.0.0",
+ "description": "Draws stacked paper strips whose height follows the layer's brightness or opacity, like a ridge-line landscape.",
+ "params": [
+  {
+   "id": "count",
+   "label": "Count",
+   "type": "float",
+   "default": 10,
+   "min": 0.5,
+   "max": 200,
+   "step": 0.1
+  },
+  {
+   "id": "height",
+   "label": "Height",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 15,
+   "step": 0.01
+  },
+  {
+   "id": "angle",
+   "label": "Angle",
+   "type": "angle",
+   "default": 0,
+   "min": -3600,
+   "max": 3600,
+   "step": 0.5
+  },
+  {
+   "id": "thickness",
+   "label": "Thickness",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.001
+  },
+  {
+   "id": "phase",
+   "label": "Phase",
+   "type": "float",
+   "default": 0,
+   "min": -1000,
+   "max": 1000,
+   "step": 0.01
+  },
+  {
+   "id": "invert",
+   "label": "Invert",
+   "type": "switch",
+   "default": false
+  },
+  {
+   "id": "edgeColor",
+   "label": "Edge Color",
+   "type": "color",
+   "default": "#ffffff"
+  },
+  {
+   "id": "color1",
+   "label": "Color 1",
+   "type": "color",
+   "default": "#ffd23c"
+  },
+  {
+   "id": "color2",
+   "label": "Color 2",
+   "type": "color",
+   "default": "#ff3c78"
+  },
+  {
+   "id": "light",
+   "label": "Light Color",
+   "type": "color",
+   "default": "#ffffff"
+  },
+  {
+   "id": "lightAngle",
+   "label": "Light Angle",
+   "type": "angle",
+   "default": 0,
+   "min": 0,
+   "max": 3600,
+   "step": 0.5
+  },
+  {
+   "id": "map",
+   "label": "Height Map",
+   "type": "choice",
+   "default": 1,
+   "options": [
+    "Alpha",
+    "Luminance"
+   ]
+  },
+  {
+   "id": "mask",
+   "label": "Mask To Layer",
+   "type": "switch",
+   "default": true
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float count;\nuniform float height;\nuniform float angle;\nuniform float thickness;\nuniform float phase;\nuniform float invert;\nlayout(color) uniform half4 edgeColor;\nlayout(color) uniform half4 color1;\nlayout(color) uniform half4 color2;\nlayout(color) uniform half4 light;\nuniform float lightAngle;\nuniform float map;\nuniform float mask;\nfloat heightAt(float2 p) {\n    half4 c = image.eval(p);\n    float h = map > 0.5 ? (c.a > 0.0 ? dot(float3(c.rgb) / float(c.a), float3(0.2126, 0.7152, 0.0722)) * float(c.a) : 0.0) : float(c.a);\n    return invert > 0.5 ? 1.0 - h : h;\n}\nhalf4 main(float2 coord) {\n    float ra = radians(angle);\n    float2 ax = float2(cos(ra), sin(ra));\n    float2 ay = float2(-ax.y, ax.x);\n    float2 mid = size * 0.5;\n    float2 r = float2(dot(coord - mid, ax), dot(coord - mid, ay));\n    float extent = abs(dot(size, abs(ay)));\n    float gap = extent / max(count, 0.5);\n    float tall = max(height, 0.0) * gap;\n    float thick = clamp(thickness, 0.0, 1.0) * gap * 0.5;\n    float first = floor((r.y + tall + thick) / gap - phase);\n    for (int k = 0; k < 48; k++) {\n        float i = first - float(k);\n        float base = (i + phase) * gap;\n        if (base < r.y) break;\n        float2 at = mid + r.x * ax + base * ay;\n        float h = heightAt(at) * tall;\n        float top = base - h;\n        if (r.y >= top - thick) {\n            float3 rgb;\n            if (r.y < top) {\n                float slope = (heightAt(at + ax * 2.0) - heightAt(at - ax * 2.0)) * tall / 4.0;\n                float la = radians(lightAngle);\n                float lit = 0.5 + 0.5 * dot(normalize(float2(slope, -1.0)), float2(cos(la), -sin(la)));\n                rgb = float3(edgeColor.rgb) * float3(light.rgb) * mix(0.35, 1.0, lit);\n            } else {\n                float t = h > 0.0 ? clamp((r.y - top) / h, 0.0, 1.0) : 1.0;\n                rgb = mix(float3(color1.rgb), float3(color2.rgb), t);\n            }\n            float a = mask > 0.5 ? float(image.eval(coord).a) : 1.0;\n            return half4(half3(rgb * a), half(a));\n        }\n    }\n    return half4(0.0);\n}\n"
+}

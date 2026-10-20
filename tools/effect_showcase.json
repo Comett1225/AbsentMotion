@@ -174,10 +174,17 @@
     "stroketaper": {"layout": "drawing", "params": {"start": [0, 0.5, 0.5], "end": [1, 0.5, 0.5]}, "animate": 16},
     "magnifybackground": {"photo": "colour", "under": "landscape", "half": 110, "shape": ".circle", "params": {"scale": 2.2}},
     "maskblur": {"photo": "detail", "under": "landscape", "half": 130, "shape": ".circle", "params": {"strength": 40}},
-    "fillbehind": {"photo": "portrait", "half": 110, "params": {"blur": 60, "edgeStrength": 0.6}},
+    "fillbehind": {"photo": "portrait", "half": 110, "params": {"blur": 60, "edgeStrength": 0.6, "edgeColor": "#ffffff"}},
     "glass": {"photo": "colour", "under": "landscape", "half": 120, "shape": ".circle"},
     "ominoglass": {"photo": "colour", "under": "landscape", "half": 130, "shape": ".circle", "params": {"refraction": 20, "aberration": 12, "blur": 20}},
     "displacementmap": {"photo": "colour", "under": "landscape", "half": 130, "params": {"offset": [40, 40], "fromCenter": true}},
-    "polardisplacement": {"photo": "colour", "under": "landscape", "half": 150, "shape": ".circle", "params": {"angle": 40, "reach": 20}}
+    "polardisplacement": {"photo": "colour", "under": "landscape", "half": 150, "shape": ".circle", "params": {"angle": 40, "reach": 20}},
+    "bend": {"photo": "colour", "layout": "move", "half": [40, 150], "params": {"angle": [0, 120, 0], "start": 0.1}, "animate": 16},
+    "curl": {"photo": "colour", "layout": "move", "half": [150, 30], "params": {"offset": [1.0, 0.3], "radius": 1.4}, "animate": 16},
+    "electricedges": {"photo": "colour", "layout": "move", "params": {"blur": 40, "evolution": [0, 60]}, "animate": 16},
+    "contourstrips": {"photo": "portrait", "params": {"count": 24, "height": 2.5, "thickness": 0.4}},
+    "ominodiffusion": {"photo": "portrait", "params": {"palette": 7, "steps": 30, "weight": 1.2}},
+    "glowscan": {"photo": "landscape", "params": {"position": [0.0, 1.0], "blur": 16}, "animate": 16},
+    "ribbon": {"photo": "colour", "params": {"phase": [0, 3], "magnitude": 0.5, "width": 0.8, "tintAmount": 0.6}, "animate": 16}
   }
 }

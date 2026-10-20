@@ -1,0 +1,182 @@
+{
+ "id": "electricedges",
+ "name": "Electric Edges",
+ "category": "stylize",
+ "since": "3.0.0",
+ "description": "Draws a crackling, glowing outline around the layer that jitters like electricity when Seed or Evolution is animated, with optional contour lines inside.",
+ "params": [
+  {
+   "id": "blur",
+   "label": "Distance",
+   "type": "float",
+   "default": 30,
+   "min": 0,
+   "max": 300,
+   "step": 0.1,
+   "pixels": true
+  },
+  {
+   "id": "thickness",
+   "label": "Thickness",
+   "type": "float",
+   "default": 0.8,
+   "min": 0,
+   "max": 1,
+   "step": 0.001
+  },
+  {
+   "id": "detail",
+   "label": "Detail",
+   "type": "float",
+   "default": 2,
+   "min": 0,
+   "max": 20,
+   "step": 0.01
+  },
+  {
+   "id": "distortion",
+   "label": "Distortion",
+   "type": "float",
+   "default": 0.5,
+   "min": -1,
+   "max": 1,
+   "step": 0.001
+  },
+  {
+   "id": "color",
+   "label": "Color",
+   "type": "color",
+   "default": "#ffffff"
+  },
+  {
+   "id": "glowColor",
+   "label": "Glow Color",
+   "type": "color",
+   "default": "#3c8cff"
+  },
+  {
+   "id": "alpha",
+   "label": "Alpha",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "glow",
+   "label": "Glow",
+   "type": "float",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "seed",
+   "label": "Seed",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 5,
+   "step": 0.01
+  },
+  {
+   "id": "evolution",
+   "label": "Evolution",
+   "type": "float",
+   "default": 0,
+   "min": -999,
+   "max": 999,
+   "step": 0.01
+  },
+  {
+   "id": "fill",
+   "label": "Fill",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "maskStrength",
+   "label": "Mask Strength",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.001
+  },
+  {
+   "id": "maskEvolution",
+   "label": "Mask Evolution",
+   "type": "float",
+   "default": 0,
+   "min": -50,
+   "max": 50,
+   "step": 0.01
+  },
+  {
+   "id": "maskScale",
+   "label": "Mask Scale",
+   "type": "float",
+   "default": 1,
+   "min": 0.01,
+   "max": 50,
+   "step": 0.01
+  },
+  {
+   "id": "maskSeed",
+   "label": "Mask Seed",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 5,
+   "step": 0.01
+  },
+  {
+   "id": "maskColor",
+   "label": "Mask Color",
+   "type": "color",
+   "default": "#ff3cdc"
+  },
+  {
+   "id": "contours",
+   "label": "Render Contours",
+   "type": "switch",
+   "default": false
+  },
+  {
+   "id": "count",
+   "label": "Contour Count",
+   "type": "float",
+   "default": 20,
+   "min": 0,
+   "max": 200,
+   "step": 0.1
+  },
+  {
+   "id": "phase",
+   "label": "Contour Phase",
+   "type": "float",
+   "default": 0,
+   "min": -999,
+   "max": 999,
+   "step": 0.01
+  },
+  {
+   "id": "contourAngle",
+   "label": "Contour Angle",
+   "type": "angle",
+   "default": 0,
+   "min": -3600,
+   "max": 3600,
+   "step": 0.5
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform shader blurred;\nuniform float blur;\nuniform float thickness;\nuniform float detail;\nuniform float distortion;\nlayout(color) uniform half4 color;\nlayout(color) uniform half4 glowColor;\nuniform float alpha;\nuniform float glow;\nuniform float seed;\nuniform float evolution;\nuniform float fill;\nuniform float maskStrength;\nuniform float maskEvolution;\nuniform float maskScale;\nuniform float maskSeed;\nlayout(color) uniform half4 maskColor;\nuniform float contours;\nuniform float count;\nuniform float phase;\nuniform float contourAngle;\nfloat hash13(float3 p) {\n    p = fract(p * 0.1031);\n    p += dot(p, p.zyx + 31.32);\n    return fract((p.x + p.y) * p.z);\n}\nfloat vnoise(float3 p) {\n    float3 i = floor(p);\n    float3 f = fract(p);\n    f = f * f * (3.0 - 2.0 * f);\n    float a = mix(hash13(i), hash13(i + float3(1, 0, 0)), f.x);\n    float b = mix(hash13(i + float3(0, 1, 0)), hash13(i + float3(1, 1, 0)), f.x);\n    float c = mix(hash13(i + float3(0, 0, 1)), hash13(i + float3(1, 0, 1)), f.x);\n    float d = mix(hash13(i + float3(0, 1, 1)), hash13(i + float3(1, 1, 1)), f.x);\n    return mix(mix(a, b, f.y), mix(c, d, f.y), f.z);\n}\nfloat fbm(float3 p, float octaves) {\n    float sum = 0.0;\n    float amp = 0.5;\n    float norm = 0.0;\n    for (int i = 0; i < 6; i++) {\n        if (float(i) >= octaves) break;\n        sum += amp * vnoise(p);\n        norm += amp;\n        amp *= 0.55;\n        p = float3(p.xy * 2.07 + 13.1, p.z * 1.5 + 2.3);\n    }\n    return norm > 0.0 ? sum / norm : 0.5;\n}\nfloat field(float2 p) { return float(blurred.eval(p).a); }\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    float reach = max(blur, 1.0);\n    float octaves = clamp(2.0 + detail * 0.5, 1.0, 6.0);\n    float3 q = float3(coord * (1.0 + detail * 0.25) / (reach * 0.8) + seed * float2(41.3, 17.9), evolution * 0.1);\n    float2 warp = float2(fbm(q, octaves), fbm(q + float3(19.1, 7.3, 3.7), octaves)) - 0.5;\n    float2 p = coord + warp * distortion * reach * 0.7;\n    float b = field(p);\n    float e = 1.0;\n    float2 g = float2(field(p + float2(e, 0.0)) - field(p - float2(e, 0.0)), field(p + float2(0.0, e)) - field(p - float2(0.0, e))) / (2.0 * e);\n    float level = mix(0.5, 0.06, blur > 0.0 ? 1.0 : 0.0);\n    float dist = abs(b - level) / max(length(g), 0.0005);\n    float width = mix(0.6, reach * 0.12, clamp(thickness, 0.0, 1.0));\n    float core = (1.0 - smoothstep(width * 0.5, width * 0.5 + 1.0, dist)) * clamp(alpha, 0.0, 1.0);\n    float halo = exp(-dist / max(width * 2.0, 2.0)) * clamp(glow, 0.0, 1.0);\n    float3 rgb = float3(color.rgb) * core * float(color.a) + float3(glowColor.rgb) * halo * float(glowColor.a);\n    float a = clamp(core * float(color.a) + halo * float(glowColor.a), 0.0, 1.0);\n    if (maskStrength > 0.0) {\n        float mn = vnoise(float3(coord / (40.0 * max(maskScale, 0.01)) + maskSeed * float2(23.1, 51.7), maskEvolution * 0.2));\n        float keep = smoothstep(maskStrength - 0.12, maskStrength + 0.12, mn);\n        float edge = keep * (1.0 - keep) * 4.0;\n        rgb = mix(rgb, float3(maskColor.rgb) * a, edge);\n        rgb *= keep;\n        a *= keep;\n    }\n    half4 body = src * half(clamp(fill, 0.0, 1.0));\n    if (contours > 0.5 && src.a > 0.0) {\n        float ca = radians(contourAngle);\n        float2 dir = float2(-sin(ca), cos(ca));\n        float h = dot(coord - size * 0.5, dir) / max(length(size), 1.0) * count + phase + (1.0 - field(coord)) * 2.0;\n        float line = 1.0 - smoothstep(0.0, 0.12, abs(fract(h) - 0.5) * 2.0 - 0.76);\n        float la = line * float(src.a) * clamp(alpha, 0.0, 1.0);\n        body = half4(half3(float3(body.rgb) * (1.0 - la) + float3(color.rgb) * la), max(body.a, half(la)));\n    }\n    half4 edgeLight = half4(half3(clamp(rgb, 0.0, 1.0)), half(a));\n    return half4(min(body.rgb + edgeLight.rgb, half3(1.0)), body.a + edgeLight.a * (1.0 - body.a));\n}\n"
+}
