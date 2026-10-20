@@ -176,6 +176,8 @@ class EditorState(
 
     var pointAdjust by mutableStateOf<PointAdjust?>(null)
 
+    var turner by mutableStateOf<((drag: Offset, twist: Float) -> Unit)?>(null)
+
     var volumeOpen by mutableStateOf(false)
 
     var easingOpen by mutableStateOf(false)

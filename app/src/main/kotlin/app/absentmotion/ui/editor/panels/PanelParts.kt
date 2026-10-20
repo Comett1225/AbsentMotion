@@ -107,6 +107,8 @@ internal object RulerMath {
     }
 
     fun value(base: Float, travel: Float, minStep: Float): Float = base + travel * max(minStep, abs(base) * K)
+
+    fun travel(tickShiftPx: Float, density: Float): Float = -tickShiftPx / density
 }
 
 @Composable
@@ -131,8 +133,8 @@ internal fun RulerSpinner(
     Canvas(
         modifier.then(app.absentmotion.platform.wheel { delta, _, _ ->
             Glide.stop(); started()
-            val dx = -(delta.x + delta.y) * 10f
-            shift += dx * wheelDensity; dragging(dx); ended()
+            val px = (delta.x + delta.y) * 10f * wheelDensity
+            shift += px; dragging(RulerMath.travel(px, wheelDensity)); ended()
         }).pointerInput(Unit) {
             val decay = splineBasedDecay<Float>(this)
             awaitEachGesture {
@@ -147,7 +149,7 @@ internal fun RulerSpinner(
                         c.consume()
                         tracker.addPointerInputChange(c)
                         shift += dx
-                        dragging(dx / density)
+                        dragging(RulerMath.travel(dx, density))
                     }
                     val v = tracker.calculateVelocity().x.coerceIn(-viewConfiguration.maximumFlingVelocity, viewConfiguration.maximumFlingVelocity)
                     if (fling && abs(v) > viewConfiguration.minimumFlingVelocity) {
@@ -158,7 +160,7 @@ internal fun RulerSpinner(
                                 val dx = value - last
                                 last = value
                                 shift += dx
-                                Glide.step { dragging(dx / density) }
+                                Glide.step { dragging(RulerMath.travel(dx, density)) }
                             }
                             Glide.finished(glide)
                             running[0] = false

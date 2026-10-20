@@ -12,6 +12,7 @@ import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.calculateCentroid
 import androidx.compose.foundation.gestures.calculatePan
+import androidx.compose.foundation.gestures.calculateRotation
 import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -144,6 +145,7 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier) {
                     val startLayer = state.selected
                     val startQuad = quad?.let { q -> List(4) { Offset(q[2 * it], q[2 * it + 1]) * currentScale + currentOffset } }
                     val adjusting = state.pointAdjust.takeIf { state.panel == EditorPanel.Effects }
+                    val turning = state.turner
                     val handle = if (startLayer != null && startQuad != null && state.panel == EditorPanel.EditText) {
                         val centre = if (startLayer.textAlign == "right") (startQuad[0] + startQuad[3]) / 2f else (startQuad[1] + startQuad[2]) / 2f
                         if ((centre - down.position).getDistance() < 24.dp.toPx()) 9 else -1
@@ -214,6 +216,10 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier) {
                             val move = (pan + held) / currentScale
                             held = Offset.Zero
                             state.editSelected(key = "preview-gesture") { it.cameraGesture(move.x, move.y, zoom) }
+                        } else if (moved && turning != null && !(canvasGesture && fingers > 1)) {
+                            gesture = HIDDEN
+                            turning(if (fingers > 1) Offset.Zero else (pan + held) / density, if (fingers > 1) event.calculateRotation() else 0f)
+                            held = Offset.Zero
                         } else if (moved && state.selectedId != null && !(canvasGesture && fingers > 1)) {
                             gesture = HIDDEN
                             val s = currentScale

@@ -39,6 +39,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.sp
 import app.absentmotion.editor.EditorState
@@ -47,6 +48,7 @@ import app.absentmotion.editor.KeypadRequest
 import app.absentmotion.engine.SnapGuide
 import app.absentmotion.model.Layer
 import app.absentmotion.ui.editor.PanelIcons
+import app.absentmotion.ui.editor.rememberHaptic
 import app.absentmotion.ui.theme.Am
 import kotlin.math.abs
 import kotlin.math.atan2
@@ -56,13 +58,13 @@ import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
 
 @Composable
-internal fun MoveTransformPanel(state: EditorState, layer: Layer, tab: Int, modifier: Modifier = Modifier) {
+internal fun MoveTransformPanel(state: EditorState, layer: Layer, tab: Int, turn: Turn?, modifier: Modifier = Modifier) {
     Box(modifier) {
         when (tab) {
             0 -> PositionTab(state, layer)
-            1 -> RotationTab(state, layer)
-            2 -> TiltTab(state, layer)
-            3 -> if (layer.kind == "camera") CameraSizeTab(state, layer) else SizeTab(state, layer)
+            1 -> if (layer.kind == "camera") CameraSizeTab(state, layer) else SizeTab(state, layer)
+            2 -> if (turn != null) TurnTab(state, layer, turn) else RotationTab(state, layer)
+            3 -> TiltTab(state, layer, turn)
             else -> SkewTab(state, layer)
         }
     }
@@ -86,6 +88,7 @@ private fun PositionTab(state: EditorState, layer: Layer) {
     val box by produceState<FloatArray?>(null, layer.node, state.timeMs) { value = state.engine.layerBounds(layer.id, state.timeMs) }
     val start by rememberUpdatedState { snapAxes(state.scene.width.toFloat(), state.scene.height.toFloat(), layer.location, box, others) }
     val now by rememberUpdatedState(layer)
+    val tick = rememberHaptic(state)
     DisposableEffect(Unit) { onDispose { state.snapGuides = emptyList() } }
     Box(
         Modifier.fillMaxSize().pointerInput(state) {
@@ -95,7 +98,10 @@ private fun PositionTab(state: EditorState, layer: Layer) {
             var shown = Offset.Zero
             fun done() { state.snapGuides = emptyList(); state.endGesture() }
             detectDragGestures(
-                onDragStart = { axes = start(); origin = now.location; travel = Offset.Zero; shown = Offset.Zero },
+                onDragStart = {
+                    axes = start(); origin = now.location; travel = Offset.Zero; shown = Offset.Zero
+                    state.snapGuides = if (deep) emptyList() else axes.first.guidesAt(0f) + axes.second.guidesAt(0f)
+                },
                 onDragEnd = ::done, onDragCancel = ::done,
             ) { change, drag ->
                 change.consume()
@@ -108,8 +114,10 @@ private fun PositionTab(state: EditorState, layer: Layer) {
                 val snapped = Offset(axes.first.map(travel.x), axes.second.map(travel.y))
                 val step = snapped - shown
                 shown = snapped
-                state.snapGuides = (if (step.x == 0f) axes.first.guidesAt(snapped.x) else emptyList()) +
+                val guides = (if (step.x == 0f) axes.first.guidesAt(snapped.x) else emptyList()) +
                     (if (step.y == 0f) axes.second.guidesAt(snapped.y) else emptyList())
+                if (guides.any { it !in state.snapGuides }) tick(HapticFeedbackType.SegmentTick)
+                state.snapGuides = guides
                 if (step != Offset.Zero) state.editSelected(key = "move") { l -> l.withTransform("location", origin[0] + snapped.x, origin[1] + snapped.y, l.location[2]) }
             }
         },
@@ -196,7 +204,7 @@ internal class SnapAxis(snaps: List<Snap>, private val threshold: Float = 25f) {
 }
 
 @Composable
-private fun TrackpadCorners() {
+internal fun TrackpadCorners() {
     Canvas(Modifier.fillMaxSize()) {
         val far = 718.5f
         val near = 24.5f
@@ -409,7 +417,8 @@ private fun SkewTab(state: EditorState, layer: Layer) {
 private const val DEGREES_PER_DP = 0.25f
 
 @Composable
-private fun TiltTab(state: EditorState, layer: Layer) {
+private fun TiltTab(state: EditorState, layer: Layer, turn: Turn?) {
+    if (turn != null) TurnHook(state, turn)
     var active by remember { mutableIntStateOf(0) }
     val tilt = layer.tilt
     val labels = listOf(stringResource(R.string.tilt_x_rotation), stringResource(R.string.tilt_y_rotation))
