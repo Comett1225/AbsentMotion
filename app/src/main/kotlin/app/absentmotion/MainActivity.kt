@@ -402,6 +402,18 @@ class MainActivity : ComponentActivity() {
                 catch (e: Exception) { Log.e("AMAac", "failed", e) }
             }
         }
+        if (intent.getBooleanExtra("capcheck", false)) lifecycleScope.launch {
+            try {
+                val caps = app.absentmotion.export.DeviceCapabilities.of(this@MainActivity)
+                val report = caps.runCheckNow(engine)
+                report.toJson().toString().chunked(3000).forEach { Log.i("AMCaps", it) }
+                for (codec in app.absentmotion.export.Codec.entries) for (side in listOf(1080, 2160)) {
+                    Log.i("AMCaps", "check ${codec.name} ${side}p30: ${report.check(ExportSettings(side, 30, codec), side, side * 16 / 9)}")
+                }
+                Log.i("AMCaps", "done probe=${report.probe?.pixelsPerSecond}")
+            } catch (e: kotlinx.coroutines.CancellationException) { throw e }
+            catch (e: Exception) { Log.e("AMCaps", "failed", e) }
+        }
         if (intent.getBooleanExtra("devicecheck", false)) lifecycleScope.launch {
             try { checkDevice(this@MainActivity) }
             catch (e: kotlinx.coroutines.CancellationException) { throw e }
@@ -518,7 +530,7 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         importShared()
-        if ((intent.hasExtra("xml") || intent.hasExtra("aaccheck") || intent.hasExtra("devicecheck")) && applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0) {
+        if ((intent.hasExtra("xml") || intent.hasExtra("aaccheck") || intent.hasExtra("devicecheck") || intent.hasExtra("capcheck")) && applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0) {
             setIntent(intent)
             handleTestIntent()
             return
