@@ -42,11 +42,16 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
                         val started = android.os.SystemClock.elapsedRealtime()
                         var paused = 0L
                         val mix = ExportAudio.mixFor?.invoke(scene, f.audio.effectiveRate)
-                        direct(saved, name, f.container.ext, f.container.mime, "Movies/$AppFolder") { fd ->
-                            cool { thermal ->
-                                exportVideo(engine, scene, xml, f, fd, mix, thermal.hot, { thermal.pauseMs().also { paused += it } }, progress)
+                        val written = try {
+                            direct(saved, name, f.container.ext, f.container.mime, "Movies/$AppFolder") { fd ->
+                                cool { thermal ->
+                                    exportVideo(engine, scene, xml, f, fd, mix, thermal.hot, { thermal.pauseMs().also { paused += it } }, progress)
+                                }
                             }
-                        }.also {
+                        } finally {
+                            (mix as? java.io.Closeable)?.close()
+                        }
+                        written.also {
                             val (w, h) = exportSize(scene, f.shortSide, even = true)
                             val ms = android.os.SystemClock.elapsedRealtime() - started - paused
                             ExportTimes(context).record(ExportRecord(f.codec, w, h, f.fps, frameCount(scene, f.fps), ms.coerceAtLeast(1), f.interpolation))
