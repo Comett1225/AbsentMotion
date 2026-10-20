@@ -213,6 +213,7 @@
     <string name="home_version_restored">Version restored</string>
     <string name="home_close_save_failed">Your last changes could not be saved. Free some storage space and close again, or close again to leave without them.</string>
     <string name="home_search_hint">Search projects and assets</string>
+    <string name="home_search_templates_hint">Search templates and presets</string>
     <string name="home_search">Search</string>
     <string name="home_close_search">Close search</string>
     <string name="home_your_projects">Your projects</string>
