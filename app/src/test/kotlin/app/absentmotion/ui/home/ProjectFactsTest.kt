@@ -13,12 +13,16 @@ class ProjectFactsTest {
     }
 
     @Test fun fileSizesPromoteRoundedUnitBoundaries() {
-        assertEquals("1MB", fileSize(1048575))
-        assertEquals("1KB", fileSize(1024))
-        assertEquals("1023KB", fileSize(1047552))
-        assertEquals("1.0MB", formatBytes(1048550))
-        assertEquals("1.0GB", formatBytes(1073741800))
-        assertEquals("1.0KB", formatBytes(1024))
+        assertEquals("1MB", formatBytes(1048575))
+        assertEquals("0B", formatBytes(0))
+        assertEquals("609B", formatBytes(609))
+        assertEquals("190KB", formatBytes(190 * 1024 + 100))
+        assertEquals("1.7MB", formatBytes(1782579))
+        assertEquals("1023KB", formatBytes(1047552))
+        assertEquals("1MB", formatBytes(1048550))
+        assertEquals("1GB", formatBytes(1073741800))
+        assertEquals("23MB", formatBytes(23929388))
+        assertEquals("1KB", formatBytes(1024))
     }
 
     @Test fun longGifsHavePositiveAccurateEstimates() {

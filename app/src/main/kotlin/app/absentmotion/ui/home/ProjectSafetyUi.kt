@@ -1,5 +1,6 @@
 package app.absentmotion.ui.home
 
+import app.absentmotion.export.formatBytes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -143,7 +144,7 @@ private fun VersionRow(version: ProjectVersions.Version, engine: EngineThread, o
         Column(Modifier.weight(1f).padding(horizontal = 12.dp)) {
             Text(versionLabel(version.time).text(), color = Am.Navy, fontWeight = FontWeight.Medium, maxLines = 2, lineHeight = 16.sp,
                 autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(11.sp, 15.sp))
-            Text(fileSize(version.file.length()), color = Am.HomeMid, fontSize = 13.sp, maxLines = 1)
+            Text(formatBytes(version.file.length()), color = Am.HomeMid, fontSize = 13.sp, maxLines = 1)
         }
         TextButton(onRestore) { Text(stringResource(R.string.restore), color = Am.Navy) }
     }

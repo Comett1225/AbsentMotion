@@ -16,7 +16,7 @@ class StorageTest {
 
     @Test fun statusNamesTheShortfall() {
         val short = storageStatus(1000 * mb, 500 * mb) as StorageStatus.NotEnough
-        assertEquals(txt(R.string.export_storage_not_enough, "1.1GB", "500.0MB"), short.message)
+        assertEquals(txt(R.string.export_storage_not_enough, "1.1GB", "500MB"), short.message)
         assertTrue(storageStatus(100 * mb, 600 * mb) is StorageStatus.Low)
         assertEquals(StorageStatus.Enough, storageStatus(100 * mb, 4096 * mb))
     }

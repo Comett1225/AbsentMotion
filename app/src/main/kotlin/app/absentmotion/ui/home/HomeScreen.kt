@@ -1,5 +1,6 @@
 package app.absentmotion.ui.home
 
+import app.absentmotion.export.formatBytes
 import app.absentmotion.platform.BitmapFactory
 import app.absentmotion.platform.LocalContext
 import app.absentmotion.platform.Uri
@@ -524,7 +525,7 @@ private fun facts(p: ProjectInfo): List<List<Pair<ImageVector, String>>> {
     } else {
         listOf(HomeIcons.Resolution to "${p.width}x${p.height}")
     }
-    return listOf(first, listOf(HomeIcons.Folder to fileSize(p.sizeBytes), HomeIcons.FrameRate to "${p.fps}fps"))
+    return listOf(first, listOf(HomeIcons.Folder to formatBytes(p.sizeBytes), HomeIcons.FrameRate to "${p.fps}fps"))
 }
 
 private fun duration(ms: Int): String {

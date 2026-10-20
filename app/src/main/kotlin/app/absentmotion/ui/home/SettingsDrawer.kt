@@ -1,5 +1,6 @@
 package app.absentmotion.ui.home
 
+import app.absentmotion.export.formatBytes
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.background
@@ -148,7 +149,7 @@ private fun PreviewCopiesRow() {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(stringResource(R.string.settings_clear_preview_copies), Modifier.weight(1f), color = Am.HomeInk, fontSize = 13.sp)
-        Text(fileSize(bytes), color = Am.HomeMid, fontSize = 13.sp)
+        Text(formatBytes(bytes), color = Am.HomeMid, fontSize = 13.sp)
     }
 }
 
@@ -164,7 +165,7 @@ private fun CaptionModelRow() {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(stringResource(R.string.remove_caption_model), Modifier.weight(1f), color = Am.HomeInk, fontSize = 13.sp)
-        Text(app.absentmotion.export.formatBytes(bytes), color = Am.HomeMid, fontSize = 13.sp)
+        Text(formatBytes(bytes), color = Am.HomeMid, fontSize = 13.sp)
     }
 }
 

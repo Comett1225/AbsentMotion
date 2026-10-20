@@ -198,11 +198,11 @@ fun estimateBytes(kind: ExportKind, scene: Scene, s: ExportSettings, hasAudio: B
 }
 
 fun formatBytes(bytes: Long): String {
-    fun f(v: Double, unit: String) = String.format(Locale.ROOT, "%.1f%s", v, unit)
+    fun f(v: Double, unit: String) = (if (v >= 10) String.format(Locale.ROOT, "%.0f", v) else String.format(Locale.ROOT, "%.1f", v).removeSuffix(".0")) + unit
     return when {
-        bytes < 1024 -> "${bytes}B"
-        bytes < 1024L * 1024 - 51 -> f(bytes / 1024.0, "KB")
-        bytes < 1024L * 1024 * 1024 - 52428 -> f(bytes / (1024.0 * 1024), "MB")
+        bytes < 1024 -> "${bytes.coerceAtLeast(0)}B"
+        bytes < 1024L * 1024 - 512 -> f(bytes / 1024.0, "KB")
+        bytes < 1024L * 1024 * 1024 - 512L * 1024 -> f(bytes / (1024.0 * 1024), "MB")
         else -> f(bytes / (1024.0 * 1024 * 1024), "GB")
     }
 }
