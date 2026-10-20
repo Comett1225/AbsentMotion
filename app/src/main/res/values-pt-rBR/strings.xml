@@ -904,6 +904,7 @@
     <string name="effects_reorder">Reordenar</string>
     <string name="speed_freeze_frame">Congelar quadro</string>
     <string name="speed_seconds">Segundos</string>
+    <string name="speed_remove_keyframes">Remover quadros-chave</string>
     <string name="transform_width">Largura</string>
     <string name="transform_height">Altura</string>
     <string name="transform_x_skew">Inclinação X</string>

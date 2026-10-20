@@ -904,6 +904,7 @@
     <string name="effects_reorder">Yeniden sırala</string>
     <string name="speed_freeze_frame">Kareyi dondur</string>
     <string name="speed_seconds">Saniye</string>
+    <string name="speed_remove_keyframes">Anahtar kareleri kaldır</string>
     <string name="transform_width">Genişlik</string>
     <string name="transform_height">Yükseklik</string>
     <string name="transform_x_skew">X EĞİKLİĞİ</string>

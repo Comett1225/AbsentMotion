@@ -889,6 +889,7 @@
     <string name="effects_reorder">Susun Semula</string>
     <string name="speed_freeze_frame">Bekukan Bingkai</string>
     <string name="speed_seconds">Saat</string>
+    <string name="speed_remove_keyframes">Buang bingkai kunci</string>
     <string name="transform_width">Lebar</string>
     <string name="transform_height">Tinggi</string>
     <string name="transform_x_skew">Pintal X</string>

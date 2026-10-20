@@ -964,6 +964,7 @@
     <string name="effects_reorder">إعادة الترتيب</string>
     <string name="speed_freeze_frame">تجميد الإطار</string>
     <string name="speed_seconds">ثوانٍ</string>
+    <string name="speed_remove_keyframes">إزالة الإطارات المفتاحية</string>
     <string name="transform_width">العرض</string>
     <string name="transform_height">الارتفاع</string>
     <string name="transform_x_skew">انحراف X</string>

@@ -904,6 +904,7 @@
     <string name="effects_reorder">I-reorder</string>
     <string name="speed_freeze_frame">I-freeze ang frame</string>
     <string name="speed_seconds">Segundo</string>
+    <string name="speed_remove_keyframes">Alisin ang mga keyframe</string>
     <string name="transform_width">Lapad</string>
     <string name="transform_height">Taas</string>
     <string name="transform_x_skew">X skew</string>

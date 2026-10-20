@@ -934,6 +934,7 @@
     <string name="effects_reorder">Изменить порядок</string>
     <string name="speed_freeze_frame">Стоп-кадр</string>
     <string name="speed_seconds">Секунды</string>
+    <string name="speed_remove_keyframes">Удалить ключевые кадры</string>
     <string name="transform_width">Ширина</string>
     <string name="transform_height">Высота</string>
     <string name="transform_x_skew">Наклон X</string>

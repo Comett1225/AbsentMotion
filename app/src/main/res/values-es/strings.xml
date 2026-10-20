@@ -904,6 +904,7 @@
     <string name="effects_reorder">Reordenar</string>
     <string name="speed_freeze_frame">Congelar fotograma</string>
     <string name="speed_seconds">Segundos</string>
+    <string name="speed_remove_keyframes">Quitar fotogramas clave</string>
     <string name="transform_width">Ancho</string>
     <string name="transform_height">Alto</string>
     <string name="transform_x_skew">Inclinación X</string>

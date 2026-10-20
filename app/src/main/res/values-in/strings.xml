@@ -889,6 +889,7 @@
     <string name="effects_reorder">Susun ulang</string>
     <string name="speed_freeze_frame">Bekukan frame</string>
     <string name="speed_seconds">Detik</string>
+    <string name="speed_remove_keyframes">Hapus Keyframe</string>
     <string name="transform_width">Lebar</string>
     <string name="transform_height">Tinggi</string>
     <string name="transform_x_skew">Kemiringan X</string>

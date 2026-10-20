@@ -889,6 +889,7 @@
     <string name="effects_reorder">Sắp xếp lại</string>
     <string name="speed_freeze_frame">Đóng băng khung hình</string>
     <string name="speed_seconds">Giây</string>
+    <string name="speed_remove_keyframes">Xóa keyframe</string>
     <string name="transform_width">Chiều rộng</string>
     <string name="transform_height">Chiều cao</string>
     <string name="transform_x_skew">Nghiêng X</string>

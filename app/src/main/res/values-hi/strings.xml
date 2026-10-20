@@ -904,6 +904,7 @@
     <string name="effects_reorder">रीऑर्डर</string>
     <string name="speed_freeze_frame">फ़्रीज़ फ़्रेम</string>
     <string name="speed_seconds">सेकंड</string>
+    <string name="speed_remove_keyframes">कीफ़्रेम हटाएं</string>
     <string name="transform_width">चौड़ाई</string>
     <string name="transform_height">ऊँचाई</string>
     <string name="transform_x_skew">X स्क्यू</string>
