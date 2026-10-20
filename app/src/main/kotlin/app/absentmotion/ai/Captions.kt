@@ -32,8 +32,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.Closeable
 import java.io.File
+import java.io.InputStream
+import java.io.OutputStream
 import java.net.HttpURLConnection
 import java.net.URL
+import java.security.DigestInputStream
+import java.security.MessageDigest
 import java.util.function.IntConsumer
 import kotlin.coroutines.coroutineContext
 import kotlin.math.min
@@ -141,6 +145,7 @@ internal suspend fun recogniseCaptions(
     } finally {
         (mix as? Closeable)?.close()
     }
+    withContext(Dispatchers.IO) { CaptionModel.verify(context) }
     val words = Whisper.transcribe(CaptionModel.file(context), pcm, style.english) { progress(0.15f + 0.85f * it / 100f, AppText.get(R.string.ai_recognising_speech)) }
     return chunkWords(words.map { Word(it.text, min(it.startMs + startMs, endMs - 1), min(it.endMs + startMs, endMs)) }, style.maxWords)
         .ifEmpty { error(AppText.get(R.string.ai_no_speech)) }
@@ -212,11 +217,22 @@ internal object CaptionModel {
     const val NAME = app.absentmotion.platform.CAPTION_MODEL_NAME
 
     const val BYTES = app.absentmotion.platform.CAPTION_MODEL_BYTES
-    private const val SOURCE = "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/$NAME"
+    const val SHA256 = "422f1ae452ade6f30a004d7e5c6a43195e4433bc370bf23fac9cc591f01a8898"
+    private const val SOURCE = "https://huggingface.co/ggerganov/whisper.cpp/resolve/5359861c739e955e79d9a303bcbc70fb988958b1/$NAME"
+
+    @Volatile private var checked: Pair<Long, Long>? = null
 
     fun file(context: Context) = File(context.filesDir, "models/$NAME")
     fun installed(context: Context) = file(context).length() == BYTES
     fun remove(context: Context) { file(context).delete() }
+
+    fun verify(context: Context) {
+        val file = file(context)
+        val stamp = file.length() to file.lastModified()
+        if (checked == stamp) return
+        check(file.length() == BYTES && file.inputStream().use(::sha256) == SHA256) { AppText.get(R.string.ai_caption_model_load_failed) }
+        checked = stamp
+    }
 
     suspend fun download(context: Context, progress: (Float) -> Unit) = withContext(Dispatchers.IO) {
         val target = file(context)
@@ -228,28 +244,41 @@ internal object CaptionModel {
                 connection.connectTimeout = 15_000
                 connection.readTimeout = 30_000
                 check(connection.responseCode == HttpURLConnection.HTTP_OK) { AppText.get(R.string.ai_download_failed_http, connection.responseCode.toString()) }
-                connection.inputStream.use { input ->
-                    part.outputStream().use { output ->
-                        val buffer = ByteArray(64 * 1024)
-                        var done = 0L
-                        while (true) {
-                            ensureActive()
-                            val count = input.read(buffer)
-                            if (count < 0) break
-                            output.write(buffer, 0, count)
-                            done += count
-                            check(done <= BYTES) { AppText.get(R.string.ai_download_not_model) }
-                            progress(done.toFloat() / BYTES)
-                        }
-                    }
-                }
+                connection.inputStream.use { input -> receive(input, part, target, BYTES, SHA256, { ensureActive() }, progress) }
             } finally {
                 connection.disconnect()
             }
-            check(part.length() == BYTES) { AppText.get(R.string.ai_download_incomplete) }
-            check(part.renameTo(target)) { AppText.get(R.string.ai_cannot_save_model) }
         } finally {
             part.delete()
         }
     }
+
+    internal fun receive(input: InputStream, part: File, target: File, bytes: Long, sha256: String, active: () -> Unit, progress: (Float) -> Unit) {
+        val digest = MessageDigest.getInstance("SHA-256")
+        val digesting = DigestInputStream(input, digest)
+        part.outputStream().use { output ->
+            val buffer = ByteArray(64 * 1024)
+            var done = 0L
+            while (true) {
+                active()
+                val count = digesting.read(buffer)
+                if (count < 0) break
+                output.write(buffer, 0, count)
+                done += count
+                check(done <= bytes) { AppText.get(R.string.ai_download_not_model) }
+                progress(done.toFloat() / bytes)
+            }
+        }
+        check(part.length() == bytes) { AppText.get(R.string.ai_download_incomplete) }
+        check(hex(digest.digest()) == sha256) { AppText.get(R.string.ai_download_not_model) }
+        check(part.renameTo(target)) { AppText.get(R.string.ai_cannot_save_model) }
+    }
+
+    private fun sha256(input: InputStream): String {
+        val digest = MessageDigest.getInstance("SHA-256")
+        DigestInputStream(input, digest).transferTo(OutputStream.nullOutputStream())
+        return hex(digest.digest())
+    }
+
+    private fun hex(bytes: ByteArray) = bytes.joinToString("") { "%02x".format(it) }
 }

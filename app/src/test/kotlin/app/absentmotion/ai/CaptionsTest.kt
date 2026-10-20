@@ -111,4 +111,23 @@ class CaptionsTest {
         val again = layers.fold(scene) { s, l -> s.add(l) }.captionLayers(chunks.take(1), CaptionStyle(), { "Caption $it" }) { _, s -> s }
         assertEquals("Caption 4", again.single().label)
     }
+
+    @Test fun theCaptionModelIsKeptOnlyWhenItsSha256Matches() {
+        val dir = java.nio.file.Files.createTempDirectory("model").toFile()
+        try {
+            val good = "speech model bytes".toByteArray()
+            val hash = java.security.MessageDigest.getInstance("SHA-256").digest(good).joinToString("") { "%02x".format(it) }
+            val target = java.io.File(dir, "model.bin")
+            val part = java.io.File(dir, "model.bin.part")
+            val forged = "SPEECH MODEL BYTES".toByteArray()
+            val refused = runCatching { CaptionModel.receive(forged.inputStream(), part, target, good.size.toLong(), hash, {}, {}) }
+            assertTrue(refused.exceptionOrNull() is IllegalStateException)
+            assertTrue(!target.exists())
+            CaptionModel.receive(good.inputStream(), part, target, good.size.toLong(), hash, {}, {})
+            assertTrue(target.readBytes().contentEquals(good))
+            assertEquals(64, CaptionModel.SHA256.length)
+        } finally {
+            dir.deleteRecursively()
+        }
+    }
 }
