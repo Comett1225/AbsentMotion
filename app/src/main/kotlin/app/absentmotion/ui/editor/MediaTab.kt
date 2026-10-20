@@ -29,7 +29,13 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupPositionProvider
 import androidx.compose.ui.window.PopupProperties
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntRect
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.addImage
 import app.absentmotion.editor.addVideo
@@ -103,12 +109,15 @@ internal fun MediaTab(state: EditorState, modifier: Modifier, library: AddLibrar
                     Box(Modifier.fillMaxWidth().weight(1f).background(Am.Well).clickable { albumsOpen = true }, Alignment.Center) {
                         Text(files.firstOrNull { it.albumId == album }?.album ?: allLabel, color = Am.OnDark, fontSize = 16.sp, maxLines = 1)
                         MediaAlbumArrow(Modifier.align(Alignment.TopEnd).padding(3.dp).size(6.dp))
-                        if (albumsOpen) Popup(onDismissRequest = { albumsOpen = false }, properties = PopupProperties(focusable = true)) {
-                            Column(Modifier.width(220.dp).heightIn(max = 300.dp).background(Am.Field).verticalScroll(rememberScrollState())) {
-                                val albums = listOf(null to allLabel) + files.distinctBy { it.albumId }.map { it.albumId to it.album }
-                                albums.forEach { (id, name) ->
-                                    Box(Modifier.fillMaxWidth().height(44.dp).clickable { album = id; albumsOpen = false }.padding(horizontal = 16.dp), Alignment.CenterStart) {
-                                        Text(name, color = Am.OnDark, fontSize = 15.sp, maxLines = 1)
+                        val cell = remember { CellDrop() }
+                        Presence(albumsOpen) {
+                            Popup(cell, onDismissRequest = { albumsOpen = false }, properties = PopupProperties(focusable = true)) {
+                                Column(Modifier.presence(scaleFrom = 0.85f, origin = cell.origin).width(220.dp).heightIn(max = 300.dp).background(Am.Field).verticalScroll(rememberScrollState())) {
+                                    val albums = listOf(null to allLabel) + files.distinctBy { it.albumId }.map { it.albumId to it.album }
+                                    albums.forEach { (id, name) ->
+                                        Box(Modifier.fillMaxWidth().height(44.dp).clickable { album = id; albumsOpen = false }.padding(horizontal = 16.dp), Alignment.CenterStart) {
+                                            Text(name, color = Am.OnDark, fontSize = 15.sp, maxLines = 1)
+                                        }
                                     }
                                 }
                             }
@@ -154,6 +163,21 @@ internal fun MediaTab(state: EditorState, modifier: Modifier, library: AddLibrar
                     onClose = { focus.clearFocus(); searching = false })
             }
         }
+    }
+}
+
+internal class CellDrop : PopupPositionProvider {
+    var origin by mutableStateOf(TransformOrigin(0f, 0f))
+        private set
+
+    override fun calculatePosition(anchorBounds: IntRect, windowSize: IntSize, layoutDirection: LayoutDirection, popupContentSize: IntSize): IntOffset {
+        val rtl = layoutDirection == LayoutDirection.Rtl
+        val up = anchorBounds.top + popupContentSize.height > windowSize.height
+        origin = TransformOrigin(if (rtl) 1f else 0f, if (up) 1f else 0f)
+        return IntOffset(
+            (if (rtl) anchorBounds.right - popupContentSize.width else anchorBounds.left).coerceIn(0, (windowSize.width - popupContentSize.width).coerceAtLeast(0)),
+            if (up) (anchorBounds.bottom - popupContentSize.height).coerceAtLeast(0) else anchorBounds.top,
+        )
     }
 }
 
