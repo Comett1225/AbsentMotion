@@ -43,7 +43,7 @@ subscription, no account and no advertising, and your projects never leave your 
   recognition (whisper.cpp; the speech model is downloaded once, after the app tells you its size).
 - **Export.** MP4, MOV, MKV or WebM video (H.264, HEVC, AV1, VP9 or APV, as the phone supports), audio settings, audio only
   (WAV, FLAC, M4A, OGG or MP3), animated GIF, image sequences and single frames, with a time estimate, a storage check,
-  protection when the phone is hot and a check of every finished file.
+  protection when the phone is hot and a check of every finished video and audio file.
 - **Safe projects.** Automatic version history, crash recovery, imported media copied into the project and one-tap
   backup of every project to a folder that survives reinstalling.
 - **12 languages.** English, Indonesian, Hindi, Portuguese (Brazil), Spanish, Filipino, Vietnamese, Thai, Malay,

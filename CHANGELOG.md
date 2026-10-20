@@ -27,7 +27,7 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 - Export to MP4, MOV, MKV or WebM with H.264, HEVC, AV1, VP9 or APV where the phone has the encoder, audio settings, and
   audio-only export as WAV, FLAC, M4A, OGG or MP3.
 - A new export screen: space, size, time and temperature in one stacked block, options the phone cannot make greyed out
-  with the reason, a codec warning with a better choice, help for frame interpolation, and a check of every finished file.
+  with the reason, a codec warning with a better choice, help for frame interpolation, and a check of every finished video and audio file.
 - Project safety: background saving, version history, crash recovery, imported media kept in the project, and backup and
   restore of all projects.
 - 12 languages (English, Indonesian, Hindi, Portuguese (Brazil), Spanish, Filipino, Vietnamese, Thai, Malay, Arabic,
