@@ -916,10 +916,10 @@ static bool ContainsOne(const std::vector<Layer>& siblings, const Layer& l, doub
     return false;
 }
 
-static bool SelectionRect(const Layer& l, double timeMs, const SkMatrix& matrix, SkRect* out) {
-    const SkPath shape = ShapePath(l, l.localTime(timeMs)).makeTransform(matrix);
+static bool ContentRect(const Layer& l, double timeMs, const SkMatrix& matrix, SkRect* out) {
+    const SkPath shape = ShapePath(l, l.localTime(timeMs));
     if (shape.isEmpty()) return false;
-    *out = shape.getBounds();
+    *out = matrix.mapRect(shape.getBounds());
     if (l.kind != "embedScene") return true;
     const double innerTime = NestedTime(l, timeMs);
     const SkMatrix origin = SkMatrix::Concat(matrix, SkMatrix::Translate(-l.innerWidth / 2.0f, -l.innerHeight / 2.0f));
@@ -927,7 +927,7 @@ static bool SelectionRect(const Layer& l, double timeMs, const SkMatrix& matrix,
     SkRect child;
     for (const Layer& c : l.children) {
         if (innerTime < 0 || !c.activeAt(innerTime) || c.kind == "nullobj" || c.kind == "camera") continue;
-        if (!SelectionRect(c, innerTime, SkMatrix::Concat(origin, SiblingMatrix(l.children, c, innerTime)), &child)) continue;
+        if (!ContentRect(c, innerTime, SkMatrix::Concat(origin, SiblingMatrix(l.children, c, innerTime)), &child)) continue;
         left = std::min(left, child.fLeft);
         top = std::min(top, child.fTop);
         right = std::max(right, child.fRight);
@@ -939,8 +939,9 @@ static bool SelectionRect(const Layer& l, double timeMs, const SkMatrix& matrix,
 }
 
 SkRect SelectionBounds(const Layer& layer, double timeMs, const SkMatrix& matrix) {
+    if (layer.kind != "embedScene") return ShapePath(layer, layer.localTime(timeMs)).makeTransform(matrix).getBounds();
     SkRect bounds = SkRect::MakeEmpty();
-    SelectionRect(layer, timeMs, matrix, &bounds);
+    ContentRect(layer, timeMs, matrix, &bounds);
     return bounds;
 }
 
