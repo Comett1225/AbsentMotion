@@ -124,6 +124,11 @@
     "grid": {"photo": "landscape", "params": {"count": 3, "width": 0.06}},
     "dots": {"photo": "colour", "params": {"radius": 0.6, "color1": "#ffffff", "color2": "#ff3c6e"}},
     "clouds": {"photo": "landscape", "params": {"color1": "#0d2a5c", "color2": "#ffffff"}},
-    "fractalridges": {"photo": "portrait", "params": {"color1": "#1b1464", "color2": "#ffb070"}}
+    "fractalridges": {"photo": "portrait", "params": {"color1": "#1b1464", "color2": "#ffb070"}},
+    "halftonelines": {"photo": "portrait", "params": {"amount": 40}},
+    "cmykhalftone": {"photo": "colour", "params": {"amount": 45, "black": 0.6}},
+    "mosaic": {"photo": "colour", "params": {"count": 9}},
+    "longshadow": {"photo": "colour", "layout": "move", "params": {"reach": 200, "alpha": 0.8, "fade": 0.3}},
+    "radialshadow": {"photo": "colour", "layout": "move", "params": {"light": [-0.7, -0.7], "reach": 0.8, "alpha": 0.8}}
   }
 }

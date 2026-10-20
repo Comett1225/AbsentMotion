@@ -1,0 +1,44 @@
+{
+ "id": "mosaic",
+ "name": "Mosaic",
+ "category": "stylize",
+ "since": "3.0.0",
+ "description": "Divides the layer into squares and fills each one with its average colour.",
+ "params": [
+  {
+   "id": "count",
+   "label": "Count",
+   "type": "float",
+   "default": 20,
+   "min": 1,
+   "max": 500,
+   "step": 1
+  },
+  {
+   "id": "stretch",
+   "label": "Stretch",
+   "type": "point",
+   "default": [
+    1,
+    1
+   ],
+   "min": 0.01,
+   "max": 10,
+   "step": 0.01
+  },
+  {
+   "id": "offset",
+   "label": "Offset",
+   "type": "point",
+   "default": [
+    0,
+    0
+   ],
+   "min": -5000,
+   "max": 5000,
+   "step": 1,
+   "pixels": true
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float count;\nuniform float2 stretch;\nuniform float2 offset;\nhalf4 main(float2 coord) {\n    float2 dims = max(abs(stretch), float2(0.01)) * size.y / max(count, 1.0);\n    float2 o = size * 0.5 + offset;\n    float2 n = floor((coord - o) / dims);\n    float4 sum = float4(0.0);\n    for (int j = 0; j < 4; j++) {\n        for (int i = 0; i < 4; i++) {\n            sum += float4(image.eval(o + (n + (float2(float(i), float(j)) + 0.5) / 4.0) * dims));\n        }\n    }\n    return half4(sum / 16.0);\n}\n"
+}

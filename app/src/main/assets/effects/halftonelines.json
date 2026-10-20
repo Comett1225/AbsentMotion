@@ -1,0 +1,58 @@
+{
+ "id": "halftonelines",
+ "name": "Halftone Lines",
+ "category": "stylize",
+ "since": "3.0.0",
+ "description": "Redraws the layer as printed lines that get thicker in dark areas and thinner in light ones.",
+ "params": [
+  {
+   "id": "amount",
+   "label": "Amount",
+   "type": "float",
+   "default": 100,
+   "min": 0,
+   "max": 500,
+   "step": 0.1
+  },
+  {
+   "id": "strength",
+   "label": "Strength",
+   "type": "float",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.001
+  },
+  {
+   "id": "angle",
+   "label": "Angle",
+   "type": "angle",
+   "default": 45,
+   "min": 0,
+   "max": 3600,
+   "step": 0.5
+  },
+  {
+   "id": "phase",
+   "label": "Phase",
+   "type": "float",
+   "default": 0,
+   "min": -1000,
+   "max": 1000,
+   "step": 0.001
+  },
+  {
+   "id": "color1",
+   "label": "Color 1",
+   "type": "color",
+   "default": "#113355"
+  },
+  {
+   "id": "color2",
+   "label": "Color 2",
+   "type": "color",
+   "default": "#ffeedd"
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float amount;\nuniform float strength;\nuniform float angle;\nuniform float phase;\nlayout(color) uniform half4 color1;\nlayout(color) uniform half4 color2;\nfloat luma(float3 c) { return dot(c, float3(0.2126, 0.7152, 0.0722)); }\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return src;\n    float period = size.x / max(amount, 0.5);\n    float a = radians(angle);\n    float u = dot(coord - size * 0.5, float2(-sin(a), cos(a))) / period + phase;\n    float s = clamp(strength, 0.001, 0.999);\n    float ink = pow(clamp(1.0 - luma(float3(src.rgb) / float(src.a)), 0.0, 1.0), (1.0 - s) / s);\n    float e = abs(fract(u) - 0.5) * period;\n    float line = clamp(ink * period * 0.5 - e + 0.5, 0.0, 1.0);\n    float3 rgb = mix(float3(color2.rgb), float3(color1.rgb), line);\n    return half4(half3(rgb) * src.a, src.a);\n}\n"
+}
