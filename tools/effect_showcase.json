@@ -41,7 +41,7 @@
     "ripple": {"photo": "portrait", "params": {"amplitude": 6, "wavelength": 6, "speed": 4.712389}, "animate": 16},
     "wavewarp": {"photo": "portrait", "params": {"magnitude": 2.6, "spacing": 35, "angle": 45, "warpAngle": 135, "speed": 4.712389}, "animate": 16},
     "stretch": {"photo": "portrait", "params": {"stretch": 120, "angle": 90}},
-    "glow": {"photo": "flower", "params": {"radius": 40, "alpha": 0.7}},
+    "glow": {"photo": "flower", "half": 120, "shape": ".circle", "params": {"radius": 40, "alpha": 0.7}},
     "lightglow": {"photo": "sunset", "params": {"blur": 24, "threshold": 0.55}},
     "softglow": {"photo": "flower", "params": {"blur": 12}, "split": 0.4},
     "edgedetect": {"photo": "landscape", "params": {"strength": 1.5}},
