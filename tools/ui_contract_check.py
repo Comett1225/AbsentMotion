@@ -19,7 +19,7 @@ def source(relative):
 class UiContracts(unittest.TestCase):
     def test_export_rechecks_storage_on_retry_and_resume(self):
         text = source('ui/export/ExportScreen.kt')
-        self.assertIn('free = freeSpace()\n        if (kind != ExportKind.Gif && estimate > free)', text)
+        self.assertIn('free = freeSpace()\n        if (kind != ExportKind.Gif && storageStatus(estimate, free) is StorageStatus.NotEnough)', text)
         self.assertIn('Lifecycle.Event.ON_RESUME', text)
 
     def test_export_probes_missing_media_inside_the_export_job_on_io(self):

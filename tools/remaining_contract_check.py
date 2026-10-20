@@ -53,8 +53,8 @@ class RemainingContracts(unittest.TestCase):
     def test_gif_storage_gate_uses_an_encoded_measurement(self):
         text = kotlin('ui/export/ExportScreen.kt')
         self.assertIn('val measured = measureGifBytes(engine, scene, s)', text)
-        self.assertIn('if (measured > free)', text)
-        self.assertIn('if (kind != ExportKind.Gif && estimate > free)', text)
+        self.assertIn('if (storageStatus(measured, free) is StorageStatus.NotEnough)', text)
+        self.assertIn('if (kind != ExportKind.Gif && storageStatus(estimate, free) is StorageStatus.NotEnough)', text)
 
     def test_interpolation_errors_cannot_silently_choose_a_blend_or_plain_frame(self):
         text = source('app/src/main/cpp/engine.cpp')
