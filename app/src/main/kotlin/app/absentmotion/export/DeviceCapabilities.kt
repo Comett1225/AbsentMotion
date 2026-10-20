@@ -62,7 +62,8 @@ data class DeviceReport(val key: String, val encoders: List<EncoderCaps>, val pr
 
     val videoCodecs: List<Codec> get() = Codec.entries.filter { encodersFor(it.mime).isNotEmpty() }
 
-    fun check(s: ExportSettings, width: Int, height: Int): Support {
+    fun check(s: ExportSettings, width: Int, height: Int, hasAudio: Boolean = true): Support {
+        formatProblem(s, hasAudio)?.let { return Support.Unsupported(it, s.fixedFormat()) }
         val all = encodersFor(s.codec.mime)
         if (all.isEmpty()) {
             return Support.Unsupported("This phone has no ${s.codec.label} encoder.", alternative(s, width, height))
@@ -159,11 +160,11 @@ class DeviceCapabilities private constructor(context: Context) {
         return lock.withLock { DeviceReport(key, encoders, probe ?: state.value?.probe).also { store(it); state.value = it } }
     }
 
-    fun check(settings: ExportSettings, width: Int, height: Int): Support =
-        state.value?.check(settings, width, height) ?: Support.Supported
+    fun check(settings: ExportSettings, width: Int, height: Int, hasAudio: Boolean = true): Support =
+        state.value?.check(settings, width, height, hasAudio) ?: formatProblem(settings, hasAudio)?.let { Support.Unsupported(it, settings.fixedFormat()) } ?: Support.Supported
 
-    fun check(settings: ExportSettings, scene: Scene): Support =
-        exportSize(scene, settings.shortSide, even = true).let { (w, h) -> check(settings, w, h) }
+    fun check(settings: ExportSettings, scene: Scene, hasAudio: Boolean = true): Support =
+        exportSize(scene, settings.shortSide, even = true).let { (w, h) -> check(settings, w, h, hasAudio) }
 
     private fun store(report: DeviceReport) {
         prefs.edit().putString("report", report.toJson().toString()).apply()

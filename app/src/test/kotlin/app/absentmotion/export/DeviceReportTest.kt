@@ -56,6 +56,16 @@ class DeviceReportTest {
         assertTrue(landscapeOnly.check(ExportSettings(720, 30, Codec.Av1), 1280, 720) is Support.SlowSoftwareOnly)
     }
 
+    @Test fun containerRulesComeFirst() {
+        val webmH264 = ExportSettings(1080, 30, Codec.H264, container = Container.WebM)
+        val result = report.check(webmH264, 1080, 1920) as Support.Unsupported
+        assertEquals(Container.Mp4, result.suggestion?.container)
+        assertEquals(Codec.H264, result.suggestion?.codec)
+        val mkvOpus = ExportSettings(1080, 30, Codec.H264, container = Container.Mov, audio = AudioSettings(AudioCodec.Opus))
+        assertTrue(report.check(mkvOpus, 1080, 1920, hasAudio = false) is Support.Supported)
+        assertEquals(AudioCodec.Aac, (report.check(mkvOpus, 1080, 1920) as Support.Unsupported).suggestion?.audio?.codec)
+    }
+
     @Test fun oddSizesMissTheAlignment() {
         assertTrue(report.check(ExportSettings(1080, 30, Codec.H264), 1081, 1920) is Support.Unsupported)
     }
