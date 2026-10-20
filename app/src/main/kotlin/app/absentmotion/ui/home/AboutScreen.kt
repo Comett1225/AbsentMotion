@@ -50,7 +50,7 @@ import kotlinx.coroutines.withContext
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
 
-private const val HOME_PAGE = "https://github.com/Comett1225/AbsentMotion"
+internal const val HOME_PAGE ="https://github.com/Comett1225/AbsentMotion"
 
 internal const val LICENCES_ASSET = "licenses.txt"
 

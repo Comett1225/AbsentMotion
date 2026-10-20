@@ -142,6 +142,14 @@
     <string name="settings_group_playback">Playback and preview</string>
     <string name="settings_group_projects">Projects and media</string>
     <string name="settings_group_backup">Backup</string>
+    <string name="update_check_on_open">Check for a new version each time the app opens</string>
+    <string name="update_check_note">It only asks GitHub for the latest version number.</string>
+    <string name="update_check_now">Check for Update</string>
+    <string name="update_available">AbsentMotion %1$s is available</string>
+    <string name="update_download">Download</string>
+    <string name="update_later">Later</string>
+    <string name="update_latest">You have the latest version</string>
+    <string name="update_failed">Could not check, try again when you are online</string>
     <string name="theme_absentmotion">AbsentMotion</string>
     <string name="theme_daylight">Daylight</string>
     <string name="theme_custom">Custom</string>

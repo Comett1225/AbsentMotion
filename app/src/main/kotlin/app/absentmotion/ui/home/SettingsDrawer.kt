@@ -38,6 +38,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.Text
@@ -135,6 +136,8 @@ fun SettingsDrawer(settings: AppSettings, drawer: androidx.compose.material3.Dra
             LinkRow(stringResource(R.string.settings_language), currentLanguage(LocalContext.current).nativeName) { language = true }
             Spacer(Modifier.height(CardGap))
             LinkRow(stringResource(R.string.settings_about)) { about = true }
+            Spacer(Modifier.height(CardGap))
+            UpdateRows(settings)
         }
     }
     if (language) LanguageDialog { language = false }
@@ -211,6 +214,16 @@ private fun Divider(inset: androidx.compose.ui.unit.Dp) {
 }
 
 @Composable
+private fun UpdateRows(settings: AppSettings) {
+    val context = LocalContext.current
+    Column(Modifier.padding(horizontal = 6.dp).fillMaxWidth().clip(PanelShape).background(PanelColor)) {
+        SwitchRow(stringResource(R.string.update_check_on_open), settings.checkUpdates, enabled = true) { settings.checkUpdates = it }
+        Divider(10.dp)
+        ActionRow(stringResource(R.string.update_check_now), busy = Updates.checking) { Updates.check(context, manual = true) }
+    }
+}
+
+@Composable
 internal fun LinkRow(label: String, value: String? = null, onClick: () -> Unit) {
     Box(Modifier.padding(horizontal = 6.dp).fillMaxWidth().clip(PanelShape).background(PanelColor)) {
         ActionRow(label, value, chevron = true, onClick = onClick)
@@ -218,14 +231,16 @@ internal fun LinkRow(label: String, value: String? = null, onClick: () -> Unit) 
 }
 
 @Composable
-internal fun ActionRow(label: String, value: String? = null, chevron: Boolean = true, onClick: () -> Unit) {
+internal fun ActionRow(label: String, value: String? = null, chevron: Boolean = true, busy: Boolean = false, onClick: () -> Unit) {
     Row(
         Modifier.fillMaxWidth().height(44.dp).clickable(onClick = onClick).padding(start = 15.dp, end = if (chevron) 7.dp else 15.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(label, Modifier.weight(1f), color = Am.HomeInk, fontSize = 13.sp)
         if (value != null) Text(value, color = Am.HomeMid, fontSize = 13.sp, maxLines = 1)
-        if (chevron) Icon(HomeIcons.ChevronRight, null, Modifier.size(24.dp), tint = Am.HomeMid)
+        if (busy) Box(Modifier.size(24.dp), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator(Modifier.size(16.dp), color = Am.HomeMid, strokeWidth = 2.dp)
+        } else if (chevron) Icon(HomeIcons.ChevronRight, null, Modifier.size(24.dp), tint = Am.HomeMid)
     }
 }
 
@@ -241,7 +256,7 @@ internal fun SwitchRow(label: String, checked: Boolean, enabled: Boolean, onChan
 }
 
 @Composable
-private fun RefSwitch(checked: Boolean, enabled: Boolean, onChange: (Boolean) -> Unit) =
+internal fun RefSwitch(checked: Boolean, enabled: Boolean, onChange: (Boolean) -> Unit) =
     ThinSwitch(checked, enabled = enabled, offTrack = Am.SwitchOff, onTrack = Am.HomeAccent.copy(alpha = 0.5f), onThumb = Am.HomeAccent, onChange = onChange)
 
 @Composable

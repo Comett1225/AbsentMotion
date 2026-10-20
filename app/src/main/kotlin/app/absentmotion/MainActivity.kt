@@ -81,6 +81,8 @@ import app.absentmotion.ui.onboarding.Onboarding
 import app.absentmotion.ui.home.OpenFailedDialog
 import app.absentmotion.ui.home.OpeningOverlay
 import app.absentmotion.ui.home.RecoveryDialog
+import app.absentmotion.ui.home.UpdateDialog
+import app.absentmotion.ui.home.Updates
 import app.absentmotion.ui.home.autoBackupIfDue
 import app.absentmotion.ui.home.VersionHistory
 import app.absentmotion.ui.theme.PressIndication
@@ -149,6 +151,7 @@ class MainActivity : ComponentActivity() {
                 if (open == null && first != null) {
                     Onboarding(settings, first, { engine }) { firstRun = null }
                 } else if (open == null) {
+                    LaunchedEffect(Unit) { if (settings.checkUpdates) Updates.atStart(applicationContext) }
                     val returning = remember { cameFromEditor }
                     Box(Modifier.fillMaxSize().then(if (returning) Modifier.enterFade() else Modifier)) {
                         HomeScreen(
@@ -192,6 +195,7 @@ class MainActivity : ComponentActivity() {
                     VersionHistory(store, id, title, engine, onRestore = { restoreVersion(id, it) }, onDelete = if (damaged) { { deleteDamaged(id) } } else null) { historyFor = null }
                 }
                 if (open == null && !opening) recovered?.let { offer -> RecoveryDialog(offer.title, onRestore = { answerRecovery(offer, true) }) { answerRecovery(offer, false) } }
+                if (open == null && first == null && !opening && recovered == null && editingTemplate == null && exportingFromList == null) UpdateDialog()
             }
         }
         Log.i("AMStart", "onCreate took ${SystemClock.elapsedRealtime() - started} ms")

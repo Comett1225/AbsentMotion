@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -64,6 +65,7 @@ import app.absentmotion.platform.sheetDialogProperties
 import app.absentmotion.ui.editor.PanelIcons
 import app.absentmotion.ui.editor.PhoneScreen
 import app.absentmotion.ui.home.HomeIcons
+import app.absentmotion.ui.home.RefSwitch
 import app.absentmotion.ui.home.TitleBar
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.enterFade
@@ -110,7 +112,7 @@ fun Onboarding(settings: AppSettings, first: FirstRun, engine: () -> EngineThrea
                     step = OnboardingStep.Check
                     applyLanguage(context, language)
                 }
-                OnboardingStep.Check -> CheckStep(engine) {
+                OnboardingStep.Check -> CheckStep(settings, engine) {
                     settings.onboarding = ONBOARDING_DONE
                     onDone()
                 }
@@ -138,7 +140,7 @@ private fun LanguageStep(onContinue: (AppLanguage) -> Unit) {
 }
 
 @Composable
-private fun CheckStep(engine: () -> EngineThread, onDone: () -> Unit) {
+private fun CheckStep(settings: AppSettings, engine: () -> EngineThread, onDone: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var job by remember { mutableStateOf<Job?>(null) }
@@ -175,6 +177,8 @@ private fun CheckStep(engine: () -> EngineThread, onDone: () -> Unit) {
             Spacer(Modifier.height(16.dp))
         }
         Footer {
+            UpdateChoice(settings)
+            Spacer(Modifier.height(10.dp))
             val runLabel = stringResource(if (running) R.string.onboarding_check_running else R.string.onboarding_check_run)
             val skipLabel = stringResource(R.string.action_skip)
             if (finished) FilledButton(stringResource(R.string.action_continue), enabled = true, onClick = onDone)
@@ -182,6 +186,21 @@ private fun CheckStep(engine: () -> EngineThread, onDone: () -> Unit) {
             Spacer(Modifier.height(6.dp))
             PlainButton(skipLabel, visible = !finished, onClick = ::skip)
         }
+    }
+}
+
+@Composable
+private fun UpdateChoice(settings: AppSettings) {
+    Row(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Am.Card).padding(start = 16.dp, end = 8.dp, top = 12.dp, bottom = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(Modifier.weight(1f)) {
+            Text(stringResource(R.string.update_check_on_open), color = Am.HomeInk, fontSize = 15.sp, lineHeight = 20.sp, fontWeight = FontWeight.Medium)
+            Text(stringResource(R.string.update_check_note), Modifier.padding(top = 2.dp), color = Am.HomeMid, fontSize = 13.sp, lineHeight = 18.sp)
+        }
+        Spacer(Modifier.width(8.dp))
+        RefSwitch(settings.checkUpdates, enabled = true) { settings.checkUpdates = it }
     }
 }
 
