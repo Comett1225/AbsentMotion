@@ -92,7 +92,7 @@ internal fun FontBrowser(library: FontLibrary, onSelect: (String) -> Unit, onClo
         val filtered = all.filter { entry ->
             val matchesCategory = categories.isEmpty() || entry.category in categories || (110 in categories && entry.name.xml in favourites)
             matchesCategory && (language == 0 || language in entry.languages || entry.category == 100) &&
-                (search.isNullOrEmpty() || entry.name.label.contains(search.orEmpty(), ignoreCase = true))
+                matchesSearch(search.orEmpty(), entry.name.label)
         }
         when (sorting) { "Alphabetical" -> filtered.sortedBy { it.name.label.lowercase() }
             else -> filtered }

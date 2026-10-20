@@ -49,6 +49,7 @@ import app.absentmotion.effects.EffectPreset
 import app.absentmotion.model.addEffect
 import app.absentmotion.model.effects
 import app.absentmotion.ui.editor.PanelIcons
+import app.absentmotion.ui.editor.matchesSearch
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Swap
 import kotlinx.coroutines.Dispatchers
@@ -125,11 +126,11 @@ fun EffectBrowser(state: EditorState) {
                 }
             }
         } else if (searching || category != null) {
-            val results = catalog.listed(if (searching) null else category).filter { query.isBlank() || it.name.contains(query, true) }
+            val results = catalog.listed(if (searching) null else category).filter { matchesSearch(query, it.name) }
                 .sortedBy { it.name.lowercase() }
-            val actions = if (searching || category == "ai") AiAction.entries.filter { it.offered && (query.isBlank() || stringResource(it.title).contains(query, true)) } else emptyList()
+            val actions = if (searching || category == "ai") AiAction.entries.filter { it.offered && matchesSearch(query, stringResource(it.title)) } else emptyList()
             val presets = catalog.definitions.flatMap { d -> d.presets.map { d to it } }
-                .filter { (d, p) -> if (searching) query.isNotBlank() && p.name.contains(query, true) else d.category == category }
+                .filter { (d, p) -> if (searching) query.isNotBlank() && matchesSearch(query, p.name) else d.category == category }
             LazyVerticalGrid(GridCells.Fixed(3), Modifier.fillMaxSize(), contentPadding = PaddingValues(10.dp)) {
                 items(actions, key = { "ai-${it.name}" }) { action -> AiTile(action, state.selected, ai) }
                 items(presets, key = { (d, p) -> "preset-${d.id}-${p.slug}" }) { (d, p) -> PresetTile(catalog, d, p) { add(d, p) } }
