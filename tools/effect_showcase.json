@@ -115,7 +115,7 @@
     "voronoicells": {"photo": "portrait", "params": {"color1": "#1b1464", "color2": "#fbb03b", "lineWidth": 0.06, "lineColor": "#ffffff"}},
     "zoomstreaks": {"photo": "colour", "layout": "move", "params": {"strength": 0.5}},
     "blockdissolve": {"photo": "landscape", "params": {"strength": [0, 1, 0], "blockSize": 14}, "animate": 16},
-    "spinstreaks": {"photo": "colour", "layout": "move", "params": {"sweep": 40, "mode": 0}},
+    "spinstreaks": {"photo": "colour", "layout": "move", "params": {"sweep": 40}},
     "spotcolor": {"photo": "colour", "params": {"color": "#f0b000", "threshold": 0.6, "choke": 2}, "split": 0.4},
     "squeeze": {"photo": "portrait", "params": {"strength": 1.2}},
     "star": {"photo": "landscape", "params": {"position": [0.62, 0.32], "radius": 0.6}},

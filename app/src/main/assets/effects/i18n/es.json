@@ -3645,11 +3645,29 @@
    }
   },
   "spinstreaks": {
-   "description": "Crea estelas en forma de arco girando copias de la capa alrededor de un punto y mezclándolas donde se superponen.",
+   "description": "Crea estelas en forma de arco girando copias de la capa alrededor de un punto y mezclándolas donde se superponen. R, G, B y A eligen por canal si las copias conservan el valor más bajo, el más alto o el promedio, o si dejan ese canal intacto.",
    "name": "Estelas de giro",
    "params": {
+    "a": {
+     "label": "A",
+     "options": [
+      "Mín",
+      "Máx",
+      "Prom",
+      "Desactivado"
+     ]
+    },
     "alpha": {
      "label": "Alfa"
+    },
+    "b": {
+     "label": "B",
+     "options": [
+      "Mín",
+      "Máx",
+      "Prom",
+      "Desactivado"
+     ]
     },
     "bias": {
      "label": "Sesgo"
@@ -3657,12 +3675,22 @@
     "center": {
      "label": "Centro"
     },
-    "mode": {
-     "label": "Fusión",
+    "g": {
+     "label": "G",
      "options": [
-      "Aclarar",
-      "Promedio",
-      "Oscurecer"
+      "Mín",
+      "Máx",
+      "Prom",
+      "Desactivado"
+     ]
+    },
+    "r": {
+     "label": "R",
+     "options": [
+      "Mín",
+      "Máx",
+      "Prom",
+      "Desactivado"
      ]
     },
     "sweep": {
@@ -4664,11 +4692,29 @@
    }
   },
   "zoomstreaks": {
-   "description": "Crea estelas que salen disparadas desde un punto al escalar copias de la capa a su alrededor y conservar los píxeles más brillantes. Promedio produce un desenfoque de zoom.",
+   "description": "Crea estelas que salen disparadas desde un punto escalando copias de la capa a su alrededor y conservando los píxeles más brillantes. El promedio produce un desenfoque de zoom. R, G, B y A eligen por canal si las copias conservan el valor más bajo, el más alto o el promedio, o si dejan ese canal intacto.",
    "name": "Estelas de zoom",
    "params": {
+    "a": {
+     "label": "A",
+     "options": [
+      "Mín",
+      "Máx",
+      "Prom",
+      "Desactivado"
+     ]
+    },
     "alpha": {
      "label": "Alfa"
+    },
+    "b": {
+     "label": "B",
+     "options": [
+      "Mín",
+      "Máx",
+      "Prom",
+      "Desactivado"
+     ]
     },
     "bias": {
      "label": "Sesgo"
@@ -4676,12 +4722,22 @@
     "center": {
      "label": "Centro"
     },
-    "mode": {
-     "label": "Fusión",
+    "g": {
+     "label": "G",
      "options": [
-      "Aclarar",
-      "Promedio",
-      "Oscurecer"
+      "Mín",
+      "Máx",
+      "Prom",
+      "Desactivado"
+     ]
+    },
+    "r": {
+     "label": "R",
+     "options": [
+      "Mín",
+      "Máx",
+      "Prom",
+      "Desactivado"
      ]
     },
     "strength": {

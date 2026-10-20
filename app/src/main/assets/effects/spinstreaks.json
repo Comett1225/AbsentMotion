@@ -3,7 +3,7 @@
  "name": "Spin Streaks",
  "category": "blur",
  "since": "3.0.0",
- "description": "Makes arc-shaped streaks by turning copies of the layer around a point and blending where they overlap.",
+ "description": "Makes arc-shaped streaks by turning copies of the layer around a point and blending where they overlap. R, G, B and A choose per channel whether the copies keep the lowest, highest or average value, or leave that channel alone.",
  "params": [
   {
    "id": "center",
@@ -47,16 +47,53 @@
    "percent": true
   },
   {
-   "id": "mode",
-   "label": "Blending",
+   "id": "r",
+   "label": "R",
    "type": "choice",
-   "default": 2,
+   "default": 1,
    "options": [
-    "Lighten",
-    "Average",
-    "Darken"
+    "Min",
+    "Max",
+    "Avg",
+    "Off"
+   ]
+  },
+  {
+   "id": "g",
+   "label": "G",
+   "type": "choice",
+   "default": 1,
+   "options": [
+    "Min",
+    "Max",
+    "Avg",
+    "Off"
+   ]
+  },
+  {
+   "id": "b",
+   "label": "B",
+   "type": "choice",
+   "default": 1,
+   "options": [
+    "Min",
+    "Max",
+    "Avg",
+    "Off"
+   ]
+  },
+  {
+   "id": "a",
+   "label": "A",
+   "type": "choice",
+   "default": 1,
+   "options": [
+    "Min",
+    "Max",
+    "Avg",
+    "Off"
    ]
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float2 center;\nuniform float sweep;\nuniform float alpha;\nuniform float bias;\nuniform float mode;\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    float2 c = center * size;\n    float span = radians(sweep);\n    if (span <= 0.0) return src;\n    float2 d = coord - c;\n    float4 hi = float4(0.0);\n    float4 sum = float4(0.0);\n    float3 lo = float3(1.0);\n    for (int i = 0; i < 48; i++) {\n        float a = span * 0.5 * mix(bias - 1.0, bias + 1.0, float(i) / 47.0);\n        float cs = cos(a);\n        float sn = sin(a);\n        float4 v = float4(image.eval(c + float2(cs * d.x - sn * d.y, sn * d.x + cs * d.y)));\n        hi = max(hi, v);\n        sum += v;\n        if (v.a > 0.002) lo = min(lo, v.rgb / v.a);\n    }\n    float4 acc = mode < 0.5 ? hi : mode < 1.5 ? sum / 48.0 : float4(lo * hi.a, hi.a);\n    return half4(mix(float4(src), acc, clamp(alpha, 0.0, 1.0)));\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float2 center;\nuniform float sweep;\nuniform float alpha;\nuniform float bias;\nuniform float r;\nuniform float g;\nuniform float b;\nuniform float a;\nfloat pick(float m, float lo, float hi, float avg, float src) {\n    return m < 0.5 ? lo : m < 1.5 ? hi : m < 2.5 ? avg : src;\n}\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    float2 c = center * size;\n    float span = radians(sweep);\n    if (span <= 0.0) return src;\n    float2 d = coord - c;\n    float4 hi = float4(0.0);\n    float4 sum = float4(0.0);\n    float4 lo = float4(1.0);\n    for (int i = 0; i < 48; i++) {\n        float t = span * 0.5 * mix(bias - 1.0, bias + 1.0, float(i) / 47.0);\n        float cs = cos(t);\n        float sn = sin(t);\n        float4 v = float4(image.eval(c + float2(cs * d.x - sn * d.y, sn * d.x + cs * d.y)));\n        hi = max(hi, v);\n        sum += v;\n        lo = min(lo, v);\n    }\n    float4 avg = sum / 48.0;\n    float4 s = float4(src);\n    float4 acc = float4(pick(r, lo.r, hi.r, avg.r, s.r), pick(g, lo.g, hi.g, avg.g, s.g), pick(b, lo.b, hi.b, avg.b, s.b), pick(a, lo.a, hi.a, avg.a, s.a));\n    return half4(mix(s, acc, clamp(alpha, 0.0, 1.0)));\n}"
 }

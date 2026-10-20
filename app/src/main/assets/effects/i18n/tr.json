@@ -3645,11 +3645,29 @@
    }
   },
   "spinstreaks": {
-   "description": "Katmanın kopyalarını bir nokta etrafında döndürüp üst üste geldikleri yerlerde karıştırarak yay şeklinde izler oluşturur.",
+   "description": "Katmanın kopyalarını bir nokta etrafında döndürüp üst üste bindikleri yerlerde karıştırarak yay şeklinde çizgiler oluşturur. R, G, B ve A, her kanal için kopyaların en düşük, en yüksek ya da ortalama değeri tutmasını veya o kanalın olduğu gibi bırakılmasını seçer.",
    "name": "Döndürme izleri",
    "params": {
+    "a": {
+     "label": "A",
+     "options": [
+      "Min",
+      "Maks",
+      "Ort",
+      "Kapalı"
+     ]
+    },
     "alpha": {
      "label": "Alfa"
+    },
+    "b": {
+     "label": "B",
+     "options": [
+      "Min",
+      "Maks",
+      "Ort",
+      "Kapalı"
+     ]
     },
     "bias": {
      "label": "Eğilim"
@@ -3657,12 +3675,22 @@
     "center": {
      "label": "Merkez"
     },
-    "mode": {
-     "label": "Karışım",
+    "g": {
+     "label": "G",
      "options": [
-      "Açıklaştır",
-      "Ortalama",
-      "Koyulaştır"
+      "Min",
+      "Maks",
+      "Ort",
+      "Kapalı"
+     ]
+    },
+    "r": {
+     "label": "R",
+     "options": [
+      "Min",
+      "Maks",
+      "Ort",
+      "Kapalı"
      ]
     },
     "sweep": {
@@ -4664,11 +4692,29 @@
    }
   },
   "zoomstreaks": {
-   "description": "Katmanın kopyalarını merkezi etrafında ölçekleyip en parlak pikselleri tutarak bir noktadan dışarı fırlayan izler oluşturur. Ortalama, yakınlaştırma bulanıklığı verir.",
+   "description": "Katmanın kopyalarını bir nokta etrafında ölçekleyip en parlak pikselleri tutarak o noktadan dışa doğru çizgiler oluşturur. Ortalama seçeneği yakınlaştırma bulanıklığı verir. R, G, B ve A, her kanal için kopyaların en düşük, en yüksek ya da ortalama değeri tutmasını veya o kanalın olduğu gibi bırakılmasını seçer.",
    "name": "Yakınlaştırma izleri",
    "params": {
+    "a": {
+     "label": "A",
+     "options": [
+      "Min",
+      "Maks",
+      "Ort",
+      "Kapalı"
+     ]
+    },
     "alpha": {
      "label": "Alfa"
+    },
+    "b": {
+     "label": "B",
+     "options": [
+      "Min",
+      "Maks",
+      "Ort",
+      "Kapalı"
+     ]
     },
     "bias": {
      "label": "Sapma"
@@ -4676,12 +4722,22 @@
     "center": {
      "label": "Merkez"
     },
-    "mode": {
-     "label": "Karışım",
+    "g": {
+     "label": "G",
      "options": [
-      "Açığa çıkar",
-      "Ortalama",
-      "Koyulaştır"
+      "Min",
+      "Maks",
+      "Ort",
+      "Kapalı"
+     ]
+    },
+    "r": {
+     "label": "R",
+     "options": [
+      "Min",
+      "Maks",
+      "Ort",
+      "Kapalı"
      ]
     },
     "strength": {

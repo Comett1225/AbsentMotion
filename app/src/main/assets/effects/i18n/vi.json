@@ -3645,11 +3645,29 @@
    }
   },
   "spinstreaks": {
-   "description": "Tạo các vệt hình cung bằng cách xoay các bản sao của lớp quanh một điểm và hòa trộn ở chỗ chúng chồng lên nhau.",
+   "description": "Tạo các vệt hình cung bằng cách xoay bản sao của lớp quanh một điểm và hòa trộn ở chỗ chúng chồng lên nhau. R, G, B và A chọn cho từng kênh xem các bản sao giữ giá trị thấp nhất, cao nhất hay trung bình, hoặc để nguyên kênh đó.",
    "name": "Vệt xoay",
    "params": {
+    "a": {
+     "label": "A",
+     "options": [
+      "Thấp nhất",
+      "Cao nhất",
+      "Trung bình",
+      "Tắt"
+     ]
+    },
     "alpha": {
      "label": "Alpha"
+    },
+    "b": {
+     "label": "B",
+     "options": [
+      "Thấp nhất",
+      "Cao nhất",
+      "Trung bình",
+      "Tắt"
+     ]
     },
     "bias": {
      "label": "Độ lệch"
@@ -3657,12 +3675,22 @@
     "center": {
      "label": "Tâm"
     },
-    "mode": {
-     "label": "Hòa trộn",
+    "g": {
+     "label": "G",
      "options": [
-      "Sáng hơn",
+      "Thấp nhất",
+      "Cao nhất",
       "Trung bình",
-      "Tối hơn"
+      "Tắt"
+     ]
+    },
+    "r": {
+     "label": "R",
+     "options": [
+      "Thấp nhất",
+      "Cao nhất",
+      "Trung bình",
+      "Tắt"
      ]
     },
     "sweep": {
@@ -4664,11 +4692,29 @@
    }
   },
   "zoomstreaks": {
-   "description": "Tạo các vệt bắn ra từ một điểm bằng cách phóng to bản sao của lớp xung quanh và giữ lại các điểm ảnh sáng nhất. Chế độ Trung bình tạo nhòe zoom.",
+   "description": "Tạo các vệt tỏa ra từ một điểm bằng cách phóng to bản sao của lớp quanh điểm đó và giữ lại các điểm ảnh sáng nhất. Trung bình cho hiệu ứng nhòe phóng to. R, G, B và A chọn cho từng kênh xem các bản sao giữ giá trị thấp nhất, cao nhất hay trung bình, hoặc để nguyên kênh đó.",
    "name": "Vệt zoom",
    "params": {
+    "a": {
+     "label": "A",
+     "options": [
+      "Thấp nhất",
+      "Cao nhất",
+      "Trung bình",
+      "Tắt"
+     ]
+    },
     "alpha": {
      "label": "Alpha"
+    },
+    "b": {
+     "label": "B",
+     "options": [
+      "Thấp nhất",
+      "Cao nhất",
+      "Trung bình",
+      "Tắt"
+     ]
     },
     "bias": {
      "label": "Độ lệch"
@@ -4676,12 +4722,22 @@
     "center": {
      "label": "Tâm"
     },
-    "mode": {
-     "label": "Hòa trộn",
+    "g": {
+     "label": "G",
      "options": [
-      "Làm sáng",
+      "Thấp nhất",
+      "Cao nhất",
       "Trung bình",
-      "Làm tối"
+      "Tắt"
+     ]
+    },
+    "r": {
+     "label": "R",
+     "options": [
+      "Thấp nhất",
+      "Cao nhất",
+      "Trung bình",
+      "Tắt"
      ]
     },
     "strength": {

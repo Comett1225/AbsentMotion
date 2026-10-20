@@ -43,6 +43,11 @@ class AlightParityTest {
         assertEquals(listOf("Clockwise", "Counterclockwise", "Both"), params("radialwipe").getValue("direction").options)
         assertEquals(listOf("Size", "Roundness", "Feather", "Strength", "Tint", "Color", "Punch Out"), catalog.find("absent.vignette")!!.params.map { it.label })
         assertEquals(listOf("Strength", "float", "0.800000", "0.0..1.0"), params("vignette").getValue("strength").row())
+        for (key in listOf("zoomstreaks", "spinstreaks")) {
+            val streaks = catalog.find("absent.$key")!!.params.takeLast(4)
+            assertEquals(listOf("R", "G", "B", "A"), streaks.map { it.label })
+            assertTrue(streaks.all { it.options == listOf("Min", "Max", "Avg", "Off") && it.default == "1.000000" })
+        }
     }
 
     private fun older(effect: String, vararg values: Pair<String, String>) = XmlNode("effect", mapOf("id" to "absent.$effect", "hidden" to "false"),
@@ -58,6 +63,7 @@ class AlightParityTest {
             older("bulge", "strength" to "0.4", "radius" to "0.5"),
             older("radialwipe", "completion" to "0.25", "start" to "30"),
             older("vignette", "amount" to "0.5", "radius" to "1", "softness" to "0.5", "roundness" to "1"),
+            older("spinstreaks", "sweep" to "5", "mode" to "2"),
         )
         val scene = Scene(XmlNode("scene", mapOf("width" to "100", "height" to "100", "fps" to "30", "totalTime" to "1000"),
             listOf(XmlNode("shape", mapOf("id" to "1", "startTime" to "0", "endTime" to "1000", "s" to ".rect"), made))))
@@ -72,6 +78,7 @@ class AlightParityTest {
         assertEquals(mapOf("amount" to 0.1f, "radius" to 0.5f), values(5))
         assertEquals(mapOf("progress" to 90f, "start" to 30f), values(6))
         assertEquals(mapOf("extent" to 1f, "rounding" to 2f, "feather" to 0.5f, "strength" to 0.5f, "tint" to 0f), values(7))
+        assertEquals(mapOf("sweep" to 5f, "r" to 0f, "g" to 0f, "b" to 0f, "a" to 1f), values(8))
         assertTrue(result.dropped.isEmpty())
         assertEquals(result.scene.node, migration.migrate(result.scene).scene.node)
     }

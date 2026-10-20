@@ -3645,11 +3645,29 @@
    }
   },
   "spinstreaks": {
-   "description": "Cria rastros em forma de arco girando cópias da camada ao redor de um ponto e mesclando onde elas se sobrepõem.",
+   "description": "Cria rastros em arco girando cópias da camada ao redor de um ponto e mesclando onde elas se sobrepõem. R, G, B e A definem, por canal, se as cópias mantêm o valor mínimo, máximo ou médio, ou deixam o canal intacto.",
    "name": "Rastros de rotação",
    "params": {
+    "a": {
+     "label": "A",
+     "options": [
+      "Mín",
+      "Máx",
+      "Média",
+      "Desativado"
+     ]
+    },
     "alpha": {
      "label": "Alfa"
+    },
+    "b": {
+     "label": "B",
+     "options": [
+      "Mín",
+      "Máx",
+      "Média",
+      "Desativado"
+     ]
     },
     "bias": {
      "label": "Viés"
@@ -3657,12 +3675,22 @@
     "center": {
      "label": "Centro"
     },
-    "mode": {
-     "label": "Mesclagem",
+    "g": {
+     "label": "G",
      "options": [
-      "Clarear",
+      "Mín",
+      "Máx",
       "Média",
-      "Escurecer"
+      "Desativado"
+     ]
+    },
+    "r": {
+     "label": "R",
+     "options": [
+      "Mín",
+      "Máx",
+      "Média",
+      "Desativado"
      ]
     },
     "sweep": {
@@ -4664,11 +4692,29 @@
    }
   },
   "zoomstreaks": {
-   "description": "Cria rastros que saem de um ponto ao escalar cópias da camada ao redor dele e manter os pixels mais claros. Média gera um desfoque de zoom.",
+   "description": "Cria rastros que saem de um ponto escalando cópias da camada ao redor dele e mantendo os pixels mais claros. Média gera um desfoque de zoom. R, G, B e A definem, por canal, se as cópias mantêm o valor mínimo, máximo ou médio, ou deixam o canal intacto.",
    "name": "Rastros de zoom",
    "params": {
+    "a": {
+     "label": "A",
+     "options": [
+      "Mín",
+      "Máx",
+      "Média",
+      "Desativado"
+     ]
+    },
     "alpha": {
      "label": "Alfa"
+    },
+    "b": {
+     "label": "B",
+     "options": [
+      "Mín",
+      "Máx",
+      "Média",
+      "Desativado"
+     ]
     },
     "bias": {
      "label": "Viés"
@@ -4676,12 +4722,22 @@
     "center": {
      "label": "Centro"
     },
-    "mode": {
-     "label": "Mesclagem",
+    "g": {
+     "label": "G",
      "options": [
-      "Clarear",
+      "Mín",
+      "Máx",
       "Média",
-      "Escurecer"
+      "Desativado"
+     ]
+    },
+    "r": {
+     "label": "R",
+     "options": [
+      "Mín",
+      "Máx",
+      "Média",
+      "Desativado"
      ]
     },
     "strength": {

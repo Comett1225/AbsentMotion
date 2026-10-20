@@ -1684,5 +1684,91 @@
   "set": {
    "tint": 0
   }
+ },
+ "absent.zoomstreaks": {
+  "to": "zoomstreaks",
+  "params": {
+   "mode": [
+    {
+     "to": "r",
+     "component": 0,
+     "values": {
+      "0": 1,
+      "1": 2,
+      "2": 0
+     }
+    },
+    {
+     "to": "g",
+     "component": 0,
+     "values": {
+      "0": 1,
+      "1": 2,
+      "2": 0
+     }
+    },
+    {
+     "to": "b",
+     "component": 0,
+     "values": {
+      "0": 1,
+      "1": 2,
+      "2": 0
+     }
+    },
+    {
+     "to": "a",
+     "component": 0,
+     "values": {
+      "0": 1,
+      "1": 2,
+      "2": 1
+     }
+    }
+   ]
+  }
+ },
+ "absent.spinstreaks": {
+  "to": "spinstreaks",
+  "params": {
+   "mode": [
+    {
+     "to": "r",
+     "component": 0,
+     "values": {
+      "0": 1,
+      "1": 2,
+      "2": 0
+     }
+    },
+    {
+     "to": "g",
+     "component": 0,
+     "values": {
+      "0": 1,
+      "1": 2,
+      "2": 0
+     }
+    },
+    {
+     "to": "b",
+     "component": 0,
+     "values": {
+      "0": 1,
+      "1": 2,
+      "2": 0
+     }
+    },
+    {
+     "to": "a",
+     "component": 0,
+     "values": {
+      "0": 1,
+      "1": 2,
+      "2": 1
+     }
+    }
+   ]
+  }
  }
 }

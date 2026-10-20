@@ -3645,11 +3645,29 @@
    }
   },
   "spinstreaks": {
-   "description": "Gumagawa ng hugis-arko na streak sa pag-ikot ng mga kopya ng layer sa paligid ng isang punto at pag-blend kapag nagsalap.",
+   "description": "Gumagawa ng hugis-arkong streak sa pag-ikot ng mga kopya ng layer sa isang punto at pag-blend kung saan nag-o-overlap. Pinipili ng R, G, B at A sa bawat channel kung pinakamababa, pinakamataas o average na value ang gagamitin ng mga kopya, o hindi papansinin ang channel.",
    "name": "Spin streaks",
    "params": {
+    "a": {
+     "label": "A",
+     "options": [
+      "Pinakamababa",
+      "Pinakamataas",
+      "Average",
+      "Naka-off"
+     ]
+    },
     "alpha": {
      "label": "Alpha"
+    },
+    "b": {
+     "label": "B",
+     "options": [
+      "Pinakamababa",
+      "Pinakamataas",
+      "Average",
+      "Naka-off"
+     ]
     },
     "bias": {
      "label": "Bias"
@@ -3657,12 +3675,22 @@
     "center": {
      "label": "Gitna"
     },
-    "mode": {
-     "label": "Blending",
+    "g": {
+     "label": "G",
      "options": [
-      "Paliwanagin",
+      "Pinakamababa",
+      "Pinakamataas",
       "Average",
-      "Padilimin"
+      "Naka-off"
+     ]
+    },
+    "r": {
+     "label": "R",
+     "options": [
+      "Pinakamababa",
+      "Pinakamataas",
+      "Average",
+      "Naka-off"
      ]
     },
     "sweep": {
@@ -4664,11 +4692,29 @@
    }
   },
   "zoomstreaks": {
-   "description": "Gumagawa ng mga streak na sumisibad mula sa isang punto sa pamamagitan ng pag-scale ng mga kopya ng layer at pagpapanatili ng pinakamaliwanag na pixel. Ang Average ay nagbibigay ng zoom blur.",
+   "description": "Gumagawa ng mga streak na lumalabas mula sa isang punto sa pag-scale ng mga kopya ng layer sa paligid nito at pagpapanatili ng pinakamaliwanag na mga pixel. Ang Average ay nagbibigay ng zoom blur. Pinipili ng R, G, B at A sa bawat channel kung pinakamababa, pinakamataas o average na value ang gagamitin ng mga kopya, o hindi papansinin ang channel.",
    "name": "Zoom Streaks",
    "params": {
+    "a": {
+     "label": "A",
+     "options": [
+      "Pinakamababa",
+      "Pinakamataas",
+      "Average",
+      "Naka-off"
+     ]
+    },
     "alpha": {
      "label": "Alpha"
+    },
+    "b": {
+     "label": "B",
+     "options": [
+      "Pinakamababa",
+      "Pinakamataas",
+      "Average",
+      "Naka-off"
+     ]
     },
     "bias": {
      "label": "Bias"
@@ -4676,12 +4722,22 @@
     "center": {
      "label": "Gitna"
     },
-    "mode": {
-     "label": "Blending",
+    "g": {
+     "label": "G",
      "options": [
-      "Lighten",
+      "Pinakamababa",
+      "Pinakamataas",
       "Average",
-      "Darken"
+      "Naka-off"
+     ]
+    },
+    "r": {
+     "label": "R",
+     "options": [
+      "Pinakamababa",
+      "Pinakamataas",
+      "Average",
+      "Naka-off"
      ]
     },
     "strength": {

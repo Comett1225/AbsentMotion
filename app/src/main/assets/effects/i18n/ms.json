@@ -3645,11 +3645,29 @@
    }
   },
   "spinstreaks": {
-   "description": "Menghasilkan jalur berbentuk lengkok dengan memusingkan salinan lapisan mengelilingi satu titik dan mencampurkan bahagian yang bertindih.",
+   "description": "Menghasilkan jalur berbentuk lengkok dengan memusingkan salinan lapisan mengelilingi satu titik dan mencampurkannya apabila bertindih; R, G, B dan A menentukan bagi setiap saluran sama ada salinan mengambil nilai terendah, tertinggi atau purata, atau membiarkan saluran itu tanpa perubahan.",
    "name": "Jalur Putaran",
    "params": {
+    "a": {
+     "label": "A",
+     "options": [
+      "Min",
+      "Maks",
+      "Purata",
+      "Mati"
+     ]
+    },
     "alpha": {
      "label": "Alfa"
+    },
+    "b": {
+     "label": "B",
+     "options": [
+      "Min",
+      "Maks",
+      "Purata",
+      "Mati"
+     ]
     },
     "bias": {
      "label": "Bias"
@@ -3657,12 +3675,22 @@
     "center": {
      "label": "Pusat"
     },
-    "mode": {
-     "label": "Campuran",
+    "g": {
+     "label": "G",
      "options": [
-      "Cerahkan",
+      "Min",
+      "Maks",
       "Purata",
-      "Gelapkan"
+      "Mati"
+     ]
+    },
+    "r": {
+     "label": "R",
+     "options": [
+      "Min",
+      "Maks",
+      "Purata",
+      "Mati"
      ]
     },
     "sweep": {
@@ -4664,11 +4692,29 @@
    }
   },
   "zoomstreaks": {
-   "description": "Menghasilkan jalur yang memancar keluar dari satu titik dengan menskalakan salinan lapisan di sekelilingnya dan mengekalkan piksel paling cerah. Purata menghasilkan kabur zum.",
+   "description": "Menghasilkan jalur yang memancar keluar dari satu titik dengan menskalakan salinan lapisan di sekelilingnya dan mengekalkan piksel paling cerah; Purata menghasilkan kabur zum, manakala R, G, B dan A menentukan bagi setiap saluran sama ada salinan mengambil nilai terendah, tertinggi atau purata, atau membiarkan saluran itu tanpa perubahan.",
    "name": "Jalur Zum",
    "params": {
+    "a": {
+     "label": "A",
+     "options": [
+      "Min",
+      "Maks",
+      "Purata",
+      "Mati"
+     ]
+    },
     "alpha": {
      "label": "Alfa"
+    },
+    "b": {
+     "label": "B",
+     "options": [
+      "Min",
+      "Maks",
+      "Purata",
+      "Mati"
+     ]
     },
     "bias": {
      "label": "Bias"
@@ -4676,12 +4722,22 @@
     "center": {
      "label": "Pusat"
     },
-    "mode": {
-     "label": "Campuran",
+    "g": {
+     "label": "G",
      "options": [
-      "Cerahkan",
+      "Min",
+      "Maks",
       "Purata",
-      "Gelapkan"
+      "Mati"
+     ]
+    },
+    "r": {
+     "label": "R",
+     "options": [
+      "Min",
+      "Maks",
+      "Purata",
+      "Mati"
      ]
     },
     "strength": {

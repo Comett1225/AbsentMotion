@@ -3645,11 +3645,29 @@
    }
   },
   "spinstreaks": {
-   "description": "Membuat jejak berbentuk busur dengan memutar salinan lapisan di sekitar satu titik dan memadukannya saat saling tumpang tindih.",
+   "description": "Membuat guratan berbentuk busur dengan memutar salinan lapisan di sekitar satu titik lalu memadukannya saat saling tumpang tindih. R, G, B, dan A menentukan per kanal apakah salinan memakai nilai terendah, tertinggi, atau rata-rata, atau membiarkan kanal itu.",
    "name": "Jejak Putar",
    "params": {
+    "a": {
+     "label": "A",
+     "options": [
+      "Min",
+      "Maks",
+      "Rata-rata",
+      "Nonaktif"
+     ]
+    },
     "alpha": {
      "label": "Alpha"
+    },
+    "b": {
+     "label": "B",
+     "options": [
+      "Min",
+      "Maks",
+      "Rata-rata",
+      "Nonaktif"
+     ]
     },
     "bias": {
      "label": "Bias"
@@ -3657,12 +3675,22 @@
     "center": {
      "label": "Pusat"
     },
-    "mode": {
-     "label": "Blending",
+    "g": {
+     "label": "G",
      "options": [
-      "Terangkan",
+      "Min",
+      "Maks",
       "Rata-rata",
-      "Gelapkan"
+      "Nonaktif"
+     ]
+    },
+    "r": {
+     "label": "R",
+     "options": [
+      "Min",
+      "Maks",
+      "Rata-rata",
+      "Nonaktif"
      ]
     },
     "sweep": {
@@ -4664,11 +4692,29 @@
    }
   },
   "zoomstreaks": {
-   "description": "Membuat garis-garis memancar dari satu titik dengan menskalakan salinan lapisan di sekitarnya dan mempertahankan piksel paling terang. Rata-rata menghasilkan blur zoom.",
+   "description": "Membuat guratan yang memancar dari satu titik dengan menskalakan salinan lapisan di sekitarnya dan mempertahankan piksel paling terang. Rata-rata menghasilkan blur zoom. R, G, B, dan A menentukan per kanal apakah salinan memakai nilai terendah, tertinggi, atau rata-rata, atau membiarkan kanal itu.",
    "name": "Zoom Streaks",
    "params": {
+    "a": {
+     "label": "A",
+     "options": [
+      "Min",
+      "Maks",
+      "Rata-rata",
+      "Nonaktif"
+     ]
+    },
     "alpha": {
      "label": "Alpha"
+    },
+    "b": {
+     "label": "B",
+     "options": [
+      "Min",
+      "Maks",
+      "Rata-rata",
+      "Nonaktif"
+     ]
     },
     "bias": {
      "label": "Bias"
@@ -4676,12 +4722,22 @@
     "center": {
      "label": "Pusat"
     },
-    "mode": {
-     "label": "Blending",
+    "g": {
+     "label": "G",
      "options": [
-      "Cerahkan",
+      "Min",
+      "Maks",
       "Rata-rata",
-      "Gelapkan"
+      "Nonaktif"
+     ]
+    },
+    "r": {
+     "label": "R",
+     "options": [
+      "Min",
+      "Maks",
+      "Rata-rata",
+      "Nonaktif"
      ]
     },
     "strength": {
