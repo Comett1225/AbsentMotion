@@ -102,7 +102,7 @@ fun SettingsDrawer(settings: AppSettings, drawer: androidx.compose.material3.Dra
         drawer, Modifier.width(280.dp), drawerShape = RectangleShape, drawerContainerColor = Am.HomeDrawer,
         windowInsets = WindowInsets(0),
     ) {
-        Column(Modifier.fillMaxWidth().background(Am.Card).statusBarsPadding().verticalScroll(rememberScrollState()).navigationBarsPadding().padding(bottom = 8.dp)) {
+        Column(Modifier.fillMaxSize().background(Am.Card).statusBarsPadding().verticalScroll(rememberScrollState()).navigationBarsPadding().padding(bottom = 8.dp)) {
             Text(
                 stringResource(R.string.settings), Modifier.fillMaxWidth().height(50.dp).wrapContentHeight(Alignment.CenterVertically).padding(start = 11.dp),
                 color = Am.HomeInk, fontSize = 18.sp, fontWeight = FontWeight.Bold,
