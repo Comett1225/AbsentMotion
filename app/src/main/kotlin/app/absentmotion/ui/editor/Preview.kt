@@ -31,6 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
@@ -68,6 +69,7 @@ import app.absentmotion.ui.theme.Presence
 import kotlin.math.min
 import kotlin.math.roundToInt
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @Composable
@@ -96,25 +98,19 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier) {
         state.panel != EditorPanel.Tools -> -1
         else -> 8
     }
-    LaunchedEffect(
-        scale, dx, dy, state.frame, scene, state.selectedId, handles, editingText, quality, selection,
-        state.pixelMode, state.gridMode, state.soloMode, state.cameraMode, state.snapGuides, refPx,
-    ) {
-        if (size.width > 0) {
-            val shown = state.selectedId?.takeIf { handles != HIDDEN && !editingText } ?: 0
-            state.engine.setView(
-                PreviewView(
-                    state.timeMs, scale * quality, dx * quality, dy * quality, shown, handles,
-                    pixels = state.pixelMode, divisor = divisor, gridSpacing = if (state.gridMode) state.gridSpacing.toFloat() else 0f,
-                    solo = state.soloMode, soloIds = selection, camera = state.cameraMode, guides = state.snapGuides, refPx = refPx * quality,
-                ),
-            )
-        }
+    val shownId = state.selectedId?.takeIf { handles != HIDDEN && !editingText } ?: 0
+    val baseView = if (size.width > 0) PreviewView(
+        0, scale * quality, dx * quality, dy * quality, shownId, handles,
+        pixels = state.pixelMode, divisor = divisor, gridSpacing = if (state.gridMode) state.gridSpacing.toFloat() else 0f,
+        solo = state.soloMode, soloIds = selection, camera = state.cameraMode, guides = state.snapGuides, refPx = refPx * quality,
+    ) else null
+    LaunchedEffect(baseView) {
+        if (baseView != null) snapshotFlow { state.timeMs }.collect { state.engine.setView(baseView.copy(timeMs = it)) }
     }
 
     var quad by remember { mutableStateOf<FloatArray?>(null) }
-    LaunchedEffect(state.selectedId, scene, state.frame, mediaRevision, state.cameraMode) {
-        quad = state.selectedId?.let { state.engine.layerQuad(it, state.timeMs) }
+    LaunchedEffect(state.selectedId, scene, mediaRevision, state.cameraMode) {
+        snapshotFlow { state.timeMs }.collectLatest { timeMs -> quad = state.selectedId?.let { state.engine.layerQuad(it, timeMs) } }
     }
 
     val adjust = state.pointAdjust.takeIf { state.panel == EditorPanel.Effects }

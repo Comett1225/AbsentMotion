@@ -208,16 +208,16 @@ fun Timeline(state: EditorState, modifier: Modifier = Modifier) {
     val eye = rememberVectorPainter(TimelineIcons.Eye)
     val eyeOff = rememberVectorPainter(TimelineIcons.EyeOff)
     val outline = remember { Path() }
+    val strips by remember(view) { derivedStateOf { view.stripWindow() } }
     val mediaPictures = buildMap {
-        for (row in view.visibleRows()) {
+        for (row in strips.rows) {
             val layer = view.layerAt(row) ?: continue
-            val time = view.timeScale()
             val info = layer.mediaFill?.let { state.scene.media(it.uri) }
             val turned = info?.orientation == 90 || info?.orientation == 270
             val width = (if (turned) info.height else info?.width)?.coerceAtLeast(1) ?: 1
             val height = (if (turned) info.width else info?.height)?.coerceAtLeast(1) ?: 1
             val tileMs = 23f * width / height * 1000 / view.dpPerSecond
-            key(layer.id) { mediaStripPicture(layer, state.scene, state.engine, time.time(0f), time.time(view.size.width.toFloat()), tileMs)?.let { put(layer.id, it) } }
+            key(layer.id) { mediaStripPicture(layer, state.scene, state.engine, strips.fromMs, strips.toMs, tileMs)?.let { put(layer.id, it) } }
         }
     }
 
@@ -318,6 +318,10 @@ internal object TimelineMath {
         }
     }
 }
+
+private data class StripWindow(val rows: IntRange, val fromMs: Float, val toMs: Float)
+
+private const val STRIP_WINDOW_MS = 2000f
 
 private class TimeScale(val nowMs: Float, val originX: Float, val pxPerMs: Float) {
     fun x(timeMs: Float) = TimelineMath.timeToX(timeMs, nowMs, originX, pxPerMs)
@@ -432,6 +436,20 @@ private class TimelineView(val state: EditorState, density: Density, private val
     private fun rowAt(y: Float): Int = floor((y - rulerH + scroll) / rowH).toInt()
 
     fun visibleRows(): IntRange = TimelineMath.visibleRows(layers.size, rowH, rulerH, rowsBottom, scroll)
+
+    fun stripWindow(): StripWindow {
+        val time = timeScale()
+        return StripWindow(visibleRows(), floor(time.time(0f) / STRIP_WINDOW_MS) * STRIP_WINDOW_MS,
+            ceil(time.time(size.width.toFloat()) / STRIP_WINDOW_MS) * STRIP_WINDOW_MS)
+    }
+
+    private var keyFramesOf: List<Layer>? = null
+    private val keyFrames = HashMap<Long, List<Int>>()
+
+    fun keyFrames(layer: Layer): List<Int> {
+        if (keyFramesOf !== layers) { keyFrames.clear(); keyFramesOf = layers }
+        return keyFrames.getOrPut(layer.id) { layer.keyframeTimes().map { state.scene.frameAt(it) }.distinct() }
+    }
 
     fun revealSelected() {
         val index = layers.indexOfFirst { it.id == state.selectedId }
@@ -902,7 +920,7 @@ private fun DrawScope.drawTimeline(view: TimelineView, measurer: TextMeasurer, e
         for (row in view.visibleRows()) {
             val layer = view.layerAt(row) ?: continue
             if (layer.id == view.liftId) continue
-            drawRow(layer, layer.id == state.selectedId, view.shownTop(row, layer.id), time, stripe, measurer, if (layer.hidden) eyeOff else eye, outline, state.scene, state.frame, pictures[layer.id], appear, view.keyFrame.takeIf { layer.id == view.keyId }, view.limitEdge.takeIf { layer.id == state.selectedId })
+            drawRow(layer, layer.id == state.selectedId, view.shownTop(row, layer.id), time, stripe, measurer, if (layer.hidden) eyeOff else eye, outline, state.scene, state.frame, pictures[layer.id], view.keyFrames(layer), appear, view.keyFrame.takeIf { layer.id == view.keyId }, view.limitEdge.takeIf { layer.id == state.selectedId })
         }
     }
     view.snapAt?.let { frame ->
@@ -932,7 +950,7 @@ private fun DrawScope.drawLifted(view: TimelineView, measurer: TextMeasurer, eye
             val step = LiftShadowStep.toPx()
             for (i in 1..4) drawRect(Color.Black, Offset(-i * step, top - i * step + step), Size(size.width + 2 * i * step, rowH + 2 * i * step), alpha = LIFT_SHADOW_ALPHA * amount)
             drawRect(Am.TimelineBg, Offset(0f, top), Size(size.width, rowH), alpha = amount)
-            drawRow(layer, id == state.selectedId, top, time, stripe, measurer, if (layer.hidden) eyeOff else eye, outline, state.scene, state.frame, pictures[id], appear)
+            drawRow(layer, id == state.selectedId, top, time, stripe, measurer, if (layer.hidden) eyeOff else eye, outline, state.scene, state.frame, pictures[id], view.keyFrames(layer), appear)
         }
     }
 }
@@ -982,7 +1000,7 @@ private fun DrawScope.drawRetimeMarks(scene: Scene, time: TimeScale) {
 
 private fun DrawScope.drawRow(
     layer: Layer, selected: Boolean, top: Float, time: TimeScale, stripe: Float,
-    measurer: TextMeasurer, eye: Painter, outline: Path, scene: Scene, frame: Int, picture: StripPicture?, appear: Float = 1f, held: Int? = null, limit: Boolean? = null,
+    measurer: TextMeasurer, eye: Painter, outline: Path, scene: Scene, frame: Int, picture: StripPicture?, keyFrames: List<Int>, appear: Float = 1f, held: Int? = null, limit: Boolean? = null,
 ) {
     val barTop = top + BarInset.toPx()
     val barBottom = top + (RowHeight - BarInset).toPx()
@@ -994,7 +1012,7 @@ private fun DrawScope.drawRow(
     else drawBar(outline, left, right, barTop, barBottom, stripe, picture, layer.startTime, time.pxPerMs, layer.kind == "text")
     layer.labelColour?.let { drawTagCorner(outline, left, barTop, (barBottom - barTop) / 2, Color(it.start)) }
     drawLabel(layer.label, measurer, left, right, barTop, barBottom, if (layer.kind == "audio") LabelStyle.copy(color = Am.OnAudioBar) else LabelStyle)
-    drawKeyframes(layer, scene, selected, frame, time, left, right, centre, outline, appear, held)
+    drawKeyframes(keyFrames, scene, selected, frame, time, left, right, centre, outline, appear, held)
     if (selected) {
         drawGrip(outline, left, barTop, barBottom, start = true, appear, limit == true)
         drawGrip(outline, right, barTop, barBottom, start = false, appear, limit == false)
@@ -1037,10 +1055,8 @@ private fun DrawScope.drawBar(outline: Path, left: Float, right: Float, top: Flo
     }
 }
 
-private fun DrawScope.drawKeyframes(layer: Layer, scene: Scene, selected: Boolean, frame: Int, time: TimeScale, left: Float, right: Float, centre: Float, outline: Path, appear: Float = 1f, held: Int? = null) {
-    val times = layer.keyframeTimes()
-    if (times.isEmpty()) return
-    val frames = times.map { scene.frameAt(it) }.distinct()
+private fun DrawScope.drawKeyframes(frames: List<Int>, scene: Scene, selected: Boolean, frame: Int, time: TimeScale, left: Float, right: Float, centre: Float, outline: Path, appear: Float = 1f, held: Int? = null) {
+    if (frames.isEmpty()) return
     val grabbed = held?.let { h -> frames.minByOrNull { abs(it - h) } }
     clipRect(left = max(left, 0f), right = min(right, size.width)) {
         for (keyFrame in frames) {

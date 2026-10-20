@@ -136,7 +136,7 @@ class UiContracts(unittest.TestCase):
 
     def test_camera_view_refreshes_selection_quad(self):
         text = source('ui/editor/Preview.kt')
-        self.assertIn('LaunchedEffect(state.selectedId, scene, state.frame, mediaRevision, state.cameraMode)', text)
+        self.assertIn('LaunchedEffect(state.selectedId, scene, mediaRevision, state.cameraMode) {\n        snapshotFlow { state.timeMs }.collectLatest', text)
 
     def test_curve_menu_and_both_paste_paths_share_compatibility_rules(self):
         text = source('editor/EditorActions.kt')
