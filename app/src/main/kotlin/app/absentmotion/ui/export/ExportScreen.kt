@@ -68,6 +68,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -202,6 +203,13 @@ fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromProjectList
     var kind by remember { mutableStateOf(ExportKind.Video) }
     val prefs = remember { ExportPrefs(context) }
     val settings = remember { mutableStateMapOf<ExportKind, ExportSettings>().apply { ExportKind.entries.forEach { put(it, prefs.load(it, scene)) } } }
+    LaunchedEffect(settings) {
+        var last = settings.toMap()
+        snapshotFlow { settings.toMap() }.collect { now ->
+            now.forEach { (k, v) -> if (last[k] != v) prefs.save(k, v) }
+            last = now
+        }
+    }
     var page by remember { mutableStateOf<ExportKind?>(null) }
     var lastPage by remember { mutableStateOf(ExportKind.Gif) }
     var audioPage by remember { mutableStateOf(false) }
