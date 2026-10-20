@@ -134,11 +134,14 @@ private fun backUp(context: Context, task: BackupTask): List<UiText> {
     val needed = Backup.files(root, includeMedia = true, ai).sumOf { it.second.length() }
     if (needed + (50L shl 20) > freeSpace()) return listOf(txt(R.string.backup_no_space, formatBytes(needed)))
     val name = "AbsentMotion-backup-${stamp()}.${Backup.EXTENSION}"
-    MediaStoreExport(context).save(null, name, "application/octet-stream") { out ->
+    val uri = MediaStoreExport(context).save(null, name, "application/octet-stream") { out ->
         Backup.write(root, out, includeMedia = true, ai) { done, total -> task.report(done.toFloat() / total) }
     }
     task.report(1f)
-    return listOf(txt(R.string.backup_saved, name))
+    val written = runCatching {
+        context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { if (it.moveToFirst()) it.getString(0) else null }
+    }.getOrNull() ?: name
+    return listOf(txt(R.string.backup_saved, written))
 }
 
 private fun restoreBackup(context: Context, uri: Uri, task: BackupTask): List<UiText> {
