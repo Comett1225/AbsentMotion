@@ -9,6 +9,7 @@ import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
 import app.absentmotion.model.formatFloats
 import app.absentmotion.model.keyframes
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -151,6 +152,23 @@ class MotionTrackTest {
         assertNull(outcome.lostAt)
         assertEquals(frames, outcome.steps.map { it.frame })
         outcome.steps.forEach { near(Pt(60f + 2 * it.frame, 40f + 2 * it.frame), it.points.single()) }
+    }
+
+    @Test fun framesTrackedBeforeACancelAreKept() = runBlocking {
+        val frames = (0 until 8).toList()
+        val pts = frames.map { it * 1000L }
+        val lumas = frames.associate { it * 1000L to frame(it, it) }
+        val found = HashMap<Long, List<Pt>>()
+        try {
+            trackFrames(frames, pts, pts.toLongArray(), listOf(Pt(60f, 40f)), 128, 96,
+                read = { batch, deliver -> batch.forEach { deliver(it, lumas.getValue(it)) } }, tracker = { BlockMatcher(it) }, found = found,
+            ) { step, _ -> if (step.frame == 3) throw CancellationException() }
+        } catch (_: CancellationException) {
+        }
+        val kept = trackedSteps(frames, pts, found)
+        assertEquals(listOf(0, 1, 2, 3), kept.steps.map { it.frame })
+        assertEquals(4, kept.lostAt)
+        kept.steps.forEach { near(Pt(60f + 2 * it.frame, 40f + 2 * it.frame), it.points.single()) }
     }
 
     @Test fun trackingStopsAtTheFirstLostFrame() = runBlocking {

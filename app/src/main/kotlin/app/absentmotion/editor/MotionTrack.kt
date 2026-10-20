@@ -170,12 +170,12 @@ internal suspend fun trackFrames(
     frames: List<Int>, pts: List<Long>, stamps: LongArray, start: List<Pt>, mediaWidth: Int, mediaHeight: Int,
     read: suspend (List<Long>, suspend (Long, LumaFrame) -> Unit) -> Unit,
     tracker: (List<Pt>) -> PointTracker,
+    found: MutableMap<Long, List<Pt>> = HashMap(),
     progress: suspend (TrackStep, Float) -> Unit = { _, _ -> },
 ): TrackOutcome {
     val order = sourceOrder(pts, stamps)
     val firstFrame = HashMap<Long, Int>()
     frames.indices.forEach { firstFrame.putIfAbsent(pts[it], frames[it]) }
-    val found = HashMap<Long, List<Pt>>()
     var lostPoints = start
     var active: PointTracker? = null
     try {
@@ -197,6 +197,10 @@ internal suspend fun trackFrames(
     } finally {
         active?.close()
     }
+    return trackedSteps(frames, pts, found, lostPoints)
+}
+
+internal fun trackedSteps(frames: List<Int>, pts: List<Long>, found: Map<Long, List<Pt>>, lostPoints: List<Pt> = emptyList()): TrackOutcome {
     val steps = ArrayList<TrackStep>()
     for (i in frames.indices) {
         val points = found[pts[i]] ?: return TrackOutcome(steps, frames[i], lostPoints)
