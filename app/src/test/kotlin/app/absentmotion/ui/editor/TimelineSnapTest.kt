@@ -47,4 +47,13 @@ class TimelineSnapTest {
         val all = TimelineMath.snapTargets(scene, skip = 0, playhead = 12)
         assertEquals(setOf(12, 75, 30, 60, 45, 0, 90, 27), all)
     }
+
+    @Test fun edgesOffTheFrameGridSnapToTheFramesWhereTheClipAppearsAndDisappears() {
+        val clip = XmlNode("shape", mapOf("id" to "2", "startTime" to "3482", "endTime" to "3981"))
+        val scene = Scene.create("t", 1080, 1080, 60, 0).let { Scene(it.node.copy(children = it.node.children + clip)) }
+        val targets = TimelineMath.snapTargets(scene, skip = 1, playhead = 0)
+        assertEquals(setOf(0, 209, 239), targets)
+        assertEquals(scene.firstShownFrame(3482), 209)
+        assertEquals(scene.lastShownFrame(3981), 238)
+    }
 }

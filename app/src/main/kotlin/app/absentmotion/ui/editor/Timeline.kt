@@ -316,11 +316,11 @@ internal object TimelineMath {
 
     fun snapTargets(scene: Scene, skip: Long, playhead: Int): Set<Int> = buildSet {
         add(playhead)
-        scene.bookmarks.forEach { add(scene.frameAt(it)) }
+        scene.bookmarks.forEach { add(scene.firstShownFrame(it)) }
         for (layer in scene.layers) if (layer.id != skip) {
-            add(scene.frameAt(layer.startTime))
-            add(scene.frameAt(layer.endTime + 1))
-            layer.keyframeTimes().forEach { add(scene.frameAt(it)) }
+            add(scene.firstShownFrame(layer.startTime))
+            add(scene.lastShownFrame(layer.endTime) + 1)
+            layer.keyframeTimes().forEach { add(scene.firstShownFrame(it)) }
         }
     }
 }
