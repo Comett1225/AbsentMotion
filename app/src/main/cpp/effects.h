@@ -31,8 +31,8 @@ private:
     const Definition* find(const std::string& id) const;
     int liftAt(const Layer& layer) const;
     bool needs(const Layer& layer, bool Definition::*input) const;
-    sk_sp<SkImageFilter> chain(const Scene& scene, const Layer& layer, double timeMs, const SkRect& area, const SkMatrix& placed,
-                               sk_sp<SkImageFilter> content, sk_sp<SkImageFilter> below) const;
+    sk_sp<SkImageFilter> chain(const Scene& scene, const Layer& layer, double timeMs, const SkRect& area, const SkRect& seen,
+                               const SkMatrix& placed, sk_sp<SkImageFilter> content, sk_sp<SkImageFilter> below) const;
     std::map<std::string, Definition> fDefinitions;
 };
 
