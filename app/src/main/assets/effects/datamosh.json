@@ -3,7 +3,7 @@
  "name": "Datamosh",
  "category": "stylize",
  "since": "3.0.0",
- "description": "From the start time the picture stops refreshing and is dragged around by the motion that follows, as if a key frame were missing. Video layers are smeared by their real motion, other layers by moving blocks.",
+ "description": "Between the start and end times, in seconds from the beginning of the layer, the picture stops refreshing and is dragged around by the motion that follows, as if a key frame were missing. Video layers are smeared by their real motion, other layers by moving blocks.",
  "params": [
   {
    "id": "start",
@@ -12,16 +12,21 @@
    "default": 0,
    "min": 0,
    "max": 3600,
-   "step": 0.01
+   "step": 0.01,
+   "unit": "s",
+   "layerTime": true
   },
   {
-   "id": "duration",
-   "label": "Length",
+   "id": "end",
+   "label": "End",
    "type": "float",
    "default": 2,
-   "min": 0.04,
-   "max": 10,
-   "step": 0.01
+   "min": 0,
+   "max": 3600,
+   "step": 0.01,
+   "unit": "s",
+   "layerTime": true,
+   "after": "start"
   },
   {
    "id": "intensity",
@@ -73,5 +78,5 @@
    "percent": true
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float start;\nuniform float duration;\nuniform float intensity;\nuniform float block;\nuniform float decay;\nuniform float glitch;\nuniform float bloom;\n\nfloat hash(float2 p) { return fract(sin(dot(p, float2(127.1, 311.7))) * 43758.5453); }\n\nhalf4 main(float2 xy) {\n    half4 plain = image.eval(xy);\n    float into = time - start;\n    if (into < 0.0 || into >= duration) { return plain; }\n    float steps = floor(into * 15.0) + 1.0;\n    float b = max(block, 2.0);\n    float2 cell = floor(xy / b);\n    float2 region = floor(cell / 4.0);\n    float2 dir = float2(hash(region + 3.7), hash(region + 9.1)) * 2.0 - 1.0;\n    dir += (float2(hash(cell + 1.1), hash(cell + 2.2)) - 0.5) * 0.6;\n    float moving = step(0.3, hash(region + 5.5));\n    float keep = pow(1.0 - clamp(decay, 0.0, 1.0), steps);\n    float grow = steps * (1.0 + bloom * steps * 0.05);\n    float2 shift = dir * moving * intensity * b * 0.15 * grow * keep;\n    float2 lo = float2(0.5);\n    float2 hi = max(size - 0.5, lo);\n    half4 moved = image.eval(clamp(xy - shift, lo, hi));\n    half4 trail = (image.eval(clamp(xy - shift * 0.66, lo, hi)) + image.eval(clamp(xy - shift * 0.33, lo, hi))) * 0.5;\n    half4 c = mix(moved, trail, 0.35);\n    float g = hash(cell + float2(steps * 7.13, steps * 3.71));\n    if (g < glitch * 0.3) {\n        half4 r = image.eval(clamp(xy - shift + float2(b * 0.5, 0.0), lo, hi));\n        c = half4(min(r.r, max(c.a, r.a)), c.g, c.b * 0.8, max(c.a, r.a));\n    }\n    return c;\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float start;\nuniform float end;\nuniform float duration;\nuniform float intensity;\nuniform float block;\nuniform float decay;\nuniform float glitch;\nuniform float bloom;\n\nfloat hash(float2 p) { return fract(sin(dot(p, float2(127.1, 311.7))) * 43758.5453); }\n\nhalf4 main(float2 xy) {\n    half4 plain = image.eval(xy);\n    float from = clamp(start, 0.0, duration);\n    float into = time - from;\n    if (into < 0.0 || time >= clamp(end, from, duration) || plain.a <= 0.0) { return plain; }\n    if (xy.x < 0.0 || xy.y < 0.0 || xy.x > size.x || xy.y > size.y) { return plain; }\n    float steps = floor(into * 15.0) + 1.0;\n    float b = max(block, 2.0);\n    float2 cell = floor(xy / b);\n    float2 region = floor(cell / 4.0);\n    float2 dir = float2(hash(region + 3.7), hash(region + 9.1)) * 2.0 - 1.0;\n    dir += (float2(hash(cell + 1.1), hash(cell + 2.2)) - 0.5) * 0.6;\n    float moving = step(0.3, hash(region + 5.5));\n    float keep = pow(1.0 - clamp(decay, 0.0, 1.0), steps);\n    float grow = steps * (1.0 + bloom * steps * 0.05);\n    float2 shift = dir * moving * intensity * b * 0.15 * grow * keep;\n    float2 lo = float2(0.5);\n    float2 hi = max(size - 0.5, lo);\n    half4 moved = image.eval(clamp(xy - shift, lo, hi));\n    half4 trail = (image.eval(clamp(xy - shift * 0.66, lo, hi)) + image.eval(clamp(xy - shift * 0.33, lo, hi))) * 0.5;\n    half4 c = mix(moved, trail, 0.35);\n    float g = hash(cell + float2(steps * 7.13, steps * 3.71));\n    if (g < glitch * 0.3) {\n        half4 r = image.eval(clamp(xy - shift + float2(b * 0.5, 0.0), lo, hi));\n        c = half4(min(r.r, max(c.a, r.a)), c.g, c.b * 0.8, max(c.a, r.a));\n    }\n    half a = min(plain.a, c.a);\n    return half4(unpremul(c).rgb * a, a);\n}\n"
 }

@@ -849,7 +849,7 @@
    }
   },
   "datamosh": {
-   "description": "Sejak waktu mulai, gambar berhenti diperbarui dan terseret oleh gerakan setelahnya, seolah ada keyframe yang hilang. Lapisan video digeser oleh gerakan aslinya, lapisan lain oleh blok yang bergerak.",
+   "description": "Antara waktu mulai dan akhir, dalam detik dari awal lapisan, gambar berhenti diperbarui dan terseret oleh gerakan sesudahnya, seolah ada keyframe yang hilang. Lapisan video dilelehkan oleh gerakan aslinya, lapisan lain oleh blok yang bergerak.",
    "name": "Datamosh",
    "params": {
     "block": {
@@ -861,8 +861,8 @@
     "decay": {
      "label": "Peluruhan"
     },
-    "duration": {
-     "label": "Durasi"
+    "end": {
+     "label": "Akhir"
     },
     "glitch": {
      "label": "Glitch"

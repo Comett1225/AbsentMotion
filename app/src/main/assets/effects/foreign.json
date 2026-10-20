@@ -985,6 +985,15 @@
    }
   }
  },
+ "absent.datamosh": {
+  "to": "datamosh",
+  "params": {
+   "duration": {
+    "to": "end",
+    "plus": "start"
+   }
+  }
+ },
  "com.alightcreative.effects.checkerdissolve2": {
   "to": "blockdissolve",
   "params": {

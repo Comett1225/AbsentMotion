@@ -849,7 +849,7 @@
    }
   },
   "datamosh": {
-   "description": "Mula sa oras ng simula, tumitigil sa pag-refresh ang larawan at hinihila ito ng kasunod na galaw, na parang may kulang na key frame. Ang mga video layer ay nababahiran ng totoong galaw nila, ang iba naman ay ng gumagalaw na block.",
+   "description": "Sa pagitan ng simula at pagtatapos, sa mga segundong mula sa simula ng layer, humihinto ang pag-refresh ng larawan at hinihila ito ng kasunod na galaw, na parang may kulang na keyframe. Ang mga video layer ay nababahiran ng totoong galaw nila, ang ibang layer naman ay ng gumagalaw na bloke.",
    "name": "Datamosh",
    "params": {
     "block": {
@@ -861,8 +861,8 @@
     "decay": {
      "label": "Paghina"
     },
-    "duration": {
-     "label": "Haba"
+    "end": {
+     "label": "Pagtatapos"
     },
     "glitch": {
      "label": "Glitch"
