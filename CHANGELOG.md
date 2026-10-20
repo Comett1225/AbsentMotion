@@ -59,6 +59,7 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 - Back left the app while the Home menu or search was open; the trim and split buttons jumped as the playhead moved; SVG
   files showed as black tiles; icon-only buttons had no TalkBack names; new media did not appear until the app was
   reopened.
+- An imported project showed a blank thumbnail until it was opened once.
 
 ## [2.5.2] - 2026-10-20
 
