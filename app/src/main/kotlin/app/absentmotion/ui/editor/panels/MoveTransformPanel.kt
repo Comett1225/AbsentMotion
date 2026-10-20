@@ -289,6 +289,15 @@ private fun SizeTab(state: EditorState, layer: Layer) {
         val first = isWidth != quarter
         l.withTransform("scale", if (first || linked) s[0] * factor else s[0], if (!first || linked) s[1] * factor else s[1])
     }
+    val drag = remember { floatArrayOf(1f, 1f, 0f) }
+    fun resize(isWidth: Boolean, key: Any) = state.editSelected(key) { l ->
+        val quarter = abs(abs(l.rotation % 180f) - 90f) < 0.01f
+        val first = isWidth != quarter
+        val ref = if (linked) maxOf(abs(drag[0]), abs(drag[1])) else abs(drag[if (first) 0 else 1])
+        val factor = RulerMath.scale(ref, drag[2]) / ref.coerceAtLeast(1e-4f)
+        val s = l.scale
+        l.withTransform("scale", if (first || linked) drag[0] * factor else s[0], if (!first || linked) drag[1] * factor else s[1])
+    }
     fun openKeypad(isWidth: Boolean) {
         active = if (isWidth) 0 else 1
         if (box == null) return
@@ -322,21 +331,24 @@ private fun SizeTab(state: EditorState, layer: Layer) {
             key(linked, which) {
                 RulerSpinner(
                     colour(which),
-                    onDrag = { dx -> stretch((1f + SIZE_PER_DP * dx).coerceAtLeast(0.05f), which == 0, "size-$which") },
+                    onDrag = { dx -> drag[2] += dx; resize(which == 0, "size-$which") },
                     onEnd = { state.endGesture() },
                     modifier = when {
                         linked -> Modifier.padding(top = 160.px).fillMaxWidth().height(378.px)
                         which == 0 -> Modifier.padding(top = 137.px).fillMaxWidth().height(194.px)
                         else -> Modifier.padding(top = 345.px).fillMaxWidth().height(193.px)
                     },
-                    onStart = { active = which },
+                    onStart = {
+                        active = which
+                        state.selected?.scale?.let { drag[0] = it[0]; drag[1] = it[1] }
+                        drag[2] = 0f
+                    },
+                    fling = false,
                 )
             }
         }
     }
 }
-
-private const val SIZE_PER_DP = 0.005f
 
 @Composable
 private fun SkewTab(state: EditorState, layer: Layer) {

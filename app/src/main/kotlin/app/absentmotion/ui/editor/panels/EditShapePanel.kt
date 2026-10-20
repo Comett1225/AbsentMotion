@@ -50,7 +50,6 @@ import app.absentmotion.model.ShapeParam
 import app.absentmotion.model.ShapeParam.Kind
 import app.absentmotion.model.formatFloats
 import app.absentmotion.ui.theme.Am
-import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.math.roundToInt
 
@@ -84,6 +83,8 @@ private class ShapeEdit(val state: EditorState, val layer: Layer, val param: Sha
         v[box] = f(v[box])
         l.withProp(param.prop, param.kind.type, formatFloats(v))
     }
+
+    fun live(box: Int): Float = (state.selected?.let { numbers(it, param) } ?: values).getOrElse(box) { 0f }
 
     fun show(v: Float) = formatFixed(v, param.decimals) + if (param.kind == Kind.Angle) "º" else ""
 
@@ -136,12 +137,13 @@ private fun NumberRow(edit: ShapeEdit, active: Boolean, onActivate: () -> Unit) 
     Row(Modifier.fillMaxWidth().height(160.px)) {
         Spacer(Modifier.width(8.px))
         LabelTile(edit, active, RowTop, onActivate)
+        val drag = remember { floatArrayOf(0f, 0f) }
         RulerSpinner(
             PanelGreen,
-            onDrag = { dx -> edit.change(0) { step(param.kind, it, dx, param.decimals) } },
+            onDrag = { dx -> drag[1] += dx; edit.change(0) { step(param.kind, drag[0], drag[1], param.decimals) } },
             onEnd = { edit.state.endGesture() },
             modifier = Modifier.weight(1f).height(158.px),
-            onStart = onActivate,
+            onStart = { onActivate(); drag[0] = edit.live(0); drag[1] = 0f },
             tickSpacing = 5.33.dp,
         )
         Spacer(Modifier.width(3.px))
@@ -160,12 +162,13 @@ private fun PairRow(edit: ShapeEdit, active: Boolean, onActivate: () -> Unit) {
     Row(Modifier.fillMaxWidth().height(160.px)) {
         Spacer(Modifier.width(8.px))
         LabelTile(edit, active, RowTop, onActivate)
+        val drag = remember { floatArrayOf(0f, 0f) }
         RulerSpinner(
             PanelGreen,
-            onDrag = { dx -> edit.change(box) { step(param.kind, it, dx, param.decimals) } },
+            onDrag = { dx -> drag[1] += dx; edit.change(box) { step(param.kind, drag[0], drag[1], param.decimals) } },
             onEnd = { edit.state.endGesture() },
             modifier = Modifier.weight(1f).height(158.px),
-            onStart = onActivate,
+            onStart = { onActivate(); drag[0] = edit.live(box); drag[1] = 0f },
             tickSpacing = 5.33.dp,
         )
         Column(Modifier.width(37.px).padding(top = 19.px), Arrangement.spacedBy(6.px)) {
@@ -281,10 +284,10 @@ private fun ToggleRow(edit: ShapeEdit) {
     }
 }
 
-private fun step(kind: Kind, value: Float, dx: Float, decimals: Int): Float = when (kind) {
-    Kind.Point -> value + dx
-    Kind.Angle -> value + dx * 0.5f
-    else -> value + dx * maxOf(0.5f * 10f.pow(-decimals), abs(value) * 0.005f)
+internal fun step(kind: Kind, base: Float, travel: Float, decimals: Int): Float = when (kind) {
+    Kind.Point -> base + travel
+    Kind.Angle -> base + travel * 0.5f
+    else -> RulerMath.value(base, travel, 0.5f * 10f.pow(-decimals))
 }
 
 private fun numbers(layer: Layer, param: ShapeParam): FloatArray {

@@ -46,7 +46,10 @@ import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.animatedColor
 import java.util.Locale
 import kotlin.math.abs
+import kotlin.math.exp
 import kotlin.math.floor
+import kotlin.math.ln
+import kotlin.math.max
 
 internal val Int.px: Dp get() = (this / 2.8125f).dp
 internal val Float.px: Dp get() = (this / 2.8125f).dp
@@ -93,6 +96,19 @@ internal fun Caption(text: String, modifier: Modifier = Modifier) {
     }
 }
 
+internal object RulerMath {
+    private val K = ln(1.25f) / 100f
+    private const val MIN_SCALE = 1e-4f
+
+    fun scale(base: Float, travel: Float): Float {
+        val from = max(base, MIN_SCALE)
+        val at = (if (from <= 1f) ln(from) else from - 1f) / K + travel
+        return if (at <= 0f) exp(K * at) else 1f + K * at
+    }
+
+    fun value(base: Float, travel: Float, minStep: Float): Float = base + travel * max(minStep, abs(base) * K)
+}
+
 @Composable
 internal fun RulerSpinner(
     lineColor: Color,
@@ -102,6 +118,7 @@ internal fun RulerSpinner(
     onStart: () -> Unit = {},
     tickSpacing: Dp = 5.dp,
     tickInset: Dp = 8.5.dp,
+    fling: Boolean = true,
 ) {
     val wheelDensity = androidx.compose.ui.platform.LocalDensity.current.density
     var shift by remember { mutableFloatStateOf(0f) }
@@ -133,7 +150,7 @@ internal fun RulerSpinner(
                         dragging(dx / density)
                     }
                     val v = tracker.calculateVelocity().x.coerceIn(-viewConfiguration.maximumFlingVelocity, viewConfiguration.maximumFlingVelocity)
-                    if (abs(v) > viewConfiguration.minimumFlingVelocity) {
+                    if (fling && abs(v) > viewConfiguration.minimumFlingVelocity) {
                         var glide: Job? = null
                         glide = scope.launch {
                             var last = 0f
