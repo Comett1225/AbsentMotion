@@ -18,7 +18,7 @@ constexpr double kTau = 6.283185307179586;
 
 const char* const kMotionIds[] = {"absent.autoshake", "absent.randomdisplace", "absent.randomjitter", "absent.oscillate",
                                   "absent.swing", "absent.spin", "absent.pulsesize", "absent.pulseopacity",
-                                  "absent.stretchaxis", "absent.echo", "absent.timequant", "absent.shutterblur"};
+                                  "absent.echo", "absent.timequant", "absent.shutterblur"};
 
 bool gFastShutter = false;
 
@@ -29,9 +29,9 @@ const Anim* Find(const LayerEffect& e, const char* name) {
     return nullptr;
 }
 
-float Param(const LayerEffect& e, const char* name, float t, float fallback) {
+float Param(const LayerEffect& e, const char* name, float t, float fallback, int i = 0) {
     const Anim* a = Find(e, name);
-    return a ? a->get(0, t, fallback) : fallback;
+    return a ? a->get(i, t, fallback) : fallback;
 }
 
 double Integral(const LayerEffect& e, const char* name, const Layer& l, double seconds, float fallback) {
@@ -72,7 +72,9 @@ uint64_t SeedOf(const Layer& l, const LayerEffect& e, float t, uint64_t channel)
 
 double Unit(uint64_t seed, int64_t k) { return (Mix(seed ^ Mix((uint64_t)k)) >> 11) * (1.0 / 9007199254740992.0); }
 
-double Smooth(uint64_t seed, double x) { return std::clamp(SimplexNoise2(x, (seed >> 48) * 0.618034 + 0.5), -1.0, 1.0); }
+double Noise(double x, double y) { return std::clamp(SimplexNoise2(x, y), -1.0, 1.0); }
+
+double Plane(float seed, int channel) { return seed * 7.919 + channel * 101.37 + 0.5; }
 
 double Wave(double cycles, float kind) {
     const double f = cycles - std::floor(cycles);
@@ -370,46 +372,46 @@ bool MotionEffect(const std::string& id) {
 }
 
 void ApplyMotion(const Layer& l, double timeMs, Placement* p) {
+    if (l.placed) return;
     const float t = l.localTime(timeMs);
     const double s = Seconds(l, timeMs);
     for (const LayerEffect& e : l.effects) {
         if (e.hidden || e.id.compare(0, 7, "absent.") != 0) continue;
         const std::string_view id = std::string_view(e.id).substr(7);
-        if (id == "stretchaxis") {
-            const float angle = Param(e, "angle", t, 0), amount = std::max(Param(e, "amount", t, 1.5f), 0.0f);
-            SkMatrix m = SkMatrix::RotateDeg(-angle);
-            m.postScale(amount, 1);
-            m.postRotate(angle);
-            p->stretch.postConcat(m);
-            continue;
-        }
-        if (l.placed) continue;
         if (id == "autoshake") {
-            const double x = Integral(e, "frequency", l, s, 6);
-            const double magnitude = Param(e, "magnitude", t, 20);
-            p->location += SkVector{(float)(magnitude * Smooth(SeedOf(l, e, t, 1), x)), (float)(magnitude * Smooth(SeedOf(l, e, t, 2), x))};
-            p->rotation += (float)(Param(e, "rotation", t, 3) * Smooth(SeedOf(l, e, t, 3), x));
+            const double x = Integral(e, "frequency", l, s, 2) + Param(e, "evolution", t, 0);
+            const float seed = Param(e, "seed", t, 0), m = Param(e, "magnitude", t, 50), angle = Param(e, "angle", t, 45);
+            p->location += Toward(angle, m * Noise(x, Plane(seed, 0))) + Toward(angle + 90, m * Param(e, "slack", t, 0.25f) * Noise(x, Plane(seed, 1)));
+            p->z += (float)(Param(e, "zshake", t, 0) * Noise(x, Plane(seed, 2)));
         } else if (id == "randomdisplace") {
-            const double x = Integral(e, "speed", l, s, 1);
-            const double magnitude = Param(e, "magnitude", t, 50);
-            p->location += SkVector{(float)(magnitude * Smooth(SeedOf(l, e, t, 4), x)), (float)(magnitude * Smooth(SeedOf(l, e, t, 5), x))};
+            const float scatter = Param(e, "scatter", t, 0.5f) / 100, m = Param(e, "magnitude", t, 50);
+            const double x = Param(e, "evolution", t, 0) + scatter * p->location.fX;
+            const double y = Plane(Param(e, "seed", t, 0), 0) + scatter * p->location.fY;
+            p->location += SkVector{(float)(m * Noise(x, y)), (float)(m * Noise(x + 57.31, y + 23.17))};
         } else if (id == "randomjitter") {
-            const int64_t k = (int64_t)std::floor(Integral(e, "rate", l, s, 8));
-            const double side = (k & 1) ? -1 : 1;
-            const double amount = side * (0.35 + 0.65 * Unit(SeedOf(l, e, t, 6), k));
-            p->location += Toward(Param(e, "angle", t, 0), Param(e, "magnitude", t, 25) * amount);
+            const int64_t k = (int64_t)std::floor(Integral(e, "frequency", l, s, 30) + 1e-6);
+            const uint64_t seed = Mix((uint64_t)std::llround((double)Param(e, "seed", t, 0) * 1000) + 0x51ed27ull);
+            const float m = Param(e, "magnitude", t, 25), angle = Param(e, "angle", t, 45);
+            const double along = ((k & 1) ? -1 : 1) * (0.35 + 0.65 * Unit(seed, k));
+            p->location += Toward(angle, m * along) + Toward(angle + 90, m * Param(e, "slack", t, 0) * (2 * Unit(seed ^ 1, k) - 1));
+            p->z += (float)(Param(e, "zjitter", t, 0) * (2 * Unit(seed ^ 2, k) - 1));
         } else if (id == "oscillate") {
-            const double w = Wave(Integral(e, "frequency", l, s, 2) + Param(e, "phase", t, 0), Param(e, "wave", t, 0));
-            p->location += Toward(Param(e, "angle", t, 45), Param(e, "magnitude", t, 25) * w);
+            const double c = Integral(e, "frequency", l, s, 2) + Param(e, "phase", t, 0) / 2;
+            const float kind = Param(e, "wave", t, 0), m = Param(e, "magnitude", t, 25), angle = Param(e, "angle", t, 45);
+            const long direction = std::lround(Param(e, "direction", t, 0));
+            if (direction == 1) p->z += (float)(m * Wave(c, kind));
+            else if (direction == 2) p->location += Toward(angle, m * Wave(c + 0.25, kind)) + Toward(angle + 90, m * Wave(c, kind));
+            else p->location += Toward(angle, m * Wave(c, kind));
         } else if (id == "swing") {
-            const double w = Wave(Integral(e, "frequency", l, s, 1) + Param(e, "phase", t, 0), Param(e, "wave", t, 0));
-            p->rotation += (float)(Param(e, "angle", t, 15) * w);
+            const double w = Wave(Integral(e, "frequency", l, s, 2) + Param(e, "phase", t, 0) / 2, Param(e, "wave", t, 0));
+            const float a1 = Param(e, "angle1", t, -30), a2 = Param(e, "angle2", t, 30);
+            p->rotation += (float)((a1 + a2) / 2 + (a2 - a1) / 2 * w);
         } else if (id == "spin") {
-            const double turned = Integral(e, "speed", l, s, 90);
-            p->rotation += (float)std::fmod(Param(e, "direction", t, 0) >= 0.5f ? -turned : turned, 360.0);
+            p->rotation += (float)std::fmod(6 * Integral(e, "rpm", l, s, 60), 360.0);
         } else if (id == "pulsesize") {
-            const double w = Wave(Integral(e, "frequency", l, s, 1) + Param(e, "phase", t, 0), Param(e, "wave", t, 0));
-            const float k = (float)std::max(0.0, 1 + Param(e, "amount", t, 0.2f) * w);
+            const double w = Wave(Integral(e, "frequency", l, s, 2) + Param(e, "phase", t, 0) / 2, Param(e, "wave", t, 0));
+            const float lo = Param(e, "shrink", t, 0.9f), hi = Param(e, "grow", t, 1.1f);
+            const float k = (float)std::max(0.0, (lo + hi) / 2 + (hi - lo) / 2 * w);
             p->scale = {p->scale.fX * k, p->scale.fY * k};
         }
     }

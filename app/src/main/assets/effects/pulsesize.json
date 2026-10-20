@@ -4,24 +4,43 @@
  "category": "move",
  "since": "3.0.0",
  "native": true,
- "description": "Makes the layer grow and shrink over and over.",
+ "description": "Grows and shrinks the layer over and over, on a sine or triangle wave.",
  "params": [
-  {
-   "id": "amount",
-   "label": "Amount",
-   "type": "float",
-   "default": 0.2,
-   "min": 0,
-   "max": 10,
-   "step": 0.01
-  },
   {
    "id": "frequency",
    "label": "Frequency",
    "type": "float",
-   "default": 1,
+   "default": 2,
    "min": 0,
    "max": 16,
+   "step": 0.01,
+   "unit": "Hz"
+  },
+  {
+   "id": "shrink",
+   "label": "Shrink",
+   "type": "float",
+   "default": 0.9,
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  },
+  {
+   "id": "grow",
+   "label": "Grow",
+   "type": "float",
+   "default": 1.1,
+   "min": 1,
+   "max": 2,
+   "step": 0.01
+  },
+  {
+   "id": "phase",
+   "label": "Starting Phase",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 2,
    "step": 0.01
   },
   {
@@ -33,15 +52,6 @@
     "Sine",
     "Triangle"
    ]
-  },
-  {
-   "id": "phase",
-   "label": "Phase",
-   "type": "float",
-   "default": 0,
-   "min": 0,
-   "max": 1000,
-   "step": 0.01
   }
  ]
 }

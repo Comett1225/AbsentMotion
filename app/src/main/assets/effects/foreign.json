@@ -562,5 +562,99 @@
     "max": 1
    }
   }
+ },
+ "absent.autoshake": {
+  "to": "autoshake",
+  "params": {
+   "rotation": {}
+  }
+ },
+ "absent.randomdisplace": {
+  "to": "randomdisplace",
+  "params": {
+   "speed": {}
+  }
+ },
+ "absent.randomjitter": {
+  "to": "randomjitter",
+  "params": {
+   "rate": {
+    "to": "frequency",
+    "min": 1,
+    "max": 60
+   }
+  }
+ },
+ "absent.swing": {
+  "to": "swing",
+  "params": {
+   "angle": [
+    {
+     "to": "angle1",
+     "scale": -1,
+     "component": 0
+    },
+    {
+     "to": "angle2",
+     "component": 0
+    }
+   ],
+   "phase": {
+    "to": "phase",
+    "scale": 2,
+    "min": 0,
+    "max": 2
+   }
+  }
+ },
+ "absent.spin": {
+  "to": "spin",
+  "params": {
+   "speed": {
+    "to": "rpm",
+    "scale": 0.16666667
+   },
+   "direction": {
+    "neutral": 0
+   }
+  }
+ },
+ "absent.pulsesize": {
+  "to": "pulsesize",
+  "params": {
+   "amount": [
+    {
+     "to": "shrink",
+     "scale": -1,
+     "offset": 1,
+     "min": 0,
+     "max": 1,
+     "component": 0
+    },
+    {
+     "to": "grow",
+     "offset": 1,
+     "min": 1,
+     "max": 2,
+     "component": 0
+    }
+   ],
+   "phase": {
+    "to": "phase",
+    "scale": 2,
+    "min": 0,
+    "max": 2
+   }
+  }
+ },
+ "absent.stretchaxis": {
+  "to": "stretchaxis",
+  "params": {
+   "amount": {
+    "to": "scale",
+    "min": 0.01,
+    "max": 50
+   }
+  }
  }
 }

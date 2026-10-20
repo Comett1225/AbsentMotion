@@ -158,7 +158,6 @@ struct Layer {
 struct Placement {
     SkPoint location, pivot, scale;
     float rotation, z;
-    SkMatrix stretch = SkMatrix::I();
     SkM44 tilt;
 };
 

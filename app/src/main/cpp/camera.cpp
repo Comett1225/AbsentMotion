@@ -75,8 +75,7 @@ Seen Look(const View& v, const Placement& p) {
 
 SkM44 Space(const View& v, const Placement& p) {
     const float r = 3.14159265f / 180, mx = v.middle.fX, my = v.middle.fY, f = v.focal;
-    const SkM44 world = SkM44::Translate(p.location.fX, p.location.fY, p.z) * SkM44(p.stretch) *
-                        SkM44::Rotate({0, 0, 1}, p.rotation * r) * p.tilt;
+    const SkM44 world = SkM44::Translate(p.location.fX, p.location.fY, p.z) * SkM44::Rotate({0, 0, 1}, p.rotation * r) * p.tilt;
     const SkM44 eye = SkM44::Rotate({0, 0, 1}, -v.rotation * r) * SkM44::Translate(-v.eye.fX, -v.eye.fY, -v.eyeZ);
     const float c = std::max(-v.eyeZ, kNearest);
     const SkM44 lens = v.orthographic ? SkM44(f, 0, 0, mx * c, 0, f, 0, my * c, 0, 0, 1, 0, 0, 0, 0, c)

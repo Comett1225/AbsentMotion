@@ -211,16 +211,12 @@ Placement Effective(const std::vector<Layer>& siblings, const Layer& l, double t
     if (p.tilt != SkM44()) own.tilt = Turn(-own.rotation) * p.tilt * Turn(own.rotation) * own.tilt;
     own.rotation += p.rotation;
     own.z = p.z + offset.z;
-    if (!own.stretch.isIdentity()) own.stretch = SkMatrix::RotateDeg(p.rotation) * own.stretch * SkMatrix::RotateDeg(-p.rotation);
     return own;
 }
 
 SkMatrix MatrixOf(const Placement& p, const Layer& l, float t) {
     SkMatrix m = l.projected ? l.space.asM33() : SkMatrix::Translate(p.location.fX, p.location.fY);
-    if (!l.projected) {
-        m.preConcat(p.stretch);
-        m.preRotate(p.rotation);
-    }
+    if (!l.projected) m.preRotate(p.rotation);
     m.preSkew(tanf(l.skew.get(0, t, 0)), tanf(l.skew.get(1, t, 0)));
     m.preScale(p.scale.fX, p.scale.fY);
     m.preTranslate(-p.pivot.fX, -p.pivot.fY);

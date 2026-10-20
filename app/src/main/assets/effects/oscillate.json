@@ -4,8 +4,19 @@
  "category": "move",
  "since": "3.0.0",
  "native": true,
- "description": "Moves the layer back and forth along an angle.",
+ "description": "Moves the layer back and forth along an angle, in depth or round in an orbit.",
  "params": [
+  {
+   "id": "direction",
+   "label": "Direction",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Angle",
+    "Depth",
+    "Orbit"
+   ]
+  },
   {
    "id": "angle",
    "label": "Angle",
@@ -22,7 +33,8 @@
    "default": 2,
    "min": 0,
    "max": 16,
-   "step": 0.01
+   "step": 0.01,
+   "unit": "Hz"
   },
   {
    "id": "magnitude",
@@ -31,7 +43,7 @@
    "default": 25,
    "min": 0,
    "max": 4000,
-   "step": 0.1
+   "step": 1
   },
   {
    "id": "wave",

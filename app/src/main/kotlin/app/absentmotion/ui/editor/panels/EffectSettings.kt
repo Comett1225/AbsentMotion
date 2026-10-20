@@ -83,7 +83,7 @@ internal fun EffectNumbers(state: EditorState, param: EffectParam, raw: String, 
         set(stored(changed), gesture)
     }
     val decimals = param.step.toBigDecimal().stripTrailingZeros().scale().coerceAtLeast(0).let { if (percent) (it - 2).coerceAtLeast(0) else it }
-    val unit = if (percent) "%" else if (param.kind == "angle") "°" else ""
+    val unit = if (percent) "%" else if (param.kind == "angle") "°" else param.unit
     fun keypad(index: Int) {
         state.keypad = KeypadRequest(values.mapIndexed { i, v -> KeypadField(if (count == 1) param.label else listOf("X", "Y")[i], v * factor) }, index) { next ->
             set(stored(next.map { v -> (v/factor).coerceIn(param.min, param.max) }), false)

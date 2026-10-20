@@ -105,15 +105,20 @@ def motion_cases():
     yield 'oscillate right', engine.scene(dot(fx('oscillate', angle=0, frequency=0.5, magnitude=50))), [((150, 100), red), ((100, 100), black)], 15
     yield 'oscillate down', engine.scene(dot(fx('oscillate', angle=90, frequency=0.5, magnitude=50))), [((100, 150), red), ((100, 100), black)], 15
     yield 'oscillate triangle at a quarter cycle', engine.scene(dot(fx('oscillate', angle=0, frequency=0.25, magnitude=60, wave=1))), [((130, 100), red), ((100, 100), black), ((160, 100), black)], 15
-    yield 'oscillate phase', engine.scene(dot(fx('oscillate', angle=0, frequency=0, magnitude=50, phase=0.75))), [((50, 100), red), ((100, 100), black)], 0
-    yield 'spin clockwise', engine.scene(dot(fx('spin', speed=90), 60, 8)), [((130, 130), red), ((130, 70), black), ((160, 100), black)], 15
-    yield 'spin counterclockwise', engine.scene(dot(fx('spin', speed=90, direction=1), 60, 8)), [((130, 70), red), ((130, 130), black)], 15
-    yield 'swing', engine.scene(dot(fx('swing', angle=45, frequency=0.5), 60, 8)), [((130, 130), red), ((160, 100), black)], 15
-    yield 'pulse size', engine.scene(dot(fx('pulsesize', amount=0.5, frequency=0.5), 40, 40)), [((155, 100), red), ((165, 100), black)], 15
+    yield 'oscillate phase', engine.scene(dot(fx('oscillate', angle=0, frequency=0, magnitude=50, phase=1.5))), [((50, 100), red), ((100, 100), black)], 0
+    yield 'spin clockwise', engine.scene(dot(fx('spin', rpm=15), 60, 8)), [((130, 130), red), ((130, 70), black), ((160, 100), black)], 15
+    yield 'spin counterclockwise', engine.scene(dot(fx('spin', rpm=-15), 60, 8)), [((130, 70), red), ((130, 130), black)], 15
+    yield 'swing', engine.scene(dot(fx('swing', angle1=-45, angle2=45, frequency=0.5), 60, 8)), [((130, 130), red), ((160, 100), black)], 15
+    yield 'pulse size', engine.scene(dot(fx('pulsesize', shrink=0.5, grow=1.5, frequency=0.5), 40, 40)), [((155, 100), red), ((165, 100), black)], 15
     yield 'pulse opacity starts opaque', engine.scene(dot(fx('pulseopacity', frequency=0.5), argb=0xffffffff)), [((100, 100), (255, 255, 255))], 0
     yield 'pulse opacity half way', engine.scene(dot(fx('pulseopacity', frequency=0.5), argb=0xffffffff)), [((100, 100), half)], 15
-    yield 'stretch axis', engine.scene(dot(fx('stretchaxis', angle=0, amount=2), 30, 30)), [((155, 100), red), ((100, 140), black)], 0
-    yield 'stretch axis upright', engine.scene(dot(fx('stretchaxis', angle=90, amount=2), 30, 30)), [((100, 155), red), ((155, 100), black)], 0
+    yield 'stretch axis', engine.scene(dot(fx('stretchaxis', angle=0, scale=2), 30, 30)), [((155, 100), red), ((100, 140), black)], 0
+    yield 'stretch axis upright', engine.scene(dot(fx('stretchaxis', angle=90, scale=2), 30, 30)), [((100, 155), red), ((155, 100), black)], 0
+    yield 'stretch axis masked to the layer', engine.scene(dot(fx('stretchaxis', angle=0, scale=2, mask=1), 30, 30)), [((115, 100), red), ((145, 100), black)], 0
+    yield 'oscillate orbit starts along the angle', engine.scene(dot(fx('oscillate', direction=2, angle=0, frequency=0.5, magnitude=50))), [((150, 100), red), ((100, 100), black)], 0
+    yield 'oscillate orbit turns clockwise', engine.scene(dot(fx('oscillate', direction=2, angle=0, frequency=0.5, magnitude=50))), [((100, 150), red), ((150, 100), black)], 15
+    yield 'swing phase 0.5 starts at angle 2', engine.scene(dot(fx('swing', angle1=0, angle2=90, frequency=0, phase=0.5), 60, 8)), [((100, 150), red), ((150, 100), black)], 0
+    yield 'pulse size phase 0.5 starts at grow', engine.scene(dot(fx('pulsesize', shrink=0.5, grow=1.5, frequency=0, phase=0.5), 40, 40)), [((155, 100), red), ((165, 100), black)], 0
     parent = '<nullobj id="5" label="n" startTime="0" endTime="1000">' + engine.transform('100,100,0') + fx('oscillate', angle=0, frequency=0.5, magnitude=50) + '</nullobj>'
     yield 'a child follows its moving parent', engine.scene(parent + engine.rect(1, 0, 0, 10, 10, 0xffff0000, attrs=' parent="5"')), [((150, 100), red), ((100, 100), black)], 15
     deep = ('<shape id="2" label="d" startTime="0" endTime="1000" fillType="color" s=".rect">' + engine.transform('20,20,60')
@@ -194,15 +199,23 @@ def main():
         good = ok(image)
         print(('ok   ' if good else 'FAIL ') + name + ('' if good else ': ' + str([tuple(int(v) for v in image[100, x]) for x in (85, 100, 114, 116, 121)])), flush=True)
         failed += not good
-    for effect, params in [('autoshake', {'magnitude': 40, 'rotation': 0}), ('randomdisplace', {'magnitude': 60}), ('randomjitter', {'angle': 90, 'magnitude': 40})]:
+    for effect, params in [('autoshake', {'magnitude': 40, 'slack': 0}), ('randomdisplace', {'magnitude': 60}), ('randomjitter', {'angle': 90, 'magnitude': 40})]:
         shots = [engine.still(f'{effect}{seed}{again}', engine.scene(engine.rect(1, 100, 100, 10, 10, 0xffff0000, extra=fx(effect, seed=seed, **params))), work, 10)
                  for seed, again in [(1, 'a'), (1, 'b'), (2, 'a')]]
         moved = [tuple(round(float(v), 1) for v in centre(shot)) for shot in shots]
         ok = np.array_equal(shots[0], shots[1]) and not np.array_equal(shots[0], shots[2]) and np.hypot(moved[0][0] - 99.5, moved[0][1] - 99.5) > 1.5
         if effect == 'randomjitter':
             ok = ok and abs(moved[0][0] - 99.5) < 1 and abs(moved[0][1] - 99.5) > 1
+        if effect == 'autoshake':
+            ok = ok and abs(moved[0][1] - moved[0][0]) < 1
         print(('ok   ' if ok else 'FAIL ') + effect + ' is steady for a seed and changes with it: ' + str(moved), flush=True)
         failed += not ok
+    still = [engine.still(f'displace{frame}', engine.scene(engine.rect(1, 100, 100, 10, 10, 0xffff0000, extra=fx('randomdisplace', magnitude=60, evolution=0.4))), work, frame) for frame in (3, 27)]
+    keyed = '<effect id="absent.randomdisplace"><property name="magnitude" type="float" value="60"/><property name="evolution" type="float"><kf t="0" v="0"/><kf t="1" v="3"/></property></effect>'
+    drift = [engine.still(f'drift{frame}', engine.scene(engine.rect(1, 100, 100, 10, 10, 0xffff0000, extra=keyed)), work, frame) for frame in (3, 27)]
+    ok = np.array_equal(still[0], still[1]) and not np.array_equal(drift[0], drift[1])
+    print(('ok   ' if ok else 'FAIL ') + 'random displacement holds still until Evolution changes', flush=True)
+    failed += not ok
     tape = engine.scene(engine.rect(1, 100, 100, 90, 90, 0xff3366cc, extra=fx('vhs')))
     shots = [engine.still(f'vhs{frame}{again}', tape, work, frame) for frame, again in [(10, 'a'), (10, 'b'), (20, 'a')]]
     ok = np.array_equal(shots[0], shots[1]) and not np.array_equal(shots[0], shots[2]) and np.abs(shots[0][100, 100] - (0x33, 0x66, 0xcc)).max() > 0
