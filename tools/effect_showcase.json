@@ -139,6 +139,11 @@
     "hexagontiling": {"photo": "colour", "layout": "move", "params": {"scale": 0.9}},
     "fractalwarp": {"photo": "portrait", "params": {"strength": 0.12}},
     "roughenedges": {"photo": "colour", "layout": "move", "params": {"blur": 30, "roughness": 1, "scale": 0.5}},
-    "innerbulge": {"photo": "portrait", "params": {"strength": 0.8}}
+    "innerbulge": {"photo": "portrait", "params": {"strength": 0.8}},
+    "innerglow": {"photo": "colour", "layout": "move", "params": {"blur": 40, "color": "#40e0ff", "intensity": 1.5}},
+    "edgeglow": {"photo": "portrait", "params": {"blend": 0.6}},
+    "darkglow": {"photo": "sunset", "params": {"blur": 40, "threshold": 0.35}, "split": 0.4},
+    "smoothbevel": {"photo": "colour", "layout": "move", "params": {"blur": 30, "depth": 4, "intensity": 1}},
+    "radialrays": {"photo": "portrait", "params": {"center": [0.5, 0.35], "count": 14, "alpha": 0.7}}
   }
 }

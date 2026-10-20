@@ -1,0 +1,54 @@
+{
+ "id": "darkglow",
+ "name": "Dark Glow",
+ "category": "color",
+ "since": "3.0.0",
+ "description": "Spreads the dark parts of the layer out over the bright ones, like a glow made of shadow.",
+ "params": [
+  {
+   "id": "blur",
+   "label": "Diffusion",
+   "type": "float",
+   "default": 40,
+   "min": 0,
+   "max": 300,
+   "step": 0.1
+  },
+  {
+   "id": "threshold",
+   "label": "Threshold",
+   "type": "float",
+   "default": 0.3,
+   "min": 0,
+   "max": 1,
+   "step": 0.001
+  },
+  {
+   "id": "color",
+   "label": "Color",
+   "type": "color",
+   "default": "#000000"
+  },
+  {
+   "id": "blend",
+   "label": "Blend",
+   "type": "float",
+   "default": 0.25,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "alpha",
+   "label": "Alpha",
+   "type": "float",
+   "default": 0.75,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform shader blurred;\nuniform float blur;\nuniform float threshold;\nlayout(color) uniform half4 color;\nuniform float blend;\nuniform float alpha;\nfloat luma(float3 c) { return dot(c, float3(0.2126, 0.7152, 0.0722)); }\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return src;\n    half4 b = blurred.eval(coord);\n    float lb = b.a > 0.0 ? luma(float3(b.rgb) / float(b.a)) : 1.0;\n    float dark = clamp((threshold - lb) / max(threshold, 0.001), 0.0, 1.0) * clamp(float(b.a), 0.0, 1.0);\n    float3 base = float3(src.rgb) / float(src.a);\n    float3 shade = mix(base * float3(color.rgb), float3(color.rgb), 1.0 - clamp(blend, 0.0, 1.0));\n    float3 rgb = mix(base, shade, dark * clamp(alpha, 0.0, 1.0));\n    return half4(half3(rgb) * src.a, src.a);\n}\n"
+}
