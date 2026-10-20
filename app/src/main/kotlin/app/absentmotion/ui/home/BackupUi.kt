@@ -157,8 +157,8 @@ private fun restoreBackup(context: Context, uri: Uri, task: BackupTask): List<Ui
     fun count(n: Int) = UiText.plural(R.plurals.backup_projects, n, n.toString())
     return listOfNotNull(
         txt(R.string.backup_restored, count(restored.added)),
-        restored.renamed.takeIf { it > 0 }?.let { txt(R.string.backup_restored_copies, count(it)) },
-        restored.skipped.takeIf { it > 0 }?.let { txt(R.string.backup_restored_skipped, count(it)) },
+        restored.renamed.takeIf { it > 0 }?.let { UiText.plural(R.plurals.backup_restored_copies, it, it.toString()) },
+        restored.skipped.takeIf { it > 0 }?.let { UiText.plural(R.plurals.backup_restored_skipped, it, it.toString()) },
     )
 }
 
