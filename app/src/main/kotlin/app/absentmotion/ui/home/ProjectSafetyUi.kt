@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -79,30 +80,45 @@ fun OpeningOverlay(onCancel: () -> Unit) {
 }
 
 @Composable
-fun VersionHistory(store: ProjectStore, id: String, title: String, engine: EngineThread, onRestore: (ProjectVersions.Version) -> Unit, onDismiss: () -> Unit) {
+fun VersionHistory(
+    store: ProjectStore, id: String, title: String, engine: EngineThread, onRestore: (ProjectVersions.Version) -> Unit,
+    onDelete: (() -> Unit)? = null, onDismiss: () -> Unit,
+) {
     val versions by produceState<List<ProjectVersions.Version>?>(null, id) { value = withContext(Dispatchers.IO) { store.versions.list(id) } }
     var chosen by remember { mutableStateOf<ProjectVersions.Version?>(null) }
+    var deleting by remember { mutableStateOf(false) }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
             Column {
-                Text(stringResource(R.string.version_history), color = Am.Navy)
+                Text(stringResource(if (onDelete != null) R.string.library_damaged_project else R.string.version_history), color = Am.Navy)
                 Text(title, color = Am.HomeMid, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
         },
         text = {
-            Box(Modifier.fillMaxWidth().height(360.dp)) {
-                val list = versions
-                if (list != null && list.isEmpty()) Text(
-                    stringResource(R.string.no_earlier_versions_yet_a_version),
-                    color = Am.Navy, fontSize = 15.sp,
+            val list = versions
+            Column(Modifier.fillMaxWidth()) {
+                if (onDelete != null && list != null) Text(
+                    stringResource(if (list.isEmpty()) R.string.damaged_explain_no_versions else R.string.damaged_explain_versions),
+                    Modifier.padding(bottom = 8.dp), color = Am.Navy, fontSize = 15.sp,
                 )
-                if (list != null) LazyColumn(Modifier.fillMaxSize()) {
+                if (list == null) Box(Modifier.fillMaxWidth().height(72.dp))
+                else if (list.isEmpty()) {
+                    if (onDelete == null) Text(stringResource(R.string.no_earlier_versions_yet_a_version), color = Am.Navy, fontSize = 15.sp)
+                } else LazyColumn(Modifier.fillMaxWidth().heightIn(max = 360.dp)) {
                     items(list, key = { it.time }) { version -> VersionRow(version, engine) { chosen = version } }
                 }
             }
         },
+        dismissButton = onDelete?.let { { TextButton({ deleting = true }) { Text(stringResource(R.string.delete), color = Am.Navy) } } },
         confirmButton = { TextButton(onDismiss) { Text(stringResource(R.string.action_close), color = Am.Navy) } },
+        containerColor = Am.Card,
+    )
+    if (deleting && onDelete != null) AlertDialog(
+        onDismissRequest = { deleting = false },
+        title = { Text(stringResource(R.string.home_delete_project_title), color = Am.Navy) },
+        dismissButton = { TextButton({ deleting = false }) { Text(stringResource(R.string.cancel), color = Am.Navy) } },
+        confirmButton = { TextButton({ deleting = false; onDelete() }) { Text(stringResource(R.string.delete), color = Am.Navy) } },
         containerColor = Am.Card,
     )
     chosen?.let { version ->

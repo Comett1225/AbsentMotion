@@ -107,7 +107,7 @@ class MainActivity : ComponentActivity() {
     private var openFailed by mutableStateOf<String?>(null)
     private var openJob: kotlinx.coroutines.Job? = null
     private var closeAnyway = false
-    private var historyFor by mutableStateOf<Pair<String, String>?>(null)
+    private var historyFor by mutableStateOf<Triple<String, String, Boolean>?>(null)
     private var projectsChanged by mutableIntStateOf(0)
     private lateinit var recovery: Recovery
     private var recovered by mutableStateOf<RecoveryOffer?>(null)
@@ -155,7 +155,7 @@ class MainActivity : ComponentActivity() {
                             store, settings, onOpen = ::open, onExport = ::exportFromList,
                             imported = imported, onImportShown = { imported = emptyList() }, onImportFile = { importUris(listOf(it)) },
                             onTemplate = { editingTemplate = it },
-                            onHistory = { historyFor = it.id to it.title }, onCollect = ::collectMedia, changes = projectsChanged,
+                            onHistory = { historyFor = Triple(it.id, it.title, it.damaged) }, onCollect = ::collectMedia, changes = projectsChanged,
                         )
                         editingTemplate?.let { id ->
                             TemplateEditor(id, engine, settings, onClose = { editingTemplate = null }) { scene ->
@@ -186,9 +186,11 @@ class MainActivity : ComponentActivity() {
                     }
                 }
                 if (opening) OpeningOverlay { openJob?.cancel() }
-                openFailed?.let { id -> OpenFailedDialog({ openFailed = null; historyFor = id to "" }) { openFailed = null } }
+                openFailed?.let { id -> OpenFailedDialog({ openFailed = null; historyFor = Triple(id, "", false) }) { openFailed = null } }
                 if (open?.historyOpen == true) VersionHistory(store, open.projectId, open.scene.title, engine, onRestore = { restoreVersion(open.projectId, it) }) { open.historyOpen = false }
-                historyFor?.let { (id, title) -> VersionHistory(store, id, title, engine, onRestore = { restoreVersion(id, it) }) { historyFor = null } }
+                historyFor?.let { (id, title, damaged) ->
+                    VersionHistory(store, id, title, engine, onRestore = { restoreVersion(id, it) }, onDelete = if (damaged) { { deleteDamaged(id) } } else null) { historyFor = null }
+                }
                 if (open == null && !opening) recovered?.let { offer -> RecoveryDialog(offer.title, onRestore = { answerRecovery(offer, true) }) { answerRecovery(offer, false) } }
             }
         }
@@ -333,6 +335,14 @@ class MainActivity : ComponentActivity() {
                 restore -> open(offer.id)
                 else -> recovered = withContext(DiskThread.dispatcher) { runCatching { recovery.pending(store) }.getOrNull() }
             }
+        }
+    }
+
+    private fun deleteDamaged(id: String) {
+        historyFor = null
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) { store.delete(id, getExternalFilesDir(null)?.resolve("ai")) }
+            projectsChanged++
         }
     }
 

@@ -93,6 +93,8 @@
     <string name="open_source_licences">Open source licences</string>
     <string name="stop">Stop</string>
     <string name="damaged_restore_a_version">Damaged — restore a version</string>
+    <string name="damaged_explain_versions">This project\'s file is damaged, so it cannot be opened. Restore one of the earlier versions below, or delete the project.</string>
+    <string name="damaged_explain_no_versions">This project\'s file is damaged, so it cannot be opened, and there is no earlier version to restore. You can delete it.</string>
     <string name="open">Open</string>
     <string name="import_complete">Import complete</string>
     <string name="choose_file">Choose file</string>
