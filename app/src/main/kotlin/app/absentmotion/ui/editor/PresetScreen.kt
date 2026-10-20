@@ -93,6 +93,7 @@ fun PresetScreen(state: EditorState) {
     val presets = loaded.orEmpty()
     var chosen by remember { mutableStateOf<String?>(null) }
     var renaming by remember { mutableStateOf<SavedPreset?>(null) }
+    var deleting by remember { mutableStateOf<SavedPreset?>(null) }
     var menuFor by remember { mutableStateOf<String?>(null) }
     var playing by remember { mutableStateOf(false) }
     var pos by remember { mutableIntStateOf(0) }
@@ -191,12 +192,7 @@ fun PresetScreen(state: EditorState) {
                         Presence(menuFor == preset.id) {
                             MenuPopup(DropOrRise, { menuFor = null }) {
                                 MenuRow(stringResource(R.string.rename)) { menuFor = null; renaming = preset }
-                                MenuRow(stringResource(R.string.delete)) {
-                                    menuFor = null
-                                    scope.launch { withContext(Dispatchers.IO) { store.delete(preset.id) }; rev++ }
-                                    if (chosen == preset.id) { chosen = null; pos = pos.coerceAtMost((base.endTime - base.startTime).coerceAtLeast(1)) }
-                                    Toast.makeText(context, context.getString(R.string.preset_deleted), Toast.LENGTH_SHORT).show()
-                                }
+                                MenuRow(stringResource(R.string.delete)) { menuFor = null; deleting = preset }
                             }
                         }
                     }
@@ -212,6 +208,21 @@ fun PresetScreen(state: EditorState) {
             }
             renaming = null
         }, onDismiss = { renaming = null })
+    }
+    deleting?.let { preset ->
+        AlertDialog(
+            onDismissRequest = { deleting = null }, title = { Text(stringResource(R.string.template_delete_preset)) },
+            confirmButton = {
+                TextButton({
+                    deleting = null
+                    scope.launch { withContext(Dispatchers.IO) { store.delete(preset.id) }; rev++ }
+                    if (chosen == preset.id) { chosen = null; pos = pos.coerceAtMost((base.endTime - base.startTime).coerceAtLeast(1)) }
+                    Toast.makeText(context, context.getString(R.string.preset_deleted), Toast.LENGTH_SHORT).show()
+                }) { Text(stringResource(R.string.delete), color = Am.Accent) }
+            },
+            dismissButton = { TextButton({ deleting = null }) { Text(stringResource(R.string.cancel), color = Am.Accent) } },
+            containerColor = Am.Field, titleContentColor = Am.OnDark,
+        )
     }
 }
 
