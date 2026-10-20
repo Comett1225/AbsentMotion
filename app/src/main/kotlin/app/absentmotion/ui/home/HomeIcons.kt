@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.dp
 internal object HomeIcons {
     val Menu = icon("Menu", stroke = "M3.2 4.3L20.8 4.3M3.2 12L20.8 12M3.2 19.7L20.8 19.7", width = 1.8f)
     val ChevronDown = icon("ChevronDown", stroke = "M5.1 8.55L12 15.45L18.9 8.55", width = 1.8f)
-    val ChevronRight = icon("ChevronRight", stroke = "M9 18L15 12L9 6")
+    val ChevronRight = icon("ChevronRight", stroke = "M9 18L15 12L9 6", mirror = true)
     val Close = icon("Close", stroke = "M19.2 4.8L4.8 19.2M4.8 4.8L19.2 19.2", width = 1.8f)
     val Plus = icon("Plus", stroke = "M1.85 12L22.15 12M12 1.85L12 22.15", width = 1.8f)
     val ClearCircle = icon("ClearCircle", stroke = "M4.2 12A7.8 7.8 0 1 0 19.8 12A7.8 7.8 0 1 0 4.2 12ZM14.34 9.66L9.66 14.34M9.66 9.66L14.34 14.34", width = 1.4f)
@@ -54,8 +54,8 @@ internal object HomeIcons {
             "A1 1 0 0 1 3 20L3 15A1 1 0 0 1 4 14ZM17 14L20 14A1 1 0 0 1 21 15L21 20A1 1 0 0 1 20 21L17 21A1 1 0 0 1 16 20L16 15A1 1 0 0 1 17 14Z", width = 1.8f)
 }
 
-private fun icon(name: String, stroke: String? = null, fill: String? = null, width: Float = 1.6f): ImageVector =
-    ImageVector.Builder(name, 24.dp, 24.dp, 24f, 24f).apply {
+private fun icon(name: String, stroke: String? = null, fill: String? = null, width: Float = 1.6f, mirror: Boolean = false): ImageVector =
+    ImageVector.Builder(name, 24.dp, 24.dp, 24f, 24f, autoMirror = mirror).apply {
         if (fill != null) {
             addPath(addPathNodes(fill), pathFillType = PathFillType.EvenOdd, fill = SolidColor(Color.Black))
         }

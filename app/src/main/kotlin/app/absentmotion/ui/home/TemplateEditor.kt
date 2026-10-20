@@ -1,5 +1,6 @@
 package app.absentmotion.ui.home
 
+import app.absentmotion.i18n.Ltr
 import app.absentmotion.platform.Uri
 import app.absentmotion.platform.Toast
 import app.absentmotion.platform.BackHandler
@@ -276,13 +277,15 @@ fun TemplateEditor(templateId: String, engine: EngineThread, settings: AppSettin
         }
         Spacer(Modifier.height(12.dp))
         if (clip == null) {
-            Track(time.toFloat() / total, selected?.let { it.start.toFloat() / total to it.end.toFloat() / total }, Modifier.padding(horizontal = 16.dp)) {
-                playing = false
-                pos = (it * total).roundToInt()
-            }
-            Row(Modifier.padding(horizontal = 16.dp).fillMaxWidth()) {
-                Text(timecode(pos), Modifier.weight(1f), color = Am.OnDarkDim, fontSize = 13.sp)
-                Text(timecode(total), color = Am.OnDarkDim, fontSize = 13.sp)
+            Ltr {
+                Track(time.toFloat() / total, selected?.let { it.start.toFloat() / total to it.end.toFloat() / total }, Modifier.padding(horizontal = 16.dp)) {
+                    playing = false
+                    pos = (it * total).roundToInt()
+                }
+                Row(Modifier.padding(horizontal = 16.dp).fillMaxWidth()) {
+                    Text(timecode(pos), Modifier.weight(1f), color = Am.OnDarkDim, fontSize = 13.sp)
+                    Text(timecode(total), color = Am.OnDarkDim, fontSize = 13.sp)
+                }
             }
             Spacer(Modifier.height(16.dp))
             Text("Media slots", Modifier.padding(horizontal = 16.dp), color = Am.OnDark, fontSize = 18.sp, fontWeight = FontWeight.Bold)
@@ -313,8 +316,10 @@ fun TemplateEditor(templateId: String, engine: EngineThread, settings: AppSettin
         } else {
             val needed = clip.slot.length
             val duration = (clip.media.duration / 1000).toInt()
-            Track(0f, trimStart.toFloat() / duration to (trimStart + needed).toFloat() / duration, Modifier.padding(horizontal = 16.dp), window = true) {
-                trimStart = (it * duration - needed / 2f).roundToInt().coerceIn(0, (duration - needed).coerceAtLeast(0))
+            Ltr {
+                Track(0f, trimStart.toFloat() / duration to (trimStart + needed).toFloat() / duration, Modifier.padding(horizontal = 16.dp), window = true) {
+                    trimStart = (it * duration - needed / 2f).roundToInt().coerceIn(0, (duration - needed).coerceAtLeast(0))
+                }
             }
             Text(
                 "${timecode(trimStart)} - ${timecode(trimStart + needed)}",

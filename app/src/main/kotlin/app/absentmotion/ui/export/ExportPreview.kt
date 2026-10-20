@@ -1,5 +1,6 @@
 package app.absentmotion.ui.export
 
+import app.absentmotion.i18n.Ltr
 import android.app.Activity
 import android.content.Context
 import android.graphics.ImageDecoder
@@ -260,7 +261,7 @@ private fun VideoPreview(uri: Uri) {
                 )
             }
         }
-        Row(Modifier.fillMaxWidth().height(62.dp).fadeInWhen(ready, from = 0.35f), verticalAlignment = Alignment.CenterVertically) {
+        Ltr { Row(Modifier.fillMaxWidth().height(62.dp).fadeInWhen(ready, from = 0.35f), verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.size(62.dp).clickable(enabled = ready, onClick = ::toggle), contentAlignment = Alignment.Center) {
                 Crossfade(playing, animationSpec = Motion.fast(), label = "play") {
                     Icon(if (it) ExportIcons.Pause else ExportIcons.Play, if (it) "Pause" else "Play", tint = Am.OnScrim)
@@ -279,7 +280,7 @@ private fun VideoPreview(uri: Uri) {
                 Modifier.weight(1f).fillMaxHeight(),
             )
             Text("${time(positionMs)} / ${time(durationMs)}", Modifier.width(92.dp), color = Am.OnScrim, fontSize = 13.sp, textAlign = TextAlign.Center, maxLines = 1)
-        }
+        } }
     }
 }
 

@@ -64,6 +64,7 @@ import app.absentmotion.export.defaultSettings
 import app.absentmotion.ui.editor.EditorScreen
 import app.absentmotion.ui.export.ExportScreen
 import app.absentmotion.ui.home.HomeScreen
+import app.absentmotion.i18n.Ltr
 import app.absentmotion.ui.theme.PressIndication
 import app.absentmotion.ui.theme.enterFade
 import kotlinx.coroutines.Dispatchers
@@ -140,7 +141,7 @@ class MainActivity : ComponentActivity() {
                         else {
                             val screen = LocalConfiguration.current
                             CompositionLocalProvider(LocalWide provides wideEditor(screen.smallestScreenWidthDp, screen.screenWidthDp)) {
-                                EditorScreen(open, onExit = ::closeEditor)
+                                Ltr { EditorScreen(open, onExit = ::closeEditor) }
                             }
                         }
                         if (open.exportOpen) ExportScreen(open.scene, open.frame, engine, fromProjectList = false) { open.exportOpen = false }

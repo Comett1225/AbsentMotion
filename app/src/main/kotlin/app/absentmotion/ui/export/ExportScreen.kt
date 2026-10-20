@@ -621,7 +621,7 @@ private fun BoxScope.RunningPanel(p: Phase.Running, progress: Float, onCancel: (
         Spacer(Modifier.height(5.dp))
         Row(Modifier.width(220.dp)) {
             Text("$percent%", Modifier.weight(1f), color = Am.OnScrim, fontSize = 13.sp)
-            Text(left?.let { "%d:%02d".format(it / 60, it % 60) } ?: "", color = Am.OnScrim, fontSize = 13.sp)
+            Text(left?.let { "%d:%02d".format(Locale.ROOT, it / 60, it % 60) } ?: "", color = Am.OnScrim, fontSize = 13.sp)
         }
         Spacer(Modifier.height(30.dp))
         TextButton(onCancel) { Text("Cancel", color = Am.OnNavyAccent, fontSize = 17.sp) }
