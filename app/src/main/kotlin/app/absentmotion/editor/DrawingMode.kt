@@ -123,10 +123,15 @@ fun EditorState.leaveDrawing() {
     val empty = when (mode) {
         is FreehandMode -> layer?.strokes.isNullOrEmpty()
         is PointMode -> layer?.contours?.all { it.knots.isEmpty() } == true
+        is TrackMode -> false
     }
     if (mode.created && empty && layer != null) {
         edit { it.remove(mode.layerId) }
         selectedId = null
+    }
+    if (mode is TrackMode) {
+        mode.job?.cancel()
+        mode.apply?.targetId?.takeIf { scene.layer(it) != null }?.let { selectedId = it }
     }
     panel = EditorPanel.Tools
 }

@@ -174,7 +174,7 @@ private fun compose(p: Place, q: Place?): Place {
     return Place(q.x + rx - p.px + q.px, q.y + ry - p.py + q.py, p.px, p.py, p.sx * q.sx, p.sy * q.sy, p.rot + q.rot, p.z + q.z)
 }
 
-private fun decompose(w: Place, q: Place): Place? {
+internal fun decompose(w: Place, q: Place): Place? {
     if (q.sx == 0f || q.sy == 0f) return null
     val a = Math.toRadians(-q.rot.toDouble())
     val dx = w.x - q.x + w.px - q.px

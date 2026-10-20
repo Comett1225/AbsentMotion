@@ -26,6 +26,7 @@ import androidx.compose.ui.input.pointer.changedToUpIgnoreConsumed
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -33,6 +34,7 @@ import app.absentmotion.editor.DrawingMode
 import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.FreehandMode
 import app.absentmotion.editor.PointMode
+import app.absentmotion.editor.TrackMode
 import app.absentmotion.editor.leaveDrawing
 import app.absentmotion.editor.worldMatrix
 import app.absentmotion.model.DrawTool
@@ -64,12 +66,15 @@ internal fun DrawingEditor(state: EditorState) {
             when (mode) {
                 is FreehandMode -> FreehandOverlay(state, mode, Modifier.fillMaxSize())
                 is PointMode -> PointOverlay(state, mode, Modifier.fillMaxSize())
+                is TrackMode -> TrackOverlay(state, mode, Modifier.fillMaxSize())
             }
         }
+        if (mode is TrackMode) DrawingTimeBar(state, mode, Modifier.fillMaxWidth().height(40.dp))
         Box(Modifier.fillMaxWidth().height(200.dp).enterFade().background(Am.Panel).pointerInput(Unit) {}) {
             when (mode) {
                 is FreehandMode -> FreehandPanel(mode)
                 is PointMode -> PointPanel(state, mode)
+                is TrackMode -> TrackPanel(state, mode)
             }
         }
     }
@@ -81,11 +86,26 @@ private fun DrawingBar(state: EditorState, mode: DrawingMode, modifier: Modifier
     Row(modifier.background(Bar), verticalAlignment = Alignment.CenterVertically) {
         BarButton(ChromeIcons.Back, "Back", cell) { state.leaveDrawing() }
         Text(
-            when { mode is PointMode && mode.vector -> "Pen Tool"; mode is PointMode -> "Edit Points"; else -> "Freehand Brush" },
+            when { mode is TrackMode -> "Track Motion"; mode is PointMode && mode.vector -> "Pen Tool"; mode is PointMode -> "Edit Points"; else -> "Freehand Brush" },
             Modifier.weight(1f), color = Am.OnDark, fontSize = 15.sp, maxLines = 1,
         )
-        BarButton(ChromeIcons.Undo, "Undo", cell, enabled = state.canUndo) { state.undo() }
-        BarButton(ChromeIcons.Redo, "Redo", cell, enabled = state.canRedo) { state.redo() }
+        val busy = (mode as? TrackMode)?.running == true
+        BarButton(ChromeIcons.Undo, "Undo", cell, enabled = state.canUndo && !busy) { state.undo() }
+        BarButton(ChromeIcons.Redo, "Redo", cell, enabled = state.canRedo && !busy) { state.redo() }
+    }
+}
+
+@Composable
+private fun DrawingTimeBar(state: EditorState, mode: DrawingMode, modifier: Modifier) {
+    val layer = state.scene.layer(mode.layerId)
+    val locked = (mode as? TrackMode)?.let { it.running || it.lostFrame != null } == true
+    val first = layer?.let { state.scene.firstShownFrame(it.startTime) } ?: 0
+    val last = layer?.let { state.scene.lastShownFrame(it.endTime) } ?: 0
+    val cell = Modifier.width(48.dp).fillMaxHeight()
+    Row(modifier.background(Am.PanelInset), verticalAlignment = Alignment.CenterVertically) {
+        BarButton(DrawingIcons.Prev, "Previous frame", cell, enabled = !locked && state.frame > first) { state.frame = (state.frame - 1).coerceAtLeast(first) }
+        Text(TimelineMath.timecode(state.frame, state.scene.fps), Modifier.weight(1f), color = Am.OnDark, fontSize = 13.sp, maxLines = 1, textAlign = TextAlign.Center)
+        BarButton(DrawingIcons.Next, "Next frame", cell, enabled = !locked && state.frame < last) { state.frame = (state.frame + 1).coerceAtMost(last) }
     }
 }
 

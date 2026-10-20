@@ -104,6 +104,7 @@ import app.absentmotion.editor.pasteCount
 import app.absentmotion.editor.copySelected
 import app.absentmotion.editor.duplicateSelected
 import app.absentmotion.editor.extractAudio
+import app.absentmotion.editor.startTracking
 import app.absentmotion.editor.markIntroEnd
 import app.absentmotion.editor.markOutroStart
 import app.absentmotion.editor.setElementOption
@@ -206,6 +207,10 @@ internal fun LayerMenu(state: EditorState, onDismiss: () -> Unit) {
             MenuRow("Extract Audio") {
                 state.extractAudio()
                 onDismiss()
+            }
+            if (!MultiSelect.active) MenuRow("Track Motion") {
+                onDismiss()
+                state.startTracking()
             }
         }
         if (state.selected?.soundUri != null && !MultiSelect.active) MenuRow("Mark Beats", enabled = !marking, busy = marking) {
