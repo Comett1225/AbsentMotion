@@ -877,6 +877,18 @@
     <string name="easing_disable_overshoot">ปิดโอเวอร์ชูต</string>
     <string name="easing_enable_overshoot">เปิดโอเวอร์ชูต</string>
     <string name="effects_copy_effects">คัดลอกเอฟเฟกต์</string>
+    <string name="effects_copy_confirm">คัดลอก</string>
+    <plurals name="effects_count">
+        <item quantity="other">%1$s เอฟเฟกต์</item>
+    </plurals>
+    <plurals name="clips_count">
+        <item quantity="other">%1$s คลิป</item>
+    </plurals>
+    <string name="effects_pasted_onto">วาง %1$s ลงบน %2$s แล้ว</string>
+    <plurals name="effects_paste_skipped">
+        <item quantity="other">ข้าม %1$s คลิป: เสียง กล้อง และออบเจ็กต์ว่างใช้เอฟเฟกต์ภาพไม่ได้</item>
+    </plurals>
+    <string name="effects_paste_no_target">เสียง กล้อง และออบเจ็กต์ว่างใช้เอฟเฟกต์ภาพไม่ได้</string>
     <string name="effects_paste_effect">วางเอฟเฟกต์</string>
     <string name="effects_paste_effects">วางเอฟเฟกต์</string>
     <string name="effects_more">เพิ่มเติม</string>

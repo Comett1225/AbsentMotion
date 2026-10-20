@@ -877,6 +877,18 @@
     <string name="easing_disable_overshoot">Lumpuhkan Lonjakan</string>
     <string name="easing_enable_overshoot">Dayakan Lonjakan</string>
     <string name="effects_copy_effects">Salin Kesan</string>
+    <string name="effects_copy_confirm">Salin</string>
+    <plurals name="effects_count">
+        <item quantity="other">%1$s kesan</item>
+    </plurals>
+    <plurals name="clips_count">
+        <item quantity="other">%1$s klip</item>
+    </plurals>
+    <string name="effects_pasted_onto">%1$s ditampal pada %2$s</string>
+    <plurals name="effects_paste_skipped">
+        <item quantity="other">%1$s klip dilangkau: audio, kamera dan objek nol tidak menerima kesan visual</item>
+    </plurals>
+    <string name="effects_paste_no_target">Audio, kamera dan objek nol tidak menerima kesan visual</string>
     <string name="effects_paste_effect">Tampal Kesan</string>
     <string name="effects_paste_effects">Tampal Kesan</string>
     <string name="effects_more">Lagi</string>

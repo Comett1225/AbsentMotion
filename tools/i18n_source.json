@@ -354,6 +354,10 @@
  "caption_whole_project": "Whole project",
  "caption_words_per_caption": "Words per caption",
  "choose_file": "Choose file",
+ "clips_count": {
+  "one": "%1$s clip",
+  "other": "%1$s clips"
+ },
  "color": "Color",
  "convert_to_group": "Convert to Group",
  "could_not_open_this_project": "Could not open this project",
@@ -429,15 +433,26 @@
  "effectbrowser_recent": "Recent",
  "effectbrowser_recent_empty": "Effects you use appear here",
  "effectbrowser_title": "Effects Library",
+ "effects_copy_confirm": "Copy",
  "effects_copy_effect": "Copy Effect",
  "effects_copy_effects": "Copy Effects",
+ "effects_count": {
+  "one": "%1$s effect",
+  "other": "%1$s effects"
+ },
  "effects_duplicate": "Duplicate",
  "effects_effect_info": "Effect Info",
  "effects_more": "More",
  "effects_not_loaded": "The effects could not be loaded",
  "effects_paste_effect": "Paste Effect",
  "effects_paste_effects": "Paste Effects",
+ "effects_paste_no_target": "Audio, cameras and null objects take no visual effects",
+ "effects_paste_skipped": {
+  "one": "%1$s clip skipped: audio, cameras and null objects take no visual effects",
+  "other": "%1$s clips skipped: audio, cameras and null objects take no visual effects"
+ },
  "effects_paste_values": "Paste Effect Values",
+ "effects_pasted_onto": "Pasted %1$s onto %2$s",
  "effects_reorder": "Reorder",
  "effects_reset_defaults": "Reset to Defaults",
  "effects_visibility": "Visibility",

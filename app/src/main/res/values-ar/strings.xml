@@ -952,6 +952,33 @@
     <string name="easing_disable_overshoot">تعطيل التجاوز</string>
     <string name="easing_enable_overshoot">تمكين التجاوز</string>
     <string name="effects_copy_effects">نسخ التأثيرات</string>
+    <string name="effects_copy_confirm">نسخ</string>
+    <plurals name="effects_count">
+        <item quantity="zero">‏%1$s تأثير</item>
+        <item quantity="one">تأثير واحد</item>
+        <item quantity="two">تأثيران</item>
+        <item quantity="few">‏%1$s تأثيرات</item>
+        <item quantity="many">‏%1$s تأثيرًا</item>
+        <item quantity="other">‏%1$s تأثير</item>
+    </plurals>
+    <plurals name="clips_count">
+        <item quantity="zero">‏%1$s مقطع</item>
+        <item quantity="one">مقطع واحد</item>
+        <item quantity="two">مقطعان</item>
+        <item quantity="few">‏%1$s مقاطع</item>
+        <item quantity="many">‏%1$s مقطعًا</item>
+        <item quantity="other">‏%1$s مقطع</item>
+    </plurals>
+    <string name="effects_pasted_onto">تم لصق %1$s على %2$s</string>
+    <plurals name="effects_paste_skipped">
+        <item quantity="zero">تم تخطي %1$s مقطع: لا تُطبَّق التأثيرات البصرية على الصوت والكاميرات والكائنات الفارغة</item>
+        <item quantity="one">تم تخطي مقطع واحد: لا تُطبَّق التأثيرات البصرية على الصوت والكاميرات والكائنات الفارغة</item>
+        <item quantity="two">تم تخطي مقطعين: لا تُطبَّق التأثيرات البصرية على الصوت والكاميرات والكائنات الفارغة</item>
+        <item quantity="few">تم تخطي %1$s مقاطع: لا تُطبَّق التأثيرات البصرية على الصوت والكاميرات والكائنات الفارغة</item>
+        <item quantity="many">تم تخطي %1$s مقطعًا: لا تُطبَّق التأثيرات البصرية على الصوت والكاميرات والكائنات الفارغة</item>
+        <item quantity="other">تم تخطي %1$s مقطع: لا تُطبَّق التأثيرات البصرية على الصوت والكاميرات والكائنات الفارغة</item>
+    </plurals>
+    <string name="effects_paste_no_target">لا تُطبَّق التأثيرات البصرية على الصوت والكاميرات والكائنات الفارغة</string>
     <string name="effects_paste_effect">لصق التأثير</string>
     <string name="effects_paste_effects">لصق التأثيرات</string>
     <string name="effects_more">المزيد</string>

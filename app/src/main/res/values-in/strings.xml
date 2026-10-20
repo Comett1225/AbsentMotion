@@ -877,6 +877,18 @@
     <string name="easing_disable_overshoot">Nonaktifkan overshoot</string>
     <string name="easing_enable_overshoot">Aktifkan overshoot</string>
     <string name="effects_copy_effects">Salin efek</string>
+    <string name="effects_copy_confirm">Salin</string>
+    <plurals name="effects_count">
+        <item quantity="other">%1$s efek</item>
+    </plurals>
+    <plurals name="clips_count">
+        <item quantity="other">%1$s klip</item>
+    </plurals>
+    <string name="effects_pasted_onto">Ditempelkan %1$s ke %2$s</string>
+    <plurals name="effects_paste_skipped">
+        <item quantity="other">%1$s klip dilewati: audio, kamera, dan objek null tidak menerima efek visual</item>
+    </plurals>
+    <string name="effects_paste_no_target">Audio, kamera, dan objek null tidak menerima efek visual</string>
     <string name="effects_paste_effect">Tempel efek</string>
     <string name="effects_paste_effects">Tempel efek</string>
     <string name="effects_more">Lainnya</string>

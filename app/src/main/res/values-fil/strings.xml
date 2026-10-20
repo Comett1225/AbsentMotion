@@ -892,6 +892,21 @@
     <string name="easing_disable_overshoot">I-disable ang overshoot</string>
     <string name="easing_enable_overshoot">I-enable ang overshoot</string>
     <string name="effects_copy_effects">Kopyahin ang mga epekto</string>
+    <string name="effects_copy_confirm">Kopyahin</string>
+    <plurals name="effects_count">
+        <item quantity="one">%1$s epekto</item>
+        <item quantity="other">%1$s na epekto</item>
+    </plurals>
+    <plurals name="clips_count">
+        <item quantity="one">%1$s clip</item>
+        <item quantity="other">%1$s na clip</item>
+    </plurals>
+    <string name="effects_pasted_onto">Na-paste ang %1$s sa %2$s</string>
+    <plurals name="effects_paste_skipped">
+        <item quantity="one">Nilaktawan ang %1$s clip: hindi tumatanggap ng visual na epekto ang audio, kamera, at null object</item>
+        <item quantity="other">Nilaktawan ang %1$s na clip: hindi tumatanggap ng visual na epekto ang audio, kamera, at null object</item>
+    </plurals>
+    <string name="effects_paste_no_target">Walang visual na epekto ang audio, kamera, at null object</string>
     <string name="effects_paste_effect">I-paste ang epekto</string>
     <string name="effects_paste_effects">I-paste ang mga epekto</string>
     <string name="effects_more">Higit pa</string>

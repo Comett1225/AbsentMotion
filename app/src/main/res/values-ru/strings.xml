@@ -922,6 +922,27 @@
     <string name="easing_disable_overshoot">Отключить перелёт</string>
     <string name="easing_enable_overshoot">Включить перехлёст</string>
     <string name="effects_copy_effects">Копировать эффекты</string>
+    <string name="effects_copy_confirm">Копировать</string>
+    <plurals name="effects_count">
+        <item quantity="one">%1$s эффект</item>
+        <item quantity="few">%1$s эффекта</item>
+        <item quantity="many">%1$s эффектов</item>
+        <item quantity="other">%1$s эффекта</item>
+    </plurals>
+    <plurals name="clips_count">
+        <item quantity="one">%1$s клип</item>
+        <item quantity="few">%1$s клипа</item>
+        <item quantity="many">%1$s клипов</item>
+        <item quantity="other">%1$s клипа</item>
+    </plurals>
+    <string name="effects_pasted_onto">В %2$s вставлено %1$s</string>
+    <plurals name="effects_paste_skipped">
+        <item quantity="one">%1$s клип пропущен: аудио, камеры и нулевые объекты не поддерживают визуальные эффекты</item>
+        <item quantity="few">%1$s клипа пропущено: аудио, камеры и нулевые объекты не поддерживают визуальные эффекты</item>
+        <item quantity="many">%1$s клипов пропущено: аудио, камеры и нулевые объекты не поддерживают визуальные эффекты</item>
+        <item quantity="other">%1$s клипа пропущено: аудио, камеры и нулевые объекты не поддерживают визуальные эффекты</item>
+    </plurals>
+    <string name="effects_paste_no_target">К аудио, камерам и нулевым объектам нельзя применить визуальные эффекты</string>
     <string name="effects_paste_effect">Вставить эффект</string>
     <string name="effects_paste_effects">Вставить эффекты</string>
     <string name="effects_more">Ещё</string>

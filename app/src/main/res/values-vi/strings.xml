@@ -877,6 +877,18 @@
     <string name="easing_disable_overshoot">Tắt vượt đà</string>
     <string name="easing_enable_overshoot">Bật vượt đà</string>
     <string name="effects_copy_effects">Sao chép hiệu ứng</string>
+    <string name="effects_copy_confirm">Sao chép</string>
+    <plurals name="effects_count">
+        <item quantity="other">%1$s hiệu ứng</item>
+    </plurals>
+    <plurals name="clips_count">
+        <item quantity="other">%1$s clip</item>
+    </plurals>
+    <string name="effects_pasted_onto">Đã dán %1$s vào %2$s</string>
+    <plurals name="effects_paste_skipped">
+        <item quantity="other">%1$s clip bị bỏ qua: âm thanh, máy ảnh và đối tượng rỗng không nhận hiệu ứng hình ảnh</item>
+    </plurals>
+    <string name="effects_paste_no_target">Âm thanh, máy ảnh và đối tượng rỗng không nhận hiệu ứng hình ảnh</string>
     <string name="effects_paste_effect">Dán hiệu ứng</string>
     <string name="effects_paste_effects">Dán các hiệu ứng</string>
     <string name="effects_more">Thêm</string>

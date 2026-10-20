@@ -892,6 +892,21 @@
     <string name="easing_disable_overshoot">ओवरशूट बंद करें</string>
     <string name="easing_enable_overshoot">ओवरशूट चालू करें</string>
     <string name="effects_copy_effects">इफ़ेक्ट कॉपी करें</string>
+    <string name="effects_copy_confirm">कॉपी</string>
+    <plurals name="effects_count">
+        <item quantity="one">%1$s इफ़ेक्ट</item>
+        <item quantity="other">%1$s इफ़ेक्ट</item>
+    </plurals>
+    <plurals name="clips_count">
+        <item quantity="one">%1$s क्लिप</item>
+        <item quantity="other">%1$s क्लिप</item>
+    </plurals>
+    <string name="effects_pasted_onto">%1$s को %2$s पर पेस्ट किया</string>
+    <plurals name="effects_paste_skipped">
+        <item quantity="one">%1$s क्लिप छोड़ी गई: ऑडियो, कैमरा और नल ऑब्जेक्ट पर विज़ुअल इफ़ेक्ट लागू नहीं होते</item>
+        <item quantity="other">%1$s क्लिप छोड़ी गईं: ऑडियो, कैमरा और नल ऑब्जेक्ट पर विज़ुअल इफ़ेक्ट लागू नहीं होते</item>
+    </plurals>
+    <string name="effects_paste_no_target">ऑडियो, कैमरा और नल ऑब्जेक्ट पर विज़ुअल इफ़ेक्ट लागू नहीं होते</string>
     <string name="effects_paste_effect">इफ़ेक्ट पेस्ट करें</string>
     <string name="effects_paste_effects">इफ़ेक्ट्स पेस्ट करें</string>
     <string name="effects_more">और</string>

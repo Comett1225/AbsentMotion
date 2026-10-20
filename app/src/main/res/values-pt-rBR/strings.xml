@@ -892,6 +892,21 @@
     <string name="easing_disable_overshoot">Desativar ultrapassagem</string>
     <string name="easing_enable_overshoot">Ativar ultrapassagem</string>
     <string name="effects_copy_effects">Copiar efeitos</string>
+    <string name="effects_copy_confirm">Copiar</string>
+    <plurals name="effects_count">
+        <item quantity="one">%1$s efeito</item>
+        <item quantity="other">%1$s efeitos</item>
+    </plurals>
+    <plurals name="clips_count">
+        <item quantity="one">%1$s clipe</item>
+        <item quantity="other">%1$s clipes</item>
+    </plurals>
+    <string name="effects_pasted_onto">Colei %1$s em %2$s</string>
+    <plurals name="effects_paste_skipped">
+        <item quantity="one">%1$s clipe ignorado: áudio, câmeras e objetos nulos não recebem efeitos visuais</item>
+        <item quantity="other">%1$s clipes ignorados: áudio, câmeras e objetos nulos não recebem efeitos visuais</item>
+    </plurals>
+    <string name="effects_paste_no_target">Áudio, câmeras e objetos nulos não recebem efeitos visuais</string>
     <string name="effects_paste_effect">Colar efeito</string>
     <string name="effects_paste_effects">Colar efeitos</string>
     <string name="effects_more">Mais</string>
