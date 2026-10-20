@@ -394,7 +394,7 @@ class EngineThread(private val background: Int, context: Context? = null) {
         awaitMedia()
         fontJob?.join()
         effectJob?.join()
-        val document = Scene.parse(xml)
+        val document = withContext(Dispatchers.Default) { Scene.parse(xml) }
         fonts?.let { library -> document.fontNames().forEach { library.resolve(it) } }
         media?.prepare(document)
         var shown: String? = null
