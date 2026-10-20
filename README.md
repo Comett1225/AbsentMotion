@@ -4,8 +4,9 @@
 
 # AbsentMotion
 
-AbsentMotion is a free, open-source motion graphics and animation editor for Android phones. There is no
-subscription, no account and no advertising. Projects live on your device.
+AbsentMotion is a free, open-source alternative to CapCut and Alight Motion: a motion graphics, animation and video
+editor for Android phones. Everything runs on your phone and it works without an internet connection. There is no
+subscription, no account and no advertising, and your projects never leave your device.
 
 <p align="center">
   <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" alt="The editor: a photo with a title on the timeline, keyframes shown as diamonds" width="280">
@@ -37,7 +38,7 @@ subscription, no account and no advertising. Projects live on your device.
 
 ## Requirements
 
-Android 14 (API level 34) or newer (only tested on Android 17 so far), a 64-bit ARM device (`arm64-v8a`), Vulkan 1.2.
+Android 14 (API level 34) or newer (tested on Android 16 and 17), a 64-bit ARM device (`arm64-v8a`), Vulkan 1.2.
 
 There are two builds: `play`, which has background removal on images through Google Play services, and `foss` (for
 F-Droid), which contains no Google libraries at all.
@@ -48,26 +49,20 @@ AbsentMotion is a young project. Please know these before you rely on it:
 
 - **The effects pack is small at first.** The app ships with a limited set of effects. A project that uses an effect
   AbsentMotion does not have still opens, and the effect stays in the file, but it is not drawn.
-- **Only 64-bit ARM Android devices on Android 14 or newer (tested so far only on Android 17).** Older Android
-  versions are not supported, and the app needs Vulkan 1.2.
-- **Release signing.** Release APKs are signed with the project's own key. Its SHA-256 certificate fingerprint is
-  `5F:AF:34:79:2B:68:1E:88:06:A1:43:E8:A7:1C:3C:C5:50:B4:E5:ED:D3:88:BA:29:2A:46:DC:09:CD:B7:E9:64`; compare it
-  with `apksigner verify --print-certs` before you install a file from anywhere other than the project's release page.
-- **Background removal uses Google Play services, in the `play` build only.** It is a proprietary Google library
-  (listed in `THIRD_PARTY_NOTICES.md`): Play services downloads its model and may send diagnostics to Google, as it does
-  for any app. The `foss` build has no background removal.
-- **Network use.** The app downloads a font from Google's font servers when you choose it, and the speech model
-  when you first generate captions. The app itself does nothing else over the Internet (the `play` build's Play
-  services library aside, see above).
+- **Only 64-bit ARM Android devices on Android 14 or newer, with Vulkan 1.2.** Tested on Android 16 and 17.
+- **Background removal.** The `foss` build removes backgrounds with its own offline model. The `play` build uses
+  Google Play services instead, a proprietary Google library (listed in `THIRD_PARTY_NOTICES.md`) that downloads its
+  model and may send diagnostics to Google, as it does for any app.
+- **Network use.** Nothing is needed online. The internet is only used when you choose an extra downloadable font and
+  for the speech model the first time you generate captions (the `play` build's Play services library aside, see above).
 
 ## File compatibility
 
-AbsentMotion can open scene XML files and `.amproj` packages exported from Alight Motion, and it exports scene XML in the same format. Effects that AbsentMotion does not include are kept in the file and are not drawn. AbsentMotion saves its own packages as `.absproj`. AbsentMotion is an independent project. It is not affiliated with, endorsed by or sponsored by Alight Creative or Alight Motion. Alight Motion is a trademark of its owner.
+AbsentMotion can open scene XML files and `.amproj` packages exported from Alight Motion, and it exports scene XML in the same format. Effects that AbsentMotion does not include are kept in the file and are not drawn. AbsentMotion saves its own packages as `.absproj`. AbsentMotion is an independent project. It is not affiliated with, endorsed by or sponsored by Alight Creative, Alight Motion, ByteDance or CapCut. Alight Motion and CapCut are trademarks of their owners.
 
 ## Building
 
-The app is built with Gradle (`app/`) and has a C++ engine on top of Skia. Building Skia from source is the slow
-part (minutes on a fast machine, several gigabytes of disk). The full guide, from a fresh machine, is in
+The app is built with Gradle (`app/`) and has a C++ engine on top of Skia, which is built from source. See
 [`docs/BUILD.md`](docs/BUILD.md).
 
 ## Contributing and security

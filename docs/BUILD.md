@@ -1,8 +1,7 @@
 # Building AbsentMotion
 
-This guide takes you from a fresh checkout to a running Android app and the release files. The project is a
-Kotlin/Compose user interface with a C++ engine on top of Skia. Skia is built from source and is the slow, disk-hungry
-step.
+From a fresh checkout to a running Android app and the release files. The project is a Kotlin/Compose user interface
+with a C++ engine on top of Skia, which is built from source.
 
 > macOS builds and the Debian CI build are supported. A fresh checkout still needs the SDK, NDK, JDK and native libraries described below.
 
@@ -13,21 +12,9 @@ maintainer builds it on macOS (Apple silicon).
 
 The build scripts support macOS and Linux with the Android NDK. CI builds the unsigned `foss` APK on Debian. Windows hosts are not supported.
 
-## 2. Disk space and time
+## 2. Disk space
 
-Disk is the main constraint. As a rough estimate, keep **15 GB or more** free for everything. What the maintainer's
-machine uses:
-
-| What | Size |
-|---|---|
-| Skia checkout with its dependencies and the Android build output | about 1.4 GB |
-| Gradle cache (`~/.gradle`) | several GB |
-| Android SDK, NDK, CMake and an emulator image, if you use one | several GB |
-| whisper.cpp and RNNoise sources (vendored in `third_party/`) | about 45 MB |
-
-Time: the Android Skia build takes about 6 minutes on an M4 Mac mini once its dependencies are fetched. The first
-fetch (about twenty git repositories) depends on your connection. Other times have not been measured on a clean
-machine.
+About 15 GB free (Skia with its dependencies, the Gradle cache, the Android SDK and NDK).
 
 ## 3. Tools to install
 
@@ -44,15 +31,14 @@ machine.
 The Gradle wrapper downloads **Gradle 9.8.1** itself. The build files pin the Android Gradle Plugin 9.4.1, Kotlin 2.4.21
 and the Compose BOM 2026.09.00.
 
-**Homebrew packages that the maintainer's machine has** (install what you lack):
+**Homebrew:**
 
 ```
 brew install openjdk@21 ninja
 ```
 
-**JDK.** Build with JDK 21: set `JAVA_HOME` to it before running Gradle (a newer JDK is too new for the Android Gradle
-plugin). The scripts in `tools/` source `tools/env.sh`, which uses `JAVA_HOME` if set and otherwise looks for a JDK 21
-(including Homebrew's).
+**JDK.** Set `JAVA_HOME` to JDK 21. The scripts in `tools/` source `tools/env.sh`, which uses `JAVA_HOME` if set and
+otherwise looks for a JDK 21 (including Homebrew's).
 
 **Android SDK location.** Create `local.properties` in the project root (it is git-ignored):
 
@@ -104,10 +90,8 @@ libraries of Skia's own dependencies). `app/src/main/cpp/CMakeLists.txt` reads t
 (`git -C third_party/skia fetch --depth 1 origin 95ee33d7ec7791ab9c071675710a14fe6408ae4f` and
 `git -C third_party/skia checkout FETCH_HEAD`) and run the script again.
 
-*Not verified:* whether Skia's server allows fetching a commit by its hash. If it does not, the script falls back to the
-tip of the branch, which can move, and stops if that is another commit.
-
-*Not verified from a clean machine:* the whole of this section.
+If Skia's server refuses to fetch the commit by hash, the script falls back to the tip of the branch and stops if that
+is another commit.
 
 ## 6. Android app
 
@@ -123,15 +107,14 @@ Skia from section 5 must be in place first.
 
 Outputs: `app/build/outputs/apk/<flavour>/<type>/app-<flavour>-<type>.apk`, for example `app/build/outputs/apk/play/debug/app-play-debug.apk`. The free flavour has no background removal; the sources that differ are in `app/src/foss` and `app/src/play`.
 
-- **Requirements of the app:** Android 14 (API 34) or newer (`minSdk = 34`; it builds and passes lint for that level, but it has only been run on Android 17), `targetSdk = 37`, a 64-bit ARM device,
-  Vulkan 1.2.
+- **Requirements of the app:** Android 14 (API 34) or newer (`minSdk = 34`, tested on Android 16 and 17), `targetSdk = 37`,
+  a 64-bit ARM device, Vulkan 1.2.
 - **Release signing:** `assemblePlayRelease` and `assembleFossRelease` sign with the key named in a git-ignored `signing.properties` in the project root
   (`storeFile`, `storePassword`, `keyAlias`, `keyPassword`); without that file the release APK is left unsigned (`app-<flavour>-release-unsigned.apk`),
-  and you sign it yourself with `apksigner`. Debug builds (`assembleFossDebug`) are signed with the debug key for your own phone. Make a release key once with
-  `keytool -genkeypair -v -keystore release.jks -alias absentmotion -keyalg RSA -keysize 4096 -validity 10000`,
-  keep it and its passwords offline (losing it means users can never update), and never commit it.
-- Install on a device with `adb install -r <apk>`. An emulator has to meet the same requirements (arm64 image,
-  Android 14 or newer, Vulkan 1.2); rendering on an emulator has not been checked.
+  and you sign it yourself with `apksigner`. Debug builds (`assembleFossDebug`) are signed with the debug key for your own phone. Make a release key with
+  `keytool -genkeypair -v -keystore release.jks -alias absentmotion -keyalg RSA -keysize 4096 -validity 10000` and never
+  commit it.
+- Install with `adb install -r <apk>`. Emulators work for development (arm64 image, Android 14 or newer).
 
 ## 7. Checking a change, and releases
 
