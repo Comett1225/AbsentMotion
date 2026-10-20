@@ -1,5 +1,6 @@
 package app.absentmotion.editor
 
+import app.absentmotion.audio.AUDIO_FX_TAG
 import app.absentmotion.model.*
 import org.junit.Assert.*
 import org.junit.Test
@@ -18,5 +19,16 @@ class PresetDomainsTest {
         assertEquals(video.endTime, out.endTime)
         assertEquals(video.node["speed"], out.node["speed"])
         assertEquals(video.node.child("gain"), out.node.child("gain"))
+    }
+
+    @Test fun audioEffectsMakeAPresetAndReachOtherClipsWithSound() {
+        val echo = XmlNode(AUDIO_FX_TAG, children = listOf(XmlNode("fx", mapOf("type" to "echo"))))
+        val source = layer("audio", mapOf("src" to "content://a"), listOf(echo))
+        assertTrue(canSavePreset(source))
+        assertFalse(canSavePreset(layer("audio", mapOf("src" to "content://a"))))
+        assertEquals(echo, applyPreset(layer("audio", mapOf("src" to "content://b")), source).node.child(AUDIO_FX_TAG))
+        val video = layer(attrs = mapOf("fillType" to "media", "fillVideo" to "content://clip"))
+        assertEquals(echo, applyPreset(video, source).node.child(AUDIO_FX_TAG))
+        assertNull(applyPreset(layer(), source).node.child(AUDIO_FX_TAG))
     }
 }

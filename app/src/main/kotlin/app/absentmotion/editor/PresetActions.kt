@@ -1,5 +1,6 @@
 package app.absentmotion.editor
 
+import app.absentmotion.audio.AUDIO_FX_TAG
 import app.absentmotion.library.PresetStore
 import app.absentmotion.library.SavedPreset
 import app.absentmotion.model.Layer
@@ -23,7 +24,7 @@ fun canSavePreset(layer: Layer): Boolean {
     val n = layer.node
     val transform = n.child("transform")
     fun XmlNode?.plain(one: Float) = this == null || (!isKeyframed && this["value"]?.toFloatOrNull().let { it == null || it == one })
-    return n.children.any { it.name in setOf("path-stroke", "border", "shadow", "effect") } ||
+    return n.children.any { it.name in setOf("path-stroke", "border", "shadow", "effect") } || n.child(AUDIO_FX_TAG)?.children?.isNotEmpty() == true ||
         (n["blending"] ?: "normal") != "normal" || !transform?.child("opacity").plain(1f) ||
         MOVING.any { transform?.child(it)?.isKeyframed == true } ||
         !n.child("gain").plain(1f) || !n.child("speedMap").plain(1f) || (n["speed"]?.toFloatOrNull() ?: 1f) != 1f ||
@@ -65,7 +66,7 @@ fun applyPreset(target: Layer, preset: Layer, presetId: String? = null): Layer {
         n = n.replaced(setOf("effect"), p)
     }
     if (retimed.kind == "text" && preset.kind == "text") for (a in listOf("size", "align", "font")) n = n.with(a, p[a])
-    if ((retimed.kind == "audio" || retimed.mediaFill?.video == true) && (preset.kind == "audio" || preset.mediaFill?.video == true)) n = n.replaced(setOf("gain"), p)
+    if ((retimed.kind == "audio" || retimed.mediaFill?.video == true) && (preset.kind == "audio" || preset.mediaFill?.video == true)) n = n.replaced(setOf("gain", AUDIO_FX_TAG), p)
     return retimed.copy(node = n.with("presetId", presetId ?: n["presetId"]))
 }
 
