@@ -139,4 +139,9 @@ class EasingHandlesTest {
             e.p.indices.forEach { assertEquals("$e", e.p[it], back.p[it], 1e-6f) }
         }
     }
+
+    @Test fun everyPresetNamesARealStringResource() {
+        for (preset in EasingCatalog.families.flatten()) assertTrue("${preset.easing}", preset.label != 0)
+        assertEquals(app.absentmotion.R.string.keyframe_easing_cubic_bezier, EasingCatalog.presetOf(Easing.Linear).label)
+    }
 }
