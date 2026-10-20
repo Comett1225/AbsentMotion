@@ -37,6 +37,23 @@ class MediaKeeperTest {
         assertEquals(1, store.mediaDir("p1").listFiles()!!.size)
     }
 
+    @Test fun aDifferentFileWithTheSameNameAndSizeGetsItsOwnCopy() {
+        val store = ProjectStore(tmp.newFolder())
+        val keeper = MediaKeeper(store, { File(java.net.URI(it)).inputStream() })
+        val first = File(tmp.newFolder("one"), "take.wav").apply { writeText("first take") }
+        val kept = keeper.keep("p1", media(first))
+        val second = File(tmp.newFolder("two"), "take.wav").apply { writeText("other take") }
+        val scene = scene(kept.uri).withMedia(kept)
+        val again = keeper.keep("p1", media(second), scene)
+        assertTrue(again.uri != kept.uri)
+        assertEquals("other take", File(java.net.URI(again.uri)).readText())
+        assertEquals("first take", File(java.net.URI(kept.uri)).readText())
+        val collected = keeper.collect("p1", scene(kept.uri, second.toURI().toString()).withMedia(kept).withMedia(media(second)))
+        val uris = collected.scene.node.mediaUris()
+        assertEquals(2, uris.size)
+        assertEquals(setOf("first take", "other take"), uris.map { File(java.net.URI(it)).readText() }.toSet())
+    }
+
     @Test fun refusesWhenStorageIsLow() {
         val store = ProjectStore(tmp.newFolder())
         val photo = tmp.newFile("big.png").apply { writeText("x") }

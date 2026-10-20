@@ -8,6 +8,7 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
 import java.io.InputStream
+import java.util.Arrays
 
 class MediaKeeper(
     private val store: ProjectStore,
@@ -20,7 +21,7 @@ class MediaKeeper(
 
     fun keep(id: String, media: MediaDeclaration, scene: Scene? = null): MediaDeclaration {
         if (!collectable(media.uri)) return media
-        scene?.media?.firstOrNull { media.size > 0 && it.size == media.size && it.filename == media.filename && store.inMediaFolder(it.uri) }
+        scene?.media?.firstOrNull { media.size > 0 && it.size == media.size && it.filename == media.filename && store.inMediaFolder(it.uri) && same(media.uri, it.uri) }
             ?.let { return MediaDeclaration(media.node.with("uri", it.uri).with("missing", null)) }
         val dir = store.mediaDir(id).apply { mkdirs() }
         val needed = maxOf(media.size, 0) + RESERVE
@@ -57,6 +58,21 @@ class MediaKeeper(
             }
         }
         return Collected(result, copied, unreadable, false)
+    }
+
+    private fun same(a: String, b: String): Boolean = runCatching {
+        (open(a) ?: return false).use { x -> (open(b) ?: return false).use { y -> equal(x, y) } }
+    }.getOrDefault(false)
+
+    private fun equal(x: InputStream, y: InputStream): Boolean {
+        val one = ByteArray(1 shl 16)
+        val two = ByteArray(1 shl 16)
+        while (true) {
+            val n = x.readNBytes(one, 0, one.size)
+            val m = y.readNBytes(two, 0, two.size)
+            if (n != m || !Arrays.equals(one, 0, n, two, 0, m)) return false
+            if (n < one.size) return true
+        }
     }
 
     private fun collectable(uri: String) = (uri.startsWith("content:") || uri.startsWith("file:")) && !store.inMediaFolder(uri)
