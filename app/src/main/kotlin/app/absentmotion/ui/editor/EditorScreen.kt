@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.key
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,10 +42,11 @@ import app.absentmotion.R
 
 @Composable
 fun EditorScreen(state: EditorState, onExit: () -> Unit) {
+    val scope = rememberCoroutineScope()
     Box(Modifier.fillMaxSize()) {
         EditorBody(state, onExit)
         state.fullColor?.let { PhoneScreen { Box(Modifier.fillMaxSize().enterFade()) { FullColorPicker(state, it) } } }
-        if (state.cameraOpen) EditorCamera(state)
+        if (state.cameraOpen) EditorCamera(state, scope)
     }
 }
 

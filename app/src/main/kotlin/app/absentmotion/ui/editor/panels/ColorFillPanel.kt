@@ -51,6 +51,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.absentmotion.editor.EditorState
+import app.absentmotion.editor.keepCopy
 import app.absentmotion.editor.FullColor
 import app.absentmotion.media.mediaDeclaration
 import app.absentmotion.model.Layer
@@ -86,7 +87,7 @@ private fun FillTabs(state: EditorState, layer: Layer, modifier: Modifier) {
     val scope = rememberCoroutineScope()
     val id = layer.id
     val picker = rememberMediaPicker { uri ->
-        if (uri != null) scope.launch { mediaDeclaration(context, uri)?.let { state.fillWithMedia(id, it) } }
+        if (uri != null) scope.launch { mediaDeclaration(context, uri)?.let { state.keepCopy(context, it) }?.let { state.fillWithMedia(id, it) } }
     }
     Row(modifier.clip(PanelShape), Arrangement.spacedBy(3.px)) {
         FillTab(PanelIcons.FillNone, active = type == "none", enabled = true) { state.editSelected { it.withFill("none") } }

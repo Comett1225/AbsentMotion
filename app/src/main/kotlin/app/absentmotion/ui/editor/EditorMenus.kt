@@ -41,6 +41,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import app.absentmotion.editor.MultiSelect
+import app.absentmotion.editor.keepCopy
 import app.absentmotion.model.replaceMedia
 import app.absentmotion.audio.soundUri
 import app.absentmotion.editor.canClip
@@ -183,7 +184,7 @@ internal fun LayerMenu(state: EditorState, onDismiss: () -> Unit) {
     val video = media?.takeIf { it.video }
     val mediaRecord = media?.let { state.scene.media(it.uri) }
     if (mediaInfo && mediaRecord != null) {
-        MediaInfoDialog(mediaRecord, onReplace = { state.edit("replace") { s -> s.replaceMedia(mediaRecord.uri, it) } }) { mediaInfo = false; onDismiss() }
+        MediaInfoDialog(mediaRecord, onReplace = { picked -> val kept = state.keepCopy(context, picked); state.edit("replace") { s -> s.replaceMedia(mediaRecord.uri, kept) } }) { mediaInfo = false; onDismiss() }
         return
     }
     val saveElement = rememberSaveToMyElements(state)

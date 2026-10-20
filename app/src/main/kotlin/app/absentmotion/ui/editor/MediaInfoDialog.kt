@@ -28,7 +28,7 @@ import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
 
 @Composable
-internal fun MediaInfoDialog(record: MediaDeclaration, onReplace: ((MediaDeclaration) -> Unit)? = null, onDismiss: () -> Unit) {
+internal fun MediaInfoDialog(record: MediaDeclaration, onReplace: (suspend (MediaDeclaration) -> Unit)? = null, onDismiss: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->

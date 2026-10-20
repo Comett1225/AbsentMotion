@@ -141,13 +141,12 @@ internal fun MediaTab(state: EditorState, modifier: Modifier, library: AddLibrar
 }
 
 @Composable
-internal fun EditorCamera(state: EditorState) {
+internal fun EditorCamera(state: EditorState, scope: kotlinx.coroutines.CoroutineScope) {
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
     CameraScreen(state.scene.width.toFloat() / state.scene.height, onClose = { state.cameraOpen = false }) { uri, video ->
         scope.launch {
             try {
-                val media = mediaDeclaration(context, uri)
+                val media = mediaDeclaration(context, uri)?.let { state.keepCopy(context, it) }
                 if (media == null) android.widget.Toast.makeText(context, context.getString(R.string.mediatab_capture_failed), android.widget.Toast.LENGTH_LONG).show()
                 else if (video) state.addVideo(media) else state.addImage(media)
             } finally {
