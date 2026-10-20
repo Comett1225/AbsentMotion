@@ -58,7 +58,7 @@ class RemainingContracts(unittest.TestCase):
 
     def test_gif_storage_gate_uses_an_encoded_measurement(self):
         text = kotlin('ui/export/ExportScreen.kt')
-        self.assertIn('val measured = measureGifBytes(engine, scene, s)', text)
+        self.assertIn('val measured = measureGif(engine, scene, s).bytes', text)
         self.assertIn('if (storageStatus(measured, free) is StorageStatus.NotEnough)', text)
         self.assertIn('if (kind != ExportKind.Gif && storageStatus(estimate, free) is StorageStatus.NotEnough)', text)
 

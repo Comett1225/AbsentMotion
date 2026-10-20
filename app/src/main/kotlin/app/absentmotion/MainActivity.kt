@@ -562,6 +562,9 @@ class MainActivity : ComponentActivity() {
                     val probe = app.absentmotion.export.DeviceCapabilities.of(applicationContext).load().probe
                     Log.i("AMExport", "estimate ms=${app.absentmotion.export.ExportTimes(applicationContext).estimateMs(s.fixedFormat(), scene, probe)}")
                 }
+                if (kind == ExportKind.Gif) Log.i("AMExport", "estimate ms=" + app.absentmotion.export.gifTimeMs(
+                    app.absentmotion.export.frameCount(scene, s.fps), app.absentmotion.export.measureGif(engine, scene, s),
+                    app.absentmotion.export.ExportTimes(applicationContext).estimateMs(s, scene)))
                 val started = SystemClock.elapsedRealtime()
                 val mediaStore = intent.getBooleanExtra("mediastore", false)
                 val result = Exporter(applicationContext, engine, if (mediaStore) app.absentmotion.export.MediaStoreExport(applicationContext) else FolderExport(dir))

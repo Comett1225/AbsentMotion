@@ -54,7 +54,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.runtime.produceState
-import app.absentmotion.export.measureGifBytes
+import app.absentmotion.export.GifSample
+import app.absentmotion.export.frameCount
+import app.absentmotion.export.gifTimeMs
+import app.absentmotion.export.measureGif
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.Composable
@@ -226,10 +229,10 @@ fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromProjectList
     var progress by remember { mutableFloatStateOf(0f) }
     val hasAudio = remember(scene) { ExportAudio.mixFor != null && AudioClip.of(scene).isNotEmpty() }
     val gifSettings = settings.getValue(ExportKind.Gif)
-    val gifEstimate by produceState<Long?>(null, kind, scene, gifSettings, phase) {
+    val gifSample by produceState<GifSample?>(null, kind, scene, gifSettings, phase) {
         value = null
         if (kind == ExportKind.Gif && phase is Phase.Idle) {
-            try { value = measureGifBytes(engine, scene, gifSettings) }
+            try { value = measureGif(engine, scene, gifSettings) }
             catch (e: CancellationException) { throw e }
             catch (e: Exception) { Log.w("AMExport", "Cannot sample GIF size", e) }
         }
@@ -249,7 +252,7 @@ fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromProjectList
         try { caps.load() } catch (e: CancellationException) { throw e } catch (e: Exception) { Log.w("AMExport", "Cannot read the encoders", e) }
     }
     val sizes = remember { ExportSizes(context) }
-    val rawEstimate = if (kind == ExportKind.Gif) gifEstimate ?: -1L else remember(kind, scene, settings.getValue(kind), hasAudio, report) {
+    val rawEstimate = if (kind == ExportKind.Gif) gifSample?.bytes ?: -1L else remember(kind, scene, settings.getValue(kind), hasAudio, report) {
         val s = settings.getValue(kind)
         val bitrates = if (kind == ExportKind.Video) exportSize(scene, s.shortSide, even = true).let { (w, h) -> report?.encoderFor(s.codec, w, h)?.bitrates } else null
         estimateBytes(kind, scene, s, hasAudio, bitrates)
@@ -270,10 +273,11 @@ fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromProjectList
     val better = remember(video, support, check) { betterChoice(video, support, check) }
     val warning = codecWarning(video, support)?.takeIf { it != acknowledged || support is Support.Unsupported }
     val current = settings.getValue(kind)
-    val timeMs = remember(kind, current, report, heat.level, estimate, phase is Phase.Idle) {
+    val timeMs = remember(kind, current, report, heat.level, estimate, phase is Phase.Idle, gifSample) {
         when (kind) {
             ExportKind.Video -> times.estimateMs(current, scene, report?.probe, heat.level, report)
-            ExportKind.Gif, ExportKind.Sequence -> times.estimateMs(current, scene, report?.probe, heat.level)
+            ExportKind.Gif -> gifSample?.let { gifTimeMs(frameCount(scene, current.fps), it, times.estimateMs(current, scene, report?.probe, heat.level)) }
+            ExportKind.Sequence -> times.estimateMs(current, scene, report?.probe, heat.level)
             ExportKind.Package -> estimate.coerceAtLeast(0) / 100_000
             else -> 0L
         }
@@ -340,7 +344,7 @@ fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromProjectList
                 }
                 var predicted = estimated
                 if (chosen == ExportKind.Gif) {
-                    val measured = measureGifBytes(engine, scene, s)
+                    val measured = measureGif(engine, scene, s).bytes
                     predicted = measured
                     free = freeSpace()
                     if (storageStatus(measured, free) is StorageStatus.NotEnough) {
@@ -547,7 +551,7 @@ private fun InfoBlock(free: Long, estimate: Long, timeMs: Long?, heat: ThermalLe
         Divider()
         InfoRow(stringResource(R.string.export_estimated_size), if (estimate < 0) stringResource(R.string.export_calculating) else formatBytes(estimate), false)
         Divider()
-        InfoRow(stringResource(R.string.export_estimated_time), timeMs?.let { timeLabel(it).text() } ?: stringResource(R.string.export_time_unknown), false)
+        InfoRow(stringResource(R.string.export_estimated_time), timeMs?.let { timeLabel(it).text() } ?: stringResource(if (estimate < 0) R.string.export_calculating else R.string.export_time_unknown), false)
         Divider()
         InfoRow(stringResource(R.string.export_phone_temperature), thermalLabel(heat).text(), heat >= ThermalLevel.Hot)
     }
