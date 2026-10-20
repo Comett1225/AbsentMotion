@@ -213,8 +213,11 @@ internal class MatteEncoder private constructor(private val codec: MediaCodec, p
     override fun close() {
         runCatching { codec.stop() }
         runCatching { codec.release() }
-        if (finished && track >= 0) muxer.stop()
-        runCatching { muxer.release() }
+        try {
+            if (finished && track >= 0) muxer.stop()
+        } finally {
+            runCatching { muxer.release() }
+        }
     }
 
     companion object {

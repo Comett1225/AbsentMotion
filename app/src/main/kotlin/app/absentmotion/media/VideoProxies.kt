@@ -289,29 +289,35 @@ private fun transcode(context: Context, uri: String, out: File, cancelled: () ->
 
 private class ProxyGl(private val surface: Surface, private val width: Int, private val height: Int) : Closeable {
     private val display = EGL14.eglGetDisplay(EGL14.EGL_DEFAULT_DISPLAY)
-    private val context: android.opengl.EGLContext
-    private val window: android.opengl.EGLSurface
-    private val program: Int
-    val texture: Int
+    private var context = EGL14.EGL_NO_CONTEXT
+    private var window = EGL14.EGL_NO_SURFACE
+    private var program = 0
+    var texture = 0
+        private set
     private val quad = ByteBuffer.allocateDirect(8 * 4).order(ByteOrder.nativeOrder()).asFloatBuffer().apply { put(floatArrayOf(0f, 0f, 1f, 0f, 0f, 1f, 1f, 1f)).position(0) }
 
     init {
-        check(EGL14.eglInitialize(display, IntArray(1), 0, IntArray(1), 0)) { "EGL is unavailable" }
-        val configs = arrayOfNulls<android.opengl.EGLConfig>(1)
-        val count = IntArray(1)
-        val wanted = intArrayOf(EGL14.EGL_RED_SIZE, 8, EGL14.EGL_GREEN_SIZE, 8, EGL14.EGL_BLUE_SIZE, 8, EGL14.EGL_RENDERABLE_TYPE, EGL14.EGL_OPENGL_ES2_BIT,
-            EGLExt.EGL_RECORDABLE_ANDROID, 1, EGL14.EGL_NONE)
-        check(EGL14.eglChooseConfig(display, wanted, 0, configs, 0, 1, count, 0) && count[0] > 0) { "no recordable EGL config" }
-        context = EGL14.eglCreateContext(display, configs[0], EGL14.EGL_NO_CONTEXT, intArrayOf(EGL14.EGL_CONTEXT_CLIENT_VERSION, 2, EGL14.EGL_NONE), 0)
-        window = EGL14.eglCreateWindowSurface(display, configs[0], surface, intArrayOf(EGL14.EGL_NONE), 0)
-        check(EGL14.eglMakeCurrent(display, window, window, context)) { "cannot use the EGL surface" }
-        program = link(VERTEX, FRAGMENT)
-        texture = IntArray(1).also { GLES20.glGenTextures(1, it, 0) }[0]
-        GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, texture)
-        GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR)
-        GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR)
-        GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE)
-        GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE)
+        try {
+            check(EGL14.eglInitialize(display, IntArray(1), 0, IntArray(1), 0)) { "EGL is unavailable" }
+            val configs = arrayOfNulls<android.opengl.EGLConfig>(1)
+            val count = IntArray(1)
+            val wanted = intArrayOf(EGL14.EGL_RED_SIZE, 8, EGL14.EGL_GREEN_SIZE, 8, EGL14.EGL_BLUE_SIZE, 8, EGL14.EGL_RENDERABLE_TYPE, EGL14.EGL_OPENGL_ES2_BIT,
+                EGLExt.EGL_RECORDABLE_ANDROID, 1, EGL14.EGL_NONE)
+            check(EGL14.eglChooseConfig(display, wanted, 0, configs, 0, 1, count, 0) && count[0] > 0) { "no recordable EGL config" }
+            context = EGL14.eglCreateContext(display, configs[0], EGL14.EGL_NO_CONTEXT, intArrayOf(EGL14.EGL_CONTEXT_CLIENT_VERSION, 2, EGL14.EGL_NONE), 0)
+            window = EGL14.eglCreateWindowSurface(display, configs[0], surface, intArrayOf(EGL14.EGL_NONE), 0)
+            check(EGL14.eglMakeCurrent(display, window, window, context)) { "cannot use the EGL surface" }
+            program = link(VERTEX, FRAGMENT)
+            texture = IntArray(1).also { GLES20.glGenTextures(1, it, 0) }[0]
+            GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, texture)
+            GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR)
+            GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR)
+            GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE)
+            GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE)
+        } catch (t: Throwable) {
+            close()
+            throw t
+        }
     }
 
     fun draw(matrix: FloatArray, timeNs: Long) {
@@ -331,11 +337,11 @@ private class ProxyGl(private val surface: Surface, private val width: Int, priv
     }
 
     override fun close() {
-        GLES20.glDeleteTextures(1, intArrayOf(texture), 0)
-        GLES20.glDeleteProgram(program)
+        if (texture != 0) GLES20.glDeleteTextures(1, intArrayOf(texture), 0)
+        if (program != 0) GLES20.glDeleteProgram(program)
         EGL14.eglMakeCurrent(display, EGL14.EGL_NO_SURFACE, EGL14.EGL_NO_SURFACE, EGL14.EGL_NO_CONTEXT)
-        EGL14.eglDestroySurface(display, window)
-        EGL14.eglDestroyContext(display, context)
+        if (window != EGL14.EGL_NO_SURFACE) EGL14.eglDestroySurface(display, window)
+        if (context != EGL14.EGL_NO_CONTEXT) EGL14.eglDestroyContext(display, context)
         EGL14.eglReleaseThread()
         surface.release()
     }
