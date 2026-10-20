@@ -76,6 +76,7 @@ fun EditorState.addModel(uri: String, name: String) {
 internal val Scene.cameraZoom: Float get() = max(width, height) / tan(Math.toRadians(30.0)).toFloat() / 2f
 
 fun EditorState.addCamera() {
+    cameraTip = !cameraMode && scene.layers.none { it.kind == "camera" }
     val zoom = scene.cameraZoom
     val attrs = newLayerAttrs(numbered(AppText.get(R.string.model_layer_camera)))
     if (scene.totalTime > 0) attrs["endTime"] = "${scene.totalTime}"

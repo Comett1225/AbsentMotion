@@ -1,6 +1,7 @@
 package app.absentmotion.ui.editor
 
 import app.absentmotion.model.Scene
+import app.absentmotion.model.defaultCameraId
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationState
@@ -189,6 +190,8 @@ private val HeaderEdge get() = Am.Line
 private val BarStripe get() = Am.LayerBarStripe
 private val TextBar get() = Am.TextBar
 private val TextStripe get() = Am.TextBarStripe
+private val CameraBar = Color(0xFFC32F5B)
+private val CameraStripe = Color(0xFFC83D66)
 private val BarShadow get() = Am.PreviewBg
 private val GripColor get() = Am.Inactive
 private val HandleColor get() = Am.Inactive
@@ -1030,8 +1033,9 @@ private fun DrawScope.drawRow(
     val left = time.x(layer.startTime.toFloat())
     val right = time.x(layer.endTime + 1f)
 
+    if (layer.kind == "camera" && layer.id == scene.defaultCameraId) drawRect(CameraBar.copy(alpha = 0.1f), Offset(0f, top), Size(size.width, RowHeight.toPx()))
     if (layer.kind == "audio") drawAudioBar(outline, layer, left, right, barTop, barBottom, time.pxPerMs)
-    else drawBar(outline, left, right, barTop, barBottom, stripe, picture, layer.startTime, time.pxPerMs, layer.kind == "text")
+    else drawBar(outline, left, right, barTop, barBottom, stripe, picture, layer.startTime, time.pxPerMs, layer.kind == "text", layer.kind == "camera")
     layer.labelColour?.let { drawTagCorner(outline, left, barTop, (barBottom - barTop) / 2, Color(it.start)) }
     drawLabel(layer.label, measurer, left, right, barTop, barBottom, if (layer.kind == "audio") LabelStyle.copy(color = Am.OnAudioBar) else LabelStyle)
     drawKeyframes(keyFrames, scene, selected, frame, time, left, right, centre, outline, appear, held)
@@ -1044,7 +1048,7 @@ private fun DrawScope.drawRow(
     drawHeader(top, eye, layer.labelColour, layer.id in MultiSelect.ids)
 }
 
-private fun DrawScope.drawBar(outline: Path, left: Float, right: Float, top: Float, bottom: Float, stripe: Float, picture: StripPicture?, startTime: Int, pxPerMs: Float, text: Boolean = false) {
+private fun DrawScope.drawBar(outline: Path, left: Float, right: Float, top: Float, bottom: Float, stripe: Float, picture: StripPicture?, startTime: Int, pxPerMs: Float, text: Boolean = false, camera: Boolean = false) {
     val radius = BarRadius.toPx()
     val from = max(left, -2 * radius)
     val to = min(right, size.width + 2 * radius)
@@ -1053,7 +1057,7 @@ private fun DrawScope.drawBar(outline: Path, left: Float, right: Float, top: Flo
     outline.rewind()
     outline.addRoundRect(RoundRect(from, top, to, bottom, CornerRadius(radius)))
     clipPath(outline) {
-        drawRect(if (text) TextBar else Am.LayerBar, Offset(from, top), Size(to - from, bottom - top))
+        drawRect(if (camera) CameraBar else if (text) TextBar else Am.LayerBar, Offset(from, top), Size(to - from, bottom - top))
         if (picture != null) {
             val tileHeight = (bottom - top).roundToInt().coerceAtLeast(1)
             val tileWidth = (tileHeight.toFloat() * picture.size.width / picture.size.height).roundToInt().coerceAtLeast(1)
@@ -1070,7 +1074,7 @@ private fun DrawScope.drawBar(outline: Path, left: Float, right: Float, top: Flo
         } else {
             var x = left + stripe * (2 * floor((from - left) / (2 * stripe)) + 1)
             while (x < to) {
-                drawRect(if (text) TextStripe else BarStripe, Offset(x, top), Size(stripe, bottom - top))
+                drawRect(if (camera) CameraStripe else if (text) TextStripe else BarStripe, Offset(x, top), Size(stripe, bottom - top))
                 x += 2 * stripe
             }
         }

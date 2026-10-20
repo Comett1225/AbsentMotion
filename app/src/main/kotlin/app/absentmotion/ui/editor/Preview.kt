@@ -262,6 +262,7 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier) {
         )
         Presence(hint) { SwipeHint(hintLabel, Modifier.align(Alignment.Center).presence()) }
         CanvasZoomHud(state, Modifier.align(Alignment.TopStart))
+        Presence(state.cameraTip && !LocalWide.current) { CameraTip(state, Modifier.align(Alignment.BottomEnd).presence()) }
         EyedropperLoupe(state, Modifier.fillMaxSize())
         GradientHandles(state, quad, scale, Offset(dx, dy))
         if (editingText) Canvas(Modifier.fillMaxSize()) {
