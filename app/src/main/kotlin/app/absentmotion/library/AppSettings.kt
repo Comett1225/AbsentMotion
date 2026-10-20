@@ -58,6 +58,16 @@ class AppSettings(private val context: Context) {
         get() = vibrationState
         set(value) { vibrationState = value; prefs.edit().putBoolean("trimLimitVibration", value).apply() }
 
+    private var previewCopiesState by mutableStateOf(prefs.getBoolean(app.absentmotion.media.VideoProxies.SETTING, true))
+
+    var previewCopies: Boolean
+        get() = previewCopiesState
+        set(value) {
+            previewCopiesState = value
+            prefs.edit().putBoolean(app.absentmotion.media.VideoProxies.SETTING, value).commit()
+            app.absentmotion.media.VideoProxies.settingChanged()
+        }
+
     private var fullMotionBlurState by mutableStateOf(prefs.getBoolean("fullMotionBlur", false))
 
     var fullMotionBlur: Boolean

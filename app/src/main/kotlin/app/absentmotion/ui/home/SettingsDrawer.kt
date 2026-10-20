@@ -54,6 +54,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.absentmotion.ai.CaptionModel
+import app.absentmotion.media.VideoProxies
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import app.absentmotion.library.AppSettings
 import app.absentmotion.library.PreviewQuality
 import app.absentmotion.ui.theme.Am
@@ -108,7 +111,9 @@ fun SettingsDrawer(settings: AppSettings, onRestored: () -> Unit = {}) {
                 Spacer(Modifier.height(10.dp))
                 Choices(PreviewQuality.entries.map { it.name.uppercase() }, settings.previewQuality.ordinal) { settings.previewQuality = PreviewQuality.entries[it] }
                 Spacer(Modifier.height(8.dp))
+                SwitchRow("Use preview copies of large videos", settings.previewCopies, enabled = true) { settings.previewCopies = it }
             }
+            PreviewCopiesRow()
             Spacer(Modifier.height(15.dp))
             LinkRow(stringResource(R.string.settings_language), currentLanguage(LocalContext.current).nativeName) { language = true }
             BackupRows(settings, onRestored)
@@ -126,6 +131,23 @@ fun SettingsDrawer(settings: AppSettings, onRestored: () -> Unit = {}) {
         confirmButton = { TextButton({ demoNote = false }) { Text("OK", color = Am.Navy) } },
         containerColor = Am.Card,
     )
+}
+
+@Composable
+private fun PreviewCopiesRow() {
+    val context = LocalContext.current
+    val made by VideoProxies.revision.collectAsState()
+    var bytes by remember { mutableLongStateOf(0L) }
+    LaunchedEffect(made) { bytes = withContext(Dispatchers.IO) { VideoProxies.bytes(context) } }
+    Spacer(Modifier.height(15.dp))
+    Row(
+        Modifier.padding(horizontal = 6.dp).fillMaxWidth().height(44.dp).clip(PanelShape).background(PanelColor)
+            .clickable { VideoProxies.clear(context) }.padding(start = 15.dp, end = 15.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text("Clear preview copies", Modifier.weight(1f), color = Am.HomeInk, fontSize = 13.sp)
+        Text(Formatter.formatShortFileSize(context, bytes), color = Am.HomeMid, fontSize = 13.sp)
+    }
 }
 
 @Composable

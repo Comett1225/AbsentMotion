@@ -7,8 +7,15 @@ import android.net.Uri
 import android.util.LruCache
 
 internal object VideoSources {
-    private val indices = LruCache<String, LongArray>(16)
-    @Synchronized fun timestamps(context: Context, uri: String): LongArray {
+    private class Index(val timestamps: LongArray, val syncGapUs: Long)
+
+    private val indices = LruCache<String, Index>(16)
+
+    fun timestamps(context: Context, uri: String): LongArray = index(context, uri).timestamps
+
+    fun syncGapUs(context: Context, uri: String): Long = index(context, uri).syncGapUs
+
+    @Synchronized private fun index(context: Context, uri: String): Index {
         val key = uri + "\n" + fileVersion(context.contentResolver, Uri.parse(uri))
         indices.get(key)?.let { return it }
         val extractor = MediaExtractor()
@@ -17,10 +24,23 @@ internal object VideoSources {
             val track = (0 until extractor.trackCount).first { extractor.getTrackFormat(it).getString(MediaFormat.KEY_MIME)?.startsWith("video/") == true }
             extractor.selectTrack(track)
             val samples = ArrayList<Long>()
-            while (extractor.sampleTime >= 0) { samples += extractor.sampleTime; extractor.advance() }
-            return samples.distinct().sorted().toLongArray().also { check(it.isNotEmpty()); indices.put(key, it) }
+            val syncs = ArrayList<Long>()
+            while (extractor.sampleTime >= 0) {
+                samples += extractor.sampleTime
+                if (extractor.sampleFlags and MediaExtractor.SAMPLE_FLAG_SYNC != 0) syncs += extractor.sampleTime
+                extractor.advance()
+            }
+            val stamps = samples.distinct().sorted().toLongArray()
+            check(stamps.isNotEmpty())
+            return Index(stamps, longestSyncGap(syncs, stamps.last())).also { indices.put(key, it) }
         } finally { extractor.release() }
     }
+}
+
+internal fun longestSyncGap(syncs: List<Long>, lastUs: Long): Long {
+    if (syncs.isEmpty()) return Long.MAX_VALUE
+    val sorted = syncs.sorted()
+    return (sorted.zipWithNext { a, b -> b - a } + (lastUs - sorted.last())).max()
 }
 
 internal fun LongArray.ptsAt(timeUs: Long): Long {

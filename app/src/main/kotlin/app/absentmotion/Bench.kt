@@ -8,10 +8,13 @@ import android.view.FrameMetrics
 import android.view.Window
 import app.absentmotion.editor.EditorState
 import app.absentmotion.engine.RenderStats
+import app.absentmotion.media.VideoProxies
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withTimeoutOrNull
 import org.json.JSONObject
 
-internal suspend fun runBench(activity: Activity, state: EditorState, seconds: Int) {
+internal suspend fun runBench(activity: Activity, state: EditorState, seconds: Int, proxies: Boolean = false) {
     val thread = HandlerThread("am-bench").apply { start() }
     val kinds = mapOf("ui" to FrameMetrics.TOTAL_DURATION, "uiInput" to FrameMetrics.INPUT_HANDLING_DURATION,
         "uiAnimation" to FrameMetrics.ANIMATION_DURATION, "uiLayout" to FrameMetrics.LAYOUT_MEASURE_DURATION,
@@ -42,6 +45,12 @@ internal suspend fun runBench(activity: Activity, state: EditorState, seconds: I
     }
     try {
         delay(1500)
+        if (proxies) {
+            val started = System.nanoTime()
+            withTimeoutOrNull(600_000) { VideoProxies.progress.first { it.isEmpty() } }
+            Log.i("AMBench", "preview copies ready after ${(System.nanoTime() - started) / 1_000_000} ms, ${VideoProxies.bytes(activity)} bytes")
+            delay(1500)
+        }
         phase("play") {
             val start = state.frame
             state.playing = true

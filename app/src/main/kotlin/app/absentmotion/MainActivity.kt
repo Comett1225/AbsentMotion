@@ -389,6 +389,7 @@ class MainActivity : ComponentActivity() {
         DebugFrameInterpolation.alpha = intent.getFloatExtra("interpAlpha", 0.15f)
         DebugFrameInterpolation.fuse = intent.getIntExtra("interpFuse", 4)
         if (intent.getBooleanExtra("audiolog", false)) engine.audio?.log = true
+        if (intent.hasExtra("previewCopies")) settings.previewCopies = intent.getBooleanExtra("previewCopies", true)
         if (intent.getBooleanExtra("effectcheck", false)) lifecycleScope.launch {
             engine.effectCheck(getExternalFilesDir(null)!!)
             Log.i("AMEffects", "effectcheck.json written")
@@ -465,7 +466,7 @@ class MainActivity : ComponentActivity() {
                     val xy = point.split(',').mapNotNull { it.trim().toFloatOrNull() }
                     if (xy.size == 2) Log.i("AMTest", "hit $point ${engine.hitTest(xy[0], xy[1], state.timeMs)}")
                 }
-                intent.getIntExtra("bench", 0).takeIf { it > 0 }?.let { runBench(this@MainActivity, state, it) }
+                intent.getIntExtra("bench", 0).takeIf { it > 0 }?.let { runBench(this@MainActivity, state, it, intent.getBooleanExtra("proxies", false)) }
             } catch (e: kotlinx.coroutines.CancellationException) {
                 throw e
             } catch (e: IllegalStateException) {

@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -85,6 +86,7 @@ import app.absentmotion.editor.toggleBookmark
 import app.absentmotion.editor.toggleHidden
 import app.absentmotion.editor.deselectLayer
 import app.absentmotion.editor.clearSelection
+import app.absentmotion.media.VideoProxies
 import app.absentmotion.model.LabelColour
 import app.absentmotion.model.Layer
 import app.absentmotion.model.trimmedTo
@@ -149,6 +151,9 @@ private val BarShadowHeight = 2.dp
 private val LabelInset = 14.dp
 private const val MAX_LABEL_PX = 16_000
 
+private val ProxyLineHeight = 2.dp
+private val ProxyLineInset = 1.dp
+
 private val GripZone = 30.dp
 private val GripGap = 1.8.dp
 
@@ -209,6 +214,7 @@ fun Timeline(state: EditorState, modifier: Modifier = Modifier) {
     val eyeOff = rememberVectorPainter(TimelineIcons.EyeOff)
     val outline = remember { Path() }
     val strips by remember(view) { derivedStateOf { view.stripWindow() } }
+    val proxies by VideoProxies.progress.collectAsState()
     val mediaPictures = buildMap {
         for (row in strips.rows) {
             val layer = view.layerAt(row) ?: continue
@@ -238,7 +244,7 @@ fun Timeline(state: EditorState, modifier: Modifier = Modifier) {
             })
             .onSizeChanged { view.size = it }
             .pointerInput(view) { timelineGestures(view) { haptic.performHapticFeedback(HapticFeedbackType.LongPress) } }
-            .drawBehind { drawTimeline(view, measurer, eye, eyeOff, outline, mediaPictures, appear.value) },
+            .drawBehind { drawTimeline(view, measurer, eye, eyeOff, outline, mediaPictures, proxies, appear.value) },
     ) {
         HeaderPictures(view) { drawLifted(view, measurer, eye, eyeOff, outline, mediaPictures, appear.value) }
     }
@@ -908,7 +914,7 @@ private suspend fun PointerInputScope.timelineGestures(view: TimelineView, onLon
     }
 }
 
-private fun DrawScope.drawTimeline(view: TimelineView, measurer: TextMeasurer, eye: Painter, eyeOff: Painter, outline: Path, pictures: Map<Long, StripPicture>, appear: Float = 1f) {
+private fun DrawScope.drawTimeline(view: TimelineView, measurer: TextMeasurer, eye: Painter, eyeOff: Painter, outline: Path, pictures: Map<Long, StripPicture>, proxies: Map<String, Float>, appear: Float = 1f) {
     val state = view.state
     val fps = view.fps
     val time = view.timeScale()
@@ -921,6 +927,9 @@ private fun DrawScope.drawTimeline(view: TimelineView, measurer: TextMeasurer, e
             val layer = view.layerAt(row) ?: continue
             if (layer.id == view.liftId) continue
             drawRow(layer, layer.id == state.selectedId, view.shownTop(row, layer.id), time, stripe, measurer, if (layer.hidden) eyeOff else eye, outline, state.scene, state.frame, pictures[layer.id], view.keyFrames(layer), appear, view.keyFrame.takeIf { layer.id == view.keyId }, view.limitEdge.takeIf { layer.id == state.selectedId })
+            layer.mediaFill?.takeIf { it.video }?.let { proxies[it.uri] }?.let { done ->
+                drawProxyProgress(time.x(layer.startTime.toFloat()), time.x(layer.endTime + 1f), view.shownTop(row, layer.id), done)
+            }
         }
     }
     view.snapAt?.let { frame ->
@@ -953,6 +962,16 @@ private fun DrawScope.drawLifted(view: TimelineView, measurer: TextMeasurer, eye
             drawRow(layer, id == state.selectedId, top, time, stripe, measurer, if (layer.hidden) eyeOff else eye, outline, state.scene, state.frame, pictures[id], view.keyFrames(layer), appear)
         }
     }
+}
+
+private fun DrawScope.drawProxyProgress(left: Float, right: Float, top: Float, done: Float) {
+    val from = max(left, 0f)
+    val to = min(right, size.width)
+    if (from >= to) return
+    val height = ProxyLineHeight.toPx()
+    val y = top + (RowHeight - BarInset).toPx() - height - ProxyLineInset.toPx()
+    drawRect(Color.Black.copy(alpha = 0.35f), Offset(from, y), Size(to - from, height))
+    drawRect(Am.Accent, Offset(from, y), Size((to - from) * done.coerceIn(0f, 1f), height))
 }
 
 private fun DrawScope.drawBookmark(x: Float, outline: Path) {

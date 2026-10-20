@@ -13,7 +13,9 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import app.absentmotion.media.VideoProxies
 import app.absentmotion.media.VideoSources
+import app.absentmotion.media.fileVersion
 import app.absentmotion.media.ptsAt
 import app.absentmotion.model.Layer
 import app.absentmotion.model.Scene
@@ -64,13 +66,14 @@ private suspend fun thumbnailsAt(context: Context, uri: String, tiles: List<Pair
     var retriever: MediaMetadataRetriever? = null
     return try {
         val pts = VideoSources.timestamps(context, uri)
+        val source = VideoProxies.ready(context, uri, fileVersion(context.contentResolver, Uri.parse(uri))) ?: uri
         tiles.mapNotNull { (projectTime, timeUs) ->
             coroutineContext.ensureActive()
             val time = pts.ptsAt(timeUs)
             val key = uri to time
             val picture = synchronized(thumbnails) { thumbnails.get(key) } ?: (retriever ?: MediaMetadataRetriever().also {
                 retriever = it
-                it.setDataSource(context, Uri.parse(uri))
+                it.setDataSource(context, Uri.parse(source))
             }).getScaledFrameAtTime(time, MediaMetadataRetriever.OPTION_CLOSEST, 160, 96)?.asImageBitmap()?.also { bitmap ->
                 synchronized(thumbnails) { thumbnails.put(key, bitmap) }
             }

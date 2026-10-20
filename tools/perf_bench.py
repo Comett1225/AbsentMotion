@@ -13,6 +13,8 @@ DEVICE_DIR = f"/sdcard/Android/data/{PKG}/files"
 WIDTH, HEIGHT, FPS, LENGTH = 1080, 1920, 30, 12000
 VIDEOS = [("bench-a.mp4", 1920, 1080, 30, "testsrc2"), ("bench-b.mp4", 1920, 1080, 30, "smptehdbars"),
           ("bench-c.mp4", 1920, 1080, 30, "mandelbrot")]
+LARGE = [("bench-4k-a.mp4", 3840, 2160, 300, "testsrc2"), ("bench-4k-b.mp4", 3840, 2160, 300, "smptehdbars"),
+         ("bench-4k-c.mp4", 3840, 2160, 300, "mandelbrot")]
 EFFECTS = [
     '<effect id="absent.glow"><property name="strength" type="float" value="18"/></effect>',
     '<effect id="absent.huesaturation"><property name="hue" type="float" value="40"/></effect>',
@@ -94,7 +96,7 @@ def run(work, seconds, label, videos, extras):
     adb("shell", "am", "force-stop", PKG)
     adb("logcat", "-c")
     adb("shell", "am", "start", "-n", f"{PKG}/.MainActivity", "--es", "xml", f"{DEVICE_DIR}/perfbench.xml", "--ei", "bench", seconds, *extras)
-    deadline = time.time() + 120 + 4 * seconds
+    deadline = time.time() + 600 + 4 * seconds
     while not (log := adb("logcat", "-d", "-s", "AMBench")).rstrip().endswith("done"):
         if time.time() > deadline:
             sys.exit("the benchmark did not finish")
@@ -117,10 +119,13 @@ def main():
     parser.add_argument("--label", default="run")
     parser.add_argument("--seconds", type=int, default=6)
     parser.add_argument("--repeat", type=int, default=1)
+    parser.add_argument("--large", action="store_true", help="three 4K videos with 10 s between key frames")
+    parser.add_argument("--copies", choices=["on", "off"], help="turn preview copies of large videos on or off first")
     args = parser.parse_args()
     args.work.mkdir(parents=True, exist_ok=True)
+    extras = (["--ez", "previewCopies", "true" if args.copies == "on" else "false"] if args.copies else []) + (["--ez", "proxies", "true"] if args.large else [])
     for _ in range(args.repeat):
-        run(args.work, args.seconds, args.label, VIDEOS, [])
+        run(args.work, args.seconds, args.label, LARGE if args.large else VIDEOS, extras)
 
 
 if __name__ == "__main__":

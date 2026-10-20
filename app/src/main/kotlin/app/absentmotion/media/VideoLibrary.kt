@@ -57,11 +57,17 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
         scope.launch {
             for (request in requests) lock.withLock {
                 if (paused || request !== latest) return@withLock
+                if (proxiesFor !== request.scene.node) {
+                    proxiesFor = request.scene.node
+                    request.scene.videoUris().forEach { VideoProxies.request(context, it) }
+                }
                 reconcile(request)
                 for (layer in visible(request)) sessions[layer.layer.id]?.request(request, layer)
             }
         }
     }
+
+    private var proxiesFor: Any? = null
 
     fun update(scene: Scene, timeMs: Int, playing: Boolean = false) {
         if (closed) return
@@ -115,6 +121,8 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
     }
 
     suspend fun retry() = lock.withLock {
+        VideoProxies.forgetChecks()
+        proxiesFor = null
         for ((id, session) in sessions.toMap()) {
             if (session.failed || session.generation != engine.generation || session.version != fileVersion(context.contentResolver, Uri.parse(session.uri))) {
                 sessions.remove(id)
@@ -140,6 +148,9 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
         private val decoderLock = Mutex()
         private val queue = Channel<Pair<Request, VideoSample>>(Channel.CONFLATED)
         private var decoder: VideoDecoder? = null
+        private var source: String? = null
+        private var proxy: String? = null
+        private var proxyRevision = -1
         val generation = engine.generation
         val version = fileVersion(context.contentResolver, Uri.parse(uri))
         @Volatile private var retryAt = 0L
@@ -188,7 +199,13 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
             }
             fun abandoned(): Boolean = !exact && latest.let { now -> now == null || paused || stopped || visible(now).none { it.layer.id == id } }
             if (obsolete()) return@withLock
-            val source = decoder ?: VideoDecoder(context, uri).also { decoder = it }
+            if (!exact && proxyRevision != VideoProxies.revision.value) {
+                proxyRevision = VideoProxies.revision.value
+                proxy = VideoProxies.ready(context, uri, version)
+            }
+            val wanted = if (exact) uri else proxy ?: uri
+            if (this.source != wanted) { decoder?.close(); decoder = null }
+            val source = decoder ?: open(wanted).also { decoder = it }
             if (exact && request.interpolation != FrameInterpolation.Off && mixed(source, request, sample)) return@withLock
             val ahead = if (request.playing) leadMs * (sample.track.timeAt(request.timeMs.toDouble(), false)?.rate ?: 1.0) else 0.0
             val time = layer.videoTimeUs((sample.timeMs + ahead).toInt(), sample.scene)
@@ -210,6 +227,15 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
                     if (!exact && request.playing) leadMs = (leadMs * 0.8 + (System.nanoTime() - request.born) / 1e6 * 0.2).coerceIn(0.0, MAX_LEAD_MS)
                 }
             }
+        }
+
+        private fun open(wanted: String): VideoDecoder = try {
+            VideoDecoder(context, wanted).also { source = wanted }
+        } catch (e: Exception) {
+            if (wanted == uri) throw e
+            Log.w("AMVideo", "Cannot open the preview copy of $uri, using the original", e)
+            proxy = null
+            VideoDecoder(context, uri).also { source = uri }
         }
 
         private suspend fun mixed(source: VideoDecoder, request: Request, sample: VideoSample): Boolean {
@@ -253,6 +279,9 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
         }
     }
 }
+
+internal fun Scene.videoUris(): Set<String> =
+    layerTracks().mapNotNullTo(LinkedHashSet()) { track -> track.layer.mediaFill?.takeIf { it.video && !isMissing(it.uri) }?.uri }
 
 internal data class VideoSample(val track: LayerTrack, val timeMs: Double) {
     val layer get() = track.layer
