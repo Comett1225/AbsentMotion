@@ -71,7 +71,7 @@ internal fun TextEditor(state: EditorState) {
                 Row(Modifier.fillMaxWidth().height(42.dp).background(Am.Deepest), verticalAlignment = Alignment.CenterVertically) {
                     val alignIcon = when (layer.textAlign) { "center" -> TextIcons.Centre; "right" -> TextIcons.Right; "justify" -> TextIcons.Justify; else -> TextIcons.Left }
                     Box(Modifier.padding(1.5.dp).width(38.dp).fillMaxHeight().background(TextControl, RoundedCornerShape(2.dp)).clickable {
-                        val alignments = listOf("left", "center", "right")
+                        val alignments = listOf("left", "center", "right", "justify")
                         state.editSelected { it.withTextAlign(alignments[(alignments.indexOf(it.textAlign) + 1) % alignments.size]) }
                     }, contentAlignment = Alignment.Center) { Icon(alignIcon, stringResource(R.string.text_alignment), Modifier.size(24.dp), tint = Am.OnDark) }
                     Row(Modifier.padding(1.5.dp).weight(1f).fillMaxHeight().background(TextControl).clickable { popup = if (popup == "font") "" else "font" },
