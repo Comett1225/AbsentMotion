@@ -506,6 +506,8 @@ class MainActivity : ComponentActivity() {
         intent.getStringExtra("interp")?.let { name -> FrameInterpolation.entries.firstOrNull { it.name.equals(name, true) }?.let { s = s.copy(interpolation = it) } }
         app.absentmotion.export.ExportDebug.forceBuffers = intent.getBooleanExtra("buffers", false)
         app.absentmotion.export.ExportDebug.fakeFreeBytes = intent.getLongExtra("fakefree", -1L)
+        app.absentmotion.export.ThermalMonitor.of(applicationContext).forced =
+            app.absentmotion.export.ThermalLevel.entries.firstOrNull { it.name.equals(intent.getStringExtra("thermal"), true) }
         intent.getStringExtra("container")?.let { name -> app.absentmotion.export.Container.entries.firstOrNull { it.name.equals(name, true) }?.let { s = s.copy(container = it) } }
         intent.getStringExtra("aformat")?.let { name -> app.absentmotion.export.AudioFormat.entries.firstOrNull { it.name.equals(name, true) }?.let { s = s.copy(audioFormat = it) } }
         var a = s.audio

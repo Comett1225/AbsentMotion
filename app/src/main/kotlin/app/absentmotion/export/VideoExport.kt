@@ -13,6 +13,7 @@ import app.absentmotion.model.Scene
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.runInterruptible
 import kotlinx.coroutines.withContext
@@ -49,7 +50,8 @@ internal const val PrimingKey = "absentmotion-priming-frames"
 private const val OpusLookaheadFrames = 312
 
 internal suspend fun exportVideo(
-    engine: EngineThread, scene: Scene, xml: String, s: ExportSettings, out: FileDescriptor, audio: AudioMix?, progress: (Float) -> Unit,
+    engine: EngineThread, scene: Scene, xml: String, s: ExportSettings, out: FileDescriptor, audio: AudioMix?,
+    hotAtStart: Boolean = false, pauseMs: () -> Long = { 0L }, progress: (Float) -> Unit,
 ) {
     val (width, height) = exportSize(scene, s.shortSide, even = true)
     val frames = frameCount(scene, s.fps)
@@ -69,6 +71,10 @@ internal suspend fun exportVideo(
         setInteger(MediaFormat.KEY_COLOR_TRANSFER, MediaFormat.COLOR_TRANSFER_SDR_VIDEO)
         if (mime == MediaFormat.MIMETYPE_VIDEO_AVC && caps.profileLevels.any { it.profile == MediaCodecInfo.CodecProfileLevel.AVCProfileHigh }) {
             setInteger(MediaFormat.KEY_PROFILE, MediaCodecInfo.CodecProfileLevel.AVCProfileHigh)
+        }
+        if (hotAtStart) {
+            setInteger(MediaFormat.KEY_PRIORITY, 1)
+            setInteger(MediaFormat.KEY_OPERATING_RATE, s.fps)
         }
     }
 
@@ -104,6 +110,7 @@ internal suspend fun exportVideo(
                     draw(k, (BASE_US + k * 1_000_000L / s.fps) * 1000)
                     progress((k + 1f) / frames * 0.98f)
                     if (k % 30 == 0) ensureStorage()
+                    pauseMs().takeIf { it > 0 }?.let { delay(it) }
                 }
                 encoder.signalEndOfInputStream()
             }

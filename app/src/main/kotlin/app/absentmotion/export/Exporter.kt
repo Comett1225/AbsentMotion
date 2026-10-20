@@ -35,11 +35,16 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
                 when (kind) {
                     ExportKind.Video -> s.fixedFormat().let { f ->
                         val started = android.os.SystemClock.elapsedRealtime()
+                        var paused = 0L
                         direct(saved, name, f.container.ext, f.container.mime, "Movies/$AppFolder") { fd ->
-                            exportVideo(engine, scene, xml, f, fd, ExportAudio.mixFor?.invoke(scene, f.audio.effectiveRate), progress)
+                            cool { thermal ->
+                                exportVideo(engine, scene, xml, f, fd, ExportAudio.mixFor?.invoke(scene, f.audio.effectiveRate), thermal.hot,
+                                    { thermal.pauseMs().also { paused += it } }, progress)
+                            }
                         }.also {
                             val (w, h) = exportSize(scene, f.shortSide, even = true)
-                            ExportTimes(context).record(ExportRecord(f.codec, w, h, f.fps, frameCount(scene, f.fps), android.os.SystemClock.elapsedRealtime() - started, f.interpolation))
+                            val ms = android.os.SystemClock.elapsedRealtime() - started - paused
+                            ExportTimes(context).record(ExportRecord(f.codec, w, h, f.fps, frameCount(scene, f.fps), ms.coerceAtLeast(1), f.interpolation))
                         }
                     }
                     ExportKind.Audio -> {
@@ -52,7 +57,7 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
                             (mix as? java.io.Closeable)?.close()
                         }
                     }
-                    ExportKind.Gif -> direct(saved, name, "gif", "image/gif", "Pictures/$AppFolder") { fd -> gif(scene, xml, s, fdStream(fd), progress) }
+                    ExportKind.Gif -> direct(saved, name, "gif", "image/gif", "Pictures/$AppFolder") { fd -> cool { gif(scene, xml, s, fdStream(fd), it::pauseMs, progress) } }
                     ExportKind.Frame, ExportKind.FrameAs -> {
                         val shape = if (kind == ExportKind.Frame) s.copy(image = ImageKind.Png) else s
                         single(saved, name, shape.image.ext, shape.image.mime, "Pictures/$AppFolder") { out ->
@@ -96,7 +101,18 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
         return ExportResult(saved, mime, store.location(where))
     }
 
-    private suspend fun gif(scene: Scene, xml: String, s: ExportSettings, out: OutputStream, progress: (Float) -> Unit) {
+    private suspend fun <T> cool(block: suspend (ThermalMonitor) -> T): T {
+        val thermal = ThermalMonitor.of(context)
+        thermal.start()
+        try {
+            android.util.Log.i("AMExport", "thermal ${thermal.refresh()} pause=${thermal.pauseMs()}")
+            return block(thermal)
+        } finally {
+            thermal.stop()
+        }
+    }
+
+    private suspend fun gif(scene: Scene, xml: String, s: ExportSettings, out: OutputStream, pauseMs: () -> Long, progress: (Float) -> Unit) {
         val (width, height) = exportSize(scene, s.shortSide, even = false)
         val frames = frameCount(scene, s.fps)
         engine.exportSession(xml, s.interpolation, s.fps) {
@@ -108,6 +124,7 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
                     withContext(Dispatchers.Default) { writer.frame(ImageEncode.flatten(pixels, s.background), (k + 1) * 1000L / s.fps) }
                     progress((k + 1f) / frames)
                     if (k % 30 == 0) ensureStorage()
+                    pauseMs().takeIf { it > 0 }?.let { kotlinx.coroutines.delay(it) }
                 }
                 writer.finish()
             }

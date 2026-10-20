@@ -82,8 +82,12 @@ class ExportTimes(context: Context) {
         prefs.edit().putString("records", recordsToJson(kept).toString()).apply()
     }
 
-    fun estimateMs(s: ExportSettings, scene: Scene, probe: ProbeResult? = DeviceCapabilities.of(app).report.value?.probe): Long? {
+    fun estimateMs(
+        s: ExportSettings, scene: Scene, probe: ProbeResult? = DeviceCapabilities.of(app).report.value?.probe,
+        thermal: ThermalLevel = ThermalLevel.Normal,
+    ): Long? {
         val (w, h) = exportSize(scene, s.shortSide, even = true)
-        return estimateExportMs(history(), probe, s.codec, w, h, s.fps, frameCount(scene, s.fps), s.interpolation)
+        val frames = frameCount(scene, s.fps)
+        return estimateExportMs(history(), probe, s.codec, w, h, s.fps, frames, s.interpolation)?.let { it + pauseMs(thermal) * frames }
     }
 }
