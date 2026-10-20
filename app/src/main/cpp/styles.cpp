@@ -910,6 +910,7 @@ static bool ContainsOne(const std::vector<Layer>& siblings, const Layer& l, doub
     const SkPoint inner = {local.fX + l.innerWidth / 2.0f, local.fY + l.innerHeight / 2.0f};
     if (!SkRect::MakeWH(l.innerWidth, l.innerHeight).contains(inner.fX, inner.fY)) return false;
     const double innerTime = NestedTime(l, timeMs);
+    if (innerTime >= 0 && (l.innerBackground >> 24) != 0) return true;
     for (auto it = l.children.rbegin(); innerTime >= 0 && it != l.children.rend(); ++it) {
         if (Contains(l.children, *it, innerTime, inner, l.innerWidth, l.innerHeight)) return true;
     }
@@ -922,6 +923,7 @@ static bool ContentRect(const Layer& l, double timeMs, const SkMatrix& matrix, S
     *out = matrix.mapRect(shape.getBounds());
     if (l.kind != "embedScene") return true;
     const double innerTime = NestedTime(l, timeMs);
+    if (innerTime >= 0 && (l.innerBackground >> 24) != 0) return true;
     const SkMatrix origin = SkMatrix::Concat(matrix, SkMatrix::Translate(-l.innerWidth / 2.0f, -l.innerHeight / 2.0f));
     float left = INFINITY, top = INFINITY, right = -INFINITY, bottom = -INFINITY;
     SkRect child;
