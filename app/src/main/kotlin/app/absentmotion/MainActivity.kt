@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -178,7 +179,7 @@ class MainActivity : ComponentActivity() {
                         else {
                             val screen = LocalConfiguration.current
                             CompositionLocalProvider(LocalWide provides wideEditor(screen.smallestScreenWidthDp, screen.screenWidthDp)) {
-                                Ltr { EditorScreen(open, onExit = ::closeEditor) }
+                                key(open) { Ltr { EditorScreen(open, onExit = ::closeEditor) } }
                             }
                         }
                         if (open.exportOpen) ExportScreen(open.scene, open.frame, engine, fromProjectList = false) { open.exportOpen = false }
