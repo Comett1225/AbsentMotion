@@ -108,6 +108,60 @@ class RowDragTest {
         assertEquals(listOf(0, 0, 0), (0..2).map { RowDrag.shift(it, 1, 1) })
     }
 
+    @Test fun slideSelectPushesOnlyAfterMovingTowardTheEdge() {
+        val slop = 8f
+        assertEquals(0f, RowDrag.toward(speed(bottom - 5f), bottom - 5f, bottom - 5f, slop), 0f)
+        assertEquals(0f, RowDrag.toward(speed(bottom - 5f), bottom - 5f, bottom - 10f, slop), 0f)
+        assertTrue(RowDrag.toward(speed(bottom - 5f), bottom - 5f, bottom - 40f, slop) > 0f)
+        assertEquals(0f, RowDrag.toward(speed(bottom - 20f), bottom - 20f, bottom - 5f, slop), 0f)
+        assertTrue(RowDrag.toward(speed(top + 5f), top + 5f, top + 60f, slop) < 0f)
+        assertEquals(0f, RowDrag.toward(speed(top + 5f), top + 5f, top + 2f, slop), 0f)
+        assertEquals(0f, RowDrag.toward(0f, 150f, 20f, slop), 0f)
+    }
+
+    @Test fun theMultiSelectBarAppearingUnderTheFingerDoesNotScroll() {
+        val finger = bottom - 10f
+        val shortened = bottom - 48f
+        assertTrue(RowDrag.edgeSpeed(finger, top, shortened, zone, slowest, fastest) > 0f)
+        assertEquals(0f, RowDrag.toward(RowDrag.edgeSpeed(finger, top, shortened, zone, slowest, fastest), finger, finger, 8f), 0f)
+        assertEquals(0f, RowDrag.toward(RowDrag.edgeSpeed(finger - 20f, top, shortened, zone, slowest, fastest), finger - 20f, finger, 8f), 0f)
+        assertTrue(RowDrag.toward(RowDrag.edgeSpeed(finger + 9f, top, shortened, zone, slowest, fastest), finger + 9f, finger, 8f) > 0f)
+    }
+
+    @Test fun fingerRowStaysOnTheVisibleRows() {
+        assertEquals(0, RowDrag.fingerRow(top, rowH, top, bottom, 0f, 30))
+        assertEquals(0, RowDrag.fingerRow(-50f, rowH, top, bottom, 0f, 30))
+        assertEquals(3, RowDrag.fingerRow(top + 3 * rowH + 1f, rowH, top, bottom, 0f, 30))
+        assertEquals(4, RowDrag.fingerRow(top + 3 * rowH + 1f, rowH, top, bottom, rowH, 30))
+        val last = RowDrag.fingerRow(bottom - 1f, rowH, top, bottom, 0f, 30)
+        assertEquals(last, RowDrag.fingerRow(bottom + 200f, rowH, top, bottom, 0f, 30))
+        val shortened = bottom - 48f
+        val visible = RowDrag.fingerRow(shortened + 20f, rowH, top, shortened, 0f, 30)
+        assertTrue(top + visible * rowH < shortened)
+        assertEquals(2, RowDrag.fingerRow(bottom + 200f, rowH, top, bottom, 0f, 3))
+        assertEquals(0, RowDrag.fingerRow(bottom, rowH, top, bottom, 0f, 0))
+    }
+
+    @Test fun slidingAddsEveryRowPassedAndSlidingBackRemovesThem() {
+        val rows = listOf(10L, 11L, 12L, 13L, 14L, 15L)
+        val base = setOf(12L)
+        assertEquals(setOf(12L), RowDrag.slideSelection(base, rows, 2, 2, add = true))
+        assertEquals(setOf(12L, 13L, 14L, 15L), RowDrag.slideSelection(base, rows, 2, 5, add = true))
+        assertEquals(setOf(12L, 13L), RowDrag.slideSelection(base, rows, 2, 3, add = true))
+        assertEquals(setOf(10L, 11L, 12L), RowDrag.slideSelection(base, rows, 2, 0, add = true))
+        val earlier = setOf(12L, 15L)
+        assertEquals(setOf(12L, 13L, 15L), RowDrag.slideSelection(earlier, rows, 2, 3, add = true))
+        assertEquals(setOf(12L, 15L), RowDrag.slideSelection(earlier, rows, 2, 2, add = true))
+    }
+
+    @Test fun slidingFromADeselectedRowDeselectsTheRange() {
+        val rows = listOf(10L, 11L, 12L, 13L, 14L)
+        val base = setOf(10L, 11L, 13L, 14L)
+        assertEquals(setOf(10L, 11L, 14L), RowDrag.slideSelection(base, rows, 2, 3, add = false))
+        assertEquals(setOf(13L, 14L), RowDrag.slideSelection(base, rows, 2, 0, add = false))
+        assertEquals(base, RowDrag.slideSelection(base, rows, 2, 2, add = false))
+    }
+
     @Test fun shiftMatchesTheModelMove() {
         val before = (0 until 30).toList()
         for (from in 0 until 30) for (to in 0 until 30) {

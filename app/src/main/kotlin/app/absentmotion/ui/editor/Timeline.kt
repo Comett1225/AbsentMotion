@@ -197,7 +197,7 @@ fun Timeline(state: EditorState, modifier: Modifier = Modifier) {
     val wide = LocalWide.current
     val view = remember(state, density, wide) {
         TimelineView(state, density, scope, wide).also { v ->
-            v.onLimit = { if (state.settings.trimLimitVibration) haptic.performHapticFeedback(HapticFeedbackType.SegmentFrequentTick) }
+            v.onTick = { if (state.settings.trimLimitVibration) haptic.performHapticFeedback(HapticFeedbackType.SegmentFrequentTick) }
         }
     }
     val measurer = rememberTextMeasurer(cacheSize = 32)
@@ -320,7 +320,7 @@ private sealed interface Hit {
     data class Row(val id: Long) : Hit
 }
 
-private enum class Drag(val edit: Boolean = false) { Scrub, Scroll, Pinch, Spent, TrimStart(true), TrimEnd(true), Reorder(true), Lift(true), Key(true) }
+private enum class Drag(val edit: Boolean = false) { Scrub, Scroll, Pinch, Spent, Select, TrimStart(true), TrimEnd(true), Reorder(true), Lift(true), Key(true) }
 
 private const val KEY_MOVE = "keyframe-move"
 
@@ -346,9 +346,19 @@ private class TimelineView(val state: EditorState, density: Density, private val
     private var edgeMs = 0f
     var limitEdge by mutableStateOf<Boolean?>(null)
         private set
-    var onLimit: () -> Unit = {}
+    var onTick: () -> Unit = {}
 
     private class Slide(val from: Float, val at: Long)
+
+    private var selectAnchor: Long? = null
+    private var selectBase = emptySet<Long>()
+    private var selectAdd = true
+    private var selectStart = 0f
+    private var selectFinger = 0f
+    private var selectSlop = 0f
+    private var selectPush = true
+    private var selectArmed = false
+    private var selectRows = 1
 
     var liftId by mutableStateOf<Long?>(null)
         private set
@@ -484,13 +494,46 @@ private class TimelineView(val state: EditorState, density: Density, private val
         keyId = null
     }
 
-    fun longPress(hit: Hit) {
-        val id = when (hit) { is Hit.Eye -> hit.id; is Hit.Header -> hit.id; else -> return }
+    fun longPress(hit: Hit, y: Float, slop: Float): Boolean {
+        val id = when (hit) { is Hit.Eye -> hit.id; is Hit.Header -> hit.id; else -> return false }
         state.deselectLayer()
         if (MultiSelect.active) MultiSelect.toggle(id) else {
             MultiSelect.ids = setOf(id)
             MultiSelect.active = true
         }
+        selectAnchor = id
+        selectBase = MultiSelect.ids
+        selectAdd = id in selectBase
+        selectStart = y
+        selectFinger = y
+        selectSlop = slop
+        selectPush = true
+        selectArmed = false
+        selectRows = 1
+        liftJob?.cancel()
+        liftJob = scope.launch { liftLoop() }
+        return true
+    }
+
+    fun selectDrag(y: Float, pushing: Boolean) {
+        selectFinger = y
+        selectPush = pushing
+        if (abs(y - selectStart) > selectSlop) selectArmed = true
+        selectUpdate()
+    }
+
+    fun endSelect() {
+        selectAnchor = null
+        liftJob?.cancel()
+    }
+
+    private fun selectUpdate() {
+        val anchor = rowOf(selectAnchor ?: return) ?: return
+        val finger = if (selectArmed) RowDrag.fingerRow(selectFinger, rowH, rulerH, rowsBottom, scroll, layers.size) else anchor
+        val rows = abs(finger - anchor) + 1
+        if (rows > selectRows) onTick()
+        selectRows = rows
+        MultiSelect.ids = RowDrag.slideSelection(selectBase, layers.asReversed().map { it.id }, anchor, finger, selectAdd)
     }
 
     fun beginDrag(hit: Hit, moved: Offset): Drag = when {
@@ -518,13 +561,14 @@ private class TimelineView(val state: EditorState, density: Density, private val
             Drag.TrimStart, Drag.TrimEnd -> trimBy(delta.x, start = drag == Drag.TrimStart)
             Drag.Reorder -> reorderTo(at.y)
             Drag.Key -> keyBy(delta.x)
-            Drag.Pinch, Drag.Spent, Drag.Lift -> Unit
+            Drag.Pinch, Drag.Spent, Drag.Lift, Drag.Select -> Unit
         }
     }
 
     fun endDrag(drag: Drag?, velocity: Velocity, lifted: Boolean = true) {
         limitEdge = null
         if (drag == Drag.Lift) drop()
+        if (drag == Drag.Select) endSelect()
         if (drag == Drag.Key) dropKey(lifted)
         if (drag?.edit == true) return state.endGesture()
         motion = scope.launch {
@@ -596,7 +640,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
                 .also { time -> if (time != layer.endTime) state.edit("trim-end") { it.update(id) { l -> l.trimmedTo(l.startTime, time, mediaMs) } } }
         }
         val hit = layer.trimHitsSourceLimit(start, time, mediaMs)
-        if (hit && limitEdge == null) onLimit()
+        if (hit && limitEdge == null) onTick()
         limitEdge = start.takeIf { hit }
     }
 
@@ -654,6 +698,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
     fun liftScroll(dy: Float) {
         scrollBy(dy)
         liftUpdate()
+        selectUpdate()
     }
 
     private fun drop() {
@@ -683,6 +728,8 @@ private class TimelineView(val state: EditorState, density: Density, private val
         state.edit("reorder") { it.move(id, layers.lastIndex - to) }
     }
 
+    private fun edgeSpeed(y: Float) = RowDrag.edgeSpeed(y, rulerH, rowsBottom, PushZone.px, PUSH_SLOWEST_ROWS * rowH, PUSH_FASTEST_ROWS * rowH)
+
     private suspend fun liftLoop() {
         val me = coroutineContext.job
         var last = SystemClock.uptimeMillis()
@@ -695,8 +742,14 @@ private class TimelineView(val state: EditorState, density: Density, private val
                 slides.values.removeAll { now - it.at >= SLIDE_MS }
                 if (dropping) {
                     if (now - dropAt >= DROP_MS && slides.isEmpty()) break
+                } else if (selectAnchor != null) {
+                    val speed = RowDrag.toward(edgeSpeed(selectFinger), selectFinger, selectStart, selectSlop)
+                    if (selectPush && speed != 0f) {
+                        scrollBy(-speed * step)
+                        selectUpdate()
+                    }
                 } else if (liftArmed && liftPush) {
-                    val speed = RowDrag.edgeSpeed(liftFinger, rulerH, rowsBottom, PushZone.px, PUSH_SLOWEST_ROWS * rowH, PUSH_FASTEST_ROWS * rowH)
+                    val speed = edgeSpeed(liftFinger)
                     if (speed != 0f) {
                         scrollBy(-speed * step)
                         liftUpdate()
@@ -744,10 +797,8 @@ private suspend fun PointerInputScope.timelineGestures(view: TimelineView, onLon
                         drag = Drag.Key
                     }
                     hit is Hit.Row && view.lift(hit.id, finger.y, viewConfiguration.touchSlop) -> drag = Drag.Lift
-                    else -> {
-                        view.longPress(hit)
-                        held = true
-                    }
+                    view.longPress(hit, finger.y, viewConfiguration.touchSlop) -> drag = Drag.Select
+                    else -> held = true
                 }
                 onLongPress()
                 continue
@@ -761,7 +812,7 @@ private suspend fun PointerInputScope.timelineGestures(view: TimelineView, onLon
             }
             when {
                 fingers == 0 -> break
-                drag == Drag.Lift -> {
+                drag == Drag.Lift || drag == Drag.Select -> {
                     if (first == null || !first.pressed) break
                     for (change in event.changes) {
                         if (change.id == down.id) continue
@@ -769,7 +820,8 @@ private suspend fun PointerInputScope.timelineGestures(view: TimelineView, onLon
                         if (change.id != second) continue
                         if (change.pressed) view.liftScroll(change.position.y - change.previousPosition.y) else second = null
                     }
-                    view.liftDrag(first.position.y, pushing = second == null)
+                    if (drag == Drag.Lift) view.liftDrag(first.position.y, pushing = second == null)
+                    else view.selectDrag(first.position.y, pushing = second == null)
                     event.changes.forEach { it.consume() }
                 }
                 fingers > 1 && drag == Drag.Key -> {
