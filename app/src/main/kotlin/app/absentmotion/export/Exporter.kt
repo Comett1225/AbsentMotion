@@ -51,11 +51,11 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
                         } finally {
                             (mix as? java.io.Closeable)?.close()
                         }
-                        written.also {
+                        written.verified(kind, scene, f, mix != null).also {
                             val (w, h) = exportSize(scene, f.shortSide, even = true)
                             val ms = android.os.SystemClock.elapsedRealtime() - started - paused
                             ExportTimes(context).record(ExportRecord(f.codec, w, h, f.fps, frameCount(scene, f.fps), ms.coerceAtLeast(1), f.interpolation))
-                        }.verified(kind, scene, f, mix != null)
+                        }
                     }
                     ExportKind.Audio -> {
                         val mix = ExportAudio.mixFor?.invoke(scene, audioRate(s)) ?: throw ExportError(txt(R.string.export_error_no_sound))

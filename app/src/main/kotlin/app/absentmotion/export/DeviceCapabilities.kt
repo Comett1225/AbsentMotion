@@ -46,6 +46,8 @@ data class EncoderCaps(
 
     fun fits(width: Int, height: Int, fps: Int): Boolean = fitsSize(width, height) &&
         covering(width, height).any { it.maxFps * it.width * it.height >= fps.toDouble() * width * height * 0.999 }
+
+    fun ratedFps(width: Int, height: Int): Double? = covering(width, height).maxOfOrNull { it.maxFps * it.width * it.height / (width.toDouble() * height) }
 }
 
 data class ProbeResult(val codec: Codec, val width: Int, val height: Int, val frames: Int, val ms: Long, val setupMs: Long = 0) {
@@ -62,6 +64,9 @@ data class DeviceReport(val key: String, val encoders: List<EncoderCaps>, val pr
     fun encodersFor(mime: String): List<EncoderCaps> = encoders.filter { it.mime == mime }
 
     fun hardware(codec: Codec): Boolean = encodersFor(codec.mime).any { it.hardware }
+
+    fun encoderFor(codec: Codec, width: Int, height: Int): EncoderCaps? =
+        encodersFor(codec.mime).sortedByDescending { it.hardware }.firstOrNull { it.fitsSize(width, height) }
 
     val videoCodecs: List<Codec> get() = Codec.entries.filter { encodersFor(it.mime).isNotEmpty() }
 

@@ -61,6 +61,22 @@ class ExportTimeTest {
         assertEquals(6400L, estimateExportMs(history, probe, Codec.H264, 1080, 1920, 30, 300))
     }
 
+    @Test fun encodersSlowerThanTheExportSetTheShortestTime() {
+        fun encoder(hardware: Boolean, fps: Double) = EncoderCaps("e", "video/avc", hardware, 64..4096, 64..4096, 2, 2, listOf(SizePoint(1080, 1920, fps)))
+        assertEquals(32000L, encoderFloorMs(encoder(false, 30.0), 1080, 1920, 60, 960))
+        assertEquals(10000L, encoderFloorMs(encoder(false, 30.0), 1080, 1920, 30, 300))
+        assertEquals(20000L, encoderFloorMs(encoder(true, 30.0), 1080, 1920, 60, 600))
+        assertNull(encoderFloorMs(encoder(true, 120.0), 1080, 1920, 60, 600))
+        assertNull(encoderFloorMs(null, 1080, 1920, 60, 600))
+    }
+
+    @Test fun sizeEstimatesLearnTheMedianOfRecentExports() {
+        assertEquals(1.0, sizeRatio(emptyList()), 0.0)
+        assertEquals(0.25, sizeRatio(listOf(100L to 25L)), 1e-9)
+        assertEquals(0.3, sizeRatio(listOf(100L to 90L, 100L to 20L, 100L to 30L, 100L to 40L, 100L to 25L, 100L to 35L)), 1e-9)
+        assertEquals(4.0, sizeRatio(listOf(10L to 1000L)), 0.0)
+    }
+
     @Test fun recordsSurviveJson() {
         val records = listOf(ExportRecord(Codec.Vp9, 720, 1280, 60, 120, 9000, FrameInterpolation.Blend))
         assertEquals(records, recordsFromJson(JSONArray(recordsToJson(records).toString())))

@@ -18,6 +18,8 @@ class GifEstimateTest {
         val out = ByteArrayOutputStream()
         GifWriter(out, w, h).apply { repeat(50) { frame(flat, (it + 1) * 100L) }; finish() }
         assertEquals(out.size().toLong(), flatSize)
-        assertEquals(noisySize, gifSampleEstimate(w, h, 50, listOf(flat, noisy)))
+        val mixed = gifSampleEstimate(w, h, 50, listOf(flat, noisy))
+        assertTrue("flat=$flatSize mixed=$mixed noisy=$noisySize", mixed in (flatSize + 1) until noisySize)
+        assertEquals((flatSize + noisySize) / 2.0, mixed.toDouble(), 50.0)
     }
 }

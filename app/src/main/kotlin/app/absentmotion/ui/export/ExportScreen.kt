@@ -98,6 +98,7 @@ import app.absentmotion.export.AudioFormat
 import app.absentmotion.export.Choice
 import app.absentmotion.export.DeviceCapabilities
 import app.absentmotion.export.ExportPrefs
+import app.absentmotion.export.ExportSizes
 import app.absentmotion.export.ExportTimes
 import app.absentmotion.export.StorageStatus
 import app.absentmotion.export.Support
@@ -161,6 +162,7 @@ import app.absentmotion.ui.theme.presenceScrim
 import app.absentmotion.library.TemplateStore
 import app.absentmotion.audio.AudioClip
 import kotlinx.coroutines.CancellationException
+import android.provider.OpenableColumns
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -224,7 +226,6 @@ fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromProjectList
             catch (e: Exception) { Log.w("AMExport", "Cannot sample GIF size", e) }
         }
     }
-    val estimate = if (kind == ExportKind.Gif) gifEstimate ?: -1L else remember(kind, scene, settings.getValue(kind), hasAudio) { estimateBytes(kind, scene, settings.getValue(kind), hasAudio) }
     var free by remember { mutableLongStateOf(freeSpace()) }
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     DisposableEffect(lifecycle) {
@@ -239,6 +240,14 @@ fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromProjectList
     LaunchedEffect(caps) {
         try { caps.load() } catch (e: CancellationException) { throw e } catch (e: Exception) { Log.w("AMExport", "Cannot read the encoders", e) }
     }
+    val sizes = remember { ExportSizes(context) }
+    val rawEstimate = if (kind == ExportKind.Gif) gifEstimate ?: -1L else remember(kind, scene, settings.getValue(kind), hasAudio, report) {
+        val s = settings.getValue(kind)
+        val bitrates = if (kind == ExportKind.Video) exportSize(scene, s.shortSide, even = true).let { (w, h) -> report?.encoderFor(s.codec, w, h)?.bitrates } else null
+        estimateBytes(kind, scene, s, hasAudio, bitrates)
+    }
+    val sizeKey = ExportSizes.key(kind, settings.getValue(kind))
+    val estimate = remember(rawEstimate, sizeKey, phase is Phase.Idle) { if (rawEstimate < 0 || sizeKey == null) rawEstimate else (rawEstimate * sizes.ratio(sizeKey)).toLong() }
     val check: (ExportSettings) -> Support = remember(report, scene, hasAudio) { { caps.check(it, scene, hasAudio) } }
     val hasEncoder: (String) -> Boolean = remember(report) { { mime -> report?.encodersFor(mime)?.isNotEmpty() ?: true } }
     val thermal = remember { ThermalMonitor.of(context) }
@@ -255,7 +264,8 @@ fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromProjectList
     val current = settings.getValue(kind)
     val timeMs = remember(kind, current, report, heat.level, estimate, phase is Phase.Idle) {
         when (kind) {
-            ExportKind.Video, ExportKind.Gif, ExportKind.Sequence -> times.estimateMs(current, scene, report?.probe, heat.level)
+            ExportKind.Video -> times.estimateMs(current, scene, report?.probe, heat.level, report)
+            ExportKind.Gif, ExportKind.Sequence -> times.estimateMs(current, scene, report?.probe, heat.level)
             ExportKind.Package -> estimate.coerceAtLeast(0) / 100_000
             else -> 0L
         }
@@ -301,6 +311,7 @@ fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromProjectList
             return
         }
         val chosen = kind
+        val estimated = rawEstimate
         prefs.save(chosen, s)
         val alsoTemplate = asTemplate
         val name = safeName(scene.title) + " " + SimpleDateFormat("yyyyMMdd_HHmmss", Locale.ENGLISH).format(Date())
@@ -319,8 +330,10 @@ fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromProjectList
                         return@launch
                     }
                 }
+                var predicted = estimated
                 if (chosen == ExportKind.Gif) {
                     val measured = measureGifBytes(engine, scene, s)
+                    predicted = measured
                     free = freeSpace()
                     if (storageStatus(measured, free) is StorageStatus.NotEnough) {
                         failure = Failure(R.string.export_storage_title, txt(R.string.export_storage_text))
@@ -329,6 +342,14 @@ fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromProjectList
                     }
                 }
                 val result = exporter.export(chosen, scene, s, frame, name) { progress = it }
+                ExportSizes.key(chosen, s)?.let { key ->
+                    withContext(Dispatchers.IO) {
+                        val written = result.uris.sumOf { uri ->
+                            runCatching { context.contentResolver.query(uri, arrayOf(OpenableColumns.SIZE), null, null, null)?.use { if (it.moveToFirst()) it.getLong(0) else 0L } }.getOrNull() ?: 0L
+                        }
+                        sizes.record(key, predicted, written)
+                    }
+                }
                 if (alsoTemplate) try {
                     TemplateStore(context).add(scene, scene.frameStart(frame), engine)
                 } catch (e: CancellationException) {

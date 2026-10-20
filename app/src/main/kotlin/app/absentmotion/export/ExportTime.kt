@@ -58,6 +58,44 @@ internal fun estimateExportMs(
     return (probe.setupMs + msPerMegapixel * work).roundToLong()
 }
 
+internal fun encoderFloorMs(encoder: EncoderCaps?, width: Int, height: Int, fps: Int, frames: Int): Long? {
+    val rated = encoder?.ratedFps(width, height)?.takeIf { it > 0 } ?: return null
+    return if (!encoder.hardware || rated < fps) (frames * 1000.0 / rated).roundToLong() else null
+}
+
+internal fun sizeRatio(records: List<Pair<Long, Long>>): Double {
+    val ratios = records.filter { it.first > 0 && it.second > 0 }.takeLast(5).map { it.second.toDouble() / it.first }.sorted()
+    if (ratios.isEmpty()) return 1.0
+    val middle = ratios.size / 2
+    val median = if (ratios.size % 2 == 1) ratios[middle] else (ratios[middle - 1] + ratios[middle]) / 2
+    return median.coerceIn(0.05, 4.0)
+}
+
+class ExportSizes(context: Context) {
+    private val prefs = context.applicationContext.getSharedPreferences("export_sizes", Context.MODE_PRIVATE)
+
+    private fun records(key: String): List<Pair<Long, Long>> = runCatching {
+        val array = JSONArray(prefs.getString(key, "[]"))
+        (0 until array.length()).map { array.getJSONArray(it).let { p -> p.getLong(0) to p.getLong(1) } }
+    }.getOrDefault(emptyList())
+
+    fun ratio(key: String): Double = sizeRatio(records(key))
+
+    @Synchronized fun record(key: String, estimated: Long, actual: Long) {
+        if (estimated <= 0 || actual <= 0) return
+        val kept = (records(key) + (estimated to actual)).takeLast(10)
+        prefs.edit().putString(key, JSONArray().apply { kept.forEach { put(JSONArray().put(it.first).put(it.second)) } }.toString()).apply()
+    }
+
+    companion object {
+        fun key(kind: ExportKind, s: ExportSettings): String? = when (kind) {
+            ExportKind.Video -> "video.${s.codec.name}"
+            ExportKind.Gif -> "gif"
+            else -> null
+        }
+    }
+}
+
 fun timeLabel(ms: Long): UiText = when {
     ms < 10_000 -> txt(R.string.export_time_few_seconds)
     ms < 90_000 -> ((ms + 2_500) / 5_000 * 5).toInt().let { UiText.plural(R.plurals.export_time_seconds, it, it.toString()) }
@@ -93,10 +131,14 @@ class ExportTimes(context: Context) {
 
     fun estimateMs(
         s: ExportSettings, scene: Scene, probe: ProbeResult? = DeviceCapabilities.of(app).report.value?.probe,
-        thermal: ThermalLevel = ThermalLevel.Normal,
+        thermal: ThermalLevel = ThermalLevel.Normal, encoders: DeviceReport? = null,
     ): Long? {
         val (w, h) = exportSize(scene, s.shortSide, even = true)
         val frames = frameCount(scene, s.fps)
-        return estimateExportMs(history(), probe, s.codec, w, h, s.fps, frames, s.interpolation)?.let { it + pauseMs(thermal) * frames }
+        val history = history()
+        val learned = estimateExportMs(history, probe, s.codec, w, h, s.fps, frames, s.interpolation)
+        val proven = history.any { it.codec == s.codec && it.width == w && it.height == h && it.fps == s.fps && it.interpolation == s.interpolation }
+        val floor = encoders?.takeIf { !proven }?.let { encoderFloorMs(it.encoderFor(s.codec, w, h), w, h, s.fps, frames) }
+        return listOfNotNull(learned, floor).maxOrNull()?.let { it + pauseMs(thermal) * frames }
     }
 }

@@ -177,12 +177,13 @@ fun optionNote(kind: ExportKind, scene: Scene, s: ExportSettings): UiText? = whe
     ExportKind.FrameAs -> if (s.image.lossy) txt(R.string.export_note_image_quality, txt(s.image.label), "${s.imageQuality}") else txt(s.image.label)
 }
 
-fun estimateBytes(kind: ExportKind, scene: Scene, s: ExportSettings, hasAudio: Boolean): Long {
+fun estimateBytes(kind: ExportKind, scene: Scene, s: ExportSettings, hasAudio: Boolean, bitrates: IntRange? = null): Long {
     val seconds = (scene.totalTime + 1) / 1000.0
     val frames = frameCount(scene, s.fps)
     return when (kind) {
         ExportKind.Video -> exportSize(scene, s.shortSide, true).let {
-            (videoBitrate(it.first, it.second, s) + if (hasAudio) s.audio.bitrateKbps * 1000 else 0) / 8 * seconds
+            val video = videoBitrate(it.first, it.second, s).let { rate -> bitrates?.takeIf { r -> r.last > 0 }?.let { r -> rate.coerceIn(r) } ?: rate }
+            (video.toDouble() + if (hasAudio) s.audio.bitrateKbps * 1000 else 0) / 8 * seconds
         }.toLong()
         ExportKind.Gif -> exportSize(scene, s.shortSide, false).let { it.first.toLong() * it.second * frames * GifBytesPerPixel }.toLong()
         ExportKind.Sequence -> exportSize(scene, s.shortSide, false).let {
