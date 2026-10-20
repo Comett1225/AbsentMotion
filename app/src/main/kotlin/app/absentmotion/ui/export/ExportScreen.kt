@@ -666,7 +666,7 @@ private fun ResolutionDropdown(shortSide: Int, choices: List<Choice<app.absentmo
     var open by remember { mutableStateOf(false) }
     Box(Modifier.fillMaxWidth().height(44.dp).clickable { open = true }) {
         Row(Modifier.fillMaxSize().padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
-            Text(resolutionLabel(shortSide), Modifier.weight(1f), color = Navy, fontSize = 16.sp, style = Mixed)
+            Text(resolutionLabel(shortSide), Modifier.weight(1f), color = Navy, fontSize = 16.sp)
             Icon(ExportIcons.ChevronDown, null, Modifier.size(20.dp), tint = Navy)
         }
         DropdownMenu(open, { open = false }, containerColor = Am.Card) {
