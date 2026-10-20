@@ -126,11 +126,12 @@ private fun stamp() = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy
 
 private fun backUp(context: Context, task: BackupTask): List<UiText> {
     val root = context.filesDir
-    val needed = Backup.files(root, includeMedia = true).sumOf { it.second.length() }
+    val ai = context.getExternalFilesDir(null)?.resolve("ai")
+    val needed = Backup.files(root, includeMedia = true, ai).sumOf { it.second.length() }
     if (needed + (50L shl 20) > freeSpace()) return listOf(txt(R.string.backup_no_space, fileSize(needed)))
     val name = "AbsentMotion-backup-${stamp()}.${Backup.EXTENSION}"
     MediaStoreExport(context).save(null, name, "application/octet-stream") { out ->
-        Backup.write(root, out, includeMedia = true) { done, total -> task.report(done.toFloat() / total) }
+        Backup.write(root, out, includeMedia = true, ai) { done, total -> task.report(done.toFloat() / total) }
     }
     task.report(1f)
     return listOf(txt(R.string.backup_saved, name))
@@ -142,7 +143,7 @@ private fun restoreBackup(context: Context, uri: Uri, task: BackupTask): List<Ui
     }.getOrNull() ?: -1L
     if (size > 0 && context.filesDir.usableSpace < size + (100L shl 20)) return listOf(txt(R.string.backup_restore_no_space, fileSize(size)))
     val restored = (context.contentResolver.openInputStream(uri) ?: return listOf(txt(R.string.backup_open_failed))).use { input ->
-        Backup.restore(ProjectStore(context), context.filesDir, input) { read -> if (size > 0) task.report(read.toFloat() / size) else task.report(0f) }
+        Backup.restore(ProjectStore(context), context.filesDir, input, ai = context.getExternalFilesDir(null)?.resolve("ai")) { read -> if (size > 0) task.report(read.toFloat() / size) else task.report(0f) }
     }
     task.report(1f)
     fun count(n: Int) = UiText.plural(R.plurals.backup_projects, n, n.toString())

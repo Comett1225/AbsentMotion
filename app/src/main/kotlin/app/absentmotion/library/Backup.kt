@@ -21,16 +21,19 @@ object Backup {
 
     data class Restored(val added: Int, val renamed: Int, val skipped: Int)
 
-    fun files(root: File, includeMedia: Boolean): List<Pair<String, File>> {
-        fun under(dir: String) = File(root, dir).walkTopDown().filter { it.isFile && it.extension != "tmp" && it.extension != "part" }
-            .map { it.relativeTo(root).invariantSeparatorsPath to it }.toList()
+    fun files(root: File, includeMedia: Boolean, ai: File? = null): List<Pair<String, File>> {
+        fun under(base: File, prefix: String) = base.walkTopDown().filter { it.isFile && it.extension != "tmp" && it.extension != "part" }
+            .map { prefix + it.relativeTo(base).invariantSeparatorsPath to it }.toList()
+        fun under(dir: String) = under(File(root, dir), "$dir/")
         val projects = under("projects")
         val (scenes, rest) = projects.partition { (name, _) -> name.count { it == '/' } == 1 && name.endsWith(".xml") }
-        return scenes + rest + if (includeMedia) under("media") else emptyList()
+        val templates = under("templates").filter { (name, _) -> includeMedia || name.split('/').getOrNull(2) != "media" }
+        val media = if (includeMedia) under("media") + under("fonts/imported") + (ai?.let { under(it, "ai/") } ?: emptyList()) else emptyList()
+        return scenes + rest + under("presets") + templates + media
     }
 
-    fun write(root: File, out: OutputStream, includeMedia: Boolean, progress: (done: Long, total: Long) -> Unit = { _, _ -> }) {
-        val files = files(root, includeMedia)
+    fun write(root: File, out: OutputStream, includeMedia: Boolean, ai: File? = null, progress: (done: Long, total: Long) -> Unit = { _, _ -> }) {
+        val files = files(root, includeMedia, ai)
         val total = files.sumOf { it.second.length() }.coerceAtLeast(1)
         var done = 0L
         ZipOutputStream(out.buffered()).use { zip ->
@@ -40,7 +43,7 @@ object Backup {
             val buffer = ByteArray(64 * 1024)
             for ((name, file) in files) {
                 val source = try { file.inputStream() } catch (e: java.io.FileNotFoundException) { continue }
-                zip.setLevel(if (name.startsWith("media/")) 0 else 6)
+                zip.setLevel(if (name.endsWith(".xml")) 6 else 0)
                 zip.putNextEntry(ZipEntry(name).apply { time = file.lastModified() })
                 source.use { input ->
                     while (true) {
@@ -56,7 +59,7 @@ object Backup {
         }
     }
 
-    fun restore(store: ProjectStore, root: File, input: InputStream, access: MediaAccess = MediaAccess.forPhone(root), progress: (read: Long) -> Unit = {}): Restored {
+    fun restore(store: ProjectStore, root: File, input: InputStream, access: MediaAccess = MediaAccess.forPhone(root), ai: File? = null, progress: (read: Long) -> Unit = {}): Restored {
         val projects = File(root, "projects")
         val renamed = HashMap<String, String>()
         val skipped = HashSet<String>()
@@ -69,8 +72,9 @@ object Backup {
             override fun read(b: ByteArray, off: Int, len: Int): Int = super.read(b, off, len).also { if (it > 0) { read += it; progress(read) } }
         }
         fun remap(text: String): String {
-            val moved = if (oldRoot.isEmpty()) text else Regex(Regex.escape(oldRoot + "media/") + "([^/\"<>]+)/").replace(text) {
-                rootUri(root) + "media/" + (renamed[it.groupValues[1]] ?: it.groupValues[1]) + "/"
+            val moved = if (oldRoot.isEmpty()) text else Regex(Regex.escape(oldRoot) + "(?:media/([^/\"<>]+)/|templates/)").replace(text) {
+                val id = it.groupValues[1]
+                rootUri(root) + if (id.isEmpty()) "templates/" else "media/" + (renamed[id] ?: id) + "/"
             }
             return runCatching { Scene(Scene.parse(moved).node.mapMediaUris(access::defused)).toXml() }.getOrDefault(moved)
         }
@@ -109,6 +113,10 @@ object Backup {
                         parts[1].removeSuffix(".png").takeIf { it !in skipped }?.let { File(projects, (renamed[it] ?: it) + ".png") }
                     parts.size == 4 && parts[0] == "projects" && parts[1] == "versions" -> File(projects, "versions/${renamed[parts[2]] ?: parts[2]}/${parts[3]}")
                     parts.size >= 3 && parts[0] == "media" -> File(root, "media/${renamed[parts[1]] ?: parts[1]}/" + parts.drop(2).joinToString("/"))
+                    parts.size >= 3 && parts[0] == "templates" -> File(root, parts.joinToString("/"))
+                    parts.size == 2 && parts[0] == "presets" && parts[1].endsWith(".xml") -> File(root, "presets/${parts[1]}")
+                    parts.size == 3 && parts[0] == "fonts" && parts[1] == "imported" -> File(root, "fonts/imported/${parts[2]}")
+                    parts.size == 2 && parts[0] == "ai" -> ai?.let { File(it, parts[1]) }
                     else -> null
                 } ?: continue
                 if (target.exists()) continue

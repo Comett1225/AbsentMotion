@@ -89,6 +89,35 @@ class BackupTest {
         assertTrue(Backup.files(root, includeMedia = false).first().first.matches(Regex("projects/[^/]+\\.xml")))
     }
 
+    @Test fun templatesPresetsImportedFontsAndAiMediaAreBackedUpAndRestored() {
+        val oldRoot = tmp.newFolder("old")
+        val oldAi = tmp.newFolder("old-ai")
+        val templateMedia = File(oldRoot, "templates/t1/media/photo.png").apply { parentFile.mkdirs(); writeText("template pixels") }
+        val matte = File(oldAi, "matte.png").apply { writeText("ai pixels") }
+        val aiUri = "content://app.absentmotion.files/files/ai/${matte.name}"
+        File(oldRoot, "templates/t1/scene.xml").writeText(Scene(XmlNode("scene", linkedMapOf("width" to "10", "height" to "10", "title" to "Template"),
+            listOf(XmlNode("shape", linkedMapOf("id" to "1", "fillImage" to templateMedia.toURI().toString())),
+                XmlNode("shape", linkedMapOf("id" to "2", "fillImage" to aiUri))))).toXml())
+        File(oldRoot, "templates/t1/thumb.png").writeText("thumb")
+        File(oldRoot, "presets/p.xml").apply { parentFile.mkdirs(); writeText("""<scene width="10" height="10" type="preset"><shape id="1"/></scene>""") }
+        File(oldRoot, "fonts/imported/Mine.ttf").apply { parentFile.mkdirs(); writeText("font") }
+        val noMedia = Backup.files(oldRoot, includeMedia = false, oldAi).map { it.first }.toSet()
+        assertEquals(setOf("templates/t1/scene.xml", "templates/t1/thumb.png", "presets/p.xml"), noMedia)
+        val bytes = ByteArrayOutputStream().also { Backup.write(oldRoot, it, true, oldAi) }.toByteArray()
+        val newRoot = tmp.newFolder("new")
+        val newAi = File(tmp.root, "new-ai")
+        Backup.restore(ProjectStore(newRoot), newRoot, ByteArrayInputStream(bytes), ai = newAi)
+        val restored = Scene.parse(File(newRoot, "templates/t1/scene.xml").readText()).node.mediaUris()
+        val local = restored.single { it.startsWith("file:") }
+        assertTrue(local, MediaAccess.forPhone(newRoot).allows(local))
+        assertEquals("template pixels", File(java.net.URI(local)).readText())
+        assertTrue(aiUri in restored)
+        assertEquals("ai pixels", File(newAi, matte.name).readText())
+        assertEquals("thumb", File(newRoot, "templates/t1/thumb.png").readText())
+        assertTrue(File(newRoot, "presets/p.xml").readText().contains("preset"))
+        assertEquals("font", File(newRoot, "fonts/imported/Mine.ttf").readText())
+    }
+
     @Test fun rejectsOtherFilesAndPathsThatLeaveTheFolder() {
         val root = tmp.newFolder("root")
         val store = ProjectStore(root)
