@@ -28,17 +28,21 @@ data class Knot(val p: Pt, val inHandle: Pt? = null, val outHandle: Pt? = null) 
 
 data class Contour(val knots: List<Knot>, val closed: Boolean, val exclude: Boolean = false)
 
-val Layer.contours: List<Contour>? get() {
-    val path = node.child("path") ?: return emptyList()
+val Layer.contours: List<Contour>? get() = node.child("path")?.let { shapeAt(it, t, exact = false) } ?: emptyList()
+
+private fun XmlNode.sources(): List<XmlNode> = listOf(this) + children.filter { it.name == "contour" }
+
+private fun shapeAt(path: XmlNode, t: Float, exact: Boolean): List<Contour> {
+    val animated = path.isAnimatedPath
     val out = ArrayList<Contour>()
-    for (source in listOf(path) + path.children.filter { it.name == "contour" }) {
+    for (source in path.sources()) {
         val knots = source.children.filter { it.name == "knot" }
         if (knots.isNotEmpty()) {
-            if (source.children.any { it.name == "knot" && it.hasKeys() }) return null
             out += Contour(
                 knots.map { k ->
-                    val p = k.vec("p") ?: Pt(0f, 0f)
-                    Knot(p, k.vec("in")?.plus(p), k.vec("out")?.plus(p))
+                    val p = k.vec("p", t, exact) ?: Pt(0f, 0f)
+                    fun handle(name: String) = k.vec(name, t, exact)?.takeUnless { animated && it.x == 0f && it.y == 0f }?.plus(p)
+                    Knot(p, handle("in"), handle("out"))
                 },
                 source["closed"] == "true", source["exclude"] == "true",
             )
@@ -51,8 +55,78 @@ val Layer.contours: List<Contour>? get() {
 
 private fun XmlNode.hasKeys() = children.any { part -> part.children.any { it.name == "kf" } }
 
-private fun XmlNode.vec(name: String): Pt? = child(name)?.get("value")?.split(',')?.mapNotNull { it.trim().toFloatOrNull() }
-    ?.takeIf { it.size >= 2 }?.let { Pt(it[0], it[1]) }
+private val XmlNode.isAnimatedPath: Boolean get() = sources().any { s -> s.children.any { it.name == "knot" && it.hasKeys() } }
+
+private fun XmlNode.vec(name: String, t: Float, exact: Boolean): Pt? {
+    val part = child(name) ?: return null
+    val text = if (exact) part.keyframes.firstOrNull { abs(it.t - t) <= KEY_EPSILON }?.v ?: part.valueAt(t) else part.valueAt(t)
+    return text?.split(',')?.mapNotNull { it.trim().toFloatOrNull() }?.takeIf { it.size >= 2 }?.let { Pt(it[0], it[1]) }
+}
+
+private const val KEY_EPSILON = 1e-6f
+
+data class ShapeKey(val t: Float, val contours: List<Contour>, val e: String? = null)
+
+val Layer.isShapeAnimated: Boolean get() = node.child("path")?.isAnimatedPath == true
+
+val Layer.shapeKeys: List<ShapeKey> get() {
+    val path = node.child("path")?.takeIf { it.isAnimatedPath } ?: return emptyList()
+    val keys = path.sources().flatMap { s -> s.children.filter { it.name == "knot" } }.flatMap { k -> k.children.flatMap { it.keyframes } }
+    val times = keys.map { it.t }.sorted().fold(ArrayList<Float>()) { list, time -> list.also { if (it.isEmpty() || time - it.last() > KEY_EPSILON) it += time } }
+    return times.map { time -> ShapeKey(time, shapeAt(path, time, exact = true), keys.firstOrNull { abs(it.t - time) <= KEY_EPSILON && it.e != null }?.e) }
+}
+
+fun Layer.withShapeKeys(keys: List<ShapeKey>): Layer {
+    val sorted = keys.sortedBy { it.t }
+    val first = sorted.firstOrNull()?.contours ?: return this
+    val kept = first.indices.filter { first[it].knots.isNotEmpty() }
+    if (kept.isEmpty()) return withContours(emptyList())
+    fun animated(name: String, values: List<Pt>) = XmlNode(name).withKeyframes(sorted.mapIndexed { i, key ->
+        Keyframe(key.t, formatFloats(floatArrayOf(values[i].x, values[i].y)), key.e?.takeIf { i > 0 })
+    })
+    fun contour(name: String, index: Int, attrs: LinkedHashMap<String, String>): XmlNode {
+        val shape = first[index]
+        attrs["closed"] = "${shape.closed}"
+        if (shape.exclude) attrs["exclude"] = "true"
+        return XmlNode(name, attrs, shape.knots.indices.map { i ->
+            val knots = sorted.map { key -> key.contours.getOrNull(index)?.knots?.getOrNull(i) ?: shape.knots[i] }
+            XmlNode("knot", children = listOfNotNull(
+                animated("p", knots.map { it.p }),
+                if (knots.any { it.inHandle != null }) animated("in", knots.map { (it.inHandle ?: it.p) - it.p }) else null,
+                if (knots.any { it.outHandle != null }) animated("out", knots.map { (it.outHandle ?: it.p) - it.p }) else null,
+            ))
+        })
+    }
+    val path = if (kept.size == 1) contour("path", kept[0], linkedMapOf())
+        else XmlNode("path", children = kept.map { contour("contour", it, linkedMapOf()) })
+    return copy(node = node.withChild("path", path))
+}
+
+fun Layer.shapeKeyIndex(): Int = shapeKeys.indexOfFirst { abs(it.t - t) <= snap }
+
+fun Layer.withContoursAt(contours: List<Contour>): Layer {
+    val keys = shapeKeys
+    if (keys.isEmpty()) return withContours(contours)
+    val here = keys.indexOfFirst { abs(it.t - t) <= snap }
+    return withShapeKeys(if (here >= 0) keys.mapIndexed { i, k -> if (i == here) k.copy(contours = contours) else k } else keys + ShapeKey(t, contours))
+}
+
+fun Layer.withShapeKeyToggled(): Layer {
+    val keys = shapeKeys
+    val now = contours ?: return this
+    if (keys.isEmpty()) return withShapeKeys(listOf(ShapeKey(t, now)))
+    val here = keys.indexOfFirst { abs(it.t - t) <= snap }
+    return when {
+        here < 0 -> withShapeKeys(keys + ShapeKey(t, now))
+        keys.size == 1 -> withContours(keys[0].contours)
+        else -> withShapeKeys(keys.filterIndexed { i, _ -> i != here })
+    }
+}
+
+fun Layer.withEveryShape(change: (List<Contour>) -> List<Contour>): Layer {
+    val keys = shapeKeys
+    return if (keys.isEmpty()) withContours(change(contours ?: emptyList())) else withShapeKeys(keys.map { it.copy(contours = change(it.contours)) })
+}
 
 fun Layer.withContours(contours: List<Contour>): Layer {
     val real = contours.filter { it.knots.isNotEmpty() }

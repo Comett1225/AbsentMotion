@@ -5,7 +5,10 @@ import app.absentmotion.model.Handle
 import app.absentmotion.model.Knot
 import app.absentmotion.model.Pt
 import app.absentmotion.model.contours
-import app.absentmotion.model.withContours
+import app.absentmotion.model.shapeKeys
+import app.absentmotion.model.withContoursAt
+import app.absentmotion.model.withEveryShape
+import app.absentmotion.model.withShapeKeyToggled
 import app.absentmotion.model.withHandleMoved
 import app.absentmotion.model.withPointAppended
 import app.absentmotion.model.withPointCurveToggled
@@ -14,10 +17,28 @@ import app.absentmotion.model.withPointMoved
 import app.absentmotion.model.withPointRemoved
 
 fun EditorState.pointContours(mode: PointMode): List<Contour> =
-    (scene.layer(mode.layerId)?.contours ?: emptyList()).withEmptyTail(mode.contour)
+    (scene.layerAt(mode.layerId, sampleMs)?.contours ?: emptyList()).withEmptyTail(mode.contour)
 
 private fun EditorState.change(mode: PointMode, key: Any? = null, change: (List<Contour>) -> List<Contour>) {
-    edit(key) { s -> s.update(mode.layerId) { l -> if (l.contours == null) l else l.withContours(change(l.contours!!.withEmptyTail(mode.contour))) } }
+    edit(key) { s -> s.update(mode.layerId, sampleMs) { l -> l.withContoursAt(change((l.contours ?: emptyList()).withEmptyTail(mode.contour))) } }
+}
+
+private fun EditorState.reshape(mode: PointMode, change: (List<Contour>) -> List<Contour>) {
+    edit { s -> s.update(mode.layerId, sampleMs) { l -> l.withEveryShape { change(it.withEmptyTail(mode.contour)) } } }
+}
+
+fun EditorState.toggleShapeKey(mode: PointMode) {
+    edit { s -> s.update(mode.layerId, sampleMs) { it.withShapeKeyToggled() } }
+}
+
+fun EditorState.shapeKeyFrames(mode: PointMode): List<Int> {
+    val layer = scene.layer(mode.layerId) ?: return emptyList()
+    return layer.shapeKeys.map { scene.frameAt(layer.timeOf(it.t)) }.distinct()
+}
+
+fun EditorState.onionShape(mode: PointMode): List<Contour>? {
+    val layer = scene.layerAt(mode.layerId, sampleMs) ?: return null
+    return layer.shapeKeys.lastOrNull { it.t < layer.t - layer.snap }?.contours
 }
 
 private fun <T> List<T>.replaced(index: Int, value: T) = mapIndexed { i, v -> if (i == index) value else v }
@@ -51,9 +72,9 @@ fun EditorState.toggleCurve(mode: PointMode) {
 }
 
 fun EditorState.toggleClosed(mode: PointMode) {
-    change(mode) { list ->
-        val c = list.getOrNull(mode.contour) ?: return@change list
-        if (!c.canToggleClosed) return@change list
+    reshape(mode) { list ->
+        val c = list.getOrNull(mode.contour) ?: return@reshape list
+        if (!c.canToggleClosed) return@reshape list
         list.replaced(mode.contour, c.copy(closed = !c.closed))
     }
 }
@@ -63,8 +84,8 @@ val Contour.canToggleClosed: Boolean get() = knots.size >= 2
 fun EditorState.deletePoint(mode: PointMode) {
     var selectContour = mode.contour
     var selectPoint = mode.point
-    change(mode) { list ->
-        val c = list.getOrNull(mode.contour)?.takeIf { mode.point in it.knots.indices } ?: return@change list
+    reshape(mode) { list ->
+        val c = list.getOrNull(mode.contour)?.takeIf { mode.point in it.knots.indices } ?: return@reshape list
         val removed = c.withPointRemoved(mode.point)
         if (removed.knots.isEmpty() && list.size > 1) {
             selectContour = (mode.contour - 1).coerceAtLeast(0)
@@ -97,10 +118,15 @@ fun EditorState.placePoint(mode: PointMode, at: Pt? = null, pull: Pt? = null) {
     val c = list.getOrNull(mode.contour) ?: return
     if (c.endsAt(mode.point)) {
         val position = at ?: mode.ghost ?: return
-        change(mode) { l -> l.replaced(mode.contour, l[mode.contour].withPointAppended(position, pull)) }
+        val anchor = c.knots.lastOrNull()?.p
+        reshape(mode) { l ->
+            val own = l[mode.contour]
+            val last = own.knots.lastOrNull()?.p
+            l.replaced(mode.contour, own.withPointAppended(if (anchor == null || last == null) position else last + (position - anchor), pull))
+        }
         selectAdd(mode, mode.contour, c.knots.size)
     } else if (mode.point in c.knots.indices && c.knots.size > 1) {
-        change(mode) { l -> l.replaced(mode.contour, l[mode.contour].withPointInserted(mode.point, mode.curveAt)) }
+        reshape(mode) { l -> l.replaced(mode.contour, l[mode.contour].let { own -> if (mode.point in own.knots.indices && own.knots.size > 1) own.withPointInserted(mode.point, mode.curveAt) else own }) }
         mode.point += 1
         mode.handle = Handle.Main
     }

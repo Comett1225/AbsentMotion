@@ -19,6 +19,8 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
@@ -40,6 +42,7 @@ import app.absentmotion.editor.map
 import app.absentmotion.editor.worldMatrix
 import app.absentmotion.editor.inverseMap
 import app.absentmotion.editor.moveSelectedTo
+import app.absentmotion.editor.onionShape
 import app.absentmotion.editor.placePoint
 import app.absentmotion.editor.pointContours
 import app.absentmotion.editor.selectAdd
@@ -127,6 +130,25 @@ internal fun PointOverlay(state: EditorState, mode: PointMode, modifier: Modifie
         fun screen(p: Pt) = m.map(p).let { Offset(it.x * scale + dx, it.y * scale + dy) }
         val mint = Am.Accent
         val ring = 11.dp.toPx()
+        state.onionShape(mode)?.forEach { c ->
+            if (c.knots.size < 2) return@forEach
+            val outline = Path()
+            outline.moveTo(screen(c.knots[0].p).x, screen(c.knots[0].p).y)
+            for (i in 0 until if (c.closed) c.knots.size else c.knots.size - 1) {
+                val a = c.knots[i]
+                val b = c.knots[(i + 1) % c.knots.size]
+                val end = screen(b.p)
+                if (a.outHandle == null && b.inHandle == null) outline.lineTo(end.x, end.y)
+                else {
+                    val c1 = screen(a.outHandle ?: a.p)
+                    val c2 = screen(b.inHandle ?: b.p)
+                    outline.cubicTo(c1.x, c1.y, c2.x, c2.y, end.x, end.y)
+                }
+            }
+            if (c.closed) outline.close()
+            drawPath(outline, Color.Black.copy(alpha = 0.5f), style = Stroke(3.dp.toPx()))
+            drawPath(outline, Color.White.copy(alpha = 0.7f), style = Stroke(1.2.dp.toPx(), pathEffect = PathEffect.dashPathEffect(floatArrayOf(6.dp.toPx(), 4.dp.toPx()))))
+        }
         if (mode.handle == Handle.Add) {
             val c = state.pointContours(mode).getOrNull(mode.contour)
             val g = c?.let { ghostOf(it, mode) }

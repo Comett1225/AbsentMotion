@@ -36,6 +36,8 @@ import app.absentmotion.editor.FreehandMode
 import app.absentmotion.editor.PointMode
 import app.absentmotion.editor.TrackMode
 import app.absentmotion.editor.leaveDrawing
+import app.absentmotion.editor.shapeKeyFrames
+import app.absentmotion.editor.toggleShapeKey
 import app.absentmotion.editor.worldMatrix
 import app.absentmotion.model.DrawTool
 import app.absentmotion.model.Stroke
@@ -69,7 +71,7 @@ internal fun DrawingEditor(state: EditorState) {
                 is TrackMode -> TrackOverlay(state, mode, Modifier.fillMaxSize())
             }
         }
-        if (mode is TrackMode) DrawingTimeBar(state, mode, Modifier.fillMaxWidth().height(40.dp))
+        if (mode !is FreehandMode) DrawingTimeBar(state, mode, Modifier.fillMaxWidth().height(40.dp))
         Box(Modifier.fillMaxWidth().height(200.dp).enterFade().background(Am.Panel).pointerInput(Unit) {}) {
             when (mode) {
                 is FreehandMode -> FreehandPanel(mode)
@@ -102,10 +104,25 @@ private fun DrawingTimeBar(state: EditorState, mode: DrawingMode, modifier: Modi
     val first = layer?.let { state.scene.firstShownFrame(it.startTime) } ?: 0
     val last = layer?.let { state.scene.lastShownFrame(it.endTime) } ?: 0
     val cell = Modifier.width(48.dp).fillMaxHeight()
+    val point = mode as? PointMode
+    val keys = point?.let(state::shapeKeyFrames).orEmpty()
     Row(modifier.background(Am.PanelInset), verticalAlignment = Alignment.CenterVertically) {
+        if (point != null) BarButton(ChromeIcons.SkipBack, "Previous shape keyframe", cell, enabled = keys.any { it < state.frame }) {
+            keys.lastOrNull { it < state.frame }?.let { state.frame = it.coerceIn(first, last) }
+        }
         BarButton(DrawingIcons.Prev, "Previous frame", cell, enabled = !locked && state.frame > first) { state.frame = (state.frame - 1).coerceAtLeast(first) }
         Text(TimelineMath.timecode(state.frame, state.scene.fps), Modifier.weight(1f), color = Am.OnDark, fontSize = 13.sp, maxLines = 1, textAlign = TextAlign.Center)
         BarButton(DrawingIcons.Next, "Next frame", cell, enabled = !locked && state.frame < last) { state.frame = (state.frame + 1).coerceAtMost(last) }
+        if (point != null) {
+            BarButton(ChromeIcons.SkipForward, "Next shape keyframe", cell, enabled = keys.any { it > state.frame }) {
+                keys.firstOrNull { it > state.frame }?.let { state.frame = it.coerceIn(first, last) }
+            }
+            val on = state.frame in keys
+            Box(cell.clickable { state.toggleShapeKey(point) }, Alignment.Center) {
+                Icon(if (on) PanelIcons.KeyframeRemove else PanelIcons.Keyframe, if (on) "Remove shape keyframe" else "Add shape keyframe",
+                    Modifier.size(26.dp), tint = if (keys.isNotEmpty()) Am.Accent else Am.OnDark)
+            }
+        }
     }
 }
 
