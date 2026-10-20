@@ -51,11 +51,11 @@
    }
   },
   "bend": {
-   "description": "Binabaluktot ang layer sa isang makinis na arko; nananatili ang gilid ng Origin at lumiliko ang kabilang dulo sa anggulong itinakda mo. Pinakamainam sa mahaba at manipis na layer.",
+   "description": "Ibinabaluktot ang layer sa pabilog na arko; nananatili ang panig ng Origin at lumiliko ang kabilang panig sa anggulong itinakda mo, pakaliwa ang positibong anggulo. Pinakamainam sa mahahaba at manipis na layer.",
    "name": "Bend",
    "params": {
-    "angle": {
-     "label": "Angulo"
+    "amount": {
+     "label": "Anggulo"
     },
     "before": {
      "label": "Bago ang Simula",

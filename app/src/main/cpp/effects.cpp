@@ -11,6 +11,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <optional>
 #include <string_view>
 #include <vector>
 
@@ -214,11 +215,18 @@ bool EffectRuntime::needs(const Layer& layer, bool Definition::*input) const {
 
 bool EffectRuntime::behind(const Layer& layer) const { return needs(layer, &Definition::backdrop); }
 
-sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer, double timeMs, const SkRect& area,
-                                          sk_sp<SkImageFilter> content, sk_sp<SkImageFilter> below) const {
+sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer, double timeMs, const SkRect& area, const SkRect& seen,
+                                          const SkMatrix& placed, sk_sp<SkImageFilter> content, sk_sp<SkImageFilter> below) const {
     const float t = layer.localTime(timeMs), seconds = (float)((layer.steppedMs(timeMs) - layer.startTime) / 1000.0);
-    const SkRect bounds = SkRect::MakeIWH(scene.width, scene.height).makeOffset(-area.left(), -area.top());
-    const float reach = (float)std::max(scene.width, scene.height);
+    const SkRect bounds = seen.makeOffset(-area.left(), -area.top());
+    const float reach = std::max({(float)scene.width, (float)scene.height, seen.width(), seen.height()});
+    std::optional<SkRect> shape;
+    const auto own = [&]() -> const SkRect& {
+        if (!shape) shape = ShapePath(layer, t).getBounds();
+        return *shape;
+    };
+    const auto fromLayer = [&] { return SkMatrix::Translate(-area.left(), -area.top()) * placed * SkMatrix::Translate(own().left(), own().top()); };
+    const auto columns = [](const SkMatrix& m) { return std::vector<float>{m[0], m[3], m[6], m[1], m[4], m[7], m[2], m[5], m[8]}; };
     const bool withBackdrop = content != nullptr;
     sk_sp<SkImageFilter> f = std::move(content);
     bool any = false;
@@ -239,9 +247,11 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
                 const bool automatic = !(defaults && defaults->count(name));
                 if (automatic && name == "size") v = {area.width(), area.height()};
                 else if (automatic && name == "time") v = {seconds};
-                else if (automatic && name == "layer") {
-                    const SkRect own = ShapePath(layer, t).getBounds();
-                    v = {std::max(own.width(), 1.0f), std::max(own.height(), 1.0f)};
+                else if (automatic && name == "layer") v = {std::max(own().width(), 1.0f), std::max(own().height(), 1.0f)};
+                else if (automatic && name == "fromLayer") v = columns(fromLayer());
+                else if (automatic && name == "toLayer") {
+                    SkMatrix inverse;
+                    v = columns(fromLayer().invert(&inverse) ? inverse : SkMatrix::I());
                 }
                 else if (automatic && name == "duration") v = {(float)((layer.endTime - layer.startTime) / 1000.0)};
                 else if (automatic && name == "screen") v = {-area.left(), -area.top(), (float)scene.width, (float)scene.height};
@@ -290,9 +300,9 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
     return any ? f->makeWithLocalMatrix(SkMatrix::Translate(area.left(), area.top())) : nullptr;
 }
 
-bool EffectRuntime::draw(SkCanvas* canvas, const Scene& scene, const Layer& layer, double timeMs, const SkRect& area,
+bool EffectRuntime::draw(SkCanvas* canvas, const Scene& scene, const Layer& layer, double timeMs, const SkRect& area, const SkMatrix& placed,
                          const std::function<void(SkCanvas*)>& source, const std::function<void(SkCanvas*)>& below) const {
-    const SkRect bounds = SkRect::MakeIWH(scene.width, scene.height);
+    const SkRect bounds = WorldView() ? canvas->getLocalClipBounds() : SkRect::MakeIWH(scene.width, scene.height);
     const int lift = liftAt(layer);
     const SkRect at = area.isEmpty() ? bounds : area;
     const SkRect local = bounds.makeOffset(-at.left(), -at.top());
@@ -306,7 +316,7 @@ bool EffectRuntime::draw(SkCanvas* canvas, const Scene& scene, const Layer& laye
     const bool seesBehind = lift < 0 && behind(layer);
     sk_sp<SkImageFilter> content = seesBehind ? record(source) : nullptr;
     sk_sp<SkImageFilter> under = below && needs(layer, &Definition::below) ? record(below) : nullptr;
-    sk_sp<SkImageFilter> filter = this->chain(scene, layer, timeMs, at, std::move(content), std::move(under));
+    sk_sp<SkImageFilter> filter = this->chain(scene, layer, timeMs, at, bounds, placed, std::move(content), std::move(under));
     if (!filter && lift < 0) return false;
     if (seesBehind) {
         SkPaint replace;

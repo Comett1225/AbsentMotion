@@ -154,9 +154,9 @@ private:
         fx.active = [this](const Layer& layer) { return fEffects.active(layer); };
         fx.lifted = [this](const Layer& layer) { return fEffects.lifted(layer); };
         fx.behind = [this](const Layer& layer) { return fEffects.behind(layer); };
-        fx.draw = [this](SkCanvas* canvas, const Scene& scene, const Layer& layer, double time, const SkRect& area,
+        fx.draw = [this](SkCanvas* canvas, const Scene& scene, const Layer& layer, double time, const SkRect& area, const SkMatrix& placed,
                          const std::function<void(SkCanvas*)>& source, const std::function<void(SkCanvas*)>& below) {
-            return fEffects.draw(canvas, scene, layer, time, area, source, below);
+            return fEffects.draw(canvas, scene, layer, time, area, placed, source, below);
         };
         return fx;
     }

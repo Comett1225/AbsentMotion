@@ -16,7 +16,7 @@ public:
     bool active(const Layer& layer) const;
     bool lifted(const Layer& layer) const;
     bool behind(const Layer& layer) const;
-    bool draw(SkCanvas* canvas, const Scene& scene, const Layer& layer, double timeMs, const SkRect& area,
+    bool draw(SkCanvas* canvas, const Scene& scene, const Layer& layer, double timeMs, const SkRect& area, const SkMatrix& placed,
               const std::function<void(SkCanvas*)>& source, const std::function<void(SkCanvas*)>& below) const;
 
 private:
@@ -31,8 +31,8 @@ private:
     const Definition* find(const std::string& id) const;
     int liftAt(const Layer& layer) const;
     bool needs(const Layer& layer, bool Definition::*input) const;
-    sk_sp<SkImageFilter> chain(const Scene& scene, const Layer& layer, double timeMs, const SkRect& area,
-                               sk_sp<SkImageFilter> content, sk_sp<SkImageFilter> below) const;
+    sk_sp<SkImageFilter> chain(const Scene& scene, const Layer& layer, double timeMs, const SkRect& area, const SkRect& seen,
+                               const SkMatrix& placed, sk_sp<SkImageFilter> content, sk_sp<SkImageFilter> below) const;
     std::map<std::string, Definition> fDefinitions;
 };
 

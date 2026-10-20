@@ -51,10 +51,10 @@
    }
   },
   "bend": {
-   "description": "Curva la capa en un arco suave: el lado de Origen queda fijo y el lado opuesto gira hasta el ángulo que definas. Ideal para capas largas y delgadas.",
+   "description": "Curva la capa a lo largo de un arco circular; el lado del origen se mantiene fijo y el lado opuesto gira hasta el ángulo que definas, con un ángulo positivo hacia la izquierda. Ideal para capas largas y delgadas.",
    "name": "Curvar",
    "params": {
-    "angle": {
+    "amount": {
      "label": "Ángulo"
     },
     "before": {

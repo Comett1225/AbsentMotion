@@ -51,10 +51,10 @@
    }
   },
   "bend": {
-   "description": "Curva a camada ao longo de um arco suave; o lado da Origem fica fixo e o lado oposto gira até o ângulo definido. Melhor em camadas longas e finas.",
+   "description": "Curva a camada em um arco circular; o lado de origem fica fixo e o lado oposto gira até o ângulo definido, com ângulo positivo para a esquerda. Ideal para camadas longas e finas.",
    "name": "Curvar",
    "params": {
-    "angle": {
+    "amount": {
      "label": "Ângulo"
     },
     "before": {

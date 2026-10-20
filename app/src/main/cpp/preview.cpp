@@ -144,7 +144,7 @@ static void DrawCameraFrames(SkCanvas* canvas, const Scene& scene, double timeMs
 
 static void DrawWorld(SkCanvas* canvas, const Scene& scene, double timeMs, const MediaPictures& pictures, const LayerEffects* effects) {
     canvas->drawColor(scene.bgColor);
-    SetLayerEffects(effects, &scene);
+    SetLayerEffects(effects, &scene, true);
     DrawLayerList(canvas, scene, scene.layers, timeMs, pictures);
     SetLayerEffects(nullptr, nullptr);
 }

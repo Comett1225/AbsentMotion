@@ -268,11 +268,12 @@ struct LayerEffects {
     std::function<bool(const Layer&)> active;
     std::function<bool(const Layer&)> lifted;
     std::function<bool(const Layer&)> behind;
-    std::function<bool(SkCanvas*, const Scene&, const Layer&, double, const SkRect&, const std::function<void(SkCanvas*)>&,
+    std::function<bool(SkCanvas*, const Scene&, const Layer&, double, const SkRect&, const SkMatrix&, const std::function<void(SkCanvas*)>&,
                        const std::function<void(SkCanvas*)>&)> draw;
 };
 void DrawScene(SkCanvas* canvas, const Scene& scene, double timeMs, const MediaPictures& pictures,
                const LayerEffects* effects = nullptr);
-void SetLayerEffects(const LayerEffects* effects, const Scene* scene);
+void SetLayerEffects(const LayerEffects* effects, const Scene* scene, bool world = false);
+bool WorldView();
 
 }

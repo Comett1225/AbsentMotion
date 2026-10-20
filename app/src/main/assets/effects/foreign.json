@@ -994,6 +994,15 @@
    }
   }
  },
+ "absent.bend": {
+  "to": "bend",
+  "params": {
+   "angle": {
+    "to": "amount",
+    "scale": -1
+   }
+  }
+ },
  "com.alightcreative.effects.checkerdissolve2": {
   "to": "blockdissolve",
   "params": {
@@ -1874,6 +1883,29 @@
     "to": "seed",
     "min": 0,
     "max": 5
+   }
+  }
+ },
+ "com.alightcreative.effects.bendwarp": {
+  "to": "bend",
+  "params": {
+   "originType": {
+    "to": "origin"
+   },
+   "amount": {
+    "to": "amount"
+   },
+   "offset": {
+    "to": "start"
+   },
+   "oppositeType": {
+    "to": "before"
+   },
+   "highLimit": {
+    "to": "tuneHead"
+   },
+   "lowLimit": {
+    "to": "tuneTail"
    }
   }
  }

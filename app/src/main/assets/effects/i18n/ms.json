@@ -51,10 +51,10 @@
    }
   },
   "bend": {
-   "description": "Lenturkan lapisan sepanjang lengkok licin; sisi Asal kekal dan sisi jauh berpusing ke sudut yang ditetapkan. Sesuai untuk lapisan panjang dan nipis.",
+   "description": "Melenturkan lapisan mengikut lengkok bulatan; bahagian Asal kekal di tempatnya dan bahagian hujung berpusing ke sudut yang anda tetapkan, sudut positif ke kiri. Terbaik untuk lapisan yang panjang dan nipis.",
    "name": "Lentur",
    "params": {
-    "angle": {
+    "amount": {
      "label": "Sudut"
     },
     "before": {

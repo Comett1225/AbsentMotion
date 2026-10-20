@@ -455,6 +455,7 @@ half4 main(float2 xy) {
 
 thread_local const LayerEffects* gEffects = nullptr;
 thread_local const Scene* gScene = nullptr;
+thread_local bool gWorld = false;
 
 int Fps() { return gScene ? gScene->fps : 30; }
 
@@ -676,7 +677,7 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
         plain.unitOpacity = true;
         DrawOne(canvas, siblings, *under, timeMs, pictures, plain);
     };
-    if (!effects || !gEffects->draw(canvas, *gScene, l, timeMs, scenePath.getBounds(), picture, below)) picture(canvas);
+    if (!effects || !gEffects->draw(canvas, *gScene, l, timeMs, scenePath.getBounds(), m, picture, below)) picture(canvas);
     if (effects && gEffects->lifted(l) && !scenePath.isEmpty()) {
         SkPaint mask;
         mask.setAntiAlias(true);
@@ -822,10 +823,13 @@ void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& 
 
 }
 
-void SetLayerEffects(const LayerEffects* effects, const Scene* scene) {
+void SetLayerEffects(const LayerEffects* effects, const Scene* scene, bool world) {
     gEffects = effects;
     gScene = scene;
+    gWorld = world;
 }
+
+bool WorldView() { return gWorld; }
 
 void ParseStyle(const XmlNode& n, Layer* l) {
     l->blending = AttrOf(n, "blending");
