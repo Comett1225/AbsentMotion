@@ -184,4 +184,56 @@ class ProjectStoreTest {
         val report = Importer(store).import { ByteArrayInputStream(xml.toByteArray()) }.single()
         assertEquals(100, store.load(report.id)!!.width)
     }
+
+    private fun model(uri: String) = XmlNode("model", linkedMapOf("id" to "5", "startTime" to "0", "endTime" to "99", "src" to uri))
+
+    @Test fun deleteKeepsAModelFolderAnotherProjectStillUsesAndSweepsItWithTheLastUser() {
+        val store = ProjectStore(tmp.newFolder())
+        val a = store.create(scene())
+        val folder = store.mediaDir(a).resolve("model-1").apply { mkdirs() }
+        val gltf = folder.resolve("robot.gltf").apply { writeText("{}") }
+        val bin = folder.resolve("robot.bin").apply { writeText("data") }
+        val unusedFolder = store.mediaDir(a).resolve("model-10").apply { mkdirs() }.resolve("other.obj").apply { writeText("v") }
+        val b = store.create(scene(model(gltf.toURI().toString())))
+        store.delete(a)
+        assertTrue(gltf.exists())
+        assertTrue(bin.exists())
+        assertFalse(unusedFolder.exists())
+        store.delete(b)
+        assertFalse(gltf.exists())
+        assertFalse(store.mediaDir(a).exists())
+    }
+
+    @Test fun deleteKeepsMediaAndAiFilesThatOnlyVersionsOrRecoveryDraftsStillUse() {
+        val root = tmp.newFolder()
+        val ai = tmp.newFolder("ai")
+        val store = ProjectStore(root)
+        fun aiUri(file: java.io.File) = "content://app.absentmotion.files/files/ai/${file.name}"
+        val a = store.create(scene())
+        store.mediaDir(a).mkdirs()
+        val inHistory = store.mediaDir(a).resolve("history.png").apply { writeText("x") }
+        val inDraft = store.mediaDir(a).resolve("draft.png").apply { writeText("x") }
+        val unused = store.mediaDir(a).resolve("unused.png").apply { writeText("x") }
+        val aiHistory = ai.resolve("matte.png").apply { writeText("x") }
+        val aiDraft = ai.resolve("voice.wav").apply { writeText("x") }
+        val aiUnused = ai.resolve("old.png").apply { writeText("x") }
+        val b = store.create(scene())
+        store.versions.snapshot(b, scene(image(inHistory.toURI().toString()), image(aiUri(aiHistory))).toXml())
+        val c = store.create(scene())
+        Recovery(root.resolve("recovery")).write(c, scene(image(inDraft.toURI().toString()), image(aiUri(aiDraft))).toXml())
+        store.delete(a, ai)
+        assertTrue(inHistory.exists())
+        assertTrue(inDraft.exists())
+        assertFalse(unused.exists())
+        assertTrue(aiHistory.exists())
+        assertTrue(aiDraft.exists())
+        assertFalse(aiUnused.exists())
+        Recovery(root.resolve("recovery")).clear(c)
+        store.delete(b, ai)
+        assertFalse(inHistory.exists())
+        assertFalse(inDraft.exists())
+        assertFalse(store.mediaDir(a).exists())
+        assertFalse(aiHistory.exists())
+        assertFalse(aiDraft.exists())
+    }
 }

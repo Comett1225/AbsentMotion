@@ -133,18 +133,26 @@ class ProjectStore(private val root: File) {
     }
 
     fun delete(id: String, aiDir: File? = null) {
-        val owners = (listOf(id) + (read(id)?.node?.mediaUris().orEmpty().mapNotNull(::ownerOf))).distinct()
+        val own = listOfNotNull(text(id)) + versions.list(id).mapNotNull { runCatching { it.file.readText() }.getOrNull() }
+        val owners = (listOf(id) + own.flatMap { runCatching { Scene.parse(it).node.mediaUris() }.getOrDefault(emptySet()) }.mapNotNull(::ownerOf)).distinct()
         sceneFile(id).delete()
         thumbnailFile(id).delete()
         versions.delete(id)
         val projectFiles = dir.listFiles { f -> f.extension == "xml" }.orEmpty().toList()
         val templateFiles = File(root, "templates").listFiles { f -> f.isDirectory }.orEmpty().map { File(it, "scene.xml") }
-        val parsed = (projectFiles + templateFiles).map { f -> runCatching { Scene.parse(f.readText()).node.mediaUris() }.getOrNull() }
+        val folders = owners.map { folderUri(mediaDir(it)) }
+        val history = (File(dir, "versions").listFiles { f -> f.isDirectory }.orEmpty().flatMap { it.listFiles { f -> f.extension == "xml" }.orEmpty().toList() } +
+            File(root, "recovery").listFiles { f -> f.extension == "xml" }.orEmpty())
+            .filter { f -> runCatching { f.readText() }.getOrNull().let { it == null || folders.any(it::contains) || aiDir != null && it.contains("/ai/") } }
+        val parsed = (projectFiles + templateFiles + history).map { f -> runCatching { Scene.parse(f.readText()).node.mediaUris() }.getOrNull() }
         if (null in parsed) return
         val used = parsed.filterNotNull().flatten().toSet()
         for (owner in owners.filter { it == id || !sceneFile(it).exists() }) {
             val folder = mediaDir(owner)
-            folder.listFiles()?.filter { it.toURI().toString() !in used }?.forEach { it.deleteRecursively() }
+            folder.listFiles()?.filter { f ->
+                val uri = f.toURI().toString()
+                if (f.isDirectory) used.none { it.startsWith(uri) } else uri !in used
+            }?.forEach { it.deleteRecursively() }
             folder.delete()
         }
         aiDir?.listFiles()?.filter { f -> f.isFile && used.none { it.endsWith("/" + f.name) } }?.forEach { it.delete() }
