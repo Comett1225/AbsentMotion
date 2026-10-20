@@ -676,7 +676,7 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
         plain.unitOpacity = true;
         DrawOne(canvas, siblings, *under, timeMs, pictures, plain);
     };
-    if (!effects || !gEffects->draw(canvas, *gScene, l, timeMs, scenePath.getBounds(), picture, below)) picture(canvas);
+    if (!effects || !gEffects->draw(canvas, *gScene, l, timeMs, scenePath.getBounds(), m, picture, below)) picture(canvas);
     if (effects && gEffects->lifted(l) && !scenePath.isEmpty()) {
         SkPaint mask;
         mask.setAntiAlias(true);

@@ -291,11 +291,16 @@ def main():
     ok = np.array_equal(shots[0], shots[1]) and not np.array_equal(shots[0], shots[2]) and np.abs(shots[0][100, 100] - (0x33, 0x66, 0xcc)).max() > 0
     print(('ok   ' if ok else 'FAIL ') + 'vhs is steady for a frame and moves with time', flush=True)
     failed += not ok
-    bent = [engine.still(f'bend{k}', engine.scene(engine.rect(1, 100, 100, 8, 80, 0xffff0000, extra=fx('bend', angle=angle, start=start))), work)[:, :, 0] > 128
+    bent = [engine.still(f'bend{k}', engine.scene(engine.rect(1, 100, 100, 8, 80, 0xffff0000, extra=fx('bend', amount=angle, start=start))), work)[:, :, 0] > 128
             for k, (angle, start) in enumerate([(80, 0), (-80, 0), (80, 0.4), (-80, 0.4)])]
     apart = [int((bent[k] ^ bent[k + 1][:, ::-1]).sum()) for k in (0, 2)]
-    ok = min(bent[0].sum(), bent[2].sum()) > 2000 and bent[0][:, 120:].sum() > 300 and bent[2][:, 120:].sum() > 300 and max(apart) <= 0.01 * bent[0].sum()
-    print(('ok   ' if ok else 'FAIL ') + 'bending left draws bending right mirrored: ' + str(apart) + ' pixels differ', flush=True)
+    ok = min(bent[0].sum(), bent[2].sum()) > 2000 and bent[0][:, :80].sum() > 300 and bent[2][:, :80].sum() > 300 and max(apart) <= 0.01 * bent[0].sum()
+    print(('ok   ' if ok else 'FAIL ') + 'a positive bend turns left and bending right draws it mirrored: ' + str(apart) + ' pixels differ', flush=True)
+    failed += not ok
+    turned = engine.scene(engine.rect(1, 100, 100, 8, 80, 0xffff0000, extra=fx('bend', amount=80, start=0)).replace('<opacity', '<rotation value="90"/><opacity'))
+    off = int(((engine.still('bendturned', turned, work)[:, :, 0] > 128) ^ np.rot90(bent[0], -1)).sum())
+    ok = off <= 0.01 * bent[0].sum()
+    print(('ok   ' if ok else 'FAIL ') + f'a bend turns with its layer: {off} pixels differ from the upright bend turned a quarter', flush=True)
     failed += not ok
     y, x = np.mgrid[0:64, 0:64]
     on = ((x // 8 + y // 8) % 2)[:, :, None]
