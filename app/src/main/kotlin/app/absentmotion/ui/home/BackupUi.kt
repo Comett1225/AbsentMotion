@@ -3,6 +3,8 @@ package app.absentmotion.ui.home
 import app.absentmotion.export.formatBytes
 import android.provider.OpenableColumns
 import androidx.compose.foundation.background
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -107,12 +109,12 @@ internal fun BackupRows(settings: AppSettings, onRestored: () -> Unit) {
             onDismissRequest = {},
             title = { Text((if (current.result == null) current.title else current.finished).text(), color = Am.Navy) },
             text = {
-                Box(Modifier.fillMaxWidth().height(96.dp)) {
+                Box(Modifier.fillMaxWidth().height(168.dp)) {
                     val result = current.result
                     if (result == null) Column {
                         LinearProgressIndicator(progress = { current.progress }, Modifier.fillMaxWidth().padding(top = 8.dp), color = Am.Accent)
                         Text("${(current.progress * 100).toInt()}%", Modifier.padding(top = 12.dp), color = Am.Navy, fontSize = 15.sp)
-                    } else Text(result.map { it.text() }.joinToString(" "), color = Am.Navy, fontSize = 15.sp)
+                    } else Text(result.map { it.text() }.joinToString(" "), Modifier.verticalScroll(rememberScrollState()), color = Am.Navy, fontSize = 15.sp)
                 }
             },
             confirmButton = {
