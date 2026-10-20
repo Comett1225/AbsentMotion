@@ -159,19 +159,20 @@ internal fun exifTag(resolver: ContentResolver, uri: Uri): Int = runCatching {
 }.getOrNull() ?: ExifInterface.ORIENTATION_NORMAL
 
 data class DeviceMedia(val uri: Uri, val name: String, val albumId: String, val album: String,
-                       val video: Boolean, val durationMs: Long, val date: Long, val modified: Long)
+                       val video: Boolean, val durationMs: Long, val date: Long, val modified: Long, val svg: Boolean = false)
 
 suspend fun deviceMedia(context: Context, demoOnly: Boolean = false): List<DeviceMedia> = withContext(Dispatchers.IO) {
     val resolver = context.contentResolver
     val found = mutableListOf<DeviceMedia>()
     for (video in listOf(false, true)) {
         val collection = if (video) MediaStore.Video.Media.EXTERNAL_CONTENT_URI else MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-        val columns = arrayOf("_id", "_display_name", "bucket_id", "bucket_display_name", "date_added", "date_modified") + if (video) arrayOf("duration") else emptyArray()
+        val columns = arrayOf("_id", "_display_name", "bucket_id", "bucket_display_name", "date_added", "date_modified", "mime_type") + if (video) arrayOf("duration") else emptyArray()
         try {
             resolver.query(collection, columns, null, null, "date_added DESC, _id DESC")?.use { c ->
                 while (c.moveToNext()) found += DeviceMedia(ContentUris.withAppendedId(collection, c.getLong(0)),
                     c.getString(1) ?: "", c.getString(2) ?: "", c.getString(3) ?: "", video,
-                    if (video) c.getLong(6) else 0, c.getLong(4), c.getLong(5))
+                    if (video) c.getLong(7) else 0, c.getLong(4), c.getLong(5),
+                    svg = !video && (c.getString(6) == "image/svg+xml" || c.getString(1).orEmpty().endsWith(".svg", ignoreCase = true)))
             }
         } catch (_: Exception) { }
     }

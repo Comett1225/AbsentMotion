@@ -124,10 +124,15 @@ internal fun MediaTab(state: EditorState, modifier: Modifier, library: AddLibrar
                 Box(Modifier.fillMaxHeight().aspectRatio(1f).background(Color.Black).clickable(enabled = !adding) {
                     scope.launch {
                         adding = true
-                        try { mediaDeclaration(context, file.uri)?.let { state.keepCopy(context, it) }?.let { if (file.video) state.addVideo(it) else state.addImage(it) } } finally { adding = false }
+                        try {
+                            if (file.svg) state.importSvgFile(context, file.uri)
+                            else mediaDeclaration(context, file.uri)?.let { state.keepCopy(context, it) }?.let { if (file.video) state.addVideo(it) else state.addImage(it) }
+                        } finally { adding = false }
                     }
                 }) {
                     bitmap?.let { Image(it.asImageBitmap(), null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop) }
+                    if (file.svg && bitmap == null) Text(file.name, Modifier.align(Alignment.Center).padding(6.dp), color = Am.OnDarkDim, fontSize = 11.sp, maxLines = 3,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center)
                     if (file.video) {
                         MediaPlayIcon(Modifier.align(Alignment.BottomStart).padding(5.dp).size(12.dp))
                         val seconds = file.durationMs / 1000

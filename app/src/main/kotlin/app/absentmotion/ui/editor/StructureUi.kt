@@ -121,7 +121,7 @@ internal fun ObjectPage(state: EditorState, modifier: Modifier) {
 
 private const val MaxSvgBytes = 16 shl 20
 
-private suspend fun EditorState.importSvgFile(context: Context, uri: Uri) {
+internal suspend fun EditorState.importSvgFile(context: Context, uri: Uri) {
     val host = scene
     val start = host.frameStart(frame)
     val end = host.frameEnd(frame + settings.defaultLayerDuration * host.fps)
