@@ -146,6 +146,7 @@ private fun EffectList(state: EditorState, effects: List<AudioFx>, open: (Int) -
 private fun EffectRow(state: EditorState, index: Int, fx: AudioFx, count: Int, open: () -> Unit) {
     var drag by remember { mutableFloatStateOf(0f) }
     val latest by rememberUpdatedState(index)
+    val rows by rememberUpdatedState(count)
     var held by remember { mutableIntStateOf(index) }
     val known = fx.kind != null
     Row(Modifier.padding(start = 6.5.dp, end = 6.5.dp, top = 6.5.dp).fillMaxWidth().height(RowHeight).clip(RowShape).background(Am.Field),
@@ -163,7 +164,7 @@ private fun EffectRow(state: EditorState, index: Int, fx: AudioFx, count: Int, o
                 change.consume()
                 drag += amount.y
                 if (abs(drag) >= 43.5.dp.toPx()) {
-                    val to = (held + if (drag > 0) 1 else -1).coerceIn(0, count - 1)
+                    val to = (held + if (drag > 0) 1 else -1).coerceIn(0, rows - 1)
                     if (to != held) state.editSelected("audiofx-reorder") { it.moveAudioEffect(held, to) }
                     held = to
                     drag = 0f
