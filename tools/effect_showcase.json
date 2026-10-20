@@ -107,6 +107,11 @@
     "tilerotate": {"photo": "colour", "params": {"count": 1.6, "rotation": 90}},
     "tileshift": {"photo": "colour", "params": {"count": 2.4, "strength": 0.06}},
     "stripes": {"photo": "portrait", "params": {"count": 12, "width": 0.35, "color": "#ffcc33"}},
-    "wipe": {"photo": "landscape", "params": {"end": [1, 0.15, 1], "angle": 20, "feather": 12}, "animate": 16}
+    "wipe": {"photo": "landscape", "params": {"end": [1, 0.15, 1], "angle": 20, "feather": 12}, "animate": 16},
+    "turbulence": {"photo": "landscape", "params": {"alpha": 0.85, "color1": "#0b1a3a"}},
+    "turbulentdisplace": {"photo": "colour", "layout": "move", "params": {"strength": 0.35}},
+    "voronoicells": {"photo": "portrait", "params": {"color1": "#1b1464", "color2": "#fbb03b", "lineWidth": 0.06, "lineColor": "#ffffff"}},
+    "zoomstreaks": {"photo": "colour", "layout": "move", "params": {"strength": 0.5}},
+    "blockdissolve": {"photo": "landscape", "params": {"strength": [0, 1, 0], "blockSize": 14}, "animate": 16}
   }
 }
