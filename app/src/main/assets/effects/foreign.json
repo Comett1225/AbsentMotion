@@ -1822,5 +1822,50 @@
     }
    }
   }
+ },
+ "com.alightcreative.effects.blocknoise2": {
+  "to": "blocknoise",
+  "params": {
+   "size": {
+    "to": "blockSize",
+    "min": 1,
+    "max": 999
+   },
+   "stretch": {
+    "to": "stretch",
+    "min": 0.01,
+    "max": 10
+   },
+   "amount": {
+    "to": "strength",
+    "min": 0,
+    "max": 1
+   },
+   "mono": {
+    "to": "mono"
+   },
+   "freeze": {
+    "to": "freeze"
+   },
+   "extremes": {
+    "to": "extremes"
+   },
+   "offset": {
+    "to": "offset"
+   },
+   "position": {
+    "to": "offset"
+   },
+   "overshoot": {
+    "to": "overshoot",
+    "min": 0.5,
+    "max": 2
+   },
+   "seed": {
+    "to": "seed",
+    "min": 0,
+    "max": 5
+   }
+  }
  }
 }
