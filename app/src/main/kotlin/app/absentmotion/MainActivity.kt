@@ -527,7 +527,7 @@ class MainActivity : ComponentActivity() {
         val dir = getExternalFilesDir(null)!!
         val ext = mapOf(ExportKind.Video to s.fixedFormat().container.ext, ExportKind.Audio to s.audioFormat.ext, ExportKind.Gif to "gif", ExportKind.Frame to "png", ExportKind.FrameAs to s.image.ext, ExportKind.Xml to "xml", ExportKind.Package to "absproj")
         val name = if (kind == ExportKind.Sequence) "export.seq" else "export"
-        lifecycleScope.launch {
+        val job = lifecycleScope.launch {
             try {
                 if (kind == ExportKind.Video) {
                     val probe = app.absentmotion.export.DeviceCapabilities.of(applicationContext).load().probe
@@ -544,6 +544,7 @@ class MainActivity : ComponentActivity() {
                 Log.e("AMExport", "failed", e)
             }
         }
+        intent.getIntExtra("cancelafter", 0).takeIf { it > 0 }?.let { ms -> lifecycleScope.launch { kotlinx.coroutines.delay(ms.toLong()); job.cancel() } }
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
