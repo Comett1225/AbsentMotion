@@ -58,7 +58,14 @@ import app.absentmotion.model.withStrokeAttr
 import app.absentmotion.model.withStrokeEnabled
 import app.absentmotion.ui.editor.ChromeIcons
 import app.absentmotion.ui.editor.PanelIcons
+import app.absentmotion.ui.editor.rememberReorder
+import app.absentmotion.ui.editor.reorderGrip
+import app.absentmotion.ui.editor.reorderLift
+import app.absentmotion.ui.editor.reorderSlot
 import app.absentmotion.ui.theme.Am
+import androidx.compose.runtime.key
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
 
@@ -327,7 +334,10 @@ private val DirectionLabels = listOf(R.string.border_inside, R.string.border_cen
 private fun BorderTab(state: EditorState, layer: Layer) {
     val borders = layer.borders
     val open = borders.getOrNull(openBorder)
-    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(18.px), verticalArrangement = Arrangement.spacedBy(18.px)) {
+    val scroll = rememberScrollState()
+    val reorder = rememberReorder(state, scroll, top = 18.px, pitch = 122.px)
+    val reorderLabel = stringResource(R.string.effects_reorder)
+    Column(Modifier.fillMaxSize().verticalScroll(scroll).padding(18.px), verticalArrangement = Arrangement.spacedBy(18.px)) {
         if (open != null) {
             Column(Modifier.fillMaxWidth().clip(PanelShape).background(CardBg).padding(bottom = 8.px)) {
                 Row(Modifier.fillMaxWidth().height(104.px).clickable { openBorder = -1 }, verticalAlignment = Alignment.CenterVertically) {
@@ -352,18 +362,23 @@ private fun BorderTab(state: EditorState, layer: Layer) {
             }
             return@Column
         }
-        borders.forEach { b ->
-            Row(
-                Modifier.fillMaxWidth().height(104.px).clip(PanelShape).background(CardBg).clickable { openBorder = b.index; borderField = 0 },
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Canvas(Modifier.padding(start = 36.px).size(51.px)) { triangle(down = false) }
-                Text(formatPlain(b.size) + "px", Modifier.padding(start = 28.px).width(78.px), color = Am.OnDark, fontSize = 16.sp, maxLines = 1, softWrap = false)
-                ColourSwatch(b.color, 56.px, Modifier.padding(start = 28.px), round = true)
-                Text(stringResource(DirectionLabels[Directions.indexOf(b.direction).coerceAtLeast(0)]), Modifier.padding(start = 28.px).weight(1f), color = Am.OnDark, fontSize = 16.sp, maxLines = 1, softWrap = false)
-                Canvas(Modifier.size(84.px).clickable { state.editSelected { it.withBorderMoved(b.index, b.index - 1) } }) {
-                    val u = 1.px.toPx()
-                    for (i in -1..1) drawLine(Am.Inactive, Offset(size.width / 2 - 22 * u, size.height / 2 + i * 9 * u), Offset(size.width / 2 + 22 * u, size.height / 2 + i * 9 * u), 2.5f * u)
+        key(reorder.generation) {
+            borders.forEach { b ->
+                Row(
+                    Modifier.reorderSlot(reorder, b.index).fillMaxWidth().height(104.px).reorderLift(reorder, b.index, 4.dp).clip(PanelShape).background(CardBg)
+                        .clickable { openBorder = b.index; borderField = 0 },
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Canvas(Modifier.padding(start = 36.px).size(51.px)) { triangle(down = false) }
+                    Text(formatPlain(b.size) + "px", Modifier.padding(start = 28.px).width(78.px), color = Am.OnDark, fontSize = 16.sp, maxLines = 1, softWrap = false)
+                    ColourSwatch(b.color, 56.px, Modifier.padding(start = 28.px), round = true)
+                    Text(stringResource(DirectionLabels[Directions.indexOf(b.direction).coerceAtLeast(0)]), Modifier.padding(start = 28.px).weight(1f), color = Am.OnDark, fontSize = 16.sp, maxLines = 1, softWrap = false)
+                    Canvas(Modifier.size(84.px).semantics { contentDescription = reorderLabel }.reorderGrip(reorder, b.index, borders.size) { from, to ->
+                        state.editSelected { it.withBorderMoved(from, to) }
+                    }) {
+                        val u = 1.px.toPx()
+                        for (i in -1..1) drawLine(Am.Inactive, Offset(size.width / 2 - 22 * u, size.height / 2 + i * 9 * u), Offset(size.width / 2 + 22 * u, size.height / 2 + i * 9 * u), 2.5f * u)
+                    }
                 }
             }
         }
