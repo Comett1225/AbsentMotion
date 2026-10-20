@@ -1,5 +1,6 @@
 package app.absentmotion.ui.home
 
+import app.absentmotion.export.formatBytes
 import android.provider.OpenableColumns
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -49,7 +50,7 @@ import java.time.format.DateTimeFormatter
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
 
-private class BackupTask(val title: UiText) {
+private class BackupTask(val title: UiText, val finished: UiText) {
     var progress by mutableFloatStateOf(0f)
     var result by mutableStateOf<List<UiText>?>(null)
     @Volatile var stopped = false
@@ -67,9 +68,9 @@ internal fun BackupRows(settings: AppSettings, onRestored: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var task by remember { mutableStateOf<BackupTask?>(null) }
-    fun run(title: UiText, stoppedText: UiText, after: () -> Unit = {}, work: (BackupTask) -> List<UiText>) {
+    fun run(title: UiText, finished: UiText, stoppedText: UiText, after: () -> Unit = {}, work: (BackupTask) -> List<UiText>) {
         if (task != null) return
-        val started = BackupTask(title)
+        val started = BackupTask(title, finished)
         task = started
         scope.launch {
             started.result = withContext(Dispatchers.IO) {
@@ -88,12 +89,12 @@ internal fun BackupRows(settings: AppSettings, onRestored: () -> Unit) {
         }
     }
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-        if (uri != null) run(txt(R.string.backup_restoring_title), txt(R.string.backup_restore_stopped), onRestored) {
+        if (uri != null) run(txt(R.string.backup_restoring_title), txt(R.string.backup_restore_result_title), txt(R.string.backup_restore_stopped), onRestored) {
             restoreBackup(context, uri, it)
         }
     }
     Column(Modifier.fillMaxWidth()) {
-        LinkRow(stringResource(R.string.backup_all_projects)) { run(txt(R.string.backup_backing_up_title), txt(R.string.backup_stopped)) { backUp(context, it) } }
+        LinkRow(stringResource(R.string.backup_all_projects)) { run(txt(R.string.backup_backing_up_title), txt(R.string.backup_result_title), txt(R.string.backup_stopped)) { backUp(context, it) } }
         Spacer(Modifier.height(6.dp))
         LinkRow(stringResource(R.string.backup_restore)) { picker.launch(arrayOf("*/*")) }
         Spacer(Modifier.height(6.dp))
@@ -104,7 +105,7 @@ internal fun BackupRows(settings: AppSettings, onRestored: () -> Unit) {
     task?.let { current ->
         AlertDialog(
             onDismissRequest = {},
-            title = { Text(current.title.text(), color = Am.Navy) },
+            title = { Text((if (current.result == null) current.title else current.finished).text(), color = Am.Navy) },
             text = {
                 Box(Modifier.fillMaxWidth().height(96.dp)) {
                     val result = current.result
@@ -129,7 +130,7 @@ private fun backUp(context: Context, task: BackupTask): List<UiText> {
     val root = context.filesDir
     val ai = context.getExternalFilesDir(null)?.resolve("ai")
     val needed = Backup.files(root, includeMedia = true, ai).sumOf { it.second.length() }
-    if (needed + (50L shl 20) > freeSpace()) return listOf(txt(R.string.backup_no_space, fileSize(needed)))
+    if (needed + (50L shl 20) > freeSpace()) return listOf(txt(R.string.backup_no_space, formatBytes(needed)))
     val name = "AbsentMotion-backup-${stamp()}.${Backup.EXTENSION}"
     MediaStoreExport(context).save(null, name, "application/octet-stream") { out ->
         Backup.write(root, out, includeMedia = true, ai) { done, total -> task.report(done.toFloat() / total) }
@@ -142,7 +143,7 @@ private fun restoreBackup(context: Context, uri: Uri, task: BackupTask): List<Ui
     val size = runCatching {
         context.contentResolver.query(uri, arrayOf(OpenableColumns.SIZE), null, null, null)?.use { if (it.moveToFirst() && !it.isNull(0)) it.getLong(0) else -1L }
     }.getOrNull() ?: -1L
-    if (size > 0 && context.filesDir.usableSpace < size + (100L shl 20)) return listOf(txt(R.string.backup_restore_no_space, fileSize(size)))
+    if (size > 0 && context.filesDir.usableSpace < size + (100L shl 20)) return listOf(txt(R.string.backup_restore_no_space, formatBytes(size)))
     val restored = (context.contentResolver.openInputStream(uri) ?: return listOf(txt(R.string.backup_open_failed))).use { input ->
         val external = context.getExternalFilesDir(null)
         Backup.restore(ProjectStore(context), context.filesDir, input, MediaAccess.forPhone(context.filesDir, external), external?.resolve("ai")) { read -> if (size > 0) task.report(read.toFloat() / size) else task.report(0f) }

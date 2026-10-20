@@ -220,6 +220,8 @@
     <string name="backup_restore_stopped">Restore stopped. Projects restored before you stopped are kept; restoring the same backup again finishes the rest.</string>
     <string name="backup_all_projects">Back up all projects</string>
     <string name="backup_backing_up_title">Backing up all projects</string>
+    <string name="backup_result_title">Backup</string>
+    <string name="backup_restore_result_title">Restore</string>
     <string name="backup_stopped">Backup stopped. No backup file was kept.</string>
     <string name="backup_restore">Restore from backup</string>
     <string name="backup_weekly">Weekly automatic backup (projects only)</string>
