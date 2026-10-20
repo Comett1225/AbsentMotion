@@ -495,7 +495,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
             onDismissRequest = { failure = null },
             title = { Text(stringResource(f.title), color = Navy) },
             text = {
-                Column {
+                Column(Modifier.verticalScroll(rememberScrollState())) {
                     Text(f.text.text(), color = Navy)
                     if (f.hint) OutdatedHint(outdated, Modifier.padding(top = 8.dp))
                 }
