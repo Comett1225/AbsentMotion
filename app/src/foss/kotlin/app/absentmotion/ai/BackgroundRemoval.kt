@@ -76,6 +76,18 @@ internal object BackgroundRemoval {
         }
     }
 
+    suspend fun <T> withFrameMatte(context: Context, block: suspend (suspend (IntArray, Int, Int) -> ByteArray) -> T): T {
+        if (!AVAILABLE) throw ModelNotReady()
+        val handle = model(context)
+        return block { argb, width, height ->
+            val rgb = ByteArray(width * height * 3)
+            for (i in 0 until width * height) {
+                rgb[3 * i] = (argb[i] shr 16).toByte(); rgb[3 * i + 1] = (argb[i] shr 8).toByte(); rgb[3 * i + 2] = argb[i].toByte()
+            }
+            synchronized(this) { nativeMatte(handle, rgb, width, height) }
+        }
+    }
+
     private fun matte(context: Context, bitmap: Bitmap): ByteArray {
         val width = bitmap.width
         val height = bitmap.height

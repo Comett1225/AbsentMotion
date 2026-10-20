@@ -164,6 +164,7 @@ fun EffectBrowser(state: EditorState) {
         }
         }
     }
+    AiVideoDialog(ai, state.scene)
     AiProgressDialog(ai)
 }
 

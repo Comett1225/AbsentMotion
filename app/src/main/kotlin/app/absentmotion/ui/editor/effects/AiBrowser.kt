@@ -23,7 +23,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.absentmotion.ai.AiAction
 import app.absentmotion.ai.AiTools
+import app.absentmotion.ai.LONG_MATTE_SECONDS
+import app.absentmotion.ai.MAX_MATTE_SECONDS
+import app.absentmotion.ai.MatteSides
+import app.absentmotion.ai.matteBytes
+import app.absentmotion.ai.matteSeconds
+import app.absentmotion.ai.matteSize
 import app.absentmotion.model.Layer
+import app.absentmotion.model.Scene
+import kotlin.math.roundToInt
 import app.absentmotion.ui.theme.Am
 
 @Composable
@@ -77,6 +85,47 @@ internal fun AiTile(action: AiAction, layer: Layer?, tools: AiTools) {
         Text(reason ?: "", Modifier.fillMaxWidth().height(16.dp), color = Am.OnDark.copy(alpha = 0.7f), fontSize = 8.sp,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center, maxLines = 1)
     }
+}
+
+@Composable
+internal fun AiVideoDialog(tools: AiTools, scene: Scene) {
+    val layer = tools.videoSetup ?: return
+    val media = layer.mediaFill?.uri?.let(scene::media)
+    val seconds = media?.let(layer::matteSeconds) ?: 0.0
+    val frames = (seconds * (media?.fps ?: 30f)).roundToInt()
+    val size = media?.let { matteSize(it.width, it.height, tools.videoSide) }
+    val tooLong = seconds > MAX_MATTE_SECONDS
+    AlertDialog(onDismissRequest = { tools.videoSetup = null },
+        title = { Text(AiAction.Video.title, color = Am.OnDark) },
+        text = {
+            Column {
+                Text("Every frame of this clip is processed on this phone. The result is a group with the video and a mask layer above it.",
+                    color = Am.OnDark, fontSize = 14.sp)
+                Row(Modifier.padding(top = 14.dp).fillMaxWidth().height(36.dp).clip(RoundedCornerShape(6.dp)).background(Am.PanelInset)) {
+                    for ((side, name) in MatteSides.zip(listOf("Small", "Medium", "Large"))) {
+                        val on = side == tools.videoSide
+                        Box(Modifier.weight(1f).fillMaxHeight().padding(2.dp).clip(RoundedCornerShape(5.dp)).background(if (on) Am.FieldHi else Color.Transparent)
+                            .clickable { tools.videoSide = side }, Alignment.Center) {
+                            Text("$name ${side}p", color = if (on) Am.Accent else Am.OnDark, fontSize = 12.sp, maxLines = 1)
+                        }
+                    }
+                }
+                Text(
+                    when {
+                        tooLong -> "Clips longer than ${MAX_MATTE_SECONDS / 60} minutes are not supported yet. Trim or split the clip first."
+                        size == null -> "This video has no size information."
+                        else -> "$frames frames at ${size.first} × ${size.second}, about ${matteBytes(seconds, size.first, size.second) / 1_000_000 + 1} MB." +
+                            if (seconds > LONG_MATTE_SECONDS) " Long clip: this can take several minutes and use a lot of battery." else ""
+                    },
+                    Modifier.padding(top = 12.dp).height(54.dp), color = if (tooLong) Am.Warning else Am.Caption, fontSize = 12.sp, lineHeight = 17.sp,
+                )
+            }
+        },
+        confirmButton = {
+            TextButton({ tools.apply(AiAction.Video, confirmed = true) }, enabled = !tooLong && size != null) { Text("Start", color = Am.Accent) }
+        },
+        dismissButton = { TextButton({ tools.videoSetup = null }) { Text("Cancel", color = Am.Accent) } },
+        containerColor = Am.Field)
 }
 
 @Composable

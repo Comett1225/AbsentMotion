@@ -89,19 +89,19 @@ internal fun Layer.shapeBox(): FloatArray? {
     return floatArrayOf(points.minOf { it.x }, points.minOf { it.y }, points.maxOf { it.x }, points.maxOf { it.y })
 }
 
+internal fun mediaHalf(halfWidth: Float, halfHeight: Float, frameWidth: Int, frameHeight: Int, mode: MediaFillMode): FloatArray {
+    if (mode == MediaFillMode.Stretch) return floatArrayOf(halfWidth, halfHeight)
+    val s = if (mode == MediaFillMode.Fit) min(halfWidth / frameWidth, halfHeight / frameHeight) else max(halfWidth / frameWidth, halfHeight / frameHeight)
+    return floatArrayOf(frameWidth * s, frameHeight * s)
+}
+
 internal fun Layer.mediaRect(frameWidth: Int, frameHeight: Int): FloatArray? {
     val box = shapeBox() ?: return null
     if (frameWidth <= 0 || frameHeight <= 0) return null
-    val mode = mediaFill?.mode ?: MediaFillMode.Fill
-    if (mode == MediaFillMode.Stretch) return box
-    val bw = box[2] - box[0]
-    val bh = box[3] - box[1]
-    val s = if (mode == MediaFillMode.Fit) min(bw / frameWidth, bh / frameHeight) else max(bw / frameWidth, bh / frameHeight)
-    val w = frameWidth * s
-    val h = frameHeight * s
+    val (w, h) = mediaHalf((box[2] - box[0]) / 2, (box[3] - box[1]) / 2, frameWidth, frameHeight, mediaFill?.mode ?: MediaFillMode.Fill)
     val cx = (box[0] + box[2]) / 2
     val cy = (box[1] + box[3]) / 2
-    return floatArrayOf(cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2)
+    return floatArrayOf(cx - w, cy - h, cx + w, cy + h)
 }
 
 internal fun Scene.layerAffine(layer: Layer, timeMs: Int): Affine {

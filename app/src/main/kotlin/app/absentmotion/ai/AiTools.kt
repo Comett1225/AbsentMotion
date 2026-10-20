@@ -2,6 +2,7 @@ package app.absentmotion.ai
 
 import android.content.Context
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.content.FileProvider
@@ -23,12 +24,12 @@ import java.util.UUID
 enum class AiAction(val title: String) {
     Background("Remove Background"), Noise("Reduce Noise"), Video("Remove Background (video)");
 
-    val offered: Boolean get() = this != Background || BackgroundRemoval.AVAILABLE
+    val offered: Boolean get() = this == Noise || BackgroundRemoval.AVAILABLE
 
     fun unavailable(layer: Layer?): String? = when (this) {
         Background -> if (layer?.mediaFill?.video == false) null else "Select an image layer"
         Noise -> if (layer?.kind == "audio") null else "Select an audio layer"
-        Video -> "Coming soon"
+        Video -> if (layer?.mediaFill?.video == true) null else "Select a video layer"
     }
 }
 
@@ -44,16 +45,23 @@ class AiTools(private val context: Context, private val state: EditorState, priv
         private set
     var retry by mutableStateOf<AiAction?>(null)
         private set
+    var videoSetup by mutableStateOf<Layer?>(null)
+    var videoSide by mutableIntStateOf(MatteSides[1])
     private var job: Job? = null
 
     fun cancel() { job?.cancel(); message = "Cancelling…" }
     fun dismiss() { message = ""; retry = null }
 
-    fun apply(action: AiAction) {
-        if (running != null || action == AiAction.Video) return
+    fun apply(action: AiAction, confirmed: Boolean = false) {
+        if (running != null) return
         val layer = state.selectedId?.let(state.scene::layer)
         action.unavailable(layer)?.let { message = it; return }
         layer ?: return
+        if (action == AiAction.Video && !confirmed) {
+            videoSetup = layer
+            return
+        }
+        videoSetup = null
         running = action; progress = 0f; message = "Preparing…"; retry = null
         job = scope.launch {
             var result: AiMedia? = null
@@ -62,22 +70,32 @@ class AiTools(private val context: Context, private val state: EditorState, priv
                 val report: AiProgress = { fraction, text ->
                     withContext(Dispatchers.Main) { progress = fraction.coerceIn(0f, 1f); message = text }
                 }
-                val original = state.scene.media(layer.node[if (action == AiAction.Noise) "src" else "fillImage"] ?: "")
-                withContext(Dispatchers.IO) {
-                    result = when (action) {
-                        AiAction.Background -> BackgroundRemoval.run(context, layer.node["fillImage"]!!, original,
-                            state.engine.maxPictureSize(), report)
-                        AiAction.Noise -> NoiseReduction.run(context, layer.node["src"]!!, report)
-                        AiAction.Video -> error("Coming soon")
+                if (action == AiAction.Video) {
+                    val media = checkNotNull(state.scene.media(layer.mediaFill!!.uri)) { "This video is missing from the project" }
+                    val matte = withContext(Dispatchers.IO) { VideoBackground.run(context, layer, media, videoSide, report).also { result = it.media } }
+                    ensureActive()
+                    check(state.scene.layer(layer.id) == layer) { "The layer changed; run the tool again" }
+                    val groupId = Layer.newId()
+                    val next = checkNotNull(state.scene.withVideoMatte(layer, matte.media.declaration, matte.frameWidth, matte.frameHeight, Layer.newId(), groupId)) { "This layer cannot be masked" }
+                    state.edit { next }
+                    state.selectedId = groupId
+                } else {
+                    val original = state.scene.media(layer.node[if (action == AiAction.Noise) "src" else "fillImage"] ?: "")
+                    withContext(Dispatchers.IO) {
+                        result = when (action) {
+                            AiAction.Background -> BackgroundRemoval.run(context, layer.node["fillImage"]!!, original,
+                                state.engine.maxPictureSize(), report)
+                            else -> NoiseReduction.run(context, layer.node["src"]!!, report)
+                        }
                     }
-                }
-                ensureActive()
-                check(state.scene.layer(layer.id) == layer) { "The layer changed; run the tool again" }
-                val output = result!!
-                state.edit { scene ->
-                    scene.update(layer.id) { it.copy(node = it.node.with(
-                        if (action == AiAction.Noise) "src" else "fillImage", output.declaration.uri)) }
-                        .withMedia(output.declaration)
+                    ensureActive()
+                    check(state.scene.layer(layer.id) == layer) { "The layer changed; run the tool again" }
+                    val output = result!!
+                    state.edit { scene ->
+                        scene.update(layer.id) { it.copy(node = it.node.with(
+                            if (action == AiAction.Noise) "src" else "fillImage", output.declaration.uri)) }
+                            .withMedia(output.declaration)
+                    }
                 }
                 committed = true
                 message = ""
@@ -90,9 +108,9 @@ class AiTools(private val context: Context, private val state: EditorState, priv
             } catch (e: Exception) {
                 message = e.message ?: "Unable to process this media"; retry = action
             } catch (_: OutOfMemoryError) {
-                message = "Not enough memory to process this image"; retry = action
+                message = if (action == AiAction.Background) "Not enough memory to process this image" else "Not enough memory to process this media"; retry = action
             } catch (_: LinkageError) {
-                message = "Noise reduction is unavailable in this build"
+                message = if (action == AiAction.Noise) "Noise reduction is unavailable in this build" else "Background removal is unavailable in this build"
             } finally {
                 if (!committed) result?.file?.delete()
                 running = null

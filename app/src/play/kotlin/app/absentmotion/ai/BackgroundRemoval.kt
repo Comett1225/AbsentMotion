@@ -73,6 +73,36 @@ internal object BackgroundRemoval {
         }
     }
 
+    suspend fun <T> withFrameMatte(context: Context, block: suspend (suspend (IntArray, Int, Int) -> ByteArray) -> T): T {
+        val client = SubjectSegmentation.getClient(SubjectSegmenterOptions.Builder().enableForegroundConfidenceMask().build())
+        try {
+            val modules = ModuleInstall.getClient(context)
+            if (!modules.areModulesAvailable(client).completed().areModulesAvailable()) {
+                modules.deferredInstall(client)
+                throw ModelNotReady()
+            }
+            return block { argb, width, height ->
+                val bitmap = Bitmap.createBitmap(argb, width, height, Bitmap.Config.ARGB_8888)
+                try {
+                    val mask = checkNotNull(client.process(InputImage.fromBitmap(bitmap, 0)).completed().foregroundConfidenceMask) { "No foreground mask was returned" }
+                    mask.rewind()
+                    check(mask.remaining() == width * height) { "The foreground mask has an unexpected size" }
+                    ByteArray(width * height) { (mask.get().let { if (it.isFinite()) it.coerceIn(0f, 1f) else 0f } * 255 + 0.5f).toInt().toByte() }
+                } finally {
+                    bitmap.recycle()
+                }
+            }
+        } catch (e: MlKitException) {
+            if (e.errorCode == MlKitException.UNAVAILABLE) {
+                ModuleInstall.getClient(context).deferredInstall(client)
+                throw ModelNotReady()
+            }
+            throw e
+        } finally {
+            client.close()
+        }
+    }
+
     private fun decode(context: Context, uri: Uri, limit: Int): Bitmap {
         val resolver = context.contentResolver
         val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
