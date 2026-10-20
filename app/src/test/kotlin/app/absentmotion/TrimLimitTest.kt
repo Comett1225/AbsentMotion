@@ -1,8 +1,12 @@
 package app.absentmotion
 
+import app.absentmotion.editor.navigationStops
 import app.absentmotion.model.Layer
+import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
+import app.absentmotion.model.trimEndAt
 import app.absentmotion.model.trimHitsSourceLimit
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -30,6 +34,17 @@ class TrimLimitTest {
         val doubled = video(0, 1000, 0, speed = "2")
         assertFalse(doubled.trimHitsSourceLimit(start = false, wanted = 1500, mediaMs = 3000))
         assertTrue(doubled.trimHitsSourceLimit(start = false, wanted = 1600, mediaMs = 3000))
+    }
+
+    @Test fun skippingBetweenKeyframesStaysOnTheTrimmedClip() {
+        val keys = XmlNode("location", children = listOf("0", "0.5", "1").map { XmlNode("kf", mapOf("t" to it, "v" to "0,0,0")) })
+        val shape = Layer(XmlNode("shape", linkedMapOf("id" to "1", "startTime" to "0", "endTime" to "9999"), listOf(XmlNode("transform", children = listOf(keys)))))
+        val full = Scene.create("t", 100, 100, 30, 0).add(shape)
+        assertEquals(listOf(0, 150, 299), full.navigationStops(full.layer(1)))
+        val trimmed = full.update(1) { full.trimEndAt(it, 149)!! }
+        assertEquals(4999, trimmed.layer(1)!!.endTime)
+        assertEquals(listOf(0, 149), trimmed.navigationStops(trimmed.layer(1)))
+        assertEquals(listOf(0, 149), trimmed.navigationStops(null))
     }
 
     @Test fun unknownLengthAndStillLayersNeverHitTheLimit() {
