@@ -86,6 +86,7 @@
     <string name="gif">GIF</string>
     <string name="export">تصدير</string>
     <string name="also_keep_a_copy_as_a">الاحتفاظ بنسخة كقالب أيضًا</string>
+    <string name="export_template_failed">تعذر الاحتفاظ بنسخة كقالب. حرر بعض مساحة التخزين.</string>
     <string name="also_keeps_the_project_with_its">يحتفظ أيضًا بالمشروع ووسائطه في القوالب على هذا الهاتف. افتحه من هناك لاستبدال وسائطه والمتابعة إلى مشروع جديد.</string>
     <string name="template">قالب</string>
     <string name="one_absproj_package_with_the_project">حزمة .absproj واحدة تضم المشروع ووسائطه الأصلية، تُحفظ في Documents / AbsentMotion. احتفظ بها كنسخة احتياطية أو انقل المشروع إلى هاتف آخر.</string>
@@ -202,13 +203,21 @@
     <string name="home_save_project_failed">تعذّر حفظ المشروع. حرّر بعض مساحة التخزين.</string>
     <string name="home_collect_unreadable_project">تعذّر قراءة هذا المشروع.</string>
     <string name="home_collect_already_kept">جميع الوسائط محفوظة في المشروع بالفعل.</string>
-    <string name="home_collect_could_not_read">تعذّرت قراءة %1$s؛ ربما حُذفت.</string>
+    <plurals name="home_collect_could_not_read">
+        <item quantity="zero">لا توجد ملفات مفقودة أو غير قابلة للقراءة.</item>
+        <item quantity="one">ملف مفقود أو غير قابل للقراءة.</item>
+        <item quantity="two">ملفان مفقودان أو غير قابلين للقراءة.</item>
+        <item quantity="few">‏%1$s ملفات مفقودة أو غير قابلة للقراءة.</item>
+        <item quantity="many">‏%1$s ملفًا مفقودًا أو غير قابل للقراءة.</item>
+        <item quantity="other">‏%1$s ملف مفقود أو غير قابل للقراءة.</item>
+    </plurals>
     <string name="home_collect_storage_full">التخزين ممتلئ، لذلك لم تُنسخ بعض الملفات.</string>
     <string name="home_restore_edits_failed">تعذّرت استعادة تعديلاتك. حرّر بعض مساحة التخزين؛ سيُطلب منك ذلك مجددًا في المرة القادمة.</string>
     <string name="home_restore_version_failed">تعذّرت استعادة هذا الإصدار. حرّر بعض مساحة التخزين.</string>
     <string name="home_version_restored">تمت استعادة الإصدار</string>
     <string name="home_close_save_failed">تعذّر حفظ تغييراتك الأخيرة. حرّر بعض مساحة التخزين ثم أغلق مجددًا، أو أغلق مجددًا للمغادرة دون حفظها.</string>
     <string name="home_search_hint">ابحث في المشاريع والأصول</string>
+    <string name="home_search_templates_hint">ابحث عن القوالب والإعدادات المسبقة</string>
     <string name="home_search">بحث</string>
     <string name="home_close_search">إغلاق البحث</string>
     <string name="home_your_projects">مشاريعك</string>
@@ -296,6 +305,7 @@
     <string name="template_delete_preset">حذف هذا الإعداد المسبق؟</string>
     <string name="template_open_as_project">فتح كمشروع</string>
     <string name="template_rename_failed">تعذّرت إعادة التسمية</string>
+    <string name="template_add_failed">تعذر إضافة القالب. حرر بعض مساحة التخزين.</string>
     <string name="safety_version_today">اليوم في %1$s</string>
     <string name="safety_version_yesterday">أمس في %1$s</string>
     <string name="safety_version_on_date">في %1$s الساعة %2$s</string>

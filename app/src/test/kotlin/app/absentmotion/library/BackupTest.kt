@@ -81,6 +81,22 @@ class BackupTest {
         assertEquals("same pixels", pictureOf(store, same))
     }
 
+    @Test fun aRestoredCopyShowsTheAssetFromTheBackupNotTheChangedOne() {
+        val root = tmp.newFolder()
+        val store = ProjectStore(root)
+        fun scene(title: String, vararg layers: XmlNode) = Scene(XmlNode("scene", linkedMapOf("width" to "10", "height" to "10", "title" to title), layers.toList()))
+        val asset = store.createElement(Scene(scene("Old asset", XmlNode("shape", linkedMapOf("id" to "1"))).node.with("type", "element")))
+        val user = store.create(scene("Old project", XmlNode("embedScene", linkedMapOf("id" to "5", "link" to store.linkOf(asset)), listOf(scene("").node))))
+        val bytes = backup(root)
+        store.save(asset, store.load(asset)!!.withTitle("New asset"))
+        store.save(user, store.load(user)!!.withTitle("New project"))
+        assertEquals(Backup.Restored(added = 2, renamed = 2, skipped = 0), Backup.restore(store, root, ByteArrayInputStream(bytes)))
+        val ids = store.list().associate { it.title to it.id }
+        fun shown(project: String) = store.load(ids.getValue(project))!!.layer(5)!!.node.child("scene")!!["title"]
+        assertEquals("Old asset", shown("Old project"))
+        assertEquals("New asset", shown("New project"))
+    }
+
     @Test fun restoringOnTheSamePhoneKeepsOwnLinksAndFindsEveryProjectAlreadyHere() {
         val root = tmp.newFolder("files")
         val external = tmp.newFolder("external")

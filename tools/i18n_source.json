@@ -593,6 +593,7 @@
  "export_support_no_encoder": "This phone has no %1$s encoder.",
  "export_support_rated_below": "This phone's %1$s encoder is rated below %2$s fps at %3$s, so the export will be slow.",
  "export_support_software_only": "This phone encodes %1$s in software only, so the export will be slow.",
+ "export_template_failed": "Could not keep a copy as a Template. Free some storage space.",
  "export_thermal_critical": "Your phone is very hot. The export pauses between frames until it cools down.",
  "export_thermal_hot": "Your phone is hot. The export slows down to let it cool.",
  "export_thermal_warm": "Your phone is getting warm. The export goes a little slower to keep it cool.",
@@ -2454,7 +2455,10 @@
   "one": "Copied %1$s file into the project.",
   "other": "Copied %1$s files into the project."
  },
- "home_collect_could_not_read": "%1$s could not be read; they may have been deleted.",
+ "home_collect_could_not_read": {
+  "one": "%1$s file is missing or could not be read.",
+  "other": "%1$s files are missing or could not be read."
+ },
  "home_collect_media": "Collect media into project",
  "home_collect_storage_full": "Storage is full, so some files were not copied.",
  "home_collect_unreadable_project": "Could not read this project.",
@@ -2474,6 +2478,7 @@
  "home_save_project_failed": "Could not save the project. Free some storage space.",
  "home_search": "Search",
  "home_search_hint": "Search projects and assets",
+ "home_search_templates_hint": "Search templates and presets",
  "home_sort_by_date": "Sort by Date",
  "home_sort_by_name": "Sort by Name",
  "home_sort_date": "Date",
@@ -2950,6 +2955,7 @@
  "swap_media_file": "Swap media file",
  "t_new": "NEW",
  "template": "Template",
+ "template_add_failed": "Could not add the template. Free some storage space.",
  "template_delete_all_presets": "Delete all presets?",
  "template_delete_preset": "Delete this preset?",
  "template_delete_template": "Delete this template?",

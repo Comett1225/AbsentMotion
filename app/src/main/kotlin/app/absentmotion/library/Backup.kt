@@ -3,6 +3,7 @@ package app.absentmotion.library
 import app.absentmotion.R
 import app.absentmotion.i18n.txt
 import app.absentmotion.model.Scene
+import app.absentmotion.model.XmlNode
 import app.absentmotion.model.mapMediaUris
 import java.io.File
 import java.io.FilterInputStream
@@ -78,7 +79,8 @@ object Backup {
         fun remap(text: String): String {
             val moved = moved(text)
             val node = runCatching { Scene.parse(moved).node }.getOrNull() ?: return moved
-            val defused = node.mapMediaUris(access::defused)
+            val links = renamed.entries.associate { (old, new) -> store.linkOf(old) to store.linkOf(new) }
+            val defused = node.mapMediaUris(access::defused).mapLinks { links[it] ?: it }
             return if (defused == node) moved else Scene(defused).toXml()
         }
         fun freshId(id: String): String =
@@ -148,4 +150,7 @@ object Backup {
     }
 
     private fun rootUri(root: File) = root.toURI().toString().trimEnd('/') + "/"
+
+    private fun XmlNode.mapLinks(change: (String) -> String): XmlNode =
+        (this["link"]?.let { with("link", change(it)) } ?: this).let { it.copy(children = it.children.map { child -> child.mapLinks(change) }) }
 }

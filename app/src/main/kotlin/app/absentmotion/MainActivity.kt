@@ -184,21 +184,11 @@ class MainActivity : ComponentActivity() {
                         HomeScreen(
                             store, settings, onOpen = ::open, onExport = ::exportFromList,
                             imported = imported, onImportShown = { imported = emptyList() }, onImportFile = { importUris(listOf(it)) },
-                            onTemplate = { editingTemplate = it },
+                            onTemplate = { editingTemplate = it }, onTemplateProject = ::projectFromTemplate,
                             onHistory = { historyFor = Triple(it.id, it.title, it.damaged) }, onCollect = ::collectMedia, changes = projectsChanged,
                         )
                         editingTemplate?.let { id ->
-                            TemplateEditor(id, engine, settings, onClose = { editingTemplate = null }) { scene ->
-                                lifecycleScope.launch {
-                                    val project = try { withContext(Dispatchers.IO) { templates.createProject(scene, store) } }
-                                    catch (e: java.io.IOException) {
-                                        Toast.makeText(this@MainActivity, getString(R.string.home_create_project_failed), Toast.LENGTH_LONG).show()
-                                        return@launch
-                                    }
-                                    editingTemplate = null
-                                    open(project)
-                                }
-                            }
+                            TemplateEditor(id, engine, settings, onClose = { editingTemplate = null }, onContinue = ::projectFromTemplate)
                         }
                         exportingFromList?.let { ExportScreen(it, 0, engine, fromProjectList = true, outdated) { exportingFromList = null } }
                     }
@@ -287,14 +277,34 @@ class MainActivity : ComponentActivity() {
         return engine.stillPng(scene.toXml(), timeMs, (256 * scene.width / longSide).coerceAtLeast(1), (256 * scene.height / longSide).coerceAtLeast(1), store.thumbnailFile(id))
     }
 
+    private fun projectFromTemplate(scene: Scene) {
+        if (opening) return
+        opening = true
+        openJob = lifecycleScope.launch {
+            val project = try { withContext(Dispatchers.IO) { templates.createProject(scene, store) } }
+            catch (e: java.io.IOException) {
+                Toast.makeText(this@MainActivity, getString(R.string.home_create_project_failed), Toast.LENGTH_LONG).show()
+                return@launch
+            } finally { opening = false }
+            editingTemplate = null
+            open(project)
+        }
+    }
+
     private fun endEmbed(state: EditorState) {
         EmbedRequest.templateId = null
         engine.setScene(state.scene)
     }
 
     private fun embedTemplate(state: EditorState, template: Scene) {
-        lifecycleScope.launch {
-            val local = withContext(Dispatchers.IO) { templates.localize(template, store.mediaDir(state.projectId)) }
+        if (opening) return
+        opening = true
+        openJob = lifecycleScope.launch {
+            val local = try { withContext(Dispatchers.IO) { templates.localize(template, store.mediaDir(state.projectId)) } }
+            catch (e: java.io.IOException) {
+                Toast.makeText(this@MainActivity, getString(R.string.template_add_failed), Toast.LENGTH_LONG).show()
+                return@launch
+            } finally { opening = false }
             val start = state.scene.frameStart(state.frame)
             val id = Layer.newId()
             val copied = local.withCopiedLayerIds().node
@@ -377,8 +387,8 @@ class MainActivity : ComponentActivity() {
                 result == null -> getString(R.string.home_collect_unreadable_project)
                 result.copied == 0 && result.unreadable == 0 && !result.noSpace -> getString(R.string.home_collect_already_kept)
                 else -> listOfNotNull(
-                    resources.getQuantityString(R.plurals.home_collect_copied, result.copied, result.copied.toString()),
-                    result.unreadable.takeIf { it > 0 }?.let { getString(R.string.home_collect_could_not_read, it.toString()) },
+                    result.copied.takeIf { it > 0 }?.let { resources.getQuantityString(R.plurals.home_collect_copied, it, it.toString()) },
+                    result.unreadable.takeIf { it > 0 }?.let { resources.getQuantityString(R.plurals.home_collect_could_not_read, it, it.toString()) },
                     getString(R.string.home_collect_storage_full).takeIf { result.noSpace },
                 ).joinToString(" ")
             }
@@ -418,7 +428,8 @@ class MainActivity : ComponentActivity() {
 
     private fun restoreVersion(id: String, version: ProjectVersions.Version) {
         val state = editor?.takeIf { it.projectId == id }
-        state?.let { it.playing = false; it.endGesture(); it.historyOpen = false; opening = true }
+        state?.let { it.playing = false; it.endGesture(); it.historyOpen = false }
+        opening = true
         historyFor = null
         openJob = lifecycleScope.launch {
             val restored = try {

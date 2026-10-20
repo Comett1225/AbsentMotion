@@ -82,10 +82,8 @@ class TemplateStore(private val root: File, private val open: (String) -> InputS
         val moved = HashMap<String, String>()
         for (uri in scene.node.mediaUris()) {
             val folder = modelFolder(uri)
-            val copied = runCatching {
-                if (folder != null) copyModel(folder, File(URI(uri)).canonicalFile.name, dir)
-                else open(uri)?.use { input -> publish(dir, safeName(scene.mediaName(uri))) { input.copyTo(it) } }
-            }.getOrNull()
+            val copied = if (folder != null) copyModel(folder, File(URI(uri)).canonicalFile.name, dir)
+                else runCatching { open(uri) }.getOrNull()?.use { input -> publish(dir, safeName(scene.mediaName(uri))) { input.copyTo(it) } }
             if (copied != null) moved[uri] = copied.toURI().toString()
         }
         return Scene(scene.node.mapMediaUris { moved[it] ?: it })

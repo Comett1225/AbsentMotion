@@ -86,6 +86,7 @@
     <string name="gif">GIF</string>
     <string name="export">Xuất</string>
     <string name="also_keep_a_copy_as_a">Đồng thời lưu một bản sao làm Mẫu</string>
+    <string name="export_template_failed">Không thể lưu bản sao thành mẫu. Hãy giải phóng dung lượng lưu trữ.</string>
     <string name="also_keeps_the_project_with_its">Đồng thời giữ dự án cùng phương tiện của nó trong Mẫu trên điện thoại này. Mở tại đó để thay phương tiện và tiếp tục với dự án mới.</string>
     <string name="template">Mẫu</string>
     <string name="one_absproj_package_with_the_project">Một gói .absproj chứa dự án và phương tiện gốc mà nó dùng, được lưu vào Documents / AbsentMotion. Giữ làm bản sao lưu hoặc chuyển dự án sang điện thoại khác.</string>
@@ -202,13 +203,16 @@
     <string name="home_save_project_failed">Không thể lưu dự án. Hãy giải phóng dung lượng lưu trữ.</string>
     <string name="home_collect_unreadable_project">Không thể đọc dự án này.</string>
     <string name="home_collect_already_kept">Mọi phương tiện đã được giữ trong dự án.</string>
-    <string name="home_collect_could_not_read">Không thể đọc %1$s; có thể chúng đã bị xóa.</string>
+    <plurals name="home_collect_could_not_read">
+        <item quantity="other">%1$s tệp bị thiếu hoặc không thể đọc được.</item>
+    </plurals>
     <string name="home_collect_storage_full">Bộ nhớ đã đầy nên một số tệp không được sao chép.</string>
     <string name="home_restore_edits_failed">Không thể khôi phục chỉnh sửa của bạn. Hãy giải phóng dung lượng lưu trữ; bạn sẽ được hỏi lại vào lần sau.</string>
     <string name="home_restore_version_failed">Không thể khôi phục phiên bản này. Hãy giải phóng dung lượng lưu trữ.</string>
     <string name="home_version_restored">Đã khôi phục phiên bản</string>
     <string name="home_close_save_failed">Không thể lưu thay đổi cuối cùng. Hãy giải phóng dung lượng lưu trữ rồi đóng lại, hoặc đóng lại để rời đi mà không lưu.</string>
     <string name="home_search_hint">Tìm dự án và tài nguyên</string>
+    <string name="home_search_templates_hint">Tìm kiếm mẫu và preset</string>
     <string name="home_search">Tìm kiếm</string>
     <string name="home_close_search">Đóng tìm kiếm</string>
     <string name="home_your_projects">Dự án của bạn</string>
@@ -286,6 +290,7 @@
     <string name="template_delete_preset">Xóa preset này?</string>
     <string name="template_open_as_project">Mở dưới dạng dự án</string>
     <string name="template_rename_failed">Không thể đổi tên</string>
+    <string name="template_add_failed">Không thể thêm mẫu. Hãy giải phóng dung lượng lưu trữ.</string>
     <string name="safety_version_today">Hôm nay lúc %1$s</string>
     <string name="safety_version_yesterday">Hôm qua lúc %1$s</string>
     <string name="safety_version_on_date">Ngày %1$s lúc %2$s</string>

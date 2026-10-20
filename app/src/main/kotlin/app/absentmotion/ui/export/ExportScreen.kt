@@ -281,6 +281,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
             ExportKind.Gif -> gifSample?.let { gifTimeMs(frameCount(scene, current.fps), it, times.estimateMs(current, scene, report?.probe, heat.level)) }
             ExportKind.Sequence -> times.estimateMs(current, scene, report?.probe, heat.level)
             ExportKind.Package -> estimate.coerceAtLeast(0) / 100_000
+            ExportKind.Audio -> scene.totalTime / if (current.audioFormat.lossless) 20L else 14L
             else -> 0L
         }
     }
@@ -370,6 +371,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
                     throw e
                 } catch (e: Exception) {
                     Log.w("AMExport", "could not store the template", e)
+                    app.absentmotion.platform.Toast.makeText(context, context.getString(R.string.export_template_failed), app.absentmotion.platform.Toast.LENGTH_LONG).show()
                 }
                 phase = Phase.Done(chosen, result)
             } catch (e: CancellationException) {
@@ -493,7 +495,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
             onDismissRequest = { failure = null },
             title = { Text(stringResource(f.title), color = Navy) },
             text = {
-                Column {
+                Column(Modifier.verticalScroll(rememberScrollState())) {
                     Text(f.text.text(), color = Navy)
                     if (f.hint) OutdatedHint(outdated, Modifier.padding(top = 8.dp))
                 }
