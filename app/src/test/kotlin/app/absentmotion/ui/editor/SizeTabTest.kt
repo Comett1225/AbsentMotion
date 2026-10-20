@@ -21,5 +21,11 @@ class SizeTabTest {
         assertEquals(100f, diamond.x, 1e-3f)
         assertEquals(100f, diamond.y, 1e-3f)
         assertFalse(diamond.upright)
+        val c = Math.cos(Math.PI / 4).toFloat()
+        val s = Math.sin(Math.PI / 4).toFloat()
+        val turned = sidesOf(floatArrayOf(0f, 0f, 200 * c, 200 * s, 200 * c - 100 * s, 200 * s + 100 * c, -100 * s, 100 * c))
+        assertEquals(200f, turned.x, 1e-3f)
+        assertEquals(100f, turned.y, 1e-3f)
+        assertFalse(turned.upright)
     }
 }

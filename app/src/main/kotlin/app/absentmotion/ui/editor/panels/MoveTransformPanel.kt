@@ -287,7 +287,7 @@ internal class Sides(val x: Float, val y: Float, val upright: Boolean)
 internal fun sidesOf(q: FloatArray): Sides {
     val dx = q[2] - q[0]
     val dy = q[3] - q[1]
-    return Sides(hypot(dx, dy), hypot(q[6] - q[0], q[7] - q[1]), abs(dy) > abs(dx))
+    return Sides(hypot(dx, dy), hypot(q[6] - q[0], q[7] - q[1]), abs(dy) > abs(dx) * 1.001f)
 }
 
 private class BoxAt(val sides: Sides, val sx: Float, val sy: Float)
