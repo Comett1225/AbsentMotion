@@ -213,7 +213,8 @@ struct RepeatCopy {
 };
 
 struct RepeatSpace {
-    SkPoint anchor = {0, 0};
+    SkPoint anchor = {0, 0}, pivot = {0, 0};
+    SkMatrix layer = SkMatrix::I();
     SkPath below;
     float width = 0, height = 0, radius = 0;
 };

@@ -549,7 +549,9 @@ std::vector<LayerCopy> CopiesOf(const std::vector<Layer>& siblings, const Layer&
     const float t = l.localTime(timeMs);
     const SkMatrix m = SiblingMatrix(siblings, l, timeMs);
     RepeatSpace space;
-    space.anchor = m.mapPoint({l.pivot.get(0, t, 0), l.pivot.get(1, t, 0)});
+    space.pivot = {l.pivot.get(0, t, 0), l.pivot.get(1, t, 0)};
+    space.layer = m;
+    space.anchor = m.mapPoint(space.pivot);
     space.width = (float)width;
     space.height = (float)height;
     const SkRect box = ShapePath(l, t).makeTransform(m).getBounds();

@@ -309,6 +309,21 @@ def main():
     ok = np.array_equal(still[0], still[1]) and not np.array_equal(drift[0], drift[1])
     print(('ok   ' if ok else 'FAIL ') + 'random displacement holds still until Evolution changes', flush=True)
     failed += not ok
+    row = '<effect id="absent.linearrepeat"><property name="count" type="float" value="3"/><property name="position" type="vec2" value="120,0"/></effect>'
+    scatter = fx('randomdisplace', magnitude=40, evolution=0.3, scatter=2)
+    drift = lambda extra: engine.still('copydrift' + str(abs(hash(extra)) % 997), engine.scene(engine.rect(1, 100, 100, 10, 10, 0xffff0000, extra=extra)), work)
+    def copies(image):
+        found = []
+        for lo, hi in [(0, 70), (70, 130), (130, 200)]:
+            ys, xs = np.nonzero(image[:, lo:hi, 0] > 128)
+            found.append((xs.mean() + lo, ys.mean()) if len(xs) else (None, None))
+        return found
+    together, apart = copies(drift(scatter + row)), copies(drift(row + scatter))
+    flat = lambda found: None not in sum(map(list, found), []) and max(y for _, y in found) - min(y for _, y in found)
+    ok = flat(together) is not False and flat(apart) is not False and flat(together) < 1 and flat(apart) > 3
+    print(('ok   ' if ok else 'FAIL ') + 'random displacement before a repeat moves every copy together and after it moves each copy on its own: '
+          + str([tuple(round(float(v), 1) for v in c) for c in together]) + ' / ' + str([tuple(round(float(v), 1) for v in c) for c in apart]), flush=True)
+    failed += not ok
     turned = lambda magnitude, scale, rotation: engine.scene(
         f'<shape id="1" label="t" startTime="0" endTime="1000" fillType="color" s=".rect"><transform><location value="100,100,0"/><scale value="{scale}"/>'
         f'<rotation value="{rotation}"/></transform><fillColor value="#ffff0000"/><property name="size" type="vec2" value="6,6"/>'
