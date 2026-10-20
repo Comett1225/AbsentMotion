@@ -71,4 +71,52 @@ class AlightParityTest {
         assertTrue(result.dropped.isEmpty())
         assertEquals(result.scene.node, migration.migrate(result.scene).scene.node)
     }
+
+    private fun alight(id: String, vararg props: Triple<String, String, String>) =
+        "<effect id=\"com.alightcreative.effects.$id\" locallyApplied=\"true\">" +
+            props.joinToString("") { (n, t, v) -> "<property name=\"$n\" type=\"$t\" value=\"$v\" />" } + "</effect>"
+
+    private fun f(n: String, v: String) = Triple(n, "float", v)
+
+    @Test fun alightRepeatOpacityAndTextEffectsImportWithTheirSettings() {
+        val range = arrayOf(f("angle", "15"), f("scale", "1.5"), f("alpha", "0.5"), Triple("fillColor", "color", "#ff2d1ef6"), f("blend", "0.25"),
+            Triple("colorAltCopies", "bool", "false"), f("start", "0.1"), f("end", "0.9"), f("phase", "0.5"), f("easeIn", "0"), f("easeOut", "0"),
+            f("overlap", "0"), Triple("shape", "int", "0"), Triple("invert", "bool", "false"), Triple("randomOrder", "bool", "true"), f("seed", "2"))
+        val effects = listOf(
+            alight("checkerdissolve2", f("amount", "0.75"), f("size", "10"), Triple("stretch", "vec2", "10.000000,1.000000"), f("seed", "0"), f("fade", "0")),
+            alight("dissolve", f("amount", "0.37"), f("seed", "0")),
+            alight("fade", f("inTime", "3.7"), f("outTime", "0.5")),
+            alight("feather", f("strength", "0.15"), f("iter", "3")),
+            alight("channelmaphsv", Triple("hue", "int", "0"), Triple("sat", "int", "1"), Triple("val", "int", "2"), Triple("alpha", "int", "3")),
+            alight("repeat.echokf", f("seconds", "-15.6"), f("count", "1"), f("alpha", "1"), Triple("mode", "int", "1")),
+            alight("counter", f("offset", "2.7"), f("scale", "1")),
+            alight("repeat", f("count", "3699.63"), f("time", "0"), Triple("offset", "vec2", "12.000000,0.000000"), f("angle", "0"), f("scale", "1"), f("alpha", "1")),
+            alight("repeat.line", f("count", "55.5"), Triple("position", "vec2", "12.000000,0.000000"), *range),
+            alight("textrand", f("amount", "0.027"), f("evo", "0"), f("seed", "0"), f("start", "0"), f("end", "1"), Triple("charset", "int", "0"),
+                Triple("preserveSpace", "bool", "true")),
+        )
+        val xml = "<scene title=\"t\" width=\"1080\" height=\"1080\" fps=\"30\" totalTime=\"1000\">" +
+            "<shape id=\"1\" startTime=\"0\" endTime=\"1000\" s=\".rect\">${effects.joinToString("")}</shape></scene>"
+        val result = migration.migrate(Scene.parse(xml))
+        val all = result.scene.node.children.single().children.filter { it.name == "effect" }
+        assertEquals(listOf("blockdissolve", "dissolve", "fade", "feather", "channelremaphsv", "echo", "countupdown", "repeat", "linearrepeat", "textrandomizer")
+            .map { "absent.$it" }, all.map { it["id"] })
+        fun values(i: Int) = all[i].children.associate { it["name"]!! to it["value"]!! }
+        assertEquals("10.000000,1.000000", values(0)["stretch"])
+        assertEquals(0.37f, values(1).getValue("progress").toFloat(), 1e-4f)
+        assertEquals(3.7f, values(2).getValue("fadeIn").toFloat(), 1e-4f)
+        assertEquals(20f, values(3).getValue("blur").toFloat(), 0.01f)
+        assertEquals(listOf("0", "1", "2", "3"), listOf("h", "s", "v", "a").map { values(4).getValue(it).toFloat().toInt().toString() })
+        assertEquals(-15.6f, values(5).getValue("seconds").toFloat(), 1e-4f)
+        assertEquals(2.7f, values(6).getValue("add").toFloat(), 1e-4f)
+        assertEquals("12.000000,0.000000", values(7)["offset"])
+        val line = values(8)
+        assertEquals(55.5f, line.getValue("count").toFloat(), 1e-4f)
+        assertEquals(15f, line.getValue("rangeRotation").toFloat(), 1e-4f)
+        assertEquals(0.25f, line.getValue("fillAmount").toFloat(), 1e-4f)
+        assertEquals("true", line["randomOrder"])
+        assertEquals(1f, values(9).getValue("charset").toFloat(), 1e-4f)
+        assertEquals("true", values(9)["keepSpaces"])
+        assertTrue(result.dropped.toString(), result.dropped.isEmpty())
+    }
 }
