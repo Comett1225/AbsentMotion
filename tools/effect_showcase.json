@@ -129,6 +129,11 @@
     "cmykhalftone": {"photo": "colour", "params": {"amount": 45, "black": 0.6}},
     "mosaic": {"photo": "colour", "params": {"count": 9}},
     "longshadow": {"photo": "colour", "layout": "move", "params": {"reach": 200, "alpha": 0.8, "fade": 0.3}},
-    "radialshadow": {"photo": "colour", "layout": "move", "params": {"light": [-0.7, -0.7], "reach": 0.8, "alpha": 0.8}}
+    "radialshadow": {"photo": "colour", "layout": "move", "params": {"light": [-0.7, -0.7], "reach": 0.8, "alpha": 0.8}},
+    "linearstreaks": {"photo": "colour", "layout": "move", "params": {"angle": 30, "reach": 120}},
+    "spinblur": {"photo": "colour", "params": {"sweep": 20}},
+    "lensblur": {"photo": "colour", "params": {"sweep": 30, "radius": 0.3}},
+    "innerblur": {"photo": "colour", "layout": "move", "params": {"blur": 18}},
+    "polar": {"photo": "landscape"}
   }
 }
