@@ -557,9 +557,7 @@
     "to": "seed"
    },
    "basis": {
-    "to": "mode",
-    "min": 0,
-    "max": 1
+    "neutral": 0
    }
   }
  },

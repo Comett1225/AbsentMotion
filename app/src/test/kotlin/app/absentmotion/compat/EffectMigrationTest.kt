@@ -337,4 +337,13 @@ class EffectMigrationTest {
         assertNull(sections[txt(R.string.library_report_dropped)])
         assertEquals(13, effects(store.load(report.id)!!.node).size)
     }
+
+    @Test fun anAlightFlickerOnlyCarriesOverItsTimeBasis() {
+        fun flicker(basis: Int) = migration.migrate(Scene.parse("""<scene width="100" height="100" fps="30" totalTime="1000"><shape id="1" startTime="0" endTime="1000" s=".rect">""" +
+            """<effect id="com.alightcreative.effects.flicker2" locallyApplied="true"><property name="freq" type="float" value="3.73" /><property name="basis" type="int" value="$basis" /></effect></shape></scene>"""))
+        val time = flicker(0)
+        assertTrue(time.dropped.isEmpty())
+        assertEquals(listOf("speed"), time.scene.node.children.single().children.single().children.map { it["name"] })
+        assertEquals(setOf("Flicker: basis"), flicker(1).dropped)
+    }
 }
