@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
@@ -58,7 +59,7 @@ internal fun EffectSettings(state: EditorState, layer: Layer, instance: XmlNode,
             }
             "color" -> EffectColor(state, param, raw, enabled, active == param, { select(param) }, { set(it) })
             "choice" -> EffectChoice(param, raw, enabled) { set(it) }
-            "text" -> EffectText(param, raw, enabled) { set(it) }
+            "text" -> EffectText(param, raw, enabled, state::endGesture) { set(it, true) }
             else -> EffectNumbers(state, param, raw, enabled, active == param, { select(param) }, { text, gesture -> set(text, gesture) })
         }
     }
@@ -154,10 +155,13 @@ private fun EffectChoice(param: EffectParam, raw: String, enabled: Boolean, set:
 }
 
 @Composable
-private fun EffectText(param: EffectParam, raw: String, enabled: Boolean, set: (String) -> Unit) {
+private fun EffectText(param: EffectParam, raw: String, enabled: Boolean, end: () -> Unit, set: (String) -> Unit) {
+    var focused by remember { mutableStateOf(false) }
+    DisposableEffect(Unit) { onDispose { if (focused) end() } }
     Row(Modifier.fillMaxWidth().height(38.dp).padding(horizontal = 8.dp).alpha(if (enabled) 1f else 0.35f), verticalAlignment = Alignment.CenterVertically) {
         Text(param.label, Modifier.padding(end = 12.dp), color = Am.OnDark, fontSize = 14.sp)
-        BasicTextField(raw, { if (enabled) set(it.replace('\n', ' ').take(200)) }, Modifier.weight(1f).clip(PanelShape).background(Color(0x33000000))
+        BasicTextField(raw, { if (enabled) set(it.replace('\n', ' ').take(200)) }, Modifier.weight(1f)
+            .onFocusChanged { if (focused && !it.isFocused) end(); focused = it.isFocused }.clip(PanelShape).background(Color(0x33000000))
             .padding(horizontal = 10.dp, vertical = 6.dp), enabled = enabled, singleLine = true,
             textStyle = TextStyle(color = Am.OnDark, fontSize = 14.sp), cursorBrush = SolidColor(Am.Accent))
     }
