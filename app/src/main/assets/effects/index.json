@@ -152,5 +152,12 @@
  "gridrepeat",
  "repeatalongpath",
  "scatterfield",
- "datamosh"
+ "datamosh",
+ "textprogress",
+ "texttransform",
+ "textrandomizer",
+ "countupdown",
+ "timecode",
+ "drawingprogress",
+ "stroketaper"
 ]

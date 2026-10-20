@@ -10,7 +10,8 @@
   "new": "Mới",
   "noise": "Nhiễu",
   "repeat": "Lặp",
-  "stylize": "Cách điệu"
+  "stylize": "Cách điệu",
+  "text": "Văn bản"
  },
  "effects": {
   "autoshake": {
@@ -556,6 +557,37 @@
     }
    }
   },
+  "countupdown": {
+   "description": "Thay đổi mọi con số trong lớp văn bản: nhân rồi cộng thêm, nên khi tạo keyframe cho Nhân từ 0% đến 100% thì số sẽ đếm tăng đến con số bạn đã nhập. Các từ xung quanh số vẫn giữ nguyên.",
+   "name": "Đếm tăng/giảm",
+   "params": {
+    "add": {
+     "label": "Cộng thêm"
+    },
+    "decimals": {
+     "label": "Số chữ số thập phân",
+     "options": [
+      "Như đã nhập",
+      "0",
+      "1",
+      "2",
+      "3"
+     ]
+    },
+    "multiply": {
+     "label": "Nhân"
+    },
+    "separator": {
+     "label": "Dấu phân cách nghìn",
+     "options": [
+      "1000.5",
+      "1,000.5",
+      "1.000,5",
+      "1 000.5"
+     ]
+    }
+   }
+  },
   "cross": {
    "description": "Đặt lớp lên ba thanh cắt nhau ở giữa.",
    "name": "Chữ thập ba trục",
@@ -813,6 +845,18 @@
     },
     "slack": {
      "label": "Độ giãn"
+    }
+   }
+  },
+  "drawingprogress": {
+   "description": "Vẽ nét vẽ tay theo từng nét, hoặc đường viền của hình dạng, từ Điểm đầu đến Điểm cuối. Tạo keyframe cho Điểm cuối từ 0% đến 100% để xem nét vẽ hiện dần. Hoạt động tốt nhất với hình dạng đã tắt Tô và có Nét.",
+   "name": "Tiến trình vẽ",
+   "params": {
+    "end": {
+     "label": "Kết thúc"
+    },
+    "start": {
+     "label": "Bắt đầu"
     }
    }
   },
@@ -3255,6 +3299,21 @@
     }
    }
   },
+  "stroketaper": {
+   "description": "Làm mảnh dần nét bút và cọ của hình vẽ tay về một điểm: từ không có gì đến Điểm đầu, và từ Điểm cuối về không. Siết giúp phần thuôn nhọn hơn.",
+   "name": "Thuôn nét",
+   "params": {
+    "end": {
+     "label": "Kết thúc"
+    },
+    "squeeze": {
+     "label": "Siết"
+    },
+    "start": {
+     "label": "Bắt đầu"
+    }
+   }
+  },
   "swing": {
    "description": "Xoay lớp qua lại giữa hai góc.",
    "name": "Đung đưa",
@@ -3289,6 +3348,155 @@
     },
     "strength": {
      "label": "Cường độ"
+    }
+   }
+  },
+  "textprogress": {
+   "description": "Hiện lớp văn bản từng phần một, theo ký tự, từ hoặc dòng, mỗi phần bật ra, mờ dần, trượt, phóng to, thu nhỏ hoặc nét dần vào vị trí.",
+   "name": "Tiến trình văn bản",
+   "params": {
+    "appearance": {
+     "label": "Kiểu xuất hiện",
+     "options": [
+      "Bật ra",
+      "Mờ dần",
+      "Trượt lên",
+      "Trượt xuống",
+      "Trượt sang trái",
+      "Trượt sang phải",
+      "Phóng to",
+      "Thu nhỏ",
+      "Làm nhòe"
+     ]
+    },
+    "direction": {
+     "label": "Hướng",
+     "options": [
+      "Từ đầu",
+      "Từ cuối",
+      "Từ giữa",
+      "Ngẫu nhiên"
+     ]
+    },
+    "distance": {
+     "label": "Khoảng cách"
+    },
+    "progress": {
+     "label": "Tiến trình"
+    },
+    "seed": {
+     "label": "Hạt giống"
+    },
+    "softness": {
+     "label": "Độ mềm"
+    },
+    "unit": {
+     "label": "Dựa trên",
+     "options": [
+      "Ký tự",
+      "Từ",
+      "Dòng"
+     ]
+    }
+   }
+  },
+  "textrandomizer": {
+   "description": "Hoán đổi các ký tự của lớp văn bản thành chữ cái, số hoặc ký hiệu ngẫu nhiên liên tục thay đổi. Tăng Tiến trình để văn bản thật hiện dần vào, theo từng ký tự.",
+   "name": "Ngẫu nhiên hóa văn bản",
+   "params": {
+    "characters": {
+     "label": "Tùy chỉnh"
+    },
+    "charset": {
+     "label": "Ký tự",
+     "options": [
+      "Chữ cái",
+      "Chữ in hoa",
+      "Chữ thường",
+      "Số",
+      "Chữ và số",
+      "Ký hiệu",
+      "Tùy chỉnh"
+     ]
+    },
+    "direction": {
+     "label": "Hướng",
+     "options": [
+      "Từ đầu",
+      "Từ cuối",
+      "Từ giữa",
+      "Ngẫu nhiên"
+     ]
+    },
+    "keepSpaces": {
+     "label": "Giữ khoảng trắng"
+    },
+    "progress": {
+     "label": "Tiến trình"
+    },
+    "seed": {
+     "label": "Hạt giống"
+    },
+    "speed": {
+     "label": "Tốc độ"
+    }
+   }
+  },
+  "texttransform": {
+   "description": "Di chuyển, thu phóng, xoay, làm mờ dần và nhuộm màu các chữ cái, từ hoặc dòng của lớp văn bản nằm trong một phạm vi. Dịch phạm vi bằng Độ lệch để hiệu ứng lan dần qua văn bản.",
+   "name": "Biến đổi văn bản",
+   "params": {
+    "end": {
+     "label": "Kết thúc"
+    },
+    "offset": {
+     "label": "Độ lệch"
+    },
+    "opacity": {
+     "label": "Độ mờ"
+    },
+    "position": {
+     "label": "Vị trí"
+    },
+    "randomOrder": {
+     "label": "Thứ tự ngẫu nhiên"
+    },
+    "rotation": {
+     "label": "Xoay"
+    },
+    "scale": {
+     "label": "Tỷ lệ"
+    },
+    "seed": {
+     "label": "Hạt giống"
+    },
+    "shape": {
+     "label": "Hình dạng",
+     "options": [
+      "Vuông",
+      "Tăng dần",
+      "Giảm dần",
+      "Tam giác",
+      "Tròn",
+      "Mượt"
+     ]
+    },
+    "smoothness": {
+     "label": "Độ mượt"
+    },
+    "start": {
+     "label": "Bắt đầu"
+    },
+    "tint": {
+     "label": "Nhuộm màu"
+    },
+    "unit": {
+     "label": "Dựa trên",
+     "options": [
+      "Ký tự",
+      "Từ",
+      "Dòng"
+     ]
     }
    }
   },
@@ -3391,6 +3599,36 @@
     },
     "stretch": {
      "label": "Kéo giãn"
+    }
+   }
+  },
+  "timecode": {
+   "description": "Thay văn bản của lớp bằng đồng hồ chạy theo thời gian của lớp hoặc dự án. Bắt đầu tại cùng Tốc độ âm tạo ra đồng hồ đếm ngược.",
+   "name": "Mã thời gian",
+   "params": {
+    "format": {
+     "label": "Định dạng",
+     "options": [
+      "HH:MM:SS:FF",
+      "HH:MM:SS",
+      "MM:SS",
+      "MM:SS.hh",
+      "SS.hh",
+      "Khung hình"
+     ]
+    },
+    "offset": {
+     "label": "Bắt đầu tại"
+    },
+    "source": {
+     "label": "Thời gian",
+     "options": [
+      "Lớp",
+      "Dự án"
+     ]
+    },
+    "speed": {
+     "label": "Tốc độ"
     }
    }
   },

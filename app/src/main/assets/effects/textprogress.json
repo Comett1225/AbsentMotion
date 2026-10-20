@@ -1,0 +1,161 @@
+{
+ "id": "textprogress",
+ "name": "Text Progress",
+ "category": "text",
+ "since": "3.0.0",
+ "native": true,
+ "description": "Shows a text layer piece by piece, by character, word or line, each piece popping, fading, sliding, growing, shrinking or sharpening into place.",
+ "params": [
+  {
+   "id": "progress",
+   "label": "Progress",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "unit",
+   "label": "Based On",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Character",
+    "Word",
+    "Line"
+   ]
+  },
+  {
+   "id": "direction",
+   "label": "Direction",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "From Start",
+    "From End",
+    "From Center",
+    "Random"
+   ]
+  },
+  {
+   "id": "appearance",
+   "label": "Appear As",
+   "type": "choice",
+   "default": 1,
+   "options": [
+    "Pop",
+    "Fade",
+    "Slide Up",
+    "Slide Down",
+    "Slide Left",
+    "Slide Right",
+    "Grow",
+    "Shrink",
+    "Blur"
+   ]
+  },
+  {
+   "id": "softness",
+   "label": "Softness",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 50,
+   "step": 0.1
+  },
+  {
+   "id": "distance",
+   "label": "Distance",
+   "type": "float",
+   "default": 40,
+   "min": 0,
+   "max": 1000,
+   "step": 0.1
+  },
+  {
+   "id": "seed",
+   "label": "Seed",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1000,
+   "step": 1
+  }
+ ],
+ "presets": [
+  {
+   "name": "Typewriter",
+   "params": {
+    "unit": 0,
+    "appearance": 0,
+    "progress": [
+     [
+      0,
+      0
+     ],
+     [
+      2,
+      1
+     ]
+    ]
+   }
+  },
+  {
+   "name": "Fade In by Word",
+   "params": {
+    "unit": 1,
+    "appearance": 1,
+    "softness": 1.5,
+    "progress": [
+     [
+      0,
+      0
+     ],
+     [
+      1.5,
+      1
+     ]
+    ]
+   }
+  },
+  {
+   "name": "Slide Up by Letter",
+   "params": {
+    "unit": 0,
+    "appearance": 2,
+    "distance": 60,
+    "softness": 4,
+    "progress": [
+     [
+      0,
+      0
+     ],
+     [
+      1.2,
+      1
+     ]
+    ]
+   }
+  },
+  {
+   "name": "Pop In",
+   "params": {
+    "unit": 0,
+    "appearance": 6,
+    "softness": 3,
+    "progress": [
+     [
+      0,
+      0
+     ],
+     [
+      1,
+      1
+     ]
+    ]
+   }
+  }
+ ]
+}

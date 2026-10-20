@@ -817,6 +817,7 @@
     <string name="aibrowser_no_size">Este vídeo não tem informações de tamanho.</string>
     <string name="effectbrowser_title">Biblioteca de efeitos</string>
     <string name="effectbrowser_favorite">Favorito</string>
+    <string name="effectbrowser_preset">PREDEFINIÇÃO</string>
     <string name="effectbrowser_recent">Recentes</string>
     <plurals name="aibrowser_too_long">
         <item quantity="one">Clipes com mais de %1$s minuto ainda não são compatíveis. É preciso aparar ou dividir o clipe primeiro.</item>

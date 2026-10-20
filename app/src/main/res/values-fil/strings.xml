@@ -817,6 +817,7 @@
     <string name="aibrowser_no_size">Walang impormasyon sa laki ang bidyong ito.</string>
     <string name="effectbrowser_title">Aklatan ng mga epekto</string>
     <string name="effectbrowser_favorite">Paborito</string>
+    <string name="effectbrowser_preset">PRESET</string>
     <string name="effectbrowser_recent">Kamakailan</string>
     <plurals name="aibrowser_too_long">
         <item quantity="one">Hindi pa sinusuportahan ang mga clip na mas mahaba sa %1$s minuto. I-trim o hatiin muna ang clip.</item>

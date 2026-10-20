@@ -10,7 +10,8 @@
   "new": "Bago",
   "noise": "Ingay",
   "repeat": "Ulitin",
-  "stylize": "I-istilo"
+  "stylize": "I-istilo",
+  "text": "Teksto"
  },
  "effects": {
   "autoshake": {
@@ -556,6 +557,37 @@
     }
    }
   },
+  "countupdown": {
+   "description": "Binabago ang bawat numero sa isang text layer: pinaparami at dinadagdagan ito, kaya kapag nag-keyframe ka ng Multiply mula 0% hanggang 100%, nagbibilang ito hanggang sa numerong tinype mo. Mananatili ang mga salita sa paligid ng mga numero.",
+   "name": "Pagbilang Pataas/Pababa",
+   "params": {
+    "add": {
+     "label": "Idagdag"
+    },
+    "decimals": {
+     "label": "Bilang ng Decimal",
+     "options": [
+      "Tulad ng Tinype",
+      "0",
+      "1",
+      "2",
+      "3"
+     ]
+    },
+    "multiply": {
+     "label": "Multiply"
+    },
+    "separator": {
+     "label": "Libu-libo",
+     "options": [
+      "1000.5",
+      "1,000.5",
+      "1.000,5",
+      "1 000.5"
+     ]
+    }
+   }
+  },
   "cross": {
    "description": "Inilalagay ang layer sa tatlong bar na nagsasalubong sa gitna.",
    "name": "Krus na Tatlong Axis",
@@ -813,6 +845,18 @@
     },
     "slack": {
      "label": "Slack"
+    }
+   }
+  },
+  "drawingprogress": {
+   "description": "Ginuguhit ang isang freehand drawing nang pa-stroke, o ang outline ng isang hugis, mula Start hanggang End. I-keyframe ang End mula 0% hanggang 100% para mapanood itong gumuhit. Pinakamainam sa mga hugis na naka-off ang Fill at may Stroke.",
+   "name": "Pag-usad ng Guhit",
+   "params": {
+    "end": {
+     "label": "Wakas"
+    },
+    "start": {
+     "label": "Simula"
     }
    }
   },
@@ -3255,6 +3299,21 @@
     }
    }
   },
+  "stroketaper": {
+   "description": "Pinapanipis ang pen at brush strokes ng freehand drawing hanggang maging matulis: mula wala hanggang Start, at mula End pababa sa wala. Pinapatalas ng Squeeze ang taper.",
+   "name": "Pagnipis ng Stroke",
+   "params": {
+    "end": {
+     "label": "Wakas"
+    },
+    "squeeze": {
+     "label": "Squeeze"
+    },
+    "start": {
+     "label": "Simula"
+    }
+   }
+  },
   "swing": {
    "description": "Pinaiikot ang layer pabalik-balik sa pagitan ng dalawang anggulo.",
    "name": "Indayog",
@@ -3289,6 +3348,155 @@
     },
     "strength": {
      "label": "Lakas"
+    }
+   }
+  },
+  "textprogress": {
+   "description": "Ipinapakita ang text layer nang paisa-isa, ayon sa character, salita o linya, kung saan bawat piraso ay lumalabas, nag-fade, dumudulas, lumalaki, lumiliit o lumilinaw sa posisyon.",
+   "name": "Pag-usad ng Teksto",
+   "params": {
+    "appearance": {
+     "label": "Lumalabas Bilang",
+     "options": [
+      "Pop",
+      "Fade",
+      "Dumulas Pataas",
+      "Dumulas Pababa",
+      "Dumulas Pakaliwa",
+      "Dumulas Pakanan",
+      "Lumaki",
+      "Lumiit",
+      "Blur"
+     ]
+    },
+    "direction": {
+     "label": "Direksyon",
+     "options": [
+      "Mula sa Simula",
+      "Mula sa Dulo",
+      "Mula sa Gitna",
+      "Random"
+     ]
+    },
+    "distance": {
+     "label": "Distansya"
+    },
+    "progress": {
+     "label": "Pag-usad"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "softness": {
+     "label": "Lambot"
+    },
+    "unit": {
+     "label": "Batay sa",
+     "options": [
+      "Character",
+      "Salita",
+      "Linya"
+     ]
+    }
+   }
+  },
+  "textrandomizer": {
+   "description": "Pinapalitan ang mga character ng text layer ng random na letra, numero o simbolo na patuloy na nagbabago. Itaas ang Progress para pumasok ang totoong teksto, isa-isa kada character.",
+   "name": "Randomizer ng Teksto",
+   "params": {
+    "characters": {
+     "label": "Custom"
+    },
+    "charset": {
+     "label": "Mga Character",
+     "options": [
+      "Mga Letra",
+      "Malalaking Titik",
+      "Maliit na titik",
+      "Mga numero",
+      "Mga titik at numero",
+      "Mga simbolo",
+      "Custom"
+     ]
+    },
+    "direction": {
+     "label": "Direksyon",
+     "options": [
+      "Mula sa Simula",
+      "Mula sa Dulo",
+      "Mula sa Gitna",
+      "Random"
+     ]
+    },
+    "keepSpaces": {
+     "label": "Panatilihin ang mga puwang"
+    },
+    "progress": {
+     "label": "Pag-usad"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "speed": {
+     "label": "Bilis"
+    }
+   }
+  },
+  "texttransform": {
+   "description": "Ginagalaw, pinalalaki, pinaiikot, pinapalabo at kinukulayan ang mga titik, salita o linya ng isang layer ng teksto na nasa loob ng isang range. Ilipat ang range gamit ang Offset para gumalaw ang pagbabago sa buong teksto.",
+   "name": "Transform ng Teksto",
+   "params": {
+    "end": {
+     "label": "Wakas"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "opacity": {
+     "label": "Opacity"
+    },
+    "position": {
+     "label": "Posisyon"
+    },
+    "randomOrder": {
+     "label": "Random na order"
+    },
+    "rotation": {
+     "label": "Rotasyon"
+    },
+    "scale": {
+     "label": "Scale"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "shape": {
+     "label": "Hugis",
+     "options": [
+      "Parisukat",
+      "Pataas",
+      "Pababa",
+      "Tatsulok",
+      "Bilog",
+      "Makinis"
+     ]
+    },
+    "smoothness": {
+     "label": "Pagkakinis"
+    },
+    "start": {
+     "label": "Simula"
+    },
+    "tint": {
+     "label": "Tint"
+    },
+    "unit": {
+     "label": "Batay sa",
+     "options": [
+      "Titik",
+      "Salita",
+      "Linya"
+     ]
     }
    }
   },
@@ -3391,6 +3599,36 @@
     },
     "stretch": {
      "label": "Stretch"
+    }
+   }
+  },
+  "timecode": {
+   "description": "Pinapalitan ang teksto ng isang layer ng tumatakbong orasan ng oras ng layer o proyekto. Ang Start At at negatibong Bilis ay gumagawa ng countdown.",
+   "name": "Timecode",
+   "params": {
+    "format": {
+     "label": "Format",
+     "options": [
+      "HH:MM:SS:FF",
+      "HH:MM:SS",
+      "MM:SS",
+      "MM:SS.hh",
+      "SS.hh",
+      "Mga frame"
+     ]
+    },
+    "offset": {
+     "label": "Magsimula sa"
+    },
+    "source": {
+     "label": "Oras",
+     "options": [
+      "Layer",
+      "Proyekto"
+     ]
+    },
+    "speed": {
+     "label": "Bilis"
     }
    }
   },

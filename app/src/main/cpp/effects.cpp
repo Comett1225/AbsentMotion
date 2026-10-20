@@ -64,7 +64,7 @@ std::string EffectRuntime::load(const std::string& xml) {
     const std::string id = root->attr("id");
     const char* sksl = root->attr("sksl");
     if (!sksl || !*sksl) {
-        if (!BuiltIn(id) && !MotionEffect(id) && !RepeatEffect(id)) return "shader error: no shader and no built-in called " + id;
+        if (!BuiltIn(id) && !MotionEffect(id) && !RepeatEffect(id) && !TextEffect(id) && !DrawingEffect(id)) return "shader error: no shader and no built-in called " + id;
     } else {
         auto result = SkRuntimeEffect::MakeForShader(SkString(sksl));
         if (!result.effect) {

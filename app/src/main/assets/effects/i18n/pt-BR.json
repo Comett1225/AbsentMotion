@@ -10,7 +10,8 @@
   "new": "Novos",
   "noise": "Ruído",
   "repeat": "Repetição",
-  "stylize": "Estilizar"
+  "stylize": "Estilizar",
+  "text": "Texto"
  },
  "effects": {
   "autoshake": {
@@ -556,6 +557,37 @@
     }
    }
   },
+  "countupdown": {
+   "description": "Altera cada número de uma camada de texto: multiplica e soma, então animar Multiplicar de 0% a 100% faz a contagem chegar ao número digitado. As palavras ao redor dos números não mudam.",
+   "name": "Contagem crescente/decrescente",
+   "params": {
+    "add": {
+     "label": "Somar"
+    },
+    "decimals": {
+     "label": "Casas decimais",
+     "options": [
+      "Como digitado",
+      "0",
+      "1",
+      "2",
+      "3"
+     ]
+    },
+    "multiply": {
+     "label": "Multiplicar"
+    },
+    "separator": {
+     "label": "Milhares",
+     "options": [
+      "1000.5",
+      "1,000.5",
+      "1.000,5",
+      "1 000.5"
+     ]
+    }
+   }
+  },
   "cross": {
    "description": "Coloca a camada em três barras que se cruzam no meio.",
    "name": "Cruz de três eixos",
@@ -813,6 +845,18 @@
     },
     "slack": {
      "label": "Folga"
+    }
+   }
+  },
+  "drawingprogress": {
+   "description": "Desenha um traço à mão livre traço por traço, ou o contorno de uma forma, de Início a Fim. Anime Fim de 0% a 100% para ver o desenho surgir. Funciona melhor em formas sem preenchimento e com contorno.",
+   "name": "Progresso do desenho",
+   "params": {
+    "end": {
+     "label": "Fim"
+    },
+    "start": {
+     "label": "Início"
     }
    }
   },
@@ -3255,6 +3299,21 @@
     }
    }
   },
+  "stroketaper": {
+   "description": "Afinar os traços de caneta e pincel de um desenho à mão livre até uma ponta: do nada até Início e de Fim até nada. Compressão deixa o afinamento mais acentuado.",
+   "name": "Afinamento do traço",
+   "params": {
+    "end": {
+     "label": "Fim"
+    },
+    "squeeze": {
+     "label": "Compressão"
+    },
+    "start": {
+     "label": "Início"
+    }
+   }
+  },
   "swing": {
    "description": "Gira a camada de um lado para o outro entre dois ângulos.",
    "name": "Balanço",
@@ -3289,6 +3348,155 @@
     },
     "strength": {
      "label": "Força"
+    }
+   }
+  },
+  "textprogress": {
+   "description": "Mostra uma camada de texto peça por peça, por caractere, palavra ou linha, cada peça surgindo com pop, fade, deslizando, crescendo, encolhendo ou desfocando no lugar.",
+   "name": "Progresso do texto",
+   "params": {
+    "appearance": {
+     "label": "Aparecer como",
+     "options": [
+      "Pop",
+      "Fade",
+      "Deslizar para cima",
+      "Deslizar para baixo",
+      "Deslizar para a esquerda",
+      "Deslizar para a direita",
+      "Crescer",
+      "Encolher",
+      "Desfoque"
+     ]
+    },
+    "direction": {
+     "label": "Direção",
+     "options": [
+      "Do início",
+      "Do fim",
+      "Do centro",
+      "Aleatório"
+     ]
+    },
+    "distance": {
+     "label": "Distância"
+    },
+    "progress": {
+     "label": "Progresso"
+    },
+    "seed": {
+     "label": "Semente"
+    },
+    "softness": {
+     "label": "Suavidade"
+    },
+    "unit": {
+     "label": "Com base em",
+     "options": [
+      "Caractere",
+      "Palavra",
+      "Linha"
+     ]
+    }
+   }
+  },
+  "textrandomizer": {
+   "description": "Troca os caracteres de uma camada de texto por letras, números ou símbolos aleatórios que ficam mudando. Aumente Progresso para o texto real se firmar, caractere por caractere.",
+   "name": "Texto aleatório",
+   "params": {
+    "characters": {
+     "label": "Personalizado"
+    },
+    "charset": {
+     "label": "Caracteres",
+     "options": [
+      "Letras",
+      "Maiúsculas",
+      "Minúsculas",
+      "Números",
+      "Letras e números",
+      "Símbolos",
+      "Personalizado"
+     ]
+    },
+    "direction": {
+     "label": "Direção",
+     "options": [
+      "Do início",
+      "Do fim",
+      "Do centro",
+      "Aleatório"
+     ]
+    },
+    "keepSpaces": {
+     "label": "Manter espaços"
+    },
+    "progress": {
+     "label": "Progresso"
+    },
+    "seed": {
+     "label": "Semente"
+    },
+    "speed": {
+     "label": "Velocidade"
+    }
+   }
+  },
+  "texttransform": {
+   "description": "Move, escala, gira, esmaece e tinge as letras, palavras ou linhas de uma camada de texto que ficam dentro de um intervalo. Mova o intervalo com Deslocamento para fazer a mudança percorrer o texto.",
+   "name": "Transformação de texto",
+   "params": {
+    "end": {
+     "label": "Fim"
+    },
+    "offset": {
+     "label": "Deslocamento"
+    },
+    "opacity": {
+     "label": "Opacidade"
+    },
+    "position": {
+     "label": "Posição"
+    },
+    "randomOrder": {
+     "label": "Ordem aleatória"
+    },
+    "rotation": {
+     "label": "Rotação"
+    },
+    "scale": {
+     "label": "Escala"
+    },
+    "seed": {
+     "label": "Semente"
+    },
+    "shape": {
+     "label": "Forma",
+     "options": [
+      "Quadrado",
+      "Rampa crescente",
+      "Rampa decrescente",
+      "Triângulo",
+      "Arredondado",
+      "Suave"
+     ]
+    },
+    "smoothness": {
+     "label": "Suavidade"
+    },
+    "start": {
+     "label": "Início"
+    },
+    "tint": {
+     "label": "Tingir"
+    },
+    "unit": {
+     "label": "Com base em",
+     "options": [
+      "Caractere",
+      "Palavra",
+      "Linha"
+     ]
     }
    }
   },
@@ -3391,6 +3599,36 @@
     },
     "stretch": {
      "label": "Esticar"
+    }
+   }
+  },
+  "timecode": {
+   "description": "Substitui o texto de uma camada por um relógio em movimento com o tempo da camada ou do projeto. Iniciar em e uma Velocidade negativa criam uma contagem regressiva.",
+   "name": "Timecode",
+   "params": {
+    "format": {
+     "label": "Formato",
+     "options": [
+      "HH:MM:SS:FF",
+      "HH:MM:SS",
+      "MM:SS",
+      "MM:SS.hh",
+      "SS.hh",
+      "Quadros"
+     ]
+    },
+    "offset": {
+     "label": "Iniciar em"
+    },
+    "source": {
+     "label": "Tempo",
+     "options": [
+      "Camada",
+      "Projeto"
+     ]
+    },
+    "speed": {
+     "label": "Velocidade"
     }
    }
   },

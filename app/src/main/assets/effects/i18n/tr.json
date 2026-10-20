@@ -10,7 +10,8 @@
   "new": "Yeni",
   "noise": "Gürültü",
   "repeat": "Tekrar",
-  "stylize": "Stil"
+  "stylize": "Stil",
+  "text": "Metin"
  },
  "effects": {
   "autoshake": {
@@ -556,6 +557,37 @@
     }
    }
   },
+  "countupdown": {
+   "description": "Bir metin katmanındaki her sayıyı değiştirir: sayıyı çarpar ve ona ekler; böylece Çarp değerini %0'dan %100'e anahtar karelediğinizde yazdığınız sayıya kadar sayar. Sayıların çevresindeki sözcükler olduğu gibi kalır.",
+   "name": "Yukarı/aşağı say",
+   "params": {
+    "add": {
+     "label": "Ekle"
+    },
+    "decimals": {
+     "label": "Ondalık basamak",
+     "options": [
+      "Yazıldığı gibi",
+      "0",
+      "1",
+      "2",
+      "3"
+     ]
+    },
+    "multiply": {
+     "label": "Çarp"
+    },
+    "separator": {
+     "label": "Binlik ayırıcı",
+     "options": [
+      "1000.5",
+      "1,000.5",
+      "1.000,5",
+      "1 000.5"
+     ]
+    }
+   }
+  },
   "cross": {
    "description": "Katmanı ortada kesişen üç çubuğa yerleştirir.",
    "name": "Üç Eksenli Haç",
@@ -813,6 +845,18 @@
     },
     "slack": {
      "label": "Gevşeklik"
+    }
+   }
+  },
+  "drawingprogress": {
+   "description": "Serbest el çizimini vuruş vuruş ya da bir şeklin dış hattını Başlangıç'tan Bitiş'e çizer. Çizilmesini izlemek için Bitiş'i %0'dan %100'e anahtar kareleyin. Dolgu kapalı, Kontur açık şekillerde en iyi sonucu verir.",
+   "name": "Çizim ilerlemesi",
+   "params": {
+    "end": {
+     "label": "Bitiş"
+    },
+    "start": {
+     "label": "Başlangıç"
     }
    }
   },
@@ -3255,6 +3299,21 @@
     }
    }
   },
+  "stroketaper": {
+   "description": "Serbest el çiziminin kalem ve fırça konturlarını bir noktaya doğru inceltir: hiç yoktan Başlangıç'a, Bitiş'ten de hiç yoka doğru. Sıkıştırma incelmeyi keskinleştirir.",
+   "name": "Kontur incelmesi",
+   "params": {
+    "end": {
+     "label": "Bitiş"
+    },
+    "squeeze": {
+     "label": "Sıkıştırma"
+    },
+    "start": {
+     "label": "Başlangıç"
+    }
+   }
+  },
   "swing": {
    "description": "Katmanı iki açı arasında ileri geri döndürür.",
    "name": "Salınım",
@@ -3289,6 +3348,155 @@
     },
     "strength": {
      "label": "Güç"
+    }
+   }
+  },
+  "textprogress": {
+   "description": "Bir metin katmanını karakter, sözcük veya satır satır gösterir; her parça yerine otururken belirir, solar, kayar, büyür, küçülür veya netleşir.",
+   "name": "Metin ilerlemesi",
+   "params": {
+    "appearance": {
+     "label": "Belirme biçimi",
+     "options": [
+      "Ani belirme",
+      "Solma",
+      "Yukarı kayma",
+      "Aşağı kayma",
+      "Sola kayma",
+      "Sağa kayma",
+      "Büyüme",
+      "Küçülme",
+      "Bulanıklaşma"
+     ]
+    },
+    "direction": {
+     "label": "Yön",
+     "options": [
+      "Baştan",
+      "Sondan",
+      "Ortadan",
+      "Rastgele"
+     ]
+    },
+    "distance": {
+     "label": "Mesafe"
+    },
+    "progress": {
+     "label": "İlerleme"
+    },
+    "seed": {
+     "label": "Tohum"
+    },
+    "softness": {
+     "label": "Yumuşaklık"
+    },
+    "unit": {
+     "label": "Şuna göre",
+     "options": [
+      "Karakter",
+      "Sözcük",
+      "Satır"
+     ]
+    }
+   }
+  },
+  "textrandomizer": {
+   "description": "Bir metin katmanının karakterlerini sürekli değişen rastgele harfler, sayılar veya simgelerle değiştirir. İlerleme'yi artırarak gerçek metnin karakter karakter yerleşmesini sağlayın.",
+   "name": "Metin rastgeleleştirici",
+   "params": {
+    "characters": {
+     "label": "Özel"
+    },
+    "charset": {
+     "label": "Karakterler",
+     "options": [
+      "Harfler",
+      "Büyük harf",
+      "Küçük harf",
+      "Sayılar",
+      "Harf ve sayılar",
+      "Semboller",
+      "Özel"
+     ]
+    },
+    "direction": {
+     "label": "Yön",
+     "options": [
+      "Baştan",
+      "Sondan",
+      "Ortadan",
+      "Rastgele"
+     ]
+    },
+    "keepSpaces": {
+     "label": "Boşlukları koru"
+    },
+    "progress": {
+     "label": "İlerleme"
+    },
+    "seed": {
+     "label": "Tohum"
+    },
+    "speed": {
+     "label": "Hız"
+    }
+   }
+  },
+  "texttransform": {
+   "description": "Bir metin katmanının aralığa giren harflerini, kelimelerini veya satırlarını taşır, ölçekler, döndürür, soldurur ve renklendirir. Aralığı Kaydırma ile kaydırarak değişimin metin boyunca ilerlemesini sağlayın.",
+   "name": "Metin Dönüştürme",
+   "params": {
+    "end": {
+     "label": "Bitiş"
+    },
+    "offset": {
+     "label": "Kaydırma"
+    },
+    "opacity": {
+     "label": "Opaklık"
+    },
+    "position": {
+     "label": "Konum"
+    },
+    "randomOrder": {
+     "label": "Rastgele sıra"
+    },
+    "rotation": {
+     "label": "Döndürme"
+    },
+    "scale": {
+     "label": "Ölçek"
+    },
+    "seed": {
+     "label": "Tohum"
+    },
+    "shape": {
+     "label": "Şekil",
+     "options": [
+      "Kare",
+      "Yükselen",
+      "Alçalan",
+      "Üçgen",
+      "Yuvarlak",
+      "Pürüzsüz"
+     ]
+    },
+    "smoothness": {
+     "label": "Yumuşaklık"
+    },
+    "start": {
+     "label": "Başlangıç"
+    },
+    "tint": {
+     "label": "Renk tonu"
+    },
+    "unit": {
+     "label": "Şuna göre",
+     "options": [
+      "Karakter",
+      "Kelime",
+      "Satır"
+     ]
     }
    }
   },
@@ -3391,6 +3599,36 @@
     },
     "stretch": {
      "label": "Uzatma"
+    }
+   }
+  },
+  "timecode": {
+   "description": "Bir katmanın metnini, katmanın veya projenin işleyen zamanıyla değiştirir. Başlangıç ve negatif Hız ile geri sayım yapabilirsiniz.",
+   "name": "Zaman kodu",
+   "params": {
+    "format": {
+     "label": "Biçim",
+     "options": [
+      "HH:MM:SS:FF",
+      "HH:MM:SS",
+      "MM:SS",
+      "MM:SS.hh",
+      "SS.hh",
+      "Kare"
+     ]
+    },
+    "offset": {
+     "label": "Başlangıç"
+    },
+    "source": {
+     "label": "Zaman",
+     "options": [
+      "Katman",
+      "Proje"
+     ]
+    },
+    "speed": {
+     "label": "Hız"
     }
    }
   },

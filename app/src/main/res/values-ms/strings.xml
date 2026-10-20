@@ -805,6 +805,7 @@
     <string name="aibrowser_no_size">Video ini tiada maklumat saiz.</string>
     <string name="effectbrowser_title">Pustaka Kesan</string>
     <string name="effectbrowser_favorite">Kegemaran</string>
+    <string name="effectbrowser_preset">PRATETAP</string>
     <string name="effectbrowser_recent">Terkini</string>
     <plurals name="aibrowser_too_long">
         <item quantity="other">Klip lebih panjang daripada %1$s minit belum disokong. Potong atau pisahkan klip itu dahulu.</item>

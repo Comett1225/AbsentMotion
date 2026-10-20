@@ -805,6 +805,7 @@
     <string name="aibrowser_no_size">วิดีโอนี้ไม่มีข้อมูลขนาด</string>
     <string name="effectbrowser_title">คลังเอฟเฟกต์</string>
     <string name="effectbrowser_favorite">รายการโปรด</string>
+    <string name="effectbrowser_preset">พรีเซ็ต</string>
     <string name="effectbrowser_recent">ล่าสุด</string>
     <plurals name="aibrowser_too_long">
         <item quantity="other">คลิปที่ยาวกว่า %1$s นาที ยังไม่รองรับ กรุณาตัดหรือแยกคลิปก่อน</item>

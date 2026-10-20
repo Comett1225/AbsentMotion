@@ -805,6 +805,7 @@
     <string name="aibrowser_no_size">Video ini tidak memiliki informasi ukuran.</string>
     <string name="effectbrowser_title">Pustaka efek</string>
     <string name="effectbrowser_favorite">Favorit</string>
+    <string name="effectbrowser_preset">PRESET</string>
     <string name="effectbrowser_recent">Terbaru</string>
     <plurals name="aibrowser_too_long">
         <item quantity="other">Klip lebih panjang dari %1$s menit belum didukung. Pangkas atau pisahkan klip terlebih dahulu.</item>

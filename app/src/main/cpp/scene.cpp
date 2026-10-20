@@ -43,6 +43,25 @@ const Property* Layer::prop(const char* propName) const {
     return nullptr;
 }
 
+const LayerEffect* Layer::effect(const char* id) const {
+    for (const auto& e : effects) {
+        if (!e.hidden && e.id == id) return &e;
+    }
+    return nullptr;
+}
+
+const Property* LayerEffect::prop(const char* propName) const {
+    for (const auto& p : props) {
+        if (p.name == propName) return &p;
+    }
+    return nullptr;
+}
+
+float LayerEffect::value(const char* propName, float t, float fallback) const {
+    const Property* p = this->prop(propName);
+    return p ? p->anim.get(0, t, fallback) : fallback;
+}
+
 float Layer::value(const char* propName, int i, float t, float fallback) const {
     const Property* p = this->prop(propName);
     return p ? p->anim.get(i, t, fallback) : fallback;
@@ -293,7 +312,7 @@ bool ParseLayer(const XmlNode& node, int fps, Layer* out) {
             effect.locallyApplied = StrAttr(*c, "locallyApplied") == "true";
             effect.toChildren = StrAttr(*c, "applyToChildren") == "true";
             for (const auto& p : c->children) if (p->name == "property")
-                effect.props.push_back({StrAttr(*p, "name"), StrAttr(*p, "type"), ParseAnim(p.get())});
+                effect.props.push_back({StrAttr(*p, "name"), StrAttr(*p, "type"), ParseAnim(p.get()), StrAttr(*p, "value")});
             l.effects.push_back(std::move(effect));
         }
         if (c->name != "property") continue;

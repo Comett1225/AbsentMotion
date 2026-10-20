@@ -1,0 +1,96 @@
+{
+ "id": "textrandomizer",
+ "name": "Text Randomizer",
+ "category": "text",
+ "since": "3.0.0",
+ "native": true,
+ "description": "Swaps the characters of a text layer for random letters, numbers or symbols that keep changing. Raise Progress to let the real text settle in, character by character.",
+ "params": [
+  {
+   "id": "progress",
+   "label": "Progress",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "direction",
+   "label": "Direction",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "From Start",
+    "From End",
+    "From Center",
+    "Random"
+   ]
+  },
+  {
+   "id": "charset",
+   "label": "Characters",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Letters",
+    "Upper Case",
+    "Lower Case",
+    "Numbers",
+    "Letters and Numbers",
+    "Symbols",
+    "Custom"
+   ]
+  },
+  {
+   "id": "characters",
+   "label": "Custom",
+   "type": "text",
+   "default": "01"
+  },
+  {
+   "id": "speed",
+   "label": "Speed",
+   "type": "float",
+   "default": 12,
+   "min": 0,
+   "max": 60,
+   "step": 0.1
+  },
+  {
+   "id": "keepSpaces",
+   "label": "Keep Spaces",
+   "type": "switch",
+   "default": true
+  },
+  {
+   "id": "seed",
+   "label": "Seed",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1000,
+   "step": 1
+  }
+ ],
+ "presets": [
+  {
+   "name": "Scramble",
+   "params": {
+    "charset": 4,
+    "speed": 20,
+    "progress": [
+     [
+      0,
+      0
+     ],
+     [
+      1.5,
+      1
+     ]
+    ]
+   }
+  }
+ ]
+}

@@ -805,6 +805,7 @@
     <string name="aibrowser_no_size">Video này không có thông tin kích thước.</string>
     <string name="effectbrowser_title">Thư viện hiệu ứng</string>
     <string name="effectbrowser_favorite">Yêu thích</string>
+    <string name="effectbrowser_preset">CÀI SẴN</string>
     <string name="effectbrowser_recent">Gần đây</string>
     <plurals name="aibrowser_too_long">
         <item quantity="other">Chưa hỗ trợ clip dài hơn %1$s phút. Hãy cắt hoặc tách clip trước.</item>

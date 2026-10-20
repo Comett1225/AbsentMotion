@@ -841,6 +841,7 @@
     <string name="aibrowser_no_size">У этого видео нет данных о размере.</string>
     <string name="effectbrowser_title">Библиотека эффектов</string>
     <string name="effectbrowser_favorite">Избранное</string>
+    <string name="effectbrowser_preset">ПРЕСЕТ</string>
     <string name="effectbrowser_recent">Недавние</string>
     <plurals name="aibrowser_too_long">
         <item quantity="one">Клипы длиннее %1$s минуты пока не поддерживаются. Сначала обрежьте или разделите клип.</item>

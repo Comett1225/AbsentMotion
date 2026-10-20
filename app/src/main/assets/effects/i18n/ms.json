@@ -10,7 +10,8 @@
   "new": "Baharu",
   "noise": "Hingar",
   "repeat": "Ulangan",
-  "stylize": "Gaya"
+  "stylize": "Gaya",
+  "text": "Teks"
  },
  "effects": {
   "autoshake": {
@@ -556,6 +557,37 @@
     }
    }
   },
+  "countupdown": {
+   "description": "Menukar setiap nombor dalam lapisan teks: nilainya didarab dan ditambah, jadi bingkai kunci Darab dari 0% ke 100% akan mengira naik ke nombor yang anda taip. Perkataan di sekeliling nombor kekal seperti asal.",
+   "name": "Kira Naik/Turun",
+   "params": {
+    "add": {
+     "label": "Tambah"
+    },
+    "decimals": {
+     "label": "Tempat Perpuluhan",
+     "options": [
+      "Seperti Ditaip",
+      "0",
+      "1",
+      "2",
+      "3"
+     ]
+    },
+    "multiply": {
+     "label": "Darab"
+    },
+    "separator": {
+     "label": "Ribu",
+     "options": [
+      "1000.5",
+      "1,000.5",
+      "1.000,5",
+      "1 000.5"
+     ]
+    }
+   }
+  },
   "cross": {
    "description": "Meletakkan lapisan pada tiga bar yang bersilang di tengah.",
    "name": "Salib Tiga Paksi",
@@ -813,6 +845,18 @@
     },
     "slack": {
      "label": "Longgar"
+    }
+   }
+  },
+  "drawingprogress": {
+   "description": "Melukis lukisan bebas lejang demi lejang, atau garis luar sesuatu bentuk, dari Mula hingga Tamat. Bingkai kunci Tamat dari 0% ke 100% untuk melihatnya dilukis. Paling sesuai untuk bentuk tanpa Isi dan ada Lejang.",
+   "name": "Kemajuan Lukisan",
+   "params": {
+    "end": {
+     "label": "Tamat"
+    },
+    "start": {
+     "label": "Mula"
     }
    }
   },
@@ -3255,6 +3299,21 @@
     }
    }
   },
+  "stroketaper": {
+   "description": "Menipiskan lejang pen dan berus lukisan bebas hingga ke satu titik: dari kosong hingga Mula, dan dari Tamat hingga kosong. Himpit menjadikan penirusan lebih tajam.",
+   "name": "Lejang Menirus",
+   "params": {
+    "end": {
+     "label": "Tamat"
+    },
+    "squeeze": {
+     "label": "Himpit"
+    },
+    "start": {
+     "label": "Mula"
+    }
+   }
+  },
   "swing": {
    "description": "Mengayunkan lapisan ke depan dan ke belakang antara dua sudut.",
    "name": "Hayun",
@@ -3289,6 +3348,155 @@
     },
     "strength": {
      "label": "Kekuatan"
+    }
+   }
+  },
+  "textprogress": {
+   "description": "Menunjukkan lapisan teks sedikit demi sedikit, mengikut aksara, perkataan atau baris; setiap bahagian muncul, malap, gelongsor, membesar, mengecil atau menjadi tajam ke tempatnya.",
+   "name": "Kemajuan Teks",
+   "params": {
+    "appearance": {
+     "label": "Muncul Sebagai",
+     "options": [
+      "Pop",
+      "Malap",
+      "Gelongsor Atas",
+      "Gelongsor Bawah",
+      "Gelongsor Kiri",
+      "Gelongsor Kanan",
+      "Membesar",
+      "Mengecil",
+      "Kabur"
+     ]
+    },
+    "direction": {
+     "label": "Arah",
+     "options": [
+      "Dari Mula",
+      "Dari Tamat",
+      "Dari Tengah",
+      "Rawak"
+     ]
+    },
+    "distance": {
+     "label": "Jarak"
+    },
+    "progress": {
+     "label": "Kemajuan"
+    },
+    "seed": {
+     "label": "Benih"
+    },
+    "softness": {
+     "label": "Kelembutan"
+    },
+    "unit": {
+     "label": "Berdasarkan",
+     "options": [
+      "Aksara",
+      "Perkataan",
+      "Baris"
+     ]
+    }
+   }
+  },
+  "textrandomizer": {
+   "description": "Menukar aksara lapisan teks dengan huruf, nombor atau simbol rawak yang sentiasa berubah. Tingkatkan Kemajuan supaya teks sebenar masuk semula, aksara demi aksara.",
+   "name": "Rawak Teks",
+   "params": {
+    "characters": {
+     "label": "Tersuai"
+    },
+    "charset": {
+     "label": "Aksara",
+     "options": [
+      "Huruf",
+      "Huruf Besar",
+      "Huruf Kecil",
+      "Nombor",
+      "Huruf dan Nombor",
+      "Simbol",
+      "Tersuai"
+     ]
+    },
+    "direction": {
+     "label": "Arah",
+     "options": [
+      "Dari Mula",
+      "Dari Tamat",
+      "Dari Tengah",
+      "Rawak"
+     ]
+    },
+    "keepSpaces": {
+     "label": "Kekalkan Ruang"
+    },
+    "progress": {
+     "label": "Kemajuan"
+    },
+    "seed": {
+     "label": "Benih"
+    },
+    "speed": {
+     "label": "Kelajuan"
+    }
+   }
+  },
+  "texttransform": {
+   "description": "Menggerakkan, menskalakan, memutar, melunturkan dan mewarnakan huruf, perkataan atau baris teks lapisan yang berada dalam julat. Gerakkan julat dengan Offset supaya perubahan merentasi teks.",
+   "name": "Transformasi Teks",
+   "params": {
+    "end": {
+     "label": "Tamat"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "opacity": {
+     "label": "Kelegapan"
+    },
+    "position": {
+     "label": "Kedudukan"
+    },
+    "randomOrder": {
+     "label": "Susunan Rawak"
+    },
+    "rotation": {
+     "label": "Putaran"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "seed": {
+     "label": "Benih"
+    },
+    "shape": {
+     "label": "Bentuk",
+     "options": [
+      "Segi empat sama",
+      "Cerun Naik",
+      "Cerun Turun",
+      "Segi tiga",
+      "Bulat",
+      "Licin"
+     ]
+    },
+    "smoothness": {
+     "label": "Kehalusan"
+    },
+    "start": {
+     "label": "Mula"
+    },
+    "tint": {
+     "label": "Warna"
+    },
+    "unit": {
+     "label": "Berdasarkan",
+     "options": [
+      "Aksara",
+      "Perkataan",
+      "Baris"
+     ]
     }
    }
   },
@@ -3391,6 +3599,36 @@
     },
     "stretch": {
      "label": "Regang"
+    }
+   }
+  },
+  "timecode": {
+   "description": "Menggantikan teks lapisan dengan jam berjalan bagi masa lapisan atau projek. Mula Pada dan Kelajuan negatif menghasilkan kiraan detik.",
+   "name": "Kod Masa",
+   "params": {
+    "format": {
+     "label": "Format",
+     "options": [
+      "HH:MM:SS:FF",
+      "HH:MM:SS",
+      "MM:SS",
+      "MM:SS.hh",
+      "SS.hh",
+      "Bingkai"
+     ]
+    },
+    "offset": {
+     "label": "Mula Pada"
+    },
+    "source": {
+     "label": "Masa",
+     "options": [
+      "Lapisan",
+      "Projek"
+     ]
+    },
+    "speed": {
+     "label": "Kelajuan"
     }
    }
   },

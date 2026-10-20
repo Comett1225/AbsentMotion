@@ -817,6 +817,7 @@
     <string name="aibrowser_no_size">Bu videoda boyut bilgisi yok.</string>
     <string name="effectbrowser_title">Efekt kitaplığı</string>
     <string name="effectbrowser_favorite">Favori</string>
+    <string name="effectbrowser_preset">HAZIR AYAR</string>
     <string name="effectbrowser_recent">Son kullanılan</string>
     <plurals name="aibrowser_too_long">
         <item quantity="one">%1$s dakikadan uzun klipler henüz desteklenmiyor. Önce klibi kırpın veya bölün.</item>

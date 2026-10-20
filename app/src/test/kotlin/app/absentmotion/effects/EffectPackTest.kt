@@ -25,7 +25,7 @@ class EffectPackTest {
         val declared = Regex("""(layout\s*\(\s*color\s*\)\s*)?uniform\s+(\w+)\s+(\w+)\s*;""")
         for (effect in catalog.definitions) {
             if (effect.native) {
-                assertTrue("${effect.key} is not a built-in", effect.category == "move" || effect.category == "repeat" || effect.id in setOf("absent.blur", "absent.glow", "absent.motionblur", "absent.backdrop"))
+                assertTrue("${effect.key} is not a built-in", effect.category in setOf("move", "repeat", "text") || effect.id in setOf("absent.blur", "absent.glow", "absent.motionblur", "absent.backdrop", "absent.drawingprogress", "absent.stroketaper"))
                 assertNull(effect.sksl)
                 continue
             }
@@ -96,7 +96,7 @@ class EffectPackTest {
         val thumbs = File(pack, "thumb").listFiles()!!.filter { it.extension == "webp" }
         for (thumb in thumbs) assertTrue("${thumb.name} is ${thumb.length()} bytes", thumb.length() <= 150_000)
         val animated = thumbs.filter { String(it.readBytes().copyOf(64), Charsets.ISO_8859_1).contains("ANIM") }.map { it.nameWithoutExtension }.toSet()
-        val wanted = catalog.listed("move").map { it.key } + catalog.listed("3d").map { it.key } + listOf("vhs", "flicker", "blink", "glitch", "static")
+        val wanted = catalog.listed("move").map { it.key } + catalog.listed("3d").map { it.key } + catalog.listed("text").map { it.key } + listOf("vhs", "flicker", "blink", "glitch", "static")
         assertEquals("still pictures", emptyList<String>(), wanted.filter { it !in animated })
         assertTrue("blur is a still picture", "blur" !in animated)
     }

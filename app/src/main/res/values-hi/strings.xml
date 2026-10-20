@@ -817,6 +817,7 @@
     <string name="aibrowser_no_size">इस वीडियो में साइज़ की जानकारी नहीं है।</string>
     <string name="effectbrowser_title">इफ़ेक्ट लाइब्रेरी</string>
     <string name="effectbrowser_favorite">पसंदीदा</string>
+    <string name="effectbrowser_preset">प्रीसेट</string>
     <string name="effectbrowser_recent">हालिया</string>
     <plurals name="aibrowser_too_long">
         <item quantity="one">%1$s मिनट से लंबी क्लिप अभी सपोर्टेड नहीं है। पहले क्लिप को ट्रिम या स्प्लिट करें।</item>

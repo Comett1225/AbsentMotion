@@ -10,7 +10,8 @@
   "new": "Baru",
   "noise": "Noise",
   "repeat": "Ulangi",
-  "stylize": "Stilisasi"
+  "stylize": "Stilisasi",
+  "text": "Teks"
  },
  "effects": {
   "autoshake": {
@@ -556,6 +557,37 @@
     }
    }
   },
+  "countupdown": {
+   "description": "Mengubah setiap angka di lapisan teks: mengalikan lalu menambahkannya, jadi keyframe Kalikan dari 0% ke 100% membuat angka menghitung naik hingga nilai yang Anda ketik. Kata di sekitar angka tetap.",
+   "name": "Hitung Naik/Turun",
+   "params": {
+    "add": {
+     "label": "Tambah"
+    },
+    "decimals": {
+     "label": "Tempat Desimal",
+     "options": [
+      "Sesuai Ketikan",
+      "0",
+      "1",
+      "2",
+      "3"
+     ]
+    },
+    "multiply": {
+     "label": "Kalikan"
+    },
+    "separator": {
+     "label": "Pemisah Ribuan",
+     "options": [
+      "1000.5",
+      "1,000.5",
+      "1.000,5",
+      "1 000.5"
+     ]
+    }
+   }
+  },
   "cross": {
    "description": "Menempatkan lapisan pada tiga batang yang bersilangan di tengah.",
    "name": "Silang tiga sumbu",
@@ -813,6 +845,18 @@
     },
     "slack": {
      "label": "Kelonggaran"
+    }
+   }
+  },
+  "drawingprogress": {
+   "description": "Menggambar coretan tangan gores demi gores, atau garis luar bentuk, dari Awal ke Akhir. Keyframe Akhir dari 0% ke 100% untuk melihat proses gambarnya. Paling cocok untuk bentuk dengan Isi mati dan Stroke.",
+   "name": "Progres Gambar",
+   "params": {
+    "end": {
+     "label": "Akhir"
+    },
+    "start": {
+     "label": "Awal"
     }
    }
   },
@@ -3255,6 +3299,21 @@
     }
    }
   },
+  "stroketaper": {
+   "description": "Menipiskan goresan pena dan kuas pada coretan tangan hingga runcing: dari nol sampai Awal, dan dari Akhir turun ke nol. Himpit membuat penyempitan lebih tajam.",
+   "name": "Penyempitan Stroke",
+   "params": {
+    "end": {
+     "label": "Akhir"
+    },
+    "squeeze": {
+     "label": "Himpit"
+    },
+    "start": {
+     "label": "Awal"
+    }
+   }
+  },
   "swing": {
    "description": "Memutar lapisan bolak-balik di antara dua sudut.",
    "name": "Ayunan",
@@ -3289,6 +3348,155 @@
     },
     "strength": {
      "label": "Kekuatan"
+    }
+   }
+  },
+  "textprogress": {
+   "description": "Menampilkan lapisan teks sepotong demi sepotong, per karakter, kata, atau baris; setiap bagian muncul, memudar, bergeser, membesar, mengecil, atau menajam ke posisinya.",
+   "name": "Progres Teks",
+   "params": {
+    "appearance": {
+     "label": "Tampil Sebagai",
+     "options": [
+      "Pop",
+      "Pudar",
+      "Geser ke Atas",
+      "Geser ke Bawah",
+      "Geser ke Kiri",
+      "Geser ke Kanan",
+      "Membesar",
+      "Mengecil",
+      "Blur"
+     ]
+    },
+    "direction": {
+     "label": "Arah",
+     "options": [
+      "Dari Awal",
+      "Dari Akhir",
+      "Dari Tengah",
+      "Acak"
+     ]
+    },
+    "distance": {
+     "label": "Jarak"
+    },
+    "progress": {
+     "label": "Progres"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "softness": {
+     "label": "Kelembutan"
+    },
+    "unit": {
+     "label": "Berdasarkan",
+     "options": [
+      "Karakter",
+      "Kata",
+      "Baris"
+     ]
+    }
+   }
+  },
+  "textrandomizer": {
+   "description": "Menukar karakter lapisan teks dengan huruf, angka, atau simbol acak yang terus berubah. Naikkan Progres agar teks asli perlahan muncul, karakter demi karakter.",
+   "name": "Pengacak Teks",
+   "params": {
+    "characters": {
+     "label": "Kustom"
+    },
+    "charset": {
+     "label": "Karakter",
+     "options": [
+      "Huruf",
+      "Huruf Kapital",
+      "Huruf kecil",
+      "Angka",
+      "Huruf dan angka",
+      "Simbol",
+      "Kustom"
+     ]
+    },
+    "direction": {
+     "label": "Arah",
+     "options": [
+      "Dari Awal",
+      "Dari Akhir",
+      "Dari Tengah",
+      "Acak"
+     ]
+    },
+    "keepSpaces": {
+     "label": "Pertahankan spasi"
+    },
+    "progress": {
+     "label": "Progres"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "speed": {
+     "label": "Kecepatan"
+    }
+   }
+  },
+  "texttransform": {
+   "description": "Menggeser, menskalakan, memutar, memudarkan, dan mewarnai huruf, kata, atau baris lapisan teks yang berada dalam rentang. Geser rentang dengan Offset agar perubahan bergerak menyusuri teks.",
+   "name": "Transformasi teks",
+   "params": {
+    "end": {
+     "label": "Akhir"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "opacity": {
+     "label": "Opasitas"
+    },
+    "position": {
+     "label": "Posisi"
+    },
+    "randomOrder": {
+     "label": "Urutan acak"
+    },
+    "rotation": {
+     "label": "Rotasi"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "shape": {
+     "label": "Bentuk",
+     "options": [
+      "Kotak",
+      "Ramp naik",
+      "Ramp turun",
+      "Segitiga",
+      "Bulat",
+      "Halus"
+     ]
+    },
+    "smoothness": {
+     "label": "Kehalusan"
+    },
+    "start": {
+     "label": "Mulai"
+    },
+    "tint": {
+     "label": "Pewarnaan"
+    },
+    "unit": {
+     "label": "Berdasarkan",
+     "options": [
+      "Karakter",
+      "Kata",
+      "Baris"
+     ]
     }
    }
   },
@@ -3391,6 +3599,36 @@
     },
     "stretch": {
      "label": "Regangan"
+    }
+   }
+  },
+  "timecode": {
+   "description": "Mengganti teks lapisan dengan jam berjalan dari waktu lapisan atau proyek. Atur Mulai dari dan Kecepatan negatif untuk membuat hitung mundur.",
+   "name": "Timecode",
+   "params": {
+    "format": {
+     "label": "Format",
+     "options": [
+      "HH:MM:SS:FF",
+      "HH:MM:SS",
+      "MM:SS",
+      "MM:SS.hh",
+      "SS.hh",
+      "Frame"
+     ]
+    },
+    "offset": {
+     "label": "Mulai dari"
+    },
+    "source": {
+     "label": "Waktu",
+     "options": [
+      "Lapisan",
+      "Proyek"
+     ]
+    },
+    "speed": {
+     "label": "Kecepatan"
     }
    }
   },

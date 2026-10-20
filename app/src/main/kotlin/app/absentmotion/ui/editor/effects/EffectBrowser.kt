@@ -45,6 +45,7 @@ import app.absentmotion.ai.AiTools
 import app.absentmotion.editor.EditorState
 import app.absentmotion.effects.EffectCatalog
 import app.absentmotion.effects.EffectDefinition
+import app.absentmotion.effects.EffectPreset
 import app.absentmotion.model.addEffect
 import app.absentmotion.model.effects
 import app.absentmotion.ui.editor.PanelIcons
@@ -78,9 +79,9 @@ fun EffectBrowser(state: EditorState) {
         favourites = if (effect.id in favourites) favourites - effect.id else favourites + effect.id
         history.edit().putStringSet("favourites", favourites).apply()
     }
-    fun add(effect: EffectDefinition) {
+    fun add(effect: EffectDefinition, preset: EffectPreset? = null) {
         if (!effect.available) return
-        state.editSelected { layer -> layer.addEffect(effect.instance()) }
+        state.editSelected { layer -> layer.addEffect(effect.instance(preset, layer.endTime - layer.startTime)) }
         recent = (listOf(effect.id) + recent.filterNot { it == effect.id }).take(40)
         history.edit().putString("recent", recent.joinToString("|")).apply()
         state.effectIndex = (state.selected?.effects?.size ?: 0) - 1
@@ -115,13 +116,23 @@ fun EffectBrowser(state: EditorState) {
                         .clickable(enabled = effect.available) { add(effect) }.padding(12.dp), color = Am.OnDark, fontSize = 15.sp)
                     Icon(PanelIcons.Star, stringResource(R.string.effectbrowser_favorite), Modifier.size(32.dp).clickable { favourite(effect) }, tint = if (effect.id in favourites) Am.Accent else Am.OnDark)
                 }
+                if (state.effectDetail == null) effect.presets.forEach { preset ->
+                    Column(Modifier.fillMaxWidth().height(56.dp).alpha(if (effect.available) 1f else 0.35f)
+                        .clickable(enabled = effect.available) { add(effect, preset) }.padding(horizontal = 12.dp), verticalArrangement = Arrangement.Center) {
+                        Text(stringResource(R.string.effectbrowser_preset), color = Am.OnDarkDim, fontSize = 10.sp, maxLines = 1)
+                        Text("+ ${preset.name}", color = Am.OnDark, fontSize = 15.sp, maxLines = 1)
+                    }
+                }
             }
         } else if (searching || category != null) {
             val results = catalog.listed(if (searching) null else category).filter { query.isBlank() || it.name.contains(query, true) }
                 .sortedBy { it.name.lowercase() }
             val actions = if (searching || category == "ai") AiAction.entries.filter { it.offered && (query.isBlank() || stringResource(it.title).contains(query, true)) } else emptyList()
+            val presets = catalog.definitions.flatMap { d -> d.presets.map { d to it } }
+                .filter { (d, p) -> if (searching) query.isNotBlank() && p.name.contains(query, true) else d.category == category }
             LazyVerticalGrid(GridCells.Fixed(3), Modifier.fillMaxSize(), contentPadding = PaddingValues(10.dp)) {
                 items(actions, key = { "ai-${it.name}" }) { action -> AiTile(action, state.selected, ai) }
+                items(presets, key = { (d, p) -> "preset-${d.id}-${p.slug}" }) { (d, p) -> PresetTile(catalog, d, p) { add(d, p) } }
                 items(results, key = { it.id }) { effect -> EffectTile(catalog, effect, 100f, { pick(effect) }, { detail = effect }, effect.id in favourites) }
             }
         } else {
@@ -191,6 +202,16 @@ private fun EffectTile(catalog: EffectCatalog, effect: EffectDefinition, width: 
         }
         Text(effect.name, Modifier.fillMaxWidth().padding(top = 4.dp), color = Am.OnDark, fontSize = if (width > 100) 10.sp else 8.sp,
             lineHeight = 9.sp, textAlign = TextAlign.Center, maxLines = 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+    }
+}
+
+@Composable
+private fun PresetTile(catalog: EffectCatalog, effect: EffectDefinition, preset: EffectPreset, onClick: () -> Unit) {
+    Column(Modifier.width(100.dp).alpha(if (effect.available) 1f else 0.35f).clickable(enabled = effect.available, onClick = onClick).padding(5.dp),
+        horizontalAlignment = Alignment.CenterHorizontally) {
+        Thumbnail(catalog, effect.thumbnail(preset), Modifier.size(93.dp).clip(RoundedCornerShape(5.dp)))
+        Text(preset.name, Modifier.fillMaxWidth().padding(top = 4.dp), color = Am.Accent, fontSize = 10.sp, lineHeight = 9.sp,
+            textAlign = TextAlign.Center, maxLines = 2)
     }
 }
 

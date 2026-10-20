@@ -453,6 +453,8 @@ half4 main(float2 xy) {
 const LayerEffects* gEffects = nullptr;
 const Scene* gScene = nullptr;
 
+int Fps() { return gScene ? gScene->fps : 30; }
+
 const std::vector<Layer>* gEffectList = nullptr;
 
 bool EffectsApply(const std::vector<Layer>& siblings, const Layer& l) {
@@ -531,7 +533,7 @@ std::vector<LayerCopy> CopiesOf(const std::vector<Layer>& siblings, const Layer&
         }
         if (below && below->kind != "nullobj" && below->kind != "camera") {
             const float tb = below->localTime(timeMs);
-            space.below = (below->text ? TextGlyphPath(*below) : ShapePath(*below, tb)).makeTransform(SiblingMatrix(siblings, *below, timeMs));
+            space.below = (below->text ? TextGlyphPath(*below, tb, Fps()) : ShapePath(*below, tb)).makeTransform(SiblingMatrix(siblings, *below, timeMs));
         }
     }
     std::vector<RepeatCopy> copies;
@@ -553,6 +555,8 @@ std::vector<LayerCopy> CopiesOf(const std::vector<Layer>& siblings, const Layer&
     }
     return out;
 }
+
+SkPath BodyPath(const Layer& l, float t) { return ShapeKind(l) ? DrawingProgressPath(l, ShapePath(l, t), t) : ShapePath(l, t); }
 
 struct Drawn {
     bool fill = false;
@@ -576,22 +580,36 @@ Drawn DrawBody(SkCanvas* canvas, const Layer& l, double timeMs, float t, const S
     }
     if (l.kind == "drawing") {
         drawn.fill = !l.strokes.empty();
-        DrawDrawing(canvas, l, alpha);
+        DrawDrawing(canvas, l, alpha, t);
     } else if (l.fillType == "color") {
         drawn.fill = fill.fA > 0;
-        if (l.text) DrawText(canvas, l, t, FillPaint(fill));
+        if (l.text) DrawText(canvas, l, t, FillPaint(fill), Fps());
         else canvas->drawPath(path, FillPaint(fill));
     } else if (l.fillType == "media" || l.fillType == "gradient") {
         drawn.fill = true;
+        const bool masked = l.text && TextAnimated(l);
         canvas->save();
-        if (l.text) canvas->clipPath(TextGlyphPath(l), true);
+        if (masked) {
+            SkPaint inside;
+            inside.setBlendMode(SkBlendMode::kSrcIn);
+            canvas->saveLayer(nullptr, nullptr);
+            DrawText(canvas, l, t, FillPaint(kWhite), Fps());
+            canvas->saveLayer(nullptr, &inside);
+        } else if (l.text) {
+            canvas->clipPath(TextGlyphPath(l), true);
+        }
         if (l.fillType == "media") {
             DrawMedia(canvas, l, path, alpha, pictures);
         } else {
             SkPaint paint;
             paint.setAntiAlias(true);
             paint.setShader(GradientShader(l.gradient, path.getBounds(), alpha));
-            if (paint.getShader()) canvas->drawPath(path, paint);
+            if (paint.getShader() && masked) canvas->drawPaint(paint);
+            else if (paint.getShader()) canvas->drawPath(path, paint);
+        }
+        if (masked) {
+            canvas->restore();
+            canvas->restore();
         }
         canvas->restore();
     }
@@ -608,7 +626,7 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
                  bool decorate, const MediaPictures& pictures, const std::vector<LayerCopy>* copies) {
     const float t = l.localTime(timeMs);
     const SkMatrix m = SiblingMatrix(siblings, l, timeMs);
-    const SkPath path = ShapePath(l, t);
+    const SkPath path = BodyPath(l, t);
     Drawn drawn;
     const SkPath scenePath = path.makeTransform(m);
     auto picture = [&](SkCanvas* canvas) {
@@ -621,7 +639,7 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
             const bool now = c.timeMs == timeMs;
             const float tc = now ? t : l.localTime(c.timeMs);
             const SkMatrix mc = now ? m : SiblingMatrix(siblings, l, c.timeMs);
-            const SkPath pc = now ? path : ShapePath(l, tc);
+            const SkPath pc = now ? path : BodyPath(l, tc);
             const bool tinted = c.look.tinted > 0;
             const bool layered = tinted || c.look.mode != SkBlendMode::kSrcOver || (c.look.alpha < 1 && SelfOverlaps(l));
             canvas->save();
@@ -660,7 +678,7 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
         drawn.fill = l.kind == "drawing" ? !l.strokes.empty() : l.fillType == "color" ? ColorAt(l.fillColor, t, kWhite, alpha).fA > 0 : l.fillType == "media" || l.fillType == "gradient";
         if (l.stroke.present && l.stroke.enabled) drawn.stroked = DrawStroke(nullptr, l, scenePath, t, alpha);
     }
-    SkPath region = drawn.fill ? (l.text ? TextGlyphPath(l).makeTransform(m) : l.kind == "drawing" ? DrawingOutline(l).makeTransform(m) : scenePath) : SkPath();
+    SkPath region = drawn.fill ? (l.text ? TextGlyphPath(l, t, Fps()).makeTransform(m) : l.kind == "drawing" ? DrawingOutline(l, t).makeTransform(m) : scenePath) : SkPath();
     region = Union(region, drawn.stroked);
     if (region.isEmpty()) return;
     for (const Edge& e : l.borders) {

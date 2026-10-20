@@ -865,6 +865,7 @@
     <string name="aibrowser_no_size">لا يحتوي هذا الفيديو على معلومات الحجم.</string>
     <string name="effectbrowser_title">مكتبة التأثيرات</string>
     <string name="effectbrowser_favorite">المفضلة</string>
+    <string name="effectbrowser_preset">إعداد مسبق</string>
     <string name="effectbrowser_recent">الأحدث</string>
     <plurals name="aibrowser_too_long">
         <item quantity="zero">المقاطع الأطول من %1$s دقيقة غير مدعومة بعد. قص المقطع أو قسّمه أولًا.</item>
