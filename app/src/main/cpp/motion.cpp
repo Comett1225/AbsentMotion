@@ -42,18 +42,30 @@ double Integral(const LayerEffect& e, const char* name, const Layer& l, double s
     const double length = (l.endTime - l.startTime) / 1000.0;
     if (a->keys.empty() || !(length > 0)) return a->get(0, 0, fallback) * seconds;
     auto f = [&](double s) { return (double)a->get(0, (float)(s / length), fallback); };
-    std::vector<double> marks = {0};
-    for (const Keyframe& k : a->keys) {
-        const double s = k.t * length;
-        if (s > 0 && s < seconds) marks.push_back(s);
+    std::vector<double> marks = {0, seconds};
+    const auto mark = [&](double s) { if (s > 0 && s < seconds) marks.push_back(s); };
+    for (size_t k = 0; k < a->keys.size(); k++) {
+        const Keyframe& key = a->keys[k];
+        mark(key.t * length);
+        const double step = key.easing.p[0];
+        if (k == 0 || key.easing.type != Easing::kStep || !(step > 0)) continue;
+        const double from = a->keys[k - 1].t * length, span = key.t * length - from;
+        const double rise = std::clamp((double)key.easing.p[1], 0.0, 1.0) * step;
+        const bool reversed = key.easing.reversals & 1;
+        for (int n = 1; n <= 256 && n * step - rise < 1; n++) {
+            for (const double u : {n * step - rise, n * step}) {
+                if (u > 0 && u < 1) mark(from + span * (reversed ? 1 - u : u));
+            }
+        }
     }
-    marks.push_back(seconds);
     std::sort(marks.begin(), marks.end());
+    const double inside = length * 1e-6;
     double sum = 0;
     for (size_t i = 0; i + 1 < marks.size(); i++) {
         const double a0 = marks[i], b = marks[i + 1], h = (b - a0) / 8;
         if (!(h > 0)) continue;
-        double part = f(a0) + f(b);
+        const double in = std::min(inside, h);
+        double part = f(a0 + in) + f(b - in);
         for (int k = 1; k < 8; k++) part += (k % 2 ? 4 : 2) * f(a0 + k * h);
         sum += part * h / 3;
     }

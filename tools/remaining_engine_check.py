@@ -197,6 +197,9 @@ def motion_cases():
     yield 'echo keeps its trail under a camera', engine.scene(echo + EYE), trail, 24
     yield 'echo keeps its trail next to a layer in depth', engine.scene(echo + deep), trail, 24
     yield 'time quantization steps effect time too', engine.scene(dot(fx('timequant', fps=2) + fx('fade', fadeIn=1, fadeOut=0))), [((100, 100), (128, 0, 0))], 20
+    held = '<effect id="absent.spin"><property name="rpm" type="float"><kf t="0" v="0"/><kf t="0.5" v="60" e="step 1 0"/></property></effect>'
+    yield 'a spin held at 0 rpm by a step key has not turned when the key comes', engine.scene(dot(held, 90, 6)), [((185, 95), red), ((15, 105), red)], 15
+    yield 'a spin after a step key turns only from the key on', engine.scene(dot(held, 90, 6)), [((169, 150), red), ((162, 158), black)], 18
 
 
 EYE = '<camera id="9" label="e" startTime="0" endTime="1000"><transform><location value="100,100,-173.2051"/></transform></camera>'
