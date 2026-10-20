@@ -27,7 +27,7 @@ The launcher icon is an own drawing, made by `tools/icon/make_icon.py` (source o
 | --- | --- |
 | Lucide only | 163 |
 | Lucide shapes plus own parts | 8 |
-| Own drawing only | 37 |
+| Own drawing only | 38 |
 | Material Symbols | 0 |
 
 (An icon is one named member of an `*Icons` object, or one icon-drawing composable.)
@@ -158,6 +158,7 @@ The launcher icon is an own drawing, made by `tools/icon/make_icon.py` (source o
 | `ui/export/ExportIcons.kt` | `ChevronRight` | Lucide | `chevron-right` | ISC and MIT (Feather) | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/chevron-right.svg | chevron-right scaled x1.1 |
 | `ui/export/ExportIcons.kt` | `ChevronDown` | Lucide | `chevron-down` | ISC and MIT (Feather) | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/chevron-down.svg | chevron-down scaled x1.1 |
 | `ui/export/ExportIcons.kt` | `Info` | Lucide | `info` | ISC and MIT (Feather) | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/info.svg | - |
+| `ui/export/ExportIcons.kt` | `Help` | own drawing | - | Apache-2.0 (own) | - | circle with a question mark |
 | `ui/export/ExportIcons.kt` | `Video` | Lucide | `clapperboard` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/clapperboard.svg | - |
 | `ui/export/ExportIcons.kt` | `Package` | Lucide | `package` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/package.svg | - |
 | `ui/export/ExportIcons.kt` | `Frame` | Lucide | `image` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/image.svg | - |

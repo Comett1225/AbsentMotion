@@ -14,6 +14,7 @@ internal object ExportIcons {
     val ChevronRight = icon("ChevronRight", "M8.7 18.6L15.3 12L8.7 5.4", 1.5f)
     val ChevronDown = icon("ChevronDown", "M5.4 8.7L12 15.3L18.6 8.7", 1.6f)
     val Info = icon("Info", "M2 12A10 10 0 1 0 22 12A10 10 0 1 0 2 12ZM12 16L12 12M12 8L12.01 8", 1.4f)
+    val Help = icon("Help", "M2 12A10 10 0 1 0 22 12A10 10 0 1 0 2 12ZM9.2 9.4A2.9 2.9 0 0 1 14.8 10.2C14.8 12.1 12 12.5 12 14.3M12 17.6L12.01 17.6", 1.4f)
     val Video = icon("Video", "M12.296 3.464L15.316 7.42M20.2 6L3 11L2.1 8.6C1.8 7.5 2.4 6.4 3.4 6.1L16.9 2.1C18 1.8 19.1 2.4 19.4 3.4ZM3 11L21 11L21 19A2 2 0 0 1 19 21L5 21" +
             "A2 2 0 0 1 3 19ZM6.18 5.276L9.28 9.175", 1.25f)
     val Package = icon("Package", "M11 21.73A2 2 0 0 0 13 21.73L20 17.73A2 2 0 0 0 21 16L21 8A2 2 0 0 0 20 6.27L13 2.27A2 2 0 0 0 11 2.27L4 6.27A2 2 0 0 0 3 8L3 16A2 2 0 0 0 4 17.73Z" +

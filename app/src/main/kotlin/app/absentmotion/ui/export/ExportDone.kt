@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.absentmotion.export.ExportKind
 import app.absentmotion.export.ExportResult
+import app.absentmotion.export.verificationLine
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.enterFade
 import app.absentmotion.ui.theme.presence
@@ -29,6 +30,12 @@ fun DoneScreen(kind: ExportKind, result: ExportResult, onClose: () -> Unit, onSh
             Text("Saved to storage", color = Am.OnNavy, fontSize = 17.sp, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(4.dp))
             Text(result.where, color = Am.OnNavy.copy(alpha = 0.7f), fontSize = 13.sp, textAlign = TextAlign.Center)
+            result.verification?.let { v ->
+                Text(
+                    verificationLine(v), Modifier.padding(top = 2.dp), color = if (v.ok) Am.OnNavy.copy(alpha = 0.7f) else Am.OnNavyAccent,
+                    fontSize = 13.sp, textAlign = TextAlign.Center, maxLines = 3,
+                )
+            }
         }
         Box(Modifier.weight(1f).fillMaxWidth().background(Am.Scrim)) {
             app.absentmotion.platform.ExportMediaPreview(kind, result.uris)

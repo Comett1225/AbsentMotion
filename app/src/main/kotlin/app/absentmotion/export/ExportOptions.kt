@@ -25,9 +25,7 @@ enum class Codec(val label: String, val mime: String, val bitsVsH264: Double) {
     Hevc("H.265/HEVC", "video/hevc", 0.6),
     Av1("AV1", "video/av01", 0.5),
     Vp9("VP9", "video/x-vnd.on2.vp9", 0.65),
-    Apv("APV", "video/apv", 8.0);
-
-    val short get() = label.substringAfter('/')
+    Apv("APV", "video/apv", 8.0),
 }
 
 enum class Container(val label: String, val ext: String, val mime: String) {
@@ -93,10 +91,6 @@ fun ExportSettings.fixedFormat(): ExportSettings {
     return copy(container = container, audio = audio.copy(codec = audioCodec))
 }
 
-val AvailableCodecs: List<Codec> by lazy {
-    app.absentmotion.platform.availableCodecs()
-}
-
 enum class ImageKind(val label: String, val ext: String, val mime: String, val alpha: Boolean, val lossy: Boolean, val bytesPerPixel: Double) {
     Png("PNG", "png", "image/png", true, false, 0.8),
     Jpeg("JPEG", "jpg", "image/jpeg", false, true, 0.2),
@@ -155,8 +149,6 @@ fun videoBitrate(width: Int, height: Int, s: ExportSettings): Int {
     return (width.toDouble() * height * s.fps * bitsPerPixel).coerceAtMost(Int.MAX_VALUE.toDouble()).roundToInt()
 }
 
-const val AudioBitrate = 128_000
-
 fun audioRate(s: ExportSettings): Int = if (s.audioFormat == AudioFormat.Ogg) 48000 else s.audio.sampleRate
 
 fun audioBytesPerSecond(s: ExportSettings): Double = when (s.audioFormat) {
@@ -169,12 +161,12 @@ fun audioBytesPerSecond(s: ExportSettings): Double = when (s.audioFormat) {
 const val GifBytesPerPixel = 0.6
 
 fun optionNote(kind: ExportKind, scene: Scene, s: ExportSettings): String? = when (kind) {
-    ExportKind.Video -> "${s.container.label} ${if (s.codec == Codec.H264) "" else s.codec.short + " "}${resolutionLabel(s.shortSide)} ${s.fps}fps"
+    ExportKind.Video -> "${s.container.label} ${if (s.codec == Codec.H264) "" else s.codec.shortName + " "}${resolutionLabel(s.shortSide)} ${s.fps}fps"
     ExportKind.Sequence -> "${s.image.label} ${resolutionLabel(s.shortSide)} ${s.fps}fps"
     ExportKind.Gif -> exportSize(scene, s.shortSide, false).let { "${it.first}x${it.second} ${s.fps}fps" }
     ExportKind.Package -> "Keeping Original Media"
     ExportKind.Xml -> "for workflow integrations"
-    ExportKind.Audio -> s.audioFormat.label + if (s.audioFormat.lossless) " ${audioRate(s) / 1000.0} kHz" else " ${s.audio.bitrateKbps} kbps"
+    ExportKind.Audio -> audioOnlySummary(s)
     ExportKind.Frame -> null
     ExportKind.FrameAs -> s.image.label + if (s.image.lossy) " ${s.imageQuality}%" else ""
 }

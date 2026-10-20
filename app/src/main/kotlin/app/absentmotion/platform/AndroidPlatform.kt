@@ -31,10 +31,6 @@ object ActivityResultContracts {
 @androidx.compose.runtime.Composable
 fun <I, O> rememberLauncherForActivityResult(contract: androidx.activity.result.contract.ActivityResultContract<I, O>, onResult: (O) -> Unit) =
     androidx.activity.compose.rememberLauncherForActivityResult(contract, onResult)
-fun availableCodecs(): List<app.absentmotion.export.Codec> {
-    val supported = android.media.MediaCodecList(android.media.MediaCodecList.REGULAR_CODECS).codecInfos.filter { it.isEncoder }.flatMap { it.supportedTypes.asList() }
-    return app.absentmotion.export.Codec.entries.filter { it.mime in supported }
-}
 @androidx.compose.runtime.Composable
 fun appVersion(): String {
     val context = LocalContext.current
