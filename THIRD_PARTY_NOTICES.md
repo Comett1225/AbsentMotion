@@ -167,8 +167,10 @@ together with Skia.
 
 ### LAME
 
-- Version: 3.100, the unmodified `libmp3lame` sources and `include/lame.h` from the 3.100 release, vendored in
-  `third_party/lame` together with its `COPYING`, `LICENSE` and `README`.
+- Version: 3.100, the `libmp3lame` sources and `include/lame.h` from the 3.100 release (lame-3.100.tar.gz, SHA-256
+  `ddfe36cab873794038ae2c1210557ad34857a4b6bdc515785d1da9e175b1da1e`), vendored in `third_party/lame` together with its
+  `COPYING`, `LICENSE` and `README`. One change: in `libmp3lame/util.c` the Linux floating-point control block is skipped on
+  Android (`&& !defined(__ANDROID__)`), and two lines lost trailing spaces. All other files are unchanged.
 - Licence: GNU Library General Public License, version 2 or later (LGPL; text in appendix A.14).
 - Copyright: Copyright (c) 1999-2017 Mike Cheng, Mark Taylor, Robert Hegemann, Takehiro Tominaga, Gabriel Bouvigne,
   Alexander Leidinger, Naoki Shibata, Albert L. Faber and the other LAME authors named in the source file headers.
