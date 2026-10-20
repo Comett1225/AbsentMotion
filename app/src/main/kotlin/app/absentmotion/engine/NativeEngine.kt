@@ -45,8 +45,8 @@ class NativeEngine(backend: Backend) : AutoCloseable {
         view: PreviewView,
     ): Int = nativeRenderScene(
         handle, target, timeMs, scale, dx, dy, background, selectedId, handles,
-        view.pixels, if (view.lowQuality) 2 else 1, view.gridSpacing, view.solo, view.soloIds.takeIf { it.isNotEmpty() }?.toLongArray(),
-        view.guides.flatMap { listOf(if (it.vertical) 1f else 0f, it.at, if (it.wide) 1f else 0f) }.toFloatArray(),
+        view.pixels, view.divisor, view.gridSpacing, view.solo, view.soloIds.takeIf { it.isNotEmpty() }?.toLongArray(),
+        view.guides.flatMap { listOf(if (it.vertical) 1f else 0f, it.at, if (it.wide) 1f else 0f) }.toFloatArray(), view.refPx,
     )
 
     fun setCameraView(on: Boolean) = nativeSetCameraView(handle, on)
@@ -98,7 +98,7 @@ class NativeEngine(backend: Backend) : AutoCloseable {
         @JvmStatic private external fun nativeRenderScene(
             engine: Long, target: Long, timeMs: Double, scale: Float, dx: Float, dy: Float, background: Int,
             selectedId: Long, handles: Int, pixels: Boolean, pixelDivisor: Int, gridSpacing: Float, solo: Int, soloIds: LongArray?,
-            guides: FloatArray,
+            guides: FloatArray, refPx: Float,
         ): Int
         @JvmStatic private external fun nativeSetCameraView(engine: Long, on: Boolean)
         @JvmStatic private external fun nativeRenderFrame(

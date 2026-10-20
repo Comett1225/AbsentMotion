@@ -151,7 +151,7 @@ fun PresetScreen(state: EditorState) {
             Modifier.padding(horizontal = 16.dp).fillMaxWidth().height(352.dp).clip(RowShape).background(Am.PreviewBg)
                 .onSizeChanged { box = it }.clickable { playing = !playing },
         ) {
-            app.absentmotion.platform.SceneSurface(state.engine, false, box, Modifier.fillMaxSize())
+            app.absentmotion.platform.SceneSurface(state.engine, 1, box, Modifier.fillMaxSize())
             if (!playing) Box(Modifier.align(Alignment.Center).size(56.dp).clip(CircleShape).background(Color(0x66000000)), Alignment.Center) {
                 Icon(ChromeIcons.Play, "Play", Modifier.size(32.dp), tint = Color.White)
             }

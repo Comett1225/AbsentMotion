@@ -41,7 +41,7 @@ fun appVersion(): String {
     return androidx.compose.runtime.remember { runCatching { context.packageManager.getPackageInfo(context.packageName, android.content.pm.PackageManager.PackageInfoFlags.of(0)).versionName }.getOrNull().orEmpty() }
 }
 @androidx.compose.runtime.Composable
-fun SceneSurface(engine: app.absentmotion.engine.EngineThread, lowQuality: Boolean, size: androidx.compose.ui.unit.IntSize, modifier: androidx.compose.ui.Modifier, onView: (Any) -> Unit = {}) {
+fun SceneSurface(engine: app.absentmotion.engine.EngineThread, divisor: Int, size: androidx.compose.ui.unit.IntSize, modifier: androidx.compose.ui.Modifier, onView: (Any) -> Unit = {}) {
     androidx.compose.ui.viewinterop.AndroidView(modifier = modifier, factory = { context ->
         android.view.SurfaceView(context).apply {
             onView(this)
@@ -52,7 +52,7 @@ fun SceneSurface(engine: app.absentmotion.engine.EngineThread, lowQuality: Boole
             })
         }
     }, update = { view ->
-        if (lowQuality && size.width > 0) view.holder.setFixedSize((size.width / 2).coerceAtLeast(1), (size.height / 2).coerceAtLeast(1))
+        if (divisor > 1 && size.width > 0) view.holder.setFixedSize((size.width / divisor).coerceAtLeast(1), (size.height / divisor).coerceAtLeast(1))
         else view.holder.setSizeFromLayout()
     })
 }

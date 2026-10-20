@@ -12,7 +12,7 @@ import androidx.compose.runtime.setValue
 class AppSettings(private val context: Context) {
     private val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
 
-    private var lowQualityPreviewState by mutableStateOf(prefs.getBoolean("lowQualityPreview", false))
+    private var previewQualityState by mutableStateOf(PreviewQuality.of(prefs.getString("previewQuality", null), prefs.getBoolean("lowQualityPreview", false)))
     private var defaultLayerDurationState by mutableIntStateOf(prefs.getInt("defaultLayerDuration", 2))
     private var sortByState by mutableStateOf(prefs.getString("sortBy", "date")!!)
     private var audioResamplingState by mutableIntStateOf(prefs.getInt("audioResampling", 2))
@@ -30,9 +30,9 @@ class AppSettings(private val context: Context) {
         prefs.getString("savedColours", null)?.split(',')?.mapNotNull { it.toIntOrNull() } ?: listOf(0x264653, 0x2A9D8F, 0xE9C46A, 0xE76F51),
     )
 
-    var lowQualityPreview: Boolean
-        get() = lowQualityPreviewState
-        set(value) { lowQualityPreviewState = value; prefs.edit().putBoolean("lowQualityPreview", value).apply() }
+    var previewQuality: PreviewQuality
+        get() = previewQualityState
+        set(value) { previewQualityState = value; prefs.edit().putString("previewQuality", value.name).apply() }
 
     var defaultLayerDuration: Int
         get() = defaultLayerDurationState
@@ -102,6 +102,14 @@ class AppSettings(private val context: Context) {
 
     companion object {
         val LAYER_DURATIONS = listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30, 45, 60)
+    }
+}
+
+enum class PreviewQuality(val divisor: Int) {
+    Full(1), Half(2), Quarter(4);
+
+    companion object {
+        fun of(stored: String?, draft: Boolean): PreviewQuality = entries.firstOrNull { it.name == stored } ?: if (draft) Half else Full
     }
 }
 

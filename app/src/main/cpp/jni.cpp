@@ -123,10 +123,11 @@ JNIEXPORT jint JNICALL JNI_FN(nativeRenderScene)(JNIEnv* env, jclass, jlong engi
                                                  jfloat scale, jfloat dx, jfloat dy, jint background,
                                                  jlong selectedId, jint handles, jboolean pixels, jint pixelDivisor,
                                                  jfloat gridSpacing, jint solo, jlongArray soloIds,
-                                                 jfloatArray guides) {
+                                                 jfloatArray guides, jfloat refPx) {
     am::PreviewOptions view;
     view.pixels = pixels;
     view.pixelDivisor = pixelDivisor;
+    view.refPx = refPx;
     view.gridSpacing = gridSpacing;
     view.solo = solo;
     if (soloIds) {

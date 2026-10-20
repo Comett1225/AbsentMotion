@@ -262,7 +262,7 @@ fun TemplateEditor(templateId: String, engine: EngineThread, settings: AppSettin
         Spacer(Modifier.height(16.dp))
         Box(Modifier.padding(horizontal = 16.dp).fillMaxWidth().weight(1f).clip(Rounded).background(Am.PreviewBg).onSizeChanged { box = it }
             .clickable(enabled = clip == null) { playing = !playing }) {
-            app.absentmotion.platform.SceneSurface(engine, false, box, Modifier.fillMaxSize())
+            app.absentmotion.platform.SceneSurface(engine, 1, box, Modifier.fillMaxSize())
             if (clip == null && !playing) Box(Modifier.align(Alignment.Center).size(56.dp).clip(CircleShape).background(Color(0x66000000)), Alignment.Center) {
                 Icon(ChromeIcons.Play, "Play", Modifier.size(32.dp), tint = Color.White)
             }

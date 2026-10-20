@@ -55,6 +55,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.absentmotion.ai.CaptionModel
 import app.absentmotion.library.AppSettings
+import app.absentmotion.library.PreviewQuality
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.editor.panels.ThinSwitch
 
@@ -78,7 +79,6 @@ fun SettingsDrawer(settings: AppSettings) {
                 color = Am.HomeInk, fontSize = 18.sp, fontWeight = FontWeight.Bold,
             )
             Column(Modifier.padding(horizontal = 6.dp).fillMaxWidth().clip(PanelShape).background(PanelColor)) {
-                SwitchRow("Draft Quality Preview", settings.lowQualityPreview, enabled = true) { settings.lowQualityPreview = it }
                 SwitchRow("Demo Mode", settings.demoMode, enabled = true) { settings.demoMode = it; demoNote = it }
                 SwitchRow("Open XML Projects", settings.xmlUpload, enabled = true) { settings.xmlUpload = it }
                 SwitchRow("Trim Limit Vibration", settings.trimLimitVibration, enabled = true) { settings.trimLimitVibration = it }
@@ -92,7 +92,15 @@ fun SettingsDrawer(settings: AppSettings) {
                     "Playback Resampling", Modifier.padding(start = 10.dp), color = Am.HomeMid, fontSize = 13.sp, lineHeight = 18.sp,
                 )
                 Spacer(Modifier.height(10.dp))
-                ResamplingChoices(settings)
+                Choices(listOf("LOW", "HIGH", "ULTRA"), settings.audioResampling) { settings.audioResampling = it }
+                Spacer(Modifier.height(8.dp))
+                Divider(10.dp)
+                Spacer(Modifier.height(6.dp))
+                Text(
+                    "Preview Quality", Modifier.padding(start = 10.dp), color = Am.HomeMid, fontSize = 13.sp, lineHeight = 18.sp,
+                )
+                Spacer(Modifier.height(10.dp))
+                Choices(PreviewQuality.entries.map { it.name.uppercase() }, settings.previewQuality.ordinal) { settings.previewQuality = PreviewQuality.entries[it] }
                 Spacer(Modifier.height(8.dp))
             }
             Spacer(Modifier.height(15.dp))
@@ -244,13 +252,13 @@ private fun readThemeText(context: Context, uri: Uri): String {
 }
 
 @Composable
-private fun ResamplingChoices(settings: AppSettings) {
+private fun Choices(labels: List<String>, chosen: Int, onPick: (Int) -> Unit) {
     val shape = RoundedCornerShape(6.dp)
     Row(Modifier.padding(horizontal = 10.dp).fillMaxWidth().height(38.dp).background(Am.Card, shape).padding(3.dp)) {
-        for ((index, label) in listOf("LOW", "HIGH", "ULTRA").withIndex().map { it.index to it.value }) {
-            val selected = index == settings.audioResampling
+        for ((index, label) in labels.withIndex()) {
+            val selected = index == chosen
             Box(
-                Modifier.weight(1f).fillMaxHeight().background(if (selected) Am.Navy else Color.Transparent, shape).clickable { settings.audioResampling = index },
+                Modifier.weight(1f).fillMaxHeight().background(if (selected) Am.Navy else Color.Transparent, shape).clickable { onPick(index) },
                 contentAlignment = Alignment.Center,
             ) {
                 Text(label, color = if (selected) Am.OnNavyAccent else Am.Navy, fontSize = 14.sp, fontWeight = FontWeight.Medium)

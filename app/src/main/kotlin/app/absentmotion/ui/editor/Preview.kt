@@ -82,8 +82,8 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier) {
     val scale = if (size.width == 0) 1f else min(size.width.toFloat() / scene.width, size.height.toFloat() / scene.height) * viewZoom
     val dx = size.width / 2 - (scene.width / 2 - viewPan.x) * scale
     val dy = size.height / 2 - (scene.height / 2 - viewPan.y) * scale
-    val lowQuality = state.settings.lowQualityPreview
-    val quality = if (lowQuality) 0.5f else 1f
+    val divisor = state.settings.previewQuality.divisor
+    val quality = 1f / divisor
     val selection = if (MultiSelect.ids.isNotEmpty()) MultiSelect.ids.toList() else listOfNotNull(state.selectedId)
     val refPx = if (LocalWide.current) LocalDensity.current.density * PhoneWidth.value / 1080f else 0f
 
@@ -105,7 +105,7 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier) {
             state.engine.setView(
                 PreviewView(
                     state.timeMs, scale * quality, dx * quality, dy * quality, shown, handles,
-                    pixels = state.pixelMode, lowQuality = lowQuality, gridSpacing = if (state.gridMode) state.gridSpacing.toFloat() else 0f,
+                    pixels = state.pixelMode, divisor = divisor, gridSpacing = if (state.gridMode) state.gridSpacing.toFloat() else 0f,
                     solo = state.soloMode, soloIds = selection, camera = state.cameraMode, guides = state.snapGuides, refPx = refPx * quality,
                 ),
             )
@@ -131,7 +131,7 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier) {
     val currentOffset by rememberUpdatedState(Offset(dx, dy))
 
     Box(modifier.background(Am.PreviewBg).onSizeChanged { size = it }) {
-        app.absentmotion.platform.SceneSurface(state.engine, lowQuality, size, Modifier.fillMaxSize()) { state.previewSurface = it }
+        app.absentmotion.platform.SceneSurface(state.engine, divisor, size, Modifier.fillMaxSize()) { state.previewSurface = it }
         Box(
             Modifier.fillMaxSize().pointerInput(state) {
                 var lastTwoFingerTap = -1_000_000L
