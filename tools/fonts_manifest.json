@@ -1,0 +1,3012 @@
+{
+ "builtin": {
+  "Abril Fatface": {
+   "category": 3,
+   "dir": "ofl/abrilfatface",
+   "files": {
+    "AbrilFatface/AbrilFatface-Regular.ttf": {
+     "bytes": 67364,
+     "italic": 0,
+     "modified": false,
+     "sha256": "5971d4a3758a922a9fedc7f6fb825a96341a2e718c45a4b2c9a6b417c8c4dbe9",
+     "source": "AbrilFatface-Regular.ttf",
+     "sourceSha256": "5971d4a3758a922a9fedc7f6fb825a96341a2e718c45a4b2c9a6b417c8c4dbe9",
+     "variable": false,
+     "weights": [
+      400
+     ]
+    }
+   },
+   "languages": [
+    22,
+    23
+   ],
+   "licence": "OFL.txt",
+   "licenceSha256": "aba8997e16b1e3888c6e855ba883c70d96bd4375bff8cb9c7ce0f097200f74b8",
+   "popularity": 177
+  },
+  "Alfa Slab One": {
+   "category": 3,
+   "dir": "ofl/alfaslabone",
+   "files": {
+    "AlfaSlabOne/AlfaSlabOne-Regular.ttf": {
+     "bytes": 97376,
+     "italic": 0,
+     "modified": false,
+     "sha256": "28664afa698a3393bd5a29eec750230a0645c5301d62200e5f2d3a027fb2299d",
+     "source": "AlfaSlabOne-Regular.ttf",
+     "sourceSha256": "28664afa698a3393bd5a29eec750230a0645c5301d62200e5f2d3a027fb2299d",
+     "variable": false,
+     "weights": [
+      400
+     ]
+    }
+   },
+   "languages": [
+    22,
+    23,
+    33
+   ],
+   "licence": "OFL.txt",
+   "licenceSha256": "e315abc82a78710c7242e2f2e6529651fd631d4d50e6ad98ea194f9b54c3d701",
+   "popularity": 113
+  },
+  "Amatic SC": {
+   "category": 4,
+   "dir": "ofl/amaticsc",
+   "files": {
+    "AmaticSC/AmaticSC-Bold.ttf": {
+     "bytes": 81856,
+     "italic": 0,
+     "modified": true,
+     "sha256": "ab368fb84763c8fc3a9f1f2be1c3358993286d8ca586da295d2ce17f1d09f11b",
+     "source": "AmaticSC-Bold.ttf",
+     "sourceSha256": "d367beadee66efbb657d24d3d8f30f3b60633e9d5c8ded7385541cf775cabb4d",
+     "variable": false,
+     "weights": [
+      700
+     ]
+    },
+    "AmaticSC/AmaticSC-Regular.ttf": {
+     "bytes": 83580,
+     "italic": 0,
+     "modified": true,
+     "sha256": "b3f353ca529b38e8124d8d1e3e9d568c0ec70fd108871b44de254d9e680e8e0c",
+     "source": "AmaticSC-Regular.ttf",
+     "sourceSha256": "513a76f96d39a5366bd27c258674aaea35ee51c42b8f3060387f74649ee8c8aa",
+     "variable": false,
+     "weights": [
+      400
+     ]
+    }
+   },
+   "languages": [
+    7,
+    22,
+    23,
+    33
+   ],
+   "licence": "OFL.txt",
+   "licenceSha256": "301f77908df2b00141b4dcea50cc1a586c3afcee78843bd811088e8263623f9d",
+   "popularity": 259
+  },
+  "Anton": {
+   "category": 3,
+   "dir": "ofl/anton",
+   "files": {
+    "Anton/Anton-Regular.ttf": {
+     "bytes": 90328,
+     "italic": 0,
+     "modified": true,
+     "sha256": "5a2f232145fee58e28bc250e363289cc84295f8aebca58fea259a4ff713d137a",
+     "source": "Anton-Regular.ttf",
+     "sourceSha256": "a4ba3a92350ebb031da0cb47630ac49eb265082ca1bc0450442f4a83ab947cab",
+     "variable": false,
+     "weights": [
+      400
+     ]
+    }
+   },
+   "languages": [
+    22,
+    23,
+    33
+   ],
+   "licence": "OFL.txt",
+   "licenceSha256": "ee67e6ee22790b7929f1a3769ca2801d565c64b5a9096942c1adf5596de9c9e4",
+   "popularity": 79
+  },
+  "Bangers": {
+   "category": 3,
+   "dir": "ofl/bangers",
+   "files": {
+    "Bangers/Bangers-Regular.ttf": {
+     "bytes": 61732,
+     "italic": 0,
+     "modified": true,
+     "sha256": "ee804509e81436e7f7d708f5f4a0cd8dfffd2ffbe15d4963e86d063ca9602141",
+     "source": "Bangers-Regular.ttf",
+     "sourceSha256": "4160a7311de9342674cce9160cde9fcbb30f48190397d86ff1b70b455af65824",
+     "variable": false,
+     "weights": [
+      400
+     ]
+    }
+   },
+   "languages": [
+    22,
+    23,
+    33
+   ],
+   "licence": "OFL.txt",
+   "licenceSha256": "630dd5a307c0657b094d324e069b390edf90182fe5003639e06c02a0e5769af7",
+   "popularity": 269
+  },
+  "Bebas Neue": {
+   "category": 3,
+   "dir": "ofl/bebasneue",
+   "files": {
+    "BebasNeue/BebasNeue-Regular.ttf": {
+     "bytes": 33516,
+     "italic": 0,
+     "modified": true,
+     "sha256": "7812e763c6531c00f08377e5bfdd75231a4bc2bffc27f8b8cf620a50b2c12d39",
+     "source": "BebasNeue-Regular.ttf",
+     "sourceSha256": "08e4623805102d819f58601e46e345648846075e363b2ceb23313c2d1c83ec73",
+     "variable": false,
+     "weights": [
+      400
+     ]
+    }
+   },
+   "languages": [
+    22,
+    23
+   ],
+   "licence": "OFL.txt",
+   "licenceSha256": "72082f6cb4d04be2ecf7cc7d9e1e7d73787f0af8a5a278a47cade70c16b78341",
+   "popularity": 41
+  },
+  "Bitter": {
+   "category": 2,
+   "dir": "ofl/bitter",
+   "files": {
+    "Bitter/Bitter-Variable.ttf": {
+     "bytes": 328636,
+     "italic": 0,
+     "modified": false,
+     "sha256": "ef2b9a711fb02f1e5823b34da1b7450e0fc76793b7d733a8b41006e24916d4a7",
+     "source": "Bitter[wght].ttf",
+     "sourceSha256": "ef2b9a711fb02f1e5823b34da1b7450e0fc76793b7d733a8b41006e24916d4a7",
+     "variable": true,
+     "weights": [
+      400,
+      700
+     ]
+    }
+   },
+   "languages": [
+    7,
+    22,
+    23,
+    33
+   ],
+   "licence": "OFL.txt",
+   "licenceSha256": "152a1e283e23b42c4940da4c72f2f5bebaa17969cb77c76d7af05903846006f1",
+   "popularity": 97
+  },
+  "Black Ops One": {
+   "category": 3,
+   "dir": "ofl/blackopsone",
+   "files": {
+    "BlackOpsOne/BlackOpsOne-Regular.ttf": {
+     "bytes": 117320,
+     "italic": 0,
+     "modified": true,
+     "sha256": "c4b719d474d64214d436cffd380440b6a307e319ad042e56eb9d31095db0b743",
+     "source": "BlackOpsOne-Regular.ttf",
+     "sourceSha256": "282a825b5f294377387e3969f765408157dbea8da0f5d0aae68c6bc704b145b3",
+     "variable": false,
+     "weights": [
+      400
+     ]
+    }
+   },
+   "languages": [
+    22,
+    23
+   ],
+   "licence": "OFL.txt",
+   "licenceSha256": "f67ca4a200424868ee8fcd5464d7b35ac1cbf7723f6bfdbd19a8524689fab9a8",
+   "popularity": 67
+  },
+  "Bungee": {
+   "category": 3,
+   "dir": "ofl/bungee",
+   "files": {
+    "Bungee/Bungee-Regular.ttf": {
+     "bytes": 99824,
+     "italic": 0,
+     "modified": true,
+     "sha256": "99b8196b41bca04eb86673131961886dc1c1aa0208707ebc59a5d3c44062fe99",
+     "source": "Bungee-Regular.ttf",
+     "sourceSha256": "c4f5361ce120af3e6b9156d0bf379fa19cda2ea0cd18ac01fd99596c6bf66e3f",
+     "variable": false,
+     "weights": [
+      400
+     ]
+    }
+   },
+   "languages": [
+    22,
+    23,
+    33
+   ],
+   "licence": "OFL.txt",
+   "licenceSha256": "d5787a50dde5be6c6daecab9ed459939b1bc37cff0d0e00257eaf1ec2cf4c16c",
+   "popularity": 145
+  },
+  "Cairo": {
+   "category": 1,
+   "dir": "ofl/cairo",
+   "files": {
+    "Cairo/Cairo-Bold.ttf": {
+     "bytes": 84404,
+     "italic": 0,
+     "modified": true,
+     "sha256": "fbd50a6e573edb18ed6c90e160e8cfd685cf162f05fbba50564a5193bf4f571b",
+     "source": "Cairo[slnt,wght].ttf",
+     "sourceSha256": "667c987182391c91f4e57a2f455b1794fb5e3ee6ca4ef3383e86bb690fa9c964",
+     "variable": false,
+     "weights": [
+      700
+     ]
+    },
+    "Cairo/Cairo-Regular.ttf": {
+     "bytes": 84336,
+     "italic": 0,
+     "modified": true,
+     "sha256": "0ee8decc334e9ff3b40a764270722c744afdae5b3ac06e97a6128d2a15a2390e",
+     "source": "Cairo[slnt,wght].ttf",
+     "sourceSha256": "667c987182391c91f4e57a2f455b1794fb5e3ee6ca4ef3383e86bb690fa9c964",
+     "variable": false,
+     "weights": [
+      400
+     ]
+    }
+   },
+   "languages": [
+    1,
+    22,
+    23
+   ],
+   "licence": "OFL.txt",
+   "licenceSha256": "a4554e1799d42e1405924b61eb0e0722ae1623b1f1f07f995348f96c496362a9",
+   "popularity": 91
+  },
+  "Caveat": {
+   "category": 4,
+   "dir": "ofl/caveat",
+   "files": {
+    "Caveat/Caveat-Bold.ttf": {
+     "bytes": 210272,
+     "italic": 0,
+     "modified": true,
+     "sha256": "dc24f311cb5df559f3ba9887789a6c20eac0e17057a86904dbb28ec08b8f3314",
+     "source": "Caveat[wght].ttf",
+     "sourceSha256": "0bdb6b660482d31531b3945849fba5916b3ef8695da7024a9e6b9ee3c4157988",
+     "variable": false,
+     "weights": [
+      700
+     ]
+    },
+    "Caveat/Caveat-Regular.ttf": {
+     "bytes": 210096,
+     "italic": 0,
+     "modified": true,
+     "sha256": "449cf456788d01f591ab1b7285a3d8b68bfb2428870371c7b659de7dcf35c858",
+     "source": "Caveat[wght].ttf",
+     "sourceSha256": "0bdb6b660482d31531b3945849fba5916b3ef8695da7024a9e6b9ee3c4157988",
+     "variable": false,
+     "weights": [
+      400
+     ]
+    }
+   },
+   "languages": [
+    7,
+    22,
+    23
+   ],
+   "licence": "OFL.txt",
+   "licenceSha256": "1f9d81d094273d82f3898a1ee8b598a717d050ecbf5ff7bede105b704880157b",
+   "popularity": 106
+  },
+  "Cinzel": {
+   "category": 2,
+   "dir": "ofl/cinzel",
+   "files": {
+    "Cinzel/Cinzel-Bold.ttf": {
+     "bytes": 70532,
+     "italic": 0,
+     "modified": true,
+     "sha256": "b8bbdee87ada08f103ed07adbbb3a7ed22feaff15e74d8d97a55983975ef310a",
+     "source": "Cinzel[wght].ttf",
+     "sourceSha256": "f4d83d34d1f6c741193e4acf4b3dff9531e5a67b6aa65228d00a7db72a4e0f34",
+     "variable": false,
+     "weights": [
+      700
+     ]
+    },
+    "Cinzel/Cinzel-Regular.ttf": {
+     "bytes": 70140,
+     "italic": 0,
+     "modified": true,
+     "sha256": "a507489fd68c03acbd6e4560722f4f1ade8174b5afd6d6452aff1a40bca10574",
+     "source": "Cinzel[wght].ttf",
+     "sourceSha256": "f4d83d34d1f6c741193e4acf4b3dff9531e5a67b6aa65228d00a7db72a4e0f34",
+     "variable": false,
+     "weights": [
+      400
+     ]
+    }
+   },
+   "languages": [
+    22,
+    23
+   ],
+   "licence": "OFL.txt",
+   "licenceSha256": "f2b3029aba64c378bf0963b62945eee15e564fe4330b934c8f2eb058282b5e83",
+   "popularity": 131
+  },
+  "Comfortaa": {
+   "category": 3,
+   "dir": "ofl/comfortaa",
+   "files": {
+    "Comfortaa/Comfortaa-Variable.ttf": {
+     "bytes": 201756,
+     "italic": 0,
+     "modified": false,
+     "sha256": "0fc3f45dc48b614db9c39181502544b37217ecbf8bee2fb35886992bc96c5bd3",
+     "source": "Comfortaa[wght].ttf",
+     "sourceSha256": "0fc3f45dc48b614db9c39181502544b37217ecbf8bee2fb35886992bc96c5bd3",
+     "variable": true,
+     "weights": [
+      400,
+      700
+     ]
+    }
+   },
+   "languages": [
+    7,
+    22,
+    23,
+    33
+   ],
+   "licence": "OFL.txt",
+   "licenceSha256": "bc85bae0b512b799bbfb2b916e4d0a34cfd963d09778cd783e248b479e67760a",
+   "popularity": 152
+  },
+  "DM Sans": {
+   "category": 1,
+   "dir": "ofl/dmsans",
+   "files": {
+    "DMSans/DMSans-Bold.ttf": {
+     "bytes": 51048,
+     "italic": 0,
+     "modified": true,
+     "sha256": "288c16ba71fbfa92d428f275125bcb8e5bf96e926fcc36d5f2b27c7bcecdad93",
+     "source": "DMSans[opsz,wght].ttf",
+     "sourceSha256": "8cd08d97e89c24d0aa92edd2f0f4c8ee6195eee9b7c9f154865a58b02f0c1c0d",
+     "variable": false,
+     "weights": [
+      700
+     ]
+    },
+    "DMSans/DMSans-Regular.ttf": {
+     "bytes": 50936,
+     "italic": 0,
+     "modified": true,
+     "sha256": "094625874626d7cafa82ce9b53d383c66001852fd8fcd4de5f5f3a8b73507afe",
+     "source": "DMSans[opsz,wght].ttf",
+     "sourceSha256": "8cd08d97e89c24d0aa92edd2f0f4c8ee6195eee9b7c9f154865a58b02f0c1c0d",
+     "variable": false,
+     "weights": [
+      400
+     ]
+    }
+   },
+   "languages": [
+    22,
+    23
+   ],
+   "licence": "OFL.txt",
+   "licenceSha256": "9af36190332437f5ecd09974de43c1f7c77a310a996cdd8ceb25628b458840e1",
+   "popularity": 21
+  },
+  "DM Serif Display": {
+   "category": 2,
+   "dir": "ofl/dmserifdisplay",
+   "files": {
+    "DMSerifDisplay/DMSerifDisplay-Regular.ttf": {
+     "bytes": 76580,
+     "italic": 0,
+     "modified": false,
+     "sha256": "8cc3643535edf039aa5d95440a8542735e9197e4f4b8d9303e980fefbf5ab616",
+     "source": "DMSerifDisplay-Regular.ttf",
+     "sourceSha256": "8cc3643535edf039aa5d95440a8542735e9197e4f4b8d9303e980fefbf5ab616",
+     "variable": false,
+     "weights": [
+      400
+     ]
+    }
+   },
+   "languages": [
+    22,
+    23
+   ],
+   "licence": "OFL.txt",
+   "licenceSha256": "a3e5cdd67d4571dd0a24fcc968de0efde7ae97ef752daf0906e4767619dd7231",
+   "popularity": 105
+  },
+  "Dancing Script": {
+   "category": 4,
+   "dir": "ofl/dancingscript",
+   "files": {
+    "DancingScript/DancingScript-Variable.ttf": {
+     "bytes": 133636,
+     "italic": 0,
+     "modified": false,
+     "sha256": "21808625578fe8d8cd10cb684be546dca077b27cd03a53a2f1ec11dc743c924c",
+     "source": "DancingScript[wght].ttf",
+     "sourceSha256": "21808625578fe8d8cd10cb684be546dca077b27cd03a53a2f1ec11dc743c924c",
+     "variable": true,
+     "weights": [
+      400,
+      700
+     ]
+    }
+   },
+   "languages": [
+    22,
+    23,
+    33
+   ],
+   "licence": "OFL.txt",
+   "licenceSha256": "6f090277c00af96651ce6dbcc38ff1591047a3bffef486e80b6a32e8276a8201",
+   "popularity": 80
+  },
+  "Fredoka": {
+   "category": 1,
+   "dir": "ofl/fredoka",
+   "files": {
+    "Fredoka/Fredoka-Bold.ttf": {
+     "bytes": 37924,
+     "italic": 0,
+     "modified": true,
+     "sha256": "42a30bf6cd9a45d2ad4ff9eda9fa209274ddc5ac4bd1d0884f6788587b6dfa08",
+     "source": "Fredoka[wdth,wght].ttf",
+     "sourceSha256": "2ba02e68b152868aef9ba28e24b3648c7d457fe6f25c761f2c2c53fb61a73fc8",
+     "variable": false,
+     "weights": [
+      700
+     ]
+    },
+    "Fredoka/Fredoka-Regular.ttf": {
+     "bytes": 38096,
+     "italic": 0,
+     "modified": true,
+     "sha256": "4c431b7fdcebbb6c983d1a765a94c6f5bad8d0572df9f8c133eda1835ef59e6c",
+     "source": "Fredoka[wdth,wght].ttf",
+     "sourceSha256": "2ba02e68b152868aef9ba28e24b3648c7d457fe6f25c761f2c2c53fb61a73fc8",
+     "variable": false,
+     "weights": [
+      400
+     ]
+    }
+   },
+   "languages": [
+    22
+   ],
+   "licence": "OFL.txt",
+   "licenceSha256": "5c9e7eee5c6b25f4b05b8d53b2e470ea4962f9ced742d044a98f7d95d1375bab",
+   "popularity": 123
+  },
+  "Great Vibes": {
+   "category": 4,
+   "dir": "ofl/greatvibes",
+   "files": {
+    "GreatVibes/GreatVibes-Regular.ttf": {
+     "bytes": 255632,
+     "italic": 0,
+     "modified": true,
+     "sha256": "47604278320560dbba97b14ac97fe05ac70bb1a35776bf1c502f0c62f37d825f",
+     "source": "GreatVibes-Regular.ttf",
+     "sourceSha256": "8d509802186f1b51572531ecf313e8098f9a5bfdfaca93f0c9b34467f9982d15",
+     "variable": false,
+     "weights": [
+      400
+     ]
+    }
+   },
+   "languages": [
+    7,
+    22,
+    23,
+    33
+   ],
+   "licence": "OFL.txt",
+   "licenceSha256": "61093a21f5e63dedf54222b3c09997e54c0fe43e3851d21386e02ddcbc246d49",
+   "popularity": 171
+  },
+  "Hind": {
+   "category": 1,
+   "dir": "ofl/hind",
+   "files": {
+    "Hind/Hind-Bold.ttf": {
+     "bytes": 135848,
+     "italic": 0,
+     "modified": true,
+     "sha256": "1231903b50c9b819545f2cf221dc17f575fa231c1edc89d56efe69053376d575",
+     "source": "Hind-Bold.ttf",
+     "sourceSha256": "330c54396bc27628c32e69b88654e41065722182c6f33b936a2a46d72c9d6774",
+     "variable": false,
+     "weights": [
+      700
+     ]
+    },
+    "Hind/Hind-Regular.ttf": {
+     "bytes": 138248,
+     "italic": 0,
+     "modified": true,
+     "sha256": "4fd6ce835d34af37cc0427ef715f66194b315d401f173495f518b2a00783001c",
+     "source": "Hind-Regular.ttf",
+     "sourceSha256": "01de158022f53077b52303e46de3b0ab5fb245222a7ffe25a2a57fdd9e969162",
+     "variable": false,
+     "weights": [
+      400
+     ]
+    }
+   },
+   "languages": [
+    9,
+    22,
+    23
+   ],
+   "licence": "OFL.txt",
+   "licenceSha256": "f62ef357d3a1c3d27edd35a6e1ba350e8a8d13499797964eeadefbf0b3b15d1f",
+   "popularity": 127
+  },
+  "Inter": {
+   "category": 1,
+   "dir": "ofl/inter",
+   "files": {
+    "Inter/Inter-Bold.ttf": {
+     "bytes": 192232,
+     "italic": 0,
+     "modified": true,
+     "sha256": "b457293ae7e9ea97c2650c84e491e4c69e5411ad1b8949a72fc99c97f1ee536c",
+     "source": "Inter[opsz,wght].ttf",
+     "sourceSha256": "29160a80ff49ddcab2c97711247e08b1fab27a484a329ce8b813d820dc559031",
+     "variable": false,
+     "weights": [
+      700
+     ]
+    },
+    "Inter/Inter-Regular.ttf": {
+     "bytes": 191200,
+     "italic": 0,
+     "modified": true,
+     "sha256": "5045a2dfad9379895c76d439111b0595b7c1290beab4c188fdbad16a84c22f4d",
+     "source": "Inter[opsz,wght].ttf",
+     "sourceSha256": "29160a80ff49ddcab2c97711247e08b1fab27a484a329ce8b813d820dc559031",
+     "variable": false,
+     "weights": [
+      400
+     ]
+    }
+   },
+   "languages": [
+    7,
+    22,
+    23,
+    33
+   ],
+   "licence": "OFL.txt",
+   "licenceSha256": "5b9321a4298cfeb6b34354164a1c3afc3db114569984c502b9b35d988fd58c57",
+   "popularity": 5
+  },
+  "JetBrains Mono": {
+   "category": 5,
+   "dir": "ofl/jetbrainsmono",
+   "files": {
+    "JetBrainsMono/JetBrainsMono-Bold.ttf": {
+     "bytes": 78332,
+     "italic": 0,
+     "modified": true,
+     "sha256": "3c2f6ff1e101966d804d043b71610af6f02f5b13a32c151474305a8b40436a67",
+     "source": "JetBrainsMono[wght].ttf",
+     "sourceSha256": "48715a42ec242c21e9f02692891e147d022299a52e48d5e413e1a942193ffeda",
+     "variable": false,
+     "weights": [
+      700
+     ]
+    },
+    "JetBrainsMono/JetBrainsMono-Regular.ttf": {
+     "bytes": 78400,
+     "italic": 0,
+     "modified": true,
+     "sha256": "a52642224594844ca1d955ae0ef216d2c56e358e93ce15d168482396b1ab3418",
+     "source": "JetBrainsMono[wght].ttf",
+     "sourceSha256": "48715a42ec242c21e9f02692891e147d022299a52e48d5e413e1a942193ffeda",
+     "variable": false,
+     "weights": [
+      400
+     ]
+    }
+   },
+   "languages": [
+    7,
+    22,
+    23,
+    33
+   ],
+   "licence": "OFL.txt",
+   "licenceSha256": "b2fe5e8987594e9ffd1d2ca52a2f5d73eb8335243893c5d6254b5ad69269591d",
+   "popularity": 43
+  },
+  "Kanit": {
+   "category": 1,
+   "dir": "ofl/kanit",
+   "files": {
+    "Kanit/Kanit-Bold.ttf": {
+     "bytes": 79256,
+     "italic": 0,
+     "modified": true,
+     "sha256": "8fd7ed43016a3900d9f05d3879c2ae71f4b079356e843f79ca6f21bc6ccb3f58",
+     "source": "Kanit-Bold.ttf",
+     "sourceSha256": "5dec5b080dab13de9d2295437c0ff3ec05c9e75587dfc31358c005eb4efa5e70",
+     "variable": false,
+     "weights": [
+      700
+     ]
+    },
+    "Kanit/Kanit-Regular.ttf": {
+     "bytes": 79796,
+     "italic": 0,
+     "modified": true,
+     "sha256": "f733a30b22f3bf9ff54c5f03697e0e495b312f81868364bb6fca7a0be9f60a5f",
+     "source": "Kanit-Regular.ttf",
+     "sourceSha256": "27170c049660b2f962d3ed28441fd20f4c743503ca031fec9c2b4542d6c52736",
+     "variable": false,
+     "weights": [
+      400
+     ]
+    }
+   },
+   "languages": [
+    22,
+    23,
+    31,
+    33
+   ],
+   "licence": "OFL.txt",
+   "licenceSha256": "eb998cc5a685b240cdb46a0b5747e70334c8c57bbd7b1f6b044d75719358df67",
+   "popularity": 36
+  },
+  "Kaushan Script": {
+   "category": 4,
+   "dir": "ofl/kaushanscript",
+   "files": {
+    "KaushanScript/KaushanScript-Regular.ttf": {
+     "bytes": 210672,
+     "italic": 0,
+     "modified": false,
+     "sha256": "6d8d379d9bba98178bee476d68114c8f83812c18005ecccf679e70f60e03d8f6",
+     "source": "KaushanScript-Regular.ttf",
+     "sourceSha256": "6d8d379d9bba98178bee476d68114c8f83812c18005ecccf679e70f60e03d8f6",
+     "variable": false,
+     "weights": [
+      400
+     ]
+    }
+   },
+   "languages": [
+    22,
+    23
+   ],
+   "licence": "OFL.txt",
+   "licenceSha256": "3336bf5d4e7eedba48ecb831f37bf676e901c39f2e6a422cceadd9d2ffa55be8",
+   "popularity": 292
+  },
+  "Lobster": {
+   "category": 3,
+   "dir": "ofl/lobster",
+   "files": {
+    "Lobster/Lobster-Regular.ttf": {
+     "bytes": 406076,
+     "italic": 0,
+     "modified": false,
+     "sha256": "d6568e697fd50cedc0be04d8aae4127fe95add607e7bff954ca88604be80c205",
+     "source": "Lobster-Regular.ttf",
+     "sourceSha256": "d6568e697fd50cedc0be04d8aae4127fe95add607e7bff954ca88604be80c205",
+     "variable": false,
+     "weights": [
+      400
+     ]
+    }
+   },
+   "languages": [
+    7,
+    22,
+    23
+   ],
+   "licence": "OFL.txt",
+   "licenceSha256": "88aece7d90f2bb7049719f11619a560af22af3451af141f12aa4f46bb157a99b",
+   "popularity": 147
+  },
+  "Lora": {
+   "category": 2,
+   "dir": "ofl/lora",
+   "files": {
+    "Lora/Lora-Variable.ttf": {
+     "bytes": 212196,
+     "italic": 0,
+     "modified": false,
+     "sha256": "822a6621ccbe8d97d20ac88c1c41f5615c9c2c202eaa75f272cd452aac6475a7",
+     "source": "Lora[wght].ttf",
+     "sourceSha256": "822a6621ccbe8d97d20ac88c1c41f5615c9c2c202eaa75f272cd452aac6475a7",
+     "variable": true,
+     "weights": [
+      400,
+      700
+     ]
+    }
+   },
+   "languages": [
+    7,
+    22,
+    23
+   ],
+   "licence": "OFL.txt",
+   "licenceSha256": "1d9a970809ac804b582a6ce7f0ebc4e7fefcbfd7ff6299cad35ee656a21be716",
+   "popularity": 39
+  },
+  "Manrope": {
+   "category": 1,
+   "dir": "ofl/manrope",
+   "files": {
+    "Manrope/Manrope-Bold.ttf": {
+     "bytes": 81940,
+     "italic": 0,
+     "modified": true,
+     "sha256": "bd95b55725e8550164b7f99dae9a6d59f6bf6dff36257d5d6c6bb1ec816beb29",
+     "source": "Manrope[wght].ttf",
+     "sourceSha256": "3ae11c49db0455a3cc33e37d380f20fdb8c7f8b41dc07625c177e3d87a9d6ae6",
+     "variable": false,
+     "weights": [
+      700
+     ]
+    },
+    "Manrope/Manrope-Regular.ttf": {
+     "bytes": 81944,
+     "italic": 0,
+     "modified": true,
+     "sha256": "57ee996a4ddb4d3f8dff901d62838f4d8106914532913a538b9de2444e5acc20",
+     "source": "Manrope[wght].ttf",
+     "sourceSha256": "3ae11c49db0455a3cc33e37d380f20fdb8c7f8b41dc07625c177e3d87a9d6ae6",
+     "variable": false,
+     "weights": [
+      400
+     ]
+    }
+   },
+   "languages": [
+    7,
+    22,
+    23,
+    33
+   ],
+   "licence": "OFL.txt",
+   "licenceSha256": "58172e0c0fac2cda8a37b348164bb55e44b0e69051e557e92b1d3f6910141f7b",
+   "popularity": 30
+  },
+  "Montserrat": {
+   "category": 1,
+   "dir": "ofl/montserrat",
+   "files": {
+    "Montserrat/Montserrat-Bold.ttf": {
+     "bytes": 229812,
+     "italic": 0,
+     "modified": true,
+     "sha256": "5b2711ac997934ea7b4b6e0789134e329557938f201dc6aa0f62c9524c8218a6",
+     "source": "Montserrat[wght].ttf",
+     "sourceSha256": "0f7b311b2f3279e4eef9b2f968bcdbab6e28f4daeb1f049f4f278a902bcd82f7",
+     "variable": false,
+     "weights": [
+      700
+     ]
+    },
+    "Montserrat/Montserrat-Regular.ttf": {
+     "bytes": 224308,
+     "italic": 0,
+     "modified": true,
+     "sha256": "40c24b6fec3758302344c3f4ff253a0301297444a7aa0c8547dbfa26a8b669f3",
+     "source": "Montserrat[wght].ttf",
+     "sourceSha256": "0f7b311b2f3279e4eef9b2f968bcdbab6e28f4daeb1f049f4f278a902bcd82f7",
+     "variable": false,
+     "weights": [
+      400
+     ]
+    }
+   },
+   "languages": [
+    7,
+    22,
+    23,
+    33
+   ],
+   "licence": "OFL.txt",
+   "licenceSha256": "8b7141c03fa4f8d44e6345d5d4931709290f0f67875e452e95ac1fd3a027802e",
+   "popularity": 7
+  },
+  "Mulish": {
+   "category": 1,
+   "dir": "ofl/mulish",
+   "files": {
+    "Mulish/Mulish-Bold.ttf": {
+     "bytes": 79300,
+     "italic": 0,
+     "modified": true,
+     "sha256": "55251c5ebf006dc54fd23c93eb0c2272cd1a70e095df78b97ca9d368be46e204",
+     "source": "Mulish[wght].ttf",
+     "sourceSha256": "00f1105796291a2fdda117a0fc7f25d8e68f8010cdbb34a411f60b3bd57717ac",
+     "variable": false,
+     "weights": [
+      700
+     ]
+    },
+    "Mulish/Mulish-Regular.ttf": {
+     "bytes": 79264,
+     "italic": 0,
+     "modified": true,
+     "sha256": "9008598550289886ef1409f7de7a964510a3ac16caf3593e169ab906788d8b10",
+     "source": "Mulish[wght].ttf",
+     "sourceSha256": "00f1105796291a2fdda117a0fc7f25d8e68f8010cdbb34a411f60b3bd57717ac",
+     "variable": false,
+     "weights": [
+      400
+     ]
+    }
+   },
+   "languages": [
+    7,
+    22,
+    23,
+    33
+   ],
+   "licence": "OFL.txt",
+   "licenceSha256": "097e9ac414d9251c8580c073a13f8899798c66db746de60662148789ca693f19",
+   "popularity": 48
+  },
+  "Noto Serif": {
+   "category": 2,
+   "dir": "ofl/notoserif",
+   "files": {
+    "NotoSerif/NotoSerif-Bold.ttf": {
+     "bytes": 166952,
+     "italic": 0,
+     "modified": true,
+     "sha256": "e3a814f5e09413cc54f462d6bd1fc3d7b6a0ea9873682f722323102063a798cb",
+     "source": "NotoSerif[wdth,wght].ttf",
+     "sourceSha256": "4d8e6761424656867019081a1a01336f3cb086982682698714054fc33f782713",
+     "variable": false,
+     "weights": [
+      700
+     ]
+    },
+    "NotoSerif/NotoSerif-Regular.ttf": {
+     "bytes": 166436,
+     "italic": 0,
+     "modified": true,
+     "sha256": "36d85b2385c19836fe22f9dab6a6f0791750d4041792856a7779dbc5e00e2eb5",
+     "source": "NotoSerif[wdth,wght].ttf",
+     "sourceSha256": "4d8e6761424656867019081a1a01336f3cb086982682698714054fc33f782713",
+     "variable": false,
+     "weights": [
+      400
+     ]
+    }
+   },
+   "languages": [
+    7,
+    22,
+    23,
+    33
+   ],
+   "licence": "OFL.txt",
+   "licenceSha256": "cee9892f9f0cc8fe882c9e9537ee6a89621d86ee7ceaf70b02e2b2b1c25c061a",
+   "popularity": 64
+  },
+  "Nunito": {
+   "category": 1,
+   "dir": "ofl/nunito",
+   "files": {
+    "Nunito/Nunito-Bold.ttf": {
+     "bytes": 99016,
+     "italic": 0,
+     "modified": true,
+     "sha256": "ace4aacf2294d3dddb49754252414b94646a61be9b619bec76114dae970eaf78",
+     "source": "Nunito[wght].ttf",
+     "sourceSha256": "bb55a5ca5c2042335b3991af27c4d0705d0ef41cac6164ac737fd8f2a1e85207",
+     "variable": false,
+     "weights": [
+      700
+     ]
+    },
+    "Nunito/Nunito-Regular.ttf": {
+     "bytes": 99016,
+     "italic": 0,
+     "modified": true,
+     "sha256": "e5312d7efa3f332140fa3fa88cb03be1267c8c99e213c12bcf6e9f50cddcc8b8",
+     "source": "Nunito[wght].ttf",
+     "sourceSha256": "bb55a5ca5c2042335b3991af27c4d0705d0ef41cac6164ac737fd8f2a1e85207",
+     "variable": false,
+     "weights": [
+      400
+     ]
+    }
+   },
+   "languages": [
+    7,
+    22,
+    23,
+    33
+   ],
+   "licence": "OFL.txt",
+   "licenceSha256": "580df76c95a1ec5ab878ceb25bb3d85c6a076804e9c970c8c6972aea775fdf65",
+   "popularity": 25
+  },
+  "Open Sans": {
+   "category": 1,
+   "dir": "ofl/opensans",
+   "files": {
+    "OpenSans/OpenSans-Bold.ttf": {
+     "bytes": 55728,
+     "italic": 0,
+     "modified": true,
+     "sha256": "1ac7c1a5de4f12a0ee90379052320e82c66c2c25fb55ef3f13592a3aedd98274",
+     "source": "OpenSans[wdth,wght].ttf",
+     "sourceSha256": "36643644f318a812aab2d2ed3bb98f8cf0872527f835fe9398d95fe6b9adb878",
+     "variable": false,
+     "weights": [
+      700
+     ]
+    },
+    "OpenSans/OpenSans-Regular.ttf": {
+     "bytes": 55876,
+     "italic": 0,
+     "modified": true,
+     "sha256": "eb796901ca90d177d3b16ad38879e28f6ceb529cb534d823ea7e785af583d8a9",
+     "source": "OpenSans[wdth,wght].ttf",
+     "sourceSha256": "36643644f318a812aab2d2ed3bb98f8cf0872527f835fe9398d95fe6b9adb878",
+     "variable": false,
+     "weights": [
+      400
+     ]
+    }
+   },
+   "languages": [
+    7,
+    22,
+    23,
+    33
+   ],
+   "licence": "OFL.txt",
+   "licenceSha256": "fbbbcfef55318de350562559b671360de6d597112ecc5c73881b05092db89602",
+   "popularity": 3
+  },
+  "Orbitron": {
+   "category": 1,
+   "dir": "ofl/orbitron",
+   "files": {
+    "Orbitron/Orbitron-Variable.ttf": {
+     "bytes": 38576,
+     "italic": 0,
+     "modified": false,
+     "sha256": "f42db2dd16e642258e35782916eceb1dcdbea06fb958d77ad71dc5963587e8fd",
+     "source": "Orbitron[wght].ttf",
+     "sourceSha256": "f42db2dd16e642258e35782916eceb1dcdbea06fb958d77ad71dc5963587e8fd",
+     "variable": true,
+     "weights": [
+      400,
+      700
+     ]
+    }
+   },
+   "languages": [
+    22
+   ],
+   "licence": "OFL.txt",
+   "licenceSha256": "ab609b0e110d622435ff337cdf233288556e011bbf9bd0550be98846c0630819",
+   "popularity": 124
+  },
+  "Oswald": {
+   "category": 1,
+   "dir": "ofl/oswald",
+   "files": {
+    "Oswald/Oswald-Bold.ttf": {
+     "bytes": 65512,
+     "italic": 0,
+     "modified": true,
+     "sha256": "5acb3fceb40486f92cf67f54be018ae3085ca4ce7947ce8715ba5d58d996bd91",
+     "source": "Oswald[wght].ttf",
+     "sourceSha256": "5b38c246e255a12f5712d640d56bcced0472466fc68983d2d0410ec0457c2817",
+     "variable": false,
+     "weights": [
+      700
+     ]
+    },
+    "Oswald/Oswald-Regular.ttf": {
+     "bytes": 65220,
+     "italic": 0,
+     "modified": true,
+     "sha256": "d31605b899e2fb18b0a7e2215e9f5475133e17d4371a8167ae8060a0d644a294",
+     "source": "Oswald[wght].ttf",
+     "sourceSha256": "5b38c246e255a12f5712d640d56bcced0472466fc68983d2d0410ec0457c2817",
+     "variable": false,
+     "weights": [
+      400
+     ]
+    }
+   },
+   "languages": [
+    7,
+    22,
+    23,
+    33
+   ],
+   "licence": "OFL.txt",
+   "licenceSha256": "0fd731a904b729a4e02eaf5e8ebd06783edd9abe400e8882760160230675b652",
+   "popularity": 19
+  },
+  "Pacifico": {
+   "category": 4,
+   "dir": "ofl/pacifico",
+   "files": {
+    "Pacifico/Pacifico-Regular.ttf": {
+     "bytes": 151780,
+     "italic": 0,
+     "modified": true,
+     "sha256": "9ae1e38a8cedc8b55befc5b279380db07954fe625eda214e0dabe38669e39270",
+     "source": "Pacifico-Regular.ttf",
+     "sourceSha256": "5b6c0d5334a7bf77dea52b975c5a0c408878c0f7115ed5b6fb151f634b7bf701",
+     "variable": false,
+     "weights": [
+      400
+     ]
+    }
+   },
+   "languages": [
+    7,
+    22,
+    23,
+    33
+   ],
+   "licence": "OFL.txt",
+   "licenceSha256": "a47e5daeda73568969395c656823102678f2eefb0d7d7ecb47aac4cc17e42204",
+   "popularity": 136
+  },
+  "Permanent Marker": {
+   "category": 4,
+   "dir": "apache/permanentmarker",
+   "files": {
+    "PermanentMarker/PermanentMarker-Regular.ttf": {
+     "bytes": 71272,
+     "italic": 0,
+     "modified": true,
+     "sha256": "49c47c14ff193f1ef29874fe26a39314a8408119ddd2a6fb74d505633d49e26c",
+     "source": "PermanentMarker-Regular.ttf",
+     "sourceSha256": "28f82c8a7943cb8e9d599f8554da1d4fc75dbcf69b9885ad6c0611d20c6946c5",
+     "variable": false,
+     "weights": [
+      400
+     ]
+    }
+   },
+   "languages": [
+    22
+   ],
+   "licence": "LICENSE.txt",
+   "licenceSha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+   "popularity": 187
+  },
+  "Playfair Display": {
+   "category": 2,
+   "dir": "ofl/playfairdisplay",
+   "files": {
+    "PlayfairDisplay/PlayfairDisplay-Variable.ttf": {
+     "bytes": 300724,
+     "italic": 0,
+     "modified": false,
+     "sha256": "c40f2293766a503bc70cce9e512ef844a4ccb7cbcde792fe2ea31d191917d8d6",
+     "source": "PlayfairDisplay[wght].ttf",
+     "sourceSha256": "c40f2293766a503bc70cce9e512ef844a4ccb7cbcde792fe2ea31d191917d8d6",
+     "variable": true,
+     "weights": [
+      400,
+      700
+     ]
+    }
+   },
+   "languages": [
+    7,
+    22,
+    23
+   ],
+   "licence": "OFL.txt",
+   "licenceSha256": "566be814f8e96e93dfa16101331557eb6b5467e9e03f627c0910fe93ca12300e",
+   "popularity": 24
+  },
+  "Poppins": {
+   "category": 1,
+   "dir": "ofl/poppins",
+   "files": {
+    "Poppins/Poppins-Bold.ttf": {
+     "bytes": 143460,
+     "italic": 0,
+     "modified": true,
+     "sha256": "cb60025c53e366deccb4f2bfc2f3b56f9d1b2d9b78e11718c1ca9b32f2536a9f",
+     "source": "Poppins-Bold.ttf",
+     "sourceSha256": "983676516167748b74de6f4771fb384c664fd913acb8b471122ecacf5da5ea6c",
+     "variable": false,
+     "weights": [
+      700
+     ]
+    },
+    "Poppins/Poppins-Regular.ttf": {
+     "bytes": 147744,
+     "italic": 0,
+     "modified": true,
+     "sha256": "30b01d90a2b596882da322e0d0a0bd936cc41db6f7e4781f3fbd39ab20329de4",
+     "source": "Poppins-Regular.ttf",
+     "sourceSha256": "7e65201e9b79159e2300267cc885e16c8dcef2424cdfa09a29bfb0980a94a7ba",
+     "variable": false,
+     "weights": [
+      400
+     ]
+    }
+   },
+   "languages": [
+    9,
+    22,
+    23
+   ],
+   "licence": "OFL.txt",
+   "licenceSha256": "6be04893d770899a015649c7aa3b582f871b272f8747a92b78b17c3e5c8b2573",
+   "popularity": 8
+  },
+  "Press Start 2P": {
+   "category": 3,
+   "dir": "ofl/pressstart2p",
+   "files": {
+    "PressStart2P/PressStart2P-Regular.ttf": {
+     "bytes": 118204,
+     "italic": 0,
+     "modified": false,
+     "sha256": "034c77f1f05ec89421e4a63f0e3a4ca1ecf852cc6d2bf611f126f275728e017d",
+     "source": "PressStart2P-Regular.ttf",
+     "sourceSha256": "034c77f1f05ec89421e4a63f0e3a4ca1ecf852cc6d2bf611f126f275728e017d",
+     "variable": false,
+     "weights": [
+      400
+     ]
+    }
+   },
+   "languages": [
+    7,
+    22,
+    23
+   ],
+   "licence": "OFL.txt",
+   "licenceSha256": "705960c3281a5765ecc0b59bd4ed7ca59eed165748076bc2fc3e8fdbfeb944b0",
+   "popularity": 246
+  },
+  "Prompt": {
+   "category": 1,
+   "dir": "ofl/prompt",
+   "files": {
+    "Prompt/Prompt-Bold.ttf": {
+     "bytes": 89724,
+     "italic": 0,
+     "modified": true,
+     "sha256": "bd60294dcc1aadbeb87a0d668a93e3e270fa2a0b31b788649c9f12d3f7a14103",
+     "source": "Prompt-Bold.ttf",
+     "sourceSha256": "02813ca4f93c1df27e271f10fef3db6e34e66751ae1f4a3ed82ae06cb20150ea",
+     "variable": false,
+     "weights": [
+      700
+     ]
+    },
+    "Prompt/Prompt-Regular.ttf": {
+     "bytes": 90164,
+     "italic": 0,
+     "modified": true,
+     "sha256": "5c686ec233337ace0584687f8afe09e8419e13dd7da96ea5620ed501862a3cbc",
+     "source": "Prompt-Regular.ttf",
+     "sourceSha256": "dbd497803cec3caffbc6b7f599ca6fed8beea0ed7e0ad1e098130c5ebbc4fd42",
+     "variable": false,
+     "weights": [
+      400
+     ]
+    }
+   },
+   "languages": [
+    22,
+    23,
+    31,
+    33
+   ],
+   "licence": "OFL.txt",
+   "licenceSha256": "1d08c63944e639bbfe8a1b81e3c6a63836806c126b3573b9cda0db83fd27ffe9",
+   "popularity": 55
+  },
+  "Quicksand": {
+   "category": 1,
+   "dir": "ofl/quicksand",
+   "files": {
+    "Quicksand/Quicksand-Variable.ttf": {
+     "bytes": 124824,
+     "italic": 0,
+     "modified": false,
+     "sha256": "39c9b64223561f56aaff6062a6f04063c4fc86809ad6768722c06614d977e1cc",
+     "source": "Quicksand[wght].ttf",
+     "sourceSha256": "39c9b64223561f56aaff6062a6f04063c4fc86809ad6768722c06614d977e1cc",
+     "variable": true,
+     "weights": [
+      400,
+      700
+     ]
+    }
+   },
+   "languages": [
+    22,
+    23,
+    33
+   ],
+   "licence": "OFL.txt",
+   "licenceSha256": "14d28541780d90f6577bb7abcc6f005bf6969614294e75c82abb8758a696ad46",
+   "popularity": 42
+  },
+  "Raleway": {
+   "category": 1,
+   "dir": "ofl/raleway",
+   "files": {
+    "Raleway/Raleway-Variable.ttf": {
+     "bytes": 312352,
+     "italic": 0,
+     "modified": false,
+     "sha256": "8bbcc3eb8275c388f4bcd998832f8a4b943eadbaf6a595205312774b5951aefb",
+     "source": "Raleway[wght].ttf",
+     "sourceSha256": "8bbcc3eb8275c388f4bcd998832f8a4b943eadbaf6a595205312774b5951aefb",
+     "variable": true,
+     "weights": [
+      400,
+      700
+     ]
+    }
+   },
+   "languages": [
+    7,
+    22,
+    23,
+    33
+   ],
+   "licence": "OFL.txt",
+   "licenceSha256": "7e946cf1171784d1015279e7dc35f827957a6b5d1f1f659ae0c98e5f5e37ed9b",
+   "popularity": 23
+  },
+  "Righteous": {
+   "category": 3,
+   "dir": "ofl/righteous",
+   "files": {
+    "Righteous/Righteous-Regular.ttf": {
+     "bytes": 43104,
+     "italic": 0,
+     "modified": false,
+     "sha256": "2ffb3fe5c27d7e6571210b800448c4e234e651b46c6b4426c1bb567e5341348a",
+     "source": "Righteous-Regular.ttf",
+     "sourceSha256": "2ffb3fe5c27d7e6571210b800448c4e234e651b46c6b4426c1bb567e5341348a",
+     "variable": false,
+     "weights": [
+      400
+     ]
+    }
+   },
+   "languages": [
+    22,
+    23
+   ],
+   "licence": "OFL.txt",
+   "licenceSha256": "1c5bc055869d5e9151ec7774082727db720ec4293c65be67f91a4bdcaeb02998",
+   "popularity": 252
+  },
+  "Roboto": {
+   "category": 1,
+   "dir": "ofl/roboto",
+   "files": {
+    "Roboto/Roboto-Bold.ttf": {
+     "bytes": 90420,
+     "italic": 0,
+     "modified": true,
+     "sha256": "603a15de6a78c2b86c4277d09a724f52a7cb29e506c7cea97d50f032b69dc756",
+     "source": "Roboto[wdth,wght].ttf",
+     "sourceSha256": "d7598e12c5dbef095ff8272cfc55da0250bd07fbdecbac8a530b9b277872a134",
+     "variable": false,
+     "weights": [
+      700
+     ]
+    },
+    "Roboto/Roboto-Regular.ttf": {
+     "bytes": 89968,
+     "italic": 0,
+     "modified": true,
+     "sha256": "dca1f6618e997c4ad3f36c051a114fe39faca5e0ac5467727945a430b7cb44b8",
+     "source": "Roboto[wdth,wght].ttf",
+     "sourceSha256": "d7598e12c5dbef095ff8272cfc55da0250bd07fbdecbac8a530b9b277872a134",
+     "variable": false,
+     "weights": [
+      400
+     ]
+    }
+   },
+   "languages": [
+    7,
+    22,
+    23,
+    33
+   ],
+   "licence": "OFL.txt",
+   "licenceSha256": "061402327a96aadb0bfb694a960ed289ecd38d383e396243831ab81feb109c41",
+   "popularity": 2
+  },
+  "Roboto Mono": {
+   "category": 5,
+   "dir": "ofl/robotomono",
+   "files": {
+    "RobotoMono/RobotoMono-Bold.ttf": {
+     "bytes": 50936,
+     "italic": 0,
+     "modified": true,
+     "sha256": "d087c78af4fa2e2dee84225ec86dd481df1152360815298b30454571b31a8131",
+     "source": "RobotoMono[wght].ttf",
+     "sourceSha256": "66a80e79d17e4c7cabd162e2916578a4cc08fd19eef6e2a643305eae9c567b2b",
+     "variable": false,
+     "weights": [
+      700
+     ]
+    },
+    "RobotoMono/RobotoMono-Regular.ttf": {
+     "bytes": 50920,
+     "italic": 0,
+     "modified": true,
+     "sha256": "8b00ba43f904edc2c1cf219767c9c0393d3063ebfaff30e35fe3391f8de44abd",
+     "source": "RobotoMono[wght].ttf",
+     "sourceSha256": "66a80e79d17e4c7cabd162e2916578a4cc08fd19eef6e2a643305eae9c567b2b",
+     "variable": false,
+     "weights": [
+      400
+     ]
+    }
+   },
+   "languages": [
+    7,
+    22,
+    23,
+    33
+   ],
+   "licence": "OFL.txt",
+   "licenceSha256": "50ab8dd54680d3473f649c9db86fece88434d097c7834475c1c72d2f8c429215",
+   "popularity": 15
+  },
+  "Roboto Slab": {
+   "category": 2,
+   "dir": "apache/robotoslab",
+   "files": {
+    "RobotoSlab/RobotoSlab-Bold.ttf": {
+     "bytes": 83092,
+     "italic": 0,
+     "modified": true,
+     "sha256": "4a7bad5ed5889a37f032cfe4f130216e2fd215ac733559285728fedc32e5abec",
+     "source": "RobotoSlab[wght].ttf",
+     "sourceSha256": "786ae192477447d33c6672c3055fba7cbfe45184c9a79e77a14f15716ca05b16",
+     "variable": false,
+     "weights": [
+      700
+     ]
+    },
+    "RobotoSlab/RobotoSlab-Regular.ttf": {
+     "bytes": 82808,
+     "italic": 0,
+     "modified": true,
+     "sha256": "9a8928500d037653383a37ca5b8f3dc9b7b8f449b5e3f68a099a58c9e1359b6f",
+     "source": "RobotoSlab[wght].ttf",
+     "sourceSha256": "786ae192477447d33c6672c3055fba7cbfe45184c9a79e77a14f15716ca05b16",
+     "variable": false,
+     "weights": [
+      400
+     ]
+    }
+   },
+   "languages": [
+    7,
+    22,
+    23,
+    33
+   ],
+   "licence": "LICENSE.txt",
+   "licenceSha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+   "popularity": 28
+  },
+  "Rubik": {
+   "category": 1,
+   "dir": "ofl/rubik",
+   "files": {
+    "Rubik/Rubik-Bold.ttf": {
+     "bytes": 93228,
+     "italic": 0,
+     "modified": true,
+     "sha256": "e497cba9b0b08287e6f11d0958db255ea0a07f5f59f7c169e8a9e0146c6bba14",
+     "source": "Rubik[wght].ttf",
+     "sourceSha256": "1b3a7437ba2af80e465e773ed60c5036d1ba6ace492d89046dbcf18fb31e4e88",
+     "variable": false,
+     "weights": [
+      700
+     ]
+    },
+    "Rubik/Rubik-Regular.ttf": {
+     "bytes": 92764,
+     "italic": 0,
+     "modified": true,
+     "sha256": "6d99a71671671e4cfe96d3f188e96ec1bbef840bb1054d3796d5a35b03b944c2",
+     "source": "Rubik[wght].ttf",
+     "sourceSha256": "1b3a7437ba2af80e465e773ed60c5036d1ba6ace492d89046dbcf18fb31e4e88",
+     "variable": false,
+     "weights": [
+      400
+     ]
+    }
+   },
+   "languages": [
+    7,
+    22,
+    23
+   ],
+   "licence": "OFL.txt",
+   "licenceSha256": "472cbe7c25441df63e9c7864b43eb3c0f4b3df950c66a76224e6cfe1eae843fb",
+   "popularity": 29
+  },
+  "Satisfy": {
+   "category": 4,
+   "dir": "apache/satisfy",
+   "files": {
+    "Satisfy/Satisfy-Regular.ttf": {
+     "bytes": 45636,
+     "italic": 0,
+     "modified": true,
+     "sha256": "f0ca12c36afd6e3bf2da2d491f4036d4a55637f514d95b0ca69402744f9edfb1",
+     "source": "Satisfy-Regular.ttf",
+     "sourceSha256": "55bb141a0a23a32278d5fa7fd2e853824faa173b94774660ebeddb106be07c80",
+     "variable": false,
+     "weights": [
+      400
+     ]
+    }
+   },
+   "languages": [
+    22
+   ],
+   "licence": "LICENSE.txt",
+   "licenceSha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+   "popularity": 168
+  },
+  "Space Mono": {
+   "category": 5,
+   "dir": "ofl/spacemono",
+   "files": {
+    "SpaceMono/SpaceMono-Bold.ttf": {
+     "bytes": 52764,
+     "italic": 0,
+     "modified": true,
+     "sha256": "eb7be4f876281247b0bad5233f2f5b0815a0fa9bd86ca9145b87c70ec6a33a36",
+     "source": "SpaceMono-Bold.ttf",
+     "sourceSha256": "405e73d41afb7e5906efce206a326af5c956f38e255f35421c260e861e599c59",
+     "variable": false,
+     "weights": [
+      700
+     ]
+    },
+    "SpaceMono/SpaceMono-Regular.ttf": {
+     "bytes": 53468,
+     "italic": 0,
+     "modified": true,
+     "sha256": "21ce8221bb432e0e3d0d0d30d101efbc9e05b2f4bae665a40b4c32dd6a449405",
+     "source": "SpaceMono-Regular.ttf",
+     "sourceSha256": "95837e182baeeada83368f7748db28357f0a1b75c6b84ff7065b5edf933c8e18",
+     "variable": false,
+     "weights": [
+      400
+     ]
+    }
+   },
+   "languages": [
+    22,
+    23,
+    33
+   ],
+   "licence": "OFL.txt",
+   "licenceSha256": "8e4ee42b2553e1e01504e61cb0d46d148cd8c9e5eacaa3622a7df2d4f2955b9f",
+   "popularity": 156
+  },
+  "Tajawal": {
+   "category": 1,
+   "dir": "ofl/tajawal",
+   "files": {
+    "Tajawal/Tajawal-Bold.ttf": {
+     "bytes": 51712,
+     "italic": 0,
+     "modified": true,
+     "sha256": "1df30c219d718e9ff7e457479368cb79d5d599b02bc354a3828db41d4899f891",
+     "source": "Tajawal-Bold.ttf",
+     "sourceSha256": "0342ab6b74b6bd1b4b5bf7beda45a9734a2b3147a31e8a3a45b6a3417a52d9d7",
+     "variable": false,
+     "weights": [
+      700
+     ]
+    },
+    "Tajawal/Tajawal-Regular.ttf": {
+     "bytes": 51472,
+     "italic": 0,
+     "modified": true,
+     "sha256": "5bf5ae9621bd5e083f04d65f5efa5b59c411d679113af1e12d8e9d6ba2501798",
+     "source": "Tajawal-Regular.ttf",
+     "sourceSha256": "6882892da3e03527d5db2bbab3b48bde6ef2e878a43f522d1a4eebda90010a19",
+     "variable": false,
+     "weights": [
+      400
+     ]
+    }
+   },
+   "languages": [
+    1,
+    22
+   ],
+   "licence": "OFL.txt",
+   "licenceSha256": "9b584984f9db0ee30347391a76eff9c0a6b03dc450c3c6afe3757a2cb3a4db87",
+   "popularity": 132
+  },
+  "Work Sans": {
+   "category": 1,
+   "dir": "ofl/worksans",
+   "files": {
+    "WorkSans/WorkSans-Bold.ttf": {
+     "bytes": 171572,
+     "italic": 0,
+     "modified": true,
+     "sha256": "31033c354bd49fa5f964a5b141a170a008b446c6215b9ef6108ec363e285bf7f",
+     "source": "WorkSans[wght].ttf",
+     "sourceSha256": "f50f61f2ba738e239442d40bf1069adb195c224b6a5a73a581fc2f3ed62a9f63",
+     "variable": false,
+     "weights": [
+      700
+     ]
+    },
+    "WorkSans/WorkSans-Regular.ttf": {
+     "bytes": 169460,
+     "italic": 0,
+     "modified": true,
+     "sha256": "2fbaf464956c933afa63609525aa712810c94375521f0f5d4758c659cebf1dc0",
+     "source": "WorkSans[wght].ttf",
+     "sourceSha256": "f50f61f2ba738e239442d40bf1069adb195c224b6a5a73a581fc2f3ed62a9f63",
+     "variable": false,
+     "weights": [
+      400
+     ]
+    }
+   },
+   "languages": [
+    22,
+    23,
+    33
+   ],
+   "licence": "OFL.txt",
+   "licenceSha256": "749aca05078664ce682dce1b1b10096ac397cb088c1a6df4e1bb56f0092a9272",
+   "popularity": 38
+  }
+ },
+ "commit": "47d54ca1ebb14fd864695f1d39dc734f39017c33",
+ "downloadable": [
+  {
+   "category": 1,
+   "languages": [
+    22,
+    23
+   ],
+   "name": "Lato",
+   "popularity": 9,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 1,
+   "languages": [
+    7,
+    17,
+    22,
+    23,
+    33
+   ],
+   "name": "Noto Sans JP",
+   "popularity": 10,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 1,
+   "languages": [
+    7,
+    8,
+    12,
+    13,
+    16,
+    22,
+    23,
+    33
+   ],
+   "name": "Arimo",
+   "popularity": 13,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 1,
+   "languages": [
+    7,
+    8,
+    12,
+    13,
+    22,
+    23,
+    33
+   ],
+   "name": "Roboto Condensed",
+   "popularity": 17,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 1,
+   "languages": [
+    7,
+    8,
+    9,
+    12,
+    13,
+    22,
+    23,
+    33
+   ],
+   "name": "Noto Sans",
+   "popularity": 20,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 1,
+   "languages": [
+    7,
+    8,
+    22,
+    23,
+    33
+   ],
+   "name": "Nunito Sans",
+   "popularity": 27,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 1,
+   "languages": [
+    7,
+    8,
+    12,
+    13,
+    22,
+    23
+   ],
+   "name": "Ubuntu",
+   "popularity": 32,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 1,
+   "languages": [
+    22,
+    23
+   ],
+   "name": "Outfit",
+   "popularity": 33,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 2,
+   "languages": [
+    7,
+    8,
+    22,
+    23,
+    33
+   ],
+   "name": "Merriweather",
+   "popularity": 34,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 1,
+   "languages": [
+    8,
+    22,
+    23,
+    33
+   ],
+   "name": "Plus Jakarta Sans",
+   "popularity": 35,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 1,
+   "languages": [
+    7,
+    20,
+    22,
+    23,
+    33
+   ],
+   "name": "Noto Sans KR",
+   "popularity": 37,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 1,
+   "languages": [
+    22,
+    23
+   ],
+   "name": "Figtree",
+   "popularity": 40,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 1,
+   "languages": [
+    22,
+    23
+   ],
+   "name": "Archivo Black",
+   "popularity": 44,
+   "variants": [
+    4
+   ]
+  },
+  {
+   "category": 1,
+   "languages": [
+    22,
+    23,
+    33
+   ],
+   "name": "Archivo",
+   "popularity": 45,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 1,
+   "languages": [
+    7,
+    8,
+    22,
+    23
+   ],
+   "name": "PT Sans",
+   "popularity": 46,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 1,
+   "languages": [
+    6,
+    7,
+    22,
+    23,
+    33
+   ],
+   "name": "Noto Sans TC",
+   "popularity": 47,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 1,
+   "languages": [
+    7,
+    8,
+    12,
+    13,
+    22,
+    23,
+    33
+   ],
+   "name": "Source Sans 3",
+   "popularity": 49,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 1,
+   "languages": [
+    22,
+    23,
+    33
+   ],
+   "name": "Barlow",
+   "popularity": 50,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 1,
+   "languages": [
+    7,
+    8,
+    12,
+    22,
+    23,
+    33
+   ],
+   "name": "IBM Plex Sans",
+   "popularity": 51,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 5,
+   "languages": [
+    22,
+    23,
+    33
+   ],
+   "name": "Inconsolata",
+   "popularity": 52,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 1,
+   "languages": [
+    7,
+    22,
+    23
+   ],
+   "name": "Jost",
+   "popularity": 53,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 1,
+   "languages": [
+    22,
+    23,
+    33
+   ],
+   "name": "Space Grotesk",
+   "popularity": 56,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 1,
+   "languages": [
+    22,
+    23,
+    33
+   ],
+   "name": "Saira",
+   "popularity": 58,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 2,
+   "languages": [
+    22,
+    23
+   ],
+   "name": "Libre Baskerville",
+   "popularity": 59,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 1,
+   "languages": [
+    7,
+    8,
+    12,
+    13,
+    22,
+    23,
+    33
+   ],
+   "name": "Fira Sans",
+   "popularity": 60,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 1,
+   "languages": [
+    22,
+    23
+   ],
+   "name": "Karla",
+   "popularity": 61,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 1,
+   "languages": [
+    22,
+    23,
+    33
+   ],
+   "name": "Bricolage Grotesque",
+   "popularity": 62,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 1,
+   "languages": [
+    16,
+    22,
+    23
+   ],
+   "name": "Heebo",
+   "popularity": 63,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 2,
+   "languages": [
+    7,
+    8,
+    22,
+    23,
+    33
+   ],
+   "name": "Cormorant Garamond",
+   "popularity": 65,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 1,
+   "languages": [
+    22,
+    23
+   ],
+   "name": "Titillium Web",
+   "popularity": 66,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 5,
+   "languages": [
+    7,
+    8,
+    12,
+    13,
+    22,
+    23,
+    33
+   ],
+   "name": "Source Code Pro",
+   "popularity": 68,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 5,
+   "languages": [
+    7,
+    8,
+    22,
+    23,
+    33
+   ],
+   "name": "IBM Plex Mono",
+   "popularity": 69,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 1,
+   "languages": [
+    22
+   ],
+   "name": "Share Tech",
+   "popularity": 70,
+   "variants": [
+    4
+   ]
+  },
+  {
+   "category": 1,
+   "languages": [
+    22,
+    23,
+    33
+   ],
+   "name": "Barlow Condensed",
+   "popularity": 71,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 1,
+   "languages": [
+    22,
+    23,
+    33
+   ],
+   "name": "Smooch Sans",
+   "popularity": 72,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 2,
+   "languages": [
+    7,
+    8,
+    22,
+    23
+   ],
+   "name": "PT Serif",
+   "popularity": 75,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 2,
+   "languages": [
+    22,
+    23
+   ],
+   "name": "Instrument Serif",
+   "popularity": 78,
+   "variants": [
+    4
+   ]
+  },
+  {
+   "category": 1,
+   "languages": [
+    5,
+    7,
+    22,
+    23,
+    33
+   ],
+   "name": "Noto Sans SC",
+   "popularity": 82,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 2,
+   "languages": [
+    7,
+    8,
+    12,
+    13,
+    22,
+    23,
+    33
+   ],
+   "name": "EB Garamond",
+   "popularity": 85,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 2,
+   "languages": [
+    22,
+    23,
+    33
+   ],
+   "name": "Fraunces",
+   "popularity": 86,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 1,
+   "languages": [
+    9,
+    22,
+    23
+   ],
+   "name": "Mukta",
+   "popularity": 88,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 2,
+   "languages": [
+    7,
+    17,
+    22,
+    23,
+    33
+   ],
+   "name": "Noto Serif JP",
+   "popularity": 89,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 3,
+   "languages": [
+    22
+   ],
+   "name": "Lobster Two",
+   "popularity": 99,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 3,
+   "languages": [
+    22
+   ],
+   "name": "Changa One",
+   "popularity": 107,
+   "variants": [
+    4
+   ]
+  },
+  {
+   "category": 1,
+   "languages": [
+    3,
+    22,
+    23
+   ],
+   "name": "Hind Siliguri",
+   "popularity": 115,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 2,
+   "languages": [
+    22,
+    23,
+    33
+   ],
+   "name": "Newsreader",
+   "popularity": 117,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 2,
+   "languages": [
+    7,
+    8,
+    12,
+    22,
+    23,
+    33
+   ],
+   "name": "Source Serif 4",
+   "popularity": 118,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 4,
+   "languages": [
+    22,
+    23
+   ],
+   "name": "Zeyada",
+   "popularity": 126,
+   "variants": [
+    4
+   ]
+  },
+  {
+   "category": 2,
+   "languages": [
+    22,
+    23
+   ],
+   "name": "Slabo 27px",
+   "popularity": 135,
+   "variants": [
+    4
+   ]
+  },
+  {
+   "category": 5,
+   "languages": [
+    7,
+    8,
+    22,
+    23,
+    33
+   ],
+   "name": "Geist Mono",
+   "popularity": 138,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 2,
+   "languages": [
+    22,
+    23,
+    33
+   ],
+   "name": "Crimson Text",
+   "popularity": 139,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 2,
+   "languages": [
+    22
+   ],
+   "name": "Arvo",
+   "popularity": 144,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 2,
+   "languages": [
+    22,
+    23
+   ],
+   "name": "Bodoni Moda",
+   "popularity": 146,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 5,
+   "languages": [
+    22,
+    23
+   ],
+   "name": "DM Mono",
+   "popularity": 148,
+   "variants": [
+    4
+   ]
+  },
+  {
+   "category": 2,
+   "languages": [
+    22,
+    23
+   ],
+   "name": "Domine",
+   "popularity": 151,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 4,
+   "languages": [
+    22,
+    23
+   ],
+   "name": "Shadows Into Light",
+   "popularity": 162,
+   "variants": [
+    4
+   ]
+  },
+  {
+   "category": 2,
+   "languages": [
+    22,
+    23
+   ],
+   "name": "Zilla Slab",
+   "popularity": 169,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 3,
+   "languages": [
+    22,
+    23
+   ],
+   "name": "Lilita One",
+   "popularity": 172,
+   "variants": [
+    4
+   ]
+  },
+  {
+   "category": 2,
+   "languages": [
+    22,
+    23
+   ],
+   "name": "Marcellus",
+   "popularity": 175,
+   "variants": [
+    4
+   ]
+  },
+  {
+   "category": 2,
+   "languages": [
+    7,
+    8,
+    22,
+    23,
+    33
+   ],
+   "name": "IBM Plex Serif",
+   "popularity": 184,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 2,
+   "languages": [
+    7,
+    8,
+    22,
+    23,
+    33
+   ],
+   "name": "Spectral",
+   "popularity": 185,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 2,
+   "languages": [
+    7,
+    8,
+    22,
+    23,
+    33
+   ],
+   "name": "Cormorant",
+   "popularity": 189,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 3,
+   "languages": [
+    9,
+    22,
+    23,
+    33
+   ],
+   "name": "Baloo 2",
+   "popularity": 190,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 3,
+   "languages": [
+    22
+   ],
+   "name": "Gravitas One",
+   "popularity": 195,
+   "variants": [
+    4
+   ]
+  },
+  {
+   "category": 3,
+   "languages": [
+    22,
+    23
+   ],
+   "name": "Oleo Script",
+   "popularity": 201,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 4,
+   "languages": [
+    22,
+    23
+   ],
+   "name": "Indie Flower",
+   "popularity": 205,
+   "variants": [
+    4
+   ]
+  },
+  {
+   "category": 4,
+   "languages": [
+    9,
+    22,
+    23
+   ],
+   "name": "Kalam",
+   "popularity": 207,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 5,
+   "languages": [
+    7,
+    8,
+    12,
+    13,
+    22,
+    23
+   ],
+   "name": "Fira Code",
+   "popularity": 218,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 5,
+   "languages": [
+    22,
+    23
+   ],
+   "name": "Courier Prime",
+   "popularity": 220,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 3,
+   "languages": [
+    22,
+    23
+   ],
+   "name": "Titan One",
+   "popularity": 221,
+   "variants": [
+    4
+   ]
+  },
+  {
+   "category": 4,
+   "languages": [
+    22
+   ],
+   "name": "Delius",
+   "popularity": 223,
+   "variants": [
+    4
+   ]
+  },
+  {
+   "category": 3,
+   "languages": [
+    22,
+    23
+   ],
+   "name": "Luckiest Guy",
+   "popularity": 224,
+   "variants": [
+    4
+   ]
+  },
+  {
+   "category": 4,
+   "languages": [
+    22,
+    23
+   ],
+   "name": "Yellowtail",
+   "popularity": 242,
+   "variants": [
+    4
+   ]
+  },
+  {
+   "category": 4,
+   "languages": [
+    22
+   ],
+   "name": "Comic Neue",
+   "popularity": 260,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 3,
+   "languages": [
+    22,
+    23,
+    33
+   ],
+   "name": "Rowdies",
+   "popularity": 271,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 3,
+   "languages": [
+    22
+   ],
+   "name": "Patua One",
+   "popularity": 273,
+   "variants": [
+    4
+   ]
+  },
+  {
+   "category": 4,
+   "languages": [
+    22,
+    23,
+    33
+   ],
+   "name": "Allura",
+   "popularity": 278,
+   "variants": [
+    4
+   ]
+  },
+  {
+   "category": 3,
+   "languages": [
+    22,
+    23
+   ],
+   "name": "Audiowide",
+   "popularity": 282,
+   "variants": [
+    4
+   ]
+  },
+  {
+   "category": 3,
+   "languages": [
+    22
+   ],
+   "name": "Creepster",
+   "popularity": 284,
+   "variants": [
+    4
+   ]
+  },
+  {
+   "category": 3,
+   "languages": [
+    22
+   ],
+   "name": "Fugaz One",
+   "popularity": 285,
+   "variants": [
+    4
+   ]
+  },
+  {
+   "category": 4,
+   "languages": [
+    22,
+    23,
+    33
+   ],
+   "name": "Patrick Hand",
+   "popularity": 287,
+   "variants": [
+    4
+   ]
+  },
+  {
+   "category": 4,
+   "languages": [
+    22,
+    23
+   ],
+   "name": "Sacramento",
+   "popularity": 288,
+   "variants": [
+    4
+   ]
+  },
+  {
+   "category": 4,
+   "languages": [
+    22,
+    23
+   ],
+   "name": "Courgette",
+   "popularity": 290,
+   "variants": [
+    4
+   ]
+  },
+  {
+   "category": 3,
+   "languages": [
+    22,
+    23
+   ],
+   "name": "Passion One",
+   "popularity": 291,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 3,
+   "languages": [
+    22,
+    23
+   ],
+   "name": "Special Elite",
+   "popularity": 294,
+   "variants": [
+    4
+   ]
+  },
+  {
+   "category": 4,
+   "languages": [
+    20,
+    22
+   ],
+   "name": "Nanum Gothic Coding",
+   "popularity": 296,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 3,
+   "languages": [
+    22,
+    23
+   ],
+   "name": "Chelsea Market",
+   "popularity": 303,
+   "variants": [
+    4
+   ]
+  },
+  {
+   "category": 3,
+   "languages": [
+    22,
+    23
+   ],
+   "name": "Oxanium",
+   "popularity": 304,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 5,
+   "languages": [
+    22
+   ],
+   "name": "Share Tech Mono",
+   "popularity": 311,
+   "variants": [
+    4
+   ]
+  },
+  {
+   "category": 4,
+   "languages": [
+    22
+   ],
+   "name": "Tangerine",
+   "popularity": 325,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 5,
+   "languages": [
+    22,
+    23,
+    33
+   ],
+   "name": "VT323",
+   "popularity": 329,
+   "variants": [
+    4
+   ]
+  },
+  {
+   "category": 3,
+   "languages": [
+    22,
+    23
+   ],
+   "name": "Gabarito",
+   "popularity": 333,
+   "variants": [
+    4,
+    7
+   ]
+  },
+  {
+   "category": 4,
+   "languages": [
+    22,
+    23,
+    33
+   ],
+   "name": "Alex Brush",
+   "popularity": 334,
+   "variants": [
+    4
+   ]
+  },
+  {
+   "category": 4,
+   "languages": [
+    22,
+    23,
+    33
+   ],
+   "name": "Pinyon Script",
+   "popularity": 336,
+   "variants": [
+    4
+   ]
+  },
+  {
+   "category": 3,
+   "languages": [
+    7,
+    12,
+    17,
+    22,
+    23,
+    33
+   ],
+   "name": "Dela Gothic One",
+   "popularity": 337,
+   "variants": [
+    4
+   ]
+  },
+  {
+   "category": 4,
+   "languages": [
+    22,
+    23
+   ],
+   "name": "Architects Daughter",
+   "popularity": 343,
+   "variants": [
+    4
+   ]
+  },
+  {
+   "category": 3,
+   "languages": [
+    7,
+    8,
+    22,
+    23
+   ],
+   "name": "Forum",
+   "popularity": 344,
+   "variants": [
+    4
+   ]
+  },
+  {
+   "category": 4,
+   "languages": [
+    22
+   ],
+   "name": "Homemade Apple",
+   "popularity": 348,
+   "variants": [
+    4
+   ]
+  },
+  {
+   "category": 5,
+   "languages": [
+    7,
+    8,
+    22,
+    23
+   ],
+   "name": "PT Mono",
+   "popularity": 350,
+   "variants": [
+    4
+   ]
+  },
+  {
+   "category": 4,
+   "languages": [
+    22,
+    23
+   ],
+   "name": "Gloria Hallelujah",
+   "popularity": 356,
+   "variants": [
+    4
+   ]
+  }
+ ],
+ "fonttools": "4.60.2"
+}

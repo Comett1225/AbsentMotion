@@ -284,10 +284,72 @@ JUnit 4.13.2 (Eclipse Public License 1.0), kXML 2 2.3.0 (`net.sf.kxml:kxml2`, a 
 
 ### Google Fonts
 
-No font file is part of AbsentMotion. When a user picks a font from the font browser, the app downloads that family
-from Google's font servers (`fonts.googleapis.com`, `fonts.gstatic.com`) and stores it on the device. Each family keeps
-its own licence: the SIL Open Font License 1.1, the Apache License 2.0 or the Ubuntu Font Licence 1.0, as stated for
-that family at https://fonts.google.com/. Text a user sets in such a font belongs to the user.
+AbsentMotion contains 50 font families that work without a network connection, and offers 100 more that the
+app downloads from Google's font servers (`fonts.googleapis.com`, `fonts.gstatic.com`) when a user picks one. A downloaded
+family keeps its own licence: the SIL Open Font License 1.1, the Apache License 2.0 or the Ubuntu Font Licence 1.0, as stated
+for that family at https://fonts.google.com/. Text a user sets in any of these fonts belongs to the user.
+
+The built-in fonts are copied from the repository https://github.com/google/fonts at commit
+`47d54ca1ebb14fd864695f1d39dc734f39017c33`. The table lists, for each family, the copyright line from the font, the licence and the licence file that
+ships next to the font files in the app. 35 families are modified: variable fonts were turned into static Regular and Bold
+instances, and every font was cut down to the Latin, Cyrillic and Vietnamese letters and (for Hindi, Thai and Arabic fonts)
+the writing system of that font, with `tools/gen_fonts.py` and fontTools. The 15 families whose copyright holders reserve
+the font name (Abril Fatface, Alfa Slab One, Bitter, Comfortaa, DM Serif Display, Dancing Script, Kaushan Script, Lobster, Lora, Orbitron, Playfair Display, Press Start 2P, Quicksand, Raleway, Righteous) are included exactly as published, because the SIL Open Font License
+does not allow a modified version to keep a reserved name. The licence text of the SIL Open Font License 1.1 is in
+appendix A.13; the Apache License 2.0 text is the file `LICENSE`.
+
+| What | Source | Licence | File |
+|---|---|---|---|
+| Abril Fatface | Copyright (c) 2011, Copyright (c) 2011, TypeTogether (www.type-together.com), with Reserved Font Names "Abril" and "Abril Fatface" | SIL Open Font License 1.1 | `assets/fonts/AbrilFatface/OFL.txt` |
+| Alfa Slab One | Copyright 2016 The Alfa Slab One Project Authors (http://www.jmsole.cl / info@jmsole.cl), with Reserved Font Name "Alfa Slab". | SIL Open Font License 1.1 | `assets/fonts/AlfaSlabOne/OFL.txt` |
+| Amatic SC | Copyright 2015 The Amatic SC Project Authors (https://github.com/googlefonts/AmaticSC) | SIL Open Font License 1.1 | `assets/fonts/AmaticSC/OFL.txt` |
+| Anton | Copyright 2020 The Anton Project Authors (https://github.com/googlefonts/AntonFont.git) | SIL Open Font License 1.1 | `assets/fonts/Anton/OFL.txt` |
+| Bangers | Copyright 2010 The Bangers Project Authors (https://github.com/googlefonts/bangers) | SIL Open Font License 1.1 | `assets/fonts/Bangers/OFL.txt` |
+| Bebas Neue | Copyright 2019 The Bebas Neue Project Authors (https://github.com/dharmatype/Bebas-Neue) | SIL Open Font License 1.1 | `assets/fonts/BebasNeue/OFL.txt` |
+| Bitter | Copyright 2011 The Bitter Project Authors (https://github.com/solmatas/BitterPro) | SIL Open Font License 1.1 | `assets/fonts/Bitter/OFL.txt` |
+| Black Ops One | Copyright 2022 The PinyonScript Project Authors (https://github.com/SorkinType/Black-Ops) | SIL Open Font License 1.1 | `assets/fonts/BlackOpsOne/OFL.txt` |
+| Bungee | Copyright 2023 The Bungee Project Authors (https://github.com/djrrb/Bungee) | SIL Open Font License 1.1 | `assets/fonts/Bungee/OFL.txt` |
+| Cairo | Copyright 2009 The Cairo Project Authors (https://github.com/Gue3bara/Cairo) | SIL Open Font License 1.1 | `assets/fonts/Cairo/OFL.txt` |
+| Caveat | Copyright 2014 The Caveat Project Authors (https://github.com/googlefonts/caveat) | SIL Open Font License 1.1 | `assets/fonts/Caveat/OFL.txt` |
+| Cinzel | Copyright 2020 The Cinzel Project Authors (https://github.com/NDISCOVER/Cinzel) | SIL Open Font License 1.1 | `assets/fonts/Cinzel/OFL.txt` |
+| Comfortaa | Copyright 2011 The Comfortaa Project Authors (https://github.com/alexeiva/comfortaa), with Reserved Font Name "Comfortaa". | SIL Open Font License 1.1 | `assets/fonts/Comfortaa/OFL.txt` |
+| DM Sans | Copyright 2014 The DM Sans Project Authors (https://github.com/googlefonts/dm-fonts) | SIL Open Font License 1.1 | `assets/fonts/DMSans/OFL.txt` |
+| DM Serif Display | Copyright 2014 - 2017 Adobe Systems Incorporated (http://www.adobe.com/), with Reserved Font Name 'Source'. Copyright 2019 Google LLC. | SIL Open Font License 1.1 | `assets/fonts/DMSerifDisplay/OFL.txt` |
+| Dancing Script | Copyright 2016 The Dancing Script Project Authors (https://github.com/googlefonts/DancingScript), with Reserved Font Name "Dancing Script". | SIL Open Font License 1.1 | `assets/fonts/DancingScript/OFL.txt` |
+| Fredoka | Copyright 2016 The Fredoka Project Authors (https://github.com/hafontia/Fredoka-One) | SIL Open Font License 1.1 | `assets/fonts/Fredoka/OFL.txt` |
+| Great Vibes | Copyright 2010 The Great Vibes Pro Project Authors (https://github.com/googlefonts/great-vibes) | SIL Open Font License 1.1 | `assets/fonts/GreatVibes/OFL.txt` |
+| Hind | Copyright (c) 2014 Indian Type Foundry (info@indiantypefoundry.com) | SIL Open Font License 1.1 | `assets/fonts/Hind/OFL.txt` |
+| Inter | Copyright 2016 The Inter Project Authors (https://github.com/rsms/inter) | SIL Open Font License 1.1 | `assets/fonts/Inter/OFL.txt` |
+| JetBrains Mono | Copyright 2020 The JetBrains Mono Project Authors (https://github.com/JetBrains/JetBrainsMono) | SIL Open Font License 1.1 | `assets/fonts/JetBrainsMono/OFL.txt` |
+| Kanit | Copyright 2020 The Kanit Project Authors (https://github.com/cadsondemak/kanit) | SIL Open Font License 1.1 | `assets/fonts/Kanit/OFL.txt` |
+| Kaushan Script | Copyright (c) 2011, Pablo Impallari (www.impallari.com/impallari@gmail.com), Copyright (c) 2011, Igino Marini. (www.ikern.com/mail@iginomarini.com), with Reserved Font Name Kaushan Script. | SIL Open Font License 1.1 | `assets/fonts/KaushanScript/OFL.txt` |
+| Lobster | Copyright 2010 The Lobster Project Authors (https://github.com/impallari/The-Lobster-Font), with Reserved Font Name "Lobster". | SIL Open Font License 1.1 | `assets/fonts/Lobster/OFL.txt` |
+| Lora | Copyright 2011 The Lora Project Authors (https://github.com/cyrealtype/Lora-Cyrillic), with Reserved Font Name "Lora". | SIL Open Font License 1.1 | `assets/fonts/Lora/OFL.txt` |
+| Manrope | Copyright 2019 The Manrope Project Authors (https://github.com/googlefonts/manrope) | SIL Open Font License 1.1 | `assets/fonts/Manrope/OFL.txt` |
+| Montserrat | Copyright 2011 The Montserrat Project Authors (https://github.com/JulietaUla/Montserrat) | SIL Open Font License 1.1 | `assets/fonts/Montserrat/OFL.txt` |
+| Mulish | Copyright 2016 The Mulish Project Authors (https://github.com/googlefonts/mulish) | SIL Open Font License 1.1 | `assets/fonts/Mulish/OFL.txt` |
+| Noto Serif | Copyright 2022 The Noto Project Authors (https://github.com/notofonts/latin-greek-cyrillic) | SIL Open Font License 1.1 | `assets/fonts/NotoSerif/OFL.txt` |
+| Nunito | Copyright 2014 The Nunito Project Authors (https://github.com/googlefonts/nunito) | SIL Open Font License 1.1 | `assets/fonts/Nunito/OFL.txt` |
+| Open Sans | Copyright 2020 The Open Sans Project Authors (https://github.com/googlefonts/opensans) | SIL Open Font License 1.1 | `assets/fonts/OpenSans/OFL.txt` |
+| Orbitron | Copyright 2018 The Orbitron Project Authors (https://github.com/theleagueof/orbitron), with Reserved Font Name: "Orbitron". | SIL Open Font License 1.1 | `assets/fonts/Orbitron/OFL.txt` |
+| Oswald | Copyright 2016 The Oswald Project Authors (https://github.com/googlefonts/OswaldFont) | SIL Open Font License 1.1 | `assets/fonts/Oswald/OFL.txt` |
+| Pacifico | Copyright 2018 The Pacifico Project Authors (https://github.com/googlefonts/Pacifico) | SIL Open Font License 1.1 | `assets/fonts/Pacifico/OFL.txt` |
+| Permanent Marker | Copyright (c) 2010 by Font Diner, Inc. All rights reserved. | Apache License 2.0 | `assets/fonts/PermanentMarker/LICENSE.txt` |
+| Playfair Display | Copyright 2017 The Playfair Display Project Authors (https://github.com/clauseggers/Playfair-Display), with Reserved Font Name "Playfair Display". | SIL Open Font License 1.1 | `assets/fonts/PlayfairDisplay/OFL.txt` |
+| Poppins | Copyright 2020 The Poppins Project Authors (https://github.com/itfoundry/Poppins) | SIL Open Font License 1.1 | `assets/fonts/Poppins/OFL.txt` |
+| Press Start 2P | Copyright 2012 The Press Start 2P Project Authors (cody@zone38.net), with Reserved Font Name "Press Start 2P" | SIL Open Font License 1.1 | `assets/fonts/PressStart2P/OFL.txt` |
+| Prompt | Copyright (c) 2015, Cadson Demak (info@cadsondemak.com) | SIL Open Font License 1.1 | `assets/fonts/Prompt/OFL.txt` |
+| Quicksand | Copyright 2019 The Quicksand Project Authors (https://github.com/andrew-paglinawan/QuicksandFamily.git), with Reserved Font Name "Quicksand" | SIL Open Font License 1.1 | `assets/fonts/Quicksand/OFL.txt` |
+| Raleway | Copyright 2010 The Raleway Project Authors (impallari@gmail.com), with Reserved Font Name "Raleway". | SIL Open Font License 1.1 | `assets/fonts/Raleway/OFL.txt` |
+| Righteous | Copyright (c) 2011 by Brian J. Bonislawsky DBA Astigmatic (AOETI) (astigma@astigmatic.com), with Reserved Font Name "Righteous" | SIL Open Font License 1.1 | `assets/fonts/Righteous/OFL.txt` |
+| Roboto | Copyright 2011 The Roboto Project Authors (https://github.com/googlefonts/roboto-classic) | SIL Open Font License 1.1 | `assets/fonts/Roboto/OFL.txt` |
+| Roboto Mono | Copyright 2015 The Roboto Mono Project Authors (https://github.com/googlefonts/robotomono) | SIL Open Font License 1.1 | `assets/fonts/RobotoMono/OFL.txt` |
+| Roboto Slab | Copyright 2018 The Roboto Slab Project Authors (https://github.com/googlefonts/robotoslab) | Apache License 2.0 | `assets/fonts/RobotoSlab/LICENSE.txt` |
+| Rubik | Copyright 2015 The Rubik Project Authors (https://github.com/googlefonts/rubik) | SIL Open Font License 1.1 | `assets/fonts/Rubik/OFL.txt` |
+| Satisfy | Copyright (c) 2011 by Font Diner, Inc. All rights reserved. | Apache License 2.0 | `assets/fonts/Satisfy/LICENSE.txt` |
+| Space Mono | Copyright 2016 The Space Mono Project Authors (https://github.com/googlefonts/spacemono) | SIL Open Font License 1.1 | `assets/fonts/SpaceMono/OFL.txt` |
+| Tajawal | (c) 2017 by Boutros International. All rights reserved. | SIL Open Font License 1.1 | `assets/fonts/Tajawal/OFL.txt` |
+| Work Sans | Copyright 2019 The Work Sans Project Authors (https://github.com/weiweihuanghuang/Work-Sans) | SIL Open Font License 1.1 | `assets/fonts/WorkSans/OFL.txt` |
 
 ### Icons
 
@@ -1661,4 +1723,95 @@ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+~~~~
+
+### A.13 SIL Open Font License 1.1 (Google Fonts built into the app)
+
+~~~~text
+-----------------------------------------------------------
+SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007
+-----------------------------------------------------------
+
+PREAMBLE
+The goals of the Open Font License (OFL) are to stimulate worldwide
+development of collaborative font projects, to support the font creation
+efforts of academic and linguistic communities, and to provide a free and
+open framework in which fonts may be shared and improved in partnership
+with others.
+
+The OFL allows the licensed fonts to be used, studied, modified and
+redistributed freely as long as they are not sold by themselves. The
+fonts, including any derivative works, can be bundled, embedded, 
+redistributed and/or sold with any software provided that any reserved
+names are not used by derivative works. The fonts and derivatives,
+however, cannot be released under any other type of license. The
+requirement for fonts to remain under this license does not apply
+to any document created using the fonts or their derivatives.
+
+DEFINITIONS
+"Font Software" refers to the set of files released by the Copyright
+Holder(s) under this license and clearly marked as such. This may
+include source files, build scripts and documentation.
+
+"Reserved Font Name" refers to any names specified as such after the
+copyright statement(s).
+
+"Original Version" refers to the collection of Font Software components as
+distributed by the Copyright Holder(s).
+
+"Modified Version" refers to any derivative made by adding to, deleting,
+or substituting -- in part or in whole -- any of the components of the
+Original Version, by changing formats or by porting the Font Software to a
+new environment.
+
+"Author" refers to any designer, engineer, programmer, technical
+writer or other person who contributed to the Font Software.
+
+PERMISSION & CONDITIONS
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of the Font Software, to use, study, copy, merge, embed, modify,
+redistribute, and sell modified and unmodified copies of the Font
+Software, subject to the following conditions:
+
+1) Neither the Font Software nor any of its individual components,
+in Original or Modified Versions, may be sold by itself.
+
+2) Original or Modified Versions of the Font Software may be bundled,
+redistributed and/or sold with any software, provided that each copy
+contains the above copyright notice and this license. These can be
+included either as stand-alone text files, human-readable headers or
+in the appropriate machine-readable metadata fields within text or
+binary files as long as those fields can be easily viewed by the user.
+
+3) No Modified Version of the Font Software may use the Reserved Font
+Name(s) unless explicit written permission is granted by the corresponding
+Copyright Holder. This restriction only applies to the primary font name as
+presented to the users.
+
+4) The name(s) of the Copyright Holder(s) or the Author(s) of the Font
+Software shall not be used to promote, endorse or advertise any
+Modified Version, except to acknowledge the contribution(s) of the
+Copyright Holder(s) and the Author(s) or with their explicit written
+permission.
+
+5) The Font Software, modified or unmodified, in part or in whole,
+must be distributed entirely under this license, and must not be
+distributed under any other license. The requirement for fonts to
+remain under this license does not apply to any document created
+using the Font Software.
+
+TERMINATION
+This license becomes null and void if any of the above conditions are
+not met.
+
+DISCLAIMER
+THE FONT SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT
+OF COPYRIGHT, PATENT, TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL THE
+COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+INCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL
+DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM
+OTHER DEALINGS IN THE FONT SOFTWARE.
 ~~~~

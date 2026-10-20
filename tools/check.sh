@@ -14,6 +14,9 @@ step "Android: compile (play and foss flavours)"
 step "Licence asset up to date"
 python3 tools/gen_licenses.py --check >"$log" 2>&1 || { cat "$log" >&2; fail "app/src/main/assets/licenses.txt is out of date: run python3 tools/gen_licenses.py"; }
 
+step "Built-in fonts and catalogue up to date"
+python3 tools/gen_fonts.py --check >"$log" 2>&1 || { cat "$log" >&2; fail "the built-in fonts or the font catalogue are out of date: see tools/gen_fonts.py"; }
+
 step "Android: unit tests"
 ./gradlew :app:testPlayDebugUnitTest :app:testFossDebugUnitTest -q >"$log" 2>&1 || { grep -E 'FAILED|Test.*>' "$log" | head -40 >&2; fail "Android unit tests"; }
 
