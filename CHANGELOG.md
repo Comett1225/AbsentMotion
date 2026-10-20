@@ -6,6 +6,23 @@ All notable changes to AbsentMotion are listed here, newest first. The format fo
 Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stands for the feature set as it stood on
 2026-10-12.
 
+## [3.1.1] - 2026-10-20
+
+### Changed
+
+- Motion Blur works like Alight Motion's: it blurs the layer along the way it really moves, from its keyframes and from
+  motion effects such as Auto-Shake and Oscillate, with Tune, Position, Scale and Angle. The old fixed directional blur is
+  now called Smear, and older projects keep their look.
+- Random Displacement placed after a Repeat effect gives every copy its own offset, as in Alight Motion.
+
+### Fixed
+
+- The timeline showed the keyframes of every effect and setting of a layer together: while editing one effect, another
+  effect's keyframes were shown, highlighted and moved with it, and all of an effect's settings moved as one bundle. Now
+  only the keyframes of the setting you are editing, or of the open effect, are shown, highlighted, dragged and stepped
+  through.
+- Motion Blur did not react to shakes or any other movement.
+
 ## [3.1.0] - 2026-10-20
 
 ### Added

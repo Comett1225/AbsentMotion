@@ -1,0 +1,1 @@
+AbsentMotion 3.1.1: Motion Blur now follows how layers really move, shakes included, like Alight Motion's; the timeline shows and moves only the keyframes of the setting you are editing; and Random Displacement after a Repeat moves each copy on its own.
