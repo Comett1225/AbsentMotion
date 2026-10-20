@@ -21,7 +21,12 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
 import app.absentmotion.editor.EditorState
+import app.absentmotion.editor.applySpeedRamp
+import app.absentmotion.editor.freezeFrame
+import app.absentmotion.model.SpeedRamp
 import app.absentmotion.editor.retimeVideo
 import app.absentmotion.editor.setVideoSpeed
 import app.absentmotion.model.Layer
@@ -56,6 +61,18 @@ fun SpeedPanel(state: EditorState, layer: Layer, modifier: Modifier = Modifier) 
             SpeedSlider(speed, state, Modifier.weight(1f).fillMaxHeight())
             PaceIcon(PanelIcons.Rabbit, Modifier.width(44.dp).height(40.dp))
         }
+        Row(Modifier.offset(y = 153.dp).fillMaxWidth().height(34.dp).horizontalScroll(rememberScrollState()).padding(horizontal = 15.dp), Arrangement.spacedBy(6.dp)) {
+            for (ramp in SpeedRamp.entries) RampChip(ramp.label, true) { state.applySpeedRamp(ramp) }
+            RampChip("Freeze Frame", enabled[1]) { state.askNumber("Seconds", 2f) { state.freezeFrame(it) } }
+        }
+    }
+}
+
+@Composable
+private fun RampChip(label: String, enabled: Boolean, onClick: () -> Unit) {
+    Box(Modifier.fillMaxHeight().alpha(if (enabled) 1f else 0.35f).background(Am.Button, RoundedCornerShape(4.dp))
+        .clickable(enabled = enabled, onClick = onClick).padding(horizontal = 12.dp), Alignment.Center) {
+        Text(label, color = Am.OnDark, fontSize = 12.sp, maxLines = 1, softWrap = false)
     }
 }
 

@@ -7,6 +7,8 @@ import kotlin.math.roundToInt
 
 val SpeedRef = PropRef(PropRef.Kind.Child, "speedMap")
 
+private const val MIN_SPEED = 0.00001
+
 class VideoTiming(layer: Layer) {
     private data class Point(val media: Double, val speed: Double, val item: Double)
     private val origin = layer.mediaFill?.inTime?.toDouble() ?: layer.node["inTime"]?.toDoubleOrNull() ?: 0.0
@@ -19,14 +21,14 @@ class VideoTiming(layer: Layer) {
         if (keys.isEmpty()) {
             samples += 0.0 to ((map?.get("value")?.toDoubleOrNull() ?: layer.node["speed"]?.toDoubleOrNull() ?: 1.0).coerceAtLeast(0.001))
         } else {
-            samples += keys.first().t.toDouble() / 1_000_000 to keys.first().v.toDouble().coerceAtLeast(0.001)
+            samples += keys.first().t.toDouble() / 1_000_000 to keys.first().v.toDouble().coerceAtLeast(MIN_SPEED)
             for ((a, b) in keys.zipWithNext()) {
                 val easing = Easing.parse(b.e)
                 val count = if (easing.isLinear) 1 else ceil((b.t - a.t) / 50_000_000.0).toInt().coerceIn(1, 250)
                 for (i in 1..count) {
                     val u = i.toFloat() / count
                     val value = a.v.toDouble() + (b.v.toDouble() - a.v.toDouble()) * (if (easing.isLinear) u else easing.at(u))
-                    samples += (a.t + (b.t - a.t) * u).toDouble() / 1_000_000 to value.coerceAtLeast(0.001)
+                    samples += (a.t + (b.t - a.t) * u).toDouble() / 1_000_000 to value.coerceAtLeast(MIN_SPEED)
                 }
             }
         }
@@ -187,7 +189,7 @@ fun Layer.retimedVideo(start: Int, end: Int): Layer {
     val map = node.child("speedMap")
     var n = node.with("startTime", "$start").with("endTime", "$end")
     n = if (map?.isKeyframed == true) n.withChild("speedMap", map.withKeyframes(map.keyframes.map { key ->
-        key.v.toFloatOrNull()?.let { key.copy(v = (it * k).coerceAtLeast(0.001f).toString()) } ?: key
+        key.v.toFloatOrNull()?.let { key.copy(v = (it * k).coerceAtLeast(MIN_SPEED.toFloat()).toString()) } ?: key
     })).with("speed", null)
         else n.withChild("speedMap", null).with("speed", speed.toString())
     return copy(node = n)
@@ -242,10 +244,60 @@ fun Layer.withSpeedKeyframeToggled(projectTime: Int, fps: Int): Layer {
             val split = splitSpeedBezier(curve, (media - a.t) / (b.t - a.t))
             val speed = a.v.toFloat() + (b.v.toFloat() - a.v.toFloat()) * curve.at((media - a.t) / (b.t - a.t))
             map.withKeyframes(keys.mapIndexed { i, key -> if (i == next) key.copy(e = split.second.toString()) else key } +
-                inserted.copy(v = speed.coerceAtLeast(0.001f).toString(), e = split.first.toString()))
+                inserted.copy(v = speed.coerceAtLeast(MIN_SPEED.toFloat()).toString(), e = split.first.toString()))
         } else map.withKeyframes(keys + inserted)
     }
     return copy(node = node.withChild("speedMap", changed))
+}
+
+enum class SpeedRamp(val label: String, val points: List<Pair<Float, Float>>) {
+    Montage("Montage", listOf(0f to 1f, 0.25f to 2.5f, 0.5f to 0.6f, 0.75f to 2.5f, 1f to 1f)),
+    Hero("Hero", listOf(0f to 2.5f, 0.4f to 0.3f, 0.6f to 0.3f, 1f to 2.5f)),
+    Bullet("Bullet", listOf(0f to 3f, 0.3f to 0.2f, 0.7f to 0.2f, 1f to 3f)),
+    JumpCut("Jump Cut", listOf(0f to 1f, 0.4f to 1f, 0.5f to 4f, 0.6f to 1f, 1f to 1f)),
+    FlashIn("Flash In", listOf(0f to 4f, 0.4f to 1f, 1f to 1f)),
+    FlashOut("Flash Out", listOf(0f to 1f, 0.6f to 1f, 1f to 4f)),
+}
+
+const val RAMP_EASE = "cubicBezier 0.42 0.0 0.58 1.0"
+
+fun speedRampKeys(ramp: SpeedRamp, fromNs: Float, toNs: Float, ease: String? = RAMP_EASE): List<Keyframe> =
+    ramp.points.mapIndexed { i, (u, speed) -> Keyframe(fromNs + (toNs - fromNs) * u, speed.toString(), ease.takeIf { i > 0 }) }
+
+fun Layer.withSpeedRamp(ramp: SpeedRamp, ease: String? = RAMP_EASE): Layer {
+    val timing = VideoTiming(this)
+    val from = (timing.mediaMs(0.0) * 1_000_000).toFloat()
+    val to = (timing.mediaMs((endTime - startTime).toDouble()) * 1_000_000).toFloat()
+    return withVideoSpeedMap(XmlNode("speedMap").withKeyframes(speedRampKeys(ramp, from, to, ease)))
+}
+
+private const val HOLD_RAMP_NS = 250_000f
+private const val HOLD_SPAN_NS = 500_000f
+
+fun Layer.withFreezeFrame(projectTime: Int, holdMs: Int, fps: Int): Layer? {
+    if (projectTime <= startTime || projectTime >= endTime || holdMs <= 0) return null
+    val local = (projectTime - startTime).toDouble()
+    val timing = VideoTiming(this)
+    val near = node.child("speedMap")?.keyframes.orEmpty().firstOrNull { abs(timing.localMs(it.t.toDouble() / 1_000_000) - local) <= 500.0 / fps }
+    val keyed = if (near != null) this else withSpeedKeyframeToggled(projectTime, fps)
+    val map = keyed.node.child("speedMap") ?: return null
+    val keys = map.keyframes
+    val media = (timing.mediaMs(local) * 1_000_000).toFloat()
+    val at = near ?: keys.minByOrNull { abs(it.t - media) } ?: return null
+    val ramp = maxOf(HOLD_RAMP_NS, 2 * Math.ulp(at.t))
+    val t1 = at.t + ramp
+    val t2 = t1 + maxOf(HOLD_SPAN_NS, 2 * Math.ulp(t1))
+    val t3 = t2 + maxOf(ramp, 2 * Math.ulp(t2))
+    val s = (at.v.toDoubleOrNull() ?: 1.0).coerceAtLeast(MIN_SPEED)
+    val e1 = (t1 - at.t) / 1e6
+    val d = (t2 - t1) / 1e6
+    val e2 = (t3 - t2) / 1e6
+    val r = holdMs + (e1 + d + e2) / s
+    val b = r * s - 2 * (e1 + e2) - d
+    val hold = ((-b + sqrt(b * b + 4 * r * d * s)) / (2 * r)).coerceAtLeast(MIN_SPEED)
+    val text = String.format(java.util.Locale.US, "%.9f", hold)
+    val kept = keys.filter { it.t <= at.t || it.t > t3 }
+    return keyed.withVideoSpeedMap(map.withKeyframes(kept + Keyframe(t1, text) + Keyframe(t2, text) + Keyframe(t3, at.v)))
 }
 
 fun Layer.withKeyframesMoved(from: Int, to: Int, scene: Scene): Layer {

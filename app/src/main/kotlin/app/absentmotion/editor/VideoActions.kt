@@ -56,6 +56,17 @@ internal fun EditorState.editKeyValue(key: Any? = null, change: (Layer) -> Layer
     }
 }
 
+fun EditorState.applySpeedRamp(ramp: SpeedRamp) {
+    val id = selected?.id ?: return
+    edit { it.update(id) { layer -> layer.withSpeedRamp(ramp) } }
+}
+
+fun EditorState.freezeFrame(seconds: Float) {
+    val layer = selected ?: return
+    val frozen = layer.withFreezeFrame(sampleMs, (seconds * 1000).toInt().coerceIn(100, 30_000), scene.fps) ?: return
+    edit { it.update(layer.id) { frozen } }
+}
+
 fun EditorState.deleteSpeedKeyframes() {
     val id = selected?.id ?: return
     edit { it.update(id) { layer -> layer.withVideoSpeedMap(XmlNode("speedMap", mapOf("value" to "1"))) } }
