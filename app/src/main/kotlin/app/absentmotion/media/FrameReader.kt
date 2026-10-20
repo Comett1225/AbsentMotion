@@ -19,7 +19,8 @@ internal class FrameReader(context: Context, uri: String) : Closeable {
     private var codec: MediaCodec? = null
     private val info = MediaCodec.BufferInfo()
     private var queued = false
-    private var lastPts = Long.MIN_VALUE
+    private var positioned = false
+    private var lastPts = 0L
     val timestamps: LongArray
     var colorStandard = 0
         private set
@@ -51,10 +52,11 @@ internal class FrameReader(context: Context, uri: String) : Closeable {
     suspend fun read(wanted: List<Long>, consume: suspend (Long, Yuv) -> Unit): Int {
         if (wanted.isEmpty()) return 0
         val decoder = checkNotNull(codec) { "The video reader is closed" }
-        if (wanted.first() <= lastPts || wanted.first() - lastPts > SKIP_US) {
+        if (!positioned || wanted.first() <= lastPts || wanted.first() - lastPts > SKIP_US) {
             if (queued) decoder.flush()
             extractor.seekTo(wanted.first(), MediaExtractor.SEEK_TO_PREVIOUS_SYNC)
             queued = false
+            positioned = true
         }
         var inputEnded = false
         var next = 0
@@ -87,7 +89,8 @@ internal class FrameReader(context: Context, uri: String) : Closeable {
                 val pts = info.presentationTimeUs
                 if (info.size > 0 && wanted[next] <= pts) {
                     lastPts = pts
-                    decoder.getOutputImage(index)?.use { image ->
+                    val image = checkNotNull(decoder.getOutputImage(index)) { "This phone cannot read the frames of this video" }
+                    image.use {
                         check(image.format == ImageFormat.YUV_420_888) { "This video uses a pixel format that cannot be read" }
                         val yuv = image.yuv()
                         while (next < wanted.size && wanted[next] <= pts) consume(wanted[next++], yuv)

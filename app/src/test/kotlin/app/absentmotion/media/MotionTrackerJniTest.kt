@@ -75,10 +75,10 @@ class MotionTrackerJniTest {
         val motion = scene.motionOf(layer, outcome.steps, 1280, 720, Sim())
         val anchor = scene.videoToScene(layer, 0, 1280, 720)!!.map(start[0])
         val out = scene.add(trackNull(5, layer, anchor, "Track 1"))
-            .withTrack(TrackApply(5, 0, Place(anchor.x, anchor.y, 0f, 0f, 1f, 1f, 0f), rotateScale = true), motion)
+            .withTrack(TrackApply(5, Place(anchor.x, anchor.y, 0f, 0f, 1f, 1f, 0f), rotateScale = true), motion)
         for (k in listOf(0, 9, 23)) {
             val expected = scene.videoToScene(layer, k, 1280, 720)!!.map(moved(start[0], k))
-            val at = out.layerAt(5, scene.frameTime(k))!!
+            val at = out.layerAt(5, scene.frameStart(k))!!
             assertEquals(expected.x, at.location[0], 0.8f)
             assertEquals(expected.y, at.location[1], 0.8f)
             assertEquals(0.8f * k, at.transform("rotation", 0f)[0], 0.2f)

@@ -113,7 +113,7 @@ internal fun Scene.layerAffine(layer: Layer, timeMs: Int): Affine {
 }
 
 internal fun Scene.videoToScene(layer: Layer, frame: Int, frameWidth: Int, frameHeight: Int): Affine? {
-    val ms = frameTime(frame)
+    val ms = frameStart(frame)
     val rect = layer.at(ms, fps).mediaRect(frameWidth, frameHeight) ?: return null
     val sx = (rect[2] - rect[0]).toDouble() / frameWidth
     val sy = (rect[3] - rect[1]).toDouble() / frameHeight
@@ -249,7 +249,7 @@ internal fun unwrapDegrees(values: List<Double>): List<Double> {
     return out
 }
 
-internal class TrackApply(val targetId: Long, val reference: Int, val origin: Place, val rotateScale: Boolean)
+internal class TrackApply(val targetId: Long, val origin: Place, val rotateScale: Boolean)
 
 internal const val LOCATION_TOLERANCE = 0.5f
 internal const val ROTATION_TOLERANCE = 0.1f
@@ -258,7 +258,7 @@ internal const val SCALE_TOLERANCE = 0.001f
 internal fun Scene.withTrack(apply: TrackApply, motion: Map<Int, Sim>): Scene {
     val target = layer(apply.targetId) ?: return this
     val length = (target.endTime - target.startTime).coerceAtLeast(1)
-    val frames = motion.keys.sorted().filter { frameTime(it) in target.startTime..target.endTime }
+    val frames = motion.keys.sorted().filter { frameStart(it) in target.startTime..target.endTime }
     if (frames.isEmpty()) return this
     val parent = chain(target).getOrNull(1)
     val turns = unwrapDegrees(frames.map { motion.getValue(it).degrees })
@@ -268,9 +268,9 @@ internal fun Scene.withTrack(apply: TrackApply, motion: Map<Int, Sim>): Scene {
         val at = s.map(Pt(o.x, o.y))
         val k = if (apply.rotateScale) s.scale.toFloat() else 1f
         val world = Place(at.x, at.y, o.px, o.py, o.sx * k, o.sy * k, if (apply.rotateScale) o.rot + turns[i].toFloat() else o.rot, o.z)
-        parent?.let { decompose(world, place(it, frameTime(f))) ?: world } ?: world
+        parent?.let { decompose(world, place(it, frameStart(f))) ?: world } ?: world
     }
-    val times = FloatArray(frames.size) { (frameTime(frames[it]) - target.startTime).toFloat() / length }
+    val times = FloatArray(frames.size) { (frameStart(frames[it]) - target.startTime).toFloat() / length }
     val parts = buildList {
         add(Triple("location", LOCATION_TOLERANCE, local.map { it.part("location") }))
         if (apply.rotateScale) {

@@ -171,11 +171,11 @@ class MotionTrackTest {
         val steps = (0..20).map { TrackStep(it, listOf(Pt(100f + 3 * it, 200f))) }
         val motion = s.motionOf(layer, steps, 1920, 1080, Sim())
         val start = s.videoToScene(layer, 0, 1920, 1080)!!.map(Pt(100f, 200f))
-        val apply = TrackApply(5, 0, Place(start.x, start.y, 0f, 0f, 1f, 1f, 0f), rotateScale = false)
+        val apply = TrackApply(5, Place(start.x, start.y, 0f, 0f, 1f, 1f, 0f), rotateScale = false)
         val out = s.add(trackNull(5, layer, start, "Track 1")).withTrack(apply, motion)
         val keys = out.layer(5)!!.node.child("transform")!!.child("location")!!.keyframes
         assertEquals(2, keys.size)
-        for (f in listOf(0, 7, 20)) near(s.videoToScene(layer, f, 1920, 1080)!!.map(Pt(100f + 3 * f, 200f)), Pt(out.layerAt(5, s.frameTime(f))!!.location[0], out.layerAt(5, s.frameTime(f))!!.location[1]), 1e-2f)
+        for (f in listOf(0, 7, 20)) near(s.videoToScene(layer, f, 1920, 1080)!!.map(Pt(100f + 3 * f, 200f)), Pt(out.layerAt(5, s.frameStart(f))!!.location[0], out.layerAt(5, s.frameStart(f))!!.location[1]), 1e-2f)
         assertNull(out.layer(5)!!.node.child("transform")!!.child("rotation"))
     }
 
@@ -192,10 +192,10 @@ class MotionTrackTest {
                 .let { TrackStep(f, it) }
         }
         val motion = s.motionOf(layer, steps, 1920, 1080, Sim())
-        val origin = s.place(s.layer(8)!!, s.frameTime(0))
-        val out = s.withTrack(TrackApply(8, 0, origin, rotateScale = true), motion)
+        val origin = s.place(s.layer(8)!!, s.frameStart(0))
+        val out = s.withTrack(TrackApply(8, origin, rotateScale = true), motion)
         for (f in listOf(0, 5, 15)) {
-            val world = out.place(out.layer(8)!!, s.frameTime(f))
+            val world = out.place(out.layer(8)!!, s.frameStart(f))
             val expected = motion.getValue(f).map(Pt(origin.x, origin.y))
             near(expected, Pt(world.x, world.y), 0.75f)
             assertEquals(origin.rot + 2f * f, world.rot, 0.15f)
@@ -211,7 +211,7 @@ class MotionTrackTest {
             )))))
         val s = scene(video(), target)
         val motion = (0..10).associateWith { Sim(tx = it.toDouble()) }
-        val out = s.withTrack(TrackApply(3, 0, Place(0f, 0f, 0f, 0f, 1f, 1f, 0f), rotateScale = false), motion)
+        val out = s.withTrack(TrackApply(3, Place(0f, 0f, 0f, 0f, 1f, 1f, 0f), rotateScale = false), motion)
         val keys = out.layer(3)!!.node.child("transform")!!.child("location")!!.keyframes
         assertTrue(keys.any { abs(it.t - 0.9f) < 1e-6f })
         assertTrue(keys.none { abs(it.t - 0.1f) < 1e-6f })

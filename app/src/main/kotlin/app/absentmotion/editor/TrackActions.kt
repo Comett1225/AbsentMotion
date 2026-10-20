@@ -66,8 +66,8 @@ fun EditorState.runTracking(context: Context, mode: TrackMode, scope: CoroutineS
         mode.motion.clear()
         mode.motion[f0] = Sim()
         mode.apply = TrackApply(
-            chosen?.id ?: Layer.newId(), f0,
-            chosen?.let { document.place(it, document.frameTime(f0)) } ?: Place(anchor.x, anchor.y, 0f, 0f, 1f, 1f, 0f),
+            chosen?.id ?: Layer.newId(),
+            chosen?.let { document.place(it, document.frameStart(f0)) } ?: Place(anchor.x, anchor.y, 0f, 0f, 1f, 1f, 0f),
             mode.points.size > 1,
         )
     }
