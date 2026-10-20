@@ -51,6 +51,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import app.absentmotion.editor.EditorState
+import app.absentmotion.model.Animations
+import app.absentmotion.model.LOOP_MAX_MS
+import app.absentmotion.model.LOOP_MIN_MS
 import app.absentmotion.model.MOTION_MAX_MS
 import app.absentmotion.model.MOTION_MIN_MS
 import app.absentmotion.model.Motion
@@ -59,12 +62,14 @@ import app.absentmotion.model.TransitionKind
 import app.absentmotion.model.cutAt
 import app.absentmotion.model.motion
 import app.absentmotion.model.parseColor
+import app.absentmotion.model.withAnimation
 import app.absentmotion.model.withTransition
 import app.absentmotion.platform.sheetDialogProperties
 import app.absentmotion.ui.editor.panels.ThinSlider
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.pressScale
 import java.util.Locale
+import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.roundToInt
@@ -111,6 +116,35 @@ internal fun TransitionSheet(state: EditorState, aId: Long, bId: Long, onClose: 
         }
         DurationLine(ms, MOTION_MIN_MS, MOTION_MAX_MS, { ms = it; if (current != null) apply(current, "transition-duration") }, state::endGesture)
         Text(note, Modifier.fillMaxWidth().height(40.dp), color = Warning, fontSize = 13.sp, lineHeight = 17.sp, maxLines = 2)
+    }
+}
+
+@Composable
+internal fun AnimationSheet(state: EditorState, id: Long, onClose: () -> Unit) {
+    var tab by remember { mutableIntStateOf(0) }
+    val slot = MotionSlot.entries[tab]
+    val layer = state.scene.layer(id)
+    val record = layer?.motion(slot)
+    val chosen = record?.takeUnless { it.transition }?.id
+    val loop = slot == MotionSlot.Loop
+    var ms by remember(tab) { mutableIntStateOf(record?.takeUnless { it.transition }?.ms ?: if (loop) 1000 else 500) }
+    val clock = rememberClock()
+    fun apply(motionId: String?, key: Any? = null) = state.edit(key) { it.withAnimation(id, slot, motionId, ms) }
+    MotionSheet("Animations", onClose) {
+        Row(Modifier.fillMaxWidth().height(40.dp), verticalAlignment = Alignment.CenterVertically) {
+            Choices(listOf("In", "Out", "Loop"), tab) { tab = it }
+        }
+        val ids = if (loop) Animations.Loops else Animations.InOut.map { it.id to it.label }
+        TileGrid(listOf<Pair<String, String>?>(null) + ids) { item, modifier ->
+            if (item == null) Tile("None", record == null, modifier, { apply(null) }, null)
+            else Tile(item.second, item.first == chosen, modifier, { apply(item.first) }) {
+                if (loop) drawLoop(item.first, clock.value) else drawAnimation(Animations.find(item.first)!!, slot == MotionSlot.In, clock.value)
+            }
+        }
+        DurationLine(ms, if (loop) LOOP_MIN_MS else MOTION_MIN_MS, if (loop) LOOP_MAX_MS else MOTION_MAX_MS,
+            { ms = it; if (chosen != null) apply(chosen, "animation-duration") }, state::endGesture)
+        val note = if (record?.transition == true) "This end of the clip has a transition. Picking an animation replaces it." else ""
+        Text(note, Modifier.fillMaxWidth().height(40.dp), color = Am.OnDarkDim, fontSize = 13.sp, lineHeight = 17.sp, maxLines = 2)
     }
 }
 
@@ -234,4 +268,20 @@ private fun DrawScope.drawTransition(kind: TransitionKind, clock: Float) {
         if (u > 0f) drawPose(inSide.pose(u, true, w, h), Am.Cool, true, clock)
     } else if (u < 0.5f) drawPose(outSide.pose(2 * u, false, w, h), Am.Accent, true, clock)
     else drawPose(inSide.pose(2 * u - 1, true, w, h), Am.Cool, true, clock)
+}
+
+private fun DrawScope.drawAnimation(motion: Motion, inSide: Boolean, clock: Float) {
+    val u = if (inSide) clock / 0.6f else (clock - 0.25f) / 0.6f
+    drawPose(motion.pose(u, inSide, size.width, size.height), Am.Accent, false, clock)
+}
+
+private fun DrawScope.drawLoop(id: String, clock: Float) {
+    val wave = sin(2 * PI.toFloat() * clock)
+    val pose = when (id) {
+        "pulse" -> Pose(scale = 1 + 0.15f * wave)
+        "wobble" -> Pose(turn = 12f * wave)
+        "float" -> Pose(dy = 0.12f * size.height * wave)
+        else -> Pose(turn = -360f * clock)
+    }
+    drawPose(pose, Am.Accent, false, clock)
 }

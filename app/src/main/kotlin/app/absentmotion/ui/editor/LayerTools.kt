@@ -10,6 +10,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.TextButton
 import app.absentmotion.audio.gain
 import app.absentmotion.model.PropRef
+import app.absentmotion.model.canAnimate
 import app.absentmotion.model.contours
 import app.absentmotion.model.SpeedRef
 import app.absentmotion.model.atVideoTime
@@ -90,6 +91,8 @@ import app.absentmotion.R
 fun LayerTools(state: EditorState, modifier: Modifier = Modifier) {
     val drawn = state.selected?.shape?.isEmpty() == true
     var properties by remember(state.selectedId) { mutableStateOf(false) }
+    var animating by remember(state.selectedId) { mutableStateOf(false) }
+    if (animating) state.selectedId?.let { AnimationSheet(state, it) { animating = false } }
     if (properties) {
         ElementProperties(state, { properties = false }, modifier)
         return
@@ -97,6 +100,8 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier) {
     Column(modifier.background(Am.Panel).padding(start = 62.px, top = 42.px, end = 62.px)) {
         Row(Modifier.fillMaxWidth().height(107.px)) {
             SmallTool(PanelIcons.Speed, Modifier.width(183.px), ToolShape, enabled = state.selected?.mediaFill?.video == true || state.selected?.kind == "audio") { state.panel = EditorPanel.Speed }
+            Spacer(Modifier.width(17.px))
+            SmallTool(PanelIcons.Animate, Modifier.width(150.px), ToolShape, enabled = state.selected?.canAnimate == true) { state.playing = false; animating = true }
             Spacer(Modifier.width(17.px))
             Row(Modifier.weight(1f).fillMaxHeight(), Arrangement.spacedBy(3.px)) {
                 val clip = state.selected

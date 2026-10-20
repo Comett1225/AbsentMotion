@@ -27,7 +27,7 @@ The launcher icon is an own drawing, made by `tools/icon/make_icon.py` (source o
 | --- | --- |
 | Lucide only | 163 |
 | Lucide shapes plus own parts | 8 |
-| Own drawing only | 39 |
+| Own drawing only | 40 |
 | Material Symbols | 0 |
 
 (An icon is one named member of an `*Icons` object, or one icon-drawing composable.)
@@ -85,6 +85,7 @@ The launcher icon is an own drawing, made by `tools/icon/make_icon.py` (source o
 | `ui/editor/ChromeIcons.kt` | `ChevronRight` | Lucide | `chevron-right` | ISC and MIT (Feather) | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/chevron-right.svg | - |
 | `ui/editor/ChromeIcons.kt` | `LayerParentIcon` | own drawing | - | Apache-2.0 (own) | - | Canvas drawing: dashed square, solid square, ring badge |
 | `ui/editor/PanelIcons.kt` | `Speed` | Lucide | `gauge` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/gauge.svg | - |
+| `ui/editor/PanelIcons.kt` | `Animate` | own drawing | - | Apache-2.0 (own) | - | circle with three speed lines |
 | `ui/editor/PanelIcons.kt` | `TrimLeft` | own drawing | - | Apache-2.0 (own) | - | playhead, solid clip and dashed edges |
 | `ui/editor/PanelIcons.kt` | `TrimRight` | own drawing | - | Apache-2.0 (own) | - | mirror of TrimLeft |
 | `ui/editor/PanelIcons.kt` | `Split` | Lucide | `scissors` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/scissors.svg | - |

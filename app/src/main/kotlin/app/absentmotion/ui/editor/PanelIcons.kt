@@ -11,6 +11,7 @@ import androidx.compose.ui.unit.dp
 
 internal object PanelIcons {
     val Speed = icon("Speed", width = 1.7f, stroke = "M12 14L16 10M3.34 19A10 10 0 1 1 20.66 19")
+    val Animate = icon("Animate", width = 1.7f, stroke = "M9 12A6 6 0 1 0 21 12A6 6 0 1 0 9 12ZM2 8L6 8M3 12L6 12M2 16L6 16")
     val TrimLeft = icon("TrimLeft", width = 1.7f, stroke = "M12 2.5L12 21.5M13.5 7.5L19.5 7.5A1.5 1.5 0 0 1 21 9L21 15A1.5 1.5 0 0 1 19.5 16.5L13.5 16.5A1.5 1.5 0 0 1 12 15L12 9A1.5 1.5 0 0 1 13.5 7.5ZM3.5 7.5" +
             "L5.3 7.5M6.8 7.5L8.6 7.5M3.5 16.5L5.3 16.5M6.8 16.5L8.6 16.5")
     val Split = icon("Split", width = 1.7f, stroke = "M3 6A3 3 0 1 0 9 6A3 3 0 1 0 3 6ZM8.12 8.12L12 12M20 4L8.12 15.88M3 18A3 3 0 1 0 9 18A3 3 0 1 0 3 18ZM14.8 14.8L20 20")

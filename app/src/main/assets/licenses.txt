@@ -2221,7 +2221,7 @@ COUNTS
 
 - Lucide only - 163
 - Lucide shapes plus own parts - 8
-- Own drawing only - 39
+- Own drawing only - 40
 - Material Symbols - 0
 
 (An icon is one named member of an *Icons object, or one icon-drawing composable.)
@@ -2277,6 +2277,7 @@ ICONS
 - ChevronRight (Lucide chevron-right) - ISC and MIT (Feather) - ui/editor/ChromeIcons.kt
 - LayerParentIcon (own drawing) - Apache-2.0 (own) - ui/editor/ChromeIcons.kt
 - Speed (Lucide gauge) - ISC - ui/editor/PanelIcons.kt
+- Animate (own drawing) - Apache-2.0 (own) - ui/editor/PanelIcons.kt
 - TrimLeft (own drawing) - Apache-2.0 (own) - ui/editor/PanelIcons.kt
 - TrimRight (own drawing) - Apache-2.0 (own) - ui/editor/PanelIcons.kt
 - Split (Lucide scissors) - ISC - ui/editor/PanelIcons.kt
