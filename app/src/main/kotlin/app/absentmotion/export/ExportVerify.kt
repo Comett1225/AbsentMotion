@@ -1,17 +1,23 @@
 package app.absentmotion.export
 
 import android.content.Context
+import android.graphics.ImageDecoder
 import android.media.MediaCodec
 import android.media.MediaExtractor
 import android.media.MediaFormat
 import android.net.Uri
 import android.os.SystemClock
+import android.util.Size
 import app.absentmotion.R
 import app.absentmotion.i18n.AppText
 import app.absentmotion.i18n.UiText
 import app.absentmotion.i18n.txt
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.io.DataInputStream
+import java.io.EOFException
+import java.io.InputStream
+import kotlin.math.abs
 
 data class Expectation(val video: Boolean, val audio: Boolean, val durationUs: Long, val frameUs: Long)
 
@@ -131,6 +137,114 @@ internal fun expectationFor(kind: ExportKind, scene: app.absentmotion.model.Scen
     ExportKind.Video -> Expectation(true, hasAudio, frameCount(scene, s.fps) * 1_000_000L / s.fps, 1_000_000L / s.fps)
     ExportKind.Audio -> Expectation(false, true, (scene.totalTime + 1) * 1000L, 30_000)
     else -> null
+}
+
+data class PictureExpectation(val width: Int, val height: Int, val frames: Int = 1, val durationUs: Long = 0, val frameUs: Long = 0) {
+    val animated: Boolean get() = durationUs > 0
+}
+
+internal fun pictureExpectationFor(kind: ExportKind, scene: app.absentmotion.model.Scene, s: ExportSettings): PictureExpectation? = when (kind) {
+    ExportKind.Gif -> {
+        val (width, height) = exportSize(scene, s.shortSide, even = false)
+        val frames = frameCount(scene, s.fps)
+        PictureExpectation(width, height, frames, frames * 1_000_000L / s.fps, 1_000_000L / s.fps)
+    }
+    ExportKind.Frame, ExportKind.FrameAs -> PictureExpectation(scene.width, scene.height)
+    else -> null
+}
+
+internal class GifFacts(val width: Int, val height: Int, val frames: Int, val durationUs: Long, val complete: Boolean)
+
+internal fun gifFacts(input: InputStream): GifFacts? {
+    val data = DataInputStream(input.buffered())
+    val buffer = ByteArray(768)
+    var width = 0
+    var height = -1
+    var frames = 0
+    var centiseconds = 0L
+    var delay = 0
+    fun byte() = data.readUnsignedByte()
+    fun short() = byte() or (byte() shl 8)
+    fun skip(count: Int) = data.readFully(buffer, 0, count)
+    fun table(packed: Int) { if (packed and 0x80 != 0) skip(3 shl ((packed and 7) + 1)) }
+    fun blocks() {
+        while (true) {
+            val size = byte()
+            if (size == 0) return
+            skip(size)
+        }
+    }
+    fun facts(complete: Boolean) = if (height < 0) null else GifFacts(width, height, frames, centiseconds * 10_000, complete)
+    try {
+        skip(6)
+        val signature = String(buffer, 0, 6, Charsets.US_ASCII)
+        if (signature != "GIF89a" && signature != "GIF87a") return null
+        width = short()
+        height = short()
+        val packed = byte()
+        skip(2)
+        table(packed)
+        while (true) when (byte()) {
+            0x21 -> if (byte() == 0xF9) {
+                val size = byte()
+                skip(size)
+                if (size >= 3) delay = (buffer[1].toInt() and 255) or ((buffer[2].toInt() and 255) shl 8)
+                blocks()
+            } else blocks()
+            0x2C -> {
+                skip(8)
+                table(byte())
+                byte()
+                blocks()
+                frames++
+                centiseconds += delay
+                delay = 0
+            }
+            0x3B -> return facts(true)
+            else -> return facts(false)
+        }
+    } catch (e: EOFException) {
+        return facts(false)
+    }
+}
+
+internal fun judgePicture(width: Int, height: Int, gif: GifFacts?, expect: PictureExpectation): List<UiText> {
+    val problems = ArrayList<UiText>()
+    if (width != expect.width || height != expect.height) problems += txt(R.string.export_verify_size, "${width}x$height", "${expect.width}x${expect.height}")
+    if (!expect.animated) return problems
+    if (gif == null || !gif.complete) return problems + txt(R.string.export_verify_picture)
+    if (gif.frames != expect.frames) problems += txt(R.string.export_verify_frames, gif.frames.toString(), expect.frames.toString())
+    if (abs(gif.durationUs - expect.durationUs) > expect.frameUs + 10_000) {
+        problems += txt(R.string.export_verify_duration, "%.3f".format(java.util.Locale.ROOT, gif.durationUs / 1e6), "%.3f".format(java.util.Locale.ROOT, expect.durationUs / 1e6))
+    }
+    return problems
+}
+
+suspend fun verifyPicture(context: Context, uri: Uri, expect: PictureExpectation): Verification = withContext(Dispatchers.IO) {
+    val start = SystemClock.elapsedRealtime()
+    try {
+        val size = decodedSize(context, uri)
+        val gif = if (expect.animated) context.contentResolver.openInputStream(uri)?.use(::gifFacts) else null
+        val problems = if (size == null) listOf(txt(R.string.export_verify_picture)) else judgePicture(size.width, size.height, gif, expect)
+        Verification(problems, gif?.durationUs ?: 0, size != null, null, SystemClock.elapsedRealtime() - start)
+    } catch (e: Exception) {
+        Verification(listOf(txt(R.string.export_verify_unreadable, e.message ?: e.javaClass.simpleName)), 0, null, null, SystemClock.elapsedRealtime() - start)
+    }
+}
+
+private fun decodedSize(context: Context, uri: Uri): Size? {
+    var size: Size? = null
+    try {
+        ImageDecoder.decodeBitmap(ImageDecoder.createSource(context.contentResolver, uri)) { decoder, info, _ ->
+            size = info.size
+            decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
+            decoder.setTargetSampleSize(maxOf(1, maxOf(info.size.width, info.size.height) / 512))
+            decoder.setOnPartialImageListener { false }
+        }.recycle()
+    } catch (e: ImageDecoder.DecodeException) {
+        return null
+    }
+    return size
 }
 
 internal fun verificationSummary(v: Verification): String =

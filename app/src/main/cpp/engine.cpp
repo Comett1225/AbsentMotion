@@ -996,9 +996,8 @@ bool EngineImpl::layerQuad(int64_t layerId, double timeMs, float xy[8]) {
     SetCameraView(fCameraView);
     const Layer* layer = fScene.layer(layerId);
     if (!layer || !layer->activeAt(timeMs)) return false;
-    const float t = layer->localTime(timeMs);
     SkPoint corners[4];
-    ShapePath(*layer, t).getBounds().toQuad(corners);
+    SelectionBounds(*layer, timeMs, SkMatrix::I()).toQuad(corners);
     WorldMatrix(fScene, *layer, timeMs).mapPoints(corners);
     for (int i = 0; i < 4; i++) {
         xy[2 * i] = corners[i].fX;
@@ -1011,9 +1010,7 @@ bool EngineImpl::layerBounds(int64_t layerId, double timeMs, float ltrb[4]) {
     SetCameraView(fCameraView);
     const Layer* layer = fScene.layer(layerId);
     if (!layer) return false;
-    const float t = layer->localTime(timeMs);
-    auto path = ShapePath(*layer, t).makeTransform(WorldMatrix(fScene, *layer, timeMs));
-    const SkRect bounds = path.getBounds();
+    const SkRect bounds = SelectionBounds(*layer, timeMs, WorldMatrix(fScene, *layer, timeMs));
     ltrb[0] = bounds.left(); ltrb[1] = bounds.top();
     ltrb[2] = bounds.right(); ltrb[3] = bounds.bottom();
     return !bounds.isEmpty();

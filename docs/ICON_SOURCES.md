@@ -25,7 +25,7 @@ The launcher icon is an own drawing, made by `tools/icon/make_icon.py` (source o
 
 | Source | Icons |
 | --- | --- |
-| Lucide only | 163 |
+| Lucide only | 167 |
 | Lucide shapes plus own parts | 8 |
 | Own drawing only | 40 |
 | Material Symbols | 0 |
@@ -73,6 +73,10 @@ The launcher icon is an own drawing, made by `tools/icon/make_icon.py` (source o
 | `ui/editor/ChromeIcons.kt` | `TextTool` | Lucide | `type` | ISC and MIT (Feather) | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/type.svg | - |
 | `ui/editor/ChromeIcons.kt` | `Captions` | Lucide | `message-square-text` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/message-square-text.svg | - |
 | `ui/editor/ChromeIcons.kt` | `CloseThick` | Lucide | `x` | ISC and MIT (Feather) | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/x.svg | x scaled x0.9 |
+| `ui/editor/ChromeIcons.kt` | `NullObject` | Lucide | `crosshair` | ISC and MIT (Feather) | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/crosshair.svg | Add menu, Null |
+| `ui/editor/ChromeIcons.kt` | `AssetProject` | Lucide | `folder-open` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/folder-open.svg | Add menu, Asset / Project |
+| `ui/editor/ChromeIcons.kt` | `ImportSvg` | Lucide | `vector-square` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/vector-square.svg | Add menu, Import SVG |
+| `ui/editor/ChromeIcons.kt` | `Model3d` | Lucide | `cuboid` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/cuboid.svg | Add menu, 3D Model |
 | `ui/editor/ChromeIcons.kt` | `Close` | Lucide | `x` | ISC and MIT (Feather) | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/x.svg | x scaled x1.15 |
 | `ui/editor/ChromeIcons.kt` | `ChevronDown` | Lucide | `chevron-down` | ISC and MIT (Feather) | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/chevron-down.svg | - |
 | `ui/editor/ChromeIcons.kt` | `Pencil` | Lucide | `pencil` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/pencil.svg | - |
@@ -103,8 +107,8 @@ The launcher icon is an own drawing, made by `tools/icon/make_icon.py` (source o
 | `ui/editor/PanelIcons.kt` | `Back` | Lucide | `arrow-left` | ISC and MIT (Feather) | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/arrow-left.svg | - |
 | `ui/editor/PanelIcons.kt` | `TabStroke` | Lucide | `route` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/route.svg | Border & Shadow, Stroke tab |
 | `ui/editor/PanelIcons.kt` | `TabBorder` | Lucide | `square` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/square.svg | Border & Shadow, Border tab |
-| `ui/editor/PanelIcons.kt` | `Keyframe` | own drawing | - | Apache-2.0 (own) | - | - |
-| `ui/editor/PanelIcons.kt` | `KeyframeRemove` | own drawing | - | Apache-2.0 (own) | - | - |
+| `ui/editor/PanelIcons.kt` | `Keyframe` | own drawing | - | Apache-2.0 (own) | - | hollow tall diamond with a plus, the proportions of the timeline keyframes |
+| `ui/editor/PanelIcons.kt` | `KeyframeRemove` | own drawing | - | Apache-2.0 (own) | - | solid tall diamond with a minus cut out, shown on a keyframe |
 | `ui/editor/PanelIcons.kt` | `Easing` | own drawing | - | Apache-2.0 (own) | - | axes and an ease curve |
 | `ui/editor/PanelIcons.kt` | `More` | Lucide | `ellipsis` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/ellipsis.svg | - |
 | `ui/editor/PanelIcons.kt` | `TabMove` | Lucide | `move` | ISC and MIT (Feather) | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/move.svg | - |

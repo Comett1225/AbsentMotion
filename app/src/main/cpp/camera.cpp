@@ -136,6 +136,20 @@ void AddCameraEffects(const Layer& camera, double timeMs, float depth, SkPoint b
 
 void SetCameraView(bool on) { gCameraView = on; }
 
+bool CameraViewOn() { return gCameraView; }
+
+bool CameraFrame(const std::vector<Layer>& layers, const Layer& camera, int width, int height, double timeMs, SkPoint corners[4]) {
+    if (width <= 0 || height <= 0) return false;
+    const Placement p = EffectivePlacement(layers, camera, timeMs);
+    const float distance = camera.camera.orthographic ? std::max(-p.z, kNearest) : -p.z;
+    if (!(distance > 0)) return false;
+    const float reach = distance / FocalLength(width, height, camera.camera.fov.get(0, camera.localTime(timeMs), kDefaultFov));
+    const float w = width * 0.5f * reach, h = height * 0.5f * reach;
+    SkRect::MakeLTRB(-w, -h, w, h).toQuad(corners);
+    SkMatrix::Translate(p.location.fX, p.location.fY).preRotate(p.rotation).mapPoints({corners, 4});
+    return true;
+}
+
 bool SeenPlacement(const Layer& l, double timeMs, Placement* out) {
     const Sight& s = l.sight;
     if (!s.layers) return false;

@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -29,7 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -65,7 +64,6 @@ import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Presence
 import app.absentmotion.ui.theme.Swap
 import java.util.Locale
-import kotlin.math.abs
 import kotlin.math.ln
 import kotlin.math.pow
 import androidx.compose.ui.res.stringResource
@@ -106,7 +104,10 @@ internal fun AudioEffectsPanel(state: EditorState, modifier: Modifier, onBack: (
 @Composable
 private fun EffectList(state: EditorState, effects: List<AudioFx>, open: (Int) -> Unit) {
     var adding by remember { mutableStateOf(false) }
-    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+    val scroll = rememberScrollState()
+    val reorder = rememberReorder(state, scroll, top = RowHeight + 13.dp)
+    val id = state.selectedId
+    Column(Modifier.fillMaxSize().verticalScroll(scroll)) {
         Row(Modifier.padding(start = 6.5.dp, end = 6.5.dp, top = 6.5.dp).fillMaxWidth().height(RowHeight).horizontalScroll(rememberScrollState()),
             Arrangement.spacedBy(6.dp), Alignment.CenterVertically) {
             for (preset in AudioPresets) {
@@ -117,7 +118,13 @@ private fun EffectList(state: EditorState, effects: List<AudioFx>, open: (Int) -
                 }
             }
         }
-        effects.forEachIndexed { i, fx -> EffectRow(state, i, fx, effects.size) { open(i) } }
+        key(reorder.generation) {
+            effects.forEachIndexed { i, fx ->
+                EffectRow(state, reorder, i, fx, effects.size, { open(i) }) { from, to ->
+                    if (id != null) state.edit { it.update(id, state.sampleMs) { l -> l.moveAudioEffect(from, to) } }
+                }
+            }
+        }
         Box(Modifier.padding(6.5.dp).fillMaxWidth().height(RowHeight)) {
             val room = effects.size < MAX_AUDIO_FX
             Box(Modifier.fillMaxSize().clip(RowShape).background(Am.Button).alpha(if (room) 1f else 0.35f)
@@ -143,14 +150,10 @@ private fun EffectList(state: EditorState, effects: List<AudioFx>, open: (Int) -
 }
 
 @Composable
-private fun EffectRow(state: EditorState, index: Int, fx: AudioFx, count: Int, open: () -> Unit) {
-    var drag by remember { mutableFloatStateOf(0f) }
-    val latest by rememberUpdatedState(index)
-    val rows by rememberUpdatedState(count)
-    var held by remember { mutableIntStateOf(index) }
+private fun EffectRow(state: EditorState, reorder: Reorder, index: Int, fx: AudioFx, count: Int, open: () -> Unit, move: (Int, Int) -> Unit) {
     val known = fx.kind != null
-    Row(Modifier.padding(start = 6.5.dp, end = 6.5.dp, top = 6.5.dp).fillMaxWidth().height(RowHeight).clip(RowShape).background(Am.Field),
-        verticalAlignment = Alignment.CenterVertically) {
+    Row(Modifier.reorderSlot(reorder, index).padding(start = 6.5.dp, end = 6.5.dp, top = 6.5.dp).fillMaxWidth().height(RowHeight).reorderLift(reorder, index, 5.dp)
+        .clip(RowShape).background(Am.Field), verticalAlignment = Alignment.CenterVertically) {
         Row(Modifier.weight(1f).fillMaxHeight().alpha(if (known && !fx.bypass) 1f else 0.35f).clickable(enabled = known, onClick = open)
             .padding(start = 11.dp), verticalAlignment = Alignment.CenterVertically) {
             Icon(EffectIcons.Expand, null, Modifier.size(18.dp).alpha(0.3f), tint = Am.OnDark)
@@ -159,18 +162,7 @@ private fun EffectRow(state: EditorState, index: Int, fx: AudioFx, count: Int, o
         Icon(if (fx.bypass) EffectIcons.EyeOff else EffectIcons.Eye, stringResource(if (fx.bypass) R.string.audiofx_turn_on else R.string.audiofx_bypass), Modifier.width(36.dp).fillMaxHeight().clickable {
             state.editSelected { it.updateAudioEffect(index) { e -> e.withBypass(!e.bypass) } }
         }, tint = Am.OnDark)
-        Icon(EffectIcons.Grip, stringResource(R.string.audiofx_reorder), Modifier.width(32.dp).fillMaxHeight().pointerInput(state) {
-            detectDragGesturesAfterLongPress(onDragStart = { drag = 0f; held = latest }, onDragEnd = { state.endGesture() }, onDragCancel = { state.endGesture() }) { change, amount ->
-                change.consume()
-                drag += amount.y
-                if (abs(drag) >= 43.5.dp.toPx()) {
-                    val to = (held + if (drag > 0) 1 else -1).coerceIn(0, rows - 1)
-                    if (to != held) state.editSelected("audiofx-reorder") { it.moveAudioEffect(held, to) }
-                    held = to
-                    drag = 0f
-                }
-            }
-        }, tint = Am.OnDark)
+        Icon(EffectIcons.Grip, stringResource(R.string.audiofx_reorder), Modifier.width(32.dp).fillMaxHeight().reorderGrip(reorder, index, count, move), tint = Am.OnDark)
     }
 }
 

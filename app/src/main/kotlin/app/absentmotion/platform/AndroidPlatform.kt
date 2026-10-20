@@ -35,10 +35,12 @@ object ActivityResultContracts {
 @androidx.compose.runtime.Composable
 fun <I, O> rememberLauncherForActivityResult(contract: androidx.activity.result.contract.ActivityResultContract<I, O>, onResult: (O) -> Unit) =
     androidx.activity.compose.rememberLauncherForActivityResult(contract, onResult)
+fun versionName(context: Context): String =
+    runCatching { context.packageManager.getPackageInfo(context.packageName, android.content.pm.PackageManager.PackageInfoFlags.of(0)).versionName }.getOrNull().orEmpty()
 @androidx.compose.runtime.Composable
 fun appVersion(): String {
     val context = LocalContext.current
-    return androidx.compose.runtime.remember { runCatching { context.packageManager.getPackageInfo(context.packageName, android.content.pm.PackageManager.PackageInfoFlags.of(0)).versionName }.getOrNull().orEmpty() }
+    return androidx.compose.runtime.remember { versionName(context) }
 }
 @androidx.compose.runtime.Composable
 fun SceneSurface(engine: app.absentmotion.engine.EngineThread, divisor: Int, size: androidx.compose.ui.unit.IntSize, modifier: androidx.compose.ui.Modifier, onView: (Any) -> Unit = {}) {

@@ -10,7 +10,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.TextButton
 import app.absentmotion.audio.gain
 import app.absentmotion.model.PropRef
-import app.absentmotion.model.canAnimate
 import app.absentmotion.model.contours
 import app.absentmotion.model.SpeedRef
 import app.absentmotion.model.atVideoTime
@@ -40,6 +39,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
@@ -81,10 +81,14 @@ import app.absentmotion.ui.editor.panels.PanelShape
 import app.absentmotion.ui.editor.panels.dimmed
 import app.absentmotion.ui.editor.panels.formatPlain
 import app.absentmotion.ui.editor.panels.px
+import app.absentmotion.ui.editor.panels.turnFor
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Presence
 import app.absentmotion.ui.theme.Swap
+import app.absentmotion.ui.theme.TilePress
 import app.absentmotion.ui.theme.fadeBackground
+import app.absentmotion.ui.theme.pressScale
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
 
@@ -92,8 +96,6 @@ import app.absentmotion.R
 fun LayerTools(state: EditorState, modifier: Modifier = Modifier) {
     val drawn = state.selected?.shape?.isEmpty() == true
     var properties by remember(state.selectedId) { mutableStateOf(false) }
-    var animating by remember(state.selectedId) { mutableStateOf(false) }
-    if (animating) state.selectedId?.let { AnimationSheet(state, it) { animating = false } }
     if (properties) {
         ElementProperties(state, { properties = false }, modifier)
         return
@@ -101,8 +103,6 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier) {
     Column(modifier.background(Am.Panel).padding(start = 62.px, top = 42.px, end = 62.px)) {
         Row(Modifier.fillMaxWidth().height(107.px)) {
             SmallTool(PanelIcons.Speed, stringResource(R.string.a11y_speed), Modifier.width(183.px), ToolShape, enabled = state.selected?.mediaFill?.video == true || state.selected?.kind == "audio") { state.panel = EditorPanel.Speed }
-            Spacer(Modifier.width(17.px))
-            SmallTool(PanelIcons.Animate, stringResource(R.string.a11y_animate), Modifier.width(150.px), ToolShape, enabled = state.selected?.canAnimate == true) { state.playing = false; animating = true }
             Spacer(Modifier.width(17.px))
             Row(Modifier.weight(1f).fillMaxHeight(), Arrangement.spacedBy(3.px)) {
                 val clip = state.selected
@@ -125,7 +125,9 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier) {
         Spacer(Modifier.height(28.px))
         if (state.selected?.kind == "audio") {
             Box(Modifier.fillMaxWidth().weight(1f)) {
-                Column(Modifier.fillMaxSize().clip(ToolShape).background(Am.Button).clickable { openPresets(state) }, Arrangement.Center, Alignment.CenterHorizontally) {
+                val press = remember { MutableInteractionSource() }
+                Column(Modifier.fillMaxSize().pressScale(press, TilePress).clip(ToolShape).background(Am.Button).clickable(press, LocalIndication.current) { openPresets(state) },
+                    Arrangement.Center, Alignment.CenterHorizontally) {
                     PanelIcon(PanelIcons.Star, Am.OnDark, size = 28.dp)
                     Text(stringResource(R.string.presets), color = ToolLabel, fontSize = 13.sp)
                 }
@@ -138,13 +140,18 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier) {
             return@Column
         }
         if (state.selected?.kind == "camera") {
+            var moving by remember(state.selectedId) { mutableStateOf(false) }
+            if (moving) state.selectedId?.let { CameraMovesSheet(state, it) { moving = false } }
             Row(Modifier.fillMaxWidth().height(160.px), Arrangement.spacedBy(17.px)) {
                 ToolButton(CameraOptions, Modifier.weight(1f)) { state.panel = EditorPanel.Camera }
                 ToolButton(MoveTransform, Modifier.weight(1f)) { state.panel = EditorPanel.MoveTransform }
                 ToolButton(Effects, Modifier.weight(1f)) { state.effectIndex = -1; state.panel = EditorPanel.Effects }
             }
             Spacer(Modifier.height(17.px))
-            ToolButton(Presets, Modifier.fillMaxWidth().height(160.px)) { openPresets(state) }
+            Row(Modifier.fillMaxWidth().height(160.px), Arrangement.spacedBy(17.px)) {
+                ToolButton(Presets, Modifier.weight(1f)) { openPresets(state) }
+                ToolButton(CameraMoves, Modifier.weight(1f)) { state.playing = false; moving = true }
+            }
             return@Column
         }
         if (state.selected?.kind == "model") {
@@ -202,15 +209,17 @@ private val ElementPropsButton = Tool(R.string.asset_properties, PanelIcons.Edit
 private val EditPoints = Tool(R.string.layer_tool_edit_points, PanelIcons.EditShape, 16f)
 private val EditDrawing = Tool(R.string.layer_tool_edit_drawing, PanelIcons.EditShape, 16f)
 private val CameraOptions = Tool(R.string.layer_tool_camera_options, PanelIcons.Camera, 19.4f)
+private val CameraMoves = Tool(R.string.camera_moves, PanelIcons.Animate, 19.4f)
 private val ModelOptions = Tool(R.string.layer_tool_model_options, PanelIcons.TabTilt, 19.4f)
 private val Presets = Tool(R.string.presets, PanelIcons.Star, 19.4f)
 private val Effects = Tool(R.string.layer_tool_effects, PanelIcons.Effects, 19.6f)
 
 @Composable
 private fun SmallTool(icon: ImageVector, description: String, modifier: Modifier, shape: RoundedCornerShape, enabled: Boolean = true, onClick: () -> Unit = {}) {
+    val press = remember { MutableInteractionSource() }
     Box(
-        modifier.fillMaxHeight().then(if (enabled) Modifier else Modifier.dimmed()).clip(shape).background(Am.Button)
-            .then(if (enabled) Modifier.clickable(onClick = onClick) else Modifier),
+        modifier.fillMaxHeight().pressScale(press, TilePress).then(if (enabled) Modifier else Modifier.dimmed()).clip(shape).background(Am.Button)
+            .then(if (enabled) Modifier.clickable(press, LocalIndication.current, onClick = onClick) else Modifier),
         contentAlignment = Alignment.Center,
     ) {
         PanelIcon(icon, Am.OnDark, description = description)
@@ -219,9 +228,10 @@ private fun SmallTool(icon: ImageVector, description: String, modifier: Modifier
 
 @Composable
 private fun ToolButton(tool: Tool, modifier: Modifier, enabled: Boolean = true, onClick: () -> Unit = {}) {
+    val press = remember { MutableInteractionSource() }
     Box(
-        modifier.fillMaxHeight().then(if (enabled) Modifier else Modifier.dimmed()).clip(ToolShape).background(Am.Button)
-            .then(if (enabled) Modifier.clickable(onClick = onClick) else Modifier),
+        modifier.fillMaxHeight().pressScale(press, TilePress).then(if (enabled) Modifier else Modifier.dimmed()).clip(ToolShape).background(Am.Button)
+            .then(if (enabled) Modifier.clickable(press, LocalIndication.current, onClick = onClick) else Modifier),
     ) {
         PanelIcon(tool.icon, Am.OnDark, Modifier.align(Alignment.TopCenter).offset(y = (tool.iconY - 12f).dp))
         Text(
@@ -245,11 +255,13 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
     }
     val move = panel == EditorPanel.MoveTransform
     var tab by remember(selected.kind) { mutableIntStateOf(0) }
+    val catalog by state.engine.effects.collectAsState()
+    val turn = remember(selected.id, tab, catalog, move) { if (move) turnFor(selected, catalog, tab) else null }
     var menuOpen by remember { mutableStateOf(false) }
     var askDeleteSpeed by remember { mutableStateOf(false) }
-    val named = panel != EditorPanel.EditShape && panel != EditorPanel.Camera && panel != EditorPanel.Model
+    val named = panel != EditorPanel.EditShape && panel != EditorPanel.Camera && panel != EditorPanel.Model && !(move && tab == ROTATE_TAB && turn != null)
     val known = if (!named) null else when {
-        move -> TransformTargets[tab]
+        move -> if (selected.kind == "camera" && tab == SIZE_TAB) KeyTarget(app.absentmotion.model.CameraFov, "60.000000") else TransformTargets[tab]
         panel == EditorPanel.Speed -> KeyTarget(SpeedRef, layer.node["speed"] ?: "1")
         panel == EditorPanel.ColorFill && layer.fillType == "color" -> KeyTarget(PropRef.FillColor, formatColor(layer.fillColor))
         panel == EditorPanel.BorderShadow -> borderShadowTarget(layer)
@@ -281,7 +293,7 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
             if (move) {
                 Box(Modifier.weight(1f).fillMaxWidth()) {
                     FrameButton(PanelIcons.More, stringResource(R.string.effects_more), Modifier.fillMaxSize()) { menuOpen = true }
-                    Presence(menuOpen) { TransformMenu(state, tab) { menuOpen = false } }
+                    Presence(menuOpen) { TransformMenu(state, tab, turn) { menuOpen = false } }
                 }
             } else {
                 Spacer(Modifier.weight(1f))
@@ -290,7 +302,7 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
         Box(Modifier.weight(1f).fillMaxHeight().background(if (move) Am.PanelInset else Am.Panel)) {
             if (panel == EditorPanel.BorderShadow) BorderShadowTabs(Modifier.align(Alignment.CenterEnd).width(168.px).fillMaxHeight().background(Am.Panel))
             when (panel) {
-                EditorPanel.MoveTransform -> Swap(tab, Modifier.fillMaxSize(), rise = 0.dp) { MoveTransformPanel(state, layer, tab, Modifier.fillMaxSize()) }
+                EditorPanel.MoveTransform -> Swap(tab, Modifier.fillMaxSize(), rise = 0.dp) { MoveTransformPanel(state, layer, tab, turn, Modifier.fillMaxSize()) }
                 EditorPanel.ColorFill -> ColorFillPanel(state, layer, Modifier.fillMaxSize())
                 EditorPanel.EditShape -> EditShapePanel(state, layer, Modifier.fillMaxSize())
                 EditorPanel.Speed -> SpeedPanel(state, layer, Modifier.fillMaxSize())
@@ -305,9 +317,9 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
         }
         if (move) {
             Column(Modifier.width(168.px).fillMaxHeight()) {
-                val names = listOf(R.string.a11y_tab_move, R.string.a11y_tab_rotate, R.string.a11y_tab_tilt, R.string.panel_size, R.string.a11y_tab_skew)
-                listOf(PanelIcons.TabMove, PanelIcons.TabRotate, PanelIcons.TabTilt, PanelIcons.TabSize, PanelIcons.TabSkew).forEachIndexed { i, icon ->
-                    val usable = i < 2 || selected.kind != "camera"
+                val names = listOf(R.string.a11y_tab_move, R.string.panel_size, R.string.a11y_tab_rotate, R.string.a11y_tab_tilt, R.string.a11y_tab_skew)
+                listOf(PanelIcons.TabMove, PanelIcons.TabSize, PanelIcons.TabRotate, PanelIcons.TabTilt, PanelIcons.TabSkew).forEachIndexed { i, icon ->
+                    val usable = i <= ROTATE_TAB || selected.kind != "camera"
                     Box(Modifier.weight(1f).fillMaxWidth().then(if (usable) Modifier.clickable { tab = i } else Modifier.dimmed()).padding(start = 10.px, end = 11.px, top = 11.px, bottom = 11.px)) {
                         Box(
                             Modifier.fillMaxSize().clip(PanelShape).fadeBackground(tab == i, PanelDark),
@@ -324,11 +336,15 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
 
 internal val TransformTargets = listOf(
     KeyTarget(PropRef.Location, "0.000000,0.000000,0.000000"),
+    KeyTarget(PropRef.Scale, "1.000000,1.000000"),
     KeyTarget(PropRef.Rotation, "0.000000"),
     KeyTarget(PropRef.Tilt, "0.000000,0.000000"),
-    KeyTarget(PropRef.Scale, "1.000000,1.000000"),
     KeyTarget(PropRef.Skew, "0.000000,0.000000"),
 )
+
+internal const val SIZE_TAB = 1
+internal const val ROTATE_TAB = 2
+internal const val TILT_TAB = 3
 
 @Composable
 private fun FrameButton(icon: ImageVector, description: String, modifier: Modifier, enabled: Boolean = true, onClick: () -> Unit = {}) {

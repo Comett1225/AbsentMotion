@@ -29,7 +29,13 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupPositionProvider
 import androidx.compose.ui.window.PopupProperties
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntRect
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.addImage
 import app.absentmotion.editor.addVideo
@@ -39,6 +45,18 @@ import app.absentmotion.media.cachedMediaThumbnail
 import app.absentmotion.ui.camera.CameraIcons
 import app.absentmotion.ui.camera.CameraScreen
 import app.absentmotion.ui.theme.Am
+import app.absentmotion.ui.theme.Presence
+import app.absentmotion.ui.theme.TilePress
+import app.absentmotion.ui.theme.pressScale
+import androidx.compose.foundation.LocalIndication
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import app.absentmotion.ui.theme.animatedBackground
+import app.absentmotion.ui.theme.animatedColor
+import app.absentmotion.ui.theme.presence
+import app.absentmotion.platform.BackHandler
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.material3.Icon
 import kotlinx.coroutines.launch
 import androidx.compose.ui.res.stringResource
@@ -52,6 +70,9 @@ internal fun MediaTab(state: EditorState, modifier: Modifier, library: AddLibrar
     var albumsOpen by remember { mutableStateOf(false) }
     var adding by remember { mutableStateOf(false) }
     var search by remember { mutableStateOf("") }
+    var searching by remember { mutableStateOf(false) }
+    val focus = LocalFocusManager.current
+    BackHandler(searching) { focus.clearFocus(); searching = false }
     val query = debounced(search)
     val files = library.media
     LaunchedEffect(files) { if (album != null && files.none { it.albumId == album }) album = null }
@@ -82,23 +103,26 @@ internal fun MediaTab(state: EditorState, modifier: Modifier, library: AddLibrar
     val viewAll = stringResource(R.string.view_all)
     val allLabel = stringResource(R.string.mediatab_all)
     val shown = remember(files, album, query) { files.filter { (album == null || it.albumId == album) && matchesSearch(query, it.name, it.album) } }
-    Column(modifier) {
-        SearchField(search, { search = it }, Modifier.padding(start = 6.dp, end = 6.dp, top = 6.dp).fillMaxWidth().height(32.dp), hint = stringResource(R.string.mediatab_search_hint))
-        LazyHorizontalGrid(AtLeastTwo(96.dp), Modifier.fillMaxWidth().weight(1f).clipToBounds(), horizontalArrangement = Arrangement.spacedBy(0.dp)) {
+    Box(modifier.clipToBounds()) {
+        LazyHorizontalGrid(AtLeastTwo(96.dp), Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(0.dp)) {
             item(key = "albums") {
                 Column(Modifier.width(97.dp).padding(6.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                    Box(Modifier.fillMaxWidth().weight(1f).background(Am.Well).semantics { contentDescription = viewAll }.clickable {
+                    val press = remember { MutableInteractionSource() }
+                    Box(Modifier.fillMaxWidth().weight(1f).pressScale(press, TilePress).background(Am.Well).semantics { contentDescription = viewAll }.clickable(press, LocalIndication.current) {
                         picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo))
                     }, Alignment.Center) { MediaGridIcon(Modifier.size(24.dp)) }
                     Box(Modifier.fillMaxWidth().weight(1f).background(Am.Well).clickable { albumsOpen = true }, Alignment.Center) {
                         Text(files.firstOrNull { it.albumId == album }?.album ?: allLabel, color = Am.OnDark, fontSize = 16.sp, maxLines = 1)
                         MediaAlbumArrow(Modifier.align(Alignment.TopEnd).padding(3.dp).size(6.dp))
-                        if (albumsOpen) Popup(onDismissRequest = { albumsOpen = false }, properties = PopupProperties(focusable = true)) {
-                            Column(Modifier.width(220.dp).heightIn(max = 300.dp).background(Am.Field).verticalScroll(rememberScrollState())) {
-                                val albums = listOf(null to allLabel) + files.distinctBy { it.albumId }.map { it.albumId to it.album }
-                                albums.forEach { (id, name) ->
-                                    Box(Modifier.fillMaxWidth().height(44.dp).clickable { album = id; albumsOpen = false }.padding(horizontal = 16.dp), Alignment.CenterStart) {
-                                        Text(name, color = Am.OnDark, fontSize = 15.sp, maxLines = 1)
+                        val cell = remember { CellDrop() }
+                        Presence(albumsOpen) {
+                            Popup(cell, onDismissRequest = { albumsOpen = false }, properties = PopupProperties(focusable = true)) {
+                                Column(Modifier.presence(scaleFrom = 0.85f, origin = cell.origin).width(220.dp).heightIn(max = 300.dp).background(Am.Field).verticalScroll(rememberScrollState())) {
+                                    val albums = listOf(null to allLabel) + files.distinctBy { it.albumId }.map { it.albumId to it.album }
+                                    albums.forEach { (id, name) ->
+                                        Box(Modifier.fillMaxWidth().height(44.dp).clickable { album = id; albumsOpen = false }.padding(horizontal = 16.dp), Alignment.CenterStart) {
+                                            Text(name, color = Am.OnDark, fontSize = 15.sp, maxLines = 1)
+                                        }
                                     }
                                 }
                             }
@@ -107,12 +131,9 @@ internal fun MediaTab(state: EditorState, modifier: Modifier, library: AddLibrar
                 }
             }
             item(key = "camera") {
-                Column(
-                    Modifier.width(97.dp).fillMaxHeight().padding(6.dp).background(Am.Well).clickable { state.playing = false; state.cameraOpen = true },
-                    horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center,
-                ) {
-                    Icon(CameraIcons.Camera, null, Modifier.size(24.dp), tint = Am.OnDark)
-                    Text(stringResource(R.string.camera), Modifier.padding(top = 4.dp), color = Am.OnDark, fontSize = 14.sp, maxLines = 1)
+                Column(Modifier.width(97.dp).padding(6.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                    MediaSquare(CameraIcons.Camera, stringResource(R.string.camera), false) { state.playing = false; state.cameraOpen = true }
+                    MediaSquare(TextIcons.Search, stringResource(R.string.search_hint), searching || search.isNotEmpty()) { searching = true }
                 }
             }
             if (shown.isEmpty() && query.isNotBlank()) item(key = "none", span = { GridItemSpan(maxLineSpan) }) {
@@ -120,7 +141,8 @@ internal fun MediaTab(state: EditorState, modifier: Modifier, library: AddLibrar
             }
             items(shown, key = { it.uri.toString() }) { file ->
                 val bitmap by produceState<android.graphics.Bitmap?>(cachedMediaThumbnail(file.uri), file.uri, file.modified, library.mediaRevision) { value = mediaThumbnail(context, file.uri) }
-                Box(Modifier.fillMaxHeight().aspectRatio(1f).background(Color.Black).clickable(enabled = !adding) {
+                val press = remember { MutableInteractionSource() }
+                Box(Modifier.fillMaxHeight().aspectRatio(1f).pressScale(press, TilePress).background(Color.Black).clickable(press, LocalIndication.current, enabled = !adding) {
                     scope.launch {
                         adding = true
                         try {
@@ -141,6 +163,41 @@ internal fun MediaTab(state: EditorState, modifier: Modifier, library: AddLibrar
                 }
             }
         }
+        Presence(searching) {
+            Box(Modifier.align(Alignment.TopCenter).presence(slide = -1f).fillMaxWidth().background(Am.Panel).padding(6.dp)) {
+                SearchField(search, { search = it }, Modifier.fillMaxWidth().height(36.dp), hint = stringResource(R.string.mediatab_search_hint), autoFocus = true,
+                    onClose = { focus.clearFocus(); searching = false })
+            }
+        }
+    }
+}
+
+internal class CellDrop : PopupPositionProvider {
+    var origin by mutableStateOf(TransformOrigin(0f, 0f))
+        private set
+
+    override fun calculatePosition(anchorBounds: IntRect, windowSize: IntSize, layoutDirection: LayoutDirection, popupContentSize: IntSize): IntOffset {
+        val rtl = layoutDirection == LayoutDirection.Rtl
+        val up = anchorBounds.top + popupContentSize.height > windowSize.height
+        origin = TransformOrigin(if (rtl) 1f else 0f, if (up) 1f else 0f)
+        return IntOffset(
+            (if (rtl) anchorBounds.right - popupContentSize.width else anchorBounds.left).coerceIn(0, (windowSize.width - popupContentSize.width).coerceAtLeast(0)),
+            if (up) (anchorBounds.bottom - popupContentSize.height).coerceAtLeast(0) else anchorBounds.top,
+        )
+    }
+}
+
+@Composable
+private fun ColumnScope.MediaSquare(icon: ImageVector, label: String, active: Boolean, onClick: () -> Unit) {
+    val tint = animatedColor(if (active) Am.Accent else Am.OnDark)
+    val press = remember { MutableInteractionSource() }
+    Column(
+        Modifier.fillMaxWidth().weight(1f).pressScale(press, TilePress).animatedBackground(if (active) Am.Accent.copy(alpha = 0.16f) else Am.Well)
+            .clickable(press, LocalIndication.current, onClick = onClick),
+        horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center,
+    ) {
+        Icon(icon, null, Modifier.size(18.dp), tint = tint)
+        Text(label, Modifier.padding(horizontal = 4.dp), color = tint, fontSize = 11.sp, lineHeight = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
 

@@ -15,6 +15,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import app.absentmotion.library.CrashEntry
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
@@ -185,24 +188,47 @@ private fun versionMoment(time: Long, now: Long, today: Int, yesterday: Int, oth
 }
 
 @Composable
-fun RecoveryDialog(title: String, onRestore: () -> Unit, onDiscard: () -> Unit) {
+internal fun ClosedDialog(
+    crash: CrashEntry?, recoveryTitle: String?, outdated: Outdated?, onRestore: () -> Unit, onDiscard: () -> Unit, onClose: () -> Unit,
+) {
+    val recovering = recoveryTitle != null
     AlertDialog(
-        onDismissRequest = {},
+        onDismissRequest = { if (!recovering) onClose() },
         title = { Text(stringResource(R.string.absentmotion_closed_unexpectedly), color = Am.Navy) },
-        text = { Text(stringResource(R.string.safety_recovery_body, title.ifBlank { stringResource(R.string.recovery_your_project) }), color = Am.Navy) },
-        dismissButton = { TextButton(onDiscard) { Text(stringResource(R.string.discard), color = Am.Navy) } },
-        confirmButton = { TextButton(onRestore) { Text(stringResource(R.string.restore), color = Am.Navy) } },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState())) {
+                if (crash != null) Text(closedText(crash.time).text() + " " + stringResource(crash.reason.sentence), color = Am.Navy)
+                OutdatedHint(outdated, Modifier.padding(top = 8.dp))
+                if (recoveryTitle != null) Text(
+                    stringResource(R.string.safety_recovery_body, recoveryTitle.ifBlank { stringResource(R.string.recovery_your_project) }),
+                    Modifier.padding(top = if (crash != null) 12.dp else 0.dp), color = Am.Navy,
+                )
+            }
+        },
+        dismissButton = if (!recovering) null else {
+            { TextButton(onDiscard) { Text(stringResource(R.string.discard), color = Am.Navy) } }
+        },
+        confirmButton = {
+            if (recovering) TextButton(onRestore) { Text(stringResource(R.string.restore), color = Am.Navy) }
+            else TextButton(onClose) { Text(stringResource(R.string.ok), color = Am.Navy) }
+        },
         containerColor = Am.Card,
     )
 }
 
+internal fun closedText(time: Long, now: Long = System.currentTimeMillis()): UiText =
+    versionMoment(time, now, R.string.crash_closed_today, R.string.crash_closed_yesterday, R.string.crash_closed_on_date)
+
 @Composable
-fun OpenFailedDialog(onHistory: (() -> Unit)?, onDismiss: () -> Unit) {
+internal fun OpenFailedDialog(onHistory: (() -> Unit)?, outdated: Outdated?, onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.could_not_open_this_project), color = Am.Navy) },
         text = {
-            Text(stringResource(if (onHistory != null) R.string.safety_open_failed_with_history else R.string.the_project_file_is_missing_or), color = Am.Navy)
+            Column {
+                Text(stringResource(if (onHistory != null) R.string.safety_open_failed_with_history else R.string.the_project_file_is_missing_or), color = Am.Navy)
+                OutdatedHint(outdated, Modifier.padding(top = 8.dp))
+            }
         },
         dismissButton = onHistory?.let { { TextButton(it) { Text(stringResource(R.string.version_history), color = Am.Navy) } } },
         confirmButton = { TextButton(onDismiss) { Text(stringResource(R.string.ok), color = Am.Navy) } },

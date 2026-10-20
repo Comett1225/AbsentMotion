@@ -38,6 +38,11 @@ internal object RowDrag {
         return if (add) base + range else base - range.toSet()
     }
 
+    fun follow(finger: Float, grab: Float, held: Int, count: Int, pitch: Float): Float =
+        if (held < 0 || count < 2) 0f else (finger - grab).coerceIn(-held * pitch, (count - 1 - held) * pitch)
+
+    fun target(held: Int, offset: Float, pitch: Float, count: Int): Int = slot(held * pitch + offset, pitch, 0f, 0f, count)
+
     fun shift(row: Int, from: Int, to: Int): Int = when {
         from < to && row in from + 1..to -> -1
         to < from && row in to until from -> 1

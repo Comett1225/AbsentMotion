@@ -53,6 +53,8 @@ import app.absentmotion.fonts.FontLibrary
 import app.absentmotion.fonts.FontName
 import app.absentmotion.ui.editor.panels.ThinSwitch
 import app.absentmotion.ui.theme.Am
+import app.absentmotion.ui.theme.Presence
+import app.absentmotion.ui.theme.Swap
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -132,7 +134,7 @@ internal fun CaptionsSheet(state: EditorState, onClose: () -> Unit) {
     }
 
     Dialog(::dismiss, DialogProperties(usePlatformDefaultWidth = false)) {
-        PhoneScreen {
+        PhoneScreen { Swap(browsing, Modifier.fillMaxSize(), rise = 0.dp) {
             if (browsing) Box(Modifier.fillMaxSize().background(Am.Panel).systemBarsPadding()) {
                 FontBrowser(fonts, onSelect = { name -> fonts.remember(name); update(style.copy(font = name)); browsing = false }, onClose = { browsing = false })
             } else Box(Modifier.fillMaxSize().clickable(interactionSource = null, indication = null) { dismiss() }.systemBarsPadding(), Alignment.BottomCenter) {
@@ -150,7 +152,7 @@ internal fun CaptionsSheet(state: EditorState, onClose: () -> Unit) {
                                 maxLines = 1, overflow = TextOverflow.Ellipsis)
                             Icon(ChromeIcons.ChevronDown, null, Modifier.size(24.dp), tint = Am.OnDark)
                         }
-                        if (sourceMenu) ChoiceList(names, { sourceMenu = false }) { source = sources.getOrNull(it - 1)?.id }
+                        Presence(sourceMenu) { ChoiceList(names, { sourceMenu = false }) { source = sources.getOrNull(it - 1)?.id } }
                     }
                     Line(stringResource(R.string.settings_language)) { Choices(listOf(stringResource(R.string.caption_language_auto), stringResource(R.string.caption_language_english)), if (style.english) 1 else 0) { update(style.copy(english = it == 1)) } }
                     Line(stringResource(R.string.caption_font), Modifier.clickable { browsing = true }) {
@@ -207,7 +209,7 @@ internal fun CaptionsSheet(state: EditorState, onClose: () -> Unit) {
                     }
                 }
             }
-        }
+        } }
     }
 }
 

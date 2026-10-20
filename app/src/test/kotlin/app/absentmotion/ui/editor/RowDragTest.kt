@@ -169,4 +169,28 @@ class RowDragTest {
             for (row in before.indices) if (row != from) assertEquals(after.indexOf(row), row + RowDrag.shift(row, from, to))
         }
     }
+
+    @Test fun aHeldListRowFollowsTheFingerExactlyUntilTheListEnds() {
+        val pitch = 43.5f
+        assertEquals(0f, RowDrag.follow(100f, 100f, 1, 4, pitch), 0f)
+        assertEquals(37.25f, RowDrag.follow(137.25f, 100f, 1, 4, pitch), 0f)
+        assertEquals(-12.5f, RowDrag.follow(87.5f, 100f, 1, 4, pitch), 0f)
+        assertEquals(-pitch, RowDrag.follow(-500f, 0f, 1, 4, pitch), 0f)
+        assertEquals(2 * pitch, RowDrag.follow(500f, 0f, 1, 4, pitch), 0f)
+        assertEquals(0f, RowDrag.follow(500f, 0f, 0, 1, pitch), 0f)
+        assertEquals(0f, RowDrag.follow(500f, 0f, -1, 4, pitch), 0f)
+    }
+
+    @Test fun aHeldListRowTakesANeighboursPlaceOncePastItsMiddle() {
+        val pitch = 40f
+        assertEquals(1, RowDrag.target(1, 19.9f, pitch, 4))
+        assertEquals(2, RowDrag.target(1, 20f, pitch, 4))
+        assertEquals(2, RowDrag.target(1, 59.9f, pitch, 4))
+        assertEquals(3, RowDrag.target(1, 60f, pitch, 4))
+        assertEquals(1, RowDrag.target(1, -20f, pitch, 4))
+        assertEquals(0, RowDrag.target(1, -20.1f, pitch, 4))
+        assertEquals(3, RowDrag.target(1, 1000f, pitch, 4))
+        assertEquals(0, RowDrag.target(1, -1000f, pitch, 4))
+        for (held in 0 until 4) for (to in 0 until 4) assertEquals(to, RowDrag.target(held, RowDrag.follow((to - held) * pitch, 0f, held, 4, pitch), pitch, 4))
+    }
 }

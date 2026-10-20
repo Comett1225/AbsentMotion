@@ -1,6 +1,21 @@
 package app.absentmotion.ui.home
 
 import app.absentmotion.export.formatBytes
+import androidx.annotation.StringRes
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.semantics.collapse
+import androidx.compose.ui.semantics.expand
+import androidx.compose.ui.semantics.semantics
+import app.absentmotion.ui.editor.ChromeIcons
+import app.absentmotion.ui.theme.Motion
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.background
@@ -23,6 +38,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.Text
@@ -80,56 +96,54 @@ internal val CardGap = 10.dp
 @Composable
 fun SettingsDrawer(settings: AppSettings, drawer: androidx.compose.material3.DrawerState, onRestored: () -> Unit = {}) {
     var about by remember { mutableStateOf(false) }
+    var crashLogs by remember { mutableStateOf(false) }
     var language by remember { mutableStateOf(false) }
     var demoNote by remember { mutableStateOf(false) }
     ModalDrawerSheet(
         drawer, Modifier.width(280.dp), drawerShape = RectangleShape, drawerContainerColor = Am.HomeDrawer,
         windowInsets = WindowInsets(0),
     ) {
-        Column(Modifier.fillMaxWidth().background(Am.Card).statusBarsPadding().verticalScroll(rememberScrollState()).navigationBarsPadding().padding(bottom = 8.dp)) {
+        Column(Modifier.fillMaxSize().background(Am.Card).statusBarsPadding().verticalScroll(rememberScrollState()).navigationBarsPadding().padding(bottom = 8.dp)) {
             Text(
                 stringResource(R.string.settings), Modifier.fillMaxWidth().height(50.dp).wrapContentHeight(Alignment.CenterVertically).padding(start = 11.dp),
                 color = Am.HomeInk, fontSize = 18.sp, fontWeight = FontWeight.Bold,
             )
-            Column(Modifier.padding(horizontal = 6.dp).fillMaxWidth().clip(PanelShape).background(PanelColor)) {
-                SwitchRow(stringResource(R.string.settings_demo_mode), settings.demoMode, enabled = true) { settings.demoMode = it; demoNote = it }
-                SwitchRow(stringResource(R.string.settings_open_xml), settings.xmlUpload, enabled = true) { settings.xmlUpload = it }
-                SwitchRow(stringResource(R.string.settings_vibration), settings.vibration, enabled = true) { settings.vibration = it }
-                SwitchRow(stringResource(R.string.settings_keep_media_copies), settings.keepMediaCopies, enabled = true) { settings.keepMediaCopies = it }
-                Divider(15.dp)
-                DurationRow(settings)
+            Category(R.string.settings_group_editor, HomeIcons.Pencil) {
                 ThemeRow(settings)
-                Spacer(Modifier.height(10.dp))
-                Divider(10.dp)
-                Spacer(Modifier.height(6.dp))
-                Text(
-                    stringResource(R.string.playback_resampling), Modifier.padding(start = 10.dp), color = Am.HomeMid, fontSize = 13.sp, lineHeight = 18.sp,
-                )
-                Spacer(Modifier.height(10.dp))
-                Choices(listOf(R.string.settings_level_low, R.string.settings_level_high, R.string.settings_level_ultra), settings.audioResampling) { settings.audioResampling = it }
-                Spacer(Modifier.height(8.dp))
-                Divider(10.dp)
-                Spacer(Modifier.height(6.dp))
-                Text(
-                    stringResource(R.string.preview_quality), Modifier.padding(start = 10.dp), color = Am.HomeMid, fontSize = 13.sp, lineHeight = 18.sp,
-                )
-                Spacer(Modifier.height(10.dp))
-                Choices(PreviewQuality.entries.map { it.label }, settings.previewQuality.ordinal) { settings.previewQuality = PreviewQuality.entries[it] }
-                Spacer(Modifier.height(8.dp))
-                SwitchRow(stringResource(R.string.settings_preview_copies), settings.previewCopies, enabled = true) { settings.previewCopies = it }
+                DurationRow(settings)
+                SwitchRow(stringResource(R.string.settings_vibration), settings.vibration, enabled = true) { settings.vibration = it }
             }
-            PreviewCopiesRow()
-            Spacer(Modifier.height(CardGap))
+            Category(R.string.settings_group_playback, HomeIcons.ProjectsTabOff) {
+                ChoicesBlock(R.string.preview_quality) {
+                    Choices(PreviewQuality.entries.map { it.label }, settings.previewQuality.ordinal) { settings.previewQuality = PreviewQuality.entries[it] }
+                }
+                Divider(10.dp)
+                ChoicesBlock(R.string.playback_resampling) {
+                    Choices(listOf(R.string.settings_level_low, R.string.settings_level_high, R.string.settings_level_ultra), settings.audioResampling) { settings.audioResampling = it }
+                }
+                Divider(10.dp)
+                SwitchRow(stringResource(R.string.settings_preview_copies), settings.previewCopies, enabled = true) { settings.previewCopies = it }
+                PreviewCopiesRow()
+            }
+            Category(R.string.settings_group_projects, HomeIcons.Folder) {
+                SwitchRow(stringResource(R.string.settings_open_xml), settings.xmlUpload, enabled = true) { settings.xmlUpload = it }
+                SwitchRow(stringResource(R.string.settings_keep_media_copies), settings.keepMediaCopies, enabled = true) { settings.keepMediaCopies = it }
+                SwitchRow(stringResource(R.string.settings_demo_mode), settings.demoMode, enabled = true) { settings.demoMode = it; demoNote = it }
+                CaptionModelRow()
+            }
+            Category(R.string.settings_group_backup, ChromeIcons.SavePreset) {
+                BackupRows(settings, onRestored)
+            }
             LinkRow(stringResource(R.string.settings_language), currentLanguage(LocalContext.current).nativeName) { language = true }
             Spacer(Modifier.height(CardGap))
-            BackupRows(settings, onRestored)
-            Spacer(Modifier.height(CardGap))
             LinkRow(stringResource(R.string.settings_about)) { about = true }
-            CaptionModelRow()
+            Spacer(Modifier.height(CardGap))
+            UpdateRows(settings) { crashLogs = true }
         }
     }
     if (language) LanguageDialog { language = false }
     if (about) AboutScreen { about = false }
+    if (crashLogs) CrashLogsScreen { crashLogs = false }
     if (demoNote) AlertDialog(
         onDismissRequest = { demoNote = false },
         title = { Text(stringResource(R.string.demo_mode_is_on), color = Am.Navy) },
@@ -140,36 +154,60 @@ fun SettingsDrawer(settings: AppSettings, drawer: androidx.compose.material3.Dra
 }
 
 @Composable
+private fun Category(@StringRes name: Int, icon: ImageVector, content: @Composable () -> Unit) {
+    var open by rememberSaveable { mutableStateOf(false) }
+    val turn by animateFloatAsState(if (open) 180f else 0f, Motion.enter())
+    Column(Modifier.padding(horizontal = 6.dp).fillMaxWidth().clip(PanelShape).background(PanelColor)) {
+        Row(
+            Modifier.fillMaxWidth().height(44.dp).clickable { open = !open }
+                .semantics { if (open) collapse { open = false; true } else expand { open = true; true } }
+                .padding(start = 13.dp, end = 7.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(icon, null, Modifier.size(20.dp), tint = Am.HomeInk)
+            Spacer(Modifier.width(10.dp))
+            Text(stringResource(name), Modifier.weight(1f), color = Am.HomeInk, fontSize = 13.sp)
+            Icon(HomeIcons.ChevronDown, null, Modifier.size(24.dp).rotate(turn), tint = Am.HomeMid)
+        }
+        AnimatedVisibility(
+            open,
+            enter = expandVertically(Motion.enter()) + fadeIn(Motion.enter()),
+            exit = shrinkVertically(Motion.exit()) + fadeOut(Motion.exit()),
+        ) {
+            Column(Modifier.fillMaxWidth().padding(bottom = 4.dp)) {
+                Divider(10.dp)
+                content()
+            }
+        }
+    }
+    Spacer(Modifier.height(CardGap))
+}
+
+@Composable
+private fun ChoicesBlock(@StringRes label: Int, choices: @Composable () -> Unit) {
+    Spacer(Modifier.height(10.dp))
+    Text(stringResource(label), Modifier.padding(start = 10.dp), color = Am.HomeMid, fontSize = 13.sp, lineHeight = 18.sp)
+    Spacer(Modifier.height(10.dp))
+    choices()
+    Spacer(Modifier.height(10.dp))
+}
+
+@Composable
 private fun PreviewCopiesRow() {
     val context = LocalContext.current
     val made by VideoProxies.revision.collectAsState()
     var bytes by remember { mutableLongStateOf(0L) }
     LaunchedEffect(made) { bytes = withContext(Dispatchers.IO) { VideoProxies.bytes(context) } }
-    Spacer(Modifier.height(CardGap))
-    Row(
-        Modifier.padding(horizontal = 6.dp).fillMaxWidth().height(44.dp).clip(PanelShape).background(PanelColor)
-            .clickable { VideoProxies.clear(context) }.padding(start = 15.dp, end = 15.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(stringResource(R.string.settings_clear_preview_copies), Modifier.weight(1f), color = Am.HomeInk, fontSize = 13.sp)
-        Text(formatBytes(bytes), color = Am.HomeMid, fontSize = 13.sp)
-    }
+    ActionRow(stringResource(R.string.settings_clear_preview_copies), formatBytes(bytes), chevron = false) { VideoProxies.clear(context) }
 }
 
 @Composable
 private fun CaptionModelRow() {
     val context = LocalContext.current
     var bytes by remember { mutableLongStateOf(CaptionModel.file(context).length()) }
-    if (bytes == 0L) return
-    Spacer(Modifier.height(CardGap))
-    Row(
-        Modifier.padding(horizontal = 6.dp).fillMaxWidth().height(44.dp).clip(PanelShape).background(PanelColor)
-            .clickable { CaptionModel.remove(context); bytes = CaptionModel.file(context).length() }.padding(start = 15.dp, end = 15.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(stringResource(R.string.remove_caption_model), Modifier.weight(1f), color = Am.HomeInk, fontSize = 13.sp)
-        Text(formatBytes(bytes), color = Am.HomeMid, fontSize = 13.sp)
-    }
+    val downloaded = remember { bytes > 0L }
+    if (!downloaded) return
+    ActionRow(stringResource(R.string.remove_caption_model), formatBytes(bytes), chevron = false) { CaptionModel.remove(context); bytes = CaptionModel.file(context).length() }
 }
 
 @Composable
@@ -178,15 +216,35 @@ private fun Divider(inset: androidx.compose.ui.unit.Dp) {
 }
 
 @Composable
+private fun UpdateRows(settings: AppSettings, onCrashLogs: () -> Unit) {
+    val context = LocalContext.current
+    Column(Modifier.padding(horizontal = 6.dp).fillMaxWidth().clip(PanelShape).background(PanelColor)) {
+        ActionRow(stringResource(R.string.crash_logs), onClick = onCrashLogs)
+        Divider(10.dp)
+        SwitchRow(stringResource(R.string.update_check_on_open), settings.autoUpdateCheck, enabled = true) { settings.chooseUpdates(it) }
+        Divider(10.dp)
+        ActionRow(stringResource(R.string.update_check_now), busy = Updates.checking) { Updates.check(context, settings, manual = true) }
+    }
+}
+
+@Composable
 internal fun LinkRow(label: String, value: String? = null, onClick: () -> Unit) {
+    Box(Modifier.padding(horizontal = 6.dp).fillMaxWidth().clip(PanelShape).background(PanelColor)) {
+        ActionRow(label, value, chevron = true, onClick = onClick)
+    }
+}
+
+@Composable
+internal fun ActionRow(label: String, value: String? = null, chevron: Boolean = true, busy: Boolean = false, onClick: () -> Unit) {
     Row(
-        Modifier.padding(horizontal = 6.dp).fillMaxWidth().height(44.dp).clip(PanelShape).background(PanelColor)
-            .clickable(onClick = onClick).padding(start = 15.dp, end = 7.dp),
+        Modifier.fillMaxWidth().height(44.dp).clickable(onClick = onClick).padding(start = 15.dp, end = if (chevron) 7.dp else 15.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(label, Modifier.weight(1f), color = Am.HomeInk, fontSize = 13.sp)
         if (value != null) Text(value, color = Am.HomeMid, fontSize = 13.sp, maxLines = 1)
-        Icon(HomeIcons.ChevronRight, null, Modifier.size(24.dp), tint = Am.HomeMid)
+        if (busy) Box(Modifier.size(24.dp), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator(Modifier.size(16.dp), color = Am.HomeMid, strokeWidth = 2.dp)
+        } else if (chevron) Icon(HomeIcons.ChevronRight, null, Modifier.size(24.dp), tint = Am.HomeMid)
     }
 }
 
@@ -202,7 +260,7 @@ internal fun SwitchRow(label: String, checked: Boolean, enabled: Boolean, onChan
 }
 
 @Composable
-private fun RefSwitch(checked: Boolean, enabled: Boolean, onChange: (Boolean) -> Unit) =
+internal fun RefSwitch(checked: Boolean, enabled: Boolean, onChange: (Boolean) -> Unit) =
     ThinSwitch(checked, enabled = enabled, offTrack = Am.SwitchOff, onTrack = Am.HomeAccent.copy(alpha = 0.5f), onThumb = Am.HomeAccent, onChange = onChange)
 
 @Composable

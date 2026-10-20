@@ -73,11 +73,13 @@ internal fun SearchField(
     content: Color = Am.OnDark,
     faint: Color = Am.OnDarkDim,
     autoFocus: Boolean = false,
+    onClose: (() -> Unit)? = null,
 ) {
     val focus = LocalFocusManager.current
     val requester = remember { FocusRequester() }
     val keyboard = LocalSoftwareKeyboardController.current
     LaunchedEffect(autoFocus) { if (autoFocus) requester.requestFocus() }
+    val clearable = text.isNotEmpty() || onClose != null
     Row(modifier.clip(RoundedCornerShape(6.dp)).background(background).padding(start = 8.dp), verticalAlignment = Alignment.CenterVertically) {
         Icon(TextIcons.Search, null, Modifier.size(16.dp), tint = faint)
         BasicTextField(
@@ -91,8 +93,11 @@ internal fun SearchField(
                 }
             },
         )
-        Box(Modifier.size(32.dp).then(if (text.isEmpty()) Modifier else Modifier.clickable { onChange(""); requester.requestFocus(); keyboard?.show() }), Alignment.Center) {
-            if (text.isNotEmpty()) Icon(ChromeIcons.CloseThick, stringResource(R.string.search_clear), Modifier.size(16.dp), tint = content)
+        Box(Modifier.size(32.dp).then(if (!clearable) Modifier else Modifier.clickable {
+            onChange("")
+            if (onClose != null) onClose() else { requester.requestFocus(); keyboard?.show() }
+        }), Alignment.Center) {
+            if (clearable) Icon(ChromeIcons.CloseThick, stringResource(R.string.search_clear), Modifier.size(16.dp), tint = content)
         }
     }
 }

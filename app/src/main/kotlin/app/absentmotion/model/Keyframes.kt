@@ -145,7 +145,7 @@ private fun blend(a: String, b: String, u: Float): String {
 data class EasingPreset(@StringRes val label: Int, val easing: Easing)
 
 object EasingCatalog {
-    private const val BEZIER = R.string.keyframe_easing_cubic_bezier
+    private val BEZIER = R.string.keyframe_easing_cubic_bezier
     val families: List<List<EasingPreset>> = listOf(
         listOf(
             EasingPreset(BEZIER, Easing.Linear),

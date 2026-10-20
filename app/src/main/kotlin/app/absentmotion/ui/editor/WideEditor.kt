@@ -31,7 +31,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import app.absentmotion.editor.EditorState
 import app.absentmotion.ui.theme.Am
+import app.absentmotion.ui.theme.Presence
 import app.absentmotion.ui.theme.enterFade
+import app.absentmotion.ui.theme.presence
 
 val LocalWide = compositionLocalOf { false }
 
@@ -55,7 +57,8 @@ internal fun WideEditorBody(state: EditorState, onExit: () -> Unit, addLibrary: 
             Row(Modifier.fillMaxWidth().weight(1f)) {
                 Box(Modifier.weight(1f).fillMaxHeight()) {
                     Preview(state, Modifier.fillMaxSize())
-                    if (state.previewPanelOpen) PreviewModePanel(state, Modifier.align(Alignment.CenterEnd).enterFade())
+                    Presence(state.previewPanelOpen) { PreviewModePanel(state, Modifier.align(Alignment.CenterEnd).presence(slideX = 0.4f)) }
+                    AnimateButton(state, Modifier.align(Alignment.BottomEnd))
                 }
                 Box(Modifier.width(SideWidth).fillMaxHeight().background(Am.TimelineBg)) { LowerPanels(state, addLibrary, top = true) }
             }

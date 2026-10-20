@@ -64,6 +64,7 @@ import app.absentmotion.editor.KeypadRequest
 import app.absentmotion.ui.editor.PanelIcons
 import app.absentmotion.ui.editor.ValueKeypad
 import app.absentmotion.ui.theme.Am
+import app.absentmotion.ui.theme.Swap
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.hypot
@@ -161,7 +162,7 @@ internal fun FullColorPicker(state: EditorState, request: FullColor, modifier: M
                 }
             }
         }
-        keypad?.let { ValueKeypad(it, { keypad = null }, Modifier.fillMaxSize()) }
+        Swap(keypad, Modifier.fillMaxSize(), rise = 0.dp) { keypad?.let { ValueKeypad(it, { keypad = null }, Modifier.fillMaxSize()) } }
     }
 }
 

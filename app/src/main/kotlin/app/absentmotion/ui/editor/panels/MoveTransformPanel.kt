@@ -39,6 +39,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.sp
 import app.absentmotion.editor.EditorState
@@ -47,6 +48,7 @@ import app.absentmotion.editor.KeypadRequest
 import app.absentmotion.engine.SnapGuide
 import app.absentmotion.model.Layer
 import app.absentmotion.ui.editor.PanelIcons
+import app.absentmotion.ui.editor.rememberHaptic
 import app.absentmotion.ui.theme.Am
 import kotlin.math.abs
 import kotlin.math.atan2
@@ -56,13 +58,13 @@ import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
 
 @Composable
-internal fun MoveTransformPanel(state: EditorState, layer: Layer, tab: Int, modifier: Modifier = Modifier) {
+internal fun MoveTransformPanel(state: EditorState, layer: Layer, tab: Int, turn: Turn?, modifier: Modifier = Modifier) {
     Box(modifier) {
         when (tab) {
             0 -> PositionTab(state, layer)
-            1 -> RotationTab(state, layer)
-            2 -> TiltTab(state, layer)
-            3 -> SizeTab(state, layer)
+            1 -> if (layer.kind == "camera") CameraSizeTab(state, layer) else SizeTab(state, layer)
+            2 -> if (turn != null) TurnTab(state, layer, turn) else RotationTab(state, layer)
+            3 -> TiltTab(state, layer, turn)
             else -> SkewTab(state, layer)
         }
     }
@@ -71,6 +73,8 @@ internal fun MoveTransformPanel(state: EditorState, layer: Layer, tab: Int, modi
 @Composable
 private fun PositionTab(state: EditorState, layer: Layer) {
     val at = layer.location
+    var depth by remember(layer.id) { mutableStateOf(false) }
+    val deep by rememberUpdatedState(depth)
     fun openKeypad(active: Int) {
         val fields = listOf(KeypadField("X", at[0]), KeypadField("Y", at[1]), KeypadField("Z", at[2]))
         state.keypad = KeypadRequest(fields, active) { v -> state.editSelected { it.withTransform("location", v[0], v[1], v[2]) } }
@@ -84,6 +88,7 @@ private fun PositionTab(state: EditorState, layer: Layer) {
     val box by produceState<FloatArray?>(null, layer.node, state.timeMs) { value = state.engine.layerBounds(layer.id, state.timeMs) }
     val start by rememberUpdatedState { snapAxes(state.scene.width.toFloat(), state.scene.height.toFloat(), layer.location, box, others) }
     val now by rememberUpdatedState(layer)
+    val tick = rememberHaptic(state)
     DisposableEffect(Unit) { onDispose { state.snapGuides = emptyList() } }
     Box(
         Modifier.fillMaxSize().pointerInput(state) {
@@ -93,30 +98,40 @@ private fun PositionTab(state: EditorState, layer: Layer) {
             var shown = Offset.Zero
             fun done() { state.snapGuides = emptyList(); state.endGesture() }
             detectDragGestures(
-                onDragStart = { axes = start(); origin = now.location; travel = Offset.Zero; shown = Offset.Zero },
+                onDragStart = {
+                    axes = start(); origin = now.location; travel = Offset.Zero; shown = Offset.Zero
+                    state.snapGuides = if (deep) emptyList() else axes.first.guidesAt(0f) + axes.second.guidesAt(0f)
+                },
                 onDragEnd = ::done, onDragCancel = ::done,
             ) { change, drag ->
                 change.consume()
+                if (deep) {
+                    travel += drag
+                    state.editSelected(key = "move-z") { l -> l.withTransform("location", origin[0], origin[1], origin[2] - travel.y) }
+                    return@detectDragGestures
+                }
                 travel += drag / density
                 val snapped = Offset(axes.first.map(travel.x), axes.second.map(travel.y))
                 val step = snapped - shown
                 shown = snapped
-                state.snapGuides = (if (step.x == 0f) axes.first.guidesAt(snapped.x) else emptyList()) +
+                val guides = (if (step.x == 0f) axes.first.guidesAt(snapped.x) else emptyList()) +
                     (if (step.y == 0f) axes.second.guidesAt(snapped.y) else emptyList())
+                if (guides.any { it !in state.snapGuides }) tick(HapticFeedbackType.SegmentTick)
+                state.snapGuides = guides
                 if (step != Offset.Zero) state.editSelected(key = "move") { l -> l.withTransform("location", origin[0] + snapped.x, origin[1] + snapped.y, l.location[2]) }
             }
         },
     ) {
         TrackpadCorners()
-        Text(stringResource(R.string.drag_here_to_move_the_layer), Modifier.align(Alignment.Center), color = PanelCaption, fontSize = 15.sp, maxLines = 1, softWrap = false)
+        Text(stringResource(if (depth) R.string.drag_to_move_along_z else R.string.drag_here_to_move_the_layer), Modifier.align(Alignment.Center), color = PanelCaption, fontSize = 15.sp, maxLines = 1, softWrap = false)
         Column(Modifier.align(Alignment.TopCenter).padding(top = 17.px)) {
             Row {
                 Row(Modifier.width(354.px).height(70.px).clip(PanelShape).background(Am.Field)) {
-                    ValueCell(formatFixed(at[0], 2), Am.Accent, Modifier.weight(1f)) { openKeypad(0) }
-                    ValueCell(formatFixed(at[1], 2), Am.Accent, Modifier.weight(1f)) { openKeypad(1) }
+                    ValueCell(formatFixed(at[0], 2), if (depth) Am.OnDark else Am.Accent, Modifier.weight(1f)) { if (depth) depth = false else openKeypad(0) }
+                    ValueCell(formatFixed(at[1], 2), if (depth) Am.OnDark else Am.Accent, Modifier.weight(1f)) { if (depth) depth = false else openKeypad(1) }
                 }
                 Spacer(Modifier.width(20.px))
-                NumberBox(formatFixed(at[2], 2), Am.OnDark, Modifier.width(177.px).height(70.px), fontSize = 10.5f) { openKeypad(2) }
+                NumberBox(formatFixed(at[2], 2), if (depth) Am.Accent else Am.OnDark, Modifier.width(177.px).height(70.px), fontSize = 10.5f) { if (depth) openKeypad(2) else depth = true }
             }
             Row(Modifier.height(23.px)) {
                 Caption("X", Modifier.width(177.px).fillMaxHeight())
@@ -189,7 +204,7 @@ internal class SnapAxis(snaps: List<Snap>, private val threshold: Float = 25f) {
 }
 
 @Composable
-private fun TrackpadCorners() {
+internal fun TrackpadCorners() {
     Canvas(Modifier.fillMaxSize()) {
         val far = 718.5f
         val near = 24.5f
@@ -402,7 +417,8 @@ private fun SkewTab(state: EditorState, layer: Layer) {
 private const val DEGREES_PER_DP = 0.25f
 
 @Composable
-private fun TiltTab(state: EditorState, layer: Layer) {
+private fun TiltTab(state: EditorState, layer: Layer, turn: Turn?) {
+    if (turn != null) TurnHook(state, turn)
     var active by remember { mutableIntStateOf(0) }
     val tilt = layer.tilt
     val labels = listOf(stringResource(R.string.tilt_x_rotation), stringResource(R.string.tilt_y_rotation))

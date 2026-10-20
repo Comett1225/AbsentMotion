@@ -6,6 +6,7 @@ import app.absentmotion.platform.Color
 import kotlin.math.roundToInt
 import app.absentmotion.model.Scene
 import app.absentmotion.model.copyLayers
+import app.absentmotion.model.withCameraFov
 import app.absentmotion.model.splitAt
 import app.absentmotion.model.trimEndAt
 import app.absentmotion.model.trimStartAt
@@ -128,9 +129,9 @@ fun EditorState.resetTransform(tabs: List<Int>) = editSelected { layer ->
     tabs.fold(layer) { l, tab ->
         when (tab) {
             0 -> l.withTransform("location", scene.width / 2f, scene.height / 2f, if (l.kind == "camera") -scene.cameraZoom else 0f)
-            1 -> l.withRotation(0f)
-            2 -> l.withTilt(0f, 0f)
-            3 -> l.withTransform("scale", 1f, 1f)
+            1 -> if (l.kind == "camera") l.withCameraFov(60f) else l.withTransform("scale", 1f, 1f)
+            2 -> l.withRotation(0f)
+            3 -> l.withTilt(0f, 0f)
             else -> l.withSkew(0f, 0f)
         }
     }

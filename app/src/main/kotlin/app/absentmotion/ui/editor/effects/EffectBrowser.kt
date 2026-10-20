@@ -52,6 +52,10 @@ import app.absentmotion.ui.editor.PanelIcons
 import app.absentmotion.ui.editor.matchesSearch
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Swap
+import app.absentmotion.ui.theme.TilePress
+import app.absentmotion.ui.theme.pressScale
+import androidx.compose.foundation.LocalIndication
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import androidx.compose.ui.res.stringResource
@@ -166,7 +170,9 @@ fun EffectBrowser(state: EditorState) {
                 catalog.categories.chunked(2).forEach { row ->
                     Row(Modifier.fillMaxWidth(), Arrangement.spacedBy(1.5.dp)) {
                         row.forEach { (key, name) ->
-                            Box(Modifier.weight(1f).height(66.5.dp).padding(bottom = 1.5.dp).clickable { category = key }, contentAlignment = Alignment.Center) {
+                            val press = remember { MutableInteractionSource() }
+                            Box(Modifier.weight(1f).height(66.5.dp).padding(bottom = 1.5.dp).pressScale(press, TilePress)
+                                .clickable(press, LocalIndication.current) { category = key }, contentAlignment = Alignment.Center) {
                                 if (key == "ai") AiBackdrop(Modifier.fillMaxSize())
                                 else Thumbnail(catalog, catalog.listed(key).firstOrNull()?.thumbnail, Modifier.fillMaxSize(), ContentScale.Crop)
                                 Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.55f)))
@@ -196,7 +202,9 @@ private fun BrowserButton(icon: ImageVector, description: String, onClick: () ->
 
 @Composable
 private fun EffectTile(catalog: EffectCatalog, effect: EffectDefinition, width: Float, onClick: () -> Unit, onLongClick: () -> Unit, favourite: Boolean) {
-    Column(Modifier.width(width.dp).alpha(if (effect.available) 1f else 0.35f).combinedClickable(onClick = onClick, onLongClick = onLongClick).padding(5.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+    val press = remember { MutableInteractionSource() }
+    Column(Modifier.width(width.dp).pressScale(press, TilePress).alpha(if (effect.available) 1f else 0.35f)
+        .combinedClickable(press, LocalIndication.current, onClick = onClick, onLongClick = onLongClick).padding(5.dp), horizontalAlignment = Alignment.CenterHorizontally) {
         Box {
             Thumbnail(catalog, effect.thumbnail, Modifier.size((width - 7).dp).clip(RoundedCornerShape(5.dp)))
             if (favourite) Icon(PanelIcons.Star, null, Modifier.align(Alignment.TopEnd).size(14.dp), tint = Am.Accent)
@@ -210,7 +218,9 @@ private fun EffectTile(catalog: EffectCatalog, effect: EffectDefinition, width: 
 
 @Composable
 private fun PresetTile(catalog: EffectCatalog, effect: EffectDefinition, preset: EffectPreset, onClick: () -> Unit) {
-    Column(Modifier.width(100.dp).alpha(if (effect.available) 1f else 0.35f).clickable(enabled = effect.available, onClick = onClick).padding(5.dp),
+    val press = remember { MutableInteractionSource() }
+    Column(Modifier.width(100.dp).pressScale(press, TilePress).alpha(if (effect.available) 1f else 0.35f)
+        .clickable(press, LocalIndication.current, enabled = effect.available, onClick = onClick).padding(5.dp),
         horizontalAlignment = Alignment.CenterHorizontally) {
         Thumbnail(catalog, effect.thumbnail(preset), Modifier.size(93.dp).clip(RoundedCornerShape(5.dp)))
         Text(preset.name, Modifier.fillMaxWidth().padding(top = 4.dp), color = Am.Accent, fontSize = 10.sp, lineHeight = 9.sp,

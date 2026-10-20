@@ -2,7 +2,6 @@ package app.absentmotion.ui.editor.panels
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -17,7 +16,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.absentmotion.editor.*
@@ -30,6 +28,11 @@ import app.absentmotion.ui.editor.MenuPopup
 import app.absentmotion.ui.editor.MenuRow
 import app.absentmotion.ui.editor.PanelHeight
 import app.absentmotion.ui.editor.PanelIcons
+import app.absentmotion.ui.editor.Reorder
+import app.absentmotion.ui.editor.rememberReorder
+import app.absentmotion.ui.editor.reorderGrip
+import app.absentmotion.ui.editor.reorderLift
+import app.absentmotion.ui.editor.reorderSlot
 import app.absentmotion.ui.editor.effects.EffectIcons
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Presence
@@ -90,8 +93,18 @@ internal fun EffectsPanel(state: EditorState, modifier: Modifier) {
         }
         Swap(index, Modifier.weight(1f).fillMaxHeight(), rise = 0.dp) {
             if (instance == null) {
-                Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
-                    layer.effects.forEachIndexed { i, effect -> EffectListRow(state, i, effect, catalog.find(effect["id"] ?: "")) }
+                val scroll = rememberScrollState()
+                val reorder = rememberReorder(state, scroll, top = 6.5.dp)
+                val id = layer.id
+                val effects = layer.effects
+                Column(Modifier.fillMaxSize().verticalScroll(scroll)) {
+                    key(reorder.generation) {
+                        effects.forEachIndexed { i, effect ->
+                            EffectListRow(state, reorder, i, effects.size, effect, catalog.find(effect["id"] ?: "")) { from, to ->
+                                state.edit { it.update(id, state.sampleMs) { l -> l.moveEffect(from, to) } }
+                            }
+                        }
+                    }
                     Box(Modifier.padding(6.5.dp).fillMaxWidth().height(37.dp).clip(RowShape).background(Am.Button)
                         .clickable { state.playing = false; state.effectBrowserOpen = true }, contentAlignment = Alignment.Center) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -151,13 +164,10 @@ private fun EffectHeader(state: EditorState, index: Int, effect: XmlNode, defini
 }
 
 @Composable
-private fun EffectListRow(state: EditorState, index: Int, effect: XmlNode, definition: EffectDefinition?) {
+private fun EffectListRow(state: EditorState, reorder: Reorder, index: Int, count: Int, effect: XmlNode, definition: EffectDefinition?, move: (Int, Int) -> Unit) {
     val visible = effect["hidden"] != "true"
-    var drag by remember { mutableFloatStateOf(0f) }
-    val latestIndex by rememberUpdatedState(index)
-    var held by remember { mutableIntStateOf(index) }
-    Row(Modifier.padding(start = 6.5.dp, end = 6.5.dp, top = 6.5.dp).fillMaxWidth().height(37.dp).clip(RowShape)
-        .background(Am.Field), verticalAlignment = Alignment.CenterVertically) {
+    Row(Modifier.reorderSlot(reorder, index).padding(start = 6.5.dp, end = 6.5.dp, top = 6.5.dp).fillMaxWidth().height(37.dp).reorderLift(reorder, index, 5.dp)
+        .clip(RowShape).background(Am.Field), verticalAlignment = Alignment.CenterVertically) {
         Row(Modifier.weight(1f).fillMaxHeight().alpha(if (definition?.available == true && effect["locallyApplied"] != "true") 1f else 0.35f)
             .clickable { state.effectIndex = index }.padding(start = 11.dp), verticalAlignment = Alignment.CenterVertically) {
             Icon(EffectIcons.Expand, null, Modifier.size(18.dp).alpha(0.3f), tint = Am.OnDark)
@@ -166,19 +176,7 @@ private fun EffectListRow(state: EditorState, index: Int, effect: XmlNode, defin
         Icon(if (visible) EffectIcons.Eye else EffectIcons.EyeOff, stringResource(R.string.effects_visibility), Modifier.width(36.dp).clickable {
             state.editSelected { it.withEffect(index) { node -> node.with("hidden", if (visible) "true" else null) } }
         }, tint = Am.OnDark)
-        Icon(EffectIcons.Grip, stringResource(R.string.effects_reorder), Modifier.width(32.dp).fillMaxHeight().pointerInput(state) {
-            detectDragGesturesAfterLongPress(onDragStart = { drag = 0f; held = latestIndex }, onDragEnd = { state.endGesture() }, onDragCancel = { state.endGesture() }) { change, amount ->
-                change.consume(); drag += amount.y
-                val step = 43.5.dp.toPx()
-                if (kotlin.math.abs(drag) >= step) {
-                    val from = held
-                    val to = (from + if (drag > 0) 1 else -1).coerceIn(0, (state.selected?.effects?.size ?: 1) - 1)
-                    if (to != from) state.editSelected("effect-reorder") { it.moveEffect(from, to) }
-                    held = to
-                    drag = 0f
-                }
-            }
-        }, tint = Am.OnDark)
+        Icon(EffectIcons.Grip, stringResource(R.string.effects_reorder), Modifier.width(32.dp).fillMaxHeight().reorderGrip(reorder, index, count, move), tint = Am.OnDark)
     }
 }
 

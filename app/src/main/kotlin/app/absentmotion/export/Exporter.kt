@@ -6,6 +6,7 @@ import app.absentmotion.platform.Context
 import app.absentmotion.platform.Bitmap
 import app.absentmotion.platform.Uri
 import app.absentmotion.engine.EngineThread
+import app.absentmotion.library.CrashLogs
 import app.absentmotion.library.MediaAccess
 import app.absentmotion.library.modelFolder
 import app.absentmotion.model.Scene
@@ -35,7 +36,7 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
     suspend fun export(kind: ExportKind, scene: Scene, s: ExportSettings, frame: Int, name: String, progress: (Float) -> Unit): ExportResult {
         val saved = ArrayList<Uri>()
         try {
-            return withContext(Dispatchers.Default) {
+            return CrashLogs.during("exporting ${kind.name.lowercase()}") { withContext(Dispatchers.Default) {
                 val xml = scene.toXml()
                 when (kind) {
                     ExportKind.Video -> s.fixedFormat().let { f ->
@@ -68,6 +69,7 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
                         }
                     }
                     ExportKind.Gif -> direct(saved, name, "gif", "image/gif", "Pictures/$AppFolder") { fd -> cool { gif(scene, xml, s, fdStream(fd), it::pauseMs, progress) } }
+                        .verified(kind, scene, s, false)
                     ExportKind.Frame, ExportKind.FrameAs -> {
                         val shape = if (kind == ExportKind.Frame) s.copy(image = ImageKind.Png) else s
                         single(saved, name, shape.image.ext, shape.image.mime, "Pictures/$AppFolder") { out ->
@@ -75,13 +77,13 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
                                 val bytes = still(scene.frameStart(frame), scene.width, scene.height) ?: throw ExportError(txt(R.string.export_error_draw_still))
                                 out.write(encode(bytes, scene.width, scene.height, shape, reuse = null))
                             }
-                        }
+                        }.verified(kind, scene, shape, false)
                     }
                     ExportKind.Xml -> single(saved, name, "xml", "text/xml", "Documents/$AppFolder") { it.write(xml.toByteArray()) }
                     ExportKind.Package -> direct(saved, name, "absproj", "application/octet-stream", "Documents/$AppFolder") { fd -> pack(scene, xml, fdStream(fd), progress) }
                     ExportKind.Sequence -> sequence(saved, scene, xml, s, name, progress)
                 }
-            }
+            } }
         } catch (t: Throwable) {
             withContext(NonCancellable + Dispatchers.IO) { saved.forEach { runCatching { store.delete(it) } } }
             throw t
@@ -111,8 +113,11 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
         return ExportResult(saved, mime, store.location(where))
     }
 
-    private suspend fun ExportResult.verified(kind: ExportKind, scene: Scene, s: ExportSettings, hasAudio: Boolean): ExportResult =
-        expectationFor(kind, scene, s, hasAudio)?.let { ExportResult(uris, mime, where, verifyExport(context, uris.first(), it)) } ?: this
+    private suspend fun ExportResult.verified(kind: ExportKind, scene: Scene, s: ExportSettings, hasAudio: Boolean): ExportResult {
+        val check = expectationFor(kind, scene, s, hasAudio)?.let { verifyExport(context, uris.first(), it) }
+            ?: pictureExpectationFor(kind, scene, s)?.let { verifyPicture(context, uris.first(), it) }
+        return if (check == null) this else ExportResult(uris, mime, where, check)
+    }
 
     private suspend fun <T> cool(block: suspend (ThermalMonitor) -> T): T {
         val thermal = ThermalMonitor.of(context)

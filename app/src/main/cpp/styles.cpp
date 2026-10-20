@@ -910,10 +910,41 @@ static bool ContainsOne(const std::vector<Layer>& siblings, const Layer& l, doub
     const SkPoint inner = {local.fX + l.innerWidth / 2.0f, local.fY + l.innerHeight / 2.0f};
     if (!SkRect::MakeWH(l.innerWidth, l.innerHeight).contains(inner.fX, inner.fY)) return false;
     const double innerTime = NestedTime(l, timeMs);
+    if (innerTime >= 0 && (l.innerBackground >> 24) != 0) return true;
     for (auto it = l.children.rbegin(); innerTime >= 0 && it != l.children.rend(); ++it) {
         if (Contains(l.children, *it, innerTime, inner, l.innerWidth, l.innerHeight)) return true;
     }
     return false;
+}
+
+static bool ContentRect(const Layer& l, double timeMs, const SkMatrix& matrix, SkRect* out) {
+    const SkPath shape = ShapePath(l, l.localTime(timeMs));
+    if (shape.isEmpty()) return false;
+    *out = matrix.mapRect(shape.getBounds());
+    if (l.kind != "embedScene") return true;
+    const double innerTime = NestedTime(l, timeMs);
+    if (innerTime >= 0 && (l.innerBackground >> 24) != 0) return true;
+    const SkMatrix origin = SkMatrix::Concat(matrix, SkMatrix::Translate(-l.innerWidth / 2.0f, -l.innerHeight / 2.0f));
+    float left = INFINITY, top = INFINITY, right = -INFINITY, bottom = -INFINITY;
+    SkRect child;
+    for (const Layer& c : l.children) {
+        if (innerTime < 0 || !c.activeAt(innerTime) || c.kind == "nullobj" || c.kind == "camera") continue;
+        if (!ContentRect(c, innerTime, SkMatrix::Concat(origin, SiblingMatrix(l.children, c, innerTime)), &child)) continue;
+        left = std::min(left, child.fLeft);
+        top = std::min(top, child.fTop);
+        right = std::max(right, child.fRight);
+        bottom = std::max(bottom, child.fBottom);
+    }
+    const SkRect seen = SkRect::MakeLTRB(std::max(left, out->fLeft), std::max(top, out->fTop), std::min(right, out->fRight), std::min(bottom, out->fBottom));
+    if (seen.fLeft <= seen.fRight && seen.fTop <= seen.fBottom) *out = seen;
+    return true;
+}
+
+SkRect SelectionBounds(const Layer& layer, double timeMs, const SkMatrix& matrix) {
+    if (layer.kind != "embedScene") return ShapePath(layer, layer.localTime(timeMs)).makeTransform(matrix).getBounds();
+    SkRect bounds = SkRect::MakeEmpty();
+    ContentRect(layer, timeMs, matrix, &bounds);
+    return bounds;
 }
 
 static const std::vector<Layer>& SeenProject(const Scene& scene, double timeMs, std::vector<Layer>* storage) {
@@ -932,6 +963,12 @@ int64_t TopLayerAt(const Scene& scene, double timeMs, float x, float y) {
     const std::vector<Layer>& list = SeenProject(scene, timeMs, &storage);
     for (auto it = list.rbegin(); it != list.rend(); ++it) {
         if (Contains(list, *it, timeMs, {x, y}, scene.width, scene.height)) return it->id;
+    }
+    if (CameraViewOn()) return 0;
+    for (auto it = scene.layers.rbegin(); it != scene.layers.rend(); ++it) {
+        SkPoint frame[4];
+        if (it->kind == "camera" && it->activeAt(timeMs) && CameraFrame(scene.layers, *it, scene.width, scene.height, timeMs, frame) &&
+            SkPath::Polygon({frame, 4}, true).contains(x, y)) return it->id;
     }
     return 0;
 }

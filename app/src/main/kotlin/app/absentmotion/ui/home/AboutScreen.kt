@@ -50,7 +50,7 @@ import kotlinx.coroutines.withContext
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
 
-private const val HOME_PAGE = "https://github.com/Comett1225/AbsentMotion"
+internal const val HOME_PAGE ="https://github.com/Comett1225/AbsentMotion"
 
 internal const val LICENCES_ASSET = "licenses.txt"
 
@@ -105,12 +105,18 @@ private val RowShape = RoundedCornerShape(7.dp)
 private fun Body(text: String) = Text(text, color = Am.HomeInk, fontSize = 14.sp, lineHeight = 20.sp)
 
 @Composable
-internal fun TitleBar(title: String, icon: ImageVector, description: String, onClick: () -> Unit) {
+internal fun TitleBar(
+    title: String, icon: ImageVector, description: String, onClick: () -> Unit,
+    action: ImageVector? = null, actionDescription: String = "", onAction: () -> Unit = {},
+) {
     Box(Modifier.fillMaxWidth().background(Am.Card).statusBarsPadding().height(49.dp)) {
         Box(Modifier.size(44.dp).clickable(onClick = onClick), contentAlignment = Alignment.Center) {
             Icon(icon, description, Modifier.size(24.dp), tint = Am.Navy)
         }
         Text(title, Modifier.align(Alignment.Center), color = Am.Navy, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+        if (action != null) Box(Modifier.align(Alignment.TopEnd).size(44.dp).clickable(onClick = onAction), contentAlignment = Alignment.Center) {
+            Icon(action, actionDescription, Modifier.size(24.dp), tint = Am.Navy)
+        }
         Box(Modifier.align(Alignment.BottomCenter).fillMaxWidth().height(0.7.dp).background(Am.HomeLine))
     }
 }

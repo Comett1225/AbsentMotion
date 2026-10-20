@@ -357,8 +357,13 @@ bool ParseScene(const std::string& xml, Scene* scene, std::string* error) {
 
 const Layer* ActiveCamera(const std::vector<Layer>& layers, double timeMs) {
     const Layer* active = nullptr;
-    for (const Layer& layer : layers) if (layer.kind == "camera" && layer.activeAt(timeMs)) active = &layer;
-    return active;
+    const Layer* lowest = nullptr;
+    for (const Layer& layer : layers) {
+        if (layer.kind != "camera" || layer.hidden) continue;
+        if (!lowest) lowest = &layer;
+        if (layer.activeAt(timeMs)) active = &layer;
+    }
+    return active ? active : lowest;
 }
 
 double NestedTime(const Layer& group, double timeMs) {

@@ -35,6 +35,8 @@ import app.absentmotion.ui.editor.panels.ColorPicker
 import app.absentmotion.ui.editor.panels.ColourSwatch
 import app.absentmotion.ui.editor.panels.ThinSlider
 import app.absentmotion.ui.theme.Am
+import app.absentmotion.ui.theme.Swap
+import app.absentmotion.ui.theme.enterFade
 import kotlin.math.roundToInt
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
@@ -56,11 +58,13 @@ internal fun TextEditor(state: EditorState) {
     DisposableEffect(layer.id) { onDispose { state.endGesture() } }
     BoxWithConstraints(Modifier.fillMaxSize().background(Am.TopBar).systemBarsPadding().imePadding()) {
         if (browser) {
-            FontBrowser(library, onSelect = { name ->
-                library.remember(name)
-                state.editSelected { it.withFont(name) }
-                browser = false; popup = ""
-            }, onClose = { browser = false })
+            Box(Modifier.fillMaxSize().enterFade(rise = 12.dp)) {
+                FontBrowser(library, onSelect = { name ->
+                    library.remember(name)
+                    state.editSelected { it.withFont(name) }
+                    browser = false; popup = ""
+                }, onClose = { browser = false })
+            }
         } else {
             val previewHeight = minOf(400.dp, (maxHeight - 102.dp).coerceAtLeast(80.dp))
             Column(Modifier.fillMaxSize()) {
@@ -93,18 +97,20 @@ internal fun TextEditor(state: EditorState) {
                 TextContent(state, layer, Modifier.fillMaxWidth().height(60.dp))
             }
             if (popup.isNotEmpty() && state.eyedropper == null) Box(Modifier.fillMaxSize().padding(top = 42.dp).clickable(interactionSource = null, indication = null) { popup = "" })
-            when (popup) {
-                "size" -> {
-                    val index = TextSizes.indexOfFirst { it >= layer.textSize.roundToInt() }.let { if (it < 0) TextSizes.lastIndex else it }
-                    ThinSlider(index.toFloat(), { value -> state.editSelected("text-size") { it.withTextSize(TextSizes[value.roundToInt()].toFloat()) } },
-                        Modifier.padding(top = 42.dp).fillMaxWidth().height(40.dp).background(TextControl).padding(horizontal = 9.dp),
-                        valueRange = 0f..TextSizes.lastIndex.toFloat(),
-                        onValueChangeFinished = { state.endGesture() })
+            Swap(popup, Modifier.fillMaxSize(), rise = (-8).dp) {
+                when (popup) {
+                    "size" -> {
+                        val index = TextSizes.indexOfFirst { it >= layer.textSize.roundToInt() }.let { if (it < 0) TextSizes.lastIndex else it }
+                        ThinSlider(index.toFloat(), { value -> state.editSelected("text-size") { it.withTextSize(TextSizes[value.roundToInt()].toFloat()) } },
+                            Modifier.padding(top = 42.dp).fillMaxWidth().height(40.dp).background(TextControl).padding(horizontal = 9.dp),
+                            valueRange = 0f..TextSizes.lastIndex.toFloat(),
+                            onValueChangeFinished = { state.endGesture() })
+                    }
+                    "font" -> FontStrip(library, layer.font, Modifier.padding(top = 42.dp),
+                        onPick = { name -> library.remember(name); state.editSelected { it.withFont(name) } },
+                        onViewAll = { keyboard?.hide(); browser = true })
+                    "color" -> ColorPicker(state, layer, Modifier.align(Alignment.TopEnd).padding(top = 42.dp).size(304.dp, 128.dp).background(Am.Panel))
                 }
-                "font" -> FontStrip(library, layer.font, Modifier.padding(top = 42.dp),
-                    onPick = { name -> library.remember(name); state.editSelected { it.withFont(name) } },
-                    onViewAll = { keyboard?.hide(); browser = true })
-                "color" -> ColorPicker(state, layer, Modifier.align(Alignment.TopEnd).padding(top = 42.dp).size(304.dp, 128.dp).background(Am.Panel))
             }
         }
     }

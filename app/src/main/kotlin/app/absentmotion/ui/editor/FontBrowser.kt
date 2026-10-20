@@ -1,6 +1,9 @@
 package app.absentmotion.ui.editor
 
 import app.absentmotion.ui.theme.Am
+import app.absentmotion.ui.theme.Presence
+import app.absentmotion.ui.theme.presence
+import app.absentmotion.ui.theme.presenceScrim
 import app.absentmotion.platform.BackHandler
 import app.absentmotion.platform.rememberLauncherForActivityResult
 import app.absentmotion.platform.ActivityResultContracts
@@ -127,9 +130,9 @@ internal fun FontBrowser(library: FontLibrary, onSelect: (String) -> Unit, onClo
                 }
             }
         }
-        if (drawer) {
-            Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = .6f)).clickable { drawer = false })
-            Column(Modifier.width(280.dp).fillMaxHeight().background(DrawerBg).verticalScroll(rememberScrollState()).padding(horizontal = 10.dp)) {
+        Presence(drawer) {
+            Box(Modifier.fillMaxSize().presenceScrim(Color.Black.copy(alpha = .6f)).clickable { drawer = false })
+            Column(Modifier.presence(fade = false, slideX = -1f).width(280.dp).fillMaxHeight().background(DrawerBg).verticalScroll(rememberScrollState()).padding(horizontal = 10.dp)) {
                 listOf(2, 1, 3, 4, 5, 110, 100).forEach { category ->
                     Row(Modifier.fillMaxWidth().height(40.dp).clickable { categories = if (category in categories) categories - category else categories + category },
                         verticalAlignment = Alignment.CenterVertically) {

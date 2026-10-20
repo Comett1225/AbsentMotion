@@ -132,6 +132,65 @@ class UiContracts(unittest.TestCase):
     def test_camera_selection_resets_transform_tabs(self):
         self.assertIn('var tab by remember(selected.kind)', source('ui/editor/LayerTools.kt'))
 
+    def test_animation_button_floats_over_the_preview_in_both_layouts(self):
+        tools = source('ui/editor/LayerTools.kt')
+        self.assertNotIn('R.string.a11y_animate', tools)
+        self.assertNotIn('AnimationSheet(', tools)
+        for path in ['ui/editor/EditorScreen.kt', 'ui/editor/WideEditor.kt']:
+            self.assertIn('AnimateButton(state, Modifier.align(Alignment.BottomEnd))', source(path))
+        text = source('ui/editor/MotionSheets.kt').split('internal fun AnimateButton', 1)[1].split('\n}\n', 1)[0]
+        self.assertIn('state.selected?.canAnimate == true', text)
+        self.assertIn('Icon(PanelIcons.Animate, stringResource(R.string.a11y_animate)', text)
+        self.assertIn('state.playing = false', text)
+
+    def test_editor_menus_animate_in_and_out(self):
+        root = ROOT / 'app/src/main/kotlin/app/absentmotion/ui/editor'
+        paths = sorted(str(p.relative_to(ROOT / 'app/src/main/kotlin/app/absentmotion')) for p in root.rglob('*.kt'))
+        for path in paths:
+            self.assertIsNone(re.search(r'if \([^\n]*\) (MenuPopup|ChoiceList|ParentMenu|PasteStyleMenu|OverflowMenu)\(', source(path)), path)
+        self.assertIn('Modifier.presence(scaleFrom = 0.92f', source('ui/editor/StructureUi.kt').split('internal fun ChoiceList', 1)[1])
+        self.assertIn('Modifier.presence(scaleFrom = 0.85f, origin = cell.origin)', source('ui/editor/MediaTab.kt'))
+        for path in ['ui/editor/EditorScreen.kt', 'ui/editor/WideEditor.kt']:
+            self.assertIn('Presence(state.previewPanelOpen) { PreviewModePanel(', source(path))
+
+    def test_every_editor_haptic_respects_the_vibration_setting(self):
+        root = ROOT / 'app/src/main/kotlin/app/absentmotion/ui/editor'
+        for p in sorted(root.rglob('*.kt')):
+            path = str(p.relative_to(ROOT / 'app/src/main/kotlin/app/absentmotion'))
+            for line in source(path).splitlines():
+                if 'performHapticFeedback(' in line:
+                    self.assertIn('state.settings.vibration', line, path)
+        self.assertIn('state.edit("reorder") { it.move(id, layers.lastIndex - to) }\n        onTick()', source('ui/editor/Timeline.kt'))
+        self.assertIn('if (moved && value != null && value != detent) haptic(HapticFeedbackType.SegmentTick)', source('ui/editor/panels/SpeedPanel.kt'))
+        self.assertIn('if (guides.any { it !in state.snapGuides }) tick(HapticFeedbackType.SegmentTick)', source('ui/editor/panels/MoveTransformPanel.kt'))
+
+    def test_transform_tabs_put_size_above_rotate(self):
+        text = source('ui/editor/LayerTools.kt')
+        self.assertIn('listOf(PanelIcons.TabMove, PanelIcons.TabSize, PanelIcons.TabRotate, PanelIcons.TabTilt, PanelIcons.TabSkew)', text)
+        self.assertIn('KeyTarget(PropRef.Location, "0.000000,0.000000,0.000000"),\n    KeyTarget(PropRef.Scale, "1.000000,1.000000"),\n    KeyTarget(PropRef.Rotation, "0.000000"),\n    KeyTarget(PropRef.Tilt, "0.000000,0.000000"),', text)
+        self.assertIn('1 -> if (l.kind == "camera") l.withCameraFov(60f) else l.withTransform("scale", 1f, 1f)\n            2 -> l.withRotation(0f)\n            3 -> l.withTilt(0f, 0f)', source('editor/EditorActions.kt'))
+        self.assertIn('val usable = i <= ROTATE_TAB || selected.kind != "camera"', text)
+        self.assertIn('1 -> if (layer.kind == "camera") CameraSizeTab(state, layer) else SizeTab(state, layer)', source('ui/editor/panels/MoveTransformPanel.kt'))
+
+    def test_every_ruler_spinner_path_moves_the_value_like_a_tape_measure(self):
+        self.assertEqual(3, source('ui/editor/panels/PanelParts.kt').count('dragging(RulerMath.travel('))
+
+    def test_rotate_and_tilt_tabs_turn_three_d_objects_on_the_preview(self):
+        text = source('ui/editor/Preview.kt')
+        turn = 'moved && turning != null && !(canvasGesture && fingers > 1)'
+        self.assertIn(turn, text)
+        self.assertLess(text.index(turn), text.index('moved && state.selectedId != null && !(canvasGesture && fingers > 1)'))
+        self.assertIn('if (turn != null) TurnHook(state, turn)', source('ui/editor/panels/MoveTransformPanel.kt'))
+        self.assertIn('2 -> if (turn != null) TurnTab(state, layer, turn) else RotationTab(state, layer)', source('ui/editor/panels/MoveTransformPanel.kt'))
+
+    def test_media_search_opens_from_a_square_over_the_grid(self):
+        text = source('ui/editor/MediaTab.kt')
+        self.assertIn('MediaSquare(TextIcons.Search, stringResource(R.string.search_hint), searching || search.isNotEmpty()) { searching = true }', text)
+        self.assertIn('BackHandler(searching) { focus.clearFocus(); searching = false }', text)
+        self.assertEqual(1, text.count('SearchField('))
+        self.assertLess(text.index('LazyHorizontalGrid('), text.index('SearchField('))
+        self.assertIn('autoFocus = true', text.split('SearchField(', 1)[1])
+
     def test_deleting_preview_preset_clamps_the_position(self):
         text = source('ui/editor/PresetScreen.kt')
         self.assertIn('chosen = null; pos = pos.coerceAtMost((base.endTime - base.startTime).coerceAtLeast(1))', text)

@@ -20,7 +20,13 @@ def cases():
     arrow = '<shape id="1" s=".arrow" startTime="0" endTime="1000" fillType="color">' + engine.transform('100,100,0') + '<fillColor value="#ffff0000"/><property name="start" type="vec2" value="-60,0"/><property name="end" type="vec2" value="60,0"/><property name="lineWidth" type="float" value="20"/><property name="headWidth" type="float" value="40"/><property name="headLength" type="float" value="30"/></shape>'
     yield 'arrow widths', engine.scene(arrow), [((70, 109), engine.RED), ((70, 111), engine.BLACK), ((70, 119), engine.BLACK)]
     camera = '<camera id="2" startTime="500" endTime="700">' + engine.transform('200,100,-300') + '</camera>'
-    yield 'inactive camera', engine.scene(engine.rect(1, 100, 100, 15, 15, 0xffff0000) + camera), [((100, 100), engine.RED)]
+    yield 'the only camera also frames the time outside its clip', engine.scene(engine.rect(1, 100, 100, 15, 15, 0xffff0000) + camera), \
+        [((42, 100), engine.RED), ((100, 100), engine.BLACK)]
+    later = '<camera id="3" startTime="800" endTime="1000">' + engine.transform('0,100,-300') + '</camera>'
+    yield 'with no camera at the time the lowest camera frames it', engine.scene(engine.rect(1, 100, 100, 15, 15, 0xffff0000) + camera + later), \
+        [((42, 100), engine.RED), ((158, 100), engine.BLACK)]
+    hidden = camera.replace('<camera id="2"', '<camera id="2" hidden="true"')
+    yield 'a hidden camera frames nothing', engine.scene(engine.rect(1, 100, 100, 15, 15, 0xffff0000) + hidden), [((100, 100), engine.RED)]
     child = engine.rect(2, 100, 100, 40, 40, 0xffff0000, extra='<effect id="absent.invert"/>')
     group = '<embedScene id="1" startTime="0" endTime="1000">' + engine.transform('100,100,0') + '<scene width="200" height="200" fps="30" totalTime="1000" retime="off">' + child + '</scene></embedScene>'
     yield 'nested effects', engine.scene(group), [((100, 100), (0, 255, 255))]

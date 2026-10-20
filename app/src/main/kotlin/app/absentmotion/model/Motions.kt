@@ -40,7 +40,7 @@ class Motion(val id: String, @StringRes val label: Int, val ease: Easing, val lo
 enum class Dir(val x: Float, val y: Float) { Left(-1f, 0f), Right(1f, 0f), Up(0f, -1f), Down(0f, 1f) }
 
 private val EaseOut = Easing("cubicBezier", listOf(0.22f, 1f, 0.36f, 1f))
-private val EaseInOut = Easing("cubicBezier", listOf(0.42f, 0f, 0.58f, 1f))
+internal val EaseInOut = Easing("cubicBezier", listOf(0.42f, 0f, 0.58f, 1f))
 private val Overshoot = Easing("cubicBezier", listOf(0.34f, 1.56f, 0.64f, 1f))
 private val Whip = Easing("cubicBezier", listOf(0.8f, 0f, 0.2f, 1f))
 private val Bouncy = Easing("bounce", listOf(0.4f, 0.5f))

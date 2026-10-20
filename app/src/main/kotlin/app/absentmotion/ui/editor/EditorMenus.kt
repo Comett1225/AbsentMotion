@@ -92,6 +92,7 @@ import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
 import androidx.compose.ui.window.PopupProperties
 import app.absentmotion.editor.resetTransform
+import app.absentmotion.ui.editor.panels.Turn
 import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.canPaste
 import app.absentmotion.editor.canSavePreset
@@ -252,11 +253,11 @@ internal object AboveLeft : PopupPositionProvider {
 }
 
 @Composable
-internal fun TransformMenu(state: EditorState, tab: Int, onDismiss: () -> Unit) {
-    val resetName = listOf(R.string.menu_reset_location, R.string.menu_reset_rotation, R.string.menu_reset_3d_rotation, R.string.menu_reset_scale, R.string.menu_reset_skew)[tab]
+internal fun TransformMenu(state: EditorState, tab: Int, turn: Turn?, onDismiss: () -> Unit) {
+    val resetName = listOf(R.string.menu_reset_location, R.string.menu_reset_scale, R.string.menu_reset_rotation, R.string.menu_reset_3d_rotation, R.string.menu_reset_skew)[tab]
     MenuPopup(AboveLeft, onDismiss, TransformOrigin(0f, 1f)) {
         MenuRow(stringResource(resetName)) {
-            state.resetTransform(listOf(tab))
+            if (tab == ROTATE_TAB && turn != null) state.editSelected { turn.reset(it) } else state.resetTransform(listOf(tab))
             onDismiss()
         }
         MenuRow(stringResource(R.string.menu_reset_transform), divider = true) {
@@ -318,7 +319,7 @@ internal fun CopyPasteMenu(state: EditorState, onDismiss: () -> Unit) {
             MenuRow(stringResource(R.string.menu_set_outro_start)) { state.markOutroStart(); onDismiss() }
         }
     }
-    if (styleOpen) PasteStyleMenu(state) { styleOpen = false; onDismiss() }
+    Presence(styleOpen) { PasteStyleMenu(state) { styleOpen = false; onDismiss() } }
 }
 
 @Composable

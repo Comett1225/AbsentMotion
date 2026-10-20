@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -54,6 +55,15 @@ import app.absentmotion.editor.pasteStyle
 import app.absentmotion.editor.setParent
 import app.absentmotion.editor.unparentChildrenOf
 import app.absentmotion.ui.theme.Am
+import app.absentmotion.ui.theme.Swap
+import app.absentmotion.ui.theme.TilePress
+import app.absentmotion.ui.theme.presence
+import app.absentmotion.ui.theme.pressScale
+import androidx.compose.foundation.LocalIndication
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
 import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
@@ -81,11 +91,16 @@ import kotlinx.coroutines.withContext
 private val ItemShape = RoundedCornerShape(4.dp)
 
 @Composable
-private fun TextButton(label: String, modifier: Modifier, enabled: Boolean = true, onClick: () -> Unit = {}) {
-    Box(
-        modifier.alpha(if (enabled) 1f else DimAlpha).clip(ItemShape).background(Am.Button).then(if (enabled) Modifier.clickable(onClick = onClick) else Modifier),
-        contentAlignment = Alignment.Center,
-    ) { Text(label, color = Am.OnDark, fontSize = 12.sp, maxLines = 2, softWrap = true, lineHeight = 14.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center) }
+private fun ObjectTile(label: String, icon: ImageVector, modifier: Modifier, enabled: Boolean = true, onClick: () -> Unit = {}) {
+    val press = remember { MutableInteractionSource() }
+    Box(modifier.pressScale(press, TilePress).alpha(if (enabled) 1f else DimAlpha).clip(ItemShape).background(Am.Button)
+        .clickable(press, LocalIndication.current, enabled = enabled, onClick = onClick)) {
+        Icon(icon, null, Modifier.align(Alignment.TopCenter).padding(top = 14.dp).size(24.dp), tint = Am.OnDark)
+        Text(
+            label, Modifier.align(Alignment.BottomCenter).fillMaxWidth().height(40.dp).padding(start = 3.dp, end = 3.dp, bottom = 4.dp).wrapContentHeight(Alignment.CenterVertically),
+            color = Am.OnDark, fontSize = 11.sp, lineHeight = 13.sp, maxLines = 2, textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+        )
+    }
 }
 
 @Composable
@@ -102,20 +117,21 @@ internal fun ObjectPage(state: EditorState, modifier: Modifier) {
         }
     }
     val svg = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> if (uri != null) scope.launch { state.importSvgFile(context, uri) } }
-    if (picking) {
-        ElementPicker(state, modifier)
-        return
-    }
-    Column(modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Swap(picking, modifier, rise = 0.dp) { if (picking) ElementPicker(state, Modifier.fillMaxSize()) else ObjectTiles(state, reading, { picking = true }, { svg.launch(arrayOf("image/svg+xml")) }) { models.launch(arrayOf("*/*")) } }
+}
+
+@Composable
+private fun ObjectTiles(state: EditorState, reading: Boolean, pick: () -> Unit, importSvg: () -> Unit, importModel: () -> Unit) {
+    Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            TextButton(stringResource(R.string.camera), Modifier.size(70.dp, 80.dp)) { state.addCamera() }
-            TextButton(stringResource(R.string.structure_null), Modifier.size(70.dp, 80.dp)) { state.addNull() }
-            TextButton(stringResource(R.string.structure_empty_group), Modifier.size(70.dp, 80.dp)) { state.addEmptyGroup() }
-            TextButton(stringResource(R.string.structure_asset_project), Modifier.size(70.dp, 80.dp)) { picking = true }
+            ObjectTile(stringResource(R.string.camera), PanelIcons.Camera, Modifier.size(70.dp, 80.dp)) { state.addCamera() }
+            ObjectTile(stringResource(R.string.structure_null), ChromeIcons.NullObject, Modifier.size(70.dp, 80.dp)) { state.addNull() }
+            ObjectTile(stringResource(R.string.structure_empty_group), SelectionIcons.Group, Modifier.size(70.dp, 80.dp)) { state.addEmptyGroup() }
+            ObjectTile(stringResource(R.string.structure_asset_project), ChromeIcons.AssetProject, Modifier.size(70.dp, 80.dp), onClick = pick)
         }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            TextButton(stringResource(R.string.structure_import_svg), Modifier.size(70.dp, 80.dp)) { svg.launch(arrayOf("image/svg+xml")) }
-            TextButton(stringResource(R.string.structure_3d_model), Modifier.size(70.dp, 80.dp), enabled = !reading) { models.launch(arrayOf("*/*")) }
+            ObjectTile(stringResource(R.string.structure_import_svg), ChromeIcons.ImportSvg, Modifier.size(70.dp, 80.dp), onClick = importSvg)
+            ObjectTile(stringResource(R.string.structure_3d_model), ChromeIcons.Model3d, Modifier.size(70.dp, 80.dp), enabled = !reading, onClick = importModel)
         }
     }
 }
@@ -272,9 +288,11 @@ private fun SelectionButton(icon: ImageVector, description: String, modifier: Mo
 
 @Composable
 internal fun ChoiceList(items: List<String>, onDismiss: () -> Unit, onPick: (Int) -> Unit) {
+    val start = if (LocalLayoutDirection.current == LayoutDirection.Rtl) 1f else 0f
     Popup(ChoicePosition, onDismissRequest = onDismiss) {
         Column(
-            Modifier.width(220.dp).heightIn(max = 280.dp).clip(ItemShape).background(Am.PanelInset).verticalScroll(rememberScrollState()),
+            Modifier.presence(scaleFrom = 0.92f, origin = TransformOrigin(start, 1f)).width(220.dp).heightIn(max = 280.dp).clip(ItemShape).background(Am.PanelInset)
+                .verticalScroll(rememberScrollState()),
         ) {
             items.forEachIndexed { i, label ->
                 Box(Modifier.fillMaxWidth().height(40.dp).clickable { onPick(i); onDismiss() }.padding(horizontal = 14.dp), contentAlignment = Alignment.CenterStart) {

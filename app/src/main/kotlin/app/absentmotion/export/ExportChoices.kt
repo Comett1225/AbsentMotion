@@ -118,4 +118,5 @@ fun exportHeatText(level: ThermalLevel): UiText? = when (level) {
     else -> null
 }
 
-fun verificationLine(v: Verification): UiText = if (v.ok) txt(R.string.export_checked_ok) else txt(R.string.export_checked_problems, v.problems)
+fun verificationLine(v: Verification, still: Boolean = false): UiText =
+    if (v.ok) txt(if (still) R.string.export_checked_ok_still else R.string.export_checked_ok) else txt(R.string.export_checked_problems, v.problems)

@@ -10,7 +10,7 @@ namespace am {
 static bool PreviewQuad(const Scene& scene, int64_t id, double time, float xy[8]) {
     const Layer* layer=scene.layer(id);
     if(!layer || !layer->activeAt(time))return false;
-    SkPoint q[4];ShapePath(*layer,layer->localTime(time)).getBounds().toQuad(q);
+    SkPoint q[4];SelectionBounds(*layer,time,SkMatrix::I()).toQuad(q);
     WorldMatrix(scene,*layer,time).mapPoints(q);
     for(int i=0;i<4;i++){xy[2*i]=q[i].fX;xy[2*i+1]=q[i].fY;}
     return true;
@@ -100,33 +100,53 @@ static void DrawGrid(SkCanvas* canvas, const SkISize& size, const Scene& scene, 
     }
 }
 
-static void DrawCameraFrames(SkCanvas* canvas, const Scene& scene, double timeMs, bool seenThrough, const SkMatrix& toTarget, float px) {
+static void DrawCameraFrames(SkCanvas* canvas, const Scene& scene, double timeMs, bool seenThrough, int64_t selectedId,
+                             const SkMatrix& toTarget, float px) {
     const Layer* active = ActiveCamera(scene.layers, timeMs);
+    const SkColor line = SkColorSetARGB(0xdc, 0x3a, 0x3a, 0x3a);
     SkPaint paint;
     paint.setAntiAlias(true);
-    paint.setStyle(SkPaint::kStroke_Style);
+    auto stroke = [&](const SkPath& path, SkColor color, float width) {
+        paint.setStyle(SkPaint::kStroke_Style);
+        paint.setStrokeWidth(width * px);
+        paint.setColor(color);
+        canvas->drawPath(path, paint);
+    };
     for (const Layer& l : scene.layers) {
-        if (l.kind != "camera" || !l.activeAt(timeMs) || (seenThrough && &l == active)) continue;
-        const float t = l.localTime(timeMs);
-        const float reach = tanf(l.camera.fov.get(0, t, 60) * 0.5f * 3.1415927f / 180) * 2 * -l.location.get(2, t, 0) / std::max(scene.width, scene.height);
-        const float w = scene.width * reach / 2, h = scene.height * reach / 2;
-        if (!(w > 0 && h > 0)) continue;
-        SkPathBuilder frame;
-        frame.addRect(SkRect::MakeLTRB(-w, -h, w, h));
-        if (!l.camera.orthographic) {
-            frame.moveTo(-w, h).lineTo(w, -h);
-            frame.moveTo(-w, -h).lineTo(w, h);
+        if (l.kind != "camera" || !l.activeAt(timeMs)) continue;
+        const bool selected = l.id == selectedId;
+        SkPoint q[4];
+        if (!(seenThrough && &l == active) && CameraFrame(scene.layers, l, scene.width, scene.height, timeMs, q)) {
+            toTarget.mapPoints(q);
+            const SkPath box = SkPath::Polygon({q, 4}, true);
+            if (selected) {
+                stroke(box, SK_ColorBLACK, 7.3f);
+                stroke(box, SK_ColorWHITE, 5.3f);
+            } else {
+                stroke(box, line, 1.5f);
+            }
+            if (!l.camera.orthographic) {
+                SkPathBuilder cross;
+                cross.moveTo(q[0]).lineTo(q[2]).moveTo(q[1]).lineTo(q[3]);
+                stroke(cross.detach(), line, 1.5f);
+            }
         }
-        SkMatrix place = toTarget;
-        place.preConcat(LayerMatrix(l, t));
-        const SkPath path = frame.detach().makeTransform(place);
-        paint.setStrokeWidth(2.8125f * px);
-        paint.setColor(SkColorSetARGB(0xbf, 0x80, 0x80, 0x80));
-        canvas->drawPath(path, paint);
-        paint.setStrokeWidth(1.40625f * px);
-        paint.setColor(SkColorSetARGB(0xbf, 0, 0, 0));
-        canvas->drawPath(path, paint);
+        if (selected) {
+            const SkPoint at = toTarget.mapPoint(EffectivePlacement(scene.layers, l, timeMs).location);
+            paint.setStyle(SkPaint::kFill_Style);
+            paint.setColor(SK_ColorWHITE);
+            canvas->drawCircle(at, 5.5f * px, paint);
+            paint.setColor(line);
+            canvas->drawCircle(at, 3.6f * px, paint);
+        }
     }
+}
+
+static void DrawWorld(SkCanvas* canvas, const Scene& scene, double timeMs, const MediaPictures& pictures, const LayerEffects* effects) {
+    canvas->drawColor(scene.bgColor);
+    SetLayerEffects(effects, &scene);
+    DrawLayerList(canvas, scene, scene.layers, timeMs, pictures);
+    SetLayerEffects(nullptr, nullptr);
 }
 
 static void DrawSnapGuides(SkCanvas* canvas, const SkISize& size, const std::vector<SnapGuide>& guides, float scale, float dx, float dy, float px) {
@@ -164,8 +184,13 @@ void RenderPreview(SkCanvas* canvas, int width, int height, const Scene& scene, 
 
         canvas->clear(background);
         const float px = view.refPx > 0 ? view.refPx : width / 1080.0f;
+        const bool world = ActiveCamera(scene.layers, timeMs) != nullptr;
+        auto drawScene = [&](SkCanvas* target, const LayerEffects* fx) {
+            if (world) DrawWorld(target, *shown, timeMs, pictures, fx);
+            else DrawScene(target, *shown, timeMs, pictures, fx);
+        };
         if ((scene.bgColor >> 24) != 0xff) {
-            const SkRect area = SkRect::MakeXYWH(dx, dy, scene.width * scale, scene.height * scale);
+            const SkRect area = world ? SkRect::MakeIWH(width, height) : SkRect::MakeXYWH(dx, dy, scene.width * scale, scene.height * scale);
             const float cell = 25.0f * px;
             SkPaint dark;
             dark.setColor(SkColorSetRGB(0xcc, 0xcc, 0xcc));
@@ -195,20 +220,21 @@ void RenderPreview(SkCanvas* canvas, int width, int height, const Scene& scene, 
             small->clear(SK_ColorTRANSPARENT);
             small->translate(roundf(dx * kx), roundf(dy * ky));
             small->scale(scale * kx, scale * ky);
-            DrawScene(small, *shown, timeMs, pictures, &fx);
+            drawScene(small, &fx);
             canvas->drawImageRect(buffer->makeImageSnapshot(), SkRect::MakeWH((float)width, (float)height),
                                   SkSamplingOptions(SkFilterMode::kNearest));
         } else {
             canvas->save();
             canvas->translate(dx, dy);
             canvas->scale(scale, scale);
-            DrawScene(canvas, *shown, timeMs, pictures, &fx);
+            drawScene(canvas, &fx);
             canvas->restore();
         }
         if (view.gridSpacing > 0) DrawGrid(canvas, canvas->getBaseLayerSize(), scene, scale, dx, dy, view.gridSpacing);
-        DrawCameraFrames(canvas, scene, timeMs, camera, SkMatrix::Translate(dx, dy).preScale(scale, scale), px);
+        DrawCameraFrames(canvas, scene, timeMs, camera, selectedId, SkMatrix::Translate(dx, dy).preScale(scale, scale), px);
         float xy[8];
         const Layer* selected = selectedId != 0 ? scene.layer(selectedId) : nullptr;
+        if (selected && selected->kind == "camera") selected = nullptr;
         if (selected && handles == -2) {
             if (selected->activeAt(timeMs)) {
                 DrawMotionPath(canvas, *selected, timeMs, scene.fps, SkMatrix::Translate(dx, dy).preScale(scale, scale), px);

@@ -52,6 +52,7 @@ import app.absentmotion.media.trackFactor
 import app.absentmotion.model.Pt
 import app.absentmotion.platform.LocalContext
 import app.absentmotion.ui.theme.Am
+import app.absentmotion.ui.theme.Presence
 import kotlin.math.min
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
@@ -185,9 +186,11 @@ private fun TargetChoice(state: EditorState, mode: TrackMode, enabled: Boolean) 
         Text(stringResource(R.string.apply_to), Modifier.width(72.dp), color = Am.Caption, fontSize = 12.sp, maxLines = 1)
         Box(Modifier.weight(1f).fillMaxHeight().clip(RoundedCornerShape(6.dp)).background(Am.PanelInset).clickable(enabled = enabled) { open = true }.padding(horizontal = 10.dp), Alignment.CenterStart) {
             Text(chosen?.let { it.label.ifEmpty { it.kind } } ?: stringResource(R.string.track_new_null), color = Am.OnDark, fontSize = 12.sp, maxLines = 1)
-            if (open) MenuPopup(DropOrRise, { open = false }) {
-                MenuRow(stringResource(R.string.track_new_null)) { mode.target = null; open = false }
-                for (layer in targets) MenuRow(layer.label.ifEmpty { layer.kind }) { mode.target = layer.id; open = false }
+            Presence(open) {
+                MenuPopup(DropOrRise, { open = false }) {
+                    MenuRow(stringResource(R.string.track_new_null)) { mode.target = null; open = false }
+                    for (layer in targets) MenuRow(layer.label.ifEmpty { layer.kind }) { mode.target = layer.id; open = false }
+                }
             }
         }
     }

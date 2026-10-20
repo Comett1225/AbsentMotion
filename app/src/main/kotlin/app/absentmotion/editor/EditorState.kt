@@ -111,7 +111,24 @@ class EditorState(
     val gridSpacing = 40
 
     var soloMode by mutableIntStateOf(0)
-    var cameraMode by mutableStateOf(false)
+
+    private var cameraView by mutableStateOf(false)
+    private var viewBeforeCamera: Pair<Float, Offset>? = null
+
+    var cameraMode: Boolean
+        get() = cameraView
+        set(on) {
+            if (on == cameraView) return
+            if (on) {
+                viewBeforeCamera = canvasZoom to canvasPan
+                canvasZoom = 1f
+                canvasPan = Offset.Zero
+            } else viewBeforeCamera?.let { (zoom, pan) -> canvasZoom = zoom; canvasPan = pan }
+            cameraTip = false
+            cameraView = on
+        }
+
+    var cameraTip by mutableStateOf(false)
 
     var canvasZoom by mutableFloatStateOf(1f)
     var canvasPan by mutableStateOf(Offset.Zero)
@@ -158,6 +175,8 @@ class EditorState(
     var snapGuides by mutableStateOf<List<SnapGuide>>(emptyList())
 
     var pointAdjust by mutableStateOf<PointAdjust?>(null)
+
+    var turner by mutableStateOf<((drag: Offset, twist: Float) -> Unit)?>(null)
 
     var volumeOpen by mutableStateOf(false)
 

@@ -67,7 +67,16 @@ import app.absentmotion.model.withTransition
 import app.absentmotion.platform.sheetDialogProperties
 import app.absentmotion.ui.editor.panels.ThinSlider
 import app.absentmotion.ui.theme.Am
+import app.absentmotion.ui.theme.Motion as ThemeMotion
+import app.absentmotion.ui.theme.Presence
+import app.absentmotion.ui.theme.presence
 import app.absentmotion.ui.theme.pressScale
+import app.absentmotion.editor.EditorPanel
+import app.absentmotion.editor.MultiSelect
+import app.absentmotion.model.canAnimate
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.layout.offset
+import androidx.compose.ui.unit.IntOffset
 import java.util.Locale
 import kotlin.math.PI
 import kotlin.math.cos
@@ -98,6 +107,27 @@ internal fun TransitionButton(state: EditorState, modifier: Modifier) {
     }
     open?.let { (a, b) -> TransitionSheet(state, a, b) { open = null } }
 }
+
+@Composable
+internal fun AnimateButton(state: EditorState, modifier: Modifier) {
+    var open by remember { mutableStateOf<Long?>(null) }
+    val shown = state.selected?.canAnimate == true && state.panel == EditorPanel.Tools && !state.addOpen && !state.volumeOpen && !MultiSelect.active
+    val clear = animateDpAsState(if (state.previewPanelOpen) PreviewPanelWidth else 0.dp, ThemeMotion.enter(), label = "animate-clear")
+    Presence(shown) {
+        val press = remember { MutableInteractionSource() }
+        Box(
+            modifier.offset { IntOffset(-clear.value.roundToPx(), 0) }.padding(12.dp).presence(scaleFrom = 0.6f).size(48.dp).pressScale(press)
+                .shadow(4.dp, CircleShape).background(Am.Panel, CircleShape).border(1.8.dp, Am.Accent, CircleShape)
+                .clickable(press, null) { state.selectedId?.let { state.playing = false; open = it } },
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(PanelIcons.Animate, stringResource(R.string.a11y_animate), Modifier.size(24.dp), tint = Am.Accent)
+        }
+    }
+    open?.let { AnimationSheet(state, it) { open = null } }
+}
+
+private val PreviewPanelWidth = 55.dp
 
 @Composable
 internal fun TransitionSheet(state: EditorState, aId: Long, bId: Long, onClose: () -> Unit) {
@@ -154,7 +184,7 @@ internal fun AnimationSheet(state: EditorState, id: Long, onClose: () -> Unit) {
 }
 
 @Composable
-private fun MotionSheet(title: String, onClose: () -> Unit, content: @Composable () -> Unit) {
+internal fun MotionSheet(title: String, onClose: () -> Unit, content: @Composable () -> Unit) {
     Dialog(onClose, sheetDialogProperties()) {
         PhoneScreen {
             Box(Modifier.fillMaxSize().clickable(interactionSource = null, indication = null, onClick = onClose).systemBarsPadding(), Alignment.BottomCenter) {
@@ -171,7 +201,7 @@ private fun MotionSheet(title: String, onClose: () -> Unit, content: @Composable
 }
 
 @Composable
-private fun <T> TileGrid(items: List<T>, tile: @Composable (T, Modifier) -> Unit) {
+internal fun <T> TileGrid(items: List<T>, tile: @Composable (T, Modifier) -> Unit) {
     Column(Modifier.fillMaxWidth().height(292.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(4.dp)) {
         items.chunked(4).forEach { row ->
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -183,7 +213,7 @@ private fun <T> TileGrid(items: List<T>, tile: @Composable (T, Modifier) -> Unit
 }
 
 @Composable
-private fun Tile(label: String, chosen: Boolean, modifier: Modifier, onClick: () -> Unit, draw: (DrawScope.() -> Unit)?) {
+internal fun Tile(label: String, chosen: Boolean, modifier: Modifier, onClick: () -> Unit, draw: (DrawScope.() -> Unit)?) {
     Column(
         modifier.height(94.dp).clip(TileShape)
             .then(if (chosen) Modifier.background(Am.Accent.copy(alpha = 0.16f)).border(2.dp, Am.Accent, TileShape) else Modifier)
@@ -201,7 +231,7 @@ private fun Tile(label: String, chosen: Boolean, modifier: Modifier, onClick: ()
 }
 
 @Composable
-private fun DurationLine(ms: Int, min: Int, max: Int, onChange: (Int) -> Unit, onDone: () -> Unit) {
+internal fun DurationLine(ms: Int, min: Int, max: Int, onChange: (Int) -> Unit, onDone: () -> Unit) {
     Line(stringResource(R.string.mediainfo_duration)) {
         ThinSlider(ms.toFloat(), { v -> ((v / 100f).roundToInt() * 100).coerceIn(min, max).takeIf { it != ms }?.let(onChange) }, Modifier.width(180.dp),
             valueRange = min.toFloat()..max.toFloat(), onValueChangeFinished = onDone, inactive = Am.Field)
@@ -211,7 +241,7 @@ private fun DurationLine(ms: Int, min: Int, max: Int, onChange: (Int) -> Unit, o
 }
 
 @Composable
-private fun rememberClock(): State<Float> = rememberInfiniteTransition(label = "motion")
+internal fun rememberClock(): State<Float> = rememberInfiniteTransition(label = "motion")
     .animateFloat(0f, 1f, infiniteRepeatable(tween(2000, easing = LinearEasing)), label = "clock")
 
 private class Pose(var dx: Float = 0f, var dy: Float = 0f, var scale: Float = 1f, var turn: Float = 0f, var alpha: Float = 1f,
