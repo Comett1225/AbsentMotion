@@ -2412,14 +2412,20 @@
    }
   },
   "motionblur": {
-   "description": "Membuat lapisan tampak memanjang ke satu arah, seolah bergerak cepat.",
+   "description": "Membuat lapisan kabur mengikuti arah gerak, putaran dan pembesarannya, dari keyframe dan efek gerak seperti Auto-Shake dan Oscillate. Tune mengatur besar blur. Pratinjau menampilkan blur yang lebih cepat kecuali Full Blur aktif.",
    "name": "Blur gerak",
    "params": {
-    "angle": {
-     "label": "Arah"
+    "position": {
+     "label": "Posisi"
     },
-    "length": {
-     "label": "Panjang"
+    "rotation": {
+     "label": "Sudut"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "tune": {
+     "label": "Atur"
     }
    }
   },
@@ -3515,6 +3521,18 @@
     },
     "shutter": {
      "label": "Sudut Rana"
+    }
+   }
+  },
+  "smear": {
+   "description": "Membuat lapisan memanjang ke satu arah dengan panjang tetap, seolah bergerak cepat.",
+   "name": "Smear",
+   "params": {
+    "angle": {
+     "label": "Arah"
+    },
+    "length": {
+     "label": "Panjang"
     }
    }
   },

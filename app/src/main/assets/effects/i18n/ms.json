@@ -2412,14 +2412,20 @@
    }
   },
   "motionblur": {
-   "description": "Mengaburkan lapisan dalam satu arah, seolah-olah bergerak pantas.",
+   "description": "Kaburkan lapisan mengikut arah ia bergerak, berpusing dan membesar, daripada bingkai kuncinya dan daripada kesan gerakan seperti Auto-Shake dan Oscillate. Larasan menentukan darjah kabur. Pratonton memaparkan kabur yang lebih pantas kecuali Kabur Penuh dihidupkan.",
    "name": "Kabur Gerakan",
    "params": {
-    "angle": {
-     "label": "Arah"
+    "position": {
+     "label": "Kedudukan"
     },
-    "length": {
-     "label": "Panjang"
+    "rotation": {
+     "label": "Sudut"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "tune": {
+     "label": "Larasan"
     }
    }
   },
@@ -3515,6 +3521,18 @@
     },
     "shutter": {
      "label": "Sudut Pengatup"
+    }
+   }
+  },
+  "smear": {
+   "description": "Calitkan lapisan dalam satu arah dengan panjang tetap, seolah-olah ia bergerak laju.",
+   "name": "Calit",
+   "params": {
+    "angle": {
+     "label": "Arah"
+    },
+    "length": {
+     "label": "Panjang"
     }
    }
   },

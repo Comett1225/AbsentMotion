@@ -2412,14 +2412,20 @@
    }
   },
   "motionblur": {
-   "description": "Espalha a camada em uma direção, como se ela se movesse rápido.",
+   "description": "Desfoca a camada conforme ela se move, gira e cresce, a partir dos quadros-chave e de efeitos de movimento como Auto-Shake e Oscillate. O Ajuste dimensiona o desfoque. A pré-visualização mostra um desfoque mais rápido, a menos que Desfoque total esteja ativado.",
    "name": "Desfoque de movimento",
    "params": {
-    "angle": {
-     "label": "Direção"
+    "position": {
+     "label": "Posição"
     },
-    "length": {
-     "label": "Comprimento"
+    "rotation": {
+     "label": "Ângulo"
+    },
+    "scale": {
+     "label": "Escala"
+    },
+    "tune": {
+     "label": "Ajuste"
     }
    }
   },
@@ -3515,6 +3521,18 @@
     },
     "shutter": {
      "label": "Ângulo do obturador"
+    }
+   }
+  },
+  "smear": {
+   "description": "Arrasta a camada em uma direção por um comprimento fixo, como se ela se movesse rápido.",
+   "name": "Rastro",
+   "params": {
+    "angle": {
+     "label": "Direção"
+    },
+    "length": {
+     "label": "Comprimento"
     }
    }
   },

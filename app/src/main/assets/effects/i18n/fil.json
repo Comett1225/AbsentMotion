@@ -2412,14 +2412,20 @@
    }
   },
   "motionblur": {
-   "description": "Pinapahid ang layer sa isang direksyon, na parang mabilis na gumalaw.",
+   "description": "Nagdadagdag ng blur sa layer habang gumagalaw, lumiliko at lumalaki ito, mula sa mga keyframe nito at sa mga epekto sa paggalaw gaya ng Auto-Shake at Oscillate. Inaayos ng I-tune ang sukat ng blur. Mas mabilis ang blur sa preview maliban kung naka-on ang Full Blur.",
    "name": "Motion blur",
    "params": {
-    "angle": {
-     "label": "Direksyon"
+    "position": {
+     "label": "Posisyon"
     },
-    "length": {
-     "label": "Haba"
+    "rotation": {
+     "label": "Anggulo"
+    },
+    "scale": {
+     "label": "Scale"
+    },
+    "tune": {
+     "label": "I-tune"
     }
    }
   },
@@ -3515,6 +3521,18 @@
     },
     "shutter": {
      "label": "Anggulo ng shutter"
+    }
+   }
+  },
+  "smear": {
+   "description": "Pinapahaba ang layer sa isang direksyon nang fixed ang haba, na parang mabilis itong gumalaw.",
+   "name": "Smear",
+   "params": {
+    "angle": {
+     "label": "Direksyon"
+    },
+    "length": {
+     "label": "Haba"
     }
    }
   },

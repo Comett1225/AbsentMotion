@@ -2412,14 +2412,20 @@
    }
   },
   "motionblur": {
-   "description": "Katmanı hızlı hareket etmiş gibi tek yönde bulanıklaştırır.",
+   "description": "Katmanı; anahtar karelerine ve Otomatik Sallama, Salınım gibi hareket efektlerine göre hareket ederken, dönerken ve büyürken bulanıklaştırır. İnce ayar, bulanıklığı ölçekler. Tam Bulanıklık açık değilse önizleme daha hızlı bir bulanıklık gösterir.",
    "name": "Hareket Bulanıklığı",
    "params": {
-    "angle": {
-     "label": "Yön"
+    "position": {
+     "label": "Konum"
     },
-    "length": {
-     "label": "Uzunluk"
+    "rotation": {
+     "label": "Açı"
+    },
+    "scale": {
+     "label": "Ölçek"
+    },
+    "tune": {
+     "label": "İnce ayar"
     }
    }
   },
@@ -3515,6 +3521,18 @@
     },
     "shutter": {
      "label": "Perde açısı"
+    }
+   }
+  },
+  "smear": {
+   "description": "Katmanı, hızlı hareket etmiş gibi sabit bir uzunlukta tek yönde bulaştırır.",
+   "name": "Bulaşma",
+   "params": {
+    "angle": {
+     "label": "Yön"
+    },
+    "length": {
+     "label": "Uzunluk"
     }
    }
   },

@@ -2412,14 +2412,20 @@
    }
   },
   "motionblur": {
-   "description": "Làm nhòe lớp theo một hướng như thể nó di chuyển nhanh.",
+   "description": "Làm nhòe lớp theo hướng di chuyển, xoay và phóng to, dựa trên keyframe và các hiệu ứng chuyển động như Auto-Shake và Oscillate. Tune điều chỉnh độ nhòe. Bản xem trước hiển thị độ nhòe nhanh hơn trừ khi bật Full Blur.",
    "name": "Nhòe chuyển động",
    "params": {
-    "angle": {
-     "label": "Hướng"
+    "position": {
+     "label": "Vị trí"
     },
-    "length": {
-     "label": "Độ dài"
+    "rotation": {
+     "label": "Góc"
+    },
+    "scale": {
+     "label": "Tỷ lệ"
+    },
+    "tune": {
+     "label": "Tinh chỉnh"
     }
    }
   },
@@ -3515,6 +3521,18 @@
     },
     "shutter": {
      "label": "Góc màn trập"
+    }
+   }
+  },
+  "smear": {
+   "description": "Tạo vệt nhòe cho lớp theo một hướng với độ dài cố định, như thể lớp đang di chuyển nhanh.",
+   "name": "Vệt nhòe",
+   "params": {
+    "angle": {
+     "label": "Hướng"
+    },
+    "length": {
+     "label": "Độ dài"
     }
    }
   },

@@ -2412,14 +2412,20 @@
    }
   },
   "motionblur": {
-   "description": "Arrastra la capa en una dirección, como si se moviera rápido.",
+   "description": "Desenfoca la capa según cómo se mueve, gira y cambia de tamaño, a partir de sus fotogramas clave y de efectos de movimiento como Sacudida automática y Oscilación. Ajuste controla la escala del desenfoque. La vista previa muestra un desenfoque más rápido, a menos que Desenfoque completo esté activado.",
    "name": "Desenfoque de movimiento",
    "params": {
-    "angle": {
-     "label": "Dirección"
+    "position": {
+     "label": "Posición"
     },
-    "length": {
-     "label": "Longitud"
+    "rotation": {
+     "label": "Ángulo"
+    },
+    "scale": {
+     "label": "Escala"
+    },
+    "tune": {
+     "label": "Ajuste"
     }
    }
   },
@@ -3515,6 +3521,18 @@
     },
     "shutter": {
      "label": "Ángulo de obturador"
+    }
+   }
+  },
+  "smear": {
+   "description": "Arrastra la capa en una dirección con una longitud fija, como si se moviera rápido.",
+   "name": "Arrastre",
+   "params": {
+    "angle": {
+     "label": "Dirección"
+    },
+    "length": {
+     "label": "Longitud"
     }
    }
   },
