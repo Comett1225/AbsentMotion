@@ -1,5 +1,6 @@
 package app.absentmotion.compat
 
+import app.absentmotion.TestData
 import app.absentmotion.effects.EffectCatalog
 import app.absentmotion.library.Importer
 import app.absentmotion.library.ProjectStore
@@ -288,5 +289,49 @@ class EffectMigrationTest {
         assertEquals(18, sections["Effects turned into this app's own"]!!.size)
         assertTrue(sections["Effect settings that could not be carried over"]!!.isNotEmpty())
         assertEquals(20, effects(store.load(report.id)!!.node).size)
+    }
+
+    private val alightMoves: String get() = File(TestData.root, "alight/move-transform.xml").readText()
+
+    @Test fun alightMoveEffectsImportWithTheirSettings() {
+        val result = migration.migrate(Scene.parse(alightMoves))
+        val all = effects(result.scene.node)
+        val moves = listOf("autoshake", "movealongpath", "offset", "oscillate", "pulsesize", "randomdisplace", "randomjitter", "swing", "spin",
+            "stretchaxis", "pulseopacity")
+        assertEquals(moves.map { "absent.$it" } + listOf("com.alightcreative.effects.transform", "com.alightcreative.effects.scaleassist"), all.map { it["id"] })
+        assertTrue(result.dropped.toString(), result.dropped.isEmpty())
+        assertEquals(moves.size, result.converted.values.sum())
+        assertTrue(all.take(moves.size).all { it["hidden"] == "true" && it["locallyApplied"] == "true" })
+        fun own(key: String) = all.single { it["id"] == "absent.$key" }
+        fun numbers(key: String) = own(key).children.filter { it["type"] == "float" }.associate { it["name"]!! to it["value"]!!.toFloat() }
+        for (effect in all.take(moves.size)) {
+            val definition = catalog.find(effect["id"]!!)!!
+            for (p in effect.children) assertEquals("${definition.key}.${p["name"]}", definition.params.single { it.id == p["name"] }.type, p["type"])
+        }
+        assertEquals(mapOf("magnitude" to 50f, "frequency" to 2f, "evolution" to 0f, "seed" to 0f, "angle" to 45f, "slack" to 0.25f, "zshake" to 0f), numbers("autoshake"))
+        assertEquals(mapOf("progress" to 0f, "orientation" to 0f, "inset" to 0f), numbers("movealongpath"))
+        assertEquals("true", own("movealongpath").prop("rotate")["value"])
+        assertEquals(mapOf("feather" to 0f), numbers("offset"))
+        assertEquals("false", own("offset").prop("mask")["value"])
+        assertEquals(mapOf("direction" to 0f, "angle" to 45f, "frequency" to 2f, "magnitude" to 25f, "wave" to 0f, "phase" to 0f), numbers("oscillate"))
+        assertEquals(mapOf("frequency" to 2f, "shrink" to 0.9f, "grow" to 1.1f, "phase" to 0f, "wave" to 0f), numbers("pulsesize"))
+        assertEquals(mapOf("magnitude" to 50f, "evolution" to 0f, "seed" to 0f, "scatter" to 0.5f), numbers("randomdisplace"))
+        assertEquals(mapOf("angle" to 45f, "frequency" to 30f, "magnitude" to 25f, "seed" to 0f, "slack" to 0f, "zjitter" to 0f), numbers("randomjitter"))
+        assertEquals(mapOf("frequency" to 5.98f, "angle1" to -30f, "angle2" to 30f, "phase" to 0f, "wave" to 0f), numbers("swing"))
+        assertEquals(mapOf("rpm" to -936f), numbers("spin"))
+        assertEquals(mapOf("scale" to 18.51f, "angle" to 0f), numbers("stretchaxis"))
+        assertEquals("false", own("stretchaxis").prop("mask")["value"])
+        assertEquals(mapOf("frequency" to 5.98f, "strength" to 1f, "phase" to 0f, "wave" to 0f), numbers("pulseopacity"))
+        assertEquals(result.scene.node, migration.migrate(result.scene).scene.node)
+    }
+
+    @Test fun anAlightProjectWithMoveEffectsImportsWithMotion() {
+        val store = ProjectStore(tmp.newFolder())
+        val report = Importer(store, migration = migration, canRun = { catalog.find(it) != null }).import { alightMoves.byteInputStream() }.single()
+        val sections = report.sections.toMap()
+        assertEquals(listOf("transform (1 layer)", "scaleassist (1 layer)").sorted(), sections["Effects this version cannot run"]!!.sorted())
+        assertEquals(11, sections["Effects turned into this app's own"]!!.size)
+        assertNull(sections["Effect settings that could not be carried over"])
+        assertEquals(13, effects(store.load(report.id)!!.node).size)
     }
 }
