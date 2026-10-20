@@ -58,6 +58,10 @@ import app.absentmotion.library.AppSettings
 import app.absentmotion.library.PreviewQuality
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.editor.panels.ThinSwitch
+import app.absentmotion.R
+import app.absentmotion.i18n.currentLanguage
+import app.absentmotion.ui.onboarding.LanguageDialog
+import androidx.compose.ui.res.stringResource
 
 private val PanelColor get() = Am.HomePanel
 private val PanelShape = RoundedCornerShape(7.dp)
@@ -68,6 +72,7 @@ private val ChosenRow get() = Am.NavyHi
 @Composable
 fun SettingsDrawer(settings: AppSettings) {
     var about by remember { mutableStateOf(false) }
+    var language by remember { mutableStateOf(false) }
     var demoNote by remember { mutableStateOf(false) }
     ModalDrawerSheet(
         Modifier.width(280.dp), drawerShape = RectangleShape, drawerContainerColor = Am.HomeDrawer,
@@ -104,10 +109,13 @@ fun SettingsDrawer(settings: AppSettings) {
                 Spacer(Modifier.height(8.dp))
             }
             Spacer(Modifier.height(15.dp))
+            LinkRow(stringResource(R.string.settings_language), currentLanguage(LocalContext.current).nativeName) { language = true }
+            Spacer(Modifier.height(15.dp))
             LinkRow("About") { about = true }
             CaptionModelRow()
         }
     }
+    if (language) LanguageDialog { language = false }
     if (about) AboutScreen { about = false }
     if (demoNote) AlertDialog(
         onDismissRequest = { demoNote = false },
@@ -140,13 +148,14 @@ private fun Divider(inset: androidx.compose.ui.unit.Dp) {
 }
 
 @Composable
-private fun LinkRow(label: String, onClick: () -> Unit) {
+private fun LinkRow(label: String, value: String? = null, onClick: () -> Unit) {
     Row(
         Modifier.padding(horizontal = 6.dp).fillMaxWidth().height(44.dp).clip(PanelShape).background(PanelColor)
             .clickable(onClick = onClick).padding(start = 15.dp, end = 7.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(label, Modifier.weight(1f), color = Am.HomeInk, fontSize = 13.sp)
+        if (value != null) Text(value, color = Am.HomeMid, fontSize = 13.sp, maxLines = 1)
         Icon(HomeIcons.ChevronRight, null, Modifier.size(24.dp), tint = Am.HomeMid)
     }
 }
