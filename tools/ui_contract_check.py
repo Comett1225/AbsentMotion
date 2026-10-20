@@ -160,6 +160,24 @@ class UiContracts(unittest.TestCase):
                     self.assertIn('state.settings.vibration', line, path)
         self.assertIn('state.edit("reorder") { it.move(id, layers.lastIndex - to) }\n        onTick()', source('ui/editor/Timeline.kt'))
         self.assertIn('if (moved && value != null && value != detent) haptic(HapticFeedbackType.SegmentTick)', source('ui/editor/panels/SpeedPanel.kt'))
+        self.assertIn('if (guides.any { it !in state.snapGuides }) tick(HapticFeedbackType.SegmentTick)', source('ui/editor/panels/MoveTransformPanel.kt'))
+
+    def test_transform_tabs_put_size_above_rotate(self):
+        text = source('ui/editor/LayerTools.kt')
+        self.assertIn('listOf(PanelIcons.TabMove, PanelIcons.TabSize, PanelIcons.TabRotate, PanelIcons.TabTilt, PanelIcons.TabSkew)', text)
+        self.assertIn('KeyTarget(PropRef.Location, "0.000000,0.000000,0.000000"),\n    KeyTarget(PropRef.Scale, "1.000000,1.000000"),\n    KeyTarget(PropRef.Rotation, "0.000000"),\n    KeyTarget(PropRef.Tilt, "0.000000,0.000000"),', text)
+        self.assertIn('1 -> l.withTransform("scale", 1f, 1f)\n            2 -> l.withRotation(0f)\n            3 -> l.withTilt(0f, 0f)', source('editor/EditorActions.kt'))
+
+    def test_every_ruler_spinner_path_moves_the_value_like_a_tape_measure(self):
+        self.assertEqual(3, source('ui/editor/panels/PanelParts.kt').count('dragging(RulerMath.travel('))
+
+    def test_rotate_and_tilt_tabs_turn_three_d_objects_on_the_preview(self):
+        text = source('ui/editor/Preview.kt')
+        turn = 'moved && turning != null && !(canvasGesture && fingers > 1)'
+        self.assertIn(turn, text)
+        self.assertLess(text.index(turn), text.index('moved && state.selectedId != null && !(canvasGesture && fingers > 1)'))
+        self.assertIn('if (turn != null) TurnHook(state, turn)', source('ui/editor/panels/MoveTransformPanel.kt'))
+        self.assertIn('2 -> if (turn != null) TurnTab(state, layer, turn) else RotationTab(state, layer)', source('ui/editor/panels/MoveTransformPanel.kt'))
 
     def test_media_search_opens_from_a_square_over_the_grid(self):
         text = source('ui/editor/MediaTab.kt')
