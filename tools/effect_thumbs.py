@@ -4,6 +4,7 @@ import html
 import json
 import math
 import os
+import re
 import subprocess
 import sys
 import time
@@ -21,7 +22,7 @@ APP_DIR = "files/effect-thumbs"
 APP_PATH = f"/data/user/0/{PKG}/{APP_DIR}"
 OUT_DIR = f"/sdcard/Android/data/{PKG}/files"
 RENDER, THUMB, SAME = 384, 192, 2.0
-ANIM_FPS, ANIM_BYTES = 12, 150_000
+ANIM_FPS, ANIM_BYTES, PRESET_FRAMES = 12, 150_000, 30
 FREE = {"cc0", "pd"}
 TYPES = {"point": "vec2", "color": "color", "switch": "bool", "text": "string"}
 UA = {"User-Agent": "AbsentMotion-effect-thumbs/1.0"}
@@ -107,6 +108,9 @@ def value(kind, v):
 
 def prop(p, v):
     kind = TYPES.get(p["type"], "float")
+    if isinstance(v, tuple):
+        keys = "".join(f'<kf t="{t:.6f}" v="{value(p["type"], x)}"' + (f' e="{e}"' if e else "") + "/>" for t, x, e in v)
+        return f'<property name="{p["id"]}" type="{kind}">{keys}</property>'
     if isinstance(v, list) and p["type"] in ("float", "angle"):
         keys = "".join(f'<kf t="{k / (len(v) - 1):.6f}" v="{value(p["type"], x)}"/>' for k, x in enumerate(v))
         return f'<property name="{p["id"]}" type="{kind}">{keys}</property>'
@@ -143,14 +147,30 @@ def backdrops(show):
     return ["grid"] if show.get("layout") in ("move", "text", "drawing") else [show["under"]] if "under" in show else []
 
 
-def scene(show, effect):
+def slug(name):
+    return re.sub("[^a-z0-9]+", "-", name.lower()).strip("-")
+
+
+def preset_params(preset, seconds):
+    out = {}
+    for pid, v in preset["params"].items():
+        if isinstance(v, list) and v and isinstance(v[0], list):
+            fit = min(1, seconds / max(max(k[0] for k in v), 1e-3))
+            out[pid] = tuple((min(1, k[0] * fit / seconds), k[1], k[2] if len(k) > 2 else None) for k in v)
+        else:
+            out[pid] = v
+    return out
+
+
+def scene(show, effect, preset=None):
     fx = ""
     if effect:
         params = {p["id"]: p["default"] for p in effect["params"]}
-        unknown = set(show.get("params", {})) - set(params)
+        chosen = preset_params(preset, show["animate"] / ANIM_FPS) if preset else show.get("params", {})
+        unknown = set(chosen) - set(params)
         if unknown:
             sys.exit(f"{effect['id']}: no such parameter {', '.join(sorted(unknown))}")
-        params.update(show.get("params", {}))
+        params.update(chosen)
         fx = f'<effect id="absent.{effect["id"]}" hidden="false">' + "".join(prop(p, params[p["id"]]) for p in effect["params"]) + "</effect>"
     fps, total = (ANIM_FPS, round(show["animate"] * 1000 / ANIM_FPS)) if "animate" in show else (30, 1000)
     layers = [layer(1, name, end=total - 1) for name in backdrops(show)]
@@ -276,9 +296,17 @@ def main():
         if base not in plain:
             plain[base] = batch.add(f"plain{len(plain)}", scene(show, None), frames)
         effect = json.loads((PACK / f"{key}.json").read_text())
-        planned.append((key, show, base, batch.add(key, scene(show, effect), frames)))
+        planned.append((key, show, base, batch.add(key, scene(show, effect), frames), PACK / "thumb" / f"{key}.webp"))
+        for preset in effect.get("presets", []):
+            name = f'{key}.{slug(preset["name"])}'
+            sample = {"layout": show["layout"], "text": show.get("presets", {}).get(slug(preset["name"]), preset["name"]), "animate": PRESET_FRAMES}
+            frames = list(range(PRESET_FRAMES))
+            base = ("preset", sample["layout"], sample["text"])
+            if base not in plain:
+                plain[base] = batch.add(f"plain{len(plain)}", scene(sample, None), frames)
+            planned.append((name, sample, base, batch.add(name, scene(sample, effect, preset), frames), PACK / "thumb" / f"{name}.webp"))
     batch.run()
-    for key, show, base, rendered in planned:
+    for key, show, base, rendered, target in planned:
         reference, frames = batch[plain[base]], batch[rendered]
         if show.get("animate"):
             changes = [change(f, r) for f, r in zip(frames, reference)]
@@ -289,7 +317,6 @@ def main():
             diff = change(image, grid(reference))
         thumbs.append((key, image, diff))
         note = "   <- hardly visible" if diff < SAME else "   <- does not move" if moving is not None and moving < SAME else ""
-        target = PACK / "thumb" / f"{key}.webp"
         if show.get("animate"):
             quality = save_animated(frames, target)
             note += f"   animated q{quality} {target.stat().st_size // 1024} KB"
@@ -302,7 +329,7 @@ def main():
     adb("shell", "run-as", PKG, "rm", "-r", APP_DIR)
     if not opts.keys:
         for stale in (PACK / "thumb").iterdir():
-            if stale.name not in {f"{k}.webp" for k in index}:
+            if stale.name not in {entry[4].name for entry in planned}:
                 stale.unlink()
     if opts.sheet:
         sheet(opts.sheet, thumbs)

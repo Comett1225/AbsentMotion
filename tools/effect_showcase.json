@@ -99,7 +99,7 @@
     "textprogress": {"layout": "text", "text": "Text Progress", "params": {"progress": [0, 1, 1], "appearance": 2, "softness": 4}, "animate": 20},
     "texttransform": {"layout": "text", "text": "Text Transform", "params": {"shape": 5, "end": 0.35, "offset": [-0.35, 1], "position": [0, -36], "scale": 1.25, "tint": "#ffffc23d"}, "animate": 20},
     "textrandomizer": {"layout": "text", "text": "Random Text", "params": {"progress": [0, 1, 1], "charset": 1}, "animate": 20},
-    "countupdown": {"layout": "text", "text": "$12,500", "params": {"multiply": [0, 1, 1], "separator": 1}, "animate": 20},
+    "countupdown": {"layout": "text", "text": "$12,500", "params": {"multiply": [0, 1, 1], "separator": 1}, "animate": 20, "presets": {"count-up": "1000"}},
     "timecode": {"layout": "text", "text": "x", "params": {"format": 3, "speed": 3}, "animate": 20},
     "drawingprogress": {"layout": "drawing", "params": {"end": [0, 1, 1]}, "animate": 20},
     "stroketaper": {"layout": "drawing", "params": {"start": [0, 0.5, 0.5], "end": [1, 0.5, 0.5]}, "animate": 16}

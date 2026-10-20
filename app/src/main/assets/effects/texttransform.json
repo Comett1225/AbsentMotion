@@ -134,5 +134,50 @@
    "max": 1000,
    "step": 1
   }
+ ],
+ "presets": [
+  {
+   "name": "Wave",
+   "params": {
+    "shape": 5,
+    "start": 0,
+    "end": 0.35,
+    "position": [
+     0,
+     -40
+    ],
+    "offset": [
+     [
+      0,
+      -0.35
+     ],
+     [
+      1.5,
+      1
+     ]
+    ]
+   }
+  },
+  {
+   "name": "Spin Cascade",
+   "params": {
+    "shape": 1,
+    "start": 0,
+    "end": 0.3,
+    "rotation": -180,
+    "scale": 0,
+    "opacity": 0,
+    "offset": [
+     [
+      0,
+      -0.3
+     ],
+     [
+      1.5,
+      1
+     ]
+    ]
+   }
+  }
  ]
 }

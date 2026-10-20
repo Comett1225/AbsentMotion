@@ -73,5 +73,24 @@
    "max": 1000,
    "step": 1
   }
+ ],
+ "presets": [
+  {
+   "name": "Scramble",
+   "params": {
+    "charset": 4,
+    "speed": 20,
+    "progress": [
+     [
+      0,
+      0
+     ],
+     [
+      1.5,
+      1
+     ]
+    ]
+   }
+  }
  ]
 }

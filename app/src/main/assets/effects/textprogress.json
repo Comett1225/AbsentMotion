@@ -83,5 +83,79 @@
    "max": 1000,
    "step": 1
   }
+ ],
+ "presets": [
+  {
+   "name": "Typewriter",
+   "params": {
+    "unit": 0,
+    "appearance": 0,
+    "progress": [
+     [
+      0,
+      0
+     ],
+     [
+      2,
+      1
+     ]
+    ]
+   }
+  },
+  {
+   "name": "Fade In by Word",
+   "params": {
+    "unit": 1,
+    "appearance": 1,
+    "softness": 1.5,
+    "progress": [
+     [
+      0,
+      0
+     ],
+     [
+      1.5,
+      1
+     ]
+    ]
+   }
+  },
+  {
+   "name": "Slide Up by Letter",
+   "params": {
+    "unit": 0,
+    "appearance": 2,
+    "distance": 60,
+    "softness": 4,
+    "progress": [
+     [
+      0,
+      0
+     ],
+     [
+      1.2,
+      1
+     ]
+    ]
+   }
+  },
+  {
+   "name": "Pop In",
+   "params": {
+    "unit": 0,
+    "appearance": 6,
+    "softness": 3,
+    "progress": [
+     [
+      0,
+      0
+     ],
+     [
+      1,
+      1
+     ]
+    ]
+   }
+  }
  ]
 }

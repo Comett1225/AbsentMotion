@@ -50,5 +50,23 @@
     "1 000.5"
    ]
   }
+ ],
+ "presets": [
+  {
+   "name": "Count Up",
+   "params": {
+    "multiply": [
+     [
+      0,
+      0
+     ],
+     [
+      2,
+      1,
+      "cubicBezier 0 0 0.58 1"
+     ]
+    ]
+   }
+  }
  ]
 }
