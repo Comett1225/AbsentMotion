@@ -31,6 +31,7 @@ import app.absentmotion.ui.editor.wideEditor
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.lifecycleScope
@@ -43,6 +44,7 @@ import app.absentmotion.engine.EngineThread
 import app.absentmotion.library.AppSettings
 import app.absentmotion.library.DiskThread
 import app.absentmotion.library.ProjectSaver
+import app.absentmotion.library.ProjectVersions
 import app.absentmotion.library.ImportReport
 import app.absentmotion.library.Importer
 import app.absentmotion.library.MediaRelink
@@ -71,6 +73,7 @@ import app.absentmotion.ui.onboarding.FirstRun
 import app.absentmotion.ui.onboarding.Onboarding
 import app.absentmotion.ui.home.OpenFailedDialog
 import app.absentmotion.ui.home.OpeningOverlay
+import app.absentmotion.ui.home.VersionHistory
 import app.absentmotion.ui.theme.PressIndication
 import app.absentmotion.ui.theme.enterFade
 import kotlinx.coroutines.Dispatchers
@@ -94,6 +97,8 @@ class MainActivity : ComponentActivity() {
     private var opening by mutableStateOf(false)
     private var openFailed by mutableStateOf<String?>(null)
     private var closeAnyway = false
+    private var historyFor by mutableStateOf<Pair<String, String>?>(null)
+    private var projectsChanged by mutableIntStateOf(0)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -104,7 +109,7 @@ class MainActivity : ComponentActivity() {
         templates = TemplateStore(this)
         ShapeCatalog.load(this)
         app.absentmotion.editor.ElementNav.open = { id ->
-            editor?.let { it.playing = false; it.endGesture() }
+            editor?.let { it.playing = false; it.endGesture(); it.saver.snapshot(it.scene.toXml()) }
             MultiSelect.clear()
             open(id)
         }
@@ -132,6 +137,7 @@ class MainActivity : ComponentActivity() {
                             store, settings, onOpen = ::open, onExport = ::exportFromList,
                             imported = imported, onImportShown = { imported = emptyList() }, onImportFile = { importUris(listOf(it)) },
                             onTemplate = { editingTemplate = it },
+                            onHistory = { historyFor = it.id to it.title }, changes = projectsChanged,
                         )
                         editingTemplate?.let { id ->
                             TemplateEditor(id, engine, settings, onClose = { editingTemplate = null }) { scene ->
@@ -162,7 +168,9 @@ class MainActivity : ComponentActivity() {
                     }
                 }
                 if (opening) OpeningOverlay()
-                openFailed?.let { OpenFailedDialog(null) { openFailed = null } }
+                openFailed?.let { id -> OpenFailedDialog({ openFailed = null; historyFor = id to "" }) { openFailed = null } }
+                if (open?.historyOpen == true) VersionHistory(store, open.projectId, open.scene.title, engine, onRestore = { restoreVersion(open.projectId, it) }) { open.historyOpen = false }
+                historyFor?.let { (id, title) -> VersionHistory(store, id, title, engine, onRestore = { restoreVersion(id, it) }) { historyFor = null } }
             }
         }
     }
@@ -225,7 +233,10 @@ class MainActivity : ComponentActivity() {
     private suspend fun loadInBackground(id: String): Scene? {
         opening = true
         val scene = try {
-            withContext(DiskThread.dispatcher) { loadRelinked(id) }
+            withContext(DiskThread.dispatcher) {
+                store.text(id)?.let { runCatching { store.versions.snapshot(id, it) } }
+                loadRelinked(id)
+            }
         } catch (e: kotlinx.coroutines.CancellationException) {
             throw e
         } catch (e: Throwable) {
@@ -255,6 +266,24 @@ class MainActivity : ComponentActivity() {
         return EditorState(id, scene, store, engine, settings, saver).also { editor = it }
     }
 
+    private fun restoreVersion(id: String, version: ProjectVersions.Version) {
+        val state = editor?.takeIf { it.projectId == id }
+        state?.let { it.playing = false; it.endGesture(); it.historyOpen = false; opening = true }
+        historyFor = null
+        lifecycleScope.launch {
+            val restored = withContext(DiskThread.dispatcher) {
+                runCatching { store.restore(id, version) }.onFailure { Log.e("AMStore", "cannot restore a version of $id", it) }.isSuccess
+            }
+            opening = false
+            projectsChanged++
+            when {
+                !restored -> Toast.makeText(this@MainActivity, "Could not restore this version. Free some storage space.", Toast.LENGTH_LONG).show()
+                state != null && editor === state -> openNow(id)
+                else -> Toast.makeText(this@MainActivity, "Version restored", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
     private fun closeEditor() {
         val closing = editor ?: return
         if (closingEditor) return
@@ -271,6 +300,7 @@ class MainActivity : ComponentActivity() {
                 return@launch
             }
             closeAnyway = false
+            closing.saver.snapshot(scene.toXml())
             engine.audio?.release()
             try {
                 val longSide = maxOf(scene.width, scene.height, 1)

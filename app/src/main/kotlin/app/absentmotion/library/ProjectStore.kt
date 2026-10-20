@@ -22,6 +22,7 @@ data class ProjectInfo(
     val modified: Long,
     val thumbnail: File?,
     val isElement: Boolean,
+    val damaged: Boolean = false,
 )
 
 class ProjectStore(private val root: File) {
@@ -31,19 +32,35 @@ class ProjectStore(private val root: File) {
 
     private val listed = ConcurrentHashMap<String, ProjectInfo>()
 
-    fun list(): List<ProjectInfo> = dir.listFiles { f -> f.extension == "xml" }.orEmpty().mapNotNull { file ->
+    val versions = ProjectVersions(File(dir, "versions"))
+
+    fun list(includeDamaged: Boolean = false): List<ProjectInfo> = dir.listFiles { f -> f.extension == "xml" }.orEmpty().mapNotNull { file ->
         val id = file.nameWithoutExtension
         val modified = file.lastModified()
         val size = file.length()
         val info = listed[id]?.takeIf { it.modified == modified && it.sizeBytes == size } ?: run {
-            val scene = runCatching { Scene.parse(file.readText()) }.getOrNull() ?: return@mapNotNull null
-            ProjectInfo(
+            val text = runCatching { file.readText() }.getOrNull()
+            val scene = text?.let { runCatching { Scene.parse(it) }.getOrNull() }
+            if (scene == null) ProjectInfo(id, damagedTitle(text), 0, 0, 0, 0, size, modified, null, isElement = false, damaged = true)
+            else ProjectInfo(
                 id = id, title = scene.title, width = scene.width, height = scene.height,
                 fps = scene.fps, durationMs = scene.totalTime, sizeBytes = size, modified = modified,
                 thumbnail = null, isElement = scene.node["type"] == "element",
-            ).also { listed[id] = it }
-        }
-        info.copy(thumbnail = thumbnailFile(id).takeIf { it.exists() })
+            )
+        }.also { listed[id] = it }
+        if (info.damaged && !includeDamaged) null else info.copy(thumbnail = thumbnailFile(id).takeIf { it.exists() })
+    }
+
+    private fun damagedTitle(text: String?): String =
+        text?.take(65_536)?.let { DamagedTitle.find(it)?.groupValues?.get(1) }
+            ?.replace("&quot;", "\"")?.replace("&lt;", "<")?.replace("&gt;", ">")?.replace("&apos;", "'")?.replace("&amp;", "&")
+            ?.takeIf { it.isNotBlank() } ?: "Damaged project"
+
+    fun restore(id: String, version: ProjectVersions.Version) {
+        val chosen = version.file.readText()
+        text(id)?.let { versions.snapshot(id, it) }
+        save(id, chosen)
+        if (version.thumbnail.exists()) version.thumbnail.copyTo(thumbnailFile(id), overwrite = true) else thumbnailFile(id).delete()
     }
 
     fun load(id: String): Scene? = read(id)?.let { withLinkedElements(it, id) }
@@ -117,6 +134,7 @@ class ProjectStore(private val root: File) {
         val owners = (listOf(id) + (read(id)?.node?.mediaUris().orEmpty().mapNotNull(::ownerOf))).distinct()
         sceneFile(id).delete()
         thumbnailFile(id).delete()
+        versions.delete(id)
         val projectFiles = dir.listFiles { f -> f.extension == "xml" }.orEmpty().toList()
         val templateFiles = File(root, "templates").listFiles { f -> f.isDirectory }.orEmpty().map { File(it, "scene.xml") }
         val parsed = (projectFiles + templateFiles).map { f -> runCatching { Scene.parse(f.readText()).node.mediaUris() }.getOrNull() }
@@ -142,6 +160,10 @@ class ProjectStore(private val root: File) {
     private fun folderUri(dir: File) = dir.toURI().toString().trimEnd('/') + "/"
 
     private fun sceneFile(id: String) = File(dir, "$id.xml")
+
+    private companion object {
+        val DamagedTitle = Regex("""<scene\b[^>]*?\btitle="([^"]*)"""")
+    }
 }
 
 internal fun writeAtomically(target: File, text: String, sync: Boolean = true) {

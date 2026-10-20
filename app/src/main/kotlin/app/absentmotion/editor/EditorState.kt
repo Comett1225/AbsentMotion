@@ -78,6 +78,8 @@ class EditorState(
 
     var exportOpen by mutableStateOf(false)
 
+    var historyOpen by mutableStateOf(false)
+
     var presetsOpen by mutableStateOf(false)
 
     var effectBrowserOpen by mutableStateOf(false)

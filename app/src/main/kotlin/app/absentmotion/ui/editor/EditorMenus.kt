@@ -409,7 +409,7 @@ private fun SettingsPanel(state: EditorState, onDismiss: () -> Unit, modifier: M
         change(width = w, height = h)
     }
     Column(
-        modifier.fillMaxWidth().height(if (scene.isElement) 400.dp else 330.dp).clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)).background(MenuBg)
+        modifier.fillMaxWidth().height(if (scene.isElement) 447.dp else 377.dp).clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)).background(MenuBg)
             .pointerInput(Unit) { detectTapGestures { } },
     ) {
         Box(Modifier.size(40.dp).clickable(onClick = onDismiss), Alignment.Center) {
@@ -455,6 +455,16 @@ private fun SettingsPanel(state: EditorState, onDismiss: () -> Unit, modifier: M
                 Backgrounds.forEachIndexed { i, choice ->
                     PickRow(choice.name, swatch = choice.argb, divider = i < Backgrounds.lastIndex) { change(bgColor = choice.argb); close() }
                 }
+            }
+        }
+        Spacer(Modifier.height(10.dp))
+        SettingRow("Version history") {
+            Row(
+                Modifier.fillMaxSize().clip(FieldShape).background(Am.Card).clickable { onDismiss(); state.historyOpen = true }.padding(start = 10.dp, end = 4.5.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text("Earlier versions", Modifier.weight(1f), color = Am.Navy, fontSize = 15.sp, maxLines = 1)
+                Icon(ChromeIcons.ChevronRight, null, Modifier.size(24.dp), tint = Am.Navy)
             }
         }
         if (scene.isElement) {

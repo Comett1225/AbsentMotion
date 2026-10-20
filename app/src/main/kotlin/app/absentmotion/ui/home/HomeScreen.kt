@@ -103,6 +103,7 @@ import app.absentmotion.library.AppSettings
 import app.absentmotion.library.ImportReport
 import app.absentmotion.library.ProjectInfo
 import app.absentmotion.library.ProjectStore
+import app.absentmotion.ui.editor.ChromeIcons
 import app.absentmotion.ui.editor.LocalWide
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Motion
@@ -144,6 +145,8 @@ fun HomeScreen(
     onImportShown: () -> Unit = {},
     onImportFile: (Uri) -> Unit = {},
     onTemplate: (String) -> Unit = {},
+    onHistory: (ProjectInfo) -> Unit = {},
+    changes: Int = 0,
 ) {
     var projects by remember { mutableStateOf<List<ProjectInfo>>(emptyList()) }
     var version by remember { mutableIntStateOf(0) }
@@ -157,7 +160,7 @@ fun HomeScreen(
     val wide = LocalWide.current
 
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { version++ }
-    LaunchedEffect(version) { projects = withContext(Dispatchers.IO) { store.list() } }
+    LaunchedEffect(version, changes) { projects = withContext(Dispatchers.IO) { store.list(includeDamaged = true) } }
     val shown = remember(projects, tab) { projects.filter { it.isElement == (tab == 1) } }
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> if (uri != null) onImportFile(uri) }
     val toReport = imported.filter { it.sections.isNotEmpty() }
@@ -183,6 +186,7 @@ fun HomeScreen(
                     onUpload = { picker.launch(arrayOf("text/xml", "application/xml", "application/zip", "application/octet-stream")) },
                     onDuplicate = { id -> scope.launch { withContext(Dispatchers.IO) { store.duplicate(id) }; version++ } },
                     onDelete = { id -> scope.launch { withContext(Dispatchers.IO) { store.delete(id, context.getExternalFilesDir(null)?.resolve("ai")) }; version++ } },
+                    onHistory = onHistory,
                     wide = wide,
                 )
                 if (!wide) Spacer(Modifier.height(BarHeight + navInset))
@@ -222,6 +226,7 @@ private fun ProjectsPane(
     onUpload: () -> Unit,
     onDuplicate: (String) -> Unit,
     onDelete: (String) -> Unit,
+    onHistory: (ProjectInfo) -> Unit,
     wide: Boolean = false,
 ) {
     val thumbs = remember {
@@ -240,10 +245,11 @@ private fun ProjectsPane(
             info, version, thumbs, itemModifier.enterOnce(seen, info.id, i), menuOpen = menu?.id == info.id,
             onMenu = { menu = OpenMenu(info.id, it) },
             onDismissMenu = { menu = null },
-            onOpen = { onOpen(info.id) },
+            onOpen = { if (info.damaged) onHistory(info) else onOpen(info.id) },
             onExport = { menu = null; onExport(info.id) },
             onDuplicate = { menu = null; onDuplicate(info.id) },
             onDelete = { menu = null; deleting = info },
+            onHistory = { menu = null; onHistory(info) },
         )
     }
 
@@ -419,6 +425,7 @@ private fun ProjectCard(
     onExport: () -> Unit,
     onDuplicate: () -> Unit,
     onDelete: () -> Unit,
+    onHistory: () -> Unit,
 ) {
     val coords = remember { arrayOfNulls<LayoutCoordinates>(1) }
     Box(
@@ -433,7 +440,8 @@ private fun ProjectCard(
                 maxLines = 1, overflow = TextOverflow.Ellipsis,
             )
             Spacer(Modifier.height(8.dp))
-            facts(info).forEachIndexed { i, row ->
+            if (info.damaged) Text("Damaged — restore a version", color = Am.Accent, fontSize = 13.sp, lineHeight = 18.sp, maxLines = 2)
+            else facts(info).forEachIndexed { i, row ->
                 if (i > 0) Spacer(Modifier.height(4.dp))
                 Row { row.forEach { (icon, text) -> Fact(icon, text) } }
             }
@@ -445,9 +453,12 @@ private fun ProjectCard(
             Icon(HomeIcons.More, "More", Modifier.size(24.dp), tint = Grey)
         }
         Box(Modifier.align(Alignment.BottomEnd).offset(y = 8.dp)) {
-            RefMenu(menuOpen, onDismissMenu, Am.Card, RoundedCornerShape(14.dp), Modifier.width(246.dp)) {
-                MenuRow("Export", HomeIcons.Export, onExport)
-                MenuRow(if (info.isElement) "Duplicate Asset" else "Duplicate", HomeIcons.Duplicate, onDuplicate)
+            RefMenu(menuOpen, onDismissMenu, Am.Card, RoundedCornerShape(14.dp), Modifier.width(270.dp)) {
+                if (!info.damaged) {
+                    MenuRow("Export", HomeIcons.Export, onExport)
+                    MenuRow(if (info.isElement) "Duplicate Asset" else "Duplicate", HomeIcons.Duplicate, onDuplicate)
+                }
+                MenuRow("Version history", ChromeIcons.Undo, onHistory)
                 MenuRow(if (info.isElement) "Delete Asset" else "Delete", HomeIcons.Delete, onDelete)
             }
         }
@@ -505,7 +516,7 @@ private fun Thumbnail(info: ProjectInfo, version: Int, cache: MutableMap<String,
     }
     Box(modifier.size(80.dp).clip(RoundedCornerShape(8.dp)).checkerboard(5.dp)) {
         bitmap?.let { Image(it, null, Modifier.fillMaxSize(), contentScale = ContentScale.Fit) }
-        Text(
+        if (!info.damaged) Text(
             duration(info.durationMs),
             Modifier.align(Alignment.BottomStart).padding(4.dp).background(Am.Navy, RoundedCornerShape(4.dp)).padding(horizontal = 4.dp),
             color = Am.OnNavy, fontSize = 13.sp, lineHeight = 16.sp, fontWeight = FontWeight.Medium,

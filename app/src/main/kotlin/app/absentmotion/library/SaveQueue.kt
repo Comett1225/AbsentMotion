@@ -56,9 +56,12 @@ class ProjectSaver(
     val id: String,
     private val store: ProjectStore,
     failed: (Exception) -> Unit,
-    executor: ScheduledExecutorService = DiskThread.executor,
+    private val executor: ScheduledExecutorService = DiskThread.executor,
 ) {
-    private val project = SaveQueue(executor, SAVE_DELAY_MS, { xml -> store.save(id, xml) }, failed)
+    private val project = SaveQueue(executor, SAVE_DELAY_MS, { xml ->
+        store.save(id, xml)
+        runCatching { store.versions.snapshot(id, xml, SNAPSHOT_GAP_MS) }
+    }, failed)
 
     val failing: Boolean get() = project.failing
 
@@ -66,7 +69,10 @@ class ProjectSaver(
 
     fun flush(): Future<*> = project.flush()
 
+    fun snapshot(xml: String): Future<*> = executor.submit { runCatching { store.versions.snapshot(id, xml) } }
+
     companion object {
         const val SAVE_DELAY_MS = 400L
+        const val SNAPSHOT_GAP_MS = 120_000L
     }
 }
