@@ -154,6 +154,10 @@
     "palettemap": {"photo": "colour"},
     "lightning": {"photo": "landscape", "params": {"from": [0.3, 0.0], "to": [0.6, 0.9], "jag": 0.25, "width": 3}},
     "iridescence": {"photo": "portrait", "params": {"blend": 3}},
-    "rays": {"photo": "sunset", "params": {"center": [0.5, 0.5], "reach": 0.6, "threshold": 0.5}}
+    "rays": {"photo": "sunset", "params": {"center": [0.5, 0.5], "reach": 0.6, "threshold": 0.5}},
+    "hexagontilerotate": {"photo": "colour", "params": {"count": 1.6, "rotation": 90}},
+    "hexagontileshift": {"photo": "colour", "params": {"count": 2.4, "strength": 0.06}},
+    "blocknoise": {"photo": "landscape", "params": {"blockSize": 18}, "animate": 8},
+    "bumpmap": {"photo": "detail", "params": {"height": 10}, "split": 0.4}
   }
 }

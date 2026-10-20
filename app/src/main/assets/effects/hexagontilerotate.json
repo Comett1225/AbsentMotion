@@ -1,0 +1,69 @@
+{
+ "id": "hexagontilerotate",
+ "name": "Hexagon Tile Rotate",
+ "category": "distort",
+ "since": "3.0.0",
+ "description": "Divides the layer into hexagonal tiles and turns the picture inside every tile on its own.",
+ "params": [
+  {
+   "id": "rotation",
+   "label": "Rotation",
+   "type": "angle",
+   "default": 60,
+   "min": -3600,
+   "max": 3600,
+   "step": 0.5
+  },
+  {
+   "id": "offset",
+   "label": "Offset",
+   "type": "point",
+   "default": [
+    0,
+    0
+   ],
+   "min": -5000,
+   "max": 5000,
+   "step": 1,
+   "pixels": true
+  },
+  {
+   "id": "count",
+   "label": "Count",
+   "type": "float",
+   "default": 10,
+   "min": 0.5,
+   "max": 200,
+   "step": 0.1
+  },
+  {
+   "id": "angle",
+   "label": "Angle",
+   "type": "angle",
+   "default": 0,
+   "min": -3600,
+   "max": 3600,
+   "step": 0.5
+  },
+  {
+   "id": "random",
+   "label": "Randomize",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "percent": true
+  },
+  {
+   "id": "seed",
+   "label": "Seed",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 5,
+   "step": 0.01
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float rotation;\nuniform float2 offset;\nuniform float count;\nuniform float angle;\nuniform float random;\nuniform float seed;\nfloat hash12(float2 p) {\n    float3 q = fract(float3(p.xyx) * 0.1031);\n    q += dot(q, q.yzx + 33.33);\n    return fract((q.x + q.y) * q.z);\n}\nfloat2 hash22(float2 p) {\n    float3 q = fract(float3(p.xyx) * float3(0.1031, 0.1030, 0.0973));\n    q += dot(q, q.yzx + 33.33);\n    return fract((q.xx + q.yz) * q.zy);\n}\nfloat2 hexLocal(float2 p) {\n    float2 r = float2(1.0, 1.7320508);\n    float2 h = r * 0.5;\n    float2 a = mod(p, r) - h;\n    float2 b = mod(p - h, r) - h;\n    return dot(a, a) < dot(b, b) ? a : b;\n}\nhalf4 main(float2 coord) {\n    float unit = size.y / (2.475 * max(count, 0.5));\n    float a = radians(angle);\n    float cs = cos(a);\n    float sn = sin(a);\n    float2 c = size * 0.5 + offset;\n    float2 p = coord - c;\n    p = float2(cs * p.x + sn * p.y, -sn * p.x + cs * p.y) / unit;\n    float2 g = hexLocal(p);\n    float2 id = floor((p - g) * float2(1.0, 0.5773503) * 2.0 + 0.5);\n    float r = radians(rotation + random * 360.0 * (hash12(id + seed * 7.31) - 0.5));\n    float rc = cos(r);\n    float rs = sin(r);\n    float2 q = (p - g) + float2(rc * g.x + rs * g.y, -rs * g.x + rc * g.y);\n    q *= unit;\n    return image.eval(float2(cs * q.x - sn * q.y, sn * q.x + cs * q.y) + c);\n}\n"
+}
