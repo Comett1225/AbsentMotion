@@ -103,6 +103,7 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier) {
         0, scale * quality, dx * quality, dy * quality, shownId, handles,
         pixels = state.pixelMode, divisor = divisor, gridSpacing = if (state.gridMode) state.gridSpacing.toFloat() else 0f,
         solo = state.soloMode, soloIds = selection, camera = state.cameraMode, guides = state.snapGuides, refPx = refPx * quality,
+        accurateBlur = state.settings.fullMotionBlur,
     ) else null
     LaunchedEffect(baseView) {
         if (baseView != null) snapshotFlow { state.timeMs }.collect { state.engine.setView(baseView.copy(timeMs = it)) }

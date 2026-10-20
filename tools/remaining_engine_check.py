@@ -85,6 +85,31 @@ def motion_cases():
     yield 'a shared effect comes after the child\'s own effects', engine.scene(family(solid, '<effect id="absent.invert"/>')), [((150, 100), green)], 0
 
 
+def shutter_scene(extra, size='10,10', moves=True, spins=False, camera=''):
+    location = '<location><kf t="0" v="-500,100,0"/><kf t="1" v="700,100,0"/></location>' if moves else '<location value="100,100,0"/>'
+    rotation = '<rotation><kf t="0" v="0"/><kf t="1" v="3600"/></rotation>' if spins else ''
+    return engine.scene(f'<shape id="1" label="b" startTime="0" endTime="1000" fillType="color" s=".rect"><transform>{location}{rotation}</transform>'
+                        f'<fillColor value="#ffff0000"/><property name="size" type="vec2" value="{size}"/>{extra}</shape>{camera}')
+
+
+def shutter_cases():
+    blur = fx('shutterblur', shutter=180, samples=8)
+    hidden = blur.replace('<effect id="absent.shutterblur"', '<effect id="absent.shutterblur" hidden="true"')
+    red = lambda image, x, y: int(image[y, x][0])
+    yield 'true motion blur smears a moving layer evenly both ways', shutter_scene(blur), \
+        lambda i: red(i, 100, 100) > 250 and 30 < red(i, 114, 100) < 100 and abs(red(i, 114, 100) - red(i, 85, 100)) < 8 and red(i, 121, 100) < 3
+    yield 'a hidden true motion blur leaves the layer sharp', shutter_scene(hidden), lambda i: red(i, 105, 100) > 250 and red(i, 114, 100) < 3
+    yield 'a closed shutter leaves the layer sharp', shutter_scene(fx('shutterblur', shutter=0, samples=8)), lambda i: red(i, 114, 100) < 3
+    yield 'true motion blur follows rotation', shutter_scene(blur, '60,6', moves=False, spins=True), \
+        lambda i: red(i, 100, 100) > 250 and 20 < red(i, 148, 113) < 130 and red(i, 135, 135) < 3
+    yield 'a spinning layer without blur stays sharp', shutter_scene('', '60,6', moves=False, spins=True), lambda i: red(i, 148, 113) < 3
+    camera = ('<camera id="2" label="c" startTime="0" endTime="1000"><transform><location><kf t="0" v="-500,100,-300"/><kf t="1" v="700,100,-300"/></location>'
+              '</transform>{}</camera>')
+    yield 'the camera motion blur still smears what it sees', shutter_scene('', '20,20', moves=False, camera=camera.format('<effect id="absent.motionblur"/>')), \
+        lambda i: red(i, 100, 100) > 150 and 15 < red(i, 116, 100) < 200
+    yield 'a camera without motion blur leaves layers sharp', shutter_scene('', '20,20', moves=False, camera=camera.format('')), lambda i: red(i, 116, 100) < 3
+
+
 def centre(image):
     ys, xs = np.nonzero(image[:, :, 0] > 128)
     return (xs.mean(), ys.mean()) if len(xs) else (None, None)
@@ -118,6 +143,11 @@ def main():
         bad = [(xy, tuple(image[xy[1], xy[0]]), want) for xy, want in probes if np.abs(image[xy[1], xy[0]] - want).max() > engine.TOLERANCE]
         print(('FAIL ' if bad else 'ok   ') + name + (': ' + str(bad) if bad else ''), flush=True)
         failed += bool(bad)
+    for k, (name, xml, ok) in enumerate(shutter_cases()):
+        image = engine.still('shutter' + str(k), xml, work, 15)
+        good = ok(image)
+        print(('ok   ' if good else 'FAIL ') + name + ('' if good else ': ' + str([tuple(int(v) for v in image[100, x]) for x in (85, 100, 114, 116, 121)])), flush=True)
+        failed += not good
     for effect, params in [('autoshake', {'magnitude': 40, 'rotation': 0}), ('randomdisplace', {'magnitude': 60}), ('randomjitter', {'angle': 90, 'magnitude': 40})]:
         shots = [engine.still(f'{effect}{seed}{again}', engine.scene(engine.rect(1, 100, 100, 10, 10, 0xffff0000, extra=fx(effect, seed=seed, **params))), work, 10)
                  for seed, again in [(1, 'a'), (1, 'b'), (2, 'a')]]

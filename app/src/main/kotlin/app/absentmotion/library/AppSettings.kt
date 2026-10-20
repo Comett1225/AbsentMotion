@@ -58,6 +58,12 @@ class AppSettings(private val context: Context) {
         get() = vibrationState
         set(value) { vibrationState = value; prefs.edit().putBoolean("trimLimitVibration", value).apply() }
 
+    private var fullMotionBlurState by mutableStateOf(prefs.getBoolean("fullMotionBlur", false))
+
+    var fullMotionBlur: Boolean
+        get() = fullMotionBlurState
+        set(value) { fullMotionBlurState = value; prefs.edit().putBoolean("fullMotionBlur", value).apply() }
+
     private var keepMediaCopiesState by mutableStateOf(prefs.getBoolean("keepMediaCopies", true))
 
     var keepMediaCopies: Boolean

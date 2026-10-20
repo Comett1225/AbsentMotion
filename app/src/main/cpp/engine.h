@@ -70,6 +70,8 @@ public:
 
     virtual void setCameraView(bool on) = 0;
 
+    virtual void setAccurateBlur(bool on) = 0;
+
     virtual int renderFrame(Target* target, double timeMs, uint32_t background, int64_t presentTimeNs) = 0;
 
     virtual int renderBuffer(AHardwareBuffer* buffer, double timeMs, uint32_t background) = 0;

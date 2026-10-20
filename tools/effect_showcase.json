@@ -76,6 +76,7 @@
     "pulseopacity": {"photo": "colour", "layout": "move", "params": {"minimum": 0.1, "frequency": 0.75}, "animate": 16},
     "stretchaxis": {"photo": "colour", "layout": "move", "params": {"angle": [0, 180], "amount": 1.6}, "animate": 16},
     "echo": {"photo": "colour", "layout": "move", "keys": [[-100, 0], [100, 0], [-100, 0]], "params": {"seconds": 0.25, "count": 3, "alpha": 0.3}, "animate": 16},
+    "shutterblur": {"photo": "colour", "layout": "move", "keys": [[-100, 0], [100, 0], [-100, 0]], "params": {"shutter": 360, "samples": 16}, "animate": 16},
     "timequant": {"photo": "colour", "layout": "move", "keys": [[-100, 0], [100, 0], [-100, 0]], "params": {"fps": 4}, "animate": 16},
     "vhs": {"photo": "portrait", "params": {"tracking": 1, "noise": 0.5}, "animate": 16}
   }

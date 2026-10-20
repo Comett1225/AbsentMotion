@@ -1,0 +1,28 @@
+{
+ "id": "shutterblur",
+ "name": "True Motion Blur",
+ "category": "move",
+ "since": "3.0.0",
+ "native": true,
+ "description": "Blurs the layer along the way it really moves, turns and grows, like a camera shutter. A wider shutter angle gives longer trails and more samples give smoother ones. The preview shows a quicker blur unless Full Blur is on.",
+ "params": [
+  {
+   "id": "shutter",
+   "label": "Shutter Angle",
+   "type": "angle",
+   "default": 180,
+   "min": 0,
+   "max": 360,
+   "step": 1
+  },
+  {
+   "id": "samples",
+   "label": "Samples",
+   "type": "float",
+   "default": 8,
+   "min": 2,
+   "max": 32,
+   "step": 1
+  }
+ ]
+}

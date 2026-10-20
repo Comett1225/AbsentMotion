@@ -58,6 +58,11 @@ internal fun PreviewModePanel(state: EditorState, modifier: Modifier = Modifier)
         ModeCell(cell, true, { state.settings.previewQuality = PreviewQuality.entries[(quality.ordinal + 1) % PreviewQuality.entries.size] }) {
             Text(quality.name, color = if (quality == PreviewQuality.Full) Color.White else Am.Accent, fontSize = 10.sp, maxLines = 1)
         }
+        val fullBlur = state.settings.fullMotionBlur
+        ModeCell(cell, true, { state.settings.fullMotionBlur = !fullBlur }) {
+            Text(if (fullBlur) "Full\nBlur" else "Fast\nBlur", color = if (fullBlur) Am.Accent else Color.White, fontSize = 10.sp,
+                lineHeight = 11.sp, maxLines = 2, textAlign = TextAlign.Center)
+        }
         ZoomBlock(state)
     }
 }

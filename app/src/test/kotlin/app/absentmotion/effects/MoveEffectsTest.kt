@@ -25,7 +25,7 @@ class MoveEffectsTest {
     @Test fun theMoveCategoryHoldsTheMotionEffects() {
         val moves = catalog.listed("move").map { it.key }.toSet()
         assertEquals(setOf("autoshake", "randomdisplace", "randomjitter", "oscillate", "swing", "spin", "pulsesize", "pulseopacity",
-            "stretchaxis", "echo", "timequant"), moves)
+            "stretchaxis", "echo", "timequant", "shutterblur"), moves)
         assertTrue(catalog.listed("move").all { it.native && it.sksl == null })
         assertEquals("Move", EffectCatalog.Categories["move"])
     }
@@ -42,6 +42,15 @@ class MoveEffectsTest {
         assertEquals(Triple(-60f, 60f, 0.5f), echo.getValue("seconds").range())
         assertEquals(Triple(0f, 20f, 1f), echo.getValue("count").range())
         assertEquals(listOf("Behind", "Atop"), echo.getValue("composite").options)
+    }
+
+    @Test fun trueMotionBlurDefaultsToAHalfOpenShutterAndEightSamples() {
+        val blur = catalog.find("absent.shutterblur")!!
+        assertEquals(listOf("shutter", "samples"), blur.params.map { it.id })
+        val params = blur.params.associateBy { it.id }
+        assertEquals(Triple(0f, 360f, 180f), params.getValue("shutter").range())
+        assertEquals(Triple(2f, 32f, 8f), params.getValue("samples").range())
+        assertEquals(1f, params.getValue("samples").step)
     }
 
     @Test fun timeQuantizationStepsTheLayerTime() {

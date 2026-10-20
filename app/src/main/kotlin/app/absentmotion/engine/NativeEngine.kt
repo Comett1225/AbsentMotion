@@ -51,6 +51,8 @@ class NativeEngine(backend: Backend) : AutoCloseable {
 
     fun setCameraView(on: Boolean) = nativeSetCameraView(handle, on)
 
+    fun setAccurateBlur(on: Boolean) = nativeSetAccurateBlur(handle, on)
+
     fun renderFrame(target: Long, timeMs: Double, background: Int, presentTimeNs: Long): Int =
         nativeRenderFrame(handle, target, timeMs, background, presentTimeNs)
 
@@ -107,6 +109,7 @@ class NativeEngine(backend: Backend) : AutoCloseable {
             guides: FloatArray, refPx: Float,
         ): Int
         @JvmStatic private external fun nativeSetCameraView(engine: Long, on: Boolean)
+        @JvmStatic private external fun nativeSetAccurateBlur(engine: Long, on: Boolean)
         @JvmStatic private external fun nativeRenderFrame(
             engine: Long, target: Long, timeMs: Double, background: Int, presentTimeNs: Long,
         ): Int

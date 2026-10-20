@@ -107,6 +107,7 @@ public:
     int renderScene(Target*, double timeMs, float scale, float dx, float dy, uint32_t background,
                     int64_t selectedId, int handles, const PreviewOptions& view) override;
     void setCameraView(bool on) override { fCameraView = on; }
+    void setAccurateBlur(bool on) override { fAccurateBlur = on; }
     int renderFrame(Target*, double timeMs, uint32_t background, int64_t presentTimeNs) override;
     int renderBuffer(AHardwareBuffer* buffer, double timeMs, uint32_t background) override;
     void releaseBuffers() override;
@@ -140,6 +141,7 @@ private:
     int failGpu(Target* target);
     bool fGpuFailed = false;
     bool fCameraView = true;
+    bool fAccurateBlur = false;
     std::vector<VkSemaphore> fFailedSemaphores;
     std::vector<VkSemaphore> fSpareSemaphores;
 
@@ -793,8 +795,10 @@ int EngineImpl::renderScene(Target* target, double timeMs, float scale, float dx
                             uint32_t background, int64_t selectedId, int handles, const PreviewOptions& view) {
     return this->frame(target, 0, false, [&](SkCanvas* canvas) {
         const LayerEffects fx = this->layerEffects();
+        SetFastShutterBlur(!fAccurateBlur);
         RenderPreview(canvas, target->width, target->height, fScene, timeMs, scale, dx, dy, background,
                       selectedId, handles, view, fCameraView, this->pictures(), fx);
+        SetFastShutterBlur(false);
     });
 }
 

@@ -15,6 +15,7 @@
 #include "include/core/SkImage.h"
 
 class SkCanvas;
+class SkImageFilter;
 
 namespace am {
 
@@ -161,7 +162,16 @@ struct Echo {
     bool atop = false;
 };
 
+struct ShutterBlur {
+    float angle = 0;
+    int samples = 0;
+    bool fast = false;
+};
+
 bool MotionEffect(const std::string& id);
+bool ShutterBlurOf(const Layer& layer, double timeMs, ShutterBlur* blur);
+void SetFastShutterBlur(bool fast);
+sk_sp<SkImageFilter> SmearFilter(SkVector moved);
 void ApplyMotion(const Layer& layer, double timeMs, Placement* placement);
 float MotionOpacity(const Layer& layer, double timeMs);
 bool EchoOf(const Layer& layer, double timeMs, Echo* echo);

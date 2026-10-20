@@ -1,4 +1,6 @@
 #include "scene.h"
+#include "include/core/SkSamplingOptions.h"
+#include "include/effects/SkImageFilters.h"
 
 #include <algorithm>
 #include <cmath>
@@ -13,7 +15,9 @@ constexpr double kTau = 6.283185307179586;
 
 const char* const kMotionIds[] = {"absent.autoshake", "absent.randomdisplace", "absent.randomjitter", "absent.oscillate",
                                   "absent.swing", "absent.spin", "absent.pulsesize", "absent.pulseopacity",
-                                  "absent.stretchaxis", "absent.echo", "absent.timequant"};
+                                  "absent.stretchaxis", "absent.echo", "absent.timequant", "absent.shutterblur"};
+
+bool gFastShutter = false;
 
 const Anim* Find(const LayerEffect& e, const char* name) {
     for (const Property& p : e.props) {
@@ -155,6 +159,30 @@ bool EchoOf(const Layer& l, double timeMs, Echo* echo) {
         return echo->count > 0 && echo->seconds != 0;
     }
     return false;
+}
+
+bool ShutterBlurOf(const Layer& l, double timeMs, ShutterBlur* blur) {
+    for (const LayerEffect& e : l.effects) {
+        if (e.hidden || e.id != "absent.shutterblur") continue;
+        const float t = l.localTime(timeMs);
+        blur->angle = std::clamp(Param(e, "shutter", t, 180), 0.0f, 360.0f);
+        blur->samples = std::clamp((int)std::lround(Param(e, "samples", t, 8)), 2, 32);
+        blur->fast = gFastShutter;
+        return blur->angle > 0;
+    }
+    return false;
+}
+
+void SetFastShutterBlur(bool fast) { gFastShutter = fast; }
+
+sk_sp<SkImageFilter> SmearFilter(SkVector moved) {
+    const float length = moved.length();
+    if (!(length >= 0.5f) || !std::isfinite(length)) return nullptr;
+    const float angle = atan2f(moved.fY, moved.fX) * 180 / 3.14159265f;
+    const SkSamplingOptions linear(SkFilterMode::kLinear);
+    auto turned = SkImageFilters::MatrixTransform(SkMatrix::RotateDeg(-angle), linear, nullptr);
+    auto blurred = SkImageFilters::Blur(length * 0.3f, 0, SkTileMode::kDecal, turned);
+    return SkImageFilters::MatrixTransform(SkMatrix::RotateDeg(angle), linear, blurred);
 }
 
 void ParseSteps(Layer* l) {

@@ -450,6 +450,7 @@ struct Override {
     SkBlendMode mode = SkBlendMode::kSrcOver;
     bool unitOpacity = false;
     bool echoed = false;
+    bool shuttered = false;
     float alpha = 1;
 };
 
@@ -554,6 +555,41 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
     }
 }
 
+void DrawShuttered(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& l, double timeMs,
+                   const MediaPictures& pictures, const Override& ov, const ShutterBlur& shutter) {
+    const double open = 1000.0 / std::max(gScene ? gScene->fps : 30, 1) * shutter.angle / 360;
+    Override sample = ov;
+    sample.shuttered = true;
+    SkPaint composite;
+    if (shutter.fast) {
+        const SkPoint middle = ShapePath(l, l.localTime(timeMs)).getBounds().center();
+        const SkVector moved = SiblingMatrix(siblings, l, timeMs + open / 2).mapPoint(middle) -
+                               SiblingMatrix(siblings, l, timeMs - open / 2).mapPoint(middle);
+        composite.setImageFilter(SmearFilter(moved));
+        if (!composite.getImageFilter()) return DrawOne(canvas, siblings, l, timeMs, pictures, sample);
+    }
+    if (ov.blend) composite.setBlendMode(ov.mode);
+    else SetBlend(&composite, l.blending);
+    sample.blend = true;
+    sample.mode = SkBlendMode::kSrcOver;
+    if (shutter.fast) {
+        canvas->saveLayer(nullptr, &composite);
+        DrawOne(canvas, siblings, l, timeMs, pictures, sample);
+        canvas->restore();
+        return;
+    }
+    canvas->saveLayer(SkCanvas::SaveLayerRec(nullptr, &composite, SkCanvas::kF16ColorType));
+    SkPaint add;
+    add.setBlendMode(SkBlendMode::kPlus);
+    add.setAlphaf(1.0f / shutter.samples);
+    for (int i = 0; i < shutter.samples; i++) {
+        canvas->saveLayer(nullptr, &add);
+        DrawOne(canvas, siblings, l, timeMs + open * ((i + 0.5) / shutter.samples - 0.5), pictures, sample);
+        canvas->restore();
+    }
+    canvas->restore();
+}
+
 void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& l, double timeMs,
              const MediaPictures& pictures, const Override& ov) {
     if (!l.activeAt(timeMs) || l.kind == "nullobj" || l.kind == "camera") return;
@@ -571,6 +607,11 @@ void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& 
         if (!echo.atop) for (int i = echo.count; i >= 1; i--) past(i);
         DrawOne(canvas, siblings, l, timeMs, pictures, plain);
         if (echo.atop) for (int i = 1; i <= echo.count; i++) past(i);
+        return;
+    }
+    ShutterBlur shutter;
+    if (!ov.shuttered && ShutterBlurOf(l, timeMs, &shutter) && !(EffectsApply(siblings, l) && gEffects->lifted(l))) {
+        DrawShuttered(canvas, siblings, l, timeMs, pictures, ov, shutter);
         return;
     }
     const float t = l.localTime(timeMs);

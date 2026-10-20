@@ -155,6 +155,10 @@ JNIEXPORT void JNICALL JNI_FN(nativeSetCameraView)(JNIEnv*, jclass, jlong engine
     engineOf(engine)->setCameraView(on);
 }
 
+JNIEXPORT void JNICALL JNI_FN(nativeSetAccurateBlur)(JNIEnv*, jclass, jlong engine, jboolean on) {
+    engineOf(engine)->setAccurateBlur(on);
+}
+
 JNIEXPORT jfloatArray JNICALL JNI_FN(nativeEase)(JNIEnv* env, jclass, jstring easing, jfloatArray us) {
     const char* text = env->GetStringUTFChars(easing, nullptr);
     const am::Easing e = am::ParseEasing(text);
