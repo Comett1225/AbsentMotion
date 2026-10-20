@@ -46,6 +46,13 @@ def cases():
     yield 'group effects keep the group opacity', framed(invert, 0.5), [((100, 100), (0, 128, 128)), ((5, 5), engine.BLACK)]
     yield 'group border', framed('<border direction="outside"><color value="#ffffffff"/><size value="40"/></border>'), [((100, 100), engine.RED), ((50, 100), (255, 255, 255)), ((100, 45), (255, 255, 255)), ((30, 100), engine.BLACK)]
     yield 'group shadow', framed('<shadow direction="outside"><color value="#ffffffff"/><size value="0"/><offset value="60,0"/></shadow>'), [((100, 100), engine.RED), ((170, 100), (255, 255, 255)), ((30, 100), engine.BLACK)]
+    def glow(radius, mode=0):
+        return fx('glow', radius=radius, alpha=1, hardness=1, blendMode=mode).replace('</effect>', '<property name="color" type="color" value="#ffff0000"/></effect>')
+    yield 'a glow of radius 0 draws nothing', engine.scene(engine.rect(1, 100, 100, 30, 30, 0xffffffff, extra=glow(0))), [((100, 100), (255, 255, 255)), ((132, 100), engine.BLACK)]
+    yield 'a hard glow lies outside the layer in its colour', engine.scene(engine.rect(1, 100, 100, 30, 30, 0xffffffff, extra=glow(60))), \
+        [((100, 100), (255, 255, 255)), ((138, 100), engine.RED), ((100, 62), engine.RED), ((160, 100), engine.BLACK)]
+    yield 'a multiply glow darkens what is behind the layer', engine.scene(engine.rect(1, 100, 100, 100, 100, 0xff808080) + engine.rect(2, 100, 100, 30, 30, 0xffffffff, extra=glow(60, 1))), \
+        [((100, 100), (255, 255, 255)), ((138, 100), (128, 0, 0)), ((170, 100), engine.HALF)]
     yield 'vivid neutral', engine.scene(engine.rect(1, 100, 100, 100, 100, 0xff808080) + engine.rect(2, 100, 100, 100, 100, 0xff808080, attrs=' blending="vivid-light"')), [((100, 100), (129, 129, 129))]
     neutral = fx('vhs', chroma=0, smear=0, scanlines=0, noise=0, tracking=0, wobble=0, saturation=1, headSwitch=0)
     yield 'vhs at zero leaves the colours', engine.scene(engine.rect(1, 100, 100, 60, 60, 0xff3366cc, extra=neutral)), [((100, 100), (0x33, 0x66, 0xcc)), ((5, 5), engine.BLACK)]
