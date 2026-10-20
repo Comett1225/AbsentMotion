@@ -154,7 +154,7 @@ fun SettingsDrawer(settings: AppSettings, drawer: androidx.compose.material3.Dra
 @Composable
 private fun Category(@StringRes name: Int, icon: ImageVector, content: @Composable () -> Unit) {
     var open by rememberSaveable { mutableStateOf(false) }
-    val turn by animateFloatAsState(if (open) 180f else 0f, Motion.enter(), label = "category chevron")
+    val turn by animateFloatAsState(if (open) 180f else 0f, Motion.enter())
     Column(Modifier.padding(horizontal = 6.dp).fillMaxWidth().clip(PanelShape).background(PanelColor)) {
         Row(
             Modifier.fillMaxWidth().height(44.dp).clickable { open = !open }
