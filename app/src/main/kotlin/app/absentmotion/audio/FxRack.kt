@@ -2,6 +2,8 @@ package app.absentmotion.audio
 
 import java.io.Closeable
 import kotlin.math.abs
+import kotlin.math.exp
+import kotlin.math.pow
 
 internal interface ClipFx : Closeable {
     val latency: Int get() = 0
@@ -27,6 +29,11 @@ internal object NativeFx {
         return if (handle == 0L) null else NativeChain(spec.kinds.copyOf(), handle)
     }
 
+    fun limiter(rate: Int): ClipFx? {
+        val spec = FxSpec(intArrayOf(LIMITER), floatArrayOf(1f, 0f, 3f, CEILING_DB, 100f))
+        return chain(spec, rate)?.also { it.set(spec.values) }
+    }
+
     @JvmStatic external fun nativeCreate(kinds: IntArray, rate: Int, maxBlock: Int): Long
     @JvmStatic external fun nativeSet(handle: Long, values: FloatArray): Boolean
     @JvmStatic external fun nativeProcess(handle: Long, data: FloatArray, frames: Int)
@@ -45,6 +52,38 @@ private class NativeChain(private val kinds: IntArray, private var handle: Long)
         if (handle != 0L) NativeFx.nativeDestroy(handle)
         handle = 0L
     }
+}
+
+internal const val CEILING_DB = -1f
+
+internal class SafeLimiter(rate: Int, releaseMs: Double = 100.0) : ClipFx {
+    private val ceiling = 10.0.pow(CEILING_DB / 20.0).toFloat()
+    private val release = exp(-1.0 / (releaseMs * 0.001 * rate)).toFloat()
+    private var gain = 1f
+
+    var peak = 0f
+        private set
+
+    override fun fits(spec: FxSpec) = false
+    override fun set(values: FloatArray) {}
+
+    override fun process(buf: FloatArray, frames: Int) {
+        var top = 0f
+        for (k in 0 until frames) {
+            val l = buf[2 * k]
+            val r = buf[2 * k + 1]
+            val p = maxOf(abs(l), abs(r))
+            if (p > top) top = p
+            val want = if (p > ceiling) ceiling / p else 1f
+            gain = if (want < gain) want else want + (gain - want) * release
+            buf[2 * k] = (l * gain).coerceIn(-ceiling, ceiling)
+            buf[2 * k + 1] = (r * gain).coerceIn(-ceiling, ceiling)
+        }
+        peak = top
+    }
+
+    override fun reset() { gain = 1f }
+    override fun close() {}
 }
 
 internal class FxRack(private val rate: Int, private val make: FxMaker = NativeFx::chain) : Closeable {

@@ -89,6 +89,7 @@ class AudioEngine(context: Context) {
         val rate = AudioTrack.getNativeOutputSampleRate(AudioManager.STREAM_MUSIC).takeIf { it > 0 } ?: 48_000
         val clock = AudioClock(startMs, rate)
         private val rack = FxRack(rate)
+        private val limiter = SafeLimiter(rate)
 
         fun halt() {
             clock.stop(System.nanoTime())
@@ -181,7 +182,8 @@ class AudioEngine(context: Context) {
 
         private fun mixBlock(out: FloatArray, t0: Double) {
             mixStreams(clips, out, BLOCK, t0, rate, quality, rack, ::stream)
-            level = Voice.finish(out, out.size)
+            limiter.process(out, BLOCK)
+            level = limiter.peak
         }
     }
 

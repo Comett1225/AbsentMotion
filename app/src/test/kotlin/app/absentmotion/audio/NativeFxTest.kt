@@ -10,6 +10,8 @@ import java.io.File
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.log10
+import kotlin.math.pow
+import kotlin.math.roundToInt
 import kotlin.math.sin
 
 class NativeFxTest {
@@ -103,6 +105,49 @@ class NativeFxTest {
         assertTrue("differs by $worst", worst <= 4f)
         assertTrue(wet.maxOf { abs(it.toInt()) } in 5_000..29_000)
         assertTrue(abs(wet[2 * 44_100 * 3 + 2 * 4410].toInt()) + abs(wet[2 * 44_100 * 3 + 2 * 4411].toInt()) > 0)
+    }
+
+    private fun scene(gain: Float, count: Int) = Scene.parse("""<scene width="100" height="100" fps="30">${
+        (1..count).joinToString("") { """<audio id="$it" src="t$it" startTime="0" endTime="3999" outTime="30000"><gain value="$gain"/></audio>""" }
+    }</scene>""")
+
+    private fun mix(scene: Scene, master: ClipFx? = null) = AudioClip.of(scene).let { clips ->
+        val open = { uri: String -> ToneSource(200.0 + 110 * uri.drop(1).toInt(), 48_000) }
+        if (master == null) OfflineMix(open, clips, Resampler.ULTRA) else OfflineMix(open, clips, Resampler.ULTRA, master = master)
+    }
+
+    @Test fun theExportLimiterKeepsTheCeilingAndTheTiming() {
+        val ceiling = (10.0.pow(CEILING_DB / 20.0) * 32767).roundToInt()
+        val loud = mix(scene(1.5f, 3)).use { it(0, 4_000_000) }
+        assertTrue(loud.all { abs(it.toInt()) <= ceiling })
+        assertTrue(loud.maxOf { abs(it.toInt()) } > ceiling - 100)
+        assertTrue(loud.count { abs(it.toInt()) >= ceiling - 1 } < loud.size / 50)
+        val quiet = scene(0.3f, 2)
+        val native = mix(quiet).use { it(0, 4_000_000) }
+        val plain = mix(quiet, SafeLimiter(44_100)).use { it(0, 4_000_000) }
+        assertTrue(plain.maxOf { abs(it.toInt()) } > 5_000)
+        for (i in native.indices) assertEquals("at $i", plain[i].toFloat(), native[i].toFloat(), 1f)
+        val jumped = mix(quiet).use { it(0, 500_000); it(2_000_000, 3_000_000) }
+        val fresh = mix(quiet, SafeLimiter(44_100)).use { it(2_000_000, 3_000_000) }
+        for (i in jumped.indices) assertEquals(fresh[i].toFloat(), jumped[i].toFloat(), 1f)
+    }
+
+    @Test fun theExportLimiterGivesTheSameSoundForAnyRequestSize() {
+        val sc = scene(1.5f, 3)
+        val whole = mix(sc).use { it(0, 3_000_000) }
+        val pieces = mix(sc).use { m ->
+            val parts = ArrayList<ShortArray>()
+            var us = 0L
+            var step = 3_000L
+            while (us < 3_000_000L) {
+                val end = minOf(3_000_000L, us + step)
+                parts += m(us, end)
+                us = end
+                step = step * 11 % 250_007 + 500
+            }
+            parts.flatMap { it.asList() }.toShortArray()
+        }
+        assertTrue(whole.contentEquals(pieces))
     }
 
     private companion object {

@@ -12,12 +12,14 @@ import kotlin.math.roundToInt
 internal class OfflineMix(
     private val open: (String) -> PcmSource, private val clips: List<AudioClip>, private val quality: Int,
     makeFx: FxMaker = NativeFx::chain,
+    private val master: ClipFx = NativeFx.limiter(RATE) ?: SafeLimiter(RATE),
 ) : AudioMix, Closeable {
     private val sources = HashMap<Long, OfflineSource>()
     private val voices = HashMap<Long, Voice>()
     private val rack = FxRack(RATE, makeFx)
+    private val lead = master.latency.coerceIn(0, BLOCK)
     private val block = FloatArray(BLOCK * 2)
-    private var index = -1L
+    private var index = Long.MIN_VALUE
 
     override fun invoke(startUs: Long, endUs: Long): ShortArray {
         val first = Math.round(startUs * RATE / 1e6)
@@ -37,11 +39,20 @@ internal class OfflineMix(
 
     private fun blockAt(i: Long): FloatArray {
         if (i == index) return block
-        if (i != index + 1) { voices.values.forEach { it.ready = false }; rack.reset() }
-        mix(i * BLOCK, BLOCK)
-        Voice.finish(block, block.size)
+        if (i != index + 1) seek(i * BLOCK)
+        mix(i * BLOCK + lead, BLOCK)
+        master.process(block, BLOCK)
         index = i
         return block
+    }
+
+    private fun seek(frame: Long) {
+        voices.values.forEach { it.ready = false }
+        rack.reset()
+        master.reset()
+        if (lead == 0) return
+        mix(frame, lead)
+        master.process(block, lead)
     }
 
     private fun mix(first: Long, frames: Int) {
@@ -82,6 +93,7 @@ internal class OfflineMix(
         sources.values.forEach { it.close() }
         sources.clear()
         rack.close()
+        master.close()
     }
 
     companion object {

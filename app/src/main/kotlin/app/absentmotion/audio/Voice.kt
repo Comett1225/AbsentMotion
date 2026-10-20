@@ -80,15 +80,5 @@ internal class Voice {
     companion object {
         private const val XFADE = 128
         private const val RAMP_MS = 2.0
-
-        fun finish(out: FloatArray, samples: Int): Float {
-            var peak = 0f
-            for (i in 0 until samples) {
-                val v = abs(out[i])
-                if (v > peak) peak = v
-                out[i] = out[i].coerceIn(-1f, 1f)
-            }
-            return peak
-        }
     }
 }

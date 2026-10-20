@@ -7,6 +7,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import kotlin.math.PI
 import kotlin.math.abs
+import kotlin.math.pow
 import kotlin.math.roundToInt
 import kotlin.math.sin
 
@@ -144,6 +145,35 @@ class FxMixTest {
         val short = render(scene(audio(1, 0, 499, true)), 8000) { _, _ -> EchoFx(4410, 0.5f) }
         assertTrue(level(short, 600, 700) > 1_000)
         assertEquals(0, level(short, 4000, 8000))
+    }
+
+    @Test fun thePreviewLimiterNeverExceedsTheCeilingAndLeavesQuietSoundAlone() {
+        val ceiling = 10f.pow(CEILING_DB / 20f)
+        val limiter = SafeLimiter(48_000)
+        var seed = 99
+        var size = 1
+        repeat(400) {
+            val buf = FloatArray(2 * size) { seed = seed * 1103515245 + 12345; ((seed ushr 8) and 0xffff) / 2048f - 16f }
+            limiter.process(buf, size)
+            assertTrue(buf.all { abs(it) <= ceiling })
+            size = size * 3 % 1021 + 1
+        }
+        limiter.reset()
+        val quiet = FloatArray(2 * 4800) { 0.5f * sin(it * 0.01f) }
+        val copy = quiet.copyOf()
+        limiter.process(quiet, 4800)
+        assertArrayEquals(copy, quiet, 0f)
+        assertEquals(0.5f, limiter.peak, 1e-3f)
+    }
+
+    @Test fun loudClipsAreLimitedInsteadOfClipped() {
+        val loud = """<gain value="1.5"/>"""
+        val sc = scene(audio(1, 0, 1999, false).replace("</audio>", "$loud</audio>"), audio(2, 0, 1999, false).replace("</audio>", "$loud</audio>"))
+        val pcm = OfflineMix({ uri -> ToneSource(if (uri == "tone1") 440.0 else 660.0) }, AudioClip.of(sc), Resampler.ULTRA, { _, _ -> null }, SafeLimiter(44_100)).use { it(0, 2_000_000) }
+        val ceiling = (10f.pow(CEILING_DB / 20f) * 32767).roundToInt()
+        assertTrue(pcm.all { abs(it.toInt()) <= ceiling })
+        assertTrue(level(pcm, 100, 1900) > ceiling - 200)
+        assertTrue(pcm.count { abs(it.toInt()) >= ceiling - 1 } < pcm.size / 20)
     }
 
     @Test fun exportStartingInsideALongClipSoundsAtOnce() {
