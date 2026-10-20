@@ -10,6 +10,8 @@ import app.absentmotion.model.formatFloats
 import app.absentmotion.model.isKeyframed
 import app.absentmotion.model.mediaUris
 import app.absentmotion.model.withCopiedLayerIds
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlin.math.cos
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -41,10 +43,9 @@ suspend fun EditorState.saveToMyElements(store: ProjectStore): Boolean {
     val width = group?.let { host.width } ?: ((bounds?.let { it[2] - it[0] } ?: host.width.toFloat()) + 2).toInt()
     val height = group?.let { host.height } ?: ((bounds?.let { it[3] - it[1] } ?: host.height.toFloat()) + 2).toInt()
     val element = Scene(Scene.create(layer.label.ifBlank { AppText.get(R.string.model_layer_element) }, width, height, host.fps, 0).node.with("type", "element"))
-    val full = host.elementNodes(layer, bounds).fold(element) { acc, node ->
-        acc.add(Layer(node), node.mediaUris().mapNotNull { host.media(it) })
+    withContext(Dispatchers.IO) {
+        store.createElement(host.elementNodes(layer, bounds).fold(element) { acc, node -> acc.add(Layer(node), node.mediaUris().mapNotNull { host.media(it) }) })
     }
-    store.createElement(full)
     return true
 }
 
