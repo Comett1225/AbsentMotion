@@ -190,23 +190,25 @@ internal fun LayerMenu(state: EditorState, onDismiss: () -> Unit) {
     val saveElement = rememberSaveToMyElements(state)
     MenuPopup(position, onDismiss) {
         if (state.selected?.link == null && !MultiSelect.active) MenuRow(stringResource(R.string.menu_save_to_my_assets)) { saveElement(onDismiss) }
-        MenuRow(stringResource(R.string.menu_flip_horizontally)) {
-            state.flip(horizontal = true)
-            onDismiss()
-        }
-        MenuRow(stringResource(R.string.menu_flip_vertically)) {
-            state.flip(horizontal = false)
-            onDismiss()
-        }
-        MenuRow(stringResource(R.string.menu_fit_to_canvas)) { scope.launch { state.compositionArea("fit"); onDismiss() } }
-        MenuRow(stringResource(R.string.menu_fill_the_canvas)) { scope.launch { state.compositionArea("fill"); onDismiss() } }
-        MenuRow(stringResource(R.string.menu_stretch_to_canvas)) { scope.launch { state.compositionArea("stretch"); onDismiss() } }
-        MenuRow(stringResource(if (state.selected?.node?.get("clippingMask") == "true") R.string.menu_release_clipping_mask else R.string.menu_create_clipping_mask), enabled = state.canClip, divider = true) {
-            state.toggleClippingMask()
-            onDismiss()
-        }
-        MenuRow(stringResource(R.string.menu_convert_to_outline), enabled = state.selected?.let { it.kind == "text" || (it.kind == "shape" && it.shape.isNotEmpty()) } == true) {
-            scope.launch { state.convertToOutline(); onDismiss() }
+        if (state.selected?.kind != "audio") {
+            MenuRow(stringResource(R.string.menu_flip_horizontally)) {
+                state.flip(horizontal = true)
+                onDismiss()
+            }
+            MenuRow(stringResource(R.string.menu_flip_vertically)) {
+                state.flip(horizontal = false)
+                onDismiss()
+            }
+            MenuRow(stringResource(R.string.menu_fit_to_canvas)) { scope.launch { state.compositionArea("fit"); onDismiss() } }
+            MenuRow(stringResource(R.string.menu_fill_the_canvas)) { scope.launch { state.compositionArea("fill"); onDismiss() } }
+            MenuRow(stringResource(R.string.menu_stretch_to_canvas)) { scope.launch { state.compositionArea("stretch"); onDismiss() } }
+            MenuRow(stringResource(if (state.selected?.node?.get("clippingMask") == "true") R.string.menu_release_clipping_mask else R.string.menu_create_clipping_mask), enabled = state.canClip, divider = true) {
+                state.toggleClippingMask()
+                onDismiss()
+            }
+            MenuRow(stringResource(R.string.menu_convert_to_outline), enabled = state.selected?.let { it.kind == "text" || (it.kind == "shape" && it.shape.isNotEmpty()) } == true) {
+                scope.launch { state.convertToOutline(); onDismiss() }
+            }
         }
         if (video != null) {
             MenuRow(stringResource(R.string.menu_extract_audio)) {
