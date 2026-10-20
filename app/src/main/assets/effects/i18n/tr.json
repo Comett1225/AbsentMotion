@@ -51,10 +51,10 @@
    }
   },
   "bend": {
-   "description": "Katmanı yumuşak bir yay boyunca büker; Kaynak tarafı sabit kalır, uzak taraf ise ayarladığınız açıya döner. En iyi uzun ve ince katmanlarda çalışır.",
+   "description": "Katmanı dairesel bir yay boyunca büker; başlangıç tarafı sabit kalır, uzak taraf ayarladığınız açıya döner, pozitif açı sola doğrudur. Uzun ve ince katmanlarda en iyi sonucu verir.",
    "name": "Bük",
    "params": {
-    "angle": {
+    "amount": {
      "label": "Açı"
     },
     "before": {

@@ -51,10 +51,10 @@
    }
   },
   "bend": {
-   "description": "Menekuk lapisan sepanjang lengkungan halus; sisi Asal tetap di tempat dan sisi jauhnya berputar ke sudut yang kamu atur. Paling cocok untuk lapisan panjang dan tipis.",
+   "description": "Membengkokkan lapisan sepanjang busur lingkaran; sisi Origin tetap di tempat dan sisi jauhnya berputar ke sudut yang kamu atur, sudut positif ke kiri. Paling cocok untuk lapisan panjang dan tipis.",
    "name": "Tekuk",
    "params": {
-    "angle": {
+    "amount": {
      "label": "Sudut"
     },
     "before": {

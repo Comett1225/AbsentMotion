@@ -51,10 +51,10 @@
    }
   },
   "bend": {
-   "description": "Uốn cong lớp theo một cung mượt; phía Gốc giữ nguyên và phía xa xoay đến góc bạn đặt. Hợp nhất với lớp dài, mỏng.",
+   "description": "Uốn cong lớp theo một cung tròn; phía Gốc giữ nguyên, phía đối diện xoay đến góc bạn đặt, góc dương quay sang trái. Hiệu quả nhất trên lớp dài, mảnh.",
    "name": "Uốn cong",
    "params": {
-    "angle": {
+    "amount": {
      "label": "Góc"
     },
     "before": {
