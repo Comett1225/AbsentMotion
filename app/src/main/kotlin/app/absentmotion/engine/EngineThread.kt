@@ -19,7 +19,11 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import app.absentmotion.R
 import app.absentmotion.audio.AudioEngine
+import app.absentmotion.export.exportCheck
+import app.absentmotion.i18n.AppText
+import app.absentmotion.i18n.txt
 import app.absentmotion.export.FrameInterpolation
 import app.absentmotion.media.VideoLibrary
 import kotlinx.coroutines.sync.Mutex
@@ -60,7 +64,7 @@ class EngineThread(private val background: Int, context: Context? = null) {
         private set
     @Volatile private var requestedView: PreviewView? = null
     @Volatile private var playing = false
-    private val effectCatalog = MutableStateFlow(EffectCatalog(message = "Loading effects…"))
+    private val effectCatalog = MutableStateFlow(EffectCatalog(message = AppText.get(R.string.engine_loading_effects)))
     val effects = effectCatalog.asStateFlow()
 
     suspend fun effectCheck(directory: File) {
@@ -132,7 +136,7 @@ class EngineThread(private val background: Int, context: Context? = null) {
     private fun engine(): NativeEngine {
         check(!closed) { "engine closed" }
         if (engine?.failed == true || simulateGpuLoss && !capturing) {
-            check(!capturing) { "GPU failed during capture" }
+            exportCheck(!capturing) { txt(R.string.engine_error_gpu_capture) }
             simulateGpuLoss = false
             target = 0L
             engine?.close()

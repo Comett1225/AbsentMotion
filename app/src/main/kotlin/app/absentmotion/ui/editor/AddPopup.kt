@@ -68,6 +68,9 @@ import app.absentmotion.editor.startVectorDrawing
 import app.absentmotion.model.ShapeCatalog
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.pressScale
+import androidx.annotation.StringRes
+import androidx.compose.ui.res.stringResource
+import app.absentmotion.R
 
 private val PopupBar get() = Am.Button
 private val DotIdle get() = Am.Caption
@@ -81,16 +84,16 @@ fun AddButton(state: EditorState, modifier: Modifier = Modifier) {
             Modifier.size(47.dp).pressScale(press).shadow(4.dp, CircleShape).background(Disc, CircleShape).border(1.8.dp, Am.Accent, CircleShape),
             contentAlignment = Alignment.Center,
         ) {
-            Icon(ChromeIcons.Plus, "Add layer", Modifier.size(24.dp), tint = Am.Accent)
+            Icon(ChromeIcons.Plus, stringResource(R.string.add_layer), Modifier.size(24.dp), tint = Am.Accent)
         }
     }
 }
 
-private class Tab(val label: String, val icon: ImageVector)
+private class Tab(@StringRes val label: Int, val icon: ImageVector)
 
 private val Tabs = listOf(
-    Tab("Shape", ChromeIcons.ShapeTab), Tab("Media", ChromeIcons.MediaTab), Tab("Audio", ChromeIcons.AudioTab),
-    Tab("Object / Asset", ChromeIcons.ObjectTab), Tab("Template", ChromeIcons.TemplateTab),
+    Tab(R.string.add_tab_shape, ChromeIcons.ShapeTab), Tab(R.string.add_tab_media, ChromeIcons.MediaTab), Tab(R.string.add_tab_audio, ChromeIcons.AudioTab),
+    Tab(R.string.add_tab_object_asset, ChromeIcons.ObjectTab), Tab(R.string.add_tab_template, ChromeIcons.TemplateTab),
 )
 
 @Composable
@@ -122,7 +125,7 @@ private fun TabButton(tab: Tab, active: Boolean, enabled: Boolean, onClick: () -
         Icon(tab.icon, null, Modifier.size(24.dp), tint = tint)
         Spacer(Modifier.height(5.dp))
         Text(
-            tab.label, Modifier.fillMaxWidth().padding(horizontal = 2.dp), color = tint,
+            stringResource(tab.label), Modifier.fillMaxWidth().padding(horizontal = 2.dp), color = tint,
             fontSize = 9.sp, lineHeight = 10.5.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, maxLines = 2,
         )
     }
@@ -168,7 +171,7 @@ private fun TemplatePage(state: EditorState, modifier: Modifier) {
         item(key = "all") {
             Column(Modifier.size(80.dp, 96.dp).clickable { all = true }, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
                 MediaGridIcon(Modifier.size(24.dp))
-                Text("View All", color = Am.OnDark, fontSize = 16.sp, maxLines = 1)
+                Text(stringResource(R.string.view_all), color = Am.OnDark, fontSize = 16.sp, maxLines = 1)
             }
         }
         items(saved, key = { it.id }) { t -> TemplateCell(t, Modifier.size(80.dp, 96.dp)) { open(t) } }
@@ -178,7 +181,7 @@ private fun TemplatePage(state: EditorState, modifier: Modifier) {
             LazyVerticalGrid(GridCells.Fixed(3), Modifier.weight(1f)) {
                 items(saved, key = { it.id }) { t -> TemplateCell(t, Modifier.fillMaxWidth().height(140.dp)) { open(t) } }
             }
-            Box(Modifier.fillMaxWidth().height(48.dp).clickable { all = false }, Alignment.Center) { Text("Close", color = Am.Accent, fontSize = 18.sp) }
+            Box(Modifier.fillMaxWidth().height(48.dp).clickable { all = false }, Alignment.Center) { Text(stringResource(R.string.action_close), color = Am.Accent, fontSize = 18.sp) }
         }
     }
 }
@@ -198,23 +201,23 @@ private fun TemplateCell(template: SavedTemplate, modifier: Modifier, onClick: (
 private fun QuickBar(state: EditorState, modifier: Modifier) {
     var captions by remember { mutableStateOf(false) }
     Column(modifier) {
-        QuickItem("Freehand Brush", ChromeIcons.Freehand, height = 61.dp, iconTop = 7.dp, labelTop = 35.dp, onClick = { state.startFreehand() })
-        QuickItem("Pen Tool", ChromeIcons.VectorDrawing, height = 61.dp, iconTop = 6.5.dp, labelTop = 35.dp, onClick = { state.startVectorDrawing() })
-        QuickItem("Text", ChromeIcons.TextTool, height = 48.dp, iconTop = 4.dp, labelTop = 31.dp, onClick = { state.addText() })
-        QuickItem("Captions", ChromeIcons.Captions, height = 48.dp, iconTop = 4.dp, labelTop = 31.dp, onClick = { captions = true })
-        BarButton(ChromeIcons.CloseThick, "Close", Modifier.fillMaxWidth().weight(1f)) { state.addOpen = false }
+        QuickItem(R.string.add_quick_freehand_brush, ChromeIcons.Freehand, height = 61.dp, iconTop = 7.dp, labelTop = 35.dp, onClick = { state.startFreehand() })
+        QuickItem(R.string.add_quick_pen_tool, ChromeIcons.VectorDrawing, height = 61.dp, iconTop = 6.5.dp, labelTop = 35.dp, onClick = { state.startVectorDrawing() })
+        QuickItem(R.string.add_quick_text, ChromeIcons.TextTool, height = 48.dp, iconTop = 4.dp, labelTop = 31.dp, onClick = { state.addText() })
+        QuickItem(R.string.add_quick_captions, ChromeIcons.Captions, height = 48.dp, iconTop = 4.dp, labelTop = 31.dp, onClick = { captions = true })
+        BarButton(ChromeIcons.CloseThick, stringResource(R.string.action_close), Modifier.fillMaxWidth().weight(1f)) { state.addOpen = false }
     }
     if (captions) CaptionsSheet(state) { captions = false }
 }
 
 @Composable
-private fun QuickItem(label: String, icon: ImageVector, height: Dp, iconTop: Dp, labelTop: Dp, onClick: () -> Unit) {
+private fun QuickItem(@StringRes label: Int, icon: ImageVector, height: Dp, iconTop: Dp, labelTop: Dp, onClick: () -> Unit) {
     Column(Modifier.fillMaxWidth().height(height).clickable(onClick = onClick), horizontalAlignment = Alignment.CenterHorizontally) {
         Spacer(Modifier.height(iconTop))
         Icon(icon, null, Modifier.size(24.dp), tint = Am.OnDark)
         Spacer(Modifier.height(labelTop - iconTop - 24.dp))
         Text(
-            label, Modifier.fillMaxWidth().padding(horizontal = 2.dp), color = Am.OnDark,
+            stringResource(label), Modifier.fillMaxWidth().padding(horizontal = 2.dp), color = Am.OnDark,
             fontSize = 9.sp, lineHeight = 10.5.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center,
         )
     }

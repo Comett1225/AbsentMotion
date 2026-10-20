@@ -25,6 +25,8 @@ import app.absentmotion.ui.editor.MenuRow
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Presence
 import kotlin.math.*
+import androidx.compose.ui.res.stringResource
+import app.absentmotion.R
 
 @Composable
 internal fun EffectSettings(state: EditorState, layer: Layer, instance: XmlNode, definition: EffectDefinition,
@@ -32,7 +34,7 @@ internal fun EffectSettings(state: EditorState, layer: Layer, instance: XmlNode,
     val enabled = definition.available
     if (definition.category != "move" && !(definition.native && definition.category == "repeat") && state.scene.hasChildren(layer)) {
         Row(Modifier.fillMaxWidth().height(38.dp).padding(horizontal = 8.dp).alpha(if (enabled) 1f else 0.35f), verticalAlignment = Alignment.CenterVertically) {
-            Text("Apply to Children", Modifier.weight(1f), color = Am.OnDark, fontSize = 14.sp)
+            Text(stringResource(R.string.apply_to_children), Modifier.weight(1f), color = Am.OnDark, fontSize = 14.sp)
             PanelSwitch(instance.appliesToChildren) { on ->
                 if (enabled) state.editSelected { it.withEffect(state.effectIndex) { node -> node.applyingToChildren(on) } }
             }

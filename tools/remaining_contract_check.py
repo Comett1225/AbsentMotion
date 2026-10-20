@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from pathlib import Path
+import re
 import subprocess
 import sys
 import unittest
@@ -19,6 +20,11 @@ def source(path):
 
 def kotlin(path):
     return source('app/src/main/kotlin/app/absentmotion/' + path)
+
+
+def english(key):
+    text = source('app/src/main/res/values/strings.xml')
+    return re.search(r'<string name="' + key + r'"[^>]*>(.*?)</string>', text, re.S).group(1)
 
 
 class RemainingContracts(unittest.TestCase):
@@ -62,7 +68,8 @@ class RemainingContracts(unittest.TestCase):
         self.assertIn('if (!mixed)', text)
         self.assertNotIn('if (mixed) image = std::move(mixed)', text)
         text = kotlin('media/VideoLibrary.kt')
-        self.assertIn('could not render the requested video frame', text)
+        self.assertIn('throw ExportError(txt(R.string.media_error_interp_render, txt(request.interpolation.label)))', text)
+        self.assertIn('could not render the requested video frame', english('media_error_interp_render'))
         exact = text.split('suspend fun exact(', 1)[1].split('private suspend fun decode', 1)[0]
         self.assertIn('throw e', exact)
         self.assertNotIn('if (image.timestamp / 1000 != pts) return false', text)

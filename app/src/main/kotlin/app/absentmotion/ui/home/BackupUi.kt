@@ -24,6 +24,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import app.absentmotion.i18n.UiText
+import app.absentmotion.i18n.text
+import app.absentmotion.i18n.txt
 import app.absentmotion.export.MediaStoreExport
 import app.absentmotion.export.freeSpace
 import app.absentmotion.library.AppSettings
@@ -42,10 +45,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import androidx.compose.ui.res.stringResource
+import app.absentmotion.R
 
-private class BackupTask(val title: String) {
+private class BackupTask(val title: UiText) {
     var progress by mutableFloatStateOf(0f)
-    var result by mutableStateOf<String?>(null)
+    var result by mutableStateOf<List<UiText>?>(null)
     @Volatile var stopped = false
 
     fun report(fraction: Float) {
@@ -61,7 +66,7 @@ internal fun BackupRows(settings: AppSettings, onRestored: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var task by remember { mutableStateOf<BackupTask?>(null) }
-    fun run(title: String, stoppedText: String, after: () -> Unit = {}, work: (BackupTask) -> String) {
+    fun run(title: UiText, stoppedText: UiText, after: () -> Unit = {}, work: (BackupTask) -> List<UiText>) {
         if (task != null) return
         val started = BackupTask(title)
         task = started
@@ -70,47 +75,47 @@ internal fun BackupRows(settings: AppSettings, onRestored: () -> Unit) {
                 try {
                     work(started)
                 } catch (e: Stopped) {
-                    stoppedText
+                    listOf(stoppedText)
                 } catch (e: ImportFailed) {
-                    e.message ?: "This file is not an AbsentMotion backup."
+                    listOf(e.text)
                 } catch (e: Exception) {
-                    Log.w("AMBackup", "$title failed", e)
-                    "Something went wrong: ${e.message ?: e.javaClass.simpleName}. Check the free storage and try again."
+                    Log.w("AMBackup", "backup task failed", e)
+                    listOf(txt(R.string.backup_error_generic, e.message ?: e.javaClass.simpleName))
                 }
             }
             after()
         }
     }
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-        if (uri != null) run("Restoring a backup", "Restore stopped. Projects restored before you stopped are kept; restoring the same backup again finishes the rest.", onRestored) {
+        if (uri != null) run(txt(R.string.backup_restoring_title), txt(R.string.backup_restore_stopped), onRestored) {
             restoreBackup(context, uri, it)
         }
     }
     Column(Modifier.fillMaxWidth()) {
-        LinkRow("Back up all projects") { run("Backing up all projects", "Backup stopped. No backup file was kept.") { backUp(context, it) } }
+        LinkRow(stringResource(R.string.backup_all_projects)) { run(txt(R.string.backup_backing_up_title), txt(R.string.backup_stopped)) { backUp(context, it) } }
         Spacer(Modifier.height(6.dp))
-        LinkRow("Restore from backup") { picker.launch(arrayOf("*/*")) }
+        LinkRow(stringResource(R.string.backup_restore)) { picker.launch(arrayOf("*/*")) }
         Spacer(Modifier.height(6.dp))
         Column(Modifier.padding(horizontal = 6.dp).fillMaxWidth().clip(RoundedCornerShape(7.dp)).background(Am.HomePanel)) {
-            SwitchRow("Weekly automatic backup (projects only)", settings.weeklyBackup, enabled = true) { settings.weeklyBackup = it }
+            SwitchRow(stringResource(R.string.backup_weekly), settings.weeklyBackup, enabled = true) { settings.weeklyBackup = it }
         }
     }
     task?.let { current ->
         AlertDialog(
             onDismissRequest = {},
-            title = { Text(current.title, color = Am.Navy) },
+            title = { Text(current.title.text(), color = Am.Navy) },
             text = {
                 Box(Modifier.fillMaxWidth().height(96.dp)) {
                     val result = current.result
                     if (result == null) Column {
                         LinearProgressIndicator(progress = { current.progress }, Modifier.fillMaxWidth().padding(top = 8.dp), color = Am.Accent)
                         Text("${(current.progress * 100).toInt()}%", Modifier.padding(top = 12.dp), color = Am.Navy, fontSize = 15.sp)
-                    } else Text(result, color = Am.Navy, fontSize = 15.sp)
+                    } else Text(result.map { it.text() }.joinToString(" "), color = Am.Navy, fontSize = 15.sp)
                 }
             },
             confirmButton = {
-                if (current.result == null) TextButton({ current.stopped = true }) { Text("Stop", color = Am.Navy) }
-                else TextButton({ task = null }) { Text("OK", color = Am.Navy) }
+                if (current.result == null) TextButton({ current.stopped = true }) { Text(stringResource(R.string.stop), color = Am.Navy) }
+                else TextButton({ task = null }) { Text(stringResource(R.string.ok), color = Am.Navy) }
             },
             containerColor = Am.Card,
         )
@@ -119,33 +124,33 @@ internal fun BackupRows(settings: AppSettings, onRestored: () -> Unit) {
 
 private fun stamp() = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HHmm"))
 
-private fun backUp(context: Context, task: BackupTask): String {
+private fun backUp(context: Context, task: BackupTask): List<UiText> {
     val root = context.filesDir
     val needed = Backup.files(root, includeMedia = true).sumOf { it.second.length() }
-    if (needed + (50L shl 20) > freeSpace()) return "Not enough free storage for the backup. It needs about ${fileSize(needed)}."
+    if (needed + (50L shl 20) > freeSpace()) return listOf(txt(R.string.backup_no_space, fileSize(needed)))
     val name = "AbsentMotion-backup-${stamp()}.${Backup.EXTENSION}"
     MediaStoreExport(context).save(null, name, "application/octet-stream") { out ->
         Backup.write(root, out, includeMedia = true) { done, total -> task.report(done.toFloat() / total) }
     }
     task.report(1f)
-    return "Saved as Documents/AbsentMotion/$name. It stays on this phone even if AbsentMotion is uninstalled; copy it to a computer or cloud storage to keep it safe."
+    return listOf(txt(R.string.backup_saved, name))
 }
 
-private fun restoreBackup(context: Context, uri: Uri, task: BackupTask): String {
+private fun restoreBackup(context: Context, uri: Uri, task: BackupTask): List<UiText> {
     val size = runCatching {
         context.contentResolver.query(uri, arrayOf(OpenableColumns.SIZE), null, null, null)?.use { if (it.moveToFirst() && !it.isNull(0)) it.getLong(0) else -1L }
     }.getOrNull() ?: -1L
-    if (size > 0 && context.filesDir.usableSpace < size + (100L shl 20)) return "Not enough free storage to restore this backup. It needs about ${fileSize(size)}."
-    val restored = (context.contentResolver.openInputStream(uri) ?: return "Could not open this file.").use { input ->
+    if (size > 0 && context.filesDir.usableSpace < size + (100L shl 20)) return listOf(txt(R.string.backup_restore_no_space, fileSize(size)))
+    val restored = (context.contentResolver.openInputStream(uri) ?: return listOf(txt(R.string.backup_open_failed))).use { input ->
         Backup.restore(ProjectStore(context), context.filesDir, input) { read -> if (size > 0) task.report(read.toFloat() / size) else task.report(0f) }
     }
     task.report(1f)
-    fun count(n: Int) = if (n == 1) "1 project" else "$n projects"
+    fun count(n: Int) = UiText.plural(R.plurals.backup_projects, n, n.toString())
     return listOfNotNull(
-        "Restored ${count(restored.added)}.",
-        restored.renamed.takeIf { it > 0 }?.let { "${count(it)} were added as separate copies because a different version was already here." },
-        restored.skipped.takeIf { it > 0 }?.let { "${count(it)} were already here and were left as they are." },
-    ).joinToString(" ")
+        txt(R.string.backup_restored, count(restored.added)),
+        restored.renamed.takeIf { it > 0 }?.let { txt(R.string.backup_restored_copies, count(it)) },
+        restored.skipped.takeIf { it > 0 }?.let { txt(R.string.backup_restored_skipped, count(it)) },
+    )
 }
 
 suspend fun autoBackupIfDue(context: Context, settings: AppSettings) = withContext(Dispatchers.IO) {

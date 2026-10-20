@@ -42,6 +42,8 @@ import app.absentmotion.ui.camera.CameraScreen
 import app.absentmotion.ui.theme.Am
 import androidx.compose.material3.Icon
 import kotlinx.coroutines.launch
+import androidx.compose.ui.res.stringResource
+import app.absentmotion.R
 
 @Composable
 internal fun MediaTab(state: EditorState, modifier: Modifier, library: AddLibrary) {
@@ -78,21 +80,23 @@ internal fun MediaTab(state: EditorState, modifier: Modifier, library: AddLibrar
                 Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED))
         }
     }
+    val viewAll = stringResource(R.string.view_all)
+    val allLabel = stringResource(R.string.mediatab_all)
     val shown = remember(files, album, query) { files.filter { (album == null || it.albumId == album) && matchesSearch(query, it.name, it.album) } }
     Column(modifier) {
-        SearchField(search, { search = it }, Modifier.padding(start = 6.dp, end = 6.dp, top = 6.dp).fillMaxWidth().height(32.dp), hint = "Search photos and videos")
+        SearchField(search, { search = it }, Modifier.padding(start = 6.dp, end = 6.dp, top = 6.dp).fillMaxWidth().height(32.dp), hint = stringResource(R.string.mediatab_search_hint))
         LazyHorizontalGrid(GridCells.Fixed(2), Modifier.fillMaxWidth().weight(1f).clipToBounds(), horizontalArrangement = Arrangement.spacedBy(0.dp)) {
             item(key = "albums") {
                 Column(Modifier.width(97.dp).padding(6.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                    Box(Modifier.fillMaxWidth().weight(1f).background(Am.Well).semantics { contentDescription = "View All" }.clickable {
+                    Box(Modifier.fillMaxWidth().weight(1f).background(Am.Well).semantics { contentDescription = viewAll }.clickable {
                         picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo))
                     }, Alignment.Center) { MediaGridIcon(Modifier.size(24.dp)) }
                     Box(Modifier.fillMaxWidth().weight(1f).background(Am.Well).clickable { albumsOpen = true }, Alignment.Center) {
-                        Text(files.firstOrNull { it.albumId == album }?.album ?: "All", color = Am.OnDark, fontSize = 16.sp, maxLines = 1)
+                        Text(files.firstOrNull { it.albumId == album }?.album ?: allLabel, color = Am.OnDark, fontSize = 16.sp, maxLines = 1)
                         MediaAlbumArrow(Modifier.align(Alignment.TopEnd).padding(3.dp).size(6.dp))
                         if (albumsOpen) Popup(onDismissRequest = { albumsOpen = false }, properties = PopupProperties(focusable = true)) {
                             Column(Modifier.width(220.dp).heightIn(max = 300.dp).background(Am.Field).verticalScroll(rememberScrollState())) {
-                                val albums = listOf(null to "All") + files.distinctBy { it.albumId }.map { it.albumId to it.album }
+                                val albums = listOf(null to allLabel) + files.distinctBy { it.albumId }.map { it.albumId to it.album }
                                 albums.forEach { (id, name) ->
                                     Box(Modifier.fillMaxWidth().height(44.dp).clickable { album = id; albumsOpen = false }.padding(horizontal = 16.dp), Alignment.CenterStart) {
                                         Text(name, color = Am.OnDark, fontSize = 15.sp, maxLines = 1)
@@ -109,11 +113,11 @@ internal fun MediaTab(state: EditorState, modifier: Modifier, library: AddLibrar
                     horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center,
                 ) {
                     Icon(CameraIcons.Camera, null, Modifier.size(24.dp), tint = Am.OnDark)
-                    Text("Camera", Modifier.padding(top = 4.dp), color = Am.OnDark, fontSize = 14.sp, maxLines = 1)
+                    Text(stringResource(R.string.camera), Modifier.padding(top = 4.dp), color = Am.OnDark, fontSize = 14.sp, maxLines = 1)
                 }
             }
             if (shown.isEmpty() && query.isNotBlank()) item(key = "none", span = { GridItemSpan(maxLineSpan) }) {
-                NoMatches(query, "photos or videos", Modifier.width(200.dp).fillMaxHeight())
+                NoMatches(query, R.string.search_no_photos_or_videos, Modifier.width(200.dp).fillMaxHeight())
             }
             items(shown, key = { it.uri.toString() }) { file ->
                 val bitmap by produceState<android.graphics.Bitmap?>(cachedMediaThumbnail(file.uri), file.uri, file.modified, library.mediaRevision) { value = mediaThumbnail(context, file.uri) }
@@ -144,7 +148,7 @@ internal fun EditorCamera(state: EditorState) {
         scope.launch {
             try {
                 val media = mediaDeclaration(context, uri)
-                if (media == null) android.widget.Toast.makeText(context, "Could not add the capture to the project.", android.widget.Toast.LENGTH_LONG).show()
+                if (media == null) android.widget.Toast.makeText(context, context.getString(R.string.mediatab_capture_failed), android.widget.Toast.LENGTH_LONG).show()
                 else if (video) state.addVideo(media) else state.addImage(media)
             } finally {
                 state.cameraOpen = false

@@ -1,5 +1,7 @@
 package app.absentmotion.ui.editor.panels
 
+import app.absentmotion.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -62,8 +64,9 @@ fun SpeedPanel(state: EditorState, layer: Layer, modifier: Modifier = Modifier) 
             PaceIcon(PanelIcons.Rabbit, Modifier.width(44.dp).height(40.dp))
         }
         Row(Modifier.offset(y = 153.dp).fillMaxWidth().height(34.dp).horizontalScroll(rememberScrollState()).padding(horizontal = 15.dp), Arrangement.spacedBy(6.dp)) {
-            for (ramp in SpeedRamp.entries) RampChip(ramp.label, true) { state.applySpeedRamp(ramp) }
-            RampChip("Freeze Frame", enabled[1]) { state.askNumber("Seconds", 2f) { state.freezeFrame(it) } }
+            for (ramp in SpeedRamp.entries) RampChip(stringResource(ramp.label), true) { state.applySpeedRamp(ramp) }
+            val secondsLabel = stringResource(R.string.speed_seconds)
+            RampChip(stringResource(R.string.speed_freeze_frame), enabled[1]) { state.askNumber(secondsLabel, 2f) { state.freezeFrame(it) } }
         }
     }
 }

@@ -1,6 +1,7 @@
 package app.absentmotion.ui.editor
 
 import app.absentmotion.platform.BackHandler
+import androidx.annotation.StringRes
 import androidx.compose.runtime.SideEffect
 import app.absentmotion.editor.KeyTarget
 import app.absentmotion.editor.toggleKeyframe
@@ -82,6 +83,8 @@ import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Presence
 import app.absentmotion.ui.theme.Swap
 import app.absentmotion.ui.theme.fadeBackground
+import androidx.compose.ui.res.stringResource
+import app.absentmotion.R
 
 @Composable
 fun LayerTools(state: EditorState, modifier: Modifier = Modifier) {
@@ -116,11 +119,11 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier) {
             Box(Modifier.fillMaxWidth().weight(1f)) {
                 Column(Modifier.fillMaxSize().clip(ToolShape).background(Am.Button).clickable { openPresets(state) }, Arrangement.Center, Alignment.CenterHorizontally) {
                     PanelIcon(PanelIcons.Star, Am.OnDark, size = 28.dp)
-                    Text("Presets", color = ToolLabel, fontSize = 13.sp)
+                    Text(stringResource(R.string.presets), color = ToolLabel, fontSize = 13.sp)
                 }
                 Box(Modifier.align(Alignment.TopEnd).padding(8.dp).size(48.dp, 28.dp).clip(ToolShape)
                     .background(Am.Button).clickable { state.effectBrowserOpen = true }, Alignment.Center) {
-                    Text("AI", color = Am.OnDark, fontSize = 13.sp)
+                    Text(stringResource(R.string.ai), color = Am.OnDark, fontSize = 13.sp)
                 }
             }
             Spacer(Modifier.height(49.px))
@@ -179,21 +182,21 @@ private val ToolShape = RoundedCornerShape(4.dp)
 private val Square = androidx.compose.foundation.shape.CornerSize(0.dp)
 private val ToolLabel get() = Am.OnDarkDim
 
-private class Tool(val label: String, val icon: ImageVector, val textSp: Float, val iconY: Float, val textY: Float)
+private class Tool(@StringRes val label: Int, val icon: ImageVector, val textSp: Float, val iconY: Float, val textY: Float)
 
-private val ColorFill = Tool("Fill & Color", PanelIcons.PaintBucket, 11f, 18.1f, 44.3f)
-private val BorderShadow = Tool("Frame & Shadow", PanelIcons.BorderShadow, 11f, 18.1f, 44.3f)
-private val Blending = Tool("Opacity & Blend Mode", PanelIcons.Blending, 11f, 18.3f, 44.3f)
-private val MoveTransform = Tool("Transform", PanelIcons.MoveTransform, 7.1f, 18.1f, 41.4f)
-private val EditShape = Tool("Shape Options", PanelIcons.EditShape, 10.2f, 16f, 42.5f)
-private val EditText = Tool("Edit Text", TextIcons.Edit, 10.8f, 16f, 42.5f)
-private val ElementPropsButton = Tool("Asset Properties", PanelIcons.EditShape, 7.1f, 16f, 42.5f)
-private val EditPoints = Tool("Edit Points", PanelIcons.EditShape, 10.8f, 16f, 42.5f)
-private val EditDrawing = Tool("Edit Drawing", PanelIcons.EditShape, 10.8f, 16f, 42.5f)
-private val CameraOptions = Tool("Camera Options", PanelIcons.Camera, 8.9f, 19.4f, 42.5f)
-private val ModelOptions = Tool("Model Options", PanelIcons.TabTilt, 8.9f, 19.4f, 42.5f)
-private val Presets = Tool("Presets", PanelIcons.Star, 8.9f, 19.4f, 42.1f)
-private val Effects = Tool("Effects", PanelIcons.Effects, 8.9f, 19.6f, 44.4f)
+private val ColorFill = Tool(R.string.layer_tool_fill_color, PanelIcons.PaintBucket, 11f, 18.1f, 44.3f)
+private val BorderShadow = Tool(R.string.layer_tool_frame_shadow, PanelIcons.BorderShadow, 11f, 18.1f, 44.3f)
+private val Blending = Tool(R.string.layer_tool_opacity_blend, PanelIcons.Blending, 11f, 18.3f, 44.3f)
+private val MoveTransform = Tool(R.string.layer_tool_transform, PanelIcons.MoveTransform, 7.1f, 18.1f, 41.4f)
+private val EditShape = Tool(R.string.layer_tool_shape_options, PanelIcons.EditShape, 10.2f, 16f, 42.5f)
+private val EditText = Tool(R.string.layer_tool_edit_text, TextIcons.Edit, 10.8f, 16f, 42.5f)
+private val ElementPropsButton = Tool(R.string.asset_properties, PanelIcons.EditShape, 7.1f, 16f, 42.5f)
+private val EditPoints = Tool(R.string.layer_tool_edit_points, PanelIcons.EditShape, 10.8f, 16f, 42.5f)
+private val EditDrawing = Tool(R.string.layer_tool_edit_drawing, PanelIcons.EditShape, 10.8f, 16f, 42.5f)
+private val CameraOptions = Tool(R.string.layer_tool_camera_options, PanelIcons.Camera, 8.9f, 19.4f, 42.5f)
+private val ModelOptions = Tool(R.string.layer_tool_model_options, PanelIcons.TabTilt, 8.9f, 19.4f, 42.5f)
+private val Presets = Tool(R.string.presets, PanelIcons.Star, 8.9f, 19.4f, 42.1f)
+private val Effects = Tool(R.string.layer_tool_effects, PanelIcons.Effects, 8.9f, 19.6f, 44.4f)
 
 @Composable
 private fun SmallTool(icon: ImageVector, modifier: Modifier, shape: RoundedCornerShape, enabled: Boolean = true, onClick: () -> Unit = {}) {
@@ -214,7 +217,7 @@ private fun ToolButton(tool: Tool, modifier: Modifier, enabled: Boolean = true, 
     ) {
         PanelIcon(tool.icon, Am.OnDark, Modifier.align(Alignment.TopCenter).offset(y = (tool.iconY - 12f).dp))
         Text(
-            tool.label, Modifier.align(Alignment.TopCenter).offset(y = (tool.textY - tool.textSp * 0.6f).dp),
+            stringResource(tool.label), Modifier.align(Alignment.TopCenter).offset(y = (tool.textY - tool.textSp * 0.6f).dp),
             color = ToolLabel, fontSize = tool.textSp.sp, lineHeight = (tool.textSp * 1.2f).sp, maxLines = 1, softWrap = false,
         )
     }
@@ -249,9 +252,9 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
         return
     }
     val target = if (named) known else state.keyTarget
-    if (askDeleteSpeed) AlertDialog(onDismissRequest = { askDeleteSpeed = false }, title = { Text("Remove every keyframe?") },
-        confirmButton = { TextButton({ askDeleteSpeed = false; state.deleteSpeedKeyframes() }) { Text("Delete", color = Am.Accent) } },
-        dismissButton = { TextButton({ askDeleteSpeed = false }) { Text("Cancel", color = Am.Accent) } }, containerColor = Am.Field, titleContentColor = Am.OnDark, textContentColor = Am.OnDark)
+    if (askDeleteSpeed) AlertDialog(onDismissRequest = { askDeleteSpeed = false }, title = { Text(stringResource(R.string.remove_every_keyframe)) },
+        confirmButton = { TextButton({ askDeleteSpeed = false; state.deleteSpeedKeyframes() }) { Text(stringResource(R.string.delete), color = Am.Accent) } },
+        dismissButton = { TextButton({ askDeleteSpeed = false }) { Text(stringResource(R.string.cancel), color = Am.Accent) } }, containerColor = Am.Field, titleContentColor = Am.OnDark, textContentColor = Am.OnDark)
     Row(modifier.background(Am.Panel)) {
         Column(Modifier.width(168.px).heightIn(max = PanelHeight).fillMaxHeight()) {
             FrameButton(PanelIcons.Back, Modifier.weight(1f).fillMaxWidth()) { state.stepBack() }

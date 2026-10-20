@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.sp
 import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.MultiSelect
 import app.absentmotion.library.PreviewQuality
+import androidx.compose.ui.res.stringResource
 import app.absentmotion.ui.theme.Am
 
 private val PanelBg = Color(0xFF333750)
@@ -56,7 +57,7 @@ internal fun PreviewModePanel(state: EditorState, modifier: Modifier = Modifier)
         ModeCell(cell, hasCamera, { state.cameraMode = !state.cameraMode }) { CameraIcon(state.cameraMode, hasCamera) }
         val quality = state.settings.previewQuality
         ModeCell(cell, true, { state.settings.previewQuality = PreviewQuality.entries[(quality.ordinal + 1) % PreviewQuality.entries.size] }) {
-            Text(quality.name, color = if (quality == PreviewQuality.Full) Color.White else Am.Accent, fontSize = 10.sp, maxLines = 1)
+            Text(stringResource(quality.label), color = if (quality == PreviewQuality.Full) Color.White else Am.Accent, fontSize = 10.sp, maxLines = 1)
         }
         val fullBlur = state.settings.fullMotionBlur
         ModeCell(cell, true, { state.settings.fullMotionBlur = !fullBlur }) {

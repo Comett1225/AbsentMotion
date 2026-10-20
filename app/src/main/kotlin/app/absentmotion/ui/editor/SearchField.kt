@@ -33,6 +33,8 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import app.absentmotion.R
 import app.absentmotion.ui.theme.Am
 import kotlinx.coroutines.delay
 import java.text.Normalizer
@@ -65,7 +67,7 @@ internal fun SearchField(
     text: String,
     onChange: (String) -> Unit,
     modifier: Modifier,
-    hint: String = "Search",
+    hint: String = stringResource(R.string.search_hint),
     background: Color = Am.Field,
     content: Color = Am.OnDark,
     faint: Color = Am.OnDarkDim,
@@ -88,15 +90,15 @@ internal fun SearchField(
             },
         )
         Box(Modifier.size(32.dp).then(if (text.isEmpty()) Modifier else Modifier.clickable { onChange(""); focus.clearFocus() }), Alignment.Center) {
-            if (text.isNotEmpty()) Icon(ChromeIcons.CloseThick, "Clear search", Modifier.size(16.dp), tint = content)
+            if (text.isNotEmpty()) Icon(ChromeIcons.CloseThick, stringResource(R.string.search_clear), Modifier.size(16.dp), tint = content)
         }
     }
 }
 
 @Composable
-internal fun NoMatches(query: String, what: String, modifier: Modifier, color: Color = Am.OnDarkDim, size: TextUnit = 13.sp) {
+internal fun NoMatches(query: String, @androidx.annotation.StringRes message: Int, modifier: Modifier, color: Color = Am.OnDarkDim, size: TextUnit = 13.sp) {
     Box(modifier, Alignment.Center) {
-        Text("No $what match “${query.trim()}”", Modifier.padding(horizontal = 12.dp), color = color, fontSize = size, maxLines = 3,
+        Text(stringResource(message, query.trim()), Modifier.padding(horizontal = 12.dp), color = color, fontSize = size, maxLines = 3,
             textAlign = TextAlign.Center)
     }
 }

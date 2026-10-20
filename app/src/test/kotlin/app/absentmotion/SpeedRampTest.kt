@@ -47,7 +47,7 @@ class SpeedRampTest {
         }
         assertEquals(4f, speeds(SpeedRamp.JumpCut).max())
         assertEquals(1f, speeds(SpeedRamp.JumpCut).first())
-        assertEquals(listOf("Montage", "Hero", "Bullet", "Jump Cut", "Flash In", "Flash Out"), SpeedRamp.entries.map { it.label })
+        assertEquals(listOf("Montage", "Hero", "Bullet", "JumpCut", "FlashIn", "FlashOut"), SpeedRamp.entries.map { it.name })
     }
 
     @Test fun applyingAPresetKeepsTheMediaAndRetimesTheClip() {

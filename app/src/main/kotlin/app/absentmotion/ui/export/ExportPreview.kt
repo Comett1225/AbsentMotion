@@ -1,6 +1,8 @@
 package app.absentmotion.ui.export
 
+import app.absentmotion.R
 import app.absentmotion.i18n.Ltr
+import androidx.compose.ui.res.stringResource
 import android.app.Activity
 import android.content.Context
 import android.graphics.ImageDecoder
@@ -134,9 +136,9 @@ private fun SequencePreview(uris: List<Uri>) {
     Column(Modifier.fillMaxSize()) {
         Box(Modifier.weight(1f).fillMaxWidth()) { StillImage(uris[index]) }
         Row(Modifier.fillMaxWidth().height(62.dp), verticalAlignment = Alignment.CenterVertically) {
-            StepButton(ExportIcons.Prev, "Previous", index > 0) { index-- }
+            StepButton(ExportIcons.Prev, stringResource(R.string.export_previous), index > 0) { index-- }
             Text("${index + 1} / ${uris.size}", Modifier.weight(1f), color = Am.OnScrim, fontSize = 13.sp, textAlign = TextAlign.Center)
-            StepButton(ExportIcons.Next, "Next", index < uris.size - 1) { index++ }
+            StepButton(ExportIcons.Next, stringResource(R.string.export_next), index < uris.size - 1) { index++ }
         }
     }
 }
@@ -264,7 +266,7 @@ private fun VideoPreview(uri: Uri) {
         Ltr { Row(Modifier.fillMaxWidth().height(62.dp).fadeInWhen(ready, from = 0.35f), verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.size(62.dp).clickable(enabled = ready, onClick = ::toggle), contentAlignment = Alignment.Center) {
                 Crossfade(playing, animationSpec = Motion.fast(), label = "play") {
-                    Icon(if (it) ExportIcons.Pause else ExportIcons.Play, if (it) "Pause" else "Play", tint = Am.OnScrim)
+                    Icon(if (it) ExportIcons.Pause else ExportIcons.Play, stringResource(if (it) R.string.export_pause else R.string.export_play), tint = Am.OnScrim)
                 }
             }
             SeekBar(

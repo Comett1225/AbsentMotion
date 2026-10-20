@@ -47,11 +47,10 @@ import app.absentmotion.ui.export.ExportIcons
 import app.absentmotion.ui.theme.Am
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import androidx.compose.ui.res.stringResource
+import app.absentmotion.R
 
 private const val HOME_PAGE = "https://github.com/Comett1225/AbsentMotion"
-private const val LICENCE_LINE = "Free and open source, licensed under the Apache License 2.0."
-private const val INDEPENDENT_NOTE = "AbsentMotion is an independent project. It is not affiliated with, endorsed by or sponsored by any other app maker; names of other products belong to their owners."
-private const val COMPATIBILITY_NOTE = "AbsentMotion can open scene XML files and .amproj packages exported from Alight Motion, and it exports scene XML in the same format. It saves its own packages as .absproj."
 
 internal const val LICENCES_ASSET = "licenses.txt"
 
@@ -73,27 +72,27 @@ fun AboutScreen(onClose: () -> Unit) {
 private fun AboutPage(onClose: () -> Unit, onLicences: () -> Unit) {
     val version = appVersion()
     Column(Modifier.fillMaxSize().navigationBarsPadding()) {
-        TitleBar("About", HomeIcons.Close, "Close", onClose)
+        TitleBar(stringResource(R.string.settings_about), HomeIcons.Close, stringResource(R.string.action_close), onClose)
         Column(Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp)) {
             Spacer(Modifier.height(24.dp))
             Text("AbsentMotion", color = Am.Navy, fontSize = 26.sp, fontWeight = FontWeight.Bold)
-            if (version.isNotEmpty()) Text("Version $version", Modifier.padding(top = 2.dp), color = Am.HomeMid, fontSize = 14.sp)
+            if (version.isNotEmpty()) Text(stringResource(R.string.about_version, version), Modifier.padding(top = 2.dp), color = Am.HomeMid, fontSize = 14.sp)
             Spacer(Modifier.height(20.dp))
-            Body(LICENCE_LINE)
+            Body(stringResource(R.string.about_licence_line))
             Spacer(Modifier.height(12.dp))
-            Body(INDEPENDENT_NOTE)
+            Body(stringResource(R.string.about_independent_note))
             Spacer(Modifier.height(12.dp))
-            Body(COMPATIBILITY_NOTE)
+            Body(stringResource(R.string.about_compatibility_note))
             Spacer(Modifier.height(20.dp))
             Row(
                 Modifier.fillMaxWidth().height(44.dp).clip(RowShape).background(Am.Card).clickable(onClick = onLicences).padding(start = 15.dp, end = 7.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text("Open source licences", Modifier.weight(1f), color = Am.HomeInk, fontSize = 14.sp)
+                Text(stringResource(R.string.open_source_licences), Modifier.weight(1f), color = Am.HomeInk, fontSize = 14.sp)
                 Icon(HomeIcons.ChevronRight, null, Modifier.size(24.dp), tint = Am.HomeMid)
             }
             Spacer(Modifier.height(24.dp))
-            Text("Project home page", color = Am.HomeMid, fontSize = 12.sp)
+            Text(stringResource(R.string.project_home_page), color = Am.HomeMid, fontSize = 12.sp)
             SelectionContainer { Text(HOME_PAGE, Modifier.padding(top = 2.dp), color = Am.HomeInk, fontSize = 14.sp) }
             Spacer(Modifier.height(24.dp))
         }
@@ -125,11 +124,11 @@ private fun LicencesPage(onBack: () -> Unit) {
         }
     }
     Column(Modifier.fillMaxSize().navigationBarsPadding()) {
-        TitleBar("Open source licences", ExportIcons.Back, "Back", onBack)
+        TitleBar(stringResource(R.string.open_source_licences), ExportIcons.Back, stringResource(R.string.home_back), onBack)
         val shown = parts
         if (shown == null || shown.isEmpty()) {
             Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
-                Text(if (shown == null) "Loading…" else "The licence text could not be read.", color = Am.HomeMid, fontSize = 14.sp)
+                Text(stringResource(if (shown == null) R.string.about_loading else R.string.about_licence_unreadable), color = Am.HomeMid, fontSize = 14.sp)
             }
         } else LazyColumn(Modifier.weight(1f).fillMaxWidth(), contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)) {
             items(shown) { part ->

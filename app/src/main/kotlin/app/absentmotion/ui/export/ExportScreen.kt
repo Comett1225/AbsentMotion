@@ -1,5 +1,7 @@
 package app.absentmotion.ui.export
 
+import app.absentmotion.i18n.AppText
+import app.absentmotion.i18n.text
 import app.absentmotion.platform.Log
 import app.absentmotion.model.mediaUris
 import app.absentmotion.platform.BackHandler
@@ -287,7 +289,7 @@ fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromProjectList
         }
         free = freeSpace()
         if (kind != ExportKind.Gif && storageStatus(estimate, free) is StorageStatus.NotEnough) {
-            failure = Failure("Not Enough Storage", (storageStatus(estimate, free) as StorageStatus.NotEnough).message)
+            failure = Failure("Not Enough Storage", AppText.get((storageStatus(estimate, free) as StorageStatus.NotEnough).message))
             return
         }
         val chosen = kind
@@ -508,7 +510,7 @@ private fun InfoBlock(free: Long, estimate: Long, timeMs: Long?, heat: ThermalLe
         Divider()
         InfoRow("Estimated file size", if (estimate < 0) "Calculating..." else formatBytes(estimate), false)
         Divider()
-        InfoRow("Estimated export time", timeMs?.let(::timeLabel) ?: "Unknown", false)
+        InfoRow("Estimated export time", timeMs?.let { timeLabel(it).text() } ?: "Unknown", false)
         Divider()
         InfoRow("Phone temperature", thermalLabel(heat), heat >= ThermalLevel.Hot)
     }

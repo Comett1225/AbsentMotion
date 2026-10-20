@@ -8,7 +8,9 @@ import android.media.MediaCodecList
 import android.media.MediaFormat
 import android.util.Log
 import android.view.Surface
+import app.absentmotion.R
 import app.absentmotion.engine.EngineThread
+import app.absentmotion.i18n.txt
 import app.absentmotion.model.Scene
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
@@ -59,7 +61,7 @@ internal suspend fun exportVideo(
     val info = MediaCodecList(MediaCodecList.REGULAR_CODECS).codecInfos
         .filter { it.isEncoder && mime in it.supportedTypes }.sortedByDescending { it.isHardwareAccelerated }
         .firstOrNull { it.getCapabilitiesForType(mime).videoCapabilities!!.isSizeSupported(width, height) }
-        ?: error("This phone cannot encode ${s.codec.label} at ${width}x$height")
+        ?: throw ExportError(txt(R.string.export_error_cannot_encode, s.codec.label, "${width}x$height"))
     val caps = info.getCapabilitiesForType(mime)
     val format = MediaFormat.createVideoFormat(mime, width, height).apply {
         setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface)
@@ -124,7 +126,7 @@ internal suspend fun exportVideo(
                         val image = writer.dequeueInputImage()
                         try {
                             val drawn = image.hardwareBuffer!!.use { renderInto(it, frameTimeMs(scene, s.fps, k)) }
-                            check(drawn) { "The engine could not draw frame $k" }
+                            exportCheck(drawn) { txt(R.string.export_error_draw_frame, k.toString()) }
                             image.timestamp = presentNs
                             writer.queueInputImage(image)
                         } catch (t: Throwable) {
@@ -139,7 +141,7 @@ internal suspend fun exportVideo(
             } else {
                 val target = attach(input)
                 try {
-                    eachFrame { k, presentNs -> check(render(target, frameTimeMs(scene, s.fps, k), presentNs)) { "The engine could not draw frame $k" } }
+                    eachFrame { k, presentNs -> exportCheck(render(target, frameTimeMs(scene, s.fps, k), presentNs)) { txt(R.string.export_error_draw_frame, k.toString()) } }
                 } finally {
                     detach(target)
                 }

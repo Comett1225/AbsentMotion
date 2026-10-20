@@ -53,6 +53,8 @@ import app.absentmotion.model.Pt
 import app.absentmotion.platform.LocalContext
 import app.absentmotion.ui.theme.Am
 import kotlin.math.min
+import androidx.compose.ui.res.stringResource
+import app.absentmotion.R
 
 @Composable
 internal fun TrackOverlay(state: EditorState, mode: TrackMode, modifier: Modifier) {
@@ -119,6 +121,10 @@ internal fun TrackOverlay(state: EditorState, mode: TrackMode, modifier: Modifie
     }
 }
 
+private val RangeLabels = mapOf(
+    TrackRange.Forward to R.string.track_forward, TrackRange.Backward to R.string.track_backward, TrackRange.Whole to R.string.track_whole_clip,
+)
+
 @Composable
 internal fun TrackPanel(state: EditorState, mode: TrackMode) {
     val context = LocalContext.current
@@ -126,28 +132,28 @@ internal fun TrackPanel(state: EditorState, mode: TrackMode) {
     DisposableEffect(mode) { onDispose { mode.job?.cancel() } }
     val idle = !mode.running
     Column(Modifier.fillMaxSize().padding(horizontal = 12.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        Choices("Track", listOf("Position" to 1, "Position, Rotation & Scale" to 2), mode.points.size, idle) { state.setTrackPointCount(mode, it) }
-        Choices("Direction", TrackRange.entries.map { it.label to it }, mode.range, idle && mode.lostFrame == null) { mode.range = it }
+        Choices(stringResource(R.string.track_track), listOf(stringResource(R.string.track_position) to 1, stringResource(R.string.track_position_rotation_scale) to 2), mode.points.size, idle) { state.setTrackPointCount(mode, it) }
+        Choices(stringResource(R.string.track_direction), TrackRange.entries.map { stringResource(RangeLabels.getValue(it)) to it }, mode.range, idle && mode.lostFrame == null) { mode.range = it }
         TargetChoice(state, mode, idle && mode.lostFrame == null)
         Row(Modifier.fillMaxWidth().height(64.dp), verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.weight(1f).fillMaxHeight(), Alignment.CenterStart) {
                 if (mode.running) {
                     Column {
-                        Text("Tracking… ${(mode.progress * 100).toInt()}%", color = Am.OnDark, fontSize = 12.sp, maxLines = 1)
+                        Text(stringResource(R.string.track_tracking, (mode.progress * 100).toInt().toString()), color = Am.OnDark, fontSize = 12.sp, maxLines = 1)
                         LinearProgressIndicator(progress = { mode.progress }, Modifier.fillMaxWidth().padding(top = 6.dp), color = Am.Accent)
                     }
                 } else {
                     Text(
-                        mode.message.ifEmpty { if (mode.points.size > 1) "Drag both boxes onto two details of the same object, far apart." else "Drag the box onto a sharp detail that stays visible." },
+                        mode.message.ifEmpty { stringResource(if (mode.points.size > 1) R.string.track_hint_two else R.string.track_hint_one) },
                         color = if (mode.lostFrame != null) Am.Warning else Am.Caption, fontSize = 12.sp, lineHeight = 15.sp, maxLines = 4,
                     )
                 }
             }
             val resume = mode.lostFrame != null
-            ActionChip(if (mode.running) "Cancel" else if (resume) "Continue" else "Track", true) {
+            ActionChip(stringResource(if (mode.running) R.string.cancel else if (resume) R.string.action_continue else R.string.track_track), true) {
                 if (mode.running) mode.job?.cancel() else state.runTracking(context, mode, scope, resume)
             }
-            ActionChip("Done", idle) { state.leaveDrawing() }
+            ActionChip(stringResource(R.string.done), idle) { state.leaveDrawing() }
         }
     }
 }
@@ -176,11 +182,11 @@ private fun TargetChoice(state: EditorState, mode: TrackMode, enabled: Boolean) 
     val targets = video?.let(state.scene::trackTargets).orEmpty()
     val chosen = mode.target?.let { id -> targets.firstOrNull { it.id == id } }
     Row(Modifier.fillMaxWidth().height(34.dp).alpha(if (enabled) 1f else DimAlpha), verticalAlignment = Alignment.CenterVertically) {
-        Text("Apply to", Modifier.width(72.dp), color = Am.Caption, fontSize = 12.sp, maxLines = 1)
+        Text(stringResource(R.string.apply_to), Modifier.width(72.dp), color = Am.Caption, fontSize = 12.sp, maxLines = 1)
         Box(Modifier.weight(1f).fillMaxHeight().clip(RoundedCornerShape(6.dp)).background(Am.PanelInset).clickable(enabled = enabled) { open = true }.padding(horizontal = 10.dp), Alignment.CenterStart) {
-            Text(chosen?.let { it.label.ifEmpty { it.kind } } ?: "New Null", color = Am.OnDark, fontSize = 12.sp, maxLines = 1)
+            Text(chosen?.let { it.label.ifEmpty { it.kind } } ?: stringResource(R.string.track_new_null), color = Am.OnDark, fontSize = 12.sp, maxLines = 1)
             if (open) MenuPopup(DropOrRise, { open = false }) {
-                MenuRow("New Null") { mode.target = null; open = false }
+                MenuRow(stringResource(R.string.track_new_null)) { mode.target = null; open = false }
                 for (layer in targets) MenuRow(layer.label.ifEmpty { layer.kind }) { mode.target = layer.id; open = false }
             }
         }

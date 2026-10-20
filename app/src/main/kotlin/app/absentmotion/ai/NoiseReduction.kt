@@ -1,5 +1,7 @@
 package app.absentmotion.ai
 
+import app.absentmotion.R
+import app.absentmotion.i18n.AppText
 import android.content.Context
 import app.absentmotion.audio.PcmDecoder
 import app.absentmotion.audio.Resampler
@@ -36,16 +38,16 @@ internal object NoiseReduction {
                         coroutineContext.ensureActive()
                         val chunk = decoder.next() ?: break
                         if (rate == 0) rate = chunk.rate
-                        check(rate > 0 && rate == chunk.rate) { "Audio sample rate changed during decoding" }
+                        check(rate > 0 && rate == chunk.rate) { AppText.get(R.string.ai_sample_rate_changed) }
                         for (i in 0 until chunk.frames) pcm.writeFloat((chunk.pcm[2 * i].toInt() + chunk.pcm[2 * i + 1].toInt()) / 65536f)
                         frames += chunk.frames
-                        check(frames * 2 <= 0xFFFFFFFFL - 36) { "This recording is too large for WAV" }
+                        check(frames * 2 <= 0xFFFFFFFFL - 36) { AppText.get(R.string.ai_recording_too_large) }
                         val percent = if (decoder.durationUs > 0) ((chunk.ptsUs * 30 / decoder.durationUs).toInt()).coerceIn(0, 30) else 0
-                        if (percent != reported) { progress(percent / 100f, "Decoding audio…"); reported = percent }
+                        if (percent != reported) { progress(percent / 100f, AppText.get(R.string.ai_decoding_audio)); reported = percent }
                     }
                 }
             }
-            check(frames > 0 && rate > 0) { "No audio samples were decoded" }
+            check(frames > 0 && rate > 0) { AppText.get(R.string.ai_no_samples_decoded) }
             val noiseFrames = (frames.toDouble() * 48000 / rate).roundToLong().coerceAtLeast(1)
             val handle = nativeCreate()
             try {
@@ -63,7 +65,7 @@ internal object NoiseReduction {
                     resample(decoded, frames, rate, 48000, noiseFrames) { block, _, done ->
                         denoise(block)
                         val percent = (done * 60 / noiseFrames).toInt()
-                        if (percent != reported) { progress(0.3f + percent / 100f, "Reducing noise…"); reported = percent }
+                        if (percent != reported) { progress(0.3f + percent / 100f, AppText.get(R.string.ai_reducing_noise)); reported = percent }
                     }
                     coroutineContext.ensureActive()
                     denoise(FloatArray(480))
@@ -83,7 +85,7 @@ internal object NoiseReduction {
                     for (i in 0 until count) bytes.putShort((block[i] * 32768f).roundToInt().coerceIn(-32768, 32767).toShort())
                     wav.write(bytes.array(), 0, count * 2)
                     val percent = (done * 10 / frames).toInt()
-                    if (percent != reported) { progress(0.9f + percent / 100f, "Saving cleaned audio…"); reported = percent }
+                    if (percent != reported) { progress(0.9f + percent / 100f, AppText.get(R.string.ai_saving_cleaned_audio)); reported = percent }
                 }
             }
             coroutineContext.ensureActive()

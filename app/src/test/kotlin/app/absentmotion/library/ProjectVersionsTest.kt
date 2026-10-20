@@ -1,5 +1,7 @@
 package app.absentmotion.library
 
+import app.absentmotion.i18n.AppText
+import app.absentmotion.R
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -79,7 +81,7 @@ class ProjectVersionsTest {
         assertEquals(3, all.size)
         assertTrue(all.getValue("p9").damaged)
         assertEquals("Holiday & Beach", all.getValue("p9").title)
-        assertEquals("Damaged project", all.getValue("p8").title)
+        assertEquals(AppText.get(R.string.library_damaged_project), all.getValue("p8").title)
         assertFalse(all.values.single { it.title == "fine" }.damaged)
     }
 }

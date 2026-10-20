@@ -35,6 +35,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import app.absentmotion.R
 import app.absentmotion.editor.MultiSelect
 import app.absentmotion.editor.EditorPanel
 import app.absentmotion.editor.EditorState
@@ -74,12 +76,12 @@ fun EditorTopBar(state: EditorState, onExit: () -> Unit, modifier: Modifier = Mo
     Row(modifier.animatedBackground(color), verticalAlignment = Alignment.CenterVertically) {
         BarButton(
             if (layer == null) ChromeIcons.Exit else ChromeIcons.Back,
-            if (layer == null) "Exit to project list" else "Back", cell,
+            stringResource(if (layer == null) R.string.topbar_exit_to_project_list else R.string.topbar_back), cell,
         ) {
             act { if (layer == null) onExit() else state.stepBack() }
         }
         if (inPanel) {
-            Text(state.panel.title, Modifier.weight(1f).enterFade(), color = Am.OnDark, fontSize = 15.sp, maxLines = 1)
+            Text(stringResource(state.panel.title), Modifier.weight(1f).enterFade(), color = Am.OnDark, fontSize = 15.sp, maxLines = 1)
         } else {
             key(layer?.id) {
                 val id = layer?.id
@@ -89,8 +91,8 @@ fun EditorTopBar(state: EditorState, onExit: () -> Unit, modifier: Modifier = Mo
             }
         }
         if (layer == null) {
-            BarButton(ChromeIcons.Gear, "Project settings", cell.enterFade()) { act { settingsOpen = true } }
-            BarButton(ChromeIcons.Share, "Export & Share", cell.enterFade()) { act { state.playing = false; state.exportOpen = true } }
+            BarButton(ChromeIcons.Gear, stringResource(R.string.topbar_project_settings), cell.enterFade()) { act { settingsOpen = true } }
+            BarButton(ChromeIcons.Share, stringResource(R.string.topbar_export_share), cell.enterFade()) { act { state.playing = false; state.exportOpen = true } }
         } else if (!inPanel) {
             Spacer(Modifier.width(5.dp))
             Box(cell.enterFade().clickable { act { parentMenuOpen = true } }, contentAlignment = Alignment.Center) {
@@ -98,9 +100,9 @@ fun EditorTopBar(state: EditorState, onExit: () -> Unit, modifier: Modifier = Mo
                 if (parentMenuOpen) ParentMenu(state) { parentMenuOpen = false }
             }
             Spacer(Modifier.width(6.dp))
-            BarButton(ChromeIcons.Trash, "Delete layer", cell.enterFade()) { act { state.deleteSelected() } }
+            BarButton(ChromeIcons.Trash, stringResource(R.string.topbar_delete_layer), cell.enterFade()) { act { state.deleteSelected() } }
             Spacer(Modifier.width(1.dp))
-            BarButton(ChromeIcons.More, "Layer menu", cell.enterFade()) { act { layerMenuOpen = true } }
+            BarButton(ChromeIcons.More, stringResource(R.string.topbar_layer_menu), cell.enterFade()) { act { layerMenuOpen = true } }
         }
         Presence(layer != null && !inPanel && layerMenuOpen) { LayerMenu(state) { layerMenuOpen = false } }
         Presence(settingsOpen) { ProjectSettingsPopup(state) { settingsOpen = false } }

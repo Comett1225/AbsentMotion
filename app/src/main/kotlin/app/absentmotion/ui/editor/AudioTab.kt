@@ -54,6 +54,8 @@ import app.absentmotion.ui.theme.Am
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.math.sin
+import androidx.compose.ui.res.stringResource
+import app.absentmotion.R
 
 private val TilePalettes = listOf(
     0xFF85A776 to 0xFF8C7968, 0xFFE9B96A to 0xFF895060, 0xFFD26E72 to 0xFF772F54, 0xFFB1BD93 to 0xFF4F8F7A,
@@ -87,7 +89,7 @@ internal fun AudioTab(state: EditorState, modifier: Modifier, library: AddLibrar
     DisposableEffect(Unit) { onDispose { preview.stop() } }
 
     Column(modifier) {
-        SearchField(search, { search = it }, Modifier.padding(start = 6.dp, end = 6.dp, top = 6.dp).fillMaxWidth().height(32.dp), hint = "Search music and sounds")
+        SearchField(search, { search = it }, Modifier.padding(start = 6.dp, end = 6.dp, top = 6.dp).fillMaxWidth().height(32.dp), hint = stringResource(R.string.audiotab_search_hint))
         LazyHorizontalGrid(GridCells.Fixed(2), Modifier.fillMaxWidth().weight(1f).clipToBounds()) {
             item(key = "viewAll") {
                 Box(Modifier.width(80.dp).fillMaxHeight(), Alignment.Center) {
@@ -96,7 +98,7 @@ internal fun AudioTab(state: EditorState, modifier: Modifier, library: AddLibrar
                         horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center,
                     ) {
                         MediaGridIcon(Modifier.size(20.dp))
-                        Text("View All", Modifier.padding(top = 4.dp), color = Am.OnDark, fontSize = 14.sp, maxLines = 1)
+                        Text(stringResource(R.string.view_all), Modifier.padding(top = 4.dp), color = Am.OnDark, fontSize = 14.sp, maxLines = 1)
                     }
                 }
             }
@@ -107,12 +109,12 @@ internal fun AudioTab(state: EditorState, modifier: Modifier, library: AddLibrar
                         horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center,
                     ) {
                         Icon(ChromeIcons.Captions, null, Modifier.size(20.dp), tint = Am.OnDark)
-                        Text("Text to Speech", Modifier.padding(top = 4.dp), color = Am.OnDark, fontSize = 11.sp, maxLines = 1)
+                        Text(stringResource(R.string.text_to_speech), Modifier.padding(top = 4.dp), color = Am.OnDark, fontSize = 11.sp, maxLines = 1)
                     }
                 }
             }
             if (shown.isEmpty() && query.isNotBlank()) item(key = "none", span = { GridItemSpan(maxLineSpan) }) {
-                NoMatches(query, "sounds", Modifier.width(200.dp).fillMaxHeight())
+                NoMatches(query, R.string.search_no_sounds, Modifier.width(200.dp).fillMaxHeight())
             }
             items(shown, key = { it.uri.toString() }) { file ->
                 val (top, bottom) = TilePalettes[file.title.hashCode().mod(TilePalettes.size)]
@@ -133,7 +135,7 @@ internal fun AudioTab(state: EditorState, modifier: Modifier, library: AddLibrar
                                     scope.launch { adding = true; try { audioDeclaration(context, file.uri)?.let { state.keepCopy(context, it) }?.let { state.addAudio(it) } } finally { adding = false } }
                                 },
                             Alignment.Center,
-                        ) { Icon(ChromeIcons.Plus, "Add", Modifier.size(16.dp), tint = Color.White) }
+                        ) { Icon(ChromeIcons.Plus, stringResource(R.string.audiotab_add), Modifier.size(16.dp), tint = Color.White) }
                     }
                 }
             }

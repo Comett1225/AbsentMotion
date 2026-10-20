@@ -77,7 +77,14 @@ class AppLanguageTest {
     }
 
     private fun strings(file: File): Map<String, String> =
-        Regex("""<string name="([a-z0-9_]+)"[^>]*>(.*?)</string>""", RegexOption.DOT_MATCHES_ALL).findAll(file.readText()).associate { it.groupValues[1] to it.groupValues[2] }
+        Regex("""<string name="([a-z0-9_]+)"([^>]*)>(.*?)</string>""", RegexOption.DOT_MATCHES_ALL).findAll(file.readText())
+            .filter { "translatable=\"false\"" !in it.groupValues[2] }.associate { it.groupValues[1] to it.groupValues[3] }
+
+    private fun plurals(file: File): Map<String, Map<String, String>> =
+        Regex("""<plurals name="([a-z0-9_]+)"[^>]*>(.*?)</plurals>""", RegexOption.DOT_MATCHES_ALL).findAll(file.readText()).associate { p ->
+            p.groupValues[1] to Regex("""<item quantity="([a-z]+)">(.*?)</item>""", RegexOption.DOT_MATCHES_ALL).findAll(p.groupValues[2])
+                .associate { it.groupValues[1] to it.groupValues[2] }
+        }
 
     @Test fun everyLanguageHasEveryStringWithTheSamePlaceholders() {
         val english = strings(File(res, "values/strings.xml"))
@@ -93,6 +100,22 @@ class AppLanguageTest {
                     placeholders.findAll(text).map { it.value }.sorted().toList(), placeholders.findAll(local.getValue(key)).map { it.value }.sorted().toList())
                 assertTrue("empty ${file.parentFile.name} $key", local.getValue(key).isNotBlank())
                 assertTrue("unescaped apostrophe in ${file.parentFile.name} $key", !Regex("""(?<!\\)'""").containsMatchIn(local.getValue(key)))
+            }
+        }
+        val englishPlurals = plurals(File(res, "values/strings.xml"))
+        for (language in AppLanguage.entries) {
+            val file = File(res, folder(language) + "/strings.xml")
+            val local = plurals(file)
+            assertEquals("plurals differ in ${file.parentFile.name}", englishPlurals.keys, local.keys)
+            for ((key, forms) in englishPlurals) {
+                val wanted = placeholders.findAll(forms.getValue("other")).map { it.value }.toSet()
+                val got = local.getValue(key)
+                assertTrue("no other form in ${file.parentFile.name} $key", "other" in got)
+                assertEquals("placeholders differ in ${file.parentFile.name} $key", wanted, placeholders.findAll(got.getValue("other")).map { it.value }.toSet())
+                for ((q, text) in got) {
+                    assertTrue("${file.parentFile.name} $key $q", text.isNotBlank() && wanted.containsAll(placeholders.findAll(text).map { it.value }.toSet()))
+                    assertTrue("unescaped apostrophe in ${file.parentFile.name} $key", !Regex("""(?<!\\)'""").containsMatchIn(text))
+                }
             }
         }
         val folders = res.listFiles()!!.filter { File(it, "strings.xml").isFile }.map { it.name }.toSet()

@@ -1,5 +1,8 @@
 package app.absentmotion.library
 
+import app.absentmotion.i18n.txt
+import app.absentmotion.i18n.UiText
+import app.absentmotion.R
 import app.absentmotion.model.XmlNode
 import app.absentmotion.model.mediaUris
 import org.json.JSONArray
@@ -28,8 +31,11 @@ class ImporterSecurityTest {
         return out.toByteArray()
     }
 
-    private fun failure(importer: Importer, bytes: ByteArray): String =
-        try { importer.import { ByteArrayInputStream(bytes) }; fail("imported"); "" } catch (e: ImportFailed) { e.message!! }
+    private val tooLarge = setOf(R.string.library_err_package_large, R.string.library_err_media_large, R.string.library_err_project_files_large, R.string.library_err_xml_large)
+    private val malformedScene = setOf(R.string.library_err_no_project, R.string.library_err_scene_needs_size, R.string.library_err_scene_too_big, R.string.library_err_scene_fps)
+
+    private fun failure(importer: Importer, bytes: ByteArray): UiText =
+        try { importer.import { ByteArrayInputStream(bytes) }; fail("imported"); txt(0) } catch (e: ImportFailed) { e.text }
 
     private fun scene(vararg body: String) = """<scene title="Crafted" width="10" height="10">${body.joinToString("")}</scene>"""
 
@@ -55,7 +61,7 @@ class ImporterSecurityTest {
         assertFalse(node.toXml().contains("\"$settings\"") || node.toXml().contains("\"$project\""))
         val missing = node.children.filter { it.name == "media" && it["missing"] == "true" }.map { it["uri"] }.toSet()
         assertEquals(setOf("blocked-$settings", "blocked-$project", "blocked-file:///etc/hosts", "x://elsewhere"), missing)
-        assertEquals(listOf("settings.json"), report.sections.first { it.first == "Media not found" }.second.filter { it == "settings.json" })
+        assertEquals(listOf(reportText("settings.json")), report.sections.first { it.first == txt(R.string.library_report_media) }.second.filter { it == reportText("settings.json") })
     }
 
     @Test fun aCraftedPackageKeepsItsOwnMediaAndLosesTheRest() {
@@ -80,14 +86,14 @@ class ImporterSecurityTest {
     @Test fun aPackageWithTooManyEntriesIsRefusedBeforeAnythingIsSaved() {
         val files = tmp.newFolder("files")
         val entries = listOf("project.xml" to scene().toByteArray(), "manifest.json" to "{}".toByteArray()) + (1..4).map { "media/$it.bin" to ByteArray(1) }
-        assertTrue(failure(importer(files, ImportLimits(entries = 5)), zip(entries)).contains("too many files"))
+        assertEquals(R.string.library_err_too_many_files, failure(importer(files, ImportLimits(entries = 5)), zip(entries)).id)
         assertEquals(1, importer(files, ImportLimits(entries = 6)).import { ByteArrayInputStream(zip(entries)) }.size)
     }
 
     @Test fun aPackageWithTooManyScenesIsRefused() {
         val files = tmp.newFolder("files")
         val bytes = zip((1..3).map { "s$it.xml" to scene().toByteArray() } + ("manifest.json" to "{}".toByteArray()))
-        assertTrue(failure(importer(files, ImportLimits(scenes = 2)), bytes).contains("too many projects"))
+        assertEquals(R.string.library_err_too_many_projects, failure(importer(files, ImportLimits(scenes = 2)), bytes).id)
         assertEquals(emptyList<ProjectInfo>(), ProjectStore(files).list())
         assertEquals(3, importer(files, ImportLimits(scenes = 3)).import { ByteArrayInputStream(bytes) }.size)
     }
@@ -96,7 +102,7 @@ class ImporterSecurityTest {
         val files = tmp.newFolder("files")
         val bytes = zip(listOf("project.xml" to scene().toByteArray(), "manifest.json" to "{}".toByteArray(), "unused.bin" to ByteArray(300_000)))
         assertTrue(bytes.size < 5_000)
-        assertTrue(failure(importer(files, ImportLimits(unpacked = 100_000)), bytes).contains("too large"))
+        assertTrue(failure(importer(files, ImportLimits(unpacked = 100_000)), bytes).id in tooLarge)
         assertEquals(emptyList<ProjectInfo>(), ProjectStore(files).list())
         assertEquals(1, importer(files, ImportLimits(unpacked = 400_000)).import { ByteArrayInputStream(bytes) }.size)
     }
@@ -106,7 +112,7 @@ class ImporterSecurityTest {
         fun withPicture(n: Int) = scene("""<shape id="$n" fillType="media" fillImage="x://a"/>""")
         val manifest = JSONObject().put("media", JSONArray().put(JSONObject().put("uri", "x://a").put("entry", "a.jpg")))
         val bytes = zip(listOf("one.xml" to withPicture(1).toByteArray(), "two.xml" to withPicture(2).toByteArray(), "a.jpg" to ByteArray(60_000), "manifest.json" to manifest.toString().toByteArray()))
-        assertTrue(failure(importer(files, ImportLimits(unpacked = 100_000)), bytes).contains("too large"))
+        assertTrue(failure(importer(files, ImportLimits(unpacked = 100_000)), bytes).id in tooLarge)
         assertEquals(emptyList<ProjectInfo>(), ProjectStore(files).list())
         assertEquals(emptyList<String>(), File(files, "media").list().orEmpty().toList())
         assertEquals(2, importer(files, ImportLimits(unpacked = 130_000)).import { ByteArrayInputStream(bytes) }.size)
@@ -116,7 +122,7 @@ class ImporterSecurityTest {
         val files = tmp.newFolder("files")
         val big = scene("""<shape id="1" label="${"x".repeat(2_000)}"/>""").toByteArray()
         val bytes = zip(listOf("one.xml" to big, "two.xml" to big, "manifest.json" to "{}".toByteArray()))
-        assertTrue(failure(importer(files, ImportLimits(sceneText = 3_000)), bytes).contains("too large"))
+        assertTrue(failure(importer(files, ImportLimits(sceneText = 3_000)), bytes).id in tooLarge)
         assertEquals(2, importer(files, ImportLimits(sceneText = 5_000)).import { ByteArrayInputStream(bytes) }.size)
     }
 
@@ -137,7 +143,7 @@ class ImporterSecurityTest {
             outcome = try { failure(importer(files), nested(20_000).toByteArray()) } catch (t: Throwable) { t }
         }, "small-stack", 512L * 1024)
         worker.start(); worker.join()
-        assertTrue("$outcome", outcome is String && (outcome as String).startsWith("Malformed XML"))
+        assertTrue("$outcome", outcome is UiText && (outcome as UiText).id == R.string.library_err_malformed_xml)
         assertEquals(emptyList<ProjectInfo>(), ProjectStore(files).list())
         assertEquals(1, importer(files).import { ByteArrayInputStream(nested(200).toByteArray()) }.size)
     }
@@ -147,7 +153,7 @@ class ImporterSecurityTest {
         val manifest = JSONObject().put("media", JSONArray().put(JSONObject().put("uri", "x://a").put("entry", "a.jpg")))
         val bytes = zip(listOf("ok.xml" to scene("""<shape id="1" fillType="media" fillImage="x://a"/>""").toByteArray(),
             "bad.xml" to "<scene title=\"Broken\" height=\"10\"/>".toByteArray(), "a.jpg" to "jpg".toByteArray(), "manifest.json" to manifest.toString().toByteArray()))
-        assertTrue(failure(importer(files), bytes).startsWith("Malformed Scene"))
+        assertTrue(failure(importer(files), bytes).id in malformedScene)
         assertEquals(emptyList<ProjectInfo>(), ProjectStore(files).list())
         assertEquals(emptyList<String>(), File(files, "media").list().orEmpty().toList())
     }

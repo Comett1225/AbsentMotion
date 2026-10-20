@@ -1,5 +1,10 @@
 package app.absentmotion.ai
 
+import androidx.annotation.StringRes
+import app.absentmotion.R
+import app.absentmotion.i18n.AppText
+import app.absentmotion.i18n.UiText
+import app.absentmotion.i18n.txt
 import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -21,15 +26,15 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.UUID
 
-enum class AiAction(val title: String) {
-    Background("Remove Background"), Noise("Reduce Noise"), Video("Remove Background (video)");
+enum class AiAction(@StringRes val title: Int) {
+    Background(R.string.ai_remove_background), Noise(R.string.ai_reduce_noise), Video(R.string.ai_remove_background_video);
 
     val offered: Boolean get() = this == Noise || BackgroundRemoval.AVAILABLE
 
-    fun unavailable(layer: Layer?): String? = when (this) {
-        Background -> if (layer?.mediaFill?.video == false) null else "Select an image layer"
-        Noise -> if (layer?.kind == "audio") null else "Select an audio layer"
-        Video -> if (layer?.mediaFill?.video == true) null else "Select a video layer"
+    fun unavailable(layer: Layer?): UiText? = when (this) {
+        Background -> if (layer?.mediaFill?.video == false) null else txt(R.string.ai_select_image_layer)
+        Noise -> if (layer?.kind == "audio") null else txt(R.string.ai_select_audio_layer)
+        Video -> if (layer?.mediaFill?.video == true) null else txt(R.string.ai_select_video_layer)
     }
 }
 
@@ -49,20 +54,20 @@ class AiTools(private val context: Context, private val state: EditorState, priv
     var videoSide by mutableIntStateOf(MatteSides[1])
     private var job: Job? = null
 
-    fun cancel() { job?.cancel(); message = "Cancelling…" }
+    fun cancel() { job?.cancel(); message = AppText.get(R.string.ai_cancelling) }
     fun dismiss() { message = ""; retry = null }
 
     fun apply(action: AiAction, confirmed: Boolean = false) {
         if (running != null) return
         val layer = state.selectedId?.let(state.scene::layer)
-        action.unavailable(layer)?.let { message = it; return }
+        action.unavailable(layer)?.let { message = AppText.get(it); return }
         layer ?: return
         if (action == AiAction.Video && !confirmed) {
             videoSetup = layer
             return
         }
         videoSetup = null
-        running = action; progress = 0f; message = "Preparing…"; retry = null
+        running = action; progress = 0f; message = AppText.get(R.string.ai_preparing); retry = null
         job = scope.launch {
             var result: AiMedia? = null
             var committed = false
@@ -71,12 +76,12 @@ class AiTools(private val context: Context, private val state: EditorState, priv
                     withContext(Dispatchers.Main) { progress = fraction.coerceIn(0f, 1f); message = text }
                 }
                 if (action == AiAction.Video) {
-                    val media = checkNotNull(state.scene.media(layer.mediaFill!!.uri)) { "This video is missing from the project" }
+                    val media = checkNotNull(state.scene.media(layer.mediaFill!!.uri)) { AppText.get(R.string.ai_video_missing) }
                     val matte = withContext(Dispatchers.IO) { VideoBackground.run(context, layer, media, videoSide, report).also { result = it.media } }
                     ensureActive()
-                    check(state.scene.layer(layer.id) == layer) { "The layer changed; run the tool again" }
+                    check(state.scene.layer(layer.id) == layer) { AppText.get(R.string.ai_layer_changed) }
                     val groupId = Layer.newId()
-                    val next = checkNotNull(state.scene.withVideoMatte(layer, matte.media.declaration, matte.frameWidth, matte.frameHeight, Layer.newId(), groupId)) { "This layer cannot be masked" }
+                    val next = checkNotNull(state.scene.withVideoMatte(layer, matte.media.declaration, matte.frameWidth, matte.frameHeight, Layer.newId(), groupId)) { AppText.get(R.string.ai_cannot_mask) }
                     state.edit { next }
                     state.selectedId = groupId
                 } else {
@@ -89,7 +94,7 @@ class AiTools(private val context: Context, private val state: EditorState, priv
                         }
                     }
                     ensureActive()
-                    check(state.scene.layer(layer.id) == layer) { "The layer changed; run the tool again" }
+                    check(state.scene.layer(layer.id) == layer) { AppText.get(R.string.ai_layer_changed) }
                     val output = result!!
                     state.edit { scene ->
                         scene.update(layer.id) { it.copy(node = it.node.with(
@@ -102,15 +107,15 @@ class AiTools(private val context: Context, private val state: EditorState, priv
                 state.panel = EditorPanel.Tools
                 state.effectBrowserOpen = false
             } catch (_: CancellationException) {
-                message = "Cancelled"
+                message = AppText.get(R.string.ai_cancelled)
             } catch (e: ModelNotReady) {
-                message = e.message ?: "The background removal model is not ready yet"; retry = action
+                message = e.message ?: AppText.get(R.string.ai_model_not_ready_default); retry = action
             } catch (e: Exception) {
-                message = e.message ?: "Unable to process this media"; retry = action
+                message = e.message ?: AppText.get(R.string.ai_unable_to_process); retry = action
             } catch (_: OutOfMemoryError) {
-                message = if (action == AiAction.Background) "Not enough memory to process this image" else "Not enough memory to process this media"; retry = action
+                message = AppText.get(if (action == AiAction.Background) R.string.ai_out_of_memory_image else R.string.ai_out_of_memory_media); retry = action
             } catch (_: LinkageError) {
-                message = if (action == AiAction.Noise) "Noise reduction is unavailable in this build" else "Background removal is unavailable in this build"
+                message = AppText.get(if (action == AiAction.Noise) R.string.ai_noise_unavailable else R.string.ai_background_unavailable)
             } finally {
                 if (!committed) result?.file?.delete()
                 running = null
@@ -120,8 +125,8 @@ class AiTools(private val context: Context, private val state: EditorState, priv
 }
 
 internal fun aiFile(context: Context, extension: String): File {
-    val directory = File(checkNotNull(context.getExternalFilesDir(null)) { "Media storage is unavailable" }, "ai")
-    check(directory.isDirectory || directory.mkdirs()) { "Cannot create AI media storage" }
+    val directory = File(checkNotNull(context.getExternalFilesDir(null)) { AppText.get(R.string.ai_storage_unavailable) }, "ai")
+    check(directory.isDirectory || directory.mkdirs()) { AppText.get(R.string.ai_storage_cannot_create) }
     return File(directory, "${UUID.randomUUID()}.$extension")
 }
 

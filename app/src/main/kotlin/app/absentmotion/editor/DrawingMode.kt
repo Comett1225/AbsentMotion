@@ -1,5 +1,7 @@
 package app.absentmotion.editor
 
+import app.absentmotion.R
+import app.absentmotion.i18n.AppText
 import app.absentmotion.platform.Color
 import app.absentmotion.platform.Matrix
 import androidx.compose.runtime.getValue
@@ -94,7 +96,7 @@ private fun EditorState.enter(layer: Layer, mode: DrawingMode, created: Boolean)
 }
 
 fun EditorState.startFreehand() {
-    val layer = newLayer("Drawing", "drawing", "none", 0, emptyList())
+    val layer = newLayer(AppText.get(R.string.model_layer_drawing), "drawing", "none", 0, emptyList())
     enter(layer, FreehandMode(layer.id, created = true), created = true)
 }
 
@@ -105,7 +107,7 @@ fun EditorState.editDrawing() {
 
 fun EditorState.startVectorDrawing() {
     val colour = Color.rgb(Random.nextInt(200) + 55, Random.nextInt(200) + 55, Random.nextInt(200) + 55)
-    val layer = newLayer("Shape", "shape", "color", colour, listOf(XmlNode("path", mapOf("d" to ""))))
+    val layer = newLayer(AppText.get(R.string.shape_name_shape), "shape", "color", colour, listOf(XmlNode("path", mapOf("d" to ""))))
     enter(layer, PointMode(layer.id, created = true, vector = true).apply { point = -1; handle = Handle.Add }, created = true)
 }
 

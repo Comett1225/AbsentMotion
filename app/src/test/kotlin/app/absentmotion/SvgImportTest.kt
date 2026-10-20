@@ -1,5 +1,6 @@
 package app.absentmotion
 
+import app.absentmotion.i18n.txt
 import app.absentmotion.model.Layer
 import app.absentmotion.model.Pt
 import app.absentmotion.model.Scene
@@ -100,8 +101,8 @@ class SvgImportTest {
         assertEquals("#ff000000", g["endColor"])
         assertEquals(0f, g["start"]!!.split(',')[0].toFloat(), 1e-3f)
         assertEquals(1f, g["end"]!!.split(',')[0].toFloat(), 1e-3f)
-        assertTrue(result.skipped.contains("text"))
-        assertTrue(result.skipped.any { it.startsWith("extra gradient colours") })
+        assertTrue(result.skipped.contains(txt(R.string.model_svg_skipped_text)))
+        assertTrue(result.skipped.contains(txt(R.string.model_svg_skipped_gradient_colours)))
     }
 
     @Test fun groupTransformsAreAppliedToTheShapes() {
@@ -225,7 +226,7 @@ class SvgImportTest {
             </svg>
         """)
         assertEquals("shape", result.layer!!.kind)
-        assertEquals(listOf("images", "text", "clipping paths", "masks", "filters"), result.skipped)
+        assertEquals(listOf(R.string.model_svg_skipped_images, R.string.model_svg_skipped_text, R.string.model_svg_skipped_clipping, R.string.model_svg_skipped_masks, R.string.model_svg_skipped_filters).map { txt(it) }, result.skipped)
     }
 
     @Test fun anEmptyOrForeignFileIsRejected() {

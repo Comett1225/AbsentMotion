@@ -48,6 +48,7 @@ import app.absentmotion.library.ProjectVersions
 import app.absentmotion.library.Recovery
 import app.absentmotion.library.RecoveryHandler
 import app.absentmotion.library.RecoveryOffer
+import app.absentmotion.library.ImportFailed
 import app.absentmotion.library.ImportReport
 import app.absentmotion.library.Importer
 import app.absentmotion.library.MediaKeeper
@@ -114,6 +115,7 @@ class MainActivity : ComponentActivity() {
         val started = SystemClock.elapsedRealtime()
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        app.absentmotion.i18n.AppText.install(this)
         followScreenSize(resources.configuration)
         store = ProjectStore(this)
         settings = AppSettings(this)
@@ -159,7 +161,7 @@ class MainActivity : ComponentActivity() {
                                 lifecycleScope.launch {
                                     val project = try { withContext(Dispatchers.IO) { templates.createProject(scene, store) } }
                                     catch (e: java.io.IOException) {
-                                        Toast.makeText(this@MainActivity, "Could not create the project. Free some storage space.", Toast.LENGTH_LONG).show()
+                                        Toast.makeText(this@MainActivity, getString(R.string.home_create_project_failed), Toast.LENGTH_LONG).show()
                                         return@launch
                                     }
                                     editingTemplate = null
@@ -212,10 +214,10 @@ class MainActivity : ComponentActivity() {
                     }
                 } catch (e: Exception) {
                     Log.w("AMImport", "cannot import $uri", e)
-                    failure = failure ?: e.message ?: "Unsupported file type"
+                    failure = failure ?: (e as? ImportFailed)?.text?.resolve(this@MainActivity) ?: e.message ?: getString(R.string.library_err_unsupported_type)
                 }
             }
-            failure?.let { Toast.makeText(this@MainActivity, "Import Failed\n$it", Toast.LENGTH_LONG).show() }
+            failure?.let { Toast.makeText(this@MainActivity, getString(R.string.home_import_failed, it), Toast.LENGTH_LONG).show() }
             if (reports.isNotEmpty()) imported = reports
         }
     }
@@ -232,7 +234,7 @@ class MainActivity : ComponentActivity() {
             val id = Layer.newId()
             val copied = local.withCopiedLayerIds().node
             val inner = copied.copy(children = copied.children.filterNot { it.name == "media" })
-            val layer = Layer(XmlNode("embedScene", linkedMapOf("id" to "$id", "label" to local.title.ifBlank { "Template" }, "startTime" to "$start", "endTime" to "${start + local.totalTime}"),
+            val layer = Layer(XmlNode("embedScene", linkedMapOf("id" to "$id", "label" to local.title.ifBlank { getString(R.string.template) }, "startTime" to "$start", "endTime" to "${start + local.totalTime}"),
                 listOf(XmlNode("transform", children = listOf(XmlNode("location", mapOf("value" to formatFloats(floatArrayOf(state.scene.width / 2f, state.scene.height / 2f, 0f)))))), inner)))
             state.edit { it.add(layer, local.media) }
             state.selectedId = id
@@ -283,7 +285,7 @@ class MainActivity : ComponentActivity() {
     private suspend fun openNow(id: String): EditorState? {
         val scene = loadInBackground(id) ?: return null
         cameFromEditor = true
-        val saver = ProjectSaver(id, store, recovery, failed = { runOnUiThread { Toast.makeText(this, "Could not save the project. Free some storage space.", Toast.LENGTH_LONG).show() } })
+        val saver = ProjectSaver(id, store, recovery, failed = { runOnUiThread { Toast.makeText(this, getString(R.string.home_save_project_failed), Toast.LENGTH_LONG).show() } })
         return EditorState(id, scene, store, engine, settings, saver).also { editor = it }
     }
 
@@ -305,12 +307,12 @@ class MainActivity : ComponentActivity() {
             } } finally { opening = false }
             projectsChanged++
             val message = when {
-                result == null -> "Could not read this project."
-                result.copied == 0 && result.unreadable == 0 && !result.noSpace -> "All media is already kept in the project."
+                result == null -> getString(R.string.home_collect_unreadable_project)
+                result.copied == 0 && result.unreadable == 0 && !result.noSpace -> getString(R.string.home_collect_already_kept)
                 else -> listOfNotNull(
-                    "Copied ${result.copied} file${if (result.copied == 1) "" else "s"} into the project.",
-                    result.unreadable.takeIf { it > 0 }?.let { "$it could not be read; they may have been deleted." },
-                    "Storage is full, so some files were not copied.".takeIf { result.noSpace },
+                    resources.getQuantityString(R.plurals.home_collect_copied, result.copied, result.copied.toString()),
+                    result.unreadable.takeIf { it > 0 }?.let { getString(R.string.home_collect_could_not_read, it.toString()) },
+                    getString(R.string.home_collect_storage_full).takeIf { result.noSpace },
                 ).joinToString(" ")
             }
             Toast.makeText(this@MainActivity, message, Toast.LENGTH_LONG).show()
@@ -326,7 +328,7 @@ class MainActivity : ComponentActivity() {
             }
             projectsChanged++
             when {
-                !done -> Toast.makeText(this@MainActivity, "Could not restore your edits. Free some storage space; you will be asked again next time.", Toast.LENGTH_LONG).show()
+                !done -> Toast.makeText(this@MainActivity, getString(R.string.home_restore_edits_failed), Toast.LENGTH_LONG).show()
                 restore -> open(offer.id)
                 else -> recovered = withContext(DiskThread.dispatcher) { runCatching { recovery.pending(store) }.getOrNull() }
             }
@@ -345,9 +347,9 @@ class MainActivity : ComponentActivity() {
             } finally { opening = false }
             projectsChanged++
             when {
-                !restored -> Toast.makeText(this@MainActivity, "Could not restore this version. Free some storage space.", Toast.LENGTH_LONG).show()
+                !restored -> Toast.makeText(this@MainActivity, getString(R.string.home_restore_version_failed), Toast.LENGTH_LONG).show()
                 state != null && editor === state -> openNow(id)
-                else -> Toast.makeText(this@MainActivity, "Version restored", Toast.LENGTH_SHORT).show()
+                else -> Toast.makeText(this@MainActivity, getString(R.string.home_version_restored), Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -364,7 +366,7 @@ class MainActivity : ComponentActivity() {
             if (closing.saver.failing && !closeAnyway) {
                 closeAnyway = true
                 closingEditor = false
-                Toast.makeText(this@MainActivity, "Your last changes could not be saved. Free some storage space and close again, or close again to leave without them.", Toast.LENGTH_LONG).show()
+                Toast.makeText(this@MainActivity, getString(R.string.home_close_save_failed), Toast.LENGTH_LONG).show()
                 return@launch
             }
             closeAnyway = false

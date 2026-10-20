@@ -1,5 +1,7 @@
 package app.absentmotion.ui.editor.panels
 
+import app.absentmotion.R
+import androidx.compose.ui.res.stringResource
 import app.absentmotion.model.PropRef
 import app.absentmotion.editor.KeyTarget
 import androidx.compose.runtime.SideEffect
@@ -61,7 +63,7 @@ internal fun EditShapePanel(state: EditorState, layer: Layer, modifier: Modifier
     SideEffect { state.keyTarget = activeParam?.let { KeyTarget(PropRef.shape(it.prop), layer.propText(it.prop) ?: it.default, it.kind.type) } }
     Column(modifier.verticalScroll(rememberScrollState())) {
         params.forEachIndexed { i, param ->
-            val edit = ShapeEdit(state, layer, param)
+            val edit = ShapeEdit(state, layer, param, stringResource(param.label))
             val activate = { activeRow = i }
             val active = activeRow == i
             when (param.kind) {
@@ -74,7 +76,7 @@ internal fun EditShapePanel(state: EditorState, layer: Layer, modifier: Modifier
     }
 }
 
-private class ShapeEdit(val state: EditorState, val layer: Layer, val param: ShapeParam) {
+private class ShapeEdit(val state: EditorState, val layer: Layer, val param: ShapeParam, val label: String) {
     val values = numbers(layer, param)
     val isOn = (layer.propText(param.prop) ?: param.default).trim() == "true"
 
@@ -90,7 +92,7 @@ private class ShapeEdit(val state: EditorState, val layer: Layer, val param: Sha
 
     fun openKeypad(box: Int) {
         val pair = param.kind == Kind.Size || param.kind == Kind.Point
-        val fields = if (pair) listOf(KeypadField("X", values[0]), KeypadField("Y", values[1])) else listOf(KeypadField(param.label, values[0]))
+        val fields = if (pair) listOf(KeypadField("X", values[0]), KeypadField("Y", values[1])) else listOf(KeypadField(label, values[0]))
         state.keypad = KeypadRequest(fields, if (pair) box else 0) { v ->
             val entered = FloatArray(v.size) { if (param.kind == Kind.Count) v[it].roundToInt().coerceAtLeast(MIN_COUNT).toFloat() else v[it] }
             state.editSelected { it.withProp(param.prop, param.kind.type, formatFloats(entered)) }
@@ -115,7 +117,7 @@ private fun LabelTile(edit: ShapeEdit, active: Boolean, topPad: Dp, onActivate: 
         contentAlignment = Alignment.Center,
     ) {
         Text(
-            edit.param.label, Modifier.padding(horizontal = 1.dp), color = if (active) Am.Accent else Am.OnDark, fontSize = 10.5.sp,
+            edit.label, Modifier.padding(horizontal = 1.dp), color = if (active) Am.Accent else Am.OnDark, fontSize = 10.5.sp,
             lineHeight = 13.sp, maxLines = 1, softWrap = false, textAlign = TextAlign.Center,
         )
     }
@@ -271,7 +273,7 @@ private fun CountSlider(value: Int, onValue: (Int) -> Unit, onEnd: () -> Unit, m
 private fun ToggleRow(edit: ShapeEdit) {
     Row(Modifier.fillMaxWidth().height(104.px), verticalAlignment = Alignment.CenterVertically) {
         Spacer(Modifier.width(23.px))
-        Text(edit.param.label, Modifier.weight(1f), color = Am.OnDark, fontSize = 14.5.sp, maxLines = 1)
+        Text(edit.label, Modifier.weight(1f), color = Am.OnDark, fontSize = 14.5.sp, maxLines = 1)
         Canvas(Modifier.size(132.px, 68.px).clickable { edit.flip() }) {
             val u = 1.px.toPx()
             val on = edit.isOn

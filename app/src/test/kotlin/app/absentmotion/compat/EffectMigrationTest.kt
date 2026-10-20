@@ -1,6 +1,9 @@
 package app.absentmotion.compat
 
 import app.absentmotion.TestData
+import app.absentmotion.i18n.txt
+import app.absentmotion.i18n.UiText
+import app.absentmotion.R
 import app.absentmotion.effects.EffectCatalog
 import app.absentmotion.library.Importer
 import app.absentmotion.library.ProjectStore
@@ -285,9 +288,9 @@ class EffectMigrationTest {
         val store = ProjectStore(tmp.newFolder())
         val report = Importer(store, migration = migration, canRun = { catalog.find(it) != null }).import { scene.byteInputStream() }.single()
         val sections = report.sections.toMap()
-        assertEquals(listOf("example.effects.unknown").map { it.substringAfterLast('.') + " (1 layer)" }, sections["Effects this version cannot run"])
-        assertEquals(18, sections["Effects turned into this app's own"]!!.size)
-        assertTrue(sections["Effect settings that could not be carried over"]!!.isNotEmpty())
+        assertEquals(listOf(UiText.plural(R.plurals.library_report_effect_layers, 1, "unknown", "1")), sections[txt(R.string.library_report_cannot_run)])
+        assertEquals(18, sections[txt(R.string.library_report_converted)]!!.size)
+        assertTrue(sections[txt(R.string.library_report_dropped)]!!.isNotEmpty())
         assertEquals(20, effects(store.load(report.id)!!.node).size)
     }
 

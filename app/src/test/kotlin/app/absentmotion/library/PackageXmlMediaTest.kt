@@ -1,5 +1,6 @@
 package app.absentmotion.library
 
+import app.absentmotion.R
 import app.absentmotion.model.mediaUris
 import java.io.ByteArrayOutputStream
 import java.util.zip.ZipEntry
@@ -33,6 +34,6 @@ class PackageXmlMediaTest {
     @Test fun aMissingManifestProjectDoesNotSilentlySelectSomeOtherXml() {
         val bytes = archive("""{"project":"absent.xml","media":[]}""")
         try { Importer(ProjectStore(tmp.newFolder())).import { bytes.inputStream() }; fail("missing project accepted") }
-        catch (e: ImportFailed) { assertTrue(e.message!!.contains("project", true)) }
+        catch (e: ImportFailed) { assertEquals(R.string.library_err_package_project_missing, e.text.id) }
     }
 }

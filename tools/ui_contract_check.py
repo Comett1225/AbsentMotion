@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from pathlib import Path
+import re
 import subprocess
 import sys
 import unittest
@@ -16,6 +17,11 @@ def source(relative):
         return subprocess.check_output(['git', 'show', REVISION + ':' + path], cwd=ROOT, text=True)
     return (ROOT / path).read_text()
 
+def english(key):
+    path = 'app/src/main/res/values/strings.xml'
+    text = subprocess.check_output(['git', 'show', REVISION + ':' + path], cwd=ROOT, text=True) if REVISION else (ROOT / path).read_text()
+    return re.search(r'<string name="' + key + r'"[^>]*>(.*?)</string>', text, re.S).group(1)
+
 class UiContracts(unittest.TestCase):
     def test_export_rechecks_storage_on_retry_and_resume(self):
         text = source('ui/export/ExportScreen.kt')
@@ -30,7 +36,8 @@ class UiContracts(unittest.TestCase):
 
     def test_media_info_requires_a_declaration(self):
         text = source('ui/editor/EditorMenus.kt')
-        self.assertIn('if (mediaRecord != null) MenuRow("Media Info")', text)
+        self.assertIn('if (mediaRecord != null) MenuRow(stringResource(R.string.media_info))', text)
+        self.assertEqual('Media Info', english('media_info'))
         self.assertIn('if (mediaInfo && mediaRecord != null)', text)
 
     def test_custom_size_consumes_pending_changes_before_callbacks(self):
@@ -159,8 +166,10 @@ class UiContracts(unittest.TestCase):
 
     def test_share_labels_match_export_names(self):
         text = source('ui/export/ExportDone.kt')
-        for label in ['Share Video', 'Share GIF', 'Share Image Sequence']:
-            self.assertIn('"' + label + '"', text)
+        for kind, key, label in [('Video', 'export_share_video', 'Share Video'), ('Gif', 'export_share_gif', 'Share GIF'),
+                                 ('Sequence', 'export_share_sequence', 'Share Image Sequence')]:
+            self.assertIn('ExportKind.' + kind + ' -> R.string.' + key, text)
+            self.assertEqual(label, english(key))
 
     def test_color_and_favorite_labels_use_consistent_spelling(self):
         for path in ['ui/editor/CaptionsSheet.kt', 'ui/editor/panels/BorderShadowPanel.kt', 'ui/editor/TextIcons.kt', 'ui/editor/effects/EffectBrowser.kt']:
@@ -179,7 +188,8 @@ class UiContracts(unittest.TestCase):
         self.assertIn('if (rows > selectRows) onTick()', text)
         self.assertEqual(1, text.count('performHapticFeedback(HapticFeedbackType.SegmentFrequentTick)'))
         self.assertIn('prefs.getBoolean("trimLimitVibration", true)', source('library/AppSettings.kt'))
-        self.assertIn('SwitchRow("Vibration", settings.vibration', source('ui/home/SettingsDrawer.kt'))
+        self.assertIn('SwitchRow(stringResource(R.string.settings_vibration), settings.vibration', source('ui/home/SettingsDrawer.kt'))
+        self.assertEqual('Vibration', english('settings_vibration'))
 
 if __name__ == '__main__':
     unittest.main()

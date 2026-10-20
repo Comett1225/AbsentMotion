@@ -34,6 +34,8 @@ import app.absentmotion.ui.editor.effects.EffectIcons
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Presence
 import app.absentmotion.ui.theme.Swap
+import androidx.compose.ui.res.stringResource
+import app.absentmotion.R
 
 private var copiedEffects by mutableStateOf<List<XmlNode>>(emptyList())
 
@@ -76,8 +78,8 @@ internal fun EffectsPanel(state: EditorState, modifier: Modifier) {
                 EffectFrameButton(PanelIcons.More, Modifier.fillMaxSize(), instance == null) { menu = true }
                 Presence(menu) {
                     MenuPopup(AboveLeft, { menu = false }, TransformOrigin(0f, 1f)) {
-                        MenuRow("Copy Effects", enabled = layer.effects.isNotEmpty()) { copiedEffects = layer.effects; menu = false }
-                        MenuRow(if (copiedEffects.size == 1) "Paste Effect" else "Paste Effects", enabled = copiedEffects.isNotEmpty(), divider = true) {
+                        MenuRow(stringResource(R.string.effects_copy_effects), enabled = layer.effects.isNotEmpty()) { copiedEffects = layer.effects; menu = false }
+                        MenuRow(stringResource(if (copiedEffects.size == 1) R.string.effects_paste_effect else R.string.effects_paste_effects), enabled = copiedEffects.isNotEmpty(), divider = true) {
                             state.editSelected { copiedEffects.fold(it) { next, effect -> next.addEffect(effect) } }
                             menu = false
                         }
@@ -94,7 +96,7 @@ internal fun EffectsPanel(state: EditorState, modifier: Modifier) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(EffectIcons.Add, null, Modifier.size(18.dp), tint = Am.OnDark)
                             Spacer(Modifier.width(6.dp))
-                            Text("Add Effect", color = Am.OnDark, fontSize = 14.sp)
+                            Text(stringResource(R.string.add_effect), color = Am.OnDark, fontSize = 14.sp)
                         }
                     }
                 }
@@ -120,21 +122,21 @@ private fun EffectHeader(state: EditorState, index: Int, effect: XmlNode, defini
         Icon(EffectIcons.Expanded, null, Modifier.padding(start = 8.dp).size(18.dp).alpha(0.9f), tint = Am.OnDark)
         Text(definition?.name ?: effect["id"]?.substringAfterLast('.') ?: "", Modifier.weight(1f).padding(start = 6.dp, end = 4.dp), color = Am.OnDark, fontSize = 14.sp, maxLines = 1)
         Box(Modifier.size(36.dp).clickable { menu = true }, contentAlignment = Alignment.Center) {
-            Icon(EffectIcons.MoreVert, "More", Modifier.size(24.dp), tint = Am.OnDark)
+            Icon(EffectIcons.MoreVert, stringResource(R.string.effects_more), Modifier.size(24.dp), tint = Am.OnDark)
             Presence(menu) {
                 MenuPopup(DropOrRise, { menu = false }) {
-                    MenuRow("Effect Info", enabled = definition != null) {
+                    MenuRow(stringResource(R.string.effects_effect_info), enabled = definition != null) {
                         definition?.let { state.effectDetail = it.id; state.playing = false; state.effectBrowserOpen = true }
                         menu = false
                     }
-                    MenuRow("Reset to Defaults", enabled = definition != null) {
+                    MenuRow(stringResource(R.string.effects_reset_defaults), enabled = definition != null) {
                         definition?.let { def -> state.editSelected { it.withEffect(index) { old -> old.copy(children = def.instance().children) } } }
                         menu = false
                     }
-                    MenuRow("Duplicate") { state.editSelected { it.duplicateEffect(index) }; menu = false }
-                    MenuRow("Copy Effect") { copiedEffects = listOf(effect); menu = false }
+                    MenuRow(stringResource(R.string.effects_duplicate)) { state.editSelected { it.duplicateEffect(index) }; menu = false }
+                    MenuRow(stringResource(R.string.effects_copy_effect)) { copiedEffects = listOf(effect); menu = false }
                     val settings = copiedEffects.singleOrNull()?.takeIf { it["id"] == effect["id"] }
-                    MenuRow("Paste Effect Values", enabled = settings != null) {
+                    MenuRow(stringResource(R.string.effects_paste_values), enabled = settings != null) {
                         settings?.let { from -> state.editSelected { it.withEffect(index) { old -> old.copy(children = from.children) } } }
                         menu = false
                     }
@@ -142,7 +144,7 @@ private fun EffectHeader(state: EditorState, index: Int, effect: XmlNode, defini
             }
         }
         Box(Modifier.size(36.dp).clickable { state.editSelected { it.removeEffect(index) }; state.effectIndex = -1 }, contentAlignment = Alignment.Center) {
-            Icon(ChromeIcons.Trash, "Delete", Modifier.size(22.dp), tint = Am.OnDark)
+            Icon(ChromeIcons.Trash, stringResource(R.string.delete), Modifier.size(22.dp), tint = Am.OnDark)
         }
     }
 }
@@ -160,10 +162,10 @@ private fun EffectListRow(state: EditorState, index: Int, effect: XmlNode, defin
             Icon(EffectIcons.Expand, null, Modifier.size(18.dp).alpha(0.3f), tint = Am.OnDark)
             Text(definition?.name ?: effect["id"]?.substringAfterLast('.') ?: "", Modifier.padding(start = 6.dp), color = Am.OnDark, fontSize = 14.sp, maxLines = 1)
         }
-        Icon(if (visible) EffectIcons.Eye else EffectIcons.EyeOff, "Visibility", Modifier.width(36.dp).clickable {
+        Icon(if (visible) EffectIcons.Eye else EffectIcons.EyeOff, stringResource(R.string.effects_visibility), Modifier.width(36.dp).clickable {
             state.editSelected { it.withEffect(index) { node -> node.with("hidden", if (visible) "true" else null) } }
         }, tint = Am.OnDark)
-        Icon(EffectIcons.Grip, "Reorder", Modifier.width(32.dp).fillMaxHeight().pointerInput(state) {
+        Icon(EffectIcons.Grip, stringResource(R.string.effects_reorder), Modifier.width(32.dp).fillMaxHeight().pointerInput(state) {
             detectDragGesturesAfterLongPress(onDragStart = { drag = 0f; held = latestIndex }, onDragEnd = { state.endGesture() }, onDragCancel = { state.endGesture() }) { change, amount ->
                 change.consume(); drag += amount.y
                 val step = 43.5.dp.toPx()

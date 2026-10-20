@@ -4,6 +4,8 @@ import android.media.MediaCodec
 import android.media.MediaFormat
 import android.media.MediaMuxer
 import android.system.Os
+import app.absentmotion.R
+import app.absentmotion.i18n.txt
 import java.io.FileDescriptor
 import java.io.FileOutputStream
 import java.nio.ByteBuffer
@@ -156,7 +158,7 @@ internal class Mux(private val sink: SampleSink, private val tracks: Int, privat
     }
 
     @Synchronized fun finish() {
-        check(started) { "The encoder produced no video" }
+        exportCheck(started) { txt(R.string.export_error_no_video) }
         sink.stop()
     }
 

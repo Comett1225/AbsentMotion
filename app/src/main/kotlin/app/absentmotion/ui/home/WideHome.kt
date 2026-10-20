@@ -29,6 +29,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import app.absentmotion.R
 import app.absentmotion.library.ProjectInfo
 import app.absentmotion.ui.editor.ChromeIcons
 import app.absentmotion.ui.theme.Am
@@ -41,12 +43,12 @@ internal fun WideHeader(page: Int, tab: Int, onTab: (page: Int, tab: Int) -> Uni
     Row(Modifier.fillMaxWidth().height(72.dp).padding(horizontal = 20.dp), Arrangement.spacedBy(12.dp), Alignment.CenterVertically) {
         Text("AbsentMotion", color = Am.Navy, fontSize = 22.sp, fontWeight = FontWeight.Medium, maxLines = 1)
         Spacer(Modifier.width(16.dp))
-        Chip("Projects", page == 0 && tab == 0) { onTab(0, 0) }
-        Chip("Assets", page == 0 && tab == 1) { onTab(0, 1) }
-        Chip("Templates", page == 1) { onTab(1, tab) }
+        Chip(stringResource(R.string.home_tab_projects), page == 0 && tab == 0) { onTab(0, 0) }
+        Chip(stringResource(R.string.home_tab_assets), page == 0 && tab == 1) { onTab(0, 1) }
+        Chip(stringResource(R.string.home_tab_templates), page == 1) { onTab(1, tab) }
         Spacer(Modifier.weight(1f))
-        HeaderButton("New project", HomeIcons.Plus, Am.Accent, Am.OnAccent, onNew)
-        HeaderButton("Settings", ChromeIcons.Gear, Am.Card, Am.Navy, onSettings)
+        HeaderButton(stringResource(R.string.home_new_project), HomeIcons.Plus, Am.Accent, Am.OnAccent, onNew)
+        HeaderButton(stringResource(R.string.settings), ChromeIcons.Gear, Am.Card, Am.Navy, onSettings)
     }
 }
 

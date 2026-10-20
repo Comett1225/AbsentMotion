@@ -1,9 +1,13 @@
 package app.absentmotion.library
 
+import app.absentmotion.R
+import app.absentmotion.i18n.UiText
+import app.absentmotion.i18n.txt
 import app.absentmotion.platform.Context
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Palette
 import app.absentmotion.ui.theme.Themes
+import androidx.annotation.StringRes
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -102,11 +106,16 @@ class AppSettings(private val context: Context) {
             Am.palette = Themes.palette(context, value)
         }
 
-    val themes: List<Pair<String, String>>
-        get() = Palette.BuiltIn.map { it.first to it.first } +
-            listOfNotNull(customThemeState?.let { Themes.CUSTOM to if (it.isEmpty()) "Custom" else "Custom ($it)" })
+    val themes: List<Pair<String, UiText>>
+        get() = Palette.BuiltIn.map { it.first to builtInThemeName(it.first) } +
+            listOfNotNull(customThemeState?.let { Themes.CUSTOM to if (it.isEmpty()) txt(R.string.theme_custom) else txt(R.string.theme_custom_named, it) })
 
-    val themeLabel: String get() = themes.firstOrNull { it.first == themeState }?.second ?: Themes.DEFAULT
+    val themeLabel: UiText get() = themes.firstOrNull { it.first == themeState }?.second ?: builtInThemeName(Themes.DEFAULT)
+
+    private fun builtInThemeName(id: String) = when (id) {
+        "Daylight" -> txt(R.string.theme_daylight)
+        else -> txt(R.string.theme_absentmotion)
+    }
 
     fun importTheme(text: String) {
         val imported = Themes.import(context, text)
@@ -145,8 +154,8 @@ class AppSettings(private val context: Context) {
     }
 }
 
-enum class PreviewQuality(val divisor: Int) {
-    Full(1), Half(2), Quarter(4);
+enum class PreviewQuality(val divisor: Int, @StringRes val label: Int) {
+    Full(1, R.string.settings_preview_full), Half(2, R.string.settings_preview_half), Quarter(4, R.string.settings_preview_quarter);
 
     companion object {
         fun of(stored: String?, draft: Boolean): PreviewQuality = entries.firstOrNull { it.name == stored } ?: if (draft) Half else Full

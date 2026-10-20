@@ -54,6 +54,8 @@ import app.absentmotion.model.Handle
 import app.absentmotion.model.Knot
 import app.absentmotion.model.Pt
 import app.absentmotion.model.hit
+import androidx.compose.ui.res.stringResource
+import app.absentmotion.R
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.animatedColor
 import kotlin.math.min
@@ -242,16 +244,16 @@ private fun Trackpad(state: EditorState, mode: PointMode, contour: Contour?, mod
             }
         }
         Text(
-            when { !adding -> "Drag to move the point"; atEnd -> "Drag here to aim the next point; tap here to drop it."; else -> "Drag to add a point" },
+            when { !adding -> stringResource(R.string.point_drag_to_move); atEnd -> stringResource(R.string.point_aim_next); else -> stringResource(R.string.point_drag_to_add) },
             Modifier.align(Alignment.Center).padding(horizontal = 20.dp), color = Guide, fontSize = 13.sp, textAlign = TextAlign.Center,
         )
         Row(Modifier.align(Alignment.TopCenter).padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-            LockButton("Angle", mode.angleLock, bothHandles, true) { mode.angleLock = !mode.angleLock }
-            LockButton("Distance", mode.distanceLock && mode.angleLock, bothHandles && mode.angleLock, true) { mode.distanceLock = !mode.distanceLock }
+            LockButton(stringResource(R.string.point_angle), mode.angleLock, bothHandles, true) { mode.angleLock = !mode.angleLock }
+            LockButton(stringResource(R.string.point_distance), mode.distanceLock && mode.angleLock, bothHandles && mode.angleLock, true) { mode.distanceLock = !mode.distanceLock }
         }
         Row(Modifier.align(Alignment.BottomCenter).padding(bottom = 4.dp).fillMaxWidth().padding(horizontal = 30.dp), verticalAlignment = Alignment.CenterVertically) {
             ContourArrow(DrawingIcons.Prev) { state.gotoContour(mode, -1) }
-            Text("Contour ${mode.contour + 1}", Modifier.weight(1f), color = Guide, fontSize = 13.sp, textAlign = TextAlign.Center)
+            Text(stringResource(R.string.point_contour, (mode.contour + 1).toString()), Modifier.weight(1f), color = Guide, fontSize = 13.sp, textAlign = TextAlign.Center)
             ContourArrow(DrawingIcons.Next) { state.gotoContour(mode, 1) }
         }
     }

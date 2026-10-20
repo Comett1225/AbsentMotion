@@ -1,5 +1,6 @@
 package app.absentmotion.ui.editor.panels
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -33,8 +34,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import app.absentmotion.R
 import app.absentmotion.editor.EditorState
 import app.absentmotion.model.Layer
 import app.absentmotion.model.PropRef
@@ -43,16 +46,16 @@ import app.absentmotion.model.withBlend
 import app.absentmotion.ui.editor.PanelIcons
 import app.absentmotion.ui.theme.Am
 
-private class Mode(val id: String, val name: String)
+private class Mode(val id: String, @StringRes val name: Int)
 
-private val Categories: List<Pair<String, List<Mode>>> = listOf(
-    "Normal" to listOf(Mode("normal", "Normal")),
-    "Darken" to listOf(Mode("multiply", "Multiply"), Mode("darken", "Darken"), Mode("darker-color", "Darker Color"), Mode("color-burn", "Color Burn"), Mode("linear-burn", "Linear Burn")),
-    "Lighten" to listOf(Mode("screen", "Screen"), Mode("lighten", "Lighten"), Mode("lighter-color", "Lighter Color"), Mode("color-dodge", "Color Dodge"), Mode("linear-dodge", "Linear Dodge")),
-    "Contrast" to listOf(Mode("overlay", "Overlay"), Mode("soft-light", "Soft Light"), Mode("hard-light", "Hard Light"), Mode("soft-overlay", "Soft Overlay"), Mode("vivid-light", "Vivid Light"), Mode("linear-light", "Linear Light"), Mode("pin-light", "Pin Light")),
-    "Difference" to listOf(Mode("diff", "Difference"), Mode("exclusion", "Exclusion"), Mode("subtract", "Subtract"), Mode("divide", "Divide")),
-    "Color" to listOf(Mode("hue", "Hue"), Mode("saturation", "Saturation"), Mode("color", "Color"), Mode("luminance", "Luminance")),
-    "Mask" to listOf(Mode("mask", "Mask"), Mode("exclude", "Exclude")),
+private val Categories: List<Pair<Int, List<Mode>>> = listOf(
+    R.string.blend_cat_normal to listOf(Mode("normal", R.string.blend_normal)),
+    R.string.blend_cat_darken to listOf(Mode("multiply", R.string.blend_multiply), Mode("darken", R.string.blend_darken), Mode("darker-color", R.string.blend_darker_color), Mode("color-burn", R.string.blend_color_burn), Mode("linear-burn", R.string.blend_linear_burn)),
+    R.string.blend_cat_lighten to listOf(Mode("screen", R.string.blend_screen), Mode("lighten", R.string.blend_lighten), Mode("lighter-color", R.string.blend_lighter_color), Mode("color-dodge", R.string.blend_color_dodge), Mode("linear-dodge", R.string.blend_linear_dodge)),
+    R.string.blend_cat_contrast to listOf(Mode("overlay", R.string.blend_overlay), Mode("soft-light", R.string.blend_soft_light), Mode("hard-light", R.string.blend_hard_light), Mode("soft-overlay", R.string.blend_soft_overlay), Mode("vivid-light", R.string.blend_vivid_light), Mode("linear-light", R.string.blend_linear_light), Mode("pin-light", R.string.blend_pin_light)),
+    R.string.blend_cat_difference to listOf(Mode("diff", R.string.blend_difference), Mode("exclusion", R.string.blend_exclusion), Mode("subtract", R.string.blend_subtract), Mode("divide", R.string.blend_divide)),
+    R.string.blend_cat_color to listOf(Mode("hue", R.string.blend_hue), Mode("saturation", R.string.blend_saturation), Mode("color", R.string.blend_color), Mode("luminance", R.string.blend_luminance)),
+    R.string.blend_cat_mask to listOf(Mode("mask", R.string.blend_mask), Mode("exclude", R.string.blend_exclude)),
 )
 
 private val RowFill get() = Am.Button
@@ -66,7 +69,7 @@ internal val OpacityRef = PropRef.Opacity
 internal fun BlendingPanel(state: EditorState, layer: Layer, modifier: Modifier = Modifier) {
     val opacity = layer.opacity
     val blend = layer.blend
-    val expanded = remember { mutableStateOf(setOf(Categories.firstOrNull { c -> c.second.any { it.id == blend } }?.first ?: "Normal")) }
+    val expanded = remember { mutableStateOf(setOf(Categories.firstOrNull { c -> c.second.any { it.id == blend } }?.first ?: R.string.blend_cat_normal)) }
     Box(modifier) {
         PanelIcon(PanelIcons.Opacity, IconGrey, Modifier.offset(19.px, 43.px), size = 56.px)
         OpacitySlider(state, opacity, Modifier.offset(122.px, 14.px).size(560.px, 113.px))
@@ -90,9 +93,9 @@ internal fun BlendingPanel(state: EditorState, layer: Layer, modifier: Modifier 
                     Box(Modifier.width(if (modes.size > 1) 101.px else 26.px), contentAlignment = Alignment.Center) {
                         if (modes.size > 1) Chevron(open)
                     }
-                    Text(name, Modifier.weight(1f), color = Am.OnDark, fontSize = 15.sp, maxLines = 1, softWrap = false)
+                    Text(stringResource(name), Modifier.weight(1f), color = Am.OnDark, fontSize = 15.sp, maxLines = 1, softWrap = false)
                     if (current != null && (!open || modes.size == 1)) {
-                        Text(current.name, color = Am.Accent, fontSize = 15.sp, maxLines = 1, softWrap = false)
+                        Text(stringResource(current.name), color = Am.Accent, fontSize = 15.sp, maxLines = 1, softWrap = false)
                         Tick()
                     }
                 }
@@ -103,7 +106,7 @@ internal fun BlendingPanel(state: EditorState, layer: Layer, modifier: Modifier 
                             Modifier.fillMaxWidth().height(104.px).clip(PanelShape).background(Am.Field).clickable { state.editSelected { it.withBlend(mode.id) } },
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            Text(mode.name, Modifier.padding(start = 101.px).weight(1f), color = if (selected) Am.Accent else Am.OnDark, fontSize = 15.sp, maxLines = 1, softWrap = false)
+                            Text(stringResource(mode.name), Modifier.padding(start = 101.px).weight(1f), color = if (selected) Am.Accent else Am.OnDark, fontSize = 15.sp, maxLines = 1, softWrap = false)
                             if (selected) Tick()
                         }
                     }

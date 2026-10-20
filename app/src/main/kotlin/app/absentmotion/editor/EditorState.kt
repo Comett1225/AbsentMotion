@@ -1,5 +1,7 @@
 package app.absentmotion.editor
 
+import androidx.annotation.StringRes
+import app.absentmotion.R
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -15,9 +17,10 @@ import app.absentmotion.model.Layer
 import app.absentmotion.model.PropRef
 import app.absentmotion.model.Scene
 
-enum class EditorPanel(val title: String) {
-    Tools(""), Speed("Time Remapping"), MoveTransform("Transform"), ColorFill("Fill & Color"), EditShape("Shape Options"), EditText("Edit Text"),
-    BorderShadow("Frame & Shadow"), Blending("Opacity & Blend Mode"), Effects("Effects"), Camera("Camera Options"), Model("Model Options"),
+enum class EditorPanel(@StringRes val title: Int) {
+    Tools(0), Speed(R.string.edit_panel_time_remapping), MoveTransform(R.string.edit_panel_transform), ColorFill(R.string.edit_panel_fill_color),
+    EditShape(R.string.edit_panel_shape_options), EditText(R.string.edit_panel_edit_text),
+    BorderShadow(R.string.edit_panel_frame_shadow), Blending(R.string.edit_panel_opacity_blend), Effects(R.string.edit_panel_effects), Camera(R.string.edit_panel_camera_options), Model(R.string.edit_panel_model_options),
 }
 
 data class KeyTarget(val ref: PropRef, val default: String, val type: String = "float")

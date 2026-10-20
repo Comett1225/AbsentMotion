@@ -5,6 +5,9 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.BatteryManager
 import android.os.PowerManager
+import app.absentmotion.R
+import app.absentmotion.i18n.UiText
+import app.absentmotion.i18n.txt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -24,7 +27,7 @@ data class ThermalState(
     val headroom: Float = Float.NaN,
     val batteryCelsius: Float = Float.NaN,
 ) {
-    val message: String? get() = thermalMessage(level)
+    val message: UiText? get() = thermalMessage(level)
 }
 
 internal fun thermalLevel(status: Int, headroom: Float, batteryCelsius: Float): ThermalLevel {
@@ -37,11 +40,11 @@ internal fun thermalLevel(status: Int, headroom: Float, batteryCelsius: Float): 
     }
 }
 
-internal fun thermalMessage(level: ThermalLevel): String? = when (level) {
+internal fun thermalMessage(level: ThermalLevel): UiText? = when (level) {
     ThermalLevel.Normal -> null
-    ThermalLevel.Warm -> "Your phone is getting warm. The export goes a little slower to keep it cool."
-    ThermalLevel.Hot -> "Your phone is hot. The export slows down to let it cool."
-    ThermalLevel.Critical -> "Your phone is very hot. The export pauses between frames until it cools down."
+    ThermalLevel.Warm -> txt(R.string.export_thermal_warm)
+    ThermalLevel.Hot -> txt(R.string.export_thermal_hot)
+    ThermalLevel.Critical -> txt(R.string.export_thermal_critical)
 }
 
 internal fun pauseMs(level: ThermalLevel): Long = when (level) {

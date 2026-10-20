@@ -1,5 +1,7 @@
 package app.absentmotion.export
 
+import app.absentmotion.R
+import app.absentmotion.i18n.txt
 import org.json.JSONObject
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
@@ -165,8 +167,8 @@ class ContainerTest {
     @Test fun formatRules() {
         assertEquals(listOf(Container.WebM, Container.Mkv), containersFor(Codec.Vp9))
         assertNull(formatProblem(ExportSettings(1080, 30), hasAudio = true))
-        assertTrue(formatProblem(ExportSettings(1080, 30, Codec.Vp9), hasAudio = false)!!.contains("MP4"))
-        assertTrue(formatProblem(ExportSettings(1080, 30, container = Container.WebM, codec = Codec.Vp9), hasAudio = true)!!.contains("AAC"))
+        assertEquals(txt(R.string.export_problem_container_video, "MP4", "VP9"), formatProblem(ExportSettings(1080, 30, Codec.Vp9), hasAudio = false))
+        assertEquals(txt(R.string.export_problem_container_audio, "WebM", "AAC"), formatProblem(ExportSettings(1080, 30, container = Container.WebM, codec = Codec.Vp9, audio = AudioSettings(AudioCodec.Aac)), hasAudio = true))
         assertNull(formatProblem(ExportSettings(1080, 30, container = Container.WebM, codec = Codec.Vp9), hasAudio = false))
         val fixed = ExportSettings(1080, 30, Codec.Vp9).fixedFormat()
         assertEquals(Container.WebM, fixed.container)

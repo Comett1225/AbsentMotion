@@ -124,13 +124,18 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import androidx.compose.ui.res.stringResource
+import app.absentmotion.R
+import app.absentmotion.i18n.text
 
 private val Grey get() = Am.HomeDim
 private val FactText get() = Am.HomeFaint
 private val MenuScrim get() = Am.MenuScrim
 private val BarHeight = 72.dp
 private val PlusOverhang = 16.dp
-private val DateFormat = DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.ENGLISH)
+internal fun dateHeader(locale: Locale): DateTimeFormatter =
+    if (locale.language == "en") DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.ENGLISH)
+    else DateTimeFormatter.ofLocalizedDate(java.time.format.FormatStyle.LONG).withLocale(locale)
 
 internal sealed interface ListRow {
     data class Date(val text: String) : ListRow
@@ -215,15 +220,15 @@ fun HomeScreen(
 private fun TopBar(onMenu: () -> Unit, search: String?, onSearch: (String?) -> Unit) {
     Box(Modifier.fillMaxWidth().height(57.dp)) {
         Box(Modifier.align(Alignment.CenterStart).size(50.dp).clickable(onClick = onMenu), contentAlignment = Alignment.Center) {
-            Icon(HomeIcons.Menu, "Settings", Modifier.size(24.dp), tint = Am.Navy)
+            Icon(HomeIcons.Menu, stringResource(R.string.settings), Modifier.size(24.dp), tint = Am.Navy)
         }
         if (search == null) Text("AbsentMotion", Modifier.align(Alignment.Center), color = Am.Navy, fontSize = 22.sp, fontWeight = FontWeight.Medium)
         else SearchField(
             search, { onSearch(it) }, Modifier.align(Alignment.Center).padding(horizontal = 56.dp).fillMaxWidth().height(40.dp),
-            hint = "Search projects and assets", background = Am.Card, content = Am.Navy, faint = Am.HomeDim, autoFocus = true,
+            hint = stringResource(R.string.home_search_hint), background = Am.Card, content = Am.Navy, faint = Am.HomeDim, autoFocus = true,
         )
         Box(Modifier.align(Alignment.CenterEnd).size(50.dp).clickable { onSearch(if (search == null) "" else null) }, contentAlignment = Alignment.Center) {
-            Icon(if (search == null) TextIcons.Search else HomeIcons.Close, if (search == null) "Search" else "Close search", Modifier.size(24.dp), tint = Am.Navy)
+            Icon(if (search == null) TextIcons.Search else HomeIcons.Close, stringResource(if (search == null) R.string.home_search else R.string.home_close_search), Modifier.size(24.dp), tint = Am.Navy)
         }
     }
 }
@@ -256,7 +261,8 @@ private fun ProjectsPane(
     var deleting by remember { mutableStateOf<ProjectInfo?>(null) }
     var origin by remember { mutableStateOf(Offset.Zero) }
     val byName = settings.sortBy == "name"
-    val rows = remember(shown, byName) { listRows(shown, byName) }
+    val locale = androidx.compose.ui.platform.LocalConfiguration.current.locales[0]
+    val rows = remember(shown, byName, locale) { listRows(shown, byName, dateHeader(locale)) }
     val card: @Composable (ProjectInfo, Int, Modifier) -> Unit = { info, i, itemModifier ->
         ProjectCard(
             info, version, thumbs, itemModifier.enterOnce(seen, info.id, i), menuOpen = menu?.id == info.id,
@@ -283,7 +289,7 @@ private fun ProjectsPane(
             }
             if (shown.isNotEmpty()) {
                 Spacer(Modifier.height(13.dp))
-                ListHeader(if (tab == 0) "Your projects" else null, byName) { settings.sortBy = if (it) "name" else "date" }
+                ListHeader(if (tab == 0) stringResource(R.string.home_your_projects) else null, byName) { settings.sortBy = if (it) "name" else "date" }
                 if (wide) ProjectGrid(rows, tab == 0 && settings.xmlUpload, onUpload, card) else LazyColumn(
                     Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 28.dp),
@@ -301,7 +307,7 @@ private fun ProjectsPane(
                 }
             }
         }
-        if (shown.isEmpty() && query.isNotBlank()) NoMatches(query, if (tab == 1) "assets" else "projects", Modifier.fillMaxWidth().padding(top = 120.dp), Am.Navy, 17.sp)
+        if (shown.isEmpty() && query.isNotBlank()) NoMatches(query, if (tab == 1) R.string.search_no_assets else R.string.search_no_projects, Modifier.fillMaxWidth().padding(top = 120.dp), Am.Navy, 17.sp)
         else if (shown.isEmpty()) EmptyState(element = tab == 1, arrow = !wide)
         menu?.let { open ->
             Box(
@@ -321,9 +327,9 @@ private fun ProjectsPane(
     deleting?.let { target ->
         AlertDialog(
             onDismissRequest = { deleting = null },
-            title = { Text(if (target.isElement) "Delete this asset?" else "Delete this project?", color = Am.Navy) },
-            dismissButton = { TextButton({ deleting = null }) { Text("Cancel", color = Am.Navy) } },
-            confirmButton = { TextButton({ deleting = null; onDelete(target.id) }) { Text("Delete", color = Am.Navy) } },
+            title = { Text(stringResource(if (target.isElement) R.string.home_delete_asset_title else R.string.home_delete_project_title), color = Am.Navy) },
+            dismissButton = { TextButton({ deleting = null }) { Text(stringResource(R.string.cancel), color = Am.Navy) } },
+            confirmButton = { TextButton({ deleting = null; onDelete(target.id) }) { Text(stringResource(R.string.delete), color = Am.Navy) } },
             containerColor = Am.Card,
         )
     }
@@ -337,12 +343,12 @@ internal fun UploadCard(onUpload: () -> Unit) {
     ) {
         Icon(HomeIcons.Upload, null, Modifier.size(48.dp), tint = Am.Navy)
         Spacer(Modifier.width(8.dp))
-        Text("Import a project file", Modifier.weight(1f), color = Am.Navy, fontSize = 16.sp, fontWeight = FontWeight.Medium)
+        Text(stringResource(R.string.import_a_project_file), Modifier.weight(1f), color = Am.Navy, fontSize = 16.sp, fontWeight = FontWeight.Medium)
         Spacer(Modifier.width(16.dp))
         Box(
             Modifier.height(40.dp).clip(RoundedCornerShape(14.dp)).background(Am.Navy).clickable(onClick = onUpload).padding(horizontal = 16.dp),
             contentAlignment = Alignment.Center,
-        ) { Text("Choose file", color = Am.OnNavy, fontSize = 15.sp, fontWeight = FontWeight.Medium) }
+        ) { Text(stringResource(R.string.choose_file), color = Am.OnNavy, fontSize = 15.sp, fontWeight = FontWeight.Medium) }
     }
 }
 
@@ -350,20 +356,20 @@ internal fun UploadCard(onUpload: () -> Unit) {
 private fun ImportDialog(reports: List<ImportReport>, onDismiss: () -> Unit, onOpen: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Import complete", color = Am.Navy) },
+        title = { Text(stringResource(R.string.import_complete), color = Am.Navy) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState())) {
                 for (report in reports) {
                     if (reports.size > 1) Text(report.title, Modifier.padding(top = 8.dp), color = Am.Navy, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                     for ((heading, lines) in report.sections) {
-                        Text(heading, Modifier.padding(top = 8.dp), color = Am.Navy, fontSize = 15.sp, fontWeight = FontWeight.Medium)
-                        for (line in lines) Text("\u2022 $line", color = Am.Navy, fontSize = 14.sp, lineHeight = 19.sp)
+                        Text(heading.text(), Modifier.padding(top = 8.dp), color = Am.Navy, fontSize = 15.sp, fontWeight = FontWeight.Medium)
+                        for (line in lines) Text("\u2022 ${line.text()}", color = Am.Navy, fontSize = 14.sp, lineHeight = 19.sp)
                     }
                 }
             }
         },
-        dismissButton = { TextButton(onDismiss) { Text("OK", color = Am.Navy) } },
-        confirmButton = { TextButton(onOpen) { Text("Open", color = Am.Navy) } },
+        dismissButton = { TextButton(onDismiss) { Text(stringResource(R.string.ok), color = Am.Navy) } },
+        confirmButton = { TextButton(onOpen) { Text(stringResource(R.string.open), color = Am.Navy) } },
         containerColor = Am.Card,
     )
 }
@@ -373,20 +379,20 @@ internal fun DateLabel(text: String, first: Boolean) {
     Text(text, Modifier.padding(top = if (first) 0.dp else 12.dp, bottom = 12.dp), color = Am.Navy, fontSize = 15.sp, lineHeight = 19.sp)
 }
 
-private fun listRows(list: List<ProjectInfo>, byName: Boolean): List<ListRow> =
+private fun listRows(list: List<ProjectInfo>, byName: Boolean, dates: DateTimeFormatter): List<ListRow> =
     if (byName) {
         list.sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.title }).map { ListRow.Card(it) }
     } else {
         list.sortedByDescending { it.modified }
-            .groupBy { Instant.ofEpochMilli(it.modified).atZone(ZoneId.systemDefault()).format(DateFormat) }
+            .groupBy { Instant.ofEpochMilli(it.modified).atZone(ZoneId.systemDefault()).format(dates) }
             .flatMap { (date, items) -> listOf<ListRow>(ListRow.Date(date)) + items.map { ListRow.Card(it) } }
     }
 
 @Composable
 private fun Chips(tab: Int, onTab: (Int) -> Unit) {
     Row(Modifier.padding(start = 16.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        Chip("Projects", tab == 0) { onTab(0) }
-        Chip("Assets", tab == 1) { onTab(1) }
+        Chip(stringResource(R.string.home_tab_projects), tab == 0) { onTab(0) }
+        Chip(stringResource(R.string.home_tab_assets), tab == 1) { onTab(1) }
     }
 }
 
@@ -409,12 +415,12 @@ private fun ListHeader(title: String?, byName: Boolean, onSort: (Boolean) -> Uni
         Text(title.orEmpty(), Modifier.weight(1f), color = Am.Navy, fontSize = 19.sp, fontWeight = FontWeight.Bold, maxLines = 1)
         Box {
             Row(Modifier.height(48.dp).clickable { open = true }, verticalAlignment = Alignment.CenterVertically) {
-                Text(if (byName) "Sort by Name" else "Sort by Date", color = Am.Navy, fontSize = 15.sp)
+                Text(stringResource(if (byName) R.string.home_sort_by_name else R.string.home_sort_by_date), color = Am.Navy, fontSize = 15.sp)
                 Icon(HomeIcons.ChevronDown, null, Modifier.size(24.dp), tint = Am.Navy)
             }
             RefMenu(open, { open = false }, Am.Card, RoundedCornerShape(14.dp), Modifier.width(211.dp)) {
-                SortRow("Name", byName) { open = false; onSort(true) }
-                SortRow("Date", !byName) { open = false; onSort(false) }
+                SortRow(stringResource(R.string.home_sort_name), byName) { open = false; onSort(true) }
+                SortRow(stringResource(R.string.home_sort_date), !byName) { open = false; onSort(false) }
             }
         }
     }
@@ -460,7 +466,7 @@ private fun ProjectCard(
                 maxLines = 1, overflow = TextOverflow.Ellipsis,
             )
             Spacer(Modifier.height(8.dp))
-            if (info.damaged) Text("Damaged — restore a version", color = Am.Accent, fontSize = 13.sp, lineHeight = 18.sp, maxLines = 2)
+            if (info.damaged) Text(stringResource(R.string.damaged_restore_a_version), color = Am.Accent, fontSize = 13.sp, lineHeight = 18.sp, maxLines = 2)
             else facts(info).forEachIndexed { i, row ->
                 if (i > 0) Spacer(Modifier.height(4.dp))
                 Row { row.forEach { (icon, text) -> Fact(icon, text) } }
@@ -470,17 +476,17 @@ private fun ProjectCard(
             Modifier.align(Alignment.CenterEnd).size(48.dp).clickable { coords[0]?.let { onMenu(it.boundsInRoot()) } },
             contentAlignment = Alignment.Center,
         ) {
-            Icon(HomeIcons.More, "More", Modifier.size(24.dp), tint = Grey)
+            Icon(HomeIcons.More, stringResource(R.string.home_more), Modifier.size(24.dp), tint = Grey)
         }
         Box(Modifier.align(Alignment.BottomEnd).offset(y = 8.dp)) {
             RefMenu(menuOpen, onDismissMenu, Am.Card, RoundedCornerShape(14.dp), Modifier.width(270.dp)) {
                 if (!info.damaged) {
-                    MenuRow("Export", HomeIcons.Export, onExport)
-                    MenuRow(if (info.isElement) "Duplicate Asset" else "Duplicate", HomeIcons.Duplicate, onDuplicate)
-                    MenuRow("Collect media into project", HomeIcons.Folder, onCollect)
+                    MenuRow(stringResource(R.string.export), HomeIcons.Export, onExport)
+                    MenuRow(stringResource(if (info.isElement) R.string.home_duplicate_asset else R.string.home_duplicate), HomeIcons.Duplicate, onDuplicate)
+                    MenuRow(stringResource(R.string.home_collect_media), HomeIcons.Folder, onCollect)
                 }
-                MenuRow("Version history", ChromeIcons.Undo, onHistory)
-                MenuRow(if (info.isElement) "Delete Asset" else "Delete", HomeIcons.Delete, onDelete)
+                MenuRow(stringResource(R.string.version_history), ChromeIcons.Undo, onHistory)
+                MenuRow(stringResource(if (info.isElement) R.string.home_delete_asset else R.string.delete), HomeIcons.Delete, onDelete)
             }
         }
     }
@@ -564,21 +570,26 @@ private fun EmptyState(element: Boolean, arrow: Boolean = true) {
     Box(Modifier.fillMaxSize().enterFade()) {
         Column(Modifier.fillMaxWidth().padding(top = 243.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                if (element) "No assets saved yet" else "No projects yet",
+                stringResource(if (element) R.string.home_empty_assets else R.string.home_empty_projects),
                 color = Am.Navy, fontSize = 24.sp, lineHeight = 33.sp, fontWeight = FontWeight.Bold,
             )
             if (element) {
                 Spacer(Modifier.height(8.dp))
-                Text(PromptText, color = Am.Navy, fontSize = 17.sp, lineHeight = 22.sp, textAlign = TextAlign.Center)
+                Text(promptText(), color = Am.Navy, fontSize = 17.sp, lineHeight = 22.sp, textAlign = TextAlign.Center)
             }
         }
         if (arrow) Icon(HomeIcons.ArrowDown, null, Modifier.align(Alignment.BottomCenter).padding(bottom = 28.dp).size(56.dp), tint = Am.HomeInk)
     }
 }
 
-private val PromptText: AnnotatedString = buildAnnotatedString {
-    append("Reuse your best work,\n")
-    withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append("create an asset") }
+@Composable
+private fun promptText(): AnnotatedString {
+    val first = stringResource(R.string.home_asset_prompt_first)
+    val bold = stringResource(R.string.home_asset_prompt_bold)
+    return buildAnnotatedString {
+        append(first + "\n")
+        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append(bold) }
+    }
 }
 
 @Composable
@@ -589,11 +600,11 @@ private fun BottomBar(onNew: () -> Unit, page: Int, onPage: (Int) -> Unit, modif
                 .shadow(8.dp).background(Am.Card).padding(top = 12.dp),
         ) {
             Box(Modifier.weight(1f), contentAlignment = Alignment.TopCenter) {
-                BarItem("Projects", if (page == 0) HomeIcons.ProjectsTab else HomeIcons.ProjectsTabOff) { onPage(0) }
+                BarItem(stringResource(R.string.home_tab_projects), if (page == 0) HomeIcons.ProjectsTab else HomeIcons.ProjectsTabOff) { onPage(0) }
             }
             Spacer(Modifier.width(56.dp))
             Box(Modifier.weight(1f), contentAlignment = Alignment.TopCenter) {
-                BarItem("Templates", if (page == 1) HomeIcons.TemplatesTabOn else HomeIcons.TemplatesTab) { onPage(1) }
+                BarItem(stringResource(R.string.home_tab_templates), if (page == 1) HomeIcons.TemplatesTabOn else HomeIcons.TemplatesTab) { onPage(1) }
             }
         }
         val press = remember { MutableInteractionSource() }
@@ -603,7 +614,7 @@ private fun BottomBar(onNew: () -> Unit, page: Int, onPage: (Int) -> Unit, modif
                 .background(Am.Accent, CircleShape).clickable(interactionSource = press, indication = null, onClick = onNew),
             contentAlignment = Alignment.Center,
         ) {
-            Icon(HomeIcons.Plus, "New project", Modifier.size(24.dp), tint = Am.OnAccent)
+            Icon(HomeIcons.Plus, stringResource(R.string.home_new_project), Modifier.size(24.dp), tint = Am.OnAccent)
         }
     }
 }

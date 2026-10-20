@@ -50,6 +50,8 @@ import app.absentmotion.ui.editor.panels.EasingPanel
 import app.absentmotion.ui.editor.panels.PanelIcon
 import app.absentmotion.ui.editor.panels.dimmed
 import app.absentmotion.ui.editor.panels.px
+import androidx.compose.ui.res.stringResource
+import app.absentmotion.R
 import app.absentmotion.ui.theme.Am
 import kotlin.math.roundToInt
 
@@ -78,14 +80,15 @@ internal fun VolumePanel(state: EditorState, modifier: Modifier = Modifier) {
         return
     }
     val percent = (layer.gain * 100).roundToInt()
+    val volumeLabel = stringResource(R.string.volume_volume)
     Column(modifier.background(Am.Panel).padding(start = 62.px, top = 42.px, end = 62.px)) {
         Row(Modifier.fillMaxWidth().height(107.px).clip(BarShape).background(Am.Button)) {
             val count = layer.audioEffects.size
             Box(Modifier.weight(1f).fillMaxHeight().clickable { state.easingOpen = false; effects = true }.padding(start = 14.dp), Alignment.CenterStart) {
-                Text(if (count == 0) "Audio Effects" else "Audio Effects ($count)", color = Am.OnDark, fontSize = 14.sp, maxLines = 1)
+                Text(if (count == 0) stringResource(R.string.volume_audio_effects) else stringResource(R.string.volume_audio_effects_count, count.toString()), color = Am.OnDark, fontSize = 14.sp, maxLines = 1)
             }
             Box(Modifier.width(183.px).fillMaxHeight().clickable { state.volumeOpen = false }, Alignment.Center) {
-                Icon(AudioIcons.Speaker, "Volume", Modifier.size(32.dp), tint = VolumeGreen)
+                Icon(AudioIcons.Speaker, volumeLabel, Modifier.size(32.dp), tint = VolumeGreen)
                 Canvas(Modifier.align(Alignment.BottomStart).padding(start = 14.px, bottom = 14.px).size(4.dp)) {
                     drawPath(Path().apply { moveTo(0f, 0f); lineTo(0f, size.height); lineTo(size.width, size.height); close() }, Am.OnDark.copy(alpha = 0.3f))
                 }
@@ -107,7 +110,7 @@ internal fun VolumePanel(state: EditorState, modifier: Modifier = Modifier) {
                 VolumeSlider(percent, state, Modifier.width(440.px).height(113.px))
                 Spacer(Modifier.width(23.px))
                 Box(Modifier.width(158.px).height(101.px).clip(RoundedCornerShape(4.dp)).background(ValueBox).clickable {
-                    state.keypad = KeypadRequest(listOf(KeypadField("Volume", layer.gain * 100)), 0) { values ->
+                    state.keypad = KeypadRequest(listOf(KeypadField(volumeLabel, layer.gain * 100)), 0) { values ->
                         state.setGain(values[0].coerceIn(0f, MAX_GAIN * 100) / 100f)
                     }
                 }, Alignment.Center) {

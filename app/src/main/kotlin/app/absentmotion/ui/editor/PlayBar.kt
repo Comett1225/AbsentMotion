@@ -16,6 +16,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import app.absentmotion.R
 import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.skipBack
 import app.absentmotion.editor.skipForward
@@ -27,20 +29,20 @@ fun PlayBar(state: EditorState, modifier: Modifier = Modifier) {
     var menuOpen by remember { mutableStateOf(false) }
     Row(modifier.background(Am.TimelineBg)) {
         val cell = Modifier.weight(1f).fillMaxHeight()
-        BarButton(ChromeIcons.Undo, "Undo", cell, enabled = state.canUndo) { state.undo() }
-        BarButton(ChromeIcons.Redo, "Redo", cell, enabled = state.canRedo) { state.redo() }
-        BarButton(ChromeIcons.SkipBack, "Skip back", cell) { state.skipBack() }
+        BarButton(ChromeIcons.Undo, stringResource(R.string.play_undo), cell, enabled = state.canUndo) { state.undo() }
+        BarButton(ChromeIcons.Redo, stringResource(R.string.play_redo), cell, enabled = state.canRedo) { state.redo() }
+        BarButton(ChromeIcons.SkipBack, stringResource(R.string.play_skip_back), cell) { state.skipBack() }
         val settings = state.settings
         BarButton(
             if (state.playing) ChromeIcons.Pause else if (settings.loopingPlay) ChromeIcons.PlayRepeat else ChromeIcons.Play,
-            if (state.playing) "Pause" else "Play", cell,
+            stringResource(if (state.playing) R.string.play_pause else R.string.play_play), cell,
             onLongClick = if (state.playing) null else ({ settings.loopingPlay = !settings.loopingPlay }),
         ) { state.playing = !state.playing }
-        BarButton(ChromeIcons.SkipForward, "Skip forward", cell) { state.skipForward() }
-        BarButton(ChromeIcons.CopyPaste, "Copy and paste", cell) { menuOpen = true }
+        BarButton(ChromeIcons.SkipForward, stringResource(R.string.play_skip_forward), cell) { state.skipForward() }
+        BarButton(ChromeIcons.CopyPaste, stringResource(R.string.play_copy_paste), cell) { menuOpen = true }
         Box(cell) {
             BarButton(
-                if (state.previewPanelOpen) ChromeIcons.PreviewModeOpen else ChromeIcons.PreviewMode, "Preview mode", Modifier.fillMaxSize(),
+                if (state.previewPanelOpen) ChromeIcons.PreviewModeOpen else ChromeIcons.PreviewMode, stringResource(R.string.play_preview_mode), Modifier.fillMaxSize(),
                 iconSize = DpSize(24.dp, 36.dp),
             ) { state.previewPanelOpen = !state.previewPanelOpen }
             if (state.cameraMode && !state.previewPanelOpen) Icon(ChromeIcons.PreviewCamera, null, Modifier.align(Alignment.Center).size(20.dp, 37.dp), tint = Am.Accent)

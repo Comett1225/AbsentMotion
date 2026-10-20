@@ -1,5 +1,7 @@
 package app.absentmotion.library
 
+import app.absentmotion.i18n.txt
+import app.absentmotion.R
 import app.absentmotion.model.MediaDeclaration
 import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
@@ -96,7 +98,7 @@ class BackupTest {
             }.toByteArray()))
             fail()
         } catch (e: ImportFailed) {
-            assertTrue(e.message!!.contains("not an AbsentMotion backup"))
+            assertEquals(txt(R.string.library_err_not_backup), e.text)
         }
         val evil = ByteArrayOutputStream().also { out ->
             ZipOutputStream(out).use { zip ->

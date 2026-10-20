@@ -3,7 +3,11 @@ package app.absentmotion.media
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import app.absentmotion.R
 import app.absentmotion.engine.EngineThread
+import app.absentmotion.export.ExportError
+import app.absentmotion.export.exportCheck
+import app.absentmotion.i18n.txt
 import app.absentmotion.export.FrameInterpolation
 import app.absentmotion.model.FramePair
 import app.absentmotion.model.Layer
@@ -192,7 +196,7 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
         private suspend fun decode(request: Request, sample: VideoSample, exact: Boolean) = decoderLock.withLock {
             val layer = sample.layer
             if (stopped) {
-                check(!exact) { "Video is unavailable: $uri" }
+                exportCheck(!exact) { txt(R.string.media_error_video_unavailable, uri) }
                 return@withLock
             }
             if (!exact && System.nanoTime() < retryAt) return@withLock
@@ -217,13 +221,13 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
             val pts = source.wantedPts(time)
             if (publishedPts == pts) return@withLock
             val image = source.frame(time, ::abandoned) ?: run {
-                check(!exact) { "Cannot decode exact video frame $pts" }
+                exportCheck(!exact) { txt(R.string.media_error_decode_frame, pts.toString()) }
                 return@withLock
             }
             if (abandoned()) return@withLock
             image.hardwareBuffer!!.use { buffer ->
                 val installed = engine.setVideoPicture(uri, buffer, id, exact, source.colorStandard, source.colorRange, image.cropRect) { !abandoned() }
-                if (exact) check(installed) { "Cannot import video frame $pts for $uri" }
+                if (exact) exportCheck(installed) { txt(R.string.media_error_import_frame, pts.toString(), uri) }
                 if (installed) {
                     publishedPts = pts
                     publishedMix = null
@@ -261,15 +265,15 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
             if (publishedMix == key) return true
             for (pts in setOf(pair.a, pair.b)) {
                 if (pts in held) continue
-                val image = source.frame(pts) { false } ?: error("Interpolation source frame $pts is unavailable")
-                check(image.timestamp / 1000 == pts) { "Interpolation received the wrong source frame for $pts" }
-                check(image.hardwareBuffer!!.use { engine.setVideoFrame(uri, it, id, pts, source.colorStandard, source.colorRange, image.cropRect) }) { "Cannot import interpolation source frame $pts" }
+                val image = source.frame(pts) { false } ?: throw ExportError(txt(R.string.media_error_interp_source, pts.toString()))
+                exportCheck(image.timestamp / 1000 == pts) { txt(R.string.media_error_interp_wrong_frame, pts.toString()) }
+                exportCheck(image.hardwareBuffer!!.use { engine.setVideoFrame(uri, it, id, pts, source.colorStandard, source.colorRange, image.cropRect) }) { txt(R.string.media_error_interp_import, pts.toString()) }
                 held += pts
             }
             if (!engine.interpolateVideo(uri, id, pair.a, pair.b, pair.t, request.interpolation == FrameInterpolation.Flow,
                     DebugFrameInterpolation.params())) {
                 held.clear()
-                error("${request.interpolation.label} could not render the requested video frame")
+                throw ExportError(txt(R.string.media_error_interp_render, request.interpolation.label))
             }
             held.retainAll(setOf(pair.a, pair.b))
             publishedMix = key

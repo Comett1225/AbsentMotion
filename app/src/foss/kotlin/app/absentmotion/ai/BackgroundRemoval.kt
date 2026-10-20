@@ -1,5 +1,7 @@
 package app.absentmotion.ai
 
+import app.absentmotion.R
+import app.absentmotion.i18n.AppText
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -12,7 +14,7 @@ import java.io.File
 import kotlin.coroutines.coroutineContext
 import kotlin.math.sqrt
 
-internal class ModelNotReady : Exception("Background removal is not available in this build.")
+internal class ModelNotReady : Exception(AppText.get(R.string.ai_model_not_ready_foss))
 
 internal const val MODEL_ASSET = "absent_bg.abg"
 internal const val MAX_MATTE_PIXELS = 16_000_000L
@@ -47,16 +49,16 @@ internal object BackgroundRemoval {
         var success = false
         try {
             file = aiFile(context, "png")
-            progress(0f, "Loading background removal model…")
+            progress(0f, AppText.get(R.string.ai_loading_model))
             model(context)
             coroutineContext.ensureActive()
             bitmap = decode(context, Uri.parse(uri), limit.coerceAtLeast(1))
             val width = bitmap.width
             val height = bitmap.height
-            progress(0.2f, "Removing background…")
+            progress(0.2f, AppText.get(R.string.ai_removing_background))
             val alpha = matte(context, bitmap)
             coroutineContext.ensureActive()
-            check(alpha.size == width * height) { "The foreground mask has an unexpected size" }
+            check(alpha.size == width * height) { AppText.get(R.string.ai_mask_unexpected_size) }
             val row = IntArray(width)
             bitmap.setHasAlpha(true)
             for (y in 0 until height) {
@@ -65,8 +67,8 @@ internal object BackgroundRemoval {
                 for (x in 0 until width) row[x] = withMatte(row[x], alpha[y * width + x])
                 bitmap.setPixels(row, 0, width, 0, y, width, 1)
             }
-            progress(0.9f, "Saving transparent image…")
-            file.outputStream().use { check(bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)) { "Cannot save image" } }
+            progress(0.9f, AppText.get(R.string.ai_saving_transparent))
+            file.outputStream().use { check(bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)) { AppText.get(R.string.ai_cannot_save_image) } }
             coroutineContext.ensureActive()
             return aiMedia(context, file, "image/png", mapOf("width" to "$width", "height" to "$height",
                 "orientation" to "${original?.orientation ?: 0}")).also { success = true }
@@ -122,7 +124,7 @@ internal object BackgroundRemoval {
         if (needsCopy(target, stamp, version)) {
             val temp = File(context.filesDir, "$MODEL_ASSET.tmp")
             context.assets.open(MODEL_ASSET).use { input -> temp.outputStream().use { input.copyTo(it) } }
-            check(temp.renameTo(target)) { "Cannot install the background removal model" }
+            check(temp.renameTo(target)) { AppText.get(R.string.ai_cannot_install_model) }
             stamp.writeText(version)
         }
         return target
@@ -132,9 +134,9 @@ internal object BackgroundRemoval {
         val resolver = context.contentResolver
         val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
         resolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, bounds) }
-        check(bounds.outWidth > 0 && bounds.outHeight > 0) { "Cannot read this image" }
-        val decoded = checkNotNull(decodePicture(resolver, uri, matteLimit(bounds.outWidth, bounds.outHeight, limit))) { "Cannot decode this image" }
+        check(bounds.outWidth > 0 && bounds.outHeight > 0) { AppText.get(R.string.ai_cannot_read_image) }
+        val decoded = checkNotNull(decodePicture(resolver, uri, matteLimit(bounds.outWidth, bounds.outHeight, limit))) { AppText.get(R.string.ai_cannot_decode_image) }
         if (decoded.isMutable) return decoded
-        return try { checkNotNull(decoded.copy(Bitmap.Config.ARGB_8888, true)) { "Cannot decode this image" } } finally { decoded.recycle() }
+        return try { checkNotNull(decoded.copy(Bitmap.Config.ARGB_8888, true)) { AppText.get(R.string.ai_cannot_decode_image) } } finally { decoded.recycle() }
     }
 }

@@ -1,5 +1,7 @@
 package app.absentmotion.model
 
+import androidx.annotation.StringRes
+import app.absentmotion.R
 import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.sqrt
@@ -258,13 +260,13 @@ fun Layer.withSpeedKeyframeToggled(projectTime: Int, fps: Int): Layer {
     return copy(node = node.withChild("speedMap", changed))
 }
 
-enum class SpeedRamp(val label: String, val points: List<Pair<Float, Float>>) {
-    Montage("Montage", listOf(0f to 1f, 0.25f to 2.5f, 0.5f to 0.6f, 0.75f to 2.5f, 1f to 1f)),
-    Hero("Hero", listOf(0f to 2.5f, 0.4f to 0.3f, 0.6f to 0.3f, 1f to 2.5f)),
-    Bullet("Bullet", listOf(0f to 3f, 0.3f to 0.2f, 0.7f to 0.2f, 1f to 3f)),
-    JumpCut("Jump Cut", listOf(0f to 1f, 0.4f to 1f, 0.5f to 4f, 0.6f to 1f, 1f to 1f)),
-    FlashIn("Flash In", listOf(0f to 4f, 0.4f to 1f, 1f to 1f)),
-    FlashOut("Flash Out", listOf(0f to 1f, 0.6f to 1f, 1f to 4f)),
+enum class SpeedRamp(@StringRes val label: Int, val points: List<Pair<Float, Float>>) {
+    Montage(R.string.timing_ramp_montage, listOf(0f to 1f, 0.25f to 2.5f, 0.5f to 0.6f, 0.75f to 2.5f, 1f to 1f)),
+    Hero(R.string.timing_ramp_hero, listOf(0f to 2.5f, 0.4f to 0.3f, 0.6f to 0.3f, 1f to 2.5f)),
+    Bullet(R.string.timing_ramp_bullet, listOf(0f to 3f, 0.3f to 0.2f, 0.7f to 0.2f, 1f to 3f)),
+    JumpCut(R.string.timing_ramp_jump_cut, listOf(0f to 1f, 0.4f to 1f, 0.5f to 4f, 0.6f to 1f, 1f to 1f)),
+    FlashIn(R.string.timing_ramp_flash_in, listOf(0f to 4f, 0.4f to 1f, 1f to 1f)),
+    FlashOut(R.string.timing_ramp_flash_out, listOf(0f to 1f, 0.6f to 1f, 1f to 4f)),
 }
 
 const val RAMP_EASE = "cubicBezier 0.42 0.0 0.58 1.0"

@@ -1,5 +1,6 @@
 package app.absentmotion.ui.editor.panels
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -41,21 +42,23 @@ import app.absentmotion.ui.theme.fadeBackground
 import kotlin.math.atan
 import kotlin.math.max
 import kotlin.math.tan
+import androidx.compose.ui.res.stringResource
+import app.absentmotion.R
 
-private class Field(val label: String, val path: String, val default: Float, val perDp: Float, val min: Float, val max: Float, val decimals: Int, val unit: String = "") {
+private class Field(@StringRes val label: Int, val path: String, val default: Float, val perDp: Float, val min: Float, val max: Float, val decimals: Int, val unit: String = "") {
     val ref = PropRef(PropRef.Kind.Child, path)
 }
 
-private val Angle = Field("View Angle", "fov", 60f, 0.2f, 0.1f, 179.9f, 1, "º")
-private val Zoom = Field("Zoom", "fov", 60f, 0f, 0f, 0f, 0)
-private val FocusDistance = Field("Focus Distance", "focus-blur/distance", 500f, 5f, 0f, 100000f, 0)
-private val DepthOfField = Field("Depth of Field", "focus-blur/depth-of-field", 100f, 2f, 0f, 100000f, 0)
-private val BlurStrength = Field("Blur Strength", "focus-blur/strength", 0.5f, 0.01f, 0f, 10f, 2)
+private val Angle = Field(R.string.camerapanel_view_angle, "fov", 60f, 0.2f, 0.1f, 179.9f, 1, "º")
+private val Zoom = Field(R.string.camerapanel_zoom, "fov", 60f, 0f, 0f, 0f, 0)
+private val FocusDistance = Field(R.string.camerapanel_focus_distance, "focus-blur/distance", 500f, 5f, 0f, 100000f, 0)
+private val DepthOfField = Field(R.string.camerapanel_depth_of_field, "focus-blur/depth-of-field", 100f, 2f, 0f, 100000f, 0)
+private val BlurStrength = Field(R.string.camerapanel_blur_strength, "focus-blur/strength", 0.5f, 0.01f, 0f, 10f, 2)
 private val FogColor = PropRef(PropRef.Kind.Child, "fog/color")
-private val FogNear = Field("Near", "fog/near-z", 0f, 5f, 0f, 100000f, 0)
-private val FogFar = Field("Far", "fog/far-z", 500f, 5f, 0f, 100000f, 0)
+private val FogNear = Field(R.string.camerapanel_near, "fog/near-z", 0f, 5f, 0f, 100000f, 0)
+private val FogFar = Field(R.string.camerapanel_far, "fog/far-z", 500f, 5f, 0f, 100000f, 0)
 
-private val Tabs = listOf("Camera View", "Focus Blur", "Fog")
+private val Tabs = listOf(R.string.camerapanel_tab_camera_view, R.string.camerapanel_focus_blur, R.string.camerapanel_fog)
 private val FogSwatches = listOf(0xFFFFFFFF, 0xFFC8CCD8, 0xFF8D90A0, 0xFF000000, 0xFF1E2239, 0xFFF5A623, 0xFFE2574C, 0xFF48C3F5)
 private val RowHeight = 40.dp
 private val BoxWidth = 76.dp
@@ -97,7 +100,7 @@ internal fun CameraPanel(state: EditorState, layer: Layer, modifier: Modifier = 
                 Box(
                     Modifier.weight(1f).fillMaxHeight().clickable { tab = i; active = 0 }.fadeBackground(tab == i, PanelDark),
                     contentAlignment = Alignment.Center,
-                ) { Text(name, color = if (tab == i) Am.Accent else Am.OnDark, fontSize = 13.sp, maxLines = 1, softWrap = false) }
+                ) { Text(stringResource(name), color = if (tab == i) Am.Accent else Am.OnDark, fontSize = 13.sp, maxLines = 1, softWrap = false) }
             }
         }
         Swap(tab, Modifier.fillMaxSize(), rise = 0.dp) {
@@ -105,27 +108,29 @@ internal fun CameraPanel(state: EditorState, layer: Layer, modifier: Modifier = 
                 when (tab) {
                     0 -> {
                         Row(Modifier.fillMaxWidth().height(RowHeight).padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Choice("Perspective", perspective, Modifier.weight(1f)) { state.editSelected { it.copy(node = it.node.with("type", "perspective")) } }
+                            Choice(stringResource(R.string.camerapanel_perspective), perspective, Modifier.weight(1f)) { state.editSelected { it.copy(node = it.node.with("type", "perspective")) } }
                             Box(Modifier.width(8.dp))
-                            Choice("Orthographic", !perspective, Modifier.weight(1f)) { state.editSelected { it.copy(node = it.node.with("type", "orthographic")) } }
+                            Choice(stringResource(R.string.camerapanel_orthographic), !perspective, Modifier.weight(1f)) { state.editSelected { it.copy(node = it.node.with("type", "orthographic")) } }
                         }
                         val angle = layer.number(Angle)
-                        NumberRow(Angle.label, formatFixed(angle, 1) + "º", active == 0, perspective, { d -> active = 0; write(Angle, true) { it + d * Angle.perDp } }, { state.endGesture() },
-                            { active = 0; state.askNumber(Angle.label, angle) { v -> write(Angle, false) { v } } })
+                        val angleLabel = stringResource(Angle.label)
+                        val zoomLabel = stringResource(Zoom.label)
+                        NumberRow(angleLabel, formatFixed(angle, 1) + "º", active == 0, perspective, { d -> active = 0; write(Angle, true) { it + d * Angle.perDp } }, { state.endGesture() },
+                            { active = 0; state.askNumber(angleLabel, angle) { v -> write(Angle, false) { v } } })
                         val zoom = zoomOf(angle, size)
-                        NumberRow(Zoom.label, "${zoom.toInt()}", active == 1, perspective, { d -> active = 1; writeZoom(true) { it + d * size / 200f } }, { state.endGesture() },
-                            { active = 1; state.askNumber(Zoom.label, zoom.toInt().toFloat()) { v -> writeZoom(false) { v } } })
+                        NumberRow(zoomLabel, "${zoom.toInt()}", active == 1, perspective, { d -> active = 1; writeZoom(true) { it + d * size / 200f } }, { state.endGesture() },
+                            { active = 1; state.askNumber(zoomLabel, zoom.toInt().toFloat()) { v -> writeZoom(false) { v } } })
                     }
                     1 -> {
-                        SwitchRow("Focus Blur", layer.blockOn("focus-blur")) { on -> state.editSelected { it.withBlock("focus-blur", on) } }
+                        SwitchRow(stringResource(R.string.camerapanel_focus_blur), layer.blockOn("focus-blur")) { on -> state.editSelected { it.withBlock("focus-blur", on) } }
                         FieldRows(state, layer, rows, active, layer.blockOn("focus-blur"), { active = it }, ::write)
                     }
                     else -> {
-                        SwitchRow("Fog", layer.blockOn("fog")) { on -> state.editSelected { it.withBlock("fog", on) } }
+                        SwitchRow(stringResource(R.string.camerapanel_fog), layer.blockOn("fog")) { on -> state.editSelected { it.withBlock("fog", on) } }
                         val on = layer.blockOn("fog")
                         val colour = parseColor(layer.element(FogColor)?.valueAt(layer.t)) ?: 0xFFFFFFFF.toInt()
                         Row(Modifier.fillMaxWidth().height(RowHeight).padding(horizontal = 8.dp).alpha(if (on) 1f else 0.35f), verticalAlignment = Alignment.CenterVertically) {
-                            Text("Color", Modifier.width(96.dp), color = Am.OnDark, fontSize = 14.sp, maxLines = 1)
+                            Text(stringResource(R.string.color), Modifier.width(96.dp), color = Am.OnDark, fontSize = 14.sp, maxLines = 1)
                             FogSwatches.forEach { argb ->
                                 val c = argb.toInt()
                                 Box(
@@ -146,8 +151,9 @@ internal fun CameraPanel(state: EditorState, layer: Layer, modifier: Modifier = 
 private fun FieldRows(state: EditorState, layer: Layer, rows: List<Field>, active: Int, on: Boolean, select: (Int) -> Unit, write: (Field, Boolean, (Float) -> Float) -> Unit) {
     rows.forEachIndexed { i, f ->
         val v = layer.number(f)
-        NumberRow(f.label, formatFixed(v, f.decimals), active == i, on, { d -> select(i); write(f, true) { it + d * f.perDp } }, { state.endGesture() },
-            { select(i); state.askNumber(f.label, v) { typed -> write(f, false) { typed } } })
+        val label = stringResource(f.label)
+        NumberRow(label, formatFixed(v, f.decimals), active == i, on, { d -> select(i); write(f, true) { it + d * f.perDp } }, { state.endGesture() },
+            { select(i); state.askNumber(label, v) { typed -> write(f, false) { typed } } })
     }
 }
 

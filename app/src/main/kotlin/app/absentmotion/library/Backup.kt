@@ -1,5 +1,7 @@
 package app.absentmotion.library
 
+import app.absentmotion.R
+import app.absentmotion.i18n.txt
 import app.absentmotion.model.Scene
 import app.absentmotion.model.mapMediaUris
 import java.io.File
@@ -90,7 +92,7 @@ object Backup {
         ZipInputStream(counted.buffered()).use { zip ->
             val first = zip.nextEntry
             val head = if (first?.name == MARKER) zip.readNBytes(4096).toString(Charsets.UTF_8).lines() else emptyList()
-            if (head.firstOrNull() != FORMAT) throw ImportFailed("This file is not an AbsentMotion backup.")
+            if (head.firstOrNull() != FORMAT) throw ImportFailed(txt(R.string.library_err_not_backup))
             oldRoot = head.getOrNull(1).orEmpty().trim()
             while (true) {
                 val entry = zip.nextEntry ?: break
@@ -130,7 +132,7 @@ object Backup {
 
     private fun readText(input: InputStream): String {
         val bytes = input.readNBytes(MAX_TEXT + 1)
-        if (bytes.size > MAX_TEXT) throw ImportFailed("A project in the backup is too large.")
+        if (bytes.size > MAX_TEXT) throw ImportFailed(txt(R.string.library_err_backup_project_large))
         return bytes.toString(Charsets.UTF_8)
     }
 

@@ -84,6 +84,8 @@ import kotlinx.coroutines.withContext
 import java.util.Locale
 import kotlin.math.min
 import kotlin.math.roundToInt
+import androidx.compose.ui.res.stringResource
+import app.absentmotion.R
 
 private val Rounded = RoundedCornerShape(12.dp)
 private const val ReplaceHint = 1
@@ -219,7 +221,7 @@ fun TemplateEditor(templateId: String, engine: EngineThread, settings: AppSettin
             val media = mediaDeclaration(context, uri)
             val duration = (media?.duration ?: -1) / 1000
             when {
-                media == null -> Toast.makeText(context, "Unsupported file type", Toast.LENGTH_SHORT).show()
+                media == null -> Toast.makeText(context, context.getString(R.string.library_err_unsupported_type), Toast.LENGTH_SHORT).show()
                 !media.type.startsWith("video/") -> choose(slot, media, 0)
                 slot.length - 300 > duration -> { frozen = true; choose(slot, media, 0) }
                 slot.length + 600 < duration -> { trimStart = 0; playing = false; trimming = Trimming(slot, media) }
@@ -253,9 +255,9 @@ fun TemplateEditor(templateId: String, engine: EngineThread, settings: AppSettin
         Spacer(Modifier.height(16.dp))
         val clip = trimming
         if (clip == null) {
-            TopBar("Use Template", ChromeIcons.Back, "Back", "Next", { if (choices.isEmpty()) onClose() else asking = 1 }, { asking = 2 })
+            TopBar(stringResource(R.string.template_use_title), ChromeIcons.Back, stringResource(R.string.home_back), stringResource(R.string.template_next), { if (choices.isEmpty()) onClose() else asking = 1 }, { asking = 2 })
         } else {
-            TopBar("Drag across to select", HomeIcons.Close, "Close", "Done", { trimming = null }, {
+            TopBar(stringResource(R.string.template_drag_to_select), HomeIcons.Close, stringResource(R.string.action_close), stringResource(R.string.done), { trimming = null }, {
                 choose(clip.slot, clip.media, trimStart)
                 trimming = null
             })
@@ -265,12 +267,12 @@ fun TemplateEditor(templateId: String, engine: EngineThread, settings: AppSettin
             .clickable(enabled = clip == null) { playing = !playing }) {
             app.absentmotion.platform.SceneSurface(engine, 1, box, Modifier.fillMaxSize())
             if (clip == null && !playing) Box(Modifier.align(Alignment.Center).size(56.dp).clip(CircleShape).background(Color(0x66000000)), Alignment.Center) {
-                Icon(ChromeIcons.Play, "Play", Modifier.size(32.dp), tint = Color.White)
+                Icon(ChromeIcons.Play, stringResource(R.string.template_play), Modifier.size(32.dp), tint = Color.White)
             }
             val hint = when {
                 clip != null -> null
-                selected != null && hints and ReplaceHint == 0 -> "Tap again to swap in your own media" to ReplaceHint
-                choices.values.any { it.media != null } && hints and ScaleHint == 0 -> "Tap the corner icon to change scaling" to ScaleHint
+                selected != null && hints and ReplaceHint == 0 -> stringResource(R.string.template_hint_replace) to ReplaceHint
+                choices.values.any { it.media != null } && hints and ScaleHint == 0 -> stringResource(R.string.template_hint_scale) to ScaleHint
                 else -> null
             }
             if (hint != null) Hint(hint.first, Modifier.align(Alignment.BottomCenter)) { hints = hints or hint.second; settings.templateHints = hints }
@@ -288,7 +290,7 @@ fun TemplateEditor(templateId: String, engine: EngineThread, settings: AppSettin
                 }
             }
             Spacer(Modifier.height(16.dp))
-            Text("Media slots", Modifier.padding(horizontal = 16.dp), color = Am.OnDark, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.media_slots), Modifier.padding(horizontal = 16.dp), color = Am.OnDark, fontSize = 18.sp, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(12.dp))
             LazyRow(Modifier.fillMaxWidth().height(96.dp), contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 itemsIndexed(slots, key = { _, s -> s.uri }) { _, slot ->
@@ -310,7 +312,7 @@ fun TemplateEditor(templateId: String, engine: EngineThread, settings: AppSettin
                 }
             }
             Text(
-                if (selected == null) "Tap to pick media" else "Tap again to swap",
+                stringResource(if (selected == null) R.string.template_tap_to_pick else R.string.template_tap_to_swap),
                 Modifier.fillMaxWidth().padding(vertical = 12.dp), color = Am.OnDarkDim, fontSize = 14.sp, textAlign = TextAlign.Center,
             )
         } else {
@@ -330,17 +332,17 @@ fun TemplateEditor(templateId: String, engine: EngineThread, settings: AppSettin
     }
 
     if (asking == 1) Ask(
-        "Leave the editor?", "Leaving now discards your changes.\n\nStay here to swap the template's media for your own.",
-        "Keep editing", { asking = 0 }, "Exit", { asking = 0; onClose() },
+        stringResource(R.string.template_leave_title), stringResource(R.string.template_leave_body),
+        stringResource(R.string.template_keep_editing), { asking = 0 }, stringResource(R.string.template_exit), { asking = 0; onClose() },
     )
     if (asking == 2) Ask(
-        "Finished swapping in your media?", "Once you continue you can't return to this step.\n\nStay here to swap the template's media for your own.",
-        "Keep Editing the Template", { asking = 0 }, "Go to Timeline", { asking = 0; playing = false; onContinue(working) },
+        stringResource(R.string.template_finish_title), stringResource(R.string.template_finish_body),
+        stringResource(R.string.template_keep_editing_template), { asking = 0 }, stringResource(R.string.template_go_to_timeline), { asking = 0; playing = false; onContinue(working) },
     )
     if (frozen) AlertDialog(
-        onDismissRequest = { frozen = false }, title = { Text("Video frozen") },
-        text = { Text("Your video ended early, so its last frame is held.\nSwap in a longer clip for a cleaner result.") },
-        confirmButton = { TextButton({ frozen = false }) { Text("OK", color = Am.Accent) } },
+        onDismissRequest = { frozen = false }, title = { Text(stringResource(R.string.video_frozen)) },
+        text = { Text(stringResource(R.string.your_video_ended_early_so_its)) },
+        confirmButton = { TextButton({ frozen = false }) { Text(stringResource(R.string.ok), color = Am.Accent) } },
         containerColor = Am.Field, titleContentColor = Am.OnDark, textContentColor = Am.OnDark,
     )
 }
@@ -360,7 +362,7 @@ private fun TopBar(title: String, icon: ImageVector, description: String, action
 private fun Hint(text: String, modifier: Modifier, onOk: () -> Unit) {
     Row(modifier.padding(12.dp).clip(Rounded).background(Am.Field).padding(start = 16.dp), verticalAlignment = Alignment.CenterVertically) {
         Text(text, Modifier.weight(1f, fill = false), color = Am.OnDark, fontSize = 15.sp)
-        TextButton(onOk) { Text("OK", color = Am.Accent) }
+        TextButton(onOk) { Text(stringResource(R.string.ok), color = Am.Accent) }
     }
 }
 
@@ -393,10 +395,10 @@ private fun SlotCell(picture: ImageBitmap?, selected: Boolean, mode: MediaFillMo
     ) {
         picture?.let { Image(it, null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop) }
         if (selected) Box(Modifier.align(Alignment.Center).size(40.dp).clip(CircleShape).background(Color(0x99000000)), Alignment.Center) {
-            Icon(HomeIcons.Replace, "Replace", Modifier.size(24.dp), tint = Color.White)
+            Icon(HomeIcons.Replace, stringResource(R.string.template_replace), Modifier.size(24.dp), tint = Color.White)
         }
         Box(Modifier.align(Alignment.TopEnd).padding(4.dp).size(28.dp).clip(CircleShape).background(Color(0x99000000)).clickable(onClick = onScale), Alignment.Center) {
-            Icon(when (mode) { MediaFillMode.Fill -> HomeIcons.CropFill; MediaFillMode.Fit -> HomeIcons.CropFit; MediaFillMode.Stretch -> HomeIcons.CropStretch }, "Scale", Modifier.size(20.dp), tint = Color.White)
+            Icon(when (mode) { MediaFillMode.Fill -> HomeIcons.CropFill; MediaFillMode.Fit -> HomeIcons.CropFit; MediaFillMode.Stretch -> HomeIcons.CropStretch }, stringResource(R.string.template_scale), Modifier.size(20.dp), tint = Color.White)
         }
     }
 }

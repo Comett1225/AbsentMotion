@@ -1,5 +1,8 @@
 package app.absentmotion.export
 
+import app.absentmotion.R
+import app.absentmotion.i18n.UiText
+import app.absentmotion.i18n.txt
 import org.json.JSONArray
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -64,9 +67,9 @@ class ExportTimeTest {
     }
 
     @Test fun labelsRound() {
-        assertEquals("a few seconds", timeLabel(4_000))
-        assertEquals("about 45 seconds", timeLabel(44_000))
-        assertEquals("about 3 minutes", timeLabel(170_000))
-        assertEquals("about 1.5 hours", timeLabel(5_400_000))
+        assertEquals(txt(R.string.export_time_few_seconds), timeLabel(4_000))
+        assertEquals(UiText.plural(R.plurals.export_time_seconds, 45, "45"), timeLabel(44_000))
+        assertEquals(UiText.plural(R.plurals.export_time_minutes, 3, "3"), timeLabel(170_000))
+        assertEquals(txt(R.string.export_time_hours, "1.5"), timeLabel(5_400_000))
     }
 }
