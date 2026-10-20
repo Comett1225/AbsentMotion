@@ -53,9 +53,9 @@ fun EditorScreen(state: EditorState, onExit: () -> Unit) {
 @Composable
 private fun EditorBody(state: EditorState, onExit: () -> Unit) {
     val wide = LocalWide.current
-    BackHandler { if (!state.stepBack()) onExit() }
+    BackHandler { if (state.previewPanelOpen) state.previewPanelOpen = false else if (!state.stepBack()) onExit() }
     val lifecycle = LocalLifecycleOwner.current.lifecycle
-    DisposableEffect(lifecycle) {
+    DisposableEffect(lifecycle, state) {
         val observer = LifecycleEventObserver { _, event -> if (event == Lifecycle.Event.ON_STOP) state.endGesture() }
         lifecycle.addObserver(observer)
         onDispose { lifecycle.removeObserver(observer) }
