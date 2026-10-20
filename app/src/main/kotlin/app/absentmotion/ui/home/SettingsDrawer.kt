@@ -297,7 +297,8 @@ private fun Choices(labels: List<Int>, chosen: Int, onPick: (Int) -> Unit) {
                 Modifier.weight(1f).fillMaxHeight().background(if (selected) Am.Navy else Color.Transparent, shape).clickable { onPick(index) },
                 contentAlignment = Alignment.Center,
             ) {
-                Text(stringResource(label).uppercase(java.util.Locale.getDefault()), color = if (selected) Am.OnNavyAccent else Am.Navy, fontSize = 14.sp, fontWeight = FontWeight.Medium)
+                Text(stringResource(label).uppercase(java.util.Locale.getDefault()), Modifier.padding(horizontal = 2.dp), color = if (selected) Am.OnNavyAccent else Am.Navy,
+                    fontWeight = FontWeight.Medium, maxLines = 1, autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(9.sp, 14.sp))
             }
         }
     }

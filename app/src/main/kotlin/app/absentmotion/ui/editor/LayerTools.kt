@@ -217,8 +217,9 @@ private fun ToolButton(tool: Tool, modifier: Modifier, enabled: Boolean = true, 
     ) {
         PanelIcon(tool.icon, Am.OnDark, Modifier.align(Alignment.TopCenter).offset(y = (tool.iconY - 12f).dp))
         Text(
-            stringResource(tool.label), Modifier.align(Alignment.TopCenter).offset(y = (tool.textY - tool.textSp * 0.6f).dp),
-            color = ToolLabel, fontSize = tool.textSp.sp, lineHeight = (tool.textSp * 1.2f).sp, maxLines = 1, softWrap = false,
+            stringResource(tool.label), Modifier.align(Alignment.TopCenter).offset(y = (tool.textY - tool.textSp * 0.6f).dp).fillMaxWidth().padding(horizontal = 4.dp),
+            color = ToolLabel, lineHeight = (tool.textSp * 1.2f).sp, maxLines = 1, softWrap = false, textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(7.sp, tool.textSp.sp, 0.5.sp),
         )
     }
 }

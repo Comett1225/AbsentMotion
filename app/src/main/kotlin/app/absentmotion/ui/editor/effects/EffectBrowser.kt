@@ -190,7 +190,7 @@ private fun EffectTile(catalog: EffectCatalog, effect: EffectDefinition, width: 
                 .padding(horizontal = 3.dp), color = Color.White, fontSize = 7.sp, lineHeight = 9.sp, fontWeight = FontWeight.Bold, maxLines = 1)
         }
         Text(effect.name, Modifier.fillMaxWidth().padding(top = 4.dp), color = Am.OnDark, fontSize = if (width > 100) 10.sp else 8.sp,
-            lineHeight = 9.sp, textAlign = TextAlign.Center, maxLines = 2)
+            lineHeight = 9.sp, textAlign = TextAlign.Center, maxLines = 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
     }
 }
 
