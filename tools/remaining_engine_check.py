@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 from pathlib import Path
+import io
 import json
 import struct
 import sys
 import numpy as np
+from PIL import Image
 import engine_check as engine
 
 
@@ -65,7 +67,18 @@ def models():
                                     {'bufferView': 1, 'componentType': 5123, 'count': 6, 'type': 'SCALAR'}]}).encode()
     doc += b' ' * (-len(doc) % 4)
     glb = struct.pack('<5I', 0x46546C67, 2, 28 + len(doc) + len(blob), len(doc), 0x4E4F534A) + doc + struct.pack('<2I', len(blob), 0x004E4942) + blob
-    return {'box.obj': box.encode(), 'box.mtl': b'newmtl red\nKd 1 0 0\n', 'card.glb': glb}
+
+    def stack(reds):
+        lines, n = ['mtllib layers.mtl', 'vt 0 0', 'vt 1 0', 'vt 1 1', 'vt 0 1'], 0
+        for name, z in [('red', z) for z in reds] + [('green', 0)]:
+            lines += [f'usemtl {name}'] + [f'v {x} {y} {z}' for x, y in [(-0.6, -0.6), (0.6, -0.6), (0.6, 0.6), (-0.6, 0.6)]]
+            lines += [f'f {n + 1}/1 {n + 2}/2 {n + 3}/3 {n + 4}/4', f'f {n + 4}/4 {n + 3}/3 {n + 2}/2 {n + 1}/1']
+            n += 4
+        return ('\n'.join(lines) + '\n').encode()
+    green = io.BytesIO()
+    Image.new('RGB', (4, 4), engine.GREEN).save(green, 'PNG')
+    return {'box.obj': box.encode(), 'box.mtl': b'newmtl red\nKd 1 0 0\n', 'card.glb': glb, 'layers.mtl': b'newmtl red\nKd 1 0 0\nnewmtl green\nKd 1 1 1\nmap_Kd green.png\n',
+            'green.png': green.getvalue(), 'layers1.obj': stack([-0.5, 0.5, 0.45]), 'layers2.obj': stack([-0.5, 0.5, -0.45])}
 
 
 def model(id, name, z=0, extra=''):
@@ -79,6 +92,8 @@ def model_cases():
     yield 'a glTF card turned away is culled', engine.scene(model(1, 'card.glb', extra='<tilt value="0,180"/>')), [((100, 100), engine.BLACK)]
     yield 'a layer in front of a model covers it', engine.scene(model(1, 'box.obj') + engine.rect(2, 100, 100, 10, 10, 0xff0000ff).replace('100,100,0', '100,100,-100')), [((100, 100), engine.BLUE), ((100, 70), engine.RED)]
     yield 'a layer behind a model is covered', engine.scene(engine.rect(2, 100, 100, 10, 10, 0xff0000ff).replace('100,100,0', '100,100,200') + model(1, 'box.obj')), [((100, 100), engine.RED)]
+    for k in (1, 2):
+        yield f'materials are layered by depth, not by material ({k})', engine.scene(model(1, f'layers{k}.obj')), [((100, 100), engine.RED)]
 
 
 def tilted(id, y, x, extra=''):
@@ -142,7 +157,9 @@ def motion_cases():
             + '<fillColor value="#ff00ff00"/><property name="size" type="vec2" value="5,5"/></shape>')
     yield 'moves are not applied twice in depth', engine.scene(dot(fx('oscillate', angle=0, frequency=0.5, magnitude=50)) + deep), [((150, 100), red), ((100, 100), black)], 15
     yield 'echo behind', engine.scene(keyed(1, 50, 150, fx('echo', seconds=0.5, count=1, alpha=0.5))), [((130, 100), red), ((80, 100), (128, 0, 0)), ((105, 100), black)], 24
-    yield 'echo count', engine.scene(keyed(1, 50, 150, fx('echo', seconds=0.6, count=2, alpha=1))), [((130, 100), red), ((100, 100), red), ((70, 100), red), ((115, 100), black)], 24
+    echo = keyed(1, 50, 150, fx('echo', seconds=0.6, count=2, alpha=1))
+    trail = [((130, 100), red), ((100, 100), red), ((70, 100), red), ((115, 100), black)]
+    yield 'echo count', engine.scene(echo), trail, 24
     yield 'time quantization', engine.scene(keyed(1, 50, 150, fx('timequant', fps=2))), [((100, 100), red), ((117, 100), black)], 20
     cyan, green = (0, 255, 255), (0, 255, 0)
     family = lambda shared, own='': (engine.rect(5, 50, 100, 15, 15, 0xffff0000, extra=shared) + engine.rect(6, 100, 0, 15, 15, 0xffff0000, extra=own, attrs=' parent="5"')
@@ -151,6 +168,12 @@ def motion_cases():
     yield 'an unshared effect stays on its layer', engine.scene(family('<effect id="absent.invert"/>')), [((50, 100), cyan), ((150, 100), red), ((150, 150), red)], 0
     solid = '<effect id="absent.solid" applyToChildren="true"><property name="color" type="color" value="#ff00ff00"/><property name="amount" type="float" value="1"/></effect>'
     yield 'a shared effect comes after the child\'s own effects', engine.scene(family(solid, '<effect id="absent.invert"/>')), [((150, 100), green)], 0
+    yield 'echo keeps its trail under a camera', engine.scene(echo + EYE), trail, 24
+    yield 'echo keeps its trail next to a layer in depth', engine.scene(echo + deep), trail, 24
+    yield 'time quantization steps effect time too', engine.scene(dot(fx('timequant', fps=2) + fx('fade', fadeIn=1, fadeOut=0))), [((100, 100), (128, 0, 0))], 20
+
+
+EYE = '<camera id="9" label="e" startTime="0" endTime="1000"><transform><location value="100,100,-173.2051"/></transform></camera>'
 
 
 def shutter_scene(extra, size='10,10', moves=True, spins=False, camera=''):
@@ -164,8 +187,8 @@ def shutter_cases():
     blur = fx('shutterblur', shutter=180, samples=8)
     hidden = blur.replace('<effect id="absent.shutterblur"', '<effect id="absent.shutterblur" hidden="true"')
     red = lambda image, x, y: int(image[y, x][0])
-    yield 'true motion blur smears a moving layer evenly both ways', shutter_scene(blur), \
-        lambda i: red(i, 100, 100) > 250 and 30 < red(i, 114, 100) < 100 and abs(red(i, 114, 100) - red(i, 85, 100)) < 8 and red(i, 121, 100) < 3
+    even = lambda i: red(i, 100, 100) > 250 and 30 < red(i, 114, 100) < 100 and abs(red(i, 114, 100) - red(i, 85, 100)) < 8 and red(i, 121, 100) < 3
+    yield 'true motion blur smears a moving layer evenly both ways', shutter_scene(blur), even
     yield 'a hidden true motion blur leaves the layer sharp', shutter_scene(hidden), lambda i: red(i, 105, 100) > 250 and red(i, 114, 100) < 3
     yield 'a closed shutter leaves the layer sharp', shutter_scene(fx('shutterblur', shutter=0, samples=8)), lambda i: red(i, 114, 100) < 3
     yield 'true motion blur follows rotation', shutter_scene(blur, '60,6', moves=False, spins=True), \
@@ -176,6 +199,7 @@ def shutter_cases():
     yield 'the camera motion blur still smears what it sees', shutter_scene('', '20,20', moves=False, camera=camera.format('<effect id="absent.motionblur"/>')), \
         lambda i: red(i, 100, 100) > 150 and 15 < red(i, 116, 100) < 200
     yield 'a camera without motion blur leaves layers sharp', shutter_scene('', '20,20', moves=False, camera=camera.format('')), lambda i: red(i, 116, 100) < 3
+    yield 'true motion blur smears evenly under a camera', shutter_scene(blur, camera=EYE), even
 
 
 def centre(image):
@@ -271,6 +295,12 @@ def main():
         bad = [(xy, tuple(image[xy[1], xy[0]]), want) for xy, want in probes if np.abs(image[xy[1], xy[0]] - want).max() > engine.TOLERANCE]
         print(('FAIL ' if bad else 'ok   ') + name + (': ' + str(bad) if bad else ''), flush=True)
         failed += bool(bad)
+    turned = lambda extra, effect='': engine.scene(model(1, 'box.obj', extra='<tilt value="0,45"/>' + extra).replace('</model>', effect + '</model>'))
+    faded = engine.still('modelfaded', turned('<opacity value="0.5"/>'), work)
+    copied = engine.still('modelcopied', turned('', fx('linearrepeat', count=1, rangeOpacity=0.5, rangeStart=-1, rangeEnd=0)), work)
+    ok = faded.max() > 100 and np.abs(faded - copied).max() <= engine.TOLERANCE
+    print(('ok   ' if ok else 'FAIL ') + 'a faded repeat copy of a turned model is not clipped: ' + str(int((np.abs(faded - copied).max(axis=2) > engine.TOLERANCE).sum())) + ' pixels differ', flush=True)
+    failed += not ok
     hits = engine.run('modelhit', engine.scene(model(4, 'box.obj')), work, [(100, 100), (10, 10)])
     engine.adb('shell', 'rm', engine.DEVICE_DIR + '/modelhit.png')
     got = [line.split()[-1] for line in hits.splitlines() if ' hit ' in line]
@@ -286,6 +316,13 @@ def main():
     same = np.array_equal(lf, crlf)
     print(('ok   ' if same else 'FAIL ') + 'CRLF matches LF', flush=True)
     failed += not same
+    words = ('<text id="1" label="w" fillType="color" startTime="0" endTime="1000" size="90" wrapWidth="190" align="left">' + engine.transform('20,40,0')
+             + '<content>O</content><fillColor value="#ff0000ff"/></text>')
+    spots = [centre(engine.still(f'textpath{k}', engine.scene(words + engine.rect(2, 0, 0, 3, 3, 0xffff0000, extra=effect)), work))
+             for k, effect in enumerate([fx('movealongpath', progress=0, rotate=0), fx('repeatalongpath', count=1)])]
+    ok = None not in spots[0] + spots[1] and np.hypot(spots[0][0] - spots[1][0], spots[0][1] - spots[1][1]) < 1.5
+    print(('ok   ' if ok else 'FAIL ') + 'move along path and repeat along path both start on the letter outline of text: ' + str(spots), flush=True)
+    failed += not ok
     timed = text('A B C D E').replace('</text>', '<effect id="com.alightcreative.effects.textspacing"><property name="letterspacing" type="float"><kf t="0" v="0"/><kf t="1" v="0.3"/></property></effect></text>')
     child = timed[timed.index('<text'):timed.index('</text>') + len('</text>')]
     group = '<embedScene id="9" startTime="500" endTime="1499">' + engine.transform('100,100,0') + '<scene width="200" height="200" fps="24" totalTime="1000" retime="off">' + child + '</scene></embedScene>'

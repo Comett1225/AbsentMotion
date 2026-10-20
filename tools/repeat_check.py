@@ -56,6 +56,16 @@ def cases():
     yield 'fill colour over the whole range', engine.scene(dot(fx('linearrepeat', count=2, position=(100, 0), fillColor='#ff00ff00', fillAmount=1, rangeEnd=0))), [((50, 100), GREEN), ((150, 100), GREEN)], 0
     yield 'range scale shrinks the last copy', engine.scene(dot(fx('linearrepeat', count=2, position=(100, 0), rangeScale=0.25), hw=12)), [((50, 100), RED), ((150, 100), RED), ((160, 100), BLACK), ((60, 100), RED)], 0
     yield 'two repeats multiply', engine.scene(dot(fx('linearrepeat', count=2, position=(100, 0)) + fx('linearrepeat', count=2, position=(0, 100)))), [((50, 50), RED), ((150, 50), RED), ((50, 150), RED), ((150, 150), RED), ((100, 100), BLACK)], 0
+    eye = '<camera id="9" label="e" startTime="0" endTime="1000"><transform><location value="100,100,-173.2051"/></transform></camera>'
+    yield 'repeat time trails the animation under a camera', engine.scene(keyed(fx('repeat', count=2, time=0.5)) + eye), [((130, 100), RED), ((80, 100), RED), ((105, 100), BLACK)], 24
+    yield 'an adjustment layer repeated by a grid adjusts only inside its copies', engine.scene(engine.rect(2, 100, 100, 100, 100, 0xffff0000) + adjustment(2, 100)), [((50, 50), CYAN), ((150, 150), CYAN), ((100, 100), RED), ((30, 30), RED)], 0
+
+
+CYAN = (0, 255, 255)
+
+
+def adjustment(count, span, hw=10):
+    return dot(fx('backdrop', mix=0) + '<effect id="absent.invert"/>' + fx('gridrepeat', count=count, position=(span, span)), hw=hw, id=3)
 
 
 def moving_video(path, frames=60, width=256, height=256):
@@ -120,6 +130,12 @@ def main():
         shots = [still(f'scatter{seed}{again}', field(seed)) for seed, again in [(1, 'a'), (1, 'b'), (2, 'a')]]
         report(np.array_equal(shots[0], shots[1]) and not np.array_equal(shots[0], shots[2]) and shots[0].max() > 200,
                'scatter field is steady for a seed and changes with it')
+        started = time.time()
+        crowd = still('adjustgrid', engine.scene(engine.rect(2, 100, 100, 100, 100, 0xffff0000) + adjustment(30, 190, 2)))
+        seconds = time.time() - started
+        near = lambda x, y, want: np.abs(crowd[y, x] - want).max() <= engine.TOLERANCE
+        report(seconds < 6 and near(5, 5, CYAN) and near(195, 195, CYAN) and near(8, 8, RED),
+               f'an adjustment layer in a 30 x 30 grid renders in {seconds:.1f} s')
     if part in ('all', 'mosh'):
         video = work / 'mosh.mp4'
         moving_video(video)
@@ -155,6 +171,20 @@ def main():
         moved = float(np.abs(blocks[0] - flat).mean())
         report(np.array_equal(*blocks) and np.array_equal(*early) and moved > 1,
                f'block datamosh on a picture is steady, starts on time and moves blocks by {moved:.1f}')
+        ended = [still('moshpictureend', mosh_scene(fx('datamosh', start=0.2, duration=0.3), video=False), 30), still('moshpictureplain30', mosh_scene('', video=False), 30)]
+        report(np.array_equal(*ended), 'block datamosh on a picture ends after its length')
+        still('moshclose', mosh_scene(effect), 20)
+        pid = engine.adb('shell', 'pidof', engine.PKG).strip()
+        engine.adb('logcat', '-b', 'all', '-c')
+        for _ in range(4):
+            engine.adb('shell', 'input', 'keyevent', 'KEYCODE_BACK')
+            time.sleep(1.5)
+        time.sleep(3)
+        alive = engine.adb('shell', 'pidof', engine.PKG).strip()
+        crashes = engine.adb('logcat', '-d', '-b', 'crash').strip()
+        again = still('moshreopen', mosh_scene(effect), 20)
+        report(bool(pid) and alive == pid and not crashes and np.array_equal(again, first),
+               f'closing the app after a video datamosh frees it without a crash (pid {pid} -> {alive or "gone"}, crash log {crashes[-300:]!r})')
         for name in ('mosh.mp4', 'mosh.png'):
             engine.adb('shell', 'rm', f'{engine.DEVICE_DIR}/{name}')
     sys.exit(1 if failed else 0)
