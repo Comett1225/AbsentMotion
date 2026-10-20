@@ -1048,7 +1048,7 @@
     <string name="shape_name_location_pin">Konum iğnesi</string>
     <string name="shape_name_rounded_play">Yuvarlak oynat</string>
     <string name="shape_name_pause">Duraklat</string>
-    <string name="shape_name_record">Kayıt</string>
+    <string name="shape_name_record">Plak</string>
     <string name="shape_name_gear">Dişli</string>
     <string name="shape_name_shape">Şekil</string>
     <string name="shape_name_ellipse">Elips</string>
@@ -1062,11 +1062,11 @@
     <string name="model_layer_svg">SVG</string>
     <string name="edit_panel_time_remapping">Zaman yeniden eşleme</string>
     <string name="edit_panel_transform">Dönüştür</string>
-    <string name="edit_panel_fill_color">Dolgu ve renk</string>
-    <string name="edit_panel_shape_options">Şekil seçenekleri</string>
+    <string name="edit_panel_fill_color">Dolgu ve Renk</string>
+    <string name="edit_panel_shape_options">Şekil Seçenekleri</string>
     <string name="edit_panel_edit_text">Metni düzenle</string>
-    <string name="edit_panel_frame_shadow">Kenarlık ve gölge</string>
-    <string name="edit_panel_opacity_blend">Opaklık ve karışım modu</string>
+    <string name="edit_panel_frame_shadow">Kenarlık ve Gölge</string>
+    <string name="edit_panel_opacity_blend">Opaklık ve Karışım Modu</string>
     <string name="edit_panel_effects">Efektler</string>
     <string name="edit_panel_camera_options">Kamera seçenekleri</string>
     <string name="edit_keep_copying">“%1$s” projeye kopyalanıyor…</string>

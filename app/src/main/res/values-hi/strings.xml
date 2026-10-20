@@ -976,7 +976,7 @@
     <string name="ai_reading_audio">ऑडियो पढ़ा जा रहा है…</string>
     <string name="ai_recognising_speech">बोली पहचानी जा रही है…</string>
     <string name="ai_caption_model_load_failed">कैप्शन मॉडल लोड नहीं हो सका। इसे सेटिंग्स में हटाएँ और फिर कोशिश करें।</string>
-    <string name="ai_speech_failed">बोली पहचान विफल रही</string>
+    <string name="ai_speech_failed">स्पीच पहचान विफल रही</string>
     <string name="ai_cannot_create_model_storage">मॉडल स्टोरेज नहीं बना सकते</string>
     <string name="ai_download_failed_http">डाउनलोड विफल रहा (HTTP %1$s)</string>
     <string name="ai_download_not_model">डाउनलोड किया गया डेटा कैप्शन मॉडल नहीं था</string>
@@ -1064,7 +1064,7 @@
     <string name="edit_panel_transform">ट्रांसफ़ॉर्म</string>
     <string name="edit_panel_fill_color">फ़िल और कलर</string>
     <string name="edit_panel_shape_options">शेप विकल्प</string>
-    <string name="edit_panel_edit_text">टेक्स्ट एडिट करें</string>
+    <string name="edit_panel_edit_text">टेक्स्ट एडिट</string>
     <string name="edit_panel_frame_shadow">फ़्रेम और शैडो</string>
     <string name="edit_panel_opacity_blend">ओपेसिटी और ब्लेंडिंग मोड</string>
     <string name="edit_panel_effects">इफ़ेक्ट्स</string>

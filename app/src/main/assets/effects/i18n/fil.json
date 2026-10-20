@@ -13,7 +13,7 @@
  },
  "effects": {
   "autoshake": {
-   "description": "Ginagyanig nang random ang patong, bahagyang gumagalaw at umiikot.",
+   "description": "Pinapanginig ang layer nang random, ginagalaw at iniikot nang bahagya.",
    "name": "Auto-yanig",
    "params": {
     "frequency": {
@@ -31,8 +31,8 @@
    }
   },
   "backdrop": {
-   "description": "Pinupuno ng patong ang anumang iginuhit sa ilalim nito, kaya binabago ng mga epektong kasunod nito ang mga patong sa ibaba. Ibinabalik ng Halo ang sariling fill ng patong.",
-   "name": "Patong pang-adjust",
+   "description": "Pinupuno ang layer ng iginuhit sa ilalim nito, kaya binabago ng mga epektong sumusunod dito ang mga layer sa ibaba. Ibinalik ng Mix ang sariling fill ng layer.",
+   "name": "Adjustment layer",
    "params": {
     "mix": {
      "label": "Halo"
@@ -40,7 +40,7 @@
    }
   },
   "blink": {
-   "description": "Pinapakita at tinatago ang patong nang ilang beses kada segundo.",
+   "description": "Pinapatay-sindi ang layer nang ilang beses kada segundo.",
    "name": "Kumurap",
    "params": {
     "frequency": {
@@ -178,7 +178,7 @@
    }
   },
   "dissolve": {
-   "description": "Nawawasak ang patong sa mga random na tuldok.",
+   "description": "Naghihiwa-hiwalay ang layer sa mga random na tipak.",
    "name": "Pagkatunaw",
    "params": {
     "grain": {
@@ -208,7 +208,7 @@
    }
   },
   "echo": {
-   "description": "Nagdaragdag ng mga kopya ng patong mula sa nakaraang sandali, kasabay ng animation nito.",
+   "description": "Nagguguhit ng mga kopya ng layer gaya ng ilang sandali ang nakalipas, sumusunod sa animation nito.",
    "name": "Echo na keyframe",
    "params": {
     "alpha": {
@@ -281,7 +281,7 @@
    }
   },
   "flicker": {
-   "description": "Random na pinapakislap ang opacity ng patong.",
+   "description": "Kumukurap ang opacity ng layer nang random.",
    "name": "Kumikislap",
    "params": {
     "intensity": {
@@ -299,7 +299,7 @@
    }
   },
   "fourcolor": {
-   "description": "Nag-blend ng apat na kulay sa apat na punto (px mula sa gitna ng patong) sa ibabaw ng patong.",
+   "description": "Pinagsasama ang apat na kulay na inilagay sa apat na punto (sa px mula sa sentro ng layer) sa ibabaw ng layer.",
    "name": "Gradient na apat na kulay",
    "params": {
     "blend": {
@@ -370,7 +370,7 @@
    }
   },
   "glow": {
-   "description": "Malambot na liwanag sa paligid ng maliwanag na bahagi ng patong.",
+   "description": "Isang malambot na liwanag sa paligid ng maliliwanag na bahagi ng layer.",
    "name": "Glow",
    "params": {
     "intensity": {
@@ -412,7 +412,7 @@
    }
   },
   "gradientoverlay": {
-   "description": "Naglalagay ng gradient na may dalawang kulay sa patong, may pagpipilian ng hugis at blend mode.",
+   "description": "Naglalagay ng gradient na may dalawang kulay sa ibabaw ng layer, na may pagpipilian ng hugis at blending mode.",
    "name": "Gradient Overlay",
    "params": {
     "angle": {
@@ -531,7 +531,7 @@
    }
   },
   "lensflare": {
-   "description": "Isang maliwanag na ilaw na may halo, nakapatong sa larawan.",
+   "description": "Isang maliwanag na ilaw na may halo, inilalagay sa ibabaw ng larawan.",
    "name": "Flare ng ilaw",
    "params": {
     "brightness": {
@@ -591,7 +591,7 @@
    }
   },
   "lumakey": {
-   "description": "Tinatanggal ang madilim na bahagi ng patong (o ang mga maliwanag na bahagi).",
+   "description": "Tinatanggal ang madidilim na bahagi ng layer (o ang maliliwanag).",
    "name": "Luma key",
    "params": {
     "invert": {
@@ -618,7 +618,7 @@
    }
   },
   "motionblur": {
-   "description": "Pinapahid ang patong sa isang direksyon, parang mabilis na gumalaw.",
+   "description": "Pinapahid ang layer sa isang direksyon, na parang mabilis na gumalaw.",
    "name": "Motion blur",
    "params": {
     "angle": {
@@ -645,7 +645,7 @@
    }
   },
   "oscillate": {
-   "description": "Pinagagalaw ang patong pabalik-balik sa isang anggulo.",
+   "description": "Ginagalaw pabalik-balik ang layer sa isang anggulo.",
    "name": "Oscillate",
    "params": {
     "angle": {
@@ -688,7 +688,7 @@
    }
   },
   "pulseopacity": {
-   "description": "Pina-fade ang patong palabas at papasok nang paulit-ulit.",
+   "description": "Paulit-ulit na pinapawi at pinapakita ang layer.",
    "name": "Pulse na Opacity",
    "params": {
     "frequency": {
@@ -710,7 +710,7 @@
    }
   },
   "pulsesize": {
-   "description": "Pinapalaki at pinapaliit ang patong nang paulit-ulit.",
+   "description": "Paulit-ulit na pinapalaki at pinapaliit ang layer.",
    "name": "Pulse na Laki",
    "params": {
     "amount": {
@@ -744,7 +744,7 @@
    }
   },
   "randomdisplace": {
-   "description": "Hinahayaang gumalaw ang patong nang random sa paligid ng puwesto nito.",
+   "description": "Hinahayaang gumalaw-galaw ang layer sa paligid ng puwesto nito nang random.",
    "name": "Random na Displacement",
    "params": {
     "magnitude": {
@@ -759,7 +759,7 @@
    }
   },
   "randomjitter": {
-   "description": "Pinapatalon ang patong pabalik-balik nang random sa isang anggulo.",
+   "description": "Pinapatalon pabalik-balik ang layer nang random sa isang anggulo.",
    "name": "Random na Jitter",
    "params": {
     "angle": {
@@ -867,7 +867,7 @@
    }
   },
   "solid": {
-   "description": "Naglalagay ng kulay sa patong, pinapanatili ang hugis, may pagpipilian ng blending mode.",
+   "description": "Naglalagay ng isang kulay sa ibabaw ng layer, pinapanatili ang hugis nito, na may pagpipilian ng blending mode.",
    "name": "Overlay ng Kulay",
    "params": {
     "amount": {
@@ -896,7 +896,7 @@
    }
   },
   "spin": {
-   "description": "Iniikot ang patong nang tuloy-tuloy sa pare-parehong bilis.",
+   "description": "Paulit-ulit na iniikot ang layer sa tuloy-tuloy na bilis.",
    "name": "Pag-ikot",
    "params": {
     "direction": {
@@ -942,7 +942,7 @@
    }
   },
   "stretch": {
-   "description": "Hinahati ang patong sa isang linya at hinihila ang dalawang bahagi, ini-stretch ang mga pixel sa linya sa puwang.",
+   "description": "Hinihiwa ang layer sa isang linya at hinihila ang dalawang hati palayo, hinihila ang mga pixel sa linya papunta sa puwang.",
    "name": "Stretch ng Segment",
    "params": {
     "angle": {
@@ -960,8 +960,8 @@
    }
   },
   "stretchaxis": {
-   "description": "Ini-stretch ang patong sa isang anggulo.",
-   "name": "Stretch na Axis",
+   "description": "Iniunat ang layer sa isang anggulo.",
+   "name": "Stretch Axis",
    "params": {
     "amount": {
      "label": "Dami"
@@ -972,7 +972,7 @@
    }
   },
   "swing": {
-   "description": "Iniikot ang patong pabalik-balik sa paligid ng pivot nito.",
+   "description": "Iniikot pabalik-balik ang layer sa paligid ng pivot nito.",
    "name": "Indayog",
    "params": {
     "angle": {
@@ -1036,7 +1036,7 @@
    }
   },
   "timequant": {
-   "description": "Pinapayagan ang oras na dumaan nang pahakbang para sa patong na ito, tulad ng mas mababang frame rate.",
+   "description": "Pinapayagang dumaan ang oras nang pahakbang para sa layer na ito, tulad ng mas mababang frame rate.",
    "name": "Quantization ng Oras",
    "params": {
     "fps": {

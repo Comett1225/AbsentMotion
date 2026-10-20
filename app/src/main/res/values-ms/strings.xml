@@ -204,7 +204,7 @@
     <string name="home_sort_date">Tarikh</string>
     <string name="home_more">Lagi</string>
     <string name="home_duplicate_asset">Pendua aset</string>
-    <string name="home_duplicate">Pendua</string>
+    <string name="home_duplicate">Gandakan</string>
     <string name="home_collect_media">Kumpul media ke dalam projek</string>
     <string name="home_delete_asset">Padam aset</string>
     <string name="home_empty_assets">Belum ada aset disimpan</string>
@@ -542,7 +542,7 @@
     <string name="menu_reset_transform">Set Semula Transformasi</string>
     <string name="menu_select_all_layers">Pilih Semua Lapisan</string>
     <plurals name="menu_duplicate_layers">
-        <item quantity="other">Pendua %1$s Lapisan</item>
+        <item quantity="other">Gandakan %1$s lapisan</item>
     </plurals>
     <string name="menu_save_preset">Simpan Pratetap</string>
     <plurals name="menu_copy_layers">
@@ -1033,7 +1033,7 @@
     <string name="shape_name_location_pin">Pin Lokasi</string>
     <string name="shape_name_rounded_play">Main Bulat</string>
     <string name="shape_name_pause">Jeda</string>
-    <string name="shape_name_record">Rakam</string>
+    <string name="shape_name_record">Piring hitam</string>
     <string name="shape_name_gear">Gear</string>
     <string name="shape_name_shape">Bentuk</string>
     <string name="shape_name_ellipse">Elips</string>
@@ -1050,10 +1050,10 @@
     <string name="edit_panel_fill_color">Isi &amp; Warna</string>
     <string name="edit_panel_shape_options">Pilihan Bentuk</string>
     <string name="edit_panel_edit_text">Edit Teks</string>
-    <string name="edit_panel_frame_shadow">Bingkai &amp; Bayang</string>
+    <string name="edit_panel_frame_shadow">Sempadan &amp; Bayang</string>
     <string name="edit_panel_opacity_blend">Kelegapan &amp; Mod Campuran</string>
     <string name="edit_panel_effects">Kesan</string>
-    <string name="edit_panel_camera_options">Pilihan kamera</string>
+    <string name="edit_panel_camera_options">Pilihan Kamera</string>
     <string name="edit_keep_copying">Menyalin “%1$s” ke dalam projek…</string>
     <string name="edit_keep_no_space">Storan bebas tidak cukup untuk menyimpan salinan “%1$s” dalam projek. Fail asal masih digunakan.</string>
     <string name="edit_keep_this_file">fail ini</string>
@@ -1068,7 +1068,7 @@
     <string name="track_motion_cancelled">Penjejakan dibatalkan. Bingkai yang telah dijejaki mengekalkan bingkai kuncinya.</string>
     <string name="track_motion_unavailable">Penjejakan gerakan tidak tersedia dalam binaan ini.</string>
     <string name="track_motion_failed">Video ini tidak dapat dijejaki.</string>
-    <string name="edit_layer_copy_name">%1$s Salinan</string>
+    <string name="edit_layer_copy_name">Salinan %1$s</string>
     <string name="model_layer_video">Video</string>
     <string name="ai_video_mask_name">%1$s topeng</string>
     <string name="ai_video_cut_out_name">Potongan %1$s</string>

@@ -59,7 +59,7 @@
     <string name="preset_stored">Nai-save ang preset</string>
     <string name="done">Tapos</string>
     <string name="rename_preset">Palitan ang pangalan ng preset</string>
-    <string name="save_a_layer_s_settings_and">I-save ang mga setting at keyframe ng isang patong bilang preset, pagkatapos ay gamitin muli ang mga ito sa iba pang patong.</string>
+    <string name="save_a_layer_s_settings_and">I-save ang mga setting at keyframe ng layer bilang preset, pagkatapos gamitin muli sa iba pang layer.</string>
     <string name="no_presets_saved_yet">Wala pang nai-save na preset</string>
     <string name="apply">Ilapat</string>
     <string name="try_a_preset">Subukan ang isang preset</string>
@@ -69,7 +69,7 @@
     <string name="apply_to">Ilapat sa</string>
     <string name="type_what_the_voice_says">I-type ang sinasabi ng boses</string>
     <string name="start">Simulan</string>
-    <string name="every_frame_of_this_clip_is">Pinoproseso ang bawat frame ng clip na ito sa teleponong ito. Ang resulta ay isang grupo na may bidyo at isang patong ng mask sa ibabaw nito.</string>
+    <string name="every_frame_of_this_clip_is">Pinoproseso sa teleponong ito ang bawat frame ng clip na ito. Ang resulta ay isang grupo na may bidyo at isang mask layer sa ibabaw nito.</string>
     <string name="t_new">BAGO</string>
     <string name="standard_settings">+ Karaniwang mga setting</string>
     <string name="add_border">Magdagdag ng border</string>
@@ -78,7 +78,7 @@
     <string name="color">Kulay</string>
     <string name="apply_to_children">Ilapat sa mga anak</string>
     <string name="add_effect">Magdagdag ng epekto</string>
-    <string name="drag_here_to_move_the_layer">I-drag dito para ilipat ang patong</string>
+    <string name="drag_here_to_move_the_layer">I-drag dito para ilipat ang layer</string>
     <string name="saved_to_storage">Na-save sa storage</string>
     <string name="keep_absentmotion_open_and_your_screen">Panatilihing bukas ang AbsentMotion at naka-on ang screen hanggang matapos ang pag-export.</string>
     <string name="gif">GIF</string>
@@ -107,7 +107,7 @@
     <string name="no_earlier_versions_yet_a_version">Wala pang naunang bersyon. Nagtatabi ng bersyon tuwing binubuksan o isinasara ang proyekto, at tuwing dalawang minuto habang nag-e-edit ka.</string>
     <string name="still_working">Ginagawa pa rin…</string>
     <string name="theme">Tema</string>
-    <string name="new_layer_length">Haba ng bagong patong</string>
+    <string name="new_layer_length">Tagal ng bagong layer</string>
     <string name="remove_caption_model">Alisin ang modelo ng kapsyon</string>
     <string name="the_media_picker_lists_only_albums">Ang media picker ay naglilista lamang ng mga album at folder na may \"Demo\" sa pangalan.</string>
     <string name="demo_mode_is_on">Naka-on ang Demo Mode</string>
@@ -204,7 +204,7 @@
     <string name="home_sort_date">Petsa</string>
     <string name="home_more">Higit pa</string>
     <string name="home_duplicate_asset">Kopyahin ang asset</string>
-    <string name="home_duplicate">Kopyahin</string>
+    <string name="home_duplicate">I-duplicate</string>
     <string name="home_collect_media">Ipunin ang media sa proyekto</string>
     <string name="home_delete_asset">Tanggalin ang asset</string>
     <string name="home_empty_assets">Wala pang naka-save na asset</string>
@@ -298,8 +298,8 @@
         <item quantity="other">Nakopya ang %1$s na file sa proyekto.</item>
     </plurals>
     <plurals name="library_report_effect_layers">
-        <item quantity="one">%1$s (%2$s patong)</item>
-        <item quantity="other">%1$s (%2$s na patong)</item>
+        <item quantity="one">%1$s (%2$s layer)</item>
+        <item quantity="other">%1$s (%2$s na layer)</item>
     </plurals>
     <plurals name="library_report_converted_effects">
         <item quantity="one">%1$s (%2$s epekto)</item>
@@ -350,11 +350,11 @@
     <string name="export_share">I-share</string>
     <string name="export_share_audio">I-share ang audio</string>
     <string name="export_failed_title">Nabigo ang pag-export</string>
-    <string name="export_failed_empty">Wala pang ma-export. Magdagdag ng patong o media, pagkatapos ay subukan muli.</string>
+    <string name="export_failed_empty">Wala pang ma-i-export. Magdagdag ng layer o media, pagkatapos subukan muli.</string>
     <string name="export_storage_title">Kulang ang storage</string>
     <string name="export_storage_text">Magbakante ng storage sa device na ito at mag-export muli.</string>
     <string name="export_missing_title">Nawawala ang media</string>
-    <string name="export_missing_text">Gumagamit ang proyektong ito ng mga file na wala sa device na ito:\n%1$s\n\nHindi isasama ang mga patong na gumagamit ng mga ito kung mag-e-export ka pa rin.</string>
+    <string name="export_missing_text">Gumagamit ang proyektong ito ng mga file na wala sa device na ito:\n%1$s\n\nIiwan ang mga layer na gumagamit ng mga ito kung mag-i-export ka pa rin.</string>
     <string name="export_image_png">PNG</string>
     <string name="export_image_jpeg">JPEG</string>
     <string name="export_image_webp">WebP</string>
@@ -422,7 +422,7 @@
     <string name="camera_timer">Timer</string>
     <string name="camera_grid">Grid</string>
     <string name="camera_photo">LITRATO</string>
-    <string name="camera_video">BIDYO</string>
+    <string name="camera_video">VIDEO</string>
     <string name="camera_close">Isara ang kamera</string>
     <string name="camera_switch">Lumipat ng kamera</string>
     <string name="camera_pause_recording">I-pause ang pag-record</string>
@@ -452,7 +452,7 @@
     <string name="platform_error_tts_unavailable">Hindi available ang text to speech sa teleponong ito</string>
     <string name="platform_error_voice">Hindi nagawa ang boses</string>
     <string name="platform_caption_download">Kinikilala ang mga kapsyon sa telepono mo ng isang speech model, dina-download nang isang beses: %1$s, %2$s, mula sa Hugging Face.</string>
-    <string name="add_layer">Magdagdag ng patong</string>
+    <string name="add_layer">Magdagdag ng layer</string>
     <string name="add_tab_shape">Hugis</string>
     <string name="add_tab_media">Media</string>
     <string name="add_tab_audio">Audio</string>
@@ -511,8 +511,8 @@
     <string name="topbar_exit_to_project_list">Lumabas sa listahan ng proyekto</string>
     <string name="topbar_project_settings">Mga setting ng proyekto</string>
     <string name="topbar_export_share">I-export at ibahagi</string>
-    <string name="topbar_delete_layer">Alisin ang patong</string>
-    <string name="topbar_layer_menu">Menu ng patong</string>
+    <string name="topbar_delete_layer">Burahin ang layer</string>
+    <string name="topbar_layer_menu">Menu ng layer</string>
     <string name="element_adaptive_resolution">Adaptive na resolusyon</string>
     <string name="element_locked_resolution">Naka-lock na resolusyon</string>
     <string name="element_retime_freeze">I-freeze</string>
@@ -547,20 +547,20 @@
     <string name="menu_reset_scale">I-reset ang scale</string>
     <string name="menu_reset_skew">I-reset ang skew</string>
     <string name="menu_reset_transform">I-reset ang transform</string>
-    <string name="menu_select_all_layers">Piliin ang lahat ng patong</string>
+    <string name="menu_select_all_layers">Piliin ang lahat ng layer</string>
     <plurals name="menu_duplicate_layers">
-        <item quantity="one">Kopyahin ang patong</item>
-        <item quantity="other">Kopyahin ang %1$s patong</item>
+        <item quantity="one">I-duplicate ang layer</item>
+        <item quantity="other">I-duplicate ang %1$s layer</item>
     </plurals>
     <string name="menu_save_preset">I-save ang preset</string>
     <plurals name="menu_copy_layers">
-        <item quantity="one">Kopyahin ang patong</item>
-        <item quantity="other">Kopyahin ang %1$s patong</item>
+        <item quantity="one">Kopyahin ang layer</item>
+        <item quantity="other">Kopyahin ang %1$s layer</item>
     </plurals>
     <string name="menu_with_its_style">(kasama ang estilo nito)</string>
     <plurals name="menu_paste_layers">
-        <item quantity="one">I-paste ang patong</item>
-        <item quantity="other">I-paste ang %1$s patong</item>
+        <item quantity="one">I-paste ang layer</item>
+        <item quantity="other">I-paste ang %1$s layer</item>
     </plurals>
     <string name="menu_paste_style">I-paste ang estilo</string>
     <string name="menu_set_intro_end">Itakda ang dulo ng intro</string>
@@ -578,7 +578,7 @@
     <string name="menu_background">Background</string>
     <string name="menu_precompose">Precompose</string>
     <string name="menu_retiming">Re-timing</string>
-    <string name="menu_custom_aspect_ratio">Pasadya ang aspect ratio</string>
+    <string name="menu_custom_aspect_ratio">Pasadyang aspect ratio</string>
     <string name="font_import_failed_title">Nabigo ang pag-import</string>
     <string name="font_import_failed_body">Hindi ma-import ang mga sumusunod na font.\n\nMaaaring mangyari ito kung ang file ay hindi font, o format ng font na hindi sinusuportahan ng iyong operating system.\n\n%1$s</string>
     <string name="font_load_failed_title">Hindi ma-load ang font</string>
@@ -681,13 +681,13 @@
     <string name="structure_align_ends">Ihanay ang dulo ng clip</string>
     <string name="structure_cancel_selection">Kanselahin ang pagpili</string>
     <plurals name="structure_layers_selected">
-        <item quantity="one">Napili ang %1$s patong</item>
-        <item quantity="other">Napili ang %1$s patong</item>
+        <item quantity="one">Napili ang %1$s layer</item>
+        <item quantity="other">Napili ang %1$s na layer</item>
     </plurals>
     <string name="structure_group">Grupo</string>
     <string name="structure_group_mask">Grupo at mask</string>
     <string name="structure_group_exclude">Grupo at ihiwalay</string>
-    <string name="structure_delete_selected">Burahin ang mga napiling patong</string>
+    <string name="structure_delete_selected">Burahin ang mga napiling layer</string>
     <string name="structure_alignment_options">Mga opsyon sa pagkakahanay</string>
     <string name="structure_group_options">Mga opsyon sa grupo</string>
     <string name="structure_align_left">Ihanay sa kaliwa</string>
@@ -922,15 +922,15 @@
     <string name="ai_remove_background">Alisin ang background</string>
     <string name="ai_reduce_noise">Bawasan ang ingay</string>
     <string name="ai_remove_background_video">Alisin ang background (bidyo)</string>
-    <string name="ai_select_image_layer">Pumili ng patong na larawan</string>
-    <string name="ai_select_audio_layer">Pumili ng patong na audio</string>
-    <string name="ai_select_video_layer">Pumili ng patong na bidyo</string>
+    <string name="ai_select_image_layer">Pumili ng layer ng larawan</string>
+    <string name="ai_select_audio_layer">Pumili ng audio layer</string>
+    <string name="ai_select_video_layer">Pumili ng layer ng bidyo</string>
     <string name="ai_cancelling">Kinakansela…</string>
     <string name="ai_preparing">Inihahanda…</string>
     <string name="ai_cancelled">Kinansela</string>
     <string name="ai_video_missing">Wala ang bidyong ito sa proyekto</string>
-    <string name="ai_layer_changed">Nagbago ang patong; patakbuhin muli ang tool</string>
-    <string name="ai_cannot_mask">Hindi ma-mask ang patong na ito</string>
+    <string name="ai_layer_changed">Nagbago ang layer; patakbuhin muli ang tool</string>
+    <string name="ai_cannot_mask">Hindi ma-mask ang layer na ito</string>
     <string name="ai_model_not_ready_default">Hindi pa handa ang model para sa pag-alis ng background</string>
     <string name="ai_unable_to_process">Hindi maproseso ang media na ito</string>
     <string name="ai_out_of_memory_image">Kulang ang memorya para iproseso ang larawang ito</string>
@@ -1048,7 +1048,7 @@
     <string name="shape_name_location_pin">Pin ng lokasyon</string>
     <string name="shape_name_rounded_play">Bilog na play</string>
     <string name="shape_name_pause">Pause</string>
-    <string name="shape_name_record">I-record</string>
+    <string name="shape_name_record">Plaka</string>
     <string name="shape_name_gear">Gear</string>
     <string name="shape_name_shape">Hugis</string>
     <string name="shape_name_ellipse">Elipse</string>
@@ -1062,24 +1062,24 @@
     <string name="model_layer_svg">SVG</string>
     <string name="edit_panel_time_remapping">Time remapping</string>
     <string name="edit_panel_transform">Transform</string>
-    <string name="edit_panel_fill_color">Fill at kulay</string>
-    <string name="edit_panel_shape_options">Mga opsyon ng hugis</string>
+    <string name="edit_panel_fill_color">Fill at Kulay</string>
+    <string name="edit_panel_shape_options">Mga opsyon sa hugis</string>
     <string name="edit_panel_edit_text">I-edit ang teksto</string>
-    <string name="edit_panel_frame_shadow">Frame at anino</string>
-    <string name="edit_panel_opacity_blend">Opacity at blending mode</string>
+    <string name="edit_panel_frame_shadow">Frame at Anino</string>
+    <string name="edit_panel_opacity_blend">Opacity at Blending Mode</string>
     <string name="edit_panel_effects">Mga epekto</string>
-    <string name="edit_panel_camera_options">Mga opsyon ng kamera</string>
+    <string name="edit_panel_camera_options">Mga opsyon sa kamera</string>
     <string name="edit_keep_copying">Kinokopya ang “%1$s” sa proyekto…</string>
     <string name="edit_keep_no_space">Kulang ang libreng storage para magtabi ng kopya ng “%1$s” sa proyekto. Ginagamit pa rin nito ang orihinal na file.</string>
     <string name="edit_keep_this_file">ang file na ito</string>
-    <string name="edit_beats_select_layer">Pumili ng audio o bidyo na patong</string>
+    <string name="edit_beats_select_layer">Pumili ng audio o bidyo na layer</string>
     <string name="edit_beats_no_sound">Walang audio na mababasa</string>
     <string name="track_motion_playhead_outside">Ilipat muna ang playhead sa loob ng clip ng bidyo.</string>
-    <string name="track_motion_no_area">Walang area na masusubaybayan ang patong na ito.</string>
+    <string name="track_motion_no_area">Walang ma-track na area ang layer na ito.</string>
     <string name="track_motion_too_little_detail">Kulang ang detalye sa lugar na ito para masubaybayan. Ilipat ang punto sa matalim na sulok o texture at i-tap ang Magpatuloy.</string>
     <string name="track_motion_lost_at_frame">Nawala ang pagsubaybay sa frame %1$s. Ilipat pabalik ang punto sa parehong feature at i-tap ang Magpatuloy.</string>
     <string name="track_motion_done">Nasubaybayan ang %1$s frame. Nasa %2$s ang mga keyframe.</string>
-    <string name="track_motion_target_layer">ang target na patong</string>
+    <string name="track_motion_target_layer">ang target na layer</string>
     <string name="track_motion_cancelled">Kinansela ang pagsubaybay. Mananatili ang mga keyframe ng mga nasubaybayan nang frame.</string>
     <string name="track_motion_unavailable">Hindi available ang motion tracking sa build na ito.</string>
     <string name="track_motion_failed">Hindi masubaybayan ang bidyo na ito.</string>

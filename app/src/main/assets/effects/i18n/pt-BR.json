@@ -1097,7 +1097,7 @@
    "name": "VHS",
    "params": {
     "chroma": {
-     "label": "Sangramento de cor"
+     "label": "Vazamento de cor"
     },
     "headSwitch": {
      "label": "Chaveamento de cabeça"

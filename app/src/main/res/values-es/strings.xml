@@ -1048,13 +1048,13 @@
     <string name="shape_name_location_pin">Marcador de ubicación</string>
     <string name="shape_name_rounded_play">Play redondeado</string>
     <string name="shape_name_pause">Pausa</string>
-    <string name="shape_name_record">Grabar</string>
+    <string name="shape_name_record">Disco</string>
     <string name="shape_name_gear">Engranaje</string>
     <string name="shape_name_shape">Forma</string>
     <string name="shape_name_ellipse">Elipse</string>
     <string name="shape_name_polyline">Polilínea</string>
     <string name="shape_name_path">Trazado</string>
-    <string name="model_layer_null">Nulo</string>
+    <string name="model_layer_null">Objeto nulo</string>
     <string name="model_layer_camera">Cámara</string>
     <string name="model_layer_group">Grupo</string>
     <string name="model_layer_drawing">Dibujo</string>
@@ -1065,7 +1065,7 @@
     <string name="edit_panel_fill_color">Relleno y color</string>
     <string name="edit_panel_shape_options">Opciones de forma</string>
     <string name="edit_panel_edit_text">Editar texto</string>
-    <string name="edit_panel_frame_shadow">Marco y sombra</string>
+    <string name="edit_panel_frame_shadow">Borde y sombra</string>
     <string name="edit_panel_opacity_blend">Opacidad y modo de fusión</string>
     <string name="edit_panel_effects">Efectos</string>
     <string name="edit_panel_camera_options">Opciones de cámara</string>

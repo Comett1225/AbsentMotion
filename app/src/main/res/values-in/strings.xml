@@ -606,7 +606,7 @@
     <string name="font_language_thai">Thai</string>
     <string name="font_language_vietnamese">Vietnam</string>
     <string name="layer_tool_fill_color">Isi &amp; Warna</string>
-    <string name="layer_tool_frame_shadow">Border &amp; Bayangan</string>
+    <string name="layer_tool_frame_shadow">Bingkai &amp; Bayangan</string>
     <string name="layer_tool_opacity_blend">Opasitas &amp; Mode Blending</string>
     <string name="layer_tool_transform">Transformasi</string>
     <string name="layer_tool_shape_options">Opsi Bentuk</string>
@@ -687,7 +687,7 @@
     <string name="structure_distribute_vertical">Distribusikan vertikal</string>
     <string name="structure_distribute_horizontal">Distribusikan horizontal</string>
     <string name="structure_paste_fill_color">Tempel Isi &amp; Warna</string>
-    <string name="structure_paste_border_shadow">Tempel Border &amp; Bayangan</string>
+    <string name="structure_paste_border_shadow">Tempel bingkai &amp; bayangan</string>
     <string name="structure_paste_blending">Tempel Opasitas &amp; Mode Blending</string>
     <string name="structure_paste_style">Tempel Gaya</string>
     <string name="text_alignment">Perataan</string>
@@ -892,7 +892,7 @@
     <string name="audio_preset_bass_boost">Penguat bass</string>
     <string name="audio_preset_vocal_clarity">Kejernihan vokal</string>
     <string name="keyframe_easing_cubic_bezier">Easing Bezier kubik</string>
-    <string name="keyframe_easing_bounce">Pantul</string>
+    <string name="keyframe_easing_bounce">PANTUL</string>
     <string name="keyframe_easing_elastic">Elastis</string>
     <string name="keyframe_easing_cyclic">Siklik</string>
     <string name="keyframe_easing_random">Acak</string>
@@ -1033,7 +1033,7 @@
     <string name="shape_name_location_pin">Pin lokasi</string>
     <string name="shape_name_rounded_play">Putar bulat</string>
     <string name="shape_name_pause">Jeda</string>
-    <string name="shape_name_record">Rekam</string>
+    <string name="shape_name_record">Piringan hitam</string>
     <string name="shape_name_gear">Gir</string>
     <string name="shape_name_shape">Bentuk</string>
     <string name="shape_name_ellipse">Elips</string>
@@ -1047,13 +1047,13 @@
     <string name="model_layer_svg">SVG</string>
     <string name="edit_panel_time_remapping">Pemetaan waktu</string>
     <string name="edit_panel_transform">Transformasi</string>
-    <string name="edit_panel_fill_color">Isi &amp; warna</string>
-    <string name="edit_panel_shape_options">Opsi bentuk</string>
-    <string name="edit_panel_edit_text">Edit teks</string>
-    <string name="edit_panel_frame_shadow">Bingkai &amp; bayangan</string>
+    <string name="edit_panel_fill_color">Isi &amp; Warna</string>
+    <string name="edit_panel_shape_options">Opsi Bentuk</string>
+    <string name="edit_panel_edit_text">Edit Teks</string>
+    <string name="edit_panel_frame_shadow">Bingkai &amp; Bayangan</string>
     <string name="edit_panel_opacity_blend">Opasitas &amp; Mode Blending</string>
     <string name="edit_panel_effects">Efek</string>
-    <string name="edit_panel_camera_options">Opsi kamera</string>
+    <string name="edit_panel_camera_options">Opsi Kamera</string>
     <string name="edit_keep_copying">Menyalin “%1$s” ke proyek…</string>
     <string name="edit_keep_no_space">Ruang penyimpanan tidak cukup untuk menyimpan salinan “%1$s” di proyek. File asli tetap digunakan.</string>
     <string name="edit_keep_this_file">file ini</string>
@@ -1068,7 +1068,7 @@
     <string name="track_motion_cancelled">Pelacakan dibatalkan. Frame yang sudah dilacak tetap menyimpan keyframe-nya.</string>
     <string name="track_motion_unavailable">Pelacakan gerak tidak tersedia di versi ini.</string>
     <string name="track_motion_failed">Video ini tidak dapat dilacak.</string>
-    <string name="edit_layer_copy_name">%1$s Salinan</string>
+    <string name="edit_layer_copy_name">Salinan %1$s</string>
     <string name="model_layer_video">Video</string>
     <string name="ai_video_mask_name">Masker %1$s</string>
     <string name="ai_video_cut_out_name">Potongan %1$s</string>

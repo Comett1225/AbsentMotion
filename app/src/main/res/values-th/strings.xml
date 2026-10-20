@@ -609,7 +609,7 @@
     <string name="layer_tool_frame_shadow">กรอบและเงา</string>
     <string name="layer_tool_opacity_blend">ความทึบและโหมดผสม</string>
     <string name="layer_tool_transform">แปลง</string>
-    <string name="layer_tool_shape_options">ตัวเลือกูปร่าง</string>
+    <string name="layer_tool_shape_options">ตัวเลือกรูปร่าง</string>
     <string name="layer_tool_edit_text">แก้ไขข้อความ</string>
     <string name="layer_tool_edit_points">แก้ไขจุด</string>
     <string name="layer_tool_edit_drawing">แก้ไขภาพวาด</string>
@@ -1033,7 +1033,7 @@
     <string name="shape_name_location_pin">หมุดตำแหน่ง</string>
     <string name="shape_name_rounded_play">ปุ่มเล่นมุมโค้ง</string>
     <string name="shape_name_pause">หยุดชั่วคราว</string>
-    <string name="shape_name_record">บันทึก</string>
+    <string name="shape_name_record">แผ่นเสียง</string>
     <string name="shape_name_gear">เฟือง</string>
     <string name="shape_name_shape">รูปร่าง</string>
     <string name="shape_name_ellipse">วงรี</string>
@@ -1048,7 +1048,7 @@
     <string name="edit_panel_time_remapping">รีแมปเวลา</string>
     <string name="edit_panel_transform">แปลง</string>
     <string name="edit_panel_fill_color">เติมและสี</string>
-    <string name="edit_panel_shape_options">ตัวเลือกของรูปร่าง</string>
+    <string name="edit_panel_shape_options">ตัวเลือกรูปร่าง</string>
     <string name="edit_panel_edit_text">แก้ไขข้อความ</string>
     <string name="edit_panel_frame_shadow">กรอบและเงา</string>
     <string name="edit_panel_opacity_blend">ความทึบและโหมดผสม</string>

@@ -22,6 +22,10 @@ QUANTITIES = {'id': ['other'], 'vi': ['other'], 'th': ['other'], 'ms': ['other']
               'ar': ['zero', 'one', 'two', 'few', 'many', 'other']}
 STATE = ROOT / 'tools/i18n_source.json'
 GLOSSARY = ROOT / 'tools/i18n_glossary.json'
+NOTES = ROOT / 'tools/i18n_notes.json'
+RULES = {'ar': 'In the Arabic plural forms "one" and "two" leave out the count placeholder when the singular or dual noun already says the number '
+               '(write "طبقتان", not "%1$s طبقتين"); keep every other placeholder.',
+         'fil': 'Filipino video apps keep many English editing terms (layer, keyframe, preset, export, template); use them as the glossary says.'}
 EFFECT_I18N = EFFECTS / 'i18n'
 CATALOG_KT = KOTLIN / 'app/absentmotion/effects/EffectCatalog.kt'
 NOT_EFFECTS = {'index', 'releases', 'foreign'}
@@ -256,6 +260,7 @@ def system_prompt(language, glossary):
             f'- Placeholders such as %1$s and %2$s must appear exactly as written, once each; the order may change to fit the grammar. Keep \\n line breaks.\n'
             f'- A word in a placeholder sentence may be replaced by a number or a name at run time; write the sentence so it reads well either way.\n'
             f'- Use consistent terminology. Glossary: {terms}\n'
+            + (f'- {RULES[language]}\n' if language in RULES else '') +
             f'- Input: a JSON object "items" whose keys are string ids; each value has "en" (the English text), "where" (the source file and code line that shows it) '
             f'and sometimes "note". When "en" is an object it is a plural: answer with an object holding exactly these {name} plural forms: {forms}.\n'
             f'- Output: one flat JSON object mapping every input id to its {name} translation (a string, or an object for plurals), '
@@ -339,12 +344,16 @@ def main():
     units = effect_units()
     state = json.loads(STATE.read_text(encoding='utf-8')) if STATE.is_file() else {}
     context = source_context()
+    notes = json.loads(NOTES.read_text(encoding='utf-8')) if NOTES.is_file() else {}
     sources = {}
     if args.only != 'effects':
         sources.update({k: {'en': v, 'where': ' | '.join(context.get(k, ('', ''))).strip(' |') or 'not found in code'} for k, v in english.items()})
     if args.only != 'strings':
         sources.update({k: {'en': v[0], 'where': 'assets/effects', 'note': v[1]} for k, v in units.items()})
 
+    for key, note in notes.items():
+        if key in sources:
+            sources[key]['note'] = (sources[key].get('note', '') + ' ' + note).strip()
     current, plans = {}, {}
     for language in languages:
         values, _ = read_resources(RES / FOLDERS[language] / 'strings.xml')
