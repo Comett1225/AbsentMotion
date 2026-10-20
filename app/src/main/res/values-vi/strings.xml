@@ -231,8 +231,12 @@
     <string name="backup_restore_no_space">Không đủ dung lượng trống để khôi phục bản sao lưu này. Cần khoảng %1$s.</string>
     <string name="backup_open_failed">Không thể mở tệp này.</string>
     <string name="backup_restored">Đã khôi phục %1$s.</string>
-    <string name="backup_restored_copies">%1$s đã được thêm thành bản sao riêng vì đã có phiên bản khác ở đây.</string>
-    <string name="backup_restored_skipped">%1$s đã có sẵn và được giữ nguyên.</string>
+    <plurals name="backup_restored_copies">
+        <item quantity="other">%1$s dự án đã được thêm dưới dạng bản sao riêng vì một phiên bản khác đã có ở đây.</item>
+    </plurals>
+    <plurals name="backup_restored_skipped">
+        <item quantity="other">%1$s dự án đã có ở đây và được giữ nguyên.</item>
+    </plurals>
     <string name="about_version">Phiên bản %1$s</string>
     <string name="about_licence_line">Miễn phí và mã nguồn mở, phát hành theo Apache License 2.0.</string>
     <string name="about_independent_note">AbsentMotion là một dự án độc lập. Ứng dụng không liên kết, không được chứng thực hay tài trợ bởi bất kỳ nhà phát triển ứng dụng nào khác; tên của các sản phẩm khác thuộc về chủ sở hữu của chúng.</string>
@@ -846,6 +850,7 @@
     <string name="effectbrowser_favorite">Yêu thích</string>
     <string name="effectbrowser_preset">CÀI SẴN</string>
     <string name="effectbrowser_recent">Gần đây</string>
+    <string name="effectbrowser_recent_empty">Các hiệu ứng bạn dùng sẽ hiện ở đây</string>
     <plurals name="aibrowser_too_long">
         <item quantity="other">Chưa hỗ trợ clip dài hơn %1$s phút. Hãy cắt hoặc tách clip trước.</item>
     </plurals>

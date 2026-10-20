@@ -231,8 +231,18 @@
     <string name="backup_restore_no_space">Недостаточно свободного места для восстановления этой резервной копии. Требуется около %1$s.</string>
     <string name="backup_open_failed">Не удалось открыть этот файл.</string>
     <string name="backup_restored">Восстановлено %1$s.</string>
-    <string name="backup_restored_copies">%1$s добавлены как отдельные копии, так как здесь уже была другая версия.</string>
-    <string name="backup_restored_skipped">%1$s уже были здесь и оставлены без изменений.</string>
+    <plurals name="backup_restored_copies">
+        <item quantity="one">%1$s проект добавлен как отдельная копия, так как здесь уже была другая версия.</item>
+        <item quantity="few">%1$s проекта добавлены как отдельные копии, так как здесь уже была другая версия.</item>
+        <item quantity="many">%1$s проектов добавлены как отдельные копии, так как здесь уже была другая версия.</item>
+        <item quantity="other">%1$s проекта добавлены как отдельные копии, так как здесь уже была другая версия.</item>
+    </plurals>
+    <plurals name="backup_restored_skipped">
+        <item quantity="one">%1$s проект уже был здесь и оставлен как есть.</item>
+        <item quantity="few">%1$s проекта уже были здесь и оставлены как есть.</item>
+        <item quantity="many">%1$s проектов уже были здесь и оставлены как есть.</item>
+        <item quantity="other">%1$s проекта уже были здесь и оставлены как есть.</item>
+    </plurals>
     <string name="about_version">Версия %1$s</string>
     <string name="about_licence_line">Бесплатно и с открытым исходным кодом, лицензия Apache License 2.0.</string>
     <string name="about_independent_note">AbsentMotion — независимый проект. Он не связан с другими разработчиками приложений, не поддерживается и не спонсируется ими; названия других продуктов принадлежат их владельцам.</string>
@@ -882,6 +892,7 @@
     <string name="effectbrowser_favorite">Избранное</string>
     <string name="effectbrowser_preset">ПРЕСЕТ</string>
     <string name="effectbrowser_recent">Недавние</string>
+    <string name="effectbrowser_recent_empty">Здесь появляются используемые эффекты</string>
     <plurals name="aibrowser_too_long">
         <item quantity="one">Клипы длиннее %1$s минуты пока не поддерживаются. Сначала обрежьте или разделите клип.</item>
         <item quantity="few">Клипы длиннее %1$s минут пока не поддерживаются. Сначала обрежьте или разделите клип.</item>

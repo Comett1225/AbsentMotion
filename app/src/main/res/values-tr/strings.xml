@@ -231,8 +231,14 @@
     <string name="backup_restore_no_space">Bu yedeği geri yüklemek için yeterli boş alan yok. Yaklaşık %1$s gerekiyor.</string>
     <string name="backup_open_failed">Bu dosya açılamadı.</string>
     <string name="backup_restored">%1$s geri yüklendi.</string>
-    <string name="backup_restored_copies">%1$s, burada zaten farklı bir sürüm olduğu için ayrı kopyalar olarak eklendi.</string>
-    <string name="backup_restored_skipped">%1$s zaten buradaydı ve olduğu gibi bırakıldı.</string>
+    <plurals name="backup_restored_copies">
+        <item quantity="one">%1$s proje, farklı bir sürüm zaten burada olduğu için ayrı bir kopya olarak eklendi.</item>
+        <item quantity="other">%1$s proje, farklı bir sürüm zaten burada olduğu için ayrı kopyalar olarak eklendi.</item>
+    </plurals>
+    <plurals name="backup_restored_skipped">
+        <item quantity="one">%1$s proje zaten buradaydı ve olduğu gibi bırakıldı.</item>
+        <item quantity="other">%1$s proje zaten buradaydı ve oldukları gibi bırakıldı.</item>
+    </plurals>
     <string name="about_version">Sürüm %1$s</string>
     <string name="about_licence_line">Ücretsiz ve açık kaynak, Apache License 2.0 ile lisanslanmıştır.</string>
     <string name="about_independent_note">AbsentMotion bağımsız bir projedir. Başka hiçbir uygulama üreticisiyle bağlantılı değildir, onlar tarafından onaylanmamış veya desteklenmemiştir; diğer ürünlerin adları sahiplerine aittir.</string>
@@ -858,6 +864,7 @@
     <string name="effectbrowser_favorite">Favori</string>
     <string name="effectbrowser_preset">HAZIR AYAR</string>
     <string name="effectbrowser_recent">Son kullanılan</string>
+    <string name="effectbrowser_recent_empty">Kullandığınız efektler burada görünür</string>
     <plurals name="aibrowser_too_long">
         <item quantity="one">%1$s dakikadan uzun klipler henüz desteklenmiyor. Önce klibi kırpın veya bölün.</item>
         <item quantity="other">%1$s dakikadan uzun klipler henüz desteklenmiyor. Önce klibi kırpın veya bölün.</item>

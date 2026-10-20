@@ -231,8 +231,14 @@
     <string name="backup_restore_no_space">Espaço livre insuficiente para restaurar este backup. Ele precisa de cerca de %1$s.</string>
     <string name="backup_open_failed">Não foi possível abrir este arquivo.</string>
     <string name="backup_restored">%1$s restaurados.</string>
-    <string name="backup_restored_copies">%1$s foram adicionados como cópias separadas porque já havia uma versão diferente aqui.</string>
-    <string name="backup_restored_skipped">%1$s já estavam aqui e foram mantidos como estão.</string>
+    <plurals name="backup_restored_copies">
+        <item quantity="one">%1$s projeto foi adicionado como uma cópia separada porque uma versão diferente já estava aqui.</item>
+        <item quantity="other">%1$s projetos foram adicionados como cópias separadas porque uma versão diferente já estava aqui.</item>
+    </plurals>
+    <plurals name="backup_restored_skipped">
+        <item quantity="one">%1$s projeto já estava aqui e foi mantido como está.</item>
+        <item quantity="other">%1$s projetos já estavam aqui e foram mantidos como estão.</item>
+    </plurals>
     <string name="about_version">Versão %1$s</string>
     <string name="about_licence_line">Gratuito e de código aberto, sob a Licença Apache 2.0.</string>
     <string name="about_independent_note">O AbsentMotion é um projeto independente. Não tem vínculo, apoio nem patrocínio de qualquer outro criador de apps; os nomes de outros produtos pertencem aos seus donos.</string>
@@ -858,6 +864,7 @@
     <string name="effectbrowser_favorite">Favorito</string>
     <string name="effectbrowser_preset">PREDEFINIÇÃO</string>
     <string name="effectbrowser_recent">Recentes</string>
+    <string name="effectbrowser_recent_empty">Os efeitos que você usa aparecem aqui</string>
     <plurals name="aibrowser_too_long">
         <item quantity="one">Clipes com mais de %1$s minuto ainda não são compatíveis. É preciso aparar ou dividir o clipe primeiro.</item>
         <item quantity="other">Clipes com mais de %1$s minutos ainda não são compatíveis. É preciso aparar ou dividir o clipe primeiro.</item>

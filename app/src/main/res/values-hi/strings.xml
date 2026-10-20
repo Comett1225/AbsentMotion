@@ -231,8 +231,14 @@
     <string name="backup_restore_no_space">इस बैकअप को रीस्टोर करने के लिए पर्याप्त खाली स्टोरेज नहीं है। इसमें लगभग %1$s चाहिए।</string>
     <string name="backup_open_failed">यह फ़ाइल खोली नहीं जा सकी।</string>
     <string name="backup_restored">%1$s रीस्टोर हो गए।</string>
-    <string name="backup_restored_copies">%1$s अलग कॉपी के रूप में जोड़े गए, क्योंकि यहाँ पहले से एक अलग वर्ज़न था।</string>
-    <string name="backup_restored_skipped">%1$s पहले से यहाँ थे और उन्हें वैसे ही छोड़ दिया गया।</string>
+    <plurals name="backup_restored_copies">
+        <item quantity="one">%1$s प्रोजेक्ट को अलग कॉपी के रूप में जोड़ा गया क्योंकि यहाँ पहले से एक अलग वर्ज़न मौजूद था।</item>
+        <item quantity="other">%1$s प्रोजेक्ट्स को अलग कॉपी के रूप में जोड़ा गया क्योंकि यहाँ पहले से एक अलग वर्ज़न मौजूद था।</item>
+    </plurals>
+    <plurals name="backup_restored_skipped">
+        <item quantity="one">%1$s प्रोजेक्ट पहले से यहाँ था और उसे जैसा था वैसा ही छोड़ दिया गया।</item>
+        <item quantity="other">%1$s प्रोजेक्ट्स पहले से यहाँ थे और उन्हें जैसे थे वैसे ही छोड़ दिया गया।</item>
+    </plurals>
     <string name="about_version">वर्ज़न %1$s</string>
     <string name="about_licence_line">मुफ़्त और ओपन सोर्स, Apache License 2.0 के अंतर्गत लाइसेंस प्राप्त।</string>
     <string name="about_independent_note">AbsentMotion एक स्वतंत्र प्रोजेक्ट है। इसका किसी अन्य ऐप निर्माता से कोई संबंध नहीं है, न ही वे इसका समर्थन या प्रायोजन करते हैं; अन्य उत्पादों के नाम उनके स्वामियों के हैं।</string>
@@ -858,6 +864,7 @@
     <string name="effectbrowser_favorite">पसंदीदा</string>
     <string name="effectbrowser_preset">प्रीसेट</string>
     <string name="effectbrowser_recent">हालिया</string>
+    <string name="effectbrowser_recent_empty">आपके इस्तेमाल किए गए इफ़ेक्ट यहाँ दिखते हैं</string>
     <plurals name="aibrowser_too_long">
         <item quantity="one">%1$s मिनट से लंबी क्लिप अभी सपोर्टेड नहीं है। पहले क्लिप को ट्रिम या स्प्लिट करें।</item>
         <item quantity="other">%1$s मिनट से लंबी क्लिपें अभी सपोर्टेड नहीं हैं। पहले क्लिप को ट्रिम या स्प्लिट करें।</item>

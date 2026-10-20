@@ -231,8 +231,12 @@
     <string name="backup_restore_no_space">Ruang storan bebas tidak mencukupi untuk memulihkan sandaran ini. Ia memerlukan kira-kira %1$s.</string>
     <string name="backup_open_failed">Fail ini tidak dapat dibuka.</string>
     <string name="backup_restored">%1$s dipulihkan.</string>
-    <string name="backup_restored_copies">%1$s ditambah sebagai salinan berasingan kerana versi lain sudah ada di sini.</string>
-    <string name="backup_restored_skipped">%1$s memang sudah ada dan dibiarkan seperti sedia ada.</string>
+    <plurals name="backup_restored_copies">
+        <item quantity="other">%1$s projek ditambah sebagai salinan berasingan kerana versi lain sudah ada di sini.</item>
+    </plurals>
+    <plurals name="backup_restored_skipped">
+        <item quantity="other">%1$s projek sudah ada di sini dan dibiarkan seperti sedia ada.</item>
+    </plurals>
     <string name="about_version">Versi %1$s</string>
     <string name="about_licence_line">Percuma dan sumber terbuka, dilesenkan di bawah Apache License 2.0.</string>
     <string name="about_independent_note">AbsentMotion ialah projek bebas. Ia tidak bergabung dengan, disokong oleh atau ditaja oleh mana-mana pembuat aplikasi lain; nama produk lain milik pemiliknya masing-masing.</string>
@@ -846,6 +850,7 @@
     <string name="effectbrowser_favorite">Kegemaran</string>
     <string name="effectbrowser_preset">PRATETAP</string>
     <string name="effectbrowser_recent">Terkini</string>
+    <string name="effectbrowser_recent_empty">Kesan yang anda gunakan muncul di sini</string>
     <plurals name="aibrowser_too_long">
         <item quantity="other">Klip lebih panjang daripada %1$s minit belum disokong. Potong atau pisahkan klip itu dahulu.</item>
     </plurals>

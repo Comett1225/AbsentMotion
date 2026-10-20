@@ -231,8 +231,22 @@
     <string name="backup_restore_no_space">لا توجد مساحة تخزين حرة كافية لاستعادة هذه النسخة الاحتياطية. تحتاج إلى نحو %1$s.</string>
     <string name="backup_open_failed">تعذّر فتح هذا الملف.</string>
     <string name="backup_restored">تمت استعادة %1$s.</string>
-    <string name="backup_restored_copies">أُضيف %1$s كنسخ منفصلة لأن نسخة مختلفة كانت موجودة بالفعل.</string>
-    <string name="backup_restored_skipped">كان %1$s موجودًا بالفعل وتُرِك كما هو.</string>
+    <plurals name="backup_restored_copies">
+        <item quantity="zero">لم تتم إضافة %1$s مشروع كنسخ منفصلة لأن نسخة مختلفة كانت موجودة هنا بالفعل.</item>
+        <item quantity="one">تمت إضافة مشروع كنسخة منفصلة لأن نسخة مختلفة كانت موجودة هنا بالفعل.</item>
+        <item quantity="two">تمت إضافة مشروعين كنسختين منفصلتين لأن نسخة مختلفة كانت موجودة هنا بالفعل.</item>
+        <item quantity="few">تمت إضافة %1$s مشاريع كنسخ منفصلة لأن نسخة مختلفة كانت موجودة هنا بالفعل.</item>
+        <item quantity="many">تمت إضافة %1$s مشروعًا كنسخ منفصلة لأن نسخة مختلفة كانت موجودة هنا بالفعل.</item>
+        <item quantity="other">تمت إضافة %1$s مشروعًا كنسخ منفصلة لأن نسخة مختلفة كانت موجودة هنا بالفعل.</item>
+    </plurals>
+    <plurals name="backup_restored_skipped">
+        <item quantity="zero">لم يكن %1$s مشروع موجودًا هنا بالفعل، ولم يترك كما هو.</item>
+        <item quantity="one">كان المشروع موجودًا هنا بالفعل وترك كما هو.</item>
+        <item quantity="two">كان المشروعان موجودين هنا بالفعل وتركا كما هما.</item>
+        <item quantity="few">كانت %1$s مشاريع موجودة هنا بالفعل وتركت كما هي.</item>
+        <item quantity="many">كان %1$s مشروعًا موجودًا هنا بالفعل وترك كما هو.</item>
+        <item quantity="other">كان %1$s مشروعًا موجودًا هنا بالفعل وترك كما هو.</item>
+    </plurals>
     <string name="about_version">الإصدار %1$s</string>
     <string name="about_licence_line">مجاني ومفتوح المصدر، مرخّص بموجب Apache License 2.0.</string>
     <string name="about_independent_note">‏AbsentMotion مشروع مستقل، وهو غير تابع لأي صانع تطبيقات آخر ولا يحظى بتأييده أو رعايته؛ وأسماء المنتجات الأخرى ملك لأصحابها.</string>
@@ -906,6 +920,7 @@
     <string name="effectbrowser_favorite">المفضلة</string>
     <string name="effectbrowser_preset">إعداد مسبق</string>
     <string name="effectbrowser_recent">الأحدث</string>
+    <string name="effectbrowser_recent_empty">تظهر التأثيرات التي تستخدمها هنا</string>
     <plurals name="aibrowser_too_long">
         <item quantity="zero">المقاطع الأطول من %1$s دقيقة غير مدعومة بعد. قص المقطع أو قسّمه أولًا.</item>
         <item quantity="one">المقاطع الأطول من دقيقة واحدة غير مدعومة بعد. قص المقطع أو قسّمه أولًا.</item>

@@ -231,8 +231,14 @@
     <string name="backup_restore_no_space">Kulang ang libreng storage para maibalik ang backup na ito. Kailangan nito ng mga %1$s.</string>
     <string name="backup_open_failed">Hindi mabuksan ang file na ito.</string>
     <string name="backup_restored">Naibalik ang %1$s.</string>
-    <string name="backup_restored_copies">Naidagdag ang %1$s bilang hiwalay na kopya dahil may ibang bersyon na narito.</string>
-    <string name="backup_restored_skipped">Narito na ang %1$s kaya hinayaan na lang.</string>
+    <plurals name="backup_restored_copies">
+        <item quantity="one">Naidagdag ang %1$s proyekto bilang hiwalay na kopya dahil may ibang bersyon na narito.</item>
+        <item quantity="other">Naidagdag ang %1$s mga proyekto bilang hiwalay na kopya dahil may ibang bersyon na narito.</item>
+    </plurals>
+    <plurals name="backup_restored_skipped">
+        <item quantity="one">Narito na ang %1$s proyekto at hindi na ginalaw.</item>
+        <item quantity="other">Narito na ang %1$s mga proyekto at hindi na ginalaw.</item>
+    </plurals>
     <string name="about_version">Bersyon %1$s</string>
     <string name="about_licence_line">Libre at open source, lisensyado sa ilalim ng Apache License 2.0.</string>
     <string name="about_independent_note">Ang AbsentMotion ay isang independiyenteng proyekto. Wala itong kaugnayan, pag-endorso o pag-sponsor mula sa ibang gumagawa ng app; pag-aari ng mga may-ari nito ang mga pangalan ng ibang produkto.</string>
@@ -858,6 +864,7 @@
     <string name="effectbrowser_favorite">Paborito</string>
     <string name="effectbrowser_preset">PRESET</string>
     <string name="effectbrowser_recent">Kamakailan</string>
+    <string name="effectbrowser_recent_empty">Lalabas dito ang mga epektong ginagamit mo</string>
     <plurals name="aibrowser_too_long">
         <item quantity="one">Hindi pa sinusuportahan ang mga clip na mas mahaba sa %1$s minuto. I-trim o hatiin muna ang clip.</item>
         <item quantity="other">Hindi pa sinusuportahan ang mga clip na mas mahaba sa %1$s minuto. I-trim o hatiin muna ang clip.</item>

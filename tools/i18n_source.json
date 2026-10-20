@@ -228,8 +228,14 @@
  "backup_restore_result_title": "Restore",
  "backup_restore_stopped": "Restore stopped. Projects restored before you stopped are kept; restoring the same backup again finishes the rest.",
  "backup_restored": "Restored %1$s.",
- "backup_restored_copies": "%1$s were added as separate copies because a different version was already here.",
- "backup_restored_skipped": "%1$s were already here and were left as they are.",
+ "backup_restored_copies": {
+  "one": "%1$s project was added as a separate copy because a different version was already here.",
+  "other": "%1$s projects were added as separate copies because a different version was already here."
+ },
+ "backup_restored_skipped": {
+  "one": "%1$s project was already here and was left as it is.",
+  "other": "%1$s projects were already here and were left as they are."
+ },
  "backup_restoring_title": "Restoring a backup",
  "backup_result_title": "Backup",
  "backup_saved": "Saved as Documents/AbsentMotion/%1$s. It stays on this phone even if AbsentMotion is uninstalled; copy it to a computer or cloud storage to keep it safe.",
@@ -391,6 +397,7 @@
  "effectbrowser_favorite": "Favorite",
  "effectbrowser_preset": "PRESET",
  "effectbrowser_recent": "Recent",
+ "effectbrowser_recent_empty": "Effects you use appear here",
  "effectbrowser_title": "Effects Library",
  "effects_copy_effect": "Copy Effect",
  "effects_copy_effects": "Copy Effects",

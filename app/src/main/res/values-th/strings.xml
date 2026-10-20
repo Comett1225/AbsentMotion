@@ -231,8 +231,12 @@
     <string name="backup_restore_no_space">พื้นที่ว่างไม่พอสำหรับกู้คืนแบ็กอัปนี้ ต้องใช้ประมาณ %1$s</string>
     <string name="backup_open_failed">เปิดไฟล์นี้ไม่ได้</string>
     <string name="backup_restored">กู้คืนแล้ว %1$s</string>
-    <string name="backup_restored_copies">%1$s ถูกเพิ่มเป็นสำเนาแยก เนื่องจากมีเวอร์ชันที่แตกต่างอยู่แล้ว</string>
-    <string name="backup_restored_skipped">%1$s มีอยู่แล้วและคงไว้ตามเดิม</string>
+    <plurals name="backup_restored_copies">
+        <item quantity="other">เพิ่ม %1$s โปรเจกต์เป็นสำเนาแยกแล้ว เนื่องจากมีเวอร์ชันอื่นอยู่ที่นี่</item>
+    </plurals>
+    <plurals name="backup_restored_skipped">
+        <item quantity="other">%1$s โปรเจกต์มีอยู่ที่นี่แล้วจึงเก็บไว้ตามเดิม</item>
+    </plurals>
     <string name="about_version">เวอร์ชัน %1$s</string>
     <string name="about_licence_line">ฟรีและโอเพนซอร์ส ภายใต้สัญญาอนุญาต Apache License 2.0</string>
     <string name="about_independent_note">AbsentMotion เป็นโปรเจกต์อิสระ ไม่มีความเกี่ยวข้อง ไม่ได้รับการรับรอง และไม่ได้รับการสนับสนุนจากผู้พัฒนาแอปอื่นใด ชื่อผลิตภัณฑ์อื่นเป็นของผู้เป็นเจ้าของ</string>
@@ -846,6 +850,7 @@
     <string name="effectbrowser_favorite">รายการโปรด</string>
     <string name="effectbrowser_preset">พรีเซ็ต</string>
     <string name="effectbrowser_recent">ล่าสุด</string>
+    <string name="effectbrowser_recent_empty">เอฟเฟกต์ที่คุณใช้จะแสดงที่นี่</string>
     <plurals name="aibrowser_too_long">
         <item quantity="other">คลิปที่ยาวกว่า %1$s นาที ยังไม่รองรับ กรุณาตัดหรือแยกคลิปก่อน</item>
     </plurals>
