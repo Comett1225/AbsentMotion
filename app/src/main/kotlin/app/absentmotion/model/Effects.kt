@@ -11,6 +11,13 @@ fun Layer.withEffect(index: Int, change: (XmlNode) -> XmlNode): Layer {
 
 fun Layer.addEffect(effect: XmlNode) = copy(node = node.copy(children = node.children + effect))
 
+fun Scene.effectTargets(ids: Set<Long>): List<Layer> = layers.filter { it.id in ids && it.canAnimate }
+
+fun Scene.withEffectsPasted(ids: Set<Long>, effects: List<XmlNode>): Scene =
+    effectTargets(ids).fold(this) { scene, target ->
+        scene.update(target.id) { layer -> effects.fold(layer) { next, effect -> next.addEffect(effect) } }
+    }
+
 fun Layer.removeEffect(index: Int): Layer {
     var current = -1
     return copy(node = node.copy(children = node.children.filterNot { it.name == "effect" && ++current == index }))

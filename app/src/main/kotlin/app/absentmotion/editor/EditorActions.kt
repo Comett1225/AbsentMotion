@@ -1,5 +1,8 @@
 package app.absentmotion.editor
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import app.absentmotion.R
 import app.absentmotion.i18n.AppText
 import app.absentmotion.platform.Color
@@ -20,6 +23,8 @@ import app.absentmotion.model.Layer
 import app.absentmotion.model.PropRef
 import app.absentmotion.model.mediaUris
 import app.absentmotion.model.withEffect
+import app.absentmotion.model.effectTargets
+import app.absentmotion.model.withEffectsPasted
 import app.absentmotion.model.withEffectProperty
 import app.absentmotion.model.keyframes
 import app.absentmotion.model.stretchAt
@@ -204,6 +209,26 @@ fun EditorState.pasteCurveToAll() {
 fun EditorState.flip(horizontal: Boolean) = editSelected {
     val s = it.scale
     if (horizontal) it.withTransform("scale", -s[0], s[1]) else it.withTransform("scale", s[0], -s[1])
+}
+
+object EffectClipboard {
+    var effects by mutableStateOf<List<XmlNode>>(emptyList())
+        private set
+
+    fun copy(all: List<XmlNode>, ticked: Set<Int>) {
+        val picked = all.filterIndexed { i, _ -> i in ticked }
+        if (picked.isNotEmpty()) effects = picked
+    }
+
+    fun copyOne(effect: XmlNode) { effects = listOf(effect) }
+}
+
+fun EditorState.pasteEffectsOnChosen(): Pair<Int, Int> {
+    val ids = chosenLayers.map { it.id }.toSet()
+    val targets = scene.effectTargets(ids).size
+    val effects = EffectClipboard.effects
+    if (targets > 0 && effects.isNotEmpty()) edit { it.withEffectsPasted(ids, effects) }
+    return targets to ids.size - targets
 }
 
 private var copiedLayers: List<Layer> = emptyList()

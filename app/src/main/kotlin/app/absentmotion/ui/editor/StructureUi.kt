@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.material3.Icon
@@ -42,6 +43,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import app.absentmotion.editor.EditorState
+import app.absentmotion.editor.EffectClipboard
+import app.absentmotion.editor.pasteEffectsOnChosen
 import app.absentmotion.editor.MultiSelect
 import app.absentmotion.editor.StylePart
 import app.absentmotion.editor.addCamera
@@ -259,17 +262,20 @@ private val PasteLabels = mapOf(
 internal fun MultiTopBar(state: EditorState, modifier: Modifier) {
     val ids = MultiSelect.ids
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
     var alignment by remember { mutableStateOf(false) }
     val tint = Am.OnAccent
     Row(modifier.background(Am.Accent), verticalAlignment = Alignment.CenterVertically) {
         SelectionButton(SelectionIcons.Cancel, stringResource(R.string.structure_cancel_selection), Modifier.width(40.dp).fillMaxHeight(), tint) { MultiSelect.clear() }
         if (!alignment) {
             val text = pluralStringResource(R.plurals.structure_layers_selected, ids.size, ids.size.toString())
-            Text(text, Modifier.weight(1f), color = tint, fontSize = 14.sp, maxLines = 1)
+            Text(text, Modifier.weight(1f), color = tint, maxLines = 1, autoSize = TextAutoSize.StepBased(10.sp, 14.sp))
             val cell = Modifier.width(40.dp).fillMaxHeight()
             SelectionButton(SelectionIcons.Group, stringResource(R.string.structure_group), cell, tint, ids.isNotEmpty()) { state.groupLayers(ids) }
             SelectionButton(SelectionIcons.Mask, stringResource(R.string.structure_group_mask), cell, tint, ids.size > 1) { state.groupLayers(ids, "mask") }
             SelectionButton(SelectionIcons.Exclude, stringResource(R.string.structure_group_exclude), cell, tint, ids.size > 1) { state.groupLayers(ids, "exclude") }
+            val copied = EffectClipboard.effects
+            SelectionButton(SelectionIcons.PasteEffects, stringResource(if (copied.size == 1) R.string.effects_paste_effect else R.string.effects_paste_effects), cell, tint, ids.isNotEmpty() && copied.isNotEmpty()) { pasteEffectsOnSelection(state, context) }
             SelectionButton(ChromeIcons.Trash, stringResource(R.string.structure_delete_selected), cell, tint, ids.isNotEmpty()) { state.deleteChosen() }
             SelectionButton(SelectionIcons.Next, stringResource(R.string.structure_alignment_options), cell, tint) { alignment = true }
         } else {
@@ -282,6 +288,17 @@ internal fun MultiTopBar(state: EditorState, modifier: Modifier) {
             SelectionButton(SelectionIcons.DistributeHorizontal, stringResource(R.string.structure_distribute_horizontal), cell, tint, ids.size > 2) { scope.launch { state.distributeSelection(true) } }
         }
     }
+}
+
+private fun pasteEffectsOnSelection(state: EditorState, context: Context) {
+    val (pasted, skipped) = state.pasteEffectsOnChosen()
+    val resources = context.resources
+    val count = EffectClipboard.effects.size
+    val text = if (pasted == 0) context.getString(R.string.effects_paste_no_target) else listOfNotNull(
+        context.getString(R.string.effects_pasted_onto, resources.getQuantityString(R.plurals.effects_count, count, count.toString()), resources.getQuantityString(R.plurals.clips_count, pasted, pasted.toString())),
+        resources.getQuantityString(R.plurals.effects_paste_skipped, skipped, skipped.toString()).takeIf { skipped > 0 },
+    ).joinToString("\n")
+    Toast.makeText(context, text, Toast.LENGTH_LONG).show()
 }
 
 @Composable

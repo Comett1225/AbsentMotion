@@ -262,5 +262,14 @@ class UiContracts(unittest.TestCase):
         self.assertIn('TimelineMath.moveTarget(wanted,', text)
         self.assertIn('if (state.settings.vibration) haptic.performHapticFeedback(HapticFeedbackType.LongPress)', text)
 
+    def test_selection_bar_pastes_copied_effects_in_one_edit_onto_visual_layers_only(self):
+        bar = source('ui/editor/StructureUi.kt').split('internal fun MultiTopBar', 1)[1]
+        self.assertIn('SelectionIcons.PasteEffects', bar)
+        self.assertIn('ids.isNotEmpty() && copied.isNotEmpty()', bar)
+        self.assertIn('pasteEffectsOnSelection(state, context)', bar)
+        self.assertIn('if (targets > 0 && effects.isNotEmpty()) edit { it.withEffectsPasted(ids, effects) }', source('editor/EditorActions.kt'))
+        self.assertIn('it.id in ids && it.canAnimate', source('model/Effects.kt'))
+        self.assertIn('EffectClipboard.copy(layer.effects, ticked)', source('ui/editor/panels/EffectsPanel.kt'))
+
 if __name__ == '__main__':
     unittest.main()

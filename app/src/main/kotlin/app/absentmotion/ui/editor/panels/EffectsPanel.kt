@@ -6,7 +6,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -16,6 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.absentmotion.editor.*
@@ -23,6 +29,7 @@ import app.absentmotion.effects.EffectDefinition
 import app.absentmotion.model.*
 import app.absentmotion.ui.editor.AboveLeft
 import app.absentmotion.ui.editor.ChromeIcons
+import app.absentmotion.ui.editor.DimAlpha
 import app.absentmotion.ui.editor.DropOrRise
 import app.absentmotion.ui.editor.MenuPopup
 import app.absentmotion.ui.editor.MenuRow
@@ -40,8 +47,6 @@ import app.absentmotion.ui.theme.Swap
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
 
-private var copiedEffects by mutableStateOf<List<XmlNode>>(emptyList())
-
 @Composable
 internal fun EffectsPanel(state: EditorState, modifier: Modifier) {
     val layer = state.selected ?: return
@@ -54,6 +59,7 @@ internal fun EffectsPanel(state: EditorState, modifier: Modifier) {
     LaunchedEffect(instance == null) { if (instance == null && index >= 0) state.effectIndex = -1 }
     var active by remember(layer.id, index, definition?.id) { mutableStateOf(definition?.params?.firstOrNull { it.kind != "color" && it.kind != "switch" && it.kind != "choice" && it.kind != "text" }) }
     var menu by remember { mutableStateOf(false) }
+    var choosing by remember { mutableStateOf(false) }
     val usable = instance != null && definition?.available == true
     val target = active?.takeIf { usable }?.let { KeyTarget(PropRef.effect(index, it.id), it.default, it.type) }
     val point = active?.takeIf { it.kind == "point" && usable }
@@ -72,6 +78,12 @@ internal fun EffectsPanel(state: EditorState, modifier: Modifier) {
     SideEffect { state.keyTarget = target; state.pointAdjust = adjust }
     DisposableEffect(Unit) { onDispose { state.pointAdjust = null } }
     if (state.easingOpen) { EasingPanel(state, modifier); return }
+    if (choosing) {
+        CopyEffectsDialog(layer.effects.map { catalog.find(it["id"] ?: "")?.name ?: it["id"]?.substringAfterLast('.') ?: "" }, { choosing = false }) { ticked ->
+            EffectClipboard.copy(layer.effects, ticked)
+            choosing = false
+        }
+    }
     Row(modifier.background(Am.Panel)) {
         Column(Modifier.width(168.px).heightIn(max = PanelHeight).fillMaxHeight()) {
             EffectFrameButton(PanelIcons.Back, stringResource(R.string.topbar_back), Modifier.weight(1f)) { state.stepBack() }
@@ -82,9 +94,9 @@ internal fun EffectsPanel(state: EditorState, modifier: Modifier) {
                 EffectFrameButton(PanelIcons.More, stringResource(R.string.effects_more), Modifier.fillMaxSize(), instance == null) { menu = true }
                 Presence(menu) {
                     MenuPopup(AboveLeft, { menu = false }, TransformOrigin(0f, 1f)) {
-                        MenuRow(stringResource(R.string.effects_copy_effects), enabled = layer.effects.isNotEmpty()) { copiedEffects = layer.effects; menu = false }
-                        MenuRow(stringResource(if (copiedEffects.size == 1) R.string.effects_paste_effect else R.string.effects_paste_effects), enabled = copiedEffects.isNotEmpty(), divider = true) {
-                            state.editSelected { copiedEffects.fold(it) { next, effect -> next.addEffect(effect) } }
+                        MenuRow(stringResource(R.string.effects_copy_effects), enabled = layer.effects.isNotEmpty()) { choosing = true; menu = false }
+                        MenuRow(stringResource(if (EffectClipboard.effects.size == 1) R.string.effects_paste_effect else R.string.effects_paste_effects), enabled = EffectClipboard.effects.isNotEmpty(), divider = true) {
+                            state.editSelected { EffectClipboard.effects.fold(it) { next, effect -> next.addEffect(effect) } }
                             menu = false
                         }
                     }
@@ -130,6 +142,33 @@ internal fun EffectsPanel(state: EditorState, modifier: Modifier) {
 private val RowShape = RoundedCornerShape(5.dp)
 
 @Composable
+private fun CopyEffectsDialog(names: List<String>, onDismiss: () -> Unit, onCopy: (Set<Int>) -> Unit) {
+    var ticked by remember { mutableStateOf(names.indices.toSet()) }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.effects_copy_effects)) },
+        text = {
+            Column(Modifier.heightIn(max = 280.dp).verticalScroll(rememberScrollState())) {
+                names.forEachIndexed { i, name ->
+                    val on = i in ticked
+                    Row(Modifier.fillMaxWidth().height(44.dp).toggleable(on, role = Role.Checkbox) { ticked = if (on) ticked - i else ticked + i }, verticalAlignment = Alignment.CenterVertically) {
+                        Checkbox(on, null, colors = CheckboxDefaults.colors(checkedColor = Am.Accent, uncheckedColor = Am.OnDark, checkmarkColor = Am.OnAccent))
+                        Text(name, Modifier.padding(start = 8.dp), color = Am.OnDark, fontSize = 15.sp, maxLines = 1)
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton({ onCopy(ticked) }, enabled = ticked.isNotEmpty()) {
+                Text(stringResource(R.string.effects_copy_confirm), color = Am.Accent.copy(alpha = if (ticked.isEmpty()) DimAlpha else 1f))
+            }
+        },
+        dismissButton = { TextButton(onDismiss) { Text(stringResource(R.string.cancel), color = Am.Accent) } },
+        containerColor = Am.Field, titleContentColor = Am.OnDark, textContentColor = Am.OnDark,
+    )
+}
+
+@Composable
 private fun EffectHeader(state: EditorState, index: Int, effect: XmlNode, definition: EffectDefinition?) {
     var menu by remember { mutableStateOf(false) }
     Row(Modifier.fillMaxWidth().height(37.dp).clickable { state.effectIndex = -1 }.padding(start = 3.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -148,8 +187,8 @@ private fun EffectHeader(state: EditorState, index: Int, effect: XmlNode, defini
                         menu = false
                     }
                     MenuRow(stringResource(R.string.effects_duplicate)) { state.editSelected { it.duplicateEffect(index) }; menu = false }
-                    MenuRow(stringResource(R.string.effects_copy_effect)) { copiedEffects = listOf(effect); menu = false }
-                    val settings = copiedEffects.singleOrNull()?.takeIf { it["id"] == effect["id"] }
+                    MenuRow(stringResource(R.string.effects_copy_effect)) { EffectClipboard.copyOne(effect); menu = false }
+                    val settings = EffectClipboard.effects.singleOrNull()?.takeIf { it["id"] == effect["id"] }
                     MenuRow(stringResource(R.string.effects_paste_values), enabled = settings != null) {
                         settings?.let { from -> state.editSelected { it.withEffect(index) { old -> old.copy(children = from.children) } } }
                         menu = false

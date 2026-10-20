@@ -914,6 +914,21 @@
     <string name="easing_disable_overshoot">Disable Overshoot</string>
     <string name="easing_enable_overshoot">Enable Overshoot</string>
     <string name="effects_copy_effects">Copy Effects</string>
+    <string name="effects_copy_confirm">Copy</string>
+    <plurals name="effects_count">
+        <item quantity="one">%1$s effect</item>
+        <item quantity="other">%1$s effects</item>
+    </plurals>
+    <plurals name="clips_count">
+        <item quantity="one">%1$s clip</item>
+        <item quantity="other">%1$s clips</item>
+    </plurals>
+    <string name="effects_pasted_onto">Pasted %1$s onto %2$s</string>
+    <plurals name="effects_paste_skipped">
+        <item quantity="one">%1$s clip skipped: audio, cameras and null objects take no visual effects</item>
+        <item quantity="other">%1$s clips skipped: audio, cameras and null objects take no visual effects</item>
+    </plurals>
+    <string name="effects_paste_no_target">Audio, cameras and null objects take no visual effects</string>
     <string name="effects_paste_effect">Paste Effect</string>
     <string name="effects_paste_effects">Paste Effects</string>
     <string name="effects_more">More</string>

@@ -2219,7 +2219,7 @@ The launcher icon is an own drawing, made by tools/icon/make_icon.py (source of 
 COUNTS
 ------
 
-- Lucide only - 167
+- Lucide only - 168
 - Lucide shapes plus own parts - 8
 - Own drawing only - 40
 - Material Symbols - 0
@@ -2398,6 +2398,7 @@ ICONS
 - AlignBottom (Lucide align-end-horizontal) - ISC - ui/editor/SelectionIcons.kt
 - DistributeHorizontal (Lucide align-horizontal-space-between) - ISC - ui/editor/SelectionIcons.kt
 - DistributeVertical (Lucide align-vertical-space-between) - ISC - ui/editor/SelectionIcons.kt
+- PasteEffects (Lucide clipboard-paste) - ISC - ui/editor/SelectionIcons.kt
 - Speaker (Lucide volume-2) - ISC - ui/editor/AudioIcons.kt
 - Note (Lucide music) - ISC and MIT (Feather) - ui/editor/AudioIcons.kt
 - Level (Lucide volume-2) - ISC - ui/editor/AudioIcons.kt
