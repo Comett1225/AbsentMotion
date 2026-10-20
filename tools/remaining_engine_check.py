@@ -321,6 +321,11 @@ def main():
     ok = max(spill) == 0 and min(moved) > 3
     print(('ok   ' if ok else 'FAIL ') + f'datamosh on a picture smaller than the canvas moves blocks only inside the layer: {spill} pixels outside, {moved} change inside', flush=True)
     failed += not ok
+    smear = engine.still('directionalfringe', engine.scene(engine.rect(1, 100, 100, 40, 40, 0xffffffff, extra=fx('directionalblur', blurLength=40, angle=0))), work)
+    fringe = [int(smear[100, x][0]) for x in (100, 160)]
+    ok = fringe[0] > 250 and 110 <= fringe[1] <= 146
+    print(('ok   ' if ok else 'FAIL ') + f'directional blur fades white to half white where half its samples are clear, not to grey: {fringe}', flush=True)
+    failed += not ok
     hits = engine.run('motionhit', engine.scene(engine.rect(7, 100, 100, 10, 10, 0xffff0000, extra=fx('oscillate', angle=0, frequency=0.5, magnitude=50))), work, [(150, 100), (100, 100)], 15)
     engine.adb('shell', 'rm', engine.DEVICE_DIR + '/motionhit.png')
     got = [line.split()[-1] for line in hits.splitlines() if ' hit ' in line]
