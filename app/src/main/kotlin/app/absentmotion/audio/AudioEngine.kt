@@ -37,7 +37,7 @@ class AudioEngine(context: Context) {
     @Volatile private var shownMs = 0
 
     init {
-        ExportAudio.mixFor = { scene -> OfflineMix.of(this.context, scene, quality) }
+        ExportAudio.mixFor = { scene, rate -> OfflineMix.of(this.context, scene, quality, rate) }
     }
 
     fun setScene(scene: Scene) {

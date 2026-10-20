@@ -33,8 +33,12 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
             return withContext(Dispatchers.Default) {
                 val xml = scene.toXml()
                 when (kind) {
-                    ExportKind.Video -> viaCache(saved, name, "mp4", "video/mp4", "Movies/$AppFolder") { out ->
-                        exportVideo(engine, scene, xml, s, out, ExportAudio.mixFor?.invoke(scene), progress)
+                    ExportKind.Video -> s.fixedFormat().let { f ->
+                        viaCache(saved, name, f.container.ext, f.container.mime, "Movies/$AppFolder") { out ->
+                            java.io.RandomAccessFile(out, "rw").use { file ->
+                                exportVideo(engine, scene, xml, f, file.fd, ExportAudio.mixFor?.invoke(scene, f.audio.effectiveRate), progress)
+                            }
+                        }
                     }
                     ExportKind.Gif -> viaCache(saved, name, "gif", "image/gif", "Pictures/$AppFolder") { out -> gif(scene, xml, s, out, progress) }
                     ExportKind.Frame, ExportKind.FrameAs -> {

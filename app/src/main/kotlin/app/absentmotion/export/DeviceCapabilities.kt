@@ -171,7 +171,9 @@ class DeviceCapabilities private constructor(context: Context) {
         try {
             val start = SystemClock.elapsedRealtime()
             var first = 0L
-            exportVideo(engine, scene, ProbeScene, s, out, null) { if (first == 0L && it > 0f) first = SystemClock.elapsedRealtime() }
+            java.io.RandomAccessFile(out, "rw").use { file ->
+                exportVideo(engine, scene, ProbeScene, s, file.fd, null) { if (first == 0L && it > 0f) first = SystemClock.elapsedRealtime() }
+            }
             val ms = SystemClock.elapsedRealtime() - start
             return ProbeResult(s.codec, w, h, frameCount(scene, s.fps), ms, (first - start).coerceIn(0, ms - 1))
         } finally {

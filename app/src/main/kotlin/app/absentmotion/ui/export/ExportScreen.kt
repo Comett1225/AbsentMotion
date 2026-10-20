@@ -77,6 +77,7 @@ import androidx.compose.ui.unit.sp
 import app.absentmotion.engine.EngineThread
 import app.absentmotion.export.AudioBitrate
 import app.absentmotion.export.AvailableCodecs
+import app.absentmotion.export.ExportPrefs
 import app.absentmotion.export.ExportAudio
 import app.absentmotion.export.ExportKind
 import app.absentmotion.export.ExportResult
@@ -142,7 +143,8 @@ fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromProjectList
     val exporter = remember { Exporter(context, engine, MediaStoreExport(context)) }
     val kinds = remember { listOf(ExportKind.Video, ExportKind.Package, ExportKind.Frame, ExportKind.FrameAs, ExportKind.Sequence, ExportKind.Gif) + if (fromProjectList) listOf(ExportKind.Xml) else emptyList() }
     var kind by remember { mutableStateOf(ExportKind.Video) }
-    val settings = remember { mutableStateMapOf<ExportKind, ExportSettings>().apply { ExportKind.entries.forEach { put(it, defaultSettings(it, scene)) } } }
+    val prefs = remember { ExportPrefs(context) }
+    val settings = remember { mutableStateMapOf<ExportKind, ExportSettings>().apply { ExportKind.entries.forEach { put(it, prefs.load(it, scene)) } } }
     var page by remember { mutableStateOf<ExportKind?>(null) }
     var lastPage by remember { mutableStateOf(ExportKind.Gif) }
     var lastPhase by remember { mutableStateOf<Phase>(Phase.Idle) }
@@ -195,6 +197,7 @@ fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromProjectList
             return
         }
         val chosen = kind
+        prefs.save(chosen, s)
         val alsoTemplate = asTemplate
         val name = safeName(scene.title) + " " + SimpleDateFormat("yyyyMMdd_HHmmss", Locale.ENGLISH).format(Date())
         progress = 0f

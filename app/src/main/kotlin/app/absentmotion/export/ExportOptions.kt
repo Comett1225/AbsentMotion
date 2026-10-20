@@ -24,9 +24,73 @@ enum class Codec(val label: String, val mime: String, val bitsVsH264: Double) {
     H264("H.264/AVC", "video/avc", 1.0),
     Hevc("H.265/HEVC", "video/hevc", 0.6),
     Av1("AV1", "video/av01", 0.5),
+    Vp9("VP9", "video/x-vnd.on2.vp9", 0.65),
     Apv("APV", "video/apv", 8.0);
 
     val short get() = label.substringAfter('/')
+}
+
+enum class Container(val label: String, val ext: String, val mime: String) {
+    Mp4("MP4", "mp4", "video/mp4"),
+    Mov("MOV", "mov", "video/quicktime"),
+    WebM("WebM", "webm", "video/webm"),
+    Mkv("MKV", "mkv", "video/x-matroska"),
+}
+
+enum class AudioCodec(val label: String, val mime: String) {
+    Aac("AAC", "audio/mp4a-latm"),
+    Opus("Opus", "audio/opus"),
+}
+
+data class AudioSettings(
+    val codec: AudioCodec = AudioCodec.Aac,
+    val bitrateKbps: Int = 128,
+    val sampleRate: Int = 44100,
+    val channels: Int = 2,
+) {
+    val effectiveRate: Int get() = if (codec == AudioCodec.Opus) 48000 else sampleRate
+}
+
+val AudioBitratesKbps = listOf(64, 96, 128, 160, 192, 256, 320)
+val AudioSampleRates = listOf(44100, 48000)
+
+enum class AudioFormat(val label: String, val ext: String, val mime: String, val lossless: Boolean) {
+    Wav16("WAV 16-bit", "wav", "audio/x-wav", true),
+    Wav24("WAV 24-bit", "wav", "audio/x-wav", true),
+    Flac("FLAC", "flac", "audio/flac", true),
+    M4a("M4A (AAC)", "m4a", "audio/mp4", false),
+    Ogg("OGG (Opus)", "ogg", "audio/ogg", false),
+    Mp3("MP3", "mp3", "audio/mpeg", false),
+}
+
+fun videoCodecsFor(container: Container): List<Codec> = when (container) {
+    Container.Mp4 -> listOf(Codec.H264, Codec.Hevc, Codec.Av1, Codec.Apv)
+    Container.Mov -> listOf(Codec.H264, Codec.Hevc)
+    Container.WebM -> listOf(Codec.Vp9, Codec.Av1)
+    Container.Mkv -> listOf(Codec.H264, Codec.Hevc, Codec.Av1, Codec.Vp9)
+}
+
+fun audioCodecsFor(container: Container): List<AudioCodec> = when (container) {
+    Container.Mp4, Container.Mov -> listOf(AudioCodec.Aac)
+    Container.WebM -> listOf(AudioCodec.Opus)
+    Container.Mkv -> listOf(AudioCodec.Aac, AudioCodec.Opus)
+}
+
+fun containersFor(codec: Codec): List<Container> = Container.entries.filter { codec in videoCodecsFor(it) }
+
+fun formatProblem(s: ExportSettings, hasAudio: Boolean): String? = when {
+    s.codec !in videoCodecsFor(s.container) -> "${s.container.label} files cannot hold ${s.codec.label} video."
+    hasAudio && s.audio.codec !in audioCodecsFor(s.container) -> "${s.container.label} files cannot hold ${s.audio.codec.label} audio."
+    s.audio.bitrateKbps !in 32..512 -> "Audio bit rate must be between 32 and 512 kbps."
+    s.audio.channels !in 1..2 -> "Audio must be mono or stereo."
+    s.audio.sampleRate !in AudioSampleRates -> "Audio sample rate must be 44.1 or 48 kHz."
+    else -> null
+}
+
+fun ExportSettings.fixedFormat(): ExportSettings {
+    val container = if (codec in videoCodecsFor(container)) container else containersFor(codec).firstOrNull() ?: Container.Mp4
+    val audioCodec = if (audio.codec in audioCodecsFor(container)) audio.codec else audioCodecsFor(container).first()
+    return copy(container = container, audio = audio.copy(codec = audioCodec))
 }
 
 val AvailableCodecs: List<Codec> by lazy {
@@ -56,6 +120,9 @@ data class ExportSettings(
     val imageQuality: Int = 95,
     val background: Int = BackgroundWhite,
     val interpolation: FrameInterpolation = FrameInterpolation.Off,
+    val container: Container = Container.Mp4,
+    val audio: AudioSettings = AudioSettings(),
+    val audioFormat: AudioFormat = AudioFormat.M4a,
 )
 
 fun defaultSettings(kind: ExportKind, scene: Scene): ExportSettings = when (kind) {
@@ -90,10 +157,17 @@ fun videoBitrate(width: Int, height: Int, s: ExportSettings): Int {
 
 const val AudioBitrate = 128_000
 
+fun audioBytesPerSecond(s: ExportSettings): Double = when (s.audioFormat) {
+    AudioFormat.Wav16 -> s.audio.sampleRate * s.audio.channels * 2.0
+    AudioFormat.Wav24 -> s.audio.sampleRate * s.audio.channels * 3.0
+    AudioFormat.Flac -> s.audio.sampleRate * s.audio.channels * 2.0 * 0.6
+    AudioFormat.M4a, AudioFormat.Ogg, AudioFormat.Mp3 -> s.audio.bitrateKbps * 125.0
+}
+
 const val GifBytesPerPixel = 0.6
 
 fun optionNote(kind: ExportKind, scene: Scene, s: ExportSettings): String? = when (kind) {
-    ExportKind.Video -> "MP4 ${if (s.codec == Codec.H264) "" else s.codec.short + " "}${resolutionLabel(s.shortSide)} ${s.fps}fps"
+    ExportKind.Video -> "${s.container.label} ${if (s.codec == Codec.H264) "" else s.codec.short + " "}${resolutionLabel(s.shortSide)} ${s.fps}fps"
     ExportKind.Sequence -> "${s.image.label} ${resolutionLabel(s.shortSide)} ${s.fps}fps"
     ExportKind.Gif -> exportSize(scene, s.shortSide, false).let { "${it.first}x${it.second} ${s.fps}fps" }
     ExportKind.Package -> "Keeping Original Media"
@@ -107,7 +181,7 @@ fun estimateBytes(kind: ExportKind, scene: Scene, s: ExportSettings, hasAudio: B
     val frames = frameCount(scene, s.fps)
     return when (kind) {
         ExportKind.Video -> exportSize(scene, s.shortSide, true).let {
-            (videoBitrate(it.first, it.second, s) + if (hasAudio) AudioBitrate else 0) / 8 * seconds
+            (videoBitrate(it.first, it.second, s) + if (hasAudio) s.audio.bitrateKbps * 1000 else 0) / 8 * seconds
         }.toLong()
         ExportKind.Gif -> exportSize(scene, s.shortSide, false).let { it.first.toLong() * it.second * frames * GifBytesPerPixel }.toLong()
         ExportKind.Sequence -> exportSize(scene, s.shortSide, false).let {

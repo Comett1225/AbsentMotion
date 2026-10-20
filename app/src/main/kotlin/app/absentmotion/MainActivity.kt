@@ -69,6 +69,7 @@ import app.absentmotion.export.FrameInterpolation
 import app.absentmotion.export.Exporter
 import app.absentmotion.export.FolderExport
 import app.absentmotion.export.defaultSettings
+import app.absentmotion.export.fixedFormat
 import app.absentmotion.ui.editor.EditorScreen
 import app.absentmotion.ui.export.ExportScreen
 import app.absentmotion.ui.home.HomeScreen
@@ -504,8 +505,16 @@ class MainActivity : ComponentActivity() {
         intent.takeIf { it.hasExtra("iquality") }?.let { s = s.copy(imageQuality = it.getIntExtra("iquality", s.imageQuality)) }
         intent.getStringExtra("interp")?.let { name -> FrameInterpolation.entries.firstOrNull { it.name.equals(name, true) }?.let { s = s.copy(interpolation = it) } }
         app.absentmotion.export.VideoExportPath.forceBuffers = intent.getBooleanExtra("buffers", false)
+        intent.getStringExtra("container")?.let { name -> app.absentmotion.export.Container.entries.firstOrNull { it.name.equals(name, true) }?.let { s = s.copy(container = it) } }
+        intent.getStringExtra("aformat")?.let { name -> app.absentmotion.export.AudioFormat.entries.firstOrNull { it.name.equals(name, true) }?.let { s = s.copy(audioFormat = it) } }
+        var a = s.audio
+        intent.getStringExtra("acodec")?.let { name -> app.absentmotion.export.AudioCodec.entries.firstOrNull { it.name.equals(name, true) }?.let { a = a.copy(codec = it) } }
+        intent.takeIf { it.hasExtra("abitrate") }?.let { a = a.copy(bitrateKbps = it.getIntExtra("abitrate", a.bitrateKbps)) }
+        intent.takeIf { it.hasExtra("arate") }?.let { a = a.copy(sampleRate = it.getIntExtra("arate", a.sampleRate)) }
+        intent.takeIf { it.hasExtra("channels") }?.let { a = a.copy(channels = it.getIntExtra("channels", a.channels)) }
+        s = s.copy(audio = a)
         val dir = getExternalFilesDir(null)!!
-        val ext = mapOf(ExportKind.Video to "mp4", ExportKind.Gif to "gif", ExportKind.Frame to "png", ExportKind.FrameAs to s.image.ext, ExportKind.Xml to "xml", ExportKind.Package to "absproj")
+        val ext = mapOf(ExportKind.Video to s.fixedFormat().container.ext, ExportKind.Gif to "gif", ExportKind.Frame to "png", ExportKind.FrameAs to s.image.ext, ExportKind.Xml to "xml", ExportKind.Package to "absproj")
         val name = if (kind == ExportKind.Sequence) "export.seq" else "export"
         lifecycleScope.launch {
             try {

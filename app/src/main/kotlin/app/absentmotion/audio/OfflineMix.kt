@@ -12,18 +12,20 @@ import kotlin.math.roundToInt
 internal class OfflineMix(
     private val open: (String) -> PcmSource, private val clips: List<AudioClip>, private val quality: Int,
     makeFx: FxMaker = NativeFx::chain,
-    private val master: ClipFx = NativeFx.limiter(RATE) ?: SafeLimiter(RATE),
+    master: ClipFx? = null,
+    private val rate: Int = ExportAudio.SAMPLE_RATE,
 ) : AudioMix, Closeable {
+    private val limiter: ClipFx = master ?: NativeFx.limiter(rate) ?: SafeLimiter(rate)
     private val sources = HashMap<Long, OfflineSource>()
     private val voices = HashMap<Long, Voice>()
-    private val rack = FxRack(RATE, makeFx)
-    private val lead = master.latency.coerceIn(0, BLOCK)
+    private val rack = FxRack(rate, makeFx)
+    private val lead = limiter.latency.coerceIn(0, BLOCK)
     private val block = FloatArray(BLOCK * 2)
     private var index = Long.MIN_VALUE
 
     override fun invoke(startUs: Long, endUs: Long): ShortArray {
-        val first = Math.round(startUs * RATE / 1e6)
-        val frames = (Math.round(endUs * RATE / 1e6) - first).toInt()
+        val first = Math.round(startUs * rate / 1e6)
+        val frames = (Math.round(endUs * rate / 1e6) - first).toInt()
         val out = ShortArray(frames * 2)
         var f = first
         while (f < first + frames) {
@@ -41,7 +43,7 @@ internal class OfflineMix(
         if (i == index) return block
         if (i != index + 1) seek(i * BLOCK)
         mix(i * BLOCK + lead, BLOCK)
-        master.process(block, BLOCK)
+        limiter.process(block, BLOCK)
         index = i
         return block
     }
@@ -49,15 +51,15 @@ internal class OfflineMix(
     private fun seek(frame: Long) {
         voices.values.forEach { it.ready = false }
         rack.reset()
-        master.reset()
+        limiter.reset()
         if (lead == 0) return
         mix(frame, lead)
-        master.process(block, lead)
+        limiter.process(block, lead)
     }
 
     private fun mix(first: Long, frames: Int) {
         java.util.Arrays.fill(block, 0, 2 * frames, 0f)
-        val dt = 1000.0 / RATE
+        val dt = 1000.0 / rate
         val t0 = first * dt
         for (clip in clips) {
             if (clip.loop && clip.outMs.isInfinite() && t0 + frames * dt > clip.startMs && t0 <= clip.endMs) {
@@ -93,17 +95,16 @@ internal class OfflineMix(
         sources.values.forEach { it.close() }
         sources.clear()
         rack.close()
-        master.close()
+        limiter.close()
     }
 
     companion object {
-        private const val RATE = ExportAudio.SAMPLE_RATE
         private const val BLOCK = 1024
 
-        fun of(context: Context, scene: Scene, quality: Int): AudioMix? =
+        fun of(context: Context, scene: Scene, quality: Int, rate: Int = ExportAudio.SAMPLE_RATE): AudioMix? =
             AudioClip.of(scene).takeIf { it.isNotEmpty() }?.let { clips ->
                 val app = context.applicationContext
-                OfflineMix({ uri -> PcmDecoder(app, uri) }, clips, quality)
+                OfflineMix({ uri -> PcmDecoder(app, uri) }, clips, quality, rate = rate)
             }
     }
 }

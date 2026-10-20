@@ -6,7 +6,6 @@ import android.media.MediaCodec
 import android.media.MediaCodecInfo
 import android.media.MediaCodecList
 import android.media.MediaFormat
-import android.media.MediaMuxer
 import android.util.Log
 import android.view.Surface
 import app.absentmotion.engine.EngineThread
@@ -18,6 +17,7 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.runInterruptible
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.FileDescriptor
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.concurrent.atomic.AtomicInteger
@@ -35,13 +35,16 @@ object ExportAudio {
     const val SAMPLE_RATE = 44100
     const val CHANNELS = 2
 
-    @Volatile var mixFor: ((Scene) -> AudioMix?)? = null
+    @Volatile var mixFor: ((Scene, Int) -> AudioMix?)? = null
 }
 
 private const val BASE_US = 1_000_000L
 
+internal const val PrimingKey = "absentmotion-priming-frames"
+private const val OpusLookaheadFrames = 312
+
 internal suspend fun exportVideo(
-    engine: EngineThread, scene: Scene, xml: String, s: ExportSettings, out: File, audio: AudioMix?, progress: (Float) -> Unit,
+    engine: EngineThread, scene: Scene, xml: String, s: ExportSettings, out: FileDescriptor, audio: AudioMix?, progress: (Float) -> Unit,
 ) {
     val (width, height) = exportSize(scene, s.shortSide, even = true)
     val frames = frameCount(scene, s.fps)
@@ -68,7 +71,7 @@ internal suspend fun exportVideo(
     val stop = AtomicBoolean()
     val failure = AtomicReference<Throwable>()
     fun fail(t: Throwable) { failure.compareAndSet(null, t); stop.set(true) }
-    val mux = try { Mux(out.path, if (audio != null) 2 else 1, ::fail) } catch (t: Throwable) { encoder.release(); throw t }
+    val mux = try { Mux(openSink(s.container, out, s.fps), if (audio != null) 2 else 1, ::fail) } catch (t: Throwable) { encoder.release(); throw t }
     val videoDone = AtomicBoolean()
     val workers = ArrayList<Thread>()
     var surface: Surface? = null
@@ -80,11 +83,13 @@ internal suspend fun exportVideo(
         encoder.start()
         worker("video") { drain(encoder, mux, videoDone, BASE_US) }
         if (audio != null) {
-            val aac = createAacEncoder().also { audioEncoder = it }
-            val delay = AtomicInteger(aacDelayFrames(null))
+            val sound = s.audio
+            val coder = createAudioEncoder(sound).also { audioEncoder = it }
+            val aac = sound.codec == AudioCodec.Aac
+            val delay = AtomicInteger(if (aac) aacDelayFrames(null) else OpusLookaheadFrames)
             val totalUs = (scene.totalTime + 1) * 1000L
-            worker("audio-out") { drain(aac, mux, stop, 0, delay, totalUs) }
-            worker("audio-in") { feedAudio(aac, audio, totalUs, stop, delay) }
+            worker("audio-out") { drain(coder, mux, stop, 0, delay.takeIf { aac }, totalUs, rate = sound.effectiveRate, zeroStart = !aac) }
+            worker("audio-in") { feedAudio(coder, audio, totalUs, stop, delay, sound.effectiveRate, sound.channels) }
         }
         engine.exportSession(xml, s.interpolation, s.fps) {
             suspend fun eachFrame(draw: suspend (k: Int, presentNs: Long) -> Unit) {
@@ -130,6 +135,7 @@ internal suspend fun exportVideo(
         runInterruptible(Dispatchers.IO) { workers.forEach { it.join() } }
         failure.get()?.let { throw it }
         mux.finish()
+        if (s.container == Container.Mov) markQuickTime(out)
     } finally {
         withContext(NonCancellable + Dispatchers.IO) {
             stop.set(true)
@@ -144,10 +150,12 @@ internal suspend fun exportVideo(
     progress(1f)
 }
 
-private fun drain(codec: MediaCodec, mux: Mux, stop: AtomicBoolean, ptsShift: Long,
-                  audioDelay: AtomicInteger? = null, totalUs: Long = Long.MAX_VALUE, trace: Boolean = false) {
+internal fun drain(codec: MediaCodec, mux: Mux, stop: AtomicBoolean, ptsShift: Long,
+                  audioDelay: AtomicInteger? = null, totalUs: Long = Long.MAX_VALUE, trace: Boolean = false, rate: Int = ExportAudio.SAMPLE_RATE,
+                  zeroStart: Boolean = false) {
     var shift = ptsShift
-    val audioTime = audioDelay?.let { AacTimestamps() }
+    var first = !zeroStart
+    val audioTime = audioDelay?.let { AacTimestamps(rate = rate) }
     val info = MediaCodec.BufferInfo()
     var track = -1
     while (!stop.get()) {
@@ -160,13 +168,15 @@ private fun drain(codec: MediaCodec, mux: Mux, stop: AtomicBoolean, ptsShift: Lo
                     audioDelay.set(frames)
                     audioTime?.delayFrames = frames
                     if (trace) android.util.Log.i("AMAac", "delay=$frames format=$format")
-                    shift = frames * 1_000_000L / ExportAudio.SAMPLE_RATE
+                    shift = frames * 1_000_000L / rate
                     format.setInteger(MediaFormat.KEY_ENCODER_DELAY, 0)
+                    format.setInteger(PrimingKey, frames)
                 }
                 track = mux.addTrack(format)
             }
             index >= 0 -> {
                 if (info.size > 0 && info.flags and MediaCodec.BUFFER_FLAG_CODEC_CONFIG == 0) {
+                    if (!first) { first = true; shift = info.presentationTimeUs }
                     if (trace) android.util.Log.i("AMAac", "packet pts=${info.presentationTimeUs} shift=$shift size=${info.size}")
                     val timestamp = if (audioTime != null) audioTime.map(info.presentationTimeUs)
                         else (info.presentationTimeUs - shift).takeIf { it >= 0 }
@@ -182,9 +192,8 @@ private fun drain(codec: MediaCodec, mux: Mux, stop: AtomicBoolean, ptsShift: Lo
     }
 }
 
-private fun feedAudio(codec: MediaCodec, mix: AudioMix, totalUs: Long, stop: AtomicBoolean, delay: AtomicInteger) {
-    val rate = ExportAudio.SAMPLE_RATE
-    val channels = ExportAudio.CHANNELS
+internal fun feedAudio(codec: MediaCodec, mix: AudioMix, totalUs: Long, stop: AtomicBoolean, delay: AtomicInteger,
+                       rate: Int = ExportAudio.SAMPLE_RATE, channels: Int = ExportAudio.CHANNELS) {
     val totalFrames = totalUs * rate / 1_000_000
     var fed = 0L
     fun queue(flags: Int, pcm: ShortArray, from: Int): Int {
@@ -200,23 +209,26 @@ private fun feedAudio(codec: MediaCodec, mix: AudioMix, totalUs: Long, stop: Ato
         }
         return 0
     }
-    while (fed < aacInputFrames(totalUs, delay.get()) && !stop.get()) {
-        val want = minOf(rate / 2L, aacInputFrames(totalUs, delay.get()) - fed).toInt()
+    while (fed < aacInputFrames(totalUs, delay.get(), rate) && !stop.get()) {
+        val want = minOf(rate / 2L, aacInputFrames(totalUs, delay.get(), rate) - fed).toInt()
         val real = minOf(want.toLong(), (totalFrames - fed).coerceAtLeast(0)).toInt()
         val pcm = if (real == 0) ShortArray(want * channels)
-            else mix(fed * 1_000_000 / rate, (fed + real) * 1_000_000 / rate).copyOf(want * channels)
+            else toChannels(mix(fed * 1_000_000 / rate, (fed + real) * 1_000_000 / rate), channels).copyOf(want * channels)
         var offset = 0
         while (offset < pcm.size && !stop.get()) offset += queue(0, pcm, offset)
     }
     queue(MediaCodec.BUFFER_FLAG_END_OF_STREAM, ShortArray(0), 0)
 }
 
-private fun createAacEncoder(): MediaCodec {
-    val codec = MediaCodec.createEncoderByType(MediaFormat.MIMETYPE_AUDIO_AAC)
+internal fun toChannels(stereo: ShortArray, channels: Int): ShortArray =
+    if (channels != 1) stereo else ShortArray(stereo.size / 2) { ((stereo[2 * it] + stereo[2 * it + 1]) / 2).toShort() }
+
+internal fun createAudioEncoder(a: AudioSettings): MediaCodec {
+    val codec = MediaCodec.createEncoderByType(a.codec.mime)
     try {
-        codec.configure(MediaFormat.createAudioFormat(MediaFormat.MIMETYPE_AUDIO_AAC, ExportAudio.SAMPLE_RATE, ExportAudio.CHANNELS).apply {
-            setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLC)
-            setInteger(MediaFormat.KEY_BIT_RATE, AudioBitrate)
+        codec.configure(MediaFormat.createAudioFormat(a.codec.mime, a.effectiveRate, a.channels).apply {
+            if (a.codec == AudioCodec.Aac) setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLC)
+            setInteger(MediaFormat.KEY_BIT_RATE, a.bitrateKbps * 1000)
         }, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
         codec.start()
         return codec
@@ -227,8 +239,8 @@ internal fun exportAacForTest(file: File, totalUs: Long) {
     val stop = AtomicBoolean()
     val failure = AtomicReference<Throwable>()
     val delay = AtomicInteger(aacDelayFrames(null))
-    val codec = createAacEncoder()
-    val mux = try { Mux(file.path, 1) { failure.compareAndSet(null, it); stop.set(true) } }
+    val codec = createAudioEncoder(AudioSettings())
+    val mux = try { Mux(MuxerSink(file.path), 1) { failure.compareAndSet(null, it); stop.set(true) } }
         catch (t: Throwable) { codec.stop(); codec.release(); throw t }
     val output = thread(name = "am-aac-check") {
         try { drain(codec, mux, stop, 0, delay, totalUs, true) }
@@ -254,43 +266,3 @@ internal fun exportAacForTest(file: File, totalUs: Long) {
     }
 }
 
-private class Mux(path: String, private val tracks: Int, private val onError: (Throwable) -> Unit) {
-    private val muxer = MediaMuxer(path, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
-    private var added = 0
-    private var started = false
-    private var broken = false
-    private var released = false
-    private val early = ArrayList<Triple<Int, ByteBuffer, MediaCodec.BufferInfo>>()
-
-    private inline fun <T> guarded(otherwise: T, op: () -> T): T {
-        if (broken) return otherwise
-        return try { op() } catch (t: Exception) { broken = true; onError(t); otherwise }
-    }
-
-    @Synchronized fun addTrack(format: MediaFormat): Int = guarded(-1) {
-        val id = muxer.addTrack(format)
-        if (++added == tracks) {
-            muxer.start()
-            started = true
-            for ((track, data, info) in early) muxer.writeSampleData(track, data, info)
-            early.clear()
-        }
-        id
-    }
-
-    @Synchronized fun write(track: Int, data: ByteBuffer, info: MediaCodec.BufferInfo) = guarded(Unit) {
-        if (started) return@guarded muxer.writeSampleData(track, data, info)
-        val copy = ByteBuffer.allocate(info.size)
-        copy.put(data.duplicate().apply { position(info.offset); limit(info.offset + info.size) }).flip()
-        early += Triple(track, copy, MediaCodec.BufferInfo().apply { set(0, info.size, info.presentationTimeUs, info.flags) })
-    }
-
-    @Synchronized fun finish() {
-        check(started) { "The encoder produced no video" }
-        muxer.stop()
-    }
-
-    @Synchronized fun release() {
-        if (!released) { released = true; runCatching { muxer.release() } }
-    }
-}
