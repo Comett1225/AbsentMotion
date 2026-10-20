@@ -50,6 +50,41 @@
     }
    }
   },
+  "bend": {
+   "description": "Curva a camada ao longo de um arco suave; o lado da Origem fica fixo e o lado oposto gira até o ângulo definido. Melhor em camadas longas e finas.",
+   "name": "Curvar",
+   "params": {
+    "angle": {
+     "label": "Ângulo"
+    },
+    "before": {
+     "label": "Antes do início",
+     "options": [
+      "Congelar",
+      "Curvar para o mesmo lado",
+      "Curvar para o lado oposto"
+     ]
+    },
+    "origin": {
+     "label": "Origem",
+     "options": [
+      "Esquerda",
+      "Direita",
+      "Superior",
+      "Inferior"
+     ]
+    },
+    "start": {
+     "label": "Início"
+    },
+    "tuneHead": {
+     "label": "Ajustar cabeça"
+    },
+    "tuneTail": {
+     "label": "Ajustar cauda"
+    }
+   }
+  },
   "blink": {
    "description": "Liga e desliga a camada um certo número de vezes por segundo.",
    "name": "Piscar",
@@ -557,6 +592,55 @@
     }
    }
   },
+  "contourstrips": {
+   "description": "Desenha tiras de papel empilhadas cuja altura segue o brilho ou a opacidade da camada, como uma paisagem de cordilheira.",
+   "name": "Tiras de contorno",
+   "params": {
+    "angle": {
+     "label": "Ângulo"
+    },
+    "color1": {
+     "label": "Cor 1"
+    },
+    "color2": {
+     "label": "Cor 2"
+    },
+    "count": {
+     "label": "Quantidade"
+    },
+    "edgeColor": {
+     "label": "Cor da borda"
+    },
+    "height": {
+     "label": "Altura"
+    },
+    "invert": {
+     "label": "Inverter"
+    },
+    "light": {
+     "label": "Cor da luz"
+    },
+    "lightAngle": {
+     "label": "Ângulo da luz"
+    },
+    "map": {
+     "label": "Mapa de altura",
+     "options": [
+      "Alfa",
+      "Luminância"
+     ]
+    },
+    "mask": {
+     "label": "Máscara para a camada"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "thickness": {
+     "label": "Espessura"
+    }
+   }
+  },
   "countupdown": {
    "description": "Altera cada número de uma camada de texto: multiplica e soma, então animar Multiplicar de 0% a 100% faz a contagem chegar ao número digitado. As palavras ao redor dos números não mudam.",
    "name": "Contagem crescente/decrescente",
@@ -666,6 +750,35 @@
     },
     "smoothing": {
      "label": "Suavização"
+    }
+   }
+  },
+  "curl": {
+   "description": "Enrola uma extremidade da camada em torno de um círculo enquanto a outra fica reta; anime o Deslocamento para enrolar ou desenrolar. Melhor em camadas largas e finas.",
+   "name": "Enrolar",
+   "params": {
+    "curlFrom": {
+     "label": "Enrolar a partir de",
+     "options": [
+      "Esquerda",
+      "Direita"
+     ]
+    },
+    "direction": {
+     "label": "Direção",
+     "options": [
+      "Para cima",
+      "Para baixo"
+     ]
+    },
+    "offset": {
+     "label": "Deslocamento"
+    },
+    "radius": {
+     "label": "Raio"
+    },
+    "stretch": {
+     "label": "Alongamento"
     }
    }
   },
@@ -783,6 +896,53 @@
     },
     "blurLength": {
      "label": "Comprimento"
+    }
+   }
+  },
+  "displacementmap": {
+   "description": "Usa as cores da camada para deslocar as camadas atrás dela e depois se oculta; ou, com Mapa definido como Camada abaixo, desloca esta camada pela camada de baixo.",
+   "name": "Mapa de deslocamento",
+   "params": {
+    "edges": {
+     "label": "Bordas",
+     "options": [
+      "Repetir",
+      "Espelhar",
+      "Limpar",
+      "Mosaico"
+     ]
+    },
+    "fromCenter": {
+     "label": "A partir do centro"
+    },
+    "invert": {
+     "label": "Inverter"
+    },
+    "map": {
+     "label": "Mapa",
+     "options": [
+      "Esta camada",
+      "Camada abaixo"
+     ]
+    },
+    "offset": {
+     "label": "Deslocamento"
+    },
+    "xchannel": {
+     "label": "X",
+     "options": [
+      "R",
+      "G",
+      "B"
+     ]
+    },
+    "ychannel": {
+     "label": "Y",
+     "options": [
+      "R",
+      "G",
+      "B"
+     ]
     }
    }
   },
@@ -933,6 +1093,72 @@
     }
    }
   },
+  "electricedges": {
+   "description": "Desenha um contorno brilhante e crepitante ao redor da camada, que treme como eletricidade quando Semente ou Evolução é animada, com linhas de contorno opcionais dentro.",
+   "name": "Bordas elétricas",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "blur": {
+     "label": "Distância"
+    },
+    "color": {
+     "label": "Cor"
+    },
+    "contourAngle": {
+     "label": "Ângulo do contorno"
+    },
+    "contours": {
+     "label": "Renderizar contornos"
+    },
+    "count": {
+     "label": "Número de contornos"
+    },
+    "detail": {
+     "label": "Detalhe"
+    },
+    "distortion": {
+     "label": "Distorção"
+    },
+    "evolution": {
+     "label": "Evolução"
+    },
+    "fill": {
+     "label": "Preenchimento"
+    },
+    "glow": {
+     "label": "Brilho"
+    },
+    "glowColor": {
+     "label": "Cor do brilho"
+    },
+    "maskColor": {
+     "label": "Cor da máscara"
+    },
+    "maskEvolution": {
+     "label": "Evolução da máscara"
+    },
+    "maskScale": {
+     "label": "Escala da máscara"
+    },
+    "maskSeed": {
+     "label": "Semente da máscara"
+    },
+    "maskStrength": {
+     "label": "Intensidade da máscara"
+    },
+    "phase": {
+     "label": "Fase do contorno"
+    },
+    "seed": {
+     "label": "Semente"
+    },
+    "thickness": {
+     "label": "Espessura"
+    }
+   }
+  },
   "ellipsoid": {
    "description": "Envolve a camada em uma esfera que você pode comprimir e achatar.",
    "name": "Elipsoide",
@@ -1020,6 +1246,63 @@
    "params": {
     "blur": {
      "label": "Intensidade"
+    }
+   }
+  },
+  "fillbehind": {
+   "description": "Preenche o quadro atrás da camada com uma cópia desfocada e ampliada dela mesma, o ajuste comum para um vídeo vertical em um projeto horizontal.",
+   "name": "Preencher atrás",
+   "params": {
+    "bgAlpha": {
+     "label": "Alfa do fundo"
+    },
+    "bgOffset": {
+     "label": "Deslocamento do fundo"
+    },
+    "bgScale": {
+     "label": "Escala do fundo"
+    },
+    "blur": {
+     "label": "Intensidade"
+    },
+    "brightness": {
+     "label": "Brilho"
+    },
+    "edgeColor": {
+     "label": "Cor da borda"
+    },
+    "edgeStrength": {
+     "label": "Intensidade da borda"
+    },
+    "feather": {
+     "label": "Suavidade"
+    },
+    "fgAlpha": {
+     "label": "Alfa do primeiro plano"
+    },
+    "fgOffset": {
+     "label": "Desloc. 1º plano"
+    },
+    "fgScale": {
+     "label": "Escala do primeiro plano"
+    },
+    "gamma": {
+     "label": "Gama"
+    },
+    "saturation": {
+     "label": "Saturação"
+    },
+    "scanCount": {
+     "label": "Número de linhas de varredura"
+    },
+    "scanStrength": {
+     "label": "Intensidade das linhas de varredura"
+    },
+    "tint": {
+     "label": "Tonalidade"
+    },
+    "tintColor": {
+     "label": "Cor da tonalidade"
     }
    }
   },
@@ -1213,6 +1496,30 @@
     }
    }
   },
+  "glass": {
+   "description": "Transforma a forma da camada em vidro chanfrado que curva as camadas atrás dela, com um realce ao longo da borda.",
+   "name": "Vidro",
+   "params": {
+    "angle": {
+     "label": "Ângulo da luz"
+    },
+    "blur": {
+     "label": "Chanfro"
+    },
+    "color": {
+     "label": "Cor"
+    },
+    "highlight": {
+     "label": "Realce"
+    },
+    "refraction": {
+     "label": "Refração"
+    },
+    "tint": {
+     "label": "Tonalidade"
+    }
+   }
+  },
   "glitch": {
    "description": "deslocamento horizontal aleatório de blocos e desvios de canais de cor, mudando algumas vezes por segundo",
    "name": "Glitch",
@@ -1237,6 +1544,33 @@
     },
     "strength": {
      "label": "Tamanho"
+    }
+   }
+  },
+  "glowscan": {
+   "description": "Desfoca e ilumina apenas as partes da camada cujo brilho fica em uma faixa; anime a Posição para varrer o brilho das sombras aos realces.",
+   "name": "Varredura de brilho",
+   "params": {
+    "blur": {
+     "label": "Desfoque"
+    },
+    "color": {
+     "label": "Cor do brilho"
+    },
+    "intensity": {
+     "label": "Intensidade"
+    },
+    "position": {
+     "label": "Posição"
+    },
+    "show": {
+     "label": "Mostrar apenas a faixa"
+    },
+    "softness": {
+     "label": "Suavidade"
+    },
+    "width": {
+     "label": "Largura"
     }
    }
   },
@@ -1990,6 +2324,37 @@
     }
    }
   },
+  "magnifybackground": {
+   "description": "Transforma a camada em uma lupa: sua forma mostra as camadas atrás dela ampliadas ao redor do centro.",
+   "name": "Ampliar fundo",
+   "params": {
+    "magnify": {
+     "label": "Ampliar camada"
+    },
+    "sampling": {
+     "label": "Amostragem",
+     "options": [
+      "Mais próxima",
+      "Linear"
+     ]
+    },
+    "scale": {
+     "label": "Escala"
+    }
+   }
+  },
+  "maskblur": {
+   "description": "Desfoca as camadas atrás desta dentro da sua forma; as partes mais claras da camada desfocam mais, então um gradiente cria um tilt-shift.",
+   "name": "Desfoque de máscara",
+   "params": {
+    "invert": {
+     "label": "Inverter"
+    },
+    "strength": {
+     "label": "Intensidade"
+    }
+   }
+  },
   "mattechoker": {
    "description": "Encolhe as partes opacas da camada consumindo suas bordas.",
    "name": "Contração de matte",
@@ -2131,6 +2496,147 @@
     }
    }
   },
+  "ominodiffusion": {
+   "description": "Redesenha a camada com uma paleta pequena e arrasta o erro de arredondamento em uma direção, criando um visual de glitch pontilhado que ganha vida em movimento.",
+   "name": "Omino Diffusion+",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "angle": {
+     "label": "Ângulo"
+    },
+    "blend": {
+     "label": "Modo de mesclagem",
+     "options": [
+      "Normal",
+      "Multiplicar",
+      "Tela"
+     ]
+    },
+    "color1": {
+     "label": "Cor 1"
+    },
+    "color2": {
+     "label": "Cor 2"
+    },
+    "color3": {
+     "label": "Cor 3"
+    },
+    "color4": {
+     "label": "Cor 4"
+    },
+    "color5": {
+     "label": "Cor 5"
+    },
+    "color6": {
+     "label": "Cor 6"
+    },
+    "falloff": {
+     "label": "Atenuação do peso"
+    },
+    "palette": {
+     "label": "Paleta",
+     "options": [
+      "Preto/branco",
+      "Posterizar RGB (2 níveis)",
+      "Posterizar RGB (3 níveis)",
+      "Posterizar RGB (4 níveis)",
+      "Cinza (3 níveis)",
+      "Cinza (4 níveis)",
+      "CGA verde/vermelho/amarelo",
+      "CGA ciano/magenta/branco",
+      "CGA azul/ciano/magenta/branco",
+      "Saturar e posterizar",
+      "Personalizada de 2 cores",
+      "Personalizada de 3 cores",
+      "Personalizada de 4 cores",
+      "Personalizada de 5 cores",
+      "Personalizada de 6 cores"
+     ]
+    },
+    "steps": {
+     "label": "Passos"
+    },
+    "strength": {
+     "label": "Intensidade"
+    },
+    "weight": {
+     "label": "Peso do erro"
+    }
+   }
+  },
+  "ominoglass": {
+   "description": "Vidro feito a partir do brilho da camada: refrata o que está atrás com franjas de arco-íris e ilumina a superfície como uma lente.",
+   "name": "Omino Glass",
+   "params": {
+    "aberration": {
+     "label": "Aberração cromática"
+    },
+    "ambient": {
+     "label": "Ambiente"
+    },
+    "amount": {
+     "label": "Rugosidade"
+    },
+    "blend": {
+     "label": "Mesclagem"
+    },
+    "blur": {
+     "label": "Chanfro"
+    },
+    "color": {
+     "label": "Cor"
+    },
+    "direction": {
+     "label": "Direção"
+    },
+    "elevation": {
+     "label": "Elevação"
+    },
+    "evolution": {
+     "label": "Evolução"
+    },
+    "feature": {
+     "label": "Tamanho do detalhe"
+    },
+    "intensity": {
+     "label": "Intensidade"
+    },
+    "light": {
+     "label": "Cor da luz"
+    },
+    "refraction": {
+     "label": "Refração"
+    },
+    "samples": {
+     "label": "Amostras de suavização"
+    },
+    "scale": {
+     "label": "Escala da rugosidade"
+    },
+    "seed": {
+     "label": "Semente"
+    },
+    "shading": {
+     "label": "Sombreamento",
+     "options": [
+      "Nenhum",
+      "Luz pontual",
+      "Luz direcional"
+     ]
+    },
+    "shine": {
+     "label": "Brilho"
+    },
+    "specularity": {
+     "label": "Especularidade"
+    },
+    "useLuma": {
+     "label": "Usar luminância da camada"
+    }
+   }
+  },
   "oscillate": {
    "description": "Move a camada para frente e para trás em um ângulo, em profundidade ou em órbita.",
    "name": "Oscilar",
@@ -2213,6 +2719,56 @@
       "Retangular para polar",
       "Polar para retangular"
      ]
+    }
+   }
+  },
+  "polardisplacement": {
+   "description": "Gira e puxa as camadas atrás desta em torno de um ponto central conforme as cores da camada e depois oculta a camada.",
+   "name": "Mapa de deslocamento polar",
+   "params": {
+    "angle": {
+     "label": "Ângulo"
+    },
+    "angleChannel": {
+     "label": "Ângulo de",
+     "options": [
+      "R",
+      "G",
+      "B",
+      "Luminância",
+      "Alfa"
+     ]
+    },
+    "center": {
+     "label": "Centro"
+    },
+    "distanceChannel": {
+     "label": "Distância de",
+     "options": [
+      "R",
+      "G",
+      "B",
+      "Luminância",
+      "Alfa"
+     ]
+    },
+    "edges": {
+     "label": "Bordas",
+     "options": [
+      "Repetir",
+      "Espelhar",
+      "Limpar",
+      "Ladrilhar"
+     ]
+    },
+    "fromCenter": {
+     "label": "A partir do centro"
+    },
+    "invert": {
+     "label": "Inverter"
+    },
+    "reach": {
+     "label": "Distância"
     }
    }
   },
@@ -2693,6 +3249,45 @@
     },
     "splitDistance": {
      "label": "Distância"
+    }
+   }
+  },
+  "ribbon": {
+   "description": "Desenha uma fita ondulada de largura variável sobre as partes opacas da camada; anime a fase para fazê-la fluir ou recorte-a da camada.",
+   "name": "Fita",
+   "params": {
+    "angle": {
+     "label": "Ângulo"
+    },
+    "color": {
+     "label": "Cor"
+    },
+    "frequency": {
+     "label": "Frequência"
+    },
+    "magnitude": {
+     "label": "Magnitude"
+    },
+    "offset": {
+     "label": "Deslocamento"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "punch": {
+     "label": "Recortar"
+    },
+    "smoothing": {
+     "label": "Suavização"
+    },
+    "tint": {
+     "label": "Tonalidade"
+    },
+    "tintAmount": {
+     "label": "Intensidade da tonalidade"
+    },
+    "width": {
+     "label": "Largura"
     }
    }
   },

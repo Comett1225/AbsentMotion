@@ -50,6 +50,41 @@
     }
    }
   },
+  "bend": {
+   "description": "Uốn cong lớp theo một cung mượt; phía Gốc giữ nguyên và phía xa xoay đến góc bạn đặt. Hợp nhất với lớp dài, mỏng.",
+   "name": "Uốn cong",
+   "params": {
+    "angle": {
+     "label": "Góc"
+    },
+    "before": {
+     "label": "Trước khi bắt đầu",
+     "options": [
+      "Đóng băng",
+      "Uốn về cùng phía",
+      "Uốn về phía đối diện"
+     ]
+    },
+    "origin": {
+     "label": "Gốc",
+     "options": [
+      "Trái",
+      "Phải",
+      "Trên",
+      "Dưới"
+     ]
+    },
+    "start": {
+     "label": "Bắt đầu"
+    },
+    "tuneHead": {
+     "label": "Tinh chỉnh đầu"
+    },
+    "tuneTail": {
+     "label": "Tinh chỉnh đuôi"
+    }
+   }
+  },
   "blink": {
    "description": "Bật tắt lớp nhiều lần mỗi giây.",
    "name": "Nháy",
@@ -557,6 +592,55 @@
     }
    }
   },
+  "contourstrips": {
+   "description": "Vẽ các dải giấy xếp chồng có chiều cao theo độ sáng hoặc độ mờ của lớp, như phong cảnh đường đồng mức.",
+   "name": "Dải đồng mức",
+   "params": {
+    "angle": {
+     "label": "Góc"
+    },
+    "color1": {
+     "label": "Màu 1"
+    },
+    "color2": {
+     "label": "Màu 2"
+    },
+    "count": {
+     "label": "Số lượng"
+    },
+    "edgeColor": {
+     "label": "Màu viền"
+    },
+    "height": {
+     "label": "Chiều cao"
+    },
+    "invert": {
+     "label": "Đảo ngược"
+    },
+    "light": {
+     "label": "Màu ánh sáng"
+    },
+    "lightAngle": {
+     "label": "Góc ánh sáng"
+    },
+    "map": {
+     "label": "Bản đồ chiều cao",
+     "options": [
+      "Alpha",
+      "Độ sáng"
+     ]
+    },
+    "mask": {
+     "label": "Mặt nạ theo lớp"
+    },
+    "phase": {
+     "label": "Pha"
+    },
+    "thickness": {
+     "label": "Độ dày"
+    }
+   }
+  },
   "countupdown": {
    "description": "Thay đổi mọi con số trong lớp văn bản: nhân rồi cộng thêm, nên khi tạo keyframe cho Nhân từ 0% đến 100% thì số sẽ đếm tăng đến con số bạn đã nhập. Các từ xung quanh số vẫn giữ nguyên.",
    "name": "Đếm tăng/giảm",
@@ -666,6 +750,35 @@
     },
     "smoothing": {
      "label": "Độ mượt"
+    }
+   }
+  },
+  "curl": {
+   "description": "Cuộn một đầu của lớp quanh một vòng tròn trong khi đầu kia giữ phẳng; tạo hiệu ứng Offset để cuộn hoặc mở cuộn. Hợp nhất với lớp rộng, mỏng.",
+   "name": "Cuộn",
+   "params": {
+    "curlFrom": {
+     "label": "Cuộn từ",
+     "options": [
+      "Trái",
+      "Phải"
+     ]
+    },
+    "direction": {
+     "label": "Hướng",
+     "options": [
+      "Lên",
+      "Xuống"
+     ]
+    },
+    "offset": {
+     "label": "Độ lệch"
+    },
+    "radius": {
+     "label": "Bán kính"
+    },
+    "stretch": {
+     "label": "Kéo giãn"
     }
    }
   },
@@ -783,6 +896,53 @@
     },
     "blurLength": {
      "label": "Chiều dài"
+    }
+   }
+  },
+  "displacementmap": {
+   "description": "Dùng màu của lớp để đẩy các lớp phía sau rồi tự ẩn; hoặc khi Map là Lớp bên dưới, đẩy chính lớp này bằng lớp bên dưới.",
+   "name": "Bản đồ dịch chuyển",
+   "params": {
+    "edges": {
+     "label": "Mép",
+     "options": [
+      "Lặp lại",
+      "Gương",
+      "Trong suốt",
+      "Lát"
+     ]
+    },
+    "fromCenter": {
+     "label": "Từ tâm"
+    },
+    "invert": {
+     "label": "Đảo ngược"
+    },
+    "map": {
+     "label": "Bản đồ",
+     "options": [
+      "Lớp này",
+      "Lớp bên dưới"
+     ]
+    },
+    "offset": {
+     "label": "Độ lệch"
+    },
+    "xchannel": {
+     "label": "X",
+     "options": [
+      "R",
+      "G",
+      "B"
+     ]
+    },
+    "ychannel": {
+     "label": "Y",
+     "options": [
+      "R",
+      "G",
+      "B"
+     ]
     }
    }
   },
@@ -933,6 +1093,72 @@
     }
    }
   },
+  "electricedges": {
+   "description": "Vẽ đường viền phát sáng, nứt tóe quanh lớp, rung lên như điện khi bạn tạo hiệu ứng cho Hạt giống hoặc Tiến hóa, kèm các đường đồng mức tùy chọn bên trong.",
+   "name": "Viền điện",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "blur": {
+     "label": "Khoảng cách"
+    },
+    "color": {
+     "label": "Màu"
+    },
+    "contourAngle": {
+     "label": "Góc đường đồng mức"
+    },
+    "contours": {
+     "label": "Kết xuất đường đồng mức"
+    },
+    "count": {
+     "label": "Số đường đồng mức"
+    },
+    "detail": {
+     "label": "Chi tiết"
+    },
+    "distortion": {
+     "label": "Độ méo"
+    },
+    "evolution": {
+     "label": "Tiến hóa"
+    },
+    "fill": {
+     "label": "Tô"
+    },
+    "glow": {
+     "label": "Phát sáng"
+    },
+    "glowColor": {
+     "label": "Màu phát sáng"
+    },
+    "maskColor": {
+     "label": "Màu mặt nạ"
+    },
+    "maskEvolution": {
+     "label": "Tiến hóa mặt nạ"
+    },
+    "maskScale": {
+     "label": "Tỷ lệ mặt nạ"
+    },
+    "maskSeed": {
+     "label": "Hạt giống mặt nạ"
+    },
+    "maskStrength": {
+     "label": "Độ mạnh mặt nạ"
+    },
+    "phase": {
+     "label": "Pha đường đồng mức"
+    },
+    "seed": {
+     "label": "Hạt giống"
+    },
+    "thickness": {
+     "label": "Độ dày"
+    }
+   }
+  },
   "ellipsoid": {
    "description": "Uốn lớp quanh một hình cầu mà bạn có thể bóp và làm dẹt.",
    "name": "Ellipsoid",
@@ -1020,6 +1246,63 @@
    "params": {
     "blur": {
      "label": "Độ mạnh"
+    }
+   }
+  },
+  "fillbehind": {
+   "description": "Tô nền phía sau lớp bằng bản sao mờ và phóng to của chính lớp đó — cách thường dùng để xử lý video dọc trong dự án ngang.",
+   "name": "Tô phía sau",
+   "params": {
+    "bgAlpha": {
+     "label": "Alpha nền"
+    },
+    "bgOffset": {
+     "label": "Độ lệch nền"
+    },
+    "bgScale": {
+     "label": "Tỷ lệ nền"
+    },
+    "blur": {
+     "label": "Cường độ"
+    },
+    "brightness": {
+     "label": "Độ sáng"
+    },
+    "edgeColor": {
+     "label": "Màu viền"
+    },
+    "edgeStrength": {
+     "label": "Độ mạnh viền"
+    },
+    "feather": {
+     "label": "Độ mềm"
+    },
+    "fgAlpha": {
+     "label": "Alpha tiền cảnh"
+    },
+    "fgOffset": {
+     "label": "Độ lệch tiền cảnh"
+    },
+    "fgScale": {
+     "label": "Tỷ lệ tiền cảnh"
+    },
+    "gamma": {
+     "label": "Gamma"
+    },
+    "saturation": {
+     "label": "Độ bão hòa"
+    },
+    "scanCount": {
+     "label": "Số đường quét"
+    },
+    "scanStrength": {
+     "label": "Độ mạnh đường quét"
+    },
+    "tint": {
+     "label": "Độ phủ màu"
+    },
+    "tintColor": {
+     "label": "Màu phủ"
     }
    }
   },
@@ -1213,6 +1496,30 @@
     }
    }
   },
+  "glass": {
+   "description": "Biến hình dạng của lớp thành kính vát cạnh, bẻ cong các lớp phía sau và có điểm sáng dọc theo viền.",
+   "name": "Kính",
+   "params": {
+    "angle": {
+     "label": "Góc sáng"
+    },
+    "blur": {
+     "label": "Vát cạnh"
+    },
+    "color": {
+     "label": "Màu"
+    },
+    "highlight": {
+     "label": "Điểm sáng"
+    },
+    "refraction": {
+     "label": "Khúc xạ"
+    },
+    "tint": {
+     "label": "Độ phủ màu"
+    }
+   }
+  },
   "glitch": {
    "description": "Dịch chuyển ngang ngẫu nhiên theo khối và lệch kênh màu, thay đổi vài lần mỗi giây.",
    "name": "Glitch",
@@ -1237,6 +1544,33 @@
     },
     "strength": {
      "label": "Kích thước"
+    }
+   }
+  },
+  "glowscan": {
+   "description": "Chỉ làm nhòe và phát sáng những phần của lớp có độ sáng nằm trong một dải; tạo hiệu ứng cho Vị trí để quét ánh sáng từ vùng tối đến vùng sáng.",
+   "name": "Quét phát sáng",
+   "params": {
+    "blur": {
+     "label": "Độ nhòe"
+    },
+    "color": {
+     "label": "Màu phát sáng"
+    },
+    "intensity": {
+     "label": "Cường độ"
+    },
+    "position": {
+     "label": "Vị trí"
+    },
+    "show": {
+     "label": "Chỉ hiện dải"
+    },
+    "softness": {
+     "label": "Độ mềm"
+    },
+    "width": {
+     "label": "Độ rộng"
     }
    }
   },
@@ -1990,6 +2324,37 @@
     }
    }
   },
+  "magnifybackground": {
+   "description": "Biến lớp thành kính lúp: hình dạng của lớp hiển thị các lớp phía sau được phóng to quanh tâm.",
+   "name": "Phóng đại nền",
+   "params": {
+    "magnify": {
+     "label": "Phóng đại lớp"
+    },
+    "sampling": {
+     "label": "Lấy mẫu",
+     "options": [
+      "Lân cận",
+      "Tuyến tính"
+     ]
+    },
+    "scale": {
+     "label": "Tỷ lệ"
+    }
+   }
+  },
+  "maskblur": {
+   "description": "Làm mờ các lớp phía sau bên trong hình dạng của lớp này; phần sáng hơn của lớp mờ nhiều hơn, nên một chuyển màu tạo ra hiệu ứng tilt-shift.",
+   "name": "Làm mờ mặt nạ",
+   "params": {
+    "invert": {
+     "label": "Đảo ngược"
+    },
+    "strength": {
+     "label": "Cường độ"
+    }
+   }
+  },
   "mattechoker": {
    "description": "Thu nhỏ những phần đục của lớp bằng cách ăn vào viền của chúng.",
    "name": "Bóp mặt nạ",
@@ -2131,6 +2496,147 @@
     }
    }
   },
+  "ominodiffusion": {
+   "description": "Vẽ lại lớp bằng bảng màu nhỏ và kéo sai số làm tròn theo một hướng, tạo vẻ ngoài nhiễu chấm sống động khi chuyển động.",
+   "name": "Omino Diffusion+",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "angle": {
+     "label": "Góc"
+    },
+    "blend": {
+     "label": "Chế độ hòa trộn",
+     "options": [
+      "Thường",
+      "Nhân",
+      "Màn hình"
+     ]
+    },
+    "color1": {
+     "label": "Màu 1"
+    },
+    "color2": {
+     "label": "Màu 2"
+    },
+    "color3": {
+     "label": "Màu 3"
+    },
+    "color4": {
+     "label": "Màu 4"
+    },
+    "color5": {
+     "label": "Màu 5"
+    },
+    "color6": {
+     "label": "Màu 6"
+    },
+    "falloff": {
+     "label": "Độ giảm trọng số"
+    },
+    "palette": {
+     "label": "Bảng màu",
+     "options": [
+      "Đen/Trắng",
+      "Posterize RGB (2 mức)",
+      "Posterize RGB (3 mức)",
+      "Posterize RGB (4 mức)",
+      "Xám (3 mức)",
+      "Xám (4 mức)",
+      "CGA Xanh lá/Đỏ/Vàng",
+      "CGA Lục lam/Đỏ tươi/Trắng",
+      "CGA Xanh dương/Lục lam/Đỏ tươi/Trắng",
+      "Tăng bão hòa và posterize",
+      "Tùy chỉnh 2 màu",
+      "Tùy chỉnh 3 màu",
+      "Tùy chỉnh 4 màu",
+      "Tùy chỉnh 5 màu",
+      "Tùy chỉnh 6 màu"
+     ]
+    },
+    "steps": {
+     "label": "Số bậc"
+    },
+    "strength": {
+     "label": "Cường độ"
+    },
+    "weight": {
+     "label": "Trọng số sai số"
+    }
+   }
+  },
+  "ominoglass": {
+   "description": "Tạo kính từ độ sáng của lớp: khúc xạ những gì phía sau với viền cầu vồng và chiếu sáng bề mặt như một thấu kính.",
+   "name": "Omino Glass",
+   "params": {
+    "aberration": {
+     "label": "Quang sai màu"
+    },
+    "ambient": {
+     "label": "Ánh sáng môi trường"
+    },
+    "amount": {
+     "label": "Độ nhám"
+    },
+    "blend": {
+     "label": "Hòa trộn"
+    },
+    "blur": {
+     "label": "Vát cạnh"
+    },
+    "color": {
+     "label": "Màu"
+    },
+    "direction": {
+     "label": "Hướng"
+    },
+    "elevation": {
+     "label": "Độ cao"
+    },
+    "evolution": {
+     "label": "Biến thiên"
+    },
+    "feature": {
+     "label": "Kích thước đặc trưng"
+    },
+    "intensity": {
+     "label": "Cường độ"
+    },
+    "light": {
+     "label": "Màu ánh sáng"
+    },
+    "refraction": {
+     "label": "Khúc xạ"
+    },
+    "samples": {
+     "label": "Số mẫu làm mượt"
+    },
+    "scale": {
+     "label": "Tỷ lệ độ nhám"
+    },
+    "seed": {
+     "label": "Hạt giống"
+    },
+    "shading": {
+     "label": "Đổ bóng",
+     "options": [
+      "Không",
+      "Đèn điểm",
+      "Đèn định hướng"
+     ]
+    },
+    "shine": {
+     "label": "Độ bóng"
+    },
+    "specularity": {
+     "label": "Độ phản xạ"
+    },
+    "useLuma": {
+     "label": "Dùng độ sáng của lớp"
+    }
+   }
+  },
   "oscillate": {
    "description": "Di chuyển lớp qua lại theo một góc, theo chiều sâu hoặc xoay theo quỹ đạo.",
    "name": "Dao động",
@@ -2213,6 +2719,56 @@
       "Chữ nhật sang cực",
       "Cực sang chữ nhật"
      ]
+    }
+   }
+  },
+  "polardisplacement": {
+   "description": "Xoay và kéo các lớp phía sau quanh một điểm tâm theo màu của lớp, rồi ẩn lớp này đi.",
+   "name": "Bản đồ dịch chuyển cực",
+   "params": {
+    "angle": {
+     "label": "Góc"
+    },
+    "angleChannel": {
+     "label": "Góc từ",
+     "options": [
+      "R",
+      "G",
+      "B",
+      "Độ sáng",
+      "Alpha"
+     ]
+    },
+    "center": {
+     "label": "Tâm"
+    },
+    "distanceChannel": {
+     "label": "Khoảng cách từ",
+     "options": [
+      "R",
+      "G",
+      "B",
+      "Độ sáng",
+      "Alpha"
+     ]
+    },
+    "edges": {
+     "label": "Cạnh",
+     "options": [
+      "Lặp lại",
+      "Gương",
+      "Trong suốt",
+      "Lát"
+     ]
+    },
+    "fromCenter": {
+     "label": "Từ tâm"
+    },
+    "invert": {
+     "label": "Đảo ngược"
+    },
+    "reach": {
+     "label": "Khoảng cách"
     }
    }
   },
@@ -2693,6 +3249,45 @@
     },
     "splitDistance": {
      "label": "Khoảng cách"
+    }
+   }
+  },
+  "ribbon": {
+   "description": "Vẽ một dải ruy băng xoắn với độ rộng thay đổi trên các phần đục của lớp; tạo keyframe cho Pha để dải chuyển động, hoặc khoét nó ra khỏi lớp.",
+   "name": "Ruy băng",
+   "params": {
+    "angle": {
+     "label": "Góc"
+    },
+    "color": {
+     "label": "Màu"
+    },
+    "frequency": {
+     "label": "Tần số"
+    },
+    "magnitude": {
+     "label": "Biên độ"
+    },
+    "offset": {
+     "label": "Độ lệch"
+    },
+    "phase": {
+     "label": "Pha"
+    },
+    "punch": {
+     "label": "Khoét lỗ"
+    },
+    "smoothing": {
+     "label": "Làm mượt"
+    },
+    "tint": {
+     "label": "Màu nhuộm"
+    },
+    "tintAmount": {
+     "label": "Mức nhuộm màu"
+    },
+    "width": {
+     "label": "Độ rộng"
     }
    }
   },

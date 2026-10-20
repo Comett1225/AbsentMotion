@@ -50,6 +50,41 @@
     }
    }
   },
+  "bend": {
+   "description": "Katmanı yumuşak bir yay boyunca büker; Kaynak tarafı sabit kalır, uzak taraf ise ayarladığınız açıya döner. En iyi uzun ve ince katmanlarda çalışır.",
+   "name": "Bük",
+   "params": {
+    "angle": {
+     "label": "Açı"
+    },
+    "before": {
+     "label": "Başlangıçtan Önce",
+     "options": [
+      "Dondur",
+      "Aynı Yöne Bük",
+      "Ters Yöne Bük"
+     ]
+    },
+    "origin": {
+     "label": "Kaynak",
+     "options": [
+      "Sol",
+      "Sağ",
+      "Üst",
+      "Alt"
+     ]
+    },
+    "start": {
+     "label": "Başlangıç"
+    },
+    "tuneHead": {
+     "label": "Baş Ayarı"
+    },
+    "tuneTail": {
+     "label": "Kuyruk Ayarı"
+    }
+   }
+  },
   "blink": {
    "description": "Katmanı saniyede belirli sayıda açıp kapatır.",
    "name": "Yanıp Sönme",
@@ -557,6 +592,55 @@
     }
    }
   },
+  "contourstrips": {
+   "description": "Yüksekliği katmanın parlaklığını veya opaklığını izleyen üst üste kağıt şeritler çizer; sırt çizgisi manzarası gibi.",
+   "name": "Kontur Şeritleri",
+   "params": {
+    "angle": {
+     "label": "Açı"
+    },
+    "color1": {
+     "label": "Renk 1"
+    },
+    "color2": {
+     "label": "Renk 2"
+    },
+    "count": {
+     "label": "Adet"
+    },
+    "edgeColor": {
+     "label": "Kenar Rengi"
+    },
+    "height": {
+     "label": "Yükseklik"
+    },
+    "invert": {
+     "label": "Ters Çevir"
+    },
+    "light": {
+     "label": "Işık Rengi"
+    },
+    "lightAngle": {
+     "label": "Işık Açısı"
+    },
+    "map": {
+     "label": "Yükseklik Haritası",
+     "options": [
+      "Alfa",
+      "Parlaklık"
+     ]
+    },
+    "mask": {
+     "label": "Katmana Maskele"
+    },
+    "phase": {
+     "label": "Faz"
+    },
+    "thickness": {
+     "label": "Kalınlık"
+    }
+   }
+  },
   "countupdown": {
    "description": "Bir metin katmanındaki her sayıyı değiştirir: sayıyı çarpar ve ona ekler; böylece Çarp değerini %0'dan %100'e anahtar karelediğinizde yazdığınız sayıya kadar sayar. Sayıların çevresindeki sözcükler olduğu gibi kalır.",
    "name": "Yukarı/aşağı say",
@@ -666,6 +750,35 @@
     },
     "smoothing": {
      "label": "Yumuşatma"
+    }
+   }
+  },
+  "curl": {
+   "description": "Katmanın bir ucunu bir daire etrafında kıvırır, diğer uç düz kalır; kıvırmak veya açmak için Kaydırma'yı canlandırın. En iyi geniş ve ince katmanlarda çalışır.",
+   "name": "Kıvır",
+   "params": {
+    "curlFrom": {
+     "label": "Kıvrım Ucu",
+     "options": [
+      "Sol",
+      "Sağ"
+     ]
+    },
+    "direction": {
+     "label": "Yön",
+     "options": [
+      "Yukarı",
+      "Aşağı"
+     ]
+    },
+    "offset": {
+     "label": "Kaydırma"
+    },
+    "radius": {
+     "label": "Yarıçap"
+    },
+    "stretch": {
+     "label": "Esnet"
     }
    }
   },
@@ -783,6 +896,53 @@
     },
     "blurLength": {
      "label": "Uzunluk"
+    }
+   }
+  },
+  "displacementmap": {
+   "description": "Katmanın renklerini kullanarak arkasındaki katmanları iter ve ardından kendini gizler; Harita, Alt Katman olarak ayarlandığında ise bu katmanı altındaki katmanla iter.",
+   "name": "Deplasman Haritası",
+   "params": {
+    "edges": {
+     "label": "Kenarlar",
+     "options": [
+      "Tekrarla",
+      "Yansıt",
+      "Temizle",
+      "Döşe"
+     ]
+    },
+    "fromCenter": {
+     "label": "Merkezden"
+    },
+    "invert": {
+     "label": "Ters çevir"
+    },
+    "map": {
+     "label": "Harita",
+     "options": [
+      "Bu katman",
+      "Alt katman"
+     ]
+    },
+    "offset": {
+     "label": "Kaydırma"
+    },
+    "xchannel": {
+     "label": "X",
+     "options": [
+      "R",
+      "G",
+      "B"
+     ]
+    },
+    "ychannel": {
+     "label": "Y",
+     "options": [
+      "R",
+      "G",
+      "B"
+     ]
     }
    }
   },
@@ -933,6 +1093,72 @@
     }
    }
   },
+  "electricedges": {
+   "description": "Katmanın çevresine, Tohum veya Evrim animasyonlandığında elektrik gibi titreyen, parlayan çatlaklı bir kontur çizer; isteğe bağlı olarak iç kontur çizgileri de ekler.",
+   "name": "Elektrikli Kenarlar",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "blur": {
+     "label": "Mesafe"
+    },
+    "color": {
+     "label": "Renk"
+    },
+    "contourAngle": {
+     "label": "Kontur açısı"
+    },
+    "contours": {
+     "label": "Konturları işle"
+    },
+    "count": {
+     "label": "Kontur sayısı"
+    },
+    "detail": {
+     "label": "Ayrıntı"
+    },
+    "distortion": {
+     "label": "Bozulma"
+    },
+    "evolution": {
+     "label": "Evrim"
+    },
+    "fill": {
+     "label": "Dolgu"
+    },
+    "glow": {
+     "label": "Parlama"
+    },
+    "glowColor": {
+     "label": "Parlama rengi"
+    },
+    "maskColor": {
+     "label": "Maske rengi"
+    },
+    "maskEvolution": {
+     "label": "Maske evrimi"
+    },
+    "maskScale": {
+     "label": "Maske ölçeği"
+    },
+    "maskSeed": {
+     "label": "Maske tohumu"
+    },
+    "maskStrength": {
+     "label": "Maske gücü"
+    },
+    "phase": {
+     "label": "Kontur fazı"
+    },
+    "seed": {
+     "label": "Tohum"
+    },
+    "thickness": {
+     "label": "Kalınlık"
+    }
+   }
+  },
   "ellipsoid": {
    "description": "Katmanı sıkıştırıp düzleştirebileceğiniz bir kürenin etrafına sarar.",
    "name": "Elipsoit",
@@ -1020,6 +1246,63 @@
    "params": {
     "blur": {
      "label": "Güç"
+    }
+   }
+  },
+  "fillbehind": {
+   "description": "Katmanın arkasındaki çerçeveyi, katmanın bulanık ve yakınlaştırılmış bir kopyasıyla doldurur; yatay projede dikey video için tipik çözümdür.",
+   "name": "Arkayı Doldur",
+   "params": {
+    "bgAlpha": {
+     "label": "Arka plan alfası"
+    },
+    "bgOffset": {
+     "label": "Arka plan ofseti"
+    },
+    "bgScale": {
+     "label": "Arka plan ölçeği"
+    },
+    "blur": {
+     "label": "Güç"
+    },
+    "brightness": {
+     "label": "Parlaklık"
+    },
+    "edgeColor": {
+     "label": "Kenar rengi"
+    },
+    "edgeStrength": {
+     "label": "Kenar gücü"
+    },
+    "feather": {
+     "label": "Kenar yumuşatma"
+    },
+    "fgAlpha": {
+     "label": "Ön plan alfası"
+    },
+    "fgOffset": {
+     "label": "Ön plan ofseti"
+    },
+    "fgScale": {
+     "label": "Ön plan ölçeği"
+    },
+    "gamma": {
+     "label": "Gama"
+    },
+    "saturation": {
+     "label": "Doygunluk"
+    },
+    "scanCount": {
+     "label": "Tarama çizgisi sayısı"
+    },
+    "scanStrength": {
+     "label": "Tarama çizgisi gücü"
+    },
+    "tint": {
+     "label": "Ton"
+    },
+    "tintColor": {
+     "label": "Ton rengi"
     }
    }
   },
@@ -1213,6 +1496,30 @@
     }
    }
   },
+  "glass": {
+   "description": "Katmanın şeklini, arkasındaki katmanları kıran eğimli bir cama dönüştürür ve kenarı boyunca bir vurgu ekler.",
+   "name": "Cam",
+   "params": {
+    "angle": {
+     "label": "Işık açısı"
+    },
+    "blur": {
+     "label": "Eğim"
+    },
+    "color": {
+     "label": "Renk"
+    },
+    "highlight": {
+     "label": "Vurgu"
+    },
+    "refraction": {
+     "label": "Kırılma"
+    },
+    "tint": {
+     "label": "Ton"
+    }
+   }
+  },
   "glitch": {
    "description": "Saniyede birkaç kez değişen rastgele yatay blok kaymaları ve renk kanalı ofsetleri.",
    "name": "Glitch",
@@ -1237,6 +1544,33 @@
     },
     "strength": {
      "label": "Boyut"
+    }
+   }
+  },
+  "glowscan": {
+   "description": "Yalnızca katmanın parlaklığı belirli bir aralığa giren kısımlarını bulanıklaştırıp aydınlatır; parlamayı gölgelerden ışıklara taramak için Konum'u animasyonlayın.",
+   "name": "Parlama Taraması",
+   "params": {
+    "blur": {
+     "label": "Bulanıklaştırma"
+    },
+    "color": {
+     "label": "Parlama rengi"
+    },
+    "intensity": {
+     "label": "Yoğunluk"
+    },
+    "position": {
+     "label": "Konum"
+    },
+    "show": {
+     "label": "Yalnızca bandı göster"
+    },
+    "softness": {
+     "label": "Yumuşaklık"
+    },
+    "width": {
+     "label": "Genişlik"
     }
    }
   },
@@ -1990,6 +2324,37 @@
     }
    }
   },
+  "magnifybackground": {
+   "description": "Katmanı bir büyütece dönüştürür: şekli, arkasındaki katmanları merkezinin çevresinde büyütülmüş olarak gösterir.",
+   "name": "Arka planı büyüt",
+   "params": {
+    "magnify": {
+     "label": "Katmanı büyüt"
+    },
+    "sampling": {
+     "label": "Örnekleme",
+     "options": [
+      "En yakın",
+      "Doğrusal"
+     ]
+    },
+    "scale": {
+     "label": "Ölçek"
+    }
+   }
+  },
+  "maskblur": {
+   "description": "Şeklinin içinde, bu katmanın arkasındaki katmanları bulanıklaştırır; katmanın parlak kısımları daha çok bulanıklaşır, böylece gradyan bir tilt-shift etkisi verir.",
+   "name": "Maske bulanıklığı",
+   "params": {
+    "invert": {
+     "label": "Ters çevir"
+    },
+    "strength": {
+     "label": "Güç"
+    }
+   }
+  },
   "mattechoker": {
    "description": "Katmanın opak kısımlarını kenarlarından yiyerek daraltır.",
    "name": "Mat daraltıcı",
@@ -2131,6 +2496,147 @@
     }
    }
   },
+  "ominodiffusion": {
+   "description": "Katmanı küçük bir paletle yeniden çizer ve yuvarlama hatasını bir yön boyunca sürükler; hareket hâlinde canlanan, bozuk ve titreşimli bir görünüm verir.",
+   "name": "Omino Diffusion+",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "angle": {
+     "label": "Açı"
+    },
+    "blend": {
+     "label": "Karışım modu",
+     "options": [
+      "Normal",
+      "Çarpma",
+      "Ekran"
+     ]
+    },
+    "color1": {
+     "label": "Renk 1"
+    },
+    "color2": {
+     "label": "Renk 2"
+    },
+    "color3": {
+     "label": "Renk 3"
+    },
+    "color4": {
+     "label": "Renk 4"
+    },
+    "color5": {
+     "label": "Renk 5"
+    },
+    "color6": {
+     "label": "Renk 6"
+    },
+    "falloff": {
+     "label": "Ağırlık düşüşü"
+    },
+    "palette": {
+     "label": "Palet",
+     "options": [
+      "Siyah/Beyaz",
+      "RGB posterleştirme (2 seviye)",
+      "RGB posterleştirme (3 seviye)",
+      "RGB posterleştirme (4 seviye)",
+      "Gri (3 seviye)",
+      "Gri (4 seviye)",
+      "CGA Yeşil/Kırmızı/Sarı",
+      "CGA Camgöbeği/Macenta/Beyaz",
+      "CGA Mavi/Camgöbeği/Macenta/Beyaz",
+      "Doygunluk ve posterleştirme",
+      "Özel 2 renk",
+      "Özel 3 renk",
+      "Özel 4 renk",
+      "Özel 5 renk",
+      "Özel 6 renk"
+     ]
+    },
+    "steps": {
+     "label": "Adım"
+    },
+    "strength": {
+     "label": "Güç"
+    },
+    "weight": {
+     "label": "Hata ağırlığı"
+    }
+   }
+  },
+  "ominoglass": {
+   "description": "Katmanın parlaklığından yapılmış cam: arkasındakini gökkuşağı saçaklarıyla kırar ve yüzeyi bir mercek gibi aydınlatır.",
+   "name": "Omino Glass",
+   "params": {
+    "aberration": {
+     "label": "Renk sapması"
+    },
+    "ambient": {
+     "label": "Ortam"
+    },
+    "amount": {
+     "label": "Pürüzlülük"
+    },
+    "blend": {
+     "label": "Karışım"
+    },
+    "blur": {
+     "label": "Eğim"
+    },
+    "color": {
+     "label": "Renk"
+    },
+    "direction": {
+     "label": "Yön"
+    },
+    "elevation": {
+     "label": "Yükseklik"
+    },
+    "evolution": {
+     "label": "Evrim"
+    },
+    "feature": {
+     "label": "Özellik boyutu"
+    },
+    "intensity": {
+     "label": "Yoğunluk"
+    },
+    "light": {
+     "label": "Işık rengi"
+    },
+    "refraction": {
+     "label": "Kırılma"
+    },
+    "samples": {
+     "label": "Yumuşatma örnekleri"
+    },
+    "scale": {
+     "label": "Pürüzlülük ölçeği"
+    },
+    "seed": {
+     "label": "Tohum"
+    },
+    "shading": {
+     "label": "Gölgeleme",
+     "options": [
+      "Yok",
+      "Nokta ışığı",
+      "Yönlü ışık"
+     ]
+    },
+    "shine": {
+     "label": "Parlama"
+    },
+    "specularity": {
+     "label": "Yansıma"
+    },
+    "useLuma": {
+     "label": "Katman parlaklığını kullan"
+    }
+   }
+  },
   "oscillate": {
    "description": "Katmanı bir açı boyunca, derinlikte veya yörüngede ileri geri hareket ettirir.",
    "name": "Salınım",
@@ -2213,6 +2719,56 @@
       "Dikdörtgenden kutupsala",
       "Kutupsaldan dikdörtgene"
      ]
+    }
+   }
+  },
+  "polardisplacement": {
+   "description": "Bu katmanın arkasındaki katmanları, katmanın renklerine göre bir merkez noktası etrafında döndürüp çeker ve ardından katmanı gizler.",
+   "name": "Kutupsal Yer Değiştirme Haritası",
+   "params": {
+    "angle": {
+     "label": "Açı"
+    },
+    "angleChannel": {
+     "label": "Açı kaynağı",
+     "options": [
+      "R",
+      "G",
+      "B",
+      "Parlaklık",
+      "Alfa"
+     ]
+    },
+    "center": {
+     "label": "Merkez"
+    },
+    "distanceChannel": {
+     "label": "Mesafe kaynağı",
+     "options": [
+      "R",
+      "G",
+      "B",
+      "Parlaklık",
+      "Alfa"
+     ]
+    },
+    "edges": {
+     "label": "Kenarlar",
+     "options": [
+      "Yinele",
+      "Ayna",
+      "Temizle",
+      "Döşe"
+     ]
+    },
+    "fromCenter": {
+     "label": "Merkezden"
+    },
+    "invert": {
+     "label": "Ters çevir"
+    },
+    "reach": {
+     "label": "Mesafe"
     }
    }
   },
@@ -2693,6 +3249,45 @@
     },
     "splitDistance": {
      "label": "Mesafe"
+    }
+   }
+  },
+  "ribbon": {
+   "description": "Katmanın opak kısımları boyunca genişliği değişen kıvrımlı bir şerit çizer; akması için Faz'ı canlandırın veya şeridi katmandan oyun.",
+   "name": "Şerit",
+   "params": {
+    "angle": {
+     "label": "Açı"
+    },
+    "color": {
+     "label": "Renk"
+    },
+    "frequency": {
+     "label": "Frekans"
+    },
+    "magnitude": {
+     "label": "Büyüklük"
+    },
+    "offset": {
+     "label": "Ofset"
+    },
+    "phase": {
+     "label": "Faz"
+    },
+    "punch": {
+     "label": "Oy"
+    },
+    "smoothing": {
+     "label": "Yumuşatma"
+    },
+    "tint": {
+     "label": "Ton"
+    },
+    "tintAmount": {
+     "label": "Ton miktarı"
+    },
+    "width": {
+     "label": "Genişlik"
     }
    }
   },
