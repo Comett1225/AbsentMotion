@@ -35,6 +35,11 @@ import app.absentmotion.model.Layer
 import app.absentmotion.model.Scene
 import kotlin.math.roundToInt
 import app.absentmotion.ui.theme.Am
+import app.absentmotion.ui.theme.TilePress
+import app.absentmotion.ui.theme.pressScale
+import androidx.compose.foundation.LocalIndication
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.runtime.remember
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
 
@@ -80,8 +85,9 @@ internal fun AiBackdrop(modifier: Modifier, action: AiAction? = null) {
 internal fun AiTile(action: AiAction, layer: Layer?, tools: AiTools) {
     val reason = action.unavailable(layer)
     Column(Modifier.width(100.dp).padding(5.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-        Column(Modifier.alpha(if (reason == null) 1f else 0.35f)
-            .clickable(enabled = reason == null && tools.running == null) { tools.apply(action) }, horizontalAlignment = Alignment.CenterHorizontally) {
+        val press = remember { MutableInteractionSource() }
+        Column(Modifier.pressScale(press, TilePress).alpha(if (reason == null) 1f else 0.35f)
+            .clickable(press, LocalIndication.current, enabled = reason == null && tools.running == null) { tools.apply(action) }, horizontalAlignment = Alignment.CenterHorizontally) {
             AiBackdrop(Modifier.size(93.dp).clip(RoundedCornerShape(5.dp)), action)
             Text(stringResource(action.title), Modifier.fillMaxWidth().height(26.dp).padding(top = 4.dp), color = Am.OnDark, fontSize = 8.sp,
                 lineHeight = 9.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center, maxLines = 2)

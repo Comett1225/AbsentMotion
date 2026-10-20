@@ -83,7 +83,10 @@ import app.absentmotion.ui.editor.panels.px
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Presence
 import app.absentmotion.ui.theme.Swap
+import app.absentmotion.ui.theme.TilePress
 import app.absentmotion.ui.theme.fadeBackground
+import app.absentmotion.ui.theme.pressScale
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
 
@@ -120,7 +123,9 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier) {
         Spacer(Modifier.height(28.px))
         if (state.selected?.kind == "audio") {
             Box(Modifier.fillMaxWidth().weight(1f)) {
-                Column(Modifier.fillMaxSize().clip(ToolShape).background(Am.Button).clickable { openPresets(state) }, Arrangement.Center, Alignment.CenterHorizontally) {
+                val press = remember { MutableInteractionSource() }
+                Column(Modifier.fillMaxSize().pressScale(press, TilePress).clip(ToolShape).background(Am.Button).clickable(press, LocalIndication.current) { openPresets(state) },
+                    Arrangement.Center, Alignment.CenterHorizontally) {
                     PanelIcon(PanelIcons.Star, Am.OnDark, size = 28.dp)
                     Text(stringResource(R.string.presets), color = ToolLabel, fontSize = 13.sp)
                 }
@@ -203,9 +208,10 @@ private val Effects = Tool(R.string.layer_tool_effects, PanelIcons.Effects, 19.6
 
 @Composable
 private fun SmallTool(icon: ImageVector, description: String, modifier: Modifier, shape: RoundedCornerShape, enabled: Boolean = true, onClick: () -> Unit = {}) {
+    val press = remember { MutableInteractionSource() }
     Box(
-        modifier.fillMaxHeight().then(if (enabled) Modifier else Modifier.dimmed()).clip(shape).background(Am.Button)
-            .then(if (enabled) Modifier.clickable(onClick = onClick) else Modifier),
+        modifier.fillMaxHeight().pressScale(press, TilePress).then(if (enabled) Modifier else Modifier.dimmed()).clip(shape).background(Am.Button)
+            .then(if (enabled) Modifier.clickable(press, LocalIndication.current, onClick = onClick) else Modifier),
         contentAlignment = Alignment.Center,
     ) {
         PanelIcon(icon, Am.OnDark, description = description)
@@ -214,9 +220,10 @@ private fun SmallTool(icon: ImageVector, description: String, modifier: Modifier
 
 @Composable
 private fun ToolButton(tool: Tool, modifier: Modifier, enabled: Boolean = true, onClick: () -> Unit = {}) {
+    val press = remember { MutableInteractionSource() }
     Box(
-        modifier.fillMaxHeight().then(if (enabled) Modifier else Modifier.dimmed()).clip(ToolShape).background(Am.Button)
-            .then(if (enabled) Modifier.clickable(onClick = onClick) else Modifier),
+        modifier.fillMaxHeight().pressScale(press, TilePress).then(if (enabled) Modifier else Modifier.dimmed()).clip(ToolShape).background(Am.Button)
+            .then(if (enabled) Modifier.clickable(press, LocalIndication.current, onClick = onClick) else Modifier),
     ) {
         PanelIcon(tool.icon, Am.OnDark, Modifier.align(Alignment.TopCenter).offset(y = (tool.iconY - 12f).dp))
         Text(

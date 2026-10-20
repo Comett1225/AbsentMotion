@@ -50,6 +50,10 @@ import app.absentmotion.audio.audioDeclaration
 import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.addAudio
 import app.absentmotion.ui.theme.Am
+import app.absentmotion.ui.theme.TilePress
+import app.absentmotion.ui.theme.pressScale
+import androidx.compose.foundation.LocalIndication
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.math.sin
@@ -92,8 +96,9 @@ internal fun AudioTab(state: EditorState, modifier: Modifier, library: AddLibrar
         LazyHorizontalGrid(AtLeastTwo(84.dp), Modifier.fillMaxWidth().weight(1f).clipToBounds()) {
             item(key = "viewAll") {
                 Box(Modifier.width(80.dp).fillMaxHeight(), Alignment.Center) {
+                    val press = remember { MutableInteractionSource() }
                     Column(
-                        Modifier.size(75.dp).clip(RoundedCornerShape(2.dp)).background(Am.Well).clickable { picker.launch(arrayOf("audio/*")) },
+                        Modifier.size(75.dp).pressScale(press, TilePress).clip(RoundedCornerShape(2.dp)).background(Am.Well).clickable(press, LocalIndication.current) { picker.launch(arrayOf("audio/*")) },
                         horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center,
                     ) {
                         MediaGridIcon(Modifier.size(20.dp))
@@ -103,8 +108,9 @@ internal fun AudioTab(state: EditorState, modifier: Modifier, library: AddLibrar
             }
             item(key = "speech") {
                 Box(Modifier.width(80.dp).fillMaxHeight(), Alignment.Center) {
+                    val press = remember { MutableInteractionSource() }
                     Column(
-                        Modifier.size(75.dp).clip(RoundedCornerShape(2.dp)).background(Am.Well).clickable { speaking = true },
+                        Modifier.size(75.dp).pressScale(press, TilePress).clip(RoundedCornerShape(2.dp)).background(Am.Well).clickable(press, LocalIndication.current) { speaking = true },
                         horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center,
                     ) {
                         Icon(ChromeIcons.Captions, null, Modifier.size(20.dp), tint = Am.OnDark)

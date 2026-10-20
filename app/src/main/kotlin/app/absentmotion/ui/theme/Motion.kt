@@ -254,6 +254,8 @@ class PressIndication(private val tint: Color) : IndicationNodeFactory {
     }
 }
 
+const val TilePress = 0.96f
+
 @Composable
 fun Modifier.pressScale(source: InteractionSource, pressed: Float = 0.93f): Modifier {
     val down by source.collectIsPressedAsState()

@@ -46,6 +46,10 @@ import app.absentmotion.ui.camera.CameraIcons
 import app.absentmotion.ui.camera.CameraScreen
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Presence
+import app.absentmotion.ui.theme.TilePress
+import app.absentmotion.ui.theme.pressScale
+import androidx.compose.foundation.LocalIndication
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import app.absentmotion.ui.theme.animatedBackground
 import app.absentmotion.ui.theme.animatedColor
 import app.absentmotion.ui.theme.presence
@@ -103,7 +107,8 @@ internal fun MediaTab(state: EditorState, modifier: Modifier, library: AddLibrar
         LazyHorizontalGrid(AtLeastTwo(96.dp), Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(0.dp)) {
             item(key = "albums") {
                 Column(Modifier.width(97.dp).padding(6.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                    Box(Modifier.fillMaxWidth().weight(1f).background(Am.Well).semantics { contentDescription = viewAll }.clickable {
+                    val press = remember { MutableInteractionSource() }
+                    Box(Modifier.fillMaxWidth().weight(1f).pressScale(press, TilePress).background(Am.Well).semantics { contentDescription = viewAll }.clickable(press, LocalIndication.current) {
                         picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo))
                     }, Alignment.Center) { MediaGridIcon(Modifier.size(24.dp)) }
                     Box(Modifier.fillMaxWidth().weight(1f).background(Am.Well).clickable { albumsOpen = true }, Alignment.Center) {
@@ -136,7 +141,8 @@ internal fun MediaTab(state: EditorState, modifier: Modifier, library: AddLibrar
             }
             items(shown, key = { it.uri.toString() }) { file ->
                 val bitmap by produceState<android.graphics.Bitmap?>(cachedMediaThumbnail(file.uri), file.uri, file.modified, library.mediaRevision) { value = mediaThumbnail(context, file.uri) }
-                Box(Modifier.fillMaxHeight().aspectRatio(1f).background(Color.Black).clickable(enabled = !adding) {
+                val press = remember { MutableInteractionSource() }
+                Box(Modifier.fillMaxHeight().aspectRatio(1f).pressScale(press, TilePress).background(Color.Black).clickable(press, LocalIndication.current, enabled = !adding) {
                     scope.launch {
                         adding = true
                         try {
@@ -184,8 +190,10 @@ internal class CellDrop : PopupPositionProvider {
 @Composable
 private fun ColumnScope.MediaSquare(icon: ImageVector, label: String, active: Boolean, onClick: () -> Unit) {
     val tint = animatedColor(if (active) Am.Accent else Am.OnDark)
+    val press = remember { MutableInteractionSource() }
     Column(
-        Modifier.fillMaxWidth().weight(1f).animatedBackground(if (active) Am.Accent.copy(alpha = 0.16f) else Am.Well).clickable(onClick = onClick),
+        Modifier.fillMaxWidth().weight(1f).pressScale(press, TilePress).animatedBackground(if (active) Am.Accent.copy(alpha = 0.16f) else Am.Well)
+            .clickable(press, LocalIndication.current, onClick = onClick),
         horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center,
     ) {
         Icon(icon, null, Modifier.size(18.dp), tint = tint)

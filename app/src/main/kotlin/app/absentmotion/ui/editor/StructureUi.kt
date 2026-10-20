@@ -55,6 +55,10 @@ import app.absentmotion.editor.pasteStyle
 import app.absentmotion.editor.setParent
 import app.absentmotion.editor.unparentChildrenOf
 import app.absentmotion.ui.theme.Am
+import app.absentmotion.ui.theme.TilePress
+import app.absentmotion.ui.theme.pressScale
+import androidx.compose.foundation.LocalIndication
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
@@ -83,7 +87,9 @@ private val ItemShape = RoundedCornerShape(4.dp)
 
 @Composable
 private fun ObjectTile(label: String, icon: ImageVector, modifier: Modifier, enabled: Boolean = true, onClick: () -> Unit = {}) {
-    Box(modifier.alpha(if (enabled) 1f else DimAlpha).clip(ItemShape).background(Am.Button).then(if (enabled) Modifier.clickable(onClick = onClick) else Modifier)) {
+    val press = remember { MutableInteractionSource() }
+    Box(modifier.pressScale(press, TilePress).alpha(if (enabled) 1f else DimAlpha).clip(ItemShape).background(Am.Button)
+        .clickable(press, LocalIndication.current, enabled = enabled, onClick = onClick)) {
         Icon(icon, null, Modifier.align(Alignment.TopCenter).padding(top = 14.dp).size(24.dp), tint = Am.OnDark)
         Text(
             label, Modifier.align(Alignment.BottomCenter).fillMaxWidth().height(40.dp).padding(start = 3.dp, end = 3.dp, bottom = 4.dp).wrapContentHeight(Alignment.CenterVertically),
