@@ -25,6 +25,8 @@ class Mesh(
 
 const val MODEL_TRIANGLE_BUDGET = 50_000
 
+internal const val MODEL_WORK_LIMIT = 16_000_000L
+
 fun parseModel(name: String, bytes: ByteArray, open: (String) -> ByteArray?): Mesh {
     val mesh = if (name.substringAfterLast('.').lowercase() == "obj") ObjReader.read(bytes.toString(Charsets.UTF_8), open) else GltfReader.read(bytes, open)
     require(mesh.triangleCount > 0) { "The model has no triangles" }
@@ -220,7 +222,7 @@ object GltfReader {
     private const val JSON = 0x4E4F534A
     private const val BIN = 0x004E4942
 
-    fun read(bytes: ByteArray, open: (String) -> ByteArray?): Mesh {
+    fun read(bytes: ByteArray, open: (String) -> ByteArray?, limit: Long = MODEL_WORK_LIMIT): Mesh {
         var bin: ByteArray? = null
         val json = if (bytes.size >= 12 && le(bytes, 0) == GLB) {
             var at = 12
@@ -261,6 +263,7 @@ object GltfReader {
         fun read(index: Int, normalizeInts: Boolean = true): Pair<FloatArray, Int>? {
             val a = accessors.getOrNull(index) ?: return null
             val count = a.optInt("count", 0)
+            require(count <= limit) { "The model is too complex" }
             val comps = when (a.optString("type")) { "SCALAR" -> 1; "VEC2" -> 2; "VEC3" -> 3; "VEC4" -> 4; else -> return null }
             val type = a.optInt("componentType")
             val size = when (type) { 5120, 5121 -> 1; 5122, 5123 -> 2; 5125, 5126 -> 4; else -> return null }
@@ -298,12 +301,20 @@ object GltfReader {
             return IntArray(values.size) { values[it].toInt() }
         }
 
+        var work = 0L
+        fun charge(accessor: Int) {
+            work += accessors.getOrNull(accessor)?.optInt("count", 0)?.coerceAtLeast(0) ?: 0
+            require(work <= limit) { "The model is too complex" }
+        }
+
         fun addMesh(meshIndex: Int, world: FloatArray) {
             val normalMatrix = normalMatrix(world)
             val flip = determinant(world) < 0
             for (primitive in meshes.getOrNull(meshIndex)?.optJSONArray("primitives").objects()) {
                 if (primitive.optInt("mode", 4) != 4) continue
                 val attributes = primitive.optJSONObject("attributes") ?: continue
+                charge(attributes.optInt("POSITION", -1))
+                charge(primitive.optInt("indices", -1))
                 val (positions, pc) = read(attributes.optInt("POSITION", -1)) ?: continue
                 if (pc != 3) continue
                 val count = positions.size / 3
@@ -333,9 +344,11 @@ object GltfReader {
             }
         }
 
+        val visited = BooleanArray(nodes.size)
         fun visit(index: Int, parent: FloatArray, depth: Int) {
             val node = nodes.getOrNull(index) ?: return
-            if (depth > 64) return
+            if (depth > 64 || visited[index]) return
+            visited[index] = true
             val world = multiply(parent, localMatrix(node))
             if (node.has("mesh")) addMesh(node.getInt("mesh"), world)
             node.optJSONArray("children")?.let { c -> for (i in 0 until c.length()) visit(c.optInt(i, -1), world, depth + 1) }
@@ -345,8 +358,9 @@ object GltfReader {
         if (nodes.isEmpty()) meshes.indices.forEach { addMesh(it, identity) }
         else {
             val scenes = json.optJSONArray("scenes").objects()
+            val children = nodes.flatMap { n -> n.optJSONArray("children")?.let { c -> List(c.length()) { c.optInt(it, -1) } }.orEmpty() }.toSet()
             val roots = scenes.getOrNull(json.optInt("scene", 0))?.optJSONArray("nodes")?.let { r -> List(r.length()) { r.optInt(it, -1) } }
-                ?: nodes.indices.filter { i -> nodes.none { n -> n.optJSONArray("children")?.let { c -> (0 until c.length()).any { c.optInt(it) == i } } == true } }
+                ?: nodes.indices.filter { it !in children }
             roots.forEach { visit(it, identity, 0) }
         }
         return builder.build(textures, twoSided)

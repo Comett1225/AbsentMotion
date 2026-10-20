@@ -7,6 +7,7 @@ import app.absentmotion.model.modelUris
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.Assert.fail
 import org.junit.Test
 import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
@@ -127,6 +128,45 @@ class ModelReaderTest {
     @Test fun aGltfCanReadItsBufferFromAFileNextToIt() {
         val mesh = readModel("tri.gltf", gltf("""{"byteLength":${triangle.size},"uri":"tri%20data.bin"}""").toByteArray()) { if (it == "tri data.bin") triangle else null }
         assertEquals(1, mesh.triangleCount)
+    }
+
+    private fun timed(seconds: Long, work: () -> Unit) {
+        val failure = arrayOfNulls<Throwable>(1)
+        val worker = Thread { try { work() } catch (t: Throwable) { failure[0] = t } }.apply { isDaemon = true; start() }
+        worker.join(seconds * 1000)
+        assertTrue("still reading after $seconds s", !worker.isAlive)
+        failure[0]?.let { throw it }
+    }
+
+    @Test fun sharedAndCyclicNodeChildrenAreReadOnceInsteadOfForever() {
+        val uri = "data:application/octet-stream;base64," + Base64.getEncoder().encodeToString(triangle)
+        val buffer = """{"byteLength":${triangle.size},"uri":"$uri"}"""
+        val fanOut = (0 until 48).joinToString(",") { i -> if (i < 47) """{"children":[${i + 1},${i + 1}]}""" else """{"mesh":0}""" }
+        timed(10) { assertEquals(1, readModel("fan.gltf", gltf(buffer, fanOut).toByteArray()) { null }.triangleCount) }
+        timed(10) { assertEquals(1, readModel("loop.gltf", gltf(buffer, """{"children":[1]},{"children":[0],"mesh":0}""").toByteArray()) { null }.triangleCount) }
+        val many = (0 until 200_000).joinToString(",") { """{"children":[]}""" }
+        val noScene = gltf(buffer, many).replace(""""scene":0,"scenes":[{"nodes":[0]}],""", "")
+        timed(10) { runCatching { GltfReader.read(noScene.toByteArray(), { null }) } }
+    }
+
+    @Test fun instancingOneMeshTooOftenIsRefusedAsTooComplex() {
+        val uri = "data:application/octet-stream;base64," + Base64.getEncoder().encodeToString(triangle)
+        val buffer = """{"byteLength":${triangle.size},"uri":"$uri"}"""
+        val nodes = (0 until 50).joinToString(",") { if (it == 0) """{"children":[${(1 until 50).joinToString(",")}],"mesh":0}""" else """{"mesh":0}""" }
+        assertEquals(50, GltfReader.read(gltf(buffer, nodes).toByteArray(), { null }, limit = 300).triangleCount)
+        try {
+            GltfReader.read(gltf(buffer, nodes).toByteArray(), { null }, limit = 299)
+            fail("read")
+        } catch (e: IllegalArgumentException) {
+            assertEquals("The model is too complex", e.message)
+        }
+        val huge = gltf(buffer).replace(""""count":3,"type":"VEC3"""", """"count":2000000000,"type":"VEC3"""")
+        try {
+            GltfReader.read(huge.toByteArray(), { null })
+            fail("read")
+        } catch (e: IllegalArgumentException) {
+            assertEquals("The model is too complex", e.message)
+        }
     }
 
     @Test(expected = IllegalArgumentException::class) fun aGltfWhoseBufferFileIsMissingIsRefused() {
