@@ -447,6 +447,8 @@ half4 main(float2 xy) {
 const LayerEffects* gEffects = nullptr;
 const Scene* gScene = nullptr;
 
+int Fps() { return gScene ? gScene->fps : 30; }
+
 const std::vector<Layer>* gEffectList = nullptr;
 
 bool EffectsApply(const std::vector<Layer>& siblings, const Layer& l) {
@@ -525,19 +527,33 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
             DrawDrawing(canvas, l, alpha);
         } else if (l.fillType == "color") {
             hasFill = fill.fA > 0;
-            if (l.text) DrawText(canvas, l, t, FillPaint(fill));
+            if (l.text) DrawText(canvas, l, t, FillPaint(fill), Fps());
             else canvas->drawPath(path, FillPaint(fill));
         } else if (l.fillType == "media" || l.fillType == "gradient") {
             hasFill = true;
+            const bool masked = l.text && TextAnimated(l);
             canvas->save();
-            if (l.text) canvas->clipPath(TextGlyphPath(l), true);
+            if (masked) {
+                SkPaint inside;
+                inside.setBlendMode(SkBlendMode::kSrcIn);
+                canvas->saveLayer(nullptr, nullptr);
+                DrawText(canvas, l, t, FillPaint(kWhite), Fps());
+                canvas->saveLayer(nullptr, &inside);
+            } else if (l.text) {
+                canvas->clipPath(TextGlyphPath(l), true);
+            }
             if (l.fillType == "media") {
                 DrawMedia(canvas, l, path, alpha, pictures);
             } else {
                 SkPaint paint;
                 paint.setAntiAlias(true);
                 paint.setShader(GradientShader(l.gradient, path.getBounds(), alpha));
-                if (paint.getShader()) canvas->drawPath(path, paint);
+                if (paint.getShader() && masked) canvas->drawPaint(paint);
+                else if (paint.getShader()) canvas->drawPath(path, paint);
+            }
+            if (masked) {
+                canvas->restore();
+                canvas->restore();
             }
             canvas->restore();
         }
@@ -556,7 +572,7 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
     }
     if (!decorate) return;
     if (l.kind == "embedScene") return DrawGroupBorders(canvas, l, t);
-    SkPath region = hasFill ? (l.text ? TextGlyphPath(l).makeTransform(m) : l.kind == "drawing" ? DrawingOutline(l).makeTransform(m) : scenePath) : SkPath();
+    SkPath region = hasFill ? (l.text ? TextGlyphPath(l, t, Fps()).makeTransform(m) : l.kind == "drawing" ? DrawingOutline(l).makeTransform(m) : scenePath) : SkPath();
     region = Union(region, stroked);
     if (region.isEmpty()) return;
     for (const Edge& e : l.borders) {

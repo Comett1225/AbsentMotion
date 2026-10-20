@@ -924,7 +924,7 @@ int64_t EngineImpl::hitTest(float x, float y, double timeMs) {
 bool EngineImpl::layerOutline(int64_t layerId, double timeMs, std::string* svg) {
     const Layer* layer = fScene.layer(layerId);
     if (!layer) return false;
-    const SkPath path = layer->text ? TextGlyphPath(*layer) : ShapePath(*layer, layer->localTime(timeMs));
+    const SkPath path = layer->text ? TextGlyphPath(*layer, layer->localTime(timeMs), fScene.fps) : ShapePath(*layer, layer->localTime(timeMs));
     if (path.isEmpty()) return false;
     *svg = OutlineSvg(path);
     return true;
@@ -944,6 +944,7 @@ bool EngineImpl::shapeIcon(const std::string& xml, int size, uint32_t color, std
     Scene scene;
     std::string error;
     if (!ParseScene(xml, &scene, &error) || scene.layers.empty()) return false;
+    scene.layers.front().effects.clear();
     const Layer& layer = scene.layers.front();
     const SkPath path = ShapePath(layer, 0);
     const SkPath stroke = StrokePath(layer, path, 0);

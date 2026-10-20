@@ -95,6 +95,7 @@
     "rasterextrude": {"photo": "colour", "under": "grid", "params": {"rotY": [-35, 325], "scale": 0.7}, "animate": 16},
     "flip": {"photo": "colour", "under": "grid", "params": {"rotY": [0, 360], "scale": 0.75}, "animate": 16},
     "spherize": {"photo": "colour", "under": "grid", "params": {"rotY": [0, 360], "scale": 0.75}, "animate": 16},
-    "tunnel": {"photo": "colour", "params": {"speed": 1.5}, "animate": 16}
+    "tunnel": {"photo": "colour", "params": {"speed": 1.5}, "animate": 16},
+    "textprogress": {"layout": "text", "text": "Text Progress", "params": {"progress": [0, 1, 1], "appearance": 2, "softness": 4}, "animate": 20}
   }
 }

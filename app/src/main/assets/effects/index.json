@@ -83,5 +83,6 @@
  "rasterextrude",
  "flip",
  "spherize",
- "tunnel"
+ "tunnel",
+ "textprogress"
 ]

@@ -35,7 +35,7 @@ data class EffectCatalog(
 
     companion object {
         val Categories = linkedMapOf("color" to "Color", "blur" to "Blur", "distort" to "Distort", "stylize" to "Stylize",
-            "noise" to "Noise", "repeat" to "Repeat", "key" to "Key", "move" to "Move", "3d" to "3D")
+            "noise" to "Noise", "repeat" to "Repeat", "key" to "Key", "move" to "Move", "3d" to "3D", "text" to "Text")
 
         fun read(context: Context): EffectCatalog = parse { context.assets.open("effects/$it") }
 

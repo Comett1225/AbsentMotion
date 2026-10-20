@@ -118,8 +118,15 @@ def layer(id, image, effect="", half=RENDER // 2, keys=None, end=999):
             f'<property name="size" type="vec2" value="{half},{half}"/>{effect}</shape>')
 
 
+def words(id, content, effect="", end=999):
+    c = RENDER // 2
+    return (f'<text id="{id}" label="text" startTime="0" endTime="{end}" fillType="color" size="18" wrapWidth="{RENDER - 48}" '
+            f'align="center" font="googlefonts?name=Montserrat&amp;weight=700"><transform><location value="{c},{c},0"/></transform>'
+            f'<fillColor value="#ffffffff"/><content>{content}</content>{effect}</text>')
+
+
 def backdrops(show):
-    return ["grid"] if show.get("layout") == "move" else [show["under"]] if "under" in show else []
+    return ["grid"] if show.get("layout") in ("move", "text") else [show["under"]] if "under" in show else []
 
 
 def scene(show, effect):
@@ -134,7 +141,10 @@ def scene(show, effect):
     fps, total = (ANIM_FPS, round(show["animate"] * 1000 / ANIM_FPS)) if "animate" in show else (30, 1000)
     layers = [layer(1, name, end=total - 1) for name in backdrops(show)]
     move = show.get("layout") == "move"
-    layers.append(layer(2, show["photo"], fx, RENDER // 4 if move else RENDER // 2, show.get("keys"), total - 1))
+    if show.get("layout") == "text":
+        layers.append(words(2, show["text"], fx, total - 1))
+    else:
+        layers.append(layer(2, show["photo"], fx, RENDER // 4 if move else RENDER // 2, show.get("keys"), total - 1))
     if "split" in show:
         layers.append(layer(3, f'{show["photo"]}-before{round(show["split"] * 100)}', end=total - 1))
     return (f'<scene title="thumb" width="{RENDER}" height="{RENDER}" fps="{fps}" totalTime="{total}" bgcolor="#00000000">'
@@ -232,7 +242,7 @@ def main():
     batch, planned = Batch(opts.work), []
     for key in keys:
         show = SHOWCASE["effects"][key]
-        names = [show["photo"]] + backdrops(show)
+        names = ([show["photo"]] if "photo" in show else []) + backdrops(show)
         for name in names:
             if name not in pushed:
                 photo(name, opts.work, made).save(opts.work / f"{name}.png")
@@ -246,7 +256,7 @@ def main():
                 pushed.add(name)
         animated = show.get("animate", 0)
         frames = list(range(animated)) if animated else show.get("frames", [show.get("frame", 0)])
-        base = (show["photo"], show.get("under"), show.get("split"), tuple(frames), show.get("layout"), json.dumps(show.get("keys")), animated)
+        base = (show.get("photo"), show.get("text"), show.get("under"), show.get("split"), tuple(frames), show.get("layout"), json.dumps(show.get("keys")), animated)
         if base not in plain:
             plain[base] = batch.add(f"plain{len(plain)}", scene(show, None), frames)
         effect = json.loads((PACK / f"{key}.json").read_text())
@@ -270,7 +280,7 @@ def main():
         else:
             out = image if image.getextrema()[3][0] < 255 else image.convert("RGB")
             out.save(target, quality=82, method=6)
-        print(f"{key:20} {show['photo']:12} {diff:6.1f}{note}", flush=True)
+        print(f"{key:20} {show.get('photo', 'text'):12} {diff:6.1f}{note}", flush=True)
         if diff < SAME or (moving is not None and moving < SAME):
             unchanged.append(key)
     adb("shell", "run-as", PKG, "rm", "-r", APP_DIR)

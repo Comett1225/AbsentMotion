@@ -42,7 +42,7 @@ data class EffectParam(
             }
             return EffectParam(id, json.optString("label", id), kind, default,
                 json.optDouble("min", -Float.MAX_VALUE.toDouble()).toFloat(), json.optDouble("max", Float.MAX_VALUE.toDouble()).toFloat(),
-                json.optDouble("step", 0.01).toFloat(), pixels = json.optBoolean("pixels"))
+                json.optDouble("step", 0.01).toFloat(), json.optBoolean("percent"), pixels = json.optBoolean("pixels"))
         }
     }
 }

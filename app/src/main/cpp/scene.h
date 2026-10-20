@@ -41,6 +41,7 @@ struct Anim {
 struct Property {
     std::string name, type;
     Anim anim;
+    std::string text;
 };
 
 struct Stroke {
@@ -79,6 +80,9 @@ struct LayerEffect {
     std::string id;
     bool hidden = false, locallyApplied = false, toChildren = false;
     std::vector<Property> props;
+
+    float value(const char* name, float t, float fallback) const;
+    const Property* prop(const char* name) const;
 };
 
 struct FreehandStroke {
@@ -141,6 +145,7 @@ struct Layer {
     float value(const char* name, int i, float t, float fallback) const;
 
     const Property* prop(const char* name) const;
+    const LayerEffect* effect(const char* id) const;
     bool activeAt(double timeMs) const { return !hidden && timeMs >= startTime && timeMs <= endTime; }
     double steppedMs(double timeMs) const {
         if (steps.empty() || endTime <= startTime) return timeMs;
@@ -173,6 +178,8 @@ struct ShutterBlur {
 };
 
 bool MotionEffect(const std::string& id);
+bool TextEffect(const std::string& id);
+bool DrawingEffect(const std::string& id);
 bool ShutterBlurOf(const Layer& layer, double timeMs, ShutterBlur* blur);
 void SetFastShutterBlur(bool fast);
 sk_sp<SkImageFilter> SmearFilter(SkVector moved);
