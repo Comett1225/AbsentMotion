@@ -10,7 +10,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.items
@@ -85,7 +84,7 @@ internal fun MediaTab(state: EditorState, modifier: Modifier, library: AddLibrar
     val shown = remember(files, album, query) { files.filter { (album == null || it.albumId == album) && matchesSearch(query, it.name, it.album) } }
     Column(modifier) {
         SearchField(search, { search = it }, Modifier.padding(start = 6.dp, end = 6.dp, top = 6.dp).fillMaxWidth().height(32.dp), hint = stringResource(R.string.mediatab_search_hint))
-        LazyHorizontalGrid(GridCells.Fixed(2), Modifier.fillMaxWidth().weight(1f).clipToBounds(), horizontalArrangement = Arrangement.spacedBy(0.dp)) {
+        LazyHorizontalGrid(AtLeastTwo(96.dp), Modifier.fillMaxWidth().weight(1f).clipToBounds(), horizontalArrangement = Arrangement.spacedBy(0.dp)) {
             item(key = "albums") {
                 Column(Modifier.width(97.dp).padding(6.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
                     Box(Modifier.fillMaxWidth().weight(1f).background(Am.Well).semantics { contentDescription = viewAll }.clickable {

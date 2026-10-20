@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import app.absentmotion.editor.EditorState
 import app.absentmotion.ui.theme.Am
@@ -68,9 +69,15 @@ internal fun WideEditorBody(state: EditorState, onExit: () -> Unit, addLibrary: 
 }
 
 @Composable
-fun PhoneScreen(content: @Composable () -> Unit) {
+fun PhoneScreen(fillWidth: Dp = 0.dp, content: @Composable () -> Unit) {
     if (!LocalWide.current) {
         content()
+        return
+    }
+    if (fillWidth > 0.dp) {
+        Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.6f)).pointerInput(Unit) {}, contentAlignment = Alignment.Center) {
+            Box(Modifier.fillMaxHeight().widthIn(max = fillWidth).fillMaxWidth()) { content() }
+        }
         return
     }
     Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.6f)).pointerInput(Unit) {}.systemBarsPadding().padding(24.dp), contentAlignment = Alignment.Center) {

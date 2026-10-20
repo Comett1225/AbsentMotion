@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.items
@@ -90,7 +89,7 @@ internal fun AudioTab(state: EditorState, modifier: Modifier, library: AddLibrar
 
     Column(modifier) {
         SearchField(search, { search = it }, Modifier.padding(start = 6.dp, end = 6.dp, top = 6.dp).fillMaxWidth().height(32.dp), hint = stringResource(R.string.audiotab_search_hint))
-        LazyHorizontalGrid(GridCells.Fixed(2), Modifier.fillMaxWidth().weight(1f).clipToBounds()) {
+        LazyHorizontalGrid(AtLeastTwo(84.dp), Modifier.fillMaxWidth().weight(1f).clipToBounds()) {
             item(key = "viewAll") {
                 Box(Modifier.width(80.dp).fillMaxHeight(), Alignment.Center) {
                     Column(

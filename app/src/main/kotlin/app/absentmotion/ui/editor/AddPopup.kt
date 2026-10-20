@@ -132,10 +132,11 @@ private fun TabButton(tab: Tab, active: Boolean, enabled: Boolean, onClick: () -
 }
 
 @Composable
-private fun ShapePages(state: EditorState, modifier: Modifier) {
-    val pages = ShapeCatalog.all.chunked(18)
+private fun ShapePages(state: EditorState, modifier: Modifier) = androidx.compose.foundation.layout.BoxWithConstraints(modifier) {
+    val rows = maxOf(3, ((maxHeight - 20.dp) / 61.dp).toInt())
+    val pages = ShapeCatalog.all.chunked(rows * 6)
     val pager = rememberPagerState { pages.size }
-    Box(modifier) {
+    Box(Modifier.fillMaxSize()) {
         HorizontalPager(pager, Modifier.fillMaxSize(), beyondViewportPageCount = 1) { page ->
             Column(Modifier.padding(start = 9.6.dp, top = 8.9.dp)) {
                 for (row in pages[page].chunked(6)) {
@@ -167,7 +168,7 @@ private fun TemplatePage(state: EditorState, modifier: Modifier) {
     val saved by produceState(emptyList<SavedTemplate>()) { value = withContext(Dispatchers.IO) { TemplateStore(context).list() } }
     var all by remember { mutableStateOf(false) }
     fun open(t: SavedTemplate) { all = false; state.addOpen = false; EmbedRequest.templateId = t.id }
-    LazyHorizontalGrid(GridCells.Fixed(2), modifier.clipToBounds()) {
+    LazyHorizontalGrid(AtLeastTwo(96.dp), modifier.clipToBounds()) {
         item(key = "all") {
             Column(Modifier.size(80.dp, 96.dp).clickable { all = true }, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
                 MediaGridIcon(Modifier.size(24.dp))
@@ -220,5 +221,13 @@ private fun QuickItem(@StringRes label: Int, icon: ImageVector, height: Dp, icon
             stringResource(label), Modifier.fillMaxWidth().padding(horizontal = 2.dp), color = Am.OnDark,
             fontSize = 9.sp, lineHeight = 10.5.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center,
         )
+    }
+}
+
+internal class AtLeastTwo(private val cell: Dp) : GridCells {
+    override fun androidx.compose.ui.unit.Density.calculateCrossAxisCellSizes(availableSize: Int, spacing: Int): List<Int> {
+        val count = maxOf(2, (availableSize + spacing) / (cell.roundToPx() + spacing).coerceAtLeast(1))
+        val total = availableSize - spacing * (count - 1)
+        return List(count) { total / count + if (it < total % count) 1 else 0 }
     }
 }

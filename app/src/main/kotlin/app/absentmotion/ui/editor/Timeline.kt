@@ -111,7 +111,6 @@ import kotlin.coroutines.coroutineContext
 private val RulerHeight = 42.dp
 private val RowHeight = 28.dp
 
-private val PanelTop = 80.dp
 
 private val PlayheadWidth = 1.5.dp
 private val TickWidth = 1.dp
@@ -430,8 +429,10 @@ private class TimelineView(val state: EditorState, density: Density, private val
 
     private val covered: Boolean get() = !wide && state.selectedId != null
 
+    private val panelTop: Float get() = size.height - PanelHeight.px
+
     private val rowsBottom: Float
-        get() = TimelineMath.rowsBottom(size.height.toFloat(), if (covered) PanelTop.px else null, if (MultiSelect.active && !wide) MultiBarHeight.px else 0f)
+        get() = TimelineMath.rowsBottom(size.height.toFloat(), if (covered) panelTop else null, if (MultiSelect.active && !wide) MultiBarHeight.px else 0f)
 
     val scroll: Float
         get() = scrollPx.coerceIn(0f, TimelineMath.maxScroll(layers.size, rowH, rulerH, rowsBottom))
@@ -465,7 +466,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
         scrollPx = scroll.coerceIn(min(top + rowH - (rowsBottom - rulerH), top), top)
     }
 
-    fun isCovered(at: Offset): Boolean = (covered && at.y >= PanelTop.px) || (MultiSelect.active && !wide && at.y >= size.height - MultiBarHeight.px)
+    fun isCovered(at: Offset): Boolean = (covered && at.y >= panelTop) || (MultiSelect.active && !wide && at.y >= size.height - MultiBarHeight.px)
 
     fun hitAt(at: Offset): Hit {
         if (at.y < rulerH) {
