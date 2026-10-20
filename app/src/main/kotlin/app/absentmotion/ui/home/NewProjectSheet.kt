@@ -10,6 +10,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -36,6 +37,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -56,6 +58,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -89,6 +93,7 @@ private val DimText get() = Am.HomeDim
 private val ListColor get() = Am.Navy
 private val ListLine get() = Am.NavyLine
 private val FieldShape = RoundedCornerShape(10.dp)
+private val SheetWidth = 384.dp
 private const val MIN_SIDE = 32
 private const val MAX_SIDE = 4096
 
@@ -201,24 +206,27 @@ fun NewProjectSheet(
     var creating by remember { mutableStateOf(false) }
     Box(Modifier.fillMaxSize()) {
         Box(Modifier.fillMaxSize().presenceScrim(Color.Black.copy(alpha = 0.7f)).pointerInput(Unit) { detectTapGestures { } })
-        Box(Modifier.align(Alignment.BottomCenter).widthIn(max = 480.dp).presence(slide = 1f, fade = false)) {
-            SheetBody(form, onClose, onCamera = { camera = true }, onCreate = create@{
-                if (creating) return@create
-                creating = true
-                settings.newProject = form.choice()
-                val scene = form.scene()
-                scope.launch {
-                    val id = try {
-                        withContext(Dispatchers.IO) { store.create(scene) }
-                    } catch (e: java.io.IOException) {
-                        Toast.makeText(context, context.getString(R.string.home_create_project_failed), Toast.LENGTH_LONG).show()
-                        creating = false
-                        return@launch
+        BoxWithConstraints(Modifier.align(Alignment.BottomCenter).widthIn(max = 480.dp).presence(slide = 1f, fade = false)) {
+            val density = LocalDensity.current
+            CompositionLocalProvider(LocalDensity provides Density(density.density * minOf(1f, maxWidth / SheetWidth), density.fontScale)) {
+                SheetBody(form, onClose, onCamera = { camera = true }, onCreate = create@{
+                    if (creating) return@create
+                    creating = true
+                    settings.newProject = form.choice()
+                    val scene = form.scene()
+                    scope.launch {
+                        val id = try {
+                            withContext(Dispatchers.IO) { store.create(scene) }
+                        } catch (e: java.io.IOException) {
+                            Toast.makeText(context, context.getString(R.string.home_create_project_failed), Toast.LENGTH_LONG).show()
+                            creating = false
+                            return@launch
+                        }
+                        onClose()
+                        onOpen(id)
                     }
-                    onClose()
-                    onOpen(id)
-                }
-            })
+                })
+            }
         }
     }
     if (camera) {
