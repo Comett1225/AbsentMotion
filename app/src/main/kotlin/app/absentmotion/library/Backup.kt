@@ -37,9 +37,10 @@ object Backup {
             zip.closeEntry()
             val buffer = ByteArray(64 * 1024)
             for ((name, file) in files) {
+                val source = try { file.inputStream() } catch (e: java.io.FileNotFoundException) { continue }
                 zip.setLevel(if (name.startsWith("media/")) 0 else 6)
                 zip.putNextEntry(ZipEntry(name).apply { time = file.lastModified() })
-                file.inputStream().use { input ->
+                source.use { input ->
                     while (true) {
                         val n = input.read(buffer)
                         if (n < 0) break
