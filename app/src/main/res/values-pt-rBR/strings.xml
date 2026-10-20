@@ -80,6 +80,7 @@
     <string name="apply_to_children">Aplicar aos filhos</string>
     <string name="add_effect">Adicionar efeito</string>
     <string name="drag_here_to_move_the_layer">Arraste aqui para mover a camada</string>
+    <string name="drag_here_to_rotate_in_3d">Arraste aqui para girar em 3D</string>
     <string name="saved_to_storage">Salvo no armazenamento</string>
     <string name="keep_absentmotion_open_and_your_screen">Mantenha o AbsentMotion aberto e a tela ligada até a exportação terminar.</string>
     <string name="gif">GIF</string>
@@ -1294,6 +1295,7 @@
     <string name="model_param_light_intensity">Intensidade da luz</string>
     <string name="tilt_x_rotation">ROTAÇÃO X</string>
     <string name="tilt_y_rotation">ROTAÇÃO Y</string>
+    <string name="tilt_z_rotation">ROTAÇÃO Z</string>
     <string name="preview_full_blur">Desfoque\ncompleto</string>
     <string name="preview_fast_blur">Desfoque\nrápido</string>
     <string name="settings_preview_copies">Usar cópias de pré-visualização de vídeos grandes</string>

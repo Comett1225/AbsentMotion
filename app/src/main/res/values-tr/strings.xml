@@ -80,6 +80,7 @@
     <string name="apply_to_children">Alt katmanlara uygula</string>
     <string name="add_effect">Efekt ekle</string>
     <string name="drag_here_to_move_the_layer">Katmanı taşımak için buraya sürükleyin</string>
+    <string name="drag_here_to_rotate_in_3d">3D döndürmek için buraya sürükleyin</string>
     <string name="saved_to_storage">Depolamaya kaydedildi</string>
     <string name="keep_absentmotion_open_and_your_screen">Dışa aktarma tamamlanana kadar AbsentMotion\'ı açık tutun ve ekranınızı kapatmayın.</string>
     <string name="gif">GIF</string>
@@ -1294,6 +1295,7 @@
     <string name="model_param_light_intensity">Işık yoğunluğu</string>
     <string name="tilt_x_rotation">X DÖNÜŞÜ</string>
     <string name="tilt_y_rotation">Y DÖNÜŞÜ</string>
+    <string name="tilt_z_rotation">Z döndürme</string>
     <string name="preview_full_blur">Tam\nBulanık</string>
     <string name="preview_fast_blur">Hızlı\nBulanık</string>
     <string name="settings_preview_copies">Büyük videolar için önizleme kopyaları kullan</string>

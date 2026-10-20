@@ -80,6 +80,7 @@
     <string name="apply_to_children">تطبيق على العناصر التابعة</string>
     <string name="add_effect">إضافة تأثير</string>
     <string name="drag_here_to_move_the_layer">اسحب هنا لتحريك الطبقة</string>
+    <string name="drag_here_to_rotate_in_3d">اسحب هنا للتدوير في 3D</string>
     <string name="saved_to_storage">تم الحفظ في التخزين</string>
     <string name="keep_absentmotion_open_and_your_screen">أبقِ AbsentMotion مفتوحًا وأبقِ الشاشة قيد التشغيل حتى ينتهي التصدير.</string>
     <string name="gif">GIF</string>
@@ -1362,6 +1363,7 @@
     <string name="model_param_light_intensity">شدة الضوء</string>
     <string name="tilt_x_rotation">دوران X</string>
     <string name="tilt_y_rotation">دوران Y</string>
+    <string name="tilt_z_rotation">تدوير Z</string>
     <string name="preview_full_blur">ضبابية\nكاملة</string>
     <string name="preview_fast_blur">ضبابية\nسريعة</string>
     <string name="settings_preview_copies">استخدام نسخ معاينة للفيديوهات الكبيرة</string>

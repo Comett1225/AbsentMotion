@@ -80,6 +80,7 @@
     <string name="apply_to_children">ใช้กับองค์ประกอบลูก</string>
     <string name="add_effect">เพิ่มเอฟเฟกต์</string>
     <string name="drag_here_to_move_the_layer">ลากที่นี่เพื่อเลื่อนเลเยอร์</string>
+    <string name="drag_here_to_rotate_in_3d">ลากที่นี่เพื่อหมุนใน 3D</string>
     <string name="saved_to_storage">บันทึกไปยังที่จัดเก็บแล้ว</string>
     <string name="keep_absentmotion_open_and_your_screen">เปิด AbsentMotion ค้างไว้และเปิดหน้าจอไว้จนกว่าจะส่งออกเสร็จ</string>
     <string name="gif">GIF</string>
@@ -1277,6 +1278,7 @@
     <string name="model_param_light_intensity">ความเข้มแสง</string>
     <string name="tilt_x_rotation">หมุนแกน X</string>
     <string name="tilt_y_rotation">หมุนแกน Y</string>
+    <string name="tilt_z_rotation">การหมุนแกน Z</string>
     <string name="preview_full_blur">เบลอ\nเต็ม</string>
     <string name="preview_fast_blur">เบลอ\nเร็ว</string>
     <string name="settings_preview_copies">ใช้ไฟล์ตัวอย่างสำหรับวิดีโอขนาดใหญ่</string>

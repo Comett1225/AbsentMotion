@@ -80,6 +80,7 @@
     <string name="apply_to_children">Ilapat sa mga anak</string>
     <string name="add_effect">Magdagdag ng epekto</string>
     <string name="drag_here_to_move_the_layer">I-drag dito para ilipat ang layer</string>
+    <string name="drag_here_to_rotate_in_3d">I-drag dito para i-rotate sa 3D</string>
     <string name="saved_to_storage">Na-save sa storage</string>
     <string name="keep_absentmotion_open_and_your_screen">Panatilihing bukas ang AbsentMotion at naka-on ang screen hanggang matapos ang pag-export.</string>
     <string name="gif">GIF</string>
@@ -1294,6 +1295,7 @@
     <string name="model_param_light_intensity">Tindi ng ilaw</string>
     <string name="tilt_x_rotation">X rotation</string>
     <string name="tilt_y_rotation">Y rotation</string>
+    <string name="tilt_z_rotation">Z rotasyon</string>
     <string name="preview_full_blur">Buong\nBlur</string>
     <string name="preview_fast_blur">Mabilis\nBlur</string>
     <string name="settings_preview_copies">Gamitin ang preview copies ng malalaking bidyo</string>

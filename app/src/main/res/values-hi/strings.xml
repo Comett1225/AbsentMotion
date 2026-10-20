@@ -80,6 +80,7 @@
     <string name="apply_to_children">चाइल्ड पर लागू करें</string>
     <string name="add_effect">इफ़ेक्ट जोड़ें</string>
     <string name="drag_here_to_move_the_layer">लेयर को मूव करने के लिए यहाँ ड्रैग करें</string>
+    <string name="drag_here_to_rotate_in_3d">3D में घुमाने के लिए यहाँ खींचें</string>
     <string name="saved_to_storage">स्टोरेज में सेव हो गया</string>
     <string name="keep_absentmotion_open_and_your_screen">एक्सपोर्ट पूरा होने तक AbsentMotion खुला और स्क्रीन चालू रखें।</string>
     <string name="gif">GIF</string>
@@ -1294,6 +1295,7 @@
     <string name="model_param_light_intensity">लाइट इंटेंसिटी</string>
     <string name="tilt_x_rotation">X रोटेशन</string>
     <string name="tilt_y_rotation">Y रोटेशन</string>
+    <string name="tilt_z_rotation">Z रोटेशन</string>
     <string name="preview_full_blur">फ़ुल\nब्लर</string>
     <string name="preview_fast_blur">फ़ास्ट\nब्लर</string>
     <string name="settings_preview_copies">बड़े वीडियो के लिए प्रीव्यू कॉपी इस्तेमाल करें</string>

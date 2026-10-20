@@ -80,6 +80,7 @@
     <string name="apply_to_children">Terapkan ke anak</string>
     <string name="add_effect">Tambahkan efek</string>
     <string name="drag_here_to_move_the_layer">Seret ke sini untuk memindahkan lapisan</string>
+    <string name="drag_here_to_rotate_in_3d">Seret ke sini untuk memutar dalam 3D</string>
     <string name="saved_to_storage">Tersimpan ke penyimpanan</string>
     <string name="keep_absentmotion_open_and_your_screen">Biarkan AbsentMotion tetap terbuka dan layar tetap menyala hingga ekspor selesai.</string>
     <string name="gif">GIF</string>
@@ -1277,6 +1278,7 @@
     <string name="model_param_light_intensity">Intensitas cahaya</string>
     <string name="tilt_x_rotation">ROTASI X</string>
     <string name="tilt_y_rotation">ROTASI Y</string>
+    <string name="tilt_z_rotation">Rotasi Z</string>
     <string name="preview_full_blur">Blur\nPenuh</string>
     <string name="preview_fast_blur">Blur\nCepat</string>
     <string name="settings_preview_copies">Gunakan salinan pratinjau untuk video besar</string>

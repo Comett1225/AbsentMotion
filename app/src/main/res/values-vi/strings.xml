@@ -80,6 +80,7 @@
     <string name="apply_to_children">Áp dụng cho lớp con</string>
     <string name="add_effect">Thêm hiệu ứng</string>
     <string name="drag_here_to_move_the_layer">Kéo vào đây để di chuyển lớp</string>
+    <string name="drag_here_to_rotate_in_3d">Kéo để xoay trong không gian 3D</string>
     <string name="saved_to_storage">Đã lưu vào bộ nhớ</string>
     <string name="keep_absentmotion_open_and_your_screen">Giữ AbsentMotion mở và màn hình bật cho đến khi xuất xong.</string>
     <string name="gif">GIF</string>
@@ -1277,6 +1278,7 @@
     <string name="model_param_light_intensity">Cường độ sáng</string>
     <string name="tilt_x_rotation">XOAY X</string>
     <string name="tilt_y_rotation">XOAY Y</string>
+    <string name="tilt_z_rotation">XOAY TRỤC Z</string>
     <string name="preview_full_blur">Nhòe\nđầy đủ</string>
     <string name="preview_fast_blur">Nhòe\nnhanh</string>
     <string name="settings_preview_copies">Dùng bản xem trước cho video lớn</string>
