@@ -155,6 +155,7 @@ fun HomeScreen(
     onImportShown: () -> Unit = {},
     onImportFile: (Uri) -> Unit = {},
     onTemplate: (String) -> Unit = {},
+    onTemplateProject: (app.absentmotion.model.Scene) -> Unit = {},
     onHistory: (ProjectInfo) -> Unit = {},
     onCollect: (String) -> Unit = {},
     changes: Int = 0,
@@ -195,7 +196,7 @@ fun HomeScreen(
             Column(Modifier.fillMaxSize().statusBarsPadding()) {
                 if (wide) WideHeader(page, tab, { p, t -> page = p; tab = t }, onSettings = { scope.launch { drawer.open() } }, onNew = { creating = true })
                 else TopBar(onMenu = { scope.launch { drawer.open() } }, search, { search = it })
-                if (page == 1) TemplatesTab(store, version, onTemplate, onOpen, Modifier.weight(1f).then(if (wide) Modifier.widthIn(max = 760.dp).align(Alignment.CenterHorizontally) else Modifier), query) else ProjectsPane(
+                if (page == 1) TemplatesTab(version, onTemplate, onTemplateProject, Modifier.weight(1f).then(if (wide) Modifier.widthIn(max = 760.dp).align(Alignment.CenterHorizontally) else Modifier), query) else ProjectsPane(
                     Modifier.weight(1f), shown, tab, { tab = it }, settings, version, onOpen, onExport, query,
                     onUpload = { picker.launch(arrayOf("text/xml", "application/xml", "application/zip", "application/octet-stream")) },
                     onDuplicate = { id -> scope.launch {

@@ -1,7 +1,6 @@
 package app.absentmotion.ui.home
 
 import app.absentmotion.platform.BitmapFactory
-import app.absentmotion.platform.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -53,7 +52,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.absentmotion.library.PresetStore
-import app.absentmotion.library.ProjectStore
+import app.absentmotion.model.Scene
 import app.absentmotion.library.SavedPreset
 import app.absentmotion.library.SavedTemplate
 import app.absentmotion.library.TemplateStore
@@ -66,7 +65,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.io.IOException
 import java.util.Locale
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
@@ -75,7 +73,7 @@ private val Grey get() = Am.HomeDim
 private val FactText get() = Am.HomeFaint
 
 @Composable
-fun TemplatesTab(projects: ProjectStore, version: Int, onTemplate: (String) -> Unit, onProject: (String) -> Unit, modifier: Modifier = Modifier, query: String = "") {
+fun TemplatesTab(version: Int, onTemplate: (String) -> Unit, onProject: (Scene) -> Unit, modifier: Modifier = Modifier, query: String = "") {
     val context = LocalContext.current
     val templates = remember { TemplateStore(context) }
     val presets = remember { PresetStore(context) }
@@ -105,13 +103,7 @@ fun TemplatesTab(projects: ProjectStore, version: Int, onTemplate: (String) -> U
                     items(shownTemplates, key = { it.id }) { t ->
                         TemplateCard(
                             t, menu == t.id, { menu = if (it) t.id else null }, { onTemplate(t.id) },
-                            onProject = {
-                                menu = null
-                                scope.launch {
-                                    try { onProject(withContext(Dispatchers.IO) { templates.createProject(t.scene, projects) }) }
-                                    catch (e: IOException) { Toast.makeText(context, context.getString(R.string.home_create_project_failed), Toast.LENGTH_LONG).show() }
-                                }
-                            },
+                            onProject = { menu = null; onProject(t.scene) },
                             onRename = { menu = null; renaming = t.id to t.title },
                             onDelete = { menu = null; confirm = R.string.template_delete_template to { scope.launch { withContext(Dispatchers.IO) { templates.delete(t.id) }; rev++ } } },
                         )
