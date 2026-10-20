@@ -29,6 +29,8 @@ import app.absentmotion.effects.EffectDefinition
 import org.json.JSONArray
 import org.json.JSONObject
 import app.absentmotion.media.MediaLibrary
+import app.absentmotion.media.Mesh
+import app.absentmotion.model.modelUris
 import app.absentmotion.fonts.FontLibrary
 import app.absentmotion.fonts.prepareText
 import app.absentmotion.model.fontNames
@@ -195,7 +197,7 @@ class EngineThread(private val background: Int, context: Context? = null) {
             mediaScene = next
             audio?.setScene(next)
             videos?.update(next, requestedView?.timeMs ?: 0, playing)
-            if (previous?.node?.imageUris() != next.node.imageUris() || previous.media != next.media) {
+            if (previous?.node?.imageUris() != next.node.imageUris() || previous.node.modelUris() != next.node.modelUris() || previous.media != next.media) {
                 mediaJob?.cancel()
                 mediaJob = mediaScope.launch { media.update(next) }
             }
@@ -253,6 +255,13 @@ class EngineThread(private val background: Int, context: Context? = null) {
     suspend fun setPicture(uri: String, bitmap: Bitmap?, layerId: Long = 0): Boolean = withContext(dispatcher) {
         if (closed) return@withContext false
         engine().setPicture(uri, bitmap, layerId).also { pictureRevision.value++; renderNow() }
+    }
+
+    suspend fun setModel(uri: String, mesh: Mesh?, textures: List<Bitmap?>): Boolean = withContext(dispatcher) {
+        if (closed) return@withContext false
+        val engine = engine()
+        textures.forEachIndexed { k, bitmap -> engine.setPicture("$uri#$k", bitmap) }
+        engine.setModel(uri, mesh).also { pictureRevision.value++; renderNow() }
     }
 
     suspend fun setPicture(uri: String, buffer: HardwareBuffer, layerId: Long = 0, opaque: Boolean = true): Boolean = withContext(dispatcher) {

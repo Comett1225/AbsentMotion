@@ -239,7 +239,8 @@ void ParseGroup(const XmlNode& scene, int fps, Layer* group) {
 
 bool ParseLayer(const XmlNode& node, int fps, Layer* out) {
     const XmlNode* n = &node;
-    if (n->name != "shape" && n->name != "text" && n->name != "embedScene" && n->name != "nullobj" && n->name != "drawing" && n->name != "camera") return false;
+    if (n->name != "shape" && n->name != "text" && n->name != "embedScene" && n->name != "nullobj" && n->name != "drawing" && n->name != "camera" &&
+        n->name != "model") return false;
     Layer& l = *out;
     l.kind = n->name;
     if (l.kind == "text") l.text = ParseText(*n);
@@ -256,6 +257,7 @@ bool ParseLayer(const XmlNode& node, int fps, Layer* out) {
     l.fillType = StrAttr(*n, "fillType");
     l.mediaUri = StrAttr(*n, "fillImage");
     if (l.mediaUri.empty()) l.mediaUri = StrAttr(*n, "fillVideo");
+    if (l.kind == "model") l.mediaUri = StrAttr(*n, "src");
     l.mediaFillMode = StrAttr(*n, "mediaFillMode");
     l.startTime = IntAttr(*n, "startTime", 0);
     l.endTime = IntAttr(*n, "endTime", 0);

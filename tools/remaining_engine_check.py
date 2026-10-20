@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 from pathlib import Path
+import json
+import struct
 import sys
 import numpy as np
 import engine_check as engine
@@ -47,6 +49,36 @@ def cases():
     yield 'a child turns in 3D with its parent', engine.scene(parent + engine.rect(2, -40, 0, 20, 20, 0xffff0000, attrs=' parent="5"')), [((50, 100), engine.BLACK), ((75, 100), engine.RED), ((85, 100), engine.RED), ((95, 100), engine.BLACK)]
     title = "a missing picture draws nothing"
     yield 'placeholder opacity', *engine.CASES[title]
+
+
+def models():
+    box = ('mtllib box.mtl\n' + ''.join(f'v {x} {y} {z}\n' for x, y, z in [(-1, -1, -1), (1, -1, -1), (1, 1, -1), (-1, 1, -1), (-1, -1, 1), (1, -1, 1), (1, 1, 1), (-1, 1, 1)])
+           + 'usemtl red\nf 5 6 7 8\nf 2 1 4 3\nf 4 8 7 3\nf 1 2 6 5\nf 2 3 7 6\nf 1 5 8 4\n')
+    positions = struct.pack('<12f', -1, -1, 0, 1, -1, 0, 1, 1, 0, -1, 1, 0)
+    indices = struct.pack('<6H', 0, 1, 2, 0, 2, 3)
+    blob = positions + indices
+    doc = json.dumps({'asset': {'version': '2.0'}, 'scenes': [{'nodes': [0]}], 'nodes': [{'mesh': 0}],
+                      'meshes': [{'primitives': [{'attributes': {'POSITION': 0}, 'indices': 1, 'material': 0}]}],
+                      'materials': [{'pbrMetallicRoughness': {'baseColorFactor': [0, 1, 0, 1]}}], 'buffers': [{'byteLength': len(blob)}],
+                      'bufferViews': [{'buffer': 0, 'byteOffset': 0, 'byteLength': 48}, {'buffer': 0, 'byteOffset': 48, 'byteLength': 12}],
+                      'accessors': [{'bufferView': 0, 'componentType': 5126, 'count': 4, 'type': 'VEC3'},
+                                    {'bufferView': 1, 'componentType': 5123, 'count': 6, 'type': 'SCALAR'}]}).encode()
+    doc += b' ' * (-len(doc) % 4)
+    glb = struct.pack('<5I', 0x46546C67, 2, 28 + len(doc) + len(blob), len(doc), 0x4E4F534A) + doc + struct.pack('<2I', len(blob), 0x004E4942) + blob
+    return {'box.obj': box.encode(), 'box.mtl': b'newmtl red\nKd 1 0 0\n', 'card.glb': glb}
+
+
+def model(id, name, z=0, extra=''):
+    return (f'<model id="{id}" label="m" startTime="0" endTime="1000" src="file://{engine.DEVICE_DIR}/{name}"><transform><location value="100,100,{z}"/>{extra}</transform>'
+            '<property name="size" type="float" value="60"/><property name="ambient" type="float" value="1"/><property name="intensity" type="float" value="0"/></model>')
+
+
+def model_cases():
+    yield 'an OBJ model draws in its material colour', engine.scene(model(1, 'box.obj')), [((100, 100), engine.RED), ((10, 10), engine.BLACK), ((100, 185), engine.BLACK)]
+    yield 'a glTF model draws in its base colour', engine.scene(model(1, 'card.glb')), [((100, 100), engine.GREEN), ((10, 10), engine.BLACK)]
+    yield 'a glTF card turned away is culled', engine.scene(model(1, 'card.glb', extra='<tilt value="0,180"/>')), [((100, 100), engine.BLACK)]
+    yield 'a layer in front of a model covers it', engine.scene(model(1, 'box.obj') + engine.rect(2, 100, 100, 10, 10, 0xff0000ff).replace('100,100,0', '100,100,-100')), [((100, 100), engine.BLUE), ((100, 70), engine.RED)]
+    yield 'a layer behind a model is covered', engine.scene(engine.rect(2, 100, 100, 10, 10, 0xff0000ff).replace('100,100,0', '100,100,200') + model(1, 'box.obj')), [((100, 100), engine.RED)]
 
 
 def tilted(id, y, x, extra=''):
@@ -188,6 +220,22 @@ def main():
     ok = got == ['7', '0', '7', '0']
     print(('ok   ' if ok else 'FAIL ') + 'tapping follows a layer turned in 3D: ' + str(got), flush=True)
     failed += not ok
+    for name, data in models().items():
+        (work / name).write_bytes(data)
+        engine.adb('push', work / name, engine.DEVICE_DIR + '/' + name)
+    for k, (name, xml, probes) in enumerate(model_cases()):
+        image = engine.still('model' + str(k), xml, work)
+        bad = [(xy, tuple(image[xy[1], xy[0]]), want) for xy, want in probes if np.abs(image[xy[1], xy[0]] - want).max() > engine.TOLERANCE]
+        print(('FAIL ' if bad else 'ok   ') + name + (': ' + str(bad) if bad else ''), flush=True)
+        failed += bool(bad)
+    hits = engine.run('modelhit', engine.scene(model(4, 'box.obj')), work, [(100, 100), (10, 10)])
+    engine.adb('shell', 'rm', engine.DEVICE_DIR + '/modelhit.png')
+    got = [line.split()[-1] for line in hits.splitlines() if ' hit ' in line]
+    ok = got == ['4', '0']
+    print(('ok   ' if ok else 'FAIL ') + 'tapping finds a 3D model: ' + str(got), flush=True)
+    failed += not ok
+    for name in models():
+        engine.adb('shell', 'rm', engine.DEVICE_DIR + '/' + name)
     lf = engine.still('remaininglf', text('A&#10;B'), work)
     crlf = engine.still('remainingcrlf', text('A&#13;&#10;B'), work)
     if lf.max() < 100:

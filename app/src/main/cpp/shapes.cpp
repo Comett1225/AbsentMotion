@@ -199,6 +199,10 @@ SkPath ShapePath(const Layer& layer, float t) {
     if (layer.text) return TextPath(layer, t);
     if (layer.kind == "embedScene") return SkPath::Rect(SkRect::MakeXYWH(-layer.innerWidth / 2.0f, -layer.innerHeight / 2.0f, (float)layer.innerWidth, (float)layer.innerHeight));
     if (layer.kind == "drawing") return DrawingBounds(layer);
+    if (layer.kind == "model") {
+        const float r = fabsf(layer.value("size", 0, t, 200));
+        return SkPath::Rect(SkRect::MakeLTRB(-r, -r, r, r));
+    }
     if (layer.shape.empty()) return OutlineAt(layer, t);
     const Params p{layer, t};
     const std::string& s = layer.shape;

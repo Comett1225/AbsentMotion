@@ -30,7 +30,7 @@ add_library(motion_tracker OBJECT tracker/tracker.cpp tracker_jni.cpp)
 set_target_properties(motion_tracker PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_compile_options(motion_tracker PRIVATE -O3 -fvisibility=hidden)
 
-add_library(amengine SHARED preview.cpp camera.cpp drawing.cpp effects.cpp easing.cpp engine.cpp interpolation.cpp jni.cpp motion.cpp scene.cpp shapes.cpp styles.cpp text.cpp xml.cpp denoise_jni.cpp audio_dsp.cpp audio_fx_jni.cpp)
+add_library(amengine SHARED preview.cpp camera.cpp drawing.cpp effects.cpp easing.cpp engine.cpp interpolation.cpp jni.cpp model.cpp motion.cpp scene.cpp shapes.cpp styles.cpp text.cpp xml.cpp denoise_jni.cpp audio_dsp.cpp audio_fx_jni.cpp)
 target_include_directories(amengine PRIVATE ${SKIA_DIR} ${SKIA_DIR}/third_party/externals/expat/expat/lib)
 target_compile_definitions(amengine PRIVATE
     NDEBUG SK_GANESH SK_GRAPHITE SK_VULKAN SK_GL SK_ENABLE_PRECOMPILE SK_DISABLE_TRACING

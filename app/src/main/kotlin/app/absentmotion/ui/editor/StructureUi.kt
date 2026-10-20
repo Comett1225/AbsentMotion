@@ -44,6 +44,7 @@ import app.absentmotion.editor.MultiSelect
 import app.absentmotion.editor.StylePart
 import app.absentmotion.editor.addCamera
 import app.absentmotion.editor.addEmptyGroup
+import app.absentmotion.editor.addModel
 import app.absentmotion.editor.addNull
 import app.absentmotion.editor.alignSelection
 import app.absentmotion.editor.distributeSelection
@@ -52,7 +53,6 @@ import app.absentmotion.editor.pasteStyle
 import app.absentmotion.editor.setParent
 import app.absentmotion.editor.unparentChildrenOf
 import app.absentmotion.ui.theme.Am
-import kotlinx.coroutines.launch
 import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
@@ -62,8 +62,15 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.ui.platform.LocalContext
 import app.absentmotion.editor.addSvg
+import app.absentmotion.library.ProjectStore
+import app.absentmotion.media.MAX_MODEL_BYTES
+import app.absentmotion.media.MODEL_TRIANGLE_BUDGET
+import app.absentmotion.media.modelFiles
+import app.absentmotion.media.parseModel
 import app.absentmotion.model.importSvg
+import java.io.File
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 private val ItemShape = RoundedCornerShape(4.dp)
@@ -79,13 +86,21 @@ private fun TextButton(label: String, modifier: Modifier, enabled: Boolean = tru
 @Composable
 internal fun ObjectPage(state: EditorState, modifier: Modifier) {
     var picking by remember { mutableStateOf(false) }
+    var reading by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val models = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
+        if (uris.isNotEmpty()) scope.launch {
+            reading = true
+            val note = try { importModel(context, state, uris) } finally { reading = false }
+            note?.let { Toast.makeText(context, it, Toast.LENGTH_LONG).show() }
+        }
+    }
+    val svg = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> if (uri != null) scope.launch { state.importSvgFile(context, uri) } }
     if (picking) {
         ElementPicker(state, modifier)
         return
     }
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-    val svg = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> if (uri != null) scope.launch { state.importSvgFile(context, uri) } }
     Column(modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             TextButton("Camera", Modifier.size(70.dp, 80.dp)) { state.addCamera() }
@@ -93,7 +108,10 @@ internal fun ObjectPage(state: EditorState, modifier: Modifier) {
             TextButton("Empty Group", Modifier.size(70.dp, 80.dp)) { state.addEmptyGroup() }
             TextButton("Asset / Project", Modifier.size(70.dp, 80.dp)) { picking = true }
         }
-        TextButton("Import SVG", Modifier.size(70.dp, 80.dp)) { svg.launch(arrayOf("image/svg+xml")) }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            TextButton("Import SVG", Modifier.size(70.dp, 80.dp)) { svg.launch(arrayOf("image/svg+xml")) }
+            TextButton("3D Model", Modifier.size(70.dp, 80.dp), enabled = !reading) { models.launch(arrayOf("*/*")) }
+        }
     }
 }
 
@@ -128,6 +146,47 @@ private suspend fun EditorState.importSvgFile(context: Context, uri: Uri) {
     addSvg(layer)
     if (result.skipped.isNotEmpty()) say("Imported ${result.shapes} shapes. Left out: ${result.skipped.joinToString(", ")}.")
 }
+
+private suspend fun importModel(context: Context, state: EditorState, picked: List<Uri>): String? =
+    withContext(Dispatchers.IO) {
+        val resolver = context.contentResolver
+        val names = picked.map { uri ->
+            (resolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { c -> if (c.moveToFirst()) c.getString(0) else null }
+                ?: uri.lastPathSegment ?: "model").substringAfterLast('/').replace(Regex("[^A-Za-z0-9._ -]"), "_").trimStart('.').ifEmpty { "model" }
+        }
+        val main = names.indexOfFirst { it.substringAfterLast('.').lowercase() in setOf("obj", "glb", "gltf") }
+        if (main < 0) return@withContext "Choose an .obj, .glb or .gltf file, with its .mtl, .bin and pictures if it has them"
+        val folder = File(ProjectStore(context).mediaDir(state.projectId), "model-${System.currentTimeMillis()}")
+        try {
+            folder.mkdirs()
+            var total = 0L
+            val buffer = ByteArray(1 shl 16)
+            picked.forEachIndexed { i, uri ->
+                resolver.openInputStream(uri)?.use { input ->
+                    File(folder, names[i]).outputStream().use { out ->
+                        while (true) {
+                            val n = input.read(buffer)
+                            if (n < 0) break
+                            total += n
+                            require(total <= MAX_MODEL_BYTES) { "the files are too large" }
+                            out.write(buffer, 0, n)
+                        }
+                    }
+                }
+            }
+            val uri = File(folder, names[main]).toURI().toString()
+            val (bytes, open) = modelFiles(resolver, uri)
+            val count = parseModel(names[main], bytes, open).triangleCount
+            withContext(Dispatchers.Main) { state.addModel(uri, names[main]) }
+            if (count > MODEL_TRIANGLE_BUDGET) "This model has $count triangles, so it is shown simplified to at most $MODEL_TRIANGLE_BUDGET" else null
+        } catch (e: Exception) {
+            folder.deleteRecursively()
+            "This model could not be read: ${e.message}"
+        } catch (_: OutOfMemoryError) {
+            folder.deleteRecursively()
+            "This model is too large to open"
+        }
+    }
 
 @Composable
 internal fun MultiBar(state: EditorState, modifier: Modifier) {

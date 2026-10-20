@@ -69,6 +69,7 @@ import app.absentmotion.ui.editor.panels.OpacityRef
 import app.absentmotion.ui.editor.panels.borderShadowTarget
 import app.absentmotion.ui.editor.panels.ColorFillPanel
 import app.absentmotion.ui.editor.panels.EditShapePanel
+import app.absentmotion.ui.editor.panels.ModelPanel
 import app.absentmotion.ui.editor.panels.MoveTransformPanel
 import app.absentmotion.ui.editor.panels.PanelDark
 import app.absentmotion.ui.editor.panels.PanelGreen
@@ -135,6 +136,19 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier) {
             ToolButton(Presets, Modifier.fillMaxWidth().height(160.px)) { openPresets(state) }
             return@Column
         }
+        if (state.selected?.kind == "model") {
+            Row(Modifier.fillMaxWidth().height(160.px), Arrangement.spacedBy(17.px)) {
+                ToolButton(ModelOptions, Modifier.weight(1f)) { state.panel = EditorPanel.Model }
+                ToolButton(Blending, Modifier.weight(1f)) { state.panel = EditorPanel.Blending }
+            }
+            Spacer(Modifier.height(17.px))
+            Row(Modifier.fillMaxWidth().height(160.px), Arrangement.spacedBy(17.px)) {
+                ToolButton(MoveTransform, Modifier.weight(1f)) { state.panel = EditorPanel.MoveTransform }
+                ToolButton(Presets, Modifier.weight(1f)) { openPresets(state) }
+                ToolButton(Effects, Modifier.weight(1f)) { state.effectIndex = -1; state.panel = EditorPanel.Effects }
+            }
+            return@Column
+        }
         Row(Modifier.fillMaxWidth().height(160.px), Arrangement.spacedBy(17.px)) {
             ToolButton(ColorFill, Modifier.weight(1f)) { state.panel = EditorPanel.ColorFill }
             ToolButton(BorderShadow, Modifier.weight(1f)) { state.panel = EditorPanel.BorderShadow }
@@ -177,6 +191,7 @@ private val ElementPropsButton = Tool("Asset Properties", PanelIcons.EditShape, 
 private val EditPoints = Tool("Edit Points", PanelIcons.EditShape, 10.8f, 16f, 42.5f)
 private val EditDrawing = Tool("Edit Drawing", PanelIcons.EditShape, 10.8f, 16f, 42.5f)
 private val CameraOptions = Tool("Camera Options", PanelIcons.Camera, 8.9f, 19.4f, 42.5f)
+private val ModelOptions = Tool("Model Options", PanelIcons.TabTilt, 8.9f, 19.4f, 42.5f)
 private val Presets = Tool("Presets", PanelIcons.Star, 8.9f, 19.4f, 42.1f)
 private val Effects = Tool("Effects", PanelIcons.Effects, 8.9f, 19.6f, 44.4f)
 
@@ -219,7 +234,7 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
     var tab by remember(selected.kind) { mutableIntStateOf(0) }
     var menuOpen by remember { mutableStateOf(false) }
     var askDeleteSpeed by remember { mutableStateOf(false) }
-    val named = panel != EditorPanel.EditShape && panel != EditorPanel.Camera
+    val named = panel != EditorPanel.EditShape && panel != EditorPanel.Camera && panel != EditorPanel.Model
     val known = if (!named) null else when {
         move -> TransformTargets[tab]
         panel == EditorPanel.Speed -> KeyTarget(SpeedRef, layer.node["speed"] ?: "1")
@@ -269,6 +284,7 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
                 EditorPanel.BorderShadow -> BorderShadowPanel(state, layer, Modifier.fillMaxSize())
                 EditorPanel.Blending -> BlendingPanel(state, layer, Modifier.fillMaxSize())
                 EditorPanel.Camera -> CameraPanel(state, layer, Modifier.fillMaxSize())
+                EditorPanel.Model -> ModelPanel(state, layer, Modifier.fillMaxSize())
                 EditorPanel.Tools, EditorPanel.EditText, EditorPanel.Effects -> {}
             }
             Box(Modifier.width(2.px).fillMaxHeight().background(PanelDark))

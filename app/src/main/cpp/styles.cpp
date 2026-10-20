@@ -512,6 +512,7 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
     SkPath stroked;
     const SkPath scenePath = path.makeTransform(m);
     auto picture = [&](SkCanvas* canvas) {
+        if (l.kind == "model") return DrawModel(canvas, l, timeMs, alpha, pictures);
         canvas->save();
         canvas->concat(m);
         if (l.kind == "embedScene") {
@@ -633,7 +634,7 @@ void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& 
     decorated = decorated || shadow || EffectsApply(siblings, l);
     const bool blended = ov.blend || !IsNormal(l.blending);
     const bool centred = ShapeKind(l) && std::any_of(l.borders.begin(), l.borders.end(), [](const Edge& e) { return e.enabled && e.direction == "centered"; });
-    const bool overlaps = l.kind == "drawing" || (l.stroke.present && l.stroke.enabled) || centred;
+    const bool overlaps = l.kind == "drawing" || l.kind == "model" || (l.stroke.present && l.stroke.enabled) || centred;
     auto centredBorders = [&](float alpha) {
         if (!centred) return;
         const SkPath scenePath = ShapePath(l, t).makeTransform(SiblingMatrix(siblings, l, timeMs));

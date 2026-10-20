@@ -1,0 +1,181 @@
+package app.absentmotion.media
+
+import app.absentmotion.model.Scene
+import app.absentmotion.model.imageUris
+import app.absentmotion.model.mediaUris
+import app.absentmotion.model.modelUris
+import org.junit.Assert.assertArrayEquals
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Test
+import java.io.ByteArrayOutputStream
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
+import java.util.Base64
+import kotlin.math.sqrt
+
+class ModelReaderTest {
+    private val cube = """
+        mtllib box.mtl
+        v -1 -1 -1
+        v 1 -1 -1
+        v 1 1 -1
+        v -1 1 -1
+        v -1 -1 1
+        v 1 -1 1
+        v 1 1 1
+        v -1 1 1
+        vt 0 0
+        vt 1 0
+        vt 1 1
+        vt 0 1
+        usemtl painted
+        f 5/1 6/2 7/3 8/4
+        f 2/1 1/2 4/3 3/4
+        usemtl plain
+        f 4 8 7 3
+        f -8 -7 -3 -4
+        f 2 3 7 6
+        f 1 5 8 4
+    """.trimIndent()
+    private val materials = """
+        newmtl painted
+        Kd 1 0 0
+        map_Kd -s 1 1 1 paint.png
+        newmtl plain
+        Kd 0 0 1
+        d 0.5
+    """.trimIndent()
+    private val png = byteArrayOf(1, 2, 3)
+
+    private fun files(name: String) = when (name) { "box.mtl" -> materials.toByteArray(); "paint.png" -> png; else -> null }
+
+    private fun normal(mesh: Mesh, triangle: Int): FloatArray {
+        val p = mesh.positions
+        val (a, b, c) = (0..2).map { mesh.triangles[triangle * 3 + it] * 3 }
+        val u = FloatArray(3) { p[b + it] - p[a + it] }
+        val v = FloatArray(3) { p[c + it] - p[a + it] }
+        val n = floatArrayOf(u[1] * v[2] - u[2] * v[1], u[2] * v[0] - u[0] * v[2], u[0] * v[1] - u[1] * v[0])
+        val l = sqrt(n[0] * n[0] + n[1] * n[1] + n[2] * n[2])
+        return FloatArray(3) { n[it] / l }
+    }
+
+    private fun centre(mesh: Mesh, triangle: Int) = FloatArray(3) { i -> (0..2).sumOf { mesh.positions[mesh.triangles[triangle * 3 + it] * 3 + i].toDouble() }.toFloat() / 3 }
+
+    @Test fun anObjCubeReadsItsFacesMaterialsAndTexture() {
+        val mesh = readModel("box.obj", cube.toByteArray(), ::files)
+        assertEquals(12, mesh.triangleCount)
+        assertEquals(1, mesh.textures.size)
+        assertArrayEquals(png, mesh.textures[0])
+        assertEquals(listOf(0, 0, 0, 0) + List(8) { -1 }, mesh.slots.toList())
+        val colours = mesh.triangles.map { mesh.colors[it] }.toSet()
+        assertEquals(setOf(0xffff0000.toInt(), 0x800000ff.toInt()), colours)
+        val radius = (0 until mesh.vertexCount).maxOf { v -> sqrt((0..2).sumOf { (mesh.positions[v * 3 + it] * mesh.positions[v * 3 + it]).toDouble() }) }
+        assertEquals(1.0, radius, 1e-5)
+        for (t in 0 until mesh.triangleCount) {
+            val n = normal(mesh, t)
+            val c = centre(mesh, t)
+            assertTrue("triangle $t faces outwards", n[0] * c[0] + n[1] * c[1] + n[2] * c[2] > 0)
+        }
+    }
+
+    @Test fun objUpIsDrawnUpAndTexturesStartAtTheTop() {
+        val mesh = readModel("box.obj", cube.toByteArray(), ::files)
+        val top = (0 until mesh.triangleCount).first { mesh.slots[it] == -1 && normal(mesh, it)[1] < -0.9f }
+        val v = mesh.triangles[top * 3]
+        assertTrue(mesh.positions[v * 3 + 1] < 0)
+        val front = (0 until mesh.vertexCount).first { mesh.uvs[it * 2] == 0f && mesh.uvs[it * 2 + 1] == 1f && mesh.colors[it] == 0xffff0000.toInt() }
+        assertTrue("the bottom of the picture is at the bottom of the model", mesh.positions[front * 3 + 1] > 0)
+    }
+
+    @Test fun missingNormalsAreWorkedOutAndPointOutwards() {
+        val mesh = readModel("box.obj", cube.toByteArray(), ::files)
+        for (v in 0 until mesh.vertexCount) {
+            val n = FloatArray(3) { mesh.normals[v * 3 + it] }
+            assertEquals(1f, sqrt(n[0] * n[0] + n[1] * n[1] + n[2] * n[2]), 1e-4f)
+            assertTrue(n[0] * mesh.positions[v * 3] + n[1] * mesh.positions[v * 3 + 1] + n[2] * mesh.positions[v * 3 + 2] > 0)
+        }
+    }
+
+    private fun floats(vararg v: Float) = ByteBuffer.allocate(v.size * 4).order(ByteOrder.LITTLE_ENDIAN).apply { v.forEach { putFloat(it) } }.array()
+    private fun shorts(vararg v: Int) = ByteBuffer.allocate(v.size * 2).order(ByteOrder.LITTLE_ENDIAN).apply { v.forEach { putShort(it.toShort()) } }.array()
+
+    private val triangle = floats(0f, 0f, 0f, 1f, 0f, 0f, 0f, 1f, 0f) + floats(0f, 0f, 1f, 0f, 0f, 1f) + shorts(0, 1, 2, 0)
+
+    private fun gltf(buffer: String, node: String = """{"mesh":0,"translation":[5,0,0],"scale":[2,2,2]}""", texture: Boolean = false) = """
+        {"asset":{"version":"2.0"},"scene":0,"scenes":[{"nodes":[0]}],"nodes":[$node],
+         "meshes":[{"primitives":[{"attributes":{"POSITION":0,"TEXCOORD_0":1},"indices":2,"material":0}]}],
+         "materials":[{"doubleSided":true,"pbrMetallicRoughness":{"baseColorFactor":[0,1,0,1]${if (texture) ""","baseColorTexture":{"index":0}""" else ""}}}],
+         ${if (texture) """"textures":[{"source":0}],"images":[{"bufferView":3,"mimeType":"image/png"}],""" else ""}
+         "buffers":[$buffer],
+         "bufferViews":[{"buffer":0,"byteOffset":0,"byteLength":36},{"buffer":0,"byteOffset":36,"byteLength":24},{"buffer":0,"byteOffset":60,"byteLength":6}${if (texture) """,{"buffer":0,"byteOffset":68,"byteLength":3}""" else ""}],
+         "accessors":[{"bufferView":0,"componentType":5126,"count":3,"type":"VEC3"},{"bufferView":1,"componentType":5126,"count":3,"type":"VEC2"},
+                      {"bufferView":2,"componentType":5123,"count":3,"type":"SCALAR"}]}
+    """.trimIndent()
+
+    @Test fun aGltfWithAnEmbeddedBufferReadsGeometryMaterialAndUvs() {
+        val uri = "data:application/octet-stream;base64," + Base64.getEncoder().encodeToString(triangle)
+        val mesh = readModel("tri.gltf", gltf("""{"byteLength":${triangle.size},"uri":"$uri"}""").toByteArray()) { null }
+        assertEquals(1, mesh.triangleCount)
+        assertTrue(mesh.twoSided)
+        assertEquals(setOf(0xff00ff00.toInt()), mesh.colors.toSet())
+        assertArrayEquals(floatArrayOf(0f, 0f, 1f, 0f, 0f, 1f), mesh.uvs, 0f)
+        val n = normal(mesh, 0)
+        assertArrayEquals(floatArrayOf(0f, 0f, -1f), n, 1e-5f)
+    }
+
+    @Test fun aGltfCanReadItsBufferFromAFileNextToIt() {
+        val mesh = readModel("tri.gltf", gltf("""{"byteLength":${triangle.size},"uri":"tri%20data.bin"}""").toByteArray()) { if (it == "tri data.bin") triangle else null }
+        assertEquals(1, mesh.triangleCount)
+    }
+
+    @Test(expected = IllegalArgumentException::class) fun aGltfWhoseBufferFileIsMissingIsRefused() {
+        readModel("tri.gltf", gltf("""{"byteLength":${triangle.size},"uri":"gone.bin"}""").toByteArray()) { null }
+    }
+
+    @Test fun aMirroredNodeKeepsItsTrianglesFacingOut() {
+        val uri = "data:application/octet-stream;base64," + Base64.getEncoder().encodeToString(triangle)
+        val mesh = readModel("tri.gltf", gltf("""{"byteLength":${triangle.size},"uri":"$uri"}""", """{"mesh":0,"scale":[-1,1,1]}""").toByteArray()) { null }
+        assertArrayEquals(floatArrayOf(0f, 0f, -1f), normal(mesh, 0), 1e-5f)
+    }
+
+    @Test fun aGlbReadsItsBinaryChunkAndEmbeddedPicture() {
+        val bin = triangle + byteArrayOf(9, 8, 7, 0)
+        val json = gltf("""{"byteLength":${bin.size}}""", texture = true).toByteArray().let { it + ByteArray((4 - it.size % 4) % 4) { 32 } }
+        val out = ByteArrayOutputStream()
+        fun int(v: Int) = out.write(ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(v).array())
+        int(0x46546C67); int(2); int(12 + 8 + json.size + 8 + bin.size)
+        int(json.size); int(0x4E4F534A); out.write(json)
+        int(bin.size); int(0x004E4942); out.write(bin)
+        val mesh = readModel("tri.glb", out.toByteArray()) { null }
+        assertEquals(1, mesh.triangleCount)
+        assertEquals(listOf(0), mesh.slots.toList())
+        assertArrayEquals(byteArrayOf(9, 8, 7), mesh.textures.single())
+    }
+
+    @Test fun aModelLayerIsALayerThatUsesItsFile() {
+        val scene = Scene.parse("""<scene width="10" height="10"><model id="1" src="file:/m/a.glb"/><shape id="2" fillImage="file:/p.png"/></scene>""")
+        assertEquals(listOf("model", "shape"), scene.layers.map { it.kind })
+        assertEquals(setOf("file:/m/a.glb"), scene.node.modelUris())
+        assertTrue("file:/m/a.glb" in scene.node.mediaUris())
+        assertTrue("file:/m/a.glb" !in scene.node.imageUris())
+    }
+
+    @Test fun aDenseModelIsReducedToTheBudget() {
+        val rows = 120
+        val text = StringBuilder()
+        for (i in 0..rows) for (j in 0..rows) text.append("v ${i / rows.toFloat()} ${j / rows.toFloat()} ${((i * 7 + j * 3) % 5) / 50f}\n")
+        for (i in 0 until rows) for (j in 0 until rows) {
+            val a = i * (rows + 1) + j + 1
+            text.append("f $a ${a + rows + 1} ${a + rows + 2} ${a + 1}\n")
+        }
+        val full = ObjReader.read(text.toString()) { null }
+        assertEquals(2 * rows * rows, full.triangleCount)
+        val small = decimated(full, 2000)
+        assertTrue(small.triangleCount in 1..2000)
+        assertTrue(small.triangles.all { it in 0 until small.vertexCount })
+        assertEquals(small.triangleCount, small.slots.size)
+        val big = readModel("dense.obj", text.toString().toByteArray()) { null }
+        assertTrue(big.triangleCount <= MODEL_TRIANGLE_BUDGET)
+    }
+}

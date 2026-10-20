@@ -136,7 +136,7 @@ struct Layer {
     Anim steps;
     bool placed = false;
     bool projected = false;
-    SkM44 space;
+    SkM44 space, turn;
 
     float value(const char* name, int i, float t, float fallback) const;
 
@@ -211,6 +211,15 @@ SkMatrix LayerMatrix(const Layer& layer, float t);
 
 void DrawMedia(SkCanvas* canvas, const Layer& layer, const SkPath& path, float opacity,
                const MediaPictures& pictures);
+
+struct Model {
+    std::vector<float> positions, normals, uvs;
+    std::vector<uint32_t> colors;
+    std::vector<int> triangles, slots;
+    bool twoSided = false;
+};
+void SetModel(const std::string& uri, std::shared_ptr<const Model> model);
+void DrawModel(SkCanvas* canvas, const Layer& layer, double timeMs, float alpha, const MediaPictures& pictures);
 struct LayerEffects {
     std::function<bool(const Layer&)> active;
     std::function<bool(const Layer&)> lifted;

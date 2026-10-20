@@ -84,7 +84,7 @@ SkM44 Space(const View& v, const Placement& p) {
     return lens * eye * world;
 }
 
-bool Solid(const Layer&, const Placement& p) { return p.tilt != SkM44(); }
+bool Solid(const Layer& l, const Placement& p) { return p.tilt != SkM44() || l.kind == "model"; }
 
 Anim Moving(float tBefore, float tNow, std::vector<float> before, std::vector<float> now) {
     Anim a;
@@ -187,6 +187,7 @@ bool SeeLayers(const std::vector<Layer>& layers, int width, int height, bool top
             if (Solid(l, p)) {
                 copy.projected = true;
                 copy.space = Space(now, p);
+                copy.turn = SkM44::Rotate({0, 0, 1}, (p.rotation - now.rotation) * 3.14159265f / 180) * p.tilt;
                 copy.scale = Anim{{p.scale.fX, p.scale.fY}};
             } else {
                 copy.location = Moving(tBefore, tNow, {b.location.fX, b.location.fY, 0}, {s.location.fX, s.location.fY, 0});

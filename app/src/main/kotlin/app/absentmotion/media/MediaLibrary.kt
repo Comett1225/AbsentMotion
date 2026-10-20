@@ -19,6 +19,7 @@ import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
 import app.absentmotion.model.exifOrientation
 import app.absentmotion.model.imageUris
+import app.absentmotion.model.modelUris
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
@@ -29,6 +30,7 @@ class MediaLibrary(context: Context, private val engine: EngineThread) {
     private val resolver = context.applicationContext.contentResolver
     private val lock = Mutex()
     private val loaded = mutableMapOf<String, Triple<MediaDeclaration?, String?, Int>>()
+    private val models = mutableMapOf<String, Triple<String?, Int, Int>>()
 
     suspend fun update(scene: Scene) = lock.withLock {
         val wanted = scene.node.imageUris()
@@ -36,6 +38,12 @@ class MediaLibrary(context: Context, private val engine: EngineThread) {
             withContext(NonCancellable) {
                 engine.setPicture(uri, null)
                 loaded.remove(uri)
+            }
+        }
+        for (uri in models.keys - scene.node.modelUris()) {
+            withContext(NonCancellable) {
+                engine.setModel(uri, null, List(models.getValue(uri).third) { null })
+                models.remove(uri)
             }
         }
         prepareLocked(scene)
@@ -53,6 +61,16 @@ class MediaLibrary(context: Context, private val engine: EngineThread) {
                     .also { Log.i("AMMedia", "picture $uri ${it?.width}x${it?.height} limit $limit") }
             },
         ) { uri, bitmap -> try { engine.setPicture(uri, bitmap) } finally { bitmap.recycle() } }
+        for (uri in scene.node.modelUris()) {
+            val version = withContext(Dispatchers.IO) { fileVersion(resolver, Uri.parse(uri)) }
+            if (models[uri]?.let { it.first == version && it.second == generation } == true) continue
+            val (mesh, textures) = withContext(Dispatchers.IO) { loadModel(resolver, uri, limit) } ?: continue
+            withContext(NonCancellable) {
+                try {
+                    if (engine.setModel(uri, mesh, textures)) models[uri] = Triple(version, generation, textures.size)
+                } finally { textures.forEach { it?.recycle() } }
+            }
+        }
     }
 
     internal companion object {
@@ -91,6 +109,40 @@ internal fun decodePicture(resolver: ContentResolver, uri: Uri, limit: Int): Bit
     Log.w("AMMedia", "cannot read $uri", e)
     null
 } catch (_: OutOfMemoryError) { null }
+
+internal const val MAX_MODEL_BYTES = 256L shl 20
+
+internal fun modelFiles(resolver: ContentResolver, uri: String): Pair<ByteArray, (String) -> ByteArray?> {
+    val parsed = Uri.parse(uri)
+    if (parsed.scheme != "file") return requireNotNull(resolver.openInputStream(parsed)?.use { it.readBytes() }) { "cannot open $uri" } to { _ -> null }
+    val file = java.io.File(requireNotNull(parsed.path))
+    require(file.length() <= MAX_MODEL_BYTES) { "the model file is too large" }
+    val folder = file.parentFile!!.canonicalFile
+    return file.readBytes() to { name ->
+        java.io.File(folder, name.substringAfterLast('/').substringAfterLast('\\')).canonicalFile.takeIf { it.parentFile == folder && it.isFile && it.length() <= MAX_MODEL_BYTES }?.readBytes()
+    }
+}
+
+internal fun loadModel(resolver: ContentResolver, uri: String, limit: Int): Pair<Mesh, List<Bitmap?>>? = try {
+    val (bytes, open) = modelFiles(resolver, uri)
+    val mesh = readModel(uri.substringAfterLast('/'), bytes, open)
+    Log.i("AMMedia", "model $uri ${mesh.triangleCount} triangles ${mesh.textures.size} pictures")
+    mesh to mesh.textures.map { decodeBytes(it, limit) }
+} catch (e: Exception) {
+    Log.w("AMMedia", "cannot read model $uri", e)
+    null
+} catch (_: OutOfMemoryError) { null }
+
+private fun decodeBytes(bytes: ByteArray, limit: Int): Bitmap? = try {
+    val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+    BitmapFactory.decodeByteArray(bytes, 0, bytes.size, bounds)
+    val ratio = maxOf(bounds.outWidth, bounds.outHeight).toDouble() / limit.coerceAtLeast(1)
+    BitmapFactory.decodeByteArray(bytes, 0, bytes.size, BitmapFactory.Options().apply {
+        inPreferredConfig = Bitmap.Config.ARGB_8888
+        inScaled = false
+        inSampleSize = Integer.highestOneBit(kotlin.math.ceil(ratio).toInt().coerceAtLeast(1))
+    })
+} catch (_: Exception) { null } catch (_: OutOfMemoryError) { null }
 
 internal fun fileVersion(resolver: ContentResolver, uri: Uri): String? = try {
     resolver.openFileDescriptor(uri, "r")?.use { fd ->

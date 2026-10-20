@@ -9,6 +9,7 @@
 
 #include "easing.h"
 #include "engine.h"
+#include "scene.h"
 
 #define JNI_FN(name) Java_app_absentmotion_engine_NativeEngine_##name
 
@@ -233,6 +234,41 @@ JNIEXPORT jbyteArray JNICALL JNI_FN(nativeShapeIcon)(JNIEnv* env, jclass, jlong 
     }
     env->SetByteArrayRegion(out, 0, (jsize)rgba.size(), reinterpret_cast<const jbyte*>(rgba.data()));
     return out;
+}
+
+JNIEXPORT jboolean JNICALL JNI_FN(nativeSetModel)(JNIEnv* env, jclass, jbyteArray uri, jfloatArray positions, jfloatArray normals,
+                                                 jfloatArray uvs, jintArray colors, jintArray triangles, jintArray slots, jboolean twoSided) {
+    std::string key((size_t)env->GetArrayLength(uri), '\0');
+    env->GetByteArrayRegion(uri, 0, (jsize)key.size(), reinterpret_cast<jbyte*>(key.data()));
+    if (!positions) {
+        am::SetModel(key, nullptr);
+        return true;
+    }
+    auto floats = [&](jfloatArray a) {
+        std::vector<float> v((size_t)env->GetArrayLength(a));
+        env->GetFloatArrayRegion(a, 0, (jsize)v.size(), v.data());
+        return v;
+    };
+    auto ints = [&](jintArray a) {
+        std::vector<int> v((size_t)env->GetArrayLength(a));
+        env->GetIntArrayRegion(a, 0, (jsize)v.size(), v.data());
+        return v;
+    };
+    auto model = std::make_shared<am::Model>();
+    model->positions = floats(positions);
+    model->normals = floats(normals);
+    model->uvs = floats(uvs);
+    const std::vector<int> argb = ints(colors);
+    model->colors.assign(argb.begin(), argb.end());
+    model->triangles = ints(triangles);
+    model->slots = ints(slots);
+    model->twoSided = twoSided;
+    const size_t count = model->positions.size() / 3;
+    const bool ok = model->positions.size() == count * 3 && model->normals.size() == count * 3 && model->uvs.size() == count * 2 &&
+                    model->colors.size() == count && model->triangles.size() % 3 == 0 && model->slots.size() == model->triangles.size() / 3 &&
+                    std::all_of(model->triangles.begin(), model->triangles.end(), [&](int i) { return i >= 0 && (size_t)i < count; });
+    if (ok) am::SetModel(key, std::move(model));
+    return ok;
 }
 
 }

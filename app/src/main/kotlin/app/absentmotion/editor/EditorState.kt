@@ -17,7 +17,7 @@ import app.absentmotion.model.Scene
 
 enum class EditorPanel(val title: String) {
     Tools(""), Speed("Time Remapping"), MoveTransform("Transform"), ColorFill("Fill & Color"), EditShape("Shape Options"), EditText("Edit Text"),
-    BorderShadow("Frame & Shadow"), Blending("Opacity & Blend Mode"), Effects("Effects"), Camera("Camera Options"),
+    BorderShadow("Frame & Shadow"), Blending("Opacity & Blend Mode"), Effects("Effects"), Camera("Camera Options"), Model("Model Options"),
 }
 
 data class KeyTarget(val ref: PropRef, val default: String, val type: String = "float")

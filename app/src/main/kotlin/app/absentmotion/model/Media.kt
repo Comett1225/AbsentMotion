@@ -57,6 +57,14 @@ fun XmlNode.imageUris(): Set<String> = buildSet {
     walk(this@imageUris)
 }
 
+fun XmlNode.modelUris(): Set<String> = buildSet {
+    fun walk(n: XmlNode) {
+        if (n.name == "model") n["src"]?.let { add(it) }
+        n.children.forEach(::walk)
+    }
+    walk(this@modelUris)
+}
+
 fun XmlNode.mapMediaUris(change: (String) -> String): XmlNode {
     val keys = if (name == "media") listOf("uri") else listOf("fillImage", "fillVideo", "src")
     val self = keys.fold(this) { node, key -> node[key]?.let { node.with(key, change(it)) } ?: node }

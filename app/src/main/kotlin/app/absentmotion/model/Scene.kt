@@ -106,7 +106,7 @@ value class Scene(val node: XmlNode) {
     fun toXml(): String = node.with("modifiedTime", "${System.currentTimeMillis()}").toXml()
 
     companion object {
-        val LAYER_TAGS = setOf("shape", "text", "drawing", "embedScene", "camera", "audio", "nullobj")
+        val LAYER_TAGS = setOf("shape", "text", "drawing", "embedScene", "camera", "audio", "nullobj", "model")
 
         fun parse(xml: String) = Scene(XmlNode.parse(xml))
 
