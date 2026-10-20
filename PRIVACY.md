@@ -20,7 +20,7 @@ The app asks for the internet permission for these things only:
   Google receives the request for that font and your IP address, as for any web request.
 - **Auto captions.** The first time you generate captions, the app tells you the size of the speech model (about 60 MB) and
   downloads it from Hugging Face (`huggingface.co`). Speech recognition itself runs on the device.
-- **Update check.** While "Check for a new version each time the app opens" is on (a switch on the first screen and in Settings), and when you tap Check for Update, the app makes one normal HTTPS request to GitHub (`api.github.com`) to read the latest version number; nothing else is sent, and GitHub sees your IP address, as for any web request.
+- **Update check.** While "Check for a new version each time the app opens" is on (a switch shown when you first open the app, and in Settings), and when you tap Check for Update, the app makes one normal HTTPS request to GitHub (`api.github.com`) to read the latest version number; nothing else is sent, and GitHub sees your IP address, as for any web request.
 
 Nothing else is sent anywhere. Text to speech uses the voices already installed on your device and works offline.
 
