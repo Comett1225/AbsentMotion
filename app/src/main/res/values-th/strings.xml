@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action_continue">ดำเนินการต่อ</string>
+    <string name="action_skip">ข้าม</string>
+    <string name="action_close">ปิด</string>
+    <string name="settings_language">ภาษา</string>
+    <string name="onboarding_language_title">เลือกภาษาของคุณ</string>
+    <string name="onboarding_language_others">ภาษาอื่นๆ</string>
+    <string name="onboarding_language_later">คุณเปลี่ยนภาษาได้ภายหลังในการตั้งค่า</string>
+    <string name="onboarding_check_title">ดูว่าโทรศัพท์เครื่องนี้ทำอะไรได้บ้าง</string>
+    <string name="onboarding_check_body">การตรวจสอบสั้นๆ จะแสดงว่าโทรศัพท์เครื่องนี้ส่งออกวิดีโอได้ในรูปแบบและขนาดใด และเร็วแค่ไหน ทำเพียงครั้งเดียว ใช้เวลาไม่กี่วินาที และข้อมูลทั้งหมดอยู่ในโทรศัพท์ของคุณ</string>
+    <string name="onboarding_check_run">เริ่มตรวจสอบ</string>
+    <string name="onboarding_check_running">กำลังตรวจสอบ…</string>
+    <string name="onboarding_check_failed">ตรวจสอบไม่สำเร็จ แต่คุณยังส่งออกวิดีโอได้ตามปกติ</string>
+    <string name="onboarding_check_formats">รูปแบบการส่งออก</string>
+    <string name="onboarding_check_up_to_hardware">สูงสุด %1$s (ฮาร์ดแวร์)</string>
+    <string name="onboarding_check_up_to_software">สูงสุด %1$s (ซอฟต์แวร์)</string>
+    <string name="onboarding_check_unsupported">ไม่รองรับ</string>
+    <string name="onboarding_check_speed">ความเร็วในการส่งออก</string>
+    <string name="onboarding_speed_fast">เร็ว</string>
+    <string name="onboarding_speed_fast_note">รองรับวิดีโอ 4K และวิดีโอยาวได้ดี</string>
+    <string name="onboarding_speed_good">ดี</string>
+    <string name="onboarding_speed_good_note">ลื่นไหลที่ 1080p การส่งออก 4K จะใช้เวลานานขึ้น</string>
+    <string name="onboarding_speed_basic">พื้นฐาน</string>
+    <string name="onboarding_speed_basic_note">เหมาะกับ 720p หรือ 1080p ที่สุด วิดีโอยาวจะใช้เวลาสักพัก</string>
+</resources>

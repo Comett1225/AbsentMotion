@@ -65,6 +65,8 @@ import app.absentmotion.ui.editor.EditorScreen
 import app.absentmotion.ui.export.ExportScreen
 import app.absentmotion.ui.home.HomeScreen
 import app.absentmotion.i18n.Ltr
+import app.absentmotion.ui.onboarding.FirstRun
+import app.absentmotion.ui.onboarding.Onboarding
 import app.absentmotion.ui.theme.PressIndication
 import app.absentmotion.ui.theme.enterFade
 import kotlinx.coroutines.Dispatchers
@@ -84,6 +86,7 @@ class MainActivity : ComponentActivity() {
     private var exportingFromList by mutableStateOf<Scene?>(null)
     private var imported by mutableStateOf<List<ImportReport>>(emptyList())
     private var editingTemplate by mutableStateOf<String?>(null)
+    private var firstRun by mutableStateOf<FirstRun?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -99,6 +102,7 @@ class MainActivity : ComponentActivity() {
             open(id)
         }
         if (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0) handleTestIntent()
+        firstRun = FirstRun.of(this, settings, intent.getStringExtra("onboarding").takeIf { savedInstanceState == null && applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0 })
         importShared()
         setContent {
             val open = editor
@@ -111,7 +115,10 @@ class MainActivity : ComponentActivity() {
             val editorPress = remember(Am.PressEditor) { PressIndication(Am.PressEditor) }
             val homePress = remember(Am.PressHome) { PressIndication(Am.PressHome) }
             CompositionLocalProvider(LocalIndication provides if (open == null) homePress else editorPress, LocalDensity provides remember(density) { Density(density, 1f) }) {
-                if (open == null) {
+                val first = firstRun
+                if (open == null && first != null) {
+                    Onboarding(settings, first) { firstRun = null }
+                } else if (open == null) {
                     val returning = remember { cameFromEditor }
                     Box(Modifier.fillMaxSize().then(if (returning) Modifier.enterFade() else Modifier)) {
                         HomeScreen(

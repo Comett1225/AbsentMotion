@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action_continue">متابعة</string>
+    <string name="action_skip">تخطٍّ</string>
+    <string name="action_close">إغلاق</string>
+    <string name="settings_language">اللغة</string>
+    <string name="onboarding_language_title">اختر لغتك</string>
+    <string name="onboarding_language_others">لغات أخرى</string>
+    <string name="onboarding_language_later">يمكنك تغيير ذلك لاحقًا من الإعدادات.</string>
+    <string name="onboarding_check_title">اكتشف ما يمكن لهذا الهاتف فعله</string>
+    <string name="onboarding_check_body">يُظهر فحص سريع صيغ الفيديو وأحجامه التي يمكن لهذا الهاتف تصديرها ومدى سرعته. يُجرى مرة واحدة فقط ويستغرق بضع ثوانٍ، وتبقى كل البيانات على هاتفك.</string>
+    <string name="onboarding_check_run">بدء الفحص</string>
+    <string name="onboarding_check_running">جارٍ الفحص…</string>
+    <string name="onboarding_check_failed">تعذّر إكمال الفحص. سيظل التصدير يعمل كالمعتاد.</string>
+    <string name="onboarding_check_formats">صيغ التصدير</string>
+    <string name="onboarding_check_up_to_hardware">حتى %1$s (عتادي)</string>
+    <string name="onboarding_check_up_to_software">حتى %1$s (برمجي)</string>
+    <string name="onboarding_check_unsupported">غير مدعوم</string>
+    <string name="onboarding_check_speed">سرعة التصدير</string>
+    <string name="onboarding_speed_fast">سريعة</string>
+    <string name="onboarding_speed_fast_note">تتعامل جيدًا مع فيديوهات 4K والفيديوهات الطويلة.</string>
+    <string name="onboarding_speed_good">جيدة</string>
+    <string name="onboarding_speed_good_note">سلسة بدقة 1080p. يستغرق تصدير 4K وقتًا أطول.</string>
+    <string name="onboarding_speed_basic">أساسية</string>
+    <string name="onboarding_speed_basic_note">الأفضل بدقة 720p أو 1080p. تستغرق الفيديوهات الطويلة بعض الوقت.</string>
+</resources>

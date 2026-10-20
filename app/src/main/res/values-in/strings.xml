@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action_continue">Lanjutkan</string>
+    <string name="action_skip">Lewati</string>
+    <string name="action_close">Tutup</string>
+    <string name="settings_language">Bahasa</string>
+    <string name="onboarding_language_title">Pilih bahasa Anda</string>
+    <string name="onboarding_language_others">Bahasa lainnya</string>
+    <string name="onboarding_language_later">Anda bisa mengubahnya nanti di Setelan.</string>
+    <string name="onboarding_check_title">Cek kemampuan ponsel ini</string>
+    <string name="onboarding_check_body">Pengecekan singkat ini menunjukkan format dan ukuran video yang bisa diekspor ponsel ini, serta seberapa cepat prosesnya. Hanya dijalankan sekali, butuh beberapa detik, dan semuanya tetap di ponsel Anda.</string>
+    <string name="onboarding_check_run">Mulai cek</string>
+    <string name="onboarding_check_running">Mengecek…</string>
+    <string name="onboarding_check_failed">Pengecekan tidak dapat diselesaikan. Ekspor tetap berfungsi seperti biasa.</string>
+    <string name="onboarding_check_formats">Format ekspor</string>
+    <string name="onboarding_check_up_to_hardware">Hingga %1$s (hardware)</string>
+    <string name="onboarding_check_up_to_software">Hingga %1$s (software)</string>
+    <string name="onboarding_check_unsupported">Tidak didukung</string>
+    <string name="onboarding_check_speed">Kecepatan ekspor</string>
+    <string name="onboarding_speed_fast">Cepat</string>
+    <string name="onboarding_speed_fast_note">Lancar untuk video 4K dan video panjang.</string>
+    <string name="onboarding_speed_good">Baik</string>
+    <string name="onboarding_speed_good_note">Lancar di 1080p. Ekspor 4K butuh waktu lebih lama.</string>
+    <string name="onboarding_speed_basic">Dasar</string>
+    <string name="onboarding_speed_basic_note">Paling cocok di 720p atau 1080p. Video panjang butuh waktu lebih lama.</string>
+</resources>

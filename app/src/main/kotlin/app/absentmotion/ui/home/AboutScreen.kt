@@ -106,7 +106,7 @@ private val RowShape = RoundedCornerShape(7.dp)
 private fun Body(text: String) = Text(text, color = Am.HomeInk, fontSize = 14.sp, lineHeight = 20.sp)
 
 @Composable
-private fun TitleBar(title: String, icon: ImageVector, description: String, onClick: () -> Unit) {
+internal fun TitleBar(title: String, icon: ImageVector, description: String, onClick: () -> Unit) {
     Box(Modifier.fillMaxWidth().background(Am.Card).statusBarsPadding().height(49.dp)) {
         Box(Modifier.size(44.dp).clickable(onClick = onClick), contentAlignment = Alignment.Center) {
             Icon(icon, description, Modifier.size(24.dp), tint = Am.Navy)

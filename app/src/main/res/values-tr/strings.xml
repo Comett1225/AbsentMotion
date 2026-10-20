@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action_continue">Devam</string>
+    <string name="action_skip">Atla</string>
+    <string name="action_close">Kapat</string>
+    <string name="settings_language">Dil</string>
+    <string name="onboarding_language_title">Dilinizi seçin</string>
+    <string name="onboarding_language_others">Diğer diller</string>
+    <string name="onboarding_language_later">Bunu daha sonra Ayarlar\'dan değiştirebilirsiniz.</string>
+    <string name="onboarding_check_title">Bu telefonun neler yapabildiğini görün</string>
+    <string name="onboarding_check_body">Kısa bir kontrol, bu telefonun hangi video biçimlerini ve boyutlarını dışa aktarabildiğini ve ne kadar hızlı olduğunu gösterir. Yalnızca bir kez çalışır, birkaç saniye sürer ve her şey telefonunuzda kalır.</string>
+    <string name="onboarding_check_run">Kontrolü başlat</string>
+    <string name="onboarding_check_running">Kontrol ediliyor…</string>
+    <string name="onboarding_check_failed">Kontrol tamamlanamadı. Dışa aktarma her zamanki gibi çalışır.</string>
+    <string name="onboarding_check_formats">Dışa aktarma biçimleri</string>
+    <string name="onboarding_check_up_to_hardware">En fazla %1$s (donanım)</string>
+    <string name="onboarding_check_up_to_software">En fazla %1$s (yazılım)</string>
+    <string name="onboarding_check_unsupported">Desteklenmiyor</string>
+    <string name="onboarding_check_speed">Dışa aktarma hızı</string>
+    <string name="onboarding_speed_fast">Hızlı</string>
+    <string name="onboarding_speed_fast_note">4K ve uzun videoları rahatça işler.</string>
+    <string name="onboarding_speed_good">İyi</string>
+    <string name="onboarding_speed_good_note">1080p\'de akıcı. 4K dışa aktarmalar daha uzun sürer.</string>
+    <string name="onboarding_speed_basic">Temel</string>
+    <string name="onboarding_speed_basic_note">En iyi 720p veya 1080p ile çalışır. Uzun videolar biraz zaman alır.</string>
+</resources>

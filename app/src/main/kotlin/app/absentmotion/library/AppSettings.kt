@@ -86,6 +86,10 @@ class AppSettings(private val context: Context) {
         get() = prefs.getInt("templateHints", 0)
         set(value) { prefs.edit().putInt("templateHints", value).apply() }
 
+    var onboarding: Int
+        get() = prefs.getInt("onboarding", 0)
+        set(value) { prefs.edit().putInt("onboarding", value).apply() }
+
     var sortBy: String
         get() = sortByState
         set(value) { sortByState = value; prefs.edit().putString("sortBy", value).apply() }

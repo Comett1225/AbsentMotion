@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action_continue">Magpatuloy</string>
+    <string name="action_skip">Laktawan</string>
+    <string name="action_close">Isara</string>
+    <string name="settings_language">Wika</string>
+    <string name="onboarding_language_title">Piliin ang iyong wika</string>
+    <string name="onboarding_language_others">Iba pang wika</string>
+    <string name="onboarding_language_later">Mababago mo ito mamaya sa Settings.</string>
+    <string name="onboarding_check_title">Alamin kung ano ang kaya ng phone na ito</string>
+    <string name="onboarding_check_body">Ipapakita ng mabilis na pagsusuri kung aling mga video format at laki ang kayang i-export ng phone na ito, at kung gaano ito kabilis. Isang beses lang itong tatakbo, ilang segundo lang, at mananatili ang lahat sa phone mo.</string>
+    <string name="onboarding_check_run">Simulan ang pagsusuri</string>
+    <string name="onboarding_check_running">Sinusuri…</string>
+    <string name="onboarding_check_failed">Hindi natapos ang pagsusuri. Gagana pa rin ang pag-export gaya ng dati.</string>
+    <string name="onboarding_check_formats">Mga format sa pag-export</string>
+    <string name="onboarding_check_up_to_hardware">Hanggang %1$s (hardware)</string>
+    <string name="onboarding_check_up_to_software">Hanggang %1$s (software)</string>
+    <string name="onboarding_check_unsupported">Hindi suportado</string>
+    <string name="onboarding_check_speed">Bilis ng pag-export</string>
+    <string name="onboarding_speed_fast">Mabilis</string>
+    <string name="onboarding_speed_fast_note">Kaya nang maayos ang 4K at mahahabang video.</string>
+    <string name="onboarding_speed_good">Maayos</string>
+    <string name="onboarding_speed_good_note">Maayos sa 1080p. Mas matagal ang pag-export ng 4K.</string>
+    <string name="onboarding_speed_basic">Basic</string>
+    <string name="onboarding_speed_basic_note">Pinakamainam sa 720p o 1080p. Matagal-tagal ang mahahabang video.</string>
+</resources>

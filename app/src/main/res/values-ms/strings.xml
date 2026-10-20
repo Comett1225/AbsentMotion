@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action_continue">Teruskan</string>
+    <string name="action_skip">Langkau</string>
+    <string name="action_close">Tutup</string>
+    <string name="settings_language">Bahasa</string>
+    <string name="onboarding_language_title">Pilih bahasa anda</string>
+    <string name="onboarding_language_others">Bahasa lain</string>
+    <string name="onboarding_language_later">Anda boleh menukarnya kemudian dalam Tetapan.</string>
+    <string name="onboarding_check_title">Semak keupayaan telefon ini</string>
+    <string name="onboarding_check_body">Semakan ringkas ini menunjukkan format dan saiz video yang boleh dieksport oleh telefon ini, dan sepantas mana. Ia dijalankan sekali sahaja, mengambil beberapa saat dan semuanya kekal dalam telefon anda.</string>
+    <string name="onboarding_check_run">Mulakan semakan</string>
+    <string name="onboarding_check_running">Menyemak…</string>
+    <string name="onboarding_check_failed">Semakan tidak dapat diselesaikan. Eksport masih berfungsi seperti biasa.</string>
+    <string name="onboarding_check_formats">Format eksport</string>
+    <string name="onboarding_check_up_to_hardware">Sehingga %1$s (perkakasan)</string>
+    <string name="onboarding_check_up_to_software">Sehingga %1$s (perisian)</string>
+    <string name="onboarding_check_unsupported">Tidak disokong</string>
+    <string name="onboarding_check_speed">Kelajuan eksport</string>
+    <string name="onboarding_speed_fast">Pantas</string>
+    <string name="onboarding_speed_fast_note">Mengendalikan video 4K dan video panjang dengan baik.</string>
+    <string name="onboarding_speed_good">Baik</string>
+    <string name="onboarding_speed_good_note">Lancar pada 1080p. Eksport 4K mengambil masa lebih lama.</string>
+    <string name="onboarding_speed_basic">Asas</string>
+    <string name="onboarding_speed_basic_note">Paling sesuai pada 720p atau 1080p. Video panjang mengambil sedikit masa.</string>
+</resources>

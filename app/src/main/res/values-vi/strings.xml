@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action_continue">Tiếp tục</string>
+    <string name="action_skip">Bỏ qua</string>
+    <string name="action_close">Đóng</string>
+    <string name="settings_language">Ngôn ngữ</string>
+    <string name="onboarding_language_title">Chọn ngôn ngữ của bạn</string>
+    <string name="onboarding_language_others">Ngôn ngữ khác</string>
+    <string name="onboarding_language_later">Bạn có thể đổi lại sau trong Cài đặt.</string>
+    <string name="onboarding_check_title">Kiểm tra khả năng của điện thoại này</string>
+    <string name="onboarding_check_body">Một bước kiểm tra nhanh sẽ cho biết điện thoại này xuất được những định dạng và kích thước video nào, và tốc độ ra sao. Chỉ chạy một lần, mất vài giây và mọi dữ liệu đều ở lại trên điện thoại của bạn.</string>
+    <string name="onboarding_check_run">Bắt đầu kiểm tra</string>
+    <string name="onboarding_check_running">Đang kiểm tra…</string>
+    <string name="onboarding_check_failed">Không thể hoàn tất việc kiểm tra. Bạn vẫn xuất video như bình thường.</string>
+    <string name="onboarding_check_formats">Định dạng xuất</string>
+    <string name="onboarding_check_up_to_hardware">Tối đa %1$s (phần cứng)</string>
+    <string name="onboarding_check_up_to_software">Tối đa %1$s (phần mềm)</string>
+    <string name="onboarding_check_unsupported">Không hỗ trợ</string>
+    <string name="onboarding_check_speed">Tốc độ xuất</string>
+    <string name="onboarding_speed_fast">Nhanh</string>
+    <string name="onboarding_speed_fast_note">Xử lý tốt video 4K và video dài.</string>
+    <string name="onboarding_speed_good">Khá</string>
+    <string name="onboarding_speed_good_note">Mượt ở 1080p. Xuất 4K sẽ lâu hơn.</string>
+    <string name="onboarding_speed_basic">Cơ bản</string>
+    <string name="onboarding_speed_basic_note">Phù hợp nhất với 720p hoặc 1080p. Video dài sẽ mất thời gian hơn.</string>
+</resources>

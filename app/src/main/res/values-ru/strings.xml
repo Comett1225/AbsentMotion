@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action_continue">Продолжить</string>
+    <string name="action_skip">Пропустить</string>
+    <string name="action_close">Закрыть</string>
+    <string name="settings_language">Язык</string>
+    <string name="onboarding_language_title">Выберите язык</string>
+    <string name="onboarding_language_others">Другие языки</string>
+    <string name="onboarding_language_later">Это можно изменить позже в настройках.</string>
+    <string name="onboarding_check_title">Узнайте, на что способен этот телефон</string>
+    <string name="onboarding_check_body">Быстрая проверка покажет, в каких форматах и размерах этот телефон может экспортировать видео и насколько быстро. Она запускается один раз, занимает несколько секунд, и все данные остаются на телефоне.</string>
+    <string name="onboarding_check_run">Запустить проверку</string>
+    <string name="onboarding_check_running">Проверка…</string>
+    <string name="onboarding_check_failed">Не удалось завершить проверку. Экспорт работает как обычно.</string>
+    <string name="onboarding_check_formats">Форматы экспорта</string>
+    <string name="onboarding_check_up_to_hardware">До %1$s (аппаратно)</string>
+    <string name="onboarding_check_up_to_software">До %1$s (программно)</string>
+    <string name="onboarding_check_unsupported">Не поддерживается</string>
+    <string name="onboarding_check_speed">Скорость экспорта</string>
+    <string name="onboarding_speed_fast">Высокая</string>
+    <string name="onboarding_speed_fast_note">Легко справляется с 4K и длинными видео.</string>
+    <string name="onboarding_speed_good">Хорошая</string>
+    <string name="onboarding_speed_good_note">Плавно в 1080p. Экспорт в 4K займёт больше времени.</string>
+    <string name="onboarding_speed_basic">Базовая</string>
+    <string name="onboarding_speed_basic_note">Лучше всего 720p или 1080p. Длинные видео экспортируются дольше.</string>
+</resources>
