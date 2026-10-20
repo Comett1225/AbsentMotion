@@ -1,10 +1,29 @@
 package app.absentmotion.editor
 
 import app.absentmotion.model.*
+import kotlin.math.roundToInt
 
 fun EditorState.addVideo(media: MediaDeclaration) {
-    if (media.width <= 0 || media.height <= 0 || media.duration <= 0) return
-    val document = scene
+    val layer = scene.videoLayer(media, frame) ?: return
+    edit { it.add(layer, listOf(media)) }
+    selectedId = layer.id; panel = EditorPanel.Tools; addOpen = false
+}
+
+fun Scene.fromCapture(media: MediaDeclaration, video: Boolean, resolution: Int, seconds: Int): Scene? {
+    if (media.width <= 0 || media.height <= 0) return null
+    val turned = media.orientation == 90 || media.orientation == 270
+    val w = if (turned) media.height else media.width
+    val h = if (turned) media.width else media.height
+    val scale = minOf(1.0, resolution.toDouble() / minOf(w, h), 4096.0 / maxOf(w, h))
+    fun even(v: Int) = ((v * scale / 2).roundToInt() * 2).coerceIn(32, 4096)
+    val sized = withSettings(even(w), even(h), fps, bgColor)
+    val layer = (if (video) sized.videoLayer(media, 0) else sized.imageLayer(media, 0, seconds)) ?: return null
+    return sized.add(layer, listOf(media))
+}
+
+fun Scene.videoLayer(media: MediaDeclaration, frame: Int): Layer? {
+    if (media.width <= 0 || media.height <= 0 || media.duration <= 0) return null
+    val document = this
     val turned = media.orientation == 90 || media.orientation == 270
     val w = if (turned) media.height else media.width
     val h = if (turned) media.width else media.height
@@ -21,8 +40,7 @@ fun EditorState.addVideo(media: MediaDeclaration) {
         .withTransform("location", document.width / 2f, document.height / 2f, 0f)
         .withProp("size", "vec2", raw.first / 2f, raw.second / 2f)
     if (media.orientation != 0) layer = layer.withTransform("rotation", media.orientation.toFloat())
-    edit { it.add(layer, listOf(media)) }
-    selectedId = id; panel = EditorPanel.Tools; addOpen = false
+    return layer
 }
 
 fun EditorState.retimeVideo(start: Boolean) {

@@ -89,6 +89,8 @@ class EditorState(
 
     var addOpen by mutableStateOf(false)
 
+    var cameraOpen by mutableStateOf(false)
+
     var drawing by mutableStateOf<DrawingMode?>(null)
 
     var fullColor by mutableStateOf<FullColor?>(null)

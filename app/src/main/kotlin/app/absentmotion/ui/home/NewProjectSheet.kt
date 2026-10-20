@@ -59,7 +59,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import android.widget.Toast
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
+import app.absentmotion.editor.fromCapture
 import app.absentmotion.library.AppSettings
+import app.absentmotion.media.mediaDeclaration
+import app.absentmotion.ui.camera.CameraIcons
+import app.absentmotion.ui.camera.CameraScreen
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import app.absentmotion.library.NewProjectChoice
 import app.absentmotion.library.ProjectStore
 import app.absentmotion.model.Scene
@@ -174,10 +184,13 @@ fun NewProjectSheet(
 ) {
     BackHandler(onBack = onClose)
     val form = remember { Form(settings.newProject, existingTitles) }
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var camera by remember { mutableStateOf(false) }
     Box(Modifier.fillMaxSize()) {
         Box(Modifier.fillMaxSize().presenceScrim(Color.Black.copy(alpha = 0.7f)).pointerInput(Unit) { detectTapGestures { } })
         Box(Modifier.align(Alignment.BottomCenter).widthIn(max = 480.dp).presence(slide = 1f, fade = false)) {
-            SheetBody(form, onClose, onCreate = {
+            SheetBody(form, onClose, onCamera = { camera = true }, onCreate = {
                 settings.newProject = form.choice()
                 val id = store.create(form.scene())
                 onClose()
@@ -185,10 +198,30 @@ fun NewProjectSheet(
             })
         }
     }
+    if (camera) {
+        val (w, h) = form.size
+        CameraScreen(w.toFloat() / h, onClose = { camera = false }) { uri, video ->
+            scope.launch {
+                val id = try {
+                    val media = mediaDeclaration(context, uri) ?: throw java.io.IOException("unreadable capture")
+                    val scene = form.scene().fromCapture(media, video, form.resolution, settings.defaultLayerDuration) ?: throw java.io.IOException("empty capture")
+                    settings.newProject = form.choice()
+                    withContext(Dispatchers.IO) { store.create(scene) }
+                } catch (e: java.io.IOException) {
+                    Toast.makeText(context, "Could not create the project from the camera.", Toast.LENGTH_LONG).show()
+                    camera = false
+                    return@launch
+                }
+                camera = false
+                onClose()
+                onOpen(id)
+            }
+        }
+    }
 }
 
 @Composable
-private fun SheetBody(form: Form, onClose: () -> Unit, onCreate: () -> Unit) {
+private fun SheetBody(form: Form, onClose: () -> Unit, onCamera: () -> Unit, onCreate: () -> Unit) {
     Column(
         Modifier.fillMaxWidth().clip(RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp)).background(Am.SheetBg)
             .windowInsetsPadding(WindowInsets.navigationBars.union(WindowInsets.ime)).verticalScroll(rememberScrollState()),
@@ -206,7 +239,12 @@ private fun SheetBody(form: Form, onClose: () -> Unit, onCreate: () -> Unit) {
         Spacer(Modifier.height(16.dp))
         FormRow("Background") { BackgroundField(form) }
         Spacer(Modifier.height(16.dp))
-        Row(Modifier.padding(horizontal = 32.dp).fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+        Row(Modifier.padding(horizontal = 32.dp).fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Row(Modifier.height(48.dp).clickable(onClick = onCamera), verticalAlignment = Alignment.CenterVertically) {
+                Icon(CameraIcons.Camera, null, Modifier.size(20.dp), tint = Ink)
+                Spacer(Modifier.width(8.dp))
+                Text("FROM CAMERA", color = Ink, fontSize = 15.sp, fontWeight = FontWeight.Medium)
+            }
             Box(Modifier.height(48.dp).clickable(onClick = onCreate), contentAlignment = Alignment.Center) {
                 Text(if (form.element) "CREATE ASSET" else "CREATE PROJECT", color = Ink, fontSize = 15.sp, fontWeight = FontWeight.Medium)
             }

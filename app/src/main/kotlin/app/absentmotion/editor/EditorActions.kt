@@ -258,8 +258,16 @@ fun EditorState.rename(title: String) = edit { it.withTitle(title) }
 fun EditorState.renameLayer(id: Long, label: String) = edit { it.update(id) { layer -> layer.withLabel(label) } }
 
 fun EditorState.addImage(media: MediaDeclaration) {
-    if (media.width <= 0 || media.height <= 0) return
-    val scene = scene
+    val layer = scene.imageLayer(media, frame, settings.defaultLayerDuration) ?: return
+    edit { it.add(layer, listOf(media)) }
+    selectedId = layer.id
+    panel = EditorPanel.Tools
+    addOpen = false
+}
+
+fun Scene.imageLayer(media: MediaDeclaration, frame: Int, seconds: Int): Layer? {
+    if (media.width <= 0 || media.height <= 0) return null
+    val scene = this
     val turned = media.orientation == 90 || media.orientation == 270
     val w = if (turned) media.height else media.width
     val h = if (turned) media.width else media.height
@@ -269,15 +277,12 @@ fun EditorState.addImage(media: MediaDeclaration) {
     val raw = if (turned) fitted.second to fitted.first else fitted
     val id = Layer.newId()
     var layer = Layer(XmlNode("shape", linkedMapOf("id" to "$id", "label" to media.title,
-        "startTime" to "${scene.frameStart(frame)}", "endTime" to "${scene.frameEnd(frame + settings.defaultLayerDuration * scene.fps)}",
+        "startTime" to "${scene.frameStart(frame)}", "endTime" to "${scene.frameEnd(frame + seconds * scene.fps)}",
         "fillType" to "media", "fillImage" to media.uri, "mediaFillMode" to "fill", "s" to ".rect")))
         .withTransform("location", scene.width / 2f, scene.height / 2f, 0f)
         .withProp("size", "vec2", raw.first / 2f, raw.second / 2f)
     if (media.orientation != 0) layer = layer.withTransform("rotation", media.orientation.toFloat())
-    edit { it.add(layer, listOf(media)) }
-    selectedId = id
-    panel = EditorPanel.Tools
-    addOpen = false
+    return layer
 }
 
 suspend fun EditorState.compositionArea(mode: String) {

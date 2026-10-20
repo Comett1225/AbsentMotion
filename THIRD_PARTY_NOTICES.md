@@ -238,6 +238,19 @@ upstream"). The artifacts were not inspected for a `META-INF/NOTICE` file.
 - URL: https://developer.android.com/jetpack/androidx
 - Used in: the app's user interface.
 
+### CameraX and the AndroidX libraries it needs
+
+- Version: CameraX 1.5.3 (`androidx.camera:camera-camera2` and `camera-view`, which bring `camera-core`, `camera-lifecycle`,
+  `camera-video` and `androidx.camera.featurecombinationquery:featurecombinationquery` 1.5.3). CameraX also adds these AndroidX
+  libraries that the build did not contain before: `appcompat` and `appcompat-resources` 1.1.0, `fragment` 1.1.0,
+  `exifinterface` 1.4.2, `lifecycle-livedata` and `lifecycle-livedata-core-ktx` 2.9.4, `vectordrawable` and
+  `vectordrawable-animated` 1.1.0, `viewpager`, `loader`, `drawerlayout`, `cursoradapter` and `customview` 1.0.0,
+  `concurrent-futures-ktx` 1.1.0 and `tracing-ktx` 1.2.0, plus Google's `com.google.auto.value:auto-value-annotations` 1.6.3.
+- Licence: Apache-2.0 (all of them).
+- Copyright: see upstream.
+- URL: https://developer.android.com/jetpack/androidx/releases/camera and https://github.com/google/auto
+- Used in: the in-app camera (photo and video capture from the Add menu and from the new project sheet).
+
 ### kotlinx.coroutines
 
 - Version: 1.9.0 (`kotlinx-coroutines-core` and `kotlinx-coroutines-android`, dependencies of Compose).

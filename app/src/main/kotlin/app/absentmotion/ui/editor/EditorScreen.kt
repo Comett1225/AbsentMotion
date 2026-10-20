@@ -41,6 +41,7 @@ fun EditorScreen(state: EditorState, onExit: () -> Unit) {
     Box(Modifier.fillMaxSize()) {
         EditorBody(state, onExit)
         state.fullColor?.let { PhoneScreen { Box(Modifier.fillMaxSize().enterFade()) { FullColorPicker(state, it) } } }
+        if (state.cameraOpen) EditorCamera(state)
     }
 }
 

@@ -25,7 +25,7 @@ The launcher icon is an own drawing, made by `tools/icon/make_icon.py` (source o
 
 | Source | Icons |
 | --- | --- |
-| Lucide only | 156 |
+| Lucide only | 163 |
 | Lucide shapes plus own parts | 8 |
 | Own drawing only | 37 |
 | Material Symbols | 0 |
@@ -245,6 +245,13 @@ The launcher icon is an own drawing, made by `tools/icon/make_icon.py` (source o
 | `ui/editor/PreviewMode.kt` | `PixelIcon` | own drawing | - | Apache-2.0 (own) | - | Canvas drawing |
 | `ui/editor/PreviewMode.kt` | `SoloIcon` | own drawing | - | Apache-2.0 (own) | - | Canvas drawing |
 | `ui/editor/PreviewMode.kt` | `ZoomBlock buttons` | own drawing | - | Apache-2.0 (own) | - | Canvas drawing |
+| `ui/camera/CameraIcons.kt` | `Camera` | Lucide | `camera` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/camera.svg | - |
+| `ui/camera/CameraIcons.kt` | `Switch` | Lucide | `switch-camera` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/switch-camera.svg | - |
+| `ui/camera/CameraIcons.kt` | `Flash` | Lucide | `zap` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/zap.svg | - |
+| `ui/camera/CameraIcons.kt` | `FlashOff` | Lucide | `zap-off` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/zap-off.svg | - |
+| `ui/camera/CameraIcons.kt` | `Timer` | Lucide | `timer` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/timer.svg | - |
+| `ui/camera/CameraIcons.kt` | `TimerOff` | Lucide | `timer-off` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/timer-off.svg | - |
+| `ui/camera/CameraIcons.kt` | `Grid` | Lucide | `grid-3x3` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/grid-3x3.svg | - |
 
 ## Licence texts
 

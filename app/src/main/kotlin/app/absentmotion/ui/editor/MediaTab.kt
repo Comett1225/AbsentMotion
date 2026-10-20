@@ -36,7 +36,10 @@ import app.absentmotion.editor.keepCopy
 import app.absentmotion.media.mediaDeclaration
 import app.absentmotion.media.mediaThumbnail
 import app.absentmotion.media.cachedMediaThumbnail
+import app.absentmotion.ui.camera.CameraIcons
+import app.absentmotion.ui.camera.CameraScreen
 import app.absentmotion.ui.theme.Am
+import androidx.compose.material3.Icon
 import kotlinx.coroutines.launch
 
 @Composable
@@ -94,6 +97,15 @@ internal fun MediaTab(state: EditorState, modifier: Modifier, library: AddLibrar
                 }
             }
         }
+        item(key = "camera") {
+            Column(
+                Modifier.width(97.dp).fillMaxHeight().padding(6.dp).background(Am.Well).clickable { state.playing = false; state.cameraOpen = true },
+                horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center,
+            ) {
+                Icon(CameraIcons.Camera, null, Modifier.size(24.dp), tint = Am.OnDark)
+                Text("Camera", Modifier.padding(top = 4.dp), color = Am.OnDark, fontSize = 14.sp, maxLines = 1)
+            }
+        }
         items(files.filter { album == null || it.albumId == album }, key = { it.uri.toString() }) { file ->
             val bitmap by produceState<android.graphics.Bitmap?>(cachedMediaThumbnail(file.uri), file.uri, file.modified, library.mediaRevision) { value = mediaThumbnail(context, file.uri) }
             Box(Modifier.size(97.dp).background(Color.Black).clickable(enabled = !adding) {
@@ -109,6 +121,23 @@ internal fun MediaTab(state: EditorState, modifier: Modifier, library: AddLibrar
                     Text("${seconds / 60}:${(seconds % 60).toString().padStart(2, '0')}",
                         Modifier.align(Alignment.BottomEnd).padding(4.dp).background(Color(0x66000000)), color = Color.White, fontSize = 10.sp)
                 }
+            }
+        }
+    }
+}
+
+@Composable
+internal fun EditorCamera(state: EditorState) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    CameraScreen(state.scene.width.toFloat() / state.scene.height, onClose = { state.cameraOpen = false }) { uri, video ->
+        scope.launch {
+            try {
+                val media = mediaDeclaration(context, uri)
+                if (media == null) android.widget.Toast.makeText(context, "Could not add the capture to the project.", android.widget.Toast.LENGTH_LONG).show()
+                else if (video) state.addVideo(media) else state.addImage(media)
+            } finally {
+                state.cameraOpen = false
             }
         }
     }
