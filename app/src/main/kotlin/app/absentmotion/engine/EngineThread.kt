@@ -316,9 +316,11 @@ class EngineThread(private val background: Int, context: Context? = null) {
             val v = view ?: return
             if (target != 0L) {
                 val native = engine()
+                val started = System.nanoTime()
                 if (target != 0L && native.renderScene(target, v.timeMs.toDouble(), v.scale, v.dx, v.dy, background, v.selectedId, v.handles, v) != 0) {
                     Log.e("AMEngine", "preview rendering failed")
                 }
+                if (RenderStats.recording) RenderStats.add((System.nanoTime() - started) / 1e6, v.timeMs)
             }
         } catch (e: Exception) {
             if (!closed) Log.e("AMEngine", "preview rendering failed", e)

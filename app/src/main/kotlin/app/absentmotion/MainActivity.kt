@@ -465,6 +465,7 @@ class MainActivity : ComponentActivity() {
                     val xy = point.split(',').mapNotNull { it.trim().toFloatOrNull() }
                     if (xy.size == 2) Log.i("AMTest", "hit $point ${engine.hitTest(xy[0], xy[1], state.timeMs)}")
                 }
+                intent.getIntExtra("bench", 0).takeIf { it > 0 }?.let { runBench(this@MainActivity, state, it) }
             } catch (e: kotlinx.coroutines.CancellationException) {
                 throw e
             } catch (e: IllegalStateException) {
