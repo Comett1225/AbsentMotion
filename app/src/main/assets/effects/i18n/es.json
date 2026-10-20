@@ -1331,9 +1331,6 @@
     "intensity": {
      "label": "Intensidad"
     },
-    "mode": {
-     "label": "Modo"
-    },
     "seed": {
      "label": "Semilla"
     },
@@ -1936,7 +1933,7 @@
    }
   },
   "highlightshadow": {
-   "description": "Recupera o realza las luces y levanta u oscurece las sombras con una máscara de luminancia local difuminada.",
+   "description": "Recupera o realza las luces altas y aclara u oscurece las sombras según el brillo de cada píxel.",
    "name": "Luces y sombras",
    "params": {
     "highlights": {

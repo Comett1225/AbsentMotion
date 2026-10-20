@@ -1331,9 +1331,6 @@
     "intensity": {
      "label": "Yoğunluk"
     },
-    "mode": {
-     "label": "Mod"
-    },
     "seed": {
      "label": "Tohum"
     },
@@ -1936,7 +1933,7 @@
    }
   },
   "highlightshadow": {
-   "description": "Bulanık bir yerel parlaklık maskesi kullanarak parlak açık tonları geri kazanır veya güçlendirir, koyu gölgeleri açar ya da derinleştirir.",
+   "description": "Her pikselin parlaklığına göre parlak vurguları kurtarır veya güçlendirir, koyu gölgeleri açar veya derinleştirir.",
    "name": "Açık Tonlar ve Gölgeler",
    "params": {
     "highlights": {

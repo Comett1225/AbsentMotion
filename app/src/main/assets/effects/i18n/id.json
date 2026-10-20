@@ -1331,9 +1331,6 @@
     "intensity": {
      "label": "Intensitas"
     },
-    "mode": {
-     "label": "Mode"
-    },
     "seed": {
      "label": "Seed"
     },
@@ -1936,7 +1933,7 @@
    }
   },
   "highlightshadow": {
-   "description": "Memulihkan atau memperkuat sorotan terang serta mengangkat atau memperdalam bayangan gelap dengan masker luminansi lokal yang diburamkan.",
+   "description": "Memulihkan atau memperkuat sorotan terang serta mengangkat atau memperdalam bayangan gelap, berdasarkan kecerahan tiap piksel.",
    "name": "Sorotan & bayangan",
    "params": {
     "highlights": {

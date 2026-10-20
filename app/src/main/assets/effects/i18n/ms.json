@@ -1331,9 +1331,6 @@
     "intensity": {
      "label": "Keamatan"
     },
-    "mode": {
-     "label": "Mod"
-    },
     "seed": {
      "label": "Seed"
     },
@@ -1936,7 +1933,7 @@
    }
   },
   "highlightshadow": {
-   "description": "Memulihkan atau menaikkan sorotan terang dan mengangkat atau mendalamkan bayang gelap dengan topeng kecerahan setempat yang kabur.",
+   "description": "Memulihkan atau menguatkan sorotan terang serta mengangkat atau mendalamkan bayang gelap, berdasarkan kecerahan setiap piksel.",
    "name": "Sorotan & Bayang",
    "params": {
     "highlights": {

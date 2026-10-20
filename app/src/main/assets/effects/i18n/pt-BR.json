@@ -1331,9 +1331,6 @@
     "intensity": {
      "label": "Intensidade"
     },
-    "mode": {
-     "label": "Modo"
-    },
     "seed": {
      "label": "Semente"
     },
@@ -1936,7 +1933,7 @@
    }
   },
   "highlightshadow": {
-   "description": "Recupera ou reforça os realces claros e levanta ou aprofunda as sombras escuras usando uma máscara de luminância local desfocada.",
+   "description": "Recupera ou realça realces claros e clareia ou aprofunda sombras escuras, conforme o brilho de cada pixel.",
    "name": "Realces e sombras",
    "params": {
     "highlights": {

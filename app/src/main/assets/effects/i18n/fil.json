@@ -1331,9 +1331,6 @@
     "intensity": {
      "label": "Tindi"
     },
-    "mode": {
-     "label": "Mode"
-    },
     "seed": {
      "label": "Seed"
     },
@@ -1936,7 +1933,7 @@
    }
   },
   "highlightshadow": {
-   "description": "Binabawi o pinapalakas ang maliwanag na highlights at itinataas o pinapalalim ang madilim na anino gamit ang blurred na local luminance mask.",
+   "description": "Binabawi o pinapalakas ang maliwanag na highlight at itinataas o pinapalalim ang madilim na anino, batay sa liwanag ng bawat pixel.",
    "name": "Highlights at Shadows",
    "params": {
     "highlights": {

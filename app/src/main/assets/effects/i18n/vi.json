@@ -1331,9 +1331,6 @@
     "intensity": {
      "label": "Cường độ"
     },
-    "mode": {
-     "label": "Chế độ"
-    },
     "seed": {
      "label": "Seed"
     },
@@ -1936,7 +1933,7 @@
    }
   },
   "highlightshadow": {
-   "description": "Phục hồi hoặc tăng vùng sáng và nâng hoặc làm sâu vùng tối bằng mặt nạ độ chói cục bộ đã làm mờ.",
+   "description": "Phục hồi hoặc tăng độ sáng của vùng sáng và nâng sáng hoặc làm tối sâu vùng tối, dựa trên độ sáng của từng pixel.",
    "name": "Vùng sáng & vùng tối",
    "params": {
     "highlights": {
