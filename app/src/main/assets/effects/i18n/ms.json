@@ -1,0 +1,1165 @@
+{
+ "categories": {
+  "ai": "AI",
+  "blur": "Kabur",
+  "color": "Warna",
+  "distort": "Herotan",
+  "key": "Kunci",
+  "move": "Gerak",
+  "new": "Baharu",
+  "noise": "Hingar",
+  "repeat": "Ulangan",
+  "stylize": "Gaya"
+ },
+ "effects": {
+  "autoshake": {
+   "description": "Menggegar lapisan secara rawak, menggerak dan memusingkannya sedikit.",
+   "name": "Gegar Automatik",
+   "params": {
+    "frequency": {
+     "label": "Kekerapan"
+    },
+    "magnitude": {
+     "label": "Magnitud"
+    },
+    "rotation": {
+     "label": "Putaran"
+    },
+    "seed": {
+     "label": "Biji"
+    }
+   }
+  },
+  "backdrop": {
+   "description": "Mengisi lapisan dengan apa yang dilukis di bawahnya, jadi kesan selepas ini mengubah lapisan di bawah. Campur mengembalikan isi lapisan sendiri.",
+   "name": "Lapisan Pelarasan",
+   "params": {
+    "mix": {
+     "label": "Campur"
+    }
+   }
+  },
+  "blink": {
+   "description": "Menghidup dan mematikan lapisan beberapa kali sesaat.",
+   "name": "Kelip",
+   "params": {
+    "frequency": {
+     "label": "Kelip sesaat"
+    }
+   }
+  },
+  "blur": {
+   "description": "Kabur yang licin dan sekata.",
+   "name": "Kabur",
+   "params": {
+    "strength": {
+     "label": "Kekuatan"
+    }
+   }
+  },
+  "brightnesscontrast": {
+   "description": "Melaraskan kecerahan dan kontras imej.",
+   "name": "Kecerahan & Kontras",
+   "params": {
+    "brightness": {
+     "label": "Kecerahan"
+    },
+    "contrast": {
+     "label": "Kontras"
+    }
+   }
+  },
+  "bulge": {
+   "description": "Menggunakan herotan pembesaran atau cubitan mata ikan di sekeliling titik pusat dengan kekuatan dan jejari yang boleh dikawal",
+   "name": "Bonjol",
+   "params": {
+    "center": {
+     "label": "Pusat"
+    },
+    "radius": {
+     "label": "Jejari"
+    },
+    "strength": {
+     "label": "Kekuatan"
+    }
+   }
+  },
+  "chromakey": {
+   "description": "Membuang satu warna, seperti skrin hijau.",
+   "name": "Kunci Kroma",
+   "params": {
+    "key": {
+     "label": "Warna Kunci"
+    },
+    "softness": {
+     "label": "Kelembutan"
+    },
+    "tolerance": {
+     "label": "Toleransi"
+    }
+   }
+  },
+  "colorbalance": {
+   "description": "Menolak bayang, nada pertengahan dan sorotan ke arah warna masing-masing (kelabu membiarkan julat tidak berubah).",
+   "name": "Imbangan Warna",
+   "params": {
+    "amount": {
+     "label": "Jumlah"
+    },
+    "highlights": {
+     "label": "Sorotan"
+    },
+    "midtones": {
+     "label": "Nada pertengahan"
+    },
+    "shadows": {
+     "label": "Bayang"
+    }
+   }
+  },
+  "colorwheels": {
+   "description": "Roda warna untuk bayang (lift), nada pertengahan (gamma) dan sorotan (gain): warna, sejauh mana hendak ditolak, dan tahap.",
+   "name": "Lift Gamma Gain",
+   "params": {
+    "gainAmount": {
+     "label": "Jumlah Gain"
+    },
+    "gainHue": {
+     "label": "Warna Gain"
+    },
+    "gainLevel": {
+     "label": "Tahap Gain"
+    },
+    "gammaAmount": {
+     "label": "Jumlah Gamma"
+    },
+    "gammaHue": {
+     "label": "Warna Gamma"
+    },
+    "gammaLevel": {
+     "label": "Tahap Gamma"
+    },
+    "liftAmount": {
+     "label": "Jumlah Lift"
+    },
+    "liftHue": {
+     "label": "Warna Lift"
+    },
+    "liftLevel": {
+     "label": "Tahap Lift"
+    }
+   }
+  },
+  "denoise": {
+   "description": "Membuang hingar imej dengan penapis dua hala yang mengekalkan tepi dan hanya memuratakan piksel berdekatan apabila warnanya serupa.",
+   "name": "Hilangkan Hingar",
+   "params": {
+    "detail": {
+     "label": "Perincian"
+    },
+    "radius": {
+     "label": "Jejari"
+    },
+    "strength": {
+     "label": "Kekuatan"
+    }
+   }
+  },
+  "directionalblur": {
+   "description": "Kabur gerakan dengan memuratakan sampel sepanjang sudut berarah.",
+   "name": "Kabur Berarah",
+   "params": {
+    "angle": {
+     "label": "Sudut"
+    },
+    "blurLength": {
+     "label": "Panjang"
+    }
+   }
+  },
+  "dissolve": {
+   "description": "Lapisan pecah menjadi bintik rawak.",
+   "name": "Larut",
+   "params": {
+    "grain": {
+     "label": "Saiz"
+    },
+    "progress": {
+     "label": "Kemajuan"
+    }
+   }
+  },
+  "duotone": {
+   "description": "Guna peta kecerunan dua warna berdasarkan kecerahan, dengan kawalan kontras dan jumlah.",
+   "name": "Duoton",
+   "params": {
+    "amount": {
+     "label": "Jumlah"
+    },
+    "color1": {
+     "label": "Warna Bayang"
+    },
+    "color2": {
+     "label": "Warna Sorotan"
+    },
+    "contrast": {
+     "label": "Kontras"
+    }
+   }
+  },
+  "echo": {
+   "description": "Lukis salinan lapisan seperti pada saat sebelumnya, mengikut animasinya.",
+   "name": "Gema Bingkai Kunci",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "composite": {
+     "label": "Komposit",
+     "options": [
+      "Di belakang",
+      "Di atas"
+     ]
+    },
+    "count": {
+     "label": "Bilangan"
+    },
+    "seconds": {
+     "label": "Saat"
+    }
+   }
+  },
+  "edgedetect": {
+   "description": "Garis terang di tempat gambar berubah, gelap di tempat lain.",
+   "name": "Kesan Tepi",
+   "params": {
+    "strength": {
+     "label": "Kekuatan"
+    }
+   }
+  },
+  "emboss": {
+   "description": "Hasilkan kesan timbul guna kecerunan kecerahan mengikut sudut cahaya yang ditetapkan.",
+   "name": "Timbul",
+   "params": {
+    "angle": {
+     "label": "Sudut Cahaya"
+    },
+    "strength": {
+     "label": "Kekuatan"
+    }
+   }
+  },
+  "exposure": {
+   "description": "Tiru pendedahan fotografi dengan stop, ofset dan pembetulan gama.",
+   "name": "Pendedahan",
+   "params": {
+    "gamma": {
+     "label": "Gama"
+    },
+    "offset": {
+     "label": "Ofset"
+    },
+    "stops": {
+     "label": "Stop"
+    }
+   }
+  },
+  "filmgrain": {
+   "description": "Butir filem monokrom beranimasi dengan jumlah, saiz butir dan kelajuan animasi yang boleh dilaraskan.",
+   "name": "Butir Filem",
+   "params": {
+    "amount": {
+     "label": "Jumlah"
+    },
+    "grainSize": {
+     "label": "Saiz Butir"
+    },
+    "speed": {
+     "label": "Kelajuan"
+    }
+   }
+  },
+  "flicker": {
+   "description": "Kelipkan kelegapan lapisan secara rawak.",
+   "name": "Kelip",
+   "params": {
+    "intensity": {
+     "label": "Keamatan"
+    },
+    "mode": {
+     "label": "Mod"
+    },
+    "seed": {
+     "label": "Benih"
+    },
+    "speed": {
+     "label": "Kelajuan"
+    }
+   }
+  },
+  "fourcolor": {
+   "description": "Serapkan empat warna pada empat titik (dalam piksel dari pusat lapisan) pada lapisan.",
+   "name": "Kecerunan Empat Warna",
+   "params": {
+    "blend": {
+     "label": "Campuran",
+     "options": [
+      "Normal",
+      "Darab",
+      "Skrin",
+      "Tindih",
+      "Cahaya Lembut",
+      "Cahaya Keras",
+      "Tambah",
+      "Gelapkan",
+      "Cerahkan",
+      "Perbezaan",
+      "Dodge Warna",
+      "Bakar Warna"
+     ]
+    },
+    "color1": {
+     "label": "Warna 1"
+    },
+    "color2": {
+     "label": "Warna 2"
+    },
+    "color3": {
+     "label": "Warna 3"
+    },
+    "color4": {
+     "label": "Warna 4"
+    },
+    "corner": {
+     "label": "Ofset Sudut"
+    },
+    "opacity": {
+     "label": "Kelegapan"
+    },
+    "point1": {
+     "label": "Titik 1"
+    },
+    "point2": {
+     "label": "Titik 2"
+    },
+    "point3": {
+     "label": "Titik 3"
+    },
+    "point4": {
+     "label": "Titik 4"
+    },
+    "softness": {
+     "label": "Kelembutan"
+    }
+   }
+  },
+  "glitch": {
+   "description": "Anjakan blok mendatar rawak dan ofset saluran warna, berubah beberapa kali sesaat.",
+   "name": "Glitch",
+   "params": {
+    "blockHeight": {
+     "label": "Tinggi Blok"
+    },
+    "intensity": {
+     "label": "Keamatan"
+    },
+    "seed": {
+     "label": "Benih"
+    }
+   }
+  },
+  "glow": {
+   "description": "Cahaya lembut di sekeliling bahagian terang lapisan.",
+   "name": "Cahaya",
+   "params": {
+    "intensity": {
+     "label": "Keamatan"
+    },
+    "strength": {
+     "label": "Saiz"
+    }
+   }
+  },
+  "gradientmap": {
+   "description": "Mewarnakan semula imej mengikut kecerahan melalui tiga warna, dengan ulangan dan fasa. Skala Kecerahan mendarab hasil dengan kecerahan imej itu sendiri.",
+   "name": "Peta Kecerunan",
+   "params": {
+    "color1": {
+     "label": "Bayang"
+    },
+    "color2": {
+     "label": "Nada Tengah"
+    },
+    "color3": {
+     "label": "Sorotan"
+    },
+    "opacity": {
+     "label": "Kelegapan"
+    },
+    "phase": {
+     "label": "Fasa"
+    },
+    "repeat": {
+     "label": "Ulangan"
+    },
+    "reverse": {
+     "label": "Songsang"
+    },
+    "scaleBrightness": {
+     "label": "Skala Kecerahan"
+    }
+   }
+  },
+  "gradientoverlay": {
+   "description": "Meletakkan kecerunan dua warna di atas lapisan dengan pilihan bentuk dan mod campuran.",
+   "name": "Tindanan Kecerunan",
+   "params": {
+    "angle": {
+     "label": "Sudut"
+    },
+    "blend": {
+     "label": "Campuran",
+     "options": [
+      "Biasa",
+      "Darab",
+      "Skrin",
+      "Tindih",
+      "Cahaya Lembut",
+      "Cahaya Keras",
+      "Tambah",
+      "Gelapkan",
+      "Cerahkan",
+      "Perbezaan",
+      "Dod Warna",
+      "Bakar Warna"
+     ]
+    },
+    "color1": {
+     "label": "Warna 1"
+    },
+    "color2": {
+     "label": "Warna 2"
+    },
+    "opacity": {
+     "label": "Kelegapan"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "shape": {
+     "label": "Bentuk",
+     "options": [
+      "Linear",
+      "Radial",
+      "Pantulan",
+      "Sudut"
+     ]
+    }
+   }
+  },
+  "halftone": {
+   "description": "Titik cetakan yang membesar di bahagian gelap imej.",
+   "name": "Halfton",
+   "params": {
+    "angle": {
+     "label": "Sudut"
+    },
+    "cell": {
+     "label": "Saiz"
+    },
+    "colored": {
+     "label": "Titik Berwarna"
+    }
+   }
+  },
+  "highlightshadow": {
+   "description": "Memulihkan atau menaikkan sorotan terang dan mengangkat atau mendalamkan bayang gelap dengan topeng kecerahan setempat yang kabur.",
+   "name": "Sorotan & Bayang",
+   "params": {
+    "highlights": {
+     "label": "Sorotan"
+    },
+    "shadows": {
+     "label": "Bayang"
+    }
+   }
+  },
+  "huesaturation": {
+   "description": "Memusingkan warna pada roda warna dan menjadikannya lebih kuat atau lemah; kesegaran paling menguatkan warna yang malap.",
+   "name": "Warna & Ketepuan",
+   "params": {
+    "hue": {
+     "label": "Warna"
+    },
+    "lightness": {
+     "label": "Kecerahan"
+    },
+    "saturation": {
+     "label": "Ketepuan"
+    },
+    "vibrance": {
+     "label": "Kesegaran"
+    }
+   }
+  },
+  "invert": {
+   "description": "Menyongsangkan saluran warna imej dengan jumlah campuran dan songsangan alfa pilihan.",
+   "name": "Songsang",
+   "params": {
+    "amount": {
+     "label": "Jumlah"
+    },
+    "invert_alpha": {
+     "label": "Songsang Alfa"
+    }
+   }
+  },
+  "kaleidoscope": {
+   "description": "Kepingan cermin di sekeliling satu titik.",
+   "name": "Kaleidoskop",
+   "params": {
+    "angle": {
+     "label": "Sudut"
+    },
+    "center": {
+     "label": "Pusat"
+    },
+    "segments": {
+     "label": "Segmen"
+    }
+   }
+  },
+  "lensflare": {
+   "description": "Cahaya terang dengan halo, ditindih pada gambar.",
+   "name": "Suar Cahaya",
+   "params": {
+    "brightness": {
+     "label": "Kecerahan"
+    },
+    "center": {
+     "label": "Pusat"
+    },
+    "color": {
+     "label": "Warna"
+    },
+    "radius": {
+     "label": "Jejari"
+    }
+   }
+  },
+  "levels": {
+   "description": "Laraskan tahap imej dengan titik hitam/putih input, gama dan titik hitam/putih output.",
+   "name": "Tahap",
+   "params": {
+    "gamma": {
+     "label": "Gama"
+    },
+    "inBlack": {
+     "label": "Hitam Input"
+    },
+    "inWhite": {
+     "label": "Putih Input"
+    },
+    "outBlack": {
+     "label": "Hitam Output"
+    },
+    "outWhite": {
+     "label": "Putih Output"
+    }
+   }
+  },
+  "lightglow": {
+   "description": "Menambah sinaran berwarna di sekeliling bahagian gambar yang lebih terang daripada ambang.",
+   "name": "Sinaran Cahaya",
+   "params": {
+    "blur": {
+     "label": "Saiz"
+    },
+    "color": {
+     "label": "Warna"
+    },
+    "intensity": {
+     "label": "Keamatan"
+    },
+    "opacity": {
+     "label": "Kelegapan"
+    },
+    "threshold": {
+     "label": "Ambang"
+    }
+   }
+  },
+  "lumakey": {
+   "description": "Buang bahagian gelap lapisan (atau bahagian terang).",
+   "name": "Kunci Luma",
+   "params": {
+    "invert": {
+     "label": "Songsang"
+    },
+    "softness": {
+     "label": "Kelembutan"
+    },
+    "threshold": {
+     "label": "Ambang"
+    }
+   }
+  },
+  "mirror": {
+   "description": "Mencerminkan separuh imej merentasi garis cermin yang ditentukan oleh sudut dan titik pusat.",
+   "name": "Cermin",
+   "params": {
+    "angle": {
+     "label": "Sudut"
+    },
+    "center": {
+     "label": "Pusat"
+    }
+   }
+  },
+  "motionblur": {
+   "description": "Mengaburkan lapisan dalam satu arah, seolah-olah bergerak pantas.",
+   "name": "Kabur Gerakan",
+   "params": {
+    "angle": {
+     "label": "Arah"
+    },
+    "length": {
+     "label": "Panjang"
+    }
+   }
+  },
+  "noisedisplace": {
+   "description": "Menganjak piksel menggunakan hingar nilai licin yang beranimasi mengikut masa.",
+   "name": "Anjakan Hingar",
+   "params": {
+    "amount": {
+     "label": "Jumlah"
+    },
+    "scale": {
+     "label": "Skala Hingar"
+    },
+    "speed": {
+     "label": "Kelajuan Animasi"
+    }
+   }
+  },
+  "oscillate": {
+   "description": "Menggerakkan lapisan ke hadapan dan ke belakang mengikut sudut.",
+   "name": "Ayunan",
+   "params": {
+    "angle": {
+     "label": "Sudut"
+    },
+    "frequency": {
+     "label": "Frekuensi"
+    },
+    "magnitude": {
+     "label": "Magnitud"
+    },
+    "phase": {
+     "label": "Fasa"
+    },
+    "wave": {
+     "label": "Gelombang",
+     "options": [
+      "Sinus",
+      "Segi tiga"
+     ]
+    }
+   }
+  },
+  "pixelate": {
+   "description": "Gunakan kesan piksel mozek dengan menggantikan kawasan dengan blok segi empat sama warna piksel kiri atas.",
+   "name": "Piksel",
+   "params": {
+    "blockSize": {
+     "label": "Saiz Blok"
+    }
+   }
+  },
+  "posterize": {
+   "description": "Mengurangkan setiap saluran warna kepada bilangan aras yang ditetapkan (2-32).",
+   "name": "Posterisasi",
+   "params": {
+    "levels": {
+     "label": "Aras"
+    }
+   }
+  },
+  "pulseopacity": {
+   "description": "Memudarkan lapisan keluar dan masuk secara berulang.",
+   "name": "Kelegapan denyut",
+   "params": {
+    "frequency": {
+     "label": "Kekerapan"
+    },
+    "minimum": {
+     "label": "Minimum"
+    },
+    "phase": {
+     "label": "Fasa"
+    },
+    "wave": {
+     "label": "Gelombang",
+     "options": [
+      "Sinus",
+      "Segi tiga"
+     ]
+    }
+   }
+  },
+  "pulsesize": {
+   "description": "Menjadikan lapisan membesar dan mengecil secara berulang.",
+   "name": "Saiz denyut",
+   "params": {
+    "amount": {
+     "label": "Jumlah"
+    },
+    "frequency": {
+     "label": "Kekerapan"
+    },
+    "phase": {
+     "label": "Fasa"
+    },
+    "wave": {
+     "label": "Gelombang",
+     "options": [
+      "Sinus",
+      "Segi tiga"
+     ]
+    }
+   }
+  },
+  "radialblur": {
+   "description": "Menggunakan kabur zum jejari dengan meratakan sampel sepanjang sinar dari titik pusat dan kekuatan yang boleh dilaraskan.",
+   "name": "Kabur zum",
+   "params": {
+    "center": {
+     "label": "Pusat"
+    },
+    "strength": {
+     "label": "Kekuatan"
+    }
+   }
+  },
+  "randomdisplace": {
+   "description": "Membolehkan lapisan hanyut secara rawak di sekitar kedudukannya.",
+   "name": "Anjakan rawak",
+   "params": {
+    "magnitude": {
+     "label": "Magnitud"
+    },
+    "seed": {
+     "label": "Benih"
+    },
+    "speed": {
+     "label": "Kelajuan"
+    }
+   }
+  },
+  "randomjitter": {
+   "description": "Menjadikan lapisan melompat ke depan dan ke belakang secara rawak mengikut sudut.",
+   "name": "Gegaran rawak",
+   "params": {
+    "angle": {
+     "label": "Sudut"
+    },
+    "magnitude": {
+     "label": "Magnitud"
+    },
+    "rate": {
+     "label": "Kadar"
+    },
+    "seed": {
+     "label": "Benih"
+    }
+   }
+  },
+  "rgbsplit": {
+   "description": "Aberasi kromatik dengan mengalihkan saluran merah dan biru ke arah bertentangan pada satu sudut.",
+   "name": "Pisah RGB",
+   "params": {
+    "angle": {
+     "label": "Sudut"
+    },
+    "splitDistance": {
+     "label": "Jarak"
+    }
+   }
+  },
+  "ripple": {
+   "description": "Riakan sepusat yang memancar dari titik pusat dengan amplitud, panjang gelombang dan kelajuan yang boleh dilaraskan.",
+   "name": "Riak",
+   "params": {
+    "amplitude": {
+     "label": "Amplitud"
+    },
+    "center": {
+     "label": "Pusat"
+    },
+    "speed": {
+     "label": "Kelajuan"
+    },
+    "wavelength": {
+     "label": "Panjang gelombang"
+    }
+   }
+  },
+  "scanlines": {
+   "description": "Menambah garis imbas mendatar untuk kesan monitor CRT dengan guling menegak pilihan.",
+   "name": "Garis imbas",
+   "params": {
+    "darkness": {
+     "label": "Kegelapan"
+    },
+    "roll_speed": {
+     "label": "Kelajuan guling"
+    },
+    "spacing": {
+     "label": "Jarak garis"
+    }
+   }
+  },
+  "sepia": {
+   "description": "Nada coklat hangat, seperti gambar lama.",
+   "name": "Sepia",
+   "params": {
+    "amount": {
+     "label": "Jumlah"
+    }
+   }
+  },
+  "sharpen": {
+   "description": "Menggunakan topeng tidak tajam dengan kejiranan 3x3 untuk menyerlahkan butiran halus.",
+   "name": "Pertajam",
+   "params": {
+    "amount": {
+     "label": "Jumlah"
+    },
+    "radius": {
+     "label": "Jejari"
+    }
+   }
+  },
+  "softglow": {
+   "description": "Menindih salinan gambar yang lembut dan kabur untuk cahaya bagaikan mimpi, kebanyakannya daripada sorotan.",
+   "name": "Cahaya lembut",
+   "params": {
+    "blur": {
+     "label": "Saiz"
+    },
+    "brightness": {
+     "label": "Kecerahan"
+    },
+    "color": {
+     "label": "Warna"
+    },
+    "contrast": {
+     "label": "Kontras"
+    },
+    "highlights": {
+     "label": "Sorotan"
+    },
+    "opacity": {
+     "label": "Kelegapan"
+    }
+   }
+  },
+  "solid": {
+   "description": "Meletakkan satu warna di atas lapisan, mengekalkan bentuknya, dengan pilihan mod campuran.",
+   "name": "Tindihan Warna",
+   "params": {
+    "amount": {
+     "label": "Amaun"
+    },
+    "blend": {
+     "label": "Campuran",
+     "options": [
+      "Normal",
+      "Darab",
+      "Skrin",
+      "Tindihan",
+      "Cahaya Lembut",
+      "Cahaya Keras",
+      "Tambah",
+      "Gelapkan",
+      "Cerahkan",
+      "Perbezaan",
+      "Dodge Warna",
+      "Burn Warna"
+     ]
+    },
+    "color": {
+     "label": "Warna"
+    }
+   }
+  },
+  "spin": {
+   "description": "Memusingkan lapisan berterusan pada kelajuan yang tetap.",
+   "name": "Putar",
+   "params": {
+    "direction": {
+     "label": "Arah",
+     "options": [
+      "Ikut Jam",
+      "Lawan Jam"
+     ]
+    },
+    "speed": {
+     "label": "Kelajuan"
+    }
+   }
+  },
+  "splittone": {
+   "description": "Mewarnakan bayang ke satu rona dan sorotan ke rona lain, sambil mengekalkan hitam, putih dan kecerahan.",
+   "name": "Tona Terpisah",
+   "params": {
+    "highlightAmount": {
+     "label": "Amaun Sorotan"
+    },
+    "highlightHue": {
+     "label": "Rona Sorotan"
+    },
+    "shadowAmount": {
+     "label": "Amaun Bayang"
+    },
+    "shadowHue": {
+     "label": "Rona Bayang"
+    }
+   }
+  },
+  "static": {
+   "description": "Hingar kelabu yang berkelip-kelip, seperti televisyen tanpa isyarat.",
+   "name": "Statik",
+   "params": {
+    "amount": {
+     "label": "Amaun"
+    },
+    "grain": {
+     "label": "Saiz"
+    }
+   }
+  },
+  "stretch": {
+   "description": "Memotong lapisan di sepanjang garis dan menarik kedua-dua belahnya berpisah, meregangkan piksel pada garis itu ke dalam ruang kosong.",
+   "name": "Regang Segmen",
+   "params": {
+    "angle": {
+     "label": "Sudut"
+    },
+    "offset": {
+     "label": "Anjakan"
+    },
+    "spread": {
+     "label": "Sebaran"
+    },
+    "stretch": {
+     "label": "Regang"
+    }
+   }
+  },
+  "stretchaxis": {
+   "description": "Meregangkan lapisan di sepanjang suatu sudut.",
+   "name": "Paksi Regang",
+   "params": {
+    "amount": {
+     "label": "Amaun"
+    },
+    "angle": {
+     "label": "Sudut"
+    }
+   }
+  },
+  "swing": {
+   "description": "Memusingkan lapisan ke depan dan ke belakang mengelilingi paksi putarannya.",
+   "name": "Hayun",
+   "params": {
+    "angle": {
+     "label": "Sudut"
+    },
+    "frequency": {
+     "label": "Frekuensi"
+    },
+    "phase": {
+     "label": "Fasa"
+    },
+    "wave": {
+     "label": "Gelombang",
+     "options": [
+      "Sinus",
+      "Segi Tiga"
+     ]
+    }
+   }
+  },
+  "temperature": {
+   "description": "Memanaskan atau menyejukkan gambar seperti cahaya pada suhu warna dalam kelvin (6500 K membiarkannya tidak berubah), sambil mengekalkan kecerahannya.",
+   "name": "Suhu Warna",
+   "params": {
+    "kelvin": {
+     "label": "Suhu"
+    },
+    "strength": {
+     "label": "Kekuatan"
+    }
+   }
+  },
+  "threshold": {
+   "description": "Hitam putih tulen, dipisahkan pada satu kecerahan.",
+   "name": "Ambang",
+   "params": {
+    "invert": {
+     "label": "Songsang"
+    },
+    "level": {
+     "label": "Aras"
+    },
+    "softness": {
+     "label": "Kelembutan"
+    }
+   }
+  },
+  "tile": {
+   "description": "Mengulang gambar dalam grid.",
+   "name": "Jubin",
+   "params": {
+    "mirror": {
+     "label": "Cermin"
+    },
+    "offset": {
+     "label": "Ofset"
+    },
+    "scale": {
+     "label": "Skala"
+    }
+   }
+  },
+  "timequant": {
+   "description": "Membuat masa bergerak berperingkat untuk lapisan ini, seperti kadar bingkai yang lebih rendah.",
+   "name": "Pengkuantuman Masa",
+   "params": {
+    "fps": {
+     "label": "Kadar Bingkai"
+    }
+   }
+  },
+  "tint": {
+   "description": "Memetakan kecerahan gambar antara warna bayang dan warna sorotan dengan jumlah campuran.",
+   "name": "Pewarnaan",
+   "params": {
+    "amount": {
+     "label": "Jumlah"
+    },
+    "highlightColor": {
+     "label": "Warna Sorotan"
+    },
+    "shadowColor": {
+     "label": "Warna Bayang"
+    }
+   }
+  },
+  "twirl": {
+   "description": "Memutar piksel di sekeliling titik pusat dengan sudut yang berkurang mengikut jarak dari pusat.",
+   "name": "Pusar",
+   "params": {
+    "angle": {
+     "label": "Sudut"
+    },
+    "center": {
+     "label": "Pusat"
+    },
+    "radius": {
+     "label": "Jejari"
+    }
+   }
+  },
+  "unsharpmask": {
+   "description": "Menggunakan topeng tidak tajam klasik dengan ambang dan pratonton topeng kelabu pilihan.",
+   "name": "Topeng Tidak Tajam",
+   "params": {
+    "amount": {
+     "label": "Jumlah"
+    },
+    "showMask": {
+     "label": "Tunjuk Topeng"
+    },
+    "strength": {
+     "label": "Kekuatan"
+    },
+    "threshold": {
+     "label": "Ambang"
+    }
+   }
+  },
+  "vhs": {
+   "description": "Kelihatan seperti pita video lama: warna meleleh, garisan kabur, garisan imbas, hingar pita dan jalur penjejakan bergulir.",
+   "name": "VHS",
+   "params": {
+    "chroma": {
+     "label": "Warna Meleleh"
+    },
+    "headSwitch": {
+     "label": "Peralihan Kepala"
+    },
+    "noise": {
+     "label": "Hingar"
+    },
+    "saturation": {
+     "label": "Ketepuan"
+    },
+    "scanlines": {
+     "label": "Garisan Imbas"
+    },
+    "seed": {
+     "label": "Benih"
+    },
+    "smear": {
+     "label": "Sapuan"
+    },
+    "tracking": {
+     "label": "Penjejakan"
+    },
+    "wobble": {
+     "label": "Goyang"
+    }
+   }
+  },
+  "vignette": {
+   "description": "Menggunakan kesan vignet untuk menggelapkan tepi imej.",
+   "name": "Vignet",
+   "params": {
+    "amount": {
+     "label": "Jumlah"
+    },
+    "radius": {
+     "label": "Saiz"
+    },
+    "roundness": {
+     "label": "Kebulatan"
+    },
+    "softness": {
+     "label": "Kelembutan"
+    }
+   }
+  },
+  "wavewarp": {
+   "description": "Menggunakan sesaran gelombang sinus pada imej dengan amplitud, panjang gelombang, arah dan kelajuan fasa yang boleh dilaras.",
+   "name": "Herotan Gelombang",
+   "params": {
+    "amplitude": {
+     "label": "Amplitud"
+    },
+    "direction": {
+     "label": "Arah"
+    },
+    "speed": {
+     "label": "Kelajuan"
+    },
+    "wavelength": {
+     "label": "Panjang Gelombang"
+    }
+   }
+  }
+ }
+}

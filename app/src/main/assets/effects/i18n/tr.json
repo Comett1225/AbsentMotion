@@ -1,0 +1,1165 @@
+{
+ "categories": {
+  "ai": "AI",
+  "blur": "Bulanıklaştırma",
+  "color": "Renk",
+  "distort": "Bozulma",
+  "key": "Anahtar",
+  "move": "Hareket",
+  "new": "Yeni",
+  "noise": "Gürültü",
+  "repeat": "Tekrar",
+  "stylize": "Stil"
+ },
+ "effects": {
+  "autoshake": {
+   "description": "Katmanı rastgele sarsar, biraz hareket ettirip döndürür.",
+   "name": "Otomatik Sarsıntı",
+   "params": {
+    "frequency": {
+     "label": "Frekans"
+    },
+    "magnitude": {
+     "label": "Şiddet"
+    },
+    "rotation": {
+     "label": "Dönüş"
+    },
+    "seed": {
+     "label": "Tohum"
+    }
+   }
+  },
+  "backdrop": {
+   "description": "Katmanı altındakilerle doldurur; böylece bu efektten sonraki efektler alttaki katmanları etkiler. Karışım, katmanın kendi dolgusunu geri getirir.",
+   "name": "Ayar Katmanı",
+   "params": {
+    "mix": {
+     "label": "Karışım"
+    }
+   }
+  },
+  "blink": {
+   "description": "Katmanı saniyede belirli sayıda açıp kapatır.",
+   "name": "Yanıp Sönme",
+   "params": {
+    "frequency": {
+     "label": "Saniyedeki Yanıp Sönme"
+    }
+   }
+  },
+  "blur": {
+   "description": "Yumuşak, eşit bir bulanıklık.",
+   "name": "Bulanıklaştırma",
+   "params": {
+    "strength": {
+     "label": "Güç"
+    }
+   }
+  },
+  "brightnesscontrast": {
+   "description": "Görselin parlaklığını ve kontrastını ayarlar.",
+   "name": "Parlaklık ve Kontrast",
+   "params": {
+    "brightness": {
+     "label": "Parlaklık"
+    },
+    "contrast": {
+     "label": "Kontrast"
+    }
+   }
+  },
+  "bulge": {
+   "description": "Bir merkez noktası çevresinde, ayarlanabilir güç ve yarıçapla balıkgözü büyütme veya sıkıştırma uygular.",
+   "name": "Şişirme",
+   "params": {
+    "center": {
+     "label": "Merkez"
+    },
+    "radius": {
+     "label": "Yarıçap"
+    },
+    "strength": {
+     "label": "Güç"
+    }
+   }
+  },
+  "chromakey": {
+   "description": "Yeşil perde gibi bir rengi kaldırır.",
+   "name": "Kroma Anahtarı",
+   "params": {
+    "key": {
+     "label": "Anahtar Rengi"
+    },
+    "softness": {
+     "label": "Yumuşaklık"
+    },
+    "tolerance": {
+     "label": "Tolerans"
+    }
+   }
+  },
+  "colorbalance": {
+   "description": "Gölgeleri, orta tonları ve vurguları kendi renklerine doğru kaydırır (gri, aralığı değiştirmez).",
+   "name": "Renk Dengesi",
+   "params": {
+    "amount": {
+     "label": "Miktar"
+    },
+    "highlights": {
+     "label": "Vurgular"
+    },
+    "midtones": {
+     "label": "Orta Tonlar"
+    },
+    "shadows": {
+     "label": "Gölgeler"
+    }
+   }
+  },
+  "colorwheels": {
+   "description": "Gölgeler (kaldır), orta tonlar (gama) ve vurgular (kazanç) için renk tekerleri: ton, itme miktarı ve seviye.",
+   "name": "Kaldır Gama Kazanç",
+   "params": {
+    "gainAmount": {
+     "label": "Kazanç Miktarı"
+    },
+    "gainHue": {
+     "label": "Kazanç Tonu"
+    },
+    "gainLevel": {
+     "label": "Kazanç Seviyesi"
+    },
+    "gammaAmount": {
+     "label": "Gama Miktarı"
+    },
+    "gammaHue": {
+     "label": "Gama Tonu"
+    },
+    "gammaLevel": {
+     "label": "Gama Seviyesi"
+    },
+    "liftAmount": {
+     "label": "Kaldır Miktarı"
+    },
+    "liftHue": {
+     "label": "Kaldır Tonu"
+    },
+    "liftLevel": {
+     "label": "Kaldır Seviyesi"
+    }
+   }
+  },
+  "denoise": {
+   "description": "Görsel gürültüsünü, yakındaki pikselleri yalnızca renkleri benzerken ortalayan kenar korumalı iki yönlü filtreyle kaldırır.",
+   "name": "Gürültü Azaltma",
+   "params": {
+    "detail": {
+     "label": "Ayrıntı"
+    },
+    "radius": {
+     "label": "Yarıçap"
+    },
+    "strength": {
+     "label": "Güç"
+    }
+   }
+  },
+  "directionalblur": {
+   "description": "Yön açısı boyunca örnekleri ortalayarak hareket bulanıklığı oluşturur.",
+   "name": "Yönlü Bulanıklaştırma",
+   "params": {
+    "angle": {
+     "label": "Açı"
+    },
+    "blurLength": {
+     "label": "Uzunluk"
+    }
+   }
+  },
+  "dissolve": {
+   "description": "Katman rastgele beneklere ayrılır.",
+   "name": "Dağılma",
+   "params": {
+    "grain": {
+     "label": "Boyut"
+    },
+    "progress": {
+     "label": "İlerleme"
+    }
+   }
+  },
+  "duotone": {
+   "description": "Parlaklığa göre iki renkli bir gradyan haritası uygular; kontrast ve miktar ayarlanabilir.",
+   "name": "İki Ton",
+   "params": {
+    "amount": {
+     "label": "Miktar"
+    },
+    "color1": {
+     "label": "Gölge Rengi"
+    },
+    "color2": {
+     "label": "Vurgu Rengi"
+    },
+    "contrast": {
+     "label": "Kontrast"
+    }
+   }
+  },
+  "echo": {
+   "description": "Katmanın az önceki hâlinin kopyalarını, animasyonunu izleyerek çizer.",
+   "name": "Yankı Anahtar Kareleri",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "composite": {
+     "label": "Birleştirme",
+     "options": [
+      "Arkada",
+      "Üstte"
+     ]
+    },
+    "count": {
+     "label": "Adet"
+    },
+    "seconds": {
+     "label": "Saniye"
+    }
+   }
+  },
+  "edgedetect": {
+   "description": "Görüntünün değiştiği yerlerde parlak, diğer yerlerde koyu çizgiler.",
+   "name": "Kenar Algılama",
+   "params": {
+    "strength": {
+     "label": "Güç"
+    }
+   }
+  },
+  "emboss": {
+   "description": "Belirtilen ışık açısı boyunca parlaklık gradyanlarıyla kabartma efekti uygular.",
+   "name": "Kabartma",
+   "params": {
+    "angle": {
+     "label": "Işık Açısı"
+    },
+    "strength": {
+     "label": "Güç"
+    }
+   }
+  },
+  "exposure": {
+   "description": "Durak, ofset ve gama düzeltmesiyle fotoğrafik pozlamayı simüle eder.",
+   "name": "Pozlama",
+   "params": {
+    "gamma": {
+     "label": "Gama"
+    },
+    "offset": {
+     "label": "Ofset"
+    },
+    "stops": {
+     "label": "Durak"
+    }
+   }
+  },
+  "filmgrain": {
+   "description": "Ayarlanabilir miktar, gren boyutu ve animasyon hızıyla hareketli tek renkli film greni.",
+   "name": "Film Greni",
+   "params": {
+    "amount": {
+     "label": "Miktar"
+    },
+    "grainSize": {
+     "label": "Gren Boyutu"
+    },
+    "speed": {
+     "label": "Hız"
+    }
+   }
+  },
+  "flicker": {
+   "description": "Katmanın opaklığını rastgele titreştirir.",
+   "name": "Titreme",
+   "params": {
+    "intensity": {
+     "label": "Yoğunluk"
+    },
+    "mode": {
+     "label": "Mod"
+    },
+    "seed": {
+     "label": "Tohum"
+    },
+    "speed": {
+     "label": "Hız"
+    }
+   }
+  },
+  "fourcolor": {
+   "description": "Dört noktaya (katmanın merkezinden piksel cinsinden) yerleştirilen dört rengi katmanın üzerine karıştırır.",
+   "name": "Dört Renkli Gradyan",
+   "params": {
+    "blend": {
+     "label": "Karışım",
+     "options": [
+      "Normal",
+      "Çarpma",
+      "Ekran",
+      "Kaplama",
+      "Yumuşak Işık",
+      "Sert Işık",
+      "Ekle",
+      "Koyulaştır",
+      "Aydınlat",
+      "Fark",
+      "Renk Soldurma",
+      "Renk Yakma"
+     ]
+    },
+    "color1": {
+     "label": "Renk 1"
+    },
+    "color2": {
+     "label": "Renk 2"
+    },
+    "color3": {
+     "label": "Renk 3"
+    },
+    "color4": {
+     "label": "Renk 4"
+    },
+    "corner": {
+     "label": "Köşe Ofsetleri"
+    },
+    "opacity": {
+     "label": "Opaklık"
+    },
+    "point1": {
+     "label": "Nokta 1"
+    },
+    "point2": {
+     "label": "Nokta 2"
+    },
+    "point3": {
+     "label": "Nokta 3"
+    },
+    "point4": {
+     "label": "Nokta 4"
+    },
+    "softness": {
+     "label": "Yumuşaklık"
+    }
+   }
+  },
+  "glitch": {
+   "description": "Saniyede birkaç kez değişen rastgele yatay blok kaymaları ve renk kanalı ofsetleri.",
+   "name": "Glitch",
+   "params": {
+    "blockHeight": {
+     "label": "Blok Yüksekliği"
+    },
+    "intensity": {
+     "label": "Yoğunluk"
+    },
+    "seed": {
+     "label": "Tohum"
+    }
+   }
+  },
+  "glow": {
+   "description": "Katmanın parlak kısımlarının çevresinde yumuşak bir ışık.",
+   "name": "Parlama",
+   "params": {
+    "intensity": {
+     "label": "Yoğunluk"
+    },
+    "strength": {
+     "label": "Boyut"
+    }
+   }
+  },
+  "gradientmap": {
+   "description": "Görseli parlaklığa göre üç renk üzerinden yeniden renklendirir; tekrarlar ve bir faz içerir. Parlaklığı Ölçekle, sonucu görselin kendi parlaklığıyla çarpar.",
+   "name": "Gradyan Eşleme",
+   "params": {
+    "color1": {
+     "label": "Gölgeler"
+    },
+    "color2": {
+     "label": "Orta tonlar"
+    },
+    "color3": {
+     "label": "Açık tonlar"
+    },
+    "opacity": {
+     "label": "Opaklık"
+    },
+    "phase": {
+     "label": "Faz"
+    },
+    "repeat": {
+     "label": "Tekrar"
+    },
+    "reverse": {
+     "label": "Ters Çevir"
+    },
+    "scaleBrightness": {
+     "label": "Parlaklığı Ölçekle"
+    }
+   }
+  },
+  "gradientoverlay": {
+   "description": "Katmanın üzerine seçilebilir şekil ve karışım modlarıyla iki renkli bir gradyan yerleştirir.",
+   "name": "Gradyan Kaplama",
+   "params": {
+    "angle": {
+     "label": "Açı"
+    },
+    "blend": {
+     "label": "Karışım",
+     "options": [
+      "Normal",
+      "Çoğalt",
+      "Ekran",
+      "Kaplama",
+      "Yumuşak Işık",
+      "Sert Işık",
+      "Ekle",
+      "Koyulaştır",
+      "Aydınlat",
+      "Fark",
+      "Renk Soldurma",
+      "Renk Yakma"
+     ]
+    },
+    "color1": {
+     "label": "Renk 1"
+    },
+    "color2": {
+     "label": "Renk 2"
+    },
+    "opacity": {
+     "label": "Opaklık"
+    },
+    "scale": {
+     "label": "Ölçek"
+    },
+    "shape": {
+     "label": "Şekil",
+     "options": [
+      "Doğrusal",
+      "Radyal",
+      "Yansımalı",
+      "Açı"
+     ]
+    }
+   }
+  },
+  "halftone": {
+   "description": "Görselin koyu olduğu yerlerde büyüyen baskı noktaları.",
+   "name": "Yarım Ton",
+   "params": {
+    "angle": {
+     "label": "Açı"
+    },
+    "cell": {
+     "label": "Boyut"
+    },
+    "colored": {
+     "label": "Renkli Noktalar"
+    }
+   }
+  },
+  "highlightshadow": {
+   "description": "Bulanık bir yerel parlaklık maskesi kullanarak parlak açık tonları geri kazanır veya güçlendirir, koyu gölgeleri açar ya da derinleştirir.",
+   "name": "Açık Tonlar ve Gölgeler",
+   "params": {
+    "highlights": {
+     "label": "Açık tonlar"
+    },
+    "shadows": {
+     "label": "Gölgeler"
+    }
+   }
+  },
+  "huesaturation": {
+   "description": "Renkleri renk çemberi üzerinde döndürür ve daha güçlü ya da zayıf hale getirir; canlılık en çok soluk renkleri güçlendirir.",
+   "name": "Ton ve Doygunluk",
+   "params": {
+    "hue": {
+     "label": "Ton"
+    },
+    "lightness": {
+     "label": "Açıklık"
+    },
+    "saturation": {
+     "label": "Doygunluk"
+    },
+    "vibrance": {
+     "label": "Canlılık"
+    }
+   }
+  },
+  "invert": {
+   "description": "Görselin renk kanallarını karışım miktarıyla ve isteğe bağlı alfa ters çevirmeyle tersine çevirir.",
+   "name": "Ters Çevir",
+   "params": {
+    "amount": {
+     "label": "Miktar"
+    },
+    "invert_alpha": {
+     "label": "Alfayı Ters Çevir"
+    }
+   }
+  },
+  "kaleidoscope": {
+   "description": "Bir nokta etrafında aynalanmış dilimler.",
+   "name": "Kaleidoskop",
+   "params": {
+    "angle": {
+     "label": "Açı"
+    },
+    "center": {
+     "label": "Merkez"
+    },
+    "segments": {
+     "label": "Dilimler"
+    }
+   }
+  },
+  "lensflare": {
+   "description": "Görselin üzerine haleli parlak bir ışık yerleştirir.",
+   "name": "Işık Parlaması",
+   "params": {
+    "brightness": {
+     "label": "Parlaklık"
+    },
+    "center": {
+     "label": "Merkez"
+    },
+    "color": {
+     "label": "Renk"
+    },
+    "radius": {
+     "label": "Yarıçap"
+    }
+   }
+  },
+  "levels": {
+   "description": "Görselin seviyelerini giriş siyah/beyaz noktaları, gama ve çıkış siyah/beyaz noktalarıyla ayarlar.",
+   "name": "Seviyeler",
+   "params": {
+    "gamma": {
+     "label": "Gama"
+    },
+    "inBlack": {
+     "label": "Giriş Siyahı"
+    },
+    "inWhite": {
+     "label": "Giriş Beyazı"
+    },
+    "outBlack": {
+     "label": "Çıkış Siyahı"
+    },
+    "outWhite": {
+     "label": "Çıkış Beyazı"
+    }
+   }
+  },
+  "lightglow": {
+   "description": "Görselin eşik değerinden parlak kısımlarının çevresine renkli bir parıltı ekler.",
+   "name": "Işık Parıltısı",
+   "params": {
+    "blur": {
+     "label": "Boyut"
+    },
+    "color": {
+     "label": "Renk"
+    },
+    "intensity": {
+     "label": "Yoğunluk"
+    },
+    "opacity": {
+     "label": "Opaklık"
+    },
+    "threshold": {
+     "label": "Eşik"
+    }
+   }
+  },
+  "lumakey": {
+   "description": "Katmanın koyu (veya açık) kısımlarını kaldırır.",
+   "name": "Luma Anahtarı",
+   "params": {
+    "invert": {
+     "label": "Ters Çevir"
+    },
+    "softness": {
+     "label": "Yumuşaklık"
+    },
+    "threshold": {
+     "label": "Eşik"
+    }
+   }
+  },
+  "mirror": {
+   "description": "Görselin bir yarısını açı ve merkez noktasıyla belirlenen ayna çizgisi boyunca yansıtır.",
+   "name": "Ayna",
+   "params": {
+    "angle": {
+     "label": "Açı"
+    },
+    "center": {
+     "label": "Merkez"
+    }
+   }
+  },
+  "motionblur": {
+   "description": "Katmanı hızlı hareket etmiş gibi tek yönde bulanıklaştırır.",
+   "name": "Hareket Bulanıklığı",
+   "params": {
+    "angle": {
+     "label": "Yön"
+    },
+    "length": {
+     "label": "Uzunluk"
+    }
+   }
+  },
+  "noisedisplace": {
+   "description": "Pikselleri zamanla hareket eden yumuşak değer gürültüsüyle kaydırır.",
+   "name": "Gürültü Kaydırma",
+   "params": {
+    "amount": {
+     "label": "Miktar"
+    },
+    "scale": {
+     "label": "Gürültü Ölçeği"
+    },
+    "speed": {
+     "label": "Animasyon Hızı"
+    }
+   }
+  },
+  "oscillate": {
+   "description": "Katmanı bir açı boyunca ileri geri hareket ettirir.",
+   "name": "Salınım",
+   "params": {
+    "angle": {
+     "label": "Açı"
+    },
+    "frequency": {
+     "label": "Frekans"
+    },
+    "magnitude": {
+     "label": "Genlik"
+    },
+    "phase": {
+     "label": "Faz"
+    },
+    "wave": {
+     "label": "Dalga",
+     "options": [
+      "Sinüs",
+      "Üçgen"
+     ]
+    }
+   }
+  },
+  "pixelate": {
+   "description": "Alanları sol üstteki pikselin rengindeki kare bloklarla değiştirerek mozaik pikselleştirme uygular.",
+   "name": "Pikselleştir",
+   "params": {
+    "blockSize": {
+     "label": "Blok Boyutu"
+    }
+   }
+  },
+  "posterize": {
+   "description": "Her renk kanalını belirli sayıda düzeye (2-32) indirir.",
+   "name": "Posterleştir",
+   "params": {
+    "levels": {
+     "label": "Düzeyler"
+    }
+   }
+  },
+  "pulseopacity": {
+   "description": "Katmanı sürekli olarak söndürüp yeniden belirginleştirir.",
+   "name": "Nabız Opaklığı",
+   "params": {
+    "frequency": {
+     "label": "Frekans"
+    },
+    "minimum": {
+     "label": "Minimum"
+    },
+    "phase": {
+     "label": "Faz"
+    },
+    "wave": {
+     "label": "Dalga",
+     "options": [
+      "Sinüs",
+      "Üçgen"
+     ]
+    }
+   }
+  },
+  "pulsesize": {
+   "description": "Katmanı sürekli olarak büyütüp küçültür.",
+   "name": "Nabız Boyutu",
+   "params": {
+    "amount": {
+     "label": "Miktar"
+    },
+    "frequency": {
+     "label": "Frekans"
+    },
+    "phase": {
+     "label": "Faz"
+    },
+    "wave": {
+     "label": "Dalga",
+     "options": [
+      "Sinüs",
+      "Üçgen"
+     ]
+    }
+   }
+  },
+  "radialblur": {
+   "description": "Bir merkez noktadan çıkan ışınlar boyunca örnekleri ortalamayla, ayarlanabilir güçte radyal yakınlaştırma bulanıklığı uygular.",
+   "name": "Yakınlaştırma Bulanıklığı",
+   "params": {
+    "center": {
+     "label": "Merkez"
+    },
+    "strength": {
+     "label": "Güç"
+    }
+   }
+  },
+  "randomdisplace": {
+   "description": "Katmanın yerinde rastgele sürüklenmesini sağlar.",
+   "name": "Rastgele Kayma",
+   "params": {
+    "magnitude": {
+     "label": "Büyüklük"
+    },
+    "seed": {
+     "label": "Tohum"
+    },
+    "speed": {
+     "label": "Hız"
+    }
+   }
+  },
+  "randomjitter": {
+   "description": "Katmanın bir açı boyunca rastgele ileri geri sıçramasını sağlar.",
+   "name": "Rastgele Titreme",
+   "params": {
+    "angle": {
+     "label": "Açı"
+    },
+    "magnitude": {
+     "label": "Büyüklük"
+    },
+    "rate": {
+     "label": "Oran"
+    },
+    "seed": {
+     "label": "Tohum"
+    }
+   }
+  },
+  "rgbsplit": {
+   "description": "Kırmızı ve mavi kanalları bir açı boyunca zıt yönlerde kaydırarak renk sapması oluşturur.",
+   "name": "RGB Ayrımı",
+   "params": {
+    "angle": {
+     "label": "Açı"
+    },
+    "splitDistance": {
+     "label": "Mesafe"
+    }
+   }
+  },
+  "ripple": {
+   "description": "Bir merkez noktadan yayılan, genlik, dalga boyu ve hızı ayarlanabilir eş merkezli dalgalanmalar.",
+   "name": "Dalgalanma",
+   "params": {
+    "amplitude": {
+     "label": "Genlik"
+    },
+    "center": {
+     "label": "Merkez"
+    },
+    "speed": {
+     "label": "Hız"
+    },
+    "wavelength": {
+     "label": "Dalga boyu"
+    }
+   }
+  },
+  "scanlines": {
+   "description": "CRT monitör etkisi için yatay tarama çizgileri ekler; isteğe bağlı dikey kaydırma da yapılabilir.",
+   "name": "Tarama Çizgileri",
+   "params": {
+    "darkness": {
+     "label": "Koyuluk"
+    },
+    "roll_speed": {
+     "label": "Kaydırma hızı"
+    },
+    "spacing": {
+     "label": "Çizgi aralığı"
+    }
+   }
+  },
+  "sepia": {
+   "description": "Eski bir fotoğraf gibi sıcak kahverengi tonlar.",
+   "name": "Sepya",
+   "params": {
+    "amount": {
+     "label": "Miktar"
+    }
+   }
+  },
+  "sharpen": {
+   "description": "İnce ayrıntıları belirginleştirmek için 3x3 komşuluk kullanan keskinleştirme maskesi uygular.",
+   "name": "Keskinleştir",
+   "params": {
+    "amount": {
+     "label": "Miktar"
+    },
+    "radius": {
+     "label": "Yarıçap"
+    }
+   }
+  },
+  "softglow": {
+   "description": "Görüntünün bulanık ve yumuşak bir kopyasını çoğunlukla parlak alanlardan gelen rüya gibi bir parıltı için üzerine ekler.",
+   "name": "Yumuşak Parıltı",
+   "params": {
+    "blur": {
+     "label": "Boyut"
+    },
+    "brightness": {
+     "label": "Parlaklık"
+    },
+    "color": {
+     "label": "Renk"
+    },
+    "contrast": {
+     "label": "Kontrast"
+    },
+    "highlights": {
+     "label": "Işıklar"
+    },
+    "opacity": {
+     "label": "Opaklık"
+    }
+   }
+  },
+  "solid": {
+   "description": "Katmanın şeklini koruyarak üzerine seçilen karışım modlarıyla tek bir renk yerleştirir.",
+   "name": "Renk Kaplama",
+   "params": {
+    "amount": {
+     "label": "Miktar"
+    },
+    "blend": {
+     "label": "Karışım",
+     "options": [
+      "Normal",
+      "Çarpma",
+      "Ekran",
+      "Kaplama",
+      "Yumuşak Işık",
+      "Sert Işık",
+      "Ekle",
+      "Koyulaştır",
+      "Aç",
+      "Fark",
+      "Renk Soldurma",
+      "Renk Yakma"
+     ]
+    },
+    "color": {
+     "label": "Renk"
+    }
+   }
+  },
+  "spin": {
+   "description": "Katmanı sabit bir hızda sürekli döndürür.",
+   "name": "Döndür",
+   "params": {
+    "direction": {
+     "label": "Yön",
+     "options": [
+      "Saat yönünde",
+      "Saat yönünün tersine"
+     ]
+    },
+    "speed": {
+     "label": "Hız"
+    }
+   }
+  },
+  "splittone": {
+   "description": "Gölgeleri bir renk tonuna, ışıkları başka bir tona doğru renklendirir; siyahı, beyazı ve parlaklığı korur.",
+   "name": "Bölünmüş Ton",
+   "params": {
+    "highlightAmount": {
+     "label": "Işık Miktarı"
+    },
+    "highlightHue": {
+     "label": "Işık Tonu"
+    },
+    "shadowAmount": {
+     "label": "Gölge Miktarı"
+    },
+    "shadowHue": {
+     "label": "Gölge Tonu"
+    }
+   }
+  },
+  "static": {
+   "description": "Sinyalsiz bir televizyon gibi titreşen gri gürültü.",
+   "name": "Statik",
+   "params": {
+    "amount": {
+     "label": "Miktar"
+    },
+    "grain": {
+     "label": "Boyut"
+    }
+   }
+  },
+  "stretch": {
+   "description": "Katmanı bir çizgi boyunca keser ve iki yarıyı birbirinden ayırır; çizgideki pikselleri boşluğa doğru uzatır.",
+   "name": "Segment Esnetme",
+   "params": {
+    "angle": {
+     "label": "Açı"
+    },
+    "offset": {
+     "label": "Ofset"
+    },
+    "spread": {
+     "label": "Yayılım"
+    },
+    "stretch": {
+     "label": "Esnetme"
+    }
+   }
+  },
+  "stretchaxis": {
+   "description": "Katmanı bir açı boyunca esnetir.",
+   "name": "Esnetme Ekseni",
+   "params": {
+    "amount": {
+     "label": "Miktar"
+    },
+    "angle": {
+     "label": "Açı"
+    }
+   }
+  },
+  "swing": {
+   "description": "Katmanı kendi dönme noktası etrafında ileri geri döndürür.",
+   "name": "Salınım",
+   "params": {
+    "angle": {
+     "label": "Açı"
+    },
+    "frequency": {
+     "label": "Frekans"
+    },
+    "phase": {
+     "label": "Faz"
+    },
+    "wave": {
+     "label": "Dalga",
+     "options": [
+      "Sinüs",
+      "Üçgen"
+     ]
+    }
+   }
+  },
+  "temperature": {
+   "description": "Görüntüyü kelvin cinsinden bir renk sıcaklığının ışığı gibi ısıtır veya soğutur (6500 K değiştirmez), parlaklığını korur.",
+   "name": "Renk Sıcaklığı",
+   "params": {
+    "kelvin": {
+     "label": "Sıcaklık"
+    },
+    "strength": {
+     "label": "Güç"
+    }
+   }
+  },
+  "threshold": {
+   "description": "Saf siyah beyaz, parlaklıkta bölünür.",
+   "name": "Eşik",
+   "params": {
+    "invert": {
+     "label": "Ters çevir"
+    },
+    "level": {
+     "label": "Seviye"
+    },
+    "softness": {
+     "label": "Yumuşaklık"
+    }
+   }
+  },
+  "tile": {
+   "description": "Görseli ızgara halinde tekrarlar.",
+   "name": "Döşeme",
+   "params": {
+    "mirror": {
+     "label": "Ayna"
+    },
+    "offset": {
+     "label": "Ofset"
+    },
+    "scale": {
+     "label": "Ölçek"
+    }
+   }
+  },
+  "timequant": {
+   "description": "Bu katmanda zamanı daha düşük kare hızı gibi adımlarla akıtır.",
+   "name": "Zaman Nicemleme",
+   "params": {
+    "fps": {
+     "label": "Kare hızı"
+    }
+   }
+  },
+  "tint": {
+   "description": "Görselin parlaklığını bir karışım miktarıyla gölge ve vurgu rengi arasında eşler.",
+   "name": "Renk Tonu",
+   "params": {
+    "amount": {
+     "label": "Miktar"
+    },
+    "highlightColor": {
+     "label": "Vurgu rengi"
+    },
+    "shadowColor": {
+     "label": "Gölge rengi"
+    }
+   }
+  },
+  "twirl": {
+   "description": "Pikselleri bir merkez noktası etrafında, merkezden uzaklaştıkça azalan bir açıyla döndürür.",
+   "name": "Burgu",
+   "params": {
+    "angle": {
+     "label": "Açı"
+    },
+    "center": {
+     "label": "Merkez"
+    },
+    "radius": {
+     "label": "Yarıçap"
+    }
+   }
+  },
+  "unsharpmask": {
+   "description": "Eşik değeri ve isteğe bağlı gri maske önizlemesiyle klasik netlik maskelemesi uygular.",
+   "name": "Netlik Maskesi",
+   "params": {
+    "amount": {
+     "label": "Miktar"
+    },
+    "showMask": {
+     "label": "Maskeyi göster"
+    },
+    "strength": {
+     "label": "Güç"
+    },
+    "threshold": {
+     "label": "Eşik"
+    }
+   }
+  },
+  "vhs": {
+   "description": "Eski bir video kaset gibi görünür: renk taşması, bulaşmış çizgiler, tarama çizgileri, kaset gürültüsü ve kayan izleme bantları.",
+   "name": "VHS",
+   "params": {
+    "chroma": {
+     "label": "Renk taşması"
+    },
+    "headSwitch": {
+     "label": "Kafa geçişi"
+    },
+    "noise": {
+     "label": "Gürültü"
+    },
+    "saturation": {
+     "label": "Doygunluk"
+    },
+    "scanlines": {
+     "label": "Tarama çizgileri"
+    },
+    "seed": {
+     "label": "Tohum"
+    },
+    "smear": {
+     "label": "Bulaşma"
+    },
+    "tracking": {
+     "label": "İzleme"
+    },
+    "wobble": {
+     "label": "Sallanma"
+    }
+   }
+  },
+  "vignette": {
+   "description": "Görselin kenarlarını karartmak için vinyet efekti uygular.",
+   "name": "Vinyet",
+   "params": {
+    "amount": {
+     "label": "Miktar"
+    },
+    "radius": {
+     "label": "Boyut"
+    },
+    "roundness": {
+     "label": "Yuvarlaklık"
+    },
+    "softness": {
+     "label": "Yumuşaklık"
+    }
+   }
+  },
+  "wavewarp": {
+   "description": "Görsele ayarlanabilir genlik, dalga boyu, yön ve faz hızıyla sinüs dalgası kaydırması uygular.",
+   "name": "Dalga Bükümü",
+   "params": {
+    "amplitude": {
+     "label": "Genlik"
+    },
+    "direction": {
+     "label": "Yön"
+    },
+    "speed": {
+     "label": "Hız"
+    },
+    "wavelength": {
+     "label": "Dalga boyu"
+    }
+   }
+  }
+ }
+}

@@ -1,0 +1,1165 @@
+{
+ "categories": {
+  "ai": "AI",
+  "blur": "Desenfoque",
+  "color": "Color",
+  "distort": "Distorsión",
+  "key": "Clave",
+  "move": "Movimiento",
+  "new": "Nuevos",
+  "noise": "Ruido",
+  "repeat": "Repetición",
+  "stylize": "Estilizar"
+ },
+ "effects": {
+  "autoshake": {
+   "description": "Sacude la capa al azar, moviéndola y girándola un poco.",
+   "name": "Sacudida automática",
+   "params": {
+    "frequency": {
+     "label": "Frecuencia"
+    },
+    "magnitude": {
+     "label": "Magnitud"
+    },
+    "rotation": {
+     "label": "Rotación"
+    },
+    "seed": {
+     "label": "Semilla"
+    }
+   }
+  },
+  "backdrop": {
+   "description": "Rellena la capa con lo que se dibuja debajo, así los efectos siguientes cambian las capas de abajo. Mezcla devuelve el relleno propio de la capa.",
+   "name": "Capa de ajuste",
+   "params": {
+    "mix": {
+     "label": "Mezcla"
+    }
+   }
+  },
+  "blink": {
+   "description": "Enciende y apaga la capa cierta cantidad de veces por segundo.",
+   "name": "Parpadeo",
+   "params": {
+    "frequency": {
+     "label": "Parpadeos por segundo"
+    }
+   }
+  },
+  "blur": {
+   "description": "Un desenfoque suave y uniforme.",
+   "name": "Desenfoque",
+   "params": {
+    "strength": {
+     "label": "Intensidad"
+    }
+   }
+  },
+  "brightnesscontrast": {
+   "description": "Ajusta el brillo y el contraste de la imagen.",
+   "name": "Brillo y contraste",
+   "params": {
+    "brightness": {
+     "label": "Brillo"
+    },
+    "contrast": {
+     "label": "Contraste"
+    }
+   }
+  },
+  "bulge": {
+   "description": "Aplica una distorsión de ojo de pez o de pinzamiento alrededor de un punto central, con intensidad y radio ajustables.",
+   "name": "Abombamiento",
+   "params": {
+    "center": {
+     "label": "Centro"
+    },
+    "radius": {
+     "label": "Radio"
+    },
+    "strength": {
+     "label": "Intensidad"
+    }
+   }
+  },
+  "chromakey": {
+   "description": "Elimina un color, como el de una pantalla verde.",
+   "name": "Croma",
+   "params": {
+    "key": {
+     "label": "Color clave"
+    },
+    "softness": {
+     "label": "Suavidad"
+    },
+    "tolerance": {
+     "label": "Tolerancia"
+    }
+   }
+  },
+  "colorbalance": {
+   "description": "Lleva las sombras, los medios tonos y las luces hacia sus propios colores (el gris deja un rango sin cambios).",
+   "name": "Equilibrio de color",
+   "params": {
+    "amount": {
+     "label": "Cantidad"
+    },
+    "highlights": {
+     "label": "Luces"
+    },
+    "midtones": {
+     "label": "Medios tonos"
+    },
+    "shadows": {
+     "label": "Sombras"
+    }
+   }
+  },
+  "colorwheels": {
+   "description": "Ruedas de color para las sombras (elevación), los medios tonos (gamma) y las luces (ganancia): un tono, cuánto aplicarlo y un nivel.",
+   "name": "Elevación, gamma y ganancia",
+   "params": {
+    "gainAmount": {
+     "label": "Cantidad de ganancia"
+    },
+    "gainHue": {
+     "label": "Tono de ganancia"
+    },
+    "gainLevel": {
+     "label": "Nivel de ganancia"
+    },
+    "gammaAmount": {
+     "label": "Cantidad de gamma"
+    },
+    "gammaHue": {
+     "label": "Tono de gamma"
+    },
+    "gammaLevel": {
+     "label": "Nivel de gamma"
+    },
+    "liftAmount": {
+     "label": "Cantidad de elevación"
+    },
+    "liftHue": {
+     "label": "Tono de elevación"
+    },
+    "liftLevel": {
+     "label": "Nivel de elevación"
+    }
+   }
+  },
+  "denoise": {
+   "description": "Elimina el ruido de la imagen con un filtro bilateral que conserva los bordes y promedia los píxeles cercanos solo cuando sus colores son similares.",
+   "name": "Reducción de ruido",
+   "params": {
+    "detail": {
+     "label": "Detalle"
+    },
+    "radius": {
+     "label": "Radio"
+    },
+    "strength": {
+     "label": "Intensidad"
+    }
+   }
+  },
+  "directionalblur": {
+   "description": "Desenfoque de movimiento que promedia muestras a lo largo de un ángulo direccional.",
+   "name": "Desenfoque direccional",
+   "params": {
+    "angle": {
+     "label": "Ángulo"
+    },
+    "blurLength": {
+     "label": "Longitud"
+    }
+   }
+  },
+  "dissolve": {
+   "description": "La capa se deshace en motas aleatorias.",
+   "name": "Disolver",
+   "params": {
+    "grain": {
+     "label": "Tamaño"
+    },
+    "progress": {
+     "label": "Progreso"
+    }
+   }
+  },
+  "duotone": {
+   "description": "Aplica un mapa de degradado de dos colores según la luminancia, con controles de contraste y cantidad.",
+   "name": "Dúotono",
+   "params": {
+    "amount": {
+     "label": "Cantidad"
+    },
+    "color1": {
+     "label": "Color de sombra"
+    },
+    "color2": {
+     "label": "Color de luces"
+    },
+    "contrast": {
+     "label": "Contraste"
+    }
+   }
+  },
+  "echo": {
+   "description": "Dibuja copias de la capa tal como estaba un momento antes, siguiendo su animación.",
+   "name": "Eco de fotogramas clave",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "composite": {
+     "label": "Composición",
+     "options": [
+      "Detrás",
+      "Encima"
+     ]
+    },
+    "count": {
+     "label": "Cantidad"
+    },
+    "seconds": {
+     "label": "Segundos"
+    }
+   }
+  },
+  "edgedetect": {
+   "description": "Líneas brillantes donde cambia la imagen y oscuro en el resto.",
+   "name": "Detección de bordes",
+   "params": {
+    "strength": {
+     "label": "Intensidad"
+    }
+   }
+  },
+  "emboss": {
+   "description": "Aplica un efecto de relieve con degradados de luminancia según un ángulo de luz determinado.",
+   "name": "Relieve",
+   "params": {
+    "angle": {
+     "label": "Ángulo de luz"
+    },
+    "strength": {
+     "label": "Intensidad"
+    }
+   }
+  },
+  "exposure": {
+   "description": "Simula la exposición fotográfica con pasos, desplazamiento y corrección de gamma.",
+   "name": "Exposición",
+   "params": {
+    "gamma": {
+     "label": "Gamma"
+    },
+    "offset": {
+     "label": "Desplazamiento"
+    },
+    "stops": {
+     "label": "Pasos"
+    }
+   }
+  },
+  "filmgrain": {
+   "description": "Grano de película monocromo animado, con cantidad, tamaño del grano y velocidad ajustables.",
+   "name": "Grano de película",
+   "params": {
+    "amount": {
+     "label": "Cantidad"
+    },
+    "grainSize": {
+     "label": "Tamaño del grano"
+    },
+    "speed": {
+     "label": "Velocidad"
+    }
+   }
+  },
+  "flicker": {
+   "description": "Hace parpadear la opacidad de la capa de forma aleatoria.",
+   "name": "Parpadeo",
+   "params": {
+    "intensity": {
+     "label": "Intensidad"
+    },
+    "mode": {
+     "label": "Modo"
+    },
+    "seed": {
+     "label": "Semilla"
+    },
+    "speed": {
+     "label": "Velocidad"
+    }
+   }
+  },
+  "fourcolor": {
+   "description": "Mezcla cuatro colores ubicados en cuatro puntos (en píxeles desde el centro de la capa) sobre la capa.",
+   "name": "Degradado de cuatro colores",
+   "params": {
+    "blend": {
+     "label": "Fusión",
+     "options": [
+      "Normal",
+      "Multiplicar",
+      "Trama",
+      "Superponer",
+      "Luz suave",
+      "Luz fuerte",
+      "Añadir",
+      "Oscurecer",
+      "Aclarar",
+      "Diferencia",
+      "Sobreexponer color",
+      "Subexponer color"
+     ]
+    },
+    "color1": {
+     "label": "Color 1"
+    },
+    "color2": {
+     "label": "Color 2"
+    },
+    "color3": {
+     "label": "Color 3"
+    },
+    "color4": {
+     "label": "Color 4"
+    },
+    "corner": {
+     "label": "Desplazamiento de esquinas"
+    },
+    "opacity": {
+     "label": "Opacidad"
+    },
+    "point1": {
+     "label": "Punto 1"
+    },
+    "point2": {
+     "label": "Punto 2"
+    },
+    "point3": {
+     "label": "Punto 3"
+    },
+    "point4": {
+     "label": "Punto 4"
+    },
+    "softness": {
+     "label": "Suavidad"
+    }
+   }
+  },
+  "glitch": {
+   "description": "Desplaza bloques horizontales al azar y desfasa los canales de color varias veces por segundo.",
+   "name": "Glitch",
+   "params": {
+    "blockHeight": {
+     "label": "Altura de bloque"
+    },
+    "intensity": {
+     "label": "Intensidad"
+    },
+    "seed": {
+     "label": "Semilla"
+    }
+   }
+  },
+  "glow": {
+   "description": "Un resplandor suave alrededor de las zonas brillantes de la capa.",
+   "name": "Resplandor",
+   "params": {
+    "intensity": {
+     "label": "Intensidad"
+    },
+    "strength": {
+     "label": "Tamaño"
+    }
+   }
+  },
+  "gradientmap": {
+   "description": "Recolorea la imagen según su brillo con tres colores, con repeticiones y una fase. Escalar brillo multiplica el resultado por el brillo propio de la imagen.",
+   "name": "Mapa de degradado",
+   "params": {
+    "color1": {
+     "label": "Sombras"
+    },
+    "color2": {
+     "label": "Medios tonos"
+    },
+    "color3": {
+     "label": "Luces"
+    },
+    "opacity": {
+     "label": "Opacidad"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "repeat": {
+     "label": "Repetición"
+    },
+    "reverse": {
+     "label": "Invertir"
+    },
+    "scaleBrightness": {
+     "label": "Escalar brillo"
+    }
+   }
+  },
+  "gradientoverlay": {
+   "description": "Aplica un degradado de dos colores sobre la capa, con formas y modos de fusión a elegir.",
+   "name": "Capa de degradado",
+   "params": {
+    "angle": {
+     "label": "Ángulo"
+    },
+    "blend": {
+     "label": "Fusión",
+     "options": [
+      "Normal",
+      "Multiplicar",
+      "Trama",
+      "Superponer",
+      "Luz suave",
+      "Luz fuerte",
+      "Sumar",
+      "Oscurecer",
+      "Aclarar",
+      "Diferencia",
+      "Sobreexponer color",
+      "Subexponer color"
+     ]
+    },
+    "color1": {
+     "label": "Color 1"
+    },
+    "color2": {
+     "label": "Color 2"
+    },
+    "opacity": {
+     "label": "Opacidad"
+    },
+    "scale": {
+     "label": "Escala"
+    },
+    "shape": {
+     "label": "Forma",
+     "options": [
+      "Lineal",
+      "Radial",
+      "Reflejado",
+      "Ángulo"
+     ]
+    }
+   }
+  },
+  "halftone": {
+   "description": "Puntos de impresión que crecen donde la imagen es más oscura.",
+   "name": "Semitono",
+   "params": {
+    "angle": {
+     "label": "Ángulo"
+    },
+    "cell": {
+     "label": "Tamaño"
+    },
+    "colored": {
+     "label": "Puntos de color"
+    }
+   }
+  },
+  "highlightshadow": {
+   "description": "Recupera o realza las luces y levanta u oscurece las sombras con una máscara de luminancia local difuminada.",
+   "name": "Luces y sombras",
+   "params": {
+    "highlights": {
+     "label": "Luces"
+    },
+    "shadows": {
+     "label": "Sombras"
+    }
+   }
+  },
+  "huesaturation": {
+   "description": "Gira los colores en el círculo cromático y los hace más fuertes o más débiles; la vibrancia refuerza más los colores apagados.",
+   "name": "Tono y saturación",
+   "params": {
+    "hue": {
+     "label": "Tono"
+    },
+    "lightness": {
+     "label": "Luminosidad"
+    },
+    "saturation": {
+     "label": "Saturación"
+    },
+    "vibrance": {
+     "label": "Vibrancia"
+    }
+   }
+  },
+  "invert": {
+   "description": "Invierte los canales de color de la imagen con una cantidad de mezcla e inversión de alfa opcional.",
+   "name": "Invertir",
+   "params": {
+    "amount": {
+     "label": "Cantidad"
+    },
+    "invert_alpha": {
+     "label": "Invertir alfa"
+    }
+   }
+  },
+  "kaleidoscope": {
+   "description": "Porciones reflejadas alrededor de un punto.",
+   "name": "Caleidoscopio",
+   "params": {
+    "angle": {
+     "label": "Ángulo"
+    },
+    "center": {
+     "label": "Centro"
+    },
+    "segments": {
+     "label": "Segmentos"
+    }
+   }
+  },
+  "lensflare": {
+   "description": "Una luz brillante con halo sobre la imagen.",
+   "name": "Destello de luz",
+   "params": {
+    "brightness": {
+     "label": "Brillo"
+    },
+    "center": {
+     "label": "Centro"
+    },
+    "color": {
+     "label": "Color"
+    },
+    "radius": {
+     "label": "Radio"
+    }
+   }
+  },
+  "levels": {
+   "description": "Ajusta los niveles de la imagen con puntos de entrada negro y blanco, gamma y puntos de salida negro y blanco.",
+   "name": "Niveles",
+   "params": {
+    "gamma": {
+     "label": "Gamma"
+    },
+    "inBlack": {
+     "label": "Negro de entrada"
+    },
+    "inWhite": {
+     "label": "Blanco de entrada"
+    },
+    "outBlack": {
+     "label": "Negro de salida"
+    },
+    "outWhite": {
+     "label": "Blanco de salida"
+    }
+   }
+  },
+  "lightglow": {
+   "description": "Añade un resplandor de color alrededor de las partes de la imagen más brillantes que un umbral.",
+   "name": "Resplandor de luz",
+   "params": {
+    "blur": {
+     "label": "Tamaño"
+    },
+    "color": {
+     "label": "Color"
+    },
+    "intensity": {
+     "label": "Intensidad"
+    },
+    "opacity": {
+     "label": "Opacidad"
+    },
+    "threshold": {
+     "label": "Umbral"
+    }
+   }
+  },
+  "lumakey": {
+   "description": "Elimina las partes oscuras de la capa (o las claras).",
+   "name": "Clave de luma",
+   "params": {
+    "invert": {
+     "label": "Invertir"
+    },
+    "softness": {
+     "label": "Suavidad"
+    },
+    "threshold": {
+     "label": "Umbral"
+    }
+   }
+  },
+  "mirror": {
+   "description": "Refleja una mitad de la imagen sobre una línea de espejo definida por un ángulo y un punto central.",
+   "name": "Espejo",
+   "params": {
+    "angle": {
+     "label": "Ángulo"
+    },
+    "center": {
+     "label": "Centro"
+    }
+   }
+  },
+  "motionblur": {
+   "description": "Arrastra la capa en una dirección, como si se moviera rápido.",
+   "name": "Desenfoque de movimiento",
+   "params": {
+    "angle": {
+     "label": "Dirección"
+    },
+    "length": {
+     "label": "Longitud"
+    }
+   }
+  },
+  "noisedisplace": {
+   "description": "Desplaza los píxeles usando un ruido de valor suave que se anima con el tiempo.",
+   "name": "Desplazamiento por ruido",
+   "params": {
+    "amount": {
+     "label": "Cantidad"
+    },
+    "scale": {
+     "label": "Escala del ruido"
+    },
+    "speed": {
+     "label": "Velocidad de animación"
+    }
+   }
+  },
+  "oscillate": {
+   "description": "Mueve la capa de un lado a otro a lo largo de un ángulo.",
+   "name": "Oscilar",
+   "params": {
+    "angle": {
+     "label": "Ángulo"
+    },
+    "frequency": {
+     "label": "Frecuencia"
+    },
+    "magnitude": {
+     "label": "Magnitud"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "wave": {
+     "label": "Onda",
+     "options": [
+      "Seno",
+      "Triangular"
+     ]
+    }
+   }
+  },
+  "pixelate": {
+   "description": "Aplica un pixelado en mosaico reemplazando áreas con bloques cuadrados del color del píxel superior izquierdo.",
+   "name": "Pixelar",
+   "params": {
+    "blockSize": {
+     "label": "Tamaño del bloque"
+    }
+   }
+  },
+  "posterize": {
+   "description": "Reduce cada canal de color a un número determinado de niveles (2-32).",
+   "name": "Posterizar",
+   "params": {
+    "levels": {
+     "label": "Niveles"
+    }
+   }
+  },
+  "pulseopacity": {
+   "description": "Atenúa la capa y vuelve a mostrarla una y otra vez.",
+   "name": "Opacidad pulsante",
+   "params": {
+    "frequency": {
+     "label": "Frecuencia"
+    },
+    "minimum": {
+     "label": "Mínimo"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "wave": {
+     "label": "Onda",
+     "options": [
+      "Seno",
+      "Triángulo"
+     ]
+    }
+   }
+  },
+  "pulsesize": {
+   "description": "Hace que la capa crezca y se encoja una y otra vez.",
+   "name": "Tamaño pulsante",
+   "params": {
+    "amount": {
+     "label": "Cantidad"
+    },
+    "frequency": {
+     "label": "Frecuencia"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "wave": {
+     "label": "Onda",
+     "options": [
+      "Seno",
+      "Triángulo"
+     ]
+    }
+   }
+  },
+  "radialblur": {
+   "description": "Aplica un desenfoque de zoom radial promediando muestras a lo largo de rayos desde un punto central, con intensidad ajustable.",
+   "name": "Desenfoque de zoom",
+   "params": {
+    "center": {
+     "label": "Centro"
+    },
+    "strength": {
+     "label": "Intensidad"
+    }
+   }
+  },
+  "randomdisplace": {
+   "description": "Hace que la capa se mueva al azar alrededor de su posición.",
+   "name": "Desplazamiento aleatorio",
+   "params": {
+    "magnitude": {
+     "label": "Magnitud"
+    },
+    "seed": {
+     "label": "Semilla"
+    },
+    "speed": {
+     "label": "Velocidad"
+    }
+   }
+  },
+  "randomjitter": {
+   "description": "Hace que la capa salte de un lado a otro al azar siguiendo un ángulo.",
+   "name": "Vibración aleatoria",
+   "params": {
+    "angle": {
+     "label": "Ángulo"
+    },
+    "magnitude": {
+     "label": "Magnitud"
+    },
+    "rate": {
+     "label": "Frecuencia"
+    },
+    "seed": {
+     "label": "Semilla"
+    }
+   }
+  },
+  "rgbsplit": {
+   "description": "Aberración cromática que desplaza los canales rojo y azul en direcciones opuestas siguiendo un ángulo.",
+   "name": "Separación RGB",
+   "params": {
+    "angle": {
+     "label": "Ángulo"
+    },
+    "splitDistance": {
+     "label": "Distancia"
+    }
+   }
+  },
+  "ripple": {
+   "description": "Ondas concéntricas que se irradian desde un punto central, con amplitud, longitud de onda y velocidad configurables.",
+   "name": "Ondulación",
+   "params": {
+    "amplitude": {
+     "label": "Amplitud"
+    },
+    "center": {
+     "label": "Centro"
+    },
+    "speed": {
+     "label": "Velocidad"
+    },
+    "wavelength": {
+     "label": "Longitud de onda"
+    }
+   }
+  },
+  "scanlines": {
+   "description": "Añade líneas de barrido horizontales para un efecto de monitor CRT, con desplazamiento vertical opcional.",
+   "name": "Líneas de barrido",
+   "params": {
+    "darkness": {
+     "label": "Oscuridad"
+    },
+    "roll_speed": {
+     "label": "Velocidad de desplazamiento"
+    },
+    "spacing": {
+     "label": "Espaciado de líneas"
+    }
+   }
+  },
+  "sepia": {
+   "description": "Tonos marrones cálidos, como una fotografía antigua.",
+   "name": "Sepia",
+   "params": {
+    "amount": {
+     "label": "Cantidad"
+    }
+   }
+  },
+  "sharpen": {
+   "description": "Aplica una máscara de enfoque con un vecindario de 3x3 para realzar los detalles finos.",
+   "name": "Enfocar",
+   "params": {
+    "amount": {
+     "label": "Cantidad"
+    },
+    "radius": {
+     "label": "Radio"
+    }
+   }
+  },
+  "softglow": {
+   "description": "Superpone en modo trama una copia suave y desenfocada de la imagen para lograr un brillo de ensueño, sobre todo a partir de las luces altas.",
+   "name": "Brillo suave",
+   "params": {
+    "blur": {
+     "label": "Tamaño"
+    },
+    "brightness": {
+     "label": "Brillo"
+    },
+    "color": {
+     "label": "Color"
+    },
+    "contrast": {
+     "label": "Contraste"
+    },
+    "highlights": {
+     "label": "Altas luces"
+    },
+    "opacity": {
+     "label": "Opacidad"
+    }
+   }
+  },
+  "solid": {
+   "description": "Coloca un color sobre la capa, conservando su forma, con distintos modos de fusión.",
+   "name": "Superposición de color",
+   "params": {
+    "amount": {
+     "label": "Cantidad"
+    },
+    "blend": {
+     "label": "Fusión",
+     "options": [
+      "Normal",
+      "Multiplicar",
+      "Pantalla",
+      "Superponer",
+      "Luz suave",
+      "Luz fuerte",
+      "Agregar",
+      "Oscurecer",
+      "Aclarar",
+      "Diferencia",
+      "Sobreexponer color",
+      "Subexponer color"
+     ]
+    },
+    "color": {
+     "label": "Color"
+    }
+   }
+  },
+  "spin": {
+   "description": "Gira la capa sin parar a una velocidad constante.",
+   "name": "Giro",
+   "params": {
+    "direction": {
+     "label": "Dirección",
+     "options": [
+      "Horario",
+      "Antihorario"
+     ]
+    },
+    "speed": {
+     "label": "Velocidad"
+    }
+   }
+  },
+  "splittone": {
+   "description": "Tiñe las sombras hacia un tono y las altas luces hacia otro, conservando el negro, el blanco y el brillo.",
+   "name": "Tono dividido",
+   "params": {
+    "highlightAmount": {
+     "label": "Cantidad de altas luces"
+    },
+    "highlightHue": {
+     "label": "Tono de altas luces"
+    },
+    "shadowAmount": {
+     "label": "Cantidad de sombras"
+    },
+    "shadowHue": {
+     "label": "Tono de sombras"
+    }
+   }
+  },
+  "static": {
+   "description": "Ruido gris parpadeante, como una televisión sin señal.",
+   "name": "Estática",
+   "params": {
+    "amount": {
+     "label": "Cantidad"
+    },
+    "grain": {
+     "label": "Tamaño"
+    }
+   }
+  },
+  "stretch": {
+   "description": "Corta la capa por una línea y separa las dos mitades, estirando hacia el hueco los píxeles de la línea.",
+   "name": "Estirar segmento",
+   "params": {
+    "angle": {
+     "label": "Ángulo"
+    },
+    "offset": {
+     "label": "Desplazamiento"
+    },
+    "spread": {
+     "label": "Dispersión"
+    },
+    "stretch": {
+     "label": "Estiramiento"
+    }
+   }
+  },
+  "stretchaxis": {
+   "description": "Estira la capa a lo largo de un ángulo.",
+   "name": "Eje de estiramiento",
+   "params": {
+    "amount": {
+     "label": "Cantidad"
+    },
+    "angle": {
+     "label": "Ángulo"
+    }
+   }
+  },
+  "swing": {
+   "description": "Gira la capa de un lado a otro alrededor de su pivote.",
+   "name": "Balanceo",
+   "params": {
+    "angle": {
+     "label": "Ángulo"
+    },
+    "frequency": {
+     "label": "Frecuencia"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "wave": {
+     "label": "Onda",
+     "options": [
+      "Seno",
+      "Triángulo"
+     ]
+    }
+   }
+  },
+  "temperature": {
+   "description": "Da un tono cálido o frío a la imagen como la luz de una temperatura de color en kelvin (6500 K la deja igual), conservando su brillo.",
+   "name": "Temperatura de color",
+   "params": {
+    "kelvin": {
+     "label": "Temperatura"
+    },
+    "strength": {
+     "label": "Intensidad"
+    }
+   }
+  },
+  "threshold": {
+   "description": "Blanco y negro puro, dividido por un nivel de brillo.",
+   "name": "Umbral",
+   "params": {
+    "invert": {
+     "label": "Invertir"
+    },
+    "level": {
+     "label": "Nivel"
+    },
+    "softness": {
+     "label": "Suavidad"
+    }
+   }
+  },
+  "tile": {
+   "description": "Repite la imagen en una cuadrícula.",
+   "name": "Mosaico",
+   "params": {
+    "mirror": {
+     "label": "Espejo"
+    },
+    "offset": {
+     "label": "Desplazamiento"
+    },
+    "scale": {
+     "label": "Escala"
+    }
+   }
+  },
+  "timequant": {
+   "description": "Hace que el tiempo avance por pasos en esta capa, como con una velocidad de fotogramas más baja.",
+   "name": "Cuantización de tiempo",
+   "params": {
+    "fps": {
+     "label": "Velocidad de fotogramas"
+    }
+   }
+  },
+  "tint": {
+   "description": "Asigna la luminancia de la imagen entre un color de sombra y uno de luz con una cantidad de mezcla.",
+   "name": "Tinte",
+   "params": {
+    "amount": {
+     "label": "Cantidad"
+    },
+    "highlightColor": {
+     "label": "Color de luz"
+    },
+    "shadowColor": {
+     "label": "Color de sombra"
+    }
+   }
+  },
+  "twirl": {
+   "description": "Rota los píxeles alrededor de un punto central con un ángulo que disminuye según la distancia al centro.",
+   "name": "Remolino",
+   "params": {
+    "angle": {
+     "label": "Ángulo"
+    },
+    "center": {
+     "label": "Centro"
+    },
+    "radius": {
+     "label": "Radio"
+    }
+   }
+  },
+  "unsharpmask": {
+   "description": "Aplica una máscara de enfoque clásica con un umbral y una vista previa opcional de la máscara en gris.",
+   "name": "Máscara de enfoque",
+   "params": {
+    "amount": {
+     "label": "Cantidad"
+    },
+    "showMask": {
+     "label": "Mostrar máscara"
+    },
+    "strength": {
+     "label": "Intensidad"
+    },
+    "threshold": {
+     "label": "Umbral"
+    }
+   }
+  },
+  "vhs": {
+   "description": "Parece una cinta de video antigua: sangrado de color, líneas arrastradas, líneas de barrido, ruido de cinta y bandas de seguimiento.",
+   "name": "VHS",
+   "params": {
+    "chroma": {
+     "label": "Sangrado de color"
+    },
+    "headSwitch": {
+     "label": "Conmutación de cabezal"
+    },
+    "noise": {
+     "label": "Ruido"
+    },
+    "saturation": {
+     "label": "Saturación"
+    },
+    "scanlines": {
+     "label": "Líneas de barrido"
+    },
+    "seed": {
+     "label": "Semilla"
+    },
+    "smear": {
+     "label": "Arrastre"
+    },
+    "tracking": {
+     "label": "Seguimiento"
+    },
+    "wobble": {
+     "label": "Ondulación"
+    }
+   }
+  },
+  "vignette": {
+   "description": "Aplica un efecto de viñeta para oscurecer los bordes de la imagen.",
+   "name": "Viñeta",
+   "params": {
+    "amount": {
+     "label": "Cantidad"
+    },
+    "radius": {
+     "label": "Tamaño"
+    },
+    "roundness": {
+     "label": "Redondez"
+    },
+    "softness": {
+     "label": "Suavidad"
+    }
+   }
+  },
+  "wavewarp": {
+   "description": "Aplica un desplazamiento de onda sinusoidal a la imagen con amplitud, longitud de onda, dirección y velocidad de fase ajustables.",
+   "name": "Deformación de onda",
+   "params": {
+    "amplitude": {
+     "label": "Amplitud"
+    },
+    "direction": {
+     "label": "Dirección"
+    },
+    "speed": {
+     "label": "Velocidad"
+    },
+    "wavelength": {
+     "label": "Longitud de onda"
+    }
+   }
+  }
+ }
+}

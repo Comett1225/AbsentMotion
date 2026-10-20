@@ -1,0 +1,1165 @@
+{
+ "categories": {
+  "ai": "AI",
+  "blur": "Blur",
+  "color": "Kulay",
+  "distort": "Distort",
+  "key": "Key",
+  "move": "Galaw",
+  "new": "Bago",
+  "noise": "Ingay",
+  "repeat": "Ulitin",
+  "stylize": "I-istilo"
+ },
+ "effects": {
+  "autoshake": {
+   "description": "Ginagyanig nang random ang patong, bahagyang gumagalaw at umiikot.",
+   "name": "Auto-yanig",
+   "params": {
+    "frequency": {
+     "label": "Dalas"
+    },
+    "magnitude": {
+     "label": "Lakas"
+    },
+    "rotation": {
+     "label": "Rotasyon"
+    },
+    "seed": {
+     "label": "Seed"
+    }
+   }
+  },
+  "backdrop": {
+   "description": "Pinupuno ng patong ang anumang iginuhit sa ilalim nito, kaya binabago ng mga epektong kasunod nito ang mga patong sa ibaba. Ibinabalik ng Halo ang sariling fill ng patong.",
+   "name": "Patong pang-adjust",
+   "params": {
+    "mix": {
+     "label": "Halo"
+    }
+   }
+  },
+  "blink": {
+   "description": "Pinapakita at tinatago ang patong nang ilang beses kada segundo.",
+   "name": "Kumurap",
+   "params": {
+    "frequency": {
+     "label": "Kurap kada segundo"
+    }
+   }
+  },
+  "blur": {
+   "description": "Makinis at pantay na pag-blur.",
+   "name": "Pag-blur",
+   "params": {
+    "strength": {
+     "label": "Lakas"
+    }
+   }
+  },
+  "brightnesscontrast": {
+   "description": "Inaayos ang liwanag at kontrast ng larawan.",
+   "name": "Liwanag at kontrast",
+   "params": {
+    "brightness": {
+     "label": "Liwanag"
+    },
+    "contrast": {
+     "label": "Kontrast"
+    }
+   }
+  },
+  "bulge": {
+   "description": "Nagdadagdag ng fisheye na paglaki o pagpisil sa paligid ng isang sentro, na may kontroladong lakas at radius.",
+   "name": "Pag-usli",
+   "params": {
+    "center": {
+     "label": "Sentro"
+    },
+    "radius": {
+     "label": "Radius"
+    },
+    "strength": {
+     "label": "Lakas"
+    }
+   }
+  },
+  "chromakey": {
+   "description": "Tinatanggal ang isang kulay, tulad ng green screen.",
+   "name": "Chroma key",
+   "params": {
+    "key": {
+     "label": "Kulay ng key"
+    },
+    "softness": {
+     "label": "Kalambutan"
+    },
+    "tolerance": {
+     "label": "Toleransya"
+    }
+   }
+  },
+  "colorbalance": {
+   "description": "Itinatulak ang mga anino, midtone at highlight sa kani-kanilang kulay (hindi binabago ng grey ang sakop).",
+   "name": "Balanse ng kulay",
+   "params": {
+    "amount": {
+     "label": "Dami"
+    },
+    "highlights": {
+     "label": "Mga highlight"
+    },
+    "midtones": {
+     "label": "Mga midtone"
+    },
+    "shadows": {
+     "label": "Mga anino"
+    }
+   }
+  },
+  "colorwheels": {
+   "description": "Mga color wheel para sa anino (lift), midtone (gamma) at highlight (gain): isang hue, gaano kalayo itulak, at isang antas.",
+   "name": "Lift gamma gain",
+   "params": {
+    "gainAmount": {
+     "label": "Dami ng gain"
+    },
+    "gainHue": {
+     "label": "Hue ng gain"
+    },
+    "gainLevel": {
+     "label": "Antas ng gain"
+    },
+    "gammaAmount": {
+     "label": "Dami ng gamma"
+    },
+    "gammaHue": {
+     "label": "Hue ng gamma"
+    },
+    "gammaLevel": {
+     "label": "Antas ng gamma"
+    },
+    "liftAmount": {
+     "label": "Dami ng lift"
+    },
+    "liftHue": {
+     "label": "Hue ng lift"
+    },
+    "liftLevel": {
+     "label": "Antas ng lift"
+    }
+   }
+  },
+  "denoise": {
+   "description": "Tinatanggal ang ingay ng larawan gamit ang bilateral filter na nagpapanatili ng gilid at nag-average lang ng kalapit na pixel kapag magkatulad ang kulay.",
+   "name": "Bawas ingay",
+   "params": {
+    "detail": {
+     "label": "Detalye"
+    },
+    "radius": {
+     "label": "Radius"
+    },
+    "strength": {
+     "label": "Lakas"
+    }
+   }
+  },
+  "directionalblur": {
+   "description": "Gumagawa ng motion blur gamit ang pag-average ng mga sample sa isang direksyon.",
+   "name": "Directional na pag-blur",
+   "params": {
+    "angle": {
+     "label": "Anggulo"
+    },
+    "blurLength": {
+     "label": "Haba"
+    }
+   }
+  },
+  "dissolve": {
+   "description": "Nawawasak ang patong sa mga random na tuldok.",
+   "name": "Pagkatunaw",
+   "params": {
+    "grain": {
+     "label": "Laki"
+    },
+    "progress": {
+     "label": "Progreso"
+    }
+   }
+  },
+  "duotone": {
+   "description": "Naglalapat ng gradient map na may dalawang kulay batay sa liwanag, may kontrol sa kontrast at dami.",
+   "name": "Dalawang tono",
+   "params": {
+    "amount": {
+     "label": "Dami"
+    },
+    "color1": {
+     "label": "Kulay ng anino"
+    },
+    "color2": {
+     "label": "Kulay ng highlight"
+    },
+    "contrast": {
+     "label": "Kontrast"
+    }
+   }
+  },
+  "echo": {
+   "description": "Nagdaragdag ng mga kopya ng patong mula sa nakaraang sandali, kasabay ng animation nito.",
+   "name": "Echo na keyframe",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "composite": {
+     "label": "Composite",
+     "options": [
+      "Sa likod",
+      "Sa ibabaw"
+     ]
+    },
+    "count": {
+     "label": "Bilang"
+    },
+    "seconds": {
+     "label": "Segundo"
+    }
+   }
+  },
+  "edgedetect": {
+   "description": "Maliwanag na linya kung saan nagbabago ang larawan, madilim sa iba.",
+   "name": "Pag-detect ng gilid",
+   "params": {
+    "strength": {
+     "label": "Lakas"
+    }
+   }
+  },
+  "emboss": {
+   "description": "Naglalapat ng emboss gamit ang gradient ng liwanag sa tinukoy na anggulo.",
+   "name": "Emboss",
+   "params": {
+    "angle": {
+     "label": "Anggulo ng liwanag"
+    },
+    "strength": {
+     "label": "Lakas"
+    }
+   }
+  },
+  "exposure": {
+   "description": "Ginagaya ang exposure ng litrato gamit ang stops, offset, at gamma correction.",
+   "name": "Exposure",
+   "params": {
+    "gamma": {
+     "label": "Gamma"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "stops": {
+     "label": "Stops"
+    }
+   }
+  },
+  "filmgrain": {
+   "description": "Gumagalaw na monochrome na butil ng pelikula, may kontrol sa dami, laki ng butil, at bilis ng animation.",
+   "name": "Butil ng pelikula",
+   "params": {
+    "amount": {
+     "label": "Dami"
+    },
+    "grainSize": {
+     "label": "Laki ng butil"
+    },
+    "speed": {
+     "label": "Bilis"
+    }
+   }
+  },
+  "flicker": {
+   "description": "Random na pinapakislap ang opacity ng patong.",
+   "name": "Kumikislap",
+   "params": {
+    "intensity": {
+     "label": "Tindi"
+    },
+    "mode": {
+     "label": "Mode"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "speed": {
+     "label": "Bilis"
+    }
+   }
+  },
+  "fourcolor": {
+   "description": "Nag-blend ng apat na kulay sa apat na punto (px mula sa gitna ng patong) sa ibabaw ng patong.",
+   "name": "Gradient na apat na kulay",
+   "params": {
+    "blend": {
+     "label": "Blend",
+     "options": [
+      "Normal",
+      "Multiply",
+      "Screen",
+      "Overlay",
+      "Soft light",
+      "Hard light",
+      "Idagdag",
+      "Padilimin",
+      "Paliwanagin",
+      "Pagkakaiba",
+      "Color dodge",
+      "Color Burn"
+     ]
+    },
+    "color1": {
+     "label": "Kulay 1"
+    },
+    "color2": {
+     "label": "Kulay 2"
+    },
+    "color3": {
+     "label": "Kulay 3"
+    },
+    "color4": {
+     "label": "Kulay 4"
+    },
+    "corner": {
+     "label": "Mga offset ng sulok"
+    },
+    "opacity": {
+     "label": "Opacity"
+    },
+    "point1": {
+     "label": "Punto 1"
+    },
+    "point2": {
+     "label": "Punto 2"
+    },
+    "point3": {
+     "label": "Punto 3"
+    },
+    "point4": {
+     "label": "Punto 4"
+    },
+    "softness": {
+     "label": "Lambot"
+    }
+   }
+  },
+  "glitch": {
+   "description": "Random na horizontal na block displacement at offset ng color channel, nagbabago ilang beses kada segundo.",
+   "name": "Glitch",
+   "params": {
+    "blockHeight": {
+     "label": "Taas ng block"
+    },
+    "intensity": {
+     "label": "Lakas"
+    },
+    "seed": {
+     "label": "Seed"
+    }
+   }
+  },
+  "glow": {
+   "description": "Malambot na liwanag sa paligid ng maliwanag na bahagi ng patong.",
+   "name": "Glow",
+   "params": {
+    "intensity": {
+     "label": "Lakas"
+    },
+    "strength": {
+     "label": "Laki"
+    }
+   }
+  },
+  "gradientmap": {
+   "description": "Kinukulayan muli ang larawan ayon sa liwanag gamit ang tatlong kulay, may repeat at phase, at pinaparami ng Scale Brightness ang resulta sa sariling liwanag ng larawan.",
+   "name": "Gradient Map",
+   "params": {
+    "color1": {
+     "label": "Anino"
+    },
+    "color2": {
+     "label": "Gitnang tono"
+    },
+    "color3": {
+     "label": "Highlights"
+    },
+    "opacity": {
+     "label": "Opacity"
+    },
+    "phase": {
+     "label": "Phase"
+    },
+    "repeat": {
+     "label": "Ulitin"
+    },
+    "reverse": {
+     "label": "Baliktarin"
+    },
+    "scaleBrightness": {
+     "label": "I-scale ang liwanag"
+    }
+   }
+  },
+  "gradientoverlay": {
+   "description": "Naglalagay ng gradient na may dalawang kulay sa patong, may pagpipilian ng hugis at blend mode.",
+   "name": "Gradient Overlay",
+   "params": {
+    "angle": {
+     "label": "Anggulo"
+    },
+    "blend": {
+     "label": "Blend",
+     "options": [
+      "Normal",
+      "Multiply",
+      "Screen",
+      "Overlay",
+      "Soft Light",
+      "Hard Light",
+      "Add",
+      "Darken",
+      "Lighten",
+      "Difference",
+      "Color Dodge",
+      "Color Burn"
+     ]
+    },
+    "color1": {
+     "label": "Kulay 1"
+    },
+    "color2": {
+     "label": "Kulay 2"
+    },
+    "opacity": {
+     "label": "Opacity"
+    },
+    "scale": {
+     "label": "Scale"
+    },
+    "shape": {
+     "label": "Hugis",
+     "options": [
+      "Linear",
+      "Radial",
+      "Reflected",
+      "Angle"
+     ]
+    }
+   }
+  },
+  "halftone": {
+   "description": "Mga naka-print na tuldok na lumalaki kung saan madilim ang larawan.",
+   "name": "Halftone",
+   "params": {
+    "angle": {
+     "label": "Anggulo"
+    },
+    "cell": {
+     "label": "Laki"
+    },
+    "colored": {
+     "label": "Mga kulay na tuldok"
+    }
+   }
+  },
+  "highlightshadow": {
+   "description": "Binabawi o pinapalakas ang maliwanag na highlights at itinataas o pinapalalim ang madilim na anino gamit ang blurred na local luminance mask.",
+   "name": "Highlights at Shadows",
+   "params": {
+    "highlights": {
+     "label": "Highlights"
+    },
+    "shadows": {
+     "label": "Anino"
+    }
+   }
+  },
+  "huesaturation": {
+   "description": "Iniikot ang mga kulay sa color wheel at pinapalakas o pinapahina; pinakamalakas na pinapalakas ng vibrance ang mga maputlang kulay.",
+   "name": "Hue at Saturation",
+   "params": {
+    "hue": {
+     "label": "Hue"
+    },
+    "lightness": {
+     "label": "Liwanag"
+    },
+    "saturation": {
+     "label": "Saturation"
+    },
+    "vibrance": {
+     "label": "Vibrance"
+    }
+   }
+  },
+  "invert": {
+   "description": "Binabaligtad ang mga channel ng kulay ng larawan gamit ang dami ng paghahalo at opsyonal na pagbaligtad ng alpha.",
+   "name": "Baliktarin",
+   "params": {
+    "amount": {
+     "label": "Dami"
+    },
+    "invert_alpha": {
+     "label": "Baliktarin ang alpha"
+    }
+   }
+  },
+  "kaleidoscope": {
+   "description": "Mga nakasalamin na hiwa sa paligid ng isang punto.",
+   "name": "Kaleidoscope",
+   "params": {
+    "angle": {
+     "label": "Anggulo"
+    },
+    "center": {
+     "label": "Gitna"
+    },
+    "segments": {
+     "label": "Mga segment"
+    }
+   }
+  },
+  "lensflare": {
+   "description": "Isang maliwanag na ilaw na may halo, nakapatong sa larawan.",
+   "name": "Flare ng ilaw",
+   "params": {
+    "brightness": {
+     "label": "Kaliwanagan"
+    },
+    "center": {
+     "label": "Gitna"
+    },
+    "color": {
+     "label": "Kulay"
+    },
+    "radius": {
+     "label": "Radius"
+    }
+   }
+  },
+  "levels": {
+   "description": "Inaayos ang mga antas ng larawan gamit ang input na itim/puti, gamma, at output na itim/puti.",
+   "name": "Mga antas",
+   "params": {
+    "gamma": {
+     "label": "Gamma"
+    },
+    "inBlack": {
+     "label": "Itim na input"
+    },
+    "inWhite": {
+     "label": "Puting input"
+    },
+    "outBlack": {
+     "label": "Itim na output"
+    },
+    "outWhite": {
+     "label": "Puting output"
+    }
+   }
+  },
+  "lightglow": {
+   "description": "Nagdadagdag ng makulay na glow sa mga bahagi ng larawan na mas maliwanag kaysa sa hangganan.",
+   "name": "Glow ng ilaw",
+   "params": {
+    "blur": {
+     "label": "Laki"
+    },
+    "color": {
+     "label": "Kulay"
+    },
+    "intensity": {
+     "label": "Tindi"
+    },
+    "opacity": {
+     "label": "Opacity"
+    },
+    "threshold": {
+     "label": "Hangganan"
+    }
+   }
+  },
+  "lumakey": {
+   "description": "Tinatanggal ang madilim na bahagi ng patong (o ang mga maliwanag na bahagi).",
+   "name": "Luma key",
+   "params": {
+    "invert": {
+     "label": "Baliktarin"
+    },
+    "softness": {
+     "label": "Lambot"
+    },
+    "threshold": {
+     "label": "Hangganan"
+    }
+   }
+  },
+  "mirror": {
+   "description": "Sinasalamin ang kalahati ng larawan sa linya ng salamin na tinutukoy ng anggulo at gitna.",
+   "name": "Salamin",
+   "params": {
+    "angle": {
+     "label": "Anggulo"
+    },
+    "center": {
+     "label": "Gitna"
+    }
+   }
+  },
+  "motionblur": {
+   "description": "Pinapahid ang patong sa isang direksyon, parang mabilis na gumalaw.",
+   "name": "Motion blur",
+   "params": {
+    "angle": {
+     "label": "Direksyon"
+    },
+    "length": {
+     "label": "Haba"
+    }
+   }
+  },
+  "noisedisplace": {
+   "description": "Inilalayo ang mga pixel gamit ang makinis na value noise na gumagalaw sa paglipas ng oras.",
+   "name": "Noise displace",
+   "params": {
+    "amount": {
+     "label": "Dami"
+    },
+    "scale": {
+     "label": "Sukat ng noise"
+    },
+    "speed": {
+     "label": "Bilis ng animation"
+    }
+   }
+  },
+  "oscillate": {
+   "description": "Pinagagalaw ang patong pabalik-balik sa isang anggulo.",
+   "name": "Oscillate",
+   "params": {
+    "angle": {
+     "label": "Anggulo"
+    },
+    "frequency": {
+     "label": "Dalas"
+    },
+    "magnitude": {
+     "label": "Laki"
+    },
+    "phase": {
+     "label": "Phase"
+    },
+    "wave": {
+     "label": "Alon",
+     "options": [
+      "Sine",
+      "Tatsulok"
+     ]
+    }
+   }
+  },
+  "pixelate": {
+   "description": "Naglalapat ng mosaic pixelation gamit ang mga parisukat na bloke ng kulay ng pinakataas-kaliwang pixel.",
+   "name": "Pixelate",
+   "params": {
+    "blockSize": {
+     "label": "Laki ng bloke"
+    }
+   }
+  },
+  "posterize": {
+   "description": "Binabawasan ang bawat channel ng kulay sa tinukoy na bilang ng antas (2-32).",
+   "name": "Posterize",
+   "params": {
+    "levels": {
+     "label": "Mga antas"
+    }
+   }
+  },
+  "pulseopacity": {
+   "description": "Pina-fade ang patong palabas at papasok nang paulit-ulit.",
+   "name": "Pulse na Opacity",
+   "params": {
+    "frequency": {
+     "label": "Dalas"
+    },
+    "minimum": {
+     "label": "Pinakamababa"
+    },
+    "phase": {
+     "label": "Phase"
+    },
+    "wave": {
+     "label": "Alon",
+     "options": [
+      "Sine",
+      "Tatsulok"
+     ]
+    }
+   }
+  },
+  "pulsesize": {
+   "description": "Pinapalaki at pinapaliit ang patong nang paulit-ulit.",
+   "name": "Pulse na Laki",
+   "params": {
+    "amount": {
+     "label": "Dami"
+    },
+    "frequency": {
+     "label": "Dalas"
+    },
+    "phase": {
+     "label": "Phase"
+    },
+    "wave": {
+     "label": "Alon",
+     "options": [
+      "Sine",
+      "Tatsulok"
+     ]
+    }
+   }
+  },
+  "radialblur": {
+   "description": "Nagdadagdag ng radial zoom blur gamit ang mga sample sa mga sinag mula sa gitna, na may adjustable na lakas.",
+   "name": "Zoom Blur",
+   "params": {
+    "center": {
+     "label": "Gitna"
+    },
+    "strength": {
+     "label": "Lakas"
+    }
+   }
+  },
+  "randomdisplace": {
+   "description": "Hinahayaang gumalaw ang patong nang random sa paligid ng puwesto nito.",
+   "name": "Random na Displacement",
+   "params": {
+    "magnitude": {
+     "label": "Laki"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "speed": {
+     "label": "Bilis"
+    }
+   }
+  },
+  "randomjitter": {
+   "description": "Pinapatalon ang patong pabalik-balik nang random sa isang anggulo.",
+   "name": "Random na Jitter",
+   "params": {
+    "angle": {
+     "label": "Anggulo"
+    },
+    "magnitude": {
+     "label": "Laki"
+    },
+    "rate": {
+     "label": "Rate"
+    },
+    "seed": {
+     "label": "Seed"
+    }
+   }
+  },
+  "rgbsplit": {
+   "description": "Chromatic aberration sa pamamagitan ng pag-shift ng pula at asul na channel sa magkasalungat na direksyon sa isang anggulo.",
+   "name": "RGB Split",
+   "params": {
+    "angle": {
+     "label": "Anggulo"
+    },
+    "splitDistance": {
+     "label": "Distansya"
+    }
+   }
+  },
+  "ripple": {
+   "description": "Mga konsentrikong alon mula sa gitna na may adjustable na amplitude, haba ng alon, at bilis.",
+   "name": "Alon",
+   "params": {
+    "amplitude": {
+     "label": "Amplitude"
+    },
+    "center": {
+     "label": "Gitna"
+    },
+    "speed": {
+     "label": "Bilis"
+    },
+    "wavelength": {
+     "label": "Haba ng alon"
+    }
+   }
+  },
+  "scanlines": {
+   "description": "Nagdadagdag ng pahalang na scanlines para sa CRT monitor effect, may opsyonal na vertical rolling.",
+   "name": "Scanlines",
+   "params": {
+    "darkness": {
+     "label": "Kadiliman"
+    },
+    "roll_speed": {
+     "label": "Bilis ng roll"
+    },
+    "spacing": {
+     "label": "Espasyo ng linya"
+    }
+   }
+  },
+  "sepia": {
+   "description": "Mainit na kayumangging tono, parang lumang litrato.",
+   "name": "Sepia",
+   "params": {
+    "amount": {
+     "label": "Dami"
+    }
+   }
+  },
+  "sharpen": {
+   "description": "Nag-aaplay ng unsharp mask gamit ang 3x3 na kapitbahayan para palinawin ang maliliit na detalye.",
+   "name": "Pagpapatalas",
+   "params": {
+    "amount": {
+     "label": "Dami"
+    },
+    "radius": {
+     "label": "Radius"
+    }
+   }
+  },
+  "softglow": {
+   "description": "Nagsa-screen ng malambot at blurred na kopya ng larawan para sa dreamy glow, kadalasan mula sa highlights.",
+   "name": "Malambot na Glow",
+   "params": {
+    "blur": {
+     "label": "Laki"
+    },
+    "brightness": {
+     "label": "Liwanag"
+    },
+    "color": {
+     "label": "Kulay"
+    },
+    "contrast": {
+     "label": "Kontrast"
+    },
+    "highlights": {
+     "label": "Mga highlight"
+    },
+    "opacity": {
+     "label": "Opacity"
+    }
+   }
+  },
+  "solid": {
+   "description": "Naglalagay ng kulay sa patong, pinapanatili ang hugis, may pagpipilian ng blending mode.",
+   "name": "Overlay ng Kulay",
+   "params": {
+    "amount": {
+     "label": "Dami"
+    },
+    "blend": {
+     "label": "Blend",
+     "options": [
+      "Normal",
+      "Multiply",
+      "Screen",
+      "Overlay",
+      "Soft Light",
+      "Hard Light",
+      "Add",
+      "Darken",
+      "Lighten",
+      "Difference",
+      "Color Dodge",
+      "Color Burn"
+     ]
+    },
+    "color": {
+     "label": "Kulay"
+    }
+   }
+  },
+  "spin": {
+   "description": "Iniikot ang patong nang tuloy-tuloy sa pare-parehong bilis.",
+   "name": "Pag-ikot",
+   "params": {
+    "direction": {
+     "label": "Direksyon",
+     "options": [
+      "Pakanan",
+      "Pakaliwa"
+     ]
+    },
+    "speed": {
+     "label": "Bilis"
+    }
+   }
+  },
+  "splittone": {
+   "description": "Kinukulayan ang mga anino at highlight sa magkaibang hue, pinapanatili ang itim, puti at liwanag.",
+   "name": "Hatiin ang Tono",
+   "params": {
+    "highlightAmount": {
+     "label": "Dami ng Highlight"
+    },
+    "highlightHue": {
+     "label": "Hue ng Highlight"
+    },
+    "shadowAmount": {
+     "label": "Dami ng Anino"
+    },
+    "shadowHue": {
+     "label": "Hue ng Anino"
+    }
+   }
+  },
+  "static": {
+   "description": "Kumikislap na kulay-abong ingay, parang TV na walang signal.",
+   "name": "Static",
+   "params": {
+    "amount": {
+     "label": "Dami"
+    },
+    "grain": {
+     "label": "Laki"
+    }
+   }
+  },
+  "stretch": {
+   "description": "Hinahati ang patong sa isang linya at hinihila ang dalawang bahagi, ini-stretch ang mga pixel sa linya sa puwang.",
+   "name": "Stretch ng Segment",
+   "params": {
+    "angle": {
+     "label": "Anggulo"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "spread": {
+     "label": "Spread"
+    },
+    "stretch": {
+     "label": "Stretch"
+    }
+   }
+  },
+  "stretchaxis": {
+   "description": "Ini-stretch ang patong sa isang anggulo.",
+   "name": "Stretch na Axis",
+   "params": {
+    "amount": {
+     "label": "Dami"
+    },
+    "angle": {
+     "label": "Anggulo"
+    }
+   }
+  },
+  "swing": {
+   "description": "Iniikot ang patong pabalik-balik sa paligid ng pivot nito.",
+   "name": "Indayog",
+   "params": {
+    "angle": {
+     "label": "Anggulo"
+    },
+    "frequency": {
+     "label": "Dalas"
+    },
+    "phase": {
+     "label": "Phase"
+    },
+    "wave": {
+     "label": "Alon",
+     "options": [
+      "Sine",
+      "Triangle"
+     ]
+    }
+   }
+  },
+  "temperature": {
+   "description": "Pinapainit o pinapalamig ang larawan ayon sa temperatura ng kulay sa kelvin (6500 K ay hindi nagbabago), pinapanatili ang liwanag.",
+   "name": "Temperatura ng Kulay",
+   "params": {
+    "kelvin": {
+     "label": "Temperatura"
+    },
+    "strength": {
+     "label": "Lakas"
+    }
+   }
+  },
+  "threshold": {
+   "description": "Purong itim at puti, nahahati batay sa liwanag.",
+   "name": "Threshold",
+   "params": {
+    "invert": {
+     "label": "Baliktarin"
+    },
+    "level": {
+     "label": "Antas"
+    },
+    "softness": {
+     "label": "Kalambutan"
+    }
+   }
+  },
+  "tile": {
+   "description": "Inuulit ang larawan sa isang grid.",
+   "name": "Tile",
+   "params": {
+    "mirror": {
+     "label": "Salamin"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "scale": {
+     "label": "Iskala"
+    }
+   }
+  },
+  "timequant": {
+   "description": "Pinapayagan ang oras na dumaan nang pahakbang para sa patong na ito, tulad ng mas mababang frame rate.",
+   "name": "Quantization ng Oras",
+   "params": {
+    "fps": {
+     "label": "Frame Rate"
+    }
+   }
+  },
+  "tint": {
+   "description": "Inimamapa ang liwanag ng larawan sa pagitan ng kulay ng anino at kulay ng highlight na may halong dami.",
+   "name": "Tint",
+   "params": {
+    "amount": {
+     "label": "Dami"
+    },
+    "highlightColor": {
+     "label": "Kulay ng Highlight"
+    },
+    "shadowColor": {
+     "label": "Kulay ng Anino"
+    }
+   }
+  },
+  "twirl": {
+   "description": "Iniikot ang mga pixel sa paligid ng sentro sa anggulong bumababa habang lumalayo sa sentro.",
+   "name": "Twirl",
+   "params": {
+    "angle": {
+     "label": "Anggulo"
+    },
+    "center": {
+     "label": "Sentro"
+    },
+    "radius": {
+     "label": "Radius"
+    }
+   }
+  },
+  "unsharpmask": {
+   "description": "Naglalapat ng klasikong unsharp masking na may hangganan at opsyonal na preview ng grey na mask.",
+   "name": "Unsharp Mask",
+   "params": {
+    "amount": {
+     "label": "Dami"
+    },
+    "showMask": {
+     "label": "Ipakita ang Mask"
+    },
+    "strength": {
+     "label": "Lakas"
+    },
+    "threshold": {
+     "label": "Hangganan"
+    }
+   }
+  },
+  "vhs": {
+   "description": "Mukhang lumang video tape: pagguho ng kulay, pahid na linya, scanlines, ingay ng tape at gumugulong na tracking.",
+   "name": "VHS",
+   "params": {
+    "chroma": {
+     "label": "Pagguho ng Kulay"
+    },
+    "headSwitch": {
+     "label": "Pagpalit ng Head"
+    },
+    "noise": {
+     "label": "Ingay"
+    },
+    "saturation": {
+     "label": "Saturation"
+    },
+    "scanlines": {
+     "label": "Scanlines"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "smear": {
+     "label": "Pahid"
+    },
+    "tracking": {
+     "label": "Tracking"
+    },
+    "wobble": {
+     "label": "Pag-indayog"
+    }
+   }
+  },
+  "vignette": {
+   "description": "Naglalapat ng vignette para padilimin ang mga gilid ng larawan.",
+   "name": "Vignette",
+   "params": {
+    "amount": {
+     "label": "Dami"
+    },
+    "radius": {
+     "label": "Laki"
+    },
+    "roundness": {
+     "label": "Pagkabilog"
+    },
+    "softness": {
+     "label": "Kalambutan"
+    }
+   }
+  },
+  "wavewarp": {
+   "description": "Naglalapat ng sine wave displacement sa larawan na may amplitude, wavelength, direksyon at bilis ng phase na maaaring isaayos.",
+   "name": "Wave Warp",
+   "params": {
+    "amplitude": {
+     "label": "Amplitude"
+    },
+    "direction": {
+     "label": "Direksyon"
+    },
+    "speed": {
+     "label": "Bilis"
+    },
+    "wavelength": {
+     "label": "Wavelength"
+    }
+   }
+  }
+ }
+}
