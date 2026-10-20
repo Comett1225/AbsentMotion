@@ -290,6 +290,25 @@ def main():
     ok = min(bent[0].sum(), bent[2].sum()) > 2000 and bent[0][:, 120:].sum() > 300 and bent[2][:, 120:].sum() > 300 and max(apart) <= 0.01 * bent[0].sum()
     print(('ok   ' if ok else 'FAIL ') + 'bending left draws bending right mirrored: ' + str(apart) + ' pixels differ', flush=True)
     failed += not ok
+    y, x = np.mgrid[0:64, 0:64]
+    on = ((x // 8 + y // 8) % 2)[:, :, None]
+    Image.fromarray((on * [255, 0, 0] + (1 - on) * [0, 0, 255]).astype(np.uint8)).save(work / 'moshchecker.png')
+    engine.adb('push', work / 'moshchecker.png', engine.DEVICE_DIR + '/moshchecker.png')
+    card = lambda rotation, effect: engine.scene(
+        '<shape id="1" label="c" startTime="0" endTime="1000" fillType="media" mediaFillMode="stretch" s=".rect" '
+        f'fillImage="file://{engine.DEVICE_DIR}/moshchecker.png"><transform><location value="100,100,0"/><rotation value="{rotation}"/></transform>'
+        '<property name="size" type="vec2" value="30,30"/>' + effect + '</shape>')
+    spill, moved = [], []
+    for rotation in (0, 45):
+        plain = engine.still(f'moshplain{rotation}', card(rotation, ''), work, 20)
+        shot = engine.still(f'moshcard{rotation}', card(rotation, fx('datamosh', start=0, end=1, intensity=2, block=8, decay=0)), work, 20)
+        empty = plain.max(axis=2) <= 8
+        spill.append(int((empty & (shot.max(axis=2) > 24)).sum()))
+        moved.append(round(float(np.abs(shot - plain)[~empty].mean()), 1))
+    engine.adb('shell', 'rm', engine.DEVICE_DIR + '/moshchecker.png')
+    ok = max(spill) == 0 and min(moved) > 3
+    print(('ok   ' if ok else 'FAIL ') + f'datamosh on a picture smaller than the canvas moves blocks only inside the layer: {spill} pixels outside, {moved} change inside', flush=True)
+    failed += not ok
     hits = engine.run('motionhit', engine.scene(engine.rect(7, 100, 100, 10, 10, 0xffff0000, extra=fx('oscillate', angle=0, frequency=0.5, magnitude=50))), work, [(150, 100), (100, 100)], 15)
     engine.adb('shell', 'rm', engine.DEVICE_DIR + '/motionhit.png')
     got = [line.split()[-1] for line in hits.splitlines() if ' hit ' in line]
