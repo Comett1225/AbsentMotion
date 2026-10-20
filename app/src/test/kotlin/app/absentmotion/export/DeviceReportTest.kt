@@ -7,7 +7,9 @@ import org.junit.Test
 
 class DeviceReportTest {
     private fun video(mime: String, hardware: Boolean, maxPixels: Long = 1920L * 1088, rate: Double = 1920.0 * 1088 * 60) =
-        EncoderCaps("enc.$mime.$hardware", mime, hardware, 64..4096, 64..4096, 2, 2, maxPixels, rate, 1..100_000_000, listOf(1, 8))
+        EncoderCaps("enc.$mime.$hardware", mime, hardware, 64..4096, 64..4096, 2, 2,
+            ProbeSizes.filter { (w, h) -> w.toLong() * h <= maxPixels }.map { (w, h) -> SizePoint(w, h, rate / (w.toDouble() * h)) },
+            1..100_000_000, listOf(1, 8))
 
     private val report = DeviceReport(
         "k",
@@ -45,6 +47,13 @@ class DeviceReportTest {
     @Test fun tooLargeForEveryCodecSuggestsTheLargestSizeThatFits() {
         val result = report.check(ExportSettings(2160, 30, Codec.Av1), 4320, 7680) as Support.Unsupported
         assertEquals(ExportSettings(1440, 30, Codec.Hevc), result.suggestion)
+    }
+
+    @Test fun portraitAndLandscapeAreCheckedSeparately() {
+        val landscapeOnly = DeviceReport("k", listOf(EncoderCaps("av1", "video/av01", false, 2..1920, 2..1920, 1, 1, listOf(SizePoint(1920, 1080, 30.0)))))
+        assertTrue(landscapeOnly.check(ExportSettings(1080, 30, Codec.Av1), 1920, 1080) is Support.SlowSoftwareOnly)
+        assertTrue(landscapeOnly.check(ExportSettings(1080, 30, Codec.Av1), 1080, 1920) is Support.Unsupported)
+        assertTrue(landscapeOnly.check(ExportSettings(720, 30, Codec.Av1), 1280, 720) is Support.SlowSoftwareOnly)
     }
 
     @Test fun oddSizesMissTheAlignment() {

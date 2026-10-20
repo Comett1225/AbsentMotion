@@ -18,6 +18,8 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 
+data class SizePoint(val width: Int, val height: Int, val maxFps: Double)
+
 data class EncoderCaps(
     val name: String,
     val mime: String,
@@ -26,8 +28,7 @@ data class EncoderCaps(
     val heights: IntRange = 0..0,
     val widthAlign: Int = 1,
     val heightAlign: Int = 1,
-    val maxPixels: Long = 0,
-    val maxPixelRate: Double = 0.0,
+    val sizes: List<SizePoint> = emptyList(),
     val bitrates: IntRange = 0..0,
     val profiles: List<Int> = emptyList(),
     val sampleRates: List<Int> = emptyList(),
@@ -35,10 +36,13 @@ data class EncoderCaps(
 ) {
     val video: Boolean get() = mime.startsWith("video/")
 
-    fun fitsSize(width: Int, height: Int): Boolean =
-        width in widths && height in heights && width % widthAlign == 0 && height % heightAlign == 0 && width.toLong() * height <= maxPixels
+    private fun covering(width: Int, height: Int) = sizes.filter { it.width >= width && it.height >= height }
 
-    fun fits(width: Int, height: Int, fps: Int): Boolean = fitsSize(width, height) && width.toDouble() * height * fps <= maxPixelRate * 1.001
+    fun fitsSize(width: Int, height: Int): Boolean =
+        width in widths && height in heights && width % widthAlign == 0 && height % heightAlign == 0 && covering(width, height).isNotEmpty()
+
+    fun fits(width: Int, height: Int, fps: Int): Boolean = fitsSize(width, height) &&
+        covering(width, height).any { it.maxFps * it.width * it.height >= fps.toDouble() * width * height * 0.999 }
 }
 
 data class ProbeResult(val codec: Codec, val width: Int, val height: Int, val frames: Int, val ms: Long, val setupMs: Long = 0) {
@@ -91,7 +95,7 @@ data class DeviceReport(val key: String, val encoders: List<EncoderCaps>, val pr
         val order = codecs.filter { it != s.codec }.map { it to s.shortSide } +
             sides.flatMap { side -> (listOf(s.codec) + codecs).distinct().map { it to side } }
         for (hardware in listOf(true, false)) {
-            order.firstOrNull { (codec, side) -> fit(codec, side, hardware) }?.let { (codec, side) -> return s.copy(codec = codec, shortSide = side) }
+            order.firstOrNull { (codec, side) -> fit(codec, side, hardware) }?.let { (codec, side) -> return s.copy(codec = codec, shortSide = side).fixedFormat() }
         }
         return null
     }
@@ -117,13 +121,15 @@ private fun JSONArray?.ints(): List<Int> = if (this == null) emptyList() else (0
 
 private fun EncoderCaps.toJson(): JSONObject = JSONObject().put("name", name).put("mime", mime).put("hardware", hardware)
     .put("widths", widths.toJson()).put("heights", heights.toJson()).put("widthAlign", widthAlign).put("heightAlign", heightAlign)
-    .put("maxPixels", maxPixels).put("maxPixelRate", maxPixelRate).put("bitrates", bitrates.toJson())
+    .put("sizes", JSONArray().apply { sizes.forEach { put(JSONArray().put(it.width).put(it.height).put(it.maxFps)) } })
+    .put("bitrates", bitrates.toJson())
     .put("profiles", JSONArray(profiles)).put("sampleRates", JSONArray(sampleRates)).put("maxChannels", maxChannels)
 
 private fun encoderFromJson(o: JSONObject) = EncoderCaps(
     o.getString("name"), o.getString("mime"), o.getBoolean("hardware"),
     o.optJSONArray("widths").toRange(), o.optJSONArray("heights").toRange(), o.optInt("widthAlign", 1), o.optInt("heightAlign", 1),
-    o.optLong("maxPixels"), o.optDouble("maxPixelRate", 0.0), o.optJSONArray("bitrates").toRange(),
+    o.optJSONArray("sizes")?.let { a -> (0 until a.length()).map { i -> a.getJSONArray(i).let { SizePoint(it.getInt(0), it.getInt(1), it.getDouble(2)) } } }.orEmpty(),
+    o.optJSONArray("bitrates").toRange(),
     o.optJSONArray("profiles").ints(), o.optJSONArray("sampleRates").ints(), o.optInt("maxChannels"),
 )
 
@@ -197,7 +203,7 @@ class DeviceCapabilities private constructor(context: Context) {
     }
 }
 
-private val ProbeSizes = VideoResolutions.map { it.shortSide }.flatMap { side ->
+internal val ProbeSizes = VideoResolutions.map { it.shortSide }.flatMap { side ->
     val long = (side * 16 / 9 + 1) and 1.inv()
     listOf(side to long, long to side, side to side)
 }
@@ -209,18 +215,11 @@ internal fun analyseEncoders(): List<EncoderCaps> = MediaCodecList(MediaCodecLis
 private fun encoderCaps(info: MediaCodecInfo, mime: String): EncoderCaps? {
     val caps = info.getCapabilitiesForType(mime)
     caps.videoCapabilities?.let { v ->
-        var maxPixels = 0L
-        var maxRate = 0.0
-        for ((w, h) in ProbeSizes) {
-            if (!v.isSizeSupported(w, h)) continue
-            val pixels = w.toLong() * h
-            maxPixels = maxOf(maxPixels, pixels)
-            maxRate = maxOf(maxRate, pixels * v.getSupportedFrameRatesFor(w, h).upper)
-        }
+        val sizes = ProbeSizes.filter { (w, h) -> v.isSizeSupported(w, h) }.map { (w, h) -> SizePoint(w, h, v.getSupportedFrameRatesFor(w, h).upper) }
         return EncoderCaps(
             info.name, mime, info.isHardwareAccelerated,
             v.supportedWidths.lower..v.supportedWidths.upper, v.supportedHeights.lower..v.supportedHeights.upper,
-            v.widthAlignment, v.heightAlignment, maxPixels, maxRate,
+            v.widthAlignment, v.heightAlignment, sizes,
             v.bitrateRange.lower..v.bitrateRange.upper, caps.profileLevels.map { it.profile }.distinct(),
         )
     }
