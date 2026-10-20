@@ -242,6 +242,7 @@ bool SeeLayers(const std::vector<Layer>& layers, int width, int height, bool top
 bool SeenPlacement(const Layer& layer, double timeMs, Placement* placement);
 SkMatrix WorldMatrix(const Scene& scene, const Layer& layer, double timeMs);
 int64_t TopLayerAt(const Scene& scene, double timeMs, float x, float y);
+SkRect SelectionBounds(const Layer& layer, double timeMs, const SkMatrix& matrix);
 bool HitLayer(const Scene& scene, const Layer& layer, double timeMs, float x, float y);
 void DrawLayerList(SkCanvas* canvas, const Scene& scene, const std::vector<Layer>& layers, double timeMs, const MediaPictures& pictures);
 
