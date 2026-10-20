@@ -160,7 +160,7 @@ class UiContracts(unittest.TestCase):
             for line in source(path).splitlines():
                 if 'performHapticFeedback(' in line:
                     self.assertIn('state.settings.vibration', line, path)
-        self.assertIn('state.edit("reorder") { it.move(id, layers.lastIndex - to) }\n        onTick()', source('ui/editor/Timeline.kt'))
+        self.assertIn('state.edit(MOVE_EDIT) { it.move(id, layers.lastIndex - to) }\n        onTick()', source('ui/editor/Timeline.kt'))
         self.assertIn('if (moved && value != null && value != detent) haptic(HapticFeedbackType.SegmentTick)', source('ui/editor/panels/SpeedPanel.kt'))
         self.assertIn('if (guides.any { it !in state.snapGuides }) tick(HapticFeedbackType.SegmentTick)', source('ui/editor/panels/MoveTransformPanel.kt'))
 
