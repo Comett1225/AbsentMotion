@@ -90,12 +90,7 @@ class TemplateStore(private val root: File, private val resolver: ContentResolve
         return Scene(scene.node.mapMediaUris { moved[it] ?: it })
     }
 
-    private fun write(id: String, scene: Scene) {
-        val dir = File(root, id).apply { mkdirs() }
-        val temp = File(dir, "scene.xml.tmp")
-        temp.writeText(scene.toXml())
-        java.nio.file.Files.move(temp.toPath(), File(dir, "scene.xml").toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING)
-    }
+    private fun write(id: String, scene: Scene) = writeAtomically(File(root, "$id/scene.xml"), scene.toXml())
 }
 
 internal fun canReplaceProject(template: Scene?, projects: ProjectStore): Boolean =

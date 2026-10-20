@@ -38,12 +38,7 @@ class PresetStore(private val dir: File) {
         dir.listFiles { f -> f.extension == "xml" }.orEmpty().forEach { it.delete() }
     }
 
-    private fun write(id: String, scene: Scene) {
-        dir.mkdirs()
-        val temp = File(dir, "$id.xml.tmp")
-        temp.writeText(scene.toXml())
-        java.nio.file.Files.move(temp.toPath(), file(id).toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING)
-    }
+    private fun write(id: String, scene: Scene) = writeAtomically(file(id), scene.toXml())
 
     private fun file(id: String) = File(dir, "$id.xml")
 }
