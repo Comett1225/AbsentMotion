@@ -34,6 +34,8 @@ def cases():
     yield 'group border', framed('<border direction="outside"><color value="#ffffffff"/><size value="40"/></border>'), [((100, 100), engine.RED), ((50, 100), (255, 255, 255)), ((100, 45), (255, 255, 255)), ((30, 100), engine.BLACK)]
     yield 'group shadow', framed('<shadow direction="outside"><color value="#ffffffff"/><size value="0"/><offset value="60,0"/></shadow>'), [((100, 100), engine.RED), ((170, 100), (255, 255, 255)), ((30, 100), engine.BLACK)]
     yield 'vivid neutral', engine.scene(engine.rect(1, 100, 100, 100, 100, 0xff808080) + engine.rect(2, 100, 100, 100, 100, 0xff808080, attrs=' blending="vivid-light"')), [((100, 100), (129, 129, 129))]
+    neutral = fx('vhs', chroma=0, smear=0, scanlines=0, noise=0, tracking=0, wobble=0, saturation=1, headSwitch=0)
+    yield 'vhs at zero leaves the colours', engine.scene(engine.rect(1, 100, 100, 60, 60, 0xff3366cc, extra=neutral)), [((100, 100), (0x33, 0x66, 0xcc)), ((5, 5), engine.BLACK)]
     title = "a missing picture draws nothing"
     yield 'placeholder opacity', *engine.CASES[title]
 
@@ -118,6 +120,11 @@ def main():
             ok = ok and abs(moved[0][0] - 99.5) < 1 and abs(moved[0][1] - 99.5) > 1
         print(('ok   ' if ok else 'FAIL ') + effect + ' is steady for a seed and changes with it: ' + str(moved), flush=True)
         failed += not ok
+    tape = engine.scene(engine.rect(1, 100, 100, 90, 90, 0xff3366cc, extra=fx('vhs')))
+    shots = [engine.still(f'vhs{frame}{again}', tape, work, frame) for frame, again in [(10, 'a'), (10, 'b'), (20, 'a')]]
+    ok = np.array_equal(shots[0], shots[1]) and not np.array_equal(shots[0], shots[2]) and np.abs(shots[0][100, 100] - (0x33, 0x66, 0xcc)).max() > 0
+    print(('ok   ' if ok else 'FAIL ') + 'vhs is steady for a frame and moves with time', flush=True)
+    failed += not ok
     hits = engine.run('motionhit', engine.scene(engine.rect(7, 100, 100, 10, 10, 0xffff0000, extra=fx('oscillate', angle=0, frequency=0.5, magnitude=50))), work, [(150, 100), (100, 100)], 15)
     engine.adb('shell', 'rm', engine.DEVICE_DIR + '/motionhit.png')
     got = [line.split()[-1] for line in hits.splitlines() if ' hit ' in line]
