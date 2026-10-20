@@ -284,6 +284,12 @@ def main():
     ok = np.array_equal(shots[0], shots[1]) and not np.array_equal(shots[0], shots[2]) and np.abs(shots[0][100, 100] - (0x33, 0x66, 0xcc)).max() > 0
     print(('ok   ' if ok else 'FAIL ') + 'vhs is steady for a frame and moves with time', flush=True)
     failed += not ok
+    bent = [engine.still(f'bend{k}', engine.scene(engine.rect(1, 100, 100, 8, 80, 0xffff0000, extra=fx('bend', angle=angle, start=start))), work)[:, :, 0] > 128
+            for k, (angle, start) in enumerate([(80, 0), (-80, 0), (80, 0.4), (-80, 0.4)])]
+    apart = [int((bent[k] ^ bent[k + 1][:, ::-1]).sum()) for k in (0, 2)]
+    ok = min(bent[0].sum(), bent[2].sum()) > 2000 and bent[0][:, 120:].sum() > 300 and bent[2][:, 120:].sum() > 300 and max(apart) <= 0.01 * bent[0].sum()
+    print(('ok   ' if ok else 'FAIL ') + 'bending left draws bending right mirrored: ' + str(apart) + ' pixels differ', flush=True)
+    failed += not ok
     hits = engine.run('motionhit', engine.scene(engine.rect(7, 100, 100, 10, 10, 0xffff0000, extra=fx('oscillate', angle=0, frequency=0.5, magnitude=50))), work, [(150, 100), (100, 100)], 15)
     engine.adb('shell', 'rm', engine.DEVICE_DIR + '/motionhit.png')
     got = [line.split()[-1] for line in hits.splitlines() if ' hit ' in line]
