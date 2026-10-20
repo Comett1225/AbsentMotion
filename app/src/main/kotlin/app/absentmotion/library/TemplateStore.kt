@@ -7,17 +7,22 @@ import app.absentmotion.engine.EngineThread
 import app.absentmotion.export.safeName
 import app.absentmotion.model.Scene
 import app.absentmotion.model.mapMediaUris
+import app.absentmotion.model.mediaName
 import app.absentmotion.model.mediaUris
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.IOException
+import java.io.InputStream
+import java.net.URI
+import java.nio.file.Files
 
 data class SavedTemplate(val id: String, val scene: Scene, val thumbnail: File?, val modified: Long) {
     val title: String get() = scene.title
 }
 
-class TemplateStore(private val root: File, private val resolver: ContentResolver) {
+class TemplateStore(private val root: File, private val open: (String) -> InputStream?) {
+    constructor(root: File, resolver: ContentResolver) : this(root, { uri -> resolver.openInputStream(Uri.parse(uri)) })
     constructor(context: Context) : this(File(context.filesDir, "templates"), context.applicationContext.contentResolver)
 
     fun list(): List<SavedTemplate> = root.listFiles { f -> f.isDirectory }.orEmpty().mapNotNull { dir ->
@@ -75,19 +80,47 @@ class TemplateStore(private val root: File, private val resolver: ContentResolve
 
     fun localize(scene: Scene, dir: File): Scene {
         val moved = HashMap<String, String>()
-        scene.node.mediaUris().forEachIndexed { i, uri ->
-            val name = (scene.media(uri)?.filename?.takeIf { it.isNotEmpty() } ?: Uri.parse(uri).lastPathSegment ?: "media").substringAfterLast('/')
-            val target = File(dir, "${i + 1}_${safeName(name)}")
+        for (uri in scene.node.mediaUris()) {
+            val folder = modelFolder(uri)
             val copied = runCatching {
-                resolver.openInputStream(Uri.parse(uri))?.use { input ->
-                    dir.mkdirs()
-                    target.outputStream().use { input.copyTo(it) }
-                    true
-                }
-            }.getOrNull() == true
-            if (copied) moved[uri] = target.toURI().toString() else target.delete()
+                if (folder != null) copyModel(folder, File(URI(uri)).canonicalFile.name, dir)
+                else open(uri)?.use { input -> publish(dir, safeName(scene.mediaName(uri))) { input.copyTo(it) } }
+            }.getOrNull()
+            if (copied != null) moved[uri] = copied.toURI().toString()
         }
         return Scene(scene.node.mapMediaUris { moved[it] ?: it })
+    }
+
+    private fun copyModel(folder: File, main: String, dir: File): File {
+        dir.mkdirs()
+        val temp = Files.createTempDirectory(dir.toPath(), "copy-").toFile()
+        try {
+            folder.listFiles { f -> f.isFile }.orEmpty().forEach { it.copyTo(File(temp, it.name)) }
+            val target = fresh(dir, folder.name)
+            if (!temp.renameTo(target)) throw IOException("Cannot copy ${folder.name}")
+            return File(target, main)
+        } finally {
+            temp.deleteRecursively()
+        }
+    }
+
+    private fun publish(dir: File, name: String, write: (java.io.OutputStream) -> Unit): File {
+        dir.mkdirs()
+        val temp = File.createTempFile("copy-", ".part", dir)
+        try {
+            temp.outputStream().use(write)
+            val target = fresh(dir, name)
+            if (!temp.renameTo(target)) throw IOException("Cannot copy $name")
+            return target
+        } finally {
+            temp.delete()
+        }
+    }
+
+    private fun fresh(dir: File, name: String): File {
+        val dot = name.lastIndexOf('.').takeIf { it > 0 } ?: name.length
+        return (sequenceOf(name) + generateSequence(2) { it + 1 }.map { name.substring(0, dot) + "-$it" + name.substring(dot) })
+            .map { File(dir, it) }.first { !it.exists() }
     }
 
     private fun write(id: String, scene: Scene) = writeAtomically(File(root, "$id/scene.xml"), scene.toXml())

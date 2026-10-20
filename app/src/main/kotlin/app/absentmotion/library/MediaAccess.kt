@@ -4,6 +4,11 @@ import app.absentmotion.platform.Context
 import java.io.File
 import java.net.URI
 
+internal fun modelFolder(uri: String): File? {
+    if (!uri.startsWith("file:", ignoreCase = true)) return null
+    return runCatching { File(URI(uri)).canonicalFile.parentFile }.getOrNull()?.takeIf { it.name.startsWith("model-") && it.isDirectory }
+}
+
 class MediaAccess private constructor(private val filesDir: File?) {
     fun allows(uri: String): Boolean {
         if (filesDir == null) return true

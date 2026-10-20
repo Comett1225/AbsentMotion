@@ -1,6 +1,8 @@
 package app.absentmotion.export
 
+import app.absentmotion.library.Importer
 import app.absentmotion.library.MediaAccess
+import app.absentmotion.library.ProjectStore
 import app.absentmotion.model.Scene
 import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
@@ -52,5 +54,29 @@ class ProjectPackageTest {
         assertEquals("media/1_a.jpg", byUri.getValue(picture).getString("entry"))
         for (refused in listOf(secret, project, "file:///etc/hosts")) assertFalse(refused, byUri.getValue(refused).has("entry"))
         assertTrue(byUri.getValue("content://provider/1").has("entry"))
+    }
+
+    @Test fun aModelTravelsWithItsBufferMaterialsAndTexturesUnderTheirOwnNames() = runBlocking {
+        val files = tmp.newFolder("files")
+        val folder = File(files, "media/p1/model-1").apply { mkdirs() }
+        val gltf = File(folder, "robot.gltf").apply { writeText("""{"buffers":[{"uri":"robot.bin","byteLength":4}]}""") }
+        File(folder, "robot.bin").writeText("data")
+        File(folder, "skin.png").writeText("png")
+        val uri = gltf.toURI().toString()
+        val scene = Scene.parse("""<scene title="T" width="10" height="10"><media uri="$uri" filename="robot.gltf"/><model id="5" startTime="0" endTime="99" src="$uri"/></scene>""")
+        val out = ByteArrayOutputStream()
+        writeProjectPackage(scene, scene.toXml(), out, MediaAccess.forPhone(files), { File(URI(it)).inputStream() }, {})
+        val names = ArrayList<String>()
+        ZipInputStream(ByteArrayInputStream(out.toByteArray())).use { zip -> while (true) names += (zip.nextEntry ?: break).name }
+        assertEquals(listOf("project.xml", "media/1_model/robot.bin", "media/1_model/robot.gltf", "media/1_model/skin.png", "manifest.json"), names)
+        val other = tmp.newFolder("other")
+        val store = ProjectStore(other)
+        val report = Importer(store, access = MediaAccess.forPhone(other)).import { ByteArrayInputStream(out.toByteArray()) }.single()
+        val imported = store.load(report.id)!!.layers.single().node["src"]!!
+        val main = File(URI(imported))
+        assertEquals(File(store.mediaDir(report.id), "model-1/robot.gltf"), main)
+        assertEquals(setOf("robot.gltf", "robot.bin", "skin.png"), main.parentFile.list()!!.toSet())
+        assertEquals("data", File(main.parentFile, "robot.bin").readText())
+        assertTrue(MediaAccess.forPhone(other).allows(imported))
     }
 }

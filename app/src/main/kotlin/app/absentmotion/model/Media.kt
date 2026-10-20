@@ -71,6 +71,9 @@ fun XmlNode.mapMediaUris(change: (String) -> String): XmlNode {
     return self.copy(children = children.map { it.mapMediaUris(change) })
 }
 
+fun Scene.mediaName(uri: String): String = (media(uri)?.filename?.takeIf { it.isNotEmpty() }
+    ?: (runCatching { java.net.URI(uri).path }.getOrNull() ?: uri).substringAfterLast('/').takeIf { it.isNotEmpty() } ?: "media").substringAfterLast('/')
+
 fun Scene.replaceMedia(old: String, with: MediaDeclaration): Scene =
     Scene(node.copy(children = node.children.filterNot { it.name == "media" && it["uri"] == old })
         .mapMediaUris { if (it == old) with.uri else it }).withMedia(with)

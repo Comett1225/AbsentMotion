@@ -7,7 +7,9 @@ import app.absentmotion.platform.Bitmap
 import app.absentmotion.platform.Uri
 import app.absentmotion.engine.EngineThread
 import app.absentmotion.library.MediaAccess
+import app.absentmotion.library.modelFolder
 import app.absentmotion.model.Scene
+import app.absentmotion.model.mediaName
 import app.absentmotion.model.mediaUris
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
@@ -20,6 +22,7 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
+import java.net.URI
 import java.nio.ByteBuffer
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
@@ -177,16 +180,30 @@ internal suspend fun writeProjectPackage(
         zip.setLevel(0)
         uris.forEachIndexed { i, uri ->
             currentCoroutineContext().ensureActive()
-            val declared = scene.media(uri)
-            val file = (declared?.filename?.takeIf { it.isNotEmpty() } ?: Uri.parse(uri).lastPathSegment ?: "media").substringAfterLast('/')
-            val entry = "media/${i + 1}_${safeName(file)}"
-            val input = if (access.allows(uri)) open(uri) else null
-            if (input != null) {
-                zip.putNextEntry(ZipEntry(entry))
-                input.use { it.copyTo(zip) }
-                zip.closeEntry()
+            val file = scene.mediaName(uri)
+            val folder = if (access.allows(uri)) modelFolder(uri) else null
+            val record = JSONObject().put("uri", uri).put("file", file)
+            if (folder != null) {
+                val main = File(URI(uri)).canonicalFile
+                val parts = folder.listFiles { f -> f.isFile }.orEmpty().sortedBy { it.name }
+                for (part in parts) {
+                    zip.putNextEntry(ZipEntry("media/${i + 1}_model/${part.name}"))
+                    part.inputStream().use { it.copyTo(zip) }
+                    zip.closeEntry()
+                }
+                record.put("entry", "media/${i + 1}_model/${main.name}")
+                    .put("companions", JSONArray(parts.filter { it != main }.map { "media/${i + 1}_model/${it.name}" }))
+            } else {
+                val entry = "media/${i + 1}_${safeName(file)}"
+                val input = if (access.allows(uri)) open(uri) else null
+                if (input != null) {
+                    zip.putNextEntry(ZipEntry(entry))
+                    input.use { it.copyTo(zip) }
+                    zip.closeEntry()
+                    record.put("entry", entry)
+                }
             }
-            media.put(JSONObject().put("uri", uri).put("file", file).apply { if (input != null) put("entry", entry) })
+            media.put(record)
             progress((i + 1f) / uris.size * 0.95f)
         }
         zip.setLevel(6)

@@ -68,6 +68,7 @@ class Importer(
         val files = LinkedHashSet<String>()
         var sigs: Map<String, String>? = null
         var links: Map<String, String>? = null
+        var companions: Map<String, List<String>> = emptyMap()
         var projectEntry: String? = null
         var sceneText = 0
         var written = limits.unpacked
@@ -81,10 +82,11 @@ class Importer(
                     leaf(name) == "manifest.json" -> {
                         val manifest = JSONObject(readText(input, MaxXml))
                         projectEntry = manifest.optString("project").takeIf { it.isNotBlank() }
-                        links = manifest.optJSONArray("media")?.let { list ->
-                            (0 until list.length()).map { list.getJSONObject(it) }.filter { it.has("entry") }
-                                .associate { m -> m.getString("uri") to m.getString("entry") }
-                        }.orEmpty()
+                        val listed = manifest.optJSONArray("media")?.let { list -> (0 until list.length()).map { list.getJSONObject(it) }.filter { it.has("entry") } }.orEmpty()
+                        links = listed.associate { m -> m.getString("uri") to m.getString("entry") }
+                        companions = listed.filter { it.has("companions") }.associate { m ->
+                            m.getString("uri") to m.getJSONArray("companions").let { c -> List(c.length()) { c.getString(it) } }
+                        }
                     }
                 }
             }
@@ -113,12 +115,19 @@ class Importer(
                         entry?.let { find(it, files) }?.let { uri to it }
                     }.toMap()
                     val names = HashSet<String>()
-                    val target = entries.values.distinct().associateWith { path ->
-                        val name = leaf(path)!!
-                        File(store.mediaDir(id), (sequenceOf(name) + generateSequence(2) { it + 1 }.map { "${it}_$name" }).first { names.add(it) })
+                    fun unique(name: String) = (sequenceOf(name) + generateSequence(2) { it + 1 }.map { "${it}_$name" }).first { names.add(it) }
+                    val target = HashMap<String, File>()
+                    for ((uri, path) in entries) {
+                        if (path in target) continue
+                        val parts = companions[uri]?.mapNotNull { find(it, files) }
+                        if (parts == null) target[path] = File(store.mediaDir(id), unique(leaf(path)!!))
+                        else {
+                            val folder = File(store.mediaDir(id), generateSequence(1) { it + 1 }.map { "model-$it" }.first { names.add(it) })
+                            (listOf(path) + parts).forEach { part -> target.putIfAbsent(part, File(folder, leaf(part)!!)) }
+                        }
                     }
                     if (target.isNotEmpty()) {
-                        store.mediaDir(id).mkdirs()
+                        target.values.forEach { it.parentFile.mkdirs() }
                         eachEntry(open, limits) { name, input -> target[name]?.let { written -= copy(input, it, written) } }
                     }
                     entries.mapValues { (_, entry) -> target.getValue(entry).toURI().toString() }
