@@ -1539,14 +1539,28 @@
    }
   },
   "glow": {
-   "description": "Cahaya lembut di sekitar bagian terang lapisan.",
+   "description": "Pendar satu warna di sekeliling luar bentuk lapisan. Kekerasan mengubahnya dari pudar lembut menjadi garis tepi padat.",
    "name": "Glow",
    "params": {
-    "intensity": {
-     "label": "Intensitas"
+    "alpha": {
+     "label": "Alpha"
     },
-    "strength": {
-     "label": "Ukuran"
+    "blendMode": {
+     "label": "Mode Blending",
+     "options": [
+      "Normal",
+      "Multiply",
+      "Screen"
+     ]
+    },
+    "color": {
+     "label": "Warna"
+    },
+    "hardness": {
+     "label": "Kekerasan"
+    },
+    "radius": {
+     "label": "Radius"
     }
    }
   },

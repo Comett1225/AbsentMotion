@@ -1539,14 +1539,28 @@
    }
   },
   "glow": {
-   "description": "Ánh sáng mềm quanh các vùng sáng của lớp.",
+   "description": "Quầng sáng một màu quanh bên ngoài hình dạng của lớp; độ cứng biến nó từ vệt mờ mềm mại thành viền đặc.",
    "name": "Phát sáng",
    "params": {
-    "intensity": {
-     "label": "Cường độ"
+    "alpha": {
+     "label": "Alpha"
     },
-    "strength": {
-     "label": "Kích thước"
+    "blendMode": {
+     "label": "Chế độ hòa trộn",
+     "options": [
+      "Bình thường",
+      "Nhân",
+      "Màn hình"
+     ]
+    },
+    "color": {
+     "label": "Màu"
+    },
+    "hardness": {
+     "label": "Độ cứng"
+    },
+    "radius": {
+     "label": "Bán kính"
     }
    }
   },

@@ -1539,14 +1539,28 @@
    }
   },
   "glow": {
-   "description": "Katmanın parlak kısımlarının çevresinde yumuşak bir ışık.",
+   "description": "Katmanın şeklinin dışında tek renkli bir hale. Sertlik, yumuşak geçişi belirgin bir dış çizgiye dönüştürür.",
    "name": "Parlama",
    "params": {
-    "intensity": {
-     "label": "Yoğunluk"
+    "alpha": {
+     "label": "Alfa"
     },
-    "strength": {
-     "label": "Boyut"
+    "blendMode": {
+     "label": "Karışım modu",
+     "options": [
+      "Normal",
+      "Çarpma",
+      "Ekran"
+     ]
+    },
+    "color": {
+     "label": "Renk"
+    },
+    "hardness": {
+     "label": "Sertlik"
+    },
+    "radius": {
+     "label": "Yarıçap"
     }
    }
   },

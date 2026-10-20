@@ -1539,14 +1539,28 @@
    }
   },
   "glow": {
-   "description": "Un resplandor suave alrededor de las zonas brillantes de la capa.",
+   "description": "Un halo de un solo color alrededor del contorno de la capa. La dureza lo convierte de un degradado suave en un contorno sólido.",
    "name": "Resplandor",
    "params": {
-    "intensity": {
-     "label": "Intensidad"
+    "alpha": {
+     "label": "Alfa"
     },
-    "strength": {
-     "label": "Tamaño"
+    "blendMode": {
+     "label": "Modo de fusión",
+     "options": [
+      "Normal",
+      "Multiplicar",
+      "Trama"
+     ]
+    },
+    "color": {
+     "label": "Color"
+    },
+    "hardness": {
+     "label": "Dureza"
+    },
+    "radius": {
+     "label": "Radio"
     }
    }
   },

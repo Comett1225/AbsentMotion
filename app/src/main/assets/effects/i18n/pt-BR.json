@@ -1539,14 +1539,28 @@
    }
   },
   "glow": {
-   "description": "Uma luz suave ao redor das partes claras da camada.",
+   "description": "Um halo de uma cor ao redor da parte externa da forma da camada. A dureza o transforma de um esmaecimento suave em um contorno sólido.",
    "name": "Brilho",
    "params": {
-    "intensity": {
-     "label": "Intensidade"
+    "alpha": {
+     "label": "Alfa"
     },
-    "strength": {
-     "label": "Tamanho"
+    "blendMode": {
+     "label": "Modo de mesclagem",
+     "options": [
+      "Normal",
+      "Multiplicar",
+      "Tela"
+     ]
+    },
+    "color": {
+     "label": "Cor"
+    },
+    "hardness": {
+     "label": "Dureza"
+    },
+    "radius": {
+     "label": "Raio"
     }
    }
   },

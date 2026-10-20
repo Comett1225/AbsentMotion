@@ -1539,14 +1539,28 @@
    }
   },
   "glow": {
-   "description": "Cahaya lembut di sekeliling bahagian terang lapisan.",
+   "description": "Halo satu warna di sekeliling luar bentuk lapisan. Kekerasan menukarnya daripada pudar lembut kepada garis luar pejal.",
    "name": "Cahaya",
    "params": {
-    "intensity": {
-     "label": "Keamatan"
+    "alpha": {
+     "label": "Alfa"
     },
-    "strength": {
-     "label": "Saiz"
+    "blendMode": {
+     "label": "Mod campuran",
+     "options": [
+      "Normal",
+      "Darab",
+      "Skrin"
+     ]
+    },
+    "color": {
+     "label": "Warna"
+    },
+    "hardness": {
+     "label": "Kekerasan"
+    },
+    "radius": {
+     "label": "Jejari"
     }
    }
   },

@@ -1539,14 +1539,28 @@
    }
   },
   "glow": {
-   "description": "Isang malambot na liwanag sa paligid ng maliliwanag na bahagi ng layer.",
+   "description": "Isang kulay na halo sa labas ng hugis ng layer; ginagawang solid na outline ng tigas ang malambot na fade.",
    "name": "Glow",
    "params": {
-    "intensity": {
-     "label": "Lakas"
+    "alpha": {
+     "label": "Alpha"
     },
-    "strength": {
-     "label": "Laki"
+    "blendMode": {
+     "label": "Blending mode",
+     "options": [
+      "Normal",
+      "Multiply",
+      "Screen"
+     ]
+    },
+    "color": {
+     "label": "Kulay"
+    },
+    "hardness": {
+     "label": "Tigas"
+    },
+    "radius": {
+     "label": "Radius"
     }
    }
   },
