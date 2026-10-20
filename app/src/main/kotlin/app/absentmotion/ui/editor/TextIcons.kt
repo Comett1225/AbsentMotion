@@ -18,6 +18,7 @@ internal object TextIcons {
     val Menu = icon("Menu", "M4 5L20 5M4 12L20 12M4 19L20 19")
     val Search = icon("Search", "M21 21L16.66 16.66M3 11A8 8 0 1 0 19 11A8 8 0 1 0 3 11Z")
     val Import = icon("Import Font", "M12 3L12 15M8 11L12 15L16 11M8 5L4 5A2 2 0 0 0 2 7L2 17A2 2 0 0 0 4 19L20 19A2 2 0 0 0 22 17L22 7A2 2 0 0 0 20 5L16 5")
+    val Cloud = icon("Cloud", "M6.5 19L17.5 19A4.5 4.5 0 0 0 18 10.03A6 6 0 0 0 6.35 11.2A4 4 0 0 0 6.5 19Z")
     val Recent = icon("Recent", "M2 12A10 10 0 1 0 22 12A10 10 0 1 0 2 12ZM12 6L12 12L16 14")
     val Down = ImageVector.Builder("Dropdown", 24.dp, 24.dp, 24f, 24f)
         .addPath(addPathNodes("M6 9.5L18 9.5L12 16.5Z"), fill = SolidColor(Color.White)).build()

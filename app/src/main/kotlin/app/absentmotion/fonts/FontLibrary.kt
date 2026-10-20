@@ -26,6 +26,12 @@ class FontLibrary(context: Context) {
     private val prefs = this.context.getSharedPreferences("fonts", Context.MODE_PRIVATE)
     private val imported = File(this.context.filesDir, "fonts/imported").apply { mkdirs() }
     private val cache = File(this.context.filesDir, "fonts/google").apply { mkdirs() }
+    private val builtin = File(this.context.filesDir, "fonts/builtin").apply { mkdirs() }
+    private val bundledNames: Set<String> by lazy {
+        this.context.assets.list("fonts").orEmpty().flatMap { folder ->
+            this.context.assets.list("fonts/$folder").orEmpty().filter { it.endsWith(".ttf") }.map { "$folder/$it" }
+        }.toSet()
+    }
     private val downloadLocks = ConcurrentHashMap<String, Mutex>()
     private val fontRevision = MutableStateFlow(0L)
     val revision = fontRevision.asStateFlow()
@@ -85,9 +91,32 @@ class FontLibrary(context: Context) {
     fun systemFamily(name: String): String? = when (FontName.parse(name).family) {
         "Roboto" -> "sans-serif"; "Roboto Condensed" -> "sans-serif-condensed"; "Noto Serif" -> "serif"; "Droid Sans Mono" -> "monospace"; else -> null
     }
+    private fun bundledAsset(font: FontName, exact: Boolean = true): String? = BundledFonts.pick(font, bundledNames, exact)
+    fun isBundled(name: String): Boolean = bundledAsset(FontName.parse(name)) != null
+    private val builtinCurrent: Boolean by lazy {
+        val stamp = context.packageManager.getPackageInfo(context.packageName, 0).lastUpdateTime
+        if (prefs.getLong("builtinStamp", 0L) != stamp) {
+            builtin.listFiles()?.forEach { it.delete() }
+            prefs.edit().putLong("builtinStamp", stamp).apply()
+        }
+        true
+    }
+    private fun bundledFile(asset: String): File? = synchronized(builtin) {
+        check(builtinCurrent)
+        val target = File(builtin, asset.replace('/', '_'))
+        if (!target.isFile || target.length() == 0L) runCatching {
+            val temporary = File.createTempFile("builtin-", ".font", builtin)
+            try {
+                context.assets.open("fonts/$asset").use { input -> temporary.outputStream().use { input.copyTo(it) } }
+                check(temporary.renameTo(target))
+            } finally { temporary.delete() }
+        }
+        target.takeIf { it.isFile && it.length() > 0 }
+    }
     fun localFile(name: String): File? {
         val font = FontName.parse(name)
         if (font.source == "imported") return File(imported, File(font.family).name).takeIf { it.isFile }
+        bundledAsset(font)?.let { asset -> bundledFile(asset)?.let { return it } }
         cachedFile(name).takeIf { it.isFile }?.let { return it }
         systemFont(name)?.file?.takeIf { it.isFile }?.let { return it }
         val base = when (font.family) { "Roboto" -> "Roboto"; "Noto Serif" -> "NotoSerif"; "Droid Sans Mono" -> "DroidSansMono"; else -> return null }
@@ -96,14 +125,16 @@ class FontLibrary(context: Context) {
         return listOf(File("/system/fonts/$base-$suffix.ttf"), File("/system/fonts/$base.ttf"), File("/system/fonts/$base-VariableFont_wght.ttf"))
             .firstOrNull { it.isFile }
     }
+    fun renderFile(name: String): File? = localFile(name) ?: bundledAsset(FontName.parse(name), exact = false)?.let { bundledFile(it) }
     fun typeface(name: String): Typeface {
         val font = FontName.parse(name)
-        val file = localFile(name)
+        val file = renderFile(name)
+        val variable = file?.name?.contains("-Variable") == true
         val face = file?.takeUnless { it.path.startsWith("/system/") && systemFamily(name) != null }?.let { runCatching {
-            Typeface.Builder(it).setTtcIndex(fontIndex(name)).build()
+            Typeface.Builder(it).setTtcIndex(fontIndex(name)).apply { if (variable) setFontVariationSettings("'wght' ${font.weight}") }.build()
         }.getOrNull() }
             ?: Typeface.create(systemFamily(name) ?: font.family, Typeface.NORMAL)
-        return if (font.source == "imported") face else Typeface.create(face, font.weight, font.italic)
+        return if (font.source == "imported" || variable) face else Typeface.create(face, font.weight, font.italic)
     }
     suspend fun import(uri: Uri): FontName = withContext(Dispatchers.IO) {
         val filename = context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use {

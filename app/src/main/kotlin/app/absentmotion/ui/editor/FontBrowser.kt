@@ -51,6 +51,7 @@ internal fun FontBrowser(library: FontLibrary, onSelect: (String) -> Unit, onClo
     var deleting by remember { mutableStateOf<FontEntry?>(null) }
     var sortMenu by remember { mutableStateOf(false) }
     var revision by remember { mutableIntStateOf(0) }
+    val downloads by library.revision.collectAsState()
     var error by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
     LaunchedEffect(search != null) { if (search != null) { searchFocus.requestFocus(); keyboard?.show() } else keyboard?.hide() }
@@ -109,11 +110,13 @@ internal fun FontBrowser(library: FontLibrary, onSelect: (String) -> Unit, onClo
             }
             LazyVerticalGrid(GridCells.Fixed(2), Modifier.weight(1f)) {
                 items(entries, key = { it.name.xml }) { entry ->
+                    val needsDownload = !entry.bundled && entry.category != 100 && remember(entry.name.xml, downloads) { library.localFile(entry.name.xml) == null }
                     Box(Modifier.fillMaxWidth().height(100.dp).border(.5.dp, BrowserLine).combinedClickable(onLongClick = { if (entry.category == 100) deleting = entry }) { choose(entry.name.xml) }) {
                         FontPreview(library, entry.name.xml, "Abcdefg", Modifier.align(Alignment.TopCenter).padding(top = 13.dp, start = 10.dp, end = 10.dp).fillMaxWidth().height(46.dp))
                         Text(entry.name.label, Modifier.align(Alignment.BottomCenter).padding(start = 10.dp, end = 25.dp, bottom = 13.dp),
                             color = Am.OnDark, fontSize = 12.sp, maxLines = 2, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
                         if (entry.category == 100) Icon(TextIcons.Import, "Imported", Modifier.padding(8.dp).size(13.dp), tint = Am.OnDark.copy(alpha = .38f))
+                        if (needsDownload) Icon(TextIcons.Cloud, "Downloads when chosen", Modifier.align(Alignment.TopEnd).padding(8.dp).size(15.dp), tint = Am.OnDark.copy(alpha = .38f))
                         Icon(if (entry.name.xml in favourites) TextIcons.FilledStar else TextIcons.Star, "Favorite", Modifier.align(Alignment.BottomEnd).size(34.dp).clickable {
                             library.favourite(entry.name.xml); revision++
                         }.padding(7.dp), tint = if (entry.name.xml in favourites) Favourite else Am.OnDark.copy(alpha = .38f))
@@ -179,13 +182,18 @@ internal fun FontIconButton(icon: androidx.compose.ui.graphics.vector.ImageVecto
 }
 
 @Composable
-internal fun rememberFontFamily(library: FontLibrary, name: String): FontFamily? =
-    produceState<FontFamily?>(null, name) { library.resolve(name); value = app.absentmotion.platform.fontFamily(library, name) }.value
+internal fun rememberFontFamily(library: FontLibrary, name: String, download: Boolean = true): FontFamily? {
+    val downloads by library.revision.collectAsState()
+    return produceState<FontFamily?>(null, name, downloads) {
+        if (download) library.resolve(name)
+        value = if (library.renderFile(name) != null) app.absentmotion.platform.fontFamily(library, name) else null
+    }.value
+}
 
 @Composable
 internal fun FontPreview(library: FontLibrary, name: String, content: String, modifier: Modifier = Modifier) {
     Box(modifier, contentAlignment = Alignment.Center) {
-        Text(content, fontFamily = rememberFontFamily(library, name), color = Am.OnDark, fontSize = 20.sp, maxLines = 1, softWrap = false,
+        Text(content, fontFamily = rememberFontFamily(library, name, download = false), color = Am.OnDark, fontSize = 20.sp, maxLines = 1, softWrap = false,
             style = TextStyle(platformStyle = app.absentmotion.platform.fontPreviewStyle()))
     }
 }
