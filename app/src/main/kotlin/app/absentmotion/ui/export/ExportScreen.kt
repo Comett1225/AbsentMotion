@@ -281,6 +281,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
             ExportKind.Gif -> gifSample?.let { gifTimeMs(frameCount(scene, current.fps), it, times.estimateMs(current, scene, report?.probe, heat.level)) }
             ExportKind.Sequence -> times.estimateMs(current, scene, report?.probe, heat.level)
             ExportKind.Package -> estimate.coerceAtLeast(0) / 100_000
+            ExportKind.Audio -> scene.totalTime / if (current.audioFormat.lossless) 20L else 14L
             else -> 0L
         }
     }
