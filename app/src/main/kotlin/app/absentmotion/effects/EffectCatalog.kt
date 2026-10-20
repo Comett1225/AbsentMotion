@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable
 import app.absentmotion.R
 import app.absentmotion.i18n.currentLanguage
 import app.absentmotion.platform.Context
+import app.absentmotion.ui.editor.matchesSearch
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.InputStream
@@ -24,6 +25,11 @@ data class EffectCatalog(
 
     fun listed(category: String? = null): List<EffectDefinition> =
         definitions.filter { category == null || it.category == category || (category == "new" && isNew(it)) }
+
+    fun search(query: String): List<EffectDefinition> {
+        val byName = definitions.filter { matchesSearch(query, it.name) }.sortedBy { it.name.lowercase() }
+        return byName + definitions.filter { it !in byName && matchesSearch(query, it.name, it.description) }.sortedBy { it.name.lowercase() }
+    }
 
     val categories: List<Pair<String, String>> get() =
         ((if (definitions.any(::isNew)) listOf("new" to "New") else emptyList()) + EffectCategories).map { (k, v) -> k to (categoryNames[k] ?: v) }

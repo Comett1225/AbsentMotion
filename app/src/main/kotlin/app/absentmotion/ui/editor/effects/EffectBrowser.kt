@@ -127,8 +127,7 @@ fun EffectBrowser(state: EditorState) {
                 }
             }
         } else if (searching || category != null) {
-            val results = catalog.listed(if (searching) null else category).filter { matchesSearch(query, it.name) }
-                .sortedBy { it.name.lowercase() }
+            val results = if (searching) catalog.search(query) else catalog.listed(category).sortedBy { it.name.lowercase() }
             val actions = if (searching || category == "ai") AiAction.entries.filter { it.offered && matchesSearch(query, stringResource(it.title)) } else emptyList()
             val presets = catalog.definitions.flatMap { d -> d.presets.map { d to it } }
                 .filter { (d, p) -> if (searching) query.isNotBlank() && matchesSearch(query, p.name) else d.category == category }
