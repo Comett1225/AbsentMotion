@@ -141,7 +141,7 @@ private const val MaxSvgBytes = 16 shl 20
 internal suspend fun EditorState.importSvgFile(context: Context, uri: Uri) {
     val host = scene
     val start = host.frameStart(frame)
-    val end = host.frameEnd(frame + settings.defaultLayerDuration * host.fps)
+    val end = host.endTimeFor(frame, settings.defaultLayerDuration * 1000)
     fun say(text: String) = Toast.makeText(context, text, Toast.LENGTH_LONG).show()
     val result = try {
         withContext(Dispatchers.IO) {

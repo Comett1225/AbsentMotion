@@ -33,9 +33,8 @@ fun Scene.videoLayer(media: MediaDeclaration, frame: Int): Layer? {
     val raw = if (turned) fitted.second to fitted.first else fitted
     val id = Layer.newId()
     val duration = (media.duration / 1000).toInt()
-    val endFrame = ((document.frameStart(frame) + duration).toLong() * document.fps / 1000).toInt()
     var layer = Layer(XmlNode("shape", linkedMapOf("id" to "$id", "label" to media.title,
-        "startTime" to "${document.frameStart(frame)}", "endTime" to "${document.frameEnd(endFrame)}",
+        "startTime" to "${document.frameStart(frame)}", "endTime" to "${document.endTimeFor(frame, duration)}",
         "fillType" to "media", "fillVideo" to media.uri, "outTime" to "$duration", "mediaFillMode" to "fill", "s" to ".rect")))
         .withTransform("location", document.width / 2f, document.height / 2f, 0f)
         .withProp("size", "vec2", raw.first / 2f, raw.second / 2f)

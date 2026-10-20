@@ -46,7 +46,7 @@ private fun EditorState.numbered(base: String): String {
 
 private fun EditorState.newLayerAttrs(label: String): LinkedHashMap<String, String> = linkedMapOf(
     "id" to "${Layer.newId()}", "label" to label,
-    "startTime" to "${scene.frameStart(frame)}", "endTime" to "${scene.frameEnd(frame + settings.defaultLayerDuration * scene.fps)}",
+    "startTime" to "${scene.frameStart(frame)}", "endTime" to "${scene.endTimeFor(frame, settings.defaultLayerDuration * 1000)}",
 )
 
 private fun EditorState.addAndSelect(node: XmlNode) {

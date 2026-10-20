@@ -76,7 +76,7 @@ private fun EditorState.newLayer(name: String, tag: String, fill: String, color:
         tag,
         linkedMapOf(
             "id" to "$id", "label" to "$name $number",
-            "startTime" to "${scene.frameStart(frame)}", "endTime" to "${scene.frameEnd(frame + settings.defaultLayerDuration * scene.fps)}",
+            "startTime" to "${scene.frameStart(frame)}", "endTime" to "${scene.endTimeFor(frame, settings.defaultLayerDuration * 1000)}",
             "fillType" to fill,
         ),
         listOf(XmlNode("transform", children = listOf(XmlNode("location", mapOf("value" to formatFloats(floatArrayOf(scene.width / 2f, scene.height / 2f, 0f))))))) +
