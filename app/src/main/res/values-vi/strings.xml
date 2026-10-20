@@ -367,8 +367,6 @@
     <string name="export_note_gif">%1$sx%2$s %3$sfps</string>
     <string name="export_note_package">Giữ phương tiện gốc</string>
     <string name="export_note_xml">cho tích hợp quy trình làm việc</string>
-    <string name="export_note_audio_khz">%1$s %2$s kHz</string>
-    <string name="export_note_audio_kbps">%1$s %2$s kbps</string>
     <string name="export_note_image_quality">%1$s %2$s%%</string>
     <string name="export_problem_container_video">Tệp %1$s không chứa được video %2$s.</string>
     <string name="export_problem_container_audio">Tệp %1$s không chứa được âm thanh %2$s.</string>

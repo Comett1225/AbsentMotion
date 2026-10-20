@@ -371,8 +371,6 @@
     <string name="export_note_gif">%1$sx%2$s %3$sfps</string>
     <string name="export_note_package">Mantendo mídia original</string>
     <string name="export_note_xml">para integrações de fluxo de trabalho</string>
-    <string name="export_note_audio_khz">%1$s %2$s kHz</string>
-    <string name="export_note_audio_kbps">%1$s %2$s kbps</string>
     <string name="export_note_image_quality">%1$s %2$s%%</string>
     <string name="export_problem_container_video">Arquivos %1$s não comportam vídeo %2$s.</string>
     <string name="export_problem_container_audio">Arquivos %1$s não comportam áudio %2$s.</string>

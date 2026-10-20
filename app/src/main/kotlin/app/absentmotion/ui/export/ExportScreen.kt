@@ -3,7 +3,10 @@ package app.absentmotion.ui.export
 import androidx.annotation.StringRes
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
+import app.absentmotion.i18n.Ltr
 import app.absentmotion.i18n.UiText
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextDirection
 import app.absentmotion.i18n.text
 import app.absentmotion.i18n.txt
 import app.absentmotion.platform.Log
@@ -525,7 +528,7 @@ private fun InfoBlock(free: Long, estimate: Long, timeMs: Long?, heat: ThermalLe
 private fun InfoRow(label: String, value: String, warn: Boolean) {
     Row(Modifier.fillMaxWidth().height(33.dp), verticalAlignment = Alignment.CenterVertically) {
         Text(label, Modifier.weight(1f), color = Navy, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-        Text(value, Modifier.padding(start = 10.dp), color = animatedColor(if (warn) Alert else Navy), fontSize = 15.sp,
+        Text(value, Modifier.padding(start = 10.dp), color = animatedColor(if (warn) Alert else Navy), fontSize = 15.sp, style = Mixed,
             fontWeight = if (warn) FontWeight.Bold else FontWeight.Normal, maxLines = 1)
     }
 }
@@ -554,7 +557,8 @@ private fun ScrollArea(modifier: Modifier, fade: Color, padding: PaddingValues, 
 private fun TemplateToggle(checked: Boolean, onChange: (Boolean) -> Unit, onInfo: () -> Unit) {
     Row(Modifier.fillMaxWidth().background(Am.Card).height(52.dp).padding(horizontal = 15.dp), verticalAlignment = Alignment.CenterVertically) {
         Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
-            Text(stringResource(R.string.also_keep_a_copy_as_a), Modifier.weight(1f, fill = false), color = Navy, fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(stringResource(R.string.also_keep_a_copy_as_a), Modifier.weight(1f, fill = false), color = Navy, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(11.sp, 16.sp))
             Box(Modifier.size(36.dp).clickable(onClick = onInfo), contentAlignment = Alignment.Center) { Icon(ExportIcons.Info, stringResource(R.string.export_info), Modifier.size(20.dp), tint = Am.HomeDim) }
         }
         Switch(
@@ -633,7 +637,7 @@ private fun ResolutionDropdown(shortSide: Int, choices: List<Choice<app.absentmo
     var open by remember { mutableStateOf(false) }
     Box(Modifier.fillMaxWidth().height(44.dp).clickable { open = true }) {
         Row(Modifier.fillMaxSize().padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
-            Text(resolutionLabel(shortSide), Modifier.weight(1f), color = Navy, fontSize = 16.sp)
+            Text(resolutionLabel(shortSide), Modifier.weight(1f), color = Navy, fontSize = 16.sp, style = Mixed)
             Icon(ExportIcons.ChevronDown, null, Modifier.size(20.dp), tint = Navy)
         }
         DropdownMenu(open, { open = false }, containerColor = Am.Card) {
@@ -771,7 +775,7 @@ private fun Field(
                 Icon(ExportIcons.Help, stringResource(R.string.export_what_is, title), Modifier.size(20.dp), tint = ValueGrey)
             }
             Spacer(Modifier.weight(1f))
-            if (value != null) Text(value, color = ValueGrey, fontSize = 14.sp, maxLines = 1)
+            if (value != null) Text(value, color = ValueGrey, fontSize = 14.sp, maxLines = 1, style = Mixed)
         }
         Box {
             Column(Modifier.fillMaxWidth().alpha(dim), verticalArrangement = Arrangement.spacedBy(FieldGap), content = content)
@@ -786,12 +790,14 @@ private fun Hint(text: String) {
 }
 
 @Composable
-private fun Ends(left: String, right: String) {
+private fun Ends(left: String, right: String) = Ltr {
     Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp)) {
-        Text(left, Modifier.weight(1f), color = ValueGrey, fontSize = 12.sp, maxLines = 1)
-        Text(right, color = ValueGrey, fontSize = 12.sp, maxLines = 1)
+        Text(left, Modifier.weight(1f), color = ValueGrey, fontSize = 12.sp, maxLines = 1, style = Mixed, textAlign = TextAlign.Left)
+        Text(right, color = ValueGrey, fontSize = 12.sp, maxLines = 1, style = Mixed)
     }
 }
+
+private val Mixed = TextStyle(textDirection = TextDirection.Content)
 
 @Composable
 private fun NavRow(text: String, note: String?, onClick: () -> Unit) {
@@ -822,7 +828,8 @@ private fun <T> Segments(options: List<Choice<T>>, selected: T, label: @Composab
                 Modifier.weight(1f).fillMaxHeight().clip(RoundedCornerShape(4.dp)).background(fill).clickable { c.reason?.let(onReason) ?: onPick(c.value) },
                 contentAlignment = Alignment.Center,
             ) {
-                Text(label(c.value), Modifier.alpha(if (c.enabled) 1f else Dimmed), color = text, fontSize = size, fontWeight = FontWeight.Medium, maxLines = 1)
+                Text(label(c.value), Modifier.alpha(if (c.enabled) 1f else Dimmed).padding(horizontal = 2.dp), color = text, fontWeight = FontWeight.Medium, maxLines = 1, style = Mixed,
+                    autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(9.sp, size))
             }
         }
     }
@@ -894,7 +901,7 @@ private fun Chip(label: String, selected: Boolean, onClick: () -> Unit) {
     val fill = animatedColor(if (selected) Navy else Am.SheetBg)
     val text = animatedColor(if (selected) Am.OnNavyAccent else Navy)
     Box(Modifier.height(34.dp).clip(RoundedCornerShape(17.dp)).background(fill).clickable(onClick = onClick).padding(horizontal = 14.dp), contentAlignment = Alignment.Center) {
-        Text(label, color = text, fontSize = 15.sp, maxLines = 1)
+        Text(label, color = text, fontSize = 15.sp, maxLines = 1, style = Mixed)
     }
 }
 

@@ -371,8 +371,6 @@
     <string name="export_note_gif">%1$sx%2$s %3$sfps</string>
     <string name="export_note_package">मूल मीडिया रखा जाएगा</string>
     <string name="export_note_xml">वर्कफ़्लो इंटीग्रेशन के लिए</string>
-    <string name="export_note_audio_khz">%1$s %2$s kHz</string>
-    <string name="export_note_audio_kbps">%1$s %2$s kbps</string>
     <string name="export_note_image_quality">%1$s %2$s%%</string>
     <string name="export_problem_container_video">%1$s फ़ाइलों में %2$s वीडियो नहीं रखा जा सकता।</string>
     <string name="export_problem_container_audio">%1$s फ़ाइलों में %2$s ऑडियो नहीं रखा जा सकता।</string>

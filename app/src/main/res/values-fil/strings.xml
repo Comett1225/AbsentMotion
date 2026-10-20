@@ -371,8 +371,6 @@
     <string name="export_note_gif">%1$sx%2$s %3$sfps</string>
     <string name="export_note_package">Pinapanatili ang orihinal na media</string>
     <string name="export_note_xml">para sa mga integrasyon ng workflow</string>
-    <string name="export_note_audio_khz">%1$s %2$s kHz</string>
-    <string name="export_note_audio_kbps">%1$s %2$s kbps</string>
     <string name="export_note_image_quality">%1$s %2$s%%</string>
     <string name="export_problem_container_video">Hindi kayang maglaman ng %2$s na bidyo ang mga %1$s file.</string>
     <string name="export_problem_container_audio">Hindi kayang maglaman ng %2$s na audio ang mga %1$s file.</string>

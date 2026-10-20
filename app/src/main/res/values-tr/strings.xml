@@ -371,8 +371,6 @@
     <string name="export_note_gif">%1$sx%2$s %3$sfps</string>
     <string name="export_note_package">Orijinal medya korunuyor</string>
     <string name="export_note_xml">iş akışı entegrasyonları için</string>
-    <string name="export_note_audio_khz">%1$s %2$s kHz</string>
-    <string name="export_note_audio_kbps">%1$s %2$s kbps</string>
     <string name="export_note_image_quality">%1$s %%%2$s</string>
     <string name="export_problem_container_video">%1$s dosyaları %2$s videosunu barındıramaz.</string>
     <string name="export_problem_container_audio">%1$s dosyaları %2$s sesini barındıramaz.</string>

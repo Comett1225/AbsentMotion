@@ -375,8 +375,6 @@
     <string name="export_note_gif">%1$sx%2$s %3$sfps</string>
     <string name="export_note_package">Keeping Original Media</string>
     <string name="export_note_xml">for workflow integrations</string>
-    <string name="export_note_audio_khz">%1$s %2$s kHz</string>
-    <string name="export_note_audio_kbps">%1$s %2$s kbps</string>
     <string name="export_note_image_quality">%1$s %2$s%%</string>
 
     <string name="export_problem_container_video">%1$s files cannot hold %2$s video.</string>

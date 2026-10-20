@@ -367,8 +367,6 @@
     <string name="export_note_gif">%1$sx%2$s %3$sfps</string>
     <string name="export_note_package">Mengekalkan media asal</string>
     <string name="export_note_xml">untuk integrasi aliran kerja</string>
-    <string name="export_note_audio_khz">%1$s %2$s kHz</string>
-    <string name="export_note_audio_kbps">%1$s %2$s kbps</string>
     <string name="export_note_image_quality">%1$s %2$s%%</string>
     <string name="export_problem_container_video">Fail %1$s tidak boleh mengandungi video %2$s.</string>
     <string name="export_problem_container_audio">Fail %1$s tidak boleh mengandungi audio %2$s.</string>

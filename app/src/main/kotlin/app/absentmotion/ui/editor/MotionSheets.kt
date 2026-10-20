@@ -172,7 +172,7 @@ private fun MotionSheet(title: String, onClose: () -> Unit, content: @Composable
 
 @Composable
 private fun <T> TileGrid(items: List<T>, tile: @Composable (T, Modifier) -> Unit) {
-    Column(Modifier.fillMaxWidth().height(264.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+    Column(Modifier.fillMaxWidth().height(292.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(4.dp)) {
         items.chunked(4).forEach { row ->
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 row.forEach { tile(it, Modifier.weight(1f)) }
@@ -184,13 +184,14 @@ private fun <T> TileGrid(items: List<T>, tile: @Composable (T, Modifier) -> Unit
 
 @Composable
 private fun Tile(label: String, chosen: Boolean, modifier: Modifier, onClick: () -> Unit, draw: (DrawScope.() -> Unit)?) {
-    Column(modifier.height(84.dp).clip(TileShape).clickable(onClick = onClick).padding(3.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(modifier.height(94.dp).clip(TileShape).clickable(onClick = onClick).padding(3.dp), horizontalAlignment = Alignment.CenterHorizontally) {
         Box(Modifier.fillMaxWidth().height(56.dp).clip(TileShape).background(Am.Field).then(if (chosen) Modifier.border(2.dp, Am.Accent, TileShape) else Modifier)) {
             if (draw == null) Text("—", Modifier.align(Alignment.Center), color = Am.OnDarkDim, fontSize = 18.sp)
             else Canvas(Modifier.fillMaxSize()) { draw() }
         }
         Spacer(Modifier.height(4.dp))
-        Text(label, color = if (chosen) Am.Accent else Am.OnDark, fontSize = 11.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Text(label, Modifier.fillMaxWidth().height(28.dp), color = if (chosen) Am.Accent else Am.OnDark, lineHeight = 12.sp, maxLines = 2,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center, autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(8.sp, 11.sp))
     }
 }
 

@@ -465,8 +465,6 @@
  "export_no_sound_yet": "This project has no sound yet",
  "export_not_available": "Not Available",
  "export_not_supported_title": "Not Supported",
- "export_note_audio_kbps": "%1$s %2$s kbps",
- "export_note_audio_khz": "%1$s %2$s kHz",
  "export_note_gif": "%1$sx%2$s %3$sfps",
  "export_note_image_quality": "%1$s %2$s%%",
  "export_note_package": "Keeping Original Media",

@@ -387,8 +387,6 @@
     <string name="export_note_gif">%1$sx%2$s %3$sfps</string>
     <string name="export_note_package">الاحتفاظ بالوسائط الأصلية</string>
     <string name="export_note_xml">لتكاملات سير العمل</string>
-    <string name="export_note_audio_khz">%1$s %2$s kHz</string>
-    <string name="export_note_audio_kbps">%1$s %2$s kbps</string>
     <string name="export_note_image_quality">%1$s %2$s%%</string>
     <string name="export_problem_container_video">لا يمكن لملفات %1$s أن تحتوي فيديو %2$s.</string>
     <string name="export_problem_container_audio">لا يمكن لملفات %1$s أن تحتوي صوت %2$s.</string>

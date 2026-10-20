@@ -125,7 +125,8 @@ private fun VersionRow(version: ProjectVersions.Version, engine: EngineThread, o
             picture?.let { Image(it, null, Modifier.fillMaxSize(), contentScale = ContentScale.Fit) }
         }
         Column(Modifier.weight(1f).padding(horizontal = 12.dp)) {
-            Text(versionLabel(version.time).text(), color = Am.Navy, fontSize = 15.sp, fontWeight = FontWeight.Medium, maxLines = 1)
+            Text(versionLabel(version.time).text(), color = Am.Navy, fontWeight = FontWeight.Medium, maxLines = 2, lineHeight = 16.sp,
+                autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(11.sp, 15.sp))
             Text(fileSize(version.file.length()), color = Am.HomeMid, fontSize = 13.sp, maxLines = 1)
         }
         TextButton(onRestore) { Text(stringResource(R.string.restore), color = Am.Navy) }

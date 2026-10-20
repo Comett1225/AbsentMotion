@@ -367,8 +367,6 @@
     <string name="export_note_gif">%1$sx%2$s %3$sfps</string>
     <string name="export_note_package">เก็บสื่อต้นฉบับไว้</string>
     <string name="export_note_xml">สำหรับเชื่อมต่อกับเวิร์กโฟลว์</string>
-    <string name="export_note_audio_khz">%1$s %2$s kHz</string>
-    <string name="export_note_audio_kbps">%1$s %2$s kbps</string>
     <string name="export_note_image_quality">%1$s %2$s%%</string>
     <string name="export_problem_container_video">ไฟล์ %1$s ไม่รองรับวิดีโอ %2$s</string>
     <string name="export_problem_container_audio">ไฟล์ %1$s ไม่รองรับเสียง %2$s</string>
