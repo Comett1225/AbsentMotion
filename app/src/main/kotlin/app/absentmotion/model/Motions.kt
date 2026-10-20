@@ -79,10 +79,10 @@ object Animations {
     fun loop(id: String, ms: Int, h: Float): Fx? {
         val hz = 1000f / ms
         return when (id) {
-            "pulse" -> Fx("absent.pulsesize", emptyMap(), mapOf("amount" to number(0.08f), "frequency" to number(hz)))
-            "wobble" -> Fx("absent.swing", emptyMap(), mapOf("angle" to number(6f), "frequency" to number(hz)))
+            "pulse" -> Fx("absent.pulsesize", emptyMap(), mapOf("shrink" to number(0.92f), "grow" to number(1.08f), "frequency" to number(hz)))
+            "wobble" -> Fx("absent.swing", emptyMap(), mapOf("angle1" to number(-6f), "angle2" to number(6f), "frequency" to number(hz)))
             "float" -> Fx("absent.oscillate", emptyMap(), mapOf("angle" to number(90f), "magnitude" to number(0.02f * h), "frequency" to number(hz)))
-            "rotate" -> Fx("absent.spin", emptyMap(), mapOf("speed" to number(360f * hz)))
+            "rotate" -> Fx("absent.spin", emptyMap(), mapOf("rpm" to number(60f * hz)))
             else -> null
         }
     }
