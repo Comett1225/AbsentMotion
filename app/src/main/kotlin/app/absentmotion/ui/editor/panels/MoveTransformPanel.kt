@@ -60,9 +60,9 @@ internal fun MoveTransformPanel(state: EditorState, layer: Layer, tab: Int, modi
     Box(modifier) {
         when (tab) {
             0 -> PositionTab(state, layer)
-            1 -> RotationTab(state, layer)
-            2 -> TiltTab(state, layer)
-            3 -> SizeTab(state, layer)
+            1 -> SizeTab(state, layer)
+            2 -> RotationTab(state, layer)
+            3 -> TiltTab(state, layer)
             else -> SkewTab(state, layer)
         }
     }

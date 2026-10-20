@@ -253,7 +253,7 @@ internal object AboveLeft : PopupPositionProvider {
 
 @Composable
 internal fun TransformMenu(state: EditorState, tab: Int, onDismiss: () -> Unit) {
-    val resetName = listOf(R.string.menu_reset_location, R.string.menu_reset_rotation, R.string.menu_reset_3d_rotation, R.string.menu_reset_scale, R.string.menu_reset_skew)[tab]
+    val resetName = listOf(R.string.menu_reset_location, R.string.menu_reset_scale, R.string.menu_reset_rotation, R.string.menu_reset_3d_rotation, R.string.menu_reset_skew)[tab]
     MenuPopup(AboveLeft, onDismiss, TransformOrigin(0f, 1f)) {
         MenuRow(stringResource(resetName)) {
             state.resetTransform(listOf(tab))

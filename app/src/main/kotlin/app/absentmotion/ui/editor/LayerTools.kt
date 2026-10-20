@@ -307,9 +307,9 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
         }
         if (move) {
             Column(Modifier.width(168.px).fillMaxHeight()) {
-                val names = listOf(R.string.a11y_tab_move, R.string.a11y_tab_rotate, R.string.a11y_tab_tilt, R.string.panel_size, R.string.a11y_tab_skew)
-                listOf(PanelIcons.TabMove, PanelIcons.TabRotate, PanelIcons.TabTilt, PanelIcons.TabSize, PanelIcons.TabSkew).forEachIndexed { i, icon ->
-                    val usable = i < 2 || selected.kind != "camera"
+                val names = listOf(R.string.a11y_tab_move, R.string.panel_size, R.string.a11y_tab_rotate, R.string.a11y_tab_tilt, R.string.a11y_tab_skew)
+                listOf(PanelIcons.TabMove, PanelIcons.TabSize, PanelIcons.TabRotate, PanelIcons.TabTilt, PanelIcons.TabSkew).forEachIndexed { i, icon ->
+                    val usable = i == 0 || i == ROTATE_TAB || selected.kind != "camera"
                     Box(Modifier.weight(1f).fillMaxWidth().then(if (usable) Modifier.clickable { tab = i } else Modifier.dimmed()).padding(start = 10.px, end = 11.px, top = 11.px, bottom = 11.px)) {
                         Box(
                             Modifier.fillMaxSize().clip(PanelShape).fadeBackground(tab == i, PanelDark),
@@ -326,11 +326,14 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
 
 internal val TransformTargets = listOf(
     KeyTarget(PropRef.Location, "0.000000,0.000000,0.000000"),
+    KeyTarget(PropRef.Scale, "1.000000,1.000000"),
     KeyTarget(PropRef.Rotation, "0.000000"),
     KeyTarget(PropRef.Tilt, "0.000000,0.000000"),
-    KeyTarget(PropRef.Scale, "1.000000,1.000000"),
     KeyTarget(PropRef.Skew, "0.000000,0.000000"),
 )
+
+internal const val ROTATE_TAB = 2
+internal const val TILT_TAB = 3
 
 @Composable
 private fun FrameButton(icon: ImageVector, description: String, modifier: Modifier, enabled: Boolean = true, onClick: () -> Unit = {}) {
