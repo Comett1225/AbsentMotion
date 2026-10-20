@@ -670,6 +670,9 @@
       "1 000.5"
      ]
     }
+   },
+   "presets": {
+    "count-up": "Conteo ascendente"
    }
   },
   "cross": {
@@ -3134,7 +3137,7 @@
   },
   "repeat": {
    "description": "Genera dinámicamente varias copias de la capa.",
-   "name": "Repetir",
+   "name": "Repetición",
    "params": {
     "alpha": {
      "label": "Alfa"
@@ -3993,6 +3996,12 @@
       "Línea"
      ]
     }
+   },
+   "presets": {
+    "fade-in-by-word": "Entrada por palabra",
+    "pop-in": "Aparición",
+    "slide-up-by-letter": "Subida por letra",
+    "typewriter": "Máquina de escribir"
    }
   },
   "textrandomizer": {
@@ -4035,6 +4044,9 @@
     "speed": {
      "label": "Velocidad"
     }
+   },
+   "presets": {
+    "scramble": "Mezcla aleatoria"
    }
   },
   "texttransform": {
@@ -4093,6 +4105,10 @@
       "Línea"
      ]
     }
+   },
+   "presets": {
+    "spin-cascade": "Giro en cascada",
+    "wave": "Onda"
    }
   },
   "threshold": {

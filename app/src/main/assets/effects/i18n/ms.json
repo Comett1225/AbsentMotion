@@ -670,6 +670,9 @@
       "1 000.5"
      ]
     }
+   },
+   "presets": {
+    "count-up": "Kira naik"
    }
   },
   "cross": {
@@ -3134,7 +3137,7 @@
   },
   "repeat": {
    "description": "Menjana berbilang salinan lapisan secara dinamik.",
-   "name": "Ulang",
+   "name": "Ulangan",
    "params": {
     "alpha": {
      "label": "Alfa"
@@ -3993,6 +3996,12 @@
       "Baris"
      ]
     }
+   },
+   "presets": {
+    "fade-in-by-word": "Pudar masuk per perkataan",
+    "pop-in": "Pop masuk",
+    "slide-up-by-letter": "Luncur naik per huruf",
+    "typewriter": "Mesin taip"
    }
   },
   "textrandomizer": {
@@ -4035,6 +4044,9 @@
     "speed": {
      "label": "Kelajuan"
     }
+   },
+   "presets": {
+    "scramble": "Kacau"
    }
   },
   "texttransform": {
@@ -4093,6 +4105,10 @@
       "Baris"
      ]
     }
+   },
+   "presets": {
+    "spin-cascade": "Lata Berpusing",
+    "wave": "Gelombang"
    }
   },
   "threshold": {

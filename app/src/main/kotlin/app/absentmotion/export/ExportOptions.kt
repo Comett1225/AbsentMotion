@@ -1,5 +1,9 @@
 package app.absentmotion.export
 
+import androidx.annotation.StringRes
+import app.absentmotion.R
+import app.absentmotion.i18n.UiText
+import app.absentmotion.i18n.txt
 import app.absentmotion.model.Scene
 import app.absentmotion.model.mediaUris
 import java.util.Locale
@@ -52,13 +56,13 @@ data class AudioSettings(
 val AudioBitratesKbps = listOf(64, 96, 128, 160, 192, 256, 320)
 val AudioSampleRates = listOf(44100, 48000)
 
-enum class AudioFormat(val label: String, val ext: String, val mime: String, val lossless: Boolean) {
-    Wav16("WAV 16-bit", "wav", "audio/x-wav", true),
-    Wav24("WAV 24-bit", "wav", "audio/x-wav", true),
-    Flac("FLAC", "flac", "audio/flac", true),
-    M4a("M4A (AAC)", "m4a", "audio/mp4", false),
-    Ogg("OGG (Opus)", "ogg", "audio/ogg", false),
-    Mp3("MP3", "mp3", "audio/mpeg", false),
+enum class AudioFormat(@StringRes val label: Int, val ext: String, val mime: String, val lossless: Boolean) {
+    Wav16(R.string.export_audio_wav16, "wav", "audio/x-wav", true),
+    Wav24(R.string.export_audio_wav24, "wav", "audio/x-wav", true),
+    Flac(R.string.export_audio_flac, "flac", "audio/flac", true),
+    M4a(R.string.export_audio_m4a, "m4a", "audio/mp4", false),
+    Ogg(R.string.export_audio_ogg, "ogg", "audio/ogg", false),
+    Mp3(R.string.export_audio_mp3, "mp3", "audio/mpeg", false),
 }
 
 fun videoCodecsFor(container: Container): List<Codec> = when (container) {
@@ -76,12 +80,12 @@ fun audioCodecsFor(container: Container): List<AudioCodec> = when (container) {
 
 fun containersFor(codec: Codec): List<Container> = Container.entries.filter { codec in videoCodecsFor(it) }
 
-fun formatProblem(s: ExportSettings, hasAudio: Boolean): String? = when {
-    s.codec !in videoCodecsFor(s.container) -> "${s.container.label} files cannot hold ${s.codec.label} video."
-    hasAudio && s.audio.codec !in audioCodecsFor(s.container) -> "${s.container.label} files cannot hold ${s.audio.codec.label} audio."
-    s.audio.bitrateKbps !in 32..512 -> "Audio bit rate must be between 32 and 512 kbps."
-    s.audio.channels !in 1..2 -> "Audio must be mono or stereo."
-    s.audio.sampleRate !in AudioSampleRates -> "Audio sample rate must be 44.1 or 48 kHz."
+fun formatProblem(s: ExportSettings, hasAudio: Boolean): UiText? = when {
+    s.codec !in videoCodecsFor(s.container) -> txt(R.string.export_problem_container_video, s.container.label, s.codec.label)
+    hasAudio && s.audio.codec !in audioCodecsFor(s.container) -> txt(R.string.export_problem_container_audio, s.container.label, s.audio.codec.label)
+    s.audio.bitrateKbps !in 32..512 -> txt(R.string.export_problem_audio_bitrate)
+    s.audio.channels !in 1..2 -> txt(R.string.export_problem_audio_channels)
+    s.audio.sampleRate !in AudioSampleRates -> txt(R.string.export_problem_audio_rate)
     else -> null
 }
 
@@ -91,19 +95,21 @@ fun ExportSettings.fixedFormat(): ExportSettings {
     return copy(container = container, audio = audio.copy(codec = audioCodec))
 }
 
-enum class ImageKind(val label: String, val ext: String, val mime: String, val alpha: Boolean, val lossy: Boolean, val bytesPerPixel: Double) {
-    Png("PNG", "png", "image/png", true, false, 0.8),
-    Jpeg("JPEG", "jpg", "image/jpeg", false, true, 0.2),
-    Webp("WebP", "webp", "image/webp", true, true, 0.12),
-    WebpLossless("WebP lossless", "webp", "image/webp", true, false, 0.5),
-    Bmp("BMP", "bmp", "image/bmp", false, false, 3.0),
+enum class ImageKind(@StringRes val label: Int, val ext: String, val mime: String, val alpha: Boolean, val lossy: Boolean, val bytesPerPixel: Double) {
+    Png(R.string.export_image_png, "png", "image/png", true, false, 0.8),
+    Jpeg(R.string.export_image_jpeg, "jpg", "image/jpeg", false, true, 0.2),
+    Webp(R.string.export_image_webp, "webp", "image/webp", true, true, 0.12),
+    WebpLossless(R.string.export_image_webp_lossless, "webp", "image/webp", true, false, 0.5),
+    Bmp(R.string.export_image_bmp, "bmp", "image/bmp", false, false, 3.0),
 }
 
 val ImageQualities = listOf(50, 70, 85, 95, 100)
 const val BackgroundWhite = 0xFFFFFFFF.toInt()
 const val BackgroundBlack = 0xFF000000.toInt()
 
-enum class FrameInterpolation(val label: String) { Off("Off"), Blend("Frame blending"), Flow("Optical flow") }
+enum class FrameInterpolation(@StringRes val label: Int) {
+    Off(R.string.export_interpolation_off), Blend(R.string.export_interpolation_blend), Flow(R.string.export_interpolation_flow)
+}
 
 data class ExportSettings(
     val shortSide: Int,
@@ -160,15 +166,15 @@ fun audioBytesPerSecond(s: ExportSettings): Double = when (s.audioFormat) {
 
 const val GifBytesPerPixel = 0.6
 
-fun optionNote(kind: ExportKind, scene: Scene, s: ExportSettings): String? = when (kind) {
-    ExportKind.Video -> "${s.container.label} ${if (s.codec == Codec.H264) "" else s.codec.shortName + " "}${resolutionLabel(s.shortSide)} ${s.fps}fps"
-    ExportKind.Sequence -> "${s.image.label} ${resolutionLabel(s.shortSide)} ${s.fps}fps"
-    ExportKind.Gif -> exportSize(scene, s.shortSide, false).let { "${it.first}x${it.second} ${s.fps}fps" }
-    ExportKind.Package -> "Keeping Original Media"
-    ExportKind.Xml -> "for workflow integrations"
+fun optionNote(kind: ExportKind, scene: Scene, s: ExportSettings): UiText? = when (kind) {
+    ExportKind.Video -> txt(R.string.export_note_video, s.container.label, if (s.codec == Codec.H264) "" else s.codec.shortName + " ", resolutionLabel(s.shortSide), "${s.fps}")
+    ExportKind.Sequence -> txt(R.string.export_note_sequence, txt(s.image.label), resolutionLabel(s.shortSide), "${s.fps}")
+    ExportKind.Gif -> exportSize(scene, s.shortSide, false).let { txt(R.string.export_note_gif, "${it.first}", "${it.second}", "${s.fps}") }
+    ExportKind.Package -> txt(R.string.export_note_package)
+    ExportKind.Xml -> txt(R.string.export_note_xml)
     ExportKind.Audio -> audioOnlySummary(s)
     ExportKind.Frame -> null
-    ExportKind.FrameAs -> s.image.label + if (s.image.lossy) " ${s.imageQuality}%" else ""
+    ExportKind.FrameAs -> if (s.image.lossy) txt(R.string.export_note_image_quality, txt(s.image.label), "${s.imageQuality}") else txt(s.image.label)
 }
 
 fun estimateBytes(kind: ExportKind, scene: Scene, s: ExportSettings, hasAudio: Boolean): Long {

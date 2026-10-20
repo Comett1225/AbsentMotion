@@ -159,7 +159,7 @@ private suspend fun importModel(context: Context, state: EditorState, picked: Li
                 ?: uri.lastPathSegment ?: "model").substringAfterLast('/').replace(Regex("[^A-Za-z0-9._ -]"), "_").trimStart('.').ifEmpty { "model" }
         }
         val main = names.indexOfFirst { it.substringAfterLast('.').lowercase() in setOf("obj", "glb", "gltf") }
-        if (main < 0) return@withContext "Choose an .obj, .glb or .gltf file, with its .mtl, .bin and pictures if it has them"
+        if (main < 0) return@withContext context.getString(R.string.model_choose_file)
         val folder = File(ProjectStore(context).mediaDir(state.projectId), "model-${System.currentTimeMillis()}")
         try {
             folder.mkdirs()
@@ -182,13 +182,13 @@ private suspend fun importModel(context: Context, state: EditorState, picked: Li
             val (bytes, open) = modelFiles(resolver, uri)
             val count = parseModel(names[main], bytes, open).triangleCount
             withContext(Dispatchers.Main) { state.addModel(uri, names[main]) }
-            if (count > MODEL_TRIANGLE_BUDGET) "This model has $count triangles, so it is shown simplified to at most $MODEL_TRIANGLE_BUDGET" else null
+            if (count > MODEL_TRIANGLE_BUDGET) context.getString(R.string.model_simplified, "$count", "$MODEL_TRIANGLE_BUDGET") else null
         } catch (e: Exception) {
             folder.deleteRecursively()
-            "This model could not be read: ${e.message}"
+            context.getString(R.string.model_unreadable, e.message.orEmpty())
         } catch (_: OutOfMemoryError) {
             folder.deleteRecursively()
-            "This model is too large to open"
+            context.getString(R.string.model_too_large)
         }
     }
 
@@ -207,7 +207,7 @@ internal fun MultiBar(state: EditorState, modifier: Modifier) {
             state.moveClipEdges(end, false)
         }
         Spacer(Modifier.weight(1f))
-        BarButton(ChromeIcons.Transition, "Add a transition between the two clips", Modifier.width(48.dp).fillMaxHeight(), cut != null) {
+        BarButton(ChromeIcons.Transition, stringResource(R.string.transition_add_between), Modifier.width(48.dp).fillMaxHeight(), cut != null) {
             cut?.let { (a, b) -> state.playing = false; transition = a.id to b.id }
         }
         Spacer(Modifier.weight(1f))

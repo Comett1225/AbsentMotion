@@ -25,7 +25,7 @@ class Recovery(private val dir: File) {
                 clear(id)
                 continue
             }
-            return RecoveryOffer(id, scene.title.ifBlank { "your project" }, xml)
+            return RecoveryOffer(id, scene.title, xml)
         }
         return null
     }

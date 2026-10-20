@@ -670,6 +670,9 @@
       "1 000.5"
      ]
     }
+   },
+   "presets": {
+    "count-up": "Contagem crescente"
    }
   },
   "cross": {
@@ -3134,7 +3137,7 @@
   },
   "repeat": {
    "description": "Gera dinamicamente várias cópias da camada.",
-   "name": "Repetir",
+   "name": "Repetição",
    "params": {
     "alpha": {
      "label": "Alfa"
@@ -3993,6 +3996,12 @@
       "Linha"
      ]
     }
+   },
+   "presets": {
+    "fade-in-by-word": "Fade por palavra",
+    "pop-in": "Pop",
+    "slide-up-by-letter": "Subir por letra",
+    "typewriter": "Máquina de escrever"
    }
   },
   "textrandomizer": {
@@ -4035,6 +4044,9 @@
     "speed": {
      "label": "Velocidade"
     }
+   },
+   "presets": {
+    "scramble": "Embaralhar"
    }
   },
   "texttransform": {
@@ -4093,6 +4105,10 @@
       "Linha"
      ]
     }
+   },
+   "presets": {
+    "spin-cascade": "Cascata giratória",
+    "wave": "Onda"
    }
   },
   "threshold": {

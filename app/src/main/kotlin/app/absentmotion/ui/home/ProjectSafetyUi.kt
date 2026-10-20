@@ -171,7 +171,7 @@ fun RecoveryDialog(title: String, onRestore: () -> Unit, onDiscard: () -> Unit) 
     AlertDialog(
         onDismissRequest = {},
         title = { Text(stringResource(R.string.absentmotion_closed_unexpectedly), color = Am.Navy) },
-        text = { Text(stringResource(R.string.safety_recovery_body, title), color = Am.Navy) },
+        text = { Text(stringResource(R.string.safety_recovery_body, title.ifBlank { stringResource(R.string.recovery_your_project) }), color = Am.Navy) },
         dismissButton = { TextButton(onDiscard) { Text(stringResource(R.string.discard), color = Am.Navy) } },
         confirmButton = { TextButton(onRestore) { Text(stringResource(R.string.restore), color = Am.Navy) } },
         containerColor = Am.Card,

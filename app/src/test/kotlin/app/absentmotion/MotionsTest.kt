@@ -26,6 +26,7 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import javax.xml.parsers.DocumentBuilderFactory
+import app.absentmotion.i18n.txt
 
 class MotionsTest {
     private fun f(vararg v: Float) = formatFloats(v)
@@ -144,7 +145,7 @@ class MotionsTest {
         assertEquals("0", b.node["inTime"])
         assertEquals(500, b.motion(MotionSlot.In)!!.shift)
         assertNotNull(done.note)
-        assertTrue(done.note!!, done.note!!.contains("Clip 2") && done.note!!.contains("0.5 s earlier"))
+        assertEquals(txt(R.string.library_text_value, listOf(txt(R.string.transition_moved, "Clip 2", "0.5 s"))), done.note)
         assertEquals(start.node, done.scene.withTransition(1, 2, null, 0).scene.node)
     }
 
@@ -166,7 +167,7 @@ class MotionsTest {
         val done = scene(image(1, 0, 800), image(2, 800, 3000)).withTransition(1, 2, TransitionKind.CrossDissolve, 2000)
         assertEquals(1200, done.scene.layer(1)!!.endTime)
         assertEquals(400, done.scene.layer(2)!!.startTime)
-        assertTrue(done.note!!.contains("Shortened to 0.8 s"))
+        assertEquals(txt(R.string.library_text_value, listOf(txt(R.string.transition_shortened, "0.8 s"))), done.note)
         assertEquals(2000, done.scene.layer(2)!!.motion(MotionSlot.In)!!.ms)
     }
 

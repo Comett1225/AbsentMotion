@@ -10,6 +10,8 @@ import java.io.File
 import java.io.RandomAccessFile
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import app.absentmotion.R
+import app.absentmotion.i18n.txt
 
 class ContainerTest {
     private fun hex(s: String) = ByteArray(s.length / 2) { s.substring(2 * it, 2 * it + 2).toInt(16).toByte() }
@@ -165,8 +167,9 @@ class ContainerTest {
     @Test fun formatRules() {
         assertEquals(listOf(Container.WebM, Container.Mkv), containersFor(Codec.Vp9))
         assertNull(formatProblem(ExportSettings(1080, 30), hasAudio = true))
-        assertTrue(formatProblem(ExportSettings(1080, 30, Codec.Vp9), hasAudio = false)!!.contains("MP4"))
-        assertTrue(formatProblem(ExportSettings(1080, 30, container = Container.WebM, codec = Codec.Vp9), hasAudio = true)!!.contains("AAC"))
+        assertEquals(txt(R.string.export_problem_container_video, "MP4", "VP9"), formatProblem(ExportSettings(1080, 30, Codec.Vp9), hasAudio = false))
+        assertEquals(txt(R.string.export_problem_container_audio, "WebM", "AAC"),
+            formatProblem(ExportSettings(1080, 30, container = Container.WebM, codec = Codec.Vp9), hasAudio = true))
         assertNull(formatProblem(ExportSettings(1080, 30, container = Container.WebM, codec = Codec.Vp9), hasAudio = false))
         val fixed = ExportSettings(1080, 30, Codec.Vp9).fixedFormat()
         assertEquals(Container.WebM, fixed.container)

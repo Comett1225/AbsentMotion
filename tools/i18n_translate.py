@@ -111,6 +111,8 @@ def effect_units():
                 units[f'fx:{key}:{p["id"]}:label'] = (p['label'], f'parameter slider/switch label of the effect "{data.get("name", key)}"')
             for i, option in enumerate(p.get('options') or []):
                 units[f'fx:{key}:{p["id"]}:option{i}'] = (option, f'choice option of the parameter "{p.get("label", p["id"])}" of the effect "{data.get("name", key)}"')
+        for preset in data.get('presets', []):
+            units[f'fxpreset:{key}:{slug(preset["name"])}'] = (preset['name'], f'name of a one-tap animation preset of the effect "{data.get("name", key)}" (short, shown under an animated tile)')
     text = CATALOG_KT.read_text(encoding='utf-8')
     for cat, name in re.findall(r'"([a-z0-9]+)" to "([^"]+)"', text):
         units[f'fxcat:{cat}'] = (name, 'effect category name (one or two words)')
@@ -128,6 +130,9 @@ def effect_assets(units, translations):
             out['categories'][parts[1]] = value
             continue
         effect = out['effects'].setdefault(parts[1], {})
+        if parts[0] == 'fxpreset':
+            effect.setdefault('presets', {})[parts[2]] = value
+            continue
         if len(parts) == 3:
             effect[parts[2]] = value
             continue
@@ -151,6 +156,8 @@ def flatten_effect_asset(data, units):
         for field in ('name', 'description'):
             if effect.get(field):
                 flat[f'fx:{key}:{field}'] = effect[field]
+        for preset, name in effect.get('presets', {}).items():
+            flat[f'fxpreset:{key}:{preset}'] = name
         for pid, param in effect.get('params', {}).items():
             if param.get('label'):
                 flat[f'fx:{key}:{pid}:label'] = param['label']
@@ -160,6 +167,10 @@ def flatten_effect_asset(data, units):
                 for i, option in enumerate(options):
                     flat[f'fx:{key}:{pid}:option{i}'] = option
     return flat
+
+
+def slug(name):
+    return re.sub('[^a-z0-9]+', '-', name.lower()).strip('-')
 
 
 def source_context():

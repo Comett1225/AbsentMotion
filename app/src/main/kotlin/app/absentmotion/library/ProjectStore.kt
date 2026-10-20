@@ -119,7 +119,7 @@ class ProjectStore(private val root: File) {
     fun duplicate(id: String): String? {
         val source = load(id) ?: return null
         val copy = newId()
-        var scene = source.withTitle(source.title + " Copy")
+        var scene = source.withTitle(AppText.get(R.string.edit_layer_copy_name, source.title))
         val from = mediaDir(id)
         if (from.isDirectory) {
             val old = folderUri(from)

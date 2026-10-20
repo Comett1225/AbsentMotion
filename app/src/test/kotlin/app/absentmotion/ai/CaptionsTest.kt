@@ -81,7 +81,7 @@ class CaptionsTest {
             for (percent in listOf(50, 100, 150, 200)) for (position in CaptionPosition.entries) {
                 val style = CaptionStyle(sizePercent = percent, position = position)
                 val chunks = texts.mapIndexed { i, text -> Chunk(text, i * 1000, i * 1000 + 900) }
-                val layers = scene.captionLayers(chunks, style, measure)
+                val layers = scene.captionLayers(chunks, style, measure = measure)
                 for (layer in layers) {
                     val (x, y) = layer.location
                     val tall = measure(layer.content, layer.textSize)
@@ -101,14 +101,14 @@ class CaptionsTest {
     @Test fun layersAreFrameTimedNumberedAndOutlined() {
         val scene = Scene.create("t", 1080, 1920, 30, 0)
         val chunks = listOf(Chunk("one two", 0, 1000), Chunk("three", 1000, 1010), Chunk("four", 2950, 4000))
-        val layers = scene.captionLayers(chunks, CaptionStyle(color = 0xFFFFE14D.toInt())) { _, size -> size * 3.5f }
+        val layers = scene.captionLayers(chunks, CaptionStyle(color = 0xFFFFE14D.toInt()), { "Caption $it" }) { _, size -> size * 3.5f }
         assertEquals(listOf("Caption 1", "Caption 2", "Caption 3"), layers.map { it.label })
         assertEquals(listOf(0 to 999, 1000 to 1032, 2933 to 3999), layers.map { it.startTime to it.endTime })
         assertEquals(0xFFFFE14D.toInt(), layers[0].fillColor)
         assertEquals(listOf("outside"), layers[0].borders.map { it.direction })
         assertEquals(StyleColors.Black, layers[0].borders[0].color)
         assertTrue(scene.captionLayers(chunks, CaptionStyle(outline = false)) { _, s -> s }.all { it.borders.isEmpty() })
-        val again = layers.fold(scene) { s, l -> s.add(l) }.captionLayers(chunks.take(1), CaptionStyle()) { _, s -> s }
+        val again = layers.fold(scene) { s, l -> s.add(l) }.captionLayers(chunks.take(1), CaptionStyle(), { "Caption $it" }) { _, s -> s }
         assertEquals("Caption 4", again.single().label)
     }
 }

@@ -55,9 +55,10 @@ data class EffectParam(
     }
 }
 
-data class EffectPreset(val name: String, val values: Map<String, String>, val keys: Map<String, List<Keyframe>>) {
-    val slug: String get() = name.lowercase(Locale.US).replace(Regex("[^a-z0-9]+"), "-").trim('-')
-}
+data class EffectPreset(
+    val name: String, val values: Map<String, String>, val keys: Map<String, List<Keyframe>>,
+    val slug: String = name.lowercase(Locale.US).replace(Regex("[^a-z0-9]+"), "-").trim('-'),
+)
 
 data class EffectDefinition(
     val id: String,

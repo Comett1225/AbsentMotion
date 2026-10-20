@@ -9,7 +9,7 @@
   "move": "Gerak",
   "new": "Baru",
   "noise": "Noise",
-  "repeat": "Ulangi",
+  "repeat": "Pengulangan",
   "stylize": "Stilisasi",
   "text": "Teks"
  },
@@ -670,6 +670,9 @@
       "1 000.5"
      ]
     }
+   },
+   "presets": {
+    "count-up": "Hitung naik"
    }
   },
   "cross": {
@@ -3134,7 +3137,7 @@
   },
   "repeat": {
    "description": "Menghasilkan beberapa salinan lapisan secara dinamis.",
-   "name": "Pengulangan",
+   "name": "Pengulang",
    "params": {
     "alpha": {
      "label": "Alpha"
@@ -3993,6 +3996,12 @@
       "Baris"
      ]
     }
+   },
+   "presets": {
+    "fade-in-by-word": "Pudar per kata",
+    "pop-in": "Muncul pop",
+    "slide-up-by-letter": "Geser naik per huruf",
+    "typewriter": "Mesin tik"
    }
   },
   "textrandomizer": {
@@ -4035,6 +4044,9 @@
     "speed": {
      "label": "Kecepatan"
     }
+   },
+   "presets": {
+    "scramble": "Acak"
    }
   },
   "texttransform": {
@@ -4093,6 +4105,10 @@
       "Baris"
      ]
     }
+   },
+   "presets": {
+    "spin-cascade": "Putaran Beruntun",
+    "wave": "Gelombang"
    }
   },
   "threshold": {

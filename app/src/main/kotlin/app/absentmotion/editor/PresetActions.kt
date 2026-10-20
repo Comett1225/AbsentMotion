@@ -10,6 +10,8 @@ import app.absentmotion.model.isKeyframed
 import app.absentmotion.model.keyframes
 import app.absentmotion.model.withKeyframes
 import app.absentmotion.model.withVideoSpeedMap
+import app.absentmotion.R
+import app.absentmotion.i18n.AppText
 
 private val STYLED = setOf("shape", "text", "drawing", "embedScene")
 private val STROKED = setOf("shape", "text")
@@ -26,8 +28,8 @@ fun canSavePreset(layer: Layer): Boolean {
         (n["font"] ?: "") != "" || (n["size"]?.toFloatOrNull() ?: 18f) != 18f || (n["align"] ?: "left") != "left"
 }
 
-fun presetTitle(layer: Layer, taken: Collection<String>): String =
-    layer.label.takeIf { it.isNotBlank() } ?: (1..1000).map { "Preset $it" }.firstOrNull { it !in taken } ?: "Preset"
+fun presetTitle(layer: Layer, taken: Collection<String>, numbered: (Int) -> String = { AppText.get(R.string.preset_numbered, "$it") }): String =
+    layer.label.takeIf { it.isNotBlank() } ?: (1..1000).map(numbered).firstOrNull { it !in taken } ?: numbered(1)
 
 fun presetScene(scene: Scene, layer: Layer, title: String): Scene {
     val parent = layer.node["parent"]?.toLongOrNull()

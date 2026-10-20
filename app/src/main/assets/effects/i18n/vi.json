@@ -9,7 +9,7 @@
   "move": "Di chuyển",
   "new": "Mới",
   "noise": "Nhiễu",
-  "repeat": "Lặp",
+  "repeat": "Lặp lại",
   "stylize": "Cách điệu",
   "text": "Văn bản"
  },
@@ -670,6 +670,9 @@
       "1 000.5"
      ]
     }
+   },
+   "presets": {
+    "count-up": "Đếm lên"
    }
   },
   "cross": {
@@ -3134,7 +3137,7 @@
   },
   "repeat": {
    "description": "Tự động tạo nhiều bản sao của lớp.",
-   "name": "Lặp lại",
+   "name": "Lặp",
    "params": {
     "alpha": {
      "label": "Alpha"
@@ -3993,6 +3996,12 @@
       "Dòng"
      ]
     }
+   },
+   "presets": {
+    "fade-in-by-word": "Mờ dần theo từ",
+    "pop-in": "Bật vào",
+    "slide-up-by-letter": "Trượt lên theo chữ cái",
+    "typewriter": "Máy đánh chữ"
    }
   },
   "textrandomizer": {
@@ -4035,6 +4044,9 @@
     "speed": {
      "label": "Tốc độ"
     }
+   },
+   "presets": {
+    "scramble": "Xáo trộn"
    }
   },
   "texttransform": {
@@ -4093,6 +4105,10 @@
       "Dòng"
      ]
     }
+   },
+   "presets": {
+    "spin-cascade": "Xoay nối tiếp",
+    "wave": "Gợn sóng"
    }
   },
   "threshold": {

@@ -88,9 +88,17 @@ fun captionY(width: Int, height: Int, position: CaptionPosition, textHeight: Flo
     return if (2 * reach >= height) height / 2f else line.coerceIn(reach, height - reach)
 }
 
-internal fun Scene.captionLayers(chunks: List<Chunk>, style: CaptionStyle, measure: (text: String, size: Float) -> Float): List<Layer> {
-    val numbered = Regex("Caption (\\d+)")
-    val first = 1 + (layers.mapNotNull { numbered.matchEntire(it.label)?.groupValues?.get(1)?.toIntOrNull() }.maxOrNull() ?: 0)
+internal fun Scene.captionLayers(
+    chunks: List<Chunk>, style: CaptionStyle,
+    name: (Int) -> String = { AppText.get(R.string.caption_layer_name, "$it") },
+    measure: (text: String, size: Float) -> Float,
+): List<Layer> {
+    val head = name(0).substringBefore('0')
+    val tail = name(0).substringAfter('0')
+    val first = 1 + (layers.mapNotNull { l ->
+        l.label.takeIf { it.length > head.length + tail.length && it.startsWith(head) && it.endsWith(tail) }
+            ?.let { it.substring(head.length, it.length - tail.length).toIntOrNull() }
+    }.maxOrNull() ?: 0)
     val wrap = captionWrap(width)
     val starts = chunks.map { frameAt(it.startMs) }
     return chunks.mapIndexed { i, chunk ->
@@ -98,7 +106,7 @@ internal fun Scene.captionLayers(chunks: List<Chunk>, style: CaptionStyle, measu
         var size = captionSize(width, height, style.sizePercent)
         var tall = measure(chunk.text, size)
         while (tall > height * 0.9f && size > 1f) { size *= 0.9f; tall = measure(chunk.text, size) }
-        val layer = Layer(XmlNode("text", linkedMapOf("id" to "${Layer.newId()}", "label" to "Caption ${first + i}",
+        val layer = Layer(XmlNode("text", linkedMapOf("id" to "${Layer.newId()}", "label" to name(first + i),
             "startTime" to "${frameStart(starts[i])}", "endTime" to "${frameEnd(lastFrame)}",
             "fillType" to "color", "mediaFillMode" to "fill", "size" to formatFloats(floatArrayOf(size)),
             "font" to style.font, "wrapWidth" to "$wrap", "align" to "center")))

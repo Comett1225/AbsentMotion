@@ -1,7 +1,11 @@
 package app.absentmotion.ui.export
 
-import app.absentmotion.i18n.AppText
+import androidx.annotation.StringRes
+import androidx.compose.ui.res.stringResource
+import app.absentmotion.R
+import app.absentmotion.i18n.UiText
 import app.absentmotion.i18n.text
+import app.absentmotion.i18n.txt
 import app.absentmotion.platform.Log
 import app.absentmotion.model.mediaUris
 import app.absentmotion.platform.BackHandler
@@ -130,6 +134,7 @@ import app.absentmotion.export.exportSize
 import app.absentmotion.export.formatBytes
 import app.absentmotion.export.freeSpace
 import app.absentmotion.export.khz
+import app.absentmotion.export.listed
 import app.absentmotion.export.optionNote
 import app.absentmotion.export.resolutionChoices
 import app.absentmotion.export.resolutionLabel
@@ -181,7 +186,7 @@ private sealed interface Phase {
     class Done(val kind: ExportKind, val result: ExportResult) : Phase
 }
 
-private class Failure(val title: String, val text: String, val action: String? = null, val proceed: (() -> Unit)? = null)
+private class Failure(@StringRes val title: Int, val text: UiText, val action: UiText? = null, val proceed: (() -> Unit)? = null)
 
 @Composable
 fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromProjectList: Boolean, onClose: () -> Unit) {
@@ -196,7 +201,7 @@ fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromProjectList
     var lastPage by remember { mutableStateOf(ExportKind.Gif) }
     var audioPage by remember { mutableStateOf(false) }
     var help by remember { mutableStateOf(false) }
-    var acknowledged by remember { mutableStateOf<String?>(null) }
+    var acknowledged by remember { mutableStateOf<UiText?>(null) }
     var lastPhase by remember { mutableStateOf<Phase>(Phase.Idle) }
     var packageInfo by remember { mutableStateOf(false) }
     var asTemplate by remember { mutableStateOf(false) }
@@ -254,7 +259,7 @@ fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromProjectList
     }
     val storage = if (estimate < 0) StorageStatus.Enough else storageStatus(estimate, free)
     val blocked = exportBlock(storage, if (kind == ExportKind.Video) support else Support.Supported)
-    val explain: (String) -> Unit = { failure = Failure("Not Available", it) }
+    val explain: (UiText) -> Unit = { failure = Failure(R.string.export_not_available, it) }
 
     app.absentmotion.platform.ExportBars(dark = false, running = phase is Phase.Running)
     BackHandler {
@@ -276,20 +281,20 @@ fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromProjectList
     fun start(ignoreMissing: Boolean = false) {
         val s = settings.getValue(kind)
         if (scene.layers.isEmpty() && kind != ExportKind.Xml && kind != ExportKind.Package) {
-            failure = Failure("Export Failed", "There is nothing to export yet. Add a layer or some media, then try again.")
+            failure = Failure(R.string.export_failed_title, txt(R.string.export_failed_empty))
             return
         }
         if (kind == ExportKind.Audio && !hasAudio) {
-            failure = Failure("Nothing to Export", NoSound)
+            failure = Failure(R.string.export_nothing_title, NoSound)
             return
         }
         if (kind == ExportKind.Video && support is Support.Unsupported) {
-            failure = Failure("Not Supported", codecWarning(s, support).orEmpty(), better?.let { suggestionLabel(s, it) }, better?.let { ::useBetter })
+            failure = Failure(R.string.export_not_supported_title, codecWarning(s, support) ?: txt(R.string.export_block_unsupported), better?.let { suggestionLabel(s, it) }, better?.let { ::useBetter })
             return
         }
         free = freeSpace()
         if (kind != ExportKind.Gif && storageStatus(estimate, free) is StorageStatus.NotEnough) {
-            failure = Failure("Not Enough Storage", AppText.get((storageStatus(estimate, free) as StorageStatus.NotEnough).message))
+            failure = Failure(R.string.export_storage_title, (storageStatus(estimate, free) as StorageStatus.NotEnough).message)
             return
         }
         val chosen = kind
@@ -306,8 +311,7 @@ fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromProjectList
                         }.map { scene.media(it)?.filename?.ifEmpty { null } ?: it }
                     }
                     if (missing.isNotEmpty()) {
-                        failure = Failure("Media Missing", "This project uses files that are not on this device:\n" + missing.joinToString("\n") +
-                            "\n\nThe layers that use them are left out if you export anyway.", "Export Anyway") { start(true) }
+                        failure = Failure(R.string.export_missing_title, txt(R.string.export_missing_text, missing.joinToString("\n")), txt(R.string.export_anyway)) { start(true) }
                         phase = Phase.Idle
                         return@launch
                     }
@@ -316,7 +320,7 @@ fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromProjectList
                     val measured = measureGifBytes(engine, scene, s)
                     free = freeSpace()
                     if (storageStatus(measured, free) is StorageStatus.NotEnough) {
-                        failure = Failure("Not Enough Storage", "Free up some storage on this device and export again.")
+                        failure = Failure(R.string.export_storage_title, txt(R.string.export_storage_text))
                         phase = Phase.Idle
                         return@launch
                     }
@@ -336,7 +340,7 @@ fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromProjectList
             } catch (e: Throwable) {
                 Log.e("AMExport", "export failed", e)
                 phase = Phase.Idle
-                failure = Failure("Export Failed", e.message ?: e.toString())
+                failure = Failure(R.string.export_failed_title, txt(R.string.library_text_value, e.message ?: e.toString()))
             }
         }
         phase = Phase.Running(chosen, System.nanoTime(), job)
@@ -347,15 +351,15 @@ fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromProjectList
 
     Box(Modifier.fillMaxSize().background(Am.SheetBg).pointerInput(Unit) {}.enterFade(12.dp)) {
         Column(Modifier.fillMaxSize()) {
-            TitleBar("Export Project", ExportIcons.Close, "Cancel", onClose)
+            TitleBar(stringResource(R.string.export_title), ExportIcons.Close, stringResource(R.string.cancel), onClose)
             info()
             ScrollArea(Modifier.weight(1f), Am.SheetBg, PaddingValues(15.dp), 10.dp) {
                 kinds.forEachIndexed { i, k ->
                     val s = settings.getValue(k)
                     val silent = k == ExportKind.Audio && !hasAudio
                     OptionCard(
-                        selected = kind == k, enabled = !silent, icon = k.icon(), title = k.title(),
-                        note = if (silent) "This project has no sound" else optionNote(k, scene, s),
+                        selected = kind == k, enabled = !silent, icon = k.icon(), title = stringResource(k.title()),
+                        note = if (silent) stringResource(R.string.export_no_sound_short) else optionNote(k, scene, s)?.text(),
                         right = when (k) { ExportKind.Package -> ExportIcons.Info; ExportKind.Video, ExportKind.Audio, ExportKind.FrameAs, ExportKind.Sequence, ExportKind.Gif -> ExportIcons.ChevronRight; else -> null },
                         onSelect = { if (silent) explain(NoSound) else { kind = k; if (k == ExportKind.FrameAs) page = k } },
                         onRight = { if (k == ExportKind.Package) packageInfo = true else if (silent) explain(NoSound) else { kind = k; page = k } },
@@ -392,7 +396,7 @@ fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromProjectList
                         .clickable(indication = null, interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }) {}
                         .navigationBarsPadding(),
                 ) {
-                    Text(shown.title(), Modifier.padding(start = 15.dp, end = 15.dp, top = 18.dp, bottom = 4.dp), color = Navy, fontSize = 20.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+                    Text(stringResource(shown.title()), Modifier.padding(start = 15.dp, end = 15.dp, top = 18.dp, bottom = 4.dp), color = Navy, fontSize = 20.sp, fontWeight = FontWeight.Bold, maxLines = 1)
                     ScrollArea(Modifier.weight(1f, fill = false), Am.Card, PaddingValues(start = 15.dp, end = 15.dp, top = 10.dp, bottom = 18.dp), GroupGap) {
                         OptionsPage(shown, scene, settings.getValue(shown), explain, { help = true }) { settings[shown] = it }
                     }
@@ -413,68 +417,69 @@ fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromProjectList
     if (packageInfo) {
         AlertDialog(
             onDismissRequest = { packageInfo = false },
-            title = { Text("Project Bundle", color = Navy) },
-            text = { Text("One .absproj package with the project and the original media it uses, saved to Documents / AbsentMotion. Keep it as a backup or move the project to another phone.", color = Navy) },
-            confirmButton = { TextButton({ packageInfo = false }) { Text("OK", color = Navy) } },
+            title = { Text(stringResource(R.string.project_bundle), color = Navy) },
+            text = { Text(stringResource(R.string.one_absproj_package_with_the_project), color = Navy) },
+            confirmButton = { TextButton({ packageInfo = false }) { Text(stringResource(R.string.ok), color = Navy) } },
             containerColor = Am.Card,
         )
     }
     if (templateInfo) {
         AlertDialog(
             onDismissRequest = { templateInfo = false },
-            title = { Text("Template", color = Navy) },
-            text = { Text("Also keeps the project, with its media, in Templates on this phone. Open it there to replace its media and continue to a new project.", color = Navy) },
-            confirmButton = { TextButton({ templateInfo = false }) { Text("OK", color = Navy) } },
+            title = { Text(stringResource(R.string.template), color = Navy) },
+            text = { Text(stringResource(R.string.also_keeps_the_project_with_its), color = Navy) },
+            confirmButton = { TextButton({ templateInfo = false }) { Text(stringResource(R.string.ok), color = Navy) } },
             containerColor = Am.Card,
         )
     }
     if (help) {
         AlertDialog(
             onDismissRequest = { help = false },
-            title = { Text("Frame Interpolation", color = Navy) },
+            title = { Text(stringResource(R.string.export_interpolation), color = Navy) },
             text = {
                 Column(Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     InterpolationHelp.forEach { (name, text) ->
                         Column {
-                            Text(name, color = Navy, fontSize = 15.sp, fontWeight = FontWeight.Bold)
-                            Text(text, color = Navy, fontSize = 14.sp, lineHeight = 19.sp)
+                            Text(stringResource(name), color = Navy, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                            Text(stringResource(text), color = Navy, fontSize = 14.sp, lineHeight = 19.sp)
                         }
                     }
                 }
             },
-            confirmButton = { TextButton({ help = false }) { Text("OK", color = Navy) } },
+            confirmButton = { TextButton({ help = false }) { Text(stringResource(R.string.ok), color = Navy) } },
             containerColor = Am.Card,
         )
     }
     failure?.let { f ->
         AlertDialog(
             onDismissRequest = { failure = null },
-            title = { Text(f.title, color = Navy) },
-            text = { Text(f.text, color = Navy) },
-            confirmButton = { TextButton({ failure = null; f.proceed?.invoke() }) { Text(f.action ?: "OK", color = Navy) } },
-            dismissButton = f.proceed?.let { { TextButton({ failure = null }) { Text("Cancel", color = Navy) } } },
+            title = { Text(stringResource(f.title), color = Navy) },
+            text = { Text(f.text.text(), color = Navy) },
+            confirmButton = { TextButton({ failure = null; f.proceed?.invoke() }) { Text(f.action?.text() ?: stringResource(R.string.ok), color = Navy) } },
+            dismissButton = f.proceed?.let { { TextButton({ failure = null }) { Text(stringResource(R.string.cancel), color = Navy) } } },
             containerColor = Am.Card,
         )
     }
 }
 
-private const val NoSound = "This project has no sound to export. Add music, a sound or a video with sound first."
+private val NoSound = txt(R.string.export_no_sound)
 
 private val InterpolationHelp = listOf(
-    "Off" to "Each clip shows its own frames. A 30 fps clip in a 60 fps export shows every frame twice, so motion can look a little stepped.",
-    "Frame blending" to "The new in-between frames mix the two nearest frames like a quick cross-fade. Fast to export; fast motion can look ghosted.",
-    "Optical flow" to "The app follows how each part of the picture moves and draws real in-between frames. Smoothest motion, but the export is slower and very fast motion can smear at the edges.",
+    R.string.export_interpolation_off to R.string.export_interpolation_off_help,
+    R.string.export_interpolation_blend to R.string.export_interpolation_blend_help,
+    R.string.export_interpolation_flow to R.string.export_interpolation_flow_help,
 )
 
+@StringRes
 private fun ExportKind.title() = when (this) {
-    ExportKind.Video -> "Video"
-    ExportKind.Package -> "Project Bundle"
-    ExportKind.Frame -> "Current Frame as PNG"
-    ExportKind.FrameAs -> "Current Frame as…"
-    ExportKind.Sequence -> "Image Sequence"
-    ExportKind.Gif -> "GIF"
-    ExportKind.Xml -> "XML"
-    ExportKind.Audio -> "Audio Only"
+    ExportKind.Video -> R.string.export_kind_video
+    ExportKind.Package -> R.string.project_bundle
+    ExportKind.Frame -> R.string.export_kind_frame_png
+    ExportKind.FrameAs -> R.string.export_kind_frame_as
+    ExportKind.Sequence -> R.string.export_kind_sequence
+    ExportKind.Gif -> R.string.gif
+    ExportKind.Xml -> R.string.export_kind_xml
+    ExportKind.Audio -> R.string.export_kind_audio_only
 }
 
 private fun ExportKind.icon(): ImageVector? = when (this) {
@@ -502,17 +507,17 @@ private fun TitleBar(title: String, icon: ImageVector, description: String, onCl
 private fun InfoBlock(free: Long, estimate: Long, timeMs: Long?, heat: ThermalLevel, storage: StorageStatus) {
     val space = when (storage) {
         StorageStatus.Enough -> null
-        is StorageStatus.Low -> "Low"
-        is StorageStatus.NotEnough -> "Not enough"
+        is StorageStatus.Low -> stringResource(R.string.export_space_low)
+        is StorageStatus.NotEnough -> stringResource(R.string.export_space_not_enough)
     }
     Column(Modifier.fillMaxWidth().background(Am.Card).padding(horizontal = 15.dp)) {
-        InfoRow("Available space", formatBytes(free) + (space?.let { " · $it" } ?: ""), space != null)
+        InfoRow(stringResource(R.string.export_available_space), formatBytes(free) + (space?.let { " · $it" } ?: ""), space != null)
         Divider()
-        InfoRow("Estimated file size", if (estimate < 0) "Calculating..." else formatBytes(estimate), false)
+        InfoRow(stringResource(R.string.export_estimated_size), if (estimate < 0) stringResource(R.string.export_calculating) else formatBytes(estimate), false)
         Divider()
-        InfoRow("Estimated export time", timeMs?.let { timeLabel(it).text() } ?: "Unknown", false)
+        InfoRow(stringResource(R.string.export_estimated_time), timeMs?.let { timeLabel(it).text() } ?: stringResource(R.string.export_time_unknown), false)
         Divider()
-        InfoRow("Phone temperature", thermalLabel(heat), heat >= ThermalLevel.Hot)
+        InfoRow(stringResource(R.string.export_phone_temperature), thermalLabel(heat).text(), heat >= ThermalLevel.Hot)
     }
 }
 
@@ -540,7 +545,7 @@ private fun ScrollArea(modifier: Modifier, fade: Color, padding: PaddingValues, 
             Modifier.align(Alignment.BottomCenter).fillMaxWidth().height(44.dp).graphicsLayer { alpha = more }
                 .background(Brush.verticalGradient(listOf(fade.copy(alpha = 0f), fade.copy(alpha = 0.92f), fade))),
         ) {
-            Icon(ExportIcons.ChevronDown, if (scroll.canScrollForward) "More below" else null, Modifier.align(Alignment.BottomCenter).padding(bottom = 3.dp).size(22.dp), tint = ValueGrey)
+            Icon(ExportIcons.ChevronDown, if (scroll.canScrollForward) stringResource(R.string.export_more_below) else null, Modifier.align(Alignment.BottomCenter).padding(bottom = 3.dp).size(22.dp), tint = ValueGrey)
         }
     }
 }
@@ -549,8 +554,8 @@ private fun ScrollArea(modifier: Modifier, fade: Color, padding: PaddingValues, 
 private fun TemplateToggle(checked: Boolean, onChange: (Boolean) -> Unit, onInfo: () -> Unit) {
     Row(Modifier.fillMaxWidth().background(Am.Card).height(52.dp).padding(horizontal = 15.dp), verticalAlignment = Alignment.CenterVertically) {
         Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
-            Text("Also keep a copy as a Template", Modifier.weight(1f, fill = false), color = Navy, fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            Box(Modifier.size(36.dp).clickable(onClick = onInfo), contentAlignment = Alignment.Center) { Icon(ExportIcons.Info, "Info", Modifier.size(20.dp), tint = Am.HomeDim) }
+            Text(stringResource(R.string.also_keep_a_copy_as_a), Modifier.weight(1f, fill = false), color = Navy, fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Box(Modifier.size(36.dp).clickable(onClick = onInfo), contentAlignment = Alignment.Center) { Icon(ExportIcons.Info, stringResource(R.string.export_info), Modifier.size(20.dp), tint = Am.HomeDim) }
         }
         Switch(
             checked, onChange,
@@ -563,14 +568,14 @@ private fun TemplateToggle(checked: Boolean, onChange: (Boolean) -> Unit, onInfo
 }
 
 @Composable
-private fun ExportBar(enabled: Boolean, blocked: String?, onClick: () -> Unit) {
+private fun ExportBar(enabled: Boolean, blocked: UiText?, onClick: () -> Unit) {
     Box(Modifier.fillMaxWidth().background(Am.Card).navigationBarsPadding().padding(start = 15.dp, end = 15.dp, top = 12.dp, bottom = 15.dp)) {
         Box(
             Modifier.fillMaxWidth().height(50.dp).shadow(4.dp, RoundedCornerShape(6.dp)).clip(RoundedCornerShape(6.dp))
                 .background(animatedColor(if (blocked == null) Navy else lerp(Navy, Am.Card, 0.8f)))
                 .clickable(enabled = enabled, onClick = onClick),
             contentAlignment = Alignment.Center,
-        ) { Text(blocked ?: "Export", color = if (blocked == null) Am.OnNavyAccent else Navy, fontSize = if (blocked == null) 21.sp else 18.sp, maxLines = 1) }
+        ) { Text(blocked?.text() ?: stringResource(R.string.export), color = if (blocked == null) Am.OnNavyAccent else Navy, fontSize = if (blocked == null) 21.sp else 18.sp, maxLines = 1) }
     }
 }
 
@@ -619,12 +624,12 @@ private fun GifBadge() {
         Canvas(Modifier.fillMaxSize()) {
             drawCircle(Navy, size.minDimension / 2 - 1.dp.toPx(), style = Stroke(1.2.dp.toPx(), pathEffect = PathEffect.dashPathEffect(floatArrayOf(2.5.dp.toPx(), 2.dp.toPx()))))
         }
-        Text("GIF", color = Navy, fontSize = 7.sp, fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.gif), color = Navy, fontSize = 7.sp, fontWeight = FontWeight.Bold)
     }
 }
 
 @Composable
-private fun ResolutionDropdown(shortSide: Int, choices: List<Choice<app.absentmotion.export.Resolution>>, onReason: (String) -> Unit, onPick: (Int) -> Unit) {
+private fun ResolutionDropdown(shortSide: Int, choices: List<Choice<app.absentmotion.export.Resolution>>, onReason: (UiText) -> Unit, onPick: (Int) -> Unit) {
     var open by remember { mutableStateOf(false) }
     Box(Modifier.fillMaxWidth().height(44.dp).clickable { open = true }) {
         Row(Modifier.fillMaxSize().padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -645,7 +650,7 @@ private fun ResolutionDropdown(shortSide: Int, choices: List<Choice<app.absentmo
 @Composable
 private fun PageFrame(title: String, onBack: () -> Unit, content: @Composable ColumnScope.() -> Unit) {
     Column(Modifier.fillMaxSize().presence(slide = 1f, fade = false).background(Am.SheetBg).pointerInput(Unit) {}) {
-        TitleBar(title, ExportIcons.Back, "Back", onBack)
+        TitleBar(title, ExportIcons.Back, stringResource(R.string.export_back), onBack)
         content()
     }
 }
@@ -654,36 +659,36 @@ private fun PageFrame(title: String, onBack: () -> Unit, content: @Composable Co
 private fun VideoPage(
     scene: Scene, s: ExportSettings, hasAudio: Boolean, check: (ExportSettings) -> Support,
     info: @Composable () -> Unit, bar: @Composable () -> Unit,
-    warning: String?, slow: Boolean, use: String?, onUse: () -> Unit, onContinue: () -> Unit,
-    onChange: (ExportSettings) -> Unit, onReason: (String) -> Unit, onAudio: () -> Unit, onHelp: () -> Unit, onBack: () -> Unit,
+    warning: UiText?, slow: Boolean, use: UiText?, onUse: () -> Unit, onContinue: () -> Unit,
+    onChange: (ExportSettings) -> Unit, onReason: (UiText) -> Unit, onAudio: () -> Unit, onHelp: () -> Unit, onBack: () -> Unit,
 ) {
     val rates = (VideoFrameRates + scene.fps).distinct().sorted()
     val (w, h) = exportSize(scene, s.shortSide, even = true)
-    PageFrame("Video", onBack) {
+    PageFrame(stringResource(R.string.export_kind_video), onBack) {
         info()
         ScrollArea(Modifier.weight(1f).fillMaxWidth(), Am.SheetBg, PaddingValues(start = 15.dp, end = 15.dp, top = 16.dp, bottom = 20.dp), GroupGap) {
-            Field("Export Resolution") {
+            Field(stringResource(R.string.export_resolution_heading)) {
                 Box(Modifier.clip(RoundedCornerShape(4.dp)).background(Am.Card)) { ResolutionDropdown(s.shortSide, resolutionChoices(s, check), onReason) { onChange(s.copy(shortSide = it)) } }
             }
-            Field("Format") { Segments(containerChoices(s, check), s.container, { it.label }, onReason) { onChange(withContainer(s, it, check)) } }
-            Field("Codec") { Segments(codecChoices(s, check), s.codec, { it.shortName }, onReason) { onChange(s.copy(codec = it)) } }
-            Field("Frame Rate", "${s.fps}fps") {
+            Field(stringResource(R.string.export_format)) { Segments(containerChoices(s, check), s.container, { it.label }, onReason) { onChange(withContainer(s, it, check)) } }
+            Field(stringResource(R.string.export_codec)) { Segments(codecChoices(s, check), s.codec, { it.shortName }, onReason) { onChange(s.copy(codec = it)) } }
+            Field(stringResource(R.string.export_frame_rate), "${s.fps}fps") {
                 ExportSlider(rates.indexOf(s.fps).coerceAtLeast(0).toFloat() / (rates.size - 1)) { onChange(s.copy(fps = rates[(it * (rates.size - 1)).roundToInt()])) }
                 Ends("${rates.first()}fps", "${rates.last()}fps")
             }
-            Field("Frame Interpolation", onHelp = onHelp) {
-                Segments(FrameInterpolation.entries.map { Choice(it) }, s.interpolation, { it.label }, onReason) { onChange(s.copy(interpolation = it)) }
-                Hint(InterpolationHint)
+            Field(stringResource(R.string.export_interpolation), onHelp = onHelp) {
+                Segments(FrameInterpolation.entries.map { Choice(it) }, s.interpolation, { stringResource(it.label) }, onReason) { onChange(s.copy(interpolation = it)) }
+                Hint(stringResource(R.string.export_interpolation_hint))
             }
-            Field("Quality", "%.1f Mbps".format(Locale.ROOT, videoBitrate(w, h, s) / 1e6)) {
+            Field(stringResource(R.string.export_quality), "%.1f Mbps".format(Locale.ROOT, videoBitrate(w, h, s) / 1e6)) {
                 ExportSlider(s.quality) { onChange(s.copy(quality = it)) }
-                Ends("Low", "High")
+                Ends(stringResource(R.string.export_quality_low), stringResource(R.string.export_quality_high))
             }
-            Field("Audio") {
-                NavRow(audioSummary(s.audio), if (hasAudio) null else "This project has no sound yet", onAudio)
+            Field(stringResource(R.string.export_kind_audio)) {
+                NavRow(audioSummary(s.audio).text(), if (hasAudio) null else stringResource(R.string.export_no_sound_yet), onAudio)
             }
         }
-        if (warning != null) WarningCard(if (slow) "Slow export" else "Not supported", warning, use, onUse, if (slow) onContinue else null)
+        if (warning != null) WarningCard(stringResource(if (slow) R.string.export_slow_title else R.string.onboarding_check_unsupported), warning.text(), use?.text(), onUse, if (slow) onContinue else null)
         bar()
     }
 }
@@ -691,21 +696,20 @@ private fun VideoPage(
 @Composable
 private fun AudioSettingsPage(
     s: ExportSettings, hasAudio: Boolean, hasEncoder: (String) -> Boolean,
-    onChange: (ExportSettings) -> Unit, onReason: (String) -> Unit, onBack: () -> Unit,
+    onChange: (ExportSettings) -> Unit, onReason: (UiText) -> Unit, onBack: () -> Unit,
 ) {
     val a = s.audio
-    PageFrame("Audio", onBack) {
+    PageFrame(stringResource(R.string.export_kind_audio), onBack) {
         ScrollArea(Modifier.weight(1f).fillMaxWidth(), Am.SheetBg, PaddingValues(start = 15.dp, end = 15.dp, top = 16.dp, bottom = 20.dp), GroupGap) {
-            Hint(if (hasAudio) "Sound settings for the video file. ${s.container.label} can hold ${audioCodecsFor(s.container).joinToString(" or ") { it.label }} audio."
-                else "This project has no sound yet. These settings are used once you add some.")
-            Field("Codec") { Segments(audioCodecChoices(s.container, hasEncoder), a.codec, { it.label }, onReason) { onChange(s.copy(audio = a.copy(codec = it))) } }
-            Field("Bit Rate", "${a.bitrateKbps} kbps") {
+            Hint(if (hasAudio) audioHint(s).text() else stringResource(R.string.export_audio_hint_silent))
+            Field(stringResource(R.string.export_codec)) { Segments(audioCodecChoices(s.container, hasEncoder), a.codec, { it.label }, onReason) { onChange(s.copy(audio = a.copy(codec = it))) } }
+            Field(stringResource(R.string.export_bit_rate), "${a.bitrateKbps} kbps") {
                 Segments(bitrateChoices(null), a.bitrateKbps, { "$it" }, onReason) { onChange(s.copy(audio = a.copy(bitrateKbps = it))) }
             }
-            Field("Sample Rate") {
-                Segments(sampleRateChoices(if (a.codec == AudioCodec.Opus) "Opus" else null), a.effectiveRate, ::khz, onReason) { onChange(s.copy(audio = a.copy(sampleRate = it))) }
+            Field(stringResource(R.string.export_sample_rate)) {
+                Segments(sampleRateChoices(if (a.codec == AudioCodec.Opus) AudioCodec.Opus.label else null), a.effectiveRate, { khz(it) }, onReason) { onChange(s.copy(audio = a.copy(sampleRate = it))) }
             }
-            Field("Channels") { Segments(listOf(Choice(2), Choice(1)), a.channels, ::channelsLabel, onReason) { onChange(s.copy(audio = a.copy(channels = it))) } }
+            Field(stringResource(R.string.export_channels)) { Segments(listOf(Choice(2), Choice(1)), a.channels, { channelsLabel(it).text() }, onReason) { onChange(s.copy(audio = a.copy(channels = it))) } }
         }
     }
 }
@@ -713,26 +717,26 @@ private fun AudioSettingsPage(
 @Composable
 private fun AudioOnlyPage(
     s: ExportSettings, hasEncoder: (String) -> Boolean, info: @Composable () -> Unit, bar: @Composable () -> Unit,
-    onChange: (ExportSettings) -> Unit, onReason: (String) -> Unit, onBack: () -> Unit,
+    onChange: (ExportSettings) -> Unit, onReason: (UiText) -> Unit, onBack: () -> Unit,
 ) {
     val a = s.audio
     val f = s.audioFormat
-    PageFrame("Audio Only", onBack) {
+    PageFrame(stringResource(R.string.export_kind_audio_only), onBack) {
         info()
         ScrollArea(Modifier.weight(1f).fillMaxWidth(), Am.SheetBg, PaddingValues(start = 15.dp, end = 15.dp, top = 16.dp, bottom = 20.dp), GroupGap) {
-            Field("Format") {
+            Field(stringResource(R.string.export_format)) {
                 audioFormatChoices(hasEncoder).chunked(3).forEach { row ->
-                    Segments(row, f, { it.label }, onReason) { onChange(s.copy(audioFormat = it)) }
+                    Segments(row, f, { stringResource(it.label) }, onReason) { onChange(s.copy(audioFormat = it)) }
                 }
             }
-            Field("Bit Rate", if (f.lossless) "Lossless" else "${a.bitrateKbps} kbps") {
+            Field(stringResource(R.string.export_bit_rate), if (f.lossless) stringResource(R.string.export_lossless) else "${a.bitrateKbps} kbps") {
                 Segments(bitrateChoices(f), if (f.lossless) -1 else a.bitrateKbps, { "$it" }, onReason) { onChange(s.copy(audio = a.copy(bitrateKbps = it))) }
             }
-            Field("Sample Rate") {
-                Segments(sampleRateChoices(if (f == AudioFormat.Ogg) f.label else null), audioRate(s), ::khz, onReason) { onChange(s.copy(audio = a.copy(sampleRate = it))) }
+            Field(stringResource(R.string.export_sample_rate)) {
+                Segments(sampleRateChoices(if (f == AudioFormat.Ogg) txt(f.label) else null), audioRate(s), { khz(it) }, onReason) { onChange(s.copy(audio = a.copy(sampleRate = it))) }
             }
-            Field("Channels") { Segments(listOf(Choice(2), Choice(1)), a.channels, ::channelsLabel, onReason) { onChange(s.copy(audio = a.copy(channels = it))) } }
-            Hint("Saved to Music / AbsentMotion. WAV and FLAC keep every detail; M4A, OGG and MP3 are smaller.")
+            Field(stringResource(R.string.export_channels)) { Segments(listOf(Choice(2), Choice(1)), a.channels, { channelsLabel(it).text() }, onReason) { onChange(s.copy(audio = a.copy(channels = it))) } }
+            Hint(stringResource(R.string.export_audio_only_hint))
         }
         bar()
     }
@@ -746,7 +750,7 @@ private fun WarningCard(title: String, text: String, use: String?, onUse: () -> 
             Text(title, color = Alert, fontSize = 15.sp, fontWeight = FontWeight.Bold, maxLines = 1)
             Text(text, Modifier.padding(top = 2.dp), color = Navy, fontSize = 14.sp, lineHeight = 19.sp)
             Row(Modifier.fillMaxWidth().height(44.dp), horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
-                if (onContinue != null) TextButton(onContinue) { Text("Continue anyway", color = ValueGrey, fontSize = 15.sp, maxLines = 1) }
+                if (onContinue != null) TextButton(onContinue) { Text(stringResource(R.string.export_continue_anyway), color = ValueGrey, fontSize = 15.sp, maxLines = 1) }
                 if (use != null) TextButton(onUse) { Text(use, color = Alert, fontSize = 15.sp, fontWeight = FontWeight.Bold, maxLines = 1) }
             }
         }
@@ -755,22 +759,23 @@ private fun WarningCard(title: String, text: String, use: String?, onUse: () -> 
 
 @Composable
 private fun Field(
-    title: String, value: String? = null, reason: String? = null, onReason: (String) -> Unit = {}, onHelp: (() -> Unit)? = null,
+    title: String, value: String? = null, reason: UiText? = null, onReason: (UiText) -> Unit = {}, onHelp: (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val dim = if (reason == null) 1f else Dimmed
+    val reasonText = reason?.text()
     Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(FieldGap)) {
         Row(Modifier.fillMaxWidth().height(28.dp).alpha(dim), verticalAlignment = Alignment.CenterVertically) {
             Text(title, color = Navy, fontSize = 17.sp, maxLines = 1)
             if (onHelp != null) Box(Modifier.size(32.dp).clickable(onClick = onHelp), contentAlignment = Alignment.Center) {
-                Icon(ExportIcons.Help, "What is $title?", Modifier.size(20.dp), tint = ValueGrey)
+                Icon(ExportIcons.Help, stringResource(R.string.export_what_is, title), Modifier.size(20.dp), tint = ValueGrey)
             }
             Spacer(Modifier.weight(1f))
             if (value != null) Text(value, color = ValueGrey, fontSize = 14.sp, maxLines = 1)
         }
         Box {
             Column(Modifier.fillMaxWidth().alpha(dim), verticalArrangement = Arrangement.spacedBy(FieldGap), content = content)
-            if (reason != null) Box(Modifier.matchParentSize().semantics { contentDescription = reason }.clickable { onReason(reason) })
+            if (reason != null && reasonText != null) Box(Modifier.matchParentSize().semantics { contentDescription = reasonText }.clickable { onReason(reason) })
         }
     }
 }
@@ -798,14 +803,15 @@ private fun NavRow(text: String, note: String?, onClick: () -> Unit) {
             Text(text, color = Navy, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
             if (note != null) Text(note, color = NoteGrey, fontSize = 12.sp, maxLines = 1)
         }
-        Icon(ExportIcons.ChevronRight, "Audio settings", Modifier.size(22.dp), tint = Am.HomeDim)
+        Icon(ExportIcons.ChevronRight, stringResource(R.string.export_audio_settings), Modifier.size(22.dp), tint = Am.HomeDim)
     }
 }
 
-private const val InterpolationHint = "Clips with a lower frame rate than the export are smoothed to match, for example 30 to 60 fps."
+private fun audioHint(s: ExportSettings): UiText =
+    txt(R.string.export_audio_hint, s.container.label, listed(audioCodecsFor(s.container).map { it.label }, R.string.export_list_or))
 
 @Composable
-private fun <T> Segments(options: List<Choice<T>>, selected: T, label: (T) -> String, onReason: (String) -> Unit, onPick: (T) -> Unit) {
+private fun <T> Segments(options: List<Choice<T>>, selected: T, label: @Composable (T) -> String, onReason: (UiText) -> Unit, onPick: (T) -> Unit) {
     val size = if (options.size > 4) 13.sp else 15.sp
     Row(Modifier.fillMaxWidth().height(42.dp).clip(RoundedCornerShape(4.dp)).background(Am.Card).padding(3.dp)) {
         options.forEach { c ->
@@ -848,36 +854,36 @@ private fun PointerInputScope.along(x: Float): Float {
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun OptionsPage(kind: ExportKind, scene: Scene, s: ExportSettings, onReason: (String) -> Unit, onHelp: () -> Unit, onChange: (ExportSettings) -> Unit) {
+private fun OptionsPage(kind: ExportKind, scene: Scene, s: ExportSettings, onReason: (UiText) -> Unit, onHelp: () -> Unit, onChange: (ExportSettings) -> Unit) {
     val rates = (if (kind == ExportKind.Gif) GifFrameRates else (VideoFrameRates + scene.fps)).distinct().sorted()
     val images = kind == ExportKind.Sequence || kind == ExportKind.FrameAs
     if (images) {
-        Chips("Format", if (kind == ExportKind.FrameAs) "${scene.width}x${scene.height}" else null) { ImageKind.entries.forEach { Chip(it.label, s.image == it) { onChange(s.copy(image = it)) } } }
-        Chips("Quality", reason = if (s.image.lossy) null else "${s.image.label} keeps every pixel exactly, so it has no quality setting.", onReason = onReason) {
+        Chips(stringResource(R.string.export_format), if (kind == ExportKind.FrameAs) "${scene.width}x${scene.height}" else null) { ImageKind.entries.forEach { Chip(stringResource(it.label), s.image == it) { onChange(s.copy(image = it)) } } }
+        Chips(stringResource(R.string.export_quality), reason = if (s.image.lossy) null else txt(R.string.export_reason_image_lossless, txt(s.image.label)), onReason = onReason) {
             ImageQualities.forEach { Chip("$it%", s.imageQuality == it) { onChange(s.copy(imageQuality = it)) } }
         }
     }
-    Chips("Transparent areas become", reason = if (images && s.image.alpha) "${s.image.label} keeps transparent areas, so nothing needs filling." else null, onReason = onReason) {
-        Chip("White", s.background == BackgroundWhite) { onChange(s.copy(background = BackgroundWhite)) }
-        Chip("Black", s.background == BackgroundBlack) { onChange(s.copy(background = BackgroundBlack)) }
+    Chips(stringResource(R.string.export_transparent_becomes), reason = if (images && s.image.alpha) txt(R.string.export_reason_image_alpha, txt(s.image.label)) else null, onReason = onReason) {
+        Chip(stringResource(R.string.export_white), s.background == BackgroundWhite) { onChange(s.copy(background = BackgroundWhite)) }
+        Chip(stringResource(R.string.export_black), s.background == BackgroundBlack) { onChange(s.copy(background = BackgroundBlack)) }
     }
     if (kind == ExportKind.FrameAs) return
     val (w, h) = exportSize(scene, s.shortSide, even = false)
-    Chips(if (kind == ExportKind.Gif) "Size" else "Resolution", "${w}x$h") {
+    Chips(stringResource(if (kind == ExportKind.Gif) R.string.export_size else R.string.export_resolution), "${w}x$h") {
         (if (kind == ExportKind.Gif) GifResolutions else VideoResolutions).forEach { Chip(it.label, s.shortSide == it.shortSide) { onChange(s.copy(shortSide = it.shortSide)) } }
     }
-    Chips("Frame Rate") { rates.forEach { Chip("${it}fps", s.fps == it) { onChange(s.copy(fps = it)) } } }
-    Field("Frame Interpolation", onHelp = onHelp) {
+    Chips(stringResource(R.string.export_frame_rate)) { rates.forEach { Chip("${it}fps", s.fps == it) { onChange(s.copy(fps = it)) } } }
+    Field(stringResource(R.string.export_interpolation), onHelp = onHelp) {
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            FrameInterpolation.entries.forEach { Chip(it.label, s.interpolation == it) { onChange(s.copy(interpolation = it)) } }
+            FrameInterpolation.entries.forEach { Chip(stringResource(it.label), s.interpolation == it) { onChange(s.copy(interpolation = it)) } }
         }
-        Hint(InterpolationHint)
+        Hint(stringResource(R.string.export_interpolation_hint))
     }
 }
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun Chips(label: String, value: String? = null, reason: String? = null, onReason: (String) -> Unit = {}, chips: @Composable () -> Unit) {
+private fun Chips(label: String, value: String? = null, reason: UiText? = null, onReason: (UiText) -> Unit = {}, chips: @Composable () -> Unit) {
     Field(label, value, reason, onReason) {
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { chips() }
     }
@@ -898,7 +904,13 @@ private fun BoxScope.RunningPanel(p: Phase.Running, progress: Float, heat: Therm
     val left = if (progress > 0.02f) ((System.nanoTime() - p.startNs) / 1e9 * (1 - progress) / progress).toInt() else null
     Column(Modifier.align(Alignment.Center).presence(), horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
-            when (p.kind) { ExportKind.Video -> "Exporting Video"; ExportKind.Audio -> "Exporting Audio"; ExportKind.Gif -> "Exporting GIF"; ExportKind.Sequence -> "Exporting Image Sequence"; else -> "Exporting" },
+            stringResource(when (p.kind) {
+                ExportKind.Video -> R.string.export_running_video
+                ExportKind.Audio -> R.string.export_running_audio
+                ExportKind.Gif -> R.string.export_running_gif
+                ExportKind.Sequence -> R.string.export_running_sequence
+                else -> R.string.export_running
+            }),
             color = Am.OnScrim, fontSize = 18.sp, textAlign = TextAlign.Center,
         )
         Spacer(Modifier.height(15.dp))
@@ -911,12 +923,12 @@ private fun BoxScope.RunningPanel(p: Phase.Running, progress: Float, heat: Therm
             Text(left?.let { "%d:%02d".format(Locale.ROOT, it / 60, it % 60) } ?: "", color = Am.OnScrim, fontSize = 13.sp)
         }
         Box(Modifier.width(300.dp).height(96.dp).padding(top = 16.dp), contentAlignment = Alignment.TopCenter) {
-            exportHeatText(heat)?.let { Text(it, color = Am.OnNavyAccent, fontSize = 21.sp, lineHeight = 27.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, maxLines = 3) }
+            exportHeatText(heat)?.let { Text(it.text(), color = Am.OnNavyAccent, fontSize = 21.sp, lineHeight = 27.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, maxLines = 3) }
         }
-        TextButton(onCancel) { Text("Cancel", color = Am.OnNavyAccent, fontSize = 17.sp) }
+        TextButton(onCancel) { Text(stringResource(R.string.cancel), color = Am.OnNavyAccent, fontSize = 17.sp) }
     }
     Text(
-        "Keep AbsentMotion open and your screen on until the export has finished.",
+        stringResource(R.string.keep_absentmotion_open_and_your_screen),
         Modifier.align(Alignment.BottomCenter).navigationBarsPadding().padding(horizontal = 30.dp, vertical = 30.dp),
         color = Am.OnScrim, fontSize = 12.sp, textAlign = TextAlign.Center,
     )

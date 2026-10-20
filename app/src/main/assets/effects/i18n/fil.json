@@ -9,7 +9,7 @@
   "move": "Galaw",
   "new": "Bago",
   "noise": "Ingay",
-  "repeat": "Ulitin",
+  "repeat": "Pag-uulit",
   "stylize": "I-istilo",
   "text": "Teksto"
  },
@@ -670,6 +670,9 @@
       "1 000.5"
      ]
     }
+   },
+   "presets": {
+    "count-up": "Bilang pataas"
    }
   },
   "cross": {
@@ -3134,7 +3137,7 @@
   },
   "repeat": {
    "description": "Dynamic na gumagawa ng maraming kopya ng layer.",
-   "name": "Ulitin",
+   "name": "Pag-uulit",
    "params": {
     "alpha": {
      "label": "Alpha"
@@ -3993,6 +3996,12 @@
       "Linya"
      ]
     }
+   },
+   "presets": {
+    "fade-in-by-word": "Fade in bawat salita",
+    "pop-in": "Pop in",
+    "slide-up-by-letter": "Slide pataas bawat letra",
+    "typewriter": "Makinilya"
    }
   },
   "textrandomizer": {
@@ -4035,6 +4044,9 @@
     "speed": {
      "label": "Bilis"
     }
+   },
+   "presets": {
+    "scramble": "Guluhin"
    }
   },
   "texttransform": {
@@ -4093,6 +4105,10 @@
       "Linya"
      ]
     }
+   },
+   "presets": {
+    "spin-cascade": "Sunod-sunod na ikot",
+    "wave": "Alon"
    }
   },
   "threshold": {

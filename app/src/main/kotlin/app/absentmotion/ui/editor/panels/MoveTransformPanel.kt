@@ -405,7 +405,7 @@ private const val DEGREES_PER_DP = 0.25f
 private fun TiltTab(state: EditorState, layer: Layer) {
     var active by remember { mutableIntStateOf(0) }
     val tilt = layer.tilt
-    val labels = listOf("X ROTATION", "Y ROTATION")
+    val labels = listOf(stringResource(R.string.tilt_x_rotation), stringResource(R.string.tilt_y_rotation))
     fun openKeypad(which: Int) {
         active = which
         state.keypad = KeypadRequest(labels.mapIndexed { i, label -> KeypadField(label, tilt[i]) }, which) { v -> state.editSelected { it.withTilt(v[0], v[1]) } }

@@ -74,6 +74,10 @@ import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.roundToInt
 import kotlin.math.sin
+import androidx.compose.ui.res.stringResource
+import app.absentmotion.R
+import app.absentmotion.i18n.UiText
+import app.absentmotion.i18n.text
 
 private val TileShape = RoundedCornerShape(6.dp)
 
@@ -88,7 +92,7 @@ internal fun TransitionButton(state: EditorState, modifier: Modifier) {
                 Modifier.size(47.dp).pressScale(press).shadow(4.dp, CircleShape).background(Am.Panel, CircleShape).border(1.8.dp, Am.OnDark, CircleShape),
                 contentAlignment = Alignment.Center,
             ) {
-                Icon(ChromeIcons.Transition, "Transition", Modifier.size(22.dp), tint = Am.OnDark)
+                Icon(ChromeIcons.Transition, stringResource(R.string.transition_title), Modifier.size(22.dp), tint = Am.OnDark)
             }
         }
     }
@@ -100,22 +104,23 @@ internal fun TransitionSheet(state: EditorState, aId: Long, bId: Long, onClose: 
     val record = state.scene.layer(bId)?.motion(MotionSlot.In)?.takeIf { it.transition && it.partner == aId }
     val current = TransitionKind.of(record?.id)
     var ms by remember { mutableIntStateOf(record?.ms ?: 500) }
-    var note by remember { mutableStateOf("") }
+    var note by remember { mutableStateOf<UiText?>(null) }
     val clock = rememberClock()
     fun apply(kind: TransitionKind?, key: Any? = null) {
-        var told: String? = null
+        var told: UiText? = null
         state.edit(key) { s -> s.withTransition(aId, bId, kind, ms).also { told = it.note }.scene }
-        note = told.orEmpty()
+        note = told
     }
-    val names = listOf(aId, bId).map { id -> state.scene.layer(id)?.label?.ifEmpty { null } ?: "Clip" }
-    MotionSheet("Transition", onClose) {
+    val clip = stringResource(R.string.transition_clip)
+    val names = listOf(aId, bId).map { id -> state.scene.layer(id)?.label?.ifEmpty { null } ?: clip }
+    MotionSheet(stringResource(R.string.transition_title), onClose) {
         Text("${names[0]}  →  ${names[1]}", Modifier.fillMaxWidth().height(24.dp), color = Am.OnDarkDim, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
         TileGrid(listOf<TransitionKind?>(null) + TransitionKind.entries) { kind, modifier ->
-            if (kind == null) Tile("None", current == null, modifier, { apply(null) }, null)
-            else Tile(kind.label, kind == current, modifier, { apply(kind) }) { drawTransition(kind, clock.value) }
+            if (kind == null) Tile(stringResource(R.string.none), current == null, modifier, { apply(null) }, null)
+            else Tile(stringResource(kind.label), kind == current, modifier, { apply(kind) }) { drawTransition(kind, clock.value) }
         }
         DurationLine(ms, MOTION_MIN_MS, MOTION_MAX_MS, { ms = it; if (current != null) apply(current, "transition-duration") }, state::endGesture)
-        Text(note, Modifier.fillMaxWidth().height(40.dp), color = Warning, fontSize = 13.sp, lineHeight = 17.sp, maxLines = 2)
+        Text(note?.text().orEmpty(), Modifier.fillMaxWidth().height(40.dp), color = Warning, fontSize = 13.sp, lineHeight = 17.sp, maxLines = 2)
     }
 }
 
@@ -130,20 +135,20 @@ internal fun AnimationSheet(state: EditorState, id: Long, onClose: () -> Unit) {
     var ms by remember(tab) { mutableIntStateOf(record?.takeUnless { it.transition }?.ms ?: if (loop) 1000 else 500) }
     val clock = rememberClock()
     fun apply(motionId: String?, key: Any? = null) = state.edit(key) { it.withAnimation(id, slot, motionId, ms) }
-    MotionSheet("Animations", onClose) {
+    MotionSheet(stringResource(R.string.animation_title), onClose) {
         Row(Modifier.fillMaxWidth().height(40.dp), verticalAlignment = Alignment.CenterVertically) {
-            Choices(listOf("In", "Out", "Loop"), tab) { tab = it }
+            Choices(listOf(stringResource(R.string.animation_in), stringResource(R.string.animation_out), stringResource(R.string.animation_loop)), tab) { tab = it }
         }
         val ids = if (loop) Animations.Loops else Animations.InOut.map { it.id to it.label }
-        TileGrid(listOf<Pair<String, String>?>(null) + ids) { item, modifier ->
-            if (item == null) Tile("None", record == null, modifier, { apply(null) }, null)
-            else Tile(item.second, item.first == chosen, modifier, { apply(item.first) }) {
+        TileGrid(listOf<Pair<String, Int>?>(null) + ids) { item, modifier ->
+            if (item == null) Tile(stringResource(R.string.none), record == null, modifier, { apply(null) }, null)
+            else Tile(stringResource(item.second), item.first == chosen, modifier, { apply(item.first) }) {
                 if (loop) drawLoop(item.first, clock.value) else drawAnimation(Animations.find(item.first)!!, slot == MotionSlot.In, clock.value)
             }
         }
         DurationLine(ms, if (loop) LOOP_MIN_MS else MOTION_MIN_MS, if (loop) LOOP_MAX_MS else MOTION_MAX_MS,
             { ms = it; if (chosen != null) apply(chosen, "animation-duration") }, state::endGesture)
-        val note = if (record?.transition == true) "This end of the clip has a transition. Picking an animation replaces it." else ""
+        val note = if (record?.transition == true) stringResource(R.string.animation_replaces_transition) else ""
         Text(note, Modifier.fillMaxWidth().height(40.dp), color = Am.OnDarkDim, fontSize = 13.sp, lineHeight = 17.sp, maxLines = 2)
     }
 }
@@ -156,7 +161,7 @@ private fun MotionSheet(title: String, onClose: () -> Unit, content: @Composable
                 Column(Modifier.fillMaxWidth().clip(SheetShape).background(Am.Panel).clickable(interactionSource = null, indication = null) {}.padding(horizontal = 16.dp)) {
                     Row(Modifier.fillMaxWidth().height(48.dp), verticalAlignment = Alignment.CenterVertically) {
                         Text(title, Modifier.weight(1f), color = Am.OnDark, fontSize = 17.sp, fontWeight = FontWeight.Bold)
-                        BarButton(ChromeIcons.Close, "Close", Modifier.size(40.dp), onClick = onClose)
+                        BarButton(ChromeIcons.Close, stringResource(R.string.action_close), Modifier.size(40.dp), onClick = onClose)
                     }
                     content()
                 }
@@ -191,7 +196,7 @@ private fun Tile(label: String, chosen: Boolean, modifier: Modifier, onClick: ()
 
 @Composable
 private fun DurationLine(ms: Int, min: Int, max: Int, onChange: (Int) -> Unit, onDone: () -> Unit) {
-    Line("Duration") {
+    Line(stringResource(R.string.mediainfo_duration)) {
         ThinSlider(ms.toFloat(), { v -> ((v / 100f).roundToInt() * 100).coerceIn(min, max).takeIf { it != ms }?.let(onChange) }, Modifier.width(180.dp),
             valueRange = min.toFloat()..max.toFloat(), onValueChangeFinished = onDone, inactive = Am.Field)
         Text(String.format(Locale.US, "%.1f s", ms / 1000f), Modifier.width(48.dp), color = Am.OnDark, fontSize = 14.sp, maxLines = 1,

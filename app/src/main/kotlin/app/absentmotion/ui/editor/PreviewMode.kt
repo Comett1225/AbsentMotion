@@ -40,6 +40,7 @@ import app.absentmotion.editor.MultiSelect
 import app.absentmotion.library.PreviewQuality
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.ui.theme.Am
+import app.absentmotion.R
 
 private val PanelBg = Color(0xFF333750)
 private val ZoomBg = Color(0xFF191B27)
@@ -61,7 +62,7 @@ internal fun PreviewModePanel(state: EditorState, modifier: Modifier = Modifier)
         }
         val fullBlur = state.settings.fullMotionBlur
         ModeCell(cell, true, { state.settings.fullMotionBlur = !fullBlur }) {
-            Text(if (fullBlur) "Full\nBlur" else "Fast\nBlur", color = if (fullBlur) Am.Accent else Color.White, fontSize = 10.sp,
+            Text(stringResource(if (fullBlur) R.string.preview_full_blur else R.string.preview_fast_blur), color = if (fullBlur) Am.Accent else Color.White, fontSize = 10.sp,
                 lineHeight = 11.sp, maxLines = 2, textAlign = TextAlign.Center)
         }
         ZoomBlock(state)

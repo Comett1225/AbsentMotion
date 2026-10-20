@@ -68,6 +68,7 @@ fun EffectCatalog.translated(json: JSONObject): EffectCatalog {
 
 private fun EffectDefinition.translated(json: JSONObject): EffectDefinition {
     val params = json.optJSONObject("params") ?: JSONObject()
+    val presetNames = json.optJSONObject("presets") ?: JSONObject()
     return copy(
         name = json.optString("name").ifBlank { name },
         description = json.optString("description").ifBlank { description },
@@ -79,5 +80,6 @@ private fun EffectDefinition.translated(json: JSONObject): EffectDefinition {
                 options = if (options != null && options.size == p.options.size && options.none { it.isBlank() }) options else p.options,
             )
         },
+        presets = presets.map { it.copy(name = presetNames.optString(it.slug).ifBlank { it.name }) },
     )
 }

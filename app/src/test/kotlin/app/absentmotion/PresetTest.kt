@@ -106,7 +106,7 @@ class PresetTest {
         val project = Scene.create("p", 1080, 1920, 60, 0)
         val layer = shape(0, 1000, XmlNode("shadow")).let { it.copy(node = it.node.with("label", null).with("parent", null)) }
         val dir = File.createTempFile("presets", "").apply { delete(); mkdirs() }
-        val id = PresetStore(dir).save(presetScene(project, layer, presetTitle(layer, listOf("Preset 1"))))
+        val id = PresetStore(dir).save(presetScene(project, layer, presetTitle(layer, listOf("Preset 1")) { "Preset $it" }))
         val file = parse(File(dir, "$id.xml"))
         assertEquals("preset", file["type"])
         assertEquals("Preset 2", file["title"])

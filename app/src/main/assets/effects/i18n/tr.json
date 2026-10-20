@@ -670,6 +670,9 @@
       "1 000.5"
      ]
     }
+   },
+   "presets": {
+    "count-up": "Yukarı sayma"
    }
   },
   "cross": {
@@ -3134,7 +3137,7 @@
   },
   "repeat": {
    "description": "Katmanın birden çok kopyasını dinamik olarak oluşturur.",
-   "name": "Tekrarla",
+   "name": "Tekrar",
    "params": {
     "alpha": {
      "label": "Alfa"
@@ -3993,6 +3996,12 @@
       "Satır"
      ]
     }
+   },
+   "presets": {
+    "fade-in-by-word": "Kelime kelime belirme",
+    "pop-in": "İçeri patlama",
+    "slide-up-by-letter": "Harf harf yukarı kayma",
+    "typewriter": "Daktilo"
    }
   },
   "textrandomizer": {
@@ -4035,6 +4044,9 @@
     "speed": {
      "label": "Hız"
     }
+   },
+   "presets": {
+    "scramble": "Karıştırma"
    }
   },
   "texttransform": {
@@ -4093,6 +4105,10 @@
       "Satır"
      ]
     }
+   },
+   "presets": {
+    "spin-cascade": "Sıralı Dönüş",
+    "wave": "Dalga"
    }
   },
   "threshold": {

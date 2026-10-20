@@ -1,5 +1,9 @@
 package app.absentmotion.model
 
+import androidx.annotation.StringRes
+import app.absentmotion.R
+import app.absentmotion.i18n.UiText
+import app.absentmotion.i18n.txt
 import java.util.Locale
 import kotlin.math.abs
 import kotlin.math.max
@@ -29,7 +33,7 @@ class Look(val prop: String, val away: (rest: FloatArray, w: Float, h: Float, si
 
 class Fx(val id: String, val keyed: Map<String, Pair<Float, Float>>, val fixed: Map<String, String> = emptyMap())
 
-class Motion(val id: String, val label: String, val ease: Easing, val looks: List<Look> = emptyList(), val fx: List<Fx> = emptyList()) {
+class Motion(val id: String, @StringRes val label: Int, val ease: Easing, val looks: List<Look> = emptyList(), val fx: List<Fx> = emptyList()) {
     fun curve(inSide: Boolean): Easing = if (inSide) ease else ease.reversed() ?: ease
 }
 
@@ -53,20 +57,22 @@ private val BlurFx = Fx("absent.blur", mapOf("strength" to (0f to 60f)))
 
 object Animations {
     val InOut: List<Motion> = listOf(
-        Motion("fade", "Fade", EaseOut, listOf(Fade)),
-        Motion("slide-left", "Slide left", EaseOut, listOf(slide(Dir.Left))),
-        Motion("slide-right", "Slide right", EaseOut, listOf(slide(Dir.Right))),
-        Motion("slide-up", "Slide up", EaseOut, listOf(slide(Dir.Up))),
-        Motion("slide-down", "Slide down", EaseOut, listOf(slide(Dir.Down))),
-        Motion("zoom-in", "Zoom in", EaseOut, listOf(scaled(0.4f, 1.8f), Fade)),
-        Motion("zoom-out", "Zoom out", EaseOut, listOf(scaled(1.8f, 0.4f), Fade)),
-        Motion("pop", "Pop", Overshoot, listOf(scaled(0.01f, 0.01f))),
-        Motion("bounce", "Bounce", Bouncy, listOf(Drop)),
-        Motion("spin", "Spin", EaseOut, listOf(turn(360f), scaled(0.3f, 0.3f), Fade)),
-        Motion("blur", "Blur", EaseOut, listOf(Fade), listOf(BlurFx)),
+        Motion("fade", R.string.motion_fade, EaseOut, listOf(Fade)),
+        Motion("slide-left", R.string.motion_slide_left, EaseOut, listOf(slide(Dir.Left))),
+        Motion("slide-right", R.string.motion_slide_right, EaseOut, listOf(slide(Dir.Right))),
+        Motion("slide-up", R.string.motion_slide_up, EaseOut, listOf(slide(Dir.Up))),
+        Motion("slide-down", R.string.motion_slide_down, EaseOut, listOf(slide(Dir.Down))),
+        Motion("zoom-in", R.string.motion_zoom_in, EaseOut, listOf(scaled(0.4f, 1.8f), Fade)),
+        Motion("zoom-out", R.string.motion_zoom_out, EaseOut, listOf(scaled(1.8f, 0.4f), Fade)),
+        Motion("pop", R.string.motion_pop, Overshoot, listOf(scaled(0.01f, 0.01f))),
+        Motion("bounce", R.string.motion_bounce, Bouncy, listOf(Drop)),
+        Motion("spin", R.string.motion_spin, EaseOut, listOf(turn(360f), scaled(0.3f, 0.3f), Fade)),
+        Motion("blur", R.string.motion_blur, EaseOut, listOf(Fade), listOf(BlurFx)),
     )
 
-    val Loops: List<Pair<String, String>> = listOf("pulse" to "Pulse", "wobble" to "Wobble", "float" to "Float", "rotate" to "Rotate")
+    val Loops: List<Pair<String, Int>> = listOf(
+        "pulse" to R.string.motion_pulse, "wobble" to R.string.motion_wobble, "float" to R.string.motion_float, "rotate" to R.string.motion_rotate,
+    )
 
     fun find(id: String?): Motion? = InOut.firstOrNull { it.id == id }
 
@@ -82,14 +88,17 @@ object Animations {
     }
 }
 
-enum class TransitionKind(val id: String, val label: String, val overlap: Boolean, val dir: Dir = Dir.Left) {
-    CrossDissolve("cross-dissolve", "Cross dissolve", true), DipBlack("dip-black", "Dip to black", false), DipWhite("dip-white", "Dip to white", false),
-    SlideLeft("slide-left", "Slide left", true, Dir.Left), SlideRight("slide-right", "Slide right", true, Dir.Right),
-    SlideUp("slide-up", "Slide up", true, Dir.Up), SlideDown("slide-down", "Slide down", true, Dir.Down),
-    PushLeft("push-left", "Push left", true, Dir.Left), PushRight("push-right", "Push right", true, Dir.Right),
-    PushUp("push-up", "Push up", true, Dir.Up), PushDown("push-down", "Push down", true, Dir.Down),
-    ZoomIn("zoom-in", "Zoom in", true), ZoomOut("zoom-out", "Zoom out", true), Spin("spin", "Spin", true), Blur("blur", "Blur", true),
-    WhipPan("whip-pan", "Whip pan", true), Glitch("glitch", "Glitch", false), Flash("flash", "Flash", false), Shake("shake", "Shake", false);
+enum class TransitionKind(val id: String, @StringRes val label: Int, val overlap: Boolean, val dir: Dir = Dir.Left) {
+    CrossDissolve("cross-dissolve", R.string.transition_cross_dissolve, true), DipBlack("dip-black", R.string.transition_dip_black, false),
+    DipWhite("dip-white", R.string.transition_dip_white, false),
+    SlideLeft("slide-left", R.string.motion_slide_left, true, Dir.Left), SlideRight("slide-right", R.string.motion_slide_right, true, Dir.Right),
+    SlideUp("slide-up", R.string.motion_slide_up, true, Dir.Up), SlideDown("slide-down", R.string.motion_slide_down, true, Dir.Down),
+    PushLeft("push-left", R.string.transition_push_left, true, Dir.Left), PushRight("push-right", R.string.transition_push_right, true, Dir.Right),
+    PushUp("push-up", R.string.transition_push_up, true, Dir.Up), PushDown("push-down", R.string.transition_push_down, true, Dir.Down),
+    ZoomIn("zoom-in", R.string.motion_zoom_in, true), ZoomOut("zoom-out", R.string.motion_zoom_out, true), Spin("spin", R.string.motion_spin, true),
+    Blur("blur", R.string.motion_blur, true),
+    WhipPan("whip-pan", R.string.transition_whip_pan, true), Glitch("glitch", R.string.transition_glitch, false), Flash("flash", R.string.transition_flash, false),
+    Shake("shake", R.string.transition_shake, false);
 
     fun sides(bOnTop: Boolean, bothFade: Boolean): Pair<Motion, Motion> {
         val fadeA = if (!bOnTop || bothFade) listOf(Fade) else emptyList()
@@ -243,7 +252,7 @@ fun Scene.cutAt(timeMs: Int): Pair<Layer, Layer>? {
     return best
 }
 
-data class TransitionResult(val scene: Scene, val note: String? = null)
+data class TransitionResult(val scene: Scene, val note: UiText? = null)
 
 private fun seconds(ms: Int) = String.format(Locale.US, "%.1f s", ms / 1000f)
 
@@ -299,8 +308,8 @@ fun Scene.withTransition(aId: Long, bId: Long, kind: TransitionKind?, ms: Int): 
     val next = s.update(aId) { outA.copy(node = outA.node.with(MotionSlot.Out.attr, MotionRecord(true, kind.id, wanted, extA, 0, bId).toString())) }
         .update(bId) { inB.copy(node = inB.node.with(MotionSlot.In.attr, MotionRecord(true, kind.id, wanted, extB, shift, aId).toString())) }
     val notes = listOfNotNull(
-        if (shift > 0) "Moved “${b.label.ifEmpty { "the second clip" }}” ${seconds(shift)} earlier so the clips overlap" else null,
-        if (d < wanted) "Shortened to ${seconds(d)} to fit the clips" else null,
+        if (shift > 0) txt(R.string.transition_moved, b.label.ifEmpty { null } ?: txt(R.string.transition_second_clip), seconds(shift)) else null,
+        if (d < wanted) txt(R.string.transition_shortened, seconds(d)) else null,
     )
-    return TransitionResult(next, notes.joinToString(". ").ifEmpty { null })
+    return TransitionResult(next, notes.takeIf { it.isNotEmpty() }?.let { txt(R.string.library_text_value, it) })
 }

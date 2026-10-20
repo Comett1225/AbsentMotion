@@ -66,7 +66,7 @@ fun EditorState.addNull() = addAndSelect(
 fun EditorState.addModel(uri: String, name: String) {
     fun value(name: String, v: Float) = XmlNode("property", mapOf("name" to name, "type" to "float", "value" to formatFloats(floatArrayOf(v))))
     addAndSelect(
-        XmlNode("model", newLayerAttrs(name.substringBeforeLast('.').ifBlank { numbered("Model") }) + ("src" to uri), listOf(
+        XmlNode("model", newLayerAttrs(name.substringBeforeLast('.').ifBlank { numbered(AppText.get(R.string.model_layer_model)) }) + ("src" to uri), listOf(
             XmlNode("transform", children = listOf(XmlNode("location", mapOf("value" to formatFloats(floatArrayOf(scene.width / 2f, scene.height / 2f, 0f)))))),
             value("size", min(scene.width, scene.height) * 0.3f), value("lightAngle", 135f), value("ambient", 0.35f), value("intensity", 1f), value("spin", 0f),
         )),

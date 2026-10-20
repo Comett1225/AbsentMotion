@@ -113,7 +113,7 @@ fun SettingsDrawer(settings: AppSettings, onRestored: () -> Unit = {}) {
                 Spacer(Modifier.height(10.dp))
                 Choices(PreviewQuality.entries.map { it.label }, settings.previewQuality.ordinal) { settings.previewQuality = PreviewQuality.entries[it] }
                 Spacer(Modifier.height(8.dp))
-                SwitchRow("Use preview copies of large videos", settings.previewCopies, enabled = true) { settings.previewCopies = it }
+                SwitchRow(stringResource(R.string.settings_preview_copies), settings.previewCopies, enabled = true) { settings.previewCopies = it }
             }
             PreviewCopiesRow()
             Spacer(Modifier.height(15.dp))
@@ -147,7 +147,7 @@ private fun PreviewCopiesRow() {
             .clickable { VideoProxies.clear(context) }.padding(start = 15.dp, end = 15.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text("Clear preview copies", Modifier.weight(1f), color = Am.HomeInk, fontSize = 13.sp)
+        Text(stringResource(R.string.settings_clear_preview_copies), Modifier.weight(1f), color = Am.HomeInk, fontSize = 13.sp)
         Text(fileSize(bytes), color = Am.HomeMid, fontSize = 13.sp)
     }
 }

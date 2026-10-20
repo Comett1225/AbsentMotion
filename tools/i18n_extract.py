@@ -208,6 +208,7 @@ def scan_effects():
             for o in p.get('options') if isinstance(p.get('options'), list) else []:
                 if isinstance(o, str):
                     rows.append({'line': 0, 'kind': 'param.option', 'text': o, 'rewrite': False})
+        rows += [{'line': 0, 'kind': 'preset.name', 'text': p['name'], 'rewrite': False} for p in data.get('presets', []) if isinstance(p.get('name'), str)]
         if rows:
             found[path] = rows
     return found

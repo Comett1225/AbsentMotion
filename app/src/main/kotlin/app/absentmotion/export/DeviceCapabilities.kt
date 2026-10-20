@@ -66,7 +66,7 @@ data class DeviceReport(val key: String, val encoders: List<EncoderCaps>, val pr
     val videoCodecs: List<Codec> get() = Codec.entries.filter { encodersFor(it.mime).isNotEmpty() }
 
     fun check(s: ExportSettings, width: Int, height: Int, hasAudio: Boolean = true): Support {
-        formatProblem(s, hasAudio)?.let { return Support.Unsupported(txt(R.string.library_text_value, it), s.fixedFormat()) }
+        formatProblem(s, hasAudio)?.let { return Support.Unsupported(it, s.fixedFormat()) }
         val all = encodersFor(s.codec.mime)
         if (all.isEmpty()) {
             return Support.Unsupported(txt(R.string.export_support_no_encoder, s.codec.label), alternative(s, width, height))
@@ -166,7 +166,7 @@ class DeviceCapabilities private constructor(context: Context) {
     }
 
     fun check(settings: ExportSettings, width: Int, height: Int, hasAudio: Boolean = true): Support =
-        state.value?.check(settings, width, height, hasAudio) ?: formatProblem(settings, hasAudio)?.let { Support.Unsupported(txt(R.string.library_text_value, it), settings.fixedFormat()) } ?: Support.Supported
+        state.value?.check(settings, width, height, hasAudio) ?: formatProblem(settings, hasAudio)?.let { Support.Unsupported(it, settings.fixedFormat()) } ?: Support.Supported
 
     fun check(settings: ExportSettings, scene: Scene, hasAudio: Boolean = true): Support =
         exportSize(scene, settings.shortSide, even = true).let { (w, h) -> check(settings, w, h, hasAudio) }

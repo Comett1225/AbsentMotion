@@ -29,6 +29,7 @@ class EffectTranslationTest {
                     assertTrue("${e.key}.${p.id} label: $hint", tp.optString("label").isNotBlank())
                     if (p.options.isNotEmpty()) assertEquals("${e.key}.${p.id} options: $hint", p.options.size, tp.optJSONArray("options")?.length())
                 }
+                for (preset in e.presets) assertTrue("${e.key} preset ${preset.slug}: $hint", t.optJSONObject("presets")?.optString(preset.slug).orEmpty().isNotBlank())
             }
             val names = json.getJSONObject("categories")
             for (key in EffectCatalog.Categories.keys + "new" + "ai") assertTrue("category $key: $hint", names.optString(key).isNotBlank())
@@ -54,5 +55,13 @@ class EffectTranslationTest {
             JSONObject().put("params", JSONObject().put(choice.second.id, JSONObject().put("options", org.json.JSONArray().put("only one")))))))
         assertEquals(choice.second.options, wrong.find(choice.first.id)!!.params.first { it.id == choice.second.id }.options)
         assertNotEquals(0, choice.second.options.size)
+    }
+
+    @Test fun presetNamesTranslateButKeepTheirThumbnails() {
+        val typing = english.find("absent.textprogress")!!
+        val local = english.translated(JSONObject("""{"effects":{"textprogress":{"presets":{"typewriter":"T"}}}}""")).find("absent.textprogress")!!
+        assertEquals(listOf("T") + typing.presets.drop(1).map { it.name }, local.presets.map { it.name })
+        assertEquals(typing.presets.map { typing.thumbnail(it) }, local.presets.map { local.thumbnail(it) })
+        assertEquals(typing.presets.map { it.keys }, local.presets.map { it.keys })
     }
 }
