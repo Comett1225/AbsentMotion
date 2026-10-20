@@ -46,6 +46,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import app.absentmotion.audio.audioDeclaration
 import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.addAudio
@@ -90,6 +92,7 @@ internal fun AudioTab(state: EditorState, modifier: Modifier, library: AddLibrar
     }
     val preview = remember { SoundPreview(context) }
     DisposableEffect(Unit) { onDispose { preview.stop() } }
+    LifecycleEventEffect(Lifecycle.Event.ON_STOP) { preview.stop() }
 
     Column(modifier) {
         SearchField(search, { search = it }, Modifier.padding(start = 6.dp, end = 6.dp, top = 6.dp).fillMaxWidth().height(32.dp), hint = stringResource(R.string.audiotab_search_hint))
