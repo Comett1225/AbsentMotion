@@ -160,6 +160,8 @@
     "blocknoise": {"photo": "landscape", "params": {"blockSize": 18}, "animate": 8},
     "bumpmap": {"photo": "detail", "params": {"height": 10}, "split": 0.4},
     "viewer360": {"photo": "landscape", "params": {"yaw": 20, "pitch": -10, "fov": 70}},
-    "reorient360": {"photo": "landscape", "params": {"yaw": 90, "pitch": 25}}
+    "reorient360": {"photo": "landscape", "params": {"yaw": 90, "pitch": 25}},
+    "contourlines": {"photo": "colour", "layout": "move", "params": {"blur": 40, "count": 3, "width": 3}},
+    "contourgradient": {"photo": "colour", "layout": "move", "params": {"blur": 50}}
   }
 }

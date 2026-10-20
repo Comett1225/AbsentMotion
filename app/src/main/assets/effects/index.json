@@ -60,6 +60,8 @@
  "softglow",
  "innerglow",
  "edgeglow",
+ "contourlines",
+ "contourgradient",
  "edgedetect",
  "emboss",
  "smoothbevel",
