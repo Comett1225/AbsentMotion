@@ -2,8 +2,12 @@ package app.absentmotion.ui.editor
 
 import app.absentmotion.model.Layer
 import app.absentmotion.model.Scene
+import app.absentmotion.model.SpeedRamp
+import app.absentmotion.model.VideoTiming
 import app.absentmotion.model.XmlNode
+import app.absentmotion.model.withSpeedRamp
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class TimelineMoveTest {
@@ -77,5 +81,46 @@ class TimelineMoveTest {
         val away = layer.movedTo(TimelineMath.movedStart(scene, layer, home + 40))
         assertEquals(layer.startTime, away.movedTo(TimelineMath.movedStart(scene, layer, home)).startTime)
         assertEquals(layer.endTime, away.movedTo(TimelineMath.movedStart(scene, layer, home)).endTime)
+    }
+
+    @Test fun aNearestEndTargetThatWouldStartBeforeZeroDoesNotHideAValidOne() {
+        assertEquals(MoveTarget(0, 30), move(-25f, setOf(29, 30), zoneMs = 40f))
+    }
+
+    @Test fun aZeroSnapZoneSnapsOnlyToAnExactEdge() {
+        assertEquals(MoveTarget(60, 60), move(2000f, setOf(60), zoneMs = 0f))
+        assertEquals(MoveTarget(60, null), move(2001f, setOf(60), zoneMs = 0f))
+    }
+
+    @Test fun everyTargetKeepsTheStartOnTheTimelineAndSnapsOnlyToAnEdgeOfTheClip() {
+        val targets = setOf(0, 5, 29, 30, 31, 60)
+        for (wanted in -2000..2500 step 3) {
+            val target = move(wanted.toFloat(), targets)
+            assertTrue("$wanted", target.frame >= 0)
+            assertTrue("$wanted", target.snap == null || target.snap == target.frame || target.snap == target.frame + 30)
+        }
+    }
+
+    @Test fun aClipWithAnOddLengthKeepsItsLengthOnEveryFrame() {
+        val layer = Layer(XmlNode("shape", mapOf("id" to "1", "startTime" to "500", "endTime" to "1733")))
+        val scene = sceneWith(layer.node)
+        for (frame in listOf(0, 3, 15, 50)) {
+            val moved = layer.movedTo(TimelineMath.movedStart(scene, layer, frame))
+            assertEquals(1233, moved.endTime - moved.startTime)
+            assertEquals(frame, scene.firstShownFrame(moved.startTime))
+        }
+    }
+
+    @Test fun aSpeedRampKeepsItsMediaPositionsWhenTheClipMoves() {
+        val clip = Layer(XmlNode("shape", linkedMapOf("id" to "1", "startTime" to "1000", "endTime" to "4999",
+            "fillType" to "media", "fillVideo" to "content://v", "inTime" to "500")))
+        val scene = sceneWith(clip.withSpeedRamp(SpeedRamp.Hero, ease = null).node)
+        val layer = scene.layers.single()
+        val moved = layer.movedTo(TimelineMath.movedStart(scene, layer, 40))
+        val shift = moved.startTime - layer.startTime
+        assertEquals(layer.keyframeTimes().map { it + shift }, moved.keyframeTimes())
+        for (offset in listOf(0, 250, 1500, 3999)) {
+            assertEquals(VideoTiming(layer).mediaMs(offset.toDouble()), VideoTiming(moved).mediaMs(offset.toDouble()), 1e-6)
+        }
     }
 }

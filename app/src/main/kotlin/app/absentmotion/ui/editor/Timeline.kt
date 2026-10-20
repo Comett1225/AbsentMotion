@@ -318,11 +318,9 @@ internal object TimelineMath {
     }
 
     fun moveTarget(wantedMs: Float, spanMs: Float, spanFrames: Int, targets: Collection<Int>, fps: Int, zoneMs: Float): MoveTarget {
-        val snapped = listOf(0f to 0, spanMs to spanFrames).mapNotNull { (offsetMs, offsetFrames) ->
-            snapFrame(wantedMs + offsetMs, targets, fps, zoneMs)?.let { hit ->
-                Triple(hit - offsetFrames, hit, abs(frameTimeMs(hit, fps) - wantedMs - offsetMs))
-            }
-        }.filter { it.first >= 0 }.minByOrNull { it.third }
+        val snapped = listOf(0f to 0, spanMs to spanFrames).flatMap { (offsetMs, offsetFrames) ->
+            targets.map { hit -> Triple(hit - offsetFrames, hit, abs(frameTimeMs(hit, fps) - wantedMs - offsetMs)) }
+        }.filter { it.first >= 0 && it.third <= zoneMs }.minByOrNull { it.third }
         return snapped?.let { MoveTarget(it.first, it.second) } ?: MoveTarget(nearestFrame(wantedMs, fps).coerceAtLeast(0), null)
     }
 
@@ -753,7 +751,6 @@ private class TimelineView(val state: EditorState, density: Density, private val
 
     private fun moveBegin(id: Long): Boolean {
         val layer = state.scene.layer(id) ?: return false
-        state.playing = false
         moveLayer = layer
         moveBase = state.scene
         moveId = id
@@ -771,6 +768,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
 
     private fun moveApply() {
         val original = moveLayer ?: return
+        state.playing = false
         val scene = state.scene
         val pxPerMs = timeScale().pxPerMs
         val wanted = original.startTime + moveDx / pxPerMs
