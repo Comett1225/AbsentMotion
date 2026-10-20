@@ -41,6 +41,20 @@ target_link_libraries(amengine PRIVATE
     -Wl,--gc-sections
     rnnoise absent_bg m vulkan android nativewindow jnigraphics EGL GLESv3 log)
 
+set(LAME_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../../third_party/lame)
+set(LAME_SOURCES bitstream encoder fft gain_analysis id3tag lame mpglib_interface newmdct presets psymodel quantize
+    quantize_pvt reservoir set_get tables takehiro util vbrquantize VbrTag version)
+list(TRANSFORM LAME_SOURCES PREPEND ${LAME_DIR}/libmp3lame/)
+list(TRANSFORM LAME_SOURCES APPEND .c)
+add_library(mp3lame SHARED ${LAME_SOURCES})
+target_include_directories(mp3lame PUBLIC ${LAME_DIR}/include PRIVATE ${LAME_DIR}/libmp3lame)
+target_compile_definitions(mp3lame PRIVATE NDEBUG STDC_HEADERS HAVE_STDINT_H HAVE_ERRNO_H HAVE_FCNTL_H ieee754_float32_t=float)
+target_compile_options(mp3lame PRIVATE -O2 -w)
+target_link_libraries(mp3lame PRIVATE m)
+add_library(lame_jni SHARED lame_jni.cpp)
+target_compile_options(lame_jni PRIVATE -O2 -fvisibility=hidden -Wall)
+target_link_libraries(lame_jni PRIVATE mp3lame)
+
 set(WHISPER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../../third_party/whisper.cpp)
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 set(WHISPER_BUILD_TESTS OFF CACHE BOOL "" FORCE)

@@ -6,7 +6,7 @@ import java.util.Locale
 import kotlin.math.pow
 import kotlin.math.roundToInt
 
-enum class ExportKind { Video, Package, Frame, FrameAs, Sequence, Gif, Xml }
+enum class ExportKind { Video, Package, Frame, FrameAs, Sequence, Gif, Xml, Audio }
 
 data class Resolution(val label: String, val shortSide: Int)
 
@@ -157,6 +157,8 @@ fun videoBitrate(width: Int, height: Int, s: ExportSettings): Int {
 
 const val AudioBitrate = 128_000
 
+fun audioRate(s: ExportSettings): Int = if (s.audioFormat == AudioFormat.Ogg) 48000 else s.audio.sampleRate
+
 fun audioBytesPerSecond(s: ExportSettings): Double = when (s.audioFormat) {
     AudioFormat.Wav16 -> s.audio.sampleRate * s.audio.channels * 2.0
     AudioFormat.Wav24 -> s.audio.sampleRate * s.audio.channels * 3.0
@@ -172,6 +174,7 @@ fun optionNote(kind: ExportKind, scene: Scene, s: ExportSettings): String? = whe
     ExportKind.Gif -> exportSize(scene, s.shortSide, false).let { "${it.first}x${it.second} ${s.fps}fps" }
     ExportKind.Package -> "Keeping Original Media"
     ExportKind.Xml -> "for workflow integrations"
+    ExportKind.Audio -> s.audioFormat.label + if (s.audioFormat.lossless) " ${audioRate(s) / 1000.0} kHz" else " ${s.audio.bitrateKbps} kbps"
     ExportKind.Frame -> null
     ExportKind.FrameAs -> s.image.label + if (s.image.lossy) " ${s.imageQuality}%" else ""
 }
@@ -190,6 +193,7 @@ fun estimateBytes(kind: ExportKind, scene: Scene, s: ExportSettings, hasAudio: B
         ExportKind.Frame -> (scene.width.toLong() * scene.height * ImageKind.Png.bytesPerPixel).toLong()
         ExportKind.FrameAs -> (scene.width.toLong() * scene.height * s.image.bytesPerPixel).toLong()
         ExportKind.Xml -> scene.toXml().length.toLong()
+        ExportKind.Audio -> (audioBytesPerSecond(s) * seconds).toLong() + 4096
         ExportKind.Package -> scene.toXml().length + scene.node.mediaUris().sumOf { (scene.media(it)?.size ?: 0).coerceAtLeast(0) }
     }
 }

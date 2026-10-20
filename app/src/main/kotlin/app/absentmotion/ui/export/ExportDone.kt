@@ -47,6 +47,7 @@ private fun shareLabel(kind: ExportKind) = when (kind) {
     ExportKind.Frame, ExportKind.FrameAs -> "Share Image"
     ExportKind.Xml -> "Share Project XML"
     ExportKind.Package -> "Share"
+    ExportKind.Audio -> "Share Audio"
 }
 
 @Composable

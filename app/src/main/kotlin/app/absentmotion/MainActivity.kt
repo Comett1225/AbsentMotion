@@ -495,7 +495,7 @@ class MainActivity : ComponentActivity() {
 
     private fun exportForTest(kindName: String, scene: Scene, frame: Int) {
         val kind = mapOf("video" to ExportKind.Video, "gif" to ExportKind.Gif, "frame" to ExportKind.Frame, "frameas" to ExportKind.FrameAs, "sequence" to ExportKind.Sequence,
-            "xml" to ExportKind.Xml, "package" to ExportKind.Package)[kindName] ?: run { Log.e("AMExport", "unknown kind $kindName"); return }
+            "xml" to ExportKind.Xml, "package" to ExportKind.Package, "audio" to ExportKind.Audio)[kindName] ?: run { Log.e("AMExport", "unknown kind $kindName"); return }
         var s = defaultSettings(kind, scene)
         intent.takeIf { it.hasExtra("short") }?.let { s = s.copy(shortSide = it.getIntExtra("short", s.shortSide)) }
         intent.takeIf { it.hasExtra("fps") }?.let { s = s.copy(fps = it.getIntExtra("fps", s.fps)) }
@@ -514,7 +514,7 @@ class MainActivity : ComponentActivity() {
         intent.takeIf { it.hasExtra("channels") }?.let { a = a.copy(channels = it.getIntExtra("channels", a.channels)) }
         s = s.copy(audio = a)
         val dir = getExternalFilesDir(null)!!
-        val ext = mapOf(ExportKind.Video to s.fixedFormat().container.ext, ExportKind.Gif to "gif", ExportKind.Frame to "png", ExportKind.FrameAs to s.image.ext, ExportKind.Xml to "xml", ExportKind.Package to "absproj")
+        val ext = mapOf(ExportKind.Video to s.fixedFormat().container.ext, ExportKind.Audio to s.audioFormat.ext, ExportKind.Gif to "gif", ExportKind.Frame to "png", ExportKind.FrameAs to s.image.ext, ExportKind.Xml to "xml", ExportKind.Package to "absproj")
         val name = if (kind == ExportKind.Sequence) "export.seq" else "export"
         lifecycleScope.launch {
             try {

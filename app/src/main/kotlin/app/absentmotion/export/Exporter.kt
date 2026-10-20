@@ -40,6 +40,16 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
                             }
                         }
                     }
+                    ExportKind.Audio -> {
+                        val mix = ExportAudio.mixFor?.invoke(scene, audioRate(s)) ?: error("This project has no sound to export.")
+                        try {
+                            viaCache(saved, name, s.audioFormat.ext, s.audioFormat.mime, "Music/$AppFolder") { out ->
+                                java.io.RandomAccessFile(out, "rw").use { file -> exportAudio(s, (scene.totalTime + 1) * 1000L, mix, file.fd, progress) }
+                            }
+                        } finally {
+                            (mix as? java.io.Closeable)?.close()
+                        }
+                    }
                     ExportKind.Gif -> viaCache(saved, name, "gif", "image/gif", "Pictures/$AppFolder") { out -> gif(scene, xml, s, out, progress) }
                     ExportKind.Frame, ExportKind.FrameAs -> {
                         val shape = if (kind == ExportKind.Frame) s.copy(image = ImageKind.Png) else s

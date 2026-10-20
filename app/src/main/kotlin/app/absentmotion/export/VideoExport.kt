@@ -27,6 +27,10 @@ import kotlin.concurrent.thread
 
 typealias AudioMix = (startUs: Long, endUs: Long) -> ShortArray
 
+interface FloatMix {
+    fun floats(startUs: Long, endUs: Long): FloatArray
+}
+
 object VideoExportPath {
     @Volatile var forceBuffers = false
 }
@@ -193,7 +197,7 @@ internal fun drain(codec: MediaCodec, mux: Mux, stop: AtomicBoolean, ptsShift: L
 }
 
 internal fun feedAudio(codec: MediaCodec, mix: AudioMix, totalUs: Long, stop: AtomicBoolean, delay: AtomicInteger,
-                       rate: Int = ExportAudio.SAMPLE_RATE, channels: Int = ExportAudio.CHANNELS) {
+                       rate: Int = ExportAudio.SAMPLE_RATE, channels: Int = ExportAudio.CHANNELS, onFed: (Long) -> Unit = {}) {
     val totalFrames = totalUs * rate / 1_000_000
     var fed = 0L
     fun queue(flags: Int, pcm: ShortArray, from: Int): Int {
@@ -205,6 +209,7 @@ internal fun feedAudio(codec: MediaCodec, mix: AudioMix, totalUs: Long, stop: At
             if (n > 0) buffer.asShortBuffer().put(pcm, from, n)
             codec.queueInputBuffer(index, 0, n * 2, fed * 1_000_000 / rate, flags)
             fed += n / channels
+            onFed(fed)
             return n
         }
         return 0

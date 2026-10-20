@@ -337,6 +337,7 @@ private fun ExportKind.title() = when (this) {
     ExportKind.Sequence -> "Image Sequence"
     ExportKind.Gif -> "GIF"
     ExportKind.Xml -> "XML"
+    ExportKind.Audio -> "Audio"
 }
 
 private fun ExportKind.icon(): ImageVector? = when (this) {
@@ -346,6 +347,7 @@ private fun ExportKind.icon(): ImageVector? = when (this) {
     ExportKind.Sequence -> ExportIcons.Sequence
     ExportKind.Gif -> null
     ExportKind.Xml -> ExportIcons.Xml
+    ExportKind.Audio -> null
 }
 
 @Composable

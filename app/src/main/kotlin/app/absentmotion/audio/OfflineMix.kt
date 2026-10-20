@@ -4,6 +4,7 @@ import app.absentmotion.platform.Context
 import app.absentmotion.platform.Log
 import app.absentmotion.export.AudioMix
 import app.absentmotion.export.ExportAudio
+import app.absentmotion.export.FloatMix
 import app.absentmotion.model.Scene
 import java.io.Closeable
 import kotlin.math.min
@@ -14,7 +15,7 @@ internal class OfflineMix(
     makeFx: FxMaker = NativeFx::chain,
     master: ClipFx? = null,
     private val rate: Int = ExportAudio.SAMPLE_RATE,
-) : AudioMix, Closeable {
+) : AudioMix, FloatMix, Closeable {
     private val limiter: ClipFx = master ?: NativeFx.limiter(rate) ?: SafeLimiter(rate)
     private val sources = HashMap<Long, OfflineSource>()
     private val voices = HashMap<Long, Voice>()
@@ -23,17 +24,20 @@ internal class OfflineMix(
     private val block = FloatArray(BLOCK * 2)
     private var index = Long.MIN_VALUE
 
-    override fun invoke(startUs: Long, endUs: Long): ShortArray {
+    override fun invoke(startUs: Long, endUs: Long): ShortArray =
+        floats(startUs, endUs).let { mixed -> ShortArray(mixed.size) { (mixed[it] * 32767f).roundToInt().coerceIn(-32768, 32767).toShort() } }
+
+    override fun floats(startUs: Long, endUs: Long): FloatArray {
         val first = Math.round(startUs * rate / 1e6)
         val frames = (Math.round(endUs * rate / 1e6) - first).toInt()
-        val out = ShortArray(frames * 2)
+        val out = FloatArray(frames * 2)
         var f = first
         while (f < first + frames) {
             val i = Math.floorDiv(f, BLOCK.toLong())
             val mixed = blockAt(i)
             val offset = (f - i * BLOCK).toInt()
             val take = min(BLOCK - offset, (first + frames - f).toInt())
-            for (k in 0 until 2 * take) out[(2 * (f - first)).toInt() + k] = (mixed[2 * offset + k] * 32767f).roundToInt().coerceIn(-32768, 32767).toShort()
+            System.arraycopy(mixed, 2 * offset, out, (2 * (f - first)).toInt(), 2 * take)
             f += take
         }
         return out
