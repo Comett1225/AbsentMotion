@@ -321,7 +321,7 @@ class EngineThread(private val background: Int, context: Context? = null) {
 
     private fun rememberScene(xml: String?, timeMs: Int) {
         scene = xml
-        animatedText = xml?.let { it.contains(app.absentmotion.compat.ForeignEffectIds.TEXT_SPACING) && it.contains("<kf") } == true
+        animatedText = xml?.let(::animatesTextSpacing) == true
         textTime = timeMs
     }
 
@@ -533,6 +533,11 @@ class EngineThread(private val background: Int, context: Context? = null) {
         }
     }
 }
+
+private val spacingEffects = Regex("<effect\\b[^>]*\"${Regex.escape(app.absentmotion.compat.ForeignEffectIds.TEXT_SPACING)}\"[^>]*?(/>|>.*?</effect>)", RegexOption.DOT_MATCHES_ALL)
+
+internal fun animatesTextSpacing(xml: String): Boolean =
+    xml.contains(app.absentmotion.compat.ForeignEffectIds.TEXT_SPACING) && spacingEffects.findAll(xml).any { it.value.contains("<kf") }
 
 internal class PendingScene {
     private val next = AtomicReference<String?>(null)
