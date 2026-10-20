@@ -163,6 +163,9 @@ fun CameraScreen(aspect: Float, onClose: () -> Unit, onCaptured: (Uri, Boolean) 
     }
 }
 
+internal fun cameraBlocked(granted: Boolean, rationaleBefore: Boolean, rationaleAfter: Boolean, dialogShown: Boolean): Boolean =
+    !granted && !rationaleAfter && (rationaleBefore || !dialogShown)
+
 private fun Context.findActivity(): Activity? {
     var c: Context? = this
     while (c is ContextWrapper) {
@@ -179,11 +182,15 @@ private fun Permitted(onClose: () -> Unit, content: @Composable (mic: Boolean) -
     var camera by remember { mutableStateOf(has(Manifest.permission.CAMERA)) }
     var mic by remember { mutableStateOf(has(Manifest.permission.RECORD_AUDIO)) }
     var blocked by remember { mutableStateOf(false) }
+    var rationaleBefore by remember { mutableStateOf(false) }
+    var dialogShown by remember { mutableStateOf(false) }
+    fun rationale() = context.findActivity()?.shouldShowRequestPermissionRationale(Manifest.permission.CAMERA) == true
     val request = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
         camera = has(Manifest.permission.CAMERA)
         mic = has(Manifest.permission.RECORD_AUDIO)
-        blocked = !camera && context.findActivity()?.shouldShowRequestPermissionRationale(Manifest.permission.CAMERA) == false
+        blocked = cameraBlocked(camera, rationaleBefore, rationale(), dialogShown)
     }
+    LifecycleEventEffect(Lifecycle.Event.ON_PAUSE) { dialogShown = true }
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
         camera = has(Manifest.permission.CAMERA)
         mic = has(Manifest.permission.RECORD_AUDIO)
@@ -208,7 +215,11 @@ private fun Permitted(onClose: () -> Unit, content: @Composable (mic: Boolean) -
         Box(
             Modifier.height(48.dp).clip(RoundedCornerShape(24.dp)).background(Am.Accent).clickable {
                 if (blocked) context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", context.packageName, null)))
-                else request.launch(arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO))
+                else {
+                    rationaleBefore = rationale()
+                    dialogShown = false
+                    request.launch(arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO))
+                }
             }.padding(horizontal = 24.dp),
             Alignment.Center,
         ) { Text(stringResource(if (blocked) R.string.camera_open_settings else R.string.camera_allow), color = Am.OnAccent, fontSize = 16.sp, fontWeight = FontWeight.Medium) }

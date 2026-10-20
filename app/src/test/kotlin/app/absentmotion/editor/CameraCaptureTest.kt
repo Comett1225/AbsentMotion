@@ -4,8 +4,10 @@ import androidx.camera.core.AspectRatio
 import app.absentmotion.model.MediaDeclaration
 import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
+import app.absentmotion.ui.camera.cameraBlocked
 import app.absentmotion.ui.camera.cameraRatio
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -43,5 +45,14 @@ class CameraCaptureTest {
 
     @Test fun anEmptyCaptureMakesNoProject() {
         assertEquals(null, Scene.create("x", 100, 100, 30, 0).fromCapture(media(0, 0, 0, "image/jpeg"), false, 1080, 3))
+    }
+
+    @Test fun onlyARealSecondRefusalOrNoDialogAtAllSendsToSettings() {
+        assertFalse(cameraBlocked(granted = false, rationaleBefore = false, rationaleAfter = false, dialogShown = true))
+        assertFalse(cameraBlocked(granted = false, rationaleBefore = false, rationaleAfter = true, dialogShown = true))
+        assertFalse(cameraBlocked(granted = false, rationaleBefore = true, rationaleAfter = true, dialogShown = true))
+        assertTrue(cameraBlocked(granted = false, rationaleBefore = true, rationaleAfter = false, dialogShown = true))
+        assertTrue(cameraBlocked(granted = false, rationaleBefore = false, rationaleAfter = false, dialogShown = false))
+        assertFalse(cameraBlocked(granted = true, rationaleBefore = true, rationaleAfter = false, dialogShown = false))
     }
 }
