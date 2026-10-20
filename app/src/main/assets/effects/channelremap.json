@@ -1,0 +1,70 @@
+{
+ "id": "channelremap",
+ "name": "Channel Remap (RGB)",
+ "category": "color",
+ "since": "3.0.0",
+ "description": "Rebuilds each colour channel from another channel of the layer, for false colour or for moving luminance into alpha.",
+ "params": [
+  {
+   "id": "r",
+   "label": "R",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Red",
+    "Green",
+    "Blue",
+    "Alpha",
+    "Luminance",
+    "Zero",
+    "Full"
+   ]
+  },
+  {
+   "id": "g",
+   "label": "G",
+   "type": "choice",
+   "default": 1,
+   "options": [
+    "Red",
+    "Green",
+    "Blue",
+    "Alpha",
+    "Luminance",
+    "Zero",
+    "Full"
+   ]
+  },
+  {
+   "id": "b",
+   "label": "B",
+   "type": "choice",
+   "default": 2,
+   "options": [
+    "Red",
+    "Green",
+    "Blue",
+    "Alpha",
+    "Luminance",
+    "Zero",
+    "Full"
+   ]
+  },
+  {
+   "id": "a",
+   "label": "A",
+   "type": "choice",
+   "default": 3,
+   "options": [
+    "Red",
+    "Green",
+    "Blue",
+    "Alpha",
+    "Luminance",
+    "Zero",
+    "Full"
+   ]
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float r;\nuniform float g;\nuniform float b;\nuniform float a;\nfloat pick(float k, float4 c) {\n    if (k < 0.5) return c.r;\n    if (k < 1.5) return c.g;\n    if (k < 2.5) return c.b;\n    if (k < 3.5) return c.a;\n    if (k < 4.5) return dot(c.rgb, float3(0.2126, 0.7152, 0.0722));\n    if (k < 5.5) return 0.0;\n    return 1.0;\n}\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    float4 c = float4(src);\n    if (c.a > 0.0) c.rgb /= c.a;\n    float4 o = clamp(float4(pick(r, c), pick(g, c), pick(b, c), pick(a, c)), 0.0, 1.0);\n    return half4(half3(o.rgb) * half(o.a), half(o.a));\n}\n"
+}

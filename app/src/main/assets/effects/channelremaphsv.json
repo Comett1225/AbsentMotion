@@ -1,0 +1,70 @@
+{
+ "id": "channelremaphsv",
+ "name": "Channel Remap (HSV)",
+ "category": "color",
+ "since": "3.0.0",
+ "description": "Rebuilds hue, saturation, value and alpha from other channels of the layer.",
+ "params": [
+  {
+   "id": "h",
+   "label": "H",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Hue",
+    "Saturation",
+    "Value",
+    "Alpha",
+    "Luminance",
+    "Zero",
+    "Full"
+   ]
+  },
+  {
+   "id": "s",
+   "label": "S",
+   "type": "choice",
+   "default": 1,
+   "options": [
+    "Hue",
+    "Saturation",
+    "Value",
+    "Alpha",
+    "Luminance",
+    "Zero",
+    "Full"
+   ]
+  },
+  {
+   "id": "v",
+   "label": "V",
+   "type": "choice",
+   "default": 2,
+   "options": [
+    "Hue",
+    "Saturation",
+    "Value",
+    "Alpha",
+    "Luminance",
+    "Zero",
+    "Full"
+   ]
+  },
+  {
+   "id": "a",
+   "label": "A",
+   "type": "choice",
+   "default": 3,
+   "options": [
+    "Hue",
+    "Saturation",
+    "Value",
+    "Alpha",
+    "Luminance",
+    "Zero",
+    "Full"
+   ]
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float h;\nuniform float s;\nuniform float v;\nuniform float a;\nfloat3 toHsv(float3 c) {\n    float hi = max(c.r, max(c.g, c.b));\n    float lo = min(c.r, min(c.g, c.b));\n    float d = hi - lo;\n    float hue = 0.0;\n    if (d > 0.00001) {\n        if (hi == c.r) hue = mod((c.g - c.b) / d, 6.0);\n        else if (hi == c.g) hue = (c.b - c.r) / d + 2.0;\n        else hue = (c.r - c.g) / d + 4.0;\n    }\n    return float3(hue / 6.0, hi > 0.0 ? d / hi : 0.0, hi);\n}\nfloat3 toRgb(float3 c) {\n    float3 k = clamp(abs(mod(c.x * 6.0 + float3(0.0, 4.0, 2.0), 6.0) - 3.0) - 1.0, 0.0, 1.0);\n    return c.z * mix(float3(1.0), k, c.y);\n}\nfloat pick(float k, float4 hsva, float luma) {\n    if (k < 0.5) return hsva.x;\n    if (k < 1.5) return hsva.y;\n    if (k < 2.5) return hsva.z;\n    if (k < 3.5) return hsva.w;\n    if (k < 4.5) return luma;\n    if (k < 5.5) return 0.0;\n    return 1.0;\n}\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    float4 c = float4(src);\n    if (c.a > 0.0) c.rgb /= c.a;\n    float4 hsva = float4(toHsv(c.rgb), c.a);\n    float luma = dot(c.rgb, float3(0.2126, 0.7152, 0.0722));\n    float4 o = clamp(float4(pick(h, hsva, luma), pick(s, hsva, luma), pick(v, hsva, luma), pick(a, hsva, luma)), 0.0, 1.0);\n    return half4(half3(toRgb(o.xyz)) * half(o.w), half(o.w));\n}\n"
+}

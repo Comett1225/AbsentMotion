@@ -144,6 +144,11 @@
     "edgeglow": {"photo": "portrait", "params": {"blend": 0.6}},
     "darkglow": {"photo": "sunset", "params": {"blur": 40, "threshold": 0.35}, "split": 0.4},
     "smoothbevel": {"photo": "colour", "layout": "move", "params": {"blur": 30, "depth": 4, "intensity": 1}},
-    "radialrays": {"photo": "portrait", "params": {"center": [0.5, 0.35], "count": 14, "alpha": 0.7}}
+    "radialrays": {"photo": "portrait", "params": {"center": [0.5, 0.35], "count": 14, "alpha": 0.7}},
+    "radialwipe": {"photo": "landscape", "params": {"completion": [0, 1, 0], "feather": 10}, "animate": 16},
+    "mattechoker": {"photo": "colour", "layout": "move", "params": {"blur": 30, "amount": 0.85}},
+    "replacecolor": {"photo": "colour", "params": {"source": "#f0b000", "target": "#e0207a", "threshold": 0.6, "choke": 2}, "split": 0.4},
+    "channelremap": {"photo": "colour", "params": {"r": 2, "b": 0}, "split": 0.4},
+    "channelremaphsv": {"photo": "colour", "params": {"h": 4}, "split": 0.4}
   }
 }
