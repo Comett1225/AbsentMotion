@@ -203,7 +203,10 @@
     <string name="home_save_project_failed">Could not save the project. Free some storage space.</string>
     <string name="home_collect_unreadable_project">Could not read this project.</string>
     <string name="home_collect_already_kept">All media is already kept in the project.</string>
-    <string name="home_collect_could_not_read">%1$s could not be read; they may have been deleted.</string>
+    <plurals name="home_collect_could_not_read">
+        <item quantity="one">%1$s file could not be read; it may have been deleted.</item>
+        <item quantity="other">%1$s files could not be read; they may have been deleted.</item>
+    </plurals>
     <string name="home_collect_storage_full">Storage is full, so some files were not copied.</string>
     <string name="home_restore_edits_failed">Could not restore your edits. Free some storage space; you will be asked again next time.</string>
     <string name="home_restore_version_failed">Could not restore this version. Free some storage space.</string>
