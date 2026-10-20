@@ -32,6 +32,7 @@ fun LayerThumbnail(layer: Layer, engine: EngineThread, modifier: Modifier = Modi
     if (layer.mediaFill?.video == true) { VideoLayerThumbnail(layer, modifier); return }
     if (layer.kind == "audio") { androidx.compose.material3.Icon(AudioIcons.Note, layer.label, modifier, tint = Am.OnDark.copy(alpha = 0.8f)); return }
     if (layer.kind == "model") { androidx.compose.material3.Icon(PanelIcons.TabTilt, layer.label, modifier, tint = Am.OnDark.copy(alpha = 0.8f)); return }
+    if (layer.kind == "camera") { androidx.compose.material3.Icon(PanelIcons.Camera, layer.label, modifier, tint = Am.OnDark.copy(alpha = 0.8f)); return }
     val shape = XmlNode(layer.kind, layer.node.attrs.filterKeys { it in setOf("s", "fillType", "fillImage", "fillVideo", "mediaFillMode", "id", "size", "font", "wrapWidth", "align") }, layer.node.children.filter { it.name != "transform" && it.name != "fillColor" })
     ShapeIcon(shape, layer.fillColor or 0xFF000000.toInt(), layer.label, engine, modifier)
 }

@@ -96,6 +96,7 @@ internal val CardGap = 10.dp
 @Composable
 fun SettingsDrawer(settings: AppSettings, drawer: androidx.compose.material3.DrawerState, onRestored: () -> Unit = {}) {
     var about by remember { mutableStateOf(false) }
+    var crashLogs by remember { mutableStateOf(false) }
     var language by remember { mutableStateOf(false) }
     var demoNote by remember { mutableStateOf(false) }
     ModalDrawerSheet(
@@ -137,11 +138,12 @@ fun SettingsDrawer(settings: AppSettings, drawer: androidx.compose.material3.Dra
             Spacer(Modifier.height(CardGap))
             LinkRow(stringResource(R.string.settings_about)) { about = true }
             Spacer(Modifier.height(CardGap))
-            UpdateRows(settings)
+            UpdateRows(settings) { crashLogs = true }
         }
     }
     if (language) LanguageDialog { language = false }
     if (about) AboutScreen { about = false }
+    if (crashLogs) CrashLogsScreen { crashLogs = false }
     if (demoNote) AlertDialog(
         onDismissRequest = { demoNote = false },
         title = { Text(stringResource(R.string.demo_mode_is_on), color = Am.Navy) },
@@ -214,12 +216,14 @@ private fun Divider(inset: androidx.compose.ui.unit.Dp) {
 }
 
 @Composable
-private fun UpdateRows(settings: AppSettings) {
+private fun UpdateRows(settings: AppSettings, onCrashLogs: () -> Unit) {
     val context = LocalContext.current
     Column(Modifier.padding(horizontal = 6.dp).fillMaxWidth().clip(PanelShape).background(PanelColor)) {
+        ActionRow(stringResource(R.string.crash_logs), onClick = onCrashLogs)
+        Divider(10.dp)
         SwitchRow(stringResource(R.string.update_check_on_open), settings.autoUpdateCheck, enabled = true) { settings.chooseUpdates(it) }
         Divider(10.dp)
-        ActionRow(stringResource(R.string.update_check_now), busy = Updates.checking) { Updates.check(context, manual = true) }
+        ActionRow(stringResource(R.string.update_check_now), busy = Updates.checking) { Updates.check(context, settings, manual = true) }
     }
 }
 

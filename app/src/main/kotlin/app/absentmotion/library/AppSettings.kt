@@ -103,6 +103,18 @@ class AppSettings(private val context: Context) {
         prefs.edit().putBoolean("checkUpdates", on).putBoolean("updatesAsked", true).apply()
     }
 
+    private var newestVersionState by mutableStateOf(prefs.getString("newestVersion", null))
+    private var newestLinkState by mutableStateOf(prefs.getString("newestLink", null))
+
+    val newestVersion: String? get() = newestVersionState
+    val newestLink: String? get() = newestLinkState
+
+    fun rememberNewest(version: String, link: String) {
+        newestVersionState = version
+        newestLinkState = link
+        prefs.edit().putString("newestVersion", version).putString("newestLink", link).apply()
+    }
+
     var lastAutoBackup: Long
         get() = prefs.getLong("lastAutoBackup", 0L)
         set(value) { prefs.edit().putLong("lastAutoBackup", value).apply() }

@@ -140,13 +140,18 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier) {
             return@Column
         }
         if (state.selected?.kind == "camera") {
+            var moving by remember(state.selectedId) { mutableStateOf(false) }
+            if (moving) state.selectedId?.let { CameraMovesSheet(state, it) { moving = false } }
             Row(Modifier.fillMaxWidth().height(160.px), Arrangement.spacedBy(17.px)) {
                 ToolButton(CameraOptions, Modifier.weight(1f)) { state.panel = EditorPanel.Camera }
                 ToolButton(MoveTransform, Modifier.weight(1f)) { state.panel = EditorPanel.MoveTransform }
                 ToolButton(Effects, Modifier.weight(1f)) { state.effectIndex = -1; state.panel = EditorPanel.Effects }
             }
             Spacer(Modifier.height(17.px))
-            ToolButton(Presets, Modifier.fillMaxWidth().height(160.px)) { openPresets(state) }
+            Row(Modifier.fillMaxWidth().height(160.px), Arrangement.spacedBy(17.px)) {
+                ToolButton(Presets, Modifier.weight(1f)) { openPresets(state) }
+                ToolButton(CameraMoves, Modifier.weight(1f)) { state.playing = false; moving = true }
+            }
             return@Column
         }
         if (state.selected?.kind == "model") {
@@ -204,6 +209,7 @@ private val ElementPropsButton = Tool(R.string.asset_properties, PanelIcons.Edit
 private val EditPoints = Tool(R.string.layer_tool_edit_points, PanelIcons.EditShape, 16f)
 private val EditDrawing = Tool(R.string.layer_tool_edit_drawing, PanelIcons.EditShape, 16f)
 private val CameraOptions = Tool(R.string.layer_tool_camera_options, PanelIcons.Camera, 19.4f)
+private val CameraMoves = Tool(R.string.camera_moves, PanelIcons.Animate, 19.4f)
 private val ModelOptions = Tool(R.string.layer_tool_model_options, PanelIcons.TabTilt, 19.4f)
 private val Presets = Tool(R.string.presets, PanelIcons.Star, 19.4f)
 private val Effects = Tool(R.string.layer_tool_effects, PanelIcons.Effects, 19.6f)
@@ -255,7 +261,7 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
     var askDeleteSpeed by remember { mutableStateOf(false) }
     val named = panel != EditorPanel.EditShape && panel != EditorPanel.Camera && panel != EditorPanel.Model && !(move && tab == ROTATE_TAB && turn != null)
     val known = if (!named) null else when {
-        move -> TransformTargets[tab]
+        move -> if (selected.kind == "camera" && tab == SIZE_TAB) KeyTarget(app.absentmotion.model.CameraFov, "60.000000") else TransformTargets[tab]
         panel == EditorPanel.Speed -> KeyTarget(SpeedRef, layer.node["speed"] ?: "1")
         panel == EditorPanel.ColorFill && layer.fillType == "color" -> KeyTarget(PropRef.FillColor, formatColor(layer.fillColor))
         panel == EditorPanel.BorderShadow -> borderShadowTarget(layer)
@@ -313,7 +319,7 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
             Column(Modifier.width(168.px).fillMaxHeight()) {
                 val names = listOf(R.string.a11y_tab_move, R.string.panel_size, R.string.a11y_tab_rotate, R.string.a11y_tab_tilt, R.string.a11y_tab_skew)
                 listOf(PanelIcons.TabMove, PanelIcons.TabSize, PanelIcons.TabRotate, PanelIcons.TabTilt, PanelIcons.TabSkew).forEachIndexed { i, icon ->
-                    val usable = i == 0 || i == ROTATE_TAB || selected.kind != "camera"
+                    val usable = i <= ROTATE_TAB || selected.kind != "camera"
                     Box(Modifier.weight(1f).fillMaxWidth().then(if (usable) Modifier.clickable { tab = i } else Modifier.dimmed()).padding(start = 10.px, end = 11.px, top = 11.px, bottom = 11.px)) {
                         Box(
                             Modifier.fillMaxSize().clip(PanelShape).fadeBackground(tab == i, PanelDark),
@@ -336,6 +342,7 @@ internal val TransformTargets = listOf(
     KeyTarget(PropRef.Skew, "0.000000,0.000000"),
 )
 
+internal const val SIZE_TAB = 1
 internal const val ROTATE_TAB = 2
 internal const val TILT_TAB = 3
 

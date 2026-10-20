@@ -58,6 +58,7 @@ import app.absentmotion.editor.clearSelection
 import app.absentmotion.editor.MultiSelect
 import app.absentmotion.engine.PreviewView
 import app.absentmotion.model.withGradient
+import app.absentmotion.model.cameraGesture
 import app.absentmotion.model.gradient
 import app.absentmotion.model.PropRef
 import app.absentmotion.model.textAlign
@@ -150,7 +151,7 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier) {
                         if ((centre - down.position).getDistance() < 24.dp.toPx()) 9 else -1
                     } else if (startLayer != null && startQuad != null && state.panel == EditorPanel.ColorFill && startLayer.fillType == "gradient") {
                         gradientHandleAt(startLayer, startQuad, down.position, 24.dp.toPx())
-                    } else if (startLayer != null && startQuad != null && (state.panel == EditorPanel.Tools || (state.panel == EditorPanel.Effects && adjusting == null))) {
+                    } else if (startLayer != null && startQuad != null && startLayer.kind != "camera" && (state.panel == EditorPanel.Tools || (state.panel == EditorPanel.Effects && adjusting == null))) {
                         handlesOf(startQuad).indexOfFirst { (it - down.position).getDistance() < 20.dp.toPx() }
                     } else {
                         -1
@@ -210,6 +211,11 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier) {
                             state.canvasPan += move
                             state.canvasZoom = (state.canvasZoom * zoom).coerceIn(0.01f, 64f)
                             state.zoomShown++
+                        } else if (moved && startLayer?.kind == "camera" && !(canvasGesture && fingers > 1)) {
+                            gesture = HIDDEN
+                            val move = (pan + held) / currentScale
+                            held = Offset.Zero
+                            state.editSelected(key = "preview-gesture") { it.cameraGesture(move.x, move.y, zoom) }
                         } else if (moved && turning != null && !(canvasGesture && fingers > 1)) {
                             gesture = HIDDEN
                             turning(if (fingers > 1) Offset.Zero else (pan + held) / density, if (fingers > 1) event.calculateRotation() else 0f)
@@ -262,6 +268,7 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier) {
         )
         Presence(hint) { SwipeHint(hintLabel, Modifier.align(Alignment.Center).presence()) }
         CanvasZoomHud(state, Modifier.align(Alignment.TopStart))
+        Presence(state.cameraTip && !LocalWide.current) { CameraTip(state, Modifier.align(Alignment.BottomEnd).presence()) }
         EyedropperLoupe(state, Modifier.fillMaxSize())
         GradientHandles(state, quad, scale, Offset(dx, dy))
         if (editingText) Canvas(Modifier.fillMaxSize()) {

@@ -1,7 +1,10 @@
 package app.absentmotion.ui.home
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.Alignment
+import app.absentmotion.platform.LocalContext
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -41,30 +44,41 @@ internal object Updates {
     var checking by mutableStateOf(false)
         private set
     var answer by mutableStateOf<UpdateAnswer?>(null)
+    var installedOverride: String? = null
     private var checkedAtStart = false
+    private var quiet = false
     private val scope = MainScope()
 
-    fun atStart(context: Context) {
+    fun installed(context: Context): String = installedOverride ?: versionName(context)
+
+    fun atStart(context: Context, settings: AppSettings) {
         if (checkedAtStart) return
         checkedAtStart = true
-        check(context, manual = false)
+        check(context, settings, manual = false)
     }
 
-    fun check(context: Context, manual: Boolean) {
+    fun hush() {
+        quiet = true
+        if (answer is UpdateAnswer.Available) answer = null
+    }
+
+    fun check(context: Context, settings: AppSettings, manual: Boolean) {
         if (manual && checking) return
         if (manual) checking = true
-        val current = versionName(context)
+        val current = installed(context)
         scope.launch {
-            val result = withContext(Dispatchers.IO) {
+            val release = withContext(Dispatchers.IO) {
                 try {
-                    answerFor(fetchLatest(), current)
+                    fetchLatest()
                 } catch (e: Exception) {
                     Log.i("AMUpdate", "update check failed: $e")
-                    UpdateAnswer.Failed
+                    null
                 }
             }
+            release?.let { settings.rememberNewest(it.version, it.link) }
+            val result = answerFor(release, current)
             if (manual) checking = false
-            if (manual || result is UpdateAnswer.Available) answer = result
+            if (manual || (result is UpdateAnswer.Available && !quiet)) answer = result
         }
     }
 
@@ -104,6 +118,31 @@ internal fun isNewer(latest: String, current: String): Boolean? {
     val a = Version.parse(latest) ?: return null
     val b = Version.parse(current) ?: return null
     return a > b
+}
+
+internal data class Outdated(val installed: String, val newest: String, val link: String)
+
+internal fun outdatedHint(allowed: Boolean, installed: String, newest: String?, link: String?): Outdated? {
+    if (!allowed || newest == null || link == null || !link.startsWith("$HOME_PAGE/", ignoreCase = true)) return null
+    return if (isNewer(newest, installed) == true) Outdated(installed, newest, link) else null
+}
+
+@Composable
+internal fun outdatedNow(settings: AppSettings): Outdated? {
+    val context = LocalContext.current
+    return outdatedHint(settings.autoUpdateCheck, Updates.installed(context), settings.newestVersion, settings.newestLink)
+}
+
+@Composable
+internal fun OutdatedHint(outdated: Outdated?, modifier: Modifier = Modifier) {
+    outdated ?: return
+    val links = LocalUriHandler.current
+    Column(modifier.fillMaxWidth()) {
+        Text(stringResource(R.string.update_outdated, outdated.installed, outdated.newest), color = Am.Navy)
+        TextButton({ runCatching { links.openUri(outdated.link) } }, Modifier.align(Alignment.End)) {
+            Text(stringResource(R.string.update_download), color = Am.Navy)
+        }
+    }
 }
 
 internal class Version private constructor(private val numbers: List<Int>, private val pre: List<String>) : Comparable<Version> {

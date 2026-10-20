@@ -54,6 +54,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.runtime.produceState
+import app.absentmotion.ui.home.Outdated
+import app.absentmotion.ui.home.OutdatedHint
 import app.absentmotion.export.GifSample
 import app.absentmotion.export.frameCount
 import app.absentmotion.export.gifTimeMs
@@ -195,10 +197,10 @@ private sealed interface Phase {
     class Done(val kind: ExportKind, val result: ExportResult) : Phase
 }
 
-private class Failure(@StringRes val title: Int, val text: UiText, val action: UiText? = null, val proceed: (() -> Unit)? = null)
+private class Failure(@StringRes val title: Int, val text: UiText, val action: UiText? = null, val proceed: (() -> Unit)? = null, val hint: Boolean = false)
 
 @Composable
-fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromProjectList: Boolean, onClose: () -> Unit) {
+internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromProjectList: Boolean, outdated: Outdated? = null, onClose: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val exporter = remember { Exporter(context, engine, MediaStoreExport(context)) }
@@ -337,7 +339,7 @@ fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromProjectList
                         }.map { scene.media(it)?.filename?.ifEmpty { null } ?: it }
                     }
                     if (missing.isNotEmpty()) {
-                        failure = Failure(R.string.export_missing_title, txt(R.string.export_missing_text, missing.joinToString("\n")), txt(R.string.export_anyway)) { start(true) }
+                        failure = Failure(R.string.export_missing_title, txt(R.string.export_missing_text, missing.joinToString("\n")), txt(R.string.export_anyway), proceed = { start(true) })
                         phase = Phase.Idle
                         return@launch
                     }
@@ -376,7 +378,7 @@ fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromProjectList
             } catch (e: Throwable) {
                 Log.e("AMExport", "export failed", e)
                 phase = Phase.Idle
-                failure = Failure(R.string.export_failed_title, txt(R.string.library_text_value, e.message ?: e.toString()))
+                failure = Failure(R.string.export_failed_title, txt(R.string.library_text_value, e.message ?: e.toString()), hint = true)
             }
         }
         phase = Phase.Running(chosen, System.nanoTime(), job)
@@ -490,7 +492,12 @@ fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromProjectList
         AlertDialog(
             onDismissRequest = { failure = null },
             title = { Text(stringResource(f.title), color = Navy) },
-            text = { Text(f.text.text(), color = Navy) },
+            text = {
+                Column {
+                    Text(f.text.text(), color = Navy)
+                    if (f.hint) OutdatedHint(outdated, Modifier.padding(top = 8.dp))
+                }
+            },
             confirmButton = { TextButton({ failure = null; f.proceed?.invoke() }) { Text(f.action?.text() ?: stringResource(R.string.ok), color = Navy) } },
             dismissButton = f.proceed?.let { { TextButton({ failure = null }) { Text(stringResource(R.string.cancel), color = Navy) } } },
             containerColor = Am.Card,

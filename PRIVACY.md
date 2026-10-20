@@ -12,6 +12,10 @@ The camera and microphone permissions are used only by the in-app camera, while 
 videos you add to a project. Recordings are saved on the device. Backups of your projects are written to
 `Documents/AbsentMotion` on the device and stay there.
 
+If the app closes unexpectedly, it keeps a crash log in its own storage on the device: when it happened, the reason in one sentence,
+the app and Android versions, the phone model, what you were doing and the technical error. Only the last 20 are kept, they are not
+included in phone backups and they are never sent anywhere; you can read or copy them in Settings under Crash logs.
+
 ## When the app uses the internet
 
 The app asks for the internet permission for these things only:

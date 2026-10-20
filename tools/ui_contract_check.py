@@ -133,7 +133,9 @@ class UiContracts(unittest.TestCase):
         self.assertIn('var tab by remember(selected.kind)', source('ui/editor/LayerTools.kt'))
 
     def test_animation_button_floats_over_the_preview_in_both_layouts(self):
-        self.assertNotIn('PanelIcons.Animate', source('ui/editor/LayerTools.kt'))
+        tools = source('ui/editor/LayerTools.kt')
+        self.assertNotIn('R.string.a11y_animate', tools)
+        self.assertNotIn('AnimationSheet(', tools)
         for path in ['ui/editor/EditorScreen.kt', 'ui/editor/WideEditor.kt']:
             self.assertIn('AnimateButton(state, Modifier.align(Alignment.BottomEnd))', source(path))
         text = source('ui/editor/MotionSheets.kt').split('internal fun AnimateButton', 1)[1].split('\n}\n', 1)[0]
@@ -166,7 +168,9 @@ class UiContracts(unittest.TestCase):
         text = source('ui/editor/LayerTools.kt')
         self.assertIn('listOf(PanelIcons.TabMove, PanelIcons.TabSize, PanelIcons.TabRotate, PanelIcons.TabTilt, PanelIcons.TabSkew)', text)
         self.assertIn('KeyTarget(PropRef.Location, "0.000000,0.000000,0.000000"),\n    KeyTarget(PropRef.Scale, "1.000000,1.000000"),\n    KeyTarget(PropRef.Rotation, "0.000000"),\n    KeyTarget(PropRef.Tilt, "0.000000,0.000000"),', text)
-        self.assertIn('1 -> l.withTransform("scale", 1f, 1f)\n            2 -> l.withRotation(0f)\n            3 -> l.withTilt(0f, 0f)', source('editor/EditorActions.kt'))
+        self.assertIn('1 -> if (l.kind == "camera") l.withCameraFov(60f) else l.withTransform("scale", 1f, 1f)\n            2 -> l.withRotation(0f)\n            3 -> l.withTilt(0f, 0f)', source('editor/EditorActions.kt'))
+        self.assertIn('val usable = i <= ROTATE_TAB || selected.kind != "camera"', text)
+        self.assertIn('1 -> if (layer.kind == "camera") CameraSizeTab(state, layer) else SizeTab(state, layer)', source('ui/editor/panels/MoveTransformPanel.kt'))
 
     def test_every_ruler_spinner_path_moves_the_value_like_a_tape_measure(self):
         self.assertEqual(3, source('ui/editor/panels/PanelParts.kt').count('dragging(RulerMath.travel('))

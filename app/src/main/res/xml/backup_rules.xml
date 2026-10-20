@@ -5,4 +5,6 @@
     <exclude domain="file" path="models" />
     <exclude domain="file" path="fonts/google" />
     <exclude domain="file" path="media" />
+    <exclude domain="file" path="crashlogs" />
+    <exclude domain="sharedpref" path="crashlogs.xml" />
 </full-backup-content>
