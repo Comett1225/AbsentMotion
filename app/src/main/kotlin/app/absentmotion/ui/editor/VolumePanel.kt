@@ -22,6 +22,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.absentmotion.audio.GainRef
 import app.absentmotion.audio.MAX_GAIN
+import app.absentmotion.audio.audioEffects
 import app.absentmotion.audio.gain
 import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.KeyTarget
@@ -61,6 +66,11 @@ internal fun VolumePanel(state: EditorState, modifier: Modifier = Modifier) {
     DisposableEffect(Unit) {
         onDispose { state.volumeOpen = false; state.easingOpen = false; state.keyTarget = null }
     }
+    var effects by remember { mutableStateOf(false) }
+    if (effects) {
+        AudioEffectsPanel(state, modifier) { effects = false }
+        return
+    }
     SideEffect { state.keyTarget = KeyTarget(GainRef, "1.000000") }
     BackHandler { if (state.easingOpen) state.easingOpen = false else state.volumeOpen = false }
     if (state.easingOpen) {
@@ -70,7 +80,10 @@ internal fun VolumePanel(state: EditorState, modifier: Modifier = Modifier) {
     val percent = (layer.gain * 100).roundToInt()
     Column(modifier.background(Am.Panel).padding(start = 62.px, top = 42.px, end = 62.px)) {
         Row(Modifier.fillMaxWidth().height(107.px).clip(BarShape).background(Am.Button)) {
-            Spacer(Modifier.weight(1f))
+            val count = layer.audioEffects.size
+            Box(Modifier.weight(1f).fillMaxHeight().clickable { state.easingOpen = false; effects = true }.padding(start = 14.dp), Alignment.CenterStart) {
+                Text(if (count == 0) "Audio Effects" else "Audio Effects ($count)", color = Am.OnDark, fontSize = 14.sp, maxLines = 1)
+            }
             Box(Modifier.width(183.px).fillMaxHeight().clickable { state.volumeOpen = false }, Alignment.Center) {
                 Icon(AudioIcons.Speaker, "Volume", Modifier.size(32.dp), tint = VolumeGreen)
                 Canvas(Modifier.align(Alignment.BottomStart).padding(start = 14.px, bottom = 14.px).size(4.dp)) {
