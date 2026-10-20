@@ -163,6 +163,7 @@ class EditorState(
     private val undoStack = ArrayDeque<Scene>()
     private val redoStack = ArrayDeque<Scene>()
     private var lastEditKey: Any? = null
+    private var redoBeforeGesture: List<Scene> = emptyList()
 
     val selected: Layer? get() = selectedId?.let { scene.layerAt(it, sampleMs) }
 
@@ -197,6 +198,7 @@ class EditorState(
         if (key == null || key != lastEditKey) {
             undoStack.addLast(scene)
             if (undoStack.size > MAX_UNDO) undoStack.removeFirst()
+            redoBeforeGesture = redoStack.toList()
         }
         lastEditKey = key
         redoStack.clear()
@@ -212,7 +214,10 @@ class EditorState(
     fun cancelGesture(key: Any) {
         if (lastEditKey != key) return
         lastEditKey = null
-        apply(undoStack.removeLastOrNull() ?: return, save = false)
+        val previous = undoStack.removeLastOrNull() ?: return
+        redoStack.clear()
+        redoStack.addAll(redoBeforeGesture)
+        apply(previous, save = false)
     }
 
     fun editSelected(key: Any? = null, change: (Layer) -> Layer) {
