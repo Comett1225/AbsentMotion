@@ -54,6 +54,12 @@ class NativeEngine(backend: Backend) : AutoCloseable {
     fun renderFrame(target: Long, timeMs: Double, background: Int, presentTimeNs: Long): Int =
         nativeRenderFrame(handle, target, timeMs, background, presentTimeNs)
 
+    fun renderBuffer(buffer: HardwareBuffer, timeMs: Double, background: Int): Int = nativeRenderBuffer(handle, buffer, timeMs, background)
+
+    fun releaseBuffers() = nativeReleaseBuffers(handle)
+
+    val displayTiming: Boolean get() = org.json.JSONObject(info).optBoolean("displayTiming")
+
     fun layerQuad(layerId: Long, timeMs: Double): FloatArray? = nativeLayerQuad(handle, layerId, timeMs)
 
     fun layerBounds(layerId: Long, timeMs: Double): FloatArray? = nativeLayerBounds(handle, layerId, timeMs)
@@ -104,6 +110,8 @@ class NativeEngine(backend: Backend) : AutoCloseable {
         @JvmStatic private external fun nativeRenderFrame(
             engine: Long, target: Long, timeMs: Double, background: Int, presentTimeNs: Long,
         ): Int
+        @JvmStatic private external fun nativeRenderBuffer(engine: Long, buffer: HardwareBuffer, timeMs: Double, background: Int): Int
+        @JvmStatic private external fun nativeReleaseBuffers(engine: Long)
         @JvmStatic private external fun nativeEase(easing: String, us: FloatArray): FloatArray
         @JvmStatic private external fun nativeLayerBounds(engine: Long, layerId: Long, timeMs: Double): FloatArray?
         @JvmStatic private external fun nativeLayerQuad(engine: Long, layerId: Long, timeMs: Double): FloatArray?

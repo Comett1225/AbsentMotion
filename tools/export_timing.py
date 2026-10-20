@@ -11,7 +11,7 @@ def main():
         stamp = re.match(r'\s*(\d+\.\d+)', line)
         if stamp is None:
             continue
-        if re.search(r'AMEngine: attached.*color space [1-9]', line):
+        if re.search(r'AMEngine: attached.*color space [1-9]|AMExport: rendering', line):
             started = float(stamp[1])
         if re.search(r'AMExport:\s+failed', line):
             failed = True

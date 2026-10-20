@@ -411,6 +411,13 @@ class EngineThread(private val background: Int, context: Context? = null) {
 
         suspend fun render(target: Long, timeMs: Int, presentTimeNs: Long): Boolean =
             atFrame(document, timeMs, interpolation, fps) { engine().renderFrame(target, timeMs.toDouble(), 0xFF000000.toInt(), presentTimeNs) == 0 }
+
+        suspend fun stampsPresentTime(): Boolean = withContext(dispatcher) { engine().displayTiming }
+
+        suspend fun renderInto(buffer: HardwareBuffer, timeMs: Int): Boolean =
+            atFrame(document, timeMs, interpolation, fps) { engine().renderBuffer(buffer, timeMs.toDouble(), 0xFF000000.toInt()) == 0 }
+
+        suspend fun releaseBuffers() = withContext(NonCancellable + dispatcher) { engine?.releaseBuffers() }
     }
 
     private suspend fun <T> atFrame(document: Scene, timeMs: Int, interpolation: FrameInterpolation, fps: Int, draw: () -> T): T {

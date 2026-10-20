@@ -72,6 +72,10 @@ public:
 
     virtual int renderFrame(Target* target, double timeMs, uint32_t background, int64_t presentTimeNs) = 0;
 
+    virtual int renderBuffer(AHardwareBuffer* buffer, double timeMs, uint32_t background) = 0;
+
+    virtual void releaseBuffers() = 0;
+
     virtual bool layerQuad(int64_t layerId, double timeMs, float xy[8]) = 0;
 
     virtual bool layerBounds(int64_t layerId, double timeMs, float ltrb[4]) = 0;

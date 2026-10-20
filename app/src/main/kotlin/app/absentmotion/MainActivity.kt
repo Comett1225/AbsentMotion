@@ -491,6 +491,7 @@ class MainActivity : ComponentActivity() {
         intent.getStringExtra("format")?.let { name -> app.absentmotion.export.ImageKind.entries.firstOrNull { it.name.equals(name, true) || it.ext == name }?.let { s = s.copy(image = it) } }
         intent.takeIf { it.hasExtra("iquality") }?.let { s = s.copy(imageQuality = it.getIntExtra("iquality", s.imageQuality)) }
         intent.getStringExtra("interp")?.let { name -> FrameInterpolation.entries.firstOrNull { it.name.equals(name, true) }?.let { s = s.copy(interpolation = it) } }
+        app.absentmotion.export.VideoExportPath.forceBuffers = intent.getBooleanExtra("buffers", false)
         val dir = getExternalFilesDir(null)!!
         val ext = mapOf(ExportKind.Video to "mp4", ExportKind.Gif to "gif", ExportKind.Frame to "png", ExportKind.FrameAs to s.image.ext, ExportKind.Xml to "xml", ExportKind.Package to "absproj")
         val name = if (kind == ExportKind.Sequence) "export.seq" else "export"

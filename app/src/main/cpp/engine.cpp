@@ -106,6 +106,8 @@ public:
                     int64_t selectedId, int handles, const PreviewOptions& view) override;
     void setCameraView(bool on) override { fCameraView = on; }
     int renderFrame(Target*, double timeMs, uint32_t background, int64_t presentTimeNs) override;
+    int renderBuffer(AHardwareBuffer* buffer, double timeMs, uint32_t background) override;
+    void releaseBuffers() override;
     bool layerQuad(int64_t layerId, double timeMs, float xy[8]) override;
     bool layerBounds(int64_t layerId, double timeMs, float ltrb[4]) override;
     int64_t hitTest(float x, float y, double timeMs) override;
@@ -179,6 +181,8 @@ private:
     double heldMegabytes() const;
     sk_sp<SkImage> flowFor(VideoFrames& video, int64_t a, int64_t b, const InterpolationParams& params);
     std::map<std::pair<std::string, int64_t>, VideoFrames> fVideoFrames;
+    std::map<uint64_t, sk_sp<SkSurface>> fBufferSurfaces;
+    SkSurface* bufferSurface(AHardwareBuffer* buffer);
     bool fLoggedFrame = false;
 };
 
@@ -335,6 +339,7 @@ bool EngineImpl::init(std::string* error) {
 
 EngineImpl::~EngineImpl() {
     while (!fTargets.empty()) this->detach(fTargets.back().get());
+    fBufferSurfaces.clear();
     fPictures.clear();
     fVideoFrames.clear();
     this->syncGpu();
@@ -724,6 +729,82 @@ int EngineImpl::renderFrame(Target* target, double timeMs, uint32_t background, 
         const LayerEffects fx = this->layerEffects();
         DrawScene(canvas, fScene, timeMs, this->pictures(), &fx);
     });
+}
+
+SkSurface* EngineImpl::bufferSurface(AHardwareBuffer* buffer) {
+    uint64_t id = 0;
+    if (!buffer || AHardwareBuffer_getId(buffer, &id) != 0) return nullptr;
+    auto found = fBufferSurfaces.find(id);
+    if (found != fBufferSurfaces.end()) return found->second.get();
+    AHardwareBuffer_Desc desc;
+    AHardwareBuffer_describe(buffer, &desc);
+    auto tex = fRecorder->createBackendTexture(buffer, true, false, {(int)desc.width, (int)desc.height});
+    if (!tex.isValid()) {
+        LOGE("encoder buffer %ux%u format 0x%x usage 0x%" PRIx64 " cannot be rendered to", desc.width, desc.height,
+             desc.format, desc.usage);
+        return nullptr;
+    }
+    struct Release {
+        EngineImpl* engine;
+        skgpu::graphite::BackendTexture tex;
+        AHardwareBuffer* buffer;
+    };
+    AHardwareBuffer_acquire(buffer);
+    SkSurfaceProps props(0, kUnknown_SkPixelGeometry);
+    auto surface = SkSurfaces::WrapBackendTexture(
+            fRecorder.get(), tex, SkColorSpace::MakeSRGB(), &props,
+            [](void* context) {
+                auto* release = static_cast<Release*>(context);
+                release->engine->fDeadTextures.push_back({release->tex, release->buffer});
+                delete release;
+            },
+            new Release{this, tex, buffer});
+    if (!surface) return nullptr;
+    LOGI("encoder buffer %ux%u format 0x%x", desc.width, desc.height, desc.format);
+    return (fBufferSurfaces[id] = std::move(surface)).get();
+}
+
+int EngineImpl::renderBuffer(AHardwareBuffer* buffer, double timeMs, uint32_t background) {
+    if (fGpuFailed) return -1000;
+    if (!fGraphite) return -3;
+    if (fScene.width <= 0 || fScene.height <= 0) return -1;
+    this->deleteDeadTextures();
+    SkSurface* surface = this->bufferSurface(buffer);
+    if (!surface) return -2;
+    SetCameraView(true);
+    {
+        SkCanvas* canvas = surface->getCanvas();
+        SkAutoCanvasRestore restore(canvas, true);
+        canvas->clear(background);
+        canvas->scale((float)surface->width() / fScene.width, (float)surface->height() / fScene.height);
+        const LayerEffects fx = this->layerEffects();
+        DrawScene(canvas, fScene, timeMs, this->pictures(), &fx);
+    }
+    auto foreign = skgpu::MutableTextureStates::MakeVulkan(VK_IMAGE_LAYOUT_GENERAL, VK_QUEUE_FAMILY_FOREIGN_EXT);
+    std::unique_ptr<skgpu::graphite::Recording> recording = fRecorder->snap();
+    skgpu::graphite::InsertRecordingInfo info;
+    info.fRecording = recording.get();
+    info.fTargetSurface = surface;
+    info.fTargetTextureState = &foreign;
+    auto status = fGraphite->insertRecording(info);
+    if (!status) {
+        LOGE("buffer insertRecording failed: %s", status.message().c_str());
+        recording.reset();
+        return this->failGpu(nullptr);
+    }
+    if (!fGraphite->submit(skgpu::graphite::SyncToCpu::kYes)) {
+        LOGE("buffer submit failed");
+        recording.reset();
+        return this->failGpu(nullptr);
+    }
+    return 0;
+}
+
+void EngineImpl::releaseBuffers() {
+    if (fBufferSurfaces.empty()) return;
+    this->syncGpu();
+    fBufferSurfaces.clear();
+    this->syncGpu();
 }
 
 bool EngineImpl::layerQuad(int64_t layerId, double timeMs, float xy[8]) {

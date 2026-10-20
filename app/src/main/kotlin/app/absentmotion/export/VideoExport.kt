@@ -1,10 +1,13 @@
 package app.absentmotion.export
 
+import android.hardware.HardwareBuffer
+import android.media.ImageWriter
 import android.media.MediaCodec
 import android.media.MediaCodecInfo
 import android.media.MediaCodecList
 import android.media.MediaFormat
 import android.media.MediaMuxer
+import android.util.Log
 import android.view.Surface
 import app.absentmotion.engine.EngineThread
 import app.absentmotion.model.Scene
@@ -23,6 +26,10 @@ import java.util.concurrent.atomic.AtomicReference
 import kotlin.concurrent.thread
 
 typealias AudioMix = (startUs: Long, endUs: Long) -> ShortArray
+
+object VideoExportPath {
+    @Volatile var forceBuffers = false
+}
 
 object ExportAudio {
     const val SAMPLE_RATE = 44100
@@ -69,7 +76,7 @@ internal suspend fun exportVideo(
     fun worker(name: String, body: () -> Unit) { workers += thread(name = "am-export-$name") { try { body() } catch (t: Throwable) { fail(t) } } }
     try {
         encoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
-        surface = encoder.createInputSurface()
+        val input = encoder.createInputSurface().also { surface = it }
         encoder.start()
         worker("video") { drain(encoder, mux, videoDone, BASE_US) }
         if (audio != null) {
@@ -80,18 +87,44 @@ internal suspend fun exportVideo(
             worker("audio-in") { feedAudio(aac, audio, totalUs, stop, delay) }
         }
         engine.exportSession(xml, s.interpolation, s.fps) {
-            val target = attach(surface)
-            try {
+            suspend fun eachFrame(draw: suspend (k: Int, presentNs: Long) -> Unit) {
                 for (k in 0 until frames) {
                     currentCoroutineContext().ensureActive()
                     failure.get()?.let { throw it }
-                    val presentUs = BASE_US + k * 1_000_000L / s.fps
-                    check(render(target, frameTimeMs(scene, s.fps, k), presentUs * 1000)) { "The engine could not draw frame $k" }
+                    draw(k, (BASE_US + k * 1_000_000L / s.fps) * 1000)
                     progress((k + 1f) / frames * 0.98f)
                 }
                 encoder.signalEndOfInputStream()
-            } finally {
-                detach(target)
+            }
+            val buffers = VideoExportPath.forceBuffers || !stampsPresentTime()
+            Log.i("AMExport", "rendering $frames frames at ${width}x$height through ${if (buffers) "encoder buffers" else "the swapchain"}")
+            if (buffers) {
+                val writer = ImageWriter.Builder(input).setMaxImages(2).setHardwareBufferFormat(HardwareBuffer.RGBA_8888)
+                    .setUsage(HardwareBuffer.USAGE_GPU_COLOR_OUTPUT or HardwareBuffer.USAGE_GPU_SAMPLED_IMAGE).build()
+                try {
+                    eachFrame { k, presentNs ->
+                        val image = writer.dequeueInputImage()
+                        try {
+                            val drawn = image.hardwareBuffer!!.use { renderInto(it, frameTimeMs(scene, s.fps, k)) }
+                            check(drawn) { "The engine could not draw frame $k" }
+                            image.timestamp = presentNs
+                            writer.queueInputImage(image)
+                        } catch (t: Throwable) {
+                            image.close()
+                            throw t
+                        }
+                    }
+                } finally {
+                    releaseBuffers()
+                    writer.close()
+                }
+            } else {
+                val target = attach(input)
+                try {
+                    eachFrame { k, presentNs -> check(render(target, frameTimeMs(scene, s.fps, k), presentNs)) { "The engine could not draw frame $k" } }
+                } finally {
+                    detach(target)
+                }
             }
         }
         runInterruptible(Dispatchers.IO) { workers.forEach { it.join() } }

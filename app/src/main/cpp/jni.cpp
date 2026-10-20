@@ -119,6 +119,15 @@ JNIEXPORT jint JNICALL JNI_FN(nativeRenderFrame)(JNIEnv*, jclass, jlong engine, 
     return engineOf(engine)->renderFrame(targetOf(target), timeMs, (uint32_t)background, presentTimeNs);
 }
 
+JNIEXPORT jint JNICALL JNI_FN(nativeRenderBuffer)(JNIEnv* env, jclass, jlong engine, jobject buffer, jdouble timeMs,
+                                                  jint background) {
+    return engineOf(engine)->renderBuffer(AHardwareBuffer_fromHardwareBuffer(env, buffer), timeMs, (uint32_t)background);
+}
+
+JNIEXPORT void JNICALL JNI_FN(nativeReleaseBuffers)(JNIEnv*, jclass, jlong engine) {
+    engineOf(engine)->releaseBuffers();
+}
+
 JNIEXPORT jint JNICALL JNI_FN(nativeRenderScene)(JNIEnv* env, jclass, jlong engine, jlong target, jdouble timeMs,
                                                  jfloat scale, jfloat dx, jfloat dy, jint background,
                                                  jlong selectedId, jint handles, jboolean pixels, jint pixelDivisor,
