@@ -920,6 +920,7 @@
     <string name="effects_reorder">Reorder</string>
     <string name="speed_freeze_frame">Freeze Frame</string>
     <string name="speed_seconds">Seconds</string>
+    <string name="speed_remove_keyframes">Remove Keyframes</string>
     <string name="transform_width">Width</string>
     <string name="transform_height">Height</string>
     <string name="transform_x_skew">X SKEW</string>
