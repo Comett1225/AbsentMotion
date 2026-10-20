@@ -1,0 +1,57 @@
+{
+ "id": "contourgradient",
+ "name": "Contour Gradient",
+ "category": "stylize",
+ "since": "3.0.0",
+ "description": "Paints a two-colour gradient outwards from the edges of the opaque parts of the layer, like a soft coloured halo.",
+ "params": [
+  {
+   "id": "color1",
+   "label": "Color 1",
+   "type": "color",
+   "default": "#ff3c6e"
+  },
+  {
+   "id": "color2",
+   "label": "Color 2",
+   "type": "color",
+   "default": "#3cc8ff"
+  },
+  {
+   "id": "blur",
+   "label": "Width",
+   "type": "float",
+   "default": 25,
+   "min": 1,
+   "max": 300,
+   "step": 0.1
+  },
+  {
+   "id": "alpha",
+   "label": "Alpha",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "fill",
+   "label": "Fill",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "fade",
+   "label": "Fade",
+   "type": "switch",
+   "default": false
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform shader blurred;\nlayout(color) uniform half4 color1;\nlayout(color) uniform half4 color2;\nuniform float blur;\nuniform float alpha;\nuniform float fill;\nuniform float fade;\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    float b = float(blurred.eval(coord).a);\n    float t = clamp(1.0 - b * 2.0, 0.0, 1.0);\n    t *= t;\n    float cover = smoothstep(0.0, 0.06, b) * clamp(alpha, 0.0, 1.0);\n    if (fade > 0.5) cover *= 1.0 - t;\n    float3 rgb = mix(float3(color1.rgb), float3(color2.rgb), t);\n    float ca = cover * mix(float(color1.a), float(color2.a), t);\n    half4 halo = half4(half3(rgb) * half(ca), half(ca));\n    half4 body = src * half(clamp(fill, 0.0, 1.0));\n    return body + halo * (1.0 - body.a);\n}\n"
+}

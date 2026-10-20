@@ -10,8 +10,8 @@ import androidx.compose.ui.unit.dp
 
 internal object ExportIcons {
     val Close = icon("Close", "M19.2 4.8L4.8 19.2M4.8 4.8L19.2 19.2", 1.8f)
-    val Back = icon("Back", "M12 19L5 12L12 5M19 12L5 12", 1.5f)
-    val ChevronRight = icon("ChevronRight", "M8.7 18.6L15.3 12L8.7 5.4", 1.5f)
+    val Back = icon("Back", "M12 19L5 12L12 5M19 12L5 12", 1.5f, mirror = true)
+    val ChevronRight = icon("ChevronRight", "M8.7 18.6L15.3 12L8.7 5.4", 1.5f, mirror = true)
     val ChevronDown = icon("ChevronDown", "M5.4 8.7L12 15.3L18.6 8.7", 1.6f)
     val Info = icon("Info", "M2 12A10 10 0 1 0 22 12A10 10 0 1 0 2 12ZM12 16L12 12M12 8L12.01 8", 1.4f)
     val Help = icon("Help", "M2 12A10 10 0 1 0 22 12A10 10 0 1 0 2 12ZM9.2 9.4A2.9 2.9 0 0 1 14.8 10.2C14.8 12.1 12 12.5 12 14.3M12 17.6L12.01 17.6", 1.4f)
@@ -41,13 +41,13 @@ internal object ExportIcons {
             paths.forEach { addPath(addPathNodes(it), fill = SolidColor(Color.Black)) }
         }.build()
 
-    private fun stroked(name: String, w: Float, h: Float, vw: Float, vh: Float, path: String, width: Float): ImageVector =
-        ImageVector.Builder(name, w.dp, h.dp, vw, vh).apply {
+    private fun stroked(name: String, w: Float, h: Float, vw: Float, vh: Float, path: String, width: Float, mirror: Boolean = false): ImageVector =
+        ImageVector.Builder(name, w.dp, h.dp, vw, vh, autoMirror = mirror).apply {
             addPath(
                 addPathNodes(path), stroke = SolidColor(Color.Black), strokeLineWidth = width,
                 strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round,
             )
         }.build()
 
-    private fun icon(name: String, path: String, width: Float): ImageVector = stroked(name, 24f, 24f, 24f, 24f, path, width)
+    private fun icon(name: String, path: String, width: Float, mirror: Boolean = false): ImageVector = stroked(name, 24f, 24f, 24f, 24f, path, width, mirror)
 }

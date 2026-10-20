@@ -1,4 +1,5 @@
 package app.absentmotion.ui.export
+import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -21,13 +22,15 @@ import app.absentmotion.export.verificationLine
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.enterFade
 import app.absentmotion.ui.theme.presence
+import androidx.compose.ui.res.stringResource
+import app.absentmotion.R
 
 @Composable
 fun DoneScreen(kind: ExportKind, result: ExportResult, onClose: () -> Unit, onShare: () -> Unit) {
     app.absentmotion.platform.ExportBars(dark = true, running = false)
     Column(Modifier.fillMaxSize().presence().enterFade(10.dp).statusBarsPadding().navigationBarsPadding()) {
         Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 14.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            Text("Saved to storage", color = Am.OnNavy, fontSize = 17.sp, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.saved_to_storage), color = Am.OnNavy, fontSize = 17.sp, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(4.dp))
             Text(result.where, color = Am.OnNavy.copy(alpha = 0.7f), fontSize = 13.sp, textAlign = TextAlign.Center)
             result.verification?.let { v ->
@@ -41,20 +44,21 @@ fun DoneScreen(kind: ExportKind, result: ExportResult, onClose: () -> Unit, onSh
             app.absentmotion.platform.ExportMediaPreview(kind, result.uris)
         }
         Column(Modifier.fillMaxWidth().padding(20.dp), verticalArrangement = Arrangement.spacedBy(15.dp)) {
-            BottomButton(shareLabel(kind), ExportIcons.Share, onShare)
-            BottomButton("OK", null, onClose)
+            BottomButton(stringResource(shareLabel(kind)), ExportIcons.Share, onShare)
+            BottomButton(stringResource(R.string.ok), null, onClose)
         }
     }
 }
 
+@StringRes
 private fun shareLabel(kind: ExportKind) = when (kind) {
-    ExportKind.Video -> "Share Video"
-    ExportKind.Gif -> "Share GIF"
-    ExportKind.Sequence -> "Share Image Sequence"
-    ExportKind.Frame, ExportKind.FrameAs -> "Share Image"
-    ExportKind.Xml -> "Share Project XML"
-    ExportKind.Package -> "Share"
-    ExportKind.Audio -> "Share Audio"
+    ExportKind.Video -> R.string.export_share_video
+    ExportKind.Gif -> R.string.export_share_gif
+    ExportKind.Sequence -> R.string.export_share_sequence
+    ExportKind.Frame, ExportKind.FrameAs -> R.string.export_share_image
+    ExportKind.Xml -> R.string.export_share_xml
+    ExportKind.Package -> R.string.export_share
+    ExportKind.Audio -> R.string.export_share_audio
 }
 
 @Composable

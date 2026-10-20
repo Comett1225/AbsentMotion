@@ -1,5 +1,6 @@
 package app.absentmotion.editor
 
+import app.absentmotion.R
 import app.absentmotion.library.MediaKeeper
 import app.absentmotion.model.MediaDeclaration
 import app.absentmotion.platform.Context
@@ -12,15 +13,15 @@ import kotlinx.coroutines.withContext
 
 suspend fun EditorState.keepCopy(context: Context, media: MediaDeclaration): MediaDeclaration {
     if (!settings.keepMediaCopies) return media
-    val name = media.title.ifEmpty { "this file" }
-    if (media.size > BIG_FILE && !store.inMediaFolder(media.uri)) Toast.makeText(context, "Copying “$name” into the project…", Toast.LENGTH_SHORT).show()
+    val name = media.title.ifEmpty { context.getString(R.string.edit_keep_this_file) }
+    if (media.size > BIG_FILE && !store.inMediaFolder(media.uri)) Toast.makeText(context, context.getString(R.string.edit_keep_copying, name), Toast.LENGTH_SHORT).show()
     val keeper = MediaKeeper(store, { uri -> context.contentResolver.openInputStream(Uri.parse(uri)) })
     return try {
         withContext(Dispatchers.IO) { keeper.keep(projectId, media, scene) }
     } catch (e: CancellationException) {
         throw e
     } catch (e: MediaKeeper.NoSpace) {
-        Toast.makeText(context, "Not enough free storage to keep a copy of “$name” in the project. It still uses the original file.", Toast.LENGTH_LONG).show()
+        Toast.makeText(context, context.getString(R.string.edit_keep_no_space, name), Toast.LENGTH_LONG).show()
         media
     } catch (e: Exception) {
         Log.w("AMStore", "cannot keep a copy of ${media.uri}", e)

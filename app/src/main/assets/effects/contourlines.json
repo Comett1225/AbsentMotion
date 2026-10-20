@@ -1,0 +1,72 @@
+{
+ "id": "contourlines",
+ "name": "Contour Lines",
+ "category": "stylize",
+ "since": "3.0.0",
+ "description": "Draws outline rings around the opaque parts of the layer, for stacked sticker or neon outlines.",
+ "params": [
+  {
+   "id": "color",
+   "label": "Color",
+   "type": "color",
+   "default": "#ffffff"
+  },
+  {
+   "id": "blur",
+   "label": "Outset",
+   "type": "float",
+   "default": 20,
+   "min": 1,
+   "max": 300,
+   "step": 0.1
+  },
+  {
+   "id": "width",
+   "label": "Width",
+   "type": "float",
+   "default": 3,
+   "min": 0,
+   "max": 100,
+   "step": 0.1
+  },
+  {
+   "id": "alpha",
+   "label": "Alpha",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "fill",
+   "label": "Fill",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "count",
+   "label": "Count",
+   "type": "float",
+   "default": 1,
+   "min": 1,
+   "max": 10,
+   "step": 1
+  },
+  {
+   "id": "phase",
+   "label": "Phase",
+   "type": "float",
+   "default": 0,
+   "min": -999,
+   "max": 999,
+   "step": 0.001
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform shader blurred;\nlayout(color) uniform half4 color;\nuniform float blur;\nuniform float width;\nuniform float alpha;\nuniform float fill;\nuniform float count;\nuniform float phase;\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    float b = float(blurred.eval(coord).a);\n    float gx = float(blurred.eval(coord + float2(1.0, 0.0)).a - blurred.eval(coord - float2(1.0, 0.0)).a) * 0.5;\n    float gy = float(blurred.eval(coord + float2(0.0, 1.0)).a - blurred.eval(coord - float2(0.0, 1.0)).a) * 0.5;\n    float grad = max(length(float2(gx, gy)), 0.00001);\n    float n = floor(count + 0.5);\n    float line = 0.0;\n    for (int i = 0; i < 10; i++) {\n        if (float(i) >= n) break;\n        float level = 0.48 * (1.0 - fract((float(i) + 0.5) / n + phase));\n        float px = abs(b - level) / grad;\n        line = max(line, clamp(width * 0.5 - px + 0.5, 0.0, 1.0));\n    }\n    line *= clamp(alpha, 0.0, 1.0) * float(color.a) * step(float(src.a), 0.999);\n    half4 body = src * half(clamp(fill, 0.0, 1.0));\n    half4 ring = half4(color.rgb, 1.0) * half(line);\n    return ring + body * (1.0 - ring.a);\n}\n"
+}

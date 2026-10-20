@@ -4,26 +4,16 @@
  "category": "move",
  "since": "3.0.0",
  "native": true,
- "description": "Turns the layer round and round at a steady speed.",
+ "description": "Turns the layer round and round at a steady speed; below zero it turns the other way.",
  "params": [
   {
-   "id": "speed",
-   "label": "Speed",
-   "type": "angle",
-   "default": 90,
-   "min": 0,
+   "id": "rpm",
+   "label": "RPM",
+   "type": "float",
+   "default": 60,
+   "min": -3600,
    "max": 3600,
-   "step": 0.1
-  },
-  {
-   "id": "direction",
-   "label": "Direction",
-   "type": "choice",
-   "default": 0,
-   "options": [
-    "Clockwise",
-    "Counterclockwise"
-   ]
+   "step": 1
   }
  ]
 }

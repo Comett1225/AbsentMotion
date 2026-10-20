@@ -6,6 +6,8 @@ import android.net.Uri
 import android.os.Environment
 import android.os.StatFs
 import android.provider.MediaStore
+import app.absentmotion.R
+import app.absentmotion.i18n.txt
 import java.io.File
 import java.io.OutputStream
 
@@ -25,12 +27,12 @@ class MediaStoreExport(context: Context) : ExportStore {
             put(MediaStore.MediaColumns.RELATIVE_PATH, "$root/$AppFolder" + (folder?.let { "/$it" } ?: ""))
             put(MediaStore.MediaColumns.IS_PENDING, 1)
         }
-        return resolver.insert(collection, values) ?: error("Cannot create $name in $root")
+        return resolver.insert(collection, values) ?: throw ExportError(txt(R.string.export_error_create, name, root))
     }
 
     override fun open(folder: String?, name: String, mime: String): OpenExport {
         val uri = insert(folder, name, mime)
-        val file = try { resolver.openFileDescriptor(uri, "rw") ?: error("Cannot write $name") }
+        val file = try { resolver.openFileDescriptor(uri, "rw") ?: throw ExportError(txt(R.string.export_error_write, name)) }
             catch (t: Throwable) { resolver.delete(uri, null, null); throw t }
         return OpenExport(uri, file.fileDescriptor, file::close,
             { resolver.update(uri, ContentValues().apply { put(MediaStore.MediaColumns.IS_PENDING, 0) }, null, null) },
@@ -40,7 +42,7 @@ class MediaStoreExport(context: Context) : ExportStore {
     override fun save(folder: String?, name: String, mime: String, write: (OutputStream) -> Unit): Uri {
         val uri = insert(folder, name, mime)
         try {
-            (resolver.openOutputStream(uri) ?: error("Cannot write $name")).use(write)
+            (resolver.openOutputStream(uri) ?: throw ExportError(txt(R.string.export_error_write, name))).use(write)
             resolver.update(uri, ContentValues().apply { put(MediaStore.MediaColumns.IS_PENDING, 0) }, null, null)
         } catch (t: Throwable) {
             resolver.delete(uri, null, null)

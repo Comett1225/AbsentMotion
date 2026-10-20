@@ -1,5 +1,7 @@
 package app.absentmotion.ai
 
+import app.absentmotion.R
+import app.absentmotion.i18n.AppText
 import android.content.Context
 import android.media.MediaCodec
 import android.media.MediaCodecInfo
@@ -126,7 +128,7 @@ internal fun Scene.withVideoMatte(original: Layer, matte: MediaDeclaration, fram
     val size = original.node.children.firstOrNull { it.name == "property" && it["name"] == "size" }
     val matteSize = XmlNode("property", linkedMapOf("name" to "size", "type" to "vec2"), size?.children?.filter { it.name == "kf" }?.map { it.with("v", half(it["v"])) }.orEmpty())
         .let { if (it.children.isEmpty()) it.with("value", half(size?.get("value"))) else it }
-    val attrs = linkedMapOf("id" to "$matteId", "label" to "${original.label.ifEmpty { "Video" }} mask")
+    val attrs = linkedMapOf("id" to "$matteId", "label" to AppText.get(R.string.ai_video_mask_name, original.label.ifEmpty { AppText.get(R.string.model_layer_video) }))
     for (key in listOf("startTime", "endTime", "inTime", "outTime", "speed", "loop", "parent")) original.node[key]?.let { attrs[key] = it }
     attrs += listOf("s" to ".rect", "fillType" to "media", "fillVideo" to matte.uri, "mediaFillMode" to "stretch")
     val key = XmlNode("effect", linkedMapOf("id" to "absent.lumakey", "hidden" to "false"), listOf(
@@ -138,7 +140,7 @@ internal fun Scene.withVideoMatte(original: Layer, matte: MediaDeclaration, fram
     ) + original.effects.filter { it["id"] == "absent.timequant" } + key)
     val children = node.let { added -> this.node.children.flatMap { if (it.name in Scene.LAYER_TAGS && Layer(it).id == original.id) listOf(it, added) else listOf(it) } }
     val withMatte = Scene(this.node.copy(children = children)).withMedia(matte)
-    return withMatte.grouped(setOf(original.id, matteId), "mask", groupId, "${original.label.ifEmpty { "Video" }} cut out")
+    return withMatte.grouped(setOf(original.id, matteId), "mask", groupId, AppText.get(R.string.ai_video_cut_out_name, original.label.ifEmpty { AppText.get(R.string.model_layer_video) }))
 }
 
 internal class MatteEncoder private constructor(private val codec: MediaCodec, private val muxer: MediaMuxer, val width: Int, val height: Int) : Closeable {
@@ -147,10 +149,10 @@ internal class MatteEncoder private constructor(private val codec: MediaCodec, p
     private var finished = false
 
     fun write(pts: Long, matte: ByteArray) {
-        check(matte.size == width * height) { "The mask has an unexpected size" }
+        check(matte.size == width * height) { AppText.get(R.string.ai_mask_wrong_size) }
         val index = input()
         val size = codec.getInputBuffer(index)!!.capacity()
-        val image = checkNotNull(codec.getInputImage(index)) { "The video encoder gave no input image" }
+        val image = checkNotNull(codec.getInputImage(index)) { AppText.get(R.string.ai_encoder_no_image) }
         val (yPlane, uPlane, vPlane) = image.planes
         val y = yPlane.buffer
         for (row in 0 until height) {
@@ -181,7 +183,7 @@ internal class MatteEncoder private constructor(private val codec: MediaCodec, p
             if (index >= 0) return index
             drain(false)
         }
-        error("The video encoder stopped responding")
+        error(AppText.get(R.string.ai_encoder_not_responding))
     }
 
     private fun drain(end: Boolean) {
@@ -196,14 +198,14 @@ internal class MatteEncoder private constructor(private val codec: MediaCodec, p
                 index >= 0 -> {
                     val config = info.flags and MediaCodec.BUFFER_FLAG_CODEC_CONFIG != 0
                     if (!config && info.size > 0) {
-                        check(track >= 0) { "The video encoder sent frames before its format" }
+                        check(track >= 0) { AppText.get(R.string.ai_encoder_frames_before_format) }
                         muxer.writeSampleData(track, codec.getOutputBuffer(index)!!, info)
                     }
                     codec.releaseOutputBuffer(index, false)
                     if (info.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) return
                 }
                 !end -> return
-                System.nanoTime() > deadline -> error("The video encoder did not finish")
+                System.nanoTime() > deadline -> error(AppText.get(R.string.ai_encoder_not_finished))
             }
         }
     }
@@ -239,7 +241,7 @@ internal class MatteEncoder private constructor(private val codec: MediaCodec, p
                     if (w != width || h != height) throw e
                 }
             }
-            error("This phone cannot encode the mask video")
+            error(AppText.get(R.string.ai_cannot_encode_mask))
         }
     }
 }
@@ -248,23 +250,23 @@ internal class VideoMatte(val media: AiMedia, val frameWidth: Int, val frameHeig
 
 internal object VideoBackground {
     suspend fun run(context: Context, layer: Layer, media: MediaDeclaration, side: Int, progress: AiProgress): VideoMatte {
-        val fill = checkNotNull(layer.mediaFill?.takeIf { it.video }) { "Select a video layer" }
-        check(media.width > 0 && media.height > 0) { "This video has no size information" }
+        val fill = checkNotNull(layer.mediaFill?.takeIf { it.video }) { AppText.get(R.string.ai_select_video_layer) }
+        check(media.width > 0 && media.height > 0) { AppText.get(R.string.ai_video_no_size) }
         val seconds = layer.matteSeconds(media)
-        check(seconds <= MAX_MATTE_SECONDS) { "Clips longer than ${MAX_MATTE_SECONDS / 60} minutes are not supported yet. Trim or split the clip first." }
+        check(seconds <= MAX_MATTE_SECONDS) { AppText.get(R.string.ai_clip_too_long, (MAX_MATTE_SECONDS / 60).toString()) }
         val (width, height) = matteSize(media.width, media.height, side)
         val file = aiFile(context, "mp4")
         val needed = matteBytes(seconds, width, height) * 2 + FREE_MARGIN
-        check(file.parentFile!!.usableSpace >= needed) { "Not enough free storage: this needs about ${needed / 1_000_000} MB." }
+        check(file.parentFile!!.usableSpace >= needed) { AppText.get(R.string.ai_not_enough_storage, (needed / 1_000_000).toString()) }
         val fps = (media.fps ?: 30f).roundToInt().coerceIn(1, 240)
         var success = false
         try {
-            progress(0f, "Loading background removal model…")
+            progress(0f, AppText.get(R.string.ai_loading_model))
             var encoded = width to height
             val (frameWidth, frameHeight) = BackgroundRemoval.withFrameMatte(context) { matte ->
                 FrameReader(context, fill.uri).use { reader ->
                     val stamps = matteStamps(reader.timestamps, fill.inTime, fill.outTime)
-                    check(stamps.isNotEmpty()) { "This clip has no video frames to process" }
+                    check(stamps.isNotEmpty()) { AppText.get(R.string.ai_no_video_frames) }
                     var frame = media.width to media.height
                     MatteEncoder.open(file, width, height, fps).use { encoder ->
                         encoded = encoder.width to encoder.height
@@ -276,14 +278,14 @@ internal object VideoBackground {
                             reader.read(batch) { pts, yuv ->
                                 frame = yuv.width to yuv.height
                                 val alpha = matte(yuv.argb(encoder.width, encoder.height, reader.colorStandard, reader.fullRange), encoder.width, encoder.height)
-                                check(alpha.size == encoder.width * encoder.height) { "The foreground mask has an unexpected size" }
+                                check(alpha.size == encoder.width * encoder.height) { AppText.get(R.string.ai_mask_unexpected_size) }
                                 smoother.push(pts, alpha)?.let { (p, m) -> encoder.write(p, m) }
                                 done++
                                 progress(0.02f + 0.96f * done / stamps.size, status(done, stamps.size, System.nanoTime() - started))
                             }
                         }
                         smoother.flush()?.let { (p, m) -> encoder.write(p, m) }
-                        progress(0.99f, "Saving the mask video…")
+                        progress(0.99f, AppText.get(R.string.ai_saving_mask_video))
                         encoder.finish()
                     }
                     frame
@@ -298,13 +300,10 @@ internal object VideoBackground {
     }
 
     private fun status(done: Int, total: Int, elapsedNs: Long): String {
-        val text = "Removing background: frame $done of $total"
-        if (done < 3) return "$text…"
+        if (done < 3) return AppText.get(R.string.ai_video_frame_start, done.toString(), total.toString())
         val left = elapsedNs / 1e9 / done * (total - done)
-        return "$text, " + when {
-            left < 60 -> "less than a minute left"
-            else -> "about ${(left / 60).roundToInt()} min left"
-        }
+        return if (left < 60) AppText.get(R.string.ai_video_frame_under_minute, done.toString(), total.toString())
+            else AppText.get(R.string.ai_video_frame_minutes_left, done.toString(), total.toString(), (left / 60).roundToInt().toString())
     }
 
     private const val BATCH = 16

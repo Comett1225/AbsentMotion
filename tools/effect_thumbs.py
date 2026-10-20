@@ -111,7 +111,7 @@ def prop(p, v):
     if isinstance(v, tuple):
         keys = "".join(f'<kf t="{t:.6f}" v="{value(p["type"], x)}"' + (f' e="{e}"' if e else "") + "/>" for t, x, e in v)
         return f'<property name="{p["id"]}" type="{kind}">{keys}</property>'
-    if isinstance(v, list) and p["type"] in ("float", "angle"):
+    if isinstance(v, list) and (p["type"] in ("float", "angle") or isinstance(v[0], list)):
         keys = "".join(f'<kf t="{k / (len(v) - 1):.6f}" v="{value(p["type"], x)}"/>' for k, x in enumerate(v))
         return f'<property name="{p["id"]}" type="{kind}">{keys}</property>'
     return f'<property name="{p["id"]}" type="{kind}" value="{value(p["type"], v)}"/>'
@@ -144,7 +144,14 @@ def sketch(id, effect="", end=999):
 
 
 def backdrops(show):
-    return ["grid"] if show.get("layout") in ("move", "text", "drawing") else [show["under"]] if "under" in show else []
+    return ["grid"] if show.get("layout") in ("move", "repeat", "text", "drawing") else [show["under"]] if "under" in show else []
+
+
+def path_layer(show, end):
+    c, (shape, half) = RENDER // 2, show["path"]
+    return (f'<shape id="4" label="path" startTime="0" endTime="{end}" fillType="none" s="{shape}"><transform>'
+            f'<location value="{c},{c},0"/></transform><property name="size" type="vec2" value="{half},{half}"/>'
+            '<path-stroke><color value="#66ffffff"/><size value="3"/></path-stroke></shape>')
 
 
 def slug(name):
@@ -174,13 +181,15 @@ def scene(show, effect, preset=None):
         fx = f'<effect id="absent.{effect["id"]}" hidden="false">' + "".join(prop(p, params[p["id"]]) for p in effect["params"]) + "</effect>"
     fps, total = (ANIM_FPS, round(show["animate"] * 1000 / ANIM_FPS)) if "animate" in show else (30, 1000)
     layers = [layer(1, name, end=total - 1) for name in backdrops(show)]
-    move = show.get("layout") == "move"
+    if "path" in show:
+        layers.append(path_layer(show, total - 1))
     if show.get("layout") == "text":
         layers.append(words(2, show["text"], fx, total - 1))
     elif show.get("layout") == "drawing":
         layers.append(sketch(2, fx, total - 1))
     else:
-        layers.append(layer(2, show["photo"], fx, RENDER // 4 if move else RENDER // 2, show.get("keys"), total - 1))
+        half = {"move": RENDER // 4, "repeat": RENDER // 12}.get(show.get("layout"), RENDER // 2)
+        layers.append(layer(2, show["photo"], fx, half, show.get("keys"), total - 1))
     if "split" in show:
         layers.append(layer(3, f'{show["photo"]}-before{round(show["split"] * 100)}', end=total - 1))
     return (f'<scene title="thumb" width="{RENDER}" height="{RENDER}" fps="{fps}" totalTime="{total}" bgcolor="#00000000">'
@@ -292,7 +301,8 @@ def main():
                 pushed.add(name)
         animated = show.get("animate", 0)
         frames = list(range(animated)) if animated else show.get("frames", [show.get("frame", 0)])
-        base = (show.get("photo"), show.get("text"), show.get("under"), show.get("split"), tuple(frames), show.get("layout"), json.dumps(show.get("keys")), animated)
+        base = (show.get("photo"), show.get("text"), show.get("under"), show.get("split"), tuple(frames), show.get("layout"),
+                json.dumps(show.get("keys")), animated, json.dumps(show.get("path")))
         if base not in plain:
             plain[base] = batch.add(f"plain{len(plain)}", scene(show, None), frames)
         effect = json.loads((PACK / f"{key}.json").read_text())

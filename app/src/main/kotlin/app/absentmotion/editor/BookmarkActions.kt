@@ -1,5 +1,7 @@
 package app.absentmotion.editor
 
+import app.absentmotion.R
+import app.absentmotion.i18n.AppText
 import app.absentmotion.platform.Context
 import app.absentmotion.ai.speechPcm
 import app.absentmotion.audio.Beats
@@ -16,11 +18,11 @@ import kotlin.math.roundToInt
 fun EditorState.toggleBookmark() = edit { it.withBookmarkToggled(frame) }
 
 suspend fun EditorState.markBeats(context: Context): Int {
-    val layer = selectedId?.let(scene::layer)?.takeIf { it.soundUri != null } ?: error("Select an audio or video layer")
+    val layer = selectedId?.let(scene::layer)?.takeIf { it.soundUri != null } ?: error(AppText.get(R.string.edit_beats_select_layer))
     val fps = scene.fps
     val alone = Scene(scene.node.copy(children = scene.node.children.filter { it.name !in Scene.LAYER_TAGS } +
         layer.node.with("hidden", null).let { it.copy(children = it.children.filterNot { c -> c.name == "gain" }) }))
-    val mix = OfflineMix.of(context, alone, Resampler.HIGH) ?: error("There is no sound to read")
+    val mix = OfflineMix.of(context, alone, Resampler.HIGH) ?: error(AppText.get(R.string.edit_beats_no_sound))
     val pcm = try {
         withContext(Dispatchers.IO) { speechPcm(mix, layer.startTime, layer.endTime + 1) {} }
     } finally {

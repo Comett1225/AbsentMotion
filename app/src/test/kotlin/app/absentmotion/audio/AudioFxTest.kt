@@ -1,5 +1,6 @@
 package app.absentmotion.audio
 
+import app.absentmotion.R
 import app.absentmotion.editor.extractedAudio
 import app.absentmotion.model.Scene
 import org.junit.Assert.assertArrayEquals
@@ -74,9 +75,9 @@ class AudioFxTest {
         val counts = mapOf(FxKind.Eq to 13, FxKind.LowPass to 3, FxKind.HighPass to 3, FxKind.Reverb to 6, FxKind.Echo to 5, FxKind.Compressor to 6, FxKind.Gate to 5)
         assertEquals(FxKind.entries.toSet(), counts.keys)
         for ((kind, count) in counts) {
-            assertEquals(kind.label, count, kind.params.size)
+            assertEquals(kind.xml, count, kind.params.size)
             assertEquals(kind, FxKind.entries.single { it.id == kind.id })
-            for (p in kind.params) assertTrue("${kind.label} ${p.label}", p.default in p.min..p.max && (!p.log || p.min > 0f))
+            for (p in kind.params) assertTrue("${kind.xml} ${p.key}", p.default in p.min..p.max && (!p.log || p.min > 0f))
         }
         val spec = FxKind.entries.map { AudioFx.of(it) }.spec()!!
         assertEquals(counts.values.sumOf { it + 2 }, spec.values.size)
@@ -84,9 +85,9 @@ class AudioFxTest {
     }
 
     @Test fun everyPresetIsAValidChain() {
-        assertEquals(listOf("Radio", "Telephone", "Small Room", "Hall", "Stadium", "Underwater", "Echo", "Bass Boost", "Vocal Clarity", "Noise Gate"), AudioPresets.map { it.name })
+        assertEquals(listOf(R.string.audio_preset_radio, R.string.audio_preset_telephone, R.string.audio_preset_small_room, R.string.audio_preset_hall, R.string.audio_preset_stadium, R.string.audio_preset_underwater, R.string.audio_fx_echo, R.string.audio_preset_bass_boost, R.string.audio_preset_vocal_clarity, R.string.audio_fx_noise_gate), AudioPresets.map { it.name })
         for (preset in AudioPresets) {
-            assertTrue(preset.name, preset.effects.isNotEmpty() && preset.effects.all { it.kind != null })
+            assertTrue("${preset.name}", preset.effects.isNotEmpty() && preset.effects.all { it.kind != null })
             val spec = preset.effects.spec()!!
             assertEquals(preset.effects.size, spec.kinds.size)
             assertTrue(spec.values.all { it.isFinite() })
@@ -95,7 +96,7 @@ class AudioFxTest {
 
     @Test fun extractedAudioKeepsTheEffects() {
         val video = Scene.parse("""<scene width="100" height="100" fps="30"><shape id="1" startTime="0" endTime="999" fillType="media" fillVideo="file:/v.mp4" s=".rect"/></scene>""")
-            .update(1) { it.withAudioEffects(AudioPresets.first { p -> p.name == "Hall" }.effects) }
+            .update(1) { it.withAudioEffects(AudioPresets.first { p -> p.name == R.string.audio_preset_hall }.effects) }
         val clip = AudioClip.of(video).single()
         assertArrayEquals(intArrayOf(FxKind.Reverb.id), clip.fx!!.kinds)
         assertEquals(video.layer(1)!!.audioEffects, video.layer(1)!!.extractedAudio(2)!!.audioEffects)

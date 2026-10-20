@@ -61,6 +61,9 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import app.absentmotion.R
 import app.absentmotion.editor.addSvg
 import app.absentmotion.library.ProjectStore
 import app.absentmotion.media.MAX_MODEL_BYTES
@@ -103,14 +106,14 @@ internal fun ObjectPage(state: EditorState, modifier: Modifier) {
     }
     Column(modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            TextButton("Camera", Modifier.size(70.dp, 80.dp)) { state.addCamera() }
-            TextButton("Null", Modifier.size(70.dp, 80.dp)) { state.addNull() }
-            TextButton("Empty Group", Modifier.size(70.dp, 80.dp)) { state.addEmptyGroup() }
-            TextButton("Asset / Project", Modifier.size(70.dp, 80.dp)) { picking = true }
+            TextButton(stringResource(R.string.camera), Modifier.size(70.dp, 80.dp)) { state.addCamera() }
+            TextButton(stringResource(R.string.structure_null), Modifier.size(70.dp, 80.dp)) { state.addNull() }
+            TextButton(stringResource(R.string.structure_empty_group), Modifier.size(70.dp, 80.dp)) { state.addEmptyGroup() }
+            TextButton(stringResource(R.string.structure_asset_project), Modifier.size(70.dp, 80.dp)) { picking = true }
         }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            TextButton("Import SVG", Modifier.size(70.dp, 80.dp)) { svg.launch(arrayOf("image/svg+xml")) }
-            TextButton("3D Model", Modifier.size(70.dp, 80.dp), enabled = !reading) { models.launch(arrayOf("*/*")) }
+            TextButton(stringResource(R.string.structure_import_svg), Modifier.size(70.dp, 80.dp)) { svg.launch(arrayOf("image/svg+xml")) }
+            TextButton(stringResource(R.string.structure_3d_model), Modifier.size(70.dp, 80.dp), enabled = !reading) { models.launch(arrayOf("*/*")) }
         }
     }
 }
@@ -135,16 +138,16 @@ private suspend fun EditorState.importSvgFile(context: Context, uri: Uri) {
         throw e
     } catch (e: Exception) {
         Log.w("AMSvg", "cannot import $uri", e)
-        say("Could not read this SVG file.")
+        say(context.getString(R.string.structure_svg_unreadable))
         return
     }
     val layer = result.layer
     if (layer == null) {
-        say("This SVG file has no shapes that can be imported.")
+        say(context.getString(R.string.structure_svg_empty))
         return
     }
     addSvg(layer)
-    if (result.skipped.isNotEmpty()) say("Imported ${result.shapes} shapes. Left out: ${result.skipped.joinToString(", ")}.")
+    if (result.skipped.isNotEmpty()) say(context.resources.getQuantityString(R.plurals.structure_svg_imported, result.shapes, result.shapes.toString(), result.skipped.joinToString(", ") { it.resolve(context) }))
 }
 
 private suspend fun importModel(context: Context, state: EditorState, picked: List<Uri>): String? =
@@ -193,18 +196,28 @@ internal fun MultiBar(state: EditorState, modifier: Modifier) {
     val layers = state.chosenLayers
     Row(modifier.padding(6.dp).clip(RoundedCornerShape(3.dp)).background(Am.PanelInset), verticalAlignment = Alignment.CenterVertically) {
         val end = layers.isNotEmpty() && state.timeMs >= layers.maxOf { it.endTime }
-        BarButton(if (end) PanelIcons.TrimRight else PanelIcons.TrimLeft, if (end) "Extend clip ends to playhead" else "Extend clip starts to playhead", Modifier.width(60.dp).fillMaxHeight(), layers.isNotEmpty()) {
+        BarButton(if (end) PanelIcons.TrimRight else PanelIcons.TrimLeft, stringResource(if (end) R.string.structure_extend_ends else R.string.structure_extend_starts), Modifier.width(60.dp).fillMaxHeight(), layers.isNotEmpty()) {
             state.moveClipEdges(end, true)
         }
-        BarButton(if (end) ChromeIcons.SkipForward else ChromeIcons.SkipBack, if (end) "Move clip ends to playhead" else "Move clip starts to playhead", Modifier.width(60.dp).fillMaxHeight(), layers.isNotEmpty()) {
+        BarButton(if (end) ChromeIcons.SkipForward else ChromeIcons.SkipBack, stringResource(if (end) R.string.structure_move_ends else R.string.structure_move_starts), Modifier.width(60.dp).fillMaxHeight(), layers.isNotEmpty()) {
             state.moveClipEdges(end, false)
         }
         Spacer(Modifier.weight(1f))
-        BarButton(SelectionIcons.Align[0], "Align clip starts", Modifier.width(40.dp).fillMaxHeight(), layers.size > 1) { state.alignClipTimes(0) }
-        BarButton(SelectionIcons.DistributeHorizontal, "Distribute clip starts", Modifier.width(40.dp).fillMaxHeight(), layers.size > 2) { state.alignClipTimes(1) }
-        BarButton(SelectionIcons.Align[2], "Align clip ends", Modifier.width(40.dp).fillMaxHeight(), layers.size > 1) { state.alignClipTimes(2) }
+        BarButton(SelectionIcons.Align[0], stringResource(R.string.structure_align_starts), Modifier.width(40.dp).fillMaxHeight(), layers.size > 1) { state.alignClipTimes(0) }
+        BarButton(SelectionIcons.DistributeHorizontal, stringResource(R.string.structure_distribute_starts), Modifier.width(40.dp).fillMaxHeight(), layers.size > 2) { state.alignClipTimes(1) }
+        BarButton(SelectionIcons.Align[2], stringResource(R.string.structure_align_ends), Modifier.width(40.dp).fillMaxHeight(), layers.size > 1) { state.alignClipTimes(2) }
     }
 }
+
+private val AlignNames = listOf(
+    R.string.structure_align_left, R.string.structure_align_centre, R.string.structure_align_right,
+    R.string.structure_align_top, R.string.structure_align_middle, R.string.structure_align_bottom,
+)
+
+private val PasteLabels = mapOf(
+    StylePart.ColorFill to R.string.structure_paste_fill_color, StylePart.BorderShadow to R.string.structure_paste_border_shadow,
+    StylePart.Blending to R.string.structure_paste_blending,
+)
 
 @Composable
 internal fun MultiTopBar(state: EditorState, modifier: Modifier) {
@@ -213,24 +226,24 @@ internal fun MultiTopBar(state: EditorState, modifier: Modifier) {
     var alignment by remember { mutableStateOf(false) }
     val tint = Am.OnAccent
     Row(modifier.background(Am.Accent), verticalAlignment = Alignment.CenterVertically) {
-        SelectionButton(SelectionIcons.Cancel, "Cancel selection", Modifier.width(40.dp).fillMaxHeight(), tint) { MultiSelect.clear() }
+        SelectionButton(SelectionIcons.Cancel, stringResource(R.string.structure_cancel_selection), Modifier.width(40.dp).fillMaxHeight(), tint) { MultiSelect.clear() }
         if (!alignment) {
-            val text = if (ids.size == 1) "1 layer selected" else "${ids.size} layers selected"
+            val text = pluralStringResource(R.plurals.structure_layers_selected, ids.size, ids.size.toString())
             Text(text, Modifier.weight(1f), color = tint, fontSize = 14.sp, maxLines = 1)
             val cell = Modifier.width(40.dp).fillMaxHeight()
-            SelectionButton(SelectionIcons.Group, "Group", cell, tint, ids.isNotEmpty()) { state.groupLayers(ids) }
-            SelectionButton(SelectionIcons.Mask, "Group & Mask", cell, tint, ids.size > 1) { state.groupLayers(ids, "mask") }
-            SelectionButton(SelectionIcons.Exclude, "Group & Exclude", cell, tint, ids.size > 1) { state.groupLayers(ids, "exclude") }
-            SelectionButton(ChromeIcons.Trash, "Delete selected layers", cell, tint, ids.isNotEmpty()) { state.deleteChosen() }
-            SelectionButton(SelectionIcons.Next, "Alignment options", cell, tint) { alignment = true }
+            SelectionButton(SelectionIcons.Group, stringResource(R.string.structure_group), cell, tint, ids.isNotEmpty()) { state.groupLayers(ids) }
+            SelectionButton(SelectionIcons.Mask, stringResource(R.string.structure_group_mask), cell, tint, ids.size > 1) { state.groupLayers(ids, "mask") }
+            SelectionButton(SelectionIcons.Exclude, stringResource(R.string.structure_group_exclude), cell, tint, ids.size > 1) { state.groupLayers(ids, "exclude") }
+            SelectionButton(ChromeIcons.Trash, stringResource(R.string.structure_delete_selected), cell, tint, ids.isNotEmpty()) { state.deleteChosen() }
+            SelectionButton(SelectionIcons.Next, stringResource(R.string.structure_alignment_options), cell, tint) { alignment = true }
         } else {
             val cell = Modifier.weight(1f).fillMaxHeight()
-            SelectionButton(SelectionIcons.Previous, "Group options", cell, tint) { alignment = false }
+            SelectionButton(SelectionIcons.Previous, stringResource(R.string.structure_group_options), cell, tint) { alignment = false }
             SelectionIcons.Align.forEachIndexed { edge, icon ->
-                SelectionButton(icon, icon.name, cell, tint, ids.isNotEmpty()) { scope.launch { state.alignSelection(edge) } }
+                SelectionButton(icon, stringResource(AlignNames[edge]), cell, tint, ids.isNotEmpty()) { scope.launch { state.alignSelection(edge) } }
             }
-            SelectionButton(SelectionIcons.DistributeVertical, "Distribute vertically", cell, tint, ids.size > 2) { scope.launch { state.distributeSelection(false) } }
-            SelectionButton(SelectionIcons.DistributeHorizontal, "Distribute horizontally", cell, tint, ids.size > 2) { scope.launch { state.distributeSelection(true) } }
+            SelectionButton(SelectionIcons.DistributeVertical, stringResource(R.string.structure_distribute_vertical), cell, tint, ids.size > 2) { scope.launch { state.distributeSelection(false) } }
+            SelectionButton(SelectionIcons.DistributeHorizontal, stringResource(R.string.structure_distribute_horizontal), cell, tint, ids.size > 2) { scope.launch { state.distributeSelection(true) } }
         }
     }
 }
@@ -263,14 +276,14 @@ internal fun ParentMenu(state: EditorState, onDismiss: () -> Unit) {
     val others = state.scene.layers.filter { it.id != layer.id }.reversed()
     val current = layer.node["parent"]?.toLongOrNull()
     ChoiceList(
-        listOf("None") + others.map { (if (it.id == current) "> " else "") + it.label.ifEmpty { it.kind } }, onDismiss,
+        listOf(stringResource(R.string.none)) + others.map { (if (it.id == current) "> " else "") + it.label.ifEmpty { it.kind } }, onDismiss,
     ) { i -> state.setParent(if (i == 0) null else others[i - 1].id) }
 }
 
 @Composable
 internal fun PasteStyleMenu(state: EditorState, onDismiss: () -> Unit) {
     val parts = StylePart.entries
-    ChoiceList(parts.map { it.label } + "Paste Style", onDismiss) { i ->
+    ChoiceList(parts.map { stringResource(PasteLabels.getValue(it)) } + stringResource(R.string.structure_paste_style), onDismiss) { i ->
         state.pasteStyle(if (i < parts.size) setOf(parts[i]) else parts.toSet())
     }
 }

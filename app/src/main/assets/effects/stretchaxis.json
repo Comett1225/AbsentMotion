@@ -3,9 +3,17 @@
  "name": "Stretch Axis",
  "category": "move",
  "since": "3.0.0",
- "native": true,
- "description": "Stretches the layer along an angle.",
+ "description": "Stretches the layer in any direction.",
  "params": [
+  {
+   "id": "scale",
+   "label": "Scale",
+   "type": "float",
+   "default": 1,
+   "min": 0.01,
+   "max": 50,
+   "step": 0.01
+  },
   {
    "id": "angle",
    "label": "Angle",
@@ -16,13 +24,11 @@
    "step": 0.1
   },
   {
-   "id": "amount",
-   "label": "Amount",
-   "type": "float",
-   "default": 1.5,
-   "min": 0,
-   "max": 10,
-   "step": 0.01
+   "id": "mask",
+   "label": "Mask To Layer",
+   "type": "switch",
+   "default": false
   }
- ]
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float scale;\nuniform float angle;\nuniform float mask;\nhalf4 main(float2 coord) {\n    float a = radians(angle);\n    float2 d = float2(cos(a), sin(a));\n    float2 v = coord - size * 0.5;\n    float along = dot(v, d);\n    half4 color = image.eval(coord + d * (along / max(scale, 0.01) - along));\n    if (mask > 0.5) color *= image.eval(coord).a;\n    return color;\n}\n"
 }

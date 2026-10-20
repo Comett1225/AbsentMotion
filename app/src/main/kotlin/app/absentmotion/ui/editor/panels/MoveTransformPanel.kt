@@ -52,6 +52,8 @@ import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
+import androidx.compose.ui.res.stringResource
+import app.absentmotion.R
 
 @Composable
 internal fun MoveTransformPanel(state: EditorState, layer: Layer, tab: Int, modifier: Modifier = Modifier) {
@@ -106,7 +108,7 @@ private fun PositionTab(state: EditorState, layer: Layer) {
         },
     ) {
         TrackpadCorners()
-        Text("Drag here to move the layer", Modifier.align(Alignment.Center), color = PanelCaption, fontSize = 15.sp, maxLines = 1, softWrap = false)
+        Text(stringResource(R.string.drag_here_to_move_the_layer), Modifier.align(Alignment.Center), color = PanelCaption, fontSize = 15.sp, maxLines = 1, softWrap = false)
         Column(Modifier.align(Alignment.TopCenter).padding(top = 17.px)) {
             Row {
                 Row(Modifier.width(354.px).height(70.px).clip(PanelShape).background(Am.Field)) {
@@ -299,11 +301,13 @@ private fun SizeTab(state: EditorState, layer: Layer) {
         val s = l.scale
         l.withTransform("scale", if (first || linked) drag[0] * factor else s[0], if (!first || linked) drag[1] * factor else s[1])
     }
+    val widthLabel = stringResource(R.string.transform_width)
+    val heightLabel = stringResource(R.string.transform_height)
     fun openKeypad(isWidth: Boolean) {
         active = if (isWidth) 0 else 1
         if (box == null) return
         val old = if (isWidth) boxW else boxH
-        val field = KeypadField(if (isWidth) "Width" else "Height", old)
+        val field = KeypadField(if (isWidth) widthLabel else heightLabel, old)
         state.keypad = KeypadRequest(listOf(field), 0) { v -> if (old > 0f && v[0] > 0f) stretch(v[0] / old, isWidth) }
     }
     fun colour(which: Int) = if (linked || active == which) Am.Accent else Am.OnDark
@@ -323,9 +327,9 @@ private fun SizeTab(state: EditorState, layer: Layer) {
                 NumberBox(formatFixed(boxH, 1), colour(1), Modifier.width(177.px).height(70.px)) { openKeypad(false) }
             }
             Row(Modifier.height(23.px)) {
-                Caption("Width", Modifier.width(177.px).fillMaxHeight())
+                Caption(widthLabel, Modifier.width(177.px).fillMaxHeight())
                 Spacer(Modifier.width(98.px))
-                Caption("Height", Modifier.width(177.px).fillMaxHeight())
+                Caption(heightLabel, Modifier.width(177.px).fillMaxHeight())
             }
         }
         for (which in if (linked) 0..0 else 0..1) {
@@ -355,9 +359,11 @@ private fun SizeTab(state: EditorState, layer: Layer) {
 private fun SkewTab(state: EditorState, layer: Layer) {
     var active by remember { mutableIntStateOf(0) }
     val skew = layer.skew
+    val xSkew = stringResource(R.string.transform_x_skew)
+    val ySkew = stringResource(R.string.transform_y_skew)
     fun openKeypad(which: Int) {
         active = which
-        val fields = listOf(KeypadField("X SKEW", skew[0]), KeypadField("Y SKEW", skew[1]))
+        val fields = listOf(KeypadField(xSkew, skew[0]), KeypadField(ySkew, skew[1]))
         state.keypad = KeypadRequest(fields, which) { v -> state.editSelected { it.withSkew(v[0], v[1]) } }
     }
     fun colour(which: Int) = if (active == which) Am.Accent else Am.OnDark
@@ -370,9 +376,9 @@ private fun SkewTab(state: EditorState, layer: Layer) {
                 NumberBox(formatFixed(skew[1], 1) + "º", colour(1), Modifier.width(177.px).height(70.px)) { openKeypad(1) }
             }
             Row(Modifier.height(23.px)) {
-                Caption("X SKEW", Modifier.width(177.px).fillMaxHeight())
+                Caption(xSkew, Modifier.width(177.px).fillMaxHeight())
                 Spacer(Modifier.width(14.px))
-                Caption("Y SKEW", Modifier.width(177.px).fillMaxHeight())
+                Caption(ySkew, Modifier.width(177.px).fillMaxHeight())
             }
         }
         for (which in 0..1) {

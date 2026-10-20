@@ -1,0 +1,59 @@
+{
+ "id": "smoothbevel",
+ "name": "Smooth Bevel",
+ "category": "stylize",
+ "since": "3.0.0",
+ "description": "Gives the opaque parts of the layer a smooth, rounded bevel lit from one side.",
+ "params": [
+  {
+   "id": "blur",
+   "label": "Size",
+   "type": "float",
+   "default": 20,
+   "min": 0,
+   "max": 300,
+   "step": 0.1
+  },
+  {
+   "id": "angle",
+   "label": "Light Angle",
+   "type": "angle",
+   "default": 135,
+   "min": -3600,
+   "max": 3600,
+   "step": 0.5
+  },
+  {
+   "id": "depth",
+   "label": "Depth",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 5,
+   "step": 0.01
+  },
+  {
+   "id": "intensity",
+   "label": "Intensity",
+   "type": "float",
+   "default": 0.6,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "highlight",
+   "label": "Highlight",
+   "type": "color",
+   "default": "#ffffff"
+  },
+  {
+   "id": "shadow",
+   "label": "Shadow",
+   "type": "color",
+   "default": "#000000"
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform shader blurred;\nuniform float blur;\nuniform float angle;\nuniform float depth;\nuniform float intensity;\nlayout(color) uniform half4 highlight;\nlayout(color) uniform half4 shadow;\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0 || blur <= 0.0) return src;\n    float s = max(blur * 0.2, 1.0);\n    float dx = float(blurred.eval(coord + float2(s, 0.0)).a - blurred.eval(coord - float2(s, 0.0)).a);\n    float dy = float(blurred.eval(coord + float2(0.0, s)).a - blurred.eval(coord - float2(0.0, s)).a);\n    float3 n = normalize(float3(-dx * depth * 4.0, -dy * depth * 4.0, 1.0));\n    float a = radians(angle);\n    float3 l = normalize(float3(cos(a), -sin(a), 0.8));\n    float lit = dot(n, l) - l.z;\n    float3 base = float3(src.rgb) / float(src.a);\n    float k = clamp(intensity, 0.0, 1.0);\n    float3 rgb = lit > 0.0 ? mix(base, float3(highlight.rgb), clamp(lit * 2.0, 0.0, 1.0) * k * float(highlight.a))\n                           : mix(base, float3(shadow.rgb), clamp(-lit * 2.0, 0.0, 1.0) * k * float(shadow.a));\n    return half4(half3(rgb) * src.a, src.a);\n}\n"
+}

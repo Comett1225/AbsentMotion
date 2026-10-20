@@ -1,5 +1,9 @@
 package app.absentmotion.platform
 
+import app.absentmotion.R
+import app.absentmotion.export.exportCheck
+import app.absentmotion.i18n.txt
+
 import androidx.compose.ui.graphics.asImageBitmap as androidImageBitmap
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.asAndroidPath
@@ -155,7 +159,6 @@ fun effectsMessageOnHome() = false
 
 internal const val CAPTION_MODEL_NAME = "ggml-base-q5_1.bin"
 internal const val CAPTION_MODEL_BYTES = 59_707_625L
-typealias Formatter = android.text.format.Formatter
 internal fun loadCaptionLibrary() = System.loadLibrary("whisper_jni")
 internal fun captionTextHeight(fonts: app.absentmotion.fonts.FontLibrary, text: String, font: String, size: Float, wrap: Int): Float {
     val paint = android.text.TextPaint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply { textSize = size * 3f; typeface = fonts.typeface(font) }
@@ -179,8 +182,7 @@ internal fun readPreviewPixel(surface: Any?, x: Float, y: Float, complete: (Int?
 }
 
 internal fun captionDownloadDescription(context: Context, name: String, bytes: Long) =
-    "Captions are recognised on your phone by a speech model, downloaded once: $name, " +
-        "${Formatter.formatShortFileSize(context, bytes)}, from Hugging Face."
+    context.getString(R.string.platform_caption_download, name, app.absentmotion.export.formatBytes(bytes))
 
 class Speech(context: Context) {
     private val context = context.applicationContext
@@ -204,7 +206,7 @@ class Speech(context: Context) {
             !it.isNetworkConnectionRequired && android.speech.tts.TextToSpeech.Engine.KEY_FEATURE_NOT_INSTALLED !in it.features
         }
         return usable.groupBy { it.locale.displayName }.flatMap { (language, list) ->
-            list.sortedBy { it.name }.mapIndexed { i, v -> app.absentmotion.ui.editor.SpeechVoice(v.name, "Voice ${i + 1}", language) }
+            list.sortedBy { it.name }.mapIndexed { i, v -> app.absentmotion.ui.editor.SpeechVoice(v.name, context.getString(R.string.platform_voice_name, (i + 1).toString()), language) }
         }
     }
 
@@ -221,15 +223,15 @@ class Speech(context: Context) {
     }
 
     suspend fun toFile(text: String, voice: app.absentmotion.ui.editor.SpeechVoice, rate: Float, pitch: Float): Uri {
-        check(kotlinx.coroutines.withTimeoutOrNull(START_MS) { ready.await() } == true) { "Text to speech is unavailable on this phone" }
+        exportCheck(kotlinx.coroutines.withTimeoutOrNull(START_MS) { ready.await() } == true) { txt(R.string.platform_error_tts_unavailable) }
         val file = app.absentmotion.ai.aiFile(context, "wav")
         val id = java.util.UUID.randomUUID().toString()
         val done = kotlinx.coroutines.CompletableDeferred<Boolean>().also { pending[id] = it }
         try {
             tts.stop()
             use(voice, rate, pitch)
-            check(tts.synthesizeToFile(text, null, file, id) == android.speech.tts.TextToSpeech.SUCCESS) { "The voice could not be made" }
-            check(kotlinx.coroutines.withTimeoutOrNull(START_MS + 50L * text.length) { done.await() } == true && file.length() > 44) { "The voice could not be made" }
+            exportCheck(tts.synthesizeToFile(text, null, file, id) == android.speech.tts.TextToSpeech.SUCCESS) { txt(R.string.platform_error_voice) }
+            exportCheck(kotlinx.coroutines.withTimeoutOrNull(START_MS + 50L * text.length) { done.await() } == true && file.length() > 44) { txt(R.string.platform_error_voice) }
         } catch (e: Throwable) {
             pending.remove(id); tts.stop(); file.delete(); throw e
         }

@@ -1,5 +1,7 @@
 package app.absentmotion.ai
 
+import app.absentmotion.R
+import app.absentmotion.i18n.AppText
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -20,7 +22,7 @@ import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 import kotlin.math.roundToInt
 
-internal class ModelNotReady : Exception("The background removal model is not ready yet. Connect to the internet and retry shortly; first use needs Google Play services.")
+internal class ModelNotReady : Exception(AppText.get(R.string.ai_model_not_ready_play))
 
 internal object BackgroundRemoval {
     const val AVAILABLE = true
@@ -32,7 +34,7 @@ internal object BackgroundRemoval {
         var success = false
         try {
             file = aiFile(context, "png")
-            progress(0f, "Checking background removal model…")
+            progress(0f, AppText.get(R.string.ai_checking_model))
             val modules = ModuleInstall.getClient(context)
             if (!modules.areModulesAvailable(client).completed().areModulesAvailable()) {
                 modules.deferredInstall(client)
@@ -40,14 +42,14 @@ internal object BackgroundRemoval {
             }
             coroutineContext.ensureActive()
             bitmap = decode(context, Uri.parse(uri), limit.coerceAtLeast(1))
-            progress(0.2f, "Removing background…")
+            progress(0.2f, AppText.get(R.string.ai_removing_background))
             val result = client.process(InputImage.fromBitmap(bitmap, 0)).completed()
             coroutineContext.ensureActive()
-            val mask = checkNotNull(result.foregroundConfidenceMask) { "No foreground mask was returned" }
+            val mask = checkNotNull(result.foregroundConfidenceMask) { AppText.get(R.string.ai_no_foreground_mask) }
             mask.rewind()
             val pixels = IntArray(bitmap.width * bitmap.height)
             bitmap.getPixels(pixels, 0, bitmap.width, 0, 0, bitmap.width, bitmap.height)
-            check(mask.remaining() == pixels.size) { "The foreground mask has an unexpected size" }
+            check(mask.remaining() == pixels.size) { AppText.get(R.string.ai_mask_unexpected_size) }
             for (i in pixels.indices) {
                 if (i % bitmap.width == 0) coroutineContext.ensureActive()
                 val confidence = mask.get().let { if (it.isFinite()) it.coerceIn(0f, 1f) else 0f }
@@ -56,8 +58,8 @@ internal object BackgroundRemoval {
             }
             bitmap.setHasAlpha(true)
             bitmap.setPixels(pixels, 0, bitmap.width, 0, 0, bitmap.width, bitmap.height)
-            progress(0.9f, "Saving transparent image…")
-            file.outputStream().use { check(bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)) { "Cannot save image" } }
+            progress(0.9f, AppText.get(R.string.ai_saving_transparent))
+            file.outputStream().use { check(bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)) { AppText.get(R.string.ai_cannot_save_image) } }
             coroutineContext.ensureActive()
             return aiMedia(context, file, "image/png", mapOf("width" to "${bitmap.width}", "height" to "${bitmap.height}",
                 "orientation" to "${original?.orientation ?: 0}")).also { success = true }
@@ -84,9 +86,9 @@ internal object BackgroundRemoval {
             return block { argb, width, height ->
                 val bitmap = Bitmap.createBitmap(argb, width, height, Bitmap.Config.ARGB_8888)
                 try {
-                    val mask = checkNotNull(client.process(InputImage.fromBitmap(bitmap, 0)).completed().foregroundConfidenceMask) { "No foreground mask was returned" }
+                    val mask = checkNotNull(client.process(InputImage.fromBitmap(bitmap, 0)).completed().foregroundConfidenceMask) { AppText.get(R.string.ai_no_foreground_mask) }
                     mask.rewind()
-                    check(mask.remaining() == width * height) { "The foreground mask has an unexpected size" }
+                    check(mask.remaining() == width * height) { AppText.get(R.string.ai_mask_unexpected_size) }
                     ByteArray(width * height) { (mask.get().let { if (it.isFinite()) it.coerceIn(0f, 1f) else 0f } * 255 + 0.5f).toInt().toByte() }
                 } finally {
                     bitmap.recycle()
@@ -107,14 +109,14 @@ internal object BackgroundRemoval {
         val resolver = context.contentResolver
         val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
         resolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, bounds) }
-        check(bounds.outWidth > 0 && bounds.outHeight > 0) { "Cannot read this image" }
+        check(bounds.outWidth > 0 && bounds.outHeight > 0) { AppText.get(R.string.ai_cannot_read_image) }
         val ratio = maxOf(bounds.outWidth, bounds.outHeight).toDouble() / limit
         val options = BitmapFactory.Options().apply {
             inPreferredConfig = Bitmap.Config.ARGB_8888; inMutable = true; inScaled = false
             inPreferredColorSpace = ColorSpace.get(ColorSpace.Named.SRGB)
             inSampleSize = Integer.highestOneBit(ratio.toInt().coerceAtLeast(1))
         }
-        val raw = checkNotNull(resolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, options) }) { "Cannot decode this image" }
+        val raw = checkNotNull(resolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, options) }) { AppText.get(R.string.ai_cannot_decode_image) }
         if (maxOf(raw.width, raw.height) <= limit) return raw.mirroredByExif(resolver, uri)
         val scale = limit.toFloat() / maxOf(raw.width, raw.height)
         val scaled = try {

@@ -1,5 +1,7 @@
 package app.absentmotion.ui.editor.effects
 
+import app.absentmotion.i18n.text
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -33,6 +35,8 @@ import app.absentmotion.model.Layer
 import app.absentmotion.model.Scene
 import kotlin.math.roundToInt
 import app.absentmotion.ui.theme.Am
+import androidx.compose.ui.res.stringResource
+import app.absentmotion.R
 
 @Composable
 internal fun AiBackdrop(modifier: Modifier, action: AiAction? = null) {
@@ -79,10 +83,10 @@ internal fun AiTile(action: AiAction, layer: Layer?, tools: AiTools) {
         Column(Modifier.alpha(if (reason == null) 1f else 0.35f)
             .clickable(enabled = reason == null && tools.running == null) { tools.apply(action) }, horizontalAlignment = Alignment.CenterHorizontally) {
             AiBackdrop(Modifier.size(93.dp).clip(RoundedCornerShape(5.dp)), action)
-            Text(action.title, Modifier.fillMaxWidth().height(26.dp).padding(top = 4.dp), color = Am.OnDark, fontSize = 8.sp,
+            Text(stringResource(action.title), Modifier.fillMaxWidth().height(26.dp).padding(top = 4.dp), color = Am.OnDark, fontSize = 8.sp,
                 lineHeight = 9.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center, maxLines = 2)
         }
-        Text(reason ?: "", Modifier.fillMaxWidth().height(16.dp), color = Am.OnDark.copy(alpha = 0.7f), fontSize = 8.sp,
+        Text(reason?.text() ?: "", Modifier.fillMaxWidth().height(16.dp), color = Am.OnDark.copy(alpha = 0.7f), fontSize = 8.sp,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center, maxLines = 1)
     }
 }
@@ -95,36 +99,39 @@ internal fun AiVideoDialog(tools: AiTools, scene: Scene) {
     val frames = (seconds * (media?.fps ?: 30f)).roundToInt()
     val size = media?.let { matteSize(it.width, it.height, tools.videoSide) }
     val tooLong = seconds > MAX_MATTE_SECONDS
+    val sizeNames = listOf(R.string.aibrowser_size_small, R.string.aibrowser_size_medium, R.string.aibrowser_size_large)
     AlertDialog(onDismissRequest = { tools.videoSetup = null },
-        title = { Text(AiAction.Video.title, color = Am.OnDark) },
+        title = { Text(stringResource(AiAction.Video.title), color = Am.OnDark) },
         text = {
             Column {
-                Text("Every frame of this clip is processed on this phone. The result is a group with the video and a mask layer above it.",
+                Text(stringResource(R.string.every_frame_of_this_clip_is),
                     color = Am.OnDark, fontSize = 14.sp)
                 Row(Modifier.padding(top = 14.dp).fillMaxWidth().height(36.dp).clip(RoundedCornerShape(6.dp)).background(Am.PanelInset)) {
-                    for ((side, name) in MatteSides.zip(listOf("Small", "Medium", "Large"))) {
+                    for ((side, name) in MatteSides.zip(sizeNames)) {
                         val on = side == tools.videoSide
                         Box(Modifier.weight(1f).fillMaxHeight().padding(2.dp).clip(RoundedCornerShape(5.dp)).background(if (on) Am.FieldHi else Color.Transparent)
                             .clickable { tools.videoSide = side }, Alignment.Center) {
-                            Text("$name ${side}p", color = if (on) Am.Accent else Am.OnDark, fontSize = 12.sp, maxLines = 1)
+                            Text(stringResource(R.string.aibrowser_size_option, stringResource(name), side.toString()), color = if (on) Am.Accent else Am.OnDark, fontSize = 12.sp, maxLines = 1)
                         }
                     }
                 }
                 Text(
                     when {
-                        tooLong -> "Clips longer than ${MAX_MATTE_SECONDS / 60} minutes are not supported yet. Trim or split the clip first."
-                        size == null -> "This video has no size information."
-                        else -> "$frames frames at ${size.first} × ${size.second}, about ${matteBytes(seconds, size.first, size.second) / 1_000_000 + 1} MB." +
-                            if (seconds > LONG_MATTE_SECONDS) " Long clip: this can take several minutes and use a lot of battery." else ""
+                        tooLong -> pluralStringResource(R.plurals.aibrowser_too_long, MAX_MATTE_SECONDS / 60, (MAX_MATTE_SECONDS / 60).toString())
+                        size == null -> stringResource(R.string.aibrowser_no_size)
+                        else -> pluralStringResource(
+                            if (seconds > LONG_MATTE_SECONDS) R.plurals.aibrowser_estimate_long else R.plurals.aibrowser_estimate, frames,
+                            frames.toString(), size.first.toString(), size.second.toString(), (matteBytes(seconds, size.first, size.second) / 1_000_000 + 1).toString(),
+                        )
                     },
                     Modifier.padding(top = 12.dp).height(54.dp), color = if (tooLong) Am.Warning else Am.Caption, fontSize = 12.sp, lineHeight = 17.sp,
                 )
             }
         },
         confirmButton = {
-            TextButton({ tools.apply(AiAction.Video, confirmed = true) }, enabled = !tooLong && size != null) { Text("Start", color = Am.Accent) }
+            TextButton({ tools.apply(AiAction.Video, confirmed = true) }, enabled = !tooLong && size != null) { Text(stringResource(R.string.start), color = Am.Accent) }
         },
-        dismissButton = { TextButton({ tools.videoSetup = null }) { Text("Cancel", color = Am.Accent) } },
+        dismissButton = { TextButton({ tools.videoSetup = null }) { Text(stringResource(R.string.cancel), color = Am.Accent) } },
         containerColor = Am.Field)
 }
 
@@ -133,7 +140,7 @@ internal fun AiProgressDialog(tools: AiTools) {
     if (tools.message.isEmpty()) return
     val action = tools.running
     AlertDialog(onDismissRequest = { if (action != null) tools.cancel() else tools.dismiss() },
-        title = { Text(action?.title ?: "AI", color = Am.OnDark) },
+        title = { Text(action?.let { stringResource(it.title) } ?: stringResource(R.string.ai), color = Am.OnDark) },
         text = {
             Column {
                 Text(tools.message, color = Am.OnDark, fontSize = 14.sp)
@@ -145,9 +152,9 @@ internal fun AiProgressDialog(tools: AiTools) {
         },
         confirmButton = {
             TextButton({ if (action != null) tools.cancel() else tools.retry?.let(tools::apply) ?: tools.dismiss() }) {
-                Text(if (action != null) "Cancel" else if (tools.retry != null) "Retry" else "OK", color = Am.Accent)
+                Text(stringResource(if (action != null) R.string.cancel else if (tools.retry != null) R.string.aibrowser_retry else R.string.ok), color = Am.Accent)
             }
         },
-        dismissButton = { if (action == null && tools.retry != null) TextButton(tools::dismiss) { Text("Cancel", color = Am.Accent) } },
+        dismissButton = { if (action == null && tools.retry != null) TextButton(tools::dismiss) { Text(stringResource(R.string.cancel), color = Am.Accent) } },
         containerColor = Am.Field)
 }

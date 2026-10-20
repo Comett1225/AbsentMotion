@@ -1,5 +1,7 @@
 package app.absentmotion.ui.editor.panels
 
+import app.absentmotion.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -222,7 +224,7 @@ private fun Graph(state: EditorState, easing: Easing, overshoot: Boolean, modifi
         Row(Modifier.align(Alignment.BottomCenter).fillMaxWidth().height(98.px), verticalAlignment = Alignment.CenterVertically) {
             StretchButton(state, -1)
             Box(Modifier.weight(1f), Alignment.Center) {
-                Text(EasingCatalog.presetOf(easing).label, color = CaptionColour, fontSize = 9.sp, maxLines = 1, softWrap = false)
+                Text(stringResource(EasingCatalog.presetOf(easing).label), color = CaptionColour, fontSize = 9.sp, maxLines = 1, softWrap = false)
             }
             StretchButton(state, 1)
         }
@@ -348,10 +350,10 @@ private object AboveAnchor : PopupPositionProvider {
 private fun OverflowMenu(state: EditorState, bezier: Boolean, overshoot: Boolean, toggleOvershoot: () -> Unit, onDismiss: () -> Unit) {
     Popup(AboveAnchor, onDismiss, PopupProperties(focusable = true)) {
         Column(Modifier.width(250.dp).clip(RoundedCornerShape(8.dp)).background(MenuBg)) {
-            MenuRow("Copy Curve", true, false) { state.copyCurve(); onDismiss() }
-            MenuRow("Paste Curve", state.canPasteCurve, true) { state.pasteCurve(); onDismiss() }
-            MenuRow("Apply Curve to All Keyframes", state.canPasteCurve, true) { state.pasteCurveToAll(); onDismiss() }
-            if (bezier && state.panel != EditorPanel.Speed) MenuRow(if (overshoot) "Disable Overshoot" else "Enable Overshoot", true, true) {
+            MenuRow(stringResource(R.string.easing_copy_curve), true, false) { state.copyCurve(); onDismiss() }
+            MenuRow(stringResource(R.string.easing_paste_curve), state.canPasteCurve, true) { state.pasteCurve(); onDismiss() }
+            MenuRow(stringResource(R.string.easing_apply_to_all), state.canPasteCurve, true) { state.pasteCurveToAll(); onDismiss() }
+            if (bezier && state.panel != EditorPanel.Speed) MenuRow(stringResource(if (overshoot) R.string.easing_disable_overshoot else R.string.easing_enable_overshoot), true, true) {
                 toggleOvershoot()
                 onDismiss()
             }

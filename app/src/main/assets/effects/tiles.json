@@ -1,0 +1,49 @@
+{
+ "id": "tiles",
+ "name": "Tiles",
+ "category": "distort",
+ "since": "3.0.0",
+ "description": "Repeats the layer in a tile pattern that fills the screen, with optional mirroring, row offset and rotation.",
+ "params": [
+  {
+   "id": "crop",
+   "label": "Crop",
+   "type": "float",
+   "default": 1,
+   "min": 0.005,
+   "max": 20,
+   "step": 0.005
+  },
+  {
+   "id": "offset",
+   "label": "Offset",
+   "type": "float",
+   "default": 0,
+   "min": -100,
+   "max": 100,
+   "step": 0.01
+  },
+  {
+   "id": "mirror",
+   "label": "Mirror",
+   "type": "switch",
+   "default": false
+  },
+  {
+   "id": "vertical",
+   "label": "Offset Vertically",
+   "type": "switch",
+   "default": false
+  },
+  {
+   "id": "angle",
+   "label": "Angle",
+   "type": "angle",
+   "default": 0,
+   "min": -1800,
+   "max": 1800,
+   "step": 0.5
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float crop;\nuniform float offset;\nuniform float mirror;\nuniform float vertical;\nuniform float angle;\nhalf4 main(float2 coord) {\n    float2 c = size * 0.5;\n    float a = radians(angle);\n    float cs = cos(a);\n    float sn = sin(a);\n    float2 p = coord - c;\n    p = float2(cs * p.x + sn * p.y, -sn * p.x + cs * p.y) / max(crop, 0.005);\n    float2 g = p / max(size, float2(1.0)) + 0.5;\n    if (vertical > 0.5) g.y -= offset * floor(g.x);\n    else g.x -= offset * floor(g.y);\n    float2 n = floor(g);\n    float2 t = g - n;\n    if (mirror > 0.5) t = mix(t, 1.0 - t, mod(n, 2.0));\n    return image.eval(clamp(t * size, float2(0.5), size - 0.5));\n}\n"
+}

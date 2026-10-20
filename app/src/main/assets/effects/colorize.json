@@ -1,0 +1,29 @@
+{
+ "id": "colorize",
+ "name": "Colorize",
+ "category": "color",
+ "since": "3.0.0",
+ "description": "Tints the whole layer with one hue while keeping its light and shade.",
+ "params": [
+  {
+   "id": "hue",
+   "label": "Hue",
+   "type": "angle",
+   "default": 0,
+   "min": 0,
+   "max": 360,
+   "step": 0.5
+  },
+  {
+   "id": "amount",
+   "label": "Amount",
+   "type": "float",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float hue;\nuniform float amount;\nfloat luma(float3 c) { return dot(c, float3(0.2126, 0.7152, 0.0722)); }\nfloat3 hue2rgb(float h) {\n    return clamp(abs(mod(h * 6.0 + float3(0.0, 4.0, 2.0), 6.0) - 3.0) - 1.0, 0.0, 1.0);\n}\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return src;\n    float3 rgb = float3(src.rgb) / float(src.a);\n    float l = luma(rgb);\n    float3 tint = hue2rgb(hue / 360.0);\n    float3 colored = l < 0.5 ? tint * l * 2.0 : mix(tint, float3(1.0), l * 2.0 - 1.0);\n    return half4(half3(mix(rgb, colored, clamp(amount, 0.0, 1.0))) * src.a, src.a);\n}\n"
+}

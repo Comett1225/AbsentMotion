@@ -1,5 +1,9 @@
 package app.absentmotion.library
 
+import app.absentmotion.R
+import app.absentmotion.i18n.AppText
+import app.absentmotion.i18n.UiText
+import app.absentmotion.i18n.txt
 import app.absentmotion.platform.Context
 import app.absentmotion.platform.Uri
 import app.absentmotion.compat.EffectMigration
@@ -19,13 +23,15 @@ import java.io.OutputStream
 import java.io.Serializable
 import java.util.zip.ZipInputStream
 
-class ImportFailed(message: String) : Exception(message)
+class ImportFailed(val text: UiText) : Exception(text.toString())
+
+fun reportText(value: String): UiText = txt(R.string.library_text_value, value)
 
 data class ImportReport(
     val id: String,
     val title: String,
     val element: Boolean,
-    val sections: List<Pair<String, List<String>>>,
+    val sections: List<Pair<UiText, List<UiText>>>,
     val template: Boolean = false,
 ) : Serializable
 
@@ -47,13 +53,13 @@ class Importer(
     private val limits: ImportLimits = ImportLimits(),
 ) {
     fun import(open: () -> InputStream?): List<ImportReport> {
-        fun stream() = open() ?: throw ImportFailed("No data received.")
+        fun stream() = open() ?: throw ImportFailed(txt(R.string.library_err_no_data))
         val head = stream().use { it.readNBytes(2) }
         if (head.size == 2 && head[0] == 'P'.code.toByte() && head[1] == 'K'.code.toByte()) {
             return fromPackage(::stream).map { if (it.element) it else it.copy(template = true) }
         }
         val text = stream().use { readText(it, MaxXml) }.removePrefix("\uFEFF")
-        if (!text.trimStart().startsWith("<")) throw ImportFailed("Unsupported file type")
+        if (!text.trimStart().startsWith("<")) throw ImportFailed(txt(R.string.library_err_unsupported_type))
         return listOf(add(text) { _, _ -> emptyMap() })
     }
 
@@ -82,22 +88,22 @@ class Importer(
                     }
                 }
             }
-            if (sigs == null && links == null) throw ImportFailed("Project package missing manifest")
-            val declaredProject = projectEntry?.let { find(it, files) ?: throw ImportFailed("Malformed package: project file is missing") }
+            if (sigs == null && links == null) throw ImportFailed(txt(R.string.library_err_missing_manifest))
+            val declaredProject = projectEntry?.let { find(it, files) ?: throw ImportFailed(txt(R.string.library_err_package_project_missing)) }
             val mediaEntries = (links.orEmpty().values + sigs.orEmpty().values).mapNotNull { find(it, files) }.toSet()
             eachEntry(open, limits) { name, input ->
                 if (name == declaredProject || declaredProject == null && name.endsWith(".xml", ignoreCase = true) && name !in mediaEntries) {
                     val text = readText(input, MaxXml)
                     val isScene = declaredProject != null || runCatching { XmlNode.parse(text.removePrefix("\uFEFF")).name == "scene" }.getOrDefault(false)
                     if (isScene) {
-                        if (scenes.size >= limits.scenes) throw ImportFailed("The package holds too many projects (more than ${limits.scenes})")
+                        if (scenes.size >= limits.scenes) throw ImportFailed(txt(R.string.library_err_too_many_projects, limits.scenes.toString()))
                         sceneText += text.length
-                        if (sceneText > limits.sceneText) throw ImportFailed("The package's project files are too large")
+                        if (sceneText > limits.sceneText) throw ImportFailed(txt(R.string.library_err_project_files_large))
                         scenes += text
                     }
                 }
             }
-            if (scenes.isEmpty()) throw ImportFailed("Malformed Scene: no project in the package")
+            if (scenes.isEmpty()) throw ImportFailed(txt(R.string.library_err_no_project))
             return scenes.mapTo(saved) { text ->
                 add(text) { id, root ->
                     val declared = Scene(root).media.associateBy { it.uri }
@@ -120,25 +126,25 @@ class Importer(
             }
         } catch (t: Throwable) {
             saved.forEach { store.delete(it.id) }
-            if (t is IOException) throw ImportFailed("Malformed package: ${t.message}")
+            if (t is IOException) throw ImportFailed(txt(R.string.library_err_malformed_package, t.message.toString()))
             throw t
         }
     }
 
     private fun add(text: String, copies: (String, XmlNode) -> Map<String, String>): ImportReport {
-        val root = try { XmlNode.parse(text.removePrefix("\uFEFF")) } catch (e: Exception) { throw ImportFailed("Malformed XML: ${e.message}") }
+        val root = try { XmlNode.parse(text.removePrefix("\uFEFF")) } catch (e: Exception) { throw ImportFailed(txt(R.string.library_err_malformed_xml, e.message.toString())) }
         val width = root["width"]?.toIntOrNull() ?: 0
         val height = root["height"]?.toIntOrNull() ?: 0
-        if (root.name != "scene" || width <= 0 || height <= 0) throw ImportFailed("Malformed Scene: expected a <scene> with a size")
-        if (width > MaxSide || height > MaxSide) throw ImportFailed("Malformed Scene: the size is larger than $MaxSide pixels")
-        if (root["fps"]?.toIntOrNull()?.let { it !in 1..MaxFps } == true) throw ImportFailed("Malformed Scene: the frame rate must be from 1 to $MaxFps")
+        if (root.name != "scene" || width <= 0 || height <= 0) throw ImportFailed(txt(R.string.library_err_scene_needs_size))
+        if (width > MaxSide || height > MaxSide) throw ImportFailed(txt(R.string.library_err_scene_too_big, MaxSide.toString()))
+        if (root["fps"]?.toIntOrNull()?.let { it !in 1..MaxFps } == true) throw ImportFailed(txt(R.string.library_err_scene_fps, MaxFps.toString()))
         val id = store.newId()
         try {
             val moved = copies(id, root)
             var scene = relink(Scene(uniqueLayerIds(root.mapMediaUris { moved[it] ?: access.defused(it) })))
             val migrated = migration?.migrate(scene)
             if (migrated != null) scene = migrated.scene
-            if (scene.title.isBlank()) scene = scene.withTitle("Imported Project")
+            if (scene.title.isBlank()) scene = scene.withTitle(AppText.get(R.string.library_imported_project))
             val missing = scene.node.mediaUris().filterNot { access.allows(it) && exists(it) }
             for (uri in missing) scene = scene.withMedia(MediaDeclaration(XmlNode("media", mapOf("uri" to uri))))
             scene = Scene(scene.node.copy(children = scene.node.children.map { if (it.name == "media" && it["uri"] in missing) it.with("missing", "true") else it }))
@@ -150,22 +156,22 @@ class Importer(
         }
     }
 
-    private fun report(scene: Scene, missing: List<String>, migrated: EffectMigration.Result?): List<Pair<String, List<String>>> {
+    private fun report(scene: Scene, missing: List<String>, migrated: EffectMigration.Result?): List<Pair<UiText, List<UiText>>> {
         val layers = allLayers(scene.node).toList()
         val unknown = sortedSetOf<String>()
         scene.node.children.filter { it.name !in Scene.LAYER_TAGS && it.name != "media" && it.name != "bookmark" }.forEach { unknown += "<${it.name}>" }
         for (layer in layers) for (attr in layer.attrs.keys - KnownAttributes) unknown += "${layer.name} $attr"
         val effects = layers.flatMap { l -> l.children.filter { it.name == "effect" }.mapNotNull { it["id"] }.distinct() }
             .groupingBy { it }.eachCount().filterKeys { !canRun(it) }
-            .map { (id, n) -> id.substringAfterLast('.') + if (n == 1) " (1 layer)" else " ($n layers)" }
+            .map { (id, n) -> UiText.plural(R.plurals.library_report_effect_layers, n, id.substringAfterLast('.'), n.toString()) }
         val fonts = layers.filter { it.name == "text" }.mapNotNull { it["font"] }.filter { it.startsWith("imported") && !hasFont(it) }
             .map { it.substringAfter("name=").substringBefore('&') }.distinct()
         val names = missing.map { uri -> scene.media(uri)?.filename?.takeIf { it.isNotEmpty() } ?: uri.substringAfterLast('/') }
         return listOf(
-            "Not recognised, kept in the file" to unknown.toList(), "Effects this version cannot run" to effects,
-            "Effects turned into this app's own" to migrated?.converted?.map { (what, n) -> what + if (n == 1) " (1 effect)" else " ($n effects)" }.orEmpty(),
-            "Effect settings that could not be carried over" to migrated?.dropped?.toList().orEmpty(),
-            "Media not found" to names, "Fonts not installed" to fonts,
+            txt(R.string.library_report_unknown) to unknown.map(::reportText), txt(R.string.library_report_cannot_run) to effects,
+            txt(R.string.library_report_converted) to migrated?.converted?.map { (what, n) -> UiText.plural(R.plurals.library_report_converted_effects, n, what, n.toString()) }.orEmpty(),
+            txt(R.string.library_report_dropped) to migrated?.dropped?.map(::reportText).orEmpty(),
+            txt(R.string.library_report_media) to names.map(::reportText), txt(R.string.library_report_fonts) to fonts.map(::reportText),
         ).filter { it.second.isNotEmpty() }
     }
 
@@ -226,7 +232,7 @@ class Importer(
             ZipInputStream(open().buffered()).use { zip ->
                 fun charge(n: Int) {
                     left -= n
-                    if (left < 0) throw ImportFailed("The package is too large (more than ${limits.unpacked shr 20} MB unpacked)")
+                    if (left < 0) throw ImportFailed(txt(R.string.library_err_package_large, (limits.unpacked shr 20).toString()))
                 }
                 val counted = object : InputStream() {
                     override fun read(): Int = zip.read().also { if (it >= 0) charge(1) }
@@ -234,7 +240,7 @@ class Importer(
                 }
                 while (true) {
                     val entry = zip.nextEntry ?: break
-                    if (++entries > limits.entries) throw ImportFailed("The package has too many files (more than ${limits.entries})")
+                    if (++entries > limits.entries) throw ImportFailed(txt(R.string.library_err_too_many_files, limits.entries.toString()))
                     if (!entry.isDirectory) entryPath(entry.name).takeIf { leaf(it) != null }?.let { visit(it, counted) }
                     counted.transferTo(OutputStream.nullOutputStream())
                 }
@@ -243,7 +249,7 @@ class Importer(
 
         private fun readText(input: InputStream, limit: Int): String {
             val bytes = input.readNBytes(limit + 1)
-            if (bytes.size > limit) throw ImportFailed("Malformed XML: file is too large")
+            if (bytes.size > limit) throw ImportFailed(txt(R.string.library_err_xml_large))
             return bytes.toString(Charsets.UTF_8)
         }
 
@@ -256,7 +262,7 @@ class Importer(
                         val n = input.read(buffer)
                         if (n < 0) break
                         total += n
-                        if (total > allowed) throw ImportFailed("The package is too large (more than ${allowed shr 20} MB of media)")
+                        if (total > allowed) throw ImportFailed(txt(R.string.library_err_media_large, (allowed shr 20).toString()))
                         out.write(buffer, 0, n)
                     }
                 }

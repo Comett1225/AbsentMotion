@@ -1,5 +1,8 @@
 package app.absentmotion.library
 
+import app.absentmotion.i18n.txt
+import app.absentmotion.i18n.UiText
+import app.absentmotion.R
 import app.absentmotion.TestData
 import app.absentmotion.model.MediaDeclaration
 import app.absentmotion.model.Scene
@@ -99,8 +102,8 @@ class ImporterTest {
         assertEquals("element", node["type"])
         assertTrue(node.children.any { it.name == "widget" })
         assertEquals(true, report.element)
-        assertEquals(listOf("<widget>"), report.sections.first { it.first.startsWith("Not recognised") }.second)
-        assertEquals(listOf("c.mp4"), report.sections.first { it.first == "Media not found" }.second)
+        assertEquals(listOf(reportText("<widget>")), report.sections.first { it.first == txt(R.string.library_report_unknown) }.second)
+        assertEquals(listOf(reportText("c.mp4")), report.sections.first { it.first == txt(R.string.library_report_media) }.second)
         assertEquals("true", node.children.first { it.name == "media" && it["uri"] == "amproj:three.mp4" }["missing"])
         assertFalse(node.children.first { it.name == "media" && it["filename"] == "a.jpg" }.attrs.containsKey("missing"))
     }
@@ -123,21 +126,21 @@ class ImporterTest {
         val file = TestData.scene("media")
         val store = store()
         val report = Importer(store, exists = { false }, canRun = { false }, hasFont = { false }).import { file.inputStream() }.single()
-        assertEquals(listOf("test-image.jpg", "test-alpha.png", "test-video.mp4", "test-audio.m4a"), report.sections.first { it.first == "Media not found" }.second)
+        assertEquals(listOf("test-image.jpg", "test-alpha.png", "test-video.mp4", "test-audio.m4a").map(::reportText), report.sections.first { it.first == txt(R.string.library_report_media) }.second)
         assertEquals(4, saved(store, report).children.count { it.name == "media" && it["missing"] == "true" })
         val effect = """<scene width="10" height="10"><text id="1" font="imported?name=Foo.ttf"><effect id="blur" /></text>
             <shape id="2"><effect id="blur" /><effect id="glow" /></shape></scene>"""
         val sections = Importer(store, canRun = { false }, hasFont = { false }).import { effect.byteInputStream() }.single().sections.toMap()
-        assertEquals(listOf("blur (2 layers)", "glow (1 layer)"), sections["Effects this version cannot run"])
-        assertEquals(listOf("Foo.ttf"), sections["Fonts not installed"])
+        assertEquals(listOf(UiText.plural(R.plurals.library_report_effect_layers, 2, "blur", "2"), UiText.plural(R.plurals.library_report_effect_layers, 1, "glow", "1")), sections[txt(R.string.library_report_cannot_run)])
+        assertEquals(listOf(reportText("Foo.ttf")), sections[txt(R.string.library_report_fonts)])
     }
 
     @Test fun otherFilesAreRefusedWithTheImportersMessages() {
-        fun failure(bytes: ByteArray) = try { Importer(store()).import { ByteArrayInputStream(bytes) }; fail("imported"); "" } catch (e: ImportFailed) { e.message!! }
-        assertEquals("Unsupported file type", failure("hello".toByteArray()))
-        assertEquals("Project package missing manifest", failure(zip(listOf("a.xml" to "<scene width=\"1\" height=\"1\"/>".toByteArray()))))
-        assertTrue(failure("<html/>".toByteArray()).startsWith("Malformed Scene"))
-        assertTrue(failure("<scene width=\"1\"".toByteArray()).startsWith("Malformed XML"))
+        fun failure(bytes: ByteArray) = try { Importer(store()).import { ByteArrayInputStream(bytes) }; fail("imported"); txt(0) } catch (e: ImportFailed) { e.text }
+        assertEquals(txt(R.string.library_err_unsupported_type), failure("hello".toByteArray()))
+        assertEquals(txt(R.string.library_err_missing_manifest), failure(zip(listOf("a.xml" to "<scene width=\"1\" height=\"1\"/>".toByteArray()))))
+        assertEquals(R.string.library_err_scene_needs_size, failure("<html/>".toByteArray()).id)
+        assertEquals(R.string.library_err_malformed_xml, failure("<scene width=\"1\"".toByteArray()).id)
     }
 
     @Test fun aZeroFrameRateFallsBackAndImportRefusesBadRatesAndSizes() {
@@ -145,11 +148,11 @@ class ImporterTest {
         assertEquals(30, zero.fps)
         assertEquals(1000, zero.frameStart(30))
         assertEquals(30, zero.lastFrame)
-        fun failure(xml: String) = try { Importer(store()).import { xml.byteInputStream() }; fail("imported $xml"); "" } catch (e: ImportFailed) { e.message!! }
-        assertTrue(failure("""<scene width="10" height="10" fps="0"/>""").contains("frame rate"))
-        assertTrue(failure("""<scene width="10" height="10" fps="1000"/>""").contains("frame rate"))
-        assertTrue(failure("""<scene width="100000" height="10" fps="30"/>""").contains("size"))
-        assertTrue(failure("""<scene width="10" height="100000"/>""").contains("size"))
+        fun failure(xml: String) = try { Importer(store()).import { xml.byteInputStream() }; fail("imported $xml"); txt(0) } catch (e: ImportFailed) { e.text }
+        assertEquals(R.string.library_err_scene_fps, failure("""<scene width="10" height="10" fps="0"/>""").id)
+        assertEquals(R.string.library_err_scene_fps, failure("""<scene width="10" height="10" fps="1000"/>""").id)
+        assertEquals(R.string.library_err_scene_too_big, failure("""<scene width="100000" height="10" fps="30"/>""").id)
+        assertEquals(R.string.library_err_scene_too_big, failure("""<scene width="10" height="100000"/>""").id)
         val store = store()
         assertEquals(240, store.load(Importer(store).import { """<scene width="16384" height="10" fps="240"/>""".byteInputStream() }.single().id)!!.fps)
     }

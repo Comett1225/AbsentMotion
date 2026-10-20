@@ -1,5 +1,9 @@
 package app.absentmotion.export
 
+import app.absentmotion.R
+import app.absentmotion.i18n.AppText
+import app.absentmotion.i18n.UiText
+import app.absentmotion.i18n.txt
 import app.absentmotion.platform.Uri
 import java.io.FileDescriptor
 import java.io.OutputStream
@@ -34,8 +38,8 @@ const val LowStorageBytes = 1L shl 30
 
 sealed interface StorageStatus {
     data object Enough : StorageStatus
-    data class Low(val message: String) : StorageStatus
-    data class NotEnough(val message: String) : StorageStatus
+    data class Low(val message: UiText) : StorageStatus
+    data class NotEnough(val message: UiText) : StorageStatus
 }
 
 fun bytesNeeded(estimate: Long): Long = (estimate.coerceAtLeast(0) * 1.1).toLong() + MinFreeBytes
@@ -43,10 +47,20 @@ fun bytesNeeded(estimate: Long): Long = (estimate.coerceAtLeast(0) * 1.1).toLong
 fun storageStatus(estimate: Long, free: Long): StorageStatus {
     val needed = bytesNeeded(estimate)
     return when {
-        needed > free -> StorageStatus.NotEnough("This export needs about ${formatBytes(needed)} but only ${formatBytes(free.coerceAtLeast(0))} is free. Free up some storage or pick a smaller size.")
-        free - needed < LowStorageBytes -> StorageStatus.Low("Storage is almost full: about ${formatBytes(free - needed)} will be left after this export.")
+        needed > free -> StorageStatus.NotEnough(txt(R.string.export_storage_not_enough, formatBytes(needed), formatBytes(free.coerceAtLeast(0))))
+        free - needed < LowStorageBytes -> StorageStatus.Low(txt(R.string.export_storage_low, formatBytes(free - needed)))
         else -> StorageStatus.Enough
     }
 }
 
-class StorageFullException : java.io.IOException("The phone ran out of storage during the export. The unfinished file was removed.")
+class StorageFullException : java.io.IOException() {
+    override val message: String get() = AppText.get(R.string.export_storage_full)
+}
+
+class ExportError(val text: UiText) : IllegalStateException() {
+    override val message: String get() = AppText.get(text)
+}
+
+inline fun exportCheck(ok: Boolean, text: () -> UiText) {
+    if (!ok) throw ExportError(text())
+}

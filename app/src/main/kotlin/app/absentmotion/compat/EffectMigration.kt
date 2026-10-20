@@ -23,6 +23,7 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
         val max: Float = Float.MAX_VALUE,
         val values: Map<String, Float> = emptyMap(),
         val neutral: String? = null,
+        val component: Int = -1,
     )
 
     class Rule(val to: String, val params: Map<String, List<Conversion?>>, val set: Map<String, String>)
@@ -34,32 +35,37 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
     fun migrate(scene: Scene): Result {
         val converted = linkedMapOf<String, Int>()
         val dropped = sortedSetOf<String>()
+        var renamed = false
         fun visit(node: XmlNode): XmlNode {
             val rule = if (node.name == "effect") rules[node["id"]] else null
             val own = rule?.let { catalog.definitions.firstOrNull { d -> d.key == it.to } }
-            if (rule != null && own != null) {
-                converted.merge("${node["id"]!!.substringAfterLast('.')} → ${own.name}", 1, Int::plus)
-                return convert(node, rule, own) { dropped += "${own.name}: $it" }
+            val older = own != null && node["id"] == own.id
+            if (rule != null && own != null && (!older || node.children.any { c -> c.name == "property" && own.params.none { it.id == c["name"] } })) {
+                if (older) renamed = true else converted.merge("${node["id"]!!.substringAfterLast('.')} → ${own.name}", 1, Int::plus)
+                return convert(node, rule, own, older) { dropped += "${own.name}: $it" }
             }
             return if (node.children.isEmpty()) node else node.copy(children = node.children.map(::visit))
         }
         val root = visit(scene.node)
-        return Result(if (converted.isEmpty()) scene else Scene(root), converted, dropped)
+        return Result(if (converted.isEmpty() && !renamed) scene else Scene(root), converted, dropped)
     }
 
-    private fun convert(effect: XmlNode, rule: Rule, own: EffectDefinition, drop: (String) -> Unit): XmlNode {
+    private fun convert(effect: XmlNode, rule: Rule, own: EffectDefinition, keep: Boolean, drop: (String) -> Unit): XmlNode {
         val made = linkedMapOf<String, XmlNode>()
         val others = ArrayList<XmlNode>()
         for (child in effect.children) {
             val name = child["name"]
             if (child.name != "property" || name == null) { others += child; continue }
             val conversions = rule.params[name]
-            if (conversions == null) { drop(name); continue }
+            if (conversions == null) {
+                if (keep && own.params.any { it.id == name }) made.putIfAbsent(name, child) else drop(name)
+                continue
+            }
             val split = conversions.size > 1
             conversions.forEachIndexed { i, c ->
                 val param = c?.to?.let { to -> own.params.firstOrNull { it.id == to } }
                 if (param != null) {
-                    made[param.id] = property(child, param.id, param.type) { text -> convertValue(text, c, if (split) i else -1) }
+                    made[param.id] = property(child, param.id, param.type) { text -> convertValue(text, c, if (c.component >= 0) c.component else if (split) i else -1) }
                 } else if (c?.neutral == null || values(child).any { !same(if (split) it.split(',').getOrElse(i) { "" } else it, c.neutral) }) {
                     drop(if (split) "$name (${i + 1})" else name)
                 }
@@ -140,6 +146,7 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
             json.optDouble("max", Float.MAX_VALUE.toDouble()).toFloat(),
             json.optJSONObject("values")?.let { v -> v.keys().asSequence().associateWith { v.getDouble(it).toFloat() } }.orEmpty(),
             json.opt("neutral")?.toString(),
+            json.optInt("component", -1),
         )
     }
 }

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import keyword
 import json
 import re
 import sys
@@ -28,6 +29,7 @@ KEEP = {'AbsentMotion', 'Alight Motion', 'Roboto'}
 REWRITE_IMPORTS = ['import androidx.compose.ui.res.stringResource', 'import app.absentmotion.R']
 FOLDERS = {'en': 'values', 'id': 'values-in', 'hi': 'values-hi', 'pt-BR': 'values-pt-rBR', 'es': 'values-es', 'fil': 'values-fil',
            'vi': 'values-vi', 'th': 'values-th', 'ms': 'values-ms', 'ar': 'values-ar', 'tr': 'values-tr', 'ru': 'values-ru'}
+JAVA_WORDS = {'new', 'default', 'switch', 'case', 'do', 'final', 'private', 'public', 'static', 'void', 'int', 'char', 'this', 'super', 'throw', 'goto', 'const', 'package', 'native', 'long', 'short', 'byte', 'float', 'double', 'boolean', 'catch', 'enum', 'extends', 'implements', 'interface', 'instanceof', 'protected', 'synchronized', 'throws', 'transient', 'volatile', 'abstract', 'strictfp', 'null', 'true', 'false'}
 PLACEHOLDER = re.compile(r'%(\d+\$)?[sdf]')
 LETTER = re.compile('[A-Za-z\u00c0-\uffff]')
 
@@ -228,7 +230,11 @@ def read_strings(path):
     if not path.is_file():
         return {}
     text = path.read_text(encoding='utf-8')
-    return {m.group(1): m.group(2) for m in re.finditer(r'<string name="([A-Za-z0-9_]+)"[^>]*>(.*?)</string>', text, re.S)}
+    found = {m.group(1): m.group(3) for m in re.finditer(r'<string name="([A-Za-z0-9_]+)"([^>]*)>(.*?)</string>', text, re.S) if 'translatable="false"' not in m.group(2)}
+    for m in re.finditer(r'<plurals name="([A-Za-z0-9_]+)"[^>]*>(.*?)</plurals>', text, re.S):
+        for q, v in re.findall(r'<item quantity="([a-z]+)">(.*?)</item>', m.group(2), re.S):
+            found[f'{m.group(1)}#{q}'] = v
+    return found
 
 
 def xml_escape(text):
@@ -245,7 +251,7 @@ def xml_unescape(value):
 def make_key(text, taken):
     words = re.findall(r'[a-z0-9]+', text.lower().encode('ascii', 'ignore').decode())
     base = '_'.join(words[:6])[:40].strip('_') or 'text'
-    if base[0].isdigit():
+    if base[0].isdigit() or keyword.iskeyword(base) or base in JAVA_WORDS:
         base = 't_' + base
     key, n = base, 2
     while key in taken:
@@ -268,7 +274,7 @@ def add_imports(src):
 def rewrite(found, write):
     english_path = strings_file('values')
     existing = read_strings(english_path)
-    by_text = {xml_unescape(v): k for k, v in existing.items()}
+    by_text = {xml_unescape(v): k for k, v in existing.items() if '#' not in k}
     added = {}
     changed = 0
     for path, rows in found.items():
@@ -313,24 +319,29 @@ def check():
         if not local:
             problems.append(f'{folder}: strings.xml is missing or empty')
             continue
-        missing = sorted(set(english) - set(local))
-        extra = sorted(set(local) - set(english))
+        names, local_names = {k.split('#')[0] for k in english}, {k.split('#')[0] for k in local}
+        missing = sorted(names - local_names)
+        extra = sorted(local_names - names)
         if missing:
             problems.append(f'{folder}: {len(missing)} missing: ' + ', '.join(missing))
         if extra:
             problems.append(f'{folder}: {len(extra)} not in English: ' + ', '.join(extra))
-        for key in sorted(set(english) & set(local)):
-            a = sorted(m.group(0) for m in PLACEHOLDER.finditer(english[key]))
+        for key in sorted(k for k in local if k.split('#')[0] in names):
+            base = key.split('#')[0]
+            reference = english.get(key) if '#' not in key else english.get(base + '#other', '')
+            a = sorted(m.group(0) for m in PLACEHOLDER.finditer(reference or ''))
             b = sorted(m.group(0) for m in PLACEHOLDER.finditer(local[key]))
-            if a != b:
+            if a != b and not ('#' in key and not key.endswith('#other') and set(b) <= set(a)):
                 problems.append(f'{folder}: {key}: placeholders {a} in English but {b} here')
+            if '#' in key and base + '#other' not in local:
+                problems.append(f'{folder}: {base}: no "other" plural form')
             if re.search(r"(?<!\\)'", local[key]):
                 problems.append(f'{folder}: {key}: unescaped apostrophe')
             if not local[key].strip():
                 problems.append(f'{folder}: {key}: empty')
     for line in problems:
         print(line)
-    print(f'{len(english)} keys in English, {len(tags)} languages: ' + ('all present.' if not problems else f'{len(problems)} problem(s).'))
+    print(f'{len({k.split("#")[0] for k in english})} keys in English, {len(tags)} languages: ' + ('all present.' if not problems else f'{len(problems)} problem(s).'))
     return 1 if problems else 0
 
 
@@ -366,6 +377,7 @@ def selftest():
     assert make_key('Draft Quality Preview', set()) == 'draft_quality_preview'
     assert make_key('Draft Quality Preview', {'draft_quality_preview'}) == 'draft_quality_preview_2'
     assert make_key('4K export', set()) == 't_4k_export'
+    assert make_key('NEW', set()) == 't_new'
     assert xml_escape('Don\'t @ "x" & <b>') == 'Don\\\'t @ \\"x\\" &amp; &lt;b&gt;'
     assert xml_escape('@home') == '\\@home'
     assert xml_unescape(xml_escape("It's 100% <ok>\nnext")) == "It's 100% <ok>\nnext"

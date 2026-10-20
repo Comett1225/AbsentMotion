@@ -1,5 +1,7 @@
 package app.absentmotion.export
 
+import app.absentmotion.i18n.AppText
+
 import java.util.Locale
 
 data class Choice<T>(val value: T, val reason: String? = null) {
@@ -26,7 +28,7 @@ fun audioOnlySummary(s: ExportSettings): String = listOfNotNull(
 private fun ExportSettings.fitAudio(): ExportSettings =
     if (audio.codec in audioCodecsFor(container)) this else copy(audio = audio.copy(codec = audioCodecsFor(container).first()))
 
-private fun unsupported(support: Support): String? = (support as? Support.Unsupported)?.reason
+private fun unsupported(support: Support): String? = (support as? Support.Unsupported)?.reason?.let(AppText::get)
 
 fun containerChoices(s: ExportSettings, check: (ExportSettings) -> Support): List<Choice<Container>> = Container.entries.map { c ->
     val codecs = videoCodecsFor(c)

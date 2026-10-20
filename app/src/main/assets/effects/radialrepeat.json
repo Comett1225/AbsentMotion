@@ -1,0 +1,177 @@
+{
+ "id": "radialrepeat",
+ "name": "Radial Repeat",
+ "category": "repeat",
+ "since": "3.0.0",
+ "native": true,
+ "description": "Dynamically generates multiple copies of the layer, arranged in a circular pattern.",
+ "params": [
+  {
+   "id": "count",
+   "label": "Count",
+   "type": "float",
+   "default": 8,
+   "min": 0,
+   "max": 150,
+   "step": 1
+  },
+  {
+   "id": "radius",
+   "label": "Radius",
+   "type": "float",
+   "default": 300,
+   "min": 0,
+   "max": 2000,
+   "step": 1
+  },
+  {
+   "id": "orientation",
+   "label": "Orientation",
+   "type": "angle",
+   "default": 0,
+   "min": -3600,
+   "max": 3600,
+   "step": 1
+  },
+  {
+   "id": "angle",
+   "label": "Angle",
+   "type": "angle",
+   "default": 0,
+   "min": -3600,
+   "max": 3600,
+   "step": 1
+  },
+  {
+   "id": "sweep",
+   "label": "Sweep",
+   "type": "angle",
+   "default": 360,
+   "min": -3600,
+   "max": 3600,
+   "step": 1
+  },
+  {
+   "id": "scale",
+   "label": "Scale",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 10,
+   "step": 0.01
+  },
+  {
+   "id": "rangePosition",
+   "label": "Range Position",
+   "type": "point",
+   "default": [
+    0,
+    0
+   ],
+   "min": -99999,
+   "max": 99999,
+   "step": 1
+  },
+  {
+   "id": "rangeScale",
+   "label": "Range Scale",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 10,
+   "step": 0.01
+  },
+  {
+   "id": "rangeRotation",
+   "label": "Range Rotation",
+   "type": "angle",
+   "default": 0,
+   "min": -3600,
+   "max": 3600,
+   "step": 0.1
+  },
+  {
+   "id": "rangeOpacity",
+   "label": "Range Opacity",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "fillColor",
+   "label": "Fill Color",
+   "type": "color",
+   "default": "#ffffff"
+  },
+  {
+   "id": "fillAmount",
+   "label": "Fill Amount",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "rangeStart",
+   "label": "Range Start",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "rangeEnd",
+   "label": "Range End",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "rangeOffset",
+   "label": "Range Offset",
+   "type": "float",
+   "default": 0,
+   "min": -10,
+   "max": 10,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "easing",
+   "label": "Easing",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Linear",
+    "Ease In",
+    "Ease Out",
+    "Ease In Out"
+   ]
+  },
+  {
+   "id": "randomOrder",
+   "label": "Random Order",
+   "type": "switch",
+   "default": false
+  },
+  {
+   "id": "seed",
+   "label": "Seed",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 9999,
+   "step": 1
+  }
+ ]
+}

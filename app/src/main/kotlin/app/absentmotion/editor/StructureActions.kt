@@ -1,5 +1,7 @@
 package app.absentmotion.editor
 
+import app.absentmotion.R
+import app.absentmotion.i18n.AppText
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -56,7 +58,7 @@ private fun EditorState.addAndSelect(node: XmlNode) {
 }
 
 fun EditorState.addNull() = addAndSelect(
-    XmlNode("nullobj", newLayerAttrs(numbered("Null")), listOf(
+    XmlNode("nullobj", newLayerAttrs(numbered(AppText.get(R.string.model_layer_null))), listOf(
         XmlNode("transform", children = listOf(XmlNode("location", mapOf("value" to formatFloats(floatArrayOf(scene.width / 2f, scene.height / 2f, 0f))))))),
     ),
 )
@@ -75,7 +77,7 @@ internal val Scene.cameraZoom: Float get() = max(width, height) / tan(Math.toRad
 
 fun EditorState.addCamera() {
     val zoom = scene.cameraZoom
-    val attrs = newLayerAttrs(numbered("Camera"))
+    val attrs = newLayerAttrs(numbered(AppText.get(R.string.model_layer_camera)))
     if (scene.totalTime > 0) attrs["endTime"] = "${scene.totalTime}"
     attrs["type"] = "perspective"
     fun value(name: String, v: Float) = XmlNode(name, mapOf("value" to formatFloats(floatArrayOf(v))))
@@ -104,13 +106,13 @@ private fun Scene.groupNode(attrs: Map<String, String>, children: List<XmlNode>,
 )
 
 fun EditorState.addEmptyGroup() {
-    val attrs = newLayerAttrs(numbered("Group"))
+    val attrs = newLayerAttrs(numbered(AppText.get(R.string.model_layer_group)))
     addAndSelect(scene.groupNode(attrs, emptyList(), attrs.getValue("endTime").toInt() - attrs.getValue("startTime").toInt()))
 }
 
 fun EditorState.groupLayers(ids: Set<Long>, blend: String? = null) {
     val id = Layer.newId()
-    val label = numbered("Group")
+    val label = numbered(AppText.get(R.string.model_layer_group))
     edit { it.grouped(ids, blend, id, label) }
     if (scene.layer(id) == null) return
     MultiSelect.clear()
@@ -319,9 +321,7 @@ suspend fun EditorState.distributeSelection(horizontal: Boolean) {
     }
 }
 
-enum class StylePart(val label: String) {
-    ColorFill("Paste Fill & Color"), BorderShadow("Paste Frame & Shadow"), Blending("Paste Opacity & Blend Mode"),
-}
+enum class StylePart { ColorFill, BorderShadow, Blending }
 
 fun EditorState.pasteStyle(parts: Set<StylePart>) {
     val from = copiedLayerForStyle ?: return

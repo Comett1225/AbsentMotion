@@ -1,5 +1,9 @@
 package app.absentmotion.model
 
+import app.absentmotion.i18n.AppText
+import app.absentmotion.R
+import app.absentmotion.i18n.UiText
+import app.absentmotion.i18n.txt
 import java.util.Locale
 import kotlin.math.abs
 import kotlin.math.cos
@@ -9,7 +13,7 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 import kotlin.math.tan
 
-class SvgImport(val layer: Layer?, val skipped: List<String>, val shapes: Int)
+class SvgImport(val layer: Layer?, val skipped: List<UiText>, val shapes: Int)
 
 fun importSvg(text: String, title: String, host: Scene, startTime: Int, endTime: Int): SvgImport {
     val root = XmlNode.parse(text)
@@ -21,7 +25,7 @@ fun importSvg(text: String, title: String, host: Scene, startTime: Int, endTime:
     val top = when {
         built.isEmpty() -> null
         built.size == 1 -> built[0]
-        else -> SvgGroup(title.ifBlank { "SVG" }, built, 1f)
+        else -> SvgGroup(title.ifBlank { AppText.get(R.string.model_layer_svg) }, built, 1f)
     }
     val node = top?.let { writer.node(it, startTime, endTime) }
     return SvgImport(node?.let(::Layer), reader.skipped.toList(), reader.shapeCount)
@@ -72,7 +76,7 @@ private const val MaxShapes = 1000
 private fun numbers(text: String?): List<Float> = text?.let { NumberPattern.findAll(it).map { m -> m.value.toFloat() }.toList() } ?: emptyList()
 
 private class SvgReader(private val root: XmlNode) {
-    val skipped = LinkedHashSet<String>()
+    val skipped = LinkedHashSet<UiText>()
     var shapeCount = 0
     private val ids = HashMap<String, XmlNode>()
     private val rules = ArrayList<CssRule>()
@@ -176,22 +180,22 @@ private class SvgReader(private val root: XmlNode) {
         when (tag) {
             "defs", "symbol", "style", "title", "desc", "metadata", "linearGradient", "radialGradient", "clipPath", "mask",
             "pattern", "marker", "script" -> return null
-            "text", "tspan", "textPath" -> { skipped += "text"; return null }
-            "image" -> { skipped += "images"; return null }
+            "text", "tspan", "textPath" -> { skipped += txt(R.string.model_svg_skipped_text); return null }
+            "image" -> { skipped += txt(R.string.model_svg_skipped_images); return null }
             "filter" -> return null
-            "foreignObject" -> { skipped += "embedded content"; return null }
-            "animate", "animateTransform", "animateMotion", "set" -> { skipped += "animations"; return null }
+            "foreignObject" -> { skipped += txt(R.string.model_svg_skipped_embedded); return null }
+            "animate", "animateTransform", "animateMotion", "set" -> { skipped += txt(R.string.model_svg_skipped_animations); return null }
         }
         val style = computed(inherited, n)
         if (style["display"] == "none") return null
-        if (style["clip-path"].let { it != null && it != "none" }) skipped += "clipping paths"
-        if (style["mask"].let { it != null && it != "none" }) skipped += "masks"
-        if (style["filter"].let { it != null && it != "none" }) skipped += "filters"
-        if (listOf("marker", "marker-start", "marker-mid", "marker-end").any { style[it].let { v -> v != null && v != "none" } }) skipped += "markers"
+        if (style["clip-path"].let { it != null && it != "none" }) skipped += txt(R.string.model_svg_skipped_clipping)
+        if (style["mask"].let { it != null && it != "none" }) skipped += txt(R.string.model_svg_skipped_masks)
+        if (style["filter"].let { it != null && it != "none" }) skipped += txt(R.string.model_svg_skipped_filters)
+        if (listOf("marker", "marker-start", "marker-mid", "marker-end").any { style[it].let { v -> v != null && v != "none" } }) skipped += txt(R.string.model_svg_skipped_markers)
         val m = parent * transform(n.attr("transform"))
         val opacity = (style["opacity"]?.let(::unit) ?: 1f).coerceIn(0f, 1f)
         return when (tag) {
-            "g", "a", "switch" -> group(label(n, "Group"), children(n, m, style, depth), opacity)
+            "g", "a", "switch" -> group(label(n, AppText.get(R.string.model_layer_group)), children(n, m, style, depth), opacity)
             "svg" -> {
                 val x = length(n.attr("x"), viewW, 0f)
                 val y = length(n.attr("y"), viewH, 0f)
@@ -199,7 +203,7 @@ private class SvgReader(private val root: XmlNode) {
                 val w = length(n.attr("width"), viewW, box?.get(2) ?: viewW)
                 val h = length(n.attr("height"), viewH, box?.get(3) ?: viewH)
                 val inner = m * Affine(e = x, f = y) * (if (box != null) viewBox(box, w, h, n.attr("preserveAspectRatio")) else Affine())
-                group(label(n, "Group"), children(n, inner, style, depth), opacity)
+                group(label(n, AppText.get(R.string.model_layer_group)), children(n, inner, style, depth), opacity)
             }
             "use" -> {
                 val ref = (n.attr("href"))?.removePrefix("#")?.let(ids::get) ?: return null
@@ -210,12 +214,12 @@ private class SvgReader(private val root: XmlNode) {
                     val w = length(n.attr("width"), viewW, box?.get(2) ?: 0f)
                     val h = length(n.attr("height"), viewH, box?.get(3) ?: 0f)
                     val inner = if (box != null && w > 0 && h > 0) moved * viewBox(box, w, h, ref.attr("preserveAspectRatio")) else moved
-                    group(label(ref, "Group"), children(ref, inner, computed(style, ref), depth), 1f)
+                    group(label(ref, AppText.get(R.string.model_layer_group)), children(ref, inner, computed(style, ref), depth), 1f)
                 } else element(ref, moved, style, depth + 1)
                 when {
                     item == null -> null
                     opacity >= 1f -> item
-                    else -> group(label(n, "Group"), listOf(item), opacity)
+                    else -> group(label(n, AppText.get(R.string.model_layer_group)), listOf(item), opacity)
                 }
             }
             "path", "rect", "circle", "ellipse", "line", "polyline", "polygon" -> shape(n, tag, m, style, opacity)
@@ -239,13 +243,13 @@ private class SvgReader(private val root: XmlNode) {
         if (style["visibility"].let { it == "hidden" || it == "collapse" }) return null
         val local = geometry(n, tag).filter { c -> c.knots.isNotEmpty() && c.knots.all { it.p.x.isFinite() && it.p.y.isFinite() } }
         if (local.isEmpty()) return null
-        if (shapeCount >= MaxShapes) { skipped += "shapes after the first $MaxShapes"; return null }
+        if (shapeCount >= MaxShapes) { skipped += txt(R.string.model_svg_skipped_shapes, MaxShapes.toString()); return null }
         val fill = if (tag == "line") null else paint(style["fill"] ?: "black", style, "fill-opacity", local, m)
         val strokePaint = paint(style["stroke"] ?: "none", style, "stroke-opacity", local, m)
         val width = length(style["stroke-width"], diagonal(), 1f) * m.scale
         val stroke = if (strokePaint == null || !(width > 0f)) null else {
-            if (strokePaint is GradientFill) skipped += "gradient strokes"
-            if (style["stroke-dasharray"].let { it != null && it != "none" }) skipped += "dashed strokes"
+            if (strokePaint is GradientFill) skipped += txt(R.string.model_svg_skipped_gradient_strokes)
+            if (style["stroke-dasharray"].let { it != null && it != "none" }) skipped += txt(R.string.model_svg_skipped_dashed)
             SvgStroke(
                 when (strokePaint) { is SolidFill -> strokePaint.argb; is GradientFill -> strokePaint.start },
                 width, style["stroke-linecap"]?.takeIf { it in setOf("butt", "round", "square") } ?: "butt",
@@ -254,7 +258,7 @@ private class SvgReader(private val root: XmlNode) {
         }
         if (fill == null && stroke == null) return null
         shapeCount++
-        val name = when (tag) { "rect" -> "Rectangle"; "circle" -> "Circle"; "ellipse" -> "Ellipse"; "line" -> "Line"; "polyline" -> "Polyline"; "polygon" -> "Polygon"; else -> "Path" }
+        val name = AppText.get(when (tag) { "rect" -> R.string.shape_name_rectangle; "circle" -> R.string.shape_name_circle; "ellipse" -> R.string.shape_name_ellipse; "line" -> R.string.shape_name_line; "polyline" -> R.string.shape_name_polyline; "polygon" -> R.string.shape_name_polygon; else -> R.string.shape_name_path })
         return SvgShape(label(n, name), local.map { it.mapped(m) }, fill, style["fill-rule"] == "evenodd", stroke, opacity)
     }
 
@@ -298,7 +302,7 @@ private class SvgReader(private val root: XmlNode) {
             val id = text.substringAfter("url(").substringBefore(')').trim().trim('\'', '"').removePrefix("#")
             val target = ids[id]
             if (target != null && (target.local == "linearGradient" || target.local == "radialGradient")) return gradient(target, alpha, local, m)
-            if (target?.local == "pattern") skipped += "pattern fills"
+            if (target?.local == "pattern") skipped += txt(R.string.model_svg_skipped_patterns)
             val fallback = text.substringAfter(')').trim()
             return if (fallback.isEmpty()) null else paint(fallback, style, opacityKey, local, m)
         }
@@ -320,7 +324,7 @@ private class SvgReader(private val root: XmlNode) {
         fun attr(key: String) = chain.firstNotNullOfOrNull { it.attr(key) }
         val stops = chain.firstOrNull { c -> c.children.any { it.local == "stop" } }?.children?.filter { it.local == "stop" }.orEmpty()
         if (stops.isEmpty()) return null
-        if (stops.size > 2) skipped += "extra gradient colours (the first and last are used)"
+        if (stops.size > 2) skipped += txt(R.string.model_svg_skipped_gradient_colours)
         fun stop(s: XmlNode): Pair<Float, Int> {
             val style = computed(emptyMap(), s)
             val colour = parseSvgColor(style["stop-color"] ?: "black") ?: 0xFF000000.toInt()

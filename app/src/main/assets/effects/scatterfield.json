@@ -1,0 +1,207 @@
+{
+ "id": "scatterfield",
+ "name": "Scatter Field",
+ "category": "repeat",
+ "since": "3.0.0",
+ "native": true,
+ "description": "Scatters copies of the layer within an infinite 3D field while hiding the original layer, and allows simulated motion within the field in three dimensions through keyframe animation.",
+ "params": [
+  {
+   "id": "position",
+   "label": "Position",
+   "type": "point",
+   "default": [
+    0,
+    0
+   ],
+   "min": -99999,
+   "max": 99999,
+   "step": 1
+  },
+  {
+   "id": "z",
+   "label": "Position Z",
+   "type": "float",
+   "default": 0,
+   "min": -99999,
+   "max": 99999,
+   "step": 1
+  },
+  {
+   "id": "density",
+   "label": "Density",
+   "type": "float",
+   "default": 0.3,
+   "min": 0,
+   "max": 1,
+   "step": 0.001
+  },
+  {
+   "id": "evolution",
+   "label": "Evolution",
+   "type": "float",
+   "default": 0,
+   "min": -9999,
+   "max": 9999,
+   "step": 0.01
+  },
+  {
+   "id": "seed",
+   "label": "Seed",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 9999,
+   "step": 0.01
+  },
+  {
+   "id": "scale",
+   "label": "Scale",
+   "type": "float",
+   "default": 1,
+   "min": 0.05,
+   "max": 20,
+   "step": 0.01
+  },
+  {
+   "id": "size",
+   "label": "Size",
+   "type": "float",
+   "default": 0.5,
+   "min": 0,
+   "max": 10,
+   "step": 0.001
+  },
+  {
+   "id": "angle",
+   "label": "Angle",
+   "type": "angle",
+   "default": 0,
+   "min": -3600,
+   "max": 3600,
+   "step": 0.1
+  },
+  {
+   "id": "sizeVariance",
+   "label": "Size Variance",
+   "type": "float",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "percent": true
+  },
+  {
+   "id": "angleVariance",
+   "label": "Angle Variance",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "percent": true
+  },
+  {
+   "id": "amount",
+   "label": "Amount",
+   "type": "float",
+   "default": 15,
+   "min": 0,
+   "max": 40,
+   "step": 0.01
+  },
+  {
+   "id": "fade",
+   "label": "Fade",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "alpha",
+   "label": "Alpha",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "percent": true
+  },
+  {
+   "id": "slack",
+   "label": "Slack",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "percent": true
+  },
+  {
+   "id": "blending",
+   "label": "Blending Mode",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Normal",
+    "Add",
+    "Screen",
+    "Multiply",
+    "Lighten",
+    "Darken",
+    "Overlay",
+    "Difference"
+   ]
+  },
+  {
+   "id": "coloring",
+   "label": "Coloring",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "None",
+    "Random",
+    "Depth"
+   ]
+  },
+  {
+   "id": "color1",
+   "label": "Color 1",
+   "type": "color",
+   "default": "#ff55aa"
+  },
+  {
+   "id": "color2",
+   "label": "Color 2",
+   "type": "color",
+   "default": "#55aaff"
+  },
+  {
+   "id": "color3",
+   "label": "Color 3",
+   "type": "color",
+   "default": "#ffaa55"
+  },
+  {
+   "id": "lockLuminance",
+   "label": "Lock Luminance",
+   "type": "switch",
+   "default": true
+  },
+  {
+   "id": "lockSaturation",
+   "label": "Lock Saturation",
+   "type": "switch",
+   "default": false
+  },
+  {
+   "id": "interpolateHue",
+   "label": "Interpolate Hue",
+   "type": "switch",
+   "default": false
+  }
+ ]
+}

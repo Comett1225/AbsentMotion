@@ -6,6 +6,10 @@ import android.media.MediaExtractor
 import android.media.MediaFormat
 import android.net.Uri
 import android.os.SystemClock
+import app.absentmotion.R
+import app.absentmotion.i18n.AppText
+import app.absentmotion.i18n.UiText
+import app.absentmotion.i18n.txt
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -14,7 +18,7 @@ data class Expectation(val video: Boolean, val audio: Boolean, val durationUs: L
 data class ProbedTrack(val mime: String, val durationUs: Long)
 
 data class Verification(
-    val problems: List<String>,
+    val problems: List<UiText>,
     val durationUs: Long,
     val firstFrame: Boolean?,
     val lastFrame: Boolean?,
@@ -25,22 +29,22 @@ data class Verification(
 
 internal const val AudioOverhangUs = 100_000L
 
-internal fun judge(tracks: List<ProbedTrack>, expect: Expectation, firstFrame: Boolean?, lastFrame: Boolean?): List<String> {
-    val problems = ArrayList<String>()
+internal fun judge(tracks: List<ProbedTrack>, expect: Expectation, firstFrame: Boolean?, lastFrame: Boolean?): List<UiText> {
+    val problems = ArrayList<UiText>()
     val video = tracks.filter { it.mime.startsWith("video/") }
     val audio = tracks.filter { it.mime.startsWith("audio/") }
-    if (tracks.isEmpty()) return listOf("The file has no audio or video in it.")
-    if (expect.video && video.isEmpty()) problems += "The file has no video track."
-    if (expect.audio && audio.isEmpty()) problems += "The file has no sound although the project has audio."
+    if (tracks.isEmpty()) return listOf(txt(R.string.export_verify_empty))
+    if (expect.video && video.isEmpty()) problems += txt(R.string.export_verify_no_video)
+    if (expect.audio && audio.isEmpty()) problems += txt(R.string.export_verify_no_audio)
     val duration = tracks.maxOf { it.durationUs }
     val slack = expect.frameUs + 1_000
     val over = duration - expect.durationUs
     if (over < -slack || over > slack + if (audio.isNotEmpty()) AudioOverhangUs else 0) {
-        problems += "The file lasts %.3f s instead of %.3f s.".format(java.util.Locale.ROOT, duration / 1e6, expect.durationUs / 1e6)
+        problems += txt(R.string.export_verify_duration, "%.3f".format(java.util.Locale.ROOT, duration / 1e6), "%.3f".format(java.util.Locale.ROOT, expect.durationUs / 1e6))
     }
     if (expect.video && video.isNotEmpty()) {
-        if (firstFrame == false) problems += "The first video frame does not decode."
-        if (lastFrame == false) problems += "The last video frame does not decode."
+        if (firstFrame == false) problems += txt(R.string.export_verify_first_frame)
+        if (lastFrame == false) problems += txt(R.string.export_verify_last_frame)
     }
     return problems
 }
@@ -58,7 +62,7 @@ suspend fun verifyExport(context: Context, uri: Uri, expect: Expectation): Verif
         val (first, last) = if (videoIndex >= 0) decodeEnds(extractor, videoIndex, formats[videoIndex], start + DecodeBudgetMs) else null to null
         Verification(judge(tracks, expect, first, last), tracks.maxOfOrNull { it.durationUs } ?: 0, first, last, SystemClock.elapsedRealtime() - start)
     } catch (e: Exception) {
-        Verification(listOf("The file cannot be read back: ${e.message ?: e.javaClass.simpleName}"), 0, null, null, SystemClock.elapsedRealtime() - start)
+        Verification(listOf(txt(R.string.export_verify_unreadable, e.message ?: e.javaClass.simpleName)), 0, null, null, SystemClock.elapsedRealtime() - start)
     } finally {
         extractor.release()
     }
@@ -130,4 +134,4 @@ internal fun expectationFor(kind: ExportKind, scene: app.absentmotion.model.Scen
 }
 
 internal fun verificationSummary(v: Verification): String =
-    if (v.ok) "verified in ${v.ms} ms" else v.problems.joinToString(" ") + " (${v.ms} ms)"
+    if (v.ok) "verified in ${v.ms} ms" else v.problems.joinToString(" ") { AppText.get(it) } + " (${v.ms} ms)"

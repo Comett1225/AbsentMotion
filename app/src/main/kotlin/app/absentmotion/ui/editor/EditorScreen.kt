@@ -36,6 +36,8 @@ import app.absentmotion.ui.editor.panels.FullColorPicker
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Swap
 import app.absentmotion.ui.theme.enterFade
+import androidx.compose.ui.res.stringResource
+import app.absentmotion.R
 
 @Composable
 fun EditorScreen(state: EditorState, onExit: () -> Unit) {
@@ -73,9 +75,9 @@ private fun EditorBody(state: EditorState, onExit: () -> Unit) {
         if (state.panel == EditorPanel.Tools) state.keyTarget = null
     }
     if (state.easingHint) AlertDialog(
-        onDismissRequest = { state.easingHint = false }, title = { Text("Add Keyframes First") },
-        text = { Text("Easing needs at least two keyframes to work with.\n\nIf your keyframes are on another property, select that property first.") },
-        confirmButton = { TextButton({ state.easingHint = false }) { Text("OK", color = Am.Accent) } },
+        onDismissRequest = { state.easingHint = false }, title = { Text(stringResource(R.string.add_keyframes_first)) },
+        text = { Text(stringResource(R.string.easing_needs_at_least_two_keyframes)) },
+        confirmButton = { TextButton({ state.easingHint = false }) { Text(stringResource(R.string.ok), color = Am.Accent) } },
         containerColor = Am.Field, titleContentColor = Am.OnDark, textContentColor = Am.OnDark,
     )
     if (state.effectBrowserOpen) {

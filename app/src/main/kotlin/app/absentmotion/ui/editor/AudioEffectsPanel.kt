@@ -68,6 +68,8 @@ import java.util.Locale
 import kotlin.math.abs
 import kotlin.math.ln
 import kotlin.math.pow
+import androidx.compose.ui.res.stringResource
+import app.absentmotion.R
 
 private val RowShape = RoundedCornerShape(5.dp)
 private val RowHeight = 37.dp
@@ -111,7 +113,7 @@ private fun EffectList(state: EditorState, effects: List<AudioFx>, open: (Int) -
                 val active = preset.effects == effects
                 Box(Modifier.fillMaxHeight().clip(RowShape).background(if (active) Am.Accent else Am.Button)
                     .clickable { state.editSelected { it.withAudioEffects(preset.effects) } }.padding(horizontal = 12.dp), Alignment.Center) {
-                    Text(preset.name, color = Am.OnDark, fontSize = 13.sp, maxLines = 1)
+                    Text(stringResource(preset.name), color = Am.OnDark, fontSize = 13.sp, maxLines = 1)
                 }
             }
         }
@@ -123,12 +125,12 @@ private fun EffectList(state: EditorState, effects: List<AudioFx>, open: (Int) -
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(EffectIcons.Add, null, Modifier.size(18.dp), tint = Am.OnDark)
                     Spacer(Modifier.width(6.dp))
-                    Text("Add Audio Effect", color = Am.OnDark, fontSize = 14.sp)
+                    Text(stringResource(R.string.add_audio_effect), color = Am.OnDark, fontSize = 14.sp)
                 }
             }
             Presence(adding) {
                 MenuPopup(AboveLeft, { adding = false }, TransformOrigin(0f, 1f)) {
-                    for (kind in FxKind.entries) MenuRow(kind.label) {
+                    for (kind in FxKind.entries) MenuRow(stringResource(kind.label)) {
                         adding = false
                         val at = effects.size
                         state.editSelected { it.withAudioEffects(it.audioEffects + AudioFx.of(kind)) }
@@ -151,12 +153,12 @@ private fun EffectRow(state: EditorState, index: Int, fx: AudioFx, count: Int, o
         Row(Modifier.weight(1f).fillMaxHeight().alpha(if (known && !fx.bypass) 1f else 0.35f).clickable(enabled = known, onClick = open)
             .padding(start = 11.dp), verticalAlignment = Alignment.CenterVertically) {
             Icon(EffectIcons.Expand, null, Modifier.size(18.dp).alpha(0.3f), tint = Am.OnDark)
-            Text(fx.kind?.label ?: "Unknown effect", Modifier.padding(start = 6.dp), color = Am.OnDark, fontSize = 14.sp, maxLines = 1)
+            Text(fx.kind?.let { stringResource(it.label) } ?: stringResource(R.string.audiofx_unknown_effect), Modifier.padding(start = 6.dp), color = Am.OnDark, fontSize = 14.sp, maxLines = 1)
         }
-        Icon(if (fx.bypass) EffectIcons.EyeOff else EffectIcons.Eye, if (fx.bypass) "Turn on" else "Bypass", Modifier.width(36.dp).fillMaxHeight().clickable {
+        Icon(if (fx.bypass) EffectIcons.EyeOff else EffectIcons.Eye, stringResource(if (fx.bypass) R.string.audiofx_turn_on else R.string.audiofx_bypass), Modifier.width(36.dp).fillMaxHeight().clickable {
             state.editSelected { it.updateAudioEffect(index) { e -> e.withBypass(!e.bypass) } }
         }, tint = Am.OnDark)
-        Icon(EffectIcons.Grip, "Reorder", Modifier.width(32.dp).fillMaxHeight().pointerInput(state) {
+        Icon(EffectIcons.Grip, stringResource(R.string.audiofx_reorder), Modifier.width(32.dp).fillMaxHeight().pointerInput(state) {
             detectDragGesturesAfterLongPress(onDragStart = { drag = 0f; held = latest }, onDragEnd = { state.endGesture() }, onDragCancel = { state.endGesture() }) { change, amount ->
                 change.consume()
                 drag += amount.y
@@ -178,17 +180,17 @@ private fun EffectDetail(state: EditorState, index: Int, fx: AudioFx, close: () 
         Row(Modifier.fillMaxWidth().height(RowHeight).padding(start = 3.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
             Row(Modifier.weight(1f).fillMaxHeight().clickable(onClick = close), verticalAlignment = Alignment.CenterVertically) {
                 Icon(EffectIcons.Expanded, null, Modifier.padding(start = 8.dp).size(18.dp).alpha(0.9f), tint = Am.OnDark)
-                Text(kind.label, Modifier.padding(start = 6.dp), color = Am.OnDark, fontSize = 14.sp, maxLines = 1)
+                Text(stringResource(kind.label), Modifier.padding(start = 6.dp), color = Am.OnDark, fontSize = 14.sp, maxLines = 1)
             }
             Box(Modifier.size(36.dp).clickable { state.editSelected { it.updateAudioEffect(index) { e -> e.reset() } } }, Alignment.Center) {
-                Icon(ChromeIcons.Undo, "Reset", Modifier.size(22.dp), tint = Am.OnDark)
+                Icon(ChromeIcons.Undo, stringResource(R.string.audiofx_reset), Modifier.size(22.dp), tint = Am.OnDark)
             }
             Box(Modifier.size(36.dp).clickable { close(); state.editSelected { it.withAudioEffects(it.audioEffects.filterIndexed { i, _ -> i != index }) } }, Alignment.Center) {
-                Icon(ChromeIcons.Trash, "Delete", Modifier.size(22.dp), tint = Am.OnDark)
+                Icon(ChromeIcons.Trash, stringResource(R.string.delete), Modifier.size(22.dp), tint = Am.OnDark)
             }
         }
         Column(Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState())) {
-            ParamSlider(state, "Mix", fx.mix, 0f, 1f, false, percent(fx.mix), { it * 100 }, { it / 100 }) { v ->
+            ParamSlider(state, stringResource(R.string.audiofx_mix), fx.mix, 0f, 1f, false, percent(fx.mix), { it * 100 }, { it / 100 }) { v ->
                 state.editSelected("audiofx-$index-mix") { it.updateAudioEffect(index) { e -> e.withMix(v) } }
             }
             for (param in kind.params) {
@@ -196,7 +198,7 @@ private fun EffectDetail(state: EditorState, index: Int, fx: AudioFx, close: () 
                 if (param.choices.isNotEmpty()) ChoiceRow(param, fx[param]) { set(it, null) }
                 else {
                     val scale = if (param.unit == "%") 100f else 1f
-                    ParamSlider(state, param.label, fx[param], param.min, param.max, param.log, display(param, fx[param]),
+                    ParamSlider(state, stringResource(param.label), fx[param], param.min, param.max, param.log, display(param, fx[param]),
                         { it * scale }, { it / scale }) { set(it, "audiofx-$index-${param.key}") }
                 }
             }
@@ -248,13 +250,13 @@ private fun ParamSlider(
 @Composable
 private fun ChoiceRow(param: FxParam, value: Float, set: (Float) -> Unit) {
     Row(Modifier.fillMaxWidth().height(SliderHeight).padding(start = 12.dp, end = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text(param.label, Modifier.width(78.dp), color = Am.OnDark, fontSize = 12.sp, maxLines = 1)
+        Text(stringResource(param.label), Modifier.width(78.dp), color = Am.OnDark, fontSize = 12.sp, maxLines = 1)
         Row(Modifier.weight(1f).height(30.dp).clip(RoundedCornerShape(4.dp)).background(Am.PanelInset)) {
             param.choices.forEachIndexed { i, label ->
                 val v = if (i == 0) param.min else param.max
                 Box(Modifier.weight(1f).fillMaxHeight().clip(RoundedCornerShape(4.dp)).background(if (v == value) Am.Accent else Am.PanelInset)
                     .clickable { set(v) }, Alignment.Center) {
-                    Text(label, color = Am.OnDark, fontSize = 12.sp, maxLines = 1)
+                    Text(stringResource(label), color = Am.OnDark, fontSize = 12.sp, maxLines = 1)
                 }
             }
         }

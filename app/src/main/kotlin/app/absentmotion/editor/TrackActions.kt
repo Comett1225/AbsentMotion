@@ -1,5 +1,7 @@
 package app.absentmotion.editor
 
+import app.absentmotion.R
+import app.absentmotion.i18n.AppText
 import android.content.Context
 import app.absentmotion.media.FrameReader
 import app.absentmotion.media.MotionTracker
@@ -52,14 +54,14 @@ fun EditorState.runTracking(context: Context, mode: TrackMode, scope: CoroutineS
         document.trackRuns(video, frame, mode.range).map { TrackRun(it, mode.points.toList(), Sim()) }
     }
     if (runs.isEmpty() || width <= 0 || height <= 0) {
-        mode.message = "Move the playhead inside the video clip first."
+        mode.message = AppText.get(R.string.track_motion_playhead_outside)
         return
     }
     if (!continuing) {
         val f0 = runs.first().frames.first()
         val anchor = document.videoToScene(video, f0, width, height)?.map(mode.points.first())
         if (anchor == null) {
-            mode.message = "This layer has no area to track."
+            mode.message = AppText.get(R.string.track_motion_no_area)
             return
         }
         val chosen = mode.target?.let(document::layer)
@@ -114,8 +116,8 @@ fun EditorState.runTracking(context: Context, mode: TrackMode, scope: CoroutineS
                             mode.points += outcome.lostPoints
                             frame = at
                             mode.lostFrame = at
-                            mode.message = if (outcome.steps.isEmpty()) "This spot has too little detail to follow. Move the point onto a sharp corner or texture and tap Continue."
-                                else "Tracking was lost at frame ${at + 1}. Move the point back onto the same feature and tap Continue."
+                            mode.message = if (outcome.steps.isEmpty()) AppText.get(R.string.track_motion_too_little_detail)
+                                else AppText.get(R.string.track_motion_lost_at_frame, (at + 1).toString())
                         }
                         lost = true
                         break
@@ -128,14 +130,14 @@ fun EditorState.runTracking(context: Context, mode: TrackMode, scope: CoroutineS
                     mode.points += step.points
                     frame = step.frame
                 }
-                mode.message = "Tracked ${mode.motion.size} frames. The keyframes are on ${scene.layer(apply.targetId)?.label?.ifEmpty { null } ?: "the target layer"}."
+                mode.message = AppText.get(R.string.track_motion_done, mode.motion.size.toString(), scene.layer(apply.targetId)?.label?.ifEmpty { null } ?: AppText.get(R.string.track_motion_target_layer))
             }
         } catch (_: CancellationException) {
-            mode.message = "Tracking cancelled. Frames already tracked keep their keyframes."
+            mode.message = AppText.get(R.string.track_motion_cancelled)
         } catch (_: LinkageError) {
-            mode.message = "Motion tracking is unavailable in this build."
+            mode.message = AppText.get(R.string.track_motion_unavailable)
         } catch (e: Exception) {
-            mode.message = e.message ?: "This video could not be tracked."
+            mode.message = e.message ?: AppText.get(R.string.track_motion_failed)
         } finally {
             mode.running = false
             mode.live = null
@@ -149,8 +151,9 @@ private fun EditorState.writeTrack(mode: TrackMode, video: Layer, apply: TrackAp
         var next = s
         if (next.layer(apply.targetId) == null) {
             if (mode.target != null) return@edit s
-            val count = next.layers.count { it.kind == "nullobj" && it.label.startsWith("Track ") } + 1
-            next = next.add(trackNull(apply.targetId, video, Pt(apply.origin.x, apply.origin.y), "Track $count"))
+            val name = AppText.get(R.string.model_layer_track)
+            val count = next.layers.count { it.kind == "nullobj" && it.label.startsWith("$name ") } + 1
+            next = next.add(trackNull(apply.targetId, video, Pt(apply.origin.x, apply.origin.y), "$name $count"))
         }
         next.withTrack(apply, mode.motion)
     }

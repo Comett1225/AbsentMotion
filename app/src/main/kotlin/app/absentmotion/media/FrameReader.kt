@@ -1,5 +1,10 @@
 package app.absentmotion.media
 
+import app.absentmotion.R
+import app.absentmotion.export.ExportError
+import app.absentmotion.export.exportCheck
+import app.absentmotion.i18n.txt
+
 import android.content.Context
 import android.graphics.ImageFormat
 import android.media.Image
@@ -35,7 +40,7 @@ internal class FrameReader(context: Context, uri: String) : Closeable {
             extractor.selectTrack(track)
             timestamps = VideoSources.timestamps(context, uri)
             readColor(format)
-            val name = MediaCodecList(MediaCodecList.REGULAR_CODECS).findDecoderForFormat(format) ?: error("This phone has no decoder for this video")
+            val name = MediaCodecList(MediaCodecList.REGULAR_CODECS).findDecoderForFormat(format) ?: throw ExportError(txt(R.string.media_error_no_decoder))
             format.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Flexible)
             codec = MediaCodec.createByCodecName(name).apply { configure(format, null, null, 0); start() }
         } catch (e: Exception) {
@@ -80,7 +85,7 @@ internal class FrameReader(context: Context, uri: String) : Closeable {
             val index = decoder.dequeueOutputBuffer(info, 5_000)
             if (index == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) readColor(decoder.outputFormat)
             if (index < 0) {
-                check(System.nanoTime() - waiting < TimeUnit.SECONDS.toNanos(10)) { "The video decoder stopped responding" }
+                exportCheck(System.nanoTime() - waiting < TimeUnit.SECONDS.toNanos(10)) { txt(R.string.media_error_decoder_stalled) }
                 continue
             }
             waiting = System.nanoTime()
@@ -89,9 +94,9 @@ internal class FrameReader(context: Context, uri: String) : Closeable {
                 val pts = info.presentationTimeUs
                 if (info.size > 0 && wanted[next] <= pts) {
                     lastPts = pts
-                    val image = checkNotNull(decoder.getOutputImage(index)) { "This phone cannot read the frames of this video" }
+                    val image = decoder.getOutputImage(index) ?: throw ExportError(txt(R.string.media_error_read_frames))
                     image.use {
-                        check(image.format == ImageFormat.YUV_420_888) { "This video uses a pixel format that cannot be read" }
+                        exportCheck(image.format == ImageFormat.YUV_420_888) { txt(R.string.media_error_pixel_format) }
                         val yuv = image.yuv()
                         while (next < wanted.size && wanted[next] <= pts) consume(wanted[next++], yuv)
                     }

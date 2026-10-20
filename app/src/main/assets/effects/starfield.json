@@ -1,0 +1,50 @@
+{
+ "id": "starfield",
+ "name": "Starfield",
+ "category": "stylize",
+ "since": "3.0.0",
+ "description": "Fills the opaque parts of the layer with a deep field of stars in several layers that move at different speeds.",
+ "params": [
+  {
+   "id": "offset",
+   "label": "Offset",
+   "type": "point",
+   "default": [
+    0,
+    0
+   ],
+   "min": -100000,
+   "max": 100000,
+   "step": 1,
+   "pixels": true
+  },
+  {
+   "id": "scale",
+   "label": "Scale",
+   "type": "float",
+   "default": 0.3,
+   "min": 0.01,
+   "max": 9,
+   "step": 0.001
+  },
+  {
+   "id": "brightness",
+   "label": "Brightness",
+   "type": "float",
+   "default": 0.015,
+   "min": 0.001,
+   "max": 3,
+   "step": 0.001
+  },
+  {
+   "id": "darkMatter",
+   "label": "Dark Matter",
+   "type": "float",
+   "default": 0.3,
+   "min": 0.001,
+   "max": 2,
+   "step": 0.001
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float2 offset;\nuniform float scale;\nuniform float brightness;\nuniform float darkMatter;\nfloat hash12(float2 p) {\n    float3 q = fract(float3(p.xyx) * 0.1031);\n    q += dot(q, q.yzx + 33.33);\n    return fract((q.x + q.y) * q.z);\n}\nfloat2 hash22(float2 p) {\n    float3 q = fract(float3(p.xyx) * float3(0.1031, 0.1030, 0.0973));\n    q += dot(q, q.yzx + 33.33);\n    return fract((q.xx + q.yz) * q.zy);\n}\nfloat hash13(float3 p) {\n    p = fract(p * 0.1031);\n    p += dot(p, p.zyx + 31.32);\n    return fract((p.x + p.y) * p.z);\n}\nfloat vnoise(float3 p) {\n    float3 i = floor(p);\n    float3 f = fract(p);\n    f = f * f * f * (f * (f * 6.0 - 15.0) + 10.0);\n    float a = mix(hash13(i), hash13(i + float3(1, 0, 0)), f.x);\n    float b = mix(hash13(i + float3(0, 1, 0)), hash13(i + float3(1, 1, 0)), f.x);\n    float c = mix(hash13(i + float3(0, 0, 1)), hash13(i + float3(1, 0, 1)), f.x);\n    float d = mix(hash13(i + float3(0, 1, 1)), hash13(i + float3(1, 1, 1)), f.x);\n    return mix(mix(a, b, f.y), mix(c, d, f.y), f.z);\n}\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return src;\n    float2 c = size * 0.5;\n    float zoom = max(scale, 0.01) / 0.3;\n    float3 rgb = float3(0.012, 0.02, 0.04);\n    float gain = brightness / 0.015;\n    for (int k = 0; k < 7; k++) {\n        float depth = 1.0 + float(k) * 0.55;\n        float cellSize = 46.0 / pow(zoom, 0.25) * depth / (1.0 + 0.15 * float(k));\n        float2 q = (coord - c + offset / depth) / cellSize;\n        float2 n = floor(q);\n        float2 h = hash22(n + float(k) * 31.7);\n        float2 starAt = n + 0.15 + 0.7 * h;\n        float d = length((q - starAt) * cellSize);\n        float b = hash12(n * 1.31 + float(k) * 7.9);\n        float lit = step(0.55, b) * pow(b, 6.0);\n        float core = exp(-d * d / (0.9 + 1.6 * b * b));\n        float halo = exp(-d / (1.6 + 2.0 * b)) * 0.25;\n        float3 tint = mix(float3(0.75, 0.85, 1.0), mix(float3(1.0, 0.7, 0.95), float3(0.7, 1.0, 0.95), h.y), h.x * 0.6);\n        float dust = vnoise(float3((coord - c + offset / depth) / (220.0 / zoom), float(k) * 3.1));\n        float veil = mix(1.0, smoothstep(0.25, 0.75, dust), clamp(darkMatter, 0.0, 1.0));\n        rgb += tint * lit * (core + halo) * veil * gain * 1.6 / depth;\n        rgb += float3(0.03, 0.035, 0.07) * dust * max(darkMatter - 0.5, 0.0) * 0.4;\n    }\n    rgb = 1.0 - exp(-rgb * 1.6);\n    return half4(half3(rgb) * src.a, src.a);\n}\n"
+}

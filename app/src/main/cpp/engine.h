@@ -41,6 +41,12 @@ struct InterpolationParams {
     bool operator==(const InterpolationParams&) const = default;
 };
 
+struct MoshParams {
+    float intensity = 1, block = 16, decay = 0.05f, glitch = 0.1f, bloom = 0.3f, source = 0;
+    InterpolationParams flow;
+    bool operator==(const MoshParams&) const = default;
+};
+
 class Engine {
 public:
     static std::unique_ptr<Engine> Make(Backend backend, std::string* error);
@@ -64,6 +70,9 @@ public:
     virtual bool setVideoFrame(const std::string& uri, int64_t layerId, int64_t pts, AHardwareBuffer* buffer, int colorStandard = 0, int colorRange = 0, const FrameCrop& crop = {}) = 0;
     virtual bool interpolateVideo(const std::string& uri, int64_t layerId, int64_t a, int64_t b, float t, bool flow,
                                   const InterpolationParams& params) = 0;
+    virtual int moshStart(const std::string& uri, int64_t layerId, const std::vector<int64_t>& pts, const MoshParams& params) = 0;
+    virtual bool moshFrame(const std::string& uri, int64_t layerId, int step, AHardwareBuffer* buffer, int colorStandard, int colorRange,
+                           const FrameCrop& crop) = 0;
 
     virtual int renderScene(Target* target, double timeMs, float scale, float dx, float dy,
                             uint32_t background, int64_t selectedId, int handles, const PreviewOptions& view) = 0;

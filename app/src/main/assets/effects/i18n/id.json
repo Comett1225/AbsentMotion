@@ -1,0 +1,4027 @@
+{
+ "categories": {
+  "ai": "AI",
+  "blur": "Blur",
+  "color": "Warna",
+  "distort": "Distorsi",
+  "key": "Key",
+  "move": "Gerak",
+  "new": "Baru",
+  "noise": "Noise",
+  "repeat": "Ulangi",
+  "stylize": "Stilisasi",
+  "text": "Teks"
+ },
+ "effects": {
+  "autoshake": {
+   "description": "Menggerakkan lapisan secara acak seiring waktu dalam batas yang ditentukan.",
+   "name": "Goyang otomatis",
+   "params": {
+    "angle": {
+     "label": "Sudut"
+    },
+    "evolution": {
+     "label": "Evolusi"
+    },
+    "frequency": {
+     "label": "Frekuensi"
+    },
+    "magnitude": {
+     "label": "Besaran"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "slack": {
+     "label": "Kelonggaran"
+    },
+    "zshake": {
+     "label": "Guncangan Z"
+    }
+   }
+  },
+  "backdrop": {
+   "description": "Mengisi lapisan dengan apa yang digambar di bawahnya, sehingga efek setelah ini mengubah lapisan di bawah. Campuran mengembalikan isi lapisan itu sendiri.",
+   "name": "Lapisan Penyesuaian",
+   "params": {
+    "mix": {
+     "label": "Campuran"
+    }
+   }
+  },
+  "blink": {
+   "description": "Menyalakan dan mematikan lapisan beberapa kali per detik.",
+   "name": "Kedip",
+   "params": {
+    "frequency": {
+     "label": "Kedipan per Detik"
+    }
+   }
+  },
+  "blockdissolve": {
+   "description": "Menghapus blok acak sejajar grid dari lapisan. Animasikan Kekuatan untuk menghilangkan blok makin banyak.",
+   "name": "Disolve Blok",
+   "params": {
+    "blockSize": {
+     "label": "Ukuran"
+    },
+    "fade": {
+     "label": "Pudar"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "strength": {
+     "label": "Kekuatan"
+    },
+    "stretch": {
+     "label": "Regangan"
+    }
+   }
+  },
+  "blocknoise": {
+   "description": "Membuat blok noise acak berkedip di atas lapisan, seperti sinyal digital yang rusak.",
+   "name": "Noise Blok",
+   "params": {
+    "blockSize": {
+     "label": "Ukuran"
+    },
+    "extremes": {
+     "label": "Ekstrem"
+    },
+    "freeze": {
+     "label": "Bekukan"
+    },
+    "mono": {
+     "label": "Monokrom"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "overshoot": {
+     "label": "Overshoot"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "strength": {
+     "label": "Kekuatan"
+    },
+    "stretch": {
+     "label": "Regangan"
+    }
+   }
+  },
+  "blur": {
+   "description": "Blur yang halus dan merata.",
+   "name": "Blur",
+   "params": {
+    "strength": {
+     "label": "Kekuatan"
+    }
+   }
+  },
+  "box": {
+   "description": "Membungkus lapisan menjadi kotak dengan lebar, tinggi, dan kedalaman sesuai pilihanmu.",
+   "name": "Kotak",
+   "params": {
+    "depth": {
+     "label": "Kedalaman"
+    },
+    "height": {
+     "label": "Tinggi"
+    },
+    "light": {
+     "label": "Sudut cahaya"
+    },
+    "perspective": {
+     "label": "Perspektif"
+    },
+    "position": {
+     "label": "Posisi"
+    },
+    "rotX": {
+     "label": "Rotasi X"
+    },
+    "rotY": {
+     "label": "Rotasi Y"
+    },
+    "rotZ": {
+     "label": "Rotasi Z"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "shading": {
+     "label": "Pembayangan"
+    },
+    "shine": {
+     "label": "Kilau"
+    },
+    "smoothing": {
+     "label": "Penghalusan"
+    },
+    "width": {
+     "label": "Lebar"
+    }
+   }
+  },
+  "brightnesscontrast": {
+   "description": "Menyesuaikan kecerahan dan kontras gambar.",
+   "name": "Kecerahan & Kontras",
+   "params": {
+    "brightness": {
+     "label": "Kecerahan"
+    },
+    "contrast": {
+     "label": "Kontras"
+    }
+   }
+  },
+  "bulge": {
+   "description": "Menerapkan distorsi fisheye (memperbesar atau mencubit) di sekitar titik pusat dengan kekuatan dan radius yang dapat diatur.",
+   "name": "Cembung",
+   "params": {
+    "center": {
+     "label": "Pusat"
+    },
+    "radius": {
+     "label": "Radius"
+    },
+    "strength": {
+     "label": "Kekuatan"
+    }
+   }
+  },
+  "bumpmap": {
+   "description": "Menerangi lapisan seolah kecerahannya adalah permukaan timbul, memberi kesan emboss bertekstur dengan warna tetap.",
+   "name": "Peta Bump",
+   "params": {
+    "ambient": {
+     "label": "Ambient"
+    },
+    "angle": {
+     "label": "Sudut cahaya"
+    },
+    "height": {
+     "label": "Tinggi"
+    },
+    "light": {
+     "label": "Warna cahaya"
+    },
+    "shine": {
+     "label": "Kilau"
+    }
+   }
+  },
+  "channelremap": {
+   "description": "Menyusun ulang tiap kanal warna dari kanal lain pada lapisan, untuk warna semu atau memindahkan luminansi ke alfa.",
+   "name": "Pemetaan Ulang Kanal (RGB)",
+   "params": {
+    "a": {
+     "label": "A",
+     "options": [
+      "Merah",
+      "Hijau",
+      "Biru",
+      "Alpha",
+      "Luminans",
+      "Nol",
+      "Penuh"
+     ]
+    },
+    "b": {
+     "label": "B",
+     "options": [
+      "Merah",
+      "Hijau",
+      "Biru",
+      "Alpha",
+      "Luminans",
+      "Nol",
+      "Penuh"
+     ]
+    },
+    "g": {
+     "label": "G",
+     "options": [
+      "Merah",
+      "Hijau",
+      "Biru",
+      "Alpha",
+      "Luminans",
+      "Nol",
+      "Penuh"
+     ]
+    },
+    "r": {
+     "label": "R",
+     "options": [
+      "Merah",
+      "Hijau",
+      "Biru",
+      "Alfa",
+      "Luminansi",
+      "Nol",
+      "Penuh"
+     ]
+    }
+   }
+  },
+  "channelremaphsv": {
+   "description": "Menyusun ulang hue, saturasi, value, dan alpha dari kanal lain pada lapisan.",
+   "name": "Channel Remap (HSV)",
+   "params": {
+    "a": {
+     "label": "A",
+     "options": [
+      "Hue",
+      "Saturasi",
+      "Value",
+      "Alpha",
+      "Luminans",
+      "Nol",
+      "Penuh"
+     ]
+    },
+    "h": {
+     "label": "H",
+     "options": [
+      "Hue",
+      "Saturasi",
+      "Value",
+      "Alpha",
+      "Luminans",
+      "Nol",
+      "Penuh"
+     ]
+    },
+    "s": {
+     "label": "S",
+     "options": [
+      "Hue",
+      "Saturasi",
+      "Value",
+      "Alpha",
+      "Luminans",
+      "Nol",
+      "Penuh"
+     ]
+    },
+    "v": {
+     "label": "V",
+     "options": [
+      "Hue",
+      "Saturasi",
+      "Value",
+      "Alpha",
+      "Luminans",
+      "Nol",
+      "Penuh"
+     ]
+    }
+   }
+  },
+  "checker": {
+   "description": "Menggambar papan catur di atas bagian opak lapisan, atau melubangi kotak-kotaknya.",
+   "name": "Checker",
+   "params": {
+    "angle": {
+     "label": "Sudut"
+    },
+    "color": {
+     "label": "Warna"
+    },
+    "count": {
+     "label": "Jumlah"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "punch": {
+     "label": "Bolongkan"
+    },
+    "stretch": {
+     "label": "Regangan"
+    }
+   }
+  },
+  "chromakey": {
+   "description": "Menghapus satu warna, seperti green screen.",
+   "name": "Chroma Key",
+   "params": {
+    "key": {
+     "label": "Warna Kunci"
+    },
+    "softness": {
+     "label": "Kelembutan"
+    },
+    "tolerance": {
+     "label": "Toleransi"
+    }
+   }
+  },
+  "circularripple": {
+   "description": "Membuat riak melingkar menyebar dari satu titik, seperti tetesan yang jatuh ke air.",
+   "name": "Riak melingkar",
+   "params": {
+    "center": {
+     "label": "Pusat"
+    },
+    "feather": {
+     "label": "Pemudaran"
+    },
+    "frequency": {
+     "label": "Frekuensi"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "radius": {
+     "label": "Radius"
+    },
+    "strength": {
+     "label": "Kekuatan"
+    }
+   }
+  },
+  "clouds": {
+   "description": "Menutupi bagian opak lapisan dengan pola awan lembut, juga berguna sebagai sumber noise.",
+   "name": "Awan",
+   "params": {
+    "color1": {
+     "label": "Warna 1"
+    },
+    "color2": {
+     "label": "Warna 2"
+    },
+    "intensity": {
+     "label": "Intensitas"
+    },
+    "octaves": {
+     "label": "Oktaf"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "parallax": {
+     "label": "Paralaks"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "stretch": {
+     "label": "Regangan"
+    }
+   }
+  },
+  "cmykhalftone": {
+   "description": "Menggambar ulang lapisan seperti cetakan majalah: titik cyan, magenta, kuning, dan hitam pada empat layar yang diputar.",
+   "name": "Titik halftone CMYK",
+   "params": {
+    "amount": {
+     "label": "Jumlah"
+    },
+    "angle": {
+     "label": "Sudut"
+    },
+    "black": {
+     "label": "Hitam"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "strength": {
+     "label": "Kekuatan"
+    }
+   }
+  },
+  "colorbalance": {
+   "description": "Menggeser bayangan, midtone, dan highlight ke warnanya masing-masing (abu-abu tidak mengubah rentang).",
+   "name": "Keseimbangan Warna",
+   "params": {
+    "amount": {
+     "label": "Jumlah"
+    },
+    "highlights": {
+     "label": "Highlight"
+    },
+    "midtones": {
+     "label": "Midtone"
+    },
+    "shadows": {
+     "label": "Bayangan"
+    }
+   }
+  },
+  "colorize": {
+   "description": "Memberi warna pada seluruh lapisan dengan satu hue sambil mempertahankan terang dan bayangannya.",
+   "name": "Warnai",
+   "params": {
+    "amount": {
+     "label": "Jumlah"
+    },
+    "hue": {
+     "label": "Hue"
+    }
+   }
+  },
+  "colorwheels": {
+   "description": "Roda warna untuk bayangan (lift), midtone (gamma), dan highlight (gain): hue, seberapa jauh mendorongnya, dan level.",
+   "name": "Lift Gamma Gain",
+   "params": {
+    "gainAmount": {
+     "label": "Jumlah Gain"
+    },
+    "gainHue": {
+     "label": "Hue Gain"
+    },
+    "gainLevel": {
+     "label": "Level Gain"
+    },
+    "gammaAmount": {
+     "label": "Jumlah Gamma"
+    },
+    "gammaHue": {
+     "label": "Hue Gamma"
+    },
+    "gammaLevel": {
+     "label": "Level Gamma"
+    },
+    "liftAmount": {
+     "label": "Jumlah Lift"
+    },
+    "liftHue": {
+     "label": "Hue Lift"
+    },
+    "liftLevel": {
+     "label": "Level Lift"
+    }
+   }
+  },
+  "contourgradient": {
+   "description": "Melukis gradien dua warna ke arah luar dari tepi bagian opak lapisan, seperti halo berwarna lembut.",
+   "name": "Gradien kontur",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "blur": {
+     "label": "Lebar"
+    },
+    "color1": {
+     "label": "Warna 1"
+    },
+    "color2": {
+     "label": "Warna 2"
+    },
+    "fade": {
+     "label": "Pudar"
+    },
+    "fill": {
+     "label": "Isi"
+    }
+   }
+  },
+  "contourlines": {
+   "description": "Menggambar cincin garis luar di sekitar bagian opak lapisan, untuk tumpukan stiker atau garis neon.",
+   "name": "Garis kontur",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "blur": {
+     "label": "Perluasan"
+    },
+    "color": {
+     "label": "Warna"
+    },
+    "count": {
+     "label": "Jumlah"
+    },
+    "fill": {
+     "label": "Isi"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "width": {
+     "label": "Lebar"
+    }
+   }
+  },
+  "countupdown": {
+   "description": "Mengubah setiap angka di lapisan teks: mengalikan lalu menambahkannya, jadi keyframe Kalikan dari 0% ke 100% membuat angka menghitung naik hingga nilai yang Anda ketik. Kata di sekitar angka tetap.",
+   "name": "Hitung Naik/Turun",
+   "params": {
+    "add": {
+     "label": "Tambah"
+    },
+    "decimals": {
+     "label": "Tempat Desimal",
+     "options": [
+      "Sesuai Ketikan",
+      "0",
+      "1",
+      "2",
+      "3"
+     ]
+    },
+    "multiply": {
+     "label": "Kalikan"
+    },
+    "separator": {
+     "label": "Pemisah Ribuan",
+     "options": [
+      "1000.5",
+      "1,000.5",
+      "1.000,5",
+      "1 000.5"
+     ]
+    }
+   }
+  },
+  "cross": {
+   "description": "Menempatkan lapisan pada tiga batang yang bersilangan di tengah.",
+   "name": "Silang tiga sumbu",
+   "params": {
+    "light": {
+     "label": "Sudut cahaya"
+    },
+    "perspective": {
+     "label": "Perspektif"
+    },
+    "position": {
+     "label": "Posisi"
+    },
+    "reach": {
+     "label": "Panjang"
+    },
+    "rotX": {
+     "label": "Rotasi X"
+    },
+    "rotY": {
+     "label": "Rotasi Y"
+    },
+    "rotZ": {
+     "label": "Rotasi Z"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "shading": {
+     "label": "Pencahayaan"
+    },
+    "shine": {
+     "label": "Kilau"
+    },
+    "smoothing": {
+     "label": "Pemulusan"
+    },
+    "thickness": {
+     "label": "Ketebalan"
+    }
+   }
+  },
+  "cube": {
+   "description": "Membungkus lapisan ke setiap sisi kubus yang berputar dengan tepi membulat dan pencahayaan.",
+   "name": "Kubus",
+   "params": {
+    "edge": {
+     "label": "Ukuran"
+    },
+    "light": {
+     "label": "Sudut cahaya"
+    },
+    "perspective": {
+     "label": "Perspektif"
+    },
+    "position": {
+     "label": "Posisi"
+    },
+    "rotX": {
+     "label": "Rotasi X"
+    },
+    "rotY": {
+     "label": "Rotasi Y"
+    },
+    "rotZ": {
+     "label": "Rotasi Z"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "shading": {
+     "label": "Pencahayaan"
+    },
+    "shine": {
+     "label": "Kilau"
+    },
+    "smoothing": {
+     "label": "Pemulusan"
+    }
+   }
+  },
+  "cylinder": {
+   "description": "Membungkus lapisan mengelilingi silinder dan ke ujung-ujungnya yang bulat.",
+   "name": "Silinder",
+   "params": {
+    "height": {
+     "label": "Tinggi"
+    },
+    "light": {
+     "label": "Sudut cahaya"
+    },
+    "perspective": {
+     "label": "Perspektif"
+    },
+    "position": {
+     "label": "Posisi"
+    },
+    "radius": {
+     "label": "Radius"
+    },
+    "rotX": {
+     "label": "Rotasi X"
+    },
+    "rotY": {
+     "label": "Rotasi Y"
+    },
+    "rotZ": {
+     "label": "Rotasi Z"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "shading": {
+     "label": "Pencahayaan"
+    },
+    "shine": {
+     "label": "Kilau"
+    },
+    "smoothing": {
+     "label": "Pemulusan"
+    }
+   }
+  },
+  "darkglow": {
+   "description": "Menyebarkan bagian gelap lapisan ke bagian yang terang, seperti pendar yang terbuat dari bayangan.",
+   "name": "Pendar Gelap",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "blend": {
+     "label": "Blending"
+    },
+    "blur": {
+     "label": "Difusi"
+    },
+    "color": {
+     "label": "Warna"
+    },
+    "threshold": {
+     "label": "Ambang"
+    }
+   }
+  },
+  "datamosh": {
+   "description": "Sejak waktu mulai, gambar berhenti diperbarui dan terseret oleh gerakan setelahnya, seolah ada keyframe yang hilang. Lapisan video digeser oleh gerakan aslinya, lapisan lain oleh blok yang bergerak.",
+   "name": "Datamosh",
+   "params": {
+    "block": {
+     "label": "Ukuran blok"
+    },
+    "bloom": {
+     "label": "Bloom"
+    },
+    "decay": {
+     "label": "Peluruhan"
+    },
+    "duration": {
+     "label": "Durasi"
+    },
+    "glitch": {
+     "label": "Glitch"
+    },
+    "intensity": {
+     "label": "Intensitas"
+    },
+    "start": {
+     "label": "Mulai"
+    }
+   }
+  },
+  "denoise": {
+   "description": "Menghilangkan noise gambar dengan filter bilateral yang mempertahankan tepi, hanya merata-ratakan piksel sekitar yang warnanya mirip.",
+   "name": "Penghilang Noise",
+   "params": {
+    "detail": {
+     "label": "Detail"
+    },
+    "radius": {
+     "label": "Radius"
+    },
+    "strength": {
+     "label": "Kekuatan"
+    }
+   }
+  },
+  "directionalblur": {
+   "description": "Membuat blur gerak dengan merata-ratakan sampel sepanjang sudut tertentu.",
+   "name": "Blur Arah",
+   "params": {
+    "angle": {
+     "label": "Sudut"
+    },
+    "blurLength": {
+     "label": "Panjang"
+    }
+   }
+  },
+  "dissolve": {
+   "description": "Lapisan pecah menjadi bintik-bintik acak.",
+   "name": "Larut",
+   "params": {
+    "grain": {
+     "label": "Ukuran"
+    },
+    "progress": {
+     "label": "Progres"
+    }
+   }
+  },
+  "dots": {
+   "description": "Menggambar pola titik lembut yang acak namun merata di atas lapisan, atau memakai lapisan hanya sebagai masker untuk titik-titik.",
+   "name": "Titik",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "blend": {
+     "label": "Mode Blending",
+     "options": [
+      "Normal",
+      "Multiply",
+      "Screen"
+     ]
+    },
+    "color1": {
+     "label": "Warna 1"
+    },
+    "color2": {
+     "label": "Warna 2"
+    },
+    "density": {
+     "label": "Kepadatan"
+    },
+    "feather": {
+     "label": "Pemudaran"
+    },
+    "fill": {
+     "label": "Isi"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "radius": {
+     "label": "Radius"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "slack": {
+     "label": "Kelonggaran"
+    }
+   }
+  },
+  "drawingprogress": {
+   "description": "Menggambar coretan tangan gores demi gores, atau garis luar bentuk, dari Awal ke Akhir. Keyframe Akhir dari 0% ke 100% untuk melihat proses gambarnya. Paling cocok untuk bentuk dengan Isi mati dan Stroke.",
+   "name": "Progres Gambar",
+   "params": {
+    "end": {
+     "label": "Akhir"
+    },
+    "start": {
+     "label": "Awal"
+    }
+   }
+  },
+  "duotone": {
+   "description": "Terapkan peta gradien dua warna berdasarkan luminansi dengan kontrol kontras dan intensitas.",
+   "name": "Duotone",
+   "params": {
+    "amount": {
+     "label": "Jumlah"
+    },
+    "color1": {
+     "label": "Warna bayangan"
+    },
+    "color2": {
+     "label": "Warna sorotan"
+    },
+    "contrast": {
+     "label": "Kontras"
+    }
+   }
+  },
+  "echo": {
+   "description": "Menggambar salinan lapisan dari beberapa saat sebelumnya sambil mengikuti animasinya.",
+   "name": "Keyframe gema",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "composite": {
+     "label": "Komposit",
+     "options": [
+      "Di belakang",
+      "Di atas"
+     ]
+    },
+    "count": {
+     "label": "Jumlah"
+    },
+    "seconds": {
+     "label": "Detik"
+    }
+   }
+  },
+  "edgedetect": {
+   "description": "Garis terang di area gambar yang berubah, gelap di bagian lain.",
+   "name": "Deteksi tepi",
+   "params": {
+    "strength": {
+     "label": "Kekuatan"
+    }
+   }
+  },
+  "edgeglow": {
+   "description": "Menemukan tepi pada lapisan dan membuatnya menyala seperti neon di atas gambar yang digelapkan.",
+   "name": "Pendar Tepi",
+   "params": {
+    "blend": {
+     "label": "Blending"
+    },
+    "blur": {
+     "label": "Blur"
+    },
+    "color": {
+     "label": "Warna"
+    },
+    "invert": {
+     "label": "Invers"
+    },
+    "spread": {
+     "label": "Sebaran"
+    },
+    "threshold": {
+     "label": "Ambang"
+    }
+   }
+  },
+  "ellipsoid": {
+   "description": "Membungkus lapisan pada bola yang bisa Anda peras dan ratakan.",
+   "name": "Elipsoid",
+   "params": {
+    "flatten": {
+     "label": "Ratakan"
+    },
+    "light": {
+     "label": "Sudut Cahaya"
+    },
+    "perspective": {
+     "label": "Perspektif"
+    },
+    "position": {
+     "label": "Posisi"
+    },
+    "radius": {
+     "label": "Radius"
+    },
+    "rotX": {
+     "label": "Rotasi X"
+    },
+    "rotY": {
+     "label": "Rotasi Y"
+    },
+    "rotZ": {
+     "label": "Rotasi Z"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "shading": {
+     "label": "Peneduhan"
+    },
+    "shine": {
+     "label": "Kilau"
+    },
+    "squeeze": {
+     "label": "Peras"
+    }
+   }
+  },
+  "emboss": {
+   "description": "Memberi efek emboss dengan gradien kecerahan sesuai sudut cahaya yang ditentukan.",
+   "name": "Emboss",
+   "params": {
+    "angle": {
+     "label": "Sudut cahaya"
+    },
+    "strength": {
+     "label": "Kekuatan"
+    }
+   }
+  },
+  "exposure": {
+   "description": "Mensimulasikan eksposur fotografi dengan stop, offset, dan koreksi gamma.",
+   "name": "Eksposur",
+   "params": {
+    "gamma": {
+     "label": "Gamma"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "stops": {
+     "label": "Stop"
+    }
+   }
+  },
+  "fade": {
+   "description": "Memudarkan lapisan masuk di awal dan keluar di akhir selama waktu yang Anda atur.",
+   "name": "Pudar Masuk/Keluar",
+   "params": {
+    "fadeIn": {
+     "label": "Masuk"
+    },
+    "fadeOut": {
+     "label": "Keluar"
+    }
+   }
+  },
+  "feather": {
+   "description": "Melembutkan tepi bagian opak lapisan dengan memudarkannya ke arah garis tepi.",
+   "name": "Pelembutan",
+   "params": {
+    "blur": {
+     "label": "Kekuatan"
+    }
+   }
+  },
+  "filmgrain": {
+   "description": "Grain film monokrom beranimasi dengan jumlah, ukuran butiran, dan kecepatan animasi yang dapat diatur.",
+   "name": "Grain film",
+   "params": {
+    "amount": {
+     "label": "Jumlah"
+    },
+    "grainSize": {
+     "label": "Ukuran butiran"
+    },
+    "speed": {
+     "label": "Kecepatan"
+    }
+   }
+  },
+  "flicker": {
+   "description": "Mengubah opasitas lapisan secara acak seperti berkedip.",
+   "name": "Kedip",
+   "params": {
+    "intensity": {
+     "label": "Intensitas"
+    },
+    "mode": {
+     "label": "Mode"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "speed": {
+     "label": "Kecepatan"
+    }
+   }
+  },
+  "flip": {
+   "description": "Membalik lapisan seperti kartu dalam 3D, dengan bagian belakang tembus pandang, gambar, atau warna.",
+   "name": "Balik Lapisan",
+   "params": {
+    "back": {
+     "label": "Belakang",
+     "options": [
+      "Tembus pandang",
+      "Gambar",
+      "Warna"
+     ]
+    },
+    "backColor": {
+     "label": "Warna Belakang"
+    },
+    "light": {
+     "label": "Sudut Cahaya"
+    },
+    "perspective": {
+     "label": "Perspektif"
+    },
+    "position": {
+     "label": "Posisi"
+    },
+    "rotX": {
+     "label": "Rotasi X"
+    },
+    "rotY": {
+     "label": "Rotasi Y"
+    },
+    "rotZ": {
+     "label": "Rotasi Z"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "shading": {
+     "label": "Peneduhan"
+    },
+    "shine": {
+     "label": "Kilau"
+    }
+   }
+  },
+  "fourcolor": {
+   "description": "Memadukan empat warna di empat titik (piksel dari pusat lapisan) ke seluruh lapisan.",
+   "name": "Gradien empat warna",
+   "params": {
+    "blend": {
+     "label": "Blending",
+     "options": [
+      "Normal",
+      "Perkalian",
+      "Layar",
+      "Overlay",
+      "Cahaya lembut",
+      "Cahaya keras",
+      "Tambah",
+      "Gelapkan",
+      "Terangkan",
+      "Perbedaan",
+      "Color Dodge",
+      "Color Burn"
+     ]
+    },
+    "color1": {
+     "label": "Warna 1"
+    },
+    "color2": {
+     "label": "Warna 2"
+    },
+    "color3": {
+     "label": "Warna 3"
+    },
+    "color4": {
+     "label": "Warna 4"
+    },
+    "corner": {
+     "label": "Offset sudut"
+    },
+    "opacity": {
+     "label": "Opasitas"
+    },
+    "point1": {
+     "label": "Titik 1"
+    },
+    "point2": {
+     "label": "Titik 2"
+    },
+    "point3": {
+     "label": "Titik 3"
+    },
+    "point4": {
+     "label": "Titik 4"
+    },
+    "softness": {
+     "label": "Kelembutan"
+    }
+   }
+  },
+  "fractalridges": {
+   "description": "Mengisi bagian opak lapisan dengan punggungan tajam dan bergolak dari noise fraktal.",
+   "name": "Punggungan Fraktal",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "color1": {
+     "label": "Warna 1"
+    },
+    "color2": {
+     "label": "Warna 2"
+    },
+    "evolution": {
+     "label": "Evolusi"
+    },
+    "intensity": {
+     "label": "Intensitas"
+    },
+    "octaves": {
+     "label": "Oktaf"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "stretch": {
+     "label": "Regangkan"
+    }
+   }
+  },
+  "fractalwarp": {
+   "description": "Memelintir lapisan dengan noise fraktal terlipat, cocok untuk api, air, dan kilau panas.",
+   "name": "Warp Fraktal",
+   "params": {
+    "complexity": {
+     "label": "Kompleksitas"
+    },
+    "evolution": {
+     "label": "Evolusi"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "strength": {
+     "label": "Kekuatan"
+    }
+   }
+  },
+  "glitch": {
+   "description": "Pergeseran blok horizontal acak dan offset kanal warna, berubah beberapa kali per detik.",
+   "name": "Glitch",
+   "params": {
+    "blockHeight": {
+     "label": "Tinggi blok"
+    },
+    "intensity": {
+     "label": "Intensitas"
+    },
+    "seed": {
+     "label": "Seed"
+    }
+   }
+  },
+  "glow": {
+   "description": "Cahaya lembut di sekitar bagian terang lapisan.",
+   "name": "Glow",
+   "params": {
+    "intensity": {
+     "label": "Intensitas"
+    },
+    "strength": {
+     "label": "Ukuran"
+    }
+   }
+  },
+  "gradientmap": {
+   "description": "Mewarnai ulang gambar berdasarkan kecerahan melalui tiga warna, dengan pengulangan dan fase. Skala kecerahan mengalikan hasil dengan kecerahan gambar itu sendiri.",
+   "name": "Peta gradien",
+   "params": {
+    "color1": {
+     "label": "Bayangan"
+    },
+    "color2": {
+     "label": "Nada tengah"
+    },
+    "color3": {
+     "label": "Sorotan"
+    },
+    "opacity": {
+     "label": "Opasitas"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "repeat": {
+     "label": "Pengulangan"
+    },
+    "reverse": {
+     "label": "Terbalik"
+    },
+    "scaleBrightness": {
+     "label": "Skala kecerahan"
+    }
+   }
+  },
+  "gradientoverlay": {
+   "description": "Menimpa lapisan dengan gradien dua warna, dengan pilihan bentuk dan mode blending.",
+   "name": "Overlay gradien",
+   "params": {
+    "angle": {
+     "label": "Sudut"
+    },
+    "blend": {
+     "label": "Blending",
+     "options": [
+      "Normal",
+      "Multiply",
+      "Screen",
+      "Overlay",
+      "Soft Light",
+      "Hard Light",
+      "Add",
+      "Darken",
+      "Lighten",
+      "Difference",
+      "Color Dodge",
+      "Color Burn"
+     ]
+    },
+    "color1": {
+     "label": "Warna 1"
+    },
+    "color2": {
+     "label": "Warna 2"
+    },
+    "opacity": {
+     "label": "Opasitas"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "shape": {
+     "label": "Bentuk",
+     "options": [
+      "Linear",
+      "Radial",
+      "Pantulan",
+      "Sudut"
+     ]
+    }
+   }
+  },
+  "grid": {
+   "description": "Menggambar garis grid di atas bagian opak lapisan, atau memotongnya dari lapisan.",
+   "name": "Grid",
+   "params": {
+    "angle": {
+     "label": "Sudut"
+    },
+    "color": {
+     "label": "Warna"
+    },
+    "count": {
+     "label": "Jumlah"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "punch": {
+     "label": "Lubangi"
+    },
+    "stretch": {
+     "label": "Regangan"
+    },
+    "width": {
+     "label": "Lebar"
+    }
+   }
+  },
+  "gridrepeat": {
+   "description": "Membuat banyak salinan lapisan secara dinamis, tersusun dalam grid.",
+   "name": "Ulang Grid",
+   "params": {
+    "count": {
+     "label": "Jumlah"
+    },
+    "easing": {
+     "label": "Easing",
+     "options": [
+      "Linear",
+      "Ease In",
+      "Ease Out",
+      "Ease In Out"
+     ]
+    },
+    "fillAmount": {
+     "label": "Jumlah Isi"
+    },
+    "fillColor": {
+     "label": "Warna Isi"
+    },
+    "position": {
+     "label": "Posisi"
+    },
+    "randomOrder": {
+     "label": "Urutan Acak"
+    },
+    "rangeEnd": {
+     "label": "Akhir Rentang"
+    },
+    "rangeOffset": {
+     "label": "Offset Rentang"
+    },
+    "rangeOpacity": {
+     "label": "Opasitas Rentang"
+    },
+    "rangePosition": {
+     "label": "Posisi Rentang"
+    },
+    "rangeRotation": {
+     "label": "Rotasi Rentang"
+    },
+    "rangeScale": {
+     "label": "Skala Rentang"
+    },
+    "rangeStart": {
+     "label": "Awal Rentang"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "stagger": {
+     "label": "Jeda"
+    }
+   }
+  },
+  "halftone": {
+   "description": "Titik-titik cetak yang membesar di area gelap gambar.",
+   "name": "Halftone",
+   "params": {
+    "angle": {
+     "label": "Sudut"
+    },
+    "cell": {
+     "label": "Ukuran"
+    },
+    "colored": {
+     "label": "Titik warna"
+    }
+   }
+  },
+  "halftonelines": {
+   "description": "Menggambar ulang lapisan sebagai garis cetak yang menebal di area gelap dan menipis di area terang.",
+   "name": "Garis Halftone",
+   "params": {
+    "amount": {
+     "label": "Jumlah"
+    },
+    "angle": {
+     "label": "Sudut"
+    },
+    "color1": {
+     "label": "Warna 1"
+    },
+    "color2": {
+     "label": "Warna 2"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "strength": {
+     "label": "Kekuatan"
+    }
+   }
+  },
+  "heart": {
+   "description": "Memotong lapisan menjadi bentuk hati yang empuk.",
+   "name": "Hati",
+   "params": {
+    "depth": {
+     "label": "Kedalaman"
+    },
+    "heartSize": {
+     "label": "Ukuran"
+    },
+    "light": {
+     "label": "Sudut cahaya"
+    },
+    "perspective": {
+     "label": "Perspektif"
+    },
+    "position": {
+     "label": "Posisi"
+    },
+    "rotX": {
+     "label": "Rotasi X"
+    },
+    "rotY": {
+     "label": "Rotasi Y"
+    },
+    "rotZ": {
+     "label": "Rotasi Z"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "shading": {
+     "label": "Bayangan"
+    },
+    "shine": {
+     "label": "Kilau"
+    },
+    "smoothing": {
+     "label": "Penghalusan"
+    }
+   }
+  },
+  "hexagontilerotate": {
+   "description": "Membagi lapisan menjadi ubin heksagon dan memutar gambar di setiap ubin secara terpisah.",
+   "name": "Rotasi Ubin Heksagon",
+   "params": {
+    "angle": {
+     "label": "Sudut"
+    },
+    "count": {
+     "label": "Jumlah"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "random": {
+     "label": "Acak"
+    },
+    "rotation": {
+     "label": "Rotasi"
+    },
+    "seed": {
+     "label": "Seed"
+    }
+   }
+  },
+  "hexagontileshift": {
+   "description": "Membagi lapisan menjadi ubin heksagon dan menggeser gambar di setiap ubin ke arah acak.",
+   "name": "Geser Ubin Heksagon",
+   "params": {
+    "angle": {
+     "label": "Sudut"
+    },
+    "count": {
+     "label": "Jumlah"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "strength": {
+     "label": "Kekuatan"
+    }
+   }
+  },
+  "hexagontiling": {
+   "description": "Mengulang bagian tengah lapisan dalam ubin heksagon yang memenuhi layar.",
+   "name": "Ubin Heksagon",
+   "params": {
+    "angle": {
+     "label": "Sudut"
+    },
+    "mirror": {
+     "label": "Cermin"
+    },
+    "scale": {
+     "label": "Skala"
+    }
+   }
+  },
+  "hexprism": {
+   "description": "Menempatkan lapisan di sisi depan dan belakang prisma bersisi enam.",
+   "name": "Prisma Heksagon",
+   "params": {
+    "depth": {
+     "label": "Kedalaman"
+    },
+    "light": {
+     "label": "Sudut cahaya"
+    },
+    "perspective": {
+     "label": "Perspektif"
+    },
+    "position": {
+     "label": "Posisi"
+    },
+    "radius": {
+     "label": "Radius"
+    },
+    "rotX": {
+     "label": "Rotasi X"
+    },
+    "rotY": {
+     "label": "Rotasi Y"
+    },
+    "rotZ": {
+     "label": "Rotasi Z"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "shading": {
+     "label": "Bayangan"
+    },
+    "shine": {
+     "label": "Kilau"
+    },
+    "smoothing": {
+     "label": "Penghalusan"
+    }
+   }
+  },
+  "highlightshadow": {
+   "description": "Memulihkan atau memperkuat sorotan terang serta mengangkat atau memperdalam bayangan gelap dengan masker luminansi lokal yang diburamkan.",
+   "name": "Sorotan & bayangan",
+   "params": {
+    "highlights": {
+     "label": "Sorotan"
+    },
+    "shadows": {
+     "label": "Bayangan"
+    }
+   }
+  },
+  "hollowbox": {
+   "description": "Kotak dengan atas dan bawah terbuka: lapisan menutupi bagian luar dan bagian dalam memakai warna interior.",
+   "name": "Kotak Berongga",
+   "params": {
+    "depth": {
+     "label": "Kedalaman"
+    },
+    "height": {
+     "label": "Tinggi"
+    },
+    "interior": {
+     "label": "Warna interior"
+    },
+    "light": {
+     "label": "Sudut cahaya"
+    },
+    "perspective": {
+     "label": "Perspektif"
+    },
+    "position": {
+     "label": "Posisi"
+    },
+    "rotX": {
+     "label": "Rotasi X"
+    },
+    "rotY": {
+     "label": "Rotasi Y"
+    },
+    "rotZ": {
+     "label": "Rotasi Z"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "shading": {
+     "label": "Bayangan"
+    },
+    "shine": {
+     "label": "Kilau"
+    },
+    "smoothing": {
+     "label": "Penghalusan"
+    },
+    "thickness": {
+     "label": "Ketebalan"
+    },
+    "width": {
+     "label": "Lebar"
+    }
+   }
+  },
+  "huesaturation": {
+   "description": "Memutar warna pada roda warna dan membuatnya lebih kuat atau lemah; vibrance paling memperkuat warna yang kusam.",
+   "name": "Hue & saturasi",
+   "params": {
+    "hue": {
+     "label": "Hue"
+    },
+    "lightness": {
+     "label": "Kecerahan"
+    },
+    "saturation": {
+     "label": "Saturasi"
+    },
+    "vibrance": {
+     "label": "Vibrance"
+    }
+   }
+  },
+  "innerblur": {
+   "description": "Membuat gambar di dalam lapisan menjadi blur dengan garis luarnya tetap tajam.",
+   "name": "Blur Dalam",
+   "params": {
+    "blur": {
+     "label": "Kekuatan"
+    }
+   }
+  },
+  "innerbulge": {
+   "description": "Mencembungkan bagian tengah lapisan ke luar atau mencubitnya ke dalam, sementara tepi lapisan tetap di tempatnya.",
+   "name": "Cubit/Cembung Dalam",
+   "params": {
+    "strength": {
+     "label": "Kekuatan"
+    }
+   }
+  },
+  "innerglow": {
+   "description": "Menambahkan cahaya di sepanjang tepi dalam area opak lapisan.",
+   "name": "Cahaya Dalam",
+   "params": {
+    "blur": {
+     "label": "Ukuran"
+    },
+    "color": {
+     "label": "Warna"
+    },
+    "intensity": {
+     "label": "Intensitas"
+    }
+   }
+  },
+  "invert": {
+   "description": "Membalik kanal warna gambar dengan jumlah campuran dan inversi alpha opsional.",
+   "name": "Invert",
+   "params": {
+    "amount": {
+     "label": "Jumlah"
+    },
+    "invert_alpha": {
+     "label": "Balikkan alpha"
+    }
+   }
+  },
+  "iridescence": {
+   "description": "Menutupi bagian opak lapisan dengan kilau pelangi yang mengalir, seperti minyak di atas air atau gelembung sabun.",
+   "name": "Iridesensi",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "blend": {
+     "label": "Mode Blending",
+     "options": [
+      "Normal",
+      "Multiply",
+      "Screen",
+      "Overlay",
+      "Soft Light",
+      "Hard Light",
+      "Add",
+      "Darken",
+      "Lighten",
+      "Difference",
+      "Color Dodge",
+      "Color Burn"
+     ]
+    },
+    "evolution": {
+     "label": "Evolusi"
+    },
+    "saturation": {
+     "label": "Saturasi"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "shift": {
+     "label": "Pergeseran Hue"
+    }
+   }
+  },
+  "kaleidoscope": {
+   "description": "Potongan cermin di sekitar satu titik.",
+   "name": "Kaleidoskop",
+   "params": {
+    "angle": {
+     "label": "Sudut"
+    },
+    "center": {
+     "label": "Pusat"
+    },
+    "segments": {
+     "label": "Segmen"
+    }
+   }
+  },
+  "lensblur": {
+   "description": "Blur berputar yang menyisakan area tajam di sekitar pusat dan makin besar ke arah tepi.",
+   "name": "Blur Lensa",
+   "params": {
+    "center": {
+     "label": "Pusat"
+    },
+    "feather": {
+     "label": "Feather"
+    },
+    "radius": {
+     "label": "Radius"
+    },
+    "sweep": {
+     "label": "Sudut"
+    }
+   }
+  },
+  "lensflare": {
+   "description": "Cahaya terang dengan halo di atas gambar.",
+   "name": "Kilau cahaya",
+   "params": {
+    "brightness": {
+     "label": "Kecerahan"
+    },
+    "center": {
+     "label": "Pusat"
+    },
+    "color": {
+     "label": "Warna"
+    },
+    "radius": {
+     "label": "Radius"
+    }
+   }
+  },
+  "levels": {
+   "description": "Menyesuaikan level gambar dengan titik hitam/putih input, gamma, dan titik hitam/putih output.",
+   "name": "Level",
+   "params": {
+    "gamma": {
+     "label": "Gamma"
+    },
+    "inBlack": {
+     "label": "Hitam input"
+    },
+    "inWhite": {
+     "label": "Putih input"
+    },
+    "outBlack": {
+     "label": "Hitam output"
+    },
+    "outWhite": {
+     "label": "Putih output"
+    }
+   }
+  },
+  "lightglow": {
+   "description": "Menambahkan pendar berwarna di sekitar bagian gambar yang lebih terang dari ambang.",
+   "name": "Pendar cahaya",
+   "params": {
+    "blur": {
+     "label": "Ukuran"
+    },
+    "color": {
+     "label": "Warna"
+    },
+    "intensity": {
+     "label": "Intensitas"
+    },
+    "opacity": {
+     "label": "Opasitas"
+    },
+    "threshold": {
+     "label": "Ambang"
+    }
+   }
+  },
+  "lightning": {
+   "description": "Menggambar petir bercabang di antara dua titik pada lapisan.",
+   "name": "Petir",
+   "params": {
+    "color": {
+     "label": "Warna"
+    },
+    "evolution": {
+     "label": "Evolusi"
+    },
+    "from": {
+     "label": "Awal"
+    },
+    "glow": {
+     "label": "Cahaya"
+    },
+    "jag": {
+     "label": "Detail"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "to": {
+     "label": "Akhir"
+    },
+    "width": {
+     "label": "Lebar"
+    }
+   }
+  },
+  "linearrepeat": {
+   "description": "Menghasilkan beberapa salinan lapisan secara dinamis, tersusun sepanjang garis.",
+   "name": "Pengulangan Linear",
+   "params": {
+    "count": {
+     "label": "Jumlah"
+    },
+    "easing": {
+     "label": "Easing",
+     "options": [
+      "Linear",
+      "Ease In",
+      "Ease Out",
+      "Ease In Out"
+     ]
+    },
+    "fillAmount": {
+     "label": "Jumlah Isi"
+    },
+    "fillColor": {
+     "label": "Warna Isi"
+    },
+    "position": {
+     "label": "Posisi"
+    },
+    "randomOrder": {
+     "label": "Urutan Acak"
+    },
+    "rangeEnd": {
+     "label": "Akhir Rentang"
+    },
+    "rangeOffset": {
+     "label": "Offset Rentang"
+    },
+    "rangeOpacity": {
+     "label": "Opasitas Rentang"
+    },
+    "rangePosition": {
+     "label": "Posisi Rentang"
+    },
+    "rangeRotation": {
+     "label": "Rotasi Rentang"
+    },
+    "rangeScale": {
+     "label": "Skala Rentang"
+    },
+    "rangeStart": {
+     "label": "Awal Rentang"
+    },
+    "seed": {
+     "label": "Seed"
+    }
+   }
+  },
+  "linearstreaks": {
+   "description": "Membuat goresan lurus dengan menggeser salinan lapisan sepanjang sudut dan memadukannya di bagian yang bertumpuk.",
+   "name": "Goresan Linear",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "angle": {
+     "label": "Sudut"
+    },
+    "bias": {
+     "label": "Bias"
+    },
+    "mode": {
+     "label": "Blending",
+     "options": [
+      "Cerahkan",
+      "Rata-rata",
+      "Gelapkan"
+     ]
+    },
+    "reach": {
+     "label": "Panjang"
+    }
+   }
+  },
+  "longshadow": {
+   "description": "Memberi bayangan panjang yang sejajar dari bagian lapisan yang tidak transparan.",
+   "name": "Bayangan Panjang",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "angle": {
+     "label": "Sudut"
+    },
+    "color": {
+     "label": "Warna"
+    },
+    "fade": {
+     "label": "Pudar"
+    },
+    "reach": {
+     "label": "Panjang"
+    }
+   }
+  },
+  "lumakey": {
+   "description": "Menghapus bagian gelap lapisan (atau bagian terang).",
+   "name": "Kunci luma",
+   "params": {
+    "invert": {
+     "label": "Balik"
+    },
+    "softness": {
+     "label": "Kelembutan"
+    },
+    "threshold": {
+     "label": "Ambang"
+    }
+   }
+  },
+  "mattechoker": {
+   "description": "Menyusutkan bagian lapisan yang tidak transparan dengan memakan tepinya.",
+   "name": "Matte Choker",
+   "params": {
+    "amount": {
+     "label": "Choke"
+    },
+    "blur": {
+     "label": "Ukuran"
+    },
+    "softness": {
+     "label": "Kelembutan"
+    }
+   }
+  },
+  "mirror": {
+   "description": "Memantulkan separuh gambar melintasi garis cermin yang ditentukan oleh sudut dan titik pusat.",
+   "name": "Cermin",
+   "params": {
+    "angle": {
+     "label": "Sudut"
+    },
+    "center": {
+     "label": "Pusat"
+    }
+   }
+  },
+  "mosaic": {
+   "description": "Membagi lapisan menjadi kotak-kotak dan mengisi tiap kotak dengan warna rata-ratanya.",
+   "name": "Mosaik",
+   "params": {
+    "count": {
+     "label": "Jumlah"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "stretch": {
+     "label": "Regangan"
+    }
+   }
+  },
+  "motionblur": {
+   "description": "Membuat lapisan tampak memanjang ke satu arah, seolah bergerak cepat.",
+   "name": "Blur gerak",
+   "params": {
+    "angle": {
+     "label": "Arah"
+    },
+    "length": {
+     "label": "Panjang"
+    }
+   }
+  },
+  "movealongpath": {
+   "description": "Menempatkan lapisan di sepanjang garis luar lapisan tepat di bawahnya.",
+   "name": "Gerak Sepanjang Jalur",
+   "params": {
+    "inset": {
+     "label": "Inset/Outset"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "orientation": {
+     "label": "Orientasi"
+    },
+    "progress": {
+     "label": "Progres"
+    },
+    "rotate": {
+     "label": "Putar Otomatis"
+    }
+   }
+  },
+  "noisedisplace": {
+   "description": "Menggeser piksel menggunakan noise nilai halus yang beranimasi seiring waktu.",
+   "name": "Geser noise",
+   "params": {
+    "amount": {
+     "label": "Jumlah"
+    },
+    "scale": {
+     "label": "Skala noise"
+    },
+    "speed": {
+     "label": "Kecepatan animasi"
+    }
+   }
+  },
+  "octahedron": {
+   "description": "Menempatkan lapisan pada delapan sisi oktahedron.",
+   "name": "Oktahedron",
+   "params": {
+    "light": {
+     "label": "Sudut Cahaya"
+    },
+    "perspective": {
+     "label": "Perspektif"
+    },
+    "position": {
+     "label": "Posisi"
+    },
+    "radius": {
+     "label": "Radius"
+    },
+    "rotX": {
+     "label": "Rotasi X"
+    },
+    "rotY": {
+     "label": "Rotasi Y"
+    },
+    "rotZ": {
+     "label": "Rotasi Z"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "shading": {
+     "label": "Peneduhan"
+    },
+    "shine": {
+     "label": "Kilau"
+    }
+   }
+  },
+  "offset": {
+   "description": "Menggeser gambar lapisan dan membungkusnya di tepi kotak lapisan.",
+   "name": "Offset",
+   "params": {
+    "feather": {
+     "label": "Pelembutan"
+    },
+    "mask": {
+     "label": "Masker ke Lapisan"
+    },
+    "offset": {
+     "label": "Offset"
+    }
+   }
+  },
+  "oscillate": {
+   "description": "Menggerakkan lapisan maju-mundur sepanjang sudut, ke arah kedalaman, atau berputar dalam orbit.",
+   "name": "Osilasi",
+   "params": {
+    "angle": {
+     "label": "Sudut"
+    },
+    "direction": {
+     "label": "Arah",
+     "options": [
+      "Sudut",
+      "Kedalaman",
+      "Orbit"
+     ]
+    },
+    "frequency": {
+     "label": "Frekuensi"
+    },
+    "magnitude": {
+     "label": "Besaran"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "wave": {
+     "label": "Gelombang",
+     "options": [
+      "Sinus",
+      "Segitiga"
+     ]
+    }
+   }
+  },
+  "palettemap": {
+   "description": "Mewarnai ulang setiap piksel dengan warna terdekat dari palet kecil untuk kesan retro.",
+   "name": "Peta Palet",
+   "params": {
+    "color1": {
+     "label": "Warna 1"
+    },
+    "color2": {
+     "label": "Warna 2"
+    },
+    "color3": {
+     "label": "Warna 3"
+    },
+    "color4": {
+     "label": "Warna 4"
+    },
+    "color5": {
+     "label": "Warna 5"
+    },
+    "colors": {
+     "label": "Warna"
+    },
+    "dither": {
+     "label": "Dither"
+    }
+   }
+  },
+  "pixelate": {
+   "description": "Menerapkan efek mozaik piksel dengan mengganti area dengan blok persegi berwarna piksel kiri atas.",
+   "name": "Pikselasi",
+   "params": {
+    "blockSize": {
+     "label": "Ukuran blok"
+    }
+   }
+  },
+  "polar": {
+   "description": "Membengkokkan lapisan di sekitar pusatnya, mengubah garis lurus jadi lingkaran atau membuka lingkaran jadi garis lurus.",
+   "name": "Koordinat polar",
+   "params": {
+    "amount": {
+     "label": "Interpolasi"
+    },
+    "direction": {
+     "label": "Jenis",
+     "options": [
+      "Kartesius ke polar",
+      "Polar ke kartesius"
+     ]
+    }
+   }
+  },
+  "posterize": {
+   "description": "Mengurangi setiap kanal warna ke jumlah level tertentu (2-32).",
+   "name": "Posterisasi",
+   "params": {
+    "levels": {
+     "label": "Levels"
+    }
+   }
+  },
+  "pulseopacity": {
+   "description": "Membuat lapisan memudar keluar dan masuk berulang kali mengikuti gelombang sinus atau segitiga.",
+   "name": "Opasitas Berdenyut",
+   "params": {
+    "frequency": {
+     "label": "Frekuensi"
+    },
+    "phase": {
+     "label": "Fase awal"
+    },
+    "strength": {
+     "label": "Kekuatan"
+    },
+    "wave": {
+     "label": "Gelombang",
+     "options": [
+      "Sinus",
+      "Segitiga"
+     ]
+    }
+   }
+  },
+  "pulsesize": {
+   "description": "Membesarkan dan mengecilkan lapisan berulang kali mengikuti gelombang sinus atau segitiga.",
+   "name": "Ukuran Berdenyut",
+   "params": {
+    "frequency": {
+     "label": "Frekuensi"
+    },
+    "grow": {
+     "label": "Perbesar"
+    },
+    "phase": {
+     "label": "Fase awal"
+    },
+    "shrink": {
+     "label": "Perkecil"
+    },
+    "wave": {
+     "label": "Gelombang",
+     "options": [
+      "Sinus",
+      "Segitiga"
+     ]
+    }
+   }
+  },
+  "pyramid": {
+   "description": "Menempatkan lapisan pada sisi-sisi piramida persegi.",
+   "name": "Piramida",
+   "params": {
+    "base": {
+     "label": "Alas"
+    },
+    "height": {
+     "label": "Tinggi"
+    },
+    "light": {
+     "label": "Sudut cahaya"
+    },
+    "perspective": {
+     "label": "Perspektif"
+    },
+    "position": {
+     "label": "Posisi"
+    },
+    "rotX": {
+     "label": "Rotasi X"
+    },
+    "rotY": {
+     "label": "Rotasi Y"
+    },
+    "rotZ": {
+     "label": "Rotasi Z"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "shading": {
+     "label": "Pencahayaan"
+    },
+    "shine": {
+     "label": "Kilau"
+    }
+   }
+  },
+  "radialblur": {
+   "description": "Memberi blur zoom radial dengan merata-ratakan sampel dari titik pusat, kekuatannya bisa diatur.",
+   "name": "Blur Zoom",
+   "params": {
+    "center": {
+     "label": "Pusat"
+    },
+    "strength": {
+     "label": "Kekuatan"
+    }
+   }
+  },
+  "radialrays": {
+   "description": "Menambahkan sinar radial padat dari satu titik pada bagian opak lapisan.",
+   "name": "Sinar radial",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "angle": {
+     "label": "Sudut"
+    },
+    "center": {
+     "label": "Pusat"
+    },
+    "color": {
+     "label": "Warna"
+    },
+    "count": {
+     "label": "Jumlah"
+    },
+    "width": {
+     "label": "Lebar"
+    }
+   }
+  },
+  "radialrepeat": {
+   "description": "Membuat banyak salinan lapisan secara dinamis dalam pola melingkar.",
+   "name": "Pengulangan radial",
+   "params": {
+    "angle": {
+     "label": "Sudut"
+    },
+    "count": {
+     "label": "Jumlah"
+    },
+    "easing": {
+     "label": "Easing",
+     "options": [
+      "Linear",
+      "Masuk Perlahan",
+      "Keluar Perlahan",
+      "Masuk-Keluar Perlahan"
+     ]
+    },
+    "fillAmount": {
+     "label": "Jumlah isi"
+    },
+    "fillColor": {
+     "label": "Warna isi"
+    },
+    "orientation": {
+     "label": "Orientasi"
+    },
+    "radius": {
+     "label": "Radius"
+    },
+    "randomOrder": {
+     "label": "Urutan Acak"
+    },
+    "rangeEnd": {
+     "label": "Akhir rentang"
+    },
+    "rangeOffset": {
+     "label": "Offset rentang"
+    },
+    "rangeOpacity": {
+     "label": "Opasitas rentang"
+    },
+    "rangePosition": {
+     "label": "Posisi rentang"
+    },
+    "rangeRotation": {
+     "label": "Rotasi rentang"
+    },
+    "rangeScale": {
+     "label": "Skala rentang"
+    },
+    "rangeStart": {
+     "label": "Awal rentang"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "sweep": {
+     "label": "Sapuan"
+    }
+   }
+  },
+  "radialshadow": {
+   "description": "Membuat bayangan panjang dari bagian opak lapisan, menyebar menjauh dari titik cahaya.",
+   "name": "Bayangan Radial",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "color": {
+     "label": "Warna"
+    },
+    "fade": {
+     "label": "Pudar"
+    },
+    "light": {
+     "label": "Cahaya"
+    },
+    "reach": {
+     "label": "Panjang"
+    }
+   }
+  },
+  "radialwipe": {
+   "description": "Menyembunyikan sektor lapisan di antara dua garis dari titik pusat, seperti jarum jam yang berputar. Animasikan Penyelesaian untuk transisi.",
+   "name": "Sapuan Radial",
+   "params": {
+    "center": {
+     "label": "Pusat"
+    },
+    "completion": {
+     "label": "Penyelesaian"
+    },
+    "direction": {
+     "label": "Arah",
+     "options": [
+      "Searah jarum jam",
+      "Berlawanan arah jarum jam"
+     ]
+    },
+    "feather": {
+     "label": "Feather"
+    },
+    "start": {
+     "label": "Sudut Awal"
+    }
+   }
+  },
+  "randomdisplace": {
+   "description": "Memindahkan lapisan secara halus namun acak saat Evolusi berubah.",
+   "name": "Perpindahan Acak",
+   "params": {
+    "evolution": {
+     "label": "Evolusi"
+    },
+    "magnitude": {
+     "label": "Besaran"
+    },
+    "scatter": {
+     "label": "Sebaran"
+    },
+    "seed": {
+     "label": "Seed"
+    }
+   }
+  },
+  "randomjitter": {
+   "description": "Membuat lapisan melompat maju-mundur secara acak sepanjang sudut.",
+   "name": "Getaran Acak",
+   "params": {
+    "angle": {
+     "label": "Sudut"
+    },
+    "frequency": {
+     "label": "Frekuensi"
+    },
+    "magnitude": {
+     "label": "Besaran"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "slack": {
+     "label": "Kelonggaran"
+    },
+    "zjitter": {
+     "label": "Jitter Z"
+    }
+   }
+  },
+  "rasterextrude": {
+   "description": "Mendorong gambar lapisan menjadi blok padat; sisi-sisinya mengambil warna interior.",
+   "name": "Ekstrusi Raster",
+   "params": {
+    "depth": {
+     "label": "Kedalaman"
+    },
+    "interior": {
+     "label": "Warna Interior"
+    },
+    "light": {
+     "label": "Sudut Cahaya"
+    },
+    "perspective": {
+     "label": "Perspektif"
+    },
+    "position": {
+     "label": "Posisi"
+    },
+    "rotX": {
+     "label": "Rotasi X"
+    },
+    "rotY": {
+     "label": "Rotasi Y"
+    },
+    "rotZ": {
+     "label": "Rotasi Z"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "shading": {
+     "label": "Shading"
+    },
+    "shine": {
+     "label": "Kilau"
+    }
+   }
+  },
+  "rays": {
+   "description": "Memancarkan sinar cahaya dari bagian terang lapisan, menjauh dari titik pusat.",
+   "name": "Sinar",
+   "params": {
+    "center": {
+     "label": "Pusat"
+    },
+    "color": {
+     "label": "Warna"
+    },
+    "intensity": {
+     "label": "Intensitas"
+    },
+    "reach": {
+     "label": "Panjang"
+    },
+    "threshold": {
+     "label": "Ambang"
+    }
+   }
+  },
+  "reorient360": {
+   "description": "Memutar lapisan panorama 360° di dalam bola, untuk meratakan horizon atau mengubah arah depan.",
+   "name": "Orientasi Ulang Bola 360°",
+   "params": {
+    "pitch": {
+     "label": "Pitch"
+    },
+    "roll": {
+     "label": "Roll"
+    },
+    "yaw": {
+     "label": "Yaw"
+    }
+   }
+  },
+  "repeat": {
+   "description": "Menghasilkan beberapa salinan lapisan secara dinamis.",
+   "name": "Pengulangan",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "angle": {
+     "label": "Sudut"
+    },
+    "count": {
+     "label": "Jumlah"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "time": {
+     "label": "Waktu"
+    }
+   }
+  },
+  "repeatalongpath": {
+   "description": "Menghasilkan beberapa salinan lapisan secara dinamis di sepanjang jalur garis luar lapisan tepat di bawahnya.",
+   "name": "Ulangi Sepanjang Jalur",
+   "params": {
+    "count": {
+     "label": "Jumlah"
+    },
+    "easing": {
+     "label": "Easing",
+     "options": [
+      "Linear",
+      "Ease In",
+      "Ease Out",
+      "Ease In Out"
+     ]
+    },
+    "end": {
+     "label": "Akhir"
+    },
+    "fillAmount": {
+     "label": "Jumlah Isi"
+    },
+    "fillColor": {
+     "label": "Warna Isi"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "randomOrder": {
+     "label": "Urutan Acak"
+    },
+    "rangeEnd": {
+     "label": "Akhir Rentang"
+    },
+    "rangeOffset": {
+     "label": "Offset Rentang"
+    },
+    "rangeOpacity": {
+     "label": "Opasitas Rentang"
+    },
+    "rangePosition": {
+     "label": "Posisi Rentang"
+    },
+    "rangeRotation": {
+     "label": "Rotasi Rentang"
+    },
+    "rangeScale": {
+     "label": "Skala Rentang"
+    },
+    "rangeStart": {
+     "label": "Awal Rentang"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "start": {
+     "label": "Mulai"
+    },
+    "tangent": {
+     "label": "Tangen"
+    }
+   }
+  },
+  "replacecolor": {
+   "description": "Menukar satu warna pada lapisan dengan warna lain, sambil mempertahankan terang dan gelap aslinya.",
+   "name": "Ganti Warna",
+   "params": {
+    "choke": {
+     "label": "Choke"
+    },
+    "feather": {
+     "label": "Feather"
+    },
+    "source": {
+     "label": "Dari"
+    },
+    "target": {
+     "label": "Ke"
+    },
+    "threshold": {
+     "label": "Ambang"
+    }
+   }
+  },
+  "rgbsplit": {
+   "description": "Aberasi kromatik dengan menggeser kanal merah dan biru ke arah berlawanan sepanjang sudut.",
+   "name": "Pemisahan RGB",
+   "params": {
+    "angle": {
+     "label": "Sudut"
+    },
+    "splitDistance": {
+     "label": "Jarak"
+    }
+   }
+  },
+  "ripple": {
+   "description": "Riak konsentris memancar dari titik pusat dengan amplitudo, panjang gelombang, dan kecepatan yang bisa diatur.",
+   "name": "Riak",
+   "params": {
+    "amplitude": {
+     "label": "Amplitudo"
+    },
+    "center": {
+     "label": "Pusat"
+    },
+    "speed": {
+     "label": "Kecepatan"
+    },
+    "wavelength": {
+     "label": "Panjang gelombang"
+    }
+   }
+  },
+  "roughenedges": {
+   "description": "Menggerogoti tepi bagian opak dengan noise, untuk garis luar yang sobek, usang, atau terbakar.",
+   "name": "Perkasar Tepi",
+   "params": {
+    "blur": {
+     "label": "Border"
+    },
+    "evolution": {
+     "label": "Evolusi"
+    },
+    "roughness": {
+     "label": "Kekasaran"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "seed": {
+     "label": "Seed"
+    }
+   }
+  },
+  "scanlines": {
+   "description": "Menambahkan garis pindai horizontal untuk efek monitor CRT dengan gulir vertikal opsional.",
+   "name": "Scanlines",
+   "params": {
+    "darkness": {
+     "label": "Kegelapan"
+    },
+    "roll_speed": {
+     "label": "Kecepatan gulir"
+    },
+    "spacing": {
+     "label": "Jarak antargaris"
+    }
+   }
+  },
+  "scatterfield": {
+   "description": "Menyebarkan salinan lapisan dalam bidang 3D tak terbatas sambil menyembunyikan lapisan asli, dan memungkinkan gerak simulasi dalam bidang tiga dimensi melalui animasi keyframe.",
+   "name": "Bidang Sebar",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "amount": {
+     "label": "Jumlah"
+    },
+    "angle": {
+     "label": "Sudut"
+    },
+    "angleVariance": {
+     "label": "Variasi Sudut"
+    },
+    "blending": {
+     "label": "Mode Blending",
+     "options": [
+      "Normal",
+      "Tambah",
+      "Screen",
+      "Kalikan",
+      "Cerahkan",
+      "Gelapkan",
+      "Overlay",
+      "Selisih"
+     ]
+    },
+    "color1": {
+     "label": "Warna 1"
+    },
+    "color2": {
+     "label": "Warna 2"
+    },
+    "color3": {
+     "label": "Warna 3"
+    },
+    "coloring": {
+     "label": "Pewarnaan",
+     "options": [
+      "Tidak ada",
+      "Acak",
+      "Kedalaman"
+     ]
+    },
+    "density": {
+     "label": "Kepadatan"
+    },
+    "evolution": {
+     "label": "Evolusi"
+    },
+    "fade": {
+     "label": "Pudar"
+    },
+    "interpolateHue": {
+     "label": "Interpolasi Hue"
+    },
+    "lockLuminance": {
+     "label": "Kunci Luminansi"
+    },
+    "lockSaturation": {
+     "label": "Kunci Saturasi"
+    },
+    "position": {
+     "label": "Posisi"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "size": {
+     "label": "Ukuran"
+    },
+    "sizeVariance": {
+     "label": "Variasi Ukuran"
+    },
+    "slack": {
+     "label": "Slack"
+    },
+    "z": {
+     "label": "Posisi Z"
+    }
+   }
+  },
+  "sepia": {
+   "description": "Nada cokelat hangat, seperti foto lama.",
+   "name": "Sepia",
+   "params": {
+    "amount": {
+     "label": "Jumlah"
+    }
+   }
+  },
+  "sharpen": {
+   "description": "Menerapkan unsharp mask dengan area 3x3 untuk menajamkan detail halus.",
+   "name": "Pertajam",
+   "params": {
+    "amount": {
+     "label": "Jumlah"
+    },
+    "radius": {
+     "label": "Radius"
+    }
+   }
+  },
+  "shutterblur": {
+   "description": "Memblurkan lapisan mengikuti gerak, putaran dan pembesarannya yang sebenarnya, seperti rana kamera. Sudut rana yang lebih lebar memberi jejak lebih panjang dan sampel lebih banyak membuatnya lebih halus. Pratinjau menampilkan blur yang lebih cepat kecuali Full Blur aktif.",
+   "name": "Blur Gerak Sejati",
+   "params": {
+    "samples": {
+     "label": "Sampel"
+    },
+    "shutter": {
+     "label": "Sudut Rana"
+    }
+   }
+  },
+  "smoothbevel": {
+   "description": "Memberi bevel halus dan membulat pada bagian opak lapisan dengan cahaya dari satu sisi.",
+   "name": "Bevel Halus",
+   "params": {
+    "angle": {
+     "label": "Sudut Cahaya"
+    },
+    "blur": {
+     "label": "Ukuran"
+    },
+    "depth": {
+     "label": "Kedalaman"
+    },
+    "highlight": {
+     "label": "Sorotan"
+    },
+    "intensity": {
+     "label": "Intensitas"
+    },
+    "shadow": {
+     "label": "Bayangan"
+    }
+   }
+  },
+  "softglow": {
+   "description": "Menimpa gambar dengan salinan lembut yang diburamkan untuk efek cahaya mempesona, terutama dari bagian terang.",
+   "name": "Cahaya Lembut",
+   "params": {
+    "blur": {
+     "label": "Ukuran"
+    },
+    "brightness": {
+     "label": "Kecerahan"
+    },
+    "color": {
+     "label": "Warna"
+    },
+    "contrast": {
+     "label": "Kontras"
+    },
+    "highlights": {
+     "label": "Sorotan"
+    },
+    "opacity": {
+     "label": "Opasitas"
+    }
+   }
+  },
+  "solid": {
+   "description": "Melapisi lapisan dengan satu warna tanpa mengubah bentuknya, dengan pilihan mode blending.",
+   "name": "Overlay warna",
+   "params": {
+    "amount": {
+     "label": "Jumlah"
+    },
+    "blend": {
+     "label": "Blending",
+     "options": [
+      "Normal",
+      "Kalikan",
+      "Layar",
+      "Overlay",
+      "Cahaya lembut",
+      "Cahaya keras",
+      "Tambahkan",
+      "Gelapkan",
+      "Terangkan",
+      "Perbedaan",
+      "Dodge warna",
+      "Burn warna"
+     ]
+    },
+    "color": {
+     "label": "Warna"
+    }
+   }
+  },
+  "spherize": {
+   "description": "Melengkungkan lapisan mengikuti bagian depan bola.",
+   "name": "Spherize",
+   "params": {
+    "coverage": {
+     "label": "Cakupan"
+    },
+    "light": {
+     "label": "Sudut Cahaya"
+    },
+    "perspective": {
+     "label": "Perspektif"
+    },
+    "position": {
+     "label": "Posisi"
+    },
+    "radius": {
+     "label": "Radius"
+    },
+    "rotX": {
+     "label": "Rotasi X"
+    },
+    "rotY": {
+     "label": "Rotasi Y"
+    },
+    "rotZ": {
+     "label": "Rotasi Z"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "shading": {
+     "label": "Shading"
+    },
+    "shine": {
+     "label": "Kilau"
+    }
+   }
+  },
+  "spin": {
+   "description": "Memutar lapisan terus-menerus dengan kecepatan tetap; di bawah nol putarannya ke arah sebaliknya.",
+   "name": "Putar",
+   "params": {
+    "rpm": {
+     "label": "RPM"
+    }
+   }
+  },
+  "spinblur": {
+   "description": "Memblurkan lapisan melingkar di sekitar satu titik, seolah berputar.",
+   "name": "Blur Putar",
+   "params": {
+    "center": {
+     "label": "Pusat"
+    },
+    "sweep": {
+     "label": "Sudut"
+    }
+   }
+  },
+  "spinstreaks": {
+   "description": "Membuat jejak berbentuk busur dengan memutar salinan lapisan di sekitar satu titik dan memadukannya saat saling tumpang tindih.",
+   "name": "Jejak Putar",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "bias": {
+     "label": "Bias"
+    },
+    "center": {
+     "label": "Pusat"
+    },
+    "mode": {
+     "label": "Blending",
+     "options": [
+      "Terangkan",
+      "Rata-rata",
+      "Gelapkan"
+     ]
+    },
+    "sweep": {
+     "label": "Sapuan"
+    }
+   }
+  },
+  "splittone": {
+   "description": "Memberi warna pada bayangan ke satu hue dan sorotan ke hue lain, sambil mempertahankan hitam, putih, dan kecerahan.",
+   "name": "Nada terpisah",
+   "params": {
+    "highlightAmount": {
+     "label": "Jumlah sorotan"
+    },
+    "highlightHue": {
+     "label": "Hue sorotan"
+    },
+    "shadowAmount": {
+     "label": "Jumlah bayangan"
+    },
+    "shadowHue": {
+     "label": "Hue bayangan"
+    }
+   }
+  },
+  "spotcolor": {
+   "description": "Mempertahankan satu warna dan menghilangkan saturasi dari semua warna lain di lapisan.",
+   "name": "Warna Spot",
+   "params": {
+    "choke": {
+     "label": "Choke"
+    },
+    "color": {
+     "label": "Warna"
+    },
+    "feather": {
+     "label": "Feather"
+    },
+    "saturation": {
+     "label": "Saturasi"
+    },
+    "threshold": {
+     "label": "Ambang"
+    }
+   }
+  },
+  "squeeze": {
+   "description": "Menghimpit lapisan pada satu sumbu sambil meregangkannya pada sumbu lain. Nilai negatif menukar sumbunya.",
+   "name": "Himpit",
+   "params": {
+    "strength": {
+     "label": "Kekuatan"
+    }
+   }
+  },
+  "star": {
+   "description": "Menggambar satu bintang bercahaya pada lapisan.",
+   "name": "Bintang",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "blend": {
+     "label": "Mode Blending",
+     "options": [
+      "Normal",
+      "Perkalian",
+      "Layar",
+      "Hamparan",
+      "Cahaya Lembut",
+      "Cahaya Keras",
+      "Tambah",
+      "Gelapkan",
+      "Terangkan",
+      "Selisih",
+      "Dodge Warna",
+      "Burn Warna"
+     ]
+    },
+    "brightness": {
+     "label": "Kecerahan"
+    },
+    "color": {
+     "label": "Warna"
+    },
+    "points": {
+     "label": "Titik"
+    },
+    "position": {
+     "label": "Posisi"
+    },
+    "radius": {
+     "label": "Radius"
+    },
+    "shine": {
+     "label": "Kilau"
+    }
+   }
+  },
+  "starfield": {
+   "description": "Mengisi bagian opak lapisan dengan medan bintang yang dalam pada beberapa lapisan yang bergerak dengan kecepatan berbeda.",
+   "name": "Medan Bintang",
+   "params": {
+    "brightness": {
+     "label": "Kecerahan"
+    },
+    "darkMatter": {
+     "label": "Materi Gelap"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "scale": {
+     "label": "Skala"
+    }
+   }
+  },
+  "starpolyhedron": {
+   "description": "Menempatkan lapisan pada bintang yang terbuat dari dua piramida bersilang.",
+   "name": "Polihedron Bintang",
+   "params": {
+    "light": {
+     "label": "Sudut Cahaya"
+    },
+    "perspective": {
+     "label": "Perspektif"
+    },
+    "position": {
+     "label": "Posisi"
+    },
+    "radius": {
+     "label": "Radius"
+    },
+    "rotX": {
+     "label": "Rotasi X"
+    },
+    "rotY": {
+     "label": "Rotasi Y"
+    },
+    "rotZ": {
+     "label": "Rotasi Z"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "shading": {
+     "label": "Shading"
+    },
+    "shine": {
+     "label": "Kilau"
+    }
+   }
+  },
+  "starprism": {
+   "description": "Memotong lapisan menjadi bentuk bintang dan memberinya kedalaman.",
+   "name": "Prisma Bintang",
+   "params": {
+    "depth": {
+     "label": "Kedalaman"
+    },
+    "inner": {
+     "label": "Radius Dalam"
+    },
+    "light": {
+     "label": "Sudut Cahaya"
+    },
+    "perspective": {
+     "label": "Perspektif"
+    },
+    "points": {
+     "label": "Titik"
+    },
+    "position": {
+     "label": "Posisi"
+    },
+    "radius": {
+     "label": "Radius"
+    },
+    "rotX": {
+     "label": "Rotasi X"
+    },
+    "rotY": {
+     "label": "Rotasi Y"
+    },
+    "rotZ": {
+     "label": "Rotasi Z"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "shading": {
+     "label": "Shading"
+    },
+    "shine": {
+     "label": "Kilau"
+    },
+    "smoothing": {
+     "label": "Penghalusan"
+    }
+   }
+  },
+  "static": {
+   "description": "Noise abu-abu berkedip, seperti televisi tanpa sinyal.",
+   "name": "Statis",
+   "params": {
+    "amount": {
+     "label": "Jumlah"
+    },
+    "grain": {
+     "label": "Ukuran"
+    }
+   }
+  },
+  "stretch": {
+   "description": "Memotong lapisan sepanjang garis dan menarik kedua bagiannya terpisah, meregangkan piksel pada garis ke dalam celah.",
+   "name": "Regang segmen",
+   "params": {
+    "angle": {
+     "label": "Sudut"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "spread": {
+     "label": "Sebaran"
+    },
+    "stretch": {
+     "label": "Regangan"
+    }
+   }
+  },
+  "stretchaxis": {
+   "description": "Merenggangkan lapisan ke segala arah.",
+   "name": "Regangkan sumbu",
+   "params": {
+    "angle": {
+     "label": "Sudut"
+    },
+    "mask": {
+     "label": "Masker ke Lapisan"
+    },
+    "scale": {
+     "label": "Skala"
+    }
+   }
+  },
+  "stripes": {
+   "description": "Menggambar pola garis-garis pada bagian opak lapisan, atau melubangi garis-garisnya.",
+   "name": "Garis-garis",
+   "params": {
+    "angle": {
+     "label": "Sudut"
+    },
+    "color": {
+     "label": "Warna"
+    },
+    "count": {
+     "label": "Jumlah"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "punch": {
+     "label": "Lubangi"
+    },
+    "smoothing": {
+     "label": "Penghalusan"
+    },
+    "width": {
+     "label": "Lebar"
+    }
+   }
+  },
+  "stroketaper": {
+   "description": "Menipiskan goresan pena dan kuas pada coretan tangan hingga runcing: dari nol sampai Awal, dan dari Akhir turun ke nol. Himpit membuat penyempitan lebih tajam.",
+   "name": "Penyempitan Stroke",
+   "params": {
+    "end": {
+     "label": "Akhir"
+    },
+    "squeeze": {
+     "label": "Himpit"
+    },
+    "start": {
+     "label": "Awal"
+    }
+   }
+  },
+  "swing": {
+   "description": "Memutar lapisan bolak-balik di antara dua sudut.",
+   "name": "Ayunan",
+   "params": {
+    "angle1": {
+     "label": "Sudut 1"
+    },
+    "angle2": {
+     "label": "Sudut 2"
+    },
+    "frequency": {
+     "label": "Frekuensi"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "wave": {
+     "label": "Gelombang",
+     "options": [
+      "Sinus",
+      "Segitiga"
+     ]
+    }
+   }
+  },
+  "temperature": {
+   "description": "Menghangatkan atau mendinginkan gambar seperti cahaya pada suhu warna dalam kelvin (6500 K tidak mengubahnya), sambil mempertahankan kecerahannya.",
+   "name": "Suhu warna",
+   "params": {
+    "kelvin": {
+     "label": "Suhu"
+    },
+    "strength": {
+     "label": "Kekuatan"
+    }
+   }
+  },
+  "textprogress": {
+   "description": "Menampilkan lapisan teks sepotong demi sepotong, per karakter, kata, atau baris; setiap bagian muncul, memudar, bergeser, membesar, mengecil, atau menajam ke posisinya.",
+   "name": "Progres Teks",
+   "params": {
+    "appearance": {
+     "label": "Tampil Sebagai",
+     "options": [
+      "Pop",
+      "Pudar",
+      "Geser ke Atas",
+      "Geser ke Bawah",
+      "Geser ke Kiri",
+      "Geser ke Kanan",
+      "Membesar",
+      "Mengecil",
+      "Blur"
+     ]
+    },
+    "direction": {
+     "label": "Arah",
+     "options": [
+      "Dari Awal",
+      "Dari Akhir",
+      "Dari Tengah",
+      "Acak"
+     ]
+    },
+    "distance": {
+     "label": "Jarak"
+    },
+    "progress": {
+     "label": "Progres"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "softness": {
+     "label": "Kelembutan"
+    },
+    "unit": {
+     "label": "Berdasarkan",
+     "options": [
+      "Karakter",
+      "Kata",
+      "Baris"
+     ]
+    }
+   }
+  },
+  "textrandomizer": {
+   "description": "Menukar karakter lapisan teks dengan huruf, angka, atau simbol acak yang terus berubah. Naikkan Progres agar teks asli perlahan muncul, karakter demi karakter.",
+   "name": "Pengacak Teks",
+   "params": {
+    "characters": {
+     "label": "Kustom"
+    },
+    "charset": {
+     "label": "Karakter",
+     "options": [
+      "Huruf",
+      "Huruf Kapital",
+      "Huruf kecil",
+      "Angka",
+      "Huruf dan angka",
+      "Simbol",
+      "Kustom"
+     ]
+    },
+    "direction": {
+     "label": "Arah",
+     "options": [
+      "Dari Awal",
+      "Dari Akhir",
+      "Dari Tengah",
+      "Acak"
+     ]
+    },
+    "keepSpaces": {
+     "label": "Pertahankan spasi"
+    },
+    "progress": {
+     "label": "Progres"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "speed": {
+     "label": "Kecepatan"
+    }
+   }
+  },
+  "texttransform": {
+   "description": "Menggeser, menskalakan, memutar, memudarkan, dan mewarnai huruf, kata, atau baris lapisan teks yang berada dalam rentang. Geser rentang dengan Offset agar perubahan bergerak menyusuri teks.",
+   "name": "Transformasi teks",
+   "params": {
+    "end": {
+     "label": "Akhir"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "opacity": {
+     "label": "Opasitas"
+    },
+    "position": {
+     "label": "Posisi"
+    },
+    "randomOrder": {
+     "label": "Urutan acak"
+    },
+    "rotation": {
+     "label": "Rotasi"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "shape": {
+     "label": "Bentuk",
+     "options": [
+      "Kotak",
+      "Ramp naik",
+      "Ramp turun",
+      "Segitiga",
+      "Bulat",
+      "Halus"
+     ]
+    },
+    "smoothness": {
+     "label": "Kehalusan"
+    },
+    "start": {
+     "label": "Mulai"
+    },
+    "tint": {
+     "label": "Pewarnaan"
+    },
+    "unit": {
+     "label": "Berdasarkan",
+     "options": [
+      "Karakter",
+      "Kata",
+      "Baris"
+     ]
+    }
+   }
+  },
+  "threshold": {
+   "description": "Hitam putih murni, dipisahkan pada tingkat kecerahan.",
+   "name": "Ambang batas",
+   "params": {
+    "invert": {
+     "label": "Balik"
+    },
+    "level": {
+     "label": "Level"
+    },
+    "softness": {
+     "label": "Kelembutan"
+    }
+   }
+  },
+  "tile": {
+   "description": "Mengulang gambar dalam kisi.",
+   "name": "Ubin",
+   "params": {
+    "mirror": {
+     "label": "Cermin"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "scale": {
+     "label": "Skala"
+    }
+   }
+  },
+  "tilerotate": {
+   "description": "Membagi lapisan menjadi kisi ubin dan memutar gambar di setiap ubin secara terpisah.",
+   "name": "Rotasi Ubin",
+   "params": {
+    "angle": {
+     "label": "Sudut"
+    },
+    "count": {
+     "label": "Jumlah"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "random": {
+     "label": "Acak"
+    },
+    "rotation": {
+     "label": "Rotasi"
+    },
+    "seed": {
+     "label": "Benih"
+    },
+    "stretch": {
+     "label": "Regangan"
+    }
+   }
+  },
+  "tiles": {
+   "description": "Mengulang lapisan dalam pola ubin yang memenuhi layar, dengan opsi cermin, offset baris, dan rotasi.",
+   "name": "Ubin",
+   "params": {
+    "angle": {
+     "label": "Sudut"
+    },
+    "crop": {
+     "label": "Pangkas"
+    },
+    "mirror": {
+     "label": "Cermin"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "vertical": {
+     "label": "Offset Vertikal"
+    }
+   }
+  },
+  "tileshift": {
+   "description": "Membagi lapisan menjadi kisi ubin dan menggeser gambar di setiap ubin ke arah acak.",
+   "name": "Geser Ubin",
+   "params": {
+    "angle": {
+     "label": "Sudut"
+    },
+    "count": {
+     "label": "Jumlah"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "seed": {
+     "label": "Benih"
+    },
+    "strength": {
+     "label": "Kekuatan"
+    },
+    "stretch": {
+     "label": "Regangan"
+    }
+   }
+  },
+  "timecode": {
+   "description": "Mengganti teks lapisan dengan jam berjalan dari waktu lapisan atau proyek. Atur Mulai dari dan Kecepatan negatif untuk membuat hitung mundur.",
+   "name": "Timecode",
+   "params": {
+    "format": {
+     "label": "Format",
+     "options": [
+      "HH:MM:SS:FF",
+      "HH:MM:SS",
+      "MM:SS",
+      "MM:SS.hh",
+      "SS.hh",
+      "Frame"
+     ]
+    },
+    "offset": {
+     "label": "Mulai dari"
+    },
+    "source": {
+     "label": "Waktu",
+     "options": [
+      "Lapisan",
+      "Proyek"
+     ]
+    },
+    "speed": {
+     "label": "Kecepatan"
+    }
+   }
+  },
+  "timequant": {
+   "description": "Membuat waktu berjalan bertahap untuk lapisan ini, seperti Frame rate yang lebih rendah.",
+   "name": "Kuantisasi waktu",
+   "params": {
+    "fps": {
+     "label": "Frame rate"
+    }
+   }
+  },
+  "tint": {
+   "description": "Memetakan luminansi gambar antara warna bayangan dan warna sorotan dengan jumlah campuran.",
+   "name": "Pewarnaan",
+   "params": {
+    "amount": {
+     "label": "Jumlah"
+    },
+    "highlightColor": {
+     "label": "Warna sorotan"
+    },
+    "shadowColor": {
+     "label": "Warna bayangan"
+    }
+   }
+  },
+  "torus": {
+   "description": "Melingkarkan lapisan pada sebuah cincin.",
+   "name": "Torus",
+   "params": {
+    "light": {
+     "label": "Sudut Cahaya"
+    },
+    "perspective": {
+     "label": "Perspektif"
+    },
+    "position": {
+     "label": "Posisi"
+    },
+    "radius": {
+     "label": "Radius"
+    },
+    "rotX": {
+     "label": "Rotasi X"
+    },
+    "rotY": {
+     "label": "Rotasi Y"
+    },
+    "rotZ": {
+     "label": "Rotasi Z"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "shading": {
+     "label": "Pencahayaan"
+    },
+    "shine": {
+     "label": "Kilau"
+    },
+    "thickness": {
+     "label": "Ketebalan"
+    }
+   }
+  },
+  "tunnel": {
+   "description": "Melapisi terowongan tak berujung dengan lapisan dan terbang melewatinya.",
+   "name": "Terowongan",
+   "params": {
+    "fog": {
+     "label": "Kabut"
+    },
+    "fogColor": {
+     "label": "Warna Kabut"
+    },
+    "position": {
+     "label": "Posisi"
+    },
+    "repeat": {
+     "label": "Pengulangan"
+    },
+    "rotX": {
+     "label": "Rotasi X"
+    },
+    "rotY": {
+     "label": "Rotasi Y"
+    },
+    "rotZ": {
+     "label": "Rotasi Z"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "speed": {
+     "label": "Kecepatan"
+    },
+    "twist": {
+     "label": "Puntir"
+    }
+   }
+  },
+  "turbulence": {
+   "description": "Mengisi bagian opak lapisan dengan noise fraktal halus, untuk awan, asap, atau peta kecerahan.",
+   "name": "Turbulensi",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "bias": {
+     "label": "Bias"
+    },
+    "blend": {
+     "label": "Mode Blending",
+     "options": [
+      "Normal",
+      "Multiply",
+      "Screen",
+      "Overlay",
+      "Soft Light",
+      "Hard Light",
+      "Add",
+      "Darken",
+      "Lighten",
+      "Difference",
+      "Color Dodge",
+      "Color Burn"
+     ]
+    },
+    "color1": {
+     "label": "Warna 1"
+    },
+    "color2": {
+     "label": "Warna 2"
+    },
+    "evolution": {
+     "label": "Evolusi"
+    },
+    "intensity": {
+     "label": "Intensitas"
+    },
+    "octaves": {
+     "label": "Oktaf"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "parallax": {
+     "label": "Paralaks"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "stretch": {
+     "label": "Regang"
+    }
+   }
+  },
+  "turbulentdisplace": {
+   "description": "Mendorong lapisan dengan noise fraktal halus, untuk api, air, kabut panas, atau tepi alami yang kasar.",
+   "name": "Displace Turbulen",
+   "params": {
+    "bias": {
+     "label": "Bias"
+    },
+    "direction": {
+     "label": "Arah",
+     "options": [
+      "Keduanya",
+      "Horizontal",
+      "Vertikal",
+      "Radial",
+      "Puntir"
+     ]
+    },
+    "evolution": {
+     "label": "Evolusi"
+    },
+    "octaves": {
+     "label": "Oktaf"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "parallax": {
+     "label": "Paralaks"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "strength": {
+     "label": "Kekuatan"
+    },
+    "stretch": {
+     "label": "Regang"
+    }
+   }
+  },
+  "twirl": {
+   "description": "Memutar piksel di sekitar titik pusat dengan sudut yang berkurang seiring jarak dari pusat.",
+   "name": "Pilin",
+   "params": {
+    "angle": {
+     "label": "Sudut"
+    },
+    "center": {
+     "label": "Pusat"
+    },
+    "radius": {
+     "label": "Radius"
+    }
+   }
+  },
+  "unsharpmask": {
+   "description": "Menerapkan masking unsharp klasik dengan ambang batas dan pratinjau masker abu-abu opsional.",
+   "name": "Masker unsharp",
+   "params": {
+    "amount": {
+     "label": "Jumlah"
+    },
+    "showMask": {
+     "label": "Tampilkan masker"
+    },
+    "strength": {
+     "label": "Kekuatan"
+    },
+    "threshold": {
+     "label": "Ambang batas"
+    }
+   }
+  },
+  "vhs": {
+   "description": "Terlihat seperti pita video lama: rembesan warna, garis kabur, scanline, noise pita, dan pita pelacakan bergulir.",
+   "name": "VHS",
+   "params": {
+    "chroma": {
+     "label": "Rembesan warna"
+    },
+    "headSwitch": {
+     "label": "Pergantian head"
+    },
+    "noise": {
+     "label": "Noise"
+    },
+    "saturation": {
+     "label": "Saturasi"
+    },
+    "scanlines": {
+     "label": "Scanline"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "smear": {
+     "label": "Olesan"
+    },
+    "tracking": {
+     "label": "Pelacakan"
+    },
+    "wobble": {
+     "label": "Goyangan"
+    }
+   }
+  },
+  "viewer360": {
+   "description": "Menampilkan lapisan panorama 360° melalui kamera virtual yang bisa diputar dan di-zoom.",
+   "name": "Penampil 360°",
+   "params": {
+    "fov": {
+     "label": "Bidang Pandang"
+    },
+    "pitch": {
+     "label": "Pitch"
+    },
+    "roll": {
+     "label": "Roll"
+    },
+    "yaw": {
+     "label": "Yaw"
+    }
+   }
+  },
+  "vignette": {
+   "description": "Menerapkan efek vignette untuk menggelapkan tepi gambar.",
+   "name": "Vignette",
+   "params": {
+    "amount": {
+     "label": "Jumlah"
+    },
+    "radius": {
+     "label": "Ukuran"
+    },
+    "roundness": {
+     "label": "Kebulatan"
+    },
+    "softness": {
+     "label": "Kelembutan"
+    }
+   }
+  },
+  "voronoicells": {
+   "description": "Mengisi bagian opak lapisan dengan pola sel di sekitar titik yang ditempatkan acak.",
+   "name": "Sel Voronoi",
+   "params": {
+    "color1": {
+     "label": "Warna 1"
+    },
+    "color2": {
+     "label": "Warna 2"
+    },
+    "lineColor": {
+     "label": "Warna garis"
+    },
+    "lineWidth": {
+     "label": "Lebar Garis"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "seed": {
+     "label": "Seed"
+    }
+   }
+  },
+  "wavewarp": {
+   "description": "Menerapkan pergeseran gelombang sinus ke gambar dengan amplitudo, panjang gelombang, arah, dan kecepatan fase yang dapat diatur.",
+   "name": "Distorsi gelombang",
+   "params": {
+    "amplitude": {
+     "label": "Amplitudo"
+    },
+    "direction": {
+     "label": "Arah"
+    },
+    "speed": {
+     "label": "Kecepatan"
+    },
+    "wavelength": {
+     "label": "Panjang gelombang"
+    }
+   }
+  },
+  "wipe": {
+   "description": "Menyembunyikan lapisan dari dua sisi yang berlawanan. Animasikan Mulai atau Akhir untuk transisi wipe.",
+   "name": "Wipe",
+   "params": {
+    "angle": {
+     "label": "Sudut"
+    },
+    "end": {
+     "label": "Akhir"
+    },
+    "feather": {
+     "label": "Feather"
+    },
+    "start": {
+     "label": "Mulai"
+    }
+   }
+  },
+  "zoomstreaks": {
+   "description": "Membuat garis-garis memancar dari satu titik dengan menskalakan salinan lapisan di sekitarnya dan mempertahankan piksel paling terang. Rata-rata menghasilkan blur zoom.",
+   "name": "Zoom Streaks",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "bias": {
+     "label": "Bias"
+    },
+    "center": {
+     "label": "Pusat"
+    },
+    "mode": {
+     "label": "Blending",
+     "options": [
+      "Cerahkan",
+      "Rata-rata",
+      "Gelapkan"
+     ]
+    },
+    "strength": {
+     "label": "Kekuatan"
+    }
+   }
+  }
+ }
+}

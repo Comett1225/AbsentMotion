@@ -104,6 +104,9 @@ public:
     bool setVideoFrame(const std::string& uri, int64_t layerId, int64_t pts, AHardwareBuffer* buffer, int colorStandard, int colorRange, const FrameCrop& crop) override;
     bool interpolateVideo(const std::string& uri, int64_t layerId, int64_t a, int64_t b, float t, bool flow,
                           const InterpolationParams& params) override;
+    int moshStart(const std::string& uri, int64_t layerId, const std::vector<int64_t>& pts, const MoshParams& params) override;
+    bool moshFrame(const std::string& uri, int64_t layerId, int step, AHardwareBuffer* buffer, int colorStandard, int colorRange,
+                   const FrameCrop& crop) override;
     int renderScene(Target*, double timeMs, float scale, float dx, float dy, uint32_t background,
                     int64_t selectedId, int handles, const PreviewOptions& view) override;
     void setCameraView(bool on) override { fCameraView = on; }
@@ -127,7 +130,7 @@ private:
     skgpu::graphite::BackendTexture importTexture(AHardwareBuffer*, int colorStandard, bool* rawYuv);
     void forgetImported(const MediaKey& key);
     sk_sp<SkImage> copyFrame(AHardwareBuffer*, bool opaque, int colorStandard, int colorRange, const FrameCrop& crop,
-                             const MediaKey* key = nullptr);
+                             const MediaKey* key = nullptr, int maxSide = 0);
     sk_sp<SkImage> picture(const std::string& uri, int64_t layerId) const;
     MediaPictures pictures() const {
         return [this](const std::string& uri, int64_t id) { return this->picture(uri, id); };
@@ -203,6 +206,14 @@ private:
     double heldMegabytes() const;
     sk_sp<SkImage> flowFor(VideoFrames& video, int64_t a, int64_t b, const InterpolationParams& params);
     std::map<std::pair<std::string, int64_t>, VideoFrames> fVideoFrames;
+    struct Mosh {
+        MoshParams params;
+        std::vector<int64_t> pts, done;
+        int step = -1;
+        sk_sp<SkImage> state, motion, previous;
+        std::map<int, std::pair<sk_sp<SkImage>, sk_sp<SkImage>>> marks;
+    };
+    std::map<std::pair<std::string, int64_t>, Mosh> fMosh;
     std::map<uint64_t, sk_sp<SkSurface>> fBufferSurfaces;
     SkSurface* bufferSurface(AHardwareBuffer* buffer);
     bool fLoggedFrame = false;
@@ -653,14 +664,15 @@ sk_sp<SkImage> EngineImpl::picture(const std::string& uri, int64_t layerId) cons
 }
 
 sk_sp<SkImage> EngineImpl::copyFrame(AHardwareBuffer* buffer, bool opaque, int colorStandard, int colorRange, const FrameCrop& crop,
-                                     const MediaKey* key) {
+                                     const MediaKey* key, int maxSide) {
     bool rawYuv = false;
     auto imported = this->importFrame(buffer, opaque, colorStandard, colorRange, &rawYuv, key);
     if (!imported) return nullptr;
     auto bounds = SkIRect::MakeWH(imported->width(), imported->height());
     if (crop.right > crop.left && crop.bottom > crop.top &&
         !bounds.intersect(SkIRect::MakeLTRB(crop.left, crop.top, crop.right, crop.bottom))) return nullptr;
-    const auto info = SkImageInfo::Make(bounds.width(), bounds.height(),
+    const float fit = maxSide > 0 ? std::min(1.0f, (float)maxSide / std::max(bounds.width(), bounds.height())) : 1.0f;
+    const auto info = SkImageInfo::Make(std::max(1, (int)std::lround(bounds.width() * fit)), std::max(1, (int)std::lround(bounds.height() * fit)),
             kRGBA_8888_SkColorType, opaque ? kOpaque_SkAlphaType : kPremul_SkAlphaType, SkColorSpace::MakeSRGB());
     auto surface = fGraphite ? SkSurfaces::RenderTarget(fRecorder.get(), info)
                             : SkSurfaces::RenderTarget(fGanesh.get(), skgpu::Budgeted::kNo, info);
@@ -680,7 +692,12 @@ sk_sp<SkImage> EngineImpl::copyFrame(AHardwareBuffer* buffer, bool opaque, int c
         const float matrix[20] = {ro, ys, 0, 0, yo, gr, ys, gb, 0, yo, 0, ys, bo, 0, yo, 0, 0, 0, 1, 0};
         paint.setColorFilter(SkColorFilters::Matrix(matrix));
     }
-    surface->getCanvas()->drawImage(imported, -bounds.left(), -bounds.top(), SkSamplingOptions(), &paint);
+    if (fit < 1) {
+        surface->getCanvas()->drawImageRect(imported, SkRect::Make(bounds), SkRect::MakeIWH(info.width(), info.height()),
+                                            SkSamplingOptions(SkFilterMode::kLinear), &paint, SkCanvas::kFast_SrcRectConstraint);
+    } else {
+        surface->getCanvas()->drawImage(imported, -bounds.left(), -bounds.top(), SkSamplingOptions(), &paint);
+    }
     sk_sp<SkImage> image = surface->makeImageSnapshot();
     if (fGraphite) {
         const bool ok = fGraphite->insertRecording({fRecorder->snap().get()}) &&
@@ -695,7 +712,7 @@ sk_sp<SkImage> EngineImpl::copyFrame(AHardwareBuffer* buffer, bool opaque, int c
 bool EngineImpl::setPicture(const std::string& uri, int64_t layerId, AHardwareBuffer* buffer,
                             const void* pixels, int width, int height, size_t rowBytes, bool opaque, int colorStandard, int colorRange, const FrameCrop& crop) {
     const auto key = std::make_pair(uri, layerId);
-    if (!buffer && !pixels) { fPictures.erase(key); fVideoFrames.erase(key); this->forgetImported(key); return true; }
+    if (!buffer && !pixels) { fPictures.erase(key); fVideoFrames.erase(key); fMosh.erase(key); this->forgetImported(key); return true; }
     sk_sp<SkImage> image;
     if (buffer) {
         image = this->copyFrame(buffer, opaque, colorStandard, colorRange, crop, &key);
@@ -731,6 +748,9 @@ double EngineImpl::heldMegabytes() const {
         for (const auto& [pair, image] : video.flows) bytes += 8.0 * image->width() * image->height();
     }
     for (const auto& [key, image] : fPictures) bytes += 4.0 * image->width() * image->height();
+    for (const auto& [key, mosh] : fMosh) {
+        for (const auto& [step, mark] : mosh.marks) bytes += 4.0 * mark.first->width() * mark.first->height();
+    }
     return bytes / (1 << 20);
 }
 
@@ -788,6 +808,87 @@ bool EngineImpl::interpolateVideo(const std::string& uri, int64_t layerId, int64
         return !video.frames.count(pair.first.first) || !video.frames.count(pair.first.second);
     });
     fPictures[key] = std::move(image);
+    return true;
+}
+
+int EngineImpl::moshStart(const std::string& uri, int64_t layerId, const std::vector<int64_t>& pts, const MoshParams& params) {
+    if (!fGraphite || fGpuFailed || pts.empty()) return -1;
+    const auto key = std::make_pair(uri, layerId);
+    Mosh& m = fMosh[key];
+    if (!(m.params == params)) m = Mosh{params};
+    size_t common = 0;
+    while (common < m.done.size() && common < pts.size() && m.done[common] == pts[common]) common++;
+    std::erase_if(m.marks, [&](const auto& mark) { return mark.first >= (int)common; });
+    m.done.resize(common);
+    m.pts = pts;
+    const int last = (int)pts.size() - 1;
+    if (m.step >= 0 && m.step < (int)common && m.step <= last && m.previous) {
+        if (m.step < last) return m.step + 1;
+        fPictures[key] = m.state;
+        return (int)pts.size();
+    }
+    auto mark = m.marks.upper_bound(std::min((int)common - 1, last));
+    if (mark != m.marks.begin()) {
+        --mark;
+        m.step = mark->first;
+        m.state = mark->second.first;
+        m.motion = mark->second.second;
+        m.previous = nullptr;
+        m.done.resize(m.step + 1);
+        return m.step;
+    }
+    m.marks.clear();
+    m.done.clear();
+    m.step = -1;
+    m.state = m.motion = m.previous = nullptr;
+    return 0;
+}
+
+bool EngineImpl::moshFrame(const std::string& uri, int64_t layerId, int step, AHardwareBuffer* buffer, int colorStandard, int colorRange,
+                           const FrameCrop& crop) {
+    constexpr int kMaxSide = 1920, kMarkEvery = 15;
+    const auto key = std::make_pair(uri, layerId);
+    auto found = fMosh.find(key);
+    if (found == fMosh.end() || !buffer || step < 0 || step >= (int)found->second.pts.size() || fGpuFailed) return false;
+    Mosh& m = found->second;
+    const auto start = std::chrono::steady_clock::now();
+    auto frame = this->copyFrame(buffer, true, colorStandard, colorRange, crop, &key, kMaxSide);
+    if (!frame) return false;
+    double flowMs = 0;
+    if (step == 0) {
+        m.state = m.previous = frame;
+        m.motion = nullptr;
+        m.step = 0;
+        m.done = {m.pts[0]};
+        m.marks.clear();
+        m.marks[0] = {frame, nullptr};
+    } else if (step == m.step && !m.previous) {
+        m.previous = frame;
+    } else if (step == m.step + 1 && m.previous && m.state) {
+        sk_sp<SkImage> flow;
+        if (m.pts[step] != m.pts[step - 1] && frame->dimensions() == m.previous->dimensions()) {
+            FlowStats stats;
+            flow = EstimateFlow(fGraphite.get(), fRecorder.get(), m.previous, frame, m.params.flow, &stats);
+            if (!flow) return false;
+            flowMs = stats.ms;
+        }
+        sk_sp<SkImage> motion;
+        const float salt = (float)(((uint64_t)layerId * 131 + (uint64_t)step * 7919) % 997) + 0.5f;
+        auto next = MoshStep(fGraphite.get(), fRecorder.get(), m.state, m.motion, frame, flow, m.params, salt, &motion);
+        if (!next) return false;
+        m.state = next;
+        m.motion = motion;
+        m.previous = frame;
+        m.step = step;
+        m.done.push_back(m.pts[step]);
+        if (step % kMarkEvery == 0) m.marks[step] = {next, motion};
+    } else {
+        return false;
+    }
+    if (step == (int)m.pts.size() - 1) fPictures[key] = m.state;
+    __android_log_print(ANDROID_LOG_INFO, "AMMosh", "step %d/%d pts=%" PRId64 " size=%dx%d flow=%.2f total=%.2f held=%.1fMB", step,
+                        (int)m.pts.size() - 1, m.pts[step], frame->width(), frame->height(), flowMs,
+                        std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - start).count(), this->heldMegabytes());
     return true;
 }
 

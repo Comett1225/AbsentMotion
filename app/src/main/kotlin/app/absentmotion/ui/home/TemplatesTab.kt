@@ -66,6 +66,8 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.IOException
 import java.util.Locale
+import androidx.compose.ui.res.stringResource
+import app.absentmotion.R
 
 private val Grey get() = Am.HomeDim
 private val FactText get() = Am.HomeFaint
@@ -80,20 +82,20 @@ fun TemplatesTab(projects: ProjectStore, version: Int, onTemplate: (String) -> U
     var rev by remember { mutableIntStateOf(0) }
     var menu by remember { mutableStateOf<String?>(null) }
     var renaming by remember { mutableStateOf<Pair<String, String>?>(null) }
-    var confirm by remember { mutableStateOf<Pair<String, () -> Unit>?>(null) }
+    var confirm by remember { mutableStateOf<Pair<Int, () -> Unit>?>(null) }
     val savedTemplates by produceState(emptyList<SavedTemplate>(), version, rev) { value = withContext(Dispatchers.IO) { templates.list() } }
     val savedPresets by produceState(emptyList<SavedPreset>(), version, rev) { value = withContext(Dispatchers.IO) { presets.list() } }
 
     Column(modifier.fillMaxSize()) {
         Spacer(Modifier.height(24.dp))
         Row(Modifier.padding(start = 16.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            SubChip("My Templates", sub == 0) { sub = 0; menu = null }
-            SubChip("My Presets", sub == 1) { sub = 1; menu = null }
+            SubChip(stringResource(R.string.template_my_templates), sub == 0) { sub = 0; menu = null }
+            SubChip(stringResource(R.string.template_my_presets), sub == 1) { sub = 1; menu = null }
         }
         Spacer(Modifier.height(13.dp))
         Box(Modifier.weight(1f).fillMaxWidth()) {
             if (sub == 0) {
-                if (savedTemplates.isEmpty()) EmptyText("No templates")
+                if (savedTemplates.isEmpty()) EmptyText(stringResource(R.string.template_none))
                 LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 28.dp)) {
                     items(savedTemplates, key = { it.id }) { t ->
                         TemplateCard(
@@ -102,21 +104,21 @@ fun TemplatesTab(projects: ProjectStore, version: Int, onTemplate: (String) -> U
                                 menu = null
                                 scope.launch {
                                     try { onProject(withContext(Dispatchers.IO) { templates.createProject(t.scene, projects) }) }
-                                    catch (e: IOException) { Toast.makeText(context, "Could not create the project. Free some storage space.", Toast.LENGTH_LONG).show() }
+                                    catch (e: IOException) { Toast.makeText(context, context.getString(R.string.home_create_project_failed), Toast.LENGTH_LONG).show() }
                                 }
                             },
                             onRename = { menu = null; renaming = t.id to t.title },
-                            onDelete = { menu = null; confirm = "Delete this template?" to { scope.launch { withContext(Dispatchers.IO) { templates.delete(t.id) }; rev++ } } },
+                            onDelete = { menu = null; confirm = R.string.template_delete_template to { scope.launch { withContext(Dispatchers.IO) { templates.delete(t.id) }; rev++ } } },
                         )
                     }
                 }
             } else {
-                if (savedPresets.isEmpty()) EmptyText("No presets")
+                if (savedPresets.isEmpty()) EmptyText(stringResource(R.string.template_no_presets))
                 Column(Modifier.fillMaxSize()) {
                     if (savedPresets.isNotEmpty()) Row(Modifier.fillMaxWidth().height(48.dp).padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
                         Spacer(Modifier.weight(1f))
                         Text(
-                            "Delete all", Modifier.clickable { confirm = "Delete all presets?" to { scope.launch { withContext(Dispatchers.IO) { presets.deleteAll() }; rev++ } } }.padding(vertical = 12.dp),
+                            stringResource(R.string.delete_all), Modifier.clickable { confirm = R.string.template_delete_all_presets to { scope.launch { withContext(Dispatchers.IO) { presets.deleteAll() }; rev++ } } }.padding(vertical = 12.dp),
                             color = Am.Navy, fontSize = 15.sp,
                         )
                     }
@@ -126,8 +128,8 @@ fun TemplatesTab(projects: ProjectStore, version: Int, onTemplate: (String) -> U
                                 Text(p.title, Modifier.weight(1f).padding(start = 16.dp), color = Am.Navy, fontSize = 17.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                                 Menu(
                                     menu == p.id, { menu = if (it) p.id else null },
-                                    "Rename" to HomeIcons.Pencil to { menu = null; renaming = p.id to p.title },
-                                    "Delete" to HomeIcons.Delete to { menu = null; confirm = "Delete this preset?" to { scope.launch { withContext(Dispatchers.IO) { presets.delete(p.id) }; rev++ } } },
+                                    stringResource(R.string.rename) to HomeIcons.Pencil to { menu = null; renaming = p.id to p.title },
+                                    stringResource(R.string.delete) to HomeIcons.Delete to { menu = null; confirm = R.string.template_delete_preset to { scope.launch { withContext(Dispatchers.IO) { presets.delete(p.id) }; rev++ } } },
                                 )
                             }
                         }
@@ -142,7 +144,7 @@ fun TemplatesTab(projects: ProjectStore, version: Int, onTemplate: (String) -> U
                 val template = sub == 0
                 scope.launch {
                     val renamed = withContext(Dispatchers.IO) { runCatching { if (template) templates.rename(id, name) else presets.rename(id, name) }.isSuccess }
-                    if (!renamed) app.absentmotion.platform.Toast.makeText(context, "Could not rename", app.absentmotion.platform.Toast.LENGTH_SHORT).show()
+                    if (!renamed) app.absentmotion.platform.Toast.makeText(context, context.getString(R.string.template_rename_failed), app.absentmotion.platform.Toast.LENGTH_SHORT).show()
                     rev++
                 }
                 renaming = null
@@ -152,9 +154,9 @@ fun TemplatesTab(projects: ProjectStore, version: Int, onTemplate: (String) -> U
     confirm?.let { (title, action) ->
         AlertDialog(
             onDismissRequest = { confirm = null },
-            title = { Text(title, color = Am.Navy) },
-            dismissButton = { TextButton({ confirm = null }) { Text("Cancel", color = Am.Navy) } },
-            confirmButton = { TextButton({ confirm = null; action() }) { Text("Delete", color = Am.Navy) } },
+            title = { Text(stringResource(title), color = Am.Navy) },
+            dismissButton = { TextButton({ confirm = null }) { Text(stringResource(R.string.cancel), color = Am.Navy) } },
+            confirmButton = { TextButton({ confirm = null; action() }) { Text(stringResource(R.string.delete), color = Am.Navy) } },
             containerColor = Am.Card,
         )
     }
@@ -214,9 +216,9 @@ private fun TemplateCard(
         }
         Menu(
             menuOpen, onMenu,
-            "Open as project" to HomeIcons.Select to onProject,
-            "Rename" to HomeIcons.Pencil to onRename,
-            "Delete" to HomeIcons.Delete to onDelete,
+            stringResource(R.string.template_open_as_project) to HomeIcons.Select to onProject,
+            stringResource(R.string.rename) to HomeIcons.Pencil to onRename,
+            stringResource(R.string.delete) to HomeIcons.Delete to onDelete,
         )
     }
 }
@@ -233,7 +235,7 @@ private fun Fact(icon: ImageVector, text: String) {
 @Composable
 private fun Menu(open: Boolean, onOpen: (Boolean) -> Unit, vararg rows: Pair<Pair<String, ImageVector>, () -> Unit>) {
     Box {
-        Box(Modifier.size(48.dp).clickable { onOpen(true) }, contentAlignment = Alignment.Center) { Icon(HomeIcons.More, "More", Modifier.size(24.dp), tint = Grey) }
+        Box(Modifier.size(48.dp).clickable { onOpen(true) }, contentAlignment = Alignment.Center) { Icon(HomeIcons.More, stringResource(R.string.home_more), Modifier.size(24.dp), tint = Grey) }
         Box(Modifier.align(Alignment.BottomEnd).offset(y = 8.dp)) {
             RefMenu(open, { onOpen(false) }, Am.Card, RoundedCornerShape(14.dp), Modifier.width(246.dp)) {
                 for ((label, action) in rows) {
@@ -259,15 +261,15 @@ internal fun rememberFileBitmap(file: File?, key: Any?): ImageBitmap? {
 private fun RenameDialog(title: String, onDone: (String) -> Unit, onDismiss: () -> Unit) {
     var text by remember { mutableStateOf(title) }
     AlertDialog(
-        onDismissRequest = onDismiss, title = { Text("Rename", color = Am.Navy) },
+        onDismissRequest = onDismiss, title = { Text(stringResource(R.string.rename), color = Am.Navy) },
         text = {
             BasicTextField(
                 text, { text = it }, Modifier.fillMaxWidth().clip(RoundedCornerShape(6.dp)).background(Am.HomeBg).padding(12.dp),
                 textStyle = TextStyle(color = Am.Navy, fontSize = 16.sp), singleLine = true, cursorBrush = SolidColor(Am.Navy),
             )
         },
-        confirmButton = { TextButton({ onDone(text.ifBlank { title }) }) { Text("Done", color = Am.Navy) } },
-        dismissButton = { TextButton(onDismiss) { Text("Cancel", color = Am.Navy) } },
+        confirmButton = { TextButton({ onDone(text.ifBlank { title }) }) { Text(stringResource(R.string.done), color = Am.Navy) } },
+        dismissButton = { TextButton(onDismiss) { Text(stringResource(R.string.cancel), color = Am.Navy) } },
         containerColor = Am.Card,
     )
 }

@@ -1,11 +1,16 @@
 package app.absentmotion.ui.theme
 
 import androidx.compose.ui.graphics.Color
+import app.absentmotion.R
+import app.absentmotion.i18n.UiText
+import app.absentmotion.i18n.txt
 import app.absentmotion.platform.Context
 import org.json.JSONObject
 import java.io.File
 
 class Theme(val name: String?, val palette: Palette)
+
+class ThemeError(val text: UiText) : IllegalArgumentException(text.toString())
 
 object ThemeFile {
     fun parseColour(text: String): Color? {
@@ -17,13 +22,13 @@ object ThemeFile {
     }
 
     fun parse(text: String): Theme {
-        val json = try { JSONObject(text) } catch (e: Exception) { throw IllegalArgumentException("This is not a theme file") }
+        val json = try { JSONObject(text) } catch (e: Exception) { throw ThemeError(txt(R.string.settings_theme_not_theme_file)) }
         val colours = HashMap<String, Color>()
         for (key in Palette.Names) {
             if (!json.has(key)) continue
-            colours[key] = (json.get(key) as? String)?.let(::parseColour) ?: throw IllegalArgumentException("Bad colour for $key")
+            colours[key] = (json.get(key) as? String)?.let(::parseColour) ?: throw ThemeError(txt(R.string.theme_error_bad_colour, key))
         }
-        if (colours.isEmpty()) throw IllegalArgumentException("No theme colours in this file")
+        if (colours.isEmpty()) throw ThemeError(txt(R.string.theme_error_no_colours))
         val name = (json.opt("name") as? String)?.trim()?.take(MAX_NAME)?.ifEmpty { null }
         return Theme(name, Palette.from(colours))
     }

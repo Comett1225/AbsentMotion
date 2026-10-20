@@ -1,5 +1,7 @@
 package app.absentmotion.library
 
+import app.absentmotion.R
+import app.absentmotion.i18n.AppText
 import app.absentmotion.platform.Context
 import app.absentmotion.model.MediaDeclaration
 import app.absentmotion.model.Scene
@@ -54,7 +56,7 @@ class ProjectStore(private val root: File) {
     private fun damagedTitle(text: String?): String =
         text?.take(65_536)?.let { DamagedTitle.find(it)?.groupValues?.get(1) }
             ?.replace("&quot;", "\"")?.replace("&lt;", "<")?.replace("&gt;", ">")?.replace("&apos;", "'")?.replace("&amp;", "&")
-            ?.takeIf { it.isNotBlank() } ?: "Damaged project"
+            ?.takeIf { it.isNotBlank() } ?: AppText.get(R.string.library_damaged_project)
 
     fun restore(id: String, version: ProjectVersions.Version) {
         val chosen = version.file.readText()

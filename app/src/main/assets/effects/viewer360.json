@@ -1,0 +1,46 @@
+{
+ "id": "viewer360",
+ "name": "360° Viewer",
+ "category": "distort",
+ "since": "3.0.0",
+ "description": "Shows a 360° panorama layer through a virtual camera that you can turn and zoom.",
+ "params": [
+  {
+   "id": "yaw",
+   "label": "Yaw",
+   "type": "angle",
+   "default": 0,
+   "min": -3600,
+   "max": 3600,
+   "step": 0.5
+  },
+  {
+   "id": "pitch",
+   "label": "Pitch",
+   "type": "angle",
+   "default": 0,
+   "min": -3600,
+   "max": 3600,
+   "step": 0.5
+  },
+  {
+   "id": "roll",
+   "label": "Roll",
+   "type": "angle",
+   "default": 0,
+   "min": -3600,
+   "max": 3600,
+   "step": 0.5
+  },
+  {
+   "id": "fov",
+   "label": "Field of View",
+   "type": "float",
+   "default": 90,
+   "min": 1,
+   "max": 179,
+   "step": 0.1
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float yaw;\nuniform float pitch;\nuniform float roll;\nuniform float fov;\nfloat3 turn(float3 d) {\n    float y = radians(yaw);\n    float p = radians(pitch);\n    float r = radians(roll);\n    d = float3(cos(r) * d.x - sin(r) * d.y, sin(r) * d.x + cos(r) * d.y, d.z);\n    d = float3(d.x, cos(p) * d.y - sin(p) * d.z, sin(p) * d.y + cos(p) * d.z);\n    return float3(cos(y) * d.x + sin(y) * d.z, d.y, -sin(y) * d.x + cos(y) * d.z);\n}\nhalf4 panorama(float3 d) {\n    float lon = atan(d.x, d.z);\n    float lat = asin(clamp(d.y, -1.0, 1.0));\n    float2 uv = float2(lon / 6.2831853 + 0.5, 0.5 - lat / 3.1415927);\n    float2 at = float2(mod(uv.x * size.x, size.x), clamp(uv.y * size.y, 0.5, size.y - 0.5));\n    return image.eval(clamp(at, float2(0.5), size - 0.5));\n}\nhalf4 main(float2 coord) {\n    if (coord.x < 0.0 || coord.y < 0.0 || coord.x > size.x || coord.y > size.y) return half4(0.0);\n    float2 ndc = (coord - size * 0.5) / (0.5 * size.y);\n    float k = tan(radians(clamp(fov, 1.0, 179.0)) * 0.5);\n    float3 d = normalize(float3(ndc.x * k, -ndc.y * k, 1.0));\n    return panorama(turn(d));\n}\n"
+}

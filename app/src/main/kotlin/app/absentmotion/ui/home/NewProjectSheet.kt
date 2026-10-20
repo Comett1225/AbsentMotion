@@ -59,6 +59,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
@@ -77,6 +78,9 @@ import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.presence
 import app.absentmotion.ui.theme.presenceScrim
 import kotlin.math.roundToInt
+import androidx.annotation.StringRes
+import androidx.compose.ui.res.stringResource
+import app.absentmotion.R
 
 private val Ink get() = Am.HomeInk
 private val DimText get() = Am.HomeDim
@@ -92,12 +96,12 @@ private val Resolutions = listOf(
 )
 private val FrameRates = listOf(12, 15, 18, 20, 24, 25, 30, 48, 50, 60)
 
-private class BackgroundChoice(val name: String, val argb: Int)
+private class BackgroundChoice(@StringRes val name: Int, val argb: Int)
 
 private val Backgrounds = listOf(
-    BackgroundChoice("Black", 0xFF000000.toInt()), BackgroundChoice("White", 0xFFFFFFFF.toInt()),
-    BackgroundChoice("Light Grey", 0xFFD8D8D8.toInt()), BackgroundChoice("Green", 0xFF00B140.toInt()),
-    BackgroundChoice("Blue", 0xFF0047BB.toInt()), BackgroundChoice("Transparent", 0x00000000),
+    BackgroundChoice(R.string.newproject_bg_black, 0xFF000000.toInt()), BackgroundChoice(R.string.newproject_bg_white, 0xFFFFFFFF.toInt()),
+    BackgroundChoice(R.string.newproject_bg_light_grey, 0xFFD8D8D8.toInt()), BackgroundChoice(R.string.newproject_bg_green, 0xFF00B140.toInt()),
+    BackgroundChoice(R.string.newproject_bg_blue, 0xFF0047BB.toInt()), BackgroundChoice(R.string.newproject_bg_transparent, 0x00000000),
 )
 
 private class AspectDef(val key: String, val w: Int, val h: Int, val boxW: Dp, val boxH: Dp)
@@ -110,9 +114,9 @@ private val Aspects = listOf(
 
 private const val CUSTOM = "custom"
 
-private class Form(saved: NewProjectChoice, val titles: List<String>) {
+private class Form(saved: NewProjectChoice, val titles: List<String>, val names: DefaultNames) {
     var element by mutableStateOf(false)
-    var name by mutableStateOf(defaultName(false, titles))
+    var name by mutableStateOf(names.of(false, titles))
     var aspect by mutableStateOf(saved.aspect)
     var resolution by mutableIntStateOf(saved.resolution)
     var customW by mutableStateOf(saved.customWidth.toString())
@@ -132,7 +136,7 @@ private class Form(saved: NewProjectChoice, val titles: List<String>) {
 
     fun switchType(on: Boolean) {
         if (on == element) return
-        if (name == defaultName(element, titles)) name = defaultName(on, titles)
+        if (name == names.of(element, titles)) name = names.of(on, titles)
         element = on
     }
 
@@ -160,7 +164,7 @@ private class Form(saved: NewProjectChoice, val titles: List<String>) {
 
     fun scene(): Scene {
         val (w, h) = size
-        val title = name.trim().ifEmpty { defaultName(element, titles) }
+        val title = name.trim().ifEmpty { names.of(element, titles) }
         val scene = Scene.create(title, w, h, fps, if (element) 0 else background)
         return if (element) Scene(scene.node.with("type", "element")) else scene
     }
@@ -168,10 +172,15 @@ private class Form(saved: NewProjectChoice, val titles: List<String>) {
 
 private fun side(text: String) = text.toIntOrNull()?.coerceIn(MIN_SIDE, MAX_SIDE) ?: MIN_SIDE
 
-private fun defaultName(element: Boolean, titles: List<String>): String {
-    if (element) return "New Asset"
-    val highest = titles.mapNotNull { Regex("""New Project (\d+)""").matchEntire(it)?.groupValues?.get(1)?.toIntOrNull() }.maxOrNull()
-    return "New Project ${(highest ?: titles.size) + 1}"
+private class DefaultNames(private val context: Context) {
+    private val numbered = context.getString(R.string.newproject_default_project, "\u0000").split('\u0000', limit = 2)
+    private val pattern = Regex(Regex.escape(numbered[0]) + """(\d+)""" + Regex.escape(numbered.getOrElse(1) { "" }))
+
+    fun of(element: Boolean, titles: List<String>): String {
+        if (element) return context.getString(R.string.newproject_default_asset)
+        val highest = titles.mapNotNull { pattern.matchEntire(it)?.groupValues?.get(1)?.toIntOrNull() }.maxOrNull()
+        return context.getString(R.string.newproject_default_project, ((highest ?: titles.size) + 1).toString())
+    }
 }
 
 @Composable
@@ -183,8 +192,8 @@ fun NewProjectSheet(
     onOpen: (String) -> Unit,
 ) {
     BackHandler(onBack = onClose)
-    val form = remember { Form(settings.newProject, existingTitles) }
     val context = LocalContext.current
+    val form = remember { Form(settings.newProject, existingTitles, DefaultNames(context)) }
     val scope = rememberCoroutineScope()
     var camera by remember { mutableStateOf(false) }
     Box(Modifier.fillMaxSize()) {
@@ -208,7 +217,7 @@ fun NewProjectSheet(
                     settings.newProject = form.choice()
                     withContext(Dispatchers.IO) { store.create(scene) }
                 } catch (e: java.io.IOException) {
-                    Toast.makeText(context, "Could not create the project from the camera.", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, context.getString(R.string.newproject_camera_failed), Toast.LENGTH_LONG).show()
                     camera = false
                     return@launch
                 }
@@ -235,18 +244,18 @@ private fun SheetBody(form: Form, onClose: () -> Unit, onCamera: () -> Unit, onC
         Spacer(Modifier.height(16.dp))
         SizeRow(form)
         Spacer(Modifier.height(16.dp))
-        FormRow("Frame Rate") { FrameRateField(form) }
+        FormRow(stringResource(R.string.newproject_frame_rate)) { FrameRateField(form) }
         Spacer(Modifier.height(16.dp))
-        FormRow("Background") { BackgroundField(form) }
+        FormRow(stringResource(R.string.newproject_background)) { BackgroundField(form) }
         Spacer(Modifier.height(16.dp))
         Row(Modifier.padding(horizontal = 32.dp).fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Row(Modifier.height(48.dp).clickable(onClick = onCamera), verticalAlignment = Alignment.CenterVertically) {
                 Icon(CameraIcons.Camera, null, Modifier.size(20.dp), tint = Ink)
                 Spacer(Modifier.width(8.dp))
-                Text("FROM CAMERA", color = Ink, fontSize = 15.sp, fontWeight = FontWeight.Medium)
+                Text(stringResource(R.string.from_camera), color = Ink, fontSize = 15.sp, fontWeight = FontWeight.Medium)
             }
             Box(Modifier.height(48.dp).clickable(onClick = onCreate), contentAlignment = Alignment.Center) {
-                Text(if (form.element) "CREATE ASSET" else "CREATE PROJECT", color = Ink, fontSize = 15.sp, fontWeight = FontWeight.Medium)
+                Text(stringResource(if (form.element) R.string.newproject_create_asset else R.string.newproject_create_project), color = Ink, fontSize = 15.sp, fontWeight = FontWeight.Medium)
             }
         }
         Spacer(Modifier.height(52.dp))
@@ -254,7 +263,7 @@ private fun SheetBody(form: Form, onClose: () -> Unit, onCamera: () -> Unit, onC
             Modifier.align(Alignment.CenterHorizontally).size(60.dp).clickable(onClick = onClose),
             contentAlignment = Alignment.Center,
         ) {
-            Icon(HomeIcons.Close, "Cancel", Modifier.size(24.dp), tint = Am.Navy)
+            Icon(HomeIcons.Close, stringResource(R.string.cancel), Modifier.size(24.dp), tint = Am.Navy)
         }
     }
 }
@@ -265,8 +274,8 @@ private fun TypeToggle(form: Form) {
         Modifier.padding(horizontal = 32.dp).fillMaxWidth().height(44.dp).background(Am.Card, FieldShape).padding(3.dp),
         horizontalArrangement = Arrangement.spacedBy(6.dp),
     ) {
-        Segment("PROJECT", !form.element, Modifier.weight(1f)) { form.switchType(false) }
-        Segment("ASSET", form.element, Modifier.weight(1f)) { form.switchType(true) }
+        Segment(stringResource(R.string.newproject_segment_project), !form.element, Modifier.weight(1f)) { form.switchType(false) }
+        Segment(stringResource(R.string.newproject_segment_asset), form.element, Modifier.weight(1f)) { form.switchType(true) }
     }
 }
 
@@ -295,7 +304,7 @@ private fun NameField(form: Form) {
             Modifier.align(Alignment.CenterEnd).offset(x = 12.dp).size(48.dp).clickable { form.name = "" },
             contentAlignment = Alignment.Center,
         ) {
-            Icon(HomeIcons.ClearCircle, "Clear title field", Modifier.size(24.dp), tint = Ink)
+            Icon(HomeIcons.ClearCircle, stringResource(R.string.newproject_clear_title), Modifier.size(24.dp), tint = Ink)
         }
     }
 }
@@ -310,7 +319,7 @@ private fun AspectRow(form: Form) {
         }
         val custom = form.aspect == CUSTOM
         AspectButton(31.dp, 31.dp, custom, onClick = { form.aspect = CUSTOM }) {
-            Icon(HomeIcons.Pencil, "Custom aspect ratio", Modifier.size(16.dp), tint = if (custom) Am.OnAccent else Am.HomeDim)
+            Icon(HomeIcons.Pencil, stringResource(R.string.newproject_custom_aspect), Modifier.size(16.dp), tint = if (custom) Am.OnAccent else Am.HomeDim)
         }
     }
 }
@@ -362,7 +371,7 @@ private fun FormRow(label: String, details: List<String> = emptyList(), field: @
 @Composable
 private fun SizeRow(form: Form) {
     val (w, h) = form.size
-    FormRow("Resolution", listOf("Canvas Size", "$w ⨉ $h")) {
+    FormRow(stringResource(R.string.newproject_resolution), listOf(stringResource(R.string.newproject_canvas_size), "$w ⨉ $h")) {
         if (form.aspect == CUSTOM) CustomSize(form) else ResolutionField(form)
     }
 }
@@ -388,9 +397,9 @@ private fun FrameRateField(form: Form) {
 @Composable
 private fun BackgroundField(form: Form) {
     val shown = if (form.element) Backgrounds.last() else Backgrounds.firstOrNull { it.argb == form.background } ?: Backgrounds.last()
-    DropdownField(shown.name, enabled = !form.element, swatch = shown.argb) { close ->
+    DropdownField(stringResource(shown.name), enabled = !form.element, swatch = shown.argb) { close ->
         Backgrounds.forEachIndexed { i, choice ->
-            PickRow(choice.name, swatch = choice.argb, divider = i < Backgrounds.lastIndex) { form.background = choice.argb; close() }
+            PickRow(stringResource(choice.name), swatch = choice.argb, divider = i < Backgrounds.lastIndex) { form.background = choice.argb; close() }
         }
     }
 }
@@ -449,7 +458,7 @@ private fun CustomSize(form: Form) {
         val tint = if (form.linked) Am.Navy else Am.HomeFaint
         Box(Modifier.size(44.dp).clickable(onClick = form::toggleLink), contentAlignment = Alignment.Center) {
             Box(Modifier.size(27.dp).border(1.dp, tint, CircleShape), contentAlignment = Alignment.Center) {
-                Icon(HomeIcons.Link, "Link", Modifier.size(20.dp), tint = tint)
+                Icon(HomeIcons.Link, stringResource(R.string.newproject_link), Modifier.size(20.dp), tint = tint)
             }
         }
         NumberField(form.customH, form::editHeight, form::commitSides, Modifier.width(68.dp))

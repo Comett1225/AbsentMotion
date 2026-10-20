@@ -58,6 +58,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.io.IOException
 import kotlin.math.roundToInt
+import androidx.compose.ui.res.stringResource
+import app.absentmotion.R
 
 internal val SheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
 private val ChoiceShape = RoundedCornerShape(6.dp)
@@ -65,6 +67,12 @@ private val Swatches = listOf(0xFFFFFFFF, 0xFFFFE14D, 0xFFFF9F1C, 0xFFFF4D4D, 0x
 internal val Warning get() = Am.Warning
 
 private var lastStyle = CaptionStyle()
+
+private fun CaptionPosition.labelRes() = when (this) {
+    CaptionPosition.Top -> R.string.caption_position_top
+    CaptionPosition.Middle -> R.string.caption_position_middle
+    CaptionPosition.Bottom -> R.string.caption_position_bottom
+}
 
 private enum class Phase { Choose, Confirm, Download, Work }
 
@@ -89,17 +97,17 @@ internal fun CaptionsSheet(state: EditorState, onClose: () -> Unit) {
         message = ""
         job = scope.launch {
             try { work() }
-            catch (_: CancellationException) { message = "Cancelled" }
-            catch (e: Exception) { message = e.message ?: "Unable to make captions" }
-            catch (_: OutOfMemoryError) { message = "Not enough memory for this much sound" }
-            catch (_: LinkageError) { message = "Auto Captions is unavailable in this build" }
+            catch (_: CancellationException) { message = context.getString(R.string.caption_cancelled) }
+            catch (e: Exception) { message = e.message ?: context.getString(R.string.caption_unable) }
+            catch (_: OutOfMemoryError) { message = context.getString(R.string.caption_out_of_memory) }
+            catch (_: LinkageError) { message = context.getString(R.string.caption_unavailable_build) }
             finally { job = null; phase = Phase.Choose }
         }
     }
     suspend fun captions() {
         phase = Phase.Work
         progress = 0f
-        status = "Reading the audio…"
+        status = context.getString(R.string.caption_reading_audio)
         val chunks = recogniseCaptions(context, state.scene, source, style) { fraction, text -> progress = fraction; status = text }
         state.addCaptions(chunks, style, fonts)
         onClose()
@@ -111,7 +119,7 @@ internal fun CaptionsSheet(state: EditorState, onClose: () -> Unit) {
         phase = Phase.Download
         progress = 0f
         try { CaptionModel.download(context) { progress = it } }
-        catch (_: IOException) { error("The download failed. Check your internet connection and try again.") }
+        catch (_: IOException) { error(context.getString(R.string.caption_download_failed)) }
         captions()
     }
     fun dismiss() {
@@ -130,30 +138,30 @@ internal fun CaptionsSheet(state: EditorState, onClose: () -> Unit) {
             } else Box(Modifier.fillMaxSize().clickable(interactionSource = null, indication = null) { dismiss() }.systemBarsPadding(), Alignment.BottomCenter) {
                 Column(Modifier.fillMaxWidth().clip(SheetShape).background(Am.Panel).clickable(interactionSource = null, indication = null) {}.padding(horizontal = 16.dp)) {
                     Row(Modifier.fillMaxWidth().height(48.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Text("Auto Captions", Modifier.weight(1f), color = Am.OnDark, fontSize = 17.sp, fontWeight = FontWeight.Bold)
-                        BarButton(ChromeIcons.Close, "Close", Modifier.size(40.dp), onClick = ::dismiss)
+                        Text(stringResource(R.string.auto_captions), Modifier.weight(1f), color = Am.OnDark, fontSize = 17.sp, fontWeight = FontWeight.Bold)
+                        BarButton(ChromeIcons.Close, stringResource(R.string.action_close), Modifier.size(40.dp), onClick = ::dismiss)
                     }
-                    val names = listOf("Whole project") + sources.map { layer ->
+                    val names = listOf(stringResource(R.string.caption_whole_project)) + sources.map { layer ->
                         layer.label.ifEmpty { layer.soundUri?.let(state.scene::media)?.title.orEmpty() }.ifEmpty { layer.kind }
                     }
                     Box {
-                        Line("Source", Modifier.clickable { sourceMenu = true }) {
+                        Line(stringResource(R.string.caption_source), Modifier.clickable { sourceMenu = true }) {
                             Text(names[sources.indexOfFirst { it.id == source } + 1], Modifier.widthIn(max = 220.dp), color = Am.OnDark, fontSize = 14.sp,
                                 maxLines = 1, overflow = TextOverflow.Ellipsis)
                             Icon(ChromeIcons.ChevronDown, null, Modifier.size(24.dp), tint = Am.OnDark)
                         }
                         if (sourceMenu) ChoiceList(names, { sourceMenu = false }) { source = sources.getOrNull(it - 1)?.id }
                     }
-                    Line("Language") { Choices(listOf("Auto", "English"), if (style.english) 1 else 0) { update(style.copy(english = it == 1)) } }
-                    Line("Font", Modifier.clickable { browsing = true }) {
+                    Line(stringResource(R.string.settings_language)) { Choices(listOf(stringResource(R.string.caption_language_auto), stringResource(R.string.caption_language_english)), if (style.english) 1 else 0) { update(style.copy(english = it == 1)) } }
+                    Line(stringResource(R.string.caption_font), Modifier.clickable { browsing = true }) {
                         Text(FontName.parse(style.font).label, Modifier.widthIn(max = 220.dp), color = Am.OnDark, fontSize = 14.sp, maxLines = 1,
                             overflow = TextOverflow.Ellipsis)
                         Icon(ChromeIcons.ChevronRight, null, Modifier.size(24.dp), tint = Am.OnDark)
                     }
-                    Line("Size") {
+                    Line(stringResource(R.string.caption_size)) {
                         Steps(style.sizePercent, 50..200, 10, "${style.sizePercent}%") { update(style.copy(sizePercent = it)) }
                     }
-                    Line("Color") {
+                    Line(stringResource(R.string.color)) {
                         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                             for (argb in Swatches) {
                                 val chosen = argb == style.color
@@ -163,18 +171,18 @@ internal fun CaptionsSheet(state: EditorState, onClose: () -> Unit) {
                             }
                         }
                     }
-                    Line("Outline") { ThinSwitch(style.outline) { update(style.copy(outline = it)) } }
-                    Line("Position") {
-                        Choices(CaptionPosition.entries.map { it.name }, style.position.ordinal) { update(style.copy(position = CaptionPosition.entries[it])) }
+                    Line(stringResource(R.string.caption_outline)) { ThinSwitch(style.outline) { update(style.copy(outline = it)) } }
+                    Line(stringResource(R.string.caption_position)) {
+                        Choices(CaptionPosition.entries.map { stringResource(it.labelRes()) }, style.position.ordinal) { update(style.copy(position = CaptionPosition.entries[it])) }
                     }
-                    Line("Words per caption") {
+                    Line(stringResource(R.string.caption_words_per_caption)) {
                         Steps(style.maxWords, 1..10, 1, "${style.maxWords}") { update(style.copy(maxWords = it)) }
                     }
                     Box(Modifier.fillMaxWidth().height(112.dp).padding(vertical = 12.dp)) {
                         when (phase) {
                             Phase.Choose -> Column {
                                 Text(message, Modifier.fillMaxWidth().height(36.dp), color = Warning, fontSize = 13.sp, lineHeight = 17.sp, maxLines = 2)
-                                Action("Generate", Modifier.fillMaxWidth(), primary = true, onClick = ::generate)
+                                Action(stringResource(R.string.caption_generate), Modifier.fillMaxWidth(), primary = true, onClick = ::generate)
                             }
                             Phase.Confirm -> Column {
                                 Text(
@@ -182,18 +190,18 @@ internal fun CaptionsSheet(state: EditorState, onClose: () -> Unit) {
                                     Modifier.fillMaxWidth().height(36.dp), color = Am.OnDark, fontSize = 13.sp, lineHeight = 17.sp, maxLines = 2,
                                 )
                                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                                    Action("Not now", Modifier.weight(1f)) { phase = Phase.Choose }
-                                    Action("Download", Modifier.weight(1f), primary = true) { download() }
+                                    Action(stringResource(R.string.caption_not_now), Modifier.weight(1f)) { phase = Phase.Choose }
+                                    Action(stringResource(R.string.caption_download), Modifier.weight(1f), primary = true) { download() }
                                 }
                             }
                             Phase.Download, Phase.Work -> Column {
-                                val text = if (phase == Phase.Download) "Downloading the speech model…" else status
+                                val text = if (phase == Phase.Download) stringResource(R.string.caption_downloading_model) else status
                                 Text("$text ${(progress * 100).roundToInt()}%", Modifier.fillMaxWidth().height(22.dp), color = Am.OnDark, fontSize = 13.sp, maxLines = 1)
                                 Box(Modifier.fillMaxWidth().height(4.dp).background(Am.Field, CircleShape)) {
                                     Box(Modifier.fillMaxWidth(progress.coerceIn(0f, 1f)).fillMaxHeight().background(Am.Accent, CircleShape))
                                 }
                                 Spacer(Modifier.height(10.dp))
-                                Action("Cancel", Modifier.fillMaxWidth()) { job?.cancel() }
+                                Action(stringResource(R.string.cancel), Modifier.fillMaxWidth()) { job?.cancel() }
                             }
                         }
                     }

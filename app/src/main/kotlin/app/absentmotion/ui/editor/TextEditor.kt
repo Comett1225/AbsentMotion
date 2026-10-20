@@ -36,6 +36,8 @@ import app.absentmotion.ui.editor.panels.ColourSwatch
 import app.absentmotion.ui.editor.panels.ThinSlider
 import app.absentmotion.ui.theme.Am
 import kotlin.math.roundToInt
+import androidx.compose.ui.res.stringResource
+import app.absentmotion.R
 
 private val TextControl get() = Am.Button
 private val TextSizes = listOf(5, 6, 7, 8, 9, 10, 11, 12, 14, 16, 18, 20, 24, 28, 32, 36, 40, 48, 56, 64, 72, 80, 96, 112, 144)
@@ -67,7 +69,7 @@ internal fun TextEditor(state: EditorState) {
                     Box(Modifier.padding(1.5.dp).width(38.dp).fillMaxHeight().background(TextControl, RoundedCornerShape(2.dp)).clickable {
                         val alignments = listOf("left", "center", "right")
                         state.editSelected { it.withTextAlign(alignments[(alignments.indexOf(it.textAlign) + 1) % alignments.size]) }
-                    }, contentAlignment = Alignment.Center) { Icon(alignIcon, "Alignment", Modifier.size(24.dp), tint = Am.OnDark) }
+                    }, contentAlignment = Alignment.Center) { Icon(alignIcon, stringResource(R.string.text_alignment), Modifier.size(24.dp), tint = Am.OnDark) }
                     Row(Modifier.padding(1.5.dp).weight(1f).fillMaxHeight().background(TextControl).clickable { popup = if (popup == "font") "" else "font" },
                         verticalAlignment = Alignment.CenterVertically) {
                         Text(FontName.parse(layer.font).label, Modifier.weight(1f).padding(start = 6.dp), fontSize = 16.sp, fontFamily = rememberFontFamily(library, layer.font),
@@ -85,7 +87,7 @@ internal fun TextEditor(state: EditorState) {
                     Box(Modifier.padding(1.5.dp).width(38.dp).fillMaxHeight().background(TextControl).clickable { keyboard?.hide(); popup = if (popup == "color") "" else "color" }, contentAlignment = Alignment.Center) {
                         ColourSwatch(layer.fillColor, 24.dp)
                     }
-                    FontIconButton(TextIcons.Tick, "Done", finish)
+                    FontIconButton(TextIcons.Tick, stringResource(R.string.done), finish)
                 }
                 Preview(state, Modifier.fillMaxWidth().height(previewHeight))
                 TextContent(state, layer, Modifier.fillMaxWidth().height(60.dp))
@@ -119,7 +121,7 @@ private fun TextContent(state: EditorState, layer: Layer, modifier: Modifier) {
         BasicTextField(value, { next -> value = next; state.editSelected("text-content") { it.withContent(next.text) } },
             Modifier.fillMaxWidth().padding(horizontal = 6.dp, vertical = 2.dp).focusRequester(focus),
             textStyle = TextStyle(color = Am.OnDark, fontSize = 18.sp), cursorBrush = SolidColor(Am.Accent),
-            decorationBox = { inner -> if (value.text.isEmpty()) Text("Enter your text here.", color = Am.OnDark.copy(alpha = .19f), fontSize = 18.sp); inner() })
+            decorationBox = { inner -> if (value.text.isEmpty()) Text(stringResource(R.string.enter_your_text_here), color = Am.OnDark.copy(alpha = .19f), fontSize = 18.sp); inner() })
     }
 }
 
@@ -155,7 +157,7 @@ private fun FontStrip(library: FontLibrary, current: String, modifier: Modifier,
         Row(Modifier.height(33.dp).background(TextControl).clickable(onClick = onViewAll).padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
             Icon(TextIcons.ViewAll, null, Modifier.size(20.dp), tint = Am.OnDark)
             Spacer(Modifier.width(5.dp))
-            Text("Show All Fonts", color = Am.OnDark, fontSize = 16.sp)
+            Text(stringResource(R.string.show_all_fonts), color = Am.OnDark, fontSize = 16.sp)
         }
     }
 }

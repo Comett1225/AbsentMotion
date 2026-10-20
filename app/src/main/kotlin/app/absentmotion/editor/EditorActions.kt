@@ -1,5 +1,7 @@
 package app.absentmotion.editor
 
+import app.absentmotion.R
+import app.absentmotion.i18n.AppText
 import app.absentmotion.platform.Color
 import kotlin.math.roundToInt
 import app.absentmotion.model.Scene
@@ -28,11 +30,12 @@ import kotlin.random.Random
 fun EditorState.addShape(def: ShapeDef) {
     val scene = scene
     val durationSec = settings.defaultLayerDuration
-    val number = (scene.layers.mapNotNull { it.label.removePrefix(def.name + " ").toIntOrNull().takeIf { _ -> it.label.startsWith(def.name + " ") } }.maxOrNull() ?: 0) + 1
+    val title = AppText.get(def.title)
+    val number = (scene.layers.mapNotNull { it.label.removePrefix("$title ").toIntOrNull().takeIf { _ -> it.label.startsWith("$title ") } }.maxOrNull() ?: 0) + 1
     fun randomColor() = formatColor(Color.HSVToColor(floatArrayOf(Random.nextFloat() * 360f, 0.3f + Random.nextFloat() * 0.5f, 0.55f + Random.nextFloat() * 0.45f)))
     val id = Layer.newId()
     val attrs = linkedMapOf(
-        "id" to "$id", "label" to "${def.name} $number",
+        "id" to "$id", "label" to "$title $number",
         "startTime" to "${scene.frameStart(frame)}", "endTime" to "${scene.frameEnd(frame + durationSec * scene.fps)}",
         "fillType" to def.fillType, "mediaFillMode" to "fill",
     )
@@ -85,7 +88,7 @@ fun EditorState.deleteSelected() {
 
 fun EditorState.duplicateSelected() {
     val layer = selected ?: return
-    val copy = copyLayers(listOf(layer), preserveOutsideParents = true).single().withLabel(layer.label + " Copy")
+    val copy = copyLayers(listOf(layer), preserveOutsideParents = true).single().withLabel(AppText.get(R.string.edit_layer_copy_name, layer.label))
     edit { it.add(copy) }
     selectedId = copy.id
 }
@@ -224,7 +227,7 @@ fun EditorState.copySelected() {
 fun EditorState.duplicateChosen() {
     if (!MultiSelect.active) return duplicateSelected()
     val copies = chosenLayers.zip(copyLayers(chosenLayers, preserveOutsideParents = true))
-        .associate { (source, copy) -> source.id to copy.withLabel(source.label + " Copy") }
+        .associate { (source, copy) -> source.id to copy.withLabel(AppText.get(R.string.edit_layer_copy_name, source.label)) }
     if (copies.isEmpty()) return
     edit { s -> Scene(s.node.copy(children = s.node.children.flatMap { node ->
         val copy = if (node.name in Scene.LAYER_TAGS) node["id"]?.toLongOrNull()?.let { copies[it] } else null

@@ -116,6 +116,10 @@ import app.absentmotion.ui.theme.Presence
 import app.absentmotion.ui.theme.presence
 import app.absentmotion.ui.theme.presenceScrim
 import kotlin.math.roundToInt
+import androidx.annotation.StringRes
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import app.absentmotion.R
 
 private val MenuBg get() = Am.Field
 private val MenuLine get() = Am.MenuLine
@@ -184,50 +188,50 @@ internal fun LayerMenu(state: EditorState, onDismiss: () -> Unit) {
     }
     val saveElement = rememberSaveToMyElements(state)
     MenuPopup(position, onDismiss) {
-        if (state.selected?.link == null && !MultiSelect.active) MenuRow("Save to My Assets") { saveElement(onDismiss) }
-        MenuRow("Flip Horizontally") {
+        if (state.selected?.link == null && !MultiSelect.active) MenuRow(stringResource(R.string.menu_save_to_my_assets)) { saveElement(onDismiss) }
+        MenuRow(stringResource(R.string.menu_flip_horizontally)) {
             state.flip(horizontal = true)
             onDismiss()
         }
-        MenuRow("Flip Vertically") {
+        MenuRow(stringResource(R.string.menu_flip_vertically)) {
             state.flip(horizontal = false)
             onDismiss()
         }
-        MenuRow("Fit to Canvas") { scope.launch { state.compositionArea("fit"); onDismiss() } }
-        MenuRow("Fill the Canvas") { scope.launch { state.compositionArea("fill"); onDismiss() } }
-        MenuRow("Stretch to Canvas") { scope.launch { state.compositionArea("stretch"); onDismiss() } }
-        MenuRow(if (state.selected?.node?.get("clippingMask") == "true") "Release Clipping Mask" else "Create Clipping Mask", enabled = state.canClip, divider = true) {
+        MenuRow(stringResource(R.string.menu_fit_to_canvas)) { scope.launch { state.compositionArea("fit"); onDismiss() } }
+        MenuRow(stringResource(R.string.menu_fill_the_canvas)) { scope.launch { state.compositionArea("fill"); onDismiss() } }
+        MenuRow(stringResource(R.string.menu_stretch_to_canvas)) { scope.launch { state.compositionArea("stretch"); onDismiss() } }
+        MenuRow(stringResource(if (state.selected?.node?.get("clippingMask") == "true") R.string.menu_release_clipping_mask else R.string.menu_create_clipping_mask), enabled = state.canClip, divider = true) {
             state.toggleClippingMask()
             onDismiss()
         }
-        MenuRow("Convert to Outline", enabled = state.selected?.let { it.kind == "text" || (it.kind == "shape" && it.shape.isNotEmpty()) } == true) {
+        MenuRow(stringResource(R.string.menu_convert_to_outline), enabled = state.selected?.let { it.kind == "text" || (it.kind == "shape" && it.shape.isNotEmpty()) } == true) {
             scope.launch { state.convertToOutline(); onDismiss() }
         }
         if (video != null) {
-            MenuRow("Extract Audio") {
+            MenuRow(stringResource(R.string.menu_extract_audio)) {
                 state.extractAudio()
                 onDismiss()
             }
-            if (!MultiSelect.active) MenuRow("Track Motion") {
+            if (!MultiSelect.active) MenuRow(stringResource(R.string.draw_title_track_motion)) {
                 onDismiss()
                 state.startTracking()
             }
         }
-        if (state.selected?.soundUri != null && !MultiSelect.active) MenuRow("Mark Beats", enabled = !marking, busy = marking) {
+        if (state.selected?.soundUri != null && !MultiSelect.active) MenuRow(stringResource(R.string.menu_mark_beats), enabled = !marking, busy = marking) {
             marking = true
             scope.launch {
                 val note = try {
-                    state.markBeats(context).let { if (it == 0) "No new beats found" else "$it ${if (it == 1) "beat" else "beats"} marked" }
+                    state.markBeats(context).let { if (it == 0) context.getString(R.string.menu_no_new_beats) else context.resources.getQuantityString(R.plurals.menu_beats_marked, it, it.toString()) }
                 } catch (e: CancellationException) {
                     throw e
                 } catch (e: Exception) {
-                    e.message ?: "Beats could not be found"
+                    e.message ?: context.getString(R.string.menu_beats_not_found)
                 }
                 Toast.makeText(context, note, Toast.LENGTH_SHORT).show()
                 onDismiss()
             }
         }
-        if (mediaRecord != null) MenuRow("Media Info") { mediaInfo = true }
+        if (mediaRecord != null) MenuRow(stringResource(R.string.media_info)) { mediaInfo = true }
         LabelColours(state, onDismiss)
     }
 }
@@ -246,13 +250,13 @@ internal object AboveLeft : PopupPositionProvider {
 
 @Composable
 internal fun TransformMenu(state: EditorState, tab: Int, onDismiss: () -> Unit) {
-    val name = listOf("Location", "Rotation", "3D Rotation", "Scale", "Skew")[tab]
+    val resetName = listOf(R.string.menu_reset_location, R.string.menu_reset_rotation, R.string.menu_reset_3d_rotation, R.string.menu_reset_scale, R.string.menu_reset_skew)[tab]
     MenuPopup(AboveLeft, onDismiss, TransformOrigin(0f, 1f)) {
-        MenuRow("Reset $name") {
+        MenuRow(stringResource(resetName)) {
             state.resetTransform(listOf(tab))
             onDismiss()
         }
-        MenuRow("Reset Transform", divider = true) {
+        MenuRow(stringResource(R.string.menu_reset_transform), divider = true) {
             state.resetTransform(listOf(0, 1, 2, 3, 4))
             onDismiss()
         }
@@ -270,35 +274,35 @@ internal fun CopyPasteMenu(state: EditorState, onDismiss: () -> Unit) {
     val context = LocalContext.current
     saved?.let { PresetSavedDialog(it, PresetStore(context), onDismiss); return }
     MenuPopup(position, onDismiss) {
-        MenuRow("Select All Layers", enabled = state.scene.layers.isNotEmpty(), icon = ChromeIcons.SelectAll) {
+        MenuRow(stringResource(R.string.menu_select_all_layers), enabled = state.scene.layers.isNotEmpty(), icon = ChromeIcons.SelectAll) {
             state.selectedId = null
             MultiSelect.ids = state.scene.layers.map { it.id }.toSet()
             MultiSelect.active = true
             onDismiss()
         }
-        MenuRow(if (count == 1) "Duplicate Layer" else "Duplicate $count Layers", enabled = count > 0, icon = ChromeIcons.Duplicate) {
+        MenuRow(pluralStringResource(R.plurals.menu_duplicate_layers, count, count.toString()), enabled = count > 0, icon = ChromeIcons.Duplicate) {
             state.duplicateChosen()
             onDismiss()
         }
-        MenuRow("Save Preset", enabled = layer != null && canSavePreset(layer), icon = ChromeIcons.SavePreset) {
+        MenuRow(stringResource(R.string.menu_save_preset), enabled = layer != null && canSavePreset(layer), icon = ChromeIcons.SavePreset) {
             saved = runCatching { state.savePreset(PresetStore(context)) }.getOrNull()
             if (saved == null) onDismiss()
         }
         MenuRow(
-            if (count == 1) "Copy Layer" else "Copy $count Layers", enabled = count > 0, icon = ChromeIcons.Copy,
-            subText = "(with its style)",
+            pluralStringResource(R.plurals.menu_copy_layers, count, count.toString()), enabled = count > 0, icon = ChromeIcons.Copy,
+            subText = stringResource(R.string.menu_with_its_style),
         ) {
             state.copySelected()
             onDismiss()
         }
-        MenuRow(if (state.pasteCount <= 1) "Paste Layer" else "Paste ${state.pasteCount} Layers", enabled = state.canPaste, icon = ChromeIcons.Paste) {
+        MenuRow(pluralStringResource(R.plurals.menu_paste_layers, maxOf(1, state.pasteCount), maxOf(1, state.pasteCount).toString()), enabled = state.canPaste, icon = ChromeIcons.Paste) {
             state.pasteLayer()
             onDismiss()
         }
-        MenuRow("Paste Style", enabled = layer != null && state.canPaste, icon = ChromeIcons.PasteStyle, trailing = ChromeIcons.ChevronRight) { styleOpen = true }
+        MenuRow(stringResource(R.string.menu_paste_style), enabled = layer != null && state.canPaste, icon = ChromeIcons.PasteStyle, trailing = ChromeIcons.ChevronRight) { styleOpen = true }
         if (state.scene.isElement) {
-            MenuRow("Set intro end", divider = true) { state.markIntroEnd(); onDismiss() }
-            MenuRow("Set outro start") { state.markOutroStart(); onDismiss() }
+            MenuRow(stringResource(R.string.menu_set_intro_end), divider = true) { state.markIntroEnd(); onDismiss() }
+            MenuRow(stringResource(R.string.menu_set_outro_start)) { state.markOutroStart(); onDismiss() }
         }
     }
     if (styleOpen) PasteStyleMenu(state) { styleOpen = false; onDismiss() }
@@ -353,12 +357,12 @@ private val Resolutions = listOf(
 )
 private val FrameRates = listOf(12, 15, 18, 20, 24, 25, 30, 48, 50, 60)
 
-private class BackgroundChoice(val name: String, val argb: Int)
+private class BackgroundChoice(@StringRes val name: Int, val argb: Int)
 
 private val Backgrounds = listOf(
-    BackgroundChoice("Black", 0xFF000000.toInt()), BackgroundChoice("White", 0xFFFFFFFF.toInt()),
-    BackgroundChoice("Light Grey", 0xFFD8D8D8.toInt()), BackgroundChoice("Green", 0xFF00B140.toInt()),
-    BackgroundChoice("Blue", 0xFF0047BB.toInt()), BackgroundChoice("Transparent", 0x00000000),
+    BackgroundChoice(R.string.menu_bg_black, 0xFF000000.toInt()), BackgroundChoice(R.string.menu_bg_white, 0xFFFFFFFF.toInt()),
+    BackgroundChoice(R.string.menu_bg_light_grey, 0xFFD8D8D8.toInt()), BackgroundChoice(R.string.menu_bg_green, 0xFF00B140.toInt()),
+    BackgroundChoice(R.string.menu_bg_blue, 0xFF0047BB.toInt()), BackgroundChoice(R.string.menu_bg_transparent, 0x00000000),
 )
 
 private class Aspect(val key: String, val w: Int, val h: Int, val boxW: Dp, val boxH: Dp)
@@ -418,7 +422,7 @@ private fun SettingsPanel(state: EditorState, onDismiss: () -> Unit, modifier: M
             .pointerInput(Unit) { detectTapGestures { } },
     ) {
         Box(Modifier.size(40.dp).clickable(onClick = onDismiss), Alignment.Center) {
-            Icon(ChromeIcons.Close, "Close", Modifier.size(24.dp), tint = Am.OnDark)
+            Icon(ChromeIcons.Close, stringResource(R.string.action_close), Modifier.size(24.dp), tint = Am.OnDark)
         }
         AspectRow(
             aspect,
@@ -433,7 +437,7 @@ private fun SettingsPanel(state: EditorState, onDismiss: () -> Unit, modifier: M
             },
         )
         Spacer(Modifier.height(10.dp))
-        SettingRow(if (scene.isElement) "Asset Resolution" else "Resolution") {
+        SettingRow(stringResource(if (scene.isElement) R.string.menu_asset_resolution else R.string.menu_resolution)) {
             if (aspect == CUSTOM) {
                 CustomSize(scene.width, scene.height) { w, h -> change(width = w, height = h) }
             } else {
@@ -446,7 +450,7 @@ private fun SettingsPanel(state: EditorState, onDismiss: () -> Unit, modifier: M
             }
         }
         Spacer(Modifier.height(10.dp))
-        SettingRow("Frame Rate") {
+        SettingRow(stringResource(R.string.menu_frame_rate)) {
             Dropdown("${scene.fps} fps") { close ->
                 FrameRates.forEachIndexed { i, rate ->
                     PickRow("$rate fps", divider = i < FrameRates.lastIndex) { change(fps = rate); close() }
@@ -454,38 +458,38 @@ private fun SettingsPanel(state: EditorState, onDismiss: () -> Unit, modifier: M
             }
         }
         Spacer(Modifier.height(10.dp))
-        SettingRow("Background") {
+        SettingRow(stringResource(R.string.menu_background)) {
             val shown = Backgrounds.firstOrNull { it.argb == scene.bgColor || (it.argb ushr 24 == 0 && scene.bgColor ushr 24 == 0) }
-            Dropdown(shown?.name ?: "Custom", swatch = scene.bgColor) { close ->
+            Dropdown(stringResource(shown?.name ?: R.string.menu_custom), swatch = scene.bgColor) { close ->
                 Backgrounds.forEachIndexed { i, choice ->
-                    PickRow(choice.name, swatch = choice.argb, divider = i < Backgrounds.lastIndex) { change(bgColor = choice.argb); close() }
+                    PickRow(stringResource(choice.name), swatch = choice.argb, divider = i < Backgrounds.lastIndex) { change(bgColor = choice.argb); close() }
                 }
             }
         }
         Spacer(Modifier.height(10.dp))
-        SettingRow("Version history") {
+        SettingRow(stringResource(R.string.version_history)) {
             Row(
                 Modifier.fillMaxSize().clip(FieldShape).background(Am.Card).clickable { onDismiss(); state.historyOpen = true }.padding(start = 10.dp, end = 4.5.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text("Earlier versions", Modifier.weight(1f), color = Am.Navy, fontSize = 15.sp, maxLines = 1)
+                Text(stringResource(R.string.earlier_versions), Modifier.weight(1f), color = Am.Navy, fontSize = 15.sp, maxLines = 1)
                 Icon(ChromeIcons.ChevronRight, null, Modifier.size(24.dp), tint = Am.Navy)
             }
         }
         if (scene.isElement) {
             Spacer(Modifier.height(10.dp))
-            SettingRow("Precompose") {
-                Dropdown(PrecomposeOptions.firstOrNull { it.first == scene.precompose }?.second ?: PrecomposeOptions[0].second) { close ->
+            SettingRow(stringResource(R.string.menu_precompose)) {
+                Dropdown(stringResource(PrecomposeOptions.firstOrNull { it.first == scene.precompose }?.second ?: PrecomposeOptions[0].second)) { close ->
                     PrecomposeOptions.forEachIndexed { i, (value, label) ->
-                        PickRow(label, divider = i < PrecomposeOptions.lastIndex) { state.setElementOption("precompose", value); close() }
+                        PickRow(stringResource(label), divider = i < PrecomposeOptions.lastIndex) { state.setElementOption("precompose", value); close() }
                     }
                 }
             }
             Spacer(Modifier.height(10.dp))
-            SettingRow("Re-timing") {
-                Dropdown(RetimingOptions.firstOrNull { it.first == scene.retime }?.second ?: RetimingOptions[0].second) { close ->
+            SettingRow(stringResource(R.string.menu_retiming)) {
+                Dropdown(stringResource(RetimingOptions.firstOrNull { it.first == scene.retime }?.second ?: RetimingOptions[0].second)) { close ->
                     RetimingOptions.forEachIndexed { i, (value, label) ->
-                        PickRow(label, divider = i < RetimingOptions.lastIndex) { state.setElementOption("retime", value); close() }
+                        PickRow(stringResource(label), divider = i < RetimingOptions.lastIndex) { state.setElementOption("retime", value); close() }
                     }
                 }
             }
@@ -503,7 +507,7 @@ private fun AspectRow(selected: String, onPick: (Aspect) -> Unit, onCustom: () -
         }
         val custom = selected == CUSTOM
         AspectButton(31.dp, 31.dp, custom, onClick = onCustom) {
-            Icon(ChromeIcons.Pencil, "Custom aspect ratio", Modifier.size(16.dp), tint = if (custom) Am.OnAccent else Am.HomeDim)
+            Icon(ChromeIcons.Pencil, stringResource(R.string.menu_custom_aspect_ratio), Modifier.size(16.dp), tint = if (custom) Am.OnAccent else Am.HomeDim)
         }
     }
 }

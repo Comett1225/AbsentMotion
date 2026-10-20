@@ -1,0 +1,30 @@
+{
+ "id": "polar",
+ "name": "Polar Coordinates",
+ "category": "distort",
+ "since": "3.0.0",
+ "description": "Bends the layer around its centre, turning straight lines into circles, or unrolls circles into straight lines.",
+ "params": [
+  {
+   "id": "amount",
+   "label": "Interpolation",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "direction",
+   "label": "Type",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Rectangular to Polar",
+    "Polar to Rectangular"
+   ]
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float amount;\nuniform float direction;\nhalf4 main(float2 coord) {\n    float2 c = size * 0.5;\n    float r = 0.5 * min(size.x, size.y);\n    float2 q;\n    if (direction < 0.5) {\n        float2 d = coord - c;\n        float t = atan(d.x, -d.y) / 6.2831853 + 0.5;\n        q = float2(t * size.x, length(d) / r * size.y);\n    } else {\n        float t = (coord.x / size.x - 0.5) * 6.2831853;\n        float k = coord.y / size.y * r;\n        q = c + float2(sin(t), -cos(t)) * k;\n    }\n    float2 at = mix(coord, q, clamp(amount, 0.0, 1.0));\n    if (at.x < 0.0 || at.y < 0.0 || at.x > size.x || at.y > size.y) return half4(0.0);\n    return image.eval(at);\n}\n"
+}

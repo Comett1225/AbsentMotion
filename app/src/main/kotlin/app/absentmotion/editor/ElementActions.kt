@@ -1,5 +1,7 @@
 package app.absentmotion.editor
 
+import app.absentmotion.R
+import app.absentmotion.i18n.AppText
 import app.absentmotion.library.ProjectStore
 import app.absentmotion.model.Layer
 import app.absentmotion.model.Scene
@@ -38,7 +40,7 @@ suspend fun EditorState.saveToMyElements(store: ProjectStore): Boolean {
     val bounds = if (group == null) lifetimeBounds(layer) else null
     val width = group?.let { host.width } ?: ((bounds?.let { it[2] - it[0] } ?: host.width.toFloat()) + 2).toInt()
     val height = group?.let { host.height } ?: ((bounds?.let { it[3] - it[1] } ?: host.height.toFloat()) + 2).toInt()
-    val element = Scene(Scene.create(layer.label.ifBlank { "Element" }, width, height, host.fps, 0).node.with("type", "element"))
+    val element = Scene(Scene.create(layer.label.ifBlank { AppText.get(R.string.model_layer_element) }, width, height, host.fps, 0).node.with("type", "element"))
     val full = host.elementNodes(layer, bounds).fold(element) { acc, node ->
         acc.add(Layer(node), node.mediaUris().mapNotNull { host.media(it) })
     }

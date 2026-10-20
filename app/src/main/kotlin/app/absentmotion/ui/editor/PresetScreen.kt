@@ -74,6 +74,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.min
 import kotlin.math.roundToInt
+import androidx.compose.ui.res.stringResource
+import app.absentmotion.R
 
 private val RowShape = RoundedCornerShape(12.dp)
 private val Orange get() = Am.Accent
@@ -133,18 +135,18 @@ fun PresetScreen(state: EditorState) {
         Spacer(Modifier.height(16.dp))
         Box(Modifier.fillMaxWidth().height(48.dp)) {
             Box(Modifier.size(48.dp).padding(start = 4.dp).clickable { state.presetsOpen = false }, Alignment.Center) {
-                Icon(ChromeIcons.Back, "Back", Modifier.size(24.dp), tint = Am.OnDark)
+                Icon(ChromeIcons.Back, stringResource(R.string.preset_back), Modifier.size(24.dp), tint = Am.OnDark)
             }
-            Text("Try a Preset", Modifier.align(Alignment.Center), color = Am.OnDark, fontSize = 22.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+            Text(stringResource(R.string.try_a_preset), Modifier.align(Alignment.Center), color = Am.OnDark, fontSize = 22.sp, fontWeight = FontWeight.Bold, maxLines = 1)
             Box(
                 Modifier.align(Alignment.CenterEnd).height(48.dp).width(52.dp).alpha(if (current == null) DimAlpha else 1f)
                     .then(if (current == null) Modifier else Modifier.clickable {
                         state.applyPreset(current)
                         state.presetsOpen = false
-                        Toast.makeText(context, "Preset applied", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context.getString(R.string.preset_applied), Toast.LENGTH_SHORT).show()
                     }),
                 Alignment.Center,
-            ) { Text("Apply", color = Am.OnDark, fontSize = 18.sp, maxLines = 1) }
+            ) { Text(stringResource(R.string.apply), color = Am.OnDark, fontSize = 18.sp, maxLines = 1) }
         }
         Spacer(Modifier.height(16.dp))
         Box(
@@ -153,7 +155,7 @@ fun PresetScreen(state: EditorState) {
         ) {
             app.absentmotion.platform.SceneSurface(state.engine, 1, box, Modifier.fillMaxSize())
             if (!playing) Box(Modifier.align(Alignment.Center).size(56.dp).clip(CircleShape).background(Color(0x66000000)), Alignment.Center) {
-                Icon(ChromeIcons.Play, "Play", Modifier.size(32.dp), tint = Color.White)
+                Icon(ChromeIcons.Play, stringResource(R.string.preset_play), Modifier.size(32.dp), tint = Color.White)
             }
         }
         Spacer(Modifier.height(16.dp))
@@ -165,9 +167,9 @@ fun PresetScreen(state: EditorState) {
         LazyColumn(Modifier.padding(horizontal = 16.dp).fillMaxWidth().weight(1f)) {
             if (loaded?.isEmpty() == true) item {
                 Column(Modifier.fillMaxWidth().padding(top = 24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("No presets saved yet", color = Am.OnDark, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.no_presets_saved_yet), color = Am.OnDark, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                     Text(
-                        "Save a layer's settings and keyframes as a preset, then reuse them on any other layer.", Modifier.padding(vertical = 12.dp),
+                        stringResource(R.string.save_a_layer_s_settings_and), Modifier.padding(vertical = 12.dp),
                         color = Am.OnDarkDim, fontSize = 14.sp, textAlign = TextAlign.Center,
                     )
                 }
@@ -184,14 +186,14 @@ fun PresetScreen(state: EditorState) {
                         maxLines = 1, overflow = TextOverflow.Ellipsis,
                     )
                     Box(Modifier.size(48.dp).clickable { menuFor = preset.id }, Alignment.Center) {
-                        Icon(PanelIcons.More, "More", Modifier.size(24.dp), tint = Am.OnDark)
+                        Icon(PanelIcons.More, stringResource(R.string.preset_more), Modifier.size(24.dp), tint = Am.OnDark)
                         if (menuFor == preset.id) MenuPopup(DropOrRise, { menuFor = null }) {
-                            MenuRow("Rename") { menuFor = null; renaming = preset }
-                            MenuRow("Delete") {
+                            MenuRow(stringResource(R.string.rename)) { menuFor = null; renaming = preset }
+                            MenuRow(stringResource(R.string.delete)) {
                                 menuFor = null
                                 scope.launch { withContext(Dispatchers.IO) { store.delete(preset.id) }; rev++ }
                                 if (chosen == preset.id) { chosen = null; pos = pos.coerceAtMost((base.endTime - base.startTime).coerceAtLeast(1)) }
-                                Toast.makeText(context, "Preset deleted", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, context.getString(R.string.preset_deleted), Toast.LENGTH_SHORT).show()
                             }
                         }
                     }
@@ -202,7 +204,7 @@ fun PresetScreen(state: EditorState) {
     renaming?.let { preset ->
         RenamePresetDialog(preset.title, onDone = { title ->
             scope.launch {
-                if (!withContext(Dispatchers.IO) { runCatching { store.rename(preset.id, title) }.isSuccess }) Toast.makeText(context, "Could not rename the preset", Toast.LENGTH_SHORT).show()
+                if (!withContext(Dispatchers.IO) { runCatching { store.rename(preset.id, title) }.isSuccess }) Toast.makeText(context, context.getString(R.string.preset_rename_failed), Toast.LENGTH_SHORT).show()
                 rev++
             }
             renaming = null
@@ -255,7 +257,7 @@ private fun Scrubber(progress: Float, now: String, start: String, end: String, m
 internal fun RenamePresetDialog(title: String, onDone: (String) -> Unit, onDismiss: () -> Unit) {
     var text by remember { mutableStateOf(title) }
     AlertDialog(
-        onDismissRequest = onDismiss, title = { Text("Rename preset") },
+        onDismissRequest = onDismiss, title = { Text(stringResource(R.string.rename_preset)) },
         text = {
             BasicTextField(
                 text, { text = it }, Modifier.fillMaxWidth().clip(RoundedCornerShape(6.dp)).background(Am.Panel).padding(12.dp),
@@ -263,8 +265,8 @@ internal fun RenamePresetDialog(title: String, onDone: (String) -> Unit, onDismi
                 decorationBox = { field -> Box { if (text.isEmpty()) Text(title, color = Am.OnDarkDim, fontSize = 16.sp); field() } },
             )
         },
-        confirmButton = { TextButton({ onDone(text.ifBlank { title }) }) { Text("Done", color = Am.Accent) } },
-        dismissButton = { TextButton(onDismiss) { Text("Cancel", color = Am.Accent) } },
+        confirmButton = { TextButton({ onDone(text.ifBlank { title }) }) { Text(stringResource(R.string.done), color = Am.Accent) } },
+        dismissButton = { TextButton(onDismiss) { Text(stringResource(R.string.cancel), color = Am.Accent) } },
         containerColor = Am.Field, titleContentColor = Am.OnDark, textContentColor = Am.OnDark,
     )
 }
@@ -277,16 +279,16 @@ internal fun PresetSavedDialog(preset: SavedPreset, store: PresetStore, onDismis
     if (renaming) {
         RenamePresetDialog(preset.title, onDone = { title ->
             scope.launch {
-                if (!withContext(Dispatchers.IO) { runCatching { store.rename(preset.id, title) }.isSuccess }) Toast.makeText(context, "Could not rename the preset", Toast.LENGTH_SHORT).show()
+                if (!withContext(Dispatchers.IO) { runCatching { store.rename(preset.id, title) }.isSuccess }) Toast.makeText(context, context.getString(R.string.preset_rename_failed), Toast.LENGTH_SHORT).show()
                 onDismiss()
             }
         }, onDismiss = onDismiss)
         return
     }
     AlertDialog(
-        onDismissRequest = onDismiss, title = { Text("Preset stored") },
-        confirmButton = { TextButton({ renaming = true }) { Text("Name it", color = Am.Accent) } },
-        dismissButton = { TextButton(onDismiss) { Text("Close", color = Am.Accent) } },
+        onDismissRequest = onDismiss, title = { Text(stringResource(R.string.preset_stored)) },
+        confirmButton = { TextButton({ renaming = true }) { Text(stringResource(R.string.name_it), color = Am.Accent) } },
+        dismissButton = { TextButton(onDismiss) { Text(stringResource(R.string.action_close), color = Am.Accent) } },
         containerColor = Am.Field, titleContentColor = Am.OnDark,
     )
 }

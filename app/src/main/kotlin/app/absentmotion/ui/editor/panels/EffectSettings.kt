@@ -28,14 +28,16 @@ import app.absentmotion.ui.editor.MenuRow
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Presence
 import kotlin.math.*
+import androidx.compose.ui.res.stringResource
+import app.absentmotion.R
 
 @Composable
 internal fun EffectSettings(state: EditorState, layer: Layer, instance: XmlNode, definition: EffectDefinition,
                             active: EffectParam?, select: (EffectParam) -> Unit) {
     val enabled = definition.available
-    if (definition.category != "move" && state.scene.hasChildren(layer)) {
+    if (definition.category != "move" && !(definition.native && definition.category == "repeat") && state.scene.hasChildren(layer)) {
         Row(Modifier.fillMaxWidth().height(38.dp).padding(horizontal = 8.dp).alpha(if (enabled) 1f else 0.35f), verticalAlignment = Alignment.CenterVertically) {
-            Text("Apply to Children", Modifier.weight(1f), color = Am.OnDark, fontSize = 14.sp)
+            Text(stringResource(R.string.apply_to_children), Modifier.weight(1f), color = Am.OnDark, fontSize = 14.sp)
             PanelSwitch(instance.appliesToChildren) { on ->
                 if (enabled) state.editSelected { it.withEffect(state.effectIndex) { node -> node.applyingToChildren(on) } }
             }
@@ -87,7 +89,7 @@ internal fun EffectNumbers(state: EditorState, param: EffectParam, raw: String, 
         set(stored(changed), gesture)
     }
     val decimals = param.step.toBigDecimal().stripTrailingZeros().scale().coerceAtLeast(0).let { if (percent) (it - 2).coerceAtLeast(0) else it }
-    val unit = if (percent) "%" else if (param.kind == "angle") "°" else ""
+    val unit = if (percent) "%" else if (param.kind == "angle") "°" else param.unit
     fun keypad(index: Int) {
         state.keypad = KeypadRequest(values.mapIndexed { i, v -> KeypadField(if (count == 1) param.label else listOf("X", "Y")[i], v * factor) }, index) { next ->
             set(stored(next.map { v -> (v/factor).coerceIn(param.min, param.max) }), false)

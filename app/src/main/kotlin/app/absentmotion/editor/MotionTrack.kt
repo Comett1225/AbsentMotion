@@ -73,7 +73,7 @@ internal data class Affine(val a: Double, val b: Double, val c: Double, val d: D
     }
 }
 
-enum class TrackRange(val label: String) { Forward("Forward"), Backward("Backward"), Whole("Whole clip") }
+enum class TrackRange { Forward, Backward, Whole }
 
 internal fun Layer.shapeBox(): FloatArray? {
     if (shape.isNotEmpty()) {

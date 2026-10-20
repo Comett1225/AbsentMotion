@@ -1,5 +1,7 @@
 package app.absentmotion.model
 
+import androidx.annotation.StringRes
+import app.absentmotion.R
 import app.absentmotion.engine.NativeEngine
 import java.util.Locale
 import kotlin.math.abs
@@ -137,10 +139,10 @@ private fun blend(a: String, b: String, u: Float): String {
     return formatFloats(FloatArray(x.size) { x[it]!! + (y[it]!! - x[it]!!) * u })
 }
 
-data class EasingPreset(val label: String, val easing: Easing)
+data class EasingPreset(@StringRes val label: Int, val easing: Easing)
 
 object EasingCatalog {
-    private const val BEZIER = "CUBIC BEZIER EASING"
+    private const val BEZIER = R.string.keyframe_easing_cubic_bezier
     val families: List<List<EasingPreset>> = listOf(
         listOf(
             EasingPreset(BEZIER, Easing.Linear),
@@ -149,14 +151,14 @@ object EasingCatalog {
             EasingPreset(BEZIER, Easing("cubicBezier", listOf(0.42f, 0f, 0.58f, 1f))),
         ),
         listOf(
-            EasingPreset("BOUNCE", Easing("bounce", listOf(0.3f, 0.8f))),
-            EasingPreset("ELASTIC", Easing("elastic", listOf(0.25f, 1f, 0.5f, 1f))),
-            EasingPreset("CYCLIC", Easing("cyclic", listOf(0.2857143f, 0f, 0.5f, 0f, 0f))),
-            EasingPreset("RANDOM", Easing("random", listOf(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0f))),
+            EasingPreset(R.string.keyframe_easing_bounce, Easing("bounce", listOf(0.3f, 0.8f))),
+            EasingPreset(R.string.keyframe_easing_elastic, Easing("elastic", listOf(0.25f, 1f, 0.5f, 1f))),
+            EasingPreset(R.string.keyframe_easing_cyclic, Easing("cyclic", listOf(0.2857143f, 0f, 0.5f, 0f, 0f))),
+            EasingPreset(R.string.keyframe_easing_random, Easing("random", listOf(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0f))),
         ),
         listOf(
-            EasingPreset("STEPS", Easing("step", listOf(0.25f, 0f))),
-            EasingPreset("ELASTIC STEPS", Easing("elasticStep", listOf(0.2f, 0.5f))),
+            EasingPreset(R.string.keyframe_easing_steps, Easing("step", listOf(0.25f, 0f))),
+            EasingPreset(R.string.keyframe_easing_elastic_steps, Easing("elasticStep", listOf(0.2f, 0.5f))),
         ),
     )
 

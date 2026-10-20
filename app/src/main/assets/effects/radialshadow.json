@@ -1,0 +1,57 @@
+{
+ "id": "radialshadow",
+ "name": "Radial Shadow",
+ "category": "stylize",
+ "since": "3.0.0",
+ "description": "Casts long shadows from the opaque parts of the layer, spreading out away from a light point.",
+ "params": [
+  {
+   "id": "light",
+   "label": "Light",
+   "type": "point",
+   "default": [
+    0.3,
+    0.2
+   ],
+   "min": -2,
+   "max": 3,
+   "step": 0.01
+  },
+  {
+   "id": "reach",
+   "label": "Length",
+   "type": "float",
+   "default": 0.5,
+   "min": 0,
+   "max": 5,
+   "step": 0.001
+  },
+  {
+   "id": "color",
+   "label": "Color",
+   "type": "color",
+   "default": "#000000"
+  },
+  {
+   "id": "alpha",
+   "label": "Alpha",
+   "type": "float",
+   "default": 0.6,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "fade",
+   "label": "Fade",
+   "type": "float",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float2 light;\nuniform float reach;\nlayout(color) uniform half4 color;\nuniform float alpha;\nuniform float fade;\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    float2 l = light * size;\n    float shade = 0.0;\n    for (int i = 1; i <= 64; i++) {\n        float t = float(i) / 64.0;\n        float k = 1.0 / (1.0 + reach * t);\n        float hit = float(image.eval(l + (coord - l) * k).a) * (1.0 - fade * t);\n        shade = max(shade, hit);\n    }\n    float sa = shade * clamp(alpha, 0.0, 1.0) * float(color.a);\n    half4 s = half4(half3(color.rgb) * half(sa), half(sa));\n    return src + s * (1.0 - src.a);\n}\n"
+}

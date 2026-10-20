@@ -1,6 +1,5 @@
 package app.absentmotion.ui.home
 
-import app.absentmotion.platform.Formatter
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.background
@@ -49,7 +48,10 @@ import app.absentmotion.platform.LocalContext
 import app.absentmotion.platform.Toast
 import app.absentmotion.platform.Uri
 import app.absentmotion.platform.rememberDocumentPicker
+import app.absentmotion.ui.theme.ThemeError
 import app.absentmotion.ui.theme.Themes
+import app.absentmotion.i18n.text
+import app.absentmotion.i18n.txt
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -83,14 +85,14 @@ fun SettingsDrawer(settings: AppSettings, onRestored: () -> Unit = {}) {
     ) {
         Column(Modifier.fillMaxWidth().background(Am.Card).statusBarsPadding().verticalScroll(rememberScrollState()).padding(bottom = 8.dp)) {
             Text(
-                "Settings", Modifier.fillMaxWidth().height(50.dp).wrapContentHeight(Alignment.CenterVertically).padding(start = 11.dp),
+                stringResource(R.string.settings), Modifier.fillMaxWidth().height(50.dp).wrapContentHeight(Alignment.CenterVertically).padding(start = 11.dp),
                 color = Am.HomeInk, fontSize = 18.sp, fontWeight = FontWeight.Bold,
             )
             Column(Modifier.padding(horizontal = 6.dp).fillMaxWidth().clip(PanelShape).background(PanelColor)) {
-                SwitchRow("Demo Mode", settings.demoMode, enabled = true) { settings.demoMode = it; demoNote = it }
-                SwitchRow("Open XML Projects", settings.xmlUpload, enabled = true) { settings.xmlUpload = it }
-                SwitchRow("Vibration", settings.vibration, enabled = true) { settings.vibration = it }
-                SwitchRow("Keep a copy of imported media in the project", settings.keepMediaCopies, enabled = true) { settings.keepMediaCopies = it }
+                SwitchRow(stringResource(R.string.settings_demo_mode), settings.demoMode, enabled = true) { settings.demoMode = it; demoNote = it }
+                SwitchRow(stringResource(R.string.settings_open_xml), settings.xmlUpload, enabled = true) { settings.xmlUpload = it }
+                SwitchRow(stringResource(R.string.settings_vibration), settings.vibration, enabled = true) { settings.vibration = it }
+                SwitchRow(stringResource(R.string.settings_keep_media_copies), settings.keepMediaCopies, enabled = true) { settings.keepMediaCopies = it }
                 Divider(15.dp)
                 DurationRow(settings)
                 ThemeRow(settings)
@@ -98,18 +100,18 @@ fun SettingsDrawer(settings: AppSettings, onRestored: () -> Unit = {}) {
                 Divider(10.dp)
                 Spacer(Modifier.height(6.dp))
                 Text(
-                    "Playback Resampling", Modifier.padding(start = 10.dp), color = Am.HomeMid, fontSize = 13.sp, lineHeight = 18.sp,
+                    stringResource(R.string.playback_resampling), Modifier.padding(start = 10.dp), color = Am.HomeMid, fontSize = 13.sp, lineHeight = 18.sp,
                 )
                 Spacer(Modifier.height(10.dp))
-                Choices(listOf("LOW", "HIGH", "ULTRA"), settings.audioResampling) { settings.audioResampling = it }
+                Choices(listOf(R.string.settings_level_low, R.string.settings_level_high, R.string.settings_level_ultra), settings.audioResampling) { settings.audioResampling = it }
                 Spacer(Modifier.height(8.dp))
                 Divider(10.dp)
                 Spacer(Modifier.height(6.dp))
                 Text(
-                    "Preview Quality", Modifier.padding(start = 10.dp), color = Am.HomeMid, fontSize = 13.sp, lineHeight = 18.sp,
+                    stringResource(R.string.preview_quality), Modifier.padding(start = 10.dp), color = Am.HomeMid, fontSize = 13.sp, lineHeight = 18.sp,
                 )
                 Spacer(Modifier.height(10.dp))
-                Choices(PreviewQuality.entries.map { it.name.uppercase() }, settings.previewQuality.ordinal) { settings.previewQuality = PreviewQuality.entries[it] }
+                Choices(PreviewQuality.entries.map { it.label }, settings.previewQuality.ordinal) { settings.previewQuality = PreviewQuality.entries[it] }
                 Spacer(Modifier.height(8.dp))
                 SwitchRow("Use preview copies of large videos", settings.previewCopies, enabled = true) { settings.previewCopies = it }
             }
@@ -118,7 +120,7 @@ fun SettingsDrawer(settings: AppSettings, onRestored: () -> Unit = {}) {
             LinkRow(stringResource(R.string.settings_language), currentLanguage(LocalContext.current).nativeName) { language = true }
             BackupRows(settings, onRestored)
             Spacer(Modifier.height(15.dp))
-            LinkRow("About") { about = true }
+            LinkRow(stringResource(R.string.settings_about)) { about = true }
             CaptionModelRow()
         }
     }
@@ -126,9 +128,9 @@ fun SettingsDrawer(settings: AppSettings, onRestored: () -> Unit = {}) {
     if (about) AboutScreen { about = false }
     if (demoNote) AlertDialog(
         onDismissRequest = { demoNote = false },
-        title = { Text("Demo Mode is on", color = Am.Navy) },
-        text = { Text("The media picker lists only albums and folders whose name contains Demo.", color = Am.Navy) },
-        confirmButton = { TextButton({ demoNote = false }) { Text("OK", color = Am.Navy) } },
+        title = { Text(stringResource(R.string.demo_mode_is_on), color = Am.Navy) },
+        text = { Text(stringResource(R.string.the_media_picker_lists_only_albums), color = Am.Navy) },
+        confirmButton = { TextButton({ demoNote = false }) { Text(stringResource(R.string.ok), color = Am.Navy) } },
         containerColor = Am.Card,
     )
 }
@@ -146,7 +148,7 @@ private fun PreviewCopiesRow() {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text("Clear preview copies", Modifier.weight(1f), color = Am.HomeInk, fontSize = 13.sp)
-        Text(Formatter.formatShortFileSize(context, bytes), color = Am.HomeMid, fontSize = 13.sp)
+        Text(fileSize(bytes), color = Am.HomeMid, fontSize = 13.sp)
     }
 }
 
@@ -161,8 +163,8 @@ private fun CaptionModelRow() {
             .clickable { CaptionModel.remove(context); bytes = CaptionModel.file(context).length() }.padding(start = 15.dp, end = 15.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text("Remove caption model", Modifier.weight(1f), color = Am.HomeInk, fontSize = 13.sp)
-        Text(Formatter.formatShortFileSize(context, bytes), color = Am.HomeMid, fontSize = 13.sp)
+        Text(stringResource(R.string.remove_caption_model), Modifier.weight(1f), color = Am.HomeInk, fontSize = 13.sp)
+        Text(app.absentmotion.export.formatBytes(bytes), color = Am.HomeMid, fontSize = 13.sp)
     }
 }
 
@@ -204,7 +206,7 @@ private fun DurationRow(settings: AppSettings) {
     var open by remember { mutableStateOf(false) }
     val shape = RoundedCornerShape(10.dp)
     Row(Modifier.fillMaxWidth().height(44.dp).padding(horizontal = 15.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text("New Layer Length", Modifier.weight(1f), color = Am.HomeInk, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.new_layer_length), Modifier.weight(1f), color = Am.HomeInk, fontSize = 12.sp, fontWeight = FontWeight.Bold)
         Box(Modifier.size(90.dp, 37.dp)) {
             Row(
                 Modifier.fillMaxSize().clip(shape).background(Am.Card).clickable { open = true }.padding(start = 10.dp, end = 4.dp),
@@ -245,25 +247,26 @@ private fun ThemeRow(settings: AppSettings) {
                 } catch (e: CancellationException) {
                     throw e
                 } catch (e: Exception) {
-                    Toast.makeText(context, e.message ?: "Could not read this file", Toast.LENGTH_LONG).show()
+                    val message = (e as? ThemeError)?.text?.resolve(context) ?: context.getString(R.string.settings_theme_read_failed)
+                    Toast.makeText(context, message, Toast.LENGTH_LONG).show()
                 }
             }
         }
     }
     Row(Modifier.fillMaxWidth().height(44.dp).padding(horizontal = 15.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text("Theme", Modifier.weight(1f), color = Am.HomeInk, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.theme), Modifier.weight(1f), color = Am.HomeInk, fontSize = 12.sp, fontWeight = FontWeight.Bold)
         Box(Modifier.size(150.dp, 37.dp)) {
             Row(
                 Modifier.fillMaxSize().clip(shape).background(Am.Card).clickable { open = true }.padding(start = 10.dp, end = 4.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(settings.themeLabel, Modifier.weight(1f), color = Am.Navy, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(settings.themeLabel.text(), Modifier.weight(1f), color = Am.Navy, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Icon(HomeIcons.ChevronDown, null, Modifier.size(24.dp), tint = Am.Navy)
             }
             RefMenu(open, { open = false }, Am.Navy, shape, Modifier.width(210.dp), maxHeight = 327.dp) {
-                for ((id, label) in settings.themes) ThemeItem(label, id == settings.theme) { settings.theme = id; open = false }
+                for ((id, label) in settings.themes) ThemeItem(label.text(), id == settings.theme) { settings.theme = id; open = false }
                 Box(Modifier.fillMaxWidth().height(1.dp).background(ListLineColor))
-                ThemeItem("Import theme file\u2026", false) { open = false; picker.launch() }
+                ThemeItem(stringResource(R.string.settings_import_theme), false) { open = false; picker.launch() }
             }
         }
     }
@@ -279,13 +282,13 @@ private fun ThemeItem(label: String, chosen: Boolean, onClick: () -> Unit) {
 
 private fun readThemeText(context: Context, uri: Uri): String {
     val stream: java.io.InputStream? = try { context.contentResolver.openInputStream(uri) } catch (e: Exception) { null }
-    val bytes = stream?.use { it.readNBytes(Themes.MAX_BYTES + 1) } ?: throw IllegalArgumentException("Could not open this file")
-    require(bytes.size <= Themes.MAX_BYTES) { "This is not a theme file" }
+    val bytes = stream?.use { it.readNBytes(Themes.MAX_BYTES + 1) } ?: throw ThemeError(txt(R.string.settings_theme_open_failed))
+    if (bytes.size > Themes.MAX_BYTES) throw ThemeError(txt(R.string.settings_theme_not_theme_file))
     return String(bytes, Charsets.UTF_8)
 }
 
 @Composable
-private fun Choices(labels: List<String>, chosen: Int, onPick: (Int) -> Unit) {
+private fun Choices(labels: List<Int>, chosen: Int, onPick: (Int) -> Unit) {
     val shape = RoundedCornerShape(6.dp)
     Row(Modifier.padding(horizontal = 10.dp).fillMaxWidth().height(38.dp).background(Am.Card, shape).padding(3.dp)) {
         for ((index, label) in labels.withIndex()) {
@@ -294,7 +297,8 @@ private fun Choices(labels: List<String>, chosen: Int, onPick: (Int) -> Unit) {
                 Modifier.weight(1f).fillMaxHeight().background(if (selected) Am.Navy else Color.Transparent, shape).clickable { onPick(index) },
                 contentAlignment = Alignment.Center,
             ) {
-                Text(label, color = if (selected) Am.OnNavyAccent else Am.Navy, fontSize = 14.sp, fontWeight = FontWeight.Medium)
+                Text(stringResource(label).uppercase(java.util.Locale.getDefault()), Modifier.padding(horizontal = 2.dp), color = if (selected) Am.OnNavyAccent else Am.Navy,
+                    fontWeight = FontWeight.Medium, maxLines = 1, autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(9.sp, 14.sp))
             }
         }
     }

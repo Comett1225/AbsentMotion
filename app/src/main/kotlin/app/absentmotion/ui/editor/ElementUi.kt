@@ -53,10 +53,13 @@ import app.absentmotion.ui.theme.Am
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import androidx.compose.ui.res.stringResource
+import app.absentmotion.R
 
-internal val PrecomposeOptions = listOf("dynamicResolution" to "Adaptive Resolution", "fixedResolution" to "Locked Resolution")
+internal val PrecomposeOptions = listOf("dynamicResolution" to R.string.element_adaptive_resolution, "fixedResolution" to R.string.element_locked_resolution)
 internal val RetimingOptions = listOf(
-    "freeze" to "Freeze", "stretch" to "Stretch", "loop" to "Loop", "loop-stretch" to "Repeat & Stretch", "blank" to "Blank",
+    "freeze" to R.string.element_retime_freeze, "stretch" to R.string.element_retime_stretch, "loop" to R.string.element_retime_loop,
+    "loop-stretch" to R.string.element_retime_repeat_stretch, "blank" to R.string.element_retime_blank,
 )
 
 @Composable
@@ -73,9 +76,9 @@ internal fun rememberSaveToMyElements(state: EditorState): (done: () -> Unit) ->
     return { done ->
         scope.launch {
             try {
-                if (state.saveToMyElements(store)) Toast.makeText(context, "Saved to My Assets", Toast.LENGTH_SHORT).show()
+                if (state.saveToMyElements(store)) Toast.makeText(context, context.getString(R.string.element_saved_to_my_assets), Toast.LENGTH_SHORT).show()
             } catch (e: java.io.IOException) {
-                Toast.makeText(context, "Could not save to My Assets. Free some storage space.", Toast.LENGTH_LONG).show()
+                Toast.makeText(context, context.getString(R.string.element_save_failed), Toast.LENGTH_LONG).show()
             }
             done()
         }
@@ -96,12 +99,12 @@ internal fun ElementPicker(state: EditorState, modifier: Modifier) {
     val list = items
     val shown = remember(list, query) { list?.filter { matchesSearch(query, it.title) } }
     Column(modifier) {
-        SearchField(search, { search = it }, Modifier.padding(start = 8.5.dp, end = 8.dp, top = 6.dp).fillMaxWidth().height(32.dp), hint = "Search assets and projects")
+        SearchField(search, { search = it }, Modifier.padding(start = 8.5.dp, end = 8.dp, top = 6.dp).fillMaxWidth().height(32.dp), hint = stringResource(R.string.element_search_hint))
         val body = Modifier.fillMaxWidth().weight(1f)
         when {
             list == null || shown == null -> Box(body)
-            list.isEmpty() -> Box(body, Alignment.Center) { Text("Your asset collection is empty", color = Am.OnDarkDim, fontSize = 13.sp, textAlign = TextAlign.Center) }
-            shown.isEmpty() -> NoMatches(query, "assets or projects", body)
+            list.isEmpty() -> Box(body, Alignment.Center) { Text(stringResource(R.string.your_asset_collection_is_empty), color = Am.OnDarkDim, fontSize = 13.sp, textAlign = TextAlign.Center) }
+            shown.isEmpty() -> NoMatches(query, R.string.search_no_assets_or_projects, body)
             else -> LazyRow(body.padding(start = 8.5.dp), verticalAlignment = Alignment.CenterVertically) {
                 items(shown, key = { it.id }) { info -> ElementCard(info) { state.addElement(store, info.id, link = info.isElement) } }
             }
@@ -132,38 +135,38 @@ internal fun ElementProperties(state: EditorState, onBack: () -> Unit, modifier:
     var missing by remember { mutableStateOf(false) }
     Column(modifier.background(Am.Panel)) {
         Row(Modifier.fillMaxWidth().height(40.dp), verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.size(40.dp).clickable(onClick = onBack), Alignment.Center) { Icon(ChromeIcons.Back, "Back", Modifier.size(24.dp), tint = Am.OnDark) }
-            Text("Asset Properties", color = Am.OnDark, fontSize = 15.sp, maxLines = 1)
+            Box(Modifier.size(40.dp).clickable(onClick = onBack), Alignment.Center) { Icon(ChromeIcons.Back, stringResource(R.string.topbar_back), Modifier.size(24.dp), tint = Am.OnDark) }
+            Text(stringResource(R.string.asset_properties), color = Am.OnDark, fontSize = 15.sp, maxLines = 1)
         }
         Row(Modifier.fillMaxWidth().padding(12.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            PropertyButton("Open original Asset", Modifier.weight(1f), enabled = ElementNav.open != null) {
+            PropertyButton(stringResource(R.string.element_open_original), Modifier.weight(1f), enabled = ElementNav.open != null) {
                 if (original == null) missing = true else ElementNav.open?.invoke(original)
             }
-            PropertyButton("Convert to Group", Modifier.weight(1f)) { state.unlinkElement() }
+            PropertyButton(stringResource(R.string.convert_to_group), Modifier.weight(1f)) { state.unlinkElement() }
         }
         Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            PropertyButton("Unlink from Asset", Modifier.weight(1f)) { state.unlinkElement() }
+            PropertyButton(stringResource(R.string.element_unlink), Modifier.weight(1f)) { state.unlinkElement() }
             Box(Modifier.weight(1f))
         }
     }
     if (missing) AlertDialog(
         onDismissRequest = { missing = false },
-        text = { Text("This asset pointed to a project that has been deleted.\n\nRebuild a project from this asset, or detach it and edit it directly?") },
+        text = { Text(stringResource(R.string.this_asset_pointed_to_a_project)) },
         confirmButton = {
             TextButton({
                 missing = false
                 try {
                     layer.nested?.let { store.save(store.linkOf(layer.link.orEmpty()), it) }
-                    Toast.makeText(context, "Saved to My Assets", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, context.getString(R.string.element_saved_to_my_assets), Toast.LENGTH_SHORT).show()
                 } catch (e: java.io.IOException) {
-                    Toast.makeText(context, "Could not save to My Assets. Free some storage space.", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, context.getString(R.string.element_save_failed), Toast.LENGTH_LONG).show()
                 }
-            }) { Text("Rebuild Source Project", color = Am.Accent) }
+            }) { Text(stringResource(R.string.rebuild_source_project), color = Am.Accent) }
         },
         dismissButton = {
             Row {
-                TextButton({ missing = false }) { Text("Cancel", color = Am.Accent) }
-                TextButton({ missing = false; state.unlinkElement() }) { Text("Convert to Group", color = Am.Accent) }
+                TextButton({ missing = false }) { Text(stringResource(R.string.cancel), color = Am.Accent) }
+                TextButton({ missing = false; state.unlinkElement() }) { Text(stringResource(R.string.convert_to_group), color = Am.Accent) }
             }
         },
         containerColor = Am.Field, textContentColor = Am.OnDark,

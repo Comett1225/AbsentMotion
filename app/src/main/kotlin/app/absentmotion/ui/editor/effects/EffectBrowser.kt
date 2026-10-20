@@ -53,6 +53,8 @@ import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Swap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import androidx.compose.ui.res.stringResource
+import app.absentmotion.R
 
 @Composable
 fun EffectBrowser(state: EditorState) {
@@ -95,7 +97,7 @@ fun EffectBrowser(state: EditorState) {
                 BasicTextField(query, { query = it }, Modifier.weight(1f).padding(8.dp).focusRequester(focus), singleLine = true,
                     textStyle = TextStyle(color = Am.OnDark, fontSize = 17.sp), cursorBrush = SolidColor(Am.Accent))
             }
-            else Text(detail?.name ?: category?.let { key -> catalog.categories.firstOrNull { it.first == key }?.second } ?: "Effects Library",
+            else Text(detail?.name ?: category?.let { key -> catalog.categories.firstOrNull { it.first == key }?.second } ?: stringResource(R.string.effectbrowser_title),
                 Modifier.weight(1f), color = Am.OnDark, fontSize = 17.sp, textAlign = TextAlign.Center, maxLines = 1)
             BrowserButton(EffectIcons.Search, { state.effectDetail = null; detail = null; searching = true })
         }
@@ -110,14 +112,14 @@ fun EffectBrowser(state: EditorState) {
                 Thumbnail(catalog, effect.thumbnail, Modifier.align(Alignment.CenterHorizontally).size(160.dp))
                 Text(effect.description, Modifier.padding(vertical = 16.dp), color = Am.OnDark, fontSize = 14.sp)
                 if (state.effectDetail == null) Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    Text("+ Standard Settings", Modifier.weight(1f).height(48.dp).alpha(if (effect.available) 1f else 0.35f)
+                    Text(stringResource(R.string.standard_settings), Modifier.weight(1f).height(48.dp).alpha(if (effect.available) 1f else 0.35f)
                         .clickable(enabled = effect.available) { add(effect) }.padding(12.dp), color = Am.OnDark, fontSize = 15.sp)
-                    Icon(PanelIcons.Star, "Favorite", Modifier.size(32.dp).clickable { favourite(effect) }, tint = if (effect.id in favourites) Am.Accent else Am.OnDark)
+                    Icon(PanelIcons.Star, stringResource(R.string.effectbrowser_favorite), Modifier.size(32.dp).clickable { favourite(effect) }, tint = if (effect.id in favourites) Am.Accent else Am.OnDark)
                 }
                 if (state.effectDetail == null) effect.presets.forEach { preset ->
                     Column(Modifier.fillMaxWidth().height(56.dp).alpha(if (effect.available) 1f else 0.35f)
                         .clickable(enabled = effect.available) { add(effect, preset) }.padding(horizontal = 12.dp), verticalArrangement = Arrangement.Center) {
-                        Text("PRESET", color = Am.OnDarkDim, fontSize = 10.sp, maxLines = 1)
+                        Text(stringResource(R.string.effectbrowser_preset), color = Am.OnDarkDim, fontSize = 10.sp, maxLines = 1)
                         Text("+ ${preset.name}", color = Am.OnDark, fontSize = 15.sp, maxLines = 1)
                     }
                 }
@@ -125,7 +127,7 @@ fun EffectBrowser(state: EditorState) {
         } else if (searching || category != null) {
             val results = catalog.listed(if (searching) null else category).filter { query.isBlank() || it.name.contains(query, true) }
                 .sortedBy { it.name.lowercase() }
-            val actions = if (searching || category == "ai") AiAction.entries.filter { it.offered && (query.isBlank() || it.title.contains(query, true)) } else emptyList()
+            val actions = if (searching || category == "ai") AiAction.entries.filter { it.offered && (query.isBlank() || stringResource(it.title).contains(query, true)) } else emptyList()
             val presets = catalog.definitions.flatMap { d -> d.presets.map { d to it } }
                 .filter { (d, p) -> if (searching) query.isNotBlank() && p.name.contains(query, true) else d.category == category }
             LazyVerticalGrid(GridCells.Fixed(3), Modifier.fillMaxSize(), contentPadding = PaddingValues(10.dp)) {
@@ -154,8 +156,8 @@ fun EffectBrowser(state: EditorState) {
                         }
                     }
                     Row(Modifier.align(Alignment.BottomCenter).padding(bottom = 5.dp)) {
-                        Icon(EffectIcons.Recent, "Recent", Modifier.size(12.dp).clickable { favPage = false }, tint = if (!favPage) Am.Accent else Am.OnDarkDim)
-                        Icon(PanelIcons.Star, "Favorite", Modifier.size(12.dp).clickable { favPage = true }, tint = if (favPage) Am.Accent else Am.OnDarkDim)
+                        Icon(EffectIcons.Recent, stringResource(R.string.effectbrowser_recent), Modifier.size(12.dp).clickable { favPage = false }, tint = if (!favPage) Am.Accent else Am.OnDarkDim)
+                        Icon(PanelIcons.Star, stringResource(R.string.effectbrowser_favorite), Modifier.size(12.dp).clickable { favPage = true }, tint = if (favPage) Am.Accent else Am.OnDarkDim)
                     }
                 }
                 catalog.categories.chunked(2).forEach { row ->
@@ -195,11 +197,11 @@ private fun EffectTile(catalog: EffectCatalog, effect: EffectDefinition, width: 
         Box {
             Thumbnail(catalog, effect.thumbnail, Modifier.size((width - 7).dp).clip(RoundedCornerShape(5.dp)))
             if (favourite) Icon(PanelIcons.Star, null, Modifier.align(Alignment.TopEnd).size(14.dp), tint = Am.Accent)
-            if (catalog.isNew(effect)) Text("NEW", Modifier.align(Alignment.TopStart).padding(3.dp).clip(RoundedCornerShape(3.dp)).background(Am.Accent)
+            if (catalog.isNew(effect)) Text(stringResource(R.string.t_new), Modifier.align(Alignment.TopStart).padding(3.dp).clip(RoundedCornerShape(3.dp)).background(Am.Accent)
                 .padding(horizontal = 3.dp), color = Color.White, fontSize = 7.sp, lineHeight = 9.sp, fontWeight = FontWeight.Bold, maxLines = 1)
         }
         Text(effect.name, Modifier.fillMaxWidth().padding(top = 4.dp), color = Am.OnDark, fontSize = if (width > 100) 10.sp else 8.sp,
-            lineHeight = 9.sp, textAlign = TextAlign.Center, maxLines = 2)
+            lineHeight = 9.sp, textAlign = TextAlign.Center, maxLines = 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
     }
 }
 

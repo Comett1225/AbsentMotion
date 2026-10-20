@@ -1,0 +1,115 @@
+{
+ "id": "turbulentdisplace",
+ "name": "Turbulent Displace",
+ "category": "distort",
+ "since": "3.0.0",
+ "description": "Pushes the layer around with smooth fractal noise, for fire, water, heat haze or rough natural edges.",
+ "params": [
+  {
+   "id": "parallax",
+   "label": "Parallax",
+   "type": "point",
+   "default": [
+    0,
+    0
+   ],
+   "min": -5000,
+   "max": 5000,
+   "step": 1,
+   "pixels": true
+  },
+  {
+   "id": "offset",
+   "label": "Offset",
+   "type": "point",
+   "default": [
+    0,
+    0
+   ],
+   "min": -5000,
+   "max": 5000,
+   "step": 1,
+   "pixels": true
+  },
+  {
+   "id": "strength",
+   "label": "Strength",
+   "type": "float",
+   "default": 0.25,
+   "min": 0,
+   "max": 2.5,
+   "step": 0.001
+  },
+  {
+   "id": "evolution",
+   "label": "Evolution",
+   "type": "float",
+   "default": 0,
+   "min": -50,
+   "max": 50,
+   "step": 0.01
+  },
+  {
+   "id": "direction",
+   "label": "Direction",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Both",
+    "Horizontal",
+    "Vertical",
+    "Radial",
+    "Twist"
+   ]
+  },
+  {
+   "id": "scale",
+   "label": "Scale",
+   "type": "float",
+   "default": 1,
+   "min": 0.01,
+   "max": 50,
+   "step": 0.01
+  },
+  {
+   "id": "stretch",
+   "label": "Stretch",
+   "type": "point",
+   "default": [
+    1,
+    1
+   ],
+   "min": 0.01,
+   "max": 10,
+   "step": 0.01
+  },
+  {
+   "id": "seed",
+   "label": "Seed",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 5,
+   "step": 0.01
+  },
+  {
+   "id": "octaves",
+   "label": "Octaves",
+   "type": "float",
+   "default": 6,
+   "min": 1,
+   "max": 9,
+   "step": 1
+  },
+  {
+   "id": "bias",
+   "label": "Bias",
+   "type": "float",
+   "default": 0,
+   "min": -1,
+   "max": 1,
+   "step": 0.001
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float2 parallax;\nuniform float2 offset;\nuniform float strength;\nuniform float evolution;\nuniform float direction;\nuniform float scale;\nuniform float2 stretch;\nuniform float seed;\nuniform float octaves;\nuniform float bias;\nfloat hash13(float3 p) {\n    p = fract(p * 0.1031);\n    p += dot(p, p.zyx + 31.32);\n    return fract((p.x + p.y) * p.z);\n}\nfloat vnoise(float3 p) {\n    float3 i = floor(p);\n    float3 f = fract(p);\n    f = f * f * f * (f * (f * 6.0 - 15.0) + 10.0);\n    float a = mix(hash13(i), hash13(i + float3(1, 0, 0)), f.x);\n    float b = mix(hash13(i + float3(0, 1, 0)), hash13(i + float3(1, 1, 0)), f.x);\n    float c = mix(hash13(i + float3(0, 0, 1)), hash13(i + float3(1, 0, 1)), f.x);\n    float d = mix(hash13(i + float3(0, 1, 1)), hash13(i + float3(1, 1, 1)), f.x);\n    return mix(mix(a, b, f.y), mix(c, d, f.y), f.z);\n}\nfloat fbm(float3 p, float octaves, float2 drift, float gain) {\n    float sum = 0.0;\n    float amp = 0.5;\n    float norm = 0.0;\n    for (int i = 0; i < 9; i++) {\n        if (float(i) >= octaves) break;\n        sum += amp * vnoise(p);\n        norm += amp;\n        amp *= gain;\n        p = float3(p.xy * 2.03 + drift + float2(17.13, 9.71), p.z * 1.7 + 3.1);\n    }\n    return sum / max(norm, 0.0001);\n}\nhalf4 main(float2 coord) {\n    float unit = 0.4 * size.y * max(scale, 0.01);\n    float2 rel = coord - size * 0.5;\n    float2 p = (rel - offset) / (unit * max(abs(stretch), float2(0.01)));\n    float3 q = float3(p + seed * float2(37.1, 17.3), evolution);\n    float2 drift = parallax / unit;\n    float nx = fbm(q, octaves, drift, 0.62) - 0.5 + bias * 0.5;\n    float ny = fbm(q + float3(31.7, 47.3, 11.0), octaves, drift, 0.62) - 0.5 + bias * 0.5;\n    float amount = 4.0 * strength * 0.4 * size.y;\n    float2 d = float2(nx, ny) * amount;\n    if (direction > 0.5 && direction < 1.5) d.y = 0.0;\n    if (direction > 1.5 && direction < 2.5) d.x = 0.0;\n    if (direction > 2.5) {\n        float2 r = length(rel) > 0.001 ? normalize(rel) : float2(1.0, 0.0);\n        d = direction < 3.5 ? r * nx * amount : float2(-r.y, r.x) * nx * amount;\n    }\n    return image.eval(coord + d);\n}\n"
+}

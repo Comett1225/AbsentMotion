@@ -51,7 +51,13 @@ import java.io.File
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.time.format.DecimalStyle
 import java.util.Locale
+import androidx.compose.ui.res.stringResource
+import app.absentmotion.R
+import app.absentmotion.i18n.UiText
+import app.absentmotion.i18n.text
+import app.absentmotion.i18n.txt
 
 @Composable
 fun OpeningOverlay(onCancel: () -> Unit) {
@@ -65,8 +71,8 @@ fun OpeningOverlay(onCancel: () -> Unit) {
         if (shown) Column(Modifier.size(220.dp, 150.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             CircularProgressIndicator(Modifier.size(44.dp), color = Am.Accent)
             if (slow) {
-                Text("Still working…", Modifier.padding(top = 16.dp), color = Color.White, fontSize = 15.sp)
-                TextButton(onCancel) { Text("Cancel", color = Color.White, fontSize = 15.sp) }
+                Text(stringResource(R.string.still_working), Modifier.padding(top = 16.dp), color = Color.White, fontSize = 15.sp)
+                TextButton(onCancel) { Text(stringResource(R.string.cancel), color = Color.White, fontSize = 15.sp) }
             }
         }
     }
@@ -80,7 +86,7 @@ fun VersionHistory(store: ProjectStore, id: String, title: String, engine: Engin
         onDismissRequest = onDismiss,
         title = {
             Column {
-                Text("Version history", color = Am.Navy)
+                Text(stringResource(R.string.version_history), color = Am.Navy)
                 Text(title, color = Am.HomeMid, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
         },
@@ -88,7 +94,7 @@ fun VersionHistory(store: ProjectStore, id: String, title: String, engine: Engin
             Box(Modifier.fillMaxWidth().height(360.dp)) {
                 val list = versions
                 if (list != null && list.isEmpty()) Text(
-                    "No earlier versions yet. A version is kept each time the project is opened or closed, and every two minutes while you edit.",
+                    stringResource(R.string.no_earlier_versions_yet_a_version),
                     color = Am.Navy, fontSize = 15.sp,
                 )
                 if (list != null) LazyColumn(Modifier.fillMaxSize()) {
@@ -96,16 +102,16 @@ fun VersionHistory(store: ProjectStore, id: String, title: String, engine: Engin
                 }
             }
         },
-        confirmButton = { TextButton(onDismiss) { Text("Close", color = Am.Navy) } },
+        confirmButton = { TextButton(onDismiss) { Text(stringResource(R.string.action_close), color = Am.Navy) } },
         containerColor = Am.Card,
     )
     chosen?.let { version ->
         AlertDialog(
             onDismissRequest = { chosen = null },
-            title = { Text("Restore this version?", color = Am.Navy) },
-            text = { Text("The project goes back to how it was ${versionLabel(version.time).replaceFirstChar { it.lowercase() }}. The current state is kept in Version history, so nothing is lost.", color = Am.Navy) },
-            dismissButton = { TextButton({ chosen = null }) { Text("Cancel", color = Am.Navy) } },
-            confirmButton = { TextButton({ chosen = null; onRestore(version) }) { Text("Restore", color = Am.Navy) } },
+            title = { Text(stringResource(R.string.restore_this_version), color = Am.Navy) },
+            text = { Text(versionRestoreText(version.time).text(), color = Am.Navy) },
+            dismissButton = { TextButton({ chosen = null }) { Text(stringResource(R.string.cancel), color = Am.Navy) } },
+            confirmButton = { TextButton({ chosen = null; onRestore(version) }) { Text(stringResource(R.string.restore), color = Am.Navy) } },
             containerColor = Am.Card,
         )
     }
@@ -119,10 +125,10 @@ private fun VersionRow(version: ProjectVersions.Version, engine: EngineThread, o
             picture?.let { Image(it, null, Modifier.fillMaxSize(), contentScale = ContentScale.Fit) }
         }
         Column(Modifier.weight(1f).padding(horizontal = 12.dp)) {
-            Text(versionLabel(version.time), color = Am.Navy, fontSize = 15.sp, fontWeight = FontWeight.Medium, maxLines = 1)
+            Text(versionLabel(version.time).text(), color = Am.Navy, fontSize = 15.sp, fontWeight = FontWeight.Medium, maxLines = 1)
             Text(fileSize(version.file.length()), color = Am.HomeMid, fontSize = 13.sp, maxLines = 1)
         }
-        TextButton(onRestore) { Text("Restore", color = Am.Navy) }
+        TextButton(onRestore) { Text(stringResource(R.string.restore), color = Am.Navy) }
     }
 }
 
@@ -142,15 +148,21 @@ private suspend fun versionThumbnail(version: ProjectVersions.Version, engine: E
     null
 }
 
-internal fun versionLabel(time: Long, now: Long = System.currentTimeMillis()): String {
+internal fun versionLabel(time: Long, now: Long = System.currentTimeMillis()): UiText =
+    versionMoment(time, now, R.string.safety_version_today, R.string.safety_version_yesterday, R.string.safety_version_on_date)
+
+private fun versionRestoreText(time: Long, now: Long = System.currentTimeMillis()): UiText =
+    versionMoment(time, now, R.string.safety_restore_today, R.string.safety_restore_yesterday, R.string.safety_restore_on_date)
+
+private fun versionMoment(time: Long, now: Long, today: Int, yesterday: Int, other: Int): UiText {
     val zone = ZoneId.systemDefault()
     val at = Instant.ofEpochMilli(time).atZone(zone)
-    val today = Instant.ofEpochMilli(now).atZone(zone).toLocalDate()
+    val current = Instant.ofEpochMilli(now).atZone(zone).toLocalDate()
     val clock = at.format(DateTimeFormatter.ofPattern("HH:mm", Locale.ENGLISH))
     return when (at.toLocalDate()) {
-        today -> "Today at $clock"
-        today.minusDays(1) -> "Yesterday at $clock"
-        else -> "On " + at.format(DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.ENGLISH)) + " at $clock"
+        current -> txt(today, clock)
+        current.minusDays(1) -> txt(yesterday, clock)
+        else -> txt(other, at.format(DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.getDefault()).withDecimalStyle(DecimalStyle.STANDARD)), clock)
     }
 }
 
@@ -158,10 +170,10 @@ internal fun versionLabel(time: Long, now: Long = System.currentTimeMillis()): S
 fun RecoveryDialog(title: String, onRestore: () -> Unit, onDiscard: () -> Unit) {
     AlertDialog(
         onDismissRequest = {},
-        title = { Text("AbsentMotion closed unexpectedly", color = Am.Navy) },
-        text = { Text("Restore your last edits to “$title”? If you discard them, they are kept in the project's Version history.", color = Am.Navy) },
-        dismissButton = { TextButton(onDiscard) { Text("Discard", color = Am.Navy) } },
-        confirmButton = { TextButton(onRestore) { Text("Restore", color = Am.Navy) } },
+        title = { Text(stringResource(R.string.absentmotion_closed_unexpectedly), color = Am.Navy) },
+        text = { Text(stringResource(R.string.safety_recovery_body, title), color = Am.Navy) },
+        dismissButton = { TextButton(onDiscard) { Text(stringResource(R.string.discard), color = Am.Navy) } },
+        confirmButton = { TextButton(onRestore) { Text(stringResource(R.string.restore), color = Am.Navy) } },
         containerColor = Am.Card,
     )
 }
@@ -170,16 +182,12 @@ fun RecoveryDialog(title: String, onRestore: () -> Unit, onDiscard: () -> Unit) 
 fun OpenFailedDialog(onHistory: (() -> Unit)?, onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Could not open this project", color = Am.Navy) },
+        title = { Text(stringResource(R.string.could_not_open_this_project), color = Am.Navy) },
         text = {
-            Text(
-                "The project file is missing or damaged, so nothing was changed." +
-                    if (onHistory != null) " You can bring back an earlier version from Version history." else "",
-                color = Am.Navy,
-            )
+            Text(stringResource(if (onHistory != null) R.string.safety_open_failed_with_history else R.string.the_project_file_is_missing_or), color = Am.Navy)
         },
-        dismissButton = onHistory?.let { { TextButton(it) { Text("Version history", color = Am.Navy) } } },
-        confirmButton = { TextButton(onDismiss) { Text("OK", color = Am.Navy) } },
+        dismissButton = onHistory?.let { { TextButton(it) { Text(stringResource(R.string.version_history), color = Am.Navy) } } },
+        confirmButton = { TextButton(onDismiss) { Text(stringResource(R.string.ok), color = Am.Navy) } },
         containerColor = Am.Card,
     )
 }

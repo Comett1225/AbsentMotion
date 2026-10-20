@@ -19,7 +19,11 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import app.absentmotion.R
 import app.absentmotion.audio.AudioEngine
+import app.absentmotion.export.exportCheck
+import app.absentmotion.i18n.AppText
+import app.absentmotion.i18n.txt
 import app.absentmotion.export.FrameInterpolation
 import app.absentmotion.media.VideoLibrary
 import kotlinx.coroutines.sync.Mutex
@@ -60,7 +64,7 @@ class EngineThread(private val background: Int, context: Context? = null) {
         private set
     @Volatile private var requestedView: PreviewView? = null
     @Volatile private var playing = false
-    private val effectCatalog = MutableStateFlow(EffectCatalog(message = "Loading effects…"))
+    private val effectCatalog = MutableStateFlow(EffectCatalog(message = AppText.get(R.string.engine_loading_effects)))
     val effects = effectCatalog.asStateFlow()
 
     suspend fun effectCheck(directory: File) {
@@ -132,7 +136,7 @@ class EngineThread(private val background: Int, context: Context? = null) {
     private fun engine(): NativeEngine {
         check(!closed) { "engine closed" }
         if (engine?.failed == true || simulateGpuLoss && !capturing) {
-            check(!capturing) { "GPU failed during capture" }
+            exportCheck(!capturing) { txt(R.string.engine_error_gpu_capture) }
             simulateGpuLoss = false
             target = 0L
             engine?.close()
@@ -248,6 +252,17 @@ class EngineThread(private val background: Int, context: Context? = null) {
     internal suspend fun interpolateVideo(uri: String, layerId: Long, a: Long, b: Long, t: Float, flow: Boolean,
                                           params: FloatArray): Boolean = withContext(dispatcher) {
         !closed && engine().interpolateVideo(uri, layerId, a, b, t, flow, params)
+    }
+
+    internal suspend fun moshStart(uri: String, layerId: Long, pts: LongArray, mosh: FloatArray, flow: FloatArray, exact: Boolean): Int = withContext(dispatcher) {
+        if (closed || (!exact && capturing)) return@withContext -1
+        engine().moshStart(uri, layerId, pts, mosh, flow).also { if (it == pts.size && !exact) renderNow() }
+    }
+
+    internal suspend fun moshFrame(uri: String, buffer: HardwareBuffer, layerId: Long, step: Int, last: Boolean, exact: Boolean,
+                                   standard: Int, range: Int, crop: Rect, accept: () -> Boolean): Boolean = withContext(dispatcher) {
+        if (closed || (!exact && capturing) || !accept()) return@withContext false
+        engine().moshFrame(uri, layerId, step, buffer, standard, range, crop).also { if (it && last && !exact) renderNow() }
     }
 
     suspend fun maxPictureSize(): Int = withContext(dispatcher) { if (closed) 1 else engine().maxPictureSize }

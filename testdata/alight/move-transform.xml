@@ -1,0 +1,92 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<scene title="AM inventory" width="720" height="720" exportWidth="720" exportHeight="720" precompose="dynamicResolution" bgcolor="#ffd8d8d8" totalTime="2032" fps="30" amver="1028425" ffver="106" am="com.alightcreative.motion/5.0.273.1028425" amplatform="android" retime="freeze" retimeAdaptFPS="false">
+  <shape id="87" label="Test card" startTime="0" endTime="2032" fillType="color" mediaFillMode="fill" s=".rect">
+    <transform>
+      <location value="360.000000,360.000000,0.000000" />
+    </transform>
+    <fillColor value="#ff4ec2c2" />
+    <effect id="com.alightcreative.effects.shake2" hidden="true" locallyApplied="true">
+      <property name="mag" type="float" value="50.000000" />
+      <property name="freq" type="float" value="2.000000" />
+      <property name="evolution" type="float" value="0.000000" />
+      <property name="seed" type="float" value="0.000000" />
+      <property name="angle" type="float" value="45.000000" />
+      <property name="slack" type="float" value="0.250000" />
+      <property name="zshake" type="float" value="0.000000" />
+    </effect>
+    <effect id="com.alightcreative.effect.movealongpath3" hidden="true" locallyApplied="true">
+      <property name="progress" type="float" value="0.000000" />
+      <property name="angle" type="float" value="0.000000" />
+      <property name="tangent" type="bool" value="true" />
+      <property name="inset" type="float" value="0.000000" />
+    </effect>
+    <effect id="com.alightcreative.effects.offset" hidden="true" locallyApplied="true">
+      <property name="feather" type="float" value="0.000000" />
+      <property name="mask" type="bool" value="false" />
+    </effect>
+    <effect id="com.alightcreative.effects.oscillate3" hidden="true" locallyApplied="true">
+      <property name="direction" type="int" value="0" />
+      <property name="angle" type="float" value="45.000000" />
+      <property name="freq" type="float" value="2.000000" />
+      <property name="mag" type="float" value="25.000000" />
+      <property name="type" type="int" value="0" />
+      <property name="phase" type="float" value="0.000000" />
+    </effect>
+    <effect id="com.alightcreative.effects.pulsate2" hidden="true" locallyApplied="true">
+      <property name="freq" type="float" value="2.000000" />
+      <property name="minsize" type="float" value="0.900000" />
+      <property name="maxsize" type="float" value="1.100000" />
+      <property name="phase" type="float" value="0.000000" />
+      <property name="type" type="int" value="0" />
+    </effect>
+    <effect id="com.alightcreative.effects.randomdisplace" hidden="true" locallyApplied="true">
+      <property name="mag" type="float" value="50.000000" />
+      <property name="evolution" type="float" value="0.000000" />
+      <property name="seed" type="float" value="0.000000" />
+      <property name="scatter" type="float" value="0.500000" />
+    </effect>
+    <effect id="com.alightcreative.effects.jitter" hidden="true" locallyApplied="true">
+      <property name="angle" type="float" value="45.000000" />
+      <property name="freq" type="float" value="30.000000" />
+      <property name="mag" type="float" value="25.000000" />
+      <property name="seed" type="float" value="0.000000" />
+      <property name="slack" type="float" value="0.000000" />
+      <property name="zjitter" type="float" value="0.000000" />
+    </effect>
+    <effect id="com.alightcreative.effects.swing2" hidden="true" locallyApplied="true">
+      <property name="freq" type="float" value="5.980000" />
+      <property name="a1" type="float" value="-30.000000" />
+      <property name="a2" type="float" value="30.000000" />
+      <property name="phase" type="float" value="0.000000" />
+      <property name="type" type="int" value="0" />
+    </effect>
+    <effect id="com.alightcreative.effects.spin" hidden="true" locallyApplied="true">
+      <property name="rpm" type="float" value="-936.000000" />
+    </effect>
+    <effect id="com.alightcreative.effects.stretch2" hidden="true" locallyApplied="true">
+      <property name="scale" type="float" value="18.510000" />
+      <property name="angle" type="float" value="0.000000" />
+      <property name="contentOnly" type="bool" value="false" />
+    </effect>
+    <effect id="com.alightcreative.effects.pulseopacity2" hidden="true" locallyApplied="true">
+      <property name="freq" type="float" value="5.980000" />
+      <property name="strength" type="float" value="1.000000" />
+      <property name="phase" type="float" value="0.000000" />
+      <property name="type" type="int" value="0" />
+    </effect>
+    <effect id="com.alightcreative.effects.transform" hidden="true" locallyApplied="true">
+      <property name="scale" type="float" value="1.000000" />
+      <property name="angle" type="float" value="0.000000" />
+      <property name="maskToLayer" type="bool" value="false" />
+      <property name="alpha" type="float" value="1.000000" />
+      <property name="fill" type="float" value="0.000000" />
+      <property name="sample" type="int" value="1" />
+    </effect>
+    <effect id="com.alightcreative.effects.scaleassist" hidden="true" locallyApplied="true">
+      <property name="axis" type="int" value="3" />
+      <property name="scale" type="float" value="369.996277" />
+      <property name="damp" type="float" value="1.000000" />
+    </effect>
+    <property name="size" type="vec2" value="360.000000,270.000000" />
+  </shape>
+</scene>

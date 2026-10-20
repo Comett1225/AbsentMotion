@@ -1,0 +1,71 @@
+{
+ "id": "blockdissolve",
+ "name": "Block Dissolve",
+ "category": "noise",
+ "since": "3.0.0",
+ "description": "Removes random grid-aligned blocks from the layer. Animate Strength to take away more and more blocks.",
+ "params": [
+  {
+   "id": "strength",
+   "label": "Strength",
+   "type": "float",
+   "default": 0.75,
+   "min": 0,
+   "max": 1,
+   "step": 0.001
+  },
+  {
+   "id": "blockSize",
+   "label": "Size",
+   "type": "float",
+   "default": 10,
+   "min": 1,
+   "max": 500,
+   "step": 0.1
+  },
+  {
+   "id": "stretch",
+   "label": "Stretch",
+   "type": "point",
+   "default": [
+    1,
+    1
+   ],
+   "min": 0.01,
+   "max": 10,
+   "step": 0.01
+  },
+  {
+   "id": "seed",
+   "label": "Seed",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 5,
+   "step": 0.01
+  },
+  {
+   "id": "fade",
+   "label": "Fade",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 0.5,
+   "step": 0.001
+  },
+  {
+   "id": "offset",
+   "label": "Offset",
+   "type": "point",
+   "default": [
+    0,
+    0
+   ],
+   "min": -5000,
+   "max": 5000,
+   "step": 1,
+   "pixels": true
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float strength;\nuniform float blockSize;\nuniform float2 stretch;\nuniform float seed;\nuniform float fade;\nuniform float2 offset;\nfloat hash12(float2 p) {\n    float3 q = fract(float3(p.xyx) * 0.1031);\n    q += dot(q, q.yzx + 33.33);\n    return fract((q.x + q.y) * q.z);\n}\nfloat2 hash22(float2 p) {\n    float3 q = fract(float3(p.xyx) * float3(0.1031, 0.1030, 0.0973));\n    q += dot(q, q.yzx + 33.33);\n    return fract((q.xx + q.yz) * q.zy);\n}\nhalf4 main(float2 coord) {\n    float2 dims = max(abs(stretch), float2(0.01)) * size.y * max(blockSize, 1.0) / 100.0;\n    float h = hash12(floor((coord - size * 0.5 - offset) / dims) + seed * 11.7);\n    float keep = fade > 0.0 ? smoothstep(strength - fade, strength + fade, h) : step(strength, h);\n    return image.eval(coord) * half(keep);\n}\n"
+}

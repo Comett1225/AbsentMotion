@@ -1,6 +1,7 @@
 package app.absentmotion.ui.camera
 
 import android.Manifest
+import androidx.annotation.StringRes
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ContentValues
@@ -97,9 +98,11 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.compose.ui.res.stringResource
+import app.absentmotion.R
 
-private enum class Flash(val label: String, val mode: Int) {
-    Off("Off", ImageCapture.FLASH_MODE_OFF), Auto("Auto", ImageCapture.FLASH_MODE_AUTO), On("On", ImageCapture.FLASH_MODE_ON),
+private enum class Flash(@StringRes val label: Int, val mode: Int) {
+    Off(R.string.camera_off, ImageCapture.FLASH_MODE_OFF), Auto(R.string.camera_auto, ImageCapture.FLASH_MODE_AUTO), On(R.string.camera_on, ImageCapture.FLASH_MODE_ON),
 }
 
 private val Timers = listOf(0, 3, 10)
@@ -195,12 +198,10 @@ private fun Permitted(onClose: () -> Unit, content: @Composable (mic: Boolean) -
     ) {
         Icon(CameraIcons.Camera, null, Modifier.size(48.dp), tint = Color.White)
         Spacer(Modifier.height(16.dp))
-        Text("Camera access", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.camera_access), color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
         Spacer(Modifier.height(12.dp))
         Text(
-            if (blocked) "Camera access is turned off for AbsentMotion. Turn on Camera (and Microphone for sound) in the app settings to take photos and videos."
-            else "AbsentMotion uses the camera to take photos and record videos for your project, and the microphone to record their sound. " +
-                "They are saved to your gallery in DCIM/AbsentMotion and stay on this device.",
+            stringResource(if (blocked) R.string.camera_permission_blocked else R.string.camera_permission_explain),
             Modifier.widthIn(max = 420.dp), color = Color.White.copy(alpha = 0.8f), fontSize = 15.sp, lineHeight = 21.sp, textAlign = TextAlign.Center,
         )
         Spacer(Modifier.height(24.dp))
@@ -210,9 +211,9 @@ private fun Permitted(onClose: () -> Unit, content: @Composable (mic: Boolean) -
                 else request.launch(arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO))
             }.padding(horizontal = 24.dp),
             Alignment.Center,
-        ) { Text(if (blocked) "Open Settings" else "Allow Camera", color = Am.OnAccent, fontSize = 16.sp, fontWeight = FontWeight.Medium) }
+        ) { Text(stringResource(if (blocked) R.string.camera_open_settings else R.string.camera_allow), color = Am.OnAccent, fontSize = 16.sp, fontWeight = FontWeight.Medium) }
         Box(Modifier.height(48.dp).clickable(onClick = onClose).padding(horizontal = 24.dp), Alignment.Center) {
-            Text("Close", color = Color.White, fontSize = 16.sp)
+            Text(stringResource(R.string.action_close), color = Color.White, fontSize = 16.sp)
         }
     }
 }
@@ -275,7 +276,7 @@ private fun CameraBody(ui: CameraUi, aspect: Float, mic: Boolean, onClose: () ->
     LaunchedEffect(ui.torch, ui.video, hasFlash) { if (hasFlash) controller.enableTorch(ui.torch && ui.video) }
     LaunchedEffect(focusCount) { delay(1200); focusAt = null }
 
-    fun failed(text: String) = Toast.makeText(context, text, Toast.LENGTH_LONG).show()
+    fun failed(@StringRes text: Int) = Toast.makeText(context, context.getString(text), Toast.LENGTH_LONG).show()
 
     fun takePhoto() {
         ui.busy = true
@@ -286,13 +287,13 @@ private fun CameraBody(ui: CameraUi, aspect: Float, mic: Boolean, onClose: () ->
             override fun onImageSaved(output: ImageCapture.OutputFileResults) {
                 ui.busy = false
                 val uri = output.savedUri
-                if (uri == null) failed("Could not save the photo.") else if (!ui.closed) onCaptured(uri, false)
+                if (uri == null) failed(R.string.camera_error_save_photo) else if (!ui.closed) onCaptured(uri, false)
             }
 
             override fun onError(e: ImageCaptureException) {
                 ui.busy = false
                 Log.w("AMCamera", "photo failed", e)
-                failed("Could not take the photo.")
+                failed(R.string.camera_error_photo)
             }
         })
     }
@@ -316,14 +317,14 @@ private fun CameraBody(ui: CameraUi, aspect: Float, mic: Boolean, onClose: () ->
                         if (uri != Uri.EMPTY && event.error in KeptVideo) { if (!ui.closed) onCaptured(uri, true) }
                         else {
                             Log.w("AMCamera", "video failed ${event.error}", event.cause)
-                            failed("Could not save the video.")
+                            failed(R.string.camera_error_save_video)
                         }
                     }
                 }
             }
         } catch (e: RuntimeException) {
             Log.w("AMCamera", "cannot record", e)
-            failed("Could not start recording.")
+            failed(R.string.camera_error_start_recording)
             null
         }
     }
@@ -355,7 +356,7 @@ private fun CameraBody(ui: CameraUi, aspect: Float, mic: Boolean, onClose: () ->
     Column(Modifier.fillMaxSize().systemBarsPadding()) {
         Row(Modifier.fillMaxWidth().height(64.dp).padding(horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.size(56.dp).clickable { if (recording) ui.recording?.stop() else onClose() }, Alignment.Center) {
-                Icon(ChromeIcons.CloseThick, "Close camera", Modifier.size(26.dp), tint = Color.White)
+                Icon(ChromeIcons.CloseThick, stringResource(R.string.camera_close), Modifier.size(26.dp), tint = Color.White)
             }
             Box(Modifier.weight(1f), Alignment.Center) {
                 if (recording) Row(
@@ -369,13 +370,13 @@ private fun CameraBody(ui: CameraUi, aspect: Float, mic: Boolean, onClose: () ->
                 }
             }
             val flashIcon = if (ui.video) (if (ui.torch) CameraIcons.Flash else CameraIcons.FlashOff) else if (ui.flash == Flash.Off) CameraIcons.FlashOff else CameraIcons.Flash
-            TopButton(flashIcon, if (ui.video) (if (ui.torch) "On" else "Off") else ui.flash.label, "Flash", enabled = hasFlash) {
+            TopButton(flashIcon, stringResource(if (ui.video) (if (ui.torch) R.string.camera_on else R.string.camera_off) else ui.flash.label), stringResource(R.string.camera_flash), enabled = hasFlash) {
                 if (ui.video) ui.torch = !ui.torch else ui.flash = Flash.entries[(ui.flash.ordinal + 1) % Flash.entries.size]
             }
-            TopButton(if (ui.timer == 0) CameraIcons.TimerOff else CameraIcons.Timer, if (ui.timer == 0) "Off" else "${ui.timer} s", "Timer", enabled = !locked) {
+            TopButton(if (ui.timer == 0) CameraIcons.TimerOff else CameraIcons.Timer, if (ui.timer == 0) stringResource(R.string.camera_off) else "${ui.timer} s", stringResource(R.string.camera_timer), enabled = !locked) {
                 ui.timer = Timers[(Timers.indexOf(ui.timer) + 1) % Timers.size]
             }
-            TopButton(CameraIcons.Grid, if (ui.grid) "On" else "Off", "Grid") { ui.grid = !ui.grid }
+            TopButton(CameraIcons.Grid, stringResource(if (ui.grid) R.string.camera_on else R.string.camera_off), stringResource(R.string.camera_grid)) { ui.grid = !ui.grid }
         }
         BoxWithConstraints(Modifier.fillMaxWidth().weight(1f), Alignment.Center) {
             val ratio = cameraRatio(aspect, maxHeight > maxWidth)
@@ -415,22 +416,22 @@ private fun CameraBody(ui: CameraUi, aspect: Float, mic: Boolean, onClose: () ->
                     color = Color.White, fontSize = 14.sp,
                 )
                 if (ui.video && !mic) Text(
-                    "No sound: microphone access is off",
+                    stringResource(R.string.no_sound_microphone_access_is_off),
                     Modifier.align(Alignment.TopCenter).padding(10.dp).clip(RoundedCornerShape(12.dp)).background(Color.Black.copy(alpha = 0.5f))
                         .padding(horizontal = 10.dp, vertical = 3.dp),
                     color = Color.White, fontSize = 13.sp,
                 )
                 if (lenses?.let { !it.first && !it.second } == true) Text(
-                    "No camera was found on this device.", Modifier.align(Alignment.Center).padding(16.dp), color = Color.White, fontSize = 16.sp,
+                    stringResource(R.string.no_camera_was_found_on_this), Modifier.align(Alignment.Center).padding(16.dp), color = Color.White, fontSize = 16.sp,
                     textAlign = TextAlign.Center,
                 )
                 Blink(blink)
             }
         }
         Row(Modifier.fillMaxWidth().height(40.dp).alpha(if (locked) 0.35f else 1f), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-            ModeTab("PHOTO", !ui.video, !locked) { ui.video = false }
+            ModeTab(stringResource(R.string.camera_photo), !ui.video, !locked) { ui.video = false }
             Spacer(Modifier.width(24.dp))
-            ModeTab("VIDEO", ui.video, !locked) { ui.video = true }
+            ModeTab(stringResource(R.string.camera_video), ui.video, !locked) { ui.video = true }
         }
         Row(Modifier.fillMaxWidth().height(104.dp), horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.size(64.dp), Alignment.Center) {
@@ -438,14 +439,14 @@ private fun CameraBody(ui: CameraUi, aspect: Float, mic: Boolean, onClose: () ->
                     Modifier.size(52.dp).clip(CircleShape).background(Color.White.copy(alpha = 0.18f))
                         .clickable { if (ui.paused) ui.recording?.resume() else ui.recording?.pause() },
                     Alignment.Center,
-                ) { Icon(if (ui.paused) ChromeIcons.Play else ChromeIcons.Pause, if (ui.paused) "Resume recording" else "Pause recording", Modifier.size(26.dp), tint = Color.White) }
+                ) { Icon(if (ui.paused) ChromeIcons.Play else ChromeIcons.Pause, stringResource(if (ui.paused) R.string.camera_resume_recording else R.string.camera_pause_recording), Modifier.size(26.dp), tint = Color.White) }
             }
             Shutter(ui.video, recording, ui.busy || ui.countdown > 0, ::shutter)
             val canSwitch = lenses?.let { it.first && it.second } == true && !locked
             Box(
                 Modifier.size(64.dp).alpha(if (canSwitch) 1f else 0.35f).clip(CircleShape).clickable(enabled = canSwitch) { ui.front = !ui.front },
                 Alignment.Center,
-            ) { Icon(CameraIcons.Switch, "Switch camera", Modifier.size(30.dp), tint = Color.White) }
+            ) { Icon(CameraIcons.Switch, stringResource(R.string.camera_switch), Modifier.size(30.dp), tint = Color.White) }
         }
     }
 }

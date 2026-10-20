@@ -30,6 +30,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import app.absentmotion.R
 import app.absentmotion.editor.DrawingMode
 import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.FreehandMode
@@ -50,6 +52,13 @@ import kotlinx.coroutines.launch
 import kotlin.math.hypot
 import kotlin.math.min
 import kotlin.math.roundToInt
+
+private fun DrawTool.labelRes() = when (this) {
+    DrawTool.Pen -> R.string.draw_tool_pen
+    DrawTool.Brush -> R.string.draw_tool_brush
+    DrawTool.Fill -> R.string.draw_tool_fill
+    DrawTool.Eraser -> R.string.draw_tool_eraser
+}
 
 private val Bar get() = Am.Button
 
@@ -86,14 +95,16 @@ internal fun DrawingEditor(state: EditorState) {
 private fun DrawingBar(state: EditorState, mode: DrawingMode, modifier: Modifier) {
     val cell = Modifier.width(40.dp).fillMaxHeight()
     Row(modifier.background(Bar), verticalAlignment = Alignment.CenterVertically) {
-        BarButton(ChromeIcons.Back, "Back", cell) { state.leaveDrawing() }
+        BarButton(ChromeIcons.Back, stringResource(R.string.draw_back), cell) { state.leaveDrawing() }
         Text(
-            when { mode is TrackMode -> "Track Motion"; mode is PointMode && mode.vector -> "Pen Tool"; mode is PointMode -> "Edit Points"; else -> "Freehand Brush" },
+            stringResource(
+                when { mode is TrackMode -> R.string.draw_title_track_motion; mode is PointMode && mode.vector -> R.string.add_quick_pen_tool; mode is PointMode -> R.string.draw_title_edit_points; else -> R.string.add_quick_freehand_brush },
+            ),
             Modifier.weight(1f), color = Am.OnDark, fontSize = 15.sp, maxLines = 1,
         )
         val busy = (mode as? TrackMode)?.running == true
-        BarButton(ChromeIcons.Undo, "Undo", cell, enabled = state.canUndo && !busy) { state.undo() }
-        BarButton(ChromeIcons.Redo, "Redo", cell, enabled = state.canRedo && !busy) { state.redo() }
+        BarButton(ChromeIcons.Undo, stringResource(R.string.draw_undo), cell, enabled = state.canUndo && !busy) { state.undo() }
+        BarButton(ChromeIcons.Redo, stringResource(R.string.draw_redo), cell, enabled = state.canRedo && !busy) { state.redo() }
     }
 }
 
@@ -107,19 +118,19 @@ private fun DrawingTimeBar(state: EditorState, mode: DrawingMode, modifier: Modi
     val point = mode as? PointMode
     val keys = point?.let(state::shapeKeyFrames).orEmpty()
     Row(modifier.background(Am.PanelInset), verticalAlignment = Alignment.CenterVertically) {
-        if (point != null) BarButton(ChromeIcons.SkipBack, "Previous shape keyframe", cell, enabled = keys.any { it < state.frame }) {
+        if (point != null) BarButton(ChromeIcons.SkipBack, stringResource(R.string.draw_previous_shape_keyframe), cell, enabled = keys.any { it < state.frame }) {
             keys.lastOrNull { it < state.frame }?.let { state.frame = it.coerceIn(first, last) }
         }
-        BarButton(DrawingIcons.Prev, "Previous frame", cell, enabled = !locked && state.frame > first) { state.frame = (state.frame - 1).coerceAtLeast(first) }
+        BarButton(DrawingIcons.Prev, stringResource(R.string.draw_previous_frame), cell, enabled = !locked && state.frame > first) { state.frame = (state.frame - 1).coerceAtLeast(first) }
         Text(TimelineMath.timecode(state.frame, state.scene.fps), Modifier.weight(1f), color = Am.OnDark, fontSize = 13.sp, maxLines = 1, textAlign = TextAlign.Center)
-        BarButton(DrawingIcons.Next, "Next frame", cell, enabled = !locked && state.frame < last) { state.frame = (state.frame + 1).coerceAtMost(last) }
+        BarButton(DrawingIcons.Next, stringResource(R.string.draw_next_frame), cell, enabled = !locked && state.frame < last) { state.frame = (state.frame + 1).coerceAtMost(last) }
         if (point != null) {
-            BarButton(ChromeIcons.SkipForward, "Next shape keyframe", cell, enabled = keys.any { it > state.frame }) {
+            BarButton(ChromeIcons.SkipForward, stringResource(R.string.draw_next_shape_keyframe), cell, enabled = keys.any { it > state.frame }) {
                 keys.firstOrNull { it > state.frame }?.let { state.frame = it.coerceIn(first, last) }
             }
             val on = state.frame in keys
             Box(cell.clickable { state.toggleShapeKey(point) }, Alignment.Center) {
-                Icon(if (on) PanelIcons.KeyframeRemove else PanelIcons.Keyframe, if (on) "Remove shape keyframe" else "Add shape keyframe",
+                Icon(if (on) PanelIcons.KeyframeRemove else PanelIcons.Keyframe, stringResource(if (on) R.string.draw_remove_shape_keyframe else R.string.draw_add_shape_keyframe),
                     Modifier.size(26.dp), tint = if (keys.isNotEmpty()) Am.Accent else Am.OnDark)
             }
         }
@@ -275,7 +286,7 @@ private fun FreehandPanel(mode: FreehandMode) {
         Column(Modifier.width(59.dp).fillMaxHeight()) {
             for ((tool, icon) in listOf(DrawTool.Pen to DrawingIcons.Pen, DrawTool.Brush to DrawingIcons.Brush, DrawTool.Fill to DrawingIcons.Fill, DrawTool.Eraser to DrawingIcons.Eraser)) {
                 Box(Modifier.weight(1f).fillMaxWidth().clickable { mode.pick(tool) }, Alignment.Center) {
-                    Icon(icon, tool.xml, Modifier.size(26.dp), tint = app.absentmotion.ui.theme.animatedColor(if (mode.tool == tool) Am.Accent else Am.OnDark))
+                    Icon(icon, stringResource(tool.labelRes()), Modifier.size(26.dp), tint = app.absentmotion.ui.theme.animatedColor(if (mode.tool == tool) Am.Accent else Am.OnDark))
                 }
             }
         }

@@ -24,6 +24,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Locale
+import androidx.compose.ui.res.stringResource
+import app.absentmotion.R
 
 @Composable
 internal fun MediaInfoDialog(record: MediaDeclaration, onReplace: ((MediaDeclaration) -> Unit)? = null, onDismiss: () -> Unit) {
@@ -35,7 +37,7 @@ internal fun MediaInfoDialog(record: MediaDeclaration, onReplace: ((MediaDeclara
             scope.launch { mediaDeclaration(context, uri)?.let { onReplace?.invoke(it) } }
         }
     }
-    val rows by produceState(listOf("Name" to record.title, "Dimensions" to "${record.width} x ${record.height}"), record) {
+    val rows by produceState(listOf(R.string.mediainfo_name to record.title, R.string.mediainfo_dimensions to "${record.width} x ${record.height}"), record) {
         value = withContext(Dispatchers.IO) {
             val extractor = MediaExtractor()
             try {
@@ -46,35 +48,35 @@ internal fun MediaInfoDialog(record: MediaDeclaration, onReplace: ((MediaDeclara
                 val seconds = (record.duration / 1_000_000).coerceAtLeast(0)
                 val format = listOfNotNull(video?.getString(MediaFormat.KEY_MIME), audio?.getString(MediaFormat.KEY_MIME)).joinToString("\n")
                 buildList {
-                    add("Name" to record.title)
-                    add("Dimensions" to "${record.width} x ${record.height}")
-                    if (video != null) record.fps?.let { add("Frame Rate" to String.format(Locale.US, "%.02f", it)) }
-                    add("Duration" to String.format(Locale.US, "%03d:%02d:%02d", seconds / 3600, seconds / 60 % 60, seconds % 60))
-                    add("Format" to format.ifEmpty { record.type })
-                    add("Size" to sizeText(record.size.coerceAtLeast(0)))
-                    audio?.getNumber(MediaFormat.KEY_SAMPLE_RATE)?.let { add("Sample Rate" to kilohertz(it.toFloat() / 1000)) }
+                    add(R.string.mediainfo_name to record.title)
+                    add(R.string.mediainfo_dimensions to "${record.width} x ${record.height}")
+                    if (video != null) record.fps?.let { add(R.string.mediainfo_frame_rate to String.format(Locale.US, "%.02f", it)) }
+                    add(R.string.mediainfo_duration to String.format(Locale.US, "%03d:%02d:%02d", seconds / 3600, seconds / 60 % 60, seconds % 60))
+                    add(R.string.mediainfo_format to format.ifEmpty { record.type })
+                    add(R.string.mediainfo_size to sizeText(record.size.coerceAtLeast(0)))
+                    audio?.getNumber(MediaFormat.KEY_SAMPLE_RATE)?.let { add(R.string.mediainfo_sample_rate to kilohertz(it.toFloat() / 1000)) }
                 }
             } catch (_: Exception) {
-                listOf("Name" to record.title, "Dimensions" to "${record.width} x ${record.height}", "Format" to record.type)
+                listOf(R.string.mediainfo_name to record.title, R.string.mediainfo_dimensions to "${record.width} x ${record.height}", R.string.mediainfo_format to record.type)
             } finally { extractor.release() }
         }
     }
-    AlertDialog(onDismissRequest = onDismiss, title = { Text("Media Info") },
+    AlertDialog(onDismissRequest = onDismiss, title = { Text(stringResource(R.string.media_info)) },
         text = {
             Column {
                 for ((name, value) in rows) Row(Modifier.fillMaxWidth()) {
-                    Text(name, Modifier.width(100.dp).padding(end = 15.dp), fontSize = 14.sp)
+                    Text(stringResource(name), Modifier.width(100.dp).padding(end = 15.dp), fontSize = 14.sp)
                     Text(value, Modifier.weight(1f), fontSize = 14.sp)
                 }
                 Text(
-                    "Swap media file", Modifier.fillMaxWidth().padding(top = 12.dp).alpha(if (onReplace == null) 0.35f else 1f)
+                    stringResource(R.string.swap_media_file), Modifier.fillMaxWidth().padding(top = 12.dp).alpha(if (onReplace == null) 0.35f else 1f)
                         .clickable(enabled = onReplace != null) {
                             picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.SingleMimeType(record.type.substringBefore('/', "image") + "/*")))
                         },
                     color = Am.Accent, fontSize = 14.sp,
                 )
             }
-        }, confirmButton = { TextButton(onClick = onDismiss) { Text("OK", color = Am.Accent) } }, containerColor = Am.Field, titleContentColor = Am.OnDark, textContentColor = Am.OnDark)
+        }, confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.ok), color = Am.Accent) } }, containerColor = Am.Field, titleContentColor = Am.OnDark, textContentColor = Am.OnDark)
 }
 
 private fun sizeText(bytes: Long): String {

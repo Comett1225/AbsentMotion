@@ -1,0 +1,49 @@
+{
+ "id": "lensblur",
+ "name": "Lens Blur",
+ "category": "blur",
+ "since": "3.0.0",
+ "description": "A spinning blur that leaves a sharp area around the centre and grows towards the edges.",
+ "params": [
+  {
+   "id": "center",
+   "label": "Center",
+   "type": "point",
+   "default": [
+    0.5,
+    0.5
+   ],
+   "min": -1,
+   "max": 2,
+   "step": 0.01
+  },
+  {
+   "id": "sweep",
+   "label": "Angle",
+   "type": "angle",
+   "default": 10,
+   "min": 0,
+   "max": 360,
+   "step": 0.1
+  },
+  {
+   "id": "radius",
+   "label": "Radius",
+   "type": "float",
+   "default": 0.25,
+   "min": 0,
+   "max": 2,
+   "step": 0.001
+  },
+  {
+   "id": "feather",
+   "label": "Feather",
+   "type": "float",
+   "default": 0.25,
+   "min": 0,
+   "max": 2,
+   "step": 0.001
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float2 center;\nuniform float sweep;\nuniform float radius;\nuniform float feather;\nhalf4 main(float2 coord) {\n    float2 c = center * size;\n    float2 d = coord - c;\n    float k = smoothstep(radius, radius + feather + 0.0001, length(d) / (0.5 * min(size.x, size.y)));\n    float span = radians(sweep) * k;\n    if (span <= 0.0) return image.eval(coord);\n    half4 sum = half4(0.0);\n    for (int i = 0; i < 48; i++) {\n        float a = span * (float(i) / 47.0 - 0.5);\n        sum += image.eval(c + float2(cos(a) * d.x - sin(a) * d.y, sin(a) * d.x + cos(a) * d.y));\n    }\n    return sum / 48.0;\n}\n"
+}

@@ -1,0 +1,52 @@
+{
+ "id": "bumpmap",
+ "name": "Bump Map",
+ "category": "stylize",
+ "since": "3.0.0",
+ "description": "Lights the layer as if its brightness were a raised surface, for an embossed, textured look that keeps the colours.",
+ "params": [
+  {
+   "id": "angle",
+   "label": "Light Angle",
+   "type": "angle",
+   "default": 135,
+   "min": -3600,
+   "max": 3600,
+   "step": 0.5
+  },
+  {
+   "id": "height",
+   "label": "Height",
+   "type": "float",
+   "default": 4,
+   "min": 0,
+   "max": 30,
+   "step": 0.01
+  },
+  {
+   "id": "ambient",
+   "label": "Ambient",
+   "type": "float",
+   "default": 0.4,
+   "min": 0,
+   "max": 1,
+   "step": 0.001
+  },
+  {
+   "id": "shine",
+   "label": "Shine",
+   "type": "float",
+   "default": 0.3,
+   "min": 0,
+   "max": 1,
+   "step": 0.001
+  },
+  {
+   "id": "light",
+   "label": "Light Color",
+   "type": "color",
+   "default": "#ffffff"
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float angle;\nuniform float height;\nuniform float ambient;\nuniform float shine;\nlayout(color) uniform half4 light;\nfloat lum(float2 at) {\n    half4 c = image.eval(at);\n    return c.a > 0.0 ? dot(float3(c.rgb), float3(0.2126, 0.7152, 0.0722)) : 0.0;\n}\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return src;\n    float dx = lum(coord + float2(1.0, 0.0)) - lum(coord - float2(1.0, 0.0));\n    float dy = lum(coord + float2(0.0, 1.0)) - lum(coord - float2(0.0, 1.0));\n    float3 n = normalize(float3(-dx * height, -dy * height, 1.0));\n    float a = radians(angle);\n    float3 l = normalize(float3(cos(a), -sin(a), 1.0));\n    float diffuse = max(dot(n, l), 0.0);\n    float spec = pow(max(dot(reflect(-l, n), float3(0.0, 0.0, 1.0)), 0.0), 24.0) * shine;\n    float3 base = float3(src.rgb) / float(src.a);\n    float3 lit = base * float3(light.rgb) * (ambient + (1.0 - ambient) * diffuse / l.z) + float3(light.rgb) * spec;\n    return half4(half3(clamp(lit, 0.0, 1.0)) * src.a, src.a);\n}\n"
+}

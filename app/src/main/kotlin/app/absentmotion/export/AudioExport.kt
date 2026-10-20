@@ -4,6 +4,8 @@ import android.media.MediaCodec
 import android.media.MediaFormat
 import android.media.MediaMuxer
 import android.system.Os
+import app.absentmotion.R
+import app.absentmotion.i18n.txt
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.currentCoroutineContext
@@ -24,11 +26,11 @@ import kotlin.concurrent.thread
 import kotlin.math.roundToInt
 
 internal class Mp3Encoder(rate: Int, channels: Int, kbps: Int) : Closeable {
-    private var handle = nativeOpen(rate, channels, kbps).also { check(it != 0L) { "The MP3 encoder cannot use $rate Hz at $kbps kbps" } }
+    private var handle = nativeOpen(rate, channels, kbps).also { exportCheck(it != 0L) { txt(R.string.export_error_mp3_settings, rate.toString(), kbps.toString()) } }
 
-    fun encode(pcm: ShortArray, frames: Int): ByteArray = nativeEncode(handle, pcm, frames) ?: error("The MP3 encoder failed")
+    fun encode(pcm: ShortArray, frames: Int): ByteArray = nativeEncode(handle, pcm, frames) ?: throw ExportError(txt(R.string.export_error_mp3))
 
-    fun flush(): ByteArray = nativeFlush(handle) ?: error("The MP3 encoder failed")
+    fun flush(): ByteArray = nativeFlush(handle) ?: throw ExportError(txt(R.string.export_error_mp3))
 
     fun tag(): ByteArray = nativeTag(handle) ?: ByteArray(0)
 

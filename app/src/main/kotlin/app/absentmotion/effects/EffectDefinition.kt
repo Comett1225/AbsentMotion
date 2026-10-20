@@ -19,6 +19,7 @@ data class EffectParam(
     val percent: Boolean = false,
     val options: List<String> = emptyList(),
     val pixels: Boolean = false,
+    val unit: String = "",
 ) {
     val type: String get() = when (kind) { "point" -> "vec2"; "color" -> "color"; "switch" -> "bool"; "text" -> "string"; else -> "float" }
 
@@ -49,7 +50,7 @@ data class EffectParam(
             }
             return EffectParam(id, json.optString("label", id), kind, default,
                 json.optDouble("min", -Float.MAX_VALUE.toDouble()).toFloat(), json.optDouble("max", Float.MAX_VALUE.toDouble()).toFloat(),
-                json.optDouble("step", 0.01).toFloat(), json.optBoolean("percent"), pixels = json.optBoolean("pixels"))
+                json.optDouble("step", 0.01).toFloat(), percent = json.optBoolean("percent"), pixels = json.optBoolean("pixels"), unit = json.optString("unit"))
         }
     }
 }

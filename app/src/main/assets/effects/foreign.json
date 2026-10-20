@@ -562,5 +562,323 @@
     "max": 1
    }
   }
+ },
+ "absent.autoshake": {
+  "to": "autoshake",
+  "params": {
+   "rotation": {}
+  }
+ },
+ "absent.randomdisplace": {
+  "to": "randomdisplace",
+  "params": {
+   "speed": {}
+  }
+ },
+ "absent.randomjitter": {
+  "to": "randomjitter",
+  "params": {
+   "rate": {
+    "to": "frequency",
+    "min": 1,
+    "max": 60
+   }
+  }
+ },
+ "absent.swing": {
+  "to": "swing",
+  "params": {
+   "angle": [
+    {
+     "to": "angle1",
+     "scale": -1,
+     "component": 0
+    },
+    {
+     "to": "angle2",
+     "component": 0
+    }
+   ],
+   "phase": {
+    "to": "phase",
+    "scale": 2,
+    "min": 0,
+    "max": 2
+   }
+  }
+ },
+ "absent.spin": {
+  "to": "spin",
+  "params": {
+   "speed": {
+    "to": "rpm",
+    "scale": 0.16666667
+   },
+   "direction": {
+    "neutral": 0
+   }
+  }
+ },
+ "absent.pulsesize": {
+  "to": "pulsesize",
+  "params": {
+   "amount": [
+    {
+     "to": "shrink",
+     "scale": -1,
+     "offset": 1,
+     "min": 0,
+     "max": 1,
+     "component": 0
+    },
+    {
+     "to": "grow",
+     "offset": 1,
+     "min": 1,
+     "max": 2,
+     "component": 0
+    }
+   ],
+   "phase": {
+    "to": "phase",
+    "scale": 2,
+    "min": 0,
+    "max": 2
+   }
+  }
+ },
+ "absent.stretchaxis": {
+  "to": "stretchaxis",
+  "params": {
+   "amount": {
+    "to": "scale",
+    "min": 0.01,
+    "max": 50
+   }
+  }
+ },
+ "absent.pulseopacity": {
+  "to": "pulseopacity",
+  "params": {
+   "minimum": {
+    "to": "strength",
+    "scale": -1,
+    "offset": 1,
+    "min": 0,
+    "max": 1
+   },
+   "phase": {
+    "to": "phase",
+    "scale": 2,
+    "offset": 0.5,
+    "wrap": 2
+   }
+  }
+ },
+ "com.alightcreative.effects.shake2": {
+  "to": "autoshake",
+  "params": {
+   "mag": {
+    "to": "magnitude"
+   },
+   "freq": {
+    "to": "frequency"
+   },
+   "evolution": {
+    "to": "evolution"
+   },
+   "seed": {
+    "to": "seed"
+   },
+   "angle": {
+    "to": "angle"
+   },
+   "slack": {
+    "to": "slack"
+   },
+   "zshake": {
+    "to": "zshake"
+   }
+  }
+ },
+ "com.alightcreative.effects.randomdisplace": {
+  "to": "randomdisplace",
+  "params": {
+   "mag": {
+    "to": "magnitude"
+   },
+   "evolution": {
+    "to": "evolution"
+   },
+   "seed": {
+    "to": "seed"
+   },
+   "scatter": {
+    "to": "scatter"
+   }
+  }
+ },
+ "com.alightcreative.effects.jitter": {
+  "to": "randomjitter",
+  "params": {
+   "freq": {
+    "to": "frequency"
+   },
+   "mag": {
+    "to": "magnitude"
+   },
+   "angle": {
+    "to": "angle"
+   },
+   "seed": {
+    "to": "seed"
+   },
+   "slack": {
+    "to": "slack"
+   },
+   "zjitter": {
+    "to": "zjitter"
+   }
+  }
+ },
+ "com.alightcreative.effects.oscillate3": {
+  "to": "oscillate",
+  "params": {
+   "direction": {
+    "to": "direction",
+    "min": 0,
+    "max": 2
+   },
+   "angle": {
+    "to": "angle"
+   },
+   "freq": {
+    "to": "frequency"
+   },
+   "mag": {
+    "to": "magnitude"
+   },
+   "type": {
+    "to": "wave",
+    "min": 0,
+    "max": 1
+   },
+   "phase": {
+    "to": "phase"
+   }
+  }
+ },
+ "com.alightcreative.effects.pulsate2": {
+  "to": "pulsesize",
+  "params": {
+   "freq": {
+    "to": "frequency"
+   },
+   "minsize": {
+    "to": "shrink"
+   },
+   "maxsize": {
+    "to": "grow"
+   },
+   "phase": {
+    "to": "phase"
+   },
+   "type": {
+    "to": "wave",
+    "min": 0,
+    "max": 1
+   }
+  }
+ },
+ "com.alightcreative.effects.pulseopacity2": {
+  "to": "pulseopacity",
+  "params": {
+   "freq": {
+    "to": "frequency"
+   },
+   "strength": {
+    "to": "strength"
+   },
+   "phase": {
+    "to": "phase"
+   },
+   "type": {
+    "to": "wave",
+    "min": 0,
+    "max": 1
+   }
+  }
+ },
+ "com.alightcreative.effects.swing2": {
+  "to": "swing",
+  "params": {
+   "freq": {
+    "to": "frequency"
+   },
+   "a1": {
+    "to": "angle1"
+   },
+   "a2": {
+    "to": "angle2"
+   },
+   "phase": {
+    "to": "phase"
+   },
+   "type": {
+    "to": "wave",
+    "min": 0,
+    "max": 1
+   }
+  }
+ },
+ "com.alightcreative.effects.spin": {
+  "to": "spin",
+  "params": {
+   "rpm": {
+    "to": "rpm"
+   }
+  }
+ },
+ "com.alightcreative.effects.stretch2": {
+  "to": "stretchaxis",
+  "params": {
+   "scale": {
+    "to": "scale"
+   },
+   "angle": {
+    "to": "angle"
+   },
+   "contentOnly": {
+    "to": "mask"
+   }
+  }
+ },
+ "com.alightcreative.effects.offset": {
+  "to": "offset",
+  "params": {
+   "feather": {
+    "to": "feather"
+   },
+   "mask": {
+    "to": "mask"
+   }
+  }
+ },
+ "com.alightcreative.effect.movealongpath3": {
+  "to": "movealongpath",
+  "params": {
+   "progress": {
+    "to": "progress"
+   },
+   "angle": {
+    "to": "orientation"
+   },
+   "tangent": {
+    "to": "rotate"
+   },
+   "inset": {
+    "to": "inset"
+   }
+  }
  }
 }

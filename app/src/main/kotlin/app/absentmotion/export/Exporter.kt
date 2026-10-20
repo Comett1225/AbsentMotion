@@ -1,5 +1,7 @@
 package app.absentmotion.export
 
+import app.absentmotion.R
+import app.absentmotion.i18n.txt
 import app.absentmotion.platform.Context
 import app.absentmotion.platform.Bitmap
 import app.absentmotion.platform.Uri
@@ -48,7 +50,7 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
                         }.verified(kind, scene, f, mix != null)
                     }
                     ExportKind.Audio -> {
-                        val mix = ExportAudio.mixFor?.invoke(scene, audioRate(s)) ?: error("This project has no sound to export.")
+                        val mix = ExportAudio.mixFor?.invoke(scene, audioRate(s)) ?: throw ExportError(txt(R.string.export_error_no_sound))
                         try {
                             direct(saved, name, s.audioFormat.ext, s.audioFormat.mime, "Music/$AppFolder") { fd ->
                                 exportAudio(s, (scene.totalTime + 1) * 1000L, mix, fd, progress)
@@ -62,7 +64,7 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
                         val shape = if (kind == ExportKind.Frame) s.copy(image = ImageKind.Png) else s
                         single(saved, name, shape.image.ext, shape.image.mime, "Pictures/$AppFolder") { out ->
                             engine.exportSession(xml) {
-                                val bytes = still(scene.frameStart(frame), scene.width, scene.height) ?: error("The engine could not draw the frame")
+                                val bytes = still(scene.frameStart(frame), scene.width, scene.height) ?: throw ExportError(txt(R.string.export_error_draw_still))
                                 out.write(encode(bytes, scene.width, scene.height, shape, reuse = null))
                             }
                         }
@@ -123,7 +125,7 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
                 val writer = GifWriter(stream, width, height)
                 for (k in 0 until frames) {
                     currentCoroutineContext().ensureActive()
-                    val pixels = still(frameTimeMs(scene, s.fps, k), width, height) ?: error("The engine could not draw frame $k")
+                    val pixels = still(frameTimeMs(scene, s.fps, k), width, height) ?: throw ExportError(txt(R.string.export_error_draw_frame, k.toString()))
                     withContext(Dispatchers.Default) { writer.frame(ImageEncode.flatten(pixels, s.background), (k + 1) * 1000L / s.fps) }
                     progress((k + 1f) / frames)
                     if (k % 30 == 0) ensureStorage()
@@ -142,7 +144,7 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
             engine.exportSession(xml, s.interpolation, s.fps) {
                 for (k in 0 until frames) {
                     currentCoroutineContext().ensureActive()
-                    val pixels = still(frameTimeMs(scene, s.fps, k), width, height) ?: error("The engine could not draw frame $k")
+                    val pixels = still(frameTimeMs(scene, s.fps, k), width, height) ?: throw ExportError(txt(R.string.export_error_draw_frame, k.toString()))
                     val bytes = withContext(Dispatchers.Default) { encode(pixels, width, height, s, bitmap) }
                     save(saved, name, sequenceFrameName(k, s.image.ext), s.image.mime) { it.write(bytes) }
                     progress((k + 1f) / frames)

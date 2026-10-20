@@ -1,0 +1,64 @@
+{
+ "id": "voronoicells",
+ "name": "Voronoi Cells",
+ "category": "stylize",
+ "since": "3.0.0",
+ "description": "Fills the opaque parts of the layer with a pattern of cells around randomly placed points.",
+ "params": [
+  {
+   "id": "scale",
+   "label": "Scale",
+   "type": "float",
+   "default": 1,
+   "min": 0.01,
+   "max": 100,
+   "step": 0.01
+  },
+  {
+   "id": "phase",
+   "label": "Phase",
+   "type": "float",
+   "default": 0,
+   "min": -99,
+   "max": 99,
+   "step": 0.001
+  },
+  {
+   "id": "lineWidth",
+   "label": "Line Width",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.001
+  },
+  {
+   "id": "color1",
+   "label": "Color 1",
+   "type": "color",
+   "default": "#000000"
+  },
+  {
+   "id": "color2",
+   "label": "Color 2",
+   "type": "color",
+   "default": "#ffffff"
+  },
+  {
+   "id": "lineColor",
+   "label": "Line Color",
+   "type": "color",
+   "default": "#000000"
+  },
+  {
+   "id": "seed",
+   "label": "Seed",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 5,
+   "step": 0.01
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float scale;\nuniform float phase;\nuniform float lineWidth;\nlayout(color) uniform half4 color1;\nlayout(color) uniform half4 color2;\nlayout(color) uniform half4 lineColor;\nuniform float seed;\nfloat hash12(float2 p) {\n    float3 q = fract(float3(p.xyx) * 0.1031);\n    q += dot(q, q.yzx + 33.33);\n    return fract((q.x + q.y) * q.z);\n}\nfloat2 hash22(float2 p) {\n    float3 q = fract(float3(p.xyx) * float3(0.1031, 0.1030, 0.0973));\n    q += dot(q, q.yzx + 33.33);\n    return fract((q.xx + q.yz) * q.zy);\n}\nfloat2 site(float2 n) {\n    float2 h = hash22(n + seed * 19.19);\n    float2 w = hash22(n + 71.3 + seed * 3.7);\n    return 0.5 + 0.42 * float2(sin(6.2831853 * (phase * (0.5 + w.x) + h.x)), cos(6.2831853 * (phase * (0.5 + w.y) + h.y)));\n}\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return src;\n    float cell = size.y * max(scale, 0.01) / 13.0;\n    float2 x = (coord - size * 0.5) / cell;\n    float2 n = floor(x);\n    float2 f = x - n;\n    float2 best = float2(0.0);\n    float2 bestCell = float2(0.0);\n    float d1 = 8.0;\n    for (int j = -1; j <= 1; j++) {\n        for (int i = -1; i <= 1; i++) {\n            float2 g = float2(float(i), float(j));\n            float2 r = g + site(n + g) - f;\n            float d = dot(r, r);\n            if (d < d1) { d1 = d; best = r; bestCell = n + g; }\n        }\n    }\n    float edge = 8.0;\n    for (int j = -2; j <= 2; j++) {\n        for (int i = -2; i <= 2; i++) {\n            float2 g = float2(float(i), float(j));\n            float2 r = g + site(n + g) - f;\n            float2 diff = r - best;\n            if (dot(diff, diff) > 0.00001) edge = min(edge, dot(0.5 * (best + r), normalize(diff)));\n        }\n    }\n    float3 fill = mix(float3(color1.rgb), float3(color2.rgb), hash12(bestCell + seed * 5.3 + 0.37));\n    float line = lineWidth > 0.0 ? 1.0 - smoothstep(lineWidth * 0.5 - 0.5 / cell, lineWidth * 0.5 + 0.5 / cell, edge) : 0.0;\n    float3 rgb = mix(fill, float3(lineColor.rgb), line * float(lineColor.a));\n    return half4(half3(rgb) * src.a, src.a);\n}\n"
+}

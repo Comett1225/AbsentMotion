@@ -71,6 +71,8 @@ import kotlin.math.roundToInt
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import androidx.compose.ui.res.stringResource
+import app.absentmotion.R
 
 @Composable
 fun Preview(state: EditorState, modifier: Modifier = Modifier) {
@@ -311,7 +313,7 @@ private fun SwipeHint(label: String, modifier: Modifier) {
             }
         }
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text("Drag to Adjust", color = Color.White, fontSize = 11.sp, lineHeight = 14.sp, maxLines = 1)
+            Text(stringResource(R.string.drag_to_adjust), color = Color.White, fontSize = 11.sp, lineHeight = 14.sp, maxLines = 1)
             Text(label, color = Am.Accent, fontSize = 15.sp, lineHeight = 19.sp, fontWeight = FontWeight.Bold, maxLines = 1)
         }
     }

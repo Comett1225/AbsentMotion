@@ -1,5 +1,7 @@
 package app.absentmotion.ai
 
+import app.absentmotion.R
+import app.absentmotion.i18n.AppText
 import app.absentmotion.platform.Context
 import app.absentmotion.platform.captionTextHeight
 import app.absentmotion.platform.loadCaptionLibrary
@@ -125,15 +127,15 @@ internal suspend fun recogniseCaptions(
         layer.node.with("hidden", null).let { it.copy(children = it.children.filterNot { c -> c.name == "gain" }) }))
     val startMs = layer?.startTime ?: 0
     val endMs = (layer?.endTime ?: scene.totalTime) + 1
-    val mix = OfflineMix.of(context, source, Resampler.ULTRA) ?: error("There is no sound to caption")
+    val mix = OfflineMix.of(context, source, Resampler.ULTRA) ?: error(AppText.get(R.string.ai_no_sound_to_caption))
     val pcm = try {
-        withContext(Dispatchers.IO) { speechPcm(mix, startMs, endMs) { progress(0.15f * it, "Reading the audio…") } }
+        withContext(Dispatchers.IO) { speechPcm(mix, startMs, endMs) { progress(0.15f * it, AppText.get(R.string.ai_reading_audio)) } }
     } finally {
         (mix as? Closeable)?.close()
     }
-    val words = Whisper.transcribe(CaptionModel.file(context), pcm, style.english) { progress(0.15f + 0.85f * it / 100f, "Recognising speech…") }
+    val words = Whisper.transcribe(CaptionModel.file(context), pcm, style.english) { progress(0.15f + 0.85f * it / 100f, AppText.get(R.string.ai_recognising_speech)) }
     return chunkWords(words.map { Word(it.text, min(it.startMs + startMs, endMs - 1), min(it.endMs + startMs, endMs)) }, style.maxWords)
-        .ifEmpty { error("No speech was found") }
+        .ifEmpty { error(AppText.get(R.string.ai_no_speech)) }
 }
 
 internal suspend fun speechPcm(mix: AudioMix, startMs: Int, endMs: Int, progress: (Float) -> Unit): FloatArray {
@@ -182,12 +184,12 @@ internal object Whisper {
 
     suspend fun transcribe(model: File, pcm: FloatArray, english: Boolean, progress: (Int) -> Unit): List<Word> = withContext(Dispatchers.Default) {
         val handle = nativeOpen(model.path)
-        check(handle != 0L) { "The caption model could not be loaded. Remove it in Settings and try again." }
+        check(handle != 0L) { AppText.get(R.string.ai_caption_model_load_failed) }
         try {
             val stop = launch(start = CoroutineStart.UNDISPATCHED) { try { awaitCancellation() } finally { nativeCancel(handle) } }
             val text = try { nativeRun(handle, pcm, english) { progress(it) } } finally { stop.cancelAndJoin() }
             ensureActive()
-            checkNotNull(text) { "Speech recognition failed" }.toString(Charsets.UTF_8).lineSequence().mapNotNull { line ->
+            checkNotNull(text) { AppText.get(R.string.ai_speech_failed) }.toString(Charsets.UTF_8).lineSequence().mapNotNull { line ->
                 val parts = line.split('\t', limit = 3)
                 val word = parts.getOrNull(2)?.trim().orEmpty()
                 if (word.isEmpty()) null else Word(word, parts[0].toInt(), parts[1].toInt())
@@ -212,12 +214,12 @@ internal object CaptionModel {
         val target = file(context)
         val part = File(target.path + ".part")
         try {
-            check(target.parentFile!!.let { it.isDirectory || it.mkdirs() }) { "Cannot create model storage" }
+            check(target.parentFile!!.let { it.isDirectory || it.mkdirs() }) { AppText.get(R.string.ai_cannot_create_model_storage) }
             val connection = URL(SOURCE).openConnection() as HttpURLConnection
             try {
                 connection.connectTimeout = 15_000
                 connection.readTimeout = 30_000
-                check(connection.responseCode == HttpURLConnection.HTTP_OK) { "The download failed (HTTP ${connection.responseCode})" }
+                check(connection.responseCode == HttpURLConnection.HTTP_OK) { AppText.get(R.string.ai_download_failed_http, connection.responseCode.toString()) }
                 connection.inputStream.use { input ->
                     part.outputStream().use { output ->
                         val buffer = ByteArray(64 * 1024)
@@ -228,7 +230,7 @@ internal object CaptionModel {
                             if (count < 0) break
                             output.write(buffer, 0, count)
                             done += count
-                            check(done <= BYTES) { "The download was not the caption model" }
+                            check(done <= BYTES) { AppText.get(R.string.ai_download_not_model) }
                             progress(done.toFloat() / BYTES)
                         }
                     }
@@ -236,8 +238,8 @@ internal object CaptionModel {
             } finally {
                 connection.disconnect()
             }
-            check(part.length() == BYTES) { "The download was incomplete. Please try again." }
-            check(part.renameTo(target)) { "Cannot save the caption model" }
+            check(part.length() == BYTES) { AppText.get(R.string.ai_download_incomplete) }
+            check(part.renameTo(target)) { AppText.get(R.string.ai_cannot_save_model) }
         } finally {
             part.delete()
         }
