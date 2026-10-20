@@ -123,6 +123,8 @@
  "pulsesize",
  "pulseopacity",
  "stretchaxis",
+ "offset",
+ "movealongpath",
  "echo",
  "timequant",
  "shutterblur",

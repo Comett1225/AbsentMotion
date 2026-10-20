@@ -2,6 +2,8 @@
 #include "include/core/SkSamplingOptions.h"
 #include "include/effects/SkImageFilters.h"
 
+#include "include/core/SkPathMeasure.h"
+
 #include <algorithm>
 #include <cmath>
 #include <cstring>
@@ -18,7 +20,7 @@ constexpr double kTau = 6.283185307179586;
 
 const char* const kMotionIds[] = {"absent.autoshake", "absent.randomdisplace", "absent.randomjitter", "absent.oscillate",
                                   "absent.swing", "absent.spin", "absent.pulsesize", "absent.pulseopacity",
-                                  "absent.echo", "absent.timequant", "absent.shutterblur"};
+                                  "absent.echo", "absent.timequant", "absent.shutterblur", "absent.movealongpath"};
 
 bool gFastShutter = false;
 
@@ -427,6 +429,41 @@ float MotionOpacity(const Layer& l, double timeMs) {
         opacity *= low + (1 - low) * (float)(0.5 + 0.5 * w);
     }
     return opacity;
+}
+
+bool FollowsPath(const Layer& l) {
+    return !l.placed && std::any_of(l.effects.begin(), l.effects.end(), [](const LayerEffect& e) { return !e.hidden && e.id == "absent.movealongpath"; });
+}
+
+void FollowPath(const Layer& l, double timeMs, const SkPath& path, Placement* p) {
+    for (const LayerEffect& e : l.effects) {
+        if (e.hidden || e.id != "absent.movealongpath") continue;
+        const float t = l.localTime(timeMs);
+        std::vector<double> lengths;
+        double total = 0;
+        SkPathMeasure measure(path, false);
+        do {
+            lengths.push_back(measure.getLength());
+            total += lengths.back();
+        } while (measure.nextContour());
+        if (!(total > 0)) return;
+        double at = std::clamp((double)Param(e, "progress", t, 0), 0.0, 1.0) * total;
+        SkPathMeasure walk(path, false);
+        for (size_t i = 0; i + 1 < lengths.size() && (at > lengths[i] || !(lengths[i] > 0)); i++) {
+            at -= lengths[i];
+            walk.nextContour();
+        }
+        SkPoint pos;
+        SkVector tangent;
+        if (!walk.getPosTan((SkScalar)at, &pos, &tangent)) return;
+        SkVector out{tangent.fY, -tangent.fX};
+        if (path.contains(pos.fX + out.fX * 0.5f, pos.fY + out.fY * 0.5f)) out = -out;
+        const float turn = (Param(e, "rotate", t, 1) >= 0.5f ? (float)(std::atan2(tangent.fY, tangent.fX) * 360 / kTau) : 0.0f) + Param(e, "orientation", t, 0);
+        const SkVector shift = SkMatrix::RotateDeg(turn).mapVector(Param(e, "offset", t, 0, 0), Param(e, "offset", t, 0, 1));
+        p->location = pos + out * Param(e, "inset", t, 0) + shift;
+        p->rotation += turn;
+        return;
+    }
 }
 
 bool EchoOf(const Layer& l, double timeMs, Echo* echo) {

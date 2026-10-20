@@ -26,13 +26,13 @@ class MoveEffectsTest {
     @Test fun theMoveCategoryHoldsTheMotionEffects() {
         val moves = catalog.listed("move").map { it.key }.toSet()
         assertEquals(setOf("autoshake", "randomdisplace", "randomjitter", "oscillate", "swing", "spin", "pulsesize", "pulseopacity",
-            "stretchaxis", "echo", "timequant", "shutterblur"), moves)
-        assertEquals(setOf("stretchaxis"), catalog.listed("move").filterNot { it.native && it.sksl == null }.map { it.key }.toSet())
+            "stretchaxis", "offset", "movealongpath", "echo", "timequant", "shutterblur"), moves)
+        assertEquals(setOf("stretchaxis", "offset"), catalog.listed("move").filterNot { it.native && it.sksl == null }.map { it.key }.toSet())
         assertEquals("Move", EffectCatalog.Categories["move"])
     }
 
     private fun params(key: String) = catalog.find("absent.$key")!!.params.map { p ->
-        listOf(p.label, p.kind, p.default, if (p.kind in setOf("float", "angle")) "${p.min}..${p.max}" else p.options.joinToString("/"), p.unit + if (p.percent) "%" else "")
+        listOf(p.label, p.kind, p.default, if (p.kind in setOf("float", "angle", "point")) "${p.min}..${p.max}" else p.options.joinToString("/"), p.unit + if (p.percent) "%" else "")
     }
 
     private fun row(label: String, kind: String, default: String, range: String = "", unit: String = "") = listOf(label, kind, default, range, unit)
@@ -57,6 +57,11 @@ class MoveEffectsTest {
             row("Grow", "float", "1.100000", "1.0..2.0"), row("Starting Phase", "float", "0.000000", "0.0..2.0"), wave), params("pulsesize"))
         assertEquals(listOf(row("Scale", "float", "1.000000", "0.01..50.0"), row("Angle", "angle", "0.000000", "-3600.0..3600.0"),
             row("Mask To Layer", "switch", "false")), params("stretchaxis"))
+        assertEquals(listOf(row("Offset", "point", "0.000000,0.000000", "-5000.0..5000.0"), row("Feather", "float", "0.000000", "0.0..1.0"),
+            row("Mask To Layer", "switch", "false")), params("offset"))
+        assertEquals(listOf(row("Progress", "float", "0.000000", "0.0..1.0", "%"), row("Orientation", "angle", "0.000000", "-3600.0..3600.0"),
+            row("Rotate Automatically", "switch", "true"), row("Inset/Outset", "float", "0.000000", "-500.0..500.0"),
+            row("Offset", "point", "0.000000,0.000000", "-5000.0..5000.0")), params("movealongpath"))
     }
 
     private fun older(effect: String, vararg values: Pair<String, String>) = XmlNode("effect", mapOf("id" to "absent.$effect", "hidden" to "false"),

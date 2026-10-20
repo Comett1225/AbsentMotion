@@ -119,6 +119,21 @@ def motion_cases():
     yield 'oscillate orbit turns clockwise', engine.scene(dot(fx('oscillate', direction=2, angle=0, frequency=0.5, magnitude=50))), [((100, 150), red), ((150, 100), black)], 15
     yield 'swing phase 0.5 starts at angle 2', engine.scene(dot(fx('swing', angle1=0, angle2=90, frequency=0, phase=0.5), 60, 8)), [((100, 150), red), ((150, 100), black)], 0
     yield 'pulse size phase 0.5 starts at grow', engine.scene(dot(fx('pulsesize', shrink=0.5, grow=1.5, frequency=0, phase=0.5), 40, 40)), [((155, 100), red), ((165, 100), black)], 0
+    blue = engine.BLUE
+    halves = lambda extra: engine.scene('<embedScene id="1" startTime="0" endTime="1000">' + engine.transform('100,100,0') + extra
+                                        + '<scene width="200" height="200" fps="30" totalTime="1000" retime="off">' + engine.rect(2, 50, 100, 50, 100, 0xffff0000)
+                                        + engine.rect(3, 150, 100, 50, 100, 0xff00ff00) + '</scene></embedScene>')
+    shift = lambda value: f'<effect id="absent.offset"><property name="offset" type="vec2" value="{value}"/></effect>'
+    yield 'offset wraps the picture round', halves(shift('100,0')), [((50, 100), (0, 255, 0)), ((150, 100), red)], 0
+    yield 'offset wraps backwards too', halves(shift('-50,0')), [((25, 100), red), ((125, 100), (0, 255, 0)), ((175, 100), red)], 0
+    guide = engine.rect(1, 100, 100, 50, 50, 0xff0000ff)
+    rider = lambda extra, hw=6, hh=6: engine.rect(2, 0, 0, hw, hh, 0xffff0000, extra=extra)
+    yield 'move along path follows the layer beneath', engine.scene(guide + rider(fx('movealongpath', progress=0.375))), [((150, 100), red), ((100, 100), blue), ((140, 60), blue)], 0
+    yield 'move along path turns with the path', engine.scene(guide + rider(fx('movealongpath', progress=0.375), 20, 3)), [((150, 115), red), ((165, 100), black)], 0
+    yield 'move along path keeps its angle when told', engine.scene(guide + rider(fx('movealongpath', progress=0.375, rotate=0), 20, 3)), [((165, 100), red), ((140, 115), blue)], 0
+    yield 'move along path outset', engine.scene(guide + rider(fx('movealongpath', progress=0.375, inset=20))), [((170, 100), red), ((145, 100), blue)], 0
+    yield 'move along path inset', engine.scene(guide + rider(fx('movealongpath', progress=0.375, inset=-20))), [((130, 100), red), ((155, 100), black)], 0
+    yield 'move along path progress moves on', engine.scene(guide + rider(fx('movealongpath', progress=0.625))), [((100, 150), red), ((140, 100), blue)], 0
     parent = '<nullobj id="5" label="n" startTime="0" endTime="1000">' + engine.transform('100,100,0') + fx('oscillate', angle=0, frequency=0.5, magnitude=50) + '</nullobj>'
     yield 'a child follows its moving parent', engine.scene(parent + engine.rect(1, 0, 0, 10, 10, 0xffff0000, attrs=' parent="5"')), [((150, 100), red), ((100, 100), black)], 15
     deep = ('<shape id="2" label="d" startTime="0" endTime="1000" fillType="color" s=".rect">' + engine.transform('20,20,60')

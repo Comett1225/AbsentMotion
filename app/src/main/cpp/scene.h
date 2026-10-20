@@ -180,6 +180,8 @@ sk_sp<SkImageFilter> SmearFilter(SkVector moved);
 void ApplyMotion(const Layer& layer, double timeMs, Placement* placement);
 float MotionOpacity(const Layer& layer, double timeMs);
 bool EchoOf(const Layer& layer, double timeMs, Echo* echo);
+bool FollowsPath(const Layer& layer);
+void FollowPath(const Layer& layer, double timeMs, const SkPath& path, Placement* placement);
 void ParseSteps(Layer* layer);
 
 struct RepeatCopy {

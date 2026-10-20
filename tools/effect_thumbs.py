@@ -103,7 +103,7 @@ def value(kind, v):
 
 def prop(p, v):
     kind = TYPES.get(p["type"], "float")
-    if isinstance(v, list) and p["type"] in ("float", "angle"):
+    if isinstance(v, list) and (p["type"] in ("float", "angle") or isinstance(v[0], list)):
         keys = "".join(f'<kf t="{k / (len(v) - 1):.6f}" v="{value(p["type"], x)}"/>' for k, x in enumerate(v))
         return f'<property name="{p["id"]}" type="{kind}">{keys}</property>'
     return f'<property name="{p["id"]}" type="{kind}" value="{value(p["type"], v)}"/>'

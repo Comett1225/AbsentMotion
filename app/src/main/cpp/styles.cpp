@@ -195,22 +195,31 @@ SkM44 Turn(float degrees) { return SkM44::Rotate({0, 0, 1}, degrees * kRadians);
 
 constexpr int kMaxParentDepth = 16;
 
+SkMatrix MatrixOf(const Placement& p, const Layer& l, float t);
+
 Placement Effective(const std::vector<Layer>& siblings, const Layer& l, double timeMs, int depth) {
     Placement own = Own(l, timeMs);
-    if (l.parent == 0 || depth >= kMaxParentDepth) return own;
+    if (depth >= kMaxParentDepth) return own;
     const Layer* parent = nullptr;
     for (const Layer& s : siblings) {
-        if (s.id == l.parent && &s != &l) { parent = &s; break; }
+        if (l.parent != 0 && s.id == l.parent && &s != &l) { parent = &s; break; }
     }
-    if (!parent) return own;
-    const Placement p = Effective(siblings, *parent, timeMs, depth + 1);
-    const SkV4 offset = Turn(p.rotation) * p.tilt * SkV4{(own.location.fX + own.pivot.fX - p.pivot.fX) * p.scale.fX,
-                                                         (own.location.fY + own.pivot.fY - p.pivot.fY) * p.scale.fY, own.z, 0};
-    own.location = p.location + SkVector{offset.x, offset.y} - own.pivot + p.pivot;
-    own.scale = {own.scale.fX * p.scale.fX, own.scale.fY * p.scale.fY};
-    if (p.tilt != SkM44()) own.tilt = Turn(-own.rotation) * p.tilt * Turn(own.rotation) * own.tilt;
-    own.rotation += p.rotation;
-    own.z = p.z + offset.z;
+    if (parent) {
+        const Placement p = Effective(siblings, *parent, timeMs, depth + 1);
+        const SkV4 offset = Turn(p.rotation) * p.tilt * SkV4{(own.location.fX + own.pivot.fX - p.pivot.fX) * p.scale.fX,
+                                                             (own.location.fY + own.pivot.fY - p.pivot.fY) * p.scale.fY, own.z, 0};
+        own.location = p.location + SkVector{offset.x, offset.y} - own.pivot + p.pivot;
+        own.scale = {own.scale.fX * p.scale.fX, own.scale.fY * p.scale.fY};
+        if (p.tilt != SkM44()) own.tilt = Turn(-own.rotation) * p.tilt * Turn(own.rotation) * own.tilt;
+        own.rotation += p.rotation;
+        own.z = p.z + offset.z;
+    }
+    if (!FollowsPath(l)) return own;
+    const auto at = std::find_if(siblings.begin(), siblings.end(), [&](const Layer& s) { return s.id == l.id; });
+    if (at == siblings.end() || at == siblings.begin()) return own;
+    const Layer& below = *(at - 1);
+    const float t = below.localTime(timeMs);
+    FollowPath(l, timeMs, ShapePath(below, t).makeTransform(MatrixOf(Effective(siblings, below, timeMs, depth + 1), below, t)), &own);
     return own;
 }
 
