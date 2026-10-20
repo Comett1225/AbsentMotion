@@ -36,6 +36,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -189,21 +190,21 @@ private val ToolShape = RoundedCornerShape(4.dp)
 private val Square = androidx.compose.foundation.shape.CornerSize(0.dp)
 private val ToolLabel get() = Am.OnDarkDim
 
-private class Tool(@StringRes val label: Int, val icon: ImageVector, val textSp: Float, val iconY: Float, val textY: Float)
+private class Tool(@StringRes val label: Int, val icon: ImageVector, val iconY: Float)
 
-private val ColorFill = Tool(R.string.layer_tool_fill_color, PanelIcons.PaintBucket, 11f, 18.1f, 44.3f)
-private val BorderShadow = Tool(R.string.layer_tool_frame_shadow, PanelIcons.BorderShadow, 11f, 18.1f, 44.3f)
-private val Blending = Tool(R.string.layer_tool_opacity_blend, PanelIcons.Blending, 11f, 18.3f, 44.3f)
-private val MoveTransform = Tool(R.string.layer_tool_transform, PanelIcons.MoveTransform, 7.1f, 18.1f, 41.4f)
-private val EditShape = Tool(R.string.layer_tool_shape_options, PanelIcons.EditShape, 10.2f, 16f, 42.5f)
-private val EditText = Tool(R.string.layer_tool_edit_text, TextIcons.Edit, 10.8f, 16f, 42.5f)
-private val ElementPropsButton = Tool(R.string.asset_properties, PanelIcons.EditShape, 7.1f, 16f, 42.5f)
-private val EditPoints = Tool(R.string.layer_tool_edit_points, PanelIcons.EditShape, 10.8f, 16f, 42.5f)
-private val EditDrawing = Tool(R.string.layer_tool_edit_drawing, PanelIcons.EditShape, 10.8f, 16f, 42.5f)
-private val CameraOptions = Tool(R.string.layer_tool_camera_options, PanelIcons.Camera, 8.9f, 19.4f, 42.5f)
-private val ModelOptions = Tool(R.string.layer_tool_model_options, PanelIcons.TabTilt, 8.9f, 19.4f, 42.5f)
-private val Presets = Tool(R.string.presets, PanelIcons.Star, 8.9f, 19.4f, 42.1f)
-private val Effects = Tool(R.string.layer_tool_effects, PanelIcons.Effects, 8.9f, 19.6f, 44.4f)
+private val ColorFill = Tool(R.string.layer_tool_fill_color, PanelIcons.PaintBucket, 18.1f)
+private val BorderShadow = Tool(R.string.layer_tool_frame_shadow, PanelIcons.BorderShadow, 18.1f)
+private val Blending = Tool(R.string.layer_tool_opacity_blend, PanelIcons.Blending, 18.3f)
+private val MoveTransform = Tool(R.string.layer_tool_transform, PanelIcons.MoveTransform, 18.1f)
+private val EditShape = Tool(R.string.layer_tool_shape_options, PanelIcons.EditShape, 16f)
+private val EditText = Tool(R.string.layer_tool_edit_text, TextIcons.Edit, 16f)
+private val ElementPropsButton = Tool(R.string.asset_properties, PanelIcons.EditShape, 16f)
+private val EditPoints = Tool(R.string.layer_tool_edit_points, PanelIcons.EditShape, 16f)
+private val EditDrawing = Tool(R.string.layer_tool_edit_drawing, PanelIcons.EditShape, 16f)
+private val CameraOptions = Tool(R.string.layer_tool_camera_options, PanelIcons.Camera, 19.4f)
+private val ModelOptions = Tool(R.string.layer_tool_model_options, PanelIcons.TabTilt, 19.4f)
+private val Presets = Tool(R.string.presets, PanelIcons.Star, 19.4f)
+private val Effects = Tool(R.string.layer_tool_effects, PanelIcons.Effects, 19.6f)
 
 @Composable
 private fun SmallTool(icon: ImageVector, description: String, modifier: Modifier, shape: RoundedCornerShape, enabled: Boolean = true, onClick: () -> Unit = {}) {
@@ -224,9 +225,10 @@ private fun ToolButton(tool: Tool, modifier: Modifier, enabled: Boolean = true, 
     ) {
         PanelIcon(tool.icon, Am.OnDark, Modifier.align(Alignment.TopCenter).offset(y = (tool.iconY - 12f).dp))
         Text(
-            stringResource(tool.label), Modifier.align(Alignment.TopCenter).offset(y = (tool.textY - tool.textSp * 0.6f).dp).fillMaxWidth().padding(horizontal = 4.dp),
-            color = ToolLabel, lineHeight = (tool.textSp * 1.2f).sp, maxLines = 1, softWrap = false, textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-            autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(7.sp, tool.textSp.sp, 0.5.sp),
+            stringResource(tool.label), Modifier.align(Alignment.TopCenter).offset(y = 32.dp).fillMaxWidth().height(24.dp).padding(horizontal = 4.dp)
+                .wrapContentHeight(Alignment.CenterVertically),
+            color = ToolLabel, lineHeight = 11.5.sp, maxLines = 2, textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(7.sp, 10.sp, 0.5.sp),
         )
     }
 }
