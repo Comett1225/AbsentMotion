@@ -72,6 +72,11 @@ def cases():
     yield 'light glow adds nothing to a grey darker than its threshold', grey(fx('lightglow', blur=24, threshold=0.6, intensity=1, opacity=1)), [((100, 100), (115, 115, 115))]
     flat = engine.rect(1, 100, 100, 100, 100, 0x94888888, extra=fx('unsharpmask', radius=2, amount=0.5, threshold=0.5))
     yield 'unsharp mask leaves a flat see-through grey alone', engine.scene(flat), [((100, 100), (79, 79, 79))]
+    pushed = lambda edges: engine.scene(engine.rect(1, 175, 100, 25, 100, opacity=0.0) + engine.rect(2, 100, 100, 100, 100, 0xff00ff00, extra=(
+        '<effect id="absent.displacementmap" hidden="false"><property name="offset" type="vec2" value="-80,0"/>'
+        f'<property name="map" type="float" value="1"/><property name="edges" type="float" value="{edges}"/></effect>')))
+    yield 'a map from the layer below repeats the edge of a picture pushed past the frame', pushed(0), [((180, 100), engine.GREEN), ((100, 100), engine.GREEN)]
+    yield 'a map from the layer below leaves the frame edge clear when told', pushed(2), [((180, 100), engine.BLACK), ((100, 100), engine.GREEN)]
 
 
 def models():
