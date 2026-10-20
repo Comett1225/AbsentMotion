@@ -84,5 +84,6 @@
  "flip",
  "spherize",
  "tunnel",
- "textprogress"
+ "textprogress",
+ "texttransform"
 ]
