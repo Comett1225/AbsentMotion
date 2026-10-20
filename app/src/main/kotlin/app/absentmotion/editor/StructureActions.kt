@@ -301,10 +301,7 @@ suspend fun EditorState.alignSelection(edge: Int) {
             val from = if (horizontal) b[0] else b[1]
             val to = if (horizontal) b[2] else b[3]
             val d = when (edge % 3) { 0 -> lo - from; 1 -> (lo + hi) / 2 - (from + to) / 2; else -> hi - to }
-            acc.update(l.id, sampleMs) { layer ->
-                val p = layer.location
-                if (horizontal) layer.withTransform("location", p[0] + d, p[1], p[2]) else layer.withTransform("location", p[0], p[1] + d, p[2])
-            }
+            acc.update(l.id, sampleMs) { layer -> acc.withWorldLocation(layer, sampleMs) { x, y -> if (horizontal) x + d to y else x to y + d } }
         }
     }
 }
@@ -321,10 +318,7 @@ suspend fun EditorState.distributeSelection(horizontal: Boolean) {
         items.drop(1).dropLast(1).fold(s) { acc, (l, b) ->
             val d = cursor - from(b)
             cursor += to(b) - from(b) + gap
-            acc.update(l.id, sampleMs) { layer ->
-                val p = layer.location
-                if (horizontal) layer.withTransform("location", p[0] + d, p[1], p[2]) else layer.withTransform("location", p[0], p[1] + d, p[2])
-            }
+            acc.update(l.id, sampleMs) { layer -> acc.withWorldLocation(layer, sampleMs) { x, y -> if (horizontal) x + d to y else x to y + d } }
         }
     }
 }
