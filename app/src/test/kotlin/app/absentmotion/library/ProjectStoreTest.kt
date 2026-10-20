@@ -257,4 +257,17 @@ class ProjectStoreTest {
         assertFalse(aiHistory.exists())
         assertFalse(aiDraft.exists())
     }
+
+    @Test fun restoringOverADamagedProjectKeepsTheBrokenFileOutOfTheVersionList() {
+        val root = tmp.newFolder()
+        val store = ProjectStore(root)
+        val id = store.create(scene(image("file:///a.png")))
+        store.versions.snapshot(id, store.text(id)!!)
+        val good = store.versions.list(id).single()
+        root.resolve("projects/$id.xml").writeText("<scene width=\"100\" hei")
+        store.restore(id, good)
+        assertEquals(listOf(good.time), store.versions.list(id).map { it.time })
+        assertEquals(1, store.versions.dir(id).listFiles { f -> f.extension == "damaged" }!!.size)
+        assertTrue(store.load(id) != null)
+    }
 }

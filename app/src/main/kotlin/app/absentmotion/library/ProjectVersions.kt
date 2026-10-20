@@ -28,6 +28,9 @@ class ProjectVersions(private val root: File, private val now: () -> Long = Syst
         return true
     }
 
+    @Synchronized
+    fun keepDamaged(id: String, text: String) = writeAtomically(File(dir(id), "${now()}.damaged"), text)
+
     fun prune(id: String) {
         val all = list(id)
         val keep = retained(all.map { it.time }, now(), zone())
