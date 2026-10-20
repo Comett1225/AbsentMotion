@@ -1,0 +1,19 @@
+{
+ "id": "innerbulge",
+ "name": "Inner Pinch/Bulge",
+ "category": "distort",
+ "since": "3.0.0",
+ "description": "Bulges the middle of the layer out or pinches it in, while the edges of the layer stay where they are.",
+ "params": [
+  {
+   "id": "strength",
+   "label": "Strength",
+   "type": "float",
+   "default": 0.5,
+   "min": -1,
+   "max": 1,
+   "step": 0.001
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float strength;\nhalf4 main(float2 coord) {\n    float2 h = size * 0.5;\n    float2 p = (coord - h) / h;\n    if (abs(p.x) >= 1.0 || abs(p.y) >= 1.0) return image.eval(coord);\n    float2 e = 1.0 - p * p;\n    float w = e.x * e.y;\n    return image.eval(h + p * (1.0 - strength * 0.6 * w) * h);\n}\n"
+}

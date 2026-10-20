@@ -1,0 +1,34 @@
+{
+ "id": "hexagontiling",
+ "name": "Hexagon Tiling",
+ "category": "distort",
+ "since": "3.0.0",
+ "description": "Repeats the middle of the layer in hexagonal tiles that fill the screen.",
+ "params": [
+  {
+   "id": "scale",
+   "label": "Scale",
+   "type": "float",
+   "default": 1,
+   "min": 0.05,
+   "max": 10,
+   "step": 0.01
+  },
+  {
+   "id": "angle",
+   "label": "Angle",
+   "type": "angle",
+   "default": 0,
+   "min": -3600,
+   "max": 3600,
+   "step": 0.5
+  },
+  {
+   "id": "mirror",
+   "label": "Mirror",
+   "type": "switch",
+   "default": false
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float scale;\nuniform float angle;\nuniform float mirror;\nhalf4 main(float2 coord) {\n    float2 c = size * 0.5;\n    float unit = 0.5 * min(size.x, size.y) * max(scale, 0.05);\n    float a = radians(angle);\n    float cs = cos(a);\n    float sn = sin(a);\n    float2 p = coord - c;\n    p = float2(cs * p.x + sn * p.y, -sn * p.x + cs * p.y) / unit;\n    float2 r = float2(1.0, 1.7320508);\n    float2 h = r * 0.5;\n    float2 ga = mod(p, r) - h;\n    float2 gb = mod(p - h, r) - h;\n    float2 g = dot(ga, ga) < dot(gb, gb) ? ga : gb;\n    if (mirror > 0.5) {\n        float2 id = p - g;\n        float k = mod(floor(id.x + 0.5) + floor(id.y / 1.7320508 * 2.0 + 0.5), 2.0);\n        g.x = mix(g.x, -g.x, k);\n    }\n    g *= unit;\n    g = float2(cs * g.x - sn * g.y, sn * g.x + cs * g.y);\n    return image.eval(clamp(c + g, float2(0.5), size - 0.5));\n}\n"
+}

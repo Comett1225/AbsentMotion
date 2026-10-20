@@ -1,0 +1,67 @@
+{
+ "id": "circularripple",
+ "name": "Circular Ripple",
+ "category": "distort",
+ "since": "3.0.0",
+ "description": "Makes circular ripples spread out from a point, like a drop falling into water.",
+ "params": [
+  {
+   "id": "center",
+   "label": "Center",
+   "type": "point",
+   "default": [
+    0.5,
+    0.5
+   ],
+   "min": -1,
+   "max": 2,
+   "step": 0.01
+  },
+  {
+   "id": "frequency",
+   "label": "Frequency",
+   "type": "float",
+   "default": 20,
+   "min": 0,
+   "max": 100,
+   "step": 0.1
+  },
+  {
+   "id": "strength",
+   "label": "Strength",
+   "type": "float",
+   "default": 0.03,
+   "min": -1,
+   "max": 1,
+   "step": 0.001
+  },
+  {
+   "id": "phase",
+   "label": "Phase",
+   "type": "float",
+   "default": 0,
+   "min": -1000,
+   "max": 1000,
+   "step": 0.001
+  },
+  {
+   "id": "radius",
+   "label": "Radius",
+   "type": "float",
+   "default": 0.3,
+   "min": 0,
+   "max": 0.8,
+   "step": 0.001
+  },
+  {
+   "id": "feather",
+   "label": "Feather",
+   "type": "float",
+   "default": 0.1,
+   "min": 0,
+   "max": 1,
+   "step": 0.001
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float2 center;\nuniform float frequency;\nuniform float strength;\nuniform float phase;\nuniform float radius;\nuniform float feather;\nhalf4 main(float2 coord) {\n    float m = min(size.x, size.y);\n    float2 d = coord - center * size;\n    float r = length(d) / m;\n    if (r <= 0.0) return image.eval(coord);\n    float edge = max(feather * radius, 0.0005);\n    float fade = 1.0 - smoothstep(radius - edge, radius, r);\n    float wave = sin(6.2831853 * (frequency * r - phase));\n    return image.eval(coord + d / (r * m) * wave * strength * m * 0.5 * fade);\n}\n"
+}

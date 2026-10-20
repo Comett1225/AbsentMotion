@@ -134,6 +134,11 @@
     "spinblur": {"photo": "colour", "params": {"sweep": 20}},
     "lensblur": {"photo": "colour", "params": {"sweep": 30, "radius": 0.3}},
     "innerblur": {"photo": "colour", "layout": "move", "params": {"blur": 18}},
-    "polar": {"photo": "landscape"}
+    "polar": {"photo": "landscape"},
+    "circularripple": {"photo": "landscape", "params": {"strength": 0.09, "frequency": 10, "radius": 0.5}},
+    "hexagontiling": {"photo": "colour", "layout": "move", "params": {"scale": 0.9}},
+    "fractalwarp": {"photo": "portrait", "params": {"strength": 0.12}},
+    "roughenedges": {"photo": "colour", "layout": "move", "params": {"blur": 30, "roughness": 1, "scale": 0.5}},
+    "innerbulge": {"photo": "portrait", "params": {"strength": 0.8}}
   }
 }
