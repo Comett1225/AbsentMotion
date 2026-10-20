@@ -138,6 +138,10 @@
     <string name="settings_theme_read_failed">Could not read this file</string>
     <string name="settings_theme_open_failed">Could not open this file</string>
     <string name="settings_theme_not_theme_file">This is not a theme file</string>
+    <string name="settings_group_editor">Editor</string>
+    <string name="settings_group_playback">Playback and preview</string>
+    <string name="settings_group_projects">Projects and media</string>
+    <string name="settings_group_backup">Backup</string>
     <string name="theme_absentmotion">AbsentMotion</string>
     <string name="theme_daylight">Daylight</string>
     <string name="theme_custom">Custom</string>

@@ -2,16 +2,13 @@ package app.absentmotion.ui.home
 
 import app.absentmotion.export.formatBytes
 import android.provider.OpenableColumns
-import androidx.compose.foundation.background
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
@@ -24,7 +21,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.absentmotion.i18n.UiText
@@ -96,13 +92,9 @@ internal fun BackupRows(settings: AppSettings, onRestored: () -> Unit) {
         }
     }
     Column(Modifier.fillMaxWidth()) {
-        LinkRow(stringResource(R.string.backup_all_projects)) { run(txt(R.string.backup_backing_up_title), txt(R.string.backup_result_title), txt(R.string.backup_stopped)) { backUp(context, it) } }
-        Spacer(Modifier.height(CardGap))
-        LinkRow(stringResource(R.string.backup_restore)) { picker.launch(arrayOf("*/*")) }
-        Spacer(Modifier.height(CardGap))
-        Column(Modifier.padding(horizontal = 6.dp).fillMaxWidth().clip(RoundedCornerShape(7.dp)).background(Am.HomePanel)) {
-            SwitchRow(stringResource(R.string.backup_weekly), settings.weeklyBackup, enabled = true) { settings.weeklyBackup = it }
-        }
+        ActionRow(stringResource(R.string.backup_all_projects)) { run(txt(R.string.backup_backing_up_title), txt(R.string.backup_result_title), txt(R.string.backup_stopped)) { backUp(context, it) } }
+        ActionRow(stringResource(R.string.backup_restore)) { picker.launch(arrayOf("*/*")) }
+        SwitchRow(stringResource(R.string.backup_weekly), settings.weeklyBackup, enabled = true) { settings.weeklyBackup = it }
     }
     task?.let { current ->
         AlertDialog(
