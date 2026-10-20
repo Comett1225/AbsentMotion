@@ -57,11 +57,32 @@ class ImporterSecurityTest {
         val report = Importer(store, access = MediaAccess.forPhone(files)).import { xml.byteInputStream() }.single()
         val node = store.load(report.id)!!.node
         val uris = node.mediaUris()
-        assertEquals(setOf("blocked-$settings", "blocked-$project", own, "content://media/external/images/media/5", "blocked-file:///etc/hosts", "x://elsewhere"), uris)
+        assertEquals(setOf("blocked-$settings", "blocked-$project", own, "blocked-content://media/external/images/media/5", "blocked-file:///etc/hosts", "x://elsewhere"), uris)
         assertFalse(node.toXml().contains("\"$settings\"") || node.toXml().contains("\"$project\""))
         val missing = node.children.filter { it.name == "media" && it["missing"] == "true" }.map { it["uri"] }.toSet()
-        assertEquals(setOf("blocked-$settings", "blocked-$project", "blocked-file:///etc/hosts", "x://elsewhere"), missing)
+        assertEquals(setOf("blocked-$settings", "blocked-$project", "blocked-content://media/external/images/media/5", "blocked-file:///etc/hosts", "x://elsewhere"), missing)
         assertEquals(listOf(reportText("settings.json")), report.sections.first { it.first == txt(R.string.library_report_media) }.second.filter { it == reportText("settings.json") })
+    }
+
+    @Test fun aHiddenLayerInAnImportedFileCannotPullThePhonesPhotosIntoAPackage() {
+        val files = tmp.newFolder("files")
+        val photo = "content://media/external/images/media/42"
+        val xml = scene(
+            """<media uri="$photo" filename="IMG_0042.jpg" size="1234" type="image/jpeg"/>""",
+            """<shape id="1" fillType="media" fillImage="$photo" hidden="true"/>""",
+        )
+        val store = ProjectStore(files)
+        val report = Importer(store, access = MediaAccess.forPhone(files)).import { xml.byteInputStream() }.single()
+        val imported = store.load(report.id)!!
+        assertEquals(setOf("blocked-$photo"), imported.node.mediaUris())
+        assertTrue(report.sections.first { it.first == txt(R.string.library_report_media) }.second.contains(reportText("IMG_0042.jpg")))
+        val opened = ArrayList<String>()
+        val out = ByteArrayOutputStream()
+        kotlinx.coroutines.runBlocking {
+            app.absentmotion.export.writeProjectPackage(imported, imported.toXml(), out, MediaAccess.forPhone(files), { opened += it; "private pixels".byteInputStream() }, {})
+        }
+        assertEquals(emptyList<String>(), opened)
+        assertFalse(String(out.toByteArray(), Charsets.ISO_8859_1).contains("private pixels"))
     }
 
     @Test fun aCraftedPackageKeepsItsOwnMediaAndLosesTheRest() {

@@ -21,6 +21,8 @@ class MediaAccess private constructor(private val filesDir: File?) {
 
     fun defused(uri: String): String = if (uri.startsWith("file:", ignoreCase = true) && !allows(uri)) "blocked-$uri" else uri
 
+    fun imported(uri: String): String = if (filesDir != null && uri.startsWith("content:", ignoreCase = true)) "blocked-$uri" else defused(uri)
+
     companion object {
         val Unlimited = MediaAccess(null)
 

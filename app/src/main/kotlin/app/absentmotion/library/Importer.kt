@@ -150,7 +150,7 @@ class Importer(
         val id = store.newId()
         try {
             val moved = copies(id, root)
-            var scene = relink(Scene(uniqueLayerIds(root.mapMediaUris { moved[it] ?: access.defused(it) })))
+            var scene = relink(Scene(uniqueLayerIds(root.mapMediaUris { moved[it] ?: access.imported(it) })))
             val migrated = migration?.migrate(scene)
             if (migrated != null) scene = migrated.scene
             if (scene.title.isBlank()) scene = scene.withTitle(AppText.get(R.string.library_imported_project))
