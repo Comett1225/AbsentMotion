@@ -1,0 +1,130 @@
+{
+ "id": "dots",
+ "name": "Dots",
+ "category": "stylize",
+ "since": "3.0.0",
+ "description": "Draws a random but even pattern of soft dots over the layer, or uses the layer only as a mask for the dots.",
+ "params": [
+  {
+   "id": "scale",
+   "label": "Scale",
+   "type": "float",
+   "default": 1,
+   "min": 0.01,
+   "max": 100,
+   "step": 0.01
+  },
+  {
+   "id": "phase",
+   "label": "Phase",
+   "type": "float",
+   "default": 0,
+   "min": -99,
+   "max": 99,
+   "step": 0.001
+  },
+  {
+   "id": "radius",
+   "label": "Radius",
+   "type": "float",
+   "default": 0.2,
+   "min": 0,
+   "max": 2,
+   "step": 0.001
+  },
+  {
+   "id": "feather",
+   "label": "Feather",
+   "type": "float",
+   "default": 0.1,
+   "min": 0,
+   "max": 1,
+   "step": 0.001
+  },
+  {
+   "id": "color1",
+   "label": "Color 1",
+   "type": "color",
+   "default": "#ffffff"
+  },
+  {
+   "id": "color2",
+   "label": "Color 2",
+   "type": "color",
+   "default": "#000000"
+  },
+  {
+   "id": "density",
+   "label": "Density",
+   "type": "float",
+   "default": 12,
+   "min": 1,
+   "max": 13,
+   "step": 1
+  },
+  {
+   "id": "offset",
+   "label": "Offset",
+   "type": "point",
+   "default": [
+    0,
+    0
+   ],
+   "min": -5000,
+   "max": 5000,
+   "step": 1,
+   "pixels": true
+  },
+  {
+   "id": "fill",
+   "label": "Fill",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "alpha",
+   "label": "Alpha",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "blend",
+   "label": "Blending Mode",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Normal",
+    "Multiply",
+    "Screen"
+   ]
+  },
+  {
+   "id": "seed",
+   "label": "Seed",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 5,
+   "step": 0.01
+  },
+  {
+   "id": "slack",
+   "label": "Slack",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float scale;\nuniform float phase;\nuniform float radius;\nuniform float feather;\nlayout(color) uniform half4 color1;\nlayout(color) uniform half4 color2;\nuniform float density;\nuniform float2 offset;\nuniform float fill;\nuniform float alpha;\nuniform float blend;\nuniform float seed;\nuniform float slack;\nfloat hash12(float2 p) {\n    float3 q = fract(float3(p.xyx) * 0.1031);\n    q += dot(q, q.yzx + 33.33);\n    return fract((q.x + q.y) * q.z);\n}\nfloat2 hash22(float2 p) {\n    float3 q = fract(float3(p.xyx) * float3(0.1031, 0.1030, 0.0973));\n    q += dot(q, q.yzx + 33.33);\n    return fract((q.xx + q.yz) * q.zy);\n}\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return src;\n    float cell = size.y * max(scale, 0.01) / 13.0;\n    float2 x = (coord - size * 0.5 - offset) / cell;\n    float2 n = floor(x);\n    float cover = 0.0;\n    float3 dot_ = float3(0.0);\n    float r = max(radius, 0.0) * 0.5;\n    float soft = max(feather * r, 0.5 / cell);\n    for (int j = -1; j <= 1; j++) {\n        for (int i = -1; i <= 1; i++) {\n            float2 g = n + float2(float(i), float(j));\n            for (int k = 0; k < 3; k++) {\n                float2 h = hash22(g + seed * 9.7 + float(k) * 41.3);\n                float chance = k == 0 ? density / 11.0 : density - 10.0 - float(k);\n                if (hash12(g * 1.7 + float(k) * 13.1 + seed) >= chance) continue;\n                float t = 6.2831853 * (phase * (0.6 + 0.8 * h.y) + h.x);\n                float2 at = g + 0.5 + (h - 0.5) * slack * 0.6 + 0.2 * slack * float2(cos(t), sin(t));\n                float d = length(x - at);\n                float c = 1.0 - smoothstep(r - soft, r + soft, d);\n                if (c > cover) {\n                    cover = c;\n                    dot_ = mix(float3(color1.rgb), float3(color2.rgb), hash12(g * 3.1 + float(k) * 5.3 + seed * 2.1));\n                }\n            }\n        }\n    }\n    float a = float(src.a);\n    float3 base = float3(src.rgb) / a;\n    float3 shade = blend < 0.5 ? dot_ : blend < 1.5 ? base * dot_ : base + dot_ - base * dot_;\n    float k = cover * clamp(alpha, 0.0, 1.0);\n    float layerA = clamp(fill, 0.0, 1.0);\n    float outA = k + layerA * (1.0 - k);\n    float3 rgb = outA > 0.0 ? (shade * k + base * layerA * (1.0 - k)) / outA : float3(0.0);\n    return half4(half3(rgb) * half(outA * a), half(outA * a));\n}\n"
+}

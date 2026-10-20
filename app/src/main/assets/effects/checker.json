@@ -1,0 +1,65 @@
+{
+ "id": "checker",
+ "name": "Checker",
+ "category": "stylize",
+ "since": "3.0.0",
+ "description": "Draws a checkerboard over the opaque parts of the layer, or punches the checkers out of it.",
+ "params": [
+  {
+   "id": "offset",
+   "label": "Offset",
+   "type": "point",
+   "default": [
+    0,
+    0
+   ],
+   "min": -5000,
+   "max": 5000,
+   "step": 1,
+   "pixels": true
+  },
+  {
+   "id": "count",
+   "label": "Count",
+   "type": "float",
+   "default": 10,
+   "min": 0.5,
+   "max": 200,
+   "step": 0.1
+  },
+  {
+   "id": "stretch",
+   "label": "Stretch",
+   "type": "point",
+   "default": [
+    1,
+    1
+   ],
+   "min": 0.01,
+   "max": 10,
+   "step": 0.01
+  },
+  {
+   "id": "color",
+   "label": "Color",
+   "type": "color",
+   "default": "#2d1ef6"
+  },
+  {
+   "id": "punch",
+   "label": "Punch Out",
+   "type": "switch",
+   "default": false
+  },
+  {
+   "id": "angle",
+   "label": "Angle",
+   "type": "angle",
+   "default": 0,
+   "min": -3600,
+   "max": 3600,
+   "step": 0.5
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float2 offset;\nuniform float count;\nuniform float2 stretch;\nlayout(color) uniform half4 color;\nuniform float punch;\nuniform float angle;\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return src;\n    float cell = size.y / (2.475 * max(count, 0.5));\n    float a = radians(angle);\n    float2 p = coord - size * 0.5 - offset;\n    p = float2(cos(a) * p.x + sin(a) * p.y, -sin(a) * p.x + cos(a) * p.y) / (max(abs(stretch), float2(0.01)) * cell);\n    float2 e = min(fract(p), 1.0 - fract(p)) * max(abs(stretch), float2(0.01)) * cell;\n    float on = mod(floor(p.x) + floor(p.y), 2.0);\n    float aa = clamp(min(e.x, e.y) + 0.5, 0.0, 1.0);\n    float s = mix(0.5, on, aa);\n    if (punch > 0.5) return src * half(1.0 - s);\n    float3 base = float3(src.rgb) / float(src.a);\n    float3 rgb = mix(base, float3(color.rgb), s * float(color.a));\n    return half4(half3(rgb) * src.a, src.a);\n}\n"
+}
