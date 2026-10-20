@@ -215,8 +215,7 @@ class DeviceCapabilities private constructor(context: Context) {
 }
 
 internal val ProbeSizes = VideoResolutions.map { it.shortSide }.flatMap { side ->
-    val long = (side * 16 / 9 + 1) and 1.inv()
-    listOf(side to long, long to side, side to side)
+    listOf(16, 20, 21).flatMap { wide -> val long = (side * wide / 9 + 1) and 1.inv(); listOf(side to long, long to side) } + (side to side)
 }
 
 internal fun analyseEncoders(): List<EncoderCaps> = MediaCodecList(MediaCodecList.REGULAR_CODECS).codecInfos

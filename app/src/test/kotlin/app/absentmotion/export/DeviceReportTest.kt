@@ -49,6 +49,12 @@ class DeviceReportTest {
         assertEquals(ExportSettings(1440, 30, Codec.Hevc), result.suggestion)
     }
 
+    @Test fun tallPhoneShapedVideosAreCheckedAgainstTallProbes() {
+        val tall = DeviceReport("k", listOf(video("video/avc", true, 1088L * 2400)))
+        assertEquals(Support.Supported, tall.check(ExportSettings(1080, 30, Codec.H264), 1080, 2400))
+        assertEquals(Support.Supported, tall.check(ExportSettings(1080, 30, Codec.H264), 2340, 1080))
+    }
+
     @Test fun portraitAndLandscapeAreCheckedSeparately() {
         val landscapeOnly = DeviceReport("k", listOf(EncoderCaps("av1", "video/av01", false, 2..1920, 2..1920, 1, 1, listOf(SizePoint(1920, 1080, 30.0)))))
         assertTrue(landscapeOnly.check(ExportSettings(1080, 30, Codec.Av1), 1920, 1080) is Support.SlowSoftwareOnly)
