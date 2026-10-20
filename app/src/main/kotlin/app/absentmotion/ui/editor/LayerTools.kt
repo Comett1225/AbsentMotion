@@ -39,6 +39,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
@@ -80,6 +81,7 @@ import app.absentmotion.ui.editor.panels.PanelShape
 import app.absentmotion.ui.editor.panels.dimmed
 import app.absentmotion.ui.editor.panels.formatPlain
 import app.absentmotion.ui.editor.panels.px
+import app.absentmotion.ui.editor.panels.turnFor
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Presence
 import app.absentmotion.ui.theme.Swap
@@ -247,9 +249,11 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
     }
     val move = panel == EditorPanel.MoveTransform
     var tab by remember(selected.kind) { mutableIntStateOf(0) }
+    val catalog by state.engine.effects.collectAsState()
+    val turn = remember(selected.id, tab, catalog, move) { if (move) turnFor(selected, catalog, tab) else null }
     var menuOpen by remember { mutableStateOf(false) }
     var askDeleteSpeed by remember { mutableStateOf(false) }
-    val named = panel != EditorPanel.EditShape && panel != EditorPanel.Camera && panel != EditorPanel.Model
+    val named = panel != EditorPanel.EditShape && panel != EditorPanel.Camera && panel != EditorPanel.Model && !(move && tab == ROTATE_TAB && turn != null)
     val known = if (!named) null else when {
         move -> TransformTargets[tab]
         panel == EditorPanel.Speed -> KeyTarget(SpeedRef, layer.node["speed"] ?: "1")
@@ -283,7 +287,7 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
             if (move) {
                 Box(Modifier.weight(1f).fillMaxWidth()) {
                     FrameButton(PanelIcons.More, stringResource(R.string.effects_more), Modifier.fillMaxSize()) { menuOpen = true }
-                    Presence(menuOpen) { TransformMenu(state, tab) { menuOpen = false } }
+                    Presence(menuOpen) { TransformMenu(state, tab, turn) { menuOpen = false } }
                 }
             } else {
                 Spacer(Modifier.weight(1f))
@@ -292,7 +296,7 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
         Box(Modifier.weight(1f).fillMaxHeight().background(if (move) Am.PanelInset else Am.Panel)) {
             if (panel == EditorPanel.BorderShadow) BorderShadowTabs(Modifier.align(Alignment.CenterEnd).width(168.px).fillMaxHeight().background(Am.Panel))
             when (panel) {
-                EditorPanel.MoveTransform -> Swap(tab, Modifier.fillMaxSize(), rise = 0.dp) { MoveTransformPanel(state, layer, tab, Modifier.fillMaxSize()) }
+                EditorPanel.MoveTransform -> Swap(tab, Modifier.fillMaxSize(), rise = 0.dp) { MoveTransformPanel(state, layer, tab, turn, Modifier.fillMaxSize()) }
                 EditorPanel.ColorFill -> ColorFillPanel(state, layer, Modifier.fillMaxSize())
                 EditorPanel.EditShape -> EditShapePanel(state, layer, Modifier.fillMaxSize())
                 EditorPanel.Speed -> SpeedPanel(state, layer, Modifier.fillMaxSize())

@@ -58,13 +58,13 @@ import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
 
 @Composable
-internal fun MoveTransformPanel(state: EditorState, layer: Layer, tab: Int, modifier: Modifier = Modifier) {
+internal fun MoveTransformPanel(state: EditorState, layer: Layer, tab: Int, turn: Turn?, modifier: Modifier = Modifier) {
     Box(modifier) {
         when (tab) {
             0 -> PositionTab(state, layer)
             1 -> SizeTab(state, layer)
-            2 -> RotationTab(state, layer)
-            3 -> TiltTab(state, layer)
+            2 -> if (turn != null) TurnTab(state, layer, turn) else RotationTab(state, layer)
+            3 -> TiltTab(state, layer, turn)
             else -> SkewTab(state, layer)
         }
     }
@@ -197,7 +197,7 @@ internal class SnapAxis(snaps: List<Snap>, private val threshold: Float = 25f) {
 }
 
 @Composable
-private fun TrackpadCorners() {
+internal fun TrackpadCorners() {
     Canvas(Modifier.fillMaxSize()) {
         val far = 718.5f
         val near = 24.5f
@@ -410,7 +410,8 @@ private fun SkewTab(state: EditorState, layer: Layer) {
 private const val DEGREES_PER_DP = 0.25f
 
 @Composable
-private fun TiltTab(state: EditorState, layer: Layer) {
+private fun TiltTab(state: EditorState, layer: Layer, turn: Turn?) {
+    if (turn != null) TurnHook(state, turn)
     var active by remember { mutableIntStateOf(0) }
     val tilt = layer.tilt
     val labels = listOf(stringResource(R.string.tilt_x_rotation), stringResource(R.string.tilt_y_rotation))
