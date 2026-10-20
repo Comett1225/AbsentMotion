@@ -146,6 +146,7 @@ fun HomeScreen(
     onImportFile: (Uri) -> Unit = {},
     onTemplate: (String) -> Unit = {},
     onHistory: (ProjectInfo) -> Unit = {},
+    onCollect: (String) -> Unit = {},
     changes: Int = 0,
 ) {
     var projects by remember { mutableStateOf<List<ProjectInfo>>(emptyList()) }
@@ -187,6 +188,7 @@ fun HomeScreen(
                     onDuplicate = { id -> scope.launch { withContext(Dispatchers.IO) { store.duplicate(id) }; version++ } },
                     onDelete = { id -> scope.launch { withContext(Dispatchers.IO) { store.delete(id, context.getExternalFilesDir(null)?.resolve("ai")) }; version++ } },
                     onHistory = onHistory,
+                    onCollect = onCollect,
                     wide = wide,
                 )
                 if (!wide) Spacer(Modifier.height(BarHeight + navInset))
@@ -227,6 +229,7 @@ private fun ProjectsPane(
     onDuplicate: (String) -> Unit,
     onDelete: (String) -> Unit,
     onHistory: (ProjectInfo) -> Unit,
+    onCollect: (String) -> Unit,
     wide: Boolean = false,
 ) {
     val thumbs = remember {
@@ -250,6 +253,7 @@ private fun ProjectsPane(
             onDuplicate = { menu = null; onDuplicate(info.id) },
             onDelete = { menu = null; deleting = info },
             onHistory = { menu = null; onHistory(info) },
+            onCollect = { menu = null; onCollect(info.id) },
         )
     }
 
@@ -426,6 +430,7 @@ private fun ProjectCard(
     onDuplicate: () -> Unit,
     onDelete: () -> Unit,
     onHistory: () -> Unit,
+    onCollect: () -> Unit,
 ) {
     val coords = remember { arrayOfNulls<LayoutCoordinates>(1) }
     Box(
@@ -457,6 +462,7 @@ private fun ProjectCard(
                 if (!info.damaged) {
                     MenuRow("Export", HomeIcons.Export, onExport)
                     MenuRow(if (info.isElement) "Duplicate Asset" else "Duplicate", HomeIcons.Duplicate, onDuplicate)
+                    MenuRow("Collect media into project", HomeIcons.Folder, onCollect)
                 }
                 MenuRow("Version history", ChromeIcons.Undo, onHistory)
                 MenuRow(if (info.isElement) "Delete Asset" else "Delete", HomeIcons.Delete, onDelete)

@@ -56,7 +56,7 @@ class PointAdjust(val label: String, val move: (dx: Float, dy: Float) -> Unit)
 class EditorState(
     val projectId: String,
     initial: Scene,
-    private val store: ProjectStore,
+    internal val store: ProjectStore,
     val engine: EngineThread,
     val settings: AppSettings,
     val saver: ProjectSaver,

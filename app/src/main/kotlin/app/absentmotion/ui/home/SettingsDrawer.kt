@@ -87,6 +87,7 @@ fun SettingsDrawer(settings: AppSettings) {
                 SwitchRow("Demo Mode", settings.demoMode, enabled = true) { settings.demoMode = it; demoNote = it }
                 SwitchRow("Open XML Projects", settings.xmlUpload, enabled = true) { settings.xmlUpload = it }
                 SwitchRow("Vibration", settings.vibration, enabled = true) { settings.vibration = it }
+                SwitchRow("Keep a copy of imported media in the project", settings.keepMediaCopies, enabled = true) { settings.keepMediaCopies = it }
                 Divider(15.dp)
                 DurationRow(settings)
                 ThemeRow(settings)

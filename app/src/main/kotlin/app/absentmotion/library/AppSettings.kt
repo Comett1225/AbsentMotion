@@ -58,6 +58,12 @@ class AppSettings(private val context: Context) {
         get() = vibrationState
         set(value) { vibrationState = value; prefs.edit().putBoolean("trimLimitVibration", value).apply() }
 
+    private var keepMediaCopiesState by mutableStateOf(prefs.getBoolean("keepMediaCopies", true))
+
+    var keepMediaCopies: Boolean
+        get() = keepMediaCopiesState
+        set(value) { keepMediaCopiesState = value; prefs.edit().putBoolean("keepMediaCopies", value).apply() }
+
     var theme: String
         get() = themeState
         set(value) {

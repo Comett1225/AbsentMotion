@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.sp
 import app.absentmotion.audio.audioDeclaration
 import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.addAudio
+import app.absentmotion.editor.keepCopy
 import app.absentmotion.ui.theme.Am
 import kotlinx.coroutines.launch
 import kotlin.math.abs
@@ -68,7 +69,7 @@ internal fun AudioTab(state: EditorState, modifier: Modifier, library: AddLibrar
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) {
             runCatching { context.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION) }
-            scope.launch { adding = true; try { audioDeclaration(context, uri)?.let { state.addAudio(it) } } finally { adding = false } }
+            scope.launch { adding = true; try { audioDeclaration(context, uri)?.let { state.keepCopy(context, it) }?.let { state.addAudio(it) } } finally { adding = false } }
         }
     }
     androidx.compose.runtime.LaunchedEffect(Unit) {
@@ -120,7 +121,7 @@ internal fun AudioTab(state: EditorState, modifier: Modifier, library: AddLibrar
                     Box(
                         Modifier.align(Alignment.BottomCenter).fillMaxWidth().height(26.dp).background(Color(0x32000000))
                             .clickable(enabled = !adding) {
-                                scope.launch { adding = true; try { audioDeclaration(context, file.uri)?.let { state.addAudio(it) } } finally { adding = false } }
+                                scope.launch { adding = true; try { audioDeclaration(context, file.uri)?.let { state.keepCopy(context, it) }?.let { state.addAudio(it) } } finally { adding = false } }
                             },
                         Alignment.Center,
                     ) { Icon(ChromeIcons.Plus, "Add", Modifier.size(16.dp), tint = Color.White) }

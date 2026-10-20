@@ -50,6 +50,7 @@ import app.absentmotion.library.RecoveryHandler
 import app.absentmotion.library.RecoveryOffer
 import app.absentmotion.library.ImportReport
 import app.absentmotion.library.Importer
+import app.absentmotion.library.MediaKeeper
 import app.absentmotion.library.MediaRelink
 import app.absentmotion.library.ProjectStore
 import app.absentmotion.library.TemplateStore
@@ -146,7 +147,7 @@ class MainActivity : ComponentActivity() {
                             store, settings, onOpen = ::open, onExport = ::exportFromList,
                             imported = imported, onImportShown = { imported = emptyList() }, onImportFile = { importUris(listOf(it)) },
                             onTemplate = { editingTemplate = it },
-                            onHistory = { historyFor = it.id to it.title }, changes = projectsChanged,
+                            onHistory = { historyFor = it.id to it.title }, onCollect = ::collectMedia, changes = projectsChanged,
                         )
                         editingTemplate?.let { id ->
                             TemplateEditor(id, engine, settings, onClose = { editingTemplate = null }) { scene ->
@@ -274,6 +275,37 @@ class MainActivity : ComponentActivity() {
         cameFromEditor = true
         val saver = ProjectSaver(id, store, recovery, failed = { runOnUiThread { Toast.makeText(this, "Could not save the project. Free some storage space.", Toast.LENGTH_LONG).show() } })
         return EditorState(id, scene, store, engine, settings, saver).also { editor = it }
+    }
+
+    private fun collectMedia(id: String) {
+        if (opening) return
+        opening = true
+        lifecycleScope.launch {
+            val result = withContext(Dispatchers.IO) {
+                runCatching {
+                    store.load(id)?.let { scene ->
+                        MediaKeeper(store, { uri -> contentResolver.openInputStream(Uri.parse(uri)) }).collect(id, MediaRelink.relink(this@MainActivity, scene)).also {
+                            if (it.copied > 0) {
+                                store.text(id)?.let { old -> store.versions.snapshot(id, old) }
+                                store.save(id, it.scene)
+                            }
+                        }
+                    }
+                }.onFailure { Log.e("AMStore", "cannot collect the media of $id", it) }.getOrNull()
+            }
+            opening = false
+            projectsChanged++
+            val message = when {
+                result == null -> "Could not read this project."
+                result.copied == 0 && result.unreadable == 0 && !result.noSpace -> "All media is already kept in the project."
+                else -> listOfNotNull(
+                    "Copied ${result.copied} file${if (result.copied == 1) "" else "s"} into the project.",
+                    result.unreadable.takeIf { it > 0 }?.let { "$it could not be read; they may have been deleted." },
+                    "Storage is full, so some files were not copied.".takeIf { result.noSpace },
+                ).joinToString(" ")
+            }
+            Toast.makeText(this@MainActivity, message, Toast.LENGTH_LONG).show()
+        }
     }
 
     private fun answerRecovery(offer: RecoveryOffer, restore: Boolean) {

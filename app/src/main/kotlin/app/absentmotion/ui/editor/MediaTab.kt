@@ -32,6 +32,7 @@ import androidx.compose.ui.window.PopupProperties
 import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.addImage
 import app.absentmotion.editor.addVideo
+import app.absentmotion.editor.keepCopy
 import app.absentmotion.media.mediaDeclaration
 import app.absentmotion.media.mediaThumbnail
 import app.absentmotion.media.cachedMediaThumbnail
@@ -56,7 +57,7 @@ internal fun MediaTab(state: EditorState, modifier: Modifier, library: AddLibrar
             runCatching { context.contentResolver.takePersistableUriPermission(uri, android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION) }
             scope.launch {
                 adding = true
-                try { mediaDeclaration(context, uri)?.let { if (it.type.startsWith("video/")) state.addVideo(it) else state.addImage(it) } } finally { adding = false }
+                try { mediaDeclaration(context, uri)?.let { state.keepCopy(context, it) }?.let { if (it.type.startsWith("video/")) state.addVideo(it) else state.addImage(it) } } finally { adding = false }
             }
         }
     }
@@ -98,7 +99,7 @@ internal fun MediaTab(state: EditorState, modifier: Modifier, library: AddLibrar
             Box(Modifier.size(97.dp).background(Color.Black).clickable(enabled = !adding) {
                 scope.launch {
                     adding = true
-                    try { mediaDeclaration(context, file.uri)?.let { if (file.video) state.addVideo(it) else state.addImage(it) } } finally { adding = false }
+                    try { mediaDeclaration(context, file.uri)?.let { state.keepCopy(context, it) }?.let { if (file.video) state.addVideo(it) else state.addImage(it) } } finally { adding = false }
                 }
             }) {
                 bitmap?.let { Image(it.asImageBitmap(), null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop) }

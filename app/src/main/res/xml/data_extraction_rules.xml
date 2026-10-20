@@ -5,6 +5,7 @@
         <exclude domain="root" path="code_cache" />
         <exclude domain="file" path="models" />
         <exclude domain="file" path="fonts/google" />
+        <exclude domain="file" path="media" />
     </cloud-backup>
     <device-transfer>
         <exclude domain="root" path="cache" />
