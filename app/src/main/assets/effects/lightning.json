@@ -1,0 +1,85 @@
+{
+ "id": "lightning",
+ "name": "Lightning",
+ "category": "stylize",
+ "since": "3.0.0",
+ "description": "Draws a forked bolt of lightning between two points on the layer.",
+ "params": [
+  {
+   "id": "from",
+   "label": "Start",
+   "type": "point",
+   "default": [
+    0.5,
+    0.05
+   ],
+   "min": -1,
+   "max": 2,
+   "step": 0.01
+  },
+  {
+   "id": "to",
+   "label": "End",
+   "type": "point",
+   "default": [
+    0.5,
+    0.95
+   ],
+   "min": -1,
+   "max": 2,
+   "step": 0.01
+  },
+  {
+   "id": "width",
+   "label": "Width",
+   "type": "float",
+   "default": 4,
+   "min": 0.5,
+   "max": 50,
+   "step": 0.1
+  },
+  {
+   "id": "jag",
+   "label": "Detail",
+   "type": "float",
+   "default": 0.15,
+   "min": 0,
+   "max": 1,
+   "step": 0.001
+  },
+  {
+   "id": "evolution",
+   "label": "Evolution",
+   "type": "float",
+   "default": 0,
+   "min": -1000,
+   "max": 1000,
+   "step": 0.01
+  },
+  {
+   "id": "glow",
+   "label": "Glow",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 4,
+   "step": 0.01
+  },
+  {
+   "id": "color",
+   "label": "Color",
+   "type": "color",
+   "default": "#80a0ff"
+  },
+  {
+   "id": "seed",
+   "label": "Seed",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 5,
+   "step": 0.01
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float2 from;\nuniform float2 to;\nuniform float width;\nuniform float jag;\nuniform float evolution;\nuniform float glow;\nlayout(color) uniform half4 color;\nuniform float seed;\nfloat hash13(float3 p) {\n    p = fract(p * 0.1031);\n    p += dot(p, p.zyx + 31.32);\n    return fract((p.x + p.y) * p.z);\n}\nfloat vnoise(float3 p) {\n    float3 i = floor(p);\n    float3 f = fract(p);\n    f = f * f * f * (f * (f * 6.0 - 15.0) + 10.0);\n    float a = mix(hash13(i), hash13(i + float3(1, 0, 0)), f.x);\n    float b = mix(hash13(i + float3(0, 1, 0)), hash13(i + float3(1, 1, 0)), f.x);\n    float c = mix(hash13(i + float3(0, 0, 1)), hash13(i + float3(1, 0, 1)), f.x);\n    float d = mix(hash13(i + float3(0, 1, 1)), hash13(i + float3(1, 1, 1)), f.x);\n    return mix(mix(a, b, f.y), mix(c, d, f.y), f.z);\n}\nfloat fbm(float3 p, float octaves, float2 drift, float gain) {\n    float sum = 0.0;\n    float amp = 0.5;\n    float norm = 0.0;\n    for (int i = 0; i < 9; i++) {\n        if (float(i) >= octaves) break;\n        sum += amp * vnoise(p);\n        norm += amp;\n        amp *= gain;\n        p = float3(p.xy * 2.03 + drift + float2(17.13, 9.71), p.z * 1.7 + 3.1);\n    }\n    return sum / max(norm, 0.0001);\n}\nfloat bolt(float2 coord, float2 a, float2 b, float amp, float salt) {\n    float2 ab = b - a;\n    float len = max(length(ab), 1.0);\n    float2 dir = ab / len;\n    float2 nrm = float2(-dir.y, dir.x);\n    float t = clamp(dot(coord - a, dir) / len, 0.0, 1.0);\n    float n = fbm(float3(t * 6.0 + salt, seed * 3.1 + salt, evolution), 6.0, float2(0.0), 0.62) - 0.5;\n    float2 at = a + ab * t + nrm * n * amp * len * sin(3.1415927 * t);\n    return length(coord - at);\n}\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return src;\n    float2 a = from * size;\n    float2 b = to * size;\n    float d = bolt(coord, a, b, jag * 2.0, 0.0);\n    float2 mid = mix(a, b, 0.45) + float2(-(b - a).y, (b - a).x) * (fbm(float3(seed, 7.7, evolution), 3.0, float2(0.0), 0.5) - 0.5) * jag;\n    float2 fork = mid + (b - a) * 0.35 + float2(-(b - a).y, (b - a).x) * 0.25 * jag * 2.0;\n    d = min(d, bolt(coord, mid, fork, jag * 2.0, 17.3) + width * 0.4);\n    float core = 1.0 - smoothstep(width * 0.25, width * 0.5 + 0.5, d);\n    float halo = exp(-d / max(width * 3.0, 0.5)) * glow;\n    float3 base = float3(src.rgb) / float(src.a);\n    float3 light = float3(color.rgb) * halo + float3(core);\n    float3 rgb = clamp(base + light - base * light, 0.0, 1.0);\n    return half4(half3(rgb) * src.a, src.a);\n}\n"
+}

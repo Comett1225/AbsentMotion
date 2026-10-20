@@ -1,0 +1,86 @@
+{
+ "id": "iridescence",
+ "name": "Iridescence",
+ "category": "stylize",
+ "since": "3.0.0",
+ "description": "Covers the opaque parts of the layer with a flowing rainbow sheen, like oil on water or a soap bubble.",
+ "params": [
+  {
+   "id": "scale",
+   "label": "Scale",
+   "type": "float",
+   "default": 1,
+   "min": 0.01,
+   "max": 50,
+   "step": 0.01
+  },
+  {
+   "id": "evolution",
+   "label": "Evolution",
+   "type": "float",
+   "default": 0,
+   "min": -50,
+   "max": 50,
+   "step": 0.01
+  },
+  {
+   "id": "shift",
+   "label": "Hue Shift",
+   "type": "float",
+   "default": 0,
+   "min": -10,
+   "max": 10,
+   "step": 0.001
+  },
+  {
+   "id": "saturation",
+   "label": "Saturation",
+   "type": "float",
+   "default": 0.6,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "alpha",
+   "label": "Alpha",
+   "type": "float",
+   "default": 0.8,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "blend",
+   "label": "Blending Mode",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Normal",
+    "Multiply",
+    "Screen",
+    "Overlay",
+    "Soft Light",
+    "Hard Light",
+    "Add",
+    "Darken",
+    "Lighten",
+    "Difference",
+    "Color Dodge",
+    "Color Burn"
+   ]
+  },
+  {
+   "id": "seed",
+   "label": "Seed",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 5,
+   "step": 0.01
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float scale;\nuniform float evolution;\nuniform float shift;\nuniform float saturation;\nuniform float alpha;\nuniform float blend;\nuniform float seed;\nfloat hash13(float3 p) {\n    p = fract(p * 0.1031);\n    p += dot(p, p.zyx + 31.32);\n    return fract((p.x + p.y) * p.z);\n}\nfloat vnoise(float3 p) {\n    float3 i = floor(p);\n    float3 f = fract(p);\n    f = f * f * f * (f * (f * 6.0 - 15.0) + 10.0);\n    float a = mix(hash13(i), hash13(i + float3(1, 0, 0)), f.x);\n    float b = mix(hash13(i + float3(0, 1, 0)), hash13(i + float3(1, 1, 0)), f.x);\n    float c = mix(hash13(i + float3(0, 0, 1)), hash13(i + float3(1, 0, 1)), f.x);\n    float d = mix(hash13(i + float3(0, 1, 1)), hash13(i + float3(1, 1, 1)), f.x);\n    return mix(mix(a, b, f.y), mix(c, d, f.y), f.z);\n}\nfloat fbm(float3 p, float octaves, float2 drift, float gain) {\n    float sum = 0.0;\n    float amp = 0.5;\n    float norm = 0.0;\n    for (int i = 0; i < 9; i++) {\n        if (float(i) >= octaves) break;\n        sum += amp * vnoise(p);\n        norm += amp;\n        amp *= gain;\n        p = float3(p.xy * 2.03 + drift + float2(17.13, 9.71), p.z * 1.7 + 3.1);\n    }\n    return sum / max(norm, 0.0001);\n}\nfloat3 hue2rgb(float h) {\n    return clamp(abs(mod(h * 6.0 + float3(0.0, 4.0, 2.0), 6.0) - 3.0) - 1.0, 0.0, 1.0);\n}\nfloat3 blendWith(float m, float3 b, float3 s) {\n    if (m < 0.5) return s;\n    if (m < 1.5) return b * s;\n    if (m < 2.5) return b + s - b * s;\n    if (m < 3.5) return mix(2.0 * b * s, 1.0 - 2.0 * (1.0 - b) * (1.0 - s), step(0.5, b));\n    if (m < 4.5) {\n        float3 d = mix(sqrt(b), ((16.0 * b - 12.0) * b + 4.0) * b, step(b, float3(0.25)));\n        return mix(b - (1.0 - 2.0 * s) * b * (1.0 - b), b + (2.0 * s - 1.0) * (d - b), step(0.5, s));\n    }\n    if (m < 5.5) return mix(2.0 * b * s, 1.0 - 2.0 * (1.0 - b) * (1.0 - s), step(0.5, s));\n    if (m < 6.5) return min(b + s, 1.0);\n    if (m < 7.5) return min(b, s);\n    if (m < 8.5) return max(b, s);\n    if (m < 9.5) return abs(b - s);\n    if (m < 10.5) return min(b / max(1.0 - s, 0.0001), 1.0);\n    return 1.0 - min((1.0 - b) / max(s, 0.0001), 1.0);\n}\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return src;\n    float unit = 0.4 * size.y * max(scale, 0.01);\n    float2 p = (coord - size * 0.5) / unit + seed * float2(11.3, 5.9);\n    float w = fbm(float3(p, evolution), 5.0, float2(0.0), 0.5);\n    float v = fbm(float3(p + 3.0 * w + float2(2.7, 8.1), evolution * 0.7), 5.0, float2(0.0), 0.5);\n    float3 film = mix(float3(1.0), hue2rgb(fract(v * 2.5 + shift)), clamp(saturation, 0.0, 1.0));\n    float3 base = float3(src.rgb) / float(src.a);\n    float3 rgb = mix(base, clamp(blendWith(blend, base, film), 0.0, 1.0), clamp(alpha, 0.0, 1.0));\n    return half4(half3(rgb) * src.a, src.a);\n}\n"
+}
