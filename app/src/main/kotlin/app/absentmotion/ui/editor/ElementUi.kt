@@ -129,44 +129,47 @@ private fun ElementCard(info: ProjectInfo, onClick: () -> Unit) {
 @Composable
 internal fun ElementProperties(state: EditorState, onBack: () -> Unit, modifier: Modifier) {
     val layer = state.selected ?: return
+    val link = layer.link
     val context = LocalContext.current
     val store = rememberStore()
-    val original = layer.link?.let(store::idOfLink)
+    val scope = rememberCoroutineScope()
     var missing by remember { mutableStateOf(false) }
+    fun unlink() {
+        state.unlinkElement()
+        onBack()
+    }
     Column(modifier.background(Am.Panel)) {
         Row(Modifier.fillMaxWidth().height(40.dp), verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.size(40.dp).clickable(onClick = onBack), Alignment.Center) { Icon(ChromeIcons.Back, stringResource(R.string.topbar_back), Modifier.size(24.dp), tint = Am.OnDark) }
             Text(stringResource(R.string.asset_properties), color = Am.OnDark, fontSize = 15.sp, maxLines = 1)
         }
         Row(Modifier.fillMaxWidth().padding(12.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            PropertyButton(stringResource(R.string.element_open_original), Modifier.weight(1f), enabled = ElementNav.open != null) {
-                if (original == null) missing = true else ElementNav.open?.invoke(original)
+            PropertyButton(stringResource(R.string.element_open_original), Modifier.weight(1f), enabled = ElementNav.open != null && link != null) {
+                scope.launch {
+                    val original = withContext(Dispatchers.IO) { link?.let(store::idOfLink) }
+                    if (original == null) missing = true else ElementNav.open?.invoke(original)
+                }
             }
-            PropertyButton(stringResource(R.string.convert_to_group), Modifier.weight(1f)) { state.unlinkElement() }
-        }
-        Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            PropertyButton(stringResource(R.string.element_unlink), Modifier.weight(1f)) { state.unlinkElement() }
-            Box(Modifier.weight(1f))
+            PropertyButton(stringResource(R.string.element_unlink), Modifier.weight(1f), enabled = link != null) { unlink() }
         }
     }
-    if (missing) AlertDialog(
+    if (missing && link != null) AlertDialog(
         onDismissRequest = { missing = false },
         text = { Text(stringResource(R.string.this_asset_pointed_to_a_project)) },
         confirmButton = {
             TextButton({
                 missing = false
-                try {
-                    layer.nested?.let { store.save(store.linkOf(layer.link.orEmpty()), it) }
-                    Toast.makeText(context, context.getString(R.string.element_saved_to_my_assets), Toast.LENGTH_SHORT).show()
-                } catch (e: java.io.IOException) {
-                    Toast.makeText(context, context.getString(R.string.element_save_failed), Toast.LENGTH_LONG).show()
+                val nested = layer.nested
+                scope.launch {
+                    val saved = withContext(Dispatchers.IO) { runCatching { nested?.let { store.save(store.linkOf(link), it) } }.isSuccess }
+                    Toast.makeText(context, context.getString(if (saved) R.string.element_saved_to_my_assets else R.string.element_save_failed), if (saved) Toast.LENGTH_SHORT else Toast.LENGTH_LONG).show()
                 }
             }) { Text(stringResource(R.string.rebuild_source_project), color = Am.Accent) }
         },
         dismissButton = {
             Row {
                 TextButton({ missing = false }) { Text(stringResource(R.string.cancel), color = Am.Accent) }
-                TextButton({ missing = false; state.unlinkElement() }) { Text(stringResource(R.string.convert_to_group), color = Am.Accent) }
+                TextButton({ missing = false; unlink() }) { Text(stringResource(R.string.element_unlink), color = Am.Accent) }
             }
         },
         containerColor = Am.Field, textContentColor = Am.OnDark,
