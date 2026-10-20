@@ -7,8 +7,8 @@
     <string name="onboarding_language_title">Choose your language</string>
     <string name="onboarding_language_others">Other languages</string>
     <string name="onboarding_language_later">You can change this later in Settings.</string>
-    <string name="onboarding_check_title">Check what this phone can do</string>
-    <string name="onboarding_check_body">A quick check shows which video formats and sizes this phone can export, and how fast it is. It runs once, takes a few seconds and everything stays on your phone.</string>
+    <string name="onboarding_check_title">Check what this device can do</string>
+    <string name="onboarding_check_body">A quick check shows which video formats and sizes this device can export, and how fast it is. It runs once, takes a few seconds and everything stays on this device.</string>
     <string name="onboarding_check_run">Run check</string>
     <string name="onboarding_check_running">Checking…</string>
     <string name="onboarding_check_failed">The check could not finish. Exporting still works as usual.</string>
@@ -21,6 +21,7 @@
     <string name="onboarding_speed_fast_note">Handles 4K and long videos well.</string>
     <string name="onboarding_speed_good">Good</string>
     <string name="onboarding_speed_good_note">Smooth at 1080p. 4K exports take longer.</string>
+    <string name="onboarding_speed_good_note_hd">Smooth at 1080p.</string>
     <string name="onboarding_speed_basic">Basic</string>
     <string name="onboarding_speed_basic_note">Best at 720p or 1080p. Long videos take a while.</string>
     <string name="no_camera_was_found_on_this">No camera was found on this device.</string>

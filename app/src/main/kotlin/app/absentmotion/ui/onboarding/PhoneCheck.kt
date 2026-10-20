@@ -29,12 +29,18 @@ internal fun phoneCheckResult(report: DeviceReport, performanceClass: Int): Phon
         FormatSupport(codec.label, best ?: 0, best != null && fits(best, true))
     }
     val measured = report.probe?.pixelsPerSecond
-    val speed = when {
+    val hardware = formats.filter { it.hardware }.maxOfOrNull { it.maxShortSide } ?: 0
+    val cap = when {
+        hardware >= 2160 -> PhoneSpeed.Fast
+        hardware >= 1080 -> PhoneSpeed.Good
+        else -> PhoneSpeed.Basic
+    }
+    val rated = when {
         measured != null -> if (measured >= RealTime1080p) PhoneSpeed.Fast else if (measured >= RealTime1080p / 3) PhoneSpeed.Good else PhoneSpeed.Basic
         performanceClass >= Build.VERSION_CODES.TIRAMISU -> PhoneSpeed.Fast
         performanceClass >= Build.VERSION_CODES.S -> PhoneSpeed.Good
         formats.any { it.hardware && it.maxShortSide >= 2160 } -> PhoneSpeed.Good
         else -> PhoneSpeed.Basic
     }
-    return PhoneCheckResult(formats, speed)
+    return PhoneCheckResult(formats, maxOf(rated, cap))
 }

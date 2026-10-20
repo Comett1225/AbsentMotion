@@ -1,7 +1,5 @@
 package app.absentmotion.ui.onboarding
 
-import android.content.Context
-import android.content.pm.PackageManager
 import app.absentmotion.engine.EngineThread
 import app.absentmotion.export.sizeLabel
 import androidx.compose.foundation.background
@@ -79,7 +77,7 @@ const val ONBOARDING_DONE = 2
 
 enum class OnboardingStep { Language, Check }
 
-data class FirstRun(val step: OnboardingStep, val upgrading: Boolean) {
+data class FirstRun(val step: OnboardingStep) {
     companion object {
         fun start(stored: Int): OnboardingStep? = when {
             stored >= ONBOARDING_DONE -> null
@@ -87,20 +85,15 @@ data class FirstRun(val step: OnboardingStep, val upgrading: Boolean) {
             else -> OnboardingStep.Language
         }
 
-        fun of(context: Context, settings: AppSettings, forced: String?): FirstRun? {
+        fun of(settings: AppSettings, forced: String?): FirstRun? {
             if (forced != null) settings.onboarding = when (forced) {
                 "done" -> ONBOARDING_DONE
                 "check" -> ONBOARDING_LANGUAGE_CHOSEN
                 else -> 0
             }
             val step = start(settings.onboarding) ?: return null
-            return FirstRun(step, if (forced != null) forced == "upgrade" else isUpgrade(context))
+            return FirstRun(step)
         }
-
-        private fun isUpgrade(context: Context) = runCatching {
-            val info = context.packageManager.getPackageInfo(context.packageName, PackageManager.PackageInfoFlags.of(0))
-            info.lastUpdateTime > info.firstInstallTime
-        }.getOrDefault(false)
     }
 }
 
@@ -117,7 +110,7 @@ fun Onboarding(settings: AppSettings, first: FirstRun, engine: () -> EngineThrea
                     step = OnboardingStep.Check
                     applyLanguage(context, language)
                 }
-                OnboardingStep.Check -> CheckStep(first.upgrading, engine) {
+                OnboardingStep.Check -> CheckStep(engine) {
                     settings.onboarding = ONBOARDING_DONE
                     onDone()
                 }
@@ -145,7 +138,7 @@ private fun LanguageStep(onContinue: (AppLanguage) -> Unit) {
 }
 
 @Composable
-private fun CheckStep(upgrading: Boolean, engine: () -> EngineThread, onDone: () -> Unit) {
+private fun CheckStep(engine: () -> EngineThread, onDone: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var job by remember { mutableStateOf<Job?>(null) }
@@ -184,17 +177,10 @@ private fun CheckStep(upgrading: Boolean, engine: () -> EngineThread, onDone: ()
         Footer {
             val runLabel = stringResource(if (running) R.string.onboarding_check_running else R.string.onboarding_check_run)
             val skipLabel = stringResource(R.string.action_skip)
-            when {
-                finished -> FilledButton(stringResource(R.string.action_continue), enabled = true, onClick = onDone)
-                upgrading -> FilledButton(skipLabel, enabled = true, onClick = ::skip)
-                else -> FilledButton(runLabel, enabled = !running, onClick = ::run)
-            }
+            if (finished) FilledButton(stringResource(R.string.action_continue), enabled = true, onClick = onDone)
+            else FilledButton(runLabel, enabled = !running, onClick = ::run)
             Spacer(Modifier.height(6.dp))
-            when {
-                finished -> PlainButton("", visible = false) {}
-                upgrading -> PlainButton(runLabel, visible = true, enabled = !running, onClick = ::run)
-                else -> PlainButton(skipLabel, visible = true, onClick = ::skip)
-            }
+            PlainButton(skipLabel, visible = !finished, onClick = ::skip)
         }
     }
 }
@@ -225,7 +211,8 @@ private fun Results(result: PhoneCheckResult?, running: Boolean, progress: () ->
         val (word, note) = when (result?.speed) {
             null -> null to null
             PhoneSpeed.Fast -> R.string.onboarding_speed_fast to R.string.onboarding_speed_fast_note
-            PhoneSpeed.Good -> R.string.onboarding_speed_good to R.string.onboarding_speed_good_note
+            PhoneSpeed.Good -> R.string.onboarding_speed_good to
+                if (result.formats.any { it.maxShortSide >= 2160 }) R.string.onboarding_speed_good_note else R.string.onboarding_speed_good_note_hd
             PhoneSpeed.Basic -> R.string.onboarding_speed_basic to R.string.onboarding_speed_basic_note
         }
         Text(word?.let { stringResource(it) } ?: UNKNOWN, color = if (word != null) Am.Navy else Am.HomeMid, fontSize = 18.sp, fontWeight = FontWeight.Bold)

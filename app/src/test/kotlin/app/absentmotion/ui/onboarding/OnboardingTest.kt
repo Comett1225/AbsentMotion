@@ -52,6 +52,16 @@ class OnboardingTest {
         assertEquals(PhoneSpeed.Good, result.speed)
     }
 
+    @Test fun phoneSpeedNeverPromisesMoreThanTheHardwareEncodersCanMake() {
+        val probe = ProbeResult(Codec.H264, 1080, 1920, 31, 300, 100)
+        val software = listOf(video("video/avc", false, 1920L * 1088, 1920.0 * 1088 * 30), video("video/av01", false, 1280L * 720, 1280.0 * 720 * 30))
+        assertEquals(PhoneSpeed.Basic, phoneCheckResult(DeviceReport("k", software, probe), 0).speed)
+        assertEquals(PhoneSpeed.Basic, phoneCheckResult(DeviceReport("k", software), 33).speed)
+        val hd = listOf(video("video/avc", true, 1920L * 1088, 1920.0 * 1088 * 120))
+        assertEquals(PhoneSpeed.Good, phoneCheckResult(DeviceReport("k", hd, probe), 0).speed)
+        assertEquals(PhoneSpeed.Basic, phoneCheckResult(DeviceReport("k", hd, ProbeResult(Codec.H264, 1080, 1920, 31, 6000, 100)), 0).speed)
+    }
+
     @Test fun phoneSpeedComesFromTheMeasuredExport() {
         fun speed(ms: Long) = phoneCheckResult(DeviceReport("k", encoders, ProbeResult(Codec.H264, 1080, 1920, 31, ms, 100)), 0).speed
         assertEquals(PhoneSpeed.Fast, speed(600))

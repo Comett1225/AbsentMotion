@@ -132,7 +132,7 @@ class MainActivity : ComponentActivity() {
             open(id)
         }
         if (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0) handleTestIntent()
-        firstRun = FirstRun.of(this, settings, intent.getStringExtra("onboarding").takeIf { savedInstanceState == null && applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0 })
+        firstRun = FirstRun.of(settings, intent.getStringExtra("onboarding").takeIf { savedInstanceState == null && applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0 })
         importShared()
         setContent {
             val open = editor
