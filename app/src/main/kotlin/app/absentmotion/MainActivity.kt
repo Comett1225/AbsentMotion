@@ -80,7 +80,18 @@ import app.absentmotion.ui.onboarding.FirstRun
 import app.absentmotion.ui.onboarding.Onboarding
 import app.absentmotion.ui.home.OpenFailedDialog
 import app.absentmotion.ui.home.OpeningOverlay
-import app.absentmotion.ui.home.RecoveryDialog
+import app.absentmotion.ui.home.ClosedDialog
+import app.absentmotion.ui.home.OutdatedHint
+import app.absentmotion.ui.home.outdatedNow
+import app.absentmotion.library.CrashEntry
+import app.absentmotion.library.CrashLogs
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import app.absentmotion.ui.home.UpdateAskDialog
 import app.absentmotion.ui.home.UpdateDialog
 import app.absentmotion.ui.home.Updates
@@ -114,6 +125,8 @@ class MainActivity : ComponentActivity() {
     private var projectsChanged by mutableIntStateOf(0)
     private lateinit var recovery: Recovery
     private var recovered by mutableStateOf<RecoveryOffer?>(null)
+    private var crashed by mutableStateOf<CrashEntry?>(null)
+    private var importFailed by mutableStateOf<String?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val started = SystemClock.elapsedRealtime()
@@ -125,8 +138,13 @@ class MainActivity : ComponentActivity() {
         settings = AppSettings(this)
         templates = TemplateStore(this)
         recovery = Recovery(File(filesDir, "recovery"))
+        CrashLogs.install(this)
         RecoveryHandler.install(recovery) { editor?.let { it.projectId to it.scene.toXml() } }
-        lifecycleScope.launch { recovered = withContext(DiskThread.dispatcher) { runCatching { recovery.pending(store) }.getOrNull() } }
+        lifecycleScope.launch {
+            val (offer, crash) = withContext(DiskThread.dispatcher) { runCatching { recovery.pending(store) }.getOrNull() to runCatching { CrashLogs.collect(applicationContext) }.getOrNull() }
+            crashed = crash
+            recovered = offer
+        }
         lifecycleScope.launch { kotlinx.coroutines.delay(15_000); autoBackupIfDue(applicationContext, settings) }
         lifecycleScope.launch(Dispatchers.IO) { ShapeCatalog.load(applicationContext) }
         app.absentmotion.editor.ElementNav.open = { id ->
@@ -149,10 +167,18 @@ class MainActivity : ComponentActivity() {
             val homePress = remember(Am.PressHome) { PressIndication(Am.PressHome) }
             CompositionLocalProvider(LocalIndication provides if (open == null) homePress else editorPress, LocalDensity provides remember(density) { Density(density, 1f) }) {
                 val first = firstRun
+                val outdated = outdatedNow(settings)
+                val screen = when {
+                    open != null -> "editing a project"
+                    first != null -> "first start"
+                    editingTemplate != null -> "editing a template"
+                    else -> "home"
+                }
+                LaunchedEffect(screen) { CrashLogs.onScreen(screen) }
                 if (open == null && first != null) {
                     Onboarding(settings, first, { engine }) { firstRun = null }
                 } else if (open == null) {
-                    LaunchedEffect(settings.autoUpdateCheck) { if (settings.autoUpdateCheck) Updates.atStart(applicationContext) }
+                    LaunchedEffect(settings.autoUpdateCheck) { if (settings.autoUpdateCheck) Updates.atStart(applicationContext, settings) }
                     val returning = remember { cameFromEditor }
                     Box(Modifier.fillMaxSize().then(if (returning) Modifier.enterFade() else Modifier)) {
                         HomeScreen(
@@ -174,7 +200,7 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                         }
-                        exportingFromList?.let { ExportScreen(it, 0, engine, fromProjectList = true) { exportingFromList = null } }
+                        exportingFromList?.let { ExportScreen(it, 0, engine, fromProjectList = true, outdated) { exportingFromList = null } }
                     }
                 } else {
                     Box(Modifier.fillMaxSize()) {
@@ -186,17 +212,35 @@ class MainActivity : ComponentActivity() {
                                 key(open) { Ltr { EditorScreen(open, onExit = ::closeEditor) } }
                             }
                         }
-                        if (open.exportOpen) ExportScreen(open.scene, open.frame, engine, fromProjectList = false) { open.exportOpen = false }
+                        if (open.exportOpen) ExportScreen(open.scene, open.frame, engine, fromProjectList = false, outdated) { open.exportOpen = false }
                     }
                 }
                 if (opening) OpeningOverlay { openJob?.cancel() }
-                openFailed?.let { id -> OpenFailedDialog({ openFailed = null; historyFor = Triple(id, "", false) }) { openFailed = null } }
+                openFailed?.let { id -> OpenFailedDialog({ openFailed = null; historyFor = Triple(id, "", false) }, outdated) { openFailed = null } }
+                importFailed?.let { reason ->
+                    AlertDialog(
+                        onDismissRequest = { importFailed = null },
+                        text = {
+                            Column {
+                                Text(stringResource(R.string.home_import_failed, reason), color = Am.Navy)
+                                OutdatedHint(outdated, Modifier.padding(top = 8.dp))
+                            }
+                        },
+                        confirmButton = { TextButton({ importFailed = null }) { Text(stringResource(R.string.ok), color = Am.Navy) } },
+                        containerColor = Am.Card,
+                    )
+                }
                 if (open?.historyOpen == true) VersionHistory(store, open.projectId, open.scene.title, engine, onRestore = { restoreVersion(open.projectId, it) }) { open.historyOpen = false }
                 historyFor?.let { (id, title, damaged) ->
                     VersionHistory(store, id, title, engine, onRestore = { restoreVersion(id, it) }, onDelete = if (damaged) { { deleteDamaged(id) } } else null) { historyFor = null }
                 }
-                if (open == null && !opening) recovered?.let { offer -> RecoveryDialog(offer.title, onRestore = { answerRecovery(offer, true) }) { answerRecovery(offer, false) } }
-                if (open == null && first == null && !opening && recovered == null && editingTemplate == null && exportingFromList == null) {
+                val offer = recovered
+                if (open == null && !opening && (offer != null || crashed != null)) ClosedDialog(
+                    crashed, offer?.title, outdated,
+                    onRestore = { seenCrash(outdated != null); offer?.let { answerRecovery(it, true) } },
+                    onDiscard = { seenCrash(outdated != null); offer?.let { answerRecovery(it, false) } },
+                    onClose = { seenCrash(outdated != null) },
+                ) else if (open == null && first == null && !opening && editingTemplate == null && exportingFromList == null) {
                     if (settings.updatesAsked) UpdateDialog() else UpdateAskDialog(settings)
                 }
             }
@@ -216,7 +260,7 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch {
             val reports = ArrayList<ImportReport>()
             var failure: String? = null
-            withContext(Dispatchers.IO) {
+            CrashLogs.during("importing") { withContext(Dispatchers.IO) {
                 val importer = Importer.forApp(applicationContext, store)
                 for (uri in uris) try {
                     reports += importer.import { contentResolver.openInputStream(uri) }.map {
@@ -226,8 +270,8 @@ class MainActivity : ComponentActivity() {
                     Log.w("AMImport", "cannot import $uri", e)
                     failure = failure ?: (e as? ImportFailed)?.text?.resolve(this@MainActivity) ?: e.message ?: getString(R.string.library_err_unsupported_type)
                 }
-            }
-            failure?.let { Toast.makeText(this@MainActivity, getString(R.string.home_import_failed, it), Toast.LENGTH_LONG).show() }
+            } }
+            failure?.let { importFailed = it }
             if (reports.isNotEmpty()) imported = reports
             var drawn = false
             for (report in reports) if (!report.template) {
@@ -269,9 +313,11 @@ class MainActivity : ComponentActivity() {
         opening = true
         val started = SystemClock.elapsedRealtime()
         val scene = try {
-            val loaded = withContext(DiskThread.dispatcher) {
-                store.text(id)?.let { runCatching { store.versions.snapshot(id, it) } }
-                store.load(id)
+            val loaded = CrashLogs.during("opening a project") {
+                withContext(DiskThread.dispatcher) {
+                    store.text(id)?.let { runCatching { store.versions.snapshot(id, it) } }
+                    store.load(id)
+                }
             }
             loaded?.let { scene ->
                 withContext(Dispatchers.IO) {
@@ -338,6 +384,12 @@ class MainActivity : ComponentActivity() {
             }
             Toast.makeText(this@MainActivity, message, Toast.LENGTH_LONG).show()
         }
+    }
+
+    private fun seenCrash(hush: Boolean) {
+        crashed?.let { CrashLogs.markShown(applicationContext, it.time) }
+        crashed = null
+        if (hush) Updates.hush()
     }
 
     private fun answerRecovery(offer: RecoveryOffer, restore: Boolean) {
@@ -411,6 +463,16 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private fun crashForTest(kind: String) {
+        Log.i("AMTest", "crash test: $kind")
+        when (kind) {
+            "java" -> throw IllegalStateException(kind)
+            "memory" -> lifecycleScope.launch { CrashLogs.during("exporting video") { throw OutOfMemoryError(kind) } }
+            "native" -> android.system.Os.kill(android.system.Os.getpid(), android.system.OsConstants.SIGABRT)
+            "anr" -> Thread.sleep(60_000)
+        }
+    }
+
     private fun handleTestIntent() {
         DebugFrameInterpolation.divisor = intent.getIntExtra("interpDivisor", 4)
         DebugFrameInterpolation.levels = intent.getIntExtra("interpLevels", 5)
@@ -418,6 +480,8 @@ class MainActivity : ComponentActivity() {
         DebugFrameInterpolation.warps = intent.getIntExtra("interpWarps", 1)
         DebugFrameInterpolation.alpha = intent.getFloatExtra("interpAlpha", 0.15f)
         DebugFrameInterpolation.fuse = intent.getIntExtra("interpFuse", 4)
+        intent.getStringExtra("fakeversion")?.let { Updates.installedOverride = it }
+        intent.getStringExtra("crash")?.let { kind -> window.decorView.postDelayed({ crashForTest(kind) }, 2000) }
         if (intent.getBooleanExtra("audiolog", false)) engine.audio?.log = true
         if (intent.hasExtra("previewCopies")) settings.previewCopies = intent.getBooleanExtra("previewCopies", true)
         if (intent.getBooleanExtra("effectcheck", false)) lifecycleScope.launch {

@@ -6,6 +6,7 @@ import app.absentmotion.platform.Context
 import app.absentmotion.platform.Bitmap
 import app.absentmotion.platform.Uri
 import app.absentmotion.engine.EngineThread
+import app.absentmotion.library.CrashLogs
 import app.absentmotion.library.MediaAccess
 import app.absentmotion.library.modelFolder
 import app.absentmotion.model.Scene
@@ -35,7 +36,7 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
     suspend fun export(kind: ExportKind, scene: Scene, s: ExportSettings, frame: Int, name: String, progress: (Float) -> Unit): ExportResult {
         val saved = ArrayList<Uri>()
         try {
-            return withContext(Dispatchers.Default) {
+            return CrashLogs.during("exporting ${kind.name.lowercase()}") { withContext(Dispatchers.Default) {
                 val xml = scene.toXml()
                 when (kind) {
                     ExportKind.Video -> s.fixedFormat().let { f ->
@@ -82,7 +83,7 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
                     ExportKind.Package -> direct(saved, name, "absproj", "application/octet-stream", "Documents/$AppFolder") { fd -> pack(scene, xml, fdStream(fd), progress) }
                     ExportKind.Sequence -> sequence(saved, scene, xml, s, name, progress)
                 }
-            }
+            } }
         } catch (t: Throwable) {
             withContext(NonCancellable + Dispatchers.IO) { saved.forEach { runCatching { store.delete(it) } } }
             throw t

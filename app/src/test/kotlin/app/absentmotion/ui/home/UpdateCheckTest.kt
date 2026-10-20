@@ -65,6 +65,21 @@ class UpdateCheckTest {
         assertNull(parseRelease(""))
     }
 
+    @Test fun theOutdatedHintOnlyAppearsWhenAllowedAndReallyOlder() {
+        val page = "$HOME_PAGE/releases/tag/v3.2.0"
+        assertEquals(Outdated("3.1.0", "3.2.0", page), outdatedHint(allowed = true, installed = "3.1.0", newest = "3.2.0", link = page))
+        assertEquals(Outdated("3.1.0", "3.1.1-rc.1", page), outdatedHint(true, "3.1.0", "3.1.1-rc.1", page))
+        assertNull(outdatedHint(allowed = false, installed = "3.1.0", newest = "3.2.0", link = page))
+        assertNull(outdatedHint(true, "3.2.0", "3.2.0", page))
+        assertNull(outdatedHint(true, "3.3.0", "3.2.0", page))
+        assertNull(outdatedHint(true, "3.2.0", "3.2.0-beta.4", page))
+        assertNull(outdatedHint(true, "3.1.0", null, null))
+        assertNull(outdatedHint(true, "3.1.0", "3.2.0", null))
+        assertNull(outdatedHint(true, "3.1.0", "nightly", page))
+        assertNull(outdatedHint(true, "", "3.2.0", page))
+        assertNull(outdatedHint(true, "3.1.0", "3.2.0", "https://example.com/AbsentMotion.apk"))
+    }
+
     @Test fun theAnswerSaysWhatToShow() {
         val newer = Release("3.1.0", HOME_PAGE)
         assertEquals(UpdateAnswer.Available(newer), answerFor(newer, "3.0.0"))
