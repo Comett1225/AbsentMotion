@@ -437,6 +437,9 @@
     <string name="export_verify_first_frame">The first video frame does not decode.</string>
     <string name="export_verify_last_frame">The last video frame does not decode.</string>
     <string name="export_verify_unreadable">The file cannot be read back: %1$s</string>
+    <string name="export_verify_picture">The picture in the file does not decode.</string>
+    <string name="export_verify_size">The picture is %1$s instead of %2$s.</string>
+    <string name="export_verify_frames">The GIF has %1$s frames instead of %2$s.</string>
 
     <string name="export_error_cannot_encode">This phone cannot encode %1$s at %2$s</string>
     <string name="export_error_draw_frame">The engine could not draw frame %1$s</string>
@@ -1229,6 +1232,7 @@
     <string name="export_heat_text_hot">Your phone is hot — export slowed down to protect it</string>
     <string name="export_heat_text_critical">Your phone is very hot — export paused between frames to let it cool</string>
     <string name="export_checked_ok">Checked: plays correctly</string>
+    <string name="export_checked_ok_still">Checked: opens correctly</string>
     <string name="export_checked_problems">Checked: %1$s</string>
 
     <string name="transition_title">Transition</string>

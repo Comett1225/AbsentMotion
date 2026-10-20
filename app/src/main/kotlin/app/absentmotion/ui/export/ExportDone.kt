@@ -36,7 +36,8 @@ fun DoneScreen(kind: ExportKind, result: ExportResult, onClose: () -> Unit, onSh
             Text(result.where, color = Am.OnNavy.copy(alpha = 0.7f), fontSize = 13.sp, textAlign = TextAlign.Center)
             result.verification?.let { v ->
                 Text(
-                    verificationLine(v).text(), Modifier.padding(top = 2.dp), color = if (v.ok) Am.OnNavy.copy(alpha = 0.7f) else Am.OnNavyAccent,
+                    verificationLine(v, still = kind == ExportKind.Frame || kind == ExportKind.FrameAs).text(), Modifier.padding(top = 2.dp),
+                    color = if (v.ok) Am.OnNavy.copy(alpha = 0.7f) else Am.OnNavyAccent,
                     fontSize = 13.sp, textAlign = TextAlign.Center, maxLines = 3,
                 )
             }

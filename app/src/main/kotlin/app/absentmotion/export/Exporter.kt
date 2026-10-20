@@ -68,6 +68,7 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
                         }
                     }
                     ExportKind.Gif -> direct(saved, name, "gif", "image/gif", "Pictures/$AppFolder") { fd -> cool { gif(scene, xml, s, fdStream(fd), it::pauseMs, progress) } }
+                        .verified(kind, scene, s, false)
                     ExportKind.Frame, ExportKind.FrameAs -> {
                         val shape = if (kind == ExportKind.Frame) s.copy(image = ImageKind.Png) else s
                         single(saved, name, shape.image.ext, shape.image.mime, "Pictures/$AppFolder") { out ->
@@ -75,7 +76,7 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
                                 val bytes = still(scene.frameStart(frame), scene.width, scene.height) ?: throw ExportError(txt(R.string.export_error_draw_still))
                                 out.write(encode(bytes, scene.width, scene.height, shape, reuse = null))
                             }
-                        }
+                        }.verified(kind, scene, shape, false)
                     }
                     ExportKind.Xml -> single(saved, name, "xml", "text/xml", "Documents/$AppFolder") { it.write(xml.toByteArray()) }
                     ExportKind.Package -> direct(saved, name, "absproj", "application/octet-stream", "Documents/$AppFolder") { fd -> pack(scene, xml, fdStream(fd), progress) }
@@ -111,8 +112,11 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
         return ExportResult(saved, mime, store.location(where))
     }
 
-    private suspend fun ExportResult.verified(kind: ExportKind, scene: Scene, s: ExportSettings, hasAudio: Boolean): ExportResult =
-        expectationFor(kind, scene, s, hasAudio)?.let { ExportResult(uris, mime, where, verifyExport(context, uris.first(), it)) } ?: this
+    private suspend fun ExportResult.verified(kind: ExportKind, scene: Scene, s: ExportSettings, hasAudio: Boolean): ExportResult {
+        val check = expectationFor(kind, scene, s, hasAudio)?.let { verifyExport(context, uris.first(), it) }
+            ?: pictureExpectationFor(kind, scene, s)?.let { verifyPicture(context, uris.first(), it) }
+        return if (check == null) this else ExportResult(uris, mime, where, check)
+    }
 
     private suspend fun <T> cool(block: suspend (ThermalMonitor) -> T): T {
         val thermal = ThermalMonitor.of(context)
