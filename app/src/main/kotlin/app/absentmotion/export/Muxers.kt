@@ -70,6 +70,7 @@ internal class MatroskaSink(fd: FileDescriptor, private val fps: Int, webm: Bool
         val payload = when (mimes[track]) {
             MediaFormat.MIMETYPE_VIDEO_AVC, MediaFormat.MIMETYPE_VIDEO_HEVC -> NalUnits.lengthPrefixed(bytes)
             MediaFormat.MIMETYPE_VIDEO_AV1 -> NalUnits.withoutTemporalDelimiter(bytes)
+            MediaFormat.MIMETYPE_VIDEO_VP9 -> vp9Bt709(bytes)
             else -> bytes
         }
         val key = !tracks[track].video || info.flags and MediaCodec.BUFFER_FLAG_KEY_FRAME != 0

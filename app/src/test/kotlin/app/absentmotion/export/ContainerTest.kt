@@ -128,6 +128,14 @@ class ContainerTest {
         assertArrayEquals(hex("81000c00"), av1Config(hex("81000c00")))
     }
 
+    @Test fun vp9KeyFramesAreMarkedBt709() {
+        assertArrayEquals(hex("82498342400ff0"), vp9Bt709(hex("82498342000ff0")))
+        assertArrayEquals(hex("86498342000ff0"), vp9Bt709(hex("86498342000ff0")))
+        assertArrayEquals(hex("8649834200"), vp9Bt709(hex("8649834200")))
+        assertArrayEquals(hex("86000000"), vp9Bt709(hex("86000000")))
+        assertArrayEquals(hex("82498342a00ff0"), vp9Bt709(hex("82498342a00ff0")))
+    }
+
     @Test fun androidOpusConfigurationIsSplit() {
         val head = hex("4f707573486561640102380180bb0000000000")
         fun part(marker: String, body: ByteArray) =

@@ -294,6 +294,13 @@ internal object NalUnits {
         if (obus.size >= 2 && obus[0].toInt() == 0x12 && obus[1].toInt() == 0) obus.copyOfRange(2, obus.size) else obus
 }
 
+internal fun vp9Bt709(frame: ByteArray): ByteArray {
+    val keyProfile0 = frame.size > 4 && frame[0].toInt() and 0xFC == 0x80
+    if (!keyProfile0 || frame[1].toInt() != 0x49 || frame[2].toInt() and 0xFF != 0x83 || frame[3].toInt() != 0x42) return frame
+    if (frame[4].toInt() and 0xE0 != 0) return frame
+    return frame.copyOf().also { it[4] = ((it[4].toInt() and 0x1F) or 0x40).toByte() }
+}
+
 internal class OpusConfig(val head: ByteArray, val delayNs: Long, val preRollNs: Long)
 
 internal fun opusConfig(csd0: ByteArray, csd1: ByteArray?, csd2: ByteArray?): OpusConfig {

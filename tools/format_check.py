@@ -10,6 +10,7 @@ VIDEO = {'mp4': ['h264', 'hevc', 'av1', 'apv'], 'mov': ['h264', 'hevc'], 'webm':
 AUDIO = {'mp4': ['aac'], 'mov': ['aac'], 'webm': ['opus'], 'mkv': ['aac', 'opus']}
 FFCODEC = {'h264': 'h264', 'hevc': 'hevc', 'av1': 'av1', 'vp9': 'vp9', 'apv': 'apv', 'aac': 'aac', 'opus': 'opus'}
 FPS = 30
+COLORS = [(0, 0, 0), (64, 64, 64), (128, 128, 128), (192, 192, 192), (255, 255, 255), (255, 0, 0), (0, 255, 0), (0, 0, 255)]
 SECONDS = 2
 
 
@@ -81,8 +82,13 @@ def check(path, container, vcodec, acodec, rate, channels):
             break
     frame = np.frombuffer(subprocess.run(['ffmpeg', '-v', 'error', '-i', str(path), '-frames:v', '1', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-'],
                                          capture_output=True).stdout, dtype=np.uint8)
-    if frame.size != 256 * 256 * 3 or not (frame.reshape(256, 256, 3)[128, 128, 0] > 230 and frame.reshape(256, 256, 3)[128, 128, 1:].max() < 25):
-        problems.append('wrong pixels')
+    if frame.size != 256 * 256 * 3:
+        problems.append('no first frame')
+    else:
+        image = frame.reshape(256, 256, 3).astype(int)
+        worst = max(int(np.abs(image[128, 16 + 32 * i] - np.array(color)).max()) for i, color in enumerate(COLORS))
+        if worst > 8:
+            problems.append('colours off by %d' % worst)
     return problems
 
 
@@ -93,7 +99,8 @@ def main():
     subprocess.run(['ffmpeg', '-v', 'error', '-y', '-f', 'lavfi', '-i', 'sine=frequency=440:sample_rate=44100:duration=0.5', str(wav)], check=True)
     tone = engine.DEVICE_DIR + '/formattone.wav'
     engine.adb('push', wav, tone)
-    body = engine.rect(1, 128, 128, 128, 128, 0xffff0000) + '<audio id="2" startTime="0" endTime="1999" src="file://' + tone + '" loop="true"/>'
+    bars = ''.join(engine.rect(i + 1, 16 + 32 * i, 128, 16, 128, 0xff000000 | (r << 16) | (g << 8) | b) for i, (r, g, b) in enumerate(COLORS))
+    body = bars + '<audio id="20" startTime="0" endTime="1999" src="file://' + tone + '" loop="true"/>'
     xml = engine.scene(body, 256, 256).replace('totalTime="1000"', 'totalTime="1999"', 1)
     (work / 'formatcheck.xml').write_text(xml)
     engine.adb('push', work / 'formatcheck.xml', engine.DEVICE_DIR + '/formatcheck.xml')
