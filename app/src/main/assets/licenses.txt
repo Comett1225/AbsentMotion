@@ -2219,7 +2219,7 @@ The launcher icon is an own drawing, made by tools/icon/make_icon.py (source of 
 COUNTS
 ------
 
-- Lucide only - 163
+- Lucide only - 167
 - Lucide shapes plus own parts - 8
 - Own drawing only - 40
 - Material Symbols - 0
@@ -2265,6 +2265,10 @@ ICONS
 - TextTool (Lucide type) - ISC and MIT (Feather) - ui/editor/ChromeIcons.kt
 - Captions (Lucide message-square-text) - ISC - ui/editor/ChromeIcons.kt
 - CloseThick (Lucide x) - ISC and MIT (Feather) - ui/editor/ChromeIcons.kt
+- NullObject (Lucide crosshair) - ISC and MIT (Feather) - ui/editor/ChromeIcons.kt
+- AssetProject (Lucide folder-open) - ISC - ui/editor/ChromeIcons.kt
+- ImportSvg (Lucide vector-square) - ISC - ui/editor/ChromeIcons.kt
+- Model3d (Lucide cuboid) - ISC - ui/editor/ChromeIcons.kt
 - Close (Lucide x) - ISC and MIT (Feather) - ui/editor/ChromeIcons.kt
 - ChevronDown (Lucide chevron-down) - ISC and MIT (Feather) - ui/editor/ChromeIcons.kt
 - Pencil (Lucide pencil) - ISC - ui/editor/ChromeIcons.kt

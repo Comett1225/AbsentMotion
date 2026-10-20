@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -81,11 +82,14 @@ import kotlinx.coroutines.withContext
 private val ItemShape = RoundedCornerShape(4.dp)
 
 @Composable
-private fun TextButton(label: String, modifier: Modifier, enabled: Boolean = true, onClick: () -> Unit = {}) {
-    Box(
-        modifier.alpha(if (enabled) 1f else DimAlpha).clip(ItemShape).background(Am.Button).then(if (enabled) Modifier.clickable(onClick = onClick) else Modifier),
-        contentAlignment = Alignment.Center,
-    ) { Text(label, color = Am.OnDark, fontSize = 12.sp, maxLines = 2, softWrap = true, lineHeight = 14.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center) }
+private fun ObjectTile(label: String, icon: ImageVector, modifier: Modifier, enabled: Boolean = true, onClick: () -> Unit = {}) {
+    Box(modifier.alpha(if (enabled) 1f else DimAlpha).clip(ItemShape).background(Am.Button).then(if (enabled) Modifier.clickable(onClick = onClick) else Modifier)) {
+        Icon(icon, null, Modifier.align(Alignment.TopCenter).padding(top = 14.dp).size(24.dp), tint = Am.OnDark)
+        Text(
+            label, Modifier.align(Alignment.BottomCenter).fillMaxWidth().height(40.dp).padding(start = 3.dp, end = 3.dp, bottom = 4.dp).wrapContentHeight(Alignment.CenterVertically),
+            color = Am.OnDark, fontSize = 11.sp, lineHeight = 13.sp, maxLines = 2, textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+        )
+    }
 }
 
 @Composable
@@ -108,14 +112,14 @@ internal fun ObjectPage(state: EditorState, modifier: Modifier) {
     }
     Column(modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            TextButton(stringResource(R.string.camera), Modifier.size(70.dp, 80.dp)) { state.addCamera() }
-            TextButton(stringResource(R.string.structure_null), Modifier.size(70.dp, 80.dp)) { state.addNull() }
-            TextButton(stringResource(R.string.structure_empty_group), Modifier.size(70.dp, 80.dp)) { state.addEmptyGroup() }
-            TextButton(stringResource(R.string.structure_asset_project), Modifier.size(70.dp, 80.dp)) { picking = true }
+            ObjectTile(stringResource(R.string.camera), PanelIcons.Camera, Modifier.size(70.dp, 80.dp)) { state.addCamera() }
+            ObjectTile(stringResource(R.string.structure_null), ChromeIcons.NullObject, Modifier.size(70.dp, 80.dp)) { state.addNull() }
+            ObjectTile(stringResource(R.string.structure_empty_group), SelectionIcons.Group, Modifier.size(70.dp, 80.dp)) { state.addEmptyGroup() }
+            ObjectTile(stringResource(R.string.structure_asset_project), ChromeIcons.AssetProject, Modifier.size(70.dp, 80.dp)) { picking = true }
         }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            TextButton(stringResource(R.string.structure_import_svg), Modifier.size(70.dp, 80.dp)) { svg.launch(arrayOf("image/svg+xml")) }
-            TextButton(stringResource(R.string.structure_3d_model), Modifier.size(70.dp, 80.dp), enabled = !reading) { models.launch(arrayOf("*/*")) }
+            ObjectTile(stringResource(R.string.structure_import_svg), ChromeIcons.ImportSvg, Modifier.size(70.dp, 80.dp)) { svg.launch(arrayOf("image/svg+xml")) }
+            ObjectTile(stringResource(R.string.structure_3d_model), ChromeIcons.Model3d, Modifier.size(70.dp, 80.dp), enabled = !reading) { models.launch(arrayOf("*/*")) }
         }
     }
 }

@@ -102,6 +102,15 @@ internal object ChromeIcons {
             "L13 15M7 7L15 7")
     val CloseThick = icon("CloseThick", stroke = "M17.4 6.6L6.6 17.4M6.6 6.6L17.4 17.4", width = 2.2f)
 
+    val NullObject = icon("NullObject", stroke = "M2 12A10 10 0 1 0 22 12A10 10 0 1 0 2 12ZM22 12L18 12M6 12L2 12M12 6L12 2M12 22L12 18")
+    val AssetProject = icon("AssetProject", stroke = "M6 14L7.5 11.1A2 2 0 0 1 9.24 10L20 10A2 2 0 0 1 21.94 12.5L20.4 18.5A2 2 0 0 1 18.45 20L4 20A2 2 0 0 1 2 18L2 5A2 2 0 0 1 4 3" +
+            "L7.9 3A2 2 0 0 1 9.59 3.9L10.4 5.1A2 2 0 0 0 12.07 6L18 6A2 2 0 0 1 20 8L20 10")
+    val ImportSvg = icon("ImportSvg", stroke = "M17.055 4.533A24 24 0 0 0 6.945 4.533M19.467 17.055A24 24 0 0 0 19.467 6.945M4.533 6.945A24 24 0 0 0 4.533 17.055M6.945 19.467" +
+            "A24 24 0 0 0 17.055 19.467M17 19A2 2 0 1 0 21 19A2 2 0 1 0 17 19ZM17 5A2 2 0 1 0 21 5A2 2 0 1 0 17 5ZM3 19A2 2 0 1 0 7 19A2 2 0 1 0 3 19ZM3 5" +
+            "A2 2 0 1 0 7 5A2 2 0 1 0 3 5Z")
+    val Model3d = icon("Model3d", stroke = "M10 22L10 14M2.336 8.89L10 14L21.715 6.971M22 14A2 2 0 0 1 21.029 15.715L11.029 21.715A2 2 0 0 1 8.891 21.665L2.891 17.665A2 2 0 0 1 2 16" +
+            "L2 10A2 2 0 0 1 2.971 8.285L12.971 2.285A2 2 0 0 1 15.109 2.335L21.109 6.335A2 2 0 0 1 22 8Z")
+
     val Close = icon("Close", stroke = "M18.9 5.1L5.1 18.9M5.1 5.1L18.9 18.9")
     val ChevronDown = icon("ChevronDown", stroke = "M6 9L12 15L18 9")
     val Pencil = icon("Pencil", stroke = "M21.174 6.812A1 1 0 0 0 17.188 2.825L3.842 16.174A2 2 0 0 0 3.342 17.004L2.021 21.356A0.5 0.5 0 0 0 2.644 21.978L6.997 20.658A2 2 0 0 0 7.827 20.161Z" +
