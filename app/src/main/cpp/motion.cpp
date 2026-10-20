@@ -468,7 +468,22 @@ void FollowPath(const Layer& l, double timeMs, const SkPath& path, Placement* p)
         SkVector tangent;
         if (!walk.getPosTan((SkScalar)at, &pos, &tangent)) return;
         SkVector out{tangent.fY, -tangent.fX};
-        if (path.contains(pos.fX + out.fX * 0.5f, pos.fY + out.fY * 0.5f)) out = -out;
+        if (walk.isClosed()) {
+            if (path.contains(pos.fX + out.fX * 0.5f, pos.fY + out.fY * 0.5f)) out = -out;
+        } else {
+            const float length = walk.getLength();
+            double area = 0;
+            SkPoint first = pos, prev = pos;
+            for (int k = 0; k <= 64; k++) {
+                SkPoint q;
+                if (!walk.getPosTan(length * k / 64, &q, nullptr)) continue;
+                if (k == 0) first = q;
+                else area += (double)prev.fX * q.fY - (double)q.fX * prev.fY;
+                prev = q;
+            }
+            area += (double)prev.fX * first.fY - (double)first.fX * prev.fY;
+            if (area < -1e-3 * length * length) out = -out;
+        }
         const float turn = (Param(e, "rotate", t, 1) >= 0.5f ? (float)(std::atan2(tangent.fY, tangent.fX) * 360 / kTau) : 0.0f) + Param(e, "orientation", t, 0);
         const SkVector shift = SkMatrix::RotateDeg(turn).mapVector(Param(e, "offset", t, 0, 0), Param(e, "offset", t, 0, 1));
         p->location = pos + out * Param(e, "inset", t, 0) + shift;

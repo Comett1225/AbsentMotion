@@ -346,6 +346,13 @@ def main():
     ok = fringe[0] > 250 and 110 <= fringe[1] <= 146
     print(('ok   ' if ok else 'FAIL ') + f'directional blur fades white to half white where half its samples are clear, not to grey: {fringe}', flush=True)
     failed += not ok
+    curve = ('<shape id="1" label="s" startTime="0" endTime="1000" fillType="none">' + engine.transform() + '<path d="M 20 100 C 60 20, 80 20, 100 100 S 140 180, 180 100"/>'
+             '<path-stroke><color value="#ff0000ff"/><size value="2"/></path-stroke></shape>')
+    rides = [centre(engine.still(f'sidecurve{k}', engine.scene(curve + engine.rect(2, 0, 0, 6, 6, 0xffff0000, extra=fx('movealongpath', progress=p, inset=20, rotate=0))), work))
+             for k, p in enumerate((0.25, 0.75))]
+    ok = None not in rides[0] + rides[1] and rides[0][1] < 60 and rides[1][1] < 150
+    print(('ok   ' if ok else 'FAIL ') + 'move along path keeps an inset on one side of an open S curve instead of jumping across where it crosses its chord: ' + str(rides), flush=True)
+    failed += not ok
     hits = engine.run('motionhit', engine.scene(engine.rect(7, 100, 100, 10, 10, 0xffff0000, extra=fx('oscillate', angle=0, frequency=0.5, magnitude=50))), work, [(150, 100), (100, 100)], 15)
     engine.adb('shell', 'rm', engine.DEVICE_DIR + '/motionhit.png')
     got = [line.split()[-1] for line in hits.splitlines() if ' hit ' in line]
