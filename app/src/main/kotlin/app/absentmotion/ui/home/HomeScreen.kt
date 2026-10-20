@@ -172,6 +172,7 @@ fun HomeScreen(
     val wide = LocalWide.current
 
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { version++ }
+    app.absentmotion.platform.BackHandler(search != null) { search = null }
     LaunchedEffect(version, changes) { projects = withContext(Dispatchers.IO) { store.list(includeDamaged = true) } }
     val shown = remember(projects, tab, query) { projects.filter { it.isElement == (tab == 1) && matchesSearch(query, it.title) } }
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> if (uri != null) onImportFile(uri) }
@@ -185,7 +186,7 @@ fun HomeScreen(
     }
 
     ModalNavigationDrawer(
-        drawerContent = { SettingsDrawer(settings, onRestored = { version++ }) },
+        drawerContent = { SettingsDrawer(settings, drawer, onRestored = { version++ }) },
         drawerState = drawer,
         scrimColor = Color.Black.copy(alpha = 0.94f),
     ) {

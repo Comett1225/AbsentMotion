@@ -75,12 +75,12 @@ private val ListLineColor get() = Am.NavyLine
 private val ChosenRow get() = Am.NavyHi
 
 @Composable
-fun SettingsDrawer(settings: AppSettings, onRestored: () -> Unit = {}) {
+fun SettingsDrawer(settings: AppSettings, drawer: androidx.compose.material3.DrawerState, onRestored: () -> Unit = {}) {
     var about by remember { mutableStateOf(false) }
     var language by remember { mutableStateOf(false) }
     var demoNote by remember { mutableStateOf(false) }
     ModalDrawerSheet(
-        Modifier.width(280.dp), drawerShape = RectangleShape, drawerContainerColor = Am.HomeDrawer,
+        drawer, Modifier.width(280.dp), drawerShape = RectangleShape, drawerContainerColor = Am.HomeDrawer,
         windowInsets = WindowInsets(0),
     ) {
         Column(Modifier.fillMaxWidth().background(Am.Card).statusBarsPadding().verticalScroll(rememberScrollState()).padding(bottom = 8.dp)) {
