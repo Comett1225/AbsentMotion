@@ -50,7 +50,7 @@ import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sin
 
-internal class Turn(val effect: Int = -1, private val axes: List<EffectParam> = emptyList()) {
+internal data class Turn(val effect: Int = -1, private val axes: List<EffectParam> = emptyList()) {
     fun values(layer: Layer): FloatArray {
         if (effect < 0) return floatArrayOf(layer.tilt[0], layer.tilt[1], layer.rotation)
         val node = layer.effects.getOrNull(effect)
