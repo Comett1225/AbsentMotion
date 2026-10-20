@@ -119,9 +119,9 @@ private val ButtonBg get() = Am.PanelInset
 internal fun borderShadowTarget(layer: Layer): KeyTarget? {
     colourEditing?.let { return KeyTarget(it, String.format(java.util.Locale.US, "#%08x", colourDefault), "color") }
     return when (tab) {
-        0 -> if (layer.stroke.present) (if (strokeField == 1) KeyTarget(StrokeColour, "#ff000000", "color") else KeyTarget(StrokeSize, "4.000000")) else null
+        0 -> if (layer.stroke.let { it.present && it.enabled }) (if (strokeField == 1) KeyTarget(StrokeColour, "#ff000000", "color") else KeyTarget(StrokeSize, "4.000000")) else null
         1 -> layer.borders.getOrNull(openBorder)?.let { if (borderField == 0) KeyTarget(it.colorRef, "#ffffffff", "color") else KeyTarget(it.sizeRef, "6.000000") }
-        else -> if (layer.shadow.present) ShadowTargets[shadowField] else null
+        else -> if (layer.shadow.let { it.present && it.enabled }) ShadowTargets[shadowField] else null
     }
 }
 
@@ -206,24 +206,24 @@ private fun StrokeTab(state: EditorState, layer: Layer) {
     val s = layer.stroke
     val on = s.present && s.enabled
     Box(Modifier.fillMaxSize()) {
-        TitleRow(stringResource(R.string.border_stroke), on, s.color, { strokeField = 1; if (s.present) editColour(StrokeColour, StyleColors.Black) }) {
+        TitleRow(stringResource(R.string.border_stroke), on, s.color, { strokeField = 1; if (on) editColour(StrokeColour, StyleColors.Black) }) {
             state.editSelected { l -> l.withStrokeEnabled(it) }
         }
         Box(Modifier.at(0, 119, 721, 160)) {
-            EffectRuler(s.width, 0.1f, 0f, 10000f, s.present, { strokeField = 0 }, { state.setRow(StrokeSize, "$it", true) }, state::endGesture,
+            EffectRuler(s.width, 0.1f, 0f, 10000f, on, { strokeField = 0 }, { state.setRow(StrokeSize, "$it", true) }, state::endGesture,
                 Modifier.fillMaxSize().padding(end = 104.px))
-            ValueBox(formatFixed(s.width, 1), false, strokeField == 0, Modifier.align(Alignment.CenterEnd).size(155.px, 127.px), 8f, s.present) {
+            ValueBox(formatFixed(s.width, 1), false, strokeField == 0, Modifier.align(Alignment.CenterEnd).size(155.px, 127.px), 8f, on) {
                 if (strokeField == 0) state.askNumber("", s.width) { v -> state.setRow(StrokeSize, "${v.coerceAtLeast(0f)}", false) } else strokeField = 0
             }
         }
         val caps = listOf("butt", "round", "square")
         val joins = listOf("bevel", "round", "miter")
-        Choices(3, app.absentmotion.model.strokeCapIndex(s.cap), Modifier.at(23, 302, 338, 84), s.present, { state.editSelected { l -> l.withStrokeAttr("cap", caps[it]) } }) { i, lit -> capGlyph(i, lit) }
-        Choices(3, joins.indexOf(s.join).coerceAtLeast(0), Modifier.at(383, 302, 338, 84), s.present, { state.editSelected { l -> l.withStrokeAttr("join", joins[it]) } }) { i, lit -> joinGlyph(i, lit) }
+        Choices(3, app.absentmotion.model.strokeCapIndex(s.cap), Modifier.at(23, 302, 338, 84), on, { state.editSelected { l -> l.withStrokeAttr("cap", caps[it]) } }) { i, lit -> capGlyph(i, lit) }
+        Choices(3, joins.indexOf(s.join).coerceAtLeast(0), Modifier.at(383, 302, 338, 84), on, { state.editSelected { l -> l.withStrokeAttr("join", joins[it]) } }) { i, lit -> joinGlyph(i, lit) }
         for (end in 0..1) {
             Box(
                 Modifier.at(if (end == 0) 23 else 383, 409, 338, 84).clip(PanelShape).background(ButtonBg)
-                    .then(if (s.present) Modifier.clickable { endPicker = end } else Modifier),
+                    .then(if (on) Modifier.clickable { endPicker = end } else Modifier),
                 contentAlignment = Alignment.Center,
             ) {
                 Canvas(Modifier.fillMaxSize()) {
@@ -403,14 +403,15 @@ private fun DrawScope.triangle(down: Boolean) {
 @Composable
 private fun ShadowTab(state: EditorState, layer: Layer) {
     val s = layer.shadow
+    val on = s.present && s.enabled
     Column(Modifier.fillMaxSize()) {
-        TitleRow(stringResource(R.string.shadow_title), s.present && s.enabled, null, {}) { on -> state.editSelected { it.withShadowEnabled(on) } }
-        Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).then(if (s.present) Modifier else Modifier.dimmed())) {
+        TitleRow(stringResource(R.string.shadow_title), on, null, {}) { checked -> state.editSelected { it.withShadowEnabled(checked) } }
+        Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).then(if (on) Modifier else Modifier.dimmed())) {
             fun select(i: Int) = { shadowField = i }
-            ColourRow(s.color, shadowField == 0, select(0)) { if (s.present) editColour(ShadowColour, StyleColors.Black) }
-            EffectNumbers(state, sizeParam(), "${s.size}", s.present, shadowField == 1, select(1)) { text, g -> state.setRow(ShadowRefs[1], text, g) }
-            EffectNumbers(state, alphaParam(), "${s.opacity}", s.present, shadowField == 2, select(2)) { text, g -> state.setRow(ShadowRefs[2], text, g) }
-            EffectNumbers(state, positionParam(), "${s.x},${s.y}", s.present, shadowField == 3, select(3)) { text, g -> state.setRow(ShadowRefs[3], text, g) }
+            ColourRow(s.color, shadowField == 0, select(0)) { if (on) editColour(ShadowColour, StyleColors.Black) }
+            EffectNumbers(state, sizeParam(), "${s.size}", on, shadowField == 1, select(1)) { text, g -> state.setRow(ShadowRefs[1], text, g) }
+            EffectNumbers(state, alphaParam(), "${s.opacity}", on, shadowField == 2, select(2)) { text, g -> state.setRow(ShadowRefs[2], text, g) }
+            EffectNumbers(state, positionParam(), "${s.x},${s.y}", on, shadowField == 3, select(3)) { text, g -> state.setRow(ShadowRefs[3], text, g) }
         }
     }
 }
