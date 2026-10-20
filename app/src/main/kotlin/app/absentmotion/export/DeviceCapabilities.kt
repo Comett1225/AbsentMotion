@@ -154,9 +154,11 @@ class DeviceCapabilities private constructor(context: Context) {
         }
     }
 
-    suspend fun runCheckNow(engine: EngineThread?): DeviceReport {
+    suspend fun runCheckNow(engine: EngineThread?, progress: (Float) -> Unit = {}): DeviceReport {
         val encoders = withContext(Dispatchers.Default) { analyseEncoders() }
-        val probe = engine?.let { runCatching { probe(it) }.onFailure { e -> if (e is kotlinx.coroutines.CancellationException) throw e }.getOrNull() }
+        progress(0.3f)
+        val probe = engine?.let { runCatching { probe(it) { p -> progress(0.3f + 0.7f * p) } }.onFailure { e -> if (e is kotlinx.coroutines.CancellationException) throw e }.getOrNull() }
+        progress(1f)
         return lock.withLock { DeviceReport(key, encoders, probe ?: state.value?.probe).also { store(it); state.value = it } }
     }
 
@@ -170,7 +172,7 @@ class DeviceCapabilities private constructor(context: Context) {
         prefs.edit().putString("report", report.toJson().toString()).apply()
     }
 
-    suspend fun probe(engine: EngineThread): ProbeResult {
+    suspend fun probe(engine: EngineThread, progress: (Float) -> Unit = {}): ProbeResult {
         val s = ExportSettings(1080, 30)
         val scene = Scene.parse(ProbeScene)
         val (w, h) = exportSize(scene, s.shortSide, even = true)
@@ -179,7 +181,7 @@ class DeviceCapabilities private constructor(context: Context) {
             val start = SystemClock.elapsedRealtime()
             var first = 0L
             java.io.RandomAccessFile(out, "rw").use { file ->
-                exportVideo(engine, scene, ProbeScene, s, file.fd, null, progress = { if (first == 0L && it > 0f) first = SystemClock.elapsedRealtime() })
+                exportVideo(engine, scene, ProbeScene, s, file.fd, null, progress = { if (first == 0L && it > 0f) first = SystemClock.elapsedRealtime(); progress(it) })
             }
             val ms = SystemClock.elapsedRealtime() - start
             return ProbeResult(s.codec, w, h, frameCount(scene, s.fps), ms, (first - start).coerceIn(0, ms - 1))

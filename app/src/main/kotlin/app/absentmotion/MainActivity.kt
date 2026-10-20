@@ -144,7 +144,7 @@ class MainActivity : ComponentActivity() {
             CompositionLocalProvider(LocalIndication provides if (open == null) homePress else editorPress, LocalDensity provides remember(density) { Density(density, 1f) }) {
                 val first = firstRun
                 if (open == null && first != null) {
-                    Onboarding(settings, first) { firstRun = null }
+                    Onboarding(settings, first, { engine }) { firstRun = null }
                 } else if (open == null) {
                     val returning = remember { cameFromEditor }
                     Box(Modifier.fillMaxSize().then(if (returning) Modifier.enterFade() else Modifier)) {

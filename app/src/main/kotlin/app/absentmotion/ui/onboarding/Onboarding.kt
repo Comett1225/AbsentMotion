@@ -2,6 +2,8 @@ package app.absentmotion.ui.onboarding
 
 import android.content.Context
 import android.content.pm.PackageManager
+import app.absentmotion.engine.EngineThread
+import app.absentmotion.export.sizeLabel
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -103,7 +105,7 @@ data class FirstRun(val step: OnboardingStep, val upgrading: Boolean) {
 }
 
 @Composable
-fun Onboarding(settings: AppSettings, first: FirstRun, onDone: () -> Unit) {
+fun Onboarding(settings: AppSettings, first: FirstRun, engine: () -> EngineThread, onDone: () -> Unit) {
     val context = LocalContext.current
     var step by rememberSaveable { mutableStateOf(first.step) }
     BackHandler(step == OnboardingStep.Check) { step = OnboardingStep.Language }
@@ -115,7 +117,7 @@ fun Onboarding(settings: AppSettings, first: FirstRun, onDone: () -> Unit) {
                     step = OnboardingStep.Check
                     applyLanguage(context, language)
                 }
-                OnboardingStep.Check -> CheckStep(first.upgrading) {
+                OnboardingStep.Check -> CheckStep(first.upgrading, engine) {
                     settings.onboarding = ONBOARDING_DONE
                     onDone()
                 }
@@ -143,7 +145,7 @@ private fun LanguageStep(onContinue: (AppLanguage) -> Unit) {
 }
 
 @Composable
-private fun CheckStep(upgrading: Boolean, onDone: () -> Unit) {
+private fun CheckStep(upgrading: Boolean, engine: () -> EngineThread, onDone: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var job by remember { mutableStateOf<Job?>(null) }
@@ -155,7 +157,7 @@ private fun CheckStep(upgrading: Boolean, onDone: () -> Unit) {
     fun run() {
         job = scope.launch {
             try {
-                result = runPhoneCheck(context.applicationContext) { progress = it }
+                result = runPhoneCheck(context.applicationContext, engine()) { progress = it }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -232,8 +234,6 @@ private fun Results(result: PhoneCheckResult?, running: Boolean, progress: () ->
 }
 
 private const val UNKNOWN = "\u2013"
-
-internal fun sizeLabel(shortSide: Int) = if (shortSide >= 2160) "4K" else "${shortSide}p"
 
 @Composable
 fun LanguageDialog(onClose: () -> Unit) {

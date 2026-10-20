@@ -1,11 +1,11 @@
 package app.absentmotion.ui.onboarding
 
 import android.content.Context
-import android.media.MediaCodecList
 import android.os.Build
+import app.absentmotion.engine.EngineThread
 import app.absentmotion.export.Codec
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import app.absentmotion.export.DeviceCapabilities
+import app.absentmotion.export.DeviceReport
 
 data class PhoneCheckResult(val formats: List<FormatSupport>, val speed: PhoneSpeed)
 
@@ -13,26 +13,28 @@ data class FormatSupport(val name: String, val maxShortSide: Int, val hardware: 
 
 enum class PhoneSpeed { Fast, Good, Basic }
 
-suspend fun runPhoneCheck(context: Context, progress: (Float) -> Unit): PhoneCheckResult = withContext(Dispatchers.Default) {
-    val encoders = MediaCodecList(MediaCodecList.REGULAR_CODECS).codecInfos.filter { it.isEncoder }
-    val sizes = listOf(2160 to 3840, 1440 to 2560, 1080 to 1920, 720 to 1280)
-    val formats = Codec.entries.mapIndexed { i, codec ->
-        progress(i.toFloat() / Codec.entries.size)
-        val found = encoders.filter { info -> info.supportedTypes.any { it.equals(codec.mime, ignoreCase = true) } }
-        fun fits(info: android.media.MediaCodecInfo, short: Int, long: Int) = runCatching {
-            val video = info.getCapabilitiesForType(codec.mime).videoCapabilities ?: return@runCatching false
-            video.areSizeAndRateSupported(long, short, 30.0) || video.areSizeAndRateSupported(short, long, 30.0)
-        }.getOrDefault(false)
-        val best = sizes.firstOrNull { (short, long) -> found.any { fits(it, short, long) } }
-        val hardware = best != null && found.any { it.isHardwareAccelerated && fits(it, best.first, best.second) }
-        FormatSupport(codec.label, best?.first ?: 0, hardware)
+suspend fun runPhoneCheck(context: Context, engine: EngineThread?, progress: (Float) -> Unit): PhoneCheckResult =
+    phoneCheckResult(DeviceCapabilities.of(context).runCheckNow(engine, progress), Build.VERSION.MEDIA_PERFORMANCE_CLASS)
+
+private const val RealTime1080p = 1080.0 * 1920 * 30
+
+internal fun phoneCheckResult(report: DeviceReport, performanceClass: Int): PhoneCheckResult {
+    val formats = Codec.entries.map { codec ->
+        val encoders = report.encodersFor(codec.mime)
+        fun fits(side: Int, hardware: Boolean): Boolean {
+            val long = (side * 16 / 9 + 1) and 1.inv()
+            return encoders.any { (it.hardware || !hardware) && (it.fits(side, long, 30) || it.fits(long, side, 30)) }
+        }
+        val best = listOf(2160, 1440, 1080, 720).firstOrNull { fits(it, false) }
+        FormatSupport(codec.label, best ?: 0, best != null && fits(best, true))
     }
-    progress(1f)
+    val measured = report.probe?.pixelsPerSecond
     val speed = when {
-        Build.VERSION.MEDIA_PERFORMANCE_CLASS >= Build.VERSION_CODES.TIRAMISU -> PhoneSpeed.Fast
-        Build.VERSION.MEDIA_PERFORMANCE_CLASS >= Build.VERSION_CODES.S -> PhoneSpeed.Good
+        measured != null -> if (measured >= RealTime1080p) PhoneSpeed.Fast else if (measured >= RealTime1080p / 3) PhoneSpeed.Good else PhoneSpeed.Basic
+        performanceClass >= Build.VERSION_CODES.TIRAMISU -> PhoneSpeed.Fast
+        performanceClass >= Build.VERSION_CODES.S -> PhoneSpeed.Good
         formats.any { it.hardware && it.maxShortSide >= 2160 } -> PhoneSpeed.Good
         else -> PhoneSpeed.Basic
     }
-    PhoneCheckResult(formats, speed)
+    return PhoneCheckResult(formats, speed)
 }
