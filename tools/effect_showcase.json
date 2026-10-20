@@ -73,7 +73,7 @@
     "swing": {"photo": "colour", "layout": "move", "params": {"angle1": -25, "angle2": 25, "frequency": 0.75}, "animate": 16},
     "spin": {"photo": "colour", "layout": "move", "params": {"rpm": 11.25}, "animate": 16},
     "pulsesize": {"photo": "colour", "layout": "move", "params": {"shrink": 0.65, "grow": 1.35, "frequency": 0.75}, "animate": 16},
-    "pulseopacity": {"photo": "colour", "layout": "move", "params": {"minimum": 0.1, "frequency": 0.75}, "animate": 16},
+    "pulseopacity": {"photo": "colour", "layout": "move", "params": {"strength": 0.9, "frequency": 0.75}, "animate": 16},
     "stretchaxis": {"photo": "colour", "layout": "move", "params": {"angle": [0, 180], "scale": 1.6}, "animate": 16},
     "offset": {"photo": "colour", "layout": "move", "params": {"offset": [[0, 0], [192, 0]]}, "animate": 16},
     "movealongpath": {"photo": "colour", "layout": "move", "path": [".circle", 128], "params": {"progress": [0, 1]}, "animate": 16},

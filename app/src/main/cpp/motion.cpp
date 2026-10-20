@@ -424,9 +424,8 @@ float MotionOpacity(const Layer& l, double timeMs) {
     for (const LayerEffect& e : l.effects) {
         if (e.hidden || e.id != "absent.pulseopacity") continue;
         const float t = l.localTime(timeMs);
-        const double w = Wave(Integral(e, "frequency", l, Seconds(l, timeMs), 1) + Param(e, "phase", t, 0) + 0.25, Param(e, "wave", t, 0));
-        const float low = std::clamp(Param(e, "minimum", t, 0), 0.0f, 1.0f);
-        opacity *= low + (1 - low) * (float)(0.5 + 0.5 * w);
+        const double w = Wave(Integral(e, "frequency", l, Seconds(l, timeMs), 2) + Param(e, "phase", t, 0) / 2, Param(e, "wave", t, 0));
+        opacity *= 1 - std::clamp(Param(e, "strength", t, 1), 0.0f, 1.0f) * (float)(0.5 - 0.5 * w);
     }
     return opacity;
 }

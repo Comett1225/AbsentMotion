@@ -55,6 +55,8 @@ class MoveEffectsTest {
         assertEquals(listOf(row("RPM", "float", "60.000000", "-3600.0..3600.0")), params("spin"))
         assertEquals(listOf(row("Frequency", "float", "2.000000", "0.0..16.0", "Hz"), row("Shrink", "float", "0.900000", "0.0..1.0"),
             row("Grow", "float", "1.100000", "1.0..2.0"), row("Starting Phase", "float", "0.000000", "0.0..2.0"), wave), params("pulsesize"))
+        assertEquals(listOf(row("Frequency", "float", "2.000000", "0.1..16.0", "Hz"), row("Strength", "float", "1.000000", "0.0..1.0", "%"),
+            row("Starting Phase", "float", "0.000000", "0.0..2.0"), wave), params("pulseopacity"))
         assertEquals(listOf(row("Scale", "float", "1.000000", "0.01..50.0"), row("Angle", "angle", "0.000000", "-3600.0..3600.0"),
             row("Mask To Layer", "switch", "false")), params("stretchaxis"))
         assertEquals(listOf(row("Offset", "point", "0.000000,0.000000", "-5000.0..5000.0"), row("Feather", "float", "0.000000", "0.0..1.0"),
@@ -78,6 +80,7 @@ class MoveEffectsTest {
             older("pulsesize", "amount" to "0.2", "frequency" to "1", "wave" to "0", "phase" to "0.5"),
             older("stretchaxis", "angle" to "30", "amount" to "1.5"),
             older("oscillate", "angle" to "45", "frequency" to "2", "magnitude" to "25", "wave" to "0", "phase" to "0"),
+            older("pulseopacity", "minimum" to "0.2", "frequency" to "1", "wave" to "1", "phase" to "0.25"),
         )
         val scene = Scene(XmlNode("scene", mapOf("width" to "100", "height" to "100", "fps" to "30", "totalTime" to "1000"),
             listOf(XmlNode("shape", mapOf("id" to "1", "startTime" to "0", "endTime" to "1000", "s" to ".rect"), made))))
@@ -92,6 +95,7 @@ class MoveEffectsTest {
         assertEquals(mapOf("frequency" to 1f, "shrink" to 0.8f, "grow" to 1.2f, "phase" to 1f, "wave" to 0f), values(5).mapValues { Math.round(it.value * 1000) / 1000f })
         assertEquals(mapOf("scale" to 1.5f, "angle" to 30f), values(6))
         assertEquals(made[7], effects[7])
+        assertEquals(mapOf("frequency" to 1f, "strength" to 0.8f, "phase" to 1f, "wave" to 1f), values(8).mapValues { Math.round(it.value * 1000) / 1000f })
         assertEquals(setOf("Auto-Shake: rotation", "Random Displacement: speed"), result.dropped.toSet())
         assertTrue(result.converted.isEmpty())
         val again = migration.migrate(result.scene)

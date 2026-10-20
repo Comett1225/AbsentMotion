@@ -656,5 +656,23 @@
     "max": 50
    }
   }
+ },
+ "absent.pulseopacity": {
+  "to": "pulseopacity",
+  "params": {
+   "minimum": {
+    "to": "strength",
+    "scale": -1,
+    "offset": 1,
+    "min": 0,
+    "max": 1
+   },
+   "phase": {
+    "to": "phase",
+    "scale": 2,
+    "offset": 0.5,
+    "wrap": 2
+   }
+  }
  }
 }

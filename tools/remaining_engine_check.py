@@ -110,8 +110,10 @@ def motion_cases():
     yield 'spin counterclockwise', engine.scene(dot(fx('spin', rpm=-15), 60, 8)), [((130, 70), red), ((130, 130), black)], 15
     yield 'swing', engine.scene(dot(fx('swing', angle1=-45, angle2=45, frequency=0.5), 60, 8)), [((130, 130), red), ((160, 100), black)], 15
     yield 'pulse size', engine.scene(dot(fx('pulsesize', shrink=0.5, grow=1.5, frequency=0.5), 40, 40)), [((155, 100), red), ((165, 100), black)], 15
-    yield 'pulse opacity starts opaque', engine.scene(dot(fx('pulseopacity', frequency=0.5), argb=0xffffffff)), [((100, 100), (255, 255, 255))], 0
-    yield 'pulse opacity half way', engine.scene(dot(fx('pulseopacity', frequency=0.5), argb=0xffffffff)), [((100, 100), half)], 15
+    yield 'pulse opacity phase 0.5 starts opaque', engine.scene(dot(fx('pulseopacity', frequency=0.5, phase=0.5), argb=0xffffffff)), [((100, 100), (255, 255, 255))], 0
+    yield 'pulse opacity half way', engine.scene(dot(fx('pulseopacity', frequency=0.5, phase=0.5), argb=0xffffffff)), [((100, 100), half)], 15
+    yield 'pulse opacity starts half way and its strength sets the lowest opacity', engine.scene(dot(fx('pulseopacity', frequency=0.5, strength=0.5), argb=0xffffffff)), [((100, 100), (191, 191, 191))], 0
+    yield 'pulse opacity reaches 1 - strength', engine.scene(dot(fx('pulseopacity', frequency=1.5, strength=0.5), argb=0xffffffff)), [((100, 100), half)], 15
     yield 'stretch axis', engine.scene(dot(fx('stretchaxis', angle=0, scale=2), 30, 30)), [((155, 100), red), ((100, 140), black)], 0
     yield 'stretch axis upright', engine.scene(dot(fx('stretchaxis', angle=90, scale=2), 30, 30)), [((100, 155), red), ((155, 100), black)], 0
     yield 'stretch axis masked to the layer', engine.scene(dot(fx('stretchaxis', angle=0, scale=2, mask=1), 30, 30)), [((115, 100), red), ((145, 100), black)], 0
