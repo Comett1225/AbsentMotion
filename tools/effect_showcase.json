@@ -102,6 +102,11 @@
     "gridrepeat": {"photo": "colour", "layout": "repeat", "params": {"count": 4, "position": [270, 270], "fillColor": "#7a3cc8", "fillAmount": 0.7}},
     "repeatalongpath": {"photo": "colour", "layout": "repeat", "path": [".circle", 125], "params": {"count": 10, "tangent": true, "phase": [0, 0.1], "rangeScale": 0.5}, "animate": 16},
     "scatterfield": {"photo": "colour", "layout": "repeat", "params": {"z": [0, 160], "density": 0.4}, "animate": 16},
-    "datamosh": {"photo": "portrait", "params": {"duration": 10, "block": 24, "intensity": 1.2, "decay": 0}, "animate": 16}
+    "datamosh": {"photo": "portrait", "params": {"duration": 10, "block": 24, "intensity": 1.2, "decay": 0}, "animate": 16},
+    "tiles": {"photo": "colour", "layout": "move", "params": {"offset": 0.5}},
+    "tilerotate": {"photo": "colour", "params": {"count": 1.6, "rotation": 90}},
+    "tileshift": {"photo": "colour", "params": {"count": 2.4, "strength": 0.06}},
+    "stripes": {"photo": "portrait", "params": {"count": 12, "width": 0.35, "color": "#ffcc33"}},
+    "wipe": {"photo": "landscape", "params": {"end": [1, 0.15, 1], "angle": 20, "feather": 12}, "animate": 16}
   }
 }

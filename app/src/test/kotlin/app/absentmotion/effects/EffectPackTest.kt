@@ -33,6 +33,7 @@ class EffectPackTest {
             val blurred = "blurred" in uniforms
             val expected = mapOf("image" to ("shader" to false), "size" to ("float2" to false), "time" to ("float" to false)) +
                 (if (blurred) mapOf("blurred" to ("shader" to false)) else emptyMap()) +
+                (if ("duration" in uniforms) mapOf("duration" to ("float" to false)) else emptyMap()) +
                 effect.params.associate { p ->
                     p.id to when (p.kind) { "point" -> "float2" to false; "color" -> "half4" to true; else -> "float" to false }
                 }
@@ -52,6 +53,12 @@ class EffectPackTest {
                 assertTrue("${effect.key}.${p.id} = ${p.default}", it.toFloat() in p.min..p.max)
             }
         }
+    }
+
+    @Test fun percentParamsAreMarked() {
+        val wipe = catalog.definitions.first { it.key == "wipe" }.params
+        assertTrue(wipe.first { it.id == "start" }.percent)
+        assertTrue(!wipe.first { it.id == "angle" }.percent)
     }
 
     @Test fun choicesHaveLabelsAndAWholeDefault() {

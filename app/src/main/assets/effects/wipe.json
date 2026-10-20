@@ -1,0 +1,48 @@
+{
+ "id": "wipe",
+ "name": "Wipe",
+ "category": "key",
+ "since": "3.0.0",
+ "description": "Hides the layer from two opposite sides. Animate Start or End for a wipe transition.",
+ "params": [
+  {
+   "id": "start",
+   "label": "Start",
+   "type": "float",
+   "default": 0,
+   "min": -0.5,
+   "max": 1.5,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "end",
+   "label": "End",
+   "type": "float",
+   "default": 1,
+   "min": -0.5,
+   "max": 1.5,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "angle",
+   "label": "Angle",
+   "type": "angle",
+   "default": 0,
+   "min": -3600,
+   "max": 3600,
+   "step": 0.5
+  },
+  {
+   "id": "feather",
+   "label": "Feather",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 100,
+   "step": 0.1
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float start;\nuniform float end;\nuniform float angle;\nuniform float feather;\nhalf4 main(float2 coord) {\n    float a = radians(angle);\n    float2 d = float2(cos(a), sin(a));\n    float ext = abs(size.x * d.x) + abs(size.y * d.y);\n    float x = dot(coord - size * 0.5, d) + ext * 0.5;\n    float w = max(feather, 1.0);\n    float m = clamp((x - start * ext) / w + 0.5, 0.0, 1.0) * clamp((end * ext - x) / w + 0.5, 0.0, 1.0);\n    return image.eval(coord) * half(m);\n}\n"
+}

@@ -1,0 +1,67 @@
+{
+ "id": "stripes",
+ "name": "Stripes",
+ "category": "stylize",
+ "since": "3.0.0",
+ "description": "Draws a pattern of stripes over the opaque parts of the layer, or punches the stripes out of it.",
+ "params": [
+  {
+   "id": "count",
+   "label": "Count",
+   "type": "float",
+   "default": 10,
+   "min": 0.5,
+   "max": 200,
+   "step": 0.1
+  },
+  {
+   "id": "width",
+   "label": "Width",
+   "type": "float",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  },
+  {
+   "id": "angle",
+   "label": "Angle",
+   "type": "angle",
+   "default": 45,
+   "min": -3600,
+   "max": 3600,
+   "step": 0.5
+  },
+  {
+   "id": "phase",
+   "label": "Phase",
+   "type": "float",
+   "default": 0,
+   "min": -1000,
+   "max": 1000,
+   "step": 0.01
+  },
+  {
+   "id": "color",
+   "label": "Color",
+   "type": "color",
+   "default": "#2d1ef6"
+  },
+  {
+   "id": "punch",
+   "label": "Punch Out",
+   "type": "switch",
+   "default": false
+  },
+  {
+   "id": "smoothing",
+   "label": "Smoothing",
+   "type": "float",
+   "default": 0.01,
+   "min": 0,
+   "max": 0.5,
+   "step": 0.001
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float count;\nuniform float width;\nuniform float angle;\nuniform float phase;\nlayout(color) uniform half4 color;\nuniform float punch;\nuniform float smoothing;\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return src;\n    float a = radians(angle);\n    float period = size.y / (2.475 * max(count, 0.5));\n    float u = dot(coord - size * 0.5, float2(-sin(a), cos(a))) / period + phase;\n    float e = abs(fract(u) - 0.5);\n    float edge = max(smoothing * 0.5, 0.5 * 1.0 / period);\n    float s = 1.0 - smoothstep(width * 0.5 - edge, width * 0.5 + edge, e);\n    s *= step(0.0001, width);\n    if (punch > 0.5) return src * half(1.0 - s);\n    float3 base = float3(src.rgb) / float(src.a);\n    float3 rgb = mix(base, float3(color.rgb), s * float(color.a));\n    return half4(half3(rgb) * src.a, src.a);\n}\n"
+}
