@@ -654,7 +654,7 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
                 paint.setAlphaf(c.look.alpha);
                 paint.setBlendMode(c.look.mode);
                 if (tinted) paint.setColorFilter(SkColorFilters::Lerp(c.look.tinted, nullptr, SkColorFilters::Blend(c.look.tint, nullptr, c.look.tintMode)));
-                const SkRect bounds = l.kind == "embedScene" || l.text ? SkRect::MakeEmpty() : pc.makeTransform(mc).getBounds().makeOutset(room, room);
+                const SkRect bounds = l.kind == "embedScene" || l.kind == "model" || l.text ? SkRect::MakeEmpty() : pc.makeTransform(mc).getBounds().makeOutset(room, room);
                 canvas->saveLayer(bounds.isEmpty() ? nullptr : &bounds, &paint);
             }
             const Drawn d = DrawBody(canvas, l, c.timeMs, tc, mc, pc, layered ? alpha : alpha * c.look.alpha, pictures);
