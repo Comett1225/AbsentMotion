@@ -86,6 +86,7 @@
     <string name="gif">GIF</string>
     <string name="export">Экспорт</string>
     <string name="also_keep_a_copy_as_a">Также сохранить копию как шаблон</string>
+    <string name="export_template_failed">Не удалось сохранить копию как шаблон. Освободите место в хранилище.</string>
     <string name="also_keeps_the_project_with_its">Также сохраняет проект вместе с медиа в «Шаблонах» на этом телефоне. Откройте его там, чтобы заменить медиа и продолжить в новом проекте.</string>
     <string name="template">Шаблон</string>
     <string name="one_absproj_package_with_the_project">Один пакет .absproj с проектом и исходными медиа, сохранённый в Documents / AbsentMotion. Храните его как резервную копию или перенесите проект на другой телефон.</string>
@@ -202,13 +203,19 @@
     <string name="home_save_project_failed">Не удалось сохранить проект. Освободите место в памяти.</string>
     <string name="home_collect_unreadable_project">Не удалось прочитать этот проект.</string>
     <string name="home_collect_already_kept">Все медиа уже сохранены в проекте.</string>
-    <string name="home_collect_could_not_read">Не удалось прочитать: %1$s. Возможно, файлы удалены.</string>
+    <plurals name="home_collect_could_not_read">
+        <item quantity="one">%1$s файл отсутствует или его не удалось прочитать.</item>
+        <item quantity="few">%1$s файла отсутствуют или их не удалось прочитать.</item>
+        <item quantity="many">%1$s файлов отсутствуют или их не удалось прочитать.</item>
+        <item quantity="other">%1$s файла отсутствует или его не удалось прочитать.</item>
+    </plurals>
     <string name="home_collect_storage_full">Память заполнена, поэтому некоторые файлы не скопированы.</string>
     <string name="home_restore_edits_failed">Не удалось восстановить изменения. Освободите место в памяти; в следующий раз мы спросим снова.</string>
     <string name="home_restore_version_failed">Не удалось восстановить эту версию. Освободите место в памяти.</string>
     <string name="home_version_restored">Версия восстановлена</string>
     <string name="home_close_save_failed">Не удалось сохранить последние изменения. Освободите место в памяти и закройте снова или закройте снова, чтобы выйти без них.</string>
     <string name="home_search_hint">Поиск проектов и ресурсов</string>
+    <string name="home_search_templates_hint">Поиск шаблонов и пресетов</string>
     <string name="home_search">Поиск</string>
     <string name="home_close_search">Закрыть поиск</string>
     <string name="home_your_projects">Ваши проекты</string>
@@ -292,6 +299,7 @@
     <string name="template_delete_preset">Удалить этот пресет?</string>
     <string name="template_open_as_project">Открыть как проект</string>
     <string name="template_rename_failed">Не удалось переименовать</string>
+    <string name="template_add_failed">Не удалось добавить шаблон. Освободите место в хранилище.</string>
     <string name="safety_version_today">Сегодня в %1$s</string>
     <string name="safety_version_yesterday">Вчера в %1$s</string>
     <string name="safety_version_on_date">%1$s в %2$s</string>
@@ -926,6 +934,7 @@
     <string name="effects_reorder">Изменить порядок</string>
     <string name="speed_freeze_frame">Стоп-кадр</string>
     <string name="speed_seconds">Секунды</string>
+    <string name="speed_remove_keyframes">Удалить ключевые кадры</string>
     <string name="transform_width">Ширина</string>
     <string name="transform_height">Высота</string>
     <string name="transform_x_skew">Наклон X</string>

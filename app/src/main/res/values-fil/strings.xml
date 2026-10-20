@@ -86,6 +86,7 @@
     <string name="gif">GIF</string>
     <string name="export">I-export</string>
     <string name="also_keep_a_copy_as_a">Magtabi rin ng kopya bilang Template</string>
+    <string name="export_template_failed">Hindi mai-save ang kopya bilang template. Magbakante ng storage.</string>
     <string name="also_keeps_the_project_with_its">Itinatabi rin nito ang proyekto, kasama ang media nito, sa Templates sa teleponong ito. Buksan ito doon para palitan ang media nito at magpatuloy sa bagong proyekto.</string>
     <string name="template">Template</string>
     <string name="one_absproj_package_with_the_project">Isang .absproj package kasama ang proyekto at ang orihinal na media na ginagamit nito, na naka-save sa Documents / AbsentMotion. Itabi ito bilang backup o ilipat ang proyekto sa ibang telepono.</string>
@@ -202,13 +203,17 @@
     <string name="home_save_project_failed">Hindi ma-save ang proyekto. Magbakante ng storage.</string>
     <string name="home_collect_unreadable_project">Hindi mabasa ang proyektong ito.</string>
     <string name="home_collect_already_kept">Nasa proyekto na ang lahat ng media.</string>
-    <string name="home_collect_could_not_read">Hindi mabasa ang %1$s; maaaring natanggal na ang mga ito.</string>
+    <plurals name="home_collect_could_not_read">
+        <item quantity="one">May %1$s file na nawawala o hindi mabasa.</item>
+        <item quantity="other">May mga file na nawawala o hindi mabasa: %1$s.</item>
+    </plurals>
     <string name="home_collect_storage_full">Puno ang storage, kaya may mga file na hindi nakopya.</string>
     <string name="home_restore_edits_failed">Hindi maibalik ang mga edit mo. Magbakante ng storage; tatanungin ka ulit sa susunod.</string>
     <string name="home_restore_version_failed">Hindi maibalik ang bersyong ito. Magbakante ng storage.</string>
     <string name="home_version_restored">Naibalik ang bersyon</string>
     <string name="home_close_save_failed">Hindi na-save ang huling mga pagbabago mo. Magbakante ng storage at isara ulit, o isara ulit para umalis nang wala ang mga ito.</string>
     <string name="home_search_hint">Maghanap ng mga proyekto at asset</string>
+    <string name="home_search_templates_hint">Maghanap ng mga template at preset</string>
     <string name="home_search">Maghanap</string>
     <string name="home_close_search">Isara ang paghahanap</string>
     <string name="home_your_projects">Mga proyekto mo</string>
@@ -288,6 +293,7 @@
     <string name="template_delete_preset">Burahin ang preset na ito?</string>
     <string name="template_open_as_project">Buksan bilang proyekto</string>
     <string name="template_rename_failed">Hindi mapalitan ng pangalan</string>
+    <string name="template_add_failed">Hindi maidagdag ang template. Magbakante ng storage.</string>
     <string name="safety_version_today">Ngayon nang %1$s</string>
     <string name="safety_version_yesterday">Kahapon nang %1$s</string>
     <string name="safety_version_on_date">Noong %1$s nang %2$s</string>
@@ -898,6 +904,7 @@
     <string name="effects_reorder">I-reorder</string>
     <string name="speed_freeze_frame">I-freeze ang frame</string>
     <string name="speed_seconds">Segundo</string>
+    <string name="speed_remove_keyframes">Alisin ang mga keyframe</string>
     <string name="transform_width">Lapad</string>
     <string name="transform_height">Taas</string>
     <string name="transform_x_skew">X skew</string>

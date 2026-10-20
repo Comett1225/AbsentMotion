@@ -86,6 +86,7 @@
     <string name="gif">GIF</string>
     <string name="export">Dışa aktar</string>
     <string name="also_keep_a_copy_as_a">Ayrıca Şablon olarak bir kopya sakla</string>
+    <string name="export_template_failed">Şablon olarak kopya saklanamadı. Biraz depolama alanı boşaltın.</string>
     <string name="also_keeps_the_project_with_its">Ayrıca projeyi medyasıyla birlikte bu telefondaki Şablonlar\'da tutar. Medyasını değiştirip yeni bir projeye devam etmek için oradan açın.</string>
     <string name="template">Şablon</string>
     <string name="one_absproj_package_with_the_project">Projeyi ve kullandığı orijinal medyayı içeren tek bir .absproj paketi, Belgeler / AbsentMotion konumuna kaydedilir. Yedek olarak saklayın veya projeyi başka bir telefona taşıyın.</string>
@@ -202,13 +203,17 @@
     <string name="home_save_project_failed">Proje kaydedilemedi. Biraz depolama alanı boşaltın.</string>
     <string name="home_collect_unreadable_project">Bu proje okunamadı.</string>
     <string name="home_collect_already_kept">Tüm medya zaten projede tutuluyor.</string>
-    <string name="home_collect_could_not_read">%1$s okunamadı; silinmiş olabilir.</string>
+    <plurals name="home_collect_could_not_read">
+        <item quantity="one">%1$s dosya eksik veya okunamadı.</item>
+        <item quantity="other">%1$s dosya eksik veya okunamadı.</item>
+    </plurals>
     <string name="home_collect_storage_full">Depolama alanı dolu, bu yüzden bazı dosyalar kopyalanamadı.</string>
     <string name="home_restore_edits_failed">Düzenlemeleriniz geri yüklenemedi. Biraz depolama alanı boşaltın; bir dahaki sefere tekrar sorulacak.</string>
     <string name="home_restore_version_failed">Bu sürüm geri yüklenemedi. Biraz depolama alanı boşaltın.</string>
     <string name="home_version_restored">Sürüm geri yüklendi</string>
     <string name="home_close_save_failed">Son değişiklikleriniz kaydedilemedi. Biraz depolama alanı boşaltıp tekrar kapatın veya değişiklikler olmadan çıkmak için tekrar kapatın.</string>
     <string name="home_search_hint">Proje ve varlık ara</string>
+    <string name="home_search_templates_hint">Şablon ve ön ayar ara</string>
     <string name="home_search">Ara</string>
     <string name="home_close_search">Aramayı kapat</string>
     <string name="home_your_projects">Projeleriniz</string>
@@ -288,6 +293,7 @@
     <string name="template_delete_preset">Bu ön ayar silinsin mi?</string>
     <string name="template_open_as_project">Proje olarak aç</string>
     <string name="template_rename_failed">Yeniden adlandırılamadı</string>
+    <string name="template_add_failed">Şablon eklenemedi. Biraz depolama alanı boşaltın.</string>
     <string name="safety_version_today">Bugün %1$s</string>
     <string name="safety_version_yesterday">Dün %1$s</string>
     <string name="safety_version_on_date">%1$s tarihinde %2$s</string>
@@ -898,6 +904,7 @@
     <string name="effects_reorder">Yeniden sırala</string>
     <string name="speed_freeze_frame">Kareyi dondur</string>
     <string name="speed_seconds">Saniye</string>
+    <string name="speed_remove_keyframes">Anahtar kareleri kaldır</string>
     <string name="transform_width">Genişlik</string>
     <string name="transform_height">Yükseklik</string>
     <string name="transform_x_skew">X EĞİKLİĞİ</string>

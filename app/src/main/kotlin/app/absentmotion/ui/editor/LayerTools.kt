@@ -5,9 +5,6 @@ import androidx.annotation.StringRes
 import androidx.compose.runtime.SideEffect
 import app.absentmotion.editor.KeyTarget
 import app.absentmotion.editor.toggleKeyframe
-import app.absentmotion.editor.deleteSpeedKeyframes
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.TextButton
 import app.absentmotion.audio.gain
 import app.absentmotion.model.PropRef
 import app.absentmotion.model.contours
@@ -256,9 +253,8 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
     val move = panel == EditorPanel.MoveTransform
     var tab by remember(selected.kind) { mutableIntStateOf(0) }
     val catalog by state.engine.effects.collectAsState()
-    val turn = remember(selected.id, tab, catalog, move) { if (move) turnFor(selected, catalog, tab) else null }
+    val turn = if (move) turnFor(selected, catalog, tab) else null
     var menuOpen by remember { mutableStateOf(false) }
-    var askDeleteSpeed by remember { mutableStateOf(false) }
     val named = panel != EditorPanel.EditShape && panel != EditorPanel.Camera && panel != EditorPanel.Model && !(move && tab == ROTATE_TAB && turn != null)
     val known = if (!named) null else when {
         move -> if (selected.kind == "camera" && tab == SIZE_TAB) KeyTarget(app.absentmotion.model.CameraFov, "60.000000") else TransformTargets[tab]
@@ -274,9 +270,6 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
         return
     }
     val target = if (named) known else state.keyTarget
-    if (askDeleteSpeed) AlertDialog(onDismissRequest = { askDeleteSpeed = false }, title = { Text(stringResource(R.string.remove_every_keyframe)) },
-        confirmButton = { TextButton({ askDeleteSpeed = false; state.deleteSpeedKeyframes() }) { Text(stringResource(R.string.delete), color = Am.Accent) } },
-        dismissButton = { TextButton({ askDeleteSpeed = false }) { Text(stringResource(R.string.cancel), color = Am.Accent) } }, containerColor = Am.Field, titleContentColor = Am.OnDark, textContentColor = Am.OnDark)
     Row(modifier.background(Am.Panel)) {
         Column(Modifier.width(168.px).heightIn(max = PanelHeight).fillMaxHeight()) {
             FrameButton(PanelIcons.Back, stringResource(R.string.topbar_back), Modifier.weight(1f).fillMaxWidth()) { state.stepBack() }
@@ -286,7 +279,7 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
             } else {
                 val onKeyframe = layer.onKeyframe(target.ref)
                 FrameButton(if (onKeyframe) PanelIcons.KeyframeRemove else PanelIcons.Keyframe, stringResource(if (onKeyframe) R.string.a11y_remove_keyframe else R.string.a11y_add_keyframe), Modifier.weight(1f).fillMaxWidth()) {
-                    if (panel == EditorPanel.Speed && onKeyframe) askDeleteSpeed = true else state.toggleKeyframe()
+                    state.toggleKeyframe()
                 }
                 FrameButton(PanelIcons.Easing, stringResource(R.string.a11y_easing), Modifier.weight(1f).fillMaxWidth()) { if (layer.easing(target.ref) != null) state.easingOpen = true else state.easingHint = true }
             }

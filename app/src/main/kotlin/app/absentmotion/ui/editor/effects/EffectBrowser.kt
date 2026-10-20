@@ -71,13 +71,14 @@ fun EffectBrowser(state: EditorState) {
     var recent by remember { mutableStateOf(history.getString("recent", "")!!.split('|').filter { it.isNotEmpty() }) }
     var favourites by remember { mutableStateOf(history.getStringSet("favourites", emptySet())!!.toSet()) }
     var favPage by remember { mutableStateOf(false) }
-    var category by remember { mutableStateOf<String?>(if (state.selected?.kind == "audio") "ai" else null) }
+    val audio = state.selected?.kind == "audio"
+    var category by remember { mutableStateOf<String?>(if (audio) "ai" else null) }
     var searching by remember { mutableStateOf(false) }
     var query by remember { mutableStateOf("") }
     var detail by remember { mutableStateOf(state.effectDetail?.let(catalog::find)) }
     fun close() { state.effectDetail = null; state.effectBrowserOpen = false }
     fun back() {
-        when { detail != null -> if (state.effectDetail != null) close() else detail = null; searching -> { searching = false; query = "" }; category != null -> category = null; else -> close() }
+        when { detail != null -> if (state.effectDetail != null) close() else detail = null; searching -> { searching = false; query = "" }; category != null && !audio -> category = null; else -> close() }
     }
     BackHandler(onBack = ::back)
     fun favourite(effect: EffectDefinition) {
@@ -95,7 +96,7 @@ fun EffectBrowser(state: EditorState) {
     fun pick(effect: EffectDefinition) { if (effect.available) add(effect) else detail = effect }
     Column(Modifier.fillMaxSize().background(BrowserBg).systemBarsPadding()) {
         Row(Modifier.fillMaxWidth().height(44.dp).background(BrowserBg), verticalAlignment = Alignment.CenterVertically) {
-            val stepping = category != null || detail != null || searching
+            val stepping = (category != null && !audio) || detail != null || searching
             BrowserButton(if (stepping) PanelIcons.Back else EffectIcons.Close, stringResource(if (stepping) R.string.topbar_back else R.string.action_close), ::back)
             if (searching) {
                 val focus = remember { FocusRequester() }
@@ -131,9 +132,9 @@ fun EffectBrowser(state: EditorState) {
                 }
             }
         } else if (searching || category != null) {
-            val results = if (searching) catalog.search(query) else catalog.listed(category).sortedBy { it.name.lowercase() }
+            val results = if (audio) emptyList() else if (searching) catalog.search(query) else catalog.listed(category).sortedBy { it.name.lowercase() }
             val actions = if (searching || category == "ai") AiAction.entries.filter { it.offered && matchesSearch(query, stringResource(it.title)) } else emptyList()
-            val presets = catalog.definitions.flatMap { d -> d.presets.map { d to it } }
+            val presets = if (audio) emptyList() else catalog.definitions.flatMap { d -> d.presets.map { d to it } }
                 .filter { (d, p) -> if (searching) query.isNotBlank() && matchesSearch(query, p.name) else d.category == category }
             LazyVerticalGrid(GridCells.Fixed(3), Modifier.fillMaxSize(), contentPadding = PaddingValues(10.dp)) {
                 items(actions, key = { "ai-${it.name}" }) { action -> AiTile(action, state.selected, ai) }
@@ -162,9 +163,13 @@ fun EffectBrowser(state: EditorState) {
                     }
                     if (shown.isEmpty() && !favPage) Text(stringResource(R.string.effectbrowser_recent_empty), Modifier.align(Alignment.Center).padding(horizontal = 24.dp),
                         color = Am.OnDarkDim, fontSize = 13.sp, textAlign = TextAlign.Center)
-                    Row(Modifier.align(Alignment.BottomCenter).padding(bottom = 5.dp)) {
-                        Icon(EffectIcons.Recent, stringResource(R.string.effectbrowser_recent), Modifier.size(12.dp).clickable { favPage = false }, tint = if (!favPage) Am.Accent else Am.OnDarkDim)
-                        Icon(PanelIcons.Star, stringResource(R.string.effectbrowser_favorite), Modifier.size(12.dp).clickable { favPage = true }, tint = if (favPage) Am.Accent else Am.OnDarkDim)
+                    Row(Modifier.align(Alignment.BottomCenter)) {
+                        Box(Modifier.size(40.dp, 22.dp).clickable { favPage = false }, Alignment.CenterEnd) {
+                            Icon(EffectIcons.Recent, stringResource(R.string.effectbrowser_recent), Modifier.size(12.dp), tint = if (!favPage) Am.Accent else Am.OnDarkDim)
+                        }
+                        Box(Modifier.size(40.dp, 22.dp).clickable { favPage = true }, Alignment.CenterStart) {
+                            Icon(PanelIcons.Star, stringResource(R.string.effectbrowser_favorite), Modifier.size(12.dp), tint = if (favPage) Am.Accent else Am.OnDarkDim)
+                        }
                     }
                 }
                 catalog.categories.chunked(2).forEach { row ->

@@ -86,6 +86,7 @@
     <string name="gif">GIF</string>
     <string name="export">Exportar</string>
     <string name="also_keep_a_copy_as_a">También guardar una copia como plantilla</string>
+    <string name="export_template_failed">No se pudo conservar una copia como plantilla. Libera espacio de almacenamiento.</string>
     <string name="also_keeps_the_project_with_its">También guarda el proyecto, con sus medios, en Plantillas de este teléfono. Ábrelo ahí para reemplazar sus medios y continuar con un nuevo proyecto.</string>
     <string name="template">Plantilla</string>
     <string name="one_absproj_package_with_the_project">Un paquete .absproj con el proyecto y los medios originales que usa, guardado en Documentos / AbsentMotion. Consérvalo como copia de seguridad o pasa el proyecto a otro teléfono.</string>
@@ -202,13 +203,17 @@
     <string name="home_save_project_failed">No se pudo guardar el proyecto. Libera espacio de almacenamiento.</string>
     <string name="home_collect_unreadable_project">No se pudo leer este proyecto.</string>
     <string name="home_collect_already_kept">Todos los medios ya están guardados en el proyecto.</string>
-    <string name="home_collect_could_not_read">No se pudieron leer %1$s; es posible que se hayan eliminado.</string>
+    <plurals name="home_collect_could_not_read">
+        <item quantity="one">Falta %1$s archivo o no se pudo leer.</item>
+        <item quantity="other">Faltan %1$s archivos o no se pudieron leer.</item>
+    </plurals>
     <string name="home_collect_storage_full">El almacenamiento está lleno, así que no se copiaron algunos archivos.</string>
     <string name="home_restore_edits_failed">No se pudieron restaurar tus ediciones. Libera espacio de almacenamiento; se te volverá a preguntar la próxima vez.</string>
     <string name="home_restore_version_failed">No se pudo restaurar esta versión. Libera espacio de almacenamiento.</string>
     <string name="home_version_restored">Versión restaurada</string>
     <string name="home_close_save_failed">No se pudieron guardar tus últimos cambios. Libera espacio de almacenamiento y vuelve a cerrar, o cierra de nuevo para salir sin ellos.</string>
     <string name="home_search_hint">Buscar proyectos y recursos</string>
+    <string name="home_search_templates_hint">Buscar plantillas y preajustes</string>
     <string name="home_search">Buscar</string>
     <string name="home_close_search">Cerrar búsqueda</string>
     <string name="home_your_projects">Tus proyectos</string>
@@ -288,6 +293,7 @@
     <string name="template_delete_preset">¿Eliminar este preajuste?</string>
     <string name="template_open_as_project">Abrir como proyecto</string>
     <string name="template_rename_failed">No se pudo cambiar el nombre</string>
+    <string name="template_add_failed">No se pudo agregar la plantilla. Libera espacio de almacenamiento.</string>
     <string name="safety_version_today">Hoy a las %1$s</string>
     <string name="safety_version_yesterday">Ayer a las %1$s</string>
     <string name="safety_version_on_date">El %1$s a las %2$s</string>
@@ -898,6 +904,7 @@
     <string name="effects_reorder">Reordenar</string>
     <string name="speed_freeze_frame">Congelar fotograma</string>
     <string name="speed_seconds">Segundos</string>
+    <string name="speed_remove_keyframes">Quitar fotogramas clave</string>
     <string name="transform_width">Ancho</string>
     <string name="transform_height">Alto</string>
     <string name="transform_x_skew">Inclinación X</string>

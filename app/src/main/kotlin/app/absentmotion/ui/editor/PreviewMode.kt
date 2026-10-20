@@ -51,13 +51,13 @@ private val DisabledTint = Color(0xFF818390)
 @Composable
 internal fun PreviewModePanel(state: EditorState, modifier: Modifier = Modifier) {
     val selected = state.selectedId != null || MultiSelect.ids.isNotEmpty()
-    val hasCamera = state.scene.layers.any { it.kind == "camera" }
+    val cameraToggle = state.cameraMode || state.scene.layers.any { it.kind == "camera" }
     Column(modifier.width(55.dp).fillMaxHeight().background(PanelBg).pointerInput(Unit) {}) {
         val cell = Modifier.weight(1f)
         ModeCell(cell, true, { state.pixelMode = !state.pixelMode }, stringResource(R.string.a11y_pixel_preview)) { PixelIcon(state.pixelMode) }
         ModeCell(cell, true, { state.gridMode = !state.gridMode }, stringResource(R.string.camera_grid)) { GridIcon(state.gridMode) }
         ModeCell(cell, selected, { state.soloMode = (state.soloMode + 1) % 3 }, stringResource(R.string.a11y_solo)) { SoloIcon(state.soloMode, selected) }
-        ModeCell(cell, hasCamera, { state.cameraMode = !state.cameraMode }, stringResource(R.string.camerapanel_tab_camera_view)) { CameraIcon(state.cameraMode, hasCamera) }
+        ModeCell(cell, cameraToggle, { state.cameraMode = !state.cameraMode }, stringResource(R.string.camerapanel_tab_camera_view)) { CameraIcon(state.cameraMode, cameraToggle) }
         val quality = state.settings.previewQuality
         ModeCell(cell, true, { state.settings.previewQuality = PreviewQuality.entries[(quality.ordinal + 1) % PreviewQuality.entries.size] }) {
             Text(stringResource(quality.label), color = if (quality == PreviewQuality.Full) Color.White else Am.Accent, fontSize = 10.sp, maxLines = 1)

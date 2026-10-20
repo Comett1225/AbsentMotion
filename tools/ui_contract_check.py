@@ -160,7 +160,7 @@ class UiContracts(unittest.TestCase):
             for line in source(path).splitlines():
                 if 'performHapticFeedback(' in line:
                     self.assertIn('state.settings.vibration', line, path)
-        self.assertIn('state.edit("reorder") { it.move(id, layers.lastIndex - to) }\n        onTick()', source('ui/editor/Timeline.kt'))
+        self.assertIn('state.edit(MOVE_EDIT) { it.move(id, layers.lastIndex - to) }\n        onTick()', source('ui/editor/Timeline.kt'))
         self.assertIn('if (moved && value != null && value != detent) haptic(HapticFeedbackType.SegmentTick)', source('ui/editor/panels/SpeedPanel.kt'))
         self.assertIn('if (guides.any { it !in state.snapGuides }) tick(HapticFeedbackType.SegmentTick)', source('ui/editor/panels/MoveTransformPanel.kt'))
 
@@ -249,6 +249,18 @@ class UiContracts(unittest.TestCase):
         self.assertIn('prefs.getBoolean("trimLimitVibration", true)', source('library/AppSettings.kt'))
         self.assertIn('SwitchRow(stringResource(R.string.settings_vibration), settings.vibration', source('ui/home/SettingsDrawer.kt'))
         self.assertEqual('Vibration', english('settings_vibration'))
+
+    def test_holding_or_dragging_a_selected_clip_moves_it_in_time_as_one_undo_step(self):
+        text = source('ui/editor/Timeline.kt')
+        self.assertIn('hit is Hit.Bar && view.lift(hit.id, finger, viewConfiguration.touchSlop, moves = true) -> drag = Drag.Lift', text)
+        self.assertIn('hit.clipId?.takeIf { it == state.selectedId && abs(moved.x) > abs(moved.y) }', text)
+        self.assertIn('clip != null && moveBegin(clip) -> {', text)
+        self.assertIn('Drag.Move -> moveBy(delta.x)', text)
+        self.assertIn('state.edit(MOVE_EDIT) { it.update(id) { l -> l.movedTo(start) } }', text)
+        self.assertIn('state.edit(MOVE_EDIT) { it.move(id, layers.lastIndex - to) }', text)
+        self.assertIn('if (!commit || state.scene == moveBase) state.cancelGesture(MOVE_EDIT)', text)
+        self.assertIn('TimelineMath.moveTarget(wanted,', text)
+        self.assertIn('if (state.settings.vibration) haptic.performHapticFeedback(HapticFeedbackType.LongPress)', text)
 
 if __name__ == '__main__':
     unittest.main()

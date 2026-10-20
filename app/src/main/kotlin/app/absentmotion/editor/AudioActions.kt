@@ -13,10 +13,9 @@ fun EditorState.addAudio(media: MediaDeclaration) {
     if (media.duration <= 0) return
     val document = scene
     val duration = (media.duration / 1000).toInt()
-    val endFrame = ((document.frameStart(frame) + duration).toLong() * document.fps / 1000).toInt()
     val id = Layer.newId()
     val layer = Layer(XmlNode("audio", linkedMapOf("id" to "$id", "label" to media.title,
-        "startTime" to "${document.frameStart(frame)}", "endTime" to "${document.frameEnd(endFrame)}",
+        "startTime" to "${document.frameStart(frame)}", "endTime" to "${document.endTimeFor(frame, duration)}",
         "src" to media.uri, "outTime" to "$duration", "mediaFillMode" to "fill")))
     edit { it.add(layer, listOf(media)) }
     selectedId = id; panel = EditorPanel.Tools; addOpen = false

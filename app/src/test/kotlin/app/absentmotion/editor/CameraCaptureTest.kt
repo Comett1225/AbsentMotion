@@ -32,8 +32,19 @@ class CameraCaptureTest {
         val layer = scene.layers.single()
         assertEquals("content://media/external/1", layer.node["fillVideo"])
         assertEquals(0, layer.startTime)
-        assertTrue(layer.endTime in 2000..2050)
+        assertEquals(1999, layer.endTime)
         assertEquals("content://media/external/1", scene.media.single().uri)
+    }
+
+    @Test fun newClipsCoverTheirLengthWithoutAnExtraFrame() {
+        for (fps in listOf(24, 25, 30, 60)) {
+            val s = Scene.create("t", 100, 100, fps, 0)
+            for (frame in listOf(0, 7, 15)) assertEquals(frame + 2 * fps - 1, s.lastShownFrame(s.endTimeFor(frame, 2000)))
+        }
+        val thirty = Scene.create("Clip", 1080, 1080, 30, 0)
+        val clip = thirty.videoLayer(media(1920, 1080, 0, "video/mp4", 1_000_000), 15)!!
+        assertEquals(500 to 1499, clip.startTime to clip.endTime)
+        assertEquals(15, thirty.lastShownFrame(thirty.endTimeFor(15, 0)))
     }
 
     @Test fun aLargePhotoIsScaledToTheResolutionAndKeepsItsShape() {

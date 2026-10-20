@@ -83,15 +83,14 @@ internal fun CameraTip(state: EditorState, modifier: Modifier = Modifier) {
 @Composable
 internal fun CameraMovesSheet(state: EditorState, id: Long, onClose: () -> Unit) {
     val start = remember { state.sampleMs }
+    val before = remember { state.scene }
     var ms by remember { mutableIntStateOf(3000) }
     var chosen by remember { mutableStateOf<CameraMove?>(null) }
-    var cleared by remember { mutableIntStateOf(0) }
     val clock = rememberClock()
     val span = state.scene.cameraMoveSpan(id, start, ms)
     fun apply(move: CameraMove, key: Any? = null) {
-        val (_, to) = state.scene.cameraMoveSpan(id, start, ms) ?: return
-        state.edit(key) { it.withCameraMove(id, move, start, ms, cleared) }
-        cleared = maxOf(cleared, to)
+        if (before.cameraMoveSpan(id, start, ms) == null) return
+        state.edit(key) { before.withCameraMove(id, move, start, ms) }
         chosen = move
     }
     MotionSheet(stringResource(R.string.camera_moves), onClose) {

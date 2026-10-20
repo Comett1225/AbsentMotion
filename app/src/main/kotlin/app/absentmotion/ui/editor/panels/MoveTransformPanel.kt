@@ -53,6 +53,7 @@ import app.absentmotion.ui.theme.Am
 import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.cos
+import kotlin.math.hypot
 import kotlin.math.sin
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
@@ -79,13 +80,14 @@ private fun PositionTab(state: EditorState, layer: Layer) {
         val fields = listOf(KeypadField("X", at[0]), KeypadField("Y", at[1]), KeypadField("Z", at[2]))
         state.keypad = KeypadRequest(fields, active) { v -> state.editSelected { it.withTransform("location", v[0], v[1], v[2]) } }
     }
-    val others by produceState(emptyList<SnapOther>(), layer.id, state.scene.layers, state.timeMs) {
+    val others by produceState(emptyList<SnapOther>(), layer.id, state.scene.layers, state.timeMs, state.playing) {
+        if (state.playing) return@produceState
         value = state.scene.layers.filter { it.id != layer.id && it.kind != "audio" && it.activeAt(state.sampleMs) }.map { o ->
             val at = o.at(state.sampleMs, state.scene.fps).location
             SnapOther(at[0], at[1], state.engine.layerBounds(o.id, state.timeMs))
         }
     }
-    val box by produceState<FloatArray?>(null, layer.node, state.timeMs) { value = state.engine.layerBounds(layer.id, state.timeMs) }
+    val box by produceState<FloatArray?>(null, layer.node, state.timeMs, state.playing) { if (!state.playing) value = state.engine.layerBounds(layer.id, state.timeMs) }
     val start by rememberUpdatedState { snapAxes(state.scene.width.toFloat(), state.scene.height.toFloat(), layer.location, box, others) }
     val now by rememberUpdatedState(layer)
     val tick = rememberHaptic(state)
@@ -281,36 +283,39 @@ private const val ROTATION_LABEL = ""
 
 private fun dialAngle(fromCentre: Offset): Float = Math.toDegrees(atan2(-fromCentre.y, fromCentre.x).toDouble()).toFloat()
 
-private class BoxAt(val w: Float, val h: Float, val sx: Float, val sy: Float)
+internal class Sides(val x: Float, val y: Float, val upright: Boolean)
+
+internal fun sidesOf(q: FloatArray): Sides {
+    val dx = q[2] - q[0]
+    val dy = q[3] - q[1]
+    return Sides(hypot(dx, dy), hypot(q[6] - q[0], q[7] - q[1]), abs(dy) > abs(dx) * 1.001f)
+}
+
+private class BoxAt(val sides: Sides, val sx: Float, val sy: Float)
 
 @Composable
 private fun SizeTab(state: EditorState, layer: Layer) {
     var linked by remember { mutableStateOf(true) }
     var active by remember { mutableIntStateOf(0) }
     val measured by produceState<BoxAt?>(null, layer.node, state.sampleMs) {
-        value = state.engine.layerQuad(layer.id, state.sampleMs)?.let { q ->
-            val xs = listOf(q[0], q[2], q[4], q[6])
-            val ys = listOf(q[1], q[3], q[5], q[7])
-            BoxAt(xs.max() - xs.min(), ys.max() - ys.min(), layer.scale[0], layer.scale[1])
-        }
+        value = state.engine.layerQuad(layer.id, state.sampleMs)?.let { q -> BoxAt(sidesOf(q), layer.scale[0], layer.scale[1]) }
     }
+    val upright = measured?.sides?.upright == true
     val box = measured?.let { m ->
-        val rx = if (m.sx != 0f) abs(layer.scale[0] / m.sx) else 1f
-        val ry = if (m.sy != 0f) abs(layer.scale[1] / m.sy) else 1f
-        if (abs(rx - ry) < 1e-4f || (layer.rotation == 0f && layer.skew.all { it == 0f })) m.w * rx to m.h * ry else m.w to m.h
+        val x = m.sides.x * if (m.sx != 0f) abs(layer.scale[0] / m.sx) else 1f
+        val y = m.sides.y * if (m.sy != 0f) abs(layer.scale[1] / m.sy) else 1f
+        if (upright) y to x else x to y
     }
     val (boxW, boxH) = box ?: (0f to 0f)
 
     fun stretch(factor: Float, isWidth: Boolean, key: Any? = null) = state.editSelected(key) { l ->
         val s = l.scale
-        val quarter = abs(abs(l.rotation % 180f) - 90f) < 0.01f
-        val first = isWidth != quarter
+        val first = isWidth != upright
         l.withTransform("scale", if (first || linked) s[0] * factor else s[0], if (!first || linked) s[1] * factor else s[1])
     }
     val drag = remember { floatArrayOf(1f, 1f, 0f) }
     fun resize(isWidth: Boolean, key: Any) = state.editSelected(key) { l ->
-        val quarter = abs(abs(l.rotation % 180f) - 90f) < 0.01f
-        val first = isWidth != quarter
+        val first = isWidth != upright
         val ref = if (linked) maxOf(abs(drag[0]), abs(drag[1])) else abs(drag[if (first) 0 else 1])
         val factor = RulerMath.scale(ref, drag[2]) / ref.coerceAtLeast(1e-4f)
         val s = l.scale

@@ -46,7 +46,7 @@ private fun EditorState.numbered(base: String): String {
 
 private fun EditorState.newLayerAttrs(label: String): LinkedHashMap<String, String> = linkedMapOf(
     "id" to "${Layer.newId()}", "label" to label,
-    "startTime" to "${scene.frameStart(frame)}", "endTime" to "${scene.frameEnd(frame + settings.defaultLayerDuration * scene.fps)}",
+    "startTime" to "${scene.frameStart(frame)}", "endTime" to "${scene.endTimeFor(frame, settings.defaultLayerDuration * 1000)}",
 )
 
 private fun EditorState.addAndSelect(node: XmlNode) {
@@ -263,6 +263,13 @@ internal fun Scene.rebased(layer: Layer, parentId: Long?): Layer? {
     return moved.copy(node = moved.node.with("parent", parentId?.toString()))
 }
 
+internal fun Scene.withWorldLocation(layer: Layer, timeMs: Int, change: (x: Float, y: Float) -> Pair<Float, Float>): Layer {
+    val world = place(layer, timeMs)
+    val (x, y) = change(world.x, world.y)
+    val local = chain(layer).getOrNull(1)?.let { decompose(world.copy(x = x, y = y), place(it, timeMs)) }
+    return layer.withTransform("location", local?.x ?: x, local?.y ?: y, layer.location[2])
+}
+
 internal fun Scene.unparentChildrenOf(ids: Set<Long>): Scene =
     layers.filter { it.id !in ids && it.node["parent"]?.toLongOrNull() in ids }
         .fold(this) { acc, child -> acc.update(child.id) { acc.rebased(it, null) ?: it } }
@@ -294,10 +301,7 @@ suspend fun EditorState.alignSelection(edge: Int) {
             val from = if (horizontal) b[0] else b[1]
             val to = if (horizontal) b[2] else b[3]
             val d = when (edge % 3) { 0 -> lo - from; 1 -> (lo + hi) / 2 - (from + to) / 2; else -> hi - to }
-            acc.update(l.id, sampleMs) { layer ->
-                val p = layer.location
-                if (horizontal) layer.withTransform("location", p[0] + d, p[1], p[2]) else layer.withTransform("location", p[0], p[1] + d, p[2])
-            }
+            acc.update(l.id, sampleMs) { layer -> acc.withWorldLocation(layer, sampleMs) { x, y -> if (horizontal) x + d to y else x to y + d } }
         }
     }
 }
@@ -314,10 +318,7 @@ suspend fun EditorState.distributeSelection(horizontal: Boolean) {
         items.drop(1).dropLast(1).fold(s) { acc, (l, b) ->
             val d = cursor - from(b)
             cursor += to(b) - from(b) + gap
-            acc.update(l.id, sampleMs) { layer ->
-                val p = layer.location
-                if (horizontal) layer.withTransform("location", p[0] + d, p[1], p[2]) else layer.withTransform("location", p[0], p[1] + d, p[2])
-            }
+            acc.update(l.id, sampleMs) { layer -> acc.withWorldLocation(layer, sampleMs) { x, y -> if (horizontal) x + d to y else x to y + d } }
         }
     }
 }

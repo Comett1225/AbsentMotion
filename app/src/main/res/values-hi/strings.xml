@@ -86,6 +86,7 @@
     <string name="gif">GIF</string>
     <string name="export">एक्सपोर्ट</string>
     <string name="also_keep_a_copy_as_a">साथ ही एक कॉपी टेम्पलेट के रूप में रखें</string>
+    <string name="export_template_failed">कॉपी को टेम्पलेट के रूप में नहीं रखा जा सका। कुछ स्टोरेज खाली करें।</string>
     <string name="also_keeps_the_project_with_its">साथ ही प्रोजेक्ट को उसके मीडिया के साथ इस फ़ोन के टेम्पलेट्स में रखता है। उसे वहाँ खोलकर उसका मीडिया बदलें और नए प्रोजेक्ट के रूप में जारी रखें।</string>
     <string name="template">टेम्पलेट</string>
     <string name="one_absproj_package_with_the_project">प्रोजेक्ट और उसके द्वारा इस्तेमाल किए गए मूल मीडिया वाला एक .absproj पैकेज, जो Documents / AbsentMotion में सेव होता है। इसे बैकअप के रूप में रखें या प्रोजेक्ट को दूसरे फ़ोन में ले जाएँ।</string>
@@ -202,13 +203,17 @@
     <string name="home_save_project_failed">प्रोजेक्ट सेव नहीं हो सका। कुछ स्टोरेज खाली करें।</string>
     <string name="home_collect_unreadable_project">यह प्रोजेक्ट पढ़ा नहीं जा सका।</string>
     <string name="home_collect_already_kept">सारा मीडिया पहले से प्रोजेक्ट में सुरक्षित है।</string>
-    <string name="home_collect_could_not_read">%1$s आइटम पढ़े नहीं जा सके; हो सकता है उन्हें हटा दिया गया हो।</string>
+    <plurals name="home_collect_could_not_read">
+        <item quantity="one">%1$s फ़ाइल मौजूद नहीं है या पढ़ी नहीं जा सकी।</item>
+        <item quantity="other">%1$s फ़ाइलें मौजूद नहीं हैं या पढ़ी नहीं जा सकीं।</item>
+    </plurals>
     <string name="home_collect_storage_full">स्टोरेज भरा है, इसलिए कुछ फ़ाइलें कॉपी नहीं हुईं।</string>
     <string name="home_restore_edits_failed">आपके बदलाव बहाल नहीं हो सके। कुछ स्टोरेज खाली करें; अगली बार फिर पूछा जाएगा।</string>
     <string name="home_restore_version_failed">यह वर्ज़न बहाल नहीं हो सका। कुछ स्टोरेज खाली करें।</string>
     <string name="home_version_restored">वर्ज़न बहाल हो गया</string>
     <string name="home_close_save_failed">आपके पिछले बदलाव सेव नहीं हो सके। कुछ स्टोरेज खाली करके फिर बंद करें, या उनके बिना बाहर निकलने के लिए फिर बंद करें।</string>
     <string name="home_search_hint">प्रोजेक्ट और एसेट खोजें</string>
+    <string name="home_search_templates_hint">टेम्पलेट और प्रीसेट खोजें</string>
     <string name="home_search">खोजें</string>
     <string name="home_close_search">खोज बंद करें</string>
     <string name="home_your_projects">आपके प्रोजेक्ट</string>
@@ -288,6 +293,7 @@
     <string name="template_delete_preset">यह प्रीसेट हटाएँ?</string>
     <string name="template_open_as_project">प्रोजेक्ट के रूप में खोलें</string>
     <string name="template_rename_failed">नाम नहीं बदला जा सका</string>
+    <string name="template_add_failed">टेम्पलेट नहीं जोड़ा जा सका। कुछ स्टोरेज खाली करें।</string>
     <string name="safety_version_today">आज %1$s पर</string>
     <string name="safety_version_yesterday">कल %1$s पर</string>
     <string name="safety_version_on_date">%1$s को %2$s पर</string>
@@ -898,6 +904,7 @@
     <string name="effects_reorder">रीऑर्डर</string>
     <string name="speed_freeze_frame">फ़्रीज़ फ़्रेम</string>
     <string name="speed_seconds">सेकंड</string>
+    <string name="speed_remove_keyframes">कीफ़्रेम हटाएं</string>
     <string name="transform_width">चौड़ाई</string>
     <string name="transform_height">ऊँचाई</string>
     <string name="transform_x_skew">X स्क्यू</string>

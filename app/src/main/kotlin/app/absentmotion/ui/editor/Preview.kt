@@ -56,6 +56,8 @@ import app.absentmotion.editor.EditorPanel
 import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.clearSelection
 import app.absentmotion.editor.MultiSelect
+import app.absentmotion.editor.place
+import app.absentmotion.editor.withWorldLocation
 import app.absentmotion.engine.PreviewView
 import app.absentmotion.model.withGradient
 import app.absentmotion.model.cameraGesture
@@ -68,6 +70,7 @@ import app.absentmotion.ui.editor.panels.EyedropperLoupe
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.presence
 import app.absentmotion.ui.theme.Presence
+import kotlin.math.abs
 import kotlin.math.min
 import kotlin.math.roundToInt
 import kotlinx.coroutines.delay
@@ -180,7 +183,10 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier) {
                                 l.withGradient(if (handle == 10) g.copy(x0 = u, y0 = v) else g.copy(x1 = u, y1 = v))
                             }
                         } else if (moved && startLayer != null && handle == 9 && startQuad != null) {
-                            val localX = (position.x - down.position.x) / currentScale
+                            val axis = startQuad[1] - startQuad[0]
+                            val drag = position - down.position
+                            val along = (drag.x * axis.x + drag.y * axis.y) / axis.getDistance().coerceAtLeast(1e-3f)
+                            val localX = along / currentScale / abs(state.scene.place(startLayer, state.sampleMs).sx).coerceAtLeast(1e-3f)
                             val factor = when (startLayer.textAlign) { "center" -> 2f; "right" -> -1f; else -> 1f }
                             val width = (startLayer.wrapWidth + localX * factor).roundToInt().coerceAtLeast(50)
                             state.editSelected("text-wrap") { startLayer.withResizedTextWrap(width) }
@@ -227,11 +233,10 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier) {
                             held = Offset.Zero
                             val about = (event.calculateCentroid(useCurrent = false) - currentOffset) / s
                             state.editSelected(key = "preview-gesture") { layer ->
-                                val at = layer.location
                                 if (zoom == 1f || !about.isSpecified) {
-                                    layer.withTransform("location", at[0] + move.x, at[1] + move.y, at[2])
+                                    state.scene.withWorldLocation(layer, state.sampleMs) { x, y -> x + move.x to y + move.y }
                                 } else {
-                                    layer.withTransform("location", about.x + (at[0] - about.x) * zoom + move.x, about.y + (at[1] - about.y) * zoom + move.y, at[2])
+                                    state.scene.withWorldLocation(layer, state.sampleMs) { x, y -> about.x + (x - about.x) * zoom + move.x to about.y + (y - about.y) * zoom + move.y }
                                         .withTransform("scale", layer.scale[0] * zoom, layer.scale[1] * zoom)
                                 }
                             }

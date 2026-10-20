@@ -12,6 +12,7 @@ import app.absentmotion.model.Pt
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -82,15 +83,19 @@ fun EditorState.runTracking(context: Context, mode: TrackMode, scope: CoroutineS
     mode.job = scope.launch {
         var lost = false
         var last: TrackStep? = null
+        var partial: (() -> Map<Int, Sim>)? = null
         try {
             withContext(Dispatchers.IO) {
                 FrameReader(context, uri).use { reader ->
                     for ((index, run) in runs.withIndex()) {
                         var shown = 0L
+                        val pts = document.framePts(video, run.frames, reader.timestamps)
+                        val found = HashMap<Long, List<Pt>>()
+                        partial = { document.motionOf(video, trackedSteps(run.frames, pts, found).steps, width, height, run.base) }
                         val outcome = trackFrames(
-                            run.frames, document.framePts(video, run.frames, reader.timestamps), reader.timestamps, run.points, width, height,
+                            run.frames, pts, reader.timestamps, run.points, width, height,
                             read = { batch, deliver -> reader.read(batch) { p, yuv -> deliver(p, yuv.luma(trackFactor(yuv.width, yuv.height))) } },
-                            tracker = { MotionTracker(it) },
+                            tracker = { MotionTracker(it) }, found = found,
                         ) { step, fraction ->
                             val now = System.nanoTime()
                             if (now - shown > LIVE_NS) {
@@ -108,6 +113,7 @@ fun EditorState.runTracking(context: Context, mode: TrackMode, scope: CoroutineS
                             mode.motion.putAll(motion)
                             if (motion.size > 1) writeTrack(mode, video, apply)
                         }
+                        partial = null
                         val at = outcome.lostAt ?: continue
                         val base = outcome.steps.lastOrNull()?.let { mode.motion[it.frame] } ?: run.base
                         mode.pending = listOf(TrackRun(run.frames.dropWhile { it != at }, emptyList(), base)) + runs.drop(index + 1)
@@ -133,6 +139,7 @@ fun EditorState.runTracking(context: Context, mode: TrackMode, scope: CoroutineS
                 mode.message = AppText.get(R.string.track_motion_done, mode.motion.size.toString(), scene.layer(apply.targetId)?.label?.ifEmpty { null } ?: AppText.get(R.string.track_motion_target_layer))
             }
         } catch (_: CancellationException) {
+            partial?.takeIf { scope.isActive }?.invoke()?.takeIf { it.size > 1 }?.let { mode.motion.putAll(it); writeTrack(mode, video, apply) }
             mode.message = AppText.get(R.string.track_motion_cancelled)
         } catch (_: LinkageError) {
             mode.message = AppText.get(R.string.track_motion_unavailable)

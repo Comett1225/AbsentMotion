@@ -86,6 +86,7 @@
     <string name="gif">GIF</string>
     <string name="export">Exportar</string>
     <string name="also_keep_a_copy_as_a">Também manter uma cópia como modelo</string>
+    <string name="export_template_failed">Não foi possível manter uma cópia como modelo. Libere espaço de armazenamento.</string>
     <string name="also_keeps_the_project_with_its">Também mantém o projeto, com sua mídia, em Modelos neste celular. Abra-o lá para substituir a mídia e continuar em um novo projeto.</string>
     <string name="template">Modelo</string>
     <string name="one_absproj_package_with_the_project">Um pacote .absproj com o projeto e a mídia original usada por ele, salvo em Documents / AbsentMotion. Mantenha como backup ou leve o projeto para outro celular.</string>
@@ -202,13 +203,17 @@
     <string name="home_save_project_failed">Não foi possível salvar o projeto. Libere espaço de armazenamento.</string>
     <string name="home_collect_unreadable_project">Não foi possível ler este projeto.</string>
     <string name="home_collect_already_kept">Todas as mídias já estão guardadas no projeto.</string>
-    <string name="home_collect_could_not_read">Não foi possível ler %1$s; os arquivos podem ter sido excluídos.</string>
+    <plurals name="home_collect_could_not_read">
+        <item quantity="one">%1$s arquivo está ausente ou não pôde ser lido.</item>
+        <item quantity="other">%1$s arquivos estão ausentes ou não puderam ser lidos.</item>
+    </plurals>
     <string name="home_collect_storage_full">O armazenamento está cheio, então alguns arquivos não foram copiados.</string>
     <string name="home_restore_edits_failed">Não foi possível restaurar suas edições. Libere espaço de armazenamento; você será perguntado novamente na próxima vez.</string>
     <string name="home_restore_version_failed">Não foi possível restaurar esta versão. Libere espaço de armazenamento.</string>
     <string name="home_version_restored">Versão restaurada</string>
     <string name="home_close_save_failed">Suas últimas alterações não puderam ser salvas. Libere espaço de armazenamento e feche de novo, ou feche de novo para sair sem elas.</string>
     <string name="home_search_hint">Pesquisar projetos e recursos</string>
+    <string name="home_search_templates_hint">Pesquisar modelos e predefinições</string>
     <string name="home_search">Pesquisar</string>
     <string name="home_close_search">Fechar pesquisa</string>
     <string name="home_your_projects">Seus projetos</string>
@@ -288,6 +293,7 @@
     <string name="template_delete_preset">Excluir esta predefinição?</string>
     <string name="template_open_as_project">Abrir como projeto</string>
     <string name="template_rename_failed">Não foi possível renomear</string>
+    <string name="template_add_failed">Não foi possível adicionar o modelo. Libere espaço de armazenamento.</string>
     <string name="safety_version_today">Hoje às %1$s</string>
     <string name="safety_version_yesterday">Ontem às %1$s</string>
     <string name="safety_version_on_date">Em %1$s às %2$s</string>
@@ -898,6 +904,7 @@
     <string name="effects_reorder">Reordenar</string>
     <string name="speed_freeze_frame">Congelar quadro</string>
     <string name="speed_seconds">Segundos</string>
+    <string name="speed_remove_keyframes">Remover quadros-chave</string>
     <string name="transform_width">Largura</string>
     <string name="transform_height">Altura</string>
     <string name="transform_x_skew">Inclinação X</string>

@@ -37,7 +37,7 @@ fun EditorState.addShape(def: ShapeDef) {
     val id = Layer.newId()
     val attrs = linkedMapOf(
         "id" to "$id", "label" to "$title $number",
-        "startTime" to "${scene.frameStart(frame)}", "endTime" to "${scene.frameEnd(frame + durationSec * scene.fps)}",
+        "startTime" to "${scene.frameStart(frame)}", "endTime" to "${scene.endTimeFor(frame, durationSec * 1000)}",
         "fillType" to def.fillType, "mediaFillMode" to "fill",
     )
     if (def.id.isNotEmpty()) attrs["s"] = def.id
@@ -112,10 +112,12 @@ fun EditorState.split() {
     selectedId = null
 }
 
-private fun EditorState.stops(): List<Int> {
-    val layer = selected ?: return listOf(0, scene.lastFrame)
-    return (listOf(layer.startTime, layer.endTime) + layer.keyframeTimes()).map { scene.frameAt(it) }.distinct().sorted()
+internal fun Scene.navigationStops(layer: Layer?): List<Int> {
+    val times = if (layer == null) listOf(0, totalTime) else listOf(layer.startTime, layer.endTime) + layer.keyframeTimes().filter { it in layer.startTime..layer.endTime }
+    return (times + bookmarks).map { frameAt(it).coerceIn(0, maxOf(lastFrame, 0)) }.distinct().sorted()
 }
+
+private fun EditorState.stops(): List<Int> = scene.navigationStops(selected)
 
 fun EditorState.skipBack() {
     frame = stops().lastOrNull { it < frame } ?: frame
@@ -289,7 +291,7 @@ fun Scene.imageLayer(media: MediaDeclaration, frame: Int, seconds: Int): Layer? 
     val raw = if (turned) fitted.second to fitted.first else fitted
     val id = Layer.newId()
     var layer = Layer(XmlNode("shape", linkedMapOf("id" to "$id", "label" to media.title,
-        "startTime" to "${scene.frameStart(frame)}", "endTime" to "${scene.frameEnd(frame + seconds * scene.fps)}",
+        "startTime" to "${scene.frameStart(frame)}", "endTime" to "${scene.endTimeFor(frame, seconds * 1000)}",
         "fillType" to "media", "fillImage" to media.uri, "mediaFillMode" to "fill", "s" to ".rect")))
         .withTransform("location", scene.width / 2f, scene.height / 2f, 0f)
         .withProp("size", "vec2", raw.first / 2f, raw.second / 2f)

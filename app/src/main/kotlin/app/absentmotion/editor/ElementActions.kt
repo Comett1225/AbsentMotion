@@ -10,6 +10,8 @@ import app.absentmotion.model.formatFloats
 import app.absentmotion.model.isKeyframed
 import app.absentmotion.model.mediaUris
 import app.absentmotion.model.withCopiedLayerIds
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlin.math.cos
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -41,15 +43,20 @@ suspend fun EditorState.saveToMyElements(store: ProjectStore): Boolean {
     val width = group?.let { host.width } ?: ((bounds?.let { it[2] - it[0] } ?: host.width.toFloat()) + 2).toInt()
     val height = group?.let { host.height } ?: ((bounds?.let { it[3] - it[1] } ?: host.height.toFloat()) + 2).toInt()
     val element = Scene(Scene.create(layer.label.ifBlank { AppText.get(R.string.model_layer_element) }, width, height, host.fps, 0).node.with("type", "element"))
-    val full = host.elementNodes(layer, bounds).fold(element) { acc, node ->
-        acc.add(Layer(node), node.mediaUris().mapNotNull { host.media(it) })
+    withContext(Dispatchers.IO) {
+        store.createElement(host.elementNodes(layer, bounds).fold(element) { acc, node -> acc.add(Layer(node), node.mediaUris().mapNotNull { host.media(it) }) })
     }
-    store.createElement(full)
     return true
 }
 
+private val PLAIN_GROUP_ATTRS = setOf("id", "label", "startTime", "endTime", "tag", "parent", "hidden")
+private val PLACEMENT = setOf("location", "scale", "rotation", "pivot")
+
+private fun Layer.flattensIntoAsset(): Boolean = nested?.retime == "off" && node.attrs.keys.all { it in PLAIN_GROUP_ATTRS } &&
+    node.children.all { it.name == "scene" || it.name == "transform" && it.children.all { part -> part.name in PLACEMENT } }
+
 internal fun Scene.elementNodes(layer: Layer, bounds: FloatArray?): List<XmlNode> {
-    val group = layer.nested
+    val group = layer.nested?.takeIf { layer.flattensIntoAsset() }
     if (group == null) {
         val shifted = (rebased(layer, null) ?: layer).node.with("startTime", "0").with("endTime", "${layer.endTime - layer.startTime}")
         return listOf(if (bounds == null) shifted else shifted.mapTransform("location") { v -> v[0] -= bounds[0]; v[1] -= bounds[1] })

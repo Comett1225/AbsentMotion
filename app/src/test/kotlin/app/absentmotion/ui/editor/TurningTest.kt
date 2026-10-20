@@ -64,6 +64,13 @@ class TurningTest {
         assertNull(turnFor(layer().addEffect(effect("blur")), catalog, ROTATE_TAB))
     }
 
+    @Test fun theTurnIsTheSameWhileTurningAndGoesWithTheEffect() {
+        val cube = layer().addEffect(effect("cube"))
+        val turn = turnFor(cube, catalog, ROTATE_TAB)!!
+        assertEquals(turn, turnFor(turn.turned(cube, Offset(20f, 5f), 0f), catalog, ROTATE_TAB))
+        assertNull(turnFor(layer(), catalog, ROTATE_TAB))
+    }
+
     @Test fun turningAnEffectWritesItsRotationsAndLeavesTheTiltAlone() {
         val cube = layer().addEffect(effect("cube"))
         val turn = turnFor(cube, catalog, ROTATE_TAB)!!

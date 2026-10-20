@@ -9,7 +9,9 @@ import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,6 +29,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.applySpeedRamp
+import app.absentmotion.editor.deleteSpeedKeyframes
 import app.absentmotion.editor.freezeFrame
 import app.absentmotion.model.SpeedRamp
 import app.absentmotion.editor.retimeVideo
@@ -34,6 +37,7 @@ import app.absentmotion.editor.setVideoSpeed
 import app.absentmotion.model.Layer
 import app.absentmotion.model.VideoTiming
 import app.absentmotion.model.atVideoTime
+import app.absentmotion.model.isKeyframed
 import app.absentmotion.ui.editor.PanelIcons
 import app.absentmotion.ui.editor.rememberHaptic
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -42,6 +46,7 @@ import kotlin.math.roundToInt
 
 @Composable
 fun SpeedPanel(state: EditorState, layer: Layer, modifier: Modifier = Modifier) {
+    var askRemove by remember { mutableStateOf(false) }
     val speed = VideoTiming(layer).speed((state.sampleMs - layer.startTime).toDouble())
     val enabled = listOf(state.sampleMs < layer.startTime, state.sampleMs in (layer.startTime + 1) until layer.endTime,
         state.sampleMs in (layer.startTime + 1) until layer.endTime, state.sampleMs > layer.endTime)
@@ -69,8 +74,12 @@ fun SpeedPanel(state: EditorState, layer: Layer, modifier: Modifier = Modifier) 
             for (ramp in SpeedRamp.entries) RampChip(stringResource(ramp.label), true) { state.applySpeedRamp(ramp) }
             val secondsLabel = stringResource(R.string.speed_seconds)
             RampChip(stringResource(R.string.speed_freeze_frame), enabled[1]) { state.askNumber(secondsLabel, 2f) { state.freezeFrame(it) } }
+            RampChip(stringResource(R.string.speed_remove_keyframes), layer.node.child("speedMap")?.isKeyframed == true) { askRemove = true }
         }
     }
+    if (askRemove) AlertDialog(onDismissRequest = { askRemove = false }, title = { Text(stringResource(R.string.remove_every_keyframe)) },
+        confirmButton = { TextButton({ askRemove = false; state.deleteSpeedKeyframes() }) { Text(stringResource(R.string.delete), color = Am.Accent) } },
+        dismissButton = { TextButton({ askRemove = false }) { Text(stringResource(R.string.cancel), color = Am.Accent) } }, containerColor = Am.Field, titleContentColor = Am.OnDark, textContentColor = Am.OnDark)
 }
 
 @Composable

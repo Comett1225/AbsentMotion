@@ -99,6 +99,22 @@ class TemplateEditorTest {
         assertEquals(listOf(50f, 100f), layer.prop("size")!!.toList())
     }
 
+    @Test fun aLoopingVideoKeepsLoopingWithItsReplacement() {
+        val looped = Scene.parse(
+            """<scene width="1080" height="1080" fps="30" totalTime="10000">
+              <media uri="file:/v.mp4" type="video/mp4" duration="1000000" width="100" height="50" orientation="0"/>
+              <shape id="1" startTime="0" endTime="10000" fillType="media" fillVideo="file:/v.mp4" outTime="1000" loop="true" s=".rect"/>
+            </scene>""",
+        )
+        val slot = slotsOf(looped).single()
+        assertEquals(1000, slot.length)
+        assertTrue(slot.loop)
+        val out = applied(looped, listOf(slot), mapOf("file:/v.mp4" to Choice(media("content://other", "video/mp4", 1_000_000), 0, MediaFillMode.Fill)))
+        assertEquals("true", out.layer(1)!!.node["loop"])
+        assertEquals("1000", out.layer(1)!!.node["outTime"])
+        assertNull(applied(looped, listOf(slot), mapOf("file:/v.mp4" to Choice(media("content://photo", "image/png"), 0, MediaFillMode.Fill))).layer(1)!!.node["loop"])
+    }
+
     @Test fun nothingChosenLeavesTheTemplateAsItWas() {
         assertEquals(template, applied(template, slotsOf(template), emptyMap()))
     }

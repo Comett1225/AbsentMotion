@@ -185,9 +185,9 @@ private fun PairRow(edit: ShapeEdit, active: Boolean, onActivate: () -> Unit) {
                 val on = box == i
                 Box(
                     Modifier.fillMaxWidth().height(57.px).clip(PanelShape).background(if (on) PanelDark else Am.PanelInset).clickable {
+                        if (active && on) edit.openKeypad(i)
                         box = i
                         onActivate()
-                        edit.openKeypad(i)
                     },
                     contentAlignment = Alignment.CenterEnd,
                 ) {

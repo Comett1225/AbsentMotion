@@ -141,7 +141,7 @@ private const val MaxSvgBytes = 16 shl 20
 internal suspend fun EditorState.importSvgFile(context: Context, uri: Uri) {
     val host = scene
     val start = host.frameStart(frame)
-    val end = host.frameEnd(frame + settings.defaultLayerDuration * host.fps)
+    val end = host.endTimeFor(frame, settings.defaultLayerDuration * 1000)
     fun say(text: String) = Toast.makeText(context, text, Toast.LENGTH_LONG).show()
     val result = try {
         withContext(Dispatchers.IO) {
@@ -189,7 +189,7 @@ private suspend fun importModel(context: Context, state: EditorState, picked: Li
                             val n = input.read(buffer)
                             if (n < 0) break
                             total += n
-                            require(total <= MAX_MODEL_BYTES) { "the files are too large" }
+                            if (total > MAX_MODEL_BYTES) throw ModelTooLarge()
                             out.write(buffer, 0, n)
                         }
                     }
@@ -200,6 +200,9 @@ private suspend fun importModel(context: Context, state: EditorState, picked: Li
             val count = parseModel(names[main], bytes, open).triangleCount
             withContext(Dispatchers.Main) { state.addModel(uri, names[main]) }
             if (count > MODEL_TRIANGLE_BUDGET) context.getString(R.string.model_simplified, "$count", "$MODEL_TRIANGLE_BUDGET") else null
+        } catch (_: ModelTooLarge) {
+            folder.deleteRecursively()
+            context.getString(R.string.model_too_large)
         } catch (e: Exception) {
             folder.deleteRecursively()
             context.getString(R.string.model_unreadable, e.message.orEmpty())
@@ -208,6 +211,8 @@ private suspend fun importModel(context: Context, state: EditorState, picked: Li
             context.getString(R.string.model_too_large)
         }
     }
+
+private class ModelTooLarge : Exception()
 
 @Composable
 internal fun MultiBar(state: EditorState, modifier: Modifier) {
