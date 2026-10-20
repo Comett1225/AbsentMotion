@@ -105,6 +105,10 @@ import app.absentmotion.library.ProjectInfo
 import app.absentmotion.library.ProjectStore
 import app.absentmotion.ui.editor.ChromeIcons
 import app.absentmotion.ui.editor.LocalWide
+import app.absentmotion.ui.editor.NoMatches
+import app.absentmotion.ui.editor.SearchField
+import app.absentmotion.ui.editor.TextIcons
+import app.absentmotion.ui.editor.matchesSearch
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Motion
 import app.absentmotion.ui.theme.Presence
@@ -154,6 +158,8 @@ fun HomeScreen(
     var tab by rememberSaveable { mutableIntStateOf(0) }
     var page by rememberSaveable { mutableIntStateOf(0) }
     var creating by remember { mutableStateOf(false) }
+    var search by remember { mutableStateOf<String?>(null) }
+    val query = app.absentmotion.ui.editor.debounced(search.orEmpty())
     val drawer = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -162,7 +168,7 @@ fun HomeScreen(
 
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { version++ }
     LaunchedEffect(version, changes) { projects = withContext(Dispatchers.IO) { store.list(includeDamaged = true) } }
-    val shown = remember(projects, tab) { projects.filter { it.isElement == (tab == 1) } }
+    val shown = remember(projects, tab, query) { projects.filter { it.isElement == (tab == 1) && matchesSearch(query, it.title) } }
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> if (uri != null) onImportFile(uri) }
     val toReport = imported.filter { it.sections.isNotEmpty() }
     LaunchedEffect(imported) {
@@ -181,9 +187,9 @@ fun HomeScreen(
         Box(Modifier.fillMaxSize().background(Am.HomeBg)) {
             Column(Modifier.fillMaxSize().statusBarsPadding()) {
                 if (wide) WideHeader(page, tab, { p, t -> page = p; tab = t }, onSettings = { scope.launch { drawer.open() } }, onNew = { creating = true })
-                else TopBar(onMenu = { scope.launch { drawer.open() } })
+                else TopBar(onMenu = { scope.launch { drawer.open() } }, search, { search = it })
                 if (page == 1) TemplatesTab(store, version, onTemplate, onOpen, Modifier.weight(1f).then(if (wide) Modifier.widthIn(max = 760.dp).align(Alignment.CenterHorizontally) else Modifier)) else ProjectsPane(
-                    Modifier.weight(1f), shown, tab, { tab = it }, settings, version, onOpen, onExport,
+                    Modifier.weight(1f), shown, tab, { tab = it }, settings, version, onOpen, onExport, query,
                     onUpload = { picker.launch(arrayOf("text/xml", "application/xml", "application/zip", "application/octet-stream")) },
                     onDuplicate = { id -> scope.launch { withContext(Dispatchers.IO) { store.duplicate(id) }; version++ } },
                     onDelete = { id -> scope.launch { withContext(Dispatchers.IO) { store.delete(id, context.getExternalFilesDir(null)?.resolve("ai")) }; version++ } },
@@ -206,12 +212,19 @@ fun HomeScreen(
 }
 
 @Composable
-private fun TopBar(onMenu: () -> Unit) {
+private fun TopBar(onMenu: () -> Unit, search: String?, onSearch: (String?) -> Unit) {
     Box(Modifier.fillMaxWidth().height(57.dp)) {
         Box(Modifier.align(Alignment.CenterStart).size(50.dp).clickable(onClick = onMenu), contentAlignment = Alignment.Center) {
             Icon(HomeIcons.Menu, "Settings", Modifier.size(24.dp), tint = Am.Navy)
         }
-        Text("AbsentMotion", Modifier.align(Alignment.Center), color = Am.Navy, fontSize = 22.sp, fontWeight = FontWeight.Medium)
+        if (search == null) Text("AbsentMotion", Modifier.align(Alignment.Center), color = Am.Navy, fontSize = 22.sp, fontWeight = FontWeight.Medium)
+        else SearchField(
+            search, { onSearch(it) }, Modifier.align(Alignment.Center).padding(horizontal = 56.dp).fillMaxWidth().height(40.dp),
+            hint = "Search projects and assets", background = Am.Card, content = Am.Navy, faint = Am.HomeDim, autoFocus = true,
+        )
+        Box(Modifier.align(Alignment.CenterEnd).size(50.dp).clickable { onSearch(if (search == null) "" else null) }, contentAlignment = Alignment.Center) {
+            Icon(if (search == null) TextIcons.Search else HomeIcons.Close, if (search == null) "Search" else "Close search", Modifier.size(24.dp), tint = Am.Navy)
+        }
     }
 }
 
@@ -225,6 +238,7 @@ private fun ProjectsPane(
     version: Int,
     onOpen: (String) -> Unit,
     onExport: (String) -> Unit,
+    query: String,
     onUpload: () -> Unit,
     onDuplicate: (String) -> Unit,
     onDelete: (String) -> Unit,
@@ -263,7 +277,7 @@ private fun ProjectsPane(
                 Spacer(Modifier.height(24.dp))
                 Chips(tab, onTab)
             }
-            if (shown.isEmpty() && tab == 0 && settings.xmlUpload) {
+            if (shown.isEmpty() && tab == 0 && settings.xmlUpload && query.isBlank()) {
                 Spacer(Modifier.height(13.dp))
                 Box(Modifier.padding(horizontal = 16.dp).then(if (wide) WideCard else Modifier)) { UploadCard(onUpload) }
             }
@@ -287,7 +301,8 @@ private fun ProjectsPane(
                 }
             }
         }
-        if (shown.isEmpty()) EmptyState(element = tab == 1, arrow = !wide)
+        if (shown.isEmpty() && query.isNotBlank()) NoMatches(query, if (tab == 1) "assets" else "projects", Modifier.fillMaxWidth().padding(top = 120.dp), Am.Navy, 17.sp)
+        else if (shown.isEmpty()) EmptyState(element = tab == 1, arrow = !wide)
         menu?.let { open ->
             Box(
                 Modifier.fillMaxSize().enterFade()

@@ -1,5 +1,6 @@
 package app.absentmotion.ui.editor
 
+import app.absentmotion.editor.keepCopy
 import android.Manifest
 import android.content.Context
 import android.content.Intent
@@ -23,6 +24,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -48,7 +50,6 @@ import androidx.compose.ui.unit.sp
 import app.absentmotion.audio.audioDeclaration
 import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.addAudio
-import app.absentmotion.editor.keepCopy
 import app.absentmotion.ui.theme.Am
 import kotlinx.coroutines.launch
 import kotlin.math.abs
@@ -64,7 +65,10 @@ internal fun AudioTab(state: EditorState, modifier: Modifier, library: AddLibrar
     val scope = rememberCoroutineScope()
     var adding by remember { mutableStateOf(false) }
     var speaking by remember { mutableStateOf(false) }
+    var search by remember { mutableStateOf("") }
+    val query = debounced(search)
     val files = library.audio
+    val shown = remember(files, query) { files.filter { matchesSearch(query, it.title, it.name, it.album, it.artist) } }
     val permission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { library.audioRevision++ }
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) {
@@ -82,49 +86,55 @@ internal fun AudioTab(state: EditorState, modifier: Modifier, library: AddLibrar
     val preview = remember { SoundPreview(context) }
     DisposableEffect(Unit) { onDispose { preview.stop() } }
 
-    LazyHorizontalGrid(GridCells.Fixed(2), modifier.clipToBounds()) {
-        item(key = "viewAll") {
-            Box(Modifier.width(80.dp).fillMaxHeight(), Alignment.Center) {
-                Column(
-                    Modifier.size(75.dp).clip(RoundedCornerShape(2.dp)).background(Am.Well).clickable { picker.launch(arrayOf("audio/*")) },
-                    horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center,
-                ) {
-                    MediaGridIcon(Modifier.size(20.dp))
-                    Text("View All", Modifier.padding(top = 4.dp), color = Am.OnDark, fontSize = 14.sp, maxLines = 1)
+    Column(modifier) {
+        SearchField(search, { search = it }, Modifier.padding(start = 6.dp, end = 6.dp, top = 6.dp).fillMaxWidth().height(32.dp), hint = "Search music and sounds")
+        LazyHorizontalGrid(GridCells.Fixed(2), Modifier.fillMaxWidth().weight(1f).clipToBounds()) {
+            item(key = "viewAll") {
+                Box(Modifier.width(80.dp).fillMaxHeight(), Alignment.Center) {
+                    Column(
+                        Modifier.size(75.dp).clip(RoundedCornerShape(2.dp)).background(Am.Well).clickable { picker.launch(arrayOf("audio/*")) },
+                        horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center,
+                    ) {
+                        MediaGridIcon(Modifier.size(20.dp))
+                        Text("View All", Modifier.padding(top = 4.dp), color = Am.OnDark, fontSize = 14.sp, maxLines = 1)
+                    }
                 }
             }
-        }
-        item(key = "speech") {
-            Box(Modifier.width(80.dp).fillMaxHeight(), Alignment.Center) {
-                Column(
-                    Modifier.size(75.dp).clip(RoundedCornerShape(2.dp)).background(Am.Well).clickable { speaking = true },
-                    horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center,
-                ) {
-                    Icon(ChromeIcons.Captions, null, Modifier.size(20.dp), tint = Am.OnDark)
-                    Text("Text to Speech", Modifier.padding(top = 4.dp), color = Am.OnDark, fontSize = 11.sp, maxLines = 1)
+            item(key = "speech") {
+                Box(Modifier.width(80.dp).fillMaxHeight(), Alignment.Center) {
+                    Column(
+                        Modifier.size(75.dp).clip(RoundedCornerShape(2.dp)).background(Am.Well).clickable { speaking = true },
+                        horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center,
+                    ) {
+                        Icon(ChromeIcons.Captions, null, Modifier.size(20.dp), tint = Am.OnDark)
+                        Text("Text to Speech", Modifier.padding(top = 4.dp), color = Am.OnDark, fontSize = 11.sp, maxLines = 1)
+                    }
                 }
             }
-        }
-        items(files, key = { it.uri.toString() }) { file ->
-            val (top, bottom) = TilePalettes[file.title.hashCode().mod(TilePalettes.size)]
-            val playing = preview.uri == file.uri
-            Box(Modifier.width(80.dp).fillMaxHeight(), Alignment.Center) {
-                Box(
-                    Modifier.size(75.dp).clip(RoundedCornerShape(2.dp))
-                        .background(Brush.verticalGradient(listOf(Color(top), Color(bottom))))
-                        .then(if (playing) Modifier.border(2.dp, Am.Accent, RoundedCornerShape(2.dp)) else Modifier)
-                        .clickable { preview.toggle(file.uri) },
-                ) {
-                    WaveformArt(file.title.hashCode(), Modifier.align(Alignment.Center).fillMaxWidth().height(30.dp))
-                    Text(file.title, Modifier.padding(start = 3.dp, top = 0.5.dp).fillMaxWidth(), color = Color.White, fontSize = 11.sp, maxLines = 1, overflow = TextOverflow.MiddleEllipsis)
-                    Text(duration(file.durationMs), Modifier.padding(start = 3.dp, top = 15.dp).fillMaxWidth(), color = Color.White, fontSize = 9.sp, maxLines = 1)
+            if (shown.isEmpty() && query.isNotBlank()) item(key = "none", span = { GridItemSpan(maxLineSpan) }) {
+                NoMatches(query, "sounds", Modifier.width(200.dp).fillMaxHeight())
+            }
+            items(shown, key = { it.uri.toString() }) { file ->
+                val (top, bottom) = TilePalettes[file.title.hashCode().mod(TilePalettes.size)]
+                val playing = preview.uri == file.uri
+                Box(Modifier.width(80.dp).fillMaxHeight(), Alignment.Center) {
                     Box(
-                        Modifier.align(Alignment.BottomCenter).fillMaxWidth().height(26.dp).background(Color(0x32000000))
-                            .clickable(enabled = !adding) {
-                                scope.launch { adding = true; try { audioDeclaration(context, file.uri)?.let { state.keepCopy(context, it) }?.let { state.addAudio(it) } } finally { adding = false } }
-                            },
-                        Alignment.Center,
-                    ) { Icon(ChromeIcons.Plus, "Add", Modifier.size(16.dp), tint = Color.White) }
+                        Modifier.size(75.dp).clip(RoundedCornerShape(2.dp))
+                            .background(Brush.verticalGradient(listOf(Color(top), Color(bottom))))
+                            .then(if (playing) Modifier.border(2.dp, Am.Accent, RoundedCornerShape(2.dp)) else Modifier)
+                            .clickable { preview.toggle(file.uri) },
+                    ) {
+                        WaveformArt(file.title.hashCode(), Modifier.align(Alignment.Center).fillMaxWidth().height(30.dp))
+                        Text(file.title, Modifier.padding(start = 3.dp, top = 0.5.dp).fillMaxWidth(), color = Color.White, fontSize = 11.sp, maxLines = 1, overflow = TextOverflow.MiddleEllipsis)
+                        Text(duration(file.durationMs), Modifier.padding(start = 3.dp, top = 15.dp).fillMaxWidth(), color = Color.White, fontSize = 9.sp, maxLines = 1)
+                        Box(
+                            Modifier.align(Alignment.BottomCenter).fillMaxWidth().height(26.dp).background(Color(0x32000000))
+                                .clickable(enabled = !adding) {
+                                    scope.launch { adding = true; try { audioDeclaration(context, file.uri)?.let { state.keepCopy(context, it) }?.let { state.addAudio(it) } } finally { adding = false } }
+                                },
+                            Alignment.Center,
+                        ) { Icon(ChromeIcons.Plus, "Add", Modifier.size(16.dp), tint = Color.White) }
+                    }
                 }
             }
         }
@@ -134,7 +144,7 @@ internal fun AudioTab(state: EditorState, modifier: Modifier, library: AddLibrar
 
 private fun duration(ms: Long): String {
     val s = ms / 1000
-    return if (s >= 3600) "%d:%02d:%02d".format(java.util.Locale.ROOT, s / 3600, s / 60 % 60, s % 60) else "%02d:%02d".format(java.util.Locale.ROOT, s / 60, s % 60)
+    return if (s >= 3600) "%d:%02d:%02d".format(s / 3600, s / 60 % 60, s % 60) else "%02d:%02d".format(s / 60, s % 60)
 }
 
 @Composable

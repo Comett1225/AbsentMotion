@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -89,7 +90,7 @@ private fun EditorBody(state: EditorState, onExit: () -> Unit) {
         WideEditorBody(state, onExit, addLibrary)
         return
     }
-    Column(Modifier.fillMaxSize().background(Am.TopBar).systemBarsPadding()) {
+    Column(Modifier.fillMaxSize().background(Am.TopBar).systemBarsPadding().imePadding()) {
         EditorTopBar(state, onExit, Modifier.fillMaxWidth().height(42.dp).enterFade())
         Box(Modifier.fillMaxWidth().weight(1f)) {
             Preview(state, Modifier.fillMaxSize())

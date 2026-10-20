@@ -91,12 +91,20 @@ internal fun ElementPicker(state: EditorState, modifier: Modifier) {
             store.list().filter { it.id != state.projectId }.sortedWith(compareByDescending<ProjectInfo> { it.isElement }.thenByDescending { it.modified })
         }
     }
+    var search by remember { mutableStateOf("") }
+    val query = debounced(search)
     val list = items
-    when {
-        list == null -> Box(modifier)
-        list.isEmpty() -> Box(modifier, Alignment.Center) { Text("Your asset collection is empty", color = Am.OnDarkDim, fontSize = 13.sp, textAlign = TextAlign.Center) }
-        else -> LazyRow(modifier.padding(start = 8.5.dp), verticalAlignment = Alignment.CenterVertically) {
-            items(list, key = { it.id }) { info -> ElementCard(info) { state.addElement(store, info.id, link = info.isElement) } }
+    val shown = remember(list, query) { list?.filter { matchesSearch(query, it.title) } }
+    Column(modifier) {
+        SearchField(search, { search = it }, Modifier.padding(start = 8.5.dp, end = 8.dp, top = 6.dp).fillMaxWidth().height(32.dp), hint = "Search assets and projects")
+        val body = Modifier.fillMaxWidth().weight(1f)
+        when {
+            list == null || shown == null -> Box(body)
+            list.isEmpty() -> Box(body, Alignment.Center) { Text("Your asset collection is empty", color = Am.OnDarkDim, fontSize = 13.sp, textAlign = TextAlign.Center) }
+            shown.isEmpty() -> NoMatches(query, "assets or projects", body)
+            else -> LazyRow(body.padding(start = 8.5.dp), verticalAlignment = Alignment.CenterVertically) {
+                items(shown, key = { it.id }) { info -> ElementCard(info) { state.addElement(store, info.id, link = info.isElement) } }
+            }
         }
     }
 }

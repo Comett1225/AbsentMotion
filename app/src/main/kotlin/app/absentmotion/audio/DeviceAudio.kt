@@ -12,16 +12,16 @@ import app.absentmotion.model.XmlNode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-data class DeviceAudio(val uri: Uri, val title: String, val durationMs: Long, val date: Long)
+data class DeviceAudio(val uri: Uri, val title: String, val durationMs: Long, val date: Long, val name: String = "", val album: String = "", val artist: String = "")
 
 suspend fun deviceAudio(context: Context): List<DeviceAudio> = withContext(Dispatchers.IO) {
     val found = mutableListOf<DeviceAudio>()
     val collection = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
     try {
-        context.contentResolver.query(collection, arrayOf("_id", "title", "_display_name", "duration", "date_added"),
+        context.contentResolver.query(collection, arrayOf("_id", "title", "_display_name", "duration", "date_added", "album", "artist"),
             "duration > 0", null, "date_added DESC, _id DESC")?.use { c ->
             while (c.moveToNext()) found += DeviceAudio(ContentUris.withAppendedId(collection, c.getLong(0)),
-                c.getString(1) ?: c.getString(2) ?: "", c.getLong(3), c.getLong(4))
+                c.getString(1) ?: c.getString(2) ?: "", c.getLong(3), c.getLong(4), c.getString(2) ?: "", c.getString(5) ?: "", c.getString(6) ?: "")
         }
     } catch (_: Exception) { }
     found
