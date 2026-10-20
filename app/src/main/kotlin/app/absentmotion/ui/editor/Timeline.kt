@@ -91,6 +91,7 @@ import app.absentmotion.model.LabelColour
 import app.absentmotion.model.Layer
 import app.absentmotion.model.trimmedTo
 import app.absentmotion.model.trimHitsSourceLimit
+import app.absentmotion.model.mediaLengthMs
 import app.absentmotion.model.withKeyframesMoved
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Motion
@@ -691,7 +692,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
         val snap = snapNear(edgeMs)
         val frame = snap ?: TimelineMath.nearestFrame(edgeMs, fps)
         val id = dragId
-        val mediaMs = (layer.mediaFill?.uri ?: layer.node["src"])?.let { scene.media(it)?.duration }?.takeIf { it > 0 }?.let { (it / 1000).toInt() } ?: Int.MAX_VALUE
+        val mediaMs = scene.mediaLengthMs(layer)
         val edge = if (start) frame.coerceIn(0, scene.lastShownFrame(layer.endTime).coerceAtLeast(0)) else (frame - 1).coerceAtLeast(scene.firstShownFrame(layer.startTime)) + 1
         val time = if (start) {
             scene.frameStart(edge)

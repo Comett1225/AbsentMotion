@@ -10,7 +10,7 @@ import kotlin.math.min
 import kotlin.math.pow
 import kotlin.math.roundToInt
 
-data class Keyframe(val t: Float, val v: String, val e: String? = null)
+data class Keyframe(val t: Float, val v: String, val e: String? = null, val gen: String? = null)
 
 data class PropRef(val kind: Kind, val name: String, val effectIndex: Int = -1) {
     enum class Kind { Transform, Child, Property, Effect }
@@ -60,7 +60,7 @@ data class Easing(val type: String, val p: List<Float> = emptyList(), val prefix
 }
 
 val XmlNode.keyframes: List<Keyframe>
-    get() = children.filter { it.name == "kf" }.map { Keyframe(it["t"]?.toFloatOrNull() ?: 0f, it["v"] ?: "", it["e"]) }.sortedBy { it.t }
+    get() = children.filter { it.name == "kf" }.map { Keyframe(it["t"]?.toFloatOrNull() ?: 0f, it["v"] ?: "", it["e"], it["gen"]) }.sortedBy { it.t }
 
 val XmlNode.isKeyframed: Boolean get() = children.any { it.name == "kf" }
 
@@ -69,6 +69,7 @@ fun XmlNode.withKeyframes(keys: List<Keyframe>): XmlNode = copy(
     children = children.filterNot { it.name == "kf" } + keys.sortedBy { it.t }.map { k ->
         val attrs = linkedMapOf("t" to String.format(Locale.US, "%.6f", k.t), "v" to k.v)
         if (k.e != null) attrs["e"] = k.e
+        if (k.gen != null) attrs["gen"] = k.gen
         XmlNode("kf", attrs)
     },
 )

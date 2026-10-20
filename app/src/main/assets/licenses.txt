@@ -2221,7 +2221,7 @@ COUNTS
 
 - Lucide only - 163
 - Lucide shapes plus own parts - 8
-- Own drawing only - 38
+- Own drawing only - 39
 - Material Symbols - 0
 
 (An icon is one named member of an *Icons object, or one icon-drawing composable.)
@@ -2249,6 +2249,7 @@ ICONS
 - Play (Lucide play) - ISC - ui/editor/ChromeIcons.kt
 - PlayRepeat (Lucide + own drawing repeat) - ISC; own part Apache-2.0 - ui/editor/ChromeIcons.kt
 - Pause (Lucide pause) - ISC - ui/editor/ChromeIcons.kt
+- Transition (own drawing) - Apache-2.0 (own) - ui/editor/ChromeIcons.kt
 - CopyPaste (Lucide clipboard-copy) - ISC - ui/editor/ChromeIcons.kt
 - PreviewMode (Lucide + own drawing scan) - ISC; own part Apache-2.0 - ui/editor/ChromeIcons.kt
 - PreviewModeOpen (Lucide + own drawing scan) - ISC; own part Apache-2.0 - ui/editor/ChromeIcons.kt

@@ -27,7 +27,7 @@ The launcher icon is an own drawing, made by `tools/icon/make_icon.py` (source o
 | --- | --- |
 | Lucide only | 163 |
 | Lucide shapes plus own parts | 8 |
-| Own drawing only | 38 |
+| Own drawing only | 39 |
 | Material Symbols | 0 |
 
 (An icon is one named member of an `*Icons` object, or one icon-drawing composable.)
@@ -57,6 +57,7 @@ The launcher icon is an own drawing, made by `tools/icon/make_icon.py` (source o
 | `ui/editor/ChromeIcons.kt` | `Play` | Lucide | `play` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/play.svg | play scaled x0.8 |
 | `ui/editor/ChromeIcons.kt` | `PlayRepeat` | Lucide + own drawing | `repeat` | ISC; own part Apache-2.0 | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/repeat.svg | play triangle inside the loop |
 | `ui/editor/ChromeIcons.kt` | `Pause` | Lucide | `pause` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/pause.svg | pause scaled x0.7 |
+| `ui/editor/ChromeIcons.kt` | `Transition` | own drawing | - | Apache-2.0 (own) | - | two triangles meeting in the middle |
 | `ui/editor/ChromeIcons.kt` | `CopyPaste` | Lucide | `clipboard-copy` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/clipboard-copy.svg | - |
 | `ui/editor/ChromeIcons.kt` | `PreviewMode` | Lucide + own drawing | `scan` | ISC; own part Apache-2.0 | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/scan.svg | scan moved; inner screen; small arrow |
 | `ui/editor/ChromeIcons.kt` | `PreviewModeOpen` | Lucide + own drawing | `scan` | ISC; own part Apache-2.0 | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/scan.svg | small arrow; inner screen |

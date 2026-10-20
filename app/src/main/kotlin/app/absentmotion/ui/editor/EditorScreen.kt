@@ -126,7 +126,10 @@ internal fun LowerPanels(state: EditorState, addLibrary: AddLibrary, top: Boolea
         when {
             state.addOpen -> AddPopup(state, lower.height(251.dp), addLibrary)
             MultiSelect.active -> MultiBar(state, lower.height(48.dp))
-            state.selectedId == null -> AddButton(state, Modifier.align(Alignment.BottomEnd))
+            state.selectedId == null -> {
+                TransitionButton(state, Modifier.align(Alignment.BottomStart))
+                AddButton(state, Modifier.align(Alignment.BottomEnd))
+            }
             state.volumeOpen && state.panel == EditorPanel.Tools -> key(state.selectedId) { VolumePanel(state, lower.height(PanelHeight)) }
             state.panel == EditorPanel.Tools -> LayerTools(state, lower.height(PanelHeight))
             else -> LayerPanel(state, if (tall) lower.fillMaxHeight() else lower.height(PanelHeight))

@@ -26,6 +26,7 @@ import app.absentmotion.editor.chosenLayers
 import app.absentmotion.editor.deleteChosen
 import app.absentmotion.editor.alignClipTimes
 import app.absentmotion.editor.moveClipEdges
+import app.absentmotion.model.cutBetween
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -194,6 +195,9 @@ private suspend fun importModel(context: Context, state: EditorState, picked: Li
 @Composable
 internal fun MultiBar(state: EditorState, modifier: Modifier) {
     val layers = state.chosenLayers
+    val cut = layers.takeIf { it.size == 2 }?.let { state.scene.cutBetween(it[0].id, it[1].id) }
+    var transition by remember { mutableStateOf<Pair<Long, Long>?>(null) }
+    transition?.let { (a, b) -> TransitionSheet(state, a, b) { transition = null } }
     Row(modifier.padding(6.dp).clip(RoundedCornerShape(3.dp)).background(Am.PanelInset), verticalAlignment = Alignment.CenterVertically) {
         val end = layers.isNotEmpty() && state.timeMs >= layers.maxOf { it.endTime }
         BarButton(if (end) PanelIcons.TrimRight else PanelIcons.TrimLeft, stringResource(if (end) R.string.structure_extend_ends else R.string.structure_extend_starts), Modifier.width(60.dp).fillMaxHeight(), layers.isNotEmpty()) {
@@ -201,6 +205,10 @@ internal fun MultiBar(state: EditorState, modifier: Modifier) {
         }
         BarButton(if (end) ChromeIcons.SkipForward else ChromeIcons.SkipBack, stringResource(if (end) R.string.structure_move_ends else R.string.structure_move_starts), Modifier.width(60.dp).fillMaxHeight(), layers.isNotEmpty()) {
             state.moveClipEdges(end, false)
+        }
+        Spacer(Modifier.weight(1f))
+        BarButton(ChromeIcons.Transition, "Add a transition between the two clips", Modifier.width(48.dp).fillMaxHeight(), cut != null) {
+            cut?.let { (a, b) -> state.playing = false; transition = a.id to b.id }
         }
         Spacer(Modifier.weight(1f))
         BarButton(SelectionIcons.Align[0], stringResource(R.string.structure_align_starts), Modifier.width(40.dp).fillMaxHeight(), layers.size > 1) { state.alignClipTimes(0) }
