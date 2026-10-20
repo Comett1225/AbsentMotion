@@ -40,7 +40,8 @@ sk_sp<SkImageFilter> BuiltInFilter(const std::string& id, const std::function<fl
         return sigma > 0 ? SkImageFilters::Blur(sigma, sigma, SkTileMode::kDecal, input) : input;
     }
     if (id == "absent.glow") {
-        const float sigma = std::max(v("strength", 0, 20), 0.0f) / 3, intensity = std::max(v("intensity", 0, 1), 0.0f);
+        const float sigma = std::max(v("strength", 0, 20), 0.0f) / 3;
+        const float intensity = std::max(v("intensity", 0, 1), 0.0f) * std::min(sigma / 3, 1.0f);
         if (!(sigma > 0) || !(intensity > 0)) return input;
         return SkImageFilters::Arithmetic(0, intensity, 1, 0, true, input,
                                           SkImageFilters::Blur(sigma, sigma, SkTileMode::kDecal, input));
