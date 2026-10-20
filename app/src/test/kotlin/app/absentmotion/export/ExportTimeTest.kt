@@ -23,7 +23,13 @@ class ExportTimeTest {
             ExportRecord(Codec.H264, 1080, 1920, 30, 300, 6400),
             ExportRecord(Codec.Hevc, 1080, 1920, 30, 300, 100_000),
         )
-        assertEquals(12800L, estimateExportMs(history, probe, Codec.H264, 1080, 1920, 30, 600))
+        assertEquals(12700L, estimateExportMs(history, probe, Codec.H264, 1080, 1920, 30, 600))
+    }
+
+    @Test fun farAwayHistoryFallsBackToTheProbe() {
+        val history = listOf(ExportRecord(Codec.H264, 256, 256, 30, 60, 1000))
+        assertEquals(5100L, estimateExportMs(history, probe, Codec.H264, 1080, 1920, 30, 300))
+        assertEquals(5900L, estimateExportMs(history, null, Codec.H264, 512, 512, 30, 120))
     }
 
     @Test fun otherCodecsAreScaledAndNearestSizesPreferred() {
@@ -31,8 +37,8 @@ class ExportTimeTest {
             ExportRecord(Codec.H264, 1080, 1920, 30, 300, 6400),
             ExportRecord(Codec.H264, 180, 320, 30, 300, 100_000),
         )
-        assertEquals(16000L, estimateExportMs(history.take(1), probe, Codec.Av1, 1080, 1920, 30, 300))
-        assertEquals(12800L, estimateExportMs(history, null, Codec.H264, 1080, 1920, 60, 600))
+        assertEquals(15850L, estimateExportMs(history.take(1), probe, Codec.Av1, 1080, 1920, 30, 300))
+        assertEquals(12500L, estimateExportMs(history, null, Codec.H264, 1080, 1920, 60, 600))
     }
 
     @Test fun longExportsWeighMoreThanShortOnes() {
@@ -40,7 +46,7 @@ class ExportTimeTest {
             ExportRecord(Codec.H264, 1080, 1920, 30, 30, 1000),
             ExportRecord(Codec.H264, 1080, 1920, 30, 900, 18000),
         )
-        assertEquals(19000L, estimateExportMs(history, null, Codec.H264, 1080, 1920, 30, 930))
+        assertEquals(18700L, estimateExportMs(history, null, Codec.H264, 1080, 1920, 30, 930))
     }
 
     @Test fun interpolationRecordsAreKeptApart() {
