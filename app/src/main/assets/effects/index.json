@@ -88,5 +88,7 @@
  "texttransform",
  "textrandomizer",
  "countupdown",
- "timecode"
+ "timecode",
+ "drawingprogress",
+ "stroketaper"
 ]

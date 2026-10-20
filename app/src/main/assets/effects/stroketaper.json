@@ -1,0 +1,39 @@
+{
+ "id": "stroketaper",
+ "name": "Stroke Taper",
+ "category": "stylize",
+ "since": "3.0.0",
+ "native": true,
+ "description": "Thins the pen and brush strokes of a freehand drawing to a point: from nothing up to Start, and from End down to nothing. Squeeze makes the taper sharper.",
+ "params": [
+  {
+   "id": "start",
+   "label": "Start",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "end",
+   "label": "End",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "squeeze",
+   "label": "Squeeze",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 100,
+   "step": 0.1
+  }
+ ]
+}

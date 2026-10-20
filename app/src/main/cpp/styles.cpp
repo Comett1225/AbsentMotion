@@ -508,7 +508,7 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
                  bool decorate, const MediaPictures& pictures) {
     const float t = l.localTime(timeMs);
     const SkMatrix m = SiblingMatrix(siblings, l, timeMs);
-    const SkPath path = ShapePath(l, t);
+    const SkPath path = ShapeKind(l) ? DrawingProgressPath(l, ShapePath(l, t), t) : ShapePath(l, t);
     const SkColor4f fill = ColorAt(l.fillColor, t, kWhite, alpha);
     bool hasFill = false;
     SkPath stroked;
@@ -524,7 +524,7 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
         }
         if (l.kind == "drawing") {
             hasFill = !l.strokes.empty();
-            DrawDrawing(canvas, l, alpha);
+            DrawDrawing(canvas, l, alpha, t);
         } else if (l.fillType == "color") {
             hasFill = fill.fA > 0;
             if (l.text) DrawText(canvas, l, t, FillPaint(fill), Fps());
@@ -572,7 +572,7 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
     }
     if (!decorate) return;
     if (l.kind == "embedScene") return DrawGroupBorders(canvas, l, t);
-    SkPath region = hasFill ? (l.text ? TextGlyphPath(l, t, Fps()).makeTransform(m) : l.kind == "drawing" ? DrawingOutline(l).makeTransform(m) : scenePath) : SkPath();
+    SkPath region = hasFill ? (l.text ? TextGlyphPath(l, t, Fps()).makeTransform(m) : l.kind == "drawing" ? DrawingOutline(l, t).makeTransform(m) : scenePath) : SkPath();
     region = Union(region, stroked);
     if (region.isEmpty()) return;
     for (const Edge& e : l.borders) {

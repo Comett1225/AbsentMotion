@@ -2,6 +2,7 @@
 import argparse
 import html
 import json
+import math
 import os
 import subprocess
 import sys
@@ -128,8 +129,18 @@ def words(id, content, effect="", end=999):
             f'<fillColor value="#ffffffff"/><content>{content}</content>{effect}</text>')
 
 
+def sketch(id, effect="", end=999):
+    c = RENDER // 2
+    spiral = [(math.cos(k / 9) * (14 + k * 1.1), math.sin(k / 9) * (14 + k * 1.1)) for k in range(100)]
+    wave = [(-130 + k * 6.5, 130 + math.sin(k / 3) * 18) for k in range(41)]
+    strokes = "".join(f'<stroke color="{colour}" width="{width}" type="pen" points="' + ";".join(f"{x:.1f},{y:.1f},1" for x, y in line) + '"/>'
+                      for line, colour, width in [(spiral, "#ffffc23d", 16), (wave, "#ff5eb7d9", 12)])
+    return (f'<drawing id="{id}" label="drawing" startTime="0" endTime="{end}"><transform><location value="{c},{c - 20},0"/></transform>'
+            f"{strokes}{effect}</drawing>")
+
+
 def backdrops(show):
-    return ["grid"] if show.get("layout") in ("move", "text") else [show["under"]] if "under" in show else []
+    return ["grid"] if show.get("layout") in ("move", "text", "drawing") else [show["under"]] if "under" in show else []
 
 
 def scene(show, effect):
@@ -146,6 +157,8 @@ def scene(show, effect):
     move = show.get("layout") == "move"
     if show.get("layout") == "text":
         layers.append(words(2, show["text"], fx, total - 1))
+    elif show.get("layout") == "drawing":
+        layers.append(sketch(2, fx, total - 1))
     else:
         layers.append(layer(2, show["photo"], fx, RENDER // 4 if move else RENDER // 2, show.get("keys"), total - 1))
     if "split" in show:
@@ -283,7 +296,7 @@ def main():
         else:
             out = image if image.getextrema()[3][0] < 255 else image.convert("RGB")
             out.save(target, quality=82, method=6)
-        print(f"{key:20} {show.get('photo', 'text'):12} {diff:6.1f}{note}", flush=True)
+        print(f"{key:20} {show.get('photo', show.get('layout')):12} {diff:6.1f}{note}", flush=True)
         if diff < SAME or (moving is not None and moving < SAME):
             unchanged.append(key)
     adb("shell", "run-as", PKG, "rm", "-r", APP_DIR)

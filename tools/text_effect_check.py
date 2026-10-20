@@ -34,6 +34,17 @@ def text(content, effect="", size=14, width=380, align="center", fill="color", y
             + engine.transform(f"{W // 2},{y},0") + f"<content>{content}</content>{paint}{effect}</text>")
 
 
+def sketch(effect="", tool="pen"):
+    line = ";".join(f"{x},0,1" for x in range(-150, 151, 10))
+    return (f'<drawing id="8" label="d" startTime="0" endTime="999">' + engine.transform(f"{W // 2},{H // 2},0")
+            + f'<stroke color="#ffffffff" width="20" type="{tool}" points="{line}"/>{effect}</drawing>')
+
+
+def line_shape(effect=""):
+    return ('<shape id="9" label="l" startTime="0" endTime="999" fillType="none" mediaFillMode="fill">' + engine.transform(f"{W // 2},{H // 2},0")
+            + '<path d="M -150 0 L 150 0"/><path-stroke><color value="#ffffffff"/><size value="20"/></path-stroke>' + effect + "</shape>")
+
+
 def scene(body, fps=30, total=1000):
     return (f'<scene title="textcheck" width="{W}" height="{H}" fps="{fps}" totalTime="{total}" bgcolor="#ff000000">'
             + body + "</scene>")
@@ -139,6 +150,15 @@ def main():
     b.add("timecodeplain", scene(text("00:00:01:15", end=2999), fps=30, total=3000))
     b.add("countdown", scene(text("x", fx("timecode", format=2, offset=10, speed=-1), end=2999), fps=30, total=3000), 60)
     b.add("countdownplain", scene(text("00:08", end=2999), fps=30, total=3000))
+    b.add("sketch", scene(sketch()))
+    b.add("sketchhalf", scene(sketch(fx("drawingprogress", end=0.5))))
+    b.add("sketchnone", scene(sketch(fx("drawingprogress", end=0))))
+    b.add("sketchmiddle", scene(sketch(fx("drawingprogress", start=0.25, end=0.75))))
+    b.add("brushhalf", scene(sketch(fx("drawingprogress", end=0.5), tool="brush")))
+    b.add("linehalf", scene(line_shape(fx("drawingprogress", end=0.5))))
+    b.add("line", scene(line_shape()))
+    b.add("taper", scene(sketch(fx("stroketaper", start=0.5, end=0.5))))
+    b.add("taperhard", scene(sketch(fx("stroketaper", start=0.5, end=0.5, squeeze=100))))
     b.run()
 
     results = []
@@ -194,6 +214,19 @@ def main():
     check("keyframed count is part way", diff(b["countkeyed"], plain) > 0 and ink(b["countkeyed"]).any())
     check("timecode shows the layer time", same_text(b["timecode"], b["timecodeplain"]))
     check("a timecode counts down from an offset", same_text(b["countdown"], b["countdownplain"]))
+    sk, half, middle = columns(b["sketch"]), columns(b["sketchhalf"]), columns(b["sketchmiddle"])
+    check("drawing progress draws the first half of a stroke", half and abs(half[0] - sk[0]) <= 2 and abs(half[1] - (sk[0] + sk[1]) / 2) <= 12, f"{half} of {sk}")
+    check("drawing progress at 0 draws nothing", not ink(b["sketchnone"]).any())
+    check("drawing progress start and end cut both ends", middle and middle[0] > sk[0] + 50 and middle[1] < sk[1] - 50, f"{middle} of {sk}")
+    brush = columns(b["brushhalf"])
+    check("brush strokes are cut too", brush and brush[1] < sk[1] - 100, f"{brush}")
+    line, lhalf = columns(b["line"]), columns(b["linehalf"])
+    check("drawing progress trims a shape outline", lhalf and abs(lhalf[0] - line[0]) <= 2 and lhalf[1] < line[1] - 120, f"{lhalf} of {line}")
+    taper, hard = b["taper"], b["taperhard"]
+    ends = lambda image: int(ink(image)[:, sk[0]:sk[0] + 20].sum())
+    check("stroke taper thins the ends", ends(taper) < ends(b["sketch"]) / 2 and rows(taper)[1] - rows(taper)[0] >= rows(b["sketch"])[1] - rows(b["sketch"])[0] - 2,
+          f"ends {ends(taper)} vs {ends(b['sketch'])}")
+    check("squeeze sharpens the taper", ink(hard).sum() < ink(taper).sum())
     failed = [t for t, ok in results if not ok]
     print(f"\n{len(results) - len(failed)} of {len(results)} text effect checks passed", flush=True)
     sys.exit(1 if failed else 0)

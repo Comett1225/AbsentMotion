@@ -90,6 +90,8 @@ struct FreehandStroke {
     float width = 5, color[4] = {1, 1, 1, 1};
     SkPath geometry;
     bool filled = false;
+    std::vector<SkPoint> points;
+    std::vector<float> radius;
 };
 
 struct PathKnot {

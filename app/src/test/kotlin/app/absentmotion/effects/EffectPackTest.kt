@@ -25,7 +25,7 @@ class EffectPackTest {
         val declared = Regex("""(layout\s*\(\s*color\s*\)\s*)?uniform\s+(\w+)\s+(\w+)\s*;""")
         for (effect in catalog.definitions) {
             if (effect.native) {
-                assertTrue("${effect.key} is not a built-in", effect.category in setOf("move", "text") || effect.id in setOf("absent.blur", "absent.glow", "absent.motionblur", "absent.backdrop"))
+                assertTrue("${effect.key} is not a built-in", effect.category in setOf("move", "text") || effect.id in setOf("absent.blur", "absent.glow", "absent.motionblur", "absent.backdrop", "absent.drawingprogress", "absent.stroketaper"))
                 assertNull(effect.sksl)
                 continue
             }

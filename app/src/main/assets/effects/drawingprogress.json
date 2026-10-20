@@ -1,0 +1,30 @@
+{
+ "id": "drawingprogress",
+ "name": "Drawing Progress",
+ "category": "stylize",
+ "since": "3.0.0",
+ "native": true,
+ "description": "Draws a freehand drawing stroke by stroke, or the outline of a shape, from Start to End. Keyframe End from 0% to 100% to watch it being drawn. Works best on shapes with Fill off and a Stroke.",
+ "params": [
+  {
+   "id": "start",
+   "label": "Start",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "end",
+   "label": "End",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  }
+ ]
+}

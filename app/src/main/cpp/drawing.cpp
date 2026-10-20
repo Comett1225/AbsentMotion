@@ -11,6 +11,7 @@
 #include "include/core/SkCanvas.h"
 #include "include/core/SkPaint.h"
 #include "include/core/SkPathBuilder.h"
+#include "include/core/SkPathMeasure.h"
 #include "include/core/SkPathUtils.h"
 
 namespace am {
@@ -52,6 +53,8 @@ SkPath Band(const std::vector<SkPoint>& pts, const std::vector<float>& radius) {
 
 void BuildGeometry(FreehandStroke* s, const std::vector<SkPoint>& pts, const std::vector<float>& pressure) {
     if (pts.empty()) return;
+    s->points = pts;
+    for (size_t i = 0; i < pts.size(); i++) s->radius.push_back(std::max(0.01f, (s->tool == kBrush ? pressure[i] : 1.0f) * s->width / 2));
     switch (s->tool) {
         case kFill: {
             s->geometry = SkPath::Polygon({pts.data(), pts.size()}, true);
@@ -120,12 +123,136 @@ void ParseStrokes(const XmlNode& drawing, Layer* layer) {
     }
 }
 
-void DrawDrawing(SkCanvas* canvas, const Layer& layer, float opacity) {
+namespace {
+
+struct Reveal {
+    float start = 0, end = 1, taperStart = 0, taperEnd = 1, squeeze = 0;
+    bool tapered = false;
+};
+
+Reveal RevealOf(const Layer& layer, float t) {
+    Reveal r;
+    if (const LayerEffect* e = layer.effect("absent.drawingprogress")) {
+        r.start = std::clamp(e->value("start", t, 0), 0.0f, 1.0f);
+        r.end = std::clamp(e->value("end", t, 1), 0.0f, 1.0f);
+    }
+    if (const LayerEffect* e = layer.effect("absent.stroketaper")) {
+        r.taperStart = std::clamp(e->value("start", t, 0), 0.0f, 1.0f);
+        r.taperEnd = std::clamp(e->value("end", t, 1), 0.0f, 1.0f);
+        r.squeeze = std::clamp(e->value("squeeze", t, 0), 0.0f, 100.0f);
+        r.tapered = r.taperStart > 0 || r.taperEnd < 1;
+    }
+    return r;
+}
+
+float Length(const FreehandStroke& s) {
+    float length = 0;
+    for (size_t i = 0; i + 1 < s.points.size(); i++) length += SkPoint::Distance(s.points[i], s.points[i + 1]);
+    return length;
+}
+
+float Taper(const Reveal& r, float u) {
+    float f = 1;
+    if (r.taperStart > 0 && u < r.taperStart) f = std::min(f, u / r.taperStart);
+    if (r.taperEnd < 1 && u > r.taperEnd) f = std::min(f, (1 - u) / (1 - r.taperEnd));
+    return std::pow(std::clamp(f, 0.0f, 1.0f), 1 + r.squeeze / 25);
+}
+
+void Slice(const FreehandStroke& s, float lo, float hi, float step, std::vector<SkPoint>* pts, std::vector<float>* radius,
+           std::vector<float>* along) {
+    const auto& p = s.points;
+    if (p.size() == 1) {
+        pts->push_back(p[0]);
+        radius->push_back(s.radius[0]);
+        along->push_back(0);
+        return;
+    }
+    float a0 = 0;
+    for (size_t i = 0; i + 1 < p.size(); i++) {
+        const float d = SkPoint::Distance(p[i], p[i + 1]), a1 = a0 + d;
+        const float from = std::max(lo, a0), to = std::min(hi, a1);
+        if (to >= from && !(d <= 0 && !pts->empty())) {
+            auto emit = [&](float a) {
+                const float u = d > 0 ? (a - a0) / d : 0;
+                pts->push_back(p[i] + (p[i + 1] - p[i]) * u);
+                radius->push_back(s.radius[i] + (s.radius[i + 1] - s.radius[i]) * u);
+                along->push_back(a);
+            };
+            if (pts->empty()) emit(from);
+            const int pieces = step > 0 ? std::max(1, (int)std::ceil((to - from) / step)) : 1;
+            for (int k = 1; k <= pieces; k++) emit(from + (to - from) * k / pieces);
+        }
+        a0 = a1;
+    }
+}
+
+template <typename F> void EachPiece(const Layer& layer, float t, F&& draw) {
+    const Reveal r = RevealOf(layer, t);
+    float total = 0;
+    std::vector<float> lengths;
+    for (const FreehandStroke& s : layer.strokes) total += lengths.emplace_back(Length(s));
+    const float start = r.start * total, end = r.end * total;
+    float at = 0;
+    for (size_t k = 0; k < layer.strokes.size(); k++) {
+        const FreehandStroke& s = layer.strokes[k];
+        const float length = lengths[k], lo = std::max(start - at, 0.0f), hi = std::min(end - at, length);
+        const bool seen = length > 0 ? hi > lo : at >= start && at <= end && end > start;
+        at += length;
+        if (s.geometry.isEmpty() || !seen) continue;
+        const bool taper = r.tapered && (s.tool == kPen || s.tool == kBrush);
+        if (!taper && lo <= 0 && hi >= length) {
+            draw(s, s.geometry, s.filled);
+            continue;
+        }
+        std::vector<SkPoint> pts;
+        std::vector<float> radius, along;
+        Slice(s, lo, hi, taper ? std::max(length / 200, 1.5f) : 0, &pts, &radius, &along);
+        if (pts.empty()) continue;
+        if (s.tool == kFill) {
+            draw(s, SkPath::Polygon({pts.data(), pts.size()}, true), true);
+        } else if (taper) {
+            for (size_t i = 0; i < pts.size(); i++) radius[i] = std::max(0.01f, radius[i] * Taper(r, length > 0 ? along[i] / length : 0));
+            draw(s, Band(pts, radius), true);
+        } else if (s.tool == kBrush) {
+            draw(s, Band(pts, radius), true);
+        } else if (pts.size() == 1) {
+            draw(s, SkPath::Circle(pts[0].fX, pts[0].fY, std::max(0.01f, s.width / 2)), true);
+        } else {
+            draw(s, SkPath::Polygon({pts.data(), pts.size()}, false), false);
+        }
+    }
+}
+
+}
+
+SkPath DrawingProgressPath(const Layer& layer, const SkPath& path, float t) {
+    const LayerEffect* e = layer.effect("absent.drawingprogress");
+    if (!e) return path;
+    const float start = std::clamp(e->value("start", t, 0), 0.0f, 1.0f), end = std::clamp(e->value("end", t, 1), 0.0f, 1.0f);
+    if (start <= 0 && end >= 1) return path;
+    float total = 0;
+    SkPathMeasure measure(path, false);
+    do total += measure.getLength(); while (measure.nextContour());
+    SkPathBuilder b;
+    if (!(total > 0) || end <= start) return b.detach();
+    SkPathMeasure pieces(path, false);
+    float at = 0;
+    do {
+        const float length = pieces.getLength(), lo = std::max(start * total - at, 0.0f), hi = std::min(end * total - at, length);
+        if (hi > lo) {
+            pieces.getSegment(lo, hi, &b, true);
+            if (lo <= 0 && hi >= length && pieces.isClosed()) b.close();
+        }
+        at += length;
+    } while (pieces.nextContour());
+    return b.detach();
+}
+
+void DrawDrawing(SkCanvas* canvas, const Layer& layer, float opacity, float t) {
     bool erases = false;
     for (const FreehandStroke& s : layer.strokes) erases |= s.tool == kEraser;
     if (erases) canvas->saveLayer(nullptr, nullptr);
-    for (const FreehandStroke& s : layer.strokes) {
-        if (s.geometry.isEmpty()) continue;
+    EachPiece(layer, t, [&](const FreehandStroke& s, const SkPath& geometry, bool filled) {
         SkPaint paint;
         paint.setAntiAlias(true);
         if (s.tool == kEraser) {
@@ -133,14 +260,14 @@ void DrawDrawing(SkCanvas* canvas, const Layer& layer, float opacity) {
         } else {
             paint.setColor4f({s.color[1], s.color[2], s.color[3], std::clamp(s.color[0] * opacity, 0.0f, 1.0f)});
         }
-        if (!s.filled) {
+        if (!filled) {
             paint.setStyle(SkPaint::kStroke_Style);
             paint.setStrokeWidth(s.width);
             paint.setStrokeCap(SkPaint::kRound_Cap);
             paint.setStrokeJoin(SkPaint::kRound_Join);
         }
-        canvas->drawPath(s.geometry, paint);
-    }
+        canvas->drawPath(geometry, paint);
+    });
     if (erases) canvas->restore();
 }
 
@@ -157,12 +284,14 @@ SkPath DrawingBounds(const Layer& layer) {
     return any ? SkPath::Rect(all) : SkPath();
 }
 
-SkPath DrawingOutline(const Layer& layer) {
+SkPath DrawingOutline(const Layer& layer, float t) {
     SkPathBuilder b;
-    for (const FreehandStroke& s : layer.strokes) {
-        if (s.tool == kEraser || s.geometry.isEmpty()) continue;
-        b.addPath(s.filled ? s.geometry : StrokedOutline(s));
-    }
+    EachPiece(layer, t, [&](const FreehandStroke& s, const SkPath& geometry, bool filled) {
+        if (s.tool == kEraser) return;
+        FreehandStroke piece = s;
+        piece.geometry = geometry;
+        b.addPath(filled ? geometry : StrokedOutline(piece));
+    });
     return b.detach();
 }
 
