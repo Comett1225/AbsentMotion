@@ -270,7 +270,7 @@ private fun FrameButton(icon: androidx.compose.ui.graphics.vector.ImageVector, m
 
 private fun percent(v: Float) = String.format(Locale.US, "%.0f%%", v * 100)
 
-internal fun display(param: FxParam, v: Float): String = when (param.unit) {
+private fun display(param: FxParam, v: Float): String = when (param.unit) {
     "Hz" -> if (v >= 1000) String.format(Locale.US, if (v >= 10_000) "%.1f kHz" else "%.2f kHz", v / 1000) else String.format(Locale.US, "%.0f Hz", v)
     "dB" -> String.format(Locale.US, "%.1f dB", v)
     "ms" -> String.format(Locale.US, if (v < 10) "%.1f ms" else "%.0f ms", v)

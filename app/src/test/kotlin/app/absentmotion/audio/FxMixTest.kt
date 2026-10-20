@@ -97,6 +97,45 @@ class FxMixTest {
         assertArrayEquals(plain, both)
     }
 
+    @Test fun withoutEffectsTheExportEqualsThePreviousMixer() {
+        val half = { layer: String -> layer.replace("</audio>", """<gain value="0.5"/></audio>""") }
+        val sc = scene(half(audio(1, 0, 2999, false, """speed="1.5"""")), half(audio(2, 0, 1999, false)), half(audio(3, 0, 2499, false, """loop="true" outTime="700"""")))
+        val clips = AudioClip.of(sc)
+        val now = OfflineMix({ uri -> ToneSource(if (uri == "tone1") 440.0 else 660.0) }, clips, Resampler.ULTRA, { _, _ -> null }, SafeLimiter(44_100)).use { it(0, 3_000_000) }
+        val rate = 44_100
+        val block = FloatArray(2048)
+        val sources = HashMap<Long, OfflineSource>()
+        val voices = HashMap<Long, Voice>()
+        val before = ShortArray(2 * rate * 3)
+        val dt = 1000.0 / rate
+        for (i in 0 until (rate * 3 + 1023) / 1024) {
+            block.fill(0f)
+            val t0 = i * 1024 * dt
+            for (clip in AudioClip.of(sc)) {
+                var next = 0
+                while (true) {
+                    val span = clip.span(t0, 1024, dt, next) ?: break
+                    next = span.to
+                    if (!span.inMedia) { voices[clip.id]?.ready = false; continue }
+                    val source = sources.getOrPut(clip.id) { OfflineSource(clip.uri) { uri -> ToneSource(if (uri == "tone1") 440.0 else 660.0) } }
+                    val r = source.open(span.pos)
+                    val voice = voices.getOrPut(clip.id) { Voice() }
+                    val count = span.to - span.from
+                    voice.begin(span.pos * r / 1000.0, span.step * r / 1000.0, count)
+                    if (voice.jump) { source.window(voice.ghostBase, voice.ghostSize, voice.ghostWindow()); voice.ghostOk = true }
+                    source.window(voice.base, voice.size, voice.win)
+                    voice.render(block, span.from, count, span.pos * r / 1000.0, span.step * r / 1000.0, span.g0, span.g1, Resampler.ULTRA, span.clipMs0, dt, span.lengthMs)
+                }
+            }
+            for (k in 0 until 2048) {
+                val at = 2 * i * 1024 + k
+                if (at < before.size) before[at] = (block[k].coerceIn(-1f, 1f) * 32767f).roundToInt().coerceIn(-32768, 32767).toShort()
+            }
+        }
+        assertTrue(level(before, 100, 2900) in 8_000..29_000)
+        assertArrayEquals(before, now)
+    }
+
     @Test fun eachClipRunsThroughItsOwnChain() {
         val half: FxMaker = { _, _ -> GainFx(0.5f) }
         val mixed = render(scene(audio(1, 0, 1999, true), audio(2, 0, 1999, false)), 2000, half)
