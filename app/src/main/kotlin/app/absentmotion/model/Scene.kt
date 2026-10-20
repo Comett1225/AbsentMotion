@@ -225,7 +225,7 @@ data class Layer(val node: XmlNode, val t: Float = 0f, val snap: Float = 0f) {
         PropRef.Kind.Property -> node.children.firstOrNull { it.name == "property" && it["name"] == ref.name }
     }
 
-    private fun withElement(ref: PropRef, element: XmlNode): Layer = copy(
+    internal fun withElement(ref: PropRef, element: XmlNode): Layer = copy(
         node = when (ref.kind) {
             PropRef.Kind.Effect -> withEffect(ref.effectIndex) { effect ->
                 val old = effect.effectProperty(ref.name)

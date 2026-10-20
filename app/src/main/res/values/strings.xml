@@ -881,6 +881,15 @@
     <string name="camerapanel_focus_plane">at Z %1$s</string>
     <string name="camera_frame_caption">Zoom %1$s · View angle %2$s</string>
     <string name="camera_tip">To look through the camera, open this panel and turn on Camera View.</string>
+    <string name="camera_moves">Camera Moves</string>
+    <string name="camera_moves_start">Starts at %1$s and adds keyframes you can edit.</string>
+    <string name="camera_moves_shortened">Shortened to %1$s to fit the camera\'s clip.</string>
+    <string name="camera_move_push_in">Push In</string>
+    <string name="camera_move_pull_out">Pull Out</string>
+    <string name="camera_move_orbit">Orbit</string>
+    <string name="camera_move_pan">Pan</string>
+    <string name="camera_move_dolly_zoom">Dolly Zoom</string>
+    <string name="camera_move_handheld">Handheld</string>
     <string name="drag_to_move_along_z">Drag up or down to move along Z</string>
     <string name="border_stroke">Stroke</string>
     <string name="shadow_title">Shadow</string>

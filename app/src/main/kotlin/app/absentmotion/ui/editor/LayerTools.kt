@@ -138,13 +138,18 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier) {
             return@Column
         }
         if (state.selected?.kind == "camera") {
+            var moving by remember(state.selectedId) { mutableStateOf(false) }
+            if (moving) state.selectedId?.let { CameraMovesSheet(state, it) { moving = false } }
             Row(Modifier.fillMaxWidth().height(160.px), Arrangement.spacedBy(17.px)) {
                 ToolButton(CameraOptions, Modifier.weight(1f)) { state.panel = EditorPanel.Camera }
                 ToolButton(MoveTransform, Modifier.weight(1f)) { state.panel = EditorPanel.MoveTransform }
                 ToolButton(Effects, Modifier.weight(1f)) { state.effectIndex = -1; state.panel = EditorPanel.Effects }
             }
             Spacer(Modifier.height(17.px))
-            ToolButton(Presets, Modifier.fillMaxWidth().height(160.px)) { openPresets(state) }
+            Row(Modifier.fillMaxWidth().height(160.px), Arrangement.spacedBy(17.px)) {
+                ToolButton(Presets, Modifier.weight(1f)) { openPresets(state) }
+                ToolButton(CameraMoves, Modifier.weight(1f)) { state.playing = false; moving = true }
+            }
             return@Column
         }
         if (state.selected?.kind == "model") {
@@ -202,6 +207,7 @@ private val ElementPropsButton = Tool(R.string.asset_properties, PanelIcons.Edit
 private val EditPoints = Tool(R.string.layer_tool_edit_points, PanelIcons.EditShape, 16f)
 private val EditDrawing = Tool(R.string.layer_tool_edit_drawing, PanelIcons.EditShape, 16f)
 private val CameraOptions = Tool(R.string.layer_tool_camera_options, PanelIcons.Camera, 19.4f)
+private val CameraMoves = Tool(R.string.camera_moves, PanelIcons.Animate, 19.4f)
 private val ModelOptions = Tool(R.string.layer_tool_model_options, PanelIcons.TabTilt, 19.4f)
 private val Presets = Tool(R.string.presets, PanelIcons.Star, 19.4f)
 private val Effects = Tool(R.string.layer_tool_effects, PanelIcons.Effects, 19.6f)
