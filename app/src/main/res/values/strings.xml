@@ -886,6 +886,7 @@
     <string name="effectbrowser_favorite">Favorite</string>
     <string name="effectbrowser_preset">PRESET</string>
     <string name="effectbrowser_recent">Recent</string>
+    <string name="effectbrowser_recent_empty">Effects you use appear here</string>
     <plurals name="aibrowser_too_long">
         <item quantity="one">Clips longer than %1$s minute are not supported yet. Trim or split the clip first.</item>
         <item quantity="other">Clips longer than %1$s minutes are not supported yet. Trim or split the clip first.</item>
