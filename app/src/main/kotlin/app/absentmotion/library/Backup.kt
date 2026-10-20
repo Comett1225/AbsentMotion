@@ -71,12 +71,15 @@ object Backup {
             override fun read(): Int = super.read().also { if (it >= 0) progress(++read) }
             override fun read(b: ByteArray, off: Int, len: Int): Int = super.read(b, off, len).also { if (it > 0) { read += it; progress(read) } }
         }
+        fun moved(text: String): String = if (oldRoot.isEmpty()) text else Regex(Regex.escape(oldRoot) + "(?:media/([^/\"<>]+)/|templates/)").replace(text) {
+            val id = it.groupValues[1]
+            rootUri(root) + if (id.isEmpty()) "templates/" else "media/" + (renamed[id] ?: id) + "/"
+        }
         fun remap(text: String): String {
-            val moved = if (oldRoot.isEmpty()) text else Regex(Regex.escape(oldRoot) + "(?:media/([^/\"<>]+)/|templates/)").replace(text) {
-                val id = it.groupValues[1]
-                rootUri(root) + if (id.isEmpty()) "templates/" else "media/" + (renamed[id] ?: id) + "/"
-            }
-            return runCatching { Scene(Scene.parse(moved).node.mapMediaUris(access::defused)).toXml() }.getOrDefault(moved)
+            val moved = moved(text)
+            val node = runCatching { Scene.parse(moved).node }.getOrNull() ?: return moved
+            val defused = node.mapMediaUris(access::defused)
+            return if (defused == node) moved else Scene(defused).toXml()
         }
         fun freshId(id: String): String =
             if (runCatching { UUID.fromString(id) }.isSuccess) UUID.randomUUID().toString()
@@ -85,7 +88,7 @@ object Backup {
             for ((id, text) in waiting) {
                 val local = File(projects, "$id.xml")
                 if (!local.exists()) continue
-                if (runCatching { sameScene(local.readText(), remap(text)) }.getOrDefault(false)) skipped += id else renamed[id] = freshId(id)
+                if (runCatching { sameScene(local.readText(), moved(text)) }.getOrDefault(false)) skipped += id else renamed[id] = freshId(id)
             }
             for ((id, text) in waiting) if (id !in skipped) {
                 store.save(renamed[id] ?: id, remap(text))

@@ -32,6 +32,7 @@ import app.absentmotion.export.freeSpace
 import app.absentmotion.library.AppSettings
 import app.absentmotion.library.Backup
 import app.absentmotion.library.ImportFailed
+import app.absentmotion.library.MediaAccess
 import app.absentmotion.library.ProjectStore
 import app.absentmotion.platform.ActivityResultContracts
 import app.absentmotion.platform.Context
@@ -143,7 +144,8 @@ private fun restoreBackup(context: Context, uri: Uri, task: BackupTask): List<Ui
     }.getOrNull() ?: -1L
     if (size > 0 && context.filesDir.usableSpace < size + (100L shl 20)) return listOf(txt(R.string.backup_restore_no_space, fileSize(size)))
     val restored = (context.contentResolver.openInputStream(uri) ?: return listOf(txt(R.string.backup_open_failed))).use { input ->
-        Backup.restore(ProjectStore(context), context.filesDir, input, ai = context.getExternalFilesDir(null)?.resolve("ai")) { read -> if (size > 0) task.report(read.toFloat() / size) else task.report(0f) }
+        val external = context.getExternalFilesDir(null)
+        Backup.restore(ProjectStore(context), context.filesDir, input, MediaAccess.forPhone(context.filesDir, external), external?.resolve("ai")) { read -> if (size > 0) task.report(read.toFloat() / size) else task.report(0f) }
     }
     task.report(1f)
     fun count(n: Int) = UiText.plural(R.plurals.backup_projects, n, n.toString())

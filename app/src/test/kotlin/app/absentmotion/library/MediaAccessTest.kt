@@ -84,6 +84,18 @@ class MediaAccessTest {
         assertFalse(access.allows(access.defused(secret)))
     }
 
+    @Test fun ownFoldersAreAllowedButNothingAboveThem() {
+        val external = tmp.newFolder("external")
+        val own = MediaAccess.forPhone(files, external)
+        val tone = File(external, "qa/tone.wav").apply { parentFile.mkdirs(); writeText("x") }
+        assertTrue(own.allows(tone.toURI().toString()))
+        assertEquals(tone.toURI().toString(), own.defused(tone.toURI().toString()))
+        assertFalse(access.allows(tone.toURI().toString()))
+        assertFalse(own.allows(external.toURI().toString()))
+        assertFalse(own.allows("file://" + external.path + "/../data/files/projects/p1.xml"))
+        assertFalse(own.allows(file("projects/p1.xml").toURI().toString()))
+    }
+
     @Test fun unlimitedAllowsEverythingForTheMac() {
         assertTrue(MediaAccess.Unlimited.allows("file:///anywhere/else/a.mp4"))
         assertTrue(MediaAccess.Unlimited.allows("testdata/media/test-image.jpg"))

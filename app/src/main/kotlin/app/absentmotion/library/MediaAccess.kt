@@ -9,12 +9,12 @@ internal fun modelFolder(uri: String): File? {
     return runCatching { File(URI(uri)).canonicalFile.parentFile }.getOrNull()?.takeIf { it.name.startsWith("model-") && it.isDirectory }
 }
 
-class MediaAccess private constructor(private val filesDir: File?) {
+class MediaAccess private constructor(private val filesDir: File?, private val own: List<File> = emptyList()) {
     fun allows(uri: String): Boolean {
         if (filesDir == null) return true
         return when (uri.substringBefore(':', "").lowercase()) {
             "content" -> uri.startsWith("content://", ignoreCase = true) && uri.substring("content://".length).substringBefore('/').isNotEmpty()
-            "file" -> inMediaFolder(filesDir, uri)
+            "file" -> inMediaFolder(filesDir, uri) || own.any { inside(it, uri) }
             else -> false
         }
     }
@@ -26,11 +26,19 @@ class MediaAccess private constructor(private val filesDir: File?) {
     companion object {
         val Unlimited = MediaAccess(null)
 
-        fun forPhone(filesDir: File) = MediaAccess(filesDir)
+        fun forPhone(filesDir: File, vararg own: File?) = MediaAccess(filesDir, own.filterNotNull())
 
         fun forApp(context: Context): MediaAccess = if (onPhone) forPhone(context.filesDir) else Unlimited
 
         private val onPhone = System.getProperty("java.vm.name").orEmpty().contains("Dalvik", ignoreCase = true)
+
+        private fun inside(dir: File, uri: String): Boolean = try {
+            val base = dir.canonicalFile.toPath()
+            val path = File(URI(uri)).canonicalFile.toPath()
+            path.startsWith(base) && path != base
+        } catch (e: Exception) {
+            false
+        }
 
         private fun inMediaFolder(filesDir: File, uri: String): Boolean = try {
             val base = filesDir.canonicalFile.toPath()

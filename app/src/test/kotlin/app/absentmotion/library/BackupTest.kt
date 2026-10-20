@@ -81,6 +81,31 @@ class BackupTest {
         assertEquals("same pixels", pictureOf(store, same))
     }
 
+    @Test fun restoringOnTheSamePhoneKeepsOwnLinksAndFindsEveryProjectAlreadyHere() {
+        val root = tmp.newFolder("files")
+        val external = tmp.newFolder("external")
+        val access = MediaAccess.forPhone(root, external)
+        val store = ProjectStore(root)
+        project(store, "Kept", "kept pixels")
+        val tone = File(external, "tone.wav").apply { writeText("tone") }.toURI().toString()
+        val photo = "content://media/external/images/media/12"
+        val foreign = File(tmp.newFolder("elsewhere"), "secret.txt").apply { writeText("secret") }.toURI().toString()
+        val linked = store.create(Scene(XmlNode("scene", linkedMapOf("width" to "10", "height" to "10", "title" to "Linked"), listOf(
+            XmlNode("audio", linkedMapOf("id" to "1", "src" to tone)),
+            XmlNode("shape", linkedMapOf("id" to "2", "fillImage" to photo)),
+            XmlNode("shape", linkedMapOf("id" to "3", "fillImage" to foreign))))))
+        val plain = store.create(Scene(XmlNode("scene", linkedMapOf("width" to "10", "height" to "10", "title" to "Plain"), listOf(
+            XmlNode("audio", linkedMapOf("id" to "1", "src" to tone))))))
+        val bytes = backup(root)
+        assertEquals(Backup.Restored(0, 0, 3), Backup.restore(store, root, ByteArrayInputStream(bytes), access))
+        assertEquals(3, store.list().size)
+        val newRoot = tmp.newFolder("new")
+        val fresh = ProjectStore(newRoot)
+        assertEquals(Backup.Restored(3, 0, 0), Backup.restore(fresh, newRoot, ByteArrayInputStream(bytes), MediaAccess.forPhone(newRoot, external)))
+        assertEquals(setOf(tone, photo, "blocked-$foreign"), fresh.load(linked)!!.node.mediaUris())
+        assertEquals(store.text(plain), fresh.text(plain))
+    }
+
     @Test fun projectsOnlyBackupLeavesMediaOut() {
         val root = tmp.newFolder()
         project(ProjectStore(root), "A", "pixels")
