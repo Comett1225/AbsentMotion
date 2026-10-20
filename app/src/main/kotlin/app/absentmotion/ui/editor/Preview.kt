@@ -56,6 +56,7 @@ import app.absentmotion.editor.EditorPanel
 import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.clearSelection
 import app.absentmotion.editor.MultiSelect
+import app.absentmotion.editor.place
 import app.absentmotion.editor.withWorldLocation
 import app.absentmotion.engine.PreviewView
 import app.absentmotion.model.withGradient
@@ -69,6 +70,7 @@ import app.absentmotion.ui.editor.panels.EyedropperLoupe
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.presence
 import app.absentmotion.ui.theme.Presence
+import kotlin.math.abs
 import kotlin.math.min
 import kotlin.math.roundToInt
 import kotlinx.coroutines.delay
@@ -181,7 +183,10 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier) {
                                 l.withGradient(if (handle == 10) g.copy(x0 = u, y0 = v) else g.copy(x1 = u, y1 = v))
                             }
                         } else if (moved && startLayer != null && handle == 9 && startQuad != null) {
-                            val localX = (position.x - down.position.x) / currentScale
+                            val axis = startQuad[1] - startQuad[0]
+                            val drag = position - down.position
+                            val along = (drag.x * axis.x + drag.y * axis.y) / axis.getDistance().coerceAtLeast(1e-3f)
+                            val localX = along / currentScale / abs(state.scene.place(startLayer, state.sampleMs).sx).coerceAtLeast(1e-3f)
                             val factor = when (startLayer.textAlign) { "center" -> 2f; "right" -> -1f; else -> 1f }
                             val width = (startLayer.wrapWidth + localX * factor).roundToInt().coerceAtLeast(50)
                             state.editSelected("text-wrap") { startLayer.withResizedTextWrap(width) }

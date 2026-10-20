@@ -1,5 +1,8 @@
 package app.absentmotion.model
 
+import kotlin.math.cos
+import kotlin.math.sin
+
 val Layer.content: String get() = node.child("content")?.text ?: ""
 val Layer.font: String get() = node["font"] ?: ""
 val Layer.textSize: Float get() = node["size"]?.toFloatOrNull() ?: 18f
@@ -18,12 +21,15 @@ fun Layer.textSpacing(name: String, fallback: Float): Float = node.children
 fun Layer.withResizedTextWrap(width: Int): Layer {
     val offset = when (textAlign) { "center" -> 0f; "right" -> -(width - wrapWidth) / 2f; else -> (width - wrapWidth) / 2f }
     if (offset == 0f) return withWrapWidth(width)
+    val turn = Math.toRadians(transform("rotation", 0f)[0].toDouble())
+    val along = offset * scale[0]
     val transform = node.child("transform") ?: XmlNode("transform")
     val location = transform.child("location") ?: XmlNode("location", mapOf("value" to "0,0,0"))
     fun translated(value: String?): String {
         val parts = value?.split(',')?.map { it.toFloatOrNull() ?: 0f } ?: emptyList()
         val values = FloatArray(maxOf(3, parts.size)) { parts.getOrElse(it) { 0f } }
-        values[0] += offset
+        values[0] += (along * cos(turn)).toFloat()
+        values[1] += (along * sin(turn)).toFloat()
         return formatFloats(values)
     }
     val moved = location.copy(attrs = if (location["value"] != null) location.attrs + ("value" to translated(location["value"])) else location.attrs,
