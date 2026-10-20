@@ -21,7 +21,7 @@ constexpr float kDefaultFov = 60;
 constexpr float kNearest = 1;
 constexpr float kFocusBlurPerDepth = 0.1f;
 
-bool gCameraView = true;
+thread_local bool gCameraView = true;
 
 float FocalLength(int width, int height, float fov) {
     const float half = std::clamp(fov, 0.1f, 179.9f) * 0.5f * 3.14159265f / 180;

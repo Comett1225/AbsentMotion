@@ -89,7 +89,7 @@ const ShaderMode kShaderModes[] = {
 };
 
 sk_sp<SkBlender> ShaderBlender(const std::string& id) {
-    static std::map<std::string, sk_sp<SkBlender>> cache;
+    thread_local std::map<std::string, sk_sp<SkBlender>> cache;
     if (auto hit = cache.find(id); hit != cache.end()) return hit->second;
     sk_sp<SkBlender> blender;
     for (const ShaderMode& mode : kShaderModes) {
@@ -450,12 +450,12 @@ half4 main(float2 xy) {
     canvas->restore();
 }
 
-const LayerEffects* gEffects = nullptr;
-const Scene* gScene = nullptr;
+thread_local const LayerEffects* gEffects = nullptr;
+thread_local const Scene* gScene = nullptr;
 
 int Fps() { return gScene ? gScene->fps : 30; }
 
-const std::vector<Layer>* gEffectList = nullptr;
+thread_local const std::vector<Layer>* gEffectList = nullptr;
 
 bool EffectsApply(const std::vector<Layer>& siblings, const Layer& l) {
     return gEffects && gScene && &siblings == gEffectList && gEffects->active(l);

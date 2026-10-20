@@ -22,7 +22,7 @@ const char* const kMotionIds[] = {"absent.autoshake", "absent.randomdisplace", "
                                   "absent.swing", "absent.spin", "absent.pulsesize", "absent.pulseopacity",
                                   "absent.echo", "absent.timequant", "absent.shutterblur", "absent.movealongpath"};
 
-bool gFastShutter = false;
+thread_local bool gFastShutter = false;
 
 const Anim* Find(const LayerEffect& e, const char* name) {
     for (const Property& p : e.props) {

@@ -16,7 +16,7 @@ constexpr float kRadians = 3.14159265f / 180;
 constexpr float kNear = 1;
 
 std::map<std::string, std::shared_ptr<const Model>>& Models() {
-    static std::map<std::string, std::shared_ptr<const Model>> models;
+    thread_local std::map<std::string, std::shared_ptr<const Model>> models;
     return models;
 }
 
