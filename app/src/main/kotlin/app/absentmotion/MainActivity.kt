@@ -387,7 +387,7 @@ class MainActivity : ComponentActivity() {
                 result == null -> getString(R.string.home_collect_unreadable_project)
                 result.copied == 0 && result.unreadable == 0 && !result.noSpace -> getString(R.string.home_collect_already_kept)
                 else -> listOfNotNull(
-                    resources.getQuantityString(R.plurals.home_collect_copied, result.copied, result.copied.toString()),
+                    result.copied.takeIf { it > 0 }?.let { resources.getQuantityString(R.plurals.home_collect_copied, it, it.toString()) },
                     result.unreadable.takeIf { it > 0 }?.let { resources.getQuantityString(R.plurals.home_collect_could_not_read, it, it.toString()) },
                     getString(R.string.home_collect_storage_full).takeIf { result.noSpace },
                 ).joinToString(" ")
