@@ -27,6 +27,21 @@ class ImageEncodeTest {
     }
 
     @Test
+    fun aGifFrameIsEncodedFromItsOwnColoursOnly() {
+        fun solid(r: Int, g: Int, b: Int) = ByteArray(64 * 4) { i -> when (i % 4) { 0 -> r; 1 -> g; 2 -> b; else -> 255 }.toByte() }
+        val gradient = ByteArray(64 * 4) { i -> if (i % 4 == 3) -1 else (i / 4 * 4 + i % 4 * 60).toByte() }
+        fun second(first: ByteArray): ByteArray {
+            val out = java.io.ByteArrayOutputStream()
+            val writer = GifWriter(out, 8, 8)
+            writer.frame(first, 100)
+            val start = out.size()
+            writer.frame(gradient, 200)
+            return out.toByteArray().copyOfRange(start, out.size())
+        }
+        assertTrue(second(solid(255, 0, 0)).contentEquals(second(solid(0, 0, 255))))
+    }
+
+    @Test
     fun aTransparentGifFrameTakesTheChosenBackground() {
         fun firstColour(background: Int): List<Int> {
             val out = java.io.ByteArrayOutputStream()

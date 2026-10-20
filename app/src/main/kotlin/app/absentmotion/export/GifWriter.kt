@@ -8,6 +8,8 @@ class GifWriter(private val out: OutputStream, private val width: Int, private v
     private var errNow = IntArray((width + 2) * 3)
     private var errNext = IntArray((width + 2) * 3)
     private val want = IntArray(3)
+    private val count = IntArray(KEYS)
+    private val sum = Array(3) { IntArray(KEYS) }
     private var timeCs = 0
     private var frames = 0
 
@@ -20,8 +22,8 @@ class GifWriter(private val out: OutputStream, private val width: Int, private v
 
     fun frame(rgba: ByteArray, endTimeMs: Long) {
         val n = width * height
-        val count = IntArray(KEYS)
-        val sum = Array(3) { IntArray(KEYS) }
+        count.fill(0)
+        sum.forEach { it.fill(0) }
         for (i in 0 until n) {
             val a = rgba[i * 4 + 3].toInt() and 255
             val r = (rgba[i * 4].toInt() and 255) * a / 255
