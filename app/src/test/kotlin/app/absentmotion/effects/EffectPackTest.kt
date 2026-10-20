@@ -36,6 +36,7 @@ class EffectPackTest {
                 (if ("duration" in uniforms) mapOf("duration" to ("float" to false)) else emptyMap()) +
                 listOf("backdrop", "below").filter { it in uniforms }.associateWith { "shader" to false } +
                 (if ("screen" in uniforms) mapOf("screen" to ("float4" to false)) else emptyMap()) +
+                (if ("layer" in uniforms) mapOf("layer" to ("float2" to false)) else emptyMap()) +
                 effect.params.associate { p ->
                     p.id to when (p.kind) { "point" -> "float2" to false; "color" -> "half4" to true; else -> "float" to false }
                 }

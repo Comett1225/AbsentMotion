@@ -239,6 +239,10 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
                 const bool automatic = !(defaults && defaults->count(name));
                 if (automatic && name == "size") v = {area.width(), area.height()};
                 else if (automatic && name == "time") v = {seconds};
+                else if (automatic && name == "layer") {
+                    const SkRect own = ShapePath(layer, t).getBounds();
+                    v = {std::max(own.width(), 1.0f), std::max(own.height(), 1.0f)};
+                }
                 else if (automatic && name == "duration") v = {(float)((layer.endTime - layer.startTime) / 1000.0)};
                 else if (automatic && name == "screen") v = {-area.left(), -area.top(), (float)scene.width, (float)scene.height};
                 else if (u.isColor() && n == 4) v = {Value(e, defaults, name, 1, t, 0), Value(e, defaults, name, 2, t, 0),
