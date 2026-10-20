@@ -945,6 +945,8 @@
     <string name="effects_paste_no_target">К аудио, камерам и нулевым объектам нельзя применить визуальные эффекты</string>
     <string name="effects_paste_effect">Вставить эффект</string>
     <string name="effects_paste_effects">Вставить эффекты</string>
+    <string name="effects_paste_all">Вставить все эффекты</string>
+    <string name="effects_none_copied">Сначала скопируйте эффекты на панели «Эффекты» клипа</string>
     <string name="effects_more">Ещё</string>
     <string name="effects_effect_info">Об эффекте</string>
     <string name="effects_reset_defaults">Сбросить настройки</string>

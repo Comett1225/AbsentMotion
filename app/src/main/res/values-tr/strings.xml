@@ -909,6 +909,8 @@
     <string name="effects_paste_no_target">Ses, kamera ve boş nesneler görsel efekt almaz</string>
     <string name="effects_paste_effect">Efekti yapıştır</string>
     <string name="effects_paste_effects">Efektleri yapıştır</string>
+    <string name="effects_paste_all">Tüm efektleri yapıştır</string>
+    <string name="effects_none_copied">Önce bir klibin Efektler panelinden efektleri kopyalayın</string>
     <string name="effects_more">Diğer</string>
     <string name="effects_effect_info">Efekt bilgisi</string>
     <string name="effects_reset_defaults">Varsayılanlara sıfırla</string>

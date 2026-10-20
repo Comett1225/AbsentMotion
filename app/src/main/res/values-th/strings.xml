@@ -891,6 +891,8 @@
     <string name="effects_paste_no_target">เสียง กล้อง และออบเจ็กต์ว่างใช้เอฟเฟกต์ภาพไม่ได้</string>
     <string name="effects_paste_effect">วางเอฟเฟกต์</string>
     <string name="effects_paste_effects">วางเอฟเฟกต์</string>
+    <string name="effects_paste_all">วางเอฟเฟกต์ทั้งหมด</string>
+    <string name="effects_none_copied">ก่อนอื่นให้คัดลอกเอฟเฟกต์จากแผงเอฟเฟกต์ของคลิป</string>
     <string name="effects_more">เพิ่มเติม</string>
     <string name="effects_effect_info">ข้อมูลเอฟเฟกต์</string>
     <string name="effects_reset_defaults">รีเซ็ตเป็นค่าเริ่มต้น</string>

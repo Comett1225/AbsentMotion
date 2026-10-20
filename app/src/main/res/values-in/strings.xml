@@ -891,6 +891,8 @@
     <string name="effects_paste_no_target">Audio, kamera, dan objek null tidak menerima efek visual</string>
     <string name="effects_paste_effect">Tempel efek</string>
     <string name="effects_paste_effects">Tempel efek</string>
+    <string name="effects_paste_all">Tempel semua efek</string>
+    <string name="effects_none_copied">Salin efek di panel Efek klip dulu</string>
     <string name="effects_more">Lainnya</string>
     <string name="effects_effect_info">Info efek</string>
     <string name="effects_reset_defaults">Reset ke default</string>

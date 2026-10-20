@@ -25,7 +25,7 @@ The launcher icon is an own drawing, made by `tools/icon/make_icon.py` (source o
 
 | Source | Icons |
 | --- | --- |
-| Lucide only | 168 |
+| Lucide only | 167 |
 | Lucide shapes plus own parts | 8 |
 | Own drawing only | 40 |
 | Material Symbols | 0 |
@@ -206,7 +206,6 @@ The launcher icon is an own drawing, made by `tools/icon/make_icon.py` (source o
 | `ui/editor/SelectionIcons.kt` | `AlignBottom` | Lucide | `align-end-horizontal` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/align-end-horizontal.svg | - |
 | `ui/editor/SelectionIcons.kt` | `DistributeHorizontal` | Lucide | `align-horizontal-space-between` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/align-horizontal-space-between.svg | - |
 | `ui/editor/SelectionIcons.kt` | `DistributeVertical` | Lucide | `align-vertical-space-between` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/align-vertical-space-between.svg | - |
-| `ui/editor/SelectionIcons.kt` | `PasteEffects` | Lucide | `clipboard-paste` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/clipboard-paste.svg | - |
 | `ui/editor/AudioIcons.kt` | `Speaker` | Lucide | `volume-2` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/volume-2.svg | volume-2 moved |
 | `ui/editor/AudioIcons.kt` | `Note` | Lucide | `music` | ISC and MIT (Feather) | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/music.svg | music moved |
 | `ui/editor/AudioIcons.kt` | `Level` | Lucide | `volume-2` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/volume-2.svg | volume-2 moved |

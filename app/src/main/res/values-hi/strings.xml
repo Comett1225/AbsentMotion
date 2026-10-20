@@ -909,6 +909,8 @@
     <string name="effects_paste_no_target">ऑडियो, कैमरा और नल ऑब्जेक्ट पर विज़ुअल इफ़ेक्ट लागू नहीं होते</string>
     <string name="effects_paste_effect">इफ़ेक्ट पेस्ट करें</string>
     <string name="effects_paste_effects">इफ़ेक्ट्स पेस्ट करें</string>
+    <string name="effects_paste_all">सभी इफ़ेक्ट पेस्ट करें</string>
+    <string name="effects_none_copied">पहले क्लिप के इफ़ेक्ट पैनल में इफ़ेक्ट कॉपी करें</string>
     <string name="effects_more">और</string>
     <string name="effects_effect_info">इफ़ेक्ट जानकारी</string>
     <string name="effects_reset_defaults">डिफ़ॉल्ट पर रीसेट करें</string>

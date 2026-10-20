@@ -931,6 +931,8 @@
     <string name="effects_paste_no_target">Audio, cameras and null objects take no visual effects</string>
     <string name="effects_paste_effect">Paste Effect</string>
     <string name="effects_paste_effects">Paste Effects</string>
+    <string name="effects_paste_all">Paste All Effects</string>
+    <string name="effects_none_copied">Copy effects in a clip\'s Effects panel first</string>
     <string name="effects_more">More</string>
     <string name="effects_effect_info">Effect Info</string>
     <string name="effects_reset_defaults">Reset to Defaults</string>

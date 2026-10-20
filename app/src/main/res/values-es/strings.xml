@@ -909,6 +909,8 @@
     <string name="effects_paste_no_target">El audio, las cámaras y los objetos nulos no admiten efectos visuales</string>
     <string name="effects_paste_effect">Pegar efecto</string>
     <string name="effects_paste_effects">Pegar efectos</string>
+    <string name="effects_paste_all">Pegar todos los efectos</string>
+    <string name="effects_none_copied">Primero copia efectos en el panel Efectos de un clip</string>
     <string name="effects_more">Más</string>
     <string name="effects_effect_info">Información del efecto</string>
     <string name="effects_reset_defaults">Restablecer valores predeterminados</string>

@@ -60,6 +60,7 @@ import app.absentmotion.editor.unparentChildrenOf
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Swap
 import app.absentmotion.ui.theme.TilePress
+import app.absentmotion.ui.theme.Presence
 import app.absentmotion.ui.theme.presence
 import app.absentmotion.ui.theme.pressScale
 import androidx.compose.foundation.LocalIndication
@@ -275,7 +276,20 @@ internal fun MultiTopBar(state: EditorState, modifier: Modifier) {
             SelectionButton(SelectionIcons.Mask, stringResource(R.string.structure_group_mask), cell, tint, ids.size > 1) { state.groupLayers(ids, "mask") }
             SelectionButton(SelectionIcons.Exclude, stringResource(R.string.structure_group_exclude), cell, tint, ids.size > 1) { state.groupLayers(ids, "exclude") }
             val copied = EffectClipboard.effects
-            SelectionButton(SelectionIcons.PasteEffects, stringResource(if (copied.size == 1) R.string.effects_paste_effect else R.string.effects_paste_effects), cell, tint, ids.isNotEmpty() && copied.isNotEmpty()) { pasteEffectsOnSelection(state, context) }
+            var effectsMenu by remember { mutableStateOf(false) }
+            Box(cell) {
+                SelectionButton(PanelIcons.Effects, stringResource(R.string.layer_tool_effects), Modifier.fillMaxSize(), tint, ids.isNotEmpty()) { effectsMenu = true }
+                Presence(effectsMenu) {
+                    MenuPopup(DropOrRise, { effectsMenu = false }) {
+                        val note = if (copied.isEmpty()) stringResource(R.string.effects_none_copied)
+                            else pluralStringResource(R.plurals.effects_count, copied.size, copied.size.toString())
+                        MenuRow(stringResource(R.string.effects_paste_all), enabled = copied.isNotEmpty(), subText = note) {
+                            effectsMenu = false
+                            pasteEffectsOnSelection(state, context)
+                        }
+                    }
+                }
+            }
             SelectionButton(ChromeIcons.Trash, stringResource(R.string.structure_delete_selected), cell, tint, ids.isNotEmpty()) { state.deleteChosen() }
             SelectionButton(SelectionIcons.Next, stringResource(R.string.structure_alignment_options), cell, tint) { alignment = true }
         } else {
