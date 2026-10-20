@@ -113,6 +113,7 @@ fun Onboarding(settings: AppSettings, first: FirstRun, engine: () -> EngineThrea
                     applyLanguage(context, language)
                 }
                 OnboardingStep.Check -> CheckStep(settings, engine) {
+                    settings.chooseUpdates(settings.checkUpdates)
                     settings.onboarding = ONBOARDING_DONE
                     onDone()
                 }
@@ -200,7 +201,7 @@ private fun UpdateChoice(settings: AppSettings) {
             Text(stringResource(R.string.update_check_note), Modifier.padding(top = 2.dp), color = Am.HomeMid, fontSize = 13.sp, lineHeight = 18.sp)
         }
         Spacer(Modifier.width(8.dp))
-        RefSwitch(settings.checkUpdates, enabled = true) { settings.checkUpdates = it }
+        RefSwitch(settings.checkUpdates, enabled = true) { settings.chooseUpdates(it) }
     }
 }
 

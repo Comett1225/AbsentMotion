@@ -1,5 +1,7 @@
 package app.absentmotion.ui.home
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -7,9 +9,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import app.absentmotion.R
+import app.absentmotion.library.AppSettings
 import app.absentmotion.platform.Context
 import app.absentmotion.platform.Log
 import app.absentmotion.platform.versionName
@@ -127,6 +134,22 @@ internal class Version private constructor(private val numbers: List<Int>, priva
             return Version(numbers, plain.substringAfter('-', "").split('.').filter { it.isNotEmpty() })
         }
     }
+}
+
+@Composable
+internal fun UpdateAskDialog(settings: AppSettings) {
+    AlertDialog(
+        onDismissRequest = {},
+        text = {
+            Column {
+                Text(stringResource(R.string.update_check_on_open), color = Am.Navy, fontSize = 17.sp, lineHeight = 23.sp, fontWeight = FontWeight.Medium)
+                Text(stringResource(R.string.update_check_note), Modifier.padding(top = 6.dp), color = Am.HomeMid, fontSize = 14.sp, lineHeight = 20.sp)
+            }
+        },
+        dismissButton = { TextButton({ settings.chooseUpdates(false) }) { Text(stringResource(R.string.update_not_now), color = Am.Navy) } },
+        confirmButton = { TextButton({ settings.chooseUpdates(true) }) { Text(stringResource(R.string.update_turn_on), color = Am.Navy) } },
+        containerColor = Am.Card,
+    )
 }
 
 @Composable

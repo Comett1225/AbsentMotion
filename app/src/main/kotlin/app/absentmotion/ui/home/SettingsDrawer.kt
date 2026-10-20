@@ -217,7 +217,7 @@ private fun Divider(inset: androidx.compose.ui.unit.Dp) {
 private fun UpdateRows(settings: AppSettings) {
     val context = LocalContext.current
     Column(Modifier.padding(horizontal = 6.dp).fillMaxWidth().clip(PanelShape).background(PanelColor)) {
-        SwitchRow(stringResource(R.string.update_check_on_open), settings.checkUpdates, enabled = true) { settings.checkUpdates = it }
+        SwitchRow(stringResource(R.string.update_check_on_open), settings.autoUpdateCheck, enabled = true) { settings.chooseUpdates(it) }
         Divider(10.dp)
         ActionRow(stringResource(R.string.update_check_now), busy = Updates.checking) { Updates.check(context, manual = true) }
     }

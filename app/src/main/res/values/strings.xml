@@ -150,6 +150,8 @@
     <string name="update_later">Later</string>
     <string name="update_latest">You have the latest version</string>
     <string name="update_failed">Could not check, try again when you are online</string>
+    <string name="update_turn_on">Turn it on</string>
+    <string name="update_not_now">Not now</string>
     <string name="theme_absentmotion">AbsentMotion</string>
     <string name="theme_daylight">Daylight</string>
     <string name="theme_custom">Custom</string>
