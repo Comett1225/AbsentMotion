@@ -64,6 +64,7 @@ import android.widget.Toast
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import app.absentmotion.editor.fromCapture
+import app.absentmotion.editor.keepCopy
 import app.absentmotion.library.AppSettings
 import app.absentmotion.media.mediaDeclaration
 import app.absentmotion.ui.camera.CameraIcons
@@ -74,6 +75,7 @@ import kotlinx.coroutines.withContext
 import app.absentmotion.library.NewProjectChoice
 import app.absentmotion.library.ProjectStore
 import app.absentmotion.model.Scene
+import app.absentmotion.model.replaceMedia
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.presence
 import app.absentmotion.ui.theme.presenceScrim
@@ -227,7 +229,10 @@ fun NewProjectSheet(
                     val media = mediaDeclaration(context, uri) ?: throw java.io.IOException("unreadable capture")
                     val scene = form.scene().fromCapture(media, video, form.resolution, settings.defaultLayerDuration) ?: throw java.io.IOException("empty capture")
                     settings.newProject = form.choice()
-                    withContext(Dispatchers.IO) { store.create(scene) }
+                    withContext(Dispatchers.IO) { store.create(scene) }.also { id ->
+                        val kept = keepCopy(context, settings, store, id, media, scene)
+                        if (kept != media) withContext(Dispatchers.IO) { runCatching { store.save(id, scene.replaceMedia(media.uri, kept)) } }
+                    }
                 } catch (e: java.io.IOException) {
                     Toast.makeText(context, context.getString(R.string.newproject_camera_failed), Toast.LENGTH_LONG).show()
                     camera = false
