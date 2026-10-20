@@ -106,7 +106,7 @@ private fun XmlNode.mapLayers(change: (XmlNode) -> XmlNode): XmlNode = copy(
 
 private fun XmlNode.int(name: String, default: Int) = this[name]?.toIntOrNull() ?: default
 
-internal class Slot(val uri: String, val video: Boolean, val length: Int, val start: Int, val end: Int, val mode: MediaFillMode)
+internal class Slot(val uri: String, val video: Boolean, val length: Int, val start: Int, val end: Int, val mode: MediaFillMode, val loop: Boolean)
 
 internal class Choice(val media: MediaDeclaration?, val trim: Int, val mode: MediaFillMode)
 
@@ -122,7 +122,7 @@ internal fun slotsOf(scene: Scene): List<Slot> =
             val length = if (video) layers.maxOf { minOf(it.int("outTime", Int.MAX_VALUE), app.absentmotion.model.VideoTiming(Layer(it)).mediaMs(span(it).toDouble()).roundToInt()) } - layers.minOf { it.int("inTime", 0) }
                 else layers.maxOf(::span)
             Slot(uri, video, length, layers.minOf { it.int("startTime", 0) }, layers.maxOf { it.int("endTime", 0) },
-                MediaFillMode.entries.firstOrNull { it.xml == layers.first()["mediaFillMode"] } ?: MediaFillMode.Fill)
+                MediaFillMode.entries.firstOrNull { it.xml == layers.first()["mediaFillMode"] } ?: MediaFillMode.Fill, video && layers.any { it["loop"] == "true" })
         }
 
 internal fun applied(template: Scene, slots: List<Slot>, choices: Map<String, Choice>): Scene {
@@ -154,7 +154,7 @@ private fun swap(layer: XmlNode, slot: Slot, choice: Choice, old: MediaDeclarati
         val duration = (media.duration / 1000).toInt()
         val start = if (duration < slot.length) min(from, duration) else from + choice.trim
         val end = if (duration < slot.length) min(to, duration) else to + choice.trim
-        n = n.with("inTime", start.takeIf { it != 0 }?.toString()).with("outTime", "$end").with("loop", null)
+        n = n.with("inTime", start.takeIf { it != 0 }?.toString()).with("outTime", "$end")
         n.child("speedMap")?.let { n = n.withChild("speedMap", it.keysShifted("t", (start - layer.int("inTime", 0)) * 1e6)) }
     }
     return turned(n, media.orientation - (old?.orientation ?: 0))
@@ -224,7 +224,7 @@ fun TemplateEditor(templateId: String, engine: EngineThread, settings: AppSettin
             when {
                 media == null -> Toast.makeText(context, context.getString(R.string.library_err_unsupported_type), Toast.LENGTH_SHORT).show()
                 !media.type.startsWith("video/") -> choose(slot, media, 0)
-                slot.length - 300 > duration -> { frozen = true; choose(slot, media, 0) }
+                !slot.loop && slot.length - 300 > duration -> { frozen = true; choose(slot, media, 0) }
                 slot.length + 600 < duration -> { trimStart = 0; playing = false; trimming = Trimming(slot, media) }
                 else -> choose(slot, media, 0)
             }
