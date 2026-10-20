@@ -6,6 +6,57 @@ All notable changes to AbsentMotion are listed here, newest first. The format fo
 Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stands for the feature set as it stood on
 2026-10-12.
 
+## [3.0.0] - 2026-10-20
+
+### Added
+
+- **120 new effects (175 in total), modelled on Alight Motion's.** Move effects that change where a layer is (Auto-Shake,
+  Random Displacement, Random Jitter, Oscillate, Swing, Spin, Pulse Size, Pulse Opacity, Stretch Axis, Offset, Move Along
+  Path, Echo Keyframes, Time Quantization, True Motion Blur); Repeat, Linear, Radial and Grid Repeat, Repeat Along Path and
+  Scatter Field; 3D objects (cube, box, cylinder, ellipsoid, torus, pyramid, prisms, raster extrude, spherize, tunnel and
+  more); text animators (Text Progress, Text Transform, Text Randomizer, Count Up/Down, Timecode) with one-tap presets;
+  Drawing Progress and Stroke Taper; VHS, Datamosh, Glass, Displacement Map and many pattern, blur, glow, distortion and
+  colour effects. Imported Alight Motion projects keep their Move effects.
+- A New effects category with NEW badges, animated effect thumbnails, and parent effects that can apply to child layers.
+- One-tap transitions between clips and In, Out and Loop animations for any layer, written as keyframes you can edit.
+- 3D tilt (X and Y rotation) for layers, and 3D Model layers from `.obj`, `.gltf` and `.glb` files.
+- Motion tracking that writes keyframes, animated mask paths for rotoscoping, and background removal for videos.
+- An in-app camera for photos and videos, SVG import as editable shapes, and search in the media, audio, asset and project
+  lists.
+- Audio effects per clip (EQ, filters, reverb, echo, compressor, noise gate, limiter) with ten presets, and a master limiter.
+- Export to MP4, MOV, MKV or WebM with H.264, HEVC, AV1, VP9 or APV where the phone has the encoder, audio settings, and
+  audio-only export as WAV, FLAC, M4A, OGG or MP3.
+- A new export screen: space, size, time and temperature in one stacked block, options the phone cannot make greyed out
+  with the reason, a codec warning with a better choice, help for frame interpolation, and a check of every finished file.
+- Project safety: background saving, version history, crash recovery, imported media kept in the project, and backup and
+  restore of all projects.
+- 12 languages (English, Indonesian, Hindi, Portuguese (Brazil), Spanish, Filipino, Vietnamese, Thai, Malay, Arabic,
+  Turkish, Russian), a language screen and an optional device check on first start.
+- Slide-to-select layers, frame-accurate snapping, speed-ramp presets and freeze frames, Full, Half and Quarter preview
+  quality, a tablet layout and preview copies of heavy 4K videos.
+- 50 fonts built into the app; 100 more can be downloaded.
+
+### Changed
+
+- The preview is faster, and the timeline and preview no longer redraw on every played frame.
+- MP4 export also works on phones without the `VK_GOOGLE_display_timing` Vulkan extension, writes straight into the
+  gallery, slows down instead of failing when the phone is hot, and shows an estimated time.
+- The size ruler grows more slowly for big layers. The trim-limit vibration switch is now called Vibration.
+
+### Fixed
+
+- Typing fast in the text box could drop letters.
+- Plugging in a keyboard, changing the font size or turning on bold text closed the editor and stopped a running export.
+- A keyframe or speed with an invalid number in an imported file could crash the editor.
+- Duplicating a project or making a new one on a full phone crashed the app, and a double tap made two projects.
+- Projects were opened and saved on the main thread; templates and presets could be left half-written.
+- An imported project could link to other photos on the phone and carry them into packages exported from it.
+- Auto captions could crash on processors without the newer arithmetic instructions, and the speech model is now checked
+  against a known hash.
+- Back left the app while the Home menu or search was open; the trim and split buttons jumped as the playhead moved; SVG
+  files showed as black tiles; icon-only buttons had no TalkBack names; new media did not appear until the app was
+  reopened.
+
 ## [2.5.2] - 2026-10-20
 
 ### Added

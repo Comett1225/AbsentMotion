@@ -5,14 +5,18 @@ data. There is no account, no advertising, no analytics and no tracking.
 
 ## Your projects and media
 
-Projects, imported pictures, videos and audio, and everything you export stay on your device. The app reads media only when
-you pick it (the photo, video and audio permissions let you choose files from your library). Nothing is uploaded.
+Projects, imported pictures, videos and audio, and everything you export stay on your device. The photo, video and audio
+permissions let the app show your library and use the files you pick, on the device. Nothing is uploaded.
+
+The camera and microphone permissions are used only by the in-app camera, while it is open, to take the photos and
+videos you add to a project. Recordings are saved on the device. Backups of your projects are written to
+`Documents/AbsentMotion` on the device and stay there.
 
 ## When the app uses the internet
 
 The app asks for the internet permission for two things, and only when you start them:
 
-- **Fonts.** When you pick a Google Font, the app downloads it from Google Fonts (`fonts.googleapis.com`, `fonts.gstatic.com`).
+- **Fonts.** When you pick one of the downloadable fonts, the app downloads it from Google Fonts (`fonts.googleapis.com`, `fonts.gstatic.com`).
   Google receives the request for that font and your IP address, as for any web request.
 - **Auto captions.** The first time you generate captions, the app tells you the size of the speech model (about 60 MB) and
   downloads it from Hugging Face (`huggingface.co`). Speech recognition itself runs on the device.

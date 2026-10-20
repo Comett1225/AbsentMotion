@@ -1,27 +1,31 @@
-AbsentMotion is a free, open-source motion graphics and animation editor. There is no subscription, no account and no advertising. Your projects stay on your device.
+AbsentMotion is a free, open-source alternative to CapCut and Alight Motion: a motion graphics, animation and video editor. Everything runs on your phone and works offline. There is no subscription, no account and no advertising. Your projects stay on your device.
 
 <b>What you can do</b>
 
 <ul>
-<li>Build scenes from layers on a timeline: shapes, text, images, video, audio, freehand drawings, groups and reusable elements.</li>
+<li>Build scenes from layers on a timeline: shapes, text, images, video, audio, freehand drawings, groups, reusable elements and 3D models.</li>
 <li>Animate any value with keyframes and easing curves (cubic Bezier, bounce, elastic, cyclic, random and steps), edited on a graph.</li>
-<li>Draw vector shapes and edit their points, or draw freehand with pen, brush, fill and eraser.</li>
-<li>Set text in any font from Google Fonts. Fonts are downloaded when you pick them.</li>
-<li>Add borders, shadows, gradients, blend modes, clipping masks and per-layer effects.</li>
-<li>Use camera layers with perspective, depth, focus blur, fog and motion blur.</li>
-<li>Mix audio, mark the beat of a song with bookmarks, and turn text into speech with the voices on your device, offline.</li>
+<li>175 effects: shake, oscillate, spin and other Move effects, Repeat, 3D objects, text animators, VHS, datamosh, glass, blurs, glows, distortions and colour effects, with animated previews.</li>
+<li>One-tap transitions between clips and In, Out and Loop animations for any layer.</li>
+<li>Motion tracking, animated masks for rotoscoping, speed ramps and freeze frames, and an in-app camera.</li>
+<li>Draw vector shapes and edit their points, import SVG files, or draw freehand with pen, brush, fill and eraser.</li>
+<li>Set text in 50 built-in fonts, or download 100 more from Google Fonts.</li>
+<li>Use camera layers with perspective, depth, focus blur, fog and motion blur, and tilt layers in 3D.</li>
+<li>Mix audio with effects (EQ, reverb, echo, compressor and more), mark the beat of a song, and turn text into speech with the voices on your device, offline.</li>
 <li>Generate captions from speech, on the device. The speech model is downloaded the first time you use the feature, after the app shows its size.</li>
-<li>Export MP4 video, animated GIF, image sequences and single frames.</li>
+<li>Export MP4, MOV, MKV or WebM video, audio only (WAV, FLAC, M4A, OGG, MP3), animated GIF, image sequences and single frames.</li>
+<li>Version history, crash recovery and backup of all projects.</li>
+<li>12 languages: English, Indonesian, Hindi, Portuguese (Brazil), Spanish, Filipino, Vietnamese, Thai, Malay, Arabic, Turkish and Russian.</li>
 </ul>
 
-AbsentMotion can open scene XML files and .amproj packages exported from Alight Motion, and it exports scene XML in the same format. Effects that AbsentMotion does not include are kept in the file and are not drawn. AbsentMotion saves its own packages as .absproj. AbsentMotion is an independent project. It is not affiliated with, endorsed by or sponsored by Alight Creative or Alight Motion. Alight Motion is a trademark of its owner.
+AbsentMotion can open scene XML files and .amproj packages exported from Alight Motion, and it exports scene XML in the same format. Effects that AbsentMotion does not include are kept in the file and are not drawn. AbsentMotion saves its own packages as .absproj. AbsentMotion is an independent project. It is not affiliated with, endorsed by or sponsored by Alight Creative, Alight Motion, ByteDance or CapCut. Alight Motion and CapCut are trademarks of their owners.
 
 <b>Good to know</b>
 
 <ul>
-<li>The set of built-in effects is small at first.</li>
+<li>Some Alight Motion effects are not in AbsentMotion yet; they stay in imported files but are not drawn.</li>
 <li>Requires Android 14 or newer and a 64-bit ARM device with Vulkan 1.2.</li>
-<li>This build contains no Google libraries, so there is no background removal.</li>
+<li>This build contains no Google libraries. Background removal uses its own offline model.</li>
 </ul>
 
 AbsentMotion is released under the Apache License 2.0. The source code and the list of third-party software are in the project repository.

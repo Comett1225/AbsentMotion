@@ -17,24 +17,37 @@ subscription, no account and no advertising, and your projects never leave your 
 
 ## What it does
 
-- **Layers and a timeline.** Shapes, text, images, video, audio, freehand drawings, groups, reusable elements and
-  null objects, with trimming, splitting, parenting, clipping masks, label colours and bookmarks.
-- **Keyframes with easing.** Any value (position, size, rotation, skew, opacity, colour, shape and effect
+- **Layers and a timeline.** Shapes, text, images, video, audio, freehand drawings, groups, reusable elements, 3D models
+  and null objects, with trimming, splitting, parenting, clipping masks, label colours, bookmarks, slide-to-select and
+  frame-accurate snapping.
+- **Keyframes with easing.** Any value (position, size, rotation, 3D tilt, skew, opacity, colour, shape and effect
   parameters) can be keyframed. Easing is a cubic Bezier, bounce, elastic, cyclic, random or stepped curve, edited
   with handles on a graph.
-- **Shapes and drawing.** Parametric shapes with editable parameters, vector paths with point editing, freehand pen,
-  brush, fill and eraser, borders, shadows, gradients and blend modes.
-- **Text.** Text layers with spacing and alignment, and any font from Google Fonts, downloaded when you pick it.
-- **Effects.** Per-layer effects with keyframeable parameters. The built-in set is small at first (see "Limits").
-- **Camera layers.** A camera with perspective or orthographic projection, depth ordering, focus blur, fog and motion
-  blur.
-- **Audio.** Audio layers and the sound of video clips, a waveform view, volume, an offline mixer, beat detection
-  (Mark Beats) and noise reduction.
-- **Offline text to speech.** Turns text into an audio layer with the voices already installed on the device.
-- **Auto captions.** On-device speech recognition (whisper.cpp) turns speech into caption layers. The speech model is
-  downloaded the first time you use the feature, after the app tells you its size.
-- **Export.** MP4 video (H.264 or HEVC, where the device has an encoder), animated GIF, PNG or JPEG image sequence,
-  single frames, and project files.
+- **175 effects.** Colour, blur, distort, stylize, noise, keying, Move (Auto-Shake, Oscillate, Swing, Spin, Random
+  Displacement, Random Jitter, Pulse, Echo, Offset, Move Along Path, true motion blur), Repeat (linear, radial, grid,
+  along a path, scatter), 3D objects (cube, sphere, torus, prisms, raster extrude and more), Text (typewriter reveal,
+  per-letter transforms, scramble, count up, timecode), VHS, Datamosh, Glass, Displacement Map and many more, with
+  animated previews and a "New" category.
+- **Transitions and animations.** One-tap transitions between clips and In / Out / Loop animations for any layer,
+  written as ordinary keyframes you can edit.
+- **Shapes and drawing.** Parametric shapes, vector paths with point editing and animated (rotoscoping) masks, SVG
+  import, freehand pen, brush, fill and eraser, borders, shadows, gradients and blend modes.
+- **Text.** Text layers with spacing and alignment, 50 fonts built in and 100 more to download from Google Fonts.
+- **Video tools.** Speed ramps with presets and freeze frames, motion tracking, background removal for photos and
+  videos, frame blending and optical-flow slow motion, preview copies for heavy 4K videos, and an in-app camera.
+- **Camera layers.** A 3D camera with perspective or orthographic projection, depth ordering, focus blur, fog and
+  motion blur.
+- **Audio.** Audio layers and the sound of video clips, a waveform view, volume, audio effects (EQ, filters, reverb,
+  echo, compressor, noise gate, limiter, with presets), beat detection (Mark Beats) and noise reduction.
+- **Offline text to speech** with the voices already on the device, and **auto captions** with on-device speech
+  recognition (whisper.cpp; the speech model is downloaded once, after the app tells you its size).
+- **Export.** MP4, MOV, MKV or WebM video (H.264, HEVC, AV1, VP9 or APV, as the phone supports), audio settings, audio only
+  (WAV, FLAC, M4A, OGG or MP3), animated GIF, image sequences and single frames, with a time estimate, a storage check,
+  protection when the phone is hot and a check of every finished file.
+- **Safe projects.** Automatic version history, crash recovery, imported media copied into the project and one-tap
+  backup of every project to a folder that survives reinstalling.
+- **12 languages.** English, Indonesian, Hindi, Portuguese (Brazil), Spanish, Filipino, Vietnamese, Thai, Malay,
+  Arabic, Turkish and Russian, chosen on first start.
 
 ## Requirements
 
@@ -47,13 +60,13 @@ F-Droid), which contains no Google libraries at all.
 
 AbsentMotion is a young project. Please know these before you rely on it:
 
-- **The effects pack is small at first.** The app ships with a limited set of effects. A project that uses an effect
-  AbsentMotion does not have still opens, and the effect stays in the file, but it is not drawn.
+- **Some Alight Motion effects are still missing.** AbsentMotion has 175 effects, and about 17 of Alight Motion's
+  are not in it yet. A project that uses one still opens, and the effect stays in the file, but it is not drawn.
 - **Only 64-bit ARM Android devices on Android 14 or newer, with Vulkan 1.2.** Tested on Android 16 and 17.
 - **Background removal.** The `foss` build removes backgrounds with its own offline model. The `play` build uses
   Google Play services instead, a proprietary Google library (listed in `THIRD_PARTY_NOTICES.md`) that downloads its
   model and may send diagnostics to Google, as it does for any app.
-- **Network use.** Nothing is needed online. The internet is only used when you choose an extra downloadable font and
+- **Network use.** Nothing is needed online. The internet is only used when you choose one of the downloadable fonts and
   for the speech model the first time you generate captions (the `play` build's Play services library aside, see above).
 
 ## File compatibility

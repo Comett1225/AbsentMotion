@@ -1,0 +1,1 @@
+AbsentMotion 3.0: 120 new effects modelled on Alight Motion's (shake, oscillate, repeat, 3D objects, text animators, VHS, datamosh), transitions and In/Out/Loop animations, 3D models, motion tracking, audio effects, an in-app camera, SVG import, MOV/MKV/WebM and audio-only export, version history and crash recovery, and 12 languages.
