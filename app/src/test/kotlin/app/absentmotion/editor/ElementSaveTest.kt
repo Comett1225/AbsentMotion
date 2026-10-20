@@ -48,6 +48,19 @@ class ElementSaveTest {
         assertEquals(90f, saved.transform("rotation", 0f)[0], 1e-3f)
     }
 
+    @Test fun aGroupWithItsOwnLookIsSavedWhole() {
+        val blur = XmlNode("effect", mapOf("id" to "absent.blur"))
+        val inner = layer("shape", 5, null, listOf(prop("location", 0f to "300,200,0")))
+        val styled = group(prop("location", 0f to "200,200,0"), prop("opacity", 0f to "0.5"), inner = listOf(inner)).let { it.copy(children = it.children + blur) }
+        val host = scene(styled)
+        val saved = host.elementNodes(host.layer(9)!!, null).single()
+        assertEquals("embedScene", saved.name)
+        assertEquals("0.5", saved.child("transform")?.child("opacity")?.get("value"))
+        assertEquals(blur, saved.child("effect"))
+        assertEquals(listOf(inner), saved.child("scene")?.children)
+        assertEquals(200f, Layer(saved).x(0), 1e-3f)
+    }
+
     @Test fun anAnimatedGroupBakesItsMotionIntoTheSavedLayers() {
         val host = scene(group(prop("location", 0f to "200,200,0", 1f to "300,200,0"), prop("scale", 0f to "1,1", 1f to "2,2"),
             inner = listOf(
