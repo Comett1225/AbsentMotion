@@ -251,7 +251,7 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
     var askDeleteSpeed by remember { mutableStateOf(false) }
     val named = panel != EditorPanel.EditShape && panel != EditorPanel.Camera && panel != EditorPanel.Model
     val known = if (!named) null else when {
-        move -> TransformTargets[tab]
+        move -> if (selected.kind == "camera" && tab == 3) KeyTarget(app.absentmotion.model.CameraFov, "60.000000") else TransformTargets[tab]
         panel == EditorPanel.Speed -> KeyTarget(SpeedRef, layer.node["speed"] ?: "1")
         panel == EditorPanel.ColorFill && layer.fillType == "color" -> KeyTarget(PropRef.FillColor, formatColor(layer.fillColor))
         panel == EditorPanel.BorderShadow -> borderShadowTarget(layer)
@@ -309,7 +309,7 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
             Column(Modifier.width(168.px).fillMaxHeight()) {
                 val names = listOf(R.string.a11y_tab_move, R.string.a11y_tab_rotate, R.string.a11y_tab_tilt, R.string.panel_size, R.string.a11y_tab_skew)
                 listOf(PanelIcons.TabMove, PanelIcons.TabRotate, PanelIcons.TabTilt, PanelIcons.TabSize, PanelIcons.TabSkew).forEachIndexed { i, icon ->
-                    val usable = i < 2 || selected.kind != "camera"
+                    val usable = i < 2 || i == 3 || selected.kind != "camera"
                     Box(Modifier.weight(1f).fillMaxWidth().then(if (usable) Modifier.clickable { tab = i } else Modifier.dimmed()).padding(start = 10.px, end = 11.px, top = 11.px, bottom = 11.px)) {
                         Box(
                             Modifier.fillMaxSize().clip(PanelShape).fadeBackground(tab == i, PanelDark),

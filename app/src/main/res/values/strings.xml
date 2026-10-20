@@ -878,7 +878,10 @@
     <string name="camerapanel_fog">Fog</string>
     <string name="camerapanel_perspective">Perspective</string>
     <string name="camerapanel_orthographic">Orthographic</string>
+    <string name="camerapanel_focus_plane">at Z %1$s</string>
+    <string name="camera_frame_caption">Zoom %1$s · View angle %2$s</string>
     <string name="camera_tip">To look through the camera, open this panel and turn on Camera View.</string>
+    <string name="drag_to_move_along_z">Drag up or down to move along Z</string>
     <string name="border_stroke">Stroke</string>
     <string name="shadow_title">Shadow</string>
     <string name="border_stroke_start">Start</string>

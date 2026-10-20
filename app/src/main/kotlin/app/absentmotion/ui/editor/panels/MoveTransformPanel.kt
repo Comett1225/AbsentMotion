@@ -62,7 +62,7 @@ internal fun MoveTransformPanel(state: EditorState, layer: Layer, tab: Int, modi
             0 -> PositionTab(state, layer)
             1 -> RotationTab(state, layer)
             2 -> TiltTab(state, layer)
-            3 -> SizeTab(state, layer)
+            3 -> if (layer.kind == "camera") CameraSizeTab(state, layer) else SizeTab(state, layer)
             else -> SkewTab(state, layer)
         }
     }
@@ -71,6 +71,8 @@ internal fun MoveTransformPanel(state: EditorState, layer: Layer, tab: Int, modi
 @Composable
 private fun PositionTab(state: EditorState, layer: Layer) {
     val at = layer.location
+    var depth by remember(layer.id) { mutableStateOf(false) }
+    val deep by rememberUpdatedState(depth)
     fun openKeypad(active: Int) {
         val fields = listOf(KeypadField("X", at[0]), KeypadField("Y", at[1]), KeypadField("Z", at[2]))
         state.keypad = KeypadRequest(fields, active) { v -> state.editSelected { it.withTransform("location", v[0], v[1], v[2]) } }
@@ -97,6 +99,11 @@ private fun PositionTab(state: EditorState, layer: Layer) {
                 onDragEnd = ::done, onDragCancel = ::done,
             ) { change, drag ->
                 change.consume()
+                if (deep) {
+                    travel += drag
+                    state.editSelected(key = "move-z") { l -> l.withTransform("location", origin[0], origin[1], origin[2] - travel.y) }
+                    return@detectDragGestures
+                }
                 travel += drag / density
                 val snapped = Offset(axes.first.map(travel.x), axes.second.map(travel.y))
                 val step = snapped - shown
@@ -108,15 +115,15 @@ private fun PositionTab(state: EditorState, layer: Layer) {
         },
     ) {
         TrackpadCorners()
-        Text(stringResource(R.string.drag_here_to_move_the_layer), Modifier.align(Alignment.Center), color = PanelCaption, fontSize = 15.sp, maxLines = 1, softWrap = false)
+        Text(stringResource(if (depth) R.string.drag_to_move_along_z else R.string.drag_here_to_move_the_layer), Modifier.align(Alignment.Center), color = PanelCaption, fontSize = 15.sp, maxLines = 1, softWrap = false)
         Column(Modifier.align(Alignment.TopCenter).padding(top = 17.px)) {
             Row {
                 Row(Modifier.width(354.px).height(70.px).clip(PanelShape).background(Am.Field)) {
-                    ValueCell(formatFixed(at[0], 2), Am.Accent, Modifier.weight(1f)) { openKeypad(0) }
-                    ValueCell(formatFixed(at[1], 2), Am.Accent, Modifier.weight(1f)) { openKeypad(1) }
+                    ValueCell(formatFixed(at[0], 2), if (depth) Am.OnDark else Am.Accent, Modifier.weight(1f)) { if (depth) depth = false else openKeypad(0) }
+                    ValueCell(formatFixed(at[1], 2), if (depth) Am.OnDark else Am.Accent, Modifier.weight(1f)) { if (depth) depth = false else openKeypad(1) }
                 }
                 Spacer(Modifier.width(20.px))
-                NumberBox(formatFixed(at[2], 2), Am.OnDark, Modifier.width(177.px).height(70.px), fontSize = 10.5f) { openKeypad(2) }
+                NumberBox(formatFixed(at[2], 2), if (depth) Am.Accent else Am.OnDark, Modifier.width(177.px).height(70.px), fontSize = 10.5f) { if (depth) openKeypad(2) else depth = true }
             }
             Row(Modifier.height(23.px)) {
                 Caption("X", Modifier.width(177.px).fillMaxHeight())
