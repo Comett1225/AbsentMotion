@@ -56,6 +56,7 @@ internal fun WideEditorBody(state: EditorState, onExit: () -> Unit, addLibrary: 
                 Box(Modifier.weight(1f).fillMaxHeight()) {
                     Preview(state, Modifier.fillMaxSize())
                     if (state.previewPanelOpen) PreviewModePanel(state, Modifier.align(Alignment.CenterEnd).enterFade())
+                    AnimateButton(state, Modifier.align(Alignment.BottomEnd))
                 }
                 Box(Modifier.width(SideWidth).fillMaxHeight().background(Am.TimelineBg)) { LowerPanels(state, addLibrary, top = true) }
             }

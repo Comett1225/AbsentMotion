@@ -67,7 +67,16 @@ import app.absentmotion.model.withTransition
 import app.absentmotion.platform.sheetDialogProperties
 import app.absentmotion.ui.editor.panels.ThinSlider
 import app.absentmotion.ui.theme.Am
+import app.absentmotion.ui.theme.Motion as ThemeMotion
+import app.absentmotion.ui.theme.Presence
+import app.absentmotion.ui.theme.presence
 import app.absentmotion.ui.theme.pressScale
+import app.absentmotion.editor.EditorPanel
+import app.absentmotion.editor.MultiSelect
+import app.absentmotion.model.canAnimate
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.layout.offset
+import androidx.compose.ui.unit.IntOffset
 import java.util.Locale
 import kotlin.math.PI
 import kotlin.math.cos
@@ -98,6 +107,27 @@ internal fun TransitionButton(state: EditorState, modifier: Modifier) {
     }
     open?.let { (a, b) -> TransitionSheet(state, a, b) { open = null } }
 }
+
+@Composable
+internal fun AnimateButton(state: EditorState, modifier: Modifier) {
+    var open by remember { mutableStateOf<Long?>(null) }
+    val shown = state.selected?.canAnimate == true && state.panel == EditorPanel.Tools && !state.addOpen && !state.volumeOpen && !MultiSelect.active
+    val clear = animateDpAsState(if (state.previewPanelOpen) PreviewPanelWidth else 0.dp, ThemeMotion.enter(), label = "animate-clear")
+    Presence(shown) {
+        val press = remember { MutableInteractionSource() }
+        Box(
+            modifier.offset { IntOffset(-clear.value.roundToPx(), 0) }.padding(12.dp).presence(scaleFrom = 0.6f).size(48.dp).pressScale(press)
+                .shadow(4.dp, CircleShape).background(Am.Panel, CircleShape).border(1.8.dp, Am.Accent, CircleShape)
+                .clickable(press, null) { state.selectedId?.let { state.playing = false; open = it } },
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(PanelIcons.Animate, stringResource(R.string.a11y_animate), Modifier.size(24.dp), tint = Am.Accent)
+        }
+    }
+    open?.let { AnimationSheet(state, it) { open = null } }
+}
+
+private val PreviewPanelWidth = 55.dp
 
 @Composable
 internal fun TransitionSheet(state: EditorState, aId: Long, bId: Long, onClose: () -> Unit) {

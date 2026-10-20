@@ -132,6 +132,15 @@ class UiContracts(unittest.TestCase):
     def test_camera_selection_resets_transform_tabs(self):
         self.assertIn('var tab by remember(selected.kind)', source('ui/editor/LayerTools.kt'))
 
+    def test_animation_button_floats_over_the_preview_in_both_layouts(self):
+        self.assertNotIn('PanelIcons.Animate', source('ui/editor/LayerTools.kt'))
+        for path in ['ui/editor/EditorScreen.kt', 'ui/editor/WideEditor.kt']:
+            self.assertIn('AnimateButton(state, Modifier.align(Alignment.BottomEnd))', source(path))
+        text = source('ui/editor/MotionSheets.kt').split('internal fun AnimateButton', 1)[1].split('\n}\n', 1)[0]
+        self.assertIn('state.selected?.canAnimate == true', text)
+        self.assertIn('Icon(PanelIcons.Animate, stringResource(R.string.a11y_animate)', text)
+        self.assertIn('state.playing = false', text)
+
     def test_deleting_preview_preset_clamps_the_position(self):
         text = source('ui/editor/PresetScreen.kt')
         self.assertIn('chosen = null; pos = pos.coerceAtMost((base.endTime - base.startTime).coerceAtLeast(1))', text)
