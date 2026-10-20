@@ -55,24 +55,34 @@ class SaveQueue(
 class ProjectSaver(
     val id: String,
     private val store: ProjectStore,
+    private val recovery: Recovery,
     failed: (Exception) -> Unit,
     private val executor: ScheduledExecutorService = DiskThread.executor,
 ) {
     private val project = SaveQueue(executor, SAVE_DELAY_MS, { xml ->
         store.save(id, xml)
+        recovery.clear(id)
         runCatching { store.versions.snapshot(id, xml, SNAPSHOT_GAP_MS) }
     }, failed)
 
+    private val drafts = SaveQueue(executor, DRAFT_DELAY_MS, { xml -> recovery.write(id, xml) })
+
     val failing: Boolean get() = project.failing
 
-    fun commit(xml: String) = project.submit(xml)
+    fun commit(xml: String) {
+        drafts.cancel()
+        project.submit(xml)
+    }
 
-    fun flush(): Future<*> = project.flush()
+    fun draft(xml: String) = drafts.submit(xml)
+
+    fun flush(): Future<*> = project.flush().also { drafts.flush() }
 
     fun snapshot(xml: String): Future<*> = executor.submit { runCatching { store.versions.snapshot(id, xml) } }
 
     companion object {
         const val SAVE_DELAY_MS = 400L
+        const val DRAFT_DELAY_MS = 1000L
         const val SNAPSHOT_GAP_MS = 120_000L
     }
 }

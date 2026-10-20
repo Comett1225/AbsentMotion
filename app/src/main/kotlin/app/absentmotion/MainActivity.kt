@@ -45,6 +45,9 @@ import app.absentmotion.library.AppSettings
 import app.absentmotion.library.DiskThread
 import app.absentmotion.library.ProjectSaver
 import app.absentmotion.library.ProjectVersions
+import app.absentmotion.library.Recovery
+import app.absentmotion.library.RecoveryHandler
+import app.absentmotion.library.RecoveryOffer
 import app.absentmotion.library.ImportReport
 import app.absentmotion.library.Importer
 import app.absentmotion.library.MediaRelink
@@ -73,6 +76,7 @@ import app.absentmotion.ui.onboarding.FirstRun
 import app.absentmotion.ui.onboarding.Onboarding
 import app.absentmotion.ui.home.OpenFailedDialog
 import app.absentmotion.ui.home.OpeningOverlay
+import app.absentmotion.ui.home.RecoveryDialog
 import app.absentmotion.ui.home.VersionHistory
 import app.absentmotion.ui.theme.PressIndication
 import app.absentmotion.ui.theme.enterFade
@@ -99,6 +103,8 @@ class MainActivity : ComponentActivity() {
     private var closeAnyway = false
     private var historyFor by mutableStateOf<Pair<String, String>?>(null)
     private var projectsChanged by mutableIntStateOf(0)
+    private lateinit var recovery: Recovery
+    private var recovered by mutableStateOf<RecoveryOffer?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -107,6 +113,9 @@ class MainActivity : ComponentActivity() {
         store = ProjectStore(this)
         settings = AppSettings(this)
         templates = TemplateStore(this)
+        recovery = Recovery(File(filesDir, "recovery"))
+        RecoveryHandler.install(recovery) { editor?.let { it.projectId to it.scene.toXml() } }
+        lifecycleScope.launch { recovered = withContext(DiskThread.dispatcher) { runCatching { recovery.pending(store) }.getOrNull() } }
         ShapeCatalog.load(this)
         app.absentmotion.editor.ElementNav.open = { id ->
             editor?.let { it.playing = false; it.endGesture(); it.saver.snapshot(it.scene.toXml()) }
@@ -171,6 +180,7 @@ class MainActivity : ComponentActivity() {
                 openFailed?.let { id -> OpenFailedDialog({ openFailed = null; historyFor = id to "" }) { openFailed = null } }
                 if (open?.historyOpen == true) VersionHistory(store, open.projectId, open.scene.title, engine, onRestore = { restoreVersion(open.projectId, it) }) { open.historyOpen = false }
                 historyFor?.let { (id, title) -> VersionHistory(store, id, title, engine, onRestore = { restoreVersion(id, it) }) { historyFor = null } }
+                if (open == null && !opening) recovered?.let { offer -> RecoveryDialog(offer.title, onRestore = { answerRecovery(offer, true) }) { answerRecovery(offer, false) } }
             }
         }
     }
@@ -262,8 +272,24 @@ class MainActivity : ComponentActivity() {
     private suspend fun openNow(id: String): EditorState? {
         val scene = loadInBackground(id) ?: return null
         cameFromEditor = true
-        val saver = ProjectSaver(id, store, failed = { runOnUiThread { Toast.makeText(this, "Could not save the project. Free some storage space.", Toast.LENGTH_LONG).show() } })
+        val saver = ProjectSaver(id, store, recovery, failed = { runOnUiThread { Toast.makeText(this, "Could not save the project. Free some storage space.", Toast.LENGTH_LONG).show() } })
         return EditorState(id, scene, store, engine, settings, saver).also { editor = it }
+    }
+
+    private fun answerRecovery(offer: RecoveryOffer, restore: Boolean) {
+        recovered = null
+        lifecycleScope.launch {
+            val done = withContext(DiskThread.dispatcher) {
+                runCatching { if (restore) recovery.restore(store, offer) else recovery.discard(store, offer) }
+                    .onFailure { Log.e("AMStore", "cannot answer the recovery of ${offer.id}", it) }.isSuccess
+            }
+            projectsChanged++
+            when {
+                !done -> Toast.makeText(this@MainActivity, "Could not restore your edits. Free some storage space; you will be asked again next time.", Toast.LENGTH_LONG).show()
+                restore -> open(offer.id)
+                else -> recovered = withContext(DiskThread.dispatcher) { runCatching { recovery.pending(store) }.getOrNull() }
+            }
+        }
     }
 
     private fun restoreVersion(id: String, version: ProjectVersions.Version) {

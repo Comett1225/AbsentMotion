@@ -68,7 +68,7 @@ class SaveQueueTest {
         val root = tmp.newFolder()
         val store = ProjectStore(root)
         val id = store.create(app.absentmotion.model.Scene.parse("<scene width='10' height='10' title='A'/>"))
-        val saver = ProjectSaver(id, store, failed = { throw AssertionError(it) }, executor = executor)
+        val saver = ProjectSaver(id, store, Recovery(root.resolve("recovery")), failed = { throw AssertionError(it) }, executor = executor)
         saver.commit("<scene width='10' height='10' title='B'/>")
         saver.flush().get(5, TimeUnit.SECONDS)
         assertEquals("B", store.load(id)!!.title)

@@ -148,6 +148,18 @@ internal fun versionLabel(time: Long, now: Long = System.currentTimeMillis()): S
 }
 
 @Composable
+fun RecoveryDialog(title: String, onRestore: () -> Unit, onDiscard: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = {},
+        title = { Text("AbsentMotion closed unexpectedly", color = Am.Navy) },
+        text = { Text("Restore your last edits to “$title”? If you discard them, they are kept in the project's Version history.", color = Am.Navy) },
+        dismissButton = { TextButton(onDiscard) { Text("Discard", color = Am.Navy) } },
+        confirmButton = { TextButton(onRestore) { Text("Restore", color = Am.Navy) } },
+        containerColor = Am.Card,
+    )
+}
+
+@Composable
 fun OpenFailedDialog(onHistory: (() -> Unit)?, onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,

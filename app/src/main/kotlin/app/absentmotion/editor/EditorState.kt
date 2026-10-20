@@ -221,7 +221,7 @@ class EditorState(
         frame = frame.coerceIn(0, maxOf(next.lastFrame, 0))
         val xml = next.toXml()
         engine.setScene(next, xml)
-        if (save) saver.commit(xml)
+        if (save) saver.commit(xml) else saver.draft(xml)
     }
 
     private companion object {
