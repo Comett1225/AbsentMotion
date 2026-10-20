@@ -68,8 +68,8 @@ internal fun formatPlain(value: Float): String =
     String.format(Locale.US, "%.5f", value).trimEnd('0').trimEnd('.').let { if (it == "-0" || it.isEmpty()) "0" else it }
 
 @Composable
-internal fun PanelIcon(icon: ImageVector, tint: Color, modifier: Modifier = Modifier, size: Dp = 24.dp) {
-    Icon(icon, null, modifier.size(size), tint = animatedColor(tint))
+internal fun PanelIcon(icon: ImageVector, tint: Color, modifier: Modifier = Modifier, size: Dp = 24.dp, description: String? = null) {
+    Icon(icon, description, modifier.size(size), tint = animatedColor(tint))
 }
 
 @Composable

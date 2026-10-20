@@ -97,10 +97,10 @@ internal fun VolumePanel(state: EditorState, modifier: Modifier = Modifier) {
         Row(Modifier.fillMaxWidth().height(365.px).clip(BarShape).background(Am.TimelineBg)) {
             Column(Modifier.width(140.px).fillMaxHeight().padding(top = 11.px)) {
                 Box(Modifier.fillMaxWidth().height(118.px).clickable { state.toggleKeyframe() }, Alignment.Center) {
-                    PanelIcon(if (layer.onKeyframe(GainRef)) PanelIcons.KeyframeRemove else PanelIcons.Keyframe, Am.OnDark)
+                    PanelIcon(if (layer.onKeyframe(GainRef)) PanelIcons.KeyframeRemove else PanelIcons.Keyframe, Am.OnDark, description = stringResource(if (layer.onKeyframe(GainRef)) R.string.a11y_remove_keyframe else R.string.a11y_add_keyframe))
                 }
                 Box(Modifier.fillMaxWidth().height(118.px).clickable { if (layer.easing(GainRef) != null) state.easingOpen = true else state.easingHint = true }, Alignment.Center) {
-                    PanelIcon(PanelIcons.Easing, Am.OnDark)
+                    PanelIcon(PanelIcons.Easing, Am.OnDark, description = stringResource(R.string.a11y_easing))
                 }
             }
             Row(Modifier.weight(1f).fillMaxHeight(), verticalAlignment = Alignment.CenterVertically) {

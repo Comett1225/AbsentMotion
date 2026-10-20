@@ -125,7 +125,7 @@ internal fun BorderShadowTabs(modifier: Modifier) {
         for (i in 0..2) {
             Box(Modifier.weight(1f).fillMaxWidth().then(if (usable) Modifier.clickable { tab = i; endPicker = -1 } else Modifier).padding(10.px, 11.px, 11.px, 11.px)) {
                 Box(Modifier.fillMaxSize().clip(PanelShape).then(if (tab == i) Modifier.background(PanelDark) else Modifier), contentAlignment = Alignment.Center) {
-                    PanelIcon(TabIcons[i], if (tab == i) Am.Accent else Am.OnDark)
+                    PanelIcon(TabIcons[i], if (tab == i) Am.Accent else Am.OnDark, description = stringResource(TabNames[i]))
                 }
             }
         }
@@ -133,6 +133,7 @@ internal fun BorderShadowTabs(modifier: Modifier) {
 }
 
 private val TabIcons = listOf(PanelIcons.TabStroke, PanelIcons.TabBorder, PanelIcons.BorderShadow)
+private val TabNames = listOf(R.string.border_stroke, R.string.border, R.string.shadow_title)
 
 @Composable
 internal fun BorderShadowPanel(state: EditorState, layer: Layer, modifier: Modifier = Modifier) {
@@ -299,7 +300,7 @@ private fun EndPicker(state: EditorState, layer: Layer) {
     val current = if (which == 0) s.start else s.end
     Column(Modifier.fillMaxSize()) {
         Row(Modifier.fillMaxWidth().height(40.dp).padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.size(32.dp).clickable { endPicker = -1 }, contentAlignment = Alignment.Center) { PanelIcon(PanelIcons.Back, Am.OnDark) }
+            Box(Modifier.size(32.dp).clickable { endPicker = -1 }, contentAlignment = Alignment.Center) { PanelIcon(PanelIcons.Back, Am.OnDark, description = stringResource(R.string.topbar_back)) }
             Text(stringResource(if (which == 0) R.string.border_stroke_start else R.string.border_stroke_end), Modifier.padding(start = 8.dp).weight(1f), color = Am.OnDark, fontSize = 15.sp)
         }
         EffectNumbers(state, spinner("Size", stringResource(R.string.panel_size), "0.1"), "${s.endSize}", true, true, {}) { text, gesture ->
@@ -333,7 +334,7 @@ private fun BorderTab(state: EditorState, layer: Layer) {
                     Canvas(Modifier.padding(start = 36.px).size(51.px)) { triangle(down = true) }
                     Text(stringResource(R.string.border), Modifier.padding(start = 30.px).weight(1f), color = Am.OnDark, fontSize = 16.sp, maxLines = 1)
                     Box(Modifier.size(101.px).clickable { state.editSelected { it.withBorderRemoved(open.index) }; openBorder = -1 }, contentAlignment = Alignment.Center) {
-                        PanelIcon(ChromeIcons.Trash, Am.OnDark, size = 28.dp)
+                        PanelIcon(ChromeIcons.Trash, Am.OnDark, size = 28.dp, description = stringResource(R.string.delete))
                     }
                 }
                 Row(Modifier.padding(start = 8.px, end = 8.px, top = 15.px).fillMaxWidth().height(77.px), Arrangement.spacedBy(3.px)) {

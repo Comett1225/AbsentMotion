@@ -39,8 +39,10 @@ import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.MultiSelect
 import app.absentmotion.library.PreviewQuality
 import androidx.compose.ui.res.stringResource
-import app.absentmotion.ui.theme.Am
 import app.absentmotion.R
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import app.absentmotion.ui.theme.Am
 
 private val PanelBg = Color(0xFF333750)
 private val ZoomBg = Color(0xFF191B27)
@@ -52,10 +54,10 @@ internal fun PreviewModePanel(state: EditorState, modifier: Modifier = Modifier)
     val hasCamera = state.scene.layers.any { it.kind == "camera" }
     Column(modifier.width(55.dp).fillMaxHeight().background(PanelBg).pointerInput(Unit) {}) {
         val cell = Modifier.weight(1f)
-        ModeCell(cell, true, { state.pixelMode = !state.pixelMode }) { PixelIcon(state.pixelMode) }
-        ModeCell(cell, true, { state.gridMode = !state.gridMode }) { GridIcon(state.gridMode) }
-        ModeCell(cell, selected, { state.soloMode = (state.soloMode + 1) % 3 }) { SoloIcon(state.soloMode, selected) }
-        ModeCell(cell, hasCamera, { state.cameraMode = !state.cameraMode }) { CameraIcon(state.cameraMode, hasCamera) }
+        ModeCell(cell, true, { state.pixelMode = !state.pixelMode }, stringResource(R.string.a11y_pixel_preview)) { PixelIcon(state.pixelMode) }
+        ModeCell(cell, true, { state.gridMode = !state.gridMode }, stringResource(R.string.camera_grid)) { GridIcon(state.gridMode) }
+        ModeCell(cell, selected, { state.soloMode = (state.soloMode + 1) % 3 }, stringResource(R.string.a11y_solo)) { SoloIcon(state.soloMode, selected) }
+        ModeCell(cell, hasCamera, { state.cameraMode = !state.cameraMode }, stringResource(R.string.camerapanel_tab_camera_view)) { CameraIcon(state.cameraMode, hasCamera) }
         val quality = state.settings.previewQuality
         ModeCell(cell, true, { state.settings.previewQuality = PreviewQuality.entries[(quality.ordinal + 1) % PreviewQuality.entries.size] }) {
             Text(stringResource(quality.label), color = if (quality == PreviewQuality.Full) Color.White else Am.Accent, fontSize = 10.sp, maxLines = 1)
@@ -70,14 +72,17 @@ internal fun PreviewModePanel(state: EditorState, modifier: Modifier = Modifier)
 }
 
 @Composable
-private fun ModeCell(modifier: Modifier, enabled: Boolean, onClick: () -> Unit, icon: @Composable () -> Unit) {
-    Box(modifier.fillMaxWidth().then(if (enabled) Modifier.clickable(onClick = onClick) else Modifier), Alignment.Center) { icon() }
+private fun ModeCell(modifier: Modifier, enabled: Boolean, onClick: () -> Unit, description: String? = null, icon: @Composable () -> Unit) {
+    Box(modifier.fillMaxWidth().then(if (description != null) Modifier.semantics { contentDescription = description } else Modifier)
+        .then(if (enabled) Modifier.clickable(onClick = onClick) else Modifier), Alignment.Center) { icon() }
 }
 
 @Composable
 private fun ZoomBlock(state: EditorState) {
     Column(Modifier.fillMaxWidth().height(127.dp).padding(5.dp).clip(RoundedCornerShape(3.dp)).background(ZoomBg)) {
-        Box(Modifier.weight(1f).fillMaxWidth().clickable { state.zoomStep(true) }, Alignment.Center) {
+        val zoomIn = stringResource(R.string.a11y_zoom_in)
+        val zoomOut = stringResource(R.string.a11y_zoom_out)
+        Box(Modifier.weight(1f).fillMaxWidth().semantics { contentDescription = zoomIn }.clickable { state.zoomStep(true) }, Alignment.Center) {
             Canvas(Modifier.size(8.dp)) { units(8f) {
                 drawLine(Color.White, Offset(4f, 0.8f), Offset(4f, 7.2f), 1.2f, StrokeCap.Round)
                 drawLine(Color.White, Offset(7.2f, 4f), Offset(0.8f, 4f), 1.2f, StrokeCap.Round)
@@ -86,7 +91,7 @@ private fun ZoomBlock(state: EditorState) {
         Box(Modifier.height(20.dp).fillMaxWidth(), Alignment.Center) {
             Text("${(state.canvasZoom * 100).toInt()}%", color = Color.White, fontSize = 10.sp, textAlign = TextAlign.Center, maxLines = 1)
         }
-        Box(Modifier.weight(1f).fillMaxWidth().clickable { state.zoomStep(false) }, Alignment.Center) {
+        Box(Modifier.weight(1f).fillMaxWidth().semantics { contentDescription = zoomOut }.clickable { state.zoomStep(false) }, Alignment.Center) {
             Canvas(Modifier.size(8.dp)) { units(8f) { drawLine(Color.White, Offset(7.2f, 4f), Offset(0.8f, 4f), 1.2f, StrokeCap.Round) } }
         }
     }

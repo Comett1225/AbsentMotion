@@ -1,5 +1,7 @@
 package app.absentmotion.ui.editor.panels
 
+import androidx.compose.ui.res.stringResource
+import app.absentmotion.R
 import app.absentmotion.platform.BackHandler
 import app.absentmotion.platform.readPreviewPixel
 import androidx.compose.foundation.Canvas
@@ -106,10 +108,10 @@ internal fun FullColorPicker(state: EditorState, request: FullColor, modifier: M
     Box(modifier.fillMaxSize().background(ScreenBg).pointerInput(Unit) {}) {
         Column(Modifier.fillMaxSize().systemBarsPadding()) {
             Row(Modifier.fillMaxWidth().height(127.px)) {
-                TopTab(PanelIcons.ColorWheel, tab == 0, Modifier.weight(469f)) { tab = 0 }
-                TopTab(PanelIcons.RgbSliders, tab == 1, Modifier.weight(470f)) { tab = 1 }
+                TopTab(PanelIcons.ColorWheel, stringResource(R.string.a11y_color_wheel), tab == 0, Modifier.weight(469f)) { tab = 0 }
+                TopTab(PanelIcons.RgbSliders, stringResource(R.string.a11y_color_sliders), tab == 1, Modifier.weight(470f)) { tab = 1 }
                 Box(Modifier.weight(141f).fillMaxHeight().background(CloseBg).clickable(onClick = close), Alignment.Center) {
-                    PanelIcon(PanelIcons.Check, Am.OnDark, size = 27.dp)
+                    PanelIcon(PanelIcons.Check, Am.OnDark, size = 27.dp, description = stringResource(R.string.done))
                 }
             }
             Box(Modifier.weight(1f).fillMaxWidth(), Alignment.Center) {
@@ -171,8 +173,8 @@ private fun save(state: EditorState, argb: Int) {
 private fun alphaTrack(colour: Color) = listOf(colour.copy(alpha = 0f), colour)
 
 @Composable
-private fun TopTab(icon: ImageVector, active: Boolean, modifier: Modifier, onClick: () -> Unit) {
-    Box(modifier.fillMaxHeight().clickable(onClick = onClick), Alignment.Center) { PanelIcon(icon, if (active) Am.Accent else Idle, size = 27.dp) }
+private fun TopTab(icon: ImageVector, description: String, active: Boolean, modifier: Modifier, onClick: () -> Unit) {
+    Box(modifier.fillMaxHeight().clickable(onClick = onClick), Alignment.Center) { PanelIcon(icon, if (active) Am.Accent else Idle, size = 27.dp, description = description) }
 }
 
 @Composable

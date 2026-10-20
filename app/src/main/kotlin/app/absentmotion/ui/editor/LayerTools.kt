@@ -99,27 +99,27 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier) {
     }
     Column(modifier.background(Am.Panel).padding(start = 62.px, top = 42.px, end = 62.px)) {
         Row(Modifier.fillMaxWidth().height(107.px)) {
-            SmallTool(PanelIcons.Speed, Modifier.width(183.px), ToolShape, enabled = state.selected?.mediaFill?.video == true || state.selected?.kind == "audio") { state.panel = EditorPanel.Speed }
+            SmallTool(PanelIcons.Speed, stringResource(R.string.a11y_speed), Modifier.width(183.px), ToolShape, enabled = state.selected?.mediaFill?.video == true || state.selected?.kind == "audio") { state.panel = EditorPanel.Speed }
             Spacer(Modifier.width(17.px))
-            SmallTool(PanelIcons.Animate, Modifier.width(150.px), ToolShape, enabled = state.selected?.canAnimate == true) { state.playing = false; animating = true }
+            SmallTool(PanelIcons.Animate, stringResource(R.string.a11y_animate), Modifier.width(150.px), ToolShape, enabled = state.selected?.canAnimate == true) { state.playing = false; animating = true }
             Spacer(Modifier.width(17.px))
             Row(Modifier.weight(1f).fillMaxHeight(), Arrangement.spacedBy(3.px)) {
                 val clip = state.selected
                 val past = clip != null && state.timeMs > clip.endTime
                 val before = clip != null && state.timeMs < clip.startTime
-                SmallTool(PanelIcons.TrimLeft, Modifier.weight(1f), ToolShape.copy(topEnd = Square, bottomEnd = Square), enabled = !past) {
+                SmallTool(PanelIcons.TrimLeft, stringResource(if (before) R.string.a11y_extend_start else R.string.a11y_trim_start), Modifier.weight(1f), ToolShape.copy(topEnd = Square, bottomEnd = Square), enabled = !past) {
                     if (before) state.moveClipEdges(false, true) else state.trimStart()
                 }
-                SmallTool(if (past) ChromeIcons.SkipForward else if (before) ChromeIcons.SkipBack else PanelIcons.Split, Modifier.weight(1f), RoundedCornerShape(0.dp)) {
+                SmallTool(if (past) ChromeIcons.SkipForward else if (before) ChromeIcons.SkipBack else PanelIcons.Split, stringResource(if (past || before) R.string.a11y_move_to_playhead else R.string.a11y_split), Modifier.weight(1f), RoundedCornerShape(0.dp)) {
                     if (past || before) state.moveClipEdges(past, false) else state.split()
                 }
-                SmallTool(PanelIcons.TrimRight, Modifier.weight(1f), ToolShape.copy(topStart = Square, bottomStart = Square), enabled = !before) {
+                SmallTool(PanelIcons.TrimRight, stringResource(if (past) R.string.a11y_extend_end else R.string.a11y_trim_end), Modifier.weight(1f), ToolShape.copy(topStart = Square, bottomStart = Square), enabled = !before) {
                     if (past) state.moveClipEdges(true, true) else state.trimEnd()
                 }
             }
             Spacer(Modifier.width(17.px))
             val sound = state.selected?.let { it.kind == "audio" || it.mediaFill?.video == true } == true
-            SmallTool(if (!sound || (state.selected?.gain ?: 1f) <= 0f) PanelIcons.AudioMuted else AudioIcons.Speaker, Modifier.width(183.px), ToolShape, enabled = sound) { state.volumeOpen = true }
+            SmallTool(if (!sound || (state.selected?.gain ?: 1f) <= 0f) PanelIcons.AudioMuted else AudioIcons.Speaker, stringResource(R.string.volume_volume), Modifier.width(183.px), ToolShape, enabled = sound) { state.volumeOpen = true }
         }
         Spacer(Modifier.height(28.px))
         if (state.selected?.kind == "audio") {
@@ -206,13 +206,13 @@ private val Presets = Tool(R.string.presets, PanelIcons.Star, 8.9f, 19.4f, 42.1f
 private val Effects = Tool(R.string.layer_tool_effects, PanelIcons.Effects, 8.9f, 19.6f, 44.4f)
 
 @Composable
-private fun SmallTool(icon: ImageVector, modifier: Modifier, shape: RoundedCornerShape, enabled: Boolean = true, onClick: () -> Unit = {}) {
+private fun SmallTool(icon: ImageVector, description: String, modifier: Modifier, shape: RoundedCornerShape, enabled: Boolean = true, onClick: () -> Unit = {}) {
     Box(
         modifier.fillMaxHeight().then(if (enabled) Modifier else Modifier.dimmed()).clip(shape).background(Am.Button)
             .then(if (enabled) Modifier.clickable(onClick = onClick) else Modifier),
         contentAlignment = Alignment.Center,
     ) {
-        PanelIcon(icon, Am.OnDark)
+        PanelIcon(icon, Am.OnDark, description = description)
     }
 }
 
@@ -265,20 +265,20 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
         dismissButton = { TextButton({ askDeleteSpeed = false }) { Text(stringResource(R.string.cancel), color = Am.Accent) } }, containerColor = Am.Field, titleContentColor = Am.OnDark, textContentColor = Am.OnDark)
     Row(modifier.background(Am.Panel)) {
         Column(Modifier.width(168.px).heightIn(max = PanelHeight).fillMaxHeight()) {
-            FrameButton(PanelIcons.Back, Modifier.weight(1f).fillMaxWidth()) { state.stepBack() }
+            FrameButton(PanelIcons.Back, stringResource(R.string.topbar_back), Modifier.weight(1f).fillMaxWidth()) { state.stepBack() }
             if (target == null) {
-                FrameButton(PanelIcons.Keyframe, Modifier.weight(1f).fillMaxWidth().dimmed(), enabled = false)
-                FrameButton(PanelIcons.Easing, Modifier.weight(1f).fillMaxWidth().dimmed(), enabled = false)
+                FrameButton(PanelIcons.Keyframe, stringResource(R.string.a11y_add_keyframe), Modifier.weight(1f).fillMaxWidth().dimmed(), enabled = false)
+                FrameButton(PanelIcons.Easing, stringResource(R.string.a11y_easing), Modifier.weight(1f).fillMaxWidth().dimmed(), enabled = false)
             } else {
                 val onKeyframe = layer.onKeyframe(target.ref)
-                FrameButton(if (onKeyframe) PanelIcons.KeyframeRemove else PanelIcons.Keyframe, Modifier.weight(1f).fillMaxWidth()) {
+                FrameButton(if (onKeyframe) PanelIcons.KeyframeRemove else PanelIcons.Keyframe, stringResource(if (onKeyframe) R.string.a11y_remove_keyframe else R.string.a11y_add_keyframe), Modifier.weight(1f).fillMaxWidth()) {
                     if (panel == EditorPanel.Speed && onKeyframe) askDeleteSpeed = true else state.toggleKeyframe()
                 }
-                FrameButton(PanelIcons.Easing, Modifier.weight(1f).fillMaxWidth()) { if (layer.easing(target.ref) != null) state.easingOpen = true else state.easingHint = true }
+                FrameButton(PanelIcons.Easing, stringResource(R.string.a11y_easing), Modifier.weight(1f).fillMaxWidth()) { if (layer.easing(target.ref) != null) state.easingOpen = true else state.easingHint = true }
             }
             if (move) {
                 Box(Modifier.weight(1f).fillMaxWidth()) {
-                    FrameButton(PanelIcons.More, Modifier.fillMaxSize()) { menuOpen = true }
+                    FrameButton(PanelIcons.More, stringResource(R.string.effects_more), Modifier.fillMaxSize()) { menuOpen = true }
                     Presence(menuOpen) { TransformMenu(state, tab) { menuOpen = false } }
                 }
             } else {
@@ -303,6 +303,7 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
         }
         if (move) {
             Column(Modifier.width(168.px).fillMaxHeight()) {
+                val names = listOf(R.string.a11y_tab_move, R.string.a11y_tab_rotate, R.string.a11y_tab_tilt, R.string.panel_size, R.string.a11y_tab_skew)
                 listOf(PanelIcons.TabMove, PanelIcons.TabRotate, PanelIcons.TabTilt, PanelIcons.TabSize, PanelIcons.TabSkew).forEachIndexed { i, icon ->
                     val usable = i < 2 || selected.kind != "camera"
                     Box(Modifier.weight(1f).fillMaxWidth().then(if (usable) Modifier.clickable { tab = i } else Modifier.dimmed()).padding(start = 10.px, end = 11.px, top = 11.px, bottom = 11.px)) {
@@ -310,7 +311,7 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
                             Modifier.fillMaxSize().clip(PanelShape).fadeBackground(tab == i, PanelDark),
                             contentAlignment = Alignment.Center,
                         ) {
-                            PanelIcon(icon, if (tab == i) Am.Accent else Am.OnDark)
+                            PanelIcon(icon, if (tab == i) Am.Accent else Am.OnDark, description = stringResource(names[i]))
                         }
                     }
                 }
@@ -328,9 +329,9 @@ internal val TransformTargets = listOf(
 )
 
 @Composable
-private fun FrameButton(icon: ImageVector, modifier: Modifier, enabled: Boolean = true, onClick: () -> Unit = {}) {
+private fun FrameButton(icon: ImageVector, description: String, modifier: Modifier, enabled: Boolean = true, onClick: () -> Unit = {}) {
     Box(modifier.then(if (enabled) Modifier.clickable(onClick = onClick) else Modifier), contentAlignment = Alignment.Center) {
-        PanelIcon(icon, Am.OnDark)
+        PanelIcon(icon, Am.OnDark, description = description)
     }
 }
 
@@ -427,8 +428,8 @@ private fun KeyGrid(onDigit: (Char) -> Unit, onBackspace: () -> Unit, onSign: ()
         KeyCap(at(0, 3), SymbolKey, onSign) { KeyText("\u00B1") }
         KeyCap(at(1, 3), DigitKey, { onDigit('0') }) { KeyText("0") }
         KeyCap(at(2, 3), SymbolKey, { onDigit('.') }) { KeyText(".") }
-        KeyCap(at(3, 0), SymbolKey, onBackspace) { PanelIcon(PanelIcons.Backspace, Am.OnDark) }
-        KeyCap(at(3, 1, 3), TickKey, onDone) { PanelIcon(PanelIcons.Check, Am.OnDark, size = 30.dp) }
+        KeyCap(at(3, 0), SymbolKey, onBackspace) { PanelIcon(PanelIcons.Backspace, Am.OnDark, description = stringResource(R.string.a11y_backspace)) }
+        KeyCap(at(3, 1, 3), TickKey, onDone) { PanelIcon(PanelIcons.Check, Am.OnDark, size = 30.dp, description = stringResource(R.string.done)) }
     }
 }
 

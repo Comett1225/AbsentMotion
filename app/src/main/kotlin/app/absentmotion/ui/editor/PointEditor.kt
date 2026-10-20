@@ -176,21 +176,21 @@ internal fun PointPanel(state: EditorState, mode: PointMode) {
     val knot = contour?.knots?.getOrNull(mode.point)
     Row(Modifier.fillMaxSize()) {
         Column(Modifier.width(60.dp).fillMaxHeight()) {
-            PanelButton(ChromeIcons.Back, Modifier.weight(1f)) { state.leaveDrawing() }
+            PanelButton(ChromeIcons.Back, stringResource(R.string.topbar_back), Modifier.weight(1f)) { state.leaveDrawing() }
             val closable = contour?.canToggleClosed == true
             Box(Modifier.weight(1f).fillMaxWidth().alpha(if (closable) 1f else DimAlpha).clickable(enabled = closable) { state.toggleClosed(mode) }, Alignment.Center) {
-                Icon(if (contour?.closed == true) DrawingIcons.PathOpen else DrawingIcons.PathClosed, null, Modifier.size(24.dp), tint = Am.OnDark)
+                Icon(if (contour?.closed == true) DrawingIcons.PathOpen else DrawingIcons.PathClosed, stringResource(if (contour?.closed == true) R.string.a11y_open_path else R.string.a11y_close_path), Modifier.size(24.dp), tint = Am.OnDark)
             }
             val curvable = knot != null && mode.handle != Handle.Add
             Box(Modifier.weight(1f).fillMaxWidth().alpha(if (curvable) 1f else DimAlpha).clickable(enabled = curvable) { state.toggleCurve(mode) }, Alignment.Center) {
-                Icon(if (knot?.sharp != false) DrawingIcons.VertexCurved else DrawingIcons.VertexSharp, null, Modifier.size(28.dp), tint = Am.OnDark)
+                Icon(if (knot?.sharp != false) DrawingIcons.VertexCurved else DrawingIcons.VertexSharp, stringResource(if (knot?.sharp != false) R.string.a11y_curved_point else R.string.a11y_sharp_point), Modifier.size(28.dp), tint = Am.OnDark)
             }
             val adding = mode.handle == Handle.Add
             val usable = if (adding) contour != null && (contour.endsAt(mode.point) || contour.knots.size > 1) else knot != null
             Box(Modifier.weight(1f).fillMaxWidth().alpha(if (usable) 1f else DimAlpha).clickable(enabled = usable) {
                 if (adding) state.placePoint(mode) else state.deletePoint(mode)
             }, Alignment.Center) {
-                Icon(if (adding) DrawingIcons.AddPoint else DrawingIcons.DeletePoint, null, Modifier.size(24.dp), tint = Am.OnDark)
+                Icon(if (adding) DrawingIcons.AddPoint else DrawingIcons.DeletePoint, stringResource(if (adding) R.string.a11y_add_point else R.string.a11y_delete_point), Modifier.size(24.dp), tint = Am.OnDark)
             }
         }
         Box(Modifier.width(1.dp).fillMaxHeight().background(Divider))
@@ -201,8 +201,8 @@ internal fun PointPanel(state: EditorState, mode: PointMode) {
 }
 
 @Composable
-private fun PanelButton(icon: androidx.compose.ui.graphics.vector.ImageVector, modifier: Modifier, onClick: () -> Unit) {
-    Box(modifier.fillMaxWidth().clickable(onClick = onClick), Alignment.Center) { Icon(icon, null, Modifier.size(24.dp), tint = Am.OnDark) }
+private fun PanelButton(icon: androidx.compose.ui.graphics.vector.ImageVector, description: String, modifier: Modifier, onClick: () -> Unit) {
+    Box(modifier.fillMaxWidth().clickable(onClick = onClick), Alignment.Center) { Icon(icon, description, Modifier.size(24.dp), tint = Am.OnDark) }
 }
 
 @Composable

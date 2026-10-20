@@ -1,5 +1,7 @@
 package app.absentmotion.ui.editor.panels
 
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import app.absentmotion.R
 import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.Canvas
@@ -125,14 +127,15 @@ private fun ColumnScope.Cell(enabled: Boolean = true, onClick: () -> Unit = {}, 
 private fun LeftColumn(state: EditorState, easing: Easing, basic: Boolean, overshoot: Boolean, toggleOvershoot: () -> Unit, modifier: Modifier) {
     var menu by remember { mutableStateOf(false) }
     Column(modifier) {
-        Cell(onClick = { state.easingOpen = false }) { PanelIcon(PanelIcons.Back, Am.OnDark, size = 26.dp) }
+        Cell(onClick = { state.easingOpen = false }) { PanelIcon(PanelIcons.Back, Am.OnDark, size = 26.dp, description = stringResource(R.string.topbar_back)) }
         Cell(enabled = false) {}
         val reversed = easing.reversed()
         Cell(enabled = reversed != null, onClick = { reversed?.let { state.setEasing(it) } }) {
-            ReverseIcon(Am.OnDark, if (reversed != null) Modifier else Modifier.dimmed())
+            val reverse = stringResource(R.string.a11y_reverse_curve)
+            ReverseIcon(Am.OnDark, (if (reversed != null) Modifier else Modifier.dimmed()).semantics { contentDescription = reverse })
         }
         Cell(onClick = { menu = true }) {
-            PanelIcon(PanelIcons.More, Am.OnDark, size = 26.dp)
+            PanelIcon(PanelIcons.More, Am.OnDark, size = 26.dp, description = stringResource(R.string.effects_more))
             if (menu) OverflowMenu(state, basic, overshoot, toggleOvershoot) { menu = false }
         }
     }

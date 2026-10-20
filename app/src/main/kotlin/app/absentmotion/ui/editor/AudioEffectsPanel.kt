@@ -86,12 +86,12 @@ internal fun AudioEffectsPanel(state: EditorState, modifier: Modifier, onBack: (
     BackHandler { if (editing >= 0) editing = -1 else onBack() }
     Row(modifier.background(Am.Panel)) {
         Column(Modifier.width(168.px).heightIn(max = PanelHeight).fillMaxHeight()) {
-            FrameButton(PanelIcons.Back, Modifier.weight(1f)) { if (editing >= 0) editing = -1 else onBack() }
+            FrameButton(PanelIcons.Back, stringResource(R.string.topbar_back), Modifier.weight(1f)) { if (editing >= 0) editing = -1 else onBack() }
             val anyOn = effects.any { !it.bypass }
-            FrameButton(if (anyOn) EffectIcons.Eye else EffectIcons.EyeOff, Modifier.weight(1f), effects.isNotEmpty()) {
+            FrameButton(if (anyOn) EffectIcons.Eye else EffectIcons.EyeOff, stringResource(if (anyOn) R.string.audiofx_bypass else R.string.audiofx_turn_on), Modifier.weight(1f), effects.isNotEmpty()) {
                 state.editSelected { it.withAudioEffects(it.audioEffects.map { fx -> fx.withBypass(anyOn) }) }
             }
-            FrameButton(ChromeIcons.Trash, Modifier.weight(1f), effects.isNotEmpty()) {
+            FrameButton(ChromeIcons.Trash, stringResource(R.string.delete_all), Modifier.weight(1f), effects.isNotEmpty()) {
                 editing = -1
                 state.editSelected { it.withAudioEffects(emptyList()) }
             }
@@ -265,9 +265,9 @@ private fun ChoiceRow(param: FxParam, value: Float, set: (Float) -> Unit) {
 }
 
 @Composable
-private fun FrameButton(icon: androidx.compose.ui.graphics.vector.ImageVector, modifier: Modifier, enabled: Boolean = true, onClick: () -> Unit) {
+private fun FrameButton(icon: androidx.compose.ui.graphics.vector.ImageVector, description: String, modifier: Modifier, enabled: Boolean = true, onClick: () -> Unit) {
     Box(modifier.fillMaxWidth().alpha(if (enabled) 1f else 0.35f).clickable(enabled = enabled, onClick = onClick), Alignment.Center) {
-        Icon(icon, null, Modifier.size(24.dp), tint = Am.OnDark)
+        Icon(icon, description, Modifier.size(24.dp), tint = Am.OnDark)
     }
 }
 

@@ -321,7 +321,7 @@ private fun SizeTab(state: EditorState, layer: Layer) {
                     Modifier.size(70.px).clip(PanelShape).background(Am.Inactive).clickable { linked = !linked },
                     contentAlignment = Alignment.Center,
                 ) {
-                    PanelIcon(if (linked) PanelIcons.Link else PanelIcons.Unlink, Am.OnDark, size = 58.px)
+                    PanelIcon(if (linked) PanelIcons.Link else PanelIcons.Unlink, Am.OnDark, size = 58.px, description = stringResource(R.string.a11y_keep_proportions))
                 }
                 Spacer(Modifier.width(14.px))
                 NumberBox(formatFixed(boxH, 1), colour(1), Modifier.width(177.px).height(70.px)) { openKeypad(false) }

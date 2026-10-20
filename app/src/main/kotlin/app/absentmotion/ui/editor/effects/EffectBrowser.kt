@@ -91,7 +91,8 @@ fun EffectBrowser(state: EditorState) {
     fun pick(effect: EffectDefinition) { if (effect.available) add(effect) else detail = effect }
     Column(Modifier.fillMaxSize().background(BrowserBg).systemBarsPadding()) {
         Row(Modifier.fillMaxWidth().height(44.dp).background(BrowserBg), verticalAlignment = Alignment.CenterVertically) {
-            BrowserButton(if (category != null || detail != null || searching) PanelIcons.Back else EffectIcons.Close, ::back)
+            val stepping = category != null || detail != null || searching
+            BrowserButton(if (stepping) PanelIcons.Back else EffectIcons.Close, stringResource(if (stepping) R.string.topbar_back else R.string.action_close), ::back)
             if (searching) {
                 val focus = remember { FocusRequester() }
                 LaunchedEffect(Unit) { focus.requestFocus() }
@@ -100,7 +101,7 @@ fun EffectBrowser(state: EditorState) {
             }
             else Text(detail?.name ?: category?.let { key -> catalog.categories.firstOrNull { it.first == key }?.second } ?: stringResource(R.string.effectbrowser_title),
                 Modifier.weight(1f), color = Am.OnDark, fontSize = 17.sp, textAlign = TextAlign.Center, maxLines = 1)
-            BrowserButton(EffectIcons.Search, { state.effectDetail = null; detail = null; searching = true })
+            BrowserButton(EffectIcons.Search, stringResource(R.string.home_search), { state.effectDetail = null; detail = null; searching = true })
         }
         Swap(listOf(detail?.id, searching, category), Modifier.fillMaxSize()) {
         if (catalog.message != null && (app.absentmotion.platform.effectsMessageOnHome() || (category != null && category != "ai" && !searching))) {
@@ -186,9 +187,9 @@ private val BrowserBg get() = Am.Field
 private val RecommendedBg get() = Am.PanelInset
 
 @Composable
-private fun BrowserButton(icon: ImageVector, onClick: () -> Unit) {
+private fun BrowserButton(icon: ImageVector, description: String, onClick: () -> Unit) {
     Box(Modifier.size(44.dp).clickable(onClick = onClick), contentAlignment = Alignment.Center) {
-        Icon(icon, null, Modifier.size(24.dp), tint = Am.OnDark)
+        Icon(icon, description, Modifier.size(24.dp), tint = Am.OnDark)
     }
 }
 

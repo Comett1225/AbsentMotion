@@ -33,6 +33,10 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import app.absentmotion.R
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
@@ -90,12 +94,12 @@ private fun FillTabs(state: EditorState, layer: Layer, modifier: Modifier) {
         if (uri != null) scope.launch { mediaDeclaration(context, uri)?.let { state.keepCopy(context, it) }?.let { state.fillWithMedia(id, it) } }
     }
     Row(modifier.clip(PanelShape), Arrangement.spacedBy(3.px)) {
-        FillTab(PanelIcons.FillNone, active = type == "none", enabled = true) { state.editSelected { it.withFill("none") } }
-        FillTab(PanelIcons.PaintBucket, active = type == "color", enabled = true) { state.editSelected { it.withFill("color") } }
-        FillTab(PanelIcons.FillGradient, active = type == "gradient", enabled = true) {
+        FillTab(PanelIcons.FillNone, stringResource(R.string.none), active = type == "none", enabled = true) { state.editSelected { it.withFill("none") } }
+        FillTab(PanelIcons.PaintBucket, stringResource(R.string.color), active = type == "color", enabled = true) { state.editSelected { it.withFill("color") } }
+        FillTab(PanelIcons.FillGradient, stringResource(R.string.a11y_gradient), active = type == "gradient", enabled = true) {
             state.editSelected { l -> l.withFill("gradient").let { if (it.node.child("gradient") == null) it.withGradient(it.gradient) else it } }
         }
-        FillTab(PanelIcons.FillMedia, active = type == "media", enabled = layer.kind == "text") {
+        FillTab(PanelIcons.FillMedia, stringResource(R.string.add_tab_media), active = type == "media", enabled = layer.kind == "text") {
             picker.launch()
         }
     }
@@ -116,9 +120,9 @@ internal fun Layer.withMediaFill(media: MediaDeclaration): Layer {
 }
 
 @Composable
-private fun RowScope.FillTab(icon: ImageVector, active: Boolean, enabled: Boolean, onClick: () -> Unit) {
+private fun RowScope.FillTab(icon: ImageVector, description: String, active: Boolean, enabled: Boolean, onClick: () -> Unit) {
     Box(
-        Modifier.weight(1f).fillMaxHeight().background(if (active) TabActive else Am.Field)
+        Modifier.weight(1f).fillMaxHeight().semantics { contentDescription = description }.background(if (active) TabActive else Am.Field)
             .then(if (enabled) Modifier.clickable(onClick = onClick) else Modifier.dimmed()),
         contentAlignment = Alignment.Center,
     ) {
@@ -163,15 +167,18 @@ internal fun ColorPicker(
         onDispose { state.eyedropper = null }
     }
 
+    val eyedropper = stringResource(R.string.a11y_eyedropper)
+    val sliders = stringResource(R.string.a11y_color_sliders)
+    val full = stringResource(R.string.a11y_full_color_picker)
     Box(modifier.clip(PanelShape).background(PanelDark)) {
         if (mini) MiniPicker(hsva, ::change) { state.endGesture() } else PaletteView(state, argb, onColor)
         Column(Modifier.offset(676.px, 0.dp).size(180.px, 359.px).background(PanelDark), Arrangement.spacedBy(3.px)) {
-            PickerButton(Modifier.clickable { picking = !picking }, if (picking) Am.Accent else Am.PanelInset) {
+            PickerButton(Modifier.semantics { contentDescription = eyedropper }.clickable { picking = !picking }, if (picking) Am.Accent else Am.PanelInset) {
                 if (picking) PanelIcon(PanelIcons.CheckCircle, PanelDark, size = 30.dp) else PanelIcon(PanelIcons.Eyedropper, IconGrey)
             }
-            PickerButton(Modifier.clickable { mini = !mini }, if (mini) PanelDark else Am.PanelInset) { MiniPickerIcon(mini) }
+            PickerButton(Modifier.semantics { contentDescription = sliders }.clickable { mini = !mini }, if (mini) PanelDark else Am.PanelInset) { MiniPickerIcon(mini) }
             PickerButton(
-                Modifier.clickable { picking = false; state.fullColor = FullColor(argb) { c, drag -> latestApply(c, drag) } }, Am.PanelInset,
+                Modifier.semantics { contentDescription = full }.clickable { picking = false; state.fullColor = FullColor(argb) { c, drag -> latestApply(c, drag) } }, Am.PanelInset,
             ) { PanelIcon(PanelIcons.Palette, IconGrey) }
         }
     }

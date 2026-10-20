@@ -71,11 +71,12 @@ internal fun EffectsPanel(state: EditorState, modifier: Modifier) {
     if (state.easingOpen) { EasingPanel(state, modifier); return }
     Row(modifier.background(Am.Panel)) {
         Column(Modifier.width(168.px).heightIn(max = PanelHeight).fillMaxHeight()) {
-            EffectFrameButton(PanelIcons.Back, Modifier.weight(1f)) { state.stepBack() }
-            EffectFrameButton(if (target != null && layer.onKeyframe(target.ref)) PanelIcons.KeyframeRemove else PanelIcons.Keyframe, Modifier.weight(1f), target != null) { state.toggleKeyframe() }
-            EffectFrameButton(PanelIcons.Easing, Modifier.weight(1f), target != null) { if (target != null && layer.easing(target.ref) != null) state.easingOpen = true else state.easingHint = true }
+            EffectFrameButton(PanelIcons.Back, stringResource(R.string.topbar_back), Modifier.weight(1f)) { state.stepBack() }
+            val onKeyframe = target != null && layer.onKeyframe(target.ref)
+            EffectFrameButton(if (onKeyframe) PanelIcons.KeyframeRemove else PanelIcons.Keyframe, stringResource(if (onKeyframe) R.string.a11y_remove_keyframe else R.string.a11y_add_keyframe), Modifier.weight(1f), target != null) { state.toggleKeyframe() }
+            EffectFrameButton(PanelIcons.Easing, stringResource(R.string.a11y_easing), Modifier.weight(1f), target != null) { if (target != null && layer.easing(target.ref) != null) state.easingOpen = true else state.easingHint = true }
             Box(Modifier.weight(1f).fillMaxWidth()) {
-                EffectFrameButton(PanelIcons.More, Modifier.fillMaxSize(), instance == null) { menu = true }
+                EffectFrameButton(PanelIcons.More, stringResource(R.string.effects_more), Modifier.fillMaxSize(), instance == null) { menu = true }
                 Presence(menu) {
                     MenuPopup(AboveLeft, { menu = false }, TransformOrigin(0f, 1f)) {
                         MenuRow(stringResource(R.string.effects_copy_effects), enabled = layer.effects.isNotEmpty()) { copiedEffects = layer.effects; menu = false }
@@ -182,8 +183,8 @@ private fun EffectListRow(state: EditorState, index: Int, effect: XmlNode, defin
 }
 
 @Composable
-private fun EffectFrameButton(icon: ImageVector, modifier: Modifier, enabled: Boolean = true, onClick: () -> Unit) {
+private fun EffectFrameButton(icon: ImageVector, description: String, modifier: Modifier, enabled: Boolean = true, onClick: () -> Unit) {
     Box(modifier.fillMaxWidth().alpha(if (enabled) 1f else 0.35f).clickable(enabled = enabled, onClick = onClick), contentAlignment = Alignment.Center) {
-        Icon(icon, null, Modifier.size(24.dp), tint = Am.OnDark)
+        Icon(icon, description, Modifier.size(24.dp), tint = Am.OnDark)
     }
 }
