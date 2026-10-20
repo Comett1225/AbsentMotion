@@ -197,6 +197,7 @@ SkM44 Turn(float degrees) { return SkM44::Rotate({0, 0, 1}, degrees * kRadians);
 constexpr int kMaxParentDepth = 16;
 
 SkMatrix MatrixOf(const Placement& p, const Layer& l, float t);
+int Fps();
 
 Placement Effective(const std::vector<Layer>& siblings, const Layer& l, double timeMs, int depth) {
     Placement own = Own(l, timeMs);
@@ -220,7 +221,8 @@ Placement Effective(const std::vector<Layer>& siblings, const Layer& l, double t
     if (at == siblings.end() || at == siblings.begin()) return own;
     const Layer& below = *(at - 1);
     const float t = below.localTime(timeMs);
-    FollowPath(l, timeMs, ShapePath(below, t).makeTransform(MatrixOf(Effective(siblings, below, timeMs, depth + 1), below, t)), &own);
+    const SkPath path = below.text ? TextGlyphPath(below, t, Fps()) : ShapePath(below, t);
+    FollowPath(l, timeMs, path.makeTransform(MatrixOf(Effective(siblings, below, timeMs, depth + 1), below, t)), &own);
     return own;
 }
 
