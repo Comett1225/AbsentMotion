@@ -3,6 +3,7 @@
 #include "xml.h"
 #include "include/core/SkCanvas.h"
 #include "include/core/SkColorFilter.h"
+#include "include/core/SkM44.h"
 #include "include/core/SkPaint.h"
 #include "include/core/SkPicture.h"
 #include "include/core/SkPictureRecorder.h"
@@ -33,18 +34,113 @@ float Value(const LayerEffect& e, const std::map<std::string, Anim>* defaults, c
     return fallback;
 }
 
+const int kGlowCells = 24;
+const float kGlowReach = 0.345f;
+
+const char* const kGlowRows = R"(
+uniform shader image;
+uniform float n;
+half4 main(float2 p) {
+    float best = n;
+    for (int i = -24; i <= 24; i++) {
+        float d = abs(float(i));
+        if (d < best && image.eval(p + float2(float(i), 0.0)).a > 0.5) best = d;
+    }
+    return half4(half(best / n), 0.0, 0.0, 1.0);
+}
+)";
+
+const char* const kGlowColumns = R"(
+uniform shader image;
+uniform float n;
+half4 main(float2 p) {
+    float best = n;
+    for (int j = -24; j <= 24; j++) {
+        float dy = abs(float(j));
+        if (dy < best) {
+            float h = float(image.eval(p + float2(0.0, float(j))).r) * n;
+            best = min(best, sqrt(h * h + dy * dy));
+        }
+    }
+    return half4(half(best / n), 0.0, 0.0, 1.0);
+}
+)";
+
+const char* const kGlowMix = R"(
+uniform shader image;
+uniform shader field;
+uniform shader backdrop;
+uniform float reach;
+uniform float shift;
+uniform float grow;
+uniform float soft;
+uniform float amount;
+uniform float mode;
+uniform half4 tint;
+half4 main(float2 p) {
+    half4 src = image.eval(p);
+    float r = float(field.eval(p).r);
+    float d = max(r * reach - shift, 0.0);
+    float g = r > 0.995 ? 0.0 : soft > 0.0 ? smoothstep(grow + soft, grow - soft, d) : (d <= grow ? 1.0 : 0.0);
+    half k = half(g * amount) * tint.a;
+    half3 c = tint.rgb;
+    if (mode > 0.5) {
+        half4 b = backdrop.eval(p);
+        half3 under = b.a > 0.0 ? b.rgb / b.a : half3(0.0);
+        half3 mixed = mode < 1.5 ? under * c : under + c - under * c;
+        c = mix(c, mixed, b.a);
+    }
+    return src + half4(c * k, k) * (1.0 - src.a);
+}
+)";
+
+sk_sp<SkRuntimeEffect> Compiled(const char* sksl) {
+    auto result = SkRuntimeEffect::MakeForShader(SkString(sksl));
+    return result.effect;
+}
+
+sk_sp<SkImageFilter> GlowFilter(const std::function<float(const char*, int, float)>& v, sk_sp<SkImageFilter> input, bool behind) {
+    static const sk_sp<SkRuntimeEffect> rows = Compiled(kGlowRows), columns = Compiled(kGlowColumns), mix = Compiled(kGlowMix);
+    const float reach = std::max(v("radius", 0, 100), 0.0f) * kGlowReach;
+    const float amount = std::clamp(v("alpha", 0, 0.75f), 0.0f, 1.0f);
+    const float hard = std::clamp(v("hardness", 0, 0.5f), 0.0f, 1.0f);
+    const float a = std::clamp(v("color", 0, 1), 0.0f, 1.0f);
+    if (!rows || !columns || !mix || !(reach > 0) || !(amount * a > 0)) return input;
+    const float edge = std::min(reach / 4, 1.0f), grow = hard * reach - 0.5f * edge, soft = (1 - hard) * reach + edge;
+    const float step = std::max(1.0f, (grow + soft + 1) / kGlowCells), cells = (grow + soft + 1) / step;
+    const SkSamplingOptions linear(SkFilterMode::kLinear);
+    sk_sp<SkImageFilter> mask = input;
+    float grown = 0;
+    if (step > 1) {
+        grown = std::ceil(step / 2);
+        mask = SkImageFilters::MatrixTransform(SkMatrix::Scale(1 / step, 1 / step), linear, SkImageFilters::Dilate(grown, grown, input));
+    }
+    SkRuntimeShaderBuilder across(rows);
+    across.uniform("n") = cells;
+    SkRuntimeShaderBuilder down(columns);
+    down.uniform("n") = cells;
+    sk_sp<SkImageFilter> field = SkImageFilters::RuntimeShader(down, cells + 1, "image",
+                                                               SkImageFilters::RuntimeShader(across, cells + 1, "image", mask));
+    if (step > 1) field = SkImageFilters::MatrixTransform(SkMatrix::Scale(step, step), linear, field);
+    SkRuntimeShaderBuilder b(mix);
+    b.uniform("reach") = cells * step;
+    b.uniform("shift") = 0.5f - grown;
+    b.uniform("grow") = grow;
+    b.uniform("soft") = soft;
+    b.uniform("amount") = amount;
+    b.uniform("mode") = behind ? std::clamp(std::round(v("blendMode", 0, 2)), 0.0f, 2.0f) : 0.0f;
+    b.uniform("tint") = SkV4{std::clamp(v("color", 1, 1), 0.0f, 1.0f), std::clamp(v("color", 2, 1), 0.0f, 1.0f),
+                             std::clamp(v("color", 3, 0.667f), 0.0f, 1.0f), a};
+    std::string_view names[] = {"image", "field", "backdrop"};
+    sk_sp<SkImageFilter> inputs[] = {input, field, behind ? nullptr : SkImageFilters::Empty()};
+    return SkImageFilters::RuntimeShader(b, 0, names, inputs, 3);
+}
+
 sk_sp<SkImageFilter> BuiltInFilter(const std::string& id, const std::function<float(const char*, int, float)>& v,
                                    sk_sp<SkImageFilter> input) {
     if (id == "absent.blur") {
         const float sigma = std::max(v("strength", 0, 10), 0.0f) / 3;
         return sigma > 0 ? SkImageFilters::Blur(sigma, sigma, SkTileMode::kDecal, input) : input;
-    }
-    if (id == "absent.glow") {
-        const float sigma = std::max(v("strength", 0, 20), 0.0f) / 3;
-        const float intensity = std::max(v("intensity", 0, 1), 0.0f) * std::min(sigma / 3, 1.0f);
-        if (!(sigma > 0) || !(intensity > 0)) return input;
-        return SkImageFilters::Arithmetic(0, intensity, 1, 0, true, input,
-                                          SkImageFilters::Blur(sigma, sigma, SkTileMode::kDecal, input));
     }
     const float length = std::max(v("length", 0, 40), 0.0f), angle = v("angle", 0, 0);
     if (!(length > 0) || !std::isfinite(angle)) return input;
@@ -68,6 +164,7 @@ std::string EffectRuntime::load(const std::string& xml) {
     const char* sksl = root->attr("sksl");
     if (!sksl || !*sksl) {
         if (!BuiltIn(id) && !MotionEffect(id) && !RepeatEffect(id) && !TextEffect(id) && !DrawingEffect(id)) return "shader error: no shader and no built-in called " + id;
+        d.backdrop = id == "absent.glow";
     } else {
         auto result = SkRuntimeEffect::MakeForShader(SkString(sksl));
         if (!result.effect) {
@@ -111,7 +208,7 @@ bool EffectRuntime::lifted(const Layer& layer) const { return liftAt(layer) >= 0
 bool EffectRuntime::needs(const Layer& layer, bool Definition::*input) const {
     return std::any_of(layer.effects.begin(), layer.effects.end(), [&](const LayerEffect& e) {
         const Definition* d = e.hidden ? nullptr : find(e.id);
-        return d && d->shader && d->*input;
+        return d && (d->shader || BuiltIn(e.id)) && d->*input;
     });
 }
 
@@ -122,6 +219,7 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
     const float t = layer.localTime(timeMs), seconds = (float)((layer.steppedMs(timeMs) - layer.startTime) / 1000.0);
     const SkRect bounds = SkRect::MakeIWH(scene.width, scene.height).makeOffset(-area.left(), -area.top());
     const float reach = (float)std::max(scene.width, scene.height);
+    const bool withBackdrop = content != nullptr;
     sk_sp<SkImageFilter> f = std::move(content);
     bool any = false;
     for (size_t k = (size_t)(liftAt(layer) + 1); k < layer.effects.size(); k++) {
@@ -130,9 +228,8 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
         const Definition* d = find(e.id);
         const auto* defaults = d ? &d->defaults : nullptr;
         if (BuiltIn(e.id)) {
-            f = BuiltInFilter(e.id, [&](const char* name, int i, float fallback) {
-                return Value(e, defaults, name, i, t, fallback);
-            }, f);
+            const auto value = [&](const char* name, int i, float fallback) { return Value(e, defaults, name, i, t, fallback); };
+            f = e.id == "absent.glow" ? GlowFilter(value, f, withBackdrop) : BuiltInFilter(e.id, value, f);
         } else if (d && d->shader) {
             SkRuntimeShaderBuilder b(d->shader);
             for (const SkRuntimeEffect::Uniform& u : d->shader->uniforms()) {

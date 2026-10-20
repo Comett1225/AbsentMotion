@@ -1770,5 +1770,26 @@
     }
    ]
   }
+ },
+ "absent.glow": {
+  "to": "glow",
+  "params": {
+   "strength": {
+    "to": "radius",
+    "scale": 2.45,
+    "min": 0,
+    "max": 400
+   },
+   "intensity": {
+    "to": "alpha",
+    "min": 0,
+    "max": 1
+   }
+  },
+  "set": {
+   "hardness": 0,
+   "color": "#ffffffff",
+   "blendMode": 2
+  }
  }
 }

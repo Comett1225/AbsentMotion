@@ -16,7 +16,7 @@ VIDEOS = [("bench-a.mp4", 1920, 1080, 30, "testsrc2"), ("bench-b.mp4", 1920, 108
 LARGE = [("bench-4k-a.mp4", 3840, 2160, 300, "testsrc2"), ("bench-4k-b.mp4", 3840, 2160, 300, "smptehdbars"),
          ("bench-4k-c.mp4", 3840, 2160, 300, "mandelbrot")]
 EFFECTS = [
-    '<effect id="absent.glow"><property name="strength" type="float" value="18"/></effect>',
+    '<effect id="absent.glow"><property name="radius" type="float" value="45"/></effect>',
     '<effect id="absent.huesaturation"><property name="hue" type="float" value="40"/></effect>',
     '<effect id="absent.blur"><property name="strength" type="float" value="4"/></effect>',
     '<effect id="absent.vignette"/>',
