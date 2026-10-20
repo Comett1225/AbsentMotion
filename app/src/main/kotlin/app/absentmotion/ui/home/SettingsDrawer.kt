@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -74,6 +75,7 @@ private val PanelShape = RoundedCornerShape(7.dp)
 private val DividerColor get() = Am.HomeLine
 private val ListLineColor get() = Am.NavyLine
 private val ChosenRow get() = Am.NavyHi
+internal val CardGap = 10.dp
 
 @Composable
 fun SettingsDrawer(settings: AppSettings, drawer: androidx.compose.material3.DrawerState, onRestored: () -> Unit = {}) {
@@ -84,7 +86,7 @@ fun SettingsDrawer(settings: AppSettings, drawer: androidx.compose.material3.Dra
         drawer, Modifier.width(280.dp), drawerShape = RectangleShape, drawerContainerColor = Am.HomeDrawer,
         windowInsets = WindowInsets(0),
     ) {
-        Column(Modifier.fillMaxWidth().background(Am.Card).statusBarsPadding().verticalScroll(rememberScrollState()).padding(bottom = 8.dp)) {
+        Column(Modifier.fillMaxWidth().background(Am.Card).statusBarsPadding().verticalScroll(rememberScrollState()).navigationBarsPadding().padding(bottom = 8.dp)) {
             Text(
                 stringResource(R.string.settings), Modifier.fillMaxWidth().height(50.dp).wrapContentHeight(Alignment.CenterVertically).padding(start = 11.dp),
                 color = Am.HomeInk, fontSize = 18.sp, fontWeight = FontWeight.Bold,
@@ -117,10 +119,11 @@ fun SettingsDrawer(settings: AppSettings, drawer: androidx.compose.material3.Dra
                 SwitchRow(stringResource(R.string.settings_preview_copies), settings.previewCopies, enabled = true) { settings.previewCopies = it }
             }
             PreviewCopiesRow()
-            Spacer(Modifier.height(15.dp))
+            Spacer(Modifier.height(CardGap))
             LinkRow(stringResource(R.string.settings_language), currentLanguage(LocalContext.current).nativeName) { language = true }
+            Spacer(Modifier.height(CardGap))
             BackupRows(settings, onRestored)
-            Spacer(Modifier.height(15.dp))
+            Spacer(Modifier.height(CardGap))
             LinkRow(stringResource(R.string.settings_about)) { about = true }
             CaptionModelRow()
         }
@@ -142,7 +145,7 @@ private fun PreviewCopiesRow() {
     val made by VideoProxies.revision.collectAsState()
     var bytes by remember { mutableLongStateOf(0L) }
     LaunchedEffect(made) { bytes = withContext(Dispatchers.IO) { VideoProxies.bytes(context) } }
-    Spacer(Modifier.height(15.dp))
+    Spacer(Modifier.height(CardGap))
     Row(
         Modifier.padding(horizontal = 6.dp).fillMaxWidth().height(44.dp).clip(PanelShape).background(PanelColor)
             .clickable { VideoProxies.clear(context) }.padding(start = 15.dp, end = 15.dp),
@@ -158,7 +161,7 @@ private fun CaptionModelRow() {
     val context = LocalContext.current
     var bytes by remember { mutableLongStateOf(CaptionModel.file(context).length()) }
     if (bytes == 0L) return
-    Spacer(Modifier.height(15.dp))
+    Spacer(Modifier.height(CardGap))
     Row(
         Modifier.padding(horizontal = 6.dp).fillMaxWidth().height(44.dp).clip(PanelShape).background(PanelColor)
             .clickable { CaptionModel.remove(context); bytes = CaptionModel.file(context).length() }.padding(start = 15.dp, end = 15.dp),

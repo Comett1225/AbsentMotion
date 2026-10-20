@@ -97,9 +97,9 @@ internal fun BackupRows(settings: AppSettings, onRestored: () -> Unit) {
     }
     Column(Modifier.fillMaxWidth()) {
         LinkRow(stringResource(R.string.backup_all_projects)) { run(txt(R.string.backup_backing_up_title), txt(R.string.backup_result_title), txt(R.string.backup_stopped)) { backUp(context, it) } }
-        Spacer(Modifier.height(6.dp))
+        Spacer(Modifier.height(CardGap))
         LinkRow(stringResource(R.string.backup_restore)) { picker.launch(arrayOf("*/*")) }
-        Spacer(Modifier.height(6.dp))
+        Spacer(Modifier.height(CardGap))
         Column(Modifier.padding(horizontal = 6.dp).fillMaxWidth().clip(RoundedCornerShape(7.dp)).background(Am.HomePanel)) {
             SwitchRow(stringResource(R.string.backup_weekly), settings.weeklyBackup, enabled = true) { settings.weeklyBackup = it }
         }
