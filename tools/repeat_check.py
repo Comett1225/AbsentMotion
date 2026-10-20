@@ -141,7 +141,7 @@ def main():
         moving_video(video)
         engine.adb('push', video, f'{engine.DEVICE_DIR}/mosh.mp4')
         engine.adb('push', video.with_suffix('.png'), f'{engine.DEVICE_DIR}/mosh.png')
-        effect = fx('datamosh', start=0.2, duration=1.5)
+        effect = fx('datamosh', start=0.2, end=1.7)
 
         def timed(name, xml, frame):
             image = still(name, xml, frame)
@@ -164,15 +164,15 @@ def main():
         report(np.array_equal(first, again) and np.array_equal(first, fresh) and smear > 3,
                f'datamosh video stills repeat exactly and differ from the plain frame by {smear:.1f}')
         after = [still('moshplain55', mosh_scene(''), 55), still('mosh55', mosh_scene(effect), 55)]
-        report(np.array_equal(*after), 'datamosh ends after its length')
+        report(np.array_equal(*after), 'datamosh ends at its end')
         blocks = [still(f'moshpicture{again}', mosh_scene(effect, video=False), 15) for again in 'ab']
         flat = still('moshpictureplain', mosh_scene('', video=False), 15)
         early = [still('moshpicture3', mosh_scene(effect, video=False), 3), still('moshpictureplain3', mosh_scene('', video=False), 3)]
         moved = float(np.abs(blocks[0] - flat).mean())
         report(np.array_equal(*blocks) and np.array_equal(*early) and moved > 1,
                f'block datamosh on a picture is steady, starts on time and moves blocks by {moved:.1f}')
-        ended = [still('moshpictureend', mosh_scene(fx('datamosh', start=0.2, duration=0.3), video=False), 30), still('moshpictureplain30', mosh_scene('', video=False), 30)]
-        report(np.array_equal(*ended), 'block datamosh on a picture ends after its length')
+        ended = [still('moshpictureend', mosh_scene(fx('datamosh', start=0.2, end=0.5), video=False), 30), still('moshpictureplain30', mosh_scene('', video=False), 30)]
+        report(np.array_equal(*ended), 'block datamosh on a picture ends at its end')
         still('moshclose', mosh_scene(effect), 20)
         pid = engine.adb('shell', 'pidof', engine.PKG).strip()
         engine.adb('logcat', '-b', 'all', '-c')

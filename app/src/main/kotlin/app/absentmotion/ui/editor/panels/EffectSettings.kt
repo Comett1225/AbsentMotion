@@ -60,7 +60,13 @@ internal fun EffectSettings(state: EditorState, layer: Layer, instance: XmlNode,
             "color" -> EffectColor(state, param, raw, enabled, active == param, { select(param) }, { set(it) })
             "choice" -> EffectChoice(param, raw, enabled) { set(it) }
             "text" -> EffectText(param, raw, enabled, state::endGesture) { set(it, true) }
-            else -> EffectNumbers(state, param, raw, enabled, active == param, { select(param) }, { text, gesture -> set(text, gesture) })
+            else -> {
+                val shown = definition.bounded(param, (layer.endTime - layer.startTime) / 1000f) { p ->
+                    (instance.effectProperty(p.id)?.valueAt(layer.t) ?: p.default).toFloatOrNull() ?: 0f
+                }
+                val within = if (shown === param) raw else formatFloats(floatArrayOf((raw.toFloatOrNull() ?: 0f).coerceIn(shown.min, shown.max)))
+                EffectNumbers(state, shown, within, enabled, active == param, { select(param) }, { text, gesture -> set(text, gesture) })
+            }
         }
     }
 }

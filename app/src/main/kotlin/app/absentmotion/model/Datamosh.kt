@@ -12,9 +12,11 @@ fun Layer.moshPlan(timeMs: Double, scene: Scene): MoshPlan? {
     if (mediaFill?.video != true || endTime <= startTime) return null
     val effect = effects.firstOrNull { it["id"] == "absent.datamosh" && it["hidden"] != "true" } ?: return null
     fun value(name: String, fallback: Float, t: Float) = effect.effectProperty(name)?.valueAt(t)?.toFloatOrNull() ?: fallback
-    val start = startTime + value("start", 0f, 0f).coerceAtLeast(0f) * 1000.0
-    val at = ((start - startTime) / (endTime - startTime)).toFloat()
-    val end = start + value("duration", 2f, at).coerceIn(0.04f, 10f) * 1000.0
+    val length = (endTime - startTime) / 1000f
+    val from = value("start", 0f, 0f).coerceIn(0f, length)
+    val start = startTime + from * 1000.0
+    val at = from / length
+    val end = startTime + value("end", 2f, at).coerceIn(from, length) * 1000.0
     if (timeMs < start || timeMs >= end) return null
     val first = scene.frameAt(start.roundToInt())
     val window = (scene.frameAt(end.roundToInt() - 1) - first + 1).coerceAtLeast(1)

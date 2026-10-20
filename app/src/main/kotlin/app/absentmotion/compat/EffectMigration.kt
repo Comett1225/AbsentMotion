@@ -5,6 +5,7 @@ import app.absentmotion.effects.EffectDefinition
 import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
 import app.absentmotion.model.formatFloats
+import app.absentmotion.model.valueAt
 import app.absentmotion.platform.Context
 import org.json.JSONArray
 import org.json.JSONObject
@@ -24,6 +25,7 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
         val values: Map<String, Float> = emptyMap(),
         val neutral: String? = null,
         val component: Int = -1,
+        val plus: String? = null,
     )
 
     class Rule(val to: String, val params: Map<String, List<Conversion?>>, val set: Map<String, String>)
@@ -65,7 +67,8 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
             conversions.forEachIndexed { i, c ->
                 val param = c?.to?.let { to -> own.params.firstOrNull { it.id == to } }
                 if (param != null) {
-                    made[param.id] = property(child, param.id, param.type) { text -> convertValue(text, c, if (c.component >= 0) c.component else if (split) i else -1) }
+                    val shift = c.plus?.let { other -> effect.children.firstOrNull { it.name == "property" && it["name"] == other }?.valueAt(0f)?.toFloatOrNull() } ?: 0f
+                    made[param.id] = property(child, param.id, param.type) { text -> convertValue(text, c, if (c.component >= 0) c.component else if (split) i else -1, shift) }
                 } else if (c?.neutral == null || values(child).any { !same(if (split) it.split(',').getOrElse(i) { "" } else it, c.neutral) }) {
                     drop(if (split) "$name (${i + 1})" else name)
                 }
@@ -94,7 +97,7 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
         return if (x.all { it != null } && y.all { it != null }) x == y else a.trim() == b.trim()
     }
 
-    private fun convertValue(text: String, c: Conversion, component: Int): String {
+    private fun convertValue(text: String, c: Conversion, component: Int, shift: Float): String {
         val t = text.trim()
         if (t.startsWith("#") || t == "true" || t == "false") return t
         val parts = t.split(',')
@@ -105,7 +108,7 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
         }
         return formatFloats(FloatArray(numbers.size) { i ->
             val raised = if (c.power == 1f) numbers[i] else abs(numbers[i]).pow(c.power).withSign(numbers[i])
-            val moved = raised * c.scale + c.offset
+            val moved = raised * c.scale + c.offset + shift
             (if (c.wrap > 0f) moved.mod(c.wrap) else moved).coerceIn(c.min, c.max)
         })
     }
@@ -147,6 +150,7 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
             json.optJSONObject("values")?.let { v -> v.keys().asSequence().associateWith { v.getDouble(it).toFloat() } }.orEmpty(),
             json.opt("neutral")?.toString(),
             json.optInt("component", -1),
+            json.optString("plus").takeIf { it.isNotEmpty() },
         )
     }
 }

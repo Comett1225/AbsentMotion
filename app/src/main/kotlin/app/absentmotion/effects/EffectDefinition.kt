@@ -20,6 +20,8 @@ data class EffectParam(
     val options: List<String> = emptyList(),
     val pixels: Boolean = false,
     val unit: String = "",
+    val layerTime: Boolean = false,
+    val after: String? = null,
 ) {
     val type: String get() = when (kind) { "point" -> "vec2"; "color" -> "color"; "switch" -> "bool"; "text" -> "string"; else -> "float" }
 
@@ -50,7 +52,8 @@ data class EffectParam(
             }
             return EffectParam(id, json.optString("label", id), kind, default,
                 json.optDouble("min", -Float.MAX_VALUE.toDouble()).toFloat(), json.optDouble("max", Float.MAX_VALUE.toDouble()).toFloat(),
-                json.optDouble("step", 0.01).toFloat(), percent = json.optBoolean("percent"), pixels = json.optBoolean("pixels"), unit = json.optString("unit"))
+                json.optDouble("step", 0.01).toFloat(), percent = json.optBoolean("percent"), pixels = json.optBoolean("pixels"), unit = json.optString("unit"),
+                layerTime = json.optBoolean("layerTime"), after = json.optString("after").takeIf { it.isNotEmpty() })
         }
     }
 }
@@ -100,6 +103,13 @@ data class EffectDefinition(
         XmlNode("property", mapOf("name" to it.id, "type" to it.type, "value" to it.default))
     })
 
+    fun bounded(param: EffectParam, seconds: Float, value: (EffectParam) -> Float): EffectParam {
+        if (!param.layerTime && param.after == null) return param
+        val floor = params.firstOrNull { it.id == param.after }?.let { p -> bounded(p, seconds, value).let { b -> value(p).coerceIn(b.min, b.max) } }
+        val lo = maxOf(param.min, floor ?: param.min)
+        return param.copy(min = lo, max = maxOf(lo, if (param.layerTime) minOf(param.max, seconds) else param.max))
+    }
+
     fun runtimeXml(): String = XmlNode("effect", listOfNotNull("id" to id, sksl?.let { "sksl" to it }).toMap(),
         params.map { XmlNode("param", mapOf("name" to it.id, "value" to it.default)) }).toXml()
 
@@ -113,6 +123,7 @@ data class EffectDefinition(
             val sksl = json.optString("sksl").takeIf { it.isNotBlank() }
             require(native || sksl != null) { "$key: no shader" }
             val parsed = List(params.length()) { EffectParam.parse(params.getJSONObject(it)) }
+            parsed.forEachIndexed { i, p -> require(p.after == null || parsed.take(i).any { it.id == p.after }) { "$key.${p.id}: after ${p.after} is not an earlier parameter" } }
             val presets = json.optJSONArray("presets") ?: JSONArray()
             return EffectDefinition("absent.$key", key, json.optString("name", key), category, json.optString("description"),
                 parsed, if (native) null else sksl, native, since = json.optString("since").takeIf { it.isNotBlank() },
