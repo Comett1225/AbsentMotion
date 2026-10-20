@@ -16,7 +16,7 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
   Scatter Field; 3D objects (cube, box, cylinder, ellipsoid, torus, pyramid, prisms, raster extrude, spherize, tunnel and
   more); text animators (Text Progress, Text Transform, Text Randomizer, Count Up/Down, Timecode) with one-tap presets;
   Drawing Progress and Stroke Taper; VHS, Datamosh, Glass, Displacement Map and many pattern, blur, glow, distortion and
-  colour effects. Imported Alight Motion projects keep their Move effects.
+  colour effects. Imported Alight Motion projects keep their Move, Repeat and text effects with their settings.
 - A New effects category with NEW badges, animated effect thumbnails, and parent effects that can apply to child layers.
 - One-tap transitions between clips and In, Out and Loop animations for any layer, written as keyframes you can edit.
 - 3D tilt (X and Y rotation) for layers, and 3D Model layers from `.obj`, `.gltf` and `.glb` files.
@@ -42,6 +42,9 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 - MP4 export also works on phones without the `VK_GOOGLE_display_timing` Vulkan extension, writes straight into the
   gallery, slows down instead of failing when the phone is hot, and shows an estimated time.
 - The size ruler grows more slowly for big layers. The trim-limit vibration switch is now called Vibration.
+- Wave Warp, RGB Split, Pixelate, Posterize, Zoom Blur, Unsharp Mask, Swirl (was Twirl), Pinch/Bulge (was Bulge), Radial
+  Wipe, Vignette, Turbulence and Zoom and Spin Streaks use Alight Motion's settings and look; older projects are converted
+  when they open. Wave Warp and Pinch leave see-through gaps at the layer's edges instead of stretching edge colours.
 
 ### Fixed
 
