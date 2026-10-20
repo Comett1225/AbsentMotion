@@ -63,6 +63,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import app.absentmotion.engine.EngineThread
 import app.absentmotion.engine.PreviewView
 import app.absentmotion.library.AppSettings
@@ -235,7 +237,8 @@ fun TemplateEditor(templateId: String, engine: EngineThread, settings: AppSettin
     LaunchedEffect(shown) { engine.setScene(shown) }
     DisposableEffect(Unit) { onDispose { engine.setPlaying(false) } }
     LaunchedEffect(playing) { engine.setPlaying(playing) }
-    val fit = if (box.width == 0) 1f else min(box.width.toFloat() / shown.width, box.height.toFloat() / shown.height)
+    LifecycleEventEffect(Lifecycle.Event.ON_STOP) { playing = false }
+    val fit =if (box.width == 0) 1f else min(box.width.toFloat() / shown.width, box.height.toFloat() / shown.height)
     LaunchedEffect(fit, time, shown) {
         if (box.width > 0) engine.setView(PreviewView(time, fit, (box.width - shown.width * fit) / 2, (box.height - shown.height * fit) / 2, 0, -1))
     }
@@ -245,7 +248,9 @@ fun TemplateEditor(templateId: String, engine: EngineThread, settings: AppSettin
         val from = pos
         val start = withFrameNanos { it }
         while (true) {
-            val next = from + ((withFrameNanos { it } - start) / 1_000_000).toInt()
+            val now = withFrameNanos { it }
+            if (!playing) break
+            val next = from + ((now - start) / 1_000_000).toInt()
             if (next >= total) { pos = total; playing = false; break }
             pos = next
         }
