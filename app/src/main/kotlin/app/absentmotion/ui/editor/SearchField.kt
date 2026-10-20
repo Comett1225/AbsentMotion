@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.text.TextStyle
@@ -75,6 +76,7 @@ internal fun SearchField(
 ) {
     val focus = LocalFocusManager.current
     val requester = remember { FocusRequester() }
+    val keyboard = LocalSoftwareKeyboardController.current
     LaunchedEffect(autoFocus) { if (autoFocus) requester.requestFocus() }
     Row(modifier.clip(RoundedCornerShape(6.dp)).background(background).padding(start = 8.dp), verticalAlignment = Alignment.CenterVertically) {
         Icon(TextIcons.Search, null, Modifier.size(16.dp), tint = faint)
@@ -89,7 +91,7 @@ internal fun SearchField(
                 }
             },
         )
-        Box(Modifier.size(32.dp).then(if (text.isEmpty()) Modifier else Modifier.clickable { onChange(""); focus.clearFocus() }), Alignment.Center) {
+        Box(Modifier.size(32.dp).then(if (text.isEmpty()) Modifier else Modifier.clickable { onChange(""); requester.requestFocus(); keyboard?.show() }), Alignment.Center) {
             if (text.isNotEmpty()) Icon(ChromeIcons.CloseThick, stringResource(R.string.search_clear), Modifier.size(16.dp), tint = content)
         }
     }
