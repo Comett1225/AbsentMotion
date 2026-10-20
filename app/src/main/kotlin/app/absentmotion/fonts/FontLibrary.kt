@@ -126,15 +126,19 @@ class FontLibrary(context: Context) {
             .firstOrNull { it.isFile }
     }
     fun renderFile(name: String): File? = localFile(name) ?: bundledAsset(FontName.parse(name), exact = false)?.let { bundledFile(it) }
+    private val faces = ConcurrentHashMap<String, Pair<String, Typeface>>()
+    fun cachedTypeface(name: String): Typeface? = faces[name]?.second
     fun typeface(name: String): Typeface {
         val font = FontName.parse(name)
         val file = renderFile(name)
+        val stamp = file?.let { it.path + ":" + it.lastModified() }.orEmpty()
+        faces[name]?.takeIf { it.first == stamp }?.let { return it.second }
         val variable = file?.name?.contains("-Variable") == true
         val face = file?.takeUnless { it.path.startsWith("/system/") && systemFamily(name) != null }?.let { runCatching {
             Typeface.Builder(it).setTtcIndex(fontIndex(name)).apply { if (variable) setFontVariationSettings("'wght' ${font.weight}") }.build()
         }.getOrNull() }
             ?: Typeface.create(systemFamily(name) ?: font.family, Typeface.NORMAL)
-        return if (font.source == "imported" || variable) face else Typeface.create(face, font.weight, font.italic)
+        return (if (font.source == "imported" || variable) face else Typeface.create(face, font.weight, font.italic)).also { faces[name] = stamp to it }
     }
     suspend fun import(uri: Uri): FontName = withContext(Dispatchers.IO) {
         val filename = context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use {

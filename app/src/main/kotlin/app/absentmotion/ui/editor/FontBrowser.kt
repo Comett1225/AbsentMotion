@@ -29,7 +29,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.FontFamily
 import app.absentmotion.fonts.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import androidx.annotation.StringRes
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
@@ -71,7 +73,7 @@ internal fun FontBrowser(library: FontLibrary, onSelect: (String) -> Unit, onClo
             loading = true
             val file = library.resolve(name)
             loading = false
-            if (file != null || library.localFile(name) != null || FontName.parse(name).source != "googlefonts") onSelect(name)
+            if (file != null || FontName.parse(name).source != "googlefonts") onSelect(name)
             else error = FontError(R.string.font_load_failed_title, R.string.font_load_failed_body)
         }
         Unit
@@ -109,7 +111,9 @@ internal fun FontBrowser(library: FontLibrary, onSelect: (String) -> Unit, onClo
             }
             LazyVerticalGrid(GridCells.Fixed(2), Modifier.weight(1f)) {
                 items(entries, key = { it.name.xml }) { entry ->
-                    val needsDownload = !entry.bundled && entry.category != 100 && remember(entry.name.xml, downloads) { library.localFile(entry.name.xml) == null }
+                    val needsDownload by produceState(false, entry.name.xml, downloads) {
+                        value = !entry.bundled && entry.category != 100 && withContext(Dispatchers.IO) { library.localFile(entry.name.xml) == null }
+                    }
                     Box(Modifier.fillMaxWidth().height(100.dp).border(.5.dp, BrowserLine).combinedClickable(onLongClick = { if (entry.category == 100) deleting = entry }) { choose(entry.name.xml) }) {
                         FontPreview(library, entry.name.xml, "Abcdefg", Modifier.align(Alignment.TopCenter).padding(top = 13.dp, start = 10.dp, end = 10.dp).fillMaxWidth().height(46.dp))
                         Text(entry.name.label, Modifier.align(Alignment.BottomCenter).padding(start = 10.dp, end = 25.dp, bottom = 13.dp),
@@ -204,9 +208,9 @@ internal fun FontIconButton(icon: androidx.compose.ui.graphics.vector.ImageVecto
 @Composable
 internal fun rememberFontFamily(library: FontLibrary, name: String, download: Boolean = true): FontFamily? {
     val downloads by library.revision.collectAsState()
-    return produceState<FontFamily?>(null, name, downloads) {
+    return produceState(library.cachedTypeface(name)?.let { FontFamily(it) }, name, downloads) {
         if (download) library.resolve(name)
-        value = if (library.renderFile(name) != null) app.absentmotion.platform.fontFamily(library, name) else null
+        value = withContext(Dispatchers.IO) { if (library.renderFile(name) != null) app.absentmotion.platform.fontFamily(library, name) else null }
     }.value
 }
 
