@@ -196,14 +196,26 @@ fun NewProjectSheet(
     val form = remember { Form(settings.newProject, existingTitles, DefaultNames(context)) }
     val scope = rememberCoroutineScope()
     var camera by remember { mutableStateOf(false) }
+    var creating by remember { mutableStateOf(false) }
     Box(Modifier.fillMaxSize()) {
         Box(Modifier.fillMaxSize().presenceScrim(Color.Black.copy(alpha = 0.7f)).pointerInput(Unit) { detectTapGestures { } })
         Box(Modifier.align(Alignment.BottomCenter).widthIn(max = 480.dp).presence(slide = 1f, fade = false)) {
-            SheetBody(form, onClose, onCamera = { camera = true }, onCreate = {
+            SheetBody(form, onClose, onCamera = { camera = true }, onCreate = create@{
+                if (creating) return@create
+                creating = true
                 settings.newProject = form.choice()
-                val id = store.create(form.scene())
-                onClose()
-                onOpen(id)
+                val scene = form.scene()
+                scope.launch {
+                    val id = try {
+                        withContext(Dispatchers.IO) { store.create(scene) }
+                    } catch (e: java.io.IOException) {
+                        Toast.makeText(context, context.getString(R.string.home_create_project_failed), Toast.LENGTH_LONG).show()
+                        creating = false
+                        return@launch
+                    }
+                    onClose()
+                    onOpen(id)
+                }
             })
         }
     }
