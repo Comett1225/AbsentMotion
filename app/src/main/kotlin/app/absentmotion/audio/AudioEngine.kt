@@ -117,8 +117,10 @@ class AudioEngine(context: Context) {
                     writeAll(track, out)
                     written += BLOCK
                 }
+                clock.latencyNs = AudioClock.learned.takeIf { it >= 0 } ?: AudioClock.outputLatency(track, rate)
                 track.play()
                 clock.wallStart = System.nanoTime()
+                var measured = false
                 val pending = ArrayDeque<Pair<Long, Double>>()
                 val stamp = AudioTimestamp()
                 while (!stopRequested) {
@@ -130,6 +132,10 @@ class AudioEngine(context: Context) {
                     written += BLOCK
                     if (track.getTimestamp(stamp) && stamp.framePosition >= 0) {
                         clock.stamp(stamp.framePosition, stamp.nanoTime)
+                        if (log && !measured && stamp.framePosition > 0) {
+                            measured = true
+                            Log.i("AMAudio", "output latency estimate=%.1fms measured=%.1fms".format(clock.latencyNs / 1e6, AudioClock.learned / 1e6))
+                        }
                         while (pending.isNotEmpty() && pending.first().first <= stamp.framePosition) {
                             val (frame, ms) = pending.removeFirst()
                             val plays = stamp.nanoTime + (frame - stamp.framePosition) * 1_000_000_000L / rate
@@ -244,8 +250,13 @@ internal class AudioClock(private val startMs: Double, private val rate: Int) {
     @Volatile private var reached = startMs
     @Volatile var wallStart = 0L
     @Volatile var failed = false
+    @Volatile var latencyNs = -1L
+    @Volatile private var measured = false
 
-    fun stamp(frames: Long, nanos: Long) { stamp = Stamp(frames, nanos) }
+    fun stamp(frames: Long, nanos: Long) {
+        if (!measured && frames > 0 && wallStart > 0 && !failed) { learned = startLatency(frames, nanos, wallStart, rate); measured = true }
+        stamp = Stamp(frames, nanos)
+    }
 
     fun stop(now: Long) { if (stoppedAt == 0L) stoppedAt = now }
 
@@ -253,11 +264,25 @@ internal class AudioClock(private val startMs: Double, private val rate: Int) {
         val at = stoppedAt.takeIf { it != 0L } ?: now
         val s = stamp
         val began = wallStart
+        val lag = if (failed) 0L else latencyNs
         val ms = when {
             s != null -> startMs + (s.frames + (at - s.nanos) * rate / 1e9).coerceAtLeast(0.0) * 1000.0 / rate
-            began > 0 && (failed || at - began > 1_500_000_000L) -> startMs + (at - began) / 1e6
+            began > 0 && (lag >= 0 || at - began > 1_500_000_000L) -> startMs + (at - began - lag.coerceAtLeast(0)).coerceAtLeast(0) / 1e6
             else -> return null
         }
         return maxOf(ms, reached).also { reached = it }
+    }
+
+    companion object {
+        const val MAX_LATENCY_NS = 1_000_000_000L
+        @Volatile var learned = -1L
+
+        fun startLatency(frames: Long, nanos: Long, wallStart: Long, rate: Int): Long =
+            (nanos - frames * 1_000_000_000L / rate - wallStart).coerceIn(0L, MAX_LATENCY_NS)
+
+        fun outputLatency(track: AudioTrack, rate: Int): Long = runCatching {
+            val ms = AudioTrack::class.java.getMethod("getLatency").invoke(track) as Int
+            (ms * 1_000_000L - track.bufferSizeInFrames * 1_000_000_000L / rate).coerceIn(0L, MAX_LATENCY_NS)
+        }.getOrDefault(-1L)
     }
 }

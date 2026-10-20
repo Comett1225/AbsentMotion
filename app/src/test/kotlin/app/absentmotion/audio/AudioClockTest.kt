@@ -27,6 +27,55 @@ class AudioClockTest {
         assertEquals(1100.0, clock.positionMs(900 * ms)!!, 1e-6)
     }
 
+    @Test fun aKnownOutputLatencyHoldsThePictureUntilTheSoundIsHeard() {
+        val clock = AudioClock(2000.0, 48_000)
+        clock.latencyNs = 80 * ms
+        clock.wallStart = 100 * ms
+        assertEquals(2000.0, clock.positionMs(150 * ms)!!, 1e-6)
+        assertEquals(2000.0, clock.positionMs(180 * ms)!!, 1e-6)
+        assertEquals(2050.0, clock.positionMs(230 * ms)!!, 1e-6)
+        clock.stamp(48 * 60, 240 * ms)
+        assertEquals(2080.0, clock.positionMs(260 * ms)!!, 1e-6)
+    }
+
+    @Test fun withoutAnEstimateThePictureWaitsForTheFirstTimestamp() {
+        val clock = AudioClock(0.0, 48_000)
+        clock.wallStart = 100 * ms
+        assertNull(clock.positionMs(400 * ms))
+        clock.stamp(48 * 50, 300 * ms)
+        assertEquals(150.0, clock.positionMs(400 * ms)!!, 1e-6)
+    }
+
+    @Test fun theFirstPresentedFrameMeasuresTheStartLatency() {
+        assertEquals(100 * ms, AudioClock.startLatency(4800, 300 * ms, 100 * ms, 48_000))
+        assertEquals(0L, AudioClock.startLatency(48_000, 300 * ms, 100 * ms, 48_000))
+        assertEquals(AudioClock.MAX_LATENCY_NS, AudioClock.startLatency(0, 5000 * ms, 100 * ms, 48_000))
+        val before = AudioClock.learned
+        try {
+            AudioClock.learned = -1
+            val clock = AudioClock(0.0, 44_100)
+            clock.wallStart = 1000 * ms
+            clock.stamp(0, 1010 * ms)
+            assertEquals(-1L, AudioClock.learned)
+            clock.stamp(4410, 1170 * ms)
+            assertEquals(70 * ms, AudioClock.learned)
+            clock.stamp(8820, 1290 * ms)
+            assertEquals(70 * ms, AudioClock.learned)
+        } finally {
+            AudioClock.learned = before
+        }
+    }
+
+    @Test fun anEarlyEstimateNeverMakesThePictureStepBack() {
+        val clock = AudioClock(0.0, 48_000)
+        clock.latencyNs = 0
+        clock.wallStart = 100 * ms
+        assertEquals(100.0, clock.positionMs(200 * ms)!!, 1e-6)
+        clock.stamp(48 * 50, 200 * ms)
+        assertEquals(100.0, clock.positionMs(210 * ms)!!, 1e-6)
+        assertEquals(110.0, clock.positionMs(260 * ms)!!, 1e-6)
+    }
+
     @Test fun switchingFromTheWallClockToTheAudioClockDoesNotStepBack() {
         val clock = AudioClock(0.0, 48_000)
         clock.wallStart = 100 * ms
