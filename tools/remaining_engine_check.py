@@ -77,6 +77,10 @@ def cases():
         f'<property name="map" type="float" value="1"/><property name="edges" type="float" value="{edges}"/></effect>')))
     yield 'a map from the layer below repeats the edge of a picture pushed past the frame', pushed(0), [((180, 100), engine.GREEN), ((100, 100), engine.GREEN)]
     yield 'a map from the layer below leaves the frame edge clear when told', pushed(2), [((180, 100), engine.BLACK), ((100, 100), engine.GREEN)]
+    band = ('<embedScene id="1" startTime="0" endTime="1000">' + engine.transform('100,100,0') + fx('bulge', amount=-0.9, radius=0.3)
+            + '<scene width="200" height="200" fps="30" totalTime="1000" retime="off">' + engine.rect(2, 100, 100, 100, 100, 0xffff0000)
+            + engine.rect(3, 175, 100, 10, 100, 0xff0000ff) + '</scene></embedScene>')
+    yield 'a pinch pulls the picture in without folding what lies past its radius back inside', engine.scene(band), [((124, 100), engine.RED), ((175, 100), engine.BLUE), ((100, 100), engine.RED)]
 
 
 def models():
