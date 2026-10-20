@@ -676,16 +676,20 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
     };
     if (!effects || !gEffects->draw(canvas, *gScene, l, timeMs, scenePath.getBounds(), picture, below)) picture(canvas);
     if (effects && gEffects->lifted(l) && !scenePath.isEmpty()) {
-        SkPath outside = scenePath;
+        SkPaint mask;
+        mask.setAntiAlias(true);
         if (copies) {
-            outside.reset();
-            for (const LayerCopy& c : *copies) outside = Union(outside, scenePath.makeTransform(c.scene));
+            SkPaint keep;
+            keep.setBlendMode(SkBlendMode::kDstIn);
+            canvas->saveLayer(nullptr, &keep);
+            for (const LayerCopy& c : *copies) canvas->drawPath(scenePath.makeTransform(c.scene), mask);
+            canvas->restore();
+        } else {
+            SkPath outside = scenePath;
+            outside.toggleInverseFillType();
+            mask.setBlendMode(SkBlendMode::kClear);
+            canvas->drawPath(outside, mask);
         }
-        outside.toggleInverseFillType();
-        SkPaint clear;
-        clear.setAntiAlias(true);
-        clear.setBlendMode(SkBlendMode::kClear);
-        canvas->drawPath(outside, clear);
     }
     if (!decorate) return;
     if (l.kind == "embedScene") return DrawGroupBorders(canvas, l, t);
