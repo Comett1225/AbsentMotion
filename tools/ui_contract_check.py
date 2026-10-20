@@ -151,6 +151,16 @@ class UiContracts(unittest.TestCase):
         for path in ['ui/editor/EditorScreen.kt', 'ui/editor/WideEditor.kt']:
             self.assertIn('Presence(state.previewPanelOpen) { PreviewModePanel(', source(path))
 
+    def test_every_editor_haptic_respects_the_vibration_setting(self):
+        root = ROOT / 'app/src/main/kotlin/app/absentmotion/ui/editor'
+        for p in sorted(root.rglob('*.kt')):
+            path = str(p.relative_to(ROOT / 'app/src/main/kotlin/app/absentmotion'))
+            for line in source(path).splitlines():
+                if 'performHapticFeedback(' in line:
+                    self.assertIn('state.settings.vibration', line, path)
+        self.assertIn('state.edit("reorder") { it.move(id, layers.lastIndex - to) }\n        onTick()', source('ui/editor/Timeline.kt'))
+        self.assertIn('if (moved && value != null && value != detent) haptic(HapticFeedbackType.SegmentTick)', source('ui/editor/panels/SpeedPanel.kt'))
+
     def test_media_search_opens_from_a_square_over_the_grid(self):
         text = source('ui/editor/MediaTab.kt')
         self.assertIn('MediaSquare(TextIcons.Search, stringResource(R.string.search_hint), searching || search.isNotEmpty()) { searching = true }', text)

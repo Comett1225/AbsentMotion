@@ -243,7 +243,7 @@ fun Timeline(state: EditorState, modifier: Modifier = Modifier) {
                 if (horizontal) view.finishWheelScrub()
             })
             .onSizeChanged { view.size = it }
-            .pointerInput(view) { timelineGestures(view) { haptic.performHapticFeedback(HapticFeedbackType.LongPress) } }
+            .pointerInput(view) { timelineGestures(view) { if (state.settings.vibration) haptic.performHapticFeedback(HapticFeedbackType.LongPress) } }
             .drawBehind { drawTimeline(view, measurer, eye, eyeOff, outline, mediaPictures, proxies, appear.value) },
     ) {
         HeaderPictures(view) { drawLifted(view, measurer, eye, eyeOff, outline, mediaPictures, appear.value) }
@@ -790,6 +790,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
             slides[layer.id] = Slide(left - shift, now)
         }
         state.edit("reorder") { it.move(id, layers.lastIndex - to) }
+        onTick()
     }
 
     private fun edgeSpeed(y: Float) = RowDrag.edgeSpeed(y, rulerH, rowsBottom, PushZone.px, PUSH_SLOWEST_ROWS * rowH, PUSH_FASTEST_ROWS * rowH)

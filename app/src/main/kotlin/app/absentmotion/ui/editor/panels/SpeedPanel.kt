@@ -35,6 +35,8 @@ import app.absentmotion.model.Layer
 import app.absentmotion.model.VideoTiming
 import app.absentmotion.model.atVideoTime
 import app.absentmotion.ui.editor.PanelIcons
+import app.absentmotion.ui.editor.rememberHaptic
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import app.absentmotion.ui.theme.Am
 import kotlin.math.roundToInt
 
@@ -84,6 +86,7 @@ private val snaps = listOf(250, 500, 750, 1000, 2000, 3000)
 @Composable
 private fun SpeedSlider(speed: Float, state: EditorState, modifier: Modifier) {
     val liveLayer by rememberUpdatedState(state.selected)
+    val haptic = rememberHaptic(state)
     fun coord(value: Int, width: Float, thumb: Float, margin: Float): Float = thumb / 2 +
         (value - 1).coerceAtLeast(0) * (width - thumb - snaps.size * margin) / 3999 +
         snaps.count { it < value } * margin + if (value in snaps) margin / 2 else 0f
@@ -93,6 +96,8 @@ private fun SpeedSlider(speed: Float, state: EditorState, modifier: Modifier) {
             val original = liveLayer ?: return@awaitEachGesture
             val anchor = original.atVideoTime(state.sampleMs, state.scene.fps).t
             val thumb = 24.dp.toPx(); val margin = 20.px.toPx()
+            var detent: Int? = null
+            var moved = false
             fun update(x: Float) {
                 val usable = (size.width - thumb - snaps.size * margin).coerceAtLeast(1f)
                 var value: Int? = null
@@ -102,6 +107,9 @@ private fun SpeedSlider(speed: Float, state: EditorState, modifier: Modifier) {
                     if (x in left..(left + margin)) { value = snap; break }
                     if (x > left + margin) passed++
                 }
+                if (moved && value != null && value != detent) haptic(HapticFeedbackType.SegmentTick)
+                moved = true
+                detent = value
                 val raw = value ?: (((x - thumb / 2 - passed * margin) * 3999 / usable + 1) / 50).roundToInt() * 50
                 state.setVideoSpeed(raw.coerceIn(1, 4000) / 1000f, anchor, original)
             }
