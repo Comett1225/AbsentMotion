@@ -49,6 +49,25 @@ subscription, no account and no advertising, and your projects never leave your 
 - **12 languages.** English, Indonesian, Hindi, Portuguese (Brazil), Spanish, Filipino, Vietnamese, Thai, Malay,
   Arabic, Turkish and Russian, chosen on first start.
 
+## Speed
+
+<p align="center">
+  <img src="docs/speed-comparison.gif" alt="Alight Motion and AbsentMotion side by side with timers: starting the app, opening the same project and exporting it in 4K" width="560">
+</p>
+
+Measured on a Samsung Galaxy S26 Ultra (Android 17) with the same project in both apps, imported from Alight Motion's
+XML export. Median of three runs, phone below 35 °C before each run.
+
+| | Alight Motion 5.0.273 | AbsentMotion 3.0.0 |
+|---|---|---|
+| Start the app, until the home screen is drawn | 1.94 s | 0.36 s |
+| Open a project, until the first preview frame | 0.39 s | 0.27 s |
+| Export 4K (2160 x 3840) 30 fps H.264 at the highest quality: video, text, shapes, keyframes | 5.04 s | 4.35 s |
+| The same with blur and glow on two layers | 17.28 s | 6.70 s |
+
+Alight Motion draws blur and glow differently (heavier) than AbsentMotion, so the last row is not the same work; the row
+above it is the like-for-like export. The GIF shows that run, with the export part at double speed.
+
 ## Requirements
 
 Android 14 (API level 34) or newer (tested on Android 16 and 17), a 64-bit ARM device (`arm64-v8a`), Vulkan 1.2.
