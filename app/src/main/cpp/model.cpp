@@ -69,28 +69,26 @@ void DrawModel(SkCanvas* canvas, const Layer& l, double timeMs, float alpha, con
     }
     std::sort(faces.begin(), faces.end(), [](const Face& x, const Face& y) { return x.depth > y.depth; });
 
-    std::map<int, std::pair<float, std::vector<const Face*>>> groups;
-    for (const Face& f : faces) {
-        auto& g = groups[m.slots[f.index]];
-        g.first += f.depth;
-        g.second.push_back(&f);
-    }
-    std::vector<std::pair<float, int>> order;
-    for (auto& [slot, g] : groups) order.push_back({g.first / g.second.size(), slot});
-    std::sort(order.begin(), order.end(), [](auto& x, auto& y) { return x.first > y.first; });
+    std::map<int, sk_sp<SkImage>> images;
+    auto imageOf = [&](const Face& f) {
+        const int slot = m.slots[f.index];
+        auto [at, fresh] = images.try_emplace(slot);
+        if (fresh && slot >= 0) at->second = pictures(l.mediaUri + "#" + std::to_string(slot), 0);
+        return at->second.get();
+    };
 
     canvas->save();
     canvas->resetMatrix();
-    for (const auto& [depth, slot] : order) {
-        const auto& list = groups[slot].second;
-        sk_sp<SkImage> image = slot >= 0 ? pictures(l.mediaUri + "#" + std::to_string(slot), 0) : nullptr;
-        SkVertices::Builder builder(SkVertices::kTriangles_VertexMode, (int)list.size() * 3, 0,
+    for (size_t start = 0, end; start < faces.size(); start = end) {
+        SkImage* const image = imageOf(faces[start]);
+        for (end = start + 1; end < faces.size() && imageOf(faces[end]) == image;) end++;
+        SkVertices::Builder builder(SkVertices::kTriangles_VertexMode, (int)(end - start) * 3, 0,
                                     SkVertices::kHasColors_BuilderFlag | (image ? SkVertices::kHasTexCoords_BuilderFlag : 0));
         SkPoint* positions = builder.positions();
         SkPoint* uvs = builder.texCoords();
         SkColor* colors = builder.colors();
         int out = 0;
-        for (const Face* f : list) {
+        for (auto f = faces.begin() + start; f != faces.begin() + end; ++f) {
             for (int i = 0; i < 3; i++, out++) {
                 const int v = m.triangles[f->index * 3 + i];
                 positions[out] = screen(v);
