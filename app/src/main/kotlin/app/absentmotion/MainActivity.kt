@@ -222,7 +222,18 @@ class MainActivity : ComponentActivity() {
             }
             failure?.let { Toast.makeText(this@MainActivity, getString(R.string.home_import_failed, it), Toast.LENGTH_LONG).show() }
             if (reports.isNotEmpty()) imported = reports
+            var drawn = false
+            for (report in reports) if (!report.template) {
+                val scene = withContext(Dispatchers.IO) { store.load(report.id) } ?: continue
+                drawn = saveThumbnail(scene, scene.totalTime / 2, report.id) || drawn
+            }
+            if (drawn) projectsChanged++
         }
+    }
+
+    private suspend fun saveThumbnail(scene: Scene, timeMs: Int, id: String): Boolean {
+        val longSide = maxOf(scene.width, scene.height, 1)
+        return engine.stillPng(scene.toXml(), timeMs, (256 * scene.width / longSide).coerceAtLeast(1), (256 * scene.height / longSide).coerceAtLeast(1), store.thumbnailFile(id))
     }
 
     private fun endEmbed(state: EditorState) {
@@ -384,8 +395,7 @@ class MainActivity : ComponentActivity() {
             closing.saver.snapshot(scene.toXml())
             engine.audio?.release()
             try {
-                val longSide = maxOf(scene.width, scene.height, 1)
-                engine.stillPng(scene.toXml(), closing.timeMs, (256 * scene.width / longSide).coerceAtLeast(1), (256 * scene.height / longSide).coerceAtLeast(1), store.thumbnailFile(closing.projectId))
+                saveThumbnail(scene, closing.timeMs, closing.projectId)
             } finally {
                 MultiSelect.clear()
                 editor = null
