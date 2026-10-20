@@ -1791,5 +1791,36 @@
    "color": "#ffffffff",
    "blendMode": 2
   }
+ },
+ "com.alightcreative.glow": {
+  "to": "glow",
+  "params": {
+   "radius": {
+    "to": "radius",
+    "min": 0,
+    "max": 400
+   },
+   "alpha": {
+    "to": "alpha",
+    "min": 0,
+    "max": 1
+   },
+   "hardness": {
+    "to": "hardness",
+    "min": 0,
+    "max": 1
+   },
+   "color": {
+    "to": "color"
+   },
+   "blendMode": {
+    "to": "blendMode",
+    "values": {
+     "0": 0,
+     "1": 1,
+     "2": 2
+    }
+   }
+  }
  }
 }

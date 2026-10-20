@@ -23,6 +23,21 @@ class GlowMigrationTest {
 
     private fun XmlNode.value(name: String) = children.single { it["name"] == name }["value"]!!
 
+    @Test fun alightGlowImportsWithItsSettings() {
+        val result = migration.migrate(scene("""<effect id="com.alightcreative.glow" locallyApplied="true">
+            <property name="radius" type="float" value="120.000000" /><property name="alpha" type="float" value="0.600000" />
+            <property name="hardness" type="float" value="0.300000" /><property name="color" type="color" value="#ff40ff80" />
+            <property name="blendMode" type="int" value="1" /></effect>"""))
+        val g = glow(result.scene)
+        assertEquals("absent.glow", g["id"])
+        assertEquals(120f, g.value("radius").toFloat(), 1e-4f)
+        assertEquals(0.6f, g.value("alpha").toFloat(), 1e-4f)
+        assertEquals(0.3f, g.value("hardness").toFloat(), 1e-4f)
+        assertEquals("#ff40ff80", g.value("color"))
+        assertEquals(1f, g.value("blendMode").toFloat(), 1e-4f)
+        assertEquals(emptySet<String>(), result.dropped)
+    }
+
     @Test fun aGlowSavedBy300BecomesTheNewGlow() {
         val result = migration.migrate(scene("""<effect id="absent.glow" hidden="false">
             <property name="strength" type="float" value="20" /><property name="intensity" type="float" value="1.5" /></effect>"""))
