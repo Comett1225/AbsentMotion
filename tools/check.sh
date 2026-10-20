@@ -17,6 +17,9 @@ python3 tools/gen_licenses.py --check >"$log" 2>&1 || { cat "$log" >&2; fail "ap
 step "Built-in fonts and catalogue up to date"
 python3 tools/gen_fonts.py --check >"$log" 2>&1 || { cat "$log" >&2; fail "the built-in fonts or the font catalogue are out of date: see tools/gen_fonts.py"; }
 
+step "3D effects up to date"
+python3 tools/gen_3d_effects.py --check >"$log" 2>&1 || { cat "$log" >&2; fail "the 3D effects are out of date: run python3 tools/gen_3d_effects.py"; }
+
 step "Android: unit tests"
 ./gradlew :app:testPlayDebugUnitTest :app:testFossDebugUnitTest -q >"$log" 2>&1 || { grep -E 'FAILED|Test.*>' "$log" | head -40 >&2; fail "Android unit tests"; }
 

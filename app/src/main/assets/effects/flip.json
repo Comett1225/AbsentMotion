@@ -1,0 +1,112 @@
+{
+ "id": "flip",
+ "name": "Flip Layer",
+ "category": "3d",
+ "since": "3.0.0",
+ "description": "Turns the layer like a card in 3D, with its back see-through, a picture or a colour.",
+ "params": [
+  {
+   "id": "rotX",
+   "label": "Rotation X",
+   "type": "angle",
+   "default": 0,
+   "min": -3600,
+   "max": 3600,
+   "step": 0.1
+  },
+  {
+   "id": "rotY",
+   "label": "Rotation Y",
+   "type": "angle",
+   "default": 35,
+   "min": -3600,
+   "max": 3600,
+   "step": 0.1
+  },
+  {
+   "id": "rotZ",
+   "label": "Rotation Z",
+   "type": "angle",
+   "default": 0,
+   "min": -3600,
+   "max": 3600,
+   "step": 0.1
+  },
+  {
+   "id": "back",
+   "label": "Back",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "See-through",
+    "Picture",
+    "Color"
+   ]
+  },
+  {
+   "id": "backColor",
+   "label": "Back Color",
+   "type": "color",
+   "default": "#ffffffff"
+  },
+  {
+   "id": "position",
+   "label": "Position",
+   "type": "point",
+   "default": [
+    0,
+    0
+   ],
+   "min": -5000,
+   "max": 5000,
+   "step": 1,
+   "pixels": true
+  },
+  {
+   "id": "scale",
+   "label": "Scale",
+   "type": "float",
+   "default": 1,
+   "min": 0.05,
+   "max": 10,
+   "step": 0.01
+  },
+  {
+   "id": "perspective",
+   "label": "Perspective",
+   "type": "float",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  },
+  {
+   "id": "shading",
+   "label": "Shading",
+   "type": "float",
+   "default": 0.6,
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  },
+  {
+   "id": "light",
+   "label": "Light Angle",
+   "type": "angle",
+   "default": 135,
+   "min": -3600,
+   "max": 3600,
+   "step": 0.1
+  },
+  {
+   "id": "shine",
+   "label": "Shine",
+   "type": "float",
+   "default": 0.3,
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float rotX;\nuniform float rotY;\nuniform float rotZ;\nuniform float back;\nlayout(color) uniform half4 backColor;\nuniform float2 position;\nuniform float scale;\nuniform float perspective;\nuniform float shading;\nuniform float light;\nuniform float shine;\n\nconst float PI = 3.14159265;\n\nfloat3x3 turn() {\n    float3 a = radians(float3(rotX, rotY, rotZ));\n    float cx = cos(a.x), sx = sin(a.x), cy = cos(a.y), sy = sin(a.y), cz = cos(a.z), sz = sin(a.z);\n    return float3x3(cz, -sz, 0.0, sz, cz, 0.0, 0.0, 0.0, 1.0) * float3x3(cy, 0.0, sy, 0.0, 1.0, 0.0, -sy, 0.0, cy) *\n        float3x3(1.0, 0.0, 0.0, 0.0, cx, -sx, 0.0, sx, cx);\n}\n\nfloat4 pic(float2 uv) {\n    return float4(image.eval(clamp(uv * size, float2(0.5), max(size - 0.5, float2(0.5)))));\n}\n\nfloat2 cover(float2 uv, float2 face) {\n    float r = (face.x / max(face.y, 0.0001)) / (size.x / max(size.y, 0.0001));\n    return (uv - 0.5) * (r > 1.0 ? float2(1.0, 1.0 / r) : float2(r, 1.0)) + 0.5;\n}\n\nfloat4 shade(float4 c, float3 n, float3 v) {\n    float a = radians(light);\n    float3 l = normalize(float3(cos(a), -sin(a), -1.2));\n    float k = 1.0 - shading + shading * (0.3 + 0.85 * max(dot(n, l), 0.0));\n    float s = shine * pow(max(dot(n, normalize(l + v)), 0.0), 40.0);\n    return float4(c.rgb * k + s * c.a, c.a);\n}\n\nhalf4 main(float2 coord) {\n    float side = min(size.x, size.y);\n    float unit = max(side * 0.5 * scale, 0.5);\n    float2 h = size / side;\n    float dist = max(2.0 + 40.0 * pow(1.0 - clamp(perspective, 0.0, 1.0), 3.0), length(h) + 0.5);\n    float3 rw = normalize(float3((coord - size * 0.5 - position) / unit, dist));\n    float3x3 m = turn();\n    float3 ro = float3(0.0, 0.0, -dist) * m;\n    float3 rd = rw * m;\n    if (abs(rd.z) < 0.000001) return half4(0.0);\n    float t = -ro.z / rd.z;\n    if (t <= 0.0) return half4(0.0);\n    float2 p = (ro + rd * t).xy;\n    float px = unit * dist / (t * rw.z);\n    float edge = clamp(min(h.x - abs(p.x), h.y - abs(p.y)) * px + 0.5, 0.0, 1.0);\n    if (edge <= 0.0) return half4(0.0);\n    bool seen = rd.z > 0.0;\n    float2 uv = p / h * 0.5 + 0.5;\n    float4 c = pic(uv);\n    if (!seen && back > 1.5) c = float4(backColor.rgb * backColor.a, backColor.a);\n    else if (!seen && back > 0.5) c = pic(float2(1.0 - uv.x, uv.y));\n    return half4(shade(c, normalize(m * float3(0.0, 0.0, seen ? -1.0 : 1.0)), -rw) * edge);\n}\n"
+}

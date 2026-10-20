@@ -36,6 +36,11 @@ def cases():
     yield 'vivid neutral', engine.scene(engine.rect(1, 100, 100, 100, 100, 0xff808080) + engine.rect(2, 100, 100, 100, 100, 0xff808080, attrs=' blending="vivid-light"')), [((100, 100), (129, 129, 129))]
     neutral = fx('vhs', chroma=0, smear=0, scanlines=0, noise=0, tracking=0, wobble=0, saturation=1, headSwitch=0)
     yield 'vhs at zero leaves the colours', engine.scene(engine.rect(1, 100, 100, 60, 60, 0xff3366cc, extra=neutral)), [((100, 100), (0x33, 0x66, 0xcc)), ((5, 5), engine.BLACK)]
+    still = dict(rotX=0, rotY=0, shading=0, shine=0)
+    yield 'a cube at rest shows the layer on its front', engine.scene(engine.rect(1, 100, 100, 40, 40, 0xffff0000, extra=fx('cube', **still))), [((100, 100), engine.RED), ((5, 5), engine.BLACK), ((100, 160), engine.BLACK)]
+    yield 'a raster extrude at rest shows the layer', engine.scene(engine.rect(1, 100, 100, 40, 40, 0xffff0000, extra=fx('rasterextrude', **still))), [((100, 100), engine.RED), ((5, 5), engine.BLACK)]
+    turned = fx('flip', rotX=0, rotY=180, shading=0, shine=0, back=2).replace('</effect>', '<property name="backColor" type="color" value="#ff0000ff"/></effect>')
+    yield 'a flipped layer shows its back colour', engine.scene(engine.rect(1, 100, 100, 40, 40, 0xffff0000, extra=turned)), [((100, 100), engine.BLUE), ((5, 5), engine.BLACK)]
     title = "a missing picture draws nothing"
     yield 'placeholder opacity', *engine.CASES[title]
 

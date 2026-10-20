@@ -1,0 +1,122 @@
+{
+ "id": "cylinder",
+ "name": "Cylinder",
+ "category": "3d",
+ "since": "3.0.0",
+ "description": "Wraps the layer around a cylinder and onto its round ends.",
+ "params": [
+  {
+   "id": "rotX",
+   "label": "Rotation X",
+   "type": "angle",
+   "default": -20,
+   "min": -3600,
+   "max": 3600,
+   "step": 0.1
+  },
+  {
+   "id": "rotY",
+   "label": "Rotation Y",
+   "type": "angle",
+   "default": -35,
+   "min": -3600,
+   "max": 3600,
+   "step": 0.1
+  },
+  {
+   "id": "rotZ",
+   "label": "Rotation Z",
+   "type": "angle",
+   "default": 0,
+   "min": -3600,
+   "max": 3600,
+   "step": 0.1
+  },
+  {
+   "id": "radius",
+   "label": "Radius",
+   "type": "float",
+   "default": 0.6,
+   "min": 0.02,
+   "max": 5,
+   "step": 0.01
+  },
+  {
+   "id": "height",
+   "label": "Height",
+   "type": "float",
+   "default": 0.85,
+   "min": 0.02,
+   "max": 5,
+   "step": 0.01
+  },
+  {
+   "id": "smoothing",
+   "label": "Smoothing",
+   "type": "float",
+   "default": 0.15,
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  },
+  {
+   "id": "position",
+   "label": "Position",
+   "type": "point",
+   "default": [
+    0,
+    0
+   ],
+   "min": -5000,
+   "max": 5000,
+   "step": 1,
+   "pixels": true
+  },
+  {
+   "id": "scale",
+   "label": "Scale",
+   "type": "float",
+   "default": 1,
+   "min": 0.05,
+   "max": 10,
+   "step": 0.01
+  },
+  {
+   "id": "perspective",
+   "label": "Perspective",
+   "type": "float",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  },
+  {
+   "id": "shading",
+   "label": "Shading",
+   "type": "float",
+   "default": 0.6,
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  },
+  {
+   "id": "light",
+   "label": "Light Angle",
+   "type": "angle",
+   "default": 135,
+   "min": -3600,
+   "max": 3600,
+   "step": 0.1
+  },
+  {
+   "id": "shine",
+   "label": "Shine",
+   "type": "float",
+   "default": 0.3,
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float rotX;\nuniform float rotY;\nuniform float rotZ;\nuniform float radius;\nuniform float height;\nuniform float smoothing;\nuniform float2 position;\nuniform float scale;\nuniform float perspective;\nuniform float shading;\nuniform float light;\nuniform float shine;\n\nconst float PI = 3.14159265;\n\nfloat3x3 turn() {\n    float3 a = radians(float3(rotX, rotY, rotZ));\n    float cx = cos(a.x), sx = sin(a.x), cy = cos(a.y), sy = sin(a.y), cz = cos(a.z), sz = sin(a.z);\n    return float3x3(cz, -sz, 0.0, sz, cz, 0.0, 0.0, 0.0, 1.0) * float3x3(cy, 0.0, sy, 0.0, 1.0, 0.0, -sy, 0.0, cy) *\n        float3x3(1.0, 0.0, 0.0, 0.0, cx, -sx, 0.0, sx, cx);\n}\n\nfloat4 pic(float2 uv) {\n    return float4(image.eval(clamp(uv * size, float2(0.5), max(size - 0.5, float2(0.5)))));\n}\n\nfloat2 cover(float2 uv, float2 face) {\n    float r = (face.x / max(face.y, 0.0001)) / (size.x / max(size.y, 0.0001));\n    return (uv - 0.5) * (r > 1.0 ? float2(1.0, 1.0 / r) : float2(r, 1.0)) + 0.5;\n}\n\nfloat4 shade(float4 c, float3 n, float3 v) {\n    float a = radians(light);\n    float3 l = normalize(float3(cos(a), -sin(a), -1.2));\n    float k = 1.0 - shading + shading * (0.3 + 0.85 * max(dot(n, l), 0.0));\n    float s = shine * pow(max(dot(n, normalize(l + v)), 0.0), 40.0);\n    return float4(c.rgb * k + s * c.a, c.a);\n}\n\nfloat sdBox(float3 p, float3 h) {\n    float3 q = abs(p) - h;\n    return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);\n}\n\nfloat sdRoundBox(float3 p, float3 h, float r) {\n    return sdBox(p, h - r) - r;\n}\n\nfloat extrude(float d, float z, float h, float r) {\n    float2 w = float2(d + r, abs(z) - h + r);\n    return min(max(w.x, w.y), 0.0) + length(max(w, 0.0)) - r;\n}\n\nfloat4 boxFace(float3 p, float3 n, float3 h) {\n    float3 a = abs(n);\n    float2 uv;\n    float2 face;\n    if (a.z >= a.x && a.z >= a.y) {\n        uv = float2(n.z < 0.0 ? p.x : -p.x, p.y) / h.xy;\n        face = h.xy;\n    } else if (a.x >= a.y) {\n        uv = float2(n.x > 0.0 ? p.z : -p.z, p.y) / h.zy;\n        face = h.zy;\n    } else {\n        uv = float2(p.x, n.y < 0.0 ? -p.z : p.z) / h.xz;\n        face = h.xz;\n    }\n    return pic(cover(uv * 0.5 + 0.5, face));\n}\n\nfloat4 front(float3 p, float3 n, float r) {\n    return pic(cover(float2(n.z > 0.0 ? -p.x : p.x, p.y) / r * 0.5 + 0.5, float2(1.0)));\n}\n\nfloat4 facet(float3 p, float3 n, float r) {\n    float3 f = normalize(sign(n));\n    float3 u = normalize(float3(-f.z, 0.0, f.x));\n    return pic(cover(float2(dot(p, u), dot(p, cross(u, f))) / r * 0.5 + 0.5, float2(1.0)));\n}\n\nfloat bound() { return length(float2(radius, height)); }\nfloat map(float3 p) {\n    float r = smoothing * min(radius, height) * 0.5;\n    float2 d = float2(length(p.xz) - radius + r, abs(p.y) - height + r);\n    return min(max(d.x, d.y), 0.0) + length(max(d, 0.0)) - r;\n}\nfloat4 surface(float3 p, float3 n) {\n    if (abs(n.y) > 0.7) return pic(cover(float2(p.x, n.y < 0.0 ? -p.z : p.z) / radius * 0.5 + 0.5, float2(1.0)));\n    return pic(float2(atan(p.x, -p.z) / (2.0 * PI) + 0.5, p.y / height * 0.5 + 0.5));\n}\n\nfloat3 normal(float3 p, float e) {\n    float2 k = float2(1.0, -1.0);\n    return normalize(k.xyy * map(p + k.xyy * e) + k.yyx * map(p + k.yyx * e) + k.yxy * map(p + k.yxy * e) + k.xxx * map(p + k.xxx * e));\n}\n\nfloat4 paint(float3 p, float3 n, float3x3 m, float3 rw) {\n    return shade(surface(p, n), normalize(m * n), -rw);\n}\n\nhalf4 main(float2 coord) {\n    float unit = max(min(size.x, size.y) * 0.5 * scale, 0.5);\n    float rb = bound();\n    float dist = max(2.0 + 40.0 * pow(1.0 - clamp(perspective, 0.0, 1.0), 3.0), rb + 0.5);\n    float3 rw = normalize(float3((coord - size * 0.5 - position) / unit, dist));\n    float3 ow = float3(0.0, 0.0, -dist);\n    float reach = rb + 2.0 * dist / (unit * max(dist - rb, 0.1));\n    float b = dot(ow, rw);\n    float disc = b * b - dot(ow, ow) + reach * reach;\n    if (disc <= 0.0) return half4(0.0);\n    float3x3 m = turn();\n    float3 ro = ow * m;\n    float3 rd = rw * m;\n    float far = -b + sqrt(disc);\n    float t = max(-b - sqrt(disc), 0.0);\n    float px = unit * dist / rw.z;\n    float best = 1e9;\n    float tb = t;\n    bool hit = false;\n    for (int i = 0; i < 96; i++) {\n        float h = map(ro + rd * t);\n        float g = h * px / t;\n        if (g < best) { best = g; tb = t; }\n        if (g < 0.2) { hit = true; break; }\n        t += h * 0.9;\n        if (t > far) break;\n    }\n    if (!hit && best >= 1.0) return half4(0.0);\n    if (!hit) t = tb;\n    float e = max(0.5 * t / px, 0.0005);\n    float3 p = ro + rd * t;\n    float3 n = normal(p, e);\n    if (!hit) p -= n * map(p);\n    float4 c = paint(p, n, m, rw);\n    if (hit && c.a < 0.996) {\n        float s = far;\n        bool back = false;\n        for (int i = 0; i < 64; i++) {\n            float h = map(ro + rd * s);\n            if (h * px / s < 0.2) { back = true; break; }\n            s -= h * 0.9;\n            if (s < t) break;\n        }\n        if (back) {\n            float3 q = ro + rd * s;\n            c += paint(q, -normal(q, e), m, rw) * (1.0 - c.a);\n        }\n    }\n    return half4(hit ? c : c * (1.0 - best));\n}\n"
+}

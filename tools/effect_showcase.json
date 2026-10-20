@@ -78,6 +78,23 @@
     "echo": {"photo": "colour", "layout": "move", "keys": [[-100, 0], [100, 0], [-100, 0]], "params": {"seconds": 0.25, "count": 3, "alpha": 0.3}, "animate": 16},
     "shutterblur": {"photo": "colour", "layout": "move", "keys": [[-100, 0], [100, 0], [-100, 0]], "params": {"shutter": 360, "samples": 16}, "animate": 16},
     "timequant": {"photo": "colour", "layout": "move", "keys": [[-100, 0], [100, 0], [-100, 0]], "params": {"fps": 4}, "animate": 16},
-    "vhs": {"photo": "portrait", "params": {"tracking": 1, "noise": 0.5}, "animate": 16}
+    "vhs": {"photo": "portrait", "params": {"tracking": 1, "noise": 0.5}, "animate": 16},
+    "cube": {"photo": "colour", "under": "grid", "params": {"rotY": [-35, 325], "scale": 0.75}, "animate": 16},
+    "box": {"photo": "colour", "under": "grid", "params": {"rotY": [-35, 325], "scale": 0.75}, "animate": 16},
+    "hollowbox": {"photo": "colour", "under": "grid", "params": {"rotY": [-35, 325], "scale": 0.75}, "animate": 16},
+    "cylinder": {"photo": "colour", "under": "grid", "params": {"rotY": [-35, 325], "scale": 0.75}, "animate": 16},
+    "ellipsoid": {"photo": "colour", "under": "grid", "params": {"rotY": [0, 360], "scale": 0.75}, "animate": 16},
+    "torus": {"photo": "colour", "under": "grid", "params": {"rotY": [-20, 340], "scale": 0.75}, "animate": 16},
+    "pyramid": {"photo": "colour", "under": "grid", "params": {"rotY": [-35, 325], "scale": 0.75}, "animate": 16},
+    "octahedron": {"photo": "colour", "under": "grid", "params": {"rotY": [-35, 325], "scale": 0.75}, "animate": 16},
+    "hexprism": {"photo": "colour", "under": "grid", "params": {"rotY": [-35, 325], "scale": 0.75}, "animate": 16},
+    "starprism": {"photo": "colour", "under": "grid", "params": {"rotY": [-35, 325], "scale": 0.75}, "animate": 16},
+    "starpolyhedron": {"photo": "colour", "under": "grid", "params": {"rotY": [-35, 325], "scale": 0.75}, "animate": 16},
+    "heart": {"photo": "colour", "under": "grid", "params": {"rotY": [-30, 330], "scale": 0.75}, "animate": 16},
+    "cross": {"photo": "colour", "under": "grid", "params": {"rotY": [-35, 325], "scale": 0.75}, "animate": 16},
+    "rasterextrude": {"photo": "colour", "under": "grid", "params": {"rotY": [-35, 325], "scale": 0.7}, "animate": 16},
+    "flip": {"photo": "colour", "under": "grid", "params": {"rotY": [0, 360], "scale": 0.75}, "animate": 16},
+    "spherize": {"photo": "colour", "under": "grid", "params": {"rotY": [0, 360], "scale": 0.75}, "animate": 16},
+    "tunnel": {"photo": "colour", "params": {"speed": 1.5}, "animate": 16}
   }
 }

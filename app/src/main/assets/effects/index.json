@@ -66,5 +66,22 @@
  "echo",
  "timequant",
  "shutterblur",
- "vhs"
+ "vhs",
+ "cube",
+ "box",
+ "hollowbox",
+ "cylinder",
+ "ellipsoid",
+ "torus",
+ "pyramid",
+ "octahedron",
+ "hexprism",
+ "starprism",
+ "starpolyhedron",
+ "heart",
+ "cross",
+ "rasterextrude",
+ "flip",
+ "spherize",
+ "tunnel"
 ]
