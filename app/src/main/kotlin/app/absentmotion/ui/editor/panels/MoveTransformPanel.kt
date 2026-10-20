@@ -80,13 +80,14 @@ private fun PositionTab(state: EditorState, layer: Layer) {
         val fields = listOf(KeypadField("X", at[0]), KeypadField("Y", at[1]), KeypadField("Z", at[2]))
         state.keypad = KeypadRequest(fields, active) { v -> state.editSelected { it.withTransform("location", v[0], v[1], v[2]) } }
     }
-    val others by produceState(emptyList<SnapOther>(), layer.id, state.scene.layers, state.timeMs) {
+    val others by produceState(emptyList<SnapOther>(), layer.id, state.scene.layers, state.timeMs, state.playing) {
+        if (state.playing) return@produceState
         value = state.scene.layers.filter { it.id != layer.id && it.kind != "audio" && it.activeAt(state.sampleMs) }.map { o ->
             val at = o.at(state.sampleMs, state.scene.fps).location
             SnapOther(at[0], at[1], state.engine.layerBounds(o.id, state.timeMs))
         }
     }
-    val box by produceState<FloatArray?>(null, layer.node, state.timeMs) { value = state.engine.layerBounds(layer.id, state.timeMs) }
+    val box by produceState<FloatArray?>(null, layer.node, state.timeMs, state.playing) { if (!state.playing) value = state.engine.layerBounds(layer.id, state.timeMs) }
     val start by rememberUpdatedState { snapAxes(state.scene.width.toFloat(), state.scene.height.toFloat(), layer.location, box, others) }
     val now by rememberUpdatedState(layer)
     val tick = rememberHaptic(state)
