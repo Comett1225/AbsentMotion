@@ -1088,4 +1088,8 @@
     <string name="ai_video_mask_name">mask ng %1$s</string>
     <string name="ai_video_cut_out_name">cut out ng %1$s</string>
     <string name="model_layer_element">Elemento</string>
+    <string name="edit_panel_model_options">Mga opsyon ng modelo</string>
+    <string name="menu_reset_3d_rotation">I-reset ang 3D rotation</string>
+    <string name="structure_3d_model">3D na modelo</string>
+    <string name="layer_tool_model_options">Mga opsyon ng modelo</string>
 </resources>

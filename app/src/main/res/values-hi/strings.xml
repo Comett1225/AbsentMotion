@@ -1088,4 +1088,8 @@
     <string name="ai_video_mask_name">%1$s मास्क</string>
     <string name="ai_video_cut_out_name">%1$s कट आउट</string>
     <string name="model_layer_element">एलिमेंट</string>
+    <string name="edit_panel_model_options">मॉडल विकल्प</string>
+    <string name="menu_reset_3d_rotation">3D रोटेशन रीसेट करें</string>
+    <string name="structure_3d_model">3D मॉडल</string>
+    <string name="layer_tool_model_options">मॉडल विकल्प</string>
 </resources>

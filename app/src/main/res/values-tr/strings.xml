@@ -1088,4 +1088,8 @@
     <string name="ai_video_mask_name">%1$s maskesi</string>
     <string name="ai_video_cut_out_name">%1$s kesimi</string>
     <string name="model_layer_element">Öğe</string>
+    <string name="edit_panel_model_options">Model seçenekleri</string>
+    <string name="menu_reset_3d_rotation">3D döndürmeyi sıfırla</string>
+    <string name="structure_3d_model">3D model</string>
+    <string name="layer_tool_model_options">Model seçenekleri</string>
 </resources>

@@ -13,20 +13,29 @@
  },
  "effects": {
   "autoshake": {
-   "description": "Katmanı rastgele sarsar, biraz hareket ettirip döndürür.",
+   "description": "Katmanı belirlenen sınırlar içinde zamanla rastgele hareket ettirir.",
    "name": "Otomatik Sarsıntı",
    "params": {
+    "angle": {
+     "label": "Açı"
+    },
+    "evolution": {
+     "label": "Evrim"
+    },
     "frequency": {
      "label": "Frekans"
     },
     "magnitude": {
      "label": "Şiddet"
     },
-    "rotation": {
-     "label": "Dönüş"
-    },
     "seed": {
      "label": "Tohum"
+    },
+    "slack": {
+     "label": "Gevşeklik"
+    },
+    "zshake": {
+     "label": "Z sarsıntısı"
     }
    }
   },
@@ -48,12 +57,114 @@
     }
    }
   },
+  "blockdissolve": {
+   "description": "Katmandan ızgaraya hizalı rastgele blokları kaldırır. Giderek daha fazla blok yok etmek için Güç değerini canlandırın.",
+   "name": "Blok çözünme",
+   "params": {
+    "blockSize": {
+     "label": "Boyut"
+    },
+    "fade": {
+     "label": "Solma"
+    },
+    "offset": {
+     "label": "Ofset"
+    },
+    "seed": {
+     "label": "Tohum"
+    },
+    "strength": {
+     "label": "Güç"
+    },
+    "stretch": {
+     "label": "Esnetme"
+    }
+   }
+  },
+  "blocknoise": {
+   "description": "Katmanın üzerinde bozuk bir dijital sinyal gibi rastgele gürültü blokları titretir.",
+   "name": "Blok gürültüsü",
+   "params": {
+    "blockSize": {
+     "label": "Boyut"
+    },
+    "extremes": {
+     "label": "Uç değerler"
+    },
+    "freeze": {
+     "label": "Dondur"
+    },
+    "mono": {
+     "label": "Tek renk"
+    },
+    "offset": {
+     "label": "Ofset"
+    },
+    "overshoot": {
+     "label": "Aşma"
+    },
+    "seed": {
+     "label": "Tohum"
+    },
+    "strength": {
+     "label": "Güç"
+    },
+    "stretch": {
+     "label": "Esnetme"
+    }
+   }
+  },
   "blur": {
    "description": "Yumuşak, eşit bir bulanıklık.",
    "name": "Bulanıklaştırma",
    "params": {
     "strength": {
      "label": "Güç"
+    }
+   }
+  },
+  "box": {
+   "description": "Katmanı, genişliğini, yüksekliğini ve derinliğini seçtiğiniz bir kutunun üzerine sarar.",
+   "name": "Kutu",
+   "params": {
+    "depth": {
+     "label": "Derinlik"
+    },
+    "height": {
+     "label": "Yükseklik"
+    },
+    "light": {
+     "label": "Işık açısı"
+    },
+    "perspective": {
+     "label": "Perspektif"
+    },
+    "position": {
+     "label": "Konum"
+    },
+    "rotX": {
+     "label": "X döndürme"
+    },
+    "rotY": {
+     "label": "Y döndürme"
+    },
+    "rotZ": {
+     "label": "Z döndürme"
+    },
+    "scale": {
+     "label": "Ölçek"
+    },
+    "shading": {
+     "label": "Gölgeleme"
+    },
+    "shine": {
+     "label": "Parlama"
+    },
+    "smoothing": {
+     "label": "Yumuşatma"
+    },
+    "width": {
+     "label": "Genişlik"
     }
    }
   },
@@ -84,6 +195,159 @@
     }
    }
   },
+  "bumpmap": {
+   "description": "Katmanı, parlaklığı yükseltilmiş bir yüzeymiş gibi aydınlatarak renkleri koruyan kabartmalı, dokulu bir görünüm verir.",
+   "name": "Kabartma haritası",
+   "params": {
+    "ambient": {
+     "label": "Ortam"
+    },
+    "angle": {
+     "label": "Işık açısı"
+    },
+    "height": {
+     "label": "Yükseklik"
+    },
+    "light": {
+     "label": "Işık rengi"
+    },
+    "shine": {
+     "label": "Parlama"
+    }
+   }
+  },
+  "channelremap": {
+   "description": "Her renk kanalını katmanın başka bir kanalından yeniden oluşturur; yanlış renkler elde etmek veya parlaklığı alfaya taşımak için.",
+   "name": "Kanal yeniden eşleme (RGB)",
+   "params": {
+    "a": {
+     "label": "A",
+     "options": [
+      "Kırmızı",
+      "Yeşil",
+      "Mavi",
+      "Alfa",
+      "Parlaklık",
+      "Sıfır",
+      "Tam"
+     ]
+    },
+    "b": {
+     "label": "B",
+     "options": [
+      "Kırmızı",
+      "Yeşil",
+      "Mavi",
+      "Alfa",
+      "Parlaklık",
+      "Sıfır",
+      "Tam"
+     ]
+    },
+    "g": {
+     "label": "G",
+     "options": [
+      "Kırmızı",
+      "Yeşil",
+      "Mavi",
+      "Alfa",
+      "Parlaklık",
+      "Sıfır",
+      "Tam"
+     ]
+    },
+    "r": {
+     "label": "R",
+     "options": [
+      "Kırmızı",
+      "Yeşil",
+      "Mavi",
+      "Alfa",
+      "Parlaklık",
+      "Sıfır",
+      "Tam"
+     ]
+    }
+   }
+  },
+  "channelremaphsv": {
+   "description": "Ton, doygunluk, değer ve alfayı katmanın diğer kanallarından yeniden oluşturur.",
+   "name": "Kanal Yeniden Eşleme (HSV)",
+   "params": {
+    "a": {
+     "label": "A",
+     "options": [
+      "Ton",
+      "Doygunluk",
+      "Değer",
+      "Alfa",
+      "Parlaklık",
+      "Sıfır",
+      "Tam"
+     ]
+    },
+    "h": {
+     "label": "H",
+     "options": [
+      "Ton",
+      "Doygunluk",
+      "Değer",
+      "Alfa",
+      "Parlaklık",
+      "Sıfır",
+      "Tam"
+     ]
+    },
+    "s": {
+     "label": "S",
+     "options": [
+      "Ton",
+      "Doygunluk",
+      "Değer",
+      "Alfa",
+      "Parlaklık",
+      "Sıfır",
+      "Tam"
+     ]
+    },
+    "v": {
+     "label": "V",
+     "options": [
+      "Ton",
+      "Doygunluk",
+      "Değer",
+      "Alfa",
+      "Parlaklık",
+      "Sıfır",
+      "Tam"
+     ]
+    }
+   }
+  },
+  "checker": {
+   "description": "Katmanın opak kısımlarının üzerine dama deseni çizer veya damaları bu kısımlardan oyar.",
+   "name": "Dama",
+   "params": {
+    "angle": {
+     "label": "Açı"
+    },
+    "color": {
+     "label": "Renk"
+    },
+    "count": {
+     "label": "Adet"
+    },
+    "offset": {
+     "label": "Ofset"
+    },
+    "punch": {
+     "label": "Delme"
+    },
+    "stretch": {
+     "label": "Uzat"
+    }
+   }
+  },
   "chromakey": {
    "description": "Yeşil perde gibi bir rengi kaldırır.",
    "name": "Kroma Anahtarı",
@@ -96,6 +360,84 @@
     },
     "tolerance": {
      "label": "Tolerans"
+    }
+   }
+  },
+  "circularripple": {
+   "description": "Suya düşen bir damla gibi bir noktadan dairesel dalgaların yayılmasını sağlar.",
+   "name": "Dairesel Dalga",
+   "params": {
+    "center": {
+     "label": "Merkez"
+    },
+    "feather": {
+     "label": "Kenar yumuşatma"
+    },
+    "frequency": {
+     "label": "Frekans"
+    },
+    "phase": {
+     "label": "Faz"
+    },
+    "radius": {
+     "label": "Yarıçap"
+    },
+    "strength": {
+     "label": "Güç"
+    }
+   }
+  },
+  "clouds": {
+   "description": "Katmanın opak kısımlarını yumuşak bir bulut deseniyle kaplar; gürültü kaynağı olarak da kullanışlıdır.",
+   "name": "Bulutlar",
+   "params": {
+    "color1": {
+     "label": "Renk 1"
+    },
+    "color2": {
+     "label": "Renk 2"
+    },
+    "intensity": {
+     "label": "Yoğunluk"
+    },
+    "octaves": {
+     "label": "Oktav"
+    },
+    "offset": {
+     "label": "Ofset"
+    },
+    "parallax": {
+     "label": "Paralaks"
+    },
+    "scale": {
+     "label": "Ölçek"
+    },
+    "seed": {
+     "label": "Tohum"
+    },
+    "stretch": {
+     "label": "Uzat"
+    }
+   }
+  },
+  "cmykhalftone": {
+   "description": "Katmanı dergi baskısı gibi yeniden çizer: dört döndürülmüş ekranda camgöbeği, eflatun, sarı ve siyah noktalar.",
+   "name": "CMYK Yarım Ton Noktaları",
+   "params": {
+    "amount": {
+     "label": "Miktar"
+    },
+    "angle": {
+     "label": "Açı"
+    },
+    "black": {
+     "label": "Siyah"
+    },
+    "phase": {
+     "label": "Faz"
+    },
+    "strength": {
+     "label": "Güç"
     }
    }
   },
@@ -114,6 +456,18 @@
     },
     "shadows": {
      "label": "Gölgeler"
+    }
+   }
+  },
+  "colorize": {
+   "description": "Katmanın tamamını açık ve koyu tonlarını koruyarak tek bir renk tonuyla renklendirir.",
+   "name": "Renklendir",
+   "params": {
+    "amount": {
+     "label": "Miktar"
+    },
+    "hue": {
+     "label": "Renk tonu"
     }
    }
   },
@@ -147,6 +501,228 @@
     },
     "liftLevel": {
      "label": "Kaldır Seviyesi"
+    }
+   }
+  },
+  "contourgradient": {
+   "description": "Katmanın opak kısımlarının kenarlarından dışa doğru iki renkli bir gradyan çizer; yumuşak renkli bir hale gibi.",
+   "name": "Kontur Gradyanı",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "blur": {
+     "label": "Genişlik"
+    },
+    "color1": {
+     "label": "Renk 1"
+    },
+    "color2": {
+     "label": "Renk 2"
+    },
+    "fade": {
+     "label": "Solma"
+    },
+    "fill": {
+     "label": "Dolgu"
+    }
+   }
+  },
+  "contourlines": {
+   "description": "Katmanın opak kısımlarının çevresine dış hat halkaları çizer; üst üste çıkartma veya neon dış hatlar için.",
+   "name": "Kontur Çizgileri",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "blur": {
+     "label": "Dışa taşma"
+    },
+    "color": {
+     "label": "Renk"
+    },
+    "count": {
+     "label": "Adet"
+    },
+    "fill": {
+     "label": "Dolgu"
+    },
+    "phase": {
+     "label": "Faz"
+    },
+    "width": {
+     "label": "Genişlik"
+    }
+   }
+  },
+  "cross": {
+   "description": "Katmanı ortada kesişen üç çubuğa yerleştirir.",
+   "name": "Üç Eksenli Haç",
+   "params": {
+    "light": {
+     "label": "Işık açısı"
+    },
+    "perspective": {
+     "label": "Perspektif"
+    },
+    "position": {
+     "label": "Konum"
+    },
+    "reach": {
+     "label": "Uzunluk"
+    },
+    "rotX": {
+     "label": "X Dönüşü"
+    },
+    "rotY": {
+     "label": "Y Dönüşü"
+    },
+    "rotZ": {
+     "label": "Z Dönüşü"
+    },
+    "scale": {
+     "label": "Ölçek"
+    },
+    "shading": {
+     "label": "Gölgelendirme"
+    },
+    "shine": {
+     "label": "Parlama"
+    },
+    "smoothing": {
+     "label": "Yumuşatma"
+    },
+    "thickness": {
+     "label": "Kalınlık"
+    }
+   }
+  },
+  "cube": {
+   "description": "Katmanı, yuvarlatılmış kenarlı ve ışıklı dönen bir küpün her yüzüne sarar.",
+   "name": "Küp",
+   "params": {
+    "edge": {
+     "label": "Boyut"
+    },
+    "light": {
+     "label": "Işık açısı"
+    },
+    "perspective": {
+     "label": "Perspektif"
+    },
+    "position": {
+     "label": "Konum"
+    },
+    "rotX": {
+     "label": "X rotasyonu"
+    },
+    "rotY": {
+     "label": "Y rotasyonu"
+    },
+    "rotZ": {
+     "label": "Z rotasyonu"
+    },
+    "scale": {
+     "label": "Ölçek"
+    },
+    "shading": {
+     "label": "Gölgelendirme"
+    },
+    "shine": {
+     "label": "Parlama"
+    },
+    "smoothing": {
+     "label": "Yumuşatma"
+    }
+   }
+  },
+  "cylinder": {
+   "description": "Katmanı bir silindirin etrafına ve yuvarlak uçlarına sarar.",
+   "name": "Silindir",
+   "params": {
+    "height": {
+     "label": "Yükseklik"
+    },
+    "light": {
+     "label": "Işık açısı"
+    },
+    "perspective": {
+     "label": "Perspektif"
+    },
+    "position": {
+     "label": "Konum"
+    },
+    "radius": {
+     "label": "Yarıçap"
+    },
+    "rotX": {
+     "label": "X rotasyonu"
+    },
+    "rotY": {
+     "label": "Y rotasyonu"
+    },
+    "rotZ": {
+     "label": "Z rotasyonu"
+    },
+    "scale": {
+     "label": "Ölçek"
+    },
+    "shading": {
+     "label": "Gölgelendirme"
+    },
+    "shine": {
+     "label": "Parlama"
+    },
+    "smoothing": {
+     "label": "Yumuşatma"
+    }
+   }
+  },
+  "darkglow": {
+   "description": "Katmanın koyu kısımlarını parlak kısımların üzerine yayar; gölgeden oluşan bir parlama gibi.",
+   "name": "Koyu parlama",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "blend": {
+     "label": "Karışım"
+    },
+    "blur": {
+     "label": "Yayılma"
+    },
+    "color": {
+     "label": "Renk"
+    },
+    "threshold": {
+     "label": "Eşik"
+    }
+   }
+  },
+  "datamosh": {
+   "description": "Başlangıç zamanından itibaren görüntü yenilenmeyi bırakır ve sanki bir anahtar kare eksikmiş gibi ardından gelen hareketle sürüklenir. Video katmanları gerçek hareketleriyle, diğer katmanlar ise hareket eden bloklarla bulanıklaşır.",
+   "name": "Datamosh",
+   "params": {
+    "block": {
+     "label": "Blok boyutu"
+    },
+    "bloom": {
+     "label": "Işıma"
+    },
+    "decay": {
+     "label": "Zayıflama"
+    },
+    "duration": {
+     "label": "Uzunluk"
+    },
+    "glitch": {
+     "label": "Glitch"
+    },
+    "intensity": {
+     "label": "Yoğunluk"
+    },
+    "start": {
+     "label": "Başlangıç"
     }
    }
   },
@@ -186,6 +762,56 @@
     },
     "progress": {
      "label": "İlerleme"
+    }
+   }
+  },
+  "dots": {
+   "description": "Katmanın üzerine rastgele ama düzenli bir yumuşak nokta deseni çizer veya katmanı yalnızca noktalar için maske olarak kullanır.",
+   "name": "Noktalar",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "blend": {
+     "label": "Karışım modu",
+     "options": [
+      "Normal",
+      "Çarpma",
+      "Ekran"
+     ]
+    },
+    "color1": {
+     "label": "Renk 1"
+    },
+    "color2": {
+     "label": "Renk 2"
+    },
+    "density": {
+     "label": "Yoğunluk"
+    },
+    "feather": {
+     "label": "Kenar yumuşatma"
+    },
+    "fill": {
+     "label": "Dolgu"
+    },
+    "offset": {
+     "label": "Ofset"
+    },
+    "phase": {
+     "label": "Faz"
+    },
+    "radius": {
+     "label": "Yarıçap"
+    },
+    "scale": {
+     "label": "Ölçek"
+    },
+    "seed": {
+     "label": "Tohum"
+    },
+    "slack": {
+     "label": "Gevşeklik"
     }
    }
   },
@@ -238,6 +864,72 @@
     }
    }
   },
+  "edgeglow": {
+   "description": "Katmandaki kenarları bulur ve koyulaştırılmış görüntünün üzerinde neon gibi parlamalarını sağlar.",
+   "name": "Kenar parıltısı",
+   "params": {
+    "blend": {
+     "label": "Karışım"
+    },
+    "blur": {
+     "label": "Bulanıklık"
+    },
+    "color": {
+     "label": "Renk"
+    },
+    "invert": {
+     "label": "Ters çevir"
+    },
+    "spread": {
+     "label": "Yayılma"
+    },
+    "threshold": {
+     "label": "Eşik"
+    }
+   }
+  },
+  "ellipsoid": {
+   "description": "Katmanı sıkıştırıp düzleştirebileceğiniz bir kürenin etrafına sarar.",
+   "name": "Elipsoit",
+   "params": {
+    "flatten": {
+     "label": "Düzleştir"
+    },
+    "light": {
+     "label": "Işık açısı"
+    },
+    "perspective": {
+     "label": "Perspektif"
+    },
+    "position": {
+     "label": "Konum"
+    },
+    "radius": {
+     "label": "Yarıçap"
+    },
+    "rotX": {
+     "label": "X dönüşü"
+    },
+    "rotY": {
+     "label": "Y dönüşü"
+    },
+    "rotZ": {
+     "label": "Z dönüşü"
+    },
+    "scale": {
+     "label": "Ölçek"
+    },
+    "shading": {
+     "label": "Gölgeleme"
+    },
+    "shine": {
+     "label": "Parlama"
+    },
+    "squeeze": {
+     "label": "Sıkıştır"
+    }
+   }
+  },
   "emboss": {
    "description": "Belirtilen ışık açısı boyunca parlaklık gradyanlarıyla kabartma efekti uygular.",
    "name": "Kabartma",
@@ -262,6 +954,27 @@
     },
     "stops": {
      "label": "Durak"
+    }
+   }
+  },
+  "fade": {
+   "description": "Katmanı başlangıçta belirlediğiniz süre boyunca içe, sonunda tekrar dışa doğru soldurur.",
+   "name": "İçe/dışa solma",
+   "params": {
+    "fadeIn": {
+     "label": "Giriş"
+    },
+    "fadeOut": {
+     "label": "Çıkış"
+    }
+   }
+  },
+  "feather": {
+   "description": "Katmanın opak kısımlarının kenarlarını dış çizgiye doğru soldurarak yumuşatır.",
+   "name": "Tüylendirme",
+   "params": {
+    "blur": {
+     "label": "Güç"
     }
    }
   },
@@ -295,6 +1008,50 @@
     },
     "speed": {
      "label": "Hız"
+    }
+   }
+  },
+  "flip": {
+   "description": "Katmanı 3D'de bir kart gibi çevirir; arka yüzü saydam, görsel veya renk olabilir.",
+   "name": "Katmanı çevir",
+   "params": {
+    "back": {
+     "label": "Arka",
+     "options": [
+      "Saydam",
+      "Görsel",
+      "Renk"
+     ]
+    },
+    "backColor": {
+     "label": "Arka renk"
+    },
+    "light": {
+     "label": "Işık açısı"
+    },
+    "perspective": {
+     "label": "Perspektif"
+    },
+    "position": {
+     "label": "Konum"
+    },
+    "rotX": {
+     "label": "X dönüşü"
+    },
+    "rotY": {
+     "label": "Y dönüşü"
+    },
+    "rotZ": {
+     "label": "Z dönüşü"
+    },
+    "scale": {
+     "label": "Ölçek"
+    },
+    "shading": {
+     "label": "Gölgeleme"
+    },
+    "shine": {
+     "label": "Parlama"
     }
    }
   },
@@ -351,6 +1108,63 @@
     },
     "softness": {
      "label": "Yumuşaklık"
+    }
+   }
+  },
+  "fractalridges": {
+   "description": "Katmanın opak kısımlarını keskin, çalkantılı fraktal gürültü sırtlarıyla doldurur.",
+   "name": "Fraktal sırtlar",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "color1": {
+     "label": "Renk 1"
+    },
+    "color2": {
+     "label": "Renk 2"
+    },
+    "evolution": {
+     "label": "Evrim"
+    },
+    "intensity": {
+     "label": "Yoğunluk"
+    },
+    "octaves": {
+     "label": "Oktav"
+    },
+    "offset": {
+     "label": "Ofset"
+    },
+    "scale": {
+     "label": "Ölçek"
+    },
+    "seed": {
+     "label": "Tohum"
+    },
+    "stretch": {
+     "label": "Uzat"
+    }
+   }
+  },
+  "fractalwarp": {
+   "description": "Katmanı katlanmış fraktal gürültüyle büker; ateş, su ve ısı titremesi için.",
+   "name": "Fraktal Büküm",
+   "params": {
+    "complexity": {
+     "label": "Karmaşıklık"
+    },
+    "evolution": {
+     "label": "Evrim"
+    },
+    "scale": {
+     "label": "Ölçek"
+    },
+    "seed": {
+     "label": "Tohum"
+    },
+    "strength": {
+     "label": "Güç"
     }
    }
   },
@@ -458,6 +1272,90 @@
     }
    }
   },
+  "grid": {
+   "description": "Katmanın opak kısımlarının üzerine ızgara çizgileri çizer veya bunları katmandan keser.",
+   "name": "Izgara",
+   "params": {
+    "angle": {
+     "label": "Açı"
+    },
+    "color": {
+     "label": "Renk"
+    },
+    "count": {
+     "label": "Adet"
+    },
+    "offset": {
+     "label": "Kaydırma"
+    },
+    "punch": {
+     "label": "Oyuk"
+    },
+    "stretch": {
+     "label": "Uzatma"
+    },
+    "width": {
+     "label": "Genişlik"
+    }
+   }
+  },
+  "gridrepeat": {
+   "description": "Katmanın birden çok kopyasını ızgara düzeninde dinamik olarak oluşturur.",
+   "name": "Izgara Tekrarı",
+   "params": {
+    "count": {
+     "label": "Adet"
+    },
+    "easing": {
+     "label": "Yumuşatma",
+     "options": [
+      "Doğrusal",
+      "Yavaş Giriş",
+      "Yavaş Çıkış",
+      "Yavaş Giriş Çıkış"
+     ]
+    },
+    "fillAmount": {
+     "label": "Dolgu Miktarı"
+    },
+    "fillColor": {
+     "label": "Dolgu Rengi"
+    },
+    "position": {
+     "label": "Konum"
+    },
+    "randomOrder": {
+     "label": "Rastgele Sıra"
+    },
+    "rangeEnd": {
+     "label": "Aralık Sonu"
+    },
+    "rangeOffset": {
+     "label": "Aralık Kaydırması"
+    },
+    "rangeOpacity": {
+     "label": "Aralık Opaklığı"
+    },
+    "rangePosition": {
+     "label": "Aralık Konumu"
+    },
+    "rangeRotation": {
+     "label": "Aralık Döndürmesi"
+    },
+    "rangeScale": {
+     "label": "Aralık Ölçeği"
+    },
+    "rangeStart": {
+     "label": "Aralık Başlangıcı"
+    },
+    "seed": {
+     "label": "Tohum"
+    },
+    "stagger": {
+     "label": "Kademelendirme"
+    }
+   }
+  },
   "halftone": {
    "description": "Görselin koyu olduğu yerlerde büyüyen baskı noktaları.",
    "name": "Yarım Ton",
@@ -473,6 +1371,174 @@
     }
    }
   },
+  "halftonelines": {
+   "description": "Katmanı, koyu alanlarda kalınlaşan ve açık alanlarda incelen basılı çizgiler olarak yeniden çizer.",
+   "name": "Yarım Ton Çizgiler",
+   "params": {
+    "amount": {
+     "label": "Miktar"
+    },
+    "angle": {
+     "label": "Açı"
+    },
+    "color1": {
+     "label": "Renk 1"
+    },
+    "color2": {
+     "label": "Renk 2"
+    },
+    "phase": {
+     "label": "Evre"
+    },
+    "strength": {
+     "label": "Güç"
+    }
+   }
+  },
+  "heart": {
+   "description": "Katmanı şişkin bir kalp şeklinde keser.",
+   "name": "Kalp",
+   "params": {
+    "depth": {
+     "label": "Derinlik"
+    },
+    "heartSize": {
+     "label": "Boyut"
+    },
+    "light": {
+     "label": "Işık açısı"
+    },
+    "perspective": {
+     "label": "Perspektif"
+    },
+    "position": {
+     "label": "Konum"
+    },
+    "rotX": {
+     "label": "X Döndürmesi"
+    },
+    "rotY": {
+     "label": "Y Döndürmesi"
+    },
+    "rotZ": {
+     "label": "Z Döndürmesi"
+    },
+    "scale": {
+     "label": "Ölçek"
+    },
+    "shading": {
+     "label": "Gölgelendirme"
+    },
+    "shine": {
+     "label": "Parlama"
+    },
+    "smoothing": {
+     "label": "Yumuşatma"
+    }
+   }
+  },
+  "hexagontilerotate": {
+   "description": "Katmanı altıgen döşemelere böler ve her döşemenin içindeki görüntüyü ayrı ayrı döndürür.",
+   "name": "Altıgen döşeme döndürme",
+   "params": {
+    "angle": {
+     "label": "Açı"
+    },
+    "count": {
+     "label": "Adet"
+    },
+    "offset": {
+     "label": "Ofset"
+    },
+    "random": {
+     "label": "Rastgeleleştir"
+    },
+    "rotation": {
+     "label": "Döndürme"
+    },
+    "seed": {
+     "label": "Tohum"
+    }
+   }
+  },
+  "hexagontileshift": {
+   "description": "Katmanı altıgen döşemelere böler ve her döşemenin içindeki görüntüyü rastgele bir yöne kaydırır.",
+   "name": "Altıgen döşeme kaydırma",
+   "params": {
+    "angle": {
+     "label": "Açı"
+    },
+    "count": {
+     "label": "Adet"
+    },
+    "offset": {
+     "label": "Ofset"
+    },
+    "seed": {
+     "label": "Tohum"
+    },
+    "strength": {
+     "label": "Güç"
+    }
+   }
+  },
+  "hexagontiling": {
+   "description": "Katmanın ortasını ekranı kaplayan altıgen döşemeler hâlinde tekrarlar.",
+   "name": "Altıgen döşeme",
+   "params": {
+    "angle": {
+     "label": "Açı"
+    },
+    "mirror": {
+     "label": "Ayna"
+    },
+    "scale": {
+     "label": "Ölçek"
+    }
+   }
+  },
+  "hexprism": {
+   "description": "Katmanı altı yüzlü bir prizmanın ön ve arka yüzüne yerleştirir.",
+   "name": "Altıgen prizma",
+   "params": {
+    "depth": {
+     "label": "Derinlik"
+    },
+    "light": {
+     "label": "Işık açısı"
+    },
+    "perspective": {
+     "label": "Perspektif"
+    },
+    "position": {
+     "label": "Konum"
+    },
+    "radius": {
+     "label": "Yarıçap"
+    },
+    "rotX": {
+     "label": "X döndürme"
+    },
+    "rotY": {
+     "label": "Y döndürme"
+    },
+    "rotZ": {
+     "label": "Z döndürme"
+    },
+    "scale": {
+     "label": "Ölçek"
+    },
+    "shading": {
+     "label": "Gölgelendirme"
+    },
+    "shine": {
+     "label": "Parlama"
+    },
+    "smoothing": {
+     "label": "Yumuşatma"
+    }
+   }
+  },
   "highlightshadow": {
    "description": "Bulanık bir yerel parlaklık maskesi kullanarak parlak açık tonları geri kazanır veya güçlendirir, koyu gölgeleri açar ya da derinleştirir.",
    "name": "Açık Tonlar ve Gölgeler",
@@ -482,6 +1548,57 @@
     },
     "shadows": {
      "label": "Gölgeler"
+    }
+   }
+  },
+  "hollowbox": {
+   "description": "Üstü ve altı açık bir kutu: katman dış yüzeyi kaplar, iç kısım iç renkle dolar.",
+   "name": "İçi boş kutu",
+   "params": {
+    "depth": {
+     "label": "Derinlik"
+    },
+    "height": {
+     "label": "Yükseklik"
+    },
+    "interior": {
+     "label": "İç renk"
+    },
+    "light": {
+     "label": "Işık açısı"
+    },
+    "perspective": {
+     "label": "Perspektif"
+    },
+    "position": {
+     "label": "Konum"
+    },
+    "rotX": {
+     "label": "X döndürme"
+    },
+    "rotY": {
+     "label": "Y döndürme"
+    },
+    "rotZ": {
+     "label": "Z döndürme"
+    },
+    "scale": {
+     "label": "Ölçek"
+    },
+    "shading": {
+     "label": "Gölgelendirme"
+    },
+    "shine": {
+     "label": "Parlama"
+    },
+    "smoothing": {
+     "label": "Yumuşatma"
+    },
+    "thickness": {
+     "label": "Kalınlık"
+    },
+    "width": {
+     "label": "Genişlik"
     }
    }
   },
@@ -503,6 +1620,39 @@
     }
    }
   },
+  "innerblur": {
+   "description": "Katmanın dış hattını keskin tutarken içindeki görüntüyü bulanıklaştırır.",
+   "name": "İç bulanıklık",
+   "params": {
+    "blur": {
+     "label": "Güç"
+    }
+   }
+  },
+  "innerbulge": {
+   "description": "Katmanın ortasını dışa şişirir veya içe sıkıştırır; katmanın kenarları yerinde kalır.",
+   "name": "İç sıkıştırma/şişirme",
+   "params": {
+    "strength": {
+     "label": "Güç"
+    }
+   }
+  },
+  "innerglow": {
+   "description": "Katmanın opak kısımlarının iç kenarları boyunca bir ışıma ekler.",
+   "name": "İç Işıma",
+   "params": {
+    "blur": {
+     "label": "Boyut"
+    },
+    "color": {
+     "label": "Renk"
+    },
+    "intensity": {
+     "label": "Yoğunluk"
+    }
+   }
+  },
   "invert": {
    "description": "Görselin renk kanallarını karışım miktarıyla ve isteğe bağlı alfa ters çevirmeyle tersine çevirir.",
    "name": "Ters Çevir",
@@ -512,6 +1662,47 @@
     },
     "invert_alpha": {
      "label": "Alfayı Ters Çevir"
+    }
+   }
+  },
+  "iridescence": {
+   "description": "Katmanın opak kısımlarını, su üstündeki yağ veya sabun köpüğü gibi akan gökkuşağı parıltısıyla kaplar.",
+   "name": "Yanardönerlik",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "blend": {
+     "label": "Karışım modu",
+     "options": [
+      "Normal",
+      "Çarpma",
+      "Ekran",
+      "Kaplama",
+      "Yumuşak ışık",
+      "Sert ışık",
+      "Ekle",
+      "Koyulaştır",
+      "Aydınlat",
+      "Fark",
+      "Renk soldurma",
+      "Renk yakma"
+     ]
+    },
+    "evolution": {
+     "label": "Evrim"
+    },
+    "saturation": {
+     "label": "Doygunluk"
+    },
+    "scale": {
+     "label": "Ölçek"
+    },
+    "seed": {
+     "label": "Tohum"
+    },
+    "shift": {
+     "label": "Ton Kaydırma"
     }
    }
   },
@@ -527,6 +1718,24 @@
     },
     "segments": {
      "label": "Dilimler"
+    }
+   }
+  },
+  "lensblur": {
+   "description": "Merkez çevresinde keskin bir alan bırakan, kenarlara doğru artan dönen bir bulanıklık.",
+   "name": "Lens Bulanıklığı",
+   "params": {
+    "center": {
+     "label": "Merkez"
+    },
+    "feather": {
+     "label": "Kenar yumuşatma"
+    },
+    "radius": {
+     "label": "Yarıçap"
+    },
+    "sweep": {
+     "label": "Açı"
     }
    }
   },
@@ -590,6 +1799,137 @@
     }
    }
   },
+  "lightning": {
+   "description": "Katman üzerindeki iki nokta arasında çatallı bir şimşek çizer.",
+   "name": "Şimşek",
+   "params": {
+    "color": {
+     "label": "Renk"
+    },
+    "evolution": {
+     "label": "Evrim"
+    },
+    "from": {
+     "label": "Başlangıç"
+    },
+    "glow": {
+     "label": "Işıma"
+    },
+    "jag": {
+     "label": "Ayrıntı"
+    },
+    "seed": {
+     "label": "Tohum"
+    },
+    "to": {
+     "label": "Bitiş"
+    },
+    "width": {
+     "label": "Genişlik"
+    }
+   }
+  },
+  "linearrepeat": {
+   "description": "Katmanın birden fazla kopyasını bir çizgi boyunca dinamik olarak oluşturur.",
+   "name": "Doğrusal Tekrar",
+   "params": {
+    "count": {
+     "label": "Adet"
+    },
+    "easing": {
+     "label": "Yumuşatma",
+     "options": [
+      "Doğrusal",
+      "Yumuşak giriş",
+      "Yumuşak çıkış",
+      "Yumuşak giriş çıkış"
+     ]
+    },
+    "fillAmount": {
+     "label": "Dolgu miktarı"
+    },
+    "fillColor": {
+     "label": "Dolgu rengi"
+    },
+    "position": {
+     "label": "Konum"
+    },
+    "randomOrder": {
+     "label": "Rastgele sıra"
+    },
+    "rangeEnd": {
+     "label": "Aralık sonu"
+    },
+    "rangeOffset": {
+     "label": "Aralık kayması"
+    },
+    "rangeOpacity": {
+     "label": "Aralık opaklığı"
+    },
+    "rangePosition": {
+     "label": "Aralık konumu"
+    },
+    "rangeRotation": {
+     "label": "Aralık dönüşü"
+    },
+    "rangeScale": {
+     "label": "Aralık ölçeği"
+    },
+    "rangeStart": {
+     "label": "Aralık başlangıcı"
+    },
+    "seed": {
+     "label": "Tohum"
+    }
+   }
+  },
+  "linearstreaks": {
+   "description": "Katmanın kopyalarını bir açı boyunca kaydırıp üst üste geldikleri yerlerde karıştırarak düz çizgiler oluşturur.",
+   "name": "Doğrusal çizgiler",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "angle": {
+     "label": "Açı"
+    },
+    "bias": {
+     "label": "Eğilim"
+    },
+    "mode": {
+     "label": "Karışım",
+     "options": [
+      "Açıklaştır",
+      "Ortalama",
+      "Koyulaştır"
+     ]
+    },
+    "reach": {
+     "label": "Uzunluk"
+    }
+   }
+  },
+  "longshadow": {
+   "description": "Katmanın opak kısımlarından uzun, paralel gölgeler düşürür.",
+   "name": "Uzun gölge",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "angle": {
+     "label": "Açı"
+    },
+    "color": {
+     "label": "Renk"
+    },
+    "fade": {
+     "label": "Solma"
+    },
+    "reach": {
+     "label": "Uzunluk"
+    }
+   }
+  },
   "lumakey": {
    "description": "Katmanın koyu (veya açık) kısımlarını kaldırır.",
    "name": "Luma Anahtarı",
@@ -605,6 +1945,21 @@
     }
    }
   },
+  "mattechoker": {
+   "description": "Katmanın opak kısımlarını kenarlarından yiyerek daraltır.",
+   "name": "Mat daraltıcı",
+   "params": {
+    "amount": {
+     "label": "Daraltma"
+    },
+    "blur": {
+     "label": "Boyut"
+    },
+    "softness": {
+     "label": "Yumuşaklık"
+    }
+   }
+  },
   "mirror": {
    "description": "Görselin bir yarısını açı ve merkez noktasıyla belirlenen ayna çizgisi boyunca yansıtır.",
    "name": "Ayna",
@@ -617,6 +1972,21 @@
     }
    }
   },
+  "mosaic": {
+   "description": "Katmanı karelere böler ve her birini ortalama rengiyle doldurur.",
+   "name": "Mozaik",
+   "params": {
+    "count": {
+     "label": "Adet"
+    },
+    "offset": {
+     "label": "Kaydırma"
+    },
+    "stretch": {
+     "label": "Esnetme"
+    }
+   }
+  },
   "motionblur": {
    "description": "Katmanı hızlı hareket etmiş gibi tek yönde bulanıklaştırır.",
    "name": "Hareket Bulanıklığı",
@@ -626,6 +1996,27 @@
     },
     "length": {
      "label": "Uzunluk"
+    }
+   }
+  },
+  "movealongpath": {
+   "description": "Katmanı, hemen altındaki katmanın dış çizgisi boyunca kısmen yerleştirir.",
+   "name": "Yol boyunca hareket",
+   "params": {
+    "inset": {
+     "label": "İçe/dışa"
+    },
+    "offset": {
+     "label": "Kaydırma"
+    },
+    "orientation": {
+     "label": "Yön"
+    },
+    "progress": {
+     "label": "İlerleme"
+    },
+    "rotate": {
+     "label": "Otomatik döndür"
     }
    }
   },
@@ -644,12 +2035,71 @@
     }
    }
   },
+  "octahedron": {
+   "description": "Katmanı bir oktahedronun sekiz yüzüne yerleştirir.",
+   "name": "Oktahedron",
+   "params": {
+    "light": {
+     "label": "Işık açısı"
+    },
+    "perspective": {
+     "label": "Perspektif"
+    },
+    "position": {
+     "label": "Konum"
+    },
+    "radius": {
+     "label": "Yarıçap"
+    },
+    "rotX": {
+     "label": "X döndürme"
+    },
+    "rotY": {
+     "label": "Y döndürme"
+    },
+    "rotZ": {
+     "label": "Z döndürme"
+    },
+    "scale": {
+     "label": "Ölçek"
+    },
+    "shading": {
+     "label": "Gölgelendirme"
+    },
+    "shine": {
+     "label": "Parlama"
+    }
+   }
+  },
+  "offset": {
+   "description": "Katmanın görüntüsünü kaydırır ve katman kutusunun kenarlarında başa döndürür.",
+   "name": "Kaydırma",
+   "params": {
+    "feather": {
+     "label": "Yumuşatma"
+    },
+    "mask": {
+     "label": "Katmana maskele"
+    },
+    "offset": {
+     "label": "Kaydırma"
+    }
+   }
+  },
   "oscillate": {
-   "description": "Katmanı bir açı boyunca ileri geri hareket ettirir.",
+   "description": "Katmanı bir açı boyunca, derinlikte veya yörüngede ileri geri hareket ettirir.",
    "name": "Salınım",
    "params": {
     "angle": {
      "label": "Açı"
+    },
+    "direction": {
+     "label": "Yön",
+     "options": [
+      "Açı",
+      "Derinlik",
+      "Yörünge"
+     ]
     },
     "frequency": {
      "label": "Frekans"
@@ -669,12 +2119,55 @@
     }
    }
   },
+  "palettemap": {
+   "description": "Her pikseli küçük bir paletten en yakın renkle yeniden boyar; retro bir görünüm verir.",
+   "name": "Palet eşleme",
+   "params": {
+    "color1": {
+     "label": "Renk 1"
+    },
+    "color2": {
+     "label": "Renk 2"
+    },
+    "color3": {
+     "label": "Renk 3"
+    },
+    "color4": {
+     "label": "Renk 4"
+    },
+    "color5": {
+     "label": "Renk 5"
+    },
+    "colors": {
+     "label": "Renkler"
+    },
+    "dither": {
+     "label": "Titreşim"
+    }
+   }
+  },
   "pixelate": {
    "description": "Alanları sol üstteki pikselin rengindeki kare bloklarla değiştirerek mozaik pikselleştirme uygular.",
    "name": "Pikselleştir",
    "params": {
     "blockSize": {
      "label": "Blok Boyutu"
+    }
+   }
+  },
+  "polar": {
+   "description": "Katmanı merkezi etrafında büker; düz çizgileri dairelere çevirir veya daireleri düz çizgilere açar.",
+   "name": "Kutupsal Koordinatlar",
+   "params": {
+    "amount": {
+     "label": "Ara değer"
+    },
+    "direction": {
+     "label": "Tür",
+     "options": [
+      "Dikdörtgenden kutupsala",
+      "Kutupsaldan dikdörtgene"
+     ]
     }
    }
   },
@@ -688,17 +2181,17 @@
    }
   },
   "pulseopacity": {
-   "description": "Katmanı sürekli olarak söndürüp yeniden belirginleştirir.",
+   "description": "Katmanı sinüs veya üçgen dalgayla sürekli olarak soluklaştırıp geri getirir.",
    "name": "Nabız Opaklığı",
    "params": {
     "frequency": {
      "label": "Frekans"
     },
-    "minimum": {
-     "label": "Minimum"
-    },
     "phase": {
-     "label": "Faz"
+     "label": "Başlangıç evresi"
+    },
+    "strength": {
+     "label": "Güç"
     },
     "wave": {
      "label": "Dalga",
@@ -710,17 +2203,20 @@
    }
   },
   "pulsesize": {
-   "description": "Katmanı sürekli olarak büyütüp küçültür.",
+   "description": "Katmanı sinüs veya üçgen dalgayla sürekli olarak büyütüp küçültür.",
    "name": "Nabız Boyutu",
    "params": {
-    "amount": {
-     "label": "Miktar"
-    },
     "frequency": {
      "label": "Frekans"
     },
+    "grow": {
+     "label": "Büyütme"
+    },
     "phase": {
-     "label": "Faz"
+     "label": "Başlangıç evresi"
+    },
+    "shrink": {
+     "label": "Küçültme"
     },
     "wave": {
      "label": "Dalga",
@@ -728,6 +2224,45 @@
       "Sinüs",
       "Üçgen"
      ]
+    }
+   }
+  },
+  "pyramid": {
+   "description": "Katmanı kare bir piramidin yüzlerine yerleştirir.",
+   "name": "Piramit",
+   "params": {
+    "base": {
+     "label": "Taban"
+    },
+    "height": {
+     "label": "Yükseklik"
+    },
+    "light": {
+     "label": "Işık açısı"
+    },
+    "perspective": {
+     "label": "Perspektif"
+    },
+    "position": {
+     "label": "Konum"
+    },
+    "rotX": {
+     "label": "X döndürme"
+    },
+    "rotY": {
+     "label": "Y döndürme"
+    },
+    "rotZ": {
+     "label": "Z döndürme"
+    },
+    "scale": {
+     "label": "Ölçek"
+    },
+    "shading": {
+     "label": "Gölgeleme"
+    },
+    "shine": {
+     "label": "Parlaklık"
     }
    }
   },
@@ -743,18 +2278,157 @@
     }
    }
   },
-  "randomdisplace": {
-   "description": "Katmanın yerinde rastgele sürüklenmesini sağlar.",
-   "name": "Rastgele Kayma",
+  "radialrays": {
+   "description": "Katmanın opak kısımlarının üzerine bir noktadan düz güneş ışınları çizer.",
+   "name": "Radyal Işınlar",
    "params": {
-    "magnitude": {
-     "label": "Büyüklük"
+    "alpha": {
+     "label": "Alfa"
+    },
+    "angle": {
+     "label": "Açı"
+    },
+    "center": {
+     "label": "Merkez"
+    },
+    "color": {
+     "label": "Renk"
+    },
+    "count": {
+     "label": "Adet"
+    },
+    "width": {
+     "label": "Genişlik"
+    }
+   }
+  },
+  "radialrepeat": {
+   "description": "Katmanın birden çok kopyasını dairesel bir düzende dinamik olarak oluşturur.",
+   "name": "Radyal Tekrar",
+   "params": {
+    "angle": {
+     "label": "Açı"
+    },
+    "count": {
+     "label": "Adet"
+    },
+    "easing": {
+     "label": "Yumuşatma",
+     "options": [
+      "Doğrusal",
+      "Yavaş giriş",
+      "Yavaş çıkış",
+      "Yavaş giriş çıkış"
+     ]
+    },
+    "fillAmount": {
+     "label": "Dolgu miktarı"
+    },
+    "fillColor": {
+     "label": "Dolgu rengi"
+    },
+    "orientation": {
+     "label": "Yönelim"
+    },
+    "radius": {
+     "label": "Yarıçap"
+    },
+    "randomOrder": {
+     "label": "Rastgele sıra"
+    },
+    "rangeEnd": {
+     "label": "Aralık sonu"
+    },
+    "rangeOffset": {
+     "label": "Aralık kayması"
+    },
+    "rangeOpacity": {
+     "label": "Aralık opaklığı"
+    },
+    "rangePosition": {
+     "label": "Aralık konumu"
+    },
+    "rangeRotation": {
+     "label": "Aralık döndürmesi"
+    },
+    "rangeScale": {
+     "label": "Aralık ölçeği"
+    },
+    "rangeStart": {
+     "label": "Aralık başlangıcı"
+    },
+    "scale": {
+     "label": "Ölçek"
     },
     "seed": {
      "label": "Tohum"
     },
-    "speed": {
-     "label": "Hız"
+    "sweep": {
+     "label": "Tarama"
+    }
+   }
+  },
+  "radialshadow": {
+   "description": "Katmanın opak kısımlarından, bir ışık noktasından uzağa doğru uzun gölgeler düşürür.",
+   "name": "Radyal gölge",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "color": {
+     "label": "Renk"
+    },
+    "fade": {
+     "label": "Solma"
+    },
+    "light": {
+     "label": "Işık"
+    },
+    "reach": {
+     "label": "Uzunluk"
+    }
+   }
+  },
+  "radialwipe": {
+   "description": "Katmanın bir merkez noktasından iki çizgi arasındaki kamasını gizler; saat ibresi gibi döner. Geçiş için Tamamlanma değerini canlandırın.",
+   "name": "Radyal geçiş",
+   "params": {
+    "center": {
+     "label": "Merkez"
+    },
+    "completion": {
+     "label": "Tamamlanma"
+    },
+    "direction": {
+     "label": "Yön",
+     "options": [
+      "Saat yönünde",
+      "Saat yönünün tersine"
+     ]
+    },
+    "feather": {
+     "label": "Yumuşatma"
+    },
+    "start": {
+     "label": "Başlangıç açısı"
+    }
+   }
+  },
+  "randomdisplace": {
+   "description": "Gelişim değiştikçe katmanı yumuşak ama rastgele hareket ettirir.",
+   "name": "Rastgele Kayma",
+   "params": {
+    "evolution": {
+     "label": "Gelişim"
+    },
+    "magnitude": {
+     "label": "Büyüklük"
+    },
+    "scatter": {
+     "label": "Dağılım"
+    },
+    "seed": {
+     "label": "Tohum"
     }
    }
   },
@@ -765,14 +2439,203 @@
     "angle": {
      "label": "Açı"
     },
+    "frequency": {
+     "label": "Frekans"
+    },
     "magnitude": {
      "label": "Büyüklük"
     },
-    "rate": {
-     "label": "Oran"
+    "seed": {
+     "label": "Tohum"
+    },
+    "slack": {
+     "label": "Gevşeklik"
+    },
+    "zjitter": {
+     "label": "Z titremesi"
+    }
+   }
+  },
+  "rasterextrude": {
+   "description": "Katmanın görüntüsünü katı bir bloğa dönüştürür; yanlar iç renk alır.",
+   "name": "Raster ekstrüzyon",
+   "params": {
+    "depth": {
+     "label": "Derinlik"
+    },
+    "interior": {
+     "label": "İç renk"
+    },
+    "light": {
+     "label": "Işık açısı"
+    },
+    "perspective": {
+     "label": "Perspektif"
+    },
+    "position": {
+     "label": "Konum"
+    },
+    "rotX": {
+     "label": "X döndürme"
+    },
+    "rotY": {
+     "label": "Y döndürme"
+    },
+    "rotZ": {
+     "label": "Z döndürme"
+    },
+    "scale": {
+     "label": "Ölçek"
+    },
+    "shading": {
+     "label": "Gölgelendirme"
+    },
+    "shine": {
+     "label": "Parlama"
+    }
+   }
+  },
+  "rays": {
+   "description": "Katmanın parlak kısımlarından, bir merkez noktasından uzağa doğru ışık ışınları yayar.",
+   "name": "Işınlar",
+   "params": {
+    "center": {
+     "label": "Merkez"
+    },
+    "color": {
+     "label": "Renk"
+    },
+    "intensity": {
+     "label": "Yoğunluk"
+    },
+    "reach": {
+     "label": "Uzunluk"
+    },
+    "threshold": {
+     "label": "Eşik"
+    }
+   }
+  },
+  "reorient360": {
+   "description": "Bir 360° panoramalı katmanı kendi küresi içinde döndürerek ufku düzleştirir veya ön tarafın yerini değiştirir.",
+   "name": "360° küre yönlendirme",
+   "params": {
+    "pitch": {
+     "label": "Eğim"
+    },
+    "roll": {
+     "label": "Yatış"
+    },
+    "yaw": {
+     "label": "Sapma"
+    }
+   }
+  },
+  "repeat": {
+   "description": "Katmanın birden çok kopyasını dinamik olarak oluşturur.",
+   "name": "Tekrarla",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "angle": {
+     "label": "Açı"
+    },
+    "count": {
+     "label": "Adet"
+    },
+    "offset": {
+     "label": "Aralık"
+    },
+    "scale": {
+     "label": "Ölçek"
+    },
+    "time": {
+     "label": "Zaman"
+    }
+   }
+  },
+  "repeatalongpath": {
+   "description": "Hemen altındaki katmanın dış çizgi yolu boyunca katmanın birden çok kopyasını dinamik olarak oluşturur.",
+   "name": "Yol boyunca yinele",
+   "params": {
+    "count": {
+     "label": "Adet"
+    },
+    "easing": {
+     "label": "Yumuşatma",
+     "options": [
+      "Doğrusal",
+      "Yavaş giriş",
+      "Yavaş çıkış",
+      "Yavaş giriş çıkış"
+     ]
+    },
+    "end": {
+     "label": "Bitiş"
+    },
+    "fillAmount": {
+     "label": "Dolgu miktarı"
+    },
+    "fillColor": {
+     "label": "Dolgu rengi"
+    },
+    "phase": {
+     "label": "Faz"
+    },
+    "randomOrder": {
+     "label": "Rastgele sıra"
+    },
+    "rangeEnd": {
+     "label": "Aralık bitişi"
+    },
+    "rangeOffset": {
+     "label": "Aralık kayması"
+    },
+    "rangeOpacity": {
+     "label": "Aralık opaklığı"
+    },
+    "rangePosition": {
+     "label": "Aralık konumu"
+    },
+    "rangeRotation": {
+     "label": "Aralık dönüşü"
+    },
+    "rangeScale": {
+     "label": "Aralık ölçeği"
+    },
+    "rangeStart": {
+     "label": "Aralık başlangıcı"
     },
     "seed": {
      "label": "Tohum"
+    },
+    "start": {
+     "label": "Başlangıç"
+    },
+    "tangent": {
+     "label": "Teğet"
+    }
+   }
+  },
+  "replacecolor": {
+   "description": "Katmandaki bir rengi diğeriyle değiştirir, özgün rengin açık ve koyu tonlarını korur.",
+   "name": "Rengi değiştir",
+   "params": {
+    "choke": {
+     "label": "Daraltma"
+    },
+    "feather": {
+     "label": "Kenar yumuşatma"
+    },
+    "source": {
+     "label": "Kaynak"
+    },
+    "target": {
+     "label": "Hedef"
+    },
+    "threshold": {
+     "label": "Eşik"
     }
    }
   },
@@ -806,6 +2669,27 @@
     }
    }
   },
+  "roughenedges": {
+   "description": "Opak kısımların kenarlarını gürültüyle aşındırarak yırtık, aşınmış veya yanık bir dış çizgi oluşturur.",
+   "name": "Kenarları pürüzleştir",
+   "params": {
+    "blur": {
+     "label": "Kenarlık"
+    },
+    "evolution": {
+     "label": "Evrim"
+    },
+    "roughness": {
+     "label": "Pürüzlülük"
+    },
+    "scale": {
+     "label": "Ölçek"
+    },
+    "seed": {
+     "label": "Tohum"
+    }
+   }
+  },
   "scanlines": {
    "description": "CRT monitör etkisi için yatay tarama çizgileri ekler; isteğe bağlı dikey kaydırma da yapılabilir.",
    "name": "Tarama Çizgileri",
@@ -818,6 +2702,93 @@
     },
     "spacing": {
      "label": "Çizgi aralığı"
+    }
+   }
+  },
+  "scatterfield": {
+   "description": "Katmanın kopyalarını sonsuz bir 3B alana dağıtırken asıl katmanı gizler ve anahtar kare animasyonuyla alanda üç boyutlu hareket taklidi sağlar.",
+   "name": "Dağılım alanı",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "amount": {
+     "label": "Miktar"
+    },
+    "angle": {
+     "label": "Açı"
+    },
+    "angleVariance": {
+     "label": "Açı varyansı"
+    },
+    "blending": {
+     "label": "Karışım modu",
+     "options": [
+      "Normal",
+      "Ekle",
+      "Ekran",
+      "Çarpma",
+      "Açıklaştır",
+      "Koyulaştır",
+      "Üst üste",
+      "Fark"
+     ]
+    },
+    "color1": {
+     "label": "Renk 1"
+    },
+    "color2": {
+     "label": "Renk 2"
+    },
+    "color3": {
+     "label": "Renk 3"
+    },
+    "coloring": {
+     "label": "Renklendirme",
+     "options": [
+      "Yok",
+      "Rastgele",
+      "Derinlik"
+     ]
+    },
+    "density": {
+     "label": "Yoğunluk"
+    },
+    "evolution": {
+     "label": "Evrim"
+    },
+    "fade": {
+     "label": "Solma"
+    },
+    "interpolateHue": {
+     "label": "Ton geçişi"
+    },
+    "lockLuminance": {
+     "label": "Parlaklığı kilitle"
+    },
+    "lockSaturation": {
+     "label": "Doygunluğu kilitle"
+    },
+    "position": {
+     "label": "Konum"
+    },
+    "scale": {
+     "label": "Ölçek"
+    },
+    "seed": {
+     "label": "Tohum"
+    },
+    "size": {
+     "label": "Boyut"
+    },
+    "sizeVariance": {
+     "label": "Boyut varyansı"
+    },
+    "slack": {
+     "label": "Gevşeklik"
+    },
+    "z": {
+     "label": "Z konumu"
     }
    }
   },
@@ -839,6 +2810,42 @@
     },
     "radius": {
      "label": "Yarıçap"
+    }
+   }
+  },
+  "shutterblur": {
+   "description": "Katmanı gerçekte hareket ettiği, döndüğü ve büyüdüğü yönde, bir kamera perdesi gibi bulanıklaştırır. Geniş perde açısı daha uzun izler, fazla örnek daha pürüzsüz izler verir. Tam bulanıklık açık değilse önizleme daha hızlı bir bulanıklık gösterir.",
+   "name": "Gerçek hareket bulanıklığı",
+   "params": {
+    "samples": {
+     "label": "Örnekler"
+    },
+    "shutter": {
+     "label": "Perde açısı"
+    }
+   }
+  },
+  "smoothbevel": {
+   "description": "Katmanın opak kısımlarına bir yandan ışık alan yumuşak, yuvarlak bir kabartma verir.",
+   "name": "Yumuşak kabartma",
+   "params": {
+    "angle": {
+     "label": "Işık açısı"
+    },
+    "blur": {
+     "label": "Boyut"
+    },
+    "depth": {
+     "label": "Derinlik"
+    },
+    "highlight": {
+     "label": "Vurgu"
+    },
+    "intensity": {
+     "label": "Yoğunluk"
+    },
+    "shadow": {
+     "label": "Gölge"
     }
    }
   },
@@ -895,19 +2902,89 @@
     }
    }
   },
+  "spherize": {
+   "description": "Katmanı bir topun ön yüzü etrafında büker.",
+   "name": "Küreleştir",
+   "params": {
+    "coverage": {
+     "label": "Kaplama"
+    },
+    "light": {
+     "label": "Işık açısı"
+    },
+    "perspective": {
+     "label": "Perspektif"
+    },
+    "position": {
+     "label": "Konum"
+    },
+    "radius": {
+     "label": "Yarıçap"
+    },
+    "rotX": {
+     "label": "Döndürme X"
+    },
+    "rotY": {
+     "label": "Döndürme Y"
+    },
+    "rotZ": {
+     "label": "Döndürme Z"
+    },
+    "scale": {
+     "label": "Ölçek"
+    },
+    "shading": {
+     "label": "Gölgeleme"
+    },
+    "shine": {
+     "label": "Parlama"
+    }
+   }
+  },
   "spin": {
-   "description": "Katmanı sabit bir hızda sürekli döndürür.",
+   "description": "Katmanı sabit bir hızda sürekli döndürür; sıfırın altında ters yönde döner.",
    "name": "Döndür",
    "params": {
-    "direction": {
-     "label": "Yön",
+    "rpm": {
+     "label": "RPM"
+    }
+   }
+  },
+  "spinblur": {
+   "description": "Katmanı bir nokta etrafında daireler halinde, dönüyormuş gibi bulanıklaştırır.",
+   "name": "Döndürme bulanıklığı",
+   "params": {
+    "center": {
+     "label": "Merkez"
+    },
+    "sweep": {
+     "label": "Açı"
+    }
+   }
+  },
+  "spinstreaks": {
+   "description": "Katmanın kopyalarını bir nokta etrafında döndürüp üst üste geldikleri yerlerde karıştırarak yay şeklinde izler oluşturur.",
+   "name": "Döndürme izleri",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "bias": {
+     "label": "Eğilim"
+    },
+    "center": {
+     "label": "Merkez"
+    },
+    "mode": {
+     "label": "Karışım",
      "options": [
-      "Saat yönünde",
-      "Saat yönünün tersine"
+      "Açıklaştır",
+      "Ortalama",
+      "Koyulaştır"
      ]
     },
-    "speed": {
-     "label": "Hız"
+    "sweep": {
+     "label": "Tarama"
     }
    }
   },
@@ -926,6 +3003,182 @@
     },
     "shadowHue": {
      "label": "Gölge Tonu"
+    }
+   }
+  },
+  "spotcolor": {
+   "description": "Tek bir rengi korur ve katmandaki diğer tüm renklerin doygunluğunu alır.",
+   "name": "Özel renk",
+   "params": {
+    "choke": {
+     "label": "Daralt"
+    },
+    "color": {
+     "label": "Renk"
+    },
+    "feather": {
+     "label": "Kenar yumuşatma"
+    },
+    "saturation": {
+     "label": "Doygunluk"
+    },
+    "threshold": {
+     "label": "Eşik"
+    }
+   }
+  },
+  "squeeze": {
+   "description": "Katmanı bir eksende sıkıştırırken diğer eksende esnetir. Negatif değerler eksenleri yer değiştirir.",
+   "name": "Sıkıştır",
+   "params": {
+    "strength": {
+     "label": "Güç"
+    }
+   }
+  },
+  "star": {
+   "description": "Katmana parlayan bir yıldız çizer.",
+   "name": "Yıldız",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "blend": {
+     "label": "Karışım modu",
+     "options": [
+      "Normal",
+      "Çarpma",
+      "Ekran",
+      "Kaplama",
+      "Yumuşak ışık",
+      "Sert ışık",
+      "Ekle",
+      "Koyulaştır",
+      "Aç",
+      "Fark",
+      "Renk soldurma",
+      "Renk yakma"
+     ]
+    },
+    "brightness": {
+     "label": "Parlaklık"
+    },
+    "color": {
+     "label": "Renk"
+    },
+    "points": {
+     "label": "Nokta sayısı"
+    },
+    "position": {
+     "label": "Konum"
+    },
+    "radius": {
+     "label": "Yarıçap"
+    },
+    "shine": {
+     "label": "Parlama"
+    }
+   }
+  },
+  "starfield": {
+   "description": "Katmanın opak kısımlarını, farklı hızlarda hareket eden birkaç katmandan oluşan derin bir yıldız alanıyla doldurur.",
+   "name": "Yıldız alanı",
+   "params": {
+    "brightness": {
+     "label": "Parlaklık"
+    },
+    "darkMatter": {
+     "label": "Karanlık madde"
+    },
+    "offset": {
+     "label": "Kaydırma"
+    },
+    "scale": {
+     "label": "Ölçek"
+    }
+   }
+  },
+  "starpolyhedron": {
+   "description": "Katmanı, birbirine çapraz iki piramitten oluşan bir yıldızın üzerine yerleştirir.",
+   "name": "Yıldız çokyüzlü",
+   "params": {
+    "light": {
+     "label": "Işık açısı"
+    },
+    "perspective": {
+     "label": "Perspektif"
+    },
+    "position": {
+     "label": "Konum"
+    },
+    "radius": {
+     "label": "Yarıçap"
+    },
+    "rotX": {
+     "label": "X döndürme"
+    },
+    "rotY": {
+     "label": "Y döndürme"
+    },
+    "rotZ": {
+     "label": "Z döndürme"
+    },
+    "scale": {
+     "label": "Ölçek"
+    },
+    "shading": {
+     "label": "Gölgeleme"
+    },
+    "shine": {
+     "label": "Parlama"
+    }
+   }
+  },
+  "starprism": {
+   "description": "Katmanı yıldız şeklinde keser ve ona derinlik kazandırır.",
+   "name": "Yıldız prizma",
+   "params": {
+    "depth": {
+     "label": "Derinlik"
+    },
+    "inner": {
+     "label": "İç yarıçap"
+    },
+    "light": {
+     "label": "Işık açısı"
+    },
+    "perspective": {
+     "label": "Perspektif"
+    },
+    "points": {
+     "label": "Nokta sayısı"
+    },
+    "position": {
+     "label": "Konum"
+    },
+    "radius": {
+     "label": "Yarıçap"
+    },
+    "rotX": {
+     "label": "X döndürme"
+    },
+    "rotY": {
+     "label": "Y döndürme"
+    },
+    "rotZ": {
+     "label": "Z döndürme"
+    },
+    "scale": {
+     "label": "Ölçek"
+    },
+    "shading": {
+     "label": "Gölgeleme"
+    },
+    "shine": {
+     "label": "Parlama"
+    },
+    "smoothing": {
+     "label": "Yumuşatma"
     }
    }
   },
@@ -960,23 +3213,56 @@
    }
   },
   "stretchaxis": {
-   "description": "Katmanı bir açı boyunca esnetir.",
+   "description": "Katmanı herhangi bir yönde uzatır.",
    "name": "Esnetme Ekseni",
    "params": {
-    "amount": {
-     "label": "Miktar"
-    },
     "angle": {
      "label": "Açı"
+    },
+    "mask": {
+     "label": "Katmana Maskele"
+    },
+    "scale": {
+     "label": "Ölçek"
+    }
+   }
+  },
+  "stripes": {
+   "description": "Katmanın opak kısımlarının üzerine çizgi deseni çizer veya çizgileri katmandan oyar.",
+   "name": "Çizgiler",
+   "params": {
+    "angle": {
+     "label": "Açı"
+    },
+    "color": {
+     "label": "Renk"
+    },
+    "count": {
+     "label": "Adet"
+    },
+    "phase": {
+     "label": "Faz"
+    },
+    "punch": {
+     "label": "Oyarak Çıkar"
+    },
+    "smoothing": {
+     "label": "Yumuşatma"
+    },
+    "width": {
+     "label": "Genişlik"
     }
    }
   },
   "swing": {
-   "description": "Katmanı kendi dönme noktası etrafında ileri geri döndürür.",
+   "description": "Katmanı iki açı arasında ileri geri döndürür.",
    "name": "Salınım",
    "params": {
-    "angle": {
-     "label": "Açı"
+    "angle1": {
+     "label": "Açı 1"
+    },
+    "angle2": {
+     "label": "Açı 2"
     },
     "frequency": {
      "label": "Frekans"
@@ -1035,6 +3321,78 @@
     }
    }
   },
+  "tilerotate": {
+   "description": "Katmanı bir döşeme ızgarasına böler ve her döşemenin içindeki görüntüyü ayrı ayrı döndürür.",
+   "name": "Döşeme Döndürme",
+   "params": {
+    "angle": {
+     "label": "Açı"
+    },
+    "count": {
+     "label": "Adet"
+    },
+    "offset": {
+     "label": "Ofset"
+    },
+    "random": {
+     "label": "Rastgele"
+    },
+    "rotation": {
+     "label": "Döndürme"
+    },
+    "seed": {
+     "label": "Tohum"
+    },
+    "stretch": {
+     "label": "Uzatma"
+    }
+   }
+  },
+  "tiles": {
+   "description": "Katmanı ekranı dolduracak şekilde döşeme deseniyle tekrarlar; isteğe bağlı yansıtma, satır kaydırma ve döndürme sunar.",
+   "name": "Döşemeler",
+   "params": {
+    "angle": {
+     "label": "Açı"
+    },
+    "crop": {
+     "label": "Kırp"
+    },
+    "mirror": {
+     "label": "Yansıt"
+    },
+    "offset": {
+     "label": "Ofset"
+    },
+    "vertical": {
+     "label": "Dikey Ofset"
+    }
+   }
+  },
+  "tileshift": {
+   "description": "Katmanı bir döşeme ızgarasına böler ve her döşemenin içindeki görüntüyü rastgele bir yönde kaydırır.",
+   "name": "Döşeme Kaydırma",
+   "params": {
+    "angle": {
+     "label": "Açı"
+    },
+    "count": {
+     "label": "Adet"
+    },
+    "offset": {
+     "label": "Ofset"
+    },
+    "seed": {
+     "label": "Tohum"
+    },
+    "strength": {
+     "label": "Güç"
+    },
+    "stretch": {
+     "label": "Uzatma"
+    }
+   }
+  },
   "timequant": {
    "description": "Bu katmanda zamanı daha düşük kare hızı gibi adımlarla akıtır.",
    "name": "Zaman Nicemleme",
@@ -1056,6 +3414,183 @@
     },
     "shadowColor": {
      "label": "Gölge rengi"
+    }
+   }
+  },
+  "torus": {
+   "description": "Katmanı bir halkanın etrafına sarar.",
+   "name": "Halka",
+   "params": {
+    "light": {
+     "label": "Işık Açısı"
+    },
+    "perspective": {
+     "label": "Perspektif"
+    },
+    "position": {
+     "label": "Konum"
+    },
+    "radius": {
+     "label": "Yarıçap"
+    },
+    "rotX": {
+     "label": "X Döndürme"
+    },
+    "rotY": {
+     "label": "Y Döndürme"
+    },
+    "rotZ": {
+     "label": "Z Döndürme"
+    },
+    "scale": {
+     "label": "Ölçek"
+    },
+    "shading": {
+     "label": "Gölgeleme"
+    },
+    "shine": {
+     "label": "Parıltı"
+    },
+    "thickness": {
+     "label": "Kalınlık"
+    }
+   }
+  },
+  "tunnel": {
+   "description": "Katmanla sonsuz bir tünel kaplar ve içinden uçar.",
+   "name": "Tünel",
+   "params": {
+    "fog": {
+     "label": "Sis"
+    },
+    "fogColor": {
+     "label": "Sis rengi"
+    },
+    "position": {
+     "label": "Konum"
+    },
+    "repeat": {
+     "label": "Tekrar"
+    },
+    "rotX": {
+     "label": "X Döndürme"
+    },
+    "rotY": {
+     "label": "Y Döndürme"
+    },
+    "rotZ": {
+     "label": "Z Döndürme"
+    },
+    "scale": {
+     "label": "Ölçek"
+    },
+    "speed": {
+     "label": "Hız"
+    },
+    "twist": {
+     "label": "Büküm"
+    }
+   }
+  },
+  "turbulence": {
+   "description": "Katmanın opak kısımlarını yumuşak fraktal gürültüyle doldurur; bulutlar, duman veya parlaklık haritası için.",
+   "name": "Türbülans",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "bias": {
+     "label": "Sapma"
+    },
+    "blend": {
+     "label": "Karışım modu",
+     "options": [
+      "Normal",
+      "Çarpma",
+      "Ekran",
+      "Kaplama",
+      "Yumuşak ışık",
+      "Sert ışık",
+      "Ekle",
+      "Koyulaştır",
+      "Aç",
+      "Fark",
+      "Renk soldurma",
+      "Renk yakma"
+     ]
+    },
+    "color1": {
+     "label": "Renk 1"
+    },
+    "color2": {
+     "label": "Renk 2"
+    },
+    "evolution": {
+     "label": "Evrim"
+    },
+    "intensity": {
+     "label": "Yoğunluk"
+    },
+    "octaves": {
+     "label": "Oktav"
+    },
+    "offset": {
+     "label": "Ofset"
+    },
+    "parallax": {
+     "label": "Paralaks"
+    },
+    "scale": {
+     "label": "Ölçek"
+    },
+    "seed": {
+     "label": "Tohum"
+    },
+    "stretch": {
+     "label": "Esnetme"
+    }
+   }
+  },
+  "turbulentdisplace": {
+   "description": "Katmanı yumuşak fraktal gürültüyle iter; ateş, su, ısı bulanıklığı veya pürüzlü doğal kenarlar için.",
+   "name": "Türbülanslı kaydırma",
+   "params": {
+    "bias": {
+     "label": "Sapma"
+    },
+    "direction": {
+     "label": "Yön",
+     "options": [
+      "Her ikisi",
+      "Yatay",
+      "Dikey",
+      "Radyal",
+      "Büküm"
+     ]
+    },
+    "evolution": {
+     "label": "Evrim"
+    },
+    "octaves": {
+     "label": "Oktav"
+    },
+    "offset": {
+     "label": "Ofset"
+    },
+    "parallax": {
+     "label": "Paralaks"
+    },
+    "scale": {
+     "label": "Ölçek"
+    },
+    "seed": {
+     "label": "Tohum"
+    },
+    "strength": {
+     "label": "Güç"
+    },
+    "stretch": {
+     "label": "Esnetme"
     }
    }
   },
@@ -1125,6 +3660,24 @@
     }
    }
   },
+  "viewer360": {
+   "description": "360° panoramik katmanı, döndürüp yakınlaştırabileceğiniz sanal bir kamera aracılığıyla gösterir.",
+   "name": "360° görüntüleyici",
+   "params": {
+    "fov": {
+     "label": "Görüş alanı"
+    },
+    "pitch": {
+     "label": "Eğim"
+    },
+    "roll": {
+     "label": "Yatış"
+    },
+    "yaw": {
+     "label": "Sapma"
+    }
+   }
+  },
   "vignette": {
    "description": "Görselin kenarlarını karartmak için vinyet efekti uygular.",
    "name": "Vinyet",
@@ -1143,6 +3696,33 @@
     }
    }
   },
+  "voronoicells": {
+   "description": "Katmanın opak kısımlarını rastgele yerleştirilmiş noktaların etrafındaki hücre deseniyle doldurur.",
+   "name": "Voronoi hücreleri",
+   "params": {
+    "color1": {
+     "label": "Renk 1"
+    },
+    "color2": {
+     "label": "Renk 2"
+    },
+    "lineColor": {
+     "label": "Çizgi rengi"
+    },
+    "lineWidth": {
+     "label": "Çizgi genişliği"
+    },
+    "phase": {
+     "label": "Faz"
+    },
+    "scale": {
+     "label": "Ölçek"
+    },
+    "seed": {
+     "label": "Tohum"
+    }
+   }
+  },
   "wavewarp": {
    "description": "Görsele ayarlanabilir genlik, dalga boyu, yön ve faz hızıyla sinüs dalgası kaydırması uygular.",
    "name": "Dalga Bükümü",
@@ -1158,6 +3738,50 @@
     },
     "wavelength": {
      "label": "Dalga boyu"
+    }
+   }
+  },
+  "wipe": {
+   "description": "Katmanı iki karşıt taraftan gizler. Sıyırmalı geçiş için Başlangıç veya Bitiş değerini canlandırın.",
+   "name": "Sıyırma",
+   "params": {
+    "angle": {
+     "label": "Açı"
+    },
+    "end": {
+     "label": "Bitiş"
+    },
+    "feather": {
+     "label": "Kenar yumuşatma"
+    },
+    "start": {
+     "label": "Başlangıç"
+    }
+   }
+  },
+  "zoomstreaks": {
+   "description": "Katmanın kopyalarını merkezi etrafında ölçekleyip en parlak pikselleri tutarak bir noktadan dışarı fırlayan izler oluşturur. Ortalama, yakınlaştırma bulanıklığı verir.",
+   "name": "Yakınlaştırma izleri",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "bias": {
+     "label": "Sapma"
+    },
+    "center": {
+     "label": "Merkez"
+    },
+    "mode": {
+     "label": "Karışım",
+     "options": [
+      "Açığa çıkar",
+      "Ortalama",
+      "Koyulaştır"
+     ]
+    },
+    "strength": {
+     "label": "Güç"
     }
    }
   }

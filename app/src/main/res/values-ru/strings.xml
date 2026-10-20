@@ -1118,4 +1118,8 @@
     <string name="ai_video_mask_name">Маска %1$s</string>
     <string name="ai_video_cut_out_name">Вырезано: %1$s</string>
     <string name="model_layer_element">Элемент</string>
+    <string name="edit_panel_model_options">Параметры модели</string>
+    <string name="menu_reset_3d_rotation">Сбросить 3D-поворот</string>
+    <string name="structure_3d_model">3D-модель</string>
+    <string name="layer_tool_model_options">Параметры модели</string>
 </resources>

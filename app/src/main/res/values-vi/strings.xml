@@ -1073,4 +1073,8 @@
     <string name="ai_video_mask_name">Mặt nạ %1$s</string>
     <string name="ai_video_cut_out_name">%1$s đã tách</string>
     <string name="model_layer_element">Phần tử</string>
+    <string name="edit_panel_model_options">Tùy chọn mô hình</string>
+    <string name="menu_reset_3d_rotation">Đặt lại xoay 3D</string>
+    <string name="structure_3d_model">Mô hình 3D</string>
+    <string name="layer_tool_model_options">Tùy chọn mô hình</string>
 </resources>

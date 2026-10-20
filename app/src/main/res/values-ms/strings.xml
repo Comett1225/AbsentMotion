@@ -1073,4 +1073,8 @@
     <string name="ai_video_mask_name">%1$s topeng</string>
     <string name="ai_video_cut_out_name">Potongan %1$s</string>
     <string name="model_layer_element">Elemen</string>
+    <string name="edit_panel_model_options">Pilihan model</string>
+    <string name="menu_reset_3d_rotation">Set semula putaran 3D</string>
+    <string name="structure_3d_model">Model 3D</string>
+    <string name="layer_tool_model_options">Pilihan model</string>
 </resources>
