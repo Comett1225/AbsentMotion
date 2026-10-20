@@ -286,13 +286,14 @@ SkPath DrawStrokeEnd(SkCanvas* canvas, SkPaint paint, SkPoint p, SkVector d, flo
     return filled ? shape : skpathutils::FillPathWithPaint(shape, paint);
 }
 
-SkPath DrawStroke(SkCanvas* canvas, const Layer& l, const SkPath& path, float t, float alpha) {
+SkPath DrawStroke(SkCanvas* canvas, const Layer& l, const SkPath& path, float t, float alpha, bool outline = true) {
     const float width = l.stroke.size.get(0, t, 0);
     if (!(width > 0) || path.isEmpty()) return {};
     const SkColor4f color = ColorAt(l.stroke.color, t, kBlack, alpha);
     SkPaint paint = StrokePaint(l, width, color);
     const bool ends = (l.stroke.start != "none" || l.stroke.end != "none") && l.stroke.endSize > 0;
-    SkPath area = skpathutils::FillPathWithPaint(path, paint);
+    SkPath area = outline ? skpathutils::FillPathWithPaint(path, paint) : SkPath();
+    const auto add = [&](const SkPath& end) { if (outline) area = Union(area, end); };
     const bool layered = canvas && ends && color.fA < 1;
     if (layered) {
         SkPaint opacity;
@@ -310,10 +311,8 @@ SkPath DrawStroke(SkCanvas* canvas, const Layer& l, const SkPath& path, float t,
             SkPoint p;
             SkVector tangent;
             if (contours.isClosed() || !(length > 0)) continue;
-            if (contours.getPosTan(0, &p, &tangent))
-                area = Union(area, DrawStrokeEnd(canvas, paint, p, -tangent, r, l.stroke.start));
-            if (contours.getPosTan(length, &p, &tangent))
-                area = Union(area, DrawStrokeEnd(canvas, paint, p, tangent, r, l.stroke.end));
+            if (contours.getPosTan(0, &p, &tangent)) add(DrawStrokeEnd(canvas, paint, p, -tangent, r, l.stroke.start));
+            if (contours.getPosTan(length, &p, &tangent)) add(DrawStrokeEnd(canvas, paint, p, tangent, r, l.stroke.end));
         } while (contours.nextContour());
     }
     if (layered) canvas->restore();
@@ -572,7 +571,7 @@ struct Drawn {
 };
 
 Drawn DrawBody(SkCanvas* canvas, const Layer& l, double timeMs, float t, const SkMatrix& m, const SkPath& path, float alpha,
-               const MediaPictures& pictures) {
+               const MediaPictures& pictures, bool outline) {
     Drawn drawn;
     if (l.kind == "model") {
         DrawModel(canvas, l, timeMs, alpha, pictures);
@@ -622,7 +621,7 @@ Drawn DrawBody(SkCanvas* canvas, const Layer& l, double timeMs, float t, const S
         canvas->restore();
     }
     canvas->restore();
-    if (l.stroke.present && l.stroke.enabled) drawn.stroked = DrawStroke(canvas, l, path.makeTransform(m), t, alpha);
+    if (l.stroke.present && l.stroke.enabled) drawn.stroked = DrawStroke(canvas, l, path.makeTransform(m), t, alpha, outline);
     return drawn;
 }
 
@@ -637,9 +636,10 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
     const SkPath path = BodyPath(l, t);
     Drawn drawn;
     const SkPath scenePath = path.makeTransform(m);
+    const bool bordered = decorate && std::any_of(l.borders.begin(), l.borders.end(), [&](const Edge& e) { return ShaderBorder(l, e, t); });
     auto picture = [&](SkCanvas* canvas) {
         if (!copies) {
-            drawn = DrawBody(canvas, l, timeMs, t, m, path, alpha, pictures);
+            drawn = DrawBody(canvas, l, timeMs, t, m, path, alpha, pictures, bordered);
             return;
         }
         const float room = l.stroke.present && l.stroke.enabled ? l.stroke.size.get(0, t, 0) * std::max(l.stroke.endSize, 1.0f) * 3 + 2 : 2;
@@ -660,7 +660,7 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
                 const SkRect bounds = l.kind == "embedScene" || l.kind == "model" || l.text ? SkRect::MakeEmpty() : pc.makeTransform(mc).getBounds().makeOutset(room, room);
                 canvas->saveLayer(bounds.isEmpty() ? nullptr : &bounds, &paint);
             }
-            const Drawn d = DrawBody(canvas, l, c.timeMs, tc, mc, pc, layered ? alpha : alpha * c.look.alpha, pictures);
+            const Drawn d = DrawBody(canvas, l, c.timeMs, tc, mc, pc, layered ? alpha : alpha * c.look.alpha, pictures, false);
             if (layered) canvas->restore();
             canvas->restore();
             if (now) drawn = d;
@@ -696,6 +696,7 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
     }
     if (!decorate) return;
     if (l.kind == "embedScene") return DrawGroupBorders(canvas, l, t);
+    if (!bordered) return;
     if (copies) {
         drawn.fill = l.kind == "drawing" ? !l.strokes.empty() : l.fillType == "color" ? ColorAt(l.fillColor, t, kWhite, alpha).fA > 0 : l.fillType == "media" || l.fillType == "gradient";
         if (l.stroke.present && l.stroke.enabled) drawn.stroked = DrawStroke(nullptr, l, scenePath, t, alpha);
