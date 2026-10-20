@@ -78,6 +78,7 @@ import app.absentmotion.ui.onboarding.Onboarding
 import app.absentmotion.ui.home.OpenFailedDialog
 import app.absentmotion.ui.home.OpeningOverlay
 import app.absentmotion.ui.home.RecoveryDialog
+import app.absentmotion.ui.home.autoBackupIfDue
 import app.absentmotion.ui.home.VersionHistory
 import app.absentmotion.ui.theme.PressIndication
 import app.absentmotion.ui.theme.enterFade
@@ -117,6 +118,7 @@ class MainActivity : ComponentActivity() {
         recovery = Recovery(File(filesDir, "recovery"))
         RecoveryHandler.install(recovery) { editor?.let { it.projectId to it.scene.toXml() } }
         lifecycleScope.launch { recovered = withContext(DiskThread.dispatcher) { runCatching { recovery.pending(store) }.getOrNull() } }
+        lifecycleScope.launch { kotlinx.coroutines.delay(15_000); autoBackupIfDue(applicationContext, settings) }
         ShapeCatalog.load(this)
         app.absentmotion.editor.ElementNav.open = { id ->
             editor?.let { it.playing = false; it.endGesture(); it.saver.snapshot(it.scene.toXml()) }

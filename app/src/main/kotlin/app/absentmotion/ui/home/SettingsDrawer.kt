@@ -70,7 +70,7 @@ private val ListLineColor get() = Am.NavyLine
 private val ChosenRow get() = Am.NavyHi
 
 @Composable
-fun SettingsDrawer(settings: AppSettings) {
+fun SettingsDrawer(settings: AppSettings, onRestored: () -> Unit = {}) {
     var about by remember { mutableStateOf(false) }
     var language by remember { mutableStateOf(false) }
     var demoNote by remember { mutableStateOf(false) }
@@ -111,6 +111,7 @@ fun SettingsDrawer(settings: AppSettings) {
             }
             Spacer(Modifier.height(15.dp))
             LinkRow(stringResource(R.string.settings_language), currentLanguage(LocalContext.current).nativeName) { language = true }
+            BackupRows(settings, onRestored)
             Spacer(Modifier.height(15.dp))
             LinkRow("About") { about = true }
             CaptionModelRow()
@@ -149,7 +150,7 @@ private fun Divider(inset: androidx.compose.ui.unit.Dp) {
 }
 
 @Composable
-private fun LinkRow(label: String, value: String? = null, onClick: () -> Unit) {
+internal fun LinkRow(label: String, value: String? = null, onClick: () -> Unit) {
     Row(
         Modifier.padding(horizontal = 6.dp).fillMaxWidth().height(44.dp).clip(PanelShape).background(PanelColor)
             .clickable(onClick = onClick).padding(start = 15.dp, end = 7.dp),
@@ -162,7 +163,7 @@ private fun LinkRow(label: String, value: String? = null, onClick: () -> Unit) {
 }
 
 @Composable
-private fun SwitchRow(label: String, checked: Boolean, enabled: Boolean, onChange: (Boolean) -> Unit) {
+internal fun SwitchRow(label: String, checked: Boolean, enabled: Boolean, onChange: (Boolean) -> Unit) {
     Row(
         Modifier.fillMaxWidth().height(44.dp).alpha(if (enabled) 1f else 0.35f).padding(horizontal = 15.dp),
         verticalAlignment = Alignment.CenterVertically,

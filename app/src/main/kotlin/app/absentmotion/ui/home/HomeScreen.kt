@@ -174,7 +174,7 @@ fun HomeScreen(
     }
 
     ModalNavigationDrawer(
-        drawerContent = { SettingsDrawer(settings) },
+        drawerContent = { SettingsDrawer(settings, onRestored = { version++ }) },
         drawerState = drawer,
         scrimColor = Color.Black.copy(alpha = 0.94f),
     ) {

@@ -64,6 +64,20 @@ class AppSettings(private val context: Context) {
         get() = keepMediaCopiesState
         set(value) { keepMediaCopiesState = value; prefs.edit().putBoolean("keepMediaCopies", value).apply() }
 
+    private var weeklyBackupState by mutableStateOf(prefs.getBoolean("weeklyBackup", false))
+
+    var weeklyBackup: Boolean
+        get() = weeklyBackupState
+        set(value) { weeklyBackupState = value; prefs.edit().putBoolean("weeklyBackup", value).apply() }
+
+    var lastAutoBackup: Long
+        get() = prefs.getLong("lastAutoBackup", 0L)
+        set(value) { prefs.edit().putLong("lastAutoBackup", value).apply() }
+
+    var autoBackupUri: String?
+        get() = prefs.getString("autoBackupUri", null)
+        set(value) { prefs.edit().putString("autoBackupUri", value).apply() }
+
     var theme: String
         get() = themeState
         set(value) {
