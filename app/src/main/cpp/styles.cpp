@@ -37,6 +37,7 @@ SkColor4f ColorAt(const Anim& a, float t, SkColor4f fallback, float alpha = 1) {
 }
 
 const SkColor4f kWhite = {1, 1, 1, 1}, kBlack = {0, 0, 0, 1};
+constexpr float kRadians = 3.14159265f / 180;
 
 const char* kBlendHelpers = R"(
 float luma(float3 c) { return dot(c, float3(0.299, 0.587, 0.114)); }
@@ -183,9 +184,13 @@ Placement Own(const Layer& l, double timeMs) {
                 {l.scale.get(0, t, 1), l.scale.get(1, t, 1)},
                 l.rotation.get(0, t, 0),
                 l.location.get(2, t, 0)};
+    const float tx = l.tilt.get(0, t, 0), ty = l.tilt.get(1, t, 0);
+    if (tx != 0 || ty != 0) p.tilt = SkM44::Rotate({0, 1, 0}, -ty * kRadians) * SkM44::Rotate({1, 0, 0}, -tx * kRadians);
     ApplyMotion(l, timeMs, &p);
     return p;
 }
+
+SkM44 Turn(float degrees) { return SkM44::Rotate({0, 0, 1}, degrees * kRadians); }
 
 constexpr int kMaxParentDepth = 16;
 
@@ -198,20 +203,23 @@ Placement Effective(const std::vector<Layer>& siblings, const Layer& l, double t
     }
     if (!parent) return own;
     const Placement p = Effective(siblings, *parent, timeMs, depth + 1);
-    const SkVector offset = SkMatrix::RotateDeg(p.rotation).mapVector(
-        (own.location.fX + own.pivot.fX - p.pivot.fX) * p.scale.fX, (own.location.fY + own.pivot.fY - p.pivot.fY) * p.scale.fY);
-    own.location = p.location + offset - own.pivot + p.pivot;
+    const SkV4 offset = Turn(p.rotation) * p.tilt * SkV4{(own.location.fX + own.pivot.fX - p.pivot.fX) * p.scale.fX,
+                                                         (own.location.fY + own.pivot.fY - p.pivot.fY) * p.scale.fY, own.z, 0};
+    own.location = p.location + SkVector{offset.x, offset.y} - own.pivot + p.pivot;
     own.scale = {own.scale.fX * p.scale.fX, own.scale.fY * p.scale.fY};
+    if (p.tilt != SkM44()) own.tilt = Turn(-own.rotation) * p.tilt * Turn(own.rotation) * own.tilt;
     own.rotation += p.rotation;
-    own.z += p.z;
+    own.z = p.z + offset.z;
     if (!own.stretch.isIdentity()) own.stretch = SkMatrix::RotateDeg(p.rotation) * own.stretch * SkMatrix::RotateDeg(-p.rotation);
     return own;
 }
 
 SkMatrix MatrixOf(const Placement& p, const Layer& l, float t) {
-    SkMatrix m = SkMatrix::Translate(p.location.fX, p.location.fY);
-    m.preConcat(p.stretch);
-    m.preRotate(p.rotation);
+    SkMatrix m = l.projected ? l.space.asM33() : SkMatrix::Translate(p.location.fX, p.location.fY);
+    if (!l.projected) {
+        m.preConcat(p.stretch);
+        m.preRotate(p.rotation);
+    }
     m.preSkew(tanf(l.skew.get(0, t, 0)), tanf(l.skew.get(1, t, 0)));
     m.preScale(p.scale.fX, p.scale.fY);
     m.preTranslate(-p.pivot.fX, -p.pivot.fY);

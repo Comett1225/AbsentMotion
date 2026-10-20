@@ -73,6 +73,19 @@ Seen Look(const View& v, const Placement& p) {
     return s;
 }
 
+SkM44 Space(const View& v, const Placement& p) {
+    const float r = 3.14159265f / 180, mx = v.middle.fX, my = v.middle.fY, f = v.focal;
+    const SkM44 world = SkM44::Translate(p.location.fX, p.location.fY, p.z) * SkM44(p.stretch) *
+                        SkM44::Rotate({0, 0, 1}, p.rotation * r) * p.tilt;
+    const SkM44 eye = SkM44::Rotate({0, 0, 1}, -v.rotation * r) * SkM44::Translate(-v.eye.fX, -v.eye.fY, -v.eyeZ);
+    const float c = std::max(-v.eyeZ, kNearest);
+    const SkM44 lens = v.orthographic ? SkM44(f, 0, 0, mx * c, 0, f, 0, my * c, 0, 0, 1, 0, 0, 0, 0, c)
+                                      : SkM44(f, 0, mx, 0, 0, f, my, 0, 0, 0, 1, 0, 0, 0, 1, 0);
+    return lens * eye * world;
+}
+
+bool Solid(const Layer&, const Placement& p) { return p.tilt != SkM44(); }
+
 Anim Moving(float tBefore, float tNow, std::vector<float> before, std::vector<float> now) {
     Anim a;
     if (tBefore < tNow && before != now) {
@@ -139,7 +152,10 @@ bool SeeLayers(const std::vector<Layer>& layers, int width, int height, bool top
     const Layer* camera = top && gCameraView ? ActiveCamera(layers, timeMs) : nullptr;
     if (!camera) {
         bool flat = true;
-        for (const Layer& l : layers) flat = flat && EffectivePlacement(layers, l, timeMs).z == 0;
+        for (const Layer& l : layers) {
+            const Placement p = EffectivePlacement(layers, l, timeMs);
+            flat = flat && p.z == 0 && !Solid(l, p);
+        }
         if (flat) return false;
     }
     const double beforeMs = timeMs - 1000.0 / std::max(fps, 1);
@@ -168,9 +184,15 @@ bool SeeLayers(const std::vector<Layer>& layers, int width, int height, bool top
             const float tBefore = l.localTime(beforeMs);
             d = s.depth;
             drop = !s.visible;
-            copy.location = Moving(tBefore, tNow, {b.location.fX, b.location.fY, 0}, {s.location.fX, s.location.fY, 0});
-            copy.scale = Moving(tBefore, tNow, {b.scale.fX, b.scale.fY}, {s.scale.fX, s.scale.fY});
-            copy.rotation = Moving(tBefore, tNow, {b.rotation}, {s.rotation});
+            if (Solid(l, p)) {
+                copy.projected = true;
+                copy.space = Space(now, p);
+                copy.scale = Anim{{p.scale.fX, p.scale.fY}};
+            } else {
+                copy.location = Moving(tBefore, tNow, {b.location.fX, b.location.fY, 0}, {s.location.fX, s.location.fY, 0});
+                copy.scale = Moving(tBefore, tNow, {b.scale.fX, b.scale.fY}, {s.scale.fX, s.scale.fY});
+                copy.rotation = Moving(tBefore, tNow, {b.rotation}, {s.rotation});
+            }
             if (camera) AddCameraEffects(*camera, timeMs, d, b.location, s.location, &copy);
         }
         copies.push_back(std::move(copy));

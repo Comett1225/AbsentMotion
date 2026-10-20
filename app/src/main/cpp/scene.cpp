@@ -266,6 +266,7 @@ bool ParseLayer(const XmlNode& node, int fps, Layer* out) {
         l.pivot = ParseAnim(t->child("pivot"));
         l.scale = ParseAnim(t->child("scale"));
         l.rotation = ParseAnim(t->child("rotation"));
+        l.tilt = ParseAnim(t->child("tilt"));
         l.skew = ParseAnim(t->child("skew"));
         l.opacity = ParseAnim(t->child("opacity"));
     }

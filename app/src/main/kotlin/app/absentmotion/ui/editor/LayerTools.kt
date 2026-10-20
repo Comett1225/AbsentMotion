@@ -276,7 +276,7 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
         }
         if (move) {
             Column(Modifier.width(168.px).fillMaxHeight()) {
-                listOf(PanelIcons.TabMove, PanelIcons.TabRotate, PanelIcons.TabSize, PanelIcons.TabSkew).forEachIndexed { i, icon ->
+                listOf(PanelIcons.TabMove, PanelIcons.TabRotate, PanelIcons.TabTilt, PanelIcons.TabSize, PanelIcons.TabSkew).forEachIndexed { i, icon ->
                     val usable = i < 2 || selected.kind != "camera"
                     Box(Modifier.weight(1f).fillMaxWidth().then(if (usable) Modifier.clickable { tab = i } else Modifier.dimmed()).padding(start = 10.px, end = 11.px, top = 11.px, bottom = 11.px)) {
                         Box(
@@ -295,6 +295,7 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
 internal val TransformTargets = listOf(
     KeyTarget(PropRef.Location, "0.000000,0.000000,0.000000"),
     KeyTarget(PropRef.Rotation, "0.000000"),
+    KeyTarget(PropRef.Tilt, "0.000000,0.000000"),
     KeyTarget(PropRef.Scale, "1.000000,1.000000"),
     KeyTarget(PropRef.Skew, "0.000000,0.000000"),
 )

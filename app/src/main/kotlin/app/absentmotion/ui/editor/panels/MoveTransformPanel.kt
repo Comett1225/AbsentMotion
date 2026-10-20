@@ -59,7 +59,8 @@ internal fun MoveTransformPanel(state: EditorState, layer: Layer, tab: Int, modi
         when (tab) {
             0 -> PositionTab(state, layer)
             1 -> RotationTab(state, layer)
-            2 -> SizeTab(state, layer)
+            2 -> TiltTab(state, layer)
+            3 -> SizeTab(state, layer)
             else -> SkewTab(state, layer)
         }
     }
@@ -393,3 +394,47 @@ private fun SkewTab(state: EditorState, layer: Layer) {
 }
 
 private const val DEGREES_PER_DP = 0.25f
+
+@Composable
+private fun TiltTab(state: EditorState, layer: Layer) {
+    var active by remember { mutableIntStateOf(0) }
+    val tilt = layer.tilt
+    val labels = listOf("X ROTATION", "Y ROTATION")
+    fun openKeypad(which: Int) {
+        active = which
+        state.keypad = KeypadRequest(labels.mapIndexed { i, label -> KeypadField(label, tilt[i]) }, which) { v -> state.editSelected { it.withTilt(v[0], v[1]) } }
+    }
+    fun colour(which: Int) = if (active == which) Am.Accent else Am.OnDark
+
+    Box(Modifier.fillMaxSize()) {
+        Column(Modifier.align(Alignment.TopCenter).padding(top = 42.px)) {
+            Row {
+                NumberBox(formatFixed(tilt[0], 1) + "º", colour(0), Modifier.width(177.px).height(70.px)) { openKeypad(0) }
+                Spacer(Modifier.width(14.px))
+                NumberBox(formatFixed(tilt[1], 1) + "º", colour(1), Modifier.width(177.px).height(70.px)) { openKeypad(1) }
+            }
+            Row(Modifier.height(23.px)) {
+                Caption(labels[0], Modifier.width(177.px).fillMaxHeight())
+                Spacer(Modifier.width(14.px))
+                Caption(labels[1], Modifier.width(177.px).fillMaxHeight())
+            }
+        }
+        for (which in 0..1) {
+            RulerSpinner(
+                colour(which),
+                onDrag = { dx ->
+                    val d = dx * TILT_PER_DP
+                    state.editSelected(key = "tilt-$which") { l ->
+                        val t = l.tilt
+                        l.withTilt(if (which == 0) t[0] + d else t[0], if (which == 1) t[1] + d else t[1])
+                    }
+                },
+                onEnd = { state.endGesture() },
+                modifier = Modifier.padding(top = (if (which == 0) 137 else 345).px).fillMaxWidth().height((if (which == 0) 194 else 193).px),
+                onStart = { active = which },
+            )
+        }
+    }
+}
+
+private const val TILT_PER_DP = 0.5f

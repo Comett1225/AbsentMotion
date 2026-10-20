@@ -167,6 +167,8 @@ data class Layer(val node: XmlNode, val t: Float = 0f, val snap: Float = 0f) {
 
     val skew: FloatArray get() = transform("skew", 0f, 0f).let { floatArrayOf(Math.toDegrees(it[0].toDouble()).toFloat(), Math.toDegrees(it[1].toDouble()).toFloat()) }
 
+    val tilt: FloatArray get() = transform("tilt", 0f, 0f)
+
     fun transform(name: String, vararg defaults: Float): FloatArray =
         floats(node.child("transform")?.child(name)?.valueAt(t), defaults)
 
@@ -205,6 +207,8 @@ data class Layer(val node: XmlNode, val t: Float = 0f, val snap: Float = 0f) {
     fun withRotation(degrees: Float) = withTransform("rotation", -degrees)
 
     fun withSkew(x: Float, y: Float) = withTransform("skew", Math.toRadians(x.toDouble()).toFloat(), Math.toRadians(y.toDouble()).toFloat())
+
+    fun withTilt(x: Float, y: Float) = withTransform("tilt", x, y)
 
     fun withProp(name: String, type: String, value: String): Layer {
         val ref = PropRef.shape(name)

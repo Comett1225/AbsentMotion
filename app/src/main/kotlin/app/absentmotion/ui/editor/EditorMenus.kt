@@ -246,14 +246,14 @@ internal object AboveLeft : PopupPositionProvider {
 
 @Composable
 internal fun TransformMenu(state: EditorState, tab: Int, onDismiss: () -> Unit) {
-    val name = listOf("Location", "Rotation", "Scale", "Skew")[tab]
+    val name = listOf("Location", "Rotation", "3D Rotation", "Scale", "Skew")[tab]
     MenuPopup(AboveLeft, onDismiss, TransformOrigin(0f, 1f)) {
         MenuRow("Reset $name") {
             state.resetTransform(listOf(tab))
             onDismiss()
         }
         MenuRow("Reset Transform", divider = true) {
-            state.resetTransform(listOf(0, 1, 2, 3))
+            state.resetTransform(listOf(0, 1, 2, 3, 4))
             onDismiss()
         }
     }

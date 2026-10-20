@@ -126,7 +126,8 @@ fun EditorState.resetTransform(tabs: List<Int>) = editSelected { layer ->
         when (tab) {
             0 -> l.withTransform("location", scene.width / 2f, scene.height / 2f, if (l.kind == "camera") -scene.cameraZoom else 0f)
             1 -> l.withRotation(0f)
-            2 -> l.withTransform("scale", 1f, 1f)
+            2 -> l.withTilt(0f, 0f)
+            3 -> l.withTransform("scale", 1f, 1f)
             else -> l.withSkew(0f, 0f)
         }
     }

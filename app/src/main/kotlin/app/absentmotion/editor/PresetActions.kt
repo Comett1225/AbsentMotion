@@ -13,7 +13,7 @@ import app.absentmotion.model.withVideoSpeedMap
 
 private val STYLED = setOf("shape", "text", "drawing", "embedScene")
 private val STROKED = setOf("shape", "text")
-private val MOVING = listOf("scale", "location", "rotation", "skew", "pivot")
+private val MOVING = listOf("scale", "location", "rotation", "tilt", "skew", "pivot")
 
 fun canSavePreset(layer: Layer): Boolean {
     val n = layer.node

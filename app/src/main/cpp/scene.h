@@ -10,6 +10,7 @@
 
 #include "easing.h"
 #include "xml.h"
+#include "include/core/SkM44.h"
 #include "include/core/SkMatrix.h"
 #include "include/core/SkPath.h"
 #include "include/core/SkImage.h"
@@ -111,7 +112,7 @@ struct Layer {
     std::string mediaUri, mediaFillMode;
     int startTime = 0, endTime = 0;
     bool hidden = false;
-    Anim location, pivot, scale, rotation, skew, opacity, fillColor;
+    Anim location, pivot, scale, rotation, skew, opacity, fillColor, tilt;
     std::vector<Property> props;
     std::vector<LayerEffect> effects;
     Stroke stroke;
@@ -134,6 +135,8 @@ struct Layer {
     Camera camera;
     Anim steps;
     bool placed = false;
+    bool projected = false;
+    SkM44 space;
 
     float value(const char* name, int i, float t, float fallback) const;
 
@@ -154,6 +157,7 @@ struct Placement {
     SkPoint location, pivot, scale;
     float rotation, z;
     SkMatrix stretch = SkMatrix::I();
+    SkM44 tilt;
 };
 
 struct Echo {

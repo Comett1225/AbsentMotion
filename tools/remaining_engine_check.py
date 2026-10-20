@@ -41,8 +41,17 @@ def cases():
     yield 'a raster extrude at rest shows the layer', engine.scene(engine.rect(1, 100, 100, 40, 40, 0xffff0000, extra=fx('rasterextrude', **still))), [((100, 100), engine.RED), ((5, 5), engine.BLACK)]
     turned = fx('flip', rotX=0, rotY=180, shading=0, shine=0, back=2).replace('</effect>', '<property name="backColor" type="color" value="#ff0000ff"/></effect>')
     yield 'a flipped layer shows its back colour', engine.scene(engine.rect(1, 100, 100, 40, 40, 0xffff0000, extra=turned)), [((100, 100), engine.BLUE), ((5, 5), engine.BLACK)]
+    yield 'a layer turned 60 degrees around Y shows perspective', engine.scene(tilted(1, 60, 0)), [((60, 100), engine.BLACK), ((75, 100), engine.RED), ((115, 100), engine.RED), ((126, 100), engine.BLACK), ((70, 40), engine.RED), ((118, 45), engine.BLACK)]
+    yield 'a layer tilted 60 degrees around X leans back', engine.scene(tilted(1, 0, 60)), [((100, 60), engine.BLACK), ((100, 85), engine.RED), ((100, 128), engine.RED), ((100, 138), engine.BLACK), ((40, 130), engine.RED), ((45, 82), engine.BLACK)]
+    parent = '<nullobj id="5" label="n" startTime="0" endTime="1000"><transform><location value="100,100,0"/><tilt value="0,60"/></transform></nullobj>'
+    yield 'a child turns in 3D with its parent', engine.scene(parent + engine.rect(2, -40, 0, 20, 20, 0xffff0000, attrs=' parent="5"')), [((50, 100), engine.BLACK), ((75, 100), engine.RED), ((85, 100), engine.RED), ((95, 100), engine.BLACK)]
     title = "a missing picture draws nothing"
     yield 'placeholder opacity', *engine.CASES[title]
+
+
+def tilted(id, y, x, extra=''):
+    return (f'<shape id="{id}" label="t" startTime="0" endTime="1000" fillType="color" s=".rect"><transform><location value="100,100,0"/>'
+            f'<tilt value="{x},{y}"/></transform><fillColor value="#ffff0000"/>' + (extra or '<property name="size" type="vec2" value="50,50"/>') + '</shape>')
 
 
 def fx(name, **params):
@@ -172,6 +181,12 @@ def main():
     got = [line.split()[-1] for line in hits.splitlines() if ' hit ' in line]
     ok = got == ['7', '0']
     print(('ok   ' if ok else 'FAIL ') + 'tapping follows an oscillating layer: ' + str(got), flush=True)
+    failed += not ok
+    hits = engine.run('tilthit', engine.scene(tilted(7, 60, 0)), work, [(75, 100), (126, 100), (70, 40), (118, 45)])
+    engine.adb('shell', 'rm', engine.DEVICE_DIR + '/tilthit.png')
+    got = [line.split()[-1] for line in hits.splitlines() if ' hit ' in line]
+    ok = got == ['7', '0', '7', '0']
+    print(('ok   ' if ok else 'FAIL ') + 'tapping follows a layer turned in 3D: ' + str(got), flush=True)
     failed += not ok
     lf = engine.still('remaininglf', text('A&#10;B'), work)
     crlf = engine.still('remainingcrlf', text('A&#13;&#10;B'), work)
