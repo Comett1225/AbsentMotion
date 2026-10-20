@@ -2,6 +2,7 @@
  "id": "stretchaxis",
  "name": "Stretch Axis",
  "category": "move",
+ "since": "3.0.0",
  "native": true,
  "description": "Stretches the layer along an angle.",
  "params": [

@@ -2,6 +2,7 @@
  "id": "randomdisplace",
  "name": "Random Displacement",
  "category": "move",
+ "since": "3.0.0",
  "native": true,
  "description": "Lets the layer drift around its place at random.",
  "params": [

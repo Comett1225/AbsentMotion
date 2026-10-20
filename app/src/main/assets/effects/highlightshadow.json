@@ -2,6 +2,7 @@
  "id": "highlightshadow",
  "name": "Highlights & Shadows",
  "category": "color",
+ "since": "2.5.0",
  "description": "Recovers or boosts bright highlights and lifts or deepens dark shadows using a blurred local luminance mask.",
  "params": [
   {

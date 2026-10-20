@@ -2,6 +2,7 @@
  "id": "unsharpmask",
  "name": "Unsharp Mask",
  "category": "stylize",
+ "since": "2.5.0",
  "description": "Applies classic unsharp masking with a threshold and an optional grey mask preview.",
  "params": [
   {

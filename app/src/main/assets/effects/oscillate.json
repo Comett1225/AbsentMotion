@@ -2,6 +2,7 @@
  "id": "oscillate",
  "name": "Oscillate",
  "category": "move",
+ "since": "3.0.0",
  "native": true,
  "description": "Moves the layer back and forth along an angle.",
  "params": [

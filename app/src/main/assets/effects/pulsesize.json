@@ -2,6 +2,7 @@
  "id": "pulsesize",
  "name": "Pulse Size",
  "category": "move",
+ "since": "3.0.0",
  "native": true,
  "description": "Makes the layer grow and shrink over and over.",
  "params": [

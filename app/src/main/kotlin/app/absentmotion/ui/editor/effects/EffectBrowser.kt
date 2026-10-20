@@ -38,7 +38,6 @@ import app.absentmotion.ai.AiAction
 import app.absentmotion.ai.AiTools
 import app.absentmotion.editor.EditorState
 import app.absentmotion.effects.EffectCatalog
-import app.absentmotion.effects.EffectCategories
 import app.absentmotion.effects.EffectDefinition
 import app.absentmotion.model.addEffect
 import app.absentmotion.model.effects
@@ -89,7 +88,7 @@ fun EffectBrowser(state: EditorState) {
                 BasicTextField(query, { query = it }, Modifier.weight(1f).padding(8.dp).focusRequester(focus), singleLine = true,
                     textStyle = TextStyle(color = Am.OnDark, fontSize = 17.sp), cursorBrush = SolidColor(Am.Accent))
             }
-            else Text(detail?.name ?: category?.let { key -> EffectCategories.firstOrNull { it.first == key }?.second } ?: "Effects Library",
+            else Text(detail?.name ?: category?.let { key -> catalog.categories.firstOrNull { it.first == key }?.second } ?: "Effects Library",
                 Modifier.weight(1f), color = Am.OnDark, fontSize = 17.sp, textAlign = TextAlign.Center, maxLines = 1)
             BrowserButton(EffectIcons.Search, { state.effectDetail = null; detail = null; searching = true })
         }
@@ -142,7 +141,7 @@ fun EffectBrowser(state: EditorState) {
                         Icon(PanelIcons.Star, "Favorite", Modifier.size(12.dp).clickable { favPage = true }, tint = if (favPage) Am.Accent else Am.OnDarkDim)
                     }
                 }
-                EffectCategories.chunked(2).forEach { row ->
+                catalog.categories.chunked(2).forEach { row ->
                     Row(Modifier.fillMaxWidth(), Arrangement.spacedBy(1.5.dp)) {
                         row.forEach { (key, name) ->
                             Box(Modifier.weight(1f).height(66.5.dp).padding(bottom = 1.5.dp).clickable { category = key }, contentAlignment = Alignment.Center) {
@@ -178,6 +177,8 @@ private fun EffectTile(catalog: EffectCatalog, effect: EffectDefinition, width: 
         Box {
             Thumbnail(catalog, effect.thumbnail, Modifier.size((width - 7).dp).clip(RoundedCornerShape(5.dp)))
             if (favourite) Icon(PanelIcons.Star, null, Modifier.align(Alignment.TopEnd).size(14.dp), tint = Am.Accent)
+            if (catalog.isNew(effect)) Text("NEW", Modifier.align(Alignment.TopStart).padding(3.dp).clip(RoundedCornerShape(3.dp)).background(Am.Accent)
+                .padding(horizontal = 3.dp), color = Color.White, fontSize = 7.sp, lineHeight = 9.sp, fontWeight = FontWeight.Bold, maxLines = 1)
         }
         Text(effect.name, Modifier.fillMaxWidth().padding(top = 4.dp), color = Am.OnDark, fontSize = if (width > 100) 10.sp else 8.sp,
             lineHeight = 9.sp, textAlign = TextAlign.Center, maxLines = 2)

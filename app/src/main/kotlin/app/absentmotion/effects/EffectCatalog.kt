@@ -13,10 +13,16 @@ data class EffectCatalog(
     val definitions: List<EffectDefinition> = emptyList(),
     val message: String? = null,
     private val open: ((String) -> InputStream)? = null,
+    val newest: Set<String> = emptySet(),
 ) {
     fun find(id: String): EffectDefinition? = definitions.firstOrNull { it.id == id }
 
-    fun listed(category: String? = null): List<EffectDefinition> = definitions.filter { category == null || it.category == category }
+    fun isNew(effect: EffectDefinition): Boolean = effect.since in newest
+
+    fun listed(category: String? = null): List<EffectDefinition> =
+        definitions.filter { category == null || it.category == category || (category == "new" && isNew(it)) }
+
+    val categories: List<Pair<String, String>> get() = (if (definitions.any(::isNew)) listOf("new" to "New") else emptyList()) + EffectCategories
 
     fun image(path: String?): Bitmap? = path?.let { p -> runCatching { open?.invoke(p)?.use { BitmapFactory.decodeStream(it) } }.getOrNull() }
 
@@ -37,7 +43,8 @@ data class EffectCatalog(
             val definitions = List(keys.length()) { keys.getString(it) }.mapNotNull { key ->
                 runCatching { EffectDefinition.parse(JSONObject(text("$key.json"))) }.getOrNull()
             }
-            EffectCatalog(definitions, open = open)
+            val releases = runCatching { JSONArray(text("releases.json")).let { a -> List(a.length()) { a.getString(it) } } }.getOrDefault(emptyList())
+            EffectCatalog(definitions, open = open, newest = releases.takeLast(5).toSet())
         }.getOrElse { EffectCatalog(message = "The effects could not be loaded") }
     }
 }

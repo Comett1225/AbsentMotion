@@ -2,6 +2,7 @@
  "id": "denoise",
  "name": "Denoise",
  "category": "blur",
+ "since": "2.5.0",
  "description": "Removes image noise with an edge-preserving bilateral filter that averages nearby pixels only when their colours are similar.",
  "params": [
   {

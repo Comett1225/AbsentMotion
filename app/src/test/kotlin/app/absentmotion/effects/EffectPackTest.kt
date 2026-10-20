@@ -14,7 +14,7 @@ class EffectPackTest {
     @Test fun everyEffectFileIsListedAndLoads() {
         assertNull(catalog.message)
         val index = JSONArray(File(pack, "index.json").readText()).let { a -> List(a.length()) { a.getString(it) } }
-        val files = pack.listFiles()!!.filter { it.extension == "json" && it.name !in setOf("index.json", "foreign.json") }.map { it.nameWithoutExtension }
+        val files = pack.listFiles()!!.filter { it.extension == "json" && it.name !in setOf("index.json", "foreign.json", "releases.json") }.map { it.nameWithoutExtension }
         assertEquals("index.json and the effect files", files.sorted(), index.sorted())
         assertEquals("ids are unique", index.size, index.toSet().size)
         assertEquals("every listed effect parses", index, catalog.definitions.map { it.key })
@@ -68,6 +68,21 @@ class EffectPackTest {
         val node = effect.instance()
         assertEquals(effect.id, node["id"])
         assertEquals(effect.params.map { Triple(it.id, it.type, it.default) }, node.children.map { Triple(it["name"], it["type"], it["value"]) })
+    }
+
+    @Test fun theNewCategoryShowsEffectsFromTheLastFiveReleases() {
+        val releases = JSONArray(File(pack, "releases.json").readText()).let { a -> List(a.length()) { a.getString(it) } }
+        val numbers = releases.map { r -> r.split('.').map { it.toInt() } }
+        assertTrue("releases are listed oldest first", numbers.zipWithNext().all { (a, b) -> a.zip(b).firstOrNull { it.first != it.second }?.let { it.first < it.second } == true })
+        assertTrue(catalog.definitions.all { it.since == null || it.since in releases })
+        assertEquals(releases.takeLast(5).toSet(), catalog.newest)
+        val fresh = catalog.listed("new").map { it.key }.toSet()
+        assertTrue(fresh.containsAll(listOf("vhs", "oscillate", "timequant", "unsharpmask", "flicker")))
+        assertTrue("blur" !in fresh && "glow" !in fresh)
+        assertEquals(listOf("new") + EffectCatalog.Categories.keys + "ai", catalog.categories.map { it.first })
+        val old = EffectCatalog(catalog.definitions.map { it.copy(since = null) }, newest = catalog.newest)
+        assertTrue(old.listed("new").isEmpty())
+        assertEquals(EffectCatalog.Categories.keys.toList() + "ai", old.categories.map { it.first })
     }
 
     @Test fun everyEffectHasAThumbnailOnceTheyAreMade() {

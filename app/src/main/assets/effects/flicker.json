@@ -2,6 +2,7 @@
  "id": "flicker",
  "name": "Flicker",
  "category": "stylize",
+ "since": "2.5.0",
  "description": "Flickers the opacity of the layer at random.",
  "params": [
   {

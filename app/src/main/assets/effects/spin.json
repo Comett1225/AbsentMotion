@@ -2,6 +2,7 @@
  "id": "spin",
  "name": "Spin",
  "category": "move",
+ "since": "3.0.0",
  "native": true,
  "description": "Turns the layer round and round at a steady speed.",
  "params": [

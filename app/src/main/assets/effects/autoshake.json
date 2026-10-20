@@ -2,6 +2,7 @@
  "id": "autoshake",
  "name": "Auto-Shake",
  "category": "move",
+ "since": "3.0.0",
  "native": true,
  "description": "Shakes the layer at random, moving and turning it a little.",
  "params": [

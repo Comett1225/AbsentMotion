@@ -2,6 +2,7 @@
  "id": "swing",
  "name": "Swing",
  "category": "move",
+ "since": "3.0.0",
  "native": true,
  "description": "Turns the layer back and forth around its pivot.",
  "params": [

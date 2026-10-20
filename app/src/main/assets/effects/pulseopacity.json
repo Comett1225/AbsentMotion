@@ -2,6 +2,7 @@
  "id": "pulseopacity",
  "name": "Pulse Opacity",
  "category": "move",
+ "since": "3.0.0",
  "native": true,
  "description": "Fades the layer out and in over and over.",
  "params": [

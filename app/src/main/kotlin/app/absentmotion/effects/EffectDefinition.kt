@@ -57,6 +57,7 @@ data class EffectDefinition(
     val sksl: String? = null,
     val native: Boolean = false,
     val status: String = "ok",
+    val since: String? = null,
 ) {
     val available: Boolean get() = status == "ok"
     val thumbnail: String get() = "thumb/$key.webp"
@@ -78,7 +79,8 @@ data class EffectDefinition(
             val sksl = json.optString("sksl").takeIf { it.isNotBlank() }
             require(native || sksl != null) { "$key: no shader" }
             return EffectDefinition("absent.$key", key, json.optString("name", key), category, json.optString("description"),
-                List(params.length()) { EffectParam.parse(params.getJSONObject(it)) }, if (native) null else sksl, native)
+                List(params.length()) { EffectParam.parse(params.getJSONObject(it)) }, if (native) null else sksl, native,
+                since = json.optString("since").takeIf { it.isNotBlank() })
         }
     }
 }
