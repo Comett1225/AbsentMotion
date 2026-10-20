@@ -52,6 +52,8 @@
  "hexagontileshift",
  "squeeze",
  "polar",
+ "viewer360",
+ "reorient360",
  "stretch",
  "glow",
  "lightglow",
