@@ -1,0 +1,1 @@
+AbsentMotion 3.1: move clips by holding them, turn 3D objects with your fingers, a camera that works like Alight Motion's with one-tap Camera Moves, Glow, Bend and Block Noise rebuilt like Alight's, crash logs and an optional update check, tidier Settings, smoother editing with animations and vibration, and about 70 fixes.

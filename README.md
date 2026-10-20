@@ -18,8 +18,8 @@ subscription, no account and no advertising, and your projects never leave your 
 ## What it does
 
 - **Layers and a timeline.** Shapes, text, images, video, audio, freehand drawings, groups, reusable elements, 3D models
-  and null objects, with trimming, splitting, parenting, clipping masks, label colours, bookmarks, slide-to-select and
-  frame-accurate snapping.
+  and null objects, with trimming, splitting, moving clips by holding them, parenting, clipping masks, label colours,
+  bookmarks, slide-to-select and frame-accurate snapping.
 - **Keyframes with easing.** Any value (position, size, rotation, 3D tilt, skew, opacity, colour, shape and effect
   parameters) can be keyframed. Easing is a cubic Bezier, bounce, elastic, cyclic, random or stepped curve, edited
   with handles on a graph.
@@ -35,8 +35,9 @@ subscription, no account and no advertising, and your projects never leave your 
 - **Text.** Text layers with spacing and alignment, 50 fonts built in and 100 more to download from Google Fonts.
 - **Video tools.** Speed ramps with presets and freeze frames, motion tracking, background removal for photos and
   videos, frame blending and optical-flow slow motion, preview copies for heavy 4K videos, and an in-app camera.
-- **Camera layers.** A 3D camera with perspective or orthographic projection, depth ordering, focus blur, fog and
-  motion blur.
+- **Camera layers.** A 3D camera that works like Alight Motion's, showing the world around the frame, with perspective or
+  orthographic projection, depth ordering, focus blur, fog, motion blur and one-tap Camera Moves (push in, pull out,
+  orbit, pan, dolly zoom, handheld). 3D objects turn with your fingers.
 - **Audio.** Audio layers and the sound of video clips, a waveform view, volume, audio effects (EQ, filters, reverb,
   echo, compressor, noise gate, limiter, with presets), beat detection (Mark Beats) and noise reduction.
 - **Offline text to speech** with the voices already on the device, and **auto captions** with on-device speech
@@ -44,8 +45,8 @@ subscription, no account and no advertising, and your projects never leave your 
 - **Export.** MP4, MOV, MKV or WebM video (H.264, HEVC, AV1, VP9 or APV, as the phone supports), audio settings, audio only
   (WAV, FLAC, M4A, OGG or MP3), animated GIF, image sequences and single frames, with a time estimate, a storage check,
   protection when the phone is hot and a check of every finished video and audio file.
-- **Safe projects.** Automatic version history, crash recovery, imported media copied into the project and one-tap
-  backup of every project to a folder that survives reinstalling.
+- **Safe projects.** Automatic version history, crash recovery, crash logs that say in one sentence what happened,
+  imported media copied into the project and one-tap backup of every project to a folder that survives reinstalling.
 - **12 languages.** English, Indonesian, Hindi, Portuguese (Brazil), Spanish, Filipino, Vietnamese, Thai, Malay,
   Arabic, Turkish and Russian, chosen on first start.
 
@@ -85,8 +86,9 @@ AbsentMotion is a young project. Please know these before you rely on it:
 - **Background removal.** The `foss` build removes backgrounds with its own offline model. The `play` build uses
   Google Play services instead, a proprietary Google library (listed in `THIRD_PARTY_NOTICES.md`) that downloads its
   model and may send diagnostics to Google, as it does for any app.
-- **Network use.** Nothing is needed online. The internet is only used when you choose one of the downloadable fonts and
-  for the speech model the first time you generate captions (the `play` build's Play services library aside, see above).
+- **Network use.** Nothing is needed online. The internet is only used when you choose one of the downloadable fonts, for
+  the speech model the first time you generate captions, and, only if you allow it when asked, to ask GitHub for the
+  newest version number when the app opens (the `play` build's Play services library aside, see above).
 
 ## File compatibility
 

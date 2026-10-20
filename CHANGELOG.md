@@ -6,6 +6,64 @@ All notable changes to AbsentMotion are listed here, newest first. The format fo
 Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stands for the feature set as it stood on
 2026-10-12.
 
+## [3.1.0] - 2026-10-20
+
+### Added
+
+- Move a clip in time by holding it and sliding it left or right, or by dragging a clip that is already selected. It snaps
+  to the playhead, other clips, keyframes and bookmarks, and one undo puts it back.
+- Turn 3D objects with your fingers on the Rotate and Tilt tabs: one finger turns them, two fingers twist them flat. The
+  Rotate tab of a 3D object shows X, Y and Z values to type and keyframe.
+- The camera works like Alight Motion's: once a project has a camera, the preview shows the world around the frame and the
+  camera as a box with an X, a selected camera's angle of view changes with a pinch, Camera View starts at 100 % zoom,
+  camera clips are pink, and Camera Options gain a Z trackpad, a Size tab and a view cone.
+- Camera Moves for a camera: Push In, Pull Out, Orbit, Pan, Dolly Zoom and Handheld, written as keyframes you can edit.
+- Crash logs in Settings, each with the time and one sentence saying why, a Copy button and Delete all. After a crash the
+  app says once when and why it closed.
+- An optional update check, asked once: the app can look up the newest version on GitHub when it opens, and Settings has
+  Check for Update. When a newer version exists, crash and error messages say it may already be fixed there.
+- Alight Motion projects keep their Glow, Block Noise and Bend effects when imported.
+
+### Changed
+
+- Glow works like Alight Motion's: Radius, Alpha, Hardness, Color and Blending Mode, drawn as a halo around the shape that
+  grows smoothly from 0. Glows in older projects are converted.
+- Bend works like Alight Motion's: a positive angle bends left, the bend is one even curve and it follows the layer's
+  rotation. Older projects are converted and keep bending to the same side.
+- Block Noise blocks grow and shrink with the layer, and Block Dissolve's size is in pixels, both as in Alight Motion.
+- Datamosh has a Start and an End in seconds instead of a Start and a Length.
+- Every ruler works like a tape measure: swiping left raises the value. Move & Transform lists Size above Rotate.
+- The Animate button is a round button in the bottom-right corner of the preview, the Media tab's search is a Search
+  square under Camera, the Object page has icons, and the keyframe button has a new icon.
+- Effects and audio effects lift and slide when you reorder them, menus and sheets animate, tiles react when pressed, and
+  drags and snaps give a light vibration.
+- Settings are grouped into Editor, Playback and preview, Projects and media, and Backup.
+- Chroma Key and Luma Key have animated thumbnails.
+- GIF and image exports are checked after saving, and the GIF and audio-only time estimates follow the real work.
+
+### Fixed
+
+- Opening Easing on a linear or bezier curve crashed the editor.
+- Bending left with Bend cut the layer off, and Datamosh painted a picture's, shape's or text's edge colour over the whole
+  canvas.
+- Glow jumped to full brightness as soon as it was above 0.
+- The selection box of an imported SVG or a background-removal group covered the whole canvas.
+- Layers with effects were cut off at the canvas edge in the camera's world view.
+- The Pulse, Wobble and Rotate loop animations ignored their size, swing and speed and used the effect's defaults.
+- Effects: Glitch, Halftone, Ripple and several 3D objects could draw broken pixels; Directional Blur left a grey fringe;
+  Unsharp Mask brightened flat areas; Dark Glow was too dark and Soft and Light Glow ignored the colour's transparency;
+  Flicker's Mode did nothing and is gone; Pinch folded over at high strength and now follows Alight Motion's curve;
+  Displacement Map's Edges did nothing with Layer Below; Radial Wipe's feather crossed the start line; Noise Displace only
+  moved along a diagonal; step keyframes on Spin and the other speed motions drifted; and Move Along Path's Inset switched
+  sides on S curves.
+- Tall projects such as 1080 x 2400 were marked as unsupported by the phone's encoder at 1080p.
+- Fixes from a code review, among them: a restored project linked to the wrong asset; replacing a template's video stopped
+  it looping; a failed template media copy silently used the original file; cancelling motion tracking threw away the
+  tracked frames; presets left out audio effects; new layers and clips were one frame too long; skipping to the next
+  keyframe could leave the project; dragging a parented layer on the canvas moved it the wrong way; the speed keyframe
+  button removed every keyframe; Save to My Assets froze the screen; a styled group lost its look when saved as an asset;
+  adding a big template froze the screen; and the New Project sheet did not fit narrow phones.
+
 ## [3.0.0] - 2026-10-20
 
 ### Added
