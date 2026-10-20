@@ -106,13 +106,15 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier) {
             Row(Modifier.weight(1f).fillMaxHeight(), Arrangement.spacedBy(3.px)) {
                 val clip = state.selected
                 val past = clip != null && state.timeMs > clip.endTime
-                if (past || clip != null && state.timeMs < clip.startTime) {
-                    SmallTool(if (past) PanelIcons.TrimRight else PanelIcons.TrimLeft, Modifier.weight(1f), ToolShape.copy(topEnd = Square, bottomEnd = Square)) { state.moveClipEdges(past, true) }
-                    SmallTool(if (past) ChromeIcons.SkipForward else ChromeIcons.SkipBack, Modifier.weight(1f), ToolShape.copy(topStart = Square, bottomStart = Square)) { state.moveClipEdges(past, false) }
-                } else {
-                    SmallTool(PanelIcons.TrimLeft, Modifier.weight(1f), ToolShape.copy(topEnd = Square, bottomEnd = Square)) { state.trimStart() }
-                    SmallTool(PanelIcons.Split, Modifier.weight(1f), RoundedCornerShape(0.dp)) { state.split() }
-                    SmallTool(PanelIcons.TrimRight, Modifier.weight(1f), ToolShape.copy(topStart = Square, bottomStart = Square)) { state.trimEnd() }
+                val before = clip != null && state.timeMs < clip.startTime
+                SmallTool(PanelIcons.TrimLeft, Modifier.weight(1f), ToolShape.copy(topEnd = Square, bottomEnd = Square), enabled = !past) {
+                    if (before) state.moveClipEdges(false, true) else state.trimStart()
+                }
+                SmallTool(if (past) ChromeIcons.SkipForward else if (before) ChromeIcons.SkipBack else PanelIcons.Split, Modifier.weight(1f), RoundedCornerShape(0.dp)) {
+                    if (past || before) state.moveClipEdges(past, false) else state.split()
+                }
+                SmallTool(PanelIcons.TrimRight, Modifier.weight(1f), ToolShape.copy(topStart = Square, bottomStart = Square), enabled = !before) {
+                    if (past) state.moveClipEdges(true, true) else state.trimEnd()
                 }
             }
             Spacer(Modifier.width(17.px))
