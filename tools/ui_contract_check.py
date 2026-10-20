@@ -250,12 +250,11 @@ class UiContracts(unittest.TestCase):
         self.assertIn('SwitchRow(stringResource(R.string.settings_vibration), settings.vibration', source('ui/home/SettingsDrawer.kt'))
         self.assertEqual('Vibration', english('settings_vibration'))
 
-    def test_holding_or_dragging_a_selected_clip_moves_it_in_time_as_one_undo_step(self):
+    def test_holding_a_clip_moves_it_in_time_as_one_undo_step_and_a_plain_swipe_scrubs(self):
         text = source('ui/editor/Timeline.kt')
         self.assertIn('hit is Hit.Bar && view.lift(hit.id, finger, viewConfiguration.touchSlop, moves = true) -> drag = Drag.Lift', text)
-        self.assertIn('hit.clipId?.takeIf { it == state.selectedId && abs(moved.x) > abs(moved.y) }', text)
-        self.assertIn('clip != null && moveBegin(clip) -> {', text)
-        self.assertIn('Drag.Move -> moveBy(delta.x)', text)
+        self.assertNotIn('Drag.Move', text)
+        self.assertNotIn('state.selectedId && abs(moved.x)', text)
         self.assertIn('state.edit(MOVE_EDIT) { it.update(id) { l -> l.movedTo(start) } }', text)
         self.assertIn('state.edit(MOVE_EDIT) { it.move(id, layers.lastIndex - to) }', text)
         self.assertIn('if (!commit || state.scene == moveBase) state.cancelGesture(MOVE_EDIT)', text)

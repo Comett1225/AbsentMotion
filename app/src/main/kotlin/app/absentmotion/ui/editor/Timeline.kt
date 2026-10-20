@@ -366,12 +366,11 @@ private sealed interface Hit {
     data class Row(val id: Long) : Hit
 }
 
-private enum class Drag(val edit: Boolean = false) { Scrub, Scroll, Pinch, Spent, Select, TrimStart(true), TrimEnd(true), Reorder(true), Lift(true), Key(true), Move(true) }
+private enum class Drag(val edit: Boolean = false) { Scrub, Scroll, Pinch, Spent, Select, TrimStart(true), TrimEnd(true), Reorder(true), Lift(true), Key(true) }
 
 private const val KEY_MOVE = "keyframe-move"
 private const val MOVE_EDIT = "clip-move"
 
-private val Hit.clipId: Long? get() = when (this) { is Hit.Bar -> id; is Hit.Key -> id; else -> null }
 
 private class TimelineView(val state: EditorState, density: Density, private val scope: CoroutineScope, private val wide: Boolean) {
     private val scale = density.density
@@ -634,7 +633,6 @@ private class TimelineView(val state: EditorState, density: Density, private val
     }
 
     fun beginDrag(hit: Hit, moved: Offset): Drag {
-        val clip = hit.clipId?.takeIf { it == state.selectedId && abs(moved.x) > abs(moved.y) }
         return when {
             hit is Hit.Grip -> {
                 val layer = layers.firstOrNull { it.id == hit.id }
@@ -646,10 +644,6 @@ private class TimelineView(val state: EditorState, density: Density, private val
             hit is Hit.Handle -> {
                 dragId = hit.id
                 Drag.Reorder
-            }
-            clip != null && moveBegin(clip) -> {
-                moveBy(moved.x)
-                Drag.Move
             }
             abs(moved.x) > abs(moved.y) -> {
                 state.playing = false
@@ -666,7 +660,6 @@ private class TimelineView(val state: EditorState, density: Density, private val
             Drag.TrimStart, Drag.TrimEnd -> trimBy(delta.x, start = drag == Drag.TrimStart)
             Drag.Reorder -> reorderTo(at.y)
             Drag.Key -> keyBy(delta.x)
-            Drag.Move -> moveBy(delta.x)
             Drag.Pinch, Drag.Spent, Drag.Lift, Drag.Select -> Unit
         }
     }
@@ -675,7 +668,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
         limitEdge = null
         snapAt = null
         if (drag == Drag.Lift) drop()
-        if (drag == Drag.Lift || drag == Drag.Move) dropMove(lifted)
+        if (drag == Drag.Lift) dropMove(lifted)
         if (drag == Drag.Select) endSelect()
         if (drag == Drag.Key) dropKey(lifted)
         if (drag?.edit == true) return state.endGesture()
@@ -765,11 +758,6 @@ private class TimelineView(val state: EditorState, density: Density, private val
         moveArmed = false
         snapTargets = TimelineMath.snapTargets(state.scene, id, state.frame)
         return true
-    }
-
-    private fun moveBy(dx: Float) {
-        moveDx += dx
-        moveApply()
     }
 
     private fun moveApply() {
