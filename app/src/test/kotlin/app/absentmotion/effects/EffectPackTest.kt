@@ -11,6 +11,8 @@ class EffectPackTest {
     private val pack = File("src/main/assets/effects")
     private val catalog = EffectCatalog.parse { File(pack, it).inputStream() }
 
+    private fun reads(input: String) = catalog.definitions.filter { Regex("""uniform\s+shader\s+$input\s*;""").containsMatchIn(it.sksl ?: "") }.map { it.key }.toSet()
+
     @Test fun everyEffectFileIsListedAndLoads() {
         assertNull(catalog.message)
         val index = JSONArray(File(pack, "index.json").readText()).let { a -> List(a.length()) { a.getString(it) } }
@@ -30,9 +32,10 @@ class EffectPackTest {
                 continue
             }
             val uniforms = declared.findAll(effect.sksl!!).associate { it.groupValues[3] to (it.groupValues[2] to it.groupValues[1].isNotEmpty()) }
-            val blurred = "blurred" in uniforms
+            val copies = listOf("blurred", "bright").filter { it in uniforms }
+            val blurred = copies.isNotEmpty()
             val expected = mapOf("image" to ("shader" to false), "size" to ("float2" to false), "time" to ("float" to false)) +
-                (if (blurred) mapOf("blurred" to ("shader" to false)) else emptyMap()) +
+                copies.associateWith { "shader" to false } +
                 (if ("duration" in uniforms) mapOf("duration" to ("float" to false)) else emptyMap()) +
                 listOf("backdrop", "below").filter { it in uniforms }.associateWith { "shader" to false } +
                 (if ("screen" in uniforms) mapOf("screen" to ("float4" to false)) else emptyMap()) +
@@ -50,10 +53,14 @@ class EffectPackTest {
     }
 
     @Test fun backgroundEffectsReadWhatIsBehindTheLayer() {
-        val reads = { input: String -> catalog.definitions.filter { Regex("""uniform\s+shader\s+$input\s*;""").containsMatchIn(it.sksl ?: "") }.map { it.key }.toSet() }
         assertTrue(reads("backdrop").containsAll(listOf("magnifybackground", "maskblur", "glass", "ominoglass", "displacementmap", "polardisplacement")))
         assertEquals(setOf("displacementmap"), reads("below"))
         assertTrue("fillbehind" !in reads("backdrop"))
+    }
+
+    @Test fun onlyLightGlowBlursTheBrightParts() {
+        assertEquals(setOf("lightglow"), reads("bright"))
+        assertTrue(reads("blurred").containsAll(listOf("darkglow", "edgeglow")))
     }
 
     @Test fun defaultsLieWithinTheirRange() {

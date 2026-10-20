@@ -173,8 +173,8 @@ std::string EffectRuntime::load(const std::string& xml) {
             return "shader error: " + text.substr(0, text.find('\n')) + "\n" + text;
         }
         if (!result.effect->findChild("image")) return "shader error: no 'uniform shader image'";
-        d.blurred = result.effect->findChild("blurred") != nullptr;
-        d.brightPass = d.blurred && result.effect->findUniform("threshold") != nullptr;
+        d.brightPass = result.effect->findChild("bright") != nullptr;
+        d.blurred = d.brightPass || result.effect->findChild("blurred") != nullptr;
         d.backdrop = result.effect->findChild("backdrop") != nullptr;
         d.below = result.effect->findChild("below") != nullptr;
         d.shader = std::move(result.effect);
@@ -278,7 +278,7 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
                                             luma[0], luma[1], luma[2], luma[3], luma[4], 0, 0, 0, 1, 0};
                     source = SkImageFilters::ColorFilter(SkColorFilters::Matrix(rows), f);
                 }
-                names.push_back("blurred");
+                names.push_back(d->brightPass ? "bright" : "blurred");
                 inputs.push_back(sigma > 0 ? SkImageFilters::Blur(sigma, sigma, SkTileMode::kDecal, source) : source);
             }
             if (d->backdrop) {
