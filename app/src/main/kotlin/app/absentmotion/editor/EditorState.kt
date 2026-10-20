@@ -1,6 +1,5 @@
 package app.absentmotion.editor
 
-import app.absentmotion.platform.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -10,6 +9,7 @@ import androidx.compose.ui.geometry.Offset
 import app.absentmotion.engine.EngineThread
 import app.absentmotion.engine.SnapGuide
 import app.absentmotion.library.AppSettings
+import app.absentmotion.library.ProjectSaver
 import app.absentmotion.library.ProjectStore
 import app.absentmotion.model.Layer
 import app.absentmotion.model.PropRef
@@ -59,7 +59,7 @@ class EditorState(
     private val store: ProjectStore,
     val engine: EngineThread,
     val settings: AppSettings,
-    private val onSaveFailed: () -> Unit,
+    val saver: ProjectSaver,
 ) {
     var scene by mutableStateOf(initial)
         private set
@@ -160,8 +160,6 @@ class EditorState(
 
     var overshoot by mutableStateOf(false)
 
-    private var saveFailed = false
-
     init {
         engine.setScene(scene)
     }
@@ -180,8 +178,9 @@ class EditorState(
     }
 
     fun endGesture() {
-        if (lastEditKey != null || saveFailed) persist(scene.toXml())
+        if (lastEditKey != null) saver.commit(scene.toXml())
         lastEditKey = null
+        saver.flush()
     }
 
     fun cancelGesture(key: Any) {
@@ -220,18 +219,7 @@ class EditorState(
         frame = frame.coerceIn(0, maxOf(next.lastFrame, 0))
         val xml = next.toXml()
         engine.setScene(next, xml)
-        if (save) persist(xml)
-    }
-
-    private fun persist(xml: String) {
-        try {
-            store.save(projectId, xml)
-            saveFailed = false
-        } catch (e: java.io.IOException) {
-            Log.e("AMStore", "cannot save project $projectId", e)
-            if (!saveFailed) onSaveFailed()
-            saveFailed = true
-        }
+        if (save) saver.commit(xml)
     }
 
     private companion object {

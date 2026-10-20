@@ -41,6 +41,8 @@ import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.MultiSelect
 import app.absentmotion.engine.EngineThread
 import app.absentmotion.library.AppSettings
+import app.absentmotion.library.DiskThread
+import app.absentmotion.library.ProjectSaver
 import app.absentmotion.library.ImportReport
 import app.absentmotion.library.Importer
 import app.absentmotion.library.MediaRelink
@@ -67,6 +69,8 @@ import app.absentmotion.ui.home.HomeScreen
 import app.absentmotion.i18n.Ltr
 import app.absentmotion.ui.onboarding.FirstRun
 import app.absentmotion.ui.onboarding.Onboarding
+import app.absentmotion.ui.home.OpenFailedDialog
+import app.absentmotion.ui.home.OpeningOverlay
 import app.absentmotion.ui.theme.PressIndication
 import app.absentmotion.ui.theme.enterFade
 import kotlinx.coroutines.Dispatchers
@@ -87,6 +91,9 @@ class MainActivity : ComponentActivity() {
     private var imported by mutableStateOf<List<ImportReport>>(emptyList())
     private var editingTemplate by mutableStateOf<String?>(null)
     private var firstRun by mutableStateOf<FirstRun?>(null)
+    private var opening by mutableStateOf(false)
+    private var openFailed by mutableStateOf<String?>(null)
+    private var closeAnyway = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -122,7 +129,7 @@ class MainActivity : ComponentActivity() {
                     val returning = remember { cameFromEditor }
                     Box(Modifier.fillMaxSize().then(if (returning) Modifier.enterFade() else Modifier)) {
                         HomeScreen(
-                            store, settings, onOpen = ::open, onExport = { id -> exportingFromList = loadRelinked(id) },
+                            store, settings, onOpen = ::open, onExport = ::exportFromList,
                             imported = imported, onImportShown = { imported = emptyList() }, onImportFile = { importUris(listOf(it)) },
                             onTemplate = { editingTemplate = it },
                         )
@@ -154,6 +161,8 @@ class MainActivity : ComponentActivity() {
                         if (open.exportOpen) ExportScreen(open.scene, open.frame, engine, fromProjectList = false) { open.exportOpen = false }
                     }
                 }
+                if (opening) OpeningOverlay()
+                openFailed?.let { OpenFailedDialog(null) { openFailed = null } }
             }
         }
     }
@@ -213,11 +222,37 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun open(id: String) {
-        cameFromEditor = true
-        editor = loadRelinked(id)?.let {
-            EditorState(id, it, store, engine, settings) { Toast.makeText(this, "Could not save the project. Free some storage space.", Toast.LENGTH_LONG).show() }
+    private suspend fun loadInBackground(id: String): Scene? {
+        opening = true
+        val scene = try {
+            withContext(DiskThread.dispatcher) { loadRelinked(id) }
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            throw e
+        } catch (e: Throwable) {
+            Log.e("AMStore", "cannot open project $id", e)
+            null
+        } finally {
+            opening = false
         }
+        if (scene == null) openFailed = id
+        return scene
+    }
+
+    private fun exportFromList(id: String) {
+        if (opening) return
+        lifecycleScope.launch { exportingFromList = loadInBackground(id) }
+    }
+
+    private fun open(id: String) {
+        if (opening) return
+        lifecycleScope.launch { openNow(id) }
+    }
+
+    private suspend fun openNow(id: String): EditorState? {
+        val scene = loadInBackground(id) ?: return null
+        cameFromEditor = true
+        val saver = ProjectSaver(id, store, failed = { runOnUiThread { Toast.makeText(this, "Could not save the project. Free some storage space.", Toast.LENGTH_LONG).show() } })
+        return EditorState(id, scene, store, engine, settings, saver).also { editor = it }
     }
 
     private fun closeEditor() {
@@ -226,9 +261,17 @@ class MainActivity : ComponentActivity() {
         closingEditor = true
         closing.playing = false
         closing.endGesture()
-        engine.audio?.release()
         val scene = closing.scene
         lifecycleScope.launch {
+            withContext(Dispatchers.IO) { runCatching { closing.saver.flush().get() } }
+            if (closing.saver.failing && !closeAnyway) {
+                closeAnyway = true
+                closingEditor = false
+                Toast.makeText(this@MainActivity, "Your last changes could not be saved. Free some storage space and close again, or close again to leave without them.", Toast.LENGTH_LONG).show()
+                return@launch
+            }
+            closeAnyway = false
+            engine.audio?.release()
             try {
                 val longSide = maxOf(scene.width, scene.height, 1)
                 engine.stillPng(scene.toXml(), closing.timeMs, (256 * scene.width / longSide).coerceAtLeast(1), (256 * scene.height / longSide).coerceAtLeast(1), store.thumbnailFile(closing.projectId))
@@ -286,13 +329,12 @@ class MainActivity : ComponentActivity() {
         val parsed = runCatching { Scene.parse(File(path).readText()) }.getOrElse { Log.e("AMTest", "cannot read $path", it); return }
         val id = "test-" + File(path).nameWithoutExtension
         store.save(id, parsed)
-        open(id)
-        val state = editor ?: return
-        val scene = state.scene
-        state.frame = intent.getIntExtra("frame", 0).coerceIn(0, scene.lastFrame)
-        val stillName = intent.getStringExtra("still")
-        intent.getStringExtra("export")?.let { exportForTest(it, scene, state.frame) }
         lifecycleScope.launch {
+            val state = openNow(id) ?: return@launch
+            val scene = state.scene
+            state.frame = intent.getIntExtra("frame", 0).coerceIn(0, scene.lastFrame)
+            val stillName = intent.getStringExtra("still")
+            intent.getStringExtra("export")?.let { exportForTest(it, scene, state.frame) }
             try {
                 engine.awaitMedia()
                 try { engine.awaitVideoFrames(scene, state.timeMs) } catch (e: java.io.IOException) { Log.i("AMTest", "video unavailable: ${e.message}") }
@@ -388,6 +430,11 @@ class MainActivity : ComponentActivity() {
         if (intent.getBooleanExtra("losegpu", false) && applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0) {
             window.decorView.postDelayed({ engine.simulateGpuLoss = true; state.frame = frame }, 2000)
         } else if (intent.hasExtra("frame")) state.frame = frame
+    }
+
+    override fun onPause() {
+        super.onPause()
+        editor?.saver?.flush()
     }
 
     override fun onStop() {

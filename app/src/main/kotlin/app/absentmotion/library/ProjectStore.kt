@@ -76,11 +76,10 @@ class ProjectStore(private val root: File) {
 
     fun save(id: String, scene: Scene) = save(id, scene.toXml())
 
-    fun save(id: String, xml: String) {
-        val temp = File(dir, "$id.xml.tmp")
-        temp.writeText(xml)
-        java.nio.file.Files.move(temp.toPath(), sceneFile(id).toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING)
-    }
+    @Synchronized
+    fun save(id: String, xml: String) = writeAtomically(sceneFile(id), xml)
+
+    fun text(id: String): String? = runCatching { sceneFile(id).readText() }.getOrNull()
 
     fun newId(): String {
         var n = System.currentTimeMillis()
@@ -143,4 +142,14 @@ class ProjectStore(private val root: File) {
     private fun folderUri(dir: File) = dir.toURI().toString().trimEnd('/') + "/"
 
     private fun sceneFile(id: String) = File(dir, "$id.xml")
+}
+
+internal fun writeAtomically(target: File, text: String, sync: Boolean = true) {
+    target.parentFile?.mkdirs()
+    val temp = File(target.parentFile, target.name + ".tmp")
+    java.io.FileOutputStream(temp).use { out ->
+        out.write(text.toByteArray())
+        if (sync) out.fd.sync()
+    }
+    java.nio.file.Files.move(temp.toPath(), target.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING, java.nio.file.StandardCopyOption.ATOMIC_MOVE)
 }
