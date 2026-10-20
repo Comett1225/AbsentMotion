@@ -86,5 +86,7 @@
  "tunnel",
  "textprogress",
  "texttransform",
- "textrandomizer"
+ "textrandomizer",
+ "countupdown",
+ "timecode"
 ]
