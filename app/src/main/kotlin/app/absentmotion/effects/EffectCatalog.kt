@@ -1,7 +1,7 @@
 package app.absentmotion.effects
 
-import app.absentmotion.platform.Bitmap
-import app.absentmotion.platform.BitmapFactory
+import android.graphics.ImageDecoder
+import android.graphics.drawable.Drawable
 import app.absentmotion.platform.Context
 import org.json.JSONArray
 import org.json.JSONObject
@@ -24,7 +24,9 @@ data class EffectCatalog(
 
     val categories: List<Pair<String, String>> get() = (if (definitions.any(::isNew)) listOf("new" to "New") else emptyList()) + EffectCategories
 
-    fun image(path: String?): Bitmap? = path?.let { p -> runCatching { open?.invoke(p)?.use { BitmapFactory.decodeStream(it) } }.getOrNull() }
+    fun drawable(path: String?): Drawable? = path?.let { p ->
+        runCatching { open?.invoke(p)?.use { ImageDecoder.decodeDrawable(ImageDecoder.createSource(java.nio.ByteBuffer.wrap(it.readBytes()))) } }.getOrNull()
+    }
 
     fun loadInto(load: (String) -> String): EffectCatalog {
         val status = definitions.associate { it.id to load(it.runtimeXml()).substringBefore('\n') }

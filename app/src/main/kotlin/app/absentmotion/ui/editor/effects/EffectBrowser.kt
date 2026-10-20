@@ -1,5 +1,9 @@
 package app.absentmotion.ui.editor.effects
 
+import android.graphics.drawable.AnimatedImageDrawable
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
+import android.widget.ImageView
 import app.absentmotion.platform.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -21,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
@@ -34,6 +39,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import app.absentmotion.ai.AiAction
 import app.absentmotion.ai.AiTools
 import app.absentmotion.editor.EditorState
@@ -187,10 +193,25 @@ private fun EffectTile(catalog: EffectCatalog, effect: EffectDefinition, width: 
 
 @Composable
 internal fun Thumbnail(catalog: EffectCatalog, path: String?, modifier: Modifier, scale: ContentScale = ContentScale.Fit) {
-    val bitmap by produceState<app.absentmotion.platform.Bitmap?>(null, catalog, path) {
-        value = withContext(Dispatchers.IO) { catalog.image(path) }
+    val drawable by produceState<Drawable?>(null, catalog, path) {
+        value = withContext(Dispatchers.IO) { catalog.drawable(path) }
+    }
+    DisposableEffect(drawable) {
+        val shown = drawable
+        onDispose { (shown as? AnimatedImageDrawable)?.stop() }
     }
     Box(modifier.background(RecommendedBg)) {
-        bitmap?.let { Image(it.asImageBitmap(), null, Modifier.fillMaxSize(), contentScale = scale) }
+        when (val d = drawable) {
+            is AnimatedImageDrawable -> AndroidView({ ImageView(it) }, Modifier.fillMaxSize().clipToBounds(), update = { v ->
+                v.scaleType = if (scale == ContentScale.Crop) ImageView.ScaleType.CENTER_CROP else ImageView.ScaleType.FIT_CENTER
+                if (v.drawable !== d) {
+                    v.setImageDrawable(d)
+                    d.repeatCount = AnimatedImageDrawable.REPEAT_INFINITE
+                    d.start()
+                }
+            })
+            is BitmapDrawable -> Image(d.bitmap.asImageBitmap(), null, Modifier.fillMaxSize(), contentScale = scale)
+            else -> {}
+        }
     }
 }

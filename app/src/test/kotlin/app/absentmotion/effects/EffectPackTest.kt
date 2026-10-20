@@ -85,6 +85,15 @@ class EffectPackTest {
         assertEquals(EffectCatalog.Categories.keys.toList() + "ai", old.categories.map { it.first })
     }
 
+    @Test fun thumbnailsStaySmallAndMovingEffectsAnimate() {
+        val thumbs = File(pack, "thumb").listFiles()!!.filter { it.extension == "webp" }
+        for (thumb in thumbs) assertTrue("${thumb.name} is ${thumb.length()} bytes", thumb.length() <= 150_000)
+        val animated = thumbs.filter { String(it.readBytes().copyOf(64), Charsets.ISO_8859_1).contains("ANIM") }.map { it.nameWithoutExtension }.toSet()
+        val wanted = catalog.listed("move").map { it.key } + listOf("vhs", "flicker", "blink", "glitch", "static")
+        assertEquals("still pictures", emptyList<String>(), wanted.filter { it !in animated })
+        assertTrue("blur is a still picture", "blur" !in animated)
+    }
+
     @Test fun everyEffectHasAThumbnailOnceTheyAreMade() {
         if (!File(pack, "thumb").isDirectory) return
         for (effect in catalog.definitions) assertTrue(effect.thumbnail, File(pack, effect.thumbnail).isFile)

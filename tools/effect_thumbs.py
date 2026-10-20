@@ -2,7 +2,6 @@
 import argparse
 import json
 import os
-import random
 import subprocess
 import sys
 import time
@@ -20,6 +19,7 @@ APP_DIR = "files/effect-thumbs"
 APP_PATH = f"/data/user/0/{PKG}/{APP_DIR}"
 OUT_DIR = f"/sdcard/Android/data/{PKG}/files"
 RENDER, THUMB, SAME = 384, 192, 2.0
+ANIM_FPS, ANIM_BYTES = 12, 150_000
 FREE = {"cc0", "pd"}
 TYPES = {"point": "vec2", "color": "color", "switch": "bool"}
 UA = {"User-Agent": "AbsentMotion-effect-thumbs/1.0"}
@@ -101,11 +101,19 @@ def value(kind, v):
     return f"{float(v):.6f}"
 
 
-def layer(id, image, effect="", half=RENDER // 2, keys=None):
+def prop(p, v):
+    kind = TYPES.get(p["type"], "float")
+    if isinstance(v, list) and p["type"] in ("float", "angle"):
+        keys = "".join(f'<kf t="{k / (len(v) - 1):.6f}" v="{value(p["type"], x)}"/>' for k, x in enumerate(v))
+        return f'<property name="{p["id"]}" type="{kind}">{keys}</property>'
+    return f'<property name="{p["id"]}" type="{kind}" value="{value(p["type"], v)}"/>'
+
+
+def layer(id, image, effect="", half=RENDER // 2, keys=None, end=999):
     c = RENDER // 2
     location = (f'<location value="{c},{c},0"/>' if not keys else
                 "<location>" + "".join(f'<kf t="{k / (len(keys) - 1):.6f}" v="{c + x},{c + y},0"/>' for k, (x, y) in enumerate(keys)) + "</location>")
-    return (f'<shape id="{id}" label="{image}" startTime="0" endTime="999" s=".rect" fillType="media" mediaFillMode="fill" '
+    return (f'<shape id="{id}" label="{image}" startTime="0" endTime="{end}" s=".rect" fillType="media" mediaFillMode="fill" '
             f'fillImage="file://{APP_PATH}/{image}.png"><transform>{location}</transform>'
             f'<property name="size" type="vec2" value="{half},{half}"/>{effect}</shape>')
 
@@ -122,34 +130,59 @@ def scene(show, effect):
         if unknown:
             sys.exit(f"{effect['id']}: no such parameter {', '.join(sorted(unknown))}")
         params.update(show.get("params", {}))
-        fx = (f'<effect id="absent.{effect["id"]}" hidden="false">'
-              + "".join(f'<property name="{p["id"]}" type="{TYPES.get(p["type"], "float")}" value="{value(p["type"], params[p["id"]])}"/>'
-                        for p in effect["params"]) + "</effect>")
-    layers = [layer(1, name) for name in backdrops(show)]
+        fx = f'<effect id="absent.{effect["id"]}" hidden="false">' + "".join(prop(p, params[p["id"]]) for p in effect["params"]) + "</effect>"
+    fps, total = (ANIM_FPS, round(show["animate"] * 1000 / ANIM_FPS)) if "animate" in show else (30, 1000)
+    layers = [layer(1, name, end=total - 1) for name in backdrops(show)]
     move = show.get("layout") == "move"
-    layers.append(layer(2, show["photo"], fx, RENDER // 4 if move else RENDER // 2, show.get("keys")))
+    layers.append(layer(2, show["photo"], fx, RENDER // 4 if move else RENDER // 2, show.get("keys"), total - 1))
     if "split" in show:
-        layers.append(layer(3, f'{show["photo"]}-before{round(show["split"] * 100)}'))
-    return (f'<scene title="thumb" width="{RENDER}" height="{RENDER}" fps="30" totalTime="1000" bgcolor="#00000000">'
+        layers.append(layer(3, f'{show["photo"]}-before{round(show["split"] * 100)}', end=total - 1))
+    return (f'<scene title="thumb" width="{RENDER}" height="{RENDER}" fps="{fps}" totalTime="{total}" bgcolor="#00000000">'
             + "".join(layers) + "</scene>")
 
 
-def render(work, name, xml, frame):
-    local = work / "thumb.xml"
-    local.write_text(xml)
-    push(local, "thumb.xml")
-    adb("logcat", "-c")
-    adb("shell", "am", "start", "-n", f"{PKG}/.MainActivity", "--es", "xml", f"{APP_PATH}/thumb.xml", "--es", "still", name, "--ei", "frame", frame)
-    deadline = time.time() + 90
-    while f"still {name} ok=" not in (log := adb("logcat", "-d", "-s", "AMTest")):
-        if time.time() > deadline:
-            sys.exit(f"{name}: the app wrote no still in 90 s")
-        time.sleep(0.3)
-    if f"still {name} ok=true" not in log:
-        sys.exit(f"{name}: the app could not render the still")
-    adb("pull", f"{OUT_DIR}/{name}.png", work / f"{name}.png")
-    adb("shell", "rm", f"{OUT_DIR}/{name}.png")
-    return Image.open(work / f"{name}.png").convert("RGBA").resize((THUMB, THUMB), Image.LANCZOS)
+class Batch:
+    def __init__(self, work):
+        self.work, self.jobs, self.images = work, [], {}
+
+    def add(self, name, xml, frames):
+        (self.work / f"{name}.xml").write_text(xml)
+        push(self.work / f"{name}.xml", f"{name}.xml")
+        names = [f"thumbs-{name}-{f}" for f in frames]
+        self.jobs += [f"{APP_PATH}/{name}.xml {f} {out}" for f, out in zip(frames, names)]
+        return names
+
+    def run(self):
+        (self.work / "list.txt").write_text("\n".join(self.jobs) + "\n")
+        push(self.work / "list.txt", "list.txt")
+        adb("logcat", "-c")
+        adb("shell", "am", "start", "-n", f"{PKG}/.MainActivity", "--es", "batch", f"{APP_PATH}/list.txt")
+        deadline = time.time() + 60 + 10 * len(self.jobs)
+        while "batch done" not in (log := adb("logcat", "-d", "-s", "AMTest")):
+            if time.time() > deadline:
+                sys.exit(f"the app did not finish {len(self.jobs)} stills in time")
+            time.sleep(1)
+        for job in self.jobs:
+            out = job.split()[2]
+            if f"still {out} ok=true" not in log:
+                sys.exit(f"{out}: the app could not render the still")
+            adb("pull", f"{OUT_DIR}/{out}.png", self.work / f"{out}.png")
+            adb("shell", "rm", f"{OUT_DIR}/{out}.png")
+            self.images[out] = Image.open(self.work / f"{out}.png").convert("RGBA").resize((THUMB, THUMB), Image.LANCZOS)
+
+    def __getitem__(self, names):
+        return [self.images[n] for n in names]
+
+
+def save_animated(frames, path):
+    opaque = all(f.getextrema()[3][0] == 255 for f in frames)
+    frames = [f.convert("RGB") if opaque else f for f in frames]
+    for quality in range(80, 20, -10):
+        frames[0].save(path, save_all=True, append_images=frames[1:], duration=round(1000 / ANIM_FPS), loop=0,
+                       quality=quality, method=6, minimize_size=True)
+        if path.stat().st_size <= ANIM_BYTES:
+            return quality
+    sys.exit(f"{path.name} stays above {ANIM_BYTES} bytes")
 
 
 def grid(images):
@@ -161,14 +194,6 @@ def grid(images):
         cell = Image.alpha_composite(Image.new("RGBA", image.size, (0, 0, 0, 255)), image).resize((side - 4, side - 4), Image.LANCZOS)
         out.paste(cell, (i % 2 * side + 2, i // 2 * side + 2))
     return out
-
-
-def grain(image, amount):
-    rng = random.Random(1)
-    noise = Image.new("L", (RENDER, RENDER))
-    noise.putdata([rng.randrange(256) for _ in range(RENDER * RENDER)])
-    noise = noise.point(lambda v: round(128 + (v - 128) * 2 * amount)).convert("RGB")
-    return ImageChops.add(image, noise, 1.0, -128).convert("RGBA").resize((THUMB, THUMB), Image.LANCZOS)
 
 
 def change(a, b):
@@ -204,6 +229,7 @@ def main():
     adb("shell", "am", "force-stop", PKG)
     adb("shell", "run-as", PKG, "mkdir", "-p", APP_DIR)
     made, pushed, plain, thumbs, unchanged = {}, set(), {}, [], []
+    batch, planned = Batch(opts.work), []
     for key in keys:
         show = SHOWCASE["effects"][key]
         names = [show["photo"]] + backdrops(show)
@@ -218,23 +244,35 @@ def main():
                 before(made[show["photo"]], show["split"]).save(opts.work / f"{name}.png")
                 push(opts.work / f"{name}.png", f"{name}.png")
                 pushed.add(name)
-        frames = show.get("frames", [show.get("frame", 0)])
-        base = (show["photo"], show.get("under"), show.get("split"), tuple(frames), show.get("layout"), json.dumps(show.get("keys")))
-        if show.get("local") == "grain":
-            plain.setdefault(base, made[show["photo"]].convert("RGBA").resize((THUMB, THUMB), Image.LANCZOS))
-            image = grain(made[show["photo"]], show["params"]["amount"])
+        animated = show.get("animate", 0)
+        frames = list(range(animated)) if animated else show.get("frames", [show.get("frame", 0)])
+        base = (show["photo"], show.get("under"), show.get("split"), tuple(frames), show.get("layout"), json.dumps(show.get("keys")), animated)
+        if base not in plain:
+            plain[base] = batch.add(f"plain{len(plain)}", scene(show, None), frames)
+        effect = json.loads((PACK / f"{key}.json").read_text())
+        planned.append((key, show, base, batch.add(key, scene(show, effect), frames)))
+    batch.run()
+    for key, show, base, rendered in planned:
+        reference, frames = batch[plain[base]], batch[rendered]
+        if show.get("animate"):
+            changes = [change(f, r) for f, r in zip(frames, reference)]
+            diff, moving = max(changes), max(change(frames[0], f) for f in frames)
+            image = frames[changes.index(diff)]
         else:
-            if base not in plain:
-                plain[base] = grid([render(opts.work, f"plain{len(plain)}-{f}", scene(show, None), f) for f in frames])
-            effect = json.loads((PACK / f"{key}.json").read_text())
-            image = grid([render(opts.work, f"{key}-{f}", scene(show, effect), f) for f in frames])
-        diff = change(image, plain[base])
+            image, moving = grid(frames), None
+            diff = change(image, grid(reference))
         thumbs.append((key, image, diff))
-        print(f"{key:20} {show['photo']:12} {diff:6.1f}{'   <- hardly visible' if diff < SAME else ''}", flush=True)
-        if diff < SAME:
+        note = "   <- hardly visible" if diff < SAME else "   <- does not move" if moving is not None and moving < SAME else ""
+        target = PACK / "thumb" / f"{key}.webp"
+        if show.get("animate"):
+            quality = save_animated(frames, target)
+            note += f"   animated q{quality} {target.stat().st_size // 1024} KB"
+        else:
+            out = image if image.getextrema()[3][0] < 255 else image.convert("RGB")
+            out.save(target, quality=82, method=6)
+        print(f"{key:20} {show['photo']:12} {diff:6.1f}{note}", flush=True)
+        if diff < SAME or (moving is not None and moving < SAME):
             unchanged.append(key)
-        out = image if image.getextrema()[3][0] < 255 else image.convert("RGB")
-        out.save(PACK / "thumb" / f"{key}.webp", quality=82, method=6)
     adb("shell", "run-as", PKG, "rm", "-r", APP_DIR)
     if not opts.keys:
         for stale in (PACK / "thumb").iterdir():
