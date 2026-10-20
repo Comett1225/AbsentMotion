@@ -7,8 +7,8 @@
     <string name="onboarding_language_title">اختر لغتك</string>
     <string name="onboarding_language_others">لغات أخرى</string>
     <string name="onboarding_language_later">يمكنك تغيير ذلك لاحقًا من الإعدادات.</string>
-    <string name="onboarding_check_title">اكتشف ما يمكن لهذا الهاتف فعله</string>
-    <string name="onboarding_check_body">يُظهر فحص سريع صيغ الفيديو وأحجامه التي يمكن لهذا الهاتف تصديرها ومدى سرعته. يُجرى مرة واحدة فقط ويستغرق بضع ثوانٍ، وتبقى كل البيانات على هاتفك.</string>
+    <string name="onboarding_check_title">تحقق مما يمكن لهذا الجهاز فعله</string>
+    <string name="onboarding_check_body">يكشف فحص سريع عن صيغ الفيديو والأحجام التي يمكن لهذا الجهاز تصديرها، ومدى سرعته. يعمل مرة واحدة، ويستغرق بضع ثوانٍ، ويبقى كل شيء على هذا الجهاز.</string>
     <string name="onboarding_check_run">بدء الفحص</string>
     <string name="onboarding_check_running">جارٍ الفحص…</string>
     <string name="onboarding_check_failed">تعذّر إكمال الفحص. سيظل التصدير يعمل كالمعتاد.</string>
@@ -21,6 +21,7 @@
     <string name="onboarding_speed_fast_note">تتعامل جيدًا مع فيديوهات 4K والفيديوهات الطويلة.</string>
     <string name="onboarding_speed_good">جيدة</string>
     <string name="onboarding_speed_good_note">سلسة بدقة 1080p. يستغرق تصدير 4K وقتًا أطول.</string>
+    <string name="onboarding_speed_good_note_hd">سلس بدقة 1080p.</string>
     <string name="onboarding_speed_basic">أساسية</string>
     <string name="onboarding_speed_basic_note">الأفضل بدقة 720p أو 1080p. تستغرق الفيديوهات الطويلة بعض الوقت.</string>
     <string name="no_camera_was_found_on_this">لم يتم العثور على كاميرا على هذا الجهاز.</string>
@@ -92,6 +93,8 @@
     <string name="open_source_licences">تراخيص المصادر المفتوحة</string>
     <string name="stop">إيقاف</string>
     <string name="damaged_restore_a_version">تالف — استعِد نسخة</string>
+    <string name="damaged_explain_versions">ملف هذا المشروع تالف، لذا لا يمكن فتحه. استرجع إحدى النسخ السابقة أدناه أو احذف المشروع.</string>
+    <string name="damaged_explain_no_versions">ملف هذا المشروع تالف، لذا لا يمكن فتحه، ولا توجد نسخة سابقة لاستعادتها. يمكنك حذفه.</string>
     <string name="open">فتح</string>
     <string name="import_complete">اكتمل الاستيراد</string>
     <string name="choose_file">اختيار ملف</string>
@@ -217,6 +220,8 @@
     <string name="backup_restore_stopped">تم إيقاف الاستعادة. تُحفظ المشاريع التي استُعيدت قبل الإيقاف؛ واستعادة النسخة الاحتياطية نفسها مرة أخرى تُكمل الباقي.</string>
     <string name="backup_all_projects">نسخ احتياطي لكل المشاريع</string>
     <string name="backup_backing_up_title">جارٍ النسخ الاحتياطي لكل المشاريع</string>
+    <string name="backup_result_title">نسخ احتياطي</string>
+    <string name="backup_restore_result_title">استعادة</string>
     <string name="backup_stopped">توقف النسخ الاحتياطي. لم يُحفظ أي ملف نسخ احتياطي.</string>
     <string name="backup_restore">استعادة من نسخة احتياطية</string>
     <string name="backup_weekly">نسخ احتياطي أسبوعي تلقائي (المشاريع فقط)</string>
@@ -1244,6 +1249,9 @@
     <string name="export_checked_problems">تم الفحص: %1$s</string>
     <string name="transition_title">انتقال</string>
     <string name="transition_add_between">أضف انتقالًا بين المقطعين</string>
+    <string name="transition_needs_two">حدد مقطعين لإضافة انتقال بينهما.</string>
+    <string name="transition_needs_visual">لا يمكن إضافة انتقالات إلى طبقات الصوت والكاميرا والكائن الفارغ.</string>
+    <string name="transition_needs_order">لا يوجد قطع هنا: يجب أن يبدأ أحد المقطعين وينتهي بعد الآخر.</string>
     <string name="transition_clip">مقطع</string>
     <string name="transition_second_clip">المقطع الثاني</string>
     <string name="transition_moved">تم تقديم “%1$s” بمقدار %2$s ليتداخل المقطعان.</string>

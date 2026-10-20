@@ -7,8 +7,8 @@
     <string name="onboarding_language_title">Dilinizi seçin</string>
     <string name="onboarding_language_others">Diğer diller</string>
     <string name="onboarding_language_later">Bunu daha sonra Ayarlar\'dan değiştirebilirsiniz.</string>
-    <string name="onboarding_check_title">Bu telefonun neler yapabildiğini görün</string>
-    <string name="onboarding_check_body">Kısa bir kontrol, bu telefonun hangi video biçimlerini ve boyutlarını dışa aktarabildiğini ve ne kadar hızlı olduğunu gösterir. Yalnızca bir kez çalışır, birkaç saniye sürer ve her şey telefonunuzda kalır.</string>
+    <string name="onboarding_check_title">Cihazınızın neler yapabildiğini görün</string>
+    <string name="onboarding_check_body">Hızlı bir kontrol, bu cihazın hangi video formatlarını ve boyutlarını dışa aktarabildiğini ve ne kadar hızlı olduğunu gösterir. Yalnızca bir kez çalışır, birkaç saniye sürer ve her şey bu cihazda kalır.</string>
     <string name="onboarding_check_run">Kontrolü başlat</string>
     <string name="onboarding_check_running">Kontrol ediliyor…</string>
     <string name="onboarding_check_failed">Kontrol tamamlanamadı. Dışa aktarma her zamanki gibi çalışır.</string>
@@ -21,6 +21,7 @@
     <string name="onboarding_speed_fast_note">4K ve uzun videoları rahatça işler.</string>
     <string name="onboarding_speed_good">İyi</string>
     <string name="onboarding_speed_good_note">1080p\'de akıcı. 4K dışa aktarmalar daha uzun sürer.</string>
+    <string name="onboarding_speed_good_note_hd">1080p\'de akıcı.</string>
     <string name="onboarding_speed_basic">Temel</string>
     <string name="onboarding_speed_basic_note">En iyi 720p veya 1080p ile çalışır. Uzun videolar biraz zaman alır.</string>
     <string name="no_camera_was_found_on_this">Bu cihazda kamera bulunamadı.</string>
@@ -92,6 +93,8 @@
     <string name="open_source_licences">Açık kaynak lisansları</string>
     <string name="stop">Durdur</string>
     <string name="damaged_restore_a_version">Hasarlı — bir sürümü geri yükle</string>
+    <string name="damaged_explain_versions">Bu projenin dosyası hasarlı olduğu için açılamıyor. Aşağıdaki önceki sürümlerden birini geri yükleyin veya projeyi silin.</string>
+    <string name="damaged_explain_no_versions">Bu projenin dosyası hasarlı olduğu için açılamıyor ve geri yüklenecek önceki bir sürüm yok. Projeyi silebilirsiniz.</string>
     <string name="open">Aç</string>
     <string name="import_complete">İçe aktarma tamamlandı</string>
     <string name="choose_file">Dosya seç</string>
@@ -217,6 +220,8 @@
     <string name="backup_restore_stopped">Geri yükleme durduruldu. Durdurmadan önce geri yüklenen projeler korunur; aynı yedeği tekrar geri yüklemek kalanları tamamlar.</string>
     <string name="backup_all_projects">Tüm projeleri yedekle</string>
     <string name="backup_backing_up_title">Tüm projeler yedekleniyor</string>
+    <string name="backup_result_title">Yedekleme</string>
+    <string name="backup_restore_result_title">Geri yükleme</string>
     <string name="backup_stopped">Yedekleme durduruldu. Yedek dosyası saklanmadı.</string>
     <string name="backup_restore">Yedekten geri yükle</string>
     <string name="backup_weekly">Haftalık otomatik yedekleme (yalnızca projeler)</string>
@@ -1184,6 +1189,9 @@
     <string name="export_checked_problems">Kontrol edildi: %1$s</string>
     <string name="transition_title">Geçiş</string>
     <string name="transition_add_between">İki klip arasına geçiş ekle</string>
+    <string name="transition_needs_two">Aralarına geçiş eklemek için iki klip seçin.</string>
+    <string name="transition_needs_visual">Ses, kamera ve boş nesne katmanlarına geçiş eklenemez.</string>
+    <string name="transition_needs_order">Burada kesim yok: kliplerden biri diğerinden daha sonra başlayıp bitmeli.</string>
     <string name="transition_clip">Klip</string>
     <string name="transition_second_clip">ikinci klip</string>
     <string name="transition_moved">Klipler üst üste binsin diye “%1$s” %2$s öne alındı.</string>

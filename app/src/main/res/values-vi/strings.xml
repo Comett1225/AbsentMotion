@@ -7,8 +7,8 @@
     <string name="onboarding_language_title">Chọn ngôn ngữ của bạn</string>
     <string name="onboarding_language_others">Ngôn ngữ khác</string>
     <string name="onboarding_language_later">Bạn có thể đổi lại sau trong Cài đặt.</string>
-    <string name="onboarding_check_title">Kiểm tra khả năng của điện thoại này</string>
-    <string name="onboarding_check_body">Một bước kiểm tra nhanh sẽ cho biết điện thoại này xuất được những định dạng và kích thước video nào, và tốc độ ra sao. Chỉ chạy một lần, mất vài giây và mọi dữ liệu đều ở lại trên điện thoại của bạn.</string>
+    <string name="onboarding_check_title">Xem thiết bị này làm được gì</string>
+    <string name="onboarding_check_body">Bản kiểm tra nhanh cho biết thiết bị này có thể xuất những định dạng và kích thước video nào, cùng tốc độ xử lý. Quá trình chỉ chạy một lần, mất vài giây và mọi thứ đều ở lại trên thiết bị.</string>
     <string name="onboarding_check_run">Bắt đầu kiểm tra</string>
     <string name="onboarding_check_running">Đang kiểm tra…</string>
     <string name="onboarding_check_failed">Không thể hoàn tất việc kiểm tra. Bạn vẫn xuất video như bình thường.</string>
@@ -21,6 +21,7 @@
     <string name="onboarding_speed_fast_note">Xử lý tốt video 4K và video dài.</string>
     <string name="onboarding_speed_good">Khá</string>
     <string name="onboarding_speed_good_note">Mượt ở 1080p. Xuất 4K sẽ lâu hơn.</string>
+    <string name="onboarding_speed_good_note_hd">Mượt ở 1080p.</string>
     <string name="onboarding_speed_basic">Cơ bản</string>
     <string name="onboarding_speed_basic_note">Phù hợp nhất với 720p hoặc 1080p. Video dài sẽ mất thời gian hơn.</string>
     <string name="no_camera_was_found_on_this">Không tìm thấy máy ảnh trên thiết bị này.</string>
@@ -92,6 +93,8 @@
     <string name="open_source_licences">Giấy phép mã nguồn mở</string>
     <string name="stop">Dừng</string>
     <string name="damaged_restore_a_version">Bị hỏng — khôi phục một phiên bản</string>
+    <string name="damaged_explain_versions">Tệp của dự án này bị hỏng nên không thể mở. Hãy khôi phục một phiên bản trước bên dưới hoặc xóa dự án.</string>
+    <string name="damaged_explain_no_versions">Tệp của dự án này bị hỏng nên không thể mở và không có phiên bản trước nào để khôi phục. Bạn có thể xóa dự án.</string>
     <string name="open">Mở</string>
     <string name="import_complete">Nhập xong</string>
     <string name="choose_file">Chọn tệp</string>
@@ -217,6 +220,8 @@
     <string name="backup_restore_stopped">Đã dừng khôi phục. Các dự án đã khôi phục trước khi bạn dừng vẫn được giữ lại; khôi phục lại cùng bản sao lưu này sẽ hoàn tất phần còn lại.</string>
     <string name="backup_all_projects">Sao lưu tất cả dự án</string>
     <string name="backup_backing_up_title">Đang sao lưu tất cả dự án</string>
+    <string name="backup_result_title">Sao lưu</string>
+    <string name="backup_restore_result_title">Khôi phục</string>
     <string name="backup_stopped">Đã dừng sao lưu. Không có tệp sao lưu nào được giữ lại.</string>
     <string name="backup_restore">Khôi phục từ bản sao lưu</string>
     <string name="backup_weekly">Tự động sao lưu hàng tuần (chỉ dự án)</string>
@@ -1169,6 +1174,9 @@
     <string name="export_checked_problems">Đã kiểm tra: %1$s</string>
     <string name="transition_title">Chuyển cảnh</string>
     <string name="transition_add_between">Thêm chuyển cảnh giữa hai clip</string>
+    <string name="transition_needs_two">Chọn hai clip để thêm hiệu ứng chuyển cảnh giữa chúng.</string>
+    <string name="transition_needs_visual">Lớp âm thanh, máy ảnh và đối tượng rỗng không thể có hiệu ứng chuyển cảnh.</string>
+    <string name="transition_needs_order">Không có điểm cắt ở đây: một clip phải bắt đầu và kết thúc muộn hơn clip kia.</string>
     <string name="transition_clip">Clip</string>
     <string name="transition_second_clip">clip thứ hai</string>
     <string name="transition_moved">Đã dời “%1$s” sớm hơn %2$s để các clip chồng lên nhau.</string>

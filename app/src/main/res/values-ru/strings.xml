@@ -7,8 +7,8 @@
     <string name="onboarding_language_title">Выберите язык</string>
     <string name="onboarding_language_others">Другие языки</string>
     <string name="onboarding_language_later">Это можно изменить позже в настройках.</string>
-    <string name="onboarding_check_title">Узнайте, на что способен этот телефон</string>
-    <string name="onboarding_check_body">Быстрая проверка покажет, в каких форматах и размерах этот телефон может экспортировать видео и насколько быстро. Она запускается один раз, занимает несколько секунд, и все данные остаются на телефоне.</string>
+    <string name="onboarding_check_title">Что умеет это устройство</string>
+    <string name="onboarding_check_body">Быстрая проверка покажет, какие видеоформаты и размеры может экспортировать это устройство и насколько оно быстрое. Она запускается один раз, занимает несколько секунд, все данные остаются на устройстве.</string>
     <string name="onboarding_check_run">Запустить проверку</string>
     <string name="onboarding_check_running">Проверка…</string>
     <string name="onboarding_check_failed">Не удалось завершить проверку. Экспорт работает как обычно.</string>
@@ -21,6 +21,7 @@
     <string name="onboarding_speed_fast_note">Легко справляется с 4K и длинными видео.</string>
     <string name="onboarding_speed_good">Хорошая</string>
     <string name="onboarding_speed_good_note">Плавно в 1080p. Экспорт в 4K займёт больше времени.</string>
+    <string name="onboarding_speed_good_note_hd">Плавно при 1080p.</string>
     <string name="onboarding_speed_basic">Базовая</string>
     <string name="onboarding_speed_basic_note">Лучше всего 720p или 1080p. Длинные видео экспортируются дольше.</string>
     <string name="no_camera_was_found_on_this">На этом устройстве не найдена камера.</string>
@@ -92,6 +93,8 @@
     <string name="open_source_licences">Лицензии открытого кода</string>
     <string name="stop">Остановить</string>
     <string name="damaged_restore_a_version">Повреждён — восстановите версию</string>
+    <string name="damaged_explain_versions">Файл проекта повреждён, поэтому его нельзя открыть. Восстановите одну из предыдущих версий ниже или удалите проект.</string>
+    <string name="damaged_explain_no_versions">Файл проекта повреждён, поэтому открыть его нельзя, а предыдущих версий для восстановления нет. Проект можно удалить.</string>
     <string name="open">Открыть</string>
     <string name="import_complete">Импорт завершён</string>
     <string name="choose_file">Выбрать файл</string>
@@ -217,6 +220,8 @@
     <string name="backup_restore_stopped">Восстановление остановлено. Проекты, восстановленные до остановки, сохранены; при повторном восстановлении этой же копии завершится остальное.</string>
     <string name="backup_all_projects">Резервная копия всех проектов</string>
     <string name="backup_backing_up_title">Создание резервной копии всех проектов</string>
+    <string name="backup_result_title">Резервное копирование</string>
+    <string name="backup_restore_result_title">Восстановление</string>
     <string name="backup_stopped">Резервное копирование остановлено. Файл копии не сохранён.</string>
     <string name="backup_restore">Восстановить из копии</string>
     <string name="backup_weekly">Еженедельная автоматическая копия (только проекты)</string>
@@ -1214,6 +1219,9 @@
     <string name="export_checked_problems">Проверено: %1$s</string>
     <string name="transition_title">Переход</string>
     <string name="transition_add_between">Добавить переход между двумя клипами</string>
+    <string name="transition_needs_two">Выберите два клипа, чтобы добавить переход между ними.</string>
+    <string name="transition_needs_visual">Аудио, камера и нулевые объекты не поддерживают переходы.</string>
+    <string name="transition_needs_order">Здесь нет стыка: один клип должен начинаться и заканчиваться позже другого.</string>
     <string name="transition_clip">Клип</string>
     <string name="transition_second_clip">второй клип</string>
     <string name="transition_moved">«%1$s» сдвинут на %2$s раньше, чтобы клипы перекрылись.</string>

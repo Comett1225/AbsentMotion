@@ -7,8 +7,8 @@
     <string name="onboarding_language_title">Pilih bahasa Anda</string>
     <string name="onboarding_language_others">Bahasa lainnya</string>
     <string name="onboarding_language_later">Anda bisa mengubahnya nanti di Setelan.</string>
-    <string name="onboarding_check_title">Cek kemampuan ponsel ini</string>
-    <string name="onboarding_check_body">Pengecekan singkat ini menunjukkan format dan ukuran video yang bisa diekspor ponsel ini, serta seberapa cepat prosesnya. Hanya dijalankan sekali, butuh beberapa detik, dan semuanya tetap di ponsel Anda.</string>
+    <string name="onboarding_check_title">Cek kemampuan perangkat ini</string>
+    <string name="onboarding_check_body">Pemeriksaan cepat menunjukkan format dan ukuran video yang bisa diekspor perangkat ini, dan seberapa cepat kinerjanya. Proses ini hanya berjalan sekali, memakan beberapa detik, dan semua data tetap di perangkat ini.</string>
     <string name="onboarding_check_run">Mulai cek</string>
     <string name="onboarding_check_running">Mengecek…</string>
     <string name="onboarding_check_failed">Pengecekan tidak dapat diselesaikan. Ekspor tetap berfungsi seperti biasa.</string>
@@ -21,6 +21,7 @@
     <string name="onboarding_speed_fast_note">Lancar untuk video 4K dan video panjang.</string>
     <string name="onboarding_speed_good">Baik</string>
     <string name="onboarding_speed_good_note">Lancar di 1080p. Ekspor 4K butuh waktu lebih lama.</string>
+    <string name="onboarding_speed_good_note_hd">Mulus di 1080p.</string>
     <string name="onboarding_speed_basic">Dasar</string>
     <string name="onboarding_speed_basic_note">Paling cocok di 720p atau 1080p. Video panjang butuh waktu lebih lama.</string>
     <string name="no_camera_was_found_on_this">Kamera tidak ditemukan di perangkat ini.</string>
@@ -92,6 +93,8 @@
     <string name="open_source_licences">Lisensi sumber terbuka</string>
     <string name="stop">Hentikan</string>
     <string name="damaged_restore_a_version">Rusak — pulihkan versi</string>
+    <string name="damaged_explain_versions">File proyek ini rusak, jadi tidak dapat dibuka. Pulihkan salah satu versi sebelumnya di bawah, atau hapus proyek.</string>
+    <string name="damaged_explain_no_versions">File proyek ini rusak sehingga tidak dapat dibuka, dan tidak ada versi sebelumnya untuk dipulihkan. Anda dapat menghapusnya.</string>
     <string name="open">Buka</string>
     <string name="import_complete">Impor selesai</string>
     <string name="choose_file">Pilih file</string>
@@ -217,6 +220,8 @@
     <string name="backup_restore_stopped">Pemulihan dihentikan. Proyek yang sudah dipulihkan sebelum Anda berhenti tetap disimpan; memulihkan cadangan yang sama lagi akan menyelesaikan sisanya.</string>
     <string name="backup_all_projects">Cadangkan semua proyek</string>
     <string name="backup_backing_up_title">Mencadangkan semua proyek</string>
+    <string name="backup_result_title">Cadangan</string>
+    <string name="backup_restore_result_title">Pemulihan</string>
     <string name="backup_stopped">Pencadangan dihentikan. Tidak ada file cadangan yang disimpan.</string>
     <string name="backup_restore">Pulihkan dari cadangan</string>
     <string name="backup_weekly">Pencadangan otomatis mingguan (hanya proyek)</string>
@@ -1169,6 +1174,9 @@
     <string name="export_checked_problems">Diperiksa: %1$s</string>
     <string name="transition_title">Transisi</string>
     <string name="transition_add_between">Tambahkan transisi di antara kedua klip</string>
+    <string name="transition_needs_two">Pilih dua klip untuk menambahkan transisi di antaranya.</string>
+    <string name="transition_needs_visual">Lapisan audio, kamera, dan null tidak dapat memiliki transisi.</string>
+    <string name="transition_needs_order">Tidak ada potongan di sini: salah satu klip harus mulai dan berakhir lebih lambat dari yang lain.</string>
     <string name="transition_clip">Klip</string>
     <string name="transition_second_clip">klip kedua</string>
     <string name="transition_moved">“%1$s” digeser %2$s lebih awal agar klip saling tumpang tindih.</string>

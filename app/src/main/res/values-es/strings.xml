@@ -7,8 +7,8 @@
     <string name="onboarding_language_title">Elige tu idioma</string>
     <string name="onboarding_language_others">Otros idiomas</string>
     <string name="onboarding_language_later">Puedes cambiarlo más tarde en Configuración.</string>
-    <string name="onboarding_check_title">Descubre lo que puede hacer este celular</string>
-    <string name="onboarding_check_body">Una revisión rápida muestra qué formatos y tamaños de video puede exportar este celular y qué tan rápido lo hace. Se ejecuta una sola vez, tarda unos segundos y todo se queda en tu celular.</string>
+    <string name="onboarding_check_title">Comprueba lo que puede hacer este dispositivo</string>
+    <string name="onboarding_check_body">Una comprobación rápida muestra qué formatos y tamaños de video puede exportar este dispositivo y qué tan rápido es. Se ejecuta una sola vez, tarda unos segundos y todo se queda en este dispositivo.</string>
     <string name="onboarding_check_run">Iniciar revisión</string>
     <string name="onboarding_check_running">Revisando…</string>
     <string name="onboarding_check_failed">No se pudo completar la revisión. La exportación sigue funcionando como siempre.</string>
@@ -21,6 +21,7 @@
     <string name="onboarding_speed_fast_note">Maneja bien el 4K y los videos largos.</string>
     <string name="onboarding_speed_good">Buena</string>
     <string name="onboarding_speed_good_note">Fluida en 1080p. Las exportaciones en 4K tardan más.</string>
+    <string name="onboarding_speed_good_note_hd">Fluido en 1080p.</string>
     <string name="onboarding_speed_basic">Básica</string>
     <string name="onboarding_speed_basic_note">Ideal para 720p o 1080p. Los videos largos tardan un poco.</string>
     <string name="no_camera_was_found_on_this">No se encontró ninguna cámara en este dispositivo.</string>
@@ -92,6 +93,8 @@
     <string name="open_source_licences">Licencias de código abierto</string>
     <string name="stop">Detener</string>
     <string name="damaged_restore_a_version">Dañado: restaura una versión</string>
+    <string name="damaged_explain_versions">El archivo de este proyecto está dañado, así que no se puede abrir. Restaura una de las versiones anteriores de abajo o elimina el proyecto.</string>
+    <string name="damaged_explain_no_versions">El archivo de este proyecto está dañado, así que no se puede abrir, y no hay ninguna versión anterior para restaurar. Puedes eliminarlo.</string>
     <string name="open">Abrir</string>
     <string name="import_complete">Importación completada</string>
     <string name="choose_file">Elegir archivo</string>
@@ -217,6 +220,8 @@
     <string name="backup_restore_stopped">Restauración detenida. Los proyectos restaurados antes de detenerte se conservan; al restaurar la misma copia de seguridad de nuevo se completará el resto.</string>
     <string name="backup_all_projects">Respaldar proyectos</string>
     <string name="backup_backing_up_title">Haciendo copia de seguridad de todos los proyectos</string>
+    <string name="backup_result_title">Copia de seguridad</string>
+    <string name="backup_restore_result_title">Restauración</string>
     <string name="backup_stopped">Copia de seguridad detenida. No se guardó ningún archivo de copia de seguridad.</string>
     <string name="backup_restore">Restaurar desde copia de seguridad</string>
     <string name="backup_weekly">Copia de seguridad automática semanal (solo proyectos)</string>
@@ -1184,6 +1189,9 @@
     <string name="export_checked_problems">Comprobado: %1$s</string>
     <string name="transition_title">Transición</string>
     <string name="transition_add_between">Agregar una transición entre los dos clips</string>
+    <string name="transition_needs_two">Selecciona dos clips para agregar una transición entre ellos.</string>
+    <string name="transition_needs_visual">Las capas de sonido, cámara y objeto nulo no pueden tener transiciones.</string>
+    <string name="transition_needs_order">Aquí no hay corte: un clip debe empezar y terminar después que el otro.</string>
     <string name="transition_clip">Clip</string>
     <string name="transition_second_clip">el segundo clip</string>
     <string name="transition_moved">Se movió “%1$s” %2$s antes para que los clips se superpongan.</string>

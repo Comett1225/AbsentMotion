@@ -7,8 +7,8 @@
     <string name="onboarding_language_title">Piliin ang iyong wika</string>
     <string name="onboarding_language_others">Iba pang wika</string>
     <string name="onboarding_language_later">Mababago mo ito mamaya sa Settings.</string>
-    <string name="onboarding_check_title">Alamin kung ano ang kaya ng phone na ito</string>
-    <string name="onboarding_check_body">Ipapakita ng mabilis na pagsusuri kung aling mga video format at laki ang kayang i-export ng phone na ito, at kung gaano ito kabilis. Isang beses lang itong tatakbo, ilang segundo lang, at mananatili ang lahat sa phone mo.</string>
+    <string name="onboarding_check_title">Tingnan ang kaya ng device na ito</string>
+    <string name="onboarding_check_body">Mabilisang check ang magpapakita kung anong mga format ng bidyo at sukat ang kayang i-export ng device na ito, at kung gaano ito kabilis. Isang beses lang itong tumatakbo, ilang segundo lang, at mananatili sa device na ito ang lahat.</string>
     <string name="onboarding_check_run">Simulan ang pagsusuri</string>
     <string name="onboarding_check_running">Sinusuri…</string>
     <string name="onboarding_check_failed">Hindi natapos ang pagsusuri. Gagana pa rin ang pag-export gaya ng dati.</string>
@@ -21,6 +21,7 @@
     <string name="onboarding_speed_fast_note">Kaya nang maayos ang 4K at mahahabang video.</string>
     <string name="onboarding_speed_good">Maayos</string>
     <string name="onboarding_speed_good_note">Maayos sa 1080p. Mas matagal ang pag-export ng 4K.</string>
+    <string name="onboarding_speed_good_note_hd">Makinis sa 1080p.</string>
     <string name="onboarding_speed_basic">Basic</string>
     <string name="onboarding_speed_basic_note">Pinakamainam sa 720p o 1080p. Matagal-tagal ang mahahabang video.</string>
     <string name="no_camera_was_found_on_this">Walang nahanap na kamera sa device na ito.</string>
@@ -92,6 +93,8 @@
     <string name="open_source_licences">Mga lisensya ng open source</string>
     <string name="stop">Itigil</string>
     <string name="damaged_restore_a_version">May sira — mag-restore ng bersyon</string>
+    <string name="damaged_explain_versions">Sirang ang file ng proyektong ito, kaya hindi ito mabuksan. I-restore ang isa sa mga naunang bersyon sa ibaba, o i-delete ang proyekto.</string>
+    <string name="damaged_explain_no_versions">Sirang ang file ng proyektong ito, kaya hindi ito mabuksan, at walang naunang bersyon na maibabalik. Puwede mo itong i-delete.</string>
     <string name="open">Buksan</string>
     <string name="import_complete">Tapos na ang pag-import</string>
     <string name="choose_file">Pumili ng file</string>
@@ -217,6 +220,8 @@
     <string name="backup_restore_stopped">Huminto ang pag-restore. Mananatili ang mga proyektong naibalik bago ka huminto; kapag ibinalik ulit ang parehong backup, matatapos ang natitira.</string>
     <string name="backup_all_projects">I-backup ang lahat ng proyekto</string>
     <string name="backup_backing_up_title">Nagba-backup ng lahat ng proyekto</string>
+    <string name="backup_result_title">Backup</string>
+    <string name="backup_restore_result_title">I-restore</string>
     <string name="backup_stopped">Huminto ang backup. Walang naka-save na backup file.</string>
     <string name="backup_restore">I-restore mula sa backup</string>
     <string name="backup_weekly">Lingguhang awtomatikong backup (mga proyekto lang)</string>
@@ -1184,6 +1189,9 @@
     <string name="export_checked_problems">Nasuri: %1$s</string>
     <string name="transition_title">Transition</string>
     <string name="transition_add_between">Magdagdag ng transition sa pagitan ng dalawang clip</string>
+    <string name="transition_needs_two">Pumili ng dalawang clip para magdagdag ng transition sa pagitan ng mga ito.</string>
+    <string name="transition_needs_visual">Hindi puwedeng magkaroon ng transition ang audio, kamera at null layer.</string>
+    <string name="transition_needs_order">Walang cut dito: kailangang magsimula at magtapos ang isang clip nang mas huli kaysa sa isa.</string>
     <string name="transition_clip">Clip</string>
     <string name="transition_second_clip">ang pangalawang clip</string>
     <string name="transition_moved">Inilipat nang %2$s nang mas maaga ang “%1$s” para mag-overlap ang mga clip.</string>

@@ -7,8 +7,8 @@
     <string name="onboarding_language_title">Escolha seu idioma</string>
     <string name="onboarding_language_others">Outros idiomas</string>
     <string name="onboarding_language_later">Você pode mudar isso depois em Configurações.</string>
-    <string name="onboarding_check_title">Veja o que este celular consegue fazer</string>
-    <string name="onboarding_check_body">Uma verificação rápida mostra quais formatos e tamanhos de vídeo este celular consegue exportar e com que velocidade. Ela roda uma vez só, leva alguns segundos e tudo fica no seu celular.</string>
+    <string name="onboarding_check_title">Veja o que este dispositivo pode fazer</string>
+    <string name="onboarding_check_body">Uma verificação rápida mostra quais formatos e tamanhos de vídeo este dispositivo pode exportar e qual é a velocidade. Ela roda uma vez, leva alguns segundos e tudo fica neste dispositivo.</string>
     <string name="onboarding_check_run">Fazer verificação</string>
     <string name="onboarding_check_running">Verificando…</string>
     <string name="onboarding_check_failed">Não foi possível concluir a verificação. A exportação continua funcionando normalmente.</string>
@@ -21,6 +21,7 @@
     <string name="onboarding_speed_fast_note">Lida bem com 4K e vídeos longos.</string>
     <string name="onboarding_speed_good">Boa</string>
     <string name="onboarding_speed_good_note">Fluida em 1080p. Exportações em 4K demoram mais.</string>
+    <string name="onboarding_speed_good_note_hd">Fluido em 1080p.</string>
     <string name="onboarding_speed_basic">Básica</string>
     <string name="onboarding_speed_basic_note">Ideal para 720p ou 1080p. Vídeos longos demoram um pouco.</string>
     <string name="no_camera_was_found_on_this">Nenhuma câmera foi encontrada neste dispositivo.</string>
@@ -92,6 +93,8 @@
     <string name="open_source_licences">Licenças de código aberto</string>
     <string name="stop">Parar</string>
     <string name="damaged_restore_a_version">Danificado — restaure uma versão</string>
+    <string name="damaged_explain_versions">O arquivo deste projeto está danificado e não pode ser aberto. Restaure uma das versões anteriores abaixo ou exclua o projeto.</string>
+    <string name="damaged_explain_no_versions">O arquivo deste projeto está danificado e não pode ser aberto, e não há versão anterior para restaurar. Você pode excluí-lo.</string>
     <string name="open">Abrir</string>
     <string name="import_complete">Importação concluída</string>
     <string name="choose_file">Escolher arquivo</string>
@@ -217,6 +220,8 @@
     <string name="backup_restore_stopped">Restauração interrompida. Os projetos restaurados antes da interrupção são mantidos; restaurar o mesmo backup novamente conclui o restante.</string>
     <string name="backup_all_projects">Fazer backup de todos os projetos</string>
     <string name="backup_backing_up_title">Fazendo backup de todos os projetos</string>
+    <string name="backup_result_title">Backup</string>
+    <string name="backup_restore_result_title">Restauração</string>
     <string name="backup_stopped">Backup interrompido. Nenhum arquivo de backup foi mantido.</string>
     <string name="backup_restore">Restaurar de backup</string>
     <string name="backup_weekly">Backup automático semanal (apenas projetos)</string>
@@ -1184,6 +1189,9 @@
     <string name="export_checked_problems">Verificado: %1$s</string>
     <string name="transition_title">Transição</string>
     <string name="transition_add_between">Adicionar uma transição entre os dois clipes</string>
+    <string name="transition_needs_two">Selecione dois clipes para adicionar uma transição entre eles.</string>
+    <string name="transition_needs_visual">Camadas de som, câmera e objeto nulo não podem ter transições.</string>
+    <string name="transition_needs_order">Não há corte aqui: um clipe deve começar e terminar depois do outro.</string>
     <string name="transition_clip">Clipe</string>
     <string name="transition_second_clip">o segundo clipe</string>
     <string name="transition_moved">Moveu “%1$s” %2$s para trás para os clipes se sobreporem.</string>

@@ -7,8 +7,8 @@
     <string name="onboarding_language_title">अपनी भाषा चुनें</string>
     <string name="onboarding_language_others">अन्य भाषाएँ</string>
     <string name="onboarding_language_later">आप इसे बाद में सेटिंग में बदल सकते हैं।</string>
-    <string name="onboarding_check_title">देखें कि यह फ़ोन क्या कर सकता है</string>
-    <string name="onboarding_check_body">एक छोटी-सी जाँच बताती है कि यह फ़ोन किन वीडियो फ़ॉर्मैट और साइज़ में एक्सपोर्ट कर सकता है और कितनी तेज़ी से। यह सिर्फ़ एक बार चलती है, कुछ सेकंड लेती है और सारी जानकारी आपके फ़ोन पर ही रहती है।</string>
+    <string name="onboarding_check_title">देखें यह डिवाइस क्या कर सकता है</string>
+    <string name="onboarding_check_body">एक त्वरित जाँच से पता चलता है कि यह डिवाइस कौन-से वीडियो फ़ॉर्मेट और साइज़ एक्सपोर्ट कर सकता है और कितना तेज़ है। यह एक बार चलती है, कुछ सेकंड लेती है और सब कुछ इसी डिवाइस पर रहता है।</string>
     <string name="onboarding_check_run">जाँच शुरू करें</string>
     <string name="onboarding_check_running">जाँच हो रही है…</string>
     <string name="onboarding_check_failed">जाँच पूरी नहीं हो सकी। एक्सपोर्ट पहले की तरह काम करता रहेगा।</string>
@@ -21,6 +21,7 @@
     <string name="onboarding_speed_fast_note">4K और लंबे वीडियो आसानी से संभालता है।</string>
     <string name="onboarding_speed_good">अच्छी</string>
     <string name="onboarding_speed_good_note">1080p पर बढ़िया। 4K एक्सपोर्ट में ज़्यादा समय लगता है।</string>
+    <string name="onboarding_speed_good_note_hd">1080p पर स्मूथ।</string>
     <string name="onboarding_speed_basic">सामान्य</string>
     <string name="onboarding_speed_basic_note">720p या 1080p के लिए सबसे अच्छा। लंबे वीडियो में समय लगता है।</string>
     <string name="no_camera_was_found_on_this">इस डिवाइस पर कोई कैमरा नहीं मिला।</string>
@@ -92,6 +93,8 @@
     <string name="open_source_licences">ओपन सोर्स लाइसेंस</string>
     <string name="stop">रोकें</string>
     <string name="damaged_restore_a_version">खराब — एक वर्ज़न रिस्टोर करें</string>
+    <string name="damaged_explain_versions">इस प्रोजेक्ट की फ़ाइल खराब है, इसलिए इसे खोला नहीं जा सकता। नीचे दिए किसी पिछले वर्ज़न को रीस्टोर करें या प्रोजेक्ट हटाएँ।</string>
+    <string name="damaged_explain_no_versions">इस प्रोजेक्ट की फ़ाइल खराब है, इसलिए इसे खोला नहीं जा सकता और रीस्टोर करने के लिए कोई पिछला वर्ज़न नहीं है। आप इसे हटा सकते हैं।</string>
     <string name="open">खोलें</string>
     <string name="import_complete">इंपोर्ट पूरा हुआ</string>
     <string name="choose_file">फ़ाइल चुनें</string>
@@ -217,6 +220,8 @@
     <string name="backup_restore_stopped">बहाली रुक गई। रुकने से पहले बहाल किए गए प्रोजेक्ट रखे गए हैं; वही बैकअप फिर बहाल करने पर बाकी पूरा हो जाएगा।</string>
     <string name="backup_all_projects">सभी प्रोजेक्ट का बैकअप लें</string>
     <string name="backup_backing_up_title">सभी प्रोजेक्ट का बैकअप लिया जा रहा है</string>
+    <string name="backup_result_title">बैकअप</string>
+    <string name="backup_restore_result_title">रीस्टोर</string>
     <string name="backup_stopped">बैकअप रुक गया। कोई बैकअप फ़ाइल नहीं रखी गई।</string>
     <string name="backup_restore">बैकअप से बहाल करें</string>
     <string name="backup_weekly">साप्ताहिक स्वचालित बैकअप (केवल प्रोजेक्ट)</string>
@@ -1184,6 +1189,9 @@
     <string name="export_checked_problems">जाँचा गया: %1$s</string>
     <string name="transition_title">ट्रांज़िशन</string>
     <string name="transition_add_between">दोनों क्लिप के बीच ट्रांज़िशन जोड़ें</string>
+    <string name="transition_needs_two">बीच में ट्रांज़िशन जोड़ने के लिए दो क्लिप चुनें।</string>
+    <string name="transition_needs_visual">साउंड, कैमरा और नल लेयर पर ट्रांज़िशन नहीं लग सकते।</string>
+    <string name="transition_needs_order">यहाँ कोई कट नहीं है: एक क्लिप की शुरुआत और समाप्ति दूसरे के बाद होनी चाहिए।</string>
     <string name="transition_clip">क्लिप</string>
     <string name="transition_second_clip">दूसरी क्लिप</string>
     <string name="transition_moved">“%1$s” को %2$s पहले खिसकाया ताकि क्लिप्स ओवरलैप हों।</string>

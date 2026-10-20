@@ -7,8 +7,8 @@
     <string name="onboarding_language_title">Pilih bahasa anda</string>
     <string name="onboarding_language_others">Bahasa lain</string>
     <string name="onboarding_language_later">Anda boleh menukarnya kemudian dalam Tetapan.</string>
-    <string name="onboarding_check_title">Semak keupayaan telefon ini</string>
-    <string name="onboarding_check_body">Semakan ringkas ini menunjukkan format dan saiz video yang boleh dieksport oleh telefon ini, dan sepantas mana. Ia dijalankan sekali sahaja, mengambil beberapa saat dan semuanya kekal dalam telefon anda.</string>
+    <string name="onboarding_check_title">Semak keupayaan peranti ini</string>
+    <string name="onboarding_check_body">Semakan pantas menunjukkan format dan saiz video yang boleh dieksport oleh peranti ini, serta kepantasannya. Ia berjalan sekali, mengambil beberapa saat dan semuanya kekal pada peranti ini.</string>
     <string name="onboarding_check_run">Mulakan semakan</string>
     <string name="onboarding_check_running">Menyemak…</string>
     <string name="onboarding_check_failed">Semakan tidak dapat diselesaikan. Eksport masih berfungsi seperti biasa.</string>
@@ -21,6 +21,7 @@
     <string name="onboarding_speed_fast_note">Mengendalikan video 4K dan video panjang dengan baik.</string>
     <string name="onboarding_speed_good">Baik</string>
     <string name="onboarding_speed_good_note">Lancar pada 1080p. Eksport 4K mengambil masa lebih lama.</string>
+    <string name="onboarding_speed_good_note_hd">Lancar pada 1080p.</string>
     <string name="onboarding_speed_basic">Asas</string>
     <string name="onboarding_speed_basic_note">Paling sesuai pada 720p atau 1080p. Video panjang mengambil sedikit masa.</string>
     <string name="no_camera_was_found_on_this">Tiada kamera ditemui pada peranti ini.</string>
@@ -92,6 +93,8 @@
     <string name="open_source_licences">Lesen sumber terbuka</string>
     <string name="stop">Hentikan</string>
     <string name="damaged_restore_a_version">Rosak — pulihkan versi</string>
+    <string name="damaged_explain_versions">Fail projek ini rosak, jadi ia tidak boleh dibuka. Pulihkan salah satu versi terdahulu di bawah, atau padam projek.</string>
+    <string name="damaged_explain_no_versions">Fail projek ini rosak, jadi ia tidak boleh dibuka, dan tiada versi terdahulu untuk dipulihkan. Anda boleh memadamkannya.</string>
     <string name="open">Buka</string>
     <string name="import_complete">Import selesai</string>
     <string name="choose_file">Pilih fail</string>
@@ -217,6 +220,8 @@
     <string name="backup_restore_stopped">Pemulihan dihentikan. Projek yang dipulihkan sebelum anda berhenti dikekalkan; memulihkan sandaran yang sama sekali lagi akan menyelesaikan selebihnya.</string>
     <string name="backup_all_projects">Sandarkan semua projek</string>
     <string name="backup_backing_up_title">Menyandarkan semua projek</string>
+    <string name="backup_result_title">Sandaran</string>
+    <string name="backup_restore_result_title">Pemulihan</string>
     <string name="backup_stopped">Sandaran dihentikan. Tiada fail sandaran disimpan.</string>
     <string name="backup_restore">Pulihkan daripada sandaran</string>
     <string name="backup_weekly">Sandaran automatik mingguan (projek sahaja)</string>
@@ -1169,6 +1174,9 @@
     <string name="export_checked_problems">Disemak: %1$s</string>
     <string name="transition_title">Peralihan</string>
     <string name="transition_add_between">Tambah peralihan antara dua klip</string>
+    <string name="transition_needs_two">Pilih dua klip untuk menambah peralihan antaranya.</string>
+    <string name="transition_needs_visual">Lapisan audio, kamera dan objek nol tidak boleh mempunyai peralihan.</string>
+    <string name="transition_needs_order">Tiada potongan di sini: satu klip mesti bermula dan tamat lebih lewat daripada yang lain.</string>
     <string name="transition_clip">Klip</string>
     <string name="transition_second_clip">klip kedua</string>
     <string name="transition_moved">“%1$s” dialihkan %2$s lebih awal supaya klip bertindih.</string>
