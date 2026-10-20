@@ -293,6 +293,7 @@ internal fun CopyPasteMenu(state: EditorState, onDismiss: () -> Unit) {
                 } catch (e: CancellationException) {
                     throw e
                 } catch (e: Exception) {
+                    Toast.makeText(context, context.getString(R.string.preset_save_failed), Toast.LENGTH_LONG).show()
                     null
                 }
                 if (saved == null) onDismiss()

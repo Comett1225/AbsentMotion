@@ -684,6 +684,7 @@
     <string name="search_no_photos_or_videos">No photos or videos match “%1$s”</string>
     <string name="search_no_templates">No templates match “%1$s”</string>
     <string name="search_no_presets">No presets match “%1$s”</string>
+    <string name="preset_save_failed">Could not save the preset. Free some storage space.</string>
     <string name="structure_null">Null</string>
     <string name="structure_empty_group">Empty Group</string>
     <string name="structure_asset_project">Asset / Project</string>
