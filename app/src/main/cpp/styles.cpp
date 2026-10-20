@@ -176,18 +176,21 @@ half4 main(float2 xy) {
     return builder.makeShader();
 }
 
-Placement Own(const Layer& l, float t) {
-    return {{l.location.get(0, t, 0), l.location.get(1, t, 0)},
-            {l.pivot.get(0, t, 0), l.pivot.get(1, t, 0)},
-            {l.scale.get(0, t, 1), l.scale.get(1, t, 1)},
-            l.rotation.get(0, t, 0),
-            l.location.get(2, t, 0)};
+Placement Own(const Layer& l, double timeMs) {
+    const float t = l.localTime(timeMs);
+    Placement p{{l.location.get(0, t, 0), l.location.get(1, t, 0)},
+                {l.pivot.get(0, t, 0), l.pivot.get(1, t, 0)},
+                {l.scale.get(0, t, 1), l.scale.get(1, t, 1)},
+                l.rotation.get(0, t, 0),
+                l.location.get(2, t, 0)};
+    ApplyMotion(l, timeMs, &p);
+    return p;
 }
 
 constexpr int kMaxParentDepth = 16;
 
 Placement Effective(const std::vector<Layer>& siblings, const Layer& l, double timeMs, int depth) {
-    Placement own = Own(l, l.localTime(timeMs));
+    Placement own = Own(l, timeMs);
     if (l.parent == 0 || depth >= kMaxParentDepth) return own;
     const Layer* parent = nullptr;
     for (const Layer& s : siblings) {
@@ -201,11 +204,13 @@ Placement Effective(const std::vector<Layer>& siblings, const Layer& l, double t
     own.scale = {own.scale.fX * p.scale.fX, own.scale.fY * p.scale.fY};
     own.rotation += p.rotation;
     own.z += p.z;
+    if (!own.stretch.isIdentity()) own.stretch = SkMatrix::RotateDeg(p.rotation) * own.stretch * SkMatrix::RotateDeg(-p.rotation);
     return own;
 }
 
 SkMatrix MatrixOf(const Placement& p, const Layer& l, float t) {
     SkMatrix m = SkMatrix::Translate(p.location.fX, p.location.fY);
+    m.preConcat(p.stretch);
     m.preRotate(p.rotation);
     m.preSkew(tanf(l.skew.get(0, t, 0)), tanf(l.skew.get(1, t, 0)));
     m.preScale(p.scale.fX, p.scale.fY);
@@ -444,6 +449,8 @@ struct Override {
     bool blend = false;
     SkBlendMode mode = SkBlendMode::kSrcOver;
     bool unitOpacity = false;
+    bool echoed = false;
+    float alpha = 1;
 };
 
 void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& l, double timeMs,
@@ -551,8 +558,23 @@ void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& 
              const MediaPictures& pictures, const Override& ov) {
     if (!l.activeAt(timeMs) || l.kind == "nullobj" || l.kind == "camera") return;
     if (l.fillType == "media" && !pictures(l.mediaUri, l.id)) return;
+    Echo echo;
+    if (!ov.echoed && EchoOf(l, timeMs, &echo)) {
+        Override plain = ov;
+        plain.echoed = true;
+        auto past = [&](int i) {
+            Override faded = plain;
+            faded.alpha = ov.alpha * (1 + (echo.alpha - 1) * i / echo.count);
+            const double at = std::clamp(timeMs - 1000.0 * echo.seconds * i / echo.count, (double)l.startTime, (double)l.endTime);
+            DrawOne(canvas, siblings, l, at, pictures, faded);
+        };
+        if (!echo.atop) for (int i = echo.count; i >= 1; i--) past(i);
+        DrawOne(canvas, siblings, l, timeMs, pictures, plain);
+        if (echo.atop) for (int i = 1; i <= echo.count; i++) past(i);
+        return;
+    }
     const float t = l.localTime(timeMs);
-    const float opacity = ov.unitOpacity ? 1.0f : std::clamp(l.opacity.get(0, t, 1), 0.0f, 1.0f);
+    const float opacity = std::clamp(ov.unitOpacity ? ov.alpha : l.opacity.get(0, t, 1) * MotionOpacity(l, timeMs) * ov.alpha, 0.0f, 1.0f);
     const bool group = l.kind == "embedScene";
     bool decorated = false;
     for (const Edge& e : l.borders) decorated |= ShaderBorder(l, e, t);
@@ -736,7 +758,7 @@ void DrawList(SkCanvas* canvas, const std::vector<Layer>& source, int width, int
         if (!base.activeAt(timeMs)) continue;
         const float t = base.localTime(timeMs);
         SkPaint stack;
-        stack.setAlphaf(std::clamp(base.opacity.get(0, t, 1), 0.0f, 1.0f));
+        stack.setAlphaf(std::clamp(base.opacity.get(0, t, 1) * MotionOpacity(base, timeMs), 0.0f, 1.0f));
         SetBlend(&stack, base.blending);
         canvas->saveLayer(nullptr, &stack);
         Override plain;

@@ -53,5 +53,16 @@
  "unsharpmask",
  "highlightshadow",
  "denoise",
- "flicker"
+ "flicker",
+ "autoshake",
+ "randomdisplace",
+ "randomjitter",
+ "oscillate",
+ "swing",
+ "spin",
+ "pulsesize",
+ "pulseopacity",
+ "stretchaxis",
+ "echo",
+ "timequant"
 ]

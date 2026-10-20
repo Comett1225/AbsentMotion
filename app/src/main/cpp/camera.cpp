@@ -154,6 +154,7 @@ bool SeeLayers(const std::vector<Layer>& layers, int width, int height, bool top
         const Placement p = EffectivePlacement(layers, l, timeMs);
         Layer copy = l;
         copy.parent = 0;
+        copy.placed = true;
         float d = 0;
         bool drop = false;
         const float tNow = l.localTime(timeMs);

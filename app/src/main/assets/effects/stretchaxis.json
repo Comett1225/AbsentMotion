@@ -1,0 +1,27 @@
+{
+ "id": "stretchaxis",
+ "name": "Stretch Axis",
+ "category": "move",
+ "native": true,
+ "description": "Stretches the layer along an angle.",
+ "params": [
+  {
+   "id": "angle",
+   "label": "Angle",
+   "type": "angle",
+   "default": 0,
+   "min": -3600,
+   "max": 3600,
+   "step": 0.1
+  },
+  {
+   "id": "amount",
+   "label": "Amount",
+   "type": "float",
+   "default": 1.5,
+   "min": 0,
+   "max": 10,
+   "step": 0.01
+  }
+ ]
+}

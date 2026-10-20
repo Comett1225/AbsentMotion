@@ -294,6 +294,7 @@ bool ParseLayer(const XmlNode& node, int fps, Layer* out) {
         if (c->name != "property") continue;
         l.props.push_back({StrAttr(*c, "name"), StrAttr(*c, "type"), ParseAnim(c.get())});
     }
+    ParseSteps(&l);
     ParseStyle(*n, &l);
     return true;
 }
@@ -337,7 +338,7 @@ const Layer* ActiveCamera(const std::vector<Layer>& layers, double timeMs) {
 }
 
 double NestedTime(const Layer& group, double timeMs) {
-    return RetimedTime(group.retiming, group.startTime, group.endTime, timeMs);
+    return RetimedTime(group.retiming, group.startTime, group.endTime, group.steppedMs(timeMs));
 }
 
 namespace {

@@ -1,0 +1,46 @@
+{
+ "id": "swing",
+ "name": "Swing",
+ "category": "move",
+ "native": true,
+ "description": "Turns the layer back and forth around its pivot.",
+ "params": [
+  {
+   "id": "angle",
+   "label": "Angle",
+   "type": "angle",
+   "default": 15,
+   "min": 0,
+   "max": 3600,
+   "step": 0.1
+  },
+  {
+   "id": "frequency",
+   "label": "Frequency",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 16,
+   "step": 0.01
+  },
+  {
+   "id": "wave",
+   "label": "Wave",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Sine",
+    "Triangle"
+   ]
+  },
+  {
+   "id": "phase",
+   "label": "Phase",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1000,
+   "step": 0.01
+  }
+ ]
+}

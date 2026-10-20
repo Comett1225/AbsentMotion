@@ -1,0 +1,46 @@
+{
+ "id": "pulseopacity",
+ "name": "Pulse Opacity",
+ "category": "move",
+ "native": true,
+ "description": "Fades the layer out and in over and over.",
+ "params": [
+  {
+   "id": "minimum",
+   "label": "Minimum",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  },
+  {
+   "id": "frequency",
+   "label": "Frequency",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 16,
+   "step": 0.01
+  },
+  {
+   "id": "wave",
+   "label": "Wave",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Sine",
+    "Triangle"
+   ]
+  },
+  {
+   "id": "phase",
+   "label": "Phase",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1000,
+   "step": 0.01
+  }
+ ]
+}

@@ -38,6 +38,49 @@ def cases():
     yield 'placeholder opacity', *engine.CASES[title]
 
 
+def fx(name, **params):
+    return f'<effect id="absent.{name}">' + ''.join(f'<property name="{k}" type="float" value="{v}"/>' for k, v in params.items()) + '</effect>'
+
+
+def moving(x0, x1):
+    return f'<transform><location><kf t="0" v="{x0},100,0"/><kf t="1" v="{x1},100,0"/></location></transform>'
+
+
+def keyed(id, x0, x1, extra):
+    return (f'<shape id="{id}" label="k" startTime="0" endTime="1000" fillType="color" s=".rect">{moving(x0, x1)}'
+            f'<fillColor value="#ffff0000"/><property name="size" type="vec2" value="10,10"/>{extra}</shape>')
+
+
+def motion_cases():
+    red, black, half = engine.RED, engine.BLACK, engine.HALF
+    dot = lambda extra, hw=10, hh=10, argb=0xffff0000, attrs='': engine.rect(1, 100, 100, hw, hh, argb, extra=extra, attrs=attrs)
+    yield 'oscillate right', engine.scene(dot(fx('oscillate', angle=0, frequency=0.5, magnitude=50))), [((150, 100), red), ((100, 100), black)], 15
+    yield 'oscillate down', engine.scene(dot(fx('oscillate', angle=90, frequency=0.5, magnitude=50))), [((100, 150), red), ((100, 100), black)], 15
+    yield 'oscillate triangle at a quarter cycle', engine.scene(dot(fx('oscillate', angle=0, frequency=0.25, magnitude=60, wave=1))), [((130, 100), red), ((100, 100), black), ((160, 100), black)], 15
+    yield 'oscillate phase', engine.scene(dot(fx('oscillate', angle=0, frequency=0, magnitude=50, phase=0.75))), [((50, 100), red), ((100, 100), black)], 0
+    yield 'spin clockwise', engine.scene(dot(fx('spin', speed=90), 60, 8)), [((130, 130), red), ((130, 70), black), ((160, 100), black)], 15
+    yield 'spin counterclockwise', engine.scene(dot(fx('spin', speed=90, direction=1), 60, 8)), [((130, 70), red), ((130, 130), black)], 15
+    yield 'swing', engine.scene(dot(fx('swing', angle=45, frequency=0.5), 60, 8)), [((130, 130), red), ((160, 100), black)], 15
+    yield 'pulse size', engine.scene(dot(fx('pulsesize', amount=0.5, frequency=0.5), 40, 40)), [((155, 100), red), ((165, 100), black)], 15
+    yield 'pulse opacity starts opaque', engine.scene(dot(fx('pulseopacity', frequency=0.5), argb=0xffffffff)), [((100, 100), (255, 255, 255))], 0
+    yield 'pulse opacity half way', engine.scene(dot(fx('pulseopacity', frequency=0.5), argb=0xffffffff)), [((100, 100), half)], 15
+    yield 'stretch axis', engine.scene(dot(fx('stretchaxis', angle=0, amount=2), 30, 30)), [((155, 100), red), ((100, 140), black)], 0
+    yield 'stretch axis upright', engine.scene(dot(fx('stretchaxis', angle=90, amount=2), 30, 30)), [((100, 155), red), ((155, 100), black)], 0
+    parent = '<nullobj id="5" label="n" startTime="0" endTime="1000">' + engine.transform('100,100,0') + fx('oscillate', angle=0, frequency=0.5, magnitude=50) + '</nullobj>'
+    yield 'a child follows its moving parent', engine.scene(parent + engine.rect(1, 0, 0, 10, 10, 0xffff0000, attrs=' parent="5"')), [((150, 100), red), ((100, 100), black)], 15
+    deep = ('<shape id="2" label="d" startTime="0" endTime="1000" fillType="color" s=".rect">' + engine.transform('20,20,60')
+            + '<fillColor value="#ff00ff00"/><property name="size" type="vec2" value="5,5"/></shape>')
+    yield 'moves are not applied twice in depth', engine.scene(dot(fx('oscillate', angle=0, frequency=0.5, magnitude=50)) + deep), [((150, 100), red), ((100, 100), black)], 15
+    yield 'echo behind', engine.scene(keyed(1, 50, 150, fx('echo', seconds=0.5, count=1, alpha=0.5))), [((130, 100), red), ((80, 100), (128, 0, 0)), ((105, 100), black)], 24
+    yield 'echo count', engine.scene(keyed(1, 50, 150, fx('echo', seconds=0.6, count=2, alpha=1))), [((130, 100), red), ((100, 100), red), ((70, 100), red), ((115, 100), black)], 24
+    yield 'time quantization', engine.scene(keyed(1, 50, 150, fx('timequant', fps=2))), [((100, 100), red), ((117, 100), black)], 20
+
+
+def centre(image):
+    ys, xs = np.nonzero(image[:, :, 0] > 128)
+    return (xs.mean(), ys.mean()) if len(xs) else (None, None)
+
+
 def text(content):
     return engine.scene('<text id="1" fillType="color" startTime="0" endTime="1000" size="40" wrapWidth="150" align="left">' + engine.transform('20,70,0') + '<content>' + content + '</content><fillColor value="#ffffffff"/></text>')
 
@@ -61,6 +104,26 @@ def main():
         print(('ok   ' if ok else 'FAIL ') + 'legacy EXIF ' + str(tag), flush=True)
         failed += not ok
         engine.adb('shell', 'rm', engine.DEVICE_DIR + '/' + name)
+    for k, (name, xml, probes, frame) in enumerate(motion_cases()):
+        image = engine.still('motion' + str(k), xml, work, frame)
+        bad = [(xy, tuple(image[xy[1], xy[0]]), want) for xy, want in probes if np.abs(image[xy[1], xy[0]] - want).max() > engine.TOLERANCE]
+        print(('FAIL ' if bad else 'ok   ') + name + (': ' + str(bad) if bad else ''), flush=True)
+        failed += bool(bad)
+    for effect, params in [('autoshake', {'magnitude': 40, 'rotation': 0}), ('randomdisplace', {'magnitude': 60}), ('randomjitter', {'angle': 90, 'magnitude': 40})]:
+        shots = [engine.still(f'{effect}{seed}{again}', engine.scene(engine.rect(1, 100, 100, 10, 10, 0xffff0000, extra=fx(effect, seed=seed, **params))), work, 10)
+                 for seed, again in [(1, 'a'), (1, 'b'), (2, 'a')]]
+        moved = [tuple(round(float(v), 1) for v in centre(shot)) for shot in shots]
+        ok = np.array_equal(shots[0], shots[1]) and not np.array_equal(shots[0], shots[2]) and np.hypot(moved[0][0] - 99.5, moved[0][1] - 99.5) > 1.5
+        if effect == 'randomjitter':
+            ok = ok and abs(moved[0][0] - 99.5) < 1 and abs(moved[0][1] - 99.5) > 1
+        print(('ok   ' if ok else 'FAIL ') + effect + ' is steady for a seed and changes with it: ' + str(moved), flush=True)
+        failed += not ok
+    hits = engine.run('motionhit', engine.scene(engine.rect(7, 100, 100, 10, 10, 0xffff0000, extra=fx('oscillate', angle=0, frequency=0.5, magnitude=50))), work, [(150, 100), (100, 100)], 15)
+    engine.adb('shell', 'rm', engine.DEVICE_DIR + '/motionhit.png')
+    got = [line.split()[-1] for line in hits.splitlines() if ' hit ' in line]
+    ok = got == ['7', '0']
+    print(('ok   ' if ok else 'FAIL ') + 'tapping follows an oscillating layer: ' + str(got), flush=True)
+    failed += not ok
     lf = engine.still('remaininglf', text('A&#10;B'), work)
     crlf = engine.still('remainingcrlf', text('A&#13;&#10;B'), work)
     if lf.max() < 100:

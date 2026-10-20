@@ -1,0 +1,45 @@
+{
+ "id": "autoshake",
+ "name": "Auto-Shake",
+ "category": "move",
+ "native": true,
+ "description": "Shakes the layer at random, moving and turning it a little.",
+ "params": [
+  {
+   "id": "magnitude",
+   "label": "Magnitude",
+   "type": "float",
+   "default": 20,
+   "min": 0,
+   "max": 4000,
+   "step": 0.1
+  },
+  {
+   "id": "rotation",
+   "label": "Rotation",
+   "type": "angle",
+   "default": 3,
+   "min": 0,
+   "max": 360,
+   "step": 0.1
+  },
+  {
+   "id": "frequency",
+   "label": "Frequency",
+   "type": "float",
+   "default": 6,
+   "min": 0,
+   "max": 30,
+   "step": 0.01
+  },
+  {
+   "id": "seed",
+   "label": "Seed",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1000,
+   "step": 1
+  }
+ ]
+}

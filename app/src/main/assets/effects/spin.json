@@ -1,0 +1,28 @@
+{
+ "id": "spin",
+ "name": "Spin",
+ "category": "move",
+ "native": true,
+ "description": "Turns the layer round and round at a steady speed.",
+ "params": [
+  {
+   "id": "speed",
+   "label": "Speed",
+   "type": "angle",
+   "default": 90,
+   "min": 0,
+   "max": 3600,
+   "step": 0.1
+  },
+  {
+   "id": "direction",
+   "label": "Direction",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Clockwise",
+    "Counterclockwise"
+   ]
+  }
+ ]
+}

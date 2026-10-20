@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cmath>
 #include <cstdint>
 #include <string>
 #include <vector>
@@ -130,20 +131,41 @@ struct Layer {
     bool keyedPoints = false;
     std::vector<FreehandStroke> strokes;
     Camera camera;
+    Anim steps;
+    bool placed = false;
 
     float value(const char* name, int i, float t, float fallback) const;
 
     const Property* prop(const char* name) const;
     bool activeAt(double timeMs) const { return !hidden && timeMs >= startTime && timeMs <= endTime; }
+    double steppedMs(double timeMs) const {
+        if (steps.empty() || endTime <= startTime) return timeMs;
+        const float fps = steps.get(0, (float)((timeMs - startTime) / (endTime - startTime)), 0);
+        if (!(fps > 0)) return timeMs;
+        return startTime + std::floor((timeMs - startTime) * fps / 1000 + 1e-4) * 1000 / fps;
+    }
     float localTime(double timeMs) const {
-        return endTime > startTime ? (float)((timeMs - startTime) / (endTime - startTime)) : 0.0f;
+        return endTime > startTime ? (float)((steppedMs(timeMs) - startTime) / (endTime - startTime)) : 0.0f;
     }
 };
 
 struct Placement {
     SkPoint location, pivot, scale;
     float rotation, z;
+    SkMatrix stretch = SkMatrix::I();
 };
+
+struct Echo {
+    int count = 0;
+    float seconds = 0, alpha = 1;
+    bool atop = false;
+};
+
+bool MotionEffect(const std::string& id);
+void ApplyMotion(const Layer& layer, double timeMs, Placement* placement);
+float MotionOpacity(const Layer& layer, double timeMs);
+bool EchoOf(const Layer& layer, double timeMs, Echo* echo);
+void ParseSteps(Layer* layer);
 
 struct Scene {
     int width = 0, height = 0, fps = 30, totalTime = 0;

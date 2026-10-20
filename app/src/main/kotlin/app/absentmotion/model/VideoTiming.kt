@@ -76,9 +76,17 @@ class VideoTiming(layer: Layer) {
 
 fun Layer.mediaTimeMs(timeMs: Double): Double = VideoTiming(this).mediaMs(timeMs - startTime)
 
+fun Layer.steppedMs(timeMs: Double): Double {
+    val effect = effects.firstOrNull { it["id"] == "absent.timequant" && it["hidden"] != "true" } ?: return timeMs
+    if (endTime <= startTime) return timeMs
+    val fps = effect.effectProperty("fps")?.valueAt(((timeMs - startTime) / (endTime - startTime)).toFloat())?.toFloatOrNull() ?: 8f
+    if (!(fps > 0f)) return timeMs
+    return startTime + kotlin.math.floor((timeMs - startTime) * fps / 1000 + 1e-4) * 1000 / fps
+}
+
 fun Layer.videoTimeUs(timeMs: Int, scene: Scene): Long {
     val fill = mediaFill ?: return 0
-    return (fill.bounded(mediaTimeMs(scene.frameTime(scene.frameAt(timeMs)).toDouble()), node["loop"] == "true") * 1000).toLong() - 500
+    return (fill.bounded(mediaTimeMs(steppedMs(scene.frameTime(scene.frameAt(timeMs)).toDouble())), node["loop"] == "true") * 1000).toLong() - 500
 }
 
 private fun MediaFill.bounded(mapped: Double, loop: Boolean): Double {
@@ -124,7 +132,7 @@ private fun Layer.pairAround(timeMs: Double, scene: Scene, stamps: LongArray): A
     val loop = node["loop"] == "true"
     val first = fill.inTime * 1000.0 - 500
     val last = fill.outTime * 1000.0 - 500
-    val mapped = VideoTiming(this).mediaMs(localMs(timeMs, scene))
+    val mapped = VideoTiming(this).mediaMs(localMs(steppedMs(timeMs), scene))
     val us = if (!loop && mapped >= fill.outTime) last else fill.bounded(mapped, loop) * 1000
     val i = stamps.atOrBefore(us)
     val gap = if (i + 1 < stamps.size) stamps[i + 1] - stamps[i] else if (i > 0) stamps[i] - stamps[i - 1] else 0

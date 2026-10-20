@@ -56,6 +56,13 @@ def photo(name, work, made):
     if name in made:
         return made[name]
     spec = SHOWCASE["photos"][name]
+    if "grid" in spec:
+        made[name] = Image.new("RGB", (RENDER, RENDER), (38, 40, 50))
+        draw = ImageDraw.Draw(made[name])
+        for k in range(0, RENDER + 1, spec["grid"]):
+            draw.line([(k, 0), (k, RENDER)], fill=(78, 82, 98), width=2)
+            draw.line([(0, k), (RENDER, k)], fill=(78, 82, 98), width=2)
+        return made[name]
     if "from" in spec:
         base = photo(spec["from"], work, made)
         lo, hi = spec["cut"]
@@ -94,11 +101,17 @@ def value(kind, v):
     return f"{float(v):.6f}"
 
 
-def layer(id, image, effect=""):
+def layer(id, image, effect="", half=RENDER // 2, keys=None):
     c = RENDER // 2
+    location = (f'<location value="{c},{c},0"/>' if not keys else
+                "<location>" + "".join(f'<kf t="{k / (len(keys) - 1):.6f}" v="{c + x},{c + y},0"/>' for k, (x, y) in enumerate(keys)) + "</location>")
     return (f'<shape id="{id}" label="{image}" startTime="0" endTime="999" s=".rect" fillType="media" mediaFillMode="fill" '
-            f'fillImage="file://{APP_PATH}/{image}.png"><transform><location value="{c},{c},0"/></transform>'
-            f'<property name="size" type="vec2" value="{c},{c}"/>{effect}</shape>')
+            f'fillImage="file://{APP_PATH}/{image}.png"><transform>{location}</transform>'
+            f'<property name="size" type="vec2" value="{half},{half}"/>{effect}</shape>')
+
+
+def backdrops(show):
+    return ["grid"] if show.get("layout") == "move" else [show["under"]] if "under" in show else []
 
 
 def scene(show, effect):
@@ -112,8 +125,9 @@ def scene(show, effect):
         fx = (f'<effect id="absent.{effect["id"]}" hidden="false">'
               + "".join(f'<property name="{p["id"]}" type="{TYPES.get(p["type"], "float")}" value="{value(p["type"], params[p["id"]])}"/>'
                         for p in effect["params"]) + "</effect>")
-    layers = [layer(1, show["under"])] if "under" in show else []
-    layers.append(layer(2, show["photo"], fx))
+    layers = [layer(1, name) for name in backdrops(show)]
+    move = show.get("layout") == "move"
+    layers.append(layer(2, show["photo"], fx, RENDER // 4 if move else RENDER // 2, show.get("keys")))
     if "split" in show:
         layers.append(layer(3, f'{show["photo"]}-before{round(show["split"] * 100)}'))
     return (f'<scene title="thumb" width="{RENDER}" height="{RENDER}" fps="30" totalTime="1000" bgcolor="#00000000">'
@@ -192,7 +206,7 @@ def main():
     made, pushed, plain, thumbs, unchanged = {}, set(), {}, [], []
     for key in keys:
         show = SHOWCASE["effects"][key]
-        names = [show["photo"]] + ([show["under"]] if "under" in show else [])
+        names = [show["photo"]] + backdrops(show)
         for name in names:
             if name not in pushed:
                 photo(name, opts.work, made).save(opts.work / f"{name}.png")
@@ -205,7 +219,7 @@ def main():
                 push(opts.work / f"{name}.png", f"{name}.png")
                 pushed.add(name)
         frames = show.get("frames", [show.get("frame", 0)])
-        base = (show["photo"], show.get("under"), show.get("split"), tuple(frames))
+        base = (show["photo"], show.get("under"), show.get("split"), tuple(frames), show.get("layout"), json.dumps(show.get("keys")))
         if show.get("local") == "grain":
             plain.setdefault(base, made[show["photo"]].convert("RGBA").resize((THUMB, THUMB), Image.LANCZOS))
             image = grain(made[show["photo"]], show["params"]["amount"])
