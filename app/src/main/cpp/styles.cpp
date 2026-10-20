@@ -461,6 +461,10 @@ bool EffectsApply(const std::vector<Layer>& siblings, const Layer& l) {
     return gEffects && gScene && &siblings == gEffectList && gEffects->active(l);
 }
 
+bool SeesPrevious(const std::vector<Layer>& siblings, const Layer& l) {
+    return EffectsApply(siblings, l) && (gEffects->lifted(l) || gEffects->behind(l));
+}
+
 struct Override {
     bool blend = false;
     SkBlendMode mode = SkBlendMode::kSrcOver;
@@ -659,7 +663,17 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
         }
     };
     const bool effects = EffectsApply(siblings, l);
-    if (!effects || !gEffects->draw(canvas, *gScene, l, timeMs, scenePath.getBounds(), picture)) picture(canvas);
+    const Layer* under = nullptr;
+    for (size_t i = 1; effects && i < siblings.size(); i++) {
+        if (&siblings[i] == &l) under = &siblings[i - 1];
+    }
+    std::function<void(SkCanvas*)> below;
+    if (under) below = [&](SkCanvas* canvas) {
+        Override plain;
+        plain.unitOpacity = true;
+        DrawOne(canvas, siblings, *under, timeMs, pictures, plain);
+    };
+    if (!effects || !gEffects->draw(canvas, *gScene, l, timeMs, scenePath.getBounds(), picture, below)) picture(canvas);
     if (effects && gEffects->lifted(l) && !scenePath.isEmpty()) {
         SkPath outside = scenePath;
         if (copies) {
@@ -745,7 +759,7 @@ void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& 
         return;
     }
     ShutterBlur shutter;
-    if (!ov.shuttered && ShutterBlurOf(l, timeMs, &shutter) && !(EffectsApply(siblings, l) && gEffects->lifted(l))) {
+    if (!ov.shuttered && ShutterBlurOf(l, timeMs, &shutter) && !SeesPrevious(siblings, l)) {
         DrawShuttered(canvas, siblings, l, timeMs, pictures, ov, shutter);
         return;
     }
@@ -792,8 +806,7 @@ void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& 
             layerPaint.setImageFilter(SkImageFilters::DropShadow(s.offset.get(0, t, 3), s.offset.get(1, t, 3), sigma, sigma,
                                                                  color, nullptr, nullptr));
         }
-        const bool lifted = EffectsApply(siblings, l) && gEffects->lifted(l);
-        canvas->saveLayer(SkCanvas::SaveLayerRec(nullptr, &layerPaint, lifted ? SkCanvas::kInitWithPrevious_SaveLayerFlag : 0));
+        canvas->saveLayer(SkCanvas::SaveLayerRec(nullptr, &layerPaint, SeesPrevious(siblings, l) ? SkCanvas::kInitWithPrevious_SaveLayerFlag : 0));
         DrawContent(canvas, siblings, l, timeMs, 1, decorated, pictures, repeated ? &copies : nullptr);
         centredBorders(1);
         canvas->restore();

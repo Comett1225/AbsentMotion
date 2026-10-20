@@ -101,6 +101,17 @@ CASES = {
         scene(picture("exif2.jpg", 0)), [((50, 100), BLUE), ((150, 100), RED)]),
     "a picture tagged as transposed shows turned and mirrored": (
         scene(picture("exif5.jpg", 270)), [((100, 50), RED), ((100, 150), BLUE)]),
+    "a backdrop effect moves the layers behind it and hides its own fill": (
+        scene(rect(1, 50, 100, 50, 100, 0xffff0000) + rect(2, 150, 100, 50, 100, 0xff0000ff)
+              + rect(3, 100, 100, 60, 60, extra='<effect id="absent.displacementmap" hidden="false">'
+                     '<property name="offset" type="vec2" value="-50,0"/></effect>')
+              + rect(4, 150, 60, 10, 10, 0xff00ff00)),
+        [((60, 100), BLUE), ((20, 100), RED), ((180, 100), BLUE), ((150, 60), GREEN), ((100, 60), BLUE)]),
+    "an effect can read the layer below as a map, even at zero opacity": (
+        scene(rect(1, 50, 100, 50, 100, opacity=0.0)
+              + rect(2, 150, 100, 50, 100, 0xff00ff00, extra='<effect id="absent.displacementmap" hidden="false">'
+                     '<property name="offset" type="vec2" value="-50,0"/><property name="map" type="float" value="1"/></effect>')),
+        [((75, 100), GREEN), ((25, 100), BLACK), ((150, 100), GREEN)]),
 }
 
 HITS = {

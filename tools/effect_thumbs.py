@@ -117,11 +117,11 @@ def prop(p, v):
     return f'<property name="{p["id"]}" type="{kind}" value="{value(p["type"], v)}"/>'
 
 
-def layer(id, image, effect="", half=RENDER // 2, keys=None, end=999):
+def layer(id, image, effect="", half=RENDER // 2, keys=None, end=999, shape=".rect"):
     c = RENDER // 2
     location = (f'<location value="{c},{c},0"/>' if not keys else
                 "<location>" + "".join(f'<kf t="{k / (len(keys) - 1):.6f}" v="{c + x},{c + y},0"/>' for k, (x, y) in enumerate(keys)) + "</location>")
-    return (f'<shape id="{id}" label="{image}" startTime="0" endTime="{end}" s=".rect" fillType="media" mediaFillMode="fill" '
+    return (f'<shape id="{id}" label="{image}" startTime="0" endTime="{end}" s="{shape}" fillType="media" mediaFillMode="fill" '
             f'fillImage="file://{APP_PATH}/{image}.png"><transform>{location}</transform>'
             f'<property name="size" type="vec2" value="{half},{half}"/>{effect}</shape>')
 
@@ -188,8 +188,8 @@ def scene(show, effect, preset=None):
     elif show.get("layout") == "drawing":
         layers.append(sketch(2, fx, total - 1))
     else:
-        half = {"move": RENDER // 4, "repeat": RENDER // 12}.get(show.get("layout"), RENDER // 2)
-        layers.append(layer(2, show["photo"], fx, half, show.get("keys"), total - 1))
+        half = show.get("half") or {"move": RENDER // 4, "repeat": RENDER // 12}.get(show.get("layout"), RENDER // 2)
+        layers.append(layer(2, show["photo"], fx, half, show.get("keys"), total - 1, show.get("shape", ".rect")))
     if "split" in show:
         layers.append(layer(3, f'{show["photo"]}-before{round(show["split"] * 100)}', end=total - 1))
     return (f'<scene title="thumb" width="{RENDER}" height="{RENDER}" fps="{fps}" totalTime="{total}" bgcolor="#00000000">'
@@ -302,7 +302,7 @@ def main():
         animated = show.get("animate", 0)
         frames = list(range(animated)) if animated else show.get("frames", [show.get("frame", 0)])
         base = (show.get("photo"), show.get("text"), show.get("under"), show.get("split"), tuple(frames), show.get("layout"),
-                json.dumps(show.get("keys")), animated, json.dumps(show.get("path")))
+                json.dumps(show.get("keys")), animated, json.dumps(show.get("path")), show.get("half"), show.get("shape"))
         if base not in plain:
             plain[base] = batch.add(f"plain{len(plain)}", scene(show, None), frames)
         effect = json.loads((PACK / f"{key}.json").read_text())

@@ -1,0 +1,65 @@
+{
+ "id": "glass",
+ "name": "Glass",
+ "category": "distort",
+ "since": "3.0.0",
+ "description": "Turns the layer's shape into bevelled glass that bends the layers behind it, with a highlight along the rim.",
+ "params": [
+  {
+   "id": "blur",
+   "label": "Bevel",
+   "type": "float",
+   "default": 24,
+   "min": 0,
+   "max": 300,
+   "step": 0.1,
+   "pixels": true
+  },
+  {
+   "id": "refraction",
+   "label": "Refraction",
+   "type": "float",
+   "default": 30,
+   "min": -300,
+   "max": 300,
+   "step": 0.1,
+   "pixels": true
+  },
+  {
+   "id": "angle",
+   "label": "Light Angle",
+   "type": "angle",
+   "default": 135,
+   "min": -3600,
+   "max": 3600,
+   "step": 0.5
+  },
+  {
+   "id": "highlight",
+   "label": "Highlight",
+   "type": "float",
+   "default": 0.6,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "color",
+   "label": "Color",
+   "type": "color",
+   "default": "#bfe6ff"
+  },
+  {
+   "id": "tint",
+   "label": "Tint",
+   "type": "float",
+   "default": 0.15,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform shader blurred;\nuniform shader backdrop;\nuniform float blur;\nuniform float refraction;\nuniform float angle;\nuniform float highlight;\nlayout(color) uniform half4 color;\nuniform float tint;\nfloat h(float2 p) { return float(blurred.eval(p).a); }\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return half4(0.0);\n    float e = max(blur * 0.15, 1.0);\n    float2 g = float2(h(coord + float2(e, 0.0)) - h(coord - float2(e, 0.0)), h(coord + float2(0.0, e)) - h(coord - float2(0.0, e))) / (2.0 * e);\n    float3 n = normalize(float3(-g * max(blur, 1.0), 1.0));\n    half4 bg = backdrop.eval(coord - n.xy * refraction);\n    float3 rgb = bg.a > 0.0 ? float3(bg.rgb) / float(bg.a) : float3(0.0);\n    rgb = mix(rgb, rgb * float3(color.rgb), clamp(tint, 0.0, 1.0) * float(color.a));\n    float a = radians(angle);\n    float3 l = normalize(float3(cos(a), -sin(a), 0.6));\n    float spec = pow(max(dot(reflect(-l, n), float3(0.0, 0.0, 1.0)), 0.0), 30.0);\n    float shine = clamp((spec + (1.0 - n.z) * 0.5) * highlight, 0.0, 1.0);\n    float alpha = max(float(bg.a), shine);\n    rgb = clamp(rgb * float(bg.a) / max(alpha, 0.001) + shine, 0.0, 1.0);\n    return half4(half3(rgb * alpha), half(alpha)) * src.a;\n}\n"
+}

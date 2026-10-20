@@ -1,0 +1,35 @@
+{
+ "id": "magnifybackground",
+ "name": "Magnify Background",
+ "category": "distort",
+ "since": "3.0.0",
+ "description": "Makes the layer a magnifying glass: its shape shows the layers behind it enlarged around its centre.",
+ "params": [
+  {
+   "id": "scale",
+   "label": "Scale",
+   "type": "float",
+   "default": 1,
+   "min": 0.01,
+   "max": 50,
+   "step": 0.01
+  },
+  {
+   "id": "magnify",
+   "label": "Magnify Layer",
+   "type": "switch",
+   "default": false
+  },
+  {
+   "id": "sampling",
+   "label": "Sampling",
+   "type": "choice",
+   "default": 1,
+   "options": [
+    "Nearest",
+    "Linear"
+   ]
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform shader backdrop;\nuniform float4 screen;\nuniform float scale;\nuniform float magnify;\nuniform float sampling;\nhalf4 main(float2 coord) {\n    float2 c = size * 0.5;\n    float2 p = c + (coord - c) / max(scale, 0.01);\n    half m = image.eval(magnify > 0.5 ? p : coord).a;\n    if (m <= 0.0) return half4(0.0);\n    if (sampling < 0.5) p = screen.xy + floor(p - screen.xy) + 0.5;\n    return backdrop.eval(p) * m;\n}\n"
+}

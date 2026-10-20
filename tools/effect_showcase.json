@@ -171,6 +171,13 @@
     "countupdown": {"layout": "text", "text": "$12,500", "params": {"multiply": [0, 1, 1], "separator": 1}, "animate": 20, "presets": {"count-up": "1000"}},
     "timecode": {"layout": "text", "text": "x", "params": {"format": 3, "speed": 3}, "animate": 20},
     "drawingprogress": {"layout": "drawing", "params": {"end": [0, 1, 1]}, "animate": 20},
-    "stroketaper": {"layout": "drawing", "params": {"start": [0, 0.5, 0.5], "end": [1, 0.5, 0.5]}, "animate": 16}
+    "stroketaper": {"layout": "drawing", "params": {"start": [0, 0.5, 0.5], "end": [1, 0.5, 0.5]}, "animate": 16},
+    "magnifybackground": {"photo": "colour", "under": "landscape", "half": 110, "shape": ".circle", "params": {"scale": 2.2}},
+    "maskblur": {"photo": "detail", "under": "landscape", "half": 130, "shape": ".circle", "params": {"strength": 40}},
+    "fillbehind": {"photo": "portrait", "half": 110, "params": {"blur": 60, "edgeStrength": 0.6}},
+    "glass": {"photo": "colour", "under": "landscape", "half": 120, "shape": ".circle"},
+    "ominoglass": {"photo": "colour", "under": "landscape", "half": 130, "shape": ".circle", "params": {"refraction": 20, "aberration": 12, "blur": 20}},
+    "displacementmap": {"photo": "colour", "under": "landscape", "half": 130, "params": {"offset": [40, 40], "fromCenter": true}},
+    "polardisplacement": {"photo": "colour", "under": "landscape", "half": 150, "shape": ".circle", "params": {"angle": 40, "reach": 20}}
   }
 }

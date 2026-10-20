@@ -4,6 +4,8 @@
 #include "include/core/SkCanvas.h"
 #include "include/core/SkColorFilter.h"
 #include "include/core/SkPaint.h"
+#include "include/core/SkPicture.h"
+#include "include/core/SkPictureRecorder.h"
 #include "include/effects/SkImageFilters.h"
 
 #include <algorithm>
@@ -74,6 +76,8 @@ std::string EffectRuntime::load(const std::string& xml) {
         if (!result.effect->findChild("image")) return "shader error: no 'uniform shader image'";
         d.blurred = result.effect->findChild("blurred") != nullptr;
         d.brightPass = d.blurred && result.effect->findUniform("threshold") != nullptr;
+        d.backdrop = result.effect->findChild("backdrop") != nullptr;
+        d.below = result.effect->findChild("below") != nullptr;
         d.shader = std::move(result.effect);
     }
     fDefinitions[id] = std::move(d);
@@ -103,11 +107,21 @@ int EffectRuntime::liftAt(const Layer& layer) const {
 
 bool EffectRuntime::lifted(const Layer& layer) const { return liftAt(layer) >= 0; }
 
-sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer, double timeMs, const SkRect& area) const {
+bool EffectRuntime::needs(const Layer& layer, bool Definition::*input) const {
+    return std::any_of(layer.effects.begin(), layer.effects.end(), [&](const LayerEffect& e) {
+        const Definition* d = e.hidden ? nullptr : find(e.id);
+        return d && d->shader && d->*input;
+    });
+}
+
+bool EffectRuntime::behind(const Layer& layer) const { return needs(layer, &Definition::backdrop); }
+
+sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer, double timeMs, const SkRect& area,
+                                          sk_sp<SkImageFilter> content, sk_sp<SkImageFilter> below) const {
     const float t = layer.localTime(timeMs), seconds = (float)((timeMs - layer.startTime) / 1000.0);
     const SkRect bounds = SkRect::MakeIWH(scene.width, scene.height).makeOffset(-area.left(), -area.top());
     const float reach = (float)std::max(scene.width, scene.height);
-    sk_sp<SkImageFilter> f;
+    sk_sp<SkImageFilter> f = std::move(content);
     bool any = false;
     for (size_t k = (size_t)(liftAt(layer) + 1); k < layer.effects.size(); k++) {
         const LayerEffect& e = layer.effects[k];
@@ -127,6 +141,7 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
                 if (name == "size") v = {area.width(), area.height()};
                 else if (name == "time") v = {seconds};
                 else if (name == "duration") v = {(float)((layer.endTime - layer.startTime) / 1000.0)};
+                else if (name == "screen") v = {-area.left(), -area.top(), (float)scene.width, (float)scene.height};
                 else if (u.isColor() && n == 4) v = {Value(e, defaults, name, 1, t, 0), Value(e, defaults, name, 2, t, 0),
                                                      Value(e, defaults, name, 3, t, 0), Value(e, defaults, name, 0, t, 1)};
                 else for (int i = 0; i < n; i++) v[i] = Value(e, defaults, name, i, t, 0);
@@ -138,6 +153,8 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
                     b.uniform(u.name).set(v.data(), n);
                 }
             }
+            std::vector<std::string_view> names = {"image"};
+            std::vector<sk_sp<SkImageFilter>> inputs = {f};
             if (d->blurred) {
                 const float sigma = std::max(Value(e, defaults, "blur", 0, t, 0), 0.0f) / 3;
                 sk_sp<SkImageFilter> source = f;
@@ -148,12 +165,19 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
                                             luma[0], luma[1], luma[2], luma[3], luma[4], 0, 0, 0, 1, 0};
                     source = SkImageFilters::ColorFilter(SkColorFilters::Matrix(rows), f);
                 }
-                std::string_view names[] = {"image", "blurred"};
-                const sk_sp<SkImageFilter> inputs[] = {f, sigma > 0 ? SkImageFilters::Blur(sigma, sigma, SkTileMode::kDecal, source) : source};
-                f = SkImageFilters::RuntimeShader(b, reach, names, inputs, 2);
-            } else {
-                f = SkImageFilters::RuntimeShader(b, reach, "image", f);
+                names.push_back("blurred");
+                inputs.push_back(sigma > 0 ? SkImageFilters::Blur(sigma, sigma, SkTileMode::kDecal, source) : source);
             }
+            if (d->backdrop) {
+                names.push_back("backdrop");
+                inputs.push_back(nullptr);
+            }
+            if (d->below) {
+                names.push_back("below");
+                inputs.push_back(below ? below : SkImageFilters::Empty());
+            }
+            f = inputs.size() == 1 ? SkImageFilters::RuntimeShader(b, reach, "image", f)
+                                   : SkImageFilters::RuntimeShader(b, reach, names.data(), inputs.data(), (int)inputs.size());
         } else {
             continue;
         }
@@ -164,11 +188,30 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
 }
 
 bool EffectRuntime::draw(SkCanvas* canvas, const Scene& scene, const Layer& layer, double timeMs, const SkRect& area,
-                         const std::function<void(SkCanvas*)>& source) const {
+                         const std::function<void(SkCanvas*)>& source, const std::function<void(SkCanvas*)>& below) const {
     const SkRect bounds = SkRect::MakeIWH(scene.width, scene.height);
     const int lift = liftAt(layer);
-    sk_sp<SkImageFilter> filter = this->chain(scene, layer, timeMs, area.isEmpty() ? bounds : area);
+    const SkRect at = area.isEmpty() ? bounds : area;
+    const SkRect local = bounds.makeOffset(-at.left(), -at.top());
+    auto record = [&](const std::function<void(SkCanvas*)>& draw) {
+        SkPictureRecorder recorder;
+        SkCanvas* c = recorder.beginRecording(local);
+        c->translate(-at.left(), -at.top());
+        draw(c);
+        return SkImageFilters::Picture(recorder.finishRecordingAsPicture(), local);
+    };
+    const bool seesBehind = lift < 0 && behind(layer);
+    sk_sp<SkImageFilter> content = seesBehind ? record(source) : nullptr;
+    sk_sp<SkImageFilter> under = below && needs(layer, &Definition::below) ? record(below) : nullptr;
+    sk_sp<SkImageFilter> filter = this->chain(scene, layer, timeMs, at, std::move(content), std::move(under));
     if (!filter && lift < 0) return false;
+    if (seesBehind) {
+        SkPaint replace;
+        replace.setBlendMode(SkBlendMode::kSrc);
+        canvas->saveLayer(SkCanvas::SaveLayerRec(&bounds, &replace, filter.get(), 0));
+        canvas->restore();
+        return true;
+    }
     SkPaint paint;
     paint.setImageFilter(std::move(filter));
     if (lift < 0) {

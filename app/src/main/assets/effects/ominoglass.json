@@ -1,0 +1,193 @@
+{
+ "id": "ominoglass",
+ "name": "Omino Glass",
+ "category": "distort",
+ "since": "3.0.0",
+ "description": "Glass made from the layer's brightness: refracts what is behind it with rainbow fringes and lights the surface like a lens.",
+ "params": [
+  {
+   "id": "blur",
+   "label": "Bevel",
+   "type": "float",
+   "default": 10,
+   "min": 0,
+   "max": 300,
+   "step": 0.1,
+   "pixels": true
+  },
+  {
+   "id": "refraction",
+   "label": "Refraction",
+   "type": "float",
+   "default": 5,
+   "min": -100,
+   "max": 100,
+   "step": 0.1,
+   "pixels": true
+  },
+  {
+   "id": "aberration",
+   "label": "Chromatic Aberration",
+   "type": "float",
+   "default": 5,
+   "min": -100,
+   "max": 100,
+   "step": 0.1,
+   "pixels": true
+  },
+  {
+   "id": "feature",
+   "label": "Feature Size",
+   "type": "float",
+   "default": 100,
+   "min": 5,
+   "max": 500,
+   "step": 0.1
+  },
+  {
+   "id": "samples",
+   "label": "Smoothing Samples",
+   "type": "float",
+   "default": 2,
+   "min": 1,
+   "max": 20,
+   "step": 1
+  },
+  {
+   "id": "color",
+   "label": "Color",
+   "type": "color",
+   "default": "#ffffff"
+  },
+  {
+   "id": "blend",
+   "label": "Blend",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "shading",
+   "label": "Shading",
+   "type": "choice",
+   "default": 1,
+   "options": [
+    "None",
+    "Point Light",
+    "Directional Light"
+   ]
+  },
+  {
+   "id": "intensity",
+   "label": "Intensity",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 2,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "shine",
+   "label": "Shine",
+   "type": "float",
+   "default": 0.8,
+   "min": 0,
+   "max": 1,
+   "step": 0.001
+  },
+  {
+   "id": "specularity",
+   "label": "Specularity",
+   "type": "float",
+   "default": 30,
+   "min": 1,
+   "max": 250,
+   "step": 0.1
+  },
+  {
+   "id": "ambient",
+   "label": "Ambient",
+   "type": "float",
+   "default": 0.1,
+   "min": 0,
+   "max": 1,
+   "step": 0.001
+  },
+  {
+   "id": "light",
+   "label": "Light Color",
+   "type": "color",
+   "default": "#ffffff"
+  },
+  {
+   "id": "direction",
+   "label": "Direction",
+   "type": "point",
+   "default": [
+    75,
+    -75
+   ],
+   "min": -5000,
+   "max": 5000,
+   "step": 1,
+   "pixels": true
+  },
+  {
+   "id": "elevation",
+   "label": "Elevation",
+   "type": "float",
+   "default": 100,
+   "min": -100,
+   "max": 800,
+   "step": 0.1
+  },
+  {
+   "id": "useLuma",
+   "label": "Use Layer Luminance",
+   "type": "switch",
+   "default": true
+  },
+  {
+   "id": "amount",
+   "label": "Roughness",
+   "type": "float",
+   "default": 0,
+   "min": -1,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "scale",
+   "label": "Roughness Scale",
+   "type": "float",
+   "default": 1,
+   "min": 0.01,
+   "max": 50,
+   "step": 0.01
+  },
+  {
+   "id": "evolution",
+   "label": "Evolution",
+   "type": "float",
+   "default": 0,
+   "min": -50,
+   "max": 50,
+   "step": 0.01
+  },
+  {
+   "id": "seed",
+   "label": "Seed",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 5,
+   "step": 0.01
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform shader blurred;\nuniform shader backdrop;\nuniform float blur;\nuniform float refraction;\nuniform float aberration;\nuniform float feature;\nuniform float samples;\nlayout(color) uniform half4 color;\nuniform float blend;\nuniform float shading;\nuniform float intensity;\nuniform float shine;\nuniform float specularity;\nuniform float ambient;\nlayout(color) uniform half4 light;\nuniform float2 direction;\nuniform float elevation;\nuniform float useLuma;\nuniform float amount;\nuniform float scale;\nuniform float evolution;\nuniform float seed;\nfloat hash13(float3 p) {\n    p = fract(p * 0.1031);\n    p += dot(p, p.zyx + 31.32);\n    return fract((p.x + p.y) * p.z);\n}\nfloat vnoise(float3 p) {\n    float3 i = floor(p);\n    float3 f = fract(p);\n    f = f * f * (3.0 - 2.0 * f);\n    float a = mix(hash13(i), hash13(i + float3(1, 0, 0)), f.x);\n    float b = mix(hash13(i + float3(0, 1, 0)), hash13(i + float3(1, 1, 0)), f.x);\n    float c = mix(hash13(i + float3(0, 0, 1)), hash13(i + float3(1, 0, 1)), f.x);\n    float d = mix(hash13(i + float3(0, 1, 1)), hash13(i + float3(1, 1, 1)), f.x);\n    return mix(mix(a, b, f.y), mix(c, d, f.y), f.z);\n}\nfloat3 band(int i) {\n    if (i == 0) return float3(0.5, 0.0, 1.0);\n    if (i == 1) return float3(0.0, 0.0, 1.0);\n    if (i == 2) return float3(0.0, 0.6, 1.0);\n    if (i == 3) return float3(0.0, 1.0, 0.0);\n    if (i == 4) return float3(1.0, 1.0, 0.0);\n    if (i == 5) return float3(1.0, 0.5, 0.0);\n    return float3(1.0, 0.0, 0.0);\n}\nfloat rough(float2 p) {\n    float3 q = float3(p / (24.0 * max(scale, 0.01)) + seed * float2(37.1, 17.3), evolution);\n    return vnoise(q) * 0.6 + vnoise(q * 2.03 + 5.1) * 0.3 + vnoise(q * 4.1 + 9.7) * 0.1;\n}\nfloat height(float2 p) {\n    half4 b = blurred.eval(p);\n    float h = useLuma > 0.5 ? dot(float3(b.rgb), float3(0.2126, 0.7152, 0.0722)) : float(b.a);\n    return amount != 0.0 ? h + amount * (rough(p) - 0.5) * float(b.a) : h;\n}\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return half4(0.0);\n    float steps = clamp(floor(samples), 1.0, 20.0);\n    float2 g = float2(0.0);\n    for (int i = 1; i <= 20; i++) {\n        if (float(i) > steps) break;\n        float d = float(i);\n        g += float2(height(coord + float2(d, 0.0)) - height(coord - float2(d, 0.0)),\n                    height(coord + float2(0.0, d)) - height(coord - float2(0.0, d))) / (2.0 * d);\n    }\n    float3 n = normalize(float3(-g / steps * feature * 0.1, 1.0));\n    float3 acc = float3(0.0);\n    float alpha = 0.0;\n    for (int i = 0; i < 7; i++) {\n        half4 s = backdrop.eval(coord - n.xy * (refraction + aberration * (float(i) / 6.0 - 0.5)));\n        acc += float3(s.rgb) * band(i);\n        alpha += float(s.a) / 7.0;\n    }\n    float3 rgb = acc / float3(3.5, 3.1, 3.0);\n    rgb = mix(rgb, rgb * float3(color.rgb), clamp(blend, 0.0, 1.0));\n    if (shading > 0.5) {\n        float3 l = normalize(shading < 1.5 ? float3(size * 0.5 + direction - coord, elevation) : float3(direction, elevation));\n        float level = max(l.z, 0.05);\n        float diffuse = min(max(dot(n, l), 0.0) / level, 2.0);\n        float spec = pow(max(dot(reflect(-l, n), float3(0.0, 0.0, 1.0)), 0.0), max(specularity, 1.0)) * shine;\n        float3 lc = float3(light.rgb) * intensity;\n        rgb = rgb * (ambient + (1.0 - ambient) * diffuse * lc) + spec * lc * max(alpha, 0.5);\n        alpha = max(alpha, clamp(spec * intensity, 0.0, 1.0));\n    }\n    return half4(half3(clamp(rgb, 0.0, alpha)), half(alpha)) * src.a;\n}\n"
+}

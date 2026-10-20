@@ -34,6 +34,8 @@ class EffectPackTest {
             val expected = mapOf("image" to ("shader" to false), "size" to ("float2" to false), "time" to ("float" to false)) +
                 (if (blurred) mapOf("blurred" to ("shader" to false)) else emptyMap()) +
                 (if ("duration" in uniforms) mapOf("duration" to ("float" to false)) else emptyMap()) +
+                listOf("backdrop", "below").filter { it in uniforms }.associateWith { "shader" to false } +
+                (if ("screen" in uniforms) mapOf("screen" to ("float4" to false)) else emptyMap()) +
                 effect.params.associate { p ->
                     p.id to when (p.kind) { "point" -> "float2" to false; "color" -> "half4" to true; else -> "float" to false }
                 }
@@ -43,6 +45,13 @@ class EffectPackTest {
             assertTrue("${effect.key} declares 'pos', the name the GPU backend gives main's argument",
                 !Regex("""\b(float2|half2|float|half)\s+pos\b""").containsMatchIn(effect.sksl))
         }
+    }
+
+    @Test fun backgroundEffectsReadWhatIsBehindTheLayer() {
+        val reads = { input: String -> catalog.definitions.filter { Regex("""uniform\s+shader\s+$input\s*;""").containsMatchIn(it.sksl ?: "") }.map { it.key }.toSet() }
+        assertTrue(reads("backdrop").containsAll(listOf("magnifybackground", "maskblur", "glass", "ominoglass", "displacementmap", "polardisplacement")))
+        assertEquals(setOf("displacementmap"), reads("below"))
+        assertTrue("fillbehind" !in reads("backdrop"))
     }
 
     @Test fun defaultsLieWithinTheirRange() {

@@ -1,0 +1,173 @@
+{
+ "id": "fillbehind",
+ "name": "Fill Behind",
+ "category": "blur",
+ "since": "3.0.0",
+ "description": "Fills the frame behind the layer with a blurred, zoomed copy of itself, the usual fix for a portrait video in a landscape project.",
+ "params": [
+  {
+   "id": "blur",
+   "label": "Strength",
+   "type": "float",
+   "default": 60,
+   "min": 0,
+   "max": 600,
+   "step": 0.1,
+   "pixels": true
+  },
+  {
+   "id": "feather",
+   "label": "Feather",
+   "type": "float",
+   "default": 0.05,
+   "min": 0,
+   "max": 1,
+   "step": 0.001
+  },
+  {
+   "id": "saturation",
+   "label": "Saturation",
+   "type": "float",
+   "default": 0,
+   "min": -1,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "brightness",
+   "label": "Brightness",
+   "type": "float",
+   "default": 0,
+   "min": -1,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "gamma",
+   "label": "Gamma",
+   "type": "float",
+   "default": 1,
+   "min": 0.01,
+   "max": 9.99,
+   "step": 0.01
+  },
+  {
+   "id": "fgAlpha",
+   "label": "Foreground Alpha",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "bgAlpha",
+   "label": "Background Alpha",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "tintColor",
+   "label": "Tint Color",
+   "type": "color",
+   "default": "#3d7eff"
+  },
+  {
+   "id": "tint",
+   "label": "Tint",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "edgeColor",
+   "label": "Edge Color",
+   "type": "color",
+   "default": "#ffffff"
+  },
+  {
+   "id": "edgeStrength",
+   "label": "Edge Strength",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "scanStrength",
+   "label": "Scan Line Strength",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "scanCount",
+   "label": "Scan Line Count",
+   "type": "float",
+   "default": 720,
+   "min": 100,
+   "max": 2160,
+   "step": 1
+  },
+  {
+   "id": "fgOffset",
+   "label": "FG Offset",
+   "type": "point",
+   "default": [
+    0,
+    0
+   ],
+   "min": -5000,
+   "max": 5000,
+   "step": 1,
+   "pixels": true
+  },
+  {
+   "id": "fgScale",
+   "label": "FG Scale",
+   "type": "float",
+   "default": 1,
+   "min": 0.01,
+   "max": 100,
+   "step": 0.01
+  },
+  {
+   "id": "bgOffset",
+   "label": "BG Offset",
+   "type": "point",
+   "default": [
+    0,
+    0
+   ],
+   "min": -5000,
+   "max": 5000,
+   "step": 1,
+   "pixels": true
+  },
+  {
+   "id": "bgScale",
+   "label": "BG Scale",
+   "type": "float",
+   "default": 1,
+   "min": 0.01,
+   "max": 100,
+   "step": 0.01
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform shader blurred;\nuniform float4 screen;\nuniform float blur;\nuniform float feather;\nuniform float saturation;\nuniform float brightness;\nuniform float gamma;\nuniform float fgAlpha;\nuniform float bgAlpha;\nlayout(color) uniform half4 tintColor;\nuniform float tint;\nlayout(color) uniform half4 edgeColor;\nuniform float edgeStrength;\nuniform float scanStrength;\nuniform float scanCount;\nuniform float2 fgOffset;\nuniform float fgScale;\nuniform float2 bgOffset;\nuniform float bgScale;\nfloat luma(float3 c) { return dot(c, float3(0.2126, 0.7152, 0.0722)); }\nhalf4 main(float2 coord) {\n    float2 c = size * 0.5;\n    float margin = max(blur, 0.0) * 0.5;\n    float2 inner = max(size - 2.0 * margin, float2(1.0));\n    float k = max(screen.z / inner.x, screen.w / inner.y) * max(bgScale, 0.01);\n    half4 b = blurred.eval(c + (coord - screen.xy - screen.zw * 0.5 - bgOffset) / k);\n    float3 rgb = b.a > 0.0 ? float3(b.rgb) / float(b.a) : float3(0.0);\n    rgb = clamp(mix(float3(luma(rgb)), rgb, 1.0 + saturation), 0.0, 1.0);\n    float l = luma(rgb);\n    if (l > 0.0) rgb *= pow(l, 1.0 / max(gamma, 0.01)) / l;\n    rgb = brightness < 0.0 ? rgb * (1.0 + brightness) : mix(rgb, float3(1.0), brightness);\n    float3 hue = float3(tintColor.rgb) * luma(rgb) / max(luma(float3(tintColor.rgb)), 0.001);\n    rgb = mix(rgb, hue, clamp(tint, 0.0, 1.0));\n    if (scanStrength > 0.0 && fract((coord.y - screen.y) / screen.w * scanCount) > 0.5) rgb *= 1.0 - clamp(scanStrength, 0.0, 1.0);\n    half4 bg = half4(half3(clamp(rgb, 0.0, 1.0)), 1.0) * half(float(b.a) * clamp(bgAlpha, 0.0, 1.0));\n    float2 fp = c + (coord - c - fgOffset) / max(fgScale, 0.01);\n    half4 fg = image.eval(fp);\n    float soft = float(blurred.eval(fp).a);\n    float spread = blur > 0.0 ? 1.0 : 0.0;\n    fg *= half(mix(1.0, smoothstep(0.5, 1.0, soft), clamp(feather, 0.0, 1.0) * spread) * clamp(fgAlpha, 0.0, 1.0));\n    float e = clamp(soft * 2.0, 0.0, 1.0) * clamp(edgeStrength, 0.0, 1.0) * float(edgeColor.a) * spread;\n    half4 under = half4(edgeColor.rgb * half(e), half(e)) + bg * half(1.0 - e);\n    return fg + under * (1.0 - fg.a);\n}\n"
+}
