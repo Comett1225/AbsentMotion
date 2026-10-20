@@ -77,6 +77,8 @@ struct Target {
 
 namespace {
 
+constexpr size_t kImportedPerMedia = 6;
+
 PFN_vkVoidFunction GetProc(const char* name, VkInstance instance, VkDevice device) {
     return device != VK_NULL_HANDLE ? vkGetDeviceProcAddr(device, name)
                                     : vkGetInstanceProcAddr(instance, name);
@@ -118,8 +120,13 @@ public:
 private:
     bool initVulkan(std::string* error);
     sk_sp<SkSurface> wrapSwapchainImage(VkImage, VkFormat, VkImageUsageFlags, int w, int h);
-    sk_sp<SkImage> importFrame(AHardwareBuffer*, bool opaque = true, int colorStandard = 0, int colorRange = 0, bool* rawYuv = nullptr);
-    sk_sp<SkImage> copyFrame(AHardwareBuffer*, bool opaque, int colorStandard, int colorRange, const FrameCrop& crop);
+    using MediaKey = std::pair<std::string, int64_t>;
+    sk_sp<SkImage> importFrame(AHardwareBuffer*, bool opaque = true, int colorStandard = 0, int colorRange = 0, bool* rawYuv = nullptr,
+                               const MediaKey* key = nullptr);
+    skgpu::graphite::BackendTexture importTexture(AHardwareBuffer*, int colorStandard, bool* rawYuv);
+    void forgetImported(const MediaKey& key);
+    sk_sp<SkImage> copyFrame(AHardwareBuffer*, bool opaque, int colorStandard, int colorRange, const FrameCrop& crop,
+                             const MediaKey* key = nullptr);
     sk_sp<SkImage> picture(const std::string& uri, int64_t layerId) const;
     MediaPictures pictures() const {
         return [this](const std::string& uri, int64_t id) { return this->picture(uri, id); };
@@ -134,6 +141,7 @@ private:
     bool fGpuFailed = false;
     bool fCameraView = true;
     std::vector<VkSemaphore> fFailedSemaphores;
+    std::vector<VkSemaphore> fSpareSemaphores;
 
     EffectRuntime fEffects;
     LayerEffects layerEffects() {
@@ -168,6 +176,18 @@ private:
     std::unique_ptr<skgpu::graphite::Recorder> fRecorder;
     struct DeadTexture { skgpu::graphite::BackendTexture texture; AHardwareBuffer* buffer; };
     std::vector<DeadTexture> fDeadTextures;
+    struct ImportedTexture {
+        uint64_t id;
+        int colorStandard;
+        bool rawYuv;
+        VkImageLayout layout;
+        uint32_t queueFamily;
+        DeadTexture held;
+        skgpu::graphite::BackendTexture view;
+        sk_sp<SkImage> image;
+        SkAlphaType alpha = kUnknown_SkAlphaType;
+    };
+    std::map<MediaKey, std::vector<ImportedTexture>> fImported;
     sk_sp<GrDirectContext> fGanesh;
 
     std::vector<std::unique_ptr<Target>> fTargets;
@@ -342,6 +362,7 @@ EngineImpl::~EngineImpl() {
     fBufferSurfaces.clear();
     fPictures.clear();
     fVideoFrames.clear();
+    while (!fImported.empty()) this->forgetImported(fImported.begin()->first);
     this->syncGpu();
     if (fGraphite) {
         auto cleanup = fGraphite->makeRecorder();
@@ -351,6 +372,7 @@ EngineImpl::~EngineImpl() {
         this->deleteDeadTextures(cleanup.get());
     }
     for (VkSemaphore sem : fFailedSemaphores) vkDestroySemaphore(fDevice, sem, nullptr);
+    for (VkSemaphore sem : fSpareSemaphores) vkDestroySemaphore(fDevice, sem, nullptr);
     if (fGanesh) {
         this->syncGpu();
         if (fGpuFailed) fGanesh->abandonContext();
@@ -512,22 +534,13 @@ void EngineImpl::detach(Target* target) {
     }
 }
 
-sk_sp<SkImage> EngineImpl::importFrame(AHardwareBuffer* buffer, bool opaque, int colorStandard, int colorRange, bool* rawYuv) {
+skgpu::graphite::BackendTexture EngineImpl::importTexture(AHardwareBuffer* buffer, int colorStandard, bool* rawYuv) {
     AHardwareBuffer_Desc desc;
     AHardwareBuffer_describe(buffer, &desc);
-    if (!fLoggedFrame) {
-        fLoggedFrame = true;
-        LOGI("first frame buffer: %ux%u format 0x%x usage 0x%" PRIx64, desc.width, desc.height,
-             desc.format, desc.usage);
-    }
-    const SkAlphaType alpha = opaque ? kOpaque_SkAlphaType : kPremul_SkAlphaType;
-    if (fBackend == Backend::kGanesh) {
-        return SkImages::DeferredFromAHardwareBuffer(buffer, alpha, SkColorSpace::MakeSRGB());
-    }
     auto tex = fRecorder->createBackendTexture(buffer, false,
                                                false,
                                                {(int)desc.width, (int)desc.height});
-    if (!tex.isValid()) return nullptr;
+    if (!tex.isValid()) return tex;
     skgpu::graphite::VulkanTextureInfo textureInfo;
     if ((colorStandard == 1 || colorStandard == 2 || colorStandard == 4 || colorStandard == 6) && skgpu::graphite::TextureInfos::GetVulkanTextureInfo(tex.info(), &textureInfo) && textureInfo.fYcbcrConversionInfo.isValid()) {
         const auto& conversion = textureInfo.fYcbcrConversionInfo;
@@ -552,6 +565,69 @@ sk_sp<SkImage> EngineImpl::importFrame(AHardwareBuffer* buffer, bool opaque, int
                 skgpu::graphite::BackendTextures::GetVkImage(original), skgpu::graphite::BackendTextures::GetMemoryAlloc(original));
         }
     }
+    return tex;
+}
+
+void EngineImpl::forgetImported(const MediaKey& key) {
+    auto found = fImported.find(key);
+    if (found == fImported.end()) return;
+    auto held = std::move(found->second);
+    fImported.erase(found);
+    for (auto& imported : held) {
+        imported.image.reset();
+        fDeadTextures.push_back(imported.held);
+    }
+}
+
+sk_sp<SkImage> EngineImpl::importFrame(AHardwareBuffer* buffer, bool opaque, int colorStandard, int colorRange, bool* rawYuv,
+                                       const MediaKey* key) {
+    if (!fLoggedFrame) {
+        fLoggedFrame = true;
+        AHardwareBuffer_Desc desc;
+        AHardwareBuffer_describe(buffer, &desc);
+        LOGI("first frame buffer: %ux%u format 0x%x usage 0x%" PRIx64, desc.width, desc.height,
+             desc.format, desc.usage);
+    }
+    const SkAlphaType alpha = opaque ? kOpaque_SkAlphaType : kPremul_SkAlphaType;
+    if (fBackend == Backend::kGanesh) {
+        return SkImages::DeferredFromAHardwareBuffer(buffer, alpha, SkColorSpace::MakeSRGB());
+    }
+    uint64_t id = 0;
+    if (key && AHardwareBuffer_getId(buffer, &id) == 0) {
+        auto& cache = fImported[*key];
+        auto hit = std::find_if(cache.begin(), cache.end(), [&](const ImportedTexture& t) {
+            return t.id == id && t.colorStandard == colorStandard;
+        });
+        if (hit == cache.end()) {
+            bool yuv = false;
+            auto tex = this->importTexture(buffer, colorStandard, &yuv);
+            if (!tex.isValid()) return nullptr;
+            AHardwareBuffer_acquire(buffer);
+            if (cache.size() >= kImportedPerMedia) {
+                cache.front().image.reset();
+                fDeadTextures.push_back(cache.front().held);
+                cache.erase(cache.begin());
+            }
+            cache.push_back({id, colorStandard, yuv, skgpu::graphite::BackendTextures::GetVkImageLayout(tex),
+                             skgpu::graphite::BackendTextures::GetVkQueueFamilyIndex(tex), {tex, buffer}});
+            hit = cache.end() - 1;
+        }
+        if (rawYuv) *rawYuv = hit->rawYuv;
+        if (hit->image && hit->alpha == alpha) {
+            skgpu::graphite::BackendTextures::SetMutableState(&hit->view, skgpu::MutableTextureStates::MakeVulkan(hit->layout, hit->queueFamily));
+            return hit->image;
+        }
+        const auto& held = hit->held.texture;
+        skgpu::graphite::VulkanTextureInfo info;
+        if (!skgpu::graphite::TextureInfos::GetVulkanTextureInfo(held.info(), &info)) return nullptr;
+        hit->view = skgpu::graphite::BackendTextures::MakeVulkan(held.dimensions(), info, hit->layout, hit->queueFamily,
+            skgpu::graphite::BackendTextures::GetVkImage(held), skgpu::graphite::BackendTextures::GetMemoryAlloc(held));
+        hit->image = SkImages::WrapTexture(fRecorder.get(), hit->view, alpha, SkColorSpace::MakeSRGB());
+        hit->alpha = alpha;
+        return hit->image;
+    }
+    auto tex = this->importTexture(buffer, colorStandard, rawYuv);
+    if (!tex.isValid()) return nullptr;
     struct Release {
         EngineImpl* engine;
         skgpu::graphite::BackendTexture tex;
@@ -574,9 +650,10 @@ sk_sp<SkImage> EngineImpl::picture(const std::string& uri, int64_t layerId) cons
     return found == fPictures.end() ? nullptr : found->second;
 }
 
-sk_sp<SkImage> EngineImpl::copyFrame(AHardwareBuffer* buffer, bool opaque, int colorStandard, int colorRange, const FrameCrop& crop) {
+sk_sp<SkImage> EngineImpl::copyFrame(AHardwareBuffer* buffer, bool opaque, int colorStandard, int colorRange, const FrameCrop& crop,
+                                     const MediaKey* key) {
     bool rawYuv = false;
-    auto imported = this->importFrame(buffer, opaque, colorStandard, colorRange, &rawYuv);
+    auto imported = this->importFrame(buffer, opaque, colorStandard, colorRange, &rawYuv, key);
     if (!imported) return nullptr;
     auto bounds = SkIRect::MakeWH(imported->width(), imported->height());
     if (crop.right > crop.left && crop.bottom > crop.top &&
@@ -616,10 +693,10 @@ sk_sp<SkImage> EngineImpl::copyFrame(AHardwareBuffer* buffer, bool opaque, int c
 bool EngineImpl::setPicture(const std::string& uri, int64_t layerId, AHardwareBuffer* buffer,
                             const void* pixels, int width, int height, size_t rowBytes, bool opaque, int colorStandard, int colorRange, const FrameCrop& crop) {
     const auto key = std::make_pair(uri, layerId);
-    if (!buffer && !pixels) { fPictures.erase(key); fVideoFrames.erase(key); return true; }
+    if (!buffer && !pixels) { fPictures.erase(key); fVideoFrames.erase(key); this->forgetImported(key); return true; }
     sk_sp<SkImage> image;
     if (buffer) {
-        image = this->copyFrame(buffer, opaque, colorStandard, colorRange, crop);
+        image = this->copyFrame(buffer, opaque, colorStandard, colorRange, crop, &key);
     }
     else if (width > 0 && height > 0 && width <= maxPictureSize() && height <= maxPictureSize()) {
         const auto info = SkImageInfo::Make(width, height, kRGBA_8888_SkColorType,
@@ -636,7 +713,8 @@ bool EngineImpl::setPicture(const std::string& uri, int64_t layerId, AHardwareBu
 
 bool EngineImpl::setVideoFrame(const std::string& uri, int64_t layerId, int64_t pts, AHardwareBuffer* buffer, int colorStandard, int colorRange, const FrameCrop& crop) {
     const auto start = std::chrono::steady_clock::now();
-    auto image = buffer ? this->copyFrame(buffer, true, colorStandard, colorRange, crop) : nullptr;
+    const auto key = std::make_pair(uri, layerId);
+    auto image = buffer ? this->copyFrame(buffer, true, colorStandard, colorRange, crop, &key) : nullptr;
     if (!image) return false;
     __android_log_print(ANDROID_LOG_INFO, "AMInterp", "import pts=%" PRId64 " size=%dx%d ms=%.2f", pts, image->width(),
                         image->height(), std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - start).count());
@@ -970,10 +1048,16 @@ int EngineImpl::frame(Target* target, int64_t presentTimeNs, bool sync,
     }
     if (fGraphite) this->deleteDeadTextures();
 
-    VkSemaphoreCreateInfo semInfo = {VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO};
     VkSemaphore acquired = VK_NULL_HANDLE;
-    VkResult r = vkCreateSemaphore(fDevice, &semInfo, nullptr, &acquired);
-    if (r != VK_SUCCESS) return r;
+    VkResult r = VK_SUCCESS;
+    if (fBackend == Backend::kGraphite && !fSpareSemaphores.empty()) {
+        acquired = fSpareSemaphores.back();
+        fSpareSemaphores.pop_back();
+    } else {
+        VkSemaphoreCreateInfo semInfo = {VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO};
+        r = vkCreateSemaphore(fDevice, &semInfo, nullptr, &acquired);
+        if (r != VK_SUCCESS) return r;
+    }
     uint32_t index = 0;
     r = vkAcquireNextImageKHR(fDevice, target->swapchain, UINT64_MAX, acquired, VK_NULL_HANDLE, &index);
     if (r != VK_SUCCESS && r != VK_SUBOPTIMAL_KHR) {
@@ -1010,7 +1094,7 @@ int EngineImpl::frame(Target* target, int64_t presentTimeNs, bool sync,
         info.fFinishedContext = new Finish{this, fDevice, acquired};
         info.fFinishedProc = [](skgpu::graphite::GpuFinishedContext context, skgpu::CallbackResult result) {
             auto* finish = static_cast<Finish*>(context);
-            if (result == skgpu::CallbackResult::kSuccess) vkDestroySemaphore(finish->device, finish->semaphore, nullptr);
+            if (result == skgpu::CallbackResult::kSuccess) finish->engine->fSpareSemaphores.push_back(finish->semaphore);
             else finish->engine->fFailedSemaphores.push_back(finish->semaphore);
             delete finish;
         };

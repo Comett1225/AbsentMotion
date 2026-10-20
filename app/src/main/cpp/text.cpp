@@ -34,6 +34,8 @@ struct TextLayout {
     sk_sp<FontCollection> fonts;
     std::vector<TextLine> lines;
     std::unique_ptr<Paragraph> paragraph;
+    bool inked = false;
+    SkRect ink = SkRect::MakeEmpty();
 };
 namespace {
 std::string attr(const XmlNode& n, const char* key, const char* fallback = "") {
@@ -165,28 +167,46 @@ SkPath TextPath(const Layer& layer, float) {
     layout(text);
     return SkPath::Rect(SkRect::MakeXYWH(-text.width / 2, -text.height / 2, text.width, text.height));
 }
-SkPath TextGlyphPath(const Layer& layer) {
-    auto& text = *layer.text;
-    layout(text);
-    SkPathBuilder b;
-    auto add = [&](Paragraph& paragraph, float x, float y) {
-        paragraph.visit([&](int, const Paragraph::VisitorInfo* info) {
-            if (!info) return;
-            for (int i = 0; i < info->count; i++) {
-                if (auto glyph = info->font.getPath(info->glyphs[i])) {
-                    b.addPath(*glyph, SkMatrix::Translate(x + info->origin.fX + info->positions[i].fX, y + info->origin.fY + info->positions[i].fY));
-                }
-            }
-        });
-    };
-    if (text.paragraph) add(*text.paragraph, -text.width / 2, -text.height / 2 + text.padTop);
+namespace {
+template <typename F> void EachParagraph(TextLayout& text, F&& at) {
+    if (text.paragraph) at(*text.paragraph, -text.width / 2, -text.height / 2 + text.padTop);
     for (auto& line : text.lines) {
         float x = -text.width / 2;
         const float runWidth = line.paragraph->getMaxIntrinsicWidth();
         if (text.align == "center") x += (text.width - runWidth) / 2;
         else if (text.align == "right") x += text.width - runWidth;
-        add(*line.paragraph, x, line.baseline - text.height / 2 - line.paragraph->getAlphabeticBaseline());
+        at(*line.paragraph, x, line.baseline - text.height / 2 - line.paragraph->getAlphabeticBaseline());
     }
+}
+template <typename F> void EachGlyph(TextLayout& text, F&& at) {
+    EachParagraph(text, [&](Paragraph& paragraph, float x, float y) {
+        paragraph.visit([&](int, const Paragraph::VisitorInfo* info) {
+            if (!info) return;
+            for (int i = 0; i < info->count; i++) {
+                at(info->font, info->glyphs[i], x + info->origin.fX + info->positions[i].fX, y + info->origin.fY + info->positions[i].fY);
+            }
+        });
+    });
+}
+const SkRect& InkBounds(TextLayout& text) {
+    if (text.inked) return text.ink;
+    text.inked = true;
+    text.ink = SkRect::MakeXYWH(-text.width / 2, -text.height / 2, text.width, text.height);
+    EachGlyph(text, [&](const SkFont& font, SkGlyphID glyph, float x, float y) {
+        SkRect bounds;
+        font.getBounds({&glyph, 1}, {&bounds, 1}, nullptr);
+        text.ink.join(bounds.makeOffset(x, y));
+    });
+    return text.ink;
+}
+}
+SkPath TextGlyphPath(const Layer& layer) {
+    auto& text = *layer.text;
+    layout(text);
+    SkPathBuilder b;
+    EachGlyph(text, [&](const SkFont& font, SkGlyphID glyph, float x, float y) {
+        if (auto path = font.getPath(glyph)) b.addPath(*path, SkMatrix::Translate(x, y));
+    });
     return b.detach();
 }
 void DrawText(SkCanvas* canvas, const Layer& layer, float, const SkPaint& paint) {
@@ -194,15 +214,15 @@ void DrawText(SkCanvas* canvas, const Layer& layer, float, const SkPaint& paint)
     layout(text);
     SkPaint tint;
     tint.setColorFilter(SkColorFilters::Blend(paint.getColor4f(), nullptr, SkBlendMode::kSrcIn));
-    canvas->saveLayer(nullptr, &tint);
-    if (text.paragraph) text.paragraph->paint(canvas, -text.width / 2, -text.height / 2 + text.padTop);
-    for (auto& line : text.lines) {
-        float x = -text.width / 2;
-        const float runWidth = line.paragraph->getMaxIntrinsicWidth();
-        if (text.align == "center") x += (text.width - runWidth) / 2;
-        else if (text.align == "right") x += text.width - runWidth;
-        line.paragraph->paint(canvas, x, line.baseline - text.height / 2 - line.paragraph->getAlphabeticBaseline());
+    const float scale = canvas->getTotalMatrix().getMinScale();
+    if (scale > 0) {
+        const float room = 2 / scale;
+        const SkRect area = InkBounds(text).makeOutset(room, room);
+        canvas->saveLayer(&area, &tint);
+    } else {
+        canvas->saveLayer(nullptr, &tint);
     }
+    EachParagraph(text, [&](Paragraph& paragraph, float x, float y) { paragraph.paint(canvas, x, y); });
     canvas->restore();
 }
 }

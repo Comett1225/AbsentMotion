@@ -233,7 +233,7 @@ class EngineThread(private val background: Int, context: Context? = null) {
                                          exact: Boolean, standard: Int, range: Int, crop: Rect, accept: () -> Boolean): Boolean = withContext(dispatcher) {
         if (closed || (!exact && capturing) || !accept()) return@withContext false
         engine().setPicture(uri, buffer, layerId, standard = standard, range = range, crop = crop).also {
-            if (!exact) renderNow()
+            if (!exact) requestRender()
         }
     }
 
