@@ -115,10 +115,20 @@ private fun TextContent(state: EditorState, layer: Layer, modifier: Modifier) {
     val focus = remember { FocusRequester() }
     val keyboard = LocalSoftwareKeyboardController.current
     var value by remember(layer.id) { mutableStateOf(TextFieldValue(layer.content, TextRange(layer.content.length))) }
-    LaunchedEffect(layer.content) { if (value.text != layer.content) value = value.copy(text = layer.content, selection = TextRange(layer.content.length)) }
+    var sent by remember(layer.id) { mutableStateOf(layer.content) }
+    if (layer.content != sent) {
+        sent = layer.content
+        value = TextFieldValue(layer.content, TextRange(layer.content.length))
+    }
     LaunchedEffect(layer.id) { focus.requestFocus(); keyboard?.show() }
     Box(modifier.background(Am.TimelineBg).padding(4.dp).border(1.dp, Am.Accent.copy(alpha = .5f), RoundedCornerShape(2.dp)), contentAlignment = Alignment.CenterStart) {
-        BasicTextField(value, { next -> value = next; state.editSelected("text-content") { it.withContent(next.text) } },
+        BasicTextField(value, { next ->
+            value = next
+            if (next.text != sent) {
+                sent = next.text
+                state.editSelected("text-content") { it.withContent(next.text) }
+            }
+        },
             Modifier.fillMaxWidth().padding(horizontal = 6.dp, vertical = 2.dp).focusRequester(focus),
             textStyle = TextStyle(color = Am.OnDark, fontSize = 18.sp), cursorBrush = SolidColor(Am.Accent),
             decorationBox = { inner -> if (value.text.isEmpty()) Text(stringResource(R.string.enter_your_text_here), color = Am.OnDark.copy(alpha = .19f), fontSize = 18.sp); inner() })
