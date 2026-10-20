@@ -88,6 +88,7 @@ class AudioEngine(context: Context) {
         @Volatile var stopRequested = false
         val rate = AudioTrack.getNativeOutputSampleRate(AudioManager.STREAM_MUSIC).takeIf { it > 0 } ?: 48_000
         val clock = AudioClock(startMs, rate)
+        private val rack = FxRack(rate)
 
         fun halt() {
             clock.stop(System.nanoTime())
@@ -146,6 +147,7 @@ class AudioEngine(context: Context) {
                 while (!stopRequested) Thread.sleep(20)
             } finally {
                 runCatching { track?.release() }
+                rack.close()
                 level = 0f
                 if (releasing) closeStreams()
             }
@@ -178,22 +180,8 @@ class AudioEngine(context: Context) {
         }
 
         private fun mixBlock(out: FloatArray, t0: Double) {
-            java.util.Arrays.fill(out, 0f)
-            val dt = 1000.0 / rate
-            val q = quality
-            for (clip in clips) {
-                stream(clip)?.let { clip.resolveDuration(it.durationUs) }
-                var next = 0
-                while (true) {
-                    val span = clip.span(t0, BLOCK, dt, next) ?: break
-                    next = span.to
-                    val stream = stream(clip) ?: break
-                    if (!span.inMedia) { stream.restart(); continue }
-                    stream.mix(out, span.from, span.to, span.pos, span.step, span.g0, span.g1, q, span.clipMs0, dt, span.lengthMs)
-                }
-            }
-            val peak = Voice.finish(out, out.size)
-            level = peak
+            mixStreams(clips, out, BLOCK, t0, rate, quality, rack, ::stream)
+            level = Voice.finish(out, out.size)
         }
     }
 
@@ -222,6 +210,29 @@ class AudioEngine(context: Context) {
         const val BEHIND_MS = 300.0
         const val IDLE_MS = 8000L
     }
+}
+
+internal fun mixStreams(
+    clips: List<AudioClip>, out: FloatArray, frames: Int, t0: Double, rate: Int, quality: Int, rack: FxRack,
+    stream: (AudioClip) -> LayerStream?,
+) {
+    java.util.Arrays.fill(out, 0, 2 * frames, 0f)
+    val dt = 1000.0 / rate
+    for (clip in clips) {
+        stream(clip)?.let { clip.resolveDuration(it.durationUs) }
+        val dst = rack.target(clip, out, frames)
+        var rendered = false
+        var next = 0
+        while (true) {
+            val span = clip.span(t0, frames, dt, next) ?: break
+            next = span.to
+            val source = stream(clip) ?: break
+            if (!span.inMedia) { source.restart(); continue }
+            if (source.mix(dst, span.from, span.to, span.pos, span.step, span.g0, span.g1, quality, span.clipMs0, dt, span.lengthMs)) rendered = true
+        }
+        rack.finish(clip, out, frames, rendered)
+    }
+    rack.sweep()
 }
 
 internal class AudioClock(private val startMs: Double, private val rate: Int) {

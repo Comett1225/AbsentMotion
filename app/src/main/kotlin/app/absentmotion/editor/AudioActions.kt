@@ -1,5 +1,6 @@
 package app.absentmotion.editor
 
+import app.absentmotion.audio.AUDIO_FX_TAG
 import app.absentmotion.audio.GainRef
 import app.absentmotion.audio.MAX_GAIN
 import app.absentmotion.audio.mutes
@@ -28,7 +29,7 @@ fun Layer.extractedAudio(id: Long): Layer? {
     attrs["src"] = fill.uri
     for (key in listOf("inTime", "outTime", "loop", "speed")) node[key]?.let { attrs[key] = it }
     attrs["mediaFillMode"] = "fill"
-    return Layer(XmlNode("audio", attrs, node.children.filter { it.name == "speedMap" || it.name == "gain" && !it.mutes }))
+    return Layer(XmlNode("audio", attrs, node.children.filter { it.name == "speedMap" || it.name == "gain" && !it.mutes || it.name == AUDIO_FX_TAG }))
 }
 
 fun EditorState.extractAudio() {

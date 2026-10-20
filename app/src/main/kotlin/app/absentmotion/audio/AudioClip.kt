@@ -33,6 +33,7 @@ internal class AudioClip(layer: Layer, val uri: String, private val track: Layer
 
     fun resolveDuration(durationUs: Long) { if (durationUs > 0) sourceEndMs = durationUs / 1000.0 }
     val loop = layer.node["loop"] == "true"
+    val fx = layer.audioEffects.spec()
     private val timing = VideoTiming(layer)
     private val gainLayer = layer
     private val length = (layer.endTime - layer.startTime).coerceAtLeast(1).toFloat()

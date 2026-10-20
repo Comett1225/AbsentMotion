@@ -11,9 +11,11 @@ import kotlin.math.roundToInt
 
 internal class OfflineMix(
     private val open: (String) -> PcmSource, private val clips: List<AudioClip>, private val quality: Int,
+    makeFx: FxMaker = NativeFx::chain,
 ) : AudioMix, Closeable {
     private val sources = HashMap<Long, OfflineSource>()
     private val voices = HashMap<Long, Voice>()
+    private val rack = FxRack(RATE, makeFx)
     private val block = FloatArray(BLOCK * 2)
     private var index = -1L
 
@@ -35,23 +37,26 @@ internal class OfflineMix(
 
     private fun blockAt(i: Long): FloatArray {
         if (i == index) return block
-        if (i != index + 1) voices.values.forEach { it.ready = false }
-        render(i)
+        if (i != index + 1) { voices.values.forEach { it.ready = false }; rack.reset() }
+        mix(i * BLOCK, BLOCK)
+        Voice.finish(block, block.size)
         index = i
         return block
     }
 
-    private fun render(i: Long) {
-        java.util.Arrays.fill(block, 0f)
+    private fun mix(first: Long, frames: Int) {
+        java.util.Arrays.fill(block, 0, 2 * frames, 0f)
         val dt = 1000.0 / RATE
-        val t0 = i * BLOCK * dt
+        val t0 = first * dt
         for (clip in clips) {
-            if (clip.loop && clip.outMs.isInfinite() && t0 + BLOCK * dt > clip.startMs && t0 <= clip.endMs) {
+            if (clip.loop && clip.outMs.isInfinite() && t0 + frames * dt > clip.startMs && t0 <= clip.endMs) {
                 clip.resolveDuration(sources.getOrPut(clip.id) { OfflineSource(clip.uri, open) }.durationUs)
             }
+            val dst = rack.target(clip, block, frames)
+            var rendered = false
             var next = 0
             while (true) {
-                val span = clip.span(t0, BLOCK, dt, next) ?: break
+                val span = clip.span(t0, frames, dt, next) ?: break
                 next = span.to
                 if (!span.inMedia) { voices[clip.id]?.ready = false; continue }
                 val source = sources.getOrPut(clip.id) { OfflineSource(clip.uri, open) }
@@ -64,16 +69,19 @@ internal class OfflineMix(
                 voice.begin(pos0, step, count)
                 if (voice.jump) { source.window(voice.ghostBase, voice.ghostSize, voice.ghostWindow()); voice.ghostOk = true }
                 source.window(voice.base, voice.size, voice.win)
-                voice.render(block, span.from, count, pos0, step, span.g0, span.g1, quality, span.clipMs0, dt, span.lengthMs)
+                voice.render(dst, span.from, count, pos0, step, span.g0, span.g1, quality, span.clipMs0, dt, span.lengthMs)
+                rendered = true
             }
+            rack.finish(clip, block, frames, rendered)
         }
-        Voice.finish(block, block.size)
+        rack.sweep()
         for (clip in clips) if (t0 > clip.endMs + 300) sources.remove(clip.id)?.close()
     }
 
     override fun close() {
         sources.values.forEach { it.close() }
         sources.clear()
+        rack.close()
     }
 
     companion object {
