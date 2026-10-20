@@ -275,8 +275,8 @@ class MotionsTest {
             val s = start.withAnimation(1, MotionSlot.Loop, id, 500)
             val effect = s.layer(1)!!.made(MotionSlot.Loop).single()
             assertEquals(expected[id], effect["id"])
-            val timing = effect.children.first { it["name"] == if (id == "rotate") "speed" else "frequency" }["value"]
-            assertEquals(if (id == "rotate") f(720f) else f(2f), timing)
+            val timing = effect.children.first { it["name"] == if (id == "rotate") "rpm" else "frequency" }["value"]
+            assertEquals(if (id == "rotate") f(120f) else f(2f), timing)
             val other = s.withAnimation(1, MotionSlot.Loop, if (id == "pulse") "wobble" else "pulse", 1000)
             assertEquals(1, other.layer(1)!!.made(MotionSlot.Loop).size)
             assertEquals(start.node, s.withAnimation(1, MotionSlot.Loop, null, 0).node)
