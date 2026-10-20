@@ -113,6 +113,15 @@ struct Retiming {
     float speed = 1.0f;
 };
 
+struct Layer;
+
+struct Sight {
+    const std::vector<Layer>* layers = nullptr;
+    const Layer* layer = nullptr;
+    const Layer* camera = nullptr;
+    int width = 0, height = 0;
+};
+
 struct Layer {
     int64_t id = 0;
     std::string kind;
@@ -144,7 +153,7 @@ struct Layer {
     Anim steps;
     bool placed = false;
     bool projected = false;
-    SkM44 space, turn;
+    Sight sight;
 
     float value(const char* name, int i, float t, float fallback) const;
 
@@ -165,7 +174,7 @@ struct Layer {
 struct Placement {
     SkPoint location, pivot, scale;
     float rotation, z;
-    SkM44 tilt;
+    SkM44 tilt, space, turn;
 };
 
 struct Echo {
@@ -230,6 +239,7 @@ double NestedTime(const Layer& group, double timeMs);
 double RetimedTime(const Retiming& r, int startTime, int endTime, double at);
 void SetCameraView(bool on);
 bool SeeLayers(const std::vector<Layer>& layers, int width, int height, bool top, int fps, double timeMs, std::vector<Layer>* seen);
+bool SeenPlacement(const Layer& layer, double timeMs, Placement* placement);
 SkMatrix WorldMatrix(const Scene& scene, const Layer& layer, double timeMs);
 int64_t TopLayerAt(const Scene& scene, double timeMs, float x, float y);
 bool HitLayer(const Scene& scene, const Layer& layer, double timeMs, float x, float y);

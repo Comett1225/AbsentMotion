@@ -179,6 +179,7 @@ half4 main(float2 xy) {
 }
 
 Placement Own(const Layer& l, double timeMs) {
+    if (Placement seen; SeenPlacement(l, timeMs, &seen)) return seen;
     const float t = l.localTime(timeMs);
     Placement p{{l.location.get(0, t, 0), l.location.get(1, t, 0)},
                 {l.pivot.get(0, t, 0), l.pivot.get(1, t, 0)},
@@ -224,7 +225,7 @@ Placement Effective(const std::vector<Layer>& siblings, const Layer& l, double t
 }
 
 SkMatrix MatrixOf(const Placement& p, const Layer& l, float t) {
-    SkMatrix m = l.projected ? l.space.asM33() : SkMatrix::Translate(p.location.fX, p.location.fY);
+    SkMatrix m = l.projected ? p.space.asM33() : SkMatrix::Translate(p.location.fX, p.location.fY);
     if (!l.projected) m.preRotate(p.rotation);
     m.preSkew(tanf(l.skew.get(0, t, 0)), tanf(l.skew.get(1, t, 0)));
     m.preScale(p.scale.fX, p.scale.fY);
