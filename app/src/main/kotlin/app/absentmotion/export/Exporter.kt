@@ -34,8 +34,12 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
                 val xml = scene.toXml()
                 when (kind) {
                     ExportKind.Video -> s.fixedFormat().let { f ->
+                        val started = android.os.SystemClock.elapsedRealtime()
                         direct(saved, name, f.container.ext, f.container.mime, "Movies/$AppFolder") { fd ->
                             exportVideo(engine, scene, xml, f, fd, ExportAudio.mixFor?.invoke(scene, f.audio.effectiveRate), progress)
+                        }.also {
+                            val (w, h) = exportSize(scene, f.shortSide, even = true)
+                            ExportTimes(context).record(ExportRecord(f.codec, w, h, f.fps, frameCount(scene, f.fps), android.os.SystemClock.elapsedRealtime() - started, f.interpolation))
                         }
                     }
                     ExportKind.Audio -> {

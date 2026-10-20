@@ -519,12 +519,17 @@ class MainActivity : ComponentActivity() {
         val name = if (kind == ExportKind.Sequence) "export.seq" else "export"
         lifecycleScope.launch {
             try {
+                if (kind == ExportKind.Video) {
+                    val probe = app.absentmotion.export.DeviceCapabilities.of(applicationContext).load().probe
+                    Log.i("AMExport", "estimate ms=${app.absentmotion.export.ExportTimes(applicationContext).estimateMs(s.fixedFormat(), scene, probe)}")
+                }
+                val started = SystemClock.elapsedRealtime()
                 if (intent.getBooleanExtra("mediastore", false)) {
                     val result = Exporter(applicationContext, engine, app.absentmotion.export.MediaStoreExport(applicationContext)).export(kind, scene, s, frame, name) { }
                     Log.i("AMExport", "done " + result.uris.joinToString(" "))
                 } else {
                     Exporter(applicationContext, engine, FolderExport(dir)).export(kind, scene, s, frame, name) { }
-                    Log.i("AMExport", "done " + File(dir, if (kind == ExportKind.Sequence) name else "$name.${ext[kind]}").path)
+                    Log.i("AMExport", "done " + File(dir, if (kind == ExportKind.Sequence) name else "$name.${ext[kind]}").path + " ms=" + (SystemClock.elapsedRealtime() - started))
                 }
             } catch (e: Throwable) {
                 Log.e("AMExport", "failed", e)
