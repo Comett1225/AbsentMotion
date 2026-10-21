@@ -152,7 +152,7 @@ class ImporterSecurityTest {
         assertEquals(2_000, limits.entries)
         assertEquals(32, limits.scenes)
         assertEquals(2L * 1024 * 1024 * 1024, limits.unpacked)
-        assertEquals(64 * 1024 * 1024, limits.sceneText)
+        assertEquals(32 * 1024 * 1024, limits.sceneText)
         XmlNode.parse(scene())
     }
 

@@ -100,9 +100,9 @@ class ProjectStore(private val root: File) {
 
     fun text(id: String): String? = runCatching { sceneFile(id).readText() }.getOrNull()
 
-    fun newId(): String {
+    fun newId(taken: Collection<String> = emptyList()): String {
         var n = System.currentTimeMillis()
-        while (sceneFile("p$n").exists()) n++
+        while (sceneFile("p$n").exists() || "p$n" in taken) n++
         return "p$n"
     }
 
