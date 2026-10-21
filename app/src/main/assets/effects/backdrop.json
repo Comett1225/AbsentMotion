@@ -3,7 +3,7 @@
  "name": "Adjustment Layer",
  "category": "color",
  "native": true,
- "description": "Fills the layer with what is drawn beneath it, so the effects after this one change the layers below. Mix brings the layer's own fill back.",
+ "description": "Copies what is drawn beneath the layer so later effects can change it. Mask To Layer limits the copy to the opaque parts of the layer. Mix brings the layer fill back.",
  "params": [
   {
    "id": "mix",
@@ -13,6 +13,13 @@
    "min": 0,
    "max": 1,
    "step": 0.01
+  },
+  {
+   "id": "mask",
+   "label": "Mask To Layer",
+   "type": "switch",
+   "default": true,
+   "legacyDefault": false
   }
  ]
 }

@@ -3,7 +3,7 @@
  "name": "Feather",
  "category": "key",
  "since": "3.0.0",
- "description": "Softens the edges of the opaque parts of the layer by fading them out towards the outline.",
+ "description": "Softens the alpha edges of the layer. Inward fades into the existing outline; Blur Alpha also spreads the softened edge outside it.",
  "params": [
   {
    "id": "blur",
@@ -13,7 +13,18 @@
    "min": 0,
    "max": 300,
    "step": 0.1
+  },
+  {
+   "id": "mode",
+   "label": "Edges",
+   "type": "choice",
+   "default": 1,
+   "options": [
+    "Inward",
+    "Blur Alpha"
+   ],
+   "legacyDefault": 0
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform shader blurred;\nuniform float blur;\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0 || blur <= 0.0) return src;\n    float soft = clamp((float(blurred.eval(coord).a) - 0.5) * 2.0, 0.0, 1.0);\n    return src * half(soft);\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform shader blurred;\nuniform float blur;\nuniform float mode;\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (blur <= 0.0) return src;\n    if (mode > 0.5) {\n        half4 b = blurred.eval(coord);\n        if (b.a <= 0.0) return half4(0.0);\n        half3 rgb = src.a > 0.0 ? src.rgb / src.a : b.rgb / b.a;\n        return half4(rgb * b.a, b.a);\n    }\n    if (src.a <= 0.0) return src;\n    float soft = clamp((float(blurred.eval(coord).a) - 0.5) * 2.0, 0.0, 1.0);\n    return src * half(soft);\n}\n"
 }

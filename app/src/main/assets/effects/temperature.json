@@ -2,7 +2,7 @@
  "id": "temperature",
  "name": "Color Temperature",
  "category": "color",
- "description": "Warms or cools the picture like light of a colour temperature in kelvin (6500 K leaves it unchanged), keeping its brightness.",
+ "description": "Warms or cools the picture like light of a color temperature in kelvin; 6500 K leaves it unchanged.",
  "params": [
   {
    "id": "kelvin",

@@ -89,6 +89,90 @@ class AlightParityTest {
 
     private fun f(n: String, v: String) = Triple(n, "float", v)
 
+    @Test fun colorAndNoiseControlsExposeReferenceSettingsAndLegacyFallbacks() {
+        assertEquals(listOf("progress", "seed", "grain"), catalog.find("absent.dissolve")!!.params.map { it.id })
+        assertEquals("0.750000", params("dissolve").getValue("progress").default)
+        assertEquals("0.500000", params("dissolve").getValue("progress").missingDefault)
+        assertEquals("1.000000", params("dissolve").getValue("grain").default)
+        assertEquals("6.000000", params("dissolve").getValue("grain").missingDefault)
+        assertEquals("0.000000", params("dissolve").getValue("seed").default)
+        assertEquals(listOf("level", "softness", "invert", "blend"), catalog.find("absent.threshold")!!.params.map { it.id })
+        assertEquals(1f, params("threshold").getValue("softness").max)
+        assertEquals("0.000000", params("threshold").getValue("blend").default)
+        assertEquals(listOf("source", "target", "threshold", "feather", "alpha", "lockLuminance", "choke"), catalog.find("absent.replacecolor")!!.params.map { it.id })
+        assertEquals("false", params("replacecolor").getValue("lockLuminance").default)
+        assertEquals("true", params("replacecolor").getValue("lockLuminance").missingDefault)
+        assertEquals("0.250000", params("replacecolor").getValue("threshold").default)
+        assertEquals("0.350000", params("replacecolor").getValue("threshold").missingDefault)
+        assertEquals("1.000000", params("replacecolor").getValue("alpha").default)
+        assertEquals(4f, params("replacecolor").getValue("threshold").max)
+        assertEquals(listOf("colors") + (1..8).map { "color$it" } + listOf("dither", "alpha"), catalog.find("absent.palettemap")!!.params.map { it.id })
+        assertEquals(8f, params("palettemap").getValue("colors").max)
+        assertEquals("5.000000", params("palettemap").getValue("colors").default)
+        assertEquals("1.000000", params("palettemap").getValue("alpha").default)
+        assertEquals(listOf("Add", "Multiply"), params("blocknoise").getValue("blending").options)
+        assertEquals("1.000000", params("blocknoise").getValue("blending").default)
+        assertEquals("0.000000", params("blocknoise").getValue("blending").missingDefault)
+        assertEquals(listOf("blur", "mode"), catalog.find("absent.feather")!!.params.map { it.id })
+        assertEquals("1.000000", params("feather").getValue("mode").default)
+        assertEquals("0.000000", params("feather").getValue("mode").missingDefault)
+        assertEquals(listOf("mix", "mask"), catalog.find("absent.backdrop")!!.params.map { it.id })
+        assertEquals("true", params("backdrop").getValue("mask").default)
+        assertEquals("false", params("backdrop").getValue("mask").missingDefault)
+        assertEquals("#ff2d1ef6", params("solid").getValue("color").default)
+        assertEquals("#ff3d7bf5", params("solid").getValue("color").missingDefault)
+        assertEquals("1.000000", params("solid").getValue("amount").default)
+        assertEquals("0.500000", params("solid").getValue("amount").missingDefault)
+    }
+
+    @Test fun newInstancesStoreNewDefaultsWhileRuntimeUsesLegacyFallbacks() {
+        for (key in listOf("dissolve", "blocknoise", "feather", "backdrop", "replacecolor", "solid")) {
+            val definition = catalog.find("absent.$key")!!
+            val fresh = definition.instance().children.associate { it["name"]!! to it["value"]!! }
+            val runtime = XmlNode.parse(definition.runtimeXml()).children.associate { it["name"]!! to it["value"]!! }
+            for (p in definition.params) {
+                assertEquals(p.default, fresh.getValue(p.id))
+                assertEquals(p.missingDefault, runtime.getValue(p.id))
+            }
+        }
+    }
+
+    @Test fun newlySupportedImportControlsKeepKeysAndDoNotRepeatMigration() {
+        val xml = """<scene width="720" height="720" fps="30" totalTime="2000">
+            <shape id="1" startTime="0" endTime="2000" s=".rect">
+                <effect id="com.alightcreative.effects.dissolve">
+                    <property name="seed" type="float"><kf t="0" v="0"/><kf t="1" v="5" e="ease-out"/></property>
+                </effect>
+                <effect id="com.alightcreative.effects.threshold">
+                    <property name="feather" type="float" value="0.8"/><property name="blendMode" type="int" value="2"/>
+                </effect>
+                <effect id="com.alightcreative.effects.clouds3">
+                    <property name="parr" type="vec2"><kf t="0" v="0,0"/><kf t="1" v="12,34"/></property>
+                    <property name="scale" type="float" value="3.7"/><property name="color1" type="color" value="#ff102030"/>
+                </effect>
+                <effect id="com.alightcreative.effects.lift"/>
+                <effect id="com.alightcreative.effects.feather"/>
+            </shape></scene>"""
+        val result = migration.migrate(Scene.parse(xml))
+        val effects = result.scene.node.children.single().children
+        fun value(i: Int, name: String) = effects[i].children.single { it["name"] == name }["value"]!!
+        assertEquals(listOf("dissolve", "threshold", "clouds", "backdrop", "feather").map { "absent.$it" }, effects.map { it["id"] })
+        assertEquals(0.75f, value(0, "progress").toFloat(), 1e-4f)
+        assertEquals(1f, value(0, "grain").toFloat(), 1e-4f)
+        val seed = effects[0].children.single { it["name"] == "seed" }
+        assertEquals(listOf(0f, 5f), seed.children.map { it["v"]!!.toFloat() })
+        assertEquals("ease-out", seed.children.last()["e"])
+        assertEquals(0.8f, value(1, "softness").toFloat(), 1e-4f)
+        assertEquals(2f, value(1, "blend").toFloat(), 1e-4f)
+        assertEquals("12.000000,34.000000", effects[2].children.single { it["name"] == "parallax" }.children.last()["v"])
+        assertEquals(3.7f, value(2, "scale").toFloat(), 1e-4f)
+        assertEquals("#ff102030", value(2, "color1"))
+        assertEquals("true", value(3, "mask"))
+        assertEquals(1f, value(4, "mode").toFloat(), 1e-4f)
+        assertTrue(result.dropped.toString(), result.dropped.isEmpty())
+        assertEquals(result.scene.node, migration.migrate(result.scene).scene.node)
+    }
+
     @Test fun alightRepeatOpacityAndTextEffectsImportWithTheirSettings() {
         val range = arrayOf(f("angle", "15"), f("scale", "1.5"), f("alpha", "0.5"), Triple("fillColor", "color", "#ff2d1ef6"), f("blend", "0.25"),
             Triple("colorAltCopies", "bool", "false"), f("start", "0.1"), f("end", "0.9"), f("phase", "0.5"), f("easeIn", "0"), f("easeOut", "0"),

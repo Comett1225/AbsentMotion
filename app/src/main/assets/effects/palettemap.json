@@ -3,7 +3,7 @@
  "name": "Palette Map",
  "category": "color",
  "since": "3.0.0",
- "description": "Repaints every pixel with the nearest colour from a small palette, for a retro look.",
+ "description": "Maps each pixel to the nearest color in a palette of up to eight colors. Alpha blends the mapped colors with the original layer.",
  "params": [
   {
    "id": "colors",
@@ -11,7 +11,7 @@
    "type": "float",
    "default": 5,
    "min": 2,
-   "max": 5,
+   "max": 8,
    "step": 1
   },
   {
@@ -45,6 +45,24 @@
    "default": "#fff1e8"
   },
   {
+   "id": "color6",
+   "label": "Color 6",
+   "type": "color",
+   "default": "#ff55ff"
+  },
+  {
+   "id": "color7",
+   "label": "Color 7",
+   "type": "color",
+   "default": "#ffff55"
+  },
+  {
+   "id": "color8",
+   "label": "Color 8",
+   "type": "color",
+   "default": "#ffffff"
+  },
+  {
    "id": "dither",
    "label": "Dither",
    "type": "float",
@@ -53,7 +71,17 @@
    "max": 1,
    "step": 0.001,
    "percent": true
+  },
+  {
+   "id": "alpha",
+   "label": "Alpha",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float colors;\nlayout(color) uniform half4 color1;\nlayout(color) uniform half4 color2;\nlayout(color) uniform half4 color3;\nlayout(color) uniform half4 color4;\nlayout(color) uniform half4 color5;\nuniform float dither;\nfloat hash12(float2 p) {\n    float3 q = fract(float3(p.xyx) * 0.1031);\n    q += dot(q, q.yzx + 33.33);\n    return fract((q.x + q.y) * q.z);\n}\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return src;\n    float3 rgb = float3(src.rgb) / float(src.a) + (hash12(floor(coord)) - 0.5) * dither * 0.3;\n    float3 best = float3(color1.rgb);\n    float bestD = distance(rgb, best);\n    float d = distance(rgb, float3(color2.rgb));\n    if (d < bestD) { bestD = d; best = float3(color2.rgb); }\n    if (colors > 2.5) { d = distance(rgb, float3(color3.rgb)); if (d < bestD) { bestD = d; best = float3(color3.rgb); } }\n    if (colors > 3.5) { d = distance(rgb, float3(color4.rgb)); if (d < bestD) { bestD = d; best = float3(color4.rgb); } }\n    if (colors > 4.5) { d = distance(rgb, float3(color5.rgb)); if (d < bestD) { bestD = d; best = float3(color5.rgb); } }\n    return half4(half3(best) * src.a, src.a);\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float colors;\nlayout(color) uniform half4 color1;\nlayout(color) uniform half4 color2;\nlayout(color) uniform half4 color3;\nlayout(color) uniform half4 color4;\nlayout(color) uniform half4 color5;\nlayout(color) uniform half4 color6;\nlayout(color) uniform half4 color7;\nlayout(color) uniform half4 color8;\nuniform float dither;\nuniform float alpha;\nfloat hash12(float2 p) {\n    float3 q = fract(float3(p.xyx) * 0.1031);\n    q += dot(q, q.yzx + 33.33);\n    return fract((q.x + q.y) * q.z);\n}\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return src;\n    float3 rgb = float3(src.rgb) / float(src.a) + (hash12(floor(coord)) - 0.5) * dither * 0.3;\n    float3 best = float3(color1.rgb);\n    float bestD = distance(rgb, best);\n    float d = distance(rgb, float3(color2.rgb));\n    if (d < bestD) { bestD = d; best = float3(color2.rgb); }\n    if (colors > 2.5) { d = distance(rgb, float3(color3.rgb)); if (d < bestD) { bestD = d; best = float3(color3.rgb); } }\n    if (colors > 3.5) { d = distance(rgb, float3(color4.rgb)); if (d < bestD) { bestD = d; best = float3(color4.rgb); } }\n    if (colors > 4.5) { d = distance(rgb, float3(color5.rgb)); if (d < bestD) { bestD = d; best = float3(color5.rgb); } }\n    if (colors > 5.5) { d = distance(rgb, float3(color6.rgb)); if (d < bestD) { bestD = d; best = float3(color6.rgb); } }\n    if (colors > 6.5) { d = distance(rgb, float3(color7.rgb)); if (d < bestD) { bestD = d; best = float3(color7.rgb); } }\n    if (colors > 7.5) { d = distance(rgb, float3(color8.rgb)); if (d < bestD) { bestD = d; best = float3(color8.rgb); } }\n    float3 base = float3(src.rgb) / float(src.a);\n    return half4(half3(mix(base, best, clamp(alpha, 0.0, 1.0))) * src.a, src.a);\n}\n"
 }

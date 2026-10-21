@@ -45,7 +45,7 @@ internal fun EffectSettings(state: EditorState, layer: Layer, instance: XmlNode,
         }
     }
     definition.params.forEach { param ->
-        val raw = instance.effectProperty(param.id)?.valueAt(layer.t) ?: param.default
+        val raw = instance.effectProperty(param.id)?.valueAt(layer.t) ?: param.missingDefault
         fun set(text: String, gesture: Boolean = false) {
             select(param)
             state.editSelected(if (gesture) "effect-${state.effectIndex}-${param.id}" else null) { current ->
@@ -62,7 +62,7 @@ internal fun EffectSettings(state: EditorState, layer: Layer, instance: XmlNode,
             "text" -> EffectText(param, raw, enabled, state::endGesture) { set(it, true) }
             else -> {
                 val shown = definition.bounded(param, (layer.endTime - layer.startTime) / 1000f) { p ->
-                    (instance.effectProperty(p.id)?.valueAt(layer.t) ?: p.default).toFloatOrNull() ?: 0f
+                    (instance.effectProperty(p.id)?.valueAt(layer.t) ?: p.missingDefault).toFloatOrNull() ?: 0f
                 }
                 val within = if (shown === param) raw else formatFloats(floatArrayOf((raw.toFloatOrNull() ?: 0f).coerceIn(shown.min, shown.max)))
                 EffectNumbers(state, shown, within, enabled, active == param, { select(param) }, { text, gesture -> set(text, gesture) })

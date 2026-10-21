@@ -29,5 +29,5 @@
    "default": false
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float threshold;\nuniform float softness;\nuniform float invert;\nhalf luma(half3 c) { return dot(c, half3(0.2126, 0.7152, 0.0722)); }\nhalf4 main(float2 coord) {\n    half4 c = image.eval(coord);\n    half keep = smoothstep(half(threshold), half(threshold + softness) + 0.0001, luma(unpremul(c).rgb));\n    return c * (invert > 0.5 ? 1 - keep : keep);\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float threshold;\nuniform float softness;\nuniform float invert;\nhalf4 main(float2 coord) {\n    half4 c = image.eval(coord);\n    float lum = dot(float3(unpremul(c).rgb), float3(0.2126, 0.7152, 0.0722));\n    float keep = softness > 0.0 ? smoothstep(threshold, threshold + softness + 0.0001, lum) : step(threshold, lum);\n    return c * (invert > 0.5 ? 1 - keep : keep);\n}\n"
 }

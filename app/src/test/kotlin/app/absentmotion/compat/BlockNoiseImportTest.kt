@@ -33,6 +33,7 @@ class BlockNoiseImportTest {
         assertEquals("true", value("freeze"))
         assertEquals(1.5f, value("overshoot").toFloat(), 1e-4f)
         assertEquals(2f, value("seed").toFloat(), 1e-4f)
+        assertEquals(1f, value("blending").toFloat(), 1e-4f)
         assertEquals(emptySet<String>(), result.dropped)
     }
 }

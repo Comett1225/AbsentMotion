@@ -65,13 +65,13 @@ internal fun EffectsPanel(state: EditorState, modifier: Modifier) {
     var menu by remember { mutableStateOf(false) }
     var choosing by remember { mutableStateOf(false) }
     val usable = instance != null && definition?.available == true
-    val target = active?.takeIf { usable }?.let { KeyTarget(PropRef.effect(index, it.id), it.default, it.type) }
+    val target = active?.takeIf { usable }?.let { KeyTarget(PropRef.effect(index, it.id), it.missingDefault, it.type) }
     val point = active?.takeIf { it.kind == "point" && usable }
     val adjust = remember(layer.id, index, point?.id) {
         point?.let { param ->
             PointAdjust(param.label) { dx, dy ->
                 state.editSelected("effect-$index-${param.id}") { current ->
-                    val old = (current.effects.getOrNull(index)?.effectProperty(param.id)?.valueAt(current.t) ?: param.default).split(',').map { it.trim().toFloatOrNull() ?: 0f }
+                    val old = (current.effects.getOrNull(index)?.effectProperty(param.id)?.valueAt(current.t) ?: param.missingDefault).split(',').map { it.trim().toFloatOrNull() ?: 0f }
                     val x = (old.getOrElse(0) { 0f } + if (param.pixels) dx else dx / state.scene.width).coerceIn(param.min, param.max)
                     val y = (old.getOrElse(1) { 0f } + if (param.pixels) dy else dy / state.scene.height).coerceIn(param.min, param.max)
                     current.withEffect(index) { it.withEffectProperty(param.id, param.type, formatFloats(floatArrayOf(x, y)), current.t, current.snap) }

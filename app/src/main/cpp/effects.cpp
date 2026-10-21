@@ -336,10 +336,18 @@ bool EffectRuntime::draw(SkCanvas* canvas, const Scene& scene, const Layer& laye
     const LayerEffect& e = layer.effects[lift];
     const Definition* d = find(e.id);
     const float own = std::clamp(Value(e, d ? &d->defaults : nullptr, "mix", 0, layer.localTime(timeMs), 0), 0.0f, 1.0f);
-    paint.setBlendMode(SkBlendMode::kSrc);
+    const bool masked = Value(e, d ? &d->defaults : nullptr, "mask", 0, layer.localTime(timeMs), 0) > 0.5f;
+    paint.setBlendMode(masked ? SkBlendMode::kSrcOver : SkBlendMode::kSrc);
     canvas->saveLayer(SkCanvas::SaveLayerRec(&bounds, &paint, SkCanvas::kInitWithPrevious_SaveLayerFlag));
     if (own > 0) {
         canvas->saveLayerAlphaf(&bounds, own);
+        source(canvas);
+        canvas->restore();
+    }
+    if (masked) {
+        SkPaint mask;
+        mask.setBlendMode(SkBlendMode::kDstIn);
+        canvas->saveLayer(&bounds, &mask);
         source(canvas);
         canvas->restore();
     }

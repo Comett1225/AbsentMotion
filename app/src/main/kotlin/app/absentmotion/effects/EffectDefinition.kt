@@ -22,8 +22,10 @@ data class EffectParam(
     val unit: String = "",
     val layerTime: Boolean = false,
     val after: String? = null,
+    val legacyDefault: String? = null,
 ) {
     val type: String get() = when (kind) { "point" -> "vec2"; "color" -> "color"; "switch" -> "bool"; "text" -> "string"; else -> "float" }
+    val missingDefault: String get() = legacyDefault ?: default
 
     fun format(value: Any?): String = format(id, kind, value)
 
@@ -45,15 +47,16 @@ data class EffectParam(
             require(kind in Kinds) { "$id: unknown type $kind" }
             val d = json.opt("default")
             val default = format(id, kind, d)
+            val legacyDefault = if (json.has("legacyDefault")) format(id, kind, json.get("legacyDefault")) else null
             if (kind == "choice") {
                 val options = json.getJSONArray("options").let { a -> List(a.length()) { a.getString(it) } }
                 require(options.isNotEmpty() && (d as Number).toInt() in options.indices) { "$id: choice $d" }
-                return EffectParam(id, json.optString("label", id), kind, default, 0f, options.size - 1f, 1f, options = options)
+                return EffectParam(id, json.optString("label", id), kind, default, 0f, options.size - 1f, 1f, options = options, legacyDefault = legacyDefault)
             }
             return EffectParam(id, json.optString("label", id), kind, default,
                 json.optDouble("min", -Float.MAX_VALUE.toDouble()).toFloat(), json.optDouble("max", Float.MAX_VALUE.toDouble()).toFloat(),
                 json.optDouble("step", 0.01).toFloat(), percent = json.optBoolean("percent"), pixels = json.optBoolean("pixels"), unit = json.optString("unit"),
-                layerTime = json.optBoolean("layerTime"), after = json.optString("after").takeIf { it.isNotEmpty() })
+                layerTime = json.optBoolean("layerTime"), after = json.optString("after").takeIf { it.isNotEmpty() }, legacyDefault = legacyDefault)
         }
     }
 }
@@ -111,7 +114,7 @@ data class EffectDefinition(
     }
 
     fun runtimeXml(): String = XmlNode("effect", listOfNotNull("id" to id, sksl?.let { "sksl" to it }).toMap(),
-        params.map { XmlNode("param", mapOf("name" to it.id, "value" to it.default)) }).toXml()
+        params.map { XmlNode("param", mapOf("name" to it.id, "value" to it.missingDefault)) }).toXml()
 
     companion object {
         fun parse(json: JSONObject): EffectDefinition {
