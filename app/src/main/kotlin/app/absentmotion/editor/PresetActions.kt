@@ -1,5 +1,6 @@
 package app.absentmotion.editor
 
+import app.absentmotion.model.finiteFloat
 import app.absentmotion.audio.AUDIO_FX_TAG
 import app.absentmotion.library.PresetStore
 import app.absentmotion.library.SavedPreset
@@ -23,12 +24,12 @@ private val MOVING = listOf("scale", "location", "rotation", "tilt", "skew", "pi
 fun canSavePreset(layer: Layer): Boolean {
     val n = layer.node
     val transform = n.child("transform")
-    fun XmlNode?.plain(one: Float) = this == null || (!isKeyframed && this["value"]?.toFloatOrNull().let { it == null || it == one })
+    fun XmlNode?.plain(one: Float) = this == null || (!isKeyframed && this["value"]?.finiteFloat().let { it == null || it == one })
     return n.children.any { it.name in setOf("path-stroke", "border", "shadow", "effect") } || n.child(AUDIO_FX_TAG)?.children?.isNotEmpty() == true ||
         (n["blending"] ?: "normal") != "normal" || !transform?.child("opacity").plain(1f) ||
         MOVING.any { transform?.child(it)?.isKeyframed == true } ||
-        !n.child("gain").plain(1f) || !n.child("speedMap").plain(1f) || (n["speed"]?.toFloatOrNull() ?: 1f) != 1f ||
-        (n["font"] ?: "") != "" || (n["size"]?.toFloatOrNull() ?: 18f) != 18f || (n["align"] ?: "left") != "left"
+        !n.child("gain").plain(1f) || !n.child("speedMap").plain(1f) || (n["speed"]?.finiteFloat() ?: 1f) != 1f ||
+        (n["font"] ?: "") != "" || (n["size"]?.finiteFloat() ?: 18f) != 18f || (n["align"] ?: "left") != "left"
 }
 
 fun presetTitle(layer: Layer, taken: Collection<String>, numbered: (Int) -> String = { AppText.get(R.string.preset_numbered, "$it") }): String =
@@ -88,7 +89,7 @@ private fun Layer.withPresetSpeed(preset: Layer): Layer {
     val map = speedOf(preset)
     if (kind == "embedScene" && map.isKeyframed) return this
     val own = speedOf(this)
-    if (!map.isKeyframed && !own.isKeyframed && own["value"]?.toFloatOrNull() == map["value"]?.toFloatOrNull()) return this
+    if (!map.isKeyframed && !own.isKeyframed && own["value"]?.finiteFloat() == map["value"]?.finiteFloat()) return this
     fun span(l: Layer) = VideoTiming(l).let { it.mediaMs((l.endTime - l.startTime).toDouble()) - it.mediaMs(0.0) }
     val stretch = (span(this) / span(preset).coerceAtLeast(1e-6)).toFloat()
     return withVideoSpeedMap(if (map.isKeyframed) map.withKeyframes(map.keyframes.map { it.copy(t = it.t * stretch) }) else map)

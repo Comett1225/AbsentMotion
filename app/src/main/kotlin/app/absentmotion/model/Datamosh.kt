@@ -11,7 +11,7 @@ class MoshPlan(val frames: List<Int>, val params: FloatArray)
 fun Layer.moshPlan(timeMs: Double, scene: Scene): MoshPlan? {
     if (mediaFill?.video != true || endTime <= startTime) return null
     val effect = effects.firstOrNull { it["id"] == "absent.datamosh" && it["hidden"] != "true" } ?: return null
-    fun value(name: String, fallback: Float, t: Float) = effect.effectProperty(name)?.valueAt(t)?.toFloatOrNull() ?: fallback
+    fun value(name: String, fallback: Float, t: Float) = effect.effectProperty(name)?.valueAt(t)?.finiteFloat() ?: fallback
     val length = (endTime - startTime) / 1000f
     val from = value("start", 0f, 0f).coerceIn(0f, length)
     val start = startTime + from * 1000.0

@@ -1,5 +1,6 @@
 package app.absentmotion.editor
 
+import app.absentmotion.model.finiteFloat
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -357,7 +358,7 @@ internal fun Scene.fittedToCanvas(id: Long, bounds: FloatArray, mode: String, ti
         fun map(name: String, defaults: FloatArray, change: (FloatArray) -> Unit): XmlNode {
             val n = current.node.child("transform")?.child(name) ?: XmlNode(name)
             fun value(text: String?): String {
-                val parts = text?.split(',')?.map { it.toFloatOrNull() } ?: emptyList()
+                val parts = text?.split(',')?.map { it.finiteFloat() } ?: emptyList()
                 val v = FloatArray(maxOf(parts.size, defaults.size)) { parts.getOrNull(it) ?: defaults.getOrElse(it) { 0f } }
                 change(v)
                 return formatFloats(v)

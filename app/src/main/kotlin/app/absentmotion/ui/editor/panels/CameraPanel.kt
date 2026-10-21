@@ -1,5 +1,6 @@
 package app.absentmotion.ui.editor.panels
 
+import app.absentmotion.model.finiteFloat
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -80,7 +81,7 @@ private val FogSwatches = listOf(0xFFFFFFFF, 0xFFC8CCD8, 0xFF8D90A0, 0xFF000000,
 private val RowHeight = 40.dp
 private val BoxWidth = 76.dp
 
-private fun Layer.number(f: Field): Float = element(f.ref)?.valueAt(t)?.toFloatOrNull() ?: f.default
+private fun Layer.number(f: Field): Float = element(f.ref)?.valueAt(t)?.finiteFloat() ?: f.default
 
 private fun Layer.blockOn(name: String): Boolean = node.child(name)?.let { it["enabled"] != "false" } == true
 

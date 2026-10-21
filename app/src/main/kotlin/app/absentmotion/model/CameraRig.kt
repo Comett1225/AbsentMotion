@@ -22,7 +22,7 @@ fun cameraZoomOf(fov: Float, size: Int): Float = (size / (2 * tan(Math.toRadians
 
 fun cameraFovOf(zoom: Float, size: Int): Float = Math.toDegrees(2 * atan(size / (2.0 * zoom))).toFloat()
 
-val Layer.cameraFov: Float get() = element(CameraFov)?.valueAt(t)?.toFloatOrNull() ?: 60f
+val Layer.cameraFov: Float get() = element(CameraFov)?.valueAt(t)?.finiteFloat() ?: 60f
 
 fun Layer.withCameraFov(fov: Float): Layer = withValue(CameraFov, formatFloats(floatArrayOf(fov.coerceIn(CAMERA_FOV_MIN, CAMERA_FOV_MAX))))
 

@@ -62,9 +62,9 @@ internal fun EffectSettings(state: EditorState, layer: Layer, instance: XmlNode,
             "text" -> EffectText(param, raw, enabled, state::endGesture) { set(it, true) }
             else -> {
                 val shown = definition.bounded(param, (layer.endTime - layer.startTime) / 1000f) { p ->
-                    (instance.effectProperty(p.id)?.valueAt(layer.t) ?: p.missingDefault).toFloatOrNull() ?: 0f
+                    (instance.effectProperty(p.id)?.valueAt(layer.t) ?: p.missingDefault).finiteFloat() ?: 0f
                 }
-                val within = if (shown === param) raw else formatFloats(floatArrayOf((raw.toFloatOrNull() ?: 0f).coerceIn(shown.min, shown.max)))
+                val within = if (shown === param) raw else formatFloats(floatArrayOf((raw.finiteFloat() ?: 0f).coerceIn(shown.min, shown.max)))
                 EffectNumbers(state, shown, within, enabled, active == param, { select(param) }, { text, gesture -> set(text, gesture) })
             }
         }
@@ -83,7 +83,7 @@ internal fun PropertyLabel(label: String, active: Boolean, enabled: Boolean, mod
 internal fun EffectNumbers(state: EditorState, param: EffectParam, raw: String, enabled: Boolean, active: Boolean,
                           select: () -> Unit, set: (String, Boolean) -> Unit) {
     val count = if (param.kind == "point") 2 else 1
-    val parsed = raw.split(',').map { it.trim().toFloatOrNull() ?: 0f }
+    val parsed = raw.split(',').map { it.trim().finiteFloat() ?: 0f }
     fun stored(v: List<Float>) = v.joinToString(",")
     val values = List(count) { parsed.getOrElse(it) { 0f } }
     var component by remember(param.id) { mutableIntStateOf(0) }
@@ -144,7 +144,7 @@ internal fun ValueBox(text: String, chosen: Boolean, lit: Boolean, modifier: Mod
 
 @Composable
 private fun EffectChoice(param: EffectParam, raw: String, enabled: Boolean, set: (String) -> Unit) {
-    val chosen = (raw.toFloatOrNull() ?: 0f).roundToInt().coerceIn(param.options.indices)
+    val chosen = (raw.finiteFloat() ?: 0f).roundToInt().coerceIn(param.options.indices)
     var open by remember(param.id) { mutableStateOf(false) }
     Row(Modifier.fillMaxWidth().height(38.dp).padding(horizontal = 8.dp).alpha(if (enabled) 1f else 0.35f), verticalAlignment = Alignment.CenterVertically) {
         Text(param.label, Modifier.weight(1f), color = Am.OnDark, fontSize = 14.sp)

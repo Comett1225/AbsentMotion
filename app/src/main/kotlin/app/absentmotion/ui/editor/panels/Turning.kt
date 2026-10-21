@@ -1,5 +1,6 @@
 package app.absentmotion.ui.editor.panels
 
+import app.absentmotion.model.finiteFloat
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.calculatePan
@@ -54,7 +55,7 @@ internal data class Turn(val effect: Int = -1, private val axes: List<EffectPara
     fun values(layer: Layer): FloatArray {
         if (effect < 0) return floatArrayOf(layer.tilt[0], layer.tilt[1], layer.rotation)
         val node = layer.effects.getOrNull(effect)
-        return FloatArray(3) { (node?.effectProperty(axes[it].id)?.valueAt(layer.t) ?: axes[it].default).toFloatOrNull() ?: 0f }
+        return FloatArray(3) { (node?.effectProperty(axes[it].id)?.valueAt(layer.t) ?: axes[it].default).finiteFloat() ?: 0f }
     }
 
     fun withValues(layer: Layer, next: FloatArray): Layer {
@@ -78,7 +79,7 @@ internal data class Turn(val effect: Int = -1, private val axes: List<EffectPara
         return withValues(layer, FloatArray(3) { now[it] + step[it] })
     }
 
-    fun reset(layer: Layer): Layer = withValues(layer, FloatArray(3) { if (effect < 0) 0f else axes[it].default.toFloatOrNull() ?: 0f })
+    fun reset(layer: Layer): Layer = withValues(layer, FloatArray(3) { if (effect < 0) 0f else axes[it].default.finiteFloat() ?: 0f })
 
     fun target(axis: Int): KeyTarget =
         if (effect >= 0) KeyTarget(PropRef.effect(effect, axes[axis].id), axes[axis].default, axes[axis].type)

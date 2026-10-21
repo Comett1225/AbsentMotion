@@ -362,7 +362,7 @@ private class SvgReader(private val root: XmlNode) {
 
     private fun length(text: String?, ref: Float, fallback: Float): Float {
         val t = text?.trim()?.lowercase(Locale.ROOT) ?: return fallback
-        val number = NumberPattern.find(t)?.takeIf { it.range.first == 0 }?.value?.toFloatOrNull() ?: return fallback
+        val number = NumberPattern.find(t)?.takeIf { it.range.first == 0 }?.value?.finiteFloat() ?: return fallback
         val factor = when (t.substring(NumberPattern.find(t)!!.value.length).trim()) {
             "", "px" -> 1f
             "pt" -> 4f / 3f
@@ -381,7 +381,7 @@ private class SvgReader(private val root: XmlNode) {
 
 private fun unit(text: String): Float? {
     val t = text.trim()
-    return if (t.endsWith("%")) t.dropLast(1).trim().toFloatOrNull()?.div(100f) else t.toFloatOrNull()
+    return if (t.endsWith("%")) t.dropLast(1).trim().finiteFloat()?.div(100f) else t.finiteFloat()
 }
 
 private fun withAlpha(argb: Int, alpha: Float): Int {
@@ -579,7 +579,7 @@ fun parseSvgColor(text: String): Int? {
         val inside = t.substringAfter('(').substringBefore(')')
         val parts = inside.split(Regex("[\\s,/]+")).filter { it.isNotEmpty() }
         if (parts.size < 3) return null
-        fun channel(p: String): Int? = (if (p.endsWith("%")) p.dropLast(1).toFloatOrNull()?.times(2.55f) else p.toFloatOrNull())?.toInt()?.coerceIn(0, 255)
+        fun channel(p: String): Int? = (if (p.endsWith("%")) p.dropLast(1).finiteFloat()?.times(2.55f) else p.finiteFloat())?.toInt()?.coerceIn(0, 255)
         val r = channel(parts[0]) ?: return null
         val g = channel(parts[1]) ?: return null
         val b = channel(parts[2]) ?: return null

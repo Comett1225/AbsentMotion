@@ -71,7 +71,7 @@ internal fun EffectsPanel(state: EditorState, modifier: Modifier) {
         point?.let { param ->
             PointAdjust(param.label) { dx, dy ->
                 state.editSelected("effect-$index-${param.id}") { current ->
-                    val old = (current.effects.getOrNull(index)?.effectProperty(param.id)?.valueAt(current.t) ?: param.missingDefault).split(',').map { it.trim().toFloatOrNull() ?: 0f }
+                    val old = (current.effects.getOrNull(index)?.effectProperty(param.id)?.valueAt(current.t) ?: param.missingDefault).split(',').map { it.trim().finiteFloat() ?: 0f }
                     val x = (old.getOrElse(0) { 0f } + if (param.pixels) dx else dx / state.scene.width).coerceIn(param.min, param.max)
                     val y = (old.getOrElse(1) { 0f } + if (param.pixels) dy else dy / state.scene.height).coerceIn(param.min, param.max)
                     current.withEffect(index) { it.withEffectProperty(param.id, param.type, formatFloats(floatArrayOf(x, y)), current.t, current.snap) }

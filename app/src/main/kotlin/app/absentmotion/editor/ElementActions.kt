@@ -1,5 +1,6 @@
 package app.absentmotion.editor
 
+import app.absentmotion.model.finiteFloat
 import app.absentmotion.R
 import app.absentmotion.i18n.AppText
 import app.absentmotion.library.ProjectStore
@@ -25,7 +26,7 @@ internal fun XmlNode.mapTransform(name: String, change: (FloatArray) -> Unit): X
     val defaults = if (name == "scale") floatArrayOf(1f, 1f) else floatArrayOf(0f, 0f, 0f)
     fun value(text: String?): String = formatFloats(defaults.copyOf().also { values ->
         val parts = text?.split(',').orEmpty()
-        for (i in values.indices) values[i] = parts.getOrNull(i)?.trim()?.toFloatOrNull() ?: values[i]
+        for (i in values.indices) values[i] = parts.getOrNull(i)?.trim()?.finiteFloat() ?: values[i]
         change(values)
     })
     val transform = child("transform") ?: XmlNode("transform")

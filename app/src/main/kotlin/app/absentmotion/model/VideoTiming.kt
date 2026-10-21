@@ -13,7 +13,7 @@ private const val MIN_SPEED = 0.00001
 
 class VideoTiming(layer: Layer) {
     private data class Point(val media: Double, val speed: Double, val item: Double)
-    private val origin = layer.mediaFill?.inTime?.toDouble() ?: layer.node["inTime"]?.toDoubleOrNull() ?: 0.0
+    private val origin = layer.mediaFill?.inTime?.toDouble() ?: layer.node["inTime"]?.finiteDouble() ?: 0.0
     private val points: List<Point>
 
     init {
@@ -81,7 +81,7 @@ fun Layer.mediaTimeMs(timeMs: Double): Double = VideoTiming(this).mediaMs(timeMs
 fun Layer.steppedMs(timeMs: Double): Double {
     val effect = effects.firstOrNull { it["id"] == "absent.timequant" && it["hidden"] != "true" } ?: return timeMs
     if (endTime <= startTime) return timeMs
-    val fps = effect.effectProperty("fps")?.valueAt(((timeMs - startTime) / (endTime - startTime)).toFloat())?.toFloatOrNull() ?: 8f
+    val fps = effect.effectProperty("fps")?.valueAt(((timeMs - startTime) / (endTime - startTime)).toFloat())?.finiteFloat() ?: 8f
     if (!(fps > 0f)) return timeMs
     return startTime + kotlin.math.floor((timeMs - startTime) * fps / 1000 + 1e-4) * 1000 / fps
 }
@@ -199,7 +199,7 @@ fun Layer.retimedVideo(start: Int, end: Int): Layer {
     val map = node.child("speedMap")
     var n = node.with("startTime", "$start").with("endTime", "$end")
     n = if (map?.isKeyframed == true) n.withChild("speedMap", map.withKeyframes(map.keyframes.map { key ->
-        key.v.toFloatOrNull()?.let { key.copy(v = (it * k).coerceAtLeast(MIN_SPEED.toFloat()).toString()) } ?: key
+        key.v.finiteFloat()?.let { key.copy(v = (it * k).coerceAtLeast(MIN_SPEED.toFloat()).toString()) } ?: key
     })).with("speed", null)
         else n.withChild("speedMap", null).with("speed", speed.toString())
     return copy(node = n)
@@ -213,7 +213,7 @@ fun Layer.withVideoSpeedMap(map: XmlNode): Layer {
     fun adjust(n: XmlNode): XmlNode {
         if (n.name == "speedMap" || n.name == "scene") return n
         if (n.name == "kf") {
-            val local = (n["t"]?.toDoubleOrNull() ?: 0.0) * (endTime - startTime)
+            val local = (n["t"]?.finiteDouble() ?: 0.0) * (endTime - startTime)
             return n.with("t", (timing.localMs(old.mediaMs(local)) / duration).toString())
         }
         return n.copy(children = n.children.map(::adjust))
@@ -298,7 +298,7 @@ fun Layer.withFreezeFrame(projectTime: Int, holdMs: Int, fps: Int): Layer? {
     val t1 = at.t + ramp
     val t2 = t1 + maxOf(HOLD_SPAN_NS, 2 * Math.ulp(t1))
     val t3 = t2 + maxOf(ramp, 2 * Math.ulp(t2))
-    val s = (at.v.toDoubleOrNull() ?: 1.0).coerceAtLeast(MIN_SPEED)
+    val s = (at.v.finiteDouble() ?: 1.0).coerceAtLeast(MIN_SPEED)
     val e1 = (t1 - at.t) / 1e6
     val d = (t2 - t1) / 1e6
     val e2 = (t3 - t2) / 1e6
@@ -343,7 +343,7 @@ private fun Layer.withScopedKeys(scope: KeyScope?, change: (XmlNode) -> XmlNode)
     else -> withEffect(scope.effectIndex, change)
 }
 
-private val XmlNode.time: Float get() = this["t"]?.toFloatOrNull() ?: 0f
+private val XmlNode.time: Float get() = this["t"]?.finiteFloat() ?: 0f
 
 private fun XmlNode.keysMoved(to: Float, moving: (Float) -> Boolean, colliding: (Float) -> Boolean): XmlNode {
     val keys = children.filter { it.name == "kf" }

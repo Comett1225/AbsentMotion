@@ -1,5 +1,6 @@
 package app.absentmotion.ui.home
 
+import app.absentmotion.model.finiteDouble
 import app.absentmotion.i18n.Ltr
 import app.absentmotion.platform.Uri
 import app.absentmotion.platform.Toast
@@ -163,7 +164,7 @@ private fun swap(layer: XmlNode, slot: Slot, choice: Choice, old: MediaDeclarati
 }
 
 private fun XmlNode.keysShifted(attr: String, by: Double): XmlNode = copy(children = children.map { k ->
-    k[attr]?.toDoubleOrNull()?.takeIf { k.name == "kf" }?.let { k.with(attr, String.format(Locale.US, "%.6f", it + by)) } ?: k
+    k[attr]?.finiteDouble()?.takeIf { k.name == "kf" }?.let { k.with(attr, String.format(Locale.US, "%.6f", it + by)) } ?: k
 })
 
 private fun turned(node: XmlNode, degrees: Int): XmlNode {

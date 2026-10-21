@@ -1,5 +1,7 @@
 package app.absentmotion.audio
 
+import app.absentmotion.model.finiteFloat
+import app.absentmotion.model.finiteDouble
 import app.absentmotion.model.Layer
 import app.absentmotion.model.PropRef
 import app.absentmotion.model.Scene
@@ -16,9 +18,9 @@ val GainRef = PropRef(PropRef.Kind.Child, "gain")
 
 const val MAX_GAIN = 1.5f
 
-val Layer.gain: Float get() = element(GainRef)?.valueAt(t)?.toFloatOrNull() ?: 1f
+val Layer.gain: Float get() = element(GainRef)?.valueAt(t)?.finiteFloat() ?: 1f
 
-val XmlNode.mutes: Boolean get() = !isKeyframed && (this["value"]?.toFloatOrNull() ?: 1f) <= 0f
+val XmlNode.mutes: Boolean get() = !isKeyframed && (this["value"]?.finiteFloat() ?: 1f) <= 0f
 
 val Layer.soundUri: String? get() = if (kind == "audio") node["src"] else mediaFill?.takeIf { it.video }?.uri
 
@@ -26,8 +28,8 @@ internal class AudioClip(layer: Layer, val uri: String, private val track: Layer
     val id = layer.id
     val startMs = track?.startMs ?: layer.startTime
     val endMs = track?.endMs ?: (layer.endTime + 1)
-    val inMs = layer.node["inTime"]?.toDoubleOrNull() ?: 0.0
-    private val declaredOutMs = layer.node["outTime"]?.toDoubleOrNull()
+    val inMs = layer.node["inTime"]?.finiteDouble() ?: 0.0
+    private val declaredOutMs = layer.node["outTime"]?.finiteDouble()
     @Volatile private var sourceEndMs = durationMs
     val outMs: Double get() = declaredOutMs ?: sourceEndMs
 
