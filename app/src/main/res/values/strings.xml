@@ -469,6 +469,7 @@
     <string name="export_verify_picture">The picture in the file does not decode.</string>
     <string name="export_verify_size">The picture is %1$s instead of %2$s.</string>
     <string name="export_verify_frames">The GIF has %1$s frames instead of %2$s.</string>
+    <string name="export_sound_unreadable">The sound of %1$s could not be read, so it is silent in this file.</string>
 
     <string name="export_error_cannot_encode">This phone cannot encode %1$s at %2$s</string>
     <string name="export_error_draw_frame">The engine could not draw frame %1$s</string>

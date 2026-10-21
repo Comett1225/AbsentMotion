@@ -167,6 +167,7 @@ import app.absentmotion.ui.theme.presence
 import app.absentmotion.ui.theme.presenceScrim
 import app.absentmotion.library.TemplateStore
 import app.absentmotion.audio.AudioClip
+import app.absentmotion.audio.OfflineMix
 import kotlinx.coroutines.CancellationException
 import android.provider.OpenableColumns
 import kotlinx.coroutines.Dispatchers
@@ -229,7 +230,11 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
     page?.let { if (it in SheetKinds) lastPage = it }
     if (phase !is Phase.Idle) lastPhase = phase
     var progress by remember { mutableFloatStateOf(0f) }
-    val hasAudio = remember(scene) { ExportAudio.mixFor != null && AudioClip.of(scene).isNotEmpty() }
+    val anyAudio = remember(scene) { ExportAudio.mixFor != null && AudioClip.of(scene).isNotEmpty() }
+    val hasAudio by produceState(anyAudio, scene) {
+        value = anyAudio
+        if (anyAudio) value = withContext(Dispatchers.IO) { OfflineMix.audible(context, scene).isNotEmpty() }
+    }
     val gifSettings = settings.getValue(ExportKind.Gif)
     val gifSample by produceState<GifSample?>(null, kind, scene, gifSettings, phase) {
         value = null

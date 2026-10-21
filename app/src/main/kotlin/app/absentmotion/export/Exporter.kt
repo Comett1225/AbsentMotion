@@ -52,7 +52,7 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
                         } finally {
                             (mix as? java.io.Closeable)?.close()
                         }
-                        written.verified(kind, scene, f, mix != null).also {
+                        written.verified(kind, scene, f, mix != null).unreadable(mix, scene).also {
                             val (w, h) = exportSize(scene, f.shortSide, even = true)
                             val ms = android.os.SystemClock.elapsedRealtime() - started - paused
                             ExportTimes(context).record(ExportRecord(f.codec, w, h, f.fps, frameCount(scene, f.fps), ms.coerceAtLeast(1), f.interpolation))
@@ -63,7 +63,7 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
                         try {
                             direct(saved, name, s.audioFormat.ext, s.audioFormat.mime, "Music/$AppFolder") { fd ->
                                 exportAudio(s, (scene.totalTime + 1) * 1000L, mix, fd, progress)
-                            }.verified(kind, scene, s, true)
+                            }.verified(kind, scene, s, true).unreadable(mix, scene)
                         } finally {
                             (mix as? java.io.Closeable)?.close()
                         }
@@ -117,6 +117,13 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
         val check = expectationFor(kind, scene, s, hasAudio)?.let { verifyExport(context, uris.first(), it) }
             ?: pictureExpectationFor(kind, scene, s)?.let { verifyPicture(context, uris.first(), it) }
         return if (check == null) this else ExportResult(uris, mime, where, check)
+    }
+
+    private fun ExportResult.unreadable(mix: AudioMix?, scene: Scene): ExportResult {
+        val names = (mix as? app.absentmotion.audio.OfflineMix)?.unreadable?.toList().orEmpty().map { scene.mediaName(it) }
+        if (names.isEmpty()) return this
+        val checked = verification ?: Verification(emptyList(), 0, null, null, 0)
+        return ExportResult(uris, mime, where, checked.copy(problems = checked.problems + txt(R.string.export_sound_unreadable, names.joinToString(", "))))
     }
 
     private suspend fun <T> cool(block: suspend (ThermalMonitor) -> T): T {
