@@ -54,5 +54,9 @@ class TextEffectsTest {
         assertEquals("01", property(catalog.find("absent.textrandomizer")!!.instance(), "characters")["value"])
         val percent = catalog.find("absent.textprogress")!!.params.first { it.id == "progress" }
         assertTrue(percent.percent && percent.min == 0f && percent.max == 1f)
+        assertEquals("start", percent.after)
+        val anchor = catalog.find("absent.texttransform")!!.params.first { it.id == "anchor" }
+        assertEquals(listOf("Component", "Layer"), anchor.options)
+        assertEquals("0.000000", anchor.default)
     }
 }

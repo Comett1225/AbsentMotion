@@ -17,7 +17,7 @@
    "id": "stretch",
    "label": "Stretch",
    "type": "float",
-   "default": 200,
+   "default": 10,
    "min": 0,
    "max": 5000,
    "step": 1

@@ -6,34 +6,21 @@
  "description": "Turns and pulls the layers behind this one around a centre point by the layer's colours, then hides the layer.",
  "params": [
   {
-   "id": "center",
-   "label": "Center",
-   "type": "point",
-   "default": [
-    0,
-    0
-   ],
-   "min": -5000,
-   "max": 5000,
-   "step": 1,
-   "pixels": true
-  },
-  {
    "id": "angle",
    "label": "Angle",
    "type": "angle",
-   "default": 45,
+   "default": 0,
    "min": -3600,
    "max": 3600,
    "step": 0.5
   },
   {
    "id": "reach",
-   "label": "Distance",
+   "label": "Inset/Outset",
    "type": "float",
    "default": 0,
-   "min": -2000,
-   "max": 2000,
+   "min": -1000,
+   "max": 1000,
    "step": 0.1,
    "pixels": true
   },
@@ -76,6 +63,19 @@
    ]
   },
   {
+   "id": "center",
+   "label": "Center",
+   "type": "point",
+   "default": [
+    0,
+    0
+   ],
+   "min": -5000,
+   "max": 5000,
+   "step": 1,
+   "pixels": true
+  },
+  {
    "id": "fromCenter",
    "label": "From Center",
    "type": "switch",
@@ -88,5 +88,5 @@
    "default": false
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform shader backdrop;\nuniform float4 screen;\nuniform float2 center;\nuniform float angle;\nuniform float reach;\nuniform float angleChannel;\nuniform float distanceChannel;\nuniform float edges;\nuniform float fromCenter;\nuniform float invert;\nfloat2 edged(float2 p, float mode) {\n    float2 q = (p - screen.xy) / screen.zw;\n    if (mode < 0.5) q = clamp(q, 0.5 / screen.zw, 1.0 - 0.5 / screen.zw);\n    else if (mode < 1.5) q = 1.0 - abs(1.0 - mod(q, 2.0));\n    else if (mode > 2.5) q = fract(q);\n    return screen.xy + q * screen.zw;\n}\nfloat pick(half4 c, float ch) {\n    float3 u = c.a > 0.0 ? float3(c.rgb) / float(c.a) : float3(0.0);\n    if (ch < 0.5) return u.r;\n    if (ch < 1.5) return u.g;\n    if (ch < 2.5) return u.b;\n    if (ch < 3.5) return dot(u, float3(0.2126, 0.7152, 0.0722));\n    return float(c.a);\n}\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return half4(0.0);\n    float ma = pick(src, angleChannel);\n    float mr = pick(src, distanceChannel);\n    if (invert > 0.5) {\n        ma = 1.0 - ma;\n        mr = 1.0 - mr;\n    }\n    if (fromCenter > 0.5) {\n        ma = ma * 2.0 - 1.0;\n        mr = mr * 2.0 - 1.0;\n    }\n    float2 c = size * 0.5 + center;\n    float2 d = coord - c;\n    float r = length(d) - reach * mr;\n    float a = atan(d.y, d.x) - radians(angle) * ma;\n    return backdrop.eval(edged(c + r * float2(cos(a), sin(a)), edges)) * src.a;\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform shader backdrop;\nuniform float4 screen;\nuniform float2 center;\nuniform float angle;\nuniform float reach;\nuniform float angleChannel;\nuniform float distanceChannel;\nuniform float edges;\nuniform float fromCenter;\nuniform float invert;\nfloat2 edged(float2 p, float mode) {\n    float2 q = (p - screen.xy) / screen.zw;\n    if (mode < 0.5) q = clamp(q, 0.5 / screen.zw, 1.0 - 0.5 / screen.zw);\n    else if (mode < 1.5) q = 1.0 - abs(1.0 - mod(q, 2.0));\n    else if (mode > 2.5) q = fract(q);\n    return screen.xy + q * screen.zw;\n}\nfloat pick(half4 c, float ch) {\n    float3 u = c.a > 0.0 ? float3(c.rgb) / float(c.a) : float3(0.0);\n    if (ch < 0.5) return u.r;\n    if (ch < 1.5) return u.g;\n    if (ch < 2.5) return u.b;\n    if (ch < 3.5) return dot(u, float3(0.2126, 0.7152, 0.0722));\n    return float(c.a);\n}\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return half4(0.0);\n    float ma = pick(src, angleChannel);\n    float mr = pick(src, distanceChannel);\n    if (invert > 0.5) {\n        ma = 1.0 - ma;\n        mr = 1.0 - mr;\n    }\n    if (fromCenter > 0.5) {\n        ma = ma * 2.0 - 1.0;\n        mr = mr * 2.0 - 1.0;\n    }\n    float2 c = size * 0.5 + center;\n    float2 d = coord - c;\n    float r = length(d) - reach * mr;\n    float a = (dot(d, d) > 0.0 ? atan(d.y, d.x) : 0.0) - radians(angle) * ma;\n    return backdrop.eval(edged(c + r * float2(cos(a), sin(a)), edges)) * src.a;\n}\n"
 }

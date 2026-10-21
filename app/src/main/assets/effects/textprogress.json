@@ -4,17 +4,28 @@
  "category": "text",
  "since": "3.0.0",
  "native": true,
- "description": "Shows a text layer piece by piece, by character, word or line, each piece popping, fading, sliding, growing, shrinking or sharpening into place.",
+ "description": "Shows the text between Start and End, by character, word or line, with optional fades, slides, scaling or blur.",
  "params": [
   {
+   "id": "start",
+   "label": "Start",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
    "id": "progress",
-   "label": "Progress",
+   "label": "End",
    "type": "float",
    "default": 1,
    "min": 0,
    "max": 1,
    "step": 0.001,
-   "percent": true
+   "percent": true,
+   "after": "start"
   },
   {
    "id": "unit",

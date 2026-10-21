@@ -4,7 +4,7 @@
  "category": "text",
  "since": "3.0.0",
  "native": true,
- "description": "Moves, scales, turns, fades and tints the letters, words or lines of a text layer that fall inside a range. Move the range with Offset to make the change travel through the text.",
+ "description": "Moves, scales, turns, fades and tints letters, words or lines inside a range. Anchor sets whether scaling and rotation use each component or the centre of the layer. Move the range with Offset to make the change travel through the text.",
  "params": [
   {
    "id": "unit",
@@ -15,6 +15,16 @@
     "Character",
     "Word",
     "Line"
+   ]
+  },
+  {
+   "id": "anchor",
+   "label": "Anchor",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Component",
+    "Layer"
    ]
   },
   {

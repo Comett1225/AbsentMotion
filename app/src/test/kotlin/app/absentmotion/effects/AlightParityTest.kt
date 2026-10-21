@@ -234,6 +234,8 @@ class AlightParityTest {
         assertEquals(15f, line.getValue("rangeRotation").toFloat(), 1e-4f)
         assertEquals(0.25f, line.getValue("fillAmount").toFloat(), 1e-4f)
         assertEquals("true", line["randomOrder"])
+        assertEquals(0.027f, values(9).getValue("amount").toFloat(), 1e-4f)
+        assertEquals(0f, values(9).getValue("speed").toFloat(), 1e-4f)
         assertEquals(1f, values(9).getValue("charset").toFloat(), 1e-4f)
         assertEquals("true", values(9)["keepSpaces"])
         assertTrue(result.dropped.toString(), result.dropped.isEmpty())

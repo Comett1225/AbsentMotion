@@ -4,11 +4,30 @@
  "category": "text",
  "since": "3.0.0",
  "native": true,
- "description": "Swaps the characters of a text layer for random letters, numbers or symbols that keep changing. Raise Progress to let the real text settle in, character by character.",
+ "description": "Randomly replaces Amount of the characters between Start and End. Animate Evolution or raise Speed to change the replacements; Reveal settles them back into the original text.",
  "params": [
   {
+   "id": "amount",
+   "label": "Amount",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "evolution",
+   "label": "Evolution",
+   "type": "float",
+   "default": 0,
+   "min": -50,
+   "max": 50,
+   "step": 0.01
+  },
+  {
    "id": "progress",
-   "label": "Progress",
+   "label": "Reveal",
    "type": "float",
    "default": 0,
    "min": 0,
@@ -29,10 +48,30 @@
    ]
   },
   {
+   "id": "start",
+   "label": "Start",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "end",
+   "label": "End",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
    "id": "charset",
    "label": "Characters",
    "type": "choice",
-   "default": 0,
+   "default": 1,
    "options": [
     "Letters",
     "Upper Case",
@@ -53,7 +92,7 @@
    "id": "speed",
    "label": "Speed",
    "type": "float",
-   "default": 12,
+   "default": 0,
    "min": 0,
    "max": 60,
    "step": 0.1
@@ -68,7 +107,7 @@
    "id": "seed",
    "label": "Seed",
    "type": "float",
-   "default": 1,
+   "default": 0,
    "min": 0,
    "max": 1000,
    "step": 1
@@ -89,7 +128,8 @@
       1.5,
       1
      ]
-    ]
+    ],
+    "amount": 1
    }
   }
  ]

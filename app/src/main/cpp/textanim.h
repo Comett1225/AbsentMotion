@@ -27,6 +27,6 @@ float RangeWeight(int shape, int index, int count, float start, float end);
 std::string CountNumbers(const std::string& text, double add, double multiply, int decimals, int separator);
 std::string FormatTimecode(double seconds, double fps, int format);
 std::string Scramble(const std::string& text, float progress, int direction, uint64_t seed, int64_t tick, int charset,
-                     const std::string& custom, bool keepSpaces);
+                     const std::string& custom, bool keepSpaces, float amount = 1, float start = 0, float end = 1);
 
 }

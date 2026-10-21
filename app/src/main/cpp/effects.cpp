@@ -26,7 +26,10 @@ bool BuiltIn(const std::string& id) {
 
 float Value(const LayerEffect& e, const std::map<std::string, Anim>* defaults, const std::string& name, int i, float t,
             float fallback) {
-    if (defaults) {
+    if (e.id == "absent.stretch" && name == "stretch") fallback = 200;
+    else if (e.id == "absent.ominoglass" && name == "color") fallback = 1;
+    else if (e.id == "absent.polardisplacement" && name == "angle") fallback = 45;
+    else if (defaults) {
         if (auto d = defaults->find(name); d != defaults->end()) fallback = d->second.get(i, t, fallback);
     }
     for (const Property& p : e.props) {

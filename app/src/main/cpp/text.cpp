@@ -1,5 +1,6 @@
 #include "text.h"
 #include <algorithm>
+#include <bit>
 #include <cmath>
 #include <cstdlib>
 #include <map>
@@ -346,9 +347,12 @@ std::string Shown(const Layer& l, float t, int fps, std::string text, bool* tabu
         } else if (e.id == "absent.textrandomizer") {
             const Property* custom = e.prop("characters");
             const int64_t tick = (int64_t)std::floor(local * std::max(0.0f, e.value("speed", t, 12)) + 1e-6);
+            const float evolution = e.value("evolution", t, 0);
+            const uint64_t seed = Seed(l, e, t) ^ (evolution == 0 ? 0 : textanim::Mix(std::bit_cast<uint32_t>(evolution)));
             text = textanim::Scramble(text, std::clamp(e.value("progress", t, 0), 0.0f, 1.0f), Choice(e, "direction", t, 0, 3),
-                                      Seed(l, e, t), tick, Choice(e, "charset", t, 0, 6), custom ? custom->text : "",
-                                      e.value("keepSpaces", t, 1) >= 0.5f);
+                                      seed, tick, Choice(e, "charset", t, 0, 6), custom ? custom->text : "",
+                                      e.value("keepSpaces", t, 1) >= 0.5f, std::clamp(e.value("amount", t, 1), 0.0f, 1.0f),
+                                      e.value("start", t, 0), e.value("end", t, 1));
         }
     }
     return text;
@@ -488,9 +492,11 @@ void Apply(const Layer& l, float t, const textanim::Segments& seg, std::vector<G
         std::vector<Look> looks(count);
         std::vector<SkMatrix> matrices(count);
         for (int u = 0; u < count; u++) {
-            looks[u] = progress ? Progress(e, t, textanim::Reveal(amount, rank[u], steps, softness))
+            looks[u] = progress ? Progress(e, t, textanim::Reveal(amount, rank[u], steps, softness) *
+                                                     (1 - textanim::Reveal(std::clamp(start, 0.0f, 1.0f), rank[u], steps, softness)))
                                 : Transform(e, t, textanim::RangeWeight(shape, rank[u], count, start + offset, end + offset));
-            const SkPoint c = box[u].isEmpty() ? fallback[u] : box[u].center();
+            const SkPoint c = !progress && Choice(e, "anchor", t, 0, 1) == 1 ? SkPoint{0, 0}
+                              : box[u].isEmpty() ? fallback[u] : box[u].center();
             matrices[u] = SkMatrix::Translate(-c.fX, -c.fY);
             matrices[u].postScale(looks[u].scale, looks[u].scale);
             matrices[u].postRotate(looks[u].rotation);

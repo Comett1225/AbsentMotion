@@ -39,6 +39,8 @@ bool Word(char c) { return Digit(c) || (c >= 'a' && c <= 'z') || (c >= 'A' && c 
 
 std::string Format(double v, int decimals, int separator) {
     char buffer[64];
+    decimals = std::clamp(decimals, 0, 63);
+    if (!std::isfinite(v)) v = std::isnan(v) ? 0 : std::copysign(1e15, v);
     snprintf(buffer, sizeof buffer, "%.*f", decimals, std::clamp(v, -1e15, 1e15));
     std::string s = buffer;
     if (s[0] == '-' && s.find_first_of("123456789") == std::string::npos) s.erase(0, 1);
@@ -211,7 +213,7 @@ std::string FormatTimecode(double seconds, double fps, int format) {
     if (!std::isfinite(seconds)) seconds = 0;
     const bool negative = seconds < 0;
     const double s = std::min(std::fabs(seconds), 3.6e8);
-    const long long rate = std::max(1LL, std::llround(fps));
+    const long long rate = std::isfinite(fps) ? std::llround(std::clamp(fps, 1.0, 1000.0)) : 30;
     const long long frames = (long long)std::floor(s * rate + 1e-6), whole = (long long)std::floor(s + 1e-6);
     const long long hundredths = (long long)std::floor(s * 100 + 1e-6);
     char buffer[64];
@@ -227,11 +229,13 @@ std::string FormatTimecode(double seconds, double fps, int format) {
             snprintf(buffer, sizeof buffer, "%02lld:%02lld:%02lld:%02lld", frames / (3600 * rate), frames / (60 * rate) % 60,
                      frames / rate % 60, frames % rate);
     }
-    return (negative && (format == kFrames ? frames : hundredths) > 0 ? "-" : "") + std::string(buffer);
+    const bool nonzero = format == kFrames || format == kHMSF ? frames > 0
+                         : format == kHMS || format == kMS ? whole > 0 : hundredths > 0;
+    return (negative && nonzero ? "-" : "") + std::string(buffer);
 }
 
 std::string Scramble(const std::string& text, float progress, int direction, uint64_t seed, int64_t tick, int charset,
-                     const std::string& custom, bool keepSpaces) {
+                     const std::string& custom, bool keepSpaces, float amount, float start, float end) {
     static const char* const kSets[] = {"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
                                         "abcdefghijklmnopqrstuvwxyz", "0123456789",
                                         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789", "!#$%&*+-=?@^~<>/|\\{}[]"};
@@ -257,7 +261,9 @@ std::string Scramble(const std::string& text, float progress, int direction, uin
     std::string out;
     for (size_t k = 0; k < clusters.size(); k++) {
         const int e = eligible[k];
-        if (e < 0 || Reveal(progress, ranks[e], steps, 0) >= 1) {
+        const float selection = (float)(Mix(seed ^ Mix((uint64_t)k + 0xa37ull)) >> 40) / 16777216.0f;
+        const float position = ((float)k + 0.5f) / std::max((float)clusters.size(), 1.0f);
+        if (e < 0 || Reveal(progress, ranks[e], steps, 0) >= 1 || amount <= selection || position < start || position >= end) {
             out += text.substr(clusters[k].first, clusters[k].second - clusters[k].first);
             continue;
         }

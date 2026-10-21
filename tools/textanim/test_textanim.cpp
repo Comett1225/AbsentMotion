@@ -3,6 +3,7 @@
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
+#include <limits>
 #include <set>
 #include <string>
 #include <vector>
@@ -117,7 +118,9 @@ int main() {
         check(CountNumbers("0.5", -0.5, 1, 1, 0) == "0.0" && CountNumbers("1", -1.0001, 1, 2, 0) == "0.00", "no minus zero");
         check(CountNumbers("v1.2.3", 1, 1, -1, 0) == "v2.2.4", "version numbers count part by part");
         check(CountNumbers("no numbers here", 5, 2, -1, 1) == "no numbers here", "text without numbers stays");
+        check(CountNumbers("1.23456789", 0, 1, -1, 0) == "1.23456789", "as typed preserves more than six decimals");
         check(CountNumbers("7", 0.6, 1, 0, 0) == "8", "rounds to the decimals asked for");
+        check(CountNumbers(std::string(400, '9'), 0, 0, -1, 0) == "0", "overflowing input multiplied by zero stays numeric");
         check(CountNumbers("١ 100", 5, 1, -1, 0) == "١ 105", "other scripts pass through");
     }
     {
@@ -128,6 +131,9 @@ int main() {
         check(FormatTimecode(9.5, 30, kSHundredths) == "9.50", "SS.hh");
         check(FormatTimecode(2, 24, kFrames) == "48", "frames");
         check(FormatTimecode(-1.5, 30, kMSHundredths) == "-00:01.50", "negative time");
+        check(FormatTimecode(-0.1, 30, kHMS) == "00:00:00", "no negative zero in whole seconds");
+        check(FormatTimecode(-0.01, 30, kHMSF) == "00:00:00:00", "no negative zero below one frame");
+        check(FormatTimecode(1, std::numeric_limits<double>::quiet_NaN(), kFrames) == "30", "invalid frame rate has a finite fallback");
         check(FormatTimecode(-0.001, 30, kMSHundredths) == "00:00.00", "no minus zero");
         check(FormatTimecode(1.0 / 3, 30, kHMSF) == "00:00:00:10", "frame boundaries are exact");
     }
@@ -146,6 +152,10 @@ int main() {
         check(Scramble(text, 0, kFromStart, 1, 3, kLetters, "", false)[2] != ' ', "spaces scramble when asked");
         const std::string star = Scramble("ab", 0, kFromStart, 1, 0, kCustom, "★", true);
         check(star == "★★", "custom characters");
+        check(Scramble(text, 0, kFromStart, 1, 0, kCustom, "x", true, 0) == text, "zero amount preserves the text");
+        check(Scramble("abcd", 0, kFromStart, 1, 0, kCustom, "x", true, 1, 0.25f, 0.75f) == "axxd", "only the selected range scrambles");
+        check(Scramble("ábcd", 0, kFromStart, 1, 0, kCustom, "x", true, 1, 0.25f, 0.75f) == "áxxd", "range counts graphemes instead of bytes");
+        check(Scramble("abcd", 0, kFromStart, 1, 0, kCustom, "x", true, 1, 0.5f, 0.5f) == "abcd", "empty randomizer range leaves text alone");
         check(Scramble("é", 0, kFromStart, 1, 0, kCustom, "x", true) == "x", "a cluster scrambles as one character");
     }
     if (failures) return 1;
