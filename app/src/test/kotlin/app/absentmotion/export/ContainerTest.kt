@@ -192,6 +192,16 @@ class ContainerTest {
         assertEquals(AudioCodec.Aac, restored.audio.codec)
     }
 
+    @Test fun aVideoExportUsesTheProjectsFrameRateAndAtMostItsResolution() {
+        val saved = ExportSettings(2160, 60, Codec.Hevc)
+        val film = forScene(ExportKind.Video, saved, ExportSettings(1080, 24))
+        assertEquals(24, film.fps)
+        assertEquals(1080, film.shortSide)
+        assertEquals(Codec.Hevc, film.codec)
+        assertEquals(720, forScene(ExportKind.Video, saved.copy(shortSide = 720), ExportSettings(1080, 24)).shortSide)
+        assertEquals(60, forScene(ExportKind.Sequence, saved, ExportSettings(360, 30)).fps)
+    }
+
     @Test fun monoIsTheAverageOfBothChannels() {
         assertArrayEquals(shortArrayOf(150, -1), toChannels(shortArrayOf(100, 200, -2, 0), 1))
         val stereo = shortArrayOf(1, 2)
