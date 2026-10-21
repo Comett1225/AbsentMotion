@@ -173,6 +173,7 @@ import kotlinx.coroutines.CancellationException
 import android.provider.OpenableColumns
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
@@ -366,6 +367,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
                     }
                 }
                 val result = exporter.export(chosen, exported, s, frame, name) { progress = it }
+                phase = Phase.Done(chosen, result)
                 ExportSizes.key(chosen, s)?.let { key ->
                     withContext(Dispatchers.IO) {
                         val written = result.uris.sumOf { uri ->
@@ -374,15 +376,14 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
                         sizes.record(key, predicted, written)
                     }
                 }
-                if (alsoTemplate) try {
-                    TemplateStore(context).add(scene, scene.frameStart(frame), engine)
-                } catch (e: CancellationException) {
-                    throw e
-                } catch (e: Exception) {
-                    Log.w("AMExport", "could not store the template", e)
-                    app.absentmotion.platform.Toast.makeText(context, context.getString(R.string.export_template_failed), app.absentmotion.platform.Toast.LENGTH_LONG).show()
+                if (alsoTemplate) withContext(NonCancellable) {
+                    try {
+                        TemplateStore(context).add(scene, scene.frameStart(frame), engine)
+                    } catch (e: Exception) {
+                        Log.w("AMExport", "could not store the template", e)
+                        app.absentmotion.platform.Toast.makeText(context, context.getString(R.string.export_template_failed), app.absentmotion.platform.Toast.LENGTH_LONG).show()
+                    }
                 }
-                phase = Phase.Done(chosen, result)
             } catch (e: CancellationException) {
                 phase = Phase.Idle
                 throw e
