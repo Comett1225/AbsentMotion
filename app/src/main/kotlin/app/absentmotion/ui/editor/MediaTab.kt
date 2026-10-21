@@ -65,10 +65,9 @@ import app.absentmotion.R
 @Composable
 internal fun MediaTab(state: EditorState, modifier: Modifier, library: AddLibrary) {
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
+    val scope = LocalEditorScope.current
     var album by remember { mutableStateOf<String?>(null) }
     var albumsOpen by remember { mutableStateOf(false) }
-    var adding by remember { mutableStateOf(false) }
     var search by remember { mutableStateOf("") }
     var searching by remember { mutableStateOf(false) }
     val focus = LocalFocusManager.current
@@ -84,8 +83,8 @@ internal fun MediaTab(state: EditorState, modifier: Modifier, library: AddLibrar
         if (uri != null) {
             runCatching { context.contentResolver.takePersistableUriPermission(uri, android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION) }
             scope.launch {
-                adding = true
-                try { mediaDeclaration(context, uri)?.let { state.keepCopy(context, it) }?.let { if (it.type.startsWith("video/")) state.addVideo(it) else state.addImage(it) } } finally { adding = false }
+                state.addingMedia = true
+                try { mediaDeclaration(context, uri)?.let { state.keepCopy(context, it) }?.let { if (it.type.startsWith("video/")) state.addVideo(it) else state.addImage(it) } } finally { state.addingMedia = false }
             }
         }
     }
@@ -142,13 +141,13 @@ internal fun MediaTab(state: EditorState, modifier: Modifier, library: AddLibrar
             items(shown, key = { it.uri.toString() }) { file ->
                 val bitmap by produceState<android.graphics.Bitmap?>(cachedMediaThumbnail(file.uri), file.uri, file.modified, library.mediaRevision) { value = mediaThumbnail(context, file.uri) }
                 val press = remember { MutableInteractionSource() }
-                Box(Modifier.fillMaxHeight().aspectRatio(1f).pressScale(press, TilePress).background(Color.Black).clickable(press, LocalIndication.current, enabled = !adding) {
+                Box(Modifier.fillMaxHeight().aspectRatio(1f).pressScale(press, TilePress).background(Color.Black).clickable(press, LocalIndication.current, enabled = !state.addingMedia) {
                     scope.launch {
-                        adding = true
+                        state.addingMedia = true
                         try {
                             if (file.svg) state.importSvgFile(context, file.uri)
                             else mediaDeclaration(context, file.uri)?.let { state.keepCopy(context, it) }?.let { if (file.video) state.addVideo(it) else state.addImage(it) }
-                        } finally { adding = false }
+                        } finally { state.addingMedia = false }
                     }
                 }) {
                     bitmap?.let { Image(it.asImageBitmap(), null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop) }

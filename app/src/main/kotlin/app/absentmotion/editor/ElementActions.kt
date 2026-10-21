@@ -89,8 +89,8 @@ private suspend fun EditorState.lifetimeBounds(layer: Layer): FloatArray? {
     }
 }
 
-fun EditorState.addElement(store: ProjectStore, id: String, link: Boolean) {
-    val element = store.load(id)?.withCopiedLayerIds() ?: return
+suspend fun EditorState.addElement(store: ProjectStore, id: String, link: Boolean) {
+    val element = withContext(Dispatchers.IO) { store.load(id)?.withCopiedLayerIds() } ?: return
     val start = timeMs
     val attrs = linkedMapOf(
         "id" to "${Layer.newId()}", "label" to element.title,

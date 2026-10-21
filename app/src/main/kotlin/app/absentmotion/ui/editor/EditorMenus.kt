@@ -185,7 +185,7 @@ internal fun LayerMenu(state: EditorState, onDismiss: () -> Unit) {
     val video = media?.takeIf { it.video }
     val mediaRecord = media?.let { state.scene.media(it.uri) }
     if (mediaInfo && mediaRecord != null) {
-        MediaInfoDialog(mediaRecord, onReplace = { picked -> val kept = state.keepCopy(context, picked); state.edit("replace") { s -> s.replaceMedia(mediaRecord.uri, kept) } }) { mediaInfo = false; onDismiss() }
+        MediaInfoDialog(mediaRecord, onReplace = { picked -> val kept = state.keepCopy(context, picked); state.edit { s -> s.replaceMedia(mediaRecord.uri, kept) } }) { mediaInfo = false; onDismiss() }
         return
     }
     val saveElement = rememberSaveToMyElements(state)

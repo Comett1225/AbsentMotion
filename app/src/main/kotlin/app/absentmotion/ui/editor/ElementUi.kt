@@ -88,6 +88,7 @@ internal fun rememberSaveToMyElements(state: EditorState): (done: () -> Unit) ->
 @Composable
 internal fun ElementPicker(state: EditorState, modifier: Modifier) {
     val store = rememberStore()
+    val scope = LocalEditorScope.current
     var items by remember { mutableStateOf<List<ProjectInfo>?>(null) }
     LaunchedEffect(Unit) {
         items = withContext(Dispatchers.IO) {
@@ -106,7 +107,9 @@ internal fun ElementPicker(state: EditorState, modifier: Modifier) {
             list.isEmpty() -> Box(body, Alignment.Center) { Text(stringResource(R.string.your_asset_collection_is_empty), color = Am.OnDarkDim, fontSize = 13.sp, textAlign = TextAlign.Center) }
             shown.isEmpty() -> NoMatches(query, R.string.search_no_assets_or_projects, body)
             else -> LazyRow(body.padding(start = 8.5.dp), verticalAlignment = Alignment.CenterVertically) {
-                items(shown, key = { it.id }) { info -> ElementCard(info) { state.addElement(store, info.id, link = info.isElement) } }
+                items(shown, key = { it.id }) { info -> ElementCard(info) {
+                    if (!state.addingMedia) scope.launch { state.addingMedia = true; try { state.addElement(store, info.id, link = info.isElement) } finally { state.addingMedia = false } }
+                } }
             }
         }
     }

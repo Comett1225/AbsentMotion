@@ -30,7 +30,7 @@ import app.absentmotion.R
 @Composable
 internal fun MediaInfoDialog(record: MediaDeclaration, onReplace: (suspend (MediaDeclaration) -> Unit)? = null, onDismiss: () -> Unit) {
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
+    val scope = LocalEditorScope.current
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         if (uri != null) {
             runCatching { context.contentResolver.takePersistableUriPermission(uri, android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION) }

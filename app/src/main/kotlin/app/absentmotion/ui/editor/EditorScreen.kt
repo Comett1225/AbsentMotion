@@ -15,10 +15,12 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.key
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
 import app.absentmotion.editor.EditorPanel
@@ -46,14 +49,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
 
+internal val LocalEditorScope = staticCompositionLocalOf<CoroutineScope> { error("outside the editor") }
+
 @Composable
 fun EditorScreen(state: EditorState, onExit: () -> Unit) {
     val scope = rememberCoroutineScope()
-    Box(Modifier.fillMaxSize()) {
-        EditorBody(state, onExit)
-        val color = remember { arrayOfNulls<FullColor>(1) }.also { if (state.fullColor != null) it[0] = state.fullColor }[0]
-        Presence(state.fullColor != null) { color?.let { PhoneScreen { Box(Modifier.fillMaxSize().presence(rise = 16.dp)) { FullColorPicker(state, it) } } } }
-        if (state.cameraOpen) EditorCamera(state, scope)
+    CompositionLocalProvider(LocalEditorScope provides scope) {
+        Box(Modifier.fillMaxSize()) {
+            EditorBody(state, onExit)
+            val color = remember { arrayOfNulls<FullColor>(1) }.also { if (state.fullColor != null) it[0] = state.fullColor }[0]
+            Presence(state.fullColor != null) { color?.let { PhoneScreen { Box(Modifier.fillMaxSize().presence(rise = 16.dp)) { FullColorPicker(state, it) } } } }
+            if (state.cameraOpen) EditorCamera(state, scope)
+        }
     }
 }
 
