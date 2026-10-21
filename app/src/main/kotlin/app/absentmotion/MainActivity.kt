@@ -53,6 +53,10 @@ import app.absentmotion.library.TemplateStore
 import app.absentmotion.model.Layer
 import app.absentmotion.model.XmlNode
 import app.absentmotion.model.formatFloats
+import app.absentmotion.model.fontNames
+import app.absentmotion.fonts.FontName
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.job
 import app.absentmotion.ui.home.EmbedRequest
 import app.absentmotion.ui.home.TemplateEditor
 import app.absentmotion.model.Scene
@@ -114,6 +118,8 @@ class MainActivity : ComponentActivity() {
     private var recovered by mutableStateOf<RecoveryOffer?>(null)
     private var crashed by mutableStateOf<CrashEntry?>(null)
     private var importFailed by mutableStateOf<String?>(null)
+    private var fontOffer by mutableStateOf<Pair<EditorState, List<String>>?>(null)
+    private val fontsDeclined = HashSet<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val started = SystemClock.elapsedRealtime()
@@ -127,10 +133,17 @@ class MainActivity : ComponentActivity() {
         recovery = Recovery(File(filesDir, "recovery"))
         CrashLogs.install(this)
         RecoveryHandler.install(recovery) { editor?.let { it.projectId to it.scene.toXml() } }
+        val reopen = savedInstanceState?.getString(OPEN_PROJECT)
         lifecycleScope.launch {
             val (offer, crash) = withContext(DiskThread.dispatcher) { runCatching { recovery.pending(store) }.getOrNull() to runCatching { CrashLogs.collect(applicationContext) }.getOrNull() }
             crashed = crash
             recovered = offer
+            if (reopen != null && offer?.id != reopen && editor == null && !opening) openJob = lifecycleScope.launch {
+                val state = openNow(reopen) ?: return@launch
+                state.frame = savedInstanceState.getInt(OPEN_FRAME).coerceIn(0, state.scene.lastFrame)
+                if (savedInstanceState.containsKey(OPEN_LAYER)) state.selectedId = savedInstanceState.getLong(OPEN_LAYER)
+                if (state.selected == null) state.selectedId = null
+            }
         }
         lifecycleScope.launch { kotlinx.coroutines.delay(15_000); autoBackupIfDue(applicationContext, settings) }
         lifecycleScope.launch(Dispatchers.IO) { ShapeCatalog.load(applicationContext) }
@@ -207,6 +220,16 @@ class MainActivity : ComponentActivity() {
                         containerColor = Am.Card,
                     )
                 }
+                fontOffer?.takeIf { it.first === open }?.let { (state, names) ->
+                    AlertDialog(
+                        onDismissRequest = { declineFonts(state) },
+                        title = { Text(stringResource(R.string.fonts_missing_title)) },
+                        text = { Text(stringResource(R.string.fonts_missing_body, names.joinToString(", ") { FontName.parse(it).label })) },
+                        confirmButton = { TextButton({ downloadFonts(names) }) { Text(stringResource(R.string.update_download), color = Am.Accent) } },
+                        dismissButton = { TextButton({ declineFonts(state) }) { Text(stringResource(R.string.update_not_now), color = Am.Accent) } },
+                        containerColor = Am.Field, titleContentColor = Am.OnDark, textContentColor = Am.OnDark,
+                    )
+                }
                 if (open?.historyOpen == true) VersionHistory(store, open.projectId, open.scene.title, engine, onRestore = { restoreVersion(open.projectId, it) }) { open.historyOpen = false }
                 historyFor?.let { (id, title, damaged) ->
                     VersionHistory(store, id, title, engine, onRestore = { restoreVersion(id, it) }, onDelete = if (damaged) { { deleteDamaged(id) } } else null) { historyFor = null }
@@ -237,17 +260,27 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch {
             val reports = ArrayList<ImportReport>()
             var failure: String? = null
-            CrashLogs.during("importing") { withContext(Dispatchers.IO) {
-                val importer = Importer.forApp(applicationContext, store)
-                for (uri in uris) try {
-                    reports += importer.import { contentResolver.openInputStream(uri) }.map {
-                        if (!it.template) it else templates.adopt(store, it.id, engine)?.let { id -> it.copy(id = id) } ?: it.copy(template = false)
+            val overlay = !opening
+            if (overlay) { opening = true; openJob = coroutineContext.job }
+            try {
+                CrashLogs.during("importing") { withContext(Dispatchers.IO) {
+                    val job = coroutineContext.job
+                    val importer = Importer.forApp(applicationContext, store)
+                    for (uri in uris) try {
+                        reports += importer.import { contentResolver.openInputStream(uri)?.let { stoppable(it, job) } }.map {
+                            if (!it.template) it else templates.adopt(store, it.id, engine)?.let { id -> it.copy(id = id) } ?: it.copy(template = false)
+                        }
+                    } catch (e: kotlinx.coroutines.CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        Log.w("AMImport", "cannot import $uri", e)
+                        failure = failure ?: (e as? ImportFailed)?.text?.resolve(this@MainActivity) ?: e.message ?: getString(R.string.library_err_unsupported_type)
                     }
-                } catch (e: Exception) {
-                    Log.w("AMImport", "cannot import $uri", e)
-                    failure = failure ?: (e as? ImportFailed)?.text?.resolve(this@MainActivity) ?: e.message ?: getString(R.string.library_err_unsupported_type)
-                }
-            } }
+                } }
+            } finally {
+                if (overlay) opening = false
+                projectsChanged++
+            }
             failure?.let { importFailed = it }
             if (reports.isNotEmpty()) imported = reports
             var drawn = false
@@ -256,6 +289,33 @@ class MainActivity : ComponentActivity() {
                 drawn = saveThumbnail(scene, scene.totalTime / 2, report.id) || drawn
             }
             if (drawn) projectsChanged++
+        }
+    }
+
+    private fun stoppable(input: java.io.InputStream, job: kotlinx.coroutines.Job) = object : java.io.FilterInputStream(input) {
+        override fun read(): Int { job.ensureActive(); return super.read() }
+        override fun read(b: ByteArray, off: Int, len: Int): Int { job.ensureActive(); return super.read(b, off, len) }
+    }
+
+    private fun offerFonts(state: EditorState) {
+        val library = engine.fonts ?: return
+        if (state.projectId in fontsDeclined) return
+        lifecycleScope.launch {
+            val missing = withContext(Dispatchers.IO) { state.scene.fontNames().filter { FontName.parse(it).source == "googlefonts" && library.localFile(it) == null } }
+            if (missing.isNotEmpty() && editor === state) fontOffer = state to missing
+        }
+    }
+
+    private fun declineFonts(state: EditorState) {
+        fontsDeclined += state.projectId
+        fontOffer = null
+    }
+
+    private fun downloadFonts(names: List<String>) {
+        fontOffer = null
+        val library = engine.fonts ?: return
+        lifecycleScope.launch {
+            if (names.count { library.resolve(it, download = true) == null } > 0) Toast.makeText(this@MainActivity, getString(R.string.font_load_failed_body), Toast.LENGTH_LONG).show()
         }
     }
 
@@ -350,7 +410,7 @@ class MainActivity : ComponentActivity() {
         val scene = loadInBackground(id) ?: return null
         cameFromEditor = true
         val saver = ProjectSaver(id, store, recovery, failed = { runOnUiThread { Toast.makeText(this, getString(R.string.home_save_project_failed), Toast.LENGTH_LONG).show() } })
-        return EditorState(id, scene, store, engine, settings, saver).also { editor = it }
+        return EditorState(id, scene, store, engine, settings, saver).also { editor = it; offerFonts(it) }
     }
 
     private fun collectMedia(id: String) {
@@ -477,6 +537,15 @@ class MainActivity : ComponentActivity() {
         TestHooks.newIntent(this, intent)
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        editor?.let { state ->
+            outState.putString(OPEN_PROJECT, state.projectId)
+            outState.putInt(OPEN_FRAME, state.frame)
+            state.selectedId?.let { outState.putLong(OPEN_LAYER, it) }
+        }
+    }
+
     override fun onPause() {
         super.onPause()
         editor?.saver?.flush()
@@ -495,5 +564,11 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         engine.refreshMedia()
+    }
+
+    private companion object {
+        const val OPEN_PROJECT = "openProject"
+        const val OPEN_FRAME = "openFrame"
+        const val OPEN_LAYER = "openLayer"
     }
 }

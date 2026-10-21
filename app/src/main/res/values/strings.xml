@@ -670,6 +670,8 @@
     <string name="font_search">Search</string>
     <string name="font_imported">Imported</string>
     <string name="font_downloads_when_chosen">Downloads when chosen</string>
+    <string name="fonts_missing_title">Fonts not on this phone</string>
+    <string name="fonts_missing_body">This project uses fonts that are not on this phone: %1$s. The text shows in another font until you download them from Google Fonts.</string>
     <string name="font_favorite">Favorite</string>
     <string name="font_category_sans_serif">Sans Serif</string>
     <string name="font_category_serif">Serif</string>
