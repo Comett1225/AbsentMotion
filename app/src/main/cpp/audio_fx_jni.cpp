@@ -8,7 +8,7 @@
 
 namespace {
 
-enum Kind { Eq = 0, LowPass = 1, HighPass = 2, Reverb = 3, Echo = 4, Compressor = 5, Gate = 6, Limiter = 7 };
+enum Kind { Eq = 0, LowPass = 1, HighPass = 2, Reverb = 3, Echo = 4, Compressor = 5, Gate = 6, Limiter = 7, Pitch = 8 };
 
 int paramCount(int kind) {
     switch (kind) {
@@ -19,6 +19,7 @@ int paramCount(int kind) {
     case Compressor: return 6;
     case Gate: return 5;
     case Limiter: return 3;
+    case Pitch: return 1;
     default: return -1;
     }
 }
@@ -32,6 +33,7 @@ struct Unit {
     std::unique_ptr<dsp::Compressor> compressor;
     std::unique_ptr<dsp::NoiseGate> gate;
     std::unique_ptr<dsp::Limiter> limiter;
+    std::unique_ptr<dsp::PitchShifter> pitch;
 };
 
 struct Rack {
@@ -58,6 +60,7 @@ bool attach(Rack& rack, Unit& unit) {
     case Compressor: unit.compressor = std::make_unique<dsp::Compressor>(); return rack.chain.add(*unit.compressor);
     case Gate: unit.gate = std::make_unique<dsp::NoiseGate>(); return rack.chain.add(*unit.gate);
     case Limiter: unit.limiter = std::make_unique<dsp::Limiter>(); return rack.chain.add(*unit.limiter);
+    case Pitch: unit.pitch = std::make_unique<dsp::PitchShifter>(); return rack.chain.add(*unit.pitch);
     default: return false;
     }
 }
@@ -107,6 +110,9 @@ void apply(Unit& unit, const float* p) {
         l.lookaheadMs = p[0]; l.ceilingDb = p[1]; l.releaseMs = p[2];
         break;
     }
+    case Pitch:
+        unit.pitch->params.semitones = p[0];
+        break;
     default: break;
     }
 }

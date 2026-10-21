@@ -40,6 +40,10 @@ import app.absentmotion.ui.editor.rememberReorder
 import app.absentmotion.ui.editor.reorderGrip
 import app.absentmotion.ui.editor.reorderLift
 import app.absentmotion.ui.editor.reorderSlot
+import app.absentmotion.ai.aiMarks
+import app.absentmotion.ui.editor.effects.AiMarkRow
+import app.absentmotion.ui.editor.effects.AiMarkRowGap
+import app.absentmotion.ui.editor.effects.AiMarkRowHeight
 import app.absentmotion.ui.editor.effects.EffectIcons
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Presence
@@ -106,10 +110,12 @@ internal fun EffectsPanel(state: EditorState, modifier: Modifier) {
         Swap(index, Modifier.weight(1f).fillMaxHeight(), rise = 0.dp) {
             if (instance == null) {
                 val scroll = rememberScrollState()
-                val reorder = rememberReorder(state, scroll, top = 6.5.dp)
+                val marks = layer.aiMarks
+                val reorder = rememberReorder(state, scroll, top = 6.5.dp + (AiMarkRowHeight + AiMarkRowGap) * marks.size)
                 val id = layer.id
                 val effects = layer.effects
                 Column(Modifier.fillMaxSize().verticalScroll(scroll)) {
+                    for (mark in marks) AiMarkRow(state, mark)
                     key(reorder.generation) {
                         effects.forEachIndexed { i, effect ->
                             EffectListRow(state, reorder, i, effects.size, effect, catalog.find(effect["id"] ?: "")) { from, to ->

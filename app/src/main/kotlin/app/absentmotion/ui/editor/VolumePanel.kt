@@ -71,7 +71,7 @@ internal fun VolumePanel(state: EditorState, modifier: Modifier = Modifier) {
     DisposableEffect(Unit) {
         onDispose { state.volumeOpen = false; state.easingOpen = false; state.keyTarget = null }
     }
-    var effects by remember { mutableStateOf(false) }
+    var effects by remember { mutableStateOf(state.audioFxFocus != null) }
     Swap(effects, modifier, rise = 0.dp) {
         if (effects) AudioEffectsPanel(state, Modifier.fillMaxSize()) { effects = false }
         else VolumeMain(state, layer, Modifier.fillMaxSize()) { state.easingOpen = false; effects = true }

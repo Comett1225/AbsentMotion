@@ -55,6 +55,21 @@ class NativeFxTest {
         assertTrue(peak(hall, 960, r) > 1e-4f)
     }
 
+    @Test fun pitchEffectsMoveTheFrequency() {
+        val r = 48_000
+        fun crossings(fx: AudioFx): Int {
+            val buf = sine(440.0, r, 2.0, 0.2)
+            chain(r, fx).use { it.process(buf, 2 * r) }
+            var n = 0
+            for (i in r until 2 * r) if (buf[2 * i - 2] < 0f && buf[2 * i] >= 0f) n++
+            return n
+        }
+        assertEquals(880.0, crossings(AudioFx.of(FxKind.HighPitch, "amount" to 12f)).toDouble(), 20.0)
+        assertEquals(220.0, crossings(AudioFx.of(FxKind.LowPitch, "amount" to 12f)).toDouble(), 10.0)
+        assertEquals(440 * 2.0.pow(5.0 / 12), crossings(AudioFx.of(FxKind.Voice, "pitch" to 5f)).toDouble(), 12.0)
+        assertEquals(440.0, crossings(AudioFx.of(FxKind.Voice)).toDouble(), 3.0)
+    }
+
     @Test fun mixAndBypassLeaveTheSoundDry() {
         val r = 44_100
         for (fx in listOf(AudioFx.of(FxKind.Eq, "lowGain" to 12f).withMix(0f), AudioFx.of(FxKind.Eq, "lowGain" to 12f).withBypass(true))) {

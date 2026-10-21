@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -42,6 +43,15 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import app.absentmotion.ai.AiAction
 import app.absentmotion.ai.AiTools
+import app.absentmotion.audio.AudioFx
+import app.absentmotion.audio.FxKind
+import app.absentmotion.audio.VoicePreset
+import app.absentmotion.audio.VoicePresets
+import app.absentmotion.audio.audioEffects
+import app.absentmotion.audio.fits
+import app.absentmotion.audio.withAudioEffects
+import app.absentmotion.audio.withVoicePreset
+import app.absentmotion.editor.EditorPanel
 import app.absentmotion.editor.EditorState
 import app.absentmotion.effects.EffectCatalog
 import app.absentmotion.effects.EffectDefinition
@@ -71,14 +81,23 @@ fun EffectBrowser(state: EditorState) {
     var recent by remember { mutableStateOf(history.getString("recent", "")!!.split('|').filter { it.isNotEmpty() }) }
     var favourites by remember { mutableStateOf(history.getStringSet("favourites", emptySet())!!.toSet()) }
     var favPage by remember { mutableStateOf(false) }
-    val audio = state.selected?.kind == "audio"
-    var category by remember { mutableStateOf<String?>(if (audio) "ai" else null) }
+    val layer = state.selected
+    val audio = layer?.kind == "audio"
+    val hasSound = audio || layer?.mediaFill?.video == true
+    var category by remember { mutableStateOf<String?>(if (audio) state.effectCategory ?: "audio" else null) }
     var searching by remember { mutableStateOf(false) }
     var query by remember { mutableStateOf("") }
     var detail by remember { mutableStateOf(state.effectDetail?.let(catalog::find)) }
-    fun close() { state.effectDetail = null; state.effectBrowserOpen = false }
+    fun close() { state.effectDetail = null; state.effectCategory = null; state.effectBrowserOpen = false }
+    var fromAudio by remember { mutableStateOf(false) }
     fun back() {
-        when { detail != null -> if (state.effectDetail != null) close() else detail = null; searching -> { searching = false; query = "" }; category != null && !audio -> category = null; else -> close() }
+        when {
+            detail != null -> if (state.effectDetail != null) close() else detail = null
+            searching -> { searching = false; query = "" }
+            fromAudio -> { fromAudio = false; category = "audio" }
+            category != null && !audio -> category = null
+            else -> close()
+        }
     }
     BackHandler(onBack = ::back)
     fun favourite(effect: EffectDefinition) {
@@ -94,9 +113,27 @@ fun EffectBrowser(state: EditorState) {
         close()
     }
     fun pick(effect: EffectDefinition) { if (effect.available) add(effect) else detail = effect }
+    fun editAudio(index: Int) {
+        state.audioFxFocus = index
+        state.panel = EditorPanel.Tools
+        state.volumeOpen = true
+        close()
+    }
+    fun addAudio(kind: FxKind) {
+        val effects = state.selected?.audioEffects ?: return
+        if (!effects.fits(kind)) return
+        state.editSelected { it.withAudioEffects(it.audioEffects + AudioFx.of(kind)) }
+        editAudio(effects.size)
+    }
+    fun applyVoice(preset: VoicePreset) {
+        state.editSelected { it.withVoicePreset(preset) }
+        editAudio(state.selected?.audioEffects?.indexOfFirst { it.kind == FxKind.Voice } ?: -1)
+    }
+    val audioName = stringResource(R.string.effects_category_audio)
+    val voiceName = stringResource(R.string.layer_tool_voice_filters)
     Column(Modifier.fillMaxSize().background(BrowserBg).systemBarsPadding()) {
         Row(Modifier.fillMaxWidth().height(44.dp).background(BrowserBg), verticalAlignment = Alignment.CenterVertically) {
-            val stepping = (category != null && !audio) || detail != null || searching
+            val stepping = (category != null && !audio) || detail != null || searching || fromAudio
             BrowserButton(if (stepping) PanelIcons.Back else EffectIcons.Close, stringResource(if (stepping) R.string.topbar_back else R.string.action_close), ::back)
             if (searching) {
                 val focus = remember { FocusRequester() }
@@ -104,12 +141,13 @@ fun EffectBrowser(state: EditorState) {
                 BasicTextField(query, { query = it }, Modifier.weight(1f).padding(8.dp).focusRequester(focus), singleLine = true,
                     textStyle = TextStyle(color = Am.OnDark, fontSize = 17.sp), cursorBrush = SolidColor(Am.Accent))
             }
-            else Text(detail?.name ?: category?.let { key -> catalog.categories.firstOrNull { it.first == key }?.second } ?: stringResource(R.string.effectbrowser_title),
+            else Text(detail?.name ?: category?.let { key -> when (key) { "audio" -> audioName; "voice" -> voiceName; else -> catalog.categories.firstOrNull { it.first == key }?.second } } ?: stringResource(R.string.effectbrowser_title),
                 Modifier.weight(1f), color = Am.OnDark, fontSize = 17.sp, textAlign = TextAlign.Center, maxLines = 1)
-            BrowserButton(EffectIcons.Search, stringResource(R.string.home_search), { state.effectDetail = null; detail = null; searching = true })
+            if (audio) Spacer(Modifier.size(44.dp))
+            else BrowserButton(EffectIcons.Search, stringResource(R.string.home_search), { state.effectDetail = null; detail = null; searching = true })
         }
         Swap(listOf(detail?.id, searching, category), Modifier.fillMaxSize()) {
-        if (catalog.message != null && (app.absentmotion.platform.effectsMessageOnHome() || (category != null && category != "ai" && !searching))) {
+        if (catalog.message != null && !audio && (app.absentmotion.platform.effectsMessageOnHome() || (category != null && category != "ai" && category != "audio" && category != "voice" && !searching))) {
             Box(Modifier.fillMaxSize().padding(24.dp), contentAlignment = Alignment.Center) {
                 Text(catalog.message!!, color = Am.OnDark, fontSize = 14.sp, textAlign = TextAlign.Center)
             }
@@ -130,6 +168,16 @@ fun EffectBrowser(state: EditorState) {
                         Text("+ ${preset.name}", color = Am.OnDark, fontSize = 15.sp, maxLines = 1)
                     }
                 }
+            }
+        } else if (!searching && (category == "audio" || category == "voice")) {
+            val effects = layer?.audioEffects.orEmpty()
+            LazyVerticalGrid(GridCells.Fixed(3), Modifier.fillMaxSize(), contentPadding = PaddingValues(10.dp)) {
+                if (category == "audio") itemsIndexed(AudioOrder) { i, kind ->
+                    AudioTile(stringResource(kind.label), i, kind == FxKind.Voice || effects.fits(kind)) {
+                        if (kind == FxKind.Voice) { fromAudio = true; category = "voice" } else addAudio(kind)
+                    }
+                }
+                else itemsIndexed(VoicePresets) { i, preset -> AudioTile(stringResource(preset.name), i, effects.any { it.kind == FxKind.Voice } || effects.fits(FxKind.Voice)) { applyVoice(preset) } }
             }
         } else if (searching || category != null) {
             val results = if (audio) emptyList() else if (searching) catalog.search(query) else catalog.listed(category).sortedBy { it.name.lowercase() }
@@ -172,13 +220,15 @@ fun EffectBrowser(state: EditorState) {
                         }
                     }
                 }
-                catalog.categories.chunked(2).forEach { row ->
+                val listed = catalog.categories.let { all -> if (hasSound) all.filter { it.first != "ai" } + ("audio" to audioName) + all.filter { it.first == "ai" } else all }
+                listed.chunked(2).forEach { row ->
                     Row(Modifier.fillMaxWidth(), Arrangement.spacedBy(1.5.dp)) {
                         row.forEach { (key, name) ->
                             val press = remember { MutableInteractionSource() }
                             Box(Modifier.weight(1f).height(66.5.dp).padding(bottom = 1.5.dp).pressScale(press, TilePress)
                                 .clickable(press, LocalIndication.current) { category = key }, contentAlignment = Alignment.Center) {
                                 if (key == "ai") AiBackdrop(Modifier.fillMaxSize())
+                                else if (key == "audio") AudioBackdrop(Modifier.fillMaxSize())
                                 else Thumbnail(catalog, catalog.listed(key).firstOrNull()?.thumbnail, Modifier.fillMaxSize(), ContentScale.Crop)
                                 Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.55f)))
                                 Text(name, color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
@@ -192,8 +242,11 @@ fun EffectBrowser(state: EditorState) {
         }
     }
     AiVideoDialog(ai, state.scene)
+    AiNoiseDialog(ai)
     AiProgressDialog(ai)
 }
+
+internal val AudioOrder = listOf(FxKind.Reverb, FxKind.HighPitch, FxKind.LowPitch, FxKind.Echo, FxKind.Voice, FxKind.Eq, FxKind.LowPass, FxKind.HighPass, FxKind.Compressor, FxKind.Gate)
 
 private val BrowserBg get() = Am.Field
 private val RecommendedBg get() = Am.PanelInset

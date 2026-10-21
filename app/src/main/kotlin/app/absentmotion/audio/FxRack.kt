@@ -17,6 +17,7 @@ internal typealias FxMaker = (FxSpec, Int) -> ClipFx?
 
 internal object NativeFx {
     const val LIMITER = 7
+    const val PITCH = 8
     const val MAX_BLOCK = 1024
 
     @Volatile private var loaded = runCatching { System.loadLibrary("amengine") }.isSuccess

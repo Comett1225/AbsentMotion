@@ -51,6 +51,7 @@ import app.absentmotion.audio.FxKind
 import app.absentmotion.audio.FxParam
 import app.absentmotion.audio.MAX_AUDIO_FX
 import app.absentmotion.audio.audioEffects
+import app.absentmotion.audio.fits
 import app.absentmotion.audio.moveAudioEffect
 import app.absentmotion.audio.updateAudioEffect
 import app.absentmotion.audio.withAudioEffects
@@ -58,6 +59,10 @@ import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.KeypadField
 import app.absentmotion.editor.KeypadRequest
 import app.absentmotion.platform.BackHandler
+import app.absentmotion.ai.aiMarks
+import app.absentmotion.ui.editor.effects.AiMarkRow
+import app.absentmotion.ui.editor.effects.AiMarkRowGap
+import app.absentmotion.ui.editor.effects.AiMarkRowHeight
 import app.absentmotion.ui.editor.effects.EffectIcons
 import app.absentmotion.ui.editor.panels.px
 import app.absentmotion.ui.theme.Am
@@ -77,7 +82,8 @@ private val SliderHeight = 40.dp
 internal fun AudioEffectsPanel(state: EditorState, modifier: Modifier, onBack: () -> Unit) {
     val layer = state.selected ?: return
     val effects = layer.audioEffects
-    var editing by remember(layer.id) { mutableIntStateOf(-1) }
+    var editing by remember(layer.id) { mutableIntStateOf(state.audioFxFocus ?: -1) }
+    LaunchedEffect(Unit) { state.audioFxFocus = null }
     val shown = effects.getOrNull(editing)
     LaunchedEffect(shown == null) { if (shown == null) editing = -1 }
     SideEffect { state.keyTarget = null }
@@ -105,7 +111,8 @@ internal fun AudioEffectsPanel(state: EditorState, modifier: Modifier, onBack: (
 private fun EffectList(state: EditorState, effects: List<AudioFx>, open: (Int) -> Unit) {
     var adding by remember { mutableStateOf(false) }
     val scroll = rememberScrollState()
-    val reorder = rememberReorder(state, scroll, top = RowHeight + 13.dp)
+    val marks = state.selected?.aiMarks.orEmpty()
+    val reorder = rememberReorder(state, scroll, top = RowHeight + 13.dp + (AiMarkRowHeight + AiMarkRowGap) * marks.size)
     val id = state.selectedId
     Column(Modifier.fillMaxSize().verticalScroll(scroll)) {
         Row(Modifier.padding(start = 6.5.dp, end = 6.5.dp, top = 6.5.dp).fillMaxWidth().height(RowHeight).horizontalScroll(rememberScrollState()),
@@ -118,6 +125,7 @@ private fun EffectList(state: EditorState, effects: List<AudioFx>, open: (Int) -
                 }
             }
         }
+        for (mark in marks) AiMarkRow(state, mark)
         key(reorder.generation) {
             effects.forEachIndexed { i, fx ->
                 EffectRow(state, reorder, i, fx, effects.size, { open(i) }) { from, to ->
@@ -126,7 +134,7 @@ private fun EffectList(state: EditorState, effects: List<AudioFx>, open: (Int) -
             }
         }
         Box(Modifier.padding(6.5.dp).fillMaxWidth().height(RowHeight)) {
-            val room = effects.size < MAX_AUDIO_FX
+            val room = effects.sumOf { it.kind?.units ?: 0 } < MAX_AUDIO_FX
             Box(Modifier.fillMaxSize().clip(RowShape).background(Am.Button).alpha(if (room) 1f else 0.35f)
                 .clickable(enabled = room) { adding = true }, Alignment.Center) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -137,7 +145,7 @@ private fun EffectList(state: EditorState, effects: List<AudioFx>, open: (Int) -
             }
             Presence(adding) {
                 MenuPopup(AboveLeft, { adding = false }, TransformOrigin(0f, 1f)) {
-                    for (kind in FxKind.entries) MenuRow(stringResource(kind.label)) {
+                    for (kind in FxKind.entries) MenuRow(stringResource(kind.label), enabled = effects.fits(kind)) {
                         adding = false
                         val at = effects.size
                         state.editSelected { it.withAudioEffects(it.audioEffects + AudioFx.of(kind)) }
@@ -268,6 +276,7 @@ private fun percent(v: Float) = String.format(Locale.US, "%.0f%%", v * 100)
 private fun display(param: FxParam, v: Float): String = when (param.unit) {
     "Hz" -> if (v >= 1000) String.format(Locale.US, if (v >= 10_000) "%.1f kHz" else "%.2f kHz", v / 1000) else String.format(Locale.US, "%.0f Hz", v)
     "dB" -> String.format(Locale.US, "%.1f dB", v)
+    "st" -> String.format(Locale.US, "%+.1f st", v)
     "ms" -> String.format(Locale.US, if (v < 10) "%.1f ms" else "%.0f ms", v)
     "%" -> percent(v)
     ":1" -> String.format(Locale.US, "%.1f:1", v)

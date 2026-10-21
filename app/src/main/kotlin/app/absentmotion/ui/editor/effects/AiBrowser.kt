@@ -6,9 +6,14 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.ui.semantics.Role
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -28,6 +33,7 @@ import app.absentmotion.ai.AiTools
 import app.absentmotion.ai.LONG_MATTE_SECONDS
 import app.absentmotion.ai.MAX_MATTE_SECONDS
 import app.absentmotion.ai.MatteSides
+import app.absentmotion.ai.NoiseSource
 import app.absentmotion.ai.matteBytes
 import app.absentmotion.ai.matteSeconds
 import app.absentmotion.ai.matteSize
@@ -138,6 +144,34 @@ internal fun AiVideoDialog(tools: AiTools, scene: Scene) {
             TextButton({ tools.apply(AiAction.Video, confirmed = true) }, enabled = !tooLong && size != null) { Text(stringResource(R.string.start), color = Am.Accent) }
         },
         dismissButton = { TextButton({ tools.videoSetup = null }) { Text(stringResource(R.string.cancel), color = Am.Accent) } },
+        containerColor = Am.Field)
+}
+
+@Composable
+internal fun AiNoiseDialog(tools: AiTools) {
+    if (tools.noiseSetup == null) return
+    AlertDialog(onDismissRequest = { tools.noiseSetup = null },
+        title = { Text(stringResource(AiAction.Noise.title), color = Am.OnDark) },
+        text = {
+            Column {
+                Text(stringResource(R.string.ai_noise_question), color = Am.OnDark, fontSize = 14.sp)
+                Column(Modifier.padding(top = 12.dp).selectableGroup(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    for (source in NoiseSource.entries) {
+                        val on = source == tools.noiseSource
+                        Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(6.dp)).background(if (on) Am.FieldHi else Am.PanelInset)
+                            .selectable(on, role = Role.RadioButton) { tools.noiseSource = source }.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
+                            RadioButton(on, null, colors = RadioButtonDefaults.colors(selectedColor = Am.Accent, unselectedColor = Am.OnDark))
+                            Column(Modifier.padding(start = 10.dp)) {
+                                Text(stringResource(source.title), color = if (on) Am.Accent else Am.OnDark, fontSize = 14.sp)
+                                Text(stringResource(source.hint), color = Am.Caption, fontSize = 12.sp, lineHeight = 16.sp)
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = { TextButton({ tools.apply(AiAction.Noise, confirmed = true) }) { Text(stringResource(R.string.start), color = Am.Accent) } },
+        dismissButton = { TextButton({ tools.noiseSetup = null }) { Text(stringResource(R.string.cancel), color = Am.Accent) } },
         containerColor = Am.Field)
 }
 

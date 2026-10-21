@@ -6,6 +6,7 @@ import android.content.Context
 import app.absentmotion.audio.PcmDecoder
 import app.absentmotion.audio.Resampler
 import kotlinx.coroutines.ensureActive
+import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.io.File
 import java.io.RandomAccessFile
@@ -22,7 +23,7 @@ internal object NoiseReduction {
     private external fun nativeProcess(handle: Long, pcm: FloatArray): FloatArray
     private external fun nativeDestroy(handle: Long)
 
-    suspend fun run(context: Context, uri: String, progress: AiProgress): AiMedia {
+    suspend fun run(context: Context, uri: String, source: NoiseSource, progress: AiProgress): AiMedia {
         val token = UUID.randomUUID()
         val decoded = File(context.cacheDir, "ai-input-$token.pcm")
         val cleaned = File(context.cacheDir, "ai-clean-$token.pcm")
@@ -31,15 +32,19 @@ internal object NoiseReduction {
         try {
             var rate = 0
             var frames = 0L
+            var rumble: Rumble? = null
             PcmDecoder(context, uri).use { decoder ->
                 DataOutputStream(decoded.outputStream().buffered()).use { pcm ->
                     var reported = -1
                     while (true) {
                         coroutineContext.ensureActive()
                         val chunk = decoder.next() ?: break
-                        if (rate == 0) rate = chunk.rate
+                        if (rate == 0) { rate = chunk.rate; if (source.rumbleHz > 0) rumble = Rumble(rate, source.rumbleHz) }
                         check(rate > 0 && rate == chunk.rate) { AppText.get(R.string.ai_sample_rate_changed) }
-                        for (i in 0 until chunk.frames) pcm.writeFloat((chunk.pcm[2 * i].toInt() + chunk.pcm[2 * i + 1].toInt()) / 65536f)
+                        for (i in 0 until chunk.frames) {
+                            val sample = (chunk.pcm[2 * i].toInt() + chunk.pcm[2 * i + 1].toInt()) / 65536f
+                            pcm.writeFloat(rumble?.next(sample) ?: sample)
+                        }
                         frames += chunk.frames
                         check(frames * 2 <= 0xFFFFFFFFL - 36) { AppText.get(R.string.ai_recording_too_large) }
                         val percent = if (decoder.durationUs > 0) ((chunk.ptsUs * 30 / decoder.durationUs).toInt()).coerceIn(0, 30) else 0
@@ -80,13 +85,20 @@ internal object NoiseReduction {
                 wav.write(header.array())
                 val bytes = ByteBuffer.allocate(960).order(ByteOrder.LITTLE_ENDIAN)
                 var reported = -1
-                resample(cleaned, noiseFrames, 48000, rate, frames) { block, count, done ->
-                    bytes.clear()
-                    for (i in 0 until count) bytes.putShort((block[i] * 32768f).roundToInt().coerceIn(-32768, 32767).toShort())
-                    wav.write(bytes.array(), 0, count * 2)
-                    val percent = (done * 10 / frames).toInt()
-                    if (percent != reported) { progress(0.9f + percent / 100f, AppText.get(R.string.ai_saving_cleaned_audio)); reported = percent }
-                }
+                val original = if (source.blend < 1.0) DataInputStream(decoded.inputStream().buffered()) else null
+                val keep = (1.0 - source.blend).toFloat()
+                try {
+                    resample(cleaned, noiseFrames, 48000, rate, frames) { block, count, done ->
+                        bytes.clear()
+                        for (i in 0 until count) {
+                            val mixed = if (original == null) block[i] else block[i] * (1f - keep) + original.readFloat() * keep
+                            bytes.putShort((mixed * 32768f).roundToInt().coerceIn(-32768, 32767).toShort())
+                        }
+                        wav.write(bytes.array(), 0, count * 2)
+                        val percent = (done * 10 / frames).toInt()
+                        if (percent != reported) { progress(0.9f + percent / 100f, AppText.get(R.string.ai_saving_cleaned_audio)); reported = percent }
+                    }
+                } finally { original?.close() }
             }
             coroutineContext.ensureActive()
             return aiMedia(context, output, "audio/wav", mapOf("duration" to "${frames * 1_000_000 / rate}"))
@@ -94,6 +106,33 @@ internal object NoiseReduction {
         } finally {
             decoded.delete(); cleaned.delete()
             if (!success) output.delete()
+        }
+    }
+
+    private class Rumble(rate: Int, hz: Double) {
+        private val b0: Double
+        private val b1: Double
+        private val a1: Double
+        private val a2: Double
+        private var x1 = 0.0
+        private var x2 = 0.0
+        private var y1 = 0.0
+        private var y2 = 0.0
+
+        init {
+            val w = 2 * Math.PI * hz / rate
+            val alpha = Math.sin(w) / (2 * 0.70710678)
+            val a0 = 1 + alpha
+            b0 = (1 + Math.cos(w)) / 2 / a0
+            b1 = -(1 + Math.cos(w)) / a0
+            a1 = -2 * Math.cos(w) / a0
+            a2 = (1 - alpha) / a0
+        }
+
+        fun next(x: Float): Float {
+            val y = b0 * x + b1 * x1 + b0 * x2 - a1 * y1 - a2 * y2
+            x2 = x1; x1 = x.toDouble(); y2 = y1; y1 = y
+            return y.toFloat()
         }
     }
 

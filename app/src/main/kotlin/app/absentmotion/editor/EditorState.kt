@@ -5,11 +5,13 @@ import app.absentmotion.R
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import app.absentmotion.engine.EngineThread
 import app.absentmotion.engine.SnapGuide
+import app.absentmotion.i18n.txt
 import app.absentmotion.library.AppSettings
 import app.absentmotion.library.ProjectSaver
 import app.absentmotion.library.ProjectStore
@@ -87,6 +89,8 @@ class EditorState(
     var presetsOpen by mutableStateOf(false)
 
     var effectBrowserOpen by mutableStateOf(false)
+    var effectCategory by mutableStateOf<String?>(null)
+    var audioFxFocus by mutableStateOf<Int?>(null)
     var effectIndex by mutableIntStateOf(-1)
 
     var effectDetail by mutableStateOf<String?>(null)
@@ -229,9 +233,19 @@ class EditorState(
         edit(key) { it.update(id, sampleMs, change) }
     }
 
+    val historyNotes = mutableStateListOf<HistoryNote>()
+    private var historyNoteCount = 0L
+
+    private fun note(undone: Boolean, change: Pair<Scene, Scene>) {
+        val what = describeEdit(change.first, change.second)
+        historyNotes.add(HistoryNote(++historyNoteCount, txt(if (undone) R.string.history_undid else R.string.history_redid, what)))
+        while (historyNotes.size > MAX_NOTES) historyNotes.removeAt(0)
+    }
+
     fun undo() {
         Glide.interrupt()
         val previous = undoStack.removeLastOrNull() ?: return
+        note(true, previous to scene)
         redoStack.addLast(scene)
         lastEditKey = null
         apply(previous)
@@ -240,6 +254,7 @@ class EditorState(
     fun redo() {
         Glide.interrupt()
         val next = redoStack.removeLastOrNull() ?: return
+        note(false, scene to next)
         undoStack.addLast(scene)
         lastEditKey = null
         apply(next)
@@ -259,6 +274,7 @@ class EditorState(
 
     private companion object {
         const val MAX_UNDO = 200
+        const val MAX_NOTES = 2
         val ZOOM_STEPS = floatArrayOf(0.01f, 0.05f, 0.1f, 0.25f, 0.5f, 1f, 1.5f, 2f, 3f, 4f, 8f, 16f, 32f, 64f)
     }
 }

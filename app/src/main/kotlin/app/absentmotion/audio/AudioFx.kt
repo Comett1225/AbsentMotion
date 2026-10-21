@@ -6,13 +6,15 @@ import app.absentmotion.model.Layer
 import app.absentmotion.model.XmlNode
 import java.math.BigDecimal
 import java.math.MathContext
+import kotlin.math.abs
+import kotlin.math.pow
 
 class FxParam(
     val key: String, @StringRes val label: Int, val min: Float, val max: Float, val default: Float,
     val unit: String = "", val log: Boolean = false, @StringRes val choices: List<Int> = emptyList(),
 )
 
-enum class FxKind(val id: Int, val xml: String, @StringRes val label: Int, val params: List<FxParam>) {
+enum class FxKind(val id: Int, val xml: String, @StringRes val label: Int, val params: List<FxParam>, val units: Int = 1) {
     Eq(0, "eq", R.string.audio_fx_equalizer, listOf(
         FxParam("lowFreq", R.string.audio_param_low_freq, 20f, 1000f, 120f, "Hz", log = true),
         FxParam("lowGain", R.string.audio_param_low_gain, -24f, 24f, 0f, "dB"),
@@ -60,6 +62,23 @@ enum class FxKind(val id: Int, val xml: String, @StringRes val label: Int, val p
         FxParam("release", R.string.audio_param_release, 5f, 2000f, 100f, "ms", log = true),
         FxParam("range", R.string.audio_param_range, 0f, 100f, 80f, "dB"),
     )),
+    HighPitch(NativeFx.PITCH, "highpitch", R.string.audio_fx_high_pitch, listOf(
+        FxParam("amount", R.string.audio_param_amount, 0f, 12f, 5f, "st"),
+    )),
+    LowPitch(NativeFx.PITCH, "lowpitch", R.string.audio_fx_low_pitch, listOf(
+        FxParam("amount", R.string.audio_param_amount, 0f, 12f, 5f, "st"),
+    )),
+    Voice(-1, "voice", R.string.audio_fx_voice_filter, listOf(
+        FxParam("pitch", R.string.audio_param_pitch, -12f, 12f, 0f, "st"),
+        FxParam("bass", R.string.audio_param_bass, -12f, 12f, 0f, "dB"),
+        FxParam("treble", R.string.audio_param_treble, -12f, 12f, 0f, "dB"),
+        FxParam("muffle", R.string.audio_param_muffle, 0f, 1f, 0f, "%"),
+        FxParam("thin", R.string.audio_param_thin, 0f, 1f, 0f, "%"),
+        FxParam("full", R.string.audio_param_fullness, 0f, 1f, 0f, "%"),
+        FxParam("echo", R.string.audio_fx_echo, 0f, 1f, 0f, "%"),
+        FxParam("reverb", R.string.audio_fx_reverb, 0f, 1f, 0f, "%"),
+        FxParam("pingPong", R.string.audio_param_ping_pong, 0f, 1f, 0f, choices = listOf(R.string.audio_choice_off, R.string.audio_choice_on)),
+    ), units = 7),
 }
 
 private fun filter(cutoff: Float) = listOf(
@@ -120,17 +139,51 @@ fun Layer.moveAudioEffect(from: Int, to: Int): Layer {
 
 internal class FxSpec(val kinds: IntArray, val values: FloatArray)
 
+internal class FxUnit(val native: Int, val mix: Float, val bypass: Boolean, val values: FloatArray)
+
+private fun AudioFx.units(kind: FxKind): List<FxUnit> = when (kind) {
+    FxKind.HighPitch -> listOf(FxUnit(kind.id, mix, bypass, floatArrayOf(this[kind.params[0]])))
+    FxKind.LowPitch -> listOf(FxUnit(kind.id, mix, bypass, floatArrayOf(-this[kind.params[0]])))
+    FxKind.Voice -> voiceUnits()
+    else -> listOf(FxUnit(kind.id, mix, bypass, FloatArray(kind.params.size) { this[kind.params[it]] }))
+}
+
+private fun AudioFx.voiceUnits(): List<FxUnit> {
+    val p = FxKind.Voice.params
+    val pitch = this[p[0]]
+    val bass = this[p[1]]
+    val treble = this[p[2]]
+    val muffle = this[p[3]]
+    val thin = this[p[4]]
+    val full = this[p[5]]
+    val echo = this[p[6]]
+    val reverb = this[p[7]]
+    val pingPong = this[p[8]]
+    fun unit(native: Int, off: Boolean, vararg values: Float) = FxUnit(native, mix, bypass || off, values)
+    return listOf(
+        unit(NativeFx.PITCH, abs(pitch) < 0.05f, pitch),
+        unit(FxKind.Eq.id, bass == 0f && treble == 0f, 150f, bass, 400f, 0f, 1f, 1500f, 0f, 1f, 5000f, 0f, 1f, 4500f, treble),
+        unit(FxKind.HighPass.id, thin < 0.01f, 20f * 60f.pow(thin), 0.70710677f, 12f),
+        unit(FxKind.LowPass.id, muffle < 0.01f, 20000f * 0.02f.pow(muffle), 0.70710677f, 24f),
+        unit(FxKind.Compressor.id, full < 0.01f, -20f - 10f * full, 1.5f + 5f * full, 8f, 140f, 8f, 10f * full),
+        unit(FxKind.Echo.id, echo < 0.01f, 300f, 0.35f, 0.5f * echo, pingPong, 120f),
+        unit(FxKind.Reverb.id, reverb < 0.01f, 0.3f + 0.65f * reverb, 0.5f, 0.55f * reverb, 1f, 1f, 12f),
+    )
+}
+
+fun List<AudioFx>.fits(kind: FxKind): Boolean = sumOf { it.kind?.units ?: 0 } + kind.units <= MAX_AUDIO_FX
+
 internal fun List<AudioFx>.spec(): FxSpec? {
-    val known = mapNotNull { fx -> fx.kind?.let { fx to it } }.take(MAX_AUDIO_FX)
-    if (known.isEmpty()) return null
-    val values = FloatArray(known.sumOf { 2 + it.second.params.size })
+    val units = mapNotNull { fx -> fx.kind?.let(fx::units) }.flatten().take(MAX_AUDIO_FX)
+    if (units.isEmpty()) return null
+    val values = FloatArray(units.sumOf { 2 + it.values.size })
     var at = 0
-    for ((fx, kind) in known) {
-        values[at++] = fx.mix
-        values[at++] = if (fx.bypass) 1f else 0f
-        for (param in kind.params) values[at++] = fx[param]
+    for (unit in units) {
+        values[at++] = unit.mix
+        values[at++] = if (unit.bypass) 1f else 0f
+        for (value in unit.values) values[at++] = value
     }
-    return FxSpec(IntArray(known.size) { known[it].second.id }, values)
+    return FxSpec(IntArray(units.size) { units[it].native }, values)
 }
 
 class AudioPreset(@StringRes val name: Int, val effects: List<AudioFx>)
@@ -177,6 +230,27 @@ val AudioPresets: List<AudioPreset> by lazy { listOf(
         AudioFx.of(FxKind.Gate, "threshold" to -45f, "attack" to 2f, "hold" to 80f, "release" to 150f, "range" to 60f),
     )),
 ) }
+
+class VoicePreset(@StringRes val name: Int, val effect: AudioFx)
+
+val VoicePresets: List<VoicePreset> by lazy { listOf(
+    VoicePreset(R.string.voice_helium, AudioFx.of(FxKind.Voice, "pitch" to 8f, "treble" to 3f)),
+    VoicePreset(R.string.voice_deep, AudioFx.of(FxKind.Voice, "pitch" to -5f, "bass" to 5f, "full" to 0.3f)),
+    VoicePreset(R.string.audio_preset_bass_boost, AudioFx.of(FxKind.Voice, "bass" to 9f, "full" to 0.2f)),
+    VoicePreset(R.string.voice_full, AudioFx.of(FxKind.Voice, "bass" to 4f, "treble" to 2f, "full" to 0.55f)),
+    VoicePreset(R.string.audio_preset_vocal_clarity, AudioFx.of(FxKind.Voice, "thin" to 0.2f, "treble" to 4f, "full" to 0.4f)),
+    VoicePreset(R.string.voice_echoey, AudioFx.of(FxKind.Voice, "echo" to 0.55f, "reverb" to 0.15f)),
+    VoicePreset(R.string.voice_ethereal, AudioFx.of(FxKind.Voice, "pitch" to 2f, "treble" to 3f, "echo" to 0.2f, "reverb" to 0.75f, "pingPong" to 1f)),
+    VoicePreset(R.string.audio_preset_underwater, AudioFx.of(FxKind.Voice, "muffle" to 0.85f, "reverb" to 0.4f)),
+    VoicePreset(R.string.voice_cheap_mic, AudioFx.of(FxKind.Voice, "thin" to 0.55f, "muffle" to 0.45f, "full" to 0.6f)),
+    VoicePreset(R.string.audio_preset_telephone, AudioFx.of(FxKind.Voice, "thin" to 0.7f, "muffle" to 0.45f, "full" to 0.4f)),
+) }
+
+fun Layer.withVoicePreset(preset: VoicePreset): Layer {
+    val effects = audioEffects
+    val at = effects.indexOfFirst { it.kind == FxKind.Voice }
+    return withAudioEffects(if (at < 0) effects + preset.effect else effects.mapIndexed { i, fx -> if (i == at) preset.effect else fx })
+}
 
 private fun number(value: Float): String =
     BigDecimal(value.toDouble()).round(MathContext(6)).stripTrailingZeros().toPlainString()

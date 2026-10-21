@@ -71,17 +71,65 @@ class AudioFxTest {
         assertTrue(reset.bypass)
     }
 
+    private val nativeCounts = mapOf(0 to 13, 1 to 3, 2 to 3, 3 to 6, 4 to 5, 5 to 6, 6 to 5, NativeFx.PITCH to 1)
+
     @Test fun parameterLayoutMatchesTheNativeBridge() {
-        val counts = mapOf(FxKind.Eq to 13, FxKind.LowPass to 3, FxKind.HighPass to 3, FxKind.Reverb to 6, FxKind.Echo to 5, FxKind.Compressor to 6, FxKind.Gate to 5)
+        val counts = mapOf(FxKind.Eq to 13, FxKind.LowPass to 3, FxKind.HighPass to 3, FxKind.Reverb to 6, FxKind.Echo to 5, FxKind.Compressor to 6, FxKind.Gate to 5,
+            FxKind.HighPitch to 1, FxKind.LowPitch to 1, FxKind.Voice to 9)
         assertEquals(FxKind.entries.toSet(), counts.keys)
         for ((kind, count) in counts) {
             assertEquals(kind.xml, count, kind.params.size)
-            assertEquals(kind, FxKind.entries.single { it.id == kind.id })
             for (p in kind.params) assertTrue("${kind.xml} ${p.key}", p.default in p.min..p.max && (!p.log || p.min > 0f))
         }
+        for (kind in FxKind.entries.filter { it.units == 1 && it != FxKind.HighPitch && it != FxKind.LowPitch })
+            assertEquals(kind, FxKind.entries.single { it.id == kind.id })
         val spec = FxKind.entries.map { AudioFx.of(it) }.spec()!!
-        assertEquals(counts.values.sumOf { it + 2 }, spec.values.size)
+        assertEquals(spec.kinds.sumOf { 2 + nativeCounts.getValue(it) }, spec.values.size)
+        assertEquals(FxKind.entries.sumOf { it.units }, spec.kinds.size)
         assertTrue((List(MAX_AUDIO_FX + 3) { AudioFx.of(FxKind.Eq) }).spec()!!.kinds.size == MAX_AUDIO_FX)
+    }
+
+    @Test fun pitchEffectsAndVoiceFiltersBecomeNativeUnits() {
+        val up = listOf(AudioFx.of(FxKind.HighPitch, "amount" to 7f)).spec()!!
+        val down = listOf(AudioFx.of(FxKind.LowPitch, "amount" to 7f)).spec()!!
+        assertArrayEquals(intArrayOf(NativeFx.PITCH), up.kinds)
+        assertEquals(7f, up.values[2])
+        assertEquals(-7f, down.values[2])
+        val neutral = listOf(AudioFx.of(FxKind.Voice)).spec()!!
+        assertArrayEquals(intArrayOf(NativeFx.PITCH, 0, 2, 1, 5, 4, 3), neutral.kinds)
+        var at = 0
+        for (native in neutral.kinds) { assertEquals(1f, neutral.values[at + 1]); at += 2 + nativeCounts.getValue(native) }
+        assertEquals(neutral.values.size, at)
+        assertTrue(listOf(AudioFx.of(FxKind.Voice).withBypass(true)).spec()!!.values.let { v -> var i = 0; neutral.kinds.all { k -> (v[i + 1] == 1f).also { i += 2 + nativeCounts.getValue(k) } } })
+    }
+
+    @Test fun everyVoiceFilterKeepsTheSameChainAndChangesTheSound() {
+        assertTrue(VoicePresets.size in 6..12)
+        for (preset in VoicePresets) {
+            assertEquals(FxKind.Voice, preset.effect.kind)
+            val spec = listOf(preset.effect).spec()!!
+            assertArrayEquals(intArrayOf(NativeFx.PITCH, 0, 2, 1, 5, 4, 3), spec.kinds)
+            assertTrue(spec.values.all { it.isFinite() })
+            var at = 0
+            var active = 0
+            for (native in spec.kinds) { if (spec.values[at + 1] == 0f) active++; at += 2 + nativeCounts.getValue(native) }
+            assertTrue("${preset.name}", active > 0)
+        }
+        val layer = Scene.parse(old).layer(1)!!.withAudioEffects(listOf(AudioFx.of(FxKind.Reverb)))
+        val first = layer.withVoicePreset(VoicePresets[0])
+        assertEquals(listOf(FxKind.Reverb, FxKind.Voice), first.audioEffects.map { it.kind })
+        val second = first.withVoicePreset(VoicePresets[1])
+        assertEquals(listOf(FxKind.Reverb, FxKind.Voice), second.audioEffects.map { it.kind })
+        assertEquals(VoicePresets[1].effect, second.audioEffects[1])
+        assertTrue(listOf(AudioFx.of(FxKind.Voice)).fits(FxKind.Voice))
+        assertTrue(!listOf(AudioFx.of(FxKind.Voice), AudioFx.of(FxKind.Voice)).fits(FxKind.Voice))
+        assertTrue(listOf(AudioFx.of(FxKind.Voice), AudioFx.of(FxKind.Voice)).fits(FxKind.Eq))
+    }
+
+    @Test fun theAudioCategoryListsEveryEffectOnce() {
+        val shown = app.absentmotion.ui.editor.effects.AudioOrder
+        assertEquals(FxKind.entries.toSet(), shown.toSet())
+        assertEquals(shown.size, shown.distinct().size)
     }
 
     @Test fun everyPresetIsAValidChain() {

@@ -312,6 +312,7 @@ void customize(dsp::Delay& e) { e.params.timeMs = 8.5f; e.params.feedback = 0.7f
 void customize(dsp::Compressor& e) { e.params.thresholdDb = -25.0f; }
 void customize(dsp::NoiseGate& e) { e.params.thresholdDb = -10.0f; }
 void customize(dsp::Limiter& e) { e.params.ceilingDb = -6.0f; }
+void customize(dsp::PitchShifter& e) { e.params.semitones = 5.0f; }
 
 void automate(dsp::Equalizer& e) { e.params.lowShelf.gainDb = -12.0f; e.params.peaks[1].frequency = 4000.0f; }
 void automate(dsp::Filters& e) { e.params.lowPassHz = 500.0f; e.params.highPass = false; e.params.slope = 12; }
@@ -320,6 +321,7 @@ void automate(dsp::Delay& e) { e.params.timeMs = 4.0f; e.params.pingPong = true;
 void automate(dsp::Compressor& e) { e.params.ratio = 10.0f; e.params.attackMs = 2.0f; e.params.thresholdDb = -12.0f; }
 void automate(dsp::NoiseGate& e) { e.params.thresholdDb = -3.0f; e.params.rangeDb = 35.0f; }
 void automate(dsp::Limiter& e) { e.params.lookaheadMs = 5.0f; e.params.ceilingDb = -12.0f; }
+void automate(dsp::PitchShifter& e) { e.params.semitones = -7.0f; }
 
 template <typename Effect>
 void testStreaming(const char* name) {
@@ -363,6 +365,39 @@ void testStreaming(const char* name) {
         }
     }
     std::printf("PASS %-10s block invariance (%.2g), reset, allocation and finite checks\n", name, difference);
+}
+
+void testPitch() {
+    for (int rate : {22050, 44100, 48000, 96000}) for (double semitones : {12.0, 7.0, 2.0, -3.0, -7.0, -12.0}) for (double hz : {220.0, 440.0}) {
+        dsp::PitchShifter shifter;
+        shifter.params.semitones = static_cast<float>(semitones);
+        shifter.prepare(rate, 4096);
+        std::vector<float> data(static_cast<std::size_t>(4 * rate));
+        for (int i = 0; i < 2 * rate; ++i)
+            data[static_cast<std::size_t>(2 * i)] = data[static_cast<std::size_t>(2 * i + 1)] = static_cast<float>(0.2 * std::sin(2.0 * pi * hz * i / rate));
+        runBlocks(shifter, data, 1000);
+        int crossings = 0;
+        double energy = 0.0, peak = 0.0;
+        for (int i = rate; i < 2 * rate; ++i) {
+            const float a = data[static_cast<std::size_t>(2 * i - 2)], b = data[static_cast<std::size_t>(2 * i)];
+            if (a < 0.0f && b >= 0.0f) ++crossings;
+            energy += static_cast<double>(b) * b;
+            peak = std::max(peak, std::abs(static_cast<double>(b)));
+        }
+        const double expected = hz * std::pow(2.0, semitones / 12.0);
+        const double rms = std::sqrt(energy / rate);
+        require(std::abs(crossings - expected) <= 0.02 * expected + 2.0, "Pitch shifted to the wrong frequency (" + std::to_string(rate) + " Hz, " + std::to_string(semitones) + " st, " + std::to_string(crossings) + " vs " + std::to_string(expected) + ")");
+        require(rms > 0.2 * 0.7071 * 0.8 && rms < 0.2 * 0.7071 * 1.2 && peak < 0.2 * 1.25, "Pitch shifted level changed (" + std::to_string(rms) + ", " + std::to_string(peak) + ")");
+    }
+    dsp::PitchShifter noise;
+    noise.params.semitones = 4.0f;
+    noise.prepare(48000, 4096);
+    Random random;
+    std::vector<float> data(2 * 48000);
+    for (auto& sample : data) sample = random.next();
+    runBlocks(noise, data, 480);
+    for (float sample : data) require(std::abs(sample) < 2.0f, "Pitch shifter exploded on noise");
+    std::printf("PASS Pitch shifter frequency and level over rates, shifts and tones\n");
 }
 
 void testChain() {
@@ -495,6 +530,8 @@ int main() {
         testStreaming<dsp::Compressor>("Compressor");
         testStreaming<dsp::NoiseGate>("NoiseGate");
         testStreaming<dsp::Limiter>("Limiter");
+        testStreaming<dsp::PitchShifter>("Pitch");
+        testPitch();
         testChain();
         timing<dsp::Equalizer>("Equalizer");
         timing<dsp::Filters>("Filters");
@@ -503,6 +540,7 @@ int main() {
         timing<dsp::Compressor>("Compressor");
         timing<dsp::NoiseGate>("NoiseGate");
         timing<dsp::Limiter>("Limiter");
+        timing<dsp::PitchShifter>("Pitch");
         timingChain();
         std::puts("ALL TESTS PASSED");
         return 0;

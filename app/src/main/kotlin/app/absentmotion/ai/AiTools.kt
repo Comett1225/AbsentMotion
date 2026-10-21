@@ -51,6 +51,8 @@ class AiTools(private val context: Context, private val state: EditorState, priv
     var retry by mutableStateOf<AiAction?>(null)
         private set
     var videoSetup by mutableStateOf<Layer?>(null)
+    var noiseSetup by mutableStateOf<Layer?>(null)
+    var noiseSource by mutableStateOf(NoiseSource.Voice)
     var videoSide by mutableIntStateOf(MatteSides[1])
     private var job: Job? = null
 
@@ -66,7 +68,12 @@ class AiTools(private val context: Context, private val state: EditorState, priv
             videoSetup = layer
             return
         }
+        if (action == AiAction.Noise && !confirmed) {
+            noiseSetup = layer
+            return
+        }
         videoSetup = null
+        noiseSetup = null
         running = action; progress = 0f; message = AppText.get(R.string.ai_preparing); retry = null
         job = scope.launch {
             var result: AiMedia? = null
@@ -82,7 +89,7 @@ class AiTools(private val context: Context, private val state: EditorState, priv
                     check(state.scene.layer(layer.id) == layer) { AppText.get(R.string.ai_layer_changed) }
                     val groupId = Layer.newId()
                     val next = checkNotNull(state.scene.withVideoMatte(layer, matte.media.declaration, matte.frameWidth, matte.frameHeight, Layer.newId(), groupId)) { AppText.get(R.string.ai_cannot_mask) }
-                    state.edit { next }
+                    state.edit { next.update(groupId) { it.withAiMark(AiKind.Video, null, null) } }
                     state.selectedId = groupId
                 } else {
                     val original = state.scene.media(layer.node[if (action == AiAction.Noise) "src" else "fillImage"] ?: "")
@@ -90,16 +97,19 @@ class AiTools(private val context: Context, private val state: EditorState, priv
                         result = when (action) {
                             AiAction.Background -> BackgroundRemoval.run(context, layer.node["fillImage"]!!, original,
                                 state.engine.maxPictureSize(), report)
-                            else -> NoiseReduction.run(context, layer.node["src"]!!, report)
+                            else -> NoiseReduction.run(context, layer.node["src"]!!, noiseSource, report)
                         }
                     }
                     ensureActive()
                     check(state.scene.layer(layer.id) == layer) { AppText.get(R.string.ai_layer_changed) }
                     val output = result!!
+                    val kind = if (action == AiAction.Noise) AiKind.Noise else AiKind.Background
+                    val used = noiseSource
                     state.edit { scene ->
-                        scene.update(layer.id) { it.copy(node = it.node.with(
-                            if (action == AiAction.Noise) "src" else "fillImage", output.declaration.uri)) }
-                            .withMedia(output.declaration)
+                        scene.update(layer.id) {
+                            it.copy(node = it.node.with(kind.attribute!!, output.declaration.uri))
+                                .withAiMark(kind, it.node[kind.attribute], output.declaration.uri, if (kind == AiKind.Noise) used.xml else null)
+                        }.withMedia(output.declaration)
                     }
                 }
                 committed = true

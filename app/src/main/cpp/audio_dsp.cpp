@@ -459,6 +459,103 @@ void NoiseGate::process(float* data, int frames) noexcept {
     }
 }
 
+void PitchShifter::prepare(double sampleRate, int) {
+    sampleRate_ = rate(sampleRate);
+    rampSamples_ = rampLength(sampleRate_);
+    grain_ = std::max(64, 2 * static_cast<int>(std::round(sampleRate_ * 0.0175)));
+    search_ = std::max(8, static_cast<int>(std::round(sampleRate_ * 0.006)));
+    window_ = std::max(16, static_cast<int>(std::round(sampleRate_ * 0.008)));
+    std::size_t size = 1;
+    while (size < static_cast<std::size_t>(grain_ + 2 * search_ + window_ + 32)) size <<= 1;
+    mask_ = size - 1;
+    ring_.assign(size, {});
+    mono_.assign(size, 0.0f);
+    shape_.resize(static_cast<std::size_t>(grain_));
+    for (int i = 0; i < grain_; ++i) shape_[static_cast<std::size_t>(i)] = static_cast<float>(0.5 - 0.5 * std::cos(2.0 * pi * i / grain_));
+    prepared_ = true;
+    reset();
+}
+
+void PitchShifter::configure(int samples) noexcept {
+    ratio_.set(std::exp2(bound(params.semitones, -12.0, 12.0, 0.0) / 12.0), samples);
+}
+
+void PitchShifter::reset() noexcept {
+    std::fill(ring_.begin(), ring_.end(), std::array<float, 2>{});
+    std::fill(mono_.begin(), mono_.end(), 0.0f);
+    written_ = 0;
+    heads_[0] = {0.0, 0};
+    heads_[1] = {-1.0e9, grain_ / 2};
+    configure(0);
+}
+
+double PitchShifter::read(double position, std::size_t channel) const noexcept {
+    const auto base = static_cast<std::int64_t>(std::floor(position));
+    const double t = position - static_cast<double>(base);
+    const auto at = [&](std::int64_t index) { return static_cast<double>(ring_[static_cast<std::size_t>(index) & mask_][channel]); };
+    const double y0 = at(base - 1), y1 = at(base), y2 = at(base + 1), y3 = at(base + 2);
+    return y1 + 0.5 * t * (y2 - y0 + t * (2.0 * y0 - 5.0 * y1 + 4.0 * y2 - y3 + t * (3.0 * (y1 - y2) + y3 - y0)));
+}
+
+void PitchShifter::restart(Head& head, const Head& other) noexcept {
+    constexpr int guard = 4;
+    const double ratio = ratio_.value;
+    const std::int64_t nominal = written_ - guard - search_ - static_cast<std::int64_t>(std::ceil(std::max(0.0, ratio - 1.0) * grain_));
+    const std::int64_t end = static_cast<std::int64_t>(std::floor(other.position));
+    const auto score = [&](int shift, int stride) {
+        double cross = 0.0, power = 0.0;
+        const std::int64_t a = end - window_, b = nominal + shift - window_;
+        for (int j = 0; j < window_; j += stride) {
+            const double x = mono_[static_cast<std::size_t>(a + j) & mask_], y = mono_[static_cast<std::size_t>(b + j) & mask_];
+            cross += x * y;
+            power += y * y;
+        }
+        return cross / std::sqrt(power + 1.0e-9);
+    };
+    int best = 0;
+    double top = score(0, 2);
+    for (int shift = -search_; shift <= search_; shift += 4) {
+        const double value = score(shift, 2);
+        if (value > top + 1.0e-12) { top = value; best = shift; }
+    }
+    const int centre = best;
+    top = score(centre, 1);
+    for (int shift = centre - 3; shift <= centre + 3; ++shift) {
+        if (shift == centre || shift < -search_ || shift > search_) continue;
+        const double value = score(shift, 1);
+        if (value > top + 1.0e-12) { top = value; best = shift; }
+    }
+    head.position = static_cast<double>(nominal + best);
+}
+
+void PitchShifter::process(float* data, int frames) noexcept {
+    if (!prepared_ || !data || frames <= 0) return;
+    configure(rampSamples_);
+    const double lowest = 4.0 - static_cast<double>(mask_);
+    for (int frame = 0; frame < frames; ++frame) {
+        ratio_.next();
+        const double left = clean(data[2 * frame]), right = clean(data[2 * frame + 1]);
+        const std::size_t slot = static_cast<std::size_t>(written_) & mask_;
+        ring_[slot] = {{static_cast<float>(left), static_cast<float>(right)}};
+        mono_[slot] = static_cast<float>(0.5 * (left + right));
+        ++written_;
+        const double newest = static_cast<double>(written_) - 3.0;
+        double sum[2] = {0.0, 0.0};
+        for (std::size_t i = 0; i < 2; ++i) {
+            Head& head = heads_[i];
+            if (head.phase == 0) restart(head, heads_[1 - i]);
+            head.position = std::clamp(head.position, static_cast<double>(written_) + lowest, newest);
+            const double weight = shape_[static_cast<std::size_t>(head.phase)];
+            sum[0] += weight * read(head.position, 0);
+            sum[1] += weight * read(head.position, 1);
+            head.position += ratio_.value;
+            if (++head.phase == grain_) head.phase = 0;
+        }
+        data[2 * frame] = output(sum[0]);
+        data[2 * frame + 1] = output(sum[1]);
+    }
+}
+
 void Limiter::prepare(double sampleRate, int) {
     sampleRate_ = rate(sampleRate);
     rampSamples_ = rampLength(sampleRate_);

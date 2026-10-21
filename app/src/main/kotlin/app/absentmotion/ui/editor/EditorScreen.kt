@@ -107,6 +107,7 @@ private fun EditorBody(state: EditorState, onExit: () -> Unit) {
             Preview(state, Modifier.fillMaxSize())
             Presence(state.previewPanelOpen) { PreviewModePanel(state, Modifier.align(Alignment.CenterEnd).presence(slideX = 0.4f)) }
             AnimateButton(state, Modifier.align(Alignment.BottomEnd))
+            HistoryNotes(state, Modifier.align(Alignment.BottomCenter))
         }
         Box(Modifier.fillMaxWidth().height(46.dp).enterFade()) {
             PlayBar(state, Modifier.fillMaxSize())

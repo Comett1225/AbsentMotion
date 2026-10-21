@@ -121,19 +121,17 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier) {
         }
         Spacer(Modifier.height(28.px))
         if (state.selected?.kind == "audio") {
-            Box(Modifier.fillMaxWidth().weight(1f)) {
-                val press = remember { MutableInteractionSource() }
-                Column(Modifier.fillMaxSize().pressScale(press, TilePress).clip(ToolShape).background(Am.Button).clickable(press, LocalIndication.current) { openPresets(state) },
-                    Arrangement.Center, Alignment.CenterHorizontally) {
-                    PanelIcon(PanelIcons.Star, Am.OnDark, size = 28.dp)
-                    Text(stringResource(R.string.presets), color = ToolLabel, fontSize = 13.sp)
-                }
-                Box(Modifier.align(Alignment.TopEnd).padding(8.dp).size(48.dp, 28.dp).clip(ToolShape)
-                    .background(Am.Button).clickable { state.effectBrowserOpen = true }, Alignment.Center) {
-                    Text(stringResource(R.string.ai), color = Am.OnDark, fontSize = 13.sp)
-                }
+            Row(Modifier.fillMaxWidth().height(160.px), Arrangement.spacedBy(17.px)) {
+                ToolButton(Presets, Modifier.weight(1f)) { openPresets(state) }
+                ToolButton(Effects, Modifier.weight(1f)) { openEffectBrowser(state, "audio") }
+                ToolButton(VoiceFilters, Modifier.weight(1f)) { openEffectBrowser(state, "voice") }
             }
-            Spacer(Modifier.height(49.px))
+            Spacer(Modifier.height(17.px))
+            Row(Modifier.fillMaxWidth().height(160.px), Arrangement.spacedBy(17.px)) {
+                ToolButton(AiTools, Modifier.weight(1f)) { openEffectBrowser(state, "ai") }
+                Spacer(Modifier.weight(1f))
+                Spacer(Modifier.weight(1f))
+            }
             return@Column
         }
         if (state.selected?.kind == "camera") {
@@ -185,6 +183,12 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier) {
     }
 }
 
+private fun openEffectBrowser(state: EditorState, category: String) {
+    state.playing = false
+    state.effectCategory = category
+    state.effectBrowserOpen = true
+}
+
 private fun openPresets(state: EditorState) {
     state.playing = false
     state.presetsOpen = true
@@ -210,6 +214,8 @@ private val CameraMoves = Tool(R.string.camera_moves, PanelIcons.Animate, 19.4f)
 private val ModelOptions = Tool(R.string.layer_tool_model_options, PanelIcons.TabTilt, 19.4f)
 private val Presets = Tool(R.string.presets, PanelIcons.Star, 19.4f)
 private val Effects = Tool(R.string.layer_tool_effects, PanelIcons.Effects, 19.6f)
+private val VoiceFilters = Tool(R.string.layer_tool_voice_filters, PanelIcons.Mic, 19.4f)
+private val AiTools = Tool(R.string.ai, PanelIcons.Bot, 19.4f)
 
 @Composable
 private fun SmallTool(icon: ImageVector, description: String, modifier: Modifier, shape: RoundedCornerShape, enabled: Boolean = true, onClick: () -> Unit = {}) {

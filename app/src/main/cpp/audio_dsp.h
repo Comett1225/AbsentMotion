@@ -2,6 +2,7 @@
 
 #include <array>
 #include <cstddef>
+#include <cstdint>
 #include <vector>
 
 namespace dsp {
@@ -191,6 +192,37 @@ private:
     std::array<detail::Ramp, 5> controls_;
     std::array<double, 2> timeKeys_{{-1.0, -1.0}};
     void configure(int samples) noexcept;
+};
+
+struct PitchShifter {
+    struct Params {
+        float semitones = 0.0f;
+    } params;
+    void prepare(double sampleRate, int maxBlock);
+    void reset() noexcept;
+    void process(float* data, int frames) noexcept;
+
+private:
+    struct Head {
+        double position = 0.0;
+        int phase = 0;
+    };
+    double sampleRate_ = 48000.0;
+    int rampSamples_ = 720;
+    bool prepared_ = false;
+    int grain_ = 0;
+    int search_ = 0;
+    int window_ = 0;
+    std::size_t mask_ = 0;
+    std::int64_t written_ = 0;
+    std::vector<std::array<float, 2>> ring_;
+    std::vector<float> mono_;
+    std::vector<float> shape_;
+    std::array<Head, 2> heads_;
+    detail::Ramp ratio_;
+    void configure(int samples) noexcept;
+    void restart(Head& head, const Head& other) noexcept;
+    double read(double position, std::size_t channel) const noexcept;
 };
 
 struct Limiter {
