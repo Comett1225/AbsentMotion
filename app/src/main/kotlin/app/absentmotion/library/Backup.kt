@@ -20,7 +20,7 @@ object Backup {
     private const val FORMAT = "AbsentMotion backup 1"
     private const val MAX_TEXT = 64 shl 20
 
-    data class Restored(val added: Int, val renamed: Int, val skipped: Int)
+    data class Restored(val added: Int, val renamed: Int, val skipped: Int, val rejected: Int = 0)
 
     fun files(root: File, includeMedia: Boolean, ai: File? = null): List<Pair<String, File>> {
         fun under(base: File, prefix: String) = base.walkTopDown().filter { it.isFile && it.extension != "tmp" && it.extension != "part" }
@@ -64,6 +64,7 @@ object Backup {
         val projects = File(root, "projects")
         val renamed = HashMap<String, String>()
         val skipped = HashSet<String>()
+        val rejected = HashSet<String>()
         val waiting = ArrayList<Pair<String, String>>()
         var added = 0
         var oldRoot = ""
@@ -109,14 +110,17 @@ object Backup {
                 if (entry.isDirectory || parts.any { it.isEmpty() || it == "." || it == ".." }) continue
                 val isScene = parts.size == 2 && parts[0] == "projects" && parts[1].endsWith(".xml")
                 if (isScene) {
-                    waiting += parts[1].removeSuffix(".xml") to readText(zip)
+                    val id = parts[1].removeSuffix(".xml")
+                    val text = readText(zip)
+                    if (runCatching { XmlNode.parse(text.removePrefix("\uFEFF")) }.getOrNull()?.let(Importer::checkScene) != null) rejected += id
+                    else waiting += id to text
                     continue
                 }
                 if (waiting.isNotEmpty()) settle()
                 val target = when {
                     parts.size == 2 && parts[0] == "projects" && parts[1].endsWith(".png") ->
-                        parts[1].removeSuffix(".png").takeIf { it !in skipped }?.let { File(projects, (renamed[it] ?: it) + ".png") }
-                    parts.size == 4 && parts[0] == "projects" && parts[1] == "versions" -> File(projects, "versions/${renamed[parts[2]] ?: parts[2]}/${parts[3]}")
+                        parts[1].removeSuffix(".png").takeIf { it !in skipped && it !in rejected }?.let { File(projects, (renamed[it] ?: it) + ".png") }
+                    parts.size == 4 && parts[0] == "projects" && parts[1] == "versions" -> if (parts[2] in rejected) null else File(projects, "versions/${renamed[parts[2]] ?: parts[2]}/${parts[3]}")
                     parts.size >= 3 && parts[0] == "media" -> File(root, "media/${renamed[parts[1]] ?: parts[1]}/" + parts.drop(2).joinToString("/"))
                     parts.size >= 3 && parts[0] == "templates" -> File(root, parts.joinToString("/"))
                     parts.size == 2 && parts[0] == "presets" && parts[1].endsWith(".xml") -> File(root, "presets/${parts[1]}")
@@ -140,7 +144,7 @@ object Backup {
             }
             if (waiting.isNotEmpty()) settle()
         }
-        return Restored(added, renamed.size, skipped.size)
+        return Restored(added, renamed.size, skipped.size, rejected.size)
     }
 
     private fun readText(input: InputStream): String {

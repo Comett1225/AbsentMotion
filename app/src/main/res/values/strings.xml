@@ -263,6 +263,10 @@
         <item quantity="one">%1$s project was already here and was left as it is.</item>
         <item quantity="other">%1$s projects were already here and were left as they are.</item>
     </plurals>
+    <plurals name="backup_restored_rejected">
+        <item quantity="one">%1$s project was not restored because its size or frame rate is not valid.</item>
+        <item quantity="other">%1$s projects were not restored because their size or frame rate is not valid.</item>
+    </plurals>
     <string name="about_version">Version %1$s</string>
     <string name="about_licence_line">Free and open source, licensed under the Apache License 2.0.</string>
     <string name="about_independent_note">AbsentMotion is an independent project. It is not affiliated with, endorsed by or sponsored by any other app maker; names of other products belong to their owners.</string>
