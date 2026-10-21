@@ -182,8 +182,8 @@ private fun Playback(state: EditorState) {
                 } else {
                     startFrame + (((now - startNanos) * fps + 250_000_000L) / 1_000_000_000L).toInt()
                 }
-                if (frame >= state.scene.lastFrame) {
-                    if (state.settings.loopingPlay) {
+                if (frame > state.scene.lastFrame) {
+                    if (state.settings.loopingPlay && state.scene.lastFrame > 0) {
                         startFrame = 0
                         startMs = state.scene.frameStart(0)
                         startNanos = now

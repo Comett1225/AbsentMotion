@@ -103,7 +103,7 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier) {
             Spacer(Modifier.width(17.px))
             Row(Modifier.weight(1f).fillMaxHeight(), Arrangement.spacedBy(3.px)) {
                 val clip = state.selected
-                val past = clip != null && state.timeMs > clip.endTime
+                val past = clip != null && state.sampleMs > clip.endTime
                 val before = clip != null && state.timeMs < clip.startTime
                 SmallTool(PanelIcons.TrimLeft, stringResource(if (before) R.string.a11y_extend_start else R.string.a11y_trim_start), Modifier.weight(1f), ToolShape.copy(topEnd = Square, bottomEnd = Square), enabled = !past) {
                     if (before) state.moveClipEdges(false, true) else state.trimStart()

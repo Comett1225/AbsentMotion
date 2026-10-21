@@ -394,6 +394,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
 
     private var dragId = 0L
     private var edgeMs = 0f
+    private var trimBase: Layer? = null
     var limitEdge by mutableStateOf<Boolean?>(null)
         private set
     var onTick: () -> Unit = {}
@@ -647,6 +648,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
             hit is Hit.Grip -> {
                 val layer = layers.firstOrNull { it.id == hit.id }
                 dragId = hit.id
+                trimBase = layer
                 edgeMs = (if (hit.start) layer?.startTime else layer?.endTime?.plus(1))?.toFloat() ?: 0f
                 snapTargets = TimelineMath.snapTargets(state.scene, hit.id, state.frame)
                 if (hit.start) Drag.TrimStart else Drag.TrimEnd
@@ -740,6 +742,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
         edgeMs += dx / timeScale().pxPerMs
         val scene = state.scene
         val layer = layers.firstOrNull { it.id == dragId } ?: return
+        val base = trimBase ?: return
         val snap = snapNear(edgeMs)
         val frame = snap ?: TimelineMath.nearestFrame(edgeMs, fps)
         val id = dragId
@@ -747,10 +750,10 @@ private class TimelineView(val state: EditorState, density: Density, private val
         val edge = if (start) frame.coerceIn(0, scene.lastShownFrame(layer.endTime).coerceAtLeast(0)) else (frame - 1).coerceAtLeast(scene.firstShownFrame(layer.startTime)) + 1
         val time = if (start) {
             scene.frameStart(edge)
-                .also { time -> if (time != layer.startTime) state.edit("trim-start") { it.update(id) { l -> l.trimmedTo(time, l.endTime, mediaMs) } } }
+                .also { time -> if (time != layer.startTime) state.edit("trim-start") { it.update(id) { base.trimmedTo(time, base.endTime, mediaMs) } } }
         } else {
             scene.frameEnd(edge - 1)
-                .also { time -> if (time != layer.endTime) state.edit("trim-end") { it.update(id) { l -> l.trimmedTo(l.startTime, time, mediaMs) } } }
+                .also { time -> if (time != layer.endTime) state.edit("trim-end") { it.update(id) { base.trimmedTo(base.startTime, time, mediaMs) } } }
         }
         val hit = layer.trimHitsSourceLimit(start, time, mediaMs)
         if (hit && limitEdge == null) onTick()
