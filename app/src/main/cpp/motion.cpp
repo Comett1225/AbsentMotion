@@ -121,7 +121,8 @@ float ParamAt(const LayerEffect& e, const char* name, int i, float t, float fall
 }
 
 int CountOf(const LayerEffect& e, float t, float fallback, int most) {
-    return std::clamp((int)std::lround(Param(e, "count", t, fallback)), 0, most);
+    const float count = Param(e, "count", t, fallback);
+    return std::isfinite(count) ? (int)std::lround(std::clamp(count, 0.0f, (float)most)) : 0;
 }
 
 SkColor4f ColourOf(const LayerEffect& e, const char* name, float t, SkColor4f fallback) {
@@ -189,12 +190,15 @@ void Basic(const LayerEffect& e, float t, std::vector<RepeatCopy>* out) {
     each.preScale(scale, scale);
     const float alpha = std::clamp(Param(e, "alpha", t, 1), 0.0f, 1.0f);
     const double step = std::max(Param(e, "time", t, 0), 0.0f) * 1000.0;
-    std::vector<RepeatCopy> copies(n);
+    std::vector<RepeatCopy> copies;
+    copies.reserve(n);
     SkMatrix m = SkMatrix::I();
-    for (int i = 0; i < n; i++) {
-        copies[i].local = m;
-        copies[i].shiftMs = -step * i;
-        copies[i].alpha = n > 1 ? Lerp(1, alpha, (float)i / (n - 1)) : 1;
+    for (int i = 0; i < n && m.isFinite(); i++) {
+        RepeatCopy copy;
+        copy.local = m;
+        copy.shiftMs = -step * i;
+        copy.alpha = n > 1 ? Lerp(1, alpha, (float)i / (n - 1)) : 1;
+        copies.push_back(copy);
         m.preConcat(each);
     }
     out->insert(out->end(), copies.rbegin(), copies.rend());
@@ -338,18 +342,22 @@ void Scatter(const Layer& l, const LayerEffect& e, float t, const RepeatSpace& s
     const bool lockLuma = Param(e, "lockLuminance", t, 1) >= 0.5f, lockSaturation = Param(e, "lockSaturation", t, 0) >= 0.5f;
     const bool hue = Param(e, "interpolateHue", t, 0) >= 0.5f;
     const SkBlendMode tintMode = lockSaturation ? SkBlendMode::kHue : lockLuma ? SkBlendMode::kColor : SkBlendMode::kSrcIn;
-    if (!(density > 0) || !(alpha > 0)) return;
+    if (!(density > 0) || !(alpha > 0) || !(size > 0)) return;
     const uint64_t seed = SeedOf(l, e, t, 11);
     std::vector<std::pair<float, RepeatCopy>> found;
+    size_t visited = 0;
+    const auto room = [&] { return found.size() < kMaxCopies && visited < 1000000; };
     const int z0 = (int)std::floor((nearZ + depth) / cell) - 1, z1 = (int)std::ceil((farZ + depth) / cell) + 1;
-    for (int iz = z0; iz <= z1 && found.size() < kMaxCopies; iz++) {
+    const float margin = std::min(cell + space.radius, cell * (1.5f + size * (1 + sizeVariance) * 0.5f));
+    for (int iz = z0; iz <= z1 && room(); iz++) {
         const float reach = ((iz + 1.5f) * cell - depth) / focal;
         if (!(reach > 0)) continue;
-        const float hx = w / 2 * reach + cell + space.radius, hy = h / 2 * reach + cell + space.radius;
+        const float hx = w / 2 * reach + margin, hy = h / 2 * reach + margin;
         const int x0 = (int)std::floor((shift.fX - hx) / cell), x1 = (int)std::ceil((shift.fX + hx) / cell);
         const int y0 = (int)std::floor((shift.fY - hy) / cell), y1 = (int)std::ceil((shift.fY + hy) / cell);
-        for (int iy = y0; iy <= y1; iy++) {
-            for (int ix = x0; ix <= x1 && found.size() < kMaxCopies; ix++) {
+        for (int iy = y0; iy <= y1 && room(); iy++) {
+            for (int ix = x0; ix <= x1 && room(); ix++) {
+                visited++;
                 const uint64_t k = Mix(seed ^ Mix((uint64_t)(int64_t)ix * 0x9e37ull) ^ Mix((uint64_t)(int64_t)iy * 0x85ebull + 7) ^ Mix((uint64_t)(int64_t)iz * 0xc2b2ull + 13));
                 if (Unit(k, 0) >= density) continue;
                 auto jitter = [&](int channel) {
@@ -599,6 +607,7 @@ void RepeatCopies(const Layer& l, double timeMs, const RepeatSpace& space, std::
                 RepeatCopy c = r;
                 c.outer = m.outer * r.outer;
                 c.local = m.local * r.local;
+                if (!c.outer.isFinite() || !c.local.isFinite()) continue;
                 c.shiftMs = r.shiftMs + m.shiftMs;
                 c.alpha = r.alpha * m.alpha;
                 if (m.tinted > r.tinted) {

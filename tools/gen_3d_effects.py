@@ -133,7 +133,7 @@ half4 main(float2 coord) {
     bool hit = false;
     for (int i = 0; i < STEPS; i++) {
         float h = map(ro + rd * t);
-        float g = h * px / t;
+        float g = h * px / max(t, 0.0001);
         if (g < best) { best = g; tb = t; }
         if (g < 0.2) { hit = true; break; }
         t += h * 0.9;
@@ -151,7 +151,7 @@ half4 main(float2 coord) {
         bool back = false;
         for (int i = 0; i < 64; i++) {
             float h = map(ro + rd * s);
-            if (h * px / s < 0.2) { back = true; break; }
+            if (h * px / max(s, 0.0001) < 0.2) { back = true; break; }
             s -= h * 0.9;
             if (s < t) break;
         }
@@ -222,9 +222,10 @@ float4 surface(float3 p, float3 n) {
 }
 """),
     solid("ellipsoid", "Ellipsoid", "Wraps the layer around a sphere that you can squeeze and flatten.",
-          [number("radius", "Radius", 0.8, 0.02, 5), number("squeeze", "Squeeze", 0, -0.9, 0.9), number("flatten", "Flatten", 0, 0, 0.95)], """
-float3 radii() { return radius * float3(1.0, 1.0 - squeeze, 1.0 - flatten); }
-float bound() { return radius * max(1.0, 1.0 - squeeze); }
+          [number("radius", "Radius", 0.8, 0.02, 5), dict(number("squeezeRatio", "Squeeze", 1, 0.1, 1.9), percent=True),
+           dict(number("flattenRatio", "Flatten", 1, 0.05, 1), percent=True)], """
+float3 radii() { return radius * float3(1.0, squeezeRatio, flattenRatio); }
+float bound() { return radius * max(1.0, squeezeRatio); }
 float map(float3 p) { float3 r = radii(); float k0 = length(p / r); float k1 = length(p / (r * r)); return k0 * (k0 - 1.0) / max(k1, 0.0001); }
 float4 surface(float3 p, float3 n) {
     float3 q = normalize(p / radii());
@@ -343,12 +344,17 @@ float map(float3 p) {
 }
 float4 surface(float3 p, float3 n) { return boxFace(p, n, float3(reach)); }
 """, x=-25),
-    solid("spherize", "Spherize", "Bends the layer around the front of a ball.",
-          [number("radius", "Radius", 0.9, 0.02, 5), number("coverage", "Coverage", 0.5, 0.2, 1)], """
+    solid("spherize", "Spherize", "Wraps the layer onto a sphere using a front projection or an equirectangular texture.",
+          [number("radius", "Radius", 0.9, 0.02, 5), number("coverage", "Coverage", 0.5, 0.2, 1),
+           {"id": "projection", "label": "Projection", "type": "choice", "default": 0, "options": ["Front", "Equirectangular"]}], """
 float bound() { return radius; }
 float map(float3 p) { return length(p) - radius; }
 float4 surface(float3 p, float3 n) {
     float3 q = normalize(p);
+    if (projection > 0.5) {
+        float longitude = length(q.xz) > 0.00001 ? atan(q.x, -q.z) : 0.0;
+        return pic(float2(longitude / (2.0 * PI) + 0.5, acos(clamp(-q.y, -1.0, 1.0)) / PI));
+    }
     float2 uv = 0.5 + q.xy / max(length(q.xy), 0.00001) * acos(clamp(-q.z, -1.0, 1.0)) / (PI * coverage) * 0.5;
     if (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0) return float4(0.0);
     return pic(uv);
@@ -452,7 +458,7 @@ half4 main(float2 coord) {
 }
 """
 
-TUNNEL_PARAMS = turns(0, 0) + [number("speed", "Speed", 1, -20, 20), number("twist", "Twist", 0, -360, 360, 0.1),
+TUNNEL_PARAMS = turns(0, 0) + [number("phase", "Phase", 0, -1000, 1000), number("speed", "Speed", 1, -20, 20), number("twist", "Twist", 0, -360, 360, 0.1),
                                number("repeat", "Repeat", 3, 1, 16, 1), number("fog", "Fog", 0.4, 0, 1), colour("fogColor", "Fog Color", "#ff000000")] + PLACE
 TUNNEL = uniforms(TUNNEL_PARAMS) + COMMON.split("float4 shade")[0] + """
 half4 main(float2 coord) {
@@ -466,7 +472,7 @@ half4 main(float2 coord) {
     float along = tile * size.y / max(size.x, 0.0001);
     float z = p.z + time * speed;
     float u = fract((atan(p.y, p.x) + radians(twist) * p.z) / tile);
-    float v = fract(z / along);
+    float v = fract(z / along + phase);
     float4 c = pic(float2(u, v));
     float k = 1.0 - exp(-abs(p.z) * fog * 0.6);
     return half4(mix(c, haze, k));
@@ -476,7 +482,7 @@ half4 main(float2 coord) {
 EFFECTS += [
     ("rasterextrude", "Raster Extrude", "Pushes the layer's picture out into a solid block; the sides take the interior colour.", EXTRUDE_PARAMS, EXTRUDE),
     ("flip", "Flip Layer", "Turns the layer like a card in 3D, with its back see-through, a picture or a colour.", FLIP_PARAMS, FLIP),
-    ("tunnel", "Tunnel", "Lines an endless tunnel with the layer and flies through it.", TUNNEL_PARAMS, TUNNEL),
+    ("tunnel", "Tunnel", "Lines an endless tunnel with the layer and flies through it. Phase shifts the texture along its length.", TUNNEL_PARAMS, TUNNEL),
 ]
 
 ORDER = ["cube", "box", "hollowbox", "cylinder", "ellipsoid", "torus", "pyramid", "octahedron", "hexprism", "starprism",

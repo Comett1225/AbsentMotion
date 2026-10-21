@@ -65,6 +65,7 @@ class MoveEffectsTest {
         assertEquals(listOf(row("Progress", "float", "0.000000", "0.0..1.0", "%"), row("Orientation", "angle", "0.000000", "-3600.0..3600.0"),
             row("Rotate Automatically", "switch", "true"), row("Inset/Outset", "float", "0.000000", "-500.0..500.0"),
             row("Offset", "point", "0.000000,0.000000", "-5000.0..5000.0")), params("movealongpath"))
+        assertEquals(listOf(row("Steps/sec", "float", "5.000000", "0.1..120.0")), params("timequant"))
     }
 
     private fun older(effect: String, vararg values: Pair<String, String>) = XmlNode("effect", mapOf("id" to "absent.$effect", "hidden" to "false"),
@@ -154,6 +155,29 @@ class MoveEffectsTest {
             XmlNode("kf", mapOf("t" to "0.5001", "v" to "10")), XmlNode("kf", mapOf("t" to "1", "v" to "10"))))
         assertEquals(1500.0, stepped(keyed).steppedMs(1900.0), 1e-9)
         assertEquals(2500.0, stepped(keyed).steppedMs(2550.0), 1e-9)
+    }
+
+    @Test fun timeQuantizationImportsKeyframesAndKeepsTheLegacyFallback() {
+        val migration = EffectMigration.parse(File("src/main/assets/effects/foreign.json").readText(), catalog)
+        val keyed = XmlNode("property", mapOf("name" to "stepsPerSecond", "type" to "float"), listOf(
+            XmlNode("kf", mapOf("t" to "0", "v" to "5")), XmlNode("kf", mapOf("t" to "1", "v" to "10"))))
+        val imported = XmlNode("effect", mapOf("id" to "com.alightcreative.effects.timequant"), listOf(keyed))
+        val default = imported.copy(children = emptyList())
+        val legacy = XmlNode("effect", mapOf("id" to "absent.timequant"))
+        val shape = stepped(fps("8")).node.copy(children = listOf(imported, default, legacy))
+        val scene = Scene(XmlNode("scene", mapOf("width" to "100", "height" to "100", "fps" to "30", "totalTime" to "3000"), listOf(shape)))
+        val result = migration.migrate(scene)
+        val effects = result.scene.node.children.single().children
+        assertEquals("absent.timequant", effects[0]["id"])
+        val converted = effects[0].children.single()
+        assertEquals("fps", converted["name"])
+        assertEquals(keyed.children.map { it["t"] }, converted.children.map { it["t"] })
+        assertEquals(listOf(5f, 10f), converted.children.map { it["v"]!!.toFloat() })
+        assertEquals(5f, effects[1].children.single()["value"]!!.toFloat(), 0f)
+        assertEquals(legacy, effects[2])
+        assertEquals(1375.0, Layer(shape.copy(children = listOf(effects[2]))).steppedMs(1399.0), 0.0)
+        assertTrue(result.dropped.isEmpty())
+        assertEquals(result.scene.node, migration.migrate(result.scene).scene.node)
     }
 
     @Test fun aSteppedVideoHoldsItsFrameForTheWholeStep() {

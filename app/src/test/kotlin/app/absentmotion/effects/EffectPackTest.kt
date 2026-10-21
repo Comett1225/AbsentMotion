@@ -95,6 +95,16 @@ class EffectPackTest {
         assertEquals(effect.params.map { Triple(it.id, it.type, it.default) }, node.children.map { Triple(it["name"], it["type"], it["value"]) })
     }
 
+    @Test fun sphereProjectionAndTunnelPhaseKeepTheirLegacyDefaults() {
+        val sphere = catalog.find("absent.spherize")!!
+        val projection = sphere.params.single { it.id == "projection" }
+        assertEquals(listOf("Front", "Equirectangular"), projection.options)
+        assertEquals("0.000000", projection.default)
+        val phase = catalog.find("absent.tunnel")!!.params.single { it.id == "phase" }
+        assertEquals("Phase", phase.label)
+        assertEquals("0.000000", phase.default)
+    }
+
     @Test fun theNewCategoryShowsEffectsFromTheLastFiveReleases() {
         val releases = JSONArray(File(pack, "releases.json").readText()).let { a -> List(a.length()) { a.getString(it) } }
         val numbers = releases.map { r -> r.split('.').map { it.toInt() } }

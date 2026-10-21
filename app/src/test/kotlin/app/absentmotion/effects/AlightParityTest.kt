@@ -53,6 +53,30 @@ class AlightParityTest {
     private fun older(effect: String, vararg values: Pair<String, String>) = XmlNode("effect", mapOf("id" to "absent.$effect", "hidden" to "false"),
         values.map { (name, value) -> XmlNode("property", mapOf("name" to name, "type" to "float", "value" to value)) })
 
+    @Test fun ellipsoidRatiosUsePercentagesAndConvertOlderKeyframes() {
+        val ratios = params("ellipsoid")
+        for (id in listOf("squeezeRatio", "flattenRatio")) {
+            assertTrue(ratios.getValue(id).percent)
+            assertEquals("1.000000", ratios.getValue(id).default)
+        }
+        val squeeze = XmlNode("property", mapOf("name" to "squeeze", "type" to "float"), listOf(
+            XmlNode("kf", mapOf("t" to "0", "v" to "-0.5")), XmlNode("kf", mapOf("t" to "1", "v" to "0.5", "e" to "cubicBezier 0.2 0.3 0.4 0.5"))))
+        val old = older("ellipsoid", "flatten" to "0.25", "radius" to "0.8").let { it.copy(children = listOf(squeeze) + it.children) }
+        val sparse = older("ellipsoid")
+        val scene = Scene(XmlNode("scene", mapOf("width" to "100", "height" to "100", "fps" to "30", "totalTime" to "1000"),
+            listOf(XmlNode("shape", mapOf("id" to "1", "startTime" to "0", "endTime" to "1000", "s" to ".rect"), listOf(old, sparse)))))
+        val result = migration.migrate(scene)
+        val effects = result.scene.node.children.single().children
+        val values = effects[0].children.associateBy { it["name"] }
+        val converted = values.getValue("squeezeRatio").children
+        assertEquals(listOf(1.5f, 0.5f), converted.map { it["v"]!!.toFloat() })
+        assertEquals(squeeze.children.map { it["t"] to it["e"] }, converted.map { it["t"] to it["e"] })
+        assertEquals(0.75f, values.getValue("flattenRatio")["value"]!!.toFloat(), 0f)
+        assertEquals(sparse, effects[1])
+        assertTrue(result.dropped.isEmpty())
+        assertEquals(result.scene.node, migration.migrate(result.scene).scene.node)
+    }
+
     @Test fun projectsMadeBeforeTheRecalibrationStillLoad() {
         val made = listOf(
             older("wavewarp", "amplitude" to "21.6", "wavelength" to "100", "direction" to "30", "speed" to "2"),

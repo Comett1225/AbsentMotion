@@ -35,5 +35,5 @@
    "step": 1
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float2 center;\nuniform float segments;\nuniform float angle;\nhalf4 main(float2 coord) {\n    float2 c = center * size;\n    float2 d = coord - c;\n    float slice = 6.2831853 / max(floor(segments), 1);\n    float a = mod(atan(d.y, d.x) - radians(angle), slice);\n    a = min(a, slice - a) + radians(angle);\n    return image.eval(c + length(d) * float2(cos(a), sin(a)));\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float2 center;\nuniform float segments;\nuniform float angle;\nhalf4 main(float2 coord) {\n    float2 c = center * size;\n    float2 d = coord - c;\n    float radius = length(d);\n    if (radius < 0.00001) return image.eval(c);\n    float slice = 6.2831853 / max(floor(segments), 1);\n    float a = mod(atan(d.y, d.x) - radians(angle), slice);\n    a = min(a, slice - a) + radians(angle);\n    return image.eval(c + radius * float2(cos(a), sin(a)));\n}\n"
 }

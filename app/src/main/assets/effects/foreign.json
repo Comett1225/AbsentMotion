@@ -2059,5 +2059,31 @@
     "to": "slack"
    }
   }
+ },
+ "com.alightcreative.effects.timequant": {
+  "to": "timequant",
+  "params": {
+   "stepsPerSecond": {
+    "to": "fps"
+   }
+  },
+  "set": {
+   "fps": 5
+  }
+ },
+ "absent.ellipsoid": {
+  "to": "ellipsoid",
+  "params": {
+   "squeeze": {
+    "to": "squeezeRatio",
+    "scale": -1,
+    "offset": 1
+   },
+   "flatten": {
+    "to": "flattenRatio",
+    "scale": -1,
+    "offset": 1
+   }
+  }
  }
 }
