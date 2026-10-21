@@ -96,9 +96,9 @@ double Wave(double cycles, float kind) {
     return std::sin(kTau * f);
 }
 
-SkVector Displacement(const LayerEffect& e, float t, SkPoint at) {
+SkVector Displacement(const LayerEffect& e, float t, double drift, SkPoint at) {
     const float scatter = Param(e, "scatter", t, 0.5f) / 100, m = Param(e, "magnitude", t, 50);
-    const double x = Param(e, "evolution", t, 0) + scatter * at.fX;
+    const double x = Param(e, "evolution", t, 0) + drift + scatter * at.fX;
     const double y = Plane(Param(e, "seed", t, 0), 0) + scatter * at.fY;
     return {(float)(m * Noise(x, y)), (float)(m * Noise(x + 57.31, y + 23.17))};
 }
@@ -410,7 +410,7 @@ void ApplyMotion(const Layer& l, double timeMs, Placement* p) {
             p->location += Toward(angle, m * Noise(x, Plane(seed, 0))) + Toward(angle + 90, m * Param(e, "slack", t, 0.25f) * Noise(x, Plane(seed, 1)));
             p->z += (float)(Param(e, "zshake", t, 0) * Noise(x, Plane(seed, 2)));
         } else if (id == "randomdisplace") {
-            if (!repeated) p->location += Displacement(e, t, p->location);
+            if (!repeated) p->location += Displacement(e, t, Integral(e, "speed", l, s, 1), p->location);
         } else if (id == "randomjitter") {
             const int64_t k = (int64_t)std::floor(Integral(e, "frequency", l, s, 30) + 1e-6);
             const uint64_t seed = Mix((uint64_t)std::llround((double)Param(e, "seed", t, 0) * 1000) + 0x51ed27ull);
@@ -562,15 +562,17 @@ bool RepeatsAlongPath(const Layer& l) {
 
 void RepeatCopies(const Layer& l, double timeMs, const RepeatSpace& space, std::vector<RepeatCopy>* copies) {
     const float t = l.localTime(timeMs);
+    const double s = Seconds(l, timeMs);
     std::vector<RepeatCopy> result(1);
     bool repeated = false;
     for (const LayerEffect& e : l.effects) {
         if (e.hidden) continue;
         if (e.id == "absent.randomdisplace") {
             if (!repeated) continue;
+            const double drift = Integral(e, "speed", l, s, 1);
             for (RepeatCopy& c : result) {
                 const SkPoint at = (c.outer * space.layer * c.local).mapPoint(space.pivot);
-                const SkVector d = Displacement(e, t, at);
+                const SkVector d = Displacement(e, t, drift, at);
                 c.outer.postTranslate(d.fX, d.fY);
             }
             continue;

@@ -43,7 +43,8 @@ class MoveEffectsTest {
             row("Evolution", "float", "0.000000", "0.0..2000.0"), row("Seed", "float", "0.000000", "0.0..5.0"), row("Angle", "angle", "45.000000", "-3600.0..3600.0"),
             row("Slack", "float", "0.250000", "0.0..1.0", "%"), row("Z Shake", "float", "0.000000", "0.0..2000.0")), params("autoshake"))
         assertEquals(listOf(row("Magnitude", "float", "50.000000", "0.0..2000.0"), row("Evolution", "float", "0.000000", "0.0..2000.0"),
-            row("Seed", "float", "0.000000", "0.0..5.0"), row("Scatter", "float", "0.500000", "0.0..2.0", "%")), params("randomdisplace"))
+            row("Seed", "float", "0.000000", "0.0..5.0"), row("Scatter", "float", "0.500000", "0.0..2.0", "%"),
+            row("Speed", "float", "1.000000", "0.0..50.0")), params("randomdisplace"))
         assertEquals(listOf(row("Angle", "angle", "45.000000", "-3600.0..3600.0"), row("Frequency", "float", "30.000000", "1.0..60.0"),
             row("Magnitude", "float", "25.000000", "1.0..2000.0"), row("Seed", "float", "0.000000", "0.0..1.0"), row("Slack", "float", "0.000000", "0.0..1.0", "%"),
             row("Z Jitter", "float", "0.000000", "0.0..2000.0")), params("randomjitter"))
@@ -88,7 +89,7 @@ class MoveEffectsTest {
         val effects = result.scene.node.children.single().children
         fun values(i: Int) = effects[i].children.associate { it["name"]!! to it["value"]!!.toFloat() }
         assertEquals(mapOf("magnitude" to 20f, "frequency" to 6f, "seed" to 1f), values(0))
-        assertEquals(mapOf("magnitude" to 50f, "seed" to 1f), values(1))
+        assertEquals(mapOf("magnitude" to 50f, "speed" to 1f, "seed" to 1f), values(1))
         assertEquals(mapOf("angle" to 10f, "frequency" to 8f, "magnitude" to 25f, "seed" to 1f), values(2))
         assertEquals(mapOf("frequency" to 1f, "angle1" to -15f, "angle2" to 15f, "phase" to 0.5f, "wave" to 1f), values(3))
         assertEquals(15f, values(4).getValue("rpm"), 1e-4f)
@@ -96,7 +97,7 @@ class MoveEffectsTest {
         assertEquals(mapOf("scale" to 1.5f, "angle" to 30f), values(6))
         assertEquals(made[7], effects[7])
         assertEquals(mapOf("frequency" to 1f, "strength" to 0.8f, "phase" to 1f, "wave" to 1f), values(8).mapValues { Math.round(it.value * 1000) / 1000f })
-        assertEquals(setOf("Auto-Shake: rotation", "Random Displacement: speed"), result.dropped.toSet())
+        assertEquals(setOf("Auto-Shake: rotation"), result.dropped.toSet())
         assertTrue(result.converted.isEmpty())
         val again = migration.migrate(result.scene)
         assertEquals(result.scene.node, again.scene.node)
@@ -105,6 +106,19 @@ class MoveEffectsTest {
             catalog.listed("move").map { it.instance() })))))
         assertTrue(fresh.dropped.isEmpty())
         assertEquals(catalog.listed("move").map { it.instance() }, fresh.scene.node.children.single().children)
+    }
+
+    @Test fun aRandomDisplacementFromAlightStaysWhereAlightPutsIt() {
+        val migration = EffectMigration.parse(File("src/main/assets/effects/foreign.json").readText(), catalog)
+        val alight = XmlNode("effect", mapOf("id" to "com.alightcreative.effects.randomdisplace"), listOf("mag" to "80", "evolution" to "2", "seed" to "1", "scatter" to "0.5")
+            .map { (name, value) -> XmlNode("property", mapOf("name" to name, "type" to "float", "value" to value)) })
+        val scene = Scene(XmlNode("scene", mapOf("width" to "100", "height" to "100", "fps" to "30", "totalTime" to "1000"),
+            listOf(XmlNode("shape", mapOf("id" to "1", "startTime" to "0", "endTime" to "1000", "s" to ".rect"), listOf(alight)))))
+        val effect = migration.migrate(scene).scene.node.children.single().children.single()
+        assertEquals("absent.randomdisplace", effect["id"])
+        assertEquals(mapOf("magnitude" to 80f, "evolution" to 2f, "seed" to 1f, "scatter" to 0.5f, "speed" to 0f),
+            effect.children.associate { it["name"]!! to it["value"]!!.toFloat() })
+        assertEquals("1.000000", catalog.find("absent.randomdisplace")!!.instance().children.single { it["name"] == "speed" }["value"])
     }
 
     @Test fun oscillateMatchesTheGuide() {

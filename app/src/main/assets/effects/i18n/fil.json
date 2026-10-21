@@ -3058,7 +3058,7 @@
    }
   },
   "randomdisplace": {
-   "description": "Ginagalaw ang layer nang smooth pero random habang nagbabago ang Evolution.",
+   "description": "Awtomatikong gumagalaw ang layer nang smooth pero random sa paglipas ng oras. Pumipili ng ibang galaw ang Seed, itinatakda ng Bilis kung gaano kabilis itong gumalaw, at binabago ng Evolution ang pattern.",
    "name": "Random na Displacement",
    "params": {
     "evolution": {
@@ -3072,6 +3072,9 @@
     },
     "seed": {
      "label": "Seed"
+    },
+    "speed": {
+     "label": "Bilis"
     }
    }
   },

@@ -569,9 +569,7 @@
  },
  "absent.randomdisplace": {
   "to": "randomdisplace",
-  "params": {
-   "speed": {}
-  }
+  "params": {}
  },
  "absent.randomjitter": {
   "to": "randomjitter",
@@ -714,6 +712,9 @@
    "scatter": {
     "to": "scatter"
    }
+  },
+  "set": {
+   "speed": 0
   }
  },
  "com.alightcreative.effects.jitter": {

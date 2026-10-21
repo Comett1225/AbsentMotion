@@ -3058,7 +3058,7 @@
    }
   },
   "randomdisplace": {
-   "description": "Move a camada de forma suave e aleatória conforme a Evolução muda.",
+   "description": "Movimenta a camada automaticamente de forma suave e aleatória ao longo do tempo. A semente escolhe um movimento diferente, a Velocidade define a rapidez do percurso e a Evolução desloca o padrão.",
    "name": "Deslocamento aleatório",
    "params": {
     "evolution": {
@@ -3072,6 +3072,9 @@
     },
     "seed": {
      "label": "Semente"
+    },
+    "speed": {
+     "label": "Velocidade"
     }
    }
   },

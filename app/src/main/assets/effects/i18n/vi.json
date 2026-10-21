@@ -3058,7 +3058,7 @@
    }
   },
   "randomdisplace": {
-   "description": "Di chuyển lớp một cách mượt mà nhưng ngẫu nhiên khi Evolution thay đổi.",
+   "description": "Tự động di chuyển lớp một cách mượt mà nhưng ngẫu nhiên theo thời gian. Seed chọn kiểu chuyển động khác, Tốc độ quyết định mức độ di chuyển nhanh chậm và Evolution thay đổi hoa văn.",
    "name": "Dịch chuyển ngẫu nhiên",
    "params": {
     "evolution": {
@@ -3072,6 +3072,9 @@
     },
     "seed": {
      "label": "Hạt giống"
+    },
+    "speed": {
+     "label": "Tốc độ"
     }
    }
   },

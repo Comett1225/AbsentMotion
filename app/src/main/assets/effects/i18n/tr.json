@@ -3058,7 +3058,7 @@
    }
   },
   "randomdisplace": {
-   "description": "Gelişim değiştikçe katmanı yumuşak ama rastgele hareket ettirir.",
+   "description": "Katmanı zamanla otomatik olarak yumuşak ama rastgele hareket ettirir. Tohum farklı bir hareket seçer, Hız gezinme hızını belirler ve Evrim deseni kaydırır.",
    "name": "Rastgele Kayma",
    "params": {
     "evolution": {
@@ -3072,6 +3072,9 @@
     },
     "seed": {
      "label": "Tohum"
+    },
+    "speed": {
+     "label": "Hız"
     }
    }
   },

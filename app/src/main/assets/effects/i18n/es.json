@@ -3058,7 +3058,7 @@
    }
   },
   "randomdisplace": {
-   "description": "Mueve la capa de forma suave pero aleatoria a medida que cambia Evolución.",
+   "description": "Desplaza la capa automáticamente de forma suave y aleatoria con el tiempo. La semilla elige un movimiento distinto, la velocidad define qué tan rápido se desplaza y la evolución cambia el patrón.",
    "name": "Desplazamiento aleatorio",
    "params": {
     "evolution": {
@@ -3072,6 +3072,9 @@
     },
     "seed": {
      "label": "Semilla"
+    },
+    "speed": {
+     "label": "Velocidad"
     }
    }
   },

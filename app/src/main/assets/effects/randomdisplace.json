@@ -4,7 +4,7 @@
  "category": "move",
  "since": "3.0.0",
  "native": true,
- "description": "Moves the layer smoothly but randomly as Evolution changes.",
+ "description": "Automatically moves the layer smoothly but randomly over time. Seed picks a different movement, Speed sets how fast it wanders and Evolution shifts the pattern.",
  "params": [
   {
    "id": "magnitude",
@@ -42,6 +42,15 @@
    "max": 2,
    "step": 0.01,
    "percent": true
+  },
+  {
+   "id": "speed",
+   "label": "Speed",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 50,
+   "step": 0.01
   }
  ]
 }
