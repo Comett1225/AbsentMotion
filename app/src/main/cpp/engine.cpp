@@ -1255,7 +1255,7 @@ int EngineImpl::frame(Target* target, int64_t presentTimeNs, bool sync,
     r = vkQueuePresentKHR(fQueue, &present);
     if (r != VK_SUCCESS && r != VK_SUBOPTIMAL_KHR) {
         LOGE("vkQueuePresentKHR failed (%d)", r);
-        this->failGpu(target);
+        if (r != VK_ERROR_OUT_OF_DATE_KHR && r != VK_ERROR_SURFACE_LOST_KHR) this->failGpu(target);
         return r;
     }
     if (presentTimeNs <= 0 && target->nextPresentId % 4 == 0) this->collectTimings(target);
