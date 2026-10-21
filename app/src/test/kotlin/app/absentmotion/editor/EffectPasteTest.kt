@@ -1,14 +1,12 @@
 package app.absentmotion.editor
 
 import app.absentmotion.model.*
+import app.absentmotion.shapeLayer
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Test
 
 class EffectPasteTest {
-    private fun layer(kind: String, id: Long, children: List<XmlNode> = emptyList()) =
-        Layer(XmlNode(kind, mapOf("id" to "$id", "startTime" to "0", "endTime" to "2000"), children))
-
     private fun effect(id: String, radius: String = "10") =
         XmlNode("effect", mapOf("id" to id, "hidden" to "false"), listOf(XmlNode("property", mapOf("name" to "radius", "type" to "float", "value" to radius))))
 
@@ -17,7 +15,7 @@ class EffectPasteTest {
     private val blur = effect("absent.blur", "7")
 
     private val scene = listOf(
-        layer("shape", 1, listOf(effect("absent.old"))), layer("text", 2), layer("audio", 3), layer("camera", 4), layer("nullobj", 5), layer("shape", 6),
+        shapeLayer("shape", id = 1, children = listOf(effect("absent.old"))), shapeLayer("text", id = 2), shapeLayer("audio", id = 3), shapeLayer("camera", id = 4), shapeLayer("nullobj", id = 5), shapeLayer("shape", id = 6),
     ).fold(Scene.create("p", 100, 100, 30, 0)) { s, l -> s.add(l) }
 
     private fun ids(layer: Long) = scene.layer(layer)!!.effects.map { it["id"] }

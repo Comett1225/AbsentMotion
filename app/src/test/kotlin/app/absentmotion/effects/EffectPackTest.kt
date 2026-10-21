@@ -129,8 +129,8 @@ class EffectPackTest {
         assertTrue("blur is a still picture", "blur" !in animated)
     }
 
-    @Test fun everyEffectHasAThumbnailOnceTheyAreMade() {
-        if (!File(pack, "thumb").isDirectory) return
+    @Test fun everyEffectHasAThumbnail() {
+        assertTrue("thumb folder", File(pack, "thumb").isDirectory)
         for (effect in catalog.definitions) assertTrue(effect.thumbnail, File(pack, effect.thumbnail).isFile)
     }
 }

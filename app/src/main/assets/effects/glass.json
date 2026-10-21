@@ -3,7 +3,7 @@
  "name": "Glass",
  "category": "distort",
  "since": "3.0.0",
- "description": "Turns the layer's shape into bevelled glass that bends the layers behind it, with a highlight along the rim.",
+ "description": "Turns the layer's shape into beveled glass that bends the layers behind it, with a highlight along the rim.",
  "params": [
   {
    "id": "blur",

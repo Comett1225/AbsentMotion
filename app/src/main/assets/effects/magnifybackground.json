@@ -3,7 +3,7 @@
  "name": "Magnify Background",
  "category": "distort",
  "since": "3.0.0",
- "description": "Makes the layer a magnifying glass: its shape shows the layers behind it enlarged around its centre.",
+ "description": "Makes the layer a magnifying glass: its shape shows the layers behind it enlarged around its center.",
  "params": [
   {
    "id": "scale",

@@ -28,11 +28,11 @@ class KeyScopeTest {
 
     private fun property(name: String, vararg frames: Int) = XmlNode("property", mapOf("name" to name, "type" to "float"), frames.map { kf(it) })
 
-    private fun layer(extra: List<XmlNode> = emptyList()) = Layer(XmlNode("shape", mapOf("id" to "1", "startTime" to "0", "endTime" to "$end"), listOf(
+    private fun layer(extra: List<XmlNode> = emptyList()) = shapeLayer(end = end, children = listOf(
         XmlNode("transform", children = listOf(XmlNode("location", children = listOf(kf(10), kf(45))))),
         XmlNode("effect", mapOf("id" to "glow"), listOf(property("radius", 10, 30), property("alpha", 10, 50))),
         XmlNode("effect", mapOf("id" to "tiles"), listOf(property("size", 10, 20))),
-    ) + extra))
+    ) + extra)
 
     private val scene = blank.add(layer())
 

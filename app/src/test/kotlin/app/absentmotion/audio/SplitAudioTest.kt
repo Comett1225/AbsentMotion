@@ -1,5 +1,7 @@
 package app.absentmotion.audio
 
+import app.absentmotion.awaitCondition
+import app.absentmotion.sceneXml
 import app.absentmotion.model.Scene
 import app.absentmotion.model.splitAt
 import org.junit.Assert.assertEquals
@@ -16,9 +18,13 @@ class SplitAudioTest {
         private var at = 0L
         private val chunk = PcmChunk()
 
+        @Volatile var reads = 0
+            private set
+
         override fun seek(us: Long) { at = us.coerceAtLeast(0) * RATE / 1_000_000 / FRAME * FRAME }
 
         override fun next(): PcmChunk? {
+            reads++
             val n = minOf(FRAME.toLong(), durationUs * RATE / 1_000_000 - at).toInt()
             if (n <= 0) return null
             if (chunk.pcm.size < 2 * n) chunk.pcm = ShortArray(2 * n)
@@ -39,8 +45,6 @@ class SplitAudioTest {
 
     private fun video(id: Int, start: Int, end: Int, extra: String = "", uri: String = "tone") =
         """<shape id="$id" startTime="$start" endTime="$end" fillType="media" fillVideo="$uri" s=".rect" $extra/>"""
-
-    private fun scene(vararg layers: String) = Scene.parse("""<scene width="100" height="100" fps="30">${layers.joinToString("")}</scene>""")
 
     private fun split(scene: Scene, frame: Int): Scene {
         val (first, second) = scene.splitAt(scene.layer(1)!!, frame, 2)!!
@@ -70,47 +74,43 @@ class SplitAudioTest {
     }
 
     @Test fun exportOfASplitClipSoundsLikeTheUncutClip() {
-        val whole = scene(video(1, 0, 7999))
+        val whole = sceneXml(video(1, 0, 7999))
         assertSameAwayFrom(render(whole, 8000), render(split(whole, 135), 8000), 4500)
     }
 
     @Test fun exportOfASplitFastClipSoundsLikeTheUncutClip() {
-        val whole = scene(video(1, 0, 7999, """speed="2""""))
+        val whole = sceneXml(video(1, 0, 7999, """speed="2""""))
         assertSameAwayFrom(render(whole, 8000), render(split(whole, 135), 8000), 4500)
     }
 
     @Test fun exportOfASplitSpeedRampSoundsLikeTheUncutRamp() {
-        val whole = scene(video(1, 0, 7999, "", "tone").replace("/>", """><speedMap><kf t="0" v="0.5"/><kf t="9000000000" v="2"/></speedMap></shape>"""))
+        val whole = sceneXml(video(1, 0, 7999, "", "tone").replace("/>", """><speedMap><kf t="0" v="0.5"/><kf t="9000000000" v="2"/></speedMap></shape>"""))
         assertSameAwayFrom(render(whole, 8000), render(split(whole, 100), 8000), 3333)
     }
 
     @Test fun exportOfTwoClipsBackToBackPlaysBoth() {
         val first = video(1, 0, 3999, "", "a")
         val second = video(2, 4000, 7999, """inTime="5000"""", "b")
-        val both = render(scene(first, second), 8000)
+        val both = render(sceneXml(first, second), 8000)
         val half = both.size / 2
-        val alone = render(scene(first), 8000)
-        val later = render(scene(second), 8000)
+        val alone = render(sceneXml(first), 8000)
+        val later = render(sceneXml(second), 8000)
         assertSameAwayFrom(FloatArray(both.size) { if (it < half) alone[it] else later[it] }, both, 4000)
         assertTrue(later.drop(half + 1000).maxOf { abs(it) } > 0.4f)
     }
 
     @Test fun aStreamOpenedDeepInItsMediaPlaysInsteadOfStayingSilent() {
-        val stream = LayerStream("tone", 4500.0 - LayerStream.LEAD_MS) { Tone(440.0) }
+        val source = Tone(440.0)
+        val stream = LayerStream("tone", 4500.0 - LayerStream.LEAD_MS) { source }
         try {
-            val until = System.nanoTime() + 3_000_000_000L
-            while (stream.rate == 0) { assertTrue("the stream never decoded", System.nanoTime() < until); Thread.sleep(1) }
-            Thread.sleep(30)
-            while (!stream.prepare(4500.0)) { assertTrue("the stream never became ready at 4500 ms", System.nanoTime() < until); Thread.sleep(5) }
+            awaitCondition("the decoder to read ahead before the first prepare", 10_000) { source.reads >= 4 }
+            awaitCondition("the stream to become ready at 4500 ms") { stream.prepare(4500.0) }
             val dt = 1000.0 / RATE
             val out = FloatArray(2 * FRAME)
             for (block in 0 until 6) {
                 java.util.Arrays.fill(out, 0f)
                 val pos = 4500.0 + block * FRAME * dt
-                while (!stream.mix(out, 0, FRAME, pos, dt, 1f, 1f, Resampler.ULTRA, 1000.0, dt, 1e9)) {
-                    assertTrue("no sound for the block at $pos ms", System.nanoTime() < until)
-                    Thread.sleep(2)
-                }
+                awaitCondition("sound for the block at $pos ms") { stream.mix(out, 0, FRAME, pos, dt, 1f, 1f, Resampler.ULTRA, 1000.0, dt, 1e9) }
                 if (block == 0) continue
                 for (k in 0 until FRAME) assertEquals(level(440.0, 4500L * RATE / 1000 + block * FRAME + k).toFloat(), out[2 * k], 2e-3f)
             }

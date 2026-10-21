@@ -89,10 +89,10 @@
     <string name="export_template_failed">Could not keep a copy as a Template. Free some storage space.</string>
     <string name="also_keeps_the_project_with_its">Also keeps the project, with its media, in Templates on this phone. Open it there to replace its media and continue to a new project.</string>
     <string name="template">Template</string>
-    <string name="one_absproj_package_with_the_project">One .absproj package with the project and the original media it uses, saved to Documents / AbsentMotion. Keep it as a backup or move the project to another phone.</string>
+    <string name="one_absproj_package_with_the_project">One .absproj package with the project and the original media it uses, saved to Documents/AbsentMotion. Keep it as a backup or move the project to another phone.</string>
     <string name="project_bundle">Project Bundle</string>
     <string name="project_home_page">Project home page</string>
-    <string name="open_source_licences">Open source licences</string>
+    <string name="open_source_licences">Open source licenses</string>
     <string name="stop">Stop</string>
     <string name="damaged_restore_a_version">Damaged — restore a version</string>
     <string name="damaged_explain_versions">This project\'s file is damaged, so it cannot be opened. Restore one of the earlier versions below, or delete the project.</string>
@@ -162,29 +162,29 @@
     <string name="theme_daylight">Daylight</string>
     <string name="theme_custom">Custom</string>
     <string name="theme_custom_named">Custom (%1$s)</string>
-    <string name="theme_error_bad_colour">Bad colour for %1$s</string>
-    <string name="theme_error_no_colours">No theme colours in this file</string>
+    <string name="theme_error_bad_colour">Bad color for %1$s</string>
+    <string name="theme_error_no_colours">No theme colors in this file</string>
     <string name="library_err_no_data">No data received.</string>
     <string name="library_err_unsupported_type">Unsupported file type</string>
     <string name="library_err_missing_manifest">Project package missing manifest</string>
     <string name="library_err_package_project_missing">Malformed package: project file is missing</string>
     <string name="library_err_too_many_projects">The package holds too many projects (more than %1$s)</string>
     <string name="library_err_project_files_large">The package\'s project files are too large</string>
-    <string name="library_err_no_project">Malformed Scene: no project in the package</string>
+    <string name="library_err_no_project">Malformed scene: no project in the package</string>
     <string name="library_err_malformed_package">Malformed package: %1$s</string>
     <string name="library_err_malformed_xml">Malformed XML: %1$s</string>
-    <string name="library_err_scene_needs_size">Malformed Scene: expected a &lt;scene> with a size</string>
-    <string name="library_err_scene_too_big">Malformed Scene: the size is larger than %1$s pixels</string>
-    <string name="library_err_scene_fps">Malformed Scene: the frame rate must be from 1 to %1$s</string>
+    <string name="library_err_scene_needs_size">Malformed scene: the file needs a scene with a width and height</string>
+    <string name="library_err_scene_too_big">Malformed scene: the size is larger than %1$s pixels</string>
+    <string name="library_err_scene_fps">Malformed scene: the frame rate must be from 1 to %1$s</string>
     <string name="library_err_package_large">The package is too large (more than %1$s MB unpacked)</string>
     <string name="library_err_too_many_files">The package has too many files (more than %1$s)</string>
-    <string name="library_err_xml_large">Malformed XML: file is too large</string>
+    <string name="library_err_xml_large">This file is too large to open (more than 32 MB)</string>
     <string name="library_err_media_large">The package is too large (more than %1$s MB of media)</string>
     <string name="library_err_not_backup">This file is not an AbsentMotion backup.</string>
     <string name="library_err_backup_project_large">A project in the backup is too large.</string>
     <string name="library_imported_project">Imported Project</string>
     <string name="library_damaged_project">Damaged project</string>
-    <string name="library_report_unknown">Not recognised, kept in the file</string>
+    <string name="library_report_unknown">Not recognized, kept in the file</string>
     <string name="library_report_cannot_run">Effects this version cannot run</string>
     <string name="library_report_converted">Effects turned into this app\'s own</string>
     <string name="library_report_dropped">Effect settings that could not be carried over</string>
@@ -268,7 +268,7 @@
     <string name="about_independent_note">AbsentMotion is an independent project. It is not affiliated with, endorsed by or sponsored by any other app maker; names of other products belong to their owners.</string>
     <string name="about_compatibility_note">AbsentMotion can open scene XML files and .amproj packages exported from Alight Motion, and it exports scene XML in the same format. It saves its own packages as .absproj.</string>
     <string name="about_loading">Loading…</string>
-    <string name="about_licence_unreadable">The licence text could not be read.</string>
+    <string name="about_licence_unreadable">The license text could not be read.</string>
     <string name="template_use_title">Use Template</string>
     <string name="template_next">Next</string>
     <string name="template_drag_to_select">Drag across to select</string>
@@ -323,7 +323,7 @@
     <string name="safety_open_failed_with_history">The project file is missing or damaged, so nothing was changed. You can bring back an earlier version from Version history.</string>
     <string name="newproject_bg_black">Black</string>
     <string name="newproject_bg_white">White</string>
-    <string name="newproject_bg_light_grey">Light Grey</string>
+    <string name="newproject_bg_light_grey">Light Gray</string>
     <string name="newproject_bg_green">Green</string>
     <string name="newproject_bg_blue">Blue</string>
     <string name="newproject_bg_transparent">Transparent</string>
@@ -364,7 +364,7 @@
     <string name="export_anyway">Export Anyway</string>
     <string name="export_available_space">Available space</string>
     <string name="export_estimated_size">Estimated file size</string>
-    <string name="export_calculating">Calculating...</string>
+    <string name="export_calculating">Calculating…</string>
     <string name="export_kind_video">Video</string>
     <string name="export_kind_frame_png">Current Frame as PNG</string>
     <string name="export_kind_frame_as">Current Frame as…</string>
@@ -471,9 +471,9 @@
     <string name="export_verify_frames">The GIF has %1$s frames instead of %2$s.</string>
 
     <string name="export_error_cannot_encode">This phone cannot encode %1$s at %2$s</string>
-    <string name="export_error_draw_frame">The engine could not draw frame %1$s</string>
+    <string name="export_error_draw_frame">Frame %1$s could not be drawn. Try exporting again.</string>
     <string name="export_error_draw_still">The engine could not draw the frame</string>
-    <string name="export_error_no_sound">This project has no sound to export.</string>
+    <string name="export_error_no_sound">This project has no sound to export. Add music, a sound or a video with sound first.</string>
     <string name="export_error_create">Cannot create %1$s in %2$s</string>
     <string name="export_error_write">Cannot write %1$s</string>
     <string name="export_error_mp3_settings">The MP3 encoder cannot use %1$s Hz at %2$s kbps</string>
@@ -508,9 +508,9 @@
     <string name="media_error_video_unavailable">Video is unavailable: %1$s</string>
     <string name="media_error_decode_frame">Cannot decode exact video frame %1$s</string>
     <string name="media_error_import_frame">Cannot import video frame %1$s for %2$s</string>
-    <string name="media_error_interp_source">Interpolation source frame %1$s is unavailable</string>
-    <string name="media_error_interp_wrong_frame">Interpolation received the wrong source frame for %1$s</string>
-    <string name="media_error_interp_import">Cannot import interpolation source frame %1$s</string>
+    <string name="media_error_interp_source">A video frame needed for Frame Interpolation is missing (%1$s). Try again, or set Frame Interpolation to Off.</string>
+    <string name="media_error_interp_wrong_frame">A video frame needed for Frame Interpolation could not be read correctly (%1$s). Try again, or set Frame Interpolation to Off.</string>
+    <string name="media_error_interp_import">A video frame needed for Frame Interpolation could not be loaded (%1$s). Try again, or set Frame Interpolation to Off.</string>
     <string name="media_error_interp_render">%1$s could not render the requested video frame</string>
 
     <string name="engine_loading_effects">Loading effects…</string>
@@ -519,7 +519,7 @@
     <string name="platform_voice_name">Voice %1$s</string>
     <string name="platform_error_tts_unavailable">Text to speech is unavailable on this phone</string>
     <string name="platform_error_voice">The voice could not be made</string>
-    <string name="platform_caption_download">Captions are recognised on your phone by a speech model, downloaded once: %1$s, %2$s, from Hugging Face.</string>
+    <string name="platform_caption_download">Captions are recognized on your phone by a speech model, downloaded once: %1$s, %2$s, from Hugging Face.</string>
     <string name="add_layer">Add layer</string>
     <string name="add_tab_shape">Shape</string>
     <string name="add_tab_media">Media</string>
@@ -541,7 +541,7 @@
     <string name="audiofx_reset">Reset</string>
     <string name="audiofx_mix">Mix</string>
 
-    <string name="caption_cancelled">Cancelled</string>
+    <string name="caption_cancelled">Canceled</string>
     <string name="caption_unable">Unable to make captions</string>
     <string name="caption_out_of_memory">Not enough memory for this much sound</string>
     <string name="caption_unavailable_build">Auto Captions is unavailable in this build</string>
@@ -642,7 +642,7 @@
     <string name="menu_set_outro_start">Set outro start</string>
     <string name="menu_bg_black">Black</string>
     <string name="menu_bg_white">White</string>
-    <string name="menu_bg_light_grey">Light Grey</string>
+    <string name="menu_bg_light_grey">Light Gray</string>
     <string name="menu_bg_green">Green</string>
     <string name="menu_bg_blue">Blue</string>
     <string name="menu_bg_transparent">Transparent</string>
@@ -804,7 +804,7 @@
     <string name="structure_alignment_options">Alignment options</string>
     <string name="structure_group_options">Group options</string>
     <string name="structure_align_left">Align left</string>
-    <string name="structure_align_centre">Align centre</string>
+    <string name="structure_align_centre">Align center</string>
     <string name="structure_align_right">Align right</string>
     <string name="structure_align_top">Align top</string>
     <string name="structure_align_middle">Align middle</string>
@@ -829,7 +829,7 @@
     <string name="track_whole_clip">Whole clip</string>
     <string name="voice_type_something">Type something to read</string>
     <string name="voice_unreadable">The voice could not be read back</string>
-    <string name="voice_cancelled">Cancelled</string>
+    <string name="voice_cancelled">Canceled</string>
     <string name="voice_unable">Unable to make the voice</string>
     <string name="voice_language">Language</string>
     <string name="voice_voice">Voice</string>
@@ -1130,9 +1130,9 @@
     <string name="ai_select_image_layer">Select an image layer</string>
     <string name="ai_select_audio_layer">Select an audio layer</string>
     <string name="ai_select_video_layer">Select a video layer</string>
-    <string name="ai_cancelling">Cancelling…</string>
+    <string name="ai_cancelling">Canceling…</string>
     <string name="ai_preparing">Preparing…</string>
-    <string name="ai_cancelled">Cancelled</string>
+    <string name="ai_cancelled">Canceled</string>
     <string name="ai_video_missing">This video is missing from the project</string>
     <string name="ai_layer_changed">The layer changed; run the tool again</string>
     <string name="ai_cannot_mask">This layer cannot be masked</string>
@@ -1151,7 +1151,7 @@
     <string name="ai_saving_transparent">Saving transparent image…</string>
     <string name="ai_loading_model">Loading background removal model…</string>
     <string name="ai_no_foreground_mask">No foreground mask was returned</string>
-    <string name="ai_mask_unexpected_size">The foreground mask has an unexpected size</string>
+    <string name="ai_mask_unexpected_size">Background removal gave a result of the wrong size. Try again.</string>
     <string name="ai_cannot_save_image">Cannot save image</string>
     <string name="ai_cannot_read_image">Cannot read this image</string>
     <string name="ai_cannot_decode_image">Cannot decode this image</string>
@@ -1162,13 +1162,13 @@
     <string name="ai_sample_rate_changed">Audio sample rate changed during decoding</string>
     <string name="ai_recording_too_large">This recording is too large for WAV</string>
     <string name="ai_no_samples_decoded">No audio samples were decoded</string>
-    <string name="ai_mask_wrong_size">The mask has an unexpected size</string>
+    <string name="ai_mask_wrong_size">Background removal gave a result of the wrong size. Try again.</string>
     <string name="ai_encoder_no_image">The video encoder gave no input image</string>
     <string name="ai_encoder_not_responding">The video encoder stopped responding</string>
-    <string name="ai_encoder_frames_before_format">The video encoder sent frames before its format</string>
+    <string name="ai_encoder_frames_before_format">The video encoder did not start correctly. Try again.</string>
     <string name="ai_encoder_not_finished">The video encoder did not finish</string>
     <string name="ai_cannot_encode_mask">This phone cannot encode the mask video</string>
-    <string name="ai_video_no_size">This video has no size information</string>
+    <string name="ai_video_no_size">This video has no size information.</string>
     <string name="ai_clip_too_long">Clips longer than %1$s minutes are not supported yet. Trim or split the clip first.</string>
     <string name="ai_not_enough_storage">Not enough free storage: this needs about %1$s MB.</string>
     <string name="ai_no_video_frames">This clip has no video frames to process</string>
@@ -1179,7 +1179,7 @@
     <string name="ai_no_sound_to_caption">There is no sound to caption</string>
     <string name="ai_no_speech">No speech was found</string>
     <string name="ai_reading_audio">Reading the audio…</string>
-    <string name="ai_recognising_speech">Recognising speech…</string>
+    <string name="ai_recognising_speech">Recognizing speech…</string>
     <string name="ai_caption_model_load_failed">The caption model could not be loaded. Remove it in Settings and try again.</string>
     <string name="ai_speech_failed">Speech recognition failed</string>
     <string name="ai_cannot_create_model_storage">Cannot create model storage</string>
@@ -1199,7 +1199,7 @@
     <string name="model_svg_skipped_gradient_strokes">gradient strokes</string>
     <string name="model_svg_skipped_dashed">dashed strokes</string>
     <string name="model_svg_skipped_patterns">pattern fills</string>
-    <string name="model_svg_skipped_gradient_colours">extra gradient colours (the first and last are used)</string>
+    <string name="model_svg_skipped_gradient_colours">extra gradient colors (the first and last are used)</string>
     <string name="ai_no_audio_track">No audio track in %1$s</string>
     <string name="shape_name_circle">Circle</string>
     <string name="shape_name_rounded_rectangle">Rounded Rectangle</string>
@@ -1285,7 +1285,7 @@
     <string name="track_motion_lost_at_frame">Tracking was lost at frame %1$s. Move the point back onto the same feature and tap Continue.</string>
     <string name="track_motion_done">Tracked %1$s frames. The keyframes are on %2$s.</string>
     <string name="track_motion_target_layer">the target layer</string>
-    <string name="track_motion_cancelled">Tracking cancelled. Frames already tracked keep their keyframes.</string>
+    <string name="track_motion_cancelled">Tracking canceled. Frames already tracked keep their keyframes.</string>
     <string name="track_motion_unavailable">Motion tracking is unavailable in this build.</string>
     <string name="track_motion_failed">This video could not be tracked.</string>
     <string name="edit_layer_copy_name">%1$s Copy</string>
@@ -1325,7 +1325,7 @@
     <string name="export_audio_summary_lossless">%1$s · %2$s · %3$s</string>
     <string name="export_audio_hint">Sound settings for the video file. %1$s can hold %2$s audio.</string>
     <string name="export_audio_hint_silent">This project has no sound yet. These settings are used once you add some.</string>
-    <string name="export_audio_only_hint">Saved to Music / AbsentMotion. WAV and FLAC keep every detail; M4A, OGG and MP3 are smaller.</string>
+    <string name="export_audio_only_hint">Saved to Music/AbsentMotion. WAV and FLAC keep every detail; M4A, OGG and MP3 are smaller.</string>
     <string name="export_running_audio">Exporting Audio</string>
     <string name="export_interpolation_off_help">Each clip shows its own frames. A 30 fps clip in a 60 fps export shows every frame twice, so motion can look a little stepped.</string>
     <string name="export_interpolation_blend_help">The new in-between frames mix the two nearest frames like a quick cross-fade. Fast to export; fast motion can look ghosted.</string>

@@ -3,7 +3,7 @@
  "name": "Lens Blur",
  "category": "blur",
  "since": "3.0.0",
- "description": "A spinning blur that leaves a sharp area around the centre and grows towards the edges.",
+ "description": "A spinning blur that leaves a sharp area around the center and grows towards the edges.",
  "params": [
   {
    "id": "center",

@@ -3,7 +3,7 @@
  "name": "Glow",
  "category": "stylize",
  "native": true,
- "description": "A halo in one colour around the outside of the layer's shape. Hardness turns it from a soft fade into a solid outline.",
+ "description": "A halo in one color around the outside of the layer's shape. Hardness turns it from a soft fade into a solid outline.",
  "params": [
   {
    "id": "radius",

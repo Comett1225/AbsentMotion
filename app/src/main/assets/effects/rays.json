@@ -3,7 +3,7 @@
  "name": "Rays",
  "category": "stylize",
  "since": "3.0.0",
- "description": "Shines rays of light out from the bright parts of the layer, away from a centre point.",
+ "description": "Shines rays of light out from the bright parts of the layer, away from a center point.",
  "params": [
   {
    "id": "center",

@@ -3,7 +3,7 @@
  "name": "VHS",
  "category": "stylize",
  "since": "3.0.0",
- "description": "Looks like an old video tape: colour bleed, smeared lines, scanlines, tape noise and rolling tracking bands.",
+ "description": "Looks like an old video tape: color bleed, smeared lines, scanlines, tape noise and rolling tracking bands.",
  "params": [
   {
    "id": "chroma",

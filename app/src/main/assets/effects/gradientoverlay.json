@@ -2,7 +2,7 @@
  "id": "gradientoverlay",
  "name": "Gradient Overlay",
  "category": "color",
- "description": "Lays a two-colour gradient over the layer with a choice of shapes and blend modes.",
+ "description": "Lays a two-color gradient over the layer with a choice of shapes and blend modes.",
  "params": [
   {
    "id": "color1",

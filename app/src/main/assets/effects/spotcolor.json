@@ -3,7 +3,7 @@
  "name": "Spot Color",
  "category": "color",
  "since": "3.0.0",
- "description": "Keeps one colour and takes the saturation out of every other colour in the layer.",
+ "description": "Keeps one color and takes the saturation out of every other color in the layer.",
  "params": [
   {
    "id": "color",

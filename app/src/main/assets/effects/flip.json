@@ -3,7 +3,7 @@
  "name": "Flip Layer",
  "category": "3d",
  "since": "3.0.0",
- "description": "Turns the layer like a card in 3D, with its back see-through, a picture or a colour.",
+ "description": "Turns the layer like a card in 3D, with its back see-through, a picture or a color.",
  "params": [
   {
    "id": "rotX",

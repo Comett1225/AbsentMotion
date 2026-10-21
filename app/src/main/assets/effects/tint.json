@@ -2,7 +2,7 @@
  "id": "tint",
  "name": "Tint",
  "category": "color",
- "description": "Maps the picture's luminance between a shadow colour and a highlight colour with a blend amount.",
+ "description": "Maps the picture's luminance between a shadow color and a highlight color with a blend amount.",
  "params": [
   {
    "id": "amount",
@@ -15,13 +15,13 @@
   },
   {
    "id": "shadowColor",
-   "label": "Shadow Colour",
+   "label": "Shadow Color",
    "type": "color",
    "default": "#000000"
   },
   {
    "id": "highlightColor",
-   "label": "Highlight Colour",
+   "label": "Highlight Color",
    "type": "color",
    "default": "#FFFFFF"
   }

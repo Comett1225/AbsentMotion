@@ -3,7 +3,7 @@
  "name": "Polar Displacement Map",
  "category": "distort",
  "since": "3.0.0",
- "description": "Turns and pulls the layers behind this one around a centre point by the layer's colours, then hides the layer.",
+ "description": "Turns and pulls the layers behind this one around a center point by the layer's colors, then hides the layer.",
  "params": [
   {
    "id": "angle",

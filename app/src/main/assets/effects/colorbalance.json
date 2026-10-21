@@ -1,8 +1,8 @@
 {
  "id": "colorbalance",
- "name": "Colour Balance",
+ "name": "Color Balance",
  "category": "color",
- "description": "Pushes the shadows, midtones and highlights towards their own colours (grey leaves a range unchanged).",
+ "description": "Pushes the shadows, midtones and highlights towards their own colors (gray leaves a range unchanged).",
  "params": [
   {
    "id": "shadows",

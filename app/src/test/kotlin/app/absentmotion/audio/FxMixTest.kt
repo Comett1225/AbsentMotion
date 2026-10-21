@@ -1,5 +1,7 @@
 package app.absentmotion.audio
 
+import app.absentmotion.awaitCondition
+import app.absentmotion.sceneXml
 import app.absentmotion.model.Scene
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
@@ -75,8 +77,6 @@ class FxMixTest {
     private fun audio(id: Int, start: Int, end: Int, fx: Boolean, extra: String = "") =
         """<audio id="$id" src="tone$id" startTime="$start" endTime="$end" outTime="30000" $extra>${if (fx) withFx else ""}</audio>"""
 
-    private fun scene(vararg layers: String) = Scene.parse("""<scene width="100" height="100" fps="30">${layers.joinToString("")}</scene>""")
-
     private fun mix(scene: Scene, make: FxMaker) = OfflineMix({ uri -> ToneSource(if (uri == "tone1") 440.0 else 660.0) }, AudioClip.of(scene), Resampler.ULTRA, make)
 
     private fun render(scene: Scene, ms: Int, make: FxMaker): ShortArray = mix(scene, make).use { it(0, ms * 1000L) }
@@ -89,9 +89,9 @@ class FxMixTest {
     }
 
     @Test fun scratchMixingEqualsTheDirectPathWhenTheChainDoesNothing() {
-        val plain = render(scene(audio(1, 0, 2999, false), audio(2, 500, 2499, false)), 3000) { _, _ -> FakeFx() }
-        val routed = render(scene(audio(1, 0, 2999, false), audio(2, 500, 2499, true)), 3000) { _, _ -> FakeFx() }
-        val both = render(scene(audio(1, 0, 2999, true), audio(2, 500, 2499, true)), 3000) { _, _ -> FakeFx() }
+        val plain = render(sceneXml(audio(1, 0, 2999, false), audio(2, 500, 2499, false)), 3000) { _, _ -> FakeFx() }
+        val routed = render(sceneXml(audio(1, 0, 2999, false), audio(2, 500, 2499, true)), 3000) { _, _ -> FakeFx() }
+        val both = render(sceneXml(audio(1, 0, 2999, true), audio(2, 500, 2499, true)), 3000) { _, _ -> FakeFx() }
         assertTrue(level(plain, 600, 2400) > 10_000)
         assertArrayEquals(plain, routed)
         assertArrayEquals(plain, both)
@@ -99,7 +99,7 @@ class FxMixTest {
 
     @Test fun withoutEffectsTheExportEqualsThePreviousMixer() {
         val half = { layer: String -> layer.replace("</audio>", """<gain value="0.5"/></audio>""") }
-        val sc = scene(half(audio(1, 0, 2999, false, """speed="1.5"""")), half(audio(2, 0, 1999, false)), half(audio(3, 0, 2499, false, """loop="true" outTime="700"""")))
+        val sc = sceneXml(half(audio(1, 0, 2999, false, """speed="1.5"""")), half(audio(2, 0, 1999, false)), half(audio(3, 0, 2499, false, """loop="true" outTime="700"""")))
         val clips = AudioClip.of(sc)
         val now = OfflineMix({ uri -> ToneSource(if (uri == "tone1") 440.0 else 660.0) }, clips, Resampler.ULTRA, { _, _ -> null }, SafeLimiter(44_100)).use { it(0, 3_000_000) }
         val rate = 44_100
@@ -138,17 +138,17 @@ class FxMixTest {
 
     @Test fun eachClipRunsThroughItsOwnChain() {
         val half: FxMaker = { _, _ -> GainFx(0.5f) }
-        val mixed = render(scene(audio(1, 0, 1999, true), audio(2, 0, 1999, false)), 2000, half)
-        val first = render(scene(audio(1, 0, 1999, true)), 2000, half)
-        val second = render(scene(audio(2, 0, 1999, false)), 2000, half)
-        val dry = render(scene(audio(1, 0, 1999, false)), 2000, half)
+        val mixed = render(sceneXml(audio(1, 0, 1999, true), audio(2, 0, 1999, false)), 2000, half)
+        val first = render(sceneXml(audio(1, 0, 1999, true)), 2000, half)
+        val second = render(sceneXml(audio(2, 0, 1999, false)), 2000, half)
+        val dry = render(sceneXml(audio(1, 0, 1999, false)), 2000, half)
         for (i in mixed.indices) assertEquals(first[i] + second[i].toFloat(), mixed[i].toFloat(), 2f)
         for (i in 2000 until 2400) assertEquals(dry[i] / 2f, first[i].toFloat(), 1f)
     }
 
     @Test fun aSeekStartsTheChainsFreshLikeANewExport() {
         val echo: FxMaker = { _, _ -> EchoFx(4410, 0.6f) }
-        val sc = scene(audio(1, 0, 9999, true))
+        val sc = sceneXml(audio(1, 0, 9999, true))
         val jumped = mix(sc, echo).use { it(0, 2_000_000); it(5_000_000, 6_000_000) }
         val fresh = mix(sc, echo).use { it(5_000_000, 6_000_000) }
         assertArrayEquals(fresh, jumped)
@@ -158,7 +158,7 @@ class FxMixTest {
 
     @Test fun theMixDoesNotDependOnHowItIsRequested() {
         val echo: FxMaker = { _, _ -> EchoFx(3001, 0.5f) }
-        val sc = scene(audio(1, 0, 1999, true), audio(2, 700, 2999, false))
+        val sc = sceneXml(audio(1, 0, 1999, true), audio(2, 700, 2999, false))
         val whole = render(sc, 3000, echo)
         val pieces = mix(sc, echo).use { m ->
             val parts = ArrayList<ShortArray>()
@@ -176,12 +176,12 @@ class FxMixTest {
     }
 
     @Test fun tailsRingOutAfterTheClipThenStop() {
-        val pcm = render(scene(audio(1, 0, 499, true)), 8000) { _, _ -> EchoFx(66_150, 0.5f) }
+        val pcm = render(sceneXml(audio(1, 0, 499, true)), 8000) { _, _ -> EchoFx(66_150, 0.5f) }
         assertTrue(level(pcm, 100, 450) > 10_000)
         assertEquals(0, level(pcm, 520, 1480))
         assertTrue(level(pcm, 1550, 1950) > 4_000)
         assertTrue(level(pcm, 3050, 3450) > 2_000)
-        val short = render(scene(audio(1, 0, 499, true)), 8000) { _, _ -> EchoFx(4410, 0.5f) }
+        val short = render(sceneXml(audio(1, 0, 499, true)), 8000) { _, _ -> EchoFx(4410, 0.5f) }
         assertTrue(level(short, 600, 700) > 1_000)
         assertEquals(0, level(short, 4000, 8000))
     }
@@ -207,7 +207,7 @@ class FxMixTest {
 
     @Test fun loudClipsAreLimitedInsteadOfClipped() {
         val loud = """<gain value="1.5"/>"""
-        val sc = scene(audio(1, 0, 1999, false).replace("</audio>", "$loud</audio>"), audio(2, 0, 1999, false).replace("</audio>", "$loud</audio>"))
+        val sc = sceneXml(audio(1, 0, 1999, false).replace("</audio>", "$loud</audio>"), audio(2, 0, 1999, false).replace("</audio>", "$loud</audio>"))
         val pcm = OfflineMix({ uri -> ToneSource(if (uri == "tone1") 440.0 else 660.0) }, AudioClip.of(sc), Resampler.ULTRA, { _, _ -> null }, SafeLimiter(44_100)).use { it(0, 2_000_000) }
         val ceiling = (10f.pow(CEILING_DB / 20f) * 32767).roundToInt()
         assertTrue(pcm.all { abs(it.toInt()) <= ceiling })
@@ -216,19 +216,18 @@ class FxMixTest {
     }
 
     @Test fun exportStartingInsideALongClipSoundsAtOnce() {
-        val pcm = mix(scene(audio(1, 0, 29_999, true)), { _, _ -> FakeFx() }).use { it(4_500_000, 4_600_000) }
+        val pcm = mix(sceneXml(audio(1, 0, 29_999, true)), { _, _ -> FakeFx() }).use { it(4_500_000, 4_600_000) }
         var peak = 0
         for (i in 2 * 200 until 2 * 1000) peak = maxOf(peak, abs(pcm[i].toInt()))
         assertTrue("peak $peak", peak > 15_000)
     }
 
     @Test fun previewStartingInsideALongClipSoundsAtOnceThroughTheChain() {
-        val clip = AudioClip.of(scene(audio(1, 0, 29_999, true))).single()
+        val clip = AudioClip.of(sceneXml(audio(1, 0, 29_999, true))).single()
         val stream = LayerStream(clip.uri, 4500.0 - LayerStream.LEAD_MS) { ToneSource(440.0) }
         FxRack(48_000) { _, _ -> FakeFx() }.use { rack ->
             try {
-                val until = System.nanoTime() + 3_000_000_000L
-                while (!stream.prepare(4500.0)) { assertTrue("the stream never became ready", System.nanoTime() < until); Thread.sleep(5) }
+                awaitCondition("the stream to become ready") { stream.prepare(4500.0) }
                 val out = FloatArray(2 * 1024)
                 mixStreams(listOf(clip), out, 1024, 4500.0, 48_000, Resampler.ULTRA, rack) { stream }
                 var peak = 0f
@@ -241,16 +240,15 @@ class FxMixTest {
     }
 
     @Test fun restartingPreviewDoesNotStackEffectTails() {
-        val clip = AudioClip.of(scene(audio(1, 0, 999, true))).single()
+        val clip = AudioClip.of(sceneXml(audio(1, 0, 999, true))).single()
         val stream = LayerStream(clip.uri, 500.0 - LayerStream.LEAD_MS) { ToneSource(440.0) }
         try {
-            val until = System.nanoTime() + 3_000_000_000L
-            while (!stream.prepare(500.0)) { assertTrue("the stream never became ready", System.nanoTime() < until); Thread.sleep(5) }
+            awaitCondition("the stream to become ready") { stream.prepare(500.0) }
             fun after(reset: Boolean): Float = FxRack(48_000) { _, _ -> EchoFx(12_000, 0.9f) }.use { rack ->
                 val out = FloatArray(2 * 1024)
                 var t = 500.0
                 repeat(20) {
-                    while (!stream.prepare(t)) Thread.sleep(2)
+                    awaitCondition("the stream at $t ms") { stream.prepare(t) }
                     mixStreams(listOf(clip), out, 1024, t, 48_000, Resampler.ULTRA, rack) { stream }
                     t += 1024 * 1000.0 / 48_000
                 }

@@ -9,6 +9,7 @@ import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import java.io.IOException
 import java.util.Collections
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
@@ -23,10 +24,14 @@ class SaveQueueTest {
 
     @Test fun manyQuickEditsBecomeOneWriteOfTheLatest() {
         val written = Collections.synchronizedList(ArrayList<String>())
-        val queue = SaveQueue(executor, 200, { written += it })
+        val wrote = CountDownLatch(1)
+        val queue = SaveQueue(executor, 50, { written += it; wrote.countDown() })
+        val release = CountDownLatch(1)
+        executor.submit { release.await() }
         repeat(20) { queue.submit("v$it") }
         assertTrue(written.isEmpty())
-        Thread.sleep(500)
+        release.countDown()
+        assertTrue(wrote.await(5, TimeUnit.SECONDS))
         drain()
         assertEquals(listOf("v19"), written)
     }

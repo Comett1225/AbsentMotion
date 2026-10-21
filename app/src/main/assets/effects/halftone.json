@@ -24,7 +24,7 @@
   },
   {
    "id": "colored",
-   "label": "Colour Dots",
+   "label": "Color Dots",
    "type": "switch",
    "default": true
   }

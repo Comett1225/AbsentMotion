@@ -3,7 +3,7 @@
  "name": "Polar Coordinates",
  "category": "distort",
  "since": "3.0.0",
- "description": "Bends the layer around its centre, turning straight lines into circles, or unrolls circles into straight lines.",
+ "description": "Bends the layer around its center, turning straight lines into circles, or unrolls circles into straight lines.",
  "params": [
   {
    "id": "amount",

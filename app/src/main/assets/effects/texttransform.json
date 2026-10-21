@@ -4,7 +4,7 @@
  "category": "text",
  "since": "3.0.0",
  "native": true,
- "description": "Moves, scales, turns, fades and tints letters, words or lines inside a range. Anchor sets whether scaling and rotation use each component or the centre of the layer. Move the range with Offset to make the change travel through the text.",
+ "description": "Moves, scales, turns, fades and tints letters, words or lines inside a range. Anchor sets whether scaling and rotation use each component or the center of the layer. Move the range with Offset to make the change travel through the text.",
  "params": [
   {
    "id": "unit",

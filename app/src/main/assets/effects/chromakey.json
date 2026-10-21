@@ -2,7 +2,7 @@
  "id": "chromakey",
  "name": "Chroma Key",
  "category": "key",
- "description": "Removes one colour, such as a green screen.",
+ "description": "Removes one color, such as a green screen.",
  "params": [
   {
    "id": "key",

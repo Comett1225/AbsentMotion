@@ -1,5 +1,7 @@
 package app.absentmotion.editor
 
+import app.absentmotion.sceneOf
+import app.absentmotion.shapeNode
 import app.absentmotion.engine.SnapGuide
 import app.absentmotion.model.Layer
 import app.absentmotion.model.MediaDeclaration
@@ -15,13 +17,12 @@ import org.junit.Test
 
 class GroupAndSnapTest {
     private fun layer(id: Long, start: Int, end: Int, x: Float = 0f, y: Float = 0f, parent: Long? = null, extra: Map<String, String> = emptyMap()) =
-        XmlNode(
-            "shape", linkedMapOf("id" to "$id", "label" to "L$id", "startTime" to "$start", "endTime" to "$end") + extra +
-                (parent?.let { mapOf("parent" to "$it") } ?: emptyMap()),
-            listOf(XmlNode("transform", children = listOf(XmlNode("location", mapOf("value" to "$x,$y,0"))))),
+        shapeNode(
+            id = id, start = start, end = end, parent = parent, attrs = mapOf("label" to "L$id") + extra,
+            children = listOf(XmlNode("transform", children = listOf(XmlNode("location", mapOf("value" to "$x,$y,0"))))),
         )
 
-    private fun scene(vararg children: XmlNode) = Scene(Scene.create("t", 1080, 1920, 30, 0).node.copy(children = children.toList()))
+    private fun scene(vararg children: XmlNode) = sceneOf(*children, width = 1080, height = 1920)
 
     private val project = scene(
         XmlNode("media", mapOf("uri" to "u1", "filename" to "pic.png")),

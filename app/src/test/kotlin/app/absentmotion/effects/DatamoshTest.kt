@@ -1,5 +1,6 @@
 package app.absentmotion.effects
 
+import app.absentmotion.shapeLayer
 import app.absentmotion.compat.EffectMigration
 import app.absentmotion.model.Layer
 import app.absentmotion.model.MOSH_STEPS
@@ -23,9 +24,8 @@ class DatamoshTest {
     private fun property(name: String, value: String) = XmlNode("property", mapOf("name" to name, "type" to "float", "value" to value))
 
     private fun layer(vararg params: Pair<String, String>, hidden: Boolean = false, fill: String = "fillVideo") =
-        Layer(XmlNode("shape", mapOf("id" to "3", "startTime" to "1000", "endTime" to "12000", "fillType" to "media", fill to "file:///v.mp4",
-            "inTime" to "0", "outTime" to "20000"), listOf(XmlNode("effect", mapOf("id" to "absent.datamosh", "hidden" to "$hidden"),
-            params.map { (name, value) -> property(name, value) }))))
+        shapeLayer(id = 3, start = 1000, end = 12000, attrs = mapOf("fillType" to "media", fill to "file:///v.mp4", "inTime" to "0", "outTime" to "20000"),
+            children = listOf(XmlNode("effect", mapOf("id" to "absent.datamosh", "hidden" to "$hidden"), params.map { (name, value) -> property(name, value) })))
 
     @Test fun theEffectIsAStylizeShaderWithItsParameters() {
         val mosh = catalog.find("absent.datamosh")!!

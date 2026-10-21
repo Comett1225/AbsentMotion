@@ -1,5 +1,7 @@
 package app.absentmotion.editor
 
+import app.absentmotion.sceneOf
+import app.absentmotion.videoNode
 import app.absentmotion.media.LumaFrame
 import app.absentmotion.media.PointTracker
 import app.absentmotion.media.TrackResult
@@ -20,12 +22,11 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 class MotionTrackTest {
-    private fun scene(vararg layers: XmlNode) = Scene(Scene.create("t", 1080, 1920, 30, 0).node.copy(children = layers.toList()))
+    private fun scene(vararg layers: XmlNode) = sceneOf(*layers, width = 1080, height = 1920)
 
     private fun video(id: Long = 1, attrs: Map<String, String> = emptyMap(), mode: String = "fill", size: Pair<Float, Float> = 192f to 108f,
                       location: FloatArray = floatArrayOf(540f, 960f, 0f), rotation: Float = 0f, scale: Float = 1f): XmlNode =
-        Layer(XmlNode("shape", linkedMapOf("id" to "$id", "startTime" to "0", "endTime" to "2000", "fillType" to "media", "fillVideo" to "v.mp4",
-            "mediaFillMode" to mode, "s" to ".rect", "outTime" to "4000") + attrs))
+        Layer(videoNode(0, 2000, id, inTime = null, outTime = 4000, uri = "v.mp4", attrs = mapOf("mediaFillMode" to mode, "s" to ".rect") + attrs))
             .withTransform("location", *location).withTransform("rotation", rotation).withTransform("scale", scale, scale)
             .withProp("size", "vec2", size.first, size.second).node
 

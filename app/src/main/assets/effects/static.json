@@ -2,7 +2,7 @@
  "id": "static",
  "name": "Static",
  "category": "noise",
- "description": "Flickering grey noise, like a television with no signal.",
+ "description": "Flickering gray noise, like a television with no signal.",
  "params": [
   {
    "id": "amount",

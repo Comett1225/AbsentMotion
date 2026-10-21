@@ -1,5 +1,6 @@
 package app.absentmotion.ai
 
+import app.absentmotion.videoLayer
 import app.absentmotion.media.Yuv
 import app.absentmotion.model.Layer
 import app.absentmotion.model.MediaDeclaration
@@ -75,10 +76,9 @@ class VideoBackgroundTest {
         assertEquals(0xFFFFFFFF.toInt(), full[0])
     }
 
-    private fun video(effects: List<XmlNode> = emptyList()) = Layer(XmlNode("shape", linkedMapOf(
-        "id" to "1", "label" to "Clip", "startTime" to "500", "endTime" to "2500", "fillType" to "media", "fillVideo" to "v.mp4",
-        "mediaFillMode" to "fill", "s" to ".rect", "inTime" to "1000", "outTime" to "3000", "speed" to "1.5",
-    ), effects)).withTransform("location", 300f, 400f, 0f).withTransform("rotation", 90f).withProp("size", "vec2", 100f, 100f)
+    private fun video(effects: List<XmlNode> = emptyList()) = videoLayer(
+        500, 2500, inTime = 1000, outTime = 3000, speed = "1.5", uri = "v.mp4", attrs = mapOf("label" to "Clip", "mediaFillMode" to "fill", "s" to ".rect"), children = effects,
+    ).withTransform("location", 300f, 400f, 0f).withTransform("rotation", 90f).withProp("size", "vec2", 100f, 100f)
 
     @Test fun theMaskSitsAboveTheVideoInsideAMaskedGroup() {
         val steps = XmlNode("effect", linkedMapOf("id" to "absent.timequant", "hidden" to "false"))

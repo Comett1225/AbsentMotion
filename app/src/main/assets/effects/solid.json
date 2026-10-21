@@ -2,7 +2,7 @@
  "id": "solid",
  "name": "Solid Color",
  "category": "color",
- "description": "Lays one colour over the layer, keeping its shape, with a choice of blend modes.",
+ "description": "Lays one color over the layer, keeping its shape, with a choice of blend modes.",
  "params": [
   {
    "id": "color",

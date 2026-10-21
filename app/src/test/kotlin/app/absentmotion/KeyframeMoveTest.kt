@@ -22,10 +22,10 @@ class KeyframeMoveTest {
     private fun kfAt(t: Float, v: String) = XmlNode("kf", mapOf("t" to String.format(Locale.US, "%.6f", t), "v" to v))
 
     private fun layer(location: List<XmlNode>, rotation: List<XmlNode> = emptyList(), effect: List<XmlNode> = emptyList(), extra: List<XmlNode> = emptyList()) =
-        Layer(XmlNode("shape", mapOf("id" to "1", "startTime" to "0", "endTime" to "$end"), listOf(
+        shapeLayer(end = end, children = listOf(
             XmlNode("transform", children = listOf(XmlNode("location", children = location), XmlNode("rotation", children = rotation))),
             XmlNode("effect", mapOf("id" to "blur"), listOf(XmlNode("property", mapOf("name" to "strength", "type" to "float"), effect))),
-        ) + extra))
+        ) + extra)
 
     private fun Layer.keys(ref: PropRef) = keyframes(ref).map { scene.frameAt(timeOf(it.t)) to it.v }
 

@@ -2,7 +2,7 @@
  "id": "pixelate",
  "name": "Pixelate",
  "category": "stylize",
- "description": "Turns the layer into blocks of one colour each, taken from the middle of the block, on a grid centred on the layer (or on the frame with Screen Space). Stretch, Offset and Angle shape the grid and Vignette darkens each block toward its edges.",
+ "description": "Turns the layer into blocks of one color each, taken from the middle of the block, on a grid centered on the layer (or on the frame with Screen Space). Stretch, Offset and Angle shape the grid and Vignette darkens each block toward its edges.",
  "params": [
   {
    "id": "blockSize",

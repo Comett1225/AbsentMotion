@@ -5,10 +5,9 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class LayerCopiesTest {
-    private fun layer(id: Long, kind: String, start: Int, end: Int, parent: Long? = null): Layer = Layer(
-        XmlNode(kind, mapOf("id" to "$id", "startTime" to "$start", "endTime" to "$end", "label" to kind) +
-            (parent?.let { mapOf("parent" to "$it") } ?: emptyMap()),
-            listOf(XmlNode("gain", children = listOf(XmlNode("kf", mapOf("t" to "0.25", "v" to "0.5")))))))
+    private fun layer(id: Long, kind: String, start: Int, end: Int, parent: Long? = null): Layer = shapeLayer(
+        kind, mapOf("label" to kind), listOf(XmlNode("gain", children = listOf(XmlNode("kf", mapOf("t" to "0.25", "v" to "0.5"))))), id, start, end, parent,
+    )
 
     @Test fun pasteKeepsTheStackTimingAndMixedClipTypes() {
         val source = listOf(layer(1, "shape", 500, 999), layer(2, "audio", 1250, 1999))
