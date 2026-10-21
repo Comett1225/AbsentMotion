@@ -60,6 +60,7 @@ import app.absentmotion.export.GifSample
 import app.absentmotion.export.frameCount
 import app.absentmotion.export.gifTimeMs
 import app.absentmotion.export.measureGif
+import app.absentmotion.export.withMissing
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.Composable
@@ -338,21 +339,24 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
         progress = 0f
         val job = scope.launch {
             try {
-                if (chosen != ExportKind.Xml && !ignoreMissing) {
+                var exported = scene
+                if (chosen != ExportKind.Xml) {
                     val missing = withContext(Dispatchers.IO) {
                         scene.node.mediaUris().filter { uri ->
                             try { context.contentResolver.openAssetFileDescriptor(app.absentmotion.platform.Uri.parse(uri), "r")?.close() == null } catch (e: Exception) { true }
-                        }.map { scene.media(it)?.filename?.ifEmpty { null } ?: it }
+                        }
                     }
-                    if (missing.isNotEmpty()) {
-                        failure = Failure(R.string.export_missing_title, txt(R.string.export_missing_text, missing.joinToString("\n")), txt(R.string.export_anyway), proceed = { start(true) })
+                    if (missing.isNotEmpty() && !ignoreMissing) {
+                        val names = missing.map { scene.media(it)?.filename?.ifEmpty { null } ?: it }
+                        failure = Failure(R.string.export_missing_title, txt(R.string.export_missing_text, names.joinToString("\n")), txt(R.string.export_anyway), proceed = { start(true) })
                         phase = Phase.Idle
                         return@launch
                     }
+                    if (chosen != ExportKind.Package) exported = scene.withMissing(missing.toSet())
                 }
                 var predicted = estimated
                 if (chosen == ExportKind.Gif) {
-                    val measured = measureGif(engine, scene, s).bytes
+                    val measured = measureGif(engine, exported, s).bytes
                     predicted = measured
                     free = freeSpace()
                     if (storageStatus(measured, free) is StorageStatus.NotEnough) {
@@ -361,7 +365,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
                         return@launch
                     }
                 }
-                val result = exporter.export(chosen, scene, s, frame, name) { progress = it }
+                val result = exporter.export(chosen, exported, s, frame, name) { progress = it }
                 ExportSizes.key(chosen, s)?.let { key ->
                     withContext(Dispatchers.IO) {
                         val written = result.uris.sumOf { uri ->

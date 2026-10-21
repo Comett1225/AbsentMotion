@@ -120,3 +120,8 @@ fun exportHeatText(level: ThermalLevel): UiText? = when (level) {
 
 fun verificationLine(v: Verification, still: Boolean = false): UiText =
     if (v.ok) txt(if (still) R.string.export_checked_ok_still else R.string.export_checked_ok) else txt(R.string.export_checked_problems, v.problems)
+
+fun app.absentmotion.model.Scene.withMissing(uris: Set<String>): app.absentmotion.model.Scene {
+    val declared = uris.fold(this) { s, uri -> s.withMedia(app.absentmotion.model.MediaDeclaration(app.absentmotion.model.XmlNode("media", mapOf("uri" to uri)))) }
+    return app.absentmotion.model.Scene(declared.node.copy(children = declared.node.children.map { if (it.name == "media" && it["uri"] in uris) it.with("missing", "true") else it }))
+}
