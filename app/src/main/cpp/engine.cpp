@@ -684,9 +684,10 @@ sk_sp<SkImage> EngineImpl::copyFrame(AHardwareBuffer* buffer, bool opaque, int c
         const float kr = colorStandard == 1 ? 0.2126f : colorStandard == 6 ? 0.2627f : 0.299f;
         const float kb = colorStandard == 1 ? 0.0722f : colorStandard == 6 ? 0.0593f : 0.114f;
         const float kg = 1 - kr - kb;
-        const float ys = colorRange == 2 ? 255.f / 219 : 1.f;
-        const float cs = colorRange == 2 ? 255.f / 224 : 1.f;
-        const float yo = colorRange == 2 ? -16.f / 219 : 0.f;
+        const bool limited = colorRange != 1;
+        const float ys = limited ? 255.f / 219 : 1.f;
+        const float cs = limited ? 255.f / 224 : 1.f;
+        const float yo = limited ? -16.f / 219 : 0.f;
         const float ro = 2 * (1 - kr) * cs;
         const float bo = 2 * (1 - kb) * cs;
         const float gr = -2 * kr * (1 - kr) / kg * cs;
