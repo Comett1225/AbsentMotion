@@ -9,7 +9,8 @@ if [ ! -f "$UNSIGNED" ] || [ -z "$OUT" ]; then
 fi
 KEYS="$ROOT/signing.properties"
 prop() { sed -n "s/^$1=//p" "$KEYS"; }
-SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-$HOME/Library/Android/sdk}}"
+. "$ROOT/tools/env.sh"
+SDK="${SDK_ROOT:-${ANDROID_HOME:-${ANDROID_SDK_ROOT:-$HOME/Library/Android/sdk}}}"
 BT="$(ls -d "$SDK"/build-tools/* | sort -V | tail -n 1)"
 PW="$(mktemp)"
 trap 'rm -f "$PW"' EXIT

@@ -8,7 +8,9 @@ from collections import defaultdict
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SDK = Path.home() / "Library/Android/sdk"
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from sdk import sdk_root
+SDK = sdk_root() or Path.home() / "Library/Android/sdk"
 SYSTEM_LIBS = ["libc.so", "libm.so", "libdl.so", "liblog.so", "libandroid.so", "libvulkan.so", "libjnigraphics.so", "libEGL.so", "libGLESv1_CM.so",
                "libGLESv2.so", "libGLESv3.so", "libnativewindow.so", "libmediandk.so", "libcamera2ndk.so", "libaaudio.so", "libOpenSLES.so", "libz.so",
                "libsync.so", "libbinder_ndk.so"]

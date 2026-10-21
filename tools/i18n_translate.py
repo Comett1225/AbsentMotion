@@ -17,13 +17,17 @@ from i18n_extract import EFFECTS, FOLDERS, KOTLIN, PLACEHOLDER, RES, ROOT, xml_e
 
 LANGUAGES = {'id': 'Indonesian', 'hi': 'Hindi', 'pt-BR': 'Brazilian Portuguese', 'es': 'Latin American Spanish', 'fil': 'Filipino (Tagalog)',
              'vi': 'Vietnamese', 'th': 'Thai', 'ms': 'Malay (Malaysia)', 'ar': 'Arabic (Modern Standard)', 'tr': 'Turkish', 'ru': 'Russian'}
-QUANTITIES = {'id': ['other'], 'vi': ['other'], 'th': ['other'], 'ms': ['other'], 'hi': ['one', 'other'], 'pt-BR': ['one', 'other'],
-              'es': ['one', 'other'], 'fil': ['one', 'other'], 'tr': ['one', 'other'], 'ru': ['one', 'few', 'many', 'other'],
+QUANTITIES = {'id': ['other'], 'vi': ['other'], 'th': ['other'], 'ms': ['other'], 'hi': ['one', 'other'], 'pt-BR': ['one', 'many', 'other'],
+              'es': ['one', 'many', 'other'], 'fil': ['one', 'other'], 'tr': ['one', 'other'], 'ru': ['one', 'few', 'many', 'other'],
               'ar': ['zero', 'one', 'two', 'few', 'many', 'other']}
 STATE = ROOT / 'tools/i18n_source.json'
 GLOSSARY = ROOT / 'tools/i18n_glossary.json'
 NOTES = ROOT / 'tools/i18n_notes.json'
-RULES = {'ar': 'In the Arabic plural forms "one" and "two" leave out the count placeholder when the singular or dual noun already says the number '
+RULES = {'ru': 'Write the count placeholder in every plural form, including "one" (it also covers 21, 31, 101 ...), unless the English text has none.',
+         'hi': 'Write the count placeholder in every plural form, including "one" (it also covers 0), unless the English text has none.',
+         'pt-BR': 'Write the count placeholder in every plural form, including "one" (it also covers 0), and give "many" the same wording as "other" (it covers millions).',
+         'es': 'Give "many" the same wording as "other" (it covers millions).',
+         'ar': 'In the Arabic plural forms "one" and "two" leave out the count placeholder when the singular or dual noun already says the number '
                '(write "طبقتان", not "%1$s طبقتين"); keep every other placeholder.',
          'fil': 'Filipino video apps keep many English editing terms (layer, keyframe, preset, export, template); use them as the glossary says.'}
 EFFECT_I18N = EFFECTS / 'i18n'
@@ -248,6 +252,10 @@ def call(system, payload, attempts=4):
             if content.strip():
                 return json.loads(content)
             error = 'empty answer'
+        except urllib.error.HTTPError as e:
+            if e.code in (401, 402, 403):
+                sys.exit(f'DeepSeek answered {e.code}: the API key is invalid or has no credit (check DEEPSEEK_API_KEY)')
+            error = e.code
         except (urllib.error.URLError, TimeoutError, json.JSONDecodeError, KeyError, ConnectionError, OSError) as e:
             error = getattr(e, 'code', None) or type(e).__name__
         print(f'  retry {attempt + 1}: {error}', file=sys.stderr)
@@ -379,6 +387,8 @@ def main():
         return 0
 
     start, (before, currency) = time.time(), balance()
+    if before != before:
+        sys.exit('could not read the DeepSeek balance: the API key is invalid or the network is down (check DEEPSEEK_API_KEY)')
     results = {}
 
     def work(language):

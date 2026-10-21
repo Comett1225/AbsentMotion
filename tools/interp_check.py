@@ -2,8 +2,9 @@
 import argparse, functools, json, os, re, statistics, subprocess, sys, time
 import numpy as np
 from PIL import Image
+from sdk import adb_command
 
-ADB = [os.path.expanduser("~/Library/Android/sdk/platform-tools/adb"), "-s", os.environ.get("ANDROID_SERIAL") or "emulator-5554"]
+ADB = adb_command()
 PKG = "app.absentmotion"
 DEVICE_DIR = f"/sdcard/Android/data/{PKG}/files"
 CLIPS = ("shapes", "pan", "line", "occlusion")

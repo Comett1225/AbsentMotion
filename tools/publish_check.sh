@@ -33,24 +33,7 @@ echo "-- forbidden words inside the files"
 python3 tools/publish_scan.py "$words" tools/publish_allowed.txt "" < "$tmp/files" | while read -r l; do problem "${l#PROBLEM: }"; done
 
 echo "-- comments in the source (the project ships without code comments)"
-grep -E '\.(kt|kts|java|cpp|h|mm|gradle)$' "$tmp/files" | while read -r f; do
-    [ -f "$f" ] || continue
-    c=$(grep -n -E '^[[:space:]]*(//|/\*|\*([[:space:]]|/|$))' "$f" | head -3)
-    [ -n "$c" ] && problem "comment in $f: $(printf '%s' "$c" | cut -c1-80 | tr '\n' '|')"
-done
-grep -E '\.py$' "$tmp/files" | while read -r f; do
-    [ -f "$f" ] || continue
-    c=$(python3 tools/source_policy.py "$f") || problem "cannot inspect Python source: $f"
-    [ -n "$c" ] && problem "comment in $f: $c"
-done
-grep -E '\.(sh|gn|pro|toml)$|CMakeLists\.txt$' "$tmp/files" | while read -r f; do
-    [ -f "$f" ] || continue
-    c=$(grep -n -E '^[[:space:]]*#' "$f" | grep -v -E '^[0-9]+:#!' | head -3)
-    [ -n "$c" ] && problem "comment in $f: $(printf '%s' "$c" | cut -c1-80 | tr '\n' '|')"
-done
-grep -E '\.xml$' "$tmp/files" | while read -r f; do
-    [ -f "$f" ] && grep -q '<!--' "$f" && ! echo "$f" | grep -q '^testdata/' && problem "XML comment in $f"
-done
+python3 tools/comment_check.py | grep -v '^comment_check:' | while read -r l; do problem "$l"; done
 
 if git rev-parse --git-dir >/dev/null 2>&1 && git rev-parse HEAD >/dev/null 2>&1; then
     echo "-- authors, committers, tags and messages in the history"

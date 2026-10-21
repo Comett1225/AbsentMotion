@@ -60,6 +60,7 @@ class ToolRegressions(unittest.TestCase):
             (folder / 'tools').mkdir()
             script = folder / 'tools/touch.sh'
             script.write_text((ROOT / 'tools/touch.sh').read_text())
+            (folder / 'tools/env.sh').write_text((ROOT / 'tools/env.sh').read_text())
             (folder / 'tools/Touch.java').write_text('fixture')
             (folder / 'app/build/touch').mkdir(parents=True)
             (folder / 'app/build/touch/classes.dex').touch()
@@ -69,7 +70,8 @@ class ToolRegressions(unittest.TestCase):
             adb.write_text('#!/bin/sh\nprintf "%s\\n" "$*" >> "$TOUCH_LOG"\n')
             adb.chmod(0o755)
             log = folder / 'calls'
-            env = dict(os.environ, HOME=str(folder), TOUCH_LOG=str(log))
+            env = {k: v for k, v in os.environ.items() if k not in ('ANDROID_HOME', 'ANDROID_SDK_ROOT', 'ADB', 'SDK_ROOT')}
+            env.update(HOME=str(folder), TOUCH_LOG=str(log))
             for target in ['emulator-5554', 'emulator-5556']:
                 subprocess.run(['sh', str(script)], env=dict(env, ANDROID_SERIAL=target), check=True, capture_output=True)
             calls = log.read_text()

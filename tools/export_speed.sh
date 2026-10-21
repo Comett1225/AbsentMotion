@@ -1,5 +1,6 @@
 #!/bin/sh
-adb() { "$HOME/Library/Android/sdk/platform-tools/adb" -s "${ANDROID_SERIAL:-emulator-5554}" "$@"; }
+. "$(dirname "$0")/env.sh"
+adb() { "$ADB" -s "${ANDROID_SERIAL:-emulator-5554}" "$@"; }
 D=/sdcard/Android/data/app.absentmotion/files
 SCENE="$1"; shift
 adb push "$SCENE" $D/perf.xml >/dev/null 2>&1

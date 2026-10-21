@@ -1,9 +1,10 @@
 #!/bin/sh
 set -e
 cd "$(dirname "$0")"
-SDK="$HOME/Library/Android/sdk"
-JDK=/opt/homebrew/opt/openjdk@21
-adb() { "$SDK/platform-tools/adb" -s "${ANDROID_SERIAL:-emulator-5554}" "$@"; }
+. ./env.sh
+SDK="$SDK_ROOT"
+JDK="${JAVA_HOME:-/opt/homebrew/opt/openjdk@21}"
+adb() { "$ADB" -s "${ANDROID_SERIAL:-emulator-5554}" "$@"; }
 OUT=../app/build/touch
 if [ ! -f $OUT/classes.dex ] || [ Touch.java -nt $OUT/classes.dex ]; then
     mkdir -p $OUT
