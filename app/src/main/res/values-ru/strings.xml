@@ -128,6 +128,9 @@
     <string name="settings_demo_mode">Демо-режим</string>
     <string name="settings_open_xml">Открывать XML-проекты</string>
     <string name="settings_vibration">Вибрация</string>
+    <string name="settings_emoji">Стиль эмодзи</string>
+    <string name="settings_emoji_system">Системные</string>
+    <string name="settings_emoji_android">Android</string>
     <string name="settings_keep_media_copies">Хранить копию импортированных медиа в проекте</string>
     <string name="settings_about">О приложении</string>
     <string name="settings_level_low">Низкий</string>

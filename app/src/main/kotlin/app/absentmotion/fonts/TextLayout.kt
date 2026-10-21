@@ -15,6 +15,8 @@ fun FontLibrary.prepareText(xml: String, timeMs: Int = 0): String {
 private fun hasText(scene: XmlNode): Boolean = scene.children.any { it.name == "text" || it.child("scene")?.let(::hasText) == true }
 
 private fun FontLibrary.prepareText(scene: XmlNode, fps: Int, timeMs: Int): XmlNode {
+    val emoji = emojiFile()?.absolutePath
+    val flags = emojiFile(flags = true)?.absolutePath
     return scene.mapTimedLayers(fps, timeMs.toDouble()) { raw, localFps, localTime ->
         val node = raw.node
         if (node.name != "text") return@mapTimedLayers node
@@ -46,7 +48,7 @@ private fun FontLibrary.prepareText(scene: XmlNode, fps: Int, timeMs: Int): XmlN
         node.with("_fontPath", renderFile(layer.font)?.takeUnless { it.path.startsWith("/system/") && systemFamily(layer.font) != null }?.absolutePath).with("_fontFamily", systemFamily(layer.font) ?: name.family)
             .with("_fontIndex", "${fontIndex(layer.font)}")
             .with("_letterSpacing", "${paint.letterSpacing}").with("_lineSpacing", "${layer.textSpacing("linespacing", 1f)}")
-            .with("_fontWeight", "${name.weight}").with("_fontItalic", "${name.italic}")
+            .with("_fontWeight", "${name.weight}").with("_fontItalic", "${name.italic}").with("_emoji", emoji).with("_emojiFlags", flags)
             .withChild("_layout", XmlNode("_layout", mapOf("height" to "${layout.height}"), lines))
     }
 }

@@ -128,6 +128,9 @@
     <string name="settings_demo_mode">डेमो मोड</string>
     <string name="settings_open_xml">XML प्रोजेक्ट खोलें</string>
     <string name="settings_vibration">वाइब्रेशन</string>
+    <string name="settings_emoji">इमोजी स्टाइल</string>
+    <string name="settings_emoji_system">सिस्टम</string>
+    <string name="settings_emoji_android">Android</string>
     <string name="settings_keep_media_copies">इम्पोर्ट किए गए मीडिया की कॉपी प्रोजेक्ट में रखें</string>
     <string name="settings_about">परिचय</string>
     <string name="settings_level_low">कम</string>

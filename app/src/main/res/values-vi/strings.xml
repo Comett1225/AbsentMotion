@@ -128,6 +128,9 @@
     <string name="settings_demo_mode">Chế độ Demo</string>
     <string name="settings_open_xml">Mở dự án XML</string>
     <string name="settings_vibration">Rung</string>
+    <string name="settings_emoji">Kiểu emoji</string>
+    <string name="settings_emoji_system">Hệ thống</string>
+    <string name="settings_emoji_android">Android</string>
     <string name="settings_keep_media_copies">Giữ bản sao phương tiện đã nhập trong dự án</string>
     <string name="settings_about">Giới thiệu</string>
     <string name="settings_level_low">Thấp</string>

@@ -128,6 +128,9 @@
     <string name="settings_demo_mode">وضع العرض التجريبي</string>
     <string name="settings_open_xml">فتح مشاريع XML</string>
     <string name="settings_vibration">الاهتزاز</string>
+    <string name="settings_emoji">نمط الإيموجي</string>
+    <string name="settings_emoji_system">النظام</string>
+    <string name="settings_emoji_android">Android</string>
     <string name="settings_keep_media_copies">الاحتفاظ بنسخة من الوسائط المستوردة في المشروع</string>
     <string name="settings_about">حول</string>
     <string name="settings_level_low">منخفض</string>

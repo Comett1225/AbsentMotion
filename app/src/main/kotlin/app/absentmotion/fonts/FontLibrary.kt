@@ -22,6 +22,11 @@ import java.util.concurrent.ConcurrentHashMap
 import javax.net.ssl.HttpsURLConnection
 
 class FontLibrary(context: Context) {
+    companion object {
+        const val ANDROID_EMOJI = "androidEmoji"
+        private const val EMOJI = "NotoColorEmoji.ttf"
+        private const val EMOJI_FLAGS = "NotoColorEmojiFlags.ttf"
+    }
     private val context = context.applicationContext
     private val prefs = this.context.getSharedPreferences("fonts", Context.MODE_PRIVATE)
     private val imported = File(this.context.filesDir, "fonts/imported").apply { mkdirs() }
@@ -101,13 +106,13 @@ class FontLibrary(context: Context) {
         }
         true
     }
-    private fun bundledFile(asset: String): File? = synchronized(builtin) {
+    private fun bundledFile(asset: String, folder: String = "fonts"): File? = synchronized(builtin) {
         check(builtinCurrent)
         val target = File(builtin, asset.replace('/', '_'))
         if (!target.isFile || target.length() == 0L) runCatching {
             val temporary = File.createTempFile("builtin-", ".font", builtin)
             try {
-                context.assets.open("fonts/$asset").use { input -> temporary.outputStream().use { input.copyTo(it) } }
+                context.assets.open("$folder/$asset").use { input -> temporary.outputStream().use { input.copyTo(it) } }
                 check(temporary.renameTo(target))
             } finally { temporary.delete() }
         }
@@ -126,6 +131,8 @@ class FontLibrary(context: Context) {
             .firstOrNull { it.isFile }
     }
     fun renderFile(name: String): File? = localFile(name) ?: bundledAsset(FontName.parse(name), exact = false)?.let { bundledFile(it) }
+    fun emojiFile(flags: Boolean = false): File? =
+        if (context.getSharedPreferences("settings", Context.MODE_PRIVATE).getBoolean(ANDROID_EMOJI, false)) bundledFile(if (flags) EMOJI_FLAGS else EMOJI, "emoji") else null
     private val faces = ConcurrentHashMap<String, Pair<String, Typeface>>()
     fun cachedTypeface(name: String): Typeface? = faces[name]?.second
     fun typeface(name: String): Typeface {

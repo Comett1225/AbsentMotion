@@ -112,6 +112,10 @@ fun SettingsDrawer(settings: AppSettings, drawer: androidx.compose.material3.Dra
                 ThemeRow(settings)
                 DurationRow(settings)
                 SwitchRow(stringResource(R.string.settings_vibration), settings.vibration, enabled = true) { settings.vibration = it }
+                Divider(10.dp)
+                ChoicesBlock(R.string.settings_emoji) {
+                    Choices(listOf(R.string.settings_emoji_system, R.string.settings_emoji_android), if (settings.androidEmoji) 1 else 0) { settings.androidEmoji = it == 1 }
+                }
             }
             Category(R.string.settings_group_playback, HomeIcons.ProjectsTabOff) {
                 ChoicesBlock(R.string.preview_quality) {

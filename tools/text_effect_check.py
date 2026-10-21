@@ -127,6 +127,9 @@ def main():
     b.add("lines", scene(text("one\ntwo\nthree", fx("textprogress", progress=0.5, unit=2, appearance=0), size=8)))
     b.add("linesplain", scene(text("one\ntwo\nthree", size=8)))
     b.add("emoji", scene(text("Hi \U0001F44D\U0001F3FD \U0001F1EC\U0001F1E7 é", fx("textprogress", progress=0.6, appearance=6))))
+    b.add("emojicolour", scene(text("Hi \U0001F600")))
+    b.add("emojianimated", scene(text("Hi \U0001F600", fx("textprogress", progress=1, appearance=1))))
+    b.add("emojigradient", scene(text("Hi \U0001F600", fill="gradient")))
     b.add("rtlplain", scene(text("مرحبا بك")))
     b.add("rtl", scene(text("مرحبا بك", fx("textprogress", progress=0.5, appearance=0))))
     b.add("gradientplain", scene(text(hello, fill="gradient")))
@@ -192,6 +195,10 @@ def main():
     lines, lines_plain = rows(b["lines"]), rows(b["linesplain"])
     check("line progress shows the first lines only", lines and lines[0] == lines_plain[0] and lines[1] < lines_plain[1] - 10, f"{lines} of {lines_plain}")
     check("emoji, flags and accents draw", ink(b["emoji"]).any())
+    yellow = lambda image: int(((image[:, :, 0] > 180) & (image[:, :, 1] > 150) & (image[:, :, 2] < 90)).sum())
+    for name, title in (("emojicolour", "emoji keep their own colours in white text"), ("emojianimated", "animated emoji keep their own colours"),
+                        ("emojigradient", "emoji in gradient text draw in their own colours")):
+        check(title, yellow(b[name]) > 50, f"{yellow(b[name])} yellow pixels")
     rtl, rtl_plain = columns(b["rtl"]), columns(b["rtlplain"])
     check("right-to-left text starts on the right", rtl and rtl[1] >= rtl_plain[1] - 2 and rtl[0] > rtl_plain[0] + 10, f"{rtl} of {rtl_plain}")
     g, gp = b["gradient50"], b["gradientplain"]

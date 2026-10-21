@@ -128,6 +128,9 @@
     <string name="settings_demo_mode">Demo Mode</string>
     <string name="settings_open_xml">Open XML Projects</string>
     <string name="settings_vibration">Vibration</string>
+    <string name="settings_emoji">Emoji Style</string>
+    <string name="settings_emoji_system">System</string>
+    <string name="settings_emoji_android">Android</string>
     <string name="settings_keep_media_copies">Keep a copy of imported media in the project</string>
     <string name="settings_about">About</string>
     <string name="settings_level_low">Low</string>

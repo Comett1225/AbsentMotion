@@ -624,7 +624,7 @@ Drawn DrawBody(SkCanvas* canvas, const Layer& l, double timeMs, float t, const S
             SkPaint inside;
             inside.setBlendMode(SkBlendMode::kSrcIn);
             canvas->saveLayer(nullptr, nullptr);
-            DrawText(canvas, l, t, FillPaint(kWhite), Fps());
+            DrawText(canvas, l, t, FillPaint(kWhite), Fps(), TextPart::kPlain);
             canvas->saveLayer(nullptr, &inside);
         } else if (l.text) {
             canvas->clipPath(TextGlyphPath(l), true);
@@ -643,6 +643,7 @@ Drawn DrawBody(SkCanvas* canvas, const Layer& l, double timeMs, float t, const S
             canvas->restore();
         }
         canvas->restore();
+        if (l.text) DrawText(canvas, l, t, FillPaint({1, 1, 1, std::clamp(alpha, 0.0f, 1.0f)}), Fps(), TextPart::kColor);
     }
     canvas->restore();
     if (l.stroke.present && l.stroke.enabled) drawn.stroked = DrawStroke(canvas, l, path.makeTransform(m), t, alpha, outline);

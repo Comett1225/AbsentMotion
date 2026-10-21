@@ -128,6 +128,9 @@
     <string name="settings_demo_mode">Demo Modu</string>
     <string name="settings_open_xml">XML projelerini aç</string>
     <string name="settings_vibration">Titreşim</string>
+    <string name="settings_emoji">Emoji stili</string>
+    <string name="settings_emoji_system">Sistem</string>
+    <string name="settings_emoji_android">Android</string>
     <string name="settings_keep_media_copies">İçe aktarılan medyanın bir kopyasını projede tut</string>
     <string name="settings_about">Hakkında</string>
     <string name="settings_level_low">Düşük</string>

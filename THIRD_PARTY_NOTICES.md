@@ -308,6 +308,18 @@ JUnit 4.13.2 (Eclipse Public License 1.0), kXML 2 2.3.0 (`net.sf.kxml:kxml2`, a 
 
 ## 5. Fonts, icons and effect thumbnails
 
+### Noto Color Emoji
+
+When Settings > Editor > Emoji Style is set to Android, text layers draw emoji with the Noto Color Emoji fonts, version
+2.057 (Unicode 18.0), copied unmodified from the release `v2026-09-24-unicode18_0` of https://github.com/googlefonts/noto-emoji:
+`2D/fonts/Noto-COLRv1-noflags.ttf` is `assets/emoji/NotoColorEmoji.ttf` and `2D/fonts/NotoColorEmoji-flagsonly.ttf` is
+`assets/emoji/NotoColorEmojiFlags.ttf`.
+
+| What | Source | Licence | File |
+|---|---|---|---|
+| Noto Color Emoji | Copyright 2022 Google Inc. | SIL Open Font License 1.1 | `assets/emoji/OFL.txt` |
+| Noto Color Emoji Flags | Copyright 2022 Google Inc. | SIL Open Font License 1.1 | `assets/emoji/OFL.txt` |
+
 ### Google Fonts
 
 AbsentMotion contains 50 font families that work without a network connection, and offers 100 more that the

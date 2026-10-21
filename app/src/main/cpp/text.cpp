@@ -3,6 +3,8 @@
 #include <cmath>
 #include <cstdlib>
 #include <map>
+#include <mutex>
+#include <string_view>
 #include "textanim.h"
 #include "include/core/SkCanvas.h"
 #include "include/core/SkColorFilter.h"
@@ -13,6 +15,7 @@
 #include "include/core/SkMaskFilter.h"
 #include "include/core/SkTypeface.h"
 #include "include/core/SkPathBuilder.h"
+#include "include/effects/SkImageFilters.h"
 #ifdef __APPLE__
 #include "include/ports/SkFontMgr_mac_ct.h"
 #else
@@ -32,7 +35,7 @@ struct TextLine {
     std::unique_ptr<Paragraph> paragraph;
 };
 struct TextLayout {
-    std::string content, family, path, align;
+    std::string content, family, path, align, emoji, flags;
     float size = 54, width = 512, height = 0, padTop = 0, letterSpacing = 0, lineSpacing = 1, lineHeight = 0;
     int weight = 400, index = 0;
     bool italic = false, imported = false;
@@ -58,6 +61,60 @@ sk_sp<SkFontMgr> systemFonts() {
 #endif
     return manager;
 }
+const char kEmojiFamily[] = "absent-emoji";
+const char kFlagFamily[] = "absent-emoji-flags";
+const char kEmojiLocale[] = "und-Zsye";
+sk_sp<SkTypeface> EmojiFace(const std::string& path) {
+    static std::mutex lock;
+    static std::map<std::string, sk_sp<SkTypeface>> faces;
+    std::lock_guard<std::mutex> hold(lock);
+    if (auto found = faces.find(path); found != faces.end()) return found->second;
+    const char* locale[] = {kEmojiLocale};
+    sk_sp<SkTypeface> face = path.empty() ? systemFonts()->matchFamilyStyleCharacter(nullptr, SkFontStyle(), locale, 1, 0x1F600)
+                                          : systemFonts()->makeFromFile(path.c_str());
+    if (face) faces[path] = face;
+    return face;
+}
+class EmojiFonts : public TypefaceFontProvider {
+public:
+    explicit EmojiFonts(std::vector<sk_sp<SkTypeface>> faces) : fFaces(std::move(faces)) {}
+    sk_sp<SkTypeface> onMatchFamilyStyleCharacter(const char[], const SkFontStyle&, const char* bcp47[], int count,
+                                                  SkUnichar character) const override {
+        if (!std::any_of(bcp47, bcp47 + count, [](const char* tag) { return tag && std::string_view(tag) == kEmojiLocale; })) return nullptr;
+        for (const auto& face : fFaces) {
+            if (face && face->unicharToGlyph(character)) return face;
+        }
+        return nullptr;
+    }
+private:
+    std::vector<sk_sp<SkTypeface>> fFaces;
+};
+std::vector<std::pair<size_t, size_t>> EmojiRuns(SkUnicode* unicode, const std::string& content) {
+    std::vector<std::pair<size_t, size_t>> runs;
+    if (!unicode) return runs;
+    std::vector<int> starts;
+    const std::vector<uint32_t> points = textanim::CodePoints(content, &starts);
+    auto at = [&](size_t i) { return i < points.size() ? (SkUnichar)points[i] : -1; };
+    auto keycap = [](SkUnichar c) { return c == '#' || c == '*' || (c >= '0' && c <= '9'); };
+    for (size_t i = 0; i < points.size(); i++) {
+        const SkUnichar c = at(i), next = at(i + 1);
+        const bool emoji = keycap(c) ? next == 0x20E3 || (next == 0xFE0F && at(i + 2) == 0x20E3)
+                                     : unicode->isEmoji(c) && !unicode->isEmojiComponent(c) && (c >= 0x1F000 || next == 0xFE0F);
+        if (!emoji) continue;
+        size_t end = i + 1;
+        while (end < points.size()) {
+            const SkUnichar d = at(end);
+            if (d == 0xFE0F || d == 0x20E3 || unicode->isEmojiModifier(d) || (d >= 0xE0020 && d <= 0xE007F)) end++;
+            else if (d == 0x200D && end + 1 < points.size()) end += 2;
+            else break;
+        }
+        const size_t from = starts[i], to = end < points.size() ? starts[end] : content.size();
+        if (!runs.empty() && runs.back().second == from) runs.back().second = to;
+        else runs.push_back({from, to});
+        i = end - 1;
+    }
+    return runs;
+}
 std::unique_ptr<Paragraph> paragraph(TextLayout& text, const std::string& content,
                                      bool rtl, float wordSpacing, bool prepared, float height = 0, bool tabular = false) {
     TextStyle style;
@@ -78,8 +135,19 @@ std::unique_ptr<Paragraph> paragraph(TextLayout& text, const std::string& conten
     settings.setTextDirection(rtl ? TextDirection::kRtl : TextDirection::kLtr);
     settings.setTextAlign(prepared ? TextAlign::kLeft : text.align == "center" ? TextAlign::kCenter : text.align == "right" ? TextAlign::kEnd :
         text.align == "justify" && !prepared ? TextAlign::kJustify : TextAlign::kStart);
-    auto builder = ParagraphBuilder::make(settings, text.fonts, SkUnicodes::ICU::Make());
-    builder->addText(content.c_str(), content.size());
+    const sk_sp<SkUnicode> unicode = SkUnicodes::ICU::Make();
+    auto builder = ParagraphBuilder::make(settings, text.fonts, unicode);
+    TextStyle emoji = style;
+    emoji.setFontFamilies({SkString(kEmojiFamily), SkString(kFlagFamily)});
+    size_t done = 0;
+    for (const auto& [from, to] : EmojiRuns(unicode.get(), content)) {
+        builder->addText(content.data() + done, from - done);
+        builder->pushStyle(emoji);
+        builder->addText(content.data() + from, to - from);
+        builder->pop();
+        done = to;
+    }
+    builder->addText(content.data() + done, content.size() - done);
     auto result = builder->Build();
     result->layout(prepared ? std::max(text.width, text.size * content.size() * 2) : text.width);
     return result;
@@ -112,12 +180,15 @@ void layout(TextLayout& text) {
             if (auto instance = face->makeClone(arguments)) face = instance;
         }
     }
+    const sk_sp<SkTypeface> emoji = EmojiFace(text.emoji), flags = text.flags.empty() ? nullptr : EmojiFace(text.flags);
+    auto provider = sk_make_sp<EmojiFonts>(std::vector<sk_sp<SkTypeface>>{emoji, flags});
     if (face) {
-        auto provider = sk_make_sp<TypefaceFontProvider>();
         text.family = "light-motion-text";
         provider->registerTypeface(face, SkString(text.family));
-        text.fonts->setAssetFontManager(provider);
     }
+    if (emoji) provider->registerTypeface(emoji, SkString(kEmojiFamily));
+    if (flags) provider->registerTypeface(flags, SkString(kFlagFamily));
+    text.fonts->setAssetFontManager(provider);
     if (!text.lines.empty()) {
         for (auto& line : text.lines) line.paragraph = paragraph(text, line.content, line.rtl, line.wordSpacing, true);
     } else {
@@ -145,6 +216,8 @@ std::shared_ptr<TextLayout> ParseText(const XmlNode& n) {
     text->weight = number(n, "_fontWeight", 400);
     text->index = number(n, "_fontIndex", 0);
     text->italic = attr(n, "_fontItalic") == "true";
+    text->emoji = attr(n, "_emoji");
+    text->flags = attr(n, "_emojiFlags");
     text->imported = attr(n, "font").starts_with("imported?");
     for (const auto& child : n.children) {
         if (child->name != "effect" || attr(*child, "id") != "com.alightcreative.effects.textspacing" || attr(*child, "hidden") == "true") continue;
@@ -192,6 +265,28 @@ template <typename F> void EachGlyph(TextLayout& text, F&& at) {
             for (int i = 0; i < info->count; i++) {
                 at(info->font, info->glyphs[i], x + info->origin.fX + info->positions[i].fX, y + info->origin.fY + info->positions[i].fY);
             }
+        });
+    });
+}
+bool Colored(const SkFont& font) {
+    SkTypeface* face = font.getTypeface();
+    if (!face) return false;
+    thread_local std::map<SkTypefaceID, bool> known;
+    if (known.size() > 512) known.clear();
+    auto [entry, fresh] = known.try_emplace(face->uniqueID(), false);
+    if (fresh) {
+        for (const char* tag : {"COLR", "CBDT", "sbix", "SVG "}) {
+            entry->second = entry->second || face->getTableSize(SkSetFourByteTag(tag[0], tag[1], tag[2], tag[3])) > 0;
+        }
+    }
+    return entry->second;
+}
+void DrawRuns(SkCanvas* canvas, TextLayout& text, bool colored, const SkPaint& paint) {
+    EachParagraph(text, [&](Paragraph& paragraph, float x, float y) {
+        paragraph.visit([&](int, const Paragraph::VisitorInfo* info) {
+            if (!info || Colored(info->font) != colored) return;
+            canvas->drawGlyphs({info->glyphs, (size_t)info->count}, {info->positions, (size_t)info->count},
+                               {x + info->origin.fX, y + info->origin.fY}, info->font, paint);
         });
     });
 }
@@ -420,16 +515,21 @@ std::vector<Glyph> Animate(const Layer& l, float t, int fps) {
     return glyphs;
 }
 
-void DrawGlyphs(SkCanvas* canvas, const std::vector<Glyph>& glyphs, SkColor4f color) {
+void DrawGlyphs(SkCanvas* canvas, const std::vector<Glyph>& glyphs, SkColor4f color, TextPart part) {
     const float opacity = color.fA;
     color.fA = 1;
     if (opacity < 1) canvas->saveLayerAlphaf(nullptr, opacity);
     const sk_sp<SkColorFilter> plain = SkColorFilters::Blend(color, nullptr, SkBlendMode::kSrcIn);
     for (const Glyph& g : glyphs) {
         if (!(g.alpha > 0.002f)) continue;
+        const bool colored = Colored(g.font);
+        if (part != TextPart::kAll && colored != (part == TextPart::kColor)) continue;
         SkPaint paint;
         paint.setAntiAlias(true);
-        if (g.tint.fA > 0) {
+        if (colored) {
+            paint.setColor4f(color);
+            if (g.tint.fA > 0) paint.setColorFilter(SkColorFilters::Blend(g.tint, nullptr, SkBlendMode::kSrcATop));
+        } else if (g.tint.fA > 0) {
             SkColor4f mixed = Blend(color, g.tint);
             mixed.fA = 1;
             paint.setColorFilter(SkColorFilters::Blend(mixed, nullptr, SkBlendMode::kSrcIn));
@@ -437,7 +537,8 @@ void DrawGlyphs(SkCanvas* canvas, const std::vector<Glyph>& glyphs, SkColor4f co
             paint.setColorFilter(plain);
         }
         paint.setAlphaf(std::min(g.alpha, 1.0f));
-        if (g.blur > 0.05f) paint.setMaskFilter(SkMaskFilter::MakeBlur(kNormal_SkBlurStyle, g.blur));
+        if (g.blur > 0.05f && colored) paint.setImageFilter(SkImageFilters::Blur(g.blur, g.blur, nullptr));
+        else if (g.blur > 0.05f) paint.setMaskFilter(SkMaskFilter::MakeBlur(kNormal_SkBlurStyle, g.blur));
         canvas->save();
         canvas->concat(g.matrix);
         canvas->drawGlyphs({&g.id, 1}, {&g.at, 1}, {0, 0}, g.font, paint);
@@ -458,7 +559,7 @@ SkPath TextGlyphPath(const Layer& layer, float t, int fps) {
     SkPathBuilder b;
     if (TextAnimated(layer)) {
         for (const Glyph& g : Animate(layer, t, fps)) {
-            if (!(g.alpha > 0.002f)) continue;
+            if (!(g.alpha > 0.002f) || Colored(g.font)) continue;
             SkMatrix m = SkMatrix::Translate(g.at.fX, g.at.fY);
             m.postConcat(g.matrix);
             if (auto path = g.font.getPath(g.id)) b.addPath(*path, m);
@@ -466,25 +567,31 @@ SkPath TextGlyphPath(const Layer& layer, float t, int fps) {
         return b.detach();
     }
     EachGlyph(text, [&](const SkFont& font, SkGlyphID glyph, float x, float y) {
+        if (Colored(font)) return;
         if (auto path = font.getPath(glyph)) b.addPath(*path, SkMatrix::Translate(x, y));
     });
     return b.detach();
 }
-void DrawText(SkCanvas* canvas, const Layer& layer, float t, const SkPaint& paint, int fps) {
+void DrawText(SkCanvas* canvas, const Layer& layer, float t, const SkPaint& paint, int fps, TextPart part) {
     auto& text = *layer.text;
     layout(text);
-    if (TextAnimated(layer)) return DrawGlyphs(canvas, Animate(layer, t, fps), paint.getColor4f());
-    SkPaint tint;
-    tint.setColorFilter(SkColorFilters::Blend(paint.getColor4f(), nullptr, SkBlendMode::kSrcIn));
-    const float scale = canvas->getTotalMatrix().getMinScale();
-    if (scale > 0) {
-        const float room = 2 / scale;
-        const SkRect area = InkBounds(text).makeOutset(room, room);
-        canvas->saveLayer(&area, &tint);
-    } else {
-        canvas->saveLayer(nullptr, &tint);
+    if (TextAnimated(layer)) return DrawGlyphs(canvas, Animate(layer, t, fps), paint.getColor4f(), part);
+    if (part != TextPart::kColor) {
+        SkPaint tint;
+        tint.setColorFilter(SkColorFilters::Blend(paint.getColor4f(), nullptr, SkBlendMode::kSrcIn));
+        const float scale = canvas->getTotalMatrix().getMinScale();
+        if (scale > 0) {
+            const float room = 2 / scale;
+            const SkRect area = InkBounds(text).makeOutset(room, room);
+            canvas->saveLayer(&area, &tint);
+        } else {
+            canvas->saveLayer(nullptr, &tint);
+        }
+        SkPaint white;
+        white.setColor(SK_ColorWHITE);
+        DrawRuns(canvas, text, false, white);
+        canvas->restore();
     }
-    EachParagraph(text, [&](Paragraph& paragraph, float x, float y) { paragraph.paint(canvas, x, y); });
-    canvas->restore();
+    if (part != TextPart::kPlain) DrawRuns(canvas, text, true, paint);
 }
 }

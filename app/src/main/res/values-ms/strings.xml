@@ -128,6 +128,9 @@
     <string name="settings_demo_mode">Mod demo</string>
     <string name="settings_open_xml">Buka projek XML</string>
     <string name="settings_vibration">Getaran</string>
+    <string name="settings_emoji">Gaya Emoji</string>
+    <string name="settings_emoji_system">Sistem</string>
+    <string name="settings_emoji_android">Android</string>
     <string name="settings_keep_media_copies">Simpan salinan media yang diimport dalam projek</string>
     <string name="settings_about">Perihal</string>
     <string name="settings_level_low">Rendah</string>
