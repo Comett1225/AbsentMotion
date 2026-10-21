@@ -12,11 +12,12 @@ import urllib.parse
 import urllib.request
 from pathlib import Path
 from PIL import Image, ImageChops, ImageDraw, ImageStat
+from sdk import adb_command
 
 ROOT = Path(__file__).resolve().parents[1]
 PACK = ROOT / "app/src/main/assets/effects"
 SHOWCASE = json.loads((ROOT / "tools/effect_showcase.json").read_text())
-ADB = [str(Path.home() / "Library/Android/sdk/platform-tools/adb"), "-s", os.environ.get("ANDROID_SERIAL") or "emulator-5554"]
+ADB = adb_command()
 PKG = "app.absentmotion"
 APP_DIR = "files/effect-thumbs"
 APP_PATH = f"/data/user/0/{PKG}/{APP_DIR}"

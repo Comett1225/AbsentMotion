@@ -6,8 +6,9 @@ import subprocess
 import sys
 import time
 from pathlib import Path
+from sdk import adb_command
 
-ADB = [str(Path.home() / "Library/Android/sdk/platform-tools/adb"), "-s", os.environ.get("ANDROID_SERIAL") or "emulator-5554"]
+ADB = adb_command()
 PKG = "app.absentmotion"
 DEVICE_DIR = f"/sdcard/Android/data/{PKG}/files"
 WIDTH, HEIGHT, FPS, LENGTH = 1080, 1920, 30, 12000

@@ -1,6 +1,7 @@
 #!/bin/sh
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-adb() { "$HOME/Library/Android/sdk/platform-tools/adb" -s "${ANDROID_SERIAL:-emulator-5554}" "$@"; }
+. "$(dirname "$0")/env.sh"
+adb() { "$ADB" -s "${ANDROID_SERIAL:-emulator-5554}" "$@"; }
 OUT="$ROOT/build/shots/lm-$1.png"
 mkdir -p "$(dirname "$OUT")"
 adb exec-out screencap -p > "$OUT.full.png"

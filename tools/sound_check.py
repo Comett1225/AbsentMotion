@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 import os, signal, subprocess, sys, time
 import numpy as np
+from sdk import adb_command
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SERIAL = os.environ.get("ANDROID_SERIAL") or "emulator-5554"
-ADB = [os.path.expanduser("~/Library/Android/sdk/platform-tools/adb"), "-s", SERIAL]
+ADB = adb_command()
 PKG = "app.absentmotion"
 DEVICE_DIR = f"/sdcard/Android/data/{PKG}/files"
 OUT = os.path.join(ROOT, "build/sound-check")

@@ -5,3 +5,12 @@ if [ -z "${JAVA_HOME:-}" ]; then
         if [ -n "$candidate" ] && [ -x "$candidate/bin/java" ]; then export JAVA_HOME="$candidate"; break; fi
     done
 fi
+if [ -z "${SDK_ROOT:-}" ]; then
+    for candidate in "${ANDROID_HOME:-}" "${ANDROID_SDK_ROOT:-}" "$HOME/Library/Android/sdk" "$HOME/Android/Sdk"; do
+        if [ -n "$candidate" ] && [ -d "$candidate" ]; then SDK_ROOT="$candidate"; break; fi
+    done
+fi
+if [ -z "${ADB:-}" ]; then
+    if [ -n "${SDK_ROOT:-}" ] && [ -x "$SDK_ROOT/platform-tools/adb" ]; then ADB="$SDK_ROOT/platform-tools/adb"; else ADB="$(command -v adb || echo adb)"; fi
+fi
+export SDK_ROOT ADB

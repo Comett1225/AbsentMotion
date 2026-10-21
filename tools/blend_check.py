@@ -7,9 +7,10 @@ from pathlib import Path
 
 import numpy as np
 from PIL import Image
+from sdk import adb_command
 
 ROOT = Path(__file__).resolve().parents[1]
-ADB = [str(Path.home() / "Library/Android/sdk/platform-tools/adb"), "-s", os.environ.get("ANDROID_SERIAL") or "emulator-5554"]
+ADB = adb_command()
 PKG = "app.absentmotion"
 DEVICE_DIR = f"/sdcard/Android/data/{PKG}/files"
 NAME = "blendcheck"
