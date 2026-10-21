@@ -228,8 +228,9 @@ Placement Effective(const std::vector<Layer>& siblings, const Layer& l, double t
     for (const Layer& s : siblings) {
         if (l.parent != 0 && s.id == l.parent && &s != &l) { parent = &s; break; }
     }
+    Placement p{};
     if (parent) {
-        const Placement p = Effective(siblings, *parent, timeMs, depth + 1);
+        p = Effective(siblings, *parent, timeMs, depth + 1);
         const SkV4 offset = Turn(p.rotation) * p.tilt * SkV4{(own.location.fX + own.pivot.fX - p.pivot.fX) * p.scale.fX,
                                                              (own.location.fY + own.pivot.fY - p.pivot.fY) * p.scale.fY, own.z, 0};
         own.location = p.location + SkVector{offset.x, offset.y} - own.pivot + p.pivot;
@@ -244,7 +245,7 @@ Placement Effective(const std::vector<Layer>& siblings, const Layer& l, double t
     const Layer& below = *(at - 1);
     const float t = below.localTime(timeMs);
     const SkPath path = below.text ? TextGlyphPath(below, t, Fps()) : ShapePath(below, t);
-    FollowPath(l, timeMs, path.makeTransform(MatrixOf(Effective(siblings, below, timeMs, depth + 1), below, t)), &own);
+    FollowPath(l, timeMs, path.makeTransform(MatrixOf(parent == &below ? p : Effective(siblings, below, timeMs, depth + 1), below, t)), &own);
     return own;
 }
 
