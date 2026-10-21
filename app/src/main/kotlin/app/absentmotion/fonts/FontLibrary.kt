@@ -97,7 +97,6 @@ class FontLibrary(context: Context) {
         "Roboto" -> "sans-serif"; "Roboto Condensed" -> "sans-serif-condensed"; "Noto Serif" -> "serif"; "Droid Sans Mono" -> "monospace"; else -> null
     }
     private fun bundledAsset(font: FontName, exact: Boolean = true): String? = BundledFonts.pick(font, bundledNames, exact)
-    fun isBundled(name: String): Boolean = bundledAsset(FontName.parse(name)) != null
     private val builtinCurrent: Boolean by lazy {
         val stamp = context.packageManager.getPackageInfo(context.packageName, 0).lastUpdateTime
         if (prefs.getLong("builtinStamp", 0L) != stamp) {
@@ -161,7 +160,7 @@ class FontLibrary(context: Context) {
             context.contentResolver.openInputStream(uri)?.use { input -> temporary.outputStream().use { output ->
                 copyLimited(input, output)
             } } ?: error("Cannot read font.")
-            Typeface.createFromFile(temporary)
+            checkFont(temporary)
             imported.listFiles()?.firstOrNull { it.isFile && it.length() == temporary.length() && it.readBytes().contentEquals(temporary.readBytes()) }
                 ?.let { return@withContext FontName("imported", it.name) }
             check(temporary.renameTo(destination)) { "Cannot save font." }
@@ -169,10 +168,11 @@ class FontLibrary(context: Context) {
             FontName("imported", destination.name)
         } finally { temporary.delete() }
     }
-    suspend fun resolve(name: String): File? = withContext(Dispatchers.IO) {
+    private fun checkFont(file: File) = checkNotNull(Typeface.Builder(file).build()) { "Not a font." }
+    suspend fun resolve(name: String, download: Boolean = false): File? = withContext(Dispatchers.IO) {
         localFile(name)?.let { return@withContext it }
         val font = FontName.parse(name)
-        if (font.source != "googlefonts") return@withContext null
+        if (!download || font.source != "googlefonts") return@withContext null
         downloadLocks.getOrPut(name) { Mutex() }.withLock {
             localFile(name)?.let { return@withLock it }
             if (System.currentTimeMillis() - (failed[name] ?: 0L) < 60_000) return@withLock null
@@ -182,7 +182,7 @@ class FontLibrary(context: Context) {
                 val temporary = File.createTempFile("download-", ".font", cache)
                 try {
                     request(fontUrl) { input -> temporary.outputStream().use { copyLimited(input, it) } }
-                    Typeface.createFromFile(temporary)
+                    checkFont(temporary)
                     val destination = cachedFile(name)
                     check(temporary.renameTo(destination))
                     fontRevision.update { it + 1 }
