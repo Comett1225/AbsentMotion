@@ -60,9 +60,11 @@ class ProjectStoreTest {
         assertFalse(shared.exists())
         assertFalse(later.exists())
         val loose = aiFile("loose.png")
-        root.resolve("projects/broken.xml").writeText("<scene")
+        val gone = aiFile("gone.png")
+        root.resolve("projects/broken.xml").writeText("<scene><shape fillImage=\"${uri(loose)}\"")
         store.delete(store.create(scene()), ai)
         assertTrue(loose.exists())
+        assertFalse(gone.exists())
     }
 
     @Test fun deleteKeepsOwnedMediaWhenAnotherProjectOrTemplateCannotBeRead() {
@@ -70,18 +72,42 @@ class ProjectStoreTest {
         val store = ProjectStore(root)
         val a = store.create(scene())
         store.mediaDir(a).mkdirs()
-        val shared = store.mediaDir(a).resolve("shared.png").apply { writeText("x") }
+        val shared = store.mediaDir(a).resolve("shared & co.png").apply { writeText("x") }
         val b = store.create(scene(image(shared.toURI().toString())))
-        root.resolve("projects/$b.xml").writeText("<scene")
+        root.resolve("projects/$b.xml").writeText(root.resolve("projects/$b.xml").readText().substringBefore("/>"))
         store.delete(a)
         assertTrue(shared.exists())
         root.resolve("projects/$b.xml").delete()
         val c = store.create(scene())
         store.mediaDir(c).mkdirs()
         val own = store.mediaDir(c).resolve("own.png").apply { writeText("x") }
-        root.resolve("templates/t1").apply { mkdirs() }.resolve("scene.xml").writeText("<scene")
+        root.resolve("projects/unreadable.xml").mkdirs()
         store.delete(c)
         assertTrue(own.exists())
+    }
+
+    @Test fun aDamagedFileOrAHalfWrittenTemplateDoesNotStopTheMediaCleanUp() {
+        val root = tmp.newFolder()
+        val store = ProjectStore(root)
+        val a = store.create(scene())
+        store.mediaDir(a).mkdirs()
+        val own = store.mediaDir(a).resolve("own.png").apply { writeText("x") }
+        val damaged = store.create(scene())
+        root.resolve("projects/$damaged.xml").writeText("<scene")
+        root.resolve("templates/t1/media").mkdirs()
+        root.resolve("templates/t2").apply { mkdirs() }.resolve("scene.xml").writeText("<scene title=")
+        store.delete(a)
+        assertFalse(own.exists())
+        assertFalse(store.mediaDir(a).exists())
+    }
+
+    @Test fun renamingATemplateOrPresetThatCannotBeReadFails() {
+        val root = tmp.newFolder()
+        val templates = TemplateStore(root.resolve("templates")) { null }
+        val presets = PresetStore(root.resolve("presets"))
+        for (rename in listOf({ templates.rename("t1", "x") }, { presets.rename("p1", "x") })) {
+            try { rename(); fail("renamed") } catch (_: java.io.IOException) {}
+        }
     }
 
     @Test fun deleteRemovesOwnFolderWhenNothingElseUsesIt() {
