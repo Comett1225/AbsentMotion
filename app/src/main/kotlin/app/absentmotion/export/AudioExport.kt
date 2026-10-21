@@ -138,10 +138,13 @@ internal suspend fun exportAudio(s: ExportSettings, totalUs: Long, mix: AudioMix
             AudioFormat.Wav16, AudioFormat.Wav24 -> writeWav(s.audioFormat == AudioFormat.Wav24, rate, channels, totalFrames, mix, out, progress)
             AudioFormat.Mp3 -> writeMp3(rate, channels, s.audio.bitrateKbps, totalFrames, mix, out, progress)
             AudioFormat.Flac -> encodeAudio(flacEncoder(rate, channels), FlacSink(out, totalFrames), null, totalUs, rate, channels, false, mix, progress)
-            AudioFormat.M4a -> encodeAudio(createAudioEncoder(AudioSettings(AudioCodec.Aac, s.audio.bitrateKbps, rate, channels)),
-                MuxerSink(out, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4), aacDelayFrames(null), totalUs, rate, channels, false, mix, progress)
-            AudioFormat.Ogg -> encodeAudio(createAudioEncoder(AudioSettings(AudioCodec.Opus, s.audio.bitrateKbps, rate, channels)),
-                MuxerSink(out, MediaMuxer.OutputFormat.MUXER_OUTPUT_OGG), null, totalUs, rate, channels, true, mix, progress)
+            AudioFormat.M4a, AudioFormat.Ogg -> {
+                val aac = s.audioFormat == AudioFormat.M4a
+                val sink = MuxerSink(out, if (aac) MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4 else MediaMuxer.OutputFormat.MUXER_OUTPUT_OGG)
+                val codec = try { createAudioEncoder(AudioSettings(if (aac) AudioCodec.Aac else AudioCodec.Opus, s.audio.bitrateKbps, rate, channels)) }
+                    catch (t: Throwable) { sink.release(); throw t }
+                encodeAudio(codec, sink, if (aac) aacDelayFrames(null) else null, totalUs, rate, channels, !aac, mix, progress)
+            }
         }
         progress(1f)
     }
