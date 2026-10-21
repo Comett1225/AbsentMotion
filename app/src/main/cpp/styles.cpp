@@ -1089,7 +1089,17 @@ void DrawList(SkCanvas* canvas, const std::vector<Layer>& listed, int width, int
         Override clipped;
         clipped.blend = true;
         clipped.mode = SkBlendMode::kSrcATop;
-        for (size_t k = i + 1; k < end; k++) DrawOne(canvas, layers, layers[k], timeMs, pictures, clipped);
+        SkPaint atop;
+        atop.setBlendMode(SkBlendMode::kSrcATop);
+        for (size_t k = i + 1; k < end; k++) {
+            if (IsNormal(layers[k].blending)) {
+                DrawOne(canvas, layers, layers[k], timeMs, pictures, clipped);
+                continue;
+            }
+            canvas->saveLayer(SkCanvas::SaveLayerRec(nullptr, &atop, SkCanvas::kInitWithPrevious_SaveLayerFlag));
+            DrawOne(canvas, layers, layers[k], timeMs, pictures, Override());
+            canvas->restore();
+        }
         canvas->restore();
     }
     gEffectList = outer;
