@@ -49,4 +49,12 @@ class PictureLoadTest {
         load("a", "b")
         assertEquals(listOf("a@1", "b@1", "a@2", "b@2"), installed)
     }
+
+    @Test fun picturesAreDecodedForTheProjectSizeNotTheLargestGpuTexture() {
+        assertEquals(4096, pictureLimit(16384, 1920))
+        assertEquals(7680, pictureLimit(16384, 3840))
+        assertEquals(16384, pictureLimit(16384, 10000))
+        assertEquals(4096, pictureLimit(16384, 0))
+        assertEquals(2048, pictureLimit(2048, 1920))
+    }
 }

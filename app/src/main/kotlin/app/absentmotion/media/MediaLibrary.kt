@@ -29,18 +29,20 @@ import kotlinx.coroutines.sync.withLock
 class MediaLibrary(context: Context, private val engine: EngineThread) {
     private val resolver = context.applicationContext.contentResolver
     private val lock = Mutex()
-    private val loaded = mutableMapOf<String, Triple<MediaDeclaration?, String?, Int>>()
-    private val models = mutableMapOf<String, Triple<String?, Int, Int>>()
+    private val loaded = mutableMapOf<String, Triple<MediaDeclaration?, String?, Pair<Int, Int>>>()
+    private val models = mutableMapOf<String, Triple<String?, Pair<Int, Int>, Int>>()
+    @Volatile var pinned: Scene? = null
 
     suspend fun update(scene: Scene) = lock.withLock {
-        val wanted = scene.node.imageUris()
+        val kept = listOfNotNull(scene, pinned)
+        val wanted = kept.flatMapTo(HashSet()) { it.node.imageUris() }
         for (uri in loaded.keys - wanted) {
             withContext(NonCancellable) {
                 engine.setPicture(uri, null)
                 loaded.remove(uri)
             }
         }
-        for (uri in models.keys - scene.node.modelUris()) {
+        for (uri in models.keys - kept.flatMapTo(HashSet()) { it.node.modelUris() }) {
             withContext(NonCancellable) {
                 engine.setModel(uri, null, List(models.getValue(uri).third) { null })
                 models.remove(uri)
@@ -52,8 +54,8 @@ class MediaLibrary(context: Context, private val engine: EngineThread) {
     suspend fun prepare(scene: Scene) = lock.withLock { prepareLocked(scene) }
 
     private suspend fun prepareLocked(scene: Scene) {
-        val limit = engine.maxPictureSize()
-        val generation = engine.generation
+        val limit = pictureLimit(engine.maxPictureSize(), listOfNotNull(scene, pinned).maxOf { maxOf(it.width, it.height) })
+        val generation = engine.generation to limit
         loadPictures(scene.node.imageUris(), loaded,
             { uri -> Triple(scene.media(uri), withContext(Dispatchers.IO) { fileVersion(resolver, Uri.parse(uri)) }, generation) },
             { uri ->
@@ -85,6 +87,10 @@ class MediaLibrary(context: Context, private val engine: EngineThread) {
         }
     }
 }
+
+internal const val MIN_PICTURE_LIMIT = 4096
+
+internal fun pictureLimit(maxTexture: Int, canvas: Int): Int = minOf(maxTexture, maxOf(MIN_PICTURE_LIMIT, 2 * canvas))
 
 internal fun decodePicture(resolver: ContentResolver, uri: Uri, limit: Int): Bitmap? = try {
     val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
