@@ -26,7 +26,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import android.provider.OpenableColumns
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -47,6 +49,7 @@ private val Favourite get() = Am.Gold
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
 internal fun FontBrowser(library: FontLibrary, onSelect: (String) -> Unit, onClose: () -> Unit) {
+    val context = LocalContext.current
     val searchFocus = remember { FocusRequester() }
     val keyboard = LocalSoftwareKeyboardController.current
     var drawer by remember { mutableStateOf(false) }
@@ -66,7 +69,7 @@ internal fun FontBrowser(library: FontLibrary, onSelect: (String) -> Unit, onClo
     val importer = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
         scope.launch {
             val failures = mutableListOf<String>()
-            uris.forEach { uri -> runCatching { library.import(uri) }.onFailure { failures.add(uri.lastPathSegment ?: "") } }
+            uris.forEach { uri -> runCatching { library.import(uri) }.onFailure { failures.add(runCatching { context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { if (it.moveToFirst()) it.getString(0) else null } }.getOrNull() ?: uri.lastPathSegment ?: "") } }
             if (failures.isNotEmpty()) error = FontError(R.string.font_import_failed_title, R.string.font_import_failed_body, failures.joinToString("\n"))
             revision++
         }
