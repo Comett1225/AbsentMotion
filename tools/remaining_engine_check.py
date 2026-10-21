@@ -303,11 +303,12 @@ def main():
             ok = ok and abs(moved[0][1] - moved[0][0]) < 1
         print(('ok   ' if ok else 'FAIL ') + effect + ' is steady for a seed and changes with it: ' + str(moved), flush=True)
         failed += not ok
-    still = [engine.still(f'displace{frame}', engine.scene(engine.rect(1, 100, 100, 10, 10, 0xffff0000, extra=fx('randomdisplace', magnitude=60, evolution=0.4))), work, frame) for frame in (3, 27)]
+    still = [engine.still(f'displace{frame}', engine.scene(engine.rect(1, 100, 100, 10, 10, 0xffff0000, extra=fx('randomdisplace', magnitude=60, evolution=0.4, speed=0))), work, frame) for frame in (3, 27)]
+    roaming = [engine.still(f'roam{frame}', engine.scene(engine.rect(1, 100, 100, 10, 10, 0xffff0000, extra=fx('randomdisplace', magnitude=60, evolution=0.4))), work, frame) for frame in (3, 27)]
     keyed = '<effect id="absent.randomdisplace"><property name="magnitude" type="float" value="60"/><property name="evolution" type="float"><kf t="0" v="0"/><kf t="1" v="3"/></property></effect>'
     drift = [engine.still(f'drift{frame}', engine.scene(engine.rect(1, 100, 100, 10, 10, 0xffff0000, extra=keyed)), work, frame) for frame in (3, 27)]
-    ok = np.array_equal(still[0], still[1]) and not np.array_equal(drift[0], drift[1])
-    print(('ok   ' if ok else 'FAIL ') + 'random displacement holds still until Evolution changes', flush=True)
+    ok = np.array_equal(still[0], still[1]) and not np.array_equal(drift[0], drift[1]) and not np.array_equal(roaming[0], roaming[1])
+    print(('ok   ' if ok else 'FAIL ') + 'random displacement moves with time by itself, and holds still at Speed 0 until Evolution changes', flush=True)
     failed += not ok
     row = '<effect id="absent.linearrepeat"><property name="count" type="float" value="3"/><property name="position" type="vec2" value="120,0"/></effect>'
     scatter = fx('randomdisplace', magnitude=40, evolution=0.3, scatter=2)
