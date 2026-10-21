@@ -2,7 +2,7 @@
  "id": "posterize",
  "name": "Posterize",
  "category": "color",
- "description": "Cuts each colour channel into a number of flat Steps, so smooth gradients turn into bands. Offset moves where the band edges fall.",
+ "description": "Cuts each color channel into a number of flat Steps, so smooth gradients turn into bands. Offset moves where the band edges fall.",
  "params": [
   {
    "id": "levels",

@@ -3,7 +3,7 @@
  "name": "Raster Extrude",
  "category": "3d",
  "since": "3.0.0",
- "description": "Pushes the layer's picture out into a solid block; the sides take the interior colour.",
+ "description": "Pushes the layer's picture out into a solid block; the sides take the interior color.",
  "params": [
   {
    "id": "rotX",

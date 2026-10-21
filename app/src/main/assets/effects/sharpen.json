@@ -2,7 +2,7 @@
  "id": "sharpen",
  "name": "Sharpen",
  "category": "stylize",
- "description": "Applies an unsharp mask using a 3x3 neighbourhood to enhance fine details.",
+ "description": "Applies an unsharp mask using a 3x3 neighborhood to enhance fine details.",
  "params": [
   {
    "id": "amount",

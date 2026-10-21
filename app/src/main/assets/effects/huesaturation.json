@@ -2,7 +2,7 @@
  "id": "huesaturation",
  "name": "Hue & Saturation",
  "category": "color",
- "description": "Turns colours around the colour wheel and makes them stronger or weaker; vibrance strengthens the duller colours most.",
+ "description": "Turns colors around the color wheel and makes them stronger or weaker; vibrance strengthens the duller colors most.",
  "params": [
   {
    "id": "hue",

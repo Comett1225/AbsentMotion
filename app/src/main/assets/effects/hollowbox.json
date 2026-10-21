@@ -3,7 +3,7 @@
  "name": "Hollow Box",
  "category": "3d",
  "since": "3.0.0",
- "description": "A box with open top and bottom: the layer covers the outside and the inside takes the interior colour.",
+ "description": "A box with open top and bottom: the layer covers the outside and the inside takes the interior color.",
  "params": [
   {
    "id": "rotX",

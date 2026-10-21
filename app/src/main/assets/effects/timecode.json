@@ -37,7 +37,8 @@
    "default": 0,
    "min": -360000,
    "max": 360000,
-   "step": 0.01
+   "step": 0.01,
+   "unit": "s"
   },
   {
    "id": "speed",

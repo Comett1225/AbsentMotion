@@ -2,7 +2,7 @@
  "id": "colorwheels",
  "name": "Lift Gamma Gain",
  "category": "color",
- "description": "Colour wheels for the shadows (lift), midtones (gamma) and highlights (gain): a hue, how far to push it, and a level.",
+ "description": "Color wheels for the shadows (lift), midtones (gamma) and highlights (gain): a hue, how far to push it, and a level.",
  "params": [
   {
    "id": "liftHue",

@@ -3,7 +3,7 @@
  "name": "Contour Gradient",
  "category": "stylize",
  "since": "3.0.0",
- "description": "Paints a two-colour gradient outwards from the edges of the opaque parts of the layer, like a soft coloured halo.",
+ "description": "Paints a two-color gradient outwards from the edges of the opaque parts of the layer, like a soft colored halo.",
  "params": [
   {
    "id": "color1",

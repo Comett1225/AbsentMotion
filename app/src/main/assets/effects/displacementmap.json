@@ -3,7 +3,7 @@
  "name": "Displacement Map",
  "category": "distort",
  "since": "3.0.0",
- "description": "Uses the layer's colours to push the layers behind it around, then hides itself; or, with Map set to Layer Below, pushes this layer by the layer beneath.",
+ "description": "Uses the layer's colors to push the layers behind it around, then hides itself; or, with Map set to Layer Below, pushes this layer by the layer beneath.",
  "params": [
   {
    "id": "offset",

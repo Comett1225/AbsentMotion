@@ -3,7 +3,7 @@
  "name": "Mosaic",
  "category": "stylize",
  "since": "3.0.0",
- "description": "Divides the layer into squares and fills each one with its average colour.",
+ "description": "Divides the layer into squares and fills each one with its average color.",
  "params": [
   {
    "id": "count",

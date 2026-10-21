@@ -2,7 +2,7 @@
  "id": "fourcolor",
  "name": "Four-Color Gradient",
  "category": "color",
- "description": "Blends four colours placed at four points (in pixels from the layer's centre) over the layer.",
+ "description": "Blends four colors placed at four points (in pixels from the layer's center) over the layer.",
  "params": [
   {
    "id": "color1",

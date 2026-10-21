@@ -3,7 +3,7 @@
  "name": "Bump Map",
  "category": "stylize",
  "since": "3.0.0",
- "description": "Lights the layer as if its brightness were a raised surface, for an embossed, textured look that keeps the colours.",
+ "description": "Lights the layer as if its brightness were a raised surface, for an embossed, textured look that keeps the colors.",
  "params": [
   {
    "id": "angle",
