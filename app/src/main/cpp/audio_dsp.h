@@ -89,6 +89,7 @@ struct Filters {
         float highPassHz = 20.0f;
         float resonance = 0.70710678f;
         int slope = 12;
+        bool flat = false;
     } params;
     void prepare(double sampleRate, int maxBlock);
     void reset() noexcept;

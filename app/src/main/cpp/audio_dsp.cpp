@@ -74,7 +74,7 @@ double Ramp::next() noexcept {
 void Biquad::set(Shape shape, double sampleRate, double frequency, double gain, double q, int samples) noexcept {
     frequency = bound(frequency, 20.0, std::min(20000.0, sampleRate * 0.45), 1000.0);
     gain = bound(gain, -24.0, 24.0, 0.0);
-    q = bound(q, 0.1, 10.0, 0.70710678);
+    q = bound(q, 0.1, 20.0, 0.70710678);
     const std::array<double, 5> nextKey{{static_cast<double>(shape), sampleRate, frequency, gain, q}};
     if (configured && key == nextKey && samples != 0) return;
     key = nextKey;
@@ -247,8 +247,14 @@ void Filters::prepare(double sampleRate, int) {
 }
 
 void Filters::configure(int samples) noexcept {
-    for (auto& filter : low_) filter.set(detail::Shape::LowPass, sampleRate_, bound(params.lowPassHz, 20.0, 20000.0, 18000.0), 0.0, params.resonance, samples);
-    for (auto& filter : high_) filter.set(detail::Shape::HighPass, sampleRate_, bound(params.highPassHz, 20.0, 20000.0, 20.0), 0.0, params.resonance, samples);
+    const double resonance = bound(params.resonance, 0.1, 10.0, 0.70710678);
+    const bool flat = params.flat && params.slope >= 24;
+    const std::array<double, 2> q{{flat ? 0.54119610 : resonance, flat ? resonance * 1.84775907 : resonance}};
+    const double lowHz = bound(params.lowPassHz, 20.0, 20000.0, 18000.0), highHz = bound(params.highPassHz, 20.0, 20000.0, 20.0);
+    for (std::size_t i = 0; i < 2; ++i) {
+        low_[i].set(detail::Shape::LowPass, sampleRate_, lowHz, 0.0, q[i], samples);
+        high_[i].set(detail::Shape::HighPass, sampleRate_, highHz, 0.0, q[i], samples);
+    }
     lowMix_.set(params.lowPass ? 1.0 : 0.0, samples);
     highMix_.set(params.highPass ? 1.0 : 0.0, samples);
     secondMix_.set(params.slope >= 24 ? 1.0 : 0.0, samples);

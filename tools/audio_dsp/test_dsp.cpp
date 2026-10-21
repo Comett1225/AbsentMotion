@@ -156,6 +156,29 @@ void testResponses() {
     std::printf("PASS EQ/filter sine responses, worst error %.6f dB\n", worst);
 }
 
+void testFlatSlope() {
+    for (bool low : {true, false}) {
+        auto measure = [low](bool flat, int slope, float resonance, int hz) {
+            dsp::Filters filter;
+            filter.params.lowPass = low;
+            filter.params.highPass = !low;
+            filter.params.lowPassHz = filter.params.highPassHz = 1000.0f;
+            filter.params.resonance = resonance;
+            filter.params.slope = slope;
+            filter.params.flat = flat;
+            return decibels(sineMagnitude(filter, 48000, hz));
+        };
+        const int pass = low ? 250 : 4000;
+        require(std::abs(measure(true, 24, 0.70710678f, 1000) + 3.0103) < 0.2, "Flat 24 dB filter is not -3 dB at the cutoff");
+        require(std::abs(measure(true, 24, 0.70710678f, pass)) < 0.1, "Flat 24 dB filter is not flat in the pass band");
+        require(std::abs(measure(true, 24, 10.0f, 1000) - measure(true, 12, 10.0f, 1000)) < 1.0, "Flat 24 dB resonance peak differs from the 12 dB one");
+        require(std::abs(measure(true, 12, 2.5f, 1000) - measure(false, 12, 2.5f, 1000)) < 1.0e-6, "12 dB filter changed with the flat setting");
+        require(std::abs(measure(false, 24, 0.70710678f, 1000) + 6.0206) < 0.2, "Saved 24 dB filter no longer cuts 6 dB at the cutoff");
+        require(std::abs(measure(false, 24, 10.0f, 1000) - 40.0) < 0.5, "Saved 24 dB filter no longer peaks at +40 dB with Q 10");
+    }
+    std::puts("PASS flat 24 dB filters keep the user Q on one stage, saved filters unchanged");
+}
+
 void testReverb() {
     dsp::Reverb reverb;
     reverb.params.wet = 1.0f;
@@ -517,6 +540,7 @@ void timingChain() {
 int main() {
     try {
         testResponses();
+        testFlatSlope();
         testReverb();
         testDelay();
         testCompressor();
