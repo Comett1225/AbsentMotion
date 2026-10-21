@@ -370,7 +370,7 @@ Paragraph* Laid(TextLayout& text, int index, const std::string& content, bool ta
 }
 
 std::vector<Piece> Pieces(TextLayout& text, const Layer& l, float t, int fps, std::string* shown) {
-    if (text.shown.size() > 256) text.shown.clear();
+    if (text.shown.size() > 16 + 2 * text.lines.size()) text.shown.clear();
     std::string all = text.lines.empty() ? text.content : "";
     for (size_t i = 0; i < text.lines.size(); i++) all += (i ? "\n" : "") + text.lines[i].content;
     bool tabular = false;
