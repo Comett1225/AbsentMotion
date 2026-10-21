@@ -11,9 +11,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class VideoSpeedTest {
-    private fun video(start: Int, end: Int, vararg children: XmlNode) = Layer(XmlNode("shape", linkedMapOf("id" to "1",
-        "startTime" to "$start", "endTime" to "$end", "fillType" to "media", "fillVideo" to "content://v", "inTime" to "500"), children.toList()))
-
     private fun span(layer: Layer) = VideoTiming(layer).let { it.mediaMs((layer.endTime - layer.startTime).toDouble()) - it.mediaMs(0.0) }
 
     @Test fun retimingARampKeepsItsShapeAndTheMediaItShows() {
@@ -21,7 +18,7 @@ class VideoSpeedTest {
             XmlNode("kf", mapOf("t" to "500000000", "v" to "1")),
             XmlNode("kf", mapOf("t" to "2500000000", "v" to "3", "e" to "linear")),
         ))
-        val layer = video(1000, 3000, ramp)
+        val layer = videoLayer(1000, 3000, children = listOf(ramp))
         val retimed = layer.retimedVideo(1000, 2000)
         val keys = retimed.node.child("speedMap")!!.keyframes
         assertEquals(listOf(500_000_000f, 2_500_000_000f), keys.map { it.t })
@@ -33,14 +30,14 @@ class VideoSpeedTest {
     }
 
     @Test fun retimingAConstantSpeedStillFitsTheSameMedia() {
-        val layer = video(0, 2000).let { it.copy(node = it.node.with("speed", "2")) }
+        val layer = videoLayer(0, 2000).let { it.copy(node = it.node.with("speed", "2")) }
         val retimed = layer.retimedVideo(500, 2000)
         assertEquals(span(layer), span(retimed), 0.5)
         assertEquals(null, retimed.node.child("speedMap"))
     }
 
     @Test fun aLongClipAtTheLowestSpeedDoesNotWrapItsEnd() {
-        val slowed = video(1000, 1000 + 40 * 60_000).withVideoSpeedMap(XmlNode("speedMap", mapOf("value" to "0.001")))
+        val slowed = videoLayer(1000, 1000 + 40 * 60_000).withVideoSpeedMap(XmlNode("speedMap", mapOf("value" to "0.001")))
         assertTrue(slowed.endTime > slowed.startTime)
         assertEquals(Int.MAX_VALUE, slowed.endTime)
     }

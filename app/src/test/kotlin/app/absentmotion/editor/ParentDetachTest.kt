@@ -1,5 +1,7 @@
 package app.absentmotion.editor
 
+import app.absentmotion.sceneOf
+import app.absentmotion.shapeNode
 import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
 import app.absentmotion.model.keyframes
@@ -14,12 +16,8 @@ class ParentDetachTest {
             XmlNode("kf", linkedMapOf("t" to "$t", "v" to v) + (if (i > 0 && e != null) mapOf("e" to e) else emptyMap()))
         })
 
-    private fun layer(id: Long, parent: Long?, vararg props: XmlNode, start: Int = 0, end: Int = 1000) = XmlNode(
-        "shape", linkedMapOf("id" to "$id", "startTime" to "$start", "endTime" to "$end") + (parent?.let { mapOf("parent" to "$it") } ?: emptyMap()),
-        listOf(XmlNode("transform", children = props.toList())),
-    )
-
-    private fun scene(vararg layers: XmlNode) = Scene(Scene.create("t", 400, 400, 30, 0).node.copy(children = layers.toList()))
+    private fun layer(id: Long, parent: Long?, vararg props: XmlNode, start: Int = 0, end: Int = 1000) =
+        shapeNode(id = id, start = start, end = end, parent = parent, children = listOf(XmlNode("transform", children = props.toList())))
 
     private val staticParent = layer(1, null, prop("location", 0f to "100,0,0"))
     private val animatedChild = layer(2, 1, prop("location", 0f to "20,100,0", 1f to "50,100,0"))
@@ -35,7 +33,7 @@ class ParentDetachTest {
     }
 
     @Test fun deletingAStaticParentKeepsEveryChildKeyInPlace() {
-        val s = scene(staticParent, animatedChild)
+        val s = sceneOf(staticParent, animatedChild)
         val out = s.unparentChildrenOf(setOf(1)).remove(1)
         assertEquals(120f, out.layerAt(2, 0)!!.location[0], 1e-3f)
         assertEquals(135f, out.layerAt(2, 500)!!.location[0], 1e-3f)
@@ -47,7 +45,7 @@ class ParentDetachTest {
 
     @Test fun easingSurvivesDetachingFromAStaticParent() {
         val curve = "cubicBezier 0.42 0.0 1.0 1.0"
-        val s = scene(
+        val s = sceneOf(
             layer(1, null, prop("location", 0f to "100,50,0"), prop("scale", 0f to "2,2"), prop("rotation", 0f to "90")),
             layer(2, 1, prop("location", 0f to "10,0,0", 1f to "30,0,0", e = curve)),
         )
@@ -57,7 +55,7 @@ class ParentDetachTest {
     }
 
     @Test fun detachingFromAnAnimatedParentBakesTheCombinedMotion() {
-        val s = scene(
+        val s = sceneOf(
             layer(1, null, prop("location", 0f to "0,0,0", 1f to "100,0,0"), prop("rotation", 0f to "0", 1f to "90")),
             layer(2, 1, prop("location", 0f to "20,0,0", 1f to "40,0,0"), prop("scale", 0f to "1,1", 1f to "2,2")),
         )
@@ -68,7 +66,7 @@ class ParentDetachTest {
     }
 
     @Test fun aParentThatOutlivesTheChildIsSampledAtTheChildsTimes() {
-        val s = scene(
+        val s = sceneOf(
             layer(1, null, prop("location", 0f to "0,0,0", 1f to "200,0,0"), start = 0, end = 2000),
             layer(2, 1, prop("location", 0f to "5,5,0"), start = 500, end = 1500),
         )
@@ -79,7 +77,7 @@ class ParentDetachTest {
     }
 
     @Test fun reparentingKeepsTheWorldMotion() {
-        val s = scene(
+        val s = sceneOf(
             layer(1, null, prop("location", 0f to "100,0,0")),
             layer(3, null, prop("location", 0f to "0,0,0", 1f to "0,80,0"), prop("scale", 0f to "2,2")),
             animatedChild,
@@ -90,7 +88,7 @@ class ParentDetachTest {
     }
 
     @Test fun groupingAcrossAnAnimatedParentKeepsTheChildsMotion() {
-        val s = scene(
+        val s = sceneOf(
             layer(1, null, prop("location", 0f to "0,0,0", 1f to "100,0,0")),
             layer(2, 1, prop("location", 0f to "20,0,0", 1f to "50,0,0"), start = 200, end = 800),
         )
@@ -101,7 +99,7 @@ class ParentDetachTest {
     }
 
     @Test fun copyingAndSavingAPresetKeepTheChildsMotion() {
-        val s = scene(staticParent, animatedChild)
+        val s = sceneOf(staticParent, animatedChild)
         val copied = s.unparentChildrenOf(setOf(1)).layer(2)!!
         assertEquals(150f, copied.at(1000, 30).location[0], 1e-3f)
         val preset = presetScene(s, s.layer(2)!!, "P").layers.single()
@@ -112,7 +110,7 @@ class ParentDetachTest {
 
     @Test fun draggingAChildMovesItWithTheFingerInsideATurnedOrScaledParent() {
         for (parent in listOf(prop("rotation", 0f to "90"), prop("scale", 0f to "2,2"))) {
-            val s = scene(layer(1, null, prop("location", 0f to "200,200,0"), parent), layer(2, 1, prop("location", 0f to "40,10,0")))
+            val s = sceneOf(layer(1, null, prop("location", 0f to "200,200,0"), parent), layer(2, 1, prop("location", 0f to "40,10,0")))
             val child = s.layerAt(2, 500)!!
             val before = s.place(child, 500)
             val dragged = s.update(2, 500) { s.withWorldLocation(it, 500) { x, y -> x + 30f to y - 20f } }
@@ -120,7 +118,7 @@ class ParentDetachTest {
             assertEquals(before.x + 30f, after.x, 1e-3f)
             assertEquals(before.y - 20f, after.y, 1e-3f)
         }
-        val alone = scene(layer(3, null, prop("location", 0f to "40,10,0")))
+        val alone = sceneOf(layer(3, null, prop("location", 0f to "40,10,0")))
         val moved = alone.withWorldLocation(alone.layerAt(3, 0)!!, 0) { x, y -> x + 30f to y - 20f }
         assertEquals(listOf(70f, -10f, 0f), moved.location.toList())
     }

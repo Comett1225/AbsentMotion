@@ -1,5 +1,7 @@
 package app.absentmotion.editor
 
+import app.absentmotion.sceneOf
+import app.absentmotion.shapeNode
 import app.absentmotion.model.Layer
 import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
@@ -12,12 +14,8 @@ class ElementSaveTest {
         if (keys.size == 1) XmlNode(name, mapOf("value" to keys[0].second))
         else XmlNode(name, children = keys.map { (t, v) -> XmlNode("kf", mapOf("t" to "$t", "v" to v)) })
 
-    private fun layer(kind: String, id: Long, parent: Long?, props: List<XmlNode>, extra: List<XmlNode> = emptyList()) = XmlNode(
-        kind, linkedMapOf("id" to "$id", "startTime" to "0", "endTime" to "1000") + (parent?.let { mapOf("parent" to "$it") } ?: emptyMap()),
-        listOf(XmlNode("transform", children = props)) + extra,
-    )
-
-    private fun scene(vararg layers: XmlNode) = Scene(Scene.create("t", 400, 400, 30, 0).node.copy(children = layers.toList()))
+    private fun layer(kind: String, id: Long, parent: Long?, props: List<XmlNode>, extra: List<XmlNode> = emptyList()) =
+        shapeNode(kind, id = id, end = 1000, parent = parent, children = listOf(XmlNode("transform", children = props)) + extra)
 
     private fun group(vararg props: XmlNode, inner: List<XmlNode>) = layer("embedScene", 9, null, props.toList(), listOf(
         Scene(Scene.create("", 400, 400, 30, 0).node.with("retime", "off").with("totalTime", "1000")).node.copy(children = inner),
@@ -27,7 +25,7 @@ class ElementSaveTest {
     private fun Layer.y(ms: Int) = at(ms, 30).location[1]
 
     @Test fun aParentedChildIsSavedWhereItWasSeen() {
-        val host = scene(
+        val host = sceneOf(
             layer("nullobj", 1, null, listOf(prop("location", 0f to "100,0,0"), prop("scale", 0f to "2,2"))),
             layer("shape", 2, 1, listOf(prop("location", 0f to "20,100,0", 1f to "50,100,0"))),
         )
@@ -40,7 +38,7 @@ class ElementSaveTest {
     }
 
     @Test fun aRotatedGroupKeepsItsRotation() {
-        val host = scene(group(prop("location", 0f to "200,200,0"), prop("rotation", 0f to "90"),
+        val host = sceneOf(group(prop("location", 0f to "200,200,0"), prop("rotation", 0f to "90"),
             inner = listOf(layer("shape", 5, null, listOf(prop("location", 0f to "300,200,0"))))))
         val saved = Layer(host.elementNodes(host.layer(9)!!, null).single())
         assertEquals(200f, saved.x(0), 1e-3f)
@@ -52,7 +50,7 @@ class ElementSaveTest {
         val blur = XmlNode("effect", mapOf("id" to "absent.blur"))
         val inner = layer("shape", 5, null, listOf(prop("location", 0f to "300,200,0")))
         val styled = group(prop("location", 0f to "200,200,0"), prop("opacity", 0f to "0.5"), inner = listOf(inner)).let { it.copy(children = it.children + blur) }
-        val host = scene(styled)
+        val host = sceneOf(styled)
         val saved = host.elementNodes(host.layer(9)!!, null).single()
         assertEquals("embedScene", saved.name)
         assertEquals("0.5", saved.child("transform")?.child("opacity")?.get("value"))
@@ -62,7 +60,7 @@ class ElementSaveTest {
     }
 
     @Test fun anAnimatedGroupBakesItsMotionIntoTheSavedLayers() {
-        val host = scene(group(prop("location", 0f to "200,200,0", 1f to "300,200,0"), prop("scale", 0f to "1,1", 1f to "2,2"),
+        val host = sceneOf(group(prop("location", 0f to "200,200,0", 1f to "300,200,0"), prop("scale", 0f to "1,1", 1f to "2,2"),
             inner = listOf(
                 layer("nullobj", 4, null, listOf(prop("location", 0f to "220,200,0"))),
                 layer("shape", 5, 4, listOf(prop("location", 0f to "10,0,0"))),

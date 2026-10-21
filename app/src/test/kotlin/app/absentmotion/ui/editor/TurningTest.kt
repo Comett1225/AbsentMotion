@@ -1,5 +1,6 @@
 package app.absentmotion.ui.editor
 
+import app.absentmotion.shapeLayer
 import androidx.compose.ui.geometry.Offset
 import app.absentmotion.effects.EffectCatalog
 import app.absentmotion.model.Layer
@@ -26,8 +27,6 @@ import java.io.File
 class TurningTest {
     private val catalog = EffectCatalog.parse { File("src/main/assets/effects", it).inputStream() }
 
-    private fun layer(kind: String = "shape") = Layer(XmlNode(kind, mapOf("id" to "1", "startTime" to "0", "endTime" to "1000")))
-
     private fun effect(id: String, hidden: Boolean = false) = catalog.find("absent.$id")!!.instance().let { if (hidden) it.with("hidden", "true") else it }
 
     @Test fun aTrackballDragTurnsTheFrontTheWayTheFingerGoes() {
@@ -48,31 +47,31 @@ class TurningTest {
     }
 
     @Test fun onlyThreeDObjectsTurnOnTheRotateTabButEveryLayerOnTheTiltTab() {
-        assertNull(turnFor(layer(), catalog, ROTATE_TAB))
-        assertEquals(-1, turnFor(layer(), catalog, TILT_TAB)!!.effect)
-        assertEquals(-1, turnFor(layer("model"), catalog, ROTATE_TAB)!!.effect)
-        assertEquals(-1, turnFor(layer().withTilt(0f, 15f), catalog, ROTATE_TAB)!!.effect)
-        assertNull(turnFor(layer(), catalog, 0))
-        assertNull(turnFor(layer("model"), catalog, 1))
-        assertNull(turnFor(layer("camera").addEffect(effect("cube")), catalog, ROTATE_TAB))
+        assertNull(turnFor(shapeLayer(), catalog, ROTATE_TAB))
+        assertEquals(-1, turnFor(shapeLayer(), catalog, TILT_TAB)!!.effect)
+        assertEquals(-1, turnFor(shapeLayer("model"), catalog, ROTATE_TAB)!!.effect)
+        assertEquals(-1, turnFor(shapeLayer().withTilt(0f, 15f), catalog, ROTATE_TAB)!!.effect)
+        assertNull(turnFor(shapeLayer(), catalog, 0))
+        assertNull(turnFor(shapeLayer("model"), catalog, 1))
+        assertNull(turnFor(shapeLayer("camera").addEffect(effect("cube")), catalog, ROTATE_TAB))
     }
 
     @Test fun theTopmostVisibleThreeDEffectIsTheOneThatTurns() {
-        val blurred = layer().addEffect(effect("blur")).addEffect(effect("cube", hidden = true)).addEffect(effect("torus")).addEffect(effect("flip"))
+        val blurred = shapeLayer().addEffect(effect("blur")).addEffect(effect("cube", hidden = true)).addEffect(effect("torus")).addEffect(effect("flip"))
         assertEquals(2, turnFor(blurred, catalog, ROTATE_TAB)!!.effect)
         assertEquals(2, turnFor(blurred, catalog, TILT_TAB)!!.effect)
-        assertNull(turnFor(layer().addEffect(effect("blur")), catalog, ROTATE_TAB))
+        assertNull(turnFor(shapeLayer().addEffect(effect("blur")), catalog, ROTATE_TAB))
     }
 
     @Test fun theTurnIsTheSameWhileTurningAndGoesWithTheEffect() {
-        val cube = layer().addEffect(effect("cube"))
+        val cube = shapeLayer().addEffect(effect("cube"))
         val turn = turnFor(cube, catalog, ROTATE_TAB)!!
         assertEquals(turn, turnFor(turn.turned(cube, Offset(20f, 5f), 0f), catalog, ROTATE_TAB))
-        assertNull(turnFor(layer(), catalog, ROTATE_TAB))
+        assertNull(turnFor(shapeLayer(), catalog, ROTATE_TAB))
     }
 
     @Test fun turningAnEffectWritesItsRotationsAndLeavesTheTiltAlone() {
-        val cube = layer().addEffect(effect("cube"))
+        val cube = shapeLayer().addEffect(effect("cube"))
         val turn = turnFor(cube, catalog, ROTATE_TAB)!!
         assertArrayEquals(floatArrayOf(-20f, -35f, 0f), turn.values(cube), 1e-4f)
         val turned = turn.turned(cube, Offset(20f, 0f), 0f)
@@ -83,7 +82,7 @@ class TurningTest {
     }
 
     @Test fun turningAModelWritesTiltAndRotation() {
-        val model = layer("model")
+        val model = shapeLayer("model")
         val turn = turnFor(model, catalog, ROTATE_TAB)!!
         val turned = turn.turned(model, Offset(0f, 10f), 0f)
         assertArrayEquals(floatArrayOf(-10f * TURN_PER_DP, 0f), turned.tilt, 1e-4f)
@@ -94,7 +93,7 @@ class TurningTest {
     }
 
     @Test fun anUnchangedAxisGetsNoKeyframe() {
-        val keyed = layer().addEffect(effect("cube")).withEffect(0) { node ->
+        val keyed = shapeLayer().addEffect(effect("cube")).withEffect(0) { node ->
             val rotX = node.effectProperty("rotX")!!
             node.copy(children = node.children.map { if (it === rotX) XmlNode("property", rotX.attrs - "value", listOf(XmlNode("kf", mapOf("t" to "0.000000", "v" to "-20.000000")))) else it })
         }.copy(t = 0.5f, snap = 0.01f)
@@ -108,9 +107,9 @@ class TurningTest {
     }
 
     @Test fun theKeyframeButtonFollowsTheChosenAxis() {
-        val turn = turnFor(layer().addEffect(effect("cube")), catalog, ROTATE_TAB)!!
+        val turn = turnFor(shapeLayer().addEffect(effect("cube")), catalog, ROTATE_TAB)!!
         assertEquals(PropRef.effect(0, "rotY"), turn.target(1).ref)
-        val tilt = turnFor(layer("model"), catalog, ROTATE_TAB)!!
+        val tilt = turnFor(shapeLayer("model"), catalog, ROTATE_TAB)!!
         assertEquals(PropRef.Tilt, tilt.target(0).ref)
         assertEquals(PropRef.Tilt, tilt.target(1).ref)
         assertEquals(PropRef.Rotation, tilt.target(2).ref)

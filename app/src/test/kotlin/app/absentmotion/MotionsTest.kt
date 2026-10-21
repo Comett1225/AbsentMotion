@@ -44,9 +44,10 @@ class MotionsTest {
     private fun shape(id: Long, start: Int, end: Int) = XmlNode("shape", linkedMapOf("id" to "$id", "label" to "Box $id", "startTime" to "$start",
         "endTime" to "$end", "fillType" to "color", "s" to ".rect"), listOf(transform()))
 
-    private fun video(id: Long, start: Int, end: Int, inTime: Int, outTime: Int) = XmlNode("shape", linkedMapOf("id" to "$id", "label" to "Clip $id",
-        "startTime" to "$start", "endTime" to "$end", "fillType" to "media", "fillVideo" to "content://vid$id", "mediaFillMode" to "fill",
-        "inTime" to "$inTime", "outTime" to "$outTime", "s" to ".rect"), listOf(transform()))
+    private fun video(id: Long, start: Int, end: Int, inTime: Int, outTime: Int) = videoNode(
+        start, end, id, inTime, outTime, uri = "content://vid$id", attrs = mapOf("label" to "Clip $id", "mediaFillMode" to "fill", "s" to ".rect"),
+        children = listOf(transform()),
+    )
 
     private fun media(id: Long, ms: Int) = XmlNode("media", linkedMapOf("uri" to "content://vid$id", "type" to "video", "duration" to "${ms * 1000L}"))
 

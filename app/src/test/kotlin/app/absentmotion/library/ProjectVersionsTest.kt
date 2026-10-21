@@ -60,7 +60,6 @@ class ProjectVersionsTest {
         val id = store.create(app.absentmotion.model.Scene.parse(xml("first")))
         store.versions.snapshot(id, store.text(id)!!)
         val first = store.versions.list(id).single()
-        Thread.sleep(2)
         store.save(id, xml("second"))
         store.restore(id, first)
         assertEquals("first", store.load(id)!!.title)

@@ -18,9 +18,6 @@ import org.junit.Test
 class SpeedRampTest {
     private val fps = 30
 
-    private fun video(start: Int, end: Int, vararg children: XmlNode) = Layer(XmlNode("shape", linkedMapOf("id" to "1",
-        "startTime" to "$start", "endTime" to "$end", "fillType" to "media", "fillVideo" to "content://v", "inTime" to "500"), children.toList()))
-
     private fun media(layer: Layer, projectMs: Int) = VideoTiming(layer).mediaMs((projectMs - layer.startTime).toDouble())
 
     private fun span(layer: Layer) = media(layer, layer.endTime) - media(layer, layer.startTime)
@@ -51,7 +48,7 @@ class SpeedRampTest {
     }
 
     @Test fun applyingAPresetKeepsTheMediaAndRetimesTheClip() {
-        val layer = video(1000, 4999)
+        val layer = videoLayer(1000, 4999)
         for (ramp in SpeedRamp.entries) {
             val ramped = layer.withSpeedRamp(ramp, ease = null)
             assertEquals(ramp.name, span(layer), span(ramped), 2.0)
@@ -63,7 +60,7 @@ class SpeedRampTest {
     }
 
     @Test fun freezeHoldsThePlayheadFrameForTheChosenTime() {
-        val layer = video(1000, 4999)
+        val layer = videoLayer(1000, 4999)
         val frozen = layer.withFreezeFrame(2000, 2000, fps)!!
         assertEquals(6999.0, frozen.endTime.toDouble(), 1000.0 / fps)
         val held = media(layer, 2000)
@@ -78,7 +75,7 @@ class SpeedRampTest {
             XmlNode("kf", mapOf("t" to "500000000", "v" to "1")),
             XmlNode("kf", mapOf("t" to "4500000000", "v" to "2", "e" to "linear")),
         ))
-        val layer = video(0, 2999, ramp)
+        val layer = videoLayer(0, 2999, children = listOf(ramp))
         val before = VideoTiming(layer)
         val frozen = layer.withFreezeFrame(1500, 1000, fps)!!
         val after = VideoTiming(frozen)
@@ -89,7 +86,7 @@ class SpeedRampTest {
     }
 
     @Test fun freezeOnlyWorksInsideTheClip() {
-        val layer = video(1000, 4999)
+        val layer = videoLayer(1000, 4999)
         assertNull(layer.withFreezeFrame(1000, 2000, fps))
         assertNull(layer.withFreezeFrame(4999, 2000, fps))
         assertNull(layer.withFreezeFrame(500, 2000, fps))
@@ -97,7 +94,7 @@ class SpeedRampTest {
     }
 
     @Test fun retimingAFrozenClipKeepsTheHold() {
-        val frozen = video(1000, 4999).withFreezeFrame(2000, 2000, fps)!!
+        val frozen = videoLayer(1000, 4999).withFreezeFrame(2000, 2000, fps)!!
         val length = frozen.endTime - frozen.startTime
         val halved = frozen.retimedVideo(frozen.startTime, frozen.startTime + length / 2)
         val held = media(frozen, 2000)
