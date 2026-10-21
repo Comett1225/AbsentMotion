@@ -63,4 +63,11 @@ class ProxyRulesTest {
         assertEquals("3", stamps.frameNumber(2_502_500L))
         assertEquals("2", stamps.frameNumber(50_000L))
     }
+
+    @Test fun aFailedCopyIsTriedAgainAFewTimesUnlessItsFramesDiffered() {
+        assertEquals(0, ProxyRules.failures(null))
+        assertEquals(2, ProxyRules.failures("2"))
+        assertEquals(1, ProxyRules.failures("java.lang.IllegalStateException: insufficient resources"))
+        assertTrue(ProxyRules.failures(ProxyRules.FRAMES_DIFFER) >= ProxyRules.MAX_TRIES)
+    }
 }

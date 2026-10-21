@@ -44,6 +44,14 @@ internal object ProxyRules {
     const val MAX_SHORT_SIDE = 1080
     const val MAX_SYNC_GAP_US = 2_000_000L
     const val SHORT_SIDE = 540
+    const val MAX_TRIES = 3
+    const val FRAMES_DIFFER = "frames differ"
+
+    fun failures(record: String?): Int = when (record) {
+        null -> 0
+        FRAMES_DIFFER -> Int.MAX_VALUE
+        else -> record.toIntOrNull() ?: 1
+    }
 
     fun needed(width: Int, height: Int, syncGapUs: Long, hdr: Boolean): Boolean =
         !hdr && width > 0 && height > 0 && (max(width, height) > MAX_LONG_SIDE || min(width, height) > MAX_SHORT_SIDE || syncGapUs > MAX_SYNC_GAP_US)
@@ -122,7 +130,9 @@ object VideoProxies {
         val folder = dir(context).apply { mkdirs() }
         val done = File(folder, "$key.mp4")
         val failed = File(folder, "$key.failed")
-        if (done.isFile || failed.isFile || cancelled()) { settled += uri; return }
+        if (cancelled()) return
+        val failures = ProxyRules.failures(failed.takeIf { it.isFile }?.readText())
+        if (done.isFile || failures >= ProxyRules.MAX_TRIES) { settled += uri; return }
         val info = sourceInfo(context, uri)
         if (!ProxyRules.needed(info.width, info.height, VideoSources.syncGapUs(context, uri), info.hdr)) { settled += uri; return }
         val part = File(folder, "$key.part")
@@ -137,24 +147,26 @@ object VideoProxies {
             if (!finished) { part.delete(); return }
             if (!ProxyRules.sameFrames(VideoSources.timestamps(context, uri), VideoSources.timestamps(context, Uri.fromFile(part).toString()))) {
                 part.delete()
-                failed.writeText("frames differ")
+                failed.writeText(ProxyRules.FRAMES_DIFFER)
                 settled += uri
                 Log.w("AMProxy", "the preview copy of $uri has different frame times; using the original")
                 return
             }
             check(part.renameTo(done))
+            failed.delete()
             settled += uri
             Log.i("AMProxy", "preview copy of $uri ready in ${(System.nanoTime() - started) / 1_000_000} ms, ${done.length()} bytes")
             trim(folder)
             made.update { it + 1 }
         } catch (e: Exception) {
             part.delete()
-            if (!cancelled()) { failed.writeText(e.toString()); settled += uri }
+            if (!cancelled()) { failed.writeText("${failures + 1}"); settled += uri }
             throw e
         }
     }
 
     private fun trim(folder: File) {
+        folder.listFiles { f -> f.extension == "part" }?.forEach { it.delete() }
         val copies = folder.listFiles { f -> f.extension == "mp4" }?.sortedByDescending { it.lastModified() } ?: return
         var total = 0L
         for (f in copies) { total += f.length(); if (total > BUDGET_BYTES) f.delete() }
