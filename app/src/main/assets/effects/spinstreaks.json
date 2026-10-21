@@ -54,7 +54,7 @@
    "options": [
     "Min",
     "Max",
-    "Average",
+    "Avg",
     "Off"
    ]
   },
@@ -66,7 +66,7 @@
    "options": [
     "Min",
     "Max",
-    "Average",
+    "Avg",
     "Off"
    ]
   },
@@ -78,7 +78,7 @@
    "options": [
     "Min",
     "Max",
-    "Average",
+    "Avg",
     "Off"
    ]
   },
@@ -90,7 +90,7 @@
    "options": [
     "Min",
     "Max",
-    "Average",
+    "Avg",
     "Off"
    ]
   }
