@@ -15,6 +15,7 @@ import androidx.compose.runtime.setValue
 
 class AppSettings(private val context: Context) {
     private val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+    val demoModeShown = context.applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE != 0
 
     private var previewQualityState by mutableStateOf(PreviewQuality.of(prefs.getString("previewQuality", null), prefs.getBoolean("lowQualityPreview", false)))
     private var defaultLayerDurationState by mutableIntStateOf(prefs.getInt("defaultLayerDuration", 2))
@@ -47,7 +48,7 @@ class AppSettings(private val context: Context) {
         set(value) { audioResamplingState = value; prefs.edit().putInt("audioResampling", value).apply() }
 
     var demoMode: Boolean
-        get() = demoModeState
+        get() = demoModeState && demoModeShown
         set(value) { demoModeState = value; prefs.edit().putBoolean("demoMode", value).apply() }
 
     var loopingPlay: Boolean

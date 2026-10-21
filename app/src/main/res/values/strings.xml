@@ -126,7 +126,7 @@
     <string name="delete_all">Delete all</string>
     <string name="effects_not_loaded">The effects could not be loaded</string>
     <string name="settings_demo_mode">Demo Mode</string>
-    <string name="settings_open_xml">Open XML Projects</string>
+    <string name="settings_open_xml">Show the import card in the project list</string>
     <string name="settings_vibration">Vibration</string>
     <string name="settings_emoji">Emoji Style</string>
     <string name="settings_emoji_system">System</string>
