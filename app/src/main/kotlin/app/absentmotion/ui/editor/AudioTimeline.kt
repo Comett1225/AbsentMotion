@@ -1,5 +1,6 @@
 package app.absentmotion.ui.editor
 
+import app.absentmotion.model.finiteDouble
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.geometry.CornerRadius
@@ -54,8 +55,8 @@ internal fun DrawScope.drawAudioBar(outline: Path, layer: Layer, left: Float, ri
         drawLine(AudioWave.copy(alpha = 0.6f), Offset(from, centre), Offset(to, centre), 1.dp.toPx())
         val peaks = layer.node["src"]?.let { Waveforms.peaks(it) } ?: return@clipPath
         val timing = timingOf(layer)
-        val inMs = layer.node["inTime"]?.toDoubleOrNull() ?: 0.0
-        val outMs = layer.node["outTime"]?.toDoubleOrNull() ?: Double.MAX_VALUE
+        val inMs = layer.node["inTime"]?.finiteDouble() ?: 0.0
+        val outMs = layer.node["outTime"]?.finiteDouble() ?: Double.MAX_VALUE
         val column = 2.dp.toPx()
         val room = (bottom - top) / 2 - 3.dp.toPx()
         var x = left + column * kotlin.math.floor((from - left) / column)

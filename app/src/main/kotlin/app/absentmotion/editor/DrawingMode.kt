@@ -29,6 +29,7 @@ import kotlin.random.Random
 
 sealed class DrawingMode(val layerId: Long, val created: Boolean) {
     abstract val handlesCode: Int
+    internal var added: Scene? = null
 }
 
 private object DrawingDefaults {
@@ -86,7 +87,7 @@ private fun EditorState.newLayer(name: String, tag: String, fill: String, color:
 }
 
 private fun EditorState.enter(layer: Layer, mode: DrawingMode, created: Boolean) {
-    if (created) edit { it.add(layer) }
+    if (created) { edit { it.add(layer) }; mode.added = scene }
     else if (!layer.activeAt(timeMs)) frame = scene.frameAt(layer.startTime)
     selectedId = layer.id
     playing = false
@@ -128,7 +129,7 @@ fun EditorState.leaveDrawing() {
         is TrackMode -> false
     }
     if (mode.created && empty && layer != null) {
-        edit { it.remove(mode.layerId) }
+        if (!forgetEdit(mode.added)) edit { it.remove(mode.layerId) }
         selectedId = null
     }
     if (mode is TrackMode) {

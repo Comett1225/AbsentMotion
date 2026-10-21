@@ -33,7 +33,7 @@ data class Border(val index: Int, val enabled: Boolean, val direction: String, v
 }
 
 private fun Layer.number(path: String, fallback: Float): Float =
-    element(PropRef(PropRef.Kind.Child, path))?.valueAt(t)?.toFloatOrNull() ?: fallback
+    element(PropRef(PropRef.Kind.Child, path))?.valueAt(t)?.finiteFloat() ?: fallback
 
 private fun Layer.colour(path: String, fallback: Int): Int =
     parseColor(element(PropRef(PropRef.Kind.Child, path))?.valueAt(t)) ?: fallback
@@ -84,7 +84,7 @@ data class Shadow(val present: Boolean, val enabled: Boolean, val color: Int, va
 val Layer.shadow: Shadow
     get() {
         val s = node.child("shadow")
-        val offset = element(PropRef(PropRef.Kind.Child, "shadow/offset"))?.valueAt(t)?.split(',')?.mapNotNull { it.toFloatOrNull() }
+        val offset = element(PropRef(PropRef.Kind.Child, "shadow/offset"))?.valueAt(t)?.split(',')?.mapNotNull { it.finiteFloat() }
         return Shadow(s != null, s != null && s["enabled"] != "false", colour("shadow/color", StyleColors.Black), number("shadow/opacity", 1f),
             number("shadow/size", 4f), offset?.getOrNull(0) ?: 3f, offset?.getOrNull(1) ?: 3f)
     }
@@ -108,7 +108,7 @@ val Layer.stroke: StrokeStyle
     get() {
         val s = node.child("path-stroke")
         return StrokeStyle(s != null, s != null && s["enabled"] != "false", colour("path-stroke/color", StyleColors.Black), number("path-stroke/size", 4f),
-            s?.get("cap") ?: "round", s?.get("join") ?: "bevel", s?.get("start") ?: "none", s?.get("end") ?: "none", s?.get("end-size")?.toFloatOrNull() ?: 1f)
+            s?.get("cap") ?: "round", s?.get("join") ?: "bevel", s?.get("start") ?: "none", s?.get("end") ?: "none", s?.get("end-size")?.finiteFloat() ?: 1f)
     }
 
 fun Layer.withStrokeEnabled(on: Boolean): Layer {
@@ -140,7 +140,7 @@ val Layer.gradient: GradientStyle
     get() {
         val g = node.child("gradient")
         fun point(key: String, dx: Float, dy: Float): Pair<Float, Float> {
-            val v = g?.get(key)?.split(',')?.mapNotNull { it.trim().toFloatOrNull() }
+            val v = g?.get(key)?.split(',')?.mapNotNull { it.trim().finiteFloat() }
             return (v?.getOrNull(0) ?: dx) to (v?.getOrNull(1) ?: dy)
         }
         val a = point("start", 0f, 0f)

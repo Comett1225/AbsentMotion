@@ -1,5 +1,6 @@
 package app.absentmotion.ui.editor.panels
 
+import app.absentmotion.model.finiteFloat
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -165,7 +166,7 @@ private fun editColour(ref: PropRef, default: Int) {
 }
 
 private fun EditorState.setRow(ref: PropRef, text: String, gesture: Boolean) =
-    editSelected(if (gesture) ref.name else null) { it.withValue(ref, text.split(',').joinToString(",") { v -> formatNumber(v.toFloatOrNull() ?: 0f) }) }
+    editSelected(if (gesture) ref.name else null) { it.withValue(ref, text.split(',').joinToString(",") { v -> formatNumber(v.finiteFloat() ?: 0f) }) }
 
 @Composable
 private fun ColourEditor(state: EditorState, layer: Layer, ref: PropRef) {
@@ -311,7 +312,7 @@ private fun EndPicker(state: EditorState, layer: Layer) {
             Text(stringResource(if (which == 0) R.string.border_stroke_start else R.string.border_stroke_end), Modifier.padding(start = 8.dp).weight(1f), color = Am.OnDark, fontSize = 15.sp)
         }
         EffectNumbers(state, spinner("Size", stringResource(R.string.panel_size), "0.1"), "${s.endSize}", true, true, {}) { text, gesture ->
-            state.editSelected(if (gesture) "end-size" else null) { it.withStrokeAttr("end-size", formatNumber((text.toFloatOrNull() ?: 1.5f).coerceAtLeast(0f))) }
+            state.editSelected(if (gesture) "end-size" else null) { it.withStrokeAttr("end-size", formatNumber((text.finiteFloat() ?: 1.5f).coerceAtLeast(0f))) }
         }
         Row(Modifier.fillMaxSize().horizontalScroll(rememberScrollState()).padding(8.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             StrokeEnds.forEach { style ->

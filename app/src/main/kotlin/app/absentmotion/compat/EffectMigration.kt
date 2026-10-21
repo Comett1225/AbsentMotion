@@ -1,5 +1,6 @@
 package app.absentmotion.compat
 
+import app.absentmotion.model.finiteFloat
 import app.absentmotion.effects.EffectCatalog
 import app.absentmotion.effects.EffectDefinition
 import app.absentmotion.model.Scene
@@ -67,7 +68,7 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
             conversions.forEachIndexed { i, c ->
                 val param = c?.to?.let { to -> own.params.firstOrNull { it.id == to } }
                 if (param != null) {
-                    val shift = c.plus?.let { other -> effect.children.firstOrNull { it.name == "property" && it["name"] == other }?.valueAt(0f)?.toFloatOrNull() } ?: 0f
+                    val shift = c.plus?.let { other -> effect.children.firstOrNull { it.name == "property" && it["name"] == other }?.valueAt(0f)?.finiteFloat() } ?: 0f
                     made[param.id] = property(child, param.id, param.type) { text -> convertValue(text, c, if (c.component >= 0) c.component else if (split) i else -1, shift) }
                 } else if (c?.neutral == null || values(child).any { !same(if (split) it.split(',').getOrElse(i) { "" } else it, c.neutral) }) {
                     drop(if (split) "$name (${i + 1})" else name)
@@ -92,8 +93,8 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
     private fun values(node: XmlNode): List<String> = listOfNotNull(node["value"]) + node.children.mapNotNull { it["v"] }
 
     private fun same(a: String, b: String): Boolean {
-        val x = a.split(',').map { it.trim().toFloatOrNull() }
-        val y = b.split(',').map { it.trim().toFloatOrNull() }
+        val x = a.split(',').map { it.trim().finiteFloat() }
+        val y = b.split(',').map { it.trim().finiteFloat() }
         return if (x.all { it != null } && y.all { it != null }) x == y else a.trim() == b.trim()
     }
 
@@ -103,7 +104,7 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
         val parts = t.split(',')
         val picked = if (component >= 0) listOf(parts.getOrElse(component) { "0" }) else parts
         val numbers = picked.map { p ->
-            val n = p.trim().toFloatOrNull() ?: return t
+            val n = p.trim().finiteFloat() ?: return t
             c.values[n.toInt().toString()]?.takeIf { n % 1f == 0f } ?: n
         }
         return formatFloats(FloatArray(numbers.size) { i ->

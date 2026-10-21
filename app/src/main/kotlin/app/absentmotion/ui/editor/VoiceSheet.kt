@@ -66,6 +66,7 @@ internal fun VoiceSheet(state: EditorState, onClose: () -> Unit) {
     DisposableEffect(Unit) { onDispose { speech.close() } }
     val voices by produceState<List<SpeechVoice>?>(null) { value = runCatching { speech.voices() }.getOrDefault(emptyList()) }
     var text by remember { mutableStateOf(lastText) }
+    DisposableEffect(Unit) { onDispose { lastText = text } }
     var voiceId by remember { mutableStateOf(lastVoice) }
     var speed by remember { mutableStateOf(lastSpeed) }
     var pitch by remember { mutableStateOf(lastPitch) }

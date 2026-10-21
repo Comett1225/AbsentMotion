@@ -33,7 +33,6 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -69,8 +68,7 @@ private val TilePalettes = listOf(
 @Composable
 internal fun AudioTab(state: EditorState, modifier: Modifier, library: AddLibrary) {
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-    var adding by remember { mutableStateOf(false) }
+    val scope = LocalEditorScope.current
     var speaking by remember { mutableStateOf(false) }
     var search by remember { mutableStateOf("") }
     val query = debounced(search)
@@ -80,7 +78,7 @@ internal fun AudioTab(state: EditorState, modifier: Modifier, library: AddLibrar
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) {
             runCatching { context.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION) }
-            scope.launch { adding = true; try { audioDeclaration(context, uri)?.let { state.keepCopy(context, it) }?.let { state.addAudio(it) } } finally { adding = false } }
+            scope.launch { state.addingMedia = true; try { audioDeclaration(context, uri)?.let { state.keepCopy(context, it) }?.let { state.addAudio(it) } } finally { state.addingMedia = false } }
         }
     }
     androidx.compose.runtime.LaunchedEffect(Unit) {
@@ -139,8 +137,8 @@ internal fun AudioTab(state: EditorState, modifier: Modifier, library: AddLibrar
                         Text(duration(file.durationMs), Modifier.padding(start = 3.dp, top = 15.dp).fillMaxWidth(), color = Color.White, fontSize = 9.sp, maxLines = 1)
                         Box(
                             Modifier.align(Alignment.BottomCenter).fillMaxWidth().height(26.dp).background(Color(0x32000000))
-                                .clickable(enabled = !adding) {
-                                    scope.launch { adding = true; try { audioDeclaration(context, file.uri)?.let { state.keepCopy(context, it) }?.let { state.addAudio(it) } } finally { adding = false } }
+                                .clickable(enabled = !state.addingMedia) {
+                                    scope.launch { state.addingMedia = true; try { audioDeclaration(context, file.uri)?.let { state.keepCopy(context, it) }?.let { state.addAudio(it) } } finally { state.addingMedia = false } }
                                 },
                             Alignment.Center,
                         ) { Icon(ChromeIcons.Plus, stringResource(R.string.audiotab_add), Modifier.size(16.dp), tint = Color.White) }

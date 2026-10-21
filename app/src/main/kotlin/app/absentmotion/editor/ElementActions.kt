@@ -1,5 +1,6 @@
 package app.absentmotion.editor
 
+import app.absentmotion.model.finiteFloat
 import app.absentmotion.R
 import app.absentmotion.i18n.AppText
 import app.absentmotion.library.ProjectStore
@@ -25,7 +26,7 @@ internal fun XmlNode.mapTransform(name: String, change: (FloatArray) -> Unit): X
     val defaults = if (name == "scale") floatArrayOf(1f, 1f) else floatArrayOf(0f, 0f, 0f)
     fun value(text: String?): String = formatFloats(defaults.copyOf().also { values ->
         val parts = text?.split(',').orEmpty()
-        for (i in values.indices) values[i] = parts.getOrNull(i)?.trim()?.toFloatOrNull() ?: values[i]
+        for (i in values.indices) values[i] = parts.getOrNull(i)?.trim()?.finiteFloat() ?: values[i]
         change(values)
     })
     val transform = child("transform") ?: XmlNode("transform")
@@ -89,8 +90,8 @@ private suspend fun EditorState.lifetimeBounds(layer: Layer): FloatArray? {
     }
 }
 
-fun EditorState.addElement(store: ProjectStore, id: String, link: Boolean) {
-    val element = store.load(id)?.withCopiedLayerIds() ?: return
+suspend fun EditorState.addElement(store: ProjectStore, id: String, link: Boolean) {
+    val element = withContext(Dispatchers.IO) { store.load(id)?.withCopiedLayerIds() } ?: return
     val start = timeMs
     val attrs = linkedMapOf(
         "id" to "${Layer.newId()}", "label" to element.title,

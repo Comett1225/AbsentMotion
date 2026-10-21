@@ -4,7 +4,7 @@ internal fun Scene.withLegacyExifOrientation(uri: String, tag: Int): Scene {
     val record = media(uri) ?: return this
     if (record.orientation != 0 || tag !in setOf(5, 7)) return this
     val degrees = exifOrientation(tag).first
-    fun rotated(value: String?) = ((value?.toFloatOrNull() ?: 0f) + degrees).toString()
+    fun rotated(value: String?) = ((value?.finiteFloat() ?: 0f) + degrees).toString()
     fun walk(node: XmlNode): XmlNode {
         var changed = node
         if (node["fillImage"] == uri) {

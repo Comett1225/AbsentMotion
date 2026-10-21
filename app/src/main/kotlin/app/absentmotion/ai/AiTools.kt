@@ -65,10 +65,12 @@ class AiTools(private val context: Context, private val state: EditorState, priv
         action.unavailable(layer)?.let { message = AppText.get(it); return }
         layer ?: return
         if (action == AiAction.Video && !confirmed) {
+            dismiss()
             videoSetup = layer
             return
         }
         if (action == AiAction.Noise && !confirmed) {
+            dismiss()
             noiseSetup = layer
             return
         }

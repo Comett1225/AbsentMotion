@@ -147,7 +147,7 @@ data class Layer(val node: XmlNode, val t: Float = 0f, val snap: Float = 0f) {
         return MediaFill(uri, node["fillImage"] == null,
             MediaFillMode.entries.firstOrNull { it.xml == node["mediaFillMode"] } ?: MediaFillMode.Fill,
             node["inTime"]?.toIntOrNull() ?: 0, node["outTime"]?.toIntOrNull() ?: Int.MAX_VALUE,
-            node["speed"]?.toFloatOrNull() ?: 1f)
+            node["speed"]?.finiteFloat() ?: 1f)
     }
 
     val id: Long get() = node["id"]?.toLongOrNull() ?: 0
@@ -290,7 +290,7 @@ data class Layer(val node: XmlNode, val t: Float = 0f, val snap: Float = 0f) {
             if (n.name == "speedMap") {
                 val timing = VideoTiming(this)
                 n.keyframes.forEach { out.add(startTime + timing.localMs(it.t.toDouble() / 1_000_000).roundToInt()) }
-            } else if (n.name == "kf") n["t"]?.toFloatOrNull()?.let { out.add(timeOf(it)) }
+            } else if (n.name == "kf") n["t"]?.finiteFloat()?.let { out.add(timeOf(it)) }
             else if (n.name != "scene") n.children.forEach(::walk)
         }
         walk(if (scope == null) node else scopeNode(scope) ?: return emptyList())
@@ -305,7 +305,7 @@ data class Layer(val node: XmlNode, val t: Float = 0f, val snap: Float = 0f) {
 }
 
 internal fun floats(text: String?, defaults: FloatArray): FloatArray {
-    val parsed = text?.split(',')?.mapNotNull { it.trim().toFloatOrNull() } ?: emptyList()
+    val parsed = text?.split(',')?.mapNotNull { it.trim().finiteFloat() } ?: emptyList()
     return FloatArray(maxOf(parsed.size, defaults.size)) { parsed.getOrNull(it) ?: defaults[it] }
 }
 

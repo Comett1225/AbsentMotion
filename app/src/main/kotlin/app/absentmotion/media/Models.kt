@@ -1,5 +1,6 @@
 package app.absentmotion.media
 
+import app.absentmotion.model.finiteFloat
 import org.json.JSONArray
 import org.json.JSONObject
 import java.nio.ByteBuffer
@@ -161,11 +162,11 @@ object ObjReader {
             val t = tokens(line)
             when (t[0]) {
                 "v" -> {
-                    for (i in 1..3) vs.add(t.getOrNull(i)?.toFloatOrNull() ?: 0f)
-                    for (i in 4..6) vcs.add(t.getOrNull(i)?.toFloatOrNull() ?: 1f)
+                    for (i in 1..3) vs.add(t.getOrNull(i)?.finiteFloat() ?: 0f)
+                    for (i in 4..6) vcs.add(t.getOrNull(i)?.finiteFloat() ?: 1f)
                 }
-                "vt" -> { vts.add(t.getOrNull(1)?.toFloatOrNull() ?: 0f); vts.add(t.getOrNull(2)?.toFloatOrNull() ?: 0f) }
-                "vn" -> for (i in 1..3) vns.add(t.getOrNull(i)?.toFloatOrNull() ?: 0f)
+                "vt" -> { vts.add(t.getOrNull(1)?.finiteFloat() ?: 0f); vts.add(t.getOrNull(2)?.finiteFloat() ?: 0f) }
+                "vn" -> for (i in 1..3) vns.add(t.getOrNull(i)?.finiteFloat() ?: 0f)
                 "mtllib" -> open(line.substringAfter("mtllib").trim())?.let { readMaterials(it.toString(Charsets.UTF_8), materials) }
                 "usemtl" -> {
                     material = materials[line.substringAfter("usemtl").trim()] ?: Material()
@@ -208,9 +209,9 @@ object ObjReader {
             val t = tokens(line)
             when (t[0]) {
                 "newmtl" -> current = Material().also { into[line.substringAfter("newmtl").trim()] = it }
-                "Kd" -> current?.let { m -> for (i in 0..2) m.color[i] = t.getOrNull(i + 1)?.toFloatOrNull() ?: 1f }
-                "d" -> current?.let { m -> m.color[3] = t.getOrNull(1)?.toFloatOrNull() ?: 1f }
-                "Tr" -> current?.let { m -> m.color[3] = 1f - (t.getOrNull(1)?.toFloatOrNull() ?: 0f) }
+                "Kd" -> current?.let { m -> for (i in 0..2) m.color[i] = t.getOrNull(i + 1)?.finiteFloat() ?: 1f }
+                "d" -> current?.let { m -> m.color[3] = t.getOrNull(1)?.finiteFloat() ?: 1f }
+                "Tr" -> current?.let { m -> m.color[3] = 1f - (t.getOrNull(1)?.finiteFloat() ?: 0f) }
                 "map_Kd" -> current?.texture = t.last().takeIf { t.size > 1 }
             }
         }

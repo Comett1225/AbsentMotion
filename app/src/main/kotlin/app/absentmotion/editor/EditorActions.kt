@@ -1,5 +1,6 @@
 package app.absentmotion.editor
 
+import app.absentmotion.model.finiteFloat
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -330,23 +331,34 @@ suspend fun EditorState.compositionArea(mode: String) {
     val document = scene
     val bounds = engine.layerBounds(layer.id, sampleMs) ?: return
     if (scene != document || selectedId != layer.id) return
-    val width = bounds[2] - bounds[0]
-    val height = bounds[3] - bounds[1]
-    if (width <= 0f || height <= 0f) return
-    var sx = document.width / width
-    var sy = document.height / height
+    edit { it.fittedToCanvas(layer.id, bounds, mode, sampleMs) ?: it }
+}
+
+internal fun Scene.fittedToCanvas(id: Long, bounds: FloatArray, mode: String, timeMs: Int): Scene? {
+    val layer = layer(id) ?: return null
+    val boxWidth = bounds[2] - bounds[0]
+    val boxHeight = bounds[3] - bounds[1]
+    if (boxWidth <= 0f || boxHeight <= 0f) return null
+    var sx = width / boxWidth
+    var sy = height / boxHeight
     if (mode != "stretch") {
         val factor = if (mode == "fit") minOf(sx, sy) else maxOf(sx, sy)
         sx = factor; sy = factor
     }
-    val at = layer.location
-    val dx = document.width / 2f - (bounds[0] + bounds[2]) / 2f + (1 - sx) * ((bounds[0] + bounds[2]) / 2f - at[0])
-    val dy = document.height / 2f - (bounds[1] + bounds[3]) / 2f + (1 - sy) * ((bounds[1] + bounds[3]) / 2f - at[1])
-    edit { it.update(layer.id) { current ->
+    val world = place(layer, timeMs)
+    val wx = width / 2f - (bounds[0] + bounds[2]) / 2f + (1 - sx) * ((bounds[0] + bounds[2]) / 2f - world.x)
+    val wy = height / 2f - (bounds[1] + bounds[3]) / 2f + (1 - sy) * ((bounds[1] + bounds[3]) / 2f - world.y)
+    val parent = chain(layer).getOrNull(1)?.let { place(it, timeMs) }
+    fun local(w: Place) = if (parent == null) w else decompose(w, parent)
+    val from = local(world) ?: return null
+    val to = local(world.copy(x = world.x + wx, y = world.y + wy)) ?: return null
+    val dx = to.x - from.x
+    val dy = to.y - from.y
+    return update(id) { current ->
         fun map(name: String, defaults: FloatArray, change: (FloatArray) -> Unit): XmlNode {
             val n = current.node.child("transform")?.child(name) ?: XmlNode(name)
             fun value(text: String?): String {
-                val parts = text?.split(',')?.map { it.toFloatOrNull() } ?: emptyList()
+                val parts = text?.split(',')?.map { it.finiteFloat() } ?: emptyList()
                 val v = FloatArray(maxOf(parts.size, defaults.size)) { parts.getOrNull(it) ?: defaults.getOrElse(it) { 0f } }
                 change(v)
                 return formatFloats(v)
@@ -360,7 +372,7 @@ suspend fun EditorState.compositionArea(mode: String) {
             .withChild("location", map("location", floatArrayOf(0f, 0f, 0f)) { v -> v[0] += dx; v[1] += dy })
             .withChild("scale", map("scale", floatArrayOf(1f, 1f)) { v -> v[0] *= sx; v[1] *= sy })
         current.copy(node = current.node.withChild("transform", transform))
-    } }
+    }
 }
 
 internal fun compatibleCurve(ref: PropRef, easing: Easing?): Easing? {

@@ -165,10 +165,9 @@ class EditorState(
     var canRedo by mutableStateOf(false)
         private set
 
-    private val undoStack = ArrayDeque<Scene>()
-    private val redoStack = ArrayDeque<Scene>()
-    private var lastEditKey: Any? = null
-    private var redoBeforeGesture: List<Scene> = emptyList()
+    var addingMedia by mutableStateOf(false)
+
+    private val history = EditHistory({ scene }, ::apply)
 
     val selected: Layer? get() = selectedId?.let { scene.layerAt(it, sampleMs) }
 
@@ -201,32 +200,17 @@ class EditorState(
 
     fun edit(key: Any? = null, change: (Scene) -> Scene) {
         Glide.interrupt()
-        val next = change(scene)
-        if (next == scene) return
-        if (key == null || key != lastEditKey) {
-            undoStack.addLast(scene)
-            if (undoStack.size > MAX_UNDO) undoStack.removeFirst()
-            redoBeforeGesture = redoStack.toList()
-        }
-        lastEditKey = key
-        redoStack.clear()
-        apply(next, save = key == null)
+        history.edit(key, change(scene))
     }
 
     fun endGesture() {
-        if (lastEditKey != null) saver.commit(scene.toXml())
-        lastEditKey = null
+        if (history.endGesture()) saver.commit(scene.toXml())
         saver.flush()
     }
 
-    fun cancelGesture(key: Any) {
-        if (lastEditKey != key) return
-        lastEditKey = null
-        val previous = undoStack.removeLastOrNull() ?: return
-        redoStack.clear()
-        redoStack.addAll(redoBeforeGesture)
-        apply(previous, save = false)
-    }
+    fun cancelGesture(key: Any) = history.cancelGesture(key)
+
+    internal fun forgetEdit(after: Scene?): Boolean = history.forget(after)
 
     fun editSelected(key: Any? = null, change: (Layer) -> Layer) {
         val id = selectedId ?: return
@@ -244,37 +228,97 @@ class EditorState(
 
     fun undo() {
         Glide.interrupt()
-        val previous = undoStack.removeLastOrNull() ?: return
-        note(true, previous to scene)
-        redoStack.addLast(scene)
-        lastEditKey = null
-        apply(previous)
+        val before = scene
+        history.undo()?.let { note(true, it to before) }
     }
 
     fun redo() {
         Glide.interrupt()
-        val next = redoStack.removeLastOrNull() ?: return
-        note(false, scene to next)
-        undoStack.addLast(scene)
-        lastEditKey = null
-        apply(next)
+        val before = scene
+        history.redo()?.let { note(false, before to it) }
     }
 
-    private fun apply(next: Scene, save: Boolean = true) {
+    private fun apply(next: Scene, save: Boolean) {
+        val previous = scene
         scene = next
         if (MultiSelect.active) MultiSelect.ids = MultiSelect.ids.filter { next.layer(it) != null }.toSet()
-        canUndo = undoStack.isNotEmpty()
-        canRedo = redoStack.isNotEmpty()
+        canUndo = history.canUndo
+        canRedo = history.canRedo
         if (selectedId != null && next.layer(selectedId!!) == null) selectedId = null
-        frame = frame.coerceIn(0, maxOf(next.lastFrame, 0))
+        frame = keptFrame(previous, next, frame)
         val xml = next.toXml()
         engine.setScene(next, xml)
         if (save) saver.commit(xml) else saver.draft(xml)
     }
 
     private companion object {
-        const val MAX_UNDO = 200
         const val MAX_NOTES = 2
         val ZOOM_STEPS = floatArrayOf(0.01f, 0.05f, 0.1f, 0.25f, 0.5f, 1f, 1.5f, 2f, 3f, 4f, 8f, 16f, 32f, 64f)
+    }
+}
+
+internal fun keptFrame(previous: Scene, next: Scene, frame: Int): Int =
+    (if (next.fps != previous.fps) next.frameAt(previous.frameStart(frame)) else frame).coerceIn(0, maxOf(next.lastFrame, 0))
+
+internal class EditHistory(private val current: () -> Scene, private val show: (Scene, save: Boolean) -> Unit) {
+    private val undoStack = ArrayDeque<Scene>()
+    private val redoStack = ArrayDeque<Scene>()
+    private var lastEditKey: Any? = null
+    private var redoBeforeGesture: List<Scene> = emptyList()
+
+    val canUndo: Boolean get() = undoStack.isNotEmpty()
+    val canRedo: Boolean get() = redoStack.isNotEmpty()
+
+    fun edit(key: Any?, next: Scene) {
+        val scene = current()
+        if (next == scene) return
+        if (key == null || key != lastEditKey) {
+            undoStack.addLast(scene)
+            if (undoStack.size > MAX_UNDO) undoStack.removeFirst()
+            redoBeforeGesture = redoStack.toList()
+        }
+        lastEditKey = key
+        redoStack.clear()
+        show(next, key == null)
+    }
+
+    fun endGesture(): Boolean = (lastEditKey != null).also { lastEditKey = null }
+
+    fun cancelGesture(key: Any) {
+        if (lastEditKey != key) return
+        lastEditKey = null
+        val previous = undoStack.removeLastOrNull() ?: return
+        redoStack.clear()
+        redoStack.addAll(redoBeforeGesture)
+        show(previous, false)
+    }
+
+    fun forget(after: Scene?): Boolean {
+        if (after == null || current().node !== after.node) return false
+        val previous = undoStack.removeLastOrNull() ?: return false
+        lastEditKey = null
+        redoStack.clear()
+        show(previous, true)
+        return true
+    }
+
+    fun undo(): Scene? {
+        val previous = undoStack.removeLastOrNull() ?: return null
+        redoStack.addLast(current())
+        lastEditKey = null
+        show(previous, true)
+        return previous
+    }
+
+    fun redo(): Scene? {
+        val next = redoStack.removeLastOrNull() ?: return null
+        undoStack.addLast(current())
+        lastEditKey = null
+        show(next, true)
+        return next
+    }
+
+    companion object {
+        const val MAX_UNDO = 200
     }
 }

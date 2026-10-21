@@ -1,5 +1,6 @@
 package app.absentmotion.ui.editor
 
+import app.absentmotion.model.finiteFloat
 import app.absentmotion.platform.BackHandler
 import androidx.annotation.StringRes
 import androidx.compose.runtime.SideEffect
@@ -382,7 +383,7 @@ fun ValueKeypad(request: KeypadRequest, onClose: () -> Unit, modifier: Modifier 
         selected = false
     }
     fun done() {
-        request.onDone(fields.indices.map { texts[it].toFloatOrNull() ?: fields[it].value })
+        request.onDone(fields.indices.map { texts[it].finiteFloat() ?: fields[it].value })
         onClose()
     }
 

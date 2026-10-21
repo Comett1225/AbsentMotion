@@ -54,7 +54,7 @@ data class Easing(val type: String, val p: List<Float> = emptyList(), val prefix
                 "bounce", "step", "elasticStep" -> 2
                 else -> return Linear
             }
-            val values = parts.drop(prefixes.size + 1).map { it.toFloatOrNull() ?: return Linear }
+            val values = parts.drop(prefixes.size + 1).map { it.finiteFloat() ?: return Linear }
             if (values.size < count) return Linear
             return Easing(type, values.take(count), prefixes)
         }
@@ -118,7 +118,7 @@ fun XmlNode.stretchAt(t: Float, snap: Float): Int {
 fun XmlNode.retimed(oldStart: Int, oldEnd: Int, newStart: Int, newEnd: Int): XmlNode {
     if (name == "speedMap" || name == "scene") return this
     if (name == "kf") {
-        val t = this["t"]?.toFloatOrNull() ?: return this
+        val t = this["t"]?.finiteFloat() ?: return this
         val ms = oldStart + t * (oldEnd - oldStart)
         return with("t", String.format(Locale.US, "%.6f", (ms - newStart) / (newEnd - newStart).coerceAtLeast(1)))
     }
@@ -137,8 +137,8 @@ private fun blend(a: String, b: String, u: Float): String {
         }
         return formatColor(out)
     }
-    val x = a.split(',').map { it.trim().toFloatOrNull() }
-    val y = b.split(',').map { it.trim().toFloatOrNull() }
+    val x = a.split(',').map { it.trim().finiteFloat() }
+    val y = b.split(',').map { it.trim().finiteFloat() }
     if (x.size != y.size || x.any { it == null } || y.any { it == null }) return if (u < 1f) a else b
     return formatFloats(FloatArray(x.size) { x[it]!! + (y[it]!! - x[it]!!) * u })
 }

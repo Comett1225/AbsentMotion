@@ -1,5 +1,6 @@
 package app.absentmotion.ui.editor.panels
 
+import app.absentmotion.model.finiteFloat
 import app.absentmotion.R
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.model.PropRef
@@ -295,7 +296,7 @@ internal fun step(kind: Kind, base: Float, travel: Float, decimals: Int): Float 
 private fun numbers(layer: Layer, param: ShapeParam): FloatArray {
     if (param.kind == Kind.Toggle) return FloatArray(0)
     val need = if (param.kind == Kind.Size || param.kind == Kind.Point) 2 else 1
-    fun parse(text: String) = text.split(',').mapNotNull { it.trim().toFloatOrNull() }.toFloatArray()
+    fun parse(text: String) = text.split(',').mapNotNull { it.trim().finiteFloat() }.toFloatArray()
     val found = parse(layer.propText(param.prop) ?: param.default)
     return (if (found.size >= need) found else parse(param.default)).copyOf(need)
 }

@@ -28,7 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import app.absentmotion.ui.editor.LocalEditorScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -88,7 +88,7 @@ private val TabActive get() = Am.PanelInset
 private fun FillTabs(state: EditorState, layer: Layer, modifier: Modifier) {
     val type = layer.fillType
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
+    val scope = LocalEditorScope.current
     val id = layer.id
     val picker = rememberMediaPicker { uri ->
         if (uri != null) scope.launch { mediaDeclaration(context, uri)?.let { state.keepCopy(context, it) }?.let { state.fillWithMedia(id, it) } }

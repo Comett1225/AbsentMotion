@@ -60,7 +60,7 @@ private val XmlNode.isAnimatedPath: Boolean get() = sources().any { s -> s.child
 private fun XmlNode.vec(name: String, t: Float, exact: Boolean): Pt? {
     val part = child(name) ?: return null
     val text = if (exact) part.keyframes.firstOrNull { abs(it.t - t) <= KEY_EPSILON }?.v ?: part.valueAt(t) else part.valueAt(t)
-    return text?.split(',')?.mapNotNull { it.trim().toFloatOrNull() }?.takeIf { it.size >= 2 }?.let { Pt(it[0], it[1]) }
+    return text?.split(',')?.mapNotNull { it.trim().finiteFloat() }?.takeIf { it.size >= 2 }?.let { Pt(it[0], it[1]) }
 }
 
 private const val KEY_EPSILON = 1e-6f
@@ -173,7 +173,7 @@ fun parseSvgPath(d: String): List<Contour> {
     var control = Pt(0f, 0f)
     var pen = Pt(0f, 0f)
     var start = pen
-    fun number(): Float = tokens.getOrNull(i++)?.toFloatOrNull() ?: 0f
+    fun number(): Float = tokens.getOrNull(i++)?.finiteFloat() ?: 0f
     fun flag(): Boolean {
         val t = tokens.getOrNull(i) ?: return false
         if (t.length > 1 && (t[0] == '0' || t[0] == '1')) tokens[i] = t.substring(1) else i++
