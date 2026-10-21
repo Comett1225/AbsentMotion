@@ -204,6 +204,14 @@ int IntAttr(const XmlNode& n, const char* key, int fallback) {
     return v ? (int)strtol(v, nullptr, 10) : fallback;
 }
 
+int FpsAttr(const XmlNode& n) {
+    const char* v = n.attr("fps");
+    if (!v || !*v) return 30;
+    char* end = nullptr;
+    const long long fps = strtoll(v, &end, 10);
+    return *end == 0 && fps > 0 && fps <= INT32_MAX ? (int)fps : 30;
+}
+
 std::string StrAttr(const XmlNode& n, const char* key) {
     const char* v = n.attr(key);
     return v ? v : "";
@@ -243,13 +251,13 @@ void ParseGroup(const XmlNode& scene, int fps, Layer* group) {
     group->innerBackground = bg && *bg == '#' ? (uint32_t)strtoul(bg + 1, nullptr, 16) : 0;
     Retiming& r = group->retiming;
     r.length = IntAttr(scene, "totalTime", 0);
-    if (const char* rate = scene.attr("fps")) r.fps = strtod(rate, nullptr);
+    r.fps = FpsAttr(scene);
     r.method = scene.attr("retime") ? scene.attr("retime") : "off";
     r.in = IntAttr(scene, "retimeIn", 0);
     r.out = IntAttr(scene, "retimeOut", 0);
     r.hostFps = fps;
     group->fixedPrecompose = StrAttr(scene, "precompose") == "fixedResolution";
-    const int innerFps = std::max(1, IntAttr(scene, "fps", 30));
+    const int innerFps = FpsAttr(scene);
     for (const auto& n : scene.children) {
         Layer l;
         if (ParseLayer(*n, innerFps, &l)) group->children.push_back(std::move(l));
@@ -267,7 +275,8 @@ bool ParseLayer(const XmlNode& node, int fps, Layer* out) {
         if (const XmlNode* inner = n->child("scene")) ParseGroup(*inner, fps, &l);
         const float fallbackSpeed = n->attr("speed") ? strtof(n->attr("speed"), nullptr) : 1;
         const float speed = ParseAnim(n->child("speedMap")).get(0, 0, fallbackSpeed);
-        if (speed > 0) l.retiming.speed = speed;
+        if (speed > 0 && std::isfinite(speed)) l.retiming.speed = speed;
+        l.retiming.cut = std::max(0, IntAttr(*n, "inTime", 0));
     }
     const char* id = n->attr("id");
     l.id = id ? strtoll(id, nullptr, 10) : 0;
@@ -335,7 +344,7 @@ bool ParseScene(const std::string& xml, Scene* scene, std::string* error) {
     Scene next;
     next.width = IntAttr(*root, "width", 0);
     next.height = IntAttr(*root, "height", 0);
-    next.fps = std::max(1, IntAttr(*root, "fps", 30));
+    next.fps = FpsAttr(*root);
     next.totalTime = IntAttr(*root, "totalTime", 0);
     const char* bg = root->attr("bgcolor");
     next.bgColor = bg && *bg == '#' ? (uint32_t)strtoul(bg + 1, nullptr, 16) : 0;
@@ -381,11 +390,12 @@ double ToLastFrameMiddle(double length, double fps) {
 }
 
 double RetimedTime(const Retiming& r, int startTime, int endTime, double at) {
-    const double local = at - startTime;
+    const double origin = (double)startTime - r.cut;
+    const double local = at - origin;
     if (r.method == "off") return local * r.speed;
-    const double sceneEnd = ToLastFrameMiddle(r.length, r.fps);
+    const double sceneEnd = ToLastFrameMiddle(std::max(0, r.length), r.fps);
     if (r.method == "blank") return local < sceneEnd ? std::round(local) : -1;
-    const double layerEnd = ToLastFrameMiddle(endTime - startTime, r.hostFps);
+    const double layerEnd = ToLastFrameMiddle(endTime - origin, r.hostFps);
     const double in = std::clamp((double)r.in, 0.0, sceneEnd);
     const double out = r.out > 0 ? std::clamp((double)r.out, in, sceneEnd) : sceneEnd;
     const double outroStart = layerEnd - (sceneEnd - out);

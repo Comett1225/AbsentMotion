@@ -108,7 +108,7 @@ struct PathContour {
 
 struct Retiming {
     std::string method = "off";
-    int length = 0, in = 0, out = 0, hostFps = 30;
+    int length = 0, in = 0, out = 0, hostFps = 30, cut = 0;
     double fps = 30;
     float speed = 1.0f;
 };
@@ -159,7 +159,7 @@ struct Layer {
 
     const Property* prop(const char* name) const;
     const LayerEffect* effect(const char* id) const;
-    bool activeAt(double timeMs) const { return !hidden && timeMs >= startTime && timeMs <= endTime; }
+    bool activeAt(double timeMs) const { return !hidden && timeMs >= startTime && timeMs < endTime + 1.0; }
     double steppedMs(double timeMs) const {
         if (steps.empty() || endTime <= startTime) return timeMs;
         const float fps = steps.get(0, (float)((timeMs - startTime) / (endTime - startTime)), 0);
