@@ -65,6 +65,16 @@ class CaptionsTest {
         assertEquals(16_000, speechPcm(mix, 0, 300) {}.size)
     }
 
+    @Test fun longRecordingsAreRecognisedInWindowsThatCoverTheWholeSpan() {
+        assertEquals(listOf(5_000 to 65_000), captionWindows(5_000, 65_000))
+        val windows = captionWindows(0, 45 * 60_000)
+        assertEquals(5, windows.size)
+        assertTrue(windows.all { (a, b) -> b - a <= CAPTION_WINDOW_MS })
+        assertEquals(0, windows.first().first)
+        assertEquals(45 * 60_000, windows.last().second)
+        assertTrue(windows.zipWithNext().all { (a, b) -> a.second == b.first })
+    }
+
     @Test fun captionsFitInsideTheFrameForEveryShape() {
         val shapes = listOf(1080 to 1920, 1080 to 1080, 1920 to 1080, 1080 to 1350)
         val texts = listOf("Hi", "Hello there, this is", "Extraordinarily unbelievable internationalisation responsibilities",
