@@ -51,19 +51,23 @@ static void DrawSelection(SkCanvas* canvas, const SkPoint q[4], int handles, flo
     }
 }
 
-static void DrawMotionPath(SkCanvas* canvas, const Layer& layer, double timeMs, int fps, const SkMatrix& toTarget, float px) {
+static void DrawMotionPath(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& layer, double timeMs, int fps,
+                           const SkMatrix& toTarget, float px) {
     SkPaint paint;
     paint.setAntiAlias(true);
     const float t = layer.localTime(timeMs);
+    auto place = [&](double ms, SkPoint own) {
+        return toTarget.mapPoint(layer.parent != 0 ? EffectivePlacement(siblings, layer, ms).location : own);
+    };
     std::vector<SkPoint> points;
     int here = -1;
     for (const Keyframe& k : layer.location.keys) {
         if (k.v.size() < 2) continue;
         const double keyMs = layer.startTime + (double)k.t * (layer.endTime - layer.startTime);
         if (fabs(keyMs - timeMs) <= 500.0 / fps) here = (int)points.size();
-        points.push_back(toTarget.mapPoint({k.v[0], k.v[1]}));
+        points.push_back(place(keyMs, {k.v[0], k.v[1]}));
     }
-    if (points.empty()) points.push_back(toTarget.mapPoint({layer.location.get(0, t, 0), layer.location.get(1, t, 0)}));
+    if (points.empty()) points.push_back(place(timeMs, {layer.location.get(0, t, 0), layer.location.get(1, t, 0)}));
     paint.setStyle(SkPaint::kStroke_Style);
     paint.setStrokeWidth(3 * px);
     canvas->drawPath(SkPath::Polygon({points.data(), points.size()}, false), paint);
@@ -237,7 +241,7 @@ void RenderPreview(SkCanvas* canvas, int width, int height, const Scene& scene, 
         if (selected && selected->kind == "camera") selected = nullptr;
         if (selected && handles == -2) {
             if (selected->activeAt(timeMs)) {
-                DrawMotionPath(canvas, *selected, timeMs, scene.fps, SkMatrix::Translate(dx, dy).preScale(scale, scale), px);
+                DrawMotionPath(canvas, scene.layers, *selected, timeMs, scene.fps, SkMatrix::Translate(dx, dy).preScale(scale, scale), px);
             }
         } else if (selected && handles >= kPointEdit) {
             if (selected->activeAt(timeMs)) {
