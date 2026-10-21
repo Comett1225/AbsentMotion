@@ -105,7 +105,7 @@ Gradle runs CMake for you (`externalNativeBuild`): it builds the engine (`libame
 (`libwhisper_jni.so`, from `third_party/whisper.cpp`) and RNNoise (from `third_party/rnnoise`), for `arm64-v8a` only.
 Skia from section 5 must be in place first.
 
-Outputs: `app/build/outputs/apk/<flavour>/<type>/app-<flavour>-<type>.apk`, for example `app/build/outputs/apk/play/debug/app-play-debug.apk`. The free flavour has no background removal; the sources that differ are in `app/src/foss` and `app/src/play`.
+Outputs: `app/build/outputs/apk/<flavour>/<type>/app-<flavour>-<type>.apk`, for example `app/build/outputs/apk/play/debug/app-play-debug.apk`. The foss flavour adds its own offline background remover (`app/src/foss`); the play flavour uses Google ML Kit through Google Play services (`app/src/play`).
 
 - **Requirements of the app:** Android 14 (API 34) or newer (`minSdk = 34`, tested on Android 16 and 17), `targetSdk = 37`,
   a 64-bit ARM device, Vulkan 1.2.

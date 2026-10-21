@@ -26,12 +26,15 @@ The app asks for the internet permission for these things only:
   downloads it from Hugging Face (`huggingface.co`). Speech recognition itself runs on the device.
 - **Update check.** While "Check for a new version each time the app opens" is on (the app asks you once, on its first screens or at the first start after an update, and the switch is also in Settings), and when you tap Check for Update, the app makes one normal HTTPS request to GitHub (`api.github.com`) to read the latest version number; nothing else is sent, and GitHub sees your IP address, as for any web request.
 
-Nothing else is sent anywhere. Text to speech uses the voices already installed on your device and works offline.
+Apart from the Google Play build described below, nothing else is sent anywhere. Text to speech uses the voices already installed on your device and works offline.
 
 ## The Google Play build
 
-The `play` build published on the GitHub releases page removes backgrounds with Google ML Kit. This also runs on the device.
-The build without Google libraries (`foss`) removes backgrounds with its own offline model.
+The `play` build published on the GitHub releases page removes backgrounds with Google ML Kit, through Google Play services.
+The removal itself runs on the device, but Google Play services (not AbsentMotion) downloads the model when it is first needed
+or earlier, and may send diagnostics to Google (such as device information, performance figures and error codes) under Google's
+own policy. The build without Google libraries (`foss`) is not affected: its own offline model is part of the app, so
+nothing is downloaded or sent for background removal.
 
 ## Children
 

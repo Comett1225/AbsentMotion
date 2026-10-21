@@ -23,7 +23,7 @@ subscription, no account and no advertising, and your projects never leave your 
 - **Keyframes with easing.** Any value (position, size, rotation, 3D tilt, skew, opacity, colour, shape and effect
   parameters) can be keyframed. Easing is a cubic Bezier, bounce, elastic, cyclic, random or stepped curve, edited
   with handles on a graph.
-- **175 effects.** Colour, blur, distort, stylize, noise, keying, Move (Auto-Shake, Oscillate, Swing, Spin, Random
+- **176 effects.** Colour, blur, distort, stylize, noise, keying, Move (Auto-Shake, Oscillate, Swing, Spin, Random
   Displacement, Random Jitter, Pulse, Echo, Offset, Move Along Path, true motion blur), Repeat (linear, radial, grid,
   along a path, scatter), 3D objects (cube, sphere, torus, prisms, raster extrude and more), Text (typewriter reveal,
   per-letter transforms, scramble, count up, timecode), VHS, Datamosh, Glass, Displacement Map and many more, with
@@ -73,19 +73,19 @@ above it is the like-for-like export. The GIF shows that run, with the export pa
 
 Android 14 (API level 34) or newer (tested on Android 16 and 17), a 64-bit ARM device (`arm64-v8a`), Vulkan 1.2.
 
-There are two builds: `play`, which has background removal on images through Google Play services, and `foss` (for
+There are two builds: `play`, which has background removal through Google Play services, and `foss` (for
 F-Droid), which contains no Google libraries at all.
 
 ## Limits
 
 AbsentMotion is a young project. Please know these before you rely on it:
 
-- **Some Alight Motion effects are still missing.** AbsentMotion has 175 effects, and about 17 of Alight Motion's
+- **Some Alight Motion effects are still missing.** AbsentMotion has 176 effects, and about 17 of Alight Motion's
   are not in it yet. A project that uses one still opens, and the effect stays in the file, but it is not drawn.
 - **Only 64-bit ARM Android devices on Android 14 or newer, with Vulkan 1.2.** Tested on Android 16 and 17.
 - **Background removal.** The `foss` build removes backgrounds with its own offline model. The `play` build uses
   Google Play services instead, a proprietary Google library (listed in `THIRD_PARTY_NOTICES.md`) that downloads its
-  model and may send diagnostics to Google, as it does for any app.
+  model when it is first needed and may send diagnostics to Google under Google's own policy, as it does for any app.
 - **Network use.** Nothing is needed online. The internet is only used when you choose one of the downloadable fonts, for
   the speech model the first time you generate captions, and, only if you allow it when asked, to ask GitHub for the
   newest version number when the app opens (the `play` build's Play services library aside, see above).
