@@ -70,4 +70,10 @@ class ProxyRulesTest {
         assertEquals(1, ProxyRules.failures("java.lang.IllegalStateException: insufficient resources"))
         assertTrue(ProxyRules.failures(ProxyRules.FRAMES_DIFFER) >= ProxyRules.MAX_TRIES)
     }
+
+    @Test fun aVideoWithoutAFrameRateGetsOneFromItsTimestamps() {
+        assertEquals(30f, estimatedFps(LongArray(31) { it * 1_000_000L / 30 })!!, 0.01f)
+        assertNull(estimatedFps(longArrayOf(0L)))
+        assertNull(estimatedFps(longArrayOf(5L, 5L)))
+    }
 }

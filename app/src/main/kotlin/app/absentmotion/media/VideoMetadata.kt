@@ -34,11 +34,12 @@ suspend fun videoDeclaration(context: Context, uri: Uri): MediaDeclaration? = wi
             rotation = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION)?.toIntOrNull() ?: 0
             if (duration <= 0) duration = (retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLongOrNull() ?: 0L) * 1000
         } finally { retriever.release() }
-        val fps = if (format.containsKey(MediaFormat.KEY_FRAME_RATE)) (format.getNumber(MediaFormat.KEY_FRAME_RATE)?.toFloat() ?: 0f) else 0f
-        MediaDeclaration(XmlNode("media", linkedMapOf("uri" to uri.toString(), "filename" to name, "title" to name,
+        val fps = (if (format.containsKey(MediaFormat.KEY_FRAME_RATE)) format.getNumber(MediaFormat.KEY_FRAME_RATE)?.toFloat() else null)?.takeIf { it > 0 }
+            ?: runCatching { estimatedFps(VideoSources.timestamps(context, uri.toString())) }.getOrNull()
+        MediaDeclaration(XmlNode("media", listOfNotNull("uri" to uri.toString(), "filename" to name, "title" to name,
             "type" to (context.contentResolver.getType(uri) ?: "video/mp4"), "size" to "$size", "orientation" to "$rotation",
             "duration" to "$duration",
-            "fps" to fpsText(fps), "infoUpdated" to "${System.currentTimeMillis()}",
-            "width" to "${format.getInteger(MediaFormat.KEY_WIDTH)}", "height" to "${format.getInteger(MediaFormat.KEY_HEIGHT)}")))
+            fps?.let { "fps" to fpsText(it) }, "infoUpdated" to "${System.currentTimeMillis()}",
+            "width" to "${format.getInteger(MediaFormat.KEY_WIDTH)}", "height" to "${format.getInteger(MediaFormat.KEY_HEIGHT)}").toMap(LinkedHashMap())))
     } catch (_: Exception) { null } finally { extractor.release() }
 }

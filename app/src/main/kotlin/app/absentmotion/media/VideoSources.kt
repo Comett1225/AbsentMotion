@@ -46,6 +46,9 @@ internal fun longestSyncGap(syncs: List<Long>, lastUs: Long): Long {
     return (sorted.zipWithNext { a, b -> b - a } + (lastUs - sorted.last())).max()
 }
 
+internal fun estimatedFps(stamps: LongArray): Float? =
+    if (stamps.size < 2 || stamps.last() <= stamps.first()) null else (stamps.size - 1) * 1_000_000f / (stamps.last() - stamps.first())
+
 internal fun LongArray.frameNumber(pts: Long): String = binarySearch(pts).let { if (it >= 0) it else -it - 1 }.toString()
 
 internal fun LongArray.ptsAt(timeUs: Long): Long {
