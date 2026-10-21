@@ -7,6 +7,8 @@ import app.absentmotion.platform.Bitmap
 import app.absentmotion.platform.Uri
 import app.absentmotion.engine.EngineThread
 import app.absentmotion.library.CrashLogs
+import app.absentmotion.library.CrashReason
+import app.absentmotion.library.crashReason
 import app.absentmotion.library.MediaAccess
 import app.absentmotion.library.modelFolder
 import app.absentmotion.model.Scene
@@ -85,10 +87,14 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
                 }
             } }
         } catch (t: Throwable) {
+            val full = storageFull(t)
             withContext(NonCancellable + Dispatchers.IO) { saved.forEach { runCatching { store.delete(it) } } }
-            throw t
+            throw if (full) StorageFullException() else t
         }
     }
+
+    private fun storageFull(t: Throwable): Boolean =
+        t !is kotlinx.coroutines.CancellationException && (crashReason(t, "") == CrashReason.Storage || runCatching { freeSpace() < MinFreeBytes }.getOrDefault(false))
 
     private suspend fun save(saved: MutableList<Uri>, folder: String?, name: String, mime: String, write: (java.io.OutputStream) -> Unit) =
         withContext(Dispatchers.IO) { saved.add(store.save(folder, name, mime, write)) }
@@ -106,8 +112,9 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
             make(file.fd)
             withContext(Dispatchers.IO) { file.publish() }
         } catch (t: Throwable) {
+            val full = storageFull(t)
             withContext(NonCancellable + Dispatchers.IO) { file.discard() }
-            throw if (t !is kotlinx.coroutines.CancellationException && freeSpace() < MinFreeBytes) StorageFullException() else t
+            throw if (full) StorageFullException() else t
         }
         saved.add(file.uri)
         return ExportResult(saved, mime, store.location(where))
@@ -177,7 +184,7 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
     }
 
     private suspend fun pack(scene: Scene, xml: String, out: OutputStream, progress: (Float) -> Unit) = withContext(Dispatchers.IO) {
-        writeProjectPackage(scene, xml, out, access, { uri -> runCatching { context.contentResolver.openInputStream(Uri.parse(uri)) }.getOrNull() }, progress)
+        writeProjectPackage(scene, xml, out, access, { uri -> runCatching { context.contentResolver.openInputStream(Uri.parse(uri)) }.getOrNull() }) { ensureStorage(); progress(it) }
     }
 
     private fun encode(pixels: ByteArray, width: Int, height: Int, settings: ExportSettings, reuse: Bitmap?): ByteArray {
@@ -200,12 +207,15 @@ internal suspend fun writeProjectPackage(
             val file = scene.mediaName(uri)
             val folder = if (access.allows(uri)) modelFolder(uri) else null
             val record = JSONObject().put("uri", uri).put("file", file)
+            fun step(fraction: Float) = progress((i + fraction.coerceIn(0f, 1f)) / uris.size * 0.95f)
             if (folder != null) {
                 val main = File(URI(uri)).canonicalFile
                 val parts = folder.listFiles { f -> f.isFile }.orEmpty().sortedBy { it.name }
+                val total = parts.sumOf { it.length() }.coerceAtLeast(1)
+                var copied = 0L
                 for (part in parts) {
                     zip.putNextEntry(ZipEntry("media/${i + 1}_model/${part.name}"))
-                    part.inputStream().use { it.copyTo(zip) }
+                    copied = part.inputStream().use { it.copyChunks(zip, copied) { done -> step(done.toFloat() / total) } }
                     zip.closeEntry()
                 }
                 record.put("entry", "media/${i + 1}_model/${main.name}")
@@ -215,7 +225,8 @@ internal suspend fun writeProjectPackage(
                 val input = if (access.allows(uri)) open(uri) else null
                 if (input != null) {
                     zip.putNextEntry(ZipEntry(entry))
-                    input.use { it.copyTo(zip) }
+                    val total = scene.media(uri)?.size?.takeIf { it > 0 }
+                    input.use { it.copyChunks(zip, 0) { done -> step(if (total == null) 0f else done.toFloat() / total) } }
                     zip.closeEntry()
                     record.put("entry", entry)
                 }
@@ -227,4 +238,17 @@ internal suspend fun writeProjectPackage(
         zip.putNextEntry(ZipEntry("manifest.json")); zip.write(manifest.put("media", media).toString(1).toByteArray()); zip.closeEntry()
     }
     progress(1f)
+}
+
+private suspend fun InputStream.copyChunks(out: OutputStream, start: Long, copied: (Long) -> Unit): Long {
+    val buffer = ByteArray(1 shl 20)
+    var done = start
+    while (true) {
+        currentCoroutineContext().ensureActive()
+        val count = read(buffer)
+        if (count < 0) return done
+        out.write(buffer, 0, count)
+        done += count
+        copied(done)
+    }
 }

@@ -4,6 +4,9 @@ import app.absentmotion.library.Importer
 import app.absentmotion.library.MediaAccess
 import app.absentmotion.library.ProjectStore
 import app.absentmotion.model.Scene
+import kotlinx.coroutines.job
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
@@ -78,5 +81,24 @@ class ProjectPackageTest {
         assertEquals(setOf("robot.gltf", "robot.bin", "skin.png"), main.parentFile.list()!!.toSet())
         assertEquals("data", File(main.parentFile, "robot.bin").readText())
         assertTrue(MediaAccess.forPhone(other).allows(imported))
+    }
+
+    @Test fun aLargeFileReportsProgressAsItCopiesAndCanBeCancelledHalfWay() = runBlocking {
+        val files = tmp.newFolder("files")
+        val big = File(files, "media/p1/big.mp4").apply { parentFile.mkdirs(); writeBytes(ByteArray(4 shl 20)) }
+        val uri = big.toURI().toString()
+        val scene = Scene.parse("""<scene title="T" width="10" height="10"><media uri="$uri" filename="big.mp4" size="${big.length()}"/><shape id="1" fillVideo="$uri"/></scene>""")
+        val seen = ArrayList<Float>()
+        writeProjectPackage(scene, scene.toXml(), ByteArrayOutputStream(), MediaAccess.forPhone(files), { File(URI(it)).inputStream() }) { seen += it }
+        assertTrue(seen.toString(), seen.count { it > 0f && it < 0.95f } >= 3)
+        val job = launch(Dispatchers.Default) {
+            val me = coroutineContext.job
+            writeProjectPackage(scene, scene.toXml(), ByteArrayOutputStream(), MediaAccess.forPhone(files), { File(URI(it)).inputStream() }) { p ->
+                assertTrue("copied on after cancel at $p", p < 0.5f)
+                if (p > 0.2f) me.cancel()
+            }
+        }
+        job.join()
+        assertTrue(job.isCancelled)
     }
 }
