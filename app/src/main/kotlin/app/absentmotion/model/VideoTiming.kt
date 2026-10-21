@@ -167,6 +167,10 @@ fun Layer.trimmedTo(start: Int, end: Int, mediaMs: Int = Int.MAX_VALUE): Layer {
         if (end > endTime && mediaMs != Int.MAX_VALUE) to = minOf(end, maxOf(endTime, startTime + timing.localMs(mediaMs.toDouble()).roundToInt()))
     }
     var trimmed = withTimes(from, to)
+    if (nested != null && from != startTime) {
+        val cut = (nestedCut + from - startTime).coerceAtLeast(0)
+        trimmed = trimmed.copy(node = trimmed.node.with("inTime", cut.takeIf { it > 0 }?.toString()))
+    }
     if (timing != null) {
         if (from != startTime) trimmed = trimmed.copy(node = trimmed.node.with("inTime", "${timing.mediaMs((from - startTime).toDouble()).roundToInt().coerceAtLeast(0)}"))
         if (to != endTime) trimmed = trimmed.copy(node = trimmed.node.with("outTime", "${timing.mediaMs((to - startTime).toDouble()).roundToInt().coerceAtMost(mediaMs)}"))
@@ -188,6 +192,11 @@ fun Scene.splitAt(layer: Layer, frame: Int, newId: Long): Pair<Layer, Layer>? {
     val cut = frameStart(frame)
     if (cut <= layer.startTime || !showsAnyFrame(layer.startTime, cut - 1) || !showsAnyFrame(cut, layer.endTime)) return null
     return layer.trimmedTo(layer.startTime, cut - 1) to layer.withId(newId).trimmedTo(cut, layer.endTime)
+}
+
+fun Scene.withSplit(layer: Layer, frame: Int, newId: Long): Scene? {
+    val (first, second) = splitAt(layer, frame, newId) ?: return null
+    return update(first.id) { first }.addAbove(second, first.id)
 }
 
 fun Layer.retimedVideo(start: Int, end: Int): Layer {

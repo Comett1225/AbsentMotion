@@ -79,9 +79,8 @@ fun XmlNode.withKeyframes(keys: List<Keyframe>): XmlNode = copy(
 )
 
 fun XmlNode.valueAt(t: Float): String? {
-    this["value"]?.let { return it }
     val keys = keyframes
-    if (keys.isEmpty()) return null
+    if (keys.isEmpty()) return this["value"]
     if (t <= keys.first().t) return keys.first().v
     if (t >= keys.last().t) return keys.last().v
     val next = keys.indexOfFirst { it.t > t }

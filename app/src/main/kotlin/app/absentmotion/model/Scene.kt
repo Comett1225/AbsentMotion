@@ -98,6 +98,11 @@ value class Scene(val node: XmlNode) {
         return withChildren(node.children.filterNot { it.name in LAYER_TAGS } + others.map { it.node })
     }
 
+    fun addAbove(layer: Layer, below: Long): Scene {
+        val index = layers.indexOfFirst { it.id == below }
+        return add(layer).let { if (index < 0) it else it.move(layer.id, index + 1) }
+    }
+
     private fun withChildren(children: List<XmlNode>): Scene {
         val end = children.filter { it.name in LAYER_TAGS }.maxOfOrNull { Layer(it).endTime } ?: 0
         val removed = node.mediaUris() - node.copy(children = children).mediaUris()

@@ -10,7 +10,7 @@ import kotlin.math.roundToInt
 import app.absentmotion.model.Scene
 import app.absentmotion.model.copyLayers
 import app.absentmotion.model.withCameraFov
-import app.absentmotion.model.splitAt
+import app.absentmotion.model.withSplit
 import app.absentmotion.model.trimEndAt
 import app.absentmotion.model.trimStartAt
 import app.absentmotion.model.SpeedRef
@@ -96,7 +96,7 @@ fun EditorState.deleteSelected() {
 fun EditorState.duplicateSelected() {
     val layer = selected ?: return
     val copy = copyLayers(listOf(layer), preserveOutsideParents = true).single().withLabel(AppText.get(R.string.edit_layer_copy_name, layer.label))
-    edit { it.add(copy) }
+    edit { it.addAbove(copy, layer.id) }
     selectedId = copy.id
 }
 
@@ -113,8 +113,8 @@ fun EditorState.trimEnd() {
 }
 
 fun EditorState.split() {
-    val (first, second) = selected?.let { scene.splitAt(it, frame, Layer.newId()) } ?: return
-    edit { it.update(first.id) { first }.add(second) }
+    val next = selected?.let { scene.withSplit(it, frame, Layer.newId()) } ?: return
+    edit { next }
     selectedId = null
 }
 

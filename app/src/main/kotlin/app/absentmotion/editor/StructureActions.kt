@@ -18,6 +18,7 @@ import app.absentmotion.model.keyframes
 import app.absentmotion.model.withKeyframes
 import app.absentmotion.model.withBlend
 import app.absentmotion.model.trimmedTo
+import app.absentmotion.model.mediaLengthMs
 import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.max
@@ -370,14 +371,18 @@ fun EditorState.alignClipTimes(mode: Int) {
 }
 
 fun EditorState.moveClipEdges(end: Boolean, extend: Boolean) {
-    val layers = chosenLayers
-    val target = if (end && extend) scene.frameEnd(frame) else timeMs
-    edit { s -> layers.fold(s) { acc, layer ->
-        acc.update(layer.id) {
+    val ids = chosenLayers.map { it.id }
+    edit { it.withClipEdgesAt(ids, frame, end, extend) }
+}
+
+internal fun Scene.withClipEdgesAt(ids: List<Long>, frame: Int, end: Boolean, extend: Boolean): Scene {
+    val target = if (end && extend) frameEnd(frame) else frameStart(frame)
+    return ids.fold(this) { acc, id ->
+        acc.update(id) {
             if (!extend) it.movedTo(if (end) target - (it.endTime - it.startTime) else target)
-            else if (end && target > it.startTime && s.showsAnyFrame(it.startTime, target)) it.trimmedTo(it.startTime, target)
-            else if (!end && target < it.endTime && s.showsAnyFrame(target, it.endTime)) it.trimmedTo(target, it.endTime)
+            else if (end && target > it.endTime && showsAnyFrame(it.startTime, target)) it.trimmedTo(it.startTime, target, mediaLengthMs(it))
+            else if (!end && target < it.startTime && showsAnyFrame(target, it.endTime)) it.trimmedTo(target, it.endTime, mediaLengthMs(it))
             else it
         }
-    } }
+    }
 }

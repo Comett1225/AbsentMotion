@@ -8,13 +8,16 @@ internal data class SceneTime(val ms: Double, val rate: Double = 1.0)
 
 private fun nearest(value: Double) = sign(value) * floor(abs(value) + 0.5)
 
+internal val Layer.nestedCut: Int get() = (node["inTime"]?.toIntOrNull() ?: 0).coerceAtLeast(0)
+
 private class NestedClock(private val layer: Layer, hostFps: Int) {
     private val scene = layer.nested!!
     private val method = scene.node["retime"] ?: "off"
-    private val speed = (layer.node.child("speedMap")?.get("value")?.toDoubleOrNull() ?: layer.node["speed"]?.toDoubleOrNull() ?: 1.0).let { if (it > 0 && it.isFinite()) it else 1.0 }
+    private val speed = (layer.node.child("speedMap")?.valueAt(0f)?.toDoubleOrNull() ?: layer.node["speed"]?.toDoubleOrNull() ?: 1.0).let { if (it > 0 && it.isFinite()) it else 1.0 }
     private fun middle(length: Int, fps: Int) = floor((2 * floor(length.toDouble() * fps / 1000 + 1e-9) + 1) * 500 / fps)
-    private val sceneEnd = middle(scene.totalTime, scene.fps)
-    private val layerEnd = middle(layer.endTime - layer.startTime, hostFps)
+    private val origin = layer.startTime - layer.nestedCut
+    private val sceneEnd = middle(scene.totalTime.coerceAtLeast(0), scene.fps)
+    private val layerEnd = middle(layer.endTime - origin, hostFps)
     private val intro = scene.retimeIn.toDouble().coerceIn(0.0, sceneEnd)
     private val outro = if (scene.retimeOut > 0) scene.retimeOut.toDouble().coerceIn(intro, sceneEnd) else sceneEnd
     private val outroStart = layerEnd - (sceneEnd - outro)
@@ -22,7 +25,7 @@ private class NestedClock(private val layer: Layer, hostFps: Int) {
     private val span = outro - intro
 
     fun at(at: Double, quantize: Boolean): SceneTime {
-        val local = at - layer.startTime
+        val local = (if (quantize) layer.steppedMs(at) else at) - origin
         if (method == "off") return SceneTime(local * speed, speed)
         if (method == "blank") return if (local < sceneEnd) SceneTime(if (quantize) nearest(local) else local) else SceneTime(-1.0, 0.0)
         val mapped = when {
