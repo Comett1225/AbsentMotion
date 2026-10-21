@@ -44,16 +44,18 @@
    "id": "color",
    "label": "Color",
    "type": "color",
-   "default": "#ffffffff"
+   "default": "#ff5566",
+   "legacyDefault": "#ffffffff"
   },
   {
    "id": "opacity",
    "label": "Opacity",
    "type": "float",
-   "default": 0.8,
+   "default": 1,
    "min": 0,
    "max": 1,
-   "step": 0.01
+   "step": 0.01,
+   "legacyDefault": 0.8
   }
  ],
  "sksl": "uniform shader image;\nuniform shader blurred;\nuniform float2 size;\nuniform float time;\nuniform float blur;\nuniform float brightness;\nuniform float contrast;\nuniform float highlights;\nlayout(color) uniform half4 color;\nuniform float opacity;\nfloat luma(float3 c) { return dot(c, float3(0.2126, 0.7152, 0.0722)); }\nhalf4 main(float2 coord) {\n    half4 c = image.eval(coord);\n    float3 base = c.a > 0.0 ? float3(c.rgb) / float(c.a) : float3(0.0);\n    half4 g = blurred.eval(coord);\n    float3 soft = g.a > 0.0 ? float3(g.rgb) / float(g.a) : float3(0.0);\n    float l = clamp(((luma(soft) - 0.5) * (1.0 + contrast) + 0.5) * brightness, 0.0, 1.0);\n    float w = mix(1.0, smoothstep(0.25, 1.0, l), clamp((highlights - 0.5) * 2.0, 0.0, 1.0));\n    float3 s = float3(l) * w * float3(color.rgb) * float(color.a) * clamp(opacity, 0.0, 1.0);\n    float3 rgb = base + s - base * s;\n    float a = max(float(c.a), float(g.a) * clamp(opacity, 0.0, 1.0));\n    return half4(half3(clamp(rgb, 0.0, 1.0)) * half(a), half(a));\n}"

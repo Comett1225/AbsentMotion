@@ -306,6 +306,10 @@
    "outsideAlpha": {
     "neutral": 0
    }
+  },
+  "set": {
+   "color": "#ffff5566",
+   "opacity": 1
   }
  },
  "com.alightcreative.effects.satvib": {
@@ -436,6 +440,9 @@
     "to": "frequency",
     "min": 0
    }
+  },
+  "set": {
+   "frequency": 2
   }
  },
  "com.alightcreative.solidcolor": {
@@ -572,6 +579,11 @@
    "basis": {
     "neutral": 0
    }
+  },
+  "set": {
+   "speed": 7,
+   "intensity": 0.75,
+   "seed": 0
   }
  },
  "absent.autoshake": {
@@ -1975,6 +1987,76 @@
    },
    "octaves": {
     "to": "octaves"
+   }
+  }
+ },
+ "com.alightcreative.effects.checker2": {
+  "to": "checker",
+  "params": {
+   "position": {
+    "to": "offset"
+   },
+   "amount": {
+    "to": "count"
+   },
+   "stretch": {
+    "to": "stretch"
+   },
+   "color": {
+    "to": "color"
+   },
+   "punchout": {
+    "to": "punch"
+   },
+   "angle": {
+    "to": "angle"
+   },
+   "screenSpace": {
+    "to": "screenSpace"
+   }
+  }
+ },
+ "com.alightcreative.effects.dots2": {
+  "to": "dots",
+  "params": {
+   "scale": {
+    "to": "scale"
+   },
+   "phase": {
+    "to": "phase"
+   },
+   "radius": {
+    "to": "radius"
+   },
+   "feather": {
+    "to": "feather"
+   },
+   "color": {
+    "to": "color1"
+   },
+   "color2": {
+    "to": "color2"
+   },
+   "density": {
+    "to": "density"
+   },
+   "position": {
+    "to": "offset"
+   },
+   "fill": {
+    "to": "fill"
+   },
+   "alpha": {
+    "to": "alpha"
+   },
+   "blendMode": {
+    "to": "blend"
+   },
+   "seed": {
+    "to": "seed"
+   },
+   "slack": {
+    "to": "slack"
    }
   }
  }

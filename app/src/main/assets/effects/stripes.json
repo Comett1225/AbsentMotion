@@ -61,7 +61,13 @@
    "min": 0,
    "max": 0.5,
    "step": 0.001
+  },
+  {
+   "id": "screenSpace",
+   "label": "Screen Space",
+   "type": "switch",
+   "default": false
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float count;\nuniform float width;\nuniform float angle;\nuniform float phase;\nlayout(color) uniform half4 color;\nuniform float punch;\nuniform float smoothing;\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return src;\n    float a = radians(angle);\n    float period = size.y / (2.475 * max(count, 0.5));\n    float u = dot(coord - size * 0.5, float2(-sin(a), cos(a))) / period + phase;\n    float e = abs(fract(u) - 0.5);\n    float edge = max(smoothing * 0.5, 0.5 * 1.0 / period);\n    float s = 1.0 - smoothstep(width * 0.5 - edge, width * 0.5 + edge, e);\n    s *= step(0.0001, width);\n    if (punch > 0.5) return src * half(1.0 - s);\n    float3 base = float3(src.rgb) / float(src.a);\n    float3 rgb = mix(base, float3(color.rgb), s * float(color.a));\n    return half4(half3(rgb) * src.a, src.a);\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float4 screen;\nuniform float time;\nuniform float count;\nuniform float width;\nuniform float angle;\nuniform float phase;\nlayout(color) uniform half4 color;\nuniform float punch;\nuniform float smoothing;\nuniform float screenSpace;\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return src;\n    float2 patternSize = screenSpace > 0.5 ? screen.zw : size;\n    float2 origin = screenSpace > 0.5 ? screen.xy + screen.zw * 0.5 : size * 0.5;\n    float a = radians(angle);\n    float period = patternSize.y / (2.475 * max(count, 0.5));\n    float u = dot(coord - origin, float2(-sin(a), cos(a))) / period + phase;\n    float e = abs(fract(u) - 0.5);\n    float edge = max(smoothing * 0.5, 0.5 * 1.0 / period);\n    float s = 1.0 - smoothstep(width * 0.5 - edge, width * 0.5 + edge, e);\n    s *= step(0.0001, width);\n    if (punch > 0.5) return src * half(1.0 - s);\n    float3 base = float3(src.rgb) / float(src.a);\n    float3 rgb = mix(base, float3(color.rgb), s * float(color.a));\n    return half4(half3(rgb) * src.a, src.a);\n}\n"
 }

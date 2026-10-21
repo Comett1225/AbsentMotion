@@ -21,10 +21,11 @@
    "id": "count",
    "label": "Count",
    "type": "float",
-   "default": 12,
+   "default": 5,
    "min": 1,
    "max": 200,
-   "step": 1
+   "step": 1,
+   "legacyDefault": 12
   },
   {
    "id": "width",
@@ -48,7 +49,8 @@
    "id": "color",
    "label": "Color",
    "type": "color",
-   "default": "#ffcc33"
+   "default": "#2d1ef6",
+   "legacyDefault": "#ffcc33"
   },
   {
    "id": "alpha",
@@ -61,5 +63,5 @@
    "percent": true
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float2 center;\nuniform float count;\nuniform float width;\nuniform float angle;\nlayout(color) uniform half4 color;\nuniform float alpha;\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return src;\n    float2 d = coord - center * size;\n    float t = (atan(d.y, d.x) - radians(angle)) / 6.2831853 * floor(count + 0.5);\n    float e = abs(fract(t) - 0.5);\n    float px = max(length(d), 1.0) * 6.2831853 / floor(count + 0.5);\n    float s = width > 0.0 ? clamp((width * 0.5 - e) * px + 0.5, 0.0, 1.0) : 0.0;\n    float3 base = float3(src.rgb) / float(src.a);\n    float3 rgb = mix(base, float3(color.rgb), s * float(color.a) * clamp(alpha, 0.0, 1.0));\n    return half4(half3(rgb) * src.a, src.a);\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float2 center;\nuniform float count;\nuniform float width;\nuniform float angle;\nlayout(color) uniform half4 color;\nuniform float alpha;\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return src;\n    float2 d = coord - center * size;\n    float n = max(floor(count + 0.5), 1.0);\n    float direction = dot(d, d) > 0.0 ? atan(d.y, d.x) : 0.0;\n    float t = (direction - radians(angle)) / 6.2831853 * n;\n    float e = abs(fract(t) - 0.5);\n    float px = max(length(d), 1.0) * 6.2831853 / n;\n    float s = width > 0.0 ? clamp((width * 0.5 - e) * px + 0.5, 0.0, 1.0) : 0.0;\n    float3 base = float3(src.rgb) / float(src.a);\n    float3 rgb = mix(base, float3(color.rgb), s * float(color.a) * clamp(alpha, 0.0, 1.0));\n    return half4(half3(rgb) * src.a, src.a);\n}\n"
 }

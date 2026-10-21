@@ -3,7 +3,7 @@
  "name": "Starfield",
  "category": "stylize",
  "since": "3.0.0",
- "description": "Fills the opaque parts of the layer with a deep field of stars in several layers that move at different speeds.",
+ "description": "Fills the opaque parts of the layer with a deep field of stars. Offset moves through the field, with nearby stars moving farther than distant stars.",
  "params": [
   {
    "id": "offset",

@@ -6,11 +6,11 @@
  "params": [
   {
    "id": "amount",
-   "label": "Amount",
+   "label": "Strength",
    "type": "float",
    "default": 1.0,
    "min": 0.0,
-   "max": 4.0,
+   "max": 20,
    "step": 0.1
   },
   {
@@ -19,7 +19,7 @@
    "type": "float",
    "default": 1.0,
    "min": 0.5,
-   "max": 4.0,
+   "max": 10,
    "step": 0.5
   }
  ],

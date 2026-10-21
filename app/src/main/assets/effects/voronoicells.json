@@ -36,19 +36,22 @@
    "id": "color1",
    "label": "Color 1",
    "type": "color",
-   "default": "#000000"
+   "default": "#ffffff",
+   "legacyDefault": "#000000"
   },
   {
    "id": "color2",
    "label": "Color 2",
    "type": "color",
-   "default": "#ffffff"
+   "default": "#000000",
+   "legacyDefault": "#ffffff"
   },
   {
    "id": "lineColor",
    "label": "Line Color",
    "type": "color",
-   "default": "#000000"
+   "default": "#0000ff",
+   "legacyDefault": "#000000"
   },
   {
    "id": "seed",

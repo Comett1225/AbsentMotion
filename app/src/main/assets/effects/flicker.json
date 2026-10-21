@@ -7,30 +7,34 @@
  "params": [
   {
    "id": "speed",
-   "label": "Speed",
+   "label": "Frequency",
    "type": "float",
-   "default": 12.0,
+   "default": 7,
    "min": 0.0,
    "max": 60.0,
-   "step": 1.0
+   "step": 0.01,
+   "legacyDefault": 12.0,
+   "unit": "Hz"
   },
   {
    "id": "intensity",
-   "label": "Intensity",
+   "label": "Strength",
    "type": "float",
-   "default": 0.4,
+   "default": 0.75,
    "min": 0.0,
    "max": 1.0,
-   "step": 0.01
+   "step": 0.01,
+   "legacyDefault": 0.4
   },
   {
    "id": "seed",
    "label": "Seed",
    "type": "float",
-   "default": 1.0,
+   "default": 0,
    "min": 0.0,
    "max": 100.0,
-   "step": 1.0
+   "step": 0.1,
+   "legacyDefault": 1.0
   }
  ],
  "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float speed;\nuniform float intensity;\nuniform float seed;\nfloat hash21(float2 p)\n{\n    p = fract(p * float2(123.34, 456.21));\n    p += dot(p, p + 45.32);\n    return fract(p.x * p.y);\n}\nhalf4 main(float2 coord)\n{\n    half4 c = image.eval(coord);\n    if (c.a <= 0.001 || speed <= 0.0 || intensity <= 0.0) return c;\n    float f = time * speed;\n    float n = floor(f);\n    float ramp = 0.15;\n    float t = clamp((f - n - (1.0 - ramp)) / ramp, 0.0, 1.0);\n    float r = mix(hash21(float2(n, seed)), hash21(float2(n + 1.0, seed)), t);\n    float keep = clamp(1.0 - intensity * r, 0.0, 1.0);\n    return c * half(keep);\n}"

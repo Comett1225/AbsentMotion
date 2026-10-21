@@ -59,7 +59,13 @@
    "min": -3600,
    "max": 3600,
    "step": 0.5
+  },
+  {
+   "id": "screenSpace",
+   "label": "Screen Space",
+   "type": "switch",
+   "default": false
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float2 offset;\nuniform float count;\nuniform float2 stretch;\nlayout(color) uniform half4 color;\nuniform float punch;\nuniform float angle;\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return src;\n    float cell = size.y / (2.475 * max(count, 0.5));\n    float a = radians(angle);\n    float2 p = coord - size * 0.5 - offset;\n    p = float2(cos(a) * p.x + sin(a) * p.y, -sin(a) * p.x + cos(a) * p.y) / (max(abs(stretch), float2(0.01)) * cell);\n    float2 e = min(fract(p), 1.0 - fract(p)) * max(abs(stretch), float2(0.01)) * cell;\n    float on = mod(floor(p.x) + floor(p.y), 2.0);\n    float aa = clamp(min(e.x, e.y) + 0.5, 0.0, 1.0);\n    float s = mix(0.5, on, aa);\n    if (punch > 0.5) return src * half(1.0 - s);\n    float3 base = float3(src.rgb) / float(src.a);\n    float3 rgb = mix(base, float3(color.rgb), s * float(color.a));\n    return half4(half3(rgb) * src.a, src.a);\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float4 screen;\nuniform float time;\nuniform float2 offset;\nuniform float count;\nuniform float2 stretch;\nlayout(color) uniform half4 color;\nuniform float punch;\nuniform float angle;\nuniform float screenSpace;\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return src;\n    float2 patternSize = screenSpace > 0.5 ? screen.zw : size;\n    float2 origin = screenSpace > 0.5 ? screen.xy + screen.zw * 0.5 : size * 0.5;\n    float cell = patternSize.y / (2.475 * max(count, 0.5));\n    float a = radians(angle);\n    float2 p = coord - origin - offset;\n    p = float2(cos(a) * p.x + sin(a) * p.y, -sin(a) * p.x + cos(a) * p.y) / (max(abs(stretch), float2(0.01)) * cell);\n    float2 e = min(fract(p), 1.0 - fract(p)) * max(abs(stretch), float2(0.01)) * cell;\n    float on = mod(floor(p.x) + floor(p.y), 2.0);\n    float aa = clamp(min(e.x, e.y) + 0.5, 0.0, 1.0);\n    float s = mix(0.5, on, aa);\n    if (punch > 0.5) return src * half(1.0 - s);\n    float3 base = float3(src.rgb) / float(src.a);\n    float3 rgb = mix(base, float3(color.rgb), s * float(color.a));\n    return half4(half3(rgb) * src.a, src.a);\n}\n"
 }

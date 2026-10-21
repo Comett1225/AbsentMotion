@@ -84,31 +84,36 @@
    "id": "color2",
    "label": "Color 2",
    "type": "color",
-   "default": "#ffffff"
+   "default": "#5555ff",
+   "legacyDefault": "#ffffff"
   },
   {
    "id": "color3",
    "label": "Color 3",
    "type": "color",
-   "default": "#ff3c3c"
+   "default": "#55ff55",
+   "legacyDefault": "#ff3c3c"
   },
   {
    "id": "color4",
    "label": "Color 4",
    "type": "color",
-   "default": "#3cff6e"
+   "default": "#55ffff",
+   "legacyDefault": "#3cff6e"
   },
   {
    "id": "color5",
    "label": "Color 5",
    "type": "color",
-   "default": "#3c78ff"
+   "default": "#ff5555",
+   "legacyDefault": "#3c78ff"
   },
   {
    "id": "color6",
    "label": "Color 6",
    "type": "color",
-   "default": "#ffd23c"
+   "default": "#ff55ff",
+   "legacyDefault": "#ffd23c"
   },
   {
    "id": "alpha",
@@ -131,5 +136,5 @@
    ]
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float angle;\nuniform float strength;\nuniform float steps;\nuniform float weight;\nuniform float falloff;\nuniform float palette;\nlayout(color) uniform half4 color1;\nlayout(color) uniform half4 color2;\nlayout(color) uniform half4 color3;\nlayout(color) uniform half4 color4;\nlayout(color) uniform half4 color5;\nlayout(color) uniform half4 color6;\nuniform float alpha;\nuniform float blend;\nfloat luma(float3 c) { return dot(c, float3(0.2126, 0.7152, 0.0722)); }\nfloat3 nearest(float3 x, float3 best, float3 c, inout float d) {\n    float e = dot(x - c, x - c);\n    if (e < d) {\n        d = e;\n        return c;\n    }\n    return best;\n}\nfloat3 quant(float3 x) {\n    if (palette < 0.5) return float3(luma(x) > 0.5 ? 1.0 : 0.0);\n    if (palette < 3.5) {\n        float n = palette;\n        return floor(clamp(x, 0.0, 1.0) * n + 0.5) / n;\n    }\n    if (palette < 5.5) {\n        float n = palette - 2.0;\n        return float3(floor(clamp(luma(x), 0.0, 1.0) * n + 0.5) / n);\n    }\n    if (palette > 8.5 && palette < 9.5) {\n        float3 s = clamp(luma(x) + (x - luma(x)) * 2.5, 0.0, 1.0);\n        return floor(s + 0.5);\n    }\n    float d = 100.0;\n    float3 best = float3(0.0);\n    if (palette < 6.5) {\n        best = nearest(x, best, float3(0.0), d);\n        best = nearest(x, best, float3(0.0, 0.67, 0.0), d);\n        best = nearest(x, best, float3(0.67, 0.0, 0.0), d);\n        return nearest(x, best, float3(0.67, 0.33, 0.0), d);\n    }\n    if (palette < 8.5) {\n        best = nearest(x, best, palette < 7.5 ? float3(0.0) : float3(0.0, 0.0, 0.67), d);\n        best = nearest(x, best, float3(0.33, 1.0, 1.0), d);\n        best = nearest(x, best, float3(1.0, 0.33, 1.0), d);\n        return nearest(x, best, float3(1.0), d);\n    }\n    float n = palette - 8.0;\n    best = nearest(x, best, float3(color1.rgb), d);\n    best = nearest(x, best, float3(color2.rgb), d);\n    if (n > 2.5) best = nearest(x, best, float3(color3.rgb), d);\n    if (n > 3.5) best = nearest(x, best, float3(color4.rgb), d);\n    if (n > 4.5) best = nearest(x, best, float3(color5.rgb), d);\n    if (n > 5.5) best = nearest(x, best, float3(color6.rgb), d);\n    return best;\n}\nfloat3 colour(float2 p) {\n    half4 c = image.eval(p);\n    return c.a > 0.0 ? float3(c.rgb) / float(c.a) : float3(0.0);\n}\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return half4(0.0);\n    float a = radians(angle);\n    float2 dir = float2(cos(a), sin(a));\n    float reach = clamp(strength, 0.01, 1.0) * max(size.x, size.y);\n    float n = clamp(floor(steps), 1.0, 200.0);\n    float3 err = float3(0.0);\n    for (int j = 0; j < 200; j++) {\n        if (float(j) >= n) break;\n        float far = n - float(j);\n        float w = 1.0 + (weight - 1.0) * pow(1.0 - clamp(falloff, 0.0, 1.0), far - 1.0);\n        float3 x = colour(coord - dir * reach * far / n) + err * w;\n        err = clamp(x - quant(x), -4.0, 4.0);\n    }\n    float3 base = float3(src.rgb) / float(src.a);\n    float3 q = quant(base + err * weight);\n    if (blend > 0.5 && blend < 1.5) q *= base;\n    if (blend > 1.5) q = 1.0 - (1.0 - q) * (1.0 - base);\n    float3 rgb = mix(base, q, clamp(alpha, 0.0, 1.0));\n    return half4(half3(rgb * float(src.a)), src.a);\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float angle;\nuniform float strength;\nuniform float steps;\nuniform float weight;\nuniform float falloff;\nuniform float palette;\nlayout(color) uniform half4 color1;\nlayout(color) uniform half4 color2;\nlayout(color) uniform half4 color3;\nlayout(color) uniform half4 color4;\nlayout(color) uniform half4 color5;\nlayout(color) uniform half4 color6;\nuniform float alpha;\nuniform float blend;\nfloat luma(float3 c) { return dot(c, float3(0.2126, 0.7152, 0.0722)); }\nfloat3 nearest(float3 x, float3 best, float3 c, inout float d) {\n    float e = dot(x - c, x - c);\n    if (e < d) {\n        d = e;\n        return c;\n    }\n    return best;\n}\nfloat3 quant(float3 x) {\n    if (palette < 0.5) return float3(luma(x) > 0.5 ? 1.0 : 0.0);\n    if (palette < 3.5) {\n        float n = palette;\n        return floor(clamp(x, 0.0, 1.0) * n + 0.5) / n;\n    }\n    if (palette < 5.5) {\n        float n = palette - 2.0;\n        return float3(floor(clamp(luma(x), 0.0, 1.0) * n + 0.5) / n);\n    }\n    if (palette > 8.5 && palette < 9.5) {\n        float3 s = clamp(luma(x) + (x - luma(x)) * 2.5, 0.0, 1.0);\n        return floor(s + 0.5);\n    }\n    float d = 100.0;\n    float3 best = float3(0.0);\n    if (palette < 6.5) {\n        best = nearest(x, best, float3(0.0), d);\n        best = nearest(x, best, float3(0.0, 0.67, 0.0), d);\n        best = nearest(x, best, float3(0.67, 0.0, 0.0), d);\n        return nearest(x, best, float3(0.67, 0.33, 0.0), d);\n    }\n    if (palette < 8.5) {\n        best = nearest(x, best, palette < 7.5 ? float3(0.0) : float3(0.0, 0.0, 0.67), d);\n        best = nearest(x, best, float3(0.33, 1.0, 1.0), d);\n        best = nearest(x, best, float3(1.0, 0.33, 1.0), d);\n        return nearest(x, best, float3(1.0), d);\n    }\n    float n = palette - 8.0;\n    best = nearest(x, best, float3(color1.rgb), d);\n    best = nearest(x, best, float3(color2.rgb), d);\n    if (n > 2.5) best = nearest(x, best, float3(color3.rgb), d);\n    if (n > 3.5) best = nearest(x, best, float3(color4.rgb), d);\n    if (n > 4.5) best = nearest(x, best, float3(color5.rgb), d);\n    if (n > 5.5) best = nearest(x, best, float3(color6.rgb), d);\n    return best;\n}\nfloat3 colour(float2 p) {\n    half4 c = image.eval(p);\n    return c.a > 0.0 ? float3(c.rgb) / float(c.a) : float3(0.0);\n}\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return half4(0.0);\n    float a = radians(angle);\n    float2 dir = float2(cos(a), sin(a));\n    float reach = clamp(strength, 0.01, 1.0) * max(size.x, size.y);\n    float n = clamp(floor(steps), 1.0, 200.0);\n    float3 err = float3(0.0);\n    for (int j = 0; j < 200; j++) {\n        if (float(j) >= n) break;\n        float far = n - float(j);\n        float propagation = far <= 1.0 ? 1.0 : pow(1.0 - clamp(falloff, 0.0, 1.0), far - 1.0);\n        float w = 1.0 + (weight - 1.0) * propagation;\n        float3 x = colour(coord - dir * reach * far / n) + err * w;\n        err = clamp(x - quant(x), -4.0, 4.0);\n    }\n    float3 base = float3(src.rgb) / float(src.a);\n    float3 q = quant(base + err * weight);\n    if (blend > 0.5 && blend < 1.5) q *= base;\n    if (blend > 1.5) q = 1.0 - (1.0 - q) * (1.0 - base);\n    float3 rgb = mix(base, q, clamp(alpha, 0.0, 1.0));\n    return half4(half3(rgb * float(src.a)), src.a);\n}\n"
 }

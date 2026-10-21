@@ -48,7 +48,8 @@
    "id": "color",
    "label": "Color",
    "type": "color",
-   "default": "#ffffff"
+   "default": "#2d1ef6",
+   "legacyDefault": "#ffffff"
   },
   {
    "id": "points",
@@ -73,7 +74,7 @@
    "id": "blend",
    "label": "Blending Mode",
    "type": "choice",
-   "default": 6,
+   "default": 2,
    "options": [
     "Normal",
     "Multiply",
@@ -87,8 +88,9 @@
     "Difference",
     "Color Dodge",
     "Color Burn"
-   ]
+   ],
+   "legacyDefault": 6
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float2 position;\nuniform float radius;\nuniform float brightness;\nuniform float shine;\nlayout(color) uniform half4 color;\nuniform float points;\nuniform float alpha;\nuniform float blend;\nfloat3 blendWith(float m, float3 b, float3 s) {\n    if (m < 0.5) return s;\n    if (m < 1.5) return b * s;\n    if (m < 2.5) return b + s - b * s;\n    if (m < 3.5) return mix(2.0 * b * s, 1.0 - 2.0 * (1.0 - b) * (1.0 - s), step(0.5, b));\n    if (m < 4.5) {\n        float3 d = mix(sqrt(b), ((16.0 * b - 12.0) * b + 4.0) * b, step(b, float3(0.25)));\n        return mix(b - (1.0 - 2.0 * s) * b * (1.0 - b), b + (2.0 * s - 1.0) * (d - b), step(0.5, s));\n    }\n    if (m < 5.5) return mix(2.0 * b * s, 1.0 - 2.0 * (1.0 - b) * (1.0 - s), step(0.5, s));\n    if (m < 6.5) return min(b + s, 1.0);\n    if (m < 7.5) return min(b, s);\n    if (m < 8.5) return max(b, s);\n    if (m < 9.5) return abs(b - s);\n    if (m < 10.5) return min(b / max(1.0 - s, 0.0001), 1.0);\n    return 1.0 - min((1.0 - b) / max(s, 0.0001), 1.0);\n}\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return src;\n    float2 p = coord - position * size;\n    float r = length(p) / max(radius * 0.5 * min(size.x, size.y), 0.0001);\n    float t = atan(p.y, p.x) + 1.5707963;\n    float spike = pow(0.5 + 0.5 * cos(floor(points + 0.5) * t), 2.0);\n    float rr = r / mix(0.12, 1.0, spike);\n    float g = brightness / 3.0 * (1.8 * exp(-3.0 * rr) + 0.45 * exp(-2.0 * r / max(1.0 + shine, 0.05)));\n    float3 glow = float3(color.rgb) * min(g, 1.0) + float3(max(g - 1.0, 0.0));\n    float amount = clamp(alpha, 0.0, 1.0) * float(color.a);\n    float3 base = float3(src.rgb) / float(src.a);\n    float cover = clamp(g, 0.0, 1.0);\n    float3 mixed = blend > 5.5 && blend < 6.5 ? min(base + glow, 1.0) : mix(base, clamp(blendWith(blend, base, clamp(glow, 0.0, 1.0)), 0.0, 1.0), cover);\n    return half4(half3(mix(base, mixed, amount)) * src.a, src.a);\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float2 position;\nuniform float radius;\nuniform float brightness;\nuniform float shine;\nlayout(color) uniform half4 color;\nuniform float points;\nuniform float alpha;\nuniform float blend;\nfloat3 blendWith(float m, float3 b, float3 s) {\n    if (m < 0.5) return s;\n    if (m < 1.5) return b * s;\n    if (m < 2.5) return b + s - b * s;\n    if (m < 3.5) return mix(2.0 * b * s, 1.0 - 2.0 * (1.0 - b) * (1.0 - s), step(0.5, b));\n    if (m < 4.5) {\n        float3 d = mix(sqrt(b), ((16.0 * b - 12.0) * b + 4.0) * b, step(b, float3(0.25)));\n        return mix(b - (1.0 - 2.0 * s) * b * (1.0 - b), b + (2.0 * s - 1.0) * (d - b), step(0.5, s));\n    }\n    if (m < 5.5) return mix(2.0 * b * s, 1.0 - 2.0 * (1.0 - b) * (1.0 - s), step(0.5, s));\n    if (m < 6.5) return min(b + s, 1.0);\n    if (m < 7.5) return min(b, s);\n    if (m < 8.5) return max(b, s);\n    if (m < 9.5) return abs(b - s);\n    if (m < 10.5) return min(b / max(1.0 - s, 0.0001), 1.0);\n    return 1.0 - min((1.0 - b) / max(s, 0.0001), 1.0);\n}\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return src;\n    float2 p = coord - position * size;\n    float r = length(p) / max(radius * 0.5 * min(size.x, size.y), 0.0001);\n    float t = (dot(p, p) > 0.0 ? atan(p.y, p.x) : 0.0) + 1.5707963;\n    float spike = pow(0.5 + 0.5 * cos(floor(points + 0.5) * t), 2.0);\n    float rr = r / mix(0.12, 1.0, spike);\n    float g = brightness / 3.0 * (1.8 * exp(-3.0 * rr) + 0.45 * exp(-2.0 * r / max(1.0 + shine, 0.05)));\n    float3 glow = float3(color.rgb) * min(g, 1.0) + float3(max(g - 1.0, 0.0));\n    float amount = clamp(alpha, 0.0, 1.0) * float(color.a);\n    float3 base = float3(src.rgb) / float(src.a);\n    float cover = clamp(g, 0.0, 1.0);\n    float3 mixed = blend > 5.5 && blend < 6.5 ? min(base + glow, 1.0) : mix(base, clamp(blendWith(blend, base, clamp(glow, 0.0, 1.0)), 0.0, 1.0), cover);\n    return half4(half3(mix(base, mixed, amount)) * src.a, src.a);\n}\n"
 }
