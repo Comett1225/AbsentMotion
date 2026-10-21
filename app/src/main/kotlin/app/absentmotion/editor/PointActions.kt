@@ -102,7 +102,7 @@ fun EditorState.deletePoint(mode: PointMode) {
     if (pointContours(mode).getOrNull(mode.contour)?.knots.isNullOrEmpty()) selectAdd(mode, mode.contour, -1)
 }
 
-fun Contour.endsAt(point: Int): Boolean = !closed && (knots.isEmpty() || point == knots.lastIndex)
+fun Contour.endsAt(point: Int): Boolean = !closed && point >= knots.lastIndex
 
 fun EditorState.selectAdd(mode: PointMode, contour: Int, point: Int) {
     mode.contour = contour

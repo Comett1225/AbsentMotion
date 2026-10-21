@@ -46,7 +46,10 @@ import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.KeypadField
 import app.absentmotion.editor.KeypadRequest
 import app.absentmotion.engine.SnapGuide
+import app.absentmotion.editor.chain
+import app.absentmotion.editor.place
 import app.absentmotion.model.Layer
+import app.absentmotion.model.Scene
 import app.absentmotion.ui.editor.PanelIcons
 import app.absentmotion.ui.editor.rememberHaptic
 import app.absentmotion.ui.theme.Am
@@ -83,12 +86,12 @@ private fun PositionTab(state: EditorState, layer: Layer) {
     val others by produceState(emptyList<SnapOther>(), layer.id, state.scene.layers, state.timeMs, state.playing) {
         if (state.playing) return@produceState
         value = state.scene.layers.filter { it.id != layer.id && it.kind != "audio" && it.activeAt(state.sampleMs) }.map { o ->
-            val at = o.at(state.sampleMs, state.scene.fps).location
-            SnapOther(at[0], at[1], state.engine.layerBounds(o.id, state.timeMs))
+            val at = state.scene.place(o, state.sampleMs)
+            SnapOther(at.x, at.y, state.engine.layerBounds(o.id, state.timeMs))
         }
     }
     val box by produceState<FloatArray?>(null, layer.node, state.timeMs, state.playing) { if (!state.playing) value = state.engine.layerBounds(layer.id, state.timeMs) }
-    val start by rememberUpdatedState { snapAxes(state.scene.width.toFloat(), state.scene.height.toFloat(), layer.location, box, others) }
+    val start by rememberUpdatedState { state.scene.snapAxesFor(layer, state.sampleMs, box, others) }
     val now by rememberUpdatedState(layer)
     val tick = rememberHaptic(state)
     DisposableEffect(Unit) { onDispose { state.snapGuides = emptyList() } }
@@ -156,16 +159,23 @@ internal class SnapOther(val x: Float, val y: Float, val bounds: FloatArray?)
 
 internal class Snap(val distance: Float, val guide: SnapGuide)
 
-internal fun snapAxes(width: Float, height: Float, at: FloatArray, mine: FloatArray?, others: List<SnapOther>): Pair<SnapAxis, SnapAxis> {
-    val xs = arrayListOf(Snap(width / 2 - at[0], SnapGuide(true, width / 2, true)))
-    val ys = arrayListOf(Snap(height / 2 - at[1], SnapGuide(false, height / 2, true)))
+internal fun Scene.snapAxesFor(layer: Layer, timeMs: Int, mine: FloatArray?, others: List<SnapOther>): Pair<SnapAxis, SnapAxis> {
+    val world = place(layer, timeMs)
+    val parent = chain(layer).getOrNull(1)?.let { place(it, timeMs) }
+    if (parent != null && parent.rot % 360f != 0f) return SnapAxis(emptyList()) to SnapAxis(emptyList())
+    return snapAxes(width.toFloat(), height.toFloat(), floatArrayOf(world.x, world.y), mine, others, parent?.sx ?: 1f, parent?.sy ?: 1f)
+}
+
+internal fun snapAxes(width: Float, height: Float, at: FloatArray, mine: FloatArray?, others: List<SnapOther>, sx: Float, sy: Float): Pair<SnapAxis, SnapAxis> {
+    val xs = arrayListOf(Snap((width / 2 - at[0]) / sx, SnapGuide(true, width / 2, true)))
+    val ys = arrayListOf(Snap((height / 2 - at[1]) / sy, SnapGuide(false, height / 2, true)))
     for (o in others) {
-        xs += Snap(o.x - at[0], SnapGuide(true, o.x, false))
-        ys += Snap(o.y - at[1], SnapGuide(false, o.y, false))
+        xs += Snap((o.x - at[0]) / sx, SnapGuide(true, o.x, false))
+        ys += Snap((o.y - at[1]) / sy, SnapGuide(false, o.y, false))
         val b = o.bounds ?: continue
         if (mine == null) continue
         for (axis in 0..1) for (theirs in intArrayOf(axis, axis + 2)) for (own in intArrayOf(axis, axis + 2)) {
-            (if (axis == 0) xs else ys) += Snap(b[theirs] - mine[own], SnapGuide(axis == 0, b[theirs], false))
+            (if (axis == 0) xs else ys) += Snap((b[theirs] - mine[own]) / (if (axis == 0) sx else sy), SnapGuide(axis == 0, b[theirs], false))
         }
     }
     return SnapAxis(xs) to SnapAxis(ys)

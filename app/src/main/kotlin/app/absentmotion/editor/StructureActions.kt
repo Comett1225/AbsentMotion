@@ -296,15 +296,19 @@ suspend fun EditorState.alignSelection(edge: Int) {
     val horizontal = edge < 3
     val lo = if (bounds.size == 1) 0f else bounds.minOf { (_, b) -> if (horizontal) b[0] else b[1] }
     val hi = if (bounds.size == 1) (if (horizontal) scene.width else scene.height).toFloat() else bounds.maxOf { (_, b) -> if (horizontal) b[2] else b[3] }
-    edit { s ->
-        bounds.fold(s) { acc, (l, b) ->
-            val from = if (horizontal) b[0] else b[1]
-            val to = if (horizontal) b[2] else b[3]
-            val d = when (edge % 3) { 0 -> lo - from; 1 -> (lo + hi) / 2 - (from + to) / 2; else -> hi - to }
-            acc.update(l.id, sampleMs) { layer -> acc.withWorldLocation(layer, sampleMs) { x, y -> if (horizontal) x + d to y else x to y + d } }
-        }
+    val moves = bounds.map { (l, b) ->
+        val from = if (horizontal) b[0] else b[1]
+        val to = if (horizontal) b[2] else b[3]
+        l to when (edge % 3) { 0 -> lo - from; 1 -> (lo + hi) / 2 - (from + to) / 2; else -> hi - to }
     }
+    edit { it.shiftedInWorld(moves, horizontal, sampleMs) }
 }
+
+internal fun Scene.shiftedInWorld(moves: List<Pair<Layer, Float>>, horizontal: Boolean, timeMs: Int): Scene =
+    moves.sortedBy { (l, _) -> chain(l).size }.fold(this) { acc, (l, d) ->
+        val w = place(layer(l.id) ?: return@fold acc, timeMs)
+        acc.update(l.id, timeMs) { layer -> acc.withWorldLocation(layer, timeMs) { _, _ -> if (horizontal) w.x + d to w.y else w.x to w.y + d } }
+    }
 
 suspend fun EditorState.distributeSelection(horizontal: Boolean) {
     val items = MultiSelect.ids.mapNotNull { scene.layer(it) }.mapNotNull { l -> engine.layerBounds(l.id, sampleMs)?.let { l to it } }
@@ -314,13 +318,12 @@ suspend fun EditorState.distributeSelection(horizontal: Boolean) {
     fun to(b: FloatArray) = if (horizontal) b[2] else b[3]
     val gap = (to(items.last().second) - from(items.first().second) - items.sumOf { (to(it.second) - from(it.second)).toDouble() }.toFloat()) / (items.size - 1)
     var cursor = to(items.first().second) + gap
-    edit { s ->
-        items.drop(1).dropLast(1).fold(s) { acc, (l, b) ->
-            val d = cursor - from(b)
-            cursor += to(b) - from(b) + gap
-            acc.update(l.id, sampleMs) { layer -> acc.withWorldLocation(layer, sampleMs) { x, y -> if (horizontal) x + d to y else x to y + d } }
-        }
+    val moves = items.drop(1).dropLast(1).map { (l, b) ->
+        val d = cursor - from(b)
+        cursor += to(b) - from(b) + gap
+        l to d
     }
+    edit { it.shiftedInWorld(moves, horizontal, sampleMs) }
 }
 
 enum class StylePart { ColorFill, BorderShadow, Blending }
