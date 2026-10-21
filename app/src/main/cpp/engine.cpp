@@ -192,6 +192,7 @@ private:
         skgpu::graphite::BackendTexture view;
         sk_sp<SkImage> image;
         SkAlphaType alpha = kUnknown_SkAlphaType;
+        uint64_t used = 0;
     };
     std::map<MediaKey, std::vector<ImportedTexture>> fImported;
     sk_sp<GrDirectContext> fGanesh;
@@ -610,6 +611,14 @@ sk_sp<SkImage> EngineImpl::importFrame(AHardwareBuffer* buffer, bool opaque, int
     uint64_t id = 0;
     if (key && AHardwareBuffer_getId(buffer, &id) == 0) {
         auto& cache = fImported[*key];
+        uint64_t tick = 1;
+        for (const auto& t : cache) tick = std::max(tick, t.used + 1);
+        for (auto t = cache.begin(); t != cache.end();) {
+            if (tick - t->used <= 2 * kImportedPerMedia) { ++t; continue; }
+            t->image.reset();
+            fDeadTextures.push_back(t->held);
+            t = cache.erase(t);
+        }
         auto hit = std::find_if(cache.begin(), cache.end(), [&](const ImportedTexture& t) {
             return t.id == id && t.colorStandard == colorStandard;
         });
@@ -627,6 +636,7 @@ sk_sp<SkImage> EngineImpl::importFrame(AHardwareBuffer* buffer, bool opaque, int
                              skgpu::graphite::BackendTextures::GetVkQueueFamilyIndex(tex), {tex, buffer}});
             hit = cache.end() - 1;
         }
+        hit->used = tick;
         if (rawYuv) *rawYuv = hit->rawYuv;
         if (hit->image && hit->alpha == alpha) {
             skgpu::graphite::BackendTextures::SetMutableState(&hit->view, skgpu::MutableTextureStates::MakeVulkan(hit->layout, hit->queueFamily));
