@@ -56,4 +56,11 @@ class ProxyRulesTest {
         assertEquals(3_000_000L, longestSyncGap(listOf(4_000_000L, 0L, 1_000_000L), 4_500_000L))
         assertEquals(Long.MAX_VALUE, longestSyncGap(emptyList(), 1_000_000L))
     }
+
+    @Test fun errorMessagesNameTheSourceFrameNotItsMicroseconds() {
+        val stamps = longArrayOf(0L, 33_366L, 66_733L, 2_502_500L)
+        assertEquals("0", stamps.frameNumber(0L))
+        assertEquals("3", stamps.frameNumber(2_502_500L))
+        assertEquals("2", stamps.frameNumber(50_000L))
+    }
 }
