@@ -308,6 +308,8 @@ internal object TimelineMath {
 
     fun maxScroll(rows: Int, rowH: Float, top: Float, bottom: Float): Float = max(0f, rows * rowH - (bottom - top))
 
+    fun centredScroll(row: Int, rowH: Float, top: Float, bottom: Float): Float = (row + 0.5f) * rowH - (bottom - top) / 2
+
     fun visibleRows(rows: Int, rowH: Float, top: Float, bottom: Float, scroll: Float): IntRange =
         max(0, floor(scroll / rowH).toInt())..min(rows - 1, ceil((bottom - top + scroll) / rowH).toInt() - 1)
 
@@ -495,11 +497,19 @@ private class TimelineView(val state: EditorState, density: Density, private val
         return keyFrames.getOrPut(layer.id to scope) { layer.keyframeTimes(scope).map { state.scene.frameAt(it) }.distinct() }
     }
 
+    private var scrollBeforeSelect: Float? = null
+
     fun revealSelected() {
-        val index = layers.indexOfFirst { it.id == state.selectedId }
+        val id = state.selectedId
+        if (id == null) {
+            scrollBeforeSelect?.takeUnless { MultiSelect.active }?.let { scrollPx = it }
+            scrollBeforeSelect = null
+            return
+        }
+        val index = layers.indexOfFirst { it.id == id }
         if (index < 0) return
-        val top = (layers.lastIndex - index) * rowH
-        scrollPx = scroll.coerceIn(min(top + rowH - (rowsBottom - rulerH), top), top)
+        if (scrollBeforeSelect == null) scrollBeforeSelect = scrollPx
+        scrollPx = TimelineMath.centredScroll(layers.lastIndex - index, rowH, rulerH, rowsBottom)
     }
 
     fun isCovered(at: Offset): Boolean = (covered && at.y >= panelTop) || (MultiSelect.active && !wide && at.y >= size.height - MultiBarHeight.px)
