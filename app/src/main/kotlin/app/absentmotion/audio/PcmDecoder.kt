@@ -33,6 +33,7 @@ internal class PcmDecoder(context: Context, uri: String) : PcmSource {
     private var outputEnded = false
     private var channels = 2
     private var float = false
+    private var mix: FloatArray? = null
 
     override val durationUs: Long
 
@@ -47,6 +48,7 @@ internal class PcmDecoder(context: Context, uri: String) : PcmSource {
             extractor.selectTrack(track)
             val decoder = MediaCodec.createDecoderByType(format.getString(MediaFormat.KEY_MIME)!!)
             codec = decoder
+            format.setInteger(MediaFormat.KEY_MAX_OUTPUT_CHANNEL_COUNT, 2)
             decoder.configure(format, null, null, 0)
             decoder.start()
         } catch (e: Exception) {
@@ -102,6 +104,7 @@ internal class PcmDecoder(context: Context, uri: String) : PcmSource {
         channels = format.getInteger(MediaFormat.KEY_CHANNEL_COUNT).coerceAtLeast(1)
         float = format.containsKey(MediaFormat.KEY_PCM_ENCODING) &&
             format.getInteger(MediaFormat.KEY_PCM_ENCODING) == AudioFormat.ENCODING_PCM_FLOAT
+        mix = if (channels > 2) downmixGains(channels, format.getInteger(MediaFormat.KEY_CHANNEL_MASK, 0)) else null
     }
 
     private fun fill(buffer: java.nio.ByteBuffer) {
@@ -111,7 +114,23 @@ internal class PcmDecoder(context: Context, uri: String) : PcmSource {
         val frames = info.size / (bytes * channels)
         if (chunk.pcm.size < frames * 2) chunk.pcm = ShortArray(frames * 2)
         val out = chunk.pcm
-        if (float) {
+        val gains = mix
+        if (gains != null) {
+            val floats = if (float) buffer.asFloatBuffer() else null
+            val shorts = buffer.asShortBuffer()
+            for (f in 0 until frames) {
+                var l = 0f
+                var r = 0f
+                for (c in 0 until channels) {
+                    val i = f * channels + c
+                    val v = if (floats != null) floats.get(i) * 32767f else shorts.get(i).toFloat()
+                    l += gains[2 * c] * v
+                    r += gains[2 * c + 1] * v
+                }
+                out[2 * f] = l.toInt().coerceIn(-32768, 32767).toShort()
+                out[2 * f + 1] = r.toInt().coerceIn(-32768, 32767).toShort()
+            }
+        } else if (float) {
             val src = buffer.asFloatBuffer()
             for (f in 0 until frames) {
                 val l = src.get(f * channels)
@@ -136,4 +155,33 @@ internal class PcmDecoder(context: Context, uri: String) : PcmSource {
         codec = null
         extractor.release()
     }
+}
+
+private const val SIDE = 0.7071f
+
+internal fun downmixGains(channels: Int, mask: Int): FloatArray {
+    val layout = mask.takeIf { Integer.bitCount(it) == channels } ?: when (channels) {
+        3 -> AudioFormat.CHANNEL_OUT_STEREO or AudioFormat.CHANNEL_OUT_FRONT_CENTER
+        4 -> AudioFormat.CHANNEL_OUT_QUAD
+        5 -> AudioFormat.CHANNEL_OUT_QUAD or AudioFormat.CHANNEL_OUT_FRONT_CENTER
+        6 -> AudioFormat.CHANNEL_OUT_5POINT1
+        7 -> AudioFormat.CHANNEL_OUT_5POINT1 or AudioFormat.CHANNEL_OUT_BACK_CENTER
+        else -> AudioFormat.CHANNEL_OUT_7POINT1_SURROUND
+    }
+    val bits = (0 until 32).map { 1 shl it }.filter { layout and it != 0 }
+    val gains = FloatArray(2 * channels)
+    for (c in 0 until minOf(channels, bits.size)) {
+        val (l, r) = when (bits[c]) {
+            AudioFormat.CHANNEL_OUT_FRONT_LEFT, AudioFormat.CHANNEL_OUT_FRONT_LEFT_OF_CENTER -> 1f to 0f
+            AudioFormat.CHANNEL_OUT_FRONT_RIGHT, AudioFormat.CHANNEL_OUT_FRONT_RIGHT_OF_CENTER -> 0f to 1f
+            AudioFormat.CHANNEL_OUT_FRONT_CENTER -> SIDE to SIDE
+            AudioFormat.CHANNEL_OUT_LOW_FREQUENCY -> 0f to 0f
+            AudioFormat.CHANNEL_OUT_BACK_LEFT, AudioFormat.CHANNEL_OUT_SIDE_LEFT -> SIDE to 0f
+            AudioFormat.CHANNEL_OUT_BACK_RIGHT, AudioFormat.CHANNEL_OUT_SIDE_RIGHT -> 0f to SIDE
+            else -> 0.5f to 0.5f
+        }
+        gains[2 * c] = l
+        gains[2 * c + 1] = r
+    }
+    return gains
 }
