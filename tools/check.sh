@@ -27,7 +27,10 @@ ui-contract|python3 tools/ui_contract_check.py|update the contract or the UI
 remaining-contract|python3 tools/remaining_contract_check.py|update the contract or the code
 tool-regressions|python3 tools/bug_regression_check.py|the tool scripts regressed"
 
-printf '== Static checks (in parallel)\n'
+printf '== Native audio effects: host build and tests\n'
+sh tools/audio_dsp.sh --lib >"$dir/audio-dsp.log" 2>&1 || { tail -n 15 "$dir/audio-dsp.log" >&2; fail "the audio DSP host tests"; }
+
+printf '\n== Static checks (in parallel)\n'
 while IFS='|' read -r name command hint; do
     ( sh -c "$command" >"$dir/$name.log" 2>&1; echo $? >"$dir/$name.status" ) &
 done <<EOF

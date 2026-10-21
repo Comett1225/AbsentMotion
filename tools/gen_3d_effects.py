@@ -196,7 +196,7 @@ float bound() { return length(dims()); }
 float map(float3 p) { float3 h = dims(); return sdRoundBox(p, h, smoothing * min(h.x, min(h.y, h.z)) * 0.5); }
 float4 surface(float3 p, float3 n) { return boxFace(p, n, dims()); }
 """),
-    solid("hollowbox", "Hollow Box", "A box with open top and bottom: the layer covers the outside and the inside takes the interior colour.",
+    solid("hollowbox", "Hollow Box", "A box with open top and bottom: the layer covers the outside and the inside takes the interior color.",
           [number("width", "Width", 0.7, 0.02, 5), number("height", "Height", 0.7, 0.02, 5), number("depth", "Depth", 0.7, 0.02, 5),
            number("thickness", "Thickness", 0.06, 0.005, 1), SMOOTH, INSIDE], INTERIOR + DIMS + """
 float bound() { return length(dims()); }
@@ -480,8 +480,8 @@ half4 main(float2 coord) {
 """
 
 EFFECTS += [
-    ("rasterextrude", "Raster Extrude", "Pushes the layer's picture out into a solid block; the sides take the interior colour.", EXTRUDE_PARAMS, EXTRUDE),
-    ("flip", "Flip Layer", "Turns the layer like a card in 3D, with its back see-through, a picture or a colour.", FLIP_PARAMS, FLIP),
+    ("rasterextrude", "Raster Extrude", "Pushes the layer's picture out into a solid block; the sides take the interior color.", EXTRUDE_PARAMS, EXTRUDE),
+    ("flip", "Flip Layer", "Turns the layer like a card in 3D, with its back see-through, a picture or a color.", FLIP_PARAMS, FLIP),
     ("tunnel", "Tunnel", "Lines an endless tunnel with the layer and flies through it. Phase shifts the texture along its length.", TUNNEL_PARAMS, TUNNEL),
 ]
 
