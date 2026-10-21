@@ -13,7 +13,7 @@ enum Kind { Eq = 0, LowPass = 1, HighPass = 2, Reverb = 3, Echo = 4, Compressor 
 int paramCount(int kind) {
     switch (kind) {
     case Eq: return 13;
-    case LowPass: case HighPass: return 3;
+    case LowPass: case HighPass: return 4;
     case Reverb: return 6;
     case Echo: return 5;
     case Compressor: return 6;
@@ -83,6 +83,7 @@ void apply(Unit& unit, const float* p) {
         if (unit.kind == LowPass) f.lowPassHz = p[0]; else f.highPassHz = p[0];
         f.resonance = p[1];
         f.slope = p[2] >= 18.0f ? 24 : 12;
+        f.flat = p[3] >= 0.5f;
         break;
     }
     case Reverb: {

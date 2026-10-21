@@ -25,6 +25,7 @@ import app.absentmotion.model.withBorderAdded
 import app.absentmotion.model.withContent
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.ensureActive
@@ -200,7 +201,7 @@ internal object Whisper {
         check(handle != 0L) { AppText.get(R.string.ai_caption_model_load_failed) }
         try {
             val stop = launch(start = CoroutineStart.UNDISPATCHED) { try { awaitCancellation() } finally { nativeCancel(handle) } }
-            val text = try { nativeRun(handle, pcm, english) { progress(it) } } finally { stop.cancelAndJoin() }
+            val text = try { nativeRun(handle, pcm, english) { progress(it) } } finally { withContext(NonCancellable) { stop.cancelAndJoin() } }
             ensureActive()
             checkNotNull(text) { AppText.get(R.string.ai_speech_failed) }.toString(Charsets.UTF_8).lineSequence().mapNotNull { line ->
                 val parts = line.split('\t', limit = 3)

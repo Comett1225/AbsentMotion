@@ -192,6 +192,7 @@ private:
         skgpu::graphite::BackendTexture view;
         sk_sp<SkImage> image;
         SkAlphaType alpha = kUnknown_SkAlphaType;
+        uint64_t used = 0;
     };
     std::map<MediaKey, std::vector<ImportedTexture>> fImported;
     sk_sp<GrDirectContext> fGanesh;
@@ -610,6 +611,14 @@ sk_sp<SkImage> EngineImpl::importFrame(AHardwareBuffer* buffer, bool opaque, int
     uint64_t id = 0;
     if (key && AHardwareBuffer_getId(buffer, &id) == 0) {
         auto& cache = fImported[*key];
+        uint64_t tick = 1;
+        for (const auto& t : cache) tick = std::max(tick, t.used + 1);
+        for (auto t = cache.begin(); t != cache.end();) {
+            if (tick - t->used <= 2 * kImportedPerMedia) { ++t; continue; }
+            t->image.reset();
+            fDeadTextures.push_back(t->held);
+            t = cache.erase(t);
+        }
         auto hit = std::find_if(cache.begin(), cache.end(), [&](const ImportedTexture& t) {
             return t.id == id && t.colorStandard == colorStandard;
         });
@@ -627,6 +636,7 @@ sk_sp<SkImage> EngineImpl::importFrame(AHardwareBuffer* buffer, bool opaque, int
                              skgpu::graphite::BackendTextures::GetVkQueueFamilyIndex(tex), {tex, buffer}});
             hit = cache.end() - 1;
         }
+        hit->used = tick;
         if (rawYuv) *rawYuv = hit->rawYuv;
         if (hit->image && hit->alpha == alpha) {
             skgpu::graphite::BackendTextures::SetMutableState(&hit->view, skgpu::MutableTextureStates::MakeVulkan(hit->layout, hit->queueFamily));
@@ -684,9 +694,10 @@ sk_sp<SkImage> EngineImpl::copyFrame(AHardwareBuffer* buffer, bool opaque, int c
         const float kr = colorStandard == 1 ? 0.2126f : colorStandard == 6 ? 0.2627f : 0.299f;
         const float kb = colorStandard == 1 ? 0.0722f : colorStandard == 6 ? 0.0593f : 0.114f;
         const float kg = 1 - kr - kb;
-        const float ys = colorRange == 2 ? 255.f / 219 : 1.f;
-        const float cs = colorRange == 2 ? 255.f / 224 : 1.f;
-        const float yo = colorRange == 2 ? -16.f / 219 : 0.f;
+        const bool limited = colorRange != 1;
+        const float ys = limited ? 255.f / 219 : 1.f;
+        const float cs = limited ? 255.f / 224 : 1.f;
+        const float yo = limited ? -16.f / 219 : 0.f;
         const float ro = 2 * (1 - kr) * cs;
         const float bo = 2 * (1 - kb) * cs;
         const float gr = -2 * kr * (1 - kr) / kg * cs;
@@ -1244,7 +1255,7 @@ int EngineImpl::frame(Target* target, int64_t presentTimeNs, bool sync,
     r = vkQueuePresentKHR(fQueue, &present);
     if (r != VK_SUCCESS && r != VK_SUBOPTIMAL_KHR) {
         LOGE("vkQueuePresentKHR failed (%d)", r);
-        this->failGpu(target);
+        if (r != VK_ERROR_OUT_OF_DATE_KHR && r != VK_ERROR_SURFACE_LOST_KHR) this->failGpu(target);
         return r;
     }
     if (presentTimeNs <= 0 && target->nextPresentId % 4 == 0) this->collectTimings(target);

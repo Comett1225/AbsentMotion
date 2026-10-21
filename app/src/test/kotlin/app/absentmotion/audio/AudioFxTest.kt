@@ -33,6 +33,18 @@ class AudioFxTest {
         assertEquals("0.8", reload(scene).layer(1)!!.node.child("gain")!!["value"])
     }
 
+    @Test fun onlyNewFiltersUseTheFlatTwentyFourDecibelSlope() {
+        val saved = Scene.parse(old.replace("</audio>", """<audioEffects><fx type="lowpass" freq="500" resonance="2.5" slope="24"/></audioEffects></audio>"""))
+        assertEquals(0f, saved.layer(1)!!.audioEffects.spec()!!.values[5])
+        val fresh = saved.update(1) { it.withAudioEffects(listOf(AudioFx.of(FxKind.LowPass, "slope" to 24f), AudioFx.of(FxKind.HighPass))) }
+        val spec = reload(fresh).layer(1)!!.audioEffects.spec()!!
+        assertEquals(1f, spec.values[5])
+        assertEquals(1f, spec.values[11])
+        val voice = listOf(AudioFx.of(FxKind.Voice, "muffle" to 0.5f)).spec()!!
+        var at = 0
+        for (native in voice.kinds) { if (native == FxKind.LowPass.id || native == FxKind.HighPass.id) assertEquals(0f, voice.values[at + 5]); at += 2 + nativeCounts.getValue(native) }
+    }
+
     @Test fun oldProjectsLoadWithoutEffects() {
         val scene = Scene.parse(old)
         assertTrue(scene.layer(1)!!.audioEffects.isEmpty())
@@ -71,7 +83,7 @@ class AudioFxTest {
         assertTrue(reset.bypass)
     }
 
-    private val nativeCounts = mapOf(0 to 13, 1 to 3, 2 to 3, 3 to 6, 4 to 5, 5 to 6, 6 to 5, NativeFx.PITCH to 1)
+    private val nativeCounts = mapOf(0 to 13, 1 to 4, 2 to 4, 3 to 6, 4 to 5, 5 to 6, 6 to 5, NativeFx.PITCH to 1)
 
     @Test fun parameterLayoutMatchesTheNativeBridge() {
         val counts = mapOf(FxKind.Eq to 13, FxKind.LowPass to 3, FxKind.HighPass to 3, FxKind.Reverb to 6, FxKind.Echo to 5, FxKind.Compressor to 6, FxKind.Gate to 5,

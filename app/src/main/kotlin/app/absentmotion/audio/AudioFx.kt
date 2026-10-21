@@ -92,6 +92,7 @@ value class AudioFx(val node: XmlNode) {
     val kind: FxKind? get() = FxKind.entries.firstOrNull { it.xml == node["type"] }
     val mix: Float get() = node["mix"]?.toFloatOrNull()?.takeIf { it.isFinite() }?.coerceIn(0f, 1f) ?: 1f
     val bypass: Boolean get() = node["bypass"] == "true"
+    val flatSlope: Boolean get() = (node["version"]?.toIntOrNull() ?: 1) >= 2
 
     operator fun get(param: FxParam): Float {
         val value = node[param.key]?.toFloatOrNull()?.takeIf { it.isFinite() }?.coerceIn(param.min, param.max) ?: return param.default
@@ -107,7 +108,7 @@ value class AudioFx(val node: XmlNode) {
     }
 
     companion object {
-        fun of(kind: FxKind, vararg values: Pair<String, Float>) = values.fold(AudioFx(XmlNode(FX_TAG, linkedMapOf("type" to kind.xml)))) { fx, (key, value) ->
+        fun of(kind: FxKind, vararg values: Pair<String, Float>) = values.fold(AudioFx(XmlNode(FX_TAG, linkedMapOf("type" to kind.xml).also { if (kind == FxKind.LowPass || kind == FxKind.HighPass) it["version"] = "2" }))) { fx, (key, value) ->
             fx.with(kind.params.first { it.key == key }, value)
         }
     }
@@ -145,6 +146,7 @@ private fun AudioFx.units(kind: FxKind): List<FxUnit> = when (kind) {
     FxKind.HighPitch -> listOf(FxUnit(kind.id, mix, bypass, floatArrayOf(this[kind.params[0]])))
     FxKind.LowPitch -> listOf(FxUnit(kind.id, mix, bypass, floatArrayOf(-this[kind.params[0]])))
     FxKind.Voice -> voiceUnits()
+    FxKind.LowPass, FxKind.HighPass -> listOf(FxUnit(kind.id, mix, bypass, FloatArray(kind.params.size) { this[kind.params[it]] } + if (flatSlope) 1f else 0f))
     else -> listOf(FxUnit(kind.id, mix, bypass, FloatArray(kind.params.size) { this[kind.params[it]] }))
 }
 
@@ -163,8 +165,8 @@ private fun AudioFx.voiceUnits(): List<FxUnit> {
     return listOf(
         unit(NativeFx.PITCH, abs(pitch) < 0.05f, pitch),
         unit(FxKind.Eq.id, bass == 0f && treble == 0f, 150f, bass, 400f, 0f, 1f, 1500f, 0f, 1f, 5000f, 0f, 1f, 4500f, treble),
-        unit(FxKind.HighPass.id, thin < 0.01f, 20f * 60f.pow(thin), 0.70710677f, 12f),
-        unit(FxKind.LowPass.id, muffle < 0.01f, 20000f * 0.02f.pow(muffle), 0.70710677f, 24f),
+        unit(FxKind.HighPass.id, thin < 0.01f, 20f * 60f.pow(thin), 0.70710677f, 12f, 0f),
+        unit(FxKind.LowPass.id, muffle < 0.01f, 20000f * 0.02f.pow(muffle), 0.70710677f, 24f, 0f),
         unit(FxKind.Compressor.id, full < 0.01f, -20f - 10f * full, 1.5f + 5f * full, 8f, 140f, 8f, 10f * full),
         unit(FxKind.Echo.id, echo < 0.01f, 300f, 0.35f, 0.5f * echo, pingPong, 120f),
         unit(FxKind.Reverb.id, reverb < 0.01f, 0.3f + 0.65f * reverb, 0.5f, 0.55f * reverb, 1f, 1f, 12f),

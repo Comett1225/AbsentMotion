@@ -39,9 +39,12 @@ JNIEXPORT jlong JNICALL JNI_FN(nativeOpen)(JNIEnv*, jclass, jint rate, jint chan
 
 JNIEXPORT jbyteArray JNICALL JNI_FN(nativeEncode)(JNIEnv* env, jclass, jlong handle, jshortArray pcm, jint frames) {
     lame_global_flags* gf = lameOf(handle);
+    const int channels = lame_get_num_channels(gf);
+    if (!pcm || frames < 0 || (jlong)frames * channels > env->GetArrayLength(pcm)) return nullptr;
     std::vector<unsigned char> out((size_t)frames * 5 / 4 + 7200);
     jshort* samples = env->GetShortArrayElements(pcm, nullptr);
-    const int n = lame_get_num_channels(gf) == 1
+    if (!samples) return nullptr;
+    const int n = channels == 1
             ? lame_encode_buffer(gf, samples, samples, frames, out.data(), (int)out.size())
             : lame_encode_buffer_interleaved(gf, samples, frames, out.data(), (int)out.size());
     env->ReleaseShortArrayElements(pcm, samples, JNI_ABORT);
