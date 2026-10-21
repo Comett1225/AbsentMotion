@@ -42,9 +42,12 @@
    }
   },
   "backdrop": {
-   "description": "Mengisi lapisan dengan apa yang dilukis di bawahnya, jadi kesan selepas ini mengubah lapisan di bawah. Campur mengembalikan isi lapisan sendiri.",
+   "description": "Menyalin apa yang dilukis di bawah lapisan supaya kesan kemudian boleh mengubahnya; Topeng ke lapisan mengehadkan salinan kepada bahagian legap lapisan dan Campur mengembalikan isi lapisan.",
    "name": "Lapisan Pelarasan",
    "params": {
+    "mask": {
+     "label": "Topeng ke lapisan"
+    },
     "mix": {
      "label": "Campur"
     }
@@ -90,7 +93,7 @@
    "name": "Kelip",
    "params": {
     "frequency": {
-     "label": "Kelip sesaat"
+     "label": "Kekerapan"
     }
    }
   },
@@ -119,9 +122,16 @@
    }
   },
   "blocknoise": {
-   "description": "Mengkelipkan blok hingar rawak pada lapisan, seperti isyarat digital rosak.",
+   "description": "Mengerdipkan blok hingar rawak di atas lapisan; Darab memodulasi warna sedia ada, Tambah menambah hingar dan Bekukan mengekalkan corak.",
    "name": "Hingar blok",
    "params": {
+    "blending": {
+     "label": "Mod campuran",
+     "options": [
+      "Tambah",
+      "Darab"
+     ]
+    },
     "blockSize": {
      "label": "Saiz"
     },
@@ -379,6 +389,9 @@
     },
     "punch": {
      "label": "Tebuk Keluar"
+    },
+    "screenSpace": {
+     "label": "Ruang skrin"
     },
     "stretch": {
      "label": "Regang"
@@ -950,14 +963,17 @@
    }
   },
   "dissolve": {
-   "description": "Lapisan pecah menjadi bintik rawak.",
+   "description": "Membuang piksel atau blok rawak daripada lapisan; animasikan Kekuatan untuk peralihan larut, Benih memilih corak dan Saiz menetapkan saiz setiap titik.",
    "name": "Larut",
    "params": {
     "grain": {
      "label": "Saiz"
     },
     "progress": {
-     "label": "Kemajuan"
+     "label": "Kekuatan"
+    },
+    "seed": {
+     "label": "Benih"
     }
    }
   },
@@ -1166,7 +1182,7 @@
    "description": "Membalut lapisan pada sfera yang boleh dihimpit dan diratakan.",
    "name": "Elipsoid",
    "params": {
-    "flatten": {
+    "flattenRatio": {
      "label": "Ratakan"
     },
     "light": {
@@ -1199,7 +1215,7 @@
     "shine": {
      "label": "Kilau"
     },
-    "squeeze": {
+    "squeezeRatio": {
      "label": "Himpit"
     }
    }
@@ -1244,11 +1260,18 @@
    }
   },
   "feather": {
-   "description": "Melembutkan tepi bahagian legap lapisan dengan memudarkannya ke arah garis luar.",
+   "description": "Melembutkan tepi alfa lapisan; Ke dalam memudar ke garis luar sedia ada, manakala Kabur Alfa juga menyebarkan tepi lembut ke luarnya.",
    "name": "Bulu",
    "params": {
     "blur": {
      "label": "Kekuatan"
+    },
+    "mode": {
+     "label": "Tepi",
+     "options": [
+      "Ke dalam",
+      "Kabur Alfa"
+     ]
     }
    }
   },
@@ -1329,13 +1352,13 @@
    "name": "Kelip",
    "params": {
     "intensity": {
-     "label": "Keamatan"
+     "label": "Kekuatan"
     },
     "seed": {
      "label": "Seed"
     },
     "speed": {
-     "label": "Kelajuan"
+     "label": "Kekerapan"
     }
    }
   },
@@ -2691,9 +2714,12 @@
    }
   },
   "palettemap": {
-   "description": "Mengecat semula setiap piksel dengan warna terdekat daripada palet kecil untuk rupa retro.",
+   "description": "Memetakan setiap piksel ke warna terdekat dalam palet sehingga lapan warna; Alfa mencampurkan warna yang dipetakan dengan lapisan asal.",
    "name": "Peta Palet",
    "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
     "color1": {
      "label": "Warna 1"
     },
@@ -2708,6 +2734,15 @@
     },
     "color5": {
      "label": "Warna 5"
+    },
+    "color6": {
+     "label": "Warna 6"
+    },
+    "color7": {
+     "label": "Warna 7"
+    },
+    "color8": {
+     "label": "Warna 8"
     },
     "colors": {
      "label": "Warna"
@@ -2803,7 +2838,7 @@
      "label": "Songsang"
     },
     "reach": {
-     "label": "Jarak"
+     "label": "Sisip/Keluar"
     }
    }
   },
@@ -3265,20 +3300,26 @@
    }
   },
   "replacecolor": {
-   "description": "Menukar satu warna dalam lapisan kepada warna lain sambil mengekalkan cahaya dan bayang asal.",
+   "description": "Menggantikan satu warna dengan warna lain; Alfa mengawal kekuatan penggantian dan Kunci luminans mengekalkan cahaya serta bayang asal.",
    "name": "Ganti Warna",
    "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
     "choke": {
      "label": "Choke"
     },
     "feather": {
      "label": "Feather"
     },
+    "lockLuminance": {
+     "label": "Kunci luminans"
+    },
     "source": {
-     "label": "Daripada"
+     "label": "Ganti warna"
     },
     "target": {
-     "label": "Kepada"
+     "label": "Warna baharu"
     },
     "threshold": {
      "label": "Ambang"
@@ -3380,6 +3421,9 @@
     },
     "evolution": {
      "label": "Evolusi"
+    },
+    "octaves": {
+     "label": "Oktav"
     },
     "roughness": {
      "label": "Kekasaran"
@@ -3508,7 +3552,7 @@
    "name": "Pertajam",
    "params": {
     "amount": {
-     "label": "Jumlah"
+     "label": "Kekuatan"
     },
     "radius": {
      "label": "Jejari"
@@ -3589,13 +3633,13 @@
   },
   "solid": {
    "description": "Meletakkan satu warna di atas lapisan, mengekalkan bentuknya, dengan pilihan mod campuran.",
-   "name": "Tindihan Warna",
+   "name": "Warna pepejal",
    "params": {
     "amount": {
-     "label": "Amaun"
+     "label": "Alfa"
     },
     "blend": {
-     "label": "Campuran",
+     "label": "Mod campuran",
      "options": [
       "Normal",
       "Darab",
@@ -3617,7 +3661,7 @@
    }
   },
   "spherize": {
-   "description": "Melengkungkan lapisan mengelilingi bahagian hadapan bola.",
+   "description": "Membalut lapisan pada sfera menggunakan unjuran hadapan atau tekstur ekuisegi empat tepat.",
    "name": "Bulatkan",
    "params": {
     "coverage": {
@@ -3631,6 +3675,13 @@
     },
     "position": {
      "label": "Kedudukan"
+    },
+    "projection": {
+     "label": "Unjuran",
+     "options": [
+      "Hadapan",
+      "Ekuisegi empat tepat"
+     ]
     },
     "radius": {
      "label": "Jejari"
@@ -3770,11 +3821,18 @@
    }
   },
   "squeeze": {
-   "description": "Menghimpit lapisan sepanjang satu paksi sambil meregangkannya sepanjang paksi yang lain. Nilai negatif menukar paksi.",
+   "description": "Mencubit bahagian tengah lapisan ke dalam dengan Kekuatan positif dan menggelembungkannya ke luar dengan Kekuatan negatif; Legasi mengekalkan bentuk projek lama.",
    "name": "Himpit",
    "params": {
-    "strength": {
+    "amount": {
      "label": "Kekuatan"
+    },
+    "shape": {
+     "label": "Bentuk",
+     "options": [
+      "Cubit/Gelembung",
+      "Legasi"
+     ]
     }
    }
   },
@@ -3823,7 +3881,7 @@
    }
   },
   "starfield": {
-   "description": "Mengisi bahagian legap lapisan dengan medan bintang yang dalam dalam beberapa lapisan yang bergerak pada kelajuan berbeza.",
+   "description": "Mengisi bahagian legap lapisan dengan medan bintang yang dalam; Ofset bergerak melalui medan, dengan bintang berdekatan bergerak lebih jauh daripada bintang jauh.",
    "name": "Medan bintang",
    "params": {
     "brightness": {
@@ -3988,6 +4046,9 @@
     "punch": {
      "label": "Tebuk keluar"
     },
+    "screenSpace": {
+     "label": "Ruang skrin"
+    },
     "smoothing": {
      "label": "Pelembutan"
     },
@@ -4037,7 +4098,7 @@
    }
   },
   "temperature": {
-   "description": "Memanaskan atau menyejukkan gambar seperti cahaya pada suhu warna dalam kelvin (6500 K membiarkannya tidak berubah), sambil mengekalkan kecerahannya.",
+   "description": "Memanaskan atau menyejukkan gambar seperti cahaya pada suhu warna dalam kelvin; 6500 K membiarkannya tidak berubah.",
    "name": "Suhu Warna",
    "params": {
     "kelvin": {
@@ -4049,7 +4110,7 @@
    }
   },
   "textprogress": {
-   "description": "Menunjukkan lapisan teks sedikit demi sedikit, mengikut aksara, perkataan atau baris; setiap bahagian muncul, malap, gelongsor, membesar, mengecil atau menjadi tajam ke tempatnya.",
+   "description": "Menunjukkan teks antara Mula dan Tamat, mengikut aksara, perkataan atau baris, dengan pudar, slaid, penskalaan atau kabur pilihan.",
    "name": "Kemajuan Teks",
    "params": {
     "appearance": {
@@ -4079,13 +4140,16 @@
      "label": "Jarak"
     },
     "progress": {
-     "label": "Kemajuan"
+     "label": "Tamat"
     },
     "seed": {
      "label": "Benih"
     },
     "softness": {
      "label": "Kelembutan"
+    },
+    "start": {
+     "label": "Mula"
     },
     "unit": {
      "label": "Berdasarkan",
@@ -4104,9 +4168,12 @@
    }
   },
   "textrandomizer": {
-   "description": "Menukar aksara lapisan teks dengan huruf, nombor atau simbol rawak yang sentiasa berubah. Tingkatkan Kemajuan supaya teks sebenar masuk semula, aksara demi aksara.",
+   "description": "Menggantikan jumlah aksara secara rawak antara Mula dan Tamat; animasikan Evolusi atau naikkan Kelajuan untuk menukar penggantian, dan Dedah menetapkannya kembali ke teks asal.",
    "name": "Rawak Teks",
    "params": {
+    "amount": {
+     "label": "Jumlah"
+    },
     "characters": {
      "label": "Tersuai"
     },
@@ -4131,17 +4198,26 @@
       "Rawak"
      ]
     },
+    "end": {
+     "label": "Tamat"
+    },
+    "evolution": {
+     "label": "Evolusi"
+    },
     "keepSpaces": {
      "label": "Kekalkan Ruang"
     },
     "progress": {
-     "label": "Kemajuan"
+     "label": "Dedah"
     },
     "seed": {
      "label": "Benih"
     },
     "speed": {
      "label": "Kelajuan"
+    },
+    "start": {
+     "label": "Mula"
     }
    },
    "presets": {
@@ -4149,9 +4225,16 @@
    }
   },
   "texttransform": {
-   "description": "Menggerakkan, menskalakan, memutar, melunturkan dan mewarnakan huruf, perkataan atau baris teks lapisan yang berada dalam julat. Gerakkan julat dengan Offset supaya perubahan merentasi teks.",
+   "description": "Menggerakkan, menskalakan, memutar, memudarkan dan mewarnakan huruf, perkataan atau baris dalam julat; Penambat menetapkan sama ada penskalaan dan putaran menggunakan setiap komponen atau pusat lapisan, dan gerakkan julat dengan Ofset supaya perubahan merentasi teks.",
    "name": "Transformasi Teks",
    "params": {
+    "anchor": {
+     "label": "Penambat",
+     "options": [
+      "Komponen",
+      "Lapisan"
+     ]
+    },
     "end": {
      "label": "Tamat"
     },
@@ -4214,6 +4297,23 @@
    "description": "Hitam putih tulen, dipisahkan pada satu kecerahan.",
    "name": "Ambang",
    "params": {
+    "blend": {
+     "label": "Mod campuran",
+     "options": [
+      "Normal",
+      "Darab",
+      "Skrin",
+      "Tindih",
+      "Cahaya lembut",
+      "Cahaya keras",
+      "Tambah",
+      "Gelapkan",
+      "Cerahkan",
+      "Perbezaan",
+      "Dodge warna",
+      "Bakar warna"
+     ]
+    },
     "invert": {
      "label": "Songsang"
     },
@@ -4268,14 +4368,11 @@
    }
   },
   "tiles": {
-   "description": "Mengulang lapisan dalam corak jubin yang memenuhi skrin, dengan pilihan cermin, anjakan baris dan putaran.",
+   "description": "Ulang lapisan untuk memenuhi skrin. Tingkatkan Potong untuk jubin lebih kecil, dengan pilihan cermin, offset baris dan putaran. Skala legasi mengekalkan projek lama.",
    "name": "Jubin",
    "params": {
     "angle": {
      "label": "Sudut"
-    },
-    "crop": {
-     "label": "Potong"
     },
     "mirror": {
      "label": "Cermin"
@@ -4283,8 +4380,18 @@
     "offset": {
      "label": "Anjakan"
     },
+    "sizing": {
+     "label": "Saiz",
+     "options": [
+      "Potong",
+      "Skala legasi"
+     ]
+    },
     "vertical": {
      "label": "Anjakan menegak"
+    },
+    "zoom": {
+     "label": "Potong"
     }
    }
   },
@@ -4347,7 +4454,7 @@
    "name": "Pengkuantuman Masa",
    "params": {
     "fps": {
-     "label": "Kadar Bingkai"
+     "label": "Langkah/saat"
     }
    }
   },
@@ -4406,7 +4513,7 @@
    }
   },
   "tunnel": {
-   "description": "Membentuk terowong tanpa hujung daripada lapisan dan terbang melaluinya.",
+   "description": "Membentuk terowong tanpa hujung dengan lapisan dan terbang melaluinya. Fasa menggeser tekstur sepanjang panjangnya.",
    "name": "Terowong",
    "params": {
     "fog": {
@@ -4414,6 +4521,9 @@
     },
     "fogColor": {
      "label": "Warna Kabus"
+    },
+    "phase": {
+     "label": "Fasa"
     },
     "position": {
      "label": "Kedudukan"

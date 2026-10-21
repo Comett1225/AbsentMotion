@@ -318,7 +318,7 @@ class EffectMigrationTest {
         assertEquals("false", own("offset").prop("mask")["value"])
         assertEquals(mapOf("direction" to 0f, "angle" to 45f, "frequency" to 2f, "magnitude" to 25f, "wave" to 0f, "phase" to 0f), numbers("oscillate"))
         assertEquals(mapOf("frequency" to 2f, "shrink" to 0.9f, "grow" to 1.1f, "phase" to 0f, "wave" to 0f), numbers("pulsesize"))
-        assertEquals(mapOf("magnitude" to 50f, "evolution" to 0f, "seed" to 0f, "scatter" to 0.5f), numbers("randomdisplace"))
+        assertEquals(mapOf("magnitude" to 50f, "evolution" to 0f, "seed" to 0f, "scatter" to 0.5f, "speed" to 0f), numbers("randomdisplace"))
         assertEquals(mapOf("angle" to 45f, "frequency" to 30f, "magnitude" to 25f, "seed" to 0f, "slack" to 0f, "zjitter" to 0f), numbers("randomjitter"))
         assertEquals(mapOf("frequency" to 5.98f, "angle1" to -30f, "angle2" to 30f, "phase" to 0f, "wave" to 0f), numbers("swing"))
         assertEquals(mapOf("rpm" to -936f), numbers("spin"))
@@ -343,7 +343,7 @@ class EffectMigrationTest {
             """<effect id="com.alightcreative.effects.flicker2" locallyApplied="true"><property name="freq" type="float" value="3.73" /><property name="basis" type="int" value="$basis" /></effect></shape></scene>"""))
         val time = flicker(0)
         assertTrue(time.dropped.isEmpty())
-        assertEquals(listOf("speed"), time.scene.node.children.single().children.single().children.map { it["name"] })
+        assertEquals(listOf("speed", "intensity", "seed"), time.scene.node.children.single().children.single().children.map { it["name"] })
         assertEquals(setOf("Flicker: basis"), flicker(1).dropped)
     }
 }

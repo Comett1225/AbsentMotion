@@ -42,9 +42,12 @@
    }
   },
   "backdrop": {
-   "description": "Pinupuno ang layer ng iginuhit sa ilalim nito, kaya binabago ng mga epektong sumusunod dito ang mga layer sa ibaba. Ibinalik ng Mix ang sariling fill ng layer.",
+   "description": "Kinokopya ang iginuhit sa ilalim ng layer para mabago ito ng mga susunod na epekto. Nililimitahan ng Mask sa layer ang kopya sa opaque na bahagi ng layer. Ibinabalik ng Mix ang fill ng layer.",
    "name": "Adjustment layer",
    "params": {
+    "mask": {
+     "label": "Mask sa layer"
+    },
     "mix": {
      "label": "Halo"
     }
@@ -90,7 +93,7 @@
    "name": "Kumurap",
    "params": {
     "frequency": {
-     "label": "Kurap kada segundo"
+     "label": "Dalas"
     }
    }
   },
@@ -119,9 +122,16 @@
    }
   },
   "blocknoise": {
-   "description": "Nagpi-flicker ng random na block ng noise sa layer, parang sirang digital signal.",
+   "description": "Nagpapakita ng kumikislap na random na bloke ng noise sa layer. Binabago ng Multiply ang mga kasalukuyang kulay; nagdadagdag ang Add ng noise sa mga ito. Pinapanatili ng Freeze na hindi gumagalaw ang pattern.",
    "name": "Block noise",
    "params": {
+    "blending": {
+     "label": "Blending mode",
+     "options": [
+      "Add",
+      "Multiply"
+     ]
+    },
     "blockSize": {
      "label": "Laki"
     },
@@ -379,6 +389,9 @@
     },
     "punch": {
      "label": "Punch Out"
+    },
+    "screenSpace": {
+     "label": "Screen space"
     },
     "stretch": {
      "label": "Iunat"
@@ -950,14 +963,17 @@
    }
   },
   "dissolve": {
-   "description": "Naghihiwa-hiwalay ang layer sa mga random na tipak.",
+   "description": "Nag-aalis ng random na pixel o bloke mula sa layer. I-animate ang Lakas para sa dissolve transition; pinipili ng Seed ang pattern at itinatakda ng Size ang laki ng bawat tuldok.",
    "name": "Pagkatunaw",
    "params": {
     "grain": {
      "label": "Laki"
     },
     "progress": {
-     "label": "Progreso"
+     "label": "Lakas"
+    },
+    "seed": {
+     "label": "Seed"
     }
    }
   },
@@ -1166,8 +1182,8 @@
    "description": "Binabalot ang layer sa isang sphere na puwede mong pisilin at patagin.",
    "name": "Ellipsoid",
    "params": {
-    "flatten": {
-     "label": "Flatten"
+    "flattenRatio": {
+     "label": "Patagin"
     },
     "light": {
      "label": "Anggulo ng ilaw"
@@ -1199,8 +1215,8 @@
     "shine": {
      "label": "Shine"
     },
-    "squeeze": {
-     "label": "Squeeze"
+    "squeezeRatio": {
+     "label": "Pisil"
     }
    }
   },
@@ -1244,11 +1260,18 @@
    }
   },
   "feather": {
-   "description": "Pinapalambot ang mga gilid ng opaque na bahagi ng layer sa pamamagitan ng pag-fade nito papunta sa outline.",
+   "description": "Pinapalambot ang alpha na gilid ng layer. Ang Papasok ay nagfa-fade papasok sa kasalukuyang outline; ang Blur alpha ay nagpapalawak din ng pinapalambot na gilid sa labas nito.",
    "name": "Feather",
    "params": {
     "blur": {
      "label": "Lakas"
+    },
+    "mode": {
+     "label": "Gilid",
+     "options": [
+      "Papasok",
+      "Blur alpha"
+     ]
     }
    }
   },
@@ -1329,13 +1352,13 @@
    "name": "Kumikislap",
    "params": {
     "intensity": {
-     "label": "Tindi"
+     "label": "Lakas"
     },
     "seed": {
      "label": "Seed"
     },
     "speed": {
-     "label": "Bilis"
+     "label": "Dalas"
     }
    }
   },
@@ -2691,9 +2714,12 @@
    }
   },
   "palettemap": {
-   "description": "Kinukulayan muli ang bawat pixel ng pinakamalapit na kulay mula sa maliit na palette, para sa retro na dating.",
+   "description": "Itinatapat ang bawat pixel sa pinakamalapit na kulay sa palette na may hanggang walong kulay. Hinahalo ng Alpha ang mga nakatapat na kulay sa orihinal na layer.",
    "name": "Mapa ng Palette",
    "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
     "color1": {
      "label": "Kulay 1"
     },
@@ -2708,6 +2734,15 @@
     },
     "color5": {
      "label": "Kulay 5"
+    },
+    "color6": {
+     "label": "Kulay 6"
+    },
+    "color7": {
+     "label": "Kulay 7"
+    },
+    "color8": {
+     "label": "Kulay 8"
     },
     "colors": {
      "label": "Mga Kulay"
@@ -2803,7 +2838,7 @@
      "label": "I-invert"
     },
     "reach": {
-     "label": "Distansya"
+     "label": "Paloob/palabas"
     }
    }
   },
@@ -3265,20 +3300,26 @@
    }
   },
   "replacecolor": {
-   "description": "Pinapalitan ang isang kulay sa layer ng iba, habang pinapanatili ang liwanag at lilim ng orihinal.",
+   "description": "Pinapalitan ang isang kulay ng iba. Kinokontrol ng Alpha ang lakas ng pagpapalit; pinapanatili ng Lock Luminance ang liwanag at anino ng orihinal.",
    "name": "Palitan ang Kulay",
    "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
     "choke": {
      "label": "Choke"
     },
     "feather": {
      "label": "Feather"
     },
+    "lockLuminance": {
+     "label": "I-lock ang luminance"
+    },
     "source": {
-     "label": "Mula sa"
+     "label": "Kulay na papalitan"
     },
     "target": {
-     "label": "Papunta sa"
+     "label": "Bagong kulay"
     },
     "threshold": {
      "label": "Threshold"
@@ -3380,6 +3421,9 @@
     },
     "evolution": {
      "label": "Evolution"
+    },
+    "octaves": {
+     "label": "Mga octave"
     },
     "roughness": {
      "label": "Pagkamagaspang"
@@ -3508,7 +3552,7 @@
    "name": "Pagpapatalas",
    "params": {
     "amount": {
-     "label": "Dami"
+     "label": "Lakas"
     },
     "radius": {
      "label": "Radius"
@@ -3589,13 +3633,13 @@
   },
   "solid": {
    "description": "Naglalagay ng isang kulay sa ibabaw ng layer, pinapanatili ang hugis nito, na may pagpipilian ng blending mode.",
-   "name": "Overlay ng Kulay",
+   "name": "Solid na kulay",
    "params": {
     "amount": {
-     "label": "Dami"
+     "label": "Alpha"
     },
     "blend": {
-     "label": "Blend",
+     "label": "Blending mode",
      "options": [
       "Normal",
       "Multiply",
@@ -3617,7 +3661,7 @@
    }
   },
   "spherize": {
-   "description": "Binabaluktot ang layer sa paligid ng harap ng isang bola.",
+   "description": "Binabalot ang layer sa isang sphere gamit ang front projection o equirectangular texture.",
    "name": "Spherize",
    "params": {
     "coverage": {
@@ -3631,6 +3675,13 @@
     },
     "position": {
      "label": "Posisyon"
+    },
+    "projection": {
+     "label": "Proyeksyon",
+     "options": [
+      "Harap",
+      "Equirectangular"
+     ]
     },
     "radius": {
      "label": "Radius"
@@ -3770,11 +3821,18 @@
    }
   },
   "squeeze": {
-   "description": "Pinipisil ang layer sa isang axis habang hinihila ito sa kabila. Pinapalitan ng mga negatibong value ang mga axis.",
+   "description": "Pinipisil ang gitna ng layer papasok kapag positibo ang Lakas at pinauslog ito palabas kapag negatibo ang Lakas. Pinapanatili ng Legacy ang hugis ng mas lumang proyekto.",
    "name": "Pisil",
    "params": {
-    "strength": {
+    "amount": {
      "label": "Lakas"
+    },
+    "shape": {
+     "label": "Hugis",
+     "options": [
+      "Pisil/Lobo",
+      "Legacy"
+     ]
     }
    }
   },
@@ -3823,7 +3881,7 @@
    }
   },
   "starfield": {
-   "description": "Pinupuno ang mga opaque na bahagi ng layer ng malalim na field ng mga bituin sa ilang layer na gumagalaw sa iba't ibang bilis.",
+   "description": "Pinupuno ang opaque na bahagi ng layer ng malalim na field ng mga bituin. Gumagalaw ang Offset sa field, at mas malayo ang galaw ng malalapit na bituin kaysa sa malalayo.",
    "name": "Starfield",
    "params": {
     "brightness": {
@@ -3988,6 +4046,9 @@
     "punch": {
      "label": "Butasin"
     },
+    "screenSpace": {
+     "label": "Screen space"
+    },
     "smoothing": {
      "label": "Pagpapakinis"
     },
@@ -4037,7 +4098,7 @@
    }
   },
   "temperature": {
-   "description": "Pinapainit o pinapalamig ang larawan ayon sa temperatura ng kulay sa kelvin (6500 K ay hindi nagbabago), pinapanatili ang liwanag.",
+   "description": "Pinapainit o pinapalamig ang larawan gaya ng ilaw na may temperatura ng kulay sa kelvin; hindi binabago ng 6500 K ang larawan.",
    "name": "Temperatura ng Kulay",
    "params": {
     "kelvin": {
@@ -4049,7 +4110,7 @@
    }
   },
   "textprogress": {
-   "description": "Ipinapakita ang text layer nang paisa-isa, ayon sa character, salita o linya, kung saan bawat piraso ay lumalabas, nag-fade, dumudulas, lumalaki, lumiliit o lumilinaw sa posisyon.",
+   "description": "Ipinapakita ang teksto sa pagitan ng Simula at Wakas, ayon sa character, salita o linya, na may opsyonal na fade, slide, scaling o blur.",
    "name": "Pag-usad ng Teksto",
    "params": {
     "appearance": {
@@ -4079,13 +4140,16 @@
      "label": "Distansya"
     },
     "progress": {
-     "label": "Pag-usad"
+     "label": "Wakas"
     },
     "seed": {
      "label": "Seed"
     },
     "softness": {
      "label": "Lambot"
+    },
+    "start": {
+     "label": "Simula"
     },
     "unit": {
      "label": "Batay sa",
@@ -4104,9 +4168,12 @@
    }
   },
   "textrandomizer": {
-   "description": "Pinapalitan ang mga character ng text layer ng random na letra, numero o simbolo na patuloy na nagbabago. Itaas ang Progress para pumasok ang totoong teksto, isa-isa kada character.",
+   "description": "Random na pinapalitan ang Dami ng mga character sa pagitan ng Simula at Wakas. I-animate ang Evolution o taasan ang bilis para baguhin ang mga kapalit; ibinabalik sila ng Ibunyag sa orihinal na teksto.",
    "name": "Randomizer ng Teksto",
    "params": {
+    "amount": {
+     "label": "Dami"
+    },
     "characters": {
      "label": "Custom"
     },
@@ -4131,17 +4198,26 @@
       "Random"
      ]
     },
+    "end": {
+     "label": "Wakas"
+    },
+    "evolution": {
+     "label": "Evolution"
+    },
     "keepSpaces": {
      "label": "Panatilihin ang mga puwang"
     },
     "progress": {
-     "label": "Pag-usad"
+     "label": "Ibunyag"
     },
     "seed": {
      "label": "Seed"
     },
     "speed": {
      "label": "Bilis"
+    },
+    "start": {
+     "label": "Simula"
     }
    },
    "presets": {
@@ -4149,9 +4225,16 @@
    }
   },
   "texttransform": {
-   "description": "Ginagalaw, pinalalaki, pinaiikot, pinapalabo at kinukulayan ang mga titik, salita o linya ng isang layer ng teksto na nasa loob ng isang range. Ilipat ang range gamit ang Offset para gumalaw ang pagbabago sa buong teksto.",
+   "description": "Inililipat, ini-scale, iniikot, pinapalabo at pinapakulay ang mga letra, salita o linya sa loob ng range. Itinatakda ng Anchor kung ang scaling at rotation ay gagamit ng bawat component o ng gitna ng layer. Ilipat ang range gamit ang Offset para gumalaw ang pagbabago sa teksto.",
    "name": "Transform ng Teksto",
    "params": {
+    "anchor": {
+     "label": "Anchor",
+     "options": [
+      "Component",
+      "Layer"
+     ]
+    },
     "end": {
      "label": "Wakas"
     },
@@ -4214,6 +4297,23 @@
    "description": "Purong itim at puti, nahahati batay sa liwanag.",
    "name": "Threshold",
    "params": {
+    "blend": {
+     "label": "Blending mode",
+     "options": [
+      "Normal",
+      "Multiply",
+      "Screen",
+      "Overlay",
+      "Soft light",
+      "Hard light",
+      "Add",
+      "Darken",
+      "Lighten",
+      "Difference",
+      "Color dodge",
+      "Color burn"
+     ]
+    },
     "invert": {
      "label": "Baliktarin"
     },
@@ -4268,14 +4368,11 @@
    }
   },
   "tiles": {
-   "description": "Inuulit ang layer sa pattern ng tile na pumupuno sa screen, na may opsyonal na mirroring, offset ng row at pag-ikot.",
+   "description": "Inuulit ang layer para mapuno ang screen. Taasan ang Crop para mas maliit ang mga tile, may opsyonal na mirroring, row offset at rotation. Pinapanatili ng Legacy Scale ang mga lumang proyekto.",
    "name": "Mga Tile",
    "params": {
     "angle": {
      "label": "Anggulo"
-    },
-    "crop": {
-     "label": "Crop"
     },
     "mirror": {
      "label": "Mirror"
@@ -4283,8 +4380,18 @@
     "offset": {
      "label": "Offset"
     },
+    "sizing": {
+     "label": "Sizing",
+     "options": [
+      "Crop",
+      "Legacy scale"
+     ]
+    },
     "vertical": {
      "label": "Offset nang patayo"
+    },
+    "zoom": {
+     "label": "Crop"
     }
    }
   },
@@ -4347,7 +4454,7 @@
    "name": "Quantization ng Oras",
    "params": {
     "fps": {
-     "label": "Frame Rate"
+     "label": "Hakbang/seg"
     }
    }
   },
@@ -4406,7 +4513,7 @@
    }
   },
   "tunnel": {
-   "description": "Pinapaligiran ng layer ang walang katapusang tunnel at lumilipad sa loob nito.",
+   "description": "Binabalot ang layer sa isang walang katapusang tunnel at lumilipad sa loob nito. Inililipat ng phase ang texture sa haba nito.",
    "name": "Tunnel",
    "params": {
     "fog": {
@@ -4414,6 +4521,9 @@
     },
     "fogColor": {
      "label": "Kulay ng fog"
+    },
+    "phase": {
+     "label": "Phase"
     },
     "position": {
      "label": "Posisyon"

@@ -42,9 +42,12 @@
    }
   },
   "backdrop": {
-   "description": "Rellena la capa con lo que se dibuja debajo, así los efectos siguientes cambian las capas de abajo. Mezcla devuelve el relleno propio de la capa.",
+   "description": "Copia lo que se dibuja debajo de la capa para que los efectos posteriores puedan modificarlo. Enmascarar a la capa limita la copia a las partes opacas de la capa. Mezcla recupera el relleno de la capa.",
    "name": "Capa de ajuste",
    "params": {
+    "mask": {
+     "label": "Enmascarar a la capa"
+    },
     "mix": {
      "label": "Mezcla"
     }
@@ -90,7 +93,7 @@
    "name": "Parpadeo",
    "params": {
     "frequency": {
-     "label": "Parpadeos por segundo"
+     "label": "Frecuencia"
     }
    }
   },
@@ -119,9 +122,16 @@
    }
   },
   "blocknoise": {
-   "description": "Parpadea bloques de ruido aleatorios sobre la capa, como una señal digital dañada.",
+   "description": "Hace parpadear bloques de ruido aleatorios sobre la capa. Multiplicar modula los colores existentes; Sumar les añade ruido. Congelar mantiene el patrón fijo.",
    "name": "Ruido en bloques",
    "params": {
+    "blending": {
+     "label": "Modo de fusión",
+     "options": [
+      "Sumar",
+      "Multiplicar"
+     ]
+    },
     "blockSize": {
      "label": "Tamaño"
     },
@@ -379,6 +389,9 @@
     },
     "punch": {
      "label": "Perforar"
+    },
+    "screenSpace": {
+     "label": "Espacio de pantalla"
     },
     "stretch": {
      "label": "Estiramiento"
@@ -950,14 +963,17 @@
    }
   },
   "dissolve": {
-   "description": "La capa se deshace en motas aleatorias.",
+   "description": "Elimina píxeles o bloques aleatorios de la capa. Anima la intensidad para crear una transición de disolución; Semilla elige el patrón y Tamaño define el tamaño de cada partícula.",
    "name": "Disolver",
    "params": {
     "grain": {
      "label": "Tamaño"
     },
     "progress": {
-     "label": "Progreso"
+     "label": "Intensidad"
+    },
+    "seed": {
+     "label": "Semilla"
     }
    }
   },
@@ -1166,8 +1182,8 @@
    "description": "Envuelve la capa alrededor de una esfera que puedes comprimir y aplanar.",
    "name": "Elipsoide",
    "params": {
-    "flatten": {
-     "label": "Aplanar"
+    "flattenRatio": {
+     "label": "Aplanamiento"
     },
     "light": {
      "label": "Ángulo de luz"
@@ -1199,7 +1215,7 @@
     "shine": {
      "label": "Brillo"
     },
-    "squeeze": {
+    "squeezeRatio": {
      "label": "Compresión"
     }
    }
@@ -1244,11 +1260,18 @@
    }
   },
   "feather": {
-   "description": "Suaviza los bordes de las partes opacas de la capa desvaneciéndolos hacia el contorno.",
+   "description": "Suaviza los bordes alfa de la capa. Hacia dentro difumina hacia el contorno existente; Desenfocar alfa también extiende el borde suavizado hacia fuera.",
    "name": "Pluma",
    "params": {
     "blur": {
      "label": "Intensidad"
+    },
+    "mode": {
+     "label": "Bordes",
+     "options": [
+      "Hacia dentro",
+      "Desenfocar alfa"
+     ]
     }
    }
   },
@@ -1335,7 +1358,7 @@
      "label": "Semilla"
     },
     "speed": {
-     "label": "Velocidad"
+     "label": "Frecuencia"
     }
    }
   },
@@ -2691,9 +2714,12 @@
    }
   },
   "palettemap": {
-   "description": "Repinta cada píxel con el color más cercano de una paleta pequeña para un estilo retro.",
+   "description": "Asigna a cada píxel el color más cercano de una paleta de hasta ocho colores. Alfa mezcla los colores asignados con la capa original.",
    "name": "Mapa de paleta",
    "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
     "color1": {
      "label": "Color 1"
     },
@@ -2708,6 +2734,15 @@
     },
     "color5": {
      "label": "Color 5"
+    },
+    "color6": {
+     "label": "Color 6"
+    },
+    "color7": {
+     "label": "Color 7"
+    },
+    "color8": {
+     "label": "Color 8"
     },
     "colors": {
      "label": "Colores"
@@ -2803,7 +2838,7 @@
      "label": "Invertir"
     },
     "reach": {
-     "label": "Distancia"
+     "label": "Contraer/Expandir"
     }
    }
   },
@@ -3265,20 +3300,26 @@
    }
   },
   "replacecolor": {
-   "description": "Cambia un color de la capa por otro y conserva las luces y sombras del original.",
+   "description": "Reemplaza un color por otro. Alfa controla la intensidad del reemplazo; Bloquear luminancia conserva las luces y sombras del original.",
    "name": "Reemplazar color",
    "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
     "choke": {
      "label": "Contracción"
     },
     "feather": {
      "label": "Difuminado"
     },
+    "lockLuminance": {
+     "label": "Bloquear luminancia"
+    },
     "source": {
-     "label": "De"
+     "label": "Color a reemplazar"
     },
     "target": {
-     "label": "A"
+     "label": "Color nuevo"
     },
     "threshold": {
      "label": "Umbral"
@@ -3380,6 +3421,9 @@
     },
     "evolution": {
      "label": "Evolución"
+    },
+    "octaves": {
+     "label": "Octavas"
     },
     "roughness": {
      "label": "Rugosidad"
@@ -3508,7 +3552,7 @@
    "name": "Enfocar",
    "params": {
     "amount": {
-     "label": "Cantidad"
+     "label": "Intensidad"
     },
     "radius": {
      "label": "Radio"
@@ -3589,13 +3633,13 @@
   },
   "solid": {
    "description": "Coloca un color sobre la capa, conservando su forma, con distintos modos de fusión.",
-   "name": "Superposición de color",
+   "name": "Color sólido",
    "params": {
     "amount": {
-     "label": "Cantidad"
+     "label": "Alfa"
     },
     "blend": {
-     "label": "Fusión",
+     "label": "Modo de fusión",
      "options": [
       "Normal",
       "Multiplicar",
@@ -3617,7 +3661,7 @@
    }
   },
   "spherize": {
-   "description": "Curva la capa alrededor de la parte frontal de una esfera.",
+   "description": "Envuelve la capa en una esfera con una proyección frontal o una textura equirectangular.",
    "name": "Esferizar",
    "params": {
     "coverage": {
@@ -3631,6 +3675,13 @@
     },
     "position": {
      "label": "Posición"
+    },
+    "projection": {
+     "label": "Proyección",
+     "options": [
+      "Frontal",
+      "Equirectangular"
+     ]
     },
     "radius": {
      "label": "Radio"
@@ -3770,11 +3821,18 @@
    }
   },
   "squeeze": {
-   "description": "Comprime la capa a lo largo de un eje mientras la estira a lo largo del otro. Los valores negativos intercambian los ejes.",
+   "description": "Pellizca el centro de la capa hacia dentro con intensidad positiva y lo abomba hacia fuera con intensidad negativa. Heredado conserva la forma de proyectos anteriores.",
    "name": "Compresión",
    "params": {
-    "strength": {
+    "amount": {
      "label": "Intensidad"
+    },
+    "shape": {
+     "label": "Forma",
+     "options": [
+      "Pellizcar/Abombar",
+      "Heredado"
+     ]
     }
    }
   },
@@ -3823,7 +3881,7 @@
    }
   },
   "starfield": {
-   "description": "Rellena las partes opacas de la capa con un profundo campo de estrellas en varias capas que se mueven a distintas velocidades.",
+   "description": "Llena las partes opacas de la capa con un campo profundo de estrellas. Desplazamiento recorre el campo, y las estrellas cercanas se mueven más que las lejanas.",
    "name": "Campo de estrellas",
    "params": {
     "brightness": {
@@ -3988,6 +4046,9 @@
     "punch": {
      "label": "Perforar"
     },
+    "screenSpace": {
+     "label": "Espacio de pantalla"
+    },
     "smoothing": {
      "label": "Suavizado"
     },
@@ -4037,7 +4098,7 @@
    }
   },
   "temperature": {
-   "description": "Da un tono cálido o frío a la imagen como la luz de una temperatura de color en kelvin (6500 K la deja igual), conservando su brillo.",
+   "description": "Da un tono más cálido o frío a la imagen como la luz de una temperatura de color en kelvin; 6500 K la deja igual.",
    "name": "Temperatura de color",
    "params": {
     "kelvin": {
@@ -4049,7 +4110,7 @@
    }
   },
   "textprogress": {
-   "description": "Muestra una capa de texto pieza por pieza, por carácter, palabra o línea, y cada pieza aparece con un salto, desvanecida, deslizada, ampliada, reducida o enfocada en su lugar.",
+   "description": "Muestra el texto entre Inicio y Fin, por carácter, palabra o línea, con fundidos, deslizamientos, escalado o desenfoque opcionales.",
    "name": "Progreso de texto",
    "params": {
     "appearance": {
@@ -4079,13 +4140,16 @@
      "label": "Distancia"
     },
     "progress": {
-     "label": "Progreso"
+     "label": "Fin"
     },
     "seed": {
      "label": "Semilla"
     },
     "softness": {
      "label": "Suavidad"
+    },
+    "start": {
+     "label": "Inicio"
     },
     "unit": {
      "label": "Basado en",
@@ -4104,9 +4168,12 @@
    }
   },
   "textrandomizer": {
-   "description": "Cambia los caracteres de una capa de texto por letras, números o símbolos aleatorios que no dejan de cambiar. Sube Progreso para que el texto real se asiente, carácter por carácter.",
+   "description": "Reemplaza al azar la cantidad indicada de caracteres entre Inicio y Fin. Anima la evolución o sube la velocidad para cambiar los reemplazos; Revelar los devuelve al texto original.",
    "name": "Texto aleatorio",
    "params": {
+    "amount": {
+     "label": "Cantidad"
+    },
     "characters": {
      "label": "Personalizado"
     },
@@ -4131,17 +4198,26 @@
       "Aleatorio"
      ]
     },
+    "end": {
+     "label": "Fin"
+    },
+    "evolution": {
+     "label": "Evolución"
+    },
     "keepSpaces": {
      "label": "Mantener espacios"
     },
     "progress": {
-     "label": "Progreso"
+     "label": "Revelar"
     },
     "seed": {
      "label": "Semilla"
     },
     "speed": {
      "label": "Velocidad"
+    },
+    "start": {
+     "label": "Inicio"
     }
    },
    "presets": {
@@ -4149,9 +4225,16 @@
    }
   },
   "texttransform": {
-   "description": "Mueve, escala, gira, desvanece y tiñe las letras, palabras o líneas de una capa de texto que estén dentro de un rango. Mueve el rango con Desplazamiento para que el cambio recorra el texto.",
+   "description": "Mueve, escala, gira, desvanece y tiñe letras, palabras o líneas dentro de un rango. Ancla define si el escalado y la rotación usan cada componente o el centro de la capa. Mueve el rango con Desplazamiento para que el cambio recorra el texto.",
    "name": "Transformar texto",
    "params": {
+    "anchor": {
+     "label": "Ancla",
+     "options": [
+      "Componente",
+      "Capa"
+     ]
+    },
     "end": {
      "label": "Fin"
     },
@@ -4214,6 +4297,23 @@
    "description": "Blanco y negro puro, dividido por un nivel de brillo.",
    "name": "Umbral",
    "params": {
+    "blend": {
+     "label": "Modo de fusión",
+     "options": [
+      "Normal",
+      "Multiplicar",
+      "Trama",
+      "Superponer",
+      "Luz suave",
+      "Luz fuerte",
+      "Añadir",
+      "Oscurecer",
+      "Aclarar",
+      "Diferencia",
+      "Sobreexponer color",
+      "Subexponer color"
+     ]
+    },
     "invert": {
      "label": "Invertir"
     },
@@ -4268,14 +4368,11 @@
    }
   },
   "tiles": {
-   "description": "Repite la capa en un patrón de mosaicos que llena la pantalla, con reflejo, desplazamiento de filas y rotación opcionales.",
+   "description": "Repite la capa para llenar la pantalla. Aumenta Recorte para crear mosaicos más pequeños, con reflejo, desplazamiento de filas y rotación opcionales. Escala heredada conserva los proyectos anteriores.",
    "name": "Mosaicos",
    "params": {
     "angle": {
      "label": "Ángulo"
-    },
-    "crop": {
-     "label": "Recorte"
     },
     "mirror": {
      "label": "Reflejar"
@@ -4283,8 +4380,18 @@
     "offset": {
      "label": "Desplazamiento"
     },
+    "sizing": {
+     "label": "Tamaño",
+     "options": [
+      "Recorte",
+      "Escala heredada"
+     ]
+    },
     "vertical": {
      "label": "Desplazar verticalmente"
+    },
+    "zoom": {
+     "label": "Recorte"
     }
    }
   },
@@ -4347,7 +4454,7 @@
    "name": "Cuantización de tiempo",
    "params": {
     "fps": {
-     "label": "Velocidad de fotogramas"
+     "label": "Pasos/s"
     }
    }
   },
@@ -4406,7 +4513,7 @@
    }
   },
   "tunnel": {
-   "description": "Forra un túnel sin fin con la capa y lo atraviesa volando.",
+   "description": "Forra un túnel infinito con la capa y vuela a través de él. La fase desplaza la textura a lo largo.",
    "name": "Túnel",
    "params": {
     "fog": {
@@ -4414,6 +4521,9 @@
     },
     "fogColor": {
      "label": "Color de niebla"
+    },
+    "phase": {
+     "label": "Fase"
     },
     "position": {
      "label": "Posición"

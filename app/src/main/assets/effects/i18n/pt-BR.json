@@ -42,9 +42,12 @@
    }
   },
   "backdrop": {
-   "description": "Preenche a camada com o que é desenhado abaixo dela, então os efeitos seguintes alteram as camadas de baixo. Mistura traz de volta o preenchimento da própria camada.",
+   "description": "Copia o que é desenhado sob a camada para que efeitos posteriores possam alterá-lo. Máscara para a camada limita a cópia às partes opacas da camada. Mistura restaura o preenchimento da camada.",
    "name": "Camada de ajuste",
    "params": {
+    "mask": {
+     "label": "Máscara para a camada"
+    },
     "mix": {
      "label": "Mistura"
     }
@@ -90,7 +93,7 @@
    "name": "Piscar",
    "params": {
     "frequency": {
-     "label": "Piscadas por segundo"
+     "label": "Frequência"
     }
    }
   },
@@ -119,9 +122,16 @@
    }
   },
   "blocknoise": {
-   "description": "Faz piscar blocos aleatórios de ruído sobre a camada, como um sinal digital com defeito.",
+   "description": "Pisca blocos aleatórios de ruído sobre a camada. Multiplicar modula as cores existentes; Adicionar soma ruído a elas. Congelar mantém o padrão fixo.",
    "name": "Ruído em blocos",
    "params": {
+    "blending": {
+     "label": "Modo de mesclagem",
+     "options": [
+      "Adicionar",
+      "Multiplicar"
+     ]
+    },
     "blockSize": {
      "label": "Tamanho"
     },
@@ -379,6 +389,9 @@
     },
     "punch": {
      "label": "Vazado"
+    },
+    "screenSpace": {
+     "label": "Espaço da tela"
     },
     "stretch": {
      "label": "Alongamento"
@@ -950,14 +963,17 @@
    }
   },
   "dissolve": {
-   "description": "A camada se desfaz em pontos aleatórios.",
+   "description": "Remove pixels ou blocos aleatórios da camada. Anime a Intensidade para uma transição de dissolução; a Semente escolhe o padrão e o Tamanho define o tamanho de cada partícula.",
    "name": "Dissolução",
    "params": {
     "grain": {
      "label": "Tamanho"
     },
     "progress": {
-     "label": "Progresso"
+     "label": "Intensidade"
+    },
+    "seed": {
+     "label": "Semente"
     }
    }
   },
@@ -1166,8 +1182,8 @@
    "description": "Envolve a camada em uma esfera que você pode comprimir e achatar.",
    "name": "Elipsoide",
    "params": {
-    "flatten": {
-     "label": "Achatar"
+    "flattenRatio": {
+     "label": "Achatamento"
     },
     "light": {
      "label": "Ângulo da luz"
@@ -1199,7 +1215,7 @@
     "shine": {
      "label": "Brilho"
     },
-    "squeeze": {
+    "squeezeRatio": {
      "label": "Compressão"
     }
    }
@@ -1244,11 +1260,18 @@
    }
   },
   "feather": {
-   "description": "Suaviza as bordas das partes opacas da camada, esmaecendo-as em direção ao contorno.",
+   "description": "Suaviza as bordas alfa da camada. Para dentro aplica o esmaecimento dentro do contorno existente; Desfoque alfa também espalha a borda suavizada para fora.",
    "name": "Suavizar bordas",
    "params": {
     "blur": {
      "label": "Intensidade"
+    },
+    "mode": {
+     "label": "Bordas",
+     "options": [
+      "Para dentro",
+      "Desfoque alfa"
+     ]
     }
    }
   },
@@ -1335,7 +1358,7 @@
      "label": "Semente"
     },
     "speed": {
-     "label": "Velocidade"
+     "label": "Frequência"
     }
    }
   },
@@ -2691,9 +2714,12 @@
    }
   },
   "palettemap": {
-   "description": "Repinta cada pixel com a cor mais próxima de uma pequena paleta, para um visual retrô.",
+   "description": "Mapeia cada pixel para a cor mais próxima em uma paleta de até oito cores. Alfa mistura as cores mapeadas com a camada original.",
    "name": "Mapa de paleta",
    "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
     "color1": {
      "label": "Cor 1"
     },
@@ -2708,6 +2734,15 @@
     },
     "color5": {
      "label": "Cor 5"
+    },
+    "color6": {
+     "label": "Cor 6"
+    },
+    "color7": {
+     "label": "Cor 7"
+    },
+    "color8": {
+     "label": "Cor 8"
     },
     "colors": {
      "label": "Cores"
@@ -2803,7 +2838,7 @@
      "label": "Inverter"
     },
     "reach": {
-     "label": "Distância"
+     "label": "Contração/Expansão"
     }
    }
   },
@@ -3265,20 +3300,26 @@
    }
   },
   "replacecolor": {
-   "description": "Troca uma cor da camada por outra, mantendo a luz e a sombra do original.",
+   "description": "Substitui uma cor por outra. Alfa controla a intensidade da substituição; Bloquear luminância mantém a luz e a sombra do original.",
    "name": "Substituir cor",
    "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
     "choke": {
      "label": "Contração"
     },
     "feather": {
      "label": "Desvanecimento"
     },
+    "lockLuminance": {
+     "label": "Bloquear luminância"
+    },
     "source": {
-     "label": "De"
+     "label": "Cor a substituir"
     },
     "target": {
-     "label": "Para"
+     "label": "Nova cor"
     },
     "threshold": {
      "label": "Limite"
@@ -3380,6 +3421,9 @@
     },
     "evolution": {
      "label": "Evolução"
+    },
+    "octaves": {
+     "label": "Oitavas"
     },
     "roughness": {
      "label": "Aspereza"
@@ -3589,13 +3633,13 @@
   },
   "solid": {
    "description": "Aplica uma cor sobre a camada, mantendo a forma dela, com opções de modo de mesclagem.",
-   "name": "Sobreposição de cor",
+   "name": "Cor sólida",
    "params": {
     "amount": {
-     "label": "Intensidade"
+     "label": "Alfa"
     },
     "blend": {
-     "label": "Mesclagem",
+     "label": "Modo de mesclagem",
      "options": [
       "Normal",
       "Multiplicar",
@@ -3617,7 +3661,7 @@
    }
   },
   "spherize": {
-   "description": "Curva a camada em volta da frente de uma bola.",
+   "description": "Envolve a camada em uma esfera usando uma projeção frontal ou uma textura equirretangular.",
    "name": "Esferizar",
    "params": {
     "coverage": {
@@ -3631,6 +3675,13 @@
     },
     "position": {
      "label": "Posição"
+    },
+    "projection": {
+     "label": "Projeção",
+     "options": [
+      "Frontal",
+      "Equirretangular"
+     ]
     },
     "radius": {
      "label": "Raio"
@@ -3770,11 +3821,18 @@
    }
   },
   "squeeze": {
-   "description": "Comprime a camada em um eixo enquanto a estica no outro. Valores negativos invertem os eixos.",
+   "description": "Comprime o meio da camada para dentro com Intensidade positiva e o expande para fora com Intensidade negativa. Legado preserva a forma de projetos mais antigos.",
    "name": "Compressão",
    "params": {
-    "strength": {
+    "amount": {
      "label": "Intensidade"
+    },
+    "shape": {
+     "label": "Forma",
+     "options": [
+      "Comprimir/Expandir",
+      "Legado"
+     ]
     }
    }
   },
@@ -3823,7 +3881,7 @@
    }
   },
   "starfield": {
-   "description": "Preenche as partes opacas da camada com um campo profundo de estrelas em várias camadas que se movem em velocidades diferentes.",
+   "description": "Preenche as partes opacas da camada com um campo profundo de estrelas. O deslocamento percorre o campo, com estrelas próximas se movendo mais que as distantes.",
    "name": "Campo de estrelas",
    "params": {
     "brightness": {
@@ -3988,6 +4046,9 @@
     "punch": {
      "label": "Recortar"
     },
+    "screenSpace": {
+     "label": "Espaço da tela"
+    },
     "smoothing": {
      "label": "Suavização"
     },
@@ -4037,7 +4098,7 @@
    }
   },
   "temperature": {
-   "description": "Deixa a imagem mais quente ou mais fria como a luz de uma temperatura de cor em kelvin (6500 K não altera nada), mantendo o brilho.",
+   "description": "Aquece ou esfria a imagem como a luz de uma temperatura de cor em kelvin; 6500 K a deixa inalterada.",
    "name": "Temperatura de cor",
    "params": {
     "kelvin": {
@@ -4049,7 +4110,7 @@
    }
   },
   "textprogress": {
-   "description": "Mostra uma camada de texto peça por peça, por caractere, palavra ou linha, cada peça surgindo com pop, fade, deslizando, crescendo, encolhendo ou desfocando no lugar.",
+   "description": "Mostra o texto entre Início e Fim, por caractere, palavra ou linha, com esmaecimentos, deslizamentos, escala ou desfoque opcionais.",
    "name": "Progresso do texto",
    "params": {
     "appearance": {
@@ -4079,13 +4140,16 @@
      "label": "Distância"
     },
     "progress": {
-     "label": "Progresso"
+     "label": "Fim"
     },
     "seed": {
      "label": "Semente"
     },
     "softness": {
      "label": "Suavidade"
+    },
+    "start": {
+     "label": "Início"
     },
     "unit": {
      "label": "Com base em",
@@ -4104,9 +4168,12 @@
    }
   },
   "textrandomizer": {
-   "description": "Troca os caracteres de uma camada de texto por letras, números ou símbolos aleatórios que ficam mudando. Aumente Progresso para o texto real se firmar, caractere por caractere.",
+   "description": "Substitui aleatoriamente uma Quantidade dos caracteres entre Início e Fim. Anime a Evolução ou aumente a Velocidade para mudar as substituições; Revelar as estabiliza de volta ao texto original.",
    "name": "Texto aleatório",
    "params": {
+    "amount": {
+     "label": "Quantidade"
+    },
     "characters": {
      "label": "Personalizado"
     },
@@ -4131,17 +4198,26 @@
       "Aleatório"
      ]
     },
+    "end": {
+     "label": "Fim"
+    },
+    "evolution": {
+     "label": "Evolução"
+    },
     "keepSpaces": {
      "label": "Manter espaços"
     },
     "progress": {
-     "label": "Progresso"
+     "label": "Revelar"
     },
     "seed": {
      "label": "Semente"
     },
     "speed": {
      "label": "Velocidade"
+    },
+    "start": {
+     "label": "Início"
     }
    },
    "presets": {
@@ -4149,9 +4225,16 @@
    }
   },
   "texttransform": {
-   "description": "Move, escala, gira, esmaece e tinge as letras, palavras ou linhas de uma camada de texto que ficam dentro de um intervalo. Mova o intervalo com Deslocamento para fazer a mudança percorrer o texto.",
+   "description": "Move, escala, gira, esmaece e tinge letras, palavras ou linhas dentro de um intervalo. A âncora define se a escala e a rotação usam cada componente ou o centro da camada. Mova o intervalo com Deslocamento para fazer a mudança percorrer o texto.",
    "name": "Transformação de texto",
    "params": {
+    "anchor": {
+     "label": "Âncora",
+     "options": [
+      "Componente",
+      "Camada"
+     ]
+    },
     "end": {
      "label": "Fim"
     },
@@ -4214,6 +4297,23 @@
    "description": "Preto e branco puro, dividido por um nível de brilho.",
    "name": "Limiar",
    "params": {
+    "blend": {
+     "label": "Modo de mesclagem",
+     "options": [
+      "Normal",
+      "Multiplicar",
+      "Tela",
+      "Sobrepor",
+      "Luz suave",
+      "Luz intensa",
+      "Adicionar",
+      "Escurecer",
+      "Clarear",
+      "Diferença",
+      "Subexposição de cor",
+      "Superexposição de cor"
+     ]
+    },
     "invert": {
      "label": "Inverter"
     },
@@ -4268,14 +4368,11 @@
    }
   },
   "tiles": {
-   "description": "Repete a camada em um padrão de blocos que preenche a tela, com espelhamento, deslocamento de linha e rotação opcionais.",
+   "description": "Repete a camada para preencher a tela. Aumente Corte para fazer blocos menores, com espelhamento, deslocamento de linha e rotação opcionais. Escala legada mantém projetos antigos.",
    "name": "Blocos",
    "params": {
     "angle": {
      "label": "Ângulo"
-    },
-    "crop": {
-     "label": "Cortar"
     },
     "mirror": {
      "label": "Espelhar"
@@ -4283,8 +4380,18 @@
     "offset": {
      "label": "Deslocamento"
     },
+    "sizing": {
+     "label": "Dimensionamento",
+     "options": [
+      "Corte",
+      "Escala legada"
+     ]
+    },
     "vertical": {
      "label": "Deslocar verticalmente"
+    },
+    "zoom": {
+     "label": "Corte"
     }
    }
   },
@@ -4347,7 +4454,7 @@
    "name": "Quantização de tempo",
    "params": {
     "fps": {
-     "label": "Taxa de quadros"
+     "label": "Passos/s"
     }
    }
   },
@@ -4406,7 +4513,7 @@
    }
   },
   "tunnel": {
-   "description": "Reveste um túnel infinito com a camada e voa por dentro dele.",
+   "description": "Reveste um túnel infinito com a camada e voa por dentro dele. A fase desloca a textura ao longo do comprimento.",
    "name": "Túnel",
    "params": {
     "fog": {
@@ -4414,6 +4521,9 @@
     },
     "fogColor": {
      "label": "Cor da neblina"
+    },
+    "phase": {
+     "label": "Fase"
     },
     "position": {
      "label": "Posição"

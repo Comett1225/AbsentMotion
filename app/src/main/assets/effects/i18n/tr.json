@@ -42,9 +42,12 @@
    }
   },
   "backdrop": {
-   "description": "Katmanı altındakilerle doldurur; böylece bu efektten sonraki efektler alttaki katmanları etkiler. Karışım, katmanın kendi dolgusunu geri getirir.",
+   "description": "Katmanın altında çizilenleri kopyalar; böylece sonraki efektler bunları değiştirebilir. Katmana maskele kopyayı katmanın opak kısımlarıyla sınırlar; Karışım katman dolgusunu geri getirir.",
    "name": "Ayar Katmanı",
    "params": {
+    "mask": {
+     "label": "Katmana maskele"
+    },
     "mix": {
      "label": "Karışım"
     }
@@ -90,7 +93,7 @@
    "name": "Yanıp Sönme",
    "params": {
     "frequency": {
-     "label": "Saniyedeki Yanıp Sönme"
+     "label": "Frekans"
     }
    }
   },
@@ -119,9 +122,16 @@
    }
   },
   "blocknoise": {
-   "description": "Katmanın üzerinde bozuk bir dijital sinyal gibi rastgele gürültü blokları titretir.",
+   "description": "Katmanın üzerinde rastgele gürültü blokları titreştirir. Çarpma mevcut renkleri modüle eder; Ekle onlara gürültü ekler. Dondur deseni sabit tutar.",
    "name": "Blok gürültüsü",
    "params": {
+    "blending": {
+     "label": "Karışım modu",
+     "options": [
+      "Ekle",
+      "Çarpma"
+     ]
+    },
     "blockSize": {
      "label": "Boyut"
     },
@@ -379,6 +389,9 @@
     },
     "punch": {
      "label": "Delme"
+    },
+    "screenSpace": {
+     "label": "Ekran alanı"
     },
     "stretch": {
      "label": "Uzat"
@@ -950,14 +963,17 @@
    }
   },
   "dissolve": {
-   "description": "Katman rastgele beneklere ayrılır.",
+   "description": "Katmandan rastgele pikseller veya bloklar kaldırır. Çözünme geçişi için Güç'ü canlandırın; Tohum deseni seçer, Boyut ise her beneğin boyutunu ayarlar.",
    "name": "Dağılma",
    "params": {
     "grain": {
      "label": "Boyut"
     },
     "progress": {
-     "label": "İlerleme"
+     "label": "Güç"
+    },
+    "seed": {
+     "label": "Tohum"
     }
    }
   },
@@ -1166,8 +1182,8 @@
    "description": "Katmanı sıkıştırıp düzleştirebileceğiniz bir kürenin etrafına sarar.",
    "name": "Elipsoit",
    "params": {
-    "flatten": {
-     "label": "Düzleştir"
+    "flattenRatio": {
+     "label": "Düzleştirme"
     },
     "light": {
      "label": "Işık açısı"
@@ -1199,8 +1215,8 @@
     "shine": {
      "label": "Parlama"
     },
-    "squeeze": {
-     "label": "Sıkıştır"
+    "squeezeRatio": {
+     "label": "Sıkıştırma"
     }
    }
   },
@@ -1244,11 +1260,18 @@
    }
   },
   "feather": {
-   "description": "Katmanın opak kısımlarının kenarlarını dış çizgiye doğru soldurarak yumuşatır.",
+   "description": "Katmanın alfa kenarlarını yumuşatır. İçe doğru, mevcut dış hattın içine solar; Alfa bulanıklaştır yumuşatılan kenarı dışarıya da taşır.",
    "name": "Tüylendirme",
    "params": {
     "blur": {
      "label": "Güç"
+    },
+    "mode": {
+     "label": "Kenarlar",
+     "options": [
+      "İçe doğru",
+      "Alfa bulanıklaştır"
+     ]
     }
    }
   },
@@ -1329,13 +1352,13 @@
    "name": "Titreme",
    "params": {
     "intensity": {
-     "label": "Yoğunluk"
+     "label": "Güç"
     },
     "seed": {
      "label": "Tohum"
     },
     "speed": {
-     "label": "Hız"
+     "label": "Frekans"
     }
    }
   },
@@ -2691,9 +2714,12 @@
    }
   },
   "palettemap": {
-   "description": "Her pikseli küçük bir paletten en yakın renkle yeniden boyar; retro bir görünüm verir.",
+   "description": "Her pikseli en fazla sekiz renkli bir paletteki en yakın renge eşler. Alfa, eşlenen renkleri orijinal katmanla karıştırır.",
    "name": "Palet eşleme",
    "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
     "color1": {
      "label": "Renk 1"
     },
@@ -2708,6 +2734,15 @@
     },
     "color5": {
      "label": "Renk 5"
+    },
+    "color6": {
+     "label": "Renk 6"
+    },
+    "color7": {
+     "label": "Renk 7"
+    },
+    "color8": {
+     "label": "Renk 8"
     },
     "colors": {
      "label": "Renkler"
@@ -2803,7 +2838,7 @@
      "label": "Ters çevir"
     },
     "reach": {
-     "label": "Mesafe"
+     "label": "İçe/Dışa"
     }
    }
   },
@@ -3265,20 +3300,26 @@
    }
   },
   "replacecolor": {
-   "description": "Katmandaki bir rengi diğeriyle değiştirir, özgün rengin açık ve koyu tonlarını korur.",
+   "description": "Bir rengi başka bir renkle değiştirir. Alfa değiştirme gücünü kontrol eder; Parlaklığı kilitle orijinalin ışık ve gölgesini korur.",
    "name": "Rengi değiştir",
    "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
     "choke": {
      "label": "Daraltma"
     },
     "feather": {
      "label": "Kenar yumuşatma"
     },
+    "lockLuminance": {
+     "label": "Parlaklığı kilitle"
+    },
     "source": {
-     "label": "Kaynak"
+     "label": "Değiştirilecek renk"
     },
     "target": {
-     "label": "Hedef"
+     "label": "Yeni renk"
     },
     "threshold": {
      "label": "Eşik"
@@ -3380,6 +3421,9 @@
     },
     "evolution": {
      "label": "Evrim"
+    },
+    "octaves": {
+     "label": "Oktavlar"
     },
     "roughness": {
      "label": "Pürüzlülük"
@@ -3508,7 +3552,7 @@
    "name": "Keskinleştir",
    "params": {
     "amount": {
-     "label": "Miktar"
+     "label": "Güç"
     },
     "radius": {
      "label": "Yarıçap"
@@ -3589,13 +3633,13 @@
   },
   "solid": {
    "description": "Katmanın şeklini koruyarak üzerine seçilen karışım modlarıyla tek bir renk yerleştirir.",
-   "name": "Renk Kaplama",
+   "name": "Düz renk",
    "params": {
     "amount": {
-     "label": "Miktar"
+     "label": "Alfa"
     },
     "blend": {
-     "label": "Karışım",
+     "label": "Karışım modu",
      "options": [
       "Normal",
       "Çarpma",
@@ -3617,7 +3661,7 @@
    }
   },
   "spherize": {
-   "description": "Katmanı bir topun ön yüzü etrafında büker.",
+   "description": "Katmanı ön projeksiyon veya eşdikdörtgen doku kullanarak bir küreye sarar.",
    "name": "Küreleştir",
    "params": {
     "coverage": {
@@ -3631,6 +3675,13 @@
     },
     "position": {
      "label": "Konum"
+    },
+    "projection": {
+     "label": "Projeksiyon",
+     "options": [
+      "Ön",
+      "Eşdikdörtgen"
+     ]
     },
     "radius": {
      "label": "Yarıçap"
@@ -3770,11 +3821,18 @@
    }
   },
   "squeeze": {
-   "description": "Katmanı bir eksende sıkıştırırken diğer eksende esnetir. Negatif değerler eksenleri yer değiştirir.",
+   "description": "Pozitif Güç katmanın ortasını içe sıkıştırır, negatif Güç dışa şişirir. Eski sürüm eski projelerin şeklini korur.",
    "name": "Sıkıştır",
    "params": {
-    "strength": {
+    "amount": {
      "label": "Güç"
+    },
+    "shape": {
+     "label": "Şekil",
+     "options": [
+      "Sıkıştır/Şişir",
+      "Eski sürüm"
+     ]
     }
    }
   },
@@ -3823,7 +3881,7 @@
    }
   },
   "starfield": {
-   "description": "Katmanın opak kısımlarını, farklı hızlarda hareket eden birkaç katmandan oluşan derin bir yıldız alanıyla doldurur.",
+   "description": "Katmanın opak kısımlarını derin bir yıldız alanıyla doldurur. Kaydırma alanda ilerler; yakın yıldızlar uzak yıldızlardan daha fazla hareket eder.",
    "name": "Yıldız alanı",
    "params": {
     "brightness": {
@@ -3988,6 +4046,9 @@
     "punch": {
      "label": "Oyarak Çıkar"
     },
+    "screenSpace": {
+     "label": "Ekran alanı"
+    },
     "smoothing": {
      "label": "Yumuşatma"
     },
@@ -4037,7 +4098,7 @@
    }
   },
   "temperature": {
-   "description": "Görüntüyü kelvin cinsinden bir renk sıcaklığının ışığı gibi ısıtır veya soğutur (6500 K değiştirmez), parlaklığını korur.",
+   "description": "Görüntüyü kelvin cinsinden bir renk sıcaklığının ışığı gibi ısıtır veya soğutur; 6500 K görüntüyü değiştirmez.",
    "name": "Renk Sıcaklığı",
    "params": {
     "kelvin": {
@@ -4049,7 +4110,7 @@
    }
   },
   "textprogress": {
-   "description": "Bir metin katmanını karakter, sözcük veya satır satır gösterir; her parça yerine otururken belirir, solar, kayar, büyür, küçülür veya netleşir.",
+   "description": "Metni Başlangıç ile Bitiş arasında karakter, kelime veya satır bazında gösterir; isteğe bağlı solmalar, kaydırmalar, ölçekleme veya bulanıklık uygular.",
    "name": "Metin ilerlemesi",
    "params": {
     "appearance": {
@@ -4079,13 +4140,16 @@
      "label": "Mesafe"
     },
     "progress": {
-     "label": "İlerleme"
+     "label": "Bitiş"
     },
     "seed": {
      "label": "Tohum"
     },
     "softness": {
      "label": "Yumuşaklık"
+    },
+    "start": {
+     "label": "Başlangıç"
     },
     "unit": {
      "label": "Şuna göre",
@@ -4104,9 +4168,12 @@
    }
   },
   "textrandomizer": {
-   "description": "Bir metin katmanının karakterlerini sürekli değişen rastgele harfler, sayılar veya simgelerle değiştirir. İlerleme'yi artırarak gerçek metnin karakter karakter yerleşmesini sağlayın.",
+   "description": "Başlangıç ile Bitiş arasındaki karakterlerin Miktar kadarını rastgele değiştirir. Değişimleri değiştirmek için Evrim'i canlandırın veya Hız'ı artırın; Ortaya Çıkar bunları orijinal metne geri döndürür.",
    "name": "Metin rastgeleleştirici",
    "params": {
+    "amount": {
+     "label": "Miktar"
+    },
     "characters": {
      "label": "Özel"
     },
@@ -4131,17 +4198,26 @@
       "Rastgele"
      ]
     },
+    "end": {
+     "label": "Bitiş"
+    },
+    "evolution": {
+     "label": "Evrim"
+    },
     "keepSpaces": {
      "label": "Boşlukları koru"
     },
     "progress": {
-     "label": "İlerleme"
+     "label": "Ortaya çıkar"
     },
     "seed": {
      "label": "Tohum"
     },
     "speed": {
      "label": "Hız"
+    },
+    "start": {
+     "label": "Başlangıç"
     }
    },
    "presets": {
@@ -4149,9 +4225,16 @@
    }
   },
   "texttransform": {
-   "description": "Bir metin katmanının aralığa giren harflerini, kelimelerini veya satırlarını taşır, ölçekler, döndürür, soldurur ve renklendirir. Aralığı Kaydırma ile kaydırarak değişimin metin boyunca ilerlemesini sağlayın.",
+   "description": "Bir aralıktaki harfleri, kelimeleri veya satırları taşır, ölçekler, döndürür, soldurur ve renklendirir. Çapa, ölçekleme ve döndürmenin her bileşeni mi yoksa katmanın merkezini mi kullanacağını belirler. Değişikliğin metin boyunca ilerlemesi için aralığı Kaydırma ile taşıyın.",
    "name": "Metin Dönüştürme",
    "params": {
+    "anchor": {
+     "label": "Çapa",
+     "options": [
+      "Bileşen",
+      "Katman"
+     ]
+    },
     "end": {
      "label": "Bitiş"
     },
@@ -4214,6 +4297,23 @@
    "description": "Saf siyah beyaz, parlaklıkta bölünür.",
    "name": "Eşik",
    "params": {
+    "blend": {
+     "label": "Karışım modu",
+     "options": [
+      "Normal",
+      "Çarpma",
+      "Ekran",
+      "Kaplama",
+      "Yumuşak ışık",
+      "Sert ışık",
+      "Ekle",
+      "Koyulaştır",
+      "Açıklaştır",
+      "Fark",
+      "Renk soldurma",
+      "Renk yakma"
+     ]
+    },
     "invert": {
      "label": "Ters çevir"
     },
@@ -4268,14 +4368,11 @@
    }
   },
   "tiles": {
-   "description": "Katmanı ekranı dolduracak şekilde döşeme deseniyle tekrarlar; isteğe bağlı yansıtma, satır kaydırma ve döndürme sunar.",
+   "description": "Katmanı ekranı dolduracak şekilde tekrarlar. Daha küçük karolar için Kırp değerini artırın; yansıma, satır kaydırma ve döndürme isteğe bağlıdır. Eski Ölçek, eski projeleri korur.",
    "name": "Döşemeler",
    "params": {
     "angle": {
      "label": "Açı"
-    },
-    "crop": {
-     "label": "Kırp"
     },
     "mirror": {
      "label": "Yansıt"
@@ -4283,8 +4380,18 @@
     "offset": {
      "label": "Ofset"
     },
+    "sizing": {
+     "label": "Boyutlandırma",
+     "options": [
+      "Kırp",
+      "Eski ölçek"
+     ]
+    },
     "vertical": {
      "label": "Dikey Ofset"
+    },
+    "zoom": {
+     "label": "Kırp"
     }
    }
   },
@@ -4347,7 +4454,7 @@
    "name": "Zaman Nicemleme",
    "params": {
     "fps": {
-     "label": "Kare hızı"
+     "label": "Adım/sn"
     }
    }
   },
@@ -4406,7 +4513,7 @@
    }
   },
   "tunnel": {
-   "description": "Katmanla sonsuz bir tünel kaplar ve içinden uçar.",
+   "description": "Katmanı sonsuz bir tünel boyunca dizer ve içinden geçer. Faz, dokuyu tünelin uzunluğu boyunca kaydırır.",
    "name": "Tünel",
    "params": {
     "fog": {
@@ -4414,6 +4521,9 @@
     },
     "fogColor": {
      "label": "Sis rengi"
+    },
+    "phase": {
+     "label": "Faz"
     },
     "position": {
      "label": "Konum"

@@ -42,9 +42,12 @@
    }
   },
   "backdrop": {
-   "description": "Tô kín lớp bằng nội dung được vẽ bên dưới, nên các hiệu ứng sau hiệu ứng này sẽ thay đổi các lớp bên dưới. Trộn khôi phục phần tô của chính lớp.",
+   "description": "Sao chép nội dung được vẽ bên dưới lớp để các hiệu ứng sau có thể thay đổi nội dung đó. Mặt nạ theo lớp giới hạn phần sao chép ở vùng đục của lớp. Trộn đưa phần tô của lớp trở lại.",
    "name": "Lớp điều chỉnh",
    "params": {
+    "mask": {
+     "label": "Mặt nạ theo lớp"
+    },
     "mix": {
      "label": "Trộn"
     }
@@ -90,7 +93,7 @@
    "name": "Nháy",
    "params": {
     "frequency": {
-     "label": "Số lần nháy/giây"
+     "label": "Tần số"
     }
    }
   },
@@ -119,9 +122,16 @@
    }
   },
   "blocknoise": {
-   "description": "Nhấp nháy các khối nhiễu ngẫu nhiên trên lớp, như tín hiệu số bị hỏng.",
+   "description": "Nhấp nháy các khối nhiễu ngẫu nhiên trên lớp. Nhân điều biến màu hiện có; Thêm thêm nhiễu vào đó. Đóng băng giữ nguyên hoa văn.",
    "name": "Nhiễu khối",
    "params": {
+    "blending": {
+     "label": "Chế độ hòa trộn",
+     "options": [
+      "Thêm",
+      "Nhân"
+     ]
+    },
     "blockSize": {
      "label": "Kích thước"
     },
@@ -379,6 +389,9 @@
     },
     "punch": {
      "label": "Đục lỗ"
+    },
+    "screenSpace": {
+     "label": "Không gian màn hình"
     },
     "stretch": {
      "label": "Kéo giãn"
@@ -950,14 +963,17 @@
    }
   },
   "dissolve": {
-   "description": "Lớp vỡ thành các đốm ngẫu nhiên.",
+   "description": "Loại bỏ điểm ảnh hoặc khối ngẫu nhiên khỏi lớp. Tạo hiệu ứng cho Cường độ để có chuyển cảnh tan rã; Hạt giống chọn hoa văn và Kích thước đặt kích thước từng hạt.",
    "name": "Tan biến",
    "params": {
     "grain": {
      "label": "Kích thước"
     },
     "progress": {
-     "label": "Tiến trình"
+     "label": "Cường độ"
+    },
+    "seed": {
+     "label": "Hạt giống"
     }
    }
   },
@@ -1166,8 +1182,8 @@
    "description": "Uốn lớp quanh một hình cầu mà bạn có thể bóp và làm dẹt.",
    "name": "Ellipsoid",
    "params": {
-    "flatten": {
-     "label": "Làm dẹt"
+    "flattenRatio": {
+     "label": "Dẹt"
     },
     "light": {
      "label": "Góc sáng"
@@ -1199,8 +1215,8 @@
     "shine": {
      "label": "Độ bóng"
     },
-    "squeeze": {
-     "label": "Bóp"
+    "squeezeRatio": {
+     "label": "Ép"
     }
    }
   },
@@ -1244,11 +1260,18 @@
    }
   },
   "feather": {
-   "description": "Làm mềm các cạnh của phần đục trên lớp bằng cách mờ dần về phía đường viền.",
+   "description": "Làm mềm các cạnh alpha của lớp. Hướng vào mờ dần vào đường viền hiện có; Làm mờ alpha còn lan cạnh đã làm mềm ra ngoài.",
    "name": "Làm mềm viền",
    "params": {
     "blur": {
      "label": "Độ mạnh"
+    },
+    "mode": {
+     "label": "Cạnh",
+     "options": [
+      "Hướng vào",
+      "Làm mờ alpha"
+     ]
     }
    }
   },
@@ -1335,7 +1358,7 @@
      "label": "Seed"
     },
     "speed": {
-     "label": "Tốc độ"
+     "label": "Tần số"
     }
    }
   },
@@ -2691,9 +2714,12 @@
    }
   },
   "palettemap": {
-   "description": "Tô lại từng điểm ảnh bằng màu gần nhất từ một bảng màu nhỏ, tạo vẻ hoài cổ.",
+   "description": "Ánh xạ từng điểm ảnh tới màu gần nhất trong bảng màu tối đa tám màu. Alpha hòa trộn các màu đã ánh xạ với lớp gốc.",
    "name": "Ánh xạ bảng màu",
    "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
     "color1": {
      "label": "Màu 1"
     },
@@ -2708,6 +2734,15 @@
     },
     "color5": {
      "label": "Màu 5"
+    },
+    "color6": {
+     "label": "Màu 6"
+    },
+    "color7": {
+     "label": "Màu 7"
+    },
+    "color8": {
+     "label": "Màu 8"
     },
     "colors": {
      "label": "Màu sắc"
@@ -2803,7 +2838,7 @@
      "label": "Đảo ngược"
     },
     "reach": {
-     "label": "Khoảng cách"
+     "label": "Thu vào/Mở rộng"
     }
    }
   },
@@ -3265,20 +3300,26 @@
    }
   },
   "replacecolor": {
-   "description": "Hoán đổi một màu trong lớp sang màu khác, giữ nguyên vùng sáng và tối của bản gốc.",
+   "description": "Thay thế màu này bằng màu khác. Alpha điều khiển cường độ thay thế; Khóa độ sáng giữ ánh sáng và sắc độ của bản gốc.",
    "name": "Thay màu",
    "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
     "choke": {
      "label": "Siết"
     },
     "feather": {
      "label": "Làm mềm"
     },
+    "lockLuminance": {
+     "label": "Khóa độ sáng"
+    },
     "source": {
-     "label": "Từ màu"
+     "label": "Màu cần thay"
     },
     "target": {
-     "label": "Sang màu"
+     "label": "Màu mới"
     },
     "threshold": {
      "label": "Ngưỡng"
@@ -3380,6 +3421,9 @@
     },
     "evolution": {
      "label": "Tiến hóa"
+    },
+    "octaves": {
+     "label": "Số bậc"
     },
     "roughness": {
      "label": "Độ nhám"
@@ -3508,7 +3552,7 @@
    "name": "Làm nét",
    "params": {
     "amount": {
-     "label": "Mức độ"
+     "label": "Cường độ"
     },
     "radius": {
      "label": "Bán kính"
@@ -3589,13 +3633,13 @@
   },
   "solid": {
    "description": "Phủ một màu lên lớp, giữ nguyên hình dạng, có thể chọn chế độ hòa trộn.",
-   "name": "Phủ màu",
+   "name": "Màu đặc",
    "params": {
     "amount": {
-     "label": "Mức"
+     "label": "Alpha"
     },
     "blend": {
-     "label": "Hòa trộn",
+     "label": "Chế độ hòa trộn",
      "options": [
       "Thường",
       "Nhân",
@@ -3617,7 +3661,7 @@
    }
   },
   "spherize": {
-   "description": "Uốn lớp quanh mặt trước của một quả cầu.",
+   "description": "Bọc lớp lên hình cầu bằng phép chiếu trực diện hoặc kết cấu equirectangular.",
    "name": "Tạo cầu",
    "params": {
     "coverage": {
@@ -3631,6 +3675,13 @@
     },
     "position": {
      "label": "Vị trí"
+    },
+    "projection": {
+     "label": "Phép chiếu",
+     "options": [
+      "Trực diện",
+      "Equirectangular"
+     ]
     },
     "radius": {
      "label": "Bán kính"
@@ -3770,11 +3821,18 @@
    }
   },
   "squeeze": {
-   "description": "Ép lớp theo một trục và kéo giãn theo trục còn lại. Giá trị âm sẽ hoán đổi hai trục.",
+   "description": "Ép phần giữa của lớp vào trong với Cường độ dương và phồng ra ngoài với Cường độ âm. Kiểu cũ giữ nguyên hình dạng của dự án cũ.",
    "name": "Ép",
    "params": {
-    "strength": {
+    "amount": {
      "label": "Cường độ"
+    },
+    "shape": {
+     "label": "Hình dạng",
+     "options": [
+      "Ép/Phồng",
+      "Kiểu cũ"
+     ]
     }
    }
   },
@@ -3823,7 +3881,7 @@
    }
   },
   "starfield": {
-   "description": "Tô các phần mờ đục của lớp bằng một trường sao sâu thẳm gồm nhiều lớp di chuyển với tốc độ khác nhau.",
+   "description": "Lấp đầy các phần đục của lớp bằng một trường sao sâu thẳm. Độ lệch di chuyển qua trường sao, với các ngôi sao gần dịch chuyển nhiều hơn các ngôi sao xa.",
    "name": "Trường sao",
    "params": {
     "brightness": {
@@ -3988,6 +4046,9 @@
     "punch": {
      "label": "Khoét ra"
     },
+    "screenSpace": {
+     "label": "Không gian màn hình"
+    },
     "smoothing": {
      "label": "Làm mượt"
     },
@@ -4037,7 +4098,7 @@
    }
   },
   "temperature": {
-   "description": "Làm ấm hoặc lạnh hình ảnh như ánh sáng có nhiệt độ màu tính bằng kelvin (6500 K giữ nguyên), vẫn giữ độ sáng.",
+   "description": "Làm ấm hoặc lạnh hình ảnh như ánh sáng có nhiệt độ màu tính bằng kelvin; 6500 K giữ nguyên hình ảnh.",
    "name": "Nhiệt độ màu",
    "params": {
     "kelvin": {
@@ -4049,7 +4110,7 @@
    }
   },
   "textprogress": {
-   "description": "Hiện lớp văn bản từng phần một, theo ký tự, từ hoặc dòng, mỗi phần bật ra, mờ dần, trượt, phóng to, thu nhỏ hoặc nét dần vào vị trí.",
+   "description": "Hiển thị văn bản giữa Bắt đầu và Kết thúc, theo ký tự, từ hoặc dòng, kèm tùy chọn mờ dần, trượt, thay đổi tỷ lệ hoặc làm mờ.",
    "name": "Tiến trình văn bản",
    "params": {
     "appearance": {
@@ -4079,13 +4140,16 @@
      "label": "Khoảng cách"
     },
     "progress": {
-     "label": "Tiến trình"
+     "label": "Kết thúc"
     },
     "seed": {
      "label": "Hạt giống"
     },
     "softness": {
      "label": "Độ mềm"
+    },
+    "start": {
+     "label": "Bắt đầu"
     },
     "unit": {
      "label": "Dựa trên",
@@ -4104,9 +4168,12 @@
    }
   },
   "textrandomizer": {
-   "description": "Hoán đổi các ký tự của lớp văn bản thành chữ cái, số hoặc ký hiệu ngẫu nhiên liên tục thay đổi. Tăng Tiến trình để văn bản thật hiện dần vào, theo từng ký tự.",
+   "description": "Thay thế ngẫu nhiên Số lượng ký tự giữa Bắt đầu và Kết thúc. Tạo hiệu ứng cho Tiến hóa hoặc tăng Tốc độ để thay đổi các ký tự thay thế; Hiện dần đưa chúng trở lại văn bản gốc.",
    "name": "Ngẫu nhiên hóa văn bản",
    "params": {
+    "amount": {
+     "label": "Số lượng"
+    },
     "characters": {
      "label": "Tùy chỉnh"
     },
@@ -4131,17 +4198,26 @@
       "Ngẫu nhiên"
      ]
     },
+    "end": {
+     "label": "Kết thúc"
+    },
+    "evolution": {
+     "label": "Tiến hóa"
+    },
     "keepSpaces": {
      "label": "Giữ khoảng trắng"
     },
     "progress": {
-     "label": "Tiến trình"
+     "label": "Hiện dần"
     },
     "seed": {
      "label": "Hạt giống"
     },
     "speed": {
      "label": "Tốc độ"
+    },
+    "start": {
+     "label": "Bắt đầu"
     }
    },
    "presets": {
@@ -4149,9 +4225,16 @@
    }
   },
   "texttransform": {
-   "description": "Di chuyển, thu phóng, xoay, làm mờ dần và nhuộm màu các chữ cái, từ hoặc dòng của lớp văn bản nằm trong một phạm vi. Dịch phạm vi bằng Độ lệch để hiệu ứng lan dần qua văn bản.",
+   "description": "Di chuyển, thay đổi tỷ lệ, xoay, làm mờ và nhuộm màu chữ cái, từ hoặc dòng trong một phạm vi. Điểm neo đặt việc thay đổi tỷ lệ và xoay dùng từng thành phần hay tâm của lớp. Di chuyển phạm vi bằng Độ lệch để thay đổi lan truyền qua văn bản.",
    "name": "Biến đổi văn bản",
    "params": {
+    "anchor": {
+     "label": "Điểm neo",
+     "options": [
+      "Thành phần",
+      "Lớp"
+     ]
+    },
     "end": {
      "label": "Kết thúc"
     },
@@ -4214,6 +4297,23 @@
    "description": "Đen trắng thuần, tách theo độ sáng.",
    "name": "Ngưỡng",
    "params": {
+    "blend": {
+     "label": "Chế độ hòa trộn",
+     "options": [
+      "Bình thường",
+      "Nhân",
+      "Màn hình",
+      "Phủ",
+      "Ánh sáng mềm",
+      "Ánh sáng cứng",
+      "Thêm",
+      "Tối hơn",
+      "Sáng hơn",
+      "Khác biệt",
+      "Làm sáng màu",
+      "Làm tối màu"
+     ]
+    },
     "invert": {
      "label": "Đảo ngược"
     },
@@ -4268,14 +4368,11 @@
    }
   },
   "tiles": {
-   "description": "Lặp lại lớp theo họa tiết ô phủ kín màn hình, kèm tùy chọn lật gương, lệch hàng và xoay.",
+   "description": "Lặp lại lớp để lấp đầy màn hình. Tăng Xén để tạo các ô nhỏ hơn, có thể lật, dịch hàng và xoay. Tỷ lệ cũ giữ nguyên dự án cũ.",
    "name": "Ô lát",
    "params": {
     "angle": {
      "label": "Góc"
-    },
-    "crop": {
-     "label": "Cắt"
     },
     "mirror": {
      "label": "Lật gương"
@@ -4283,8 +4380,18 @@
     "offset": {
      "label": "Độ lệch"
     },
+    "sizing": {
+     "label": "Kích thước",
+     "options": [
+      "Xén",
+      "Tỷ lệ cũ"
+     ]
+    },
     "vertical": {
      "label": "Lệch dọc"
+    },
+    "zoom": {
+     "label": "Xén"
     }
    }
   },
@@ -4347,7 +4454,7 @@
    "name": "Lượng tử hóa thời gian",
    "params": {
     "fps": {
-     "label": "Tốc độ khung hình"
+     "label": "Bước/giây"
     }
    }
   },
@@ -4406,7 +4513,7 @@
    }
   },
   "tunnel": {
-   "description": "Lót lớp thành một đường hầm vô tận và bay xuyên qua đó.",
+   "description": "Lót đường hầm vô tận bằng lớp và bay xuyên qua. Pha dịch chuyển kết cấu dọc theo chiều dài.",
    "name": "Đường hầm",
    "params": {
     "fog": {
@@ -4414,6 +4521,9 @@
     },
     "fogColor": {
      "label": "Màu sương mù"
+    },
+    "phase": {
+     "label": "Pha"
     },
     "position": {
      "label": "Vị trí"
