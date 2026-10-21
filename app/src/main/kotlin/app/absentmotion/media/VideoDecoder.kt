@@ -62,7 +62,7 @@ internal class VideoDecoder(private val context: Context, private val uri: Strin
 
     fun wantedPts(timeUs: Long): Long = timestamps.ptsAt(timeUs)
 
-    fun frame(timeUs: Long, obsolete: () -> Boolean): Image? {
+    fun frame(timeUs: Long, exact: Boolean, obsolete: () -> Boolean): Image? {
         val wanted = wantedPts(timeUs)
         if (wanted == currentPts) return current
         val decoder = codec ?: return current
@@ -103,7 +103,7 @@ internal class VideoDecoder(private val context: Context, private val uri: Strin
                 } else {
                     if (held >= 0) decoder.releaseOutputBuffer(held, false)
                     held = -1
-                    return show(decoder, index, info.presentationTimeUs, wanted)
+                    return show(decoder, index, info.presentationTimeUs, wanted, exact)
                 }
             }
             if (obsolete()) {
@@ -114,9 +114,10 @@ internal class VideoDecoder(private val context: Context, private val uri: Strin
                 Log.w("AMVideo", "Decoder timed out at $wanted for $uri, showing ${if (held >= 0) heldPts else currentPts}")
                 positioned = false
                 flushable = false
+                if (exact) return null
             }
             if (held < 0) return current
-            return show(decoder, held, heldPts, wanted).also { held = -1 }
+            return show(decoder, held, heldPts, wanted, exact).also { held = -1 }
         } finally {
             if (held >= 0) decoder.releaseOutputBuffer(held, false)
         }
@@ -139,9 +140,9 @@ internal class VideoDecoder(private val context: Context, private val uri: Strin
         inputEnded = false; outputEnded = false; queued = false; positioned = true
     }
 
-    private fun show(decoder: MediaCodec, index: Int, pts: Long, wanted: Long): Image? {
+    private fun show(decoder: MediaCodec, index: Int, pts: Long, wanted: Long, exact: Boolean): Image? {
         decoder.releaseOutputBuffer(index, true)
-        val image = images.poll(2, TimeUnit.SECONDS) ?: run { positioned = false; return current }
+        val image = images.poll(2, TimeUnit.SECONDS) ?: run { positioned = false; return if (exact) null else current }
         current?.close()
         current = image
         currentPts = if (pts > wanted || pts < wanted && outputEnded) wanted else pts
