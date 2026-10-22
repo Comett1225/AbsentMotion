@@ -4450,11 +4450,11 @@
    }
   },
   "timequant": {
-   "description": "Membuat masa bergerak berperingkat untuk lapisan ini, seperti kadar bingkai yang lebih rendah.",
-   "name": "Pengkuantuman Masa",
+   "description": "Menjadikan lapisan ini bergerak pada kadar bingkai lebih rendah, seperti rakaman tersekat-sekat atau gerak henti.",
+   "name": "Kadar Bingkai",
    "params": {
     "fps": {
-     "label": "Langkah/saat"
+     "label": "Bingkai/saat"
     }
    }
   },

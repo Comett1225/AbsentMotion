@@ -1,0 +1,1 @@
+Luma Key makes the dark parts of a layer transparent (the light parts with **Invert**). **Threshold** is the brightness where it cuts and **Softness** is how gradual the cut is. It is useful for footage of fire, smoke or sparks filmed on black, or for white backgrounds with Invert.

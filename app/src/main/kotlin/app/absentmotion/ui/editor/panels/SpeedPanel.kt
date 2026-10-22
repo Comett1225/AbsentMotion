@@ -28,6 +28,11 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import app.absentmotion.editor.EditorState
+import app.absentmotion.ai.AiAction
+import app.absentmotion.ai.AiTools
+import app.absentmotion.ui.editor.effects.AiProgressDialog
+import app.absentmotion.ui.editor.effects.AiSmoothDialog
+import androidx.compose.ui.platform.LocalContext
 import app.absentmotion.editor.applySpeedRamp
 import app.absentmotion.editor.deleteSpeedKeyframes
 import app.absentmotion.editor.freezeFrame
@@ -47,6 +52,9 @@ import kotlin.math.roundToInt
 @Composable
 fun SpeedPanel(state: EditorState, layer: Layer, modifier: Modifier = Modifier) {
     var askRemove by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val ai = remember(state, context, scope) { AiTools(context.applicationContext, state, scope) }
     val speed = VideoTiming(layer).speed((state.sampleMs - layer.startTime).toDouble())
     val enabled = listOf(state.sampleMs < layer.startTime, state.sampleMs in (layer.startTime + 1) until layer.endTime,
         state.sampleMs in (layer.startTime + 1) until layer.endTime, state.sampleMs > layer.endTime)
@@ -71,12 +79,15 @@ fun SpeedPanel(state: EditorState, layer: Layer, modifier: Modifier = Modifier) 
             PaceIcon(PanelIcons.Rabbit, Modifier.width(44.dp).height(40.dp))
         }
         Row(Modifier.offset(y = 153.dp).fillMaxWidth().height(34.dp).horizontalScroll(rememberScrollState()).padding(horizontal = 15.dp), Arrangement.spacedBy(6.dp)) {
+            RampChip(stringResource(R.string.smooth_clip), layer.mediaFill?.video == true && ai.running == null) { state.playing = false; ai.apply(AiAction.Smooth) }
             for (ramp in SpeedRamp.entries) RampChip(stringResource(ramp.label), true) { state.applySpeedRamp(ramp) }
             val secondsLabel = stringResource(R.string.speed_seconds)
             RampChip(stringResource(R.string.speed_freeze_frame), enabled[1]) { state.askNumber(secondsLabel, 2f) { state.freezeFrame(it) } }
             RampChip(stringResource(R.string.speed_remove_keyframes), layer.node.child("speedMap")?.isKeyframed == true) { askRemove = true }
         }
     }
+    AiSmoothDialog(ai, state.scene)
+    AiProgressDialog(ai)
     if (askRemove) AlertDialog(onDismissRequest = { askRemove = false }, title = { Text(stringResource(R.string.remove_every_keyframe)) },
         confirmButton = { TextButton({ askRemove = false; state.deleteSpeedKeyframes() }) { Text(stringResource(R.string.delete), color = Am.Accent) } },
         dismissButton = { TextButton({ askRemove = false }) { Text(stringResource(R.string.cancel), color = Am.Accent) } }, containerColor = Am.Field, titleContentColor = Am.OnDark, textContentColor = Am.OnDark)

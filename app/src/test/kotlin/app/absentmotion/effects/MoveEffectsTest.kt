@@ -1,9 +1,13 @@
 package app.absentmotion.effects
 
 import app.absentmotion.compat.EffectMigration
+import app.absentmotion.export.frameTimeMs
 import app.absentmotion.model.Layer
 import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
+import app.absentmotion.model.exportFrame
+import app.absentmotion.model.exportFrameMs
+import app.absentmotion.model.layerTracks
 import app.absentmotion.model.steppedMs
 import app.absentmotion.model.videoTimeUs
 import org.junit.Assert.assertEquals
@@ -65,7 +69,7 @@ class MoveEffectsTest {
         assertEquals(listOf(row("Progress", "float", "0.000000", "0.0..1.0", "%"), row("Orientation", "angle", "0.000000", "-3600.0..3600.0"),
             row("Rotate Automatically", "switch", "true"), row("Inset/Outset", "float", "0.000000", "-500.0..500.0"),
             row("Offset", "point", "0.000000,0.000000", "-5000.0..5000.0")), params("movealongpath"))
-        assertEquals(listOf(row("Steps/sec", "float", "5.000000", "0.1..120.0")), params("timequant"))
+        assertEquals(listOf(row("Frames/sec", "float", "5.000000", "0.1..120.0")), params("timequant"))
     }
 
     private fun older(effect: String, vararg values: Pair<String, String>) = XmlNode("effect", mapOf("id" to "absent.$effect", "hidden" to "false"),
@@ -188,5 +192,25 @@ class MoveEffectsTest {
         assertNotEquals(shown[0], shown.last())
         val plain = Layer(layer.node.copy(children = emptyList()))
         assertEquals(6, (1000 until 1200 step 33).map { plain.videoTimeUs(it, scene) }.toSet().size)
+    }
+
+    @Test fun aSixtyFpsClipAtFrameRateTwelveShowsTwelveFramesASecondInPreviewExportAndGroups() {
+        fun runs(times: List<Long>) = times.zipWithNext().count { (a, b) -> a != b } + 1
+        val sixty = Scene.parse("""<scene width="100" height="100" fps="60" totalTime="3000"/>""")
+        val clip = Layer(stepped(fps("12")).node.with("startTime", "0").with("endTime", "2999"))
+        val preview = (0 until 60).map { clip.videoTimeUs(sixty.frameStart(it), sixty) }
+        assertEquals(12, runs(preview))
+        assertEquals(List(12) { 5 }, preview.groupBy { it }.values.map { it.size })
+        assertEquals(60, runs((0 until 60).map { Layer(clip.node.copy(children = emptyList())).videoTimeUs(sixty.frameStart(it), sixty) }))
+        val thirty = Scene.parse("""<scene width="100" height="100" fps="30" totalTime="3000"/>""")
+        val stamps = LongArray(300) { it * 1_000_000L / 60 }
+        val exported = (0 until 60).map { clip.exportFrame(exportFrameMs(frameTimeMs(thirty, 60, it), 60), thirty, stamps, 60)!!.a }
+        assertEquals(12, runs(exported))
+        val nested = Scene.parse("""<scene width="100" height="100" fps="60" totalTime="3000"><embedScene id="1" startTime="0" endTime="2999">
+            <effect id="absent.timequant"><property name="fps" value="12"/></effect><scene width="100" height="100" fps="60" totalTime="2999">
+            <shape id="3" startTime="0" endTime="2999" fillType="media" fillVideo="file:///v.mp4" inTime="0" outTime="5000"/></scene></embedScene></scene>""")
+        val track = nested.layerTracks().single()
+        val inGroup = (0 until 60).map { track.layer.videoTimeUs(track.timeAt(sixty.frameStart(it).toDouble(), true)!!.ms.toInt(), track.scene) }
+        assertEquals(12, runs(inGroup))
     }
 }

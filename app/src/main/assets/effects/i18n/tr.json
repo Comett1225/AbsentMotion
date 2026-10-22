@@ -4450,11 +4450,11 @@
    }
   },
   "timequant": {
-   "description": "Bu katmanda zamanı daha düşük kare hızı gibi adımlarla akıtır.",
-   "name": "Zaman Nicemleme",
+   "description": "Bu katmanı daha düşük bir kare hızında hareket ettirir; kesik kesik veya stop-motion görüntüsü gibi görünür.",
+   "name": "Kare hızı",
    "params": {
     "fps": {
-     "label": "Adım/sn"
+     "label": "Kare/sn"
     }
    }
   },

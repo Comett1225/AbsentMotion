@@ -1,0 +1,1 @@
+Levels sets which brightness becomes pure black and pure white. Raise **Input Black** to make the shadows darker and lower **Input White** to make the highlights brighter. **Gamma** changes the midtones without touching black and white. **Output Black** and **Output White** limit the final range, for a faded look.

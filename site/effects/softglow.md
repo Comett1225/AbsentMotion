@@ -1,0 +1,1 @@
+Soft Glow adds a blurred copy of the picture on top of itself for a dreamy, hazy look, mostly from the highlights. **Size** is how soft the haze is, **Highlights** how much it comes from the bright parts, and **Color** tints it. **Opacity** blends it with the original.

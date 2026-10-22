@@ -1,0 +1,1 @@
+Lift, gamma and gain are the three tonal ranges used in color grading: **Lift** is the shadows, **Gamma** the midtones and **Gain** the highlights. For each, **Hue** picks a color, **Amount** how far to push toward it and **Level** how light or dark the range becomes.

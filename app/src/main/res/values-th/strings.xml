@@ -132,6 +132,8 @@
     <string name="settings_emoji_android">Android</string>
     <string name="settings_keep_media_copies">เก็บสำเนาสื่อที่นำเข้าไว้ในโปรเจกต์</string>
     <string name="settings_about">เกี่ยวกับ</string>
+    <string name="settings_help">ช่วยเหลือ</string>
+    <string name="effect_help">ช่วยเหลือสำหรับเอฟเฟกต์นี้</string>
     <string name="settings_level_low">ต่ำ</string>
     <string name="settings_level_high">สูง</string>
     <string name="settings_level_ultra">สูงสุด</string>
@@ -177,7 +179,7 @@
     <string name="library_err_scene_fps">ฉากผิดรูปแบบ: เฟรมเรตต้องอยู่ระหว่าง 1 ถึง %1$s</string>
     <string name="library_err_package_large">แพ็กเกจมีขนาดใหญ่เกินไป (เกิน %1$s MB เมื่อแตกไฟล์)</string>
     <string name="library_err_too_many_files">แพ็กเกจมีไฟล์มากเกินไป (เกิน %1$s)</string>
-    <string name="library_err_xml_large">ไฟล์นี้ใหญ่เกินไปที่จะเปิด (มากกว่า 32 MB)</string>
+    <string name="library_err_xml_large">ไฟล์นี้ใหญ่เกินไปที่จะเปิด (มากกว่า 16 MB)</string>
     <string name="library_err_media_large">แพ็กเกจมีขนาดใหญ่เกินไป (สื่อเกิน %1$s MB)</string>
     <string name="library_err_not_backup">ไฟล์นี้ไม่ใช่ไฟล์สำรองข้อมูลของ AbsentMotion</string>
     <string name="library_err_backup_project_large">มีโปรเจกต์ในไฟล์สำรองข้อมูลที่มีขนาดใหญ่เกินไป</string>
@@ -374,6 +376,12 @@
     <string name="export_interpolation_blend">การผสมเฟรม</string>
     <string name="export_interpolation_flow">ออปติคัลโฟลว์</string>
     <string name="export_interpolation_hint">คลิปที่มีเฟรมเรตต่ำกว่าการส่งออกจะถูกปรับให้เนียนขึ้นเพื่อให้ตรงกัน เช่น 30 เป็น 60 fps</string>
+    <string name="export_interpolation_pick_method">เลือกการผสมเฟรมหรือออปติคัลโฟลว์ก่อน</string>
+    <string name="export_level_low">ต่ำ</string>
+    <string name="export_level_medium">ปานกลาง</string>
+    <string name="export_level_high">สูง</string>
+    <string name="export_motion_blur">โมชันเบลอ</string>
+    <string name="export_motion_blur_hint">ทำให้ส่วนที่เคลื่อนไหวของคลิปวิดีโอเบลอตามการเคลื่อนไหวเหมือนชัตเตอร์กล้อง แม้คลิปจะมีเฟรมเรตเดียวกับตอนส่งออกอยู่แล้ว</string>
     <string name="export_quality">คุณภาพ</string>
     <string name="export_quality_low">ต่ำ</string>
     <string name="export_quality_high">สูง</string>
@@ -936,6 +944,9 @@
     <plurals name="aibrowser_too_long">
         <item quantity="other">คลิปที่ยาวกว่า %1$s นาที ยังไม่รองรับ กรุณาตัดหรือแยกคลิปก่อน</item>
     </plurals>
+    <plurals name="smooth_estimate">
+        <item quantity="other">%1$s เฟรมที่ %2$s fps, %3$s × %4$s, ประมาณ %5$s MB</item>
+    </plurals>
     <plurals name="aibrowser_estimate">
         <item quantity="other">%1$s เฟรมที่ %2$s × %3$s ประมาณ %4$s MB</item>
     </plurals>
@@ -1342,6 +1353,17 @@
     <string name="export_interpolation_off_help">แต่ละคลิปแสดงเฟรมของตัวเอง คลิป 30 fps ในการส่งออก 60 fps จะแสดงทุกเฟรมสองครั้ง การเคลื่อนไหวจึงอาจดูสะดุดเล็กน้อย</string>
     <string name="export_interpolation_blend_help">เฟรมแทรกใหม่จะผสมสองเฟรมที่ใกล้ที่สุดเหมือนการครอสเฟดเร็ว ส่งออกไว แต่การเคลื่อนไหวเร็วอาจดูเป็นเงาซ้อน</string>
     <string name="export_interpolation_flow_help">แอปจะติดตามการเคลื่อนไหวของแต่ละส่วนในภาพและสร้างเฟรมแทรกจริง การเคลื่อนไหวลื่นที่สุด แต่ส่งออกช้ากว่า และการเคลื่อนไหวเร็วมากอาจเบลอที่ขอบ</string>
+    <string name="export_interpolation_blend_levels">ต่ำจะยึดเฟรมที่ใกล้ที่สุด จึงมีเงาซ้อนน้อยลง ปานกลางผสมสองเฟรมเท่า ๆ กัน สูงจะผสมเฟรมรอบข้างด้วยเพื่อการเคลื่อนไหวที่นุ่มนวลที่สุด เร็วบนทุกเครื่อง</string>
+    <string name="export_interpolation_flow_levels">ต่ำจะติดตามการเคลื่อนไหวอย่างคร่าว ๆ และเร็วที่สุด เหมาะกับเครื่องระดับพื้นฐาน ปานกลางเป็นตัวเลือกปกติสำหรับเครื่องระดับดี สูงจะติดตามรายละเอียดที่ละเอียดขึ้นด้วยการประมวลผลหลายรอบเพื่อขอบที่สะอาดกว่า แต่ช้า จึงควรใช้กับเครื่องระดับเร็วหรือคลิปสั้น</string>
+    <string name="export_motion_blur_help">ทำให้ทุกเฟรมของคลิปวิดีโอเบลอตามการเคลื่อนไหวเหมือนชัตเตอร์กล้อง: ต่ำ 90°, ปานกลาง 180° (ลุคภาพยนตร์ทั่วไป), สูง 360° ยังใช้ได้แม้คลิปจะมีเฟรมเรตเดียวกับตอนส่งออกอยู่แล้ว ต้องติดตามการเคลื่อนไหว จึงใช้เวลาพอ ๆ กับออปติคัลโฟลว์ระดับปานกลาง</string>
+    <string name="export_phone_speed">เครื่องนี้: %1$s</string>
+    <string name="smooth_clip">ปรับให้ลื่น</string>
+    <string name="smooth_intro">สร้างเฟรมที่ลื่นสำหรับคลิปนี้ครั้งเดียวและเก็บไว้กับโปรเจกต์ เพื่อให้ตัวอย่างและการส่งออกทุกครั้งแสดงผลออกมา คลิปต้นฉบับยังคงอยู่และเรียกกลับได้</string>
+    <string name="smooth_method">วิธี</string>
+    <string name="smooth_nothing">คลิปนี้มีเฟรมเพียงพอต่อเฟรมเรตของโปรเจกต์แล้ว เลือกโมชันเบลอ หรือลดความเร็วคลิปก่อน</string>
+    <string name="smooth_frame">กำลังปรับให้ลื่น: เฟรม %1$s จาก %2$s…</string>
+    <string name="smooth_saving">กำลังบันทึกคลิปที่ปรับให้ลื่น…</string>
+    <string name="smooth_sound_format">เสียงของคลิปนี้ใช้รูปแบบที่ไม่สามารถเก็บไว้ได้ คลิปจึงไม่ได้ถูกปรับให้ลื่น</string>
     <string name="export_list_or">%1$s หรือ %2$s</string>
     <string name="export_list_and">%1$s และ %2$s</string>
     <string name="export_reason_container_codecs">%1$s ต้องใช้วิดีโอ %2$s ซึ่งโทรศัพท์นี้สร้างที่ %3$s ไม่ได้</string>

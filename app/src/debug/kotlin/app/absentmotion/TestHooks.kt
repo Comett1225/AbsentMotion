@@ -212,6 +212,8 @@ internal object TestHooks {
         intent.getStringExtra("format")?.let { name -> app.absentmotion.export.ImageKind.entries.firstOrNull { it.name.equals(name, true) || it.ext == name }?.let { s = s.copy(image = it) } }
         intent.takeIf { it.hasExtra("iquality") }?.let { s = s.copy(imageQuality = it.getIntExtra("iquality", s.imageQuality)) }
         intent.getStringExtra("interp")?.let { name -> FrameInterpolation.entries.firstOrNull { it.name.equals(name, true) }?.let { s = s.copy(interpolation = it) } }
+        intent.getStringExtra("interpLevel")?.let { name -> app.absentmotion.export.SmoothLevel.entries.firstOrNull { it.name.equals(name, true) }?.let { s = s.copy(interpolationLevel = it) } }
+        intent.getStringExtra("blur")?.let { name -> app.absentmotion.export.MotionBlur.entries.firstOrNull { it.name.equals(name, true) }?.let { s = s.copy(motionBlur = it) } }
         app.absentmotion.export.ExportDebug.forceBuffers = intent.getBooleanExtra("buffers", false)
         app.absentmotion.export.ExportDebug.fakeFreeBytes = intent.getLongExtra("fakefree", -1L)
         app.absentmotion.export.ThermalMonitor.of(activity.applicationContext).forced =

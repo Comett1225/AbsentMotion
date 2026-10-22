@@ -41,6 +41,13 @@ struct InterpolationParams {
     bool operator==(const InterpolationParams&) const = default;
 };
 
+struct SmoothRequest {
+    int64_t before = 0, a = 0, b = 0, after = 0;
+    float t = 0;
+    bool flow = false, soft = false;
+    float blur = 0;
+};
+
 struct MoshParams {
     float intensity = 1, block = 16, decay = 0.05f, glitch = 0.1f, bloom = 0.3f, source = 0;
     InterpolationParams flow;
@@ -68,8 +75,7 @@ public:
     virtual bool setPicture(const std::string& uri, int64_t layerId, AHardwareBuffer* buffer,
                             const void* pixels, int width, int height, size_t rowBytes, bool opaque, int colorStandard = 0, int colorRange = 0, const FrameCrop& crop = {}) = 0;
     virtual bool setVideoFrame(const std::string& uri, int64_t layerId, int64_t pts, AHardwareBuffer* buffer, int colorStandard = 0, int colorRange = 0, const FrameCrop& crop = {}) = 0;
-    virtual bool interpolateVideo(const std::string& uri, int64_t layerId, int64_t a, int64_t b, float t, bool flow,
-                                  const InterpolationParams& params) = 0;
+    virtual bool interpolateVideo(const std::string& uri, int64_t layerId, const SmoothRequest& request, const InterpolationParams& params) = 0;
     virtual int moshStart(const std::string& uri, int64_t layerId, const std::vector<int64_t>& pts, const MoshParams& params) = 0;
     virtual bool moshFrame(const std::string& uri, int64_t layerId, int step, AHardwareBuffer* buffer, int colorStandard, int colorRange,
                            const FrameCrop& crop) = 0;

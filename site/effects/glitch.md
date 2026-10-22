@@ -1,0 +1,1 @@
+Glitch shifts horizontal bands of the picture sideways and splits the color channels a few times per second. **Intensity** is how strong it is, **Block Height** how tall the bands are and **Seed** picks a different random pattern. Animate Intensity from 0 up for a short digital glitch at a cut.

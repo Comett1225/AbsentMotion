@@ -1,0 +1,1 @@
+Makes the picture warmer or cooler, as if it was lit by a lamp of a given color temperature in kelvin. **Temperature** at 6500 K leaves the picture unchanged. Lower values give a warmer, orange look, and higher values a cooler, blue look. **Strength** blends the result with the original.

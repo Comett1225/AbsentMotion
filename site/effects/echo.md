@@ -1,0 +1,1 @@
+Echo Keyframes draws copies of the layer as it was a moment ago, so a moving layer leaves a trail. **Seconds** is how far back the copies are, **Count** how many there are, **Alpha** how visible they are and **Composite** whether they sit **Behind** or **Atop** the layer.

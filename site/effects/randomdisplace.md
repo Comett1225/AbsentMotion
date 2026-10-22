@@ -1,0 +1,1 @@
+Random Displacement moves the layer around smoothly and randomly, like a drifting camera. **Magnitude** is how far it wanders, **Speed** how fast, and **Seed** picks a different path. Unlike [Auto-Shake](@effect/autoshake) the movement is slow and flowing rather than jumpy.

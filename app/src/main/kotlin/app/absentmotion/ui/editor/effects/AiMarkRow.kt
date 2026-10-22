@@ -23,7 +23,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.absentmotion.R
+import app.absentmotion.ai.AiKind
 import app.absentmotion.ai.AiMark
+import app.absentmotion.ai.smoothingOf
+import app.absentmotion.export.FrameInterpolation
+import app.absentmotion.export.MotionBlur
 import app.absentmotion.ai.restorable
 import app.absentmotion.ai.withoutAiMark
 import app.absentmotion.editor.EditorState
@@ -36,13 +40,18 @@ internal val AiMarkRowGap = 6.5.dp
 @Composable
 internal fun AiMarkRow(state: EditorState, mark: AiMark) {
     val kind = mark.kind ?: return
-    val name = stringResource(kind.title) + ((mark.source?.title ?: mark.enhance?.mode?.title)?.let { " · " + stringResource(it) } ?: "")
+    val smooth = smoothingOf(mark.node["option"])?.takeIf { kind == AiKind.Smooth }
+    val parts = listOfNotNull(mark.source?.title, mark.enhance?.mode?.title, smooth?.method?.takeIf { it != FrameInterpolation.Off }?.label,
+        smooth?.level?.label?.takeIf { smooth.method != FrameInterpolation.Off }, R.string.export_motion_blur.takeIf { smooth != null && smooth.blur != MotionBlur.Off })
+    val name = (listOf(stringResource(kind.title)) + parts.map { stringResource(it) }).joinToString(" · ")
     Row(Modifier.padding(start = 6.5.dp, end = 6.5.dp, top = AiMarkRowGap).fillMaxWidth().height(AiMarkRowHeight).clip(RoundedCornerShape(5.dp)).background(Am.Field),
         verticalAlignment = Alignment.CenterVertically) {
         Text(name, Modifier.weight(1f).padding(start = 12.dp), color = Am.OnDark, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-        Text(stringResource(R.string.ai), Modifier.padding(horizontal = 6.dp).clip(RoundedCornerShape(3.dp)).background(Am.Accent).padding(horizontal = 5.dp, vertical = 1.dp),
+        if (kind.ai) Text(stringResource(R.string.ai), Modifier.padding(horizontal = 6.dp).clip(RoundedCornerShape(3.dp)).background(Am.Accent).padding(horizontal = 5.dp, vertical = 1.dp),
             color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold, maxLines = 1)
-        if (mark.restorable) Icon(ChromeIcons.Trash, stringResource(R.string.ai_mark_restore), Modifier.size(36.dp).clickable { state.editSelected { it.withoutAiMark(kind) } }.padding(7.dp), tint = Am.OnDark)
+        if (mark.restorable) Icon(ChromeIcons.Trash, stringResource(R.string.ai_mark_restore), Modifier.size(36.dp).clickable {
+            state.selectedId?.let { id -> state.edit { it.withoutAiMark(id, kind) } }
+        }.padding(7.dp), tint = Am.OnDark)
         else Spacer(Modifier.width(12.dp))
     }
 }

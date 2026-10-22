@@ -1,0 +1,1 @@
+**Brightness** lightens or darkens the whole picture. **Contrast** pushes light and dark areas apart (or together with negative values). Use small changes first: both go from -1 to 1. For more control over shadows and highlights, use [Levels](@effect/levels) or [Highlights & Shadows](@effect/highlightshadow).

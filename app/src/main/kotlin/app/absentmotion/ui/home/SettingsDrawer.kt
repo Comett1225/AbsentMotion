@@ -96,6 +96,7 @@ internal val CardGap = 10.dp
 @Composable
 fun SettingsDrawer(settings: AppSettings, drawer: androidx.compose.material3.DrawerState, onRestored: () -> Unit = {}) {
     var about by remember { mutableStateOf(false) }
+    var help by remember { mutableStateOf(false) }
     var crashLogs by remember { mutableStateOf(false) }
     var language by remember { mutableStateOf(false) }
     var demoNote by remember { mutableStateOf(false) }
@@ -141,12 +142,15 @@ fun SettingsDrawer(settings: AppSettings, drawer: androidx.compose.material3.Dra
             }
             LinkRow(stringResource(R.string.settings_language), currentLanguage(LocalContext.current).nativeName) { language = true }
             Spacer(Modifier.height(CardGap))
+            LinkRow(stringResource(R.string.settings_help)) { help = true }
+            Spacer(Modifier.height(CardGap))
             LinkRow(stringResource(R.string.settings_about)) { about = true }
             Spacer(Modifier.height(CardGap))
             UpdateRows(settings) { crashLogs = true }
         }
     }
     if (language) LanguageDialog { language = false }
+    if (help) HelpScreen { help = false }
     if (about) AboutScreen { about = false }
     if (crashLogs) CrashLogsScreen { crashLogs = false }
     if (demoNote) AlertDialog(

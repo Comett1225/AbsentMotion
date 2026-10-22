@@ -132,6 +132,8 @@
     <string name="settings_emoji_android">Android</string>
     <string name="settings_keep_media_copies">İçe aktarılan medyanın bir kopyasını projede tut</string>
     <string name="settings_about">Hakkında</string>
+    <string name="settings_help">Yardım</string>
+    <string name="effect_help">Bu efekt için yardım</string>
     <string name="settings_level_low">Düşük</string>
     <string name="settings_level_high">Yüksek</string>
     <string name="settings_level_ultra">Ultra</string>
@@ -177,7 +179,7 @@
     <string name="library_err_scene_fps">Bozuk sahne: kare hızı 1 ile %1$s arasında olmalı</string>
     <string name="library_err_package_large">Paket çok büyük (açıldığında %1$s MB\'tan fazla)</string>
     <string name="library_err_too_many_files">Paket çok fazla dosya içeriyor (%1$s sınırından fazla)</string>
-    <string name="library_err_xml_large">Bu dosya açılamayacak kadar büyük (32 MB\'tan fazla)</string>
+    <string name="library_err_xml_large">Bu dosya açılamayacak kadar büyük (16 MB\'tan fazla)</string>
     <string name="library_err_media_large">Paket çok büyük (%1$s MB\'tan fazla medya)</string>
     <string name="library_err_not_backup">Bu dosya bir AbsentMotion yedeği değil.</string>
     <string name="library_err_backup_project_large">Yedekteki bir proje çok büyük.</string>
@@ -382,6 +384,12 @@
     <string name="export_interpolation_blend">Kare karıştırma</string>
     <string name="export_interpolation_flow">Optik akış</string>
     <string name="export_interpolation_hint">Dışa aktarmadan daha düşük kare hızındaki klipler eşleşecek şekilde yumuşatılır; örneğin 30 fps\'ten 60 fps\'e.</string>
+    <string name="export_interpolation_pick_method">Önce Kare karıştırma veya Optik akış seçin.</string>
+    <string name="export_level_low">Düşük</string>
+    <string name="export_level_medium">Orta</string>
+    <string name="export_level_high">Yüksek</string>
+    <string name="export_motion_blur">Hareket bulanıklığı</string>
+    <string name="export_motion_blur_hint">Kamera deklanşörü gibi video kliplerin hareketli kısımlarını bulanıklaştırır; klip zaten dışa aktarma kare hızına sahip olsa bile çalışır.</string>
     <string name="export_quality">Kalite</string>
     <string name="export_quality_low">Düşük</string>
     <string name="export_quality_high">Yüksek</string>
@@ -957,6 +965,10 @@
         <item quantity="one">%1$s dakikadan uzun klipler henüz desteklenmiyor. Önce klibi kırpın veya bölün.</item>
         <item quantity="other">%1$s dakikadan uzun klipler henüz desteklenmiyor. Önce klibi kırpın veya bölün.</item>
     </plurals>
+    <plurals name="smooth_estimate">
+        <item quantity="one">%1$s kare, %2$s fps, %3$s × %4$s, yaklaşık %5$s MB.</item>
+        <item quantity="other">%1$s kare, %2$s fps, %3$s × %4$s, yaklaşık %5$s MB.</item>
+    </plurals>
     <plurals name="aibrowser_estimate">
         <item quantity="one">%1$s kare, %2$s × %3$s boyutunda, yaklaşık %4$s MB.</item>
         <item quantity="other">%1$s kare, %2$s × %3$s boyutunda, yaklaşık %4$s MB.</item>
@@ -1365,6 +1377,17 @@
     <string name="export_interpolation_off_help">Her klip kendi karelerini gösterir. 60 fps dışa aktarmada 30 fps bir klip her kareyi iki kez gösterir, bu yüzden hareket biraz kesik görünebilir.</string>
     <string name="export_interpolation_blend_help">Yeni ara kareler, iki en yakın kareyi hızlı bir çapraz geçiş gibi karıştırır. Dışa aktarması hızlıdır; hızlı harekette hayalet görüntü oluşabilir.</string>
     <string name="export_interpolation_flow_help">Uygulama görüntünün her parçasının nasıl hareket ettiğini izler ve gerçek ara kareler oluşturur. En akıcı hareket, ancak dışa aktarma daha yavaştır ve çok hızlı harekette kenarlarda bulanıklaşma olabilir.</string>
+    <string name="export_interpolation_blend_levels">Düşük, en yakın kareye yaslanır, bu yüzden daha az hayalet görüntü olur. Orta, iki kareyi eşit şekilde karıştırır. Yüksek, en yumuşak hareket için çevresindeki kareleri de karıştırır. Her telefonda hızlıdır.</string>
+    <string name="export_interpolation_flow_levels">Düşük, hareketi kabaca izler ve en hızlısıdır; Basic telefonlar için uygundur. Orta, Good telefonlar için olağan seçimdir. Yüksek, daha temiz kenarlar için daha fazla geçişle ince ayrıntıları izler; yavaştır, bu yüzden Fast telefonlara veya kısa kliplere saklayın.</string>
+    <string name="export_motion_blur_help">Bir video klipin her karesini hareketi boyunca, kamera deklanşörü gibi bulanıklaştırır: Düşük 90°, Orta 180° (olağan film görünümü), Yüksek 360°. Klip zaten dışa aktarma kare hızına sahip olsa bile çalışır. Hareketi takip etmesi gerektiğinden yaklaşık Optik akış Orta kadar sürer.</string>
+    <string name="export_phone_speed">Bu telefon: %1$s</string>
+    <string name="smooth_clip">Yumuşat</string>
+    <string name="smooth_intro">Bu klip için yumuşak kareleri bir kez oluşturur ve projeyle birlikte saklar; böylece önizleme ve tüm dışa aktarmalar bunları gösterir. Orijinal klip korunur ve geri getirilebilir.</string>
+    <string name="smooth_method">Yöntem</string>
+    <string name="smooth_nothing">Bu klip proje kare hızı için zaten yeterli kareye sahip. Hareket bulanıklığı seçin veya önce klibi yavaşlatın.</string>
+    <string name="smooth_frame">Yumuşatılıyor: %2$s kareden %1$s…</string>
+    <string name="smooth_saving">Yumuşak klip kaydediliyor…</string>
+    <string name="smooth_sound_format">Bu klibin sesi korunamayan bir biçim kullanıyor, bu yüzden klip yumuşatılmadı.</string>
     <string name="export_list_or">%1$s veya %2$s</string>
     <string name="export_list_and">%1$s ve %2$s</string>
     <string name="export_reason_container_codecs">%1$s için %2$s video gerekir; bu telefon bunu %3$s değerinde oluşturamaz.</string>

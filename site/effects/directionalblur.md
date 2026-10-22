@@ -1,0 +1,1 @@
+Directional Blur smears the layer in one direction. **Length** is how far and **Angle** is the direction. It is a fixed blur: for a blur that follows how the layer actually moves, use [Motion Blur](@effect/motionblur).

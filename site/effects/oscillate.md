@@ -1,0 +1,1 @@
+Oscillate moves a layer back and forth by itself. **Direction** chooses movement along an **Angle**, in **Depth**, or round in an **Orbit**. **Frequency** is the number of swings per second, **Magnitude** how far it moves, and **Wave** is Sine (smooth) or Triangle (steady speed). Use **Phase** to offset several layers so they do not move together.

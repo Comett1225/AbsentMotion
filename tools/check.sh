@@ -18,6 +18,7 @@ start=$(date +%s)
 
 STATIC="licences|python3 tools/gen_licenses.py --check|python3 tools/gen_licenses.py
 fonts|python3 tools/gen_fonts.py --check|see tools/gen_fonts.py
+site-help|python3 tools/site_build.py --check|python3 tools/site_build.py
 3d-effects|python3 tools/gen_3d_effects.py --check|python3 tools/gen_3d_effects.py
 translations|python3 tools/i18n_extract.py check|python3 tools/i18n_translate.py
 effect-lint|python3 tools/effect_lint.py|fix the effect JSON it lists

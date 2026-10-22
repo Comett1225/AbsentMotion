@@ -1,0 +1,1 @@
+Feather softens the edge of the layer. **Strength** is how wide the soft edge is. **Edges** is **Inward** (the edge fades into the layer) or **Blur Alpha** (the soft edge also spreads outside the original outline). Use it after [Chroma Key](@effect/chromakey) for a cleaner cut-out.

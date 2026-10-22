@@ -132,6 +132,8 @@
     <string name="settings_emoji_android">Android</string>
     <string name="settings_keep_media_copies">Simpan salinan media yang diimport dalam projek</string>
     <string name="settings_about">Perihal</string>
+    <string name="settings_help">Bantuan</string>
+    <string name="effect_help">Bantuan untuk kesan ini</string>
     <string name="settings_level_low">Rendah</string>
     <string name="settings_level_high">Tinggi</string>
     <string name="settings_level_ultra">Ultra</string>
@@ -177,7 +179,7 @@
     <string name="library_err_scene_fps">Babak tidak sah: kadar bingkai mesti antara 1 hingga %1$s</string>
     <string name="library_err_package_large">Pakej terlalu besar (lebih daripada %1$s MB selepas dibuka)</string>
     <string name="library_err_too_many_files">Pakej mempunyai terlalu banyak fail (lebih daripada %1$s)</string>
-    <string name="library_err_xml_large">Fail ini terlalu besar untuk dibuka (lebih daripada 32 MB)</string>
+    <string name="library_err_xml_large">Fail ini terlalu besar untuk dibuka (lebih daripada 16 MB)</string>
     <string name="library_err_media_large">Pakej terlalu besar (lebih daripada %1$s MB media)</string>
     <string name="library_err_not_backup">Fail ini bukan sandaran AbsentMotion.</string>
     <string name="library_err_backup_project_large">Satu projek dalam sandaran terlalu besar.</string>
@@ -374,6 +376,12 @@
     <string name="export_interpolation_blend">Campuran bingkai</string>
     <string name="export_interpolation_flow">Aliran optik</string>
     <string name="export_interpolation_hint">Klip yang kadar bingkainya lebih rendah daripada eksport akan dilembutkan agar sepadan, contohnya 30 hingga 60 fps.</string>
+    <string name="export_interpolation_pick_method">Pilih Campuran bingkai atau Aliran optik dahulu.</string>
+    <string name="export_level_low">Rendah</string>
+    <string name="export_level_medium">Sederhana</string>
+    <string name="export_level_high">Tinggi</string>
+    <string name="export_motion_blur">Kabur gerakan</string>
+    <string name="export_motion_blur_hint">Mengaburkan bahagian bergerak klip video seperti pengatup kamera, walaupun klip sudah mempunyai kadar bingkai eksport.</string>
     <string name="export_quality">Kualiti</string>
     <string name="export_quality_low">Rendah</string>
     <string name="export_quality_high">Tinggi</string>
@@ -936,6 +944,9 @@
     <plurals name="aibrowser_too_long">
         <item quantity="other">Klip lebih panjang daripada %1$s minit belum disokong. Potong atau pisahkan klip itu dahulu.</item>
     </plurals>
+    <plurals name="smooth_estimate">
+        <item quantity="other">%1$s bingkai pada %2$s fps, %3$s × %4$s, kira-kira %5$s MB.</item>
+    </plurals>
     <plurals name="aibrowser_estimate">
         <item quantity="other">%1$s bingkai pada %2$s × %3$s, kira-kira %4$s MB.</item>
     </plurals>
@@ -1342,6 +1353,17 @@
     <string name="export_interpolation_off_help">Setiap klip memaparkan bingkainya sendiri. Klip 30 fps dalam eksport 60 fps memaparkan setiap bingkai dua kali, jadi gerakan mungkin kelihatan sedikit tersekat.</string>
     <string name="export_interpolation_blend_help">Bingkai selang baharu mencampur dua bingkai terdekat seperti silang-pudar pantas. Eksport pantas; gerakan laju boleh kelihatan berbayang.</string>
     <string name="export_interpolation_flow_help">Aplikasi mengikut gerakan setiap bahagian gambar dan melukis bingkai selang sebenar. Gerakan paling licin, tetapi eksport lebih perlahan dan gerakan sangat laju boleh kabur di tepi.</string>
+    <string name="export_interpolation_blend_levels">Rendah lebih bergantung pada bingkai terdekat, jadi kurang kesan hantu. Sederhana mencampurkan dua bingkai secara sekata. Tinggi turut mencampurkan bingkai di sekelilingnya untuk gerakan paling lembut. Pantas pada setiap telefon.</string>
+    <string name="export_interpolation_flow_levels">Rendah menjejak gerakan secara kasar dan paling cepat; sesuai untuk telefon asas. Sederhana ialah pilihan biasa untuk telefon baik. Tinggi menjejak butiran lebih halus dengan lebih banyak laluan untuk tepi lebih bersih; ia lambat, jadi simpan untuk telefon pantas atau klip pendek.</string>
+    <string name="export_motion_blur_help">Mengaburkan setiap bingkai klip video mengikut gerakannya, seperti pengatup kamera: Rendah 90°, Sederhana 180° (rupa filem biasa), Tinggi 360°. Ia juga berfungsi apabila klip sudah mempunyai kadar bingkai eksport. Ia perlu menjejak gerakan, jadi ia mengambil masa lebih kurang sama seperti Aliran optik Sederhana.</string>
+    <string name="export_phone_speed">Telefon ini: %1$s</string>
+    <string name="smooth_clip">Licin</string>
+    <string name="smooth_intro">Menghasilkan bingkai licin untuk klip ini sekali dan menyimpannya bersama projek, jadi pratonton dan setiap eksport memaparkannya. Klip asal dikekalkan dan boleh dikembalikan.</string>
+    <string name="smooth_method">Kaedah</string>
+    <string name="smooth_nothing">Klip ini sudah mempunyai bingkai yang cukup untuk kadar bingkai projek. Pilih Kabur gerakan atau perlahankan klip terlebih dahulu.</string>
+    <string name="smooth_frame">Pelembutan: bingkai %1$s daripada %2$s…</string>
+    <string name="smooth_saving">Menyimpan klip licin…</string>
+    <string name="smooth_sound_format">Audio klip ini menggunakan format yang tidak dapat dikekalkan, jadi klip tidak dilembutkan.</string>
     <string name="export_list_or">%1$s atau %2$s</string>
     <string name="export_list_and">%1$s dan %2$s</string>
     <string name="export_reason_container_codecs">%1$s memerlukan video %2$s, yang telefon ini tidak dapat hasilkan pada %3$s.</string>

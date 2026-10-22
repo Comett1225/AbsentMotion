@@ -1,0 +1,1 @@
+Cube wraps the layer onto the faces of a 3D cube. **Rotation X**, **Rotation Y** and **Rotation Z** turn it (animate them for a spinning cube), **Size** and **Scale** change how big it is, **Perspective** the depth effect, and **Shading**, **Light Angle** and **Shine** the lighting. See [Camera layers and 3D](@camera-3d).

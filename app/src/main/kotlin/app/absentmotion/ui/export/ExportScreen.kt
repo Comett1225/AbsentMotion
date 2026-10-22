@@ -118,6 +118,8 @@ import app.absentmotion.export.ExportResult
 import app.absentmotion.export.ExportSettings
 import app.absentmotion.export.Exporter
 import app.absentmotion.export.FrameInterpolation
+import app.absentmotion.export.MotionBlur
+import app.absentmotion.export.SmoothLevel
 import app.absentmotion.export.GifFrameRates
 import app.absentmotion.export.GifResolutions
 import app.absentmotion.export.BackgroundBlack
@@ -486,16 +488,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
         AlertDialog(
             onDismissRequest = { help = false },
             title = { Text(stringResource(R.string.export_interpolation), color = Navy) },
-            text = {
-                Column(Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    InterpolationHelp.forEach { (name, text) ->
-                        Column {
-                            Text(stringResource(name), color = Navy, fontSize = 15.sp, fontWeight = FontWeight.Bold)
-                            Text(stringResource(text), color = Navy, fontSize = 14.sp, lineHeight = 19.sp)
-                        }
-                    }
-                }
-            },
+            text = { SmoothingHelp(Navy, Modifier.heightIn(max = 420.dp)) },
             confirmButton = { TextButton({ help = false }) { Text(stringResource(R.string.ok), color = Navy) } },
             containerColor = Am.Card,
         )
@@ -518,12 +511,6 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
 }
 
 private val NoSound = txt(R.string.export_no_sound)
-
-private val InterpolationHelp = listOf(
-    R.string.export_interpolation_off to R.string.export_interpolation_off_help,
-    R.string.export_interpolation_blend to R.string.export_interpolation_blend_help,
-    R.string.export_interpolation_flow to R.string.export_interpolation_flow_help,
-)
 
 @StringRes
 private fun ExportKind.title() = when (this) {
@@ -734,7 +721,12 @@ private fun VideoPage(
             }
             Field(stringResource(R.string.export_interpolation), onHelp = onHelp) {
                 Segments(FrameInterpolation.entries.map { Choice(it) }, s.interpolation, { stringResource(it.label) }, onReason) { onChange(s.copy(interpolation = it)) }
+                Segments(levelChoices(s), s.interpolationLevel, { stringResource(it.label) }, onReason) { onChange(s.copy(interpolationLevel = it)) }
                 Hint(stringResource(R.string.export_interpolation_hint))
+            }
+            Field(stringResource(R.string.export_motion_blur), onHelp = onHelp) {
+                Segments(MotionBlur.entries.map { Choice(it) }, s.motionBlur, { stringResource(it.label) }, onReason) { onChange(s.copy(motionBlur = it)) }
+                Hint(stringResource(R.string.export_motion_blur_hint))
             }
             Field(stringResource(R.string.export_quality), "%.1f Mbps".format(Locale.ROOT, videoBitrate(w, h, s) / 1e6)) {
                 ExportSlider(s.quality) { onChange(s.copy(quality = it)) }
@@ -936,9 +928,21 @@ private fun OptionsPage(kind: ExportKind, scene: Scene, s: ExportSettings, onRea
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             FrameInterpolation.entries.forEach { Chip(stringResource(it.label), s.interpolation == it) { onChange(s.copy(interpolation = it)) } }
         }
+        FlowRow(Modifier.alpha(if (s.interpolation == FrameInterpolation.Off) Dimmed else 1f), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            levelChoices(s).forEach { c -> Chip(stringResource(c.value.label), s.interpolationLevel == c.value) { c.reason?.let(onReason) ?: onChange(s.copy(interpolationLevel = c.value)) } }
+        }
         Hint(stringResource(R.string.export_interpolation_hint))
     }
+    Field(stringResource(R.string.export_motion_blur), onHelp = onHelp) {
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            MotionBlur.entries.forEach { Chip(stringResource(it.label), s.motionBlur == it) { onChange(s.copy(motionBlur = it)) } }
+        }
+        Hint(stringResource(R.string.export_motion_blur_hint))
+    }
 }
+
+private fun levelChoices(s: ExportSettings) =
+    SmoothLevel.entries.map { Choice(it, if (s.interpolation == FrameInterpolation.Off) txt(R.string.export_interpolation_pick_method) else null) }
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable

@@ -1,0 +1,1 @@
+Three color swatches, **Shadows**, **Midtones** and **Highlights**, push the dark, middle and bright parts of the picture toward their own color. A gray swatch leaves that range unchanged. **Amount** blends the result with the original. The default look is a teal-and-orange tint: cool shadows and warm highlights.

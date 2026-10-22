@@ -132,6 +132,8 @@
     <string name="settings_emoji_android">Android</string>
     <string name="settings_keep_media_copies">Guardar una copia de los medios importados en el proyecto</string>
     <string name="settings_about">Acerca de</string>
+    <string name="settings_help">Ayuda</string>
+    <string name="effect_help">Ayuda para este efecto</string>
     <string name="settings_level_low">Baja</string>
     <string name="settings_level_high">Alta</string>
     <string name="settings_level_ultra">Ultra</string>
@@ -177,7 +179,7 @@
     <string name="library_err_scene_fps">Escena con formato incorrecto: la velocidad de fotogramas debe ser de 1 a %1$s</string>
     <string name="library_err_package_large">El paquete es demasiado grande (más de %1$s MB descomprimido)</string>
     <string name="library_err_too_many_files">El paquete tiene demasiados archivos (más de %1$s)</string>
-    <string name="library_err_xml_large">Este archivo es demasiado grande para abrirlo (más de 32 MB)</string>
+    <string name="library_err_xml_large">Este archivo es demasiado grande para abrirlo (más de 16 MB)</string>
     <string name="library_err_media_large">El paquete es demasiado grande (más de %1$s MB de medios)</string>
     <string name="library_err_not_backup">Este archivo no es una copia de seguridad de AbsentMotion.</string>
     <string name="library_err_backup_project_large">Un proyecto de la copia de seguridad es demasiado grande.</string>
@@ -390,6 +392,12 @@
     <string name="export_interpolation_blend">Mezcla de fotogramas</string>
     <string name="export_interpolation_flow">Flujo óptico</string>
     <string name="export_interpolation_hint">Los clips con una velocidad de fotogramas inferior a la de exportación se suavizan para igualarla, por ejemplo, de 30 a 60 fps.</string>
+    <string name="export_interpolation_pick_method">Primero elige Fusión de fotogramas o Flujo óptico.</string>
+    <string name="export_level_low">Baja</string>
+    <string name="export_level_medium">Media</string>
+    <string name="export_level_high">Alta</string>
+    <string name="export_motion_blur">Desenfoque de movimiento</string>
+    <string name="export_motion_blur_hint">Difumina las partes en movimiento de los clips de video como el obturador de una cámara, incluso cuando el clip ya tiene la velocidad de fotogramas de exportación.</string>
     <string name="export_quality">Calidad</string>
     <string name="export_quality_low">Baja</string>
     <string name="export_quality_high">Alta</string>
@@ -978,6 +986,11 @@
         <item quantity="many">Aún no se admiten clips de más de %1$s minutos. Recorta o divide el clip primero.</item>
         <item quantity="other">Aún no se admiten clips de más de %1$s minutos. Recorta o divide el clip primero.</item>
     </plurals>
+    <plurals name="smooth_estimate">
+        <item quantity="one">%1$s fotograma a %2$s fps, %3$s × %4$s, unos %5$s MB.</item>
+        <item quantity="many">%1$s fotogramas a %2$s fps, %3$s × %4$s, unos %5$s MB.</item>
+        <item quantity="other">%1$s fotogramas a %2$s fps, %3$s × %4$s, unos %5$s MB.</item>
+    </plurals>
     <plurals name="aibrowser_estimate">
         <item quantity="one">%1$s fotograma a %2$s × %3$s, unos %4$s MB.</item>
         <item quantity="many">%1$s fotogramas a %2$s × %3$s, unos %4$s MB.</item>
@@ -1388,6 +1401,17 @@
     <string name="export_interpolation_off_help">Cada clip muestra sus propios fotogramas. Un clip de 30 fps en una exportación de 60 fps muestra cada fotograma dos veces, así que el movimiento puede verse un poco a saltos.</string>
     <string name="export_interpolation_blend_help">Los nuevos fotogramas intermedios mezclan los dos fotogramas más cercanos como un fundido rápido. La exportación es rápida; el movimiento rápido puede verse con efecto fantasma.</string>
     <string name="export_interpolation_flow_help">La app sigue cómo se mueve cada parte de la imagen y crea fotogramas intermedios reales. Movimiento más suave, pero la exportación es más lenta y el movimiento muy rápido puede emborronarse en los bordes.</string>
+    <string name="export_interpolation_blend_levels">Baja se apoya en el fotograma más cercano, así que hay menos efecto fantasma. Media mezcla los dos fotogramas por igual. Alta también mezcla los fotogramas de alrededor para obtener el movimiento más suave. Es rápida en cualquier teléfono.</string>
+    <string name="export_interpolation_flow_levels">Baja sigue el movimiento de forma aproximada y es la más rápida; va bien con teléfonos básicos. Media es la opción habitual para teléfonos buenos. Alta sigue detalles más finos con más pasadas para bordes más limpios; es lenta, así que úsala con teléfonos rápidos o clips cortos.</string>
+    <string name="export_motion_blur_help">Difumina cada fotograma de un clip de video a lo largo de su movimiento, como el obturador de una cámara: Baja 90°, Media 180° (el aspecto cinematográfico habitual), Alta 360°. También funciona cuando un clip ya tiene la velocidad de fotogramas de exportación. Debe seguir el movimiento, así que tarda casi lo mismo que Flujo óptico en Medio.</string>
+    <string name="export_phone_speed">Este teléfono: %1$s</string>
+    <string name="smooth_clip">Suavizar</string>
+    <string name="smooth_intro">Genera una vez los fotogramas suavizados de este clip y los guarda con el proyecto, así que la vista previa y cada exportación los muestran. El clip original se conserva y se puede recuperar.</string>
+    <string name="smooth_method">Método</string>
+    <string name="smooth_nothing">Este clip ya tiene suficientes fotogramas para la velocidad de fotogramas del proyecto. Elige Desenfoque de movimiento o ralentiza primero el clip.</string>
+    <string name="smooth_frame">Suavizado: fotograma %1$s de %2$s…</string>
+    <string name="smooth_saving">Guardando el clip suavizado…</string>
+    <string name="smooth_sound_format">El audio de este clip usa un formato que no se puede conservar, así que el clip no se suavizó.</string>
     <string name="export_list_or">%1$s o %2$s</string>
     <string name="export_list_and">%1$s y %2$s</string>
     <string name="export_reason_container_codecs">%1$s necesita video %2$s, que este teléfono no puede generar a %3$s.</string>

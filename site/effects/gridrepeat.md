@@ -1,0 +1,1 @@
+Grid Repeat makes copies of the layer in a grid. **Count** is how many copies, and **Position** sets the spacing between them. The **Range** settings let each copy differ a little from the one before: smaller or larger, turned, more transparent. **Random Order** and **Seed** shuffle which copy gets which values.

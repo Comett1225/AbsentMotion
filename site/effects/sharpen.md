@@ -1,0 +1,1 @@
+Sharpen brings out fine detail. **Strength** is how much, and **Radius** how wide the sharpened edges are. Too much makes halos around edges. For a different sharpening method, try [Unsharp Mask](@effect/unsharpmask).

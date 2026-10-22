@@ -132,6 +132,8 @@
     <string name="settings_emoji_android">Android</string>
     <string name="settings_keep_media_copies">इम्पोर्ट किए गए मीडिया की कॉपी प्रोजेक्ट में रखें</string>
     <string name="settings_about">परिचय</string>
+    <string name="settings_help">सहायता</string>
+    <string name="effect_help">इस इफ़ेक्ट के लिए सहायता</string>
     <string name="settings_level_low">कम</string>
     <string name="settings_level_high">उच्च</string>
     <string name="settings_level_ultra">अल्ट्रा</string>
@@ -177,7 +179,7 @@
     <string name="library_err_scene_fps">गलत सीन: फ़्रेम रेट 1 से %1$s के बीच होना चाहिए</string>
     <string name="library_err_package_large">पैकेज बहुत बड़ा है (अनपैक करने पर %1$s MB से ज़्यादा)</string>
     <string name="library_err_too_many_files">पैकेज में बहुत ज़्यादा फ़ाइलें हैं (%1$s से ज़्यादा)</string>
-    <string name="library_err_xml_large">यह फ़ाइल खोलने के लिए बहुत बड़ी है (32 MB से ज़्यादा)</string>
+    <string name="library_err_xml_large">यह फ़ाइल खोलने के लिए बहुत बड़ी है (16 MB से ज़्यादा)</string>
     <string name="library_err_media_large">पैकेज बहुत बड़ा है (%1$s MB से ज़्यादा मीडिया)</string>
     <string name="library_err_not_backup">यह फ़ाइल AbsentMotion बैकअप नहीं है।</string>
     <string name="library_err_backup_project_large">बैकअप में एक प्रोजेक्ट बहुत बड़ा है।</string>
@@ -382,6 +384,12 @@
     <string name="export_interpolation_blend">फ़्रेम ब्लेंडिंग</string>
     <string name="export_interpolation_flow">ऑप्टिकल फ़्लो</string>
     <string name="export_interpolation_hint">एक्सपोर्ट से कम फ़्रेम रेट वाली क्लिप को मैच करने के लिए स्मूद किया जाता है, जैसे 30 से 60 fps।</string>
+    <string name="export_interpolation_pick_method">पहले फ़्रेम ब्लेंडिंग या ऑप्टिकल फ़्लो चुनें।</string>
+    <string name="export_level_low">कम</string>
+    <string name="export_level_medium">मध्यम</string>
+    <string name="export_level_high">उच्च</string>
+    <string name="export_motion_blur">मोशन ब्लर</string>
+    <string name="export_motion_blur_hint">वीडियो क्लिप के चलते हिस्सों को कैमरा शटर की तरह धुंधला करता है, तब भी जब क्लिप में एक्सपोर्ट फ़्रेम रेट पहले से हो।</string>
     <string name="export_quality">क्वालिटी</string>
     <string name="export_quality_low">कम</string>
     <string name="export_quality_high">ज़्यादा</string>
@@ -957,6 +965,10 @@
         <item quantity="one">%1$s मिनट से लंबी क्लिप अभी सपोर्टेड नहीं है। पहले क्लिप को ट्रिम या स्प्लिट करें।</item>
         <item quantity="other">%1$s मिनट से लंबी क्लिपें अभी सपोर्टेड नहीं हैं। पहले क्लिप को ट्रिम या स्प्लिट करें।</item>
     </plurals>
+    <plurals name="smooth_estimate">
+        <item quantity="one">%2$s fps पर %1$s फ़्रेम, %3$s × %4$s, लगभग %5$s MB।</item>
+        <item quantity="other">%2$s fps पर %1$s फ़्रेम, %3$s × %4$s, लगभग %5$s MB।</item>
+    </plurals>
     <plurals name="aibrowser_estimate">
         <item quantity="one">%2$s × %3$s पर %1$s फ़्रेम, लगभग %4$s MB।</item>
         <item quantity="other">%2$s × %3$s पर %1$s फ़्रेम, लगभग %4$s MB।</item>
@@ -1365,6 +1377,17 @@
     <string name="export_interpolation_off_help">हर क्लिप अपने फ़्रेम दिखाती है। 60 fps के एक्सपोर्ट में 30 fps क्लिप हर फ़्रेम दो बार दिखाती है, इसलिए मोशन थोड़ा रुक-रुक कर लग सकता है।</string>
     <string name="export_interpolation_blend_help">बीच के नए फ़्रेम दो नज़दीकी फ़्रेम को तेज़ क्रॉस-फ़ेड की तरह मिलाते हैं। एक्सपोर्ट तेज़ होता है; तेज़ मोशन में घोस्टिंग दिख सकती है।</string>
     <string name="export_interpolation_flow_help">ऐप तस्वीर का हर हिस्सा कैसे चलता है यह ट्रैक करके असली बीच के फ़्रेम बनाता है। सबसे स्मूद मोशन, लेकिन एक्सपोर्ट धीमा होता है और बहुत तेज़ मोशन में किनारों पर धुंधलापन आ सकता है।</string>
+    <string name="export_interpolation_blend_levels">कम नज़दीकी फ़्रेम पर ज़्यादा निर्भर है, इसलिए घोस्टिंग कम होती है। मध्यम दोनों फ़्रेम बराबर मिलाता है। उच्च आसपास के फ़्रेम भी मिलाता है, जिससे मोशन सबसे सॉफ़्ट होता है। हर फ़ोन पर तेज़।</string>
+    <string name="export_interpolation_flow_levels">कम मोशन को मोटे तौर पर ट्रैक करता है और सबसे तेज़ है; यह बेसिक फ़ोन के लिए ठीक है। मध्यम गुड फ़ोन के लिए आम चुनाव है। उच्च ज़्यादा पासों के साथ बारीक डिटेल ट्रैक करता है, जिससे किनारे साफ़ रहते हैं; यह धीमा है, इसलिए इसे फ़ास्ट फ़ोन या छोटी क्लिप के लिए रखें।</string>
+    <string name="export_motion_blur_help">वीडियो क्लिप के हर फ़्रेम को उसकी गति की दिशा में कैमरा शटर की तरह धुंधला करता है: कम 90°, मध्यम 180° (आम फ़िल्म लुक), उच्च 360°। यह तब भी काम करता है जब क्लिप में एक्सपोर्ट फ़्रेम रेट पहले से हो। इसे मोशन ट्रैक करना पड़ता है, इसलिए इसमें लगभग ऑप्टिकल फ़्लो मध्यम जितना समय लगता है।</string>
+    <string name="export_phone_speed">यह फ़ोन: %1$s</string>
+    <string name="smooth_clip">स्मूद</string>
+    <string name="smooth_intro">इस क्लिप के स्मूद फ़्रेम एक बार बनाकर प्रोजेक्ट के साथ रखता है, ताकि प्रीव्यू और हर एक्सपोर्ट में वे दिखें। मूल क्लिप सुरक्षित रहती है और वापस लाई जा सकती है।</string>
+    <string name="smooth_method">तरीका</string>
+    <string name="smooth_nothing">इस क्लिप में प्रोजेक्ट फ़्रेम रेट के लिए पर्याप्त फ़्रेम पहले से हैं। मोशन ब्लर चुनें, या पहले क्लिप की स्पीड धीमी करें।</string>
+    <string name="smooth_frame">स्मूदिंग: %2$s में से फ़्रेम %1$s…</string>
+    <string name="smooth_saving">स्मूद क्लिप सेव की जा रही है…</string>
+    <string name="smooth_sound_format">इस क्लिप की आवाज़ ऐसे फ़ॉर्मेट में है जिसे रखा नहीं जा सकता, इसलिए क्लिप स्मूद नहीं की गई।</string>
     <string name="export_list_or">%1$s या %2$s</string>
     <string name="export_list_and">%1$s और %2$s</string>
     <string name="export_reason_container_codecs">%1$s के लिए %2$s वीडियो चाहिए, जो यह फ़ोन %3$s पर नहीं बना सकता।</string>

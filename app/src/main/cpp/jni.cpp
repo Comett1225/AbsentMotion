@@ -111,10 +111,13 @@ JNIEXPORT jboolean JNICALL JNI_FN(nativeSetVideoFrame)(JNIEnv* env, jclass, jlon
 }
 
 JNIEXPORT jboolean JNICALL JNI_FN(nativeInterpolateVideo)(JNIEnv* env, jclass, jlong engine, jbyteArray uri, jlong layerId,
-                                                          jlong a, jlong b, jfloat t, jboolean flow, jfloatArray params) {
+                                                          jlongArray frames, jfloat t, jboolean flow, jboolean soft, jfloat blur, jfloatArray params) {
     std::string text((size_t)env->GetArrayLength(uri), '\0');
     env->GetByteArrayRegion(uri, 0, (jsize)text.size(), reinterpret_cast<jbyte*>(text.data()));
-    return engineOf(engine)->interpolateVideo(text, layerId, a, b, t, flow, interpolationParams(env, params));
+    jlong f[4] = {0, 0, 0, 0};
+    env->GetLongArrayRegion(frames, 0, std::min<jsize>(4, env->GetArrayLength(frames)), f);
+    const am::SmoothRequest request{f[0], f[1], f[2], f[3], t, flow == JNI_TRUE, soft == JNI_TRUE, blur};
+    return engineOf(engine)->interpolateVideo(text, layerId, request, interpolationParams(env, params));
 }
 
 JNIEXPORT jint JNICALL JNI_FN(nativeMoshStart)(JNIEnv* env, jclass, jlong engine, jbyteArray uri, jlong layerId, jlongArray pts,

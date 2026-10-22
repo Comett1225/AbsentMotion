@@ -132,6 +132,8 @@
     <string name="settings_emoji_android">Android</string>
     <string name="settings_keep_media_copies">Хранить копию импортированных медиа в проекте</string>
     <string name="settings_about">О приложении</string>
+    <string name="settings_help">Справка</string>
+    <string name="effect_help">Справка по этому эффекту</string>
     <string name="settings_level_low">Низкий</string>
     <string name="settings_level_high">Высокий</string>
     <string name="settings_level_ultra">Ультра</string>
@@ -177,7 +179,7 @@
     <string name="library_err_scene_fps">Некорректная сцена: частота кадров должна быть от 1 до %1$s</string>
     <string name="library_err_package_large">Пакет слишком большой (больше %1$s MB в распакованном виде)</string>
     <string name="library_err_too_many_files">В пакете слишком много файлов (больше %1$s)</string>
-    <string name="library_err_xml_large">Файл слишком большой для открытия (больше 32 MB)</string>
+    <string name="library_err_xml_large">Файл слишком большой для открытия (больше 16 MB)</string>
     <string name="library_err_media_large">Пакет слишком большой (медиа больше %1$s MB)</string>
     <string name="library_err_not_backup">Этот файл не является резервной копией AbsentMotion.</string>
     <string name="library_err_backup_project_large">Один из проектов в резервной копии слишком большой.</string>
@@ -398,6 +400,12 @@
     <string name="export_interpolation_blend">Смешивание кадров</string>
     <string name="export_interpolation_flow">Оптический поток</string>
     <string name="export_interpolation_hint">Клипы с более низкой частотой кадров, чем при экспорте, сглаживаются до неё, например с 30 до 60 fps.</string>
+    <string name="export_interpolation_pick_method">Сначала выберите смешивание кадров или оптический поток.</string>
+    <string name="export_level_low">Низкий</string>
+    <string name="export_level_medium">Средний</string>
+    <string name="export_level_high">Высокий</string>
+    <string name="export_motion_blur">Размытие в движении</string>
+    <string name="export_motion_blur_hint">Размывает движущиеся части видеоклипов, как затвор камеры, даже если у клипа уже есть частота кадров экспорта.</string>
     <string name="export_quality">Качество</string>
     <string name="export_quality_low">Низкое</string>
     <string name="export_quality_high">Высокое</string>
@@ -999,6 +1007,12 @@
         <item quantity="many">Клипы длиннее %1$s минут пока не поддерживаются. Сначала обрежьте или разделите клип.</item>
         <item quantity="other">Клипы длиннее %1$s минуты пока не поддерживаются. Сначала обрежьте или разделите клип.</item>
     </plurals>
+    <plurals name="smooth_estimate">
+        <item quantity="one">%1$s кадр при %2$s fps, %3$s × %4$s, около %5$s MB.</item>
+        <item quantity="few">%1$s кадра при %2$s fps, %3$s × %4$s, около %5$s MB.</item>
+        <item quantity="many">%1$s кадров при %2$s fps, %3$s × %4$s, около %5$s MB.</item>
+        <item quantity="other">%1$s кадра при %2$s fps, %3$s × %4$s, около %5$s MB.</item>
+    </plurals>
     <plurals name="aibrowser_estimate">
         <item quantity="one">%1$s кадр при %2$s × %3$s, около %4$s MB.</item>
         <item quantity="few">%1$s кадра при %2$s × %3$s, около %4$s MB.</item>
@@ -1411,6 +1425,17 @@
     <string name="export_interpolation_off_help">Каждый клип показывает свои кадры. Клип 30 fps при экспорте в 60 fps показывает каждый кадр дважды, поэтому движение может выглядеть немного ступенчатым.</string>
     <string name="export_interpolation_blend_help">Новые промежуточные кадры смешивают два ближайших кадра как быстрое перекрёстное затухание. Экспорт быстрый; при быстром движении может появляться двоение.</string>
     <string name="export_interpolation_flow_help">Приложение отслеживает движение каждой части изображения и создаёт настоящие промежуточные кадры. Самое плавное движение, но экспорт медленнее, а при очень быстром движении края могут смазываться.</string>
+    <string name="export_interpolation_blend_levels">Низкий опирается на ближайший кадр, поэтому меньше шлейфов. Средний равномерно смешивает два кадра. Высокий также подмешивает соседние кадры для максимально плавного движения. Быстро на любом телефоне.</string>
+    <string name="export_interpolation_flow_levels">Низкий грубо отслеживает движение и работает быстрее всего; подходит для базовых телефонов. Средний — обычный выбор для хороших телефонов. Высокий отслеживает более мелкие детали с большим числом проходов для более чистых краёв; он медленный, поэтому оставьте его для быстрых телефонов или коротких клипов.</string>
+    <string name="export_motion_blur_help">Размывает каждый кадр видеоклипа по направлению движения, как затвор камеры: низкий — 90°, средний — 180° (обычный киношный вид), высокий — 360°. Также работает, если у клипа уже есть частота кадров экспорта. Требуется отслеживание движения, поэтому занимает примерно столько же времени, сколько оптический поток среднего уровня.</string>
+    <string name="export_phone_speed">Этот телефон: %1$s</string>
+    <string name="smooth_clip">Сгладить</string>
+    <string name="smooth_intro">Один раз создаёт сглаженные кадры для этого клипа и сохраняет их в проекте, поэтому они отображаются в предпросмотре и при каждом экспорте. Исходный клип сохраняется, и его можно вернуть.</string>
+    <string name="smooth_method">Метод</string>
+    <string name="smooth_nothing">В этом клипе уже достаточно кадров для частоты кадров проекта. Выберите «Размытие в движении» или сначала замедлите клип.</string>
+    <string name="smooth_frame">Сглаживание: кадр %1$s из %2$s…</string>
+    <string name="smooth_saving">Сохранение сглаженного клипа…</string>
+    <string name="smooth_sound_format">Звук этого клипа использует формат, который нельзя сохранить, поэтому клип не был сглажен.</string>
     <string name="export_list_or">%1$s или %2$s</string>
     <string name="export_list_and">%1$s и %2$s</string>
     <string name="export_reason_container_codecs">Для %1$s нужно видео %2$s, которое этот телефон не может создать в %3$s.</string>

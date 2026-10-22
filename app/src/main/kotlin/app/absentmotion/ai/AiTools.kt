@@ -13,6 +13,8 @@ import androidx.compose.runtime.setValue
 import androidx.core.content.FileProvider
 import app.absentmotion.editor.EditorPanel
 import app.absentmotion.editor.EditorState
+import app.absentmotion.export.FrameInterpolation
+import app.absentmotion.export.Smoothing
 import app.absentmotion.model.Layer
 import app.absentmotion.model.MediaDeclaration
 import app.absentmotion.model.XmlNode
@@ -27,14 +29,15 @@ import java.io.File
 import java.util.UUID
 
 enum class AiAction(@StringRes val title: Int) {
-    Background(R.string.ai_remove_background), Noise(R.string.ai_reduce_noise), Video(R.string.ai_remove_background_video), Enhance(R.string.ai_enhance);
+    Background(R.string.ai_remove_background), Noise(R.string.ai_reduce_noise), Video(R.string.ai_remove_background_video), Smooth(R.string.smooth_clip),
+    Enhance(R.string.ai_enhance);
 
-    val offered: Boolean get() = this == Noise || this == Enhance || BackgroundRemoval.AVAILABLE
+    val offered: Boolean get() = this == Noise || this == Enhance || this != Smooth && BackgroundRemoval.AVAILABLE
 
     fun unavailable(layer: Layer?): UiText? = when (this) {
         Background -> if (layer?.mediaFill?.video == false) null else txt(R.string.ai_select_image_layer)
         Noise -> if (layer?.kind == "audio") null else txt(R.string.ai_select_audio_layer)
-        Video, Enhance -> if (layer?.mediaFill?.video == true) null else txt(R.string.ai_select_video_layer)
+        Video, Smooth, Enhance -> if (layer?.mediaFill?.video == true) null else txt(R.string.ai_select_video_layer)
     }
 }
 
@@ -43,6 +46,8 @@ internal typealias AiProgress = suspend (Float, String) -> Unit
 
 class AiTools(private val context: Context, private val state: EditorState, private val scope: CoroutineScope) {
     var running by mutableStateOf<AiAction?>(null)
+        private set
+    var last by mutableStateOf<AiAction?>(null)
         private set
     var progress by mutableStateOf(0f)
         private set
@@ -53,6 +58,8 @@ class AiTools(private val context: Context, private val state: EditorState, priv
     var videoSetup by mutableStateOf<Layer?>(null)
     var noiseSetup by mutableStateOf<Layer?>(null)
     var noiseSource by mutableStateOf(NoiseSource.Voice)
+    var smoothSetup by mutableStateOf<Layer?>(null)
+    var smoothing by mutableStateOf(Smoothing(FrameInterpolation.Flow))
     var videoSide by mutableIntStateOf(MatteSides[1])
     var enhanceSetup by mutableStateOf<Layer?>(null)
     var enhance by mutableStateOf(EnhanceOptions())
@@ -76,6 +83,11 @@ class AiTools(private val context: Context, private val state: EditorState, priv
             noiseSetup = layer
             return
         }
+        if (action == AiAction.Smooth && !confirmed) {
+            dismiss()
+            smoothSetup = layer
+            return
+        }
         if (action == AiAction.Enhance && !confirmed) {
             dismiss()
             enhanceSetup = layer
@@ -83,9 +95,10 @@ class AiTools(private val context: Context, private val state: EditorState, priv
         }
         videoSetup = null
         noiseSetup = null
+        smoothSetup = null
         enhanceSetup = null
         state.playing = false
-        running = action; progress = 0f; message = AppText.get(R.string.ai_preparing); retry = null
+        running = action; last = action; progress = 0f; message = AppText.get(R.string.ai_preparing); retry = null
         job = scope.launch {
             var result: AiMedia? = null
             var committed = false
@@ -106,7 +119,7 @@ class AiTools(private val context: Context, private val state: EditorState, priv
                     state.edit { scene ->
                         scene.update(layer.id) {
                             it.copy(node = it.node.with(AiKind.Enhance.attribute!!, output.declaration.uri))
-                                .withAiMark(AiKind.Enhance, it.node[AiKind.Enhance.attribute], output.declaration.uri, options.xml)
+                                .withAiMark(AiKind.Enhance, it.node[AiKind.Enhance.attribute], output.declaration.uri, options.xml, media)
                         }.withMedia(output.declaration)
                     }
                 } else if (action == AiAction.Video) {
@@ -118,6 +131,21 @@ class AiTools(private val context: Context, private val state: EditorState, priv
                     val next = checkNotNull(state.scene.withVideoMatte(layer, matte.media.declaration, matte.frameWidth, matte.frameHeight, Layer.newId(), groupId)) { AppText.get(R.string.ai_cannot_mask) }
                     state.edit { next.update(groupId) { it.withAiMark(AiKind.Video, null, null) } }
                     state.selectedId = groupId
+                } else if (action == AiAction.Smooth) {
+                    val previous = layer.aiMarks.firstOrNull { it.kind == AiKind.Smooth }
+                    val source = previous?.original ?: layer.mediaFill!!.uri
+                    val media = checkNotNull(previous?.media ?: state.scene.media(source)) { AppText.get(R.string.ai_video_missing) }
+                    val chosen = smoothing
+                    val output = withContext(Dispatchers.IO) {
+                        ClipSmooth.run(context, state.engine, layer.copy(node = layer.node.with("fillVideo", source)), media, state.scene.fps, chosen, report).also { result = it }
+                    }
+                    ensureActive()
+                    check(state.scene.layer(layer.id) == layer) { AppText.get(R.string.ai_layer_changed) }
+                    state.edit { scene ->
+                        scene.update(layer.id) {
+                            it.copy(node = it.node.with("fillVideo", output.declaration.uri)).withAiMark(AiKind.Smooth, source, output.declaration.uri, chosen.option, media)
+                        }.withMedia(output.declaration)
+                    }
                 } else {
                     val original = state.scene.media(layer.node[if (action == AiAction.Noise) "src" else "fillImage"] ?: "")
                     withContext(Dispatchers.IO) {
@@ -135,7 +163,7 @@ class AiTools(private val context: Context, private val state: EditorState, priv
                     state.edit { scene ->
                         scene.update(layer.id) {
                             it.copy(node = it.node.with(kind.attribute!!, output.declaration.uri))
-                                .withAiMark(kind, it.node[kind.attribute], output.declaration.uri, if (kind == AiKind.Noise) used.xml else null)
+                                .withAiMark(kind, it.node[kind.attribute], output.declaration.uri, if (kind == AiKind.Noise) used.xml else null, original)
                         }.withMedia(output.declaration)
                     }
                 }
