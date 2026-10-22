@@ -219,6 +219,12 @@
         if (verdictInfo && verdictInfo.ai) kids.push(el("p", { "class": "small", text: verdictInfo.ai }));
         break;
       case "compatible":
+        if (!link("dl-compatible")) {
+          heading = "The version for your phone is coming soon";
+          kids.push(el("p", { text: seen + " Android 9 to 12 needs the Compatible version, which comes with the next update. Check back here soon." }));
+          kids.push(el("p", { "class": "small" }, [el("a", { href: "compatible.html", text: "What the Compatible version is" }), "."]));
+          break;
+        }
         heading = "Get the Compatible version";
         kids.push(el("p", { text: seen + " Android 9 to 12 uses the Compatible version." }));
         actions.push(el("a", { "class": "btn big", href: link("dl-compatible") }, ["Download Compatible version", el("span", { "class": "sub", text: "Android 9 to 12, " + version })]));
@@ -239,7 +245,7 @@
         heading = "Which Android version do you have?";
         kids.push(el("p", { text: (name ? "We think this is a " + name + ", but " : "") + "your browser does not tell us the Android version. Open Settings, About phone, Android version." }));
         actions.push(el("a", { "class": "btn", href: link("dl-foss"), text: "Android 13 or newer: Latest" }));
-        actions.push(el("a", { "class": "btn alt", href: link("dl-compatible"), text: "Android 9 to 12: Compatible" }));
+        if (link("dl-compatible")) actions.push(el("a", { "class": "btn alt", href: link("dl-compatible"), text: "Android 9 to 12: Compatible" }));
         kids.push(el("p", { "class": "small" }, ["Not sure it will run? ", el("a", { href: "phone-checker.html", text: "Use the phone checker" }), "."]));
         break;
       case "ios":

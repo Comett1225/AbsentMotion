@@ -429,11 +429,18 @@ class Site:
             'Background removal uses its own offline model; this file contains no Google libraries. <code>AbsentMotion-%s-foss.apk</code></div></li>'
             '<li><a id="dl-play" class="btn alt" href="%s">Latest (Play services)</a><div><strong>Android 13 or newer.</strong> The same app, but background removal uses Google Play services, '
             'which downloads its own model and may send diagnostics to Google. <code>AbsentMotion-%s-play.apk</code></div></li>'
-            '<li><a id="dl-compatible" class="btn alt" href="%s">Compatible</a><div><strong>Android 9 to 12.</strong> Some features are left out: '
-            '<a href="compatible.html">see the list</a>. <code>AbsentMotion-%s-compatible.apk</code></div></li></ul>'
+            '%s</ul>'
             '<p class="small"><a id="dl-sums" href="%s">SHA256SUMS.txt</a> has the checksum of every file. <a href="%s" rel="noopener">All releases and older versions</a> &middot; '
             '<a href="%s" rel="noopener">Source code</a></p></section>'
-        ) % (v, links["foss"], v, links["play"], v, links["compatible"], v, links["sums"], SHORT["releases"], REPO)
+        ) % (v, links["foss"], v, links["play"], v, self.compatible_item(), links["sums"], SHORT["releases"], REPO)
+
+    def compatible_item(self):
+        v = self.version
+        if tuple(int(part) for part in v.split(".")[:3]) < (3, 3, 0):
+            return ('<li><span id="dl-compatible" class="btn alt" aria-disabled="true">Compatible</span><div><strong>Android 9 to 12.</strong> '
+                    'Coming with the next update. <a href="compatible.html">What it is</a>.</div></li>')
+        return ('<li><a id="dl-compatible" class="btn alt" href="%s">Compatible</a><div><strong>Android 9 to 12.</strong> Some features are left out: '
+                '<a href="compatible.html">see the list</a>. <code>AbsentMotion-%s-compatible.apk</code></div></li>') % (self.download_links()["compatible"], v)
 
     def checker_box(self):
         return (

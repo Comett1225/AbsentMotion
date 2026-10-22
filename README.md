@@ -4,6 +4,18 @@
 
 # AbsentMotion
 
+<p align="center">
+  <a href="https://comett1225.github.io/AbsentMotion/"><b>Download for your phone</b></a>
+  &nbsp;·&nbsp;
+  <a href="https://comett1225.github.io/AbsentMotion/guide.html"><b>Guide and docs</b></a>
+  &nbsp;·&nbsp;
+  <a href="https://comett1225.github.io/AbsentMotion/phone-checker.html">Will it run on my phone?</a>
+  &nbsp;·&nbsp;
+  <a href="https://comett1225.github.io/AbsentMotion/effects/index.html">All effects</a>
+  &nbsp;·&nbsp;
+  <a href="https://github.com/Comett1225/AbsentMotion/releases">All versions</a>
+</p>
+
 AbsentMotion is a free, open-source alternative to CapCut and Alight Motion: a motion graphics, animation and video
 editor for Android phones. Everything runs on your phone and it works without an internet connection. There is no
 subscription, no account and no advertising, and your projects never leave your device.
