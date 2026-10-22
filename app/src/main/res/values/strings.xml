@@ -383,6 +383,12 @@
     <string name="export_interpolation_blend">Frame blending</string>
     <string name="export_interpolation_flow">Optical flow</string>
     <string name="export_interpolation_hint">Clips with a lower frame rate than the export are smoothed to match, for example 30 to 60 fps.</string>
+    <string name="export_interpolation_pick_method">Choose Frame blending or Optical flow first.</string>
+    <string name="export_level_low">Low</string>
+    <string name="export_level_medium">Medium</string>
+    <string name="export_level_high">High</string>
+    <string name="export_motion_blur">Motion Blur</string>
+    <string name="export_motion_blur_hint">Smears moving parts of video clips like a camera shutter, even when a clip already has the export frame rate.</string>
     <string name="export_quality">Quality</string>
     <string name="export_quality_low">Low</string>
     <string name="export_quality_high">High</string>
@@ -1341,6 +1347,10 @@
     <string name="export_interpolation_off_help">Each clip shows its own frames. A 30 fps clip in a 60 fps export shows every frame twice, so motion can look a little stepped.</string>
     <string name="export_interpolation_blend_help">The new in-between frames mix the two nearest frames like a quick cross-fade. Fast to export; fast motion can look ghosted.</string>
     <string name="export_interpolation_flow_help">The app follows how each part of the picture moves and draws real in-between frames. Smoothest motion, but the export is slower and very fast motion can smear at the edges.</string>
+    <string name="export_interpolation_blend_levels">Low leans on the nearest frame, so there is less ghosting. Medium mixes the two frames evenly. High also mixes in the frames around them for the softest motion. Quick on every phone.</string>
+    <string name="export_interpolation_flow_levels">Low tracks motion roughly and is the quickest; it suits Basic phones. Medium is the usual choice for Good phones. High tracks finer detail with more passes for cleaner edges; it is slow, so keep it for Fast phones or short clips.</string>
+    <string name="export_motion_blur_help">Smears every frame of a video clip along its motion, like a camera shutter: Low 90°, Medium 180° (the usual film look), High 360°. It also works when a clip already has the export frame rate. It has to track motion, so it takes about as long as Optical flow Medium.</string>
+    <string name="export_phone_speed">This phone: %1$s</string>
     <string name="export_list_or">%1$s or %2$s</string>
     <string name="export_list_and">%1$s and %2$s</string>
     <string name="export_reason_container_codecs">%1$s needs %2$s video, which this phone cannot make at %3$s.</string>

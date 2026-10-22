@@ -39,7 +39,7 @@ internal fun gifTimeMs(frames: Int, sample: GifSample, renderMs: Long?): Long {
 internal suspend fun measureGif(engine: EngineThread, scene: Scene, settings: ExportSettings): GifSample {
     val (width, height) = exportSize(scene, settings.shortSide, false)
     val frames = frameCount(scene, settings.fps)
-    return engine.exportSession(scene.toXml(), settings.interpolation, settings.fps) {
+    return engine.exportSession(scene.toXml(), settings.smoothing, settings.fps) {
         val renderMs = ArrayList<Double>()
         val samples = listOf(0, frames / 4, frames / 2, frames * 3 / 4, frames - 1).distinct().map { index ->
             val started = System.nanoTime()

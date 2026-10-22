@@ -107,8 +107,34 @@ val ImageQualities = listOf(50, 70, 85, 95, 100)
 const val BackgroundWhite = 0xFFFFFFFF.toInt()
 const val BackgroundBlack = 0xFF000000.toInt()
 
-enum class FrameInterpolation(@StringRes val label: Int) {
-    Off(R.string.export_interpolation_off), Blend(R.string.export_interpolation_blend), Flow(R.string.export_interpolation_flow)
+enum class FrameInterpolation(@StringRes val label: Int, @StringRes val help: Int, @StringRes val levels: Int?) {
+    Off(R.string.export_interpolation_off, R.string.export_interpolation_off_help, null),
+    Blend(R.string.export_interpolation_blend, R.string.export_interpolation_blend_help, R.string.export_interpolation_blend_levels),
+    Flow(R.string.export_interpolation_flow, R.string.export_interpolation_flow_help, R.string.export_interpolation_flow_levels),
+}
+
+enum class SmoothLevel(@StringRes val label: Int) {
+    Low(R.string.export_level_low), Medium(R.string.export_level_medium), High(R.string.export_level_high)
+}
+
+enum class MotionBlur(@StringRes val label: Int, val shutter: Float) {
+    Off(R.string.export_interpolation_off, 0f), Low(R.string.export_level_low, 90f), Medium(R.string.export_level_medium, 180f), High(R.string.export_level_high, 360f)
+}
+
+data class Smoothing(
+    val method: FrameInterpolation = FrameInterpolation.Off,
+    val level: SmoothLevel = SmoothLevel.Medium,
+    val blur: MotionBlur = MotionBlur.Off,
+    val blurScale: Float = 1f,
+) {
+    val active: Boolean get() = method != FrameInterpolation.Off || blur != MotionBlur.Off
+    @get:StringRes val label: Int get() = if (method != FrameInterpolation.Off) method.label else R.string.export_motion_blur
+
+    fun flowParams(medium: FloatArray): FloatArray = when {
+        method != FrameInterpolation.Flow || level == SmoothLevel.Medium -> medium
+        level == SmoothLevel.Low -> floatArrayOf(8f, 4f, 4f, 1f, 0.15f, 4f)
+        else -> floatArrayOf(2f, 6f, 8f, 2f, 0.15f, 4f)
+    }
 }
 
 data class ExportSettings(
@@ -123,7 +149,11 @@ data class ExportSettings(
     val container: Container = Container.Mp4,
     val audio: AudioSettings = AudioSettings(),
     val audioFormat: AudioFormat = AudioFormat.M4a,
-)
+    val interpolationLevel: SmoothLevel = SmoothLevel.Medium,
+    val motionBlur: MotionBlur = MotionBlur.Off,
+) {
+    val smoothing: Smoothing get() = Smoothing(interpolation, interpolationLevel, motionBlur)
+}
 
 fun defaultSettings(kind: ExportKind, scene: Scene): ExportSettings = when (kind) {
     ExportKind.Video -> ExportSettings(

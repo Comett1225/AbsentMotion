@@ -390,6 +390,12 @@
     <string name="export_interpolation_blend">Mistura de quadros</string>
     <string name="export_interpolation_flow">Fluxo óptico</string>
     <string name="export_interpolation_hint">Clipes com taxa de quadros menor que a da exportação são suavizados para acompanhar, por exemplo, de 30 para 60 fps.</string>
+    <string name="export_interpolation_pick_method">Escolha Mesclagem de quadros ou Fluxo óptico primeiro.</string>
+    <string name="export_level_low">Baixa</string>
+    <string name="export_level_medium">Média</string>
+    <string name="export_level_high">Alta</string>
+    <string name="export_motion_blur">Desfoque de movimento</string>
+    <string name="export_motion_blur_hint">Espalha as partes em movimento dos clipes de vídeo como o obturador de uma câmera, mesmo quando o clipe já tem a taxa de quadros da exportação.</string>
     <string name="export_quality">Qualidade</string>
     <string name="export_quality_low">Baixa</string>
     <string name="export_quality_high">Alta</string>
@@ -1340,6 +1346,10 @@
     <string name="export_interpolation_off_help">Cada clipe mostra seus próprios quadros. Um clipe de 30 fps em uma exportação de 60 fps mostra cada quadro duas vezes, então o movimento pode parecer um pouco aos saltos.</string>
     <string name="export_interpolation_blend_help">Os novos quadros intermediários misturam os dois quadros mais próximos como um cross-fade rápido. A exportação é rápida; movimentos rápidos podem ficar com aspecto fantasma.</string>
     <string name="export_interpolation_flow_help">O app acompanha como cada parte da imagem se move e desenha quadros intermediários reais. Movimento mais suave, mas a exportação é mais lenta e movimentos muito rápidos podem ficar borrados nas bordas.</string>
+    <string name="export_interpolation_blend_levels">Baixa se apoia mais no quadro mais próximo, então há menos efeito fantasma. Média mistura os dois quadros por igual. Alta também mistura os quadros ao redor para o movimento mais suave. Rápido em qualquer celular.</string>
+    <string name="export_interpolation_flow_levels">Baixa rastreia o movimento de forma aproximada e é a mais rápida; combina com celulares Básicos. Média é a escolha usual para celulares Bons. Alta rastreia detalhes mais finos com mais passagens para bordas mais limpas; é lenta, então use em celulares Rápidos ou clipes curtos.</string>
+    <string name="export_motion_blur_help">Espalha cada quadro de um clipe de vídeo ao longo do movimento, como o obturador de uma câmera: Baixa 90°, Média 180° (o visual usual do cinema), Alta 360°. Também funciona quando o clipe já tem a taxa de quadros da exportação. Precisa rastrear o movimento, então leva mais ou menos o mesmo tempo que Fluxo óptico Médio.</string>
+    <string name="export_phone_speed">Este celular: %1$s</string>
     <string name="export_list_or">%1$s ou %2$s</string>
     <string name="export_list_and">%1$s e %2$s</string>
     <string name="export_reason_container_codecs">%1$s precisa de vídeo %2$s, que este celular não consegue gerar em %3$s.</string>

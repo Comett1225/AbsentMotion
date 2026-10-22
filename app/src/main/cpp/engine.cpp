@@ -103,8 +103,7 @@ public:
     bool setPicture(const std::string& uri, int64_t layerId, AHardwareBuffer* buffer,
                     const void* pixels, int width, int height, size_t rowBytes, bool opaque, int colorStandard, int colorRange, const FrameCrop& crop) override;
     bool setVideoFrame(const std::string& uri, int64_t layerId, int64_t pts, AHardwareBuffer* buffer, int colorStandard, int colorRange, const FrameCrop& crop) override;
-    bool interpolateVideo(const std::string& uri, int64_t layerId, int64_t a, int64_t b, float t, bool flow,
-                          const InterpolationParams& params) override;
+    bool interpolateVideo(const std::string& uri, int64_t layerId, const SmoothRequest& request, const InterpolationParams& params) override;
     int moshStart(const std::string& uri, int64_t layerId, const std::vector<int64_t>& pts, const MoshParams& params) override;
     bool moshFrame(const std::string& uri, int64_t layerId, int step, AHardwareBuffer* buffer, int colorStandard, int colorRange,
                    const FrameCrop& crop) override;
@@ -812,37 +811,55 @@ sk_sp<SkImage> EngineImpl::flowFor(VideoFrames& video, int64_t a, int64_t b, con
     return flow;
 }
 
-bool EngineImpl::interpolateVideo(const std::string& uri, int64_t layerId, int64_t a, int64_t b, float t, bool flow,
-                                  const InterpolationParams& params) {
+bool EngineImpl::interpolateVideo(const std::string& uri, int64_t layerId, const SmoothRequest& r, const InterpolationParams& params) {
     const auto key = std::make_pair(uri, layerId);
     auto found = fVideoFrames.find(key);
     if (found == fVideoFrames.end()) return false;
     VideoFrames& video = found->second;
-    auto first = video.frames.find(a), second = video.frames.find(b);
-    if (first == video.frames.end() || second == video.frames.end()) return false;
-    sk_sp<SkImage> image = first->second;
-    if (a != b && t > 0) {
+    auto frame = [&](int64_t pts) {
+        auto it = video.frames.find(pts);
+        return it == video.frames.end() ? nullptr : it->second;
+    };
+    const sk_sp<SkImage> first = frame(r.a), second = frame(r.b);
+    if (!first || !second) return false;
+    sk_sp<SkImage> image = first;
+    const bool mix = r.a != r.b && (r.t > 0 || r.soft);
+    const bool flow = r.a != r.b && ((r.flow && r.t > 0) || r.blur > 0);
+    if (mix || flow) {
         if (!fGraphite || fGpuFailed) {
             LOGE("interpolation failed: GPU is unavailable");
             return false;
         }
-        const sk_sp<SkImage> field = flow ? this->flowFor(video, a, b, params) : nullptr;
+        const sk_sp<SkImage> field = flow ? this->flowFor(video, r.a, r.b, params) : nullptr;
         if (flow && !field) {
             LOGE("interpolation failed: optical flow could not be estimated");
             return false;
         }
-        double ms = 0;
-        auto mixed = SynthesizeFrame(fGraphite.get(), fRecorder.get(), first->second, second->second, field, t,
-                                     params.divisor, &ms);
-        __android_log_print(ANDROID_LOG_INFO, "AMInterp", "frame a=%" PRId64 " b=%" PRId64 " t=%.4f mode=%s synthesis=%.2f",
-                            a, b, t, field ? "flow" : "blend", ms);
-        if (!mixed) {
-            LOGE("interpolation failed: frame synthesis returned no image");
-            return false;
+        if (mix) {
+            double ms = 0;
+            const sk_sp<SkImage> before = r.soft ? frame(r.before) : nullptr, after = r.soft ? frame(r.after) : nullptr;
+            auto mixed = SynthesizeFrame(fGraphite.get(), fRecorder.get(), first, second, r.flow ? field : nullptr, r.t, params.divisor, &ms,
+                                         r.soft ? (before ? before : first) : nullptr, r.soft ? (after ? after : second) : nullptr);
+            __android_log_print(ANDROID_LOG_INFO, "AMInterp", "frame a=%" PRId64 " b=%" PRId64 " t=%.4f mode=%s synthesis=%.2f",
+                                r.a, r.b, r.t, r.flow ? "flow" : r.soft ? "soft" : "blend", ms);
+            if (!mixed) {
+                LOGE("interpolation failed: frame synthesis returned no image");
+                return false;
+            }
+            image = std::move(mixed);
         }
-        image = std::move(mixed);
+        if (r.blur > 0) {
+            auto blurred = MotionBlur(fGraphite.get(), fRecorder.get(), image, field, r.t, r.blur, params.divisor);
+            if (!blurred) {
+                LOGE("interpolation failed: motion blur returned no image");
+                return false;
+            }
+            image = std::move(blurred);
+        }
     }
-    std::erase_if(video.frames, [&](const auto& frame) { return frame.first != a && frame.first != b; });
+    std::erase_if(video.frames, [&](const auto& kept) {
+        return kept.first != r.a && kept.first != r.b && kept.first != r.before && kept.first != r.after;
+    });
     std::erase_if(video.flows, [&](const auto& pair) {
         return !video.frames.count(pair.first.first) || !video.frames.count(pair.first.second);
     });

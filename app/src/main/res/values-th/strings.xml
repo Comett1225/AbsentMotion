@@ -374,6 +374,12 @@
     <string name="export_interpolation_blend">การผสมเฟรม</string>
     <string name="export_interpolation_flow">ออปติคัลโฟลว์</string>
     <string name="export_interpolation_hint">คลิปที่มีเฟรมเรตต่ำกว่าการส่งออกจะถูกปรับให้เนียนขึ้นเพื่อให้ตรงกัน เช่น 30 เป็น 60 fps</string>
+    <string name="export_interpolation_pick_method">เลือกการผสมเฟรมหรือออปติคัลโฟลว์ก่อน</string>
+    <string name="export_level_low">ต่ำ</string>
+    <string name="export_level_medium">ปานกลาง</string>
+    <string name="export_level_high">สูง</string>
+    <string name="export_motion_blur">โมชันเบลอ</string>
+    <string name="export_motion_blur_hint">ทำให้ส่วนที่เคลื่อนไหวของคลิปวิดีโอเบลอตามการเคลื่อนไหวเหมือนชัตเตอร์กล้อง แม้คลิปจะมีเฟรมเรตเดียวกับตอนส่งออกอยู่แล้ว</string>
     <string name="export_quality">คุณภาพ</string>
     <string name="export_quality_low">ต่ำ</string>
     <string name="export_quality_high">สูง</string>
@@ -1294,6 +1300,10 @@
     <string name="export_interpolation_off_help">แต่ละคลิปแสดงเฟรมของตัวเอง คลิป 30 fps ในการส่งออก 60 fps จะแสดงทุกเฟรมสองครั้ง การเคลื่อนไหวจึงอาจดูสะดุดเล็กน้อย</string>
     <string name="export_interpolation_blend_help">เฟรมแทรกใหม่จะผสมสองเฟรมที่ใกล้ที่สุดเหมือนการครอสเฟดเร็ว ส่งออกไว แต่การเคลื่อนไหวเร็วอาจดูเป็นเงาซ้อน</string>
     <string name="export_interpolation_flow_help">แอปจะติดตามการเคลื่อนไหวของแต่ละส่วนในภาพและสร้างเฟรมแทรกจริง การเคลื่อนไหวลื่นที่สุด แต่ส่งออกช้ากว่า และการเคลื่อนไหวเร็วมากอาจเบลอที่ขอบ</string>
+    <string name="export_interpolation_blend_levels">ต่ำจะยึดเฟรมที่ใกล้ที่สุด จึงมีเงาซ้อนน้อยลง ปานกลางผสมสองเฟรมเท่า ๆ กัน สูงจะผสมเฟรมรอบข้างด้วยเพื่อการเคลื่อนไหวที่นุ่มนวลที่สุด เร็วบนทุกเครื่อง</string>
+    <string name="export_interpolation_flow_levels">ต่ำจะติดตามการเคลื่อนไหวอย่างคร่าว ๆ และเร็วที่สุด เหมาะกับเครื่องระดับพื้นฐาน ปานกลางเป็นตัวเลือกปกติสำหรับเครื่องระดับดี สูงจะติดตามรายละเอียดที่ละเอียดขึ้นด้วยการประมวลผลหลายรอบเพื่อขอบที่สะอาดกว่า แต่ช้า จึงควรใช้กับเครื่องระดับเร็วหรือคลิปสั้น</string>
+    <string name="export_motion_blur_help">ทำให้ทุกเฟรมของคลิปวิดีโอเบลอตามการเคลื่อนไหวเหมือนชัตเตอร์กล้อง: ต่ำ 90°, ปานกลาง 180° (ลุคภาพยนตร์ทั่วไป), สูง 360° ยังใช้ได้แม้คลิปจะมีเฟรมเรตเดียวกับตอนส่งออกอยู่แล้ว ต้องติดตามการเคลื่อนไหว จึงใช้เวลาพอ ๆ กับออปติคัลโฟลว์ระดับปานกลาง</string>
+    <string name="export_phone_speed">เครื่องนี้: %1$s</string>
     <string name="export_list_or">%1$s หรือ %2$s</string>
     <string name="export_list_and">%1$s และ %2$s</string>
     <string name="export_reason_container_codecs">%1$s ต้องใช้วิดีโอ %2$s ซึ่งโทรศัพท์นี้สร้างที่ %3$s ไม่ได้</string>

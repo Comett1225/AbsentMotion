@@ -104,7 +104,7 @@ internal suspend fun exportVideo(
             worker("audio-out") { drain(coder, mux, stop, 0, delay.takeIf { aac }, totalUs, rate = sound.effectiveRate, zeroStart = !aac) }
             worker("audio-in") { feedAudio(coder, audio, totalUs, stop, delay, sound.effectiveRate, sound.channels) }
         }
-        engine.exportSession(xml, s.interpolation, s.fps) {
+        engine.exportSession(xml, s.smoothing, s.fps) {
             suspend fun eachFrame(draw: suspend (k: Int, presentNs: Long) -> Unit) {
                 for (k in 0 until frames) {
                     currentCoroutineContext().ensureActive()

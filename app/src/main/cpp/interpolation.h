@@ -24,6 +24,10 @@ sk_sp<SkImage> MoshStep(skgpu::graphite::Context* context, skgpu::graphite::Reco
                         float salt, sk_sp<SkImage>* motion);
 
 sk_sp<SkImage> SynthesizeFrame(skgpu::graphite::Context* context, skgpu::graphite::Recorder* recorder, const sk_sp<SkImage>& a,
-                               const sk_sp<SkImage>& b, const sk_sp<SkImage>& flow, float t, int divisor, double* ms);
+                               const sk_sp<SkImage>& b, const sk_sp<SkImage>& flow, float t, int divisor, double* ms,
+                               const sk_sp<SkImage>& before = nullptr, const sk_sp<SkImage>& after = nullptr);
+
+sk_sp<SkImage> MotionBlur(skgpu::graphite::Context* context, skgpu::graphite::Recorder* recorder, const sk_sp<SkImage>& image,
+                          const sk_sp<SkImage>& flow, float t, float length, int divisor);
 
 }

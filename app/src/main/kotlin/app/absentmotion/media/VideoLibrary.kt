@@ -9,6 +9,9 @@ import app.absentmotion.export.ExportError
 import app.absentmotion.export.exportCheck
 import app.absentmotion.i18n.txt
 import app.absentmotion.export.FrameInterpolation
+import app.absentmotion.export.MotionBlur
+import app.absentmotion.export.SmoothLevel
+import app.absentmotion.export.Smoothing
 import app.absentmotion.model.FramePair
 import app.absentmotion.model.Layer
 import app.absentmotion.model.LayerTrack
@@ -16,8 +19,11 @@ import app.absentmotion.model.MoshPlan
 import app.absentmotion.model.layerTracks
 import app.absentmotion.model.moshPlan
 import app.absentmotion.model.Scene
-import app.absentmotion.model.exportFrame
 import app.absentmotion.model.exportFrameMs
+import app.absentmotion.model.localMs
+import app.absentmotion.model.needs
+import app.absentmotion.model.pairAround
+import app.absentmotion.model.VideoTiming
 import app.absentmotion.model.videoTimeUs
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CancellationException
@@ -57,7 +63,7 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
     @Volatile private var leadMs = 0.0
     private data class Request(
         val scene: Scene, val timeMs: Int, val playing: Boolean,
-        val interpolation: FrameInterpolation = FrameInterpolation.Off, val fps: Int = 0, val warm: Boolean = false,
+        val smoothing: Smoothing = Smoothing(), val fps: Int = 0, val warm: Boolean = false,
     ) { val born = System.nanoTime() }
 
     init {
@@ -100,11 +106,11 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
     }
 
     suspend fun <T> withExact(
-        scene: Scene, timeMs: Int, interpolation: FrameInterpolation = FrameInterpolation.Off, fps: Int = 0, draw: suspend () -> T,
+        scene: Scene, timeMs: Int, smoothing: Smoothing = Smoothing(), fps: Int = 0, draw: suspend () -> T,
     ): T = lock.withLock {
         paused = true
         try {
-            val request = Request(scene, timeMs, false, interpolation, fps)
+            val request = Request(scene, timeMs, false, smoothing, fps)
             reconcile(request)
             withContext(Dispatchers.IO) {
                 visible(request).map { layer -> async { sessions.getValue(layer.layer.id).exact(request, layer) } }.awaitAll()
@@ -166,7 +172,7 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
         val failed get() = retryAt != 0L
         @Volatile private var stopped = false
         private var publishedPts: Long? = null
-        private var publishedMix: Pair<FramePair, FrameInterpolation>? = null
+        private var publishedMix: Pair<SmoothFrame, Smoothing>? = null
         private var publishedMosh: Pair<List<Long>, List<Float>>? = null
         private val held = mutableSetOf<Long>()
         private val worker = scope.launch {
@@ -222,7 +228,7 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
             val source = decoder ?: open(wanted).also { decoder = it }
             val plan = layer.moshPlan(sample.timeMs, sample.scene)
             if (plan != null && moshed(source, sample, plan, exact, ::abandoned)) return@withLock
-            if (exact && request.interpolation != FrameInterpolation.Off && mixed(source, request, sample)) return@withLock
+            if (exact && request.smoothing.active && mixed(source, request, sample)) return@withLock
             val ahead = if (request.playing) leadMs * (sample.track.timeAt(request.timeMs.toDouble(), false)?.rate ?: 1.0) else 0.0
             val time = layer.videoTimeUs((sample.timeMs + ahead).toInt(), sample.scene)
             val pts = source.wantedPts(time)
@@ -269,22 +275,26 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
                 return false
             }
             val mapped = sample.track.timeAt(exportFrameMs(request.timeMs, request.fps), false) ?: return false
-            val pair = layer.exportFrame(mapped.ms, sample.scene, stamps, request.fps, mapped.rate) ?: return false
-            val key = pair to request.interpolation
+            val smoothing = request.smoothing
+            val frame = layer.smoothFrame(mapped.ms, sample.scene, stamps, request.fps, mapped.rate, smoothing) {
+                source.wantedPts(layer.videoTimeUs(sample.timeMs.toInt(), sample.scene))
+            } ?: return false
+            val key = frame to smoothing
             if (publishedMix == key) return true
-            for (pts in setOf(pair.a, pair.b)) {
+            val wanted = setOf(frame.before, frame.pair.a, frame.pair.b, frame.after)
+            for (pts in wanted) {
                 if (pts in held) continue
                 val image = source.frame(pts, true) { false } ?: throw ExportError(txt(R.string.media_error_interp_source, stamps.frameNumber(pts)))
                 exportCheck(image.timestamp / 1000 == pts) { txt(R.string.media_error_interp_wrong_frame, stamps.frameNumber(pts)) }
                 exportCheck(image.hardwareBuffer!!.use { engine.setVideoFrame(uri, it, id, pts, source.colorStandard, source.colorRange, image.cropRect) }) { txt(R.string.media_error_interp_import, stamps.frameNumber(pts)) }
                 held += pts
             }
-            if (!engine.interpolateVideo(uri, id, pair.a, pair.b, pair.t, request.interpolation == FrameInterpolation.Flow,
-                    DebugFrameInterpolation.params())) {
+            if (!engine.interpolateVideo(uri, id, longArrayOf(frame.before, frame.pair.a, frame.pair.b, frame.after), frame.pair.t,
+                    smoothing.method == FrameInterpolation.Flow, frame.soft, frame.blur, smoothing.flowParams(DebugFrameInterpolation.params()))) {
                 held.clear()
-                throw ExportError(txt(R.string.media_error_interp_render, request.interpolation.label))
+                throw ExportError(txt(R.string.media_error_interp_render, txt(request.smoothing.label)))
             }
-            held.retainAll(setOf(pair.a, pair.b))
+            held.retainAll(wanted)
             publishedMix = key
             publishedPts = null
             publishedMosh = null
@@ -354,4 +364,34 @@ internal fun Scene.videoSamples(timeMs: Int, playing: Boolean, warm: Boolean): L
             .map { at(frameStart(it), rest) }.firstOrNull { it.isNotEmpty() }.orEmpty()
     }
     return now + near.distinctBy { it.layer.id }.filter { sample -> now.none { it.layer.id == sample.layer.id } }
+}
+
+internal data class SmoothFrame(val pair: FramePair, val before: Long, val after: Long, val blur: Float, val soft: Boolean)
+
+internal fun Layer.smoothFrame(timeMs: Double, scene: Scene, stamps: LongArray, fps: Int, rate: Double, smoothing: Smoothing, shown: () -> Long): SmoothFrame? {
+    val fill = mediaFill ?: return null
+    val around = pairAround(timeMs, scene, stamps) ?: return null
+    val method = smoothing.method
+    val interpolating = method != FrameInterpolation.Off && needs(around, timeMs, scene, fps, rate)
+    val chosen = when {
+        interpolating -> around.pair
+        method != FrameInterpolation.Off && !(fps == scene.fps && rate == 1.0) -> FramePair(around.pair.a, around.pair.a, 0f)
+        else -> null
+    }
+    if (chosen == null && smoothing.blur == MotionBlur.Off) return null
+    var pair = chosen ?: shown().let { FramePair(it, it, 0f) }
+    if (method == FrameInterpolation.Blend && smoothing.level == SmoothLevel.Low && pair.t > 0f) pair = pair.copy(t = ((pair.t - 0.25f) * 2).coerceIn(0f, 1f))
+    val first = fill.inTime * 1000L - 500
+    val last = fill.outTime * 1000L - 500
+    fun step(pts: Long, by: Int): Long? {
+        val at = stamps.binarySearch(pts).let { if (it >= 0) it else -it - 2 }
+        return stamps.getOrNull(at + by)?.takeIf { it in first..last }
+    }
+    val soft = interpolating && method == FrameInterpolation.Blend && smoothing.level == SmoothLevel.High
+    if ((soft || smoothing.blur != MotionBlur.Off) && pair.a == pair.b) step(pair.a, 1)?.let { pair = FramePair(pair.a, it, 0f) }
+    val blur = if (smoothing.blur == MotionBlur.Off || pair.a == pair.b) 0f else {
+        val mediaUs = VideoTiming(this).speed(localMs(timeMs, scene)) * rate * 1e6 / fps
+        (smoothing.blur.shutter / 360 * mediaUs / (pair.b - pair.a) * smoothing.blurScale).toFloat()
+    }
+    return SmoothFrame(pair, if (soft) step(pair.a, -1) ?: pair.a else pair.a, if (soft) step(pair.b, 1) ?: pair.b else pair.b, blur, soft && pair.a != pair.b)
 }

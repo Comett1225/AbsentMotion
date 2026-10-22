@@ -390,6 +390,12 @@
     <string name="export_interpolation_blend">Mezcla de fotogramas</string>
     <string name="export_interpolation_flow">Flujo óptico</string>
     <string name="export_interpolation_hint">Los clips con una velocidad de fotogramas inferior a la de exportación se suavizan para igualarla, por ejemplo, de 30 a 60 fps.</string>
+    <string name="export_interpolation_pick_method">Primero elige Fusión de fotogramas o Flujo óptico.</string>
+    <string name="export_level_low">Baja</string>
+    <string name="export_level_medium">Media</string>
+    <string name="export_level_high">Alta</string>
+    <string name="export_motion_blur">Desenfoque de movimiento</string>
+    <string name="export_motion_blur_hint">Difumina las partes en movimiento de los clips de video como el obturador de una cámara, incluso cuando el clip ya tiene la velocidad de fotogramas de exportación.</string>
     <string name="export_quality">Calidad</string>
     <string name="export_quality_low">Baja</string>
     <string name="export_quality_high">Alta</string>
@@ -1340,6 +1346,10 @@
     <string name="export_interpolation_off_help">Cada clip muestra sus propios fotogramas. Un clip de 30 fps en una exportación de 60 fps muestra cada fotograma dos veces, así que el movimiento puede verse un poco a saltos.</string>
     <string name="export_interpolation_blend_help">Los nuevos fotogramas intermedios mezclan los dos fotogramas más cercanos como un fundido rápido. La exportación es rápida; el movimiento rápido puede verse con efecto fantasma.</string>
     <string name="export_interpolation_flow_help">La app sigue cómo se mueve cada parte de la imagen y crea fotogramas intermedios reales. Movimiento más suave, pero la exportación es más lenta y el movimiento muy rápido puede emborronarse en los bordes.</string>
+    <string name="export_interpolation_blend_levels">Baja se apoya en el fotograma más cercano, así que hay menos efecto fantasma. Media mezcla los dos fotogramas por igual. Alta también mezcla los fotogramas de alrededor para obtener el movimiento más suave. Es rápida en cualquier teléfono.</string>
+    <string name="export_interpolation_flow_levels">Baja sigue el movimiento de forma aproximada y es la más rápida; va bien con teléfonos básicos. Media es la opción habitual para teléfonos buenos. Alta sigue detalles más finos con más pasadas para bordes más limpios; es lenta, así que úsala con teléfonos rápidos o clips cortos.</string>
+    <string name="export_motion_blur_help">Difumina cada fotograma de un clip de video a lo largo de su movimiento, como el obturador de una cámara: Baja 90°, Media 180° (el aspecto cinematográfico habitual), Alta 360°. También funciona cuando un clip ya tiene la velocidad de fotogramas de exportación. Debe seguir el movimiento, así que tarda casi lo mismo que Flujo óptico en Medio.</string>
+    <string name="export_phone_speed">Este teléfono: %1$s</string>
     <string name="export_list_or">%1$s o %2$s</string>
     <string name="export_list_and">%1$s y %2$s</string>
     <string name="export_reason_container_codecs">%1$s necesita video %2$s, que este teléfono no puede generar a %3$s.</string>

@@ -382,6 +382,12 @@
     <string name="export_interpolation_blend">फ़्रेम ब्लेंडिंग</string>
     <string name="export_interpolation_flow">ऑप्टिकल फ़्लो</string>
     <string name="export_interpolation_hint">एक्सपोर्ट से कम फ़्रेम रेट वाली क्लिप को मैच करने के लिए स्मूद किया जाता है, जैसे 30 से 60 fps।</string>
+    <string name="export_interpolation_pick_method">पहले फ़्रेम ब्लेंडिंग या ऑप्टिकल फ़्लो चुनें।</string>
+    <string name="export_level_low">कम</string>
+    <string name="export_level_medium">मध्यम</string>
+    <string name="export_level_high">उच्च</string>
+    <string name="export_motion_blur">मोशन ब्लर</string>
+    <string name="export_motion_blur_hint">वीडियो क्लिप के चलते हिस्सों को कैमरा शटर की तरह धुंधला करता है, तब भी जब क्लिप में एक्सपोर्ट फ़्रेम रेट पहले से हो।</string>
     <string name="export_quality">क्वालिटी</string>
     <string name="export_quality_low">कम</string>
     <string name="export_quality_high">ज़्यादा</string>
@@ -1317,6 +1323,10 @@
     <string name="export_interpolation_off_help">हर क्लिप अपने फ़्रेम दिखाती है। 60 fps के एक्सपोर्ट में 30 fps क्लिप हर फ़्रेम दो बार दिखाती है, इसलिए मोशन थोड़ा रुक-रुक कर लग सकता है।</string>
     <string name="export_interpolation_blend_help">बीच के नए फ़्रेम दो नज़दीकी फ़्रेम को तेज़ क्रॉस-फ़ेड की तरह मिलाते हैं। एक्सपोर्ट तेज़ होता है; तेज़ मोशन में घोस्टिंग दिख सकती है।</string>
     <string name="export_interpolation_flow_help">ऐप तस्वीर का हर हिस्सा कैसे चलता है यह ट्रैक करके असली बीच के फ़्रेम बनाता है। सबसे स्मूद मोशन, लेकिन एक्सपोर्ट धीमा होता है और बहुत तेज़ मोशन में किनारों पर धुंधलापन आ सकता है।</string>
+    <string name="export_interpolation_blend_levels">कम नज़दीकी फ़्रेम पर ज़्यादा निर्भर है, इसलिए घोस्टिंग कम होती है। मध्यम दोनों फ़्रेम बराबर मिलाता है। उच्च आसपास के फ़्रेम भी मिलाता है, जिससे मोशन सबसे सॉफ़्ट होता है। हर फ़ोन पर तेज़।</string>
+    <string name="export_interpolation_flow_levels">कम मोशन को मोटे तौर पर ट्रैक करता है और सबसे तेज़ है; यह बेसिक फ़ोन के लिए ठीक है। मध्यम गुड फ़ोन के लिए आम चुनाव है। उच्च ज़्यादा पासों के साथ बारीक डिटेल ट्रैक करता है, जिससे किनारे साफ़ रहते हैं; यह धीमा है, इसलिए इसे फ़ास्ट फ़ोन या छोटी क्लिप के लिए रखें।</string>
+    <string name="export_motion_blur_help">वीडियो क्लिप के हर फ़्रेम को उसकी गति की दिशा में कैमरा शटर की तरह धुंधला करता है: कम 90°, मध्यम 180° (आम फ़िल्म लुक), उच्च 360°। यह तब भी काम करता है जब क्लिप में एक्सपोर्ट फ़्रेम रेट पहले से हो। इसे मोशन ट्रैक करना पड़ता है, इसलिए इसमें लगभग ऑप्टिकल फ़्लो मध्यम जितना समय लगता है।</string>
+    <string name="export_phone_speed">यह फ़ोन: %1$s</string>
     <string name="export_list_or">%1$s या %2$s</string>
     <string name="export_list_and">%1$s और %2$s</string>
     <string name="export_reason_container_codecs">%1$s के लिए %2$s वीडियो चाहिए, जो यह फ़ोन %3$s पर नहीं बना सकता।</string>

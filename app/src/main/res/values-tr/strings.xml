@@ -382,6 +382,12 @@
     <string name="export_interpolation_blend">Kare karıştırma</string>
     <string name="export_interpolation_flow">Optik akış</string>
     <string name="export_interpolation_hint">Dışa aktarmadan daha düşük kare hızındaki klipler eşleşecek şekilde yumuşatılır; örneğin 30 fps\'ten 60 fps\'e.</string>
+    <string name="export_interpolation_pick_method">Önce Kare karıştırma veya Optik akış seçin.</string>
+    <string name="export_level_low">Düşük</string>
+    <string name="export_level_medium">Orta</string>
+    <string name="export_level_high">Yüksek</string>
+    <string name="export_motion_blur">Hareket bulanıklığı</string>
+    <string name="export_motion_blur_hint">Kamera deklanşörü gibi video kliplerin hareketli kısımlarını bulanıklaştırır; klip zaten dışa aktarma kare hızına sahip olsa bile çalışır.</string>
     <string name="export_quality">Kalite</string>
     <string name="export_quality_low">Düşük</string>
     <string name="export_quality_high">Yüksek</string>
@@ -1317,6 +1323,10 @@
     <string name="export_interpolation_off_help">Her klip kendi karelerini gösterir. 60 fps dışa aktarmada 30 fps bir klip her kareyi iki kez gösterir, bu yüzden hareket biraz kesik görünebilir.</string>
     <string name="export_interpolation_blend_help">Yeni ara kareler, iki en yakın kareyi hızlı bir çapraz geçiş gibi karıştırır. Dışa aktarması hızlıdır; hızlı harekette hayalet görüntü oluşabilir.</string>
     <string name="export_interpolation_flow_help">Uygulama görüntünün her parçasının nasıl hareket ettiğini izler ve gerçek ara kareler oluşturur. En akıcı hareket, ancak dışa aktarma daha yavaştır ve çok hızlı harekette kenarlarda bulanıklaşma olabilir.</string>
+    <string name="export_interpolation_blend_levels">Düşük, en yakın kareye yaslanır, bu yüzden daha az hayalet görüntü olur. Orta, iki kareyi eşit şekilde karıştırır. Yüksek, en yumuşak hareket için çevresindeki kareleri de karıştırır. Her telefonda hızlıdır.</string>
+    <string name="export_interpolation_flow_levels">Düşük, hareketi kabaca izler ve en hızlısıdır; Basic telefonlar için uygundur. Orta, Good telefonlar için olağan seçimdir. Yüksek, daha temiz kenarlar için daha fazla geçişle ince ayrıntıları izler; yavaştır, bu yüzden Fast telefonlara veya kısa kliplere saklayın.</string>
+    <string name="export_motion_blur_help">Bir video klipin her karesini hareketi boyunca, kamera deklanşörü gibi bulanıklaştırır: Düşük 90°, Orta 180° (olağan film görünümü), Yüksek 360°. Klip zaten dışa aktarma kare hızına sahip olsa bile çalışır. Hareketi takip etmesi gerektiğinden yaklaşık Optik akış Orta kadar sürer.</string>
+    <string name="export_phone_speed">Bu telefon: %1$s</string>
     <string name="export_list_or">%1$s veya %2$s</string>
     <string name="export_list_and">%1$s ve %2$s</string>
     <string name="export_reason_container_codecs">%1$s için %2$s video gerekir; bu telefon bunu %3$s değerinde oluşturamaz.</string>

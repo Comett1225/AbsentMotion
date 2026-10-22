@@ -374,6 +374,12 @@
     <string name="export_interpolation_blend">Hòa trộn khung hình</string>
     <string name="export_interpolation_flow">Luồng quang học</string>
     <string name="export_interpolation_hint">Các clip có tốc độ khung hình thấp hơn khi xuất sẽ được làm mượt để khớp, ví dụ 30 lên 60 fps.</string>
+    <string name="export_interpolation_pick_method">Hãy chọn Pha trộn khung hình hoặc Luồng quang học trước.</string>
+    <string name="export_level_low">Thấp</string>
+    <string name="export_level_medium">Trung bình</string>
+    <string name="export_level_high">Cao</string>
+    <string name="export_motion_blur">Nhòe chuyển động</string>
+    <string name="export_motion_blur_hint">Làm nhòe các phần chuyển động của clip video như màn trập máy ảnh, ngay cả khi clip đã có tốc độ khung hình khi xuất.</string>
     <string name="export_quality">Chất lượng</string>
     <string name="export_quality_low">Thấp</string>
     <string name="export_quality_high">Cao</string>
@@ -1294,6 +1300,10 @@
     <string name="export_interpolation_off_help">Mỗi clip hiển thị khung hình riêng. Clip 30 fps trong bản xuất 60 fps sẽ lặp mỗi khung hình hai lần, nên chuyển động có thể hơi bị giật.</string>
     <string name="export_interpolation_blend_help">Các khung hình xen giữa mới trộn hai khung hình gần nhất như hiệu ứng chuyển mờ nhanh. Xuất nhanh; chuyển động nhanh có thể bị bóng mờ.</string>
     <string name="export_interpolation_flow_help">Ứng dụng theo dõi cách từng phần của hình ảnh chuyển động và tạo khung hình xen giữa thực sự. Chuyển động mượt nhất, nhưng xuất chậm hơn và chuyển động rất nhanh có thể bị nhòe ở viền.</string>
+    <string name="export_interpolation_blend_levels">Thấp dựa vào khung hình gần nhất nên ít bóng mờ. Trung bình trộn đều hai khung hình. Cao còn trộn cả các khung hình xung quanh để chuyển động mượt nhất. Nhanh trên mọi điện thoại.</string>
+    <string name="export_interpolation_flow_levels">Thấp theo dõi chuyển động tương đối và nhanh nhất; phù hợp với điện thoại Cơ bản. Trung bình là lựa chọn thường dùng cho điện thoại Tốt. Cao theo dõi chi tiết mịn hơn với nhiều lượt xử lý hơn để viền sạch hơn; chạy chậm nên hãy dùng cho điện thoại Nhanh hoặc clip ngắn.</string>
+    <string name="export_motion_blur_help">Làm nhòe từng khung hình của clip video theo hướng chuyển động, giống màn trập máy ảnh: Thấp 90°, Trung bình 180° (kiểu phim thường thấy), Cao 360°. Vẫn hoạt động khi clip đã có tốc độ khung hình khi xuất. Tính năng phải theo dõi chuyển động nên mất khoảng thời gian như Luồng quang học Trung bình.</string>
+    <string name="export_phone_speed">Điện thoại này: %1$s</string>
     <string name="export_list_or">%1$s hoặc %2$s</string>
     <string name="export_list_and">%1$s và %2$s</string>
     <string name="export_reason_container_codecs">%1$s cần video %2$s, mà điện thoại này không thể tạo ở %3$s.</string>

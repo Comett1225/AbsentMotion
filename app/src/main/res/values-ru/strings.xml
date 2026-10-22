@@ -398,6 +398,12 @@
     <string name="export_interpolation_blend">Смешивание кадров</string>
     <string name="export_interpolation_flow">Оптический поток</string>
     <string name="export_interpolation_hint">Клипы с более низкой частотой кадров, чем при экспорте, сглаживаются до неё, например с 30 до 60 fps.</string>
+    <string name="export_interpolation_pick_method">Сначала выберите смешивание кадров или оптический поток.</string>
+    <string name="export_level_low">Низкий</string>
+    <string name="export_level_medium">Средний</string>
+    <string name="export_level_high">Высокий</string>
+    <string name="export_motion_blur">Размытие в движении</string>
+    <string name="export_motion_blur_hint">Размывает движущиеся части видеоклипов, как затвор камеры, даже если у клипа уже есть частота кадров экспорта.</string>
     <string name="export_quality">Качество</string>
     <string name="export_quality_low">Низкое</string>
     <string name="export_quality_high">Высокое</string>
@@ -1363,6 +1369,10 @@
     <string name="export_interpolation_off_help">Каждый клип показывает свои кадры. Клип 30 fps при экспорте в 60 fps показывает каждый кадр дважды, поэтому движение может выглядеть немного ступенчатым.</string>
     <string name="export_interpolation_blend_help">Новые промежуточные кадры смешивают два ближайших кадра как быстрое перекрёстное затухание. Экспорт быстрый; при быстром движении может появляться двоение.</string>
     <string name="export_interpolation_flow_help">Приложение отслеживает движение каждой части изображения и создаёт настоящие промежуточные кадры. Самое плавное движение, но экспорт медленнее, а при очень быстром движении края могут смазываться.</string>
+    <string name="export_interpolation_blend_levels">Низкий опирается на ближайший кадр, поэтому меньше шлейфов. Средний равномерно смешивает два кадра. Высокий также подмешивает соседние кадры для максимально плавного движения. Быстро на любом телефоне.</string>
+    <string name="export_interpolation_flow_levels">Низкий грубо отслеживает движение и работает быстрее всего; подходит для базовых телефонов. Средний — обычный выбор для хороших телефонов. Высокий отслеживает более мелкие детали с большим числом проходов для более чистых краёв; он медленный, поэтому оставьте его для быстрых телефонов или коротких клипов.</string>
+    <string name="export_motion_blur_help">Размывает каждый кадр видеоклипа по направлению движения, как затвор камеры: низкий — 90°, средний — 180° (обычный киношный вид), высокий — 360°. Также работает, если у клипа уже есть частота кадров экспорта. Требуется отслеживание движения, поэтому занимает примерно столько же времени, сколько оптический поток среднего уровня.</string>
+    <string name="export_phone_speed">Этот телефон: %1$s</string>
     <string name="export_list_or">%1$s или %2$s</string>
     <string name="export_list_and">%1$s и %2$s</string>
     <string name="export_reason_container_codecs">Для %1$s нужно видео %2$s, которое этот телефон не может создать в %3$s.</string>

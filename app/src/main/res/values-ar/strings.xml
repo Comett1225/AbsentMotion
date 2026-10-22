@@ -414,6 +414,12 @@
     <string name="export_interpolation_blend">مزج الإطارات</string>
     <string name="export_interpolation_flow">التدفق البصري</string>
     <string name="export_interpolation_hint">يتم تنعيم المقاطع ذات معدل إطارات أقل من التصدير لمطابقته، على سبيل المثال من 30 إلى 60 fps.</string>
+    <string name="export_interpolation_pick_method">اختر دمج الإطارات أو التدفق البصري أولًا.</string>
+    <string name="export_level_low">منخفض</string>
+    <string name="export_level_medium">متوسط</string>
+    <string name="export_level_high">مرتفع</string>
+    <string name="export_motion_blur">ضبابية الحركة</string>
+    <string name="export_motion_blur_hint">يضبب الأجزاء المتحركة في مقاطع الفيديو على غرار مصراع الكاميرا، حتى لو كان المقطع بمعدل إطارات التصدير نفسه.</string>
     <string name="export_quality">الجودة</string>
     <string name="export_quality_low">منخفضة</string>
     <string name="export_quality_high">عالية</string>
@@ -1409,6 +1415,10 @@
     <string name="export_interpolation_off_help">يعرض كل مقطع إطاراته الخاصة. مقطع 30 fps في تصدير 60 fps يعرض كل إطار مرتين، لذا قد تبدو الحركة متقطعة قليلًا.</string>
     <string name="export_interpolation_blend_help">تمزج الإطارات البينية الجديدة أقرب إطارين مثل تلاشٍ متقاطع سريع. التصدير سريع؛ وقد تظهر الحركة السريعة بأشباح.</string>
     <string name="export_interpolation_flow_help">يتتبع التطبيق حركة كل جزء من الصورة ويرسم إطارات بينية حقيقية. أنعم حركة، لكن التصدير أبطأ وقد تتلطخ الحركة السريعة جدًا عند الحواف.</string>
+    <string name="export_interpolation_blend_levels">يعتمد المنخفض على أقرب إطار، لذا يقل ظهور الأشباح. يمزج المتوسط الإطارين بالتساوي. كما يمزج المرتفع الإطارات المحيطة بهما للحصول على أنعم حركة. سريع على كل هاتف.</string>
+    <string name="export_interpolation_flow_levels">يتتبع المنخفض الحركة بشكل تقريبي وهو الأسرع؛ يناسب الهواتف الأساسية. المتوسط هو الخيار المعتاد للهواتف الجيدة. يتتبع المرتفع تفاصيل أدق بتمريرات أكثر للحصول على حواف أنظف؛ وهو بطيء، لذا احتفظ به للهواتف السريعة أو المقاطع القصيرة.</string>
+    <string name="export_motion_blur_help">يضبب كل إطار في مقطع الفيديو بحسب حركته، مثل مصراع الكاميرا: منخفض 90°، متوسط 180° (المظهر السينمائي المعتاد)، مرتفع 360°. يعمل أيضًا عندما يكون المقطع بمعدل إطارات التصدير بالفعل. عليه تتبع الحركة، لذا يستغرق وقتًا مماثلًا لوقت التدفق البصري المتوسط.</string>
+    <string name="export_phone_speed">هذا الهاتف: %1$s</string>
     <string name="export_list_or">‏%1$s أو %2$s</string>
     <string name="export_list_and">‏%1$s و%2$s</string>
     <string name="export_reason_container_codecs">يحتاج %1$s إلى فيديو %2$s، وهذا الهاتف لا يستطيع إنتاجه بدقة %3$s.</string>
