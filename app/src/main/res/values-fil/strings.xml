@@ -384,6 +384,12 @@
     <string name="export_interpolation_blend">Frame blending</string>
     <string name="export_interpolation_flow">Optical flow</string>
     <string name="export_interpolation_hint">Ang mga clip na mas mababa ang frame rate kaysa sa export ay pinapantay upang tumugma, halimbawa 30 hanggang 60 fps.</string>
+    <string name="export_interpolation_pick_method">Pumili muna ng Frame blending o Optical flow.</string>
+    <string name="export_level_low">Mababa</string>
+    <string name="export_level_medium">Katamtaman</string>
+    <string name="export_level_high">Mataas</string>
+    <string name="export_motion_blur">Motion blur</string>
+    <string name="export_motion_blur_hint">Pinapalabo ang gumagalaw na bahagi ng mga clip ng bidyo na parang shutter ng kamera, kahit may export frame rate na ang clip.</string>
     <string name="export_quality">Kalidad</string>
     <string name="export_quality_low">Mababa</string>
     <string name="export_quality_high">Mataas</string>
@@ -959,6 +965,10 @@
         <item quantity="one">Hindi pa sinusuportahan ang mga clip na mas mahaba sa %1$s minuto. I-trim o hatiin muna ang clip.</item>
         <item quantity="other">Hindi pa sinusuportahan ang mga clip na mas mahaba sa %1$s minuto. I-trim o hatiin muna ang clip.</item>
     </plurals>
+    <plurals name="smooth_estimate">
+        <item quantity="one">%1$s frame sa %2$s fps, %3$s × %4$s, humigit-kumulang %5$s MB.</item>
+        <item quantity="other">%1$s na frame sa %2$s fps, %3$s × %4$s, humigit-kumulang %5$s MB.</item>
+    </plurals>
     <plurals name="aibrowser_estimate">
         <item quantity="one">%1$s frame sa %2$s × %3$s, mga %4$s MB.</item>
         <item quantity="other">%1$s na frame sa %2$s × %3$s, mga %4$s MB.</item>
@@ -1319,6 +1329,17 @@
     <string name="export_interpolation_off_help">Ipinapakita ng bawat clip ang sariling frame nito. Ang 30 fps na clip sa 60 fps na export ay nagpapakita ng bawat frame nang dalawang beses, kaya maaaring medyo magaspang ang galaw.</string>
     <string name="export_interpolation_blend_help">Hinahalo ng mga bagong frame sa pagitan ang dalawang pinakamalapit na frame, parang mabilis na cross-fade. Mabilis i-export; ang mabilis na galaw ay puwedeng magmukhang ghosted.</string>
     <string name="export_interpolation_flow_help">Sinusundan ng app kung paano gumagalaw ang bawat bahagi ng larawan at gumuguhit ng tunay na frame sa pagitan. Pinakasmooth ang galaw, pero mas mabagal ang export at ang sobrang bilis na galaw ay puwedeng mag-smear sa mga gilid.</string>
+    <string name="export_interpolation_blend_levels">Ang Mababa ay sumasandal sa pinakamalapit na frame, kaya mas kaunti ang ghosting. Ang Katamtaman ay pantay na hinahalo ang dalawang frame. Ang Mataas ay hinahalo rin ang mga frame sa paligid ng mga ito para sa pinakamalambot na paggalaw. Mabilis sa lahat ng telepono.</string>
+    <string name="export_interpolation_flow_levels">Ang Mababa ay magaspang na sumusubaybay sa paggalaw at pinakamabilis; bagay ito sa Basic na telepono. Ang Katamtaman ang karaniwang pipiliin para sa Good na telepono. Ang Mataas ay sumusubaybay sa mas pinong detalye na may mas maraming pass para sa mas malinaw na gilid; mabagal ito, kaya panatilihin ito para sa Fast na telepono o maiikling clip.</string>
+    <string name="export_motion_blur_help">Pinapalabo ang bawat frame ng isang clip ng bidyo ayon sa paggalaw nito, tulad ng shutter ng kamera: Mababa 90°, Katamtaman 180° (ang karaniwang itsura ng pelikula), Mataas 360°. Gumagana rin ito kapag may export frame rate na ang clip. Kailangan nitong subaybayan ang paggalaw, kaya tumatagal ito nang halos kapareho ng Optical flow na Katamtaman.</string>
+    <string name="export_phone_speed">Ang teleponong ito: %1$s</string>
+    <string name="smooth_clip">I-smooth</string>
+    <string name="smooth_intro">Ginagawa nang isang beses ang mga smooth na frame para sa clip na ito at itinatabi ang mga ito sa proyekto, kaya ipinapakita ang mga ito sa preview at sa bawat export. Nananatili ang orihinal na clip at maaaring ibalik.</string>
+    <string name="smooth_method">Paraan</string>
+    <string name="smooth_nothing">Sapat na ang frame ng clip na ito para sa frame rate ng proyekto. Pumili ng Motion blur, o pabagalin muna ang clip.</string>
+    <string name="smooth_frame">Smoothing: frame %1$s ng %2$s…</string>
+    <string name="smooth_saving">Sini-save ang smooth na clip…</string>
+    <string name="smooth_sound_format">Gumagamit ang audio ng clip na ito ng format na hindi maaaring itago, kaya hindi na-smooth ang clip.</string>
     <string name="export_list_or">%1$s o %2$s</string>
     <string name="export_list_and">%1$s at %2$s</string>
     <string name="export_reason_container_codecs">Kailangan ng %1$s ng %2$s na bidyo, na hindi kayang gawin ng teleponong ito sa %3$s.</string>

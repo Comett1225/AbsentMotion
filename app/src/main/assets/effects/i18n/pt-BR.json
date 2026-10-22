@@ -4450,11 +4450,11 @@
    }
   },
   "timequant": {
-   "description": "Faz o tempo passar em etapas nesta camada, como uma taxa de quadros menor.",
-   "name": "Quantização de tempo",
+   "description": "Faz esta camada se mover em uma taxa de quadros menor, como uma gravação travada ou em stop motion.",
+   "name": "Taxa de quadros",
    "params": {
     "fps": {
-     "label": "Passos/s"
+     "label": "Quadros/s"
     }
    }
   },

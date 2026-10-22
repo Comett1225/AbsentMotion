@@ -26,7 +26,7 @@ internal fun settingsToJson(s: ExportSettings): JSONObject = JSONObject()
     .put("image", s.image.name).put("imageQuality", s.imageQuality).put("background", s.background)
     .put("interpolation", s.interpolation.name).put("container", s.container.name).put("audioFormat", s.audioFormat.name)
     .put("audioCodec", s.audio.codec.name).put("audioKbps", s.audio.bitrateKbps).put("audioRate", s.audio.sampleRate)
-    .put("audioChannels", s.audio.channels)
+    .put("audioChannels", s.audio.channels).put("interpolationLevel", s.interpolationLevel.name).put("motionBlur", s.motionBlur.name)
 
 internal fun settingsFromJson(o: JSONObject, fallback: ExportSettings): ExportSettings {
     fun <E : Enum<E>> pick(key: String, values: List<E>, default: E): E = values.firstOrNull { it.name == o.optString(key) } ?: default
@@ -48,5 +48,7 @@ internal fun settingsFromJson(o: JSONObject, fallback: ExportSettings): ExportSe
         pick("container", Container.entries, fallback.container),
         audio,
         pick("audioFormat", AudioFormat.entries, fallback.audioFormat),
+        pick("interpolationLevel", SmoothLevel.entries, fallback.interpolationLevel),
+        pick("motionBlur", MotionBlur.entries, fallback.motionBlur),
     ).fixedFormat()
 }

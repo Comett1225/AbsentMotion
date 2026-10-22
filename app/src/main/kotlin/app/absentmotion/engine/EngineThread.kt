@@ -24,7 +24,7 @@ import app.absentmotion.audio.AudioEngine
 import app.absentmotion.export.exportCheck
 import app.absentmotion.i18n.AppText
 import app.absentmotion.i18n.txt
-import app.absentmotion.export.FrameInterpolation
+import app.absentmotion.export.Smoothing
 import app.absentmotion.media.VideoLibrary
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -249,9 +249,9 @@ class EngineThread(private val background: Int, context: Context? = null) {
         !closed && engine().setVideoFrame(uri, layerId, pts, buffer, standard, range, crop)
     }
 
-    internal suspend fun interpolateVideo(uri: String, layerId: Long, a: Long, b: Long, t: Float, flow: Boolean,
+    internal suspend fun interpolateVideo(uri: String, layerId: Long, frames: LongArray, t: Float, flow: Boolean, soft: Boolean, blur: Float,
                                           params: FloatArray): Boolean = withContext(dispatcher) {
-        !closed && engine().interpolateVideo(uri, layerId, a, b, t, flow, params)
+        !closed && engine().interpolateVideo(uri, layerId, frames, t, flow, soft, blur, params)
     }
 
     internal suspend fun moshStart(uri: String, layerId: Long, pts: LongArray, mosh: FloatArray, flow: FloatArray, exact: Boolean): Int = withContext(dispatcher) {
@@ -433,31 +433,31 @@ class EngineThread(private val background: Int, context: Context? = null) {
         }
     }
 
-    inner class ExportSession internal constructor(private val document: Scene, private val interpolation: FrameInterpolation, private val fps: Int) {
+    inner class ExportSession internal constructor(private val document: Scene, private val smoothing: Smoothing, private val fps: Int) {
         suspend fun still(timeMs: Int, width: Int, height: Int): ByteArray? =
-            atFrame(document, timeMs, interpolation, fps) { engine().still(timeMs.toDouble(), width, height) }
+            atFrame(document, timeMs, smoothing, fps) { engine().still(timeMs.toDouble(), width, height) }
 
         suspend fun attach(surface: Surface): Long = withContext(dispatcher) { engine().attach(surface, forEncoder = true) }
 
         suspend fun detach(target: Long) = withContext(NonCancellable + dispatcher) { engine?.detach(target) }
 
         suspend fun render(target: Long, timeMs: Int, presentTimeNs: Long): Boolean =
-            atFrame(document, timeMs, interpolation, fps) { engine().renderFrame(target, timeMs.toDouble(), 0xFF000000.toInt(), presentTimeNs) == 0 }
+            atFrame(document, timeMs, smoothing, fps) { engine().renderFrame(target, timeMs.toDouble(), 0xFF000000.toInt(), presentTimeNs) == 0 }
 
         suspend fun stampsPresentTime(): Boolean = withContext(dispatcher) { engine().displayTiming }
 
         suspend fun renderInto(buffer: HardwareBuffer, timeMs: Int): Boolean =
-            atFrame(document, timeMs, interpolation, fps) { engine().renderBuffer(buffer, timeMs.toDouble(), 0xFF000000.toInt()) == 0 }
+            atFrame(document, timeMs, smoothing, fps) { engine().renderBuffer(buffer, timeMs.toDouble(), 0xFF000000.toInt()) == 0 }
 
         suspend fun releaseBuffers() = withContext(NonCancellable + dispatcher) { engine?.releaseBuffers() }
     }
 
-    private suspend fun <T> atFrame(document: Scene, timeMs: Int, interpolation: FrameInterpolation, fps: Int, draw: () -> T): T {
+    private suspend fun <T> atFrame(document: Scene, timeMs: Int, smoothing: Smoothing, fps: Int, draw: () -> T): T {
         suspend fun run() = withContext(dispatcher) { prepareTextTime(timeMs); draw() }
-        return if (videos != null) videos.withExact(document, timeMs, interpolation, fps) { run() } else run()
+        return if (videos != null) videos.withExact(document, timeMs, smoothing, fps) { run() } else run()
     }
 
-    suspend fun <T> exportSession(xml: String, interpolation: FrameInterpolation = FrameInterpolation.Off, fps: Int = 0,
+    suspend fun <T> exportSession(xml: String, smoothing: Smoothing = Smoothing(), fps: Int = 0,
                                   block: suspend ExportSession.() -> T): T = captureLock.withLock {
         awaitMedia()
         fontJob?.join()
@@ -476,7 +476,7 @@ class EngineThread(private val background: Int, context: Context? = null) {
                 capturing = true
                 setEngineScene(xml, 0)
             }
-            ExportSession(document, interpolation, fps).block()
+            ExportSession(document, smoothing, fps).block()
         } finally {
             media?.pinned = null
             var noPreview = true

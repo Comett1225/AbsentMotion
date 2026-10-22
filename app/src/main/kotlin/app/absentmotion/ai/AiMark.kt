@@ -3,14 +3,17 @@ package app.absentmotion.ai
 import androidx.annotation.StringRes
 import app.absentmotion.R
 import app.absentmotion.model.Layer
+import app.absentmotion.model.MediaDeclaration
+import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
 
 const val AI_TAG = "ai"
 
-enum class AiKind(val xml: String, @StringRes val title: Int, val attribute: String?) {
+enum class AiKind(val xml: String, @StringRes val title: Int, val attribute: String?, val ai: Boolean = true) {
     Noise("noise", R.string.ai_reduce_noise, "src"),
     Background("background", R.string.ai_remove_background, "fillImage"),
     Video("video", R.string.ai_remove_background_video, null),
+    Smooth("smooth", R.string.smooth_clip, "fillVideo", false),
 }
 
 enum class NoiseSource(val xml: String, @StringRes val title: Int, @StringRes val hint: Int, val rumbleHz: Double, val blend: Double) {
@@ -24,17 +27,20 @@ class AiMark(val node: XmlNode) {
     val source: NoiseSource? get() = NoiseSource.entries.firstOrNull { it.xml == node["option"] }
     val original: String? get() = node["original"]
     val result: String? get() = node["result"]
+    val media: MediaDeclaration? get() = node.child("media")?.let(::MediaDeclaration)
 }
 
 val Layer.aiMarks: List<AiMark> get() = node.children.filter { it.name == AI_TAG }.map(::AiMark)
 
-fun Layer.withAiMark(kind: AiKind, original: String?, result: String?, option: String? = null): Layer {
-    val first = aiMarks.firstOrNull { it.kind == kind }?.original ?: original
+fun Layer.withAiMark(kind: AiKind, original: String?, result: String?, option: String? = null, media: MediaDeclaration? = null): Layer {
+    val previous = aiMarks.firstOrNull { it.kind == kind }
+    val first = previous?.original ?: original
     val attrs = linkedMapOf("type" to kind.xml)
     first?.let { attrs["original"] = it }
     result?.let { attrs["result"] = it }
     option?.let { attrs["option"] = it }
-    return copy(node = node.copy(children = node.children.filterNot { it.name == AI_TAG && it["type"] == kind.xml } + XmlNode(AI_TAG, attrs)))
+    val kept = (if (previous?.original != null) previous.media else media)?.takeIf { it.uri == first }
+    return copy(node = node.copy(children = node.children.filterNot { it.name == AI_TAG && it["type"] == kind.xml } + XmlNode(AI_TAG, attrs, listOfNotNull(kept?.node))))
 }
 
 val AiMark.restorable: Boolean get() = kind?.attribute != null && original != null
@@ -44,4 +50,9 @@ fun Layer.withoutAiMark(kind: AiKind): Layer {
     val key = kind.attribute
     val restored = if (key != null && mark.original != null && node[key] == mark.result) node.with(key, mark.original) else node
     return copy(node = restored.copy(children = restored.children.filterNot { it.name == AI_TAG && it["type"] == kind.xml }))
+}
+
+fun Scene.withoutAiMark(id: Long, kind: AiKind): Scene {
+    val mark = layer(id)?.aiMarks?.firstOrNull { it.kind == kind } ?: return this
+    return (mark.media?.let(::withMedia) ?: this).update(id) { it.withoutAiMark(kind) }
 }

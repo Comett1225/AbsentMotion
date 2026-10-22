@@ -29,7 +29,19 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.absentmotion.ai.AiAction
+import app.absentmotion.ai.AiKind
 import app.absentmotion.ai.AiTools
+import app.absentmotion.ai.MAX_SMOOTH_FRAMES
+import app.absentmotion.ai.aiMarks
+import app.absentmotion.ai.smoothPlan
+import app.absentmotion.export.FrameInterpolation
+import app.absentmotion.export.MotionBlur
+import app.absentmotion.export.SmoothLevel
+import app.absentmotion.ui.export.SmoothingHelp
+import androidx.compose.material3.Icon
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import app.absentmotion.ai.LONG_MATTE_SECONDS
 import app.absentmotion.ai.MAX_MATTE_SECONDS
 import app.absentmotion.ai.MatteSides
@@ -82,7 +94,7 @@ internal fun AiBackdrop(modifier: Modifier, action: AiAction? = null) {
                 moveTo(cx - unit * 0.12f, cy - unit * 0.2f)
                 lineTo(cx + unit * 0.2f, cy); lineTo(cx - unit * 0.12f, cy + unit * 0.2f); close()
             }, Color.White.copy(alpha = 0.85f))
-            null -> Unit
+            AiAction.Smooth, null -> Unit
         }
     }
 }
@@ -180,7 +192,7 @@ internal fun AiProgressDialog(tools: AiTools) {
     if (tools.message.isEmpty()) return
     val action = tools.running
     AlertDialog(onDismissRequest = { if (action != null) tools.cancel() else tools.dismiss() },
-        title = { Text(action?.let { stringResource(it.title) } ?: stringResource(R.string.ai), color = Am.OnDark) },
+        title = { Text((action ?: tools.last)?.let { stringResource(it.title) } ?: stringResource(R.string.ai), color = Am.OnDark) },
         text = {
             Column {
                 Text(tools.message, color = Am.OnDark, fontSize = 14.sp)
@@ -197,4 +209,68 @@ internal fun AiProgressDialog(tools: AiTools) {
         },
         dismissButton = { if (action == null && tools.retry != null) TextButton(tools::dismiss) { Text(stringResource(R.string.cancel), color = Am.Accent) } },
         containerColor = Am.Field)
+}
+
+@Composable
+internal fun AiSmoothDialog(tools: AiTools, scene: Scene) {
+    val layer = tools.smoothSetup ?: return
+    var help by remember { mutableStateOf(false) }
+    val previous = layer.aiMarks.firstOrNull { it.kind == AiKind.Smooth }
+    val media = previous?.media ?: layer.mediaFill?.uri?.let(scene::media)
+    val source = previous?.original?.let { layer.copy(node = layer.node.with("fillVideo", it)) } ?: layer
+    val s = tools.smoothing
+    val plan = media?.let { smoothPlan(source, it, scene.fps, s) }
+    val tooLong = plan != null && (plan.seconds > MAX_MATTE_SECONDS || plan.frames > MAX_SMOOTH_FRAMES)
+    AlertDialog(onDismissRequest = { tools.smoothSetup = null },
+        title = {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(stringResource(AiAction.Smooth.title), color = Am.OnDark)
+                Box(Modifier.size(36.dp).clickable { help = true }, Alignment.Center) {
+                    Icon(app.absentmotion.ui.export.ExportIcons.Help, stringResource(R.string.export_what_is, stringResource(AiAction.Smooth.title)), Modifier.size(20.dp), tint = Am.Caption)
+                }
+            }
+        },
+        text = {
+            Column {
+                Text(stringResource(R.string.smooth_intro), color = Am.OnDark, fontSize = 14.sp)
+                Text(stringResource(R.string.smooth_method), Modifier.padding(top = 12.dp), color = Am.Caption, fontSize = 12.sp)
+                Pills(FrameInterpolation.entries, s.method, true, { stringResource(it.label) }) { tools.smoothing = s.copy(method = it) }
+                Pills(SmoothLevel.entries, s.level, s.method != FrameInterpolation.Off, { stringResource(it.label) }) { tools.smoothing = s.copy(level = it) }
+                Text(stringResource(R.string.export_motion_blur), Modifier.padding(top = 12.dp), color = Am.Caption, fontSize = 12.sp)
+                Pills(MotionBlur.entries, s.blur, true, { stringResource(it.label) }) { tools.smoothing = s.copy(blur = it) }
+                Text(
+                    when {
+                        media == null -> stringResource(R.string.ai_video_missing)
+                        tooLong -> stringResource(R.string.ai_clip_too_long, (MAX_MATTE_SECONDS / 60).toString())
+                        plan == null -> stringResource(R.string.smooth_nothing)
+                        else -> pluralStringResource(R.plurals.smooth_estimate, plan.frames, plan.frames.toString(), plan.fps.toString(),
+                            plan.width.toString(), plan.height.toString(), (plan.bytes / 1_000_000 + 1).toString())
+                    },
+                    Modifier.padding(top = 12.dp).height(54.dp), color = if (plan == null || tooLong) Am.Warning else Am.Caption, fontSize = 12.sp, lineHeight = 17.sp,
+                )
+            }
+        },
+        confirmButton = {
+            TextButton({ tools.apply(AiAction.Smooth, confirmed = true) }, enabled = plan != null && !tooLong) { Text(stringResource(R.string.start), color = Am.Accent) }
+        },
+        dismissButton = { TextButton({ tools.smoothSetup = null }) { Text(stringResource(R.string.cancel), color = Am.Accent) } },
+        containerColor = Am.Field)
+    if (help) AlertDialog(onDismissRequest = { help = false },
+        title = { Text(stringResource(R.string.export_interpolation), color = Am.OnDark) },
+        text = { SmoothingHelp(Am.OnDark, Modifier.heightIn(max = 420.dp)) },
+        confirmButton = { TextButton({ help = false }) { Text(stringResource(R.string.ok), color = Am.Accent) } },
+        containerColor = Am.Field)
+}
+
+@Composable
+private fun <T> Pills(options: List<T>, selected: T, enabled: Boolean, label: @Composable (T) -> String, onPick: (T) -> Unit) {
+    Row(Modifier.padding(top = 6.dp).fillMaxWidth().height(36.dp).alpha(if (enabled) 1f else 0.4f).clip(RoundedCornerShape(6.dp)).background(Am.PanelInset)) {
+        for (option in options) {
+            val on = option == selected
+            Box(Modifier.weight(1f).fillMaxHeight().padding(2.dp).clip(RoundedCornerShape(5.dp)).background(if (on) Am.FieldHi else Color.Transparent)
+                .clickable(enabled = enabled) { onPick(option) }, Alignment.Center) {
+                Text(label(option), color = if (on) Am.Accent else Am.OnDark, fontSize = 12.sp, maxLines = 1)
+            }
+        }
+    }
 }

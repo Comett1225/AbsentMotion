@@ -376,6 +376,12 @@
     <string name="export_interpolation_blend">Blending frame</string>
     <string name="export_interpolation_flow">Aliran optik</string>
     <string name="export_interpolation_hint">Klip dengan frame rate lebih rendah daripada hasil ekspor akan dihaluskan agar sesuai, misalnya 30 ke 60 fps.</string>
+    <string name="export_interpolation_pick_method">Pilih Frame blending atau Optical flow dulu.</string>
+    <string name="export_level_low">Rendah</string>
+    <string name="export_level_medium">Sedang</string>
+    <string name="export_level_high">Tinggi</string>
+    <string name="export_motion_blur">Blur gerak</string>
+    <string name="export_motion_blur_hint">Membuat bagian klip video yang bergerak tampak kabur seperti rana kamera, bahkan saat klip sudah memakai frame rate ekspor.</string>
     <string name="export_quality">Kualitas</string>
     <string name="export_quality_low">Rendah</string>
     <string name="export_quality_high">Tinggi</string>
@@ -938,6 +944,9 @@
     <plurals name="aibrowser_too_long">
         <item quantity="other">Klip lebih panjang dari %1$s menit belum didukung. Pangkas atau pisahkan klip terlebih dahulu.</item>
     </plurals>
+    <plurals name="smooth_estimate">
+        <item quantity="other">%1$s frame pada %2$s fps, %3$s × %4$s, sekitar %5$s MB.</item>
+    </plurals>
     <plurals name="aibrowser_estimate">
         <item quantity="other">%1$s frame pada %2$s × %3$s, sekitar %4$s MB.</item>
     </plurals>
@@ -1296,6 +1305,17 @@
     <string name="export_interpolation_off_help">Setiap klip menampilkan frame-nya sendiri. Klip 30 fps dalam ekspor 60 fps menampilkan setiap frame dua kali, jadi gerakan bisa terlihat sedikit terpatah-patah.</string>
     <string name="export_interpolation_blend_help">Frame peralihan baru mencampur dua frame terdekat seperti cross-fade cepat. Ekspor cepat; gerakan cepat bisa terlihat berbayang.</string>
     <string name="export_interpolation_flow_help">Aplikasi mengikuti pergerakan setiap bagian gambar dan membuat frame peralihan sungguhan. Gerakan paling mulus, tetapi ekspor lebih lambat dan gerakan sangat cepat bisa meninggalkan noda di tepi.</string>
+    <string name="export_interpolation_blend_levels">Rendah lebih mengandalkan frame terdekat, jadi bayangan ganda lebih sedikit. Sedang mencampur kedua frame secara merata. Tinggi juga mencampur frame di sekitarnya untuk gerakan paling halus. Cepat di semua ponsel.</string>
+    <string name="export_interpolation_flow_levels">Rendah melacak gerakan secara kasar dan paling cepat; cocok untuk ponsel Basic. Sedang adalah pilihan biasa untuk ponsel Good. Tinggi melacak detail lebih halus dengan lebih banyak proses agar tepinya lebih bersih; prosesnya lambat, jadi gunakan untuk ponsel Fast atau klip pendek.</string>
+    <string name="export_motion_blur_help">Membuat setiap frame klip video tampak kabur mengikuti gerakannya, seperti rana kamera: Rendah 90°, Sedang 180° (tampilan film biasa), Tinggi 360°. Ini juga berfungsi saat klip sudah memakai frame rate ekspor. Proses ini harus melacak gerakan, jadi memakan waktu kurang lebih sama dengan Optical flow Sedang.</string>
+    <string name="export_phone_speed">Ponsel ini: %1$s</string>
+    <string name="smooth_clip">Haluskan</string>
+    <string name="smooth_intro">Membuat frame halus untuk klip ini sekali saja dan menyimpannya bersama proyek, sehingga pratinjau dan setiap ekspor menampilkannya. Klip asli tetap disimpan dan bisa dikembalikan.</string>
+    <string name="smooth_method">Metode</string>
+    <string name="smooth_nothing">Klip ini sudah punya cukup frame untuk frame rate proyek. Pilih Blur gerak, atau perlambat klipnya dulu.</string>
+    <string name="smooth_frame">Penghalusan: frame %1$s dari %2$s…</string>
+    <string name="smooth_saving">Menyimpan klip halus…</string>
+    <string name="smooth_sound_format">Suara klip ini memakai format yang tidak bisa dipertahankan, jadi klip tidak dihaluskan.</string>
     <string name="export_list_or">%1$s atau %2$s</string>
     <string name="export_list_and">%1$s dan %2$s</string>
     <string name="export_reason_container_codecs">%1$s membutuhkan video %2$s, yang tidak dapat dibuat ponsel ini pada %3$s.</string>

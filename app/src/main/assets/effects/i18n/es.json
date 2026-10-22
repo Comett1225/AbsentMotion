@@ -4450,11 +4450,11 @@
    }
   },
   "timequant": {
-   "description": "Hace que el tiempo avance por pasos en esta capa, como con una velocidad de fotogramas más baja.",
-   "name": "Cuantización de tiempo",
+   "description": "Hace que esta capa se mueva a una velocidad de fotogramas más baja, como un video entrecortado o de stop-motion.",
+   "name": "Velocidad de fotogramas",
    "params": {
     "fps": {
-     "label": "Pasos/s"
+     "label": "Fotogramas/seg"
     }
    }
   },

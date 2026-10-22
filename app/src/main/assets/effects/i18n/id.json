@@ -4450,11 +4450,11 @@
    }
   },
   "timequant": {
-   "description": "Membuat waktu berjalan bertahap untuk lapisan ini, seperti Frame rate yang lebih rendah.",
-   "name": "Kuantisasi waktu",
+   "description": "Membuat lapisan ini bergerak dengan frame rate lebih rendah, seperti rekaman patah-patah atau stop-motion.",
+   "name": "Frame rate",
    "params": {
     "fps": {
-     "label": "Langkah/detik"
+     "label": "Frame/detik"
     }
    }
   },

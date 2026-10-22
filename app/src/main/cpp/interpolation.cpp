@@ -135,6 +135,34 @@ uniform float t;
 half4 main(float2 p) { return mix(a.eval(p), b.eval(p), half(t)); }
 )";
 
+const char* const kSoft = R"(
+uniform shader p;
+uniform shader a;
+uniform shader b;
+uniform shader n;
+uniform float4 w;
+half4 main(float2 q) { return p.eval(q) * half(w.x) + a.eval(q) * half(w.y) + b.eval(q) * half(w.z) + n.eval(q) * half(w.w); }
+)";
+
+const char* const kMotionBlur = R"(
+uniform shader image;
+uniform shader flow;
+uniform float t;
+uniform float k;
+uniform float d;
+uniform float2 size;
+half4 main(float2 p) {
+    float4 f = float4(flow.eval(p / d));
+    float2 v = mix(f.rg, -f.ba, t) * d * k;
+    float4 sum = float4(0);
+    for (int i = 0; i < 16; i++) {
+        float s = (float(i) + 0.5) / 16.0 - 0.5;
+        sum += float4(image.eval(clamp(p + v * s, float2(0.5), size - float2(0.5))));
+    }
+    return half4(sum / 16.0);
+}
+)";
+
 const char* const kMoshMotion = R"(
 uniform shader flow;
 uniform shader prior;
@@ -338,15 +366,26 @@ sk_sp<SkImage> EstimateFlow(skgpu::graphite::Context* context, skgpu::graphite::
 }
 
 sk_sp<SkImage> SynthesizeFrame(skgpu::graphite::Context* context, skgpu::graphite::Recorder* recorder, const sk_sp<SkImage>& a,
-                               const sk_sp<SkImage>& b, const sk_sp<SkImage>& flow, float t, int divisor, double* ms) {
+                               const sk_sp<SkImage>& b, const sk_sp<SkImage>& flow, float t, int divisor, double* ms,
+                               const sk_sp<SkImage>& before, const sk_sp<SkImage>& after) {
+    static const sk_sp<SkRuntimeEffect> soft = Compile(kSoft);
     const Effects& fx = Shaders();
     if (!fx.ok() || !a || !b) return nullptr;
+    const bool four = !flow && before && after;
+    if (four && !soft) return nullptr;
     const auto start = Clock::now();
     Gpu gpu(context, recorder);
-    SkRuntimeShaderBuilder builder(flow ? fx.warp : fx.blend);
+    SkRuntimeShaderBuilder builder(four ? soft : flow ? fx.warp : fx.blend);
     builder.child("a") = Sample(a);
     builder.child("b") = Sample(b);
-    builder.uniform("t") = t;
+    if (four) {
+        const float u = 1 - t;
+        builder.child("p") = Sample(before);
+        builder.child("n") = Sample(after);
+        builder.uniform("w") = SkV4{u * u * u / 6, (3 * t * t * t - 6 * t * t + 4) / 6, (-3 * t * t * t + 3 * t * t + 3 * t + 1) / 6, t * t * t / 6};
+    } else {
+        builder.uniform("t") = t;
+    }
     if (flow) {
         builder.child("flow") = Sample(flow);
         builder.uniform("d") = (float)std::max(divisor, 1);
@@ -358,6 +397,26 @@ sk_sp<SkImage> SynthesizeFrame(skgpu::graphite::Context* context, skgpu::graphit
         return nullptr;
     }
     if (ms) *ms = Since(start);
+    return out;
+}
+
+sk_sp<SkImage> MotionBlur(skgpu::graphite::Context* context, skgpu::graphite::Recorder* recorder, const sk_sp<SkImage>& image,
+                          const sk_sp<SkImage>& flow, float t, float length, int divisor) {
+    static const sk_sp<SkRuntimeEffect> blur = Compile(kMotionBlur);
+    if (!blur || !image || !flow) return nullptr;
+    Gpu gpu(context, recorder);
+    SkRuntimeShaderBuilder builder(blur);
+    builder.child("image") = Sample(image);
+    builder.child("flow") = Sample(flow);
+    builder.uniform("t") = t;
+    builder.uniform("k") = length;
+    builder.uniform("d") = (float)std::max(divisor, 1);
+    builder.uniform("size") = SkV2{(float)image->width(), (float)image->height()};
+    sk_sp<SkImage> out = gpu.draw(gpu.picture(image->width(), image->height()), builder);
+    if (!gpu.submit() || !out) {
+        LOGE("motion blur failed");
+        return nullptr;
+    }
     return out;
 }
 

@@ -4450,11 +4450,11 @@
    }
   },
   "timequant": {
-   "description": "Cho thời gian trôi theo từng bước ở lớp này, như tốc độ khung hình thấp hơn.",
-   "name": "Lượng tử hóa thời gian",
+   "description": "Làm lớp này chuyển động ở tốc độ khung hình thấp hơn, giống như footage bị giật hoặc stop-motion.",
+   "name": "Tốc độ khung hình",
    "params": {
     "fps": {
-     "label": "Bước/giây"
+     "label": "Khung hình/giây"
     }
    }
   },

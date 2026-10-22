@@ -99,7 +99,7 @@ private fun MediaFill.bounded(mapped: Double, loop: Boolean): Double {
 
 fun exportFrameMs(timeMs: Int, fps: Int): Double = ((((timeMs + 1L) * fps + 999) / 1000) - 1) * 1000.0 / fps
 
-private fun Layer.localMs(timeMs: Double, scene: Scene): Double {
+internal fun Layer.localMs(timeMs: Double, scene: Scene): Double {
     val first = scene.frameAt(startTime)
     return timeMs - if (scene.frameStart(first) == startTime) first * 1000.0 / scene.fps else startTime.toDouble()
 }
@@ -116,19 +116,19 @@ fun Layer.exportFrame(timeMs: Double, scene: Scene, stamps: LongArray, fps: Int,
     }
 }
 
-private fun Layer.needs(around: Around, timeMs: Double, scene: Scene, fps: Int, playbackRate: Double = 1.0): Boolean =
+internal fun Layer.needs(around: Around, timeMs: Double, scene: Scene, fps: Int, playbackRate: Double = 1.0): Boolean =
     around.gap > 0 && VideoTiming(this).speed(localMs(timeMs, scene)) * playbackRate * 1e6 / around.gap < fps * 0.99
 
 data class FramePair(val a: Long, val b: Long, val t: Float)
 
-private class Around(val pair: FramePair, val gap: Long)
+internal class Around(val pair: FramePair, val gap: Long)
 
 private const val PAIR_SNAP = 0.005
 
 fun Layer.framePair(timeMs: Double, scene: Scene, stamps: LongArray): FramePair =
     pairAround(timeMs, scene, stamps)?.pair ?: FramePair(stamps.first(), stamps.first(), 0f)
 
-private fun Layer.pairAround(timeMs: Double, scene: Scene, stamps: LongArray): Around? {
+internal fun Layer.pairAround(timeMs: Double, scene: Scene, stamps: LongArray): Around? {
     val fill = mediaFill ?: return null
     if (stamps.isEmpty()) return null
     val loop = node["loop"] == "true"

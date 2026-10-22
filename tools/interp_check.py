@@ -13,6 +13,10 @@ CONFIGS = {
     "blend": ["--es", "interp", "blend"],
     "flow": ["--es", "interp", "flow"],
     "flow2": ["--es", "interp", "flow", "--ei", "interpDivisor", "2"],
+    "blend-low": ["--es", "interp", "blend", "--es", "interpLevel", "low"],
+    "blend-high": ["--es", "interp", "blend", "--es", "interpLevel", "high"],
+    "flow-low": ["--es", "interp", "flow", "--es", "interpLevel", "low"],
+    "flow-high": ["--es", "interp", "flow", "--es", "interpLevel", "high"],
 }
 SOURCE_FPS, SOURCE_FRAMES, STEPS, SPEED = 10, 12, 4, 0.25
 SOURCES = {fps: round((SOURCE_FRAMES - 1) * fps / SOURCE_FPS) + 1 for fps in (10, 30, 60)}
