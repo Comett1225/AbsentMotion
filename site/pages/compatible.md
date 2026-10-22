@@ -22,7 +22,7 @@ In the app, a feature that the Compatible version leaves out is shown grayed out
 
 - **Language.** Android 13 added a per-app language setting. On older Android the app keeps its own language choice in **Settings** instead.
 - **HDR videos.** Below Android 12 the phone cannot convert HDR videos for editing, so they can look pale or washed out.
-- **Phones with less than 3 GB of memory** get a one-time note that big projects may be slow.
+- **Phones with 2 GB of memory or less** get a one-time note that big projects may be slow.
 
 ## How to install it
 
