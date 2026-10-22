@@ -4450,11 +4450,11 @@
    }
   },
   "timequant": {
-   "description": "Pinapayagang dumaan ang oras nang pahakbang para sa layer na ito, tulad ng mas mababang frame rate.",
-   "name": "Quantization ng Oras",
+   "description": "Ginagawang mas mababa ang frame rate ng layer na ito, para magmukhang choppy o stop-motion ang bidyo.",
+   "name": "Frame Rate",
    "params": {
     "fps": {
-     "label": "Hakbang/seg"
+     "label": "Frame/seg"
     }
    }
   },
