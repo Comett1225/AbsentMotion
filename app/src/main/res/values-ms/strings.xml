@@ -1224,7 +1224,6 @@
     <string name="ai_frames_minutes_left">Bingkai %1$s daripada %2$s, kira-kira %3$s min lagi</string>
     <string name="ai_saving_video">Menyimpan video…</string>
     <string name="ai_cooling_down">Telefon panas. Menunggu sehingga ia sejuk…</string>
-    <string name="ai_sound_not_kept">Bunyi klip ini tidak dapat dikekalkan dalam video baharu</string>
     <string name="ai_video_too_large_to_save">Telefon ini tidak dapat menyimpan video %1$s × %2$s</string>
     <string name="ai_delete_model">Padam %1$s</string>
     <string name="settings_ai_gpu">Gunakan cip grafik untuk AI</string>

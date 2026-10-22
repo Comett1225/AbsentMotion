@@ -28,12 +28,12 @@ import kotlin.math.roundToLong
 
 internal fun videoBitrate(width: Int, height: Int, fps: Float): Int = (width.toDouble() * height * fps * 0.1).coerceIn(1_500_000.0, 50_000_000.0).toInt()
 
-internal fun writeYuv(argb: IntArray, width: Int, height: Int, image: Image) {
+internal fun writeYuv(argb: IntArray, stride: Int, width: Int, height: Int, image: Image) {
     val (yPlane, uPlane, vPlane) = image.planes
     val y = yPlane.buffer
     for (row in 0 until height) {
         val base = row * yPlane.rowStride
-        val line = row * width
+        val line = row * stride
         for (col in 0 until width) {
             val p = argb[line + col]
             y.put(base + col * yPlane.pixelStride, lumaOf(p).toByte())
@@ -47,7 +47,7 @@ internal fun writeYuv(argb: IntArray, width: Int, height: Int, image: Image) {
         for (col in 0 until (width + 1) / 2) {
             var r = 0; var g = 0; var b = 0
             for (dy in 0..1) for (dx in 0..1) {
-                val p = argb[minOf(height - 1, row * 2 + dy) * width + minOf(width - 1, col * 2 + dx)]
+                val p = argb[minOf(height - 1, row * 2 + dy) * stride + minOf(width - 1, col * 2 + dx)]
                 r += (p shr 16) and 0xFF; g += (p shr 8) and 0xFF; b += p and 0xFF
             }
             u.put(uBase + col * uPlane.pixelStride, ((-26 * r - 87 * g + 113 * b + 512) / 1024 + 128).coerceIn(0, 255).toByte())
@@ -94,18 +94,18 @@ private class AudioCopy(context: Context, uri: String) : Closeable {
 }
 
 internal class FrameEncoder private constructor(
-    private val codec: MediaCodec, private val muxer: MediaMuxer, private val audio: AudioCopy?, val width: Int, val height: Int,
+    private val codec: MediaCodec, private val muxer: MediaMuxer, private val audio: AudioCopy?, private val stride: Int, val width: Int, val height: Int,
 ) : Closeable {
     private val info = MediaCodec.BufferInfo()
     private var track = -1
     private var finished = false
 
     fun write(pts: Long, argb: IntArray) {
-        check(argb.size >= width * height) { AppText.get(R.string.ai_mask_wrong_size) }
+        check(argb.size >= stride * height) { AppText.get(R.string.ai_mask_wrong_size) }
         val index = input()
         val size = codec.getInputBuffer(index)!!.capacity()
         val image = checkNotNull(codec.getInputImage(index)) { AppText.get(R.string.ai_encoder_no_image) }
-        writeYuv(argb, width, height, image)
+        writeYuv(argb, stride, width, height, image)
         codec.queueInputBuffer(index, 0, size, pts, 0)
         drain(false)
     }
@@ -135,9 +135,7 @@ internal class FrameEncoder private constructor(
             when {
                 index == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED -> {
                     track = muxer.addTrack(codec.outputFormat)
-                    audio?.format?.let { format ->
-                        audio.track = try { muxer.addTrack(format) } catch (_: Exception) { error(AppText.get(R.string.ai_sound_not_kept)) }
-                    }
+                    audio?.format?.let { format -> audio.track = runCatching { muxer.addTrack(format) }.getOrDefault(-1) }
                     muxer.start()
                 }
                 index >= 0 -> {
@@ -168,7 +166,9 @@ internal class FrameEncoder private constructor(
     }
 
     companion object {
-        fun open(context: Context, file: File, width: Int, height: Int, fps: Float, rotation: Int, soundFrom: String?): FrameEncoder {
+        fun open(context: Context, file: File, stride: Int, rows: Int, fps: Float, rotation: Int, soundFrom: String?): FrameEncoder {
+            val width = maxOf(2, stride and 1.inv())
+            val height = maxOf(2, rows and 1.inv())
             val list = MediaCodecList(MediaCodecList.REGULAR_CODECS)
             for (mime in listOf(MediaFormat.MIMETYPE_VIDEO_AVC, MediaFormat.MIMETYPE_VIDEO_HEVC)) {
                 val format = MediaFormat.createVideoFormat(mime, width, height).apply {
@@ -192,7 +192,7 @@ internal class FrameEncoder private constructor(
                 val muxer = MediaMuxer(file.path, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
                 muxer.setOrientationHint(((rotation % 360) + 360) % 360 / 90 * 90)
                 val audio = soundFrom?.let { runCatching { AudioCopy(context, it) }.getOrNull() }
-                return FrameEncoder(codec, muxer, audio, width, height)
+                return FrameEncoder(codec, muxer, audio, stride, width, height)
             }
             error(AppText.get(R.string.ai_video_too_large_to_save, width.toString(), height.toString()))
         }

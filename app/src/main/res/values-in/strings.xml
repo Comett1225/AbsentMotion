@@ -1224,7 +1224,6 @@
     <string name="ai_frames_minutes_left">Frame %1$s dari %2$s, sekitar %3$s mnt lagi</string>
     <string name="ai_saving_video">Menyimpan video…</string>
     <string name="ai_cooling_down">Ponsel panas. Menunggu hingga dingin…</string>
-    <string name="ai_sound_not_kept">Suara klip ini tidak dapat dipertahankan di video baru</string>
     <string name="ai_video_too_large_to_save">Ponsel ini tidak dapat menyimpan video %1$s × %2$s</string>
     <string name="ai_delete_model">Hapus %1$s</string>
     <string name="settings_ai_gpu">Gunakan chip grafis untuk AI</string>

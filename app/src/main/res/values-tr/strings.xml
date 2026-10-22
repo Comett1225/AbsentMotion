@@ -1248,7 +1248,6 @@
     <string name="ai_frames_minutes_left">Kare %1$s / %2$s, yaklaşık %3$s dk kaldı</string>
     <string name="ai_saving_video">Video kaydediliyor…</string>
     <string name="ai_cooling_down">Telefon ısındı. Soğuması bekleniyor…</string>
-    <string name="ai_sound_not_kept">Bu klibin sesi yeni videoda korunamaz</string>
     <string name="ai_video_too_large_to_save">Bu telefon %1$s × %2$s boyutunda bir video kaydedemez</string>
     <string name="ai_delete_model">%1$s sil</string>
     <string name="settings_ai_gpu">AI için grafik yongasını kullan</string>

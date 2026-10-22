@@ -1296,7 +1296,6 @@
     <string name="ai_frames_minutes_left">Кадр %1$s из %2$s, осталось около %3$s мин</string>
     <string name="ai_saving_video">Сохраняем видео…</string>
     <string name="ai_cooling_down">Телефон нагрелся. Ждём, пока он остынет…</string>
-    <string name="ai_sound_not_kept">Звук этого клипа нельзя сохранить в новом видео</string>
     <string name="ai_video_too_large_to_save">Этот телефон не может сохранить видео %1$s × %2$s</string>
     <string name="ai_delete_model">Удалить %1$s</string>
     <string name="settings_ai_gpu">Использовать графический чип для AI</string>

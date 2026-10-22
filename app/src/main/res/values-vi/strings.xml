@@ -1224,7 +1224,6 @@
     <string name="ai_frames_minutes_left">Khung hình %1$s trên %2$s, còn khoảng %3$s phút</string>
     <string name="ai_saving_video">Đang lưu video…</string>
     <string name="ai_cooling_down">Điện thoại đang nóng. Đang chờ nguội bớt…</string>
-    <string name="ai_sound_not_kept">Không thể giữ âm thanh của clip này trong video mới</string>
     <string name="ai_video_too_large_to_save">Điện thoại này không thể lưu video %1$s × %2$s</string>
     <string name="ai_delete_model">Xóa %1$s</string>
     <string name="settings_ai_gpu">Dùng chip đồ họa cho AI</string>
