@@ -274,14 +274,22 @@
   function initDownload() {
     var box = document.getElementById("rec");
     if (!box) return;
+    var settled = false;
+    var fallback = setTimeout(function () {
+      if (!settled) fillRecommendation(box, { platform: "android", android: null, model: null }, [], { kind: "unknown" });
+    }, 2000);
     detect(navigator).then(function (env) {
       if (!env.model) return { env: env, devices: [] };
       return loadDevices().then(function (devices) {
         return { env: env, devices: findByModelCode(buildIndex(devices), env.model) };
       });
     }).then(function (found) {
+      settled = true;
+      clearTimeout(fallback);
       fillRecommendation(box, found.env, found.devices, recommend(found.env, found.devices[0] || null));
     }).catch(function () {
+      settled = true;
+      clearTimeout(fallback);
       fillRecommendation(box, { platform: "android", android: null, model: null }, [], { kind: "unknown" });
     });
   }
