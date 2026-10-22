@@ -168,6 +168,13 @@ internal object TestHooks {
                 catch (e: Throwable) { Log.e("AMAi", "aismooth failed", e) }
             }
         }
+        intent.getStringExtra("videocutcheck")?.let { path ->
+            scope.launch {
+                try { checkVideoCut(activity, path, intent.getIntExtra("side", 720)) }
+                catch (e: kotlinx.coroutines.CancellationException) { throw e }
+                catch (e: Throwable) { Log.e("AMAi", "videocut failed", e) }
+            }
+        }
         intent.getStringExtra("aidownload")?.let { name ->
             scope.launch {
                 try { checkDownload(activity, name, intent.getLongExtra("stopafter", 0L)) }

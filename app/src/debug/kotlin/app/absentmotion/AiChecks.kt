@@ -162,6 +162,22 @@ internal suspend fun checkSmooth(activity: MainActivity, path: String, levels: L
     Log.i(TAG, "aismooth done")
 }
 
+internal suspend fun checkVideoCut(activity: MainActivity, path: String, side: Int) {
+    val declared = checkNotNull(app.absentmotion.media.videoDeclaration(activity, android.net.Uri.fromFile(java.io.File(path)))) { "cannot read $path" }
+    val ms = (declared.duration / 1000).toInt().coerceAtLeast(1000)
+    val xml = """<scene width="1920" height="1080" fps="30" totalTime="$ms"><shape id="1" label="clip" s=".rect" fillType="media" fillVideo="${declared.uri}" mediaFillMode="fit" startTime="0" endTime="$ms"><transform><location value="960,540,0"/></transform><property name="size" type="vec2" value="960,540"/></shape></scene>"""
+    activity.store.save("test-videocut", app.absentmotion.model.Scene.parse(xml).withMedia(declared))
+    val state = checkNotNull(activity.openNow("test-videocut")) { "cannot open test-videocut" }
+    val tools = app.absentmotion.ai.AiTools(activity.applicationContext, state, activity.lifecycleScope)
+    state.selectedId = 1
+    tools.videoSide = side
+    val started = SystemClock.elapsedRealtime()
+    tools.apply(app.absentmotion.ai.AiAction.Video, confirmed = true)
+    while (tools.running != null) kotlinx.coroutines.delay(250)
+    val layers = state.scene.layers.size
+    Log.i(TAG, "ok=${tools.message.isEmpty()} videocut ${declared.width}x${declared.height} side=$side ms=${SystemClock.elapsedRealtime() - started} layers=$layers message=${tools.message}")
+}
+
 internal suspend fun checkDownload(context: Context, name: String, stopAfterMs: Long) {
     val model = AiModel.valueOf(name)
     model.delete(context)
