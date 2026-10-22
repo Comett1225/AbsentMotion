@@ -134,6 +134,7 @@ fun SettingsDrawer(settings: AppSettings, drawer: androidx.compose.material3.Dra
                 SwitchRow(stringResource(R.string.settings_keep_media_copies), settings.keepMediaCopies, enabled = true) { settings.keepMediaCopies = it }
                 if (settings.demoModeShown) SwitchRow(stringResource(R.string.settings_demo_mode), settings.demoMode, enabled = true) { settings.demoMode = it; demoNote = it }
                 CaptionModelRow()
+                AiModelRows()
             }
             Category(R.string.settings_group_backup, ChromeIcons.SavePreset) {
                 BackupRows(settings, onRestored)
@@ -212,6 +213,18 @@ private fun CaptionModelRow() {
     val downloaded = remember { bytes > 0L }
     if (!downloaded) return
     ActionRow(stringResource(R.string.remove_caption_model), formatBytes(bytes), chevron = false) { CaptionModel.remove(context); bytes = CaptionModel.file(context).length() }
+}
+
+@Composable
+private fun AiModelRows() {
+    val context = LocalContext.current
+    var models by remember { mutableStateOf(app.absentmotion.ai.AiModel.downloaded(context)) }
+    for (model in models) {
+        ActionRow(stringResource(R.string.ai_delete_model, stringResource(model.title)), formatBytes(model.onDisk(context)), chevron = false) {
+            model.delete(context)
+            models = app.absentmotion.ai.AiModel.downloaded(context)
+        }
+    }
 }
 
 @Composable

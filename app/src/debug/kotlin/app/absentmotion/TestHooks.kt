@@ -29,7 +29,7 @@ internal object TestHooks {
     fun onboarding(intent: Intent): String? = intent.getStringExtra("onboarding")
 
     fun newIntent(activity: MainActivity, intent: Intent) {
-        if (intent.hasExtra("xml") || intent.hasExtra("aaccheck") || intent.hasExtra("devicecheck") || intent.hasExtra("capcheck")) {
+        if (intent.hasExtra("xml") || intent.hasExtra("aaccheck") || intent.hasExtra("devicecheck") || intent.hasExtra("capcheck") || intent.hasExtra("aicheck") || intent.hasExtra("enhancecheck")) {
             activity.setIntent(intent)
             start(activity)
             return
@@ -99,6 +99,21 @@ internal object TestHooks {
             try { checkDevice(activity) }
             catch (e: kotlinx.coroutines.CancellationException) { throw e }
             catch (e: Exception) { Log.e("AMDevice", "failed", e) }
+        }
+        app.absentmotion.ai.AiNet.cpuOnly = intent.getBooleanExtra("aicpu", false)
+        intent.getStringExtra("aicheck")?.let { mode ->
+            scope.launch {
+                try { checkAi(activity, mode != "cpu") }
+                catch (e: kotlinx.coroutines.CancellationException) { throw e }
+                catch (e: Throwable) { Log.e("AMAi", "failed", e) }
+            }
+        }
+        intent.getStringExtra("enhancecheck")?.let { path ->
+            scope.launch {
+                try { checkEnhance(activity, path, (intent.getStringExtra("modes") ?: "upscale2").split(',')) }
+                catch (e: kotlinx.coroutines.CancellationException) { throw e }
+                catch (e: Throwable) { Log.e("AMAi", "enhance failed", e) }
+            }
         }
         intent.getStringExtra("bgremove")?.let { asset ->
             val runs = intent.getIntExtra("runs", 3).coerceAtLeast(1)

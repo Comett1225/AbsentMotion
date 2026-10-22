@@ -29,7 +29,25 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.absentmotion.ai.AiAction
+import app.absentmotion.ai.AiDevice
+import app.absentmotion.ai.AiEnhance
 import app.absentmotion.ai.AiTools
+import app.absentmotion.ai.AiVerdict
+import app.absentmotion.ai.EnhanceMode
+import app.absentmotion.ai.aiEstimate
+import app.absentmotion.export.formatBytes
+import androidx.compose.foundation.border
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.text.font.FontWeight
 import app.absentmotion.ai.LONG_MATTE_SECONDS
 import app.absentmotion.ai.MAX_MATTE_SECONDS
 import app.absentmotion.ai.MatteSides
@@ -82,6 +100,12 @@ internal fun AiBackdrop(modifier: Modifier, action: AiAction? = null) {
                 moveTo(cx - unit * 0.12f, cy - unit * 0.2f)
                 lineTo(cx + unit * 0.2f, cy); lineTo(cx - unit * 0.12f, cy + unit * 0.2f); close()
             }, Color.White.copy(alpha = 0.85f))
+            AiAction.Enhance -> {
+                val stroke = androidx.compose.ui.graphics.drawscope.Stroke(unit * 0.025f)
+                drawRect(Color.White.copy(alpha = 0.85f), Offset(cx - unit * 0.22f, cy - unit * 0.02f), androidx.compose.ui.geometry.Size(unit * 0.2f, unit * 0.2f))
+                drawRect(Color.White.copy(alpha = 0.85f), Offset(cx - unit * 0.22f, cy - unit * 0.22f), androidx.compose.ui.geometry.Size(unit * 0.44f, unit * 0.44f), style = stroke)
+                drawLine(Color.White.copy(alpha = 0.85f), Offset(cx + unit * 0.02f, cy - unit * 0.02f), Offset(cx + unit * 0.15f, cy - unit * 0.15f), unit * 0.025f, StrokeCap.Round)
+            }
             null -> Unit
         }
     }
@@ -176,9 +200,93 @@ internal fun AiNoiseDialog(tools: AiTools) {
 }
 
 @Composable
+internal fun AiEnhanceDialog(tools: AiTools, scene: Scene, onQuickSharpen: () -> Unit) {
+    val layer = tools.enhanceSetup ?: return
+    val context = LocalContext.current
+    val media = layer.mediaFill?.uri?.let(scene::media)
+    val options = tools.enhance
+    val fits = media != null && options.mode.fits(media.width, media.height)
+    val seconds = media?.let(layer::matteSeconds) ?: 0.0
+    val tooLong = seconds > MAX_MATTE_SECONDS
+    var help by remember { mutableStateOf<EnhanceMode?>(null) }
+    var estimate by remember { mutableStateOf<String?>(null) }
+    var cannot by remember { mutableStateOf(false) }
+    val missing = options.models.filterNot { it.installed(context) }.sumOf { it.bytes }
+    LaunchedEffect(options, layer, media) {
+        estimate = null
+        cannot = false
+        if (media == null || !options.usesAi || !fits) return@LaunchedEffect
+        val phone = AiDevice.phone(context)
+        val gmac = seconds * (media.fps ?: 30f) * options.gmacPerFrame(media.width, media.height)
+        aiEstimate(phone, gmac, AiDevice.measured(options.model)).let { estimate = it.text; cannot = it.verdict == AiVerdict.Cannot }
+        AiDevice.benchmark(context, options.model)?.let { rate -> aiEstimate(phone, gmac, rate).let { estimate = it.text; cannot = it.verdict == AiVerdict.Cannot } }
+    }
+    AlertDialog(onDismissRequest = { tools.enhanceSetup = null },
+        title = { Text(stringResource(R.string.ai_enhance), color = Am.OnDark) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState())) {
+                Column(Modifier.selectableGroup(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    for (mode in EnhanceMode.entries) {
+                        val on = mode == options.mode
+                        Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(6.dp)).background(if (on) Am.FieldHi else Am.PanelInset)
+                            .selectable(on, role = Role.RadioButton) { tools.enhance = options.copy(mode = mode) }.padding(10.dp)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                RadioButton(on, null, colors = RadioButtonDefaults.colors(selectedColor = Am.Accent, unselectedColor = Am.OnDark))
+                                Column(Modifier.weight(1f).padding(start = 10.dp)) {
+                                    Text(stringResource(mode.title), color = if (on) Am.Accent else Am.OnDark, fontSize = 14.sp)
+                                    Text(stringResource(mode.hint), color = Am.Caption, fontSize = 12.sp, lineHeight = 16.sp)
+                                }
+                                Box(Modifier.size(32.dp).clip(CircleShape).clickable { help = if (help == mode) null else mode }, Alignment.Center) {
+                                    Box(Modifier.size(20.dp).border(1.5.dp, Am.OnDark, CircleShape), Alignment.Center) {
+                                        Text("?", color = Am.OnDark, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                    }
+                                }
+                            }
+                            if (help == mode) Text(stringResource(mode.help), Modifier.padding(top = 6.dp), color = Am.OnDark, fontSize = 12.sp, lineHeight = 17.sp)
+                        }
+                    }
+                }
+                if (options.mode == EnhanceMode.Sharpen) EnhanceSwitch(stringResource(R.string.ai_enhance_quick), options.quick) { tools.enhance = options.copy(quick = it) }
+                if (options.usesAi) {
+                    EnhanceSwitch(stringResource(R.string.ai_enhance_cartoon), options.cartoon) { tools.enhance = options.copy(cartoon = it) }
+                    if (!options.cartoon) EnhanceSwitch(stringResource(R.string.ai_enhance_grain), options.grain) { tools.enhance = options.copy(grain = it) }
+                }
+                val note = when {
+                    !options.usesAi -> stringResource(R.string.ai_enhance_quick_note)
+                    media == null -> stringResource(R.string.aibrowser_no_size)
+                    tooLong -> pluralStringResource(R.plurals.aibrowser_too_long, MAX_MATTE_SECONDS / 60, (MAX_MATTE_SECONDS / 60).toString())
+                    !fits -> AiEnhance.capText(options.mode)
+                    else -> listOfNotNull(estimate ?: stringResource(R.string.ai_checking_phone),
+                        if (missing > 0) stringResource(R.string.ai_download_once, formatBytes(missing)) else null).joinToString("\n")
+                }
+                Text(note, Modifier.padding(top = 12.dp).heightIn(min = 40.dp), color = if (!fits || tooLong || cannot) Am.Warning else Am.Caption, fontSize = 12.sp, lineHeight = 17.sp)
+            }
+        },
+        confirmButton = {
+            TextButton({
+                if (options.usesAi) tools.apply(AiAction.Enhance, confirmed = true) else { tools.enhanceSetup = null; onQuickSharpen() }
+            }, enabled = !options.usesAi || (fits && !tooLong && !cannot)) {
+                Text(stringResource(if (options.usesAi && missing > 0) R.string.ai_download_and_start else R.string.start), color = Am.Accent)
+            }
+        },
+        dismissButton = { TextButton({ tools.enhanceSetup = null }) { Text(stringResource(R.string.cancel), color = Am.Accent) } },
+        containerColor = Am.Field)
+}
+
+@Composable
+private fun EnhanceSwitch(label: String, on: Boolean, onChange: (Boolean) -> Unit) {
+    Row(Modifier.padding(top = 8.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Text(label, Modifier.weight(1f), color = Am.OnDark, fontSize = 14.sp)
+        app.absentmotion.ui.editor.panels.ThinSwitch(on, onChange = onChange)
+    }
+}
+
+@Composable
 internal fun AiProgressDialog(tools: AiTools) {
     if (tools.message.isEmpty()) return
     val action = tools.running
+    val view = LocalView.current
+    DisposableEffect(action != null) { view.keepScreenOn = action != null; onDispose { view.keepScreenOn = false } }
     AlertDialog(onDismissRequest = { if (action != null) tools.cancel() else tools.dismiss() },
         title = { Text(action?.let { stringResource(it.title) } ?: stringResource(R.string.ai), color = Am.OnDark) },
         text = {

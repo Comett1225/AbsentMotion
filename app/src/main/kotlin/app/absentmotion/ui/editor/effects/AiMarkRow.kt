@@ -36,7 +36,7 @@ internal val AiMarkRowGap = 6.5.dp
 @Composable
 internal fun AiMarkRow(state: EditorState, mark: AiMark) {
     val kind = mark.kind ?: return
-    val name = stringResource(kind.title) + (mark.source?.let { " · " + stringResource(it.title) } ?: "")
+    val name = stringResource(kind.title) + ((mark.source?.title ?: mark.enhance?.mode?.title)?.let { " · " + stringResource(it) } ?: "")
     Row(Modifier.padding(start = 6.5.dp, end = 6.5.dp, top = AiMarkRowGap).fillMaxWidth().height(AiMarkRowHeight).clip(RoundedCornerShape(5.dp)).background(Am.Field),
         verticalAlignment = Alignment.CenterVertically) {
         Text(name, Modifier.weight(1f).padding(start = 12.dp), color = Am.OnDark, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
