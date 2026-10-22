@@ -53,11 +53,13 @@ Set `ANDROID_NDK` to the NDK directory if it is not at `~/Library/Android/sdk/nd
 | Directory | What | State |
 |---|---|---|
 | `third_party/whisper.cpp` | whisper.cpp / ggml **1.9.5** (MIT), for on-device captions | Pinned git submodule; initialise it with `git submodule update --init --recursive`. |
+| `third_party/ncnn` | ncnn **20261020** (BSD-3-Clause) with its glslang copy, the on-device AI runtime | Pinned git submodule with a nested glslang submodule; `git submodule update --init --recursive` fetches both. |
+| `third_party/rife_warp` | The `rife.Warp` layer from rife-ncnn-vulkan (MIT) | Vendored copy, unchanged, with its licence. |
 | `third_party/rnnoise` | RNNoise (BSD-3-Clause), for noise reduction | Vendored copy in the tree. Meant to become a pinned submodule; the upstream commit is not recorded yet. |
 | `third_party/skia` | Skia | **Not in the repository** (git-ignored). Fetched by `tools/build_skia.sh`. |
 
-Nothing else needs to be fetched by hand. The Whisper speech models are not part of the build: the app downloads one
-the first time captions are generated.
+Nothing else needs to be fetched by hand. The Whisper speech models and the AI Enhance and AI Smooth models are not part
+of the build: the app downloads each one the first time it is used.
 
 ## 5. Skia
 
@@ -102,7 +104,8 @@ is another commit.
 ```
 
 Gradle runs CMake for you (`externalNativeBuild`): it builds the engine (`libamengine.so`), the speech library
-(`libwhisper_jni.so`, from `third_party/whisper.cpp`) and RNNoise (from `third_party/rnnoise`), for `arm64-v8a` only.
+(`libwhisper_jni.so`, from `third_party/whisper.cpp`), the AI runtime (`libabsent_ai.so`, ncnn from `third_party/ncnn`
+with the layer in `third_party/rife_warp`) and RNNoise (from `third_party/rnnoise`), for `arm64-v8a` only.
 Skia from section 5 must be in place first.
 
 Outputs: `app/build/outputs/apk/<flavour>/<type>/app-<flavour>-<type>.apk`, for example `app/build/outputs/apk/play/debug/app-play-debug.apk`. The foss flavour adds its own offline background remover (`app/src/foss`); the play flavour uses Google ML Kit through Google Play services (`app/src/play`).
