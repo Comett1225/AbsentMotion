@@ -130,7 +130,7 @@ internal object TestHooks {
             intent.getStringExtra("verify")?.let { file ->
                 launch {
                     val kind = if (file.endsWith(".mp4") || file.endsWith(".mkv")) ExportKind.Video else ExportKind.Audio
-                    val expect = app.absentmotion.export.expectationFor(kind, scene, defaultSettings(kind, scene), app.absentmotion.audio.AudioClip.of(scene).isNotEmpty())!!
+                    val expect = app.absentmotion.export.expectationFor(kind, scene, defaultSettings(kind, scene), app.absentmotion.audio.OfflineMix.audible(activity.applicationContext, scene).isNotEmpty())!!
                     val v = app.absentmotion.export.verifyExport(activity.applicationContext, Uri.fromFile(File(file)), expect)
                     Log.i("AMExport", "verify " + app.absentmotion.export.verificationSummary(v))
                 }

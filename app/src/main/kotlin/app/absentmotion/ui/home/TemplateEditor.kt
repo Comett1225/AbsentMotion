@@ -404,8 +404,10 @@ private fun SlotCell(picture: ImageBitmap?, selected: Boolean, mode: MediaFillMo
         if (selected) Box(Modifier.align(Alignment.Center).size(40.dp).clip(CircleShape).background(Color(0x99000000)), Alignment.Center) {
             Icon(HomeIcons.Replace, stringResource(R.string.template_replace), Modifier.size(24.dp), tint = Color.White)
         }
-        Box(Modifier.align(Alignment.TopEnd).padding(4.dp).size(28.dp).clip(CircleShape).background(Color(0x99000000)).clickable(onClick = onScale), Alignment.Center) {
-            Icon(when (mode) { MediaFillMode.Fill -> HomeIcons.CropFill; MediaFillMode.Fit -> HomeIcons.CropFit; MediaFillMode.Stretch -> HomeIcons.CropStretch }, stringResource(R.string.template_scale), Modifier.size(20.dp), tint = Color.White)
+        Box(Modifier.align(Alignment.TopEnd).size(44.dp).clickable(onClick = onScale), Alignment.Center) {
+            Box(Modifier.size(28.dp).clip(CircleShape).background(Color(0x99000000)), Alignment.Center) {
+                Icon(when (mode) { MediaFillMode.Fill -> HomeIcons.CropFill; MediaFillMode.Fit -> HomeIcons.CropFit; MediaFillMode.Stretch -> HomeIcons.CropStretch }, stringResource(R.string.template_scale), Modifier.size(20.dp), tint = Color.White)
+            }
         }
     }
 }

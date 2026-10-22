@@ -142,7 +142,7 @@ internal fun MediaTab(state: EditorState, modifier: Modifier, library: AddLibrar
             items(shown, key = { it.uri.toString() }) { file ->
                 val bitmap by produceState<android.graphics.Bitmap?>(cachedMediaThumbnail(file.uri), file.uri, file.modified, library.mediaRevision) { value = mediaThumbnail(context, file.uri) }
                 val press = remember { MutableInteractionSource() }
-                Box(Modifier.fillMaxHeight().aspectRatio(1f).pressScale(press, TilePress).background(Color.Black).clickable(press, LocalIndication.current, enabled = !state.addingMedia) {
+                Box(Modifier.fillMaxHeight().aspectRatio(1f).pressScale(press, TilePress).background(Color.Black).semantics { contentDescription = file.name }.clickable(press, LocalIndication.current, enabled = !state.addingMedia) {
                     scope.launch {
                         state.addingMedia = true
                         try {

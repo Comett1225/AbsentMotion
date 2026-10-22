@@ -154,7 +154,7 @@ internal fun FullColorPicker(state: EditorState, request: FullColor, modifier: M
                             row.forEach { swatch ->
                                 Box(
                                     Modifier.size(84.px).clip(RoundedCornerShape(5.dp)).background(Color(swatch or 0xFF000000.toInt()))
-                                        .clickable { setArgb((argb and 0xFF000000.toInt()) or swatch, false) },
+                                        .buttonLabel(colourText(swatch or 0xFF000000.toInt())).clickable { setArgb((argb and 0xFF000000.toInt()) or swatch, false) },
                                 )
                             }
                         }
@@ -246,7 +246,7 @@ private fun SliderRow(
                 }
                 drawCircle(Color.White, 35 * u, Offset(left + value.coerceIn(0f, 1f) * bar.width, size.height / 2f))
             }
-            DragArea(Modifier.fillMaxSize(), onEnd) { p -> onChange(((p.x - SLIDER_PAD * u) / (SLIDER_SPAN * u)).coerceIn(0f, 1f)) }
+            DragArea(Modifier.fillMaxSize().sliderSemantics(value, 0f..1f) { onChange(it); onEnd() }, onEnd) { p -> onChange(((p.x - SLIDER_PAD * u) / (SLIDER_SPAN * u)).coerceIn(0f, 1f)) }
         }
         Box(Modifier.offset(932.px, 0.dp).size(138.px, 124.px), Alignment.CenterEnd) { Text(text, Modifier.padding(end = 9.px), color = Am.OnDark, fontSize = 16.sp, maxLines = 1, softWrap = false) }
     }

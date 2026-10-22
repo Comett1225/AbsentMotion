@@ -646,6 +646,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
     fun beginDrag(hit: Hit, moved: Offset): Drag {
         return when {
             hit is Hit.Grip -> {
+                state.playing = false
                 val layer = layers.firstOrNull { it.id == hit.id }
                 dragId = hit.id
                 trimBase = layer

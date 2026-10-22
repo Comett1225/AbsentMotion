@@ -176,6 +176,7 @@ private fun Playback(state: EditorState) {
         try {
             while (state.playing) {
                 val now = withFrameNanos { it }
+                if (audio?.interrupted == true) { state.playing = false; break }
                 if (state.frame != shown) {
                     startFrame = state.frame
                     startMs = state.scene.frameStart(startFrame)

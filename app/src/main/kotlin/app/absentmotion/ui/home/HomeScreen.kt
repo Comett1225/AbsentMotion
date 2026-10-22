@@ -130,7 +130,7 @@ import app.absentmotion.R
 import app.absentmotion.i18n.text
 
 private val Grey get() = Am.HomeDim
-private val FactText get() = Am.HomeFaint
+private val FactText get() = Am.HomeDim
 private val MenuScrim get() = Am.MenuScrim
 private val BarHeight = 72.dp
 private val PlusOverhang = 16.dp

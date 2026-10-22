@@ -182,7 +182,7 @@ import java.util.Locale
 import kotlin.math.roundToInt
 
 private val Navy get() = Am.Navy
-private val NoteGrey get() = Am.HomeFaint
+private val NoteGrey get() = Am.HomeDim
 private val ValueGrey get() = Am.HomeDim
 private val Line get() = Am.HomeLine
 private val Scrim get() = Am.Scrim

@@ -100,6 +100,7 @@ import java.util.Date
 import java.util.Locale
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
+import app.absentmotion.ui.editor.panels.buttonLabel
 
 private enum class Flash(@StringRes val label: Int, val mode: Int) {
     Off(R.string.camera_off, ImageCapture.FLASH_MODE_OFF), Auto(R.string.camera_auto, ImageCapture.FLASH_MODE_AUTO), On(R.string.camera_on, ImageCapture.FLASH_MODE_ON),
@@ -493,8 +494,9 @@ private fun ModeTab(label: String, selected: Boolean, enabled: Boolean, onClick:
 
 @Composable
 private fun Shutter(video: Boolean, recording: Boolean, waiting: Boolean, ready: Boolean, noCamera: Boolean, onClick: () -> Unit) {
+    val label = stringResource(if (recording) R.string.stop else if (video) R.string.camera_start_recording else R.string.camera_take_photo)
     Box(
-        Modifier.size(76.dp).alpha(if (noCamera) 0.35f else 1f).border(4.dp, Color.White, CircleShape).padding(8.dp).clip(CircleShape).clickable(enabled = ready, onClick = onClick)
+        Modifier.size(76.dp).alpha(if (noCamera) 0.35f else 1f).border(4.dp, Color.White, CircleShape).padding(8.dp).clip(CircleShape).buttonLabel(label).clickable(enabled = ready, onClick = onClick)
             .then(if (recording) Modifier else Modifier.alpha(if (waiting) 0.6f else 1f)),
         Alignment.Center,
     ) {

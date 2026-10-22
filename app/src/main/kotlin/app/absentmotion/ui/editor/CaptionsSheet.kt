@@ -62,6 +62,8 @@ import java.io.IOException
 import kotlin.math.roundToInt
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
+import app.absentmotion.ui.editor.panels.buttonLabel
+import app.absentmotion.ui.editor.panels.colourText
 
 internal val SheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
 private val ChoiceShape = RoundedCornerShape(6.dp)
@@ -167,7 +169,7 @@ internal fun CaptionsSheet(state: EditorState, onClose: () -> Unit) {
                         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                             for (argb in Swatches) {
                                 val chosen = argb == style.color
-                                Box(Modifier.size(28.dp).clip(CircleShape).clickable { update(style.copy(color = argb)) }
+                                Box(Modifier.size(28.dp).clip(CircleShape).buttonLabel(colourText(argb)).clickable { update(style.copy(color = argb)) }
                                     .border(2.dp, if (chosen) Am.Accent else Color.Transparent, CircleShape).padding(4.dp)
                                     .background(Color(argb), CircleShape).border(1.dp, Am.OnDarkDim, CircleShape))
                             }

@@ -54,6 +54,12 @@ import app.absentmotion.model.PropRef
 import app.absentmotion.model.formatNumber
 import app.absentmotion.ui.theme.Am
 import java.util.Locale
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.ProgressBarRangeInfo
+import androidx.compose.ui.semantics.progressBarRangeInfo
+import androidx.compose.ui.semantics.setProgress
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
 
 internal fun EditorState.setNumber(ref: PropRef, value: Float, key: Any? = null) =
     editSelected(key) { it.withValue(ref, formatNumber(value)) }
@@ -77,6 +83,14 @@ internal fun ThinSwitch(
     }
 }
 
+internal fun Modifier.buttonLabel(text: String): Modifier = semantics { contentDescription = text; role = Role.Button }
+
+internal fun Modifier.sliderSemantics(value: Float, range: ClosedFloatingPointRange<Float>, enabled: Boolean = true, onSet: (Float) -> Unit): Modifier =
+    semantics {
+        progressBarRangeInfo = ProgressBarRangeInfo(value.coerceIn(range), range)
+        if (enabled) setProgress { onSet(it.coerceIn(range)); true }
+    }
+
 @Composable
 internal fun ThinSlider(
     value: Float, onValueChange: (Float) -> Unit, modifier: Modifier = Modifier, enabled: Boolean = true,
@@ -86,7 +100,7 @@ internal fun ThinSlider(
     val change by rememberUpdatedState(onValueChange)
     val finish by rememberUpdatedState(onValueChangeFinished)
     val span = (valueRange.endInclusive - valueRange.start).takeIf { it > 0f } ?: 1f
-    Canvas(modifier.height(32.dp).alpha(if (enabled) 1f else 0.35f).pointerInput(enabled, valueRange) {
+    Canvas(modifier.height(32.dp).alpha(if (enabled) 1f else 0.35f).sliderSemantics(value, valueRange, enabled) { change(it); finish() }.pointerInput(enabled, valueRange) {
         if (!enabled) return@pointerInput
         val r = 6.4.dp.toPx()
         fun at(x: Float) = valueRange.start + ((x - r) / (size.width - 2 * r)).coerceIn(0f, 1f) * span
@@ -112,7 +126,7 @@ internal fun PanelSwitch(on: Boolean, modifier: Modifier = Modifier, onChange: (
 
 @Composable
 internal fun ColourSwatch(argb: Int, size: Dp, modifier: Modifier = Modifier, round: Boolean = false, onClick: (() -> Unit)? = null) {
-    Canvas(modifier.size(size).then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)) {
+    Canvas(modifier.size(size).then(if (onClick != null) Modifier.buttonLabel(colourText(argb)).clickable(onClick = onClick) else Modifier)) {
         val w = this.size.width
         val inset = if (round) 0f else w * 0.095f
         val box = androidx.compose.ui.geometry.Rect(inset, inset, w - inset, w - inset)

@@ -35,7 +35,6 @@
     <string name="ok">OK</string>
     <string name="easing_needs_at_least_two_keyframes">Easing needs at least two keyframes to work with.\n\nIf your keyframes are on another property, select that property first.</string>
     <string name="add_keyframes_first">Add Keyframes First</string>
-    <string name="convert_to_group">Convert to Group</string>
     <string name="cancel">Cancel</string>
     <string name="rebuild_source_project">Rebuild Source Project</string>
     <string name="this_asset_pointed_to_a_project">This asset pointed to a project that has been deleted.\n\nRebuild a project from this asset, or detach it and edit it directly?</string>
@@ -453,7 +452,6 @@
     <string name="export_thermal_critical">Your phone is very hot. The export pauses between frames until it cools down.</string>
 
     <string name="export_time_few_seconds">a few seconds</string>
-    <string name="export_time_hours">about %1$s hours</string>
     <plurals name="export_time_seconds">
         <item quantity="one">about %1$s second</item>
         <item quantity="other">about %1$s seconds</item>
@@ -498,6 +496,8 @@
     <string name="camera_photo">PHOTO</string>
     <string name="camera_video">VIDEO</string>
     <string name="camera_close">Close camera</string>
+    <string name="camera_take_photo">Take photo</string>
+    <string name="camera_start_recording">Start recording</string>
     <string name="camera_switch">Switch camera</string>
     <string name="camera_pause_recording">Pause recording</string>
     <string name="camera_resume_recording">Resume recording</string>

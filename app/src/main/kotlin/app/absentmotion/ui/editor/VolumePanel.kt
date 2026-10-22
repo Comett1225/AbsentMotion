@@ -57,6 +57,7 @@ import app.absentmotion.ui.theme.Swap
 import app.absentmotion.model.Layer
 import androidx.compose.foundation.layout.fillMaxSize
 import kotlin.math.roundToInt
+import app.absentmotion.ui.editor.panels.sliderSemantics
 
 private val VolumeGreen get() = Am.AccentLit
 private val TrackOff get() = Am.Well
@@ -130,7 +131,7 @@ private fun VolumeMain(state: EditorState, layer: Layer, modifier: Modifier, ope
 
 @Composable
 private fun VolumeSlider(percent: Int, state: EditorState, modifier: Modifier) {
-    Canvas(modifier.pointerInput(state) {
+    Canvas(modifier.sliderSemantics(percent / 100f, 0f..MAX_GAIN) { state.setGain((it * 100).roundToInt() / 100f, "gain"); state.endGesture() }.pointerInput(state) {
         awaitEachGesture {
             val down = awaitFirstDown()
             fun update(x: Float) {

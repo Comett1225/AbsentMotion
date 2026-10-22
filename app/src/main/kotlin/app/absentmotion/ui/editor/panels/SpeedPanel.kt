@@ -99,7 +99,9 @@ private fun SpeedSlider(speed: Float, state: EditorState, modifier: Modifier) {
     fun coord(value: Int, width: Float, thumb: Float, margin: Float): Float = thumb / 2 +
         (value - 1).coerceAtLeast(0) * (width - thumb - snaps.size * margin) / 3999 +
         snaps.count { it < value } * margin + if (value in snaps) margin / 2 else 0f
-    Canvas(modifier.pointerInput(state) {
+    Canvas(modifier.sliderSemantics(speed, 0.001f..4f) { v ->
+        liveLayer?.let { state.setVideoSpeed(v, it.atVideoTime(state.sampleMs, state.scene.fps).t, it); state.endGesture() }
+    }.pointerInput(state) {
         awaitEachGesture {
             val down = awaitFirstDown()
             val original = liveLayer ?: return@awaitEachGesture

@@ -73,6 +73,9 @@ import kotlin.math.ln
 import kotlin.math.pow
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
+import androidx.compose.ui.semantics.contentDescription
+import app.absentmotion.ui.editor.panels.sliderSemantics
+import androidx.compose.ui.semantics.semantics
 
 private val RowShape = RoundedCornerShape(5.dp)
 private val RowHeight = 37.dp
@@ -217,7 +220,7 @@ private fun ParamSlider(
     val fraction = (if (log) ln(value / min) / ln(max / min) else (value - min) / (max - min)).coerceIn(0f, 1f)
     Row(Modifier.fillMaxWidth().height(SliderHeight).padding(start = 12.dp, end = 6.dp), verticalAlignment = Alignment.CenterVertically) {
         Text(label, Modifier.width(78.dp), color = Am.OnDark, fontSize = 12.sp, maxLines = 1)
-        Canvas(Modifier.weight(1f).fillMaxHeight().pointerInput(min, max, log) {
+        Canvas(Modifier.weight(1f).fillMaxHeight().semantics { contentDescription = label }.sliderSemantics(value, min..max) { update(it); state.endGesture() }.pointerInput(min, max, log) {
             awaitEachGesture {
                 val down = awaitFirstDown()
                 val pad = 8.dp.toPx()

@@ -70,7 +70,7 @@ import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
 
 private val Grey get() = Am.HomeDim
-private val FactText get() = Am.HomeFaint
+private val FactText get() = Am.HomeDim
 
 @Composable
 fun TemplatesTab(version: Int, onTemplate: (String) -> Unit, onProject: (Scene) -> Unit, modifier: Modifier = Modifier, query: String = "") {
