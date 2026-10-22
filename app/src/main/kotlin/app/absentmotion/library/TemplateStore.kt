@@ -34,7 +34,7 @@ class TemplateStore(private val root: File, private val open: (String) -> InputS
     fun load(id: String): Scene? = runCatching { Scene.parse(File(root, "$id/scene.xml").readText()) }.getOrNull()
 
     fun rename(id: String, title: String) {
-        val scene = load(id) ?: return
+        val scene = load(id) ?: throw IOException("Cannot read template $id")
         write(id, scene.withTitle(title))
     }
 

@@ -77,7 +77,7 @@ internal fun FontBrowser(library: FontLibrary, onSelect: (String) -> Unit, onClo
     val choose = { name: String ->
         if (!loading) scope.launch {
             loading = true
-            val file = library.resolve(name)
+            val file = library.resolve(name, download = true)
             loading = false
             if (file != null || FontName.parse(name).source != "googlefonts") onSelect(name)
             else error = FontError(R.string.font_load_failed_title, R.string.font_load_failed_body)

@@ -209,4 +209,49 @@ class ImporterTest {
             assertEquals(2, files.toSet().size)
         }
     }
+
+    @Test fun ownPackagesComeBackAsProjectsAndOtherPackagesAsTemplates() {
+        val scene = """<scene width="10" height="10"><shape id="1" fillType="media" fillImage="x://a" /></scene>"""
+        fun manifest(format: String?) = JSONObject().apply { format?.let { put("format", it) } }
+            .put("media", JSONArray().put(JSONObject().put("uri", "x://a").put("entry", "a.jpg"))).toString().toByteArray()
+        fun import(format: String?) = Importer(store()).import {
+            ByteArrayInputStream(zip(listOf("p.xml" to scene.toByteArray(), "a.jpg" to "jpg".toByteArray(), "manifest.json" to manifest(format))))
+        }.single()
+        assertFalse(import("absentmotion-package").template)
+        assertTrue(import(null).template)
+        val alight = zip(listOf("p.xml" to scene.toByteArray(), "manifest.txt" to "sig:a.jpg\n".toByteArray(), "a.jpg" to "jpg".toByteArray()))
+        assertTrue(Importer(store()).import { ByteArrayInputStream(alight) }.single().template)
+    }
+
+    @Test fun aPackageWithSeveralScenesIsReadInThreePassesAndEachProjectOwnsItsMedia() {
+        val scene = """<scene width="10" height="10"><shape id="1" fillType="media" fillImage="x://a" /></scene>"""
+        val manifest = JSONObject().put("media", JSONArray().put(JSONObject().put("uri", "x://a").put("entry", "a.jpg")))
+        val bytes = zip(listOf("p1.xml" to scene.toByteArray(), "p2.xml" to scene.toByteArray(), "p3.xml" to scene.toByteArray(),
+            "a.jpg" to "jpg".toByteArray(), "manifest.json" to manifest.toString().toByteArray()))
+        val store = store()
+        var opened = 0
+        val reports = Importer(store).import { opened++; ByteArrayInputStream(bytes) }
+        assertEquals(4, opened)
+        assertEquals(3, reports.map { it.id }.toSet().size)
+        val files = reports.map { File(java.net.URI(saved(store, it).children.first { c -> c.name == "shape" }["fillImage"]!!)) }
+        assertEquals(3, files.toSet().size)
+        files.forEachIndexed { i, f -> assertEquals("jpg", f.readText()); assertTrue(f.path.contains(reports[i].id)) }
+    }
+
+    @Test fun aBadSceneInAPackageLeavesNoProjectOrMediaBehind() {
+        val good = """<scene width="10" height="10"><shape id="1" fillType="media" fillImage="x://a" /></scene>"""
+        val bad = """<scene width="10" height="10" fps="100000"/>"""
+        val manifest = JSONObject().put("media", JSONArray().put(JSONObject().put("uri", "x://a").put("entry", "a.jpg")))
+        val root = tmp.newFolder()
+        val store = ProjectStore(root)
+        try {
+            Importer(store).import { ByteArrayInputStream(zip(listOf("p1.xml" to good.toByteArray(), "p2.xml" to bad.toByteArray(),
+                "a.jpg" to "jpg".toByteArray(), "manifest.json" to manifest.toString().toByteArray()))) }
+            fail("imported")
+        } catch (e: ImportFailed) {
+            assertEquals(R.string.library_err_scene_fps, e.text.id)
+        }
+        assertEquals(emptyList<ProjectInfo>(), store.list(includeDamaged = true))
+        assertFalse(root.resolve("media").walkTopDown().any { it.isFile })
+    }
 }

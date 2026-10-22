@@ -26,7 +26,7 @@ class PresetStore(private val dir: File) {
     }
 
     fun rename(id: String, title: String) {
-        val preset = load(id) ?: return
+        val preset = load(id) ?: throw java.io.IOException("Cannot read preset $id")
         write(id, preset.scene.withTitle(title))
     }
 

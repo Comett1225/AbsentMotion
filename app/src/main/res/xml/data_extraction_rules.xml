@@ -5,7 +5,11 @@
         <exclude domain="root" path="code_cache" />
         <exclude domain="file" path="models" />
         <exclude domain="file" path="fonts/google" />
+        <exclude domain="file" path="fonts/builtin" />
+        <exclude domain="file" path="fonts/imported" />
         <exclude domain="file" path="media" />
+        <exclude domain="file" path="templates" />
+        <exclude domain="external" path="ai" />
         <exclude domain="file" path="crashlogs" />
         <exclude domain="sharedpref" path="crashlogs.xml" />
     </cloud-backup>

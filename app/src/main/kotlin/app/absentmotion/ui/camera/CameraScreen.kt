@@ -257,17 +257,17 @@ private fun CameraBody(ui: CameraUi, aspect: Float, mic: Boolean, onClose: () ->
             zoom = it.zoomRatio
             hasFlash = controller.cameraInfo?.hasFlashUnit() == true
         }
-        val focusWatch = Observer<Int> {
-            if (it == CameraController.TAP_TO_FOCUS_STARTED) { focusAt = tap; focusCount++ }
+        val focusWatch = Observer<androidx.camera.view.TapToFocusInfo> {
+            if (it.focusState == CameraController.TAP_TO_FOCUS_STARTED) { focusAt = tap; focusCount++ }
         }
         controller.zoomState.observe(owner, zoomWatch)
-        controller.tapToFocusState.observe(owner, focusWatch)
+        controller.tapToFocusInfoState.observe(owner, focusWatch)
         onDispose {
             ui.closed = true
             ui.counting?.cancel()
             ui.recording?.stop()
             controller.zoomState.removeObserver(zoomWatch)
-            controller.tapToFocusState.removeObserver(focusWatch)
+            controller.tapToFocusInfoState.removeObserver(focusWatch)
             controller.unbind()
         }
     }
@@ -291,9 +291,8 @@ private fun CameraBody(ui: CameraUi, aspect: Float, mic: Boolean, onClose: () ->
         try {
             controller.takePicture(options, executor, object : ImageCapture.OnImageSavedCallback {
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                    ui.busy = false
                     val uri = output.savedUri
-                    if (uri == null) failed(R.string.camera_error_save_photo) else if (!ui.closed) onCaptured(uri, false)
+                    if (uri == null) { ui.busy = false; failed(R.string.camera_error_save_photo) } else if (!ui.closed) onCaptured(uri, false)
                 }
 
                 override fun onError(e: ImageCaptureException) {
@@ -325,7 +324,7 @@ private fun CameraBody(ui: CameraUi, aspect: Float, mic: Boolean, onClose: () ->
                         ui.paused = false
                         ui.elapsedNs = 0
                         val uri = event.outputResults.outputUri
-                        if (uri != Uri.EMPTY && event.error in KeptVideo) { if (!ui.closed) onCaptured(uri, true) }
+                        if (uri != Uri.EMPTY && event.error in KeptVideo) { ui.busy = true; if (!ui.closed) onCaptured(uri, true) }
                         else {
                             Log.w("AMCamera", "video failed ${event.error}", event.cause)
                             failed(R.string.camera_error_save_video)
@@ -496,7 +495,7 @@ private fun ModeTab(label: String, selected: Boolean, enabled: Boolean, onClick:
 private fun Shutter(video: Boolean, recording: Boolean, waiting: Boolean, ready: Boolean, noCamera: Boolean, onClick: () -> Unit) {
     Box(
         Modifier.size(76.dp).alpha(if (noCamera) 0.35f else 1f).border(4.dp, Color.White, CircleShape).padding(8.dp).clip(CircleShape).clickable(enabled = ready, onClick = onClick)
-            .then(if (video || recording) Modifier else Modifier.alpha(if (waiting) 0.6f else 1f)),
+            .then(if (recording) Modifier else Modifier.alpha(if (waiting) 0.6f else 1f)),
         Alignment.Center,
     ) {
         when {

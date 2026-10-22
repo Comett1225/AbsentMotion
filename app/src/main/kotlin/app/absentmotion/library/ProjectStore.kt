@@ -100,9 +100,9 @@ class ProjectStore(private val root: File) {
 
     fun text(id: String): String? = runCatching { sceneFile(id).readText() }.getOrNull()
 
-    fun newId(): String {
+    fun newId(taken: Collection<String> = emptyList()): String {
         var n = System.currentTimeMillis()
-        while (sceneFile("p$n").exists()) n++
+        while (sceneFile("p$n").exists() || "p$n" in taken) n++
         return "p$n"
     }
 
@@ -145,23 +145,24 @@ class ProjectStore(private val root: File) {
         thumbnailFile(id).delete()
         versions.delete(id)
         val projectFiles = dir.listFiles { f -> f.extension == "xml" }.orEmpty().toList()
-        val templateFiles = File(root, "templates").listFiles { f -> f.isDirectory }.orEmpty().map { File(it, "scene.xml") }
+        val templateFiles = File(root, "templates").listFiles { f -> f.isDirectory }.orEmpty().map { File(it, "scene.xml") }.filter { it.exists() }
         val folders = owners.map { folderUri(mediaDir(it)) }
         val history = (File(dir, "versions").listFiles { f -> f.isDirectory }.orEmpty().flatMap { it.listFiles { f -> f.extension == "xml" }.orEmpty().toList() } +
             File(root, "recovery").listFiles { f -> f.extension == "xml" }.orEmpty())
             .filter { f -> runCatching { f.readText() }.getOrNull().let { it == null || folders.any(it::contains) || aiDir != null && it.contains("/ai/") } }
-        val parsed = (projectFiles + templateFiles + history).map { f -> runCatching { Scene.parse(f.readText()).node.mediaUris() }.getOrNull() }
-        if (null in parsed) return
-        val used = parsed.filterNotNull().flatten().toSet()
+        val texts = (projectFiles + templateFiles + history).map { f -> runCatching { f.readText() }.getOrNull() ?: return }
+        val used = HashSet<String>()
+        val damaged = texts.filter { text -> runCatching { used += Scene.parse(text).node.mediaUris() }.isFailure }
+        fun mentioned(part: String) = damaged.any { it.contains(part) || it.contains(part.replace("&", "&amp;")) }
         for (owner in owners.filter { it == id || !sceneFile(it).exists() }) {
             val folder = mediaDir(owner)
             folder.listFiles()?.filter { f ->
                 val uri = f.toURI().toString()
-                if (f.isDirectory) used.none { it.startsWith(uri) } else uri !in used
+                !mentioned(uri) && if (f.isDirectory) used.none { it.startsWith(uri) } else uri !in used
             }?.forEach { it.deleteRecursively() }
             folder.delete()
         }
-        aiDir?.listFiles()?.filter { f -> f.isFile && used.none { it.endsWith("/" + f.name) } }?.forEach { it.delete() }
+        aiDir?.listFiles()?.filter { f -> f.isFile && used.none { it.endsWith("/" + f.name) } && !mentioned("/" + f.name) }?.forEach { it.delete() }
     }
 
     fun inMediaFolder(uri: String): Boolean = ownerOf(uri) != null

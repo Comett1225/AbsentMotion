@@ -39,7 +39,7 @@ data class ImportLimits(
     val entries: Int = 2_000,
     val scenes: Int = 32,
     val unpacked: Long = 2L shl 30,
-    val sceneText: Int = 64 shl 20,
+    val sceneText: Int = 32 shl 20,
 )
 
 class Importer(
@@ -52,15 +52,17 @@ class Importer(
     private val access: MediaAccess = MediaAccess.Unlimited,
     private val limits: ImportLimits = ImportLimits(),
 ) {
-    fun import(open: () -> InputStream?): List<ImportReport> {
+    fun import(open: () -> InputStream?): List<ImportReport> = try {
         fun stream() = open() ?: throw ImportFailed(txt(R.string.library_err_no_data))
         val head = stream().use { it.readNBytes(2) }
-        if (head.size == 2 && head[0] == 'P'.code.toByte() && head[1] == 'K'.code.toByte()) {
-            return fromPackage(::stream).map { if (it.element) it else it.copy(template = true) }
+        if (head.size == 2 && head[0] == 'P'.code.toByte() && head[1] == 'K'.code.toByte()) fromPackage(::stream)
+        else {
+            val text = stream().use { readText(it, MaxXml) }.removePrefix("\uFEFF")
+            if (!text.trimStart().startsWith("<")) throw ImportFailed(txt(R.string.library_err_unsupported_type))
+            listOf(add(store.newId(), check(text), emptyMap()))
         }
-        val text = stream().use { readText(it, MaxXml) }.removePrefix("\uFEFF")
-        if (!text.trimStart().startsWith("<")) throw ImportFailed(txt(R.string.library_err_unsupported_type))
-        return listOf(add(text) { _, _ -> emptyMap() })
+    } catch (e: OutOfMemoryError) {
+        throw ImportFailed(txt(R.string.library_err_xml_large))
     }
 
     private fun fromPackage(open: () -> InputStream): List<ImportReport> {
@@ -70,8 +72,10 @@ class Importer(
         var links: Map<String, String>? = null
         var companions: Map<String, List<String>> = emptyMap()
         var projectEntry: String? = null
+        var ours = false
         var sceneText = 0
         var written = limits.unpacked
+        val ids = ArrayList<String>()
         val saved = ArrayList<ImportReport>()
         try {
             eachEntry(open, limits) { name, input ->
@@ -82,6 +86,7 @@ class Importer(
                     leaf(name) == "manifest.json" -> {
                         val manifest = JSONObject(readText(input, MaxXml))
                         projectEntry = manifest.optString("project").takeIf { it.isNotBlank() }
+                        ours = manifest.optString("format") == "absentmotion-package"
                         val listed = manifest.optJSONArray("media")?.let { list -> (0 until list.length()).map { list.getJSONObject(it) }.filter { it.has("entry") } }.orEmpty()
                         links = listed.associate { m -> m.getString("uri") to m.getString("entry") }
                         companions = listed.filter { it.has("companions") }.associate { m ->
@@ -106,50 +111,58 @@ class Importer(
                 }
             }
             if (scenes.isEmpty()) throw ImportFailed(txt(R.string.library_err_no_project))
-            return scenes.mapTo(saved) { text ->
-                add(text) { id, root ->
-                    val declared = Scene(root).media.associateBy { it.uri }
-                    val entries = root.mediaUris().mapNotNull { uri ->
-                        val entry = links?.get(uri) ?: declared[uri]?.node?.get("sig")?.let { sigs?.get(it) }
-                            ?: uri.substringAfter(':').takeIf { uri.startsWith("amproj:") || uri.startsWith("am-docs:") }
-                        entry?.let { find(it, files) }?.let { uri to it }
-                    }.toMap()
-                    val names = HashSet<String>()
-                    fun unique(name: String) = (sequenceOf(name) + generateSequence(2) { it + 1 }.map { "${it}_$name" }).first { names.add(it) }
-                    val target = HashMap<String, File>()
-                    for ((uri, path) in entries) {
-                        if (path in target) continue
-                        val parts = companions[uri]?.mapNotNull { find(it, files) }
-                        if (parts == null) target[path] = File(store.mediaDir(id), unique(leaf(path)!!))
-                        else {
-                            val folder = File(store.mediaDir(id), generateSequence(1) { it + 1 }.map { "model-$it" }.first { names.add(it) })
-                            (listOf(path) + parts).forEach { part -> target.putIfAbsent(part, File(folder, leaf(part)!!)) }
-                        }
+            repeat(scenes.size) { ids += store.newId(ids) }
+            val copies = HashMap<String, MutableList<File>>()
+            val moved = scenes.mapIndexed { i, text ->
+                val id = ids[i]
+                val root = check(text)
+                val declared = Scene(root).media.associateBy { it.uri }
+                val entries = root.mediaUris().mapNotNull { uri ->
+                    val entry = links?.get(uri) ?: declared[uri]?.node?.get("sig")?.let { sigs?.get(it) }
+                        ?: uri.substringAfter(':').takeIf { uri.startsWith("amproj:") || uri.startsWith("am-docs:") }
+                    entry?.let { find(it, files) }?.let { uri to it }
+                }.toMap()
+                val names = HashSet<String>()
+                fun unique(name: String) = (sequenceOf(name) + generateSequence(2) { it + 1 }.map { "${it}_$name" }).first { names.add(it) }
+                val target = HashMap<String, File>()
+                for ((uri, path) in entries) {
+                    if (path in target) continue
+                    val parts = companions[uri]?.mapNotNull { find(it, files) }
+                    if (parts == null) target[path] = File(store.mediaDir(id), unique(leaf(path)!!))
+                    else {
+                        val folder = File(store.mediaDir(id), generateSequence(1) { it + 1 }.map { "model-$it" }.first { names.add(it) })
+                        (listOf(path) + parts).forEach { part -> target.putIfAbsent(part, File(folder, leaf(part)!!)) }
                     }
-                    if (target.isNotEmpty()) {
-                        target.values.forEach { it.parentFile.mkdirs() }
-                        eachEntry(open, limits) { name, input -> target[name]?.let { written -= copy(input, it, written) } }
-                    }
-                    entries.mapValues { (_, entry) -> target.getValue(entry).toURI().toString() }
+                }
+                target.forEach { (path, file) -> copies.getOrPut(path) { ArrayList() } += file }
+                entries.mapValues { (_, entry) -> target.getValue(entry).toURI().toString() }
+            }
+            if (copies.isNotEmpty()) {
+                copies.values.flatten().forEach { it.parentFile?.mkdirs() }
+                eachEntry(open, limits) { name, input ->
+                    val targets = copies[name] ?: return@eachEntry
+                    written -= copy(input, targets.first(), written)
+                    for (other in targets.drop(1)) written -= targets.first().inputStream().use { copy(it, other, written) }
                 }
             }
+            scenes.indices.mapTo(saved) { add(ids[it], check(scenes[it]), moved[it]) }
+            return if (ours) saved else saved.map { if (it.element) it else it.copy(template = true) }
         } catch (t: Throwable) {
+            ids.forEach { store.mediaDir(it).deleteRecursively() }
             saved.forEach { store.delete(it.id) }
             if (t is IOException) throw ImportFailed(txt(R.string.library_err_malformed_package, t.message.toString()))
             throw t
         }
     }
 
-    private fun add(text: String, copies: (String, XmlNode) -> Map<String, String>): ImportReport {
+    private fun check(text: String): XmlNode {
         val root = try { XmlNode.parse(text.removePrefix("\uFEFF")) } catch (e: Exception) { throw ImportFailed(txt(R.string.library_err_malformed_xml, e.message.toString())) }
-        val width = root["width"]?.toIntOrNull() ?: 0
-        val height = root["height"]?.toIntOrNull() ?: 0
-        if (root.name != "scene" || width <= 0 || height <= 0) throw ImportFailed(txt(R.string.library_err_scene_needs_size))
-        if (width > MaxSide || height > MaxSide) throw ImportFailed(txt(R.string.library_err_scene_too_big, MaxSide.toString()))
-        if (root["fps"]?.toIntOrNull()?.let { it !in 1..MaxFps } == true) throw ImportFailed(txt(R.string.library_err_scene_fps, MaxFps.toString()))
-        val id = store.newId()
+        checkScene(root)?.let { throw ImportFailed(it) }
+        return root
+    }
+
+    private fun add(id: String, root: XmlNode, moved: Map<String, String>): ImportReport {
         try {
-            val moved = copies(id, root)
             var scene = relink(Scene(uniqueLayerIds(root.mapMediaUris { moved[it] ?: access.imported(it) })))
             val migrated = migration?.migrate(scene)
             if (migrated != null) scene = migrated.scene
@@ -185,9 +198,20 @@ class Importer(
     }
 
     companion object {
-        private const val MaxXml = 32 shl 20
+        private const val MaxXml = 16 shl 20
         private const val MaxSide = 16384
         private const val MaxFps = 240
+
+        internal fun checkScene(root: XmlNode): UiText? {
+            val width = root["width"]?.toIntOrNull() ?: 0
+            val height = root["height"]?.toIntOrNull() ?: 0
+            return when {
+                root.name != "scene" || width <= 0 || height <= 0 -> txt(R.string.library_err_scene_needs_size)
+                width > MaxSide || height > MaxSide -> txt(R.string.library_err_scene_too_big, MaxSide.toString())
+                root["fps"]?.toIntOrNull()?.let { it !in 1..MaxFps } == true -> txt(R.string.library_err_scene_fps, MaxFps.toString())
+                else -> null
+            }
+        }
 
         private val KnownAttributes = setOf(
             "id", "label", "startTime", "endTime", "fillType", "fillImage", "fillVideo", "inTime", "outTime", "speed", "blending",

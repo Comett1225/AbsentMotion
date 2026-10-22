@@ -126,7 +126,7 @@
     <string name="delete_all">Delete all</string>
     <string name="effects_not_loaded">The effects could not be loaded</string>
     <string name="settings_demo_mode">Demo Mode</string>
-    <string name="settings_open_xml">Open XML Projects</string>
+    <string name="settings_open_xml">Show the import card in the project list</string>
     <string name="settings_vibration">Vibration</string>
     <string name="settings_emoji">Emoji Style</string>
     <string name="settings_emoji_system">System</string>
@@ -262,6 +262,10 @@
     <plurals name="backup_restored_skipped">
         <item quantity="one">%1$s project was already here and was left as it is.</item>
         <item quantity="other">%1$s projects were already here and were left as they are.</item>
+    </plurals>
+    <plurals name="backup_restored_rejected">
+        <item quantity="one">%1$s project was not restored because its size or frame rate is not valid.</item>
+        <item quantity="other">%1$s projects were not restored because their size or frame rate is not valid.</item>
     </plurals>
     <string name="about_version">Version %1$s</string>
     <string name="about_licence_line">Free and open source, licensed under the Apache License 2.0.</string>
@@ -666,6 +670,8 @@
     <string name="font_search">Search</string>
     <string name="font_imported">Imported</string>
     <string name="font_downloads_when_chosen">Downloads when chosen</string>
+    <string name="fonts_missing_title">Fonts not on this phone</string>
+    <string name="fonts_missing_body">This project uses fonts that are not on this phone: %1$s. The text shows in another font until you download them from Google Fonts.</string>
     <string name="font_favorite">Favorite</string>
     <string name="font_category_sans_serif">Sans Serif</string>
     <string name="font_category_serif">Serif</string>

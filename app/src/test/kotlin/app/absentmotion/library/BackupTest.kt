@@ -181,4 +181,21 @@ class BackupTest {
         assertFalse(File(root.parentFile, "escaped.txt").exists())
         assertFalse(tmp.root.walkTopDown().any { it.name.startsWith("escaped") })
     }
+
+    @Test fun aSceneWithAnImpossibleSizeOrFrameRateIsNotRestored() {
+        val oldRoot = tmp.newFolder("old")
+        val old = ProjectStore(oldRoot)
+        val good = project(old, "Good", "pixels")
+        val bad = project(old, "Bad", "pixels")
+        oldRoot.resolve("projects/$bad.xml").writeText(old.text(bad)!!.replace("<scene ", "<scene fps=\"100000\" "))
+        old.thumbnailFile(bad).writeText("png")
+        val damaged = old.create(Scene(XmlNode("scene", linkedMapOf("width" to "10", "height" to "10"))))
+        oldRoot.resolve("projects/$damaged.xml").writeText("<scene")
+        val newRoot = tmp.newFolder("new")
+        val fresh = ProjectStore(newRoot)
+        assertEquals(Backup.Restored(2, 0, 0, 1), Backup.restore(fresh, newRoot, ByteArrayInputStream(backup(oldRoot))))
+        assertEquals(listOf("Good"), fresh.list().map { it.title })
+        assertEquals(setOf(good, damaged), fresh.list(includeDamaged = true).map { it.id }.toSet())
+        assertFalse(fresh.thumbnailFile(bad).exists())
+    }
 }

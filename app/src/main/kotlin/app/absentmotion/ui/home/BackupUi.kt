@@ -151,6 +151,7 @@ private fun restoreBackup(context: Context, uri: Uri, task: BackupTask): List<Ui
         txt(R.string.backup_restored, count(restored.added)),
         restored.renamed.takeIf { it > 0 }?.let { UiText.plural(R.plurals.backup_restored_copies, it, it.toString()) },
         restored.skipped.takeIf { it > 0 }?.let { UiText.plural(R.plurals.backup_restored_skipped, it, it.toString()) },
+        restored.rejected.takeIf { it > 0 }?.let { UiText.plural(R.plurals.backup_restored_rejected, it, it.toString()) },
     )
 }
 

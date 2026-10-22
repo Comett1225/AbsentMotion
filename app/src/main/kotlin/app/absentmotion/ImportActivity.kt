@@ -28,7 +28,7 @@ class ImportActivity : Activity() {
             val clip = ClipData.newRawUri("import", uris.first()).apply { uris.drop(1).forEach { addItem(ClipData.Item(it)) } }
             startActivity(
                 Intent(this, MainActivity::class.java)
-                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
                     .apply { clipData = clip },
             )
         }

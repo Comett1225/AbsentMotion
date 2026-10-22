@@ -143,7 +143,8 @@ object ObjReader {
 
     private class Material(var color: FloatArray = floatArrayOf(1f, 1f, 1f, 1f), var texture: String? = null)
 
-    fun read(text: String, open: (String) -> ByteArray?): Mesh {
+    fun read(text: String, open: (String) -> ByteArray?, limit: Long = MODEL_WORK_LIMIT): Mesh {
+        var work = 0L
         val vs = Floats()
         val vcs = Floats()
         val vts = Floats()
@@ -160,6 +161,10 @@ object ObjReader {
             val line = raw.substringBefore('#').trim()
             if (line.isEmpty()) continue
             val t = tokens(line)
+            if (t[0] == "v" || t[0] == "vt" || t[0] == "vn" || t[0] == "f") {
+                work += if (t[0] == "f") t.size - 1L else 1L
+                require(work <= limit) { "The model is too complex" }
+            }
             when (t[0]) {
                 "v" -> {
                     for (i in 1..3) vs.add(t.getOrNull(i)?.finiteFloat() ?: 0f)
@@ -224,7 +229,7 @@ object GltfReader {
     private const val BIN = 0x004E4942
 
     fun read(bytes: ByteArray, open: (String) -> ByteArray?, limit: Long = MODEL_WORK_LIMIT): Mesh {
-        var bin: ByteArray? = null
+        var bin: ByteBuffer? = null
         val json = if (bytes.size >= 12 && le(bytes, 0) == GLB) {
             var at = 12
             var text: String? = null
@@ -234,12 +239,12 @@ object GltfReader {
                 val start = at + 8
                 require(length >= 0 && start + length <= bytes.size) { "The model file is cut short" }
                 if (type == JSON && text == null) text = String(bytes, start, length, Charsets.UTF_8)
-                else if (type == BIN && bin == null) bin = bytes.copyOfRange(start, start + length)
+                else if (type == BIN && bin == null) bin = ByteBuffer.wrap(bytes, start, length).slice()
                 at = start + ((length + 3) and 3.inv())
             }
             JSONObject(requireNotNull(text) { "The model has no description" })
         } else JSONObject(bytes.toString(Charsets.UTF_8))
-        val buffers = json.optJSONArray("buffers").objects().map { b -> b.optString("uri").let { uri -> if (uri.isEmpty()) bin else load(uri, open) } }
+        val buffers = json.optJSONArray("buffers").objects().map { b -> b.optString("uri").let { uri -> if (uri.isEmpty()) bin else load(uri, open)?.let(ByteBuffer::wrap) } }
         val views = json.optJSONArray("bufferViews").objects()
         val accessors = json.optJSONArray("accessors").objects()
         val meshes = json.optJSONArray("meshes").objects()
@@ -257,25 +262,27 @@ object GltfReader {
             val data = buffers.getOrNull(view.optInt("buffer", -1)) ?: return null
             val offset = view.optInt("byteOffset", 0)
             val length = view.optInt("byteLength", 0)
-            require(offset >= 0 && length >= 0 && offset + length <= data.size) { "A buffer view lies outside its buffer" }
-            return Triple(ByteBuffer.wrap(data, 0, offset + length).order(ByteOrder.LITTLE_ENDIAN), offset, view.optInt("byteStride", 0))
+            require(offset >= 0 && length >= 0 && offset.toLong() + length <= data.capacity()) { "A buffer view lies outside its buffer" }
+            return Triple(data.duplicate().apply { limit(offset + length) }.order(ByteOrder.LITTLE_ENDIAN), offset, view.optInt("byteStride", 0))
         }
 
-        fun read(index: Int, normalizeInts: Boolean = true): Pair<FloatArray, Int>? {
+        fun read(index: Int, normalizeInts: Boolean = true, expect: Int = -1): Pair<FloatArray, Int>? {
             val a = accessors.getOrNull(index) ?: return null
             val count = a.optInt("count", 0)
             require(count <= limit) { "The model is too complex" }
+            if (expect >= 0 && count != expect) return null
             val comps = when (a.optString("type")) { "SCALAR" -> 1; "VEC2" -> 2; "VEC3" -> 3; "VEC4" -> 4; else -> return null }
             val type = a.optInt("componentType")
             val size = when (type) { 5120, 5121 -> 1; 5122, 5123 -> 2; 5125, 5126 -> 4; else -> return null }
-            val out = FloatArray(count * comps)
-            val (buffer, start, viewStride) = slice(a.optInt("bufferView", -1)) ?: return if (a.has("bufferView")) null else out to comps
+            if (!a.has("bufferView")) return if (expect >= 0) FloatArray(count * comps) to comps else null
+            val (buffer, start, viewStride) = slice(a.optInt("bufferView", -1)) ?: return null
             val stride = if (viewStride > 0) viewStride else comps * size
-            val base = start + a.optInt("byteOffset", 0)
+            val base = start + a.optInt("byteOffset", 0).toLong()
             val scaled = normalizeInts && (a.optBoolean("normalized") || type == 5121 || type == 5123)
-            require(count == 0 || base + (count - 1) * stride + comps * size <= buffer.limit()) { "An accessor reads past its buffer" }
+            require(count >= 0 && base >= 0 && (count == 0 || base + (count - 1L) * stride + comps * size <= buffer.limit())) { "An accessor reads past its buffer" }
+            val out = FloatArray(count * comps)
             for (e in 0 until count) for (c in 0 until comps) {
-                val at = base + e * stride + c * size
+                val at = (base + e.toLong() * stride + c * size).toInt()
                 out[e * comps + c] = when (type) {
                     5126 -> buffer.getFloat(at)
                     5121 -> (buffer.get(at).toInt() and 0xff).let { if (scaled) it / 255f else it.toFloat() }
@@ -293,11 +300,11 @@ object GltfReader {
             val uri = img.optString("uri")
             if (uri.isNotEmpty()) return load(uri, open)
             val (buffer, start, _) = slice(img.optInt("bufferView", -1)) ?: return null
-            val length = views[img.optInt("bufferView")].optInt("byteLength", 0)
-            return ByteArray(length).also { buffer.position(start); buffer.get(it) }
+            return ByteArray(buffer.limit() - start).also { buffer.position(start); buffer.get(it) }
         }
 
         fun indices(primitive: JSONObject, count: Int): IntArray {
+            if (accessors.getOrNull(primitive.optInt("indices", -1))?.has("bufferView") == false) return IntArray(0)
             val (values, _) = (if (primitive.has("indices")) read(primitive.getInt("indices"), false) else null) ?: return IntArray(count) { it }
             return IntArray(values.size) { values[it].toInt() }
         }
@@ -319,9 +326,9 @@ object GltfReader {
                 val (positions, pc) = read(attributes.optInt("POSITION", -1)) ?: continue
                 if (pc != 3) continue
                 val count = positions.size / 3
-                val normals = read(attributes.optInt("NORMAL", -1))?.first?.takeIf { it.size == count * 3 }
-                val uvs = read(attributes.optInt("TEXCOORD_0", -1))?.first?.takeIf { it.size == count * 2 }
-                val colours = read(attributes.optInt("COLOR_0", -1))?.takeIf { it.first.size == count * it.second && it.second >= 3 }
+                val normals = read(attributes.optInt("NORMAL", -1), expect = count)?.first?.takeIf { it.size == count * 3 }
+                val uvs = read(attributes.optInt("TEXCOORD_0", -1), expect = count)?.first?.takeIf { it.size == count * 2 }
+                val colours = read(attributes.optInt("COLOR_0", -1), expect = count)?.takeIf { it.first.size == count * it.second && it.second >= 3 }
                 val material = materials.getOrNull(primitive.optInt("material", -1))
                 twoSided = twoSided || material?.optBoolean("doubleSided") == true
                 val pbr = material?.optJSONObject("pbrMetallicRoughness")
