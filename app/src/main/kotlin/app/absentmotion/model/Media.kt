@@ -66,7 +66,7 @@ fun XmlNode.modelUris(): Set<String> = buildSet {
 }
 
 fun XmlNode.mapMediaUris(change: (String) -> String): XmlNode {
-    val keys = if (name == "media") listOf("uri") else listOf("fillImage", "fillVideo", "src")
+    val keys = when (name) { "media" -> listOf("uri"); "ai" -> listOf("original", "result"); else -> listOf("fillImage", "fillVideo", "src") }
     val self = keys.fold(this) { node, key -> node[key]?.let { node.with(key, change(it)) } ?: node }
     return self.copy(children = children.map { it.mapMediaUris(change) })
 }

@@ -8,6 +8,8 @@ import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
 import app.absentmotion.effects.EffectCatalog
 import app.absentmotion.model.addEffect
+import app.absentmotion.model.copyLayers
+import app.absentmotion.model.mapMediaUris
 import app.absentmotion.model.effects
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
@@ -151,5 +153,13 @@ class VideoBackgroundTest {
         val catalog = EffectCatalog.parse { File("src/main/assets/effects", it).inputStream() }
         val expected = catalog.definitions.filter { it.category in setOf("move", "distort", "repeat", "3d") }.map { it.id }.toSet() - setOf("absent.timequant", "absent.pulseopacity")
         assertEquals(expected, MatteFollowedEffects)
+    }
+
+    @Test fun copiesKeepTheMaskNoiseLinkedAndMovedMediaRewritesAiMarks() {
+        val pair = listOf(Layer(XmlNode("shape", linkedMapOf("id" to "1"))), Layer(XmlNode("shape", linkedMapOf("id" to "2", "noiseId" to "1"))))
+        val copied = copyLayers(pair)
+        assertEquals(copied[0].id.toString(), copied[1].node["noiseId"])
+        val marked = Layer(XmlNode("shape", linkedMapOf("id" to "3"), listOf(XmlNode("ai", linkedMapOf("type" to "background", "original" to "a.png", "result" to "b.png")))))
+        assertEquals("x/a.png", marked.node.mapMediaUris { "x/$it" }.child("ai")!!["original"])
     }
 }

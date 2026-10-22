@@ -12,6 +12,7 @@ fun copyLayers(layers: List<Layer>, startTime: Int? = null, preserveOutsideParen
         if (node.name in Scene.LAYER_TAGS) {
             node["id"]?.toLongOrNull()?.let { result = result.with("id", ids[it]?.toString()) }
             node["parent"]?.toLongOrNull()?.let { result = result.with("parent", ids[it]?.toString() ?: node["parent"].takeIf { preserveOutsideParents }) }
+            node["noiseId"]?.toLongOrNull()?.let { ids[it]?.let { mapped -> result = result.with("noiseId", mapped.toString()) } }
         }
         return result.copy(children = node.children.map(::remap))
     }

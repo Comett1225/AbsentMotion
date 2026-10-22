@@ -68,7 +68,7 @@ class EditorState(
     val settings: AppSettings,
     val saver: ProjectSaver,
 ) {
-    var scene by mutableStateOf(initial)
+    var scene by mutableStateOf(initial.withMattesFollowing())
         private set
 
     private var selection by mutableStateOf<Long?>(null)
