@@ -6,6 +6,61 @@ All notable changes to AbsentMotion are listed here, newest first. The format fo
 Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stands for the feature set as it stood on
 2026-10-12.
 
+## [3.2.0] - 2026-10-22
+
+### Added
+
+- An Audio category in Effects for clips with sound: Reverb, High Pitch, Low Pitch and Voice Filter, with ten voice presets
+  (Helium, Deep, Bass Boost, Full Voice, Vocal Clarity, Echoey, Ethereal, Underwater, Cheap Mic, Telephone) that stay
+  editable as one effect. The Effects button of an audio clip opens only the audio effects.
+- Reduce Noise asks what to clean: a voice recording, wind and rumble, or music and mixed sound.
+- AI changes (reduced noise, removed backgrounds, video cut-outs) show in the effects lists, and reduced noise and removed
+  backgrounds can be undone there with one tap.
+- A short note says what Undo or Redo just changed.
+- Copy chosen effects and paste them onto every selected clip at once. The selection bar has an Effects button with
+  Paste All Effects.
+- Emoji are drawn in full color in every kind of text, and Settings > Editor > Emoji Style chooses between the phone's
+  emoji and the built-in Android emoji.
+- Random Displacement moves by itself: a new Speed setting moves the pattern over time, and each seed moves differently.
+- Screen readers can read and set every slider and name the shutter, color swatches and media tiles. The launcher icon
+  supports themed icons.
+
+### Changed
+
+- Runs on Android 13 and newer (was Android 14) and on phones with Vulkan 1.1 (was 1.2).
+- The app is smaller: the release build leaves out code it never uses (about 70 MB down to 51 MB).
+- About 60 effects are closer to Alight Motion: defaults, missing settings and behavior in the color, key, blur, noise,
+  stylize, distort, text, move, repeat and 3D groups. Projects saved before keep their look.
+- A clip moves only when it is held and dragged; a plain swipe across a selected clip scrubs the timeline.
+- The timeline keeps its scroll position after you leave a clip, and selecting a clip centers its row.
+- Google Fonts are downloaded only when you pick one; opening a project that uses them asks first.
+- A video export starts at the project's own frame rate.
+- 5.1 and 7.1 sound is mixed down to stereo instead of losing the center and surround channels.
+- Captions for long recordings are made in parts, so they no longer run out of memory, and photos are loaded at the size
+  the project needs instead of the largest size the phone allows.
+- The app's English uses one spelling (US), and export estimates of an hour or more read naturally in every language.
+
+### Fixed
+
+- Split and duplicated clips appeared at the top of the layer list instead of directly above their source.
+- Splitting or trimming the start of a group, element or template restarted its content.
+- Pictures and 3D models disappeared from an export when the app was paused during it.
+- Sharing or opening a file started a second copy of the app inside the other app.
+- Sound kept playing when another app took over the sound or the headphones were unplugged, and trimming a clip during
+  playback let its edge slide away.
+- Groups with a speed or Time Quantization could show blank frames at cuts, and the video inside a quantized group ignored
+  the quantization.
+- A clipped layer ignored its blend mode, the motion path of a parented layer was drawn in the wrong place, and fit,
+  align, distribute and snapping were wrong for parented layers.
+- A video decode that timed out during export reused an earlier frame, Export anyway failed on deleted videos, a package
+  export could not be cancelled in the middle of a large file, and the Done screen waited for the template copy.
+- Restoring a backup could bring back projects that cannot open, and the Android cloud backup went over its 25 MB limit
+  and saved nothing.
+- A damaged caption model made captions fail until it was removed in Settings; it is now downloaded again.
+- AbsentMotion .absproj packages were imported as templates instead of projects, and a crafted 3D model file could use
+  hundreds of MB of memory.
+- Many smaller fixes from a full code review.
+
 ## [3.1.1] - 2026-10-20
 
 ### Changed

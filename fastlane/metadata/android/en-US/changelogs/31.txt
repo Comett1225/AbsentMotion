@@ -1,0 +1,1 @@
+AbsentMotion 3.2.0: audio effects (Reverb, pitch and voice filters), Reduce Noise options, notes for Undo and Redo, copy and paste effects onto many clips, full-color emoji, Random Displacement that moves by itself, about 60 effects closer to Alight Motion, Android 13 support, a smaller app and many fixes from a full code review.
