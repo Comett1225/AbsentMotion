@@ -1,0 +1,1 @@
+Wave Warp bends the layer with a wave. **Spacing** is the distance between waves, **Magnitude** how far they push the picture, **Angle** the direction the waves run, and **Warp Angle** the direction they push. Animate **Phase** to make the waves travel, or set **Speed** to make them move by themselves.

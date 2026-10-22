@@ -1,0 +1,1 @@
+Text Transform moves, scales, turns, fades and tints letters, words or lines. Set what should happen to the affected pieces (**Position**, **Scale**, **Rotation**, **Opacity**, **Tint**), then animate **Offset** to make the change travel through the text from start to end. The presets Wave and Spin Cascade are good starting points.

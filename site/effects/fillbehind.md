@@ -1,0 +1,1 @@
+Fill Behind fills the empty space around a layer with a blurred, enlarged copy of the layer itself. It is the usual fix for a vertical video placed in a horizontal project (or the other way round). **Strength** is how blurred the background is. The other settings let you darken, tint or move the background and the foreground separately.

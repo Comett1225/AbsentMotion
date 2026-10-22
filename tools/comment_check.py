@@ -8,8 +8,8 @@ import tokenize
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-C_LIKE = {".kt", ".kts", ".java", ".cpp", ".cc", ".c", ".h", ".hpp", ".gradle"}
-HASH = {".sh"}
+C_LIKE = {".kt", ".kts", ".java", ".cpp", ".cc", ".c", ".h", ".hpp", ".gradle", ".js", ".css"}
+HASH = {".sh", ".yml"}
 SKIP_DIRS = ("third_party/", "gradlew", "gradle/wrapper/", "app/src/main/assets/licenses.txt")
 
 
@@ -115,7 +115,7 @@ def main():
             lines = python_comments(text)
         elif suffix in HASH or path.name in ("gradlew",):
             lines = shell_comments(text)
-        elif suffix == ".xml":
+        elif suffix in (".xml", ".html"):
             lines = xml_comments(text)
         elif suffix == ".json" and "assets/effects" in name:
             lines = json_shader_comments(text)

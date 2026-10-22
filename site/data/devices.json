@@ -1,0 +1,415 @@
+[
+ {
+  "brand": "Samsung",
+  "name": "Galaxy S23 Ultra",
+  "aliases": [
+   "S23 Ultra",
+   "S23U"
+  ],
+  "modelCodes": [
+   "SM-S918*"
+  ],
+  "year": 2023,
+  "launchAndroid": 13,
+  "maxAndroid": 17,
+  "chip": "Snapdragon 8 Gen 2",
+  "ramGB": [
+   8,
+   12
+  ],
+  "arm64": true,
+  "vulkan11": true,
+  "tier": "latest",
+  "aiClass": "great",
+  "notes": "",
+  "confidence": "medium"
+ },
+ {
+  "brand": "Samsung",
+  "name": "Galaxy S21 Ultra 5G",
+  "aliases": [
+   "S21 Ultra",
+   "S21U",
+   "Galaxy S21 Ultra"
+  ],
+  "modelCodes": [
+   "SM-G998*"
+  ],
+  "year": 2021,
+  "launchAndroid": 11,
+  "maxAndroid": 15,
+  "chip": "Snapdragon 888 or Exynos 2100",
+  "ramGB": [
+   12,
+   16
+  ],
+  "arm64": true,
+  "vulkan11": true,
+  "tier": "latest",
+  "aiClass": "great",
+  "notes": "",
+  "confidence": "medium"
+ },
+ {
+  "brand": "Samsung",
+  "name": "Galaxy S20",
+  "aliases": [
+   "S20",
+   "Galaxy S20 5G"
+  ],
+  "modelCodes": [
+   "SM-G980*",
+   "SM-G981*"
+  ],
+  "year": 2020,
+  "launchAndroid": 10,
+  "maxAndroid": 13,
+  "chip": "Snapdragon 865 or Exynos 990",
+  "ramGB": [
+   8,
+   12
+  ],
+  "arm64": true,
+  "vulkan11": true,
+  "tier": "latest",
+  "aiClass": "great",
+  "notes": "",
+  "confidence": "medium"
+ },
+ {
+  "brand": "Samsung",
+  "name": "Galaxy S9",
+  "aliases": [
+   "S9",
+   "Galaxy S9 Dual SIM"
+  ],
+  "modelCodes": [
+   "SM-G960*"
+  ],
+  "year": 2018,
+  "launchAndroid": 8,
+  "maxAndroid": 10,
+  "chip": "Exynos 9810 or Snapdragon 845",
+  "ramGB": [
+   4
+  ],
+  "arm64": true,
+  "vulkan11": true,
+  "tier": "compatible",
+  "aiClass": "good",
+  "notes": "",
+  "confidence": "medium"
+ },
+ {
+  "brand": "Samsung",
+  "name": "Galaxy A14",
+  "aliases": [
+   "A14",
+   "Galaxy A14 4G"
+  ],
+  "modelCodes": [
+   "SM-A145*"
+  ],
+  "year": 2023,
+  "launchAndroid": 13,
+  "maxAndroid": 15,
+  "chip": "Helio G80",
+  "ramGB": [
+   4,
+   6
+  ],
+  "arm64": true,
+  "vulkan11": true,
+  "tier": "latest",
+  "aiClass": "slow",
+  "notes": "",
+  "confidence": "medium"
+ },
+ {
+  "brand": "Samsung",
+  "name": "Galaxy A03 Core",
+  "aliases": [
+   "A03 Core"
+  ],
+  "modelCodes": [
+   "SM-A032*"
+  ],
+  "year": 2021,
+  "launchAndroid": 11,
+  "maxAndroid": 13,
+  "chip": "Unisoc SC9863A",
+  "ramGB": [
+   2
+  ],
+  "arm64": false,
+  "vulkan11": false,
+  "tier": "unsupported",
+  "aiClass": "slow",
+  "notes": "Sold as Android Go edition, which has a 32-bit system.",
+  "confidence": "medium"
+ },
+ {
+  "brand": "Samsung",
+  "name": "Galaxy Tab S7",
+  "aliases": [
+   "Tab S7"
+  ],
+  "modelCodes": [
+   "SM-T870",
+   "SM-T875",
+   "SM-T876*"
+  ],
+  "year": 2020,
+  "launchAndroid": 10,
+  "maxAndroid": 13,
+  "chip": "Snapdragon 865+",
+  "ramGB": [
+   6,
+   8
+  ],
+  "arm64": true,
+  "vulkan11": true,
+  "tier": "latest",
+  "aiClass": "great",
+  "notes": "",
+  "confidence": "medium"
+ },
+ {
+  "brand": "Google",
+  "name": "Pixel 7a",
+  "aliases": [
+   "7a",
+   "Pixel7a"
+  ],
+  "modelCodes": [
+   "GWKK3",
+   "GHL1X",
+   "G0DZQ",
+   "G82U8"
+  ],
+  "year": 2023,
+  "launchAndroid": 13,
+  "maxAndroid": 16,
+  "chip": "Google Tensor G2",
+  "ramGB": [
+   8
+  ],
+  "arm64": true,
+  "vulkan11": true,
+  "tier": "latest",
+  "aiClass": "great",
+  "notes": "",
+  "confidence": "high"
+ },
+ {
+  "brand": "Google",
+  "name": "Pixel 3",
+  "aliases": [
+   "Pixel3"
+  ],
+  "modelCodes": [
+   "G013A",
+   "G013B",
+   "G013C",
+   "G013D"
+  ],
+  "year": 2018,
+  "launchAndroid": 9,
+  "maxAndroid": 12,
+  "chip": "Snapdragon 845",
+  "ramGB": [
+   4
+  ],
+  "arm64": true,
+  "vulkan11": true,
+  "tier": "compatible",
+  "aiClass": "good",
+  "notes": "",
+  "confidence": "high"
+ },
+ {
+  "brand": "OnePlus",
+  "name": "6",
+  "aliases": [
+   "OnePlus 6",
+   "One Plus 6"
+  ],
+  "modelCodes": [
+   "A6000",
+   "A6003"
+  ],
+  "year": 2018,
+  "launchAndroid": 8,
+  "maxAndroid": 11,
+  "chip": "Snapdragon 845",
+  "ramGB": [
+   6,
+   8
+  ],
+  "arm64": true,
+  "vulkan11": true,
+  "tier": "compatible",
+  "aiClass": "good",
+  "notes": "",
+  "confidence": "medium"
+ },
+ {
+  "brand": "Xiaomi",
+  "name": "Redmi Note 12",
+  "aliases": [
+   "Note 12",
+   "Redmi Note 12 4G"
+  ],
+  "modelCodes": [
+   "23021RAAEG",
+   "23021RAA2Y",
+   "23028RA60L"
+  ],
+  "year": 2023,
+  "launchAndroid": 13,
+  "maxAndroid": 14,
+  "chip": "Snapdragon 685",
+  "ramGB": [
+   4,
+   6,
+   8
+  ],
+  "arm64": true,
+  "vulkan11": true,
+  "tier": "latest",
+  "aiClass": "good",
+  "notes": "",
+  "confidence": "medium"
+ },
+ {
+  "brand": "Xiaomi",
+  "name": "Redmi Note 8",
+  "aliases": [
+   "Note 8",
+   "Redmi Note 8 2021"
+  ],
+  "modelCodes": [
+   "M1908C3JH",
+   "M1908C3JG",
+   "M1908C3JI"
+  ],
+  "year": 2019,
+  "launchAndroid": 9,
+  "maxAndroid": 11,
+  "chip": "Snapdragon 665",
+  "ramGB": [
+   3,
+   4,
+   6
+  ],
+  "arm64": true,
+  "vulkan11": true,
+  "tier": "compatible",
+  "aiClass": "slow",
+  "notes": "",
+  "confidence": "medium"
+ },
+ {
+  "brand": "Xiaomi",
+  "name": "13",
+  "aliases": [
+   "Xiaomi 13",
+   "Mi 13"
+  ],
+  "modelCodes": [
+   "2211133C",
+   "2211133G"
+  ],
+  "year": 2022,
+  "launchAndroid": 13,
+  "maxAndroid": 16,
+  "chip": "Snapdragon 8 Gen 2",
+  "ramGB": [
+   8,
+   12
+  ],
+  "arm64": true,
+  "vulkan11": true,
+  "tier": "latest",
+  "aiClass": "great",
+  "notes": "",
+  "confidence": "medium"
+ },
+ {
+  "brand": "Motorola",
+  "name": "Moto G Power (2022)",
+  "aliases": [
+   "G Power 2022",
+   "Moto G Power 2022"
+  ],
+  "modelCodes": [
+   "XT2211-*"
+  ],
+  "year": 2022,
+  "launchAndroid": 11,
+  "maxAndroid": 12,
+  "chip": "Helio G37",
+  "ramGB": [
+   4
+  ],
+  "arm64": true,
+  "vulkan11": true,
+  "tier": "compatible",
+  "aiClass": "slow",
+  "notes": "",
+  "confidence": "low"
+ },
+ {
+  "brand": "Lenovo",
+  "name": "Tab P11",
+  "aliases": [
+   "P11",
+   "Lenovo Tab P11 (TB-J606)"
+  ],
+  "modelCodes": [
+   "TB-J606F",
+   "TB-J606L",
+   "TB-J606N",
+   "TB-J606X"
+  ],
+  "year": 2020,
+  "launchAndroid": 10,
+  "maxAndroid": 11,
+  "chip": "Snapdragon 662",
+  "ramGB": [
+   4
+  ],
+  "arm64": true,
+  "vulkan11": true,
+  "tier": "compatible",
+  "aiClass": "slow",
+  "notes": "",
+  "confidence": "medium"
+ },
+ {
+  "brand": "Huawei",
+  "name": "P30",
+  "aliases": [
+   "P30 Dual SIM"
+  ],
+  "modelCodes": [
+   "ELE-L29",
+   "ELE-L09",
+   "ELE-AL00"
+  ],
+  "year": 2019,
+  "launchAndroid": 9,
+  "maxAndroid": 10,
+  "chip": "Kirin 980",
+  "ramGB": [
+   6,
+   8
+  ],
+  "arm64": true,
+  "vulkan11": true,
+  "tier": "compatible",
+  "aiClass": "good",
+  "notes": "Has no Google services. The standard build works without them.",
+  "confidence": "low"
+ }
+]

@@ -1,0 +1,1 @@
+Wipe hides the layer from two opposite sides. Animate **Start** or **End** to reveal or remove the layer with a straight edge; **Angle** is the direction of the edge and **Feather** softens it. For a wipe like a clock hand, use [Radial Wipe](@effect/radialwipe).

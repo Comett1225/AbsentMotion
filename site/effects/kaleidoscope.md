@@ -1,0 +1,1 @@
+Kaleidoscope repeats a slice of the picture in a circle around a point. **Segments** is the number of slices, **Angle** turns the pattern and **Center** is the middle. Animate Angle for a spinning pattern.

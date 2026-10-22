@@ -1,0 +1,1 @@
+Fade In/Out fades the layer in at its start and out at its end. **In** and **Out** are the lengths of the fades in seconds. It is the quickest way to soften the start and the end of a title or a clip.

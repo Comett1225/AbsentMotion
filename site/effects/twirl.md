@@ -1,0 +1,1 @@
+Swirl twists the layer around a point like a whirlpool. **Center** is the middle of the twist, **Strength** how much it twists (negative values twist the other way) and **Radius** how far from the center it reaches. Animate Strength from 0 for a spiral transition.

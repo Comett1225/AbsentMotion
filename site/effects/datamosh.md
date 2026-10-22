@@ -1,0 +1,1 @@
+Datamosh imitates a video with a missing key frame: between **Start** and **End** (in seconds from the start of the layer) the picture stops refreshing and is dragged around by the movement that follows. On a video it uses the video's real motion; on other layers it uses moving blocks. **Intensity**, **Block Size**, **Decay**, **Glitch** and **Bloom** tune the look.

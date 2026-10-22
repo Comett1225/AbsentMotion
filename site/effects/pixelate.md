@@ -1,0 +1,1 @@
+Pixelate turns the picture into big square blocks. **Size** sets the block size: 1 is almost no change, 500 is a few huge blocks. **Stretch** makes the blocks wider or taller, **Angle** turns the grid and **Vignette** darkens each block toward its edge. Animate Size from large to small to reveal a picture, or the other way to hide something.

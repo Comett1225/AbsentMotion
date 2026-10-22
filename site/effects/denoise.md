@@ -1,0 +1,1 @@
+Denoise removes grain and noise while trying to keep edges sharp. **Strength** is how much noise is removed, **Radius** how far it looks around each pixel and **Detail** how much fine detail is kept. Too much makes skin and surfaces look flat.

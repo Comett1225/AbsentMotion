@@ -1,0 +1,1 @@
+Swing turns a layer back and forth between **Angle 1** and **Angle 2**, **Frequency** times per second. Use **Wave** to pick Sine (smooth) or Triangle (steady speed), and **Phase** to offset layers from each other.

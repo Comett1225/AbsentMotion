@@ -1,0 +1,1 @@
+Pulse Size grows and shrinks a layer over and over. **Shrink** and **Grow** are the smallest and largest size as a multiple of normal (0.9 is 90 %), **Frequency** is the number of pulses per second and **Wave** is Sine (smooth) or Triangle. A heartbeat or a beat-synced logo are typical uses. See also [Pulse Opacity](@effect/pulseopacity).

@@ -1,0 +1,1 @@
+**Stops** brightens or darkens the picture the way a camera does: one stop doubles or halves the light, and it goes from -4 to 4. **Offset** lifts or lowers everything evenly, and **Gamma** changes the midtones.
