@@ -1257,6 +1257,9 @@
     <string name="ai_sound_not_kept">O som deste clipe não pode ser mantido no novo vídeo</string>
     <string name="ai_video_too_large_to_save">Este celular não consegue salvar um vídeo de %1$s × %2$s</string>
     <string name="ai_delete_model">Excluir %1$s</string>
+    <string name="settings_ai_gpu">Usar o chip gráfico para IA</string>
+    <string name="ai_gpu_warning">Isso pode travar alguns celulares. Se o celular travar, reinicie-o e a IA voltará a usar o processador.</string>
+    <string name="ai_gpu_failed">O trabalho de IA na placa de vídeo não terminou, então a IA agora usa o processador.</string>
     <string name="export_interpolation_ai">Suavização com AI</string>
     <string name="export_interpolation_ai_help">Um modelo de AI desenha os quadros intermediários. Ele lida com movimento rápido e bordas que aparecem ou desaparecem melhor que o fluxo óptico, mas é muito mais lento e exige um download único de cerca de 11 MB.</string>
     <string name="export_interpolation_ai_levels">Baixo usa um modelo mais leve e é indicado para celulares bons. Médio é o modelo para começar. Alto usa um modelo maior para as cenas mais difíceis; reserve-o para celulares rápidos ou clipes curtos. Em um celular top recente, 10 segundos de vídeo em 1080p a 30 a 60 fps levam cerca de meio minuto a um minuto; celulares básicos podem levar 10 minutos ou mais.</string>

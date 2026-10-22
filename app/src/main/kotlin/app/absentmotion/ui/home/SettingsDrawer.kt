@@ -137,6 +137,7 @@ fun SettingsDrawer(settings: AppSettings, drawer: androidx.compose.material3.Dra
                 if (settings.demoModeShown) SwitchRow(stringResource(R.string.settings_demo_mode), settings.demoMode, enabled = true) { settings.demoMode = it; demoNote = it }
                 CaptionModelRow()
                 AiModelRows()
+                AiGpuRow()
             }
             Category(R.string.settings_group_backup, ChromeIcons.SavePreset) {
                 BackupRows(settings, onRestored)
@@ -230,6 +231,40 @@ private fun AiModelRows() {
             models = app.absentmotion.ai.AiModel.downloaded(context)
         }
     }
+}
+
+@Composable
+private fun AiGpuRow() {
+    if (!app.absentmotion.Tier.has(app.absentmotion.Feature.AiSmooth) && !app.absentmotion.Tier.has(app.absentmotion.Feature.AiEnhance)) return
+    val context = LocalContext.current
+    var state by remember { mutableStateOf<Pair<Boolean, Boolean>?>(null) }
+    var loaded by remember { mutableStateOf(false) }
+    var ask by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        state = withContext(Dispatchers.Default) {
+            if (app.absentmotion.ai.AiNative.gpu?.software == false) app.absentmotion.ai.AiDevice.gpuOn(context) to app.absentmotion.ai.AiDevice.gpuRisky(context) else null
+        }
+        loaded = true
+    }
+    val current = state
+    if (current == null) {
+        if (!loaded) Spacer(Modifier.height(44.dp))
+        return
+    }
+    val (on, risky) = current
+    fun choose(value: Boolean) {
+        app.absentmotion.ai.AiDevice.setGpu(context, value)
+        state = value to risky
+    }
+    SwitchRow(stringResource(R.string.settings_ai_gpu), on, enabled = true) { if (it && risky) ask = true else choose(it) }
+    if (ask) AlertDialog(
+        onDismissRequest = { ask = false },
+        title = { Text(stringResource(R.string.settings_ai_gpu), color = Am.Navy) },
+        text = { Text(stringResource(R.string.ai_gpu_warning), color = Am.Navy) },
+        confirmButton = { TextButton({ ask = false; choose(true) }) { Text(stringResource(R.string.audiofx_turn_on), color = Am.Navy) } },
+        dismissButton = { TextButton({ ask = false }) { Text(stringResource(R.string.cancel), color = Am.Navy) } },
+        containerColor = Am.Card,
+    )
 }
 
 @Composable

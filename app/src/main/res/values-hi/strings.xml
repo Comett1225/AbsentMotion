@@ -1233,6 +1233,9 @@
     <string name="ai_sound_not_kept">इस क्लिप की आवाज़ नए वीडियो में नहीं रखी जा सकती</string>
     <string name="ai_video_too_large_to_save">यह फ़ोन %1$s × %2$s वीडियो सेव नहीं कर सकता</string>
     <string name="ai_delete_model">%1$s हटाएँ</string>
+    <string name="settings_ai_gpu">AI के लिए ग्राफ़िक्स चिप का इस्तेमाल करें</string>
+    <string name="ai_gpu_warning">इससे कुछ फ़ोन हैंग हो सकते हैं। फ़ोन हैंग हो जाए तो उसे रीस्टार्ट करें, फिर AI प्रोसेसर का इस्तेमाल करेगा।</string>
+    <string name="ai_gpu_failed">ग्राफ़िक्स चिप पर AI का काम पूरा नहीं हो सका, इसलिए अब AI प्रोसेसर का उपयोग करता है।</string>
     <string name="export_interpolation_ai">AI Smooth</string>
     <string name="export_interpolation_ai_help">AI मॉडल बीच के फ़्रेम बनाता है। यह तेज़ मोशन और दिखने/गायब होने वाले किनारों को Optical flow से बेहतर संभालता है, लेकिन काफ़ी धीमा है और इसके लिए लगभग 11 MB का एक बार का डाउनलोड चाहिए।</string>
     <string name="export_interpolation_ai_levels">लो हल्का मॉडल इस्तेमाल करता है और Good फ़ोन के लिए ठीक है। मीडियम शुरू करने के लिए सही मॉडल है। हाई सबसे कठिन सीन के लिए बड़ा मॉडल इस्तेमाल करता है; इसे Fast फ़ोन या छोटी क्लिप के लिए रखें। हाल के टॉप फ़ोन पर, 30 से 60 fps पर 1080p वीडियो के 10 सेकंड में लगभग आधा मिनट से एक मिनट लगता है; Basic फ़ोन पर 10 मिनट या ज़्यादा लग सकते हैं।</string>

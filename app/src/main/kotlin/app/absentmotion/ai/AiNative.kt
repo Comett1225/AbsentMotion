@@ -14,18 +14,27 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.Closeable
 
-internal class AiGpu(val api: Int, val type: Int, val fp16: Boolean, val name: String) {
+internal class AiGpu(val api: Int, val type: Int, val fp16: Boolean, val name: String, val pushDescriptor: Boolean = false) {
     val version: String get() = "${api ushr 22}.${(api ushr 12) and 0x3FF}"
     val software: Boolean get() = type == 3
+    val known: Boolean get() = !software && api >= VULKAN_1_3 && fp16 && pushDescriptor && KnownGpus.any { it.containsMatchIn(name) }
 
     companion object {
+        private const val VULKAN_1_3 = 0x403000
+        private val KnownGpus = listOf(
+            Regex("""^Adreno \(TM\) [78]\d\d\b"""),
+            Regex("""^Mali-G(6[1-9]\d|[7-9]\d\d)\b"""),
+        )
+
         fun parse(line: String?): AiGpu? {
-            val parts = line?.split('\t', limit = 5) ?: return null
-            if (parts.size < 5) return null
-            return AiGpu(parts[0].toLongOrNull()?.toInt() ?: return null, parts[1].toIntOrNull() ?: return null, parts[2] == "1", parts[4])
+            val parts = line?.split('\t', limit = 6) ?: return null
+            if (parts.size < 6) return null
+            return AiGpu(parts[0].toLongOrNull()?.toInt() ?: return null, parts[1].toIntOrNull() ?: return null, parts[2] == "1", parts[5], parts[4] == "1")
         }
     }
 }
+
+internal fun aiUsesGpu(gpu: AiGpu?, choice: Boolean?): Boolean = gpu != null && !gpu.software && (choice ?: gpu.known)
 
 internal object AiNative {
     val loaded: Boolean by lazy { runCatching { System.loadLibrary("absent_ai") }.isSuccess }
@@ -41,7 +50,7 @@ internal object AiNative {
     external fun nativeInterpolate(handle: Long, first: IntArray, second: IntArray, width: Int, height: Int, t: Float, padding: Int, output: IntArray): Int
 }
 
-internal class AiNet private constructor(private val handle: Long) : Closeable {
+internal class AiNet private constructor(private val handle: Long, private val gpuApp: Context?) : Closeable {
     val onGpu: Boolean get() = AiNative.nativeOnGpu(handle)
 
     suspend fun upscale(input: IntArray, width: Int, height: Int, outScale: Int, output: IntArray = IntArray(width * outScale * height * outScale)): IntArray {
@@ -57,6 +66,7 @@ internal class AiNet private constructor(private val handle: Long) : Closeable {
 
     private fun checkResult(code: Int) {
         check(code != 1) { AppText.get(R.string.ai_cancelled) }
+        if (code == -3 && gpuApp != null) AiDevice.gpuFailed(gpuApp)
         check(code == 0) { AppText.get(if (code == -2) R.string.ai_out_of_memory_media else R.string.ai_model_failed) }
     }
 
@@ -67,7 +77,10 @@ internal class AiNet private constructor(private val handle: Long) : Closeable {
         }.also { ensureActive() }
     }
 
-    override fun close() = AiNative.nativeClose(handle)
+    override fun close() {
+        AiNative.nativeClose(handle)
+        if (gpuApp != null) AiDevice.gpuRunning(gpuApp, false)
+    }
 
     companion object {
         const val NET_SCALE = 4
@@ -81,9 +94,16 @@ internal class AiNet private constructor(private val handle: Long) : Closeable {
             model.verify(context)
             blend?.verify(context)
             val param = model.file(context, checkNotNull(model.param)).path
-            val handle = AiNative.nativeOpen(param, model.file(context, model.bin).path, blend?.let { it.file(context, it.bin).path }, weight, gpu && !cpuOnly)
+            val useGpu = gpu && !cpuOnly
+            if (useGpu) AiDevice.gpuRunning(context, true)
+            val handle = AiNative.nativeOpen(param, model.file(context, model.bin).path, blend?.let { it.file(context, it.bin).path }, weight, useGpu)
+            val onGpu = handle != 0L && AiNative.nativeOnGpu(handle)
+            if (useGpu && !onGpu) {
+                if (handle == 0L) AiDevice.gpuFailed(context)
+                AiDevice.gpuRunning(context, false)
+            }
             check(handle != 0L) { AppText.get(R.string.ai_model_failed) }
-            return AiNet(handle)
+            return AiNet(handle, if (onGpu) context.applicationContext else null)
         }
     }
 }

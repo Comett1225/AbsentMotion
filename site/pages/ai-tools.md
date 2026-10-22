@@ -113,4 +113,6 @@ Every model is checked against a fixed fingerprint (SHA-256) before it is used; 
 
 ## Speed
 
-The tools use the phone's processor and graphics chip. A short clip on a recent phone takes seconds to minutes; a long video or an older phone takes longer. Keep the app open and the screen on while a tool runs.
+A short clip on a recent phone takes seconds to minutes; a long video or an older phone takes longer. Keep the app open and the screen on while a tool runs.
+
+AI Smooth and AI Enhance run on the phone's processor on most phones. Newer graphics chips that are known to be safe for them (recent Snapdragon and Mali chips) are used instead, because they are much faster, and the time estimates follow the chip that will do the work. **Use the graphics chip for AI** in **Settings**, **Projects and media** turns this on or off. Turning it on for another chip shows a warning first: on some phones it can freeze the whole phone, and after a restart AI uses the processor again. If AI work on the graphics chip ever fails or is cut off, the app says so and uses the processor from then on.

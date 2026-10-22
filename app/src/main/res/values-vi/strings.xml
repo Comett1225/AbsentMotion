@@ -1209,6 +1209,9 @@
     <string name="ai_sound_not_kept">Không thể giữ âm thanh của clip này trong video mới</string>
     <string name="ai_video_too_large_to_save">Điện thoại này không thể lưu video %1$s × %2$s</string>
     <string name="ai_delete_model">Xóa %1$s</string>
+    <string name="settings_ai_gpu">Dùng chip đồ họa cho AI</string>
+    <string name="ai_gpu_warning">Tùy chọn này có thể làm treo một số điện thoại. Nếu điện thoại bị treo, hãy khởi động lại và AI sẽ dùng bộ xử lý trở lại.</string>
+    <string name="ai_gpu_failed">AI xử lý trên chip đồ họa không hoàn tất, nên AI giờ dùng bộ xử lý.</string>
     <string name="export_interpolation_ai">Làm mượt AI</string>
     <string name="export_interpolation_ai_help">Mô hình AI sẽ vẽ các khung hình xen giữa. Nó xử lý chuyển động nhanh và các cạnh xuất hiện hay biến mất tốt hơn Optical flow, nhưng chậm hơn nhiều và cần tải một lần khoảng 11 MB.</string>
     <string name="export_interpolation_ai_levels">Thấp dùng mô hình nhẹ hơn, phù hợp với điện thoại Good. Trung bình là mô hình nên bắt đầu. Cao dùng mô hình lớn hơn cho những cảnh khó nhất; chỉ nên dùng cho điện thoại Fast hoặc clip ngắn. Trên một chiếc điện thoại cao cấp gần đây, 10 giây video 1080p ở 30 đến 60 fps mất khoảng nửa phút đến một phút; điện thoại Basic có thể mất 10 phút hoặc hơn.</string>

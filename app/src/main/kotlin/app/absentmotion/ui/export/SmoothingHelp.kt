@@ -67,7 +67,7 @@ internal fun aiSmoothEstimate(gmac: Double, level: SmoothLevel): AiEstimate? {
     val estimate by produceState<AiEstimate?>(null, gmac, level) {
         value = null
         val phone = AiDevice.phone(context)
-        value = aiEstimate(phone, gmac, AiDevice.measured(level.model))
+        value = aiEstimate(phone, gmac, AiDevice.measured(level.model, phone.usesGpu))
         AiDevice.benchmark(context, level.model)?.let { value = aiEstimate(phone, gmac, it) }
     }
     return estimate

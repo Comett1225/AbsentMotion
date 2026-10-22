@@ -228,7 +228,7 @@ internal fun AiEnhanceDialog(tools: AiTools, scene: Scene, onQuickSharpen: () ->
         if (media == null || !options.usesAi || !fits) return@LaunchedEffect
         val phone = AiDevice.phone(context)
         val gmac = seconds * (media.fps ?: 30f) * options.gmacPerFrame(media.width, media.height)
-        aiEstimate(phone, gmac, AiDevice.measured(options.model)).let { estimate = it.text; cannot = it.verdict == AiVerdict.Cannot }
+        aiEstimate(phone, gmac, AiDevice.measured(options.model, phone.usesGpu)).let { estimate = it.text; cannot = it.verdict == AiVerdict.Cannot }
         AiDevice.benchmark(context, options.model)?.let { rate -> aiEstimate(phone, gmac, rate).let { estimate = it.text; cannot = it.verdict == AiVerdict.Cannot } }
     }
     AlertDialog(onDismissRequest = { tools.enhanceSetup = null },
