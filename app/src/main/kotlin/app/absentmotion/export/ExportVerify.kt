@@ -12,6 +12,7 @@ import app.absentmotion.R
 import app.absentmotion.i18n.AppText
 import app.absentmotion.i18n.UiText
 import app.absentmotion.i18n.txt
+import app.absentmotion.media.openDecoder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.DataInputStream
@@ -78,12 +79,8 @@ private const val DecodeBudgetMs = 800L
 
 private fun decodeEnds(extractor: MediaExtractor, track: Int, format: MediaFormat, deadline: Long): Pair<Boolean?, Boolean?> {
     val mime = format.getString(MediaFormat.KEY_MIME) ?: return null to null
-    val codec = try { MediaCodec.createDecoderByType(mime) } catch (e: Exception) { return null to null }
+    val codec = try { openDecoder(format, null) } catch (e: Exception) { return null to null }
     try {
-        try {
-            codec.configure(format, null, null, 0)
-            codec.start()
-        } catch (e: Exception) { return null to null }
         extractor.selectTrack(track)
         extractor.seekTo(0, MediaExtractor.SEEK_TO_CLOSEST_SYNC)
         val first = decode(codec, extractor, deadline, untilEnd = false)

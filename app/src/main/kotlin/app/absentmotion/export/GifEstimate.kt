@@ -1,5 +1,6 @@
 package app.absentmotion.export
 
+import android.hardware.HardwareBuffer
 import app.absentmotion.engine.EngineThread
 import app.absentmotion.model.Scene
 import java.io.OutputStream
@@ -34,6 +35,27 @@ internal fun gifTimeMs(frames: Int, sample: GifSample, renderMs: Long?): Long {
     fun median(values: List<Double>) = values.sorted().let { if (it.isEmpty()) 0.0 else it[it.size / 2] }
     val render = renderMs ?: (DefaultSetupMs + frames * median(sample.renderMs)).roundToLong()
     return render + (frames * median(sample.encodeMs)).roundToLong()
+}
+
+internal suspend fun measureVideoDraw(engine: EngineThread, scene: Scene, settings: ExportSettings): Double {
+    val (width, height) = exportSize(scene, settings.shortSide, even = true)
+    val frames = frameCount(scene, settings.fps)
+    val buffer = HardwareBuffer.create(width, height, HardwareBuffer.RGBA_8888, 1, HardwareBuffer.USAGE_GPU_COLOR_OUTPUT or HardwareBuffer.USAGE_GPU_SAMPLED_IMAGE)
+    try {
+        return engine.exportSession(scene.toXml(), settings.smoothing, settings.fps) {
+            try {
+                listOf(0, 0, frames / 3, frames * 2 / 3).map { index ->
+                    val started = System.nanoTime()
+                    check(renderInto(buffer, frameTimeMs(scene, settings.fps, index))) { "Cannot sample the drawing time" }
+                    (System.nanoTime() - started) / 1e6
+                }.drop(1).sorted()[1]
+            } finally {
+                releaseBuffers()
+            }
+        }
+    } finally {
+        buffer.close()
+    }
 }
 
 internal suspend fun measureGif(engine: EngineThread, scene: Scene, settings: ExportSettings): GifSample {

@@ -1,11 +1,14 @@
 package app.absentmotion.media
 
+import app.absentmotion.platform.alias
+import app.absentmotion.platform.hardware
 import app.absentmotion.platform.intOr
 import android.content.Context
 import android.graphics.ImageFormat
 import android.media.Image
 import android.media.ImageReader
 import android.media.MediaCodec
+import android.media.MediaCodecInfo
 import android.media.MediaCodecList
 import android.media.MediaExtractor
 import android.media.MediaFormat
@@ -18,6 +21,49 @@ import android.hardware.HardwareBuffer
 import java.io.Closeable
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
+
+internal fun MediaCodec.configureFitting(format: MediaFormat, surface: android.view.Surface?, flags: Int = 0) {
+    try {
+        configure(format, surface, null, flags)
+    } catch (e: MediaCodec.CodecException) {
+        Log.w("AMVideo", "$name refused real-time work, asking for best effort", e)
+        reset()
+        format.setInteger(MediaFormat.KEY_PRIORITY, 1)
+        configure(format, surface, null, flags)
+    }
+}
+
+internal fun openDecoder(format: MediaFormat, surface: android.view.Surface?): MediaCodec {
+    val mime = format.getString(MediaFormat.KEY_MIME).orEmpty()
+    val list = MediaCodecList(MediaCodecList.REGULAR_CODECS)
+    val width = format.intOr(MediaFormat.KEY_WIDTH, 0)
+    val height = format.intOr(MediaFormat.KEY_HEIGHT, 0)
+    val others = list.codecInfos.filter { info ->
+        !info.isEncoder && !info.alias && mime in info.supportedTypes && info.getCapabilitiesForType(mime).let { caps ->
+            !caps.isFeatureRequired(MediaCodecInfo.CodecCapabilities.FEATURE_SecurePlayback) &&
+                !caps.isFeatureRequired(MediaCodecInfo.CodecCapabilities.FEATURE_TunneledPlayback) &&
+                caps.videoCapabilities?.isSizeSupported(width, height) != false
+        }
+    }.sortedByDescending { it.hardware }.map { it.name }
+    var last: Exception? = null
+    for (name in (listOfNotNull(list.findDecoderForFormat(format)) + others).distinct()) {
+        val codec = try { MediaCodec.createByCodecName(name) } catch (e: Exception) {
+            last = e
+            Log.w("AMVideo", "cannot create $name", e)
+            continue
+        }
+        try {
+            codec.configureFitting(format, surface)
+            codec.start()
+            return codec
+        } catch (e: Exception) {
+            last = e
+            Log.w("AMVideo", "$name cannot decode $mime ${width}x$height", e)
+            codec.release()
+        }
+    }
+    throw last ?: IllegalArgumentException("no decoder for $mime")
+}
 
 internal class VideoDecoder(private val context: Context, private val uri: String) : Closeable {
     private val extractor = MediaExtractor()
@@ -62,9 +108,7 @@ internal class VideoDecoder(private val context: Context, private val uri: Strin
             }
             format.setInteger(MediaFormat.KEY_ROTATION, 0)
             hdr = format.requestSdr()
-            codec = MediaCodec.createByCodecName(MediaCodecList(MediaCodecList.REGULAR_CODECS).findDecoderForFormat(format))
-            codec!!.configure(format, reader!!.surface, null, 0)
-            codec!!.start()
+            codec = openDecoder(format, reader!!.surface)
         } catch (e: Exception) { close(); throw e }
     }
 

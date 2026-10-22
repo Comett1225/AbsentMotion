@@ -41,6 +41,44 @@ internal object TestHooks {
         } else if (intent.hasExtra("frame")) state.frame = frame
     }
 
+    private fun holdDecoder(activity: MainActivity, path: String, after: Long, ms: Long) {
+        activity.lifecycleScope.launch(Dispatchers.IO) {
+            val extractor = android.media.MediaExtractor()
+            var codec: android.media.MediaCodec? = null
+            try {
+                kotlinx.coroutines.delay(after)
+                extractor.setDataSource(path)
+                val format = (0 until extractor.trackCount).map { extractor.getTrackFormat(it) }.first { it.getString(android.media.MediaFormat.KEY_MIME)!!.startsWith("video/") }
+                codec = android.media.MediaCodec.createDecoderByType(format.getString(android.media.MediaFormat.KEY_MIME)!!)
+                codec.configure(format, null, null, 0)
+                codec.start()
+                Log.i("AMTest", "holding a real-time ${codec.name} for $ms ms")
+                kotlinx.coroutines.delay(ms)
+            } catch (e: Exception) {
+                Log.e("AMTest", "cannot hold a decoder", e)
+            } finally {
+                codec?.let { runCatching { it.stop() }; it.release() }
+                extractor.release()
+                Log.i("AMTest", "decoder released")
+            }
+        }
+    }
+
+    private suspend fun checkClipSmooth(activity: MainActivity, state: app.absentmotion.editor.EditorState, method: String) {
+        try {
+            val layer = state.scene.layers.first { it.mediaFill?.video == true }
+            val media = checkNotNull(state.scene.media(layer.mediaFill!!.uri))
+            val smoothing = app.absentmotion.export.Smoothing(FrameInterpolation.entries.first { it.name.equals(method, true) })
+            val started = SystemClock.elapsedRealtime()
+            val out = app.absentmotion.ai.ClipSmooth.run(activity.applicationContext, activity.engine, layer, media, state.scene.fps, smoothing) { _, _ -> }
+            val copy = File(activity.getExternalFilesDir(null), "clipsmooth.mp4")
+            out.file.copyTo(copy, overwrite = true)
+            Log.i("AMTest", "clipsmooth ${copy.path} ${copy.length()} bytes in ${SystemClock.elapsedRealtime() - started} ms")
+        } catch (e: Throwable) {
+            Log.e("AMTest", "clipsmooth failed", e)
+        }
+    }
+
     private suspend fun downloadFonts(activity: MainActivity, scene: Scene) {
         activity.engine.fonts?.let { library -> scene.fontNames().forEach { library.resolve(it, download = true) } }
     }
@@ -57,6 +95,10 @@ internal object TestHooks {
 
     fun start(activity: MainActivity) {
         val intent = activity.intent
+        intent.getStringExtra("failengine")?.let { app.absentmotion.engine.EngineDebug.failStart = it }
+        app.absentmotion.export.ExportDebug.refuseHardware = intent.getBooleanExtra("refusehw", false)
+        app.absentmotion.export.ExportDebug.failPlayers = intent.getIntExtra("failplayers", 0)
+        intent.getStringExtra("holddecoder")?.let { holdDecoder(activity, it, intent.getLongExtra("holdafter", 0L), intent.getLongExtra("holdms", 20_000L)) }
         val engine = activity.engine
         val scope = activity.lifecycleScope
         DebugFrameInterpolation.divisor = intent.getIntExtra("interpDivisor", 4)
@@ -154,6 +196,8 @@ internal object TestHooks {
             val state = activity.openNow(id) ?: return@launch
             val scene = state.scene
             state.frame = intent.getIntExtra("frame", 0).coerceIn(0, scene.lastFrame)
+            if (intent.getBooleanExtra("openexport", false)) state.exportOpen = true
+            intent.getStringExtra("clipsmooth")?.let { method -> launch { checkClipSmooth(activity, state, method) } }
             val stillName = intent.getStringExtra("still")
             intent.getStringExtra("export")?.let { exportForTest(activity, it, scene, state.frame) }
             intent.getStringExtra("verify")?.let { file ->

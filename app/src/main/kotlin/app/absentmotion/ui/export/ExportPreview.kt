@@ -12,6 +12,7 @@ import android.graphics.drawable.Drawable
 import android.media.MediaMetadataRetriever
 import android.media.MediaPlayer
 import android.net.Uri
+import android.util.Log
 import android.provider.OpenableColumns
 import android.view.Surface
 import android.view.TextureView
@@ -48,7 +49,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -79,6 +79,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import app.absentmotion.export.ExportDebug
 import app.absentmotion.export.ExportKind
 import app.absentmotion.export.ExportResult
 import app.absentmotion.ui.theme.Am
@@ -193,38 +194,87 @@ private fun FilePreview(uri: Uri) {
 @Composable
 private fun VideoPreview(uri: Uri) {
     val context = LocalContext.current
-    var aspect by remember { mutableFloatStateOf(0f) }
+    var facts by remember { mutableStateOf<VideoFacts?>(null) }
     var ready by remember { mutableStateOf(false) }
+    var failed by remember { mutableStateOf(false) }
     var playing by remember { mutableStateOf(false) }
     var scrubbing by remember { mutableStateOf(false) }
     var durationMs by remember { mutableIntStateOf(0) }
     var positionMs by remember { mutableIntStateOf(0) }
-    var preparing by remember { mutableStateOf(false) }
-    val player = remember {
-        MediaPlayer().apply {
-            runCatching { setDataSource(context, uri) }
-            setOnPreparedListener { durationMs = it.duration; it.seekTo(1, MediaPlayer.SEEK_CLOSEST); ready = true }
+    var attempt by remember { mutableIntStateOf(0) }
+    var stopped by remember { mutableStateOf(false) }
+    var playWhenReady by remember { mutableStateOf(false) }
+    var surface by remember { mutableStateOf<Surface?>(null) }
+    val asked = remember { arrayOfNulls<MediaPlayer>(1) }
+    var sourced by remember { mutableStateOf<MediaPlayer?>(null) }
+    val player = remember(attempt, stopped) {
+        if (stopped) null else MediaPlayer().apply {
+            setOnPreparedListener {
+                durationMs = it.duration
+                it.seekTo(positionMs.coerceAtLeast(1).toLong(), MediaPlayer.SEEK_CLOSEST)
+                ready = true
+                failed = false
+                if (playWhenReady) { playWhenReady = false; it.start(); playing = true }
+            }
             setOnCompletionListener { playing = false; positionMs = 0; it.seekTo(1, MediaPlayer.SEEK_CLOSEST) }
-            setOnErrorListener { _, _, _ -> ready = false; playing = false; true }
+            setOnErrorListener { _, what, extra ->
+                Log.w("AMExport", "the result player failed ($what, $extra)")
+                ready = false; playing = false; failed = true
+                true
+            }
         }
     }
-    DisposableEffect(player) { onDispose { player.release() } }
-    LaunchedEffect(uri) { aspect = withContext(Dispatchers.IO) { videoAspect(context, uri) } }
+    val current by rememberUpdatedState(player)
+    DisposableEffect(player) { onDispose { player?.release(); ready = false; playing = false } }
+    LaunchedEffect(player) {
+        val p = player ?: return@LaunchedEffect
+        if (ExportDebug.failPlayers > 0) {
+            ExportDebug.failPlayers--
+            failed = true
+        } else if (runCatching { p.setDataSource(context, uri) }.isFailure) failed = true
+        else sourced = p
+    }
+    LaunchedEffect(sourced, surface) {
+        val p = sourced?.takeIf { it === player } ?: return@LaunchedEffect
+        val s = surface ?: return@LaunchedEffect
+        runCatching { p.setSurface(s) }
+        if (asked[0] !== p) {
+            asked[0] = p
+            if (runCatching { p.prepareAsync() }.isFailure) failed = true
+        } else if (ready) p.seekTo(p.currentPosition.toLong(), MediaPlayer.SEEK_CLOSEST)
+    }
+    LaunchedEffect(failed) {
+        if (failed && attempt == 0) {
+            delay(RetryMs)
+            failed = false
+            attempt++
+        }
+    }
+    LaunchedEffect(uri) { facts = withContext(Dispatchers.IO) { videoFacts(context, uri) } }
     LaunchedEffect(playing) {
         while (playing) {
-            if (!scrubbing) positionMs = player.currentPosition
+            if (!scrubbing) current?.let { positionMs = it.currentPosition }
             delay(50)
         }
     }
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     DisposableEffect(lifecycle) {
-        val observer = LifecycleEventObserver { _, e -> if (e == Lifecycle.Event.ON_PAUSE && playing) { player.pause(); playing = false } }
+        val observer = LifecycleEventObserver { _, e ->
+            when (e) {
+                Lifecycle.Event.ON_PAUSE -> if (playing) { current?.pause(); playing = false }
+                Lifecycle.Event.ON_STOP -> { current?.takeIf { ready }?.let { positionMs = it.currentPosition }; stopped = true }
+                Lifecycle.Event.ON_START -> stopped = false
+                else -> {}
+            }
+        }
         lifecycle.addObserver(observer)
         onDispose { lifecycle.removeObserver(observer) }
     }
     fun toggle() {
+        if (failed) { failed = false; playWhenReady = true; attempt++; return }
+        val p = current ?: return
         if (!ready) return
-        if (playing) player.pause() else player.start()
+        if (playing) p.pause() else p.start()
         playing = !playing
     }
 
@@ -233,38 +283,41 @@ private fun VideoPreview(uri: Uri) {
             Modifier.weight(1f).fillMaxWidth().clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) { toggle() },
             contentAlignment = Alignment.Center,
         ) {
-            if (aspect > 0f) {
-                AndroidView(
-                    factory = { ctx ->
-                        TextureView(ctx).apply {
-                            surfaceTextureListener = object : TextureView.SurfaceTextureListener {
-                                private var surface: Surface? = null
+            val shown = facts
+            if (shown != null) {
+                Box(Modifier.aspectRatio(shown.aspect.takeIf { it > 0f } ?: (16f / 9))) {
+                    shown.still?.takeIf { !ready }?.let { Image(it, null, Modifier.fillMaxSize(), contentScale = ContentScale.Fit) }
+                    AndroidView(
+                        factory = { ctx ->
+                            TextureView(ctx).apply {
+                                surfaceTextureListener = object : TextureView.SurfaceTextureListener {
+                                    override fun onSurfaceTextureAvailable(texture: SurfaceTexture, width: Int, height: Int) { surface = Surface(texture) }
 
-                                override fun onSurfaceTextureAvailable(texture: SurfaceTexture, width: Int, height: Int) {
-                                    surface = Surface(texture)
-                                    player.setSurface(surface)
-                                    if (!preparing) { preparing = true; runCatching { player.prepareAsync() } }
-                                    else if (ready) player.seekTo(player.currentPosition.toLong(), MediaPlayer.SEEK_CLOSEST)
+                                    override fun onSurfaceTextureSizeChanged(texture: SurfaceTexture, width: Int, height: Int) {}
+
+                                    override fun onSurfaceTextureDestroyed(texture: SurfaceTexture): Boolean {
+                                        runCatching { current?.setSurface(null) }
+                                        surface?.release()
+                                        surface = null
+                                        return true
+                                    }
+
+                                    override fun onSurfaceTextureUpdated(texture: SurfaceTexture) {}
                                 }
-
-                                override fun onSurfaceTextureSizeChanged(texture: SurfaceTexture, width: Int, height: Int) {}
-
-                                override fun onSurfaceTextureDestroyed(texture: SurfaceTexture): Boolean {
-                                    runCatching { player.setSurface(null) }
-                                    surface?.release()
-                                    return true
-                                }
-
-                                override fun onSurfaceTextureUpdated(texture: SurfaceTexture) {}
                             }
-                        }
-                    },
-                    modifier = Modifier.aspectRatio(aspect).fadeInWhen(ready, from = 0.01f),
-                )
+                        },
+                        modifier = Modifier.fillMaxSize().fadeInWhen(ready, from = 0.01f),
+                    )
+                }
+            }
+            if (failed) {
+                Box(Modifier.size(72.dp).clip(RoundedCornerShape(36.dp)).background(Am.Scrim.copy(alpha = 0.6f)), contentAlignment = Alignment.Center) {
+                    Icon(ExportIcons.Play, stringResource(R.string.export_play), Modifier.size(28.dp), tint = Am.OnScrim)
+                }
             }
         }
-        Ltr { Row(Modifier.fillMaxWidth().height(62.dp).fadeInWhen(ready, from = 0.35f), verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.size(62.dp).clickable(enabled = ready, onClick = ::toggle), contentAlignment = Alignment.Center) {
+        Ltr { Row(Modifier.fillMaxWidth().height(62.dp).fadeInWhen(ready || failed, from = 0.35f), verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.size(62.dp).clickable(enabled = ready || failed, onClick = ::toggle), contentAlignment = Alignment.Center) {
                 Crossfade(playing, animationSpec = Motion.fast(), label = "play") {
                     Icon(if (it) ExportIcons.Pause else ExportIcons.Play, stringResource(if (it) R.string.export_pause else R.string.export_play), tint = Am.OnScrim)
                 }
@@ -275,7 +328,7 @@ private fun VideoPreview(uri: Uri) {
                     if (ready) {
                         scrubbing = true
                         positionMs = (f * durationMs).toInt()
-                        player.seekTo(positionMs.toLong(), MediaPlayer.SEEK_CLOSEST)
+                        current?.seekTo(positionMs.toLong(), MediaPlayer.SEEK_CLOSEST)
                     }
                 },
                 onDone = { scrubbing = false },
@@ -286,21 +339,30 @@ private fun VideoPreview(uri: Uri) {
     }
 }
 
+private class VideoFacts(val aspect: Float, val still: ImageBitmap?)
+
 private fun time(ms: Int) = "%d:%02d".format(Locale.ROOT, ms / 60000, ms / 1000 % 60)
 
-private fun videoAspect(context: Context, uri: Uri): Float {
+private fun videoFacts(context: Context, uri: Uri): VideoFacts {
     val reader = MediaMetadataRetriever()
     try {
         reader.setDataSource(context, uri)
-        val w = reader.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)?.toFloatOrNull() ?: return 0f
-        val h = reader.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)?.toFloatOrNull() ?: return 0f
-        return if (h > 0f) w / h else 0f
+        val w = reader.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)?.toIntOrNull()?.takeIf { it > 0 } ?: return VideoFacts(0f, null)
+        val h = reader.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)?.toIntOrNull()?.takeIf { it > 0 } ?: return VideoFacts(0f, null)
+        val scale = minOf(1f, StillSide.toFloat() / maxOf(w, h))
+        val still = runCatching { reader.getScaledFrameAtTime(0, MediaMetadataRetriever.OPTION_CLOSEST_SYNC, (w * scale).toInt().coerceAtLeast(1), (h * scale).toInt().coerceAtLeast(1)) }
+            .onFailure { Log.w("AMExport", "cannot read a still of the export", it) }.getOrNull()
+        return VideoFacts(w.toFloat() / h, still?.asImageBitmap())
     } catch (e: RuntimeException) {
-        return 0f
+        return VideoFacts(0f, null)
     } finally {
         reader.release()
     }
 }
+
+private const val StillSide = 1280
+
+private const val RetryMs = 1000L
 
 @Composable
 private fun SeekBar(fraction: Float, onSeek: (Float) -> Unit, onDone: () -> Unit, modifier: Modifier) {

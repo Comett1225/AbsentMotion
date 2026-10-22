@@ -83,6 +83,7 @@ object VideoProxies {
     private val making = MutableStateFlow<Map<String, Float>>(emptyMap())
     private val made = MutableStateFlow(0)
     @Volatile private var generation = 0
+    @Volatile internal var paused = false
 
     val progress: StateFlow<Map<String, Float>> = making.asStateFlow()
     val revision: StateFlow<Int> = made.asStateFlow()
@@ -100,11 +101,11 @@ object VideoProxies {
     }
 
     internal fun request(context: Context, uri: String) {
-        if (uri in settled || !enabled(context) || !queued.add(uri)) return
+        if (uri in settled || paused || !enabled(context) || !queued.add(uri)) return
         val app = context.applicationContext
         val started = generation
         scope.launch {
-            try { prepare(app, uri) { started != generation || !enabled(app) } }
+            try { prepare(app, uri) { started != generation || paused || !enabled(app) } }
             catch (e: Exception) { Log.w("AMProxy", "cannot make a preview copy of $uri", e) }
             finally { queued.remove(uri); making.update { it - uri } }
         }
@@ -226,15 +227,13 @@ private fun transcode(context: Context, uri: String, out: File, cancelled: () ->
         }
         encoder = MediaCodec.createByCodecName(MediaCodecList(MediaCodecList.REGULAR_CODECS).findEncoderForFormat(encoderFormat)
             ?: error("no encoder for a ${width}x$height preview copy"))
-        encoder.configure(encoderFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
+        encoder.configureFitting(encoderFormat, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
         gl = ProxyGl(encoder.createInputSurface(), width, height)
         val available = Semaphore(0)
         frames = SurfaceTexture(gl.texture).apply { setOnFrameAvailableListener({ available.release() }, Handler(thread.looper)) }
         decoderSurface = Surface(frames)
         format.setInteger(MediaFormat.KEY_ROTATION, 0)
-        decoder = MediaCodec.createByCodecName(MediaCodecList(MediaCodecList.REGULAR_CODECS).findDecoderForFormat(format))
-        decoder.configure(format, decoderSurface, null, 0)
-        decoder.start()
+        decoder = openDecoder(format, decoderSurface)
         encoder.start()
         muxer = MediaMuxer(out.path, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
         val info = MediaCodec.BufferInfo()

@@ -1,6 +1,7 @@
 package app.absentmotion.export
 
 import app.absentmotion.R
+import app.absentmotion.i18n.UiText
 import app.absentmotion.i18n.txt
 import app.absentmotion.platform.Context
 import app.absentmotion.platform.Bitmap
@@ -35,7 +36,7 @@ class ExportResult(val uris: List<Uri>, val mime: String, val where: String, val
 class Exporter(context: Context, private val engine: EngineThread, private val store: ExportStore, private val access: MediaAccess = MediaAccess.forApp(context)) {
     private val context = context.applicationContext
 
-    suspend fun export(kind: ExportKind, scene: Scene, s: ExportSettings, frame: Int, name: String, progress: (Float) -> Unit): ExportResult {
+    suspend fun export(kind: ExportKind, scene: Scene, s: ExportSettings, frame: Int, name: String, note: (UiText) -> Unit = {}, progress: (Float) -> Unit): ExportResult {
         val saved = ArrayList<Uri>()
         try {
             return CrashLogs.during("exporting ${kind.name.lowercase()}") { withContext(Dispatchers.Default) {
@@ -48,7 +49,7 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
                         val written = try {
                             direct(saved, name, f.container.ext, f.container.mime, "Movies/$AppFolder") { fd ->
                                 cool { thermal ->
-                                    exportVideo(engine, scene, xml, f, fd, mix, thermal.hot, { thermal.pauseMs().also { paused += it } }, progress)
+                                    exportVideo(engine, scene, xml, f, fd, mix, thermal.hot, { thermal.pauseMs().also { paused += it } }, note, progress)
                                 }
                             }
                         } finally {
@@ -89,8 +90,15 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
         } catch (t: Throwable) {
             val full = storageFull(t)
             withContext(NonCancellable + Dispatchers.IO) { saved.forEach { runCatching { store.delete(it) } } }
-            throw if (full) StorageFullException() else t
+            throw if (full) StorageFullException() else plainCodecError(t)
         }
+    }
+
+    private fun plainCodecError(t: Throwable): Throwable {
+        if (t is ExportError || t is kotlinx.coroutines.CancellationException) return t
+        if (generateSequence(t) { it.cause }.none { it is android.media.MediaCodec.CodecException }) return t
+        android.util.Log.w("AMExport", "a media codec failed", t)
+        return ExportError(txt(R.string.export_error_codec_busy), t)
     }
 
     private fun storageFull(t: Throwable): Boolean =

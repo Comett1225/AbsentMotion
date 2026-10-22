@@ -486,6 +486,24 @@
     <string name="export_sound_unreadable">The sound of %1$s could not be read, so it is silent in this file.</string>
 
     <string name="export_error_cannot_encode">This phone cannot encode %1$s at %2$s</string>
+    <string name="unsupported_title">This phone cannot run the editor</string>
+    <string name="unsupported_old_vulkan">AbsentMotion draws the preview and the export with the graphics chip through Vulkan 1.1, and this phone only has an older Vulkan version.</string>
+    <string name="unsupported_no_vulkan">The phone\'s graphics driver would not start Vulkan, which AbsentMotion needs to draw the preview and the export.</string>
+    <string name="unsupported_driver_features">The phone\'s graphics driver is missing features AbsentMotion needs to draw the preview and the export.</string>
+    <string name="unsupported_skia">AbsentMotion\'s drawing engine does not work with this phone\'s graphics driver.</string>
+    <string name="unsupported_unknown">AbsentMotion\'s drawing engine could not start on this phone.</string>
+    <string name="unsupported_still_usable">You can still see your projects, settings and crash logs, and back up your projects. Editing and exporting need the drawing engine.</string>
+    <string name="unsupported_fact_android">Android version</string>
+    <string name="unsupported_fact_gpu">Graphics chip</string>
+    <string name="unsupported_fact_vulkan">Vulkan version</string>
+    <string name="unsupported_fact_unknown">Unknown</string>
+    <string name="unsupported_fact_none">None</string>
+    <string name="unsupported_requirements">Phone requirements</string>
+    <string name="unsupported_copy">Copy details</string>
+    <string name="unsupported_copied">Details copied</string>
+    <string name="export_error_encoder_busy">This phone\'s video encoder is busy or cannot make this size. Try a lower resolution or frame rate.</string>
+    <string name="export_error_codec_busy">The phone\'s video decoder or encoder stopped working. Close other apps that play or record video, then try again.</string>
+    <string name="export_note_software">The phone\'s video encoder is busy, so this export uses the slower software encoder.</string>
     <string name="export_error_draw_frame">Frame %1$s could not be drawn. Try exporting again.</string>
     <string name="export_error_draw_still">The engine could not draw the frame</string>
     <string name="export_error_no_sound">This project has no sound to export. Add music, a sound or a video with sound first.</string>

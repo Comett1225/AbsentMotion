@@ -7,6 +7,8 @@
 #include <android/native_window_jni.h>
 #include <jni.h>
 
+#include <vector>
+
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, "AMExport", __VA_ARGS__)
 
 namespace {
@@ -37,11 +39,32 @@ struct Copier {
     PFNEGLDESTROYIMAGEKHRPROC destroyImage = nullptr;
     PFNGLEGLIMAGETARGETTEXTURE2DOESPROC targetTexture = nullptr;
     PFNEGLPRESENTATIONTIMEANDROIDPROC presentationTime = nullptr;
+    struct Imported {
+        AHardwareBuffer* buffer;
+        EGLImageKHR image;
+    };
+    std::vector<Imported> images;
+
+    EGLImageKHR imageOf(AHardwareBuffer* buffer) {
+        for (const Imported& i : images) {
+            if (i.buffer == buffer) return i.image;
+        }
+        const EGLint attributes[] = {EGL_IMAGE_PRESERVED_KHR, EGL_TRUE, EGL_NONE};
+        EGLImageKHR image = createImage(display, EGL_NO_CONTEXT, EGL_NATIVE_BUFFER_ANDROID, clientBuffer(buffer), attributes);
+        if (image == EGL_NO_IMAGE_KHR) return image;
+        AHardwareBuffer_acquire(buffer);
+        images.push_back({buffer, image});
+        return image;
+    }
 
     bool current() { return eglMakeCurrent(display, surface, surface, context) == EGL_TRUE; }
     void release() { eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT); }
 
     ~Copier() {
+        for (const Imported& i : images) {
+            destroyImage(display, i.image);
+            AHardwareBuffer_release(i.buffer);
+        }
         if (display != EGL_NO_DISPLAY) {
             if (program && current()) {
                 glDeleteProgram(program);
@@ -118,8 +141,7 @@ bool setUp(Copier* c) {
 
 bool copy(Copier* c, AHardwareBuffer* buffer, int64_t presentNs) {
     if (!buffer || !c->current()) return false;
-    const EGLint imageAttributes[] = {EGL_IMAGE_PRESERVED_KHR, EGL_TRUE, EGL_NONE};
-    EGLImageKHR image = c->createImage(c->display, EGL_NO_CONTEXT, EGL_NATIVE_BUFFER_ANDROID, c->clientBuffer(buffer), imageAttributes);
+    EGLImageKHR image = c->imageOf(buffer);
     if (image == EGL_NO_IMAGE_KHR) {
         LOGE("encoder copy: eglCreateImageKHR failed (0x%x)", eglGetError());
         c->release();
@@ -139,7 +161,6 @@ bool copy(Copier* c, AHardwareBuffer* buffer, int64_t presentNs) {
     bool ok = eglSwapBuffers(c->display, c->surface) == EGL_TRUE;
     if (!ok) LOGE("encoder copy: eglSwapBuffers failed (0x%x)", eglGetError());
     glFinish();
-    c->destroyImage(c->display, image);
     c->release();
     return ok;
 }

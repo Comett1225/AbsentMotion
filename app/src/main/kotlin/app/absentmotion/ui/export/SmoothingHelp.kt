@@ -36,7 +36,7 @@ internal fun SmoothingHelp(color: Color, modifier: Modifier = Modifier) {
     val capabilities = DeviceCapabilities.of(LocalContext.current)
     val report by capabilities.report.collectAsState()
     LaunchedEffect(capabilities) { capabilities.load() }
-    val speed = report?.let { phoneCheckResult(it, Build.VERSION.MEDIA_PERFORMANCE_CLASS).speed }
+    val speed = report?.let { phoneCheckResult(it, if (Build.VERSION.SDK_INT >= 31) Build.VERSION.MEDIA_PERFORMANCE_CLASS else 0).speed }
     Column(modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         if (speed != null) {
             val name = when (speed) {

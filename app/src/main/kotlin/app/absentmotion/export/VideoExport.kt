@@ -1,5 +1,6 @@
 package app.absentmotion.export
 
+import app.absentmotion.platform.alias
 import app.absentmotion.platform.hardware
 import app.absentmotion.platform.intOr
 import android.hardware.HardwareBuffer
@@ -13,6 +14,7 @@ import android.util.Log
 import android.view.Surface
 import app.absentmotion.R
 import app.absentmotion.engine.EngineThread
+import app.absentmotion.i18n.UiText
 import app.absentmotion.i18n.txt
 import app.absentmotion.model.Scene
 import kotlinx.coroutines.Dispatchers
@@ -26,6 +28,8 @@ import java.io.File
 import java.io.FileDescriptor
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import java.util.concurrent.Executors
+import java.util.concurrent.Future
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
@@ -40,6 +44,8 @@ interface FloatMix {
 object ExportDebug {
     @Volatile var forceBuffers = false
     @Volatile var fakeFreeBytes = -1L
+    @Volatile var refuseHardware = false
+    @Volatile var failPlayers = 0
 }
 
 object ExportAudio {
@@ -56,33 +62,72 @@ private const val OpusLookaheadFrames = 312
 
 internal suspend fun exportVideo(
     engine: EngineThread, scene: Scene, xml: String, s: ExportSettings, out: FileDescriptor, audio: AudioMix?,
-    hotAtStart: Boolean = false, pauseMs: () -> Long = { 0L }, progress: (Float) -> Unit,
+    hotAtStart: Boolean = false, pauseMs: () -> Long = { 0L }, note: (UiText) -> Unit = {}, progress: (Float) -> Unit,
 ) {
     val (width, height) = exportSize(scene, s.shortSide, even = true)
     val frames = frameCount(scene, s.fps)
-    val mime = s.codec.mime
-    val info = MediaCodecList(MediaCodecList.REGULAR_CODECS).codecInfos
-        .filter { it.isEncoder && mime in it.supportedTypes }.sortedByDescending { it.hardware }
-        .firstOrNull { it.getCapabilitiesForType(mime).videoCapabilities!!.isSizeSupported(width, height) }
-        ?: throw ExportError(txt(R.string.export_error_cannot_encode, s.codec.label, "${width}x$height"))
-    val caps = info.getCapabilitiesForType(mime)
-    val high = mime == MediaFormat.MIMETYPE_VIDEO_AVC && caps.profileLevels.any { it.profile == MediaCodecInfo.CodecProfileLevel.AVCProfileHigh }
-    fun format(profile: Boolean) = MediaFormat.createVideoFormat(mime, width, height).apply {
-        setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface)
-        setInteger(MediaFormat.KEY_BIT_RATE, videoBitrate(width, height, s).coerceIn(caps.videoCapabilities!!.bitrateRange.lower, caps.videoCapabilities!!.bitrateRange.upper))
-        setInteger(MediaFormat.KEY_FRAME_RATE, s.fps)
-        setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1)
-        setInteger(MediaFormat.KEY_COLOR_STANDARD, if (fixedBt601(info)) MediaFormat.COLOR_STANDARD_BT601_NTSC else MediaFormat.COLOR_STANDARD_BT709)
-        setInteger(MediaFormat.KEY_COLOR_RANGE, MediaFormat.COLOR_RANGE_LIMITED)
-        setInteger(MediaFormat.KEY_COLOR_TRANSFER, MediaFormat.COLOR_TRANSFER_SDR_VIDEO)
-        if (profile) setInteger(MediaFormat.KEY_PROFILE, MediaCodecInfo.CodecProfileLevel.AVCProfileHigh)
-        if (hotAtStart) {
-            setInteger(MediaFormat.KEY_PRIORITY, 1)
-            setInteger(MediaFormat.KEY_OPERATING_RATE, s.fps)
-        }
+    engine.holdVideo()?.join()
+    try {
+        encode(engine, scene, xml, s, out, audio, width, height, frames, hotAtStart, pauseMs, note, progress)
+    } finally {
+        withContext(NonCancellable) { engine.releaseVideo()?.join() }
     }
+}
 
-    val encoder = MediaCodec.createByCodecName(info.name)
+internal fun openVideoEncoder(s: ExportSettings, width: Int, height: Int, hot: Boolean, note: (UiText) -> Unit = {}, bitrate: Int? = null): MediaCodec {
+    val mime = s.codec.mime
+    val infos = MediaCodecList(MediaCodecList.REGULAR_CODECS).codecInfos
+        .filter { it.isEncoder && !it.alias && mime in it.supportedTypes && it.getCapabilitiesForType(mime).videoCapabilities?.isSizeSupported(width, height) == true }
+        .sortedByDescending { it.hardware }
+    if (infos.isEmpty()) throw ExportError(txt(R.string.export_error_cannot_encode, s.codec.label, "${width}x$height"))
+    var last: Throwable? = null
+    for (info in infos) {
+        if (ExportDebug.refuseHardware && info.hardware) continue
+        val caps = info.getCapabilitiesForType(mime)
+        val rated = runCatching { caps.videoCapabilities!!.getSupportedFrameRatesFor(width, height).upper }.getOrDefault(0.0)
+        val high = mime == MediaFormat.MIMETYPE_VIDEO_AVC && caps.profileLevels.any { it.profile == MediaCodecInfo.CodecProfileLevel.AVCProfileHigh }
+        val codec = try { MediaCodec.createByCodecName(info.name) } catch (e: Exception) {
+            last = e
+            Log.w("AMExport", "cannot create ${info.name}", e)
+            continue
+        }
+        for (bestEffort in if (hot || rated < 2.0 * s.fps) listOf(true, false) else listOf(false, true)) for (profile in if (high) listOf(true, false) else listOf(false)) {
+            try {
+                codec.configure(encoderFormat(info, caps, s, width, height, profile, bestEffort, hot, bitrate), null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
+                Log.i("AMExport", "encoding with ${info.name}${if (profile) " (High)" else ""}${if (bestEffort) " at best effort" else ""}; rated for ${rated.toInt()} fps at ${width}x$height")
+                if (!info.hardware && infos.first().hardware) note(txt(R.string.export_note_software))
+                return codec
+            } catch (e: Exception) {
+                last = e
+                Log.w("AMExport", "${info.name} refused ${width}x$height at ${s.fps} fps${if (profile) " (High)" else ""}${if (bestEffort) " at best effort" else ""}", e)
+                runCatching { codec.reset() }
+            }
+        }
+        codec.release()
+    }
+    throw ExportError(txt(R.string.export_error_encoder_busy), last)
+}
+
+private fun encoderFormat(info: MediaCodecInfo, caps: MediaCodecInfo.CodecCapabilities, s: ExportSettings, width: Int, height: Int,
+                          profile: Boolean, bestEffort: Boolean, hot: Boolean, bitrate: Int?) = MediaFormat.createVideoFormat(s.codec.mime, width, height).apply {
+    val bitrates = caps.videoCapabilities!!.bitrateRange
+    setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface)
+    setInteger(MediaFormat.KEY_BIT_RATE, (bitrate ?: videoBitrate(width, height, s)).coerceIn(bitrates.lower, bitrates.upper))
+    setInteger(MediaFormat.KEY_FRAME_RATE, s.fps)
+    setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1)
+    setInteger(MediaFormat.KEY_COLOR_STANDARD, if (fixedBt601(info)) MediaFormat.COLOR_STANDARD_BT601_NTSC else MediaFormat.COLOR_STANDARD_BT709)
+    setInteger(MediaFormat.KEY_COLOR_RANGE, MediaFormat.COLOR_RANGE_LIMITED)
+    setInteger(MediaFormat.KEY_COLOR_TRANSFER, MediaFormat.COLOR_TRANSFER_SDR_VIDEO)
+    if (profile) setInteger(MediaFormat.KEY_PROFILE, MediaCodecInfo.CodecProfileLevel.AVCProfileHigh)
+    if (bestEffort) setInteger(MediaFormat.KEY_PRIORITY, 1)
+    if (hot) setInteger(MediaFormat.KEY_OPERATING_RATE, s.fps)
+}
+
+private suspend fun encode(
+    engine: EngineThread, scene: Scene, xml: String, s: ExportSettings, out: FileDescriptor, audio: AudioMix?, width: Int, height: Int, frames: Int,
+    hotAtStart: Boolean, pauseMs: () -> Long, note: (UiText) -> Unit, progress: (Float) -> Unit,
+) {
+    val encoder = openVideoEncoder(s, width, height, hotAtStart, note)
     val stop = AtomicBoolean()
     val failure = AtomicReference<Throwable>()
     fun fail(t: Throwable) { failure.compareAndSet(null, t); stop.set(true) }
@@ -91,16 +136,9 @@ internal suspend fun exportVideo(
     val workers = ArrayList<Thread>()
     var surface: Surface? = null
     var audioEncoder: MediaCodec? = null
+    val spent = LongArray(3)
     fun worker(name: String, body: () -> Unit) { workers += thread(name = "am-export-$name") { try { body() } catch (t: Throwable) { fail(t) } } }
     try {
-        try {
-            encoder.configure(format(high), null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
-        } catch (e: MediaCodec.CodecException) {
-            if (!high) throw e
-            Log.w("AMExport", "${info.name} refused the High profile, encoding with its default profile", e)
-            encoder.reset()
-            encoder.configure(format(false), null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
-        }
         val input = encoder.createInputSurface().also { surface = it }
         encoder.start()
         worker("video") { drain(encoder, mux, videoDone, BASE_US) }
@@ -114,16 +152,23 @@ internal suspend fun exportVideo(
             worker("audio-in") { feedAudio(coder, audio, totalUs, stop, delay, sound.effectiveRate, sound.channels) }
         }
         engine.exportSession(xml, s.smoothing, s.fps) {
-            suspend fun eachFrame(draw: suspend (k: Int, presentNs: Long) -> Unit) {
+            suspend fun eachFrame(flush: () -> Unit = {}, draw: suspend (k: Int, presentNs: Long) -> Unit) {
+                val started = System.nanoTime()
                 for (k in 0 until frames) {
                     currentCoroutineContext().ensureActive()
                     failure.get()?.let { throw it }
+                    val drawing = System.nanoTime()
                     draw(k, (BASE_US + k * 1_000_000L / s.fps) * 1000)
+                    spent[0] += System.nanoTime() - drawing
                     progress((k + 1f) / frames * 0.98f)
                     if (k % 30 == 0) ensureStorage()
                     pauseMs().takeIf { it > 0 }?.let { delay(it) }
                 }
+                flush()
                 encoder.signalEndOfInputStream()
+                spent[2] = System.nanoTime() - started
+                fun perFrame(ns: Long) = "%.1f".format(java.util.Locale.ROOT, ns / 1e6 / frames.coerceAtLeast(1))
+                Log.i("AMExport", "$frames frames in ${spent[2] / 1_000_000} ms; per frame: ${perFrame(spent[2])} ms, drawing ${perFrame(spent[0] - spent[1])} ms, waiting for copies ${perFrame(spent[1])} ms")
             }
             val buffers = ExportDebug.forceBuffers || Build.VERSION.SDK_INT < 33 || !stampsPresentTime()
             Log.i("AMExport", "rendering $frames frames at ${width}x$height through ${if (buffers) "encoder buffers" else "the swapchain"}")
@@ -148,19 +193,35 @@ internal suspend fun exportVideo(
                     writer.close()
                 }
             } else if (buffers) {
-                val frame = HardwareBuffer.create(width, height, HardwareBuffer.RGBA_8888, 1,
-                    HardwareBuffer.USAGE_GPU_COLOR_OUTPUT or HardwareBuffer.USAGE_GPU_SAMPLED_IMAGE)
+                val frame = Array(2) { HardwareBuffer.create(width, height, HardwareBuffer.RGBA_8888, 1,
+                    HardwareBuffer.USAGE_GPU_COLOR_OUTPUT or HardwareBuffer.USAGE_GPU_SAMPLED_IMAGE) }
+                val copier = Executors.newSingleThreadExecutor { Thread(it, "am-export-copy") }
+                val copies = arrayOfNulls<Future<Boolean>>(2)
+                fun copied(slot: Int, k: Int) {
+                    val done = copies[slot] ?: return
+                    copies[slot] = null
+                    val copying = System.nanoTime()
+                    val ok = runCatching { done.get() }.getOrDefault(false)
+                    spent[1] += System.nanoTime() - copying
+                    exportCheck(ok) { txt(R.string.export_error_draw_frame, k.toString()) }
+                }
                 try {
                     EncoderCopy(input).use { copy ->
-                        eachFrame { k, presentNs ->
-                            exportCheck(renderInto(frame, frameTimeMs(scene, s.fps, k)) && copy.copy(frame, presentNs)) {
-                                txt(R.string.export_error_draw_frame, k.toString())
+                        try {
+                            eachFrame({ copied(frames % 2, frames - 2); copied((frames - 1) % 2, frames - 1) }) { k, presentNs ->
+                                val slot = k % 2
+                                copied(slot, k - 2)
+                                exportCheck(renderInto(frame[slot], frameTimeMs(scene, s.fps, k))) { txt(R.string.export_error_draw_frame, k.toString()) }
+                                copies[slot] = copier.submit<Boolean> { copy.copy(frame[slot], presentNs) }
                             }
+                        } finally {
+                            copies.forEach { runCatching { it?.get() } }
                         }
                     }
                 } finally {
+                    copier.shutdown()
                     releaseBuffers()
-                    frame.close()
+                    frame.forEach { it.close() }
                 }
             } else {
                 val target = attach(input)

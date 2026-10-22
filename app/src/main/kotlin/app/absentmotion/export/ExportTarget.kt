@@ -57,7 +57,7 @@ class StorageFullException : java.io.IOException() {
     override val message: String get() = AppText.get(R.string.export_storage_full)
 }
 
-class ExportError(val text: UiText) : IllegalStateException() {
+class ExportError(val text: UiText, cause: Throwable? = null) : IllegalStateException(cause) {
     override val message: String get() = AppText.get(text)
 }
 
