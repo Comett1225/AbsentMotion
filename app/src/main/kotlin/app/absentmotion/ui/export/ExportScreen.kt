@@ -880,8 +880,11 @@ private fun <T> Segments(options: List<Choice<T>>, selected: T, label: @Composab
                 Modifier.weight(1f).fillMaxHeight().clip(RoundedCornerShape(4.dp)).background(fill).clickable { c.reason?.let(onReason) ?: onPick(c.value) },
                 contentAlignment = Alignment.Center,
             ) {
-                Text(label(c.value), Modifier.alpha(if (c.enabled) 1f else Dimmed).padding(horizontal = 2.dp), color = text, fontWeight = FontWeight.Medium, maxLines = 1, style = Mixed,
-                    autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(9.sp, size))
+                Row(Modifier.alpha(if (c.enabled) 1f else Dimmed), verticalAlignment = Alignment.CenterVertically) {
+                    if (c.locked) Icon(ExportIcons.Lock, null, Modifier.size(13.dp), tint = text)
+                    Text(label(c.value), Modifier.padding(horizontal = 2.dp), color = text, fontWeight = FontWeight.Medium, maxLines = 1, style = Mixed,
+                        autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(9.sp, size))
+                }
             }
         }
     }

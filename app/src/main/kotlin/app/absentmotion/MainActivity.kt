@@ -1,5 +1,6 @@
 package app.absentmotion
 
+import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
@@ -65,7 +66,9 @@ import app.absentmotion.model.ShapeCatalog
 import app.absentmotion.ui.editor.EditorScreen
 import app.absentmotion.ui.export.ExportScreen
 import app.absentmotion.ui.home.HomeScreen
+import app.absentmotion.ui.home.LowMemoryNotice
 import app.absentmotion.i18n.Ltr
+import app.absentmotion.i18n.inAppLanguage
 import app.absentmotion.ui.onboarding.FirstRun
 import app.absentmotion.ui.onboarding.Onboarding
 import app.absentmotion.ui.home.OpenFailedDialog
@@ -120,6 +123,8 @@ class MainActivity : ComponentActivity() {
     private var importFailed by mutableStateOf<String?>(null)
     private var fontOffer by mutableStateOf<Pair<EditorState, List<String>>?>(null)
     private val fontsDeclined = HashSet<String>()
+
+    override fun attachBaseContext(newBase: Context) = super.attachBaseContext(newBase.inAppLanguage())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val started = SystemClock.elapsedRealtime()
@@ -191,6 +196,7 @@ class MainActivity : ComponentActivity() {
                             TemplateEditor(id, engine, settings, onClose = { editingTemplate = null }, onContinue = ::projectFromTemplate)
                         }
                         exportingFromList?.let { ExportScreen(it, 0, engine, fromProjectList = true, outdated) { exportingFromList = null } }
+                        LowMemoryNotice()
                     }
                 } else {
                     Box(Modifier.fillMaxSize()) {

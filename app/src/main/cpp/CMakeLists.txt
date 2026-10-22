@@ -11,7 +11,13 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(SKIA_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../../third_party/skia)
-set(SKIA_OUT ${SKIA_DIR}/out/android-arm64)
+if(AM_COMPAT)
+    set(SKIA_OUT ${SKIA_DIR}/out/android-arm64-compat)
+    add_compile_definitions(__ANDROID_UNAVAILABLE_SYMBOLS_ARE_WEAK__)
+    add_compile_options(-Werror=unguarded-availability)
+else()
+    set(SKIA_OUT ${SKIA_DIR}/out/android-arm64)
+endif()
 
 set(RNNOISE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../../third_party/rnnoise)
 add_library(rnnoise STATIC
@@ -31,6 +37,9 @@ set_target_properties(motion_tracker PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_compile_options(motion_tracker PRIVATE -O3 -fvisibility=hidden)
 
 add_library(amengine SHARED preview.cpp camera.cpp drawing.cpp effects.cpp easing.cpp engine.cpp interpolation.cpp jni.cpp model.cpp motion.cpp scene.cpp shapes.cpp styles.cpp text.cpp textanim.cpp xml.cpp denoise_jni.cpp audio_dsp.cpp audio_fx_jni.cpp)
+if(AM_COMPAT)
+    target_sources(amengine PRIVATE encoder_copy.cpp)
+endif()
 target_include_directories(amengine PRIVATE ${SKIA_DIR} ${SKIA_DIR}/third_party/externals/expat/expat/lib)
 target_compile_definitions(amengine PRIVATE
     NDEBUG SK_GANESH SK_GRAPHITE SK_VULKAN SK_GL SK_ENABLE_PRECOMPILE SK_DISABLE_TRACING

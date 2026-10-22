@@ -1400,4 +1400,10 @@
     <string name="preset_numbered">Preset %1$s</string>
     <string name="recovery_your_project">iyong proyekto</string>
     <string name="caption_layer_name">Kapsyon %1$s</string>
+    <string name="tier_needs_latest">Kailangan ang Android 13 (Latest na bersyon)</string>
+    <string name="feature_flow_high">Optical flow (Mataas)</string>
+    <string name="about_version_compatible">Bersyon %1$s Compatible</string>
+    <string name="about_compatible_note">Ito ang Compatible na bersyon para sa Android 9 hanggang 12. Hindi kasama: %1$s. Kailangan nila ang Android 13 at ang Latest na bersyon.</string>
+    <string name="low_memory_title">Mababang memory</string>
+    <string name="low_memory_body">May %1$s GB na memory ang teleponong ito. Gumagana nang pinakamahusay ang AbsentMotion sa 3 GB o higit pa: sa mahahabang proyekto, malalaking bidyo, at maraming epekto, maaaring bumagal o magsara ang app.</string>
 </resources>

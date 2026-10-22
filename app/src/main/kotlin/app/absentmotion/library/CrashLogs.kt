@@ -1,5 +1,8 @@
 package app.absentmotion.library
 
+import androidx.annotation.RequiresApi
+import android.content.SharedPreferences
+import app.absentmotion.platform.readAtMost
 import android.app.ActivityManager
 import android.app.ApplicationExitInfo
 import android.os.Build
@@ -141,7 +144,7 @@ object CrashLogs {
     }
 
     private fun publish() {
-        runCatching { activities?.setProcessStateSummary(doing.take(100).encodeToByteArray()) }
+        if (Build.VERSION.SDK_INT >= 30) runCatching { activities?.setProcessStateSummary(doing.take(100).encodeToByteArray()) }
     }
 
     fun list(context: Context): List<CrashEntry> = crashEntries(File(context.filesDir, "crashlogs"))
@@ -154,6 +157,13 @@ object CrashLogs {
         val app = context.applicationContext
         val prefs = app.getSharedPreferences("crashlogs", Context.MODE_PRIVATE)
         val dir = File(app.filesDir, "crashlogs")
+        if (Build.VERSION.SDK_INT >= 30) recordExits(app, prefs, dir)
+        val shown = prefs.getLong("shown", 0L)
+        return crashEntries(dir).firstOrNull { it.time > shown }
+    }
+
+    @RequiresApi(30)
+    private fun recordExits(app: Context, prefs: SharedPreferences, dir: File) {
         val infos = runCatching { app.getSystemService(ActivityManager::class.java).getHistoricalProcessExitReasons(app.packageName, 0, 0) }.getOrDefault(emptyList())
         val seen = prefs.getLong("exitsSeen", -1L)
         if (seen >= 0) {
@@ -164,8 +174,6 @@ object CrashLogs {
             }
         }
         prefs.edit().putLong("exitsSeen", maxOf(seen, infos.maxOfOrNull { it.timestamp } ?: 0L, if (seen < 0) System.currentTimeMillis() else 0L)).apply()
-        val shown = prefs.getLong("shown", 0L)
-        return crashEntries(dir).firstOrNull { it.time > shown }
     }
 
     fun markShown(context: Context, time: Long) {
@@ -182,11 +190,12 @@ object CrashLogs {
         else -> "Exit $reason"
     }
 
+    @RequiresApi(30)
     private fun details(info: ApplicationExitInfo): String = buildString {
         append("Exit: ").append(kindOf(info.reason)).append(", importance ").append(info.importance).append('\n')
         info.description?.let { append("Description: ").append(it).append('\n') }
         if (info.pss > 0 || info.rss > 0) append("Memory: pss ").append(info.pss / 1024).append(" MB, rss ").append(info.rss / 1024).append(" MB\n")
-        val trace = runCatching { info.traceInputStream?.use { it.readNBytes(4 * MaxDetail) } }.getOrNull()
+        val trace = runCatching { info.traceInputStream?.use { it.readAtMost(4 * MaxDetail) } }.getOrNull()
         if (trace != null && trace.isNotEmpty()) {
             append('\n')
             append(if (info.reason == ApplicationExitInfo.REASON_ANR) trace.decodeToString().take(MaxDetail) else readableStrings(trace, MaxDetail))

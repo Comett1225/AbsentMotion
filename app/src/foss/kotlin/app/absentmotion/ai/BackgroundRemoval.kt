@@ -3,7 +3,6 @@ package app.absentmotion.ai
 import app.absentmotion.R
 import app.absentmotion.i18n.AppText
 import android.content.Context
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
@@ -120,7 +119,7 @@ internal object BackgroundRemoval {
     private fun modelFile(context: Context): File {
         val target = File(context.filesDir, MODEL_ASSET)
         val stamp = File(context.filesDir, "$MODEL_ASSET.stamp")
-        val version = "${context.packageManager.getPackageInfo(context.packageName, PackageManager.PackageInfoFlags.of(0)).lastUpdateTime}"
+        val version = "${context.packageManager.getPackageInfo(context.packageName, 0).lastUpdateTime}"
         if (needsCopy(target, stamp, version)) {
             val temp = File(context.filesDir, "$MODEL_ASSET.tmp")
             context.assets.open(MODEL_ASSET).use { input -> temp.outputStream().use { input.copyTo(it) } }

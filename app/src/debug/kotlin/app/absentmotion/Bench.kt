@@ -18,7 +18,8 @@ internal suspend fun runBench(activity: Activity, state: EditorState, seconds: I
     val thread = HandlerThread("am-bench").apply { start() }
     val kinds = mapOf("ui" to FrameMetrics.TOTAL_DURATION, "uiInput" to FrameMetrics.INPUT_HANDLING_DURATION,
         "uiAnimation" to FrameMetrics.ANIMATION_DURATION, "uiLayout" to FrameMetrics.LAYOUT_MEASURE_DURATION,
-        "uiDraw" to FrameMetrics.DRAW_DURATION, "uiSync" to FrameMetrics.SYNC_DURATION, "uiGpu" to FrameMetrics.GPU_DURATION)
+        "uiDraw" to FrameMetrics.DRAW_DURATION, "uiSync" to FrameMetrics.SYNC_DURATION) +
+        if (android.os.Build.VERSION.SDK_INT >= 31) mapOf("uiGpu" to FrameMetrics.GPU_DURATION) else emptyMap()
     val ui = kinds.keys.associateWith { ArrayList<Double>() }
     val listener = Window.OnFrameMetricsAvailableListener { _, metrics, _ ->
         synchronized(ui) { for ((name, kind) in kinds) ui.getValue(name) += metrics.getMetric(kind) / 1e6 }

@@ -1,5 +1,6 @@
 package app.absentmotion.media
 
+import android.os.Build
 import android.util.Log
 import android.content.ContentResolver
 import android.content.ContentUris
@@ -206,9 +207,17 @@ suspend fun mediaThumbnail(context: Context, uri: Uri): Bitmap? = withContext(Di
     val key = uri.toString()
     thumbnailLocks[key.hashCode().mod(thumbnailLocks.size)].withLock {
         cachedMediaThumbnail(uri) ?: try {
-            context.contentResolver.loadThumbnail(uri, Size(272, 272), null).also { thumbnailCache.put(key, it) }
+            thumbnail(context.contentResolver, uri)?.also { thumbnailCache.put(key, it) }
         } catch (_: Exception) { null } catch (_: OutOfMemoryError) { null }
     }
+}
+
+private fun thumbnail(resolver: ContentResolver, uri: Uri): Bitmap? {
+    if (Build.VERSION.SDK_INT >= 29) return resolver.loadThumbnail(uri, Size(272, 272), null)
+    val id = ContentUris.parseId(uri)
+    @Suppress("DEPRECATION")
+    return if ("video" in uri.pathSegments) MediaStore.Video.Thumbnails.getThumbnail(resolver, id, MediaStore.Video.Thumbnails.MINI_KIND, null)
+        else MediaStore.Images.Thumbnails.getThumbnail(resolver, id, MediaStore.Images.Thumbnails.MINI_KIND, null)
 }
 
 suspend fun imageDeclaration(context: Context, uri: Uri): MediaDeclaration? = withContext(Dispatchers.IO) {

@@ -1,5 +1,6 @@
 package app.absentmotion.platform
 
+import android.os.Build
 import app.absentmotion.R
 import app.absentmotion.export.exportCheck
 import app.absentmotion.i18n.txt
@@ -36,7 +37,7 @@ object ActivityResultContracts {
 fun <I, O> rememberLauncherForActivityResult(contract: androidx.activity.result.contract.ActivityResultContract<I, O>, onResult: (O) -> Unit) =
     androidx.activity.compose.rememberLauncherForActivityResult(contract, onResult)
 fun versionName(context: Context): String =
-    runCatching { context.packageManager.getPackageInfo(context.packageName, android.content.pm.PackageManager.PackageInfoFlags.of(0)).versionName }.getOrNull().orEmpty()
+    runCatching { context.packageManager.getPackageInfo(context.packageName, 0).versionName }.getOrNull().orEmpty()
 @androidx.compose.runtime.Composable
 fun appVersion(): String {
     val context = LocalContext.current
@@ -127,8 +128,7 @@ fun encodeRgba(pixels: ByteArray, width: Int, height: Int, settings: app.absentm
     val out = java.io.ByteArrayOutputStream(pixels.size / 4)
     val format = when (kind) {
         app.absentmotion.export.ImageKind.Jpeg -> android.graphics.Bitmap.CompressFormat.JPEG
-        app.absentmotion.export.ImageKind.Webp -> android.graphics.Bitmap.CompressFormat.WEBP_LOSSY
-        app.absentmotion.export.ImageKind.WebpLossless -> android.graphics.Bitmap.CompressFormat.WEBP_LOSSLESS
+        app.absentmotion.export.ImageKind.Webp, app.absentmotion.export.ImageKind.WebpLossless -> webpFormat(kind == app.absentmotion.export.ImageKind.WebpLossless)
         else -> android.graphics.Bitmap.CompressFormat.PNG
     }
     bitmap.compress(format, if (kind.lossy) settings.imageQuality else 100, out)
@@ -271,3 +271,10 @@ fun DialogStatusBarIcons(darkIcons: Boolean) {
 }
 
 fun sheetDialogProperties() = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)
+
+@Suppress("DEPRECATION")
+private fun webpFormat(lossless: Boolean) = when {
+    Build.VERSION.SDK_INT < 30 -> android.graphics.Bitmap.CompressFormat.WEBP
+    lossless -> android.graphics.Bitmap.CompressFormat.WEBP_LOSSLESS
+    else -> android.graphics.Bitmap.CompressFormat.WEBP_LOSSY
+}

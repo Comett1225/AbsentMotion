@@ -1400,4 +1400,10 @@
     <string name="preset_numbered">प्रीसेट %1$s</string>
     <string name="recovery_your_project">आपका प्रोजेक्ट</string>
     <string name="caption_layer_name">कैप्शन %1$s</string>
+    <string name="tier_needs_latest">Android 13 (Latest वर्ज़न) चाहिए</string>
+    <string name="feature_flow_high">ऑप्टिकल फ़्लो हाई</string>
+    <string name="about_version_compatible">वर्ज़न %1$s Compatible</string>
+    <string name="about_compatible_note">यह Android 9 से 12 के लिए Compatible वर्ज़न है। छोड़े गए: %1$s। इनके लिए Android 13 और Latest वर्ज़न चाहिए।</string>
+    <string name="low_memory_title">कम मेमरी</string>
+    <string name="low_memory_body">इस फ़ोन में %1$s GB मेमरी है। AbsentMotion 3 GB या ज़्यादा के साथ सबसे अच्छा काम करता है: लंबे प्रोजेक्ट, बड़े वीडियो और कई इफ़ेक्ट धीमे हो सकते हैं या ऐप बंद कर सकते हैं।</string>
 </resources>

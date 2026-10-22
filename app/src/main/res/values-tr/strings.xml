@@ -1400,4 +1400,10 @@
     <string name="preset_numbered">Ön ayar %1$s</string>
     <string name="recovery_your_project">projeniz</string>
     <string name="caption_layer_name">Altyazı %1$s</string>
+    <string name="tier_needs_latest">Android 13 (Latest sürümü) gerekir</string>
+    <string name="feature_flow_high">Optik akış High</string>
+    <string name="about_version_compatible">Sürüm %1$s Compatible</string>
+    <string name="about_compatible_note">Bu, Android 9 ile 12 için Compatible sürümüdür. Dışarıda bırakılanlar: %1$s. Bunlar için Android 13 ve Latest sürümü gerekir.</string>
+    <string name="low_memory_title">Düşük bellek</string>
+    <string name="low_memory_body">Bu telefonda %1$s GB bellek var. AbsentMotion en iyi 3 GB veya daha fazlasıyla çalışır: uzun projeler, büyük videolar ve çok sayıda efekt yavaşlayabilir veya uygulamayı kapatabilir.</string>
 </resources>

@@ -1,5 +1,7 @@
 package app.absentmotion.export
 
+import app.absentmotion.platform.hardware
+import app.absentmotion.platform.alias
 import android.content.Context
 import android.media.MediaCodecInfo
 import android.media.MediaCodecList
@@ -219,7 +221,7 @@ internal val ProbeSizes = VideoResolutions.map { it.shortSide }.flatMap { side -
 }
 
 internal fun analyseEncoders(): List<EncoderCaps> = MediaCodecList(MediaCodecList.REGULAR_CODECS).codecInfos
-    .filter { it.isEncoder && !it.isAlias }
+    .filter { it.isEncoder && !it.alias }
     .flatMap { info -> info.supportedTypes.mapNotNull { mime -> runCatching { encoderCaps(info, mime) }.getOrNull() } }
 
 private fun encoderCaps(info: MediaCodecInfo, mime: String): EncoderCaps? {
@@ -227,7 +229,7 @@ private fun encoderCaps(info: MediaCodecInfo, mime: String): EncoderCaps? {
     caps.videoCapabilities?.let { v ->
         val sizes = ProbeSizes.filter { (w, h) -> v.isSizeSupported(w, h) }.map { (w, h) -> SizePoint(w, h, v.getSupportedFrameRatesFor(w, h).upper) }
         return EncoderCaps(
-            info.name, mime, info.isHardwareAccelerated,
+            info.name, mime, info.hardware,
             v.supportedWidths.lower..v.supportedWidths.upper, v.supportedHeights.lower..v.supportedHeights.upper,
             v.widthAlignment, v.heightAlignment, sizes,
             v.bitrateRange.lower..v.bitrateRange.upper, caps.profileLevels.map { it.profile }.distinct(),
@@ -235,7 +237,7 @@ private fun encoderCaps(info: MediaCodecInfo, mime: String): EncoderCaps? {
     }
     caps.audioCapabilities?.let { a ->
         val rates = a.supportedSampleRates?.toList() ?: a.supportedSampleRateRanges.flatMap { r -> listOf(44100, 48000).filter { it in r.lower..r.upper } }
-        return EncoderCaps(info.name, mime, info.isHardwareAccelerated, bitrates = a.bitrateRange.lower..a.bitrateRange.upper,
+        return EncoderCaps(info.name, mime, info.hardware, bitrates = a.bitrateRange.lower..a.bitrateRange.upper,
             sampleRates = rates, maxChannels = a.maxInputChannelCount)
     }
     return null

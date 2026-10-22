@@ -19,6 +19,7 @@ android {
         versionCode = appVersion.getProperty("versionCode").toInt()
         versionName = appVersion.getProperty("versionName")
         ndk { abiFilters += "arm64-v8a" }
+        buildConfigField("boolean", "COMPATIBLE", "false")
         externalNativeBuild {
             cmake { arguments += listOf("-DANDROID_STL=c++_static") }
         }
@@ -69,12 +70,29 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    buildFeatures { compose = true }
+    buildFeatures {
+        compose = true
+        buildConfig = true
+    }
 
     flavorDimensions += "distribution"
     productFlavors {
         create("play") { dimension = "distribution" }
         create("foss") { dimension = "distribution" }
+        create("compat") {
+            dimension = "distribution"
+            minSdk = 28
+            buildConfigField("boolean", "COMPATIBLE", "true")
+            externalNativeBuild { cmake { arguments += "-DAM_COMPAT=ON" } }
+        }
+    }
+
+    sourceSets {
+        named("compat") {
+            kotlin.directories += "src/foss/kotlin"
+            assets.directories += "src/foss/assets"
+        }
+        named("testCompat") { kotlin.directories += "src/testFoss/kotlin" }
     }
 }
 

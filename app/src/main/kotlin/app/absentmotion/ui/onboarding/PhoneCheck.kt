@@ -14,7 +14,7 @@ data class FormatSupport(val name: String, val maxShortSide: Int, val hardware: 
 enum class PhoneSpeed { Fast, Good, Basic }
 
 suspend fun runPhoneCheck(context: Context, engine: EngineThread?, progress: (Float) -> Unit): PhoneCheckResult =
-    phoneCheckResult(DeviceCapabilities.of(context).runCheckNow(engine, progress), Build.VERSION.MEDIA_PERFORMANCE_CLASS)
+    phoneCheckResult(DeviceCapabilities.of(context).runCheckNow(engine, progress), if (Build.VERSION.SDK_INT >= 31) Build.VERSION.MEDIA_PERFORMANCE_CLASS else 0)
 
 private const val RealTime1080p = 1080.0 * 1920 * 30
 

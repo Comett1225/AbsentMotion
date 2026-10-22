@@ -1,5 +1,6 @@
 package app.absentmotion.ui.editor
 
+import app.absentmotion.platform.readAtMost
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -152,7 +153,7 @@ internal suspend fun EditorState.importSvgFile(context: Context, uri: Uri) {
             val name = context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { c ->
                 if (c.moveToFirst()) c.getString(0) else null
             } ?: uri.lastPathSegment.orEmpty()
-            val bytes = context.contentResolver.openInputStream(uri)?.use { it.readNBytes(MaxSvgBytes + 1) } ?: throw java.io.IOException("unreadable")
+            val bytes = context.contentResolver.openInputStream(uri)?.use { it.readAtMost(MaxSvgBytes + 1) } ?: throw java.io.IOException("unreadable")
             if (bytes.size > MaxSvgBytes) throw java.io.IOException("too large")
             importSvg(String(bytes, Charsets.UTF_8), name.substringAfterLast('/').removeSuffix(".svg").removeSuffix(".SVG"), host, start, end)
         }

@@ -1377,4 +1377,10 @@
     <string name="preset_numbered">Preset %1$s</string>
     <string name="recovery_your_project">dự án của bạn</string>
     <string name="caption_layer_name">Phụ đề %1$s</string>
+    <string name="tier_needs_latest">Cần Android 13 (bản Latest)</string>
+    <string name="feature_flow_high">Optical flow cao</string>
+    <string name="about_version_compatible">Phiên bản %1$s Compatible</string>
+    <string name="about_compatible_note">Đây là bản Compatible cho Android 9 đến 12. Không bao gồm: %1$s. Chúng cần Android 13 và bản Latest.</string>
+    <string name="low_memory_title">Bộ nhớ thấp</string>
+    <string name="low_memory_body">Điện thoại này có %1$s GB bộ nhớ. AbsentMotion hoạt động tốt nhất với 3 GB trở lên: dự án dài, video lớn và nhiều hiệu ứng có thể bị chậm hoặc khiến ứng dụng thoát.</string>
 </resources>

@@ -1,5 +1,6 @@
 package app.absentmotion.ui.home
 
+import app.absentmotion.platform.readAtMost
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -90,7 +91,7 @@ internal object Updates {
             connection.setRequestProperty("Accept", "application/vnd.github+json")
             connection.setRequestProperty("User-Agent", "AbsentMotion")
             if (connection.responseCode != HttpURLConnection.HTTP_OK) return null
-            return parseRelease(connection.inputStream.use { it.readNBytes(MAX_BYTES) }.decodeToString())
+            return parseRelease(connection.inputStream.use { it.readAtMost(MAX_BYTES) }.decodeToString())
         } finally {
             connection.disconnect()
         }
