@@ -49,6 +49,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.sp
@@ -80,7 +81,7 @@ import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
 
 @Composable
-fun Preview(state: EditorState, modifier: Modifier = Modifier) {
+fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 0.dp) {
     var size by remember { mutableStateOf(IntSize.Zero) }
     val scene = state.scene
     val editingText = state.panel == EditorPanel.EditText
@@ -88,8 +89,10 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier) {
     val fixedView = state.drawing != null || editingText
     val viewZoom = if (fixedView) 1f else state.canvasZoom
     val viewPan = if (fixedView) Offset.Zero else state.canvasPan
-    val scale = if (size.width == 0) 1f else min(size.width.toFloat() / scene.width, size.height.toFloat() / scene.height) * viewZoom
-    val dx = size.width / 2 - (scene.width / 2 - viewPan.x) * scale
+    val free = size.width - with(LocalDensity.current) { reserveEnd.toPx() }.coerceAtMost(size.width / 2f)
+    val fit = if (size.width == 0) 1f else min(free / scene.width, size.height.toFloat() / scene.height)
+    val scale = fit * viewZoom
+    val dx = min((size.width / 2).toFloat(), free - scene.width * fit / 2f) - (scene.width / 2 - viewPan.x) * scale
     val dy = size.height / 2 - (scene.height / 2 - viewPan.y) * scale
     val divisor = state.settings.previewQuality.divisor
     val quality = 1f / divisor

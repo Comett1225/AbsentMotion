@@ -34,6 +34,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -91,14 +93,15 @@ import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
 
 @Composable
-fun LayerTools(state: EditorState, modifier: Modifier = Modifier) {
+fun LayerTools(state: EditorState, modifier: Modifier = Modifier, side: Boolean = false) {
     val drawn = state.selected?.shape?.isEmpty() == true
     var properties by remember(state.selectedId) { mutableStateOf(false) }
+    var moving by remember(state.selectedId) { mutableStateOf(false) }
     if (properties) {
         ElementProperties(state, { properties = false }, modifier)
         return
     }
-    Column(modifier.background(Am.Panel).padding(start = 62.px, top = 42.px, end = 62.px)) {
+    Column(modifier.background(Am.Panel).then(if (side) Modifier.verticalScroll(rememberScrollState()) else Modifier).padding(start = 62.px, top = 42.px, end = 62.px)) {
         Row(Modifier.fillMaxWidth().height(107.px)) {
             SmallTool(PanelIcons.Speed, stringResource(R.string.a11y_speed), Modifier.width(183.px), ToolShape, enabled = state.selected?.mediaFill?.video == true || state.selected?.kind == "audio") { state.panel = EditorPanel.Speed }
             Spacer(Modifier.width(17.px))
@@ -121,65 +124,46 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier) {
             SmallTool(if (!sound || (state.selected?.gain ?: 1f) <= 0f) PanelIcons.AudioMuted else AudioIcons.Speaker, stringResource(R.string.volume_volume), Modifier.width(183.px), ToolShape, enabled = sound) { state.volumeOpen = true }
         }
         Spacer(Modifier.height(28.px))
-        if (state.selected?.kind == "audio") {
-            Row(Modifier.fillMaxWidth().height(160.px), Arrangement.spacedBy(17.px)) {
-                ToolButton(Presets, Modifier.weight(1f)) { openPresets(state) }
-                ToolButton(Effects, Modifier.weight(1f)) { openEffectBrowser(state, "audio") }
-                ToolButton(VoiceFilters, Modifier.weight(1f)) { openEffectBrowser(state, "voice") }
+        val kind = state.selected?.kind
+        if (kind == "camera" && moving) state.selectedId?.let { CameraMovesSheet(state, it) { moving = false } }
+        val presets = Tile(Presets) { openPresets(state) }
+        val effects = Tile(Effects) { state.effectIndex = -1; state.panel = EditorPanel.Effects }
+        val transform = Tile(MoveTransform) { state.panel = EditorPanel.MoveTransform }
+        val blending = Tile(Blending) { state.panel = EditorPanel.Blending }
+        val rows = when (kind) {
+            "audio" -> listOf(
+                listOf(presets, Tile(Effects) { openEffectBrowser(state, "audio") }, Tile(VoiceFilters) { openEffectBrowser(state, "voice") }),
+                listOf(Tile(AiTools) { openEffectBrowser(state, "ai") }, null, null),
+            )
+            "camera" -> listOf(
+                listOf(Tile(CameraOptions) { state.panel = EditorPanel.Camera }, transform, effects),
+                listOf(presets, Tile(CameraMoves) { state.playing = false; moving = true }),
+            )
+            "model" -> listOf(
+                listOf(Tile(ModelOptions) { state.panel = EditorPanel.Model }, blending),
+                listOf(transform, presets, effects),
+            )
+            else -> {
+                val edit = when {
+                    kind == "text" -> Tile(EditText) { state.panel = EditorPanel.EditText }
+                    kind == "embedScene" -> if (state.selected?.link != null) Tile(ElementPropsButton) { properties = true } else null
+                    kind == "drawing" -> Tile(EditDrawing) { state.editDrawing() }
+                    drawn -> Tile(EditPoints, enabled = state.selected?.contours != null) { state.editPoints() }
+                    else -> Tile(EditShape) { state.panel = EditorPanel.EditShape }
+                }
+                listOf(
+                    listOf(Tile(ColorFill) { state.panel = EditorPanel.ColorFill }, Tile(BorderShadow) { state.panel = EditorPanel.BorderShadow }, blending),
+                    listOfNotNull(transform, edit, presets, effects),
+                )
             }
-            Spacer(Modifier.height(17.px))
-            Row(Modifier.fillMaxWidth().height(160.px), Arrangement.spacedBy(17.px)) {
-                ToolButton(AiTools, Modifier.weight(1f)) { openEffectBrowser(state, "ai") }
-                Spacer(Modifier.weight(1f))
-                Spacer(Modifier.weight(1f))
-            }
-            return@Column
         }
-        if (state.selected?.kind == "camera") {
-            var moving by remember(state.selectedId) { mutableStateOf(false) }
-            if (moving) state.selectedId?.let { CameraMovesSheet(state, it) { moving = false } }
+        val shown = if (side) rows.flatten().filterNotNull().chunked(2) else rows
+        shown.forEachIndexed { i, row ->
+            if (i > 0) Spacer(Modifier.height(17.px))
             Row(Modifier.fillMaxWidth().height(160.px), Arrangement.spacedBy(17.px)) {
-                ToolButton(CameraOptions, Modifier.weight(1f)) { state.panel = EditorPanel.Camera }
-                ToolButton(MoveTransform, Modifier.weight(1f)) { state.panel = EditorPanel.MoveTransform }
-                ToolButton(Effects, Modifier.weight(1f)) { state.effectIndex = -1; state.panel = EditorPanel.Effects }
+                for (tile in row) if (tile == null) Spacer(Modifier.weight(1f)) else ToolButton(tile.tool, Modifier.weight(1f), tile.enabled, tile.onClick)
+                if (side) repeat(2 - row.size) { Spacer(Modifier.weight(1f)) }
             }
-            Spacer(Modifier.height(17.px))
-            Row(Modifier.fillMaxWidth().height(160.px), Arrangement.spacedBy(17.px)) {
-                ToolButton(Presets, Modifier.weight(1f)) { openPresets(state) }
-                ToolButton(CameraMoves, Modifier.weight(1f)) { state.playing = false; moving = true }
-            }
-            return@Column
-        }
-        if (state.selected?.kind == "model") {
-            Row(Modifier.fillMaxWidth().height(160.px), Arrangement.spacedBy(17.px)) {
-                ToolButton(ModelOptions, Modifier.weight(1f)) { state.panel = EditorPanel.Model }
-                ToolButton(Blending, Modifier.weight(1f)) { state.panel = EditorPanel.Blending }
-            }
-            Spacer(Modifier.height(17.px))
-            Row(Modifier.fillMaxWidth().height(160.px), Arrangement.spacedBy(17.px)) {
-                ToolButton(MoveTransform, Modifier.weight(1f)) { state.panel = EditorPanel.MoveTransform }
-                ToolButton(Presets, Modifier.weight(1f)) { openPresets(state) }
-                ToolButton(Effects, Modifier.weight(1f)) { state.effectIndex = -1; state.panel = EditorPanel.Effects }
-            }
-            return@Column
-        }
-        Row(Modifier.fillMaxWidth().height(160.px), Arrangement.spacedBy(17.px)) {
-            ToolButton(ColorFill, Modifier.weight(1f)) { state.panel = EditorPanel.ColorFill }
-            ToolButton(BorderShadow, Modifier.weight(1f)) { state.panel = EditorPanel.BorderShadow }
-            ToolButton(Blending, Modifier.weight(1f)) { state.panel = EditorPanel.Blending }
-        }
-        Spacer(Modifier.height(17.px))
-        Row(Modifier.fillMaxWidth().height(160.px), Arrangement.spacedBy(17.px)) {
-            ToolButton(MoveTransform, Modifier.weight(1f)) { state.panel = EditorPanel.MoveTransform }
-            if (state.selected?.kind == "text") ToolButton(EditText, Modifier.weight(1f)) { state.panel = EditorPanel.EditText }
-            else if (state.selected?.kind == "embedScene") {
-                if (state.selected?.link != null) ToolButton(ElementPropsButton, Modifier.weight(1f)) { properties = true }
-            }
-            else if (state.selected?.kind == "drawing") ToolButton(EditDrawing, Modifier.weight(1f)) { state.editDrawing() }
-            else if (drawn) ToolButton(EditPoints, Modifier.weight(1f), enabled = state.selected?.contours != null) { state.editPoints() }
-            else ToolButton(EditShape, Modifier.weight(1f)) { state.panel = EditorPanel.EditShape }
-            ToolButton(Presets, Modifier.weight(1f)) { openPresets(state) }
-            ToolButton(Effects, Modifier.weight(1f)) { state.effectIndex = -1; state.panel = EditorPanel.Effects }
         }
     }
 }
@@ -200,6 +184,8 @@ private val Square = androidx.compose.foundation.shape.CornerSize(0.dp)
 private val ToolLabel get() = Am.OnDarkDim
 
 private class Tool(@StringRes val label: Int, val icon: ImageVector, val iconY: Float)
+
+private class Tile(val tool: Tool, val enabled: Boolean = true, val onClick: () -> Unit)
 
 private val ColorFill = Tool(R.string.layer_tool_fill_color, PanelIcons.PaintBucket, 18.1f)
 private val BorderShadow = Tool(R.string.layer_tool_frame_shadow, PanelIcons.BorderShadow, 18.1f)

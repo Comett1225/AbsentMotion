@@ -40,6 +40,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -410,7 +411,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
     val bar: @Composable () -> Unit = { ExportBar(enabled = phase == Phase.Idle, blocked = blocked, onClick = ::start) }
 
     Box(Modifier.fillMaxSize().background(Am.SheetBg).pointerInput(Unit) {}.enterFade(12.dp)) {
-        Column(Modifier.fillMaxSize()) {
+        Column(Modifier.align(Alignment.TopCenter).widthIn(max = SheetMaxWidth).fillMaxSize()) {
             TitleBar(stringResource(R.string.export_title), ExportIcons.Close, stringResource(R.string.cancel), onClose)
             info()
             ScrollArea(Modifier.weight(1f), Am.SheetBg, PaddingValues(15.dp), 10.dp) {
@@ -451,7 +452,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
             val shown = lastPage
             BoxWithConstraints(Modifier.fillMaxSize().presenceScrim(Color(0x66000000)).clickable(indication = null, interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }) { page = null }) {
                 Column(
-                    Modifier.align(Alignment.BottomCenter).fillMaxWidth().heightIn(max = maxHeight * 0.82f).presence(slide = 1f, fade = false)
+                    Modifier.align(Alignment.BottomCenter).widthIn(max = SheetMaxWidth).fillMaxWidth().heightIn(max = maxHeight * 0.82f).presence(slide = 1f, fade = false)
                         .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)).background(Am.Card)
                         .clickable(indication = null, interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }) {}
                         .navigationBarsPadding(),
@@ -709,11 +710,15 @@ private fun ResolutionDropdown(shortSide: Int, choices: List<Choice<app.absentmo
 
 @Composable
 private fun PageFrame(title: String, onBack: () -> Unit, content: @Composable ColumnScope.() -> Unit) {
-    Column(Modifier.fillMaxSize().presence(slide = 1f, fade = false).background(Am.SheetBg).pointerInput(Unit) {}) {
-        TitleBar(title, ExportIcons.Back, stringResource(R.string.export_back), onBack)
-        content()
+    Box(Modifier.fillMaxSize().presence(slide = 1f, fade = false).background(Am.SheetBg).pointerInput(Unit) {}, contentAlignment = Alignment.TopCenter) {
+        Column(Modifier.widthIn(max = SheetMaxWidth).fillMaxSize()) {
+            TitleBar(title, ExportIcons.Back, stringResource(R.string.export_back), onBack)
+            content()
+        }
     }
 }
+
+private val SheetMaxWidth = 720.dp
 
 @Composable
 private fun VideoPage(

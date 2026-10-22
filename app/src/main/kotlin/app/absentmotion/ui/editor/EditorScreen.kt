@@ -144,14 +144,14 @@ internal fun LowerPanels(state: EditorState, addLibrary: AddLibrary, top: Boolea
         val lower = Modifier.align(if (top) Alignment.TopCenter else Alignment.BottomCenter).fillMaxWidth().pointerInput(Unit) {}
         val tall = top && !state.easingOpen && (state.panel == EditorPanel.Blending || state.panel == EditorPanel.Effects)
         when {
-            state.addOpen -> AddPopup(state, if (top) lower.fillMaxHeight() else lower.height(244.dp), addLibrary)
+            state.addOpen -> AddPopup(state, lower.height(244.dp), addLibrary)
             MultiSelect.active -> MultiBar(state, lower.height(48.dp))
             state.selectedId == null -> {
                 TransitionButton(state, Modifier.align(Alignment.BottomStart))
                 AddButton(state, Modifier.align(Alignment.BottomEnd))
             }
             state.volumeOpen && state.panel == EditorPanel.Tools -> key(state.selectedId) { VolumePanel(state, lower.height(PanelHeight)) }
-            state.panel == EditorPanel.Tools -> LayerTools(state, lower.height(PanelHeight))
+            state.panel == EditorPanel.Tools -> LayerTools(state, if (top) lower else lower.height(PanelHeight), side = top)
             else -> LayerPanel(state, if (tall) lower.fillMaxHeight() else lower.height(PanelHeight))
         }
     }

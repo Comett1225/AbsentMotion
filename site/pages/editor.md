@@ -4,7 +4,7 @@ group: Interface
 order: 3
 summary: The top bar, the preview, the play bar and how the pieces fit together.
 ---
-The editor has four parts, from top to bottom: the **top bar**, the **preview**, the **play bar** and the **timeline** with its tools. On a wide tablet the preview moves to the left and the tools to a column on the right.
+The editor has four parts, from top to bottom: the **top bar**, the **preview**, the **play bar** and the **timeline** with its tools. On a wide tablet held sideways the preview keeps the whole width, and the tools of a selected clip open in a narrow column on the right edge.
 
 ![The editor: a photo with a title, and the timeline with keyframe diamonds](img/editor.webp)
 
