@@ -209,7 +209,7 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
             if (!exact && System.nanoTime() < retryAt) return@withLock
             fun obsolete(): Boolean = !exact && latest.let { now ->
                 paused || stopped || ((!request.playing || now?.playing != true) && now !== request) ||
-                    now?.scene != request.scene || visible(now).none { it.layer.id == id }
+                    now.scene != request.scene || visible(now).none { it.layer.id == id }
             }
             fun abandoned(): Boolean = !exact && latest.let { now -> now == null || paused || stopped || visible(now).none { it.layer.id == id } }
             if (obsolete()) return@withLock

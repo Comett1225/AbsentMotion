@@ -101,7 +101,7 @@ internal fun CameraMovesSheet(state: EditorState, id: Long, onClose: () -> Unit)
         }
         DurationLine(ms, CAMERA_MOVE_MIN_MS, CAMERA_MOVE_MAX_MS, { ms = it; chosen?.let { move -> apply(move, "camera-move-duration") } }, state::endGesture)
         val short = span?.let { (from, to) -> to - from < ms } == true
-        Text(if (short && span != null) stringResource(R.string.camera_moves_shortened, seconds(span.second - span.first)) else "",
+        Text(if (short) stringResource(R.string.camera_moves_shortened, seconds(span.second - span.first)) else "",
             Modifier.fillMaxWidth().height(40.dp), color = Warning, fontSize = 13.sp, lineHeight = 17.sp, maxLines = 2)
     }
 }

@@ -31,7 +31,7 @@ internal class VideoDecoder(private val context: Context, private val uri: Strin
     private var positioned = false
     private var queued = false
     private var flushable = false
-    private lateinit var format: MediaFormat
+    private var format: MediaFormat
     private var hdr = false
     var colorStandard = 0
         private set
