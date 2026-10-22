@@ -7,6 +7,8 @@ import app.absentmotion.ai.AiModel
 import app.absentmotion.ai.AiNative
 import app.absentmotion.ai.AiNet
 import app.absentmotion.ai.AiSmooth
+import app.absentmotion.ai.model
+import app.absentmotion.ai.padding
 import app.absentmotion.export.SmoothLevel
 import app.absentmotion.ai.aiMarks
 import app.absentmotion.ai.withoutAiMark
@@ -75,7 +77,8 @@ internal suspend fun checkAi(context: Context, gpu: Boolean) {
             val ran = SystemClock.elapsedRealtime()
             val ai = psnr(mid, truth)
             val mixed = psnr(blend(a, b), truth)
-            Log.i(TAG, "ok=${ai > mixed + 3} smooth $level gpu=${smooth.onGpu} open=${opened - started}ms run=${ran - opened}ms psnr ai=${"%.2f".format(java.util.Locale.US, ai)} blend=${"%.2f".format(java.util.Locale.US, mixed)}")
+            val small = AiNet.open(context, level.model, gpu = gpu).use { net -> psnr(net.interpolate(a, b, w, h, 0.5f, level.padding, w * h / 4), truth) }
+            Log.i(TAG, "ok=${ai > mixed + 3 && small > mixed + 3} smooth $level gpu=${smooth.onGpu} open=${opened - started}ms run=${ran - opened}ms psnr ai=${"%.2f".format(java.util.Locale.US, ai)} quarter=${"%.2f".format(java.util.Locale.US, small)} blend=${"%.2f".format(java.util.Locale.US, mixed)}")
         }
     }
     Log.i(TAG, "done")

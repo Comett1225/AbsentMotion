@@ -14,12 +14,18 @@ internal val SmoothLevel.model: AiModel get() = when (this) {
 
 internal val SmoothLevel.padding: Int get() = if (this == SmoothLevel.Low) 128 else 64
 
-class AiSmooth private constructor(private val net: AiNet, val level: SmoothLevel) : Closeable {
+internal fun flowPixels(level: SmoothLevel, ramBytes: Long): Int {
+    val perMegapixel = if (level == SmoothLevel.High) 1_100_000_000L else 600_000_000L
+    val allowed = if (ramBytes > 0) (ramBytes / 12).coerceIn(250_000_000L, 700_000_000L) else 250_000_000L
+    return (allowed * 1_000_000 / perMegapixel).toInt()
+}
+
+class AiSmooth private constructor(private val net: AiNet, val level: SmoothLevel, private val maxPixels: Int) : Closeable {
     val onGpu: Boolean get() = net.onGpu
 
     suspend fun between(first: IntArray, second: IntArray, width: Int, height: Int, t: Float, output: IntArray = IntArray(width * height)): IntArray {
         require(t > 0f && t < 1f && first.size >= width * height && second.size >= width * height)
-        return net.interpolate(first, second, width, height, t, level.padding, output)
+        return net.interpolate(first, second, width, height, t, level.padding, maxPixels, output)
     }
 
     override fun close() = net.close()
@@ -33,10 +39,11 @@ class AiSmooth private constructor(private val net: AiNet, val level: SmoothLeve
 
         suspend fun open(context: Context, level: SmoothLevel): AiSmooth {
             AiDevice.probeGpu(context, level.model)
-            return AiSmooth(AiNet.open(context, level.model), level)
+            return AiSmooth(AiNet.open(context, level.model), level, flowPixels(level, aiRam(context)))
         }
 
-        internal fun open(context: Context, level: SmoothLevel, gpu: Boolean): AiSmooth = AiSmooth(AiNet.open(context, level.model, gpu = gpu), level)
+        internal fun open(context: Context, level: SmoothLevel, gpu: Boolean): AiSmooth =
+            AiSmooth(AiNet.open(context, level.model, gpu = gpu), level, flowPixels(level, aiRam(context)))
 
         internal fun gmac(level: SmoothLevel, frames: Double, width: Int, height: Int): Double = level.model.gmacPerMegapixel * frames * width * height / 1e6
 

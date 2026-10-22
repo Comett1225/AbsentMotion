@@ -47,7 +47,7 @@ internal object AiNative {
     external fun nativeCancel(handle: Long)
     external fun nativeClose(handle: Long)
     external fun nativeUpscale(handle: Long, input: IntArray, width: Int, height: Int, netScale: Int, outScale: Int, tile: Int, overlap: Int, output: IntArray): Int
-    external fun nativeInterpolate(handle: Long, first: IntArray, second: IntArray, width: Int, height: Int, t: Float, padding: Int, output: IntArray): Int
+    external fun nativeInterpolate(handle: Long, first: IntArray, second: IntArray, width: Int, height: Int, t: Float, padding: Int, maxPixels: Int, output: IntArray): Int
 }
 
 internal class AiNet private constructor(private val handle: Long, private val gpuApp: Context?) : Closeable {
@@ -59,8 +59,9 @@ internal class AiNet private constructor(private val handle: Long, private val g
         return output
     }
 
-    suspend fun interpolate(first: IntArray, second: IntArray, width: Int, height: Int, t: Float, padding: Int, output: IntArray = IntArray(width * height)): IntArray {
-        checkResult(blocking { AiNative.nativeInterpolate(handle, first, second, width, height, t, padding, output) })
+    suspend fun interpolate(first: IntArray, second: IntArray, width: Int, height: Int, t: Float, padding: Int, maxPixels: Int = Int.MAX_VALUE,
+                            output: IntArray = IntArray(width * height)): IntArray {
+        checkResult(blocking { AiNative.nativeInterpolate(handle, first, second, width, height, t, padding, maxPixels, output) })
         return output
     }
 

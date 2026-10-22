@@ -42,6 +42,9 @@ internal class AiEstimate(val seconds: Double, val verdict: AiVerdict, val measu
     val extra: String get() = if (verdict == AiVerdict.Fine) AppText.get(R.string.ai_smooth_adds, aiDuration(seconds)) else text
 }
 
+internal fun aiRam(context: Context): Long =
+    runCatching { ActivityManager.MemoryInfo().also { context.getSystemService(ActivityManager::class.java).getMemoryInfo(it) }.totalMem }.getOrDefault(0L)
+
 internal fun aiDuration(seconds: Double): String {
     val minutes = ceil(seconds / 60).toInt().coerceAtLeast(1)
     return if (minutes < 90) AppText.get(R.string.ai_minutes, minutes.toString()) else AppText.get(R.string.ai_hours, (minutes / 60.0).roundToInt().toString())
@@ -164,7 +167,7 @@ internal object AiDevice {
     }
 
     suspend fun phone(context: Context): AiPhone {
-        val ram = runCatching { ActivityManager.MemoryInfo().also { context.getSystemService(ActivityManager::class.java).getMemoryInfo(it) }.totalMem }.getOrDefault(0L)
+        val ram = aiRam(context)
         val speed = runCatching { phoneCheckResult(DeviceCapabilities.of(context).load(), if (Build.VERSION.SDK_INT >= 31) Build.VERSION.MEDIA_PERFORMANCE_CLASS else 0).speed }.getOrDefault(PhoneSpeed.Basic)
         return withContext(Dispatchers.Default) { AiPhone(AiNative.loaded, AiNative.gpu, ram, speed, gpuOn(context)) }
     }
