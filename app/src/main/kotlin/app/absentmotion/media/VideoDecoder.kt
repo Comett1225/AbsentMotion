@@ -32,6 +32,7 @@ internal class VideoDecoder(private val context: Context, private val uri: Strin
     private var queued = false
     private var flushable = false
     private lateinit var format: MediaFormat
+    private var hdr = false
     var colorStandard = 0
         private set
     var colorRange = 0
@@ -56,6 +57,7 @@ internal class VideoDecoder(private val context: Context, private val uri: Strin
                 setOnImageAvailableListener({ source -> source.acquireNextImage()?.let { images.offer(it) } }, Handler(imageThread!!.looper))
             }
             format.setInteger(MediaFormat.KEY_ROTATION, 0)
+            hdr = format.requestSdr()
             codec = MediaCodec.createByCodecName(MediaCodecList(MediaCodecList.REGULAR_CODECS).findDecoderForFormat(format))
             codec!!.configure(format, reader!!.surface, null, 0)
             codec!!.start()
@@ -92,6 +94,7 @@ internal class VideoDecoder(private val context: Context, private val uri: Strin
                 if (index == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
                     flushable = true
                     readColor(decoder.outputFormat)
+                    if (hdr) Log.i("AMVideo", "HDR video $uri decodes with transfer ${decoder.outputFormat.getInteger(MediaFormat.KEY_COLOR_TRANSFER, 0)}")
                 }
                 if (index < 0) continue
                 flushable = true

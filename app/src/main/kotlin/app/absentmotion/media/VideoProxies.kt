@@ -181,8 +181,7 @@ private fun sourceInfo(context: Context, uri: String): SourceInfo {
         extractor.setDataSource(context, Uri.parse(uri), null)
         val format = videoTrack(extractor).second
         val (width, height) = visibleSize(format)
-        val transfer = format.getInteger(MediaFormat.KEY_COLOR_TRANSFER, 0)
-        return SourceInfo(width, height, transfer == MediaFormat.COLOR_TRANSFER_ST2084 || transfer == MediaFormat.COLOR_TRANSFER_HLG)
+        return SourceInfo(width, height, isHdrTransfer(format.getInteger(MediaFormat.KEY_COLOR_TRANSFER, 0)))
     } finally { extractor.release() }
 }
 
