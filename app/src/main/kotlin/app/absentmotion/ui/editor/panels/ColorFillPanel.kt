@@ -226,6 +226,7 @@ private fun PaletteView(state: EditorState, argb: Int, onColor: ((Int, key: Stri
                     Box(
                         Modifier.offset((4f + (i % 7) * 84.33f).px, (8 + (i / 7) * 84).px).size(76.px).clip(RoundedCornerShape(5.dp))
                             .background(Color(swatch or 0xFF000000.toInt()))
+                            .buttonLabel(colourText(swatch or 0xFF000000.toInt()))
                             .clickable {
                                 if (onColor != null) onColor((argb and 0xFF000000.toInt()) or swatch, null)
                                 else state.editSelected { it.withFill("color", (it.fillColor and 0xFF000000.toInt()) or swatch) }
