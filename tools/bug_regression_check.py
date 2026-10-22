@@ -19,6 +19,7 @@ class ToolRegressions(unittest.TestCase):
         result = subprocess.run([sys.executable, str(ROOT / 'tools/gen_fonts.py'), '--check'], capture_output=True, text=True)
         self.assertEqual(0, result.returncode, result.stdout + result.stderr)
 
+    @unittest.skipUnless((ROOT / 'tools/publish_forbidden.txt').exists(), 'tools/publish_forbidden.txt is private and not in this checkout')
     def test_relative_apk_is_resolved_from_the_callers_directory(self):
         with tempfile.TemporaryDirectory() as folder:
             with zipfile.ZipFile(Path(folder) / 'fixture.apk', 'w') as apk:
