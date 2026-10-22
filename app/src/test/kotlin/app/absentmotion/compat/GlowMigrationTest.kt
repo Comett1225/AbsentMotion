@@ -49,6 +49,6 @@ class GlowMigrationTest {
         assertEquals("#ffffffff", g.value("color"))
         assertEquals(2f, g.value("blendMode").toFloat(), 1e-4f)
         assertFalse(migration.migrate(result.scene).changed)
-        assertEquals(result.scene.toXml(), migration.migrate(result.scene).scene.toXml())
+        assertEquals(result.scene.node.toXml(), migration.migrate(result.scene).scene.node.toXml())
     }
 }
