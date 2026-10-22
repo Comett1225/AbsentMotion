@@ -135,7 +135,7 @@ class ExportTimes(context: Context) {
 
     fun estimateMs(
         s: ExportSettings, scene: Scene, probe: ProbeResult? = DeviceCapabilities.of(app).report.value?.probe,
-        thermal: ThermalLevel = ThermalLevel.Normal, encoders: DeviceReport? = null,
+        thermal: ThermalLevel = ThermalLevel.Normal, encoders: DeviceReport? = null, drawMs: Double? = null,
     ): Long? {
         val (w, h) = exportSize(scene, s.shortSide, even = true)
         val frames = frameCount(scene, s.fps)
@@ -143,6 +143,7 @@ class ExportTimes(context: Context) {
         val learned = estimateExportMs(history, probe, s.codec, w, h, s.fps, frames, s.interpolation)
         val proven = history.any { it.codec == s.codec && it.width == w && it.height == h && it.fps == s.fps && it.interpolation == s.interpolation }
         val floor = encoders?.takeIf { !proven }?.let { encoderFloorMs(it.encoderFor(s.codec, w, h), w, h, s.fps, frames) }
-        return listOfNotNull(learned, floor).maxOrNull()?.let { it + pauseMs(thermal) * frames }
+        val drawing = drawMs?.let { (DefaultSetupMs + frames * it).roundToLong() }
+        return listOfNotNull(learned, floor, drawing).maxOrNull()?.let { it + pauseMs(thermal) * frames }
     }
 }

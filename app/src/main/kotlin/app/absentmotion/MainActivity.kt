@@ -85,6 +85,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import app.absentmotion.ui.home.UnsupportedPhone
 import app.absentmotion.ui.home.UpdateAskDialog
 import app.absentmotion.ui.home.UpdateDialog
 import app.absentmotion.ui.home.Updates
@@ -123,6 +124,8 @@ class MainActivity : ComponentActivity() {
     private var importFailed by mutableStateOf<String?>(null)
     private var fontOffer by mutableStateOf<Pair<EditorState, List<String>>?>(null)
     private val fontsDeclined = HashSet<String>()
+    private var engineProblem by mutableStateOf<String?>(null)
+    private var problemShown by mutableStateOf(false)
 
     override fun attachBaseContext(newBase: Context) = super.attachBaseContext(newBase.inAppLanguage())
 
@@ -158,6 +161,7 @@ class MainActivity : ComponentActivity() {
             open(id)
         }
         TestHooks.start(this)
+        lifecycleScope.launch { engineWorks() }
         firstRun = FirstRun.of(settings, TestHooks.onboarding(intent).takeIf { savedInstanceState == null })
         importShared()
         setContent {
@@ -189,7 +193,7 @@ class MainActivity : ComponentActivity() {
                         HomeScreen(
                             store, settings, onOpen = ::open, onExport = ::exportFromList,
                             imported = imported, onImportShown = { imported = emptyList() }, onImportFile = { importUris(listOf(it)) },
-                            onTemplate = { editingTemplate = it }, onTemplateProject = ::projectFromTemplate,
+                            onTemplate = { id -> lifecycleScope.launch { if (engineWorks()) editingTemplate = id } }, onTemplateProject = ::projectFromTemplate,
                             onHistory = { historyFor = Triple(it.id, it.title, it.damaged) }, onCollect = ::collectMedia, changes = projectsChanged,
                         )
                         editingTemplate?.let { id ->
@@ -212,6 +216,7 @@ class MainActivity : ComponentActivity() {
                     }
                 }
                 if (opening) OpeningOverlay { openJob?.cancel() }
+                engineProblem?.takeIf { problemShown }?.let { UnsupportedPhone(it) { problemShown = false } }
                 openFailed?.let { id -> OpenFailedDialog({ openFailed = null; historyFor = Triple(id, "", false) }, outdated) { openFailed = null } }
                 importFailed?.let { reason ->
                     AlertDialog(
@@ -241,7 +246,8 @@ class MainActivity : ComponentActivity() {
                     VersionHistory(store, id, title, engine, onRestore = { restoreVersion(id, it) }, onDelete = if (damaged) { { deleteDamaged(id) } } else null) { historyFor = null }
                 }
                 val offer = recovered
-                if (open == null && !opening && (offer != null || crashed != null)) ClosedDialog(
+                if (problemShown) Unit
+                else if (open == null && !opening && (offer != null || crashed != null)) ClosedDialog(
                     crashed, offer?.title, outdated,
                     onRestore = { seenCrash(outdated != null); offer?.let { answerRecovery(it, true) } },
                     onDiscard = { seenCrash(outdated != null); offer?.let { answerRecovery(it, false) } },
@@ -404,7 +410,7 @@ class MainActivity : ComponentActivity() {
 
     private fun exportFromList(id: String) {
         if (opening) return
-        openJob = lifecycleScope.launch { exportingFromList = loadInBackground(id) }
+        openJob = lifecycleScope.launch { if (engineWorks()) exportingFromList = loadInBackground(id) }
     }
 
     private fun open(id: String) {
@@ -412,7 +418,15 @@ class MainActivity : ComponentActivity() {
         openJob = lifecycleScope.launch { openNow(id) }
     }
 
+    private suspend fun engineWorks(): Boolean {
+        val problem = engine.startProblem.await() ?: return true
+        engineProblem = problem
+        problemShown = true
+        return false
+    }
+
     internal suspend fun openNow(id: String): EditorState? {
+        if (!engineWorks()) return null
         val scene = loadInBackground(id) ?: return null
         cameFromEditor = true
         val saver = ProjectSaver(id, store, recovery, failed = { runOnUiThread { Toast.makeText(this, getString(R.string.home_save_project_failed), Toast.LENGTH_LONG).show() } })

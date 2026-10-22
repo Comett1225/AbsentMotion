@@ -61,6 +61,7 @@ import app.absentmotion.export.GifSample
 import app.absentmotion.export.frameCount
 import app.absentmotion.export.gifTimeMs
 import app.absentmotion.export.measureGif
+import app.absentmotion.export.measureVideoDraw
 import app.absentmotion.export.withMissing
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableLongStateOf
@@ -235,6 +236,11 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
     page?.let { if (it in SheetKinds) lastPage = it }
     if (phase !is Phase.Idle) lastPhase = phase
     var progress by remember { mutableFloatStateOf(0f) }
+    var note by remember { mutableStateOf<UiText?>(null) }
+    DisposableEffect(engine) {
+        engine.holdVideo()
+        onDispose { engine.releaseVideo() }
+    }
     val anyAudio = remember(scene) { ExportAudio.mixFor != null && AudioClip.of(scene).isNotEmpty() }
     val hasAudio by produceState(anyAudio, scene) {
         value = anyAudio
@@ -247,6 +253,15 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
             try { value = measureGif(engine, scene, gifSettings) }
             catch (e: CancellationException) { throw e }
             catch (e: Exception) { Log.w("AMExport", "Cannot sample GIF size", e) }
+        }
+    }
+    val videoSettings = settings.getValue(ExportKind.Video)
+    val drawMs by produceState<Double?>(null, kind, scene, videoSettings.shortSide, videoSettings.smoothing, phase is Phase.Idle) {
+        value = null
+        if (kind == ExportKind.Video && phase is Phase.Idle) {
+            try { value = measureVideoDraw(engine, scene, videoSettings) }
+            catch (e: CancellationException) { throw e }
+            catch (e: Exception) { Log.w("AMExport", "Cannot sample the drawing time", e) }
         }
     }
     var free by remember { mutableLongStateOf(freeSpace()) }
@@ -285,9 +300,9 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
     val better = remember(video, support, check) { betterChoice(video, support, check) }
     val warning = codecWarning(video, support)?.takeIf { it != acknowledged || support is Support.Unsupported }
     val current = settings.getValue(kind)
-    val timeMs = remember(kind, current, report, heat.level, estimate, phase is Phase.Idle, gifSample) {
+    val timeMs = remember(kind, current, report, heat.level, estimate, phase is Phase.Idle, gifSample, drawMs) {
         when (kind) {
-            ExportKind.Video -> times.estimateMs(current, scene, report?.probe, heat.level, report)
+            ExportKind.Video -> times.estimateMs(current, scene, report?.probe, heat.level, report, drawMs)
             ExportKind.Gif -> gifSample?.let { gifTimeMs(frameCount(scene, current.fps), it, times.estimateMs(current, scene, report?.probe, heat.level)) }
             ExportKind.Sequence -> times.estimateMs(current, scene, report?.probe, heat.level)
             ExportKind.Package -> estimate.coerceAtLeast(0) / 100_000
@@ -347,6 +362,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
         val alsoTemplate = asTemplate
         val name = safeName(scene.title) + " " + SimpleDateFormat("yyyyMMdd_HHmmss", Locale.ENGLISH).format(Date())
         progress = 0f
+        note = null
         val job = scope.launch {
             try {
                 var exported = scene
@@ -376,7 +392,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
                     }
                 }
                 if (aiLevel != null && !AiSmooth.installed(context, aiLevel)) AiSmooth.download(context, aiLevel) { progress = it }
-                val result = exporter.export(chosen, exported, s, frame, name) { progress = it }
+                val result = exporter.export(chosen, exported, s, frame, name, { note = it }) { progress = it }
                 phase = Phase.Done(chosen, result)
                 ExportSizes.key(chosen, s)?.let { key ->
                     withContext(Dispatchers.IO) {
@@ -468,7 +484,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
             val shown = lastPhase
             val background = animatedColor(if (shown is Phase.Done) Am.Navy else Scrim)
             Box(Modifier.fillMaxSize().presenceScrim(background).pointerInput(Unit) {}, contentAlignment = Alignment.Center) {
-                if (shown is Phase.Running) RunningPanel(shown, progress, heat.level) { shown.job.cancel() }
+                if (shown is Phase.Running) RunningPanel(shown, progress, heat.level, note) { shown.job.cancel() }
                 else if (shown is Phase.Done) DoneScreen(shown.kind, shown.result, { phase = Phase.Idle }) { share(context, shown) }
             }
         }
@@ -993,7 +1009,7 @@ private fun Chip(label: String, selected: Boolean, onClick: () -> Unit) {
 }
 
 @Composable
-private fun BoxScope.RunningPanel(p: Phase.Running, progress: Float, heat: ThermalLevel, onCancel: () -> Unit) {
+private fun BoxScope.RunningPanel(p: Phase.Running, progress: Float, heat: ThermalLevel, note: UiText?, onCancel: () -> Unit) {
     val percent = (progress * 100).toInt().coerceIn(0, 100)
     val left = if (progress > 0.02f) ((System.nanoTime() - p.startNs) / 1e9 * (1 - progress) / progress).toInt() else null
     Column(Modifier.align(Alignment.Center).presence(), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -1018,6 +1034,7 @@ private fun BoxScope.RunningPanel(p: Phase.Running, progress: Float, heat: Therm
         }
         Box(Modifier.width(300.dp).height(96.dp).padding(top = 16.dp), contentAlignment = Alignment.TopCenter) {
             exportHeatText(heat)?.let { Text(it.text(), color = Am.OnNavyAccent, fontSize = 21.sp, lineHeight = 27.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, maxLines = 3) }
+                ?: note?.let { Text(it.text(), color = Am.OnScrim, fontSize = 15.sp, lineHeight = 20.sp, textAlign = TextAlign.Center, maxLines = 4) }
         }
         TextButton(onCancel) { Text(stringResource(R.string.cancel), color = Am.OnNavyAccent, fontSize = 17.sp) }
     }

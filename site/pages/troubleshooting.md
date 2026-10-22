@@ -16,6 +16,10 @@ Android closes apps that use too much memory. This is most likely with 4K video,
 
 Settings, **Crash logs** shows what happened in one sentence for each crash. **Copy** copies it so you can send it with a bug report on [GitHub](@issues). Nothing is sent automatically.
 
+## This phone cannot run the editor
+
+AbsentMotion draws the preview and the export with the graphics chip through Vulkan 1.1. If the phone's graphics driver does not offer it, the app shows **This phone cannot run the editor** with the Android version and the graphics chip instead of closing. Your projects, settings, backups and crash logs still open. **Copy details** copies the facts so you can add them to a bug report on [GitHub](@issues). See [Requirements and versions](@requirements).
+
 ## Missing media
 
 A layer is empty, or export says **Media Missing**: a photo, video or audio file the project used is no longer on the phone.
@@ -35,6 +39,10 @@ If you export anyway, the layers that use missing files are left out.
 | **Slow export** | Only a software encoder is available or the hardware encoder is slow for these settings. Continue, or pick the suggested settings. |
 | The export slows down | The phone is warm. It slows down on purpose to cool. Let it cool, or take the phone out of its case. |
 | **Export Failed**, frame could not be drawn | Try again. If it repeats, lower the resolution or turn **Frame Interpolation** Off. |
+| **Export Failed**, the video encoder is busy or cannot make this size | Close other apps that play or record video, then try again. If it repeats, pick a lower resolution or frame rate. |
+| **Export Failed**, the video decoder or encoder stopped working | Another app is using the phone's video hardware. Close apps that play or record video and try again. |
+| "The phone's video encoder is busy, so this export uses the slower software encoder" | Nothing is wrong: the export takes longer. Close other video apps to get the faster hardware encoder back next time. |
+| The finished video shows a still picture with a play button | The phone could not play it right away. Tap the play button to try again; the file itself is saved. |
 | The exported video has no sound | A hidden layer, or a clip at 0 % volume, is silent. The line "Checked: ..." on the **Saved to storage** screen reports a missing sound track. |
 
 The export only runs while AbsentMotion is open and the screen is on. If you switch to another app, come back and check that it is still running.

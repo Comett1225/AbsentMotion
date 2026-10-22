@@ -30,6 +30,7 @@ import app.absentmotion.model.VideoTiming
 import app.absentmotion.model.videoTimeUs
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.SupervisorJob
@@ -64,6 +65,7 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
     @Volatile private var paused = false
     @Volatile private var closed = false
     @Volatile private var leadMs = 0.0
+    private val holds = java.util.concurrent.atomic.AtomicInteger()
     private data class Request(
         val scene: Scene, val timeMs: Int, val playing: Boolean,
         val smoothing: Smoothing = Smoothing(), val fps: Int = 0, val warm: Boolean = false,
@@ -72,7 +74,7 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
     init {
         scope.launch {
             for (request in requests) lock.withLock {
-                if (paused || request !== latest) return@withLock
+                if (paused || holds.get() > 0 || request !== latest) return@withLock
                 if (proxiesFor !== request.scene.node) {
                     proxiesFor = request.scene.node
                     request.scene.videoUris().forEach { VideoProxies.request(context, it) }
@@ -115,8 +117,9 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
         try {
             val request = Request(scene, timeMs, false, smoothing, fps)
             reconcile(request)
-            withContext(Dispatchers.IO) {
-                visible(request).map { layer -> async { sessions.getValue(layer.layer.id).exact(request, layer) } }.awaitAll()
+            val wanted = visible(request)
+            if (wanted.isNotEmpty()) withContext(Dispatchers.IO) {
+                wanted.map { layer -> async { sessions.getValue(layer.layer.id).exact(request, layer) } }.awaitAll()
             }
             draw()
         } finally {
@@ -126,6 +129,30 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
     }
 
     fun resumePreview() { latest?.let { requests.trySend(it) } }
+
+    fun hold(): Job {
+        holds.incrementAndGet()
+        VideoProxies.paused = true
+        return settle()
+    }
+
+    fun release(): Job {
+        holds.decrementAndGet()
+        return settle()
+    }
+
+    fun settle(): Job = scope.launch {
+        lock.withLock {
+            if (holds.get() > 0) {
+                sessions.values.forEach { it.close() }
+                sessions.clear()
+            } else {
+                VideoProxies.paused = false
+                proxiesFor = null
+                latest?.let { requests.trySend(it) }
+            }
+        }
+    }
 
     fun suspendPreview() {
         latest = null
@@ -150,6 +177,7 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
 
     suspend fun close() {
         closed = true; latest = null
+        if (holds.getAndSet(0) > 0) VideoProxies.paused = false
         requests.close()
         lock.withLock { sessions.values.forEach { it.close() }; sessions.clear() }
         scope.cancel()

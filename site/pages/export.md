@@ -109,7 +109,8 @@ One image per frame, saved in a folder named after the project as `frame_00001.p
 ## Check before and during export
 
 - **Storage.** The app needs the estimated size plus a safety margin. If that is more than the free space it says "Not enough" and stops; if less than 1 GB would be left it says "Low". If the phone runs out of space during the export, the export stops and the unfinished file is removed.
-- **Estimates.** The size and time estimates improve as you export: the app learns from your last exports. Before that, it uses the speed measured by the check on first start.
+- **Estimates.** The size and time estimates improve as you export: the app learns from your last exports. Before that, it uses the speed measured by the check on first start. The time estimate also draws a few frames of your project at the chosen size, so heavy effects such as VHS or blurs make it longer.
+- **Busy encoder.** If the phone's hardware video encoder is busy (for example another app holds it) or refuses the size and frame rate, the export first asks it to work at its own pace, then uses the slower software encoder and says so while it runs. Only if every encoder refuses does it stop, with "This phone's video encoder is busy or cannot make this size".
 - **Missing media.** If a project uses files that are not on the phone, the app lists them first ("Media Missing"). **Export Anyway** leaves those layers out.
 - **Heat.** If the phone gets warm, the export slows down on purpose by pausing a little after each frame, and the info line and a message say so. When it is very hot, it pauses between frames until it cools down.
 - **Keep the app open.** The export only runs while AbsentMotion is open. The screen stays on while it runs, and a note says "Keep AbsentMotion open and your screen on until the export has finished." There is no pause button; **Cancel** (or the Back button) stops it.
@@ -117,7 +118,7 @@ One image per frame, saved in a folder named after the project as `frame_00001.p
 
 ## When it is done
 
-The **Saved to storage** screen shows where the file is, plays it back (or shows the image or the pictures one by one), and has **Share Video**, **Share GIF**, **Share Image Sequence**, **Share Image**, **Share Audio** or **Share Project XML** to send it with Android's share sheet, and **OK**.
+The **Saved to storage** screen shows where the file is, plays it back (or shows the image or the pictures one by one; if the phone cannot play the video right now, it shows its first frame with a play button that tries again), and has **Share Video**, **Share GIF**, **Share Image Sequence**, **Share Image**, **Share Audio** or **Share Project XML** to send it with Android's share sheet, and **OK**.
 
 ## Keep a copy as a Template
 

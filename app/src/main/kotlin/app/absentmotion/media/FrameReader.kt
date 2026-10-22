@@ -41,13 +41,10 @@ internal class FrameReader(context: Context, uri: String) : Closeable {
             extractor.selectTrack(track)
             timestamps = VideoSources.timestamps(context, uri)
             readColor(format)
-            val name = MediaCodecList(MediaCodecList.REGULAR_CODECS).findDecoderForFormat(format) ?: throw ExportError(txt(R.string.media_error_no_decoder))
+            MediaCodecList(MediaCodecList.REGULAR_CODECS).findDecoderForFormat(format) ?: throw ExportError(txt(R.string.media_error_no_decoder))
             format.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Flexible)
             format.requestSdr()
-            val decoder = MediaCodec.createByCodecName(name)
-            codec = decoder
-            decoder.configure(format, null, null, 0)
-            decoder.start()
+            codec = openDecoder(format, null)
         } catch (e: Exception) {
             close()
             throw e

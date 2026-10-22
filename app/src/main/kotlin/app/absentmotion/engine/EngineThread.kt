@@ -14,6 +14,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
@@ -46,6 +48,10 @@ import java.nio.ByteBuffer
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
+
+object EngineDebug {
+    @Volatile var failStart: String? = null
+}
 
 class EngineThread(private val background: Int, context: Context? = null) {
     private val thread = HandlerThread("am-engine").apply { start() }
@@ -143,7 +149,7 @@ class EngineThread(private val background: Int, context: Context? = null) {
             engine = null
             lost = true
         }
-        return engine ?: NativeEngine(NativeEngine.Backend.GRAPHITE).also { next ->
+        return engine ?: startEngine().also { next ->
             engine = next
             scene?.let { next.setScene(fonts?.prepareText(it, textTime) ?: it) }
             effects.value.loadInto(next::loadEffect)
@@ -154,6 +160,25 @@ class EngineThread(private val background: Int, context: Context? = null) {
                 Handler(android.os.Looper.getMainLooper()).post(::refreshMedia)
             }
         }
+    }
+
+    @Volatile private var startFailure: String? = null
+
+    private fun startEngine(): NativeEngine {
+        startFailure?.let { throw IllegalStateException(it) }
+        return try {
+            EngineDebug.failStart?.let { throw IllegalStateException(it) }
+            NativeEngine(NativeEngine.Backend.GRAPHITE)
+        } catch (t: Throwable) {
+            val reason = t.message ?: t.toString()
+            Log.e("AMEngine", "the engine cannot start", t)
+            if (generation == 0 && !lost) startFailure = reason
+            throw t as? Exception ?: IllegalStateException(reason, t)
+        }
+    }
+
+    val startProblem: Deferred<String?> by lazy {
+        mediaScope.async { withContext(dispatcher) { if (!closed) runCatching { engine() }; startFailure } }
     }
 
     fun attach(surface: Surface) = handler.post {
@@ -231,6 +256,10 @@ class EngineThread(private val background: Int, context: Context? = null) {
             }
         }
     }
+
+    fun holdVideo(): Job? = videos?.hold()
+
+    fun releaseVideo(): Job? = videos?.release()
 
     fun setPlaying(value: Boolean) {
         playing = value
@@ -488,6 +517,7 @@ class EngineThread(private val background: Int, context: Context? = null) {
             } finally {
                 if (noPreview) videos?.suspendPreview()
                 else mediaScene?.let { videos?.update(it, requestedView?.timeMs ?: 0, playing) }
+                withContext(NonCancellable) { videos?.settle()?.join() }
                 requestRender()
             }
         }

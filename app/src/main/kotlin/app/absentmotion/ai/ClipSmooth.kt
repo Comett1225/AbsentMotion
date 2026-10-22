@@ -4,10 +4,9 @@ import android.content.Context
 import android.hardware.HardwareBuffer
 import android.media.ImageWriter
 import android.media.MediaCodec
-import android.media.MediaCodecInfo
-import android.media.MediaCodecList
 import android.media.MediaExtractor
 import android.media.MediaFormat
+import android.os.Build
 import android.view.Surface
 import androidx.core.net.toUri
 import app.absentmotion.R
@@ -18,6 +17,9 @@ import app.absentmotion.export.Mux
 import app.absentmotion.export.MuxerSink
 import app.absentmotion.export.SmoothLevel
 import app.absentmotion.export.Smoothing
+import app.absentmotion.export.EncoderCopy
+import app.absentmotion.export.ExportSettings
+import app.absentmotion.export.openVideoEncoder
 import app.absentmotion.export.drain
 import app.absentmotion.export.frameCount
 import app.absentmotion.export.frameTimeMs
@@ -132,22 +134,7 @@ internal object ClipSmooth {
 
     private suspend fun encode(engine: EngineThread, scene: Scene, plan: SmoothPlan, path: String, frames: Int, inMs: Int, smoothing: Smoothing,
                                sound: Pair<MediaExtractor, Int>?, done: suspend (Int) -> Unit) {
-        val mime = MediaFormat.MIMETYPE_VIDEO_AVC
-        val info = MediaCodecList(MediaCodecList.REGULAR_CODECS).codecInfos.filter { it.isEncoder && mime in it.supportedTypes }
-            .sortedByDescending { it.isHardwareAccelerated }.firstOrNull { it.getCapabilitiesForType(mime).videoCapabilities!!.isSizeSupported(plan.width, plan.height) }
-            ?: error(AppText.get(R.string.export_error_cannot_encode, "H.264/AVC", "${plan.width}x${plan.height}"))
-        val caps = info.getCapabilitiesForType(mime)
-        val format = MediaFormat.createVideoFormat(mime, plan.width, plan.height).apply {
-            setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface)
-            setInteger(MediaFormat.KEY_BIT_RATE, plan.bitrate.coerceIn(caps.videoCapabilities!!.bitrateRange.lower, caps.videoCapabilities!!.bitrateRange.upper))
-            setInteger(MediaFormat.KEY_FRAME_RATE, plan.fps)
-            setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1)
-            setInteger(MediaFormat.KEY_COLOR_STANDARD, MediaFormat.COLOR_STANDARD_BT709)
-            setInteger(MediaFormat.KEY_COLOR_RANGE, MediaFormat.COLOR_RANGE_LIMITED)
-            setInteger(MediaFormat.KEY_COLOR_TRANSFER, MediaFormat.COLOR_TRANSFER_SDR_VIDEO)
-            if (caps.profileLevels.any { it.profile == MediaCodecInfo.CodecProfileLevel.AVCProfileHigh }) setInteger(MediaFormat.KEY_PROFILE, MediaCodecInfo.CodecProfileLevel.AVCProfileHigh)
-        }
-        val encoder = MediaCodec.createByCodecName(info.name)
+        val encoder = openVideoEncoder(ExportSettings(minOf(plan.width, plan.height), plan.fps), plan.width, plan.height, hot = false, bitrate = plan.bitrate)
         val failure = AtomicReference<Throwable>()
         val finished = AtomicBoolean()
         val mux = try { Mux(MuxerSink(path), if (sound != null) 2 else 1) { failure.compareAndSet(null, it); finished.set(true) } }
@@ -156,21 +143,27 @@ internal object ClipSmooth {
         var output: Thread? = null
         try {
             val audio = sound?.let { (extractor, track) -> mux.addTrack(extractor.getTrackFormat(track)) }
-            encoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
             val input = encoder.createInputSurface().also { surface = it }
             encoder.start()
             output = thread(name = "am-smooth-video") {
                 try { drain(encoder, mux, finished, 0) } catch (t: Throwable) { failure.compareAndSet(null, t); finished.set(true) }
             }
             engine.exportSession(scene.toXml(), smoothing, plan.fps) {
-                val writer = ImageWriter.Builder(input).setMaxImages(2).setHardwareBufferFormat(HardwareBuffer.RGBA_8888)
-                    .setUsage(HardwareBuffer.USAGE_GPU_COLOR_OUTPUT or HardwareBuffer.USAGE_GPU_SAMPLED_IMAGE).build()
+                val writer = if (Build.VERSION.SDK_INT >= 33) ImageWriter.Builder(input).setMaxImages(2).setHardwareBufferFormat(HardwareBuffer.RGBA_8888)
+                    .setUsage(HardwareBuffer.USAGE_GPU_COLOR_OUTPUT or HardwareBuffer.USAGE_GPU_SAMPLED_IMAGE).build() else null
+                val frame = if (writer == null) HardwareBuffer.create(plan.width, plan.height, HardwareBuffer.RGBA_8888, 1,
+                    HardwareBuffer.USAGE_GPU_COLOR_OUTPUT or HardwareBuffer.USAGE_GPU_SAMPLED_IMAGE) else null
+                val copy = frame?.let { EncoderCopy(input) }
                 try {
                     for (k in 0 until frames) {
                         currentCoroutineContext().ensureActive()
                         failure.get()?.let { throw it }
                         val pts = inMs * 1000L + (k * 1_000_000.0 / plan.fps).roundToLong()
                         for (at in if (k == 0 && inMs > 0) listOf(0L, pts) else listOf(pts)) {
+                            if (writer == null) {
+                                check(renderInto(frame!!, frameTimeMs(scene, plan.fps, k)) && copy!!.copy(frame, at * 1000)) { AppText.get(R.string.ai_unable_to_process) }
+                                continue
+                            }
                             val image = writer.dequeueInputImage()
                             try {
                                 check(image.hardwareBuffer!!.use { renderInto(it, frameTimeMs(scene, plan.fps, k)) }) { AppText.get(R.string.ai_unable_to_process) }
@@ -186,7 +179,9 @@ internal object ClipSmooth {
                     encoder.signalEndOfInputStream()
                 } finally {
                     releaseBuffers()
-                    writer.close()
+                    writer?.close()
+                    copy?.close()
+                    frame?.close()
                 }
             }
             runInterruptible(Dispatchers.IO) { output.join() }
