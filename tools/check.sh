@@ -9,7 +9,7 @@ for arg in "$@"; do
     case "$arg" in
         --quick) mode=quick ;;
         --full) mode=full ;;
-        *) echo "usage: tools/check.sh [--quick|--full]   (quick: one flavour; full: both flavours, lint, API floor)" >&2; exit 2 ;;
+        *) echo "usage: tools/check.sh [--quick|--full]   (quick: one flavour; full: all flavours, lint, API floor)" >&2; exit 2 ;;
     esac
 done
 failed=0
@@ -25,7 +25,8 @@ comments|python3 tools/comment_check.py|the project ships without comments
 publish|if [ -f tools/publish_forbidden.txt ]; then sh tools/publish_check.sh; else echo 'skipped: tools/publish_forbidden.txt is private and not in this checkout'; fi|fix what it lists, never loosen it
 ui-contract|python3 tools/ui_contract_check.py|update the contract or the UI
 remaining-contract|python3 tools/remaining_contract_check.py|update the contract or the code
-tool-regressions|python3 tools/bug_regression_check.py|the tool scripts regressed"
+tool-regressions|python3 tools/bug_regression_check.py|the tool scripts regressed
+tier|python3 tools/compat/tier_check.py|gate the feature with Tier.has or Tier.choice (app/src/main/kotlin/app/absentmotion/Tier.kt)"
 
 printf '== Native audio effects: host build and tests\n'
 sh tools/audio_dsp.sh --lib >"$dir/audio-dsp.log" 2>&1 || { tail -n 15 "$dir/audio-dsp.log" >&2; fail "the audio DSP host tests"; }
@@ -41,15 +42,21 @@ if [ "$mode" = quick ]; then
     printf '\n== Android: compile and unit tests (foss)\n'
     ./gradlew :app:compileFossDebugKotlin :app:testFossDebugUnitTest -q >"$dir/gradle.log" 2>&1 || { grep -E '^e: |FAILED|Test.*>' "$dir/gradle.log" | sed 's|file://[^ ]*/app/src/main/kotlin/app/absentmotion/||' | head -40 >&2; fail "Android compile or unit tests (full output: $dir/gradle.log)"; }
 else
-    printf '\n== Android: compile (play and foss), unit tests, lint\n'
-    tasks=":app:compilePlayDebugKotlin :app:compileFossDebugKotlin :app:testFossDebugUnitTest"
-    [ -f app/lint-baseline.xml ] && tasks="$tasks :app:lintFossDebug"
+    printf '\n== Android: compile (play, foss and compat), unit tests, lint\n'
+    tasks=":app:compilePlayDebugKotlin :app:compileFossDebugKotlin :app:compileCompatDebugKotlin :app:testFossDebugUnitTest :app:testCompatDebugUnitTest"
+    [ -f app/lint-baseline.xml ] && tasks="$tasks :app:lintFossDebug :app:lintCompatDebug"
     ./gradlew $tasks -q >"$dir/gradle.log" 2>&1 || { grep -E '^e: |FAILED|Test.*>|Error:|error:' "$dir/gradle.log" | sed 's|file://[^ ]*/app/src/main/kotlin/app/absentmotion/||' | head -40 >&2; fail "Android compile, unit tests or lint (full output: $dir/gradle.log)"; }
     libs=$(ls -d app/build/intermediates/merged_native_libs/fossRelease/*/out/lib/arm64-v8a 2>/dev/null | head -1)
     if [ -n "$libs" ]; then
         printf '\n== Native libraries: lowest Android version they need\n'
         python3 tools/api_floor.py "$libs" >"$dir/api-floor.log" 2>&1 || { cat "$dir/api-floor.log" >&2; fail "a native library needs a newer Android than minSdk"; }
         tail -n 2 "$dir/api-floor.log"
+    fi
+    libs=$(ls -d app/build/intermediates/merged_native_libs/compatRelease/*/out/lib/arm64-v8a 2>/dev/null | head -1)
+    if [ -n "$libs" ]; then
+        printf '\n== Native libraries of the compat build: they must load on Android 9\n'
+        python3 tools/api_floor.py "$libs" --min 28 >"$dir/api-floor-compat.log" 2>&1 || { cat "$dir/api-floor-compat.log" >&2; fail "a compat native library needs a newer Android than 9"; }
+        tail -n 2 "$dir/api-floor-compat.log"
     fi
 fi
 

@@ -1,6 +1,13 @@
 #!/bin/sh
 set -e
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+OUT=out/android-arm64
+API=
+case "${1:-}" in
+    "") ;;
+    compat) OUT=out/android-arm64-compat; API=28 ;;
+    *) echo "usage: tools/build_skia.sh [compat]" >&2; exit 2 ;;
+esac
 SKIA="$ROOT/third_party/skia"
 BRANCH=chrome/m156
 COMMIT=95ee33d7ec7791ab9c071675710a14fe6408ae4f
@@ -43,9 +50,9 @@ for p in "$ROOT"/tools/skia-patches/*.patch; do
 done
 
 GN="$("$ROOT/tools/build_gn.sh" | tail -n 1)"
-mkdir -p out/android-arm64
-{ echo "ndk = \"$NDK\""; cat "$ROOT/tools/skia-args.gn"; } > out/android-arm64/args.gn
-"$GN" gen out/android-arm64
-ninja -C out/android-arm64 skia pathops skparagraph skshaper skunicode_core skunicode_icu
-"$NDK/toolchains/llvm/prebuilt/$HOST/bin/llvm-ar" rcs out/android-arm64/libpathops.a out/android-arm64/obj/src/pathops/*.o
-ls -la out/android-arm64/libskia.a out/android-arm64/libpathops.a
+mkdir -p "$OUT"
+{ echo "ndk = \"$NDK\""; sed "${API:+s/^ndk_api = .*/ndk_api = $API/}" "$ROOT/tools/skia-args.gn"; } > "$OUT/args.gn"
+"$GN" gen "$OUT"
+ninja -C "$OUT" skia pathops skparagraph skshaper skunicode_core skunicode_icu
+"$NDK/toolchains/llvm/prebuilt/$HOST/bin/llvm-ar" rcs "$OUT/libpathops.a" "$OUT"/obj/src/pathops/*.o
+ls -la "$OUT/libskia.a" "$OUT/libpathops.a"

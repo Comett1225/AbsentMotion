@@ -7,7 +7,7 @@ with a C++ engine on top of Skia, which is built from source.
 
 ## 1. What you can build, and where
 
-The Android app (`app/`) builds to an APK for `arm64-v8a` only, in two flavours: `play` and `foss` (section 6). The
+The Android app (`app/`) builds to an APK for `arm64-v8a` only, in three flavours: `play`, `foss` and `compat` (section 6). The
 maintainer builds it on macOS (Apple silicon).
 
 The build scripts support macOS and Linux with the Android NDK. CI builds the unsigned `foss` APK on Debian. Windows hosts are not supported.
@@ -82,6 +82,9 @@ What the script does, in order:
    `ninja`, then packs the path-operation objects into `libpathops.a` with the NDK's `llvm-ar` (from the host's `darwin-x86_64` or `linux-x86_64`
    directory).
 
+`tools/build_skia.sh compat` builds the same Skia a second time for Android 9 (`ndk_api = 28` instead of the value in
+`tools/skia-args.gn`) into `third_party/skia/out/android-arm64-compat/` (about 180 MB), which the `compat` flavour links.
+
 **Output:** `third_party/skia/out/android-arm64/` holds the static libraries the Android engine links
 (`libskia.a`, `libpathops.a`, `libskparagraph.a`, `libskshaper.a`, `libskunicode_core.a`, `libskunicode_icu.a` and the
 libraries of Skia's own dependencies). `app/src/main/cpp/CMakeLists.txt` reads them from there.
@@ -99,6 +102,7 @@ is another commit.
 ./gradlew :app:assemblePlayDebug     # debug APK, play flavour (background removal through Google Play services)
 ./gradlew :app:assembleFossDebug     # debug APK, free flavour: no Google libraries at all (what F-Droid builds)
 ./gradlew :app:assemblePlayRelease   # release APKs: assembleFossRelease for the free flavour
+./gradlew :app:assembleCompatDebug   # the Compatible build for Android 9 to 12 (needs tools/build_skia.sh compat first)
 ```
 
 Gradle runs CMake for you (`externalNativeBuild`): it builds the engine (`libamengine.so`), the speech library
@@ -114,23 +118,33 @@ Outputs: `app/build/outputs/apk/<flavour>/<type>/app-<flavour>-<type>.apk`, for 
   and you sign it yourself with `apksigner`. Debug builds (`assembleFossDebug`) are signed with the debug key for your own phone. Make a release key with
   `keytool -genkeypair -v -keystore release.jks -alias absentmotion -keyalg RSA -keysize 4096 -validity 10000` and never
   commit it.
+- **The Compatible build (`compat`):** the foss build for Android 9 to 12 (`minSdk = 28`), with the same app id, version and signing key, so a
+  phone that later gets Android 13 can install the Latest build over it and keep its projects. It uses the foss sources and assets, links the API 28
+  Skia (CMake option `AM_COMPAT`), and gates the features it leaves out with `Tier` (`app/src/main/kotlin/app/absentmotion/Tier.kt`: every `Feature`
+  says whether it is in Compatible; left-out ones are shown locked with "Needs Android 13 (Latest version)"). Below Android 13 video export renders
+  into its own GPU buffer and copies it into the encoder with OpenGL ES (`encoder_copy.cpp`), because the encoder's input surface cannot always be a
+  Vulkan swapchain there. `tools/compat/build_compat.sh` builds it, `tools/compat/compat_check.sh` checks it (native API floor 28, lint at minSdk 28,
+  `tools/compat/tier_check.py`, publish check), and `tools/compat/compat_emulators.sh [28 30 32]` installs one arm64 emulator image at a time, runs
+  `tools/smoke_check.py` and `tools/compat/export_smoke.py` (GIF and MP4) on it and deletes it again.
 - Install with `adb install -r <apk>`. Emulators work for development (arm64 image, Android 13 or newer; `tools/smoke_check.py` renders a still on whichever device `ANDROID_SERIAL` names).
 
 ## 7. Checking a change, and releases
 
-`tools/check.sh` compiles both Android flavours and runs the unit tests.
+`tools/check.sh` compiles the Android flavours and runs the unit tests (`--full` also lints foss and compat and checks the native API floor of both).
 
 `tools/release.sh [patch|minor|major]` bumps `version.properties` (with no argument it keeps the current version),
-runs `tools/check.sh`, and builds the release APKs of both flavours (signed as described in section 6). Results:
+runs `tools/check.sh`, and builds the release APKs of all three flavours (signed as described in section 6). Results:
 
 - `build/release/AbsentMotion-<version>.apk` (the `play` flavour)
 - `build/release/AbsentMotion-<version>-foss.apk` (the `foss` flavour)
+- `build/release/AbsentMotion-<version>-compatible.apk` (the `compat` flavour, Android 9 to 12)
 
 ## 8. CI and reproducible builds
 
 `.github/workflows/build.yml` builds the unsigned `foss` release APK in a Debian trixie container on pull requests,
 manual runs and version tags. It installs JDK 21 and the pinned Android SDK, NDK and CMake, builds Skia from source,
-and uploads the `foss-apk` artifact. The workflow removes the Play sources and dependencies before building.
+and uploads the `foss-apk` artifact; a second job builds the API 28 Skia and the unsigned `compat` APK (`compat-apk` artifact). The workflow
+removes the Play sources and dependencies before building.
 
 Two builds of the same commit must produce byte-identical unsigned APKs. Compare the downloaded artifacts with
 `cmp first.apk second.apk` before a release. Keep the Gradle wrapper, Android plugin, Kotlin, NDK, Skia and native
