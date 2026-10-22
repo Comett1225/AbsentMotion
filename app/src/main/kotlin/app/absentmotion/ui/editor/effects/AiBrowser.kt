@@ -384,7 +384,7 @@ private fun <T> Pills(options: List<T>, selected: T, enabled: Boolean, label: @C
             val on = option == selected
             Box(Modifier.weight(1f).fillMaxHeight().padding(2.dp).clip(RoundedCornerShape(5.dp)).background(if (on) Am.FieldHi else Color.Transparent)
                 .clickable(enabled = enabled) { onPick(option) }, Alignment.Center) {
-                Text(label(option), color = if (on) Am.Accent else Am.OnDark, fontSize = 12.sp, maxLines = 1)
+                Text(label(option), color = if (on) Am.Accent else Am.OnDark, fontSize = 12.sp, lineHeight = 13.sp, maxLines = 2, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
             }
         }
     }

@@ -52,7 +52,7 @@ internal fun guessedRate(phone: AiPhone): Double {
 
 internal fun aiVerdict(phone: AiPhone, seconds: Double): AiVerdict = when {
     !phone.runtime || phone.ramBytes in 1 until MIN_RAM || seconds > CANNOT_SECONDS -> AiVerdict.Cannot
-    !phone.usableGpu || seconds > STRUGGLE_SECONDS || phone.ramBytes in 1 until GOOD_RAM -> AiVerdict.Struggle
+    seconds > STRUGGLE_SECONDS || !phone.usableGpu && seconds > CPU_STRUGGLE_SECONDS || phone.ramBytes in 1 until GOOD_RAM -> AiVerdict.Struggle
     else -> AiVerdict.Fine
 }
 
@@ -64,6 +64,7 @@ internal fun aiEstimate(phone: AiPhone, gmac: Double, measuredRate: Double?): Ai
 private const val MIN_RAM = 2_500_000_000L
 private const val GOOD_RAM = 4_000_000_000L
 private const val STRUGGLE_SECONDS = 45 * 60.0
+private const val CPU_STRUGGLE_SECONDS = 10 * 60.0
 private const val CANNOT_SECONDS = 8 * 3600.0
 private const val BENCH_SIDE = 96
 private const val PROBE_SIDE = 16
