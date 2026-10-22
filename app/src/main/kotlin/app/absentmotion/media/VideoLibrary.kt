@@ -27,6 +27,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -148,6 +149,7 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
     private companion object {
         const val MAX_LEAD_MS = 100.0
         const val RETRY_NS = 1_000_000_000L
+        const val MAX_RETRIES = 3
     }
 
     private inner class Session(val id: Long, val uri: String) {
@@ -160,6 +162,7 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
         val generation = engine.generation
         val version = fileVersion(context.contentResolver, Uri.parse(uri))
         @Volatile private var retryAt = 0L
+        @Volatile private var failures = 0
         val failed get() = retryAt != 0L
         @Volatile private var stopped = false
         private var publishedPts: Long? = null
@@ -175,6 +178,10 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
                     catch (e: Exception) {
                         Log.w("AMVideo", "Cannot decode $uri layer $id", e)
                         decoderLock.withLock { decoder?.close(); decoder = null; retryAt = System.nanoTime() + RETRY_NS }
+                        if (++failures <= MAX_RETRIES) scope.launch {
+                            delay(RETRY_NS / 1_000_000 + 10)
+                            if (!stopped) latest?.let { requests.trySend(it) }
+                        }
                     }
                 }
             } finally {
@@ -220,6 +227,7 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
             val time = layer.videoTimeUs((sample.timeMs + ahead).toInt(), sample.scene)
             val pts = source.wantedPts(time)
             if (publishedPts == pts) return@withLock
+            val seeks = source.seeks
             val image = source.frame(time, exact, ::abandoned) ?: (if (exact) source.frame(time, true, ::abandoned) else null) ?: run {
                 exportCheck(!exact) { txt(R.string.media_error_decode_frame, source.timestamps.frameNumber(pts)) }
                 return@withLock
@@ -234,7 +242,8 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
                     publishedMosh = null
                     held.clear()
                     retryAt = 0L
-                    if (!exact && request.playing) leadMs = (leadMs * 0.8 + (System.nanoTime() - request.born) / 1e6 * 0.2).coerceIn(0.0, MAX_LEAD_MS)
+                    failures = 0
+                    if (!exact && request.playing && source.seeks == seeks) leadMs = (leadMs * 0.8 + (System.nanoTime() - request.born) / 1e6 * 0.2).coerceIn(0.0, MAX_LEAD_MS)
                 }
             }
         }

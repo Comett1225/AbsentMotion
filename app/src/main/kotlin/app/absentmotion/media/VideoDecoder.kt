@@ -38,6 +38,8 @@ internal class VideoDecoder(private val context: Context, private val uri: Strin
         private set
     var timestamps: LongArray
         private set
+    var seeks = 0
+        private set
 
     init {
         try {
@@ -138,6 +140,7 @@ internal class VideoDecoder(private val context: Context, private val uri: Strin
         drainImages()
         extractor.seekTo(wanted, MediaExtractor.SEEK_TO_PREVIOUS_SYNC)
         inputEnded = false; outputEnded = false; queued = false; positioned = true
+        seeks++
     }
 
     private fun show(decoder: MediaCodec, index: Int, pts: Long, wanted: Long, exact: Boolean): Image? {
