@@ -27,7 +27,7 @@ The launcher icon is an own drawing, made by `tools/icon/make_icon.py` (source o
 | --- | --- |
 | Lucide only | 167 |
 | Lucide shapes plus own parts | 8 |
-| Own drawing only | 40 |
+| Own drawing only | 41 |
 | Material Symbols | 0 |
 
 (An icon is one named member of an `*Icons` object, or one icon-drawing composable.)
@@ -170,6 +170,7 @@ The launcher icon is an own drawing, made by `tools/icon/make_icon.py` (source o
 | `ui/export/ExportIcons.kt` | `Frame` | Lucide | `image` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/image.svg | - |
 | `ui/export/ExportIcons.kt` | `Sequence` | Lucide | `images` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/images.svg | - |
 | `ui/export/ExportIcons.kt` | `Xml` | Lucide | `code-xml` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/code-xml.svg | - |
+| `ui/export/ExportIcons.kt` | `Lock` | own drawing | - | Apache-2.0 (own) | - | rounded rectangle with an arc on top |
 | `ui/export/ExportIcons.kt` | `File` | Lucide | `file` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/file.svg | - |
 | `ui/export/ExportIcons.kt` | `Play` | Lucide | `play` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/play.svg | play scaled x0.8, moved |
 | `ui/export/ExportIcons.kt` | `Pause` | Lucide | `pause` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/pause.svg | pause scaled x0.85, moved |

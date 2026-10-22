@@ -1,5 +1,6 @@
 package app.absentmotion.export
 
+import android.os.Build
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -61,15 +62,15 @@ class ThermalMonitor private constructor(context: Context) {
     private val flow = MutableStateFlow(ThermalState())
     private var users = 0
     private var poll: Job? = null
-    private val listener = PowerManager.OnThermalStatusChangedListener { refresh() }
+    private var listener: Any? = null
 
     val state: StateFlow<ThermalState> = flow.asStateFlow()
 
     @Volatile var forced: ThermalLevel? = null
 
     fun refresh(): ThermalState {
-        val status = power?.currentThermalStatus ?: 0
-        val headroom = runCatching { power?.getThermalHeadroom(10) ?: Float.NaN }.getOrDefault(Float.NaN)
+        val status = if (Build.VERSION.SDK_INT >= 29) power?.currentThermalStatus ?: 0 else 0
+        val headroom = if (Build.VERSION.SDK_INT >= 30) runCatching { power?.getThermalHeadroom(10) ?: Float.NaN }.getOrDefault(Float.NaN) else Float.NaN
         val battery = app.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
             ?.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, Int.MIN_VALUE)?.takeIf { it != Int.MIN_VALUE }?.let { it / 10f } ?: Float.NaN
         val level = forced ?: thermalLevel(status, headroom, battery)
@@ -78,7 +79,7 @@ class ThermalMonitor private constructor(context: Context) {
 
     @Synchronized fun start() {
         if (users++ > 0) return
-        power?.addThermalStatusListener(app.mainExecutor, listener)
+        if (Build.VERSION.SDK_INT >= 29) power?.addThermalStatusListener(app.mainExecutor, PowerManager.OnThermalStatusChangedListener { refresh() }.also { listener = it })
         poll = scope.launch {
             while (isActive) {
                 refresh()
@@ -89,7 +90,8 @@ class ThermalMonitor private constructor(context: Context) {
 
     @Synchronized fun stop() {
         if (users == 0 || --users > 0) return
-        power?.removeThermalStatusListener(listener)
+        if (Build.VERSION.SDK_INT >= 29) (listener as? PowerManager.OnThermalStatusChangedListener)?.let { power?.removeThermalStatusListener(it) }
+        listener = null
         poll?.cancel()
         poll = null
     }

@@ -1,5 +1,6 @@
 package app.absentmotion.ui.camera
 
+import android.os.Build
 import android.Manifest
 import androidx.annotation.StringRes
 import android.annotation.SuppressLint
@@ -227,7 +228,7 @@ private fun Permitted(onClose: () -> Unit, content: @Composable (mic: Boolean) -
 private fun mediaValues(mime: String, extension: String) = ContentValues().apply {
     put(MediaStore.MediaColumns.DISPLAY_NAME, "AbsentMotion_" + SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date()) + "." + extension)
     put(MediaStore.MediaColumns.MIME_TYPE, mime)
-    put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DCIM + "/AbsentMotion")
+    if (Build.VERSION.SDK_INT >= 29) put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DCIM + "/AbsentMotion")
 }
 
 @SuppressLint("MissingPermission", "ClickableViewAccessibility")

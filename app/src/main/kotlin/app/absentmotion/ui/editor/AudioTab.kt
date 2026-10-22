@@ -83,9 +83,10 @@ internal fun AudioTab(state: EditorState, modifier: Modifier, library: AddLibrar
     }
     androidx.compose.runtime.LaunchedEffect(Unit) {
         val prefs = context.getSharedPreferences("media", Context.MODE_PRIVATE)
-        if (context.checkSelfPermission(Manifest.permission.READ_MEDIA_AUDIO) != PackageManager.PERMISSION_GRANTED && !prefs.getBoolean("askedAudio", false)) {
+        val audio = if (android.os.Build.VERSION.SDK_INT >= 33) Manifest.permission.READ_MEDIA_AUDIO else Manifest.permission.READ_EXTERNAL_STORAGE
+        if (context.checkSelfPermission(audio) != PackageManager.PERMISSION_GRANTED && !prefs.getBoolean("askedAudio", false)) {
             prefs.edit().putBoolean("askedAudio", true).apply()
-            permission.launch(Manifest.permission.READ_MEDIA_AUDIO)
+            permission.launch(audio)
         }
     }
     val preview = remember { SoundPreview(context) }

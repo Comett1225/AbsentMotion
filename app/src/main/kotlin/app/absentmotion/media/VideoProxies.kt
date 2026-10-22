@@ -1,5 +1,7 @@
 package app.absentmotion.media
 
+import app.absentmotion.platform.numberOf
+import app.absentmotion.platform.intOr
 import android.content.Context
 import android.graphics.SurfaceTexture
 import android.media.MediaCodec
@@ -181,7 +183,7 @@ private fun sourceInfo(context: Context, uri: String): SourceInfo {
         extractor.setDataSource(context, Uri.parse(uri), null)
         val format = videoTrack(extractor).second
         val (width, height) = visibleSize(format)
-        return SourceInfo(width, height, isHdrTransfer(format.getInteger(MediaFormat.KEY_COLOR_TRANSFER, 0)))
+        return SourceInfo(width, height, isHdrTransfer(format.intOr(MediaFormat.KEY_COLOR_TRANSFER, 0)))
     } finally { extractor.release() }
 }
 
@@ -192,7 +194,7 @@ private fun visibleSize(format: MediaFormat): Pair<Int, Int> {
     val width = format.getInteger(MediaFormat.KEY_WIDTH)
     val height = format.getInteger(MediaFormat.KEY_HEIGHT)
     if (!format.containsKey("crop-right") || !format.containsKey("crop-bottom")) return width to height
-    return (format.getInteger("crop-right") - format.getInteger("crop-left", 0) + 1) to (format.getInteger("crop-bottom") - format.getInteger("crop-top", 0) + 1)
+    return (format.getInteger("crop-right") - format.intOr("crop-left", 0) + 1) to (format.getInteger("crop-bottom") - format.intOr("crop-top", 0) + 1)
 }
 
 private fun transcode(context: Context, uri: String, out: File, cancelled: () -> Boolean, progress: (Float) -> Unit): Boolean {
@@ -210,7 +212,7 @@ private fun transcode(context: Context, uri: String, out: File, cancelled: () ->
         extractor.selectTrack(track)
         val (visibleWidth, visibleHeight) = visibleSize(format)
         val (width, height) = ProxyRules.size(visibleWidth, visibleHeight)
-        val fps = (if (format.containsKey(MediaFormat.KEY_FRAME_RATE)) format.getNumber(MediaFormat.KEY_FRAME_RATE)?.toFloat() ?: 30f else 30f).roundToInt().coerceIn(1, 120)
+        val fps = (if (format.containsKey(MediaFormat.KEY_FRAME_RATE)) format.numberOf(MediaFormat.KEY_FRAME_RATE)?.toFloat() ?: 30f else 30f).roundToInt().coerceIn(1, 120)
         val durationUs = if (format.containsKey(MediaFormat.KEY_DURATION)) format.getLong(MediaFormat.KEY_DURATION) else 0L
         val mime = MediaFormat.MIMETYPE_VIDEO_AVC
         val encoderFormat = MediaFormat.createVideoFormat(mime, width, height).apply {

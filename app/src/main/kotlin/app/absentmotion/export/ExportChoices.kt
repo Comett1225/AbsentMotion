@@ -6,7 +6,7 @@ import app.absentmotion.i18n.UiText
 import app.absentmotion.i18n.txt
 import java.util.Locale
 
-data class Choice<T>(val value: T, val reason: UiText? = null) {
+data class Choice<T>(val value: T, val reason: UiText? = null, val locked: Boolean = false) {
     val enabled: Boolean get() = reason == null
 }
 

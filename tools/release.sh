@@ -28,10 +28,14 @@ echo "AbsentMotion $version (versionCode $(sed -n 's/^versionCode=//p' version.p
 
 tools/check.sh
 
-printf '\n== Android: release APKs (play, and the free build without Google libraries)\n'
-./gradlew :app:assemblePlayRelease :app:assembleFossRelease -q
+printf '\n== Android: release APKs (play, the free build without Google libraries, and the Compatible build for Android 9 to 12)\n'
+[ -f third_party/skia/out/android-arm64-compat/libskia.a ] || sh tools/build_skia.sh compat
+./gradlew :app:assemblePlayRelease :app:assembleFossRelease :app:assembleCompatRelease -q
 mkdir -p build/release
 mv app/build/outputs/apk/play/release/app-play-release.apk "build/release/AbsentMotion-$version.apk"
 mv app/build/outputs/apk/foss/release/app-foss-release.apk "build/release/AbsentMotion-$version-foss.apk"
+mv app/build/outputs/apk/compat/release/app-compat-release.apk "build/release/AbsentMotion-$version-compatible.apk"
+python3 tools/api_floor.py "build/release/AbsentMotion-$version-compatible.apk" --min 28
 
-printf '\nReleased %s:\n  %s\n  %s\n' "$version" "$PWD/build/release/AbsentMotion-$version.apk" "$PWD/build/release/AbsentMotion-$version-foss.apk"
+printf '\nReleased %s:\n  %s\n  %s\n  %s\n' "$version" "$PWD/build/release/AbsentMotion-$version.apk" "$PWD/build/release/AbsentMotion-$version-foss.apk" \
+    "$PWD/build/release/AbsentMotion-$version-compatible.apk"

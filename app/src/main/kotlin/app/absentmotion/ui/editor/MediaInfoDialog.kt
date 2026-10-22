@@ -1,5 +1,6 @@
 package app.absentmotion.ui.editor
 
+import app.absentmotion.platform.numberOf
 import android.media.MediaExtractor
 import android.media.MediaFormat
 import android.net.Uri
@@ -54,7 +55,7 @@ internal fun MediaInfoDialog(record: MediaDeclaration, onReplace: (suspend (Medi
                     add(R.string.mediainfo_duration to String.format(Locale.US, "%03d:%02d:%02d", seconds / 3600, seconds / 60 % 60, seconds % 60))
                     add(R.string.mediainfo_format to format.ifEmpty { record.type })
                     add(R.string.mediainfo_size to sizeText(record.size.coerceAtLeast(0)))
-                    audio?.getNumber(MediaFormat.KEY_SAMPLE_RATE)?.let { add(R.string.mediainfo_sample_rate to kilohertz(it.toFloat() / 1000)) }
+                    audio?.numberOf(MediaFormat.KEY_SAMPLE_RATE)?.let { add(R.string.mediainfo_sample_rate to kilohertz(it.toFloat() / 1000)) }
                 }
             } catch (_: Exception) {
                 listOf(R.string.mediainfo_name to record.title, R.string.mediainfo_dimensions to "${record.width} x ${record.height}", R.string.mediainfo_format to record.type)

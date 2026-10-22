@@ -88,7 +88,7 @@ private fun decodeEnds(extractor: MediaExtractor, track: Int, format: MediaForma
         extractor.seekTo(0, MediaExtractor.SEEK_TO_CLOSEST_SYNC)
         val first = decode(codec, extractor, deadline, untilEnd = false)
         var lastSample = 0L
-        extractor.seekTo(Long.MAX_VALUE / 2, MediaExtractor.SEEK_TO_PREVIOUS_SYNC)
+        extractor.seekTo(if (format.containsKey(MediaFormat.KEY_DURATION)) format.getLong(MediaFormat.KEY_DURATION) else Long.MAX_VALUE / 2, MediaExtractor.SEEK_TO_PREVIOUS_SYNC)
         while (extractor.sampleTime >= 0) {
             lastSample = maxOf(lastSample, extractor.sampleTime)
             if (!extractor.advance()) break
@@ -97,6 +97,8 @@ private fun decodeEnds(extractor: MediaExtractor, track: Int, format: MediaForma
         extractor.seekTo(lastSample, MediaExtractor.SEEK_TO_PREVIOUS_SYNC)
         val last = decode(codec, extractor, deadline, untilEnd = true)?.let { it >= 0 && lastSample - it <= 1_000 }
         return first?.let { it >= 0 } to last
+    } catch (e: MediaCodec.CodecException) {
+        return if (e.errorCode == MediaCodec.CodecException.ERROR_RECLAIMED) null to null else false to false
     } catch (e: Exception) {
         return false to false
     } finally {

@@ -1,5 +1,6 @@
 package app.absentmotion.ui.home
 
+import app.absentmotion.platform.readAtMost
 import app.absentmotion.export.formatBytes
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
@@ -352,7 +353,7 @@ private fun ThemeItem(label: String, chosen: Boolean, onClick: () -> Unit) {
 
 private fun readThemeText(context: Context, uri: Uri): String {
     val stream: java.io.InputStream? = try { context.contentResolver.openInputStream(uri) } catch (e: Exception) { null }
-    val bytes = stream?.use { it.readNBytes(Themes.MAX_BYTES + 1) } ?: throw ThemeError(txt(R.string.settings_theme_open_failed))
+    val bytes = stream?.use { it.readAtMost(Themes.MAX_BYTES + 1) } ?: throw ThemeError(txt(R.string.settings_theme_open_failed))
     if (bytes.size > Themes.MAX_BYTES) throw ThemeError(txt(R.string.settings_theme_not_theme_file))
     return String(bytes, Charsets.UTF_8)
 }

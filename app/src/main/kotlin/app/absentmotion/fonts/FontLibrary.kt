@@ -1,5 +1,6 @@
 package app.absentmotion.fonts
 
+import android.os.Build
 import android.content.Context
 import android.graphics.Typeface
 import android.graphics.fonts.Font
@@ -81,18 +82,20 @@ class FontLibrary(context: Context) {
         ?.sortedByDescending { it.lastModified() }?.map { FontName("imported", it.name) } ?: emptyList()
     private fun cachedFile(name: String): File = File(cache,
         MessageDigest.getInstance("SHA-256").digest(name.toByteArray()).joinToString("") { "%02x".format(it) } + ".ttf")
-    private val systemFonts: Set<Font> by lazy { SystemFonts.getAvailableFonts() }
-    private val systemFamilies by lazy { systemFonts.groupBy { font ->
-        familyKey(font.file?.nameWithoutExtension?.substringBefore('-') ?: "")
-    } }
+    private val systemFamilies: Map<String, List<Font>> by lazy {
+        if (Build.VERSION.SDK_INT < 29) emptyMap() else SystemFonts.getAvailableFonts().groupBy { font ->
+            familyKey(font.file?.nameWithoutExtension?.substringBefore('-') ?: "")
+        }
+    }
     private fun familyKey(value: String) = value.lowercase().filter { it.isLetterOrDigit() }
     fun systemFont(name: String): Font? {
+        if (Build.VERSION.SDK_INT < 29) return null
         val wanted = FontName.parse(name)
         if (wanted.source != "googlefonts") return null
         return systemFamilies[familyKey(wanted.family)]?.minByOrNull { font -> kotlin.math.abs(font.style.weight - wanted.weight) +
             if ((font.style.slant == 1) == wanted.italic) 0 else 1000 }
     }
-    fun fontIndex(name: String): Int = systemFont(name)?.takeIf { it.file == localFile(name) }?.ttcIndex ?: 0
+    fun fontIndex(name: String): Int = if (Build.VERSION.SDK_INT < 29) 0 else systemFont(name)?.takeIf { it.file == localFile(name) }?.ttcIndex ?: 0
     fun systemFamily(name: String): String? = when (FontName.parse(name).family) {
         "Roboto" -> "sans-serif"; "Roboto Condensed" -> "sans-serif-condensed"; "Noto Serif" -> "serif"; "Droid Sans Mono" -> "monospace"; else -> null
     }
@@ -122,7 +125,7 @@ class FontLibrary(context: Context) {
         if (font.source == "imported") return File(imported, File(font.family).name).takeIf { it.isFile }
         bundledAsset(font)?.let { asset -> bundledFile(asset)?.let { return it } }
         cachedFile(name).takeIf { it.isFile }?.let { return it }
-        systemFont(name)?.file?.takeIf { it.isFile }?.let { return it }
+        if (Build.VERSION.SDK_INT >= 29) systemFont(name)?.file?.takeIf { it.isFile }?.let { return it }
         val base = when (font.family) { "Roboto" -> "Roboto"; "Noto Serif" -> "NotoSerif"; "Droid Sans Mono" -> "DroidSansMono"; else -> return null }
         val variant = when (font.weight) { 100 -> "Thin"; 200, 300 -> "Light"; 500 -> "Medium"; 600, 700 -> "Bold"; 800, 900 -> "Black"; else -> "Regular" }
         val suffix = if (font.italic) { if (variant == "Regular") "Italic" else "${variant}Italic" } else variant

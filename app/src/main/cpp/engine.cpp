@@ -80,6 +80,12 @@ namespace {
 
 constexpr size_t kImportedPerMedia = 6;
 
+int BufferId(const AHardwareBuffer* buffer, uint64_t* id) {
+    if (__builtin_available(android 31, *)) return AHardwareBuffer_getId(buffer, id);
+    *id = reinterpret_cast<uintptr_t>(buffer);
+    return 0;
+}
+
 PFN_vkVoidFunction GetProc(const char* name, VkInstance instance, VkDevice device) {
     return device != VK_NULL_HANDLE ? vkGetDeviceProcAddr(device, name)
                                     : vkGetInstanceProcAddr(instance, name);
@@ -634,7 +640,7 @@ sk_sp<SkImage> EngineImpl::importFrame(AHardwareBuffer* buffer, bool opaque, int
         return SkImages::DeferredFromAHardwareBuffer(buffer, alpha, SkColorSpace::MakeSRGB());
     }
     uint64_t id = 0;
-    if (key && AHardwareBuffer_getId(buffer, &id) == 0) {
+    if (key && BufferId(buffer, &id) == 0) {
         auto& cache = fImported[*key];
         uint64_t tick = 1;
         for (const auto& t : cache) tick = std::max(tick, t.used + 1);
@@ -972,7 +978,7 @@ int EngineImpl::renderFrame(Target* target, double timeMs, uint32_t background, 
 
 SkSurface* EngineImpl::bufferSurface(AHardwareBuffer* buffer) {
     uint64_t id = 0;
-    if (!buffer || AHardwareBuffer_getId(buffer, &id) != 0) return nullptr;
+    if (!buffer || BufferId(buffer, &id) != 0) return nullptr;
     auto found = fBufferSurfaces.find(id);
     if (found != fBufferSurfaces.end()) return found->second.get();
     AHardwareBuffer_Desc desc;

@@ -1,5 +1,6 @@
 package app.absentmotion.media
 
+import app.absentmotion.platform.numberOf
 import android.content.Context
 import android.media.MediaExtractor
 import android.media.MediaFormat
@@ -34,7 +35,7 @@ suspend fun videoDeclaration(context: Context, uri: Uri): MediaDeclaration? = wi
             rotation = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION)?.toIntOrNull() ?: 0
             if (duration <= 0) duration = (retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLongOrNull() ?: 0L) * 1000
         } finally { retriever.release() }
-        val fps = (if (format.containsKey(MediaFormat.KEY_FRAME_RATE)) format.getNumber(MediaFormat.KEY_FRAME_RATE)?.toFloat() else null)?.takeIf { it > 0 }
+        val fps = (if (format.containsKey(MediaFormat.KEY_FRAME_RATE)) format.numberOf(MediaFormat.KEY_FRAME_RATE)?.toFloat() else null)?.takeIf { it > 0 }
             ?: runCatching { estimatedFps(VideoSources.timestamps(context, uri.toString())) }.getOrNull()
         MediaDeclaration(XmlNode("media", listOfNotNull("uri" to uri.toString(), "filename" to name, "title" to name,
             "type" to (context.contentResolver.getType(uri) ?: "video/mp4"), "size" to "$size", "orientation" to "$rotation",

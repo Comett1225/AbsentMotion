@@ -2229,7 +2229,7 @@ COUNTS
 
 - Lucide only - 167
 - Lucide shapes plus own parts - 8
-- Own drawing only - 40
+- Own drawing only - 41
 - Material Symbols - 0
 
 (An icon is one named member of an *Icons object, or one icon-drawing composable.)
@@ -2370,6 +2370,7 @@ ICONS
 - Frame (Lucide image) - ISC - ui/export/ExportIcons.kt
 - Sequence (Lucide images) - ISC - ui/export/ExportIcons.kt
 - Xml (Lucide code-xml) - ISC - ui/export/ExportIcons.kt
+- Lock (own drawing) - Apache-2.0 (own) - ui/export/ExportIcons.kt
 - File (Lucide file) - ISC - ui/export/ExportIcons.kt
 - Play (Lucide play) - ISC - ui/export/ExportIcons.kt
 - Pause (Lucide pause) - ISC - ui/export/ExportIcons.kt

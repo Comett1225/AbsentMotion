@@ -1399,4 +1399,10 @@
     <string name="preset_numbered">Preset %1$s</string>
     <string name="recovery_your_project">proyek Anda</string>
     <string name="caption_layer_name">Takarir %1$s</string>
+    <string name="tier_needs_latest">Butuh Android 13 (versi Latest)</string>
+    <string name="feature_flow_high">Optical flow Tinggi</string>
+    <string name="about_version_compatible">Versi %1$s Compatible</string>
+    <string name="about_compatible_note">Ini versi Compatible untuk Android 9 hingga 12. Tidak disertakan: %1$s. Fitur itu butuh Android 13 dan versi Latest.</string>
+    <string name="low_memory_title">Memori rendah</string>
+    <string name="low_memory_body">Ponsel ini punya memori %1$s GB. AbsentMotion paling lancar dengan 3 GB atau lebih: proyek panjang, video besar, dan banyak efek bisa membuat lambat atau menutup aplikasi.</string>
 </resources>

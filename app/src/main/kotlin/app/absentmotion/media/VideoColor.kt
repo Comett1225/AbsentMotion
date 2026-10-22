@@ -1,5 +1,6 @@
 package app.absentmotion.media
 
+import app.absentmotion.platform.intOr
 import android.media.MediaFormat
 
 internal fun videoColorStandard(standard: Int): Int {
@@ -19,6 +20,6 @@ internal fun videoColorStandard(standard: Int): Int {
 
 internal fun isHdrTransfer(transfer: Int): Boolean = transfer == MediaFormat.COLOR_TRANSFER_ST2084 || transfer == MediaFormat.COLOR_TRANSFER_HLG
 
-internal fun MediaFormat.requestSdr(): Boolean = isHdrTransfer(getInteger(MediaFormat.KEY_COLOR_TRANSFER, 0)).also { hdr ->
+internal fun MediaFormat.requestSdr(): Boolean = isHdrTransfer(intOr(MediaFormat.KEY_COLOR_TRANSFER, 0)).also { hdr ->
     if (hdr) setInteger(MediaFormat.KEY_COLOR_TRANSFER_REQUEST, MediaFormat.COLOR_TRANSFER_SDR_VIDEO)
 }

@@ -1,11 +1,14 @@
 package app.absentmotion.export
 
+import app.absentmotion.platform.hardware
+import app.absentmotion.platform.intOr
 import android.hardware.HardwareBuffer
 import android.media.ImageWriter
 import android.media.MediaCodec
 import android.media.MediaCodecInfo
 import android.media.MediaCodecList
 import android.media.MediaFormat
+import android.os.Build
 import android.util.Log
 import android.view.Surface
 import app.absentmotion.R
@@ -59,21 +62,20 @@ internal suspend fun exportVideo(
     val frames = frameCount(scene, s.fps)
     val mime = s.codec.mime
     val info = MediaCodecList(MediaCodecList.REGULAR_CODECS).codecInfos
-        .filter { it.isEncoder && mime in it.supportedTypes }.sortedByDescending { it.isHardwareAccelerated }
+        .filter { it.isEncoder && mime in it.supportedTypes }.sortedByDescending { it.hardware }
         .firstOrNull { it.getCapabilitiesForType(mime).videoCapabilities!!.isSizeSupported(width, height) }
         ?: throw ExportError(txt(R.string.export_error_cannot_encode, s.codec.label, "${width}x$height"))
     val caps = info.getCapabilitiesForType(mime)
-    val format = MediaFormat.createVideoFormat(mime, width, height).apply {
+    val high = mime == MediaFormat.MIMETYPE_VIDEO_AVC && caps.profileLevels.any { it.profile == MediaCodecInfo.CodecProfileLevel.AVCProfileHigh }
+    fun format(profile: Boolean) = MediaFormat.createVideoFormat(mime, width, height).apply {
         setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface)
         setInteger(MediaFormat.KEY_BIT_RATE, videoBitrate(width, height, s).coerceIn(caps.videoCapabilities!!.bitrateRange.lower, caps.videoCapabilities!!.bitrateRange.upper))
         setInteger(MediaFormat.KEY_FRAME_RATE, s.fps)
         setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1)
-        setInteger(MediaFormat.KEY_COLOR_STANDARD, MediaFormat.COLOR_STANDARD_BT709)
+        setInteger(MediaFormat.KEY_COLOR_STANDARD, if (fixedBt601(info)) MediaFormat.COLOR_STANDARD_BT601_NTSC else MediaFormat.COLOR_STANDARD_BT709)
         setInteger(MediaFormat.KEY_COLOR_RANGE, MediaFormat.COLOR_RANGE_LIMITED)
         setInteger(MediaFormat.KEY_COLOR_TRANSFER, MediaFormat.COLOR_TRANSFER_SDR_VIDEO)
-        if (mime == MediaFormat.MIMETYPE_VIDEO_AVC && caps.profileLevels.any { it.profile == MediaCodecInfo.CodecProfileLevel.AVCProfileHigh }) {
-            setInteger(MediaFormat.KEY_PROFILE, MediaCodecInfo.CodecProfileLevel.AVCProfileHigh)
-        }
+        if (profile) setInteger(MediaFormat.KEY_PROFILE, MediaCodecInfo.CodecProfileLevel.AVCProfileHigh)
         if (hotAtStart) {
             setInteger(MediaFormat.KEY_PRIORITY, 1)
             setInteger(MediaFormat.KEY_OPERATING_RATE, s.fps)
@@ -91,7 +93,14 @@ internal suspend fun exportVideo(
     var audioEncoder: MediaCodec? = null
     fun worker(name: String, body: () -> Unit) { workers += thread(name = "am-export-$name") { try { body() } catch (t: Throwable) { fail(t) } } }
     try {
-        encoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
+        try {
+            encoder.configure(format(high), null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
+        } catch (e: MediaCodec.CodecException) {
+            if (!high) throw e
+            Log.w("AMExport", "${info.name} refused the High profile, encoding with its default profile", e)
+            encoder.reset()
+            encoder.configure(format(false), null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
+        }
         val input = encoder.createInputSurface().also { surface = it }
         encoder.start()
         worker("video") { drain(encoder, mux, videoDone, BASE_US) }
@@ -116,9 +125,9 @@ internal suspend fun exportVideo(
                 }
                 encoder.signalEndOfInputStream()
             }
-            val buffers = ExportDebug.forceBuffers || !stampsPresentTime()
+            val buffers = ExportDebug.forceBuffers || Build.VERSION.SDK_INT < 33 || !stampsPresentTime()
             Log.i("AMExport", "rendering $frames frames at ${width}x$height through ${if (buffers) "encoder buffers" else "the swapchain"}")
-            if (buffers) {
+            if (buffers && Build.VERSION.SDK_INT >= 33) {
                 val writer = ImageWriter.Builder(input).setMaxImages(2).setHardwareBufferFormat(HardwareBuffer.RGBA_8888)
                     .setUsage(HardwareBuffer.USAGE_GPU_COLOR_OUTPUT or HardwareBuffer.USAGE_GPU_SAMPLED_IMAGE).build()
                 try {
@@ -137,6 +146,21 @@ internal suspend fun exportVideo(
                 } finally {
                     releaseBuffers()
                     writer.close()
+                }
+            } else if (buffers) {
+                val frame = HardwareBuffer.create(width, height, HardwareBuffer.RGBA_8888, 1,
+                    HardwareBuffer.USAGE_GPU_COLOR_OUTPUT or HardwareBuffer.USAGE_GPU_SAMPLED_IMAGE)
+                try {
+                    EncoderCopy(input).use { copy ->
+                        eachFrame { k, presentNs ->
+                            exportCheck(renderInto(frame, frameTimeMs(scene, s.fps, k)) && copy.copy(frame, presentNs)) {
+                                txt(R.string.export_error_draw_frame, k.toString())
+                            }
+                        }
+                    }
+                } finally {
+                    releaseBuffers()
+                    frame.close()
                 }
             } else {
                 val target = attach(input)
@@ -165,6 +189,8 @@ internal suspend fun exportVideo(
     progress(1f)
 }
 
+internal fun fixedBt601(info: MediaCodecInfo): Boolean = Build.VERSION.SDK_INT <= 30 && !info.hardware
+
 internal fun drain(codec: MediaCodec, mux: Mux, stop: AtomicBoolean, ptsShift: Long,
                   audioDelay: AtomicInteger? = null, totalUs: Long = Long.MAX_VALUE, trace: Boolean = false, rate: Int = ExportAudio.SAMPLE_RATE,
                   zeroStart: Boolean = false) {
@@ -179,7 +205,7 @@ internal fun drain(codec: MediaCodec, mux: Mux, stop: AtomicBoolean, ptsShift: L
             index == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED -> {
                 val format = codec.outputFormat
                 if (audioDelay != null) {
-                    val frames = aacDelayFrames(format.getInteger(MediaFormat.KEY_ENCODER_DELAY, -1))
+                    val frames = aacDelayFrames(format.intOr(MediaFormat.KEY_ENCODER_DELAY, -1))
                     audioDelay.set(frames)
                     audioTime?.delayFrames = frames
                     if (trace) android.util.Log.i("AMAac", "delay=$frames format=$format")

@@ -49,6 +49,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
+import app.absentmotion.Tier
 
 internal const val HOME_PAGE ="https://github.com/Comett1225/AbsentMotion"
 
@@ -76,13 +77,18 @@ private fun AboutPage(onClose: () -> Unit, onLicences: () -> Unit) {
         Column(Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp)) {
             Spacer(Modifier.height(24.dp))
             Text("AbsentMotion", color = Am.Navy, fontSize = 26.sp, fontWeight = FontWeight.Bold)
-            if (version.isNotEmpty()) Text(stringResource(R.string.about_version, version), Modifier.padding(top = 2.dp), color = Am.HomeMid, fontSize = 14.sp)
+            if (version.isNotEmpty()) Text(stringResource(if (Tier.compatible) R.string.about_version_compatible else R.string.about_version, version),
+                Modifier.padding(top = 2.dp), color = Am.HomeMid, fontSize = 14.sp)
             Spacer(Modifier.height(20.dp))
             Body(stringResource(R.string.about_licence_line))
             Spacer(Modifier.height(12.dp))
             Body(stringResource(R.string.about_independent_note))
             Spacer(Modifier.height(12.dp))
             Body(stringResource(R.string.about_compatibility_note))
+            compatibleNote()?.let {
+                Spacer(Modifier.height(12.dp))
+                Body(it)
+            }
             Spacer(Modifier.height(20.dp))
             Row(
                 Modifier.fillMaxWidth().height(44.dp).clip(RowShape).background(Am.Card).clickable(onClick = onLicences).padding(start = 15.dp, end = 7.dp),

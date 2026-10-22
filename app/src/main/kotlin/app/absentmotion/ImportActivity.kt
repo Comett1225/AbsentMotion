@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.ClipData
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 
 object ImportHandOff {
@@ -18,8 +19,8 @@ class ImportActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val uris = when (intent.action) {
-            Intent.ACTION_SEND -> listOfNotNull(intent.getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java))
-            Intent.ACTION_SEND_MULTIPLE -> intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM, Uri::class.java).orEmpty()
+            Intent.ACTION_SEND -> listOfNotNull(streamExtra())
+            Intent.ACTION_SEND_MULTIPLE -> streamExtras()
             Intent.ACTION_VIEW -> listOfNotNull(intent.data)
             else -> emptyList()
         }.filterNot(::isOwnPrivateFile)
@@ -34,6 +35,14 @@ class ImportActivity : Activity() {
         }
         finish()
     }
+
+    @Suppress("DEPRECATION")
+    private fun streamExtra(): Uri? =
+        if (Build.VERSION.SDK_INT >= 33) intent.getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java) else intent.getParcelableExtra(Intent.EXTRA_STREAM)
+
+    @Suppress("DEPRECATION")
+    private fun streamExtras(): List<Uri> = (if (Build.VERSION.SDK_INT >= 33) intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM, Uri::class.java)
+        else intent.getParcelableArrayListExtra<Uri>(Intent.EXTRA_STREAM)).orEmpty()
 
     private fun isOwnPrivateFile(uri: Uri): Boolean {
         if (uri.scheme != "file") return false

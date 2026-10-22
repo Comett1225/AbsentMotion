@@ -1,5 +1,7 @@
 package app.absentmotion.library
 
+import app.absentmotion.platform.drain
+import app.absentmotion.platform.readAtMost
 import app.absentmotion.R
 import app.absentmotion.i18n.AppText
 import app.absentmotion.i18n.UiText
@@ -19,7 +21,6 @@ import org.json.JSONObject
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
-import java.io.OutputStream
 import java.io.Serializable
 import java.util.zip.ZipInputStream
 
@@ -54,7 +55,7 @@ class Importer(
 ) {
     fun import(open: () -> InputStream?): List<ImportReport> = try {
         fun stream() = open() ?: throw ImportFailed(txt(R.string.library_err_no_data))
-        val head = stream().use { it.readNBytes(2) }
+        val head = stream().use { it.readAtMost(2) }
         if (head.size == 2 && head[0] == 'P'.code.toByte() && head[1] == 'K'.code.toByte()) fromPackage(::stream)
         else {
             val text = stream().use { readText(it, MaxXml) }.removePrefix("\uFEFF")
@@ -275,13 +276,13 @@ class Importer(
                     val entry = zip.nextEntry ?: break
                     if (++entries > limits.entries) throw ImportFailed(txt(R.string.library_err_too_many_files, limits.entries.toString()))
                     if (!entry.isDirectory) entryPath(entry.name).takeIf { leaf(it) != null }?.let { visit(it, counted) }
-                    counted.transferTo(OutputStream.nullOutputStream())
+                    counted.drain()
                 }
             }
         }
 
         private fun readText(input: InputStream, limit: Int): String {
-            val bytes = input.readNBytes(limit + 1)
+            val bytes = input.readAtMost(limit + 1)
             if (bytes.size > limit) throw ImportFailed(txt(R.string.library_err_xml_large))
             return bytes.toString(Charsets.UTF_8)
         }

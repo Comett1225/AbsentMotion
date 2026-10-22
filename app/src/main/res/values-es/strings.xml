@@ -1447,4 +1447,10 @@
     <string name="preset_numbered">Preajuste %1$s</string>
     <string name="recovery_your_project">tu proyecto</string>
     <string name="caption_layer_name">Subtítulo %1$s</string>
+    <string name="tier_needs_latest">Requiere Android 13 (versión Latest)</string>
+    <string name="feature_flow_high">Flujo óptico alto</string>
+    <string name="about_version_compatible">Versión %1$s Compatible</string>
+    <string name="about_compatible_note">Esta es la versión Compatible para Android 9 a 12. Quedaron fuera: %1$s. Necesitan Android 13 y la versión Latest.</string>
+    <string name="low_memory_title">Memoria baja</string>
+    <string name="low_memory_body">Este teléfono tiene %1$s GB de memoria. AbsentMotion funciona mejor con 3 GB o más: los proyectos largos, los videos grandes y muchos efectos pueden ir lento o cerrar la app.</string>
 </resources>

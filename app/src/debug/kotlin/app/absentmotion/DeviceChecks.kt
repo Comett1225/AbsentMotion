@@ -28,7 +28,7 @@ internal suspend fun checkDevice(context: Context) {
         if (BackgroundRemoval.AVAILABLE) {
             val decode = BackgroundRemoval.javaClass.getDeclaredMethod("decode", Context::class.java, Uri::class.java, Int::class.javaPrimitiveType).apply { isAccessible = true }
             for (tag in listOf(2, 5)) {
-                ExifInterface(image).apply { setAttribute(ExifInterface.TAG_ORIENTATION, "$tag"); saveAttributes() }
+                ExifInterface(image.path).apply { setAttribute(ExifInterface.TAG_ORIENTATION, "$tag"); saveAttributes() }
                 val decoded = withContext(Dispatchers.IO) { decode.invoke(BackgroundRemoval, context, Uri.fromFile(image), 256) as Bitmap }
                 try {
                     check(Color.blue(decoded.getPixel(10, 10)) > 240 && Color.red(decoded.getPixel(30, 10)) > 240) { "Background-removal EXIF $tag input was not mirrored" }

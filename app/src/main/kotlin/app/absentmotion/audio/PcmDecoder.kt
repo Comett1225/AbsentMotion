@@ -1,5 +1,6 @@
 package app.absentmotion.audio
 
+import app.absentmotion.platform.intOr
 import app.absentmotion.R
 import app.absentmotion.i18n.AppText
 import android.content.Context
@@ -104,7 +105,7 @@ internal class PcmDecoder(context: Context, uri: String) : PcmSource {
         channels = format.getInteger(MediaFormat.KEY_CHANNEL_COUNT).coerceAtLeast(1)
         float = format.containsKey(MediaFormat.KEY_PCM_ENCODING) &&
             format.getInteger(MediaFormat.KEY_PCM_ENCODING) == AudioFormat.ENCODING_PCM_FLOAT
-        mix = if (channels > 2) downmixGains(channels, format.getInteger(MediaFormat.KEY_CHANNEL_MASK, 0)) else null
+        mix = if (channels > 2) downmixGains(channels, format.intOr(MediaFormat.KEY_CHANNEL_MASK, 0)) else null
     }
 
     private fun fill(buffer: java.nio.ByteBuffer) {

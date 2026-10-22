@@ -1,5 +1,6 @@
 package app.absentmotion.media
 
+import app.absentmotion.platform.intOr
 import android.content.Context
 import android.graphics.ImageFormat
 import android.media.Image
@@ -9,6 +10,7 @@ import android.media.MediaCodecList
 import android.media.MediaExtractor
 import android.media.MediaFormat
 import android.net.Uri
+import android.os.Build
 import android.os.Handler
 import android.os.HandlerThread
 import android.util.Log
@@ -52,8 +54,10 @@ internal class VideoDecoder(private val context: Context, private val uri: Strin
             timestamps = VideoSources.timestamps(context, uri)
             extractor.seekTo(0, MediaExtractor.SEEK_TO_PREVIOUS_SYNC)
             imageThread = HandlerThread("am-video-images").apply { start() }
-            reader = ImageReader.newInstance(format.getInteger(MediaFormat.KEY_WIDTH), format.getInteger(MediaFormat.KEY_HEIGHT),
-                ImageFormat.PRIVATE, 4, HardwareBuffer.USAGE_GPU_SAMPLED_IMAGE).apply {
+            val width = format.getInteger(MediaFormat.KEY_WIDTH)
+            val height = format.getInteger(MediaFormat.KEY_HEIGHT)
+            reader = (if (Build.VERSION.SDK_INT >= 29) ImageReader.newInstance(width, height, ImageFormat.PRIVATE, 4, HardwareBuffer.USAGE_GPU_SAMPLED_IMAGE)
+                else ImageReader.newInstance(width, height, ImageFormat.PRIVATE, 4)).apply {
                 setOnImageAvailableListener({ source -> source.acquireNextImage()?.let { images.offer(it) } }, Handler(imageThread!!.looper))
             }
             format.setInteger(MediaFormat.KEY_ROTATION, 0)
@@ -94,7 +98,7 @@ internal class VideoDecoder(private val context: Context, private val uri: Strin
                 if (index == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
                     flushable = true
                     readColor(decoder.outputFormat)
-                    if (hdr) Log.i("AMVideo", "HDR video $uri decodes with transfer ${decoder.outputFormat.getInteger(MediaFormat.KEY_COLOR_TRANSFER, 0)}")
+                    if (hdr) Log.i("AMVideo", "HDR video $uri decodes with transfer ${decoder.outputFormat.intOr(MediaFormat.KEY_COLOR_TRANSFER, 0)}")
                 }
                 if (index < 0) continue
                 flushable = true
@@ -129,8 +133,8 @@ internal class VideoDecoder(private val context: Context, private val uri: Strin
     }
 
     private fun readColor(format: MediaFormat) {
-        colorStandard = videoColorStandard(format.getInteger(MediaFormat.KEY_COLOR_STANDARD, colorStandard))
-        colorRange = format.getInteger(MediaFormat.KEY_COLOR_RANGE, colorRange)
+        colorStandard = videoColorStandard(format.intOr(MediaFormat.KEY_COLOR_STANDARD, colorStandard))
+        colorRange = format.intOr(MediaFormat.KEY_COLOR_RANGE, colorRange)
     }
 
     private fun reposition(decoder: MediaCodec, wanted: Long) {

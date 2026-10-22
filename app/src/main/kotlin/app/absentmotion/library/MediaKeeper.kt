@@ -1,5 +1,6 @@
 package app.absentmotion.library
 
+import app.absentmotion.platform.readInto
 import app.absentmotion.export.safeName
 import app.absentmotion.model.MediaDeclaration
 import app.absentmotion.model.Scene
@@ -68,8 +69,8 @@ class MediaKeeper(
         val one = ByteArray(1 shl 16)
         val two = ByteArray(1 shl 16)
         while (true) {
-            val n = x.readNBytes(one, 0, one.size)
-            val m = y.readNBytes(two, 0, two.size)
+            val n = x.readInto(one, 0, one.size)
+            val m = y.readInto(two, 0, two.size)
             if (n != m || !Arrays.equals(one, 0, n, two, 0, m)) return false
             if (n < one.size) return true
         }

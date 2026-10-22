@@ -1,5 +1,6 @@
 package app.absentmotion.ai
 
+import app.absentmotion.platform.drain
 import app.absentmotion.R
 import app.absentmotion.i18n.AppText
 import app.absentmotion.platform.Context
@@ -34,7 +35,6 @@ import kotlinx.coroutines.withContext
 import java.io.Closeable
 import java.io.File
 import java.io.InputStream
-import java.io.OutputStream
 import java.net.HttpURLConnection
 import java.net.URL
 import java.security.DigestInputStream
@@ -292,7 +292,7 @@ internal object CaptionModel {
 
     private fun sha256(input: InputStream): String {
         val digest = MessageDigest.getInstance("SHA-256")
-        DigestInputStream(input, digest).transferTo(OutputStream.nullOutputStream())
+        DigestInputStream(input, digest).drain()
         return hex(digest.digest())
     }
 
