@@ -37,6 +37,8 @@ import app.absentmotion.ui.editor.PanelHeight
 import app.absentmotion.ui.editor.PanelIcons
 import app.absentmotion.ui.editor.Reorder
 import app.absentmotion.ui.editor.rememberReorder
+import app.absentmotion.ui.export.ExportIcons
+import app.absentmotion.ui.home.HelpScreen
 import app.absentmotion.ui.editor.reorderGrip
 import app.absentmotion.ui.editor.reorderLift
 import app.absentmotion.ui.editor.reorderSlot
@@ -177,9 +179,13 @@ private fun CopyEffectsDialog(names: List<String>, onDismiss: () -> Unit, onCopy
 @Composable
 private fun EffectHeader(state: EditorState, index: Int, effect: XmlNode, definition: EffectDefinition?) {
     var menu by remember { mutableStateOf(false) }
+    var help by remember { mutableStateOf(false) }
     Row(Modifier.fillMaxWidth().height(37.dp).clickable { state.effectIndex = -1 }.padding(start = 3.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
         Icon(EffectIcons.Expanded, null, Modifier.padding(start = 8.dp).size(18.dp).alpha(0.9f), tint = Am.OnDark)
         Text(definition?.name ?: effect["id"]?.substringAfterLast('.') ?: "", Modifier.weight(1f).padding(start = 6.dp, end = 4.dp), color = Am.OnDark, fontSize = 14.sp, maxLines = 1)
+        if (definition != null) Box(Modifier.size(36.dp).clickable { help = true }, contentAlignment = Alignment.Center) {
+            Icon(ExportIcons.Help, stringResource(R.string.effect_help), Modifier.size(22.dp), tint = Am.OnDark)
+        }
         Box(Modifier.size(36.dp).clickable { menu = true }, contentAlignment = Alignment.Center) {
             Icon(EffectIcons.MoreVert, stringResource(R.string.effects_more), Modifier.size(24.dp), tint = Am.OnDark)
             Presence(menu) {
@@ -206,6 +212,7 @@ private fun EffectHeader(state: EditorState, index: Int, effect: XmlNode, defini
             Icon(ChromeIcons.Trash, stringResource(R.string.delete), Modifier.size(22.dp), tint = Am.OnDark)
         }
     }
+    if (help && definition != null) HelpScreen("effects/${definition.key}.html") { help = false }
 }
 
 @Composable

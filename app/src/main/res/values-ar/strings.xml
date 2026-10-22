@@ -132,6 +132,8 @@
     <string name="settings_emoji_android">Android</string>
     <string name="settings_keep_media_copies">الاحتفاظ بنسخة من الوسائط المستوردة في المشروع</string>
     <string name="settings_about">حول</string>
+    <string name="settings_help">مساعدة</string>
+    <string name="effect_help">مساعدة حول هذا التأثير</string>
     <string name="settings_level_low">منخفض</string>
     <string name="settings_level_high">مرتفع</string>
     <string name="settings_level_ultra">فائق</string>

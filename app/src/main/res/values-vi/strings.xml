@@ -132,6 +132,8 @@
     <string name="settings_emoji_android">Android</string>
     <string name="settings_keep_media_copies">Giữ bản sao phương tiện đã nhập trong dự án</string>
     <string name="settings_about">Giới thiệu</string>
+    <string name="settings_help">Trợ giúp</string>
+    <string name="effect_help">Trợ giúp về hiệu ứng này</string>
     <string name="settings_level_low">Thấp</string>
     <string name="settings_level_high">Cao</string>
     <string name="settings_level_ultra">Cực cao</string>

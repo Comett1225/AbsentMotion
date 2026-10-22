@@ -132,6 +132,8 @@
     <string name="settings_emoji_android">Android</string>
     <string name="settings_keep_media_copies">Guardar una copia de los medios importados en el proyecto</string>
     <string name="settings_about">Acerca de</string>
+    <string name="settings_help">Ayuda</string>
+    <string name="effect_help">Ayuda para este efecto</string>
     <string name="settings_level_low">Baja</string>
     <string name="settings_level_high">Alta</string>
     <string name="settings_level_ultra">Ultra</string>

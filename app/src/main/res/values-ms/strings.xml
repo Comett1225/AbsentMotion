@@ -132,6 +132,8 @@
     <string name="settings_emoji_android">Android</string>
     <string name="settings_keep_media_copies">Simpan salinan media yang diimport dalam projek</string>
     <string name="settings_about">Perihal</string>
+    <string name="settings_help">Bantuan</string>
+    <string name="effect_help">Bantuan untuk kesan ini</string>
     <string name="settings_level_low">Rendah</string>
     <string name="settings_level_high">Tinggi</string>
     <string name="settings_level_ultra">Ultra</string>

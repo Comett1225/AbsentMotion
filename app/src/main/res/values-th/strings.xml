@@ -132,6 +132,8 @@
     <string name="settings_emoji_android">Android</string>
     <string name="settings_keep_media_copies">เก็บสำเนาสื่อที่นำเข้าไว้ในโปรเจกต์</string>
     <string name="settings_about">เกี่ยวกับ</string>
+    <string name="settings_help">ช่วยเหลือ</string>
+    <string name="effect_help">ช่วยเหลือสำหรับเอฟเฟกต์นี้</string>
     <string name="settings_level_low">ต่ำ</string>
     <string name="settings_level_high">สูง</string>
     <string name="settings_level_ultra">สูงสุด</string>

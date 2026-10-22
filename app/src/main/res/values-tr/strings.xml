@@ -132,6 +132,8 @@
     <string name="settings_emoji_android">Android</string>
     <string name="settings_keep_media_copies">İçe aktarılan medyanın bir kopyasını projede tut</string>
     <string name="settings_about">Hakkında</string>
+    <string name="settings_help">Yardım</string>
+    <string name="effect_help">Bu efekt için yardım</string>
     <string name="settings_level_low">Düşük</string>
     <string name="settings_level_high">Yüksek</string>
     <string name="settings_level_ultra">Ultra</string>

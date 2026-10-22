@@ -132,6 +132,8 @@
     <string name="settings_emoji_android">Android</string>
     <string name="settings_keep_media_copies">इम्पोर्ट किए गए मीडिया की कॉपी प्रोजेक्ट में रखें</string>
     <string name="settings_about">परिचय</string>
+    <string name="settings_help">सहायता</string>
+    <string name="effect_help">इस इफ़ेक्ट के लिए सहायता</string>
     <string name="settings_level_low">कम</string>
     <string name="settings_level_high">उच्च</string>
     <string name="settings_level_ultra">अल्ट्रा</string>

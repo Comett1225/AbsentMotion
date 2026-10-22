@@ -60,6 +60,8 @@ import app.absentmotion.model.addEffect
 import app.absentmotion.model.effects
 import app.absentmotion.ui.editor.PanelIcons
 import app.absentmotion.ui.editor.matchesSearch
+import app.absentmotion.ui.export.ExportIcons
+import app.absentmotion.ui.home.HelpScreen
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Swap
 import app.absentmotion.ui.theme.TilePress
@@ -86,6 +88,7 @@ fun EffectBrowser(state: EditorState) {
     val hasSound = audio || layer?.mediaFill?.video == true
     var category by remember { mutableStateOf<String?>(if (audio) state.effectCategory ?: "audio" else null) }
     var searching by remember { mutableStateOf(false) }
+    var helpPage by remember { mutableStateOf<String?>(null) }
     var query by remember { mutableStateOf("") }
     var detail by remember { mutableStateOf(state.effectDetail?.let(catalog::find)) }
     fun close() { state.effectDetail = null; state.effectCategory = null; state.effectBrowserOpen = false }
@@ -132,6 +135,7 @@ fun EffectBrowser(state: EditorState) {
     val audioName = stringResource(R.string.effects_category_audio)
     val voiceName = stringResource(R.string.layer_tool_voice_filters)
     Column(Modifier.fillMaxSize().background(BrowserBg).systemBarsPadding()) {
+        helpPage?.let { page -> HelpScreen(page) { helpPage = null } }
         Row(Modifier.fillMaxWidth().height(44.dp).background(BrowserBg), verticalAlignment = Alignment.CenterVertically) {
             val stepping = (category != null && !audio) || detail != null || searching || fromAudio
             BrowserButton(if (stepping) PanelIcons.Back else EffectIcons.Close, stringResource(if (stepping) R.string.topbar_back else R.string.action_close), ::back)
@@ -155,7 +159,11 @@ fun EffectBrowser(state: EditorState) {
             val effect = detail!!
             Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp)) {
                 Thumbnail(catalog, effect.thumbnail, Modifier.align(Alignment.CenterHorizontally).size(160.dp))
-                Text(effect.description, Modifier.padding(vertical = 16.dp), color = Am.OnDark, fontSize = 14.sp)
+                Text(effect.description, Modifier.padding(top = 16.dp, bottom = 4.dp), color = Am.OnDark, fontSize = 14.sp)
+                Row(Modifier.fillMaxWidth().height(48.dp).clickable { helpPage = "effects/${effect.key}.html" }.padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Icon(ExportIcons.Help, null, Modifier.size(22.dp), tint = Am.OnDark)
+                    Text(stringResource(R.string.effect_help), Modifier.padding(start = 12.dp), color = Am.OnDark, fontSize = 15.sp)
+                }
                 if (state.effectDetail == null) Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     Text(stringResource(R.string.standard_settings), Modifier.weight(1f).height(48.dp).alpha(if (effect.available) 1f else 0.35f)
                         .clickable(enabled = effect.available) { add(effect) }.padding(12.dp), color = Am.OnDark, fontSize = 15.sp)
