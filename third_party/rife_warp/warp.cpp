@@ -4,7 +4,6 @@
 
 #include "warp.comp.hex.h"
 #include "warp_pack4.comp.hex.h"
-#include "warp_pack8.comp.hex.h"
 
 using namespace ncnn;
 
@@ -24,58 +23,38 @@ int Warp::create_pipeline(const Option& opt)
 
     std::vector<vk_specialization_type> specializations(0 + 0);
 
-    // pack1
     {
         static std::vector<uint32_t> spirv;
         static ncnn::Mutex lock;
         {
             ncnn::MutexLockGuard guard(lock);
+            if (spirv.empty() && compile_spirv_module(warp_comp_data, sizeof(warp_comp_data), opt, spirv) != 0)
+                spirv.clear();
             if (spirv.empty())
-            {
-                compile_spirv_module(warp_comp_data, sizeof(warp_comp_data), opt, spirv);
-            }
+                return -1;
         }
 
         pipeline_warp = new Pipeline(vkdev);
         pipeline_warp->set_optimal_local_size_xyz();
-        pipeline_warp->create(spirv.data(), spirv.size() * 4, specializations);
+        if (pipeline_warp->create(spirv.data(), spirv.size() * 4, specializations) != 0)
+            return -1;
     }
 
-    // pack4
     {
         static std::vector<uint32_t> spirv;
         static ncnn::Mutex lock;
         {
             ncnn::MutexLockGuard guard(lock);
+            if (spirv.empty() && compile_spirv_module(warp_pack4_comp_data, sizeof(warp_pack4_comp_data), opt, spirv) != 0)
+                spirv.clear();
             if (spirv.empty())
-            {
-                compile_spirv_module(warp_pack4_comp_data, sizeof(warp_pack4_comp_data), opt, spirv);
-            }
+                return -1;
         }
 
         pipeline_warp_pack4 = new Pipeline(vkdev);
         pipeline_warp_pack4->set_optimal_local_size_xyz();
-        pipeline_warp_pack4->create(spirv.data(), spirv.size() * 4, specializations);
-    }
-
-    // pack8
-    // ncnn Option no longer exposes use_shader_pack8; pack8 paths are gated by
-    // fp16 packed support.
-    if (opt.use_fp16_packed)
-    {
-        static std::vector<uint32_t> spirv;
-        static ncnn::Mutex lock;
-        {
-            ncnn::MutexLockGuard guard(lock);
-            if (spirv.empty())
-            {
-                compile_spirv_module(warp_pack8_comp_data, sizeof(warp_pack8_comp_data), opt, spirv);
-            }
-        }
-
-        pipeline_warp_pack8 = new Pipeline(vkdev);
-        pipeline_warp_pack8->set_optimal_local_size_xyz();
-        pipeline_warp_pack8->create(spirv.data(), spirv.size() * 4, specializations);
+        if (pipeline_warp_pack4->create(spirv.data(), spirv.size() * 4, specializations) != 0)
+            return -1;
     }
 
     return 0;
@@ -196,11 +175,10 @@ int Warp::forward(const std::vector<VkMat>& bottom_blobs, std::vector<VkMat>& to
     constants[2].i = top_blob.c;
     constants[3].i = top_blob.cstep;
 
-    if (elempack == 8)
-    {
-        cmd.record_pipeline(pipeline_warp_pack8, bindings, constants, top_blob);
-    }
-    else if (elempack == 4)
+    if (elempack != 1 && elempack != 4)
+        return -1;
+
+    if (elempack == 4)
     {
         cmd.record_pipeline(pipeline_warp_pack4, bindings, constants, top_blob);
     }

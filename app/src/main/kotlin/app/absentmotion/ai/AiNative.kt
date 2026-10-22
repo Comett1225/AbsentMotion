@@ -89,17 +89,22 @@ internal class AiNet private constructor(private val handle: Long, private val g
 
         @Volatile var cpuOnly = false
 
-        fun open(context: Context, model: AiModel, blend: AiModel? = null, weight: Float = 1f, gpu: Boolean = AiDevice.gpuProven(context)): AiNet {
+        fun open(context: Context, model: AiModel, blend: AiModel? = null, weight: Float = 1f, gpu: Boolean = AiDevice.gpuProven(context, model)): AiNet {
             check(AiNative.loaded) { AppText.get(R.string.ai_runtime_unavailable) }
             model.verify(context)
             blend?.verify(context)
             val param = model.file(context, checkNotNull(model.param)).path
             val useGpu = gpu && !cpuOnly
             if (useGpu) AiDevice.gpuRunning(context, true)
-            val handle = AiNative.nativeOpen(param, model.file(context, model.bin).path, blend?.let { it.file(context, it.bin).path }, weight, useGpu)
+            val bin = model.file(context, model.bin).path
+            val other = blend?.let { it.file(context, it.bin).path }
+            var handle = AiNative.nativeOpen(param, bin, other, weight, useGpu)
             val onGpu = handle != 0L && AiNative.nativeOnGpu(handle)
             if (useGpu && !onGpu) {
-                if (handle == 0L) AiDevice.gpuFailed(context)
+                if (handle == 0L) {
+                    AiDevice.gpuFailed(context)
+                    handle = AiNative.nativeOpen(param, bin, other, weight, false)
+                }
                 AiDevice.gpuRunning(context, false)
             }
             check(handle != 0L) { AppText.get(R.string.ai_model_failed) }

@@ -15,6 +15,7 @@ import app.absentmotion.ui.onboarding.PhoneSpeed
 import app.absentmotion.ui.onboarding.phoneCheckResult
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
@@ -88,6 +89,7 @@ internal class GpuMark(private val token: String, private val read: () -> String
 
 internal object AiDevice {
     private val rates = ConcurrentHashMap<Pair<AiModel, Boolean>, Double>()
+    private val running = ConcurrentHashMap<AiModel, Deferred<Boolean>>()
     private val probes = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val probing = Mutex()
     @Volatile private var mark: GpuMark? = null
@@ -132,24 +134,33 @@ internal object AiDevice {
         }
     }
 
-    fun gpuProven(context: Context): Boolean = gpuOn(context) && gpuPrefs(context).getString(DeviceCapabilities.of(context).key, null) == GPU_OK
+    private fun proofKey(context: Context, model: AiModel) = "${DeviceCapabilities.of(context).key}:${model.name}"
+
+    fun gpuProven(context: Context, model: AiModel): Boolean = gpuOn(context) && gpuPrefs(context).getString(proofKey(context, model), null) == GPU_OK
 
     suspend fun probeGpu(context: Context, model: AiModel): Boolean = probing.withLock {
         if (!withContext(Dispatchers.Default) { gpuOn(context) }) return false
-        if (gpuProven(context)) return true
+        if (gpuProven(context, model)) return true
         if (!model.installed(context)) return false
-        val work = probes.async {
-            AiNet.open(context, model, gpu = true).use { net ->
-                val smooth = SmoothLevel.entries.firstOrNull { it.model == model }
-                val side = smooth?.padding ?: PROBE_SIDE
-                val input = IntArray(side * side) { 0xFF808080.toInt() }
-                if (smooth != null) net.interpolate(input, input, side, side, 0.5f, smooth.padding) else net.upscale(input, side, side, 1)
-                net.onGpu
+        val work = running[model]?.takeIf { it.isActive } ?: probes.async {
+            val ok = try {
+                AiNet.open(context, model, gpu = true).use { net ->
+                    val smooth = SmoothLevel.entries.firstOrNull { it.model == model }
+                    val side = smooth?.padding ?: PROBE_SIDE
+                    val input = IntArray(side * side) { 0xFF808080.toInt() }
+                    if (smooth != null) net.interpolate(input, input, side, side, 0.5f, smooth.padding) else net.upscale(input, side, side, 1)
+                    net.onGpu
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (_: Exception) {
+                false
             }
-        }
-        val ok = withTimeoutOrNull(PROBE_MS) { try { work.await() } catch (e: CancellationException) { throw e } catch (_: Exception) { false } } ?: false
-        if (ok) gpuPrefs(context).edit().putString(DeviceCapabilities.of(context).key, GPU_OK).commit() else gpuFailed(context)
-        ok
+            if (ok) gpuPrefs(context).edit().putString(proofKey(context, model), GPU_OK).commit() else gpuFailed(context)
+            running.remove(model)
+            ok
+        }.also { running[model] = it }
+        withTimeoutOrNull(PROBE_MS) { work.await() } ?: false
     }
 
     suspend fun phone(context: Context): AiPhone {
