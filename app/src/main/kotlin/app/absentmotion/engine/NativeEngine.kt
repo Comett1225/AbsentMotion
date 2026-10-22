@@ -37,8 +37,8 @@ class NativeEngine(backend: Backend) : AutoCloseable {
     fun setVideoFrame(uri: String, layerId: Long, pts: Long, buffer: HardwareBuffer, standard: Int = 0, range: Int = 0, crop: Rect? = null): Boolean =
         nativeSetVideoFrame(handle, uri.toByteArray(), layerId, pts, buffer, standard, range, crop?.left ?: 0, crop?.top ?: 0, crop?.right ?: 0, crop?.bottom ?: 0)
 
-    fun interpolateVideo(uri: String, layerId: Long, frames: LongArray, t: Float, flow: Boolean, soft: Boolean, blur: Float, params: FloatArray): Boolean =
-        nativeInterpolateVideo(handle, uri.toByteArray(), layerId, frames, t, flow, soft, blur, params)
+    fun interpolateVideo(uri: String, layerId: Long, frames: LongArray, t: Float, mode: Int, soft: Boolean, blur: Float, params: FloatArray, made: Bitmap? = null): Boolean =
+        nativeInterpolateVideo(handle, uri.toByteArray(), layerId, frames, t, mode, soft, blur, params, made)
 
     fun moshStart(uri: String, layerId: Long, pts: LongArray, mosh: FloatArray, flow: FloatArray): Int =
         nativeMoshStart(handle, uri.toByteArray(), layerId, pts, mosh, flow)
@@ -113,7 +113,7 @@ class NativeEngine(backend: Backend) : AutoCloseable {
                                                         bitmap: Bitmap?, buffer: HardwareBuffer?, opaque: Boolean, standard: Int, range: Int, left: Int, top: Int, right: Int, bottom: Int): Boolean
         @JvmStatic private external fun nativeSetVideoFrame(engine: Long, uri: ByteArray, layerId: Long, pts: Long, buffer: HardwareBuffer, standard: Int, range: Int, left: Int, top: Int, right: Int, bottom: Int): Boolean
         @JvmStatic private external fun nativeInterpolateVideo(engine: Long, uri: ByteArray, layerId: Long, frames: LongArray, t: Float,
-                                                               flow: Boolean, soft: Boolean, blur: Float, params: FloatArray): Boolean
+                                                               mode: Int, soft: Boolean, blur: Float, params: FloatArray, made: Bitmap?): Boolean
         @JvmStatic private external fun nativeMoshStart(engine: Long, uri: ByteArray, layerId: Long, pts: LongArray, mosh: FloatArray, flow: FloatArray): Int
         @JvmStatic private external fun nativeMoshFrame(engine: Long, uri: ByteArray, layerId: Long, step: Int, buffer: HardwareBuffer, standard: Int, range: Int, left: Int, top: Int, right: Int, bottom: Int): Boolean
         @JvmStatic private external fun nativeRenderScene(

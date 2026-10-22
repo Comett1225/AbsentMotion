@@ -3,6 +3,7 @@ package app.absentmotion.ui.export
 import androidx.annotation.StringRes
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
+import app.absentmotion.ai.AiSmooth
 import app.absentmotion.i18n.Ltr
 import app.absentmotion.i18n.UiText
 import androidx.compose.ui.text.TextStyle
@@ -315,8 +316,14 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
         better?.let { settings[ExportKind.Video] = it }
     }
 
-    fun start(ignoreMissing: Boolean = false) {
+    fun start(ignoreMissing: Boolean = false, aiReady: Boolean = false) {
         val s = settings.getValue(kind)
+        val aiLevel = s.interpolationLevel.takeIf { s.interpolation == FrameInterpolation.Ai && kind in AiKinds }
+        if (aiLevel != null && !aiReady && !AiSmooth.installed(context, aiLevel)) {
+            failure = Failure(R.string.ai_smooth_download_title, txt(R.string.ai_smooth_download_text, formatBytes(AiSmooth.downloadBytes(aiLevel))),
+                txt(R.string.ai_download_and_start), proceed = { start(ignoreMissing, true) })
+            return
+        }
         if (scene.layers.isEmpty() && kind != ExportKind.Xml && kind != ExportKind.Package) {
             failure = Failure(R.string.export_failed_title, txt(R.string.export_failed_empty))
             return
@@ -351,7 +358,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
                     }
                     if (missing.isNotEmpty() && !ignoreMissing) {
                         val names = missing.map { scene.media(it)?.filename?.ifEmpty { null } ?: it }
-                        failure = Failure(R.string.export_missing_title, txt(R.string.export_missing_text, names.joinToString("\n")), txt(R.string.export_anyway), proceed = { start(true) })
+                        failure = Failure(R.string.export_missing_title, txt(R.string.export_missing_text, names.joinToString("\n")), txt(R.string.export_anyway), proceed = { start(true, aiReady) })
                         phase = Phase.Idle
                         return@launch
                     }
@@ -368,6 +375,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
                         return@launch
                     }
                 }
+                if (aiLevel != null && !AiSmooth.installed(context, aiLevel)) AiSmooth.download(context, aiLevel) { progress = it }
                 val result = exporter.export(chosen, exported, s, frame, name) { progress = it }
                 phase = Phase.Done(chosen, result)
                 ExportSizes.key(chosen, s)?.let { key ->
@@ -511,6 +519,15 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
 }
 
 private val NoSound = txt(R.string.export_no_sound)
+
+private val AiKinds = setOf(ExportKind.Video, ExportKind.Gif, ExportKind.Sequence)
+
+@Composable
+private fun AiSmoothHint(scene: Scene, s: ExportSettings, width: Int, height: Int) {
+    if (s.interpolation != FrameInterpolation.Ai) return
+    val gmac = remember(scene, s.interpolationLevel, s.fps, width, height) { AiSmooth.exportGmac(scene, s.interpolationLevel, s.fps, width, height) }
+    Hint(aiSmoothNote(aiSmoothEstimate(gmac, s.interpolationLevel), s.interpolationLevel, clip = false))
+}
 
 @StringRes
 private fun ExportKind.title() = when (this) {
@@ -723,6 +740,7 @@ private fun VideoPage(
                 Segments(FrameInterpolation.entries.map { Choice(it) }, s.interpolation, { stringResource(it.label) }, onReason) { onChange(s.copy(interpolation = it)) }
                 Segments(levelChoices(s), s.interpolationLevel, { stringResource(it.label) }, onReason) { onChange(s.copy(interpolationLevel = it)) }
                 Hint(stringResource(R.string.export_interpolation_hint))
+                AiSmoothHint(scene, s, w, h)
             }
             Field(stringResource(R.string.export_motion_blur), onHelp = onHelp) {
                 Segments(MotionBlur.entries.map { Choice(it) }, s.motionBlur, { stringResource(it.label) }, onReason) { onChange(s.copy(motionBlur = it)) }
@@ -935,6 +953,7 @@ private fun OptionsPage(kind: ExportKind, scene: Scene, s: ExportSettings, onRea
             levelChoices(s).forEach { c -> Chip(stringResource(c.value.label), s.interpolationLevel == c.value) { c.reason?.let(onReason) ?: onChange(s.copy(interpolationLevel = c.value)) } }
         }
         Hint(stringResource(R.string.export_interpolation_hint))
+        AiSmoothHint(scene, s, w, h)
     }
     Field(stringResource(R.string.export_motion_blur), onHelp = onHelp) {
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {

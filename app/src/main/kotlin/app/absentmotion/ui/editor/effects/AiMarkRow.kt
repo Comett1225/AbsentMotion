@@ -41,7 +41,7 @@ internal val AiMarkRowGap = 6.5.dp
 internal fun AiMarkRow(state: EditorState, mark: AiMark) {
     val kind = mark.kind ?: return
     val smooth = smoothingOf(mark.node["option"])?.takeIf { kind == AiKind.Smooth }
-    val parts = listOfNotNull(mark.source?.title, smooth?.method?.takeIf { it != FrameInterpolation.Off }?.label,
+    val parts = listOfNotNull(mark.source?.title, mark.enhance?.mode?.title, smooth?.method?.takeIf { it != FrameInterpolation.Off }?.label,
         smooth?.level?.label?.takeIf { smooth.method != FrameInterpolation.Off }, R.string.export_motion_blur.takeIf { smooth != null && smooth.blur != MotionBlur.Off })
     val name = (listOf(stringResource(kind.title)) + parts.map { stringResource(it) }).joinToString(" · ")
     Row(Modifier.padding(start = 6.5.dp, end = 6.5.dp, top = AiMarkRowGap).fillMaxWidth().height(AiMarkRowHeight).clip(RoundedCornerShape(5.dp)).background(Am.Field),

@@ -41,11 +41,17 @@ struct InterpolationParams {
     bool operator==(const InterpolationParams&) const = default;
 };
 
+enum class SmoothMode { Off = 0, Blend = 1, Flow = 2, Ai = 3 };
+
 struct SmoothRequest {
     int64_t before = 0, a = 0, b = 0, after = 0;
     float t = 0;
-    bool flow = false, soft = false;
+    SmoothMode mode = SmoothMode::Off;
+    bool soft = false;
     float blur = 0;
+    const void* pixels = nullptr;
+    int width = 0, height = 0;
+    size_t rowBytes = 0;
 };
 
 struct MoshParams {

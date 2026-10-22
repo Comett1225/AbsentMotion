@@ -14,6 +14,7 @@ enum class AiKind(val xml: String, @StringRes val title: Int, val attribute: Str
     Background("background", R.string.ai_remove_background, "fillImage"),
     Video("video", R.string.ai_remove_background_video, null),
     Smooth("smooth", R.string.smooth_clip, "fillVideo", false),
+    Enhance("enhance", R.string.ai_enhance, "fillVideo"),
 }
 
 enum class NoiseSource(val xml: String, @StringRes val title: Int, @StringRes val hint: Int, val rumbleHz: Double, val blend: Double) {
@@ -25,6 +26,7 @@ enum class NoiseSource(val xml: String, @StringRes val title: Int, @StringRes va
 class AiMark(val node: XmlNode) {
     val kind: AiKind? get() = AiKind.entries.firstOrNull { it.xml == node["type"] }
     val source: NoiseSource? get() = NoiseSource.entries.firstOrNull { it.xml == node["option"] }
+    val enhance: EnhanceOptions? get() = if (kind == AiKind.Enhance) EnhanceOptions.parse(node["option"]) else null
     val original: String? get() = node["original"]
     val result: String? get() = node["result"]
     val media: MediaDeclaration? get() = node.child("media")?.let(::MediaDeclaration)

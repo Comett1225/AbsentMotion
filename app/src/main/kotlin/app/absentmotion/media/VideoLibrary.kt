@@ -1,6 +1,9 @@
 package app.absentmotion.media
 
 import android.content.Context
+import android.graphics.Bitmap
+import app.absentmotion.ai.AiSmooth
+import app.absentmotion.ai.argb
 import android.net.Uri
 import android.util.Log
 import app.absentmotion.R
@@ -175,6 +178,9 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
         private var publishedMix: Pair<SmoothFrame, Smoothing>? = null
         private var publishedMosh: Pair<List<Long>, List<Float>>? = null
         private val held = mutableSetOf<Long>()
+        private var aiSmooth: AiSmooth? = null
+        private var aiReader: Pair<String, FrameReader>? = null
+        private val aiFrames = HashMap<Long, Pair<IntArray, Pair<Int, Int>>>()
         private val worker = scope.launch {
             try {
                 for ((request, layer) in queue) {
@@ -289,10 +295,16 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
                 exportCheck(image.hardwareBuffer!!.use { engine.setVideoFrame(uri, it, id, pts, source.colorStandard, source.colorRange, image.cropRect) }) { txt(R.string.media_error_interp_import, stamps.frameNumber(pts)) }
                 held += pts
             }
-            if (!engine.interpolateVideo(uri, id, longArrayOf(frame.before, frame.pair.a, frame.pair.b, frame.after), frame.pair.t,
-                    smoothing.method == FrameInterpolation.Flow, frame.soft, frame.blur, smoothing.flowParams(DebugFrameInterpolation.params()))) {
-                held.clear()
-                throw ExportError(txt(R.string.media_error_interp_render, txt(request.smoothing.label)))
+            val made = if (smoothing.method == FrameInterpolation.Ai && frame.pair.a != frame.pair.b && frame.pair.t > 0f)
+                aiFrame(this.source ?: uri, frame.pair.a, frame.pair.b, frame.pair.t, smoothing.level, stamps) else null
+            try {
+                if (!engine.interpolateVideo(uri, id, longArrayOf(frame.before, frame.pair.a, frame.pair.b, frame.after), frame.pair.t,
+                        smoothing.method.ordinal, frame.soft, frame.blur, smoothing.flowParams(DebugFrameInterpolation.params()), made)) {
+                    held.clear()
+                    throw ExportError(txt(R.string.media_error_interp_render, txt(request.smoothing.label)))
+                }
+            } finally {
+                made?.recycle()
             }
             held.retainAll(wanted)
             publishedMix = key
@@ -331,11 +343,31 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
             return true
         }
 
+        private suspend fun aiFrame(file: String, a: Long, b: Long, t: Float, level: SmoothLevel, stamps: LongArray): Bitmap {
+            val smooth = aiSmooth?.takeIf { it.level == level } ?: withContext(Dispatchers.IO) { AiSmooth.open(context, level) }.also { aiSmooth?.close(); aiSmooth = it }
+            val reader = aiReader?.takeIf { it.first == file }?.second ?: FrameReader(context, file).also {
+                aiReader?.second?.close()
+                aiReader = file to it
+                aiFrames.clear()
+            }
+            aiFrames.keys.retainAll(setOf(a, b))
+            val missing = listOf(a, b).filter { it !in aiFrames }.distinct().sorted()
+            if (missing.isNotEmpty()) reader.read(missing) { pts, yuv -> aiFrames[pts] = yuv.argb(yuv.width, yuv.height, reader.colorStandard, reader.fullRange) to (yuv.width to yuv.height) }
+            val (first, size) = aiFrames[a] ?: throw ExportError(txt(R.string.media_error_interp_source, stamps.frameNumber(a)))
+            val second = aiFrames[b]?.first ?: throw ExportError(txt(R.string.media_error_interp_source, stamps.frameNumber(b)))
+            val out = smooth.between(first, second, size.first, size.second, t)
+            return Bitmap.createBitmap(out, size.first, size.second, Bitmap.Config.ARGB_8888)
+        }
+
         suspend fun close() {
             stopped = true
             queue.close()
             worker.cancel(); worker.join()
             engine.setPicture(uri, null, id)
+            aiSmooth?.close()
+            aiSmooth = null
+            aiReader?.second?.close()
+            aiReader = null
         }
     }
 }

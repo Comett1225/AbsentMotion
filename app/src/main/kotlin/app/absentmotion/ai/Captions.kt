@@ -269,28 +269,33 @@ internal object CaptionModel {
         }
     }
 
-    internal fun receive(input: InputStream, part: File, target: File, bytes: Long, sha256: String, active: () -> Unit, progress: (Float) -> Unit) {
+    internal fun receive(input: InputStream, part: File, target: File, bytes: Long, sha256: String, active: () -> Unit, progress: (Float) -> Unit,
+                         append: Boolean = false, wrong: Int = R.string.ai_download_not_model) {
         val digest = MessageDigest.getInstance("SHA-256")
+        if (append) part.inputStream().use { DigestInputStream(it, digest).transferTo(OutputStream.nullOutputStream()) }
         val digesting = DigestInputStream(input, digest)
-        part.outputStream().use { output ->
+        java.io.FileOutputStream(part, append).use { output ->
             val buffer = ByteArray(64 * 1024)
-            var done = 0L
+            var done = if (append) part.length() else 0L
             while (true) {
                 active()
                 val count = digesting.read(buffer)
                 if (count < 0) break
                 output.write(buffer, 0, count)
                 done += count
-                check(done <= bytes) { AppText.get(R.string.ai_download_not_model) }
+                if (done > bytes) part.delete()
+                check(done <= bytes) { AppText.get(wrong) }
                 progress(done.toFloat() / bytes)
             }
         }
         check(part.length() == bytes) { AppText.get(R.string.ai_download_incomplete) }
-        check(hex(digest.digest()) == sha256) { AppText.get(R.string.ai_download_not_model) }
+        val intact = hex(digest.digest()) == sha256
+        if (!intact) part.delete()
+        check(intact) { AppText.get(wrong) }
         check(part.renameTo(target)) { AppText.get(R.string.ai_cannot_save_model) }
     }
 
-    private fun sha256(input: InputStream): String {
+    internal fun sha256(input: InputStream): String {
         val digest = MessageDigest.getInstance("SHA-256")
         DigestInputStream(input, digest).drain()
         return hex(digest.digest())
