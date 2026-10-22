@@ -151,8 +151,8 @@ Java_app_absentmotion_ai_AiNative_nativeGpu(JNIEnv *env, jobject) {
     if (index < 0) return nullptr;
     const ncnn::GpuInfo &info = ncnn::get_gpu_info(index);
     char line[512];
-    snprintf(line, sizeof line, "%u\t%d\t%d\t%d\t%s", info.api_version(), info.type(), info.support_fp16_storage() ? 1 : 0,
-             info.support_fp16_arithmetic() ? 1 : 0, info.device_name());
+    snprintf(line, sizeof line, "%u\t%d\t%d\t%d\t%d\t%s", info.api_version(), info.type(), info.support_fp16_storage() ? 1 : 0,
+             info.support_fp16_arithmetic() ? 1 : 0, info.support_VK_KHR_push_descriptor() ? 1 : 0, info.device_name());
     return env->NewStringUTF(line);
 }
 

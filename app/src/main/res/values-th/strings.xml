@@ -1209,6 +1209,9 @@
     <string name="ai_sound_not_kept">ไม่สามารถเก็บเสียงของคลิปนี้ไว้ในวิดีโอใหม่ได้</string>
     <string name="ai_video_too_large_to_save">มือถือเครื่องนี้บันทึกวิดีโอขนาด %1$s × %2$s ไม่ได้</string>
     <string name="ai_delete_model">ลบ %1$s</string>
+    <string name="settings_ai_gpu">ใช้ชิปกราฟิกสำหรับ AI</string>
+    <string name="ai_gpu_warning">อาจทำให้โทรศัพท์บางรุ่นค้าง หากเครื่องค้าง ให้รีสตาร์ท AI จะกลับไปใช้โปรเซสเซอร์</string>
+    <string name="ai_gpu_failed">งาน AI บนชิปกราฟิกไม่สำเร็จ AI จึงสลับไปใช้โปรเซสเซอร์แทน</string>
     <string name="export_interpolation_ai">AI Smooth</string>
     <string name="export_interpolation_ai_help">โมเดล AI จะสร้างเฟรม промежขึ้นมา รองรับการเคลื่อนไหวเร็วและขอบที่โผล่หรือหายไปได้ดีกว่า Optical flow แต่ช้ากว่ามากและต้องดาวน์โหลดครั้งแรกประมาณ 11 MB</string>
     <string name="export_interpolation_ai_levels">ต่ำใช้โมเดลที่เบากว่า เหมาะกับโทรศัพท์ระดับดี ปานกลางเป็นโมเดลที่ควรเริ่มใช้ สูงใช้โมเดลที่ใหญ่กว่าสำหรับฉากที่ยากที่สุด ควรใช้กับโทรศัพท์เร็วหรือคลิปสั้น บนโทรศัพท์รุ่นท็อปใหม่ ๆ วิดีโอ 1080p ความยาว 10 วินาทีที่ 30 ถึง 60 fps ใช้เวลาประมาณครึ่งนาทีถึงหนึ่งนาที ส่วนโทรศัพท์ระดับพื้นฐานอาจใช้ 10 นาทีขึ้นไป</string>

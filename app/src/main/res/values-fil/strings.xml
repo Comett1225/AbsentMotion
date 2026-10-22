@@ -1233,6 +1233,9 @@
     <string name="ai_sound_not_kept">Hindi maipapanatili ang audio ng clip na ito sa bagong bidyo</string>
     <string name="ai_video_too_large_to_save">Hindi kayang i-save ng phone na ito ang %1$s × %2$s na bidyo</string>
     <string name="ai_delete_model">I-delete ang %1$s</string>
+    <string name="settings_ai_gpu">Gamitin ang graphics chip para sa AI</string>
+    <string name="ai_gpu_warning">Puwedeng mag-freeze ang ilang telepono dahil dito. Kapag nag-freeze ang telepono, i-restart ito at gagamitin ulit ng AI ang processor.</string>
+    <string name="ai_gpu_failed">Hindi natapos ang AI work sa graphics chip, kaya processor na ang gamit ng AI ngayon.</string>
     <string name="export_interpolation_ai">AI Smooth</string>
     <string name="export_interpolation_ai_help">Gumuguhit ng mga in-between frame ang AI model. Mas mahusay itong humawak ng mabilis na galaw at mga gilid na lumilitaw o nawawala kaysa Optical flow, pero mas mabagal ito at kailangan ng isahang pag-download na mga 11 MB.</string>
     <string name="export_interpolation_ai_levels">Gumagamit ng mas magaan na modelo ang Low at bagay ito sa Good phone. Ang Medium ang modelong dapat simulan. Gumagamit ng mas malaking modelo ang High para sa pinakamahirap na eksena; panatilihin ito para sa Fast phone o maiikling clip. Sa isang kamakailang top phone, ang 10 segundong 1080p na bidyo sa 30 hanggang 60 fps ay tumatagal ng mga kalahating minuto hanggang isang minuto; ang Basic phone ay maaaring tumagal ng 10 minuto o higit pa.</string>

@@ -1209,6 +1209,9 @@
     <string name="ai_sound_not_kept">Bunyi klip ini tidak dapat dikekalkan dalam video baharu</string>
     <string name="ai_video_too_large_to_save">Telefon ini tidak dapat menyimpan video %1$s × %2$s</string>
     <string name="ai_delete_model">Padam %1$s</string>
+    <string name="settings_ai_gpu">Gunakan cip grafik untuk AI</string>
+    <string name="ai_gpu_warning">Ini boleh menyebabkan sesetengah telefon hang. Jika telefon hang, mulakan semula dan AI akan menggunakan pemproses semula.</string>
+    <string name="ai_gpu_failed">Kerja AI pada cip grafik tidak selesai, jadi AI kini menggunakan pemproses.</string>
     <string name="export_interpolation_ai">AI Lancar</string>
     <string name="export_interpolation_ai_help">Model AI melukis bingkai antara. Ia mengendalikan gerakan pantas dan tepi yang muncul atau hilang lebih baik daripada aliran optik, tetapi ia jauh lebih perlahan dan memerlukan muat turun sekali sahaja kira-kira 11 MB.</string>
     <string name="export_interpolation_ai_levels">Rendah menggunakan model lebih ringan dan sesuai untuk telefon Good. Sederhana ialah model untuk permulaan. Tinggi menggunakan model lebih besar untuk babak paling sukar; gunakannya untuk telefon Fast atau klip pendek. Pada telefon terbaik terkini, video 1080p 10 saat pada 30 hingga 60 fps mengambil kira-kira setengah minit hingga seminit; telefon Basic boleh mengambil masa 10 minit atau lebih.</string>
