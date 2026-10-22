@@ -86,6 +86,16 @@ class ExportTimeTest {
         assertEquals(txt(R.string.export_time_few_seconds), timeLabel(4_000))
         assertEquals(UiText.plural(R.plurals.export_time_seconds, 45, "45"), timeLabel(44_000))
         assertEquals(UiText.plural(R.plurals.export_time_minutes, 3, "3"), timeLabel(170_000))
-        assertEquals(txt(R.string.export_time_hours, "1.5"), timeLabel(5_400_000))
+        val locale = java.util.Locale.getDefault()
+        try {
+            java.util.Locale.setDefault(java.util.Locale.UK)
+            assertEquals(UiText.plural(R.plurals.export_time_hours_count, 1, "1"), timeLabel(3_600_000))
+            assertEquals(UiText.plural(R.plurals.export_time_hours_count, 2, "1.5"), timeLabel(5_400_000))
+            assertEquals(UiText.plural(R.plurals.export_time_hours_count, 12, "12"), timeLabel(43_000_000))
+            java.util.Locale.setDefault(java.util.Locale.forLanguageTag("es"))
+            assertEquals(UiText.plural(R.plurals.export_time_hours_count, 2, "1,5"), timeLabel(5_400_000))
+        } finally {
+            java.util.Locale.setDefault(locale)
+        }
     }
 }

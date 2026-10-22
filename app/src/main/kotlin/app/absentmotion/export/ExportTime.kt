@@ -100,7 +100,11 @@ fun timeLabel(ms: Long): UiText = when {
     ms < 10_000 -> txt(R.string.export_time_few_seconds)
     ms < 90_000 -> ((ms + 2_500) / 5_000 * 5).toInt().let { UiText.plural(R.plurals.export_time_seconds, it, it.toString()) }
     ms < 3_600_000 -> ((ms + 30_000) / 60_000).toInt().let { UiText.plural(R.plurals.export_time_minutes, it, it.toString()) }
-    else -> txt(R.string.export_time_hours, "%.1f".format(java.util.Locale.ROOT, ms / 3_600_000.0))
+    else -> {
+        val hours = if (ms < 36_000_000) (ms / 360_000.0).roundToLong() / 10.0 else ((ms + 1_800_000) / 3_600_000).toDouble()
+        val text = java.text.NumberFormat.getNumberInstance().apply { maximumFractionDigits = 1 }.format(hours)
+        UiText.plural(R.plurals.export_time_hours_count, kotlin.math.ceil(hours).toInt(), text)
+    }
 }
 
 internal fun recordsToJson(records: List<ExportRecord>): JSONArray = JSONArray().apply {

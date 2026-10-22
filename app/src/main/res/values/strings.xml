@@ -458,6 +458,10 @@
         <item quantity="one">about %1$s minute</item>
         <item quantity="other">about %1$s minutes</item>
     </plurals>
+    <plurals name="export_time_hours_count">
+        <item quantity="one">about %1$s hour</item>
+        <item quantity="other">about %1$s hours</item>
+    </plurals>
 
     <string name="export_verify_empty">The file has no audio or video in it.</string>
     <string name="export_verify_no_video">The file has no video track.</string>
