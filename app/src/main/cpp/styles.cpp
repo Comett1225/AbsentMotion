@@ -344,9 +344,15 @@ SkPath DrawStroke(SkCanvas* canvas, const Layer& l, const SkPath& path, float t,
 
 bool ShapeKind(const Layer& l) { return l.kind == "shape"; }
 
-bool ShaderBorder(const Layer& l, const Edge& e, float t) {
+bool CutoutImage(const Layer& l, const MediaPictures& pictures) {
+    if (!ShapeKind(l) || l.text || l.video || l.fillType != "media") return false;
+    auto image = pictures(l.mediaUri, l.id);
+    return image && !image->isOpaque();
+}
+
+bool ShaderBorder(const Layer& l, const Edge& e, float t, bool cutout = false) {
     return e.enabled && e.size.get(0, t, e.direction == "centered" ? 4 : 6) > 0.003f &&
-           !(ShapeKind(l) && e.direction == "centered");
+           !(ShapeKind(l) && !cutout && e.direction == "centered");
 }
 
 bool ShadowOn(const Layer& l) { return !l.shadow.direction.empty() && l.shadow.enabled; }
@@ -418,7 +424,7 @@ half4 main(float2 xy) {
     return f;
 }
 
-void DrawGroupBorders(SkCanvas* canvas, const Layer& l, float t) {
+void DrawGroupBorders(SkCanvas* canvas, const Layer& l, float t, bool cutout = false) {
     static const sk_sp<SkRuntimeEffect> effect = [] {
         auto result = SkRuntimeEffect::MakeForShader(SkString(R"(
 uniform shader image;
@@ -456,7 +462,7 @@ half4 main(float2 xy) {
     const float unit = 1 / std::max(std::sqrt(std::fabs(ctm.getScaleX() * ctm.getScaleY() - ctm.getSkewX() * ctm.getSkewY())), 1e-3f);
     sk_sp<SkImageFilter> result;
     for (const Edge& e : l.borders) {
-        if (!ShaderBorder(l, e, t)) continue;
+        if (!ShaderBorder(l, e, t, cutout)) continue;
         const bool outside = e.direction == "outside", centered = e.direction == "centered";
         const float radius = std::max(e.size.get(0, t, centered ? 4 : 6) / 2, 0.0f);
         const SkColor4f colour = ColorAt(e.color, t, kWhite);
@@ -662,7 +668,8 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
     const SkPath path = BodyPath(l, t);
     Drawn drawn;
     const SkPath scenePath = path.makeTransform(m);
-    const bool bordered = decorate && std::any_of(l.borders.begin(), l.borders.end(), [&](const Edge& e) { return ShaderBorder(l, e, t); });
+    const bool cutout = decorate && CutoutImage(l, pictures) && !SeesPrevious(siblings, l);
+    const bool bordered = decorate && std::any_of(l.borders.begin(), l.borders.end(), [&](const Edge& e) { return ShaderBorder(l, e, t, cutout); });
     auto picture = [&](SkCanvas* canvas) {
         if (!copies) {
             drawn = DrawBody(canvas, l, timeMs, t, m, path, alpha, pictures, bordered);
@@ -723,6 +730,7 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
     if (!decorate) return;
     if (l.kind == "embedScene") return DrawGroupBorders(canvas, l, t);
     if (!bordered) return;
+    if (cutout) return DrawGroupBorders(canvas, l, t, true);
     if (copies) {
         drawn.fill = l.kind == "drawing" ? !l.strokes.empty() : l.fillType == "color" ? ColorAt(l.fillColor, t, kWhite, alpha).fA > 0 : l.fillType == "media" || l.fillType == "gradient";
         if (l.stroke.present && l.stroke.enabled) drawn.stroked = DrawStroke(nullptr, l, scenePath, t, alpha);
@@ -824,11 +832,12 @@ void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& 
     const float opacity = std::clamp(ov.unitOpacity ? ov.alpha : l.opacity.get(0, t, 1) * MotionOpacity(l, timeMs) * ov.alpha, 0.0f, 1.0f);
     const bool group = l.kind == "embedScene";
     bool decorated = false;
-    for (const Edge& e : l.borders) decorated |= ShaderBorder(l, e, t);
+    const bool cutout = CutoutImage(l, pictures) && !SeesPrevious(siblings, l);
+    for (const Edge& e : l.borders) decorated |= ShaderBorder(l, e, t, cutout);
     const bool shadow = ShadowOn(l);
     decorated = decorated || shadow || EffectsApply(siblings, l);
     const bool blended = ov.blend || !IsNormal(l.blending);
-    const bool centred = ShapeKind(l) && std::any_of(l.borders.begin(), l.borders.end(), [](const Edge& e) { return e.enabled && e.direction == "centered"; });
+    const bool centred = ShapeKind(l) && !cutout && std::any_of(l.borders.begin(), l.borders.end(), [](const Edge& e) { return e.enabled && e.direction == "centered"; });
     const bool repeated = HasRepeat(l);
     const std::vector<LayerCopy> copies = repeated ? CopiesOf(siblings, l, timeMs, gScene ? gScene->width : 0, gScene ? gScene->height : 0) : std::vector<LayerCopy>();
     const bool overlaps = l.kind == "drawing" || l.kind == "model" || (l.stroke.present && l.stroke.enabled) || centred || repeated;
