@@ -200,6 +200,8 @@ private val thumbnailCache = object : android.util.LruCache<String, Bitmap>(12 *
 }
 private val thumbnailLocks = Array(16) { Mutex() }
 
+internal fun dropThumbnails() = thumbnailCache.evictAll()
+
 private var thumbnailVersions: Map<String, Long> = emptyMap()
 
 @Synchronized

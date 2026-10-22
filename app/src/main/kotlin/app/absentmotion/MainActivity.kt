@@ -1,5 +1,6 @@
 package app.absentmotion
 
+import android.content.ComponentCallbacks2
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
@@ -23,7 +24,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import app.absentmotion.media.dropThumbnails
 import app.absentmotion.ui.editor.LocalWide
+import app.absentmotion.ui.editor.dropShapeIcons
+import app.absentmotion.ui.editor.dropVideoThumbnails
 import app.absentmotion.ui.editor.isTablet
 import app.absentmotion.ui.editor.wideEditor
 import androidx.compose.ui.unit.Density
@@ -580,6 +584,14 @@ class MainActivity : ComponentActivity() {
     override fun onDestroy() {
         super.onDestroy()
         engine.close()
+    }
+
+    override fun onTrimMemory(level: Int) {
+        super.onTrimMemory(level)
+        if (level < ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN) return
+        dropThumbnails()
+        dropVideoThumbnails()
+        dropShapeIcons()
     }
 
     override fun onResume() {

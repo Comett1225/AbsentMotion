@@ -80,3 +80,5 @@ internal fun mediaStripPicture(layer: Layer, scene: Scene, engine: EngineThread,
 }
 
 private val icons = LruCache<Pair<XmlNode, Int>, ImageBitmap>(200)
+
+internal fun dropShapeIcons() = icons.evictAll()
