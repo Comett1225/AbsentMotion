@@ -209,6 +209,7 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
         private var aiSmooth: AiSmooth? = null
         private var aiReader: Pair<String, FrameReader>? = null
         private val aiFrames = HashMap<Long, Pair<IntArray, Pair<Int, Int>>>()
+        private var aiFailed = false
         private val worker = scope.launch {
             try {
                 for ((request, layer) in queue) {
@@ -323,11 +324,12 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
                 exportCheck(image.hardwareBuffer!!.use { engine.setVideoFrame(uri, it, id, pts, source.colorStandard, source.colorRange, image.cropRect) }) { txt(R.string.media_error_interp_import, stamps.frameNumber(pts)) }
                 held += pts
             }
-            val made = if (smoothing.method == FrameInterpolation.Ai && frame.pair.a != frame.pair.b && frame.pair.t > 0f)
-                aiFrame(this.source ?: uri, frame.pair.a, frame.pair.b, frame.pair.t, smoothing.level, stamps) else null
+            val ai = smoothing.method == FrameInterpolation.Ai && frame.pair.a != frame.pair.b && frame.pair.t > 0f && !aiFailed
+            val made = if (ai) aiFrameOrNull(this.source ?: uri, frame.pair.a, frame.pair.b, frame.pair.t, smoothing.level, stamps) else null
+            val method = if (smoothing.method == FrameInterpolation.Ai && made == null) FrameInterpolation.Flow else smoothing.method
             try {
                 if (!engine.interpolateVideo(uri, id, longArrayOf(frame.before, frame.pair.a, frame.pair.b, frame.after), frame.pair.t,
-                        smoothing.method.ordinal, frame.soft, frame.blur, smoothing.flowParams(DebugFrameInterpolation.params()), made)) {
+                        method.ordinal, frame.soft, frame.blur, smoothing.flowParams(DebugFrameInterpolation.params()), made)) {
                     held.clear()
                     throw ExportError(txt(R.string.media_error_interp_render, txt(request.smoothing.label)))
                 }
@@ -369,6 +371,27 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
             held.clear()
             retryAt = 0L
             return true
+        }
+
+        private suspend fun aiFrameOrNull(file: String, a: Long, b: Long, t: Float, level: SmoothLevel, stamps: LongArray): Bitmap? = try {
+            aiFrame(file, a, b, t, level, stamps)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            aiGaveUp(e)
+        } catch (e: OutOfMemoryError) {
+            aiGaveUp(e)
+        }
+
+        private fun aiGaveUp(e: Throwable): Bitmap? {
+            Log.w("AMInterp", "AI interpolation failed, using optical flow for the rest of this clip", e)
+            aiFailed = true
+            aiSmooth?.close()
+            aiSmooth = null
+            aiReader?.second?.close()
+            aiReader = null
+            aiFrames.clear()
+            return null
         }
 
         private suspend fun aiFrame(file: String, a: Long, b: Long, t: Float, level: SmoothLevel, stamps: LongArray): Bitmap {

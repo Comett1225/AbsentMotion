@@ -3,6 +3,8 @@ package app.absentmotion.ai
 import android.content.Context
 import app.absentmotion.export.SmoothLevel
 import app.absentmotion.model.Scene
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import java.io.Closeable
 import kotlin.math.min
 
@@ -25,12 +27,14 @@ class AiSmooth private constructor(private val net: AiNet, val level: SmoothLeve
 
     suspend fun between(first: IntArray, second: IntArray, width: Int, height: Int, t: Float, output: IntArray = IntArray(width * height)): IntArray {
         require(t > 0f && t < 1f && first.size >= width * height && second.size >= width * height)
-        return net.interpolate(first, second, width, height, t, level.padding, maxPixels, output)
+        return inference.withLock { net.interpolate(first, second, width, height, t, level.padding, maxPixels, output) }
     }
 
     override fun close() = net.close()
 
     companion object {
+        private val inference = Mutex()
+
         fun installed(context: Context, level: SmoothLevel): Boolean = level.model.installed(context)
 
         fun downloadBytes(level: SmoothLevel): Long = level.model.bytes
