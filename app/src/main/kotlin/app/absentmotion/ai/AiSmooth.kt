@@ -1,15 +1,18 @@
 package app.absentmotion.ai
 
 import android.content.Context
-import androidx.annotation.StringRes
-import app.absentmotion.R
+import app.absentmotion.export.SmoothLevel
+import app.absentmotion.model.Scene
 import java.io.Closeable
+import kotlin.math.min
 
-enum class SmoothLevel(internal val model: AiModel, val padding: Int, @StringRes val title: Int) {
-    Low(AiModel.SmoothLow, 128, R.string.settings_level_low),
-    Medium(AiModel.SmoothMedium, 64, R.string.aibrowser_size_medium),
-    High(AiModel.SmoothHigh, 64, R.string.settings_level_high),
+internal val SmoothLevel.model: AiModel get() = when (this) {
+    SmoothLevel.Low -> AiModel.SmoothLow
+    SmoothLevel.Medium -> AiModel.SmoothMedium
+    SmoothLevel.High -> AiModel.SmoothHigh
 }
+
+internal val SmoothLevel.padding: Int get() = if (this == SmoothLevel.Low) 128 else 64
 
 class AiSmooth private constructor(private val net: AiNet, val level: SmoothLevel) : Closeable {
     val onGpu: Boolean get() = net.onGpu
@@ -29,5 +32,14 @@ class AiSmooth private constructor(private val net: AiNet, val level: SmoothLeve
         suspend fun download(context: Context, level: SmoothLevel, progress: (Float) -> Unit) = level.model.download(context, progress)
 
         fun open(context: Context, level: SmoothLevel, gpu: Boolean = true): AiSmooth = AiSmooth(AiNet.open(context, level.model, gpu = gpu), level)
+
+        internal fun gmac(level: SmoothLevel, frames: Double, width: Int, height: Int): Double = level.model.gmacPerMegapixel * frames * width * height / 1e6
+
+        internal fun exportGmac(scene: Scene, level: SmoothLevel, fps: Int, width: Int, height: Int): Double =
+            scene.layers.filter { it.mediaFill?.video == true }.sumOf { layer ->
+                val media = scene.media(layer.mediaFill!!.uri)
+                val pixels = min(width.toDouble() * height, (media?.width ?: width).toDouble() * (media?.height ?: height))
+                level.model.gmacPerMegapixel * (layer.endTime - layer.startTime).coerceAtLeast(0) / 1000.0 * fps * pixels / 1e6
+            }
     }
 }

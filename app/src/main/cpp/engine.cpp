@@ -824,7 +824,8 @@ bool EngineImpl::interpolateVideo(const std::string& uri, int64_t layerId, const
     if (!first || !second) return false;
     sk_sp<SkImage> image = first;
     const bool mix = r.a != r.b && (r.t > 0 || r.soft);
-    const bool flow = r.a != r.b && ((r.flow && r.t > 0) || r.blur > 0);
+    const bool flowMode = r.mode == SmoothMode::Flow;
+    const bool flow = r.a != r.b && ((flowMode && r.t > 0) || r.blur > 0);
     if (mix || flow) {
         if (!fGraphite || fGpuFailed) {
             LOGE("interpolation failed: GPU is unavailable");
@@ -838,10 +839,21 @@ bool EngineImpl::interpolateVideo(const std::string& uri, int64_t layerId, const
         if (mix) {
             double ms = 0;
             const sk_sp<SkImage> before = r.soft ? frame(r.before) : nullptr, after = r.soft ? frame(r.after) : nullptr;
-            auto mixed = SynthesizeFrame(fGraphite.get(), fRecorder.get(), first, second, r.flow ? field : nullptr, r.t, params.divisor, &ms,
-                                         r.soft ? (before ? before : first) : nullptr, r.soft ? (after ? after : second) : nullptr);
+            sk_sp<SkImage> mixed;
+            if (r.mode == SmoothMode::Ai) {
+                if (!r.pixels || r.width <= 0 || r.height <= 0) {
+                    LOGE("interpolation failed: no AI frame was given");
+                    return false;
+                }
+                const SkImageInfo info = SkImageInfo::Make(r.width, r.height, kRGBA_8888_SkColorType, kPremul_SkAlphaType, SkColorSpace::MakeSRGB());
+                mixed = SkImages::RasterFromPixmapCopy(SkPixmap(info, r.pixels, r.rowBytes));
+                if (mixed) mixed = SkImages::TextureFromImage(fRecorder.get(), mixed.get(), {});
+            } else {
+                mixed = SynthesizeFrame(fGraphite.get(), fRecorder.get(), first, second, flowMode ? field : nullptr, r.t, params.divisor, &ms,
+                                        r.soft ? (before ? before : first) : nullptr, r.soft ? (after ? after : second) : nullptr);
+            }
             __android_log_print(ANDROID_LOG_INFO, "AMInterp", "frame a=%" PRId64 " b=%" PRId64 " t=%.4f mode=%s synthesis=%.2f",
-                                r.a, r.b, r.t, r.flow ? "flow" : r.soft ? "soft" : "blend", ms);
+                                r.a, r.b, r.t, r.mode == SmoothMode::Ai ? "ai" : flowMode ? "flow" : r.soft ? "soft" : "blend", ms);
             if (!mixed) {
                 LOGE("interpolation failed: frame synthesis returned no image");
                 return false;

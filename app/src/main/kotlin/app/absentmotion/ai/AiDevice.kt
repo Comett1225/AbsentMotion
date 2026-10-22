@@ -6,6 +6,7 @@ import android.os.Build
 import android.os.SystemClock
 import app.absentmotion.R
 import app.absentmotion.export.DeviceCapabilities
+import app.absentmotion.export.SmoothLevel
 import app.absentmotion.i18n.AppText
 import app.absentmotion.ui.onboarding.PhoneSpeed
 import app.absentmotion.ui.onboarding.phoneCheckResult
@@ -28,6 +29,8 @@ internal class AiEstimate(val seconds: Double, val verdict: AiVerdict, val measu
         AiVerdict.Struggle -> AppText.get(R.string.ai_phone_struggle, aiDuration(seconds))
         AiVerdict.Fine -> if (seconds < 60) AppText.get(R.string.ai_about_under_minute) else AppText.get(R.string.ai_about_time, aiDuration(seconds))
     }
+
+    val extra: String get() = if (verdict == AiVerdict.Fine) AppText.get(R.string.ai_smooth_adds, aiDuration(seconds)) else text
 }
 
 internal fun aiDuration(seconds: Double): String {

@@ -179,7 +179,7 @@
     <string name="library_err_scene_fps">Mali ang scene: dapat mula 1 hanggang %1$s ang frame rate</string>
     <string name="library_err_package_large">Masyadong malaki ang package (higit sa %1$s MB kapag na-unpack)</string>
     <string name="library_err_too_many_files">Sobra ang file sa package (higit sa %1$s)</string>
-    <string name="library_err_xml_large">Masyadong malaki ang file na ito para buksan (higit sa 16 MB)</string>
+    <string name="library_err_xml_large">Masyadong malaki ang file na ito para buksan (mahigit 16 MB)</string>
     <string name="library_err_media_large">Masyadong malaki ang package (higit sa %1$s MB ng media)</string>
     <string name="library_err_not_backup">Hindi ito backup ng AbsentMotion.</string>
     <string name="library_err_backup_project_large">Masyadong malaki ang isang proyekto sa backup.</string>
@@ -1233,6 +1233,12 @@
     <string name="ai_sound_not_kept">Hindi maipapanatili ang audio ng clip na ito sa bagong bidyo</string>
     <string name="ai_video_too_large_to_save">Hindi kayang i-save ng phone na ito ang %1$s × %2$s na bidyo</string>
     <string name="ai_delete_model">I-delete ang %1$s</string>
+    <string name="export_interpolation_ai">AI Smooth</string>
+    <string name="export_interpolation_ai_help">Gumuguhit ng mga in-between frame ang AI model. Mas mahusay itong humawak ng mabilis na galaw at mga gilid na lumilitaw o nawawala kaysa Optical flow, pero mas mabagal ito at kailangan ng isahang pag-download na mga 11 MB.</string>
+    <string name="export_interpolation_ai_levels">Gumagamit ng mas magaan na modelo ang Low at bagay ito sa Good phone. Ang Medium ang modelong dapat simulan. Gumagamit ng mas malaking modelo ang High para sa pinakamahirap na eksena; panatilihin ito para sa Fast phone o maiikling clip. Sa isang kamakailang top phone, ang 10 segundong 1080p na bidyo sa 30 hanggang 60 fps ay tumatagal ng mga kalahating minuto hanggang isang minuto; ang Basic phone ay maaaring tumagal ng 10 minuto o higit pa.</string>
+    <string name="ai_smooth_download_title">I-download ang AI Smooth?</string>
+    <string name="ai_smooth_download_text">Kailangan ng AI Smooth ng modelo, isahang i-download: %1$s. Maaari mo itong burahin mamaya sa Mga Setting.</string>
+    <string name="ai_smooth_adds">Nagdaragdag ang AI Smooth ng humigit-kumulang %1$s sa phone na ito</string>
     <string name="ai_model_failed">Hindi mapatakbo ang AI model sa phone na ito</string>
     <string name="model_svg_skipped_text">teksto</string>
     <string name="model_svg_skipped_images">mga larawan</string>

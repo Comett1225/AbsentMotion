@@ -1257,6 +1257,12 @@
     <string name="ai_sound_not_kept">The sound of this clip cannot be kept in the new video</string>
     <string name="ai_video_too_large_to_save">This phone cannot save a %1$s × %2$s video</string>
     <string name="ai_delete_model">Delete %1$s</string>
+    <string name="export_interpolation_ai">AI Smooth</string>
+    <string name="export_interpolation_ai_help">An AI model draws the in-between frames. It copes with fast motion and edges that appear or disappear better than Optical flow, but it is much slower and needs a one-time download of about 11 MB.</string>
+    <string name="export_interpolation_ai_levels">Low uses a lighter model and suits Good phones. Medium is the model to start with. High uses a larger model for the hardest scenes; keep it for Fast phones or short clips. On a recent top phone, 10 seconds of 1080p video at 30 to 60 fps take about half a minute to a minute; Basic phones can take 10 minutes or more.</string>
+    <string name="ai_smooth_download_title">Download AI Smooth?</string>
+    <string name="ai_smooth_download_text">AI Smooth needs a model, downloaded once: %1$s. You can delete it later in Settings.</string>
+    <string name="ai_smooth_adds">AI Smooth adds about %1$s on this phone</string>
     <string name="ai_model_failed">The AI model could not run on this phone</string>
     <string name="model_svg_skipped_text">text</string>
     <string name="model_svg_skipped_images">images</string>

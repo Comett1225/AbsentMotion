@@ -60,7 +60,7 @@ The **AI** tools can cut the background from a photo or a video and reduce noise
 **Smooth** is the first button in a video clip's **Speed** tools. It makes the in-between frames for that clip once and keeps them with the project, so the preview and every export show the smooth version. It is the best way to make slow motion look fluid: a 30 fps clip at half speed gets new frames between the real ones instead of showing each frame twice.
 
 1. Select the video clip and open **Speed**.
-2. Tap **Smooth**, then pick **Frame blending** or **Optical flow** and a level (**Low**, **Medium**, **High**), and optionally **Motion Blur**.
+2. Tap **Smooth**, then pick **Frame blending**, **Optical flow** or **AI Smooth** and a level (**Low**, **Medium**, **High**), and optionally **Motion Blur**. AI Smooth downloads its model once and shows how long it should take on this phone (see [AI tools](@ai-tools)).
 3. Wait for it to finish. You can cancel at any time and nothing changes.
 
 The original clip is kept: the clip shows a **Smooth** row with a restore button that brings the original back, and **Undo** works too. Smoothing again always starts from the original. Only the trimmed part of the clip is processed. The clip's sound is kept as it is.

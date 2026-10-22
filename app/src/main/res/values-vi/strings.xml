@@ -1209,6 +1209,12 @@
     <string name="ai_sound_not_kept">Không thể giữ âm thanh của clip này trong video mới</string>
     <string name="ai_video_too_large_to_save">Điện thoại này không thể lưu video %1$s × %2$s</string>
     <string name="ai_delete_model">Xóa %1$s</string>
+    <string name="export_interpolation_ai">Làm mượt AI</string>
+    <string name="export_interpolation_ai_help">Mô hình AI sẽ vẽ các khung hình xen giữa. Nó xử lý chuyển động nhanh và các cạnh xuất hiện hay biến mất tốt hơn Optical flow, nhưng chậm hơn nhiều và cần tải một lần khoảng 11 MB.</string>
+    <string name="export_interpolation_ai_levels">Thấp dùng mô hình nhẹ hơn, phù hợp với điện thoại Good. Trung bình là mô hình nên bắt đầu. Cao dùng mô hình lớn hơn cho những cảnh khó nhất; chỉ nên dùng cho điện thoại Fast hoặc clip ngắn. Trên một chiếc điện thoại cao cấp gần đây, 10 giây video 1080p ở 30 đến 60 fps mất khoảng nửa phút đến một phút; điện thoại Basic có thể mất 10 phút hoặc hơn.</string>
+    <string name="ai_smooth_download_title">Tải Làm mượt AI?</string>
+    <string name="ai_smooth_download_text">Làm mượt AI cần một mô hình, chỉ tải một lần: %1$s. Bạn có thể xóa mô hình sau trong Cài đặt.</string>
+    <string name="ai_smooth_adds">Làm mượt AI thêm khoảng %1$s trên điện thoại này</string>
     <string name="ai_model_failed">Mô hình AI không thể chạy trên điện thoại này</string>
     <string name="model_svg_skipped_text">văn bản</string>
     <string name="model_svg_skipped_images">hình ảnh</string>

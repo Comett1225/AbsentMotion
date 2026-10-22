@@ -1329,6 +1329,12 @@
     <string name="ai_sound_not_kept">لا يمكن الاحتفاظ بصوت هذا المقطع في الفيديو الجديد</string>
     <string name="ai_video_too_large_to_save">لا يستطيع هذا الهاتف حفظ فيديو بدقة %1$s × %2$s</string>
     <string name="ai_delete_model">حذف %1$s</string>
+    <string name="export_interpolation_ai">تنعيم AI</string>
+    <string name="export_interpolation_ai_help">ينشئ نموذج AI الإطارات الوسيطة. يتعامل مع الحركة السريعة والحواف التي تظهر أو تختفي أفضل من التدفق البصري، لكنه أبطأ بكثير ويحتاج إلى تنزيل لمرة واحدة بحجم نحو 11 MB.</string>
+    <string name="export_interpolation_ai_levels">يستخدم المستوى المنخفض نموذجًا أخف ويناسب الهواتف الجيدة. المستوى المتوسط هو النموذج الذي يُنصح بالبدء به. يستخدم المستوى العالي نموذجًا أكبر لأصعب المشاهد؛ احتفظ به للهواتف السريعة أو المقاطع القصيرة. على هاتف رائد حديث، يستغرق 10 ثوانٍ من فيديو 1080p بمعدل 30 إلى 60 fps نحو نصف دقيقة إلى دقيقة؛ وقد تستغرق الهواتف الأساسية 10 دقائق أو أكثر.</string>
+    <string name="ai_smooth_download_title">تنزيل تنعيم AI؟</string>
+    <string name="ai_smooth_download_text">يحتاج تنعيم AI إلى نموذج يُنزَّل مرة واحدة: %1$s. يمكنك حذفه لاحقًا من الإعدادات.</string>
+    <string name="ai_smooth_adds">يضيف تنعيم AI نحو %1$s على هذا الهاتف</string>
     <string name="ai_model_failed">تعذّر تشغيل نموذج AI على هذا الهاتف</string>
     <string name="model_svg_skipped_text">نص</string>
     <string name="model_svg_skipped_images">صور</string>

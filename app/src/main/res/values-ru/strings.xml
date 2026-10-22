@@ -1281,6 +1281,12 @@
     <string name="ai_sound_not_kept">Звук этого клипа нельзя сохранить в новом видео</string>
     <string name="ai_video_too_large_to_save">Этот телефон не может сохранить видео %1$s × %2$s</string>
     <string name="ai_delete_model">Удалить %1$s</string>
+    <string name="export_interpolation_ai">AI-сглаживание</string>
+    <string name="export_interpolation_ai_help">AI-модель дорисовывает промежуточные кадры. Она лучше справляется с быстрым движением и краями, которые появляются или исчезают, чем оптический поток, но работает намного медленнее и требует однократной загрузки около 11 MB.</string>
+    <string name="export_interpolation_ai_levels">Низкий использует более лёгкую модель и подходит для хороших телефонов. Средний — модель, с которой стоит начать. Высокий использует более крупную модель для самых сложных сцен; оставьте его для быстрых телефонов или коротких клипов. На современном флагмане 10 секунд видео 1080p при 30–60 fps занимают примерно от полминуты до минуты; на базовых телефонах это может занять 10 минут или больше.</string>
+    <string name="ai_smooth_download_title">Скачать AI-сглаживание?</string>
+    <string name="ai_smooth_download_text">Для AI-сглаживания нужна модель, которая загружается один раз: %1$s. Позже её можно удалить в настройках.</string>
+    <string name="ai_smooth_adds">AI-сглаживание добавит около %1$s на этом телефоне</string>
     <string name="ai_model_failed">AI-модель не запустилась на этом телефоне</string>
     <string name="model_svg_skipped_text">текст</string>
     <string name="model_svg_skipped_images">изображения</string>

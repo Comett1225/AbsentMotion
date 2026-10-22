@@ -136,6 +136,10 @@ class AiTools(private val context: Context, private val state: EditorState, priv
                     val source = previous?.original ?: layer.mediaFill!!.uri
                     val media = checkNotNull(previous?.media ?: state.scene.media(source)) { AppText.get(R.string.ai_video_missing) }
                     val chosen = smoothing
+                    if (chosen.method == FrameInterpolation.Ai && !AiSmooth.installed(context, chosen.level)) {
+                        report(0f, AppText.get(R.string.ai_downloading_model))
+                        AiSmooth.download(context, chosen.level) { fraction -> progress = fraction.coerceIn(0f, 1f) }
+                    }
                     val output = withContext(Dispatchers.IO) {
                         ClipSmooth.run(context, state.engine, layer.copy(node = layer.node.with("fillVideo", source)), media, state.scene.fps, chosen, report).also { result = it }
                     }

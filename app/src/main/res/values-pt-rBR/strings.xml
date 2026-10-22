@@ -1257,6 +1257,12 @@
     <string name="ai_sound_not_kept">O som deste clipe não pode ser mantido no novo vídeo</string>
     <string name="ai_video_too_large_to_save">Este celular não consegue salvar um vídeo de %1$s × %2$s</string>
     <string name="ai_delete_model">Excluir %1$s</string>
+    <string name="export_interpolation_ai">Suavização com AI</string>
+    <string name="export_interpolation_ai_help">Um modelo de AI desenha os quadros intermediários. Ele lida com movimento rápido e bordas que aparecem ou desaparecem melhor que o fluxo óptico, mas é muito mais lento e exige um download único de cerca de 11 MB.</string>
+    <string name="export_interpolation_ai_levels">Baixo usa um modelo mais leve e é indicado para celulares bons. Médio é o modelo para começar. Alto usa um modelo maior para as cenas mais difíceis; reserve-o para celulares rápidos ou clipes curtos. Em um celular top recente, 10 segundos de vídeo em 1080p a 30 a 60 fps levam cerca de meio minuto a um minuto; celulares básicos podem levar 10 minutos ou mais.</string>
+    <string name="ai_smooth_download_title">Baixar Suavização com AI?</string>
+    <string name="ai_smooth_download_text">A Suavização com AI precisa de um modelo, baixado uma vez: %1$s. Você pode excluí-lo depois em Configurações.</string>
+    <string name="ai_smooth_adds">A Suavização com AI adiciona cerca de %1$s neste celular</string>
     <string name="ai_model_failed">O modelo AI não pôde ser executado neste celular</string>
     <string name="model_svg_skipped_text">texto</string>
     <string name="model_svg_skipped_images">imagens</string>

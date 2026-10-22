@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.sp
 import app.absentmotion.ai.AiAction
 import app.absentmotion.ai.AiDevice
 import app.absentmotion.ai.AiEnhance
+import app.absentmotion.ai.AiSmooth
 import app.absentmotion.ai.AiTools
 import app.absentmotion.ai.AiVerdict
 import app.absentmotion.ai.EnhanceMode
@@ -326,6 +327,11 @@ internal fun AiSmoothDialog(tools: AiTools, scene: Scene) {
     val s = tools.smoothing
     val plan = media?.let { smoothPlan(source, it, scene.fps, s) }
     val tooLong = plan != null && (plan.seconds > MAX_MATTE_SECONDS || plan.frames > MAX_SMOOTH_FRAMES)
+    val ai = s.method == FrameInterpolation.Ai
+    val estimate = if (ai && plan != null) app.absentmotion.ui.export.aiSmoothEstimate(
+        AiSmooth.gmac(s.level, plan.frames.toDouble(), media.width, media.height), s.level) else null
+    val cannot = estimate?.verdict == AiVerdict.Cannot
+    val download = ai && !AiSmooth.installed(LocalContext.current, s.level)
     AlertDialog(onDismissRequest = { tools.smoothSetup = null },
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -353,10 +359,14 @@ internal fun AiSmoothDialog(tools: AiTools, scene: Scene) {
                     },
                     Modifier.padding(top = 12.dp).height(54.dp), color = if (plan == null || tooLong) Am.Warning else Am.Caption, fontSize = 12.sp, lineHeight = 17.sp,
                 )
+                if (ai && plan != null && !tooLong) Text(app.absentmotion.ui.export.aiSmoothNote(estimate, s.level, clip = true), Modifier.padding(top = 4.dp),
+                    color = if (cannot) Am.Warning else Am.Caption, fontSize = 12.sp, lineHeight = 17.sp)
             }
         },
         confirmButton = {
-            TextButton({ tools.apply(AiAction.Smooth, confirmed = true) }, enabled = plan != null && !tooLong) { Text(stringResource(R.string.start), color = Am.Accent) }
+            TextButton({ tools.apply(AiAction.Smooth, confirmed = true) }, enabled = plan != null && !tooLong && !cannot) {
+                Text(stringResource(if (download) R.string.ai_download_and_start else R.string.start), color = Am.Accent)
+            }
         },
         dismissButton = { TextButton({ tools.smoothSetup = null }) { Text(stringResource(R.string.cancel), color = Am.Accent) } },
         containerColor = Am.Field)

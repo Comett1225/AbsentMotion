@@ -53,6 +53,10 @@ A codec is only offered if your phone has an encoder for it (for example "This p
   - **Low** follows the motion roughly and is the fastest.
   - **Medium** is the balanced choice.
   - **High** follows the motion most closely, for the cleanest in-between frames, and takes the longest.
+- **AI Smooth:** an AI model draws the in-between frames. It copes with fast motion and edges that appear or disappear better than Optical flow, but it is much slower. Each level needs a one-time download of about 11 MB; the first export with a level asks before it downloads, and the screen shows how long it should add on this phone.
+  - **Low** uses a lighter model and suits Good phones.
+  - **Medium** is the model to start with.
+  - **High** uses a larger model for the hardest scenes; keep it for Fast phones or short clips.
 
 It only acts on video clips whose frame rate (counting the clip's speed) is lower than the export. Shapes, text and effects are always drawn at every export frame. It is also available for GIF and image sequences. The live preview never uses it; to see smooth frames in the preview, use **Smooth** on the clip (see [Photos, video and speed](@media)).
 

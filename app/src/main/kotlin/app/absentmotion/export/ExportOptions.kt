@@ -111,6 +111,7 @@ enum class FrameInterpolation(@StringRes val label: Int, @StringRes val help: In
     Off(R.string.export_interpolation_off, R.string.export_interpolation_off_help, null),
     Blend(R.string.export_interpolation_blend, R.string.export_interpolation_blend_help, R.string.export_interpolation_blend_levels),
     Flow(R.string.export_interpolation_flow, R.string.export_interpolation_flow_help, R.string.export_interpolation_flow_levels),
+    Ai(R.string.export_interpolation_ai, R.string.export_interpolation_ai_help, R.string.export_interpolation_ai_levels),
 }
 
 enum class SmoothLevel(@StringRes val label: Int) {

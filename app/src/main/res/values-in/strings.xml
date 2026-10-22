@@ -1209,6 +1209,12 @@
     <string name="ai_sound_not_kept">Suara klip ini tidak dapat dipertahankan di video baru</string>
     <string name="ai_video_too_large_to_save">Ponsel ini tidak dapat menyimpan video %1$s × %2$s</string>
     <string name="ai_delete_model">Hapus %1$s</string>
+    <string name="export_interpolation_ai">AI Smooth</string>
+    <string name="export_interpolation_ai_help">Model AI mengisi frame di antaranya. Model ini lebih baik menangani gerakan cepat dan tepi yang muncul atau hilang dibandingkan Optical flow, tetapi jauh lebih lambat dan perlu diunduh sekali sebesar sekitar 11 MB.</string>
+    <string name="export_interpolation_ai_levels">Rendah memakai model yang lebih ringan dan cocok untuk ponsel Good. Sedang adalah model untuk memulai. Tinggi memakai model yang lebih besar untuk adegan tersulit; gunakan untuk ponsel Fast atau klip pendek. Di ponsel kelas atas terbaru, 10 detik video 1080p pada 30 hingga 60 fps butuh sekitar setengah sampai satu menit; ponsel Basic bisa butuh 10 menit atau lebih.</string>
+    <string name="ai_smooth_download_title">Unduh AI Smooth?</string>
+    <string name="ai_smooth_download_text">AI Smooth memerlukan model yang diunduh sekali: %1$s. Anda dapat menghapusnya nanti di Pengaturan.</string>
+    <string name="ai_smooth_adds">AI Smooth menambah sekitar %1$s di ponsel ini</string>
     <string name="ai_model_failed">Model AI tidak dapat berjalan di ponsel ini</string>
     <string name="model_svg_skipped_text">teks</string>
     <string name="model_svg_skipped_images">gambar</string>

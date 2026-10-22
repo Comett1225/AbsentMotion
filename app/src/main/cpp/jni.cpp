@@ -111,13 +111,26 @@ JNIEXPORT jboolean JNICALL JNI_FN(nativeSetVideoFrame)(JNIEnv* env, jclass, jlon
 }
 
 JNIEXPORT jboolean JNICALL JNI_FN(nativeInterpolateVideo)(JNIEnv* env, jclass, jlong engine, jbyteArray uri, jlong layerId,
-                                                          jlongArray frames, jfloat t, jboolean flow, jboolean soft, jfloat blur, jfloatArray params) {
+                                                          jlongArray frames, jfloat t, jint mode, jboolean soft, jfloat blur, jfloatArray params,
+                                                          jobject made) {
     std::string text((size_t)env->GetArrayLength(uri), '\0');
     env->GetByteArrayRegion(uri, 0, (jsize)text.size(), reinterpret_cast<jbyte*>(text.data()));
     jlong f[4] = {0, 0, 0, 0};
     env->GetLongArrayRegion(frames, 0, std::min<jsize>(4, env->GetArrayLength(frames)), f);
-    const am::SmoothRequest request{f[0], f[1], f[2], f[3], t, flow == JNI_TRUE, soft == JNI_TRUE, blur};
-    return engineOf(engine)->interpolateVideo(text, layerId, request, interpolationParams(env, params));
+    am::SmoothRequest request{f[0], f[1], f[2], f[3], t, static_cast<am::SmoothMode>(std::clamp<jint>(mode, 0, 3)), soft == JNI_TRUE, blur};
+    AndroidBitmapInfo info;
+    void* pixels = nullptr;
+    if (made) {
+        if (AndroidBitmap_getInfo(env, made, &info) != ANDROID_BITMAP_RESULT_SUCCESS || info.format != ANDROID_BITMAP_FORMAT_RGBA_8888 ||
+            AndroidBitmap_lockPixels(env, made, &pixels) != ANDROID_BITMAP_RESULT_SUCCESS) return false;
+        request.pixels = pixels;
+        request.width = (int)info.width;
+        request.height = (int)info.height;
+        request.rowBytes = info.stride;
+    }
+    const bool ok = engineOf(engine)->interpolateVideo(text, layerId, request, interpolationParams(env, params));
+    if (made) AndroidBitmap_unlockPixels(env, made);
+    return ok;
 }
 
 JNIEXPORT jint JNICALL JNI_FN(nativeMoshStart)(JNIEnv* env, jclass, jlong engine, jbyteArray uri, jlong layerId, jlongArray pts,

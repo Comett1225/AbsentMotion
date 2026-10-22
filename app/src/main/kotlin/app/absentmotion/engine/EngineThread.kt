@@ -249,9 +249,9 @@ class EngineThread(private val background: Int, context: Context? = null) {
         !closed && engine().setVideoFrame(uri, layerId, pts, buffer, standard, range, crop)
     }
 
-    internal suspend fun interpolateVideo(uri: String, layerId: Long, frames: LongArray, t: Float, flow: Boolean, soft: Boolean, blur: Float,
-                                          params: FloatArray): Boolean = withContext(dispatcher) {
-        !closed && engine().interpolateVideo(uri, layerId, frames, t, flow, soft, blur, params)
+    internal suspend fun interpolateVideo(uri: String, layerId: Long, frames: LongArray, t: Float, mode: Int, soft: Boolean, blur: Float,
+                                          params: FloatArray, made: android.graphics.Bitmap? = null): Boolean = withContext(dispatcher) {
+        !closed && engine().interpolateVideo(uri, layerId, frames, t, mode, soft, blur, params, made)
     }
 
     internal suspend fun moshStart(uri: String, layerId: Long, pts: LongArray, mosh: FloatArray, flow: FloatArray, exact: Boolean): Int = withContext(dispatcher) {

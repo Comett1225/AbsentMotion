@@ -7,7 +7,7 @@ import app.absentmotion.ai.AiModel
 import app.absentmotion.ai.AiNative
 import app.absentmotion.ai.AiNet
 import app.absentmotion.ai.AiSmooth
-import app.absentmotion.ai.SmoothLevel
+import app.absentmotion.export.SmoothLevel
 import app.absentmotion.ai.aiMarks
 import app.absentmotion.ai.withoutAiMark
 import androidx.lifecycle.lifecycleScope
@@ -124,4 +124,37 @@ internal suspend fun checkEnhance(activity: MainActivity, path: String, modes: L
         Log.i(TAG, "ok=$ok enhance $name ms=$ms ${declared.width}x${declared.height} -> ${media.width}x${media.height} frames $sourceFrames -> $frames tracks=$tracks preview=$previewed undo=$undone redo=$redone restore=$restored")
     }
     Log.i(TAG, "enhance done")
+}
+
+internal suspend fun checkSmooth(activity: MainActivity, path: String, levels: List<String>) {
+    val declared = checkNotNull(app.absentmotion.media.videoDeclaration(activity, android.net.Uri.fromFile(java.io.File(path)))) { "cannot read $path" }
+    val uri = declared.uri
+    for (name in levels) {
+        val method = if (name.startsWith("flow")) app.absentmotion.export.FrameInterpolation.Flow else app.absentmotion.export.FrameInterpolation.Ai
+        val level = SmoothLevel.valueOf(name.removePrefix("flow"))
+        val xml = """<scene width="640" height="360" fps="30" totalTime="2000"><shape id="1" label="clip" s=".rect" fillType="media" fillVideo="$uri" mediaFillMode="fit" startTime="0" endTime="2000"><transform><location value="320,180,0"/></transform><property name="size" type="vec2" value="640,360"/></shape></scene>"""
+        val id = "test-aismooth-$name"
+        activity.store.save(id, app.absentmotion.model.Scene.parse(xml).withMedia(declared))
+        val state = checkNotNull(activity.openNow(id)) { "cannot open $id" }
+        val tools = app.absentmotion.ai.AiTools(activity.applicationContext, state, activity.lifecycleScope)
+        state.selectedId = 1
+        tools.smoothing = app.absentmotion.export.Smoothing(method, level)
+        val started = SystemClock.elapsedRealtime()
+        tools.apply(app.absentmotion.ai.AiAction.Smooth, confirmed = true)
+        while (tools.running != null) kotlinx.coroutines.delay(250)
+        val ms = SystemClock.elapsedRealtime() - started
+        val result = state.scene.layer(1)?.node?.get("fillVideo")
+        if (result == null || result == uri) { Log.e(TAG, "ok=false aismooth $name: ${tools.message}"); continue }
+        val media = checkNotNull(state.scene.media(result))
+        val frames = app.absentmotion.media.VideoSources.timestamps(activity, result).size
+        val still = java.io.File(activity.getExternalFilesDir(null), "aismooth-$name.png")
+        activity.engine.awaitMedia()
+        runCatching { activity.engine.awaitVideoFrames(state.scene, 500) }
+        val previewed = activity.engine.stillPng(state.scene.toXml(), 500, 640, 360, still)
+        state.undo()
+        val undone = state.scene.layer(1)?.node?.get("fillVideo") == uri
+        val ok = frames >= 55 && previewed && undone && (media.fps ?: 0f) >= 29f
+        Log.i(TAG, "ok=$ok aismooth $name ms=$ms frames=$frames fps=${media.fps} ${media.width}x${media.height} preview=$previewed undo=$undone")
+    }
+    Log.i(TAG, "aismooth done")
 }

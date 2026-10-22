@@ -1233,6 +1233,12 @@
     <string name="ai_sound_not_kept">Bu klibin sesi yeni videoda korunamaz</string>
     <string name="ai_video_too_large_to_save">Bu telefon %1$s × %2$s boyutunda bir video kaydedemez</string>
     <string name="ai_delete_model">%1$s sil</string>
+    <string name="export_interpolation_ai">AI Yumuşatma</string>
+    <string name="export_interpolation_ai_help">AI modeli ara kareleri çizer. Hızlı harekette ve beliren veya kaybolan kenarlarda Optik akıştan daha iyi başa çıkar, ancak çok daha yavaştır ve yaklaşık 11 MB\'lık tek seferlik bir indirme gerektirir.</string>
+    <string name="export_interpolation_ai_levels">Düşük, daha hafif bir model kullanır ve iyi telefonlar için uygundur. Orta, başlangıç için ideal modeldir. Yüksek, en zorlu sahneler için daha büyük bir model kullanır; hızlı telefonlarda veya kısa kliplerde kullanın. Yeni bir üst seviye telefonda, 30 ila 60 fps\'te 10 saniyelik 1080p video yaklaşık yarım dakika ila bir dakika sürer; temel telefonlarda 10 dakika veya daha fazla sürebilir.</string>
+    <string name="ai_smooth_download_title">AI Yumuşatma indirilsin mi?</string>
+    <string name="ai_smooth_download_text">AI Yumuşatma için bir model gerekir; tek seferlik indirme: %1$s. Daha sonra Ayarlar\'dan silebilirsiniz.</string>
+    <string name="ai_smooth_adds">Bu telefonda AI Yumuşatma yaklaşık %1$s süre ekler</string>
     <string name="ai_model_failed">AI modeli bu telefonda çalıştırılamadı</string>
     <string name="model_svg_skipped_text">metin</string>
     <string name="model_svg_skipped_images">görseller</string>

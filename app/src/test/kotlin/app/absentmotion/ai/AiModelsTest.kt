@@ -1,5 +1,8 @@
 package app.absentmotion.ai
 
+import app.absentmotion.export.FrameInterpolation
+import app.absentmotion.export.SmoothLevel
+import app.absentmotion.export.Smoothing
 import app.absentmotion.ui.onboarding.PhoneSpeed
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -136,6 +139,15 @@ class AiModelsTest {
         assertEquals(0xFF102030.toInt(), mixArgb(0xFF102030.toInt(), 0xFFF0E0D0.toInt(), 0f))
         assertEquals(0xFFF0E0D0.toInt(), mixArgb(0xFF102030.toInt(), 0xFFF0E0D0.toInt(), 1f))
         assertEquals(0xFF808080.toInt(), mixArgb(0xFF000000.toInt(), 0xFFFFFFFF.toInt(), 0.5f))
+    }
+
+    @Test fun aiSmoothIsTheFourthMethodAndMatchesTheEngineModes() {
+        assertEquals(listOf("Off", "Blend", "Flow", "Ai"), FrameInterpolation.entries.map { it.name })
+        val chosen = Smoothing(FrameInterpolation.Ai, SmoothLevel.High)
+        assertEquals(chosen, smoothingOf(chosen.option))
+        assertEquals(listOf(AiModel.SmoothLow, AiModel.SmoothMedium, AiModel.SmoothHigh), SmoothLevel.entries.map { it.model })
+        assertEquals(listOf(128, 64, 64), SmoothLevel.entries.map { it.padding })
+        assertEquals(22.2 * 300 * 1920 * 1080 / 1e6, AiSmooth.gmac(SmoothLevel.Medium, 300.0, 1920, 1080), 1e-6)
     }
 
     @Test fun lumaUsesStudioRange() {

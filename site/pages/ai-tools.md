@@ -2,11 +2,11 @@
 title: AI tools
 group: Sound and AI
 order: 2
-summary: Auto captions, background removal and noise reduction. They run on your phone, offline, and the page says exactly what is downloaded.
+summary: Auto captions, background removal, noise reduction, AI Enhance and AI Smooth. They run on your phone, offline, and the page says exactly what is downloaded.
 ---
 Everything in this page **runs on your phone**. Your photos, videos and sound are never uploaded. The only downloads are listed in the table at the end.
 
-The AI tools are in two places: the **AI** category of the Effects Library (**Remove Background**, **Remove Background (video)** and **Reduce Noise**), and the **Captions** button of the Add menu. For a sound clip, the **AI** button in the tool grid opens the noise tool. A tool that does not fit the selected layer is grayed with a note such as "Select an image layer". One AI job runs at a time, with a progress bar and a **Cancel** button.
+The AI tools are in three places: the **AI** category of the Effects Library (**Remove Background**, **Remove Background (video)**, **Reduce Noise** and **Enhance**), the **Captions** button of the Add menu, and **AI Smooth**, one of the smoothing methods in a clip's **Smooth** tool and on the Export screen. For a sound clip, the **AI** button in the tool grid opens the noise tool. A tool that does not fit the selected layer is grayed with a note such as "Select an image layer". One AI job runs at a time, with a progress bar and a **Cancel** button.
 
 ## Auto captions
 
@@ -61,6 +61,42 @@ Select a sound clip and tap **AI** in the tool grid (or **Reduce Noise** in the 
 
 Tap **Start**. The cleaned sound is saved as a new audio file for the clip, in mono, and the original stays untouched: the clip's effect list shows a **Reduce Noise** row with an AI badge and a button to bring back the original. For a video, use **Extract Audio** first and then clean the new audio layer.
 
+## Enhance (video)
+
+Select a video layer and choose **Enhance** in the AI category. Pick what to do; the **?** next to each choice explains it, says roughly how long it takes and which phones suit it.
+
+| Choice | What it does | Clips up to |
+|---|---|---|
+| **Upscale 2x** | Doubles the width and height and draws in new detail | 720p |
+| **Upscale 4x** | Four times wider and taller, for small clips such as old phone videos | 360p |
+| **Sharpen detail** | Brings back fine detail and keeps the size | 1080p |
+| **Sharpen faces** | Finds faces looking at the camera and sharpens only them, blended softly into the picture | any size |
+
+- **Sharpen detail** has a **Quick, without AI** switch: it adds the normal **Sharpen** effect instead, which is instant and works on every phone.
+- **Cartoon or animation** uses a model made for drawn and animated video.
+- **Keep film grain** cleans less noise, so grain and fine texture stay (needs a second small download).
+- "Upscale 2x works on clips up to 720p" means the clip is too big for that choice; pick another choice or use a smaller clip.
+
+Before you start, the dialog checks the phone and estimates the time, for example "About 4 min for this clip", "This phone will most likely struggle: about 2 h" or "This phone can't run it". After the model is downloaded it measures the speed with one small test frame, so the estimate gets better. Tap **Start** (or **Download and start** the first time).
+
+Every frame is processed once and saved as a new video for the clip, with the clip's sound. Only the trimmed part of the clip is processed, and a clip can be up to five minutes. The screen stays on while it works, you can cancel at any time, and the app pauses when the phone gets too hot. The original is kept: the clip's effect list shows an **Enhance** row with an AI badge and a button that brings the original back, and **Undo** works too.
+
+AI Enhance is slow on purpose: it draws real detail. On a recent top phone, 10 seconds of 540p video take about 5 to 10 minutes for **Upscale 2x**; mid-range and older phones take much longer. Short clips are the best fit.
+
+## AI Smooth
+
+**AI Smooth** draws in-between frames with an AI model. It copes with fast motion and with edges that appear or disappear better than **Optical flow**, but it is much slower. Choose it as the method in a clip's **Smooth** tool (see [Photos, video and speed](@media)) or as the **Frame Interpolation** method when you export (see [Export](@export)).
+
+- **Low** uses a lighter model and suits Good phones.
+- **Medium** is the model to start with.
+- **High** uses a larger model for the hardest scenes; keep it for Fast phones or short clips.
+
+Each level has its own model, downloaded once (about 11 MB) after the app has shown its size. The dialog and the Export screen show the phone check and the time estimate. On a recent top phone, 10 seconds of 1080p video at 30 to 60 fps take about half a minute to a minute; Basic phones can take 10 minutes or more.
+
+## AI models in Settings
+
+**Settings**, **Projects and media** lists every downloaded AI model with its size and a **Delete** row. A deleted model is downloaded again the next time it is needed.
+
 ## What is downloaded
 
 | Item | When | Size | From |
@@ -69,8 +105,11 @@ Tap **Start**. The cleaned sound is saved as a new audio file for the clip, in m
 | Background removal model, standard build | Never: it is inside the app | about 3 MB | |
 | Background removal model, Play-services build | First use | Not shown by the app | Google Play services |
 | Noise reduction | Never: it is inside the app | | |
+| AI Enhance models | The first time you use Enhance, after you tap Download and start | about 2.4 MB (cartoon 1.3 MB, film grain 2.4 MB more) | this project's GitHub releases |
+| AI Smooth models | The first time you use AI Smooth at a level | about 11 MB per level | GitHub (the rife-ncnn-vulkan project) |
+| Sharpen faces | Never: it uses Android's own face finder | | |
 
-Nothing else is downloaded for AI. The [Privacy](@privacy) page lists every use of the internet.
+Every model is checked against a fixed fingerprint (SHA-256) before it is used; a damaged file is deleted and downloaded again. Nothing else is downloaded for AI. The [Privacy](@privacy) page lists every use of the internet.
 
 ## Speed
 
