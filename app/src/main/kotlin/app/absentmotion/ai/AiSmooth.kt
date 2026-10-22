@@ -49,12 +49,15 @@ class AiSmooth private constructor(private val net: AiNet, val level: SmoothLeve
         internal fun open(context: Context, level: SmoothLevel, gpu: Boolean): AiSmooth =
             AiSmooth(AiNet.open(context, level.model, gpu = gpu), level, flowPixels(level, aiRam(context)))
 
-        internal fun gmac(level: SmoothLevel, frames: Double, width: Int, height: Int): Double = level.model.gmacPerMegapixel * frames * width * height / 1e6
+        private fun netPixels(level: SmoothLevel, pixels: Double): Double = min(pixels, flowPixels(level, Long.MAX_VALUE).toDouble())
+
+        internal fun gmac(level: SmoothLevel, frames: Double, width: Int, height: Int): Double =
+            level.model.gmacPerMegapixel * frames * netPixels(level, width.toDouble() * height) / 1e6
 
         internal fun exportGmac(scene: Scene, level: SmoothLevel, fps: Int, width: Int, height: Int): Double =
             scene.layers.filter { it.mediaFill?.video == true }.sumOf { layer ->
                 val media = scene.media(layer.mediaFill!!.uri)
-                val pixels = min(width.toDouble() * height, (media?.width ?: width).toDouble() * (media?.height ?: height))
+                val pixels = netPixels(level, min(width.toDouble() * height, (media?.width ?: width).toDouble() * (media?.height ?: height)))
                 level.model.gmacPerMegapixel * (layer.endTime - layer.startTime).coerceAtLeast(0) / 1000.0 * fps * pixels / 1e6
             }
     }

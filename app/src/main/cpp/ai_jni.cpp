@@ -397,6 +397,10 @@ Java_app_absentmotion_ai_AiNative_nativeInterpolate(JNIEnv *env, jobject, jlong 
         if (ex.input("in0", in0) != 0 || ex.input("in1", in1) != 0 || ex.input("in2", step) != 0) return -3;
         if (ex.extract(m->mask, mask) != 0 || ex.extract(m->flow, flow) != 0) return -3;
     }
+    if (m->blobVk) {
+        m->blobVk->clear();
+        m->stagingVk->clear();
+    }
     if (flow.w != pw || flow.h != ph || flow.c < 4 || mask.w != pw || mask.h != ph || mask.c < 1) return -3;
     if (m->cancel) return 1;
     Pixels a(env, first);
