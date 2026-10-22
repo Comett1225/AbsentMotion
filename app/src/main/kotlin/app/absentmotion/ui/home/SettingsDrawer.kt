@@ -235,7 +235,7 @@ private fun AiModelRows() {
 
 @Composable
 private fun AiGpuRow() {
-    if (!app.absentmotion.Tier.has(app.absentmotion.Feature.AiSmooth) && !app.absentmotion.Tier.has(app.absentmotion.Feature.AiEnhance)) return
+    if (!app.absentmotion.Tier.has(app.absentmotion.Feature.AiSmooth)) return
     val context = LocalContext.current
     var state by remember { mutableStateOf<Pair<Boolean, Boolean>?>(null) }
     var loaded by remember { mutableStateOf(false) }

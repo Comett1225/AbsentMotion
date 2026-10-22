@@ -46,24 +46,6 @@ internal fun blend(a: IntArray, b: IntArray): IntArray = IntArray(a.size) { i ->
 
 internal suspend fun checkAi(context: Context, gpu: Boolean) {
     Log.i(TAG, "runtime loaded=${AiNative.loaded} gpu=${AiNative.gpu?.let { "${it.name} vulkan ${it.version} type ${it.type} fp16 ${it.fp16}" }} cores=${if (AiNative.loaded) AiNative.nativeCpuCores() else 0} useGpu=$gpu")
-    for (model in listOf(AiModel.Detail, AiModel.Cartoon)) {
-        if (!model.installed(context)) { Log.i(TAG, "skip $model: not installed"); continue }
-        val blend = if (model == AiModel.Detail && AiModel.Grain.installed(context)) AiModel.Grain else null
-        val started = SystemClock.elapsedRealtime()
-        AiNet.open(context, model, blend, 0.5f, gpu).use { net ->
-            val opened = SystemClock.elapsedRealtime()
-            val (w, h) = 64 to 48
-            val frame = movingFrame(w, h, 0f)
-            val out = net.upscale(frame, w, h, 4)
-            val first = SystemClock.elapsedRealtime()
-            val again = net.upscale(frame, w, h, 4)
-            val second = SystemClock.elapsedRealtime()
-            val sharpen = net.upscale(frame, w, h, 1)
-            val near = psnr(sharpen, frame)
-            val sane = out.contentEquals(again) && out.any { (it and 0xFFFFFF) != 0 }
-            Log.i(TAG, "ok=${sane && near > 20} $model blend=${blend != null} gpu=${net.onGpu} open=${opened - started}ms first=${first - opened}ms second=${second - first}ms out=${w * 4}x${h * 4} sharpenPsnr=${"%.1f".format(java.util.Locale.US, near)}")
-        }
-    }
     for (level in SmoothLevel.entries) {
         if (!AiSmooth.installed(context, level)) { Log.i(TAG, "skip smooth $level: not installed"); continue }
         val started = SystemClock.elapsedRealtime()
@@ -82,51 +64,6 @@ internal suspend fun checkAi(context: Context, gpu: Boolean) {
         }
     }
     Log.i(TAG, "done")
-}
-
-internal suspend fun checkEnhance(activity: MainActivity, path: String, modes: List<String>) {
-    val source = java.io.File(path)
-    val declared = checkNotNull(app.absentmotion.media.videoDeclaration(activity, android.net.Uri.fromFile(source))) { "cannot read $path" }
-    val uri = declared.uri
-    for (name in modes) {
-        val options = checkNotNull(app.absentmotion.ai.EnhanceOptions.parse(name)) { "unknown mode $name" }
-        val xml = """<scene width="640" height="360" fps="30" totalTime="2000"><shape id="1" label="clip" s=".rect" fillType="media" fillVideo="$uri" mediaFillMode="fit" startTime="0" endTime="2000"><transform><location value="320,180,0"/></transform><property name="size" type="vec2" value="640,360"/></shape></scene>"""
-        val id = "test-enhance-${name.replace('+', '-')}"
-        activity.store.save(id, app.absentmotion.model.Scene.parse(xml).withMedia(declared))
-        val state = checkNotNull(activity.openNow(id)) { "cannot open $id" }
-        val tools = app.absentmotion.ai.AiTools(activity.applicationContext, state, activity.lifecycleScope)
-        state.selectedId = 1
-        tools.enhance = options
-        val started = SystemClock.elapsedRealtime()
-        tools.apply(app.absentmotion.ai.AiAction.Enhance, confirmed = true)
-        while (tools.running != null) kotlinx.coroutines.delay(250)
-        val ms = SystemClock.elapsedRealtime() - started
-        val layer = checkNotNull(state.scene.layer(1))
-        val result = layer.node["fillVideo"]
-        if (result == uri) { Log.e(TAG, "ok=false enhance $name: ${tools.message}"); continue }
-        val media = checkNotNull(state.scene.media(result!!))
-        val mark = layer.aiMarks.single()
-        val frames = app.absentmotion.media.VideoSources.timestamps(activity, result).size
-        val sourceFrames = app.absentmotion.media.VideoSources.timestamps(activity, uri).size
-        val tracks = android.media.MediaExtractor().run {
-            setDataSource(activity, android.net.Uri.parse(result), null)
-            (0 until trackCount).map { getTrackFormat(it).getString(android.media.MediaFormat.KEY_MIME) }.also { release() }
-        }
-        val sizeOk = media.width == declared.width * options.mode.scale && media.height == declared.height * options.mode.scale
-        activity.engine.awaitMedia()
-        runCatching { activity.engine.awaitVideoFrames(state.scene, 500) }
-        val still = java.io.File(activity.getExternalFilesDir(null), "enhance-$name.png".replace('+', '-'))
-        val previewed = activity.engine.stillPng(state.scene.toXml(), 500, 640, 360, still)
-        state.undo()
-        val undone = state.scene.layer(1)?.node?.get("fillVideo") == uri && state.scene.layer(1)?.aiMarks?.isEmpty() == true
-        state.redo()
-        val redone = state.scene.layer(1)?.node?.get("fillVideo") == result
-        state.editSelected { it.withoutAiMark(app.absentmotion.ai.AiKind.Enhance) }
-        val restored = state.scene.layer(1)?.node?.get("fillVideo") == uri && state.scene.layer(1)?.aiMarks?.isEmpty() == true
-        val ok = sizeOk && frames >= sourceFrames && tracks.any { it?.startsWith("audio/") == true } && mark.original == uri && previewed && undone && redone && restored
-        Log.i(TAG, "ok=$ok enhance $name ms=$ms ${declared.width}x${declared.height} -> ${media.width}x${media.height} frames $sourceFrames -> $frames tracks=$tracks preview=$previewed undo=$undone redo=$redone restore=$restored")
-    }
-    Log.i(TAG, "enhance done")
 }
 
 internal suspend fun checkSmooth(activity: MainActivity, path: String, levels: List<String>) {

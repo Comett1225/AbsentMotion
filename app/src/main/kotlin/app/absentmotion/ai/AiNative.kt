@@ -42,22 +42,15 @@ internal object AiNative {
 
     external fun nativeGpu(): String?
     external fun nativeCpuCores(): Int
-    external fun nativeOpen(param: String, bin: String, blendBin: String?, weight: Float, useGpu: Boolean): Long
+    external fun nativeOpen(param: String, bin: String, useGpu: Boolean): Long
     external fun nativeOnGpu(handle: Long): Boolean
     external fun nativeCancel(handle: Long)
     external fun nativeClose(handle: Long)
-    external fun nativeUpscale(handle: Long, input: IntArray, width: Int, height: Int, netScale: Int, outScale: Int, tile: Int, overlap: Int, output: IntArray): Int
     external fun nativeInterpolate(handle: Long, first: IntArray, second: IntArray, width: Int, height: Int, t: Float, padding: Int, maxPixels: Int, output: IntArray): Int
 }
 
 internal class AiNet private constructor(private val handle: Long, private val gpuApp: Context?) : Closeable {
     val onGpu: Boolean get() = AiNative.nativeOnGpu(handle)
-
-    suspend fun upscale(input: IntArray, width: Int, height: Int, outScale: Int, output: IntArray = IntArray(width * outScale * height * outScale)): IntArray {
-        val code = blocking { AiNative.nativeUpscale(handle, input, width, height, NET_SCALE, outScale, TILE, OVERLAP, output) }
-        checkResult(code)
-        return output
-    }
 
     suspend fun interpolate(first: IntArray, second: IntArray, width: Int, height: Int, t: Float, padding: Int, maxPixels: Int = Int.MAX_VALUE,
                             output: IntArray = IntArray(width * height)): IntArray {
@@ -84,27 +77,21 @@ internal class AiNet private constructor(private val handle: Long, private val g
     }
 
     companion object {
-        const val NET_SCALE = 4
-        const val TILE = 256
-        const val OVERLAP = 10
-
         @Volatile var cpuOnly = false
 
-        fun open(context: Context, model: AiModel, blend: AiModel? = null, weight: Float = 1f, gpu: Boolean = AiDevice.gpuProven(context, model)): AiNet {
+        fun open(context: Context, model: AiModel, gpu: Boolean = AiDevice.gpuProven(context, model)): AiNet {
             check(AiNative.loaded) { AppText.get(R.string.ai_runtime_unavailable) }
             model.verify(context)
-            blend?.verify(context)
-            val param = model.file(context, checkNotNull(model.param)).path
+            val param = model.file(context, model.param).path
             val useGpu = gpu && !cpuOnly
             if (useGpu) AiDevice.gpuRunning(context, true)
             val bin = model.file(context, model.bin).path
-            val other = blend?.let { it.file(context, it.bin).path }
-            var handle = AiNative.nativeOpen(param, bin, other, weight, useGpu)
+            var handle = AiNative.nativeOpen(param, bin, useGpu)
             val onGpu = handle != 0L && AiNative.nativeOnGpu(handle)
             if (useGpu && !onGpu) {
                 if (handle == 0L) {
                     AiDevice.gpuFailed(context)
-                    handle = AiNative.nativeOpen(param, bin, other, weight, false)
+                    handle = AiNative.nativeOpen(param, bin, false)
                 }
                 AiDevice.gpuRunning(context, false)
             }

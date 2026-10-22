@@ -159,7 +159,10 @@ class MainActivity : ComponentActivity() {
         }
         lifecycleScope.launch { kotlinx.coroutines.delay(15_000); autoBackupIfDue(applicationContext, settings) }
         lifecycleScope.launch(Dispatchers.IO) { ShapeCatalog.load(applicationContext) }
-        lifecycleScope.launch(Dispatchers.IO) { app.absentmotion.ai.AiDevice.recover(applicationContext) }
+        lifecycleScope.launch(Dispatchers.IO) {
+            app.absentmotion.ai.AiDevice.recover(applicationContext)
+            app.absentmotion.ai.AiModel.removeRetired(applicationContext)
+        }
         app.absentmotion.editor.ElementNav.open = { id ->
             editor?.let { it.playing = false; it.endGesture(); it.saver.snapshot(it.scene.toXml()) }
             MultiSelect.clear()
