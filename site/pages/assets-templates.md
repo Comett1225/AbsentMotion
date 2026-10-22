@@ -2,7 +2,7 @@
 title: Assets, templates and presets
 group: Create
 order: 9
-summary: Reuse your best work: save layers as assets, start from templates and keep your favourite looks as presets.
+summary: Reuse your best work: save layers as assets, start from templates and keep your favorite looks as presets.
 ---
 AbsentMotion has three ways to reuse work. They differ in what they keep.
 
@@ -70,6 +70,6 @@ Select the layer and choose **Save Preset** in the copy and paste menu (the sixt
 
 Select another layer and tap **Presets** in the tool grid. The **Try a Preset** screen shows the layer on its own with your preset applied. Tap a preset to try it, tap the preview to play it, and tap **Apply** to keep it. Each preset has **Rename** and **Delete** in its menu.
 
-A preset replaces the border, shadow, blend mode and opacity, animated transform, effects, text style (text to text), volume and audio effects (sound to sound) and speed (clip to clip). It does not change the fill colour, the shape, the content or the timing.
+A preset replaces the border, shadow, blend mode and opacity, animated transform, effects, text style (text to text), volume and audio effects (sound to sound) and speed (clip to clip). It does not change the fill color, the shape, the content or the timing.
 
 There are no built-in presets: only the ones you save. They are listed on the home screen under **Templates**, **My Presets**, where you can rename and delete them.

@@ -42,7 +42,7 @@ Choose 12, 15, 18, 20, 24, 25, 30, 48, 50 or 60 frames per second. The default i
 
 ## Background
 
-The colour behind your layers: **Black**, **White**, **Light Gray**, **Green**, **Blue** or **Transparent** (shown as a checkerboard). A new install starts with Transparent. Transparent areas of an exported video come out black; GIF and image exports let you choose what transparent areas become, and PNG keeps them.
+The color behind your layers: **Black**, **White**, **Light Gray**, **Green**, **Blue** or **Transparent** (shown as a checkerboard). A new install starts with Transparent. Transparent areas of an exported video come out black; GIF and image exports let you choose what transparent areas become, and PNG keeps them.
 
 ## Buttons at the bottom
 

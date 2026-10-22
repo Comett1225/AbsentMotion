@@ -4,7 +4,7 @@ group: Create
 order: 1
 summary: Animate any value over time, move and retime keyframes and shape the motion with easing curves.
 ---
-A **keyframe** stores the value of one property at one moment. Between two keyframes the app calculates the values in between, which makes the animation. Almost every value can be animated: position, size, rotation, tilt, skew, opacity, colours, stroke, border and shadow settings, shape parameters, camera and model settings, volume, speed, and the settings of effects.
+A **keyframe** stores the value of one property at one moment. Between two keyframes the app calculates the values in between, which makes the animation. Almost every value can be animated: position, size, rotation, tilt, skew, opacity, colors, stroke, border and shadow settings, shape parameters, camera and model settings, volume, speed, and the settings of effects.
 
 ## Add and remove keyframes
 
@@ -16,7 +16,7 @@ Good to know:
 
 - Once a property has a keyframe, changing it at a time with no keyframe makes one there for you. You only need to add the first one by hand.
 - Removing the last keyframe of a property leaves it fixed at that last value.
-- The keyframe button is greyed when the setting cannot be animated. Text content and size, and freehand drawings, have no keyframes. Shapes drawn with points have their own shape keyframes: see [Shapes, drawing and masks](@shapes).
+- The keyframe button is grayed when the setting cannot be animated. Text content and size, and freehand drawings, have no keyframes. Shapes drawn with points have their own shape keyframes: see [Shapes, drawing and masks](@shapes).
 - In a panel with several rows (Shape Options, Frame & Shadow, Camera Options), the selected row is the one that receives the keyframe. In **Transform**, **Move** animates X, Y and Z together; **Size**, **Rotate**, **Tilt** and **Skew** are separate.
 - In **Effects**, each parameter of an open effect has its own keyframes. Tap the name of the parameter to make it the target.
 

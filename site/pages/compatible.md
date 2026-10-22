@@ -18,7 +18,7 @@ You can find your Android version in Settings, About phone, Android version.
 
 - To be filled in when the Compatible version is finished.
 
-In the app, a feature that the Compatible version leaves out is shown greyed out with a note that it needs Android 13.
+In the app, a feature that the Compatible version leaves out is shown grayed out with a note that it needs Android 13.
 
 ## How to install it
 

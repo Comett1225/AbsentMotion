@@ -11,7 +11,7 @@ Add a ready-made shape from the **Shape** tab of the [Add menu](@add-menu). Ther
 - **Parametric shapes** (Circle, Rectangle, Star, Polygon and others) are edited with **Shape Options**: size, radius, number of points and so on. These settings can be animated.
 - **Path shapes** (Heart, Cloud, Gear and others) are edited with **Edit Points**.
 
-Colour and outline are set with **Fill & Color** and **Frame & Shadow**. See [Layer tools](@layer-tools).
+Color and outline are set with **Fill & Color** and **Frame & Shadow**. See [Layer tools](@layer-tools).
 
 ## The pen tool and Edit Points
 
@@ -37,9 +37,9 @@ In the point editor, a time bar has **Previous shape keyframe**, **Next shape ke
 **Freehand Brush** in the Add menu creates a drawing layer and opens the drawing editor.
 
 - **Pen** draws an even line, **Brush** changes the line width with pressure, **Fill** turns a loop you draw into a filled shape, and **Eraser** removes parts.
-- A size slider (1 to 300), and a colour picker with a hue strip and an opacity strip.
+- A size slider (1 to 300), and a color picker with a hue strip and an opacity strip.
 - **Undo** and **Redo** at the top. Each stroke is kept when you lift your finger.
-- The tool, size and colour are remembered. Leaving without drawing anything deletes the new layer.
+- The tool, size and color are remembered. Leaving without drawing anything deletes the new layer.
 
 Drawings have no keyframes. To animate a drawing, use effects such as Drawing Progress; see the [effects library](@effects).
 

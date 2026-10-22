@@ -22,7 +22,7 @@ SHORT = {
     "releases": REPO + "/releases",
     "issues": REPO + "/issues",
     "privacy-file": REPO + "/blob/main/PRIVACY.md",
-    "licence-file": REPO + "/blob/main/LICENSE",
+    "license-file": REPO + "/blob/main/LICENSE",
     "notices-file": REPO + "/blob/main/THIRD_PARTY_NOTICES.md",
 }
 GROUPS = ["Start", "Interface", "Create", "Sound and AI", "Export and projects", "Help"]
@@ -221,7 +221,7 @@ class Site:
                 while ident in used:
                     ident += "-2"
                 used.add(ident)
-                if heads is not None and level == 2:
+                if heads is not None and level == 2 and title != "Next":
                     heads.append((ident, re.sub(r"[`*]", "", title)))
                 out.append('<h%d id="%s">%s</h%d>' % (level, ident, self.inline(title, where, depth), level))
                 i += 1
@@ -373,7 +373,7 @@ class Site:
         if page.summary and page.kind != "download":
             parts.append('<p class="lead">%s</p>' % self.inline(page.summary, where, depth))
         if len(heads) >= 3 and page.kind in ("guide", "effects"):
-            parts.append('<nav class="toc" aria-label="On this page"><strong>On this page</strong><ul>%s</ul></nav>' % "".join('<li><a href="#%s">%s</a></li>' % (i, escape(t)) for i, t in heads))
+            parts.append('<details class="toc"><summary>On this page</summary><ul>%s</ul></details>' % "".join('<li><a href="#%s">%s</a></li>' % (i, escape(t)) for i, t in heads))
         if page.kind == "download":
             parts = [self.download_top(page, depth), body, self.download_all(depth)]
         elif page.kind == "toc":
@@ -550,7 +550,7 @@ def describe(p):
         rgb = value[-6:]
         alpha = int(value[:2], 16) / 255 if len(value) == 8 else 1
         note = "" if alpha > 0.995 else ", %d%% opaque" % round(alpha * 100)
-        return "Color", "&ndash;", '<span class="sw" style="background:#%s"></span>#%s%s' % (rgb, rgb.upper(), note)
+        return "Color", "&ndash;", '<span><span class="sw" style="background:#%s"></span>#%s%s</span>' % (rgb, rgb.upper(), note)
     if kind == "text":
         return "Text", "&ndash;", escape(str(default)) or "(empty)"
     unit = ""

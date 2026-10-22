@@ -52,11 +52,12 @@ blockquote{margin:1rem 0;padding:.2rem 1rem;border-left:4px solid var(--line);co
 table{border-collapse:collapse;width:100%;font-size:.95rem}
 th,td{text-align:left;padding:.5rem .7rem;border-bottom:1px solid var(--line);vertical-align:top}
 th{font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mid)}
-@media (max-width:640px){.table-wrap{overflow:visible}table,thead,tbody,tr,td{display:block}thead{position:absolute;left:-999rem}tr{padding:.5rem 0;border-bottom:1px solid var(--line)}td{border:0;padding:.15rem 0;display:flex;gap:.8rem;justify-content:space-between}td::before{content:attr(data-label);color:var(--mid);flex:0 0 5.5rem}td:first-child{font-size:1.02rem}td>*:last-child{text-align:right}}
+@media (max-width:640px){.table-wrap{overflow:visible}table,thead,tbody,tr,td{display:block}thead{position:absolute;left:-999rem}tr{padding:.5rem 0;border-bottom:1px solid var(--line)}td{border:0;padding:.15rem 0}td::before{content:attr(data-label);display:block;color:var(--mid);font-size:.72rem;text-transform:uppercase;letter-spacing:.05em}td:first-child{font-size:1.02rem}td:first-child::before{display:none}.params td{display:flex;gap:.8rem;justify-content:space-between}.params td::before{display:inline;flex:0 0 5.5rem;font-size:inherit;text-transform:none;letter-spacing:0}.params td:first-child{justify-content:flex-start}.params td:first-child::before{display:none}}
 figure{margin:1.4rem 0;text-align:center}
 figure img{max-width:min(100%,19rem);border-radius:.9rem;border:1px solid var(--line)}
 figcaption{font-size:.9rem;color:var(--mid);margin-top:.4rem}
 .toc{margin:1.2rem 0;padding:.8rem 1rem;background:var(--panel);border:1px solid var(--line);border-radius:.8rem}
+.toc summary{cursor:pointer;font-weight:700}
 .toc ul{margin:.4rem 0 0;padding-left:1.1rem;columns:2 14rem}
 .toc-groups section{margin:0 0 1.6rem}
 .toc-groups ul{list-style:none;padding:0}

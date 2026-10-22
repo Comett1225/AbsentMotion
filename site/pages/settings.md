@@ -15,13 +15,13 @@ Tap the menu button at the top left of the home screen to open the Settings draw
 
 ### Custom themes
 
-A theme file is a small text file in JSON format of up to 64 KB with an optional `name` and any of the colours you want to change, written as `#RRGGBB` or `#AARRGGBB`. Colours you leave out keep the AbsentMotion look. For example:
+A theme file is a small text file in JSON format of up to 64 KB with an optional `name` and any of the colors you want to change, written as `#RRGGBB` or `#AARRGGBB`. Colors you leave out keep the AbsentMotion look. For example:
 
 ```
 {"name": "Mint", "Accent": "#5BD6A4", "HomeAccent": "#1B7A4A"}
 ```
 
-The colour names are the editor and home screen colours: TopBar, PreviewBg, TimelineBg, Panel, PanelInset, Button, Field, FieldHi, Chosen, Well, Deepest, Line, MenuLine, KeyDigit, KeySymbol, Scrim, PressEditor, OnDark, OnDarkDim, Caption, Faint, Inactive, OnScrim, Accent, AccentLit, AccentGlow, AccentDeep, OnAccent, Cool, CoolDeep, Gold, Warning, Bookmark, LayerBar, LayerBarStripe, TextBar, TextBarStripe, AudioBar, AudioWave, OnBar, OnAudioBar, HomeBg, Card, SheetBg, Navy, HomeAccent, OnNavy, OnNavyAccent, NavyHi, NavyLine, HomeInk, HomeMid, HomeDim, HomeFaint, HomeLine, HomePanel, HomeDrawer, SwitchOff, Thumb, MenuScrim and PressHome. One custom theme is kept at a time; importing a new file replaces it and applies it at once.
+The color names are the editor and home screen colors: TopBar, PreviewBg, TimelineBg, Panel, PanelInset, Button, Field, FieldHi, Chosen, Well, Deepest, Line, MenuLine, KeyDigit, KeySymbol, Scrim, PressEditor, OnDark, OnDarkDim, Caption, Faint, Inactive, OnScrim, Accent, AccentLit, AccentGlow, AccentDeep, OnAccent, Cool, CoolDeep, Gold, Warning, Bookmark, LayerBar, LayerBarStripe, TextBar, TextBarStripe, AudioBar, AudioWave, OnBar, OnAudioBar, HomeBg, Card, SheetBg, Navy, HomeAccent, OnNavy, OnNavyAccent, NavyHi, NavyLine, HomeInk, HomeMid, HomeDim, HomeFaint, HomeLine, HomePanel, HomeDrawer, SwitchOff, Thumb, MenuScrim and PressHome. One custom theme is kept at a time; importing a new file replaces it and applies it at once.
 
 ## Playback and preview
 
@@ -47,7 +47,7 @@ The **Language** row shows the current language and opens the list of the 12 lan
 ## About, Help and other rows
 
 - **Help** opens this guide inside the app, without a connection.
-- **About** shows the version, the licence (Apache License 2.0), a note that AbsentMotion is an independent project, **Open source licenses** (the full licence text of every library the app uses) and the **Project home page** address.
+- **About** shows the version, the license (Apache License 2.0), a note that AbsentMotion is an independent project, **Open source licenses** (the full license text of every library the app uses) and the **Project home page** address.
 - **Crash logs** lists the crashes the app recorded. Tap one to read it and use **Copy** to copy it, for example to send with a bug report. See [Troubleshooting](@troubleshooting).
 - **Check for a new version each time the app opens.** The app asks you once whether it may do this. If it is on, the app makes one request to GitHub for the latest version number when it opens. It sends nothing else and never downloads or installs anything by itself.
 - **Check for Update** does the same check once, now. If a newer version exists, **Download** opens its page in your browser.

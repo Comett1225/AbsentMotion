@@ -22,9 +22,9 @@ A photo or video is a rectangle with a picture fill, so it has the same tools as
 
 ## Every panel
 
-Most panels share a narrow column on the left with four buttons: **Back**, **Add keyframe** or **Remove keyframe**, **Easing** and, in Transform and Effects only, **More**. A grey keyframe button means the setting cannot be animated. See [Keyframes and easing](@keyframes).
+Most panels share a narrow column on the left with four buttons: **Back**, **Add keyframe** or **Remove keyframe**, **Easing** and, in Transform and Effects only, **More**. A gray keyframe button means the setting cannot be animated. See [Keyframes and easing](@keyframes).
 
-Tap any number box to open the number pad. The first tap selects the whole value, so typing replaces it. A tick applies it; tapping outside closes the pad. Rulers (a strip with ticks and a centre needle) change a number when you drag sideways.
+Tap any number box to open the number pad. The first tap selects the whole value, so typing replaces it. A tick applies it; tapping outside closes the pad. Rulers (a strip with ticks and a center needle) change a number when you drag sideways.
 
 ### Transform
 
@@ -43,18 +43,18 @@ Move is the position, with X, Y and Z animated together. Size, Rotate, Tilt and 
 
 Tabs at the top: **None**, **Color**, **Gradient**, **Media**.
 
-- **Color.** Fourteen swatches, then your saved colours. The bar at the top shows the colour as #RRGGBB and its opacity; the **+** on it saves the current colour. Three buttons: **Eyedropper** (touch the preview to sample a colour), **Color sliders** and **Full color picker** (a colour wheel or HSV and RGB sliders with a hex field).
-- **Gradient.** Pick linear, radial or sweep, then a start and an end colour. Two handles on the preview move the gradient. A gradient has exactly two colours.
+- **Color.** Fourteen swatches, then your saved colors. The bar at the top shows the color as #RRGGBB and its opacity; the **+** on it saves the current color. Three buttons: **Eyedropper** (touch the preview to sample a color), **Color sliders** and **Full color picker** (a color wheel or HSV and RGB sliders with a hex field).
+- **Gradient.** Pick linear, radial or sweep, then a start and an end color. Two handles on the preview move the gradient. A gradient has exactly two colors.
 - **Media.** Fills the shape with a photo or video. It is active when the layer already has a media fill or is a text layer; for text, tapping it opens the picker to fill the letters with a picture or video.
 
-Only the colour in the Color tab can be keyframed.
+Only the color in the Color tab can be keyframed.
 
 ### Frame & Shadow
 
 Three tabs: **Stroke**, **Border** and **Shadow**.
 
-- **Stroke** is the outline of the shape. It has a switch, a colour, a size, the line cap and join, and a style for each end of an open line (arrows, circles, diamonds and more).
-- **Border** lets you stack any number of borders. Each border has a size, a colour and a position (**INSIDE**, **CENTER**, **OUTSIDE**). Drag the grip to change their order. **Add Border** adds one.
+- **Stroke** is the outline of the shape. It has a switch, a color, a size, the line cap and join, and a style for each end of an open line (arrows, circles, diamonds and more).
+- **Border** lets you stack any number of borders. Each border has a size, a color and a position (**INSIDE**, **CENTER**, **OUTSIDE**). Drag the grip to change their order. **Add Border** adds one.
 - **Shadow** has a switch, **Color**, **Size**, **Alpha** and **Position** (X and Y).
 
 ### Opacity & Blend Mode

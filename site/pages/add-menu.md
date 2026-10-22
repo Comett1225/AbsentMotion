@@ -19,7 +19,7 @@ The menu has five tabs on the left and four quick buttons on the right. The X cl
 
 ## Shape
 
-Fifty-four ready-made shapes, six to a row, in pages you swipe through. Tap one to add it in the middle of the canvas with a random pleasant colour.
+Fifty-four ready-made shapes, six to a row, in pages you swipe through. Tap one to add it in the middle of the canvas with a random pleasant color.
 
 Nineteen shapes are parametric and are edited with **Shape Options**: Circle, Rounded Rectangle, Plus, Arc, Triangle, Callout, Pie, Polygon, Multifoil, Arrow, Quad, Moon, Rectangle, Star, Line, Wide Line, Irregular Pentagon, Stamp and Teardrop. The other thirty-five are drawn with points and are edited with **Edit Points**: Heart, Cloud, Lightning Bolt, Check Mark, X Mark, Ring, Speech Bubble, Shield, House, Bookmark, Flag, Crescent and Star, Sun, Leaf, Seal Burst, Hexagon Outline, Star Outline, Chevron, Double Arrow, Curved Arrow, Parallelogram, Trapezoid, Ticket, Tag, Crown, Eye, Umbrella, Music Note, Droplet Pair, Key, Location Pin, Rounded Play, Pause, Record and Gear.
 
@@ -52,7 +52,7 @@ Six tiles for other kinds of layers.
 - **Null** adds an invisible helper layer. Use it as a parent for other layers or as a target for motion tracking.
 - **Empty Group** adds an empty group.
 - **Asset / Project** lists your saved assets, then your other projects. Tap one to insert it as a group at the playhead. An asset stays linked to its source; a project is inserted as an independent copy. See [Assets, templates and presets](@assets-templates).
-- **Import SVG** opens a file picker for `.svg` files (up to 16 MB). One shape becomes a shape layer; several become a group. A message lists what could not be imported: text, images, embedded content, animations, clipping paths, masks, filters, markers, dashed or gradient strokes and pattern fills. Gradients keep only their first and last colour.
+- **Import SVG** opens a file picker for `.svg` files (up to 16 MB). One shape becomes a shape layer; several become a group. A message lists what could not be imported: text, images, embedded content, animations, clipping paths, masks, filters, markers, dashed or gradient strokes and pattern fills. Gradients keep only their first and last color.
 - **3D Model** opens a file picker for `.obj`, `.glb` and `.gltf` files. Pick the model's material and picture files with it if it has them. The files can total up to 256 MB, and a model with more than 50,000 triangles is shown in a simplified form.
 
 ## Template

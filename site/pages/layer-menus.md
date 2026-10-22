@@ -17,9 +17,9 @@ Select one layer and tap the three dots at the right of the top bar (**Layer men
 - **Track Motion** (videos only). See [Motion tracking](@tracking).
 - **Mark Beats** (layers with sound) adds bookmarks on the beats. See [Audio](@audio).
 - **Media Info** (photos and videos) shows name, dimensions, frame rate, duration, format and size. **Swap media file** replaces that file in every layer that uses it.
-- A row of **label colours** at the bottom.
+- A row of **label colors** at the bottom.
 
-Audio layers have a shorter menu. Entries that do not apply to the layer are greyed out.
+Audio layers have a shorter menu. Entries that do not apply to the layer are grayed out.
 
 ## The copy and paste menu
 
@@ -36,7 +36,7 @@ The sixth button of the play bar.
 
 Press and hold the eye or the name area of a layer row, then slide up or down across rows to select a range. After that, a tap on a row adds or removes it. Starting the slide on a row that is already selected deselects the range instead.
 
-The top bar changes colour and shows:
+The top bar changes color and shows:
 
 - **Cancel selection** (X) and the number of selected layers.
 - **Group** puts the layers into one group layer that lasts as long as its members. **Group & Mask** and **Group & Exclude** do the same and set the top layer's blend mode to Mask or Exclude.

@@ -10,7 +10,7 @@ Tap **Export & Share** (the share icon) in the editor's top bar, or **Export** i
 
 At the top, four lines of information: **Available space**, **Estimated file size**, **Estimated export time** and **Phone temperature**. Under them are cards for each kind of export; tap a card to select it and tap its arrow to see its options. At the bottom are the switch **Also keep a copy as a Template** and the big **Export** button.
 
-The button turns grey with a reason when the export cannot run: **Not enough storage** or **Not supported on this phone**. A choice that this phone cannot do is dimmed, and tapping it explains why. The app remembers the settings of each kind, except that a video export starts at the project's own frame rate.
+The button turns gray with a reason when the export cannot run: **Not enough storage** or **Not supported on this phone**. A choice that this phone cannot do is dimmed, and tapping it explains why. The app remembers the settings of each kind, except that a video export starts at the project's own frame rate.
 
 | Card | Result | Saved in |
 |---|---|---|
@@ -61,7 +61,7 @@ It only acts on video clips whose frame rate (counting the clip's speed) is lowe
 
 A project with no sound makes a video without an audio track.
 
-**Colour.** Videos are exported as standard 8-bit SDR video (BT.709). There is no HDR export. HDR videos you import are converted to standard colours.
+**Color.** Videos are exported as standard 8-bit SDR video (BT.709). There is no HDR export. HDR videos you import are converted to standard colors.
 
 **Transparency.** Video files have no transparency. Transparent areas of the project come out black.
 
@@ -79,7 +79,7 @@ The file is the whole project length and contains the mix of every audible clip 
 
 ## GIF
 
-Choices: **Transparent areas become** White (default) or Black, **Size** (720p, 540p, 360p by default, 270p, 180p), **Frame Rate** (5, 10, 12, 15 by default, 20, 25, 30) and **Frame Interpolation**. A GIF has 256 colours per frame and loops forever. GIF timing is in hundredths of a second, so 30 fps is only approximate. The estimated size is measured by encoding a few sample frames.
+Choices: **Transparent areas become** White (default) or Black, **Size** (720p, 540p, 360p by default, 270p, 180p), **Frame Rate** (5, 10, 12, 15 by default, 20, 25, 30) and **Frame Interpolation**. A GIF has 256 colors per frame and loops forever. GIF timing is in hundredths of a second, so 30 fps is only approximate. The estimated size is measured by encoding a few sample frames.
 
 ## Image Sequence
 

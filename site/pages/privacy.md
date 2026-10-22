@@ -1,10 +1,10 @@
 ---
-title: Privacy and licence
+title: Privacy and license
 group: Help
 order: 2
-summary: What the app keeps, what it sends, and the licence it is released under.
+summary: What the app keeps, what it sends, and the license it is released under.
 ---
-AbsentMotion does not collect, store or share personal data. There is no account, no advertising, no analytics and no tracking. This page summarises the privacy policy; the full text is in the file [PRIVACY.md](@privacy-file) of the source code.
+AbsentMotion does not collect, store or share personal data. There is no account, no advertising, no analytics and no tracking. This page summarizes the privacy policy; the full text is in the file [PRIVACY.md](@privacy-file) of the source code.
 
 ## Your projects and media
 
@@ -19,7 +19,7 @@ If the app closes unexpectedly it keeps a crash log in its own storage: when it 
 The app asks for the internet permission for these things only:
 
 - **Fonts.** When you pick one of the downloadable fonts, the app downloads it from Google Fonts. Google receives the request for that font and your IP address, as for any web request.
-- **Auto captions.** The first time you generate captions, the app tells you the size of the speech model (about 57 MB) and downloads it from Hugging Face. Recognising speech runs on the phone.
+- **Auto captions.** The first time you generate captions, the app tells you the size of the speech model (about 57 MB) and downloads it from Hugging Face. Recognizing speech runs on the phone.
 - **Update check.** If you allow it (the app asks once; the switch is in Settings), the app makes one normal HTTPS request to GitHub each time it opens, to read the latest version number. Nothing else is sent. GitHub sees your IP address, as for any web request.
 
 Apart from the Play-services build described below, nothing else is sent anywhere. Text to speech uses the voices already on the phone and works offline.
@@ -32,9 +32,9 @@ The build with Google Play services (`-play.apk`) removes backgrounds with Googl
 
 The app is not directed at children and collects nothing from anyone.
 
-## Licence and source
+## License and source
 
-AbsentMotion is free and open source, released under the [Apache License 2.0](@licence-file). Its source code is on the [project page on GitHub](@repo). The third-party software it uses (Skia, whisper.cpp, RNNoise, LAME, AndroidX Compose and others) and their licences are listed in [THIRD_PARTY_NOTICES.md](@notices-file) and in the app: Settings, About, **Open source licenses**.
+AbsentMotion is free and open source, released under the [Apache License 2.0](@license-file). Its source code is on the [project page on GitHub](@repo). The third-party software it uses (Skia, whisper.cpp, RNNoise, LAME, AndroidX Compose and others) and their licenses are listed in [THIRD_PARTY_NOTICES.md](@notices-file) and in the app: Settings, About, **Open source licenses**.
 
 AbsentMotion is an independent project. It is not affiliated with, endorsed by or sponsored by any other app maker; names of other products belong to their owners.
 

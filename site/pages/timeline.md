@@ -11,8 +11,8 @@ The timeline is the area under the play bar. Each layer is a row with a bar show
 - The **playhead** is a fixed vertical line in the middle. The content scrolls underneath it. The time pill on the ruler shows minutes, seconds and frames.
 - **Ruler.** Tall ticks mark each second and shorter ones the half seconds and frames, depending on how far you have zoomed in.
 - **Rows.** One row per layer, with the front layer on top. At the left, the eye shows or hides the layer (a hidden layer is not drawn and its sound is silent) and a tiny picture identifies it.
-- **Bar colours.** Ordinary layers are teal with diagonal stripes, text layers are amber, camera layers are crimson and audio layers are violet with a waveform. Photos and videos show a strip of pictures. The layer name is written on the bar.
-- **Label colours.** The layer menu can mark a layer with one of eleven label colours, shown as a small coloured corner on the bar.
+- **Bar colors.** Ordinary layers are teal with diagonal stripes, text layers are amber, camera layers are crimson and audio layers are violet with a waveform. Photos and videos show a strip of pictures. The layer name is written on the bar.
+- **Label colors.** The layer menu can mark a layer with one of eleven label colors, shown as a small colored corner on the bar.
 - **Keyframe diamonds.** Small diamonds on a bar are keyframes. They are bigger on the selected layer. While a property or effect is open, only its keyframes show. See [Keyframes and easing](@keyframes).
 
 ## Gestures
@@ -38,7 +38,7 @@ When a video or audio clip reaches the end of its file, the grip turns red and t
 
 ## Snapping
 
-Trims, clip moves and keyframe moves snap to the playhead, bookmarks, the start and end of other layers and keyframes. A coloured vertical line and a small vibration tell you when a snap happens. The vibration can be turned off in [Settings](@settings).
+Trims, clip moves and keyframe moves snap to the playhead, bookmarks, the start and end of other layers and keyframes. A colored vertical line and a small vibration tell you when a snap happens. The vibration can be turned off in [Settings](@settings).
 
 ## Bookmarks
 

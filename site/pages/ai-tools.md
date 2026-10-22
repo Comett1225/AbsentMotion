@@ -6,7 +6,7 @@ summary: Auto captions, background removal and noise reduction. They run on your
 ---
 Everything in this page **runs on your phone**. Your photos, videos and sound are never uploaded. The only downloads are listed in the table at the end.
 
-The AI tools are in two places: the **AI** category of the Effects Library (**Remove Background**, **Remove Background (video)** and **Reduce Noise**), and the **Captions** button of the Add menu. For a sound clip, the **AI** button in the tool grid opens the noise tool. A tool that does not fit the selected layer is greyed with a note such as "Select an image layer". One AI job runs at a time, with a progress bar and a **Cancel** button.
+The AI tools are in two places: the **AI** category of the Effects Library (**Remove Background**, **Remove Background (video)** and **Reduce Noise**), and the **Captions** button of the Add menu. For a sound clip, the **AI** button in the tool grid opens the noise tool. A tool that does not fit the selected layer is grayed with a note such as "Select an image layer". One AI job runs at a time, with a progress bar and a **Cancel** button.
 
 ## Auto captions
 
@@ -28,7 +28,7 @@ Auto captions turns speech into text layers that appear in time with the voice.
 
 The first time, the app tells you it needs a speech model: "Captions are recognized on your phone by a speech model, downloaded once", with its name and size, about 57 MB. Tap **Download** (or **Not now**). The model is the Whisper base model, downloaded from Hugging Face over a normal secure connection and checked before use. After that, recognition runs on the phone's processor with no internet. In **Settings**, **Remove caption model** deletes it again.
 
-While it works the sheet shows "Reading the audio..." and "Recognizing speech..." with a percentage. Long recordings are processed in ten-minute parts. The result is one text layer per caption, named "Caption 1", "Caption 2" and so on, centred, in time with the speech and selected together so that you can restyle them all at once. A caption ends at a pause longer than half a second, at the end of a sentence, after three seconds or at the word limit.
+While it works the sheet shows "Reading the audio..." and "Recognizing speech..." with a percentage. Long recordings are processed in ten-minute parts. The result is one text layer per caption, named "Caption 1", "Caption 2" and so on, centerd, in time with the speech and selected together so that you can restyle them all at once. A caption ends at a pause longer than half a second, at the end of a sentence, after three seconds or at the word limit.
 
 If there is no sound the app says "There is no sound to caption", and if no speech is found, "No speech was found".
 

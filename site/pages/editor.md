@@ -49,7 +49,7 @@ The preview shows the canvas. A transparent background shows as a checkerboard.
 - **Rotate.** There is no rotate handle and no two-finger twist for ordinary layers. Use **Transform**, **Rotate** (see [Layer tools](@layer-tools)).
 - **Camera layers.** Dragging pans the camera and pinching changes its view angle.
 - **Text.** In the text editor, the handle at the side of the text frame changes the wrap width.
-- **Guides.** While you move a layer in Transform, thin red lines appear when it lines up with the centre of the canvas or with another layer.
+- **Guides.** While you move a layer in Transform, thin red lines appear when it lines up with the center of the canvas or with another layer.
 
 ### Zoom and pan the canvas
 
@@ -86,7 +86,7 @@ The thin line under the bar is a live level meter while the project plays: green
 
 ## Multi-select
 
-Press and hold the eye or the name area of a layer's row and then slide up or down to select several rows at once; afterwards a tap toggles rows. The top bar changes colour and shows group, effects, delete and alignment buttons, and a bar appears at the bottom with clip-timing commands. They are all described in [Layer menus and multi-select](@layer-menus).
+Press and hold the eye or the name area of a layer's row and then slide up or down to select several rows at once; afterwards a tap toggles rows. The top bar changes color and shows group, effects, delete and alignment buttons, and a bar appears at the bottom with clip-timing commands. They are all described in [Layer menus and multi-select](@layer-menus).
 
 ## Next
 
