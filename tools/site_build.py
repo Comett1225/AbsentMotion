@@ -530,7 +530,6 @@ class Site:
         for thumb in sorted((EFFECTS / "thumb").glob("*.webp")):
             self.files["effects/thumb/" + thumb.name] = thumb.read_bytes()
         self.files["data/devices.json"] = (SITE / "data/devices.json").read_bytes()
-        self.files[".nojekyll"] = b""
 
     def add_app_assets(self):
         self.files["assets/site.css"] = (SITE / "assets/site.css").read_bytes()
