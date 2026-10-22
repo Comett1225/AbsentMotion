@@ -179,7 +179,7 @@
     <string name="library_err_scene_fps">Scene tidak valid: frame rate harus antara 1 sampai %1$s</string>
     <string name="library_err_package_large">Paket terlalu besar (lebih dari %1$s MB setelah diekstrak)</string>
     <string name="library_err_too_many_files">Paket memiliki terlalu banyak file (lebih dari %1$s)</string>
-    <string name="library_err_xml_large">File ini terlalu besar untuk dibuka (lebih dari 32 MB)</string>
+    <string name="library_err_xml_large">File ini terlalu besar untuk dibuka (lebih dari 16 MB)</string>
     <string name="library_err_media_large">Paket terlalu besar (media lebih dari %1$s MB)</string>
     <string name="library_err_not_backup">File ini bukan cadangan AbsentMotion.</string>
     <string name="library_err_backup_project_large">Ada proyek di cadangan yang terlalu besar.</string>

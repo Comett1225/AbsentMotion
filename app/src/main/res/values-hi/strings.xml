@@ -179,7 +179,7 @@
     <string name="library_err_scene_fps">गलत सीन: फ़्रेम रेट 1 से %1$s के बीच होना चाहिए</string>
     <string name="library_err_package_large">पैकेज बहुत बड़ा है (अनपैक करने पर %1$s MB से ज़्यादा)</string>
     <string name="library_err_too_many_files">पैकेज में बहुत ज़्यादा फ़ाइलें हैं (%1$s से ज़्यादा)</string>
-    <string name="library_err_xml_large">यह फ़ाइल खोलने के लिए बहुत बड़ी है (32 MB से ज़्यादा)</string>
+    <string name="library_err_xml_large">यह फ़ाइल खोलने के लिए बहुत बड़ी है (16 MB से ज़्यादा)</string>
     <string name="library_err_media_large">पैकेज बहुत बड़ा है (%1$s MB से ज़्यादा मीडिया)</string>
     <string name="library_err_not_backup">यह फ़ाइल AbsentMotion बैकअप नहीं है।</string>
     <string name="library_err_backup_project_large">बैकअप में एक प्रोजेक्ट बहुत बड़ा है।</string>

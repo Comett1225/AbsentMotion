@@ -179,7 +179,7 @@
     <string name="library_err_scene_fps">مشهد غير صالح: يجب أن يكون معدل الإطارات من 1 إلى %1$s</string>
     <string name="library_err_package_large">الحزمة كبيرة جدًا (أكثر من %1$s MB بعد فك الضغط)</string>
     <string name="library_err_too_many_files">تحتوي الحزمة على ملفات أكثر من اللازم (أكثر من %1$s)</string>
-    <string name="library_err_xml_large">هذا الملف كبير جدًا لفتحه (أكثر من 32 MB)</string>
+    <string name="library_err_xml_large">هذا الملف كبير جدًا لفتحه (أكثر من 16 MB)</string>
     <string name="library_err_media_large">الحزمة كبيرة جدًا (أكثر من %1$s MB من الوسائط)</string>
     <string name="library_err_not_backup">هذا الملف ليس نسخة احتياطية من AbsentMotion.</string>
     <string name="library_err_backup_project_large">يوجد مشروع كبير جدًا في النسخة الاحتياطية.</string>

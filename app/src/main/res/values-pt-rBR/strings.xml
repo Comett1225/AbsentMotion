@@ -179,7 +179,7 @@
     <string name="library_err_scene_fps">Cena malformada: a taxa de quadros deve ser de 1 a %1$s</string>
     <string name="library_err_package_large">O pacote é grande demais (mais de %1$s MB descompactado)</string>
     <string name="library_err_too_many_files">O pacote tem arquivos demais (mais de %1$s)</string>
-    <string name="library_err_xml_large">Este arquivo é grande demais para abrir (mais de 32 MB)</string>
+    <string name="library_err_xml_large">Este arquivo é grande demais para abrir (mais de 16 MB)</string>
     <string name="library_err_media_large">O pacote é grande demais (mais de %1$s MB de mídia)</string>
     <string name="library_err_not_backup">Este arquivo não é um backup do AbsentMotion.</string>
     <string name="library_err_backup_project_large">Um projeto no backup é grande demais.</string>

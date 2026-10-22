@@ -179,7 +179,7 @@
     <string name="library_err_scene_fps">Babak tidak sah: kadar bingkai mesti antara 1 hingga %1$s</string>
     <string name="library_err_package_large">Pakej terlalu besar (lebih daripada %1$s MB selepas dibuka)</string>
     <string name="library_err_too_many_files">Pakej mempunyai terlalu banyak fail (lebih daripada %1$s)</string>
-    <string name="library_err_xml_large">Fail ini terlalu besar untuk dibuka (lebih daripada 32 MB)</string>
+    <string name="library_err_xml_large">Fail ini terlalu besar untuk dibuka (lebih daripada 16 MB)</string>
     <string name="library_err_media_large">Pakej terlalu besar (lebih daripada %1$s MB media)</string>
     <string name="library_err_not_backup">Fail ini bukan sandaran AbsentMotion.</string>
     <string name="library_err_backup_project_large">Satu projek dalam sandaran terlalu besar.</string>

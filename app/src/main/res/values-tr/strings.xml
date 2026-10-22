@@ -179,7 +179,7 @@
     <string name="library_err_scene_fps">Bozuk sahne: kare hızı 1 ile %1$s arasında olmalı</string>
     <string name="library_err_package_large">Paket çok büyük (açıldığında %1$s MB\'tan fazla)</string>
     <string name="library_err_too_many_files">Paket çok fazla dosya içeriyor (%1$s sınırından fazla)</string>
-    <string name="library_err_xml_large">Bu dosya açılamayacak kadar büyük (32 MB\'tan fazla)</string>
+    <string name="library_err_xml_large">Bu dosya açılamayacak kadar büyük (16 MB\'tan fazla)</string>
     <string name="library_err_media_large">Paket çok büyük (%1$s MB\'tan fazla medya)</string>
     <string name="library_err_not_backup">Bu dosya bir AbsentMotion yedeği değil.</string>
     <string name="library_err_backup_project_large">Yedekteki bir proje çok büyük.</string>

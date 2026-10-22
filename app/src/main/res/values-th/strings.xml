@@ -179,7 +179,7 @@
     <string name="library_err_scene_fps">ฉากผิดรูปแบบ: เฟรมเรตต้องอยู่ระหว่าง 1 ถึง %1$s</string>
     <string name="library_err_package_large">แพ็กเกจมีขนาดใหญ่เกินไป (เกิน %1$s MB เมื่อแตกไฟล์)</string>
     <string name="library_err_too_many_files">แพ็กเกจมีไฟล์มากเกินไป (เกิน %1$s)</string>
-    <string name="library_err_xml_large">ไฟล์นี้ใหญ่เกินไปที่จะเปิด (มากกว่า 32 MB)</string>
+    <string name="library_err_xml_large">ไฟล์นี้ใหญ่เกินไปที่จะเปิด (มากกว่า 16 MB)</string>
     <string name="library_err_media_large">แพ็กเกจมีขนาดใหญ่เกินไป (สื่อเกิน %1$s MB)</string>
     <string name="library_err_not_backup">ไฟล์นี้ไม่ใช่ไฟล์สำรองข้อมูลของ AbsentMotion</string>
     <string name="library_err_backup_project_large">มีโปรเจกต์ในไฟล์สำรองข้อมูลที่มีขนาดใหญ่เกินไป</string>

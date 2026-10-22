@@ -179,7 +179,7 @@
     <string name="library_err_scene_fps">Cảnh không hợp lệ: tốc độ khung hình phải từ 1 đến %1$s</string>
     <string name="library_err_package_large">Gói quá lớn (hơn %1$s MB sau khi giải nén)</string>
     <string name="library_err_too_many_files">Gói có quá nhiều tệp (nhiều hơn %1$s)</string>
-    <string name="library_err_xml_large">Tệp này quá lớn để mở (hơn 32 MB)</string>
+    <string name="library_err_xml_large">Tệp này quá lớn để mở (hơn 16 MB)</string>
     <string name="library_err_media_large">Gói quá lớn (hơn %1$s MB phương tiện)</string>
     <string name="library_err_not_backup">Tệp này không phải bản sao lưu AbsentMotion.</string>
     <string name="library_err_backup_project_large">Một dự án trong bản sao lưu quá lớn.</string>

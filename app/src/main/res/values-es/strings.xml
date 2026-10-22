@@ -179,7 +179,7 @@
     <string name="library_err_scene_fps">Escena con formato incorrecto: la velocidad de fotogramas debe ser de 1 a %1$s</string>
     <string name="library_err_package_large">El paquete es demasiado grande (más de %1$s MB descomprimido)</string>
     <string name="library_err_too_many_files">El paquete tiene demasiados archivos (más de %1$s)</string>
-    <string name="library_err_xml_large">Este archivo es demasiado grande para abrirlo (más de 32 MB)</string>
+    <string name="library_err_xml_large">Este archivo es demasiado grande para abrirlo (más de 16 MB)</string>
     <string name="library_err_media_large">El paquete es demasiado grande (más de %1$s MB de medios)</string>
     <string name="library_err_not_backup">Este archivo no es una copia de seguridad de AbsentMotion.</string>
     <string name="library_err_backup_project_large">Un proyecto de la copia de seguridad es demasiado grande.</string>

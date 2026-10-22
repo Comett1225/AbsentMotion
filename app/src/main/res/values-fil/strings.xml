@@ -179,7 +179,7 @@
     <string name="library_err_scene_fps">Mali ang scene: dapat mula 1 hanggang %1$s ang frame rate</string>
     <string name="library_err_package_large">Masyadong malaki ang package (higit sa %1$s MB kapag na-unpack)</string>
     <string name="library_err_too_many_files">Sobra ang file sa package (higit sa %1$s)</string>
-    <string name="library_err_xml_large">Masyadong malaki ang file na ito para buksan (higit sa 32 MB)</string>
+    <string name="library_err_xml_large">Masyadong malaki ang file na ito para buksan (higit sa 16 MB)</string>
     <string name="library_err_media_large">Masyadong malaki ang package (higit sa %1$s MB ng media)</string>
     <string name="library_err_not_backup">Hindi ito backup ng AbsentMotion.</string>
     <string name="library_err_backup_project_large">Masyadong malaki ang isang proyekto sa backup.</string>

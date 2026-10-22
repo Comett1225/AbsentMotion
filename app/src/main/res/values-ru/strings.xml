@@ -179,7 +179,7 @@
     <string name="library_err_scene_fps">Некорректная сцена: частота кадров должна быть от 1 до %1$s</string>
     <string name="library_err_package_large">Пакет слишком большой (больше %1$s MB в распакованном виде)</string>
     <string name="library_err_too_many_files">В пакете слишком много файлов (больше %1$s)</string>
-    <string name="library_err_xml_large">Файл слишком большой для открытия (больше 32 MB)</string>
+    <string name="library_err_xml_large">Файл слишком большой для открытия (больше 16 MB)</string>
     <string name="library_err_media_large">Пакет слишком большой (медиа больше %1$s MB)</string>
     <string name="library_err_not_backup">Этот файл не является резервной копией AbsentMotion.</string>
     <string name="library_err_backup_project_large">Один из проектов в резервной копии слишком большой.</string>

@@ -179,7 +179,7 @@
     <string name="library_err_scene_fps">Malformed scene: the frame rate must be from 1 to %1$s</string>
     <string name="library_err_package_large">The package is too large (more than %1$s MB unpacked)</string>
     <string name="library_err_too_many_files">The package has too many files (more than %1$s)</string>
-    <string name="library_err_xml_large">This file is too large to open (more than 32 MB)</string>
+    <string name="library_err_xml_large">This file is too large to open (more than 16 MB)</string>
     <string name="library_err_media_large">The package is too large (more than %1$s MB of media)</string>
     <string name="library_err_not_backup">This file is not an AbsentMotion backup.</string>
     <string name="library_err_backup_project_large">A project in the backup is too large.</string>
