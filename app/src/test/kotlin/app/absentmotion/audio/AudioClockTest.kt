@@ -50,19 +50,22 @@ class AudioClockTest {
         assertEquals(100 * ms, AudioClock.startLatency(4800, 300 * ms, 100 * ms, 48_000))
         assertEquals(0L, AudioClock.startLatency(48_000, 300 * ms, 100 * ms, 48_000))
         assertEquals(AudioClock.MAX_LATENCY_NS, AudioClock.startLatency(0, 5000 * ms, 100 * ms, 48_000))
-        val before = AudioClock.learned
+        val before = HashMap(AudioClock.learned)
         try {
-            AudioClock.learned = -1
+            AudioClock.learned.clear()
             val clock = AudioClock(0.0, 44_100)
+            clock.route = 7
             clock.wallStart = 1000 * ms
             clock.stamp(0, 1010 * ms)
-            assertEquals(-1L, AudioClock.learned)
+            assertEquals(null, AudioClock.learned[7])
             clock.stamp(4410, 1170 * ms)
-            assertEquals(70 * ms, AudioClock.learned)
+            assertEquals(70 * ms, AudioClock.learned[7])
             clock.stamp(8820, 1290 * ms)
-            assertEquals(70 * ms, AudioClock.learned)
+            assertEquals(70 * ms, AudioClock.learned[7])
+            assertEquals(null, AudioClock.learned[8])
         } finally {
-            AudioClock.learned = before
+            AudioClock.learned.clear()
+            AudioClock.learned.putAll(before)
         }
     }
 
