@@ -12,13 +12,17 @@ You can find your Android version in Settings, About phone, Android version.
 
 ## What it leaves out
 
-::: note
-**This list is not final.** The Compatible version is still being built. The complete list of what it leaves out will be written here before it is released. Everything that is not on the list is meant to work the same way as in the Latest version.
-:::
+- **Optical flow High.** Frame Interpolation and **Smooth** offer Optical flow at Low and Medium; High needs more graphics power than most phones from the Android 9 to 12 years have.
 
-- To be filled in when the Compatible version is finished.
+Everything else works the same way as in the Latest version: the editor, every effect, keyframes, text, shapes, the camera, captions, background removal, noise reduction, text to speech, frame blending, motion blur, and export to video, GIF and images.
 
 In the app, a feature that the Compatible version leaves out is shown grayed out with a note that it needs Android 13.
+
+## Small differences
+
+- **Language.** Android 13 added a per-app language setting. On older Android the app keeps its own language choice in **Settings** instead.
+- **HDR videos.** Below Android 12 the phone cannot convert HDR videos for editing, so they can look pale or washed out.
+- **Phones with less than 3 GB of memory** get a one-time note that big projects may be slow.
 
 ## How to install it
 
