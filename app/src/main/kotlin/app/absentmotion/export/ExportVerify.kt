@@ -97,6 +97,8 @@ private fun decodeEnds(extractor: MediaExtractor, track: Int, format: MediaForma
         extractor.seekTo(lastSample, MediaExtractor.SEEK_TO_PREVIOUS_SYNC)
         val last = decode(codec, extractor, deadline, untilEnd = true)?.let { it >= 0 && lastSample - it <= 1_000 }
         return first?.let { it >= 0 } to last
+    } catch (e: MediaCodec.CodecException) {
+        return if (e.errorCode == MediaCodec.CodecException.ERROR_RECLAIMED) null to null else false to false
     } catch (e: Exception) {
         return false to false
     } finally {

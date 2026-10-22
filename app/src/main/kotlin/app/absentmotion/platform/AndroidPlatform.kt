@@ -1,6 +1,7 @@
 package app.absentmotion.platform
 
 import android.os.Build
+import androidx.compose.ui.draw.clipToBounds
 import app.absentmotion.R
 import app.absentmotion.export.exportCheck
 import app.absentmotion.i18n.txt
@@ -45,7 +46,7 @@ fun appVersion(): String {
 }
 @androidx.compose.runtime.Composable
 fun SceneSurface(engine: app.absentmotion.engine.EngineThread, divisor: Int, size: androidx.compose.ui.unit.IntSize, modifier: androidx.compose.ui.Modifier, onView: (Any) -> Unit = {}) {
-    androidx.compose.ui.viewinterop.AndroidView(modifier = modifier, factory = { context ->
+    androidx.compose.ui.viewinterop.AndroidView(modifier = if (Build.VERSION.SDK_INT < 33) modifier.clipToBounds() else modifier, factory = { context ->
         android.view.SurfaceView(context).apply {
             onView(this)
             holder.addCallback(object : android.view.SurfaceHolder.Callback {
