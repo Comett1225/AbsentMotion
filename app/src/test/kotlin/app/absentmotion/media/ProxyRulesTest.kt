@@ -56,4 +56,24 @@ class ProxyRulesTest {
         assertEquals(3_000_000L, longestSyncGap(listOf(4_000_000L, 0L, 1_000_000L), 4_500_000L))
         assertEquals(Long.MAX_VALUE, longestSyncGap(emptyList(), 1_000_000L))
     }
+
+    @Test fun errorMessagesNameTheSourceFrameNotItsMicroseconds() {
+        val stamps = longArrayOf(0L, 33_366L, 66_733L, 2_502_500L)
+        assertEquals("0", stamps.frameNumber(0L))
+        assertEquals("3", stamps.frameNumber(2_502_500L))
+        assertEquals("2", stamps.frameNumber(50_000L))
+    }
+
+    @Test fun aFailedCopyIsTriedAgainAFewTimesUnlessItsFramesDiffered() {
+        assertEquals(0, ProxyRules.failures(null))
+        assertEquals(2, ProxyRules.failures("2"))
+        assertEquals(1, ProxyRules.failures("java.lang.IllegalStateException: insufficient resources"))
+        assertTrue(ProxyRules.failures(ProxyRules.FRAMES_DIFFER) >= ProxyRules.MAX_TRIES)
+    }
+
+    @Test fun aVideoWithoutAFrameRateGetsOneFromItsTimestamps() {
+        assertEquals(30f, estimatedFps(LongArray(31) { it * 1_000_000L / 30 })!!, 0.01f)
+        assertNull(estimatedFps(longArrayOf(0L)))
+        assertNull(estimatedFps(longArrayOf(5L, 5L)))
+    }
 }

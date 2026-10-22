@@ -12,7 +12,7 @@ value class MediaDeclaration(val node: XmlNode) {
     val width: Int get() = node["width"]?.toIntOrNull() ?: 0
     val height: Int get() = node["height"]?.toIntOrNull() ?: 0
     val duration: Long get() = node["duration"]?.toLongOrNull() ?: -1
-    val fps: Float? get() = node["fps"]?.finiteFloat()
+    val fps: Float? get() = node["fps"]?.finiteFloat()?.takeIf { it > 0 }
 }
 
 fun exifOrientation(tag: Int): Pair<Int, Boolean> = when (tag) {

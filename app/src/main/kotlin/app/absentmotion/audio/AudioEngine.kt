@@ -1,7 +1,11 @@
 package app.absentmotion.audio
 
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.media.AudioAttributes
+import android.media.AudioFocusRequest
 import android.media.AudioFormat
 import android.media.AudioManager
 import android.media.AudioTimestamp
@@ -36,6 +40,33 @@ class AudioEngine(context: Context) {
     @Volatile private var shownFrame = -1
     @Volatile private var shownMs = 0
 
+    @Volatile var interrupted = false
+        private set
+    private val manager = this.context.getSystemService(AudioManager::class.java)
+    private val focus = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT).setAudioAttributes(ATTRIBUTES)
+        .setOnAudioFocusChangeListener({ change ->
+            if (change == AudioManager.AUDIOFOCUS_LOSS || change == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) interrupt()
+        }, main).build()
+    private val noisy = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) { if (intent.action == AudioManager.ACTION_AUDIO_BECOMING_NOISY) interrupt() }
+    }
+    private var listening = false
+
+    private fun interrupt() {
+        interrupted = true
+        session?.halt()
+        level = 0f
+    }
+
+    private fun listen(on: Boolean) {
+        if (on == listening) return
+        listening = on
+        runCatching {
+            if (on) context.registerReceiver(noisy, IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY), Context.RECEIVER_NOT_EXPORTED)
+            else { context.unregisterReceiver(noisy); manager?.abandonAudioFocusRequest(focus) }
+        }
+    }
+
     init {
         ExportAudio.mixFor = { scene, rate -> OfflineMix.of(this.context, scene, quality, rate) }
     }
@@ -48,6 +79,9 @@ class AudioEngine(context: Context) {
         val previous = session
         previous?.halt()
         if (closed || clips.none { it.endMs > startMs }) { session = null; return false }
+        if (manager?.requestAudioFocus(focus) == AudioManager.AUDIOFOCUS_REQUEST_FAILED) { session = null; return false }
+        interrupted = false
+        listen(true)
         main.removeCallbacks(releaseIdle)
         releasing = false
         session = Session(startMs, previous).also { it.start() }
@@ -56,6 +90,7 @@ class AudioEngine(context: Context) {
 
     fun stop() {
         session?.halt()
+        listen(false)
         level = 0f
         main.removeCallbacks(releaseIdle)
         main.postDelayed(releaseIdle, IDLE_MS)
@@ -68,6 +103,7 @@ class AudioEngine(context: Context) {
     fun release() {
         releasing = true
         session?.halt()
+        listen(false)
         level = 0f
         main.removeCallbacks(releaseIdle)
         closeStreams()
@@ -104,7 +140,7 @@ class AudioEngine(context: Context) {
                 val bytes = AudioTrack.getMinBufferSize(rate, AudioFormat.CHANNEL_OUT_STEREO, AudioFormat.ENCODING_PCM_FLOAT)
                 val bufferFrames = max(bytes / 8, BLOCK * 6)
                 track = AudioTrack.Builder()
-                    .setAudioAttributes(AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA).setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build())
+                    .setAudioAttributes(ATTRIBUTES)
                     .setAudioFormat(AudioFormat.Builder().setEncoding(AudioFormat.ENCODING_PCM_FLOAT).setSampleRate(rate).setChannelMask(AudioFormat.CHANNEL_OUT_STEREO).build())
                     .setBufferSizeInBytes(bufferFrames * 8)
                     .setTransferMode(AudioTrack.MODE_STREAM)
@@ -117,7 +153,8 @@ class AudioEngine(context: Context) {
                     writeAll(track, out)
                     written += BLOCK
                 }
-                clock.latencyNs = AudioClock.learned.takeIf { it >= 0 } ?: AudioClock.outputLatency(track, rate)
+                clock.route = track.routedDevice?.id ?: 0
+                clock.latencyNs = AudioClock.learned[clock.route] ?: AudioClock.outputLatency(track, rate)
                 track.play()
                 clock.wallStart = System.nanoTime()
                 var measured = false
@@ -134,7 +171,7 @@ class AudioEngine(context: Context) {
                         clock.stamp(stamp.framePosition, stamp.nanoTime)
                         if (log && !measured && stamp.framePosition > 0) {
                             measured = true
-                            Log.i("AMAudio", "output latency estimate=%.1fms measured=%.1fms".format(clock.latencyNs / 1e6, AudioClock.learned / 1e6))
+                            Log.i("AMAudio", "output latency estimate=%.1fms measured=%.1fms".format(clock.latencyNs / 1e6, (AudioClock.learned[clock.route] ?: -1L) / 1e6))
                         }
                         while (pending.isNotEmpty() && pending.first().first <= stamp.framePosition) {
                             val (frame, ms) = pending.removeFirst()
@@ -217,6 +254,7 @@ class AudioEngine(context: Context) {
         const val AHEAD_MS = 1500.0
         const val BEHIND_MS = 300.0
         const val IDLE_MS = 8000L
+        val ATTRIBUTES: AudioAttributes = AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA).setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build()
     }
 }
 
@@ -251,10 +289,11 @@ internal class AudioClock(private val startMs: Double, private val rate: Int) {
     @Volatile var wallStart = 0L
     @Volatile var failed = false
     @Volatile var latencyNs = -1L
+    @Volatile var route = 0
     @Volatile private var measured = false
 
     fun stamp(frames: Long, nanos: Long) {
-        if (!measured && frames > 0 && wallStart > 0 && !failed) { learned = startLatency(frames, nanos, wallStart, rate); measured = true }
+        if (!measured && frames > 0 && wallStart > 0 && !failed) { learned[route] = startLatency(frames, nanos, wallStart, rate); measured = true }
         stamp = Stamp(frames, nanos)
     }
 
@@ -275,7 +314,7 @@ internal class AudioClock(private val startMs: Double, private val rate: Int) {
 
     companion object {
         const val MAX_LATENCY_NS = 1_000_000_000L
-        @Volatile var learned = -1L
+        val learned = java.util.concurrent.ConcurrentHashMap<Int, Long>()
 
         fun startLatency(frames: Long, nanos: Long, wallStart: Long, rate: Int): Long =
             (nanos - frames * 1_000_000_000L / rate - wallStart).coerceIn(0L, MAX_LATENCY_NS)

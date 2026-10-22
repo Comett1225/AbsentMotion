@@ -462,6 +462,10 @@
         <item quantity="one">about %1$s minute</item>
         <item quantity="other">about %1$s minutes</item>
     </plurals>
+    <plurals name="export_time_hours_count">
+        <item quantity="one">about %1$s hour</item>
+        <item quantity="other">about %1$s hours</item>
+    </plurals>
 
     <string name="export_verify_empty">The file has no audio or video in it.</string>
     <string name="export_verify_no_video">The file has no video track.</string>
@@ -473,6 +477,7 @@
     <string name="export_verify_picture">The picture in the file does not decode.</string>
     <string name="export_verify_size">The picture is %1$s instead of %2$s.</string>
     <string name="export_verify_frames">The GIF has %1$s frames instead of %2$s.</string>
+    <string name="export_sound_unreadable">The sound of %1$s could not be read, so it is silent in this file.</string>
 
     <string name="export_error_cannot_encode">This phone cannot encode %1$s at %2$s</string>
     <string name="export_error_draw_frame">Frame %1$s could not be drawn. Try exporting again.</string>

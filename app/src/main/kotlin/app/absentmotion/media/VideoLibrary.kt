@@ -27,6 +27,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -148,6 +149,7 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
     private companion object {
         const val MAX_LEAD_MS = 100.0
         const val RETRY_NS = 1_000_000_000L
+        const val MAX_RETRIES = 3
     }
 
     private inner class Session(val id: Long, val uri: String) {
@@ -160,6 +162,7 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
         val generation = engine.generation
         val version = fileVersion(context.contentResolver, Uri.parse(uri))
         @Volatile private var retryAt = 0L
+        @Volatile private var failures = 0
         val failed get() = retryAt != 0L
         @Volatile private var stopped = false
         private var publishedPts: Long? = null
@@ -175,6 +178,10 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
                     catch (e: Exception) {
                         Log.w("AMVideo", "Cannot decode $uri layer $id", e)
                         decoderLock.withLock { decoder?.close(); decoder = null; retryAt = System.nanoTime() + RETRY_NS }
+                        if (++failures <= MAX_RETRIES) scope.launch {
+                            delay(RETRY_NS / 1_000_000 + 10)
+                            if (!stopped) latest?.let { requests.trySend(it) }
+                        }
                     }
                 }
             } finally {
@@ -220,21 +227,23 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
             val time = layer.videoTimeUs((sample.timeMs + ahead).toInt(), sample.scene)
             val pts = source.wantedPts(time)
             if (publishedPts == pts) return@withLock
-            val image = source.frame(time, ::abandoned) ?: run {
-                exportCheck(!exact) { txt(R.string.media_error_decode_frame, pts.toString()) }
+            val seeks = source.seeks
+            val image = source.frame(time, exact, ::abandoned) ?: (if (exact) source.frame(time, true, ::abandoned) else null) ?: run {
+                exportCheck(!exact) { txt(R.string.media_error_decode_frame, source.timestamps.frameNumber(pts)) }
                 return@withLock
             }
             if (abandoned()) return@withLock
             image.hardwareBuffer!!.use { buffer ->
                 val installed = engine.setVideoPicture(uri, buffer, id, exact, source.colorStandard, source.colorRange, image.cropRect) { !abandoned() }
-                if (exact) exportCheck(installed) { txt(R.string.media_error_import_frame, pts.toString(), uri) }
+                if (exact) exportCheck(installed) { txt(R.string.media_error_import_frame, source.timestamps.frameNumber(pts), uri) }
                 if (installed) {
                     publishedPts = pts
                     publishedMix = null
                     publishedMosh = null
                     held.clear()
                     retryAt = 0L
-                    if (!exact && request.playing) leadMs = (leadMs * 0.8 + (System.nanoTime() - request.born) / 1e6 * 0.2).coerceIn(0.0, MAX_LEAD_MS)
+                    failures = 0
+                    if (!exact && request.playing && source.seeks == seeks) leadMs = (leadMs * 0.8 + (System.nanoTime() - request.born) / 1e6 * 0.2).coerceIn(0.0, MAX_LEAD_MS)
                 }
             }
         }
@@ -265,9 +274,9 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
             if (publishedMix == key) return true
             for (pts in setOf(pair.a, pair.b)) {
                 if (pts in held) continue
-                val image = source.frame(pts) { false } ?: throw ExportError(txt(R.string.media_error_interp_source, pts.toString()))
-                exportCheck(image.timestamp / 1000 == pts) { txt(R.string.media_error_interp_wrong_frame, pts.toString()) }
-                exportCheck(image.hardwareBuffer!!.use { engine.setVideoFrame(uri, it, id, pts, source.colorStandard, source.colorRange, image.cropRect) }) { txt(R.string.media_error_interp_import, pts.toString()) }
+                val image = source.frame(pts, true) { false } ?: throw ExportError(txt(R.string.media_error_interp_source, stamps.frameNumber(pts)))
+                exportCheck(image.timestamp / 1000 == pts) { txt(R.string.media_error_interp_wrong_frame, stamps.frameNumber(pts)) }
+                exportCheck(image.hardwareBuffer!!.use { engine.setVideoFrame(uri, it, id, pts, source.colorStandard, source.colorRange, image.cropRect) }) { txt(R.string.media_error_interp_import, stamps.frameNumber(pts)) }
                 held += pts
             }
             if (!engine.interpolateVideo(uri, id, pair.a, pair.b, pair.t, request.interpolation == FrameInterpolation.Flow,
@@ -292,7 +301,7 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
             if (from < 0) return false
             for (step in from until pts.size) {
                 if (abandoned()) return true
-                val image = source.frame(times[step], abandoned) ?: run {
+                val image = source.frame(times[step], exact, abandoned) ?: run {
                     check(!exact) { "Cannot decode datamosh frame ${pts[step]}" }
                     return true
                 }

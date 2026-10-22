@@ -141,16 +141,29 @@ internal suspend fun recogniseCaptions(
     val startMs = layer?.startTime ?: 0
     val endMs = (layer?.endTime ?: scene.totalTime) + 1
     val mix = OfflineMix.of(context, source, Resampler.ULTRA) ?: error(AppText.get(R.string.ai_no_sound_to_caption))
-    val pcm = try {
-        withContext(Dispatchers.IO) { speechPcm(mix, startMs, endMs) { progress(0.15f * it, AppText.get(R.string.ai_reading_audio)) } }
+    val windows = captionWindows(startMs, endMs)
+    val words = ArrayList<Word>()
+    try {
+        withContext(Dispatchers.IO) { CaptionModel.verify(context) }
+        windows.forEachIndexed { k, (keepFrom, keepTo) ->
+            fun step(local: Float, label: Int) = progress((k + local) / windows.size, AppText.get(label))
+            val from = maxOf(startMs, keepFrom - CAPTION_OVERLAP_MS)
+            val pcm = withContext(Dispatchers.IO) { speechPcm(mix, from, keepTo) { step(0.15f * it, R.string.ai_reading_audio) } }
+            words += Whisper.transcribe(CaptionModel.file(context), pcm, style.english) { step(0.15f + 0.85f * it / 100f, R.string.ai_recognising_speech) }
+                .filter { it.startMs + from >= keepFrom && (it.startMs + from < keepTo || k == windows.lastIndex) }
+                .map { Word(it.text, min(it.startMs + from, endMs - 1), min(it.endMs + from, endMs)) }
+        }
     } finally {
         (mix as? Closeable)?.close()
     }
-    withContext(Dispatchers.IO) { CaptionModel.verify(context) }
-    val words = Whisper.transcribe(CaptionModel.file(context), pcm, style.english) { progress(0.15f + 0.85f * it / 100f, AppText.get(R.string.ai_recognising_speech)) }
-    return chunkWords(words.map { Word(it.text, min(it.startMs + startMs, endMs - 1), min(it.endMs + startMs, endMs)) }, style.maxWords)
-        .ifEmpty { error(AppText.get(R.string.ai_no_speech)) }
+    return chunkWords(words, style.maxWords).ifEmpty { error(AppText.get(R.string.ai_no_speech)) }
 }
+
+internal const val CAPTION_WINDOW_MS = 600_000
+internal const val CAPTION_OVERLAP_MS = 2_000
+
+internal fun captionWindows(startMs: Int, endMs: Int, windowMs: Int = CAPTION_WINDOW_MS): List<Pair<Int, Int>> =
+    (startMs until maxOf(endMs, startMs + 1) step windowMs).map { it to minOf(endMs, it + windowMs) }
 
 internal suspend fun speechPcm(mix: AudioMix, startMs: Int, endMs: Int, progress: (Float) -> Unit): FloatArray {
     val rate = ExportAudio.SAMPLE_RATE

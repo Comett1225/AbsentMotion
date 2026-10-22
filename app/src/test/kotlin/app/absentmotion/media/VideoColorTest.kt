@@ -17,4 +17,11 @@ class VideoColorTest {
         assertEquals(2, videoColorStandard(10))
         assertEquals(0, videoColorStandard(64))
     }
+
+    @Test fun onlyPqAndHlgCountAsHdr() {
+        assertEquals(true, isHdrTransfer(6))
+        assertEquals(true, isHdrTransfer(7))
+        assertEquals(false, isHdrTransfer(3))
+        assertEquals(false, isHdrTransfer(0))
+    }
 }

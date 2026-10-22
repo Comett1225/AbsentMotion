@@ -10,13 +10,16 @@ class ExportPrefs(context: Context) {
     fun load(kind: ExportKind, scene: Scene): ExportSettings {
         val fallback = defaultSettings(kind, scene)
         val saved = prefs.getString(kind.name, null)?.let { runCatching { settingsFromJson(JSONObject(it), fallback) }.getOrNull() } ?: return fallback
-        return if (kind == ExportKind.Video && saved.shortSide > fallback.shortSide) saved.copy(shortSide = fallback.shortSide) else saved
+        return forScene(kind, saved, fallback)
     }
 
     fun save(kind: ExportKind, settings: ExportSettings) {
         prefs.edit().putString(kind.name, settingsToJson(settings).toString()).apply()
     }
 }
+
+internal fun forScene(kind: ExportKind, saved: ExportSettings, fallback: ExportSettings): ExportSettings =
+    if (kind != ExportKind.Video) saved else saved.copy(shortSide = minOf(saved.shortSide, fallback.shortSide), fps = fallback.fps)
 
 internal fun settingsToJson(s: ExportSettings): JSONObject = JSONObject()
     .put("shortSide", s.shortSide).put("fps", s.fps).put("codec", s.codec.name).put("quality", s.quality.toDouble())

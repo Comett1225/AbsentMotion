@@ -32,11 +32,14 @@ internal class VideoDecoder(private val context: Context, private val uri: Strin
     private var queued = false
     private var flushable = false
     private lateinit var format: MediaFormat
+    private var hdr = false
     var colorStandard = 0
         private set
     var colorRange = 0
         private set
     var timestamps: LongArray
+        private set
+    var seeks = 0
         private set
 
     init {
@@ -54,6 +57,7 @@ internal class VideoDecoder(private val context: Context, private val uri: Strin
                 setOnImageAvailableListener({ source -> source.acquireNextImage()?.let { images.offer(it) } }, Handler(imageThread!!.looper))
             }
             format.setInteger(MediaFormat.KEY_ROTATION, 0)
+            hdr = format.requestSdr()
             codec = MediaCodec.createByCodecName(MediaCodecList(MediaCodecList.REGULAR_CODECS).findDecoderForFormat(format))
             codec!!.configure(format, reader!!.surface, null, 0)
             codec!!.start()
@@ -62,7 +66,7 @@ internal class VideoDecoder(private val context: Context, private val uri: Strin
 
     fun wantedPts(timeUs: Long): Long = timestamps.ptsAt(timeUs)
 
-    fun frame(timeUs: Long, obsolete: () -> Boolean): Image? {
+    fun frame(timeUs: Long, exact: Boolean, obsolete: () -> Boolean): Image? {
         val wanted = wantedPts(timeUs)
         if (wanted == currentPts) return current
         val decoder = codec ?: return current
@@ -90,6 +94,7 @@ internal class VideoDecoder(private val context: Context, private val uri: Strin
                 if (index == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
                     flushable = true
                     readColor(decoder.outputFormat)
+                    if (hdr) Log.i("AMVideo", "HDR video $uri decodes with transfer ${decoder.outputFormat.getInteger(MediaFormat.KEY_COLOR_TRANSFER, 0)}")
                 }
                 if (index < 0) continue
                 flushable = true
@@ -103,7 +108,7 @@ internal class VideoDecoder(private val context: Context, private val uri: Strin
                 } else {
                     if (held >= 0) decoder.releaseOutputBuffer(held, false)
                     held = -1
-                    return show(decoder, index, info.presentationTimeUs, wanted)
+                    return show(decoder, index, info.presentationTimeUs, wanted, exact)
                 }
             }
             if (obsolete()) {
@@ -114,9 +119,10 @@ internal class VideoDecoder(private val context: Context, private val uri: Strin
                 Log.w("AMVideo", "Decoder timed out at $wanted for $uri, showing ${if (held >= 0) heldPts else currentPts}")
                 positioned = false
                 flushable = false
+                if (exact) return null
             }
             if (held < 0) return current
-            return show(decoder, held, heldPts, wanted).also { held = -1 }
+            return show(decoder, held, heldPts, wanted, exact).also { held = -1 }
         } finally {
             if (held >= 0) decoder.releaseOutputBuffer(held, false)
         }
@@ -137,11 +143,12 @@ internal class VideoDecoder(private val context: Context, private val uri: Strin
         drainImages()
         extractor.seekTo(wanted, MediaExtractor.SEEK_TO_PREVIOUS_SYNC)
         inputEnded = false; outputEnded = false; queued = false; positioned = true
+        seeks++
     }
 
-    private fun show(decoder: MediaCodec, index: Int, pts: Long, wanted: Long): Image? {
+    private fun show(decoder: MediaCodec, index: Int, pts: Long, wanted: Long, exact: Boolean): Image? {
         decoder.releaseOutputBuffer(index, true)
-        val image = images.poll(2, TimeUnit.SECONDS) ?: run { positioned = false; return current }
+        val image = images.poll(2, TimeUnit.SECONDS) ?: run { positioned = false; return if (exact) null else current }
         current?.close()
         current = image
         currentPts = if (pts > wanted || pts < wanted && outputEnded) wanted else pts

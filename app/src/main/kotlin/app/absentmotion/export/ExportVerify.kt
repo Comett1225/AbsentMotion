@@ -80,8 +80,10 @@ private fun decodeEnds(extractor: MediaExtractor, track: Int, format: MediaForma
     val mime = format.getString(MediaFormat.KEY_MIME) ?: return null to null
     val codec = try { MediaCodec.createDecoderByType(mime) } catch (e: Exception) { return null to null }
     try {
-        codec.configure(format, null, null, 0)
-        codec.start()
+        try {
+            codec.configure(format, null, null, 0)
+            codec.start()
+        } catch (e: Exception) { return null to null }
         extractor.selectTrack(track)
         extractor.seekTo(0, MediaExtractor.SEEK_TO_CLOSEST_SYNC)
         val first = decode(codec, extractor, deadline, untilEnd = false)

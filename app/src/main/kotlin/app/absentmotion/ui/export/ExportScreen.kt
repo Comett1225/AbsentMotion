@@ -60,6 +60,7 @@ import app.absentmotion.export.GifSample
 import app.absentmotion.export.frameCount
 import app.absentmotion.export.gifTimeMs
 import app.absentmotion.export.measureGif
+import app.absentmotion.export.withMissing
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.Composable
@@ -167,10 +168,12 @@ import app.absentmotion.ui.theme.presence
 import app.absentmotion.ui.theme.presenceScrim
 import app.absentmotion.library.TemplateStore
 import app.absentmotion.audio.AudioClip
+import app.absentmotion.audio.OfflineMix
 import kotlinx.coroutines.CancellationException
 import android.provider.OpenableColumns
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
@@ -229,7 +232,11 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
     page?.let { if (it in SheetKinds) lastPage = it }
     if (phase !is Phase.Idle) lastPhase = phase
     var progress by remember { mutableFloatStateOf(0f) }
-    val hasAudio = remember(scene) { ExportAudio.mixFor != null && AudioClip.of(scene).isNotEmpty() }
+    val anyAudio = remember(scene) { ExportAudio.mixFor != null && AudioClip.of(scene).isNotEmpty() }
+    val hasAudio by produceState(anyAudio, scene) {
+        value = anyAudio
+        if (anyAudio) value = withContext(Dispatchers.IO) { OfflineMix.audible(context, scene).isNotEmpty() }
+    }
     val gifSettings = settings.getValue(ExportKind.Gif)
     val gifSample by produceState<GifSample?>(null, kind, scene, gifSettings, phase) {
         value = null
@@ -333,21 +340,24 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
         progress = 0f
         val job = scope.launch {
             try {
-                if (chosen != ExportKind.Xml && !ignoreMissing) {
+                var exported = scene
+                if (chosen != ExportKind.Xml) {
                     val missing = withContext(Dispatchers.IO) {
                         scene.node.mediaUris().filter { uri ->
                             try { context.contentResolver.openAssetFileDescriptor(app.absentmotion.platform.Uri.parse(uri), "r")?.close() == null } catch (e: Exception) { true }
-                        }.map { scene.media(it)?.filename?.ifEmpty { null } ?: it }
+                        }
                     }
-                    if (missing.isNotEmpty()) {
-                        failure = Failure(R.string.export_missing_title, txt(R.string.export_missing_text, missing.joinToString("\n")), txt(R.string.export_anyway), proceed = { start(true) })
+                    if (missing.isNotEmpty() && !ignoreMissing) {
+                        val names = missing.map { scene.media(it)?.filename?.ifEmpty { null } ?: it }
+                        failure = Failure(R.string.export_missing_title, txt(R.string.export_missing_text, names.joinToString("\n")), txt(R.string.export_anyway), proceed = { start(true) })
                         phase = Phase.Idle
                         return@launch
                     }
+                    if (chosen != ExportKind.Package) exported = scene.withMissing(missing.toSet())
                 }
                 var predicted = estimated
                 if (chosen == ExportKind.Gif) {
-                    val measured = measureGif(engine, scene, s).bytes
+                    val measured = measureGif(engine, exported, s).bytes
                     predicted = measured
                     free = freeSpace()
                     if (storageStatus(measured, free) is StorageStatus.NotEnough) {
@@ -356,7 +366,8 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
                         return@launch
                     }
                 }
-                val result = exporter.export(chosen, scene, s, frame, name) { progress = it }
+                val result = exporter.export(chosen, exported, s, frame, name) { progress = it }
+                phase = Phase.Done(chosen, result)
                 ExportSizes.key(chosen, s)?.let { key ->
                     withContext(Dispatchers.IO) {
                         val written = result.uris.sumOf { uri ->
@@ -365,15 +376,14 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
                         sizes.record(key, predicted, written)
                     }
                 }
-                if (alsoTemplate) try {
-                    TemplateStore(context).add(scene, scene.frameStart(frame), engine)
-                } catch (e: CancellationException) {
-                    throw e
-                } catch (e: Exception) {
-                    Log.w("AMExport", "could not store the template", e)
-                    app.absentmotion.platform.Toast.makeText(context, context.getString(R.string.export_template_failed), app.absentmotion.platform.Toast.LENGTH_LONG).show()
+                if (alsoTemplate) withContext(NonCancellable) {
+                    try {
+                        TemplateStore(context).add(scene, scene.frameStart(frame), engine)
+                    } catch (e: Exception) {
+                        Log.w("AMExport", "could not store the template", e)
+                        app.absentmotion.platform.Toast.makeText(context, context.getString(R.string.export_template_failed), app.absentmotion.platform.Toast.LENGTH_LONG).show()
+                    }
                 }
-                phase = Phase.Done(chosen, result)
             } catch (e: CancellationException) {
                 phase = Phase.Idle
                 throw e

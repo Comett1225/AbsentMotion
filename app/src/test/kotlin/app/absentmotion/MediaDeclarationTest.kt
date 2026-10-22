@@ -12,6 +12,7 @@ class MediaDeclarationTest {
         assertEquals("30.00", fpsText(30f))
         assertEquals("29.97", fpsText(29.97f))
         assertEquals(30f, MediaDeclaration(XmlNode("media", mapOf("fps" to fpsText(30f)))).fps)
+        assertEquals(null, MediaDeclaration(XmlNode("media", mapOf("fps" to "0.00"))).fps)
     }
 
     @Test fun everyExifOrientationGivesItsTurnAndMirror() {

@@ -18,6 +18,7 @@ internal class OfflineMix(
 ) : AudioMix, FloatMix, Closeable {
     private val limiter: ClipFx = master ?: NativeFx.limiter(rate) ?: SafeLimiter(rate)
     private val sources = HashMap<Long, OfflineSource>()
+    val unreadable: MutableSet<String> = java.util.Collections.synchronizedSet(LinkedHashSet())
     private val voices = HashMap<Long, Voice>()
     private val rack = FxRack(rate, makeFx)
     private val lead = limiter.latency.coerceIn(0, BLOCK)
@@ -67,7 +68,7 @@ internal class OfflineMix(
         val t0 = first * dt
         for (clip in clips) {
             if (clip.loop && clip.outMs.isInfinite() && t0 + frames * dt > clip.startMs && t0 <= clip.endMs) {
-                clip.resolveDuration(sources.getOrPut(clip.id) { OfflineSource(clip.uri, open) }.durationUs)
+                clip.resolveDuration(source(clip).durationUs)
             }
             val dst = rack.target(clip, block, frames)
             var rendered = false
@@ -76,7 +77,7 @@ internal class OfflineMix(
                 val span = clip.span(t0, frames, dt, next) ?: break
                 next = span.to
                 if (!span.inMedia) { voices[clip.id]?.ready = false; continue }
-                val source = sources.getOrPut(clip.id) { OfflineSource(clip.uri, open) }
+                val source = source(clip)
                 val rate = source.open(span.pos)
                 if (rate == 0) break
                 val voice = voices.getOrPut(clip.id) { Voice() }
@@ -95,6 +96,10 @@ internal class OfflineMix(
         for (clip in clips) if (t0 > clip.endMs + 300) sources.remove(clip.id)?.close()
     }
 
+    private fun source(clip: AudioClip) = sources.getOrPut(clip.id) {
+        OfflineSource(clip.uri, open).also { if (!it.readable) unreadable += clip.uri }
+    }
+
     override fun close() {
         sources.values.forEach { it.close() }
         sources.clear()
@@ -106,15 +111,31 @@ internal class OfflineMix(
         private const val BLOCK = 1024
 
         fun of(context: Context, scene: Scene, quality: Int, rate: Int = ExportAudio.SAMPLE_RATE): AudioMix? =
-            AudioClip.of(scene).takeIf { it.isNotEmpty() }?.let { clips ->
+            audible(context, scene).takeIf { it.isNotEmpty() }?.let { clips ->
                 val app = context.applicationContext
                 OfflineMix({ uri -> PcmDecoder(app, uri) }, clips, quality, rate = rate)
             }
+
+        private val soundTracks = java.util.concurrent.ConcurrentHashMap<String, Boolean>()
+
+        fun audible(context: Context, scene: Scene): List<AudioClip> = AudioClip.of(scene).filter { hasSoundTrack(context, it.uri) }
+
+        private fun hasSoundTrack(context: Context, uri: String): Boolean {
+            val parsed = android.net.Uri.parse(uri)
+            return soundTracks.getOrPut(uri + "\n" + app.absentmotion.media.fileVersion(context.contentResolver, parsed)) {
+                val extractor = android.media.MediaExtractor()
+                try {
+                    extractor.setDataSource(context.applicationContext, parsed, null)
+                    (0 until extractor.trackCount).any { extractor.getTrackFormat(it).getString(android.media.MediaFormat.KEY_MIME)?.startsWith("audio/") == true }
+                } catch (e: Exception) { true } finally { extractor.release() }
+            }
+        }
     }
 }
 
 internal class OfflineSource(private val uri: String, open: (String) -> PcmSource) : Closeable {
     private val decoder: PcmSource? = try { open(uri) } catch (e: Exception) { Log.w("AMAudio", "Cannot decode $uri for export", e); null }
+    val readable: Boolean get() = decoder != null
     val durationUs: Long get() = decoder?.durationUs ?: -1
     private var rate = 0
     private var buf = ShortArray(0)

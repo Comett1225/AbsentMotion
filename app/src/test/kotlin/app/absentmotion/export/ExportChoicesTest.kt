@@ -7,6 +7,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import app.absentmotion.media.videoSamples
 
 class ExportChoicesTest {
     private fun video(mime: String, hardware: Boolean, maxPixels: Long = 1920L * 1088, rate: Double = 1920.0 * 1088 * 60) =
@@ -137,5 +138,18 @@ class ExportChoicesTest {
         assertEquals("4K", sizeLabel(2160))
         assertEquals("44.1 kHz", khz(44100))
         assertEquals("48 kHz", khz(48000))
+    }
+
+    @Test fun exportingAnywayMarksTheMissingFilesSoTheirVideosAreSkipped() {
+        val scene = app.absentmotion.model.Scene.parse("""<scene width="100" height="100" fps="30"><media uri="gone" filename="a.mp4"/><media uri="here"/>""" +
+            """<shape id="1" startTime="0" endTime="999" fillType="media" fillVideo="gone" s=".rect"/><shape id="2" startTime="0" endTime="999" fillType="media" fillVideo="nested" s=".rect"/></scene>""")
+        val marked = scene.withMissing(setOf("gone", "nested"))
+        assertTrue(marked.isMissing("gone"))
+        assertTrue(marked.isMissing("nested"))
+        assertFalse(marked.isMissing("here"))
+        assertEquals("a.mp4", marked.media("gone")?.filename)
+        assertEquals(scene.layers, marked.layers)
+        assertEquals(2, scene.videoSamples(0, playing = false, warm = false).size)
+        assertTrue(marked.videoSamples(0, playing = false, warm = false).isEmpty())
     }
 }

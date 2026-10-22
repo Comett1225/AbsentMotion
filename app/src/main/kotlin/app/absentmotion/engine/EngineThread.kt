@@ -396,9 +396,10 @@ class EngineThread(private val background: Int, context: Context? = null) {
         effectJob?.join()
         val document = withContext(Dispatchers.Default) { Scene.parse(xml) }
         fonts?.let { library -> document.fontNames().forEach { library.resolve(it) } }
-        media?.prepare(document)
         var shown: String? = null
         try {
+            media?.pinned = document
+            media?.prepare(document)
             withContext(dispatcher) {
                 check(!closed) { "engine closed" }
                 applyPending()
@@ -419,6 +420,7 @@ class EngineThread(private val background: Int, context: Context? = null) {
             Log.e("AMVideo", "Cannot capture exact video still", e)
             false
         } finally {
+            media?.pinned = null
             try {
                 withContext(NonCancellable + dispatcher) {
                     try { restoreScene(shown) }
@@ -462,9 +464,10 @@ class EngineThread(private val background: Int, context: Context? = null) {
         effectJob?.join()
         val document = Scene.parse(xml)
         fonts?.let { library -> document.fontNames().forEach { library.resolve(it) } }
-        media?.prepare(document)
         var shown: String? = null
         try {
+            media?.pinned = document
+            media?.prepare(document)
             videos?.suspendPreview()
             withContext(dispatcher) {
                 check(!closed) { "engine closed" }
@@ -475,6 +478,7 @@ class EngineThread(private val background: Int, context: Context? = null) {
             }
             ExportSession(document, interpolation, fps).block()
         } finally {
+            media?.pinned = null
             var noPreview = true
             try {
                 withContext(NonCancellable + dispatcher) {
