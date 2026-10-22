@@ -1272,7 +1272,6 @@
     <string name="ai_frames_minutes_left">Quadro %1$s de %2$s, faltam cerca de %3$s min</string>
     <string name="ai_saving_video">Salvando o vídeo…</string>
     <string name="ai_cooling_down">O celular está quente. Aguardando esfriar…</string>
-    <string name="ai_sound_not_kept">O som deste clipe não pode ser mantido no novo vídeo</string>
     <string name="ai_video_too_large_to_save">Este celular não consegue salvar um vídeo de %1$s × %2$s</string>
     <string name="ai_delete_model">Excluir %1$s</string>
     <string name="settings_ai_gpu">Usar o chip gráfico para IA</string>

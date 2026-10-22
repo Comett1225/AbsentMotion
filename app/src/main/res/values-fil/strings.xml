@@ -1248,7 +1248,6 @@
     <string name="ai_frames_minutes_left">Frame %1$s ng %2$s, mga %3$s min ang natitira</string>
     <string name="ai_saving_video">Sine-save ang bidyo…</string>
     <string name="ai_cooling_down">Mainit ang phone. Hinihintay itong lumamig…</string>
-    <string name="ai_sound_not_kept">Hindi maipapanatili ang audio ng clip na ito sa bagong bidyo</string>
     <string name="ai_video_too_large_to_save">Hindi kayang i-save ng phone na ito ang %1$s × %2$s na bidyo</string>
     <string name="ai_delete_model">I-delete ang %1$s</string>
     <string name="settings_ai_gpu">Gamitin ang graphics chip para sa AI</string>

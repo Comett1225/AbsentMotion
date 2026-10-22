@@ -1224,7 +1224,6 @@
     <string name="ai_frames_minutes_left">เฟรม %1$s จาก %2$s เหลืออีกประมาณ %3$s นาที</string>
     <string name="ai_saving_video">กำลังบันทึกวิดีโอ…</string>
     <string name="ai_cooling_down">มือถือร้อน กำลังรอให้เย็นลง…</string>
-    <string name="ai_sound_not_kept">ไม่สามารถเก็บเสียงของคลิปนี้ไว้ในวิดีโอใหม่ได้</string>
     <string name="ai_video_too_large_to_save">มือถือเครื่องนี้บันทึกวิดีโอขนาด %1$s × %2$s ไม่ได้</string>
     <string name="ai_delete_model">ลบ %1$s</string>
     <string name="settings_ai_gpu">ใช้ชิปกราฟิกสำหรับ AI</string>

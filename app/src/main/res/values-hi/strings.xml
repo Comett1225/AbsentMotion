@@ -1248,7 +1248,6 @@
     <string name="ai_frames_minutes_left">फ़्रेम %1$s / %2$s, लगभग %3$s मिनट बाकी</string>
     <string name="ai_saving_video">वीडियो सेव हो रहा है…</string>
     <string name="ai_cooling_down">फ़ोन गर्म है। ठंडा होने का इंतज़ार कर रहे हैं…</string>
-    <string name="ai_sound_not_kept">इस क्लिप की आवाज़ नए वीडियो में नहीं रखी जा सकती</string>
     <string name="ai_video_too_large_to_save">यह फ़ोन %1$s × %2$s वीडियो सेव नहीं कर सकता</string>
     <string name="ai_delete_model">%1$s हटाएँ</string>
     <string name="settings_ai_gpu">AI के लिए ग्राफ़िक्स चिप का इस्तेमाल करें</string>

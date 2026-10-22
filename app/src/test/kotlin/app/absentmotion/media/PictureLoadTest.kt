@@ -57,4 +57,14 @@ class PictureLoadTest {
         assertEquals(4096, pictureLimit(16384, 0))
         assertEquals(2048, pictureLimit(2048, 1920))
     }
+
+    @Test fun aPictureIsNeverDecodedAtMoreThanOneAndAHalfTimesItsLimit() {
+        for (side in listOf(100, 4095, 4096, 6000, 6200, 8191, 8192, 12_000, 16_330, 30_000)) for (limit in listOf(1000, 4096, 4899, 7680)) {
+            val sample = pictureSample(side, limit)
+            val decoded = side / sample
+            assertEquals(Integer.bitCount(sample), 1)
+            assertTrue("$side / $limit -> $sample", decoded * 2 <= limit * 3)
+            assertTrue("$side / $limit -> $sample", decoded * 4 >= minOf(side, limit) * 3 - 4)
+        }
+    }
 }

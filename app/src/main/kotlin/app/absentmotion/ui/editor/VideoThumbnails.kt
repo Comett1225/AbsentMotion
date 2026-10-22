@@ -32,6 +32,8 @@ import kotlin.math.floor
 private val thumbnails = LruCache<Pair<String, Long>, ImageBitmap>(256)
 private val retrieving = Mutex()
 
+internal fun dropVideoThumbnails() = thumbnails.evictAll()
+
 @Composable
 internal fun VideoLayerThumbnail(layer: Layer, modifier: Modifier) {
     val scene = Scene(app.absentmotion.model.XmlNode("scene", mapOf("fps" to "30"), listOf(layer.node)))

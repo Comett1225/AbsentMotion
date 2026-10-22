@@ -1344,7 +1344,6 @@
     <string name="ai_frames_minutes_left">الإطار %1$s من %2$s، بقي نحو %3$s دقيقة</string>
     <string name="ai_saving_video">جارٍ حفظ الفيديو…</string>
     <string name="ai_cooling_down">الهاتف ساخن. في انتظار أن يبرد…</string>
-    <string name="ai_sound_not_kept">لا يمكن الاحتفاظ بصوت هذا المقطع في الفيديو الجديد</string>
     <string name="ai_video_too_large_to_save">لا يستطيع هذا الهاتف حفظ فيديو بدقة %1$s × %2$s</string>
     <string name="ai_delete_model">حذف %1$s</string>
     <string name="settings_ai_gpu">استخدام شريحة الرسومات للذكاء الاصطناعي</string>

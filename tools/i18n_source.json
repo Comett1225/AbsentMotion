@@ -173,7 +173,6 @@
  "ai_smooth_adds": "AI Smooth adds about %1$s on this phone",
  "ai_smooth_download_text": "AI Smooth needs a model, downloaded once: %1$s. You can delete it later in Settings.",
  "ai_smooth_download_title": "Download AI Smooth?",
- "ai_sound_not_kept": "The sound of this clip cannot be kept in the new video",
  "ai_speech_failed": "Speech recognition failed",
  "ai_storage_cannot_create": "Cannot create AI media storage",
  "ai_storage_unavailable": "Media storage is unavailable",

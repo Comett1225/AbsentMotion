@@ -212,7 +212,11 @@ class AiModelsTest {
         assertEquals(chosen, smoothingOf(chosen.option))
         assertEquals(listOf(AiModel.SmoothLow, AiModel.SmoothMedium, AiModel.SmoothHigh), SmoothLevel.entries.map { it.model })
         assertEquals(listOf(128, 64, 64), SmoothLevel.entries.map { it.padding })
-        assertEquals(22.2 * 300 * 1920 * 1080 / 1e6, AiSmooth.gmac(SmoothLevel.Medium, 300.0, 1920, 1080), 1e-6)
+        assertEquals(22.2 * 300 * 960 * 540 / 1e6, AiSmooth.gmac(SmoothLevel.Medium, 300.0, 960, 540), 1e-6)
+        assertEquals(22.2 * 300 * flowPixels(SmoothLevel.Medium, Long.MAX_VALUE) / 1e6, AiSmooth.gmac(SmoothLevel.Medium, 300.0, 3840, 2160), 1e-6)
+        assertEquals(1_166_666, flowPixels(SmoothLevel.Medium, 12_000_000_000L))
+        assertEquals(555_555, flowPixels(SmoothLevel.Medium, 4_000_000_000L))
+        assertEquals(227_272, flowPixels(SmoothLevel.High, 0L))
     }
 
     @Test fun lumaUsesStudioRange() {

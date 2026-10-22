@@ -27,6 +27,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.UUID
+import kotlin.math.sqrt
 
 enum class AiAction(@StringRes val title: Int) {
     Background(R.string.ai_remove_background), Noise(R.string.ai_reduce_noise), Video(R.string.ai_remove_background_video), Smooth(R.string.smooth_clip),
@@ -196,6 +197,14 @@ class AiTools(private val context: Context, private val state: EditorState, priv
             }
         }
     }
+}
+
+internal const val MAX_MATTE_PIXELS = 16_000_000L
+
+internal fun matteLimit(width: Int, height: Int, limit: Int, maxPixels: Long = MAX_MATTE_PIXELS): Int {
+    val side = maxOf(width, height)
+    val fit = (side * sqrt(maxPixels.toDouble() / (width.toLong() * height))).toLong()
+    return minOf(limit.toLong(), fit).toInt().coerceAtLeast(1)
 }
 
 internal fun aiFile(context: Context, extension: String): File {

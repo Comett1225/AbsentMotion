@@ -11,19 +11,10 @@ import app.absentmotion.model.MediaDeclaration
 import kotlinx.coroutines.ensureActive
 import java.io.File
 import kotlin.coroutines.coroutineContext
-import kotlin.math.sqrt
 
 internal class ModelNotReady : Exception(AppText.get(R.string.ai_model_not_ready_foss))
 
 internal const val MODEL_ASSET = "absent_bg.abg"
-internal const val MAX_MATTE_PIXELS = 16_000_000L
-
-internal fun matteLimit(width: Int, height: Int, limit: Int, maxPixels: Long = MAX_MATTE_PIXELS): Int {
-    val side = maxOf(width, height)
-    val fit = (side * sqrt(maxPixels.toDouble() / (width.toLong() * height))).toLong()
-    return minOf(limit.toLong(), fit).toInt().coerceAtLeast(1)
-}
-
 internal fun needsCopy(target: File, stamp: File, version: String): Boolean =
     !target.isFile || !stamp.isFile || stamp.readText() != version
 
@@ -134,7 +125,7 @@ internal object BackgroundRemoval {
         val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
         resolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, bounds) }
         check(bounds.outWidth > 0 && bounds.outHeight > 0) { AppText.get(R.string.ai_cannot_read_image) }
-        val decoded = checkNotNull(decodePicture(resolver, uri, matteLimit(bounds.outWidth, bounds.outHeight, limit))) { AppText.get(R.string.ai_cannot_decode_image) }
+        val decoded = checkNotNull(decodePicture(resolver, uri, matteLimit(bounds.outWidth, bounds.outHeight, limit), keepOutOfMemory = true)) { AppText.get(R.string.ai_cannot_decode_image) }
         if (decoded.isMutable) return decoded
         return try { checkNotNull(decoded.copy(Bitmap.Config.ARGB_8888, true)) { AppText.get(R.string.ai_cannot_decode_image) } } finally { decoded.recycle() }
     }

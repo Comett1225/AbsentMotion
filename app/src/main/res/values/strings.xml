@@ -1272,7 +1272,6 @@
     <string name="ai_frames_minutes_left">Frame %1$s of %2$s, about %3$s min left</string>
     <string name="ai_saving_video">Saving the video…</string>
     <string name="ai_cooling_down">The phone is hot. Waiting for it to cool down…</string>
-    <string name="ai_sound_not_kept">The sound of this clip cannot be kept in the new video</string>
     <string name="ai_video_too_large_to_save">This phone cannot save a %1$s × %2$s video</string>
     <string name="ai_delete_model">Delete %1$s</string>
     <string name="settings_ai_gpu">Use the graphics chip for AI</string>

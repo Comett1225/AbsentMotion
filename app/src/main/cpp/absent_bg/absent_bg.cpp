@@ -161,7 +161,16 @@ std::vector<uint8_t> Model::matte(const uint8_t* rgb,int width,int height) const
     int nw=std::max(1,int(width*scale+.5f)),nh=std::max(1,int(height*scale+.5f)),left=(size-nw)/2,top=(size-nh)/2;
     Tensor input(3,size,size);std::fill(input.data.begin(),input.data.end(),.5f);
     std::vector<float> gray(size_t(nh)*nw);
-    for(int y=0;y<nh;++y)for(int x=0;x<nw;++x) {
+    if(nw*2<=width&&nh*2<=height) {
+        for(int y=0;y<nh;++y)for(int x=0;x<nw;++x) {
+            int y0=int(int64_t(y)*height/nh),y1=std::max(y0+1,int(int64_t(y+1)*height/nh)),x0=int(int64_t(x)*width/nw),x1=std::max(x0+1,int(int64_t(x+1)*width/nw));
+            double sum[3]={0,0,0};
+            for(int sy=y0;sy<y1;++sy)for(int sx=x0;sx<x1;++sx)for(int c=0;c<3;++c)sum[c]+=rgb[(size_t(sy)*width+sx)*3+c];
+            float g=0,k=1.f/(255.f*float((y1-y0)*(x1-x0)));
+            for(int c=0;c<3;++c){float v=float(sum[c])*k;input.data[(size_t(c)*size+top+y)*size+left+x]=v;g+=v*(c==0?.299f:c==1?.587f:.114f);}
+            gray[y*nw+x]=g;
+        }
+    } else for(int y=0;y<nh;++y)for(int x=0;x<nw;++x) {
         float sy=std::max((y+.5f)*height/nh-.5f,0.f),sx=std::max((x+.5f)*width/nw-.5f,0.f);
         int y0=std::min(int(sy),height-1),x0=std::min(int(sx),width-1),y1=std::min(y0+1,height-1),x1=std::min(x0+1,width-1);float fy=sy-y0,fx=sx-x0;
         float g=0;
