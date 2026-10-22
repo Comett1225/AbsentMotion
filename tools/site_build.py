@@ -347,8 +347,8 @@ class Site:
             '<!doctype html>\n<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
             '<title>%s</title><meta name="description" content="%s"><meta name="color-scheme" content="light dark">'
             '%s<link rel="stylesheet" href="%sassets/site.css">%s</head>'
-            '<body class="%s" data-page="%s">%s<div class="wrap">%s<main id="main">%s</main></div>%s</body></html>\n'
-        ) % (escape(title), escape(description), '<link rel="icon" type="image/png" href="%sassets/logo.png">' % base if site else "", base, script, "site" if site else "app", kind, top, side, body, foot)
+            '<body class="%s" data-page="%s">%s%s<div class="wrap">%s<main id="main">%s</main></div>%s</body></html>\n'
+        ) % (escape(title), escape(description), '<link rel="icon" type="image/png" href="%sassets/logo.png">' % base if site else "", base, script, "site" if site else "app", kind, '<a class="skip" href="#main">Skip to the content</a>' if site else "", top, side, body, foot)
 
     def add(self, path, text):
         self.files[path] = text.encode()
@@ -375,7 +375,7 @@ class Site:
         if len(heads) >= 3 and page.kind in ("guide", "effects"):
             parts.append('<details class="toc"><summary>On this page</summary><ul>%s</ul></details>' % "".join('<li><a href="#%s">%s</a></li>' % (i, escape(t)) for i, t in heads))
         if page.kind == "download":
-            parts = [self.download_top(page, depth), body, self.download_all(depth)]
+            parts = [self.download_top(page, depth), self.download_all(depth), body]
         elif page.kind == "toc":
             parts.append(body)
             parts.append(self.toc(depth))

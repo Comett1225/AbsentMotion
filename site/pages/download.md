@@ -6,7 +6,7 @@ summary: A free, open-source motion graphics and video editor for Android. It wo
 ---
 ## Install in three steps
 
-1. Download the file for your phone with the big button above.
+1. Download the file for your phone: the big button above, or the list of all downloads.
 2. Open it from the download notification or the Downloads folder. When Android asks, allow your browser to install apps from this source.
 3. Open AbsentMotion. It works offline from the first start.
 
