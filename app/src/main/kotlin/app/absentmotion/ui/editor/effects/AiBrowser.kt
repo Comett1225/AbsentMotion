@@ -235,7 +235,8 @@ internal fun AiSmoothDialog(tools: AiTools, scene: Scene) {
                 Text(stringResource(R.string.smooth_intro), color = Am.OnDark, fontSize = 14.sp)
                 Text(stringResource(R.string.smooth_method), Modifier.padding(top = 12.dp), color = Am.Caption, fontSize = 12.sp)
                 Pills(FrameInterpolation.entries, s.method, true, { stringResource(it.label) }) { tools.smoothing = s.copy(method = it) }
-                Pills(SmoothLevel.entries, s.level, s.method != FrameInterpolation.Off, { stringResource(it.label) }) { tools.smoothing = s.copy(level = it) }
+                Pills(SmoothLevel.entries, s.level, s.method != FrameInterpolation.Off, { stringResource(it.label) },
+                    locked = { s.method == FrameInterpolation.Flow && it == SmoothLevel.High && !app.absentmotion.Tier.has(app.absentmotion.Feature.FlowHigh) }) { tools.smoothing = s.copy(level = it) }
                 Text(stringResource(R.string.export_motion_blur), Modifier.padding(top = 12.dp), color = Am.Caption, fontSize = 12.sp)
                 Pills(MotionBlur.entries, s.blur, true, { stringResource(it.label) }) { tools.smoothing = s.copy(blur = it) }
                 Text(
@@ -263,13 +264,18 @@ internal fun AiSmoothDialog(tools: AiTools, scene: Scene) {
 }
 
 @Composable
-private fun <T> Pills(options: List<T>, selected: T, enabled: Boolean, label: @Composable (T) -> String, onPick: (T) -> Unit) {
+private fun <T> Pills(options: List<T>, selected: T, enabled: Boolean, label: @Composable (T) -> String, locked: (T) -> Boolean = { false }, onPick: (T) -> Unit) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val needs = stringResource(R.string.tier_needs_latest)
     Row(Modifier.padding(top = 6.dp).fillMaxWidth().height(36.dp).alpha(if (enabled) 1f else 0.4f).clip(RoundedCornerShape(6.dp)).background(Am.PanelInset)) {
         for (option in options) {
             val on = option == selected
             Box(Modifier.weight(1f).fillMaxHeight().padding(2.dp).clip(RoundedCornerShape(5.dp)).background(if (on) Am.FieldHi else Color.Transparent)
-                .clickable(enabled = enabled) { onPick(option) }, Alignment.Center) {
-                Text(label(option), color = if (on) Am.Accent else Am.OnDark, fontSize = 12.sp, maxLines = 1)
+                .clickable(enabled = enabled) { if (locked(option)) android.widget.Toast.makeText(context, needs, android.widget.Toast.LENGTH_SHORT).show() else onPick(option) }, Alignment.Center) {
+                Row(Modifier.alpha(if (locked(option)) 0.45f else 1f), verticalAlignment = Alignment.CenterVertically) {
+                    if (locked(option)) Icon(app.absentmotion.ui.export.ExportIcons.Lock, null, Modifier.size(12.dp), tint = Am.OnDark)
+                    Text(label(option), color = if (on) Am.Accent else Am.OnDark, fontSize = 12.sp, maxLines = 1)
+                }
             }
         }
     }

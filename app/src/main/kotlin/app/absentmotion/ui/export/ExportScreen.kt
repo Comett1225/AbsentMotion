@@ -945,7 +945,13 @@ private fun OptionsPage(kind: ExportKind, scene: Scene, s: ExportSettings, onRea
 }
 
 private fun levelChoices(s: ExportSettings) =
-    SmoothLevel.entries.map { Choice(it, if (s.interpolation == FrameInterpolation.Off) txt(R.string.export_interpolation_pick_method) else null) }
+    SmoothLevel.entries.map {
+        when {
+            s.interpolation == FrameInterpolation.Off -> Choice(it, txt(R.string.export_interpolation_pick_method))
+            s.interpolation == FrameInterpolation.Flow && it == SmoothLevel.High -> app.absentmotion.Tier.choice(it, app.absentmotion.Feature.FlowHigh)
+            else -> Choice(it)
+        }
+    }
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable

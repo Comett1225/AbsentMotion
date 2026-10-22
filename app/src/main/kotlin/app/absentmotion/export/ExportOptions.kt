@@ -1,7 +1,9 @@
 package app.absentmotion.export
 
 import androidx.annotation.StringRes
+import app.absentmotion.Feature
 import app.absentmotion.R
+import app.absentmotion.Tier
 import app.absentmotion.i18n.UiText
 import app.absentmotion.i18n.txt
 import app.absentmotion.model.Scene
@@ -132,6 +134,7 @@ data class Smoothing(
 
     fun flowParams(medium: FloatArray): FloatArray = when {
         method != FrameInterpolation.Flow || level == SmoothLevel.Medium -> medium
+        level == SmoothLevel.High && !Tier.has(Feature.FlowHigh) -> medium
         level == SmoothLevel.Low -> floatArrayOf(8f, 4f, 4f, 1f, 0.15f, 4f)
         else -> floatArrayOf(2f, 6f, 8f, 2f, 0.15f, 4f)
     }
