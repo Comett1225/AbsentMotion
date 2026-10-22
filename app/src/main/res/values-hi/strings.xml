@@ -1479,6 +1479,7 @@
     <string name="caption_layer_name">कैप्शन %1$s</string>
     <string name="tier_needs_latest">Android 13 (Latest वर्ज़न) चाहिए</string>
     <string name="feature_flow_high">ऑप्टिकल फ़्लो हाई</string>
+    <string name="feature_ai_enhance">AI एन्हांस</string>
     <string name="about_version_compatible">वर्ज़न %1$s Compatible</string>
     <string name="about_compatible_note">यह Android 9 से 12 के लिए Compatible वर्ज़न है। छोड़े गए: %1$s। इनके लिए Android 13 और Latest वर्ज़न चाहिए।</string>
     <string name="low_memory_title">कम मेमरी</string>

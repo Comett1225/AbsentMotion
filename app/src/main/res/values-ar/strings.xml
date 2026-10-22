@@ -1575,6 +1575,7 @@
     <string name="caption_layer_name">تسمية توضيحية %1$s</string>
     <string name="tier_needs_latest">يتطلب Android 13 (إصدار Latest)</string>
     <string name="feature_flow_high">التدفق البصري عالي</string>
+    <string name="feature_ai_enhance">تحسين بالذكاء الاصطناعي</string>
     <string name="about_version_compatible">الإصدار %1$s Compatible</string>
     <string name="about_compatible_note">هذه نسخة Compatible لنظام Android 9 إلى 12. تم استبعاد: %1$s. وهي تحتاج إلى Android 13 ونسخة Latest.</string>
     <string name="low_memory_title">ذاكرة منخفضة</string>

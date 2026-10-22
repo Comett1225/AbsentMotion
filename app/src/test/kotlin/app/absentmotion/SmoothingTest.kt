@@ -38,7 +38,8 @@ class SmoothingTest {
         for (method in FrameInterpolation.entries) {
             val old = JSONObject().put("shortSide", 720).put("fps", 60).put("interpolation", method.name)
             val loaded = settingsFromJson(old, ExportSettings(1080, 30))
-            assertEquals(method, loaded.interpolation)
+            val kept = method != FrameInterpolation.Ai || app.absentmotion.Tier.has(app.absentmotion.Feature.AiSmooth)
+            assertEquals(if (kept) method else FrameInterpolation.Off, loaded.interpolation)
             assertEquals(SmoothLevel.Medium, loaded.interpolationLevel)
             assertEquals(MotionBlur.Off, loaded.motionBlur)
         }

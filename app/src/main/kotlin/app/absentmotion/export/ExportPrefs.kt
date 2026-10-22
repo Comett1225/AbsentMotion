@@ -44,7 +44,7 @@ internal fun settingsFromJson(o: JSONObject, fallback: ExportSettings): ExportSe
         pick("image", ImageKind.entries, fallback.image),
         o.optInt("imageQuality", fallback.imageQuality).takeIf { it in 1..100 } ?: fallback.imageQuality,
         o.optInt("background", fallback.background),
-        pick("interpolation", FrameInterpolation.entries, fallback.interpolation),
+        pick("interpolation", FrameInterpolation.entries.filter { it != FrameInterpolation.Ai || app.absentmotion.Tier.has(app.absentmotion.Feature.AiSmooth) }, fallback.interpolation),
         pick("container", Container.entries, fallback.container),
         audio,
         pick("audioFormat", AudioFormat.entries, fallback.audioFormat),

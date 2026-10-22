@@ -32,6 +32,7 @@ import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import app.absentmotion.platform.drain
 import java.io.Closeable
 import java.io.File
 import java.io.InputStream
@@ -272,7 +273,7 @@ internal object CaptionModel {
     internal fun receive(input: InputStream, part: File, target: File, bytes: Long, sha256: String, active: () -> Unit, progress: (Float) -> Unit,
                          append: Boolean = false, wrong: Int = R.string.ai_download_not_model) {
         val digest = MessageDigest.getInstance("SHA-256")
-        if (append) part.inputStream().use { DigestInputStream(it, digest).transferTo(OutputStream.nullOutputStream()) }
+        if (append) part.inputStream().use { DigestInputStream(it, digest).drain() }
         val digesting = DigestInputStream(input, digest)
         java.io.FileOutputStream(part, append).use { output ->
             val buffer = ByteArray(64 * 1024)

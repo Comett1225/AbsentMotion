@@ -1455,6 +1455,7 @@
     <string name="caption_layer_name">Kapsyen %1$s</string>
     <string name="tier_needs_latest">Perlu Android 13 (Versi Latest)</string>
     <string name="feature_flow_high">Aliran optik Tinggi</string>
+    <string name="feature_ai_enhance">Peningkatan AI</string>
     <string name="about_version_compatible">Versi %1$s Compatible</string>
     <string name="about_compatible_note">Ini ialah versi Compatible untuk Android 9 hingga 12. Tidak disertakan: %1$s. Ia memerlukan Android 13 dan versi Latest.</string>
     <string name="low_memory_title">Memori rendah</string>

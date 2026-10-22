@@ -1505,6 +1505,7 @@
     <string name="caption_layer_name">Caption %1$s</string>
     <string name="tier_needs_latest">Needs Android 13 (Latest version)</string>
     <string name="feature_flow_high">Optical flow High</string>
+    <string name="feature_ai_enhance">AI Enhance</string>
     <string name="about_version_compatible">Version %1$s Compatible</string>
     <string name="about_compatible_note">This is the Compatible version for Android 9 to 12. Left out: %1$s. They need Android 13 and the Latest version.</string>
     <string name="low_memory_title">Low memory</string>

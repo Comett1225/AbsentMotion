@@ -345,7 +345,8 @@ internal fun AiSmoothDialog(tools: AiTools, scene: Scene) {
             Column {
                 Text(stringResource(R.string.smooth_intro), color = Am.OnDark, fontSize = 14.sp)
                 Text(stringResource(R.string.smooth_method), Modifier.padding(top = 12.dp), color = Am.Caption, fontSize = 12.sp)
-                Pills(FrameInterpolation.entries, s.method, true, { stringResource(it.label) }) { tools.smoothing = s.copy(method = it) }
+                Pills(FrameInterpolation.entries, s.method, true, { stringResource(it.label) },
+                    locked = { it == FrameInterpolation.Ai && !app.absentmotion.Tier.has(app.absentmotion.Feature.AiSmooth) }) { tools.smoothing = s.copy(method = it) }
                 Pills(SmoothLevel.entries, s.level, s.method != FrameInterpolation.Off, { stringResource(it.label) },
                     locked = { s.method == FrameInterpolation.Flow && it == SmoothLevel.High && !app.absentmotion.Tier.has(app.absentmotion.Feature.FlowHigh) }) { tools.smoothing = s.copy(level = it) }
                 Text(stringResource(R.string.export_motion_blur), Modifier.padding(top = 12.dp), color = Am.Caption, fontSize = 12.sp)

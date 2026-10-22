@@ -37,7 +37,8 @@ enum class AiAction(@StringRes val title: Int) {
     fun unavailable(layer: Layer?): UiText? = when (this) {
         Background -> if (layer?.mediaFill?.video == false) null else txt(R.string.ai_select_image_layer)
         Noise -> if (layer?.kind == "audio") null else txt(R.string.ai_select_audio_layer)
-        Video, Smooth, Enhance -> if (layer?.mediaFill?.video == true) null else txt(R.string.ai_select_video_layer)
+        Enhance -> app.absentmotion.Tier.reason(app.absentmotion.Feature.AiEnhance) ?: if (layer?.mediaFill?.video == true) null else txt(R.string.ai_select_video_layer)
+        Video, Smooth -> if (layer?.mediaFill?.video == true) null else txt(R.string.ai_select_video_layer)
     }
 }
 
