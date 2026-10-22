@@ -6,6 +6,44 @@ All notable changes to AbsentMotion are listed here, newest first. The format fo
 Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stands for the feature set as it stood on
 2026-10-12.
 
+## [3.3.0] - 2026-10-22
+
+### Added
+
+- A Compatible version for Android 9, 10, 11 and 12, published as its own file. Features it leaves out (Optical flow
+  High, AI Smooth, AI Enhance) are shown with a lock and the note "Needs Android 13 (Latest version)".
+- The Frame Rate effect (formerly Time Quantization, setting Frames/sec) makes any layer move at a lower frame rate,
+  video included, for a choppy or stop-motion look. Old projects open unchanged.
+- Frame Interpolation has Low, Medium and High for Frame blending and Optical flow, and a help sheet that says which
+  phones suit each. Medium gives the same result as before.
+- A Motion Blur export option (Off, Low, Medium, High) that smears moving video like a camera shutter, also when a clip
+  already has the export frame rate.
+- Smooth on a video clip, in its Speed tools: the in-between frames are made once and kept with the project, so the
+  preview and every export show them. The original clip can be brought back.
+- AI Smooth, made on the phone, as a fourth smoothing method.
+- AI Enhance for video clips.
+- A Help screen in Settings with the whole guide offline, and a ? on every effect that opens its help page.
+- A documentation and download website that recommends the right file for the visitor's phone, with a phone checker
+  and a page for every effect.
+- A clear message instead of a crash when a phone's graphics cannot run the editor.
+
+### Changed
+
+- Tablets: the Add menu uses the full width for videos, pictures and shapes, and in landscape the clip tools are a
+  narrow column at the right edge.
+- Exports on phones with a small video chip free the editor's video players first, fall back to another encoder when
+  one is busy, and the result screen always shows the exported video.
+- Exports below Android 13 are about a third faster, and the export time estimate accounts for heavy effects.
+- AI work runs on the processor unless the graphics chip is known to handle it safely.
+- Error messages are in plain words instead of codes.
+
+### Fixed
+
+- Old Time Quantization effects without a value showed 5 fps in the settings while playing at 8.
+- The hardware video encoder of some phones refused every export.
+- The too-large project file message said 32 MB while the limit is 16 MB.
+- Restoring an AI-changed clip lost its media details.
+
 ## [3.2.0] - 2026-10-22
 
 ### Added
