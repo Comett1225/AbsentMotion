@@ -607,6 +607,14 @@ def validate_devices(devices):
             problems.append("devices.json: %s has a bad tier" % name)
         if d.get("aiClass") not in AI_CLASSES:
             problems.append("devices.json: %s has a bad aiClass" % name)
+        newest = d.get("maxAndroid")
+        if not isinstance(newest, (int, float)):
+            problems.append("devices.json: %s has no numeric maxAndroid" % name)
+            continue
+        capable = d.get("arm64") is True and d.get("vulkan11") is True
+        expected = "unsupported" if not capable or newest < 9 else "latest" if newest >= 13 else "compatible"
+        if d.get("tier") != expected:
+            problems.append("devices.json: %s is %s but its data says %s" % (name, d.get("tier"), expected))
     return problems
 
 
