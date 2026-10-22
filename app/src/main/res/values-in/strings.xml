@@ -942,6 +942,9 @@
     <plurals name="aibrowser_too_long">
         <item quantity="other">Klip lebih panjang dari %1$s menit belum didukung. Pangkas atau pisahkan klip terlebih dahulu.</item>
     </plurals>
+    <plurals name="smooth_estimate">
+        <item quantity="other">%1$s frame pada %2$s fps, %3$s × %4$s, sekitar %5$s MB.</item>
+    </plurals>
     <plurals name="aibrowser_estimate">
         <item quantity="other">%1$s frame pada %2$s × %3$s, sekitar %4$s MB.</item>
     </plurals>
@@ -1304,6 +1307,13 @@
     <string name="export_interpolation_flow_levels">Rendah melacak gerakan secara kasar dan paling cepat; cocok untuk ponsel Basic. Sedang adalah pilihan biasa untuk ponsel Good. Tinggi melacak detail lebih halus dengan lebih banyak proses agar tepinya lebih bersih; prosesnya lambat, jadi gunakan untuk ponsel Fast atau klip pendek.</string>
     <string name="export_motion_blur_help">Membuat setiap frame klip video tampak kabur mengikuti gerakannya, seperti rana kamera: Rendah 90°, Sedang 180° (tampilan film biasa), Tinggi 360°. Ini juga berfungsi saat klip sudah memakai frame rate ekspor. Proses ini harus melacak gerakan, jadi memakan waktu kurang lebih sama dengan Optical flow Sedang.</string>
     <string name="export_phone_speed">Ponsel ini: %1$s</string>
+    <string name="smooth_clip">Haluskan</string>
+    <string name="smooth_intro">Membuat frame halus untuk klip ini sekali saja dan menyimpannya bersama proyek, sehingga pratinjau dan setiap ekspor menampilkannya. Klip asli tetap disimpan dan bisa dikembalikan.</string>
+    <string name="smooth_method">Metode</string>
+    <string name="smooth_nothing">Klip ini sudah punya cukup frame untuk frame rate proyek. Pilih Blur gerak, atau perlambat klipnya dulu.</string>
+    <string name="smooth_frame">Penghalusan: frame %1$s dari %2$s…</string>
+    <string name="smooth_saving">Menyimpan klip halus…</string>
+    <string name="smooth_sound_format">Suara klip ini memakai format yang tidak bisa dipertahankan, jadi klip tidak dihaluskan.</string>
     <string name="export_list_or">%1$s atau %2$s</string>
     <string name="export_list_and">%1$s dan %2$s</string>
     <string name="export_reason_container_codecs">%1$s membutuhkan video %2$s, yang tidak dapat dibuat ponsel ini pada %3$s.</string>

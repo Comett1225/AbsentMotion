@@ -984,6 +984,11 @@
         <item quantity="many">Clipes com mais de %1$s minutos ainda não são compatíveis. Apere ou divida o clipe primeiro.</item>
         <item quantity="other">Clipes com mais de %1$s minutos ainda não são compatíveis. Apere ou divida o clipe primeiro.</item>
     </plurals>
+    <plurals name="smooth_estimate">
+        <item quantity="one">%1$s quadro a %2$s fps, %3$s × %4$s, cerca de %5$s MB.</item>
+        <item quantity="many">%1$s quadros a %2$s fps, %3$s × %4$s, cerca de %5$s MB.</item>
+        <item quantity="other">%1$s quadros a %2$s fps, %3$s × %4$s, cerca de %5$s MB.</item>
+    </plurals>
     <plurals name="aibrowser_estimate">
         <item quantity="one">%1$s quadro em %2$s × %3$s, cerca de %4$s MB.</item>
         <item quantity="many">%1$s quadros em %2$s × %3$s, cerca de %4$s MB.</item>
@@ -1350,6 +1355,13 @@
     <string name="export_interpolation_flow_levels">Baixa rastreia o movimento de forma aproximada e é a mais rápida; combina com celulares Básicos. Média é a escolha usual para celulares Bons. Alta rastreia detalhes mais finos com mais passagens para bordas mais limpas; é lenta, então use em celulares Rápidos ou clipes curtos.</string>
     <string name="export_motion_blur_help">Espalha cada quadro de um clipe de vídeo ao longo do movimento, como o obturador de uma câmera: Baixa 90°, Média 180° (o visual usual do cinema), Alta 360°. Também funciona quando o clipe já tem a taxa de quadros da exportação. Precisa rastrear o movimento, então leva mais ou menos o mesmo tempo que Fluxo óptico Médio.</string>
     <string name="export_phone_speed">Este celular: %1$s</string>
+    <string name="smooth_clip">Suavizar</string>
+    <string name="smooth_intro">Cria os quadros suavizados deste clipe uma vez e os mantém no projeto, para que a pré-visualização e todas as exportações os mostrem. O clipe original é mantido e pode ser restaurado.</string>
+    <string name="smooth_method">Método</string>
+    <string name="smooth_nothing">Este clipe já tem quadros suficientes para a taxa de quadros do projeto. Escolha Desfoque de movimento ou diminua a velocidade do clipe primeiro.</string>
+    <string name="smooth_frame">Suavização: quadro %1$s de %2$s…</string>
+    <string name="smooth_saving">Salvando o clipe suavizado…</string>
+    <string name="smooth_sound_format">O som deste clipe usa um formato que não pode ser mantido, então o clipe não foi suavizado.</string>
     <string name="export_list_or">%1$s ou %2$s</string>
     <string name="export_list_and">%1$s e %2$s</string>
     <string name="export_reason_container_codecs">%1$s precisa de vídeo %2$s, que este celular não consegue gerar em %3$s.</string>

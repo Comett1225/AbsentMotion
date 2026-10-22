@@ -7,6 +7,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
@@ -24,7 +25,9 @@ import app.absentmotion.ui.onboarding.phoneCheckResult
 
 @Composable
 internal fun SmoothingHelp(color: Color, modifier: Modifier = Modifier) {
-    val report by DeviceCapabilities.of(LocalContext.current).report.collectAsState()
+    val capabilities = DeviceCapabilities.of(LocalContext.current)
+    val report by capabilities.report.collectAsState()
+    LaunchedEffect(capabilities) { capabilities.load() }
     val speed = report?.let { phoneCheckResult(it, Build.VERSION.MEDIA_PERFORMANCE_CLASS).speed }
     Column(modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         if (speed != null) {

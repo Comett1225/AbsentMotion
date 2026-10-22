@@ -942,6 +942,9 @@
     <plurals name="aibrowser_too_long">
         <item quantity="other">Klip lebih panjang daripada %1$s minit belum disokong. Potong atau pisahkan klip itu dahulu.</item>
     </plurals>
+    <plurals name="smooth_estimate">
+        <item quantity="other">%1$s bingkai pada %2$s fps, %3$s × %4$s, kira-kira %5$s MB.</item>
+    </plurals>
     <plurals name="aibrowser_estimate">
         <item quantity="other">%1$s bingkai pada %2$s × %3$s, kira-kira %4$s MB.</item>
     </plurals>
@@ -1304,6 +1307,13 @@
     <string name="export_interpolation_flow_levels">Rendah menjejak gerakan secara kasar dan paling cepat; sesuai untuk telefon asas. Sederhana ialah pilihan biasa untuk telefon baik. Tinggi menjejak butiran lebih halus dengan lebih banyak laluan untuk tepi lebih bersih; ia lambat, jadi simpan untuk telefon pantas atau klip pendek.</string>
     <string name="export_motion_blur_help">Mengaburkan setiap bingkai klip video mengikut gerakannya, seperti pengatup kamera: Rendah 90°, Sederhana 180° (rupa filem biasa), Tinggi 360°. Ia juga berfungsi apabila klip sudah mempunyai kadar bingkai eksport. Ia perlu menjejak gerakan, jadi ia mengambil masa lebih kurang sama seperti Aliran optik Sederhana.</string>
     <string name="export_phone_speed">Telefon ini: %1$s</string>
+    <string name="smooth_clip">Licin</string>
+    <string name="smooth_intro">Menghasilkan bingkai licin untuk klip ini sekali dan menyimpannya bersama projek, jadi pratonton dan setiap eksport memaparkannya. Klip asal dikekalkan dan boleh dikembalikan.</string>
+    <string name="smooth_method">Kaedah</string>
+    <string name="smooth_nothing">Klip ini sudah mempunyai bingkai yang cukup untuk kadar bingkai projek. Pilih Kabur gerakan atau perlahankan klip terlebih dahulu.</string>
+    <string name="smooth_frame">Pelembutan: bingkai %1$s daripada %2$s…</string>
+    <string name="smooth_saving">Menyimpan klip licin…</string>
+    <string name="smooth_sound_format">Audio klip ini menggunakan format yang tidak dapat dikekalkan, jadi klip tidak dilembutkan.</string>
     <string name="export_list_or">%1$s atau %2$s</string>
     <string name="export_list_and">%1$s dan %2$s</string>
     <string name="export_reason_container_codecs">%1$s memerlukan video %2$s, yang telefon ini tidak dapat hasilkan pada %3$s.</string>

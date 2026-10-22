@@ -984,6 +984,11 @@
         <item quantity="many">Aún no se admiten clips de más de %1$s minutos. Recorta o divide el clip primero.</item>
         <item quantity="other">Aún no se admiten clips de más de %1$s minutos. Recorta o divide el clip primero.</item>
     </plurals>
+    <plurals name="smooth_estimate">
+        <item quantity="one">%1$s fotograma a %2$s fps, %3$s × %4$s, unos %5$s MB.</item>
+        <item quantity="many">%1$s fotogramas a %2$s fps, %3$s × %4$s, unos %5$s MB.</item>
+        <item quantity="other">%1$s fotogramas a %2$s fps, %3$s × %4$s, unos %5$s MB.</item>
+    </plurals>
     <plurals name="aibrowser_estimate">
         <item quantity="one">%1$s fotograma a %2$s × %3$s, unos %4$s MB.</item>
         <item quantity="many">%1$s fotogramas a %2$s × %3$s, unos %4$s MB.</item>
@@ -1350,6 +1355,13 @@
     <string name="export_interpolation_flow_levels">Baja sigue el movimiento de forma aproximada y es la más rápida; va bien con teléfonos básicos. Media es la opción habitual para teléfonos buenos. Alta sigue detalles más finos con más pasadas para bordes más limpios; es lenta, así que úsala con teléfonos rápidos o clips cortos.</string>
     <string name="export_motion_blur_help">Difumina cada fotograma de un clip de video a lo largo de su movimiento, como el obturador de una cámara: Baja 90°, Media 180° (el aspecto cinematográfico habitual), Alta 360°. También funciona cuando un clip ya tiene la velocidad de fotogramas de exportación. Debe seguir el movimiento, así que tarda casi lo mismo que Flujo óptico en Medio.</string>
     <string name="export_phone_speed">Este teléfono: %1$s</string>
+    <string name="smooth_clip">Suavizar</string>
+    <string name="smooth_intro">Genera una vez los fotogramas suavizados de este clip y los guarda con el proyecto, así que la vista previa y cada exportación los muestran. El clip original se conserva y se puede recuperar.</string>
+    <string name="smooth_method">Método</string>
+    <string name="smooth_nothing">Este clip ya tiene suficientes fotogramas para la velocidad de fotogramas del proyecto. Elige Desenfoque de movimiento o ralentiza primero el clip.</string>
+    <string name="smooth_frame">Suavizado: fotograma %1$s de %2$s…</string>
+    <string name="smooth_saving">Guardando el clip suavizado…</string>
+    <string name="smooth_sound_format">El audio de este clip usa un formato que no se puede conservar, así que el clip no se suavizó.</string>
     <string name="export_list_or">%1$s o %2$s</string>
     <string name="export_list_and">%1$s y %2$s</string>
     <string name="export_reason_container_codecs">%1$s necesita video %2$s, que este teléfono no puede generar a %3$s.</string>

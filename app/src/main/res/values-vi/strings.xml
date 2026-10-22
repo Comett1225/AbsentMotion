@@ -942,6 +942,9 @@
     <plurals name="aibrowser_too_long">
         <item quantity="other">Chưa hỗ trợ clip dài hơn %1$s phút. Hãy cắt hoặc tách clip trước.</item>
     </plurals>
+    <plurals name="smooth_estimate">
+        <item quantity="other">%1$s khung hình ở %2$s fps, %3$s × %4$s, khoảng %5$s MB.</item>
+    </plurals>
     <plurals name="aibrowser_estimate">
         <item quantity="other">%1$s khung hình ở %2$s × %3$s, khoảng %4$s MB.</item>
     </plurals>
@@ -1304,6 +1307,13 @@
     <string name="export_interpolation_flow_levels">Thấp theo dõi chuyển động tương đối và nhanh nhất; phù hợp với điện thoại Cơ bản. Trung bình là lựa chọn thường dùng cho điện thoại Tốt. Cao theo dõi chi tiết mịn hơn với nhiều lượt xử lý hơn để viền sạch hơn; chạy chậm nên hãy dùng cho điện thoại Nhanh hoặc clip ngắn.</string>
     <string name="export_motion_blur_help">Làm nhòe từng khung hình của clip video theo hướng chuyển động, giống màn trập máy ảnh: Thấp 90°, Trung bình 180° (kiểu phim thường thấy), Cao 360°. Vẫn hoạt động khi clip đã có tốc độ khung hình khi xuất. Tính năng phải theo dõi chuyển động nên mất khoảng thời gian như Luồng quang học Trung bình.</string>
     <string name="export_phone_speed">Điện thoại này: %1$s</string>
+    <string name="smooth_clip">Làm mượt</string>
+    <string name="smooth_intro">Tạo các khung hình mượt cho clip này một lần và lưu cùng dự án, để bản xem trước và mọi lần xuất đều hiển thị chúng. Clip gốc được giữ lại và có thể khôi phục.</string>
+    <string name="smooth_method">Phương thức</string>
+    <string name="smooth_nothing">Clip này đã có đủ khung hình cho tốc độ khung hình của dự án. Hãy chọn Nhòe chuyển động hoặc làm chậm clip trước.</string>
+    <string name="smooth_frame">Đang làm mượt: khung hình %1$s / %2$s…</string>
+    <string name="smooth_saving">Đang lưu clip mượt…</string>
+    <string name="smooth_sound_format">Âm thanh của clip này dùng định dạng không thể giữ lại, nên clip chưa được làm mượt.</string>
     <string name="export_list_or">%1$s hoặc %2$s</string>
     <string name="export_list_and">%1$s và %2$s</string>
     <string name="export_reason_container_codecs">%1$s cần video %2$s, mà điện thoại này không thể tạo ở %3$s.</string>

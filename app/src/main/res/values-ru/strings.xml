@@ -1005,6 +1005,12 @@
         <item quantity="many">Клипы длиннее %1$s минут пока не поддерживаются. Сначала обрежьте или разделите клип.</item>
         <item quantity="other">Клипы длиннее %1$s минуты пока не поддерживаются. Сначала обрежьте или разделите клип.</item>
     </plurals>
+    <plurals name="smooth_estimate">
+        <item quantity="one">%1$s кадр при %2$s fps, %3$s × %4$s, около %5$s MB.</item>
+        <item quantity="few">%1$s кадра при %2$s fps, %3$s × %4$s, около %5$s MB.</item>
+        <item quantity="many">%1$s кадров при %2$s fps, %3$s × %4$s, около %5$s MB.</item>
+        <item quantity="other">%1$s кадра при %2$s fps, %3$s × %4$s, около %5$s MB.</item>
+    </plurals>
     <plurals name="aibrowser_estimate">
         <item quantity="one">%1$s кадр при %2$s × %3$s, около %4$s MB.</item>
         <item quantity="few">%1$s кадра при %2$s × %3$s, около %4$s MB.</item>
@@ -1373,6 +1379,13 @@
     <string name="export_interpolation_flow_levels">Низкий грубо отслеживает движение и работает быстрее всего; подходит для базовых телефонов. Средний — обычный выбор для хороших телефонов. Высокий отслеживает более мелкие детали с большим числом проходов для более чистых краёв; он медленный, поэтому оставьте его для быстрых телефонов или коротких клипов.</string>
     <string name="export_motion_blur_help">Размывает каждый кадр видеоклипа по направлению движения, как затвор камеры: низкий — 90°, средний — 180° (обычный киношный вид), высокий — 360°. Также работает, если у клипа уже есть частота кадров экспорта. Требуется отслеживание движения, поэтому занимает примерно столько же времени, сколько оптический поток среднего уровня.</string>
     <string name="export_phone_speed">Этот телефон: %1$s</string>
+    <string name="smooth_clip">Сгладить</string>
+    <string name="smooth_intro">Один раз создаёт сглаженные кадры для этого клипа и сохраняет их в проекте, поэтому они отображаются в предпросмотре и при каждом экспорте. Исходный клип сохраняется, и его можно вернуть.</string>
+    <string name="smooth_method">Метод</string>
+    <string name="smooth_nothing">В этом клипе уже достаточно кадров для частоты кадров проекта. Выберите «Размытие в движении» или сначала замедлите клип.</string>
+    <string name="smooth_frame">Сглаживание: кадр %1$s из %2$s…</string>
+    <string name="smooth_saving">Сохранение сглаженного клипа…</string>
+    <string name="smooth_sound_format">Звук этого клипа использует формат, который нельзя сохранить, поэтому клип не был сглажен.</string>
     <string name="export_list_or">%1$s или %2$s</string>
     <string name="export_list_and">%1$s и %2$s</string>
     <string name="export_reason_container_codecs">Для %1$s нужно видео %2$s, которое этот телефон не может создать в %3$s.</string>

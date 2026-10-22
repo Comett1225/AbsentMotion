@@ -942,6 +942,9 @@
     <plurals name="aibrowser_too_long">
         <item quantity="other">คลิปที่ยาวกว่า %1$s นาที ยังไม่รองรับ กรุณาตัดหรือแยกคลิปก่อน</item>
     </plurals>
+    <plurals name="smooth_estimate">
+        <item quantity="other">%1$s เฟรมที่ %2$s fps, %3$s × %4$s, ประมาณ %5$s MB</item>
+    </plurals>
     <plurals name="aibrowser_estimate">
         <item quantity="other">%1$s เฟรมที่ %2$s × %3$s ประมาณ %4$s MB</item>
     </plurals>
@@ -1304,6 +1307,13 @@
     <string name="export_interpolation_flow_levels">ต่ำจะติดตามการเคลื่อนไหวอย่างคร่าว ๆ และเร็วที่สุด เหมาะกับเครื่องระดับพื้นฐาน ปานกลางเป็นตัวเลือกปกติสำหรับเครื่องระดับดี สูงจะติดตามรายละเอียดที่ละเอียดขึ้นด้วยการประมวลผลหลายรอบเพื่อขอบที่สะอาดกว่า แต่ช้า จึงควรใช้กับเครื่องระดับเร็วหรือคลิปสั้น</string>
     <string name="export_motion_blur_help">ทำให้ทุกเฟรมของคลิปวิดีโอเบลอตามการเคลื่อนไหวเหมือนชัตเตอร์กล้อง: ต่ำ 90°, ปานกลาง 180° (ลุคภาพยนตร์ทั่วไป), สูง 360° ยังใช้ได้แม้คลิปจะมีเฟรมเรตเดียวกับตอนส่งออกอยู่แล้ว ต้องติดตามการเคลื่อนไหว จึงใช้เวลาพอ ๆ กับออปติคัลโฟลว์ระดับปานกลาง</string>
     <string name="export_phone_speed">เครื่องนี้: %1$s</string>
+    <string name="smooth_clip">ปรับให้ลื่น</string>
+    <string name="smooth_intro">สร้างเฟรมที่ลื่นสำหรับคลิปนี้ครั้งเดียวและเก็บไว้กับโปรเจกต์ เพื่อให้ตัวอย่างและการส่งออกทุกครั้งแสดงผลออกมา คลิปต้นฉบับยังคงอยู่และเรียกกลับได้</string>
+    <string name="smooth_method">วิธี</string>
+    <string name="smooth_nothing">คลิปนี้มีเฟรมเพียงพอต่อเฟรมเรตของโปรเจกต์แล้ว เลือกโมชันเบลอ หรือลดความเร็วคลิปก่อน</string>
+    <string name="smooth_frame">กำลังปรับให้ลื่น: เฟรม %1$s จาก %2$s…</string>
+    <string name="smooth_saving">กำลังบันทึกคลิปที่ปรับให้ลื่น…</string>
+    <string name="smooth_sound_format">เสียงของคลิปนี้ใช้รูปแบบที่ไม่สามารถเก็บไว้ได้ คลิปจึงไม่ได้ถูกปรับให้ลื่น</string>
     <string name="export_list_or">%1$s หรือ %2$s</string>
     <string name="export_list_and">%1$s และ %2$s</string>
     <string name="export_reason_container_codecs">%1$s ต้องใช้วิดีโอ %2$s ซึ่งโทรศัพท์นี้สร้างที่ %3$s ไม่ได้</string>

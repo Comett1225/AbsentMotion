@@ -3052,6 +3052,17 @@
  "shape_param_tail_width": "Tail Width",
  "shape_param_width": "Width",
  "show_all_fonts": "Show All Fonts",
+ "smooth_clip": "Smooth",
+ "smooth_estimate": {
+  "one": "%1$s frame at %2$s fps, %3$s × %4$s, about %5$s MB.",
+  "other": "%1$s frames at %2$s fps, %3$s × %4$s, about %5$s MB."
+ },
+ "smooth_frame": "Smoothing: frame %1$s of %2$s…",
+ "smooth_intro": "Makes the smooth frames for this clip once and keeps them with the project, so the preview and every export show them. The original clip is kept and can be brought back.",
+ "smooth_method": "Method",
+ "smooth_nothing": "This clip already has enough frames for the project frame rate. Choose Motion Blur, or slow the clip down first.",
+ "smooth_saving": "Saving the smooth clip…",
+ "smooth_sound_format": "The sound of this clip uses a format that cannot be kept, so the clip was not smoothed.",
  "sorting": "Sorting",
  "speed_freeze_frame": "Freeze Frame",
  "speed_remove_keyframes": "Remove Keyframes",

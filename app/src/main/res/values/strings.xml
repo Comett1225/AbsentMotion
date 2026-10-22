@@ -985,6 +985,10 @@
         <item quantity="one">Clips longer than %1$s minute are not supported yet. Trim or split the clip first.</item>
         <item quantity="other">Clips longer than %1$s minutes are not supported yet. Trim or split the clip first.</item>
     </plurals>
+    <plurals name="smooth_estimate">
+        <item quantity="one">%1$s frame at %2$s fps, %3$s × %4$s, about %5$s MB.</item>
+        <item quantity="other">%1$s frames at %2$s fps, %3$s × %4$s, about %5$s MB.</item>
+    </plurals>
     <plurals name="aibrowser_estimate">
         <item quantity="one">%1$s frame at %2$s × %3$s, about %4$s MB.</item>
         <item quantity="other">%1$s frames at %2$s × %3$s, about %4$s MB.</item>
@@ -1351,6 +1355,13 @@
     <string name="export_interpolation_flow_levels">Low tracks motion roughly and is the quickest; it suits Basic phones. Medium is the usual choice for Good phones. High tracks finer detail with more passes for cleaner edges; it is slow, so keep it for Fast phones or short clips.</string>
     <string name="export_motion_blur_help">Smears every frame of a video clip along its motion, like a camera shutter: Low 90°, Medium 180° (the usual film look), High 360°. It also works when a clip already has the export frame rate. It has to track motion, so it takes about as long as Optical flow Medium.</string>
     <string name="export_phone_speed">This phone: %1$s</string>
+    <string name="smooth_clip">Smooth</string>
+    <string name="smooth_intro">Makes the smooth frames for this clip once and keeps them with the project, so the preview and every export show them. The original clip is kept and can be brought back.</string>
+    <string name="smooth_method">Method</string>
+    <string name="smooth_nothing">This clip already has enough frames for the project frame rate. Choose Motion Blur, or slow the clip down first.</string>
+    <string name="smooth_frame">Smoothing: frame %1$s of %2$s…</string>
+    <string name="smooth_saving">Saving the smooth clip…</string>
+    <string name="smooth_sound_format">The sound of this clip uses a format that cannot be kept, so the clip was not smoothed.</string>
     <string name="export_list_or">%1$s or %2$s</string>
     <string name="export_list_and">%1$s and %2$s</string>
     <string name="export_reason_container_codecs">%1$s needs %2$s video, which this phone cannot make at %3$s.</string>
