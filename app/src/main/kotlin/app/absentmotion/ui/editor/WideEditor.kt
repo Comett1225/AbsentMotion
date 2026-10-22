@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -30,6 +29,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import app.absentmotion.editor.EditorState
+import app.absentmotion.editor.MultiSelect
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Presence
 import app.absentmotion.ui.theme.enterFade
@@ -46,28 +46,43 @@ val PhoneHeight = 832.dp
 
 val PanelHeight = 200.dp
 
-private val SideWidth = 420.dp
+private val SideWidth = 320.dp
 
 @Composable
 internal fun WideEditorBody(state: EditorState, onExit: () -> Unit, addLibrary: AddLibrary) {
     BoxWithConstraints(Modifier.fillMaxSize().background(Am.TopBar).systemBarsPadding().displayCutoutPadding()) {
         val timeline = (maxHeight - 88.dp - 260.dp).coerceIn(140.dp, 320.dp)
+        val side = state.selectedId != null && !state.addOpen && !MultiSelect.active
+        val reserve = if (side) SideWidth else 0.dp
         Column(Modifier.fillMaxSize()) {
             EditorTopBar(state, onExit, Modifier.fillMaxWidth().height(42.dp).enterFade())
-            Row(Modifier.fillMaxWidth().weight(1f)) {
-                Box(Modifier.weight(1f).fillMaxHeight()) {
-                    Preview(state, Modifier.fillMaxSize())
+            Box(Modifier.fillMaxWidth().weight(1f)) {
+                Preview(state, Modifier.fillMaxSize(), reserveEnd = reserve)
+                Box(Modifier.fillMaxSize().padding(end = reserve)) {
                     Presence(state.previewPanelOpen) { PreviewModePanel(state, Modifier.align(Alignment.CenterEnd).presence(slideX = 0.4f)) }
                     AnimateButton(state, Modifier.align(Alignment.BottomEnd))
                     HistoryNotes(state, Modifier.align(Alignment.BottomCenter))
                 }
-                Box(Modifier.width(SideWidth).fillMaxHeight().background(Am.TimelineBg)) { LowerPanels(state, addLibrary, top = true) }
+                if (side) SidePanels(state, addLibrary, Modifier.align(Alignment.CenterEnd))
             }
             Box(Modifier.fillMaxWidth().height(46.dp).background(Am.TimelineBg)) {
                 PlayBar(state, Modifier.align(Alignment.Center).widthIn(max = 560.dp).fillMaxSize())
                 LevelMeter(state, Modifier.align(Alignment.BottomStart).fillMaxWidth().height(2.1.dp))
             }
-            Timeline(state, Modifier.fillMaxWidth().height(timeline).background(Am.TimelineBg))
+            Box(Modifier.fillMaxWidth().height(timeline).background(Am.TimelineBg)) {
+                Timeline(state, Modifier.fillMaxSize())
+                if (!side) LowerPanels(state, addLibrary)
+            }
+        }
+    }
+}
+
+@Composable
+private fun SidePanels(state: EditorState, addLibrary: AddLibrary, modifier: Modifier) {
+    val density = LocalDensity.current
+    Box(modifier.width(SideWidth).fillMaxHeight().background(Am.Panel).pointerInput(Unit) {}) {
+        CompositionLocalProvider(LocalDensity provides Density(density.density * (SideWidth / PhoneWidth), density.fontScale)) {
+            LowerPanels(state, addLibrary, top = true)
         }
     }
 }

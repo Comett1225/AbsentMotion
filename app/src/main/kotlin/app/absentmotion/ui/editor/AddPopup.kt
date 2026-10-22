@@ -35,6 +35,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import app.absentmotion.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.window.Dialog
@@ -103,8 +104,9 @@ private val Tabs = listOf(
 internal fun AddPopup(state: EditorState, modifier: Modifier = Modifier, library: AddLibrary) {
     var selectedTab by remember { mutableIntStateOf(0) }
     BackHandler { state.addOpen = false }
+    val tablet = isTablet(LocalConfiguration.current.smallestScreenWidthDp)
     Row(modifier.clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)).background(PopupBar)) {
-        Column(Modifier.width(326.dp).fillMaxHeight()) {
+        Column((if (tablet) Modifier.weight(1f) else Modifier.width(326.dp)).fillMaxHeight()) {
             Row(Modifier.padding(start = 6.dp).height(58.dp)) {
                 Tabs.forEachIndexed { i, tab -> TabButton(tab, active = i == selectedTab, enabled = i <= 4) { selectedTab = i } }
             }
@@ -113,7 +115,7 @@ internal fun AddPopup(state: EditorState, modifier: Modifier = Modifier, library
                 when (selectedTab) { 0 -> ShapePages(state, Modifier.fillMaxSize()); 1 -> MediaTab(state, Modifier.fillMaxSize(), library); 3 -> ObjectPage(state, Modifier.fillMaxSize()); 4 -> TemplatePage(state, Modifier.fillMaxSize()); else -> AudioTab(state, Modifier.fillMaxSize(), library) }
             }
         }
-        QuickBar(state, Modifier.weight(1f).fillMaxHeight())
+        QuickBar(state, (if (tablet) Modifier.width(64.dp) else Modifier.weight(1f)).fillMaxHeight())
     }
 }
 
@@ -137,12 +139,13 @@ private fun TabButton(tab: Tab, active: Boolean, enabled: Boolean, onClick: () -
 @Composable
 private fun ShapePages(state: EditorState, modifier: Modifier) = androidx.compose.foundation.layout.BoxWithConstraints(modifier) {
     val rows = maxOf(3, ((maxHeight - 20.dp) / 61.dp).toInt())
-    val pages = ShapeCatalog.all.chunked(rows * 6)
+    val columns = maxOf(6, ((maxWidth - 9.6.dp) / 50.84.dp).toInt())
+    val pages = ShapeCatalog.all.chunked(rows * columns)
     val pager = rememberPagerState { pages.size }
     Box(Modifier.fillMaxSize()) {
         HorizontalPager(pager, Modifier.fillMaxSize(), beyondViewportPageCount = 1) { page ->
             Column(Modifier.padding(start = 9.6.dp, top = 8.9.dp)) {
-                for (row in pages[page].chunked(6)) {
+                for (row in pages[page].chunked(columns)) {
                     Row {
                         for (def in row) {
                             val press = remember { MutableInteractionSource() }
