@@ -45,3 +45,16 @@ def adb(*args, check=False):
 def api_level():
     text = adb("shell", "getprop", "ro.build.version.sdk").strip()
     return int(text) if text.isdigit() else 0
+
+
+def pull_app_file(remote, local):
+    def pull():
+        return subprocess.run(adb_command() + ["pull", str(remote), str(local)], capture_output=True).returncode == 0
+    if pull():
+        return
+    if adb("shell", "getprop", "ro.debuggable").strip() == "1":
+        adb("root")
+        adb("wait-for-device")
+        if pull():
+            return
+    raise RuntimeError(f"cannot read {remote} from the device: adb pull is refused and the device cannot run adb as root")

@@ -22,13 +22,14 @@ FILES = f"/sdcard/Android/data/{sdk.PACKAGE}/files"
 
 def export(kind, extra, timeout):
     sdk.adb("shell", "am", "force-stop", sdk.PACKAGE)
+    sdk.adb("shell", "rm", "-f", f"{FILES}/export.gif", f"{FILES}/export.mp4")
     sdk.adb("logcat", "-c")
     sdk.adb("shell", "am", "start", "-n", f"{sdk.PACKAGE}/.MainActivity", "--es", "xml", f"/data/data/{sdk.PACKAGE}/files/export-smoke.xml",
             "--es", "export", kind, "--ei", "fps", "30", *extra)
     deadline = time.time() + timeout
     while time.time() < deadline:
         log = sdk.adb("logcat", "-d", "-s", "AMExport", "AndroidRuntime")
-        done = next((line for line in log.splitlines() if "AMExport: done" in line), None)
+        done = next((line for line in log.splitlines() if "AMExport: done" in line and (".gif" in line) == (kind == "gif")), None)
         if done:
             return done.split("done ", 1)[1].split(" ms=")[0], log
         if "AMExport: failed" in log or "FATAL EXCEPTION" in log:
@@ -64,9 +65,10 @@ def main():
     ok = True
     for kind in args.kinds.split(","):
         remote, log = export(kind, ["--ei", "short", "256"], args.timeout)
+        remote = remote.replace("/storage/emulated/0/", "/sdcard/")
         path = next((line.split("through ", 1)[1] for line in log.splitlines() if "AMExport: rendering" in line), "")
         local = work / Path(remote).name
-        sdk.adb("pull", remote, local, check=True)
+        sdk.pull_app_file(remote, local)
         sdk.adb("shell", "rm", remote)
         if kind == "gif":
             frames = Image.open(local)

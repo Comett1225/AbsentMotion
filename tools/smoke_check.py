@@ -57,7 +57,7 @@ def main():
     if "still smoke ok=true" not in log:
         sys.exit("smoke_check: no still was rendered within the time limit:\n" + log[-800:])
     png = work / "smoke.png"
-    sdk.adb("pull", f"/sdcard/Android/data/{package}/files/smoke.png", png, check=True)
+    sdk.pull_app_file(f"/sdcard/Android/data/{package}/files/smoke.png", png)
     sdk.adb("shell", "rm", f"/sdcard/Android/data/{package}/files/smoke.png")
     image = np.asarray(Image.open(png).convert("RGB")).astype(int)
     h, w = image.shape[:2]

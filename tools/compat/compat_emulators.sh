@@ -4,13 +4,15 @@ cd "$(dirname "$0")/../.."
 . tools/env.sh
 keep=0
 port=5560
+gpu=host
 apis=""
 for arg in "$@"; do
     case "$arg" in
         --keep) keep=1 ;;
         --port=*) port="${arg#--port=}" ;;
+        --gpu=*) gpu="${arg#--gpu=}" ;;
         28|29|30|31|32) apis="$apis $arg" ;;
-        *) echo "usage: tools/compat/compat_emulators.sh [--keep] [--port=5560] [28 30 32]   (one emulator at a time; images and AVDs are deleted afterwards unless --keep)" >&2; exit 2 ;;
+        *) echo "usage: tools/compat/compat_emulators.sh [--keep] [--port=5560] [--gpu=host|swiftshader_indirect] [28 30 32]   (one emulator at a time; images and AVDs are deleted afterwards unless --keep)" >&2; exit 2 ;;
     esac
 done
 [ -n "$apis" ] || apis="28 30 32"
@@ -30,8 +32,8 @@ for api in $apis; do
     printf '\n== Android API %s (%s)\n' "$api" "$image"
     [ "$had" = 1 ] || yes | "$tools/sdkmanager" "$image" >/dev/null || { echo "cannot install $image" >&2; failed=$((failed + 1)); continue; }
     echo no | "$tools/avdmanager" create avd -n "$name" -k "$image" -d pixel_4 --force >/dev/null
-    printf 'hw.ramSize=2048\nhw.gpu.enabled=yes\nhw.gpu.mode=swiftshader_indirect\n' >> "$avds/$name.avd/config.ini"
-    "$SDK_ROOT/emulator/emulator" -avd "$name" -port "$port" -no-window -no-audio -no-snapshot -no-boot-anim -gpu swiftshader_indirect >"build/compat-emulator-$api.log" 2>&1 &
+    printf 'hw.ramSize=2048\nhw.gpu.enabled=yes\nhw.gpu.mode=%s\n' "$gpu" >> "$avds/$name.avd/config.ini"
+    "$SDK_ROOT/emulator/emulator" -avd "$name" -port "$port" -no-window -no-audio -no-snapshot -no-boot-anim -gpu "$gpu" >"build/compat-emulator-$api.log" 2>&1 &
     pid=$!
     "$ADB" -s "$serial" wait-for-device
     booted=0
