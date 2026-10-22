@@ -280,6 +280,8 @@ bool ParseLayer(const XmlNode& node, int fps, Layer* out) {
     }
     const char* id = n->attr("id");
     l.id = id ? strtoll(id, nullptr, 10) : 0;
+    const char* noise = n->attr("noiseId");
+    l.noiseId = noise ? strtoll(noise, nullptr, 10) : 0;
     l.label = StrAttr(*n, "label");
     l.shape = StrAttr(*n, "s");
     l.fillType = StrAttr(*n, "fillType");

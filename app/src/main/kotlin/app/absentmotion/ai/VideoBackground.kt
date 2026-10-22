@@ -117,30 +117,81 @@ internal fun Yuv.argb(outWidth: Int, outHeight: Int, standard: Int = 0, fullRang
 
 private fun channel(v: Float): Int = v.roundToInt().coerceIn(0, 255)
 
-internal fun Scene.withVideoMatte(original: Layer, matte: MediaDeclaration, frameWidth: Int, frameHeight: Int, matteId: Long, groupId: Long): Scene? {
-    if (original.shape.isEmpty() || original.mediaFill?.video != true || layer(original.id) == null) return null
-    val mode = original.mediaFill?.mode ?: MediaFillMode.Fill
-    val fallback = if (original.shape == ".stamp") 150f else 100f
+internal val MatteFollowedEffects = setOf(
+    "absent.autoshake", "absent.bend", "absent.box", "absent.bulge",
+    "absent.circularripple", "absent.cross", "absent.cube", "absent.curl",
+    "absent.cylinder", "absent.displacementmap", "absent.echo", "absent.ellipsoid",
+    "absent.flip", "absent.fractalwarp", "absent.glass", "absent.glitch",
+    "absent.gridrepeat", "absent.heart", "absent.hexagontilerotate", "absent.hexagontileshift",
+    "absent.hexagontiling", "absent.hexprism", "absent.hollowbox", "absent.innerbulge",
+    "absent.kaleidoscope", "absent.linearrepeat", "absent.magnifybackground", "absent.mirror",
+    "absent.movealongpath", "absent.noisedisplace", "absent.octahedron", "absent.offset",
+    "absent.ominoglass", "absent.oscillate", "absent.polar", "absent.polardisplacement",
+    "absent.pulsesize", "absent.pyramid", "absent.radialrepeat",
+    "absent.randomdisplace", "absent.randomjitter", "absent.rasterextrude", "absent.reorient360",
+    "absent.repeat", "absent.repeatalongpath", "absent.ripple", "absent.scatterfield",
+    "absent.shutterblur", "absent.spherize", "absent.spin", "absent.squeeze",
+    "absent.starpolyhedron", "absent.starprism", "absent.stretch", "absent.stretchaxis",
+    "absent.swing", "absent.tile", "absent.tilerotate", "absent.tiles",
+    "absent.tileshift", "absent.torus", "absent.tunnel", "absent.turbulentdisplace",
+    "absent.twirl", "absent.viewer360", "absent.wavewarp",
+)
+
+private val MatteTimeAttributes = listOf("startTime", "endTime", "inTime", "outTime", "speed", "loop", "parent")
+
+private fun lumaKey() = XmlNode("effect", linkedMapOf("id" to "absent.lumakey", "hidden" to "false"), listOf(
+    XmlNode("property", linkedMapOf("name" to "threshold", "type" to "float", "value" to "0.03")),
+    XmlNode("property", linkedMapOf("name" to "softness", "type" to "float", "value" to "0.94")),
+))
+
+private fun Layer.matteSize(frameWidth: Int, frameHeight: Int): XmlNode {
+    val mode = mediaFill?.mode ?: MediaFillMode.Fill
+    val fallback = if (shape == ".stamp") 150f else 100f
     fun half(value: String?): String {
         val size = floats(value, floatArrayOf(fallback, fallback))
         return formatFloats(mediaHalf(abs(size[0]), abs(size[1]), frameWidth, frameHeight, mode))
     }
-    val size = original.node.children.firstOrNull { it.name == "property" && it["name"] == "size" }
-    val matteSize = XmlNode("property", linkedMapOf("name" to "size", "type" to "vec2"), size?.children?.filter { it.name == "kf" }?.map { it.with("v", half(it["v"])) }.orEmpty())
+    val size = node.children.firstOrNull { it.name == "property" && it["name"] == "size" }
+    return XmlNode("property", linkedMapOf("name" to "size", "type" to "vec2"), size?.children?.filter { it.name == "kf" }?.map { it.with("v", half(it["v"])) }.orEmpty())
         .let { if (it.children.isEmpty()) it.with("value", half(size?.get("value"))) else it }
+}
+
+internal fun Layer.followingOriginal(original: Layer): Layer {
+    val frame = node["matteFrame"]?.split(',')?.mapNotNull { it.toIntOrNull() }?.takeIf { it.size == 2 && it.all { v -> v > 0 } }
+    val size = if (frame != null) original.matteSize(frame[0], frame[1]) else node.children.firstOrNull { it.name == "property" && it["name"] == "size" }
+    val transform = original.node.child("transform")?.let { it.copy(children = it.children.filterNot { c -> c.name == "opacity" }) }
+    val moving = original.effects.filter { it["id"] == "absent.timequant" || it["id"] in MatteFollowedEffects }
+    val attrs = MatteTimeAttributes.fold(node) { acc, key -> acc.with(key, original.node[key]) }.with("noiseId", "${original.id}")
+    return copy(node = attrs.copy(children = listOfNotNull(transform, original.node.child("speedMap"), size, node.child("gain")) + moving + lumaKey()))
+}
+
+internal fun Scene.withVideoMatte(original: Layer, matte: MediaDeclaration, frameWidth: Int, frameHeight: Int, matteId: Long, groupId: Long): Scene? {
+    if (original.shape.isEmpty() || original.mediaFill?.video != true || layer(original.id) == null) return null
     val attrs = linkedMapOf("id" to "$matteId", "label" to AppText.get(R.string.ai_video_mask_name, original.label.ifEmpty { AppText.get(R.string.model_layer_video) }))
-    for (key in listOf("startTime", "endTime", "inTime", "outTime", "speed", "loop", "parent")) original.node[key]?.let { attrs[key] = it }
-    attrs += listOf("s" to ".rect", "fillType" to "media", "fillVideo" to matte.uri, "mediaFillMode" to "stretch")
-    val key = XmlNode("effect", linkedMapOf("id" to "absent.lumakey", "hidden" to "false"), listOf(
-        XmlNode("property", linkedMapOf("name" to "threshold", "type" to "float", "value" to "0.03")),
-        XmlNode("property", linkedMapOf("name" to "softness", "type" to "float", "value" to "0.94")),
-    ))
-    val node = XmlNode("shape", attrs, listOfNotNull(
-        original.node.child("transform"), original.node.child("speedMap"), matteSize, XmlNode("gain", linkedMapOf("value" to "0")),
-    ) + original.effects.filter { it["id"] == "absent.timequant" } + key)
-    val children = node.let { added -> this.node.children.flatMap { if (it.name in Scene.LAYER_TAGS && Layer(it).id == original.id) listOf(it, added) else listOf(it) } }
+    attrs += listOf("s" to ".rect", "fillType" to "media", "fillVideo" to matte.uri, "mediaFillMode" to "stretch", "matteFrame" to "$frameWidth,$frameHeight")
+    val node = Layer(XmlNode("shape", attrs, listOf(XmlNode("gain", linkedMapOf("value" to "0"))))).followingOriginal(original).node
+    val children = this.node.children.flatMap { if (it.name in Scene.LAYER_TAGS && Layer(it).id == original.id) listOf(it, node) else listOf(it) }
     val withMatte = Scene(this.node.copy(children = children)).withMedia(matte)
     return withMatte.grouped(setOf(original.id, matteId), "mask", groupId, AppText.get(R.string.ai_video_cut_out_name, original.label.ifEmpty { AppText.get(R.string.model_layer_video) }))
+}
+
+private fun Scene.followMattes(): Scene {
+    val matte = layers.getOrNull(1)?.takeIf { it.node.child("gain") != null && it.effects.any { e -> e["id"] == "absent.lumakey" } } ?: return this
+    val original = layers[0].takeIf { it.kind == "shape" && it.mediaFill?.video == true } ?: return this
+    val followed = matte.followingOriginal(original)
+    return if (followed == matte) this else update(matte.id) { followed }
+}
+
+internal fun Scene.withMattesFollowing(): Scene {
+    var changed = false
+    val children = node.children.map { child ->
+        val group = if (child.name == "embedScene") Layer(child) else return@map child
+        val inner = group.node.child("scene") ?: return@map child
+        var scene = Scene(inner).withMattesFollowing()
+        if (group.aiMarks.any { it.kind == AiKind.Video }) scene = scene.followMattes()
+        if (scene.node == inner) child else child.withChild("scene", scene.node).also { changed = true }
+    }
+    return if (changed) Scene(node.copy(children = children)) else this
 }
 
 internal class MatteEncoder private constructor(private val codec: MediaCodec, private val muxer: MediaMuxer, val width: Int, val height: Int) : Closeable {

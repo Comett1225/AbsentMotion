@@ -6,6 +6,8 @@ import app.absentmotion.model.Layer
 import app.absentmotion.model.MediaDeclaration
 import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
+import app.absentmotion.effects.EffectCatalog
+import app.absentmotion.model.addEffect
 import app.absentmotion.model.effects
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
@@ -13,6 +15,7 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.io.File
 import java.nio.ByteBuffer
 
 class VideoBackgroundTest {
@@ -126,5 +129,27 @@ class VideoBackgroundTest {
         val image = Layer(XmlNode("shape", linkedMapOf("id" to "1", "fillType" to "media", "fillImage" to "p.png", "s" to ".rect")))
         val scene = Scene(Scene.create("t", 100, 100, 30, 0).node.copy(children = listOf(image.node)))
         assertNull(scene.withVideoMatte(image, MediaDeclaration(XmlNode("media", mapOf("uri" to "m.mp4"))), 10, 10, 2, 3))
+    }
+
+    @Test fun theMaskFollowsTheClipAfterLaterEdits() {
+        val scene = Scene(Scene.create("t", 1080, 1920, 30, 0).node.copy(children = listOf(XmlNode("media", mapOf("uri" to "v.mp4")), video().node)))
+        val grouped = scene.withVideoMatte(scene.layer(1)!!, MediaDeclaration(XmlNode("media", mapOf("uri" to "m.mp4"))), 200, 100, 2, 3)!!
+            .update(3) { it.withAiMark(AiKind.Video, null, null) }
+        val shake = XmlNode("effect", linkedMapOf("id" to "absent.randomdisplace", "hidden" to "false"))
+        val colour = XmlNode("effect", linkedMapOf("id" to "absent.sepia", "hidden" to "false"))
+        val inner = grouped.layer(3)!!.nested!!.update(1) { it.addEffect(shake).addEffect(colour).withTransform("location", 10f, 20f, 0f).withTransform("opacity", 0.5f) }
+        val edited = grouped.update(3) { it.copy(node = it.node.withChild("scene", inner.node)) }.withMattesFollowing()
+        val mask = edited.layer(3)!!.nested!!.layer(2)!!
+        assertEquals(listOf("absent.randomdisplace", "absent.lumakey"), mask.effects.map { it["id"] })
+        assertEquals("1", mask.node["noiseId"])
+        assertEquals(listOf(10f, 20f, 0f), mask.transform("location", 0f).toList())
+        assertEquals(1f, mask.transform("opacity", 1f)[0])
+        assertEquals(edited, edited.withMattesFollowing())
+    }
+
+    @Test fun everyMotionAndDistortionEffectIsFollowed() {
+        val catalog = EffectCatalog.parse { File("src/main/assets/effects", it).inputStream() }
+        val expected = catalog.definitions.filter { it.category in setOf("move", "distort", "repeat", "3d") }.map { it.id }.toSet() - setOf("absent.timequant", "absent.pulseopacity")
+        assertEquals(expected, MatteFollowedEffects)
     }
 }

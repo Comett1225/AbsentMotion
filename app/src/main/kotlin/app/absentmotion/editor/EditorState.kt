@@ -2,6 +2,7 @@ package app.absentmotion.editor
 
 import androidx.annotation.StringRes
 import app.absentmotion.R
+import app.absentmotion.ai.withMattesFollowing
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -200,7 +201,7 @@ class EditorState(
 
     fun edit(key: Any? = null, change: (Scene) -> Scene) {
         Glide.interrupt()
-        history.edit(key, change(scene))
+        history.edit(key, change(scene).withMattesFollowing())
     }
 
     fun endGesture() {

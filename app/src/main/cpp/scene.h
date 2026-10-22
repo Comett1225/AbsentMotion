@@ -124,6 +124,7 @@ struct Sight {
 
 struct Layer {
     int64_t id = 0;
+    int64_t noiseId = 0;
     std::string kind;
     std::string label, shape, fillType;
     std::string mediaUri, mediaFillMode;

@@ -81,7 +81,7 @@ uint64_t Mix(uint64_t x) {
 
 uint64_t SeedOf(const Layer& l, const LayerEffect& e, float t, uint64_t channel) {
     const int64_t seed = std::llround((double)Param(e, "seed", t, 1) * 1000);
-    return Mix(Mix((uint64_t)l.id) ^ Mix((uint64_t)seed + 0x51ed27ull) ^ (channel * 0x632be59bd9b4e019ull));
+    return Mix(Mix((uint64_t)(l.noiseId ? l.noiseId : l.id)) ^ Mix((uint64_t)seed + 0x51ed27ull) ^ (channel * 0x632be59bd9b4e019ull));
 }
 
 double Unit(uint64_t seed, int64_t k) { return (Mix(seed ^ Mix((uint64_t)k)) >> 11) * (1.0 / 9007199254740992.0); }
