@@ -8,6 +8,7 @@ import app.absentmotion.i18n.txt
 enum class Feature(@StringRes val label: Int, val inCompatible: Boolean) {
     FlowHigh(R.string.feature_flow_high, inCompatible = false),
     AiSmooth(R.string.export_interpolation_ai, inCompatible = false),
+    AiEnhance(R.string.feature_ai_enhance, inCompatible = false),
 }
 
 object Tier {

@@ -72,6 +72,8 @@ private const val GOOD_RAM = 4_000_000_000L
 private const val STRUGGLE_SECONDS = 45 * 60.0
 private const val CPU_STRUGGLE_SECONDS = 10 * 60.0
 private const val CANNOT_SECONDS = 8 * 3600.0
+private const val BENCH_SIDE = 96
+private const val PROBE_SIDE = 16
 private const val PROBE_MS = 45_000L
 private const val GPU_OK = "ok"
 private const val GPU_USE = "use"
@@ -146,9 +148,10 @@ internal object AiDevice {
         val work = running[model]?.takeIf { it.isActive } ?: probes.async {
             val ok = try {
                 AiNet.open(context, model, gpu = true).use { net ->
-                    val padding = SmoothLevel.entries.first { it.model == model }.padding
-                    val input = IntArray(padding * padding) { 0xFF808080.toInt() }
-                    net.interpolate(input, input, padding, padding, 0.5f, padding)
+                    val smooth = SmoothLevel.entries.firstOrNull { it.model == model }
+                    val side = smooth?.padding ?: PROBE_SIDE
+                    val input = IntArray(side * side) { 0xFF808080.toInt() }
+                    if (smooth != null) net.interpolate(input, input, side, side, 0.5f, smooth.padding) else net.upscale(input, side, side, 1)
                     net.onGpu
                 }
             } catch (e: CancellationException) {
@@ -173,18 +176,19 @@ internal object AiDevice {
 
     suspend fun benchmark(context: Context, model: AiModel): Double? {
         if (!model.installed(context)) return null
-        val padding = SmoothLevel.entries.first { it.model == model }.padding
-        val side = padding * 2
+        val smooth = SmoothLevel.entries.firstOrNull { it.model == model }
+        val side = smooth?.padding?.times(2) ?: BENCH_SIDE
         val input = IntArray(side * side) { 0xFF000000.toInt() or ((it * 2654435761L).toInt() and 0xFFFFFF) }
         val gpu = probeGpu(context, model)
         rates[model to gpu]?.let { return it }
         return try {
             withContext(Dispatchers.IO) { AiNet.open(context, model) }.use { net ->
-                suspend fun once() = net.interpolate(input, input, side, side, 0.5f, padding)
+                suspend fun once() = if (smooth != null) net.interpolate(input, input, side, side, 0.5f, smooth.padding) else net.upscale(input, side, side, 1)
                 once()
                 val start = SystemClock.elapsedRealtimeNanos()
                 once()
-                (model.gmacPerMegapixel * side * side / 1e6 / ((SystemClock.elapsedRealtimeNanos() - start) / 1e9).coerceAtLeast(1e-4)).also { rates[model to net.onGpu] = it }
+                val pixels = if (smooth != null) side * side else (side + 2 * AiNet.OVERLAP) * (side + 2 * AiNet.OVERLAP)
+                (model.gmacPerMegapixel * pixels / 1e6 / ((SystemClock.elapsedRealtimeNanos() - start) / 1e9).coerceAtLeast(1e-4)).also { rates[model to net.onGpu] = it }
             }
         } catch (e: CancellationException) {
             throw e

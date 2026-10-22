@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.annotation.StringRes
 import app.absentmotion.R
 import app.absentmotion.i18n.AppText
+import app.absentmotion.ui.home.HOME_PAGE
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
@@ -15,12 +16,15 @@ import java.util.concurrent.ConcurrentHashMap
 
 internal class ModelFile(val name: String, val url: String, val bytes: Long, val sha256: String)
 
+internal const val MODEL_RELEASE = "$HOME_PAGE/releases/download/ai-models-1/"
 private const val RIFE_SOURCE = "https://raw.githubusercontent.com/TNTwise/rife-ncnn-vulkan/13338e38debe2e400b3eeecf6792312d01a692f9/models/"
 
 private fun rife(folder: String, paramBytes: Long, paramSha: String, binBytes: Long, binSha: String) = listOf(
     ModelFile("flownet.param", "$RIFE_SOURCE$folder/flownet.param", paramBytes, paramSha),
     ModelFile("flownet.bin", "$RIFE_SOURCE$folder/flownet.bin", binBytes, binSha),
 )
+
+private fun hosted(name: String, bytes: Long, sha: String) = ModelFile(name, MODEL_RELEASE + name, bytes, sha)
 
 internal enum class AiModel(val folder: String, @StringRes val title: Int, val licence: String, val gmacPerMegapixel: Double, val files: List<ModelFile>) {
     SmoothLow("rife-v4.25-lite", R.string.ai_model_smooth_low, "RIFE 4.25 lite (MIT)", 10.7, rife("rife-v4.25-lite",
@@ -31,10 +35,18 @@ internal enum class AiModel(val folder: String, @StringRes val title: Int, val l
         11_360_684, "10de487a095e61cb2971c39e3b5e17005a70fba6201c77fb96e063f4423b583f")),
     SmoothHigh("rife-v4.26-large", R.string.ai_model_smooth_high, "RIFE 4.26 large (MIT)", 25.3, rife("rife-v4.26-large",
         35_833, "5b26d92a5d67f95f8d95dc2d3360c30ec4576128dc7505a5475127a022234e86",
-        11_483_660, "6b2606352ff5c7da1c0affcea3a572e651c02ead1d2514b9670f1d67769cbdd2"));
+        11_483_660, "6b2606352ff5c7da1c0affcea3a572e651c02ead1d2514b9670f1d67769cbdd2")),
+    Detail("realesr-general-x4v3", R.string.ai_model_detail, "Real-ESRGAN general x4v3 (BSD-3-Clause)", 1209.0, listOf(
+        hosted("realesr-general-x4v3.param", 5_585, "88b2c9de3a4702dd1f3d6c73a55ef9539e3d955891e5cd33a9d300d623a1de86"),
+        hosted("realesr-general-x4v3.bin", 2_435_272, "01450f4a79b81c0f1f3eeefc31121167886125c25e41a6d4773e8ec8062528a1"))),
+    Grain("realesr-general-wdn-x4v3", R.string.ai_model_grain, "Real-ESRGAN general wdn x4v3 (BSD-3-Clause)", 1209.0, listOf(
+        hosted("realesr-general-wdn-x4v3.bin", 2_435_272, "bdd5bdc7da2c83411ced54c37a6646aebfe1b3f780bb7e6f877dd8934fbd3cc5"))),
+    Cartoon("realesr-animevideov3", R.string.ai_model_cartoon, "Real-ESRGAN animevideov3 (BSD-3-Clause)", 619.2, listOf(
+        hosted("realesr-animevideov3-x4.param", 3_077, "850a248e7c14c27e5bd8cf7265113a9441036a7db63963bb8aa5169d788a435e"),
+        hosted("realesr-animevideov3-x4.bin", 1_247_368, "548a36f9c3f4ab8da56cd3b13badf23968bee207b396dad14d04b830e5f2ab2d")));
 
     val bytes: Long get() = files.sumOf { it.bytes }
-    val param: String get() = files.first { it.name.endsWith(".param") }.name
+    val param: String? get() = files.firstOrNull { it.name.endsWith(".param") }?.name
     val bin: String get() = files.first { it.name.endsWith(".bin") }.name
 
     fun dir(context: Context) = File(context.filesDir, "models/ai/$folder")
@@ -83,10 +95,6 @@ internal enum class AiModel(val folder: String, @StringRes val title: Int, val l
         private val checked = ConcurrentHashMap<String, Pair<Long, Long>>()
 
         fun downloaded(context: Context) = entries.filter { it.onDisk(context) > 0 }
-
-        fun removeRetired(context: Context) {
-            File(context.filesDir, "models/ai").listFiles()?.filter { dir -> entries.none { it.folder == dir.name } }?.forEach { it.deleteRecursively() }
-        }
     }
 }
 

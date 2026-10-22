@@ -30,13 +30,15 @@ import java.util.UUID
 import kotlin.math.sqrt
 
 enum class AiAction(@StringRes val title: Int) {
-    Background(R.string.ai_remove_background), Noise(R.string.ai_reduce_noise), Video(R.string.ai_remove_background_video), Smooth(R.string.smooth_clip);
+    Background(R.string.ai_remove_background), Noise(R.string.ai_reduce_noise), Video(R.string.ai_remove_background_video), Smooth(R.string.smooth_clip),
+    Enhance(R.string.ai_enhance);
 
-    val offered: Boolean get() = this == Noise || this != Smooth && BackgroundRemoval.AVAILABLE
+    val offered: Boolean get() = this == Noise || this == Enhance || this != Smooth && BackgroundRemoval.AVAILABLE
 
     fun unavailable(layer: Layer?): UiText? = when (this) {
         Background -> if (layer?.mediaFill?.video == false) null else txt(R.string.ai_select_image_layer)
         Noise -> if (layer?.kind == "audio") null else txt(R.string.ai_select_audio_layer)
+        Enhance -> app.absentmotion.Tier.reason(app.absentmotion.Feature.AiEnhance) ?: if (layer?.mediaFill?.video == true) null else txt(R.string.ai_select_video_layer)
         Video, Smooth -> if (layer?.mediaFill?.video == true) null else txt(R.string.ai_select_video_layer)
     }
 }
@@ -61,6 +63,8 @@ class AiTools(private val context: Context, private val state: EditorState, priv
     var smoothSetup by mutableStateOf<Layer?>(null)
     var smoothing by mutableStateOf(Smoothing(FrameInterpolation.Flow))
     var videoSide by mutableIntStateOf(MatteSides[1])
+    var enhanceSetup by mutableStateOf<Layer?>(null)
+    var enhance by mutableStateOf(EnhanceOptions())
     private var job: Job? = null
 
     fun cancel() { job?.cancel(); message = AppText.get(R.string.ai_cancelling) }
@@ -86,9 +90,15 @@ class AiTools(private val context: Context, private val state: EditorState, priv
             smoothSetup = layer
             return
         }
+        if (action == AiAction.Enhance && !confirmed) {
+            dismiss()
+            enhanceSetup = layer
+            return
+        }
         videoSetup = null
         noiseSetup = null
         smoothSetup = null
+        enhanceSetup = null
         state.playing = false
         running = action; last = action; progress = 0f; message = AppText.get(R.string.ai_preparing); retry = null
         job = scope.launch {
@@ -98,7 +108,23 @@ class AiTools(private val context: Context, private val state: EditorState, priv
                 val report: AiProgress = { fraction, text ->
                     withContext(Dispatchers.Main) { progress = fraction.coerceIn(0f, 1f); message = text }
                 }
-                if (action == AiAction.Video) {
+                if (action == AiAction.Enhance) {
+                    val options = enhance
+                    val media = checkNotNull(state.scene.media(layer.mediaFill!!.uri)) { AppText.get(R.string.ai_video_missing) }
+                    for (model in options.models) if (!model.installed(context)) {
+                        report(0f, AppText.get(R.string.ai_downloading_model))
+                        model.download(context) { fraction -> progress = fraction.coerceIn(0f, 1f) }
+                    }
+                    val output = withContext(Dispatchers.IO) { AiEnhance.run(context, layer, media, options, report).also { result = it } }
+                    ensureActive()
+                    check(state.scene.layer(layer.id) == layer) { AppText.get(R.string.ai_layer_changed) }
+                    state.edit { scene ->
+                        scene.update(layer.id) {
+                            it.copy(node = it.node.with(AiKind.Enhance.attribute!!, output.declaration.uri))
+                                .withAiMark(AiKind.Enhance, it.node[AiKind.Enhance.attribute], output.declaration.uri, options.xml, media)
+                        }.withMedia(output.declaration)
+                    }
+                } else if (action == AiAction.Video) {
                     val media = checkNotNull(state.scene.media(layer.mediaFill!!.uri)) { AppText.get(R.string.ai_video_missing) }
                     val matte = withContext(Dispatchers.IO) { VideoBackground.run(context, layer, media, videoSide, report).also { result = it.media } }
                     ensureActive()
@@ -160,7 +186,11 @@ class AiTools(private val context: Context, private val state: EditorState, priv
             } catch (_: OutOfMemoryError) {
                 message = AppText.get(if (action == AiAction.Background) R.string.ai_out_of_memory_image else R.string.ai_out_of_memory_media); retry = action
             } catch (_: LinkageError) {
-                message = AppText.get(if (action == AiAction.Noise) R.string.ai_noise_unavailable else R.string.ai_background_unavailable)
+                message = AppText.get(when (action) {
+                    AiAction.Noise -> R.string.ai_noise_unavailable
+                    AiAction.Enhance -> R.string.ai_runtime_unavailable
+                    else -> R.string.ai_background_unavailable
+                })
             } finally {
                 if (!committed) result?.file?.delete()
                 running = null

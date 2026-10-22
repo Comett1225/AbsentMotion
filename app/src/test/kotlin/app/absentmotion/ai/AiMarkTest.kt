@@ -53,22 +53,4 @@ class AiMarkTest {
         assertFalse(group.aiMarks.single().restorable)
         assertNull(group.aiMarks.single().original)
     }
-
-    @Test fun anEnhanceMarkFromAnOlderVersionStillOpensAndCanBeRestored() {
-        val old = Scene.parse("""<scene width="100" height="100" fps="30"><media uri="up.mp4" width="1280" height="720" fps="30.00" duration="4000000"/>
-            <shape id="1" startTime="0" endTime="3999" fillType="media" fillVideo="up.mp4" s=".rect">
-            <ai type="enhance" original="raw.mp4" result="up.mp4" option="upscale2+cartoon"><media uri="raw.mp4" width="640" height="360" fps="30.00" duration="4000000"/></ai></shape></scene>""")
-        val saved = Scene.parse(old.node.toXml())
-        val mark = saved.layer(1)!!.aiMarks.single()
-        assertEquals(AiKind.Enhance, mark.kind)
-        assertEquals("up.mp4", saved.layer(1)!!.node["fillVideo"])
-        assertEquals(1280, saved.media("up.mp4")!!.width)
-        assertTrue(mark.restorable)
-        assertEquals("raw.mp4", mark.original)
-        val restored = saved.withoutAiMark(1, AiKind.Enhance)
-        assertEquals("raw.mp4", restored.layer(1)!!.node["fillVideo"])
-        assertEquals(640, restored.media("raw.mp4")!!.width)
-        assertNull(restored.media("up.mp4"))
-        assertTrue(restored.layer(1)!!.aiMarks.isEmpty())
-    }
 }

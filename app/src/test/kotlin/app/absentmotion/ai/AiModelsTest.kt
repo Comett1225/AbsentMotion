@@ -30,8 +30,10 @@ class AiModelsTest {
         }
         val rife = listOf(AiModel.SmoothLow, AiModel.SmoothMedium, AiModel.SmoothHigh)
         assertTrue(rife.all { m -> m.files.all { "/13338e38debe2e400b3eeecf6792312d01a692f9/models/${m.folder}/" in it.url } })
-        assertEquals(rife, AiModel.entries)
-        assertTrue(rife.all { it.param == "flownet.param" && it.bin == "flownet.bin" })
+        assertTrue((AiModel.entries - rife.toSet()).all { m -> m.files.all { it.url == MODEL_RELEASE + it.name } })
+        assertTrue(MODEL_RELEASE.endsWith("/releases/download/ai-models-1/"))
+        assertNull(AiModel.Grain.param)
+        assertEquals("realesr-general-x4v3.param", AiModel.Detail.param)
         assertEquals(11_276_252L + 35_830L, AiModel.SmoothLow.bytes)
     }
 
@@ -60,6 +62,36 @@ class AiModelsTest {
         } finally {
             dir.deleteRecursively()
         }
+    }
+
+    @Test fun enhanceOptionsPickTheirModelsAndRoundTrip() {
+        val plain = EnhanceOptions(EnhanceMode.Upscale2)
+        assertEquals(AiModel.Detail, plain.model)
+        assertNull(plain.blend)
+        assertEquals(listOf(AiModel.Detail, AiModel.Grain), plain.copy(grain = true).models)
+        assertEquals(listOf(AiModel.Cartoon), plain.copy(cartoon = true, grain = true).models)
+        assertFalse(EnhanceOptions(EnhanceMode.Sharpen, quick = true).usesAi)
+        assertTrue(EnhanceOptions(EnhanceMode.Upscale4, quick = true).usesAi)
+        for (mode in EnhanceMode.entries) for (cartoon in listOf(false, true)) for (grain in listOf(false, true)) {
+            val options = EnhanceOptions(mode, cartoon, grain && !cartoon)
+            assertEquals(options, EnhanceOptions.parse(options.xml))
+        }
+        assertNull(EnhanceOptions.parse("blur"))
+        assertNull(EnhanceOptions.parse(null))
+        assertEquals("upscale4+cartoon", EnhanceOptions(EnhanceMode.Upscale4, cartoon = true).xml)
+    }
+
+    @Test fun inputCapsFollowTheShortSide() {
+        assertTrue(EnhanceMode.Upscale2.fits(1280, 720))
+        assertTrue(EnhanceMode.Upscale2.fits(720, 1280))
+        assertFalse(EnhanceMode.Upscale2.fits(1920, 1080))
+        assertTrue(EnhanceMode.Upscale4.fits(640, 360))
+        assertFalse(EnhanceMode.Upscale4.fits(854, 480))
+        assertTrue(EnhanceMode.Sharpen.fits(1920, 1080))
+        assertFalse(EnhanceMode.Sharpen.fits(3840, 2160))
+        assertTrue(EnhanceMode.Faces.fits(3840, 2160))
+        assertFalse(EnhanceMode.Upscale2.fits(0, 0))
+        assertEquals(listOf(2, 4, 1, 1), EnhanceMode.entries.map { it.scale })
     }
 
     @Test fun estimatesTurnIntoPlainVerdicts() {
@@ -148,6 +180,32 @@ class AiModelsTest {
         assertTrue(GpuMark("later", { stored }) { stored = it }.diedBefore())
     }
 
+    @Test fun faceBoxesAreSmoothedAndDroppedAfterMisses() {
+        val tracks = mutableListOf<FaceBox>()
+        trackFaces(tracks, listOf(FaceBox(100f, 100f, 50f)))
+        assertEquals(1, tracks.size)
+        trackFaces(tracks, listOf(FaceBox(110f, 100f, 50f)))
+        assertEquals(104f, tracks.single().cx, 1e-4f)
+        trackFaces(tracks, listOf(FaceBox(400f, 400f, 60f)))
+        assertEquals(2, tracks.size)
+        repeat(7) { trackFaces(tracks, listOf(FaceBox(400f, 400f, 60f))) }
+        assertEquals(2, tracks.size)
+        trackFaces(tracks, listOf(FaceBox(400f, 400f, 60f)))
+        assertEquals(1, tracks.size)
+        assertEquals(400f, tracks.single().cx, 1e-3f)
+    }
+
+    @Test fun faceBlendIsSoftAtTheEdgesAndFullInTheMiddle() {
+        assertEquals(1f, featherWeight(50, 50, 101, 101), 1e-6f)
+        assertEquals(0f, featherWeight(0, 0, 101, 101), 1e-6f)
+        assertEquals(0f, featherWeight(0, 50, 101, 101), 0.05f)
+        val mid = featherWeight(8, 50, 101, 101)
+        assertTrue(mid > 0f && mid < 1f)
+        assertEquals(0xFF102030.toInt(), mixArgb(0xFF102030.toInt(), 0xFFF0E0D0.toInt(), 0f))
+        assertEquals(0xFFF0E0D0.toInt(), mixArgb(0xFF102030.toInt(), 0xFFF0E0D0.toInt(), 1f))
+        assertEquals(0xFF808080.toInt(), mixArgb(0xFF000000.toInt(), 0xFFFFFFFF.toInt(), 0.5f))
+    }
+
     @Test fun aiSmoothIsTheFourthMethodAndMatchesTheEngineModes() {
         assertEquals(listOf("Off", "Blend", "Flow", "Ai"), FrameInterpolation.entries.map { it.name })
         val chosen = Smoothing(FrameInterpolation.Ai, SmoothLevel.High)
@@ -159,5 +217,10 @@ class AiModelsTest {
         assertEquals(1_166_666, flowPixels(SmoothLevel.Medium, 12_000_000_000L))
         assertEquals(555_555, flowPixels(SmoothLevel.Medium, 4_000_000_000L))
         assertEquals(227_272, flowPixels(SmoothLevel.High, 0L))
+    }
+
+    @Test fun lumaUsesStudioRange() {
+        assertEquals(16, lumaOf(0xFF000000.toInt()))
+        assertEquals(235, lumaOf(0xFFFFFFFF.toInt()))
     }
 }

@@ -29,7 +29,7 @@ internal object TestHooks {
     fun onboarding(intent: Intent): String? = intent.getStringExtra("onboarding")
 
     fun newIntent(activity: MainActivity, intent: Intent) {
-        if (intent.hasExtra("xml") || intent.hasExtra("aaccheck") || intent.hasExtra("devicecheck") || intent.hasExtra("capcheck") || intent.hasExtra("aicheck") || intent.hasExtra("aismoothcheck") || intent.hasExtra("aidownload")) {
+        if (intent.hasExtra("xml") || intent.hasExtra("aaccheck") || intent.hasExtra("devicecheck") || intent.hasExtra("capcheck") || intent.hasExtra("aicheck") || intent.hasExtra("enhancecheck") || intent.hasExtra("aismoothcheck") || intent.hasExtra("aidownload")) {
             activity.setIntent(intent)
             start(activity)
             return
@@ -152,6 +152,13 @@ internal object TestHooks {
                 try { checkAi(activity, mode != "cpu") }
                 catch (e: kotlinx.coroutines.CancellationException) { throw e }
                 catch (e: Throwable) { Log.e("AMAi", "failed", e) }
+            }
+        }
+        intent.getStringExtra("enhancecheck")?.let { path ->
+            scope.launch {
+                try { checkEnhance(activity, path, (intent.getStringExtra("modes") ?: "upscale2").split(',')) }
+                catch (e: kotlinx.coroutines.CancellationException) { throw e }
+                catch (e: Throwable) { Log.e("AMAi", "enhance failed", e) }
             }
         }
         intent.getStringExtra("aismoothcheck")?.let { path ->
