@@ -28,8 +28,6 @@ import java.io.File
 import java.io.FileDescriptor
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
-import java.util.concurrent.Executors
-import java.util.concurrent.Future
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
@@ -193,35 +191,16 @@ private suspend fun encode(
                     writer.close()
                 }
             } else if (buffers) {
-                val frame = Array(2) { HardwareBuffer.create(width, height, HardwareBuffer.RGBA_8888, 1,
-                    HardwareBuffer.USAGE_GPU_COLOR_OUTPUT or HardwareBuffer.USAGE_GPU_SAMPLED_IMAGE) }
-                val copier = Executors.newSingleThreadExecutor { Thread(it, "am-export-copy") }
-                val copies = arrayOfNulls<Future<Boolean>>(2)
-                fun copied(slot: Int, k: Int) {
-                    val done = copies[slot] ?: return
-                    copies[slot] = null
-                    val copying = System.nanoTime()
-                    val ok = runCatching { done.get() }.getOrDefault(false)
-                    spent[1] += System.nanoTime() - copying
-                    exportCheck(ok) { txt(R.string.export_error_draw_frame, k.toString()) }
-                }
+                val feed = EncoderFeed(input, width, height)
                 try {
-                    EncoderCopy(input).use { copy ->
-                        try {
-                            eachFrame({ copied(frames % 2, frames - 2); copied((frames - 1) % 2, frames - 1) }) { k, presentNs ->
-                                val slot = k % 2
-                                copied(slot, k - 2)
-                                exportCheck(renderInto(frame[slot], frameTimeMs(scene, s.fps, k))) { txt(R.string.export_error_draw_frame, k.toString()) }
-                                copies[slot] = copier.submit<Boolean> { copy.copy(frame[slot], presentNs) }
-                            }
-                        } finally {
-                            copies.forEach { runCatching { it?.get() } }
-                        }
+                    eachFrame({ exportCheck(feed.flush().also { spent[1] = feed.waitedNs }) { txt(R.string.export_error_draw_frame, (frames - 1).toString()) } }) { k, presentNs ->
+                        exportCheck(feed.ready().also { spent[1] = feed.waitedNs }) { txt(R.string.export_error_draw_frame, (k - 2).toString()) }
+                        exportCheck(renderInto(feed.next, frameTimeMs(scene, s.fps, k))) { txt(R.string.export_error_draw_frame, k.toString()) }
+                        feed.send(presentNs)
                     }
                 } finally {
-                    copier.shutdown()
+                    feed.close()
                     releaseBuffers()
-                    frame.forEach { it.close() }
                 }
             } else {
                 val target = attach(input)

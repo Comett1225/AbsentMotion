@@ -17,7 +17,7 @@ import app.absentmotion.export.Mux
 import app.absentmotion.export.MuxerSink
 import app.absentmotion.export.SmoothLevel
 import app.absentmotion.export.Smoothing
-import app.absentmotion.export.EncoderCopy
+import app.absentmotion.export.EncoderFeed
 import app.absentmotion.export.ExportSettings
 import app.absentmotion.export.openVideoEncoder
 import app.absentmotion.export.drain
@@ -26,6 +26,7 @@ import app.absentmotion.export.frameTimeMs
 import app.absentmotion.i18n.AppText
 import app.absentmotion.model.Layer
 import app.absentmotion.model.MediaDeclaration
+import app.absentmotion.model.MediaFill
 import app.absentmotion.model.Scene
 import app.absentmotion.model.VideoTiming
 import app.absentmotion.model.XmlNode
@@ -73,6 +74,16 @@ internal fun smoothPlan(layer: Layer, media: MediaDeclaration, projectFps: Int, 
     return SmoothPlan(fps, (seconds * fps).toInt() + 1, even(w * k), even(h * k), seconds, (mean * fps / projectFps).toFloat())
 }
 
+internal fun smoothScene(fill: MediaFill, media: MediaDeclaration, plan: SmoothPlan): Scene {
+    val span = (plan.seconds * 1000).toInt().coerceAtLeast(1)
+    val clip = XmlNode("shape", linkedMapOf("id" to "1", "startTime" to "0", "endTime" to "$span", "fillType" to "media", "mediaFillMode" to "stretch",
+        "s" to ".rect", "fillVideo" to fill.uri, "inTime" to "${fill.inTime}", "outTime" to "${fill.inTime + span}"), listOf(
+        XmlNode("transform", children = listOf(XmlNode("location", mapOf("value" to "${plan.width / 2f},${plan.height / 2f},0")))),
+        XmlNode("property", mapOf("name" to "size", "type" to "vec2", "value" to "${plan.width / 2f},${plan.height / 2f}")),
+    ))
+    return Scene.create("smooth", plan.width, plan.height, plan.fps, 0xFF000000.toInt()).withMedia(media).add(Layer(clip))
+}
+
 internal val Smoothing.option: String get() = "${method.name}:${level.name}:${blur.name}"
 
 internal fun smoothingOf(option: String?): Smoothing? {
@@ -93,13 +104,7 @@ internal object ClipSmooth {
         val file = aiFile(context, "mp4")
         check(file.parentFile!!.usableSpace >= plan.bytes * 2) { AppText.get(R.string.ai_not_enough_storage, (plan.bytes * 2 / 1_000_000).toString()) }
         val inMs = fill.inTime
-        val span = (plan.seconds * 1000).toInt().coerceAtLeast(1)
-        val clip = XmlNode("shape", linkedMapOf("id" to "1", "startTime" to "0", "endTime" to "$span", "fillType" to "media", "mediaFillMode" to "stretch",
-            "s" to ".rect", "fillVideo" to fill.uri, "inTime" to "$inMs", "outTime" to "${inMs + span}"), listOf(
-            XmlNode("transform", children = listOf(XmlNode("location", mapOf("value" to "${plan.width / 2f},${plan.height / 2f},0")))),
-            XmlNode("property", mapOf("name" to "size", "type" to "vec2", "value" to "${plan.width / 2f},${plan.height / 2f}")),
-        ))
-        val scene = Scene.create("smooth", plan.width, plan.height, plan.fps, 0xFF000000.toInt()).withMedia(media).add(Layer(clip))
+        val scene = smoothScene(fill, media, plan)
         val frames = minOf(plan.frames, frameCount(scene, plan.fps))
         val sound = soundTrack(context, fill.uri)
         var success = false
@@ -151,9 +156,7 @@ internal object ClipSmooth {
             engine.exportSession(scene.toXml(), smoothing, plan.fps) {
                 val writer = if (Build.VERSION.SDK_INT >= 33) ImageWriter.Builder(input).setMaxImages(2).setHardwareBufferFormat(HardwareBuffer.RGBA_8888)
                     .setUsage(HardwareBuffer.USAGE_GPU_COLOR_OUTPUT or HardwareBuffer.USAGE_GPU_SAMPLED_IMAGE).build() else null
-                val frame = if (writer == null) HardwareBuffer.create(plan.width, plan.height, HardwareBuffer.RGBA_8888, 1,
-                    HardwareBuffer.USAGE_GPU_COLOR_OUTPUT or HardwareBuffer.USAGE_GPU_SAMPLED_IMAGE) else null
-                val copy = frame?.let { EncoderCopy(input) }
+                val feed = if (writer == null) EncoderFeed(input, plan.width, plan.height) else null
                 try {
                     for (k in 0 until frames) {
                         currentCoroutineContext().ensureActive()
@@ -161,7 +164,8 @@ internal object ClipSmooth {
                         val pts = inMs * 1000L + (k * 1_000_000.0 / plan.fps).roundToLong()
                         for (at in if (k == 0 && inMs > 0) listOf(0L, pts) else listOf(pts)) {
                             if (writer == null) {
-                                check(renderInto(frame!!, frameTimeMs(scene, plan.fps, k)) && copy!!.copy(frame, at * 1000)) { AppText.get(R.string.ai_unable_to_process) }
+                                check(feed!!.ready() && renderInto(feed.next, frameTimeMs(scene, plan.fps, k))) { AppText.get(R.string.ai_unable_to_process) }
+                                feed.send(at * 1000)
                                 continue
                             }
                             val image = writer.dequeueInputImage()
@@ -176,12 +180,12 @@ internal object ClipSmooth {
                         }
                         done(k + 1)
                     }
+                    check(feed?.flush() != false) { AppText.get(R.string.ai_unable_to_process) }
                     encoder.signalEndOfInputStream()
                 } finally {
+                    feed?.close()
                     releaseBuffers()
                     writer?.close()
-                    copy?.close()
-                    frame?.close()
                 }
             }
             runInterruptible(Dispatchers.IO) { output.join() }

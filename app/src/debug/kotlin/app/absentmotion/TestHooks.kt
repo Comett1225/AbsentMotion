@@ -64,16 +64,20 @@ internal object TestHooks {
         }
     }
 
-    private suspend fun checkClipSmooth(activity: MainActivity, state: app.absentmotion.editor.EditorState, method: String) {
+    private suspend fun checkClipSmooth(activity: MainActivity, state: app.absentmotion.editor.EditorState, method: String, level: String?, blur: String?) {
         try {
             val layer = state.scene.layers.first { it.mediaFill?.video == true }
             val media = checkNotNull(state.scene.media(layer.mediaFill!!.uri))
-            val smoothing = app.absentmotion.export.Smoothing(FrameInterpolation.entries.first { it.name.equals(method, true) })
+            val smoothing = app.absentmotion.export.Smoothing(FrameInterpolation.entries.first { it.name.equals(method, true) },
+                app.absentmotion.export.SmoothLevel.entries.firstOrNull { it.name.equals(level, true) } ?: app.absentmotion.export.SmoothLevel.Medium,
+                app.absentmotion.export.MotionBlur.entries.firstOrNull { it.name.equals(blur, true) } ?: app.absentmotion.export.MotionBlur.Off)
             val started = SystemClock.elapsedRealtime()
             val out = app.absentmotion.ai.ClipSmooth.run(activity.applicationContext, activity.engine, layer, media, state.scene.fps, smoothing) { _, _ -> }
             val copy = File(activity.getExternalFilesDir(null), "clipsmooth.mp4")
+            val ms = SystemClock.elapsedRealtime() - started
             out.file.copyTo(copy, overwrite = true)
-            Log.i("AMTest", "clipsmooth ${copy.path} ${copy.length()} bytes in ${SystemClock.elapsedRealtime() - started} ms")
+            File(activity.getExternalFilesDir(null), "clipsmooth.txt").writeText("$ms")
+            Log.i("AMTest", "clipsmooth ${copy.path} ${copy.length()} bytes in $ms ms")
         } catch (e: Throwable) {
             Log.e("AMTest", "clipsmooth failed", e)
         }
@@ -197,7 +201,7 @@ internal object TestHooks {
             val scene = state.scene
             state.frame = intent.getIntExtra("frame", 0).coerceIn(0, scene.lastFrame)
             if (intent.getBooleanExtra("openexport", false)) state.exportOpen = true
-            intent.getStringExtra("clipsmooth")?.let { method -> launch { checkClipSmooth(activity, state, method) } }
+            intent.getStringExtra("clipsmooth")?.let { method -> launch { checkClipSmooth(activity, state, method, intent.getStringExtra("smoothlevel"), intent.getStringExtra("smoothblur")) } }
             val stillName = intent.getStringExtra("still")
             intent.getStringExtra("export")?.let { exportForTest(activity, it, scene, state.frame) }
             intent.getStringExtra("verify")?.let { file ->

@@ -4,10 +4,17 @@ import app.absentmotion.export.FrameInterpolation
 import app.absentmotion.export.MotionBlur
 import app.absentmotion.export.SmoothLevel
 import app.absentmotion.export.Smoothing
+import app.absentmotion.export.frameCount
+import app.absentmotion.export.frameTimeMs
+import app.absentmotion.media.ptsAt
+import app.absentmotion.media.smoothFrame
 import app.absentmotion.model.Layer
 import app.absentmotion.model.MediaDeclaration
 import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
+import app.absentmotion.model.exportFrameMs
+import app.absentmotion.model.layerTracks
+import app.absentmotion.model.videoTimeUs
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -39,6 +46,38 @@ class ClipSmoothTest {
         assertEquals(1920 to 1080, turned.width to turned.height)
         assertEquals(4.0, slow.seconds, 1e-9)
         assertEquals(481, slow.frames)
+    }
+
+    @Test fun everySmoothDecodesTheSourceOnceInOrder() {
+        val stamps = LongArray(120) { it * 1_000_000L / 30 }
+        for (speed in listOf("1", "0.5", "0.3", "2")) for (start in listOf(0, 1000)) for (method in FrameInterpolation.entries.filter { it != FrameInterpolation.Ai })
+            for (level in SmoothLevel.entries) for (blur in listOf(MotionBlur.Off, MotionBlur.High)) {
+                val layer = clip(speed).let { it.copy(node = it.node.with("inTime", "$start")) }
+                val smoothing = Smoothing(method, level, blur)
+                val plan = smoothPlan(layer, media, 60, smoothing) ?: continue
+                val scene = smoothScene(layer.mediaFill!!, media, plan)
+                val track = scene.layerTracks().single()
+                val case = "$speed from $start $smoothing"
+                val imported = mutableSetOf<Long>()
+                val held = mutableSetOf<Long>()
+                var newest = -1L
+                for (k in 0 until minOf(plan.frames, frameCount(scene, plan.fps))) {
+                    val mapped = track.timeAt(exportFrameMs(frameTimeMs(scene, plan.fps, k), plan.fps), false) ?: continue
+                    val frame = track.layer.smoothFrame(mapped.ms, scene, stamps, plan.fps, mapped.rate, smoothing.copy(blurScale = plan.blurScale)) {
+                        stamps.ptsAt(track.layer.videoTimeUs(mapped.ms.toInt(), scene))
+                    }
+                    assertTrue("$case frame $k is drawn without the frame window", frame != null)
+                    val wanted = setOf(frame!!.before, frame.pair.a, frame.pair.b, frame.after)
+                    for (pts in wanted) if (pts !in held) {
+                        assertTrue("$case frame $k needs $pts again", imported.add(pts))
+                        assertTrue("$case frame $k goes back to $pts after $newest", pts > newest)
+                        newest = pts
+                        held += pts
+                    }
+                    held.retainAll(wanted)
+                }
+                assertTrue(case, imported.size > 1)
+            }
     }
 
     @Test fun theChosenSettingsAreStoredWithTheMark() {

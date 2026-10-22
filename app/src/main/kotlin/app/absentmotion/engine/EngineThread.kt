@@ -494,7 +494,9 @@ class EngineThread(private val background: Int, context: Context? = null) {
         val document = Scene.parse(xml)
         fonts?.let { library -> document.fontNames().forEach { library.resolve(it) } }
         var shown: String? = null
+        val held = videos?.hold()
         try {
+            held?.join()
             media?.pinned = document
             media?.prepare(document)
             videos?.suspendPreview()
@@ -507,6 +509,7 @@ class EngineThread(private val background: Int, context: Context? = null) {
             }
             ExportSession(document, smoothing, fps).block()
         } finally {
+            if (held != null) videos.release()
             media?.pinned = null
             var noPreview = true
             try {
