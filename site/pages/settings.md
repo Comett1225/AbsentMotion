@@ -35,8 +35,8 @@ The color names are the editor and home screen colors: TopBar, PreviewBg, Timeli
 - **Show the import card in the project list.** Off by default. Adds a card with **Choose file** at the top of the project list.
 - **Keep a copy of imported media in the project.** On by default. The photo, video or audio you add is copied inside the project, so it keeps working if the original is moved or deleted. Turn it off to save storage if you never move your files.
 - **Remove caption model.** Only shown after the speech model for captions has been downloaded. It shows the size of the file and deletes it; the app downloads it again if you use captions later.
-- **Delete AI ... model.** One row for each downloaded AI Smooth model, with its size. Tapping it deletes the model; the app downloads it again the next time it is needed.
-- **Use the graphics chip for AI.** On by default only for newer graphics chips known to be safe for AI Smooth; on other phones it runs on the processor. Turning it on for another chip asks first, because it can freeze some phones. See [AI tools](@ai-tools).
+- **Delete AI ... model.** One row for each downloaded AI Enhance or AI Smooth model, with its size. Tapping it deletes the model; the app downloads it again the next time it is needed.
+- **Use the graphics chip for AI.** On by default only for newer graphics chips known to be safe for AI Smooth and AI Enhance; on other phones these run on the processor. Turning it on for another chip asks first, because it can freeze some phones. See [AI tools](@ai-tools).
 
 ## Backup
 

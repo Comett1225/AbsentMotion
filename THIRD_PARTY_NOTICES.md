@@ -15,7 +15,7 @@ dependency is added, removed or upgraded, update this file in the same change.
 **Contents**
 
 1. Engine libraries (C and C++): Skia and the libraries it links, whisper.cpp and ggml, RNNoise, ncnn, glslang, the RIFE warp layer, LAME
-2. Machine learning models: OpenAI Whisper weights, RIFE weights (downloaded at run time), background removal model (`foss` build)
+2. Machine learning models: OpenAI Whisper weights, RIFE and Real-ESRGAN weights (all downloaded at run time), background removal model (`foss` build)
 3. Kotlin and Compose libraries
 4. Google Play services (proprietary)
 5. Fonts, icons and effect thumbnails
@@ -172,7 +172,7 @@ together with Skia.
 - Licence: BSD-3-Clause; a few headers under zlib and BSD-2-Clause (text in appendix A.15).
 - Copyright: Copyright (C) 2017 Tencent. All rights reserved.
 - URL: https://github.com/Tencent/ncnn
-- Used in: `libabsent_ai.so`, the on-device AI runtime for AI Smooth (Vulkan, with a CPU fallback).
+- Used in: `libabsent_ai.so`, the on-device AI runtime for AI Enhance and AI Smooth (Vulkan, with a CPU fallback).
 
 ### glslang (ncnn's copy)
 
@@ -232,6 +232,18 @@ together with Skia.
 - URL: https://github.com/hzwer/Practical-RIFE
 - Used in: AI Smooth (in-between frames). The models are **not** part of the app: each is downloaded from the pinned
   URL when it is first used, after the app has shown its size, and checked against its SHA-256. Settings can delete it.
+
+### AI Enhance models (Real-ESRGAN)
+
+- Version: `realesr-general-x4v3`, `realesr-general-wdn-x4v3` and `realesr-animevideov3` from the Real-ESRGAN release
+  v0.2.5.0, converted to ncnn (fp16). The general models were converted for AbsentMotion; the converted files are
+  published as assets of this repository's `ai-models-1` release.
+- Licence: BSD-3-Clause (text in appendix A.19).
+- Copyright: Copyright (c) 2021, Xintao Wang.
+- URL: https://github.com/xinntao/Real-ESRGAN
+- Used in: AI Enhance (Upscale, Sharpen detail, Sharpen faces). Downloaded on first use, after the app has shown the
+  size, checked against its SHA-256, and removable in Settings. "Sharpen faces" finds faces with Android's own
+  `android.media.FaceDetector`; no face model is downloaded.
 
 ### Background removal model (`foss` build only)
 
@@ -3540,4 +3552,38 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+~~~~
+
+### A.19 Real-ESRGAN (BSD-3-Clause)
+
+~~~~text
+BSD 3-Clause License
+
+Copyright (c) 2021, Xintao Wang
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its
+   contributors may be used to endorse or promote products derived from
+   this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ~~~~
