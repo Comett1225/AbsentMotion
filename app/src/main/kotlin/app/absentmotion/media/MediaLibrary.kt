@@ -93,16 +93,21 @@ internal const val MIN_PICTURE_LIMIT = 4096
 
 internal fun pictureLimit(maxTexture: Int, canvas: Int): Int = minOf(maxTexture, maxOf(MIN_PICTURE_LIMIT, 2 * canvas))
 
-internal fun decodePicture(resolver: ContentResolver, uri: Uri, limit: Int): Bitmap? = try {
+internal fun pictureSample(side: Int, limit: Int): Int {
+    var sample = 1
+    while (side / (sample * 2) >= limit.coerceAtLeast(1)) sample *= 2
+    return if (side / sample * 2 > limit.coerceAtLeast(1) * 3) sample * 2 else sample
+}
+
+internal fun decodePicture(resolver: ContentResolver, uri: Uri, limit: Int, keepOutOfMemory: Boolean = false): Bitmap? = try {
     val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
     resolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, bounds) }
     if (bounds.outWidth <= 0 || bounds.outHeight <= 0) null else {
-        val ratio = maxOf(bounds.outWidth, bounds.outHeight).toDouble() / limit.coerceAtLeast(1)
         val options = BitmapFactory.Options().apply {
             inPreferredConfig = Bitmap.Config.ARGB_8888
             inPreferredColorSpace = android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.SRGB)
             inScaled = false
-            inSampleSize = Integer.highestOneBit(ratio.toInt().coerceAtLeast(1))
+            inSampleSize = pictureSample(maxOf(bounds.outWidth, bounds.outHeight), limit)
         }
         val raw = resolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, options) }
         val sized = if (raw == null || maxOf(raw.width, raw.height) <= limit) raw else {
@@ -115,7 +120,10 @@ internal fun decodePicture(resolver: ContentResolver, uri: Uri, limit: Int): Bit
 } catch (e: Exception) {
     Log.w("AMMedia", "cannot read $uri", e)
     null
-} catch (_: OutOfMemoryError) { null }
+} catch (e: OutOfMemoryError) {
+    if (keepOutOfMemory) throw e
+    null
+}
 
 internal const val MAX_MODEL_BYTES = 256L shl 20
 

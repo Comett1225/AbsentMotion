@@ -14,6 +14,7 @@ import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.segmentation.subject.SubjectSegmentation
 import com.google.mlkit.vision.segmentation.subject.SubjectSegmenterOptions
 import app.absentmotion.media.mirroredByExif
+import app.absentmotion.media.pictureSample
 import app.absentmotion.model.MediaDeclaration
 import kotlinx.coroutines.ensureActive
 import kotlin.coroutines.coroutineContext
@@ -110,15 +111,15 @@ internal object BackgroundRemoval {
         val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
         resolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, bounds) }
         check(bounds.outWidth > 0 && bounds.outHeight > 0) { AppText.get(R.string.ai_cannot_read_image) }
-        val ratio = maxOf(bounds.outWidth, bounds.outHeight).toDouble() / limit
+        val side = matteLimit(bounds.outWidth, bounds.outHeight, limit)
         val options = BitmapFactory.Options().apply {
             inPreferredConfig = Bitmap.Config.ARGB_8888; inMutable = true; inScaled = false
             inPreferredColorSpace = ColorSpace.get(ColorSpace.Named.SRGB)
-            inSampleSize = Integer.highestOneBit(ratio.toInt().coerceAtLeast(1))
+            inSampleSize = pictureSample(maxOf(bounds.outWidth, bounds.outHeight), side)
         }
         val raw = checkNotNull(resolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, options) }) { AppText.get(R.string.ai_cannot_decode_image) }
-        if (maxOf(raw.width, raw.height) <= limit) return raw.mirroredByExif(resolver, uri)
-        val scale = limit.toFloat() / maxOf(raw.width, raw.height)
+        if (maxOf(raw.width, raw.height) <= side) return raw.mirroredByExif(resolver, uri)
+        val scale = side.toFloat() / maxOf(raw.width, raw.height)
         val scaled = try {
             Bitmap.createScaledBitmap(raw, (raw.width * scale).toInt().coerceAtLeast(1),
                 (raw.height * scale).toInt().coerceAtLeast(1), true)
