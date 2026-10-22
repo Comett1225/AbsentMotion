@@ -72,6 +72,8 @@ internal suspend fun exportVideo(
     }
 }
 
+private val HighRefused: MutableSet<String> = java.util.concurrent.ConcurrentHashMap.newKeySet()
+
 internal fun openVideoEncoder(s: ExportSettings, width: Int, height: Int, hot: Boolean, note: (UiText) -> Unit = {}, bitrate: Int? = null): MediaCodec {
     val mime = s.codec.mime
     val infos = MediaCodecList(MediaCodecList.REGULAR_CODECS).codecInfos
@@ -83,20 +85,24 @@ internal fun openVideoEncoder(s: ExportSettings, width: Int, height: Int, hot: B
         if (ExportDebug.refuseHardware && info.hardware) continue
         val caps = info.getCapabilitiesForType(mime)
         val rated = runCatching { caps.videoCapabilities!!.getSupportedFrameRatesFor(width, height).upper }.getOrDefault(0.0)
-        val high = mime == MediaFormat.MIMETYPE_VIDEO_AVC && caps.profileLevels.any { it.profile == MediaCodecInfo.CodecProfileLevel.AVCProfileHigh }
+        val key = "${info.name} ${width}x$height ${s.fps}"
+        val high = mime == MediaFormat.MIMETYPE_VIDEO_AVC && key !in HighRefused && caps.profileLevels.any { it.profile == MediaCodecInfo.CodecProfileLevel.AVCProfileHigh }
         val codec = try { MediaCodec.createByCodecName(info.name) } catch (e: Exception) {
             last = e
             Log.w("AMExport", "cannot create ${info.name}", e)
             continue
         }
+        var highFailed = false
         for (bestEffort in if (hot || rated < 2.0 * s.fps) listOf(true, false) else listOf(false, true)) for (profile in if (high) listOf(true, false) else listOf(false)) {
             try {
                 codec.configure(encoderFormat(info, caps, s, width, height, profile, bestEffort, hot, bitrate), null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
                 Log.i("AMExport", "encoding with ${info.name}${if (profile) " (High)" else ""}${if (bestEffort) " at best effort" else ""}; rated for ${rated.toInt()} fps at ${width}x$height")
+                if (highFailed && !profile) HighRefused += key
                 if (!info.hardware && infos.first().hardware) note(txt(R.string.export_note_software))
                 return codec
             } catch (e: Exception) {
                 last = e
+                if (profile) highFailed = true
                 Log.w("AMExport", "${info.name} refused ${width}x$height at ${s.fps} fps${if (profile) " (High)" else ""}${if (bestEffort) " at best effort" else ""}", e)
                 runCatching { codec.reset() }
             }
