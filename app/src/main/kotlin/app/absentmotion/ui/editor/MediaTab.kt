@@ -91,12 +91,13 @@ internal fun MediaTab(state: EditorState, modifier: Modifier, library: AddLibrar
     LaunchedEffect(Unit) {
         val prefs = context.getSharedPreferences("media", android.content.Context.MODE_PRIVATE)
         fun granted(name: String) = context.checkSelfPermission(name) == PackageManager.PERMISSION_GRANTED
-        val visible = granted(Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED)
+        val partial = android.os.Build.VERSION.SDK_INT >= 34
+        val visible = partial && granted(Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED)
         val full = granted(Manifest.permission.READ_MEDIA_IMAGES) && granted(Manifest.permission.READ_MEDIA_VIDEO)
         if (!prefs.getBoolean("asked", false) && !full && !visible) {
             prefs.edit().putBoolean("asked", true).apply()
-            permission.launch(arrayOf(Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.READ_MEDIA_VIDEO,
-                Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED))
+            permission.launch(listOfNotNull(Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.READ_MEDIA_VIDEO,
+                Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED.takeIf { partial }).toTypedArray())
         }
     }
     val viewAll = stringResource(R.string.view_all)

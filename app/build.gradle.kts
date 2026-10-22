@@ -14,7 +14,7 @@ android {
 
     defaultConfig {
         applicationId = "app.absentmotion"
-        minSdk = 34
+        minSdk = 33
         targetSdk = 37
         versionCode = appVersion.getProperty("versionCode").toInt()
         versionName = appVersion.getProperty("versionName")
@@ -49,6 +49,8 @@ android {
         release {
             signingConfig = signingConfigs.findByName("release")
             vcsInfo.include = false
+            isMinifyEnabled = true
+            proguardFiles(file("proguard-rules.pro"))
         }
     }
 

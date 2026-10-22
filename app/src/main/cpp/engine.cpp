@@ -61,6 +61,7 @@
 
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, "AMEngine", __VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, "AMEngine", __VA_ARGS__)
+#define LOGW(...) __android_log_print(ANDROID_LOG_WARN, "AMEngine", __VA_ARGS__)
 
 namespace am {
 
@@ -233,7 +234,7 @@ bool EngineImpl::initVulkan(std::string* error) {
     fApiVersion = std::min(loaderVersion, (uint32_t)VK_API_VERSION_1_4);
     fApiVersion = VK_MAKE_API_VERSION(0, VK_API_VERSION_MAJOR(fApiVersion),
                                       VK_API_VERSION_MINOR(fApiVersion), 0);
-    if (fApiVersion < VK_API_VERSION_1_2) return fail("Vulkan 1.2 check", VK_ERROR_INCOMPATIBLE_DRIVER);
+    if (fApiVersion < VK_API_VERSION_1_1) return fail("Vulkan 1.1 check", VK_ERROR_INCOMPATIBLE_DRIVER);
     fSkiaFeatures.init(fApiVersion);
 
     uint32_t n = 0;
@@ -266,6 +267,13 @@ bool EngineImpl::initVulkan(std::string* error) {
     if ((r != VK_SUCCESS && r != VK_INCOMPLETE) || n == 0) return fail("vkEnumeratePhysicalDevices", r);
     VkPhysicalDeviceProperties props;
     vkGetPhysicalDeviceProperties(fPhysicalDevice, &props);
+    const uint32_t deviceVersion = VK_MAKE_API_VERSION(0, VK_API_VERSION_MAJOR(props.apiVersion),
+                                                       VK_API_VERSION_MINOR(props.apiVersion), 0);
+    if (deviceVersion < VK_API_VERSION_1_1) return fail("Vulkan 1.1 device check", VK_ERROR_INCOMPATIBLE_DRIVER);
+    if (deviceVersion < fApiVersion) {
+        fApiVersion = deviceVersion;
+        fSkiaFeatures.init(fApiVersion);
+    }
 
     vkGetPhysicalDeviceQueueFamilyProperties(fPhysicalDevice, &n, nullptr);
     std::vector<VkQueueFamilyProperties> families(n);
@@ -355,18 +363,36 @@ bool EngineImpl::init(std::string* error) {
     bc.fVkExtensions = &fExtensions;
     bc.fDeviceFeatures2 = &fFeatures;
     bc.fGetProc = GetProc;
-    bc.fMemoryAllocator = SkiaVMA::Make(bc, {});
-    if (!bc.fMemoryAllocator) { *error = "SkiaVMA::Make failed"; return false; }
-
-    if (fBackend == Backend::kGraphite) {
-        skgpu::graphite::ContextOptions options;
-        fGraphite = skgpu::graphite::ContextFactory::MakeVulkan(bc, options);
-        if (fGraphite) fRecorder = fGraphite->makeRecorder();
-        if (!fRecorder) { *error = "Graphite context creation failed"; return false; }
-    } else {
-        fGanesh = GrDirectContexts::MakeVulkan(bc);
-        if (!fGanesh) { *error = "Ganesh context creation failed"; return false; }
+    std::vector<uint32_t> versions = {fApiVersion};
+    if (fApiVersion > VK_API_VERSION_1_1) versions.push_back(VK_API_VERSION_1_1);
+    bool ready = false;
+    for (uint32_t version : versions) {
+        bc.fMaxAPIVersion = version;
+        bc.fMemoryAllocator = SkiaVMA::Make(bc, {});
+        if (!bc.fMemoryAllocator) {
+            *error = "SkiaVMA::Make failed";
+        } else if (fBackend == Backend::kGraphite) {
+            skgpu::graphite::ContextOptions options;
+            fGraphite = skgpu::graphite::ContextFactory::MakeVulkan(bc, options);
+            if (fGraphite) fRecorder = fGraphite->makeRecorder();
+            ready = fRecorder != nullptr;
+            if (!ready) {
+                fRecorder.reset();
+                fGraphite.reset();
+                *error = "Graphite context creation failed";
+            }
+        } else {
+            fGanesh = GrDirectContexts::MakeVulkan(bc);
+            ready = fGanesh != nullptr;
+            if (!ready) *error = "Ganesh context creation failed";
+        }
+        if (ready) {
+            if (version != fApiVersion) LOGW("engine runs at Vulkan 1.1: the driver's own %u.%u was refused", VK_API_VERSION_MAJOR(fApiVersion), VK_API_VERSION_MINOR(fApiVersion));
+            break;
+        }
+        LOGE("%s at Vulkan %u.%u", error->c_str(), VK_API_VERSION_MAJOR(version), VK_API_VERSION_MINOR(version));
     }
+    if (!ready) return false;
 
     LOGI("engine ready: %s", fInfo.c_str());
     return true;

@@ -35,9 +35,10 @@ def main():
     package = sdk.PACKAGE
     sdk.adb("push", scene, "/data/local/tmp/am-smoke.xml", check=True)
     sdk.adb("shell", "am", "force-stop", package)
-    copied = sdk.adb("shell", "run-as", package, "cp", "/data/local/tmp/am-smoke.xml", "files/smoke.xml")
-    if copied.strip():
-        sys.exit(f"smoke_check: cannot copy into the app (is it a debug build?): {copied.strip()}")
+    sdk.adb("shell", "run-as", package, "mkdir", "-p", "files")
+    sdk.adb("shell", "run-as", package, "cp", "/data/local/tmp/am-smoke.xml", "files/smoke.xml")
+    if "smoke.xml" not in sdk.adb("shell", "run-as", package, "ls", "files"):
+        sys.exit("smoke_check: cannot copy the scene into the app (is it a debug build?)")
     sdk.adb("shell", "rm", "/data/local/tmp/am-smoke.xml")
     sdk.adb("logcat", "-c")
     internal = f"/data/data/{package}/files/smoke.xml"
