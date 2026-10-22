@@ -58,7 +58,7 @@ Set `ANDROID_NDK` to the NDK directory if it is not at `~/Library/Android/sdk/nd
 | `third_party/rnnoise` | RNNoise (BSD-3-Clause), for noise reduction | Vendored copy in the tree. Meant to become a pinned submodule; the upstream commit is not recorded yet. |
 | `third_party/skia` | Skia | **Not in the repository** (git-ignored). Fetched by `tools/build_skia.sh`. |
 
-Nothing else needs to be fetched by hand. The Whisper speech models and the AI Enhance and AI Smooth models are not part
+Nothing else needs to be fetched by hand. The Whisper speech models and the AI Smooth models are not part
 of the build: the app downloads each one the first time it is used.
 
 ## 5. Skia

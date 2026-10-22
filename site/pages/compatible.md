@@ -13,7 +13,7 @@ You can find your Android version in Settings, About phone, Android version.
 ## What it leaves out
 
 - **Optical flow High.** Frame Interpolation and **Smooth** offer Optical flow at Low and Medium; High needs more graphics power than most phones from the Android 9 to 12 years have.
-- **AI Smooth** and **AI Enhance.** The AI models need a newer graphics chip and would take many minutes, often hours, per clip on these phones.
+- **AI Smooth.** The AI model needs a newer graphics chip and would take many minutes, often hours, per clip on these phones.
 
 Everything else works the same way as in the Latest version: the editor, every effect, keyframes, text, shapes, the camera, captions, background removal, noise reduction, text to speech, frame blending, optical flow Low and Medium, motion blur, Smooth on a clip, and export to video, GIF and images.
 
