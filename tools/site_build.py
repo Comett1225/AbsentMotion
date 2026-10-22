@@ -447,8 +447,9 @@ class Site:
         out = ['<section id="brands"><h2>Phones by brand</h2>']
         extra = SITE / "data/brand_ranges.md"
         if extra.is_file():
-            out.append(self.markdown(extra.read_text(), "site/data/brand_ranges.md", 0))
+            out.append(self.markdown(re.sub(r"(?m)^## ", "### ", extra.read_text()), "site/data/brand_ranges.md", 0))
         names = {"latest": "Latest", "compatible": "Compatible", "unsupported": "Not supported"}
+        out.append("<h3>Every phone in the list</h3><p>Open a brand to see each model with the Android version it came with and the newest one it can run.</p>")
         brands = {}
         for d in self.devices:
             brands.setdefault(d["brand"], []).append(d)

@@ -122,9 +122,19 @@
   }
 
   function findByModelCode(index, model) {
-    if (!model) return null;
-    var hits = search(index, model, 3).filter(function (r) { return r.score >= 92; });
-    return hits.length ? hits[0].device : null;
+    if (!model) return [];
+    var hits = search(index, model, 6).filter(function (r) { return r.score >= 92; });
+    if (!hits.length) return [];
+    return hits.filter(function (r) { return r.score === hits[0].score; }).map(function (r) { return r.device; });
+  }
+
+  function deviceNames(devices) {
+    var names = [];
+    devices.forEach(function (d) {
+      var full = d.name.toLowerCase().indexOf(d.brand.toLowerCase()) === 0 ? d.name : d.brand + " " + d.name;
+      if (names.indexOf(full) < 0) names.push(full);
+    });
+    return names.join(" or ");
   }
 
   function blockedReason(device) {
@@ -170,7 +180,7 @@
 
   var api = {
     norm: norm, squash: squash, androidMajor: androidMajor, modelFromUserAgent: modelFromUserAgent, detect: detect,
-    buildIndex: buildIndex, search: search, findByModelCode: findByModelCode, recommend: recommend, verdict: verdict, TIER_NAMES: TIER_NAMES
+    buildIndex: buildIndex, search: search, findByModelCode: findByModelCode, deviceNames: deviceNames, recommend: recommend, verdict: verdict, TIER_NAMES: TIER_NAMES
   };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   root.AmSite = api;
@@ -190,10 +200,11 @@
     return fetch("data/devices.json").then(function (r) { return r.ok ? r.json() : []; }).catch(function () { return []; });
   }
 
-  function fillRecommendation(box, env, device, rec) {
+  function fillRecommendation(box, env, devices, rec) {
+    var device = devices[0] || null;
     var link = function (id) { var a = document.getElementById(id); return a ? a.getAttribute("href") : "#all"; };
     var version = box.getAttribute("data-version");
-    var name = device ? device.brand + " " + device.name : null;
+    var name = devices.length ? deviceNames(devices) : null;
     var seen = name ? "We think this is a " + name + (env.android ? " running Android " + env.android : "") + "." : (env.android ? "Your phone seems to run Android " + env.android + "." : "");
     var kids = [];
     var heading;
@@ -258,14 +269,14 @@
     var box = document.getElementById("rec");
     if (!box) return;
     detect(navigator).then(function (env) {
-      if (!env.model) return { env: env, device: null };
+      if (!env.model) return { env: env, devices: [] };
       return loadDevices().then(function (devices) {
-        return { env: env, device: findByModelCode(buildIndex(devices), env.model) };
+        return { env: env, devices: findByModelCode(buildIndex(devices), env.model) };
       });
     }).then(function (found) {
-      fillRecommendation(box, found.env, found.device, recommend(found.env, found.device));
+      fillRecommendation(box, found.env, found.devices, recommend(found.env, found.devices[0] || null));
     }).catch(function () {
-      fillRecommendation(box, { platform: "android", android: null, model: null }, null, { kind: "unknown" });
+      fillRecommendation(box, { platform: "android", android: null, model: null }, [], { kind: "unknown" });
     });
   }
 
@@ -273,12 +284,13 @@
     var d = result.device;
     var v = verdict(d);
     var card = el("article", { "class": "card" }, [
-      el("h3", {}, [d.brand + " " + d.name + " ", el("span", { "class": "tier " + v.tier, text: TIER_NAMES[v.tier] })]),
+      el("h3", {}, [deviceNames([d]) + " ", el("span", { "class": "tier " + v.tier, text: TIER_NAMES[v.tier] })]),
       el("p", { text: v.reason })
     ]);
     if (v.ai) card.appendChild(el("p", { text: v.ai }));
     if (d.notes) card.appendChild(el("p", { "class": "small", text: d.notes }));
-    if (d.confidence === "low") card.appendChild(el("p", { "class": "small muted", text: "We have little information about this model, so treat this as a guess and check Settings, About phone, Android version." }));
+    if (d.confidence === "low") card.appendChild(el("p", { "class": "small muted", text: "Less certain: we have little information about this model, so treat this as a guess and check Settings, About phone, Android version." }));
+    else if (d.confidence === "medium") card.appendChild(el("p", { "class": "small muted", text: "Less certain: this answer comes from the maker's usual update pattern, so it may be off by one version." }));
     return card;
   }
 

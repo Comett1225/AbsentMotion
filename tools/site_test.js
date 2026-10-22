@@ -15,7 +15,8 @@ function android(version, model) {
 
 async function recommendation(nav) {
   const env = await site.detect(nav);
-  return { env, rec: site.recommend(env, site.findByModelCode(index, env.model)) };
+  const found = site.findByModelCode(index, env.model);
+  return { env, found, rec: site.recommend(env, found[0] || null) };
 }
 
 async function main() {
@@ -38,8 +39,18 @@ async function main() {
   r = await recommendation(android("0.0.0", ""));
   assert.strictEqual(r.rec.kind, "unknown");
 
-  r = await recommendation(android("13.0.0", "SM-A032F"));
-  assert.strictEqual(r.rec.kind, "blocked", "a 32-bit phone is never offered a download");
+  const blocked = devices.find((d) => (d.arm64 === false || d.vulkan11 === false) && d.modelCodes.some((c) => !c.endsWith("*")));
+  r = await recommendation(android("13.0.0", blocked.modelCodes.find((c) => !c.endsWith("*"))));
+  assert.strictEqual(r.rec.kind, "blocked", "a phone without 64-bit ARM or Vulkan 1.1 is never offered a download");
+
+  const shared = {};
+  devices.forEach((d) => d.modelCodes.filter((c) => !c.endsWith("*")).forEach((c) => { (shared[c] = shared[c] || []).push(d); }));
+  const twin = Object.keys(shared).find((c) => shared[c].length === 2 && shared[c][0].name !== shared[c][1].name);
+  if (twin) {
+    r = await recommendation(android("14.0.0", twin));
+    assert.strictEqual(r.found.length, 2, "a code shared by two names finds both");
+    assert.ok(site.deviceNames(r.found).includes(" or "));
+  }
 
   r = await recommendation({ userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/130.0.0.0 Safari/537.36", userAgentData: { platform: "Windows", mobile: false } });
   assert.strictEqual(r.rec.kind, "desktop");
