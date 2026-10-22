@@ -75,7 +75,7 @@ jobs:
           apt-get install -y --no-install-recommends git ca-certificates curl unzip xz-utils python3 build-essential clang lld ninja-build openjdk-21-jdk-headless
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
-          submodules: true
+          submodules: recursive
           path: ${{ inputs.subdir || '.' }}
       - name: Install the Android SDK
         run: |
@@ -88,7 +88,7 @@ jobs:
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platform-tools" "platforms;android-37.0" "build-tools;37.0.0" "cmake;3.31.6" "ndk;30.0.16248370"
       - name: Prepare the source as F-Droid does
         run: |
-          rm -rf app/src/play third_party/whisper.cpp/models third_party/whisper.cpp/examples third_party/whisper.cpp/bindings
+          rm -rf app/src/play third_party/whisper.cpp/models third_party/whisper.cpp/examples third_party/whisper.cpp/bindings third_party/ncnn/examples third_party/ncnn/benchmark third_party/ncnn/python third_party/ncnn/images
           sed -i -e '/playImplementation/d' app/build.gradle.kts
           echo 'org.gradle.java.home=/usr/lib/jvm/java-21-openjdk-amd64' >> gradle.properties
       - name: Build Skia for Android 9
