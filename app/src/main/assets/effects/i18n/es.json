@@ -243,7 +243,7 @@
    }
   },
   "bumpmap": {
-   "description": "Ilumina la capa como si su brillo fuera una superficie en relieve, para un aspecto con textura y relieve que conserva los colores.",
+   "description": "Ilumina la capa como si su brillo fuera una superficie en relieve, para un aspecto texturizado y en relieve que conserva los colores.",
    "name": "Mapa de relieve",
    "params": {
     "ambient": {
@@ -399,7 +399,7 @@
    }
   },
   "chromakey": {
-   "description": "Elimina un color, como el de una pantalla verde.",
+   "description": "Elimina un color, como un fondo verde.",
    "name": "Croma",
    "params": {
     "key": {
@@ -492,8 +492,8 @@
    }
   },
   "colorbalance": {
-   "description": "Lleva las sombras, los medios tonos y las luces hacia sus propios colores (el gris deja un rango sin cambios).",
-   "name": "Equilibrio de color",
+   "description": "Empuja las sombras, los medios tonos y las luces hacia sus propios colores (el gris deja un rango sin cambios).",
+   "name": "Balance de color",
    "params": {
     "amount": {
      "label": "Cantidad"
@@ -522,7 +522,7 @@
    }
   },
   "colorwheels": {
-   "description": "Ruedas de color para las sombras (elevación), los medios tonos (gamma) y las luces (ganancia): un tono, cuánto aplicarlo y un nivel.",
+   "description": "Ruedas de color para las sombras (lift), los medios tonos (gamma) y las luces (gain): un tono, cuánto desplazarlo y un nivel.",
    "name": "Elevación, gamma y ganancia",
    "params": {
     "gainAmount": {
@@ -555,7 +555,7 @@
    }
   },
   "contourgradient": {
-   "description": "Pinta un degradado de dos colores hacia fuera desde los bordes de las partes opacas de la capa, como un halo suave de color.",
+   "description": "Pinta un degradado de dos colores hacia afuera desde los bordes de las partes opacas de la capa, como un halo de color suave.",
    "name": "Degradado de contorno",
    "params": {
     "alpha": {
@@ -889,7 +889,7 @@
    }
   },
   "denoise": {
-   "description": "Elimina el ruido de la imagen con un filtro bilateral que conserva los bordes y promedia los píxeles cercanos solo cuando sus colores son similares.",
+   "description": "Elimina el ruido de la imagen con un filtro bilateral que preserva los bordes y promedia píxeles cercanos solo cuando sus colores son similares.",
    "name": "Reducción de ruido",
    "params": {
     "detail": {
@@ -916,7 +916,7 @@
    }
   },
   "displacementmap": {
-   "description": "Usa los colores de la capa para empujar las capas de atrás y luego se oculta; o, con Mapa en Capa inferior, empuja esta capa según la capa de abajo.",
+   "description": "Usa los colores de la capa para desplazar las capas de detrás y luego se oculta; o, con Mapa en Capa inferior, desplaza esta capa según la capa de abajo.",
    "name": "Mapa de desplazamiento",
    "params": {
     "edges": {
@@ -1407,7 +1407,7 @@
    }
   },
   "fourcolor": {
-   "description": "Mezcla cuatro colores ubicados en cuatro puntos (en píxeles desde el centro de la capa) sobre la capa.",
+   "description": "Mezcla cuatro colores colocados en cuatro puntos (en píxeles desde el centro de la capa) sobre la capa.",
    "name": "Degradado de cuatro colores",
    "params": {
     "blend": {
@@ -1520,7 +1520,7 @@
    }
   },
   "glass": {
-   "description": "Convierte la forma de la capa en vidrio biselado que curva las capas de atrás, con un reflejo a lo largo del borde.",
+   "description": "Convierte la forma de la capa en vidrio biselado que curva las capas de detrás, con un brillo a lo largo del borde.",
    "name": "Cristal",
    "params": {
     "angle": {
@@ -1544,7 +1544,7 @@
    }
   },
   "glitch": {
-   "description": "Desplaza bloques horizontales al azar y desfasa los canales de color varias veces por segundo.",
+   "description": "Desplazamiento horizontal aleatorio de bloques y desfases de canales de color, cambiando varias veces por segundo.",
    "name": "Glitch",
    "params": {
     "blockHeight": {
@@ -1559,7 +1559,7 @@
    }
   },
   "glow": {
-   "description": "Un halo de un solo color alrededor del contorno de la capa. La dureza lo convierte de un degradado suave en un contorno sólido.",
+   "description": "Un halo de un color alrededor del exterior de la forma de la capa; la dureza lo convierte de un desvanecimiento suave en un contorno sólido.",
    "name": "Resplandor",
    "params": {
     "alpha": {
@@ -1612,7 +1612,7 @@
    }
   },
   "gradientmap": {
-   "description": "Recolorea la imagen según su brillo con tres colores, con repeticiones y una fase. Escalar brillo multiplica el resultado por el brillo propio de la imagen.",
+   "description": "Recolorea la imagen según el brillo mediante tres colores, con repeticiones y una fase; Escalar brillo multiplica el resultado por el brillo propio de la imagen.",
    "name": "Mapa de degradado",
    "params": {
     "color1": {
@@ -1642,7 +1642,7 @@
    }
   },
   "gradientoverlay": {
-   "description": "Aplica un degradado de dos colores sobre la capa, con formas y modos de fusión a elegir.",
+   "description": "Coloca un degradado de dos colores sobre la capa, con una selección de formas y modos de fusión.",
    "name": "Capa de degradado",
    "params": {
     "angle": {
@@ -1968,7 +1968,7 @@
    }
   },
   "hollowbox": {
-   "description": "Una caja con la parte superior e inferior abiertas: la capa cubre el exterior y el interior toma el color interior.",
+   "description": "Una caja con la parte superior e inferior abiertas: la capa cubre el exterior y el interior toma el color interno.",
    "name": "Caja hueca",
    "params": {
     "depth": {
@@ -2019,7 +2019,7 @@
    }
   },
   "huesaturation": {
-   "description": "Gira los colores en el círculo cromático y los hace más fuertes o más débiles; la vibrancia refuerza más los colores apagados.",
+   "description": "Gira los colores alrededor del círculo cromático y los hace más fuertes o más débiles; la vibrancia refuerza más los colores apagados.",
    "name": "Tono y saturación",
    "params": {
     "hue": {
@@ -2362,7 +2362,7 @@
    }
   },
   "magnifybackground": {
-   "description": "Convierte la capa en una lupa: su forma muestra las capas de atrás ampliadas alrededor de su centro.",
+   "description": "Convierte la capa en una lupa: su forma muestra las capas de detrás ampliadas alrededor de su centro.",
    "name": "Ampliar fondo",
    "params": {
     "magnify": {
@@ -2753,7 +2753,7 @@
    }
   },
   "pixelate": {
-   "description": "Convierte la capa en bloques de un solo color cada uno, tomados del centro del bloque, en una cuadrícula centrada en la capa (o en el fotograma con Espacio de pantalla). Estiramiento, Desplazamiento y Ángulo dan forma a la cuadrícula, y Viñeta oscurece cada bloque hacia sus bordes.",
+   "description": "Convierte la capa en bloques de un solo color cada uno, tomado del centro del bloque, en una cuadrícula centrada en la capa (o en el fotograma con Espacio de pantalla); Estirar, Desplazar y Ángulo dan forma a la cuadrícula, y Viñeta oscurece cada bloque hacia sus bordes.",
    "name": "Pixelar",
    "params": {
     "angle": {
@@ -2777,7 +2777,7 @@
    }
   },
   "polar": {
-   "description": "Curva la capa alrededor de su centro y convierte líneas rectas en círculos, o desenrolla círculos en líneas rectas.",
+   "description": "Curva la capa alrededor de su centro, convirtiendo líneas rectas en círculos, o desenrolla círculos en líneas rectas.",
    "name": "Coordenadas polares",
    "params": {
     "amount": {
@@ -2793,7 +2793,7 @@
    }
   },
   "polardisplacement": {
-   "description": "Gira y atrae las capas de detrás de esta alrededor de un punto central según los colores de la capa y luego la oculta.",
+   "description": "Gira y arrastra las capas de detrás de esta alrededor de un punto central según los colores de la capa y luego oculta la capa.",
    "name": "Mapa de desplazamiento polar",
    "params": {
     "angle": {
@@ -2843,7 +2843,7 @@
    }
   },
   "posterize": {
-   "description": "Divide cada canal de color en varios niveles planos, así que los degradados suaves se convierten en bandas. El desplazamiento mueve dónde caen los bordes de las bandas.",
+   "description": "Corta cada canal de color en un número de Pasos planos, de modo que los degradados suaves se conviertan en bandas; Desplazamiento mueve dónde caen los bordes de las bandas.",
    "name": "Posterizar",
    "params": {
     "levels": {
@@ -3327,7 +3327,7 @@
    }
   },
   "rgbsplit": {
-   "description": "Separa los canales rojo, verde y azul: el canal central se queda fijo y los otros dos se desplazan en direcciones opuestas a lo largo de Ángulo. Claro suma los colores desplazados, Oscuro los mantiene sólidos, Máscara conserva solo donde se superponen los tres y Luma hace que los bordes tengan opacidad según su brillo.",
+   "description": "Separa los canales rojo, verde y azul: el canal Central se queda fijo y los otros dos se desplazan en direcciones opuestas a lo largo de Ángulo; Claro suma los colores desplazados, Oscuro los mantiene sólidos, Máscara conserva solo donde se superponen los tres y Luma hace que las franjas sean tan opacas como brillantes.",
    "name": "Separación RGB",
    "params": {
     "angle": {
@@ -3395,7 +3395,7 @@
    }
   },
   "ripple": {
-   "description": "Ondas concéntricas que se irradian desde un punto central, con amplitud, longitud de onda y velocidad configurables.",
+   "description": "Ondas concéntricas que irradian desde un punto central con amplitud, longitud de onda y velocidad configurables.",
    "name": "Ondulación",
    "params": {
     "amplitude": {
@@ -3548,7 +3548,7 @@
    }
   },
   "sharpen": {
-   "description": "Aplica una máscara de enfoque con un vecindario de 3x3 para realzar los detalles finos.",
+   "description": "Aplica una máscara de enfoque usando un vecindario de 3x3 para realzar los detalles finos.",
    "name": "Enfocar",
    "params": {
     "amount": {
@@ -3632,7 +3632,7 @@
    }
   },
   "solid": {
-   "description": "Coloca un color sobre la capa, conservando su forma, con distintos modos de fusión.",
+   "description": "Coloca un color sobre la capa, manteniendo su forma, con una selección de modos de fusión.",
    "name": "Color sólido",
    "params": {
     "amount": {
@@ -4225,7 +4225,7 @@
    }
   },
   "texttransform": {
-   "description": "Mueve, escala, gira, desvanece y tiñe letras, palabras o líneas dentro de un rango. Ancla define si el escalado y la rotación usan cada componente o el centro de la capa. Mueve el rango con Desplazamiento para que el cambio recorra el texto.",
+   "description": "Mueve, escala, gira, desvanece y tiñe letras, palabras o líneas dentro de un rango; el ancla define si el escalado y la rotación usan cada componente o el centro de la capa; mueve el rango con Desplazamiento para que el cambio recorra el texto.",
    "name": "Transformar texto",
    "params": {
     "anchor": {
@@ -4459,14 +4459,14 @@
    }
   },
   "tint": {
-   "description": "Asigna la luminancia de la imagen entre un color de sombra y uno de luz con una cantidad de mezcla.",
+   "description": "Asigna la luminancia de la imagen entre un color de sombra y un color de altas luces con una cantidad de mezcla.",
    "name": "Tinte",
    "params": {
     "amount": {
      "label": "Cantidad"
     },
     "highlightColor": {
-     "label": "Color de luz"
+     "label": "Color de altas luces"
     },
     "shadowColor": {
      "label": "Color de sombra"
@@ -4687,7 +4687,7 @@
    }
   },
   "vhs": {
-   "description": "Parece una cinta de video antigua: sangrado de color, líneas arrastradas, líneas de barrido, ruido de cinta y bandas de seguimiento.",
+   "description": "Parece una videocinta antigua: sangrado de color, líneas emborronadas, líneas de barrido, ruido de cinta y bandas de seguimiento que se desplazan.",
    "name": "VHS",
    "params": {
     "chroma": {

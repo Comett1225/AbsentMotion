@@ -35,7 +35,6 @@
     <string name="ok">ตกลง</string>
     <string name="easing_needs_at_least_two_keyframes">อีสซิ่งต้องมีคีย์เฟรมอย่างน้อยสองคีย์เฟรม\n\nหากคีย์เฟรมของคุณอยู่ที่คุณสมบัติอื่น ให้เลือกคุณสมบัตินั้นก่อน</string>
     <string name="add_keyframes_first">เพิ่มคีย์เฟรมก่อน</string>
-    <string name="convert_to_group">แปลงเป็นกลุ่ม</string>
     <string name="cancel">ยกเลิก</string>
     <string name="rebuild_source_project">สร้างโปรเจกต์ต้นฉบับใหม่</string>
     <string name="this_asset_pointed_to_a_project">แอสเซทนี้ชี้ไปยังโปรเจกต์ที่ถูกลบไปแล้ว\n\nต้องการสร้างโปรเจกต์ใหม่จากแอสเซทนี้ หรือแยกออกแล้วแก้ไขโดยตรง?</string>
@@ -89,7 +88,7 @@
     <string name="export_template_failed">ไม่สามารถเก็บสำเนาเป็นเทมเพลตได้ โปรดเพิ่มพื้นที่ว่าง</string>
     <string name="also_keeps_the_project_with_its">จะเก็บโปรเจกต์พร้อมสื่อไว้ในเทมเพลตบนโทรศัพท์นี้ด้วย เปิดที่นั่นเพื่อเปลี่ยนสื่อและทำโปรเจกต์ใหม่ต่อ</string>
     <string name="template">เทมเพลต</string>
-    <string name="one_absproj_package_with_the_project">แพ็กเกจ .absproj หนึ่งชุดพร้อมโปรเจกต์และสื่อต้นฉบับที่ใช้ บันทึกไปยัง Documents / AbsentMotion เก็บไว้เป็นแบ็กอัปหรือย้ายโปรเจกต์ไปโทรศัพท์เครื่องอื่น</string>
+    <string name="one_absproj_package_with_the_project">แพ็กเกจ .absproj หนึ่งไฟล์พร้อมโปรเจกต์และสื่อต้นฉบับที่ใช้ บันทึกไว้ที่ Documents/AbsentMotion เก็บเป็นแบ็กอัปหรือย้ายโปรเจกต์ไปโทรศัพท์เครื่องอื่น</string>
     <string name="project_bundle">ชุดโปรเจกต์</string>
     <string name="project_home_page">หน้าแรกของโปรเจกต์</string>
     <string name="open_source_licences">ใบอนุญาตโอเพนซอร์ส</string>
@@ -126,7 +125,7 @@
     <string name="delete_all">ลบทั้งหมด</string>
     <string name="effects_not_loaded">โหลดเอฟเฟกต์ไม่ได้</string>
     <string name="settings_demo_mode">โหมดสาธิต</string>
-    <string name="settings_open_xml">เปิดโปรเจกต์ XML</string>
+    <string name="settings_open_xml">แสดงการ์ดนำเข้าในรายการโปรเจกต์</string>
     <string name="settings_vibration">การสั่น</string>
     <string name="settings_emoji">สไตล์อีโมจิ</string>
     <string name="settings_emoji_system">ระบบ</string>
@@ -162,23 +161,23 @@
     <string name="theme_daylight">กลางวัน</string>
     <string name="theme_custom">กำหนดเอง</string>
     <string name="theme_custom_named">กำหนดเอง (%1$s)</string>
-    <string name="theme_error_bad_colour">สีไม่ถูกต้องสำหรับ %1$s</string>
-    <string name="theme_error_no_colours">ไม่มีสีของธีมในไฟล์นี้</string>
+    <string name="theme_error_bad_colour">สีของ %1$s ไม่ถูกต้อง</string>
+    <string name="theme_error_no_colours">ไม่มีสีธีมในไฟล์นี้</string>
     <string name="library_err_no_data">ไม่ได้รับข้อมูล</string>
     <string name="library_err_unsupported_type">ไม่รองรับประเภทไฟล์นี้</string>
     <string name="library_err_missing_manifest">แพ็กเกจโปรเจกต์ไม่มีแมนนิเฟส</string>
     <string name="library_err_package_project_missing">แพ็กเกจผิดรูปแบบ: ไม่พบไฟล์โปรเจกต์</string>
     <string name="library_err_too_many_projects">แพ็กเกจมีโปรเจกต์มากเกินไป (เกิน %1$s)</string>
     <string name="library_err_project_files_large">ไฟล์โปรเจกต์ในแพ็กเกจมีขนาดใหญ่เกินไป</string>
-    <string name="library_err_no_project">Scene ผิดรูปแบบ: ไม่มีโปรเจกต์ในแพ็กเกจ</string>
+    <string name="library_err_no_project">ฉากผิดรูปแบบ: ไม่มีโปรเจกต์ในแพ็กเกจ</string>
     <string name="library_err_malformed_package">แพ็กเกจผิดรูปแบบ: %1$s</string>
     <string name="library_err_malformed_xml">XML ผิดรูปแบบ: %1$s</string>
-    <string name="library_err_scene_needs_size">Scene ผิดรูปแบบ: ต้องมี &lt;scene&gt; พร้อมขนาด</string>
-    <string name="library_err_scene_too_big">Scene ผิดรูปแบบ: ขนาดใหญ่กว่า %1$s พิกเซล</string>
-    <string name="library_err_scene_fps">Scene ผิดรูปแบบ: เฟรมเรตต้องอยู่ระหว่าง 1 ถึง %1$s</string>
+    <string name="library_err_scene_needs_size">ฉากผิดรูปแบบ: ไฟล์ต้องมีฉากที่มีความกว้างและความสูง</string>
+    <string name="library_err_scene_too_big">ฉากผิดรูปแบบ: ขนาดใหญ่กว่า %1$s พิกเซล</string>
+    <string name="library_err_scene_fps">ฉากผิดรูปแบบ: เฟรมเรตต้องอยู่ระหว่าง 1 ถึง %1$s</string>
     <string name="library_err_package_large">แพ็กเกจมีขนาดใหญ่เกินไป (เกิน %1$s MB เมื่อแตกไฟล์)</string>
     <string name="library_err_too_many_files">แพ็กเกจมีไฟล์มากเกินไป (เกิน %1$s)</string>
-    <string name="library_err_xml_large">XML ผิดรูปแบบ: ไฟล์มีขนาดใหญ่เกินไป</string>
+    <string name="library_err_xml_large">ไฟล์นี้ใหญ่เกินไปที่จะเปิด (มากกว่า 32 MB)</string>
     <string name="library_err_media_large">แพ็กเกจมีขนาดใหญ่เกินไป (สื่อเกิน %1$s MB)</string>
     <string name="library_err_not_backup">ไฟล์นี้ไม่ใช่ไฟล์สำรองข้อมูลของ AbsentMotion</string>
     <string name="library_err_backup_project_large">มีโปรเจกต์ในไฟล์สำรองข้อมูลที่มีขนาดใหญ่เกินไป</string>
@@ -260,12 +259,15 @@
     <plurals name="backup_restored_skipped">
         <item quantity="other">%1$s โปรเจกต์มีอยู่ที่นี่แล้วจึงเก็บไว้ตามเดิม</item>
     </plurals>
+    <plurals name="backup_restored_rejected">
+        <item quantity="other">ไม่ได้กู้คืน %1$s โปรเจกต์ เนื่องจากขนาดหรือเฟรมเรตไม่ถูกต้อง</item>
+    </plurals>
     <string name="about_version">เวอร์ชัน %1$s</string>
     <string name="about_licence_line">ฟรีและโอเพนซอร์ส ภายใต้สัญญาอนุญาต Apache License 2.0</string>
     <string name="about_independent_note">AbsentMotion เป็นโปรเจกต์อิสระ ไม่มีความเกี่ยวข้อง ไม่ได้รับการรับรอง และไม่ได้รับการสนับสนุนจากผู้พัฒนาแอปอื่นใด ชื่อผลิตภัณฑ์อื่นเป็นของผู้เป็นเจ้าของ</string>
     <string name="about_compatibility_note">AbsentMotion สามารถเปิดไฟล์ scene XML และแพ็กเกจ .amproj ที่ส่งออกจาก Alight Motion ได้ และส่งออก scene XML ในรูปแบบเดียวกัน แพ็กเกจของแอปจะถูกบันทึกเป็น .absproj</string>
     <string name="about_loading">กำลังโหลด…</string>
-    <string name="about_licence_unreadable">อ่านข้อความสัญญาอนุญาตไม่ได้</string>
+    <string name="about_licence_unreadable">อ่านข้อความใบอนุญาตไม่ได้</string>
     <string name="template_use_title">ใช้เทมเพลต</string>
     <string name="template_next">ถัดไป</string>
     <string name="template_drag_to_select">ลากผ่านเพื่อเลือก</string>
@@ -320,7 +322,7 @@
     <string name="safety_open_failed_with_history">ไฟล์โปรเจกต์หายไปหรือเสียหาย จึงไม่มีการเปลี่ยนแปลงใด ๆ คุณสามารถเรียกคืนเวอร์ชันก่อนหน้าจากประวัติเวอร์ชันได้</string>
     <string name="newproject_bg_black">สีดำ</string>
     <string name="newproject_bg_white">สีขาว</string>
-    <string name="newproject_bg_light_grey">สีเทาอ่อน</string>
+    <string name="newproject_bg_light_grey">เทาอ่อน</string>
     <string name="newproject_bg_green">สีเขียว</string>
     <string name="newproject_bg_blue">สีน้ำเงิน</string>
     <string name="newproject_bg_transparent">โปร่งใส</string>
@@ -356,7 +358,7 @@
     <string name="export_anyway">ส่งออกต่อไป</string>
     <string name="export_available_space">พื้นที่ว่าง</string>
     <string name="export_estimated_size">ขนาดไฟล์โดยประมาณ</string>
-    <string name="export_calculating">กำลังคำนวณ...</string>
+    <string name="export_calculating">กำลังคำนวณ…</string>
     <string name="export_kind_video">วิดีโอ</string>
     <string name="export_kind_frame_png">เฟรมปัจจุบันเป็น PNG</string>
     <string name="export_kind_frame_as">เฟรมปัจจุบันเป็น…</string>
@@ -433,12 +435,14 @@
     <string name="export_thermal_hot">เครื่องร้อน การส่งออกจะช้าลงเพื่อให้เครื่องเย็นลง</string>
     <string name="export_thermal_critical">เครื่องร้อนมาก การส่งออกจะหยุดชั่วคราวระหว่างเฟรมจนกว่าเครื่องจะเย็นลง</string>
     <string name="export_time_few_seconds">ไม่กี่วินาที</string>
-    <string name="export_time_hours">ประมาณ %1$s ชั่วโมง</string>
     <plurals name="export_time_seconds">
         <item quantity="other">ประมาณ %1$s วินาที</item>
     </plurals>
     <plurals name="export_time_minutes">
         <item quantity="other">ประมาณ %1$s นาที</item>
+    </plurals>
+    <plurals name="export_time_hours_count">
+        <item quantity="other">ประมาณ %1$s ชั่วโมง</item>
     </plurals>
     <string name="export_verify_empty">ไฟล์นี้ไม่มีทั้งเสียงและวิดีโอ</string>
     <string name="export_verify_no_video">ไฟล์นี้ไม่มีแทร็กวิดีโอ</string>
@@ -450,10 +454,11 @@
     <string name="export_verify_picture">รูปภาพในไฟล์ถอดรหัสไม่ได้</string>
     <string name="export_verify_size">รูปภาพมีขนาด %1$s แทนที่จะเป็น %2$s</string>
     <string name="export_verify_frames">GIF มี %1$s เฟรม แทนที่จะเป็น %2$s</string>
+    <string name="export_sound_unreadable">อ่านเสียงของ %1$s ไม่ได้ ไฟล์นี้จึงไม่มีเสียง</string>
     <string name="export_error_cannot_encode">เครื่องนี้เข้ารหัส %1$s ที่ %2$s ไม่ได้</string>
-    <string name="export_error_draw_frame">เอนจินวาดเฟรม %1$s ไม่ได้</string>
+    <string name="export_error_draw_frame">วาดเฟรม %1$s ไม่ได้ ลองส่งออกอีกครั้ง</string>
     <string name="export_error_draw_still">เอนจินวาดเฟรมไม่ได้</string>
-    <string name="export_error_no_sound">โปรเจกต์นี้ไม่มีเสียงให้ส่งออก</string>
+    <string name="export_error_no_sound">โปรเจกต์นี้ไม่มีเสียงให้ส่งออก เพิ่มเพลง เสียง หรือวิดีโอที่มีเสียงก่อน</string>
     <string name="export_error_create">สร้าง %1$s ใน %2$s ไม่ได้</string>
     <string name="export_error_write">เขียน %1$s ไม่ได้</string>
     <string name="export_error_mp3_settings">ตัวเข้ารหัส MP3 ใช้ %1$s Hz ที่ %2$s kbps ไม่ได้</string>
@@ -468,6 +473,8 @@
     <string name="camera_photo">รูปภาพ</string>
     <string name="camera_video">วิดีโอ</string>
     <string name="camera_close">ปิดกล้อง</string>
+    <string name="camera_take_photo">ถ่ายรูป</string>
+    <string name="camera_start_recording">เริ่มบันทึก</string>
     <string name="camera_switch">สลับกล้อง</string>
     <string name="camera_pause_recording">หยุดบันทึกชั่วคราว</string>
     <string name="camera_resume_recording">บันทึกต่อ</string>
@@ -486,16 +493,16 @@
     <string name="media_error_video_unavailable">วิดีโอไม่พร้อมใช้งาน: %1$s</string>
     <string name="media_error_decode_frame">ถอดรหัสเฟรมวิดีโอ %1$s ไม่ได้</string>
     <string name="media_error_import_frame">ไม่สามารถนำเข้าเฟรมวิดีโอ %1$s สำหรับ %2$s</string>
-    <string name="media_error_interp_source">เฟรมต้นฉบับสำหรับการอินเทอร์โพเลชัน %1$s ไม่พร้อมใช้งาน</string>
-    <string name="media_error_interp_wrong_frame">การอินเทอร์โพเลชันได้รับเฟรมต้นฉบับที่ไม่ถูกต้องสำหรับ %1$s</string>
-    <string name="media_error_interp_import">ไม่สามารถนำเข้าเฟรมต้นฉบับสำหรับการอินเทอร์โพเลชัน %1$s</string>
+    <string name="media_error_interp_source">ไม่พบเฟรมวิดีโอที่ต้องใช้สำหรับการแทรกเฟรม (%1$s) ลองอีกครั้ง หรือตั้งค่าการแทรกเฟรมเป็นปิด</string>
+    <string name="media_error_interp_wrong_frame">อ่านเฟรมวิดีโอที่ต้องใช้สำหรับการแทรกเฟรมไม่ถูกต้อง (%1$s) ลองอีกครั้ง หรือตั้งค่าการแทรกเฟรมเป็นปิด</string>
+    <string name="media_error_interp_import">โหลดเฟรมวิดีโอที่ต้องใช้สำหรับการแทรกเฟรมไม่ได้ (%1$s) ลองอีกครั้ง หรือตั้งค่าการแทรกเฟรมเป็นปิด</string>
     <string name="media_error_interp_render">%1$s ไม่สามารถเรนเดอร์เฟรมวิดีโอที่ขอได้</string>
     <string name="engine_loading_effects">กำลังโหลดเอฟเฟกต์…</string>
     <string name="engine_error_gpu_capture">GPU ทำงานผิดพลาดระหว่างการแคปเจอร์</string>
     <string name="platform_voice_name">เสียง %1$s</string>
     <string name="platform_error_tts_unavailable">ระบบแปลงข้อความเป็นเสียงไม่พร้อมใช้งานบนโทรศัพท์นี้</string>
     <string name="platform_error_voice">ไม่สามารถสร้างเสียงได้</string>
-    <string name="platform_caption_download">คำบรรยายถูกจดจำบนโทรศัพท์ของคุณโดยโมเดลเสียง ซึ่งดาวน์โหลดครั้งเดียว: %1$s, %2$s จาก Hugging Face</string>
+    <string name="platform_caption_download">ระบบจะรู้จำคำบรรยายบนโทรศัพท์ของคุณด้วยโมเดลเสียง ดาวน์โหลดครั้งเดียว: %1$s, %2$s จาก Hugging Face</string>
     <string name="add_layer">เพิ่มเลเยอร์</string>
     <string name="add_tab_shape">รูปร่าง</string>
     <string name="add_tab_media">สื่อ</string>
@@ -514,7 +521,7 @@
     <string name="audiofx_reorder">จัดลำดับ</string>
     <string name="audiofx_reset">รีเซ็ต</string>
     <string name="audiofx_mix">มิกซ์</string>
-    <string name="caption_cancelled">ยกเลิก</string>
+    <string name="caption_cancelled">ยกเลิกแล้ว</string>
     <string name="caption_unable">ไม่สามารถสร้างคำบรรยายได้</string>
     <string name="caption_out_of_memory">หน่วยความจำไม่เพียงพอสำหรับเสียงจำนวนนี้</string>
     <string name="caption_unavailable_build">คำบรรยายอัตโนมัติไม่พร้อมใช้งานในบิลด์นี้</string>
@@ -631,6 +638,8 @@
     <string name="font_search">ค้นหา</string>
     <string name="font_imported">นำเข้าแล้ว</string>
     <string name="font_downloads_when_chosen">ดาวน์โหลดเมื่อเลือก</string>
+    <string name="fonts_missing_title">ไม่มีฟอนต์ในโทรศัพท์เครื่องนี้</string>
+    <string name="fonts_missing_body">โปรเจกต์นี้ใช้ฟอนต์ที่ไม่มีในโทรศัพท์เครื่องนี้: %1$s ข้อความจะแสดงด้วยฟอนต์อื่นจนกว่าคุณจะดาวน์โหลดจาก Google Fonts</string>
     <string name="font_favorite">รายการโปรด</string>
     <string name="font_category_sans_serif">ซานส์เซอริฟ</string>
     <string name="font_category_serif">เซอริฟ</string>
@@ -1106,7 +1115,7 @@
     <string name="ai_saving_transparent">กำลังบันทึกรูปภาพโปร่งใส…</string>
     <string name="ai_loading_model">กำลังโหลดโมเดลลบพื้นหลัง…</string>
     <string name="ai_no_foreground_mask">ไม่ได้รับมาสก์ภาพเบื้องหน้า</string>
-    <string name="ai_mask_unexpected_size">ขนาดมาสก์ภาพเบื้องหน้าไม่ถูกต้อง</string>
+    <string name="ai_mask_unexpected_size">การลบพื้นหลังได้ผลลัพธ์ขนาดไม่ถูกต้อง ลองอีกครั้ง</string>
     <string name="ai_cannot_save_image">ไม่สามารถบันทึกรูปภาพ</string>
     <string name="ai_cannot_read_image">ไม่สามารถอ่านรูปภาพนี้</string>
     <string name="ai_cannot_decode_image">ไม่สามารถถอดรหัสรูปภาพนี้</string>
@@ -1117,10 +1126,10 @@
     <string name="ai_sample_rate_changed">อัตราสุ่มตัวอย่างเสียงเปลี่ยนระหว่างการถอดรหัส</string>
     <string name="ai_recording_too_large">ไฟล์บันทึกเสียงนี้ใหญ่เกินไปสำหรับ WAV</string>
     <string name="ai_no_samples_decoded">ไม่มีแซมเพิลเสียงที่ถูกถอดรหัส</string>
-    <string name="ai_mask_wrong_size">มาสก์มีขนาดไม่ถูกต้อง</string>
+    <string name="ai_mask_wrong_size">การลบพื้นหลังได้ผลลัพธ์ขนาดไม่ถูกต้อง ลองอีกครั้ง</string>
     <string name="ai_encoder_no_image">ตัวเข้ารหัสวิดีโอไม่มีภาพอินพุต</string>
     <string name="ai_encoder_not_responding">ตัวเข้ารหัสวิดีโอหยุดตอบสนอง</string>
-    <string name="ai_encoder_frames_before_format">ตัวเข้ารหัสวิดีโอส่งเฟรมมาก่อนข้อมูลรูปแบบ</string>
+    <string name="ai_encoder_frames_before_format">ตัวเข้ารหัสวิดีโอไม่ได้เริ่มอย่างถูกต้อง ลองอีกครั้ง</string>
     <string name="ai_encoder_not_finished">ตัวเข้ารหัสวิดีโอทำงานไม่เสร็จ</string>
     <string name="ai_cannot_encode_mask">โทรศัพท์นี้ไม่สามารถเข้ารหัสวิดีโอมาสก์ได้</string>
     <string name="ai_video_no_size">วิดีโอนี้ไม่มีข้อมูลขนาด</string>
@@ -1240,7 +1249,7 @@
     <string name="track_motion_lost_at_frame">การติดตามหลุดที่เฟรม %1$s เลื่อนจุดกลับไปยังจุดเดิม แล้วแตะดำเนินการต่อ</string>
     <string name="track_motion_done">ติดตามแล้ว %1$s เฟรม คีย์เฟรมอยู่ที่ %2$s</string>
     <string name="track_motion_target_layer">เลเยอร์เป้าหมาย</string>
-    <string name="track_motion_cancelled">ยกเลิกการติดตามแล้ว เฟรมที่ติดตามไปแล้วยังคงมีคีย์เฟรมอยู่</string>
+    <string name="track_motion_cancelled">ยกเลิกการติดตามแล้ว เฟรมที่ติดตามแล้วยังคงมีคีย์เฟรมอยู่</string>
     <string name="track_motion_unavailable">การติดตามการเคลื่อนไหวไม่พร้อมใช้งานในเวอร์ชันนี้</string>
     <string name="track_motion_failed">ไม่สามารถติดตามวิดีโอนี้ได้</string>
     <string name="edit_layer_copy_name">สำเนา %1$s</string>
@@ -1280,7 +1289,7 @@
     <string name="export_audio_summary_lossless">%1$s · %2$s · %3$s</string>
     <string name="export_audio_hint">การตั้งค่าเสียงสำหรับไฟล์วิดีโอ %1$s รองรับเสียง %2$s</string>
     <string name="export_audio_hint_silent">โปรเจกต์นี้ยังไม่มีเสียง การตั้งค่าเหล่านี้จะถูกใช้เมื่อคุณเพิ่มเสียง</string>
-    <string name="export_audio_only_hint">บันทึกไปที่ Music / AbsentMotion WAV และ FLAC เก็บรายละเอียดครบ ส่วน M4A, OGG และ MP3 มีขนาดเล็กกว่า</string>
+    <string name="export_audio_only_hint">บันทึกไปที่ Music/AbsentMotion WAV และ FLAC เก็บรายละเอียดครบ ส่วน M4A, OGG และ MP3 มีขนาดเล็กกว่า</string>
     <string name="export_running_audio">กำลังส่งออกเสียง</string>
     <string name="export_interpolation_off_help">แต่ละคลิปแสดงเฟรมของตัวเอง คลิป 30 fps ในการส่งออก 60 fps จะแสดงทุกเฟรมสองครั้ง การเคลื่อนไหวจึงอาจดูสะดุดเล็กน้อย</string>
     <string name="export_interpolation_blend_help">เฟรมแทรกใหม่จะผสมสองเฟรมที่ใกล้ที่สุดเหมือนการครอสเฟดเร็ว ส่งออกไว แต่การเคลื่อนไหวเร็วอาจดูเป็นเงาซ้อน</string>

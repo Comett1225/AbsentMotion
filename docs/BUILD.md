@@ -28,7 +28,7 @@ About 15 GB free (Skia with its dependencies, the Gradle cache, the Android SDK 
 | Python | 3 | The Skia dependency sync and the helper scripts in `tools/`. |
 | git | system | Fetching Skia and its dependencies. |
 
-The Gradle wrapper downloads **Gradle 9.8.1** itself. The build files pin the Android Gradle Plugin 9.4.1, Kotlin 2.4.21
+The Gradle wrapper downloads **Gradle 9.8.2** itself. The build files pin the Android Gradle Plugin 9.4.1, Kotlin 2.4.21
 and the Compose BOM 2026.09.00.
 
 **Homebrew:**
@@ -107,14 +107,14 @@ Skia from section 5 must be in place first.
 
 Outputs: `app/build/outputs/apk/<flavour>/<type>/app-<flavour>-<type>.apk`, for example `app/build/outputs/apk/play/debug/app-play-debug.apk`. The foss flavour adds its own offline background remover (`app/src/foss`); the play flavour uses Google ML Kit through Google Play services (`app/src/play`).
 
-- **Requirements of the app:** Android 14 (API 34) or newer (`minSdk = 34`, tested on Android 16 and 17), `targetSdk = 37`,
-  a 64-bit ARM device, Vulkan 1.2.
+- **Requirements of the app:** Android 13 (API 33) or newer (`minSdk = 33`, tested on Android 16 and 17 and on emulators from Android 13), `targetSdk = 37`,
+  a 64-bit ARM device, Vulkan 1.1 (`tools/api_floor.py` lists the Android version the native libraries need).
 - **Release signing:** `assemblePlayRelease` and `assembleFossRelease` sign with the key named in a git-ignored `signing.properties` in the project root
   (`storeFile`, `storePassword`, `keyAlias`, `keyPassword`); without that file the release APK is left unsigned (`app-<flavour>-release-unsigned.apk`),
   and you sign it yourself with `apksigner`. Debug builds (`assembleFossDebug`) are signed with the debug key for your own phone. Make a release key with
   `keytool -genkeypair -v -keystore release.jks -alias absentmotion -keyalg RSA -keysize 4096 -validity 10000` and never
   commit it.
-- Install with `adb install -r <apk>`. Emulators work for development (arm64 image, Android 14 or newer).
+- Install with `adb install -r <apk>`. Emulators work for development (arm64 image, Android 13 or newer; `tools/smoke_check.py` renders a still on whichever device `ANDROID_SERIAL` names).
 
 ## 7. Checking a change, and releases
 

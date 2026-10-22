@@ -35,7 +35,6 @@
     <string name="ok">OK</string>
     <string name="easing_needs_at_least_two_keyframes">Kailangan ng easing ng hindi bababa sa dalawang keyframe para gumana.\n\nKung nasa ibang property ang mga keyframe mo, piliin muna ang property na iyon.</string>
     <string name="add_keyframes_first">Magdagdag muna ng mga keyframe</string>
-    <string name="convert_to_group">Gawing grupo</string>
     <string name="cancel">Kanselahin</string>
     <string name="rebuild_source_project">I-rebuild ang source na proyekto</string>
     <string name="this_asset_pointed_to_a_project">Ang asset na ito ay tumutukoy sa isang proyektong nabura na.\n\nGumawa muli ng proyekto mula sa asset na ito, o i-detach ito at i-edit nang direkta?</string>
@@ -89,7 +88,7 @@
     <string name="export_template_failed">Hindi mai-save ang kopya bilang template. Magbakante ng storage.</string>
     <string name="also_keeps_the_project_with_its">Itinatabi rin nito ang proyekto, kasama ang media nito, sa Templates sa teleponong ito. Buksan ito doon para palitan ang media nito at magpatuloy sa bagong proyekto.</string>
     <string name="template">Template</string>
-    <string name="one_absproj_package_with_the_project">Isang .absproj package kasama ang proyekto at ang orihinal na media na ginagamit nito, na naka-save sa Documents / AbsentMotion. Itabi ito bilang backup o ilipat ang proyekto sa ibang telepono.</string>
+    <string name="one_absproj_package_with_the_project">Isang .absproj package kasama ang proyekto at ang orihinal na media na ginagamit nito, na naka-save sa Documents/AbsentMotion. Panatilihin ito bilang backup o ilipat ang proyekto sa ibang telepono.</string>
     <string name="project_bundle">Bundle ng proyekto</string>
     <string name="project_home_page">Home page ng proyekto</string>
     <string name="open_source_licences">Mga lisensya ng open source</string>
@@ -126,7 +125,7 @@
     <string name="delete_all">Burahin lahat</string>
     <string name="effects_not_loaded">Hindi ma-load ang mga epekto</string>
     <string name="settings_demo_mode">Demo Mode</string>
-    <string name="settings_open_xml">Buksan ang mga proyektong XML</string>
+    <string name="settings_open_xml">Ipakita ang import card sa listahan ng proyekto</string>
     <string name="settings_vibration">Vibration</string>
     <string name="settings_emoji">Estilo ng emoji</string>
     <string name="settings_emoji_system">Sistema</string>
@@ -163,22 +162,22 @@
     <string name="theme_custom">Pasadya</string>
     <string name="theme_custom_named">Pasadya (%1$s)</string>
     <string name="theme_error_bad_colour">Maling kulay para sa %1$s</string>
-    <string name="theme_error_no_colours">Walang kulay ng tema sa file na ito</string>
+    <string name="theme_error_no_colours">Walang kulay ng theme sa file na ito</string>
     <string name="library_err_no_data">Walang natanggap na data.</string>
     <string name="library_err_unsupported_type">Hindi suportadong uri ng file</string>
     <string name="library_err_missing_manifest">Walang manifest ang package ng proyekto</string>
     <string name="library_err_package_project_missing">Sirang package: wala ang file ng proyekto</string>
     <string name="library_err_too_many_projects">Sobra ang proyekto sa package (higit sa %1$s)</string>
     <string name="library_err_project_files_large">Masyadong malaki ang mga file ng proyekto sa package</string>
-    <string name="library_err_no_project">Sirang scene: walang proyekto sa package</string>
+    <string name="library_err_no_project">Mali ang scene: walang proyekto sa package</string>
     <string name="library_err_malformed_package">Sirang package: %1$s</string>
     <string name="library_err_malformed_xml">Sirang XML: %1$s</string>
-    <string name="library_err_scene_needs_size">Sirang scene: inaasahan ang &lt;scene&gt; na may sukat</string>
-    <string name="library_err_scene_too_big">Sirang scene: mas malaki ang sukat sa %1$s pixels</string>
-    <string name="library_err_scene_fps">Sirang scene: dapat nasa 1 hanggang %1$s ang frame rate</string>
+    <string name="library_err_scene_needs_size">Mali ang scene: kailangan ng file ng scene na may lapad at taas</string>
+    <string name="library_err_scene_too_big">Mali ang scene: mas malaki ang sukat kaysa sa %1$s pixel</string>
+    <string name="library_err_scene_fps">Mali ang scene: dapat mula 1 hanggang %1$s ang frame rate</string>
     <string name="library_err_package_large">Masyadong malaki ang package (higit sa %1$s MB kapag na-unpack)</string>
     <string name="library_err_too_many_files">Sobra ang file sa package (higit sa %1$s)</string>
-    <string name="library_err_xml_large">Sirang XML: masyadong malaki ang file</string>
+    <string name="library_err_xml_large">Masyadong malaki ang file na ito para buksan (higit sa 32 MB)</string>
     <string name="library_err_media_large">Masyadong malaki ang package (higit sa %1$s MB ng media)</string>
     <string name="library_err_not_backup">Hindi ito backup ng AbsentMotion.</string>
     <string name="library_err_backup_project_large">Masyadong malaki ang isang proyekto sa backup.</string>
@@ -263,6 +262,10 @@
         <item quantity="one">Narito na ang %1$s proyekto at hindi na ginalaw.</item>
         <item quantity="other">Narito na ang %1$s mga proyekto at hindi na ginalaw.</item>
     </plurals>
+    <plurals name="backup_restored_rejected">
+        <item quantity="one">Hindi naibalik ang %1$s proyekto dahil hindi wasto ang sukat o frame rate nito.</item>
+        <item quantity="other">Hindi naibalik ang %1$s proyekto dahil hindi wasto ang sukat o frame rate ng mga ito.</item>
+    </plurals>
     <string name="about_version">Bersyon %1$s</string>
     <string name="about_licence_line">Libre at open source, lisensyado sa ilalim ng Apache License 2.0.</string>
     <string name="about_independent_note">Ang AbsentMotion ay isang independiyenteng proyekto. Wala itong kaugnayan, pag-endorso o pag-sponsor mula sa ibang gumagawa ng app; pag-aari ng mga may-ari nito ang mga pangalan ng ibang produkto.</string>
@@ -323,7 +326,7 @@
     <string name="safety_open_failed_with_history">Nawawala o sira ang file ng proyekto, kaya walang nabago. Maaari mong ibalik ang naunang bersyon mula sa Version history.</string>
     <string name="newproject_bg_black">Itim</string>
     <string name="newproject_bg_white">Puti</string>
-    <string name="newproject_bg_light_grey">Maliwanag na abo</string>
+    <string name="newproject_bg_light_grey">Mapusyaw na Gray</string>
     <string name="newproject_bg_green">Berde</string>
     <string name="newproject_bg_blue">Asul</string>
     <string name="newproject_bg_transparent">Transparent</string>
@@ -363,7 +366,7 @@
     <string name="export_anyway">I-export pa rin</string>
     <string name="export_available_space">Available na espasyo</string>
     <string name="export_estimated_size">Tinatayang laki ng file</string>
-    <string name="export_calculating">Kinakalkula...</string>
+    <string name="export_calculating">Kinakalkula…</string>
     <string name="export_kind_video">Bidyo</string>
     <string name="export_kind_frame_png">Kasalukuyang frame bilang PNG</string>
     <string name="export_kind_frame_as">Kasalukuyang frame bilang…</string>
@@ -440,7 +443,6 @@
     <string name="export_thermal_hot">Mainit ang phone mo. Bumagal ang export para lumamig ito.</string>
     <string name="export_thermal_critical">Sobrang init ng phone mo. Nag-pause ang export sa pagitan ng mga frame hanggang lumamig ito.</string>
     <string name="export_time_few_seconds">ilang segundo</string>
-    <string name="export_time_hours">mga %1$s oras</string>
     <plurals name="export_time_seconds">
         <item quantity="one">mga %1$s segundo</item>
         <item quantity="other">mga %1$s segundo</item>
@@ -448,6 +450,10 @@
     <plurals name="export_time_minutes">
         <item quantity="one">mga %1$s minuto</item>
         <item quantity="other">mga %1$s minuto</item>
+    </plurals>
+    <plurals name="export_time_hours_count">
+        <item quantity="one">humigit-kumulang %1$s oras</item>
+        <item quantity="other">humigit-kumulang %1$s oras</item>
     </plurals>
     <string name="export_verify_empty">Walang audio o bidyo ang file.</string>
     <string name="export_verify_no_video">Walang video track ang file.</string>
@@ -459,10 +465,11 @@
     <string name="export_verify_picture">Hindi ma-decode ang larawan sa file.</string>
     <string name="export_verify_size">Ang larawan ay %1$s sa halip na %2$s.</string>
     <string name="export_verify_frames">Ang GIF ay may %1$s frame sa halip na %2$s.</string>
+    <string name="export_sound_unreadable">Hindi mabasa ang tunog ng %1$s, kaya tahimik ito sa file na ito.</string>
     <string name="export_error_cannot_encode">Hindi kayang i-encode ng phone na ito ang %1$s sa %2$s</string>
-    <string name="export_error_draw_frame">Hindi na-draw ng engine ang frame %1$s</string>
+    <string name="export_error_draw_frame">Hindi naiguhit ang frame %1$s. Subukang i-export muli.</string>
     <string name="export_error_draw_still">Hindi na-draw ng engine ang frame</string>
-    <string name="export_error_no_sound">Walang tunog na ma-e-export ang proyektong ito.</string>
+    <string name="export_error_no_sound">Walang tunog na mai-export ang proyektong ito. Magdagdag muna ng musika, tunog, o bidyo na may tunog.</string>
     <string name="export_error_create">Hindi magawa ang %1$s sa %2$s</string>
     <string name="export_error_write">Hindi maisulat ang %1$s</string>
     <string name="export_error_mp3_settings">Hindi magamit ng MP3 encoder ang %1$s Hz sa %2$s kbps</string>
@@ -477,6 +484,8 @@
     <string name="camera_photo">LITRATO</string>
     <string name="camera_video">VIDEO</string>
     <string name="camera_close">Isara ang kamera</string>
+    <string name="camera_take_photo">Kumuha ng litrato</string>
+    <string name="camera_start_recording">Simulan ang pag-record</string>
     <string name="camera_switch">Lumipat ng kamera</string>
     <string name="camera_pause_recording">I-pause ang pag-record</string>
     <string name="camera_resume_recording">Ituloy ang pag-record</string>
@@ -495,16 +504,16 @@
     <string name="media_error_video_unavailable">Hindi available ang bidyo: %1$s</string>
     <string name="media_error_decode_frame">Hindi ma-decode ang eksaktong video frame %1$s</string>
     <string name="media_error_import_frame">Hindi ma-import ang frame ng bidyo %1$s para sa %2$s</string>
-    <string name="media_error_interp_source">Hindi available ang source frame ng interpolation %1$s</string>
-    <string name="media_error_interp_wrong_frame">Nakatanggap ang interpolation ng maling source frame para sa %1$s</string>
-    <string name="media_error_interp_import">Hindi ma-import ang source frame ng interpolation %1$s</string>
+    <string name="media_error_interp_source">May kulang na video frame na kailangan para sa Frame Interpolation (%1$s). Subukan muli, o itakda ang Frame Interpolation sa Off.</string>
+    <string name="media_error_interp_wrong_frame">Hindi mabasa nang tama ang video frame na kailangan para sa Frame Interpolation (%1$s). Subukan muli, o itakda ang Frame Interpolation sa Off.</string>
+    <string name="media_error_interp_import">Hindi ma-load ang video frame na kailangan para sa Frame Interpolation (%1$s). Subukan muli, o itakda ang Frame Interpolation sa Off.</string>
     <string name="media_error_interp_render">Hindi mai-render ng %1$s ang hiniling na frame ng bidyo</string>
     <string name="engine_loading_effects">Naglo-load ng mga epekto…</string>
     <string name="engine_error_gpu_capture">Nabigo ang GPU sa pag-capture</string>
     <string name="platform_voice_name">Boses %1$s</string>
     <string name="platform_error_tts_unavailable">Hindi available ang text to speech sa teleponong ito</string>
     <string name="platform_error_voice">Hindi nagawa ang boses</string>
-    <string name="platform_caption_download">Kinikilala ang mga kapsyon sa telepono mo ng isang speech model, dina-download nang isang beses: %1$s, %2$s, mula sa Hugging Face.</string>
+    <string name="platform_caption_download">Kinikilala ang mga kapsyon sa iyong telepono ng isang speech model, na ida-download isang beses: %1$s, %2$s, mula sa Hugging Face.</string>
     <string name="add_layer">Magdagdag ng layer</string>
     <string name="add_tab_shape">Hugis</string>
     <string name="add_tab_media">Media</string>
@@ -620,7 +629,7 @@
     <string name="menu_set_outro_start">Itakda ang simula ng outro</string>
     <string name="menu_bg_black">Itim</string>
     <string name="menu_bg_white">Puti</string>
-    <string name="menu_bg_light_grey">Mapusyaw na abo</string>
+    <string name="menu_bg_light_grey">Mapusyaw na Gray</string>
     <string name="menu_bg_green">Berde</string>
     <string name="menu_bg_blue">Asul</string>
     <string name="menu_bg_transparent">Transparent</string>
@@ -644,6 +653,8 @@
     <string name="font_search">Maghanap</string>
     <string name="font_imported">Na-import</string>
     <string name="font_downloads_when_chosen">Magda-download kapag pinili</string>
+    <string name="fonts_missing_title">Mga font na wala sa telepono</string>
+    <string name="fonts_missing_body">Gumagamit ang proyektong ito ng mga font na wala sa teleponong ito: %1$s. Iba ang font na ipinapakita sa teksto hanggang i-download mo ang mga ito mula sa Google Fonts.</string>
     <string name="font_favorite">Paborito</string>
     <string name="font_category_sans_serif">Sans Serif</string>
     <string name="font_category_serif">Serif</string>
@@ -1127,7 +1138,7 @@
     <string name="ai_saving_transparent">Sine-save ang transparent na larawan…</string>
     <string name="ai_loading_model">Inilo-load ang model para sa pag-alis ng background…</string>
     <string name="ai_no_foreground_mask">Walang naibalik na foreground mask</string>
-    <string name="ai_mask_unexpected_size">May hindi inaasahang sukat ang foreground mask</string>
+    <string name="ai_mask_unexpected_size">Nagbigay ng resultang maling sukat ang pag-alis ng background. Subukan muli.</string>
     <string name="ai_cannot_save_image">Hindi ma-save ang larawan</string>
     <string name="ai_cannot_read_image">Hindi mabasa ang larawang ito</string>
     <string name="ai_cannot_decode_image">Hindi ma-decode ang larawang ito</string>
@@ -1138,13 +1149,13 @@
     <string name="ai_sample_rate_changed">Nagbago ang sample rate ng audio habang nagde-decode</string>
     <string name="ai_recording_too_large">Masyadong malaki ang rekording na ito para sa WAV</string>
     <string name="ai_no_samples_decoded">Walang na-decode na audio sample</string>
-    <string name="ai_mask_wrong_size">May hindi inaasahang sukat ang mask</string>
+    <string name="ai_mask_wrong_size">Nagbigay ng resultang maling sukat ang pag-alis ng background. Subukan muli.</string>
     <string name="ai_encoder_no_image">Walang input image na ibinigay ang video encoder</string>
     <string name="ai_encoder_not_responding">Huminto ang pagtugon ng video encoder</string>
-    <string name="ai_encoder_frames_before_format">Nagpadala ang video encoder ng mga frame bago ang format nito</string>
+    <string name="ai_encoder_frames_before_format">Hindi nagsimula nang tama ang video encoder. Subukan muli.</string>
     <string name="ai_encoder_not_finished">Hindi natapos ang video encoder</string>
     <string name="ai_cannot_encode_mask">Hindi ma-encode ng teleponong ito ang mask na bidyo</string>
-    <string name="ai_video_no_size">Walang impormasyon ng sukat ang bidyong ito</string>
+    <string name="ai_video_no_size">Walang impormasyon ng sukat ang bidyong ito.</string>
     <string name="ai_clip_too_long">Hindi pa sinusuportahan ang mga clip na mas mahaba sa %1$s minuto. I-trim o hatiin muna ang clip.</string>
     <string name="ai_not_enough_storage">Kulang ang libreng imbakan: kailangan nito ng humigit-kumulang %1$s MB.</string>
     <string name="ai_no_video_frames">Walang video frame na mapoproseso ang clip na ito</string>
@@ -1175,7 +1186,7 @@
     <string name="model_svg_skipped_gradient_strokes">mga stroke na gradient</string>
     <string name="model_svg_skipped_dashed">mga putol-putol na stroke</string>
     <string name="model_svg_skipped_patterns">mga pattern fill</string>
-    <string name="model_svg_skipped_gradient_colours">dagdag na kulay ng gradient (ang una at huli ang gagamitin)</string>
+    <string name="model_svg_skipped_gradient_colours">karagdagang kulay ng gradient (ang una at huli ang ginagamit)</string>
     <string name="ai_no_audio_track">Walang audio track sa %1$s</string>
     <string name="shape_name_circle">Bilog</string>
     <string name="shape_name_rounded_rectangle">Bilugang parihaba</string>
@@ -1261,7 +1272,7 @@
     <string name="track_motion_lost_at_frame">Nawala ang pagsubaybay sa frame %1$s. Ilipat pabalik ang punto sa parehong feature at i-tap ang Magpatuloy.</string>
     <string name="track_motion_done">Nasubaybayan ang %1$s frame. Nasa %2$s ang mga keyframe.</string>
     <string name="track_motion_target_layer">ang target na layer</string>
-    <string name="track_motion_cancelled">Kinansela ang pagsubaybay. Mananatili ang mga keyframe ng mga nasubaybayan nang frame.</string>
+    <string name="track_motion_cancelled">Kinansela ang motion tracking. Ang mga na-track nang frame ay may keyframes pa rin.</string>
     <string name="track_motion_unavailable">Hindi available ang motion tracking sa build na ito.</string>
     <string name="track_motion_failed">Hindi masubaybayan ang bidyo na ito.</string>
     <string name="edit_layer_copy_name">Kopya ng %1$s</string>
@@ -1301,7 +1312,7 @@
     <string name="export_audio_summary_lossless">%1$s · %2$s · %3$s</string>
     <string name="export_audio_hint">Mga setting ng audio para sa file ng bidyo. Maaaring maglaman ang %1$s ng %2$s audio.</string>
     <string name="export_audio_hint_silent">Wala pang audio ang proyektong ito. Gagamitin ang mga setting na ito kapag may idinagdag ka nang audio.</string>
-    <string name="export_audio_only_hint">Naka-save sa Music / AbsentMotion. Pinapanatili ng WAV at FLAC ang lahat ng detalye; mas maliit ang M4A, OGG at MP3.</string>
+    <string name="export_audio_only_hint">Naka-save sa Music/AbsentMotion. Ang WAV at FLAC ay may lahat ng detalye; mas maliit ang M4A, OGG, at MP3.</string>
     <string name="export_running_audio">Nag-e-export ng audio</string>
     <string name="export_interpolation_off_help">Ipinapakita ng bawat clip ang sariling frame nito. Ang 30 fps na clip sa 60 fps na export ay nagpapakita ng bawat frame nang dalawang beses, kaya maaaring medyo magaspang ang galaw.</string>
     <string name="export_interpolation_blend_help">Hinahalo ng mga bagong frame sa pagitan ang dalawang pinakamalapit na frame, parang mabilis na cross-fade. Mabilis i-export; ang mabilis na galaw ay puwedeng magmukhang ghosted.</string>

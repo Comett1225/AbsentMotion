@@ -264,7 +264,7 @@
    }
   },
   "channelremap": {
-   "description": "Dựng lại từng kênh màu từ một kênh khác của lớp, để tạo màu giả hoặc chuyển độ sáng vào alpha.",
+   "description": "Dựng lại từng kênh màu từ một kênh khác của lớp, để tạo màu giả hoặc chuyển độ chói vào alpha.",
    "name": "Gán lại kênh (RGB)",
    "params": {
     "a": {
@@ -399,7 +399,7 @@
    }
   },
   "chromakey": {
-   "description": "Loại bỏ một màu, ví dụ phông xanh.",
+   "description": "Loại bỏ một màu, chẳng hạn phông xanh.",
    "name": "Chroma Key",
    "params": {
     "key": {
@@ -492,7 +492,7 @@
    }
   },
   "colorbalance": {
-   "description": "Đẩy vùng tối, trung gian và sáng về màu riêng của chúng (màu xám giữ nguyên vùng đó).",
+   "description": "Đẩy vùng tối, vùng trung gian và vùng sáng về màu riêng của chúng (màu xám giữ nguyên dải đó).",
    "name": "Cân bằng màu",
    "params": {
     "amount": {
@@ -522,7 +522,7 @@
    }
   },
   "colorwheels": {
-   "description": "Bánh xe màu cho vùng tối (lift), trung gian (gamma) và sáng (gain): sắc màu, mức đẩy và cấp độ.",
+   "description": "Bánh xe màu cho vùng tối (lift), vùng trung gian (gamma) và vùng sáng (gain): tông màu, mức đẩy tông màu và độ mạnh.",
    "name": "Lift Gamma Gain",
    "params": {
     "gainAmount": {
@@ -555,7 +555,7 @@
    }
   },
   "contourgradient": {
-   "description": "Tô chuyển màu hai tông từ mép phần đục của lớp, như quầng màu mềm.",
+   "description": "Tô chuyển màu hai màu từ mép các phần không trong suốt của lớp ra ngoài, như một quầng màu mềm.",
    "name": "Chuyển màu đường viền",
    "params": {
     "alpha": {
@@ -889,7 +889,7 @@
    }
   },
   "denoise": {
-   "description": "Khử nhiễu ảnh bằng bộ lọc song phương giữ cạnh, chỉ làm mượt các điểm ảnh gần nhau có màu tương tự.",
+   "description": "Loại bỏ nhiễu hình ảnh bằng bộ lọc song phương giữ cạnh, chỉ lấy trung bình các pixel gần nhau khi màu của chúng giống nhau.",
    "name": "Khử nhiễu",
    "params": {
     "detail": {
@@ -916,7 +916,7 @@
    }
   },
   "displacementmap": {
-   "description": "Dùng màu của lớp để đẩy các lớp phía sau rồi tự ẩn; hoặc khi Map là Lớp bên dưới, đẩy chính lớp này bằng lớp bên dưới.",
+   "description": "Dùng màu của lớp để đẩy các lớp phía sau rồi tự ẩn; hoặc đặt Bản đồ thành Lớp bên dưới để đẩy lớp này bằng lớp bên dưới.",
    "name": "Bản đồ dịch chuyển",
    "params": {
     "edges": {
@@ -1363,7 +1363,7 @@
    }
   },
   "flip": {
-   "description": "Lật lớp như một tấm thẻ trong 3D, với mặt sau trong suốt, là hình ảnh hoặc màu.",
+   "description": "Lật lớp như lật thẻ trong 3D; mặt sau có thể trong suốt, là hình ảnh hoặc màu.",
    "name": "Lật lớp",
    "params": {
     "back": {
@@ -1407,7 +1407,7 @@
    }
   },
   "fourcolor": {
-   "description": "Pha trộn bốn màu đặt tại bốn điểm (tính bằng px từ tâm lớp) lên lớp.",
+   "description": "Hòa trộn bốn màu đặt tại bốn điểm (tính bằng pixel từ tâm lớp) lên lớp.",
    "name": "Chuyển màu bốn màu",
    "params": {
     "blend": {
@@ -1544,7 +1544,7 @@
    }
   },
   "glitch": {
-   "description": "Dịch chuyển ngang ngẫu nhiên theo khối và lệch kênh màu, thay đổi vài lần mỗi giây.",
+   "description": "Dịch chuyển ngang ngẫu nhiên từng khối và lệch kênh màu, thay đổi vài lần mỗi giây.",
    "name": "Glitch",
    "params": {
     "blockHeight": {
@@ -1559,7 +1559,7 @@
    }
   },
   "glow": {
-   "description": "Quầng sáng một màu quanh bên ngoài hình dạng của lớp; độ cứng biến nó từ vệt mờ mềm mại thành viền đặc.",
+   "description": "Một quầng sáng cùng màu quanh bên ngoài hình dạng của lớp. Độ cứng biến quầng mờ mềm thành viền đặc.",
    "name": "Phát sáng",
    "params": {
     "alpha": {
@@ -1612,7 +1612,7 @@
    }
   },
   "gradientmap": {
-   "description": "Tô lại màu theo độ sáng qua ba màu, có số lần lặp và pha. Tỷ lệ độ sáng nhân kết quả với độ sáng của chính hình ảnh.",
+   "description": "Đổi màu hình ảnh theo độ sáng qua ba màu, có lặp lại và pha. Tỷ lệ độ sáng nhân kết quả với độ sáng của chính hình ảnh.",
    "name": "Bản đồ chuyển màu",
    "params": {
     "color1": {
@@ -1642,7 +1642,7 @@
    }
   },
   "gradientoverlay": {
-   "description": "Phủ một lớp chuyển màu hai màu lên lớp với nhiều hình dạng và chế độ hòa trộn.",
+   "description": "Phủ một dải chuyển màu hai màu lên lớp với tùy chọn hình dạng và chế độ hòa trộn.",
    "name": "Phủ chuyển màu",
    "params": {
     "angle": {
@@ -1783,7 +1783,7 @@
      "label": "Kích thước"
     },
     "colored": {
-     "label": "Điểm màu"
+     "label": "Chấm màu"
     }
    }
   },
@@ -1968,7 +1968,7 @@
    }
   },
   "hollowbox": {
-   "description": "Hộp hở mặt trên và mặt dưới: lớp phủ lên mặt ngoài, còn phần bên trong dùng màu bên trong.",
+   "description": "Một khối hộp hở mặt trên và mặt dưới: lớp phủ bên ngoài, phần bên trong nhận màu bên trong.",
    "name": "Hộp rỗng",
    "params": {
     "depth": {
@@ -2019,7 +2019,7 @@
    }
   },
   "huesaturation": {
-   "description": "Xoay màu quanh vòng tròn màu và làm màu mạnh hơn hoặc yếu đi; độ sống động tăng cường nhiều nhất cho các màu kém rực.",
+   "description": "Xoay màu quanh vòng màu và làm màu mạnh hơn hoặc yếu đi; độ rực tăng mạnh nhất ở các màu kém tươi.",
    "name": "Sắc độ & độ bão hòa",
    "params": {
     "hue": {
@@ -2138,7 +2138,7 @@
    }
   },
   "lensblur": {
-   "description": "Hiệu ứng nhòe xoay tròn, giữ vùng quanh tâm sắc nét và tăng dần về phía các cạnh.",
+   "description": "Nhòe xoay tròn để vùng quanh tâm vẫn nét và tăng dần về phía mép.",
    "name": "Làm mờ thấu kính",
    "params": {
     "center": {
@@ -2195,7 +2195,7 @@
    }
   },
   "lightglow": {
-   "description": "Thêm quầng sáng màu quanh những vùng ảnh sáng hơn ngưỡng.",
+   "description": "Thêm quầng sáng màu quanh những phần của hình ảnh sáng hơn ngưỡng.",
    "name": "Quầng sáng",
    "params": {
     "blur": {
@@ -2362,7 +2362,7 @@
    }
   },
   "magnifybackground": {
-   "description": "Biến lớp thành kính lúp: hình dạng của lớp hiển thị các lớp phía sau được phóng to quanh tâm.",
+   "description": "Biến lớp thành kính lúp: hình dạng của nó phóng to các lớp phía sau quanh tâm của nó.",
    "name": "Phóng đại nền",
    "params": {
     "magnify": {
@@ -2753,7 +2753,7 @@
    }
   },
   "pixelate": {
-   "description": "Biến lớp thành các khối mỗi khối một màu, lấy từ giữa khối, trên lưới căn giữa lớp (hoặc khung hình với Không gian màn hình). Kéo giãn, Độ lệch và Góc định hình lưới, còn Viền tối làm tối dần từng khối về phía mép.",
+   "description": "Biến lớp thành các khối mỗi khối một màu, lấy từ giữa khối, trên lưới căn giữa theo lớp (hoặc theo khung hình với Không gian màn hình). Kéo giãn, Độ lệch và Góc tạo hình lưới, còn Tối góc làm tối từng khối về phía mép.",
    "name": "Điểm ảnh hóa",
    "params": {
     "angle": {
@@ -2777,7 +2777,7 @@
    }
   },
   "polar": {
-   "description": "Uốn lớp quanh tâm của nó, biến đường thẳng thành vòng tròn hoặc trải vòng tròn thành đường thẳng.",
+   "description": "Uốn lớp quanh tâm, biến đường thẳng thành vòng tròn hoặc mở cuộn vòng tròn thành đường thẳng.",
    "name": "Tọa độ cực",
    "params": {
     "amount": {
@@ -2793,7 +2793,7 @@
    }
   },
   "polardisplacement": {
-   "description": "Xoay và kéo các lớp phía sau quanh một điểm tâm theo màu của lớp, rồi ẩn lớp này đi.",
+   "description": "Xoay và kéo các lớp phía sau quanh một điểm tâm theo màu của lớp này, rồi ẩn lớp này.",
    "name": "Bản đồ dịch chuyển cực",
    "params": {
     "angle": {
@@ -2843,7 +2843,7 @@
    }
   },
   "posterize": {
-   "description": "Chia mỗi kênh màu thành một số bậc phẳng, khiến chuyển màu mượt thành các dải. Độ lệch dịch vị trí ranh giới các dải.",
+   "description": "Chia mỗi kênh màu thành một số bước phẳng, khiến chuyển màu mượt biến thành các dải. Độ lệch di chuyển vị trí ranh giới các dải.",
    "name": "Giảm cấp màu",
    "params": {
     "levels": {
@@ -3177,7 +3177,7 @@
    }
   },
   "rays": {
-   "description": "Tỏa các tia sáng ra từ những phần sáng của lớp, hướng xa khỏi một điểm giữa.",
+   "description": "Tỏa tia sáng ra từ các vùng sáng của lớp, hướng ra xa một điểm tâm.",
    "name": "Tia sáng",
    "params": {
     "center": {
@@ -3327,7 +3327,7 @@
    }
   },
   "rgbsplit": {
-   "description": "Tách các kênh đỏ, lục và lam: kênh tâm giữ nguyên, hai kênh còn lại dịch ngược chiều nhau theo Góc. Sáng cộng màu đã dịch, Tối giữ chúng đặc, Mặt nạ chỉ giữ nơi cả ba trùng nhau và Luma làm rìa có độ mờ tương ứng độ sáng.",
+   "description": "Tách kênh đỏ, lục và lam: kênh Trung tâm đứng yên, hai kênh còn lại dịch ngược hướng nhau theo Góc. Light cộng màu đã dịch, Dark giữ màu đặc, Mask chỉ giữ nơi cả ba kênh trùng nhau và Luma làm viền càng sáng càng đục.",
    "name": "Tách RGB",
    "params": {
     "angle": {
@@ -3395,7 +3395,7 @@
    }
   },
   "ripple": {
-   "description": "Các gợn sóng đồng tâm lan ra từ một điểm giữa với biên độ, bước sóng và tốc độ tùy chỉnh.",
+   "description": "Các gợn sóng đồng tâm lan ra từ tâm với biên độ, bước sóng và tốc độ tùy chỉnh.",
    "name": "Gợn sóng",
    "params": {
     "amplitude": {
@@ -3548,7 +3548,7 @@
    }
   },
   "sharpen": {
-   "description": "Dùng mặt nạ làm nét trên vùng 3x3 để tăng chi tiết nhỏ.",
+   "description": "Áp dụng mặt nạ unsharp 3x3 để làm nổi chi tiết nhỏ.",
    "name": "Làm nét",
    "params": {
     "amount": {
@@ -3632,7 +3632,7 @@
    }
   },
   "solid": {
-   "description": "Phủ một màu lên lớp, giữ nguyên hình dạng, có thể chọn chế độ hòa trộn.",
+   "description": "Phủ một màu lên lớp, giữ nguyên hình dạng, với tùy chọn chế độ hòa trộn.",
    "name": "Màu đặc",
    "params": {
     "amount": {
@@ -3800,7 +3800,7 @@
    }
   },
   "spotcolor": {
-   "description": "Giữ lại một màu và loại bỏ độ bão hòa của mọi màu khác trong lớp.",
+   "description": "Giữ một màu và loại bỏ độ bão hòa khỏi mọi màu khác trong lớp.",
    "name": "Màu điểm",
    "params": {
     "choke": {
@@ -4225,7 +4225,7 @@
    }
   },
   "texttransform": {
-   "description": "Di chuyển, thay đổi tỷ lệ, xoay, làm mờ và nhuộm màu chữ cái, từ hoặc dòng trong một phạm vi. Điểm neo đặt việc thay đổi tỷ lệ và xoay dùng từng thành phần hay tâm của lớp. Di chuyển phạm vi bằng Độ lệch để thay đổi lan truyền qua văn bản.",
+   "description": "Di chuyển, thu phóng, xoay, làm mờ dần và nhuộm màu chữ cái, từ hoặc dòng trong một phạm vi. Anchor đặt việc thu phóng và xoay dùng từng thành phần hay tâm của lớp. Di chuyển phạm vi bằng Offset để thay đổi lan dần qua văn bản.",
    "name": "Biến đổi văn bản",
    "params": {
     "anchor": {
@@ -4459,7 +4459,7 @@
    }
   },
   "tint": {
-   "description": "Ánh xạ độ sáng của hình ảnh giữa màu vùng tối và màu vùng sáng với mức hòa trộn.",
+   "description": "Ánh xạ độ chói của hình ảnh giữa màu bóng và màu vùng sáng với mức hòa trộn.",
    "name": "Phủ màu",
    "params": {
     "amount": {
@@ -4469,7 +4469,7 @@
      "label": "Màu vùng sáng"
     },
     "shadowColor": {
-     "label": "Màu vùng tối"
+     "label": "Màu bóng"
     }
    }
   },
@@ -4687,7 +4687,7 @@
    }
   },
   "vhs": {
-   "description": "Trông như băng video cũ: lem màu, dòng bị nhòe, dòng quét, nhiễu băng và dải tracking cuộn.",
+   "description": "Giống băng video cũ: màu lem, dòng bị nhòe, dòng quét, nhiễu băng và dải tracking cuộn.",
    "name": "VHS",
    "params": {
     "chroma": {

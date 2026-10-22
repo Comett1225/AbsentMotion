@@ -35,7 +35,6 @@
     <string name="ok">ठीक है</string>
     <string name="easing_needs_at_least_two_keyframes">ईज़िंग के लिए कम से कम दो कीफ़्रेम चाहिए।\n\nअगर आपके कीफ़्रेम किसी दूसरी प्रॉपर्टी पर हैं, तो पहले वह प्रॉपर्टी चुनें।</string>
     <string name="add_keyframes_first">पहले कीफ़्रेम जोड़ें</string>
-    <string name="convert_to_group">ग्रुप में बदलें</string>
     <string name="cancel">रद्द करें</string>
     <string name="rebuild_source_project">सोर्स प्रोजेक्ट फिर से बनाएं</string>
     <string name="this_asset_pointed_to_a_project">यह एसेट एक ऐसे प्रोजेक्ट की ओर इशारा करता था जो हटा दिया गया है।\n\nइस एसेट से प्रोजेक्ट फिर से बनाएं, या इसे अलग करके सीधे एडिट करें?</string>
@@ -89,7 +88,7 @@
     <string name="export_template_failed">कॉपी को टेम्पलेट के रूप में नहीं रखा जा सका। कुछ स्टोरेज खाली करें।</string>
     <string name="also_keeps_the_project_with_its">साथ ही प्रोजेक्ट को उसके मीडिया के साथ इस फ़ोन के टेम्पलेट्स में रखता है। उसे वहाँ खोलकर उसका मीडिया बदलें और नए प्रोजेक्ट के रूप में जारी रखें।</string>
     <string name="template">टेम्पलेट</string>
-    <string name="one_absproj_package_with_the_project">प्रोजेक्ट और उसके द्वारा इस्तेमाल किए गए मूल मीडिया वाला एक .absproj पैकेज, जो Documents / AbsentMotion में सेव होता है। इसे बैकअप के रूप में रखें या प्रोजेक्ट को दूसरे फ़ोन में ले जाएँ।</string>
+    <string name="one_absproj_package_with_the_project">प्रोजेक्ट और उसके मूल मीडिया के साथ एक .absproj पैकेज, Documents/AbsentMotion में सेव होता है। इसे बैकअप रखें या प्रोजेक्ट दूसरे फ़ोन पर ले जाएँ।</string>
     <string name="project_bundle">प्रोजेक्ट बंडल</string>
     <string name="project_home_page">प्रोजेक्ट होम पेज</string>
     <string name="open_source_licences">ओपन सोर्स लाइसेंस</string>
@@ -126,7 +125,7 @@
     <string name="delete_all">सभी हटाएँ</string>
     <string name="effects_not_loaded">इफ़ेक्ट लोड नहीं हो सके</string>
     <string name="settings_demo_mode">डेमो मोड</string>
-    <string name="settings_open_xml">XML प्रोजेक्ट खोलें</string>
+    <string name="settings_open_xml">प्रोजेक्ट सूची में इम्पोर्ट कार्ड दिखाएँ</string>
     <string name="settings_vibration">वाइब्रेशन</string>
     <string name="settings_emoji">इमोजी स्टाइल</string>
     <string name="settings_emoji_system">सिस्टम</string>
@@ -163,22 +162,22 @@
     <string name="theme_custom">कस्टम</string>
     <string name="theme_custom_named">कस्टम (%1$s)</string>
     <string name="theme_error_bad_colour">%1$s के लिए गलत कलर</string>
-    <string name="theme_error_no_colours">इस फ़ाइल में कोई थीम कलर नहीं है</string>
+    <string name="theme_error_no_colours">इस फ़ाइल में कोई थीम कलर नहीं हैं</string>
     <string name="library_err_no_data">कोई डेटा नहीं मिला।</string>
     <string name="library_err_unsupported_type">यह फ़ाइल प्रकार समर्थित नहीं है</string>
     <string name="library_err_missing_manifest">प्रोजेक्ट पैकेज में मैनिफ़ेस्ट नहीं है</string>
     <string name="library_err_package_project_missing">खराब पैकेज: प्रोजेक्ट फ़ाइल मौजूद नहीं है</string>
     <string name="library_err_too_many_projects">पैकेज में बहुत ज़्यादा प्रोजेक्ट हैं (%1$s से ज़्यादा)</string>
     <string name="library_err_project_files_large">पैकेज की प्रोजेक्ट फ़ाइलें बहुत बड़ी हैं</string>
-    <string name="library_err_no_project">खराब सीन: पैकेज में कोई प्रोजेक्ट नहीं है</string>
+    <string name="library_err_no_project">गलत सीन: पैकेज में कोई प्रोजेक्ट नहीं</string>
     <string name="library_err_malformed_package">खराब पैकेज: %1$s</string>
     <string name="library_err_malformed_xml">खराब XML: %1$s</string>
-    <string name="library_err_scene_needs_size">खराब सीन: साइज़ वाला &lt;scene&gt; होना चाहिए</string>
-    <string name="library_err_scene_too_big">खराब सीन: साइज़ %1$s px से बड़ा है</string>
-    <string name="library_err_scene_fps">खराब सीन: फ़्रेम रेट 1 से %1$s के बीच होना चाहिए</string>
+    <string name="library_err_scene_needs_size">गलत सीन: फ़ाइल में चौड़ाई और ऊँचाई वाला सीन होना चाहिए</string>
+    <string name="library_err_scene_too_big">गलत सीन: साइज़ %1$s पिक्सेल से बड़ा है</string>
+    <string name="library_err_scene_fps">गलत सीन: फ़्रेम रेट 1 से %1$s के बीच होना चाहिए</string>
     <string name="library_err_package_large">पैकेज बहुत बड़ा है (अनपैक करने पर %1$s MB से ज़्यादा)</string>
     <string name="library_err_too_many_files">पैकेज में बहुत ज़्यादा फ़ाइलें हैं (%1$s से ज़्यादा)</string>
-    <string name="library_err_xml_large">खराब XML: फ़ाइल बहुत बड़ी है</string>
+    <string name="library_err_xml_large">यह फ़ाइल खोलने के लिए बहुत बड़ी है (32 MB से ज़्यादा)</string>
     <string name="library_err_media_large">पैकेज बहुत बड़ा है (%1$s MB से ज़्यादा मीडिया)</string>
     <string name="library_err_not_backup">यह फ़ाइल AbsentMotion बैकअप नहीं है।</string>
     <string name="library_err_backup_project_large">बैकअप में एक प्रोजेक्ट बहुत बड़ा है।</string>
@@ -263,6 +262,10 @@
         <item quantity="one">%1$s प्रोजेक्ट पहले से यहाँ था और उसे जैसा था वैसा ही छोड़ दिया गया।</item>
         <item quantity="other">%1$s प्रोजेक्ट्स पहले से यहाँ थे और उन्हें जैसे थे वैसे ही छोड़ दिया गया।</item>
     </plurals>
+    <plurals name="backup_restored_rejected">
+        <item quantity="one">%1$s प्रोजेक्ट रीस्टोर नहीं हुआ क्योंकि उसका साइज़ या फ़्रेम रेट मान्य नहीं है।</item>
+        <item quantity="other">%1$s प्रोजेक्ट रीस्टोर नहीं हुए क्योंकि उनका साइज़ या फ़्रेम रेट मान्य नहीं है।</item>
+    </plurals>
     <string name="about_version">वर्ज़न %1$s</string>
     <string name="about_licence_line">मुफ़्त और ओपन सोर्स, Apache License 2.0 के अंतर्गत लाइसेंस प्राप्त।</string>
     <string name="about_independent_note">AbsentMotion एक स्वतंत्र प्रोजेक्ट है। इसका किसी अन्य ऐप निर्माता से कोई संबंध नहीं है, न ही वे इसका समर्थन या प्रायोजन करते हैं; अन्य उत्पादों के नाम उनके स्वामियों के हैं।</string>
@@ -323,7 +326,7 @@
     <string name="safety_open_failed_with_history">प्रोजेक्ट फ़ाइल मौजूद नहीं है या खराब है, इसलिए कुछ भी नहीं बदला गया। आप वर्ज़न हिस्ट्री से पिछला वर्ज़न वापस ला सकते हैं।</string>
     <string name="newproject_bg_black">काला</string>
     <string name="newproject_bg_white">सफ़ेद</string>
-    <string name="newproject_bg_light_grey">हल्का ग्रे</string>
+    <string name="newproject_bg_light_grey">लाइट ग्रे</string>
     <string name="newproject_bg_green">हरा</string>
     <string name="newproject_bg_blue">नीला</string>
     <string name="newproject_bg_transparent">पारदर्शी</string>
@@ -363,7 +366,7 @@
     <string name="export_anyway">फिर भी एक्सपोर्ट करें</string>
     <string name="export_available_space">उपलब्ध स्थान</string>
     <string name="export_estimated_size">अनुमानित फ़ाइल साइज़</string>
-    <string name="export_calculating">गणना हो रही है...</string>
+    <string name="export_calculating">गणना हो रही है…</string>
     <string name="export_kind_video">वीडियो</string>
     <string name="export_kind_frame_png">मौजूदा फ़्रेम PNG के रूप में</string>
     <string name="export_kind_frame_as">मौजूदा फ़्रेम इस रूप में…</string>
@@ -440,7 +443,6 @@
     <string name="export_thermal_hot">आपका फ़ोन गर्म है। ठंडा होने के लिए एक्सपोर्ट धीमा कर दिया गया है।</string>
     <string name="export_thermal_critical">आपका फ़ोन बहुत गर्म है। ठंडा होने तक एक्सपोर्ट फ़्रेम के बीच रुक-रुक कर चलता है।</string>
     <string name="export_time_few_seconds">कुछ सेकंड</string>
-    <string name="export_time_hours">लगभग %1$s घंटे</string>
     <plurals name="export_time_seconds">
         <item quantity="one">लगभग %1$s सेकंड</item>
         <item quantity="other">लगभग %1$s सेकंड</item>
@@ -448,6 +450,10 @@
     <plurals name="export_time_minutes">
         <item quantity="one">लगभग %1$s मिनट</item>
         <item quantity="other">लगभग %1$s मिनट</item>
+    </plurals>
+    <plurals name="export_time_hours_count">
+        <item quantity="one">लगभग %1$s घंटा</item>
+        <item quantity="other">लगभग %1$s घंटे</item>
     </plurals>
     <string name="export_verify_empty">फ़ाइल में कोई ऑडियो या वीडियो नहीं है।</string>
     <string name="export_verify_no_video">फ़ाइल में कोई वीडियो ट्रैक नहीं है।</string>
@@ -459,10 +465,11 @@
     <string name="export_verify_picture">फ़ाइल की इमेज डिकोड नहीं हो रही।</string>
     <string name="export_verify_size">इमेज का साइज़ %2$s के बजाय %1$s है।</string>
     <string name="export_verify_frames">GIF में %2$s के बजाय %1$s फ़्रेम हैं।</string>
+    <string name="export_sound_unreadable">%1$s की आवाज़ पढ़ी नहीं जा सकी, इसलिए इस फ़ाइल में यह साइलेंट है।</string>
     <string name="export_error_cannot_encode">यह फ़ोन %1$s को %2$s पर एनकोड नहीं कर सकता</string>
-    <string name="export_error_draw_frame">इंजन फ़्रेम %1$s नहीं बना सका</string>
+    <string name="export_error_draw_frame">फ़्रेम %1$s नहीं बनाया जा सका। फिर से एक्सपोर्ट करें।</string>
     <string name="export_error_draw_still">इंजन फ़्रेम नहीं बना सका</string>
-    <string name="export_error_no_sound">इस प्रोजेक्ट में एक्सपोर्ट करने के लिए कोई आवाज़ नहीं है।</string>
+    <string name="export_error_no_sound">इस प्रोजेक्ट में एक्सपोर्ट करने के लिए कोई साउंड नहीं है। पहले म्यूज़िक, कोई साउंड या साउंड वाला वीडियो जोड़ें।</string>
     <string name="export_error_create">%2$s में %1$s नहीं बना सकते</string>
     <string name="export_error_write">%1$s नहीं लिख सकते</string>
     <string name="export_error_mp3_settings">MP3 एनकोडर %1$s Hz पर %2$s kbps नहीं इस्तेमाल कर सकता</string>
@@ -477,6 +484,8 @@
     <string name="camera_photo">फ़ोटो</string>
     <string name="camera_video">वीडियो</string>
     <string name="camera_close">कैमरा बंद करें</string>
+    <string name="camera_take_photo">फ़ोटो लें</string>
+    <string name="camera_start_recording">रिकॉर्डिंग शुरू करें</string>
     <string name="camera_switch">कैमरा बदलें</string>
     <string name="camera_pause_recording">रिकॉर्डिंग पॉज़ करें</string>
     <string name="camera_resume_recording">रिकॉर्डिंग फिर शुरू करें</string>
@@ -495,9 +504,9 @@
     <string name="media_error_video_unavailable">वीडियो उपलब्ध नहीं है: %1$s</string>
     <string name="media_error_decode_frame">सटीक वीडियो फ़्रेम %1$s डिकोड नहीं हो सकता</string>
     <string name="media_error_import_frame">वीडियो फ़्रेम %1$s को %2$s के लिए इंपोर्ट नहीं किया जा सकता</string>
-    <string name="media_error_interp_source">इंटरपोलेशन सोर्स फ़्रेम %1$s उपलब्ध नहीं है</string>
-    <string name="media_error_interp_wrong_frame">%1$s के लिए इंटरपोलेशन को गलत सोर्स फ़्रेम मिला</string>
-    <string name="media_error_interp_import">इंटरपोलेशन सोर्स फ़्रेम %1$s इंपोर्ट नहीं किया जा सकता</string>
+    <string name="media_error_interp_source">फ़्रेम इंटरपोलेशन के लिए ज़रूरी वीडियो फ़्रेम गायब है (%1$s)। फिर से कोशिश करें या फ़्रेम इंटरपोलेशन को बंद करें।</string>
+    <string name="media_error_interp_wrong_frame">फ़्रेम इंटरपोलेशन के लिए ज़रूरी वीडियो फ़्रेम सही से पढ़ा नहीं जा सका (%1$s)। फिर से कोशिश करें या फ़्रेम इंटरपोलेशन को बंद करें।</string>
+    <string name="media_error_interp_import">फ़्रेम इंटरपोलेशन के लिए ज़रूरी वीडियो फ़्रेम लोड नहीं हो सका (%1$s)। फिर से कोशिश करें या फ़्रेम इंटरपोलेशन को बंद करें।</string>
     <string name="media_error_interp_render">%1$s अनुरोधित वीडियो फ़्रेम रेंडर नहीं कर सका</string>
     <string name="engine_loading_effects">इफ़ेक्ट लोड हो रहे हैं…</string>
     <string name="engine_error_gpu_capture">कैप्चर के दौरान GPU विफल रहा</string>
@@ -602,17 +611,17 @@
     <string name="menu_reset_transform">ट्रांसफ़ॉर्म रीसेट करें</string>
     <string name="menu_select_all_layers">सभी लेयर चुनें</string>
     <plurals name="menu_duplicate_layers">
-        <item quantity="one">लेयर डुप्लिकेट करें</item>
+        <item quantity="one">%1$s लेयर डुप्लिकेट करें</item>
         <item quantity="other">%1$s लेयर डुप्लिकेट करें</item>
     </plurals>
     <string name="menu_save_preset">प्रीसेट सेव करें</string>
     <plurals name="menu_copy_layers">
-        <item quantity="one">लेयर कॉपी करें</item>
+        <item quantity="one">%1$s लेयर कॉपी करें</item>
         <item quantity="other">%1$s लेयर कॉपी करें</item>
     </plurals>
     <string name="menu_with_its_style">(स्टाइल के साथ)</string>
     <plurals name="menu_paste_layers">
-        <item quantity="one">लेयर पेस्ट करें</item>
+        <item quantity="one">%1$s लेयर पेस्ट करें</item>
         <item quantity="other">%1$s लेयर पेस्ट करें</item>
     </plurals>
     <string name="menu_paste_style">स्टाइल पेस्ट करें</string>
@@ -620,7 +629,7 @@
     <string name="menu_set_outro_start">आउट्रो की शुरुआत सेट करें</string>
     <string name="menu_bg_black">काला</string>
     <string name="menu_bg_white">सफ़ेद</string>
-    <string name="menu_bg_light_grey">हल्का ग्रे</string>
+    <string name="menu_bg_light_grey">लाइट ग्रे</string>
     <string name="menu_bg_green">हरा</string>
     <string name="menu_bg_blue">नीला</string>
     <string name="menu_bg_transparent">पारदर्शी</string>
@@ -644,6 +653,8 @@
     <string name="font_search">खोजें</string>
     <string name="font_imported">इम्पोर्ट किया गया</string>
     <string name="font_downloads_when_chosen">चुनने पर डाउनलोड होगा</string>
+    <string name="fonts_missing_title">इस फ़ोन पर फ़ॉन्ट नहीं हैं</string>
+    <string name="fonts_missing_body">यह प्रोजेक्ट ऐसे फ़ॉन्ट इस्तेमाल करता है जो इस फ़ोन पर नहीं हैं: %1$s। जब तक आप उन्हें Google Fonts से डाउनलोड नहीं करते, टेक्स्ट किसी दूसरे फ़ॉन्ट में दिखता है।</string>
     <string name="font_favorite">पसंदीदा</string>
     <string name="font_category_sans_serif">सैंस सेरिफ़</string>
     <string name="font_category_serif">सेरिफ़</string>
@@ -782,7 +793,7 @@
     <string name="structure_alignment_options">अलाइनमेंट विकल्प</string>
     <string name="structure_group_options">ग्रुप विकल्प</string>
     <string name="structure_align_left">बाएँ अलाइन करें</string>
-    <string name="structure_align_centre">सेंटर अलाइन करें</string>
+    <string name="structure_align_centre">सेंटर में अलाइन करें</string>
     <string name="structure_align_right">दाएँ अलाइन करें</string>
     <string name="structure_align_top">ऊपर अलाइन करें</string>
     <string name="structure_align_middle">मध्य अलाइन करें</string>
@@ -1127,7 +1138,7 @@
     <string name="ai_saving_transparent">पारदर्शी इमेज सेव की जा रही है…</string>
     <string name="ai_loading_model">बैकग्राउंड हटाने का मॉडल लोड किया जा रहा है…</string>
     <string name="ai_no_foreground_mask">कोई फ़ोरग्राउंड मास्क नहीं मिला</string>
-    <string name="ai_mask_unexpected_size">फ़ोरग्राउंड मास्क का साइज़ अप्रत्याशित है</string>
+    <string name="ai_mask_unexpected_size">बैकग्राउंड रिमूवल का परिणाम गलत साइज़ का आया। फिर से कोशिश करें।</string>
     <string name="ai_cannot_save_image">इमेज सेव नहीं की जा सकती</string>
     <string name="ai_cannot_read_image">यह इमेज पढ़ी नहीं जा सकती</string>
     <string name="ai_cannot_decode_image">इस इमेज को डिकोड नहीं किया जा सकता</string>
@@ -1138,13 +1149,13 @@
     <string name="ai_sample_rate_changed">डिकोडिंग के दौरान ऑडियो सैंपल रेट बदल गया</string>
     <string name="ai_recording_too_large">यह रिकॉर्डिंग WAV के लिए बहुत बड़ी है</string>
     <string name="ai_no_samples_decoded">कोई ऑडियो सैंपल डिकोड नहीं हुआ</string>
-    <string name="ai_mask_wrong_size">मास्क का साइज़ अप्रत्याशित है</string>
+    <string name="ai_mask_wrong_size">बैकग्राउंड रिमूवल का परिणाम गलत साइज़ का आया। फिर से कोशिश करें।</string>
     <string name="ai_encoder_no_image">वीडियो एनकोडर ने कोई इनपुट इमेज नहीं दी</string>
     <string name="ai_encoder_not_responding">वीडियो एनकोडर ने जवाब देना बंद कर दिया</string>
-    <string name="ai_encoder_frames_before_format">वीडियो एनकोडर ने अपने फ़ॉर्मेट से पहले फ़्रेम भेजे</string>
+    <string name="ai_encoder_frames_before_format">वीडियो एनकोडर सही से शुरू नहीं हुआ। फिर से कोशिश करें।</string>
     <string name="ai_encoder_not_finished">वीडियो एनकोडर पूरा नहीं हुआ</string>
     <string name="ai_cannot_encode_mask">यह फ़ोन मास्क वीडियो एनकोड नहीं कर सकता</string>
-    <string name="ai_video_no_size">इस वीडियो में साइज़ की जानकारी नहीं है</string>
+    <string name="ai_video_no_size">इस वीडियो में साइज़ की जानकारी नहीं है।</string>
     <string name="ai_clip_too_long">%1$s मिनट से लंबी क्लिप अभी सपोर्टेड नहीं हैं। पहले क्लिप को ट्रिम या स्प्लिट करें।</string>
     <string name="ai_not_enough_storage">पर्याप्त खाली स्टोरेज नहीं है: इसके लिए लगभग %1$s MB चाहिए।</string>
     <string name="ai_no_video_frames">इस क्लिप में प्रोसेस करने के लिए कोई वीडियो फ़्रेम नहीं हैं</string>
@@ -1155,7 +1166,7 @@
     <string name="ai_no_sound_to_caption">कैप्शन के लिए कोई ऑडियो नहीं है</string>
     <string name="ai_no_speech">कोई बोली नहीं मिली</string>
     <string name="ai_reading_audio">ऑडियो पढ़ा जा रहा है…</string>
-    <string name="ai_recognising_speech">बोली पहचानी जा रही है…</string>
+    <string name="ai_recognising_speech">स्पीच पहचानी जा रही है…</string>
     <string name="ai_caption_model_load_failed">कैप्शन मॉडल लोड नहीं हो सका। इसे सेटिंग्स में हटाएँ और फिर कोशिश करें।</string>
     <string name="ai_speech_failed">स्पीच पहचान विफल रही</string>
     <string name="ai_cannot_create_model_storage">मॉडल स्टोरेज नहीं बना सकते</string>
@@ -1175,7 +1186,7 @@
     <string name="model_svg_skipped_gradient_strokes">ग्रेडिएंट स्ट्रोक</string>
     <string name="model_svg_skipped_dashed">डैश्ड स्ट्रोक</string>
     <string name="model_svg_skipped_patterns">पैटर्न फ़िल</string>
-    <string name="model_svg_skipped_gradient_colours">अतिरिक्त ग्रेडिएंट कलर (पहला और आखिरी इस्तेमाल होता है)</string>
+    <string name="model_svg_skipped_gradient_colours">अतिरिक्त ग्रेडिएंट कलर (पहला और आखिरी इस्तेमाल होते हैं)</string>
     <string name="ai_no_audio_track">%1$s में कोई ऑडियो ट्रैक नहीं है</string>
     <string name="shape_name_circle">वृत्त</string>
     <string name="shape_name_rounded_rectangle">राउंडेड आयत</string>
@@ -1261,7 +1272,7 @@
     <string name="track_motion_lost_at_frame">फ़्रेम %1$s पर ट्रैकिंग छूट गई। पॉइंट को उसी फ़ीचर पर वापस ले जाएँ और जारी रखें पर टैप करें।</string>
     <string name="track_motion_done">%1$s फ़्रेम ट्रैक किए गए। कीफ़्रेम %2$s पर हैं।</string>
     <string name="track_motion_target_layer">टारगेट लेयर</string>
-    <string name="track_motion_cancelled">ट्रैकिंग रद्द की गई। पहले से ट्रैक किए गए फ़्रेम अपने कीफ़्रेम बनाए रखेंगे।</string>
+    <string name="track_motion_cancelled">ट्रैकिंग रद्द की गई। पहले से ट्रैक किए गए फ़्रेम अपने कीफ़्रेम रखते हैं।</string>
     <string name="track_motion_unavailable">इस बिल्ड में मोशन ट्रैकिंग उपलब्ध नहीं है।</string>
     <string name="track_motion_failed">इस वीडियो को ट्रैक नहीं किया जा सका।</string>
     <string name="edit_layer_copy_name">%1$s कॉपी</string>
@@ -1301,7 +1312,7 @@
     <string name="export_audio_summary_lossless">%1$s · %2$s · %3$s</string>
     <string name="export_audio_hint">वीडियो फ़ाइल के लिए साउंड सेटिंग्स। %1$s में %2$s ऑडियो हो सकता है।</string>
     <string name="export_audio_hint_silent">इस प्रोजेक्ट में अभी कोई साउंड नहीं है। साउंड जोड़ने पर ये सेटिंग्स लागू होंगी।</string>
-    <string name="export_audio_only_hint">Music / AbsentMotion में सेव होता है। WAV और FLAC हर ब्यौरा बनाए रखते हैं; M4A, OGG और MP3 छोटे होते हैं।</string>
+    <string name="export_audio_only_hint">Music/AbsentMotion में सेव होता है। WAV और FLAC हर डिटेल रखते हैं; M4A, OGG और MP3 ज़्यादा छोटे होते हैं।</string>
     <string name="export_running_audio">ऑडियो एक्सपोर्ट हो रहा है</string>
     <string name="export_interpolation_off_help">हर क्लिप अपने फ़्रेम दिखाती है। 60 fps के एक्सपोर्ट में 30 fps क्लिप हर फ़्रेम दो बार दिखाती है, इसलिए मोशन थोड़ा रुक-रुक कर लग सकता है।</string>
     <string name="export_interpolation_blend_help">बीच के नए फ़्रेम दो नज़दीकी फ़्रेम को तेज़ क्रॉस-फ़ेड की तरह मिलाते हैं। एक्सपोर्ट तेज़ होता है; तेज़ मोशन में घोस्टिंग दिख सकती है।</string>

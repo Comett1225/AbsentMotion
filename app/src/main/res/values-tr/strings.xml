@@ -35,7 +35,6 @@
     <string name="ok">Tamam</string>
     <string name="easing_needs_at_least_two_keyframes">Yumuşatmanın çalışması için en az iki anahtar kare gerekir.\n\nAnahtar kareleriniz başka bir özellikteyse önce o özelliği seçin.</string>
     <string name="add_keyframes_first">Önce anahtar kare ekleyin</string>
-    <string name="convert_to_group">Gruba dönüştür</string>
     <string name="cancel">İptal</string>
     <string name="rebuild_source_project">Kaynak projeyi yeniden oluştur</string>
     <string name="this_asset_pointed_to_a_project">Bu varlık, silinmiş bir projeyi işaret ediyor.\n\nBu varlıktan yeni bir proje oluşturmak ister misiniz, yoksa ayırıp doğrudan düzenlemek mi?</string>
@@ -89,7 +88,7 @@
     <string name="export_template_failed">Şablon olarak kopya saklanamadı. Biraz depolama alanı boşaltın.</string>
     <string name="also_keeps_the_project_with_its">Ayrıca projeyi medyasıyla birlikte bu telefondaki Şablonlar\'da tutar. Medyasını değiştirip yeni bir projeye devam etmek için oradan açın.</string>
     <string name="template">Şablon</string>
-    <string name="one_absproj_package_with_the_project">Projeyi ve kullandığı orijinal medyayı içeren tek bir .absproj paketi, Belgeler / AbsentMotion konumuna kaydedilir. Yedek olarak saklayın veya projeyi başka bir telefona taşıyın.</string>
+    <string name="one_absproj_package_with_the_project">Projeyi ve kullandığı orijinal medyayı içeren tek bir .absproj paketi, Documents/AbsentMotion klasörüne kaydedilir. Yedek olarak saklayın veya projeyi başka bir telefona taşıyın.</string>
     <string name="project_bundle">Proje paketi</string>
     <string name="project_home_page">Proje ana sayfası</string>
     <string name="open_source_licences">Açık kaynak lisansları</string>
@@ -126,7 +125,7 @@
     <string name="delete_all">Tümünü sil</string>
     <string name="effects_not_loaded">Efektler yüklenemedi</string>
     <string name="settings_demo_mode">Demo Modu</string>
-    <string name="settings_open_xml">XML projelerini aç</string>
+    <string name="settings_open_xml">Proje listesinde içe aktarma kartını göster</string>
     <string name="settings_vibration">Titreşim</string>
     <string name="settings_emoji">Emoji stili</string>
     <string name="settings_emoji_system">Sistem</string>
@@ -173,12 +172,12 @@
     <string name="library_err_no_project">Bozuk sahne: pakette proje yok</string>
     <string name="library_err_malformed_package">Bozuk paket: %1$s</string>
     <string name="library_err_malformed_xml">Bozuk XML: %1$s</string>
-    <string name="library_err_scene_needs_size">Bozuk sahne: boyutu olan bir &lt;scene&gt; bekleniyordu</string>
+    <string name="library_err_scene_needs_size">Bozuk sahne: dosyada genişlik ve yükseklik içeren bir sahne olmalı</string>
     <string name="library_err_scene_too_big">Bozuk sahne: boyut %1$s pikselden büyük</string>
     <string name="library_err_scene_fps">Bozuk sahne: kare hızı 1 ile %1$s arasında olmalı</string>
     <string name="library_err_package_large">Paket çok büyük (açıldığında %1$s MB\'tan fazla)</string>
     <string name="library_err_too_many_files">Paket çok fazla dosya içeriyor (%1$s sınırından fazla)</string>
-    <string name="library_err_xml_large">Bozuk XML: dosya çok büyük</string>
+    <string name="library_err_xml_large">Bu dosya açılamayacak kadar büyük (32 MB\'tan fazla)</string>
     <string name="library_err_media_large">Paket çok büyük (%1$s MB\'tan fazla medya)</string>
     <string name="library_err_not_backup">Bu dosya bir AbsentMotion yedeği değil.</string>
     <string name="library_err_backup_project_large">Yedekteki bir proje çok büyük.</string>
@@ -262,6 +261,10 @@
     <plurals name="backup_restored_skipped">
         <item quantity="one">%1$s proje zaten buradaydı ve olduğu gibi bırakıldı.</item>
         <item quantity="other">%1$s proje zaten buradaydı ve oldukları gibi bırakıldı.</item>
+    </plurals>
+    <plurals name="backup_restored_rejected">
+        <item quantity="one">%1$s proje, boyutu veya kare hızı geçerli olmadığı için geri yüklenmedi.</item>
+        <item quantity="other">%1$s proje, boyutları veya kare hızları geçerli olmadığı için geri yüklenmedi.</item>
     </plurals>
     <string name="about_version">Sürüm %1$s</string>
     <string name="about_licence_line">Ücretsiz ve açık kaynak, Apache License 2.0 ile lisanslanmıştır.</string>
@@ -363,7 +366,7 @@
     <string name="export_anyway">Yine de dışa aktar</string>
     <string name="export_available_space">Kullanılabilir alan</string>
     <string name="export_estimated_size">Tahmini dosya boyutu</string>
-    <string name="export_calculating">Hesaplanıyor...</string>
+    <string name="export_calculating">Hesaplanıyor…</string>
     <string name="export_kind_video">Video</string>
     <string name="export_kind_frame_png">Geçerli kare (PNG)</string>
     <string name="export_kind_frame_as">Geçerli kare farklı biçimde…</string>
@@ -440,7 +443,6 @@
     <string name="export_thermal_hot">Telefonun çok ısındı. Soğuması için dışa aktarma yavaşlıyor.</string>
     <string name="export_thermal_critical">Telefonun aşırı ısındı. Soğuyana kadar dışa aktarma kareler arasında duraklıyor.</string>
     <string name="export_time_few_seconds">birkaç saniye</string>
-    <string name="export_time_hours">yaklaşık %1$s saat</string>
     <plurals name="export_time_seconds">
         <item quantity="one">yaklaşık %1$s saniye</item>
         <item quantity="other">yaklaşık %1$s saniye</item>
@@ -448,6 +450,10 @@
     <plurals name="export_time_minutes">
         <item quantity="one">yaklaşık %1$s dakika</item>
         <item quantity="other">yaklaşık %1$s dakika</item>
+    </plurals>
+    <plurals name="export_time_hours_count">
+        <item quantity="one">yaklaşık %1$s saat</item>
+        <item quantity="other">yaklaşık %1$s saat</item>
     </plurals>
     <string name="export_verify_empty">Dosyada ses veya video yok.</string>
     <string name="export_verify_no_video">Dosyada video kanalı yok.</string>
@@ -459,10 +465,11 @@
     <string name="export_verify_picture">Dosyadaki görsel çözülemiyor.</string>
     <string name="export_verify_size">Görsel %2$s yerine %1$s.</string>
     <string name="export_verify_frames">GIF, %2$s yerine %1$s kare içeriyor.</string>
+    <string name="export_sound_unreadable">%1$s sesi okunamadı; bu dosyada sessiz olacak.</string>
     <string name="export_error_cannot_encode">Bu telefon %1$s ile %2$s boyutunda kodlama yapamıyor</string>
-    <string name="export_error_draw_frame">Motor %1$s karesini çizemedi</string>
+    <string name="export_error_draw_frame">Kare %1$s çizilemedi. Dışa aktarmayı yeniden deneyin.</string>
     <string name="export_error_draw_still">Motor kareyi çizemedi</string>
-    <string name="export_error_no_sound">Bu projede dışa aktarılacak ses yok.</string>
+    <string name="export_error_no_sound">Bu projede dışa aktarılacak ses yok. Önce müzik, ses veya sesi olan bir video ekleyin.</string>
     <string name="export_error_create">%2$s içinde %1$s oluşturulamıyor</string>
     <string name="export_error_write">%1$s yazılamıyor</string>
     <string name="export_error_mp3_settings">MP3 kodlayıcı %1$s Hz değerini %2$s kbps ile kullanamıyor</string>
@@ -477,6 +484,8 @@
     <string name="camera_photo">FOTOĞRAF</string>
     <string name="camera_video">VİDEO</string>
     <string name="camera_close">Kamerayı kapat</string>
+    <string name="camera_take_photo">Fotoğraf çek</string>
+    <string name="camera_start_recording">Kaydı başlat</string>
     <string name="camera_switch">Kamerayı değiştir</string>
     <string name="camera_pause_recording">Kaydı duraklat</string>
     <string name="camera_resume_recording">Kayda devam et</string>
@@ -495,16 +504,16 @@
     <string name="media_error_video_unavailable">Video kullanılamıyor: %1$s</string>
     <string name="media_error_decode_frame">Tam video karesi %1$s çözülemiyor</string>
     <string name="media_error_import_frame">%2$s için %1$s video karesi içe aktarılamıyor</string>
-    <string name="media_error_interp_source">%1$s ara değer kaynak karesi kullanılamıyor</string>
-    <string name="media_error_interp_wrong_frame">%1$s için ara değer yanlış kaynak karesini aldı</string>
-    <string name="media_error_interp_import">%1$s ara değer kaynak karesi içe aktarılamıyor</string>
+    <string name="media_error_interp_source">Kare interpolasyonu için gereken bir video karesi eksik (%1$s). Tekrar deneyin veya Kare interpolasyonu\'nu Kapalı yapın.</string>
+    <string name="media_error_interp_wrong_frame">Kare interpolasyonu için gereken bir video karesi doğru okunamadı (%1$s). Tekrar deneyin veya Kare interpolasyonu\'nu Kapalı yapın.</string>
+    <string name="media_error_interp_import">Kare interpolasyonu için gereken bir video karesi yüklenemedi (%1$s). Tekrar deneyin veya Kare interpolasyonu\'nu Kapalı yapın.</string>
     <string name="media_error_interp_render">%1$s istenen video karesini işleyemedi</string>
     <string name="engine_loading_effects">Efektler yükleniyor…</string>
     <string name="engine_error_gpu_capture">Yakalama sırasında GPU başarısız oldu</string>
     <string name="platform_voice_name">Ses %1$s</string>
     <string name="platform_error_tts_unavailable">Bu telefonda metin okuma kullanılamıyor</string>
     <string name="platform_error_voice">Ses oluşturulamadı</string>
-    <string name="platform_caption_download">Altyazılar telefonunuzda bir konuşma modeliyle tanınır, bir kez indirilir: %1$s, %2$s, Hugging Face üzerinden.</string>
+    <string name="platform_caption_download">Altyazılar telefonunuzda bir konuşma modeliyle tanınır; bir kez indirilir: %1$s, %2$s, Hugging Face\'ten.</string>
     <string name="add_layer">Katman ekle</string>
     <string name="add_tab_shape">Şekil</string>
     <string name="add_tab_media">Medya</string>
@@ -644,6 +653,8 @@
     <string name="font_search">Ara</string>
     <string name="font_imported">İçe aktarıldı</string>
     <string name="font_downloads_when_chosen">Seçildiğinde indirilir</string>
+    <string name="fonts_missing_title">Bu telefonda olmayan yazı tipleri</string>
+    <string name="fonts_missing_body">Bu proje, bu telefonda olmayan yazı tipleri kullanıyor: %1$s. Google Fonts\'tan indirene kadar metin başka bir yazı tipiyle görünür.</string>
     <string name="font_favorite">Favori</string>
     <string name="font_category_sans_serif">Sans serif</string>
     <string name="font_category_serif">Serif</string>
@@ -1127,7 +1138,7 @@
     <string name="ai_saving_transparent">Saydam görsel kaydediliyor…</string>
     <string name="ai_loading_model">Arka plan kaldırma modeli yükleniyor…</string>
     <string name="ai_no_foreground_mask">Ön plan maskesi döndürülmedi</string>
-    <string name="ai_mask_unexpected_size">Ön plan maskesi beklenmedik bir boyutta</string>
+    <string name="ai_mask_unexpected_size">Arka plan kaldırma yanlış boyutta sonuç verdi. Tekrar deneyin.</string>
     <string name="ai_cannot_save_image">Görsel kaydedilemiyor</string>
     <string name="ai_cannot_read_image">Bu görsel okunamıyor</string>
     <string name="ai_cannot_decode_image">Bu görsel çözülemiyor</string>
@@ -1138,13 +1149,13 @@
     <string name="ai_sample_rate_changed">Çözme sırasında ses örnekleme hızı değişti</string>
     <string name="ai_recording_too_large">Bu kayıt WAV için çok büyük</string>
     <string name="ai_no_samples_decoded">Hiç ses örneği çözülemedi</string>
-    <string name="ai_mask_wrong_size">Maske beklenmedik bir boyutta</string>
+    <string name="ai_mask_wrong_size">Arka plan kaldırma yanlış boyutta sonuç verdi. Tekrar deneyin.</string>
     <string name="ai_encoder_no_image">Video kodlayıcı bir giriş görüntüsü vermedi</string>
     <string name="ai_encoder_not_responding">Video kodlayıcı yanıt vermeyi durdurdu</string>
-    <string name="ai_encoder_frames_before_format">Video kodlayıcı biçiminden önce kareler gönderdi</string>
+    <string name="ai_encoder_frames_before_format">Video kodlayıcı doğru başlamadı. Tekrar deneyin.</string>
     <string name="ai_encoder_not_finished">Video kodlayıcı tamamlanmadı</string>
     <string name="ai_cannot_encode_mask">Bu telefon maske videosunu kodlayamıyor</string>
-    <string name="ai_video_no_size">Bu videoda boyut bilgisi yok</string>
+    <string name="ai_video_no_size">Bu videoda boyut bilgisi yok.</string>
     <string name="ai_clip_too_long">%1$s dakikadan uzun klipler henüz desteklenmiyor. Önce klibi kırpın veya bölün.</string>
     <string name="ai_not_enough_storage">Yeterli boş depolama yok: bunun için yaklaşık %1$s MB gerekir.</string>
     <string name="ai_no_video_frames">Bu klipte işlenecek video karesi yok</string>
@@ -1175,7 +1186,7 @@
     <string name="model_svg_skipped_gradient_strokes">gradyan konturlar</string>
     <string name="model_svg_skipped_dashed">kesikli konturlar</string>
     <string name="model_svg_skipped_patterns">desen dolguları</string>
-    <string name="model_svg_skipped_gradient_colours">fazladan gradyan renkleri (ilk ve son kullanılır)</string>
+    <string name="model_svg_skipped_gradient_colours">ek gradyan renkleri (ilk ve son kullanılır)</string>
     <string name="ai_no_audio_track">%1$s içinde ses parçası yok</string>
     <string name="shape_name_circle">Daire</string>
     <string name="shape_name_rounded_rectangle">Yuvarlatılmış Dikdörtgen</string>
@@ -1261,7 +1272,7 @@
     <string name="track_motion_lost_at_frame">%1$s. karede takip kayboldu. Noktayı aynı özelliğin üzerine geri taşıyın ve Devam\'a dokunun.</string>
     <string name="track_motion_done">%1$s kare izlendi. Anahtar kareler %2$s üzerinde.</string>
     <string name="track_motion_target_layer">hedef katman</string>
-    <string name="track_motion_cancelled">Takip iptal edildi. İzlenen kareler anahtar karelerini korur.</string>
+    <string name="track_motion_cancelled">Hareket takibi iptal edildi. Takip edilen kareler anahtar karelerini korur.</string>
     <string name="track_motion_unavailable">Hareket takibi bu sürümde kullanılamıyor.</string>
     <string name="track_motion_failed">Bu video izlenemedi.</string>
     <string name="edit_layer_copy_name">%1$s Kopya</string>
@@ -1301,7 +1312,7 @@
     <string name="export_audio_summary_lossless">%1$s · %2$s · %3$s</string>
     <string name="export_audio_hint">Video dosyası için ses ayarları. %1$s, %2$s sesini barındırabilir.</string>
     <string name="export_audio_hint_silent">Bu projede henüz ses yok. Bu ayarlar ses eklediğinizde kullanılır.</string>
-    <string name="export_audio_only_hint">Müzik / AbsentMotion konumuna kaydedilir. WAV ve FLAC tüm ayrıntıları korur; M4A, OGG ve MP3 daha küçüktür.</string>
+    <string name="export_audio_only_hint">Music/AbsentMotion klasörüne kaydedilir. WAV ve FLAC tüm ayrıntıları korur; M4A, OGG ve MP3 daha küçüktür.</string>
     <string name="export_running_audio">Ses dışa aktarılıyor</string>
     <string name="export_interpolation_off_help">Her klip kendi karelerini gösterir. 60 fps dışa aktarmada 30 fps bir klip her kareyi iki kez gösterir, bu yüzden hareket biraz kesik görünebilir.</string>
     <string name="export_interpolation_blend_help">Yeni ara kareler, iki en yakın kareyi hızlı bir çapraz geçiş gibi karıştırır. Dışa aktarması hızlıdır; hızlı harekette hayalet görüntü oluşabilir.</string>

@@ -35,7 +35,6 @@
     <string name="ok">OK</string>
     <string name="easing_needs_at_least_two_keyframes">A suavização precisa de pelo menos dois quadros-chave.\n\nSe seus quadros-chave estiverem em outra propriedade, selecione essa propriedade primeiro.</string>
     <string name="add_keyframes_first">Adicione quadros-chave primeiro</string>
-    <string name="convert_to_group">Converter em grupo</string>
     <string name="cancel">Cancelar</string>
     <string name="rebuild_source_project">Reconstruir projeto de origem</string>
     <string name="this_asset_pointed_to_a_project">Este recurso apontava para um projeto que foi excluído.\n\nReconstruir um projeto a partir deste recurso ou desvinculá-lo e editá-lo diretamente?</string>
@@ -89,7 +88,7 @@
     <string name="export_template_failed">Não foi possível manter uma cópia como modelo. Libere espaço de armazenamento.</string>
     <string name="also_keeps_the_project_with_its">Também mantém o projeto, com sua mídia, em Modelos neste celular. Abra-o lá para substituir a mídia e continuar em um novo projeto.</string>
     <string name="template">Modelo</string>
-    <string name="one_absproj_package_with_the_project">Um pacote .absproj com o projeto e a mídia original usada por ele, salvo em Documents / AbsentMotion. Mantenha como backup ou leve o projeto para outro celular.</string>
+    <string name="one_absproj_package_with_the_project">Um pacote .absproj com o projeto e a mídia original que ele usa, salvo em Documents/AbsentMotion. Guarde como backup ou leve o projeto para outro celular.</string>
     <string name="project_bundle">Pacote do projeto</string>
     <string name="project_home_page">Página inicial do projeto</string>
     <string name="open_source_licences">Licenças de código aberto</string>
@@ -126,7 +125,7 @@
     <string name="delete_all">Excluir tudo</string>
     <string name="effects_not_loaded">Não foi possível carregar os efeitos</string>
     <string name="settings_demo_mode">Modo demonstração</string>
-    <string name="settings_open_xml">Abrir projetos XML</string>
+    <string name="settings_open_xml">Mostrar o cartão de importação na lista de projetos</string>
     <string name="settings_vibration">Vibração</string>
     <string name="settings_emoji">Estilo de emoji</string>
     <string name="settings_emoji_system">Sistema</string>
@@ -170,15 +169,15 @@
     <string name="library_err_package_project_missing">Pacote inválido: arquivo do projeto ausente</string>
     <string name="library_err_too_many_projects">O pacote tem projetos demais (mais de %1$s)</string>
     <string name="library_err_project_files_large">Os arquivos de projeto do pacote são grandes demais</string>
-    <string name="library_err_no_project">Cena inválida: nenhum projeto no pacote</string>
+    <string name="library_err_no_project">Cena malformada: nenhum projeto no pacote</string>
     <string name="library_err_malformed_package">Pacote inválido: %1$s</string>
     <string name="library_err_malformed_xml">XML inválido: %1$s</string>
-    <string name="library_err_scene_needs_size">Cena inválida: esperado um &lt;scene&gt; com tamanho</string>
-    <string name="library_err_scene_too_big">Cena inválida: o tamanho é maior que %1$s pixels</string>
-    <string name="library_err_scene_fps">Cena inválida: a taxa de quadros deve ser de 1 a %1$s</string>
+    <string name="library_err_scene_needs_size">Cena malformada: o arquivo precisa de uma cena com largura e altura</string>
+    <string name="library_err_scene_too_big">Cena malformada: o tamanho é maior que %1$s pixels</string>
+    <string name="library_err_scene_fps">Cena malformada: a taxa de quadros deve ser de 1 a %1$s</string>
     <string name="library_err_package_large">O pacote é grande demais (mais de %1$s MB descompactado)</string>
     <string name="library_err_too_many_files">O pacote tem arquivos demais (mais de %1$s)</string>
-    <string name="library_err_xml_large">XML inválido: o arquivo é grande demais</string>
+    <string name="library_err_xml_large">Este arquivo é grande demais para abrir (mais de 32 MB)</string>
     <string name="library_err_media_large">O pacote é grande demais (mais de %1$s MB de mídia)</string>
     <string name="library_err_not_backup">Este arquivo não é um backup do AbsentMotion.</string>
     <string name="library_err_backup_project_large">Um projeto no backup é grande demais.</string>
@@ -207,8 +206,9 @@
     <string name="home_collect_unreadable_project">Não foi possível ler este projeto.</string>
     <string name="home_collect_already_kept">Todas as mídias já estão guardadas no projeto.</string>
     <plurals name="home_collect_could_not_read">
-        <item quantity="one">%1$s arquivo está ausente ou não pôde ser lido.</item>
-        <item quantity="other">%1$s arquivos estão ausentes ou não puderam ser lidos.</item>
+        <item quantity="one">O arquivo %1$s está ausente ou não pôde ser lido.</item>
+        <item quantity="many">Os arquivos %1$s estão ausentes ou não puderam ser lidos.</item>
+        <item quantity="other">Os arquivos %1$s estão ausentes ou não puderam ser lidos.</item>
     </plurals>
     <string name="home_collect_storage_full">O armazenamento está cheio, então alguns arquivos não foram copiados.</string>
     <string name="home_restore_edits_failed">Não foi possível restaurar suas edições. Libere espaço de armazenamento; você será perguntado novamente na próxima vez.</string>
@@ -256,12 +256,19 @@
     <string name="backup_open_failed">Não foi possível abrir este arquivo.</string>
     <string name="backup_restored">%1$s restaurados.</string>
     <plurals name="backup_restored_copies">
-        <item quantity="one">%1$s projeto foi adicionado como uma cópia separada porque uma versão diferente já estava aqui.</item>
-        <item quantity="other">%1$s projetos foram adicionados como cópias separadas porque uma versão diferente já estava aqui.</item>
+        <item quantity="one">O projeto %1$s foi adicionado como uma cópia separada porque já havia uma versão diferente aqui.</item>
+        <item quantity="many">Os projetos %1$s foram adicionados como cópias separadas porque já havia uma versão diferente aqui.</item>
+        <item quantity="other">Os projetos %1$s foram adicionados como cópias separadas porque já havia uma versão diferente aqui.</item>
     </plurals>
     <plurals name="backup_restored_skipped">
-        <item quantity="one">%1$s projeto já estava aqui e foi mantido como está.</item>
-        <item quantity="other">%1$s projetos já estavam aqui e foram mantidos como estão.</item>
+        <item quantity="one">O projeto %1$s já estava aqui e foi mantido como está.</item>
+        <item quantity="many">Os projetos %1$s já estavam aqui e foram mantidos como estão.</item>
+        <item quantity="other">Os projetos %1$s já estavam aqui e foram mantidos como estão.</item>
+    </plurals>
+    <plurals name="backup_restored_rejected">
+        <item quantity="one">O projeto %1$s não foi restaurado porque o tamanho ou a taxa de quadros não é válido.</item>
+        <item quantity="many">Os projetos %1$s não foram restaurados porque o tamanho ou a taxa de quadros não é válido.</item>
+        <item quantity="other">Os projetos %1$s não foram restaurados porque o tamanho ou a taxa de quadros não é válido.</item>
     </plurals>
     <string name="about_version">Versão %1$s</string>
     <string name="about_licence_line">Gratuito e de código aberto, sob a Licença Apache 2.0.</string>
@@ -343,18 +350,22 @@
     <string name="newproject_link">Vincular</string>
     <plurals name="backup_projects">
         <item quantity="one">%1$s projeto</item>
+        <item quantity="many">%1$s projetos</item>
         <item quantity="other">%1$s projetos</item>
     </plurals>
     <plurals name="home_collect_copied">
         <item quantity="one">%1$s arquivo copiado para o projeto.</item>
+        <item quantity="many">%1$s arquivos copiados para o projeto.</item>
         <item quantity="other">%1$s arquivos copiados para o projeto.</item>
     </plurals>
     <plurals name="library_report_effect_layers">
         <item quantity="one">%1$s (%2$s camada)</item>
+        <item quantity="many">%1$s (%2$s camadas)</item>
         <item quantity="other">%1$s (%2$s camadas)</item>
     </plurals>
     <plurals name="library_report_converted_effects">
         <item quantity="one">%1$s (%2$s efeito)</item>
+        <item quantity="many">%1$s (%2$s efeitos)</item>
         <item quantity="other">%1$s (%2$s efeitos)</item>
     </plurals>
     <string name="export_title">Exportar projeto</string>
@@ -363,7 +374,7 @@
     <string name="export_anyway">Exportar mesmo assim</string>
     <string name="export_available_space">Espaço disponível</string>
     <string name="export_estimated_size">Tamanho estimado do arquivo</string>
-    <string name="export_calculating">Calculando...</string>
+    <string name="export_calculating">Calculando…</string>
     <string name="export_kind_video">Vídeo</string>
     <string name="export_kind_frame_png">Quadro atual como PNG</string>
     <string name="export_kind_frame_as">Quadro atual como…</string>
@@ -440,14 +451,20 @@
     <string name="export_thermal_hot">Seu celular está quente. A exportação desacelera para deixar esfriar.</string>
     <string name="export_thermal_critical">Seu celular está muito quente. A exportação pausa entre quadros até esfriar.</string>
     <string name="export_time_few_seconds">alguns segundos</string>
-    <string name="export_time_hours">cerca de %1$s horas</string>
     <plurals name="export_time_seconds">
         <item quantity="one">cerca de %1$s segundo</item>
+        <item quantity="many">cerca de %1$s segundos</item>
         <item quantity="other">cerca de %1$s segundos</item>
     </plurals>
     <plurals name="export_time_minutes">
         <item quantity="one">cerca de %1$s minuto</item>
+        <item quantity="many">cerca de %1$s minutos</item>
         <item quantity="other">cerca de %1$s minutos</item>
+    </plurals>
+    <plurals name="export_time_hours_count">
+        <item quantity="one">cerca de %1$s hora</item>
+        <item quantity="many">cerca de %1$s horas</item>
+        <item quantity="other">cerca de %1$s horas</item>
     </plurals>
     <string name="export_verify_empty">O arquivo não tem áudio nem vídeo.</string>
     <string name="export_verify_no_video">O arquivo não tem faixa de vídeo.</string>
@@ -459,10 +476,11 @@
     <string name="export_verify_picture">A imagem do arquivo não foi decodificada.</string>
     <string name="export_verify_size">A imagem é %1$s em vez de %2$s.</string>
     <string name="export_verify_frames">O GIF tem %1$s quadros em vez de %2$s.</string>
+    <string name="export_sound_unreadable">Não foi possível ler o som de %1$s, então ele fica silencioso neste arquivo.</string>
     <string name="export_error_cannot_encode">Este celular não consegue codificar %1$s em %2$s</string>
-    <string name="export_error_draw_frame">O mecanismo não conseguiu desenhar o quadro %1$s</string>
+    <string name="export_error_draw_frame">Não foi possível desenhar o quadro %1$s. Tente exportar de novo.</string>
     <string name="export_error_draw_still">O mecanismo não conseguiu desenhar o quadro</string>
-    <string name="export_error_no_sound">Este projeto não tem som para exportar.</string>
+    <string name="export_error_no_sound">Este projeto não tem som para exportar. Adicione música, um som ou um vídeo com som primeiro.</string>
     <string name="export_error_create">Não é possível criar %1$s em %2$s</string>
     <string name="export_error_write">Não é possível gravar %1$s</string>
     <string name="export_error_mp3_settings">O codificador MP3 não aceita %1$s Hz a %2$s kbps</string>
@@ -477,6 +495,8 @@
     <string name="camera_photo">FOTO</string>
     <string name="camera_video">VÍDEO</string>
     <string name="camera_close">Fechar câmera</string>
+    <string name="camera_take_photo">Tirar foto</string>
+    <string name="camera_start_recording">Iniciar gravação</string>
     <string name="camera_switch">Trocar câmera</string>
     <string name="camera_pause_recording">Pausar gravação</string>
     <string name="camera_resume_recording">Retomar gravação</string>
@@ -495,16 +515,16 @@
     <string name="media_error_video_unavailable">Vídeo indisponível: %1$s</string>
     <string name="media_error_decode_frame">Não é possível decodificar o quadro exato do vídeo %1$s</string>
     <string name="media_error_import_frame">Não é possível importar o quadro de vídeo %1$s de %2$s</string>
-    <string name="media_error_interp_source">O quadro de origem da interpolação %1$s não está disponível</string>
-    <string name="media_error_interp_wrong_frame">A interpolação recebeu o quadro de origem errado para %1$s</string>
-    <string name="media_error_interp_import">Não é possível importar o quadro de origem da interpolação %1$s</string>
+    <string name="media_error_interp_source">Um quadro de vídeo necessário para a interpolação de quadros está faltando (%1$s). Tente de novo ou desative a interpolação de quadros.</string>
+    <string name="media_error_interp_wrong_frame">Um quadro de vídeo necessário para a interpolação de quadros não pôde ser lido corretamente (%1$s). Tente de novo ou desative a interpolação de quadros.</string>
+    <string name="media_error_interp_import">Um quadro de vídeo necessário para a interpolação de quadros não pôde ser carregado (%1$s). Tente de novo ou desative a interpolação de quadros.</string>
     <string name="media_error_interp_render">%1$s não conseguiu renderizar o quadro de vídeo solicitado</string>
     <string name="engine_loading_effects">Carregando efeitos…</string>
     <string name="engine_error_gpu_capture">A GPU falhou durante a captura</string>
     <string name="platform_voice_name">Voz %1$s</string>
     <string name="platform_error_tts_unavailable">A síntese de voz não está disponível neste celular</string>
     <string name="platform_error_voice">Não foi possível criar a voz</string>
-    <string name="platform_caption_download">As legendas são reconhecidas no seu celular por um modelo de fala, baixado uma única vez: %1$s, %2$s, do Hugging Face.</string>
+    <string name="platform_caption_download">As legendas são reconhecidas no seu celular por um modelo de fala, baixado uma vez: %1$s, %2$s, do Hugging Face.</string>
     <string name="add_layer">Adicionar camada</string>
     <string name="add_tab_shape">Forma</string>
     <string name="add_tab_media">Mídia</string>
@@ -593,6 +613,7 @@
     <string name="menu_beats_not_found">Não foi possível encontrar as batidas</string>
     <plurals name="menu_beats_marked">
         <item quantity="one">%1$s batida marcada</item>
+        <item quantity="many">%1$s batidas marcadas</item>
         <item quantity="other">%1$s batidas marcadas</item>
     </plurals>
     <string name="menu_reset_location">Redefinir posição</string>
@@ -602,17 +623,20 @@
     <string name="menu_reset_transform">Redefinir transformação</string>
     <string name="menu_select_all_layers">Selecionar todas as camadas</string>
     <plurals name="menu_duplicate_layers">
-        <item quantity="one">Duplicar camada</item>
+        <item quantity="one">Duplicar %1$s camada</item>
+        <item quantity="many">Duplicar %1$s camadas</item>
         <item quantity="other">Duplicar %1$s camadas</item>
     </plurals>
     <string name="menu_save_preset">Salvar predefinição</string>
     <plurals name="menu_copy_layers">
-        <item quantity="one">Copiar camada</item>
+        <item quantity="one">Copiar %1$s camada</item>
+        <item quantity="many">Copiar %1$s camadas</item>
         <item quantity="other">Copiar %1$s camadas</item>
     </plurals>
     <string name="menu_with_its_style">(com o estilo)</string>
     <plurals name="menu_paste_layers">
-        <item quantity="one">Colar camada</item>
+        <item quantity="one">Colar %1$s camada</item>
+        <item quantity="many">Colar %1$s camadas</item>
         <item quantity="other">Colar %1$s camadas</item>
     </plurals>
     <string name="menu_paste_style">Colar estilo</string>
@@ -644,6 +668,8 @@
     <string name="font_search">Pesquisar</string>
     <string name="font_imported">Importadas</string>
     <string name="font_downloads_when_chosen">Baixa ao escolher</string>
+    <string name="fonts_missing_title">Fontes ausentes neste celular</string>
+    <string name="fonts_missing_body">Este projeto usa fontes que não estão neste celular: %1$s. O texto aparece em outra fonte até você baixá-las do Google Fonts.</string>
     <string name="font_favorite">Favoritos</string>
     <string name="font_category_sans_serif">Sem serifa</string>
     <string name="font_category_serif">Com serifa</string>
@@ -761,6 +787,7 @@
     <string name="structure_svg_empty">Este arquivo SVG não tem formas que possam ser importadas.</string>
     <plurals name="structure_svg_imported">
         <item quantity="one">%1$s forma importada. Deixadas de fora: %2$s.</item>
+        <item quantity="many">%1$s formas importadas. Deixadas de fora: %2$s.</item>
         <item quantity="other">%1$s formas importadas. Deixadas de fora: %2$s.</item>
     </plurals>
     <string name="structure_extend_ends">Estender finais dos clipes até o cursor de reprodução</string>
@@ -773,6 +800,7 @@
     <string name="structure_cancel_selection">Cancelar seleção</string>
     <plurals name="structure_layers_selected">
         <item quantity="one">%1$s camada selecionada</item>
+        <item quantity="many">%1$s camadas selecionadas</item>
         <item quantity="other">%1$s camadas selecionadas</item>
     </plurals>
     <string name="structure_group">Agrupar</string>
@@ -782,7 +810,7 @@
     <string name="structure_alignment_options">Opções de alinhamento</string>
     <string name="structure_group_options">Opções de grupo</string>
     <string name="structure_align_left">Alinhar à esquerda</string>
-    <string name="structure_align_centre">Alinhar ao centro</string>
+    <string name="structure_align_centre">Centralizar</string>
     <string name="structure_align_right">Alinhar à direita</string>
     <string name="structure_align_top">Alinhar ao topo</string>
     <string name="structure_align_middle">Alinhar ao meio</string>
@@ -900,15 +928,18 @@
     <string name="effects_copy_confirm">Copiar</string>
     <plurals name="effects_count">
         <item quantity="one">%1$s efeito</item>
+        <item quantity="many">%1$s efeitos</item>
         <item quantity="other">%1$s efeitos</item>
     </plurals>
     <plurals name="clips_count">
         <item quantity="one">%1$s clipe</item>
+        <item quantity="many">%1$s clipes</item>
         <item quantity="other">%1$s clipes</item>
     </plurals>
     <string name="effects_pasted_onto">Colei %1$s em %2$s</string>
     <plurals name="effects_paste_skipped">
         <item quantity="one">%1$s clipe ignorado: áudio, câmeras e objetos nulos não recebem efeitos visuais</item>
+        <item quantity="many">%1$s clipes ignorados: áudio, câmeras e objetos nulos não recebem efeitos visuais</item>
         <item quantity="other">%1$s clipes ignorados: áudio, câmeras e objetos nulos não recebem efeitos visuais</item>
     </plurals>
     <string name="effects_paste_no_target">Áudio, câmeras e objetos nulos não recebem efeitos visuais</string>
@@ -943,16 +974,19 @@
     <string name="effectbrowser_recent">Recentes</string>
     <string name="effectbrowser_recent_empty">Os efeitos que você usa aparecem aqui</string>
     <plurals name="aibrowser_too_long">
-        <item quantity="one">Clipes com mais de %1$s minuto ainda não são compatíveis. É preciso aparar ou dividir o clipe primeiro.</item>
-        <item quantity="other">Clipes com mais de %1$s minutos ainda não são compatíveis. É preciso aparar ou dividir o clipe primeiro.</item>
+        <item quantity="one">Clipes com mais de %1$s minuto ainda não são compatíveis. Apere ou divida o clipe primeiro.</item>
+        <item quantity="many">Clipes com mais de %1$s minutos ainda não são compatíveis. Apere ou divida o clipe primeiro.</item>
+        <item quantity="other">Clipes com mais de %1$s minutos ainda não são compatíveis. Apere ou divida o clipe primeiro.</item>
     </plurals>
     <plurals name="aibrowser_estimate">
         <item quantity="one">%1$s quadro em %2$s × %3$s, cerca de %4$s MB.</item>
+        <item quantity="many">%1$s quadros em %2$s × %3$s, cerca de %4$s MB.</item>
         <item quantity="other">%1$s quadros em %2$s × %3$s, cerca de %4$s MB.</item>
     </plurals>
     <plurals name="aibrowser_estimate_long">
-        <item quantity="one">%1$s quadro em %2$s × %3$s, cerca de %4$s MB. Clipe longo: isso pode levar vários minutos e consumir muita bateria.</item>
-        <item quantity="other">%1$s quadros em %2$s × %3$s, cerca de %4$s MB. Clipe longo: isso pode levar vários minutos e consumir muita bateria.</item>
+        <item quantity="one">%1$s quadro em %2$s × %3$s, cerca de %4$s MB. Clipe longo: isso pode levar vários minutos e gastar muita bateria.</item>
+        <item quantity="many">%1$s quadros em %2$s × %3$s, cerca de %4$s MB. Clipe longo: isso pode levar vários minutos e gastar muita bateria.</item>
+        <item quantity="other">%1$s quadros em %2$s × %3$s, cerca de %4$s MB. Clipe longo: isso pode levar vários minutos e gastar muita bateria.</item>
     </plurals>
     <string name="shape_param_size">Tamanho</string>
     <string name="shape_param_radius">Raio</string>
@@ -1127,7 +1161,7 @@
     <string name="ai_saving_transparent">Salvando imagem transparente…</string>
     <string name="ai_loading_model">Carregando o modelo de remoção de fundo…</string>
     <string name="ai_no_foreground_mask">Nenhuma máscara de primeiro plano foi retornada</string>
-    <string name="ai_mask_unexpected_size">A máscara de primeiro plano tem um tamanho inesperado</string>
+    <string name="ai_mask_unexpected_size">A remoção de fundo retornou um resultado com tamanho errado. Tente de novo.</string>
     <string name="ai_cannot_save_image">Não foi possível salvar a imagem</string>
     <string name="ai_cannot_read_image">Não foi possível ler esta imagem</string>
     <string name="ai_cannot_decode_image">Não foi possível decodificar esta imagem</string>
@@ -1138,13 +1172,13 @@
     <string name="ai_sample_rate_changed">A taxa de amostragem do áudio mudou durante a decodificação</string>
     <string name="ai_recording_too_large">Esta gravação é grande demais para WAV</string>
     <string name="ai_no_samples_decoded">Nenhuma amostra de áudio foi decodificada</string>
-    <string name="ai_mask_wrong_size">A máscara tem um tamanho inesperado</string>
+    <string name="ai_mask_wrong_size">A remoção de fundo retornou um resultado com tamanho errado. Tente de novo.</string>
     <string name="ai_encoder_no_image">O codificador de vídeo não forneceu imagem de entrada</string>
     <string name="ai_encoder_not_responding">O codificador de vídeo parou de responder</string>
-    <string name="ai_encoder_frames_before_format">O codificador de vídeo enviou quadros antes do formato</string>
+    <string name="ai_encoder_frames_before_format">O codificador de vídeo não iniciou corretamente. Tente de novo.</string>
     <string name="ai_encoder_not_finished">O codificador de vídeo não terminou</string>
     <string name="ai_cannot_encode_mask">Este celular não consegue codificar o vídeo de máscara</string>
-    <string name="ai_video_no_size">Este vídeo não tem informações de tamanho</string>
+    <string name="ai_video_no_size">Este vídeo não tem informação de tamanho.</string>
     <string name="ai_clip_too_long">Clipes com mais de %1$s minutos ainda não são suportados. Apara ou divida o clipe primeiro.</string>
     <string name="ai_not_enough_storage">Armazenamento livre insuficiente: são necessários cerca de %1$s MB.</string>
     <string name="ai_no_video_frames">Este clipe não tem quadros de vídeo para processar</string>
@@ -1301,7 +1335,7 @@
     <string name="export_audio_summary_lossless">%1$s · %2$s · %3$s</string>
     <string name="export_audio_hint">Configurações de som do arquivo de vídeo. %1$s pode conter áudio %2$s.</string>
     <string name="export_audio_hint_silent">Este projeto ainda não tem som. Estas configurações serão usadas quando você adicionar som.</string>
-    <string name="export_audio_only_hint">Salvo em Música / AbsentMotion. WAV e FLAC mantêm todos os detalhes; M4A, OGG e MP3 são menores.</string>
+    <string name="export_audio_only_hint">Salvo em Music/AbsentMotion. WAV e FLAC mantêm todos os detalhes; M4A, OGG e MP3 são menores.</string>
     <string name="export_running_audio">Exportando áudio</string>
     <string name="export_interpolation_off_help">Cada clipe mostra seus próprios quadros. Um clipe de 30 fps em uma exportação de 60 fps mostra cada quadro duas vezes, então o movimento pode parecer um pouco aos saltos.</string>
     <string name="export_interpolation_blend_help">Os novos quadros intermediários misturam os dois quadros mais próximos como um cross-fade rápido. A exportação é rápida; movimentos rápidos podem ficar com aspecto fantasma.</string>

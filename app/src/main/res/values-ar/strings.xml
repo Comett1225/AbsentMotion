@@ -35,7 +35,6 @@
     <string name="ok">حسنًا</string>
     <string name="easing_needs_at_least_two_keyframes">يحتاج التخفيف إلى إطارين مفتاحيين على الأقل ليعمل.\n\nإذا كانت إطاراتك المفتاحية على خاصية أخرى، فحدد تلك الخاصية أولًا.</string>
     <string name="add_keyframes_first">أضف الإطارات المفتاحية أولًا</string>
-    <string name="convert_to_group">تحويل إلى مجموعة</string>
     <string name="cancel">إلغاء</string>
     <string name="rebuild_source_project">إعادة بناء المشروع المصدر</string>
     <string name="this_asset_pointed_to_a_project">هذا الأصل يشير إلى مشروع تم حذفه.\n\nأعد بناء مشروع من هذا الأصل، أو افصله وحرره مباشرة؟</string>
@@ -89,10 +88,10 @@
     <string name="export_template_failed">تعذر الاحتفاظ بنسخة كقالب. حرر بعض مساحة التخزين.</string>
     <string name="also_keeps_the_project_with_its">يحتفظ أيضًا بالمشروع ووسائطه في القوالب على هذا الهاتف. افتحه من هناك لاستبدال وسائطه والمتابعة إلى مشروع جديد.</string>
     <string name="template">قالب</string>
-    <string name="one_absproj_package_with_the_project">حزمة .absproj واحدة تضم المشروع ووسائطه الأصلية، تُحفظ في Documents / AbsentMotion. احتفظ بها كنسخة احتياطية أو انقل المشروع إلى هاتف آخر.</string>
+    <string name="one_absproj_package_with_the_project">حزمة .absproj واحدة مع المشروع والوسائط الأصلية التي يستخدمها، محفوظة في Documents/AbsentMotion. احتفظ بها كنسخة احتياطية أو انقل المشروع إلى هاتف آخر.</string>
     <string name="project_bundle">حزمة المشروع</string>
     <string name="project_home_page">الصفحة الرئيسية للمشروع</string>
-    <string name="open_source_licences">تراخيص المصادر المفتوحة</string>
+    <string name="open_source_licences">تراخيص مفتوحة المصدر</string>
     <string name="stop">إيقاف</string>
     <string name="damaged_restore_a_version">تالف — استعِد نسخة</string>
     <string name="damaged_explain_versions">ملف هذا المشروع تالف، لذا لا يمكن فتحه. استرجع إحدى النسخ السابقة أدناه أو احذف المشروع.</string>
@@ -126,7 +125,7 @@
     <string name="delete_all">حذف الكل</string>
     <string name="effects_not_loaded">تعذّر تحميل التأثيرات</string>
     <string name="settings_demo_mode">وضع العرض التجريبي</string>
-    <string name="settings_open_xml">فتح مشاريع XML</string>
+    <string name="settings_open_xml">إظهار بطاقة الاستيراد في قائمة المشاريع</string>
     <string name="settings_vibration">الاهتزاز</string>
     <string name="settings_emoji">نمط الإيموجي</string>
     <string name="settings_emoji_system">النظام</string>
@@ -170,15 +169,15 @@
     <string name="library_err_package_project_missing">حزمة تالفة: ملف المشروع مفقود</string>
     <string name="library_err_too_many_projects">تحتوي الحزمة على مشاريع أكثر من اللازم (أكثر من %1$s)</string>
     <string name="library_err_project_files_large">ملفات مشاريع الحزمة كبيرة جدًا</string>
-    <string name="library_err_no_project">مشهد تالف: لا يوجد مشروع في الحزمة</string>
+    <string name="library_err_no_project">مشهد غير صالح: لا يوجد مشروع في الحزمة</string>
     <string name="library_err_malformed_package">حزمة تالفة: %1$s</string>
     <string name="library_err_malformed_xml">‏XML تالف: %1$s</string>
-    <string name="library_err_scene_needs_size">مشهد تالف: المتوقع &lt;scene&gt; مع حجم</string>
-    <string name="library_err_scene_too_big">مشهد تالف: الحجم أكبر من %1$s بكسل</string>
-    <string name="library_err_scene_fps">مشهد تالف: يجب أن يكون معدل الإطارات من 1 إلى %1$s</string>
+    <string name="library_err_scene_needs_size">مشهد غير صالح: يحتاج الملف إلى مشهد بعرض وارتفاع</string>
+    <string name="library_err_scene_too_big">مشهد غير صالح: الحجم أكبر من %1$s بكسل</string>
+    <string name="library_err_scene_fps">مشهد غير صالح: يجب أن يكون معدل الإطارات من 1 إلى %1$s</string>
     <string name="library_err_package_large">الحزمة كبيرة جدًا (أكثر من %1$s MB بعد فك الضغط)</string>
     <string name="library_err_too_many_files">تحتوي الحزمة على ملفات أكثر من اللازم (أكثر من %1$s)</string>
-    <string name="library_err_xml_large">‏XML تالف: الملف كبير جدًا</string>
+    <string name="library_err_xml_large">هذا الملف كبير جدًا لفتحه (أكثر من 32 MB)</string>
     <string name="library_err_media_large">الحزمة كبيرة جدًا (أكثر من %1$s MB من الوسائط)</string>
     <string name="library_err_not_backup">هذا الملف ليس نسخة احتياطية من AbsentMotion.</string>
     <string name="library_err_backup_project_large">يوجد مشروع كبير جدًا في النسخة الاحتياطية.</string>
@@ -275,12 +274,20 @@
         <item quantity="many">كان %1$s مشروعًا موجودًا هنا بالفعل وترك كما هو.</item>
         <item quantity="other">كان %1$s مشروعًا موجودًا هنا بالفعل وترك كما هو.</item>
     </plurals>
+    <plurals name="backup_restored_rejected">
+        <item quantity="zero">لم تتم استعادة أي مشروع (%1$s) لأن حجمه أو معدل إطاره غير صالح.</item>
+        <item quantity="one">لم تتم استعادة مشروع واحد لأن حجمه أو معدل إطاره غير صالح.</item>
+        <item quantity="two">لم تتم استعادة مشروعين لأن حجمهما أو معدل إطارهما غير صالح.</item>
+        <item quantity="few">لم تتم استعادة %1$s مشاريع لأن أحجامها أو معدلات إطاراتها غير صالحة.</item>
+        <item quantity="many">لم تتم استعادة %1$s مشروعًا لأن حجمه أو معدل إطاره غير صالح.</item>
+        <item quantity="other">لم تتم استعادة %1$s مشروع لأن حجمه أو معدل إطاره غير صالح.</item>
+    </plurals>
     <string name="about_version">الإصدار %1$s</string>
     <string name="about_licence_line">مجاني ومفتوح المصدر، مرخّص بموجب Apache License 2.0.</string>
     <string name="about_independent_note">‏AbsentMotion مشروع مستقل، وهو غير تابع لأي صانع تطبيقات آخر ولا يحظى بتأييده أو رعايته؛ وأسماء المنتجات الأخرى ملك لأصحابها.</string>
     <string name="about_compatibility_note">يمكن لـ AbsentMotion فتح ملفات scene XML وحزم .amproj المصدّرة من Alight Motion، ويصدّر scene XML بالصيغة نفسها. ويحفظ حزمه الخاصة بامتداد .absproj.</string>
     <string name="about_loading">جارٍ التحميل…</string>
-    <string name="about_licence_unreadable">تعذّرت قراءة نص الترخيص.</string>
+    <string name="about_licence_unreadable">تعذرت قراءة نص الترخيص.</string>
     <string name="template_use_title">استخدام القالب</string>
     <string name="template_next">التالي</string>
     <string name="template_drag_to_select">اسحب للتحديد</string>
@@ -391,7 +398,7 @@
     <string name="export_anyway">تصدير على أي حال</string>
     <string name="export_available_space">المساحة المتاحة</string>
     <string name="export_estimated_size">حجم الملف المقدر</string>
-    <string name="export_calculating">جارٍ الحساب...</string>
+    <string name="export_calculating">جارٍ الحساب…</string>
     <string name="export_kind_video">فيديو</string>
     <string name="export_kind_frame_png">الإطار الحالي بصيغة PNG</string>
     <string name="export_kind_frame_as">الإطار الحالي بصيغة…</string>
@@ -468,7 +475,6 @@
     <string name="export_thermal_hot">هاتفك ساخن. سيتم إبطاء التصدير ليبرد.</string>
     <string name="export_thermal_critical">هاتفك شديد الحرارة. يتوقف التصدير بين الإطارات حتى يبرد.</string>
     <string name="export_time_few_seconds">بضع ثوانٍ</string>
-    <string name="export_time_hours">حوالي %1$s ساعات</string>
     <plurals name="export_time_seconds">
         <item quantity="zero">حوالي %1$s ثانية</item>
         <item quantity="one">حوالي ثانية واحدة</item>
@@ -485,6 +491,14 @@
         <item quantity="many">حوالي %1$s دقيقة</item>
         <item quantity="other">حوالي %1$s دقيقة</item>
     </plurals>
+    <plurals name="export_time_hours_count">
+        <item quantity="zero">حوالي %1$s ساعة</item>
+        <item quantity="one">حوالي ساعة واحدة</item>
+        <item quantity="two">حوالي ساعتين</item>
+        <item quantity="few">حوالي %1$s ساعات</item>
+        <item quantity="many">حوالي %1$s ساعة</item>
+        <item quantity="other">حوالي %1$s ساعة</item>
+    </plurals>
     <string name="export_verify_empty">لا يحتوي الملف على صوت أو فيديو.</string>
     <string name="export_verify_no_video">لا يحتوي الملف على مسار فيديو.</string>
     <string name="export_verify_no_audio">لا يحتوي الملف على صوت رغم أن المشروع يتضمن صوتًا.</string>
@@ -495,10 +509,11 @@
     <string name="export_verify_picture">تعذر فك ترميز الصورة في الملف.</string>
     <string name="export_verify_size">حجم الصورة %1$s بدلًا من %2$s.</string>
     <string name="export_verify_frames">يحتوي GIF على %1$s إطارًا بدلًا من %2$s.</string>
+    <string name="export_sound_unreadable">تعذرت قراءة صوت %1$s، لذا فهو صامت في هذا الملف.</string>
     <string name="export_error_cannot_encode">لا يمكن لهذا الهاتف ترميز %1$s بدقة %2$s</string>
-    <string name="export_error_draw_frame">تعذر على المحرك رسم الإطار %1$s</string>
+    <string name="export_error_draw_frame">تعذر رسم الإطار %1$s. حاول التصدير مرة أخرى.</string>
     <string name="export_error_draw_still">تعذر على المحرك رسم الإطار</string>
-    <string name="export_error_no_sound">لا يحتوي هذا المشروع على صوت لتصديره.</string>
+    <string name="export_error_no_sound">لا يحتوي هذا المشروع على صوت لتصديره. أضف موسيقى أو صوتًا أو فيديو بصوت أولًا.</string>
     <string name="export_error_create">تعذر إنشاء %1$s في %2$s</string>
     <string name="export_error_write">تعذر كتابة %1$s</string>
     <string name="export_error_mp3_settings">لا يستطيع مرمّز MP3 استخدام %1$s Hz بمعدل %2$s kbps</string>
@@ -513,6 +528,8 @@
     <string name="camera_photo">صورة</string>
     <string name="camera_video">فيديو</string>
     <string name="camera_close">إغلاق الكاميرا</string>
+    <string name="camera_take_photo">التقاط صورة</string>
+    <string name="camera_start_recording">بدء التسجيل</string>
     <string name="camera_switch">تبديل الكاميرا</string>
     <string name="camera_pause_recording">إيقاف التسجيل مؤقتًا</string>
     <string name="camera_resume_recording">استئناف التسجيل</string>
@@ -531,16 +548,16 @@
     <string name="media_error_video_unavailable">الفيديو غير متاح: %1$s</string>
     <string name="media_error_decode_frame">تعذر فك ترميز إطار الفيديو المطلوب %1$s</string>
     <string name="media_error_import_frame">تعذّر استيراد إطار الفيديو %1$s لـ %2$s</string>
-    <string name="media_error_interp_source">إطار المصدر للاستيفاء %1$s غير متاح</string>
-    <string name="media_error_interp_wrong_frame">تلقّى الاستيفاء إطار مصدر غير صحيح لـ %1$s</string>
-    <string name="media_error_interp_import">تعذّر استيراد إطار مصدر الاستيفاء %1$s</string>
+    <string name="media_error_interp_source">إطار فيديو مطلوب لاستيفاء الإطارات مفقود (%1$s). حاول مرة أخرى، أو عيّن استيفاء الإطارات إلى إيقاف.</string>
+    <string name="media_error_interp_wrong_frame">تعذرت قراءة إطار فيديو مطلوب لاستيفاء الإطارات بشكل صحيح (%1$s). حاول مرة أخرى، أو عيّن استيفاء الإطارات إلى إيقاف.</string>
+    <string name="media_error_interp_import">تعذر تحميل إطار فيديو مطلوب لاستيفاء الإطارات (%1$s). حاول مرة أخرى، أو عيّن استيفاء الإطارات إلى إيقاف.</string>
     <string name="media_error_interp_render">لم يتمكن %1$s من تصيير إطار الفيديو المطلوب</string>
     <string name="engine_loading_effects">جارٍ تحميل التأثيرات…</string>
     <string name="engine_error_gpu_capture">فشل GPU أثناء الالتقاط</string>
     <string name="platform_voice_name">صوت %1$s</string>
     <string name="platform_error_tts_unavailable">تحويل النص إلى كلام غير متاح على هذا الهاتف</string>
     <string name="platform_error_voice">تعذّر إنشاء الصوت</string>
-    <string name="platform_caption_download">يتم التعرف على التسميات التوضيحية على هاتفك بواسطة نموذج كلام، يُنزَّل مرة واحدة: %1$s، %2$s، من Hugging Face.</string>
+    <string name="platform_caption_download">تُتعرّف التسميات التوضيحية على هاتفك بواسطة نموذج للكلام يُنزّل مرة واحدة: %1$s، %2$s، من Hugging Face.</string>
     <string name="add_layer">إضافة طبقة</string>
     <string name="add_tab_shape">شكل</string>
     <string name="add_tab_media">وسائط</string>
@@ -696,6 +713,8 @@
     <string name="font_search">بحث</string>
     <string name="font_imported">مستورد</string>
     <string name="font_downloads_when_chosen">يُحمَّل عند الاختيار</string>
+    <string name="fonts_missing_title">خطوط غير موجودة على هذا الهاتف</string>
+    <string name="fonts_missing_body">يستخدم هذا المشروع خطوطًا غير موجودة على هذا الهاتف: %1$s. يظهر النص بخط آخر حتى تنزّلها من Google Fonts.</string>
     <string name="font_favorite">المفضلة</string>
     <string name="font_category_sans_serif">بدون حواف</string>
     <string name="font_category_serif">بحواف</string>
@@ -842,7 +861,7 @@
     <string name="structure_alignment_options">خيارات المحاذاة</string>
     <string name="structure_group_options">خيارات التجميع</string>
     <string name="structure_align_left">محاذاة لليسار</string>
-    <string name="structure_align_centre">محاذاة للوسط</string>
+    <string name="structure_align_centre">محاذاة إلى الوسط</string>
     <string name="structure_align_right">محاذاة لليمين</string>
     <string name="structure_align_top">محاذاة للأعلى</string>
     <string name="structure_align_middle">محاذاة للمنتصف</string>
@@ -867,7 +886,7 @@
     <string name="track_whole_clip">المقطع بأكمله</string>
     <string name="voice_type_something">اكتب شيئًا لقراءته</string>
     <string name="voice_unreadable">تعذّرت قراءة الصوت</string>
-    <string name="voice_cancelled">أُلغيت</string>
+    <string name="voice_cancelled">أُلغي</string>
     <string name="voice_unable">تعذّر إنشاء الصوت</string>
     <string name="voice_language">اللغة</string>
     <string name="voice_voice">الصوت</string>
@@ -1192,7 +1211,7 @@
     <string name="ai_select_video_layer">حدد طبقة فيديو</string>
     <string name="ai_cancelling">جارٍ الإلغاء…</string>
     <string name="ai_preparing">جارٍ التحضير…</string>
-    <string name="ai_cancelled">تم الإلغاء</string>
+    <string name="ai_cancelled">أُلغي</string>
     <string name="ai_video_missing">هذا الفيديو مفقود من المشروع</string>
     <string name="ai_layer_changed">تغيّرت الطبقة؛ شغّل الأداة مرة أخرى</string>
     <string name="ai_cannot_mask">لا يمكن تطبيق قناع على هذه الطبقة</string>
@@ -1211,7 +1230,7 @@
     <string name="ai_saving_transparent">جارٍ حفظ الصورة الشفافة…</string>
     <string name="ai_loading_model">جارٍ تحميل نموذج إزالة الخلفية…</string>
     <string name="ai_no_foreground_mask">لم يتم إرجاع قناع للمقدمة</string>
-    <string name="ai_mask_unexpected_size">حجم قناع المقدمة غير متوقع</string>
+    <string name="ai_mask_unexpected_size">أعطت إزالة الخلفية نتيجة بحجم غير صحيح. حاول مرة أخرى.</string>
     <string name="ai_cannot_save_image">تعذر حفظ الصورة</string>
     <string name="ai_cannot_read_image">تعذرت قراءة هذه الصورة</string>
     <string name="ai_cannot_decode_image">تعذر فك ترميز هذه الصورة</string>
@@ -1222,13 +1241,13 @@
     <string name="ai_sample_rate_changed">تغيّر معدل عينات الصوت أثناء فك الترميز</string>
     <string name="ai_recording_too_large">هذا التسجيل كبير جدًا لصيغة WAV</string>
     <string name="ai_no_samples_decoded">لم يتم فك ترميز أي عينات صوتية</string>
-    <string name="ai_mask_wrong_size">حجم القناع غير متوقع</string>
+    <string name="ai_mask_wrong_size">أعطت إزالة الخلفية نتيجة بحجم غير صحيح. حاول مرة أخرى.</string>
     <string name="ai_encoder_no_image">لم يوفر مُرمّز الفيديو صورة إدخال</string>
     <string name="ai_encoder_not_responding">توقف مُرمّز الفيديو عن الاستجابة</string>
-    <string name="ai_encoder_frames_before_format">أرسل مُرمّز الفيديو إطارات قبل تحديد تنسيقه</string>
+    <string name="ai_encoder_frames_before_format">لم يبدأ مُرمّز الفيديو بشكل صحيح. حاول مرة أخرى.</string>
     <string name="ai_encoder_not_finished">لم ينتهِ مُرمّز الفيديو</string>
     <string name="ai_cannot_encode_mask">لا يستطيع هذا الهاتف ترميز فيديو القناع</string>
-    <string name="ai_video_no_size">لا يحتوي هذا الفيديو على معلومات الحجم</string>
+    <string name="ai_video_no_size">لا يحتوي هذا الفيديو على معلومات الحجم.</string>
     <string name="ai_clip_too_long">المقاطع الأطول من %1$s دقائق غير مدعومة بعد. قص المقطع أو قسّمه أولًا.</string>
     <string name="ai_not_enough_storage">لا توجد مساحة تخزين كافية: يلزم نحو %1$s MB.</string>
     <string name="ai_no_video_frames">لا يحتوي هذا المقطع على إطارات فيديو لمعالجتها</string>
@@ -1345,7 +1364,7 @@
     <string name="track_motion_lost_at_frame">فُقد التتبع عند الإطار %1$s. أعد النقطة إلى المعلم نفسه ثم اضغط على متابعة.</string>
     <string name="track_motion_done">جرى تتبع %1$s إطارًا. الإطارات المفتاحية على %2$s.</string>
     <string name="track_motion_target_layer">الطبقة الهدف</string>
-    <string name="track_motion_cancelled">أُلغي التتبع. تحتفظ الإطارات المتتبَّعة بالفعل بإطاراتها المفتاحية.</string>
+    <string name="track_motion_cancelled">أُلغي التتبع. تحتفظ الإطارات المتتبعة بالفعل بإطاراتها المفتاحية.</string>
     <string name="track_motion_unavailable">تتبع الحركة غير متاح في هذا الإصدار.</string>
     <string name="track_motion_failed">تعذّر تتبع هذا الفيديو.</string>
     <string name="edit_layer_copy_name">نسخة %1$s</string>
@@ -1385,7 +1404,7 @@
     <string name="export_audio_summary_lossless">%1$s · %2$s · %3$s</string>
     <string name="export_audio_hint">إعدادات الصوت لملف الفيديو. يمكن أن يحتوي %1$s على صوت %2$s.</string>
     <string name="export_audio_hint_silent">لا يوجد صوت في هذا المشروع بعد. ستُستخدم هذه الإعدادات بعد إضافة صوت.</string>
-    <string name="export_audio_only_hint">يُحفظ في Music / AbsentMotion. تحافظ WAV وFLAC على كل التفاصيل؛ بينما M4A وOGG وMP3 أصغر حجمًا.</string>
+    <string name="export_audio_only_hint">حُفظ في Music/AbsentMotion. تحافظ WAV وFLAC على كل التفاصيل؛ M4A وOGG وMP3 أصغر.</string>
     <string name="export_running_audio">جارٍ تصدير الصوت</string>
     <string name="export_interpolation_off_help">يعرض كل مقطع إطاراته الخاصة. مقطع 30 fps في تصدير 60 fps يعرض كل إطار مرتين، لذا قد تبدو الحركة متقطعة قليلًا.</string>
     <string name="export_interpolation_blend_help">تمزج الإطارات البينية الجديدة أقرب إطارين مثل تلاشٍ متقاطع سريع. التصدير سريع؛ وقد تظهر الحركة السريعة بأشباح.</string>

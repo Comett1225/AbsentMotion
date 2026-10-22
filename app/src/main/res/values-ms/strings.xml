@@ -35,7 +35,6 @@
     <string name="ok">OK</string>
     <string name="easing_needs_at_least_two_keyframes">Pelembutan memerlukan sekurang-kurangnya dua bingkai kunci untuk berfungsi.\n\nJika bingkai kunci anda berada pada sifat lain, pilih sifat itu dahulu.</string>
     <string name="add_keyframes_first">Tambah bingkai kunci dahulu</string>
-    <string name="convert_to_group">Tukar kepada kumpulan</string>
     <string name="cancel">Batal</string>
     <string name="rebuild_source_project">Bina semula projek sumber</string>
     <string name="this_asset_pointed_to_a_project">Aset ini merujuk kepada projek yang telah dipadam.\n\nBina semula projek daripada aset ini, atau lepaskan dan edit secara terus?</string>
@@ -89,7 +88,7 @@
     <string name="export_template_failed">Tidak dapat menyimpan salinan sebagai templat. Kosongkan sedikit ruang storan.</string>
     <string name="also_keeps_the_project_with_its">Juga menyimpan projek berserta media dalam Templat pada telefon ini. Buka di sana untuk ganti media dan teruskan ke projek baharu.</string>
     <string name="template">Templat</string>
-    <string name="one_absproj_package_with_the_project">Satu pakej .absproj bersama projek dan media asal yang digunakan, disimpan ke Documents / AbsentMotion. Simpan sebagai sandaran atau pindahkan projek ke telefon lain.</string>
+    <string name="one_absproj_package_with_the_project">Satu pakej .absproj dengan projek dan media asal yang digunakannya, disimpan ke Documents/AbsentMotion. Simpan sebagai sandaran atau pindahkan projek ke telefon lain.</string>
     <string name="project_bundle">Bundel projek</string>
     <string name="project_home_page">Halaman utama projek</string>
     <string name="open_source_licences">Lesen sumber terbuka</string>
@@ -126,7 +125,7 @@
     <string name="delete_all">Padam semua</string>
     <string name="effects_not_loaded">Kesan tidak dapat dimuatkan</string>
     <string name="settings_demo_mode">Mod demo</string>
-    <string name="settings_open_xml">Buka projek XML</string>
+    <string name="settings_open_xml">Paparkan kad import dalam senarai projek</string>
     <string name="settings_vibration">Getaran</string>
     <string name="settings_emoji">Gaya Emoji</string>
     <string name="settings_emoji_system">Sistem</string>
@@ -170,15 +169,15 @@
     <string name="library_err_package_project_missing">Pakej tidak sah: fail projek tiada</string>
     <string name="library_err_too_many_projects">Pakej mengandungi terlalu banyak projek (lebih daripada %1$s)</string>
     <string name="library_err_project_files_large">Fail projek dalam pakej terlalu besar</string>
-    <string name="library_err_no_project">Adegan tidak sah: tiada projek dalam pakej</string>
+    <string name="library_err_no_project">Babak tidak sah: tiada projek dalam pakej</string>
     <string name="library_err_malformed_package">Pakej tidak sah: %1$s</string>
     <string name="library_err_malformed_xml">XML tidak sah: %1$s</string>
-    <string name="library_err_scene_needs_size">Adegan tidak sah: dijangka &lt;scene&gt; dengan saiz</string>
-    <string name="library_err_scene_too_big">Adegan tidak sah: saiz melebihi %1$s piksel</string>
-    <string name="library_err_scene_fps">Adegan tidak sah: kadar bingkai mesti antara 1 hingga %1$s</string>
+    <string name="library_err_scene_needs_size">Babak tidak sah: fail memerlukan babak dengan lebar dan tinggi</string>
+    <string name="library_err_scene_too_big">Babak tidak sah: saiz melebihi %1$s piksel</string>
+    <string name="library_err_scene_fps">Babak tidak sah: kadar bingkai mesti antara 1 hingga %1$s</string>
     <string name="library_err_package_large">Pakej terlalu besar (lebih daripada %1$s MB selepas dibuka)</string>
     <string name="library_err_too_many_files">Pakej mempunyai terlalu banyak fail (lebih daripada %1$s)</string>
-    <string name="library_err_xml_large">XML tidak sah: fail terlalu besar</string>
+    <string name="library_err_xml_large">Fail ini terlalu besar untuk dibuka (lebih daripada 32 MB)</string>
     <string name="library_err_media_large">Pakej terlalu besar (lebih daripada %1$s MB media)</string>
     <string name="library_err_not_backup">Fail ini bukan sandaran AbsentMotion.</string>
     <string name="library_err_backup_project_large">Satu projek dalam sandaran terlalu besar.</string>
@@ -260,6 +259,9 @@
     <plurals name="backup_restored_skipped">
         <item quantity="other">%1$s projek sudah ada di sini dan dibiarkan seperti sedia ada.</item>
     </plurals>
+    <plurals name="backup_restored_rejected">
+        <item quantity="other">%1$s projek tidak dipulihkan kerana saiz atau kadar bingkainya tidak sah.</item>
+    </plurals>
     <string name="about_version">Versi %1$s</string>
     <string name="about_licence_line">Percuma dan sumber terbuka, dilesenkan di bawah Apache License 2.0.</string>
     <string name="about_independent_note">AbsentMotion ialah projek bebas. Ia tidak bergabung dengan, disokong oleh atau ditaja oleh mana-mana pembuat aplikasi lain; nama produk lain milik pemiliknya masing-masing.</string>
@@ -320,7 +322,7 @@
     <string name="safety_open_failed_with_history">Fail projek tiada atau rosak, jadi tiada apa-apa diubah. Anda boleh memulihkan versi terdahulu daripada Sejarah versi.</string>
     <string name="newproject_bg_black">Hitam</string>
     <string name="newproject_bg_white">Putih</string>
-    <string name="newproject_bg_light_grey">Kelabu Muda</string>
+    <string name="newproject_bg_light_grey">Kelabu muda</string>
     <string name="newproject_bg_green">Hijau</string>
     <string name="newproject_bg_blue">Biru</string>
     <string name="newproject_bg_transparent">Telus</string>
@@ -356,7 +358,7 @@
     <string name="export_anyway">Tetap eksport</string>
     <string name="export_available_space">Ruang tersedia</string>
     <string name="export_estimated_size">Anggaran saiz fail</string>
-    <string name="export_calculating">Mengira...</string>
+    <string name="export_calculating">Mengira…</string>
     <string name="export_kind_video">Video</string>
     <string name="export_kind_frame_png">Bingkai semasa sebagai PNG</string>
     <string name="export_kind_frame_as">Bingkai semasa sebagai…</string>
@@ -433,12 +435,14 @@
     <string name="export_thermal_hot">Telefon anda panas. Eksport diperlahankan untuk membiarkannya sejuk.</string>
     <string name="export_thermal_critical">Telefon anda sangat panas. Eksport dijeda antara bingkai sehingga ia sejuk semula.</string>
     <string name="export_time_few_seconds">beberapa saat</string>
-    <string name="export_time_hours">kira-kira %1$s jam</string>
     <plurals name="export_time_seconds">
         <item quantity="other">kira-kira %1$s saat</item>
     </plurals>
     <plurals name="export_time_minutes">
         <item quantity="other">kira-kira %1$s minit</item>
+    </plurals>
+    <plurals name="export_time_hours_count">
+        <item quantity="other">kira-kira %1$s jam</item>
     </plurals>
     <string name="export_verify_empty">Fail ini tidak mengandungi audio atau video.</string>
     <string name="export_verify_no_video">Fail ini tiada trek video.</string>
@@ -450,10 +454,11 @@
     <string name="export_verify_picture">Gambar dalam fail tidak dapat dinyahkod.</string>
     <string name="export_verify_size">Gambar ialah %1$s bukan %2$s.</string>
     <string name="export_verify_frames">GIF mempunyai %1$s bingkai bukan %2$s.</string>
+    <string name="export_sound_unreadable">Bunyi %1$s tidak dapat dibaca, jadi ia senyap dalam fail ini.</string>
     <string name="export_error_cannot_encode">Telefon ini tidak dapat mengekod %1$s pada %2$s</string>
-    <string name="export_error_draw_frame">Enjin tidak dapat melukis bingkai %1$s</string>
+    <string name="export_error_draw_frame">Bingkai %1$s tidak dapat dilukis. Cuba eksport semula.</string>
     <string name="export_error_draw_still">Enjin tidak dapat melukis bingkai itu</string>
-    <string name="export_error_no_sound">Projek ini tiada bunyi untuk dieksport.</string>
+    <string name="export_error_no_sound">Projek ini tiada bunyi untuk dieksport. Tambah muzik, bunyi atau video dengan bunyi dahulu.</string>
     <string name="export_error_create">Tidak dapat mencipta %1$s dalam %2$s</string>
     <string name="export_error_write">Tidak dapat menulis %1$s</string>
     <string name="export_error_mp3_settings">Pengekod MP3 tidak dapat menggunakan %1$s Hz pada %2$s kbps</string>
@@ -468,6 +473,8 @@
     <string name="camera_photo">FOTO</string>
     <string name="camera_video">VIDEO</string>
     <string name="camera_close">Tutup kamera</string>
+    <string name="camera_take_photo">Ambil foto</string>
+    <string name="camera_start_recording">Mula merakam</string>
     <string name="camera_switch">Tukar kamera</string>
     <string name="camera_pause_recording">Jeda rakaman</string>
     <string name="camera_resume_recording">Sambung rakaman</string>
@@ -486,9 +493,9 @@
     <string name="media_error_video_unavailable">Video tidak tersedia: %1$s</string>
     <string name="media_error_decode_frame">Tidak dapat menyahkod bingkai video tepat %1$s</string>
     <string name="media_error_import_frame">Tidak dapat mengimport bingkai video %1$s untuk %2$s</string>
-    <string name="media_error_interp_source">Bingkai sumber interpolasi %1$s tidak tersedia</string>
-    <string name="media_error_interp_wrong_frame">Interpolasi menerima bingkai sumber yang salah untuk %1$s</string>
-    <string name="media_error_interp_import">Tidak dapat mengimport bingkai sumber interpolasi %1$s</string>
+    <string name="media_error_interp_source">Bingkai video yang diperlukan untuk Interpolasi Bingkai tiada (%1$s). Cuba lagi atau tetapkan Interpolasi Bingkai kepada Mati.</string>
+    <string name="media_error_interp_wrong_frame">Bingkai video yang diperlukan untuk Interpolasi Bingkai tidak dapat dibaca dengan betul (%1$s). Cuba lagi atau tetapkan Interpolasi Bingkai kepada Mati.</string>
+    <string name="media_error_interp_import">Bingkai video yang diperlukan untuk Interpolasi Bingkai tidak dapat dimuatkan (%1$s). Cuba lagi atau tetapkan Interpolasi Bingkai kepada Mati.</string>
     <string name="media_error_interp_render">%1$s tidak dapat render bingkai video yang diminta</string>
     <string name="engine_loading_effects">Memuatkan kesan…</string>
     <string name="engine_error_gpu_capture">GPU gagal semasa tangkapan</string>
@@ -607,7 +614,7 @@
     <string name="menu_set_outro_start">Tetapkan mula outro</string>
     <string name="menu_bg_black">Hitam</string>
     <string name="menu_bg_white">Putih</string>
-    <string name="menu_bg_light_grey">Kelabu Muda</string>
+    <string name="menu_bg_light_grey">Kelabu muda</string>
     <string name="menu_bg_green">Hijau</string>
     <string name="menu_bg_blue">Biru</string>
     <string name="menu_bg_transparent">Lutsinar</string>
@@ -631,6 +638,8 @@
     <string name="font_search">Cari</string>
     <string name="font_imported">Diimport</string>
     <string name="font_downloads_when_chosen">Dimuat turun apabila dipilih</string>
+    <string name="fonts_missing_title">Fon tiada pada telefon ini</string>
+    <string name="fonts_missing_body">Projek ini menggunakan fon yang tiada pada telefon ini: %1$s. Teks dipaparkan dalam fon lain sehingga anda memuat turunnya daripada Google Fonts.</string>
     <string name="font_favorite">Kegemaran</string>
     <string name="font_category_sans_serif">Sans Serif</string>
     <string name="font_category_serif">Serif</string>
@@ -767,7 +776,7 @@
     <string name="structure_alignment_options">Pilihan penjajaran</string>
     <string name="structure_group_options">Pilihan kumpulan</string>
     <string name="structure_align_left">Jajarkan kiri</string>
-    <string name="structure_align_centre">Jajarkan tengah</string>
+    <string name="structure_align_centre">Jajar tengah</string>
     <string name="structure_align_right">Jajarkan kanan</string>
     <string name="structure_align_top">Jajarkan atas</string>
     <string name="structure_align_middle">Jajarkan tengah</string>
@@ -1106,7 +1115,7 @@
     <string name="ai_saving_transparent">Menyimpan imej lutsinar…</string>
     <string name="ai_loading_model">Memuatkan model pembuangan latar belakang…</string>
     <string name="ai_no_foreground_mask">Tiada topeng latar depan dikembalikan</string>
-    <string name="ai_mask_unexpected_size">Topeng latar depan mempunyai saiz yang tidak dijangka</string>
+    <string name="ai_mask_unexpected_size">Pembuangan latar belakang memberikan hasil dengan saiz yang salah. Cuba lagi.</string>
     <string name="ai_cannot_save_image">Tidak dapat menyimpan imej</string>
     <string name="ai_cannot_read_image">Tidak dapat membaca imej ini</string>
     <string name="ai_cannot_decode_image">Tidak dapat menyahkod imej ini</string>
@@ -1117,13 +1126,13 @@
     <string name="ai_sample_rate_changed">Kadar sampel audio berubah semasa menyahkod</string>
     <string name="ai_recording_too_large">Rakaman ini terlalu besar untuk WAV</string>
     <string name="ai_no_samples_decoded">Tiada sampel audio dinyahkod</string>
-    <string name="ai_mask_wrong_size">Topeng mempunyai saiz yang tidak dijangka</string>
+    <string name="ai_mask_wrong_size">Pembuangan latar belakang memberikan hasil dengan saiz yang salah. Cuba lagi.</string>
     <string name="ai_encoder_no_image">Pengekod video tidak memberikan imej input</string>
     <string name="ai_encoder_not_responding">Pengekod video berhenti bertindak balas</string>
-    <string name="ai_encoder_frames_before_format">Pengekod video menghantar bingkai sebelum formatnya</string>
+    <string name="ai_encoder_frames_before_format">Pengekod video tidak bermula dengan betul. Cuba lagi.</string>
     <string name="ai_encoder_not_finished">Pengekod video tidak selesai</string>
     <string name="ai_cannot_encode_mask">Telefon ini tidak dapat mengekod video topeng</string>
-    <string name="ai_video_no_size">Video ini tiada maklumat saiz</string>
+    <string name="ai_video_no_size">Video ini tiada maklumat saiz.</string>
     <string name="ai_clip_too_long">Klip yang lebih panjang daripada %1$s minit belum disokong. Potong atau pisahkan klip dahulu.</string>
     <string name="ai_not_enough_storage">Storan bebas tidak mencukupi: ini memerlukan kira-kira %1$s MB.</string>
     <string name="ai_no_video_frames">Klip ini tiada bingkai video untuk diproses</string>
@@ -1240,7 +1249,7 @@
     <string name="track_motion_lost_at_frame">Penjejakan hilang pada bingkai %1$s. Alihkan titik kembali ke ciri yang sama dan ketik Teruskan.</string>
     <string name="track_motion_done">Berjaya menjejak %1$s bingkai. Bingkai kunci berada pada %2$s.</string>
     <string name="track_motion_target_layer">lapisan sasaran</string>
-    <string name="track_motion_cancelled">Penjejakan dibatalkan. Bingkai yang telah dijejaki mengekalkan bingkai kuncinya.</string>
+    <string name="track_motion_cancelled">Penjejakan dibatalkan. Bingkai yang telah dijejak mengekalkan bingkai kuncinya.</string>
     <string name="track_motion_unavailable">Penjejakan gerakan tidak tersedia dalam binaan ini.</string>
     <string name="track_motion_failed">Video ini tidak dapat dijejaki.</string>
     <string name="edit_layer_copy_name">Salinan %1$s</string>
@@ -1280,7 +1289,7 @@
     <string name="export_audio_summary_lossless">%1$s · %2$s · %3$s</string>
     <string name="export_audio_hint">Tetapan bunyi untuk fail video. %1$s boleh menyimpan audio %2$s.</string>
     <string name="export_audio_hint_silent">Projek ini belum ada bunyi. Tetapan ini digunakan selepas anda menambah bunyi.</string>
-    <string name="export_audio_only_hint">Disimpan ke Muzik / AbsentMotion. WAV dan FLAC mengekalkan setiap butiran; M4A, OGG dan MP3 lebih kecil.</string>
+    <string name="export_audio_only_hint">Disimpan ke Music/AbsentMotion. WAV dan FLAC mengekalkan setiap butiran; M4A, OGG dan MP3 lebih kecil.</string>
     <string name="export_running_audio">Mengeksport audio</string>
     <string name="export_interpolation_off_help">Setiap klip memaparkan bingkainya sendiri. Klip 30 fps dalam eksport 60 fps memaparkan setiap bingkai dua kali, jadi gerakan mungkin kelihatan sedikit tersekat.</string>
     <string name="export_interpolation_blend_help">Bingkai selang baharu mencampur dua bingkai terdekat seperti silang-pudar pantas. Eksport pantas; gerakan laju boleh kelihatan berbayang.</string>

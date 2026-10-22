@@ -1,0 +1,1363 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="6" by="lint 9.4.1" type="baseline" client="gradle" dependencies="false" name="AGP (9.4.1)" variant="all" version="9.4.1">
+
+    <issue
+        id="ApplySharedPref"
+        message="Consider using `apply()` instead; `commit` writes its data to persistent storage immediately, whereas `apply` will handle it in the background"
+        errorLine1="            prefs.edit().putBoolean(app.absentmotion.media.VideoProxies.SETTING, value).commit()"
+        errorLine2="                                                                                        ~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/library/AppSettings.kt"
+            line="78"
+            column="89"/>
+    </issue>
+
+    <issue
+        id="ExifInterface"
+        message="Avoid using `android.media.ExifInterface`; use `androidx.exifinterface.media.ExifInterface` instead"
+        errorLine1="import android.media.ExifInterface"
+        errorLine2="       ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/debug/kotlin/app/absentmotion/DeviceChecks.kt"
+            line="6"
+            column="8"/>
+    </issue>
+
+    <issue
+        id="ExifInterface"
+        message="Avoid using `android.media.ExifInterface`; use `androidx.exifinterface.media.ExifInterface` instead"
+        errorLine1="                ExifInterface(image).apply { setAttribute(ExifInterface.TAG_ORIENTATION, &quot;$tag&quot;); saveAttributes() }"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/debug/kotlin/app/absentmotion/DeviceChecks.kt"
+            line="31"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="ExifInterface"
+        message="Avoid using `android.media.ExifInterface`; use `androidx.exifinterface.media.ExifInterface` instead"
+        errorLine1="import android.media.ExifInterface"
+        errorLine2="       ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/media/MediaLibrary.kt"
+            line="10"
+            column="8"/>
+    </issue>
+
+    <issue
+        id="ExifInterface"
+        message="Avoid using `android.media.ExifInterface`; use `androidx.exifinterface.media.ExifInterface` instead"
+        errorLine1="    resolver.openInputStream(uri)?.use { ExifInterface(it).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL) }"
+        errorLine2="                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/media/MediaLibrary.kt"
+            line="164"
+            column="42"/>
+    </issue>
+
+    <issue
+        id="InlinedApi"
+        message="Field requires API level 34 (current min is 33): `android.Manifest.permission#READ_MEDIA_VISUAL_USER_SELECTED`"
+        errorLine1="                Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED.takeIf { partial }).toTypedArray())"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/ui/editor/MediaTab.kt"
+            line="100"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="TextConcatSpace"
+        message="Missing space between &quot;16Z&quot; on the previous line and &quot;M3.3&quot; here? Resulting string is &quot;16ZM3.3&quot;."
+        errorLine1="            &quot;M3.3 7L12 12L20.7 7M12 22L12 12&quot;)"
+        errorLine2="             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/ui/editor/ChromeIcons.kt"
+            line="91"
+            column="14"/>
+        <location
+            file="src/main/kotlin/app/absentmotion/ui/editor/ChromeIcons.kt"
+            line="90"
+            column="49"
+            message="Previous text here"/>
+    </issue>
+
+    <issue
+        id="TextConcatSpace"
+        message="Missing space between &quot;7Z&quot; on the previous line and &quot;M10&quot; here? Resulting string is &quot;7ZM10&quot;."
+        errorLine1="            &quot;M10 2L20 2A2 2 0 0 1 22 4L22 14A2 2 0 0 1 20 16L10 16A2 2 0 0 1 8 14L8 4A2 2 0 0 1 10 2Z&quot;, 1.25f)"
+        errorLine2="             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/ui/export/ExportIcons.kt"
+            line="25"
+            column="14"/>
+        <location
+            file="src/main/kotlin/app/absentmotion/ui/export/ExportIcons.kt"
+            line="24"
+            column="38"
+            message="Previous text here"/>
+    </issue>
+
+    <issue
+        id="NonObservableLocale"
+        message="Reading locale in a non-observable way in a composable function"
+        errorLine1="                Text(stringResource(label).uppercase(java.util.Locale.getDefault()), Modifier.padding(horizontal = 2.dp), color = if (selected) Am.OnNavyAccent else Am.Navy,"
+        errorLine2="                                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/ui/home/SettingsDrawer.kt"
+            line="366"
+            column="54"/>
+    </issue>
+
+    <issue
+        id="LockedOrientationActivity"
+        message="Expecting `android:screenOrientation=&quot;unspecified&quot;` or `&quot;fullSensor&quot;` for this activity so the user can use the application in any orientation and provide a great experience on Chrome OS devices"
+        errorLine1="            android:screenOrientation=&quot;portrait&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="33"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ConfigurationScreenWidthHeight"
+        message="Using Configuration.screenHeightDp instead of LocalWindowInfo.current.containerSize"
+        errorLine1="        val lower = if (isTablet(screen.smallestScreenWidthDp)) maxOf(280, screen.screenHeightDp * 2 / 5).dp else 280.dp"
+        errorLine2="                                                                           ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/ui/editor/EditorScreen.kt"
+            line="124"
+            column="76"/>
+    </issue>
+
+    <issue
+        id="ConfigurationScreenWidthHeight"
+        message="Using Configuration.screenWidthDp instead of LocalWindowInfo.current.containerSize"
+        errorLine1="                            CompositionLocalProvider(LocalWide provides wideEditor(screen.smallestScreenWidthDp, screen.screenWidthDp)) {"
+        errorLine2="                                                                                                                 ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/MainActivity.kt"
+            line="201"
+            column="114"/>
+    </issue>
+
+    <issue
+        id="LocalContextGetResourceValueCall"
+        message="Querying resource values using LocalContext.current is not configuration-aware and may return stale values if the Configuration changes"
+        errorLine1="    fun failed(@StringRes text: Int) = Toast.makeText(context, context.getString(text), Toast.LENGTH_LONG).show()"
+        errorLine2="                                                               ~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/ui/camera/CameraScreen.kt"
+            line="285"
+            column="64"/>
+    </issue>
+
+    <issue
+        id="LocalContextGetResourceValueCall"
+        message="Querying resource values using LocalContext.current is not configuration-aware and may return stale values if the Configuration changes"
+        errorLine1="                if (media == null) android.widget.Toast.makeText(context, context.getString(R.string.mediatab_capture_failed), android.widget.Toast.LENGTH_LONG).show()"
+        errorLine2="                                                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/ui/editor/MediaTab.kt"
+            line="211"
+            column="75"/>
+    </issue>
+
+    <issue
+        id="LocalContextGetResourceValueCall"
+        message="Querying resource values using LocalContext.current is not configuration-aware and may return stale values if the Configuration changes"
+        errorLine1="                            Toast.makeText(context, context.getString(R.string.home_create_project_failed), Toast.LENGTH_LONG).show()"
+        errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/ui/home/NewProjectSheet.kt"
+            line="221"
+            column="53"/>
+    </issue>
+
+    <issue
+        id="LocalContextGetResourceValueCall"
+        message="Querying resource values using LocalContext.current is not configuration-aware and may return stale values if the Configuration changes"
+        errorLine1="                    Toast.makeText(context, context.getString(R.string.newproject_camera_failed), Toast.LENGTH_LONG).show()"
+        errorLine2="                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/ui/home/NewProjectSheet.kt"
+            line="245"
+            column="45"/>
+    </issue>
+
+    <issue
+        id="LocalContextGetResourceValueCall"
+        message="Querying resource values using LocalContext.current is not configuration-aware and may return stale values if the Configuration changes"
+        errorLine1="            else Toast.makeText(context, context.getString(when {"
+        errorLine2="                                         ^">
+        <location
+            file="src/main/kotlin/app/absentmotion/ui/editor/StructureUi.kt"
+            line="239"
+            column="42"/>
+    </issue>
+
+    <issue
+        id="ModifierFactoryExtensionFunction"
+        message="Modifier factory functions should be extensions on Modifier"
+        errorLine1="fun wheel(onScroll: (delta: androidx.compose.ui.geometry.Offset, at: androidx.compose.ui.geometry.Offset, zoom: Boolean) -> Unit): androidx.compose.ui.Modifier = androidx.compose.ui.Modifier"
+        errorLine2="    ~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/platform/AndroidPlatform.kt"
+            line="116"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="DiscouragedApi"
+        message="Fixed screen orientations will be ignored in most cases, starting from Android 16. Android is moving toward a model where apps are expected to adapt to various orientations, display sizes, and aspect ratios."
+        errorLine1="            android:screenOrientation=&quot;portrait&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="33"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedTranslation"
+        message="The language `in (Indonesian)` is present in this project, but not declared in the `localeConfig` resource"
+        errorLine1="        android:localeConfig=&quot;@xml/locales_config&quot;"
+        errorLine2="                              ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="26"
+            column="31"/>
+    </issue>
+
+    <issue
+        id="ChromeOsAbiSupport"
+        message="Missing x86_64 ABI support for ChromeOS"
+        errorLine1="        ndk { abiFilters += &quot;arm64-v8a&quot; }"
+        errorLine2="                            ~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="21"
+            column="29"/>
+    </issue>
+
+    <issue
+        id="ObsoleteSdkInt"
+        message="This folder configuration (`v26`) is unnecessary; `minSdkVersion` is 33. Merge all the resources in this folder into `mipmap-anydpi`.">
+        <location
+            file="src/main/res/mipmap-anydpi-v26"/>
+    </issue>
+
+    <issue
+        id="StaticFieldLeak"
+        message="Do not place Android context classes in static fields (static reference to `DeviceCapabilities` which has field `app` pointing to `Context`); this is a memory leak"
+        errorLine1="        @Volatile private var instance: DeviceCapabilities? = null"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/export/DeviceCapabilities.kt"
+            line="202"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="StaticFieldLeak"
+        message="Do not place Android context classes in static fields (static reference to `ThermalMonitor` which has field `app` pointing to `Context`); this is a memory leak"
+        errorLine1="        @Volatile private var instance: ThermalMonitor? = null"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/export/ThermalMonitor.kt"
+            line="102"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="StaticFieldLeak"
+        message="Do not place Android context classes in static fields (static reference to `AppText` which has field `context` pointing to `Context`); this is a memory leak"
+        errorLine1="object AppText {"
+        errorLine2="^">
+        <location
+            file="src/main/kotlin/app/absentmotion/i18n/UiText.kt"
+            line="35"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="StaticFieldLeak"
+        message="Do not place Android context classes in static fields; this is a memory leak"
+        errorLine1="    @Volatile"
+        errorLine2="    ^">
+        <location
+            file="src/main/kotlin/app/absentmotion/i18n/UiText.kt"
+            line="36"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="AutoboxingStateCreation"
+        message="Prefer `mutableFloatStateOf` instead of `mutableStateOf`"
+        errorLine1="    var progress by mutableStateOf(0f)"
+        errorLine2="                    ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/ai/AiTools.kt"
+            line="47"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="AutoboxingStateCreation"
+        message="Prefer `mutableIntStateOf` instead of `mutableStateOf`"
+        errorLine1="    var speed by remember { mutableStateOf(lastSpeed) }"
+        errorLine2="                            ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/ui/editor/VoiceSheet.kt"
+            line="71"
+            column="29"/>
+    </issue>
+
+    <issue
+        id="AutoboxingStateCreation"
+        message="Prefer `mutableIntStateOf` instead of `mutableStateOf`"
+        errorLine1="    var pitch by remember { mutableStateOf(lastPitch) }"
+        errorLine2="                            ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/ui/editor/VoiceSheet.kt"
+            line="72"
+            column="29"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.ai_model_not_ready_play` appears to be unused"
+        errorLine1="    &lt;string name=&quot;ai_model_not_ready_play&quot;>The background removal model is not ready yet. Connect to the internet and retry shortly; first use needs Google Play services.&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="1158"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.ai_checking_model` appears to be unused"
+        errorLine1="    &lt;string name=&quot;ai_checking_model&quot;>Checking background removal model…&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="1160"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.ai_no_foreground_mask` appears to be unused"
+        errorLine1="    &lt;string name=&quot;ai_no_foreground_mask&quot;>No foreground mask was returned&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="1164"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UsableSpace"
+        message="Consider also using `StorageManager#getAllocatableBytes` and `allocateBytes` which will consider clearable cached data"
+        errorLine1="    if (size > 0 &amp;&amp; context.filesDir.usableSpace &lt; size + (100L shl 20)) return listOf(txt(R.string.backup_restore_no_space, formatBytes(size)))"
+        errorLine2="                                     ~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/ui/home/BackupUi.kt"
+            line="143"
+            column="38"/>
+    </issue>
+
+    <issue
+        id="UsableSpace"
+        message="Consider also using `StorageManager#getAllocatableBytes` and `allocateBytes` which will consider clearable cached data"
+        errorLine1="    private val free: (File) -> Long = { it.usableSpace },"
+        errorLine2="                                            ~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/library/MediaKeeper.kt"
+            line="16"
+            column="45"/>
+    </issue>
+
+    <issue
+        id="UsableSpace"
+        message="Consider also using `StorageManager#getAllocatableBytes` and `allocateBytes` which will consider clearable cached data"
+        errorLine1="    private val free: (File) -> Long = { it.usableSpace },"
+        errorLine2="                                            ~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/library/MediaKeeper.kt"
+            line="16"
+            column="45"/>
+    </issue>
+
+    <issue
+        id="UsableSpace"
+        message="Consider also using `StorageManager#getAllocatableBytes` and `allocateBytes` which will consider clearable cached data"
+        errorLine1="        check(file.parentFile!!.usableSpace >= needed) { AppText.get(R.string.ai_not_enough_storage, (needed / 1_000_000).toString()) }"
+        errorLine2="                                ~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/ai/VideoBackground.kt"
+            line="263"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="UseOfNonLambdaOffsetOverload"
+        message="State backed values should use the lambda overload of Modifier.offset"
+        errorLine1="        Box(Modifier.offset(thumbX, 3.5.dp).size(20.dp).shadow(2.dp, CircleShape).background(if (on) onThumb else Am.Thumb, CircleShape))"
+        errorLine2="                     ~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/ui/editor/panels/StyleParts.kt"
+            line="82"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="NotShrinkingResources"
+        message="If enabling minification, also set isShrinkResources = true"
+        errorLine1="            isMinifyEnabled = true"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="52"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ViewConstructor"
+        message="Custom view `EffectRulerView` is missing constructor used by tools: `(Context)` or `(Context,AttributeSet)` or `(Context,AttributeSet,int)`"
+        errorLine1="private class EffectRulerView(context: Context, private val scope: CoroutineScope) : View(context) {"
+        errorLine2="              ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/ui/editor/panels/EffectRuler.kt"
+            line="38"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `Canvas.withMatrix` instead?"
+        errorLine1="        c.save(); c.concat(matrix); c.drawPath(path.path.asAndroidPath(), paint); c.restore()"
+        errorLine2="        ~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/platform/AndroidPlatform.kt"
+            line="78"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="                retriever.setDataSource(context, Uri.parse(uri))"
+        errorLine2="                                                 ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/platform/AndroidPlatform.kt"
+            line="87"
+            column="50"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="            resolver.openInputStream(Uri.parse(uri))?.use { BitmapFactory.decodeStream(it, null, bounds) }"
+        errorLine2="                                     ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/platform/AndroidPlatform.kt"
+            line="93"
+            column="38"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="            resolver.openInputStream(Uri.parse(uri))?.use { BitmapFactory.decodeStream(it, null, options) }"
+        errorLine2="                                     ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/platform/AndroidPlatform.kt"
+            line="95"
+            column="38"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX function `createBitmap` instead?"
+        errorLine1="fun makeBitmap(width: Int, height: Int): Bitmap = android.graphics.Bitmap.createBitmap(width, height, android.graphics.Bitmap.Config.ARGB_8888)"
+        errorLine2="                                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/platform/AndroidPlatform.kt"
+            line="118"
+            column="51"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX function `createBitmap` instead?"
+        errorLine1="    val pixel = android.graphics.Bitmap.createBitmap(1, 1, android.graphics.Bitmap.Config.ARGB_8888)"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/platform/AndroidPlatform.kt"
+            line="191"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `Bitmap.get` instead?"
+        errorLine1="            complete(if (result == android.view.PixelCopy.SUCCESS) pixel.getPixel(0, 0) else null)"
+        errorLine2="                                                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/platform/AndroidPlatform.kt"
+            line="194"
+            column="68"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(value) { previewQualityState = value; prefs.edit().putString(&quot;previewQuality&quot;, value.name).apply() }"
+        errorLine2="                                                  ~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/library/AppSettings.kt"
+            line="40"
+            column="51"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(value) { defaultLayerDurationState = value; prefs.edit().putInt(&quot;defaultLayerDuration&quot;, value).apply() }"
+        errorLine2="                                                        ~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/library/AppSettings.kt"
+            line="44"
+            column="57"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(value) { audioResamplingState = value; prefs.edit().putInt(&quot;audioResampling&quot;, value).apply() }"
+        errorLine2="                                                   ~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/library/AppSettings.kt"
+            line="48"
+            column="52"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(value) { demoModeState = value; prefs.edit().putBoolean(&quot;demoMode&quot;, value).apply() }"
+        errorLine2="                                            ~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/library/AppSettings.kt"
+            line="52"
+            column="45"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(value) { loopingPlayState = value; prefs.edit().putBoolean(&quot;loopingPlay&quot;, value).apply() }"
+        errorLine2="                                               ~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/library/AppSettings.kt"
+            line="56"
+            column="48"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(value) { xmlUploadState = value; prefs.edit().putBoolean(&quot;xmlUpload&quot;, value).apply() }"
+        errorLine2="                                             ~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/library/AppSettings.kt"
+            line="60"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(value) { vibrationState = value; prefs.edit().putBoolean(&quot;trimLimitVibration&quot;, value).apply() }"
+        errorLine2="                                             ~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/library/AppSettings.kt"
+            line="64"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(value) { androidEmojiState = value; prefs.edit().putBoolean(app.absentmotion.fonts.FontLibrary.ANDROID_EMOJI, value).apply() }"
+        errorLine2="                                                ~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/library/AppSettings.kt"
+            line="70"
+            column="49"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="            prefs.edit().putBoolean(app.absentmotion.media.VideoProxies.SETTING, value).commit()"
+        errorLine2="            ~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/library/AppSettings.kt"
+            line="78"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(value) { fullMotionBlurState = value; prefs.edit().putBoolean(&quot;fullMotionBlur&quot;, value).apply() }"
+        errorLine2="                                                  ~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/library/AppSettings.kt"
+            line="86"
+            column="51"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(value) { keepMediaCopiesState = value; prefs.edit().putBoolean(&quot;keepMediaCopies&quot;, value).apply() }"
+        errorLine2="                                                   ~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/library/AppSettings.kt"
+            line="92"
+            column="52"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(value) { weeklyBackupState = value; prefs.edit().putBoolean(&quot;weeklyBackup&quot;, value).apply() }"
+        errorLine2="                                                ~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/library/AppSettings.kt"
+            line="98"
+            column="49"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        prefs.edit().putBoolean(&quot;checkUpdates&quot;, on).putBoolean(&quot;updatesAsked&quot;, true).apply()"
+        errorLine2="        ~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/library/AppSettings.kt"
+            line="110"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        prefs.edit().putString(&quot;newestVersion&quot;, version).putString(&quot;newestLink&quot;, link).apply()"
+        errorLine2="        ~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/library/AppSettings.kt"
+            line="122"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(value) { prefs.edit().putLong(&quot;lastAutoBackup&quot;, value).apply() }"
+        errorLine2="                     ~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/library/AppSettings.kt"
+            line="127"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(value) { prefs.edit().putString(&quot;autoBackupUri&quot;, value).apply() }"
+        errorLine2="                     ~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/library/AppSettings.kt"
+            line="131"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="            prefs.edit().putString(&quot;theme&quot;, value).apply()"
+        errorLine2="            ~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/library/AppSettings.kt"
+            line="137"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(value) { savedColoursState = value; prefs.edit().putString(&quot;savedColours&quot;, value.joinToString(&quot;,&quot;)).apply() }"
+        errorLine2="                                                ~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/library/AppSettings.kt"
+            line="160"
+            column="49"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(value) { prefs.edit().putInt(&quot;templateHints&quot;, value).apply() }"
+        errorLine2="                     ~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/library/AppSettings.kt"
+            line="164"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(value) { prefs.edit().putInt(&quot;onboarding&quot;, value).apply() }"
+        errorLine2="                     ~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/library/AppSettings.kt"
+            line="168"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(value) { sortByState = value; prefs.edit().putString(&quot;sortBy&quot;, value).apply() }"
+        errorLine2="                                          ~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/library/AppSettings.kt"
+            line="172"
+            column="43"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(v) = prefs.edit().putString(&quot;np.aspect&quot;, v.aspect).putInt(&quot;np.resolution&quot;, v.resolution)"
+        errorLine2="                 ~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/library/AppSettings.kt"
+            line="180"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="            prefs.edit().putBoolean(&quot;askedAudio&quot;, true).apply()"
+        errorLine2="            ~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/ui/editor/AudioTab.kt"
+            line="87"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="            bitmap = decode(context, Uri.parse(uri), limit.coerceAtLeast(1))"
+        errorLine2="                                     ~~~~~~~~~~~~~~">
+        <location
+            file="src/foss/kotlin/app/absentmotion/ai/BackgroundRemoval.kt"
+            line="55"
+            column="38"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="        settings.autoBackupUri?.takeIf { it != saved.toString() }?.let { old -> runCatching { context.contentResolver.delete(Uri.parse(old), null, null) } }"
+        errorLine2="                                                                                                                             ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/ui/home/BackupUi.kt"
+            line="163"
+            column="126"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        prefs.edit().putBoolean(&quot;refused&quot;, !camera).apply()"
+        errorLine2="        ~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/ui/camera/CameraScreen.kt"
+            line="191"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        prefs.edit().putLong(&quot;exitsSeen&quot;, maxOf(seen, infos.maxOfOrNull { it.timestamp } ?: 0L, if (seen &lt; 0) System.currentTimeMillis() else 0L)).apply()"
+        errorLine2="        ~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/library/CrashLogs.kt"
+            line="166"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        prefs.edit().putLong(&quot;shown&quot;, maxOf(time, prefs.getLong(&quot;shown&quot;, 0L))).apply()"
+        errorLine2="        ~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/library/CrashLogs.kt"
+            line="173"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        prefs.edit().putString(&quot;report&quot;, report.toJson().toString()).apply()"
+        errorLine2="        ~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/export/DeviceCapabilities.kt"
+            line="180"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX function `createBitmap` instead?"
+        errorLine1="        val bitmap = Bitmap.createBitmap(40, 20, Bitmap.Config.ARGB_8888)"
+        errorLine2="                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/debug/kotlin/app/absentmotion/DeviceChecks.kt"
+            line="23"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `Bitmap.set` instead?"
+        errorLine1="        for (y in 0 until 20) for (x in 0 until 40) bitmap.setPixel(x, y, if (x &lt; 20) Color.RED else Color.BLUE)"
+        errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/debug/kotlin/app/absentmotion/DeviceChecks.kt"
+            line="24"
+            column="53"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `Bitmap.get` instead?"
+        errorLine1="                    check(Color.blue(decoded.getPixel(10, 10)) > 240 &amp;&amp; Color.red(decoded.getPixel(30, 10)) > 240) { &quot;Background-removal EXIF $tag input was not mirrored&quot; }"
+        errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/debug/kotlin/app/absentmotion/DeviceChecks.kt"
+            line="34"
+            column="38"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `Bitmap.get` instead?"
+        errorLine1="                    check(Color.blue(decoded.getPixel(10, 10)) > 240 &amp;&amp; Color.red(decoded.getPixel(30, 10)) > 240) { &quot;Background-removal EXIF $tag input was not mirrored&quot; }"
+        errorLine2="                                                                                  ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/debug/kotlin/app/absentmotion/DeviceChecks.kt"
+            line="34"
+            column="83"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        history.edit().putStringSet(&quot;favourites&quot;, favourites).apply()"
+        errorLine2="        ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/ui/editor/effects/EffectBrowser.kt"
+            line="105"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        history.edit().putString(&quot;recent&quot;, recent.joinToString(&quot;|&quot;)).apply()"
+        errorLine2="        ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/ui/editor/effects/EffectBrowser.kt"
+            line="111"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX function `createBitmap` instead?"
+        errorLine1="                Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888).apply { copyPixelsFromBuffer(ByteBuffer.wrap(pixels)) }"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/engine/EngineThread.kt"
+            line="503"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX function `createBitmap` instead?"
+        errorLine1="        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)"
+        errorLine2="                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/engine/EngineThread.kt"
+            line="509"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        prefs.edit().putString(kind.name, settingsToJson(settings).toString()).apply()"
+        errorLine2="        ~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/export/ExportPrefs.kt"
+            line="17"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="                            try { context.contentResolver.openAssetFileDescriptor(app.absentmotion.platform.Uri.parse(uri), &quot;r&quot;)?.close() == null } catch (e: Exception) { true }"
+        errorLine2="                                                                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/ui/export/ExportScreen.kt"
+            line="347"
+            column="83"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        prefs.edit().putString(key, JSONArray().apply { kept.forEach { put(JSONArray().put(it.first).put(it.second)) } }.toString()).apply()"
+        errorLine2="        ~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/export/ExportTime.kt"
+            line="87"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        prefs.edit().putString(&quot;records&quot;, recordsToJson(kept).toString()).apply()"
+        errorLine2="        ~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/export/ExportTime.kt"
+            line="133"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="        writeProjectPackage(scene, xml, out, access, { uri -> runCatching { context.contentResolver.openInputStream(Uri.parse(uri)) }.getOrNull() }) { ensureStorage(); progress(it) }"
+        errorLine2="                                                                                                                    ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/export/Exporter.kt"
+            line="187"
+            column="117"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        prefs.edit().putString(&quot;recent&quot;, JSONArray((listOf(name) + read(&quot;recent&quot;)).distinct().take(30)).toString())"
+        errorLine2="        ~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/fonts/FontLibrary.kt"
+            line="56"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        prefs.edit().putString(&quot;favourites&quot;, JSONArray(if (name in old) old - name else old + name).toString()).apply()"
+        errorLine2="        ~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/fonts/FontLibrary.kt"
+            line="61"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(value) { prefs.edit().putStringSet(&quot;browserCategories&quot;, value.map { &quot;$it&quot; }.toSet()).apply() }"
+        errorLine2="                     ~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/fonts/FontLibrary.kt"
+            line="65"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(value) { prefs.edit().putString(&quot;browserSorting&quot;, value).apply() }"
+        errorLine2="                     ~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/fonts/FontLibrary.kt"
+            line="68"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(value) { prefs.edit().putInt(&quot;browserScript&quot;, value).apply() }"
+        errorLine2="                     ~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/fonts/FontLibrary.kt"
+            line="71"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        prefs.edit().putString(&quot;favourites&quot;, JSONArray(favourites - name).toString())"
+        errorLine2="        ~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/fonts/FontLibrary.kt"
+            line="76"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="            prefs.edit().putLong(&quot;builtinStamp&quot;, stamp).apply()"
+        errorLine2="            ~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/fonts/FontLibrary.kt"
+            line="104"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="            val uri = Uri.parse(&quot;font://&quot; + value.replaceFirst(&quot;?&quot;, &quot;/?&quot;))"
+        errorLine2="                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/fonts/FontName.kt"
+            line="22"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="            extractor.setDataSource(context, Uri.parse(uri), null)"
+        errorLine2="                                             ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/media/FrameReader.kt"
+            line="37"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="                exists = { uri -> runCatching { context.contentResolver.openAssetFileDescriptor(Uri.parse(uri), &quot;r&quot;)?.use { true } }.getOrNull() == true },"
+        errorLine2="                                                                                                ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/library/Importer.kt"
+            line="315"
+            column="97"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="    val keeper = MediaKeeper(store, { uri -> context.contentResolver.openInputStream(Uri.parse(uri)) })"
+        errorLine2="                                                                                     ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/editor/KeepMedia.kt"
+            line="23"
+            column="86"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="                        MediaKeeper(store, { uri -> contentResolver.openInputStream(Uri.parse(uri)) }).collect(id, MediaRelink.relink(this@MainActivity, scene)).also {"
+        errorLine2="                                                                                    ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/MainActivity.kt"
+            line="423"
+            column="85"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="                extractor.setDataSource(context, Uri.parse(record.uri), null)"
+        errorLine2="                                                 ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/ui/editor/MediaInfoDialog.kt"
+            line="44"
+            column="50"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="            { uri -> Triple(scene.media(uri), withContext(Dispatchers.IO) { fileVersion(resolver, Uri.parse(uri)) }, generation) },"
+        errorLine2="                                                                                                  ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/media/MediaLibrary.kt"
+            line="60"
+            column="99"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="                withContext(Dispatchers.IO) { decodePicture(resolver, Uri.parse(uri), limit) }"
+        errorLine2="                                                                      ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/media/MediaLibrary.kt"
+            line="62"
+            column="71"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="            val version = withContext(Dispatchers.IO) { fileVersion(resolver, Uri.parse(uri)) }"
+        errorLine2="                                                                              ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/media/MediaLibrary.kt"
+            line="67"
+            column="79"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `Bitmap.scale` instead?"
+        errorLine1="            Bitmap.createScaledBitmap(raw, (raw.width * scale).toInt().coerceAtLeast(1),"
+        errorLine2="            ^">
+        <location
+            file="src/main/kotlin/app/absentmotion/media/MediaLibrary.kt"
+            line="109"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="    val parsed = Uri.parse(uri)"
+        errorLine2="                 ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/media/MediaLibrary.kt"
+            line="122"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="        runCatching { context.contentResolver.openAssetFileDescriptor(Uri.parse(uri), &quot;r&quot;)?.use { true } }.getOrNull() == true"
+        errorLine2="                                                                      ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/library/MediaRelink.kt"
+            line="14"
+            column="71"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="            if (m.type.startsWith(&quot;image/&quot;) &amp;&amp; m.orientation == 0) linked.withLegacyExifOrientation(uri, exifTag(context.contentResolver, Uri.parse(uri))) else linked"
+        errorLine2="                                                                                                                                          ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/library/MediaRelink.kt"
+            line="41"
+            column="139"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="            prefs.edit().putBoolean(&quot;asked&quot;, true).apply()"
+        errorLine2="            ~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/ui/editor/MediaTab.kt"
+            line="98"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="            val parsed = android.net.Uri.parse(uri)"
+        errorLine2="                         ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/audio/OfflineMix.kt"
+            line="124"
+            column="26"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="            extractor.setDataSource(context, Uri.parse(uri), null)"
+        errorLine2="                                             ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/audio/PcmDecoder.kt"
+            line="42"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="    constructor(root: File, resolver: ContentResolver) : this(root, { uri -> resolver.openInputStream(Uri.parse(uri)) })"
+        errorLine2="                                                                                                      ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/library/TemplateStore.kt"
+            line="25"
+            column="103"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="            extractor.setDataSource(context, Uri.parse(uri), null)"
+        errorLine2="                                             ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/media/VideoDecoder.kt"
+            line="47"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="            if (session.failed || session.generation != engine.generation || session.version != fileVersion(context.contentResolver, Uri.parse(session.uri))) {"
+        errorLine2="                                                                                                                                     ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/media/VideoLibrary.kt"
+            line="134"
+            column="134"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="        val version = fileVersion(context.contentResolver, Uri.parse(uri))"
+        errorLine2="                                                           ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/media/VideoLibrary.kt"
+            line="163"
+            column="60"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="        val version = fileVersion(context.contentResolver, Uri.parse(uri))"
+        errorLine2="                                                           ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/media/VideoProxies.kt"
+            line="128"
+            column="60"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="        extractor.setDataSource(context, Uri.parse(uri), null)"
+        errorLine2="                                         ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/media/VideoProxies.kt"
+            line="181"
+            column="42"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="        extractor.setDataSource(context, Uri.parse(uri), null)"
+        errorLine2="                                         ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/media/VideoProxies.kt"
+            line="208"
+            column="42"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="        val key = uri + &quot;\n&quot; + fileVersion(context.contentResolver, Uri.parse(uri))"
+        errorLine2="                                                                    ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/media/VideoSources.kt"
+            line="19"
+            column="69"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="            extractor.setDataSource(context, Uri.parse(uri), null)"
+        errorLine2="                                             ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/media/VideoSources.kt"
+            line="23"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="        val source = VideoProxies.ready(context, uri, fileVersion(context.contentResolver, Uri.parse(uri))) ?: uri"
+        errorLine2="                                                                                           ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/ui/editor/VideoThumbnails.kt"
+            line="69"
+            column="92"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="                it.setDataSource(context, Uri.parse(source))"
+        errorLine2="                                          ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/ui/editor/VideoThumbnails.kt"
+            line="76"
+            column="43"/>
+    </issue>
+
+    <issue
+        id="ClickableViewAccessibility"
+        message="Custom view `EffectRulerView` overrides `onTouchEvent` but not `performClick`"
+        errorLine1="    override fun onTouchEvent(event: MotionEvent): Boolean {"
+        errorLine2="                 ~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/app/absentmotion/ui/editor/panels/EffectRuler.kt"
+            line="154"
+            column="18"/>
+    </issue>
+
+</issues>

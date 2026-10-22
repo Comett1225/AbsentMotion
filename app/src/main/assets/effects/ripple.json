@@ -2,7 +2,7 @@
  "id": "ripple",
  "name": "Ripple",
  "category": "distort",
- "description": "Concentric ripples radiating from a center point with configurable amplitude, wavelength, and speed",
+ "description": "Concentric ripples radiating from a center point with configurable amplitude, wavelength, and speed.",
  "params": [
   {
    "id": "center",

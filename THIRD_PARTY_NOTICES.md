@@ -200,7 +200,7 @@ together with Skia.
 - Licence: Apache-2.0 ("Original student architectures, training scripts and C++ runtime: Apache License 2.0."),
   subject to the source notices and the CC BY attribution below.
 - Copyright: The AbsentMotion authors.
-- Used in: "Remove Background" on images in the `foss` build. It runs on the device and nothing is downloaded. The
+- Used in: "Remove Background" on images and videos in the `foss` build. It runs on the device and nothing is downloaded. The
   `play` build uses ML Kit instead (section 4) and does not contain this file.
 - Pretrained encoder: `timm/mobilenetv3_large_100.ra_in1k`, revision `96f46a1c52932f27492dff66c72378eb99b443a7`,
   Apache-2.0, by Ross Wightman and timm contributors (https://huggingface.co/timm/mobilenetv3_large_100.ra_in1k,

@@ -243,7 +243,7 @@
    }
   },
   "bumpmap": {
-   "description": "Ilumina a camada como se o brilho dela fosse uma superfície em relevo, criando um visual texturizado em alto-relevo que mantém as cores.",
+   "description": "Ilumina a camada como se o brilho fosse uma superfície elevada, para um visual em relevo com textura que mantém as cores.",
    "name": "Mapa de relevo",
    "params": {
     "ambient": {
@@ -399,7 +399,7 @@
    }
   },
   "chromakey": {
-   "description": "Remove uma cor, como um fundo verde.",
+   "description": "Remove uma cor, como uma tela verde.",
    "name": "Chroma key",
    "params": {
     "key": {
@@ -492,7 +492,7 @@
    }
   },
   "colorbalance": {
-   "description": "Puxa as sombras, os tons médios e os realces para as suas próprias cores (cinza mantém a faixa inalterada).",
+   "description": "Puxa as sombras, os meios-tons e os realces para as próprias cores (cinza mantém a faixa inalterada).",
    "name": "Equilíbrio de cor",
    "params": {
     "amount": {
@@ -522,7 +522,7 @@
    }
   },
   "colorwheels": {
-   "description": "Rodas de cor para as sombras (lift), os tons médios (gamma) e os realces (gain): um matiz, o quanto puxar e um nível.",
+   "description": "Rodas de cor para sombras (lift), meios-tons (gamma) e realces (gain): um matiz, o quanto puxar e um nível.",
    "name": "Lift, gamma e gain",
    "params": {
     "gainAmount": {
@@ -889,7 +889,7 @@
    }
   },
   "denoise": {
-   "description": "Remove o ruído da imagem com um filtro bilateral que preserva as bordas, fazendo a média dos pixels próximos só quando as cores são parecidas.",
+   "description": "Remove o ruído da imagem com um filtro bilateral que preserva bordas e só faz a média de pixels próximos quando as cores são parecidas.",
    "name": "Redução de ruído",
    "params": {
     "detail": {
@@ -916,7 +916,7 @@
    }
   },
   "displacementmap": {
-   "description": "Usa as cores da camada para deslocar as camadas atrás dela e depois se oculta; ou, com Mapa definido como Camada abaixo, desloca esta camada pela camada de baixo.",
+   "description": "Usa as cores da camada para empurrar as camadas atrás dela e depois se esconde; ou, com Mapa definido como Camada abaixo, empurra esta camada pela camada de baixo.",
    "name": "Mapa de deslocamento",
    "params": {
     "edges": {
@@ -1520,7 +1520,7 @@
    }
   },
   "glass": {
-   "description": "Transforma a forma da camada em vidro chanfrado que curva as camadas atrás dela, com um realce ao longo da borda.",
+   "description": "Transforma a forma da camada em vidro biselado que curva as camadas atrás, com um brilho na borda.",
    "name": "Vidro",
    "params": {
     "angle": {
@@ -1544,7 +1544,7 @@
    }
   },
   "glitch": {
-   "description": "deslocamento horizontal aleatório de blocos e desvios de canais de cor, mudando algumas vezes por segundo",
+   "description": "Deslocamento aleatório de blocos horizontais e desvios de canais de cor, mudando algumas vezes por segundo.",
    "name": "Glitch",
    "params": {
     "blockHeight": {
@@ -1559,7 +1559,7 @@
    }
   },
   "glow": {
-   "description": "Um halo de uma cor ao redor da parte externa da forma da camada. A dureza o transforma de um esmaecimento suave em um contorno sólido.",
+   "description": "Um halo de uma cor ao redor da forma da camada. A dureza o transforma de um esmaecimento suave em um contorno sólido.",
    "name": "Brilho",
    "params": {
     "alpha": {
@@ -1612,7 +1612,7 @@
    }
   },
   "gradientmap": {
-   "description": "Recolore a imagem pela luminosidade através de três cores, com repetições e uma fase. Escala do brilho multiplica o resultado pelo brilho da própria imagem.",
+   "description": "Recolore a imagem pela luminosidade através de três cores, com repetições e uma fase. Escala de brilho multiplica o resultado pelo brilho da própria imagem.",
    "name": "Mapa de gradiente",
    "params": {
     "color1": {
@@ -1642,7 +1642,7 @@
    }
   },
   "gradientoverlay": {
-   "description": "Aplica um gradiente de duas cores sobre a camada, com opções de forma e modo de mesclagem.",
+   "description": "Aplica um gradiente de duas cores sobre a camada, com formas e modos de mesclagem à escolha.",
    "name": "Sobreposição de gradiente",
    "params": {
     "angle": {
@@ -1968,7 +1968,7 @@
    }
   },
   "hollowbox": {
-   "description": "Uma caixa aberta em cima e embaixo: a camada cobre o lado externo e o interior recebe a cor interna.",
+   "description": "Uma caixa com topo e fundo abertos: a camada cobre o exterior e o interior recebe a cor interna.",
    "name": "Caixa Oca",
    "params": {
     "depth": {
@@ -2138,7 +2138,7 @@
    }
   },
   "lensblur": {
-   "description": "Um desfoque giratório que mantém uma área nítida no centro e aumenta em direção às bordas.",
+   "description": "Um desfoque giratório que deixa uma área nítida ao redor do centro e aumenta em direção às bordas.",
    "name": "Desfoque de lente",
    "params": {
     "center": {
@@ -2362,7 +2362,7 @@
    }
   },
   "magnifybackground": {
-   "description": "Transforma a camada em uma lupa: sua forma mostra as camadas atrás dela ampliadas ao redor do centro.",
+   "description": "Transforma a camada em uma lupa: sua forma mostra as camadas atrás ampliadas ao redor do centro.",
    "name": "Ampliar fundo",
    "params": {
     "magnify": {
@@ -2753,7 +2753,7 @@
    }
   },
   "pixelate": {
-   "description": "Transforma a camada em blocos de uma cor cada, tirada do meio do bloco, em uma grade centralizada na camada (ou no quadro com Espaço de tela). Alongamento, Deslocamento e Ângulo moldam a grade, e Vinheta escurece cada bloco em direção às bordas.",
+   "description": "Transforma a camada em blocos de uma cor cada, tirada do meio do bloco, em uma grade centralizada na camada (ou no quadro com Screen Space). Alongar, Deslocamento e Ângulo moldam a grade e a Vinheta escurece cada bloco em direção às bordas.",
    "name": "Pixelizar",
    "params": {
     "angle": {
@@ -2777,7 +2777,7 @@
    }
   },
   "polar": {
-   "description": "Curva a camada em torno do centro, transformando linhas retas em círculos, ou desenrola círculos em linhas retas.",
+   "description": "Dobra a camada ao redor do centro, transformando linhas retas em círculos, ou desenrola círculos em linhas retas.",
    "name": "Coordenadas polares",
    "params": {
     "amount": {
@@ -2793,7 +2793,7 @@
    }
   },
   "polardisplacement": {
-   "description": "Gira e puxa as camadas atrás desta em torno de um ponto central conforme as cores da camada e depois oculta a camada.",
+   "description": "Gira e puxa as camadas atrás desta ao redor de um ponto central usando as cores da camada, e depois esconde a camada.",
    "name": "Mapa de deslocamento polar",
    "params": {
     "angle": {
@@ -2843,7 +2843,7 @@
    }
   },
   "posterize": {
-   "description": "Divide cada canal de cor em um número de Etapas planas, transformando gradientes suaves em faixas. O Deslocamento move onde ficam as bordas das faixas.",
+   "description": "Divide cada canal de cor em um número de níveis planos, fazendo gradientes suaves virarem faixas. O deslocamento move onde ficam as bordas das faixas.",
    "name": "Posterizar",
    "params": {
     "levels": {
@@ -3138,7 +3138,7 @@
    }
   },
   "rasterextrude": {
-   "description": "Projeta a imagem da camada em um bloco sólido; as laterais assumem a cor interna.",
+   "description": "Projeta a imagem da camada para fora em um bloco sólido; as laterais recebem a cor interna.",
    "name": "Extrusão raster",
    "params": {
     "depth": {
@@ -3327,7 +3327,7 @@
    }
   },
   "rgbsplit": {
-   "description": "Separa os canais vermelho, verde e azul: o canal Central fica no lugar e os outros dois se deslocam em direções opostas ao longo do Ângulo. Claro soma as cores deslocadas, Escuro as mantém sólidas, Máscara mantém apenas onde os três se sobrepõem e Luma deixa as franjas tão opacas quanto brilhantes.",
+   "description": "Separa os canais vermelho, verde e azul: o canal central fica no lugar e os outros dois se deslocam em direções opostas ao longo do ângulo. Claro soma as cores deslocadas, Escuro as mantém sólidas, Máscara mantém só onde os três se sobrepõem e Luma deixa as franjas tão opacas quanto claras.",
    "name": "Separação RGB",
    "params": {
     "angle": {
@@ -3395,7 +3395,7 @@
    }
   },
   "ripple": {
-   "description": "Ondulações concêntricas que se irradiam de um ponto central, com amplitude, comprimento de onda e velocidade ajustáveis.",
+   "description": "Ondulações concêntricas irradiando de um ponto central com amplitude, comprimento de onda e velocidade configuráveis.",
    "name": "Ondulação",
    "params": {
     "amplitude": {
@@ -3548,7 +3548,7 @@
    }
   },
   "sharpen": {
-   "description": "Aplica uma máscara de nitidez 3x3 para realçar detalhes finos.",
+   "description": "Aplica uma máscara de nitidez usando uma vizinhança 3x3 para realçar detalhes finos.",
    "name": "Nitidez",
    "params": {
     "amount": {
@@ -3632,7 +3632,7 @@
    }
   },
   "solid": {
-   "description": "Aplica uma cor sobre a camada, mantendo a forma dela, com opções de modo de mesclagem.",
+   "description": "Aplica uma cor sobre a camada, mantendo sua forma, com modos de mesclagem à escolha.",
    "name": "Cor sólida",
    "params": {
     "amount": {
@@ -3800,7 +3800,7 @@
    }
   },
   "spotcolor": {
-   "description": "Mantém uma cor e remove a saturação de todas as outras cores da camada.",
+   "description": "Mantém uma cor e tira a saturação de todas as outras cores da camada.",
    "name": "Cor de destaque",
    "params": {
     "choke": {
@@ -3983,7 +3983,7 @@
    }
   },
   "static": {
-   "description": "Ruído cinza cintilante, como uma televisão sem sinal.",
+   "description": "Ruído cinza que pisca, como uma televisão sem sinal.",
    "name": "Estática",
    "params": {
     "amount": {
@@ -4225,7 +4225,7 @@
    }
   },
   "texttransform": {
-   "description": "Move, escala, gira, esmaece e tinge letras, palavras ou linhas dentro de um intervalo. A âncora define se a escala e a rotação usam cada componente ou o centro da camada. Mova o intervalo com Deslocamento para fazer a mudança percorrer o texto.",
+   "description": "Move, escala, gira, desvanece e tinge letras, palavras ou linhas dentro de um intervalo. A âncora define se a escala e a rotação usam cada componente ou o centro da camada. Mova o intervalo com o deslocamento para fazer a mudança percorrer o texto.",
    "name": "Transformação de texto",
    "params": {
     "anchor": {
@@ -4459,14 +4459,14 @@
    }
   },
   "tint": {
-   "description": "Mapeia a luminância da imagem entre uma cor de sombra e uma cor de destaque com uma quantidade de mistura.",
+   "description": "Mapeia a luminância da imagem entre uma cor de sombra e uma cor de realce, com uma quantidade de mistura.",
    "name": "Tonalizar",
    "params": {
     "amount": {
      "label": "Intensidade"
     },
     "highlightColor": {
-     "label": "Cor do destaque"
+     "label": "Cor do realce"
     },
     "shadowColor": {
      "label": "Cor da sombra"
@@ -4687,7 +4687,7 @@
    }
   },
   "vhs": {
-   "description": "Parece uma fita de vídeo antiga: sangramento de cor, linhas borradas, linhas de varredura, ruído de fita e faixas de tracking rolando.",
+   "description": "Parece uma fita de vídeo antiga: sangramento de cor, linhas borradas, linhas de varredura, ruído de fita e faixas de rastreamento rolando.",
    "name": "VHS",
    "params": {
     "chroma": {

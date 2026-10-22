@@ -243,7 +243,7 @@
    }
   },
   "bumpmap": {
-   "description": "Katmanı, parlaklığı yükseltilmiş bir yüzeymiş gibi aydınlatarak renkleri koruyan kabartmalı, dokulu bir görünüm verir.",
+   "description": "Katmanın parlaklığını kabartma yüzey gibi aydınlatarak renkleri koruyan, kabartmalı ve dokulu bir görünüm sağlar.",
    "name": "Kabartma haritası",
    "params": {
     "ambient": {
@@ -264,7 +264,7 @@
    }
   },
   "channelremap": {
-   "description": "Her renk kanalını katmanın başka bir kanalından yeniden oluşturur; yanlış renkler elde etmek veya parlaklığı alfaya taşımak için.",
+   "description": "Her renk kanalını katmanın başka bir kanalından yeniden oluşturur; sahte renk veya parlaklığı alfaya taşımak için.",
    "name": "Kanal yeniden eşleme (RGB)",
    "params": {
     "a": {
@@ -399,7 +399,7 @@
    }
   },
   "chromakey": {
-   "description": "Yeşil perde gibi bir rengi kaldırır.",
+   "description": "Yeşil perde gibi tek bir rengi kaldırır.",
    "name": "Kroma Anahtarı",
    "params": {
     "key": {
@@ -492,7 +492,7 @@
    }
   },
   "colorbalance": {
-   "description": "Gölgeleri, orta tonları ve vurguları kendi renklerine doğru kaydırır (gri, aralığı değiştirmez).",
+   "description": "Gölgeleri, orta tonları ve vurguları kendi renklerine doğru iter (gri, bir aralığı değiştirmeden bırakır).",
    "name": "Renk Dengesi",
    "params": {
     "amount": {
@@ -522,7 +522,7 @@
    }
   },
   "colorwheels": {
-   "description": "Gölgeler (kaldır), orta tonlar (gama) ve vurgular (kazanç) için renk tekerleri: ton, itme miktarı ve seviye.",
+   "description": "Gölgeler (lift), orta tonlar (gamma) ve vurgular (gain) için renk tekerlekleri: bir renk tonu, itme miktarı ve seviye.",
    "name": "Kaldır Gama Kazanç",
    "params": {
     "gainAmount": {
@@ -555,7 +555,7 @@
    }
   },
   "contourgradient": {
-   "description": "Katmanın opak kısımlarının kenarlarından dışa doğru iki renkli bir gradyan çizer; yumuşak renkli bir hale gibi.",
+   "description": "Katmanın opak kısımlarının kenarlarından dışa doğru iki renkli bir gradyan boyar; yumuşak renkli bir hale gibi.",
    "name": "Kontur Gradyanı",
    "params": {
     "alpha": {
@@ -889,7 +889,7 @@
    }
   },
   "denoise": {
-   "description": "Görsel gürültüsünü, yakındaki pikselleri yalnızca renkleri benzerken ortalayan kenar korumalı iki yönlü filtreyle kaldırır.",
+   "description": "Kenarları koruyan ve yakındaki pikselleri yalnızca renkleri benzer olduğunda ortalamasını alan iki taraflı filtreyle görüntü gürültüsünü kaldırır.",
    "name": "Gürültü Azaltma",
    "params": {
     "detail": {
@@ -916,7 +916,7 @@
    }
   },
   "displacementmap": {
-   "description": "Katmanın renklerini kullanarak arkasındaki katmanları iter ve ardından kendini gizler; Harita, Alt Katman olarak ayarlandığında ise bu katmanı altındaki katmanla iter.",
+   "description": "Katmanın renklerini, arkasındaki katmanları itmek için kullanır ve sonra kendini gizler; veya Harita Alt Katman olarak ayarlandığında bu katmanı altındaki katmanla iter.",
    "name": "Deplasman Haritası",
    "params": {
     "edges": {
@@ -1363,7 +1363,7 @@
    }
   },
   "flip": {
-   "description": "Katmanı 3D'de bir kart gibi çevirir; arka yüzü saydam, görsel veya renk olabilir.",
+   "description": "Katmanı 3D'de bir kart gibi çevirir; arkası saydam, bir görsel veya bir renk olabilir.",
    "name": "Katmanı çevir",
    "params": {
     "back": {
@@ -1407,7 +1407,7 @@
    }
   },
   "fourcolor": {
-   "description": "Dört noktaya (katmanın merkezinden piksel cinsinden) yerleştirilen dört rengi katmanın üzerine karıştırır.",
+   "description": "Katmanın merkezinden piksel cinsinden dört noktaya yerleştirilen dört rengi katmanın üzerine karıştırır.",
    "name": "Dört Renkli Gradyan",
    "params": {
     "blend": {
@@ -1520,7 +1520,7 @@
    }
   },
   "glass": {
-   "description": "Katmanın şeklini, arkasındaki katmanları kıran eğimli bir cama dönüştürür ve kenarı boyunca bir vurgu ekler.",
+   "description": "Katmanın şeklini, arkasındaki katmanları büken ve kenarı boyunca bir parlama olan eğimli cama dönüştürür.",
    "name": "Cam",
    "params": {
     "angle": {
@@ -1544,7 +1544,7 @@
    }
   },
   "glitch": {
-   "description": "Saniyede birkaç kez değişen rastgele yatay blok kaymaları ve renk kanalı ofsetleri.",
+   "description": "Rastgele yatay blok kayması ve renk kanalı ofsetleri, saniyede birkaç kez değişir.",
    "name": "Glitch",
    "params": {
     "blockHeight": {
@@ -1559,7 +1559,7 @@
    }
   },
   "glow": {
-   "description": "Katmanın şeklinin dışında tek renkli bir hale. Sertlik, yumuşak geçişi belirgin bir dış çizgiye dönüştürür.",
+   "description": "Katmanın şeklinin dışında tek renkli bir hale. Sertlik, onu yumuşak bir geçişten düz bir dış çizgiye dönüştürür.",
    "name": "Parlama",
    "params": {
     "alpha": {
@@ -1612,7 +1612,7 @@
    }
   },
   "gradientmap": {
-   "description": "Görseli parlaklığa göre üç renk üzerinden yeniden renklendirir; tekrarlar ve bir faz içerir. Parlaklığı Ölçekle, sonucu görselin kendi parlaklığıyla çarpar.",
+   "description": "Görseli parlaklığa göre üç renk üzerinden yeniden renklendirir; tekrarlar ve bir faz vardır. Parlaklığı Ölçekle, sonucu görselin kendi parlaklığıyla çarpar.",
    "name": "Gradyan Eşleme",
    "params": {
     "color1": {
@@ -1642,7 +1642,7 @@
    }
   },
   "gradientoverlay": {
-   "description": "Katmanın üzerine seçilebilir şekil ve karışım modlarıyla iki renkli bir gradyan yerleştirir.",
+   "description": "Katmanın üzerine seçilebilir şekiller ve karışım modlarıyla iki renkli bir gradyan yerleştirir.",
    "name": "Gradyan Kaplama",
    "params": {
     "angle": {
@@ -1783,7 +1783,7 @@
      "label": "Boyut"
     },
     "colored": {
-     "label": "Renkli Noktalar"
+     "label": "Renkli noktalar"
     }
    }
   },
@@ -1968,7 +1968,7 @@
    }
   },
   "hollowbox": {
-   "description": "Üstü ve altı açık bir kutu: katman dış yüzeyi kaplar, iç kısım iç renkle dolar.",
+   "description": "Üstü ve altı açık bir kutu: katman dış tarafı kaplar, iç taraf ise iç rengi alır.",
    "name": "İçi boş kutu",
    "params": {
     "depth": {
@@ -2019,7 +2019,7 @@
    }
   },
   "huesaturation": {
-   "description": "Renkleri renk çemberi üzerinde döndürür ve daha güçlü ya da zayıf hale getirir; canlılık en çok soluk renkleri güçlendirir.",
+   "description": "Renkleri renk tekerleği etrafında döndürür ve daha güçlü veya zayıf yapar; canlılık en çok soluk renkleri güçlendirir.",
    "name": "Ton ve Doygunluk",
    "params": {
     "hue": {
@@ -2138,7 +2138,7 @@
    }
   },
   "lensblur": {
-   "description": "Merkez çevresinde keskin bir alan bırakan, kenarlara doğru artan dönen bir bulanıklık.",
+   "description": "Merkezin etrafında keskin bir alan bırakan ve kenarlara doğru artan dönen bir bulanıklık.",
    "name": "Lens Bulanıklığı",
    "params": {
     "center": {
@@ -2195,7 +2195,7 @@
    }
   },
   "lightglow": {
-   "description": "Görselin eşik değerinden parlak kısımlarının çevresine renkli bir parıltı ekler.",
+   "description": "Görselin eşikten daha parlak kısımlarının çevresine renkli bir parlama ekler.",
    "name": "Işık Parıltısı",
    "params": {
     "blur": {
@@ -2362,7 +2362,7 @@
    }
   },
   "magnifybackground": {
-   "description": "Katmanı bir büyütece dönüştürür: şekli, arkasındaki katmanları merkezinin çevresinde büyütülmüş olarak gösterir.",
+   "description": "Katmanı büyüteç haline getirir: şekli, arkasındaki katmanları merkezinin çevresinde büyütülmüş olarak gösterir.",
    "name": "Arka planı büyüt",
    "params": {
     "magnify": {
@@ -2753,7 +2753,7 @@
    }
   },
   "pixelate": {
-   "description": "Katmanı, her bloğun ortasından alınan tek renkli bloklara böler; ızgara katmana (Ekran alanı açıkken kareye) ortalanır. Esnetme, Ofset ve Açı ızgarayı şekillendirir, Vinyet her bloğun kenarlarını karartır.",
+   "description": "Katmanı, her biri blok ortasından alınan tek renkten oluşan bloklara çevirir; ızgara katman (Ekran Alanı ile kare) merkezindedir. Uzatma, Ofset ve Açı ızgarayı şekillendirir, Vinyet her bloğu kenarlarına doğru karartır.",
    "name": "Pikselleştir",
    "params": {
     "angle": {
@@ -2777,7 +2777,7 @@
    }
   },
   "polar": {
-   "description": "Katmanı merkezi etrafında büker; düz çizgileri dairelere çevirir veya daireleri düz çizgilere açar.",
+   "description": "Katmanı merkezi etrafında büker; düz çizgileri daireye, daireleri de düz çizgiye açar.",
    "name": "Kutupsal Koordinatlar",
    "params": {
     "amount": {
@@ -2793,7 +2793,7 @@
    }
   },
   "polardisplacement": {
-   "description": "Bu katmanın arkasındaki katmanları, katmanın renklerine göre bir merkez noktası etrafında döndürüp çeker ve ardından katmanı gizler.",
+   "description": "Bu katmanın arkasındaki katmanları, katmanın renkleriyle bir merkez noktası etrafında döndürüp çeker, sonra katmanı gizler.",
    "name": "Kutupsal Yer Değiştirme Haritası",
    "params": {
     "angle": {
@@ -2843,7 +2843,7 @@
    }
   },
   "posterize": {
-   "description": "Her renk kanalını belirli sayıda düz Adıma böler; böylece yumuşak gradyanlar bantlara dönüşür. Ofset, bant kenarlarının yerini kaydırır.",
+   "description": "Her renk kanalını belirli sayıda düz Adım'a böler; böylece yumuşak gradyanlar bantlara dönüşür. Ofset, bant kenarlarının yerini değiştirir.",
    "name": "Posterleştir",
    "params": {
     "levels": {
@@ -3138,7 +3138,7 @@
    }
   },
   "rasterextrude": {
-   "description": "Katmanın görüntüsünü katı bir bloğa dönüştürür; yanlar iç renk alır.",
+   "description": "Katmanın görüntüsünü dolu bir bloğa dönüştürerek dışa iter; yan yüzler iç renk alır.",
    "name": "Raster ekstrüzyon",
    "params": {
     "depth": {
@@ -3177,7 +3177,7 @@
    }
   },
   "rays": {
-   "description": "Katmanın parlak kısımlarından, bir merkez noktasından uzağa doğru ışık ışınları yayar.",
+   "description": "Katmanın parlak kısımlarından bir merkez noktasından uzağa doğru ışık ışınları yayar.",
    "name": "Işınlar",
    "params": {
     "center": {
@@ -3327,7 +3327,7 @@
    }
   },
   "rgbsplit": {
-   "description": "Kırmızı, yeşil ve mavi kanalları ayırır: Merkez kanalı yerinde kalır, diğer ikisi Açı boyunca zıt yönlere kayar. Açık kaydırılan renkleri toplar, Koyu onları dolu tutar, Maske yalnızca üçünün çakıştığı yeri korur, Luma ise kenarları parlaklıkları kadar opak yapar.",
+   "description": "Kırmızı, yeşil ve mavi kanalları ayırır: Merkez kanalı yerinde kalır, diğer ikisi Açı boyunca zıt yönlerde kayar. Açık kaydırılan renkleri toplar, Koyu onları dolu tutar, Maske yalnızca üçünün çakıştığı yeri tutar ve Luma saçakları parlaklıkları kadar opak yapar.",
    "name": "RGB Ayrımı",
    "params": {
     "angle": {
@@ -3395,7 +3395,7 @@
    }
   },
   "ripple": {
-   "description": "Bir merkez noktadan yayılan, genlik, dalga boyu ve hızı ayarlanabilir eş merkezli dalgalanmalar.",
+   "description": "Ayarlanabilir genlik, dalga boyu ve hızla bir merkez noktasından yayılan eş merkezli dalgalar.",
    "name": "Dalgalanma",
    "params": {
     "amplitude": {
@@ -3548,7 +3548,7 @@
    }
   },
   "sharpen": {
-   "description": "İnce ayrıntıları belirginleştirmek için 3x3 komşuluk kullanan keskinleştirme maskesi uygular.",
+   "description": "3x3 komşuluk kullanarak keskin olmayan maske uygular ve ince ayrıntıları belirginleştirir.",
    "name": "Keskinleştir",
    "params": {
     "amount": {
@@ -3632,7 +3632,7 @@
    }
   },
   "solid": {
-   "description": "Katmanın şeklini koruyarak üzerine seçilen karışım modlarıyla tek bir renk yerleştirir.",
+   "description": "Katmanın üzerine, şeklini koruyarak tek bir renk yerleştirir; karışım modları seçilebilir.",
    "name": "Düz renk",
    "params": {
     "amount": {
@@ -3800,7 +3800,7 @@
    }
   },
   "spotcolor": {
-   "description": "Tek bir rengi korur ve katmandaki diğer tüm renklerin doygunluğunu alır.",
+   "description": "Bir rengi korur ve katmandaki diğer tüm renklerin doygunluğunu alır.",
    "name": "Özel renk",
    "params": {
     "choke": {
@@ -3983,7 +3983,7 @@
    }
   },
   "static": {
-   "description": "Sinyalsiz bir televizyon gibi titreşen gri gürültü.",
+   "description": "Sinyalsiz televizyon gibi titreyen gri gürültü.",
    "name": "Statik",
    "params": {
     "amount": {
@@ -4225,7 +4225,7 @@
    }
   },
   "texttransform": {
-   "description": "Bir aralıktaki harfleri, kelimeleri veya satırları taşır, ölçekler, döndürür, soldurur ve renklendirir. Çapa, ölçekleme ve döndürmenin her bileşeni mi yoksa katmanın merkezini mi kullanacağını belirler. Değişikliğin metin boyunca ilerlemesi için aralığı Kaydırma ile taşıyın.",
+   "description": "Bir aralıktaki harfleri, kelimeleri veya satırları taşır, ölçekler, döndürür, soldurur ve renklendirir. Çapa, ölçekleme ve döndürmenin her bileşeni mi yoksa katman merkezini mi kullanacağını belirler. Değişikliğin metin boyunca ilerlemesi için aralığı Ofset ile kaydırın.",
    "name": "Metin Dönüştürme",
    "params": {
     "anchor": {
@@ -4459,7 +4459,7 @@
    }
   },
   "tint": {
-   "description": "Görselin parlaklığını bir karışım miktarıyla gölge ve vurgu rengi arasında eşler.",
+   "description": "Görüntünün parlaklığını bir gölge rengi ile bir vurgu rengi arasında, karışım miktarıyla eşler.",
    "name": "Renk Tonu",
    "params": {
     "amount": {
@@ -4687,7 +4687,7 @@
    }
   },
   "vhs": {
-   "description": "Eski bir video kaset gibi görünür: renk taşması, bulaşmış çizgiler, tarama çizgileri, kaset gürültüsü ve kayan izleme bantları.",
+   "description": "Eski bir video kaset gibi görünür: renk taşması, bulanık çizgiler, tarama çizgileri, kaset gürültüsü ve kayan izleme bantları.",
    "name": "VHS",
    "params": {
     "chroma": {

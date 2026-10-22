@@ -71,7 +71,7 @@ above it is the like-for-like export. The GIF shows that run, with the export pa
 
 ## Requirements
 
-Android 14 (API level 34) or newer (tested on Android 16 and 17), a 64-bit ARM device (`arm64-v8a`), Vulkan 1.2.
+Android 13 (API level 33) or newer (tested on Android 16 and 17 and on emulators from Android 13), a 64-bit ARM device (`arm64-v8a`), Vulkan 1.1.
 
 There are two builds: `play`, which has background removal through Google Play services, and `foss` (for
 F-Droid), which contains no Google libraries at all.
@@ -82,7 +82,7 @@ AbsentMotion is a young project. Please know these before you rely on it:
 
 - **Some Alight Motion effects are still missing.** AbsentMotion has 176 effects, and about 17 of Alight Motion's
   are not in it yet. A project that uses one still opens, and the effect stays in the file, but it is not drawn.
-- **Only 64-bit ARM Android devices on Android 14 or newer, with Vulkan 1.2.** Tested on Android 16 and 17.
+- **Only 64-bit ARM Android devices on Android 13 or newer, with Vulkan 1.1.** Tested on Android 16 and 17 and on emulators from Android 13.
 - **Background removal.** The `foss` build removes backgrounds with its own offline model. The `play` build uses
   Google Play services instead, a proprietary Google library (listed in `THIRD_PARTY_NOTICES.md`) that downloads its
   model when it is first needed and may send diagnostics to Google under Google's own policy, as it does for any app.

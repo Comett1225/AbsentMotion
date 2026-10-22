@@ -2,7 +2,7 @@
  "id": "glitch",
  "name": "Glitch",
  "category": "distort",
- "description": "random horizontal block displacement and color channel offsets, changing a few times per second",
+ "description": "Random horizontal block displacement and color channel offsets, changing a few times per second.",
  "params": [
   {
    "id": "intensity",

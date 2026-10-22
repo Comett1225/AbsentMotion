@@ -35,7 +35,6 @@
     <string name="ok">OK</string>
     <string name="easing_needs_at_least_two_keyframes">Làm mượt cần ít nhất hai keyframe để hoạt động.\n\nNếu keyframe của bạn nằm trên thuộc tính khác, hãy chọn thuộc tính đó trước.</string>
     <string name="add_keyframes_first">Thêm keyframe trước</string>
-    <string name="convert_to_group">Chuyển thành nhóm</string>
     <string name="cancel">Hủy</string>
     <string name="rebuild_source_project">Tạo lại dự án nguồn</string>
     <string name="this_asset_pointed_to_a_project">Tài nguyên này trỏ đến một dự án đã bị xóa.\n\nTạo lại dự án từ tài nguyên này, hay tách nó ra và chỉnh sửa trực tiếp?</string>
@@ -89,7 +88,7 @@
     <string name="export_template_failed">Không thể lưu bản sao thành mẫu. Hãy giải phóng dung lượng lưu trữ.</string>
     <string name="also_keeps_the_project_with_its">Đồng thời giữ dự án cùng phương tiện của nó trong Mẫu trên điện thoại này. Mở tại đó để thay phương tiện và tiếp tục với dự án mới.</string>
     <string name="template">Mẫu</string>
-    <string name="one_absproj_package_with_the_project">Một gói .absproj chứa dự án và phương tiện gốc mà nó dùng, được lưu vào Documents / AbsentMotion. Giữ làm bản sao lưu hoặc chuyển dự án sang điện thoại khác.</string>
+    <string name="one_absproj_package_with_the_project">Một gói .absproj gồm dự án và các phương tiện gốc mà dự án dùng, được lưu vào Documents/AbsentMotion. Giữ làm bản sao lưu hoặc chuyển dự án sang điện thoại khác.</string>
     <string name="project_bundle">Gói dự án</string>
     <string name="project_home_page">Trang chủ dự án</string>
     <string name="open_source_licences">Giấy phép mã nguồn mở</string>
@@ -126,7 +125,7 @@
     <string name="delete_all">Xóa tất cả</string>
     <string name="effects_not_loaded">Không thể tải các hiệu ứng</string>
     <string name="settings_demo_mode">Chế độ Demo</string>
-    <string name="settings_open_xml">Mở dự án XML</string>
+    <string name="settings_open_xml">Hiện thẻ nhập trong danh sách dự án</string>
     <string name="settings_vibration">Rung</string>
     <string name="settings_emoji">Kiểu emoji</string>
     <string name="settings_emoji_system">Hệ thống</string>
@@ -163,28 +162,28 @@
     <string name="theme_custom">Tùy chỉnh</string>
     <string name="theme_custom_named">Tùy chỉnh (%1$s)</string>
     <string name="theme_error_bad_colour">Màu không hợp lệ cho %1$s</string>
-    <string name="theme_error_no_colours">Tệp này không có màu giao diện</string>
+    <string name="theme_error_no_colours">Tệp này không có màu chủ đề</string>
     <string name="library_err_no_data">Không nhận được dữ liệu.</string>
     <string name="library_err_unsupported_type">Loại tệp không được hỗ trợ</string>
     <string name="library_err_missing_manifest">Gói dự án thiếu manifest</string>
     <string name="library_err_package_project_missing">Gói không hợp lệ: thiếu tệp dự án</string>
     <string name="library_err_too_many_projects">Gói chứa quá nhiều dự án (nhiều hơn %1$s)</string>
     <string name="library_err_project_files_large">Các tệp dự án trong gói quá lớn</string>
-    <string name="library_err_no_project">Scene không hợp lệ: gói không có dự án</string>
+    <string name="library_err_no_project">Cảnh không hợp lệ: không có dự án trong gói</string>
     <string name="library_err_malformed_package">Gói không hợp lệ: %1$s</string>
     <string name="library_err_malformed_xml">XML không hợp lệ: %1$s</string>
-    <string name="library_err_scene_needs_size">Scene không hợp lệ: cần có &lt;scene&gt; kèm kích thước</string>
-    <string name="library_err_scene_too_big">Scene không hợp lệ: kích thước lớn hơn %1$s pixel</string>
-    <string name="library_err_scene_fps">Scene không hợp lệ: tốc độ khung hình phải từ 1 đến %1$s</string>
+    <string name="library_err_scene_needs_size">Cảnh không hợp lệ: tệp cần một cảnh có chiều rộng và chiều cao</string>
+    <string name="library_err_scene_too_big">Cảnh không hợp lệ: kích thước lớn hơn %1$s px</string>
+    <string name="library_err_scene_fps">Cảnh không hợp lệ: tốc độ khung hình phải từ 1 đến %1$s</string>
     <string name="library_err_package_large">Gói quá lớn (hơn %1$s MB sau khi giải nén)</string>
     <string name="library_err_too_many_files">Gói có quá nhiều tệp (nhiều hơn %1$s)</string>
-    <string name="library_err_xml_large">XML không hợp lệ: tệp quá lớn</string>
+    <string name="library_err_xml_large">Tệp này quá lớn để mở (hơn 32 MB)</string>
     <string name="library_err_media_large">Gói quá lớn (hơn %1$s MB phương tiện)</string>
     <string name="library_err_not_backup">Tệp này không phải bản sao lưu AbsentMotion.</string>
     <string name="library_err_backup_project_large">Một dự án trong bản sao lưu quá lớn.</string>
     <string name="library_imported_project">Dự án đã nhập</string>
     <string name="library_damaged_project">Dự án bị hỏng</string>
-    <string name="library_report_unknown">Không nhận dạng được, giữ nguyên trong tệp</string>
+    <string name="library_report_unknown">Không nhận diện được, giữ nguyên trong tệp</string>
     <string name="library_report_cannot_run">Hiệu ứng phiên bản này không chạy được</string>
     <string name="library_report_converted">Hiệu ứng đã chuyển sang định dạng riêng của ứng dụng</string>
     <string name="library_report_dropped">Cài đặt hiệu ứng không thể chuyển sang</string>
@@ -260,12 +259,15 @@
     <plurals name="backup_restored_skipped">
         <item quantity="other">%1$s dự án đã có ở đây và được giữ nguyên.</item>
     </plurals>
+    <plurals name="backup_restored_rejected">
+        <item quantity="other">Không khôi phục %1$s dự án vì kích thước hoặc tốc độ khung hình không hợp lệ.</item>
+    </plurals>
     <string name="about_version">Phiên bản %1$s</string>
     <string name="about_licence_line">Miễn phí và mã nguồn mở, phát hành theo Apache License 2.0.</string>
     <string name="about_independent_note">AbsentMotion là một dự án độc lập. Ứng dụng không liên kết, không được chứng thực hay tài trợ bởi bất kỳ nhà phát triển ứng dụng nào khác; tên của các sản phẩm khác thuộc về chủ sở hữu của chúng.</string>
     <string name="about_compatibility_note">AbsentMotion có thể mở tệp XML cảnh và gói .amproj xuất từ Alight Motion, và xuất XML cảnh theo cùng định dạng đó. Ứng dụng lưu gói của riêng mình dưới dạng .absproj.</string>
     <string name="about_loading">Đang tải…</string>
-    <string name="about_licence_unreadable">Không thể đọc nội dung giấy phép.</string>
+    <string name="about_licence_unreadable">Không đọc được văn bản giấy phép.</string>
     <string name="template_use_title">Dùng mẫu</string>
     <string name="template_next">Tiếp</string>
     <string name="template_drag_to_select">Kéo ngang để chọn</string>
@@ -356,7 +358,7 @@
     <string name="export_anyway">Vẫn xuất</string>
     <string name="export_available_space">Dung lượng trống</string>
     <string name="export_estimated_size">Kích thước tệp ước tính</string>
-    <string name="export_calculating">Đang tính toán...</string>
+    <string name="export_calculating">Đang tính…</string>
     <string name="export_kind_video">Video</string>
     <string name="export_kind_frame_png">Khung hình hiện tại dạng PNG</string>
     <string name="export_kind_frame_as">Khung hình hiện tại dạng…</string>
@@ -433,12 +435,14 @@
     <string name="export_thermal_hot">Điện thoại đang nóng. Quá trình xuất chậm lại để máy nguội.</string>
     <string name="export_thermal_critical">Điện thoại rất nóng. Quá trình xuất tạm dừng giữa các khung hình cho đến khi máy nguội.</string>
     <string name="export_time_few_seconds">vài giây</string>
-    <string name="export_time_hours">khoảng %1$s giờ</string>
     <plurals name="export_time_seconds">
         <item quantity="other">khoảng %1$s giây</item>
     </plurals>
     <plurals name="export_time_minutes">
         <item quantity="other">khoảng %1$s phút</item>
+    </plurals>
+    <plurals name="export_time_hours_count">
+        <item quantity="other">khoảng %1$s giờ</item>
     </plurals>
     <string name="export_verify_empty">Tệp không chứa âm thanh hay video.</string>
     <string name="export_verify_no_video">Tệp không có luồng video.</string>
@@ -450,10 +454,11 @@
     <string name="export_verify_picture">Không giải mã được hình ảnh trong tệp.</string>
     <string name="export_verify_size">Hình ảnh có kích thước %1$s thay vì %2$s.</string>
     <string name="export_verify_frames">GIF có %1$s khung hình thay vì %2$s.</string>
+    <string name="export_sound_unreadable">Không đọc được âm thanh của %1$s nên âm thanh đó bị tắt tiếng trong tệp này.</string>
     <string name="export_error_cannot_encode">Điện thoại này không thể mã hóa %1$s ở %2$s</string>
-    <string name="export_error_draw_frame">Không thể vẽ khung hình %1$s</string>
+    <string name="export_error_draw_frame">Không thể vẽ khung hình %1$s. Hãy thử xuất lại.</string>
     <string name="export_error_draw_still">Không thể vẽ khung hình</string>
-    <string name="export_error_no_sound">Dự án này không có âm thanh để xuất.</string>
+    <string name="export_error_no_sound">Dự án này không có âm thanh để xuất. Hãy thêm nhạc, âm thanh hoặc video có tiếng trước.</string>
     <string name="export_error_create">Không thể tạo %1$s trong %2$s</string>
     <string name="export_error_write">Không thể ghi %1$s</string>
     <string name="export_error_mp3_settings">Bộ mã hóa MP3 không thể dùng %1$s Hz ở %2$s kbps</string>
@@ -468,6 +473,8 @@
     <string name="camera_photo">Ảnh</string>
     <string name="camera_video">Video</string>
     <string name="camera_close">Đóng máy ảnh</string>
+    <string name="camera_take_photo">Chụp ảnh</string>
+    <string name="camera_start_recording">Bắt đầu quay</string>
     <string name="camera_switch">Chuyển máy ảnh</string>
     <string name="camera_pause_recording">Tạm dừng quay</string>
     <string name="camera_resume_recording">Tiếp tục quay</string>
@@ -486,16 +493,16 @@
     <string name="media_error_video_unavailable">Video không khả dụng: %1$s</string>
     <string name="media_error_decode_frame">Không thể giải mã đúng khung hình video %1$s</string>
     <string name="media_error_import_frame">Không thể nhập khung hình video %1$s cho %2$s</string>
-    <string name="media_error_interp_source">Không có khung hình nguồn nội suy %1$s</string>
-    <string name="media_error_interp_wrong_frame">Nội suy nhận được khung hình nguồn sai cho %1$s</string>
-    <string name="media_error_interp_import">Không thể nhập khung hình nguồn nội suy %1$s</string>
+    <string name="media_error_interp_source">Thiếu một khung hình video cần cho Nội suy khung hình (%1$s). Hãy thử lại hoặc đặt Nội suy khung hình thành Tắt.</string>
+    <string name="media_error_interp_wrong_frame">Không đọc đúng một khung hình video cần cho Nội suy khung hình (%1$s). Hãy thử lại hoặc đặt Nội suy khung hình thành Tắt.</string>
+    <string name="media_error_interp_import">Không tải được một khung hình video cần cho Nội suy khung hình (%1$s). Hãy thử lại hoặc đặt Nội suy khung hình thành Tắt.</string>
     <string name="media_error_interp_render">%1$s không thể kết xuất khung hình video được yêu cầu</string>
     <string name="engine_loading_effects">Đang tải hiệu ứng…</string>
     <string name="engine_error_gpu_capture">GPU gặp lỗi khi chụp</string>
     <string name="platform_voice_name">Giọng %1$s</string>
     <string name="platform_error_tts_unavailable">Điện thoại này không hỗ trợ chuyển văn bản thành giọng nói</string>
     <string name="platform_error_voice">Không thể tạo giọng nói</string>
-    <string name="platform_caption_download">Phụ đề được nhận dạng ngay trên điện thoại của bạn bằng mô hình nhận dạng giọng nói, chỉ tải xuống một lần: %1$s, %2$s, từ Hugging Face.</string>
+    <string name="platform_caption_download">Phụ đề được nhận dạng trên điện thoại bằng mô hình giọng nói, tải xuống một lần: %1$s, %2$s, từ Hugging Face.</string>
     <string name="add_layer">Thêm lớp</string>
     <string name="add_tab_shape">Hình dạng</string>
     <string name="add_tab_media">Phương tiện</string>
@@ -631,6 +638,8 @@
     <string name="font_search">Tìm kiếm</string>
     <string name="font_imported">Đã nhập</string>
     <string name="font_downloads_when_chosen">Tải xuống khi chọn</string>
+    <string name="fonts_missing_title">Phông chữ không có trên điện thoại này</string>
+    <string name="fonts_missing_body">Dự án này dùng phông chữ không có trên điện thoại này: %1$s. Văn bản sẽ hiển thị bằng phông chữ khác cho đến khi bạn tải chúng từ Google Fonts.</string>
     <string name="font_favorite">Yêu thích</string>
     <string name="font_category_sans_serif">Sans Serif</string>
     <string name="font_category_serif">Serif</string>
@@ -1106,7 +1115,7 @@
     <string name="ai_saving_transparent">Đang lưu hình ảnh trong suốt…</string>
     <string name="ai_loading_model">Đang tải mô hình xóa nền…</string>
     <string name="ai_no_foreground_mask">Không nhận được mặt nạ tiền cảnh</string>
-    <string name="ai_mask_unexpected_size">Mặt nạ tiền cảnh có kích thước không như mong đợi</string>
+    <string name="ai_mask_unexpected_size">Xóa nền cho ra kết quả sai kích thước. Hãy thử lại.</string>
     <string name="ai_cannot_save_image">Không thể lưu hình ảnh</string>
     <string name="ai_cannot_read_image">Không thể đọc hình ảnh này</string>
     <string name="ai_cannot_decode_image">Không thể giải mã hình ảnh này</string>
@@ -1117,13 +1126,13 @@
     <string name="ai_sample_rate_changed">Tần số lấy mẫu âm thanh đã thay đổi trong khi giải mã</string>
     <string name="ai_recording_too_large">Bản ghi này quá lớn đối với WAV</string>
     <string name="ai_no_samples_decoded">Không có mẫu âm thanh nào được giải mã</string>
-    <string name="ai_mask_wrong_size">Mặt nạ có kích thước không như mong đợi</string>
+    <string name="ai_mask_wrong_size">Xóa nền cho ra kết quả sai kích thước. Hãy thử lại.</string>
     <string name="ai_encoder_no_image">Bộ mã hóa video không cung cấp hình ảnh đầu vào</string>
     <string name="ai_encoder_not_responding">Bộ mã hóa video ngừng phản hồi</string>
-    <string name="ai_encoder_frames_before_format">Bộ mã hóa video gửi khung hình trước cả định dạng</string>
+    <string name="ai_encoder_frames_before_format">Bộ mã hóa video không khởi động đúng. Hãy thử lại.</string>
     <string name="ai_encoder_not_finished">Bộ mã hóa video chưa hoàn tất</string>
     <string name="ai_cannot_encode_mask">Điện thoại này không thể mã hóa video mặt nạ</string>
-    <string name="ai_video_no_size">Video này không có thông tin kích thước</string>
+    <string name="ai_video_no_size">Video này không có thông tin kích thước.</string>
     <string name="ai_clip_too_long">Chưa hỗ trợ clip dài hơn %1$s phút. Hãy cắt hoặc tách clip trước.</string>
     <string name="ai_not_enough_storage">Không đủ dung lượng trống: cần khoảng %1$s MB.</string>
     <string name="ai_no_video_frames">Clip này không có khung hình video nào để xử lý</string>
@@ -1154,7 +1163,7 @@
     <string name="model_svg_skipped_gradient_strokes">nét chuyển màu</string>
     <string name="model_svg_skipped_dashed">nét đứt</string>
     <string name="model_svg_skipped_patterns">tô họa tiết</string>
-    <string name="model_svg_skipped_gradient_colours">các màu chuyển màu thừa (chỉ dùng màu đầu và màu cuối)</string>
+    <string name="model_svg_skipped_gradient_colours">màu chuyển màu thừa (chỉ dùng màu đầu và màu cuối)</string>
     <string name="ai_no_audio_track">Không có âm thanh trong %1$s</string>
     <string name="shape_name_circle">Hình tròn</string>
     <string name="shape_name_rounded_rectangle">Hình chữ nhật bo góc</string>
@@ -1240,7 +1249,7 @@
     <string name="track_motion_lost_at_frame">Mất dấu theo dõi ở khung %1$s. Hãy di chuyển điểm trở lại đúng đặc điểm đó rồi nhấn Tiếp tục.</string>
     <string name="track_motion_done">Đã theo dõi %1$s khung hình. Các keyframe nằm trên %2$s.</string>
     <string name="track_motion_target_layer">lớp đích</string>
-    <string name="track_motion_cancelled">Đã hủy theo dõi. Các khung hình đã theo dõi vẫn giữ keyframe.</string>
+    <string name="track_motion_cancelled">Đã hủy theo dõi chuyển động. Các khung hình đã theo dõi vẫn giữ keyframe.</string>
     <string name="track_motion_unavailable">Theo dõi chuyển động không khả dụng trong bản dựng này.</string>
     <string name="track_motion_failed">Không thể theo dõi video này.</string>
     <string name="edit_layer_copy_name">%1$s (bản sao)</string>
@@ -1280,7 +1289,7 @@
     <string name="export_audio_summary_lossless">%1$s · %2$s · %3$s</string>
     <string name="export_audio_hint">Cài đặt âm thanh cho tệp video. %1$s có thể chứa âm thanh %2$s.</string>
     <string name="export_audio_hint_silent">Dự án này chưa có âm thanh. Các cài đặt này sẽ được dùng khi bạn thêm âm thanh.</string>
-    <string name="export_audio_only_hint">Được lưu vào Music / AbsentMotion. WAV và FLAC giữ mọi chi tiết; M4A, OGG và MP3 nhỏ hơn.</string>
+    <string name="export_audio_only_hint">Đã lưu vào Music/AbsentMotion. WAV và FLAC giữ mọi chi tiết; M4A, OGG và MP3 nhỏ hơn.</string>
     <string name="export_running_audio">Đang xuất âm thanh</string>
     <string name="export_interpolation_off_help">Mỗi clip hiển thị khung hình riêng. Clip 30 fps trong bản xuất 60 fps sẽ lặp mỗi khung hình hai lần, nên chuyển động có thể hơi bị giật.</string>
     <string name="export_interpolation_blend_help">Các khung hình xen giữa mới trộn hai khung hình gần nhất như hiệu ứng chuyển mờ nhanh. Xuất nhanh; chuyển động nhanh có thể bị bóng mờ.</string>

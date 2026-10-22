@@ -35,7 +35,6 @@
     <string name="ok">OK</string>
     <string name="easing_needs_at_least_two_keyframes">Easing memerlukan setidaknya dua keyframe.\n\nJika keyframe Anda berada di properti lain, pilih properti tersebut terlebih dahulu.</string>
     <string name="add_keyframes_first">Tambahkan keyframe dulu</string>
-    <string name="convert_to_group">Konversi ke grup</string>
     <string name="cancel">Batal</string>
     <string name="rebuild_source_project">Bangun ulang proyek sumber</string>
     <string name="this_asset_pointed_to_a_project">Aset ini menunjuk ke proyek yang telah dihapus.\n\nBangun ulang proyek dari aset ini, atau lepaskan dan edit langsung?</string>
@@ -89,10 +88,10 @@
     <string name="export_template_failed">Tidak dapat menyimpan salinan sebagai Template. Kosongkan sebagian ruang penyimpanan.</string>
     <string name="also_keeps_the_project_with_its">Juga menyimpan proyek beserta medianya di Template pada ponsel ini. Buka di sana untuk mengganti medianya dan melanjutkan ke proyek baru.</string>
     <string name="template">Template</string>
-    <string name="one_absproj_package_with_the_project">Satu paket .absproj berisi proyek dan media asli yang digunakan, disimpan ke Documents / AbsentMotion. Simpan sebagai cadangan atau pindahkan proyek ke ponsel lain.</string>
+    <string name="one_absproj_package_with_the_project">Satu paket .absproj berisi proyek dan media asli yang dipakai, disimpan ke Documents/AbsentMotion. Simpan sebagai cadangan atau pindahkan proyek ke ponsel lain.</string>
     <string name="project_bundle">Paket proyek</string>
     <string name="project_home_page">Halaman utama proyek</string>
-    <string name="open_source_licences">Lisensi sumber terbuka</string>
+    <string name="open_source_licences">Lisensi open source</string>
     <string name="stop">Hentikan</string>
     <string name="damaged_restore_a_version">Rusak — pulihkan versi</string>
     <string name="damaged_explain_versions">File proyek ini rusak, jadi tidak dapat dibuka. Pulihkan salah satu versi sebelumnya di bawah, atau hapus proyek.</string>
@@ -126,7 +125,7 @@
     <string name="delete_all">Hapus semua</string>
     <string name="effects_not_loaded">Efek tidak dapat dimuat</string>
     <string name="settings_demo_mode">Mode Demo</string>
-    <string name="settings_open_xml">Buka proyek XML</string>
+    <string name="settings_open_xml">Tampilkan kartu impor di daftar proyek</string>
     <string name="settings_vibration">Getaran</string>
     <string name="settings_emoji">Gaya Emoji</string>
     <string name="settings_emoji_system">Sistem</string>
@@ -170,21 +169,21 @@
     <string name="library_err_package_project_missing">Paket rusak: file proyek tidak ditemukan</string>
     <string name="library_err_too_many_projects">Paket berisi terlalu banyak proyek (lebih dari %1$s)</string>
     <string name="library_err_project_files_large">File proyek dalam paket terlalu besar</string>
-    <string name="library_err_no_project">Scene tidak valid: tidak ada proyek dalam paket</string>
+    <string name="library_err_no_project">Scene tidak valid: tidak ada proyek di dalam paket</string>
     <string name="library_err_malformed_package">Paket tidak valid: %1$s</string>
     <string name="library_err_malformed_xml">XML tidak valid: %1$s</string>
-    <string name="library_err_scene_needs_size">Scene tidak valid: diharapkan &lt;scene&gt; dengan ukuran</string>
-    <string name="library_err_scene_too_big">Scene tidak valid: ukuran melebihi %1$s piksel</string>
-    <string name="library_err_scene_fps">Scene tidak valid: Frame rate harus antara 1 hingga %1$s</string>
+    <string name="library_err_scene_needs_size">Scene tidak valid: file harus memiliki scene dengan lebar dan tinggi</string>
+    <string name="library_err_scene_too_big">Scene tidak valid: ukurannya melebihi %1$s piksel</string>
+    <string name="library_err_scene_fps">Scene tidak valid: frame rate harus antara 1 sampai %1$s</string>
     <string name="library_err_package_large">Paket terlalu besar (lebih dari %1$s MB setelah diekstrak)</string>
     <string name="library_err_too_many_files">Paket memiliki terlalu banyak file (lebih dari %1$s)</string>
-    <string name="library_err_xml_large">XML tidak valid: file terlalu besar</string>
+    <string name="library_err_xml_large">File ini terlalu besar untuk dibuka (lebih dari 32 MB)</string>
     <string name="library_err_media_large">Paket terlalu besar (media lebih dari %1$s MB)</string>
     <string name="library_err_not_backup">File ini bukan cadangan AbsentMotion.</string>
     <string name="library_err_backup_project_large">Ada proyek di cadangan yang terlalu besar.</string>
     <string name="library_imported_project">Proyek yang diimpor</string>
     <string name="library_damaged_project">Proyek rusak</string>
-    <string name="library_report_unknown">Tidak dikenali, tetap disimpan dalam file</string>
+    <string name="library_report_unknown">Tidak dikenali, tetap disimpan di file</string>
     <string name="library_report_cannot_run">Efek yang tidak dapat dijalankan versi ini</string>
     <string name="library_report_converted">Efek yang dikonversi menjadi efek aplikasi ini</string>
     <string name="library_report_dropped">Pengaturan efek yang tidak dapat dipertahankan</string>
@@ -259,6 +258,9 @@
     </plurals>
     <plurals name="backup_restored_skipped">
         <item quantity="other">%1$s proyek sudah ada di sini dan dibiarkan apa adanya.</item>
+    </plurals>
+    <plurals name="backup_restored_rejected">
+        <item quantity="other">%1$s proyek tidak dipulihkan karena ukuran atau frame rate-nya tidak valid.</item>
     </plurals>
     <string name="about_version">Versi %1$s</string>
     <string name="about_licence_line">Gratis dan open source, dilisensikan di bawah Apache License 2.0.</string>
@@ -356,7 +358,7 @@
     <string name="export_anyway">Tetap ekspor</string>
     <string name="export_available_space">Ruang tersedia</string>
     <string name="export_estimated_size">Perkiraan ukuran file</string>
-    <string name="export_calculating">Menghitung...</string>
+    <string name="export_calculating">Menghitung…</string>
     <string name="export_kind_video">Video</string>
     <string name="export_kind_frame_png">Frame saat ini sebagai PNG</string>
     <string name="export_kind_frame_as">Frame saat ini sebagai…</string>
@@ -433,12 +435,14 @@
     <string name="export_thermal_hot">Ponsel panas. Ekspor diperlambat agar ponsel mendingin.</string>
     <string name="export_thermal_critical">Ponsel sangat panas. Ekspor dijeda di antara frame sampai ponsel mendingin.</string>
     <string name="export_time_few_seconds">beberapa detik</string>
-    <string name="export_time_hours">sekitar %1$s jam</string>
     <plurals name="export_time_seconds">
         <item quantity="other">sekitar %1$s detik</item>
     </plurals>
     <plurals name="export_time_minutes">
         <item quantity="other">sekitar %1$s menit</item>
+    </plurals>
+    <plurals name="export_time_hours_count">
+        <item quantity="other">sekitar %1$s jam</item>
     </plurals>
     <string name="export_verify_empty">File ini tidak berisi audio atau video.</string>
     <string name="export_verify_no_video">File ini tidak memiliki trek video.</string>
@@ -450,10 +454,11 @@
     <string name="export_verify_picture">Gambar dalam file tidak dapat didekode.</string>
     <string name="export_verify_size">Ukuran gambar %1$s, bukan %2$s.</string>
     <string name="export_verify_frames">GIF memiliki %1$s frame, bukan %2$s.</string>
+    <string name="export_sound_unreadable">Suara dari %1$s tidak dapat dibaca, jadi menjadi senyap di file ini.</string>
     <string name="export_error_cannot_encode">Ponsel ini tidak dapat mengodekan %1$s pada %2$s</string>
-    <string name="export_error_draw_frame">Mesin tidak dapat menggambar frame %1$s</string>
+    <string name="export_error_draw_frame">Frame %1$s gagal digambar. Coba ekspor lagi.</string>
     <string name="export_error_draw_still">Mesin tidak dapat menggambar frame</string>
-    <string name="export_error_no_sound">Proyek ini tidak memiliki suara untuk diekspor.</string>
+    <string name="export_error_no_sound">Proyek ini tidak memiliki suara untuk diekspor. Tambahkan musik, suara, atau video bersuara terlebih dahulu.</string>
     <string name="export_error_create">Tidak dapat membuat %1$s di %2$s</string>
     <string name="export_error_write">Tidak dapat menulis %1$s</string>
     <string name="export_error_mp3_settings">Encoder MP3 tidak dapat menggunakan %1$s Hz pada %2$s kbps</string>
@@ -468,6 +473,8 @@
     <string name="camera_photo">FOTO</string>
     <string name="camera_video">VIDEO</string>
     <string name="camera_close">Tutup kamera</string>
+    <string name="camera_take_photo">Ambil foto</string>
+    <string name="camera_start_recording">Mulai merekam</string>
     <string name="camera_switch">Ganti kamera</string>
     <string name="camera_pause_recording">Jeda rekaman</string>
     <string name="camera_resume_recording">Lanjutkan rekaman</string>
@@ -486,16 +493,16 @@
     <string name="media_error_video_unavailable">Video tidak tersedia: %1$s</string>
     <string name="media_error_decode_frame">Tidak dapat mendekode frame video persis %1$s</string>
     <string name="media_error_import_frame">Tidak dapat mengimpor frame video %1$s untuk %2$s</string>
-    <string name="media_error_interp_source">Frame sumber interpolasi %1$s tidak tersedia</string>
-    <string name="media_error_interp_wrong_frame">Interpolasi menerima frame sumber yang salah untuk %1$s</string>
-    <string name="media_error_interp_import">Tidak dapat mengimpor frame sumber interpolasi %1$s</string>
+    <string name="media_error_interp_source">Frame video yang dibutuhkan untuk Interpolasi Frame tidak ditemukan (%1$s). Coba lagi, atau setel Interpolasi Frame ke Nonaktif.</string>
+    <string name="media_error_interp_wrong_frame">Frame video yang dibutuhkan untuk Interpolasi Frame tidak dapat dibaca dengan benar (%1$s). Coba lagi, atau setel Interpolasi Frame ke Nonaktif.</string>
+    <string name="media_error_interp_import">Frame video yang dibutuhkan untuk Interpolasi Frame tidak dapat dimuat (%1$s). Coba lagi, atau setel Interpolasi Frame ke Nonaktif.</string>
     <string name="media_error_interp_render">%1$s tidak dapat merender frame video yang diminta</string>
     <string name="engine_loading_effects">Memuat efek…</string>
     <string name="engine_error_gpu_capture">GPU gagal saat pengambilan</string>
     <string name="platform_voice_name">Suara %1$s</string>
     <string name="platform_error_tts_unavailable">Teks ke suara tidak tersedia di ponsel ini</string>
     <string name="platform_error_voice">Suara tidak dapat dibuat</string>
-    <string name="platform_caption_download">Takarir dikenali di ponsel Anda oleh model pengenalan suara, diunduh sekali: %1$s, %2$s, dari Hugging Face.</string>
+    <string name="platform_caption_download">Takarir dikenali di ponsel Anda oleh model ucapan yang diunduh sekali: %1$s, %2$s, dari Hugging Face.</string>
     <string name="add_layer">Tambah lapisan</string>
     <string name="add_tab_shape">Bentuk</string>
     <string name="add_tab_media">Media</string>
@@ -631,6 +638,8 @@
     <string name="font_search">Cari</string>
     <string name="font_imported">Diimpor</string>
     <string name="font_downloads_when_chosen">Diunduh saat dipilih</string>
+    <string name="fonts_missing_title">Font tidak ada di ponsel ini</string>
+    <string name="fonts_missing_body">Proyek ini memakai font yang tidak ada di ponsel ini: %1$s. Teks ditampilkan dengan font lain sampai Anda mengunduhnya dari Google Fonts.</string>
     <string name="font_favorite">Favorit</string>
     <string name="font_category_sans_serif">Sans Serif</string>
     <string name="font_category_serif">Serif</string>
@@ -767,7 +776,7 @@
     <string name="structure_alignment_options">Opsi perataan</string>
     <string name="structure_group_options">Opsi grup</string>
     <string name="structure_align_left">Ratakan kiri</string>
-    <string name="structure_align_centre">Ratakan tengah</string>
+    <string name="structure_align_centre">Rata tengah</string>
     <string name="structure_align_right">Ratakan kanan</string>
     <string name="structure_align_top">Ratakan atas</string>
     <string name="structure_align_middle">Ratakan tengah</string>
@@ -1106,7 +1115,7 @@
     <string name="ai_saving_transparent">Menyimpan gambar transparan…</string>
     <string name="ai_loading_model">Memuat model penghapus latar belakang…</string>
     <string name="ai_no_foreground_mask">Tidak ada masker latar depan yang dikembalikan</string>
-    <string name="ai_mask_unexpected_size">Ukuran masker latar depan tidak sesuai</string>
+    <string name="ai_mask_unexpected_size">Penghapusan latar belakang menghasilkan ukuran yang salah. Coba lagi.</string>
     <string name="ai_cannot_save_image">Tidak dapat menyimpan gambar</string>
     <string name="ai_cannot_read_image">Tidak dapat membaca gambar ini</string>
     <string name="ai_cannot_decode_image">Tidak dapat mendekode gambar ini</string>
@@ -1117,13 +1126,13 @@
     <string name="ai_sample_rate_changed">Sample rate audio berubah saat mendekode</string>
     <string name="ai_recording_too_large">Rekaman ini terlalu besar untuk WAV</string>
     <string name="ai_no_samples_decoded">Tidak ada sampel audio yang didekode</string>
-    <string name="ai_mask_wrong_size">Ukuran masker tidak sesuai</string>
+    <string name="ai_mask_wrong_size">Penghapusan latar belakang menghasilkan ukuran yang salah. Coba lagi.</string>
     <string name="ai_encoder_no_image">Encoder video tidak memberikan gambar masukan</string>
     <string name="ai_encoder_not_responding">Encoder video berhenti merespons</string>
-    <string name="ai_encoder_frames_before_format">Encoder video mengirim frame sebelum formatnya</string>
+    <string name="ai_encoder_frames_before_format">Encoder video tidak mulai dengan benar. Coba lagi.</string>
     <string name="ai_encoder_not_finished">Encoder video tidak selesai</string>
     <string name="ai_cannot_encode_mask">Ponsel ini tidak dapat mengodekan video masker</string>
-    <string name="ai_video_no_size">Video ini tidak memiliki informasi ukuran</string>
+    <string name="ai_video_no_size">Video ini tidak memiliki informasi ukuran.</string>
     <string name="ai_clip_too_long">Klip lebih dari %1$s menit belum didukung. Pangkas atau pisahkan klip terlebih dahulu.</string>
     <string name="ai_not_enough_storage">Ruang penyimpanan tidak cukup: diperlukan sekitar %1$s MB.</string>
     <string name="ai_no_video_frames">Klip ini tidak memiliki frame video untuk diproses</string>
@@ -1280,7 +1289,7 @@
     <string name="export_audio_summary_lossless">%1$s · %2$s · %3$s</string>
     <string name="export_audio_hint">Pengaturan suara untuk file video. %1$s dapat menyimpan audio %2$s.</string>
     <string name="export_audio_hint_silent">Proyek ini belum memiliki suara. Pengaturan ini akan digunakan setelah Anda menambahkan suara.</string>
-    <string name="export_audio_only_hint">Disimpan ke Music / AbsentMotion. WAV dan FLAC menyimpan semua detail; M4A, OGG, dan MP3 lebih kecil.</string>
+    <string name="export_audio_only_hint">Disimpan ke Music/AbsentMotion. WAV dan FLAC menjaga semua detail; M4A, OGG, dan MP3 lebih kecil.</string>
     <string name="export_running_audio">Mengekspor audio</string>
     <string name="export_interpolation_off_help">Setiap klip menampilkan frame-nya sendiri. Klip 30 fps dalam ekspor 60 fps menampilkan setiap frame dua kali, jadi gerakan bisa terlihat sedikit terpatah-patah.</string>
     <string name="export_interpolation_blend_help">Frame peralihan baru mencampur dua frame terdekat seperti cross-fade cepat. Ekspor cepat; gerakan cepat bisa terlihat berbayang.</string>

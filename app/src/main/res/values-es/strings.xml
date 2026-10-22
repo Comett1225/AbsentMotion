@@ -35,7 +35,6 @@
     <string name="ok">Aceptar</string>
     <string name="easing_needs_at_least_two_keyframes">El suavizado necesita al menos dos fotogramas clave para funcionar.\n\nSi tus fotogramas clave están en otra propiedad, selecciona primero esa propiedad.</string>
     <string name="add_keyframes_first">Primero agrega fotogramas clave</string>
-    <string name="convert_to_group">Convertir en grupo</string>
     <string name="cancel">Cancelar</string>
     <string name="rebuild_source_project">Reconstruir proyecto de origen</string>
     <string name="this_asset_pointed_to_a_project">Este recurso apuntaba a un proyecto que se eliminó.\n\n¿Reconstruir un proyecto a partir de este recurso, o separarlo y editarlo directamente?</string>
@@ -89,7 +88,7 @@
     <string name="export_template_failed">No se pudo conservar una copia como plantilla. Libera espacio de almacenamiento.</string>
     <string name="also_keeps_the_project_with_its">También guarda el proyecto, con sus medios, en Plantillas de este teléfono. Ábrelo ahí para reemplazar sus medios y continuar con un nuevo proyecto.</string>
     <string name="template">Plantilla</string>
-    <string name="one_absproj_package_with_the_project">Un paquete .absproj con el proyecto y los medios originales que usa, guardado en Documentos / AbsentMotion. Consérvalo como copia de seguridad o pasa el proyecto a otro teléfono.</string>
+    <string name="one_absproj_package_with_the_project">Un paquete .absproj con el proyecto y los medios originales que utiliza, guardado en Documents/AbsentMotion. Consérvalo como copia de seguridad o traslada el proyecto a otro teléfono.</string>
     <string name="project_bundle">Paquete del proyecto</string>
     <string name="project_home_page">Página de inicio del proyecto</string>
     <string name="open_source_licences">Licencias de código abierto</string>
@@ -126,7 +125,7 @@
     <string name="delete_all">Eliminar todo</string>
     <string name="effects_not_loaded">No se pudieron cargar los efectos</string>
     <string name="settings_demo_mode">Modo demo</string>
-    <string name="settings_open_xml">Abrir proyectos XML</string>
+    <string name="settings_open_xml">Mostrar la tarjeta de importación en la lista de proyectos</string>
     <string name="settings_vibration">Vibración</string>
     <string name="settings_emoji">Estilo de emoji</string>
     <string name="settings_emoji_system">Sistema</string>
@@ -170,21 +169,21 @@
     <string name="library_err_package_project_missing">Paquete dañado: falta el archivo del proyecto</string>
     <string name="library_err_too_many_projects">El paquete contiene demasiados proyectos (más de %1$s)</string>
     <string name="library_err_project_files_large">Los archivos de proyecto del paquete son demasiado grandes</string>
-    <string name="library_err_no_project">Escena dañada: no hay ningún proyecto en el paquete</string>
+    <string name="library_err_no_project">Escena con formato incorrecto: no hay ningún proyecto en el paquete</string>
     <string name="library_err_malformed_package">Paquete dañado: %1$s</string>
     <string name="library_err_malformed_xml">XML dañado: %1$s</string>
-    <string name="library_err_scene_needs_size">Escena dañada: se esperaba un &lt;scene&gt; con un tamaño</string>
-    <string name="library_err_scene_too_big">Escena dañada: el tamaño supera los %1$s píxeles</string>
-    <string name="library_err_scene_fps">Escena dañada: la velocidad de fotogramas debe ser de 1 a %1$s</string>
+    <string name="library_err_scene_needs_size">Escena con formato incorrecto: el archivo necesita una escena con ancho y alto</string>
+    <string name="library_err_scene_too_big">Escena con formato incorrecto: el tamaño supera los %1$s píxeles</string>
+    <string name="library_err_scene_fps">Escena con formato incorrecto: la velocidad de fotogramas debe ser de 1 a %1$s</string>
     <string name="library_err_package_large">El paquete es demasiado grande (más de %1$s MB descomprimido)</string>
     <string name="library_err_too_many_files">El paquete tiene demasiados archivos (más de %1$s)</string>
-    <string name="library_err_xml_large">XML dañado: el archivo es demasiado grande</string>
+    <string name="library_err_xml_large">Este archivo es demasiado grande para abrirlo (más de 32 MB)</string>
     <string name="library_err_media_large">El paquete es demasiado grande (más de %1$s MB de medios)</string>
     <string name="library_err_not_backup">Este archivo no es una copia de seguridad de AbsentMotion.</string>
     <string name="library_err_backup_project_large">Un proyecto de la copia de seguridad es demasiado grande.</string>
     <string name="library_imported_project">Proyecto importado</string>
     <string name="library_damaged_project">Proyecto dañado</string>
-    <string name="library_report_unknown">No reconocido, se conservó en el archivo</string>
+    <string name="library_report_unknown">No reconocido, se conserva en el archivo</string>
     <string name="library_report_cannot_run">Efectos que esta versión no puede ejecutar</string>
     <string name="library_report_converted">Efectos convertidos a los propios de esta app</string>
     <string name="library_report_dropped">Ajustes de efectos que no se pudieron conservar</string>
@@ -208,6 +207,7 @@
     <string name="home_collect_already_kept">Todos los medios ya están guardados en el proyecto.</string>
     <plurals name="home_collect_could_not_read">
         <item quantity="one">Falta %1$s archivo o no se pudo leer.</item>
+        <item quantity="many">Faltan %1$s archivos o no se pudieron leer.</item>
         <item quantity="other">Faltan %1$s archivos o no se pudieron leer.</item>
     </plurals>
     <string name="home_collect_storage_full">El almacenamiento está lleno, así que no se copiaron algunos archivos.</string>
@@ -256,12 +256,19 @@
     <string name="backup_open_failed">No se pudo abrir este archivo.</string>
     <string name="backup_restored">Restaurado: %1$s.</string>
     <plurals name="backup_restored_copies">
-        <item quantity="one">%1$s proyecto se agregó como copia separada porque ya había otra versión aquí.</item>
-        <item quantity="other">%1$s proyectos se agregaron como copias separadas porque ya había otra versión aquí.</item>
+        <item quantity="one">Se agregó %1$s proyecto como copia aparte porque ya había una versión diferente.</item>
+        <item quantity="many">Se agregaron %1$s proyectos como copias aparte porque ya había una versión diferente.</item>
+        <item quantity="other">Se agregaron %1$s proyectos como copias aparte porque ya había una versión diferente.</item>
     </plurals>
     <plurals name="backup_restored_skipped">
-        <item quantity="one">%1$s proyecto ya estaba aquí y se mantuvo tal cual.</item>
-        <item quantity="other">%1$s proyectos ya estaban aquí y se mantuvieron tal cual.</item>
+        <item quantity="one">Ya había %1$s proyecto y se dejó como estaba.</item>
+        <item quantity="many">Ya había %1$s proyectos y se dejaron como estaban.</item>
+        <item quantity="other">Ya había %1$s proyectos y se dejaron como estaban.</item>
+    </plurals>
+    <plurals name="backup_restored_rejected">
+        <item quantity="one">No se restauró %1$s proyecto porque su tamaño o velocidad de fotogramas no es válido.</item>
+        <item quantity="many">No se restauraron %1$s proyectos porque su tamaño o velocidad de fotogramas no son válidos.</item>
+        <item quantity="other">No se restauraron %1$s proyectos porque su tamaño o velocidad de fotogramas no son válidos.</item>
     </plurals>
     <string name="about_version">Versión %1$s</string>
     <string name="about_licence_line">Gratis y de código abierto, con licencia Apache License 2.0.</string>
@@ -343,18 +350,22 @@
     <string name="newproject_link">Enlace</string>
     <plurals name="backup_projects">
         <item quantity="one">%1$s proyecto</item>
+        <item quantity="many">%1$s proyectos</item>
         <item quantity="other">%1$s proyectos</item>
     </plurals>
     <plurals name="home_collect_copied">
         <item quantity="one">Se copió %1$s archivo al proyecto.</item>
+        <item quantity="many">Se copiaron %1$s archivos al proyecto.</item>
         <item quantity="other">Se copiaron %1$s archivos al proyecto.</item>
     </plurals>
     <plurals name="library_report_effect_layers">
         <item quantity="one">%1$s (%2$s capa)</item>
+        <item quantity="many">%1$s (%2$s capas)</item>
         <item quantity="other">%1$s (%2$s capas)</item>
     </plurals>
     <plurals name="library_report_converted_effects">
         <item quantity="one">%1$s (%2$s efecto)</item>
+        <item quantity="many">%1$s (%2$s efectos)</item>
         <item quantity="other">%1$s (%2$s efectos)</item>
     </plurals>
     <string name="export_title">Exportar proyecto</string>
@@ -363,7 +374,7 @@
     <string name="export_anyway">Exportar de todos modos</string>
     <string name="export_available_space">Espacio disponible</string>
     <string name="export_estimated_size">Tamaño estimado del archivo</string>
-    <string name="export_calculating">Calculando...</string>
+    <string name="export_calculating">Calculando…</string>
     <string name="export_kind_video">Video</string>
     <string name="export_kind_frame_png">Fotograma actual como PNG</string>
     <string name="export_kind_frame_as">Fotograma actual como…</string>
@@ -440,14 +451,20 @@
     <string name="export_thermal_hot">Tu teléfono está caliente. La exportación se ralentiza para que se enfríe.</string>
     <string name="export_thermal_critical">Tu teléfono está muy caliente. La exportación se pausa entre fotogramas hasta que se enfríe.</string>
     <string name="export_time_few_seconds">unos segundos</string>
-    <string name="export_time_hours">unas %1$s horas</string>
     <plurals name="export_time_seconds">
-        <item quantity="one">alrededor de %1$s segundo</item>
-        <item quantity="other">alrededor de %1$s segundos</item>
+        <item quantity="one">aproximadamente %1$s segundo</item>
+        <item quantity="many">aproximadamente %1$s segundos</item>
+        <item quantity="other">aproximadamente %1$s segundos</item>
     </plurals>
     <plurals name="export_time_minutes">
-        <item quantity="one">alrededor de %1$s minuto</item>
-        <item quantity="other">alrededor de %1$s minutos</item>
+        <item quantity="one">aproximadamente %1$s minuto</item>
+        <item quantity="many">aproximadamente %1$s minutos</item>
+        <item quantity="other">aproximadamente %1$s minutos</item>
+    </plurals>
+    <plurals name="export_time_hours_count">
+        <item quantity="one">aproximadamente %1$s hora</item>
+        <item quantity="many">aproximadamente %1$s horas</item>
+        <item quantity="other">aproximadamente %1$s horas</item>
     </plurals>
     <string name="export_verify_empty">El archivo no tiene audio ni video.</string>
     <string name="export_verify_no_video">El archivo no tiene pista de video.</string>
@@ -459,10 +476,11 @@
     <string name="export_verify_picture">La imagen del archivo no se decodifica.</string>
     <string name="export_verify_size">La imagen es %1$s en lugar de %2$s.</string>
     <string name="export_verify_frames">El GIF tiene %1$s fotogramas en lugar de %2$s.</string>
+    <string name="export_sound_unreadable">No se pudo leer el sonido de %1$s, por lo que queda en silencio en este archivo.</string>
     <string name="export_error_cannot_encode">Este teléfono no puede codificar %1$s en %2$s</string>
-    <string name="export_error_draw_frame">El motor no pudo dibujar el fotograma %1$s</string>
+    <string name="export_error_draw_frame">No se pudo dibujar el fotograma %1$s. Intenta exportar de nuevo.</string>
     <string name="export_error_draw_still">El motor no pudo dibujar el fotograma</string>
-    <string name="export_error_no_sound">Este proyecto no tiene sonido para exportar.</string>
+    <string name="export_error_no_sound">Este proyecto no tiene sonido para exportar. Agrega música, un sonido o un video con sonido primero.</string>
     <string name="export_error_create">No se puede crear %1$s en %2$s</string>
     <string name="export_error_write">No se puede escribir %1$s</string>
     <string name="export_error_mp3_settings">El codificador MP3 no puede usar %1$s Hz a %2$s kbps</string>
@@ -477,6 +495,8 @@
     <string name="camera_photo">FOTO</string>
     <string name="camera_video">VIDEO</string>
     <string name="camera_close">Cerrar cámara</string>
+    <string name="camera_take_photo">Tomar foto</string>
+    <string name="camera_start_recording">Iniciar grabación</string>
     <string name="camera_switch">Cambiar cámara</string>
     <string name="camera_pause_recording">Pausar grabación</string>
     <string name="camera_resume_recording">Reanudar grabación</string>
@@ -495,9 +515,9 @@
     <string name="media_error_video_unavailable">El video no está disponible: %1$s</string>
     <string name="media_error_decode_frame">No se puede decodificar el fotograma exacto %1$s del video</string>
     <string name="media_error_import_frame">No se puede importar el fotograma de video %1$s para %2$s</string>
-    <string name="media_error_interp_source">El fotograma de origen de interpolación %1$s no está disponible</string>
-    <string name="media_error_interp_wrong_frame">La interpolación recibió el fotograma de origen incorrecto para %1$s</string>
-    <string name="media_error_interp_import">No se puede importar el fotograma de origen de interpolación %1$s</string>
+    <string name="media_error_interp_source">Falta un fotograma de video necesario para la interpolación de fotogramas (%1$s). Inténtalo de nuevo o desactiva la interpolación de fotogramas.</string>
+    <string name="media_error_interp_wrong_frame">No se pudo leer correctamente un fotograma de video necesario para la interpolación de fotogramas (%1$s). Inténtalo de nuevo o desactiva la interpolación de fotogramas.</string>
+    <string name="media_error_interp_import">No se pudo cargar un fotograma de video necesario para la interpolación de fotogramas (%1$s). Inténtalo de nuevo o desactiva la interpolación de fotogramas.</string>
     <string name="media_error_interp_render">%1$s no pudo renderizar el fotograma de video solicitado</string>
     <string name="engine_loading_effects">Cargando efectos…</string>
     <string name="engine_error_gpu_capture">La GPU falló durante la captura</string>
@@ -592,8 +612,9 @@
     <string name="menu_no_new_beats">No se encontraron pulsos nuevos</string>
     <string name="menu_beats_not_found">No se pudieron encontrar los pulsos</string>
     <plurals name="menu_beats_marked">
-        <item quantity="one">%1$s pulso marcado</item>
-        <item quantity="other">%1$s pulsos marcados</item>
+        <item quantity="one">Se marcó %1$s pulso</item>
+        <item quantity="many">Se marcaron %1$s pulsos</item>
+        <item quantity="other">Se marcaron %1$s pulsos</item>
     </plurals>
     <string name="menu_reset_location">Restablecer posición</string>
     <string name="menu_reset_rotation">Restablecer rotación</string>
@@ -603,16 +624,19 @@
     <string name="menu_select_all_layers">Seleccionar todas las capas</string>
     <plurals name="menu_duplicate_layers">
         <item quantity="one">Duplicar capa</item>
+        <item quantity="many">Duplicar %1$s capas</item>
         <item quantity="other">Duplicar %1$s capas</item>
     </plurals>
     <string name="menu_save_preset">Guardar preajuste</string>
     <plurals name="menu_copy_layers">
         <item quantity="one">Copiar capa</item>
+        <item quantity="many">Copiar %1$s capas</item>
         <item quantity="other">Copiar %1$s capas</item>
     </plurals>
     <string name="menu_with_its_style">(con su estilo)</string>
     <plurals name="menu_paste_layers">
         <item quantity="one">Pegar capa</item>
+        <item quantity="many">Pegar %1$s capas</item>
         <item quantity="other">Pegar %1$s capas</item>
     </plurals>
     <string name="menu_paste_style">Pegar estilo</string>
@@ -644,6 +668,8 @@
     <string name="font_search">Buscar</string>
     <string name="font_imported">Importada</string>
     <string name="font_downloads_when_chosen">Se descarga al elegirla</string>
+    <string name="fonts_missing_title">Fuentes no disponibles en este teléfono</string>
+    <string name="fonts_missing_body">Este proyecto usa fuentes que no están en este teléfono: %1$s. El texto se muestra con otra fuente hasta que las descargues de Google Fonts.</string>
     <string name="font_favorite">Favorita</string>
     <string name="font_category_sans_serif">Sans serif</string>
     <string name="font_category_serif">Serif</string>
@@ -760,8 +786,9 @@
     <string name="structure_svg_unreadable">No se pudo leer este archivo SVG.</string>
     <string name="structure_svg_empty">Este archivo SVG no tiene formas que se puedan importar.</string>
     <plurals name="structure_svg_imported">
-        <item quantity="one">Se importó %1$s forma. Sin importar: %2$s.</item>
-        <item quantity="other">Se importaron %1$s formas. Sin importar: %2$s.</item>
+        <item quantity="one">Se importó %1$s forma. Se omitió: %2$s.</item>
+        <item quantity="many">Se importaron %1$s formas. Se omitió: %2$s.</item>
+        <item quantity="other">Se importaron %1$s formas. Se omitió: %2$s.</item>
     </plurals>
     <string name="structure_extend_ends">Extender finales del clip al cabezal</string>
     <string name="structure_extend_starts">Extender inicios del clip al cabezal</string>
@@ -773,6 +800,7 @@
     <string name="structure_cancel_selection">Cancelar selección</string>
     <plurals name="structure_layers_selected">
         <item quantity="one">%1$s capa seleccionada</item>
+        <item quantity="many">%1$s capas seleccionadas</item>
         <item quantity="other">%1$s capas seleccionadas</item>
     </plurals>
     <string name="structure_group">Agrupar</string>
@@ -900,16 +928,19 @@
     <string name="effects_copy_confirm">Copiar</string>
     <plurals name="effects_count">
         <item quantity="one">%1$s efecto</item>
+        <item quantity="many">%1$s efectos</item>
         <item quantity="other">%1$s efectos</item>
     </plurals>
     <plurals name="clips_count">
         <item quantity="one">%1$s clip</item>
+        <item quantity="many">%1$s clips</item>
         <item quantity="other">%1$s clips</item>
     </plurals>
     <string name="effects_pasted_onto">%1$s pegados en %2$s</string>
     <plurals name="effects_paste_skipped">
-        <item quantity="one">%1$s clip omitido: el audio, las cámaras y los objetos nulos no admiten efectos visuales</item>
-        <item quantity="other">%1$s clips omitidos: el audio, las cámaras y los objetos nulos no admiten efectos visuales</item>
+        <item quantity="one">Se omitió %1$s clip: el audio, las cámaras y los objetos nulos no admiten efectos visuales</item>
+        <item quantity="many">Se omitieron %1$s clips: el audio, las cámaras y los objetos nulos no admiten efectos visuales</item>
+        <item quantity="other">Se omitieron %1$s clips: el audio, las cámaras y los objetos nulos no admiten efectos visuales</item>
     </plurals>
     <string name="effects_paste_no_target">El audio, las cámaras y los objetos nulos no admiten efectos visuales</string>
     <string name="effects_paste_effect">Pegar efecto</string>
@@ -944,15 +975,18 @@
     <string name="effectbrowser_recent_empty">Los efectos que uses aparecen aquí</string>
     <plurals name="aibrowser_too_long">
         <item quantity="one">Aún no se admiten clips de más de %1$s minuto. Recorta o divide el clip primero.</item>
+        <item quantity="many">Aún no se admiten clips de más de %1$s minutos. Recorta o divide el clip primero.</item>
         <item quantity="other">Aún no se admiten clips de más de %1$s minutos. Recorta o divide el clip primero.</item>
     </plurals>
     <plurals name="aibrowser_estimate">
-        <item quantity="one">%1$s fotograma a %2$s × %3$s, aproximadamente %4$s MB.</item>
-        <item quantity="other">%1$s fotogramas a %2$s × %3$s, aproximadamente %4$s MB.</item>
+        <item quantity="one">%1$s fotograma a %2$s × %3$s, unos %4$s MB.</item>
+        <item quantity="many">%1$s fotogramas a %2$s × %3$s, unos %4$s MB.</item>
+        <item quantity="other">%1$s fotogramas a %2$s × %3$s, unos %4$s MB.</item>
     </plurals>
     <plurals name="aibrowser_estimate_long">
-        <item quantity="one">%1$s fotograma a %2$s × %3$s, aproximadamente %4$s MB. Clip largo: puede tardar varios minutos y consumir mucha batería.</item>
-        <item quantity="other">%1$s fotogramas a %2$s × %3$s, aproximadamente %4$s MB. Clip largo: puede tardar varios minutos y consumir mucha batería.</item>
+        <item quantity="one">%1$s fotograma a %2$s × %3$s, unos %4$s MB. Clip largo: esto puede tardar varios minutos y consumir mucha batería.</item>
+        <item quantity="many">%1$s fotogramas a %2$s × %3$s, unos %4$s MB. Clip largo: esto puede tardar varios minutos y consumir mucha batería.</item>
+        <item quantity="other">%1$s fotogramas a %2$s × %3$s, unos %4$s MB. Clip largo: esto puede tardar varios minutos y consumir mucha batería.</item>
     </plurals>
     <string name="shape_param_size">Tamaño</string>
     <string name="shape_param_radius">Radio</string>
@@ -1127,7 +1161,7 @@
     <string name="ai_saving_transparent">Guardando la imagen transparente…</string>
     <string name="ai_loading_model">Cargando el modelo para quitar el fondo…</string>
     <string name="ai_no_foreground_mask">No se devolvió ninguna máscara de primer plano</string>
-    <string name="ai_mask_unexpected_size">La máscara de primer plano tiene un tamaño inesperado</string>
+    <string name="ai_mask_unexpected_size">La eliminación del fondo dio un resultado con un tamaño incorrecto. Inténtalo de nuevo.</string>
     <string name="ai_cannot_save_image">No se puede guardar la imagen</string>
     <string name="ai_cannot_read_image">No se puede leer esta imagen</string>
     <string name="ai_cannot_decode_image">No se puede decodificar esta imagen</string>
@@ -1138,13 +1172,13 @@
     <string name="ai_sample_rate_changed">La frecuencia de muestreo del audio cambió durante la decodificación</string>
     <string name="ai_recording_too_large">Esta grabación es demasiado grande para WAV</string>
     <string name="ai_no_samples_decoded">No se decodificó ninguna muestra de audio</string>
-    <string name="ai_mask_wrong_size">La máscara tiene un tamaño inesperado</string>
+    <string name="ai_mask_wrong_size">La eliminación del fondo dio un resultado con un tamaño incorrecto. Inténtalo de nuevo.</string>
     <string name="ai_encoder_no_image">El codificador de video no proporcionó ninguna imagen de entrada</string>
     <string name="ai_encoder_not_responding">El codificador de video dejó de responder</string>
-    <string name="ai_encoder_frames_before_format">El codificador de video envió fotogramas antes de definir su formato</string>
+    <string name="ai_encoder_frames_before_format">El codificador de video no se inició correctamente. Inténtalo de nuevo.</string>
     <string name="ai_encoder_not_finished">El codificador de video no terminó</string>
     <string name="ai_cannot_encode_mask">Este teléfono no puede codificar el video de la máscara</string>
-    <string name="ai_video_no_size">Este video no tiene información de tamaño</string>
+    <string name="ai_video_no_size">Este video no tiene información de tamaño.</string>
     <string name="ai_clip_too_long">Aún no se admiten clips de más de %1$s minutos. Recorta o divide el clip primero.</string>
     <string name="ai_not_enough_storage">No hay suficiente espacio libre: se necesitan unos %1$s MB.</string>
     <string name="ai_no_video_frames">Este clip no tiene fotogramas de video para procesar</string>
@@ -1261,7 +1295,7 @@
     <string name="track_motion_lost_at_frame">Se perdió el seguimiento en el fotograma %1$s. Vuelve a poner el punto sobre la misma referencia y toca Continuar.</string>
     <string name="track_motion_done">Se hizo seguimiento de %1$s fotogramas. Los fotogramas clave están en %2$s.</string>
     <string name="track_motion_target_layer">la capa de destino</string>
-    <string name="track_motion_cancelled">Se canceló el seguimiento. Los fotogramas ya seguidos conservan sus fotogramas clave.</string>
+    <string name="track_motion_cancelled">Se canceló el seguimiento. Los fotogramas ya rastreados conservan sus fotogramas clave.</string>
     <string name="track_motion_unavailable">El seguimiento de movimiento no está disponible en esta versión.</string>
     <string name="track_motion_failed">No se pudo hacer seguimiento en este video.</string>
     <string name="edit_layer_copy_name">Copia de %1$s</string>
@@ -1301,7 +1335,7 @@
     <string name="export_audio_summary_lossless">%1$s · %2$s · %3$s</string>
     <string name="export_audio_hint">Ajustes de sonido para el archivo de video. %1$s puede contener audio %2$s.</string>
     <string name="export_audio_hint_silent">Este proyecto aún no tiene sonido. Estos ajustes se usarán cuando agregues sonido.</string>
-    <string name="export_audio_only_hint">Se guarda en Música / AbsentMotion. WAV y FLAC conservan todos los detalles; M4A, OGG y MP3 son más pequeños.</string>
+    <string name="export_audio_only_hint">Se guarda en Music/AbsentMotion. WAV y FLAC conservan todos los detalles; M4A, OGG y MP3 son más pequeños.</string>
     <string name="export_running_audio">Exportando audio</string>
     <string name="export_interpolation_off_help">Cada clip muestra sus propios fotogramas. Un clip de 30 fps en una exportación de 60 fps muestra cada fotograma dos veces, así que el movimiento puede verse un poco a saltos.</string>
     <string name="export_interpolation_blend_help">Los nuevos fotogramas intermedios mezclan los dos fotogramas más cercanos como un fundido rápido. La exportación es rápida; el movimiento rápido puede verse con efecto fantasma.</string>

@@ -243,7 +243,7 @@
    }
   },
   "bumpmap": {
-   "description": "Menerangi lapisan seolah kecerahannya adalah permukaan timbul, memberi kesan emboss bertekstur dengan warna tetap.",
+   "description": "Menyinari lapisan seolah kecerahannya adalah permukaan timbul, untuk tampilan emboss bertekstur yang tetap mempertahankan warna.",
    "name": "Peta Bump",
    "params": {
     "ambient": {
@@ -264,7 +264,7 @@
    }
   },
   "channelremap": {
-   "description": "Menyusun ulang tiap kanal warna dari kanal lain pada lapisan, untuk warna semu atau memindahkan luminansi ke alfa.",
+   "description": "Menyusun ulang setiap kanal warna dari kanal lain pada lapisan, untuk warna semu atau memindahkan luminansi ke alfa.",
    "name": "Pemetaan Ulang Kanal (RGB)",
    "params": {
     "a": {
@@ -399,7 +399,7 @@
    }
   },
   "chromakey": {
-   "description": "Menghapus satu warna, seperti green screen.",
+   "description": "Menghapus satu warna, seperti layar hijau.",
    "name": "Chroma Key",
    "params": {
     "key": {
@@ -492,7 +492,7 @@
    }
   },
   "colorbalance": {
-   "description": "Menggeser bayangan, midtone, dan highlight ke warnanya masing-masing (abu-abu tidak mengubah rentang).",
+   "description": "Menggeser bayangan, nada tengah, dan sorotan ke warnanya masing-masing (abu-abu membiarkan rentang tidak berubah).",
    "name": "Keseimbangan Warna",
    "params": {
     "amount": {
@@ -522,7 +522,7 @@
    }
   },
   "colorwheels": {
-   "description": "Roda warna untuk bayangan (lift), midtone (gamma), dan highlight (gain): hue, seberapa jauh mendorongnya, dan level.",
+   "description": "Roda warna untuk bayangan (lift), nada tengah (gamma), dan sorotan (gain): hue, seberapa jauh digeser, dan level.",
    "name": "Lift Gamma Gain",
    "params": {
     "gainAmount": {
@@ -555,7 +555,7 @@
    }
   },
   "contourgradient": {
-   "description": "Melukis gradien dua warna ke arah luar dari tepi bagian opak lapisan, seperti halo berwarna lembut.",
+   "description": "Melukis gradien dua warna ke luar dari tepi bagian opak lapisan, seperti halo berwarna yang lembut.",
    "name": "Gradien kontur",
    "params": {
     "alpha": {
@@ -889,7 +889,7 @@
    }
   },
   "denoise": {
-   "description": "Menghilangkan noise gambar dengan filter bilateral yang mempertahankan tepi, hanya merata-ratakan piksel sekitar yang warnanya mirip.",
+   "description": "Menghilangkan noise gambar dengan filter bilateral yang mempertahankan tepi dan hanya merata-ratakan piksel di sekitarnya jika warnanya mirip.",
    "name": "Penghilang Noise",
    "params": {
     "detail": {
@@ -916,7 +916,7 @@
    }
   },
   "displacementmap": {
-   "description": "Memakai warna lapisan untuk mendorong lapisan di belakangnya, lalu menyembunyikan dirinya; atau, dengan Map diatur ke Lapisan di bawah, mendorong lapisan ini oleh lapisan di bawahnya.",
+   "description": "Memakai warna lapisan untuk menggeser lapisan di belakangnya, lalu menyembunyikan dirinya; atau, dengan Peta disetel ke Lapisan di Bawah, menggeser lapisan ini oleh lapisan di bawahnya.",
    "name": "Peta pergeseran",
    "params": {
     "edges": {
@@ -1363,7 +1363,7 @@
    }
   },
   "flip": {
-   "description": "Membalik lapisan seperti kartu dalam 3D, dengan bagian belakang tembus pandang, gambar, atau warna.",
+   "description": "Membalik lapisan seperti kartu dalam 3D, dengan bagian belakang transparan, gambar, atau warna.",
    "name": "Balik Lapisan",
    "params": {
     "back": {
@@ -1407,7 +1407,7 @@
    }
   },
   "fourcolor": {
-   "description": "Memadukan empat warna di empat titik (piksel dari pusat lapisan) ke seluruh lapisan.",
+   "description": "Memadukan empat warna yang ditempatkan di empat titik (dalam piksel dari pusat lapisan) di atas lapisan.",
    "name": "Gradien empat warna",
    "params": {
     "blend": {
@@ -1520,7 +1520,7 @@
    }
   },
   "glass": {
-   "description": "Mengubah bentuk lapisan menjadi kaca berbevel yang membiaskan lapisan di belakangnya, dengan sorotan di sepanjang tepi.",
+   "description": "Mengubah bentuk lapisan menjadi kaca berbevel yang membiaskan lapisan di belakangnya, dengan kilau di sepanjang tepinya.",
    "name": "Kaca",
    "params": {
     "angle": {
@@ -1544,7 +1544,7 @@
    }
   },
   "glitch": {
-   "description": "Pergeseran blok horizontal acak dan offset kanal warna, berubah beberapa kali per detik.",
+   "description": "Pergeseran blok horizontal dan offset kanal warna secara acak, berubah beberapa kali per detik.",
    "name": "Glitch",
    "params": {
     "blockHeight": {
@@ -1559,7 +1559,7 @@
    }
   },
   "glow": {
-   "description": "Pendar satu warna di sekeliling luar bentuk lapisan. Kekerasan mengubahnya dari pudar lembut menjadi garis tepi padat.",
+   "description": "Halo satu warna di sekeliling luar bentuk lapisan. Kekerasan mengubahnya dari pudar lembut menjadi garis tepi padat.",
    "name": "Glow",
    "params": {
     "alpha": {
@@ -1612,7 +1612,7 @@
    }
   },
   "gradientmap": {
-   "description": "Mewarnai ulang gambar berdasarkan kecerahan melalui tiga warna, dengan pengulangan dan fase. Skala kecerahan mengalikan hasil dengan kecerahan gambar itu sendiri.",
+   "description": "Mewarnai ulang gambar berdasarkan kecerahan melalui tiga warna, dengan pengulangan dan fase. Skala Kecerahan mengalikan hasilnya dengan kecerahan gambar itu sendiri.",
    "name": "Peta gradien",
    "params": {
     "color1": {
@@ -1642,7 +1642,7 @@
    }
   },
   "gradientoverlay": {
-   "description": "Menimpa lapisan dengan gradien dua warna, dengan pilihan bentuk dan mode blending.",
+   "description": "Menimpa lapisan dengan gradien dua warna dengan pilihan bentuk dan mode blending.",
    "name": "Overlay gradien",
    "params": {
     "angle": {
@@ -1783,7 +1783,7 @@
      "label": "Ukuran"
     },
     "colored": {
-     "label": "Titik warna"
+     "label": "Titik Warna"
     }
    }
   },
@@ -2019,7 +2019,7 @@
    }
   },
   "huesaturation": {
-   "description": "Memutar warna pada roda warna dan membuatnya lebih kuat atau lemah; vibrance paling memperkuat warna yang kusam.",
+   "description": "Memutar warna di roda warna dan membuatnya lebih kuat atau lemah; vibrance paling menguatkan warna yang kusam.",
    "name": "Hue & saturasi",
    "params": {
     "hue": {
@@ -2138,7 +2138,7 @@
    }
   },
   "lensblur": {
-   "description": "Blur berputar yang menyisakan area tajam di sekitar pusat dan makin besar ke arah tepi.",
+   "description": "Blur berputar yang menyisakan area tajam di sekitar pusat dan makin kuat ke arah tepi.",
    "name": "Blur Lensa",
    "params": {
     "center": {
@@ -2195,7 +2195,7 @@
    }
   },
   "lightglow": {
-   "description": "Menambahkan pendar berwarna di sekitar bagian gambar yang lebih terang dari ambang.",
+   "description": "Menambahkan cahaya berwarna di sekitar bagian gambar yang lebih terang dari ambang batas.",
    "name": "Pendar cahaya",
    "params": {
     "blur": {
@@ -2362,7 +2362,7 @@
    }
   },
   "magnifybackground": {
-   "description": "Membuat lapisan menjadi kaca pembesar: bentuknya menampilkan lapisan di belakangnya yang diperbesar di sekitar pusatnya.",
+   "description": "Menjadikan lapisan sebagai kaca pembesar: bentuknya menampilkan lapisan di belakangnya yang diperbesar di sekitar pusatnya.",
    "name": "Perbesar Latar Belakang",
    "params": {
     "magnify": {
@@ -2753,7 +2753,7 @@
    }
   },
   "pixelate": {
-   "description": "Mengubah lapisan menjadi blok-blok berwarna tunggal yang diambil dari tengah blok, pada grid yang berpusat di lapisan (atau di frame dengan Ruang layar). Regangan, Offset, dan Sudut membentuk grid dan Vignette menggelapkan setiap blok ke arah tepinya.",
+   "description": "Mengubah lapisan menjadi blok-blok satu warna yang diambil dari tengah blok, pada grid yang berpusat di lapisan (atau di frame dengan Ruang Layar); Regangan, Offset, dan Sudut membentuk grid, sedangkan Vignette menggelapkan tiap blok ke arah tepinya.",
    "name": "Pikselasi",
    "params": {
     "angle": {
@@ -2777,7 +2777,7 @@
    }
   },
   "polar": {
-   "description": "Membengkokkan lapisan di sekitar pusatnya, mengubah garis lurus jadi lingkaran atau membuka lingkaran jadi garis lurus.",
+   "description": "Membengkokkan lapisan di sekitar pusatnya, mengubah garis lurus menjadi lingkaran, atau membuka lingkaran menjadi garis lurus.",
    "name": "Koordinat polar",
    "params": {
     "amount": {
@@ -2793,7 +2793,7 @@
    }
   },
   "polardisplacement": {
-   "description": "Memutar dan menarik lapisan di belakang lapisan ini mengelilingi titik pusat sesuai warna lapisan, lalu menyembunyikan lapisan.",
+   "description": "Memutar dan menarik lapisan di belakang lapisan ini di sekitar titik pusat sesuai warna lapisan, lalu menyembunyikan lapisan.",
    "name": "Peta Perpindahan Polar",
    "params": {
     "angle": {
@@ -2843,7 +2843,7 @@
    }
   },
   "posterize": {
-   "description": "Memotong setiap kanal warna menjadi sejumlah Langkah datar, sehingga gradien halus berubah menjadi pita. Offset menggeser posisi tepi pita.",
+   "description": "Memecah tiap saluran warna menjadi sejumlah Langkah datar sehingga gradien halus berubah menjadi pita; Offset menggeser posisi tepi pita.",
    "name": "Posterisasi",
    "params": {
     "levels": {
@@ -3138,7 +3138,7 @@
    }
   },
   "rasterextrude": {
-   "description": "Mendorong gambar lapisan menjadi blok padat; sisi-sisinya mengambil warna interior.",
+   "description": "Mendorong gambar lapisan menjadi blok padat; sisinya mengambil warna bagian dalam.",
    "name": "Ekstrusi Raster",
    "params": {
     "depth": {
@@ -3177,7 +3177,7 @@
    }
   },
   "rays": {
-   "description": "Memancarkan sinar cahaya dari bagian terang lapisan, menjauh dari titik pusat.",
+   "description": "Memancarkan sinar cahaya dari bagian terang lapisan, menjauhi titik pusat.",
    "name": "Sinar",
    "params": {
     "center": {
@@ -3327,7 +3327,7 @@
    }
   },
   "rgbsplit": {
-   "description": "Memisahkan kanal merah, hijau, dan biru: kanal Pusat tetap di tempat dan dua lainnya bergeser ke arah berlawanan sepanjang Sudut. Terang menambahkan warna yang bergeser, Gelap membuatnya solid, Masker hanya menyisakan area yang ketiganya tumpang tindih, dan Luma membuat pinggiran memiliki opasitas sesuai kecerahannya.",
+   "description": "Memisahkan saluran merah, hijau, dan biru: saluran Tengah tetap di tempatnya dan dua lainnya bergeser ke arah berlawanan sepanjang Sudut; Terang menambahkan warna yang bergeser, Gelap membuatnya solid, Masker hanya menyisakan area yang ketiganya bertumpuk, dan Luma membuat pinggiran seopak sesuai kecerahannya.",
    "name": "Pemisahan RGB",
    "params": {
     "angle": {
@@ -3395,7 +3395,7 @@
    }
   },
   "ripple": {
-   "description": "Riak konsentris memancar dari titik pusat dengan amplitudo, panjang gelombang, dan kecepatan yang bisa diatur.",
+   "description": "Riak konsentris memancar dari titik pusat dengan amplitudo, panjang gelombang, dan kecepatan yang dapat diatur.",
    "name": "Riak",
    "params": {
     "amplitude": {
@@ -3548,7 +3548,7 @@
    }
   },
   "sharpen": {
-   "description": "Menerapkan unsharp mask dengan area 3x3 untuk menajamkan detail halus.",
+   "description": "Menerapkan unsharp mask dengan area 3x3 untuk mempertegas detail halus.",
    "name": "Pertajam",
    "params": {
     "amount": {
@@ -3632,7 +3632,7 @@
    }
   },
   "solid": {
-   "description": "Melapisi lapisan dengan satu warna tanpa mengubah bentuknya, dengan pilihan mode blending.",
+   "description": "Menimpa lapisan dengan satu warna tanpa mengubah bentuknya, dengan pilihan mode blending.",
    "name": "Warna solid",
    "params": {
     "amount": {
@@ -3800,7 +3800,7 @@
    }
   },
   "spotcolor": {
-   "description": "Mempertahankan satu warna dan menghilangkan saturasi dari semua warna lain di lapisan.",
+   "description": "Mempertahankan satu warna dan menghilangkan saturasi dari warna lain di lapisan.",
    "name": "Warna Spot",
    "params": {
     "choke": {
@@ -3983,7 +3983,7 @@
    }
   },
   "static": {
-   "description": "Noise abu-abu berkedip, seperti televisi tanpa sinyal.",
+   "description": "Noise abu-abu berkelip, seperti televisi tanpa sinyal.",
    "name": "Statis",
    "params": {
     "amount": {
@@ -4225,7 +4225,7 @@
    }
   },
   "texttransform": {
-   "description": "Menggeser, menskalakan, memutar, memudarkan, dan mewarnai huruf, kata, atau baris dalam rentang. Jangkar menentukan apakah skala dan rotasi memakai tiap komponen atau pusat lapisan. Geser rentang dengan Offset agar perubahan menjalar melalui teks.",
+   "description": "Menggerakkan, menskalakan, memutar, memudarkan, dan mewarnai huruf, kata, atau baris dalam rentang; Anchor menentukan apakah penskalaan dan rotasi memakai tiap komponen atau pusat lapisan; geser rentang dengan Offset agar perubahan menjalar melalui teks.",
    "name": "Transformasi teks",
    "params": {
     "anchor": {
@@ -4459,17 +4459,17 @@
    }
   },
   "tint": {
-   "description": "Memetakan luminansi gambar antara warna bayangan dan warna sorotan dengan jumlah campuran.",
+   "description": "Memetakan luminansi gambar di antara warna bayangan dan warna sorotan dengan besaran blending.",
    "name": "Pewarnaan",
    "params": {
     "amount": {
      "label": "Jumlah"
     },
     "highlightColor": {
-     "label": "Warna sorotan"
+     "label": "Warna Sorotan"
     },
     "shadowColor": {
-     "label": "Warna bayangan"
+     "label": "Warna Bayangan"
     }
    }
   },
@@ -4687,7 +4687,7 @@
    }
   },
   "vhs": {
-   "description": "Terlihat seperti pita video lama: rembesan warna, garis kabur, scanline, noise pita, dan pita pelacakan bergulir.",
+   "description": "Terlihat seperti pita video lama: warna meleber, garis kabur, scanline, noise pita, dan pita tracking yang bergulir.",
    "name": "VHS",
    "params": {
     "chroma": {

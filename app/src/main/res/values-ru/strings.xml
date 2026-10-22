@@ -35,7 +35,6 @@
     <string name="ok">ОК</string>
     <string name="easing_needs_at_least_two_keyframes">Для сглаживания нужно как минимум два ключевых кадра.\n\nЕсли ключевые кадры относятся к другому свойству, сначала выберите это свойство.</string>
     <string name="add_keyframes_first">Сначала добавьте ключевые кадры</string>
-    <string name="convert_to_group">Преобразовать в группу</string>
     <string name="cancel">Отмена</string>
     <string name="rebuild_source_project">Пересобрать исходный проект</string>
     <string name="this_asset_pointed_to_a_project">Этот ресурс ссылался на проект, который был удалён.\n\nПересобрать проект из этого ресурса или отсоединить его и редактировать напрямую?</string>
@@ -89,10 +88,10 @@
     <string name="export_template_failed">Не удалось сохранить копию как шаблон. Освободите место в хранилище.</string>
     <string name="also_keeps_the_project_with_its">Также сохраняет проект вместе с медиа в «Шаблонах» на этом телефоне. Откройте его там, чтобы заменить медиа и продолжить в новом проекте.</string>
     <string name="template">Шаблон</string>
-    <string name="one_absproj_package_with_the_project">Один пакет .absproj с проектом и исходными медиа, сохранённый в Documents / AbsentMotion. Храните его как резервную копию или перенесите проект на другой телефон.</string>
+    <string name="one_absproj_package_with_the_project">Один пакет .absproj с проектом и используемыми исходными медиа, сохранённый в Documents/AbsentMotion. Храните его как резервную копию или перенесите проект на другой телефон.</string>
     <string name="project_bundle">Пакет проекта</string>
     <string name="project_home_page">Главная страница проекта</string>
-    <string name="open_source_licences">Лицензии открытого кода</string>
+    <string name="open_source_licences">Лицензии открытого исходного кода</string>
     <string name="stop">Остановить</string>
     <string name="damaged_restore_a_version">Повреждён — восстановите версию</string>
     <string name="damaged_explain_versions">Файл проекта повреждён, поэтому его нельзя открыть. Восстановите одну из предыдущих версий ниже или удалите проект.</string>
@@ -126,7 +125,7 @@
     <string name="delete_all">Удалить все</string>
     <string name="effects_not_loaded">Не удалось загрузить эффекты</string>
     <string name="settings_demo_mode">Демо-режим</string>
-    <string name="settings_open_xml">Открывать XML-проекты</string>
+    <string name="settings_open_xml">Показывать карточку импорта в списке проектов</string>
     <string name="settings_vibration">Вибрация</string>
     <string name="settings_emoji">Стиль эмодзи</string>
     <string name="settings_emoji_system">Системные</string>
@@ -170,15 +169,15 @@
     <string name="library_err_package_project_missing">Повреждённый пакет: отсутствует файл проекта</string>
     <string name="library_err_too_many_projects">В пакете слишком много проектов (больше %1$s)</string>
     <string name="library_err_project_files_large">Файлы проектов в пакете слишком большие</string>
-    <string name="library_err_no_project">Повреждённая сцена: в пакете нет проекта</string>
+    <string name="library_err_no_project">Некорректная сцена: в пакете нет проекта</string>
     <string name="library_err_malformed_package">Повреждённый пакет: %1$s</string>
     <string name="library_err_malformed_xml">Повреждённый XML: %1$s</string>
-    <string name="library_err_scene_needs_size">Повреждённая сцена: ожидался &lt;scene&gt; с размером</string>
-    <string name="library_err_scene_too_big">Повреждённая сцена: размер больше %1$s пикселей</string>
-    <string name="library_err_scene_fps">Повреждённая сцена: частота кадров должна быть от 1 до %1$s</string>
+    <string name="library_err_scene_needs_size">Некорректная сцена: в файле должна быть сцена с шириной и высотой</string>
+    <string name="library_err_scene_too_big">Некорректная сцена: размер больше %1$s пикселей</string>
+    <string name="library_err_scene_fps">Некорректная сцена: частота кадров должна быть от 1 до %1$s</string>
     <string name="library_err_package_large">Пакет слишком большой (больше %1$s MB в распакованном виде)</string>
     <string name="library_err_too_many_files">В пакете слишком много файлов (больше %1$s)</string>
-    <string name="library_err_xml_large">Повреждённый XML: файл слишком большой</string>
+    <string name="library_err_xml_large">Файл слишком большой для открытия (больше 32 MB)</string>
     <string name="library_err_media_large">Пакет слишком большой (медиа больше %1$s MB)</string>
     <string name="library_err_not_backup">Этот файл не является резервной копией AbsentMotion.</string>
     <string name="library_err_backup_project_large">Один из проектов в резервной копии слишком большой.</string>
@@ -268,6 +267,12 @@
         <item quantity="few">%1$s проекта уже были здесь и оставлены как есть.</item>
         <item quantity="many">%1$s проектов уже были здесь и оставлены как есть.</item>
         <item quantity="other">%1$s проекта уже были здесь и оставлены как есть.</item>
+    </plurals>
+    <plurals name="backup_restored_rejected">
+        <item quantity="one">%1$s проект не восстановлен: недопустимый размер или частота кадров.</item>
+        <item quantity="few">%1$s проекта не восстановлены: недопустимый размер или частота кадров.</item>
+        <item quantity="many">%1$s проектов не восстановлены: недопустимый размер или частота кадров.</item>
+        <item quantity="other">%1$s проекта не восстановлены: недопустимый размер или частота кадров.</item>
     </plurals>
     <string name="about_version">Версия %1$s</string>
     <string name="about_licence_line">Бесплатно и с открытым исходным кодом, лицензия Apache License 2.0.</string>
@@ -377,7 +382,7 @@
     <string name="export_anyway">Всё равно экспортировать</string>
     <string name="export_available_space">Доступное место</string>
     <string name="export_estimated_size">Примерный размер файла</string>
-    <string name="export_calculating">Вычисление...</string>
+    <string name="export_calculating">Расчёт…</string>
     <string name="export_kind_video">Видео</string>
     <string name="export_kind_frame_png">Текущий кадр в PNG</string>
     <string name="export_kind_frame_as">Текущий кадр как…</string>
@@ -454,7 +459,6 @@
     <string name="export_thermal_hot">Телефон горячий. Экспорт замедляется, чтобы он остыл.</string>
     <string name="export_thermal_critical">Телефон очень горячий. Экспорт приостанавливается между кадрами, пока он не остынет.</string>
     <string name="export_time_few_seconds">несколько секунд</string>
-    <string name="export_time_hours">около %1$s ч</string>
     <plurals name="export_time_seconds">
         <item quantity="one">около %1$s секунды</item>
         <item quantity="few">около %1$s секунд</item>
@@ -467,6 +471,12 @@
         <item quantity="many">около %1$s минут</item>
         <item quantity="other">около %1$s минут</item>
     </plurals>
+    <plurals name="export_time_hours_count">
+        <item quantity="one">около %1$s часа</item>
+        <item quantity="few">около %1$s часов</item>
+        <item quantity="many">около %1$s часов</item>
+        <item quantity="other">около %1$s часа</item>
+    </plurals>
     <string name="export_verify_empty">В файле нет ни аудио, ни видео.</string>
     <string name="export_verify_no_video">В файле нет видеодорожки.</string>
     <string name="export_verify_no_audio">В файле нет звука, хотя в проекте есть аудио.</string>
@@ -477,10 +487,11 @@
     <string name="export_verify_picture">Изображение в файле не декодируется.</string>
     <string name="export_verify_size">Размер изображения — %1$s вместо %2$s.</string>
     <string name="export_verify_frames">В GIF %1$s кадров вместо %2$s.</string>
+    <string name="export_sound_unreadable">Звук %1$s не удалось прочитать, поэтому в этом файле он беззвучен.</string>
     <string name="export_error_cannot_encode">Этот телефон не может кодировать %1$s в %2$s</string>
-    <string name="export_error_draw_frame">Движок не смог отрисовать кадр %1$s</string>
+    <string name="export_error_draw_frame">Не удалось отрисовать кадр %1$s. Попробуйте экспортировать ещё раз.</string>
     <string name="export_error_draw_still">Движок не смог отрисовать кадр</string>
-    <string name="export_error_no_sound">В этом проекте нет звука для экспорта.</string>
+    <string name="export_error_no_sound">В этом проекте нет звука для экспорта. Сначала добавьте музыку, звук или видео со звуком.</string>
     <string name="export_error_create">Не удаётся создать %1$s в %2$s</string>
     <string name="export_error_write">Не удаётся записать %1$s</string>
     <string name="export_error_mp3_settings">Кодировщик MP3 не может использовать %1$s Hz при %2$s kbps</string>
@@ -495,6 +506,8 @@
     <string name="camera_photo">ФОТО</string>
     <string name="camera_video">ВИДЕО</string>
     <string name="camera_close">Закрыть камеру</string>
+    <string name="camera_take_photo">Сделать фото</string>
+    <string name="camera_start_recording">Начать запись</string>
     <string name="camera_switch">Сменить камеру</string>
     <string name="camera_pause_recording">Приостановить запись</string>
     <string name="camera_resume_recording">Продолжить запись</string>
@@ -513,16 +526,16 @@
     <string name="media_error_video_unavailable">Видео недоступно: %1$s</string>
     <string name="media_error_decode_frame">Не удаётся декодировать точный видеокадр %1$s</string>
     <string name="media_error_import_frame">Не удалось импортировать кадр видео %1$s для %2$s</string>
-    <string name="media_error_interp_source">Исходный кадр для интерполяции %1$s недоступен</string>
-    <string name="media_error_interp_wrong_frame">Интерполяция получила неверный исходный кадр для %1$s</string>
-    <string name="media_error_interp_import">Не удалось импортировать исходный кадр интерполяции %1$s</string>
+    <string name="media_error_interp_source">Кадр видео, нужный для интерполяции кадров, отсутствует (%1$s). Повторите попытку или отключите интерполяцию кадров.</string>
+    <string name="media_error_interp_wrong_frame">Не удалось правильно прочитать кадр видео, нужный для интерполяции кадров (%1$s). Повторите попытку или отключите интерполяцию кадров.</string>
+    <string name="media_error_interp_import">Не удалось загрузить кадр видео, нужный для интерполяции кадров (%1$s). Повторите попытку или отключите интерполяцию кадров.</string>
     <string name="media_error_interp_render">Не удалось отрендерить запрошенный кадр видео: %1$s</string>
     <string name="engine_loading_effects">Загрузка эффектов…</string>
     <string name="engine_error_gpu_capture">Сбой GPU при захвате</string>
     <string name="platform_voice_name">Голос %1$s</string>
     <string name="platform_error_tts_unavailable">Синтез речи недоступен на этом телефоне</string>
     <string name="platform_error_voice">Не удалось создать голос</string>
-    <string name="platform_caption_download">Субтитры распознаются на телефоне с помощью речевой модели. Она скачивается один раз: %1$s, %2$s, с Hugging Face.</string>
+    <string name="platform_caption_download">Субтитры распознаются на телефоне речевой моделью, которая загружается один раз: %1$s, %2$s, из Hugging Face.</string>
     <string name="add_layer">Добавить слой</string>
     <string name="add_tab_shape">Фигура</string>
     <string name="add_tab_media">Медиа</string>
@@ -622,21 +635,21 @@
     <string name="menu_reset_transform">Сбросить трансформацию</string>
     <string name="menu_select_all_layers">Выбрать все слои</string>
     <plurals name="menu_duplicate_layers">
-        <item quantity="one">Дублировать слой</item>
+        <item quantity="one">Дублировать %1$s слой</item>
         <item quantity="few">Дублировать %1$s слоя</item>
         <item quantity="many">Дублировать %1$s слоёв</item>
         <item quantity="other">Дублировать %1$s слоя</item>
     </plurals>
     <string name="menu_save_preset">Сохранить пресет</string>
     <plurals name="menu_copy_layers">
-        <item quantity="one">Копировать слой</item>
+        <item quantity="one">Копировать %1$s слой</item>
         <item quantity="few">Копировать %1$s слоя</item>
         <item quantity="many">Копировать %1$s слоёв</item>
         <item quantity="other">Копировать %1$s слоя</item>
     </plurals>
     <string name="menu_with_its_style">(со стилем)</string>
     <plurals name="menu_paste_layers">
-        <item quantity="one">Вставить слой</item>
+        <item quantity="one">Вставить %1$s слой</item>
         <item quantity="few">Вставить %1$s слоя</item>
         <item quantity="many">Вставить %1$s слоёв</item>
         <item quantity="other">Вставить %1$s слоя</item>
@@ -670,6 +683,8 @@
     <string name="font_search">Поиск</string>
     <string name="font_imported">Импортированные</string>
     <string name="font_downloads_when_chosen">Загрузится при выборе</string>
+    <string name="fonts_missing_title">Шрифты отсутствуют на телефоне</string>
+    <string name="fonts_missing_body">В этом проекте используются шрифты, которых нет на телефоне: %1$s. Текст отображается другим шрифтом, пока вы не скачаете их из Google Fonts.</string>
     <string name="font_favorite">Избранное</string>
     <string name="font_category_sans_serif">Без засечек</string>
     <string name="font_category_serif">С засечками</string>
@@ -1148,7 +1163,7 @@
     <string name="ai_select_image_layer">Выберите слой изображения</string>
     <string name="ai_select_audio_layer">Выберите слой аудио</string>
     <string name="ai_select_video_layer">Выберите слой видео</string>
-    <string name="ai_cancelling">Отмена…</string>
+    <string name="ai_cancelling">Отменяем…</string>
     <string name="ai_preparing">Подготовка…</string>
     <string name="ai_cancelled">Отменено</string>
     <string name="ai_video_missing">Это видео отсутствует в проекте</string>
@@ -1169,7 +1184,7 @@
     <string name="ai_saving_transparent">Сохранение прозрачного изображения…</string>
     <string name="ai_loading_model">Загрузка модели удаления фона…</string>
     <string name="ai_no_foreground_mask">Маска переднего плана не получена</string>
-    <string name="ai_mask_unexpected_size">Неожиданный размер маски переднего плана</string>
+    <string name="ai_mask_unexpected_size">Удаление фона вернуло результат неверного размера. Попробуйте ещё раз.</string>
     <string name="ai_cannot_save_image">Не удалось сохранить изображение</string>
     <string name="ai_cannot_read_image">Не удалось прочитать это изображение</string>
     <string name="ai_cannot_decode_image">Не удалось декодировать это изображение</string>
@@ -1180,13 +1195,13 @@
     <string name="ai_sample_rate_changed">Частота дискретизации аудио изменилась при декодировании</string>
     <string name="ai_recording_too_large">Эта запись слишком велика для WAV</string>
     <string name="ai_no_samples_decoded">Не удалось декодировать ни одного аудиосэмпла</string>
-    <string name="ai_mask_wrong_size">Неожиданный размер маски</string>
+    <string name="ai_mask_wrong_size">Удаление фона вернуло результат неверного размера. Попробуйте ещё раз.</string>
     <string name="ai_encoder_no_image">Видеокодер не вернул входное изображение</string>
     <string name="ai_encoder_not_responding">Видеокодер перестал отвечать</string>
-    <string name="ai_encoder_frames_before_format">Видеокодер отправил кадры до передачи формата</string>
+    <string name="ai_encoder_frames_before_format">Видеокодер запустился неправильно. Попробуйте ещё раз.</string>
     <string name="ai_encoder_not_finished">Видеокодер не завершил работу</string>
     <string name="ai_cannot_encode_mask">Этот телефон не может закодировать видео маски</string>
-    <string name="ai_video_no_size">У этого видео нет данных о размере</string>
+    <string name="ai_video_no_size">У этого видео нет информации о размере.</string>
     <string name="ai_clip_too_long">Клипы длиннее %1$s мин пока не поддерживаются. Сначала обрежьте или разделите клип.</string>
     <string name="ai_not_enough_storage">Недостаточно свободного места: требуется около %1$s MB.</string>
     <string name="ai_no_video_frames">В этом клипе нет видеокадров для обработки</string>
@@ -1303,7 +1318,7 @@
     <string name="track_motion_lost_at_frame">Отслеживание прервалось на кадре %1$s. Верните точку на ту же деталь и нажмите «Продолжить».</string>
     <string name="track_motion_done">Отслежено кадров: %1$s. Ключевые кадры: %2$s.</string>
     <string name="track_motion_target_layer">целевой слой</string>
-    <string name="track_motion_cancelled">Отслеживание отменено. Уже отслеженные кадры сохранят ключевые кадры.</string>
+    <string name="track_motion_cancelled">Отслеживание движения отменено. Уже отслеженные кадры сохраняют ключевые кадры.</string>
     <string name="track_motion_unavailable">Отслеживание движения недоступно в этой сборке.</string>
     <string name="track_motion_failed">Не удалось отследить это видео.</string>
     <string name="edit_layer_copy_name">%1$s (копия)</string>
@@ -1343,7 +1358,7 @@
     <string name="export_audio_summary_lossless">%1$s · %2$s · %3$s</string>
     <string name="export_audio_hint">Настройки звука для видеофайла. %1$s поддерживает аудио %2$s.</string>
     <string name="export_audio_hint_silent">В этом проекте пока нет звука. Эти настройки применятся после добавления звука.</string>
-    <string name="export_audio_only_hint">Файл сохраняется в Music / AbsentMotion. WAV и FLAC сохраняют все детали; M4A, OGG и MP3 занимают меньше места.</string>
+    <string name="export_audio_only_hint">Сохраняется в Music/AbsentMotion. WAV и FLAC сохраняют все детали; M4A, OGG и MP3 меньше по размеру.</string>
     <string name="export_running_audio">Экспорт аудио</string>
     <string name="export_interpolation_off_help">Каждый клип показывает свои кадры. Клип 30 fps при экспорте в 60 fps показывает каждый кадр дважды, поэтому движение может выглядеть немного ступенчатым.</string>
     <string name="export_interpolation_blend_help">Новые промежуточные кадры смешивают два ближайших кадра как быстрое перекрёстное затухание. Экспорт быстрый; при быстром движении может появляться двоение.</string>
