@@ -76,7 +76,7 @@ internal class AiNet private constructor(private val handle: Long) : Closeable {
 
         @Volatile var cpuOnly = false
 
-        fun open(context: Context, model: AiModel, blend: AiModel? = null, weight: Float = 1f, gpu: Boolean = true): AiNet {
+        fun open(context: Context, model: AiModel, blend: AiModel? = null, weight: Float = 1f, gpu: Boolean = AiDevice.gpuProven(context)): AiNet {
             check(AiNative.loaded) { AppText.get(R.string.ai_runtime_unavailable) }
             model.verify(context)
             blend?.verify(context)

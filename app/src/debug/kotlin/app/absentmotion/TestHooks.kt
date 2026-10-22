@@ -29,7 +29,7 @@ internal object TestHooks {
     fun onboarding(intent: Intent): String? = intent.getStringExtra("onboarding")
 
     fun newIntent(activity: MainActivity, intent: Intent) {
-        if (intent.hasExtra("xml") || intent.hasExtra("aaccheck") || intent.hasExtra("devicecheck") || intent.hasExtra("capcheck") || intent.hasExtra("aicheck") || intent.hasExtra("enhancecheck") || intent.hasExtra("aismoothcheck")) {
+        if (intent.hasExtra("xml") || intent.hasExtra("aaccheck") || intent.hasExtra("devicecheck") || intent.hasExtra("capcheck") || intent.hasExtra("aicheck") || intent.hasExtra("enhancecheck") || intent.hasExtra("aismoothcheck") || intent.hasExtra("aidownload")) {
             activity.setIntent(intent)
             start(activity)
             return
@@ -120,6 +120,13 @@ internal object TestHooks {
                 try { checkSmooth(activity, path, (intent.getStringExtra("levels") ?: "Low").split(',')) }
                 catch (e: kotlinx.coroutines.CancellationException) { throw e }
                 catch (e: Throwable) { Log.e("AMAi", "aismooth failed", e) }
+            }
+        }
+        intent.getStringExtra("aidownload")?.let { name ->
+            scope.launch {
+                try { checkDownload(activity, name, intent.getLongExtra("stopafter", 0L)) }
+                catch (e: kotlinx.coroutines.CancellationException) { throw e }
+                catch (e: Throwable) { Log.e("AMAi", "download failed", e) }
             }
         }
         intent.getStringExtra("bgremove")?.let { asset ->

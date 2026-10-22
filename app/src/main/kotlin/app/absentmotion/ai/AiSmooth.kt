@@ -31,7 +31,12 @@ class AiSmooth private constructor(private val net: AiNet, val level: SmoothLeve
 
         suspend fun download(context: Context, level: SmoothLevel, progress: (Float) -> Unit) = level.model.download(context, progress)
 
-        fun open(context: Context, level: SmoothLevel, gpu: Boolean = true): AiSmooth = AiSmooth(AiNet.open(context, level.model, gpu = gpu), level)
+        suspend fun open(context: Context, level: SmoothLevel): AiSmooth {
+            AiDevice.probeGpu(context, level.model)
+            return AiSmooth(AiNet.open(context, level.model), level)
+        }
+
+        internal fun open(context: Context, level: SmoothLevel, gpu: Boolean): AiSmooth = AiSmooth(AiNet.open(context, level.model, gpu = gpu), level)
 
         internal fun gmac(level: SmoothLevel, frames: Double, width: Int, height: Int): Double = level.model.gmacPerMegapixel * frames * width * height / 1e6
 

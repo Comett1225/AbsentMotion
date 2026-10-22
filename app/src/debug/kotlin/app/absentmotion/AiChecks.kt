@@ -158,3 +158,17 @@ internal suspend fun checkSmooth(activity: MainActivity, path: String, levels: L
     }
     Log.i(TAG, "aismooth done")
 }
+
+internal suspend fun checkDownload(context: Context, name: String, stopAfterMs: Long) {
+    val model = AiModel.valueOf(name)
+    model.delete(context)
+    var reached = 0f
+    if (stopAfterMs > 0) kotlinx.coroutines.withTimeoutOrNull(stopAfterMs) { model.download(context) { reached = it } }
+    val parts = model.dir(context).listFiles()?.filter { it.name.endsWith(".part") }?.sumOf { it.length() } ?: 0L
+    val started = SystemClock.elapsedRealtime()
+    var first = -1f
+    model.download(context) { if (first < 0 && it > 0.01f) first = it }
+    model.verify(context)
+    Log.i(TAG, "ok=${model.installed(context)} download $model stoppedAt=${"%.2f".format(java.util.Locale.US, reached)} kept=$parts resumedFrom=${"%.2f".format(java.util.Locale.US, first)} ms=${SystemClock.elapsedRealtime() - started} bytes=${model.onDisk(context)}")
+    Log.i(TAG, "download done")
+}

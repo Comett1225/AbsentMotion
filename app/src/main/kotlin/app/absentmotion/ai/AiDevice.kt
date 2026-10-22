@@ -11,7 +11,13 @@ import app.absentmotion.i18n.AppText
 import app.absentmotion.ui.onboarding.PhoneSpeed
 import app.absentmotion.ui.onboarding.phoneCheckResult
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.coroutines.withContext
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.ceil
@@ -60,9 +66,52 @@ private const val GOOD_RAM = 4_000_000_000L
 private const val STRUGGLE_SECONDS = 45 * 60.0
 private const val CANNOT_SECONDS = 8 * 3600.0
 private const val BENCH_SIDE = 96
+private const val PROBE_SIDE = 16
+private const val PROBE_MS = 45_000L
+private const val GPU_OK = "ok"
+private const val GPU_BAD = "bad"
+private const val GPU_PENDING = "pending"
 
 internal object AiDevice {
     private val rates = ConcurrentHashMap<AiModel, Double>()
+    private val probes = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val probing = Mutex()
+
+    private fun gpuPrefs(context: Context) = context.getSharedPreferences("ai_gpu", Context.MODE_PRIVATE)
+
+    fun gpuProven(context: Context): Boolean = gpuPrefs(context).getString(DeviceCapabilities.of(context).key, null) == GPU_OK
+
+    suspend fun probeGpu(context: Context, model: AiModel): Boolean = probing.withLock {
+        val prefs = gpuPrefs(context)
+        val key = DeviceCapabilities.of(context).key
+        fun mark(state: String?) { prefs.edit().apply { if (state == null) remove(key) else putString(key, state) }.commit() }
+        when (prefs.getString(key, null)) {
+            GPU_OK -> return true
+            GPU_BAD -> return false
+            GPU_PENDING -> { mark(GPU_BAD); return false }
+        }
+        val gpu = withContext(Dispatchers.Default) { AiNative.gpu }
+        if (gpu == null || gpu.software) { mark(GPU_BAD); return false }
+        if (!model.installed(context)) return false
+        mark(GPU_PENDING)
+        val work = probes.async {
+            AiNet.open(context, model, gpu = true).use { net ->
+                val smooth = SmoothLevel.entries.firstOrNull { it.model == model }
+                val side = smooth?.padding ?: PROBE_SIDE
+                val input = IntArray(side * side) { 0xFF808080.toInt() }
+                if (smooth != null) net.interpolate(input, input, side, side, 0.5f, smooth.padding) else net.upscale(input, side, side, 1)
+                net.onGpu
+            }
+        }
+        val ok = try {
+            withTimeoutOrNull(PROBE_MS) { try { work.await() } catch (e: CancellationException) { throw e } catch (_: Exception) { false } }
+        } catch (e: CancellationException) {
+            mark(null)
+            throw e
+        } ?: false
+        mark(if (ok) GPU_OK else GPU_BAD)
+        ok
+    }
 
     suspend fun phone(context: Context): AiPhone {
         val ram = runCatching { ActivityManager.MemoryInfo().also { context.getSystemService(ActivityManager::class.java).getMemoryInfo(it) }.totalMem }.getOrDefault(0L)
@@ -78,6 +127,7 @@ internal object AiDevice {
         val smooth = SmoothLevel.entries.firstOrNull { it.model == model }
         val side = smooth?.padding?.times(2) ?: BENCH_SIDE
         val input = IntArray(side * side) { 0xFF000000.toInt() or ((it * 2654435761L).toInt() and 0xFFFFFF) }
+        probeGpu(context, model)
         return try {
             withContext(Dispatchers.IO) { AiNet.open(context, model) }.use { net ->
                 suspend fun once() = if (smooth != null) net.interpolate(input, input, side, side, 0.5f, smooth.padding) else net.upscale(input, side, side, 1)
