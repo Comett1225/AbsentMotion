@@ -45,6 +45,7 @@ internal fun matteBitrate(width: Int, height: Int): Int = (width.toLong() * heig
 
 internal fun Layer.matteSeconds(media: MediaDeclaration): Double {
     val fill = mediaFill ?: return 0.0
+    if (fill.outTime == Int.MAX_VALUE && media.duration <= 0) return MAX_MATTE_SECONDS.toDouble()
     val end = if (fill.outTime == Int.MAX_VALUE) media.duration / 1000.0 else fill.outTime.toDouble()
     return ((end - fill.inTime) / 1000).coerceAtLeast(0.0)
 }
