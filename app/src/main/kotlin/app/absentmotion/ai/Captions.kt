@@ -244,7 +244,9 @@ internal object CaptionModel {
         val file = file(context)
         val stamp = file.length() to file.lastModified()
         if (checked == stamp) return
-        check(file.length() == BYTES && file.inputStream().use(::sha256) == SHA256) { AppText.get(R.string.ai_caption_model_load_failed) }
+        val intact = file.length() == BYTES && file.inputStream().use(::sha256) == SHA256
+        if (!intact) file.delete()
+        check(intact) { AppText.get(R.string.ai_caption_model_load_failed) }
         checked = stamp
     }
 
