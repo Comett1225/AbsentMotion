@@ -209,7 +209,7 @@ class ModelReaderTest {
             val a = i * (rows + 1) + j + 1
             text.append("f $a ${a + rows + 1} ${a + rows + 2} ${a + 1}\n")
         }
-        val full = ObjReader.read(text.toString()) { null }
+        val full = ObjReader.read(text.toString(), { null })
         assertEquals(2 * rows * rows, full.triangleCount)
         val small = decimated(full, 2000)
         assertTrue(small.triangleCount in 1..2000)
@@ -217,5 +217,27 @@ class ModelReaderTest {
         assertEquals(small.triangleCount, small.slots.size)
         val big = readModel("dense.obj", text.toString().toByteArray()) { null }
         assertTrue(big.triangleCount <= MODEL_TRIANGLE_BUDGET)
+    }
+
+    @Test fun accessorsWithoutDataCannotMakeATinyFileAllocateHugeArrays() {
+        val uri = "data:application/octet-stream;base64," + Base64.getEncoder().encodeToString(triangle)
+        val buffer = """{"byteLength":${triangle.size},"uri":"$uri"}"""
+        val noData = """{"componentType":5126,"count":15000000,"type":"VEC3"}"""
+        val emptyPositions = gltf(buffer).replace("""{"bufferView":0,"componentType":5126,"count":3,"type":"VEC3"}""", noData)
+        timed(5) { assertEquals(0, GltfReader.read(emptyPositions.toByteArray(), { null }).triangleCount) }
+        val hugeNormals = gltf(buffer).replace(""""TEXCOORD_0":1""", """"TEXCOORD_0":1,"NORMAL":3""")
+            .replace("""{"bufferView":2,"componentType":5123,"count":3,"type":"SCALAR"}""", """{"bufferView":2,"componentType":5123,"count":3,"type":"SCALAR"},$noData""")
+            .replace(""""meshes":[{"primitives":[""", """"meshes":[{"primitives":[""" + List(40) { """{"attributes":{"POSITION":0,"NORMAL":3},"indices":2},""" }.joinToString(""))
+        timed(5) { assertEquals(41, GltfReader.read(hugeNormals.toByteArray(), { null }).triangleCount) }
+    }
+
+    @Test fun anObjWithTooMuchWorkIsRefused() {
+        assertEquals(12, ObjReader.read(cube, ::files, limit = 36).triangleCount)
+        try {
+            ObjReader.read(cube, ::files, limit = 35)
+            fail("read")
+        } catch (e: IllegalArgumentException) {
+            assertEquals("The model is too complex", e.message)
+        }
     }
 }
