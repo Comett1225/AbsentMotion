@@ -55,6 +55,16 @@ A video larger than 1920 x 1080, or one with more than two seconds between its i
 
 The **AI** tools can cut the background from a photo or a video and reduce noise in a recording. They run on your phone. See [AI tools](@ai-tools).
 
+## Smooth a clip
+
+**Smooth** is the first button in a video clip's **Speed** tools. It makes the in-between frames for that clip once and keeps them with the project, so the preview and every export show the smooth version. It is the best way to make slow motion look fluid: a 30 fps clip at half speed gets new frames between the real ones instead of showing each frame twice.
+
+1. Select the video clip and open **Speed**.
+2. Tap **Smooth**, then pick **Frame blending** or **Optical flow** and a level (**Low**, **Medium**, **High**), and optionally **Motion Blur**.
+3. Wait for it to finish. You can cancel at any time and nothing changes.
+
+The original clip is kept: the clip shows a **Smooth** row with a restore button that brings the original back, and **Undo** works too. Smoothing again always starts from the original. Only the trimmed part of the clip is processed. The clip's sound is kept as it is.
+
 ## Smoother motion when you export
 
-If your video clips have a lower frame rate than your export, the export screen can add in-between frames. See **Frame Interpolation** on the [Export](@export) page.
+If your video clips have a lower frame rate than your export, the export screen can also add in-between frames and motion blur for the whole video. See **Frame Interpolation** and **Motion Blur** on the [Export](@export) page.

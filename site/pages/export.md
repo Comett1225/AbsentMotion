@@ -42,13 +42,21 @@ A codec is only offered if your phone has an encoder for it (for example "This p
 
 **Frame Rate.** A slider with stops at 10, 15, 24, 25, 30, 48, 50 and 60 fps, plus the project's own frame rate. The default is the project's frame rate.
 
-**Frame Interpolation.** A switch between **Off**, **Frame blending** and **Optical flow**, with a help button. It matters when a video clip has a lower frame rate than the export, for example a 30 fps clip in a 60 fps export:
+**Frame Interpolation.** Pick a method, then a level, with a help button that explains each one and how well your phone should handle it. It matters when a video clip has a lower frame rate than the export, for example a 30 fps clip in a 60 fps export:
 
 - **Off:** each clip shows its own frames. A 30 fps clip in a 60 fps export shows every frame twice, so motion can look a little stepped.
-- **Frame blending:** the new in-between frames mix the two nearest frames like a quick cross-fade. Fast to export; fast motion can look ghosted.
+- **Frame blending:** the new in-between frames mix the nearest frames like a quick cross-fade. Fast to export; fast motion can look ghosted.
+  - **Low** leans toward the nearest real frame, so there is less ghosting.
+  - **Medium** mixes the two nearest frames evenly.
+  - **High** mixes four frames for the softest motion; it also softens the clip's own frames a little so the picture does not pulse between sharp and soft.
 - **Optical flow:** the app follows how each part of the picture moves and draws real in-between frames. Smoothest motion, but the export is slower and very fast motion can smear at the edges.
+  - **Low** follows the motion roughly and is the fastest.
+  - **Medium** is the balanced choice.
+  - **High** follows the motion most closely, for the cleanest in-between frames, and takes the longest.
 
-It only acts on video clips whose frame rate (counting the clip's speed) is lower than the export. Shapes, text and effects are always drawn at every export frame. It is also available for GIF and image sequences. The live preview never uses it.
+It only acts on video clips whose frame rate (counting the clip's speed) is lower than the export. Shapes, text and effects are always drawn at every export frame. It is also available for GIF and image sequences. The live preview never uses it; to see smooth frames in the preview, use **Smooth** on the clip (see [Photos, video and speed](@media)).
+
+**Motion Blur.** **Off**, **Low**, **Medium** or **High**. It smears the moving parts of video clips like a camera shutter that stays open longer (a quarter, a half or a whole frame). Unlike Frame Interpolation it also helps when a clip already has the export frame rate: fast pans and quick movement look smoother and less choppy. It only changes video clips, never shapes or text (for those, use the Motion Blur effect).
 
 **Quality.** A slider from **Low** to **High** that shows the resulting bit rate (for example "5.9 Mbps"). The bit rate follows the picture size, the frame rate and the codec: H.265 and AV1 need less than H.264 for the same look. The phone's encoder may adjust it a little.
 
