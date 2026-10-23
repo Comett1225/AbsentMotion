@@ -186,14 +186,15 @@ class EngineThread(private val background: Int, context: Context? = null) {
         try {
             val previous = target
             target = 0L
-            this.surface = surface
+            this.surface = null
             if (previous != 0L) engine().detach(previous)
             target = engine().attach(surface, forEncoder = false)
+            this.surface = surface
             mediaScene?.let { videos?.update(it, requestedView?.timeMs ?: 0, playing) }
             renderNow()
         } catch (e: Exception) {
             Log.e("AMEngine", "preview attachment failed", e)
-            if (retry) handler.postDelayed({ if (!closed && this.surface === surface && target == 0L && surface.isValid) attach(surface, retry = false) }, 250)
+            if (retry) handler.postDelayed({ if (!closed && target == 0L && surface.isValid) attach(surface, retry = false) }, 250)
         }
     }
 
