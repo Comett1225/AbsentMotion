@@ -113,7 +113,7 @@ internal object ClipSmooth {
         val scene = smoothScene(fill, media, plan)
         val frames = minOf(plan.frames, frameCount(scene, plan.fps))
         val spanUs = (plan.seconds * 1_000_000).roundToLong()
-        val kept = keepSound(context, fill.uri, media.duration)
+        val kept = keepSound(context, fill.uri, fill.inTime * 1000L + spanUs)
         var sound: Pair<MediaExtractor, Int>? = null
         var success = false
         try {

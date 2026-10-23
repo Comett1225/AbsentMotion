@@ -83,6 +83,14 @@ class AiSoundTest {
         assertTrue(runCatching { feed.read(2) }.isFailure)
     }
 
+    @Test fun convertedSoundStopsWhereTheClipStops() {
+        assertEquals(10_000_000L, soundEndUs(60_000_000L, 10_000_000L))
+        assertEquals(8_000_000L, soundEndUs(8_000_000L, 10_000_000L))
+        assertEquals(10_000_000L, soundEndUs(-1L, 10_000_000L))
+        assertEquals(8_000_000L, soundEndUs(8_000_000L, -1L))
+        assertEquals(300_000_000L, soundEndUs(-1L, 0L))
+    }
+
     @Test fun onlyTrackTheMp4WriterTakesAreCopiedAsTheyAre() {
         for (mime in listOf(MediaFormat.MIMETYPE_AUDIO_AAC, MediaFormat.MIMETYPE_AUDIO_AMR_NB, MediaFormat.MIMETYPE_AUDIO_AMR_WB)) assertTrue(mime, soundIsCopied(mime))
         for (mime in listOf(MediaFormat.MIMETYPE_AUDIO_MPEG, MediaFormat.MIMETYPE_AUDIO_VORBIS, MediaFormat.MIMETYPE_AUDIO_FLAC, MediaFormat.MIMETYPE_AUDIO_RAW,

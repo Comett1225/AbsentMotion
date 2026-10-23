@@ -229,7 +229,7 @@ internal suspend fun rewriteVideo(context: Context, job: VideoJob, progress: AiP
     val file = aiFile(context, "mp4")
     val needed = (videoBitrate(media.width * job.scale, media.height * job.scale, fps) / 8.0 * seconds).roundToLong() * 2 + 50_000_000L
     check(file.parentFile!!.usableSpace >= needed) { AppText.get(R.string.ai_not_enough_storage, (needed / 1_000_000).toString()) }
-    val sound = keepSound(context, fill.uri, media.duration)
+    val sound = keepSound(context, fill.uri, if (fill.outTime == Int.MAX_VALUE) media.duration else fill.outTime * 1000L)
     val thermal = ThermalMonitor.of(context)
     thermal.start()
     var success = false

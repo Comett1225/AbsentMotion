@@ -37,6 +37,9 @@ private val CopiedSound = setOf(MediaFormat.MIMETYPE_AUDIO_AAC, MediaFormat.MIME
 
 internal fun soundIsCopied(mime: String): Boolean = mime in CopiedSound
 
+internal fun soundEndUs(durationUs: Long, limitUs: Long): Long =
+    listOf(durationUs, limitUs).filter { it > 0 }.minOrNull() ?: (MAX_MATTE_SECONDS * 1_000_000L)
+
 internal class AiSound(val uri: String, private val temp: File?) : Closeable {
     override fun close() {
         temp?.delete()
@@ -113,7 +116,7 @@ private suspend fun convertSound(context: Context, uri: String, out: File, limit
     PcmDecoder(context, uri).use { decoder ->
         val first = checkNotNull(decoder.next()) { AppText.get(R.string.ai_no_samples_decoded) }
         val rate = first.rate
-        val totalUs = decoder.durationUs.takeIf { it > 0 } ?: limitUs.takeIf { it > 0 } ?: (MAX_MATTE_SECONDS * 1_000_000L)
+        val totalUs = soundEndUs(decoder.durationUs, limitUs)
         val feed = PcmFeed(decoder, first, rate) { job.ensureActive() }
         val stop = AtomicBoolean()
         val failure = AtomicReference<Throwable>()
