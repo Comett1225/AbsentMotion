@@ -9,6 +9,7 @@ import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.roundToInt
 import kotlin.math.sin
 import kotlin.math.sqrt
 import kotlin.math.tan
@@ -54,7 +55,7 @@ private class SvgGroup(val label: String, val children: List<SvgItem>, val opaci
 
 private sealed interface SvgFill
 private class SolidFill(val argb: Int) : SvgFill
-private class GradientFill(val radial: Boolean, val start: Int, val end: Int, val p0: Pt, val p1: Pt) : SvgFill
+private class GradientFill(val radial: Boolean, val start: Int, val end: Int, val p0: Pt, val p1: Pt, val inUserSpace: Boolean) : SvgFill
 
 private class SvgStroke(val argb: Int, val width: Float, val cap: String, val join: String)
 
@@ -70,12 +71,63 @@ private val Styled = Inherited + Own
 private val NumberPattern = Regex("[-+]?(?:\\d+\\.?\\d*|\\.\\d+)(?:[eE][-+]?\\d+)?")
 private val TransformPattern = Regex("(matrix|translate|scale|rotate|skewX|skewY)\\s*\\(([^)]*)\\)")
 private val SelectorPattern = Regex("^([a-zA-Z][\\w-]*|\\*)?((?:[.#][\\w-]+)*)$")
+private val PartPattern = Regex("[.#][\\w-]+")
 private const val Kappa = 0.5522848f
 private const val MaxShapes = 1000
 private const val MaxVisits = 100_000
 internal const val MaxSvgNodes = 200_000
 
-private fun numbers(text: String?): List<Float> = text?.let { NumberPattern.findAll(it).map { m -> m.value.toFloat() }.toList() } ?: emptyList()
+private fun withoutCssComments(css: String): String {
+    var at = css.indexOf("/*")
+    if (at < 0) return css
+    val out = StringBuilder(css.length)
+    var from = 0
+    while (at >= 0) {
+        out.append(css, from, at)
+        val end = css.indexOf("*/", at + 2)
+        if (end < 0) return out.toString()
+        from = end + 2
+        at = css.indexOf("/*", from)
+    }
+    return out.append(css, from, css.length).toString()
+}
+
+private fun skipAtRule(text: String, from: Int): Int {
+    var i = from
+    while (i < text.length && text[i] != ';' && text[i] != '{') i++
+    if (i >= text.length) return i
+    if (text[i] == ';') return i + 1
+    var depth = 0
+    while (i < text.length) {
+        if (text[i] == '{') depth++ else if (text[i] == '}' && --depth == 0) return i + 1
+        i++
+    }
+    return i
+}
+
+private fun cssBlocks(css: String): List<Pair<String, String>> {
+    val text = withoutCssComments(css)
+    val out = ArrayList<Pair<String, String>>()
+    var i = 0
+    while (i < text.length) {
+        val c = text[i]
+        if (c.isWhitespace() || c == ';' || c == '}') { i++; continue }
+        if (c == '@') { i = skipAtRule(text, i); continue }
+        var open = i
+        while (open < text.length && text[open] != '{' && text[open] != '}') open++
+        if (open >= text.length) break
+        if (text[open] == '}') { i = open + 1; continue }
+        var close = open + 1
+        while (close < text.length && text[close] != '}' && text[close] != '{') close++
+        if (close >= text.length) break
+        if (text[close] == '{') { i = close; continue }
+        out += text.substring(i, open) to text.substring(open + 1, close)
+        i = close + 1
+    }
+    return out
+}
+
+private fun numbers(text: String?): List<Float> = text?.let { NumberPattern.findAll(it).mapNotNull { m -> m.value.finiteFloat() }.toList() } ?: emptyList()
 
 private class SvgReader(private val root: XmlNode) {
     val skipped = LinkedHashSet<UiText>()
@@ -86,7 +138,13 @@ private class SvgReader(private val root: XmlNode) {
     private val counters = HashMap<String, Int>()
     private var viewW = 0f
     private var viewH = 0f
+    private var userW = 0f
+    private var userH = 0f
     private var sized = true
+    private val byId = HashMap<String, MutableList<CssRule>>()
+    private val byClass = HashMap<String, MutableList<CssRule>>()
+    private val byTag = HashMap<String, MutableList<CssRule>>()
+    private val anyTag = ArrayList<CssRule>()
 
     init {
         fun walk(n: XmlNode) {
@@ -102,6 +160,8 @@ private class SvgReader(private val root: XmlNode) {
         viewW = length(root.attr("width"), box?.get(2) ?: 0f, box?.get(2) ?: 0f)
         viewH = length(root.attr("height"), box?.get(3) ?: 0f, box?.get(3) ?: 0f)
         sized = viewW > 0 && viewH > 0
+        userW = box?.get(2) ?: viewW
+        userH = box?.get(3) ?: viewH
         val start = if (box != null && sized) viewBox(box, viewW, viewH, root.attr("preserveAspectRatio")) else Affine()
         val style = computed(emptyMap(), root)
         return children(root, start, style, 0)
@@ -117,7 +177,7 @@ private class SvgReader(private val root: XmlNode) {
             is SvgGroup -> SvgGroup(item.label, item.children.map(::move), item.opacity)
             is SvgShape -> SvgShape(
                 item.label, item.contours.map { it.mapped(m) },
-                (item.fill as? GradientFill)?.let { GradientFill(it.radial, it.start, it.end, m.map(it.p0), m.map(it.p1)) } ?: item.fill,
+                (item.fill as? GradientFill)?.let { GradientFill(it.radial, it.start, it.end, m.map(it.p0), m.map(it.p1), it.inUserSpace) } ?: item.fill,
                 item.evenOdd, item.stroke?.let { SvgStroke(it.argb, it.width * s, it.cap, it.join) }, item.opacity,
             )
         }
@@ -139,19 +199,26 @@ private class SvgReader(private val root: XmlNode) {
     }
 
     private fun readCss(css: String) {
-        val clean = css.replace(Regex("/\\*.*?\\*/", RegexOption.DOT_MATCHES_ALL), "")
-        for (block in Regex("([^{}]+)\\{([^{}]*)\\}").findAll(clean)) {
-            val decls = declarations(block.groupValues[2])
-            for (raw in block.groupValues[1].split(',')) {
+        for ((selectors, body) in cssBlocks(css)) {
+            val decls = declarations(body)
+            for (raw in selectors.split(',')) {
                 val selector = raw.trim()
                 val match = SelectorPattern.matchEntire(selector)
-                if (selector.isEmpty() || selector.startsWith("@") || match == null) continue
+                if (selector.isEmpty() || match == null) continue
                 val tag = match.groupValues[1].takeIf { it.isNotEmpty() && it != "*" }
-                val parts = Regex("[.#][\\w-]+").findAll(match.groupValues[2]).map { it.value }.toList()
+                val parts = PartPattern.findAll(match.groupValues[2]).map { it.value }.toList()
                 val id = parts.firstOrNull { it.startsWith("#") }?.drop(1)
                 val classes = parts.filter { it.startsWith(".") }.map { it.drop(1) }
                 val specificity = (if (id != null) 100 else 0) + classes.size * 10 + (if (tag != null) 1 else 0)
-                rules += CssRule(tag, id, classes, specificity, rules.size, decls)
+                val rule = CssRule(tag, id, classes, specificity, rules.size, decls)
+                rules += rule
+                val bucket = when {
+                    id != null -> byId.getOrPut(id) { ArrayList() }
+                    classes.isNotEmpty() -> byClass.getOrPut(classes[0]) { ArrayList() }
+                    tag != null -> byTag.getOrPut(tag) { ArrayList() }
+                    else -> anyTag
+                }
+                bucket += rule
             }
         }
     }
@@ -166,8 +233,14 @@ private class SvgReader(private val root: XmlNode) {
         for (key in Styled) n.attrs[key]?.let { own[key] = it.trim() }
         val classes = n.attr("class")?.split(Regex("\\s+"))?.filter { it.isNotEmpty() }.orEmpty()
         val id = n.attr("id")
-        rules.filter { r -> (r.tag == null || r.tag == n.local) && (r.id == null || r.id == id) && classes.containsAll(r.classes) }
-            .sortedWith(compareBy({ it.specificity }, { it.order })).forEach { own.putAll(it.decls) }
+        if (rules.isNotEmpty()) {
+            val candidates = ArrayList<CssRule>(anyTag)
+            id?.let { byId[it]?.let(candidates::addAll) }
+            for (c in classes.distinct()) byClass[c]?.let(candidates::addAll)
+            byTag[n.local]?.let(candidates::addAll)
+            candidates.filter { r -> (r.tag == null || r.tag == n.local) && (r.id == null || r.id == id) && classes.containsAll(r.classes) }
+                .sortedWith(compareBy({ it.specificity }, { it.order })).forEach { own.putAll(it.decls) }
+        }
         n.attr("style")?.let { own.putAll(declarations(it)) }
         val out = HashMap(parent.filterKeys { it in Inherited })
         own.forEach { (k, v) -> if (v != "inherit") out[k] = v }
@@ -178,7 +251,7 @@ private class SvgReader(private val root: XmlNode) {
         n.children.mapNotNull { element(it, m, style, depth + 1) }
 
     private fun element(n: XmlNode, parent: Affine, inherited: Map<String, String>, depth: Int): SvgItem? {
-        if (depth > 64) return null
+        if (depth > 64) { skipped += txt(R.string.library_text_value, "parts nested too deeply"); return null }
         if (++visits > MaxVisits) { skipped += txt(R.string.library_text_value, "parts repeated too many times"); return null }
         val tag = n.local
         when (tag) {
@@ -201,22 +274,22 @@ private class SvgReader(private val root: XmlNode) {
         return when (tag) {
             "g", "a", "switch" -> group(label(n, AppText.get(R.string.model_layer_group)), children(n, m, style, depth), opacity)
             "svg" -> {
-                val x = length(n.attr("x"), viewW, 0f)
-                val y = length(n.attr("y"), viewH, 0f)
+                val x = length(n.attr("x"), userW, 0f)
+                val y = length(n.attr("y"), userH, 0f)
                 val box = numbers(n.attr("viewBox")).takeIf { it.size == 4 && it[2] > 0 && it[3] > 0 }
-                val w = length(n.attr("width"), viewW, box?.get(2) ?: viewW)
-                val h = length(n.attr("height"), viewH, box?.get(3) ?: viewH)
+                val w = length(n.attr("width"), userW, box?.get(2) ?: userW)
+                val h = length(n.attr("height"), userH, box?.get(3) ?: userH)
                 val inner = m * Affine(e = x, f = y) * (if (box != null) viewBox(box, w, h, n.attr("preserveAspectRatio")) else Affine())
                 group(label(n, AppText.get(R.string.model_layer_group)), children(n, inner, style, depth), opacity)
             }
             "use" -> {
                 val ref = (n.attr("href"))?.removePrefix("#")?.let(ids::get) ?: return null
                 if (ref === n || depth > 32) return null
-                val moved = m * Affine(e = length(n.attr("x"), viewW, 0f), f = length(n.attr("y"), viewH, 0f))
+                val moved = m * Affine(e = length(n.attr("x"), userW, 0f), f = length(n.attr("y"), userH, 0f))
                 val item = if (ref.local == "symbol") {
                     val box = numbers(ref.attr("viewBox")).takeIf { it.size == 4 && it[2] > 0 && it[3] > 0 }
-                    val w = length(n.attr("width"), viewW, box?.get(2) ?: 0f)
-                    val h = length(n.attr("height"), viewH, box?.get(3) ?: 0f)
+                    val w = length(n.attr("width"), userW, box?.get(2) ?: 0f)
+                    val h = length(n.attr("height"), userH, box?.get(3) ?: 0f)
                     val inner = if (box != null && w > 0 && h > 0) moved * viewBox(box, w, h, ref.attr("preserveAspectRatio")) else moved
                     group(label(ref, AppText.get(R.string.model_layer_group)), children(ref, inner, computed(style, ref), depth), 1f)
                 } else element(ref, moved, style, depth + 1)
@@ -248,10 +321,12 @@ private class SvgReader(private val root: XmlNode) {
         if (shapeCount >= MaxShapes) { skipped += txt(R.string.model_svg_skipped_shapes, MaxShapes.toString()); return null }
         val local = geometry(n, tag).filter { c -> c.knots.isNotEmpty() && c.knots.all { it.p.x.isFinite() && it.p.y.isFinite() } }
         if (local.isEmpty()) return null
+        val placed = local.map { it.mapped(m) }
+        if (placed.any { c -> c.knots.any { k -> !k.p.isFinite() || k.inHandle?.isFinite() == false || k.outHandle?.isFinite() == false } }) return null
         val fill = if (tag == "line") null else paint(style["fill"] ?: "black", style, "fill-opacity", local, m)
         val strokePaint = paint(style["stroke"] ?: "none", style, "stroke-opacity", local, m)
         val width = length(style["stroke-width"], diagonal(), 1f) * m.scale
-        val stroke = if (strokePaint == null || !(width > 0f)) null else {
+        val stroke = if (strokePaint == null || !(width > 0f) || !width.isFinite()) null else {
             if (strokePaint is GradientFill) skipped += txt(R.string.model_svg_skipped_gradient_strokes)
             if (style["stroke-dasharray"].let { it != null && it != "none" }) skipped += txt(R.string.model_svg_skipped_dashed)
             SvgStroke(
@@ -263,34 +338,34 @@ private class SvgReader(private val root: XmlNode) {
         if (fill == null && stroke == null) return null
         shapeCount++
         val name = AppText.get(when (tag) { "rect" -> R.string.shape_name_rectangle; "circle" -> R.string.shape_name_circle; "ellipse" -> R.string.shape_name_ellipse; "line" -> R.string.shape_name_line; "polyline" -> R.string.shape_name_polyline; "polygon" -> R.string.shape_name_polygon; else -> R.string.shape_name_path })
-        return SvgShape(label(n, name), local.map { it.mapped(m) }, fill, style["fill-rule"] == "evenodd", stroke, opacity)
+        return SvgShape(label(n, name), placed, fill, style["fill-rule"] == "evenodd", stroke, opacity)
     }
 
-    private fun diagonal() = sqrt((viewW * viewW + viewH * viewH) / 2f)
+    private fun diagonal() = sqrt((userW * userW + userH * userH) / 2f)
 
     private fun geometry(n: XmlNode, tag: String): List<Contour> {
         fun len(key: String, ref: Float) = length(n.attr(key), ref, 0f)
         return when (tag) {
             "path" -> parseSvgPath(n.attr("d").orEmpty())
             "rect" -> {
-                val w = len("width", viewW); val h = len("height", viewH)
+                val w = len("width", userW); val h = len("height", userH)
                 if (w <= 0f || h <= 0f) return emptyList()
                 val rxText = n.attr("rx")?.takeIf { it != "auto" }; val ryText = n.attr("ry")?.takeIf { it != "auto" }
-                var rx = rxText?.let { length(it, viewW, 0f) } ?: -1f
-                var ry = ryText?.let { length(it, viewH, 0f) } ?: -1f
+                var rx = rxText?.let { length(it, userW, 0f) } ?: -1f
+                var ry = ryText?.let { length(it, userH, 0f) } ?: -1f
                 if (rx < 0f) rx = max(ry, 0f)
                 if (ry < 0f) ry = rx
-                listOf(rect(len("x", viewW), len("y", viewH), w, h, min(rx, w / 2f), min(ry, h / 2f)))
+                listOf(rect(len("x", userW), len("y", userH), w, h, min(rx, w / 2f), min(ry, h / 2f)))
             }
             "circle" -> {
                 val r = len("r", diagonal())
-                if (r <= 0f) emptyList() else listOf(ellipse(len("cx", viewW), len("cy", viewH), r, r))
+                if (r <= 0f) emptyList() else listOf(ellipse(len("cx", userW), len("cy", userH), r, r))
             }
             "ellipse" -> {
-                val rx = len("rx", viewW); val ry = len("ry", viewH)
-                if (rx <= 0f || ry <= 0f) emptyList() else listOf(ellipse(len("cx", viewW), len("cy", viewH), rx, ry))
+                val rx = len("rx", userW); val ry = len("ry", userH)
+                if (rx <= 0f || ry <= 0f) emptyList() else listOf(ellipse(len("cx", userW), len("cy", userH), rx, ry))
             }
-            "line" -> listOf(Contour(listOf(Knot(Pt(len("x1", viewW), len("y1", viewH))), Knot(Pt(len("x2", viewW), len("y2", viewH)))), closed = false))
+            "line" -> listOf(Contour(listOf(Knot(Pt(len("x1", userW), len("y1", userH))), Knot(Pt(len("x2", userW), len("y2", userH)))), closed = false))
             else -> {
                 val v = numbers(n.attr("points"))
                 val points = (0 until v.size / 2).map { Knot(Pt(v[2 * it], v[2 * it + 1])) }
@@ -349,16 +424,19 @@ private class SvgReader(private val root: XmlNode) {
         } else Affine()
         val g = m * space * transform(attr("gradientTransform"))
         val (p0, p1) = if (radial) {
-            val cx = coord("cx", if (box) 0.5f else viewW / 2f, viewW)
-            val cy = coord("cy", if (box) 0.5f else viewH / 2f, viewH)
+            val cx = coord("cx", if (box) 0.5f else userW / 2f, userW)
+            val cy = coord("cy", if (box) 0.5f else userH / 2f, userH)
             val r = coord("r", if (box) 0.5f else diagonal() / 2f, diagonal()) * last.first
             Pt(cx, cy) to Pt(cx + r, cy)
         } else {
-            val a = Pt(coord("x1", 0f, viewW), coord("y1", 0f, viewH))
-            val b = Pt(coord("x2", if (box) 1f else viewW, viewW), coord("y2", 0f, viewH))
+            val a = Pt(coord("x1", 0f, userW), coord("y1", 0f, userH))
+            val b = Pt(coord("x2", if (box) 1f else userW, userW), coord("y2", 0f, userH))
             (a + (b - a) * first.first) to (a + (b - a) * last.first)
         }
-        return GradientFill(radial, first.second, last.second, g.map(p0), g.map(p1))
+        val from = g.map(p0)
+        val to = g.map(p1)
+        if (!from.isFinite() || !to.isFinite()) return SolidFill(first.second)
+        return GradientFill(radial, first.second, last.second, from, to, !box)
     }
 
     private fun length(text: String?, ref: Float, fallback: Float): Float {
@@ -465,6 +543,17 @@ private fun ellipse(cx: Float, cy: Float, rx: Float, ry: Float): Contour {
     )
 }
 
+private fun Pt.isFinite() = x.isFinite() && y.isFinite()
+
+internal fun perpendicularAxis(axis: Pt, width: Float, height: Float): Pt {
+    val dx = axis.x * width
+    val dy = axis.y * height
+    val reach = dx * dx + dy * dy
+    if (reach <= 0f) return axis
+    val k = reach / (axis.x * axis.x * width * width * width * width + axis.y * axis.y * height * height * height * height)
+    return Pt(axis.x * width * width * k, axis.y * height * height * k)
+}
+
 private fun controlBounds(contours: List<Contour>): FloatArray? {
     val points = contours.flatMap { c -> c.knots.flatMap { listOfNotNull(it.p, it.inHandle, it.outHandle) } }
     if (points.isEmpty()) return null
@@ -491,12 +580,6 @@ private fun tightBounds(contours: List<Contour>): FloatArray? {
     }
     if (points.isEmpty()) return null
     return floatArrayOf(points.minOf { it.x }, points.minOf { it.y }, points.maxOf { it.x }, points.maxOf { it.y })
-}
-
-private fun area(c: Contour): Double = c.knots.indices.sumOf { i ->
-    val a = c.knots[i].p
-    val b = c.knots[(i + 1) % c.knots.size].p
-    (a.x * b.y - b.x * a.y).toDouble()
 }
 
 private class LayerWriter(private val host: Scene, private val duration: Int) {
@@ -536,20 +619,18 @@ private class LayerWriter(private val host: Scene, private val duration: Int) {
             is GradientFill -> {
                 val w = max(box[2] - box[0], 1e-3f)
                 val h = max(box[3] - box[1], 1e-3f)
-                fun norm(p: Pt) = "${fmt((p.x - box[0]) / w)},${fmt((p.y - box[1]) / h)}"
+                val start = Pt((f.p0.x - box[0]) / w, (f.p0.y - box[1]) / h)
+                var end = Pt((f.p1.x - box[0]) / w, (f.p1.y - box[1]) / h)
+                if (f.inUserSpace && !f.radial) end = start + perpendicularAxis(end - start, w, h)
+                fun text(p: Pt) = "${fmt(p.x)},${fmt(p.y)}"
                 children += XmlNode("gradient", linkedMapOf(
                     "type" to if (f.radial) "radial" else "linear", "startColor" to formatColor(f.start), "endColor" to formatColor(f.end),
-                    "start" to norm(f.p0), "end" to norm(f.p1),
+                    "start" to text(start), "end" to text(end),
                 ))
             }
             null -> Unit
         }
-        val multi = s.fill != null && local.size > 1 && (s.evenOdd || s.stroke == null)
-        val path = if (multi) {
-            val first = area(local[0])
-            val marked = local.mapIndexed { i, c -> c.copy(exclude = i > 0 && (s.evenOdd || area(c) * first < 0)) }
-            Layer(XmlNode("shape")).withContours(marked).node.child("path")!!
-        } else XmlNode("path", mapOf("d" to local.joinToString(" ") { it.toSvg() }))
+        val path = XmlNode("path", linkedMapOf("d" to local.joinToString(" ") { it.toSvg() }).also { if (s.fill != null && s.evenOdd) it["fillRule"] = "evenodd" })
         children += path
         s.stroke?.let { st ->
             children += XmlNode("path-stroke", linkedMapOf("cap" to st.cap, "join" to st.join), listOf(
@@ -576,6 +657,15 @@ fun parseSvgColor(text: String): Int? {
         }
         return full.toLong(16).toInt()
     }
+    if (t.startsWith("hsl")) {
+        val parts = t.substringAfter('(').substringBefore(')').split(Regex("[\\s,/]+")).filter { it.isNotEmpty() }
+        if (parts.size < 3) return null
+        val hue = parts[0].removeSuffix("deg").finiteFloat() ?: return null
+        val saturation = parts[1].removeSuffix("%").finiteFloat()?.div(100f) ?: return null
+        val lightness = parts[2].removeSuffix("%").finiteFloat()?.div(100f) ?: return null
+        val a = parts.getOrNull(3)?.let { unit(it) } ?: 1f
+        return ((a.coerceIn(0f, 1f) * 255).toInt() shl 24) or hslToRgb(hue, saturation, lightness)
+    }
     if (t.startsWith("rgb")) {
         val inside = t.substringAfter('(').substringBefore(')')
         val parts = inside.split(Regex("[\\s,/]+")).filter { it.isNotEmpty() }
@@ -588,6 +678,25 @@ fun parseSvgColor(text: String): Int? {
         return ((a.coerceIn(0f, 1f) * 255).toInt() shl 24) or (r shl 16) or (g shl 8) or b
     }
     return NamedColours[t]?.let { (0xFF000000.toInt()) or it }
+}
+
+private fun hslToRgb(hue: Float, saturation: Float, lightness: Float): Int {
+    val h = ((hue % 360f) + 360f) % 360f / 360f
+    val s = saturation.coerceIn(0f, 1f)
+    val l = lightness.coerceIn(0f, 1f)
+    val q = if (l < 0.5f) l * (1 + s) else l + s - l * s
+    val p = 2 * l - q
+    fun channel(shifted: Float): Int {
+        val t = if (shifted < 0f) shifted + 1f else if (shifted > 1f) shifted - 1f else shifted
+        val v = when {
+            t < 1f / 6 -> p + (q - p) * 6 * t
+            t < 0.5f -> q
+            t < 2f / 3 -> p + (q - p) * (2f / 3 - t) * 6
+            else -> p
+        }
+        return (v * 255f).roundToInt().coerceIn(0, 255)
+    }
+    return (channel(h + 1f / 3) shl 16) or (channel(h) shl 8) or channel(h - 1f / 3)
 }
 
 private val NamedColours: Map<String, Int> by lazy {

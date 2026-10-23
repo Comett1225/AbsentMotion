@@ -28,6 +28,42 @@ data class Knot(val p: Pt, val inHandle: Pt? = null, val outHandle: Pt? = null) 
 
 data class Contour(val knots: List<Knot>, val closed: Boolean, val exclude: Boolean = false)
 
+private const val FLATTEN_STEPS = 16
+
+fun Contour.signedArea(): Double {
+    val n = knots.size
+    if (n < 2) return 0.0
+    var sum = 0.0
+    var prev = knots[0].p
+    fun edge(to: Pt) {
+        sum += prev.x.toDouble() * to.y - to.x.toDouble() * prev.y
+        prev = to
+    }
+    for (i in 0 until if (closed) n else n - 1) {
+        val a = knots[i]
+        val b = knots[(i + 1) % n]
+        if (a.outHandle == null && b.inHandle == null) {
+            edge(b.p)
+            continue
+        }
+        val c1 = a.outHandle ?: a.p
+        val c2 = b.inHandle ?: b.p
+        for (k in 1..FLATTEN_STEPS) {
+            val t = k / FLATTEN_STEPS.toFloat()
+            val u = 1 - t
+            edge(a.p * (u * u * u) + c1 * (3 * u * u * t) + c2 * (3 * u * t * t) + b.p * (t * t * t))
+        }
+    }
+    edge(knots[0].p)
+    return sum / 2
+}
+
+fun List<Contour>.withHoles(evenOdd: Boolean = false): List<Contour> {
+    if (size < 2) return this
+    val first = first().signedArea()
+    return mapIndexed { i, c -> if (i == 0) c else c.copy(exclude = c.exclude || evenOdd || c.signedArea() * first < 0) }
+}
+
 val Layer.contours: List<Contour>? get() = node.child("path")?.let { shapeAt(it, t, exact = false) } ?: emptyList()
 
 private fun XmlNode.sources(): List<XmlNode> = listOf(this) + children.filter { it.name == "contour" }
@@ -47,7 +83,10 @@ private fun shapeAt(path: XmlNode, t: Float, exact: Boolean): List<Contour> {
                 source["closed"] == "true", source["exclude"] == "true",
             )
         } else {
-            source["d"]?.let { d -> out += parseSvgPath(d).map { it.copy(exclude = source["exclude"] == "true") } }
+            source["d"]?.let { d ->
+                val parts = parseSvgPath(d).withHoles(path["fillRule"] == "evenodd")
+                out += if (source["exclude"] == "true") parts.map { it.copy(exclude = true) } else parts
+            }
         }
     }
     return out
@@ -99,7 +138,7 @@ fun Layer.withShapeKeys(keys: List<ShapeKey>): Layer {
     }
     val path = if (kept.size == 1) contour("path", kept[0], linkedMapOf())
         else XmlNode("path", children = kept.map { contour("contour", it, linkedMapOf()) })
-    return copy(node = node.withChild("path", path))
+    return copy(node = node.withChild("path", path.withFillRule(node.child("path")?.get("fillRule"))))
 }
 
 fun Layer.shapeKeyIndex(): Int = shapeKeys.indexOfFirst { abs(it.t - t) <= snap }
@@ -139,8 +178,10 @@ fun Layer.withContours(contours: List<Contour>): Layer {
         real.size == 1 -> part("path", real[0], linkedMapOf())
         else -> XmlNode("path", children = real.map { c -> part("contour", c, linkedMapOf<String, String>().also { if (c.exclude) it["exclude"] = "true" }) })
     }
-    return copy(node = node.withChild("path", path))
+    return copy(node = node.withChild("path", path.withFillRule(node.child("path")?.get("fillRule"))))
 }
+
+private fun XmlNode.withFillRule(rule: String?) = if (rule == null) this else with("fillRule", rule)
 
 private fun Knot.toNode() = XmlNode("knot", children = listOfNotNull(vecNode("p", p), inHandle?.let { vecNode("in", it - p) }, outHandle?.let { vecNode("out", it - p) }))
 

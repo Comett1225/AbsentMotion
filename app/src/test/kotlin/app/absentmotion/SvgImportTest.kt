@@ -10,6 +10,10 @@ import app.absentmotion.model.contours
 import app.absentmotion.model.importSvg
 import app.absentmotion.model.parseColor
 import app.absentmotion.model.parseSvgColor
+import app.absentmotion.model.parseSvgPath
+import app.absentmotion.model.perpendicularAxis
+import app.absentmotion.model.signedArea
+import app.absentmotion.model.withContours
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
@@ -267,5 +271,170 @@ class SvgImportTest {
         assertTrue(fits.exceptionOrNull().toString(), fits.isSuccess)
         val error = runCatching { import(head + "<g/>".repeat(MaxSvgNodes) + "</svg>") }.exceptionOrNull()
         assertTrue(error.toString(), error is IllegalArgumentException)
+    }
+
+    private val open = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\">"
+
+    private fun importTimed(svg: String, limitMs: Long = 5_000): SvgImport {
+        var result: SvgImport? = null
+        var failure: Throwable? = null
+        val started = System.nanoTime()
+        val worker = Thread { try { result = importSvg(svg, "t", host, 0, 1000) } catch (e: Throwable) { failure = e } }.apply { isDaemon = true; start() }
+        worker.join(30_000)
+        assertTrue("a ${svg.length}-character SVG is still importing after 30 s", !worker.isAlive)
+        failure?.let { throw it }
+        val took = (System.nanoTime() - started) / 1_000_000
+        assertTrue("importing a ${svg.length}-character SVG took $took ms", took < limitMs)
+        return result!!
+    }
+
+    @Test fun anEvenOddPathKeepsItsRuleEvenWithASingleSelfCrossingContour() {
+        val star = "M50 5L80 95L5 35L95 35L20 95Z"
+        val even = import("$open<path fill-rule=\"evenodd\" d=\"$star\"/></svg>").layer!!
+        assertEquals("evenodd", even.node.child("path")!!["fillRule"])
+        assertEquals(1, even.contours!!.size)
+        assertNull(import("$open<path d=\"$star\"/></svg>").layer!!.node.child("path")!!["fillRule"])
+        assertEquals("evenodd", even.withContours(even.contours!!).node.child("path")!!["fillRule"])
+    }
+
+    @Test fun aStrokeOnlyPathHasNoFillRule() {
+        val line = import("$open<path fill=\"none\" stroke=\"red\" fill-rule=\"evenodd\" d=\"M0 0L50 50\"/></svg>").layer!!
+        assertNull(line.node.child("path")!!["fillRule"])
+    }
+
+    @Test fun aHoleMadeOfTwoCurvedAnchorsIsStillRecognisedAsAHole() {
+        val hole = "M30 50 C30 110 70 110 70 50 C70 -10 30 -10 30 50 Z"
+        val ring = parseSvgPath(hole).single()
+        assertEquals(2, ring.knots.size)
+        val area = ring.signedArea()
+        assertTrue("area $area", area < -2_000 && area > -3_500)
+        val layer = import("$open<path d=\"M0 0H100V100H0Z $hole\"/></svg>").layer!!
+        assertEquals(listOf(false, true), layer.contours!!.map { it.exclude })
+        val sameWay = import("$open<path d=\"M0 0H100V100H0Z M30 50 C30 -10 70 -10 70 50 C70 110 30 110 30 50 Z\"/></svg>").layer!!
+        assertEquals(listOf(false, false), sameWay.contours!!.map { it.exclude })
+    }
+
+    @Test fun aFillOnlyPathWithManySubpathsIsOnePathNodeAndKeepsItsHoles() {
+        val d = "M0 0H100V100H0Z M10 10V40H40V10Z M60 60V90H90V60Z M45 45H55V55H45Z"
+        val layer = import("$open<path d=\"$d\"/></svg>").layer!!
+        val path = layer.node.child("path")!!
+        assertTrue(path.children.none { it.name == "contour" })
+        assertEquals(4, path["d"]!!.count { it == 'M' })
+        assertEquals(listOf(false, true, true, false), layer.contours!!.map { it.exclude })
+        val edited = layer.withContours(layer.contours!!)
+        assertEquals(listOf(false, true, true, false), edited.contours!!.map { it.exclude })
+    }
+
+    @Test fun anEvenOddRingOfSubpathsAlternates() {
+        val layer = import("$open<path fill-rule=\"evenodd\" d=\"M0 0H100V100H0Z M10 10H90V90H10Z M20 20H80V80H20Z\"/></svg>").layer!!
+        assertEquals(listOf(false, true, true), layer.contours!!.map { it.exclude })
+    }
+
+    @Test fun aHugeTransformNeverWritesANonNumber() {
+        val result = import("""
+            $open
+              <g transform="scale(1e30)"><path d="M0 0L10 10" stroke="red" transform="scale(1e30)"/></g>
+              <rect width="10" height="10" stroke="red" stroke-width="1e30" transform="scale(1e30 1e-30)"/>
+              <rect width="5" height="5" transform="scale(1e50)"/>
+              <circle cx="50" cy="50" r="20" fill="url(#g)" transform="scale(1e20)"/>
+              <linearGradient id="g" gradientTransform="scale(1e30)"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#000"/></linearGradient>
+              <rect x="10" y="10" width="30" height="30"/>
+            </svg>
+        """)
+        val text = result.layer!!.node.toXml()
+        assertTrue(text, !text.contains("NaN") && !text.contains("Infinity"))
+    }
+
+    @Test fun styleTextWithoutRulesDoesNotTakeQuadraticTime() {
+        val plain = importTimed("$open<style>${"x ".repeat(100_000)}</style><rect width=\"10\" height=\"10\"/></svg>")
+        assertEquals(1, plain.shapes)
+        importTimed("$open<style>${"a{".repeat(50_000)}</style><rect width=\"10\" height=\"10\"/></svg>")
+        importTimed("$open<style>${("/" + "*").repeat(100_000)}</style><rect width=\"10\" height=\"10\"/></svg>")
+        importTimed("$open<style>${"@x;".repeat(100_000)}</style><rect width=\"10\" height=\"10\"/></svg>")
+        importTimed("$open<style>${"}".repeat(200_000)}</style><rect width=\"10\" height=\"10\"/></svg>")
+    }
+
+    @Test fun manyRulesAndManyElementsDoNotMultiply() {
+        val rules = (0 until 20_000).joinToString("") { ".c$it{fill:#ff0000}" }
+        val shapes = (0 until 1_000).joinToString("") { "<rect class=\"c${it * 17}\" width=\"1\" height=\"1\"/>" }
+        val big = importTimed("$open<style>$rules</style>$shapes<g>${"<g/>".repeat(60_000)}</g></svg>")
+        assertEquals(1000, big.shapes)
+        assertEquals(0xFFFF0000.toInt(), shapes(big.layer!!)[0].fillColor)
+    }
+
+    @Test fun cssAtRulesDoNotSwallowOrOverrideTheRulesAroundThem() {
+        val layer = import("""
+            $open
+              <style>
+                @charset "utf-8";
+                @import url(other.css);
+                .a { fill: #ff0000 }
+                @media (prefers-color-scheme: dark) { .a { fill: #0000ff } .b { fill: #0000ff } }
+                @keyframes spin { from { fill: #00ff00 } to { fill: #00ff00 } }
+                @font-face { font-family: x; src: url(y.woff) }
+                .b { fill: #00ff00 }
+                /* .c { fill: #123456 } */
+                .d { fill: #ffff00 }
+              </style>
+              <rect class="a" width="10" height="10"/>
+              <rect class="b" width="10" height="10"/>
+              <rect class="c" width="10" height="10"/>
+              <rect class="d" width="10" height="10"/>
+            </svg>
+        """).layer!!
+        assertEquals(listOf(0xFFFF0000.toInt(), 0xFF00FF00.toInt(), 0xFF000000.toInt(), 0xFFFFFF00.toInt()), shapes(layer).map { it.fillColor })
+    }
+
+    @Test fun percentLengthsUseTheViewBoxNotTheOuterSize() {
+        val layer = import("""
+            <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 100 100">
+              <rect width="100%" height="100%" fill="#123456"/>
+            </svg>
+        """).layer!!
+        val corners = points(layer)
+        assertHas(corners, 100f, 100f)
+        assertHas(corners, 900f, 900f)
+        assertTrue(corners.toString(), corners.all { it.x in 99f..901f && it.y in 99f..901f })
+        val plain = import("""<svg xmlns="http://www.w3.org/2000/svg" width="50%" viewBox="0 0 100 100"><circle cx="50%" cy="50%" r="25%"/></svg>""").layer!!
+        assertHas(points(plain), 600f, 500f)
+    }
+
+    @Test fun contentNestedTooDeeplyIsReported() {
+        val deep = "<g>".repeat(70) + "<rect width=\"5\" height=\"5\"/>" + "</g>".repeat(70)
+        val result = import("$open$deep<rect width=\"9\" height=\"9\"/></svg>")
+        assertEquals(1, result.shapes)
+        assertTrue(result.skipped.contains(txt(R.string.library_text_value, "parts nested too deeply")))
+    }
+
+    @Test fun aDiagonalUserSpaceGradientStaysPerpendicularOnAWideShape() {
+        val layer = import("""
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100">
+              <linearGradient id="g" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="100" y2="100"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#000"/></linearGradient>
+              <linearGradient id="b" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#000"/></linearGradient>
+              <rect width="200" height="100" fill="url(#g)"/>
+              <rect width="200" height="100" fill="url(#b)"/>
+            </svg>
+        """).layer!!
+        val (user, box) = shapes(layer).map { it.node.child("gradient")!! }
+        assertEquals("0.00000,0.00000", user["start"])
+        assertEquals("0.80000,0.40000", user["end"])
+        assertEquals("1.00000,1.00000", box["end"])
+    }
+
+    @Test fun anAxisAlignedGradientIsNotChanged() {
+        val flat = perpendicularAxis(Pt(0.3f, 0f), 800f, 400f)
+        assertEquals(0.3f, flat.x, 1e-5f)
+        assertEquals(0f, flat.y, 1e-6f)
+        val square = perpendicularAxis(Pt(0.5f, 0.5f), 300f, 300f)
+        assertEquals(0.5f, square.x, 1e-5f)
+        assertEquals(0.5f, square.y, 1e-5f)
+    }
+
+    @Test fun hslColoursParse() {
+        assertEquals(0xFF00FF00.toInt(), parseSvgColor("hsl(120, 100%, 50%)"))
+        assertEquals(0x7FFF0000, parseSvgColor("hsl(0 100% 50% / 0.5)"))
+        assertEquals(0xFF808080.toInt(), parseSvgColor("hsl(200, 0%, 50%)"))
+        assertEquals(0xFF0000FF.toInt(), parseSvgColor("hsla(240deg, 100%, 50%, 1)"))
+        assertNull(parseSvgColor("hsl(nope)"))
     }
 }

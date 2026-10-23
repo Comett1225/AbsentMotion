@@ -22,6 +22,7 @@ import app.absentmotion.model.formatFloats
 import app.absentmotion.model.parseSvgPath
 import app.absentmotion.model.strokes
 import app.absentmotion.model.withContours
+import app.absentmotion.model.withHoles
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.tan
@@ -145,10 +146,9 @@ suspend fun EditorState.convertToOutline() {
     val document = scene
     val svg = engine.layerOutline(layer.id, timeMs) ?: return
     if (scene != document) return
-    fun area(c: Contour) = c.knots.indices.sumOf { i -> val a = c.knots[i].p; val b = c.knots[(i + 1) % c.knots.size].p; (a.x * b.y - b.x * a.y).toDouble() }
     val parsed = parseSvgPath(svg)
     if (parsed.none { it.knots.isNotEmpty() }) return
-    val contours = parsed.mapIndexed { i, c -> c.copy(exclude = i > 0 && area(c) * area(parsed[0]) < 0) }
+    val contours = parsed.withHoles()
     edit { s ->
         s.update(layer.id) { l ->
             val keep = l.node.children.filter { child ->
