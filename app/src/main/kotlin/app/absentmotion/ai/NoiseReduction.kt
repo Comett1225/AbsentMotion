@@ -5,6 +5,7 @@ import app.absentmotion.i18n.AppText
 import android.content.Context
 import app.absentmotion.audio.PcmDecoder
 import app.absentmotion.audio.Resampler
+import app.absentmotion.audio.SincBank
 import kotlinx.coroutines.ensureActive
 import java.io.DataInputStream
 import java.io.DataOutputStream
@@ -144,7 +145,7 @@ internal object NoiseReduction {
             val window = FloatArray(windowFrames * 2)
             val bytes = ByteArray(windowFrames * 4)
             val pair = FloatArray(2)
-            val scratch = FloatArray(taps * 2)
+            val sinc = SincBank()
             val block = FloatArray(480)
             val step = sourceRate.toDouble() / targetRate
             var base = Long.MIN_VALUE
@@ -170,7 +171,7 @@ internal object NoiseReduction {
                             window[2 * j] = sample; window[2 * j + 1] = sample
                         }
                     }
-                    Resampler.sample(window, (index - base).toInt(), (position - index).toFloat(), Resampler.ULTRA, step, pair, scratch)
+                    Resampler.sample(window, (index - base).toInt(), (position - index).toFloat(), Resampler.ULTRA, step, pair, sinc)
                     block[i] = pair[0]
                 }
                 done += count

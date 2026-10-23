@@ -8,6 +8,7 @@ import app.absentmotion.platform.captionTextHeight
 import app.absentmotion.platform.loadCaptionLibrary
 import app.absentmotion.audio.OfflineMix
 import app.absentmotion.audio.Resampler
+import app.absentmotion.audio.SincBank
 import app.absentmotion.audio.soundUri
 import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.MultiSelect
@@ -195,7 +196,7 @@ internal suspend fun speechChunks(mix: AudioMix, startMs: Int, endMs: Int, progr
     val first = Math.round(startMs / 1000.0 * rate)
     var fetched = 0L
     val pair = FloatArray(2)
-    val scratch = FloatArray(2 * taps)
+    val sinc = SincBank()
     fun us(frame: Long) = Math.round(frame * 1e6 / rate)
     var i = 0
     while (i < total) {
@@ -212,7 +213,7 @@ internal suspend fun speechChunks(mix: AudioMix, startMs: Int, endMs: Int, progr
             val position = i * step
             val j = position.toLong()
             if (j + taps >= base + filled) break
-            Resampler.sample(window, (j - base).toInt(), (position - j).toFloat(), Resampler.ULTRA, step, pair, scratch)
+            Resampler.sample(window, (j - base).toInt(), (position - j).toFloat(), Resampler.ULTRA, step, pair, sinc)
             chunk[held++] = (pair[0] + pair[1]) / 2
             i++
             if (held == chunk.size) { sink(chunk, held); held = 0 }
