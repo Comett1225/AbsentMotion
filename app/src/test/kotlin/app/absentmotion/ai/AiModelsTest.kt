@@ -4,6 +4,7 @@ import app.absentmotion.export.FrameInterpolation
 import app.absentmotion.export.SmoothLevel
 import app.absentmotion.export.Smoothing
 import app.absentmotion.ui.onboarding.PhoneSpeed
+import android.app.ApplicationExitInfo
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -159,10 +160,10 @@ class AiModelsTest {
         var stored: String? = null
         val writes = mutableListOf<String?>()
         val first = GpuMark("first", { stored }) { stored = it; writes += it }
-        assertFalse(first.diedBefore())
+        assertNull(first.diedBefore())
         first.begin()
         assertEquals("first", stored)
-        assertFalse(first.diedBefore())
+        assertNull(first.diedBefore())
         first.begin()
         first.end()
         assertEquals("first", stored)
@@ -172,12 +173,37 @@ class AiModelsTest {
         assertEquals(listOf("first", null), writes)
         first.begin()
         val next = GpuMark("next", { stored }) { stored = it }
-        assertTrue(next.diedBefore())
+        assertEquals("first", next.diedBefore())
         stored = null
-        assertFalse(next.diedBefore())
+        assertNull(next.diedBefore())
         next.begin()
-        assertFalse(next.diedBefore())
-        assertTrue(GpuMark("later", { stored }) { stored = it }.diedBefore())
+        assertNull(next.diedBefore())
+        assertEquals("next", GpuMark("later", { stored }) { stored = it }.diedBefore())
+    }
+
+    @Test fun aForgivenDeathLeavesNoMarkButNeverErasesTheRunningOne() {
+        var stored: String? = "1234:old"
+        val mark = GpuMark("1235:new", { stored }) { stored = it }
+        assertEquals("1234:old", mark.diedBefore())
+        mark.forgive()
+        assertNull(stored)
+        mark.begin()
+        mark.forgive()
+        assertEquals("1235:new", stored)
+    }
+
+    @Test fun onlyADeathThatLooksLikeACrashBlamesTheGpu() {
+        assertTrue(gpuDeathBlamed(null))
+        for (reason in listOf(ApplicationExitInfo.REASON_CRASH_NATIVE, ApplicationExitInfo.REASON_CRASH, ApplicationExitInfo.REASON_ANR,
+            ApplicationExitInfo.REASON_SIGNALED, ApplicationExitInfo.REASON_UNKNOWN, ApplicationExitInfo.REASON_OTHER, ApplicationExitInfo.REASON_INITIALIZATION_FAILURE)) {
+            assertTrue("reason $reason", gpuDeathBlamed(reason))
+        }
+        for (reason in listOf(ApplicationExitInfo.REASON_USER_REQUESTED, ApplicationExitInfo.REASON_USER_STOPPED, ApplicationExitInfo.REASON_LOW_MEMORY,
+            ApplicationExitInfo.REASON_EXIT_SELF, ApplicationExitInfo.REASON_PERMISSION_CHANGE, ApplicationExitInfo.REASON_PACKAGE_UPDATED,
+            ApplicationExitInfo.REASON_PACKAGE_STATE_CHANGE, ApplicationExitInfo.REASON_DEPENDENCY_DIED, ApplicationExitInfo.REASON_FREEZER,
+            ApplicationExitInfo.REASON_EXCESSIVE_RESOURCE_USAGE)) {
+            assertFalse("reason $reason", gpuDeathBlamed(reason))
+        }
     }
 
     @Test fun faceBoxesAreSmoothedAndDroppedAfterMisses() {

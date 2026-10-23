@@ -181,19 +181,19 @@ class EngineThread(private val background: Int, context: Context? = null) {
         mediaScope.async { withContext(dispatcher) { if (!closed) runCatching { engine() }; startFailure } }
     }
 
-    fun attach(surface: Surface) = handler.post {
+    fun attach(surface: Surface, retry: Boolean = true): Boolean = handler.post {
         if (closed) return@post
         try {
             val previous = target
             target = 0L
-            this.surface = null
+            this.surface = surface
             if (previous != 0L) engine().detach(previous)
             target = engine().attach(surface, forEncoder = false)
-            this.surface = surface
             mediaScene?.let { videos?.update(it, requestedView?.timeMs ?: 0, playing) }
             renderNow()
         } catch (e: Exception) {
             Log.e("AMEngine", "preview attachment failed", e)
+            if (retry) handler.postDelayed({ if (!closed && this.surface === surface && target == 0L && surface.isValid) attach(surface, retry = false) }, 250)
         }
     }
 
