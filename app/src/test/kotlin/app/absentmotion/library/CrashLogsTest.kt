@@ -4,6 +4,8 @@ import android.app.ActivityManager.RunningAppProcessInfo
 import android.app.ApplicationExitInfo
 import app.absentmotion.export.StorageFullException
 import java.io.File
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.yield
 import java.io.IOException
 import java.nio.file.Files
 import org.junit.Assert.assertEquals
@@ -77,5 +79,23 @@ class CrashLogsTest {
         } finally {
             folder.deleteRecursively()
         }
+    }
+
+    @Test fun overlappingTasksNeverLeaveAStaleOneBehind() = kotlinx.coroutines.runBlocking {
+        val first = kotlinx.coroutines.CompletableDeferred<Unit>()
+        val second = kotlinx.coroutines.CompletableDeferred<Unit>()
+        val screen = CrashLogs.doing
+        val one = launch { CrashLogs.during("importing") { first.await() } }
+        yield()
+        assertEquals("importing", CrashLogs.doing)
+        val two = launch { CrashLogs.during("exporting video") { second.await() } }
+        yield()
+        assertEquals("exporting video", CrashLogs.doing)
+        first.complete(Unit)
+        one.join()
+        assertEquals("exporting video", CrashLogs.doing)
+        second.complete(Unit)
+        two.join()
+        assertEquals(screen, CrashLogs.doing)
     }
 }

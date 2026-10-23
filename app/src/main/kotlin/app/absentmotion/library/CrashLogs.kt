@@ -98,7 +98,9 @@ object CrashLogs {
     @Volatile private var activities: ActivityManager? = null
     @Volatile private var about = ""
     @Volatile private var screen = "starting"
-    @Volatile private var task: String? = null
+    private class Running(val name: String)
+    private val running = ArrayList<Running>()
+    private val task: String? get() = synchronized(running) { running.lastOrNull()?.name }
     @Volatile private var failedDuring: Pair<Throwable, String>? = null
 
     val doing: String get() = task ?: screen
@@ -129,8 +131,8 @@ object CrashLogs {
     }
 
     suspend fun <T> during(name: String, block: suspend () -> T): T {
-        val before = task
-        task = name
+        val mine = Running(name)
+        synchronized(running) { running += mine }
         publish()
         try {
             return block()
@@ -138,7 +140,7 @@ object CrashLogs {
             failedDuring = t to name
             throw t
         } finally {
-            task = before
+            synchronized(running) { running.remove(mine) }
             publish()
         }
     }
