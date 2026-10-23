@@ -765,7 +765,11 @@ sk_sp<SkImage> EngineImpl::copyFrame(AHardwareBuffer* buffer, bool opaque, int c
     if (fGraphite) {
         const bool ok = fGraphite->insertRecording({fRecorder->snap().get()}) &&
                         fGraphite->submit(skgpu::graphite::SyncToCpu::kYes);
-        if (!ok) image = nullptr;
+        if (!ok) {
+            LOGE("frame copy submit failed");
+            image = nullptr;
+            this->failGpu(nullptr);
+        }
     } else {
         fGanesh->flushAndSubmit(surface.get(), GrSyncCpu::kYes);
     }
@@ -842,6 +846,11 @@ sk_sp<SkImage> EngineImpl::flowFor(VideoFrames& video, int64_t a, int64_t b, con
 
 bool EngineImpl::interpolateVideo(const std::string& uri, int64_t layerId, const SmoothRequest& r, const InterpolationParams& params) {
     const auto key = std::make_pair(uri, layerId);
+    auto fail = [&](const char* why) {
+        LOGE("interpolation failed: %s", why);
+        if (fGraphite && fGraphite->isDeviceLost()) this->failGpu(nullptr);
+        return false;
+    };
     auto found = fVideoFrames.find(key);
     if (found == fVideoFrames.end()) return false;
     VideoFrames& video = found->second;
@@ -861,10 +870,7 @@ bool EngineImpl::interpolateVideo(const std::string& uri, int64_t layerId, const
             return false;
         }
         const sk_sp<SkImage> field = flow ? this->flowFor(video, r.a, r.b, params) : nullptr;
-        if (flow && !field) {
-            LOGE("interpolation failed: optical flow could not be estimated");
-            return false;
-        }
+        if (flow && !field) return fail("optical flow could not be estimated");
         if (mix) {
             double ms = 0;
             const sk_sp<SkImage> before = r.soft ? frame(r.before) : nullptr, after = r.soft ? frame(r.after) : nullptr;
@@ -883,18 +889,12 @@ bool EngineImpl::interpolateVideo(const std::string& uri, int64_t layerId, const
             }
             __android_log_print(ANDROID_LOG_INFO, "AMInterp", "frame a=%" PRId64 " b=%" PRId64 " t=%.4f mode=%s synthesis=%.2f",
                                 r.a, r.b, r.t, r.mode == SmoothMode::Ai ? "ai" : flowMode ? "flow" : r.soft ? "soft" : "blend", ms);
-            if (!mixed) {
-                LOGE("interpolation failed: frame synthesis returned no image");
-                return false;
-            }
+            if (!mixed) return fail("frame synthesis returned no image");
             image = std::move(mixed);
         }
         if (r.blur > 0) {
             auto blurred = MotionBlur(fGraphite.get(), fRecorder.get(), image, field, r.t, r.blur, params.divisor);
-            if (!blurred) {
-                LOGE("interpolation failed: motion blur returned no image");
-                return false;
-            }
+            if (!blurred) return fail("motion blur returned no image");
             image = std::move(blurred);
         }
     }
@@ -1263,6 +1263,7 @@ int EngineImpl::frame(Target* target, int64_t presentTimeNs, bool sync,
     if (r != VK_SUCCESS && r != VK_SUBOPTIMAL_KHR) {
         vkDestroySemaphore(fDevice, acquired, nullptr);
         LOGE("vkAcquireNextImageKHR failed (%d)", r);
+        if (r != VK_ERROR_OUT_OF_DATE_KHR && r != VK_ERROR_SURFACE_LOST_KHR) this->failGpu(target);
         return r;
     }
 
