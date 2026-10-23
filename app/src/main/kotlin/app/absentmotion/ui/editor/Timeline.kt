@@ -179,7 +179,6 @@ private const val PUSH_SLOWEST_ROWS = 1f
 private const val PUSH_FASTEST_ROWS = 12f
 private const val PUSH_MAX_STEP_S = 0.1f
 
-private const val DEFAULT_ZOOM = 100f
 private const val MIN_ZOOM = 10f
 private const val MAX_ZOOM = 1000f
 
@@ -244,7 +243,7 @@ fun Timeline(state: EditorState, modifier: Modifier = Modifier) {
                 view.stopMotion(); state.playing = false
                 val horizontal = kotlin.math.abs(delta.x) > kotlin.math.abs(delta.y) || at.y < view.rulerH
                 view.dragBy(if (horizontal) Drag.Scrub else Drag.Scroll, if (horizontal) Offset(-(if (delta.x != 0f) delta.x else delta.y) * 18f, 0f) else Offset(0f, -delta.y * 18f), at)
-                if (horizontal) view.finishWheelScrub()
+                view.finishWheelScrub()
             })
             .onSizeChanged { view.size = it }
             .pointerInput(view) { timelineGestures(view) { if (state.settings.vibration) haptic.performHapticFeedback(HapticFeedbackType.LongPress) } }
@@ -384,8 +383,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
 
     var size by mutableStateOf(IntSize.Zero)
 
-    var dpPerSecond by mutableFloatStateOf(DEFAULT_ZOOM)
-        private set
+    val dpPerSecond: Float get() = state.timelineZoom
     private var scrollPx by mutableFloatStateOf(0f)
 
     private var scrubMs by mutableStateOf<Float?>(null)
@@ -690,7 +688,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
         if (drag == Drag.Select) endSelect()
         if (drag == Drag.Key) dropKey(lifted)
         if (drag == Drag.TrimStart || drag == Drag.TrimEnd) dropTrim(if (drag == Drag.TrimStart) "trim-start" else "trim-end")
-        if (drag?.edit == true) return state.endGesture()
+        if (drag?.edit == true) state.endGesture()
         motion = scope.launch {
             if (drag == Drag.Scroll) launch { fling(velocity.y, ::scrollBy) }
             if (drag == Drag.Scrub) fling(velocity.x) { state.frame == scrubFrame && scrubBy(it) }
@@ -708,7 +706,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
     }
 
     fun zoomBy(factor: Float) {
-        dpPerSecond = (dpPerSecond * factor).coerceIn(MIN_ZOOM, MAX_ZOOM)
+        state.timelineZoom = (dpPerSecond * factor).coerceIn(MIN_ZOOM, MAX_ZOOM)
     }
 
     private fun scrubBy(dx: Float): Boolean {
