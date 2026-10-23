@@ -18,6 +18,7 @@ import app.absentmotion.i18n.UiText
 import app.absentmotion.i18n.txt
 import app.absentmotion.model.Scene
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
@@ -64,11 +65,18 @@ internal suspend fun exportVideo(
 ) {
     val (width, height) = exportSize(scene, s.shortSide, even = true)
     val frames = frameCount(scene, s.fps)
-    engine.holdVideo()?.join()
-    try {
+    holdingVideo(engine::holdVideo, engine::releaseVideo) {
         encode(engine, scene, xml, s, out, audio, width, height, frames, hotAtStart, pauseMs, note, progress)
+    }
+}
+
+internal suspend fun <T> holdingVideo(hold: () -> Job?, release: () -> Job?, block: suspend () -> T): T {
+    val held = hold()
+    try {
+        held?.join()
+        return block()
     } finally {
-        withContext(NonCancellable) { engine.releaseVideo()?.join() }
+        withContext(NonCancellable) { release()?.join() }
     }
 }
 
