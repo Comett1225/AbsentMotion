@@ -75,7 +75,7 @@ fun Layer.withoutAiMark(kind: AiKind): Layer {
     val mark = aiMarks.firstOrNull { it.kind == kind } ?: return this
     val key = kind.attribute
     val stack = aiStack(kind)
-    val back = if (key != null && mark.original != null && stack.isNotEmpty()) Layer(node.with(key, mark.original)).shiftedMedia(mark.shift).node else node
+    val back = if (key != null && mark.original != null && stack.isNotEmpty()) Layer(node.with(key, mark.original)).shiftedMedia(stack.sumOf { it.shift }).node else node
     val gone = (stack.ifEmpty { listOf(mark) }).map { it.node }.toSet()
     return copy(node = back.copy(children = back.children.filterNot { it.name == AI_TAG && it in gone }))
 }

@@ -101,6 +101,22 @@ class ClipSmoothTest {
         assertEquals(listOf("raw.mp4", "4500", "6500"), listOf(back.uri, "${back.inTime}", "${back.outTime}"))
     }
 
+    @Test fun restoringBelowASmoothedResultCountsEveryShiftOnTheWayDown() {
+        val raw = videoLayer(0, 3000, inTime = 4000, outTime = 7000, uri = "raw.mp4")
+        val enhanced = raw.copy(node = raw.node.with("fillVideo", "enhanced.mp4")).withAiMark(AiKind.Enhance, "raw.mp4", "enhanced.mp4", "upscale2")
+        val smoothed = enhanced.withSmoothed("smooth.mp4", "enhanced.mp4", "Flow:Medium:Off", null, enhanced.smoothSource(null))
+        assertEquals(listOf(0, 3000), smoothed.mediaFill!!.let { listOf(it.inTime, it.outTime) })
+        assertEquals(4000, smoothed.aiMarks.first { it.kind == AiKind.Smooth }.shift)
+        val everything = smoothed.withoutAiMark(AiKind.Enhance).mediaFill!!
+        assertEquals(listOf("raw.mp4", "4000", "7000"), listOf(everything.uri, "${everything.inTime}", "${everything.outTime}"))
+        val onlySmooth = smoothed.withoutAiMark(AiKind.Smooth).mediaFill!!
+        assertEquals(listOf("enhanced.mp4", "4000", "7000"), listOf(onlySmooth.uri, "${onlySmooth.inTime}", "${onlySmooth.outTime}"))
+        val smoothFirst = raw.withSmoothed("smooth.mp4", "raw.mp4", "Flow:Medium:Off", null, raw.smoothSource(null))
+        val onTop = smoothFirst.copy(node = smoothFirst.node.with("fillVideo", "enhanced.mp4")).withAiMark(AiKind.Enhance, "smooth.mp4", "enhanced.mp4", "upscale2")
+        val down = onTop.withoutAiMark(AiKind.Smooth).mediaFill!!
+        assertEquals(listOf("raw.mp4", "4000", "7000"), listOf(down.uri, "${down.inTime}", "${down.outTime}"))
+    }
+
     @Test fun aSmoothedClipThatStartedAtZeroNeedsNoShift() {
         val raw = videoLayer(0, 3000, inTime = 0, outTime = null, uri = "raw.mp4")
         val smoothed = raw.withSmoothed("one.mp4", "raw.mp4", "Flow:Medium:Off", null, raw.smoothSource(null))
