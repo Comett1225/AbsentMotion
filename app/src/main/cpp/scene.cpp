@@ -144,18 +144,24 @@ bool Keyed(const PathKnot& k) { return !k.p.keys.empty() || !k.in.keys.empty() |
 
 SkPath Combine(const std::vector<PathContour>& contours, float t, bool rebuild) {
     SkPath result;
+    SkPathBuilder open;
     bool first = true;
     for (const PathContour& c : contours) {
         SkPath part = rebuild && !c.knots.empty() ? KnotsPath(c, t) : c.path;
         if (c.evenOdd) part.setFillType(SkPathFillType::kEvenOdd);
-        if (first) {
+        if (contours.size() > 1 && !part.isLastContourClosed()) {
+            open.addPath(part);
+        } else if (first) {
             result = part;
             first = false;
         } else if (auto combined = Op(result, part, c.exclude ? kXOR_SkPathOp : kUnion_SkPathOp)) {
             result = *combined;
         }
     }
-    return result;
+    if (open.isEmpty()) return result;
+    SkPathBuilder all(result);
+    all.addPath(open.detach());
+    return all.detach();
 }
 
 void ParseOutline(const XmlNode& path, Layer* layer) {
