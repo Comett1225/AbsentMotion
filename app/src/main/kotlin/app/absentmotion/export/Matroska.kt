@@ -57,6 +57,7 @@ internal class MatroskaWriter(private val out: FileChannel, private val docType:
         val channels: Int = 0,
         val codecDelayNs: Long = 0,
         val seekPreRollNs: Long = 0,
+        val bt601: Boolean = false,
     )
 
     private class Cue(val timeMs: Long, val track: Int, val clusterPosition: Long)
@@ -129,7 +130,8 @@ internal class MatroskaWriter(private val out: FileChannel, private val docType:
                             Ebml.uint(this, 0xB0, t.width.toLong())
                             Ebml.uint(this, 0xBA, t.height.toLong())
                             Ebml.master(this, 0x55B0) {
-                                Ebml.uint(this, 0x55B1, 1); Ebml.uint(this, 0x55B9, 1); Ebml.uint(this, 0x55BA, 1); Ebml.uint(this, 0x55BB, 1)
+                                val code = if (t.bt601) 6L else 1L
+                                Ebml.uint(this, 0x55B1, code); Ebml.uint(this, 0x55B9, 1); Ebml.uint(this, 0x55BA, code); Ebml.uint(this, 0x55BB, code)
                             }
                         } else Ebml.master(this, 0xE1) {
                             Ebml.float(this, 0xB5, t.sampleRate)
@@ -294,11 +296,14 @@ internal object NalUnits {
         if (obus.size >= 2 && obus[0].toInt() == 0x12 && obus[1].toInt() == 0) obus.copyOfRange(2, obus.size) else obus
 }
 
-internal fun vp9Bt709(frame: ByteArray): ByteArray {
+internal const val Vp9Bt601 = 1
+internal const val Vp9Bt709 = 2
+
+internal fun vp9ColourSpace(frame: ByteArray, space: Int): ByteArray {
     val keyProfile0 = frame.size > 4 && frame[0].toInt() and 0xFC == 0x80
     if (!keyProfile0 || frame[1].toInt() != 0x49 || frame[2].toInt() and 0xFF != 0x83 || frame[3].toInt() != 0x42) return frame
     if (frame[4].toInt() and 0xE0 != 0) return frame
-    return frame.copyOf().also { it[4] = ((it[4].toInt() and 0x1F) or 0x40).toByte() }
+    return frame.copyOf().also { it[4] = ((it[4].toInt() and 0x1F) or (space shl 5)).toByte() }
 }
 
 internal class OpusConfig(val head: ByteArray, val delayNs: Long, val preRollNs: Long)

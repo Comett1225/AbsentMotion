@@ -131,11 +131,41 @@ class ContainerTest {
     }
 
     @Test fun vp9KeyFramesAreMarkedBt709() {
-        assertArrayEquals(hex("82498342400ff0"), vp9Bt709(hex("82498342000ff0")))
-        assertArrayEquals(hex("86498342000ff0"), vp9Bt709(hex("86498342000ff0")))
-        assertArrayEquals(hex("8649834200"), vp9Bt709(hex("8649834200")))
-        assertArrayEquals(hex("86000000"), vp9Bt709(hex("86000000")))
-        assertArrayEquals(hex("82498342a00ff0"), vp9Bt709(hex("82498342a00ff0")))
+        assertArrayEquals(hex("82498342400ff0"), vp9ColourSpace(hex("82498342000ff0"), Vp9Bt709))
+        assertArrayEquals(hex("86498342000ff0"), vp9ColourSpace(hex("86498342000ff0"), Vp9Bt709))
+        assertArrayEquals(hex("8649834200"), vp9ColourSpace(hex("8649834200"), Vp9Bt709))
+        assertArrayEquals(hex("86000000"), vp9ColourSpace(hex("86000000"), Vp9Bt709))
+        assertArrayEquals(hex("82498342a00ff0"), vp9ColourSpace(hex("82498342a00ff0"), Vp9Bt709))
+    }
+
+    @Test fun vp9KeyFramesFromAnEncoderThatConvertsWithBt601AreMarkedBt601() {
+        assertArrayEquals(hex("82498342200ff0"), vp9ColourSpace(hex("82498342000ff0"), Vp9Bt601))
+        assertArrayEquals(hex("82498342a00ff0"), vp9ColourSpace(hex("82498342a00ff0"), Vp9Bt601))
+        assertArrayEquals(hex("86498342000ff0"), vp9ColourSpace(hex("86498342000ff0"), Vp9Bt601))
+    }
+
+    @Test fun matroskaVideoIsTaggedWithTheMatrixTheEncoderUsed() {
+        fun colour(bt601: Boolean): List<Long> {
+            val file = File.createTempFile("colour", ".mkv")
+            try {
+                RandomAccessFile(file, "rw").use { raf ->
+                    val writer = MatroskaWriter(raf.channel)
+                    writer.start(listOf(MatroskaWriter.Track(true, "V_VP9", null, 64, 64, frameDurationNs(30), bt601 = bt601)))
+                    writer.write(0, ByteArray(10), 0, true)
+                    writer.finish()
+                }
+                val r = Reader(file.readBytes())
+                val header = r.element(0)
+                val top = r.children(r.element((header.dataStart + header.size).toInt()))
+                val video = r.children(r.children(top.first { it.id == 0x1654AE6BL }).first()).first { it.id == 0xE0L }
+                val tags = r.children(r.children(video).first { it.id == 0x55B0L })
+                return listOf(0x55B1L, 0x55B9L, 0x55BAL, 0x55BBL).map { id -> r.uint(tags.first { it.id == id }) }
+            } finally {
+                file.delete()
+            }
+        }
+        assertEquals(listOf(1L, 1L, 1L, 1L), colour(false))
+        assertEquals(listOf(6L, 1L, 6L, 6L), colour(true))
     }
 
     @Test fun androidOpusConfigurationIsSplit() {

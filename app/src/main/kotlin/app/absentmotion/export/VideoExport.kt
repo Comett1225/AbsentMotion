@@ -143,7 +143,7 @@ private suspend fun encode(
     val stop = AtomicBoolean()
     val failure = AtomicReference<Throwable>()
     fun fail(t: Throwable) { failure.compareAndSet(null, t); stop.set(true) }
-    val mux = try { Mux(openSink(s.container, out, s.fps), if (audio != null) 2 else 1, ::fail) } catch (t: Throwable) { encoder.release(); throw t }
+    val mux = try { Mux(openSink(s.container, out, s.fps, fixedBt601(encoder.codecInfo)), if (audio != null) 2 else 1, ::fail) } catch (t: Throwable) { encoder.release(); throw t }
     val videoDone = AtomicBoolean()
     val workers = ArrayList<Thread>()
     var surface: Surface? = null
