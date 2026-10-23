@@ -67,6 +67,46 @@ class ProjectStoreTest {
         assertFalse(gone.exists())
     }
 
+    private fun marked(original: String, result: String) = XmlNode(
+        "shape", linkedMapOf("id" to "1", "startTime" to "0", "endTime" to "99", "fillType" to "media", "fillVideo" to result),
+        listOf(XmlNode("ai", linkedMapOf("type" to "smooth", "original" to original, "result" to result), listOf(XmlNode("media", linkedMapOf("uri" to original))))),
+    )
+
+    @Test fun deleteKeepsAiFilesThatAnotherProjectsMarksCanStillRestore() {
+        val root = tmp.newFolder()
+        val ai = tmp.newFolder("ai")
+        val store = ProjectStore(root)
+        fun aiFile(name: String) = ai.resolve(name).apply { writeText("x") }
+        fun uri(file: java.io.File) = "content://app.absentmotion.files/files/ai/${file.name}"
+        val enhanced = aiFile("enhanced.mp4")
+        val smooth = aiFile("smooth.mp4")
+        val orphan = aiFile("orphan.mp4")
+        val a = store.create(scene(marked(uri(enhanced), uri(smooth))))
+        val b = store.create(scene(marked(uri(enhanced), uri(smooth))))
+        store.delete(a, ai)
+        assertTrue(enhanced.exists())
+        assertTrue(smooth.exists())
+        assertFalse(orphan.exists())
+        store.delete(b, ai)
+        assertFalse(enhanced.exists())
+        assertFalse(smooth.exists())
+    }
+
+    @Test fun deleteKeepsAnOriginalInTheProjectFolderThatAnotherProjectsAiMarkPointsAt() {
+        val store = ProjectStore(tmp.newFolder())
+        val a = store.create(scene())
+        store.mediaDir(a).mkdirs()
+        val original = store.mediaDir(a).resolve("clip.mp4").apply { writeText("x") }
+        val other = store.mediaDir(a).resolve("other.mp4").apply { writeText("y") }
+        val b = store.create(scene(marked(original.toURI().toString(), "content://app.absentmotion.files/files/ai/enhanced.mp4")))
+        store.delete(a)
+        assertTrue(original.exists())
+        assertFalse(other.exists())
+        store.delete(b)
+        assertFalse(original.exists())
+        assertFalse(store.mediaDir(a).exists())
+    }
+
     @Test fun deleteKeepsOwnedMediaWhenAnotherProjectOrTemplateCannotBeRead() {
         val root = tmp.newFolder()
         val store = ProjectStore(root)

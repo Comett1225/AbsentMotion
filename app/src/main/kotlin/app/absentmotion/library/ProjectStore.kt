@@ -145,7 +145,7 @@ class ProjectStore(private val root: File) {
 
     fun delete(id: String, aiDir: File? = null) {
         val own = listOfNotNull(text(id)) + versions.list(id).mapNotNull { runCatching { it.file.readText() }.getOrNull() }
-        val owners = (listOf(id) + own.flatMap { runCatching { Scene.parse(it).node.mediaUris() }.getOrDefault(emptySet()) }.mapNotNull(::ownerOf)).distinct()
+        val owners = (listOf(id) + own.flatMap { runCatching { Scene.parse(it).node.keptUris() }.getOrDefault(emptySet()) }.mapNotNull(::ownerOf)).distinct()
         sceneFile(id).delete()
         thumbnailFile(id).delete()
         recoveryFile(id).delete()
@@ -158,7 +158,7 @@ class ProjectStore(private val root: File) {
             .filter { f -> runCatching { f.readText() }.getOrNull().let { it == null || folders.any(it::contains) || aiDir != null && it.contains("/ai/") } }
         val texts = (projectFiles + templateFiles + history).map { f -> runCatching { f.readText() }.getOrNull() ?: return }
         val used = HashSet<String>()
-        val damaged = texts.filter { text -> runCatching { used += Scene.parse(text).node.mediaUris() }.isFailure }
+        val damaged = texts.filter { text -> runCatching { used += Scene.parse(text).node.keptUris() }.isFailure }
         fun mentioned(part: String) = damaged.any { it.contains(part) || it.contains(part.replace("&", "&amp;")) }
         for (owner in owners.filter { it == id || !sceneFile(it).exists() }) {
             val folder = mediaDir(owner)
@@ -187,6 +187,14 @@ class ProjectStore(private val root: File) {
     private companion object {
         val DamagedTitle = Regex("""<scene\b[^>]*?\btitle="([^"]*)"""")
     }
+}
+
+private fun XmlNode.keptUris(): Set<String> = mediaUris() + buildSet {
+    fun walk(n: XmlNode) {
+        if (n.name == "ai") listOf("original", "result").forEach { key -> n[key]?.let { add(it) } }
+        n.children.forEach(::walk)
+    }
+    walk(this@keptUris)
 }
 
 internal val ProjectId = Regex("[A-Za-z0-9_-]{1,64}")
