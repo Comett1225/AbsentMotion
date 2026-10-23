@@ -250,8 +250,8 @@ void ParseCamera(const XmlNode& n, Camera* c) {
 }
 
 void ParseGroup(const XmlNode& scene, int fps, Layer* group) {
-    group->innerWidth = std::clamp(IntAttr(scene, "width", 0), 1, 8192);
-    group->innerHeight = std::clamp(IntAttr(scene, "height", 0), 1, 8192);
+    group->innerWidth = std::clamp(IntAttr(scene, "width", 1080), 1, 8192);
+    group->innerHeight = std::clamp(IntAttr(scene, "height", 1080), 1, 8192);
     const char* bg = scene.attr("bgcolor");
     group->innerBackground = bg && *bg == '#' ? (uint32_t)strtoul(bg + 1, nullptr, 16) : 0;
     Retiming& r = group->retiming;
@@ -440,19 +440,21 @@ SkMatrix LayerMatrix(const Layer& l, float t) {
     return m;
 }
 
+SkRect MediaRect(const Layer& layer, const SkRect& bounds, int width, int height) {
+    if (layer.mediaFillMode == "stretch") return bounds;
+    const float sx = bounds.width() / width, sy = bounds.height() / height;
+    const float scale = layer.mediaFillMode == "fit" ? std::min(sx, sy) : std::max(sx, sy);
+    const float w = width * scale, h = height * scale;
+    return SkRect::MakeXYWH(bounds.centerX() - w / 2, bounds.centerY() - h / 2, w, h);
+}
+
 void DrawMedia(SkCanvas* canvas, const Layer& layer, const SkPath& path, float opacity,
                const MediaPictures& pictures) {
     auto image = pictures(layer.mediaUri, layer.id);
     if (!image) return;
     const SkRect bounds = path.getBounds();
     if (bounds.isEmpty()) return;
-    SkRect dst = bounds;
-    if (layer.mediaFillMode != "stretch") {
-        const float sx = bounds.width() / image->width(), sy = bounds.height() / image->height();
-        const float scale = layer.mediaFillMode == "fit" ? std::min(sx, sy) : std::max(sx, sy);
-        const float w = image->width() * scale, h = image->height() * scale;
-        dst = SkRect::MakeXYWH(bounds.centerX() - w / 2, bounds.centerY() - h / 2, w, h);
-    }
+    const SkRect dst = MediaRect(layer, bounds, image->width(), image->height());
     SkPaint paint;
     paint.setAntiAlias(true);
     paint.setAlphaf(std::clamp(opacity, 0.0f, 1.0f));

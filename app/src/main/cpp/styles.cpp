@@ -424,7 +424,12 @@ half4 main(float2 xy) {
     return f;
 }
 
-void DrawGroupBorders(SkCanvas* canvas, const Layer& l, float t, bool cutout = false) {
+float PixelUnit(const SkCanvas* canvas) {
+    const SkMatrix& ctm = canvas->getTotalMatrix();
+    return 1 / std::max(std::sqrt(std::fabs(ctm.getScaleX() * ctm.getScaleY() - ctm.getSkewX() * ctm.getSkewY())), 1e-3f);
+}
+
+sk_sp<SkImageFilter> EdgeFilter(sk_sp<SkImageFilter> image, const std::string& direction, float radius, SkColor4f colour, float unit) {
     static const sk_sp<SkRuntimeEffect> effect = [] {
         auto result = SkRuntimeEffect::MakeForShader(SkString(R"(
 uniform shader image;
@@ -457,23 +462,29 @@ half4 main(float2 xy) {
         if (!result.effect) __android_log_print(ANDROID_LOG_ERROR, "AMStyles", "border: %s", result.errorText.c_str());
         return result.effect;
     }();
-    if (!effect) return;
-    const SkMatrix& ctm = canvas->getTotalMatrix();
-    const float unit = 1 / std::max(std::sqrt(std::fabs(ctm.getScaleX() * ctm.getScaleY() - ctm.getSkewX() * ctm.getSkewY())), 1e-3f);
+    if (!effect) return image;
+    const bool outside = direction == "outside", centered = direction == "centered";
+    SkRuntimeShaderBuilder b(effect);
+    b.uniform("colour") = SkV4{colour.fR, colour.fG, colour.fB, colour.fA};
+    b.uniform("mode") = outside ? 1.0f : centered ? 2.0f : 0.0f;
+    b.uniform("unit") = unit;
+    std::string_view names[] = {"image", "grown", "shrunk"};
+    const sk_sp<SkImageFilter> inputs[] = {image, outside || centered ? Morph(radius, true) : nullptr, outside ? nullptr : Morph(radius, false)};
+    return SkImageFilters::RuntimeShader(b, 3 * unit, names, inputs, 3);
+}
+
+sk_sp<SkImageFilter> BorderFilter(const Layer& l, float t, bool cutout, float unit) {
     sk_sp<SkImageFilter> result;
     for (const Edge& e : l.borders) {
         if (!ShaderBorder(l, e, t, cutout)) continue;
-        const bool outside = e.direction == "outside", centered = e.direction == "centered";
-        const float radius = std::max(e.size.get(0, t, centered ? 4 : 6) / 2, 0.0f);
-        const SkColor4f colour = ColorAt(e.color, t, kWhite);
-        SkRuntimeShaderBuilder b(effect);
-        b.uniform("colour") = SkV4{colour.fR, colour.fG, colour.fB, colour.fA};
-        b.uniform("mode") = outside ? 1.0f : centered ? 2.0f : 0.0f;
-        b.uniform("unit") = unit;
-        std::string_view names[] = {"image", "grown", "shrunk"};
-        const sk_sp<SkImageFilter> inputs[] = {result, outside || centered ? Morph(radius, true) : nullptr, outside ? nullptr : Morph(radius, false)};
-        result = SkImageFilters::RuntimeShader(b, 3 * unit, names, inputs, 3);
+        const float radius = std::max(e.size.get(0, t, e.direction == "centered" ? 4 : 6) / 2, 0.0f);
+        result = EdgeFilter(result, e.direction, radius, ColorAt(e.color, t, kWhite), unit);
     }
+    return result;
+}
+
+void DrawGroupBorders(SkCanvas* canvas, const Layer& l, float t, bool cutout = false) {
+    const sk_sp<SkImageFilter> result = BorderFilter(l, t, cutout, PixelUnit(canvas));
     if (!result) return;
     SkPaint replace;
     replace.setBlendMode(SkBlendMode::kSrc);
@@ -596,6 +607,8 @@ std::vector<LayerCopy> CopiesOf(const std::vector<Layer>& siblings, const Layer&
 
 SkPath BodyPath(const Layer& l, float t) { return ShapeKind(l) ? DrawingProgressPath(l, ShapePath(l, t), t) : ShapePath(l, t); }
 
+SkPath StrokeGeometry(const Layer& l, const SkPath& body, float t) { return l.text ? TextGlyphPath(l, t, Fps()) : body; }
+
 struct Drawn {
     bool fill = false;
     SkPath stroked;
@@ -609,6 +622,13 @@ Drawn DrawBody(SkCanvas* canvas, const Layer& l, double timeMs, float t, const S
         return drawn;
     }
     const SkColor4f fill = ColorAt(l.fillColor, t, kWhite, alpha);
+    const bool stroked = l.stroke.present && l.stroke.enabled, edged = stroked && CutoutImage(l, pictures);
+    if (edged) {
+        const float width = l.stroke.size.get(0, t, 0);
+        SkPaint edge;
+        if (width > 0) edge.setImageFilter(EdgeFilter(nullptr, "centered", width / 2, ColorAt(l.stroke.color, t, kBlack, alpha), PixelUnit(canvas)));
+        canvas->saveLayer(nullptr, &edge);
+    }
     canvas->save();
     canvas->concat(m);
     if (l.kind == "embedScene") {
@@ -653,7 +673,8 @@ Drawn DrawBody(SkCanvas* canvas, const Layer& l, double timeMs, float t, const S
         if (l.text) DrawText(canvas, l, t, FillPaint({1, 1, 1, std::clamp(alpha, 0.0f, 1.0f)}), Fps(), TextPart::kColor);
     }
     canvas->restore();
-    if (l.stroke.present && l.stroke.enabled) drawn.stroked = DrawStroke(canvas, l, path.makeTransform(m), t, alpha, outline);
+    if (edged) canvas->restore();
+    else if (stroked) drawn.stroked = DrawStroke(canvas, l, StrokeGeometry(l, path, t).makeTransform(m), t, alpha, outline);
     return drawn;
 }
 
@@ -668,9 +689,11 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
     const SkPath path = BodyPath(l, t);
     Drawn drawn;
     const SkPath scenePath = path.makeTransform(m);
-    const bool cutout = decorate && CutoutImage(l, pictures) && !SeesPrevious(siblings, l);
+    const bool effects = EffectsApply(siblings, l);
+    const bool cutout = decorate && CutoutImage(l, pictures);
     const bool bordered = decorate && std::any_of(l.borders.begin(), l.borders.end(), [&](const Edge& e) { return ShaderBorder(l, e, t, cutout); });
-    auto picture = [&](SkCanvas* canvas) {
+    const bool early = cutout && bordered && SeesPrevious(siblings, l) && !gEffects->lifted(l);
+    auto body = [&](SkCanvas* canvas) {
         if (!copies) {
             drawn = DrawBody(canvas, l, timeMs, t, m, path, alpha, pictures, bordered);
             return;
@@ -699,7 +722,14 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
             if (now) drawn = d;
         }
     };
-    const bool effects = EffectsApply(siblings, l);
+    auto picture = [&](SkCanvas* canvas) {
+        if (!early) return body(canvas);
+        SkPaint edges;
+        edges.setImageFilter(BorderFilter(l, t, true, PixelUnit(canvas)));
+        canvas->saveLayer(nullptr, &edges);
+        body(canvas);
+        canvas->restore();
+    };
     const Layer* under = nullptr;
     for (size_t i = 1; effects && i < siblings.size(); i++) {
         if (&siblings[i] == &l) under = &siblings[i - 1];
@@ -714,11 +744,12 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
     if (effects && gEffects->lifted(l) && !scenePath.isEmpty()) {
         SkPaint mask;
         mask.setAntiAlias(true);
-        if (copies) {
+        if (copies || cutout) {
             SkPaint keep;
             keep.setBlendMode(SkBlendMode::kDstIn);
             canvas->saveLayer(nullptr, &keep);
-            for (const LayerCopy& c : *copies) canvas->drawPath(scenePath.makeTransform(c.scene), mask);
+            if (cutout) body(canvas);
+            else for (const LayerCopy& c : *copies) canvas->drawPath(scenePath.makeTransform(c.scene), mask);
             canvas->restore();
         } else {
             SkPath outside = scenePath;
@@ -730,10 +761,13 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
     if (!decorate) return;
     if (l.kind == "embedScene") return DrawGroupBorders(canvas, l, t);
     if (!bordered) return;
-    if (cutout) return DrawGroupBorders(canvas, l, t, true);
+    if (cutout) {
+        if (!early) DrawGroupBorders(canvas, l, t, true);
+        return;
+    }
     if (copies) {
         drawn.fill = l.kind == "drawing" ? !l.strokes.empty() : l.fillType == "color" ? ColorAt(l.fillColor, t, kWhite, alpha).fA > 0 : l.fillType == "media" || l.fillType == "gradient";
-        if (l.stroke.present && l.stroke.enabled) drawn.stroked = DrawStroke(nullptr, l, scenePath, t, alpha);
+        if (l.stroke.present && l.stroke.enabled) drawn.stroked = DrawStroke(nullptr, l, StrokeGeometry(l, path, t).makeTransform(m), t, alpha);
     }
     SkPath region = drawn.fill ? (l.text ? TextGlyphPath(l, t, Fps()).makeTransform(m) : l.kind == "drawing" ? DrawingOutline(l, t).makeTransform(m) : scenePath) : SkPath();
     region = Union(region, drawn.stroked);
@@ -798,7 +832,7 @@ void DrawShuttered(SkCanvas* canvas, const std::vector<Layer>& siblings, const L
     add.setAlphaf(1.0f / samples);
     for (int i = 0; i < samples; i++) {
         canvas->saveLayer(nullptr, &add);
-        DrawOne(canvas, siblings, l, timeMs + open * ((i + 0.5) / samples - 0.5), pictures, sample);
+        DrawOne(canvas, siblings, l, std::clamp(timeMs + open * ((i + 0.5) / samples - 0.5), (double)l.startTime, (double)l.endTime), pictures, sample);
         canvas->restore();
     }
     canvas->restore();
@@ -832,7 +866,7 @@ void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& 
     const float opacity = std::clamp(ov.unitOpacity ? ov.alpha : l.opacity.get(0, t, 1) * MotionOpacity(l, timeMs) * ov.alpha, 0.0f, 1.0f);
     const bool group = l.kind == "embedScene";
     bool decorated = false;
-    const bool cutout = CutoutImage(l, pictures) && !SeesPrevious(siblings, l);
+    const bool cutout = CutoutImage(l, pictures);
     for (const Edge& e : l.borders) decorated |= ShaderBorder(l, e, t, cutout);
     const bool shadow = ShadowOn(l);
     decorated = decorated || shadow || EffectsApply(siblings, l);
@@ -944,19 +978,39 @@ void ParseStyle(const XmlNode& n, Layer* l) {
     }
 }
 
-static bool ContainsOne(const std::vector<Layer>& siblings, const Layer& l, double timeMs, SkPoint p);
+static bool ContainsOne(const std::vector<Layer>& siblings, const Layer& l, double timeMs, SkPoint p, const MediaPictures& masks);
 
-static bool Contains(const std::vector<Layer>& siblings, const Layer& l, double timeMs, SkPoint p, int width, int height) {
+static bool Contains(const std::vector<Layer>& siblings, const Layer& l, double timeMs, SkPoint p, int width, int height,
+                     const MediaPictures& masks) {
     if (!l.activeAt(timeMs) || l.kind == "nullobj" || l.kind == "camera") return false;
-    if (!HasRepeat(l)) return ContainsOne(siblings, l, timeMs, p);
+    if (!HasRepeat(l)) return ContainsOne(siblings, l, timeMs, p, masks);
     for (const LayerCopy& c : CopiesOf(siblings, l, timeMs, width, height)) {
         SkMatrix inverse;
-        if (c.scene.invert(&inverse) && ContainsOne(siblings, l, c.timeMs, inverse.mapPoint(p))) return true;
+        if (c.scene.invert(&inverse) && ContainsOne(siblings, l, c.timeMs, inverse.mapPoint(p), masks)) return true;
     }
     return false;
 }
 
-static bool ContainsOne(const std::vector<Layer>& siblings, const Layer& l, double timeMs, SkPoint p) {
+static bool CutoutContains(const Layer& l, float t, const SkPath& path, const SkImage& mask, SkPoint local, float scale) {
+    SkPixmap pixels;
+    const SkRect dst = MediaRect(l, path.getBounds(), mask.width(), mask.height());
+    if (dst.isEmpty() || !mask.peekPixels(&pixels)) return path.contains(local.fX, local.fY);
+    auto seen = [&](SkPoint q) {
+        const int x = (int)std::floor((q.fX - dst.left()) / dst.width() * pixels.width());
+        const int y = (int)std::floor((q.fY - dst.top()) / dst.height() * pixels.height());
+        return x >= 0 && y >= 0 && x < pixels.width() && y < pixels.height() && path.contains(q.fX, q.fY) && pixels.getAlphaf(x, y) >= 0.5f;
+    };
+    if (seen(local)) return true;
+    const float width = l.stroke.present && l.stroke.enabled ? l.stroke.size.get(0, t, 0) : 0;
+    const float reach = width / 2 / std::max(scale, 1e-6f);
+    for (int k = 0; reach > 0 && k < 16; k++) {
+        const float angle = k * 3.14159265f / 4, r = k < 8 ? reach : reach / 2;
+        if (seen({local.fX + r * cosf(angle), local.fY + r * sinf(angle)})) return true;
+    }
+    return false;
+}
+
+static bool ContainsOne(const std::vector<Layer>& siblings, const Layer& l, double timeMs, SkPoint p, const MediaPictures& masks) {
     const SkMatrix matrix = SiblingMatrix(siblings, l, timeMs);
     SkMatrix inverse;
     if (!matrix.invert(&inverse)) return false;
@@ -965,16 +1019,18 @@ static bool ContainsOne(const std::vector<Layer>& siblings, const Layer& l, doub
     if (l.kind != "embedScene") {
         const float t = l.localTime(timeMs);
         const SkPath path = ShapePath(l, t);
+        const sk_sp<SkImage> mask = ShapeKind(l) && !l.text && !l.video && l.fillType == "media" ? masks(l.mediaUri, l.id) : nullptr;
+        if (mask) return CutoutContains(l, t, path, *mask, local, std::sqrt(std::fabs(matrix.getScaleX() * matrix.getScaleY() - matrix.getSkewX() * matrix.getSkewY())));
         if (l.fillType != "none" && path.contains(local.fX, local.fY)) return true;
         if (!(l.stroke.present && l.stroke.enabled)) return false;
-        return DrawStroke(nullptr, l, path.makeTransform(matrix), t, 1).contains(p.fX, p.fY);
+        return DrawStroke(nullptr, l, StrokeGeometry(l, path, t).makeTransform(matrix), t, 1).contains(p.fX, p.fY);
     }
     const SkPoint inner = {local.fX + l.innerWidth / 2.0f, local.fY + l.innerHeight / 2.0f};
     if (!SkRect::MakeWH(l.innerWidth, l.innerHeight).contains(inner.fX, inner.fY)) return false;
     const double innerTime = NestedTime(l, timeMs);
     if (innerTime >= 0 && (l.innerBackground >> 24) != 0) return true;
     for (auto it = l.children.rbegin(); innerTime >= 0 && it != l.children.rend(); ++it) {
-        if (Contains(l.children, *it, innerTime, inner, l.innerWidth, l.innerHeight)) return true;
+        if (Contains(l.children, *it, innerTime, inner, l.innerWidth, l.innerHeight, masks)) return true;
     }
     return false;
 }
@@ -1013,18 +1069,11 @@ static const std::vector<Layer>& SeenProject(const Scene& scene, double timeMs, 
     return SeeLayers(scene.layers, scene.width, scene.height, true, scene.fps, timeMs, storage) ? *storage : scene.layers;
 }
 
-bool HitLayer(const Scene& scene, const Layer& layer, double timeMs, float x, float y) {
-    std::vector<Layer> storage;
-    const std::vector<Layer>& list = SeenProject(scene, timeMs, &storage);
-    for (const Layer& l : list) if (l.id == layer.id) return Contains(list, l, timeMs, {x, y}, scene.width, scene.height);
-    return false;
-}
-
-int64_t TopLayerAt(const Scene& scene, double timeMs, float x, float y) {
+int64_t TopLayerAt(const Scene& scene, double timeMs, float x, float y, const MediaPictures& masks) {
     std::vector<Layer> storage;
     const std::vector<Layer>& list = SeenProject(scene, timeMs, &storage);
     for (auto it = list.rbegin(); it != list.rend(); ++it) {
-        if (Contains(list, *it, timeMs, {x, y}, scene.width, scene.height)) return it->id;
+        if (Contains(list, *it, timeMs, {x, y}, scene.width, scene.height, masks)) return it->id;
     }
     if (CameraViewOn()) return 0;
     for (auto it = scene.layers.rbegin(); it != scene.layers.rend(); ++it) {

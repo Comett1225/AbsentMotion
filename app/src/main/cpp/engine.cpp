@@ -21,6 +21,7 @@
 
 #include "include/android/SkImageAndroid.h"
 #include "include/android/vk/AndroidVulkanMemoryAllocator.h"
+#include "include/core/SkBitmap.h"
 #include "include/core/SkCanvas.h"
 #include "include/core/SkColorSpace.h"
 #include "include/core/SkColorFilter.h"
@@ -91,6 +92,16 @@ PFN_vkVoidFunction GetProc(const char* name, VkInstance instance, VkDevice devic
                                     : vkGetInstanceProcAddr(instance, name);
 }
 
+sk_sp<SkImage> AlphaMask(const SkPixmap& source) {
+    const float scale = std::min(1.0f, 256.0f / std::max(source.width(), source.height()));
+    SkBitmap bitmap;
+    if (!bitmap.tryAllocPixels(SkImageInfo::MakeA8(std::max(1, (int)std::lround(source.width() * scale)),
+                                                   std::max(1, (int)std::lround(source.height() * scale))))) return nullptr;
+    if (!source.scalePixels(bitmap.pixmap(), SkSamplingOptions(SkFilterMode::kLinear))) return nullptr;
+    bitmap.setImmutable();
+    return bitmap.asImage();
+}
+
 class EngineImpl final : public Engine {
 public:
     explicit EngineImpl(Backend backend) : fBackend(backend) {}
@@ -140,6 +151,13 @@ private:
     sk_sp<SkImage> picture(const std::string& uri, int64_t layerId) const;
     MediaPictures pictures() const {
         return [this](const std::string& uri, int64_t id) { return this->picture(uri, id); };
+    }
+    MediaPictures masks() const {
+        return [this](const std::string& uri, int64_t id) {
+            auto found = fMasks.find({uri, id});
+            if (found == fMasks.end()) found = fMasks.find({uri, 0});
+            return found == fMasks.end() ? nullptr : found->second;
+        };
     }
     int frame(Target*, int64_t presentTimeNs, bool sync, const std::function<void(SkCanvas*)>& paint);
     bool offscreen(int width, int height, bool premultiplied, const std::function<void(SkCanvas*)>& paint,
@@ -206,6 +224,7 @@ private:
     std::vector<std::unique_ptr<Target>> fTargets;
     Scene fScene;
     std::map<std::pair<std::string, int64_t>, sk_sp<SkImage>> fPictures;
+    std::map<std::pair<std::string, int64_t>, sk_sp<SkImage>> fMasks;
     struct VideoFrames {
         std::map<int64_t, sk_sp<SkImage>> frames;
         std::map<std::pair<int64_t, int64_t>, sk_sp<SkImage>> flows;
@@ -339,11 +358,13 @@ bool EngineImpl::initVulkan(std::string* error) {
     fExtensions.init(GetProc, fInstance, fPhysicalDevice, (uint32_t)instanceExts.size(),
                      instanceExts.data(), (uint32_t)deviceExts.size(), deviceExts.data());
 
+    std::string device = props.deviceName;
+    std::replace_if(device.begin(), device.end(), [](char c) { return c == '"' || c == '\\' || (unsigned char)c < 0x20; }, ' ');
     char buf[512];
     snprintf(buf, sizeof(buf),
              "{\"backend\":\"%s\",\"device\":\"%s\",\"api\":\"%u.%u.%u\",\"driverVersion\":%u,"
              "\"displayTiming\":%s,\"deviceExtensions\":[",
-             fBackend == Backend::kGraphite ? "graphite" : "ganesh", props.deviceName,
+             fBackend == Backend::kGraphite ? "graphite" : "ganesh", device.c_str(),
              VK_API_VERSION_MAJOR(props.apiVersion), VK_API_VERSION_MINOR(props.apiVersion),
              VK_API_VERSION_PATCH(props.apiVersion), props.driverVersion,
              fDisplayTiming ? "true" : "false");
@@ -746,7 +767,11 @@ sk_sp<SkImage> EngineImpl::copyFrame(AHardwareBuffer* buffer, bool opaque, int c
     if (fGraphite) {
         const bool ok = fGraphite->insertRecording({fRecorder->snap().get()}) &&
                         fGraphite->submit(skgpu::graphite::SyncToCpu::kYes);
-        if (!ok) image = nullptr;
+        if (!ok) {
+            LOGE("frame copy submit failed");
+            image = nullptr;
+            this->failGpu(nullptr);
+        }
     } else {
         fGanesh->flushAndSubmit(surface.get(), GrSyncCpu::kYes);
     }
@@ -756,21 +781,25 @@ sk_sp<SkImage> EngineImpl::copyFrame(AHardwareBuffer* buffer, bool opaque, int c
 bool EngineImpl::setPicture(const std::string& uri, int64_t layerId, AHardwareBuffer* buffer,
                             const void* pixels, int width, int height, size_t rowBytes, bool opaque, int colorStandard, int colorRange, const FrameCrop& crop) {
     const auto key = std::make_pair(uri, layerId);
-    if (!buffer && !pixels) { fPictures.erase(key); fVideoFrames.erase(key); fMosh.erase(key); this->forgetImported(key); return true; }
-    sk_sp<SkImage> image;
+    if (!buffer && !pixels) { fPictures.erase(key); fMasks.erase(key); fVideoFrames.erase(key); fMosh.erase(key); this->forgetImported(key); return true; }
+    sk_sp<SkImage> image, mask;
     if (buffer) {
         image = this->copyFrame(buffer, opaque, colorStandard, colorRange, crop, &key);
     }
     else if (width > 0 && height > 0 && width <= maxPictureSize() && height <= maxPictureSize()) {
         const auto info = SkImageInfo::Make(width, height, kRGBA_8888_SkColorType,
                 opaque ? kOpaque_SkAlphaType : kPremul_SkAlphaType, SkColorSpace::MakeSRGB());
-        image = SkImages::RasterFromPixmapCopy(SkPixmap(info, pixels, rowBytes));
+        const SkPixmap source(info, pixels, rowBytes);
+        image = SkImages::RasterFromPixmapCopy(source);
         if (image && fRecorder) image = SkImages::TextureFromImage(fRecorder.get(), image.get(), {});
+        if (!opaque) mask = AlphaMask(source);
     }
     if (!image && buffer) return false;
     fVideoFrames.erase(key);
+    fMasks.erase(key);
     if (!image) { fPictures.erase(key); return false; }
     fPictures[key] = std::move(image);
+    if (mask) fMasks[key] = std::move(mask);
     return true;
 }
 
@@ -819,6 +848,11 @@ sk_sp<SkImage> EngineImpl::flowFor(VideoFrames& video, int64_t a, int64_t b, con
 
 bool EngineImpl::interpolateVideo(const std::string& uri, int64_t layerId, const SmoothRequest& r, const InterpolationParams& params) {
     const auto key = std::make_pair(uri, layerId);
+    auto fail = [&](const char* why) {
+        LOGE("interpolation failed: %s", why);
+        if (fGraphite && fGraphite->isDeviceLost()) this->failGpu(nullptr);
+        return false;
+    };
     auto found = fVideoFrames.find(key);
     if (found == fVideoFrames.end()) return false;
     VideoFrames& video = found->second;
@@ -838,10 +872,7 @@ bool EngineImpl::interpolateVideo(const std::string& uri, int64_t layerId, const
             return false;
         }
         const sk_sp<SkImage> field = flow ? this->flowFor(video, r.a, r.b, params) : nullptr;
-        if (flow && !field) {
-            LOGE("interpolation failed: optical flow could not be estimated");
-            return false;
-        }
+        if (flow && !field) return fail("optical flow could not be estimated");
         if (mix) {
             double ms = 0;
             const sk_sp<SkImage> before = r.soft ? frame(r.before) : nullptr, after = r.soft ? frame(r.after) : nullptr;
@@ -860,18 +891,12 @@ bool EngineImpl::interpolateVideo(const std::string& uri, int64_t layerId, const
             }
             __android_log_print(ANDROID_LOG_INFO, "AMInterp", "frame a=%" PRId64 " b=%" PRId64 " t=%.4f mode=%s synthesis=%.2f",
                                 r.a, r.b, r.t, r.mode == SmoothMode::Ai ? "ai" : flowMode ? "flow" : r.soft ? "soft" : "blend", ms);
-            if (!mixed) {
-                LOGE("interpolation failed: frame synthesis returned no image");
-                return false;
-            }
+            if (!mixed) return fail("frame synthesis returned no image");
             image = std::move(mixed);
         }
         if (r.blur > 0) {
             auto blurred = MotionBlur(fGraphite.get(), fRecorder.get(), image, field, r.t, r.blur, params.divisor);
-            if (!blurred) {
-                LOGE("interpolation failed: motion blur returned no image");
-                return false;
-            }
+            if (!blurred) return fail("motion blur returned no image");
             image = std::move(blurred);
         }
     }
@@ -1090,7 +1115,7 @@ bool EngineImpl::layerBounds(int64_t layerId, double timeMs, float ltrb[4]) {
 
 int64_t EngineImpl::hitTest(float x, float y, double timeMs) {
     SetCameraView(fCameraView);
-    return TopLayerAt(fScene, timeMs, x, y);
+    return TopLayerAt(fScene, timeMs, x, y, this->masks());
 }
 
 bool EngineImpl::layerOutline(int64_t layerId, double timeMs, std::string* svg) {
@@ -1240,6 +1265,7 @@ int EngineImpl::frame(Target* target, int64_t presentTimeNs, bool sync,
     if (r != VK_SUCCESS && r != VK_SUBOPTIMAL_KHR) {
         vkDestroySemaphore(fDevice, acquired, nullptr);
         LOGE("vkAcquireNextImageKHR failed (%d)", r);
+        if (r != VK_ERROR_OUT_OF_DATE_KHR && r != VK_ERROR_SURFACE_LOST_KHR) this->failGpu(target);
         return r;
     }
 

@@ -26,6 +26,7 @@
 #include "modules/skparagraph/include/ParagraphBuilder.h"
 #include "modules/skparagraph/include/TypefaceFontProvider.h"
 #include "modules/skunicode/include/SkUnicode_icu.h"
+#include "unicode/uchar.h"
 
 namespace am {
 using namespace skia::textlayout;
@@ -99,10 +100,12 @@ std::vector<std::pair<size_t, size_t>> EmojiRuns(SkUnicode* unicode, const std::
     auto keycap = [](SkUnichar c) { return c == '#' || c == '*' || (c >= '0' && c <= '9'); };
     for (size_t i = 0; i < points.size(); i++) {
         const SkUnichar c = at(i), next = at(i + 1);
-        const bool emoji = keycap(c) ? next == 0x20E3 || (next == 0xFE0F && at(i + 2) == 0x20E3)
-                                     : unicode->isEmoji(c) && !unicode->isEmojiComponent(c) && (c >= 0x1F000 || next == 0xFE0F);
+        const bool flag = unicode->isRegionalIndicator(c) && unicode->isRegionalIndicator(next);
+        const bool emoji = flag || (keycap(c) ? next == 0x20E3 || (next == 0xFE0F && at(i + 2) == 0x20E3)
+                                              : unicode->isEmoji(c) && !unicode->isEmojiComponent(c) &&
+                                                (c >= 0x1F000 || next == 0xFE0F || (next != 0xFE0E && u_hasBinaryProperty(c, UCHAR_EMOJI_PRESENTATION))));
         if (!emoji) continue;
-        size_t end = i + 1;
+        size_t end = i + (flag ? 2 : 1);
         while (end < points.size()) {
             const SkUnichar d = at(end);
             if (d == 0xFE0F || d == 0x20E3 || unicode->isEmojiModifier(d) || (d >= 0xE0020 && d <= 0xE007F)) end++;

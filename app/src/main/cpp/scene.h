@@ -247,9 +247,8 @@ bool CameraFrame(const std::vector<Layer>& layers, const Layer& camera, int widt
 bool SeeLayers(const std::vector<Layer>& layers, int width, int height, bool top, int fps, double timeMs, std::vector<Layer>* seen);
 bool SeenPlacement(const Layer& layer, double timeMs, Placement* placement);
 SkMatrix WorldMatrix(const Scene& scene, const Layer& layer, double timeMs);
-int64_t TopLayerAt(const Scene& scene, double timeMs, float x, float y);
+int64_t TopLayerAt(const Scene& scene, double timeMs, float x, float y, const MediaPictures& masks);
 SkRect SelectionBounds(const Layer& layer, double timeMs, const SkMatrix& matrix);
-bool HitLayer(const Scene& scene, const Layer& layer, double timeMs, float x, float y);
 void DrawLayerList(SkCanvas* canvas, const Scene& scene, const std::vector<Layer>& layers, double timeMs, const MediaPictures& pictures);
 
 SkPath ShapePath(const Layer& layer, float t);
@@ -257,6 +256,7 @@ SkPath StrokePath(const Layer& layer, const SkPath& path, float t);
 SkPath OutlineAt(const Layer& layer, float t);
 SkMatrix LayerMatrix(const Layer& layer, float t);
 
+SkRect MediaRect(const Layer& layer, const SkRect& bounds, int width, int height);
 void DrawMedia(SkCanvas* canvas, const Layer& layer, const SkPath& path, float opacity,
                const MediaPictures& pictures);
 

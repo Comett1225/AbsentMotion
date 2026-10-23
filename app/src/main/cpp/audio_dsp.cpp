@@ -165,6 +165,7 @@ void StereoBuffer::write(double left, double right) noexcept {
 double StereoBuffer::read(double delay, int channel) const noexcept {
     double index = static_cast<double>(position) - delay;
     if (index < 0.0) index += static_cast<double>(data.size());
+    if (index >= static_cast<double>(data.size())) index -= static_cast<double>(data.size());
     const auto first = static_cast<std::size_t>(index);
     const auto second = first + 1 == data.size() ? 0 : first + 1;
     const double fraction = index - static_cast<double>(first);

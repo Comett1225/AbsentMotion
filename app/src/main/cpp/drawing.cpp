@@ -196,7 +196,7 @@ template <typename F> void EachPiece(const Layer& layer, float t, F&& draw) {
     for (size_t k = 0; k < layer.strokes.size(); k++) {
         const FreehandStroke& s = layer.strokes[k];
         const float length = lengths[k], lo = std::max(start - at, 0.0f), hi = std::min(end - at, length);
-        const bool seen = length > 0 ? hi > lo : at >= start && at <= end && end > start;
+        const bool seen = length > 0 ? hi > lo : total > 0 ? at >= start && at <= end && end > start : r.end > r.start;
         at += length;
         if (s.geometry.isEmpty() || !seen) continue;
         const bool taper = r.tapered && (s.tool == kPen || s.tool == kBrush);
