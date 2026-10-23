@@ -1,10 +1,13 @@
 package app.absentmotion.ui.editor
 
+import app.absentmotion.model.Keyframe
 import app.absentmotion.model.Layer
 import app.absentmotion.model.MediaDeclaration
 import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
 import app.absentmotion.model.videoTimeUs
+import app.absentmotion.model.keyframes
+import app.absentmotion.model.withKeyframes
 import app.absentmotion.ui.editor.panels.withMediaFill
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -39,5 +42,12 @@ class MediaFillReplaceTest {
         assertEquals(null, replaced.node["inTime"])
         assertEquals(null, replaced.node["outTime"])
         assertEquals("content://pic", replaced.node["fillImage"])
+    }
+
+    @Test fun switchingTheFillTypeLeavesAnAnimatedColourAlone() {
+        val colour = XmlNode("fillColor").withKeyframes(listOf(Keyframe(0f, "#ffff0000"), Keyframe(1f, "#ff0000ff", "cubicBezier 0.42 0.0 0.58 1.0")))
+        val layer = Layer(XmlNode("shape", linkedMapOf("id" to "1", "startTime" to "0", "endTime" to "1000", "fillType" to "color"), listOf(colour)), 0.5f, 0.49f..0.51f)
+        for (type in listOf("none", "color", "gradient")) assertEquals(colour, layer.withFill(type).node.child("fillColor"))
+        assertEquals(3, layer.withFill("color", 0xff00ff00.toInt()).node.child("fillColor")!!.keyframes.size)
     }
 }
