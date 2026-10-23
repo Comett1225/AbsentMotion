@@ -120,6 +120,29 @@ class ToolRegressions(unittest.TestCase):
             self.assertNotEqual(0, remote.returncode)
             self.assertIn('tools/site_test.js did not run', remote.stderr)
 
+    def test_full_check_refuses_native_libraries_older_than_the_native_code(self):
+        script = (ROOT / 'tools/check.sh').read_text()
+        function = script[script.index('native_libs() {'):script.index('\n}\n', script.index('native_libs() {')) + 3]
+        with tempfile.TemporaryDirectory() as folder:
+            folder = Path(folder)
+            lib = folder / 'app/build/intermediates/merged_native_libs/fossRelease/mergeFossReleaseNativeLibs/out/lib/arm64-v8a/libengine.so'
+            source = folder / 'app/src/main/cpp/engine.cpp'
+            run = lambda: subprocess.run(['sh', '-c', 'fail() { echo "FAILED: $1"; }; ' + function + '\nnative_libs fossRelease mergeFossReleaseNativeLibs; echo "rc=$? libs=$libs"'],
+                                         cwd=folder, capture_output=True, text=True).stdout
+            self.assertIn('rc=1', run())
+            self.assertIn('not built', run())
+            lib.parent.mkdir(parents=True)
+            lib.touch()
+            source.parent.mkdir(parents=True)
+            source.touch()
+            os.utime(source, (1000, 1000))
+            os.utime(lib, (2000, 2000))
+            self.assertIn('rc=0 libs=app/build/intermediates/merged_native_libs/fossRelease/mergeFossReleaseNativeLibs/out/lib/arm64-v8a', run())
+            os.utime(source, (3000, 3000))
+            stale = run()
+            self.assertIn('FAILED: the fossRelease native libraries are older than the native code', stale)
+            self.assertIn('rc=1', stale)
+
     def test_python_policy_rejects_docstrings_but_allows_data_strings(self):
         scanner = ROOT / 'tools/source_policy.py'
         self.assertTrue(scanner.exists())

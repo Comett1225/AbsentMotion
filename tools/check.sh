@@ -14,6 +14,18 @@ for arg in "$@"; do
 done
 failed=0
 fail() { printf 'check.sh: FAILED: %s\n' "$1" >&2; failed=$((failed + 1)); }
+native_libs() {
+    newest=$(ls -t "app/build/intermediates/merged_native_libs/$1/"*/out/lib/arm64-v8a/*.so 2>/dev/null | head -n 1)
+    if [ -z "$newest" ]; then
+        printf 'skipped: the %s native libraries are not built (./gradlew :app:%s builds them)\n' "$1" "$2"
+        return 1
+    fi
+    libs=$(dirname "$newest")
+    if [ -n "$(find app/src/main/cpp third_party/rnnoise third_party/lame third_party/rife_warp -type f -newer "$newest" 2>/dev/null | head -n 1)" ]; then
+        fail "the $1 native libraries are older than the native code, so their API floor would describe an old build (./gradlew :app:$2 rebuilds them)"
+        return 1
+    fi
+}
 start=$(date +%s)
 
 STATIC="licences|python3 tools/gen_licenses.py --check|python3 tools/gen_licenses.py
@@ -47,15 +59,13 @@ else
     tasks=":app:compilePlayDebugKotlin :app:compileFossDebugKotlin :app:compileCompatDebugKotlin :app:testFossDebugUnitTest :app:testCompatDebugUnitTest"
     [ -f app/lint-baseline.xml ] && tasks="$tasks :app:lintFossDebug :app:lintCompatDebug"
     ./gradlew $tasks -q >"$dir/gradle.log" 2>&1 || { grep -E '^e: |FAILED|Test.*>|Error:|error:' "$dir/gradle.log" | sed 's|file://[^ ]*/app/src/main/kotlin/app/absentmotion/||' | head -40 >&2; fail "Android compile, unit tests or lint (full output: $dir/gradle.log)"; }
-    libs=$(ls -d app/build/intermediates/merged_native_libs/fossRelease/*/out/lib/arm64-v8a 2>/dev/null | head -1)
-    if [ -n "$libs" ]; then
-        printf '\n== Native libraries: lowest Android version they need\n'
+    printf '\n== Native libraries: lowest Android version they need\n'
+    if native_libs fossRelease mergeFossReleaseNativeLibs; then
         python3 tools/api_floor.py "$libs" >"$dir/api-floor.log" 2>&1 || { cat "$dir/api-floor.log" >&2; fail "a native library needs a newer Android than minSdk"; }
         tail -n 2 "$dir/api-floor.log"
     fi
-    libs=$(ls -d app/build/intermediates/merged_native_libs/compatRelease/*/out/lib/arm64-v8a 2>/dev/null | head -1)
-    if [ -n "$libs" ]; then
-        printf '\n== Native libraries of the compat build: they must load on Android 9\n'
+    printf '\n== Native libraries of the compat build: they must load on Android 9\n'
+    if native_libs compatRelease mergeCompatReleaseNativeLibs; then
         python3 tools/api_floor.py "$libs" --min 28 >"$dir/api-floor-compat.log" 2>&1 || { cat "$dir/api-floor-compat.log" >&2; fail "a compat native library needs a newer Android than 9"; }
         tail -n 2 "$dir/api-floor-compat.log"
     fi
