@@ -118,6 +118,13 @@ internal fun BackupRows(settings: AppSettings, onRestored: () -> Unit) {
     }
 }
 
+internal fun isWeeklyBackupName(name: String?) = name != null && name.startsWith(WEEKLY_PREFIX) && name.contains("." + Backup.EXTENSION)
+
+private fun displayName(context: Context, uri: Uri): String? =
+    context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { if (it.moveToFirst()) it.getString(0) else null }
+
+private const val WEEKLY_PREFIX = "AbsentMotion-weekly-"
+
 private fun stamp() = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HHmm"))
 
 private fun backUp(context: Context, task: BackupTask): List<UiText> {
@@ -158,9 +165,9 @@ private fun restoreBackup(context: Context, uri: Uri, task: BackupTask): List<Ui
 suspend fun autoBackupIfDue(context: Context, settings: AppSettings) = withContext(Dispatchers.IO) {
     if (!settings.weeklyBackup || System.currentTimeMillis() - settings.lastAutoBackup < WEEK_MS) return@withContext
     try {
-        val name = "AbsentMotion-weekly-${stamp()}.${Backup.EXTENSION}"
+        val name = "$WEEKLY_PREFIX${stamp()}.${Backup.EXTENSION}"
         val saved = MediaStoreExport(context).save(null, name, "application/octet-stream") { Backup.write(context.filesDir, it, includeMedia = false) }
-        settings.autoBackupUri?.takeIf { it != saved.toString() }?.let { old -> runCatching { context.contentResolver.delete(Uri.parse(old), null, null) } }
+        settings.autoBackupUri?.takeIf { it != saved.toString() }?.let { old -> runCatching { if (isWeeklyBackupName(displayName(context, Uri.parse(old)))) context.contentResolver.delete(Uri.parse(old), null, null) } }
         settings.autoBackupUri = saved.toString()
         settings.lastAutoBackup = System.currentTimeMillis()
         Log.i("AMBackup", "weekly backup written: $name")

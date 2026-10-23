@@ -12,6 +12,12 @@
         <exclude domain="external" path="ai" />
         <exclude domain="file" path="crashlogs" />
         <exclude domain="sharedpref" path="crashlogs.xml" />
+        <exclude domain="sharedpref" path="ai_gpu.xml" />
+        <exclude domain="sharedpref" path="media.xml" />
+        <exclude domain="sharedpref" path="camera.xml" />
+        <exclude domain="sharedpref" path="export_device.xml" />
+        <exclude domain="sharedpref" path="export_history.xml" />
+        <exclude domain="sharedpref" path="export_sizes.xml" />
     </cloud-backup>
     <device-transfer>
         <exclude domain="root" path="cache" />
@@ -20,5 +26,11 @@
         <exclude domain="file" path="fonts/google" />
         <exclude domain="file" path="crashlogs" />
         <exclude domain="sharedpref" path="crashlogs.xml" />
+        <exclude domain="sharedpref" path="ai_gpu.xml" />
+        <exclude domain="sharedpref" path="media.xml" />
+        <exclude domain="sharedpref" path="camera.xml" />
+        <exclude domain="sharedpref" path="export_device.xml" />
+        <exclude domain="sharedpref" path="export_history.xml" />
+        <exclude domain="sharedpref" path="export_sizes.xml" />
     </device-transfer>
 </data-extraction-rules>
