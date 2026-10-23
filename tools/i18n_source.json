@@ -178,6 +178,7 @@
  "ai_storage_cannot_create": "Cannot create AI media storage",
  "ai_storage_unavailable": "Media storage is unavailable",
  "ai_unable_to_process": "Unable to process this media",
+ "ai_undo_newer_first": "Undo newer AI first",
  "ai_video_cut_out_name": "%1$s cut out",
  "ai_video_frame_minutes_left": "Removing background: frame %1$s of %2$s, about %3$s min left",
  "ai_video_frame_start": "Removing background: frame %1$s of %2$s…",

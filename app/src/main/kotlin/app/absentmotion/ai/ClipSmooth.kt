@@ -85,6 +85,13 @@ internal fun smoothScene(fill: MediaFill, media: MediaDeclaration, plan: SmoothP
     return Scene.create("smooth", plan.width, plan.height, plan.fps, 0xFF000000.toInt()).withMedia(media).add(Layer(clip))
 }
 
+internal fun Layer.smoothSource(previous: AiMark?): Layer =
+    previous?.original?.let { copy(node = node.with("fillVideo", it)).shiftedMedia(previous.shift) } ?: this
+
+internal fun Layer.withSmoothed(result: String, source: String, option: String, original: MediaDeclaration?, base: Layer): Layer =
+    copy(node = node.with("fillVideo", result)).shiftedMedia(-(mediaFill?.inTime ?: 0))
+        .withAiMark(AiKind.Smooth, source, result, option, original, base.mediaFill?.inTime ?: 0)
+
 internal val Smoothing.option: String get() = "${method.name}:${level.name}:${blur.name}"
 
 internal fun smoothingOf(option: String?): Smoothing? {
@@ -104,19 +111,19 @@ internal object ClipSmooth {
         check(plan.seconds <= MAX_MATTE_SECONDS && plan.frames <= MAX_SMOOTH_FRAMES) { AppText.get(R.string.ai_clip_too_long, (MAX_MATTE_SECONDS / 60).toString()) }
         val file = aiFile(context, "mp4")
         check(file.parentFile!!.usableSpace >= plan.bytes * 2) { AppText.get(R.string.ai_not_enough_storage, (plan.bytes * 2 / 1_000_000).toString()) }
-        val inMs = fill.inTime
         val scene = smoothScene(fill, media, plan)
         val frames = minOf(plan.frames, frameCount(scene, plan.fps))
         val sound = soundTrack(context, fill.uri)
+        val spanUs = (plan.seconds * 1_000_000).roundToLong()
         var success = false
         try {
             progress(0f, AppText.get(R.string.ai_preparing))
-            encode(engine, scene, plan, file.path, frames, inMs, smoothing.copy(blurScale = plan.blurScale), sound) { done ->
+            encode(engine, scene, plan, file.path, frames, fill.inTime * 1000L, spanUs, smoothing.copy(blurScale = plan.blurScale), sound) { done ->
                 progress(0.98f * done / frames, AppText.get(R.string.smooth_frame, done.toString(), frames.toString()))
             }
             progress(0.99f, AppText.get(R.string.smooth_saving))
             return aiMedia(context, file, "video/mp4", mapOf("width" to "${plan.width}", "height" to "${plan.height}", "orientation" to "${media.orientation}",
-                "duration" to "${media.duration}", "fps" to fpsText(plan.fps.toFloat()))).also { success = true }
+                "duration" to "$spanUs", "fps" to fpsText(plan.fps.toFloat()))).also { success = true }
         } finally {
             sound?.first?.release()
             if (!success) file.delete()
@@ -138,7 +145,7 @@ internal object ClipSmooth {
         }
     }
 
-    private suspend fun encode(engine: EngineThread, scene: Scene, plan: SmoothPlan, path: String, frames: Int, inMs: Int, smoothing: Smoothing,
+    private suspend fun encode(engine: EngineThread, scene: Scene, plan: SmoothPlan, path: String, frames: Int, fromUs: Long, spanUs: Long, smoothing: Smoothing,
                                sound: Pair<MediaExtractor, Int>?, done: suspend (Int) -> Unit) {
         val encoder = openVideoEncoder(ExportSettings(minOf(plan.width, plan.height), plan.fps), plan.width, plan.height, hot = false, bitrate = plan.bitrate)
         val failure = AtomicReference<Throwable>()
@@ -162,17 +169,15 @@ internal object ClipSmooth {
                     for (k in 0 until frames) {
                         currentCoroutineContext().ensureActive()
                         failure.get()?.let { throw it }
-                        val pts = inMs * 1000L + (k * 1_000_000.0 / plan.fps).roundToLong()
-                        for (at in if (k == 0 && inMs > 0) listOf(0L, pts) else listOf(pts)) {
-                            if (writer == null) {
-                                check(feed!!.ready() && renderInto(feed.next, frameTimeMs(scene, plan.fps, k))) { AppText.get(R.string.ai_unable_to_process) }
-                                feed.send(at * 1000)
-                                continue
-                            }
+                        val pts = (k * 1_000_000.0 / plan.fps).roundToLong()
+                        if (writer == null) {
+                            check(feed!!.ready() && renderInto(feed.next, frameTimeMs(scene, plan.fps, k))) { AppText.get(R.string.ai_unable_to_process) }
+                            feed.send(pts * 1000)
+                        } else {
                             val image = writer.dequeueInputImage()
                             try {
                                 check(image.hardwareBuffer!!.use { renderInto(it, frameTimeMs(scene, plan.fps, k)) }) { AppText.get(R.string.ai_unable_to_process) }
-                                image.timestamp = at * 1000
+                                image.timestamp = pts * 1000
                                 writer.queueInputImage(image)
                             } catch (t: Throwable) {
                                 image.close()
@@ -191,7 +196,7 @@ internal object ClipSmooth {
             }
             runInterruptible(Dispatchers.IO) { output.join() }
             failure.get()?.let { throw it }
-            if (sound != null && audio != null) copySound(sound.first, mux, audio)
+            if (sound != null && audio != null) copySound(sound.first, mux, audio, fromUs, spanUs)
             failure.get()?.let { throw it }
             mux.finish()
         } finally {
@@ -206,15 +211,20 @@ internal object ClipSmooth {
         }
     }
 
-    private fun copySound(extractor: MediaExtractor, mux: Mux, track: Int) {
+    private fun copySound(extractor: MediaExtractor, mux: Mux, track: Int, fromUs: Long, spanUs: Long) {
         val buffer = ByteBuffer.allocateDirect(1 shl 20)
         val info = MediaCodec.BufferInfo()
+        if (fromUs > 0) extractor.seekTo(fromUs, MediaExtractor.SEEK_TO_PREVIOUS_SYNC)
         while (true) {
-            val size = extractor.readSampleData(buffer, 0)
-            if (size < 0) return
-            val key = extractor.sampleFlags and MediaExtractor.SAMPLE_FLAG_SYNC != 0
-            info.set(0, size, extractor.sampleTime, if (key) MediaCodec.BUFFER_FLAG_KEY_FRAME else 0)
-            mux.write(track, buffer, info)
+            val time = extractor.sampleTime
+            if (time < 0 || time >= fromUs + spanUs) return
+            if (time >= fromUs) {
+                val size = extractor.readSampleData(buffer, 0)
+                if (size < 0) return
+                val key = extractor.sampleFlags and MediaExtractor.SAMPLE_FLAG_SYNC != 0
+                info.set(0, size, time - fromUs, if (key) MediaCodec.BUFFER_FLAG_KEY_FRAME else 0)
+                mux.write(track, buffer, info)
+            }
             extractor.advance()
         }
     }

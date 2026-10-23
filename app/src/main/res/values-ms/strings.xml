@@ -1124,6 +1124,7 @@
     <string name="ai_select_image_layer">Pilih lapisan imej</string>
     <string name="ai_select_audio_layer">Pilih lapisan audio</string>
     <string name="ai_select_video_layer">Pilih lapisan video</string>
+    <string name="ai_undo_newer_first">Buat asal AI lebih baharu dahulu</string>
     <string name="ai_cancelling">Membatalkan…</string>
     <string name="ai_preparing">Menyediakan…</string>
     <string name="ai_cancelled">Dibatalkan</string>

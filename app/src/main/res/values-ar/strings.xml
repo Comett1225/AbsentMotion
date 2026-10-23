@@ -1244,6 +1244,7 @@
     <string name="ai_select_image_layer">حدد طبقة صورة</string>
     <string name="ai_select_audio_layer">حدد طبقة صوت</string>
     <string name="ai_select_video_layer">حدد طبقة فيديو</string>
+    <string name="ai_undo_newer_first">تراجع عن أحدث AI أولاً</string>
     <string name="ai_cancelling">جارٍ الإلغاء…</string>
     <string name="ai_preparing">جارٍ التحضير…</string>
     <string name="ai_cancelled">أُلغي</string>

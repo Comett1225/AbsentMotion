@@ -1148,6 +1148,7 @@
     <string name="ai_select_image_layer">Bir görsel katman seçin</string>
     <string name="ai_select_audio_layer">Bir ses katmanı seçin</string>
     <string name="ai_select_video_layer">Bir video katmanı seçin</string>
+    <string name="ai_undo_newer_first">Önce yeni AI işlemini geri al</string>
     <string name="ai_cancelling">İptal ediliyor…</string>
     <string name="ai_preparing">Hazırlanıyor…</string>
     <string name="ai_cancelled">İptal edildi</string>
