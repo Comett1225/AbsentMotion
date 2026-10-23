@@ -15,15 +15,19 @@ class ProjectVersions(private val root: File, private val now: () -> Long = Syst
         .mapNotNull { f -> f.nameWithoutExtension.toLongOrNull()?.let { Version(f, it) } }
         .sortedByDescending { it.time }
 
+    private val written = HashMap<String, Long>()
+
     @Synchronized
     fun snapshot(id: String, xml: String, minGapMs: Long = 0): Boolean {
         if (xml.isBlank()) return false
         val newest = list(id).firstOrNull()
         val time = now()
-        if (newest != null && (time - newest.time < minGapMs || sameScene(newest.file.readText(), xml))) return false
+        val last = newest?.time?.takeIf { it <= time } ?: written[id]
+        if (newest != null && (last != null && time - last in 0 until minGapMs || sameScene(newest.file.readText(), xml))) return false
         var name = maxOf(time, (newest?.time ?: 0) + 1)
         while (File(dir(id), "$name.xml").exists()) name++
         writeAtomically(File(dir(id), "$name.xml"), xml)
+        written[id] = time
         prune(id)
         return true
     }

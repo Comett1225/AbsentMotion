@@ -55,6 +55,33 @@ class ProjectVersionsTest {
         assertEquals(2, versions.list("p1").size)
     }
 
+    private fun titles(versions: ProjectVersions, id: String) =
+        versions.list(id).map { Regex("title=\"([^\"]*)\"").find(it.file.readText())!!.groupValues[1] }
+
+    @Test fun aNewestVersionDatedInTheFutureDoesNotStopTheHistory() {
+        var clock = now + 30 * day
+        val versions = ProjectVersions(tmp.newFolder(), { clock }, { ZoneOffset.UTC })
+        assertTrue(versions.snapshot("p1", xml("future")))
+        clock = now
+        assertTrue(versions.snapshot("p1", xml("fixed clock")))
+        assertFalse(versions.snapshot("p1", xml("too soon"), minGapMs = 120_000))
+        assertFalse(versions.snapshot("p1", xml("fixed clock", 2)))
+        clock += 120_000
+        assertTrue(versions.snapshot("p1", xml("later"), minGapMs = 120_000))
+        assertEquals(listOf("later", "fixed clock", "future"), titles(versions, "p1"))
+    }
+
+    @Test fun restoringWhileTheNewestVersionIsDatedInTheFutureKeepsTheCurrentState() {
+        val store = ProjectStore(tmp.newFolder())
+        val id = store.create(app.absentmotion.model.Scene.parse(xml("first")))
+        val future = System.currentTimeMillis() + 30 * day
+        store.versions.dir(id).apply { mkdirs() }.resolve("$future.xml").writeText(xml("future"))
+        store.save(id, xml("current"))
+        store.restore(id, store.versions.list(id).single())
+        assertEquals("future", store.load(id)!!.title)
+        assertEquals(listOf("current", "future"), titles(store.versions, id))
+    }
+
     @Test fun restoringKeepsTheCurrentStateAsAVersion() {
         val store = ProjectStore(tmp.newFolder())
         val id = store.create(app.absentmotion.model.Scene.parse(xml("first")))
