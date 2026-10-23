@@ -5,6 +5,9 @@ import app.absentmotion.audio.AUDIO_FX_TAG
 import app.absentmotion.library.PresetStore
 import app.absentmotion.library.SavedPreset
 import app.absentmotion.model.Layer
+import app.absentmotion.model.MotionSlot
+import app.absentmotion.model.effects
+import app.absentmotion.model.motion
 import app.absentmotion.model.Scene
 import app.absentmotion.model.VideoTiming
 import app.absentmotion.model.XmlNode
@@ -68,8 +71,13 @@ fun applyPreset(target: Layer, preset: Layer, presetId: String? = null): Layer {
     }
     if (retimed.kind == "text" && preset.kind == "text") for (a in listOf("size", "align", "font")) n = n.with(a, p[a])
     if ((retimed.kind == "audio" || retimed.mediaFill?.video == true) && (preset.kind == "audio" || preset.mediaFill?.video == true)) n = n.replaced(setOf("gain", AUDIO_FX_TAG), p)
-    return retimed.copy(node = n.with("presetId", presetId ?: n["presetId"]))
+    var applied = retimed.copy(node = n.with("presetId", presetId ?: n["presetId"]))
+    for (slot in MotionSlot.entries) if (applied.motion(slot) != null && !applied.hasMotionParts(slot)) applied = applied.copy(node = applied.node.with(slot.attr, null))
+    return applied
 }
+
+private fun Layer.hasMotionParts(slot: MotionSlot): Boolean = effects.any { it["gen"] == slot.xml } ||
+    node.child("transform")?.children.orEmpty().any { part -> part.keyframes.any { it.gen == slot.xml } }
 
 private fun XmlNode.replaced(names: Set<String>, from: XmlNode): XmlNode {
     val at = children.indexOfFirst { it.name in names }.takeIf { it >= 0 } ?: children.size
