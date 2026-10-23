@@ -638,17 +638,17 @@
     <string name="menu_reset_transform">I-reset ang transform</string>
     <string name="menu_select_all_layers">Piliin ang lahat ng layer</string>
     <plurals name="menu_duplicate_layers">
-        <item quantity="one">I-duplicate ang layer</item>
+        <item quantity="one">I-duplicate ang %1$s layer</item>
         <item quantity="other">I-duplicate ang %1$s layer</item>
     </plurals>
     <string name="menu_save_preset">I-save ang preset</string>
     <plurals name="menu_copy_layers">
-        <item quantity="one">Kopyahin ang layer</item>
+        <item quantity="one">Kopyahin ang %1$s layer</item>
         <item quantity="other">Kopyahin ang %1$s layer</item>
     </plurals>
     <string name="menu_with_its_style">(kasama ang estilo nito)</string>
     <plurals name="menu_paste_layers">
-        <item quantity="one">I-paste ang layer</item>
+        <item quantity="one">I-paste ang %1$s layer</item>
         <item quantity="other">I-paste ang %1$s layer</item>
     </plurals>
     <string name="menu_paste_style">I-paste ang estilo</string>

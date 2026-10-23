@@ -31,6 +31,7 @@ FOLDERS = {'en': 'values', 'id': 'values-in', 'hi': 'values-hi', 'pt-BR': 'value
            'vi': 'values-vi', 'th': 'values-th', 'ms': 'values-ms', 'ar': 'values-ar', 'tr': 'values-tr', 'ru': 'values-ru'}
 JAVA_WORDS = {'new', 'default', 'switch', 'case', 'do', 'final', 'private', 'public', 'static', 'void', 'int', 'char', 'this', 'super', 'throw', 'goto', 'const', 'package', 'native', 'long', 'short', 'byte', 'float', 'double', 'boolean', 'catch', 'enum', 'extends', 'implements', 'interface', 'instanceof', 'protected', 'synchronized', 'throws', 'transient', 'volatile', 'abstract', 'strictfp', 'null', 'true', 'false'}
 PLACEHOLDER = re.compile(r'%(\d+\$)?[sdf]')
+COUNTED_ONE = {'values-fil', 'values-ru', 'values-hi', 'values-pt-rBR'}
 LETTER = re.compile('[A-Za-z\u00c0-\uffff]')
 
 
@@ -332,7 +333,7 @@ def check():
             reference = english.get(key) if '#' not in key else english.get(base + '#other', '')
             a = sorted(m.group(0) for m in PLACEHOLDER.finditer(reference or ''))
             b = sorted(m.group(0) for m in PLACEHOLDER.finditer(local[key]))
-            if a != b and not ('#' in key and not key.endswith('#other') and set(b) <= set(a)):
+            if a != b and not ('#' in key and not key.endswith('#other') and set(b) <= set(a) and folder not in COUNTED_ONE):
                 problems.append(f'{folder}: {key}: placeholders {a} in English but {b} here')
             if '#' in key and base + '#other' not in local:
                 problems.append(f'{folder}: {base}: no "other" plural form')
