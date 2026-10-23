@@ -183,8 +183,8 @@ private fun EditorState.stretchFrame(direction: Int): Int? {
     val layer = keyLayer ?: return null
     val element = layer.element(ref) ?: return null
     val keys = element.keyframes
-    val end = element.stretchAt(layer.t, layer.snap) + direction
-    if (end < 1 || end > keys.lastIndex || element.stretchAt(layer.t, layer.snap) < 0) return null
+    val end = element.stretchAt(layer.snap) + direction
+    if (end < 1 || end > keys.lastIndex || element.stretchAt(layer.snap) < 0) return null
     val middle = (keys[end - 1].t + keys[end].t) / 2
     val time = if (ref == SpeedRef) layer.startTime + VideoTiming(layer).localMs(middle.toDouble() / 1_000_000).roundToInt() else layer.timeOf(middle)
     return scene.frameAt(time)

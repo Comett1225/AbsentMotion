@@ -33,7 +33,7 @@ class EffectPasteTest {
 
     @Test fun eachClipOwnsItsPastedEffects() {
         val out = scene.withEffectsPasted(setOf(1L, 2L), listOf(glow))
-        val changed = out.update(1) { it.withEffect(1) { node -> node.withEffectProperty("radius", "float", "99", 0f, 0f) } }
+        val changed = out.update(1) { it.withEffect(1) { node -> node.withEffectProperty("radius", "float", "99", 0f, 0f..0f) } }
         assertNotEquals(changed.layer(1)!!.effects[1], changed.layer(2)!!.effects[0])
         assertEquals(glow, changed.layer(2)!!.effects[0])
     }

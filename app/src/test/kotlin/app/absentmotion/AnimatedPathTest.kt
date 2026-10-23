@@ -33,13 +33,13 @@ class AnimatedPathTest {
     }
 
     private fun animated(): Layer {
-        val first = base.copy(t = 0.2f, snap = 0.01f).withShapeKeyToggled()
-        return first.copy(t = 0.6f, snap = 0.01f).withContoursAt(bigger)
+        val first = base.copy(t = 0.2f, snap = 0.2f - 0.01f..0.2f + 0.01f).withShapeKeyToggled()
+        return first.copy(t = 0.6f, snap = 0.6f - 0.01f..0.6f + 0.01f).withContoursAt(bigger)
     }
 
     @Test fun aKeyframeToggleTurnsAStaticPathIntoOneShapeKey() {
         assertFalse(base.isShapeAnimated)
-        val keyed = base.copy(t = 0.2f, snap = 0.01f).withShapeKeyToggled()
+        val keyed = base.copy(t = 0.2f, snap = 0.2f - 0.01f..0.2f + 0.01f).withShapeKeyToggled()
         assertTrue(keyed.isShapeAnimated)
         assertEquals(listOf(0.2f), keyed.shapeKeys.map { it.t })
         assertEquals(square, keyed.contours)
@@ -50,7 +50,7 @@ class AnimatedPathTest {
         assertEquals(listOf(0.2f), knots[1].child("p")!!.keyframes.map { it.t })
         assertEquals("100.000000,0.000000", knots[1].child("p")!!.keyframes.single().v)
         assertNull(knots[1].child("in"))
-        assertEquals(0, keyed.copy(t = 0.2f, snap = 0.01f).shapeKeyIndex())
+        assertEquals(0, keyed.copy(t = 0.2f, snap = 0.2f - 0.01f..0.2f + 0.01f).shapeKeyIndex())
     }
 
     @Test fun movingPointsAtANewTimeAddsAShapeKeyAndInterpolatesPointByPoint() {
@@ -65,15 +65,15 @@ class AnimatedPathTest {
         near(Pt(120f, 15f), middle[1].outHandle!!)
         near(Pt(0f, 120f), middle[3].p)
         assertNull(layer.copy(t = 0.2f).contours!!.single().knots[1].inHandle)
-        val edited = layer.copy(t = 0.6f, snap = 0.01f).withContoursAt(square)
+        val edited = layer.copy(t = 0.6f, snap = 0.6f - 0.01f..0.6f + 0.01f).withContoursAt(square)
         assertEquals(2, edited.shapeKeys.size)
         assertEquals(square, edited.copy(t = 0.6f).contours)
     }
 
     @Test fun removingEveryKeyLeavesTheLastShapeAsAStaticPath() {
-        val one = animated().copy(t = 0.2f, snap = 0.01f).withShapeKeyToggled()
+        val one = animated().copy(t = 0.2f, snap = 0.2f - 0.01f..0.2f + 0.01f).withShapeKeyToggled()
         assertEquals(listOf(0.6f), one.shapeKeys.map { it.t })
-        val plain = one.copy(t = 0.6f, snap = 0.01f).withShapeKeyToggled()
+        val plain = one.copy(t = 0.6f, snap = 0.6f - 0.01f..0.6f + 0.01f).withShapeKeyToggled()
         assertFalse(plain.isShapeAnimated)
         assertNotNull(plain.node.child("path")!!["d"])
         assertEquals(bigger, plain.contours)

@@ -90,18 +90,18 @@ fun XmlNode.valueAt(t: Float): String? {
     return blend(a.v, b.v, if (b.e.isNullOrEmpty()) u else NativeEngine.ease(b.e, u))
 }
 
-fun XmlNode.withValueAt(t: Float, value: String, snap: Float): XmlNode {
+fun XmlNode.withValueAt(t: Float, value: String, snap: ClosedFloatingPointRange<Float>): XmlNode {
     if (!isKeyframed) return with("value", value)
     val keys = keyframes
-    val here = keys.indexOfFirst { abs(it.t - t) <= snap }
+    val here = keys.indexOfFirst { it.t in snap }
     return withKeyframes(if (here >= 0) keys.toMutableList().also { it[here] = it[here].copy(v = value) } else keys + Keyframe(t, value))
 }
 
-fun XmlNode.keyframeAt(t: Float, snap: Float): Int = keyframes.indexOfFirst { abs(it.t - t) <= snap }
+fun XmlNode.keyframeAt(snap: ClosedFloatingPointRange<Float>): Int = keyframes.indexOfFirst { it.t in snap }
 
-fun XmlNode.withKeyframeToggled(t: Float, snap: Float): XmlNode {
+fun XmlNode.withKeyframeToggled(t: Float, snap: ClosedFloatingPointRange<Float>): XmlNode {
     val keys = keyframes
-    val here = keyframeAt(t, snap)
+    val here = keyframeAt(snap)
     return when {
         here < 0 -> withKeyframes(keys + Keyframe(t, valueAt(t) ?: return this))
         keys.size == 1 -> copy(children = children.filterNot { it.name == "kf" }).with("value", keys[0].v)
@@ -109,10 +109,10 @@ fun XmlNode.withKeyframeToggled(t: Float, snap: Float): XmlNode {
     }
 }
 
-fun XmlNode.stretchAt(t: Float, snap: Float): Int {
+fun XmlNode.stretchAt(snap: ClosedFloatingPointRange<Float>): Int {
     val keys = keyframes
-    val next = keys.indexOfFirst { it.t > t + snap }
-    return if (next > 0 && keys[next - 1].t < t - snap) next else -1
+    val next = keys.indexOfFirst { it.t > snap.endInclusive }
+    return if (next > 0 && keys[next - 1].t < snap.start) next else -1
 }
 
 fun XmlNode.retimed(oldStart: Int, oldEnd: Int, newStart: Int, newEnd: Int): XmlNode {

@@ -38,7 +38,7 @@ fun EditorState.shapeKeyFrames(mode: PointMode): List<Int> {
 
 fun EditorState.onionShape(mode: PointMode): List<Contour>? {
     val layer = scene.layerAt(mode.layerId, sampleMs) ?: return null
-    return layer.shapeKeys.lastOrNull { it.t < layer.t - layer.snap }?.contours
+    return layer.shapeKeys.lastOrNull { it.t < layer.snap.start }?.contours
 }
 
 private fun <T> List<T>.replaced(index: Int, value: T) = mapIndexed { i, v -> if (i == index) value else v }

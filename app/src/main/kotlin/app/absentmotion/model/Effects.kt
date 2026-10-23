@@ -38,7 +38,7 @@ fun Layer.moveEffect(from: Int, to: Int): Layer {
 
 fun XmlNode.effectProperty(name: String): XmlNode? = children.firstOrNull { it.name == "property" && it["name"] == name }
 
-fun XmlNode.withEffectProperty(name: String, type: String, value: String, t: Float, snap: Float): XmlNode {
+fun XmlNode.withEffectProperty(name: String, type: String, value: String, t: Float, snap: ClosedFloatingPointRange<Float>): XmlNode {
     val old = effectProperty(name)
     val property = (old ?: XmlNode("property", mapOf("name" to name, "type" to type))).withValueAt(t, value, snap)
     return copy(children = if (old == null) children + property else children.map { if (it === old) property else it })

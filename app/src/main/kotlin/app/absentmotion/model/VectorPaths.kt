@@ -102,12 +102,12 @@ fun Layer.withShapeKeys(keys: List<ShapeKey>): Layer {
     return copy(node = node.withChild("path", path))
 }
 
-fun Layer.shapeKeyIndex(): Int = shapeKeys.indexOfFirst { abs(it.t - t) <= snap }
+fun Layer.shapeKeyIndex(): Int = shapeKeys.indexOfFirst { it.t in snap }
 
 fun Layer.withContoursAt(contours: List<Contour>): Layer {
     val keys = shapeKeys
     if (keys.isEmpty()) return withContours(contours)
-    val here = keys.indexOfFirst { abs(it.t - t) <= snap }
+    val here = keys.indexOfFirst { it.t in snap }
     return withShapeKeys(if (here >= 0) keys.mapIndexed { i, k -> if (i == here) k.copy(contours = contours) else k } else keys + ShapeKey(t, contours))
 }
 
@@ -115,7 +115,7 @@ fun Layer.withShapeKeyToggled(): Layer {
     val keys = shapeKeys
     val now = contours ?: return this
     if (keys.isEmpty()) return withShapeKeys(listOf(ShapeKey(t, now)))
-    val here = keys.indexOfFirst { abs(it.t - t) <= snap }
+    val here = keys.indexOfFirst { it.t in snap }
     return when {
         here < 0 -> withShapeKeys(keys + ShapeKey(t, now))
         keys.size == 1 -> withContours(keys[0].contours)

@@ -336,7 +336,7 @@ internal object TimelineMath {
         for (layer in scene.layers) if (layer.id != skip) {
             add(scene.firstShownFrame(layer.startTime))
             add(scene.lastShownFrame(layer.endTime) + 1)
-            layer.keyframeTimes().forEach { add(scene.firstShownFrame(it)) }
+            layer.keyframeTimes().forEach { add(scene.frameAt(it)) }
         }
     }
 }
