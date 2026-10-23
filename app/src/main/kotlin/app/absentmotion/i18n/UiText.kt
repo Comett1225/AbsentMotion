@@ -37,7 +37,7 @@ object AppText {
     private var context: Context? = null
 
     fun install(context: Context) {
-        this.context = context.applicationContext
+        this.context = context.applicationContext.inAppLanguage()
     }
 
     fun get(@StringRes id: Int, vararg args: Any): String = context?.getString(id, *args) ?: "#$id"

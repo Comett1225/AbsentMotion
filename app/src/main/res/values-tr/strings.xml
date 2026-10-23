@@ -25,7 +25,7 @@
     <string name="onboarding_speed_basic">Temel</string>
     <string name="onboarding_speed_basic_note">En iyi 720p veya 1080p ile çalışır. Uzun videolar biraz zaman alır.</string>
     <string name="no_camera_was_found_on_this">Bu cihazda kamera bulunamadı.</string>
-    <string name="no_sound_microphone_access_is_off">Ses yok: mikrofon erişimi kapalı</string>
+    <string name="no_sound_microphone_access_is_off">Ses yok: mikrofon erişimi kapalı. Açmak için dokunun</string>
     <string name="camera_access">Kamera erişimi</string>
     <string name="view_all">Tümünü gör</string>
     <string name="add_audio_effect">Ses efekti ekle</string>

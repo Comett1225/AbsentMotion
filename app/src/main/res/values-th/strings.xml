@@ -25,7 +25,7 @@
     <string name="onboarding_speed_basic">พื้นฐาน</string>
     <string name="onboarding_speed_basic_note">เหมาะกับ 720p หรือ 1080p ที่สุด วิดีโอยาวจะใช้เวลาสักพัก</string>
     <string name="no_camera_was_found_on_this">ไม่พบกล้องบนอุปกรณ์นี้</string>
-    <string name="no_sound_microphone_access_is_off">ไม่มีเสียง: ปิดการเข้าถึงไมโครโฟนอยู่</string>
+    <string name="no_sound_microphone_access_is_off">ไม่มีเสียง: สิทธิ์การใช้ไมโครโฟนถูกปิดอยู่ แตะเพื่อเปิด</string>
     <string name="camera_access">การเข้าถึงกล้อง</string>
     <string name="view_all">ดูทั้งหมด</string>
     <string name="add_audio_effect">เพิ่มเอฟเฟกต์เสียง</string>

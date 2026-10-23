@@ -25,7 +25,7 @@
     <string name="onboarding_speed_basic">Cơ bản</string>
     <string name="onboarding_speed_basic_note">Phù hợp nhất với 720p hoặc 1080p. Video dài sẽ mất thời gian hơn.</string>
     <string name="no_camera_was_found_on_this">Không tìm thấy máy ảnh trên thiết bị này.</string>
-    <string name="no_sound_microphone_access_is_off">Không có âm thanh: quyền truy cập micrô đang tắt</string>
+    <string name="no_sound_microphone_access_is_off">Không có âm thanh: quyền truy cập micrô đang tắt. Nhấn để bật</string>
     <string name="camera_access">Quyền truy cập máy ảnh</string>
     <string name="view_all">Xem tất cả</string>
     <string name="add_audio_effect">Thêm hiệu ứng âm thanh</string>

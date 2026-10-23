@@ -2917,7 +2917,7 @@
  "no_camera_was_found_on_this": "No camera was found on this device.",
  "no_earlier_versions_yet_a_version": "No earlier versions yet. A version is kept each time the project is opened or closed, and every two minutes while you edit.",
  "no_presets_saved_yet": "No presets saved yet",
- "no_sound_microphone_access_is_off": "No sound: microphone access is off",
+ "no_sound_microphone_access_is_off": "No sound: microphone access is off. Tap to turn it on",
  "none": "None",
  "ok": "OK",
  "onboarding_check_body": "A quick check shows which video formats and sizes this device can export, and how fast it is. It runs once, takes a few seconds and everything stays on this device.",

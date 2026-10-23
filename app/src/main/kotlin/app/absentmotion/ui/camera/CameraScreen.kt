@@ -160,7 +160,7 @@ fun CameraScreen(aspect: Float, onClose: () -> Unit, onCaptured: (Uri, Boolean) 
             }
         }
         Box(Modifier.fillMaxSize().background(Color.Black)) {
-            Permitted(onClose) { mic -> CameraBody(ui, aspect, mic, onClose, onCaptured) }
+            Permitted(onClose) { mic, askMic -> CameraBody(ui, aspect, mic, askMic, onClose, onCaptured) }
         }
     }
 }
@@ -177,7 +177,7 @@ private fun Context.findActivity(): Activity? {
 }
 
 @Composable
-private fun Permitted(onClose: () -> Unit, content: @Composable (mic: Boolean) -> Unit) {
+private fun Permitted(onClose: () -> Unit, content: @Composable (mic: Boolean, askMic: () -> Unit) -> Unit) {
     val context = LocalContext.current
     fun has(name: String) = context.checkSelfPermission(name) == PackageManager.PERMISSION_GRANTED
     var camera by remember { mutableStateOf(has(Manifest.permission.CAMERA)) }
@@ -191,12 +191,22 @@ private fun Permitted(onClose: () -> Unit, content: @Composable (mic: Boolean) -
         blocked = cameraBlocked(camera, rationale, prefs.getBoolean("refused", false))
         prefs.edit().putBoolean("refused", !camera).apply()
     }
+    val micRequest = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        mic = granted
+        prefs.edit().putBoolean("micRefused", !granted).apply()
+    }
+    fun askMic() {
+        val rationale = context.findActivity()?.shouldShowRequestPermissionRationale(Manifest.permission.RECORD_AUDIO) == true
+        if (cameraBlocked(false, rationale, prefs.getBoolean("micRefused", false))) {
+            context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", context.packageName, null)))
+        } else micRequest.launch(Manifest.permission.RECORD_AUDIO)
+    }
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
         camera = has(Manifest.permission.CAMERA)
         mic = has(Manifest.permission.RECORD_AUDIO)
     }
     if (camera) {
-        content(mic)
+        content(mic, ::askMic)
         return
     }
     Column(
@@ -233,7 +243,7 @@ private fun mediaValues(mime: String, extension: String) = ContentValues().apply
 
 @SuppressLint("MissingPermission", "ClickableViewAccessibility")
 @Composable
-private fun CameraBody(ui: CameraUi, aspect: Float, mic: Boolean, onClose: () -> Unit, onCaptured: (Uri, Boolean) -> Unit) {
+private fun CameraBody(ui: CameraUi, aspect: Float, mic: Boolean, askMic: () -> Unit, onClose: () -> Unit, onCaptured: (Uri, Boolean) -> Unit) {
     val context = LocalContext.current
     val owner = LocalLifecycleOwner.current
     val scope = rememberCoroutineScope()
@@ -430,7 +440,7 @@ private fun CameraBody(ui: CameraUi, aspect: Float, mic: Boolean, onClose: () ->
                 if (ui.video && !mic) Text(
                     stringResource(R.string.no_sound_microphone_access_is_off),
                     Modifier.align(Alignment.TopCenter).padding(10.dp).clip(RoundedCornerShape(12.dp)).background(Color.Black.copy(alpha = 0.5f))
-                        .padding(horizontal = 10.dp, vertical = 3.dp),
+                        .clickable(onClick = askMic).padding(horizontal = 10.dp, vertical = 3.dp),
                     color = Color.White, fontSize = 13.sp,
                 )
                 if (lenses?.let { !it.first && !it.second } == true) Text(

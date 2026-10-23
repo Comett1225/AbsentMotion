@@ -62,6 +62,10 @@ import kotlinx.coroutines.launch
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
 
+private fun unsupportedPick(context: android.content.Context) {
+    android.widget.Toast.makeText(context, context.getString(R.string.library_err_unsupported_type), android.widget.Toast.LENGTH_LONG).show()
+}
+
 @Composable
 internal fun MediaTab(state: EditorState, modifier: Modifier, library: AddLibrary) {
     val context = LocalContext.current
@@ -84,7 +88,7 @@ internal fun MediaTab(state: EditorState, modifier: Modifier, library: AddLibrar
             runCatching { context.contentResolver.takePersistableUriPermission(uri, android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION) }
             scope.launch {
                 state.addingMedia = true
-                try { mediaDeclaration(context, uri)?.let { state.keepCopy(context, it) }?.let { if (it.type.startsWith("video/")) state.addVideo(it) else state.addImage(it) } } finally { state.addingMedia = false }
+                try { mediaDeclaration(context, uri)?.let { state.keepCopy(context, it) }?.let { if (it.type.startsWith("video/")) state.addVideo(it) else state.addImage(it) } ?: unsupportedPick(context) } finally { state.addingMedia = false }
             }
         }
     }
@@ -148,7 +152,7 @@ internal fun MediaTab(state: EditorState, modifier: Modifier, library: AddLibrar
                         state.addingMedia = true
                         try {
                             if (file.svg) state.importSvgFile(context, file.uri)
-                            else mediaDeclaration(context, file.uri)?.let { state.keepCopy(context, it) }?.let { if (file.video) state.addVideo(it) else state.addImage(it) }
+                            else mediaDeclaration(context, file.uri)?.let { state.keepCopy(context, it) }?.let { if (file.video) state.addVideo(it) else state.addImage(it) } ?: unsupportedPick(context)
                         } finally { state.addingMedia = false }
                     }
                 }) {

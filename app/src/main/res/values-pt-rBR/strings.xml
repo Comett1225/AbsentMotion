@@ -25,7 +25,7 @@
     <string name="onboarding_speed_basic">Básica</string>
     <string name="onboarding_speed_basic_note">Ideal para 720p ou 1080p. Vídeos longos demoram um pouco.</string>
     <string name="no_camera_was_found_on_this">Nenhuma câmera foi encontrada neste dispositivo.</string>
-    <string name="no_sound_microphone_access_is_off">Sem som: acesso ao microfone desativado</string>
+    <string name="no_sound_microphone_access_is_off">Sem som: o acesso ao microfone está desativado. Toque para ativar</string>
     <string name="camera_access">Acesso à câmera</string>
     <string name="view_all">Ver tudo</string>
     <string name="add_audio_effect">Adicionar efeito de áudio</string>
