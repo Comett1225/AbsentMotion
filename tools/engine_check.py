@@ -82,6 +82,15 @@ SWAPPED = scene('<shape id="1" label="v" startTime="0" endTime="1999" fillType="
                 '<property name="size" type="vec2" value="32,32"/></shape>', 64, 64, 10)
 
 CENTRED = '<border direction="centered"><color value="#ffffffff"/><size value="{}"/></border>'
+OUTSIDE = '<border direction="outside"><color value="#ffffffff"/><size value="{}"/></border>'
+
+
+def repeated_late(extra):
+    return ('<shape id="1" label="m" startTime="0" endTime="1000" fillType="color" mediaFillMode="fill" s=".rect">'
+            '<transform><location><kf t="0" v="40,60,0"/><kf t="1" v="160,60,0"/></location></transform>'
+            '<fillColor value="#ffff0000"/><property name="size" type="vec2" value="20,20"/>'
+            '<effect id="absent.repeat" hidden="false"><property name="count" type="float" value="2"/>'
+            f'<property name="time" type="float" value="0.5"/></effect>{extra}</shape>')
 
 
 def fill_stroke(points):
@@ -122,6 +131,29 @@ CASES = {
         scene(cutout(CUT_STROKE)), [((100, 70), GREEN), ((100, 100), RED), ((52, 100), BLACK), ((55, 55), BLACK)]),
     "a border on a cut-out picture with Glow follows its visible pixels": (
         scene(cutout(CUT_GLOW)), [((100, 68), BLUE), ((100, 100), RED), ((52, 100), BLACK), ((55, 55), BLACK)]),
+    "an outside border stays outside a see-through fill": (
+        scene(rect(1, 100, 100, 50, 50, 0x80ff0000, extra=OUTSIDE.format(12))),
+        [((100, 100), (128, 0, 0)), ((52, 100), (128, 0, 0)), ((100, 47), (255, 255, 255)), ((100, 30), BLACK)]),
+    "an outside border stays outside see-through text": (
+        scene('<text id="1" label="t" fillType="color" startTime="0" endTime="1000" size="150" wrapWidth="190" align="center">'
+              f'{transform("100,100,0")}<content>I</content><fillColor value="#80ff0000"/>{OUTSIDE.format(10)}</text>'),
+        [((100, 100), (128, 0, 0))]),
+    "a stroke on a drawing follows the drawn line, not its bounding box": (
+        scene(f'<drawing id="1" label="d" startTime="0" endTime="1000">{transform()}'
+              f'<stroke color="#ffffffff" width="20" type="pen" points="40,40,1;160,160,1"/>{CUT_STROKE}</drawing>'),
+        [((100, 100), (255, 255, 255)), ((107, 93), GREEN), ((168, 100), BLACK), ((165, 35), BLACK)]),
+    "a stroke on a group follows what is inside it": (
+        scene(f'<embedScene id="1" label="g" startTime="0" endTime="1000">{transform("100,100,0")}'
+              '<scene width="200" height="200" fps="30" totalTime="1000" bgcolor="#00000000">'
+              + rect(2, 100, 100, 40, 40, 0xffff0000) + f'</scene>{CUT_STROKE}</embedScene>'),
+        [((100, 100), RED), ((60, 100), GREEN), ((100, 140), GREEN), ((50, 100), BLACK)]),
+    "a border follows a Repeat copy that runs late": (
+        scene(repeated_late(OUTSIDE.format(8)), fps=10),
+        [((76, 60), RED), ((136, 60), RED), ((54, 60), (255, 255, 255)), ((98, 60), (255, 255, 255)), ((114, 60), (255, 255, 255)),
+         ((158, 60), (255, 255, 255)), ((106, 60), BLACK)], 8),
+    "a centred border follows a Repeat copy that runs late": (
+        scene(repeated_late(CENTRED.format(6).replace("#ffffffff", "#ff0000ff")), fps=10),
+        [((76, 60), RED), ((56, 60), BLUE), ((96, 60), BLUE), ((116, 60), BLUE), ((156, 60), BLUE), ((106, 60), BLACK)], 8),
     "a shutter blur on a still layer keeps its first frame at full strength": (
         scene(rect(1, 100, 100, 50, 50, extra='<effect id="absent.shutterblur" hidden="false"><property name="shutter" type="float" value="180"/></effect>')),
         [((100, 100), (255, 255, 255))]),
@@ -197,8 +229,8 @@ def main():
     for name, make in PICTURES.items():
         make(work / name)
         adb("push", work / name, f"{DEVICE_DIR}/{name}")
-    for k, (title, (xml, probes)) in enumerate(CASES.items()):
-        image = still(f"enginecheck{k}", xml, work)
+    for k, (title, (xml, probes, *frame)) in enumerate(CASES.items()):
+        image = still(f"enginecheck{k}", xml, work, *frame)
         results.append((title, [f"{xy} is {tuple(int(v) for v in image[xy[1], xy[0]])}, expected {want}" for xy, want in probes
                                 if np.abs(image[xy[1], xy[0]] - want).max() > TOLERANCE]))
     for k, (title, (xml, probes)) in enumerate(HITS.items()):
