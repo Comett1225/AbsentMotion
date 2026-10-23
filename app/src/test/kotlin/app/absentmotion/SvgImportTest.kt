@@ -2,6 +2,7 @@ package app.absentmotion
 
 import app.absentmotion.i18n.txt
 import app.absentmotion.model.Layer
+import app.absentmotion.model.MaxSvgNodes
 import app.absentmotion.model.Pt
 import app.absentmotion.model.Scene
 import app.absentmotion.model.SvgImport
@@ -258,5 +259,13 @@ class SvgImportTest {
         assertEquals(1000, result!!.shapes)
         assertTrue(result!!.skipped.contains(txt(app.absentmotion.R.string.model_svg_skipped_shapes, "1000")))
         assertTrue(result!!.skipped.contains(txt(app.absentmotion.R.string.library_text_value, "parts repeated too many times")))
+    }
+
+    @Test fun anSvgWithTooManyElementsIsRefusedWhileParsing() {
+        val head = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 10 10\">"
+        val fits = runCatching { import(head + "<g/>".repeat(MaxSvgNodes - 1) + "</svg>") }
+        assertTrue(fits.exceptionOrNull().toString(), fits.isSuccess)
+        val error = runCatching { import(head + "<g/>".repeat(MaxSvgNodes) + "</svg>") }.exceptionOrNull()
+        assertTrue(error.toString(), error is IllegalArgumentException)
     }
 }

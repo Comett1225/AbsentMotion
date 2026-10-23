@@ -16,7 +16,7 @@ import kotlin.math.tan
 class SvgImport(val layer: Layer?, val skipped: List<UiText>, val shapes: Int)
 
 fun importSvg(text: String, title: String, host: Scene, startTime: Int, endTime: Int): SvgImport {
-    val root = XmlNode.parse(text)
+    val root = XmlNode.parse(text, MaxSvgNodes)
     require(root.local == "svg") { "This file is not an SVG image." }
     val reader = SvgReader(root)
     val items = reader.read()
@@ -73,6 +73,7 @@ private val SelectorPattern = Regex("^([a-zA-Z][\\w-]*|\\*)?((?:[.#][\\w-]+)*)$"
 private const val Kappa = 0.5522848f
 private const val MaxShapes = 1000
 private const val MaxVisits = 100_000
+internal const val MaxSvgNodes = 200_000
 
 private fun numbers(text: String?): List<Float> = text?.let { NumberPattern.findAll(it).map { m -> m.value.toFloat() }.toList() } ?: emptyList()
 

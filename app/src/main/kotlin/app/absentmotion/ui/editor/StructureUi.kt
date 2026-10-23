@@ -90,6 +90,7 @@ import app.absentmotion.media.parseModel
 import app.absentmotion.model.importSvg
 import java.io.File
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -155,12 +156,17 @@ internal suspend fun EditorState.importSvgFile(context: Context, uri: Uri) {
             } ?: uri.lastPathSegment.orEmpty()
             val bytes = context.contentResolver.openInputStream(uri)?.use { it.readAtMost(MaxSvgBytes + 1) } ?: throw java.io.IOException("unreadable")
             if (bytes.size > MaxSvgBytes) throw java.io.IOException("too large")
+            ensureActive()
             importSvg(String(bytes, Charsets.UTF_8), name.substringAfterLast('/').removeSuffix(".svg").removeSuffix(".SVG"), host, start, end)
         }
     } catch (e: kotlinx.coroutines.CancellationException) {
         throw e
     } catch (e: Exception) {
         Log.w("AMSvg", "cannot import $uri", e)
+        say(context.getString(R.string.structure_svg_unreadable))
+        return
+    } catch (e: OutOfMemoryError) {
+        Log.w("AMSvg", "too large to import $uri", e)
         say(context.getString(R.string.structure_svg_unreadable))
         return
     }

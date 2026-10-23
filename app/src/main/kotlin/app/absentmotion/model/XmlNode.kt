@@ -48,20 +48,21 @@ data class XmlNode(
     }
 
     companion object {
-        fun parse(xml: String): XmlNode {
+        fun parse(xml: String, maxNodes: Int = Int.MAX_VALUE): XmlNode {
             val parser = xmlParser()
             parser.setInput(xml.reader())
             while (parser.eventType != XmlPullParser.START_TAG) {
                 if (parser.eventType == XmlPullParser.END_DOCUMENT) throw IllegalArgumentException("No root element")
                 parser.next()
             }
-            return read(parser, 1)
+            return read(parser, 1, intArrayOf(maxNodes))
         }
 
         private const val MAX_DEPTH = 256
 
-        private fun read(parser: XmlPullParser, depth: Int): XmlNode {
+        private fun read(parser: XmlPullParser, depth: Int, budget: IntArray): XmlNode {
             if (depth > MAX_DEPTH) throw IllegalArgumentException("Elements are nested more than $MAX_DEPTH deep")
+            if (--budget[0] < 0) throw IllegalArgumentException("Too many elements")
             val name = parser.name
             val attrs = LinkedHashMap<String, String>()
             for (i in 0 until parser.attributeCount) attrs[parser.getAttributeName(i)] = parser.getAttributeValue(i)
@@ -69,7 +70,7 @@ data class XmlNode(
             val text = StringBuilder()
             while (true) {
                 when (parser.next()) {
-                    XmlPullParser.START_TAG -> children += read(parser, depth + 1)
+                    XmlPullParser.START_TAG -> children += read(parser, depth + 1, budget)
                     XmlPullParser.TEXT -> text.append(parser.text)
                     XmlPullParser.END_TAG, XmlPullParser.END_DOCUMENT -> break
                 }
