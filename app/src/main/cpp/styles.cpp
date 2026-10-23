@@ -607,6 +607,8 @@ std::vector<LayerCopy> CopiesOf(const std::vector<Layer>& siblings, const Layer&
 
 SkPath BodyPath(const Layer& l, float t) { return ShapeKind(l) ? DrawingProgressPath(l, ShapePath(l, t), t) : ShapePath(l, t); }
 
+SkPath StrokeGeometry(const Layer& l, const SkPath& body, float t) { return l.text ? TextGlyphPath(l, t, Fps()) : body; }
+
 struct Drawn {
     bool fill = false;
     SkPath stroked;
@@ -672,7 +674,7 @@ Drawn DrawBody(SkCanvas* canvas, const Layer& l, double timeMs, float t, const S
     }
     canvas->restore();
     if (edged) canvas->restore();
-    else if (stroked) drawn.stroked = DrawStroke(canvas, l, path.makeTransform(m), t, alpha, outline);
+    else if (stroked) drawn.stroked = DrawStroke(canvas, l, StrokeGeometry(l, path, t).makeTransform(m), t, alpha, outline);
     return drawn;
 }
 
@@ -765,7 +767,7 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
     }
     if (copies) {
         drawn.fill = l.kind == "drawing" ? !l.strokes.empty() : l.fillType == "color" ? ColorAt(l.fillColor, t, kWhite, alpha).fA > 0 : l.fillType == "media" || l.fillType == "gradient";
-        if (l.stroke.present && l.stroke.enabled) drawn.stroked = DrawStroke(nullptr, l, scenePath, t, alpha);
+        if (l.stroke.present && l.stroke.enabled) drawn.stroked = DrawStroke(nullptr, l, StrokeGeometry(l, path, t).makeTransform(m), t, alpha);
     }
     SkPath region = drawn.fill ? (l.text ? TextGlyphPath(l, t, Fps()).makeTransform(m) : l.kind == "drawing" ? DrawingOutline(l, t).makeTransform(m) : scenePath) : SkPath();
     region = Union(region, drawn.stroked);
@@ -1021,7 +1023,7 @@ static bool ContainsOne(const std::vector<Layer>& siblings, const Layer& l, doub
         if (mask) return CutoutContains(l, t, path, *mask, local, std::sqrt(std::fabs(matrix.getScaleX() * matrix.getScaleY() - matrix.getSkewX() * matrix.getSkewY())));
         if (l.fillType != "none" && path.contains(local.fX, local.fY)) return true;
         if (!(l.stroke.present && l.stroke.enabled)) return false;
-        return DrawStroke(nullptr, l, path.makeTransform(matrix), t, 1).contains(p.fX, p.fY);
+        return DrawStroke(nullptr, l, StrokeGeometry(l, path, t).makeTransform(matrix), t, 1).contains(p.fX, p.fY);
     }
     const SkPoint inner = {local.fX + l.innerWidth / 2.0f, local.fY + l.innerHeight / 2.0f};
     if (!SkRect::MakeWH(l.innerWidth, l.innerHeight).contains(inner.fX, inner.fY)) return false;
