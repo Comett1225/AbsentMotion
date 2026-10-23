@@ -11,12 +11,52 @@ import android.provider.MediaStore
 import app.absentmotion.R
 import app.absentmotion.i18n.txt
 import java.io.File
+import java.io.IOException
 import java.io.OutputStream
+
+internal class PendingExports(private val file: File) {
+    fun add(uri: String) = synchronized(Lock) {
+        try {
+            file.parentFile?.mkdirs()
+            file.appendText(uri + "\n")
+        } catch (e: IOException) {
+            file.delete()
+        }
+    }
+
+    fun remove(uri: String) = synchronized(Lock) {
+        try {
+            val left = read().filter { it != uri }
+            if (left.isEmpty()) file.delete() else file.writeText(left.joinToString("\n", postfix = "\n"))
+        } catch (e: IOException) {
+            file.delete()
+        }
+    }
+
+    fun drain(): List<String> = synchronized(Lock) { (try { read() } catch (e: IOException) { emptyList() }).also { file.delete() } }
+
+    private fun read() = if (file.exists()) file.readLines().filter { it.isNotBlank() } else emptyList()
+
+    private companion object {
+        val Lock = Any()
+    }
+}
 
 class MediaStoreExport(context: Context) : ExportStore {
     private val app = context.applicationContext
     private val resolver = app.contentResolver
     private val scoped = Build.VERSION.SDK_INT >= 29
+    private val pending = PendingExports(File(app.noBackupFilesDir, "export-pending.txt"))
+
+    fun discardAbandoned() {
+        if (!scoped || !swept.compareAndSet(false, true)) return
+        pending.drain().forEach { runCatching { resolver.delete(Uri.parse(it), null, null) } }
+    }
+
+    private fun discard(uri: Uri) {
+        pending.remove(uri.toString())
+        resolver.delete(uri, null, null)
+    }
 
     private fun insert(folder: String?, name: String, mime: String): Uri {
         val volume = if (scoped) MediaStore.VOLUME_EXTERNAL_PRIMARY else "external"
@@ -38,11 +78,14 @@ class MediaStoreExport(context: Context) : ExportStore {
                 put(MediaStore.MediaColumns.DATA, freeFile(File(Environment.getExternalStorageDirectory(), path), name).path)
             }
         }
-        return resolver.insert(collection, values) ?: throw ExportError(txt(R.string.export_error_create, name, root))
+        val uri = resolver.insert(collection, values) ?: throw ExportError(txt(R.string.export_error_create, name, root))
+        if (scoped) pending.add(uri.toString())
+        return uri
     }
 
     private fun done(uri: Uri) {
         if (scoped) {
+            pending.remove(uri.toString())
             resolver.update(uri, ContentValues().apply { put(MediaStore.MediaColumns.IS_PENDING, 0) }, null, null)
             return
         }
@@ -54,8 +97,8 @@ class MediaStoreExport(context: Context) : ExportStore {
     override fun open(folder: String?, name: String, mime: String): OpenExport {
         val uri = insert(folder, name, mime)
         val file = try { resolver.openFileDescriptor(uri, "rw") ?: throw ExportError(txt(R.string.export_error_write, name)) }
-            catch (t: Throwable) { resolver.delete(uri, null, null); throw t }
-        return OpenExport(uri, file.fileDescriptor, file::close, { done(uri) }, { resolver.delete(uri, null, null) })
+            catch (t: Throwable) { discard(uri); throw t }
+        return OpenExport(uri, file.fileDescriptor, file::close, { done(uri) }, { discard(uri) })
     }
 
     override fun save(folder: String?, name: String, mime: String, write: (OutputStream) -> Unit): Uri {
@@ -64,13 +107,17 @@ class MediaStoreExport(context: Context) : ExportStore {
             (resolver.openOutputStream(uri) ?: throw ExportError(txt(R.string.export_error_write, name))).use(write)
             done(uri)
         } catch (t: Throwable) {
-            resolver.delete(uri, null, null)
+            discard(uri)
             throw t
         }
         return uri
     }
 
-    override fun delete(uri: Uri) { resolver.delete(uri, null, null) }
+    override fun delete(uri: Uri) { discard(uri) }
+
+    private companion object {
+        val swept = java.util.concurrent.atomic.AtomicBoolean(false)
+    }
 }
 
 internal fun freeFile(dir: File, name: String): File {
