@@ -185,12 +185,16 @@ private fun XmlNode.withoutKeys(slot: String): XmlNode {
     return copy(children = children.filterNot { it.name == "kf" }).with("value", rest.v)
 }
 
-fun Layer.withoutMotion(slot: MotionSlot): Layer {
-    val record = motion(slot)
+internal fun Layer.withoutMotionMarks(slot: MotionSlot): Layer {
     val transform = node.child("transform")
     var n = node.copy(children = node.children.filterNot { it.name == "effect" && it["gen"] == slot.xml }).with(slot.attr, null)
     if (transform != null) n = n.withChild("transform", transform.copy(children = transform.children.map { it.withoutKeys(slot.xml) }))
-    var l = copy(node = n)
+    return copy(node = n)
+}
+
+fun Layer.withoutMotion(slot: MotionSlot): Layer {
+    val record = motion(slot)
+    var l = withoutMotionMarks(slot)
     if (record?.transition != true) return l
     if (slot == MotionSlot.Out && record.extend in 1 until l.length) l = l.trimmedTo(l.startTime, l.endTime - record.extend)
     if (slot == MotionSlot.In) {

@@ -191,7 +191,8 @@ fun Scene.trimEndAt(layer: Layer, frame: Int): Layer? =
 fun Scene.splitAt(layer: Layer, frame: Int, newId: Long): Pair<Layer, Layer>? {
     val cut = frameStart(frame)
     if (cut <= layer.startTime || !showsAnyFrame(layer.startTime, cut - 1) || !showsAnyFrame(cut, layer.endTime)) return null
-    return layer.trimmedTo(layer.startTime, cut - 1) to layer.withId(newId).trimmedTo(cut, layer.endTime)
+    return layer.trimmedTo(layer.startTime, cut - 1).withoutMotionMarks(MotionSlot.Out) to
+        layer.withId(newId).trimmedTo(cut, layer.endTime).withoutMotionMarks(MotionSlot.In)
 }
 
 fun Scene.withSplit(layer: Layer, frame: Int, newId: Long, nextId: () -> Long = Layer::newId): Scene? {
@@ -212,7 +213,12 @@ fun Scene.withSplit(layer: Layer, frame: Int, newId: Long, nextId: () -> Long = 
             else -> lower += mask
         }
     }
-    return withLayers(list.subList(0, index) + lower + upper + list.subList(end, list.size))
+    val split = withLayers(list.subList(0, index) + lower + upper + list.subList(end, list.size))
+    val out = layer.motion(MotionSlot.Out)?.takeIf { it.transition } ?: return split
+    return split.update(out.partner) { next ->
+        next.motion(MotionSlot.In)?.takeIf { it.transition && it.partner == layer.id }
+            ?.let { next.copy(node = next.node.with(MotionSlot.In.attr, it.copy(partner = newId).toString())) } ?: next
+    }
 }
 
 fun Layer.retimedVideo(start: Int, end: Int): Layer {
