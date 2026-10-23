@@ -68,7 +68,7 @@ class AudioEngine(context: Context) {
     }
 
     init {
-        ExportAudio.mixFor = { scene, rate -> OfflineMix.of(this.context, scene, quality, rate) }
+        ExportAudio.mixFor = { scene, rate -> OfflineMix.of(this.context, scene, Resampler.ULTRA, rate) }
     }
 
     fun setScene(scene: Scene) {
@@ -120,7 +120,7 @@ class AudioEngine(context: Context) {
         streams.clear()
     }
 
-    private inner class Session(val startMs: Double, private val previous: Session?) : Thread("am-audio-mixer") {
+    private inner class Session(val startMs: Double, @Volatile private var previous: Session?) : Thread("am-audio-mixer") {
         @Volatile var stopRequested = false
         val rate = AudioTrack.getNativeOutputSampleRate(AudioManager.STREAM_MUSIC).takeIf { it > 0 } ?: 48_000
         val clock = AudioClock(startMs, rate)
@@ -135,6 +135,7 @@ class AudioEngine(context: Context) {
         override fun run() {
             Process.setThreadPriority(Process.THREAD_PRIORITY_URGENT_AUDIO)
             previous?.join()
+            previous = null
             var track: AudioTrack? = null
             try {
                 val bytes = AudioTrack.getMinBufferSize(rate, AudioFormat.CHANNEL_OUT_STEREO, AudioFormat.ENCODING_PCM_FLOAT)

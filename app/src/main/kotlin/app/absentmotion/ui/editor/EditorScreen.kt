@@ -168,12 +168,12 @@ private fun Playback(state: EditorState) {
         state.engine.timing()
         val audio = state.engine.audio
         audio?.quality = state.settings.audioResampling
-        var startFrame = state.frame
-        var startMs = state.scene.frameStart(startFrame)
-        var audible = audio?.play(startMs.toDouble()) == true
-        var startNanos = withFrameNanos { it }
-        var shown = startFrame
         try {
+            var startFrame = state.frame
+            var startMs = state.scene.frameStart(startFrame)
+            var audible = audio?.play(startMs.toDouble()) == true
+            var startNanos = withFrameNanos { it }
+            var shown = startFrame
             while (state.playing) {
                 val now = withFrameNanos { it }
                 if (audio?.interrupted == true) { state.playing = false; break }
