@@ -60,9 +60,10 @@ class ProjectStore(private val root: File) {
 
     fun restore(id: String, version: ProjectVersions.Version) {
         val chosen = version.file.readText()
+        val picture = version.thumbnail.takeIf { it.exists() }?.readBytes()
         text(id)?.let { if (runCatching { Scene.parse(it) }.isSuccess) versions.snapshot(id, it) else versions.keepDamaged(id, it) }
         save(id, chosen)
-        if (version.thumbnail.exists()) version.thumbnail.copyTo(thumbnailFile(id), overwrite = true) else thumbnailFile(id).delete()
+        if (picture != null) thumbnailFile(id).writeBytes(picture) else thumbnailFile(id).delete()
         recoveryFile(id).delete()
     }
 

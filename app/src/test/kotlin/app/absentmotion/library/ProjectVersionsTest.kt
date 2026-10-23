@@ -82,6 +82,21 @@ class ProjectVersionsTest {
         assertEquals(listOf("current", "future"), titles(store.versions, id))
     }
 
+    @Test fun restoringTheOldestVersionKeepsItsThumbnailEvenThoughTheNewSnapshotPrunesIt() {
+        val store = ProjectStore(tmp.newFolder())
+        val id = store.create(app.absentmotion.model.Scene.parse(xml("v0")))
+        repeat(20) { store.versions.snapshot(id, xml("v$it")) }
+        val oldest = store.versions.list(id).last()
+        oldest.thumbnail.writeText("the oldest picture")
+        store.save(id, xml("current"))
+        store.thumbnailFile(id).writeText("the current picture")
+        store.restore(id, oldest)
+        assertFalse(oldest.file.exists())
+        assertEquals("v0", store.load(id)!!.title)
+        assertEquals("the oldest picture", store.thumbnailFile(id).readText())
+        assertEquals("current", titles(store.versions, id).first())
+    }
+
     @Test fun restoringKeepsTheCurrentStateAsAVersion() {
         val store = ProjectStore(tmp.newFolder())
         val id = store.create(app.absentmotion.model.Scene.parse(xml("first")))
