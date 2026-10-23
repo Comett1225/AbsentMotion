@@ -336,4 +336,17 @@ class ProjectStoreTest {
         store.delete(id)
         assertTrue(root.resolve("keep.txt").exists())
     }
+
+    @Test fun anUnsavedEditDraftOfTheDeletedProjectDoesNotKeepItsMediaAlive() {
+        val root = tmp.newFolder()
+        val store = ProjectStore(root)
+        val a = store.create(scene())
+        store.mediaDir(a).mkdirs()
+        val picture = store.mediaDir(a).resolve("a.png").apply { writeText("x") }
+        val draft = scene(image(picture.toURI().toString())).toXml()
+        root.resolve("recovery").apply { mkdirs() }.resolve("$a.xml").writeText(draft)
+        store.delete(a)
+        assertFalse(picture.exists())
+        assertFalse(root.resolve("recovery/$a.xml").exists())
+    }
 }
