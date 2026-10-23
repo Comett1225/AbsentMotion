@@ -1,6 +1,5 @@
 package app.absentmotion.media
 
-import app.absentmotion.platform.intOr
 import app.absentmotion.R
 import app.absentmotion.export.ExportError
 import app.absentmotion.export.exportCheck
@@ -53,8 +52,8 @@ internal class FrameReader(context: Context, uri: String) : Closeable {
     }
 
     private fun readColor(format: MediaFormat) {
-        colorStandard = videoColorStandard(format.intOr(MediaFormat.KEY_COLOR_STANDARD, 0))
-        fullRange = format.intOr(MediaFormat.KEY_COLOR_RANGE, 0) == MediaFormat.COLOR_RANGE_FULL
+        if (format.containsKey(MediaFormat.KEY_COLOR_STANDARD)) colorStandard = videoColorStandard(format.getInteger(MediaFormat.KEY_COLOR_STANDARD))
+        if (format.containsKey(MediaFormat.KEY_COLOR_RANGE)) fullRange = format.getInteger(MediaFormat.KEY_COLOR_RANGE) == MediaFormat.COLOR_RANGE_FULL
     }
 
     suspend fun read(wanted: List<Long>, consume: suspend (Long, Yuv) -> Unit): Int {

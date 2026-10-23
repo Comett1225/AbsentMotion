@@ -536,7 +536,7 @@ private fun duration(ms: Int): String {
 
 @Composable
 private fun Thumbnail(info: ProjectInfo, version: Int, cache: MutableMap<String, ImageBitmap>, modifier: Modifier) {
-    val bitmap by produceState<ImageBitmap?>(cache[info.id], info.id, info.modified, version) {
+    val bitmap by produceState<ImageBitmap?>(cache[info.id], info.id, info.modified, info.thumbnail, version) {
         val file = info.thumbnail
         if (file == null) {
             value = null

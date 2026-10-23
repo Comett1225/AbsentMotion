@@ -130,6 +130,7 @@ class MainActivity : ComponentActivity() {
     private val fontsDeclined = HashSet<String>()
     private var engineProblem by mutableStateOf<String?>(null)
     private var problemShown by mutableStateOf(false)
+    private var elementNav: ((String) -> Unit)? = null
 
     override fun attachBaseContext(newBase: Context) = super.attachBaseContext(newBase.inAppLanguage())
 
@@ -161,11 +162,13 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch(Dispatchers.IO) { ShapeCatalog.load(applicationContext) }
         lifecycleScope.launch(Dispatchers.IO) { app.absentmotion.ai.AiDevice.recover(applicationContext) }
         lifecycleScope.launch(Dispatchers.IO) { runCatching { app.absentmotion.export.MediaStoreExport(applicationContext).discardAbandoned() } }
-        app.absentmotion.editor.ElementNav.open = { id ->
+        val openElement: (String) -> Unit = { id ->
             editor?.let { it.playing = false; it.endGesture(); it.saver.snapshot(it.scene.toXml()) }
             MultiSelect.clear()
             open(id)
         }
+        elementNav = openElement
+        app.absentmotion.editor.ElementNav.open = openElement
         TestHooks.start(this)
         lifecycleScope.launch { engineWorks() }
         firstRun = FirstRun.of(settings, TestHooks.onboarding(intent).takeIf { savedInstanceState == null })
@@ -584,6 +587,9 @@ class MainActivity : ComponentActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        if (app.absentmotion.editor.ElementNav.open === elementNav) app.absentmotion.editor.ElementNav.open = null
+        elementNav = null
+        RecoveryHandler.install(recovery) { null }
         engine.close()
     }
 

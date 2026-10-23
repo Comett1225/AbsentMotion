@@ -25,7 +25,7 @@
     <string name="onboarding_speed_basic">Asas</string>
     <string name="onboarding_speed_basic_note">Paling sesuai pada 720p atau 1080p. Video panjang mengambil sedikit masa.</string>
     <string name="no_camera_was_found_on_this">Tiada kamera ditemui pada peranti ini.</string>
-    <string name="no_sound_microphone_access_is_off">Tiada bunyi: akses mikrofon dimatikan</string>
+    <string name="no_sound_microphone_access_is_off">Tiada bunyi: akses mikrofon dimatikan. Ketik untuk hidupkan</string>
     <string name="camera_access">Akses kamera</string>
     <string name="view_all">Lihat semua</string>
     <string name="add_audio_effect">Tambah kesan audio</string>
@@ -1204,6 +1204,7 @@
     <string name="ai_enhance_faces">Pertajam wajah</string>
     <string name="ai_enhance_faces_hint">Wajah lebih tajam, yang lain kekal seperti sedia ada</string>
     <string name="ai_enhance_faces_help">Mengesan wajah yang memandang kamera dan mempertajamkan wajah itu sahaja, sambil melaraskan hasilnya secara lembut ke dalam gambar. Ia tidak mengubah rupa sesiapa. Kira-kira seminit untuk 10 saat video pada telefon unggul terkini; telefon pertengahan mengambil masa beberapa kali lebih lama.</string>
+    <string name="ai_enhance_no_faces">Tiada wajah ditemui dalam klip ini, jadi tiada apa-apa diubah</string>
     <string name="ai_enhance_quick">Pantas, tanpa AI</string>
     <string name="ai_enhance_quick_note">Menambah kesan Pertajam pada klip. Anda boleh mengubah atau membuangnya dalam senarai kesan.</string>
     <string name="ai_enhance_cartoon">Kartun atau animasi</string>

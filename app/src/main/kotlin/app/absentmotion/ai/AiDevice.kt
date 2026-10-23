@@ -1,11 +1,14 @@
 package app.absentmotion.ai
 
 import android.app.ActivityManager
+import android.app.ApplicationExitInfo
 import android.content.Context
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.os.Process
 import android.os.SystemClock
+import android.util.Log
 import android.widget.Toast
 import app.absentmotion.R
 import app.absentmotion.export.DeviceCapabilities
@@ -87,8 +90,19 @@ internal class GpuMark(private val token: String, private val read: () -> String
 
     @Synchronized fun end() { if (open > 0 && --open == 0) write(null) }
 
-    @Synchronized fun diedBefore(): Boolean = read().let { it != null && it != token }
+    @Synchronized fun diedBefore(): String? = read()?.takeIf { it != token }
+
+    @Synchronized fun forgive() { if (read() != token) write(null) }
 }
+
+private val BenignDeaths = setOf(
+    ApplicationExitInfo.REASON_EXIT_SELF, ApplicationExitInfo.REASON_LOW_MEMORY, ApplicationExitInfo.REASON_PERMISSION_CHANGE,
+    ApplicationExitInfo.REASON_EXCESSIVE_RESOURCE_USAGE, ApplicationExitInfo.REASON_USER_REQUESTED, ApplicationExitInfo.REASON_USER_STOPPED,
+    ApplicationExitInfo.REASON_DEPENDENCY_DIED, ApplicationExitInfo.REASON_FREEZER, ApplicationExitInfo.REASON_PACKAGE_STATE_CHANGE,
+    ApplicationExitInfo.REASON_PACKAGE_UPDATED,
+)
+
+internal fun gpuDeathBlamed(reason: Int?): Boolean = reason == null || reason !in BenignDeaths
 
 internal object AiDevice {
     private val rates = ConcurrentHashMap<Pair<AiModel, Boolean>, Double>()
@@ -101,14 +115,24 @@ internal object AiDevice {
 
     private fun mark(context: Context): GpuMark = mark ?: synchronized(this) {
         mark ?: gpuPrefs(context).let { prefs ->
-            GpuMark(UUID.randomUUID().toString(), { prefs.getString(GPU_RUNNING, null) }) {
+            GpuMark("${Process.myPid()}:${UUID.randomUUID()}", { prefs.getString(GPU_RUNNING, null) }) {
                 prefs.edit().apply { if (it == null) remove(GPU_RUNNING) else putString(GPU_RUNNING, it) }.commit()
             }
         }.also { mark = it }
     }
 
     fun recover(context: Context) {
-        if (mark(context).diedBefore()) gpuFailed(context)
+        val mark = mark(context)
+        val died = mark.diedBefore() ?: return
+        if (gpuDeathBlamed(exitReason(context, died))) gpuFailed(context) else mark.forgive()
+    }
+
+    private fun exitReason(context: Context, token: String): Int? {
+        if (Build.VERSION.SDK_INT < 30) return null
+        val pid = token.substringBefore(':').toIntOrNull() ?: return null
+        return runCatching {
+            context.getSystemService(ActivityManager::class.java).getHistoricalProcessExitReasons(context.packageName, pid, 1).firstOrNull()?.reason
+        }.getOrNull()
     }
 
     fun gpuChoice(context: Context): Boolean? {
@@ -146,7 +170,7 @@ internal object AiDevice {
         if (gpuProven(context, model)) return true
         if (!model.installed(context)) return false
         val work = running[model]?.takeIf { it.isActive } ?: probes.async {
-            val ok = try {
+            val ok: Boolean? = try {
                 AiNet.open(context, model, gpu = true).use { net ->
                     val smooth = SmoothLevel.entries.firstOrNull { it.model == model }
                     val side = smooth?.padding ?: PROBE_SIDE
@@ -156,12 +180,17 @@ internal object AiDevice {
                 }
             } catch (e: CancellationException) {
                 throw e
-            } catch (_: Exception) {
-                false
+            } catch (e: Exception) {
+                Log.w("AMAi", "cannot tell whether the GPU works", e)
+                null
             }
-            if (ok) gpuPrefs(context).edit().putString(proofKey(context, model), GPU_OK).commit() else gpuFailed(context)
+            when (ok) {
+                true -> gpuPrefs(context).edit().putString(proofKey(context, model), GPU_OK).commit()
+                false -> gpuFailed(context)
+                null -> Unit
+            }
             running.remove(model)
-            ok
+            ok == true
         }.also { running[model] = it }
         withTimeoutOrNull(PROBE_MS) { work.await() } ?: false
     }
@@ -182,13 +211,15 @@ internal object AiDevice {
         val gpu = probeGpu(context, model)
         rates[model to gpu]?.let { return it }
         return try {
-            withContext(Dispatchers.IO) { AiNet.open(context, model) }.use { net ->
-                suspend fun once() = if (smooth != null) net.interpolate(input, input, side, side, 0.5f, smooth.padding) else net.upscale(input, side, side, 1)
-                once()
-                val start = SystemClock.elapsedRealtimeNanos()
-                once()
-                val pixels = if (smooth != null) side * side else (side + 2 * AiNet.OVERLAP) * (side + 2 * AiNet.OVERLAP)
-                (model.gmacPerMegapixel * pixels / 1e6 / ((SystemClock.elapsedRealtimeNanos() - start) / 1e9).coerceAtLeast(1e-4)).also { rates[model to net.onGpu] = it }
+            withContext(Dispatchers.IO) {
+                AiNet.open(context, model).use { net ->
+                    suspend fun once() = if (smooth != null) net.interpolate(input, input, side, side, 0.5f, smooth.padding) else net.upscale(input, side, side, 1)
+                    once()
+                    val start = SystemClock.elapsedRealtimeNanos()
+                    once()
+                    val pixels = if (smooth != null) side * side else (side + 2 * AiNet.OVERLAP) * (side + 2 * AiNet.OVERLAP)
+                    (model.gmacPerMegapixel * pixels / 1e6 / ((SystemClock.elapsedRealtimeNanos() - start) / 1e9).coerceAtLeast(1e-4)).also { rates[model to net.onGpu] = it }
+                }
             }
         } catch (e: CancellationException) {
             throw e

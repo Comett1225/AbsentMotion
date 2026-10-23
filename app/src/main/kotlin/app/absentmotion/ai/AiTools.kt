@@ -15,6 +15,7 @@ import app.absentmotion.editor.EditorPanel
 import app.absentmotion.editor.EditorState
 import app.absentmotion.export.FrameInterpolation
 import app.absentmotion.export.Smoothing
+import app.absentmotion.library.CrashLogs
 import app.absentmotion.model.Layer
 import app.absentmotion.model.MediaDeclaration
 import app.absentmotion.model.XmlNode
@@ -104,7 +105,7 @@ class AiTools(private val context: Context, private val state: EditorState, priv
         job = scope.launch {
             var result: AiMedia? = null
             var committed = false
-            try {
+            try { CrashLogs.during("running AI ${action.name.lowercase()}") {
                 val report: AiProgress = { fraction, text ->
                     withContext(Dispatchers.Main) { progress = fraction.coerceIn(0f, 1f); message = text }
                 }
@@ -177,7 +178,7 @@ class AiTools(private val context: Context, private val state: EditorState, priv
                 message = ""
                 state.panel = EditorPanel.Tools
                 state.effectBrowserOpen = false
-            } catch (_: CancellationException) {
+            } } catch (_: CancellationException) {
                 message = AppText.get(R.string.ai_cancelled)
             } catch (e: ModelNotReady) {
                 message = e.message ?: AppText.get(R.string.ai_model_not_ready_default); retry = action

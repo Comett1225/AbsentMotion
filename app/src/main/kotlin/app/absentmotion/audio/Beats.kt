@@ -29,10 +29,76 @@ object Beats {
 
     private const val LEAD = 0.34
 
-    fun detect(pcm: FloatArray, rate: Int): List<Double> {
-        val hop = (rate * HOP_SECONDS).roundToInt().coerceAtLeast(1)
-        val flux = spectralFlux(pcm, hop, rate)
-        if (flux.size < 16) return emptyList()
+    fun detect(pcm: FloatArray, rate: Int): List<Double> = Stream(rate).also { it.add(pcm, pcm.size) }.beats()
+
+    class Stream(private val rate: Int) {
+        private val hop = (rate * HOP_SECONDS).roundToInt().coerceAtLeast(1)
+        private val window = DoubleArray(WINDOW) { 0.5 - 0.5 * cos(2 * PI * it / WINDOW) }
+        private val norm = 2.0 / window.sum()
+        private val cosines = DoubleArray(WINDOW / 2) { cos(2 * PI * it / WINDOW) }
+        private val sines = DoubleArray(WINDOW / 2) { -sin(2 * PI * it / WINDOW) }
+        private val band = IntArray(WINDOW / 2) { k -> if (k * rate.toDouble() / WINDOW < LOW_HZ) -1 else (BANDS_PER_OCTAVE * ln(k * rate.toDouble() / WINDOW / LOW_HZ) / ln(2.0)).toInt() }
+        private val bands = band.max() + 1
+        private val width = IntArray(bands).also { w -> band.forEach { if (it >= 0) w[it]++ } }
+        private val re = DoubleArray(WINDOW)
+        private val im = DoubleArray(WINDOW)
+        private val pending = FloatArray(WINDOW)
+        private var have = 0
+        private var skip = 0
+        private var before = DoubleArray(bands)
+        private var now = DoubleArray(bands)
+        private var flux = DoubleArray(1024)
+        private var frames = 0
+
+        fun add(pcm: FloatArray, count: Int) {
+            var i = 0
+            while (i < count) {
+                if (skip > 0) {
+                    val dropped = min(skip, count - i)
+                    skip -= dropped
+                    i += dropped
+                    continue
+                }
+                val take = min(WINDOW - have, count - i)
+                System.arraycopy(pcm, i, pending, have, take)
+                have += take
+                i += take
+                if (have < WINDOW) continue
+                frame()
+                if (hop >= WINDOW) {
+                    skip = hop - WINDOW
+                    have = 0
+                } else {
+                    System.arraycopy(pending, hop, pending, 0, WINDOW - hop)
+                    have = WINDOW - hop
+                }
+            }
+        }
+
+        private fun frame() {
+            for (i in 0 until WINDOW) { re[i] = pending[i] * window[i]; im[i] = 0.0 }
+            fft(re, im, cosines, sines)
+            java.util.Arrays.fill(now, 0.0)
+            for (k in 1 until WINDOW / 2) if (band[k] >= 0) now[band[k]] += re[k] * re[k] + im[k] * im[k]
+            var sum = 0.0
+            for (b in 0 until bands) {
+                now[b] = if (width[b] == 0) 0.0 else ln1p(LAMBDA * norm * sqrt(now[b] / width[b]))
+                sum += max(0.0, now[b] - before[b])
+            }
+            if (frames == flux.size) flux = flux.copyOf(flux.size * 2)
+            flux[frames] = if (frames == 0) 0.0 else sum
+            frames++
+            val swap = before; before = now; now = swap
+        }
+
+        fun beats(): List<Double> {
+            val usable = frames - 1
+            if (usable < 16) return emptyList()
+            return pick(flux.copyOf(usable), hop, rate)
+        }
+    }
+
+    private fun pick(flux: DoubleArray, hop: Int, rate: Int): List<Double> {
         val hopMs = hop * 1000.0 / rate
         val onsets = pickOnsets(flux, (MIN_GAP_SECONDS * 1000 / hopMs).roundToInt().coerceAtLeast(1), (MEAN_SECONDS * 1000 / hopMs).roundToInt())
         if (onsets.size < 4) return emptyList()
@@ -114,37 +180,6 @@ object Beats {
             val c = flux[i + 1]
             i + 0.5 * (a - c) / (a - 2 * b + c)
         }
-    }
-
-    private fun spectralFlux(pcm: FloatArray, hop: Int, rate: Int): DoubleArray {
-        val frames = (pcm.size - WINDOW) / hop
-        if (frames < 2) return DoubleArray(0)
-        val window = DoubleArray(WINDOW) { 0.5 - 0.5 * cos(2 * PI * it / WINDOW) }
-        val norm = 2.0 / window.sum()
-        val cosines = DoubleArray(WINDOW / 2) { cos(2 * PI * it / WINDOW) }
-        val sines = DoubleArray(WINDOW / 2) { -sin(2 * PI * it / WINDOW) }
-        val band = IntArray(WINDOW / 2) { k -> if (k * rate.toDouble() / WINDOW < LOW_HZ) -1 else (BANDS_PER_OCTAVE * ln(k * rate.toDouble() / WINDOW / LOW_HZ) / ln(2.0)).toInt() }
-        val bands = band.max() + 1
-        val width = IntArray(bands).also { w -> band.forEach { if (it >= 0) w[it]++ } }
-        val re = DoubleArray(WINDOW)
-        val im = DoubleArray(WINDOW)
-        var before = DoubleArray(bands)
-        var now = DoubleArray(bands)
-        val flux = DoubleArray(frames)
-        for (f in 0 until frames) {
-            for (i in 0 until WINDOW) { re[i] = pcm[f * hop + i] * window[i]; im[i] = 0.0 }
-            fft(re, im, cosines, sines)
-            java.util.Arrays.fill(now, 0.0)
-            for (k in 1 until WINDOW / 2) if (band[k] >= 0) now[band[k]] += re[k] * re[k] + im[k] * im[k]
-            var sum = 0.0
-            for (b in 0 until bands) {
-                now[b] = if (width[b] == 0) 0.0 else ln1p(LAMBDA * norm * sqrt(now[b] / width[b]))
-                sum += max(0.0, now[b] - before[b])
-            }
-            flux[f] = if (f == 0) 0.0 else sum
-            val swap = before; before = now; now = swap
-        }
-        return flux
     }
 
     private fun fft(re: DoubleArray, im: DoubleArray, cosines: DoubleArray, sines: DoubleArray) {

@@ -25,7 +25,7 @@
     <string name="onboarding_speed_basic">Basic</string>
     <string name="onboarding_speed_basic_note">Best at 720p or 1080p. Long videos take a while.</string>
     <string name="no_camera_was_found_on_this">No camera was found on this device.</string>
-    <string name="no_sound_microphone_access_is_off">No sound: microphone access is off</string>
+    <string name="no_sound_microphone_access_is_off">No sound: microphone access is off. Tap to turn it on</string>
     <string name="camera_access">Camera access</string>
     <string name="view_all">View All</string>
     <string name="add_audio_effect">Add Audio Effect</string>
@@ -1252,6 +1252,7 @@
     <string name="ai_enhance_faces">Sharpen faces</string>
     <string name="ai_enhance_faces_hint">Sharper faces, the rest stays as it is</string>
     <string name="ai_enhance_faces_help">Finds faces looking at the camera and sharpens only them, blending the result softly into the picture. It does not change how anyone looks. About a minute for 10 seconds of video on a recent top phone; mid-range phones take a few times longer.</string>
+    <string name="ai_enhance_no_faces">No faces were found in this clip, so nothing was changed</string>
     <string name="ai_enhance_quick">Quick, without AI</string>
     <string name="ai_enhance_quick_note">Adds the Sharpen effect to the clip. You can change or remove it in the effects list.</string>
     <string name="ai_enhance_cartoon">Cartoon or animation</string>

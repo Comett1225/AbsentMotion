@@ -25,7 +25,7 @@
     <string name="onboarding_speed_basic">Básica</string>
     <string name="onboarding_speed_basic_note">Ideal para 720p o 1080p. Los videos largos tardan un poco.</string>
     <string name="no_camera_was_found_on_this">No se encontró ninguna cámara en este dispositivo.</string>
-    <string name="no_sound_microphone_access_is_off">Sin sonido: el acceso al micrófono está desactivado</string>
+    <string name="no_sound_microphone_access_is_off">Sin sonido: el acceso al micrófono está desactivado. Toca para activarlo</string>
     <string name="camera_access">Acceso a la cámara</string>
     <string name="view_all">Ver todo</string>
     <string name="add_audio_effect">Agregar efecto de audio</string>
@@ -1252,6 +1252,7 @@
     <string name="ai_enhance_faces">Aumentar nitidez de rostros</string>
     <string name="ai_enhance_faces_hint">Rostros más nítidos, el resto queda igual</string>
     <string name="ai_enhance_faces_help">Encuentra los rostros que miran a la cámara y solo les aumenta la nitidez, mezclando el resultado suavemente con la imagen. No cambia la apariencia de nadie. Tarda alrededor de un minuto por cada 10 segundos de video en un teléfono reciente de gama alta; los de gama media tardan varias veces más.</string>
+    <string name="ai_enhance_no_faces">No se encontraron rostros en este clip, así que no se cambió nada</string>
     <string name="ai_enhance_quick">Rápido, sin AI</string>
     <string name="ai_enhance_quick_note">Añade el efecto Aumentar nitidez al clip. Puedes cambiarlo o quitarlo en la lista de efectos.</string>
     <string name="ai_enhance_cartoon">Dibujo animado o animación</string>

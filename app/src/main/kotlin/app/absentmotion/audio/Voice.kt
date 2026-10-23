@@ -14,7 +14,7 @@ internal class Voice {
         private set
     private var ghost = FloatArray(0)
     private val sample = FloatArray(2)
-    private val scratch = FloatArray(2 * Resampler.TAPS)
+    private val sinc = SincBank()
 
     var base = 0L
         private set
@@ -54,7 +54,7 @@ internal class Voice {
         for (k in 0 until count) {
             val p = pos0 + step * k - base
             val j = p.toInt()
-            Resampler.sample(win, j, (p - j).toFloat(), quality, step, sample, scratch)
+            Resampler.sample(win, j, (p - j).toFloat(), quality, step, sample, sinc)
             val t = clipMs0 + k * dtMs
             var gain = (g0 + (g1 - g0) * k * inv) * (minOf(t, clipLenMs - t) / RAMP_MS).coerceIn(0.0, 1.0).toFloat()
             if (k < fade) gain *= k / fade.toFloat()
@@ -65,7 +65,7 @@ internal class Voice {
         if (ghostOk) for (k in 0 until fade) {
             val p = lastEnd + lastStep * k - ghostBase
             val j = p.toInt()
-            Resampler.sample(ghost, j, (p - j).toFloat(), quality, lastStep, sample, scratch)
+            Resampler.sample(ghost, j, (p - j).toFloat(), quality, lastStep, sample, sinc)
             val gain = lastGain * (1f - k / fade.toFloat())
             val at = 2 * (from + k)
             dst[at] += sample[0] * gain

@@ -102,7 +102,7 @@ struct PathKnot {
 };
 struct PathContour {
     SkPath path;
-    bool exclude = false, closed = false;
+    bool exclude = false, closed = false, evenOdd = false;
     std::vector<PathKnot> knots;
 };
 

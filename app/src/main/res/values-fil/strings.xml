@@ -25,7 +25,7 @@
     <string name="onboarding_speed_basic">Basic</string>
     <string name="onboarding_speed_basic_note">Pinakamainam sa 720p o 1080p. Matagal-tagal ang mahahabang video.</string>
     <string name="no_camera_was_found_on_this">Walang nahanap na kamera sa device na ito.</string>
-    <string name="no_sound_microphone_access_is_off">Walang tunog: naka-off ang access sa mikropono</string>
+    <string name="no_sound_microphone_access_is_off">Walang tunog: naka-off ang access sa mikropono. I-tap para i-on</string>
     <string name="camera_access">Access sa kamera</string>
     <string name="view_all">Tingnan lahat</string>
     <string name="add_audio_effect">Magdagdag ng epekto sa audio</string>
@@ -1228,6 +1228,7 @@
     <string name="ai_enhance_faces">I-sharpen ang mga mukha</string>
     <string name="ai_enhance_faces_hint">Mas sharp ang mga mukha, hindi binabago ang iba</string>
     <string name="ai_enhance_faces_help">Hinahanap ang mga mukhang nakatingin sa kamera at ang mga iyon lang ang ini-sharpen, at pinagsasama nang malumanay ang resulta sa larawan. Hindi nito binabago ang itsura ng sinuman. Mga isang minuto para sa 10 segundong bidyo sa bagong high-end na phone; mas matagal nang ilang beses sa mid-range na phone.</string>
+    <string name="ai_enhance_no_faces">Walang nakitang mukha sa clip na ito, kaya walang binago</string>
     <string name="ai_enhance_quick">Mabilis, walang AI</string>
     <string name="ai_enhance_quick_note">Nagdadagdag ng Sharpen na epekto sa clip. Puwede mo itong baguhin o alisin sa listahan ng mga epekto.</string>
     <string name="ai_enhance_cartoon">Cartoon o animation</string>

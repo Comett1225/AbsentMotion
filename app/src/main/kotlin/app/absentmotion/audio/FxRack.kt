@@ -122,7 +122,11 @@ internal class FxRack(private val rate: Int, private val make: FxMaker = NativeF
             if (!rendered) return
             slot = Slot(make(spec, rate)).also { slots[clip.id] = it }
         } else if (slot.tail <= 0) {
-            if (!rendered) { slot.seen = generation; return }
+            if (!rendered) {
+                slot.fx?.close()
+                slots.remove(clip.id)
+                return
+            }
             slot.fx?.reset()
         }
         slot.seen = generation

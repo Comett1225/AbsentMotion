@@ -99,7 +99,12 @@ internal class AiNet private constructor(private val handle: Long, private val g
             if (useGpu) AiDevice.gpuRunning(context, true)
             val bin = model.file(context, model.bin).path
             val other = blend?.let { it.file(context, it.bin).path }
-            var handle = AiNative.nativeOpen(param, bin, other, weight, useGpu)
+            var handle = try {
+                AiNative.nativeOpen(param, bin, other, weight, useGpu)
+            } catch (t: Throwable) {
+                if (useGpu) AiDevice.gpuRunning(context, false)
+                throw t
+            }
             val onGpu = handle != 0L && AiNative.nativeOnGpu(handle)
             if (useGpu && !onGpu) {
                 if (handle == 0L) {

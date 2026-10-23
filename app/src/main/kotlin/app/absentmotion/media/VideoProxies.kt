@@ -242,19 +242,25 @@ private fun transcode(context: Context, uri: String, out: File, cancelled: () ->
         var inputDone = false
         var decodeDone = false
         var muxTrack = -1
+        var encoded = false
         fun drain(wait: Boolean): Boolean {
+            var quiet = System.nanoTime()
             while (true) {
                 val index = encoder.dequeueOutputBuffer(info, if (wait) 10_000 else 0)
                 when {
-                    index == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED -> { muxTrack = muxer.addTrack(encoder.outputFormat); muxer.start() }
+                    index == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED -> { muxTrack = muxer.addTrack(encoder.outputFormat); muxer.start(); quiet = System.nanoTime() }
                     index >= 0 -> {
+                        quiet = System.nanoTime()
                         if (info.size > 0 && info.flags and MediaCodec.BUFFER_FLAG_CODEC_CONFIG == 0 && muxTrack >= 0) {
                             muxer.writeSampleData(muxTrack, encoder.getOutputBuffer(index)!!, info)
                         }
                         encoder.releaseOutputBuffer(index, false)
-                        if (info.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) return true
+                        if (info.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) { encoded = true; return true }
                     }
-                    else -> if (!wait) return false else if (cancelled()) return false
+                    else -> if (!wait) return false else {
+                        if (cancelled()) return false
+                        check(System.nanoTime() - quiet < TimeUnit.SECONDS.toNanos(10)) { "the encoder did not finish the preview copy" }
+                    }
                 }
             }
         }
@@ -285,7 +291,7 @@ private fun transcode(context: Context, uri: String, out: File, cancelled: () ->
             }
             drain(false)
         }
-        if (!drain(true)) return false
+        if (!encoded && !drain(true)) return false
         muxer.stop()
         return true
     } finally {

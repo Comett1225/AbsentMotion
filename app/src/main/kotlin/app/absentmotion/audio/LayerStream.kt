@@ -9,6 +9,10 @@ import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.min
 
+internal fun MutableMap<Long, LayerStream>.dropFailed() {
+    values.removeAll { stream -> stream.failed.also { if (it) stream.close() } }
+}
+
 internal class LayerStream(val uri: String, startMs: Double, private val open: () -> PcmSource) {
     private val lock = ReentrantLock()
     private val changed = lock.newCondition()

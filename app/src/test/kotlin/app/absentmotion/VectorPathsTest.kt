@@ -8,8 +8,10 @@ import app.absentmotion.model.Pt
 import app.absentmotion.model.XmlNode
 import app.absentmotion.model.contours
 import app.absentmotion.model.parseSvgPath
+import app.absentmotion.model.signedArea
 import app.absentmotion.model.toSvg
 import app.absentmotion.model.withContours
+import app.absentmotion.model.withHoles
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -108,5 +110,32 @@ class VectorPathsTest {
         val (a, b) = parseSvgPath("M 10 10 L 20 10 Z L 30 30")
         assertEquals(true, a.closed)
         assertEquals(listOf(Pt(10f, 10f), Pt(30f, 30f)), b.knots.map { it.p })
+    }
+
+    @Test fun theAreaOfACurvedContourFollowsItsCurves() {
+        val square = parseSvgPath("M0 0H10V10H0Z").single()
+        assertEquals(100.0, square.signedArea(), 1e-6)
+        assertEquals(-100.0, parseSvgPath("M0 0V10H10V0Z").single().signedArea(), 1e-6)
+        val lens = parseSvgPath("M0 0C0 20 20 20 20 0C20 -20 0 -20 0 0Z").single()
+        assertEquals(2, lens.knots.size)
+        assertEquals(-480.0, lens.signedArea(), 5.0)
+        assertEquals(0.0, Contour(listOf(Knot(Pt(1f, 1f))), closed = true).signedArea(), 0.0)
+    }
+
+    @Test fun holesAreInferredFromTheWindingOfLaterContours() {
+        val same = parseSvgPath("M0 0H10V10H0Z M2 2H4V4H2Z").withHoles()
+        assertEquals(listOf(false, false), same.map { it.exclude })
+        val opposite = parseSvgPath("M0 0H10V10H0Z M2 2V4H4V2Z").withHoles()
+        assertEquals(listOf(false, true), opposite.map { it.exclude })
+        assertEquals(listOf(false, true), same.withHoles(evenOdd = true).map { it.exclude })
+        assertEquals(1, parseSvgPath("M0 0H10V10H0Z").withHoles().size)
+    }
+
+    @Test fun editingAMultiSubpathShapeKeepsItsHolesAndRule() {
+        val layer = Layer(XmlNode("shape", mapOf("id" to "1"), listOf(XmlNode("path", mapOf("d" to "M0 0H10V10H0Z M2 2V4H4V2Z M6 6H8V8H6Z", "fillRule" to "evenodd")))))
+        assertEquals(listOf(false, true, true), layer.contours!!.map { it.exclude })
+        val edited = layer.withContours(layer.contours!!)
+        assertEquals("evenodd", edited.node.child("path")!!["fillRule"])
+        assertEquals(listOf(false, true, true), edited.contours!!.map { it.exclude })
     }
 }

@@ -146,7 +146,8 @@ SkPath Combine(const std::vector<PathContour>& contours, float t, bool rebuild) 
     SkPath result;
     bool first = true;
     for (const PathContour& c : contours) {
-        const SkPath part = rebuild && !c.knots.empty() ? KnotsPath(c, t) : c.path;
+        SkPath part = rebuild && !c.knots.empty() ? KnotsPath(c, t) : c.path;
+        if (c.evenOdd) part.setFillType(SkPathFillType::kEvenOdd);
         if (first) {
             result = part;
             first = false;
@@ -158,8 +159,11 @@ SkPath Combine(const std::vector<PathContour>& contours, float t, bool rebuild) 
 }
 
 void ParseOutline(const XmlNode& path, Layer* layer) {
+    const char* rule = path.attr("fillRule");
+    const bool evenOdd = rule && !strcmp(rule, "evenodd");
     auto add = [&](const XmlNode& n) {
         PathContour c;
+        c.evenOdd = evenOdd;
         const char* d = n.attr("d");
         const char* closed = n.attr("closed");
         const char* exclude = n.attr("exclude");
@@ -181,6 +185,7 @@ void ParseOutline(const XmlNode& path, Layer* layer) {
         } else {
             return;
         }
+        if (evenOdd) c.path.setFillType(SkPathFillType::kEvenOdd);
         layer->contours.push_back(std::move(c));
     };
     add(path);

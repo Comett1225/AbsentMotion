@@ -10,10 +10,10 @@ internal object Resampler {
     const val ULTRA = 2
 
     const val TAPS = 8
-    private const val PHASES = 256
+    const val PHASES = 256
     private val fixed = Array(PHASES + 1) { kernel(it / PHASES.toDouble(), 1.0, FloatArray(2 * TAPS)) }
 
-    private fun kernel(frac: Double, fc: Double, out: FloatArray): FloatArray {
+    fun kernel(frac: Double, fc: Double, out: FloatArray): FloatArray {
         var sum = 0.0
         for (m in 0 until 2 * TAPS) {
             val x = (m - (TAPS - 1)) - frac
@@ -28,7 +28,7 @@ internal object Resampler {
         return out
     }
 
-    fun sample(win: FloatArray, j: Int, frac: Float, quality: Int, step: Double, out: FloatArray, scratch: FloatArray) {
+    fun sample(win: FloatArray, j: Int, frac: Float, quality: Int, step: Double, out: FloatArray, sinc: SincBank) {
         when (quality) {
             LOW -> {
                 val a = 2 * j
@@ -43,7 +43,7 @@ internal object Resampler {
                 out[ch] = p1 + 0.5f * frac * (p2 - p0 + frac * (2 * p0 - 5 * p1 + 4 * p2 - p3 + frac * (3 * (p1 - p2) + p3 - p0)))
             }
             else -> {
-                val w = if (step <= 1.0001) fixed[(frac * PHASES + 0.5f).toInt()] else kernel(frac.toDouble(), 1.0 / step, scratch)
+                val w = if (step <= 1.0001) fixed[(frac * PHASES + 0.5f).toInt()] else sinc.kernel(frac, step)
                 var l = 0f
                 var r = 0f
                 val first = 2 * (j - (TAPS - 1))
@@ -55,5 +55,29 @@ internal object Resampler {
                 out[1] = r
             }
         }
+    }
+}
+
+internal class SincBank {
+    private var key = -1
+    private var cutoff = 1.0
+    private val phases = arrayOfNulls<FloatArray>(Resampler.PHASES + 1)
+
+    var built = 0
+        private set
+
+    fun kernel(frac: Float, step: Double): FloatArray {
+        val k = (step * STEP_STEPS + 0.5).toInt()
+        if (k != key) {
+            key = k
+            cutoff = STEP_STEPS / k.toDouble()
+            phases.fill(null)
+        }
+        val at = (frac * Resampler.PHASES + 0.5f).toInt()
+        return phases[at] ?: Resampler.kernel(at / Resampler.PHASES.toDouble(), cutoff, FloatArray(2 * Resampler.TAPS)).also { phases[at] = it; built++ }
+    }
+
+    private companion object {
+        const val STEP_STEPS = 256
     }
 }

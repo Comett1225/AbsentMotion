@@ -65,6 +65,22 @@ class CaptionsTest {
         assertEquals(16_000, speechPcm(mix, 0, 300) {}.size)
     }
 
+    @Test fun soundArrivesInBoundedChunksThatAddUpToTheWholeBuffer() = runBlocking {
+        fun tone(frame: Long) = (0.5 * sin(2 * PI * 440 * frame / 44100)).toFloat()
+        val mix = { startUs: Long, endUs: Long ->
+            val first = Math.round(startUs * 44100 / 1e6)
+            val frames = (Math.round(endUs * 44100 / 1e6) - first).toInt()
+            ShortArray(frames * 2) { (tone(first + it / 2) * 32767).toInt().toShort() }
+        }
+        val whole = speechPcm(mix, 1_000, 8_500) {}
+        val parts = ArrayList<FloatArray>()
+        speechChunks(mix, 1_000, 8_500, {}) { chunk, count -> parts += chunk.copyOf(count) }
+        assertTrue(parts.size > 1)
+        assertTrue(parts.all { it.size <= 16_000 })
+        assertEquals(whole.toList(), parts.flatMap { it.toList() })
+        assertEquals(120_000, whole.size)
+    }
+
     @Test fun longRecordingsAreRecognisedInWindowsThatCoverTheWholeSpan() {
         assertEquals(listOf(5_000 to 65_000), captionWindows(5_000, 65_000))
         val windows = captionWindows(0, 45 * 60_000)

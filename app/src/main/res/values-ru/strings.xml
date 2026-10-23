@@ -25,7 +25,7 @@
     <string name="onboarding_speed_basic">Базовая</string>
     <string name="onboarding_speed_basic_note">Лучше всего 720p или 1080p. Длинные видео экспортируются дольше.</string>
     <string name="no_camera_was_found_on_this">На этом устройстве не найдена камера.</string>
-    <string name="no_sound_microphone_access_is_off">Нет звука: доступ к микрофону выключен</string>
+    <string name="no_sound_microphone_access_is_off">Нет звука: доступ к микрофону отключён. Нажмите, чтобы включить</string>
     <string name="camera_access">Доступ к камере</string>
     <string name="view_all">Показать все</string>
     <string name="add_audio_effect">Добавить аудиоэффект</string>
@@ -1276,6 +1276,7 @@
     <string name="ai_enhance_faces">Повышение резкости лиц</string>
     <string name="ai_enhance_faces_hint">Лица резче, остальное без изменений</string>
     <string name="ai_enhance_faces_help">Находит лица, смотрящие в камеру, и повышает резкость только их, мягко вписывая результат в кадр. Внешность людей не меняется. Около минуты на 10 секунд видео на недавнем флагмане; на средних телефонах — в несколько раз дольше.</string>
+    <string name="ai_enhance_no_faces">В этом клипе не найдено лиц, поэтому ничего не изменено</string>
     <string name="ai_enhance_quick">Быстро, без AI</string>
     <string name="ai_enhance_quick_note">Добавляет эффект «Повышение резкости» к клипу. Его можно изменить или удалить в списке эффектов.</string>
     <string name="ai_enhance_cartoon">Мультфильм или анимация</string>

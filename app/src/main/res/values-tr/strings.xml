@@ -25,7 +25,7 @@
     <string name="onboarding_speed_basic">Temel</string>
     <string name="onboarding_speed_basic_note">En iyi 720p veya 1080p ile çalışır. Uzun videolar biraz zaman alır.</string>
     <string name="no_camera_was_found_on_this">Bu cihazda kamera bulunamadı.</string>
-    <string name="no_sound_microphone_access_is_off">Ses yok: mikrofon erişimi kapalı</string>
+    <string name="no_sound_microphone_access_is_off">Ses yok: mikrofon erişimi kapalı. Açmak için dokunun</string>
     <string name="camera_access">Kamera erişimi</string>
     <string name="view_all">Tümünü gör</string>
     <string name="add_audio_effect">Ses efekti ekle</string>
@@ -1228,6 +1228,7 @@
     <string name="ai_enhance_faces">Yüzleri keskinleştir</string>
     <string name="ai_enhance_faces_hint">Daha keskin yüzler, geri kalanı olduğu gibi kalır</string>
     <string name="ai_enhance_faces_help">Kameraya bakan yüzleri bulur ve yalnızca onları keskinleştirir, sonucu yumuşakça görüntüye harmanlar. Kimsenin görünümünü değiştirmez. Güncel üst seviye bir telefonda 10 saniyelik video için yaklaşık bir dakika; orta segment telefonlar birkaç kat daha uzun sürer.</string>
+    <string name="ai_enhance_no_faces">Bu klipte yüz bulunamadığı için hiçbir şey değiştirilmedi</string>
     <string name="ai_enhance_quick">Hızlı, AI olmadan</string>
     <string name="ai_enhance_quick_note">Klibe Keskinleştir efektini ekler. Efektler listesinden değiştirebilir veya kaldırabilirsiniz.</string>
     <string name="ai_enhance_cartoon">Çizgi film veya animasyon</string>

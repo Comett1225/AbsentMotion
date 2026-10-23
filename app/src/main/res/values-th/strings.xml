@@ -25,7 +25,7 @@
     <string name="onboarding_speed_basic">พื้นฐาน</string>
     <string name="onboarding_speed_basic_note">เหมาะกับ 720p หรือ 1080p ที่สุด วิดีโอยาวจะใช้เวลาสักพัก</string>
     <string name="no_camera_was_found_on_this">ไม่พบกล้องบนอุปกรณ์นี้</string>
-    <string name="no_sound_microphone_access_is_off">ไม่มีเสียง: ปิดการเข้าถึงไมโครโฟนอยู่</string>
+    <string name="no_sound_microphone_access_is_off">ไม่มีเสียง: สิทธิ์การใช้ไมโครโฟนถูกปิดอยู่ แตะเพื่อเปิด</string>
     <string name="camera_access">การเข้าถึงกล้อง</string>
     <string name="view_all">ดูทั้งหมด</string>
     <string name="add_audio_effect">เพิ่มเอฟเฟกต์เสียง</string>
@@ -1204,6 +1204,7 @@
     <string name="ai_enhance_faces">เพิ่มความคมชัดใบหน้า</string>
     <string name="ai_enhance_faces_hint">ใบหน้าคมชัดขึ้น ส่วนที่เหลือคงเดิม</string>
     <string name="ai_enhance_faces_help">ค้นหาใบหน้าที่หันมองกล้องและเพิ่มความคมชัดเฉพาะส่วนนั้น โดยผสมผลลัพธ์เข้ากับภาพอย่างนุ่มนวล ไม่เปลี่ยนหน้าตาของใคร ประมาณหนึ่งนาทีสำหรับวิดีโอ 10 วินาที บนมือถือรุ่นท็อปใหม่ ๆ ส่วนมือถือระดับกลางจะใช้เวลานานกว่านั้นหลายเท่า</string>
+    <string name="ai_enhance_no_faces">ไม่พบใบหน้าในคลิปนี้ จึงไม่มีการเปลี่ยนแปลง</string>
     <string name="ai_enhance_quick">แบบเร็ว ไม่ใช้ AI</string>
     <string name="ai_enhance_quick_note">เพิ่มเอฟเฟกต์เพิ่มความคมชัดให้กับคลิป คุณเปลี่ยนหรือลบได้ในรายการเอฟเฟกต์</string>
     <string name="ai_enhance_cartoon">การ์ตูนหรือแอนิเมชัน</string>
