@@ -241,7 +241,7 @@ internal suspend fun rewriteVideo(context: Context, job: VideoJob, progress: AiP
             }
             val started = System.nanoTime()
             var done = 0
-            for (batch in stamps.chunked(BATCH)) {
+            for (batch in stamps.chunked(enhanceBatch(media.width, media.height))) {
                 val frames = ArrayList<Pair<Long, IntArray>>(batch.size)
                 reader.read(batch) { pts, yuv ->
                     size = yuv.width to yuv.height
@@ -294,5 +294,9 @@ internal fun frameStatus(done: Int, total: Int, elapsedNs: Long): String {
         else AppText.get(R.string.ai_frames_minutes_left, done.toString(), total.toString(), (left / 60).roundToInt().toString())
 }
 
-private const val BATCH = 8
+internal fun enhanceBatch(width: Int, height: Int, heapBytes: Long = Runtime.getRuntime().maxMemory()): Int =
+    (heapBytes / BATCH_HEAP_SHARE / (width.toLong().coerceAtLeast(1) * height.toLong().coerceAtLeast(1) * 4)).coerceIn(1L, MAX_BATCH.toLong()).toInt()
+
+private const val MAX_BATCH = 8
+private const val BATCH_HEAP_SHARE = 8
 private const val HOT_PAUSE_MS = 2_000L
