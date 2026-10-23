@@ -39,6 +39,7 @@ import app.absentmotion.platform.LocalContext
 import app.absentmotion.platform.Log
 import app.absentmotion.platform.Uri
 import app.absentmotion.platform.rememberLauncherForActivityResult
+import app.absentmotion.platform.rememberStorageAccess
 import app.absentmotion.ui.theme.Am
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -91,10 +92,17 @@ internal fun BackupRows(settings: AppSettings, onRestored: () -> Unit) {
             restoreBackup(context, uri, it)
         }
     }
+    val storage = rememberStorageAccess()
+    fun backUpNow() {
+        if (storage.ready(::backUpNow)) run(txt(R.string.backup_backing_up_title), txt(R.string.backup_result_title), txt(R.string.backup_stopped)) { backUp(context, it) }
+    }
     Column(Modifier.fillMaxWidth()) {
-        ActionRow(stringResource(R.string.backup_all_projects)) { run(txt(R.string.backup_backing_up_title), txt(R.string.backup_result_title), txt(R.string.backup_stopped)) { backUp(context, it) } }
+        ActionRow(stringResource(R.string.backup_all_projects)) { backUpNow() }
         ActionRow(stringResource(R.string.backup_restore)) { picker.launch(arrayOf("*/*")) }
-        SwitchRow(stringResource(R.string.backup_weekly), settings.weeklyBackup, enabled = true) { settings.weeklyBackup = it }
+        SwitchRow(stringResource(R.string.backup_weekly), settings.weeklyBackup, enabled = true) {
+            settings.weeklyBackup = it
+            if (it) storage.ready {}
+        }
     }
     task?.let { current ->
         AlertDialog(

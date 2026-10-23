@@ -91,6 +91,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import app.absentmotion.platform.rememberStorageAccess
 import app.absentmotion.ui.editor.ChromeIcons
 import app.absentmotion.ui.theme.Am
 import kotlinx.coroutines.Job
@@ -249,6 +250,7 @@ private fun CameraBody(ui: CameraUi, aspect: Float, mic: Boolean, askMic: () -> 
     val scope = rememberCoroutineScope()
     val executor = remember { ContextCompat.getMainExecutor(context) }
     val controller = remember { LifecycleCameraController(context) }
+    val storage = rememberStorageAccess()
     var lenses by remember { mutableStateOf<Pair<Boolean, Boolean>?>(null) }
     var hasFlash by remember { mutableStateOf(false) }
     var zoom by remember { mutableFloatStateOf(1f) }
@@ -357,6 +359,7 @@ private fun CameraBody(ui: CameraUi, aspect: Float, mic: Boolean, askMic: () -> 
             ui.recording != null -> ui.recording?.stop()
             counting != null -> counting.cancel()
             ui.busy -> Unit
+            !storage.ready(::shutter) -> Unit
             else -> ui.counting = scope.launch {
                 try {
                     for (s in ui.timer downTo 1) {
