@@ -42,4 +42,19 @@ class PresetDomainsTest {
         assertEquals(echo, applyPreset(video, source).node.child(AUDIO_FX_TAG))
         assertNull(applyPreset(shapeLayer(), source).node.child(AUDIO_FX_TAG))
     }
+
+    @Test fun aSpeedRampPresetLandsOnTheTrimmedPartOfTheClip() {
+        fun video(inTime: Int, children: List<XmlNode> = emptyList()) =
+            shapeLayer(attrs = mapOf("fillType" to "media", "fillVideo" to "content://clip", "inTime" to "$inTime", "outTime" to "60000"), children = children)
+        val ramp = XmlNode("speedMap").withKeyframes(listOf(Keyframe(0f, "1"), Keyframe(1e9f, "3")))
+        val preset = video(0, listOf(ramp))
+        val span = VideoTiming(preset).let { it.mediaMs(2000.0) - it.mediaMs(0.0) }
+        for (trim in listOf(0, 5000, 20000)) {
+            val applied = applyPreset(video(trim), preset)
+            val keys = applied.node.child("speedMap")!!.keyframes
+            assertEquals(trim * 1e6, keys.first().t.toDouble(), 1e4)
+            assertEquals((trim + 1000 * 2000 / span) * 1e6, keys.last().t.toDouble(), 1e5)
+            assertEquals(1f, VideoTiming(applied).speed(0.0), 1e-3f)
+        }
+    }
 }

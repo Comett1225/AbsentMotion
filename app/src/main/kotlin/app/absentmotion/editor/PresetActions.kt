@@ -98,7 +98,9 @@ private fun Layer.withPresetSpeed(preset: Layer): Layer {
     if (kind == "embedScene" && map.isKeyframed) return this
     val own = speedOf(this)
     if (!map.isKeyframed && !own.isKeyframed && own["value"]?.finiteFloat() == map["value"]?.finiteFloat()) return this
-    fun span(l: Layer) = VideoTiming(l).let { it.mediaMs((l.endTime - l.startTime).toDouble()) - it.mediaMs(0.0) }
-    val stretch = (span(this) / span(preset).coerceAtLeast(1e-6)).toFloat()
-    return withVideoSpeedMap(if (map.isKeyframed) map.withKeyframes(map.keyframes.map { it.copy(t = it.t * stretch) }) else map)
+    fun range(l: Layer) = VideoTiming(l).let { it.mediaMs(0.0) to it.mediaMs((l.endTime - l.startTime).toDouble()) }
+    val (from, to) = range(preset)
+    val (start, end) = range(this)
+    val stretch = (end - start) / (to - from).coerceAtLeast(1e-6)
+    return withVideoSpeedMap(if (map.isKeyframed) map.withKeyframes(map.keyframes.map { it.copy(t = ((start + (it.t / 1e6 - from) * stretch) * 1e6).toFloat()) }) else map)
 }
