@@ -138,7 +138,7 @@ fun EditorState.skipForward() {
 fun EditorState.resetTransform(tabs: List<Int>) = editSelected { layer ->
     tabs.fold(layer) { l, tab ->
         when (tab) {
-            0 -> l.withTransform("location", scene.width / 2f, scene.height / 2f, if (l.kind == "camera") -scene.cameraZoom else 0f)
+            0 -> scene.centred(l, sampleMs)
             1 -> if (l.kind == "camera") l.withCameraFov(60f) else l.withTransform("scale", 1f, 1f)
             2 -> l.withRotation(0f)
             3 -> l.withTilt(0f, 0f)
@@ -208,10 +208,14 @@ fun EditorState.pasteCurveToAll() {
     editKeyValue { it.withEasingEverywhere(ref, curve) }
 }
 
-fun EditorState.flip(horizontal: Boolean) = editSelected {
-    val s = it.scale
-    if (horizontal) it.withTransform("scale", -s[0], s[1]) else it.withTransform("scale", s[0], -s[1])
+internal fun Scene.centred(layer: Layer, timeMs: Int): Layer {
+    val local = withWorldLocation(layer, timeMs) { _, _ -> width / 2f to height / 2f }.location
+    return layer.withTransform("location", local[0], local[1], if (layer.kind == "camera") -cameraZoom else 0f)
 }
+
+fun EditorState.flip(horizontal: Boolean) = editSelected { it.flipped(horizontal) }
+
+internal fun Layer.flipped(horizontal: Boolean): Layer = copy(node = node.mapTransform("scale") { v -> v[if (horizontal) 0 else 1] *= -1f })
 
 object EffectClipboard {
     var effects by mutableStateOf<List<XmlNode>>(emptyList())
