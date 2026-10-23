@@ -29,6 +29,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.json.JSONArray
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URI
@@ -84,22 +85,22 @@ internal object Updates {
     }
 
     private fun fetchLatest(): Release? {
-        val connection = URI(LATEST_RELEASE).toURL().openConnection() as HttpURLConnection
+        val connection = URI(RELEASES).toURL().openConnection() as HttpURLConnection
         try {
             connection.connectTimeout = TIMEOUT_MS
             connection.readTimeout = TIMEOUT_MS
             connection.setRequestProperty("Accept", "application/vnd.github+json")
             connection.setRequestProperty("User-Agent", "AbsentMotion")
             if (connection.responseCode != HttpURLConnection.HTTP_OK) return null
-            return parseRelease(connection.inputStream.use { it.readAtMost(MAX_BYTES) }.decodeToString())
+            return parseReleases(connection.inputStream.use { it.readAtMost(MAX_BYTES) }.decodeToString())
         } finally {
             connection.disconnect()
         }
     }
 
-    private val LATEST_RELEASE = "https://api.github.com/repos/" + HOME_PAGE.removePrefix("https://github.com/") + "/releases/latest"
+    private val RELEASES = "https://api.github.com/repos/" + HOME_PAGE.removePrefix("https://github.com/") + "/releases?per_page=30"
     private const val TIMEOUT_MS = 5_000
-    private const val MAX_BYTES = 1 shl 20
+    private const val MAX_BYTES = 4 shl 20
 }
 
 internal fun answerFor(release: Release?, current: String): UpdateAnswer {
@@ -107,8 +108,17 @@ internal fun answerFor(release: Release?, current: String): UpdateAnswer {
     return if (newer) UpdateAnswer.Available(release) else UpdateAnswer.Latest
 }
 
-internal fun parseRelease(json: String): Release? {
-    val release = runCatching { JSONObject(json) }.getOrNull() ?: return null
+internal fun parseRelease(json: String): Release? = runCatching { JSONObject(json) }.getOrNull()?.let(::releaseOf)
+
+internal fun parseReleases(json: String): Release? {
+    val list = runCatching { JSONArray(json) }.getOrNull() ?: return null
+    return (0 until list.length()).mapNotNull { list.optJSONObject(it) }
+        .filterNot { it.optBoolean("draft") || it.optBoolean("prerelease") }
+        .mapNotNull(::releaseOf)
+        .maxWithOrNull(compareBy<Release> { Version.parse(it.version) })
+}
+
+private fun releaseOf(release: JSONObject): Release? {
     val tag = release.optString("tag_name").trim()
     if (Version.parse(tag) == null) return null
     val page = release.optString("html_url").takeIf { it.startsWith("$HOME_PAGE/", ignoreCase = true) } ?: "$HOME_PAGE/releases/latest"

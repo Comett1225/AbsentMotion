@@ -65,6 +65,28 @@ class UpdateCheckTest {
         assertNull(parseRelease(""))
     }
 
+    @Test fun theNewestVersionWinsWhateverElseTheRepositoryPublishes() {
+        fun release(tag: String, extra: String = "") = """{"tag_name":"$tag","html_url":"$HOME_PAGE/releases/tag/$tag"$extra}"""
+        val list = "[" + listOf(
+            release("ai-models-1"), release("v3.4.0", ""","draft":true"""), release("v3.5.0-beta.1", ""","prerelease":true"""),
+            release("v3.3.0"), release("v3.3.10"), release("v3.3.9"), release("models-v2"), release("v2.5.2"),
+        ).joinToString(",") + "]"
+        assertEquals(Release("3.3.10", "$HOME_PAGE/releases/tag/v3.3.10"), parseReleases(list))
+        assertEquals(Release("3.3.0", "$HOME_PAGE/releases/tag/v3.3.0"), parseReleases("[" + listOf(release("ai-models-1"), release("v3.3.0")).joinToString(",") + "]"))
+    }
+
+    @Test fun aListWithNothingToOfferGivesNoRelease() {
+        assertNull(parseReleases("[]"))
+        assertNull(parseReleases("""[{"tag_name":"ai-models-1"},{"tag_name":"nightly"}]"""))
+        assertNull(parseReleases("""[{"tag_name":"v3.4.0","draft":true},{"tag_name":"v3.5.0","prerelease":true}]"""))
+        assertNull(parseReleases("""{"tag_name":"v3.1.0"}"""))
+        assertNull(parseReleases("""{"message":"API rate limit exceeded"}"""))
+        assertNull(parseReleases("[1, null, \"x\"]"))
+        assertNull(parseReleases("<html>rate limited</html>"))
+        assertNull(parseReleases("[{\"tag_name\":\"v3.1"))
+        assertNull(parseReleases(""))
+    }
+
     @Test fun theOutdatedHintOnlyAppearsWhenAllowedAndReallyOlder() {
         val page = "$HOME_PAGE/releases/tag/v3.2.0"
         assertEquals(Outdated("3.1.0", "3.2.0", page), outdatedHint(allowed = true, installed = "3.1.0", newest = "3.2.0", link = page))
