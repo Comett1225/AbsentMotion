@@ -84,6 +84,7 @@ class AudioEngine(context: Context) {
         listen(true)
         main.removeCallbacks(releaseIdle)
         releasing = false
+        synchronized(streams) { streams.dropFailed() }
         session = Session(startMs, previous).also { it.start() }
         return true
     }
