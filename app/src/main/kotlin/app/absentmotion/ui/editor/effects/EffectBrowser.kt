@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import app.absentmotion.ai.AiAction
 import app.absentmotion.ai.AiTools
+import app.absentmotion.ai.QUICK_SHARPEN
 import app.absentmotion.audio.AudioFx
 import app.absentmotion.audio.FxKind
 import app.absentmotion.audio.VoicePreset
@@ -251,7 +252,7 @@ fun EffectBrowser(state: EditorState) {
     }
     AiVideoDialog(ai, state.scene)
     AiNoiseDialog(ai)
-    AiEnhanceDialog(ai, state.scene) { catalog.find("sharpen")?.let(::pick) }
+    AiEnhanceDialog(ai, state.scene) { catalog.find(QUICK_SHARPEN)?.let(::pick) }
     AiProgressDialog(ai)
 }
 

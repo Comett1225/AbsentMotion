@@ -1,5 +1,6 @@
 package app.absentmotion.ai
 
+import app.absentmotion.effects.EffectCatalog
 import app.absentmotion.export.FrameInterpolation
 import app.absentmotion.export.SmoothLevel
 import app.absentmotion.export.Smoothing
@@ -7,6 +8,7 @@ import app.absentmotion.ui.onboarding.PhoneSpeed
 import android.app.ApplicationExitInfo
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -80,6 +82,15 @@ class AiModelsTest {
         assertNull(EnhanceOptions.parse("blur"))
         assertNull(EnhanceOptions.parse(null))
         assertEquals("upscale4+cartoon", EnhanceOptions(EnhanceMode.Upscale4, cartoon = true).xml)
+    }
+
+    @Test fun quickSharpenFindsTheSharpenEffectInTheCatalog() {
+        val catalog = EffectCatalog.parse { File("src/main/assets/effects", it).inputStream() }
+        val effect = catalog.find(QUICK_SHARPEN)
+        assertNotNull(effect)
+        assertTrue(effect!!.available)
+        assertEquals("sharpen", effect.key)
+        assertNull(catalog.find("sharpen"))
     }
 
     @Test fun inputCapsFollowTheShortSide() {
