@@ -209,7 +209,7 @@ fun HomeScreen(
                     onCollect = onCollect,
                     wide = wide,
                 )
-                if (!wide) Spacer(Modifier.height(BarHeight + navInset))
+                Spacer(Modifier.height(if (wide) navInset else BarHeight + navInset))
             }
             if (!wide) BottomBar(onNew = { creating = true }, page, { page = it }, Modifier.align(Alignment.BottomCenter), navInset)
             if (toReport.isNotEmpty()) ImportDialog(toReport, onDismiss = onImportShown, onOpen = { onImportShown(); toReport.first().let { if (it.template) onTemplate(it.id) else onOpen(it.id) } })
