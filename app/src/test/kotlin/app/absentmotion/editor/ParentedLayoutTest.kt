@@ -2,6 +2,7 @@ package app.absentmotion.editor
 
 import app.absentmotion.model.Contour
 import app.absentmotion.model.Knot
+import app.absentmotion.model.Layer
 import app.absentmotion.model.Pt
 import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
@@ -79,5 +80,13 @@ class ParentedLayoutTest {
         val (tx, ty) = turned.snapAxesFor(turned.layerAt(2, 0)!!, 0, null, emptyList())
         assertEquals(10f, tx.map(10f), 1e-3f)
         assertEquals(10f, ty.map(10f), 1e-3f)
+        val tilted = scene(400, Layer(layer(1, null, "100,100,0")).withTilt(0f, 60f).node, layer(2, 1, "0,0,0"), layer(3, 2, "50,0,0"))
+        for ((id, pastCentre) in listOf(2L to 105f, 3L to 55f)) {
+            val (ax, ay) = tilted.snapAxesFor(tilted.layerAt(id, 0)!!, 0, null, emptyList())
+            assertEquals(pastCentre, ax.map(pastCentre), 1e-3f)
+            assertEquals(105f, ay.map(105f), 1e-3f)
+        }
+        val flat = scene(400, layer(1, null, "100,100,0"), layer(2, 1, "0,0,0"))
+        assertEquals(100f, flat.snapAxesFor(flat.layerAt(2, 0)!!, 0, null, emptyList()).first.map(105f), 1e-3f)
     }
 }
