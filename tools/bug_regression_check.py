@@ -109,6 +109,17 @@ class ToolRegressions(unittest.TestCase):
                 self.assertNotEqual(0, result.returncode)
                 self.assertIn(message, result.stderr)
 
+    def test_site_tests_are_required_in_ci_and_optional_elsewhere(self):
+        with tempfile.TemporaryDirectory() as folder:
+            env = {k: v for k, v in os.environ.items() if k != 'CI'}
+            env['PATH'] = folder
+            command = [sys.executable, str(ROOT / 'tools/site_build.py'), '--check']
+            local = subprocess.run(command, env=env, capture_output=True, text=True)
+            self.assertNotIn('did not run', local.stderr)
+            remote = subprocess.run(command, env=dict(env, CI='true'), capture_output=True, text=True)
+            self.assertNotEqual(0, remote.returncode)
+            self.assertIn('tools/site_test.js did not run', remote.stderr)
+
     def test_python_policy_rejects_docstrings_but_allows_data_strings(self):
         scanner = ROOT / 'tools/source_policy.py'
         self.assertTrue(scanner.exists())

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import json
+import os
 import re
 import shutil
 import struct
@@ -719,6 +720,8 @@ def main():
             run = subprocess.run([node, str(test)], capture_output=True, text=True)
             if run.returncode:
                 problems.append("tools/site_test.js failed:\n" + (run.stdout + run.stderr).strip())
+        elif test.is_file() and os.environ.get("CI"):
+            problems.append("node is not installed, so tools/site_test.js did not run")
         for line in problems[:60]:
             print(line, file=sys.stderr)
         print("site_build: %d problem(s); %d site files, %d help files" % (len(problems), len(site_files), len(app_files)))
