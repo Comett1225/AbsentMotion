@@ -15,6 +15,7 @@ import app.absentmotion.editor.EditorPanel
 import app.absentmotion.editor.EditorState
 import app.absentmotion.export.FrameInterpolation
 import app.absentmotion.export.Smoothing
+import app.absentmotion.export.holdingVideo
 import app.absentmotion.library.CrashLogs
 import app.absentmotion.model.Layer
 import app.absentmotion.model.MediaDeclaration
@@ -68,6 +69,9 @@ class AiTools(private val context: Context, private val state: EditorState, priv
     var enhance by mutableStateOf(EnhanceOptions())
     private var job: Job? = null
 
+    private suspend fun <T> holdingPreview(action: AiAction, block: suspend () -> T): T =
+        if (action == AiAction.Noise || action == AiAction.Background) block() else holdingVideo(state.engine::holdVideo, state.engine::releaseVideo, block)
+
     fun cancel() { job?.cancel(); message = AppText.get(R.string.ai_cancelling) }
     fun dismiss() { message = ""; retry = null }
 
@@ -105,7 +109,7 @@ class AiTools(private val context: Context, private val state: EditorState, priv
         job = scope.launch {
             var result: AiMedia? = null
             var committed = false
-            try { CrashLogs.during("running AI ${action.name.lowercase()}") {
+            try { CrashLogs.during("running AI ${action.name.lowercase()}") { holdingPreview(action) {
                 val report: AiProgress = { fraction, text ->
                     withContext(Dispatchers.Main) { progress = fraction.coerceIn(0f, 1f); message = text }
                 }
@@ -178,7 +182,7 @@ class AiTools(private val context: Context, private val state: EditorState, priv
                 message = ""
                 state.panel = EditorPanel.Tools
                 state.effectBrowserOpen = false
-            } } catch (_: CancellationException) {
+            } } } catch (_: CancellationException) {
                 message = AppText.get(R.string.ai_cancelled)
             } catch (e: ModelNotReady) {
                 message = e.message ?: AppText.get(R.string.ai_model_not_ready_default); retry = action
