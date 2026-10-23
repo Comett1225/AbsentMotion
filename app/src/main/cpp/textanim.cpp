@@ -209,6 +209,13 @@ std::string CountNumbers(const std::string& text, double add, double multiply, i
     return out;
 }
 
+double FrameMs(double ms, int fps) {
+    if (!std::isfinite(ms)) return 0;
+    const long long rate = std::clamp(fps, 1, 1000), whole = std::llround(std::clamp(ms, -3.6e11, 3.6e11));
+    const long long up = (whole + 1) * rate + 999;
+    return ((up >= 0 ? up / 1000 : -((999 - up) / 1000)) - 1) * 1000.0 / rate;
+}
+
 std::string FormatTimecode(double seconds, double fps, int format) {
     if (!std::isfinite(seconds)) seconds = 0;
     const bool negative = seconds < 0;

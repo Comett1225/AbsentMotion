@@ -336,7 +336,9 @@ uint64_t Seed(const Layer& l, const LayerEffect& e, float t) {
 }
 
 std::string Shown(const Layer& l, float t, int fps, std::string text, bool* tabular) {
-    const double local = t * std::max(0, l.endTime - l.startTime) / 1000.0;
+    const double begin = textanim::FrameMs(l.startTime, fps);
+    const double now = textanim::FrameMs(l.startTime + (double)t * std::max(0, l.endTime - l.startTime), fps);
+    const double local = (now - (std::floor(begin) == l.startTime ? begin : l.startTime)) / 1000.0;
     for (const LayerEffect& e : l.effects) {
         if (e.hidden) continue;
         if (e.id == "absent.countupdown") {
@@ -344,7 +346,7 @@ std::string Shown(const Layer& l, float t, int fps, std::string text, bool* tabu
                                           Choice(e, "separator", t, 0, 3));
             *tabular = true;
         } else if (e.id == "absent.timecode") {
-            const double clock = Choice(e, "source", t, 0, 1) == 1 ? l.startTime / 1000.0 + local : local;
+            const double clock = Choice(e, "source", t, 0, 1) == 1 ? now / 1000.0 : local;
             text = textanim::FormatTimecode(clock * e.value("speed", t, 1) + e.value("offset", t, 0), fps, Choice(e, "format", t, 0, 5));
             *tabular = true;
         } else if (e.id == "absent.textrandomizer") {

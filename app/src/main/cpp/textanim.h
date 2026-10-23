@@ -25,6 +25,7 @@ std::vector<int> Ranks(int count, int direction, uint64_t seed, int* steps);
 float Reveal(float progress, int rank, int steps, float softness);
 float RangeWeight(int shape, int index, int count, float start, float end);
 std::string CountNumbers(const std::string& text, double add, double multiply, int decimals, int separator);
+double FrameMs(double ms, int fps);
 std::string FormatTimecode(double seconds, double fps, int format);
 std::string Scramble(const std::string& text, float progress, int direction, uint64_t seed, int64_t tick, int charset,
                      const std::string& custom, bool keepSpaces, float amount = 1, float start = 0, float end = 1);

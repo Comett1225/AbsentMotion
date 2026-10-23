@@ -420,7 +420,7 @@ void ApplyMotion(const Layer& l, double timeMs, Placement* p) {
         } else if (id == "randomdisplace") {
             if (!repeated) p->location += Displacement(e, t, Integral(e, "speed", l, s, 1), p->location);
         } else if (id == "randomjitter") {
-            const int64_t k = (int64_t)std::floor(Integral(e, "frequency", l, s, 30) + 1e-6);
+            const int64_t k = (int64_t)std::floor(Integral(e, "frequency", l, LatestMs(s * 1000) / 1000, 30));
             const uint64_t seed = Mix((uint64_t)std::llround((double)Param(e, "seed", t, 0) * 1000) + 0x51ed27ull);
             const float m = Param(e, "magnitude", t, 25), angle = Param(e, "angle", t, 45);
             const double along = ((k & 1) ? -1 : 1) * (0.35 + 0.65 * Unit(seed, k));

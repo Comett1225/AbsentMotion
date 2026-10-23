@@ -1,3 +1,4 @@
+#include "frames.h"
 #include "textanim.h"
 
 #include <cmath>
@@ -136,6 +137,45 @@ int main() {
         check(FormatTimecode(1, std::numeric_limits<double>::quiet_NaN(), kFrames) == "30", "invalid frame rate has a finite fallback");
         check(FormatTimecode(-0.001, 30, kMSHundredths) == "00:00.00", "no minus zero");
         check(FormatTimecode(1.0 / 3, 30, kHMSF) == "00:00:00:10", "frame boundaries are exact");
+    }
+    {
+        const auto drawn = [](long long frame, int fps) { return (double)(frame * 1000 / fps); };
+        bool frames = true, nearly = true, countdown = true, layer = true;
+        for (int fps : {24, 25, 30, 50, 60}) {
+            for (long long f = 0; f < 200000; f += 7) {
+                const double ms = drawn(f, fps), exact = FrameMs(ms, fps) / 1000;
+                frames &= FormatTimecode(exact, fps, kFrames) == std::to_string(f);
+                nearly &= FrameMs(ms + 0.04, fps) == FrameMs(ms, fps) && FrameMs(ms - 0.04, fps) == FrameMs(ms, fps);
+                countdown &= FormatTimecode(600 - exact, fps, kFrames) == std::to_string(600LL * fps - f);
+                layer &= FormatTimecode(exact - FrameMs(drawn(f / 3, fps), fps) / 1000, fps, kFrames) == std::to_string(f - f / 3);
+            }
+        }
+        check(frames, "the timecode shows the frame being drawn, also between whole milliseconds");
+        check(nearly, "a frame time read back from a float lands on the same frame");
+        check(countdown, "a countdown shows every frame");
+        check(layer, "layer time counts whole frames from a layer that starts on any frame");
+    }
+    {
+        const auto runs = [](int fps, double rate, int first, int frames) {
+            std::vector<int> out;
+            double last = -1;
+            for (int f = first; f < first + frames; f++) {
+                const double held = am::HeldMs((double)(f * 1000LL / fps), (double)(first * 1000LL / fps), rate);
+                if (out.empty() || held != last) out.push_back(0);
+                out.back()++;
+                last = held;
+            }
+            return out;
+        };
+        check(runs(30, 15, 0, 12) == std::vector<int>(6, 2), "Frame Rate 15 holds every frame twice at 30 fps");
+        check(runs(30, 10, 0, 12) == std::vector<int>(4, 3), "Frame Rate 10 holds 3-3-3 at 30 fps");
+        check(runs(24, 12, 0, 12) == std::vector<int>(6, 2), "Frame Rate 12 holds 2-2-2 at 24 fps");
+        check(runs(60, 15, 0, 16) == std::vector<int>(4, 4), "a 60 fps export holds Frame Rate 15 for four frames");
+        check(runs(30, 30, 0, 9) == std::vector<int>(9, 1), "Frame Rate equal to the project rate changes every frame");
+        check(runs(30, 15, 1, 12) == std::vector<int>(6, 2), "a layer starting on frame 1 also holds 2-2-2");
+        bool jitter = true;
+        for (long long f = 0; f < 30000; f++) jitter &= (long long)std::floor(30 * am::LatestMs((double)(f * 1000 / 30)) / 1000) == f;
+        check(jitter, "a 30 Hz random jitter moves on every frame at 30 fps");
     }
     {
         const std::string text = "Hi there\nyou";
