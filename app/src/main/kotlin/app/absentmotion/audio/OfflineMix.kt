@@ -9,6 +9,7 @@ import app.absentmotion.model.Scene
 import java.io.Closeable
 import kotlin.math.min
 import kotlin.math.roundToInt
+import app.absentmotion.library.openableUri
 
 internal class OfflineMix(
     private val open: (String) -> PcmSource, private val clips: List<AudioClip>, private val quality: Int,
@@ -125,7 +126,7 @@ internal class OfflineMix(
             return soundTracks.getOrPut(uri + "\n" + app.absentmotion.media.fileVersion(context.contentResolver, parsed)) {
                 val extractor = android.media.MediaExtractor()
                 try {
-                    extractor.setDataSource(context.applicationContext, parsed, null)
+                    extractor.setDataSource(context.applicationContext, android.net.Uri.parse(openableUri(uri)), null)
                     (0 until extractor.trackCount).any { extractor.getTrackFormat(it).getString(android.media.MediaFormat.KEY_MIME)?.startsWith("audio/") == true }
                 } catch (e: Exception) { true } finally { extractor.release() }
             }

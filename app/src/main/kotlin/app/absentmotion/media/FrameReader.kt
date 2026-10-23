@@ -19,6 +19,7 @@ import kotlinx.coroutines.ensureActive
 import java.io.Closeable
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.coroutineContext
+import app.absentmotion.library.openableUri
 
 internal class FrameReader(context: Context, uri: String) : Closeable {
     private val extractor = MediaExtractor()
@@ -35,7 +36,7 @@ internal class FrameReader(context: Context, uri: String) : Closeable {
 
     init {
         try {
-            extractor.setDataSource(context, Uri.parse(uri), null)
+            extractor.setDataSource(context, Uri.parse(openableUri(uri)), null)
             val track = (0 until extractor.trackCount).first { extractor.getTrackFormat(it).getString(MediaFormat.KEY_MIME)?.startsWith("video/") == true }
             val format = extractor.getTrackFormat(track)
             extractor.selectTrack(track)

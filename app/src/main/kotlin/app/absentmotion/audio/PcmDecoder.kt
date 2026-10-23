@@ -11,6 +11,7 @@ import android.media.MediaFormat
 import android.net.Uri
 import java.io.Closeable
 import java.nio.ByteOrder
+import app.absentmotion.library.openableUri
 
 internal class PcmChunk {
     var pcm = ShortArray(0)
@@ -40,7 +41,7 @@ internal class PcmDecoder(context: Context, uri: String) : PcmSource {
 
     init {
         try {
-            extractor.setDataSource(context, Uri.parse(uri), null)
+            extractor.setDataSource(context, Uri.parse(openableUri(uri)), null)
             val track = (0 until extractor.trackCount).firstOrNull {
                 extractor.getTrackFormat(it).getString(MediaFormat.KEY_MIME)?.startsWith("audio/") == true
             } ?: error(AppText.get(R.string.ai_no_audio_track, uri))

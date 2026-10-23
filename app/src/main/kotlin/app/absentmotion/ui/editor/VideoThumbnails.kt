@@ -28,6 +28,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.ensureActive
 import kotlin.coroutines.coroutineContext
 import kotlin.math.floor
+import app.absentmotion.library.openableUri
 
 private val thumbnails = LruCache<Pair<String, Long>, ImageBitmap>(256)
 private val retrieving = Mutex()
@@ -75,7 +76,7 @@ private suspend fun thumbnailsAt(context: Context, uri: String, tiles: List<Pair
             val key = uri to time
             val picture = synchronized(thumbnails) { thumbnails.get(key) } ?: (retriever ?: MediaMetadataRetriever().also {
                 retriever = it
-                it.setDataSource(context, Uri.parse(source))
+                it.setDataSource(context, Uri.parse(openableUri(source)))
             }).getScaledFrameAtTime(time, MediaMetadataRetriever.OPTION_CLOSEST, 160, 96)?.asImageBitmap()?.also { bitmap ->
                 synchronized(thumbnails) { thumbnails.put(key, bitmap) }
             }

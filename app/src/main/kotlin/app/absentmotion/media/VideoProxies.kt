@@ -40,6 +40,7 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
+import app.absentmotion.library.openableUri
 
 internal object ProxyRules {
     const val MAX_LONG_SIDE = 1920
@@ -181,7 +182,7 @@ private class SourceInfo(val width: Int, val height: Int, val hdr: Boolean)
 private fun sourceInfo(context: Context, uri: String): SourceInfo {
     val extractor = MediaExtractor()
     try {
-        extractor.setDataSource(context, Uri.parse(uri), null)
+        extractor.setDataSource(context, Uri.parse(openableUri(uri)), null)
         val format = videoTrack(extractor).second
         val (width, height) = visibleSize(format)
         return SourceInfo(width, height, isHdrTransfer(format.intOr(MediaFormat.KEY_COLOR_TRANSFER, 0)))
@@ -208,7 +209,7 @@ private fun transcode(context: Context, uri: String, out: File, cancelled: () ->
     var muxer: MediaMuxer? = null
     val thread = HandlerThread("am-proxy-frames").apply { start() }
     try {
-        extractor.setDataSource(context, Uri.parse(uri), null)
+        extractor.setDataSource(context, Uri.parse(openableUri(uri)), null)
         val (track, format) = videoTrack(extractor)
         extractor.selectTrack(track)
         val (visibleWidth, visibleHeight) = visibleSize(format)

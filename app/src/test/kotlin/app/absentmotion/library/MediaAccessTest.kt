@@ -78,7 +78,13 @@ class MediaAccessTest {
         val secret = file("preferences/settings.json").toURI().toString()
         assertEquals(picture, access.defused(picture))
         assertEquals("content://media/external/images/media/12", access.defused("content://media/external/images/media/12"))
-        assertEquals("amproj:a.jpg", access.defused("amproj:a.jpg"))
+        assertEquals("blocked-amproj:a.jpg", access.defused("amproj:a.jpg"))
+        assertEquals("blocked-https://example.com/a.mp4", access.defused("https://example.com/a.mp4"))
+        assertEquals("blocked-/etc/hosts", access.defused("/etc/hosts"))
+        assertEquals("blocked-x://elsewhere", access.defused("x://elsewhere"))
+        assertEquals("blocked-file:///etc/hosts", access.defused("blocked-file:///etc/hosts".removePrefix("blocked-")))
+        assertEquals("blocked-file:///etc/hosts", access.defused("blocked-file:///etc/hosts"))
+        assertEquals("", access.defused(""))
         assertEquals("blocked-$secret", access.defused(secret))
         assertEquals("blocked-FILE:///etc/hosts", access.defused("FILE:///etc/hosts"))
         assertFalse(access.allows(access.defused(secret)))
@@ -94,6 +100,13 @@ class MediaAccessTest {
         assertFalse(own.allows(external.toURI().toString()))
         assertFalse(own.allows("file://" + external.path + "/../data/files/projects/p1.xml"))
         assertFalse(own.allows(file("projects/p1.xml").toURI().toString()))
+    }
+
+    @Test fun onlyContentAndFileAddressesCanBeOpened() {
+        for (ok in listOf("content://media/external/video/media/1", "file:///data/x.mp4", "FILE:///data/x.mp4", "Content://a/b")) assertEquals(ok, openableUri(ok))
+        for (bad in listOf("https://example.com/a.mp4", "http://example.com/a.mp4", "rtsp://x/y", "ftp://x/y", "/etc/hosts", "relative/path.mp4", "", "blocked-file:///x", "android.resource://a/1", "data:video/mp4;base64,AAAA", "x:y")) {
+            try { openableUri(bad); org.junit.Assert.fail("opened $bad") } catch (_: SecurityException) {}
+        }
     }
 
     @Test fun unlimitedAllowsEverythingForTheMac() {

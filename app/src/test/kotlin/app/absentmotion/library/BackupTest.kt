@@ -313,4 +313,17 @@ class BackupTest {
         assertTrue(odd.contentEquals(root.resolve("media/$a/data.xml").readBytes()))
         assertTrue(odd.contentEquals(root.resolve("templates/t1/media/blob.xml").readBytes()))
     }
+
+    @Test fun addressesThatAreNotLocalAreBlockedWhenARestoreBringsThemIn() {
+        val root = tmp.newFolder("new")
+        val store = ProjectStore(root)
+        val scene = Scene(XmlNode("scene", linkedMapOf("width" to "10", "height" to "10", "title" to "Net"), listOf(
+            XmlNode("shape", linkedMapOf("id" to "1", "fillImage" to "https://example.com/a.png")),
+            XmlNode("shape", linkedMapOf("id" to "2", "fillVideo" to "/etc/hosts")),
+            XmlNode("shape", linkedMapOf("id" to "3", "fillVideo" to "rtsp://example.com/live")),
+            XmlNode("audio", linkedMapOf("id" to "4", "src" to "content://media/external/audio/media/3")),
+        )))
+        Backup.restore(store, root, ByteArrayInputStream(zipOf("projects/p1.xml" to scene.toXml().toByteArray())), MediaAccess.forPhone(root))
+        assertEquals(setOf("blocked-https://example.com/a.png", "blocked-/etc/hosts", "blocked-rtsp://example.com/live", "content://media/external/audio/media/3"), store.load("p1")!!.node.mediaUris())
+    }
 }

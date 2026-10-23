@@ -4,6 +4,13 @@ import app.absentmotion.platform.Context
 import java.io.File
 import java.net.URI
 
+fun openableUri(uri: String): String {
+    if (uri.substringBefore(':', "").lowercase() !in OPENABLE_SCHEMES) throw SecurityException("Not a local media address")
+    return uri
+}
+
+private val OPENABLE_SCHEMES = setOf("content", "file")
+
 internal fun modelFolder(uri: String): File? {
     if (!uri.startsWith("file:", ignoreCase = true)) return null
     return runCatching { File(URI(uri)).canonicalFile.parentFile }.getOrNull()?.takeIf { it.name.startsWith("model-") && it.isDirectory }
@@ -19,11 +26,13 @@ class MediaAccess private constructor(private val filesDir: File?, private val o
         }
     }
 
-    fun defused(uri: String): String = if (uri.startsWith("file:", ignoreCase = true) && !allows(uri)) "blocked-$uri" else uri
+    fun defused(uri: String): String = if (filesDir == null || uri.isEmpty() || uri.startsWith(BLOCKED) || allows(uri)) uri else BLOCKED + uri
 
-    fun imported(uri: String): String = if (filesDir != null && uri.startsWith("content:", ignoreCase = true)) "blocked-$uri" else defused(uri)
+    fun imported(uri: String): String = if (filesDir != null && uri.startsWith("content:", ignoreCase = true)) BLOCKED + uri else defused(uri)
 
     companion object {
+        private const val BLOCKED = "blocked-"
+
         val Unlimited = MediaAccess(null)
 
         fun forPhone(filesDir: File, vararg own: File?) = MediaAccess(filesDir, own.filterNotNull())

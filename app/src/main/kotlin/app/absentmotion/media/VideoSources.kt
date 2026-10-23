@@ -5,6 +5,7 @@ import android.media.MediaExtractor
 import android.media.MediaFormat
 import android.net.Uri
 import android.util.LruCache
+import app.absentmotion.library.openableUri
 
 internal object VideoSources {
     private class Index(val timestamps: LongArray, val syncGapUs: Long)
@@ -20,7 +21,7 @@ internal object VideoSources {
         indices.get(key)?.let { return it }
         val extractor = MediaExtractor()
         try {
-            extractor.setDataSource(context, Uri.parse(uri), null)
+            extractor.setDataSource(context, Uri.parse(openableUri(uri)), null)
             val track = (0 until extractor.trackCount).first { extractor.getTrackFormat(it).getString(MediaFormat.KEY_MIME)?.startsWith("video/") == true }
             extractor.selectTrack(track)
             val samples = ArrayList<Long>()

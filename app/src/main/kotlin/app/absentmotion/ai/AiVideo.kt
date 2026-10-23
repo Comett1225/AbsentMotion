@@ -25,6 +25,7 @@ import java.nio.ByteBuffer
 import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong
+import app.absentmotion.library.openableUri
 
 internal fun videoBitrate(width: Int, height: Int, fps: Float): Int = (width.toDouble() * height * fps * 0.1).coerceIn(1_500_000.0, 50_000_000.0).toInt()
 
@@ -67,7 +68,7 @@ private class AudioCopy(context: Context, uri: String) : Closeable {
     private var ended = false
 
     init {
-        extractor.setDataSource(context, Uri.parse(uri), null)
+        extractor.setDataSource(context, Uri.parse(openableUri(uri)), null)
         val index = (0 until extractor.trackCount).firstOrNull { extractor.getTrackFormat(it).getString(MediaFormat.KEY_MIME)?.startsWith("audio/") == true }
         format = index?.let(extractor::getTrackFormat)
         index?.let(extractor::selectTrack)

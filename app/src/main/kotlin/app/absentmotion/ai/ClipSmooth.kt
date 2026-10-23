@@ -46,6 +46,7 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong
+import app.absentmotion.library.openableUri
 
 internal const val MAX_SMOOTH_FRAMES = 20_000
 private const val MAX_SMOOTH_STEPS = 8
@@ -125,7 +126,7 @@ internal object ClipSmooth {
     private fun soundTrack(context: Context, uri: String): Pair<MediaExtractor, Int>? {
         val extractor = MediaExtractor()
         try {
-            extractor.setDataSource(context, uri.toUri(), null)
+            extractor.setDataSource(context, openableUri(uri).toUri(), null)
             val track = (0 until extractor.trackCount).firstOrNull { extractor.getTrackFormat(it).getString(MediaFormat.KEY_MIME)?.startsWith("audio/") == true }
                 ?: return null.also { extractor.release() }
             check(extractor.getTrackFormat(track).getString(MediaFormat.KEY_MIME) in KeptSound) { AppText.get(R.string.smooth_sound_format) }

@@ -52,15 +52,17 @@ class ImporterSecurityTest {
             """<audio id="4" src="file:///etc/hosts"/>""",
             """<shape id="5" fillType="media" fillImage="$settings"/>""",
             """<shape id="6" fillType="media" fillImage="x://elsewhere"/>""",
+            """<shape id="7" fillType="media" fillVideo="https://example.com/a.mp4"/>""",
+            """<audio id="8" src="/etc/hosts"/>""",
         )
         val store = ProjectStore(files)
         val report = Importer(store, access = MediaAccess.forPhone(files)).import { xml.byteInputStream() }.single()
         val node = store.load(report.id)!!.node
         val uris = node.mediaUris()
-        assertEquals(setOf("blocked-$settings", "blocked-$project", own, "blocked-content://media/external/images/media/5", "blocked-file:///etc/hosts", "x://elsewhere"), uris)
+        assertEquals(setOf("blocked-$settings", "blocked-$project", own, "blocked-content://media/external/images/media/5", "blocked-file:///etc/hosts", "blocked-x://elsewhere", "blocked-https://example.com/a.mp4", "blocked-/etc/hosts"), uris)
         assertFalse(node.toXml().contains("\"$settings\"") || node.toXml().contains("\"$project\""))
         val missing = node.children.filter { it.name == "media" && it["missing"] == "true" }.map { it["uri"] }.toSet()
-        assertEquals(setOf("blocked-$settings", "blocked-$project", "blocked-content://media/external/images/media/5", "blocked-file:///etc/hosts", "x://elsewhere"), missing)
+        assertEquals(setOf("blocked-$settings", "blocked-$project", "blocked-content://media/external/images/media/5", "blocked-file:///etc/hosts", "blocked-x://elsewhere", "blocked-https://example.com/a.mp4", "blocked-/etc/hosts"), missing)
         assertEquals(listOf(reportText("settings.json")), report.sections.first { it.first == txt(R.string.library_report_media) }.second.filter { it == reportText("settings.json") })
     }
 

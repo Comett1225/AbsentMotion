@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import kotlin.math.roundToInt
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import app.absentmotion.library.openableUri
 
 typealias Context = android.content.Context
 typealias Uri = android.net.Uri
@@ -86,7 +87,7 @@ suspend fun slotPicture(context: Context, uri: String, video: Boolean): androidx
         if (video) {
             val retriever = android.media.MediaMetadataRetriever()
             try {
-                retriever.setDataSource(context, Uri.parse(uri))
+                retriever.setDataSource(context, Uri.parse(openableUri(uri)))
                 retriever.getScaledFrameAtTime(0, android.media.MediaMetadataRetriever.OPTION_CLOSEST_SYNC, 288, 288)
             } finally { retriever.release() }
         } else {

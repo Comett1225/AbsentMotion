@@ -27,6 +27,7 @@ import kotlinx.coroutines.withContext
 import java.util.Locale
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
+import app.absentmotion.library.openableUri
 
 @Composable
 internal fun MediaInfoDialog(record: MediaDeclaration, onReplace: (suspend (MediaDeclaration) -> Unit)? = null, onDismiss: () -> Unit) {
@@ -42,7 +43,7 @@ internal fun MediaInfoDialog(record: MediaDeclaration, onReplace: (suspend (Medi
         value = withContext(Dispatchers.IO) {
             val extractor = MediaExtractor()
             try {
-                extractor.setDataSource(context, Uri.parse(record.uri), null)
+                extractor.setDataSource(context, Uri.parse(openableUri(record.uri)), null)
                 val tracks = (0 until extractor.trackCount).map { extractor.getTrackFormat(it) }
                 val video = tracks.firstOrNull { it.getString(MediaFormat.KEY_MIME)?.startsWith("video/") == true }
                 val audio = tracks.firstOrNull { it.getString(MediaFormat.KEY_MIME)?.startsWith("audio/") == true }

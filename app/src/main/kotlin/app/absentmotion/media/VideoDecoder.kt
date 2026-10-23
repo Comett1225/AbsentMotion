@@ -21,6 +21,7 @@ import android.hardware.HardwareBuffer
 import java.io.Closeable
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
+import app.absentmotion.library.openableUri
 
 internal fun MediaCodec.configureFitting(format: MediaFormat, surface: android.view.Surface?, flags: Int = 0) {
     try {
@@ -92,7 +93,7 @@ internal class VideoDecoder(private val context: Context, private val uri: Strin
 
     init {
         try {
-            extractor.setDataSource(context, Uri.parse(uri), null)
+            extractor.setDataSource(context, Uri.parse(openableUri(uri)), null)
             val track = (0 until extractor.trackCount).first { extractor.getTrackFormat(it).getString(MediaFormat.KEY_MIME)?.startsWith("video/") == true }
             format = extractor.getTrackFormat(track)
             readColor(format)
