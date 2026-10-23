@@ -1,6 +1,7 @@
 package app.absentmotion.model
 
 import java.util.Locale
+import java.util.concurrent.atomic.AtomicLong
 import kotlin.math.roundToInt
 import kotlin.random.Random
 
@@ -97,7 +98,8 @@ value class Scene(val node: XmlNode) {
         layer.node.mediaUris().forEach { uri ->
             next = next.withMedia(MediaDeclaration(XmlNode("media", mapOf("uri" to uri))))
         }
-        return next.withChildren(next.node.children + layer.node)
+        val unique = if (this.layer(layer.id) == null) layer else layer.withId(generateSequence { Layer.newId() }.first { this.layer(it) == null })
+        return next.withChildren(next.node.children + unique.node)
     }
 
     fun remove(id: Long): Scene = withChildren(node.children.filterNot { it.name in LAYER_TAGS && Layer(it).id == id })
@@ -347,7 +349,10 @@ data class Layer(val node: XmlNode, val t: Float = 0f, val snap: Float = 0f) {
     private fun scopeNode(scope: KeyScope): XmlNode? = if (scope.ref != null) element(scope.ref) else effects.getOrNull(scope.effectIndex)
 
     companion object {
-        fun newId(): Long = Random.nextLong(10_000_000, 99_999_999)
+        private val nextId = AtomicLong(Random.nextLong(ID_SPAN))
+        private const val ID_SPAN = 89_999_999L
+
+        fun newId(): Long = 10_000_000 + Math.floorMod(nextId.getAndIncrement(), ID_SPAN)
     }
 }
 
