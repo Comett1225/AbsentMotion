@@ -40,7 +40,7 @@ import app.absentmotion.editor.TrackMode
 import app.absentmotion.editor.leaveDrawing
 import app.absentmotion.editor.shapeKeyFrames
 import app.absentmotion.editor.toggleShapeKey
-import app.absentmotion.editor.worldMatrix
+import app.absentmotion.editor.screenMatrix
 import app.absentmotion.model.DrawTool
 import app.absentmotion.model.Stroke
 import app.absentmotion.model.StrokePoint
@@ -48,6 +48,7 @@ import app.absentmotion.model.withStroke
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.enterFade
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlin.math.hypot
 import kotlin.math.min
@@ -70,6 +71,7 @@ internal fun DrawingEditor(state: EditorState) {
     val gone = state.scene.layer(mode.layerId) == null
     LaunchedEffect(gone) { if (gone) state.drawing = null }
     DisposableEffect(mode) { onDispose { state.endGesture() } }
+    LaunchedEffect(mode, state.scene, state.cameraMode) { snapshotFlow { state.timeMs }.collectLatest { mode.seen = state.engine.layerMatrix(mode.layerId, it) } }
     Column(Modifier.fillMaxSize().background(Am.TopBar).systemBarsPadding()) {
         DrawingBar(state, mode, Modifier.fillMaxWidth().height(42.dp).enterFade())
         Box(Modifier.fillMaxWidth().weight(1f)) {
@@ -165,7 +167,7 @@ private fun FreehandOverlay(state: EditorState, mode: FreehandMode, modifier: Mo
                 down.consume()
                 val layer = state.scene.layerAt(mode.layerId, state.timeMs) ?: return@awaitEachGesture
                 val (s, ox, oy) = view
-                val toScene = state.scene.worldMatrix(mode.layerId, state.timeMs) ?: return@awaitEachGesture
+                val toScene = mode.screenMatrix(state.scene, state.timeMs) ?: return@awaitEachGesture
                 val toLayer = app.absentmotion.platform.Matrix().also { toScene.invert(it) }
                 val toScreen = app.absentmotion.platform.Matrix().apply { setTranslate(ox, oy); preScale(s, s); preConcat(toScene) }
                 val live = LiveStroke(mode.tool, mode.color, mode.width, toScreen, layer.opacity)

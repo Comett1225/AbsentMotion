@@ -101,6 +101,8 @@ public:
 
     virtual bool layerQuad(int64_t layerId, double timeMs, float xy[8]) = 0;
 
+    virtual bool layerMatrix(int64_t layerId, double timeMs, float m[18]) = 0;
+
     virtual bool layerBounds(int64_t layerId, double timeMs, float ltrb[4]) = 0;
 
     virtual int64_t hitTest(float x, float y, double timeMs) = 0;

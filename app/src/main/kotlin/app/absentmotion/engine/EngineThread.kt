@@ -391,6 +391,14 @@ class EngineThread(private val background: Int, context: Context? = null) {
         }
     }
 
+    suspend fun layerMatrix(layerId: Long, timeMs: Int): FloatArray? = captureLock.withLock {
+        withContext(dispatcher) {
+            applyPending()
+            prepareTextTime(timeMs)
+            engine().layerMatrix(layerId, timeMs.toDouble())
+        }
+    }
+
     suspend fun layerBounds(layerId: Long, timeMs: Int): FloatArray? = captureLock.withLock {
         withContext(dispatcher) {
             applyPending()
