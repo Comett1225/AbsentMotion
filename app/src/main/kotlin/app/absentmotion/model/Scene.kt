@@ -258,8 +258,8 @@ data class Layer(val node: XmlNode, val t: Float = 0f, val snap: ClosedFloatingP
 
     fun movedTo(startTime: Int) = copy(node = node.with("startTime", "$startTime").with("endTime", "${startTime + endTime - this.startTime}"))
 
-    fun withFill(type: String, color: Int = fillColor) =
-        copy(node = node.with("fillType", type)).withValue(PropRef.FillColor, formatColor(color))
+    fun withFill(type: String, color: Int? = null): Layer =
+        copy(node = node.with("fillType", type)).let { if (color == null) it else it.withValue(PropRef.FillColor, formatColor(color)) }
 
     fun withTransform(name: String, vararg values: Float) = withValue(PropRef(PropRef.Kind.Transform, name), formatFloats(values))
 

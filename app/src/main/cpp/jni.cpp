@@ -230,6 +230,18 @@ JNIEXPORT jfloatArray JNICALL JNI_FN(nativeLayerQuad)(JNIEnv* env, jclass, jlong
     return out;
 }
 
+JNIEXPORT jfloatArray JNICALL JNI_FN(nativeLayerMatrix)(JNIEnv* env, jclass, jlong engine, jlong layerId, jdouble timeMs) {
+    float m[18];
+    if (!engineOf(engine)->layerMatrix(layerId, timeMs, m)) return nullptr;
+    jfloatArray out = env->NewFloatArray(18);
+    if (!out) {
+        env->ExceptionClear();
+        return nullptr;
+    }
+    env->SetFloatArrayRegion(out, 0, 18, m);
+    return out;
+}
+
 JNIEXPORT jfloatArray JNICALL JNI_FN(nativeLayerBounds)(JNIEnv* env, jclass, jlong engine, jlong layerId, jdouble timeMs) {
     float bounds[4];
     if (!engineOf(engine)->layerBounds(layerId, timeMs, bounds)) return nullptr;

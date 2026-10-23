@@ -165,6 +165,11 @@ CASES = {
               f'{transform("100,100,0")}<content>Hi</content><fillColor value="#ffffffff"/>'
               '<path-stroke><color value="#ff00ff00"/><size value="4"/></path-stroke></text>'),
         [((5, 100), BLACK), ((195, 100), BLACK), ((64, 100), GREEN)]),
+    "an open part of a shape with several parts keeps its stroke": (
+        scene('<shape id="1" label="icon" startTime="0" endTime="1000" fillType="none" mediaFillMode="fill">'
+              f'{transform()}<path><contour d="M 60 60 L 140 60 L 140 140 L 60 140 Z"/><contour d="M 20 20 L 180 180"/></path>'
+              '<path-stroke><color value="#ffffffff"/><size value="8"/></path-stroke></shape>'),
+        [((30, 30), (255, 255, 255)), ((170, 170), (255, 255, 255)), ((60, 100), (255, 255, 255)), ((120, 80), BLACK), ((170, 30), BLACK)]),
     "a backdrop effect moves the layers behind it and hides its own fill": (
         scene(rect(1, 50, 100, 50, 100, 0xffff0000) + rect(2, 150, 100, 50, 100, 0xff0000ff)
               + rect(3, 100, 100, 60, 60, extra='<effect id="absent.displacementmap" hidden="false">'

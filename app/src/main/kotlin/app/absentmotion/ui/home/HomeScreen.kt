@@ -194,7 +194,7 @@ fun HomeScreen(
     ) {
         Box(Modifier.fillMaxSize().background(Am.HomeBg)) {
             Column(Modifier.fillMaxSize().statusBarsPadding()) {
-                if (wide) WideHeader(page, tab, { p, t -> page = p; tab = t }, onSettings = { scope.launch { drawer.open() } }, onNew = { creating = true })
+                if (wide) WideHeader(page, tab, { p, t -> page = p; tab = t }, onSettings = { scope.launch { drawer.open() } }, onNew = { creating = true }, search, { search = it })
                 else TopBar(onMenu = { scope.launch { drawer.open() } }, search, page == 1, { search = it })
                 if (page == 1) TemplatesTab(version, onTemplate, onTemplateProject, Modifier.weight(1f).then(if (wide) Modifier.widthIn(max = 760.dp).align(Alignment.CenterHorizontally) else Modifier), query) else ProjectsPane(
                     Modifier.weight(1f), shown, tab, { tab = it }, settings, version, onOpen, onExport, query,
@@ -209,7 +209,7 @@ fun HomeScreen(
                     onCollect = onCollect,
                     wide = wide,
                 )
-                if (!wide) Spacer(Modifier.height(BarHeight + navInset))
+                Spacer(Modifier.height(if (wide) navInset else BarHeight + navInset))
             }
             if (!wide) BottomBar(onNew = { creating = true }, page, { page = it }, Modifier.align(Alignment.BottomCenter), navInset)
             if (toReport.isNotEmpty()) ImportDialog(toReport, onDismiss = onImportShown, onOpen = { onImportShown(); toReport.first().let { if (it.template) onTemplate(it.id) else onOpen(it.id) } })
@@ -230,13 +230,21 @@ private fun TopBar(onMenu: () -> Unit, search: String?, templates: Boolean, onSe
             Icon(HomeIcons.Menu, stringResource(R.string.settings), Modifier.size(24.dp), tint = Am.Navy)
         }
         if (search == null) Text("AbsentMotion", Modifier.align(Alignment.Center), color = Am.Navy, fontSize = 22.sp, fontWeight = FontWeight.Medium)
-        else SearchField(
-            search, { onSearch(it) }, Modifier.align(Alignment.Center).padding(horizontal = 56.dp).fillMaxWidth().height(40.dp),
-            hint = stringResource(if (templates) R.string.home_search_templates_hint else R.string.home_search_hint), background = Am.Card, content = Am.Navy, faint = Am.HomeDim, autoFocus = true,
-        )
-        Box(Modifier.align(Alignment.CenterEnd).size(50.dp).clickable { onSearch(if (search == null) "" else null) }, contentAlignment = Alignment.Center) {
-            Icon(if (search == null) TextIcons.Search else HomeIcons.Close, stringResource(if (search == null) R.string.home_search else R.string.home_close_search), Modifier.size(24.dp), tint = Am.Navy)
-        }
+        else HomeSearchField(search, templates, onSearch, Modifier.align(Alignment.Center).padding(horizontal = 56.dp).fillMaxWidth())
+        SearchButton(search, onSearch, Modifier.align(Alignment.CenterEnd))
+    }
+}
+
+@Composable
+internal fun HomeSearchField(search: String, templates: Boolean, onSearch: (String?) -> Unit, modifier: Modifier) = SearchField(
+    search, { onSearch(it) }, modifier.height(40.dp),
+    hint = stringResource(if (templates) R.string.home_search_templates_hint else R.string.home_search_hint), background = Am.Card, content = Am.Navy, faint = Am.HomeDim, autoFocus = true,
+)
+
+@Composable
+internal fun SearchButton(search: String?, onSearch: (String?) -> Unit, modifier: Modifier = Modifier) {
+    Box(modifier.size(50.dp).clickable { onSearch(if (search == null) "" else null) }, contentAlignment = Alignment.Center) {
+        Icon(if (search == null) TextIcons.Search else HomeIcons.Close, stringResource(if (search == null) R.string.home_search else R.string.home_close_search), Modifier.size(24.dp), tint = Am.Navy)
     }
 }
 

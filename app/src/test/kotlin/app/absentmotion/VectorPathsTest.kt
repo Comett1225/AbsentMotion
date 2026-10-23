@@ -138,4 +138,15 @@ class VectorPathsTest {
         assertEquals("evenodd", edited.node.child("path")!!["fillRule"])
         assertEquals(listOf(false, true, true), edited.contours!!.map { it.exclude })
     }
+
+    @Test fun editingAPointOfALineIconKeepsEveryOpenStroke() {
+        val icon = Layer(XmlNode("shape", mapOf("id" to "1"), listOf(XmlNode("path", mapOf("d" to "M3 12H21 M12 3V21 M5 5C9 1 15 1 19 5 M2 2H6V6H2Z")))))
+        val before = icon.contours!!
+        assertEquals(listOf(false, false, false, true), before.map { it.closed })
+        val moved = before.mapIndexed { i, c -> if (i == 1) c.copy(knots = c.knots.mapIndexed { k, knot -> if (k == 0) knot.movedBy(Pt(0f, 1f)) else knot }) else c }
+        val after = icon.withContours(moved).contours!!
+        assertEquals(before.map { it.closed }, after.map { it.closed })
+        assertEquals(moved.map { c -> c.knots.map { it.p } }, after.map { c -> c.knots.map { it.p } })
+        assertEquals(4, icon.withContours(moved).node.child("path")!!.children.count { it.name == "contour" })
+    }
 }

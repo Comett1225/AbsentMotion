@@ -30,7 +30,7 @@ def english(key):
 class RemainingContracts(unittest.TestCase):
     def test_wheel_scrubbing_settles_after_the_last_event(self):
         text = kotlin('ui/editor/Timeline.kt')
-        self.assertIn('if (horizontal) view.finishWheelScrub()', text)
+        self.assertIn('\n                view.finishWheelScrub()\n', text)
         self.assertIn('fun finishWheelScrub() { motion = scope.launch { kotlinx.coroutines.delay(120); settle() } }', text)
 
     def test_test_intents_handle_closed_engines_and_preserve_cancellation(self):

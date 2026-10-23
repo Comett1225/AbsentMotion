@@ -137,6 +137,7 @@ class EditorState(
     var cameraTip by mutableStateOf(false)
 
     var canvasZoom by mutableFloatStateOf(1f)
+    var timelineZoom by mutableFloatStateOf(100f)
     var canvasPan by mutableStateOf(Offset.Zero)
 
     var panZoomMode by mutableStateOf(false)

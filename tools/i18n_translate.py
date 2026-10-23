@@ -29,7 +29,8 @@ RULES = {'ru': 'Write the count placeholder in every plural form, including "one
          'es': 'Give "many" the same wording as "other" (it covers millions).',
          'ar': 'In the Arabic plural forms "one" and "two" leave out the count placeholder when the singular or dual noun already says the number '
                '(write "طبقتان", not "%1$s طبقتين"); keep every other placeholder.',
-         'fil': 'Filipino video apps keep many English editing terms (layer, keyframe, preset, export, template); use them as the glossary says.'}
+         'fil': 'Filipino video apps keep many English editing terms (layer, keyframe, preset, export, template); use them as the glossary says. '
+                'Write the count placeholder in every plural form, including "one" (it also covers 2, 3, 5, 7, 8, 10 ...), unless the English text has none.'}
 EFFECT_I18N = EFFECTS / 'i18n'
 CATALOG_KT = KOTLIN / 'app/absentmotion/effects/EffectCatalog.kt'
 NOT_EFFECTS = {'index', 'releases', 'foreign'}

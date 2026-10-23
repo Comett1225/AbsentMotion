@@ -140,6 +140,14 @@ void AddCameraEffects(const Layer& camera, double timeMs, float depth, SkPoint b
 
 }
 
+SkMatrix PlaneMatrix(const std::vector<Layer>& layers, const Layer& layer, int width, int height, double timeMs) {
+    const Layer* camera = gCameraView ? ActiveCamera(layers, timeMs) : nullptr;
+    const View v = camera ? LayerView(layers, *camera, width, height, timeMs) : DefaultView(width, height);
+    const float depth = EffectivePlacement(layers, layer, timeMs).z - v.eyeZ;
+    const float k = v.focal / (v.orthographic ? std::max(-v.eyeZ, kNearest) : std::max(depth, kNearest));
+    return SkMatrix::Translate(v.middle.fX, v.middle.fY).preRotate(-v.rotation).preScale(k, k).preTranslate(-v.eye.fX, -v.eye.fY);
+}
+
 void SetCameraView(bool on) { gCameraView = on; }
 
 bool CameraViewOn() { return gCameraView; }

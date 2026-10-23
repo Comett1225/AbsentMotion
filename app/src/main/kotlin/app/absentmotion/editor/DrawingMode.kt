@@ -31,7 +31,11 @@ import kotlin.random.Random
 sealed class DrawingMode(val layerId: Long, val created: Boolean) {
     abstract val handlesCode: Int
     internal var added: Scene? = null
+    var seen by mutableStateOf<FloatArray?>(null)
 }
+
+internal fun DrawingMode.screenMatrix(scene: Scene, timeMs: Int): Matrix? =
+    seen?.let { Matrix().apply { setValues(it.copyOf(9)) } } ?: scene.worldMatrix(layerId, timeMs)
 
 private object DrawingDefaults {
     var tool = DrawTool.Pen

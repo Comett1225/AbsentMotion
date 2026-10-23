@@ -59,6 +59,10 @@ import app.absentmotion.editor.clearSelection
 import app.absentmotion.editor.MultiSelect
 import app.absentmotion.editor.place
 import app.absentmotion.editor.withWorldLocation
+import app.absentmotion.editor.inverseMap
+import app.absentmotion.editor.unmapVector
+import app.absentmotion.model.Pt
+import app.absentmotion.platform.Matrix
 import app.absentmotion.engine.PreviewView
 import app.absentmotion.model.withGradient
 import app.absentmotion.model.cameraGesture
@@ -120,8 +124,12 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
     }
 
     var quad by remember { mutableStateOf<FloatArray?>(null) }
+    var plane by remember { mutableStateOf<FloatArray?>(null) }
     LaunchedEffect(state.selectedId, scene, mediaRevision, state.cameraMode) {
-        snapshotFlow { state.timeMs }.collectLatest { timeMs -> quad = state.selectedId?.let { state.engine.layerQuad(it, timeMs) } }
+        snapshotFlow { state.timeMs }.collectLatest { timeMs ->
+            quad = state.selectedId?.let { state.engine.layerQuad(it, timeMs) }
+            plane = state.selectedId?.let { state.engine.layerMatrix(it, timeMs) }?.copyOfRange(9, 18)
+        }
     }
 
     val adjust = state.pointAdjust.takeIf { state.panel == EditorPanel.Effects }
@@ -150,6 +158,7 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
                     val starts = HashMap<PointerId, Offset>()
                     val startLayer = state.selected
                     val startQuad = quad?.let { q -> List(4) { Offset(q[2 * it], q[2 * it + 1]) * currentScale + currentOffset } }
+                    val planeView = plane?.let { v -> Matrix().apply { setValues(v) } }
                     val adjusting = state.pointAdjust.takeIf { state.panel == EditorPanel.Effects }
                     val turning = state.turner
                     val handle = if (startLayer != null && startQuad != null && state.panel == EditorPanel.EditText) {
@@ -189,7 +198,7 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
                             val axis = startQuad[1] - startQuad[0]
                             val drag = position - down.position
                             val along = (drag.x * axis.x + drag.y * axis.y) / axis.getDistance().coerceAtLeast(1e-3f)
-                            val localX = along / currentScale / abs(state.scene.place(startLayer, state.sampleMs).sx).coerceAtLeast(1e-3f)
+                            val localX = along / currentScale * (planeView?.unmapVector(Pt(1f, 0f))?.length ?: 1f) / abs(state.scene.place(startLayer, state.sampleMs).sx).coerceAtLeast(1e-3f)
                             val factor = when (startLayer.textAlign) { "center" -> 2f; "right" -> -1f; else -> 1f }
                             val width = (startLayer.wrapWidth + localX * factor).roundToInt().coerceAtLeast(50)
                             state.editSelected("text-wrap") { startLayer.withResizedTextWrap(width) }
@@ -235,11 +244,12 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
                         } else if (moved && state.selectedId != null && !(canvasGesture && fingers > 1)) {
                             gesture = HIDDEN
                             val s = currentScale
-                            val move = (pan + held) / s
+                            val move = ((pan + held) / s).let { Pt(it.x, it.y) }.let { planeView?.unmapVector(it) ?: it }
                             held = Offset.Zero
-                            val about = (event.calculateCentroid(useCurrent = false) - currentOffset) / s
+                            val centroid = event.calculateCentroid(useCurrent = false)
+                            val about = if (centroid.isSpecified) ((centroid - currentOffset) / s).let { Pt(it.x, it.y) }.let { planeView?.inverseMap(it) ?: it } else null
                             state.editSelected(key = "preview-gesture") { layer ->
-                                if (zoom == 1f || !about.isSpecified) {
+                                if (zoom == 1f || about == null) {
                                     state.scene.withWorldLocation(layer, state.sampleMs) { x, y -> x + move.x to y + move.y }
                                 } else {
                                     state.scene.withWorldLocation(layer, state.sampleMs) { x, y -> about.x + (x - about.x) * zoom + move.x to about.y + (y - about.y) * zoom + move.y }

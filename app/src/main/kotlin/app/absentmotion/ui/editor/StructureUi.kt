@@ -43,6 +43,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupProperties
 import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.EffectClipboard
 import app.absentmotion.editor.pasteEffectsOnChosen
@@ -332,7 +333,7 @@ private fun SelectionButton(icon: ImageVector, description: String, modifier: Mo
 @Composable
 internal fun ChoiceList(items: List<String>, onDismiss: () -> Unit, onPick: (Int) -> Unit) {
     val start = if (LocalLayoutDirection.current == LayoutDirection.Rtl) 1f else 0f
-    Popup(ChoicePosition, onDismissRequest = onDismiss) {
+    Popup(ChoicePosition, onDismiss, PopupProperties(focusable = true)) {
         Column(
             Modifier.presence(scaleFrom = 0.92f, origin = TransformOrigin(start, 1f)).width(220.dp).heightIn(max = 280.dp).clip(ItemShape).background(Am.PanelInset)
                 .verticalScroll(rememberScrollState()),

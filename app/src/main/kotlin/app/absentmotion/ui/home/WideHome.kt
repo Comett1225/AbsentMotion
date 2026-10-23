@@ -39,14 +39,15 @@ import app.absentmotion.ui.theme.Motion
 internal val WideCard = Modifier.widthIn(max = 420.dp)
 
 @Composable
-internal fun WideHeader(page: Int, tab: Int, onTab: (page: Int, tab: Int) -> Unit, onSettings: () -> Unit, onNew: () -> Unit) {
+internal fun WideHeader(page: Int, tab: Int, onTab: (page: Int, tab: Int) -> Unit, onSettings: () -> Unit, onNew: () -> Unit, search: String?, onSearch: (String?) -> Unit) {
     Row(Modifier.fillMaxWidth().height(72.dp).padding(horizontal = 20.dp), Arrangement.spacedBy(12.dp), Alignment.CenterVertically) {
         Text("AbsentMotion", color = Am.Navy, fontSize = 22.sp, fontWeight = FontWeight.Medium, maxLines = 1)
         Spacer(Modifier.width(16.dp))
         Chip(stringResource(R.string.home_tab_projects), page == 0 && tab == 0) { onTab(0, 0) }
         Chip(stringResource(R.string.home_tab_assets), page == 0 && tab == 1) { onTab(0, 1) }
         Chip(stringResource(R.string.home_tab_templates), page == 1) { onTab(1, tab) }
-        Spacer(Modifier.weight(1f))
+        if (search == null) Spacer(Modifier.weight(1f)) else HomeSearchField(search, page == 1, onSearch, Modifier.weight(1f))
+        SearchButton(search, onSearch)
         HeaderButton(stringResource(R.string.home_new_project), HomeIcons.Plus, Am.Accent, Am.OnAccent, onNew)
         HeaderButton(stringResource(R.string.settings), ChromeIcons.Gear, Am.Card, Am.Navy, onSettings)
     }

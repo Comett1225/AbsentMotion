@@ -39,7 +39,7 @@ import app.absentmotion.editor.endsAt
 import app.absentmotion.editor.gotoContour
 import app.absentmotion.editor.leaveDrawing
 import app.absentmotion.editor.map
-import app.absentmotion.editor.worldMatrix
+import app.absentmotion.editor.screenMatrix
 import app.absentmotion.editor.inverseMap
 import app.absentmotion.editor.moveSelectedTo
 import app.absentmotion.editor.onionShape
@@ -48,7 +48,6 @@ import app.absentmotion.editor.pointContours
 import app.absentmotion.editor.selectAdd
 import app.absentmotion.editor.toggleClosed
 import app.absentmotion.editor.toggleCurve
-import app.absentmotion.editor.unmapVector
 import app.absentmotion.model.Contour
 import app.absentmotion.model.Handle
 import app.absentmotion.model.Knot
@@ -90,7 +89,7 @@ internal fun PointOverlay(state: EditorState, mode: PointMode, modifier: Modifie
                 val down = awaitFirstDown(requireUnconsumed = false)
                 down.consume()
                 val (s, ox, oy) = view
-                val m = state.scene.worldMatrix(mode.layerId, state.timeMs) ?: return@awaitEachGesture
+                val m = mode.screenMatrix(state.scene, state.timeMs) ?: return@awaitEachGesture
                 fun scene(p: Offset) = Pt((p.x - ox) / s, (p.y - oy) / s)
                 val contours = state.pointContours(mode)
                 val inScene = contours.map { c -> c.copy(knots = c.knots.map { k -> Knot(m.map(k.p), k.inHandle?.let { h -> m.map(h) }, k.outHandle?.let { h -> m.map(h) }) }) }
@@ -105,7 +104,7 @@ internal fun PointOverlay(state: EditorState, mode: PointMode, modifier: Modifie
                         val change = awaitPointerEvent().changes.firstOrNull { it.id == down.id } ?: break
                         if (!change.pressed) break
                         if (!moved && (change.position - down.position).getDistance() > viewConfiguration.touchSlop) moved = true
-                        if (moved) state.moveSelectedTo(mode, start + m.unmapVector(scene(change.position) - scene(down.position)))
+                        if (moved) state.moveSelectedTo(mode, start + (m.inverseMap(scene(change.position)) - m.inverseMap(scene(down.position))))
                         change.consume()
                     }
                     if (moved) state.endGesture()
@@ -114,7 +113,7 @@ internal fun PointOverlay(state: EditorState, mode: PointMode, modifier: Modifie
                         val change = awaitPointerEvent().changes.firstOrNull { it.id == down.id } ?: break
                         if (!change.pressed) {
                             val at = m.inverseMap(scene(down.position))
-                            val pull = if (moved) m.unmapVector(scene(change.position) - scene(down.position)) else null
+                            val pull = if (moved) m.inverseMap(scene(change.position)) - at else null
                             pulling = null
                             state.placePoint(mode, at, pull)
                             break
@@ -128,7 +127,7 @@ internal fun PointOverlay(state: EditorState, mode: PointMode, modifier: Modifie
             }
         },
     ) {
-        val m = state.scene.worldMatrix(mode.layerId, state.timeMs) ?: return@Canvas
+        val m = mode.screenMatrix(state.scene, state.timeMs) ?: return@Canvas
         fun screen(p: Pt) = m.map(p).let { Offset(it.x * scale + dx, it.y * scale + dy) }
         val mint = Am.Accent
         val ring = 11.dp.toPx()
@@ -260,16 +259,16 @@ private fun Trackpad(state: EditorState, mode: PointMode, contour: Contour?, mod
 }
 
 private fun swipe(state: EditorState, mode: PointMode, delta: Offset, width: Float) {
-    val m = state.scene.worldMatrix(mode.layerId, state.timeMs) ?: return
-    val local = m.unmapVector(Pt(delta.x / mode.previewScale, delta.y / mode.previewScale))
+    val m = mode.screenMatrix(state.scene, state.timeMs) ?: return
+    fun moved(from: Pt) = m.inverseMap(m.map(from) + Pt(delta.x / mode.previewScale, delta.y / mode.previewScale))
     val contour = state.pointContours(mode).getOrNull(mode.contour) ?: return
     if (mode.handle == Handle.Add) {
-        if (contour.endsAt(mode.point)) mode.ghost = (mode.ghost ?: contour.knots.lastOrNull()?.p ?: Pt(0f, 0f)) + local
+        if (contour.endsAt(mode.point)) mode.ghost = moved(mode.ghost ?: contour.knots.lastOrNull()?.p ?: Pt(0f, 0f))
         else mode.curveAt = (mode.curveAt + delta.x / width).coerceIn(0.03f, 0.97f)
         return
     }
     val at = contour.knots.getOrNull(mode.point)?.at(mode.handle) ?: return
-    state.moveSelectedTo(mode, at + local)
+    state.moveSelectedTo(mode, moved(at))
 }
 
 @Composable

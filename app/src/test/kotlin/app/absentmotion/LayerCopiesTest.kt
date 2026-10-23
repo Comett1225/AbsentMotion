@@ -34,6 +34,28 @@ class LayerCopiesTest {
         assertEquals("2", child.node["parent"])
     }
 
+    @Test fun copiedTransitionsLinkTheCopiesAndALoneCopyKeepsItsRecord() {
+        val a = layer(1, "shape", 0, 999).let { it.copy(node = it.node.with("genOut", "t fade 500 0 0 2")) }
+        val b = layer(2, "shape", 1000, 1999).let { it.copy(node = it.node.with("genIn", "t fade 500 0 0 1")) }
+        var next = 10L
+        val copies = copyLayers(listOf(a, b)) { next++ }
+        assertEquals(11L, copies[0].motion(MotionSlot.Out)!!.partner)
+        assertEquals(10L, copies[1].motion(MotionSlot.In)!!.partner)
+        assertEquals(MotionRecord(true, "fade", 500, 0, 0, 2), copyLayers(listOf(a)) { 20 }.single().motion(MotionSlot.Out))
+    }
+
+    @Test fun theSecondHalfOfASplitGroupGetsItsOwnInnerIds() {
+        val inner = listOf(layer(3, "shape", 0, 2999), layer(4, "shape", 0, 2999, 3).let { it.copy(node = it.node.with("genIn", "t fade 500 0 0 3")) })
+        val group = layer(2, "embedScene", 0, 2999).let { it.copy(node = it.node.copy(children = listOf(XmlNode("scene", children = inner.map { l -> l.node })))) }
+        val (first, second) = thirty.splitAt(group, 30, 9)!!
+        val firstIds = first.nested!!.layers.map { it.id }
+        val secondInner = second.nested!!.layers
+        assertEquals(listOf(3L, 4L), firstIds)
+        assertTrue(secondInner.none { it.id in firstIds + 2L + 9L })
+        assertEquals(secondInner[0].id.toString(), secondInner[1].node["parent"])
+        assertEquals(secondInner[0].id, secondInner[1].motion(MotionSlot.In)!!.partner)
+    }
+
     @Test fun duplicationCanRetainAParentThatIsAlreadyInTheScene() {
         val source = layer(3, "shape", 0, 999, 2)
         assertEquals("2", copyLayers(listOf(source), preserveOutsideParents = true, newId = { 4 }).single().node["parent"])

@@ -132,6 +132,7 @@ public:
     int renderBuffer(AHardwareBuffer* buffer, double timeMs, uint32_t background) override;
     void releaseBuffers() override;
     bool layerQuad(int64_t layerId, double timeMs, float xy[8]) override;
+    bool layerMatrix(int64_t layerId, double timeMs, float m[18]) override;
     bool layerBounds(int64_t layerId, double timeMs, float ltrb[4]) override;
     int64_t hitTest(float x, float y, double timeMs) override;
     bool still(double timeMs, int width, int height, std::vector<uint8_t>* rgba) override;
@@ -1100,6 +1101,15 @@ bool EngineImpl::layerQuad(int64_t layerId, double timeMs, float xy[8]) {
         xy[2 * i] = corners[i].fX;
         xy[2 * i + 1] = corners[i].fY;
     }
+    return true;
+}
+
+bool EngineImpl::layerMatrix(int64_t layerId, double timeMs, float m[18]) {
+    SetCameraView(fCameraView);
+    const Layer* layer = fScene.layer(layerId);
+    if (!layer) return false;
+    WorldMatrix(fScene, *layer, timeMs).get9(m);
+    PlaneMatrix(fScene.layers, *layer, fScene.width, fScene.height, timeMs).get9(m + 9);
     return true;
 }
 

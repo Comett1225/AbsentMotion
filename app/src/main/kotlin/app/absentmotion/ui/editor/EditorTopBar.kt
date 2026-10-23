@@ -109,19 +109,17 @@ fun EditorTopBar(state: EditorState, onExit: () -> Unit, modifier: Modifier = Mo
     }
 }
 
+internal fun typedName(typed: String, shown: String): String? = typed.trim().takeIf { typed != shown && it.isNotEmpty() && it != shown }
+
 @Composable
 private fun NameField(value: String, modifier: Modifier, onCommit: (String) -> Unit) {
     var text by remember(value) { mutableStateOf(value) }
     var focused by remember { mutableStateOf(false) }
     val focus = LocalFocusManager.current
     fun commit() {
-        val name = text.trim()
-        if (name.isEmpty()) {
-            text = value
-        } else {
-            text = name
-            if (name != value) onCommit(name)
-        }
+        val name = typedName(text, value)
+        text = name ?: value
+        if (name != null) onCommit(name)
     }
     val commitNow by rememberUpdatedState(::commit)
     DisposableEffect(Unit) { onDispose { commitNow() } }

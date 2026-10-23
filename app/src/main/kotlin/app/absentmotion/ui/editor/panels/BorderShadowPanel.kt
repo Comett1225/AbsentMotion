@@ -1,5 +1,6 @@
 package app.absentmotion.ui.editor.panels
 
+import app.absentmotion.model.path
 import app.absentmotion.model.finiteFloat
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -23,6 +24,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -146,7 +148,8 @@ private val TabNames = listOf(R.string.border_stroke, R.string.border, R.string.
 @Composable
 internal fun BorderShadowPanel(state: EditorState, layer: Layer, modifier: Modifier = Modifier) {
     Box(modifier) {
-        val editing = colourEditing
+        val editing = colourEditing?.takeIf { layer.node.path(it.name.substringBeforeLast('/')) != null }
+        if (editing == null && colourEditing != null) SideEffect { colourEditing = null }
         if (editing != null) ColourEditor(state, layer, editing)
         else Box(Modifier.width(744.px).fillMaxHeight()) {
             when {

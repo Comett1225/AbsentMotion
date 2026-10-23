@@ -1,6 +1,7 @@
 package app.absentmotion.audio
 
 import app.absentmotion.model.Scene
+import app.absentmotion.model.splitAt
 import org.junit.Assert.*
 import org.junit.Test
 
@@ -48,5 +49,26 @@ class GroupedAudioTest {
         assertEquals("file:/v.mp4", AudioClip.of(video).single().uri)
         assertFalse(scene().layers.any { it.kind == "audio" })
         assertTrue(AudioClip.of(scene()).isNotEmpty())
+    }
+
+    private class CountingFx : FakeFx() {
+        var frames = 0L
+        override fun process(buf: FloatArray, frames: Int) { this.frames += frames }
+    }
+
+    @Test fun eachHalfOfASplitGroupRunsItsSoundThroughItsOwnEffectChain() {
+        val whole = Scene.parse("""
+            <scene width="100" height="100" fps="30"><embedScene id="1" startTime="0" endTime="1999">
+            <scene width="100" height="100" fps="30" totalTime="1999">
+            <audio id="2" src="tone" startTime="0" endTime="1999" outTime="30000"><audioEffects><fx type="eq"/></audioEffects></audio>
+            </scene></embedScene></scene>""")
+        val (first, second) = whole.splitAt(whole.layer(1)!!, 30, 3)!!
+        val clips = AudioClip.of(whole.update(1) { first }.add(second))
+        assertEquals(2, clips.map { it.id }.toSet().size)
+        val chains = mutableListOf<CountingFx>()
+        OfflineMix({ ToneSource(440.0) }, clips, Resampler.ULTRA, { _, _ -> CountingFx().also { chains += it } }, SafeLimiter(44_100), 44_100)
+            .use { it(0, 2_000_000) }
+        assertEquals(2, chains.size)
+        assertTrue(chains.all { it.frames <= 88_200 + 2048 })
     }
 }
