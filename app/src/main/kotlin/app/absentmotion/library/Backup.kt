@@ -70,6 +70,7 @@ object Backup {
         val waiting = ArrayList<Pair<String, String>>()
         val ready = ArrayList<Pair<String, String>>()
         val created = ArrayList<File>()
+        val stamps = HashMap<String, Long>()
         var added = 0
         var oldRoot = ""
         var read = 0L
@@ -112,8 +113,9 @@ object Backup {
         fun publish() {
             for ((id, text) in ready) {
                 val target = renamed[id] ?: id
-                created += File(projects, "$target.xml")
+                val file = File(projects, "$target.xml").also { created += it }
                 store.save(target, remap(text))
+                stamps[id]?.let { file.setLastModified(it) }
                 added++
             }
             ready.clear()
@@ -133,7 +135,10 @@ object Backup {
                         val id = parts[1].removeSuffix(".xml")
                         val text = readText(zip)
                         if (!ProjectId.matches(id) || runCatching { XmlNode.parse(text.removePrefix("\uFEFF")) }.getOrNull()?.let(Importer::checkScene) != null) rejected += id
-                        else waiting += id to text
+                        else {
+                            waiting += id to text
+                            if (entry.time > 0) stamps[id] = entry.time
+                        }
                         continue
                     }
                     if (waiting.isNotEmpty()) settle()

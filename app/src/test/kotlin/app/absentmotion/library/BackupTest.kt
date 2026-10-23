@@ -61,6 +61,23 @@ class BackupTest {
         assertTrue(fresh.versions.list(a).single().file.readText().contains(newRoot.toURI().toString().trimEnd('/') + "/media/$a/"))
     }
 
+    @Test fun restoredProjectsKeepTheDateTheyWereLastChanged() {
+        val oldRoot = tmp.newFolder("old")
+        val old = ProjectStore(oldRoot)
+        val a = project(old, "A", "pixels of a")
+        val b = project(old, "B", "pixels of b")
+        val then = java.time.LocalDate.of(2025, 3, 14).atStartOfDay(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+        oldRoot.resolve("projects/$a.xml").setLastModified(then)
+        oldRoot.resolve("projects/$b.xml").setLastModified(then + 86_400_000L)
+        val bytes = backup(oldRoot)
+        val newRoot = tmp.newFolder("new")
+        val fresh = ProjectStore(newRoot)
+        Backup.restore(fresh, newRoot, ByteArrayInputStream(bytes))
+        val dates = fresh.list().associate { it.id to it.modified }
+        assertEquals(then.toDouble(), dates.getValue(a).toDouble(), 2_000.0)
+        assertEquals(then + 86_400_000.0, dates.getValue(b).toDouble(), 2_000.0)
+    }
+
     @Test fun restoringBesideChangedProjectsAddsCopiesAndNeverOverwrites() {
         val root = tmp.newFolder()
         val store = ProjectStore(root)
