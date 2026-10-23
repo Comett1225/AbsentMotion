@@ -36,7 +36,7 @@ class ProjectStore(private val root: File) {
 
     val versions = ProjectVersions(File(dir, "versions"))
 
-    fun list(includeDamaged: Boolean = false): List<ProjectInfo> = dir.listFiles { f -> f.extension == "xml" }.orEmpty().mapNotNull { file ->
+    fun list(includeDamaged: Boolean = false): List<ProjectInfo> = dir.listFiles { f -> f.extension == "xml" && safeSegment(f.nameWithoutExtension) }.orEmpty().mapNotNull { file ->
         val id = file.nameWithoutExtension
         val modified = file.lastModified()
         val size = file.length()
@@ -108,7 +108,7 @@ class ProjectStore(private val root: File) {
 
     fun create(scene: Scene): String = newId().also { save(it, scene) }
 
-    fun mediaDir(id: String) = File(root, "media/$id")
+    fun mediaDir(id: String) = File(root, "media").child(id)
 
     fun createElement(scene: Scene): String {
         val id = UUID.randomUUID().toString()
@@ -169,18 +169,27 @@ class ProjectStore(private val root: File) {
 
     private fun ownerOf(uri: String): String? {
         val media = folderUri(File(root, "media"))
-        return uri.takeIf { it.startsWith(media) }?.removePrefix(media)?.substringBefore('/')?.takeIf { it.isNotEmpty() && it != "." && it != ".." }
+        return uri.takeIf { it.startsWith(media) }?.removePrefix(media)?.substringBefore('/')?.takeIf(::safeSegment)
     }
 
-    fun thumbnailFile(id: String) = File(dir, "$id.png")
+    fun thumbnailFile(id: String) = dir.child("$id.png")
 
     private fun folderUri(dir: File) = dir.toURI().toString().trimEnd('/') + "/"
 
-    private fun sceneFile(id: String) = File(dir, "$id.xml")
+    private fun sceneFile(id: String) = dir.child("$id.xml")
 
     private companion object {
         val DamagedTitle = Regex("""<scene\b[^>]*?\btitle="([^"]*)"""")
     }
+}
+
+internal val ProjectId = Regex("[A-Za-z0-9_-]{1,64}")
+
+internal fun safeSegment(name: String) = name.isNotEmpty() && name != "." && name != ".." && name.none { it == '/' || it == '\\' || it == '\u0000' }
+
+internal fun File.child(name: String): File {
+    require(safeSegment(name)) { "Unsafe file name" }
+    return File(this, name).also { require(it.canonicalFile.parentFile == canonicalFile) { "Unsafe file name" } }
 }
 
 internal fun writeAtomically(target: File, text: String, sync: Boolean = true) {

@@ -9,7 +9,7 @@ class ProjectVersions(private val root: File, private val now: () -> Long = Syst
         val thumbnail: File get() = File(file.parentFile, "$time.png")
     }
 
-    fun dir(id: String) = File(root, id)
+    fun dir(id: String) = root.child(id)
 
     fun list(id: String): List<Version> = dir(id).listFiles { f -> f.extension == "xml" }.orEmpty()
         .mapNotNull { f -> f.nameWithoutExtension.toLongOrNull()?.let { Version(f, it) } }

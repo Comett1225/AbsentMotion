@@ -20,6 +20,7 @@ object Backup {
     private const val MARKER = "absentmotion-backup.txt"
     private const val FORMAT = "AbsentMotion backup 1"
     private const val MAX_TEXT = 64 shl 20
+    private val VersionFile = Regex("[0-9]{1,19}\\.(?:xml|png|damaged)")
 
     data class Restored(val added: Int, val renamed: Int, val skipped: Int, val rejected: Int = 0)
 
@@ -67,6 +68,8 @@ object Backup {
         val skipped = HashSet<String>()
         val rejected = HashSet<String>()
         val waiting = ArrayList<Pair<String, String>>()
+        val ready = ArrayList<Pair<String, String>>()
+        val created = ArrayList<File>()
         var added = 0
         var oldRoot = ""
         var read = 0L
@@ -87,63 +90,90 @@ object Backup {
         }
         fun freshId(id: String): String =
             if (runCatching { UUID.fromString(id) }.isSuccess) UUID.randomUUID().toString()
-            else generateSequence(System.currentTimeMillis()) { it + 1 }.map { "p$it" }.first { p -> !File(projects, "$p.xml").exists() && p !in renamed.values && waiting.none { it.first == p } }
+            else generateSequence(System.currentTimeMillis()) { it + 1 }.map { "p$it" }.first { p ->
+                !File(projects, "$p.xml").exists() && p !in renamed.values && waiting.none { it.first == p } && ready.none { it.first == p }
+            }
         fun settle() {
             for ((id, text) in waiting) {
                 val local = File(projects, "$id.xml")
-                if (!local.exists()) continue
-                if (runCatching { sameScene(local.readText(), moved(text)) }.getOrDefault(false)) skipped += id else renamed[id] = freshId(id)
-            }
-            for ((id, text) in waiting) if (id !in skipped) {
-                store.save(renamed[id] ?: id, remap(text))
-                added++
+                if (local.exists()) {
+                    if (runCatching { sameScene(local.readText(), moved(text)) }.getOrDefault(false)) { skipped += id; continue }
+                    renamed[id] = freshId(id)
+                }
+                ready += id to text
             }
             waiting.clear()
         }
-        ZipInputStream(counted.buffered()).use { zip ->
-            val first = zip.nextEntry
-            val head = if (first?.name == MARKER) zip.readAtMost(4096).toString(Charsets.UTF_8).lines() else emptyList()
-            if (head.firstOrNull() != FORMAT) throw ImportFailed(txt(R.string.library_err_not_backup))
-            oldRoot = head.getOrNull(1).orEmpty().trim()
-            while (true) {
-                val entry = zip.nextEntry ?: break
-                val parts = entry.name.replace('\\', '/').split('/')
-                if (entry.isDirectory || parts.any { it.isEmpty() || it == "." || it == ".." }) continue
-                val isScene = parts.size == 2 && parts[0] == "projects" && parts[1].endsWith(".xml")
-                if (isScene) {
-                    val id = parts[1].removeSuffix(".xml")
-                    val text = readText(zip)
-                    if (runCatching { XmlNode.parse(text.removePrefix("\uFEFF")) }.getOrNull()?.let(Importer::checkScene) != null) rejected += id
-                    else waiting += id to text
-                    continue
-                }
-                if (waiting.isNotEmpty()) settle()
-                val target = when {
-                    parts.size == 2 && parts[0] == "projects" && parts[1].endsWith(".png") ->
-                        parts[1].removeSuffix(".png").takeIf { it !in skipped && it !in rejected }?.let { File(projects, (renamed[it] ?: it) + ".png") }
-                    parts.size == 4 && parts[0] == "projects" && parts[1] == "versions" -> if (parts[2] in rejected) null else File(projects, "versions/${renamed[parts[2]] ?: parts[2]}/${parts[3]}")
-                    parts.size >= 3 && parts[0] == "media" -> File(root, "media/${renamed[parts[1]] ?: parts[1]}/" + parts.drop(2).joinToString("/"))
-                    parts.size >= 3 && parts[0] == "templates" -> File(root, parts.joinToString("/"))
-                    parts.size == 2 && parts[0] == "presets" && parts[1].endsWith(".xml") -> File(root, "presets/${parts[1]}")
-                    parts.size == 3 && parts[0] == "fonts" && parts[1] == "imported" -> File(root, "fonts/imported/${parts[2]}")
-                    parts.size == 2 && parts[0] == "ai" -> ai?.let { File(it, parts[1]) }
-                    else -> null
-                } ?: continue
-                if (target.exists()) continue
-                if (target.extension == "xml") writeAtomically(target, remap(readText(zip)))
-                else {
-                    target.parentFile?.mkdirs()
-                    val part = File(target.parentFile, target.name + ".part")
-                    try {
-                        part.outputStream().use { zip.copyTo(it) }
-                        if (!part.renameTo(target)) part.delete()
-                    } catch (t: Throwable) {
-                        part.delete()
-                        throw t
+        fun makeDirs(dir: File) {
+            val missing = generateSequence(dir) { it.parentFile }.takeWhile { !it.exists() }.toList()
+            dir.mkdirs()
+            created += missing.asReversed()
+        }
+        fun publish() {
+            for ((id, text) in ready) {
+                val target = renamed[id] ?: id
+                created += File(projects, "$target.xml")
+                store.save(target, remap(text))
+                added++
+            }
+            ready.clear()
+        }
+        try {
+            ZipInputStream(counted.buffered()).use { zip ->
+                val first = zip.nextEntry
+                val head = if (first?.name == MARKER) zip.readAtMost(4096).toString(Charsets.UTF_8).lines() else emptyList()
+                if (head.firstOrNull() != FORMAT) throw ImportFailed(txt(R.string.library_err_not_backup))
+                oldRoot = head.getOrNull(1).orEmpty().trim()
+                while (true) {
+                    val entry = zip.nextEntry ?: break
+                    val parts = entry.name.replace('\\', '/').split('/')
+                    if (entry.isDirectory || !parts.all(::safeSegment)) continue
+                    val isScene = parts.size == 2 && parts[0] == "projects" && parts[1].endsWith(".xml")
+                    if (isScene) {
+                        val id = parts[1].removeSuffix(".xml")
+                        val text = readText(zip)
+                        if (!ProjectId.matches(id) || runCatching { XmlNode.parse(text.removePrefix("\uFEFF")) }.getOrNull()?.let(Importer::checkScene) != null) rejected += id
+                        else waiting += id to text
+                        continue
+                    }
+                    if (waiting.isNotEmpty()) settle()
+                    fun known(id: String) = id.takeIf { ProjectId.matches(it) && it !in rejected }
+                    val target = when {
+                        parts.size == 2 && parts[0] == "projects" && parts[1].endsWith(".png") ->
+                            known(parts[1].removeSuffix(".png"))?.takeIf { it !in skipped }?.let { File(projects, (renamed[it] ?: it) + ".png") }
+                        parts.size == 4 && parts[0] == "projects" && parts[1] == "versions" && VersionFile.matches(parts[3]) ->
+                            known(parts[2])?.let { File(projects, "versions/${renamed[it] ?: it}/${parts[3]}") }
+                        parts.size >= 3 && parts[0] == "media" -> known(parts[1])?.let { File(root, "media/${renamed[it] ?: it}/" + parts.drop(2).joinToString("/")) }
+                        parts.size >= 3 && parts[0] == "templates" -> known(parts[1])?.let { File(root, parts.joinToString("/")) }
+                        parts.size == 2 && parts[0] == "presets" && parts[1].endsWith(".xml") -> File(root, "presets/${parts[1]}")
+                        parts.size == 3 && parts[0] == "fonts" && parts[1] == "imported" -> File(root, "fonts/imported/${parts[2]}")
+                        parts.size == 2 && parts[0] == "ai" -> ai?.let { File(it, parts[1]) }
+                        else -> null
+                    } ?: continue
+                    if (target.exists()) continue
+                    makeDirs(target.parentFile!!)
+                    val text = target.extension == "xml" && when (parts[0]) { "media" -> false; "templates" -> parts.size == 3; else -> true }
+                    if (text) {
+                        created += target
+                        writeAtomically(target, remap(readText(zip)))
+                    } else {
+                        val part = File(target.parentFile, target.name + ".part")
+                        try {
+                            part.outputStream().use { zip.copyTo(it) }
+                            if (!part.renameTo(target)) throw java.io.IOException("Cannot restore ${target.name}")
+                            created += target
+                        } catch (t: Throwable) {
+                            part.delete()
+                            throw t
+                        }
                     }
                 }
+                if (waiting.isNotEmpty()) settle()
+                publish()
             }
-            if (waiting.isNotEmpty()) settle()
+        } catch (t: Throwable) {
+            created.asReversed().forEach { it.delete() }
+            throw t
         }
         return Restored(added, renamed.size, skipped.size, rejected.size)
     }

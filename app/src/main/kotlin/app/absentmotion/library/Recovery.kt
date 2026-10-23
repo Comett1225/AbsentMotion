@@ -6,7 +6,7 @@ import java.io.File
 data class RecoveryOffer(val id: String, val title: String, val xml: String)
 
 class Recovery(private val dir: File) {
-    fun file(id: String) = File(dir, "$id.xml")
+    fun file(id: String) = dir.child("$id.xml")
 
     @Synchronized
     fun write(id: String, xml: String) = writeAtomically(file(id), xml, sync = false)

@@ -296,4 +296,44 @@ class ProjectStoreTest {
         assertEquals(1, store.versions.dir(id).listFiles { f -> f.extension == "damaged" }!!.size)
         assertTrue(store.load(id) != null)
     }
+
+    @Test fun anIdThatWouldLeaveItsFolderIsRefusedEverywhere() {
+        val root = tmp.newFolder()
+        val store = ProjectStore(root)
+        val real = store.create(scene())
+        fun refused(use: () -> Any?) = try { use(); fail("accepted") } catch (_: IllegalArgumentException) {}
+        for (bad in listOf("..", ".", "", "a/b", "../x", "a\\b", "x\u0000y")) {
+            refused { store.mediaDir(bad) }
+            refused { store.versions.dir(bad) }
+        }
+        for (bad in listOf("a/b", "../x", "a\\b", "x\u0000y")) {
+            refused { store.thumbnailFile(bad) }
+            refused { store.save(bad, "<scene/>") }
+        }
+        assertEquals(listOf(real), store.list().map { it.id })
+        assertEquals(setOf("$real.xml"), root.resolve("projects").list()!!.toSet())
+    }
+
+    @Test fun aStrayFileNamedLikeADotSegmentIsNotAProjectAndDeletesNothing() {
+        val root = tmp.newFolder()
+        val store = ProjectStore(root)
+        val real = store.create(scene())
+        store.mediaDir(real).mkdirs()
+        root.resolve("keep.txt").writeText("keep")
+        root.resolve("projects/...xml").writeText(scene().toXml())
+        root.resolve("projects/..xml").writeText(scene().toXml())
+        assertEquals(listOf(real), store.list(includeDamaged = true).map { it.id })
+        store.delete(real)
+        assertTrue(root.resolve("keep.txt").exists())
+        assertTrue(root.resolve("projects/...xml").exists())
+    }
+
+    @Test fun aMediaAddressNamingTheFolderAboveIsNotAnOwner() {
+        val root = tmp.newFolder()
+        val store = ProjectStore(root)
+        root.resolve("keep.txt").writeText("keep")
+        val id = store.create(scene(image(root.resolve("media").toURI().toString() + "%2e%2e/x.png"), image(root.resolve("media").toURI().toString() + "./x.png")))
+        store.delete(id)
+        assertTrue(root.resolve("keep.txt").exists())
+    }
 }

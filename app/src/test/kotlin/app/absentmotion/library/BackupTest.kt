@@ -198,4 +198,119 @@ class BackupTest {
         assertEquals(setOf(good, damaged), fresh.list(includeDamaged = true).map { it.id }.toSet())
         assertFalse(fresh.thumbnailFile(bad).exists())
     }
+
+    private fun zipOf(vararg entries: Pair<String, ByteArray>) = ByteArrayOutputStream().also { out ->
+        ZipOutputStream(out).use { zip ->
+            zip.putNextEntry(ZipEntry("absentmotion-backup.txt")); zip.write("AbsentMotion backup 1\nfile:/elsewhere/\n".toByteArray())
+            for ((name, bytes) in entries) { zip.putNextEntry(ZipEntry(name)); zip.write(bytes) }
+        }
+    }.toByteArray()
+
+    private fun everything(root: File) = root.walkTopDown().map { it.relativeTo(root).path to (if (it.isFile) it.readText() else "") }.toList().sortedBy { it.first }
+
+    @Test fun anEntryNamedLikeADotSegmentOrAnOddIdNeverReachesAnotherFolder() {
+        val root = tmp.newFolder("root")
+        val store = ProjectStore(root)
+        val kept = project(store, "Kept", "kept pixels")
+        root.resolve("keep.txt").writeText("keep")
+        store.versions.snapshot(kept, store.text(kept)!!)
+        val before = everything(root)
+        val scene = Scene(XmlNode("scene", linkedMapOf("width" to "10", "height" to "10", "title" to "Evil"))).toXml().toByteArray()
+        val bytes = zipOf(
+            "projects/...xml" to scene, "projects/.xml" to scene, "projects/a b.xml" to scene, "projects/a:b.xml" to scene,
+            "projects/..\\x.xml" to scene, "projects/" + "x".repeat(65) + ".xml" to scene,
+            "projects/....png" to "x".toByteArray(), "projects/versions/.../1.xml" to scene, "projects/versions/x y/1.xml" to scene,
+            "projects/versions/p1/notnumber.xml" to scene, "projects/versions/p1/1.exe" to scene,
+            "media/.../a.png" to "x".toByteArray(), "media/a b/a.png" to "x".toByteArray(), "templates/.../scene.xml" to scene,
+        )
+        val result = Backup.restore(store, root, ByteArrayInputStream(bytes))
+        assertEquals(Backup.Restored(0, 0, 0, 5), result)
+        assertEquals(before, everything(root))
+        assertEquals(listOf("Kept"), store.list().map { it.title })
+    }
+
+    @Test fun idsTheAppCreatesAreAllRestored() {
+        val root = tmp.newFolder("root")
+        val store = ProjectStore(root)
+        val scene = Scene(XmlNode("scene", linkedMapOf("width" to "10", "height" to "10", "title" to "Ids"))).toXml().toByteArray()
+        val uuid = java.util.UUID.randomUUID().toString()
+        val bytes = zipOf("projects/p1700000000000.xml" to scene, "projects/$uuid.xml" to scene, "projects/Mixed_id-7.xml" to scene, "templates/t1700000000000/scene.xml" to scene)
+        assertEquals(Backup.Restored(3, 0, 0), Backup.restore(store, root, ByteArrayInputStream(bytes)))
+        assertEquals(setOf("p1700000000000", uuid, "Mixed_id-7"), store.list().map { it.id }.toSet())
+        assertTrue(root.resolve("templates/t1700000000000/scene.xml").exists())
+    }
+
+    @Test fun aStoppedOrCutRestoreLeavesTheLibraryExactlyAsItWas() {
+        val oldRoot = tmp.newFolder("old")
+        val old = ProjectStore(oldRoot)
+        val big = "p".repeat(300_000)
+        val a = project(old, "A", big)
+        val b = project(old, "B", big + "b")
+        old.thumbnailFile(a).writeText("thumb")
+        old.versions.snapshot(a, old.text(a)!!)
+        val bytes = backup(oldRoot)
+        val root = tmp.newFolder("new")
+        val store = ProjectStore(root)
+        val before = everything(root)
+        try {
+            Backup.restore(store, root, ByteArrayInputStream(bytes)) { read -> if (read > bytes.size / 2) throw IllegalStateException("stopped") }
+            fail("should have stopped")
+        } catch (e: IllegalStateException) {
+            assertEquals("stopped", e.message)
+        }
+        assertEquals(before, everything(root))
+        try {
+            Backup.restore(store, root, ByteArrayInputStream(bytes.copyOf(bytes.size - 100_000)))
+            fail("should have failed")
+        } catch (e: java.io.IOException) {
+        }
+        assertEquals(before, everything(root))
+        assertEquals(Backup.Restored(2, 0, 0), Backup.restore(store, root, ByteArrayInputStream(bytes)))
+        assertEquals(big, pictureOf(store, a))
+        assertEquals(big + "b", pictureOf(store, b))
+    }
+
+    @Test fun retryingAnInterruptedRestoreAddsOneCopyNotTwo() {
+        val root = tmp.newFolder("files")
+        val store = ProjectStore(root)
+        val changed = project(store, "Before", "p".repeat(300_000))
+        val bytes = backup(root)
+        store.save(changed, store.load(changed)!!.withTitle("After"))
+        try {
+            Backup.restore(store, root, ByteArrayInputStream(bytes)) { read -> if (read > bytes.size / 2) throw IllegalStateException("stopped") }
+            fail("should have stopped")
+        } catch (e: IllegalStateException) {
+        }
+        assertEquals(listOf("After"), store.list().map { it.title })
+        assertEquals(Backup.Restored(added = 1, renamed = 1, skipped = 0), Backup.restore(store, root, ByteArrayInputStream(bytes)))
+        assertEquals(setOf("After", "Before"), store.list().map { it.title }.toSet())
+        assertEquals(2, root.resolve("media").list()!!.size)
+    }
+
+    @Test fun projectsAreOnlyPublishedOnceTheirMediaIsThere() {
+        val oldRoot = tmp.newFolder("old")
+        val old = ProjectStore(oldRoot)
+        val a = project(old, "A", "pixels")
+        val bytes = backup(oldRoot)
+        val root = tmp.newFolder("new")
+        val store = ProjectStore(root)
+        var listedWhileReading = -1
+        Backup.restore(store, root, ByteArrayInputStream(bytes)) { listedWhileReading = store.list().size }
+        assertEquals(0, listedWhileReading)
+        assertEquals(listOf(a), store.list().map { it.id })
+    }
+
+    @Test fun aMediaFileWithAnXmlNameIsCopiedByteForByte() {
+        val oldRoot = tmp.newFolder("old")
+        val old = ProjectStore(oldRoot)
+        val a = project(old, "A", "pixels")
+        val odd = byteArrayOf(-1, -2, 0, 1, -128, 60, 63, 120)
+        old.mediaDir(a).resolve("data.xml").writeBytes(odd)
+        File(oldRoot, "templates/t1/media").apply { mkdirs() }.resolve("blob.xml").writeBytes(odd)
+        File(oldRoot, "templates/t1/scene.xml").writeText(Scene(XmlNode("scene", linkedMapOf("width" to "10", "height" to "10"))).toXml())
+        val root = tmp.newFolder("new")
+        Backup.restore(ProjectStore(root), root, ByteArrayInputStream(backup(oldRoot)))
+        assertTrue(odd.contentEquals(root.resolve("media/$a/data.xml").readBytes()))
+        assertTrue(odd.contentEquals(root.resolve("templates/t1/media/blob.xml").readBytes()))
+    }
 }
