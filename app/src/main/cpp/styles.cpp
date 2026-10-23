@@ -830,7 +830,7 @@ void DrawShuttered(SkCanvas* canvas, const std::vector<Layer>& siblings, const L
     add.setAlphaf(1.0f / samples);
     for (int i = 0; i < samples; i++) {
         canvas->saveLayer(nullptr, &add);
-        DrawOne(canvas, siblings, l, timeMs + open * ((i + 0.5) / samples - 0.5), pictures, sample);
+        DrawOne(canvas, siblings, l, std::clamp(timeMs + open * ((i + 0.5) / samples - 0.5), (double)l.startTime, (double)l.endTime), pictures, sample);
         canvas->restore();
     }
     canvas->restore();
