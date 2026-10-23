@@ -791,10 +791,42 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
     const std::vector<std::pair<SkPath, float>> regions = copies
         ? CopyOutlines(l, *copies, [&](float at, const SkMatrix& placed) { return regionAt(at, placed, BodyPath(l, at), drawn); })
         : std::vector<std::pair<SkPath, float>>{{regionAt(t, m, path, drawn), t}};
+    const auto seeThrough = [&](float at) {
+        const bool fill = l.fillType == "color" ? ColorAt(l.fillColor, at, kWhite, alpha).fA < 1
+                        : l.fillType == "gradient" && std::min(l.gradient.startColor[0], l.gradient.endColor[0]) * alpha < 1;
+        return fill || (l.stroke.present && l.stroke.enabled && ColorAt(l.stroke.color, at, kBlack, alpha).fA < 1);
+    };
+    const bool hollow = std::any_of(regions.begin(), regions.end(), [&](const auto& r) { return seeThrough(r.second); }) ||
+                        (copies && std::any_of(copies->begin(), copies->end(), [](const LayerCopy& c) { return c.look.alpha < 1; }));
+    SkPaint clear, seam, beneath;
+    clear.setAntiAlias(true);
+    clear.setBlendMode(SkBlendMode::kClear);
+    seam.setStyle(SkPaint::kStroke_Style);
+    seam.setStrokeJoin(SkPaint::kRound_Join);
+    seam.setStrokeWidth((l.text ? 5 : 2) * PixelUnit(canvas));
+    beneath.setBlendMode(SkBlendMode::kDstOver);
+    std::vector<SkPath> seams;
     for (const Edge& e : l.borders) {
+        SkRect band = SkRect::MakeEmpty();
+        for (const auto& [region, at] : regions) {
+            if (!ShaderBorder(l, e, at) || region.isEmpty()) continue;
+            const float reach = e.size.get(0, at, 6) / 2 + 1;
+            if (hollow && e.direction == "outside") band.join(region.getBounds().makeOutset(reach, reach));
+            else DrawBorder(canvas, region, e, at);
+        }
+        if (band.isEmpty()) continue;
+        if (seams.empty()) for (const auto& [region, at] : regions) seams.push_back(skpathutils::FillPathWithPaint(region, seam));
+        canvas->saveLayer(&band, &beneath);
         for (const auto& [region, at] : regions) {
             if (ShaderBorder(l, e, at) && !region.isEmpty()) DrawBorder(canvas, region, e, at);
         }
+        for (size_t i = 0; i < regions.size(); i++) {
+            canvas->save();
+            canvas->clipPath(seams[i], SkClipOp::kDifference, true);
+            canvas->drawPath(regions[i].first, clear);
+            canvas->restore();
+        }
+        canvas->restore();
     }
 }
 

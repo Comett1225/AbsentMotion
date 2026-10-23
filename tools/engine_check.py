@@ -131,6 +131,13 @@ CASES = {
         scene(cutout(CUT_STROKE)), [((100, 70), GREEN), ((100, 100), RED), ((52, 100), BLACK), ((55, 55), BLACK)]),
     "a border on a cut-out picture with Glow follows its visible pixels": (
         scene(cutout(CUT_GLOW)), [((100, 68), BLUE), ((100, 100), RED), ((52, 100), BLACK), ((55, 55), BLACK)]),
+    "an outside border stays outside a see-through fill": (
+        scene(rect(1, 100, 100, 50, 50, 0x80ff0000, extra=OUTSIDE.format(12))),
+        [((100, 100), (128, 0, 0)), ((52, 100), (128, 0, 0)), ((100, 47), (255, 255, 255)), ((100, 30), BLACK)]),
+    "an outside border stays outside see-through text": (
+        scene('<text id="1" label="t" fillType="color" startTime="0" endTime="1000" size="150" wrapWidth="190" align="center">'
+              f'{transform("100,100,0")}<content>I</content><fillColor value="#80ff0000"/>{OUTSIDE.format(10)}</text>'),
+        [((100, 100), (128, 0, 0))]),
     "a border follows a Repeat copy that runs late": (
         scene(repeated_late(OUTSIDE.format(8)), fps=10),
         [((76, 60), RED), ((136, 60), RED), ((54, 60), (255, 255, 255)), ((98, 60), (255, 255, 255)), ((114, 60), (255, 255, 255)),
