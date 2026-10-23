@@ -157,13 +157,24 @@ private fun Layer.matteSize(frameWidth: Int, frameHeight: Int): XmlNode {
         .let { if (it.children.isEmpty()) it.with("value", half(size?.get("value"))) else it }
 }
 
+private fun XmlNode.isMatteSize() = name == "property" && this["name"] == "size"
+
+private val MatteFollowedChildren = setOf("transform", "speedMap", "gain", "effect")
+
+private fun XmlNode.isFollowedEffect() = this["id"] == "absent.timequant" || this["id"] in MatteFollowedEffects
+
 internal fun Layer.followingOriginal(original: Layer): Layer {
     val frame = node["matteFrame"]?.split(',')?.mapNotNull { it.toIntOrNull() }?.takeIf { it.size == 2 && it.all { v -> v > 0 } }
-    val size = if (frame != null) original.matteSize(frame[0], frame[1]) else node.children.firstOrNull { it.name == "property" && it["name"] == "size" }
-    val transform = original.node.child("transform")?.let { it.copy(children = it.children.filterNot { c -> c.name == "opacity" }) }
-    val moving = original.effects.filter { it["id"] == "absent.timequant" || it["id"] in MatteFollowedEffects }
-    val attrs = MatteTimeAttributes.fold(node) { acc, key -> acc.with(key, original.node[key]) }.with("noiseId", "${original.id}")
-    return copy(node = attrs.copy(children = listOfNotNull(transform, original.node.child("speedMap"), size, node.child("gain")) + moving + lumaKey()))
+    val size = if (frame != null) original.matteSize(frame[0], frame[1]) else node.children.firstOrNull { it.isMatteSize() }
+    val opacity = node.child("transform")?.child("opacity")
+    val placement = original.node.child("transform")?.let { it.copy(children = it.children.filterNot { c -> c.name == "opacity" }) }
+    val transform = if (opacity == null) placement else (placement ?: XmlNode("transform")).let { it.copy(children = it.children + opacity) }
+    val moving = original.effects.filter { it.isFollowedEffect() }
+    val key = effects.firstOrNull { it["id"] == "absent.lumakey" } ?: lumaKey()
+    val own = effects.filter { it !== key && !it.isFollowedEffect() }
+    val kept = node.children.filterNot { it.name in MatteFollowedChildren || it.isMatteSize() }
+    val attrs = MatteTimeAttributes.fold(node) { acc, name -> acc.with(name, original.node[name]) }.with("noiseId", "${original.id}")
+    return copy(node = attrs.copy(children = listOfNotNull(transform, original.node.child("speedMap"), size, node.child("gain")) + kept + moving + key + own))
 }
 
 internal fun Scene.withVideoMatte(original: Layer, matte: MediaDeclaration, frameWidth: Int, frameHeight: Int, matteId: Long, groupId: Long): Scene? {
@@ -183,13 +194,17 @@ private fun Scene.followMattes(): Scene {
     return if (followed == matte) this else update(matte.id) { followed }
 }
 
-internal fun Scene.withMattesFollowing(): Scene {
+private fun XmlNode.firstLayer(): XmlNode? = children.firstOrNull { it.name in Scene.LAYER_TAGS }
+
+internal fun Scene.withMattesFollowing(previous: Scene? = null): Scene {
     var changed = false
     val children = node.children.map { child ->
         val group = if (child.name == "embedScene") Layer(child) else return@map child
         val inner = group.node.child("scene") ?: return@map child
-        var scene = Scene(inner).withMattesFollowing()
-        if (group.aiMarks.any { it.kind == AiKind.Video }) scene = scene.followMattes()
+        val earlier = previous?.node?.children?.firstOrNull { it.name == "embedScene" && it["id"] == child["id"] }?.child("scene")
+        if (earlier == inner) return@map child
+        var scene = Scene(inner).withMattesFollowing(earlier?.let(::Scene))
+        if (group.aiMarks.any { it.kind == AiKind.Video } && (earlier == null || earlier.firstLayer() != inner.firstLayer())) scene = scene.followMattes()
         if (scene.node == inner) child else child.withChild("scene", scene.node).also { changed = true }
     }
     return if (changed) Scene(node.copy(children = children)) else this

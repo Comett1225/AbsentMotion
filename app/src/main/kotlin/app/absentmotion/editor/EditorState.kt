@@ -201,7 +201,8 @@ class EditorState(
 
     fun edit(key: Any? = null, change: (Scene) -> Scene) {
         Glide.interrupt()
-        history.edit(key, change(scene).withMattesFollowing())
+        val before = scene
+        history.edit(key, change(before).withMattesFollowing(before))
     }
 
     fun endGesture() {

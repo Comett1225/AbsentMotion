@@ -9,6 +9,7 @@ import app.absentmotion.model.XmlNode
 import app.absentmotion.effects.EffectCatalog
 import app.absentmotion.model.addEffect
 import app.absentmotion.model.copyLayers
+import app.absentmotion.model.withEffect
 import app.absentmotion.model.mapMediaUris
 import app.absentmotion.model.effects
 import org.junit.Assert.assertArrayEquals
@@ -147,6 +148,64 @@ class VideoBackgroundTest {
         assertEquals(listOf(10f, 20f, 0f), mask.transform("location", 0f).toList())
         assertEquals(1f, mask.transform("opacity", 1f)[0])
         assertEquals(edited, edited.withMattesFollowing())
+    }
+
+    private fun cutOut(): Scene {
+        val scene = Scene(Scene.create("t", 1080, 1920, 30, 0).node.copy(children = listOf(XmlNode("media", mapOf("uri" to "v.mp4")),
+            video(listOf(XmlNode("effect", linkedMapOf("id" to "absent.timequant", "hidden" to "false")), XmlNode("effect", linkedMapOf("id" to "absent.glow", "hidden" to "false")))).node)))
+        return scene.withVideoMatte(scene.layer(1)!!, MediaDeclaration(XmlNode("media", mapOf("uri" to "m.mp4"))), 200, 100, 2, 3)!!.update(3) { it.withAiMark(AiKind.Video, null, null) }
+    }
+
+    private fun Scene.inside(change: (Scene) -> Scene): Scene = update(3) { it.copy(node = it.node.withChild("scene", change(it.nested!!).node)) }
+
+    private fun Scene.matte(): Layer = layer(3)!!.nested!!.layer(2)!!
+
+    private fun Layer.keyThreshold(): String? = effects.first { it["id"] == "absent.lumakey" }.children.first { it["name"] == "threshold" }["value"]
+
+    private val blur get() = XmlNode("effect", linkedMapOf("id" to "absent.blur", "hidden" to "false"))
+
+    private fun Scene.tunedMask(): Scene = inside { inner ->
+        inner.update(2) { m -> m.withTransform("opacity", 0.4f).addEffect(blur).withEffect(1) { key -> key.copy(children = key.children.map { if (it["name"] == "threshold") it.with("value", "0.2") else it }) } }
+    }
+
+    @Test fun theMasksOwnOpacityEffectsAndKeySettingsSurviveTheSync() {
+        val tuned = cutOut().tunedMask()
+        assertEquals("0.03", cutOut().matte().keyThreshold())
+        val synced = tuned.withMattesFollowing()
+        assertEquals(tuned, synced)
+        val mask = synced.matte()
+        assertEquals(0.4f, mask.transform("opacity", 1f)[0], 1e-6f)
+        assertEquals("0.2", mask.keyThreshold())
+        assertEquals(listOf("absent.timequant", "absent.lumakey", "absent.blur"), mask.effects.map { it["id"] })
+        assertEquals(synced, synced.withMattesFollowing())
+    }
+
+    @Test fun aChangeToTheClipStillReachesTheMaskWhileItsOwnSettingsStay() {
+        val tuned = cutOut().tunedMask()
+        val shake = XmlNode("effect", linkedMapOf("id" to "absent.randomdisplace", "hidden" to "false"))
+        val moved = tuned.inside { inner -> inner.update(1) { it.addEffect(shake).withTransform("location", 50f, 60f, 0f).withTransform("opacity", 0.9f) } }.withMattesFollowing(tuned)
+        val mask = moved.matte()
+        assertEquals(listOf(50f, 60f, 0f), mask.transform("location", 0f).toList())
+        assertEquals(listOf("absent.timequant", "absent.randomdisplace", "absent.lumakey", "absent.blur"), mask.effects.map { it["id"] })
+        assertEquals(0.4f, mask.transform("opacity", 1f)[0], 1e-6f)
+        assertEquals("0.2", mask.keyThreshold())
+        assertEquals(moved, moved.withMattesFollowing(moved))
+        val unshaken = moved.inside { inner -> inner.update(1) { it.copy(node = it.node.copy(children = it.node.children.filterNot { c -> c["id"] == "absent.randomdisplace" })) } }.withMattesFollowing(moved)
+        assertEquals(listOf("absent.timequant", "absent.lumakey", "absent.blur"), unshaken.matte().effects.map { it["id"] })
+    }
+
+    @Test fun theSyncStaysOutOfTheWayWhileTheClipIsUnchanged() {
+        val grouped = cutOut()
+        val drifted = grouped.inside { inner -> inner.update(2) { it.withTransform("location", 999f, 888f, 0f) } }
+        assertEquals(listOf(999f, 888f, 0f), drifted.matte().transform("location", 0f).toList())
+        assertEquals(drifted, drifted.withMattesFollowing(drifted))
+        val dimmed = drifted.inside { inner -> inner.update(2) { it.withTransform("opacity", 0.5f) } }
+        assertEquals(dimmed, dimmed.withMattesFollowing(drifted))
+        assertEquals(dimmed, dimmed.withMattesFollowing(dimmed))
+        val groupOnly = grouped.update(3) { it.withTransform("opacity", 0.3f) }
+        assertEquals(groupOnly, groupOnly.withMattesFollowing(grouped))
+        assertEquals(listOf(300f, 400f, 0f), drifted.withMattesFollowing().matte().transform("location", 0f).toList())
+        assertEquals(listOf(300f, 400f, 0f), drifted.withMattesFollowing(Scene(Scene.create("t", 1080, 1920, 30, 0).node)).matte().transform("location", 0f).toList())
     }
 
     @Test fun everyMotionAndDistortionEffectIsFollowed() {
