@@ -63,7 +63,10 @@ class ProjectStore(private val root: File) {
         text(id)?.let { if (runCatching { Scene.parse(it) }.isSuccess) versions.snapshot(id, it) else versions.keepDamaged(id, it) }
         save(id, chosen)
         if (version.thumbnail.exists()) version.thumbnail.copyTo(thumbnailFile(id), overwrite = true) else thumbnailFile(id).delete()
+        recoveryFile(id).delete()
     }
+
+    private fun recoveryFile(id: String) = File(root, "recovery").child("$id.xml")
 
     fun load(id: String): Scene? = read(id)?.let { withLinkedElements(it, id) }
 
@@ -99,6 +102,8 @@ class ProjectStore(private val root: File) {
     fun save(id: String, xml: String) = writeAtomically(sceneFile(id), xml)
 
     fun text(id: String): String? = runCatching { sceneFile(id).readText() }.getOrNull()
+
+    fun exists(id: String): Boolean = runCatching { sceneFile(id).exists() }.getOrDefault(false)
 
     fun newId(taken: Collection<String> = emptyList()): String {
         var n = System.currentTimeMillis()
@@ -143,6 +148,7 @@ class ProjectStore(private val root: File) {
         val owners = (listOf(id) + own.flatMap { runCatching { Scene.parse(it).node.mediaUris() }.getOrDefault(emptySet()) }.mapNotNull(::ownerOf)).distinct()
         sceneFile(id).delete()
         thumbnailFile(id).delete()
+        recoveryFile(id).delete()
         versions.delete(id)
         val projectFiles = dir.listFiles { f -> f.extension == "xml" }.orEmpty().toList()
         val templateFiles = File(root, "templates").listFiles { f -> f.isDirectory }.orEmpty().map { File(it, "scene.xml") }.filter { it.exists() }

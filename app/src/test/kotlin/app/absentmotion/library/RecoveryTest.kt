@@ -90,4 +90,32 @@ class RecoveryTest {
             executor.shutdownNow()
         }
     }
+
+    @Test fun deletingAProjectAlsoDropsItsUnsavedEdits() {
+        val (store, recovery, id) = setup()
+        recovery.write(id, xml("unsaved"))
+        store.delete(id)
+        assertFalse(recovery.file(id).exists())
+        assertNull(recovery.pending(store))
+    }
+
+    @Test fun anOfferForAProjectThatIsGoneIsDroppedNotRestored() {
+        val (store, recovery, id) = setup()
+        store.delete(id)
+        recovery.write(id, xml("left behind"))
+        assertNull(recovery.pending(store))
+        assertFalse(recovery.file(id).exists())
+        assertFalse(store.exists(id))
+    }
+
+    @Test fun restoringAnOlderVersionAlsoDropsUnsavedEditsOfTheNewerOne() {
+        val (store, recovery, id) = setup()
+        store.versions.snapshot(id, xml("old", 3))
+        store.save(id, xml("newer", 7))
+        recovery.write(id, xml("unsaved"))
+        store.restore(id, store.versions.list(id).single())
+        assertEquals("old", store.load(id)!!.title)
+        assertFalse(recovery.file(id).exists())
+        assertNull(recovery.pending(store))
+    }
 }

@@ -21,7 +21,7 @@ class Recovery(private val dir: File) {
             val id = found.nameWithoutExtension
             val xml = runCatching { found.readText() }.getOrNull()
             val scene = xml?.let { runCatching { Scene.parse(it) }.getOrNull() }
-            if (xml == null || scene == null || store.text(id)?.let { sameScene(it, xml) } == true) {
+            if (xml == null || scene == null || !store.exists(id) || store.text(id)?.let { sameScene(it, xml) } == true) {
                 clear(id)
                 continue
             }
