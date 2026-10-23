@@ -250,7 +250,7 @@ internal fun drain(codec: MediaCodec, mux: Mux, stop: AtomicBoolean, ptsShift: L
                   zeroStart: Boolean = false) {
     var shift = ptsShift
     var first = !zeroStart
-    val audioTime = audioDelay?.let { AacTimestamps(rate = rate) }
+    val audioTime = audioDelay?.let { AacTimestamps(rate = rate, negative = mux.negativeTimes) }
     val info = MediaCodec.BufferInfo()
     var track = -1
     while (!stop.get()) {

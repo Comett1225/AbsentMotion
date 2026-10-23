@@ -3,6 +3,7 @@ package app.absentmotion.export
 import android.media.MediaCodec
 import android.media.MediaFormat
 import android.media.MediaMuxer
+import android.os.Build
 import android.system.Os
 import app.absentmotion.R
 import app.absentmotion.i18n.txt
@@ -11,6 +12,8 @@ import java.io.FileOutputStream
 import java.nio.ByteBuffer
 
 internal interface SampleSink {
+    val negativeTimes: Boolean get() = true
+
     fun addTrack(format: MediaFormat): Int
     fun start()
     fun write(track: Int, data: ByteBuffer, info: MediaCodec.BufferInfo)
@@ -21,6 +24,8 @@ internal interface SampleSink {
 internal class MuxerSink(private val muxer: MediaMuxer) : SampleSink {
     constructor(fd: FileDescriptor, format: Int) : this(MediaMuxer(fd, format))
     constructor(path: String, format: Int = MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4) : this(MediaMuxer(path, format))
+
+    override val negativeTimes: Boolean get() = muxerTakesNegativeTimes(Build.VERSION.SDK_INT)
 
     override fun addTrack(format: MediaFormat) = muxer.addTrack(format)
     override fun start() = muxer.start()
@@ -128,6 +133,8 @@ internal fun markQuickTime(fd: FileDescriptor) {
 }
 
 internal class Mux(private val sink: SampleSink, private val tracks: Int, private val onError: (Throwable) -> Unit) {
+    val negativeTimes: Boolean get() = sink.negativeTimes
+
     private var added = 0
     private var started = false
     private var broken = false

@@ -28,4 +28,23 @@ class AacTimingTest {
         assertEquals(23219L, aligned.map(23219))
     }
 
+    @Test fun aMuxerThatRefusesNegativeTimesGetsNoPrimingPacketsAndEverythingElseOnTime() {
+        val time = AacTimestamps(2048, negative = false)
+        assertNull(time.map(0))
+        assertNull(time.map(23219))
+        assertEquals(0L, time.map(46438))
+        assertEquals(23219L, time.map(69658))
+        assertEquals(46439L, time.map(92878))
+        val aligned = AacTimestamps(1024, negative = false)
+        assertNull(aligned.map(-23219))
+        assertEquals(0L, aligned.map(0))
+        assertEquals(23219L, aligned.map(23219))
+    }
+
+    @Test fun onlyAndroid9And10MuxersRefuseNegativeTimes() {
+        assertFalse(muxerTakesNegativeTimes(28))
+        assertFalse(muxerTakesNegativeTimes(29))
+        assertTrue(muxerTakesNegativeTimes(30))
+        assertTrue(muxerTakesNegativeTimes(36))
+    }
 }
