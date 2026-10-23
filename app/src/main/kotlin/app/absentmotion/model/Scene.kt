@@ -18,7 +18,7 @@ value class Scene(val node: XmlNode) {
 
     val precompose: String get() = node["precompose"] ?: "dynamicResolution"
 
-    val retime: String get() = node["retime"] ?: "freeze"
+    val retime: String get() = node["retime"] ?: "off"
 
     val retimeIn: Int get() = node["retimeIn"]?.toIntOrNull() ?: 0
     val retimeOut: Int get() = node["retimeOut"]?.toIntOrNull() ?: 0

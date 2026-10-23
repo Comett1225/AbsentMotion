@@ -51,6 +51,12 @@ class ClipTimingTest {
         assertEquals(30, Scene.parse("""<scene fps="29.97"/>""").fps)
     }
 
+    @Test fun aGroupWithoutARetimeSettingIsOffLikeInTheEngine() {
+        val s = scene("""<embedScene id="1" startTime="0" endTime="3999" speed="2"><scene width="100" height="100" fps="30" totalTime="999"/></embedScene>""")
+        assertEquals("off", s.layer(1)!!.nested!!.retime)
+        assertEquals(3000.0, s.layer(1)!!.nestedTime(1500.0, 30).ms, 0.0)
+    }
+
     @Test fun aNegativeNestedLengthDoesNotCrash() {
         val s = Scene.parse("""<scene width="100" height="100" fps="30"><embedScene id="1" startTime="0" endTime="999"><scene totalTime="-5000" retime="freeze">
             <shape id="2" startTime="0" endTime="999" fillType="media" fillVideo="v"/></scene></embedScene></scene>""")
