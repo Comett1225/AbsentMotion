@@ -141,7 +141,7 @@ internal suspend fun recogniseCaptions(
         layer.node.with("hidden", null).let { it.copy(children = it.children.filterNot { c -> c.name == "gain" }) }))
     val startMs = layer?.startTime ?: 0
     val endMs = (layer?.endTime ?: scene.totalTime) + 1
-    val mix = OfflineMix.of(context, source, Resampler.ULTRA) ?: error(AppText.get(R.string.ai_no_sound_to_caption))
+    val mix = withContext(Dispatchers.IO) { OfflineMix.of(context, source, Resampler.ULTRA) } ?: error(AppText.get(R.string.ai_no_sound_to_caption))
     val windows = captionWindows(startMs, endMs)
     val words = ArrayList<Word>()
     try {
@@ -166,11 +166,28 @@ internal const val CAPTION_OVERLAP_MS = 2_000
 internal fun captionWindows(startMs: Int, endMs: Int, windowMs: Int = CAPTION_WINDOW_MS): List<Pair<Int, Int>> =
     (startMs until maxOf(endMs, startMs + 1) step windowMs).map { it to minOf(endMs, it + windowMs) }
 
+internal const val SPEECH_RATE = 16000
+private const val SPEECH_CHUNK = SPEECH_RATE
+
 internal suspend fun speechPcm(mix: AudioMix, startMs: Int, endMs: Int, progress: (Float) -> Unit): FloatArray {
+    val out = FloatArray(speechSamples(startMs, endMs))
+    var at = 0
+    speechChunks(mix, startMs, endMs, progress) { chunk, count ->
+        System.arraycopy(chunk, 0, out, at, count)
+        at += count
+    }
+    return out
+}
+
+private fun speechSamples(startMs: Int, endMs: Int) = maxOf(SPEECH_RATE, ((endMs - startMs) * (SPEECH_RATE / 1000L)).toInt())
+
+internal suspend fun speechChunks(mix: AudioMix, startMs: Int, endMs: Int, progress: (Float) -> Unit, sink: (FloatArray, Int) -> Unit) {
     val rate = ExportAudio.SAMPLE_RATE
-    val step = rate / 16000.0
+    val step = rate / SPEECH_RATE.toDouble()
     val taps = Resampler.TAPS
-    val out = FloatArray(maxOf(16000, ((endMs - startMs) * 16L).toInt()))
+    val total = speechSamples(startMs, endMs)
+    val chunk = FloatArray(SPEECH_CHUNK)
+    var held = 0
     val block = 4096
     val window = FloatArray((block + 4 * taps) * 2)
     var base = -2L * taps
@@ -181,7 +198,7 @@ internal suspend fun speechPcm(mix: AudioMix, startMs: Int, endMs: Int, progress
     val scratch = FloatArray(2 * taps)
     fun us(frame: Long) = Math.round(frame * 1e6 / rate)
     var i = 0
-    while (i < out.size) {
+    while (i < total) {
         coroutineContext.ensureActive()
         val keep = ((i * step).toLong() - taps - base).toInt().coerceIn(0, filled)
         System.arraycopy(window, 2 * keep, window, 0, 2 * (filled - keep))
@@ -191,16 +208,18 @@ internal suspend fun speechPcm(mix: AudioMix, startMs: Int, endMs: Int, progress
         for (k in pcm.indices) window[2 * filled + k] = pcm[k] / 32768f
         filled += pcm.size / 2
         fetched += pcm.size / 2
-        while (i < out.size) {
+        while (i < total) {
             val position = i * step
             val j = position.toLong()
             if (j + taps >= base + filled) break
             Resampler.sample(window, (j - base).toInt(), (position - j).toFloat(), Resampler.ULTRA, step, pair, scratch)
-            out[i++] = (pair[0] + pair[1]) / 2
+            chunk[held++] = (pair[0] + pair[1]) / 2
+            i++
+            if (held == chunk.size) { sink(chunk, held); held = 0 }
         }
-        progress(i.toFloat() / out.size)
+        progress(i.toFloat() / total)
     }
-    return out
+    if (held > 0) sink(chunk, held)
 }
 
 internal object Whisper {

@@ -1,5 +1,6 @@
 package app.absentmotion.audio
 
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.util.Random
@@ -49,5 +50,38 @@ class BeatsTest {
     @Test
     fun silenceHasNoBeats() {
         assertTrue(Beats.detect(FloatArray(10 * rate), rate).isEmpty())
+    }
+
+    @Test
+    fun chunkedAnalysisGivesTheSameBeatsAsOneBuffer() {
+        val (pcm, _) = track(30, 430.0, 1L, 200.0, 40.0)
+        val whole = Beats.detect(pcm, rate)
+        assertTrue(whole.size > 40)
+        for (size in listOf(1, 367, 368, 369, 511, 512, 513, 4096, 16000, 100_003)) {
+            val stream = Beats.Stream(rate)
+            var at = 0
+            while (at < pcm.size) {
+                val count = minOf(size, pcm.size - at)
+                stream.add(pcm.copyOfRange(at, at + count), count)
+                at += count
+            }
+            assertEquals("chunks of $size", whole, stream.beats())
+        }
+    }
+
+    @Test
+    fun aChunkMayBeOnlyPartlyUsed() {
+        val (pcm, _) = track(20, 90.0, 2L, 1000.0, 10.0)
+        val stream = Beats.Stream(rate)
+        val padded = FloatArray(5000)
+        var at = 0
+        while (at < pcm.size) {
+            val count = minOf(3000, pcm.size - at)
+            System.arraycopy(pcm, at, padded, 0, count)
+            padded.fill(9f, count, padded.size)
+            stream.add(padded, count)
+            at += count
+        }
+        assertEquals(Beats.detect(pcm, rate), stream.beats())
     }
 }
