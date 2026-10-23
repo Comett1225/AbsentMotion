@@ -112,7 +112,9 @@ bool Space(uint32_t c) {
            c == 0x1680 || Between(c, 0x2000, 0x200A) || c == 0x2028 || c == 0x2029 || c == 0x202F || c == 0x205F || c == 0x3000;
 }
 
-Segments Split(const std::string& text) {
+bool Spaceless(uint32_t c) { return Between(c, 0x0E00, 0x0EFF) || Between(c, 0x1000, 0x109F) || Between(c, 0x1780, 0x17FF); }
+
+Segments Split(const std::string& text, const std::vector<int>& breaks) {
     Segments s;
     s.character.assign(text.size(), -1);
     s.word.assign(text.size(), -1);
@@ -128,7 +130,9 @@ Segments Split(const std::string& text) {
         if (!joins) {
             s.characters++;
             wordHead = !Space(c);
-            if (wordHead && !inWord) s.words++;
+            const bool cut = inWord && wordHead && (Spaceless(c) || Spaceless(previous)) &&
+                             std::binary_search(breaks.begin(), breaks.end(), starts[i]);
+            if (wordHead && (!inWord || cut)) s.words++;
             inWord = wordHead;
         }
         const int end = i + 1 < cps.size() ? starts[i + 1] : (int)text.size();

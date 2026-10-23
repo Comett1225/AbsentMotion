@@ -519,10 +519,22 @@ void Apply(const Layer& l, float t, const textanim::Segments& seg, std::vector<G
     }
 }
 
+std::vector<int> WordBreaks(const std::string& text) {
+    std::vector<int> out;
+    const std::vector<uint32_t> points = textanim::CodePoints(text);
+    if (std::none_of(points.begin(), points.end(), textanim::Spaceless)) return out;
+    std::vector<SkUnicode::Position> found;
+    const sk_sp<SkUnicode> unicode = SkUnicodes::ICU::Make();
+    if (unicode && unicode->getUtf8Words(text.data(), (int)text.size(), "th", &found)) {
+        for (const SkUnicode::Position p : found) out.push_back((int)p);
+    }
+    return out;
+}
+
 std::vector<Glyph> Animate(const Layer& l, float t, int fps) {
     std::string shown;
     std::vector<Glyph> glyphs = Collect(Pieces(*l.text, l, t, fps, &shown));
-    Apply(l, t, textanim::Split(shown), &glyphs);
+    Apply(l, t, textanim::Split(shown, WordBreaks(shown)), &glyphs);
     return glyphs;
 }
 

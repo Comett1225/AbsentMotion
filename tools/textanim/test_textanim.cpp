@@ -186,6 +186,14 @@ int main() {
         check(Split("क्ष").characters == 1 && Split("क्‍ष").characters == 1, "a halant still joins the next consonant");
     }
     {
+        const std::string thai = "สวัสดีครับ";
+        const Segments s = Split(thai, {0, 18, 30});
+        check(s.words == 2 && pieces(thai, s.word)[1] == "ครับ", "thai words split where the dictionary breaks them");
+        check(Split("Hi " + thai, {0, 2, 3, 21, 33}).words == 3, "thai words after a latin word");
+        check(Split("abcd ef", {0, 2, 4, 5, 7}).words == 2, "breaks inside words of spaced scripts are ignored");
+        check(Split(thai).words == 1, "without breaks thai text stays one word");
+    }
+    {
         check(CountNumbers("1.000,5", 0, 2, -1, 2) == "2.001,0", "a number typed as 1.000,5 counts in that style");
         check(CountNumbers("Total 12.345.678,90", 0, 1, -1, 2) == "Total 12.345.678,90", "dot groups and a comma decimal read back as typed");
         check(CountNumbers("1 000.5", 0, 2, -1, 3) == "2 001.0", "space groups read back");
