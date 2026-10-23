@@ -340,6 +340,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
     }
 
     fun start(ignoreMissing: Boolean = false, aiReady: Boolean = false) {
+        if (phase !is Phase.Idle) return
         if (android.os.Build.VERSION.SDK_INT < 29 && !storageAsked && context.checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
             storageAsked = true
             afterStorageAnswer = { start(ignoreMissing, aiReady) }
