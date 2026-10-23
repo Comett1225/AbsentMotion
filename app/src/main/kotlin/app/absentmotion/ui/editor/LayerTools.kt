@@ -143,6 +143,7 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier, side: Boolean 
                 listOf(Tile(ModelOptions) { state.panel = EditorPanel.Model }, blending),
                 listOf(transform, presets, effects),
             )
+            "nullobj" -> listOf(listOf(transform, presets, effects))
             else -> {
                 val edit = when {
                     kind == "text" -> Tile(EditText) { state.panel = EditorPanel.EditText }
