@@ -358,11 +358,13 @@ bool EngineImpl::initVulkan(std::string* error) {
     fExtensions.init(GetProc, fInstance, fPhysicalDevice, (uint32_t)instanceExts.size(),
                      instanceExts.data(), (uint32_t)deviceExts.size(), deviceExts.data());
 
+    std::string device = props.deviceName;
+    std::replace_if(device.begin(), device.end(), [](char c) { return c == '"' || c == '\\' || (unsigned char)c < 0x20; }, ' ');
     char buf[512];
     snprintf(buf, sizeof(buf),
              "{\"backend\":\"%s\",\"device\":\"%s\",\"api\":\"%u.%u.%u\",\"driverVersion\":%u,"
              "\"displayTiming\":%s,\"deviceExtensions\":[",
-             fBackend == Backend::kGraphite ? "graphite" : "ganesh", props.deviceName,
+             fBackend == Backend::kGraphite ? "graphite" : "ganesh", device.c_str(),
              VK_API_VERSION_MAJOR(props.apiVersion), VK_API_VERSION_MINOR(props.apiVersion),
              VK_API_VERSION_PATCH(props.apiVersion), props.driverVersion,
              fDisplayTiming ? "true" : "false");

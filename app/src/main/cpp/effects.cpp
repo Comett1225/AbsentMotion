@@ -85,7 +85,7 @@ half4 main(float2 p) {
     half4 src = image.eval(p);
     float r = float(field.eval(p).r);
     float d = max(r * reach - shift, 0.0);
-    float g = r > 0.995 ? 0.0 : soft > 0.0 ? smoothstep(grow + soft, grow - soft, d) : (d <= grow ? 1.0 : 0.0);
+    float g = r > 0.995 ? 0.0 : soft > 0.0 ? 1.0 - smoothstep(grow - soft, grow + soft, d) : (d <= grow ? 1.0 : 0.0);
     half k = half(g * amount) * tint.a;
     half3 c = tint.rgb;
     if (mode > 0.5) {

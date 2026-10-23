@@ -245,8 +245,8 @@ void ParseCamera(const XmlNode& n, Camera* c) {
 }
 
 void ParseGroup(const XmlNode& scene, int fps, Layer* group) {
-    group->innerWidth = std::clamp(IntAttr(scene, "width", 0), 1, 8192);
-    group->innerHeight = std::clamp(IntAttr(scene, "height", 0), 1, 8192);
+    group->innerWidth = std::clamp(IntAttr(scene, "width", 1080), 1, 8192);
+    group->innerHeight = std::clamp(IntAttr(scene, "height", 1080), 1, 8192);
     const char* bg = scene.attr("bgcolor");
     group->innerBackground = bg && *bg == '#' ? (uint32_t)strtoul(bg + 1, nullptr, 16) : 0;
     Retiming& r = group->retiming;
