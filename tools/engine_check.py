@@ -7,7 +7,7 @@ import time
 from pathlib import Path
 
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageDraw
 from sdk import adb_command
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -47,7 +47,23 @@ def exif_jpeg(path, tag):
     image.save(path, "JPEG", quality=100, subsampling=0, exif=exif.tobytes())
 
 
-PICTURES = {"exif2.jpg": 2, "exif5.jpg": 5}
+def cutout_png(path):
+    image = Image.new("RGBA", (100, 100), (0, 0, 0, 0))
+    ImageDraw.Draw(image).ellipse((20, 20, 80, 80), fill=RED + (255,))
+    image.save(path)
+
+
+PICTURES = {"exif2.jpg": lambda path: exif_jpeg(path, 2), "exif5.jpg": lambda path: exif_jpeg(path, 5), "cutout.png": cutout_png}
+
+
+def cutout(extra=""):
+    return (f'<shape id="1" label="c" startTime="0" endTime="1000" fillType="media" mediaFillMode="stretch" s=".rect" '
+            f'fillImage="file://{DEVICE_DIR}/cutout.png">{transform("100,100,0")}<property name="size" type="vec2" value="50,50"/>{extra}</shape>')
+
+
+CUT_STROKE = '<path-stroke><color value="#ff00ff00"/><size value="6"/></path-stroke>'
+CUT_GLOW = ('<border direction="outside"><color value="#ff0000ff"/><size value="8"/></border><effect id="absent.glow" hidden="false">'
+            '<property name="radius" type="float" value="30"/><property name="hardness" type="float" value="1"/></effect>')
 
 
 def video(path, fps, colours):
@@ -102,6 +118,10 @@ CASES = {
         scene(picture("exif2.jpg", 0)), [((50, 100), BLUE), ((150, 100), RED)]),
     "a picture tagged as transposed shows turned and mirrored": (
         scene(picture("exif5.jpg", 270)), [((100, 50), RED), ((100, 150), BLUE)]),
+    "a stroke on a cut-out picture follows its visible pixels": (
+        scene(cutout(CUT_STROKE)), [((100, 70), GREEN), ((100, 100), RED), ((52, 100), BLACK), ((55, 55), BLACK)]),
+    "a border on a cut-out picture with Glow follows its visible pixels": (
+        scene(cutout(CUT_GLOW)), [((100, 68), BLUE), ((100, 100), RED), ((52, 100), BLACK), ((55, 55), BLACK)]),
     "a backdrop effect moves the layers behind it and hides its own fill": (
         scene(rect(1, 50, 100, 50, 100, 0xffff0000) + rect(2, 150, 100, 50, 100, 0xff0000ff)
               + rect(3, 100, 100, 60, 60, extra='<effect id="absent.displacementmap" hidden="false">'
@@ -121,6 +141,8 @@ HITS = {
               f'{transform()}<path d="M 40 100 L 140 100"/>'
               '<path-stroke end="arrow-filled" end-size="3"><color value="#ffffffff"/><size value="10"/></path-stroke></shape>'),
         [((130, 85), 7), ((60, 100), 7), ((60, 85), 0), ((180, 100), 0)]),
+    "only the visible pixels of a cut-out picture can be tapped": (
+        scene(cutout(CUT_STROKE)), [((100, 100), 1), ((100, 68), 1), ((55, 55), 0), ((100, 60), 0)]),
 }
 
 
@@ -161,8 +183,8 @@ def main():
     work = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "build/engine-check"
     work.mkdir(parents=True, exist_ok=True)
     results = []
-    for name, tag in PICTURES.items():
-        exif_jpeg(work / name, tag)
+    for name, make in PICTURES.items():
+        make(work / name)
         adb("push", work / name, f"{DEVICE_DIR}/{name}")
     for k, (title, (xml, probes)) in enumerate(CASES.items()):
         image = still(f"enginecheck{k}", xml, work)

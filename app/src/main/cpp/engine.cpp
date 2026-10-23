@@ -21,6 +21,7 @@
 
 #include "include/android/SkImageAndroid.h"
 #include "include/android/vk/AndroidVulkanMemoryAllocator.h"
+#include "include/core/SkBitmap.h"
 #include "include/core/SkCanvas.h"
 #include "include/core/SkColorSpace.h"
 #include "include/core/SkColorFilter.h"
@@ -91,6 +92,16 @@ PFN_vkVoidFunction GetProc(const char* name, VkInstance instance, VkDevice devic
                                     : vkGetInstanceProcAddr(instance, name);
 }
 
+sk_sp<SkImage> AlphaMask(const SkPixmap& source) {
+    const float scale = std::min(1.0f, 256.0f / std::max(source.width(), source.height()));
+    SkBitmap bitmap;
+    if (!bitmap.tryAllocPixels(SkImageInfo::MakeA8(std::max(1, (int)std::lround(source.width() * scale)),
+                                                   std::max(1, (int)std::lround(source.height() * scale))))) return nullptr;
+    if (!source.scalePixels(bitmap.pixmap(), SkSamplingOptions(SkFilterMode::kLinear))) return nullptr;
+    bitmap.setImmutable();
+    return bitmap.asImage();
+}
+
 class EngineImpl final : public Engine {
 public:
     explicit EngineImpl(Backend backend) : fBackend(backend) {}
@@ -140,6 +151,13 @@ private:
     sk_sp<SkImage> picture(const std::string& uri, int64_t layerId) const;
     MediaPictures pictures() const {
         return [this](const std::string& uri, int64_t id) { return this->picture(uri, id); };
+    }
+    MediaPictures masks() const {
+        return [this](const std::string& uri, int64_t id) {
+            auto found = fMasks.find({uri, id});
+            if (found == fMasks.end()) found = fMasks.find({uri, 0});
+            return found == fMasks.end() ? nullptr : found->second;
+        };
     }
     int frame(Target*, int64_t presentTimeNs, bool sync, const std::function<void(SkCanvas*)>& paint);
     bool offscreen(int width, int height, bool premultiplied, const std::function<void(SkCanvas*)>& paint,
@@ -206,6 +224,7 @@ private:
     std::vector<std::unique_ptr<Target>> fTargets;
     Scene fScene;
     std::map<std::pair<std::string, int64_t>, sk_sp<SkImage>> fPictures;
+    std::map<std::pair<std::string, int64_t>, sk_sp<SkImage>> fMasks;
     struct VideoFrames {
         std::map<int64_t, sk_sp<SkImage>> frames;
         std::map<std::pair<int64_t, int64_t>, sk_sp<SkImage>> flows;
@@ -756,21 +775,25 @@ sk_sp<SkImage> EngineImpl::copyFrame(AHardwareBuffer* buffer, bool opaque, int c
 bool EngineImpl::setPicture(const std::string& uri, int64_t layerId, AHardwareBuffer* buffer,
                             const void* pixels, int width, int height, size_t rowBytes, bool opaque, int colorStandard, int colorRange, const FrameCrop& crop) {
     const auto key = std::make_pair(uri, layerId);
-    if (!buffer && !pixels) { fPictures.erase(key); fVideoFrames.erase(key); fMosh.erase(key); this->forgetImported(key); return true; }
-    sk_sp<SkImage> image;
+    if (!buffer && !pixels) { fPictures.erase(key); fMasks.erase(key); fVideoFrames.erase(key); fMosh.erase(key); this->forgetImported(key); return true; }
+    sk_sp<SkImage> image, mask;
     if (buffer) {
         image = this->copyFrame(buffer, opaque, colorStandard, colorRange, crop, &key);
     }
     else if (width > 0 && height > 0 && width <= maxPictureSize() && height <= maxPictureSize()) {
         const auto info = SkImageInfo::Make(width, height, kRGBA_8888_SkColorType,
                 opaque ? kOpaque_SkAlphaType : kPremul_SkAlphaType, SkColorSpace::MakeSRGB());
-        image = SkImages::RasterFromPixmapCopy(SkPixmap(info, pixels, rowBytes));
+        const SkPixmap source(info, pixels, rowBytes);
+        image = SkImages::RasterFromPixmapCopy(source);
         if (image && fRecorder) image = SkImages::TextureFromImage(fRecorder.get(), image.get(), {});
+        if (!opaque) mask = AlphaMask(source);
     }
     if (!image && buffer) return false;
     fVideoFrames.erase(key);
+    fMasks.erase(key);
     if (!image) { fPictures.erase(key); return false; }
     fPictures[key] = std::move(image);
+    if (mask) fMasks[key] = std::move(mask);
     return true;
 }
 
@@ -1090,7 +1113,7 @@ bool EngineImpl::layerBounds(int64_t layerId, double timeMs, float ltrb[4]) {
 
 int64_t EngineImpl::hitTest(float x, float y, double timeMs) {
     SetCameraView(fCameraView);
-    return TopLayerAt(fScene, timeMs, x, y);
+    return TopLayerAt(fScene, timeMs, x, y, this->masks());
 }
 
 bool EngineImpl::layerOutline(int64_t layerId, double timeMs, std::string* svg) {
