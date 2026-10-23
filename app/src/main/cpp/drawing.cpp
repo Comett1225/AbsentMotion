@@ -284,17 +284,6 @@ SkPath DrawingBounds(const Layer& layer) {
     return any ? SkPath::Rect(all) : SkPath();
 }
 
-SkPath DrawingOutline(const Layer& layer, float t) {
-    SkPathBuilder b;
-    EachPiece(layer, t, [&](const FreehandStroke& s, const SkPath& geometry, bool filled) {
-        if (s.tool == kEraser) return;
-        FreehandStroke piece = s;
-        piece.geometry = geometry;
-        b.addPath(filled ? geometry : StrokedOutline(piece));
-    });
-    return b.detach();
-}
-
 bool DrawingContains(const Layer& layer, SkPoint local) {
     for (auto it = layer.strokes.rbegin(); it != layer.strokes.rend(); ++it) {
         if (it->geometry.isEmpty() || (it->tool != kEraser && it->color[0] <= 0)) continue;

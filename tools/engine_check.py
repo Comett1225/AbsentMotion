@@ -138,6 +138,15 @@ CASES = {
         scene('<text id="1" label="t" fillType="color" startTime="0" endTime="1000" size="150" wrapWidth="190" align="center">'
               f'{transform("100,100,0")}<content>I</content><fillColor value="#80ff0000"/>{OUTSIDE.format(10)}</text>'),
         [((100, 100), (128, 0, 0))]),
+    "a stroke on a drawing follows the drawn line, not its bounding box": (
+        scene(f'<drawing id="1" label="d" startTime="0" endTime="1000">{transform()}'
+              f'<stroke color="#ffffffff" width="20" type="pen" points="40,40,1;160,160,1"/>{CUT_STROKE}</drawing>'),
+        [((100, 100), (255, 255, 255)), ((107, 93), GREEN), ((168, 100), BLACK), ((165, 35), BLACK)]),
+    "a stroke on a group follows what is inside it": (
+        scene(f'<embedScene id="1" label="g" startTime="0" endTime="1000">{transform("100,100,0")}'
+              '<scene width="200" height="200" fps="30" totalTime="1000" bgcolor="#00000000">'
+              + rect(2, 100, 100, 40, 40, 0xffff0000) + f'</scene>{CUT_STROKE}</embedScene>'),
+        [((100, 100), RED), ((60, 100), GREEN), ((100, 140), GREEN), ((50, 100), BLACK)]),
     "a border follows a Repeat copy that runs late": (
         scene(repeated_late(OUTSIDE.format(8)), fps=10),
         [((76, 60), RED), ((136, 60), RED), ((54, 60), (255, 255, 255)), ((98, 60), (255, 255, 255)), ((114, 60), (255, 255, 255)),
