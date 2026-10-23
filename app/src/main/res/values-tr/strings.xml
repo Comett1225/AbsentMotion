@@ -411,6 +411,7 @@
     <string name="export_share_image">Görseli paylaş</string>
     <string name="export_share_xml">Proje XML\'ini paylaş</string>
     <string name="export_share">Paylaş</string>
+    <string name="export_share_too_many">Tek seferde gönderilemeyecek kadar çok resim var. Bunlar %1$s konumuna kaydedildi.</string>
     <string name="export_share_audio">Sesi paylaş</string>
     <string name="export_failed_title">Dışa aktarma başarısız</string>
     <string name="export_failed_empty">Henüz dışa aktarılacak bir şey yok. Bir katman veya medya ekleyip tekrar deneyin.</string>
@@ -1349,6 +1350,7 @@
     <string name="edit_panel_camera_options">Kamera seçenekleri</string>
     <string name="edit_keep_copying">“%1$s” projeye kopyalanıyor…</string>
     <string name="edit_keep_no_space">“%1$s” kopyasını projede tutmak için yeterli boş depolama alanı yok. Özgün dosya kullanılmaya devam eder.</string>
+    <string name="edit_keep_failed">“%1$s” projeye kopyalanamadı. Hâlâ orijinal dosyayı kullanıyor, bu yüzden dosya taşınırsa veya silinirse çalışmayı durdurabilir.</string>
     <string name="edit_keep_this_file">bu dosya</string>
     <string name="edit_beats_select_layer">Bir ses veya video katmanı seçin</string>
     <string name="edit_beats_no_sound">Okunacak ses yok</string>

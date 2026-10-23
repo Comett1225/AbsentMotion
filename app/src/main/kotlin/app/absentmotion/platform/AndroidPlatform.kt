@@ -150,11 +150,21 @@ fun ExportBars(dark: Boolean, running: Boolean) {
     }
     androidx.compose.runtime.DisposableEffect(running) { view.keepScreenOn = running; onDispose { view.keepScreenOn = false } }
 }
+internal const val MAX_SHARED_PICTURES = 500
 fun shareExport(context: Context, result: app.absentmotion.export.ExportResult) {
-    val send = if (result.uris.size > 1) android.content.Intent(android.content.Intent.ACTION_SEND_MULTIPLE).putParcelableArrayListExtra(android.content.Intent.EXTRA_STREAM, ArrayList(result.uris))
+    val many = result.uris.size > 1
+    val send = if (many) android.content.Intent(android.content.Intent.ACTION_SEND_MULTIPLE).putParcelableArrayListExtra(android.content.Intent.EXTRA_STREAM, ArrayList(result.uris))
         else android.content.Intent(android.content.Intent.ACTION_SEND).putExtra(android.content.Intent.EXTRA_STREAM, result.uris.first())
-    send.setType(if (result.uris.size > 1) "image/*" else result.mime).addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
-    context.startActivity(android.content.Intent.createChooser(send, null))
+    send.setType(if (many) "image/*" else result.mime).addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    fun tooMany() = Toast.makeText(context, context.getString(R.string.export_share_too_many, result.where), Toast.LENGTH_LONG).show()
+    if (many && result.uris.size > MAX_SHARED_PICTURES) return tooMany()
+    try {
+        context.startActivity(android.content.Intent.createChooser(send, null))
+    } catch (e: RuntimeException) {
+        if (!many) throw e
+        android.util.Log.w("AMShare", "cannot share ${result.uris.size} pictures at once", e)
+        tooMany()
+    }
 }
 @androidx.compose.runtime.Composable
 fun ExportMediaPreview(kind: app.absentmotion.export.ExportKind, uris: List<Uri>) = app.absentmotion.ui.export.ExportMediaPreview(kind, uris)

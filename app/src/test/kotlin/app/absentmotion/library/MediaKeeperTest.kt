@@ -83,4 +83,79 @@ class MediaKeeperTest {
         assertTrue(gone.toURI().toString() in uris)
         assertEquals(setOf("a.png", "b.png"), store.mediaDir("p1").listFiles()!!.map { it.name }.toSet())
     }
+
+    private fun sized(file: File, size: Long = file.length()) =
+        MediaDeclaration(XmlNode("media", linkedMapOf("uri" to file.toURI().toString(), "filename" to file.name, "size" to "$size", "type" to "video/mp4")))
+
+    @Test fun aCopyThatEndsShortIsRefusedAndLeavesNothingBehind() {
+        val store = ProjectStore(tmp.newFolder())
+        val clip = tmp.newFile("clip.mp4").apply { writeText("only ten b") }
+        try {
+            MediaKeeper(store, { File(java.net.URI(it)).inputStream() }).keep("p1", sized(clip, size = 1_000))
+            fail("kept a short copy")
+        } catch (e: java.io.IOException) {
+            assertFalse(e is MediaKeeper.NoSpace)
+        }
+        assertTrue(store.mediaDir("p1").listFiles().orEmpty().isEmpty())
+    }
+
+    @Test fun leavingMidCopyStopsItAndLeavesNoFile() {
+        val store = ProjectStore(tmp.newFolder())
+        val clip = tmp.newFile("clip.mp4").apply { writeBytes(ByteArray(1 shl 20) { 7 }) }
+        var reads = 0
+        val keeper = MediaKeeper(store, { File(java.net.URI(it)).inputStream() })
+        try {
+            keeper.keep("p1", sized(clip), cancelled = { ++reads > 3 })
+            fail("finished the copy")
+        } catch (e: java.util.concurrent.CancellationException) {
+        }
+        assertTrue(store.mediaDir("p1").listFiles().orEmpty().isEmpty())
+    }
+
+    @Test fun aFileDeletedFromTheProjectAndAddedAgainIsNotCopiedTwice() {
+        val store = ProjectStore(tmp.newFolder())
+        val keeper = MediaKeeper(store, { File(java.net.URI(it)).inputStream() })
+        val take = File(tmp.newFolder("one"), "take.wav").apply { writeText("first take") }
+        val kept = keeper.keep("p1", media(take))
+        val again = keeper.keep("p1", media(take), scene())
+        assertEquals(kept.uri, again.uri)
+        val other = File(tmp.newFolder("two"), "take.wav").apply { writeText("other take") }
+        val third = keeper.keep("p1", media(other), scene())
+        assertTrue(third.uri != kept.uri)
+        assertEquals("other take", File(java.net.URI(third.uri)).readText())
+        assertEquals(setOf("take.wav", "2_take.wav"), store.mediaDir("p1").list()!!.toSet())
+    }
+
+    @Test fun twoPicksWithTheSameNameAtTheSameTimeKeepTheirOwnContent() {
+        val store = ProjectStore(tmp.newFolder())
+        val first = File(tmp.newFolder("one"), "take.wav").apply { writeBytes(ByteArray(300_000) { 'a'.code.toByte() }) }
+        val second = File(tmp.newFolder("two"), "take.wav").apply { writeBytes(ByteArray(400_000) { 'b'.code.toByte() }) }
+        val started = java.util.concurrent.CountDownLatch(1)
+        val secondDone = java.util.concurrent.CountDownLatch(1)
+        val keeper = MediaKeeper(store, { uri ->
+            val file = File(java.net.URI(uri))
+            if (file != first) file.inputStream() else object : java.io.FilterInputStream(file.inputStream()) {
+                private var waited = false
+                override fun read(b: ByteArray, off: Int, len: Int): Int {
+                    val n = super.read(b, off, minOf(len, 65_536))
+                    if (!waited) { waited = true; started.countDown(); secondDone.await(10, java.util.concurrent.TimeUnit.SECONDS) }
+                    return n
+                }
+            }
+        })
+        val results = java.util.concurrent.ConcurrentHashMap<String, MediaDeclaration>()
+        val a = Thread { results["first"] = keeper.keep("p1", media(first)) }.apply { start() }
+        assertTrue(started.await(10, java.util.concurrent.TimeUnit.SECONDS))
+        results["second"] = keeper.keep("p1", media(second))
+        secondDone.countDown()
+        a.join(10_000)
+        val one = File(java.net.URI(results.getValue("first").uri))
+        val two = File(java.net.URI(results.getValue("second").uri))
+        assertTrue(one != two)
+        assertEquals(300_000L, one.length())
+        assertEquals(400_000L, two.length())
+        assertTrue(one.readBytes().all { it == 'a'.code.toByte() })
+        assertTrue(two.readBytes().all { it == 'b'.code.toByte() })
+        assertEquals(2, store.mediaDir("p1").listFiles()!!.size)
+    }
 }

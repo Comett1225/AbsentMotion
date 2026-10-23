@@ -419,6 +419,7 @@
     <string name="export_share_image">Compartir imagen</string>
     <string name="export_share_xml">Compartir XML del proyecto</string>
     <string name="export_share">Compartir</string>
+    <string name="export_share_too_many">Hay demasiadas imágenes para enviarlas de una vez. Se guardaron en %1$s.</string>
     <string name="export_share_audio">Compartir audio</string>
     <string name="export_failed_title">Error al exportar</string>
     <string name="export_failed_empty">Todavía no hay nada para exportar. Agrega una capa o algún medio e inténtalo de nuevo.</string>
@@ -1373,6 +1374,7 @@
     <string name="edit_panel_camera_options">Opciones de cámara</string>
     <string name="edit_keep_copying">Copiando “%1$s” al proyecto…</string>
     <string name="edit_keep_no_space">No hay suficiente espacio libre para guardar una copia de “%1$s” en el proyecto. Se seguirá usando el archivo original.</string>
+    <string name="edit_keep_failed">No se pudo copiar “%1$s” al proyecto. Se sigue usando el archivo original, así que podría dejar de funcionar si se mueve o se elimina.</string>
     <string name="edit_keep_this_file">este archivo</string>
     <string name="edit_beats_select_layer">Selecciona una capa de audio o video</string>
     <string name="edit_beats_no_sound">No hay sonido que analizar</string>

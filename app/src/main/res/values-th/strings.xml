@@ -403,6 +403,7 @@
     <string name="export_share_image">แชร์รูปภาพ</string>
     <string name="export_share_xml">แชร์โปรเจกต์ XML</string>
     <string name="export_share">แชร์</string>
+    <string name="export_share_too_many">มีรูปภาพมากเกินไปที่จะส่งในครั้งเดียว บันทึกไว้ใน %1$s แล้ว</string>
     <string name="export_share_audio">แชร์เสียง</string>
     <string name="export_failed_title">ส่งออกไม่สำเร็จ</string>
     <string name="export_failed_empty">ยังไม่มีอะไรให้ส่งออก เพิ่มเลเยอร์หรือสื่อก่อน แล้วลองอีกครั้ง</string>
@@ -1325,6 +1326,7 @@
     <string name="edit_panel_camera_options">ตัวเลือกกล้อง</string>
     <string name="edit_keep_copying">กำลังคัดลอก “%1$s” ไปยังโปรเจกต์…</string>
     <string name="edit_keep_no_space">พื้นที่ว่างไม่พอสำหรับเก็บสำเนาของ “%1$s” ในโปรเจกต์ จะยังใช้ไฟล์ต้นฉบับอยู่</string>
+    <string name="edit_keep_failed">ไม่สามารถคัดลอก “%1$s” เข้าโปรเจกต์ได้ ยังใช้ไฟล์ต้นฉบับอยู่ จึงอาจใช้งานไม่ได้หากไฟล์ถูกย้ายหรือลบ</string>
     <string name="edit_keep_this_file">ไฟล์นี้</string>
     <string name="edit_beats_select_layer">เลือกเลเยอร์เสียงหรือวิดีโอ</string>
     <string name="edit_beats_no_sound">ไม่มีเสียงให้อ่าน</string>

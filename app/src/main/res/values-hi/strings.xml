@@ -411,6 +411,7 @@
     <string name="export_share_image">इमेज शेयर करें</string>
     <string name="export_share_xml">प्रोजेक्ट XML शेयर करें</string>
     <string name="export_share">शेयर करें</string>
+    <string name="export_share_too_many">एक बार में भेजने के लिए बहुत ज़्यादा तस्वीरें हैं। इन्हें %1$s में सेव किया गया है।</string>
     <string name="export_share_audio">ऑडियो शेयर करें</string>
     <string name="export_failed_title">एक्सपोर्ट विफल</string>
     <string name="export_failed_empty">अभी एक्सपोर्ट करने के लिए कुछ नहीं है। कोई लेयर या मीडिया जोड़ें, फिर दोबारा कोशिश करें।</string>
@@ -1349,6 +1350,7 @@
     <string name="edit_panel_camera_options">कैमरा विकल्प</string>
     <string name="edit_keep_copying">“%1$s” को प्रोजेक्ट में कॉपी किया जा रहा है…</string>
     <string name="edit_keep_no_space">प्रोजेक्ट में “%1$s” की कॉपी रखने के लिए पर्याप्त खाली स्टोरेज नहीं है। इसके लिए अब भी मूल फ़ाइल का उपयोग होगा।</string>
+    <string name="edit_keep_failed">“%1$s” को प्रोजेक्ट में कॉपी नहीं किया जा सका। यह अभी भी मूल फ़ाइल का उपयोग करता है, इसलिए वह फ़ाइल हटने या स्थानांतरित होने पर यह काम करना बंद कर सकता है।</string>
     <string name="edit_keep_this_file">यह फ़ाइल</string>
     <string name="edit_beats_select_layer">ऑडियो या वीडियो लेयर चुनें</string>
     <string name="edit_beats_no_sound">पढ़ने के लिए कोई ऑडियो नहीं है।</string>

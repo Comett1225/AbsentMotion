@@ -443,6 +443,7 @@
     <string name="export_share_image">مشاركة الصورة</string>
     <string name="export_share_xml">مشاركة مشروع XML</string>
     <string name="export_share">مشاركة</string>
+    <string name="export_share_too_many">هناك عدد كبير جدًا من الصور لإرسالها دفعة واحدة. تم حفظها في %1$s.</string>
     <string name="export_share_audio">مشاركة الصوت</string>
     <string name="export_failed_title">فشل التصدير</string>
     <string name="export_failed_empty">لا يوجد شيء لتصديره بعد. أضف طبقة أو بعض الوسائط، ثم حاول مجددًا.</string>
@@ -1445,6 +1446,7 @@
     <string name="edit_panel_camera_options">خيارات الكاميرا</string>
     <string name="edit_keep_copying">جارٍ نسخ «%1$s» إلى المشروع…</string>
     <string name="edit_keep_no_space">لا توجد مساحة تخزين كافية للاحتفاظ بنسخة من «%1$s» في المشروع. ما زال يستخدم الملف الأصلي.</string>
+    <string name="edit_keep_failed">تعذّر نسخ «%1$s» إلى المشروع. لا يزال يستخدم الملف الأصلي، لذا قد يتوقف عن العمل إذا نُقل هذا الملف أو حُذف.</string>
     <string name="edit_keep_this_file">هذا الملف</string>
     <string name="edit_beats_select_layer">حدّد طبقة صوت أو فيديو</string>
     <string name="edit_beats_no_sound">لا يوجد صوت لقراءته</string>

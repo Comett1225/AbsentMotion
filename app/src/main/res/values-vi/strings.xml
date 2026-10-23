@@ -403,6 +403,7 @@
     <string name="export_share_image">Chia sẻ hình ảnh</string>
     <string name="export_share_xml">Chia sẻ XML dự án</string>
     <string name="export_share">Chia sẻ</string>
+    <string name="export_share_too_many">Có quá nhiều ảnh để gửi cùng lúc. Chúng đã được lưu trong %1$s.</string>
     <string name="export_share_audio">Chia sẻ âm thanh</string>
     <string name="export_failed_title">Xuất thất bại</string>
     <string name="export_failed_empty">Chưa có gì để xuất. Hãy thêm lớp hoặc phương tiện rồi thử lại.</string>
@@ -1325,6 +1326,7 @@
     <string name="edit_panel_camera_options">Tùy chọn máy ảnh</string>
     <string name="edit_keep_copying">Đang sao chép “%1$s” vào dự án…</string>
     <string name="edit_keep_no_space">Không đủ dung lượng trống để giữ bản sao của “%1$s” trong dự án. Tệp gốc vẫn được dùng.</string>
+    <string name="edit_keep_failed">Không thể sao chép “%1$s” vào dự án. Dự án vẫn dùng tệp gốc, nên có thể ngừng hoạt động nếu tệp đó bị di chuyển hoặc xóa.</string>
     <string name="edit_keep_this_file">tệp này</string>
     <string name="edit_beats_select_layer">Chọn một lớp âm thanh hoặc video</string>
     <string name="edit_beats_no_sound">Không có âm thanh để đọc</string>

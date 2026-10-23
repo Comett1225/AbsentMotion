@@ -419,6 +419,7 @@
     <string name="export_share_image">Compartilhar imagem</string>
     <string name="export_share_xml">Compartilhar XML do projeto</string>
     <string name="export_share">Compartilhar</string>
+    <string name="export_share_too_many">Há imagens demais para enviar de uma vez. Elas foram salvas em %1$s.</string>
     <string name="export_share_audio">Compartilhar áudio</string>
     <string name="export_failed_title">Falha na exportação</string>
     <string name="export_failed_empty">Ainda não há nada para exportar. Adicione uma camada ou mídia e tente de novo.</string>
@@ -1373,6 +1374,7 @@
     <string name="edit_panel_camera_options">Opções da câmera</string>
     <string name="edit_keep_copying">Copiando “%1$s” para o projeto…</string>
     <string name="edit_keep_no_space">Armazenamento livre insuficiente para manter uma cópia de “%1$s” no projeto. O arquivo original continua sendo usado.</string>
+    <string name="edit_keep_failed">Não foi possível copiar “%1$s” para o projeto. Ele ainda usa o arquivo original, então pode parar de funcionar se esse arquivo for movido ou removido.</string>
     <string name="edit_keep_this_file">este arquivo</string>
     <string name="edit_beats_select_layer">Selecione uma camada de áudio ou vídeo</string>
     <string name="edit_beats_no_sound">Não há som para analisar</string>

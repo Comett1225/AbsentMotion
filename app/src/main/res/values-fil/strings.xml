@@ -411,6 +411,7 @@
     <string name="export_share_image">I-share ang larawan</string>
     <string name="export_share_xml">I-share ang XML ng proyekto</string>
     <string name="export_share">I-share</string>
+    <string name="export_share_too_many">Napakaraming larawan para ipadala nang sabay. Naka-save ang mga ito sa %1$s.</string>
     <string name="export_share_audio">I-share ang audio</string>
     <string name="export_failed_title">Nabigo ang pag-export</string>
     <string name="export_failed_empty">Wala pang ma-i-export. Magdagdag ng layer o media, pagkatapos subukan muli.</string>
@@ -1349,6 +1350,7 @@
     <string name="edit_panel_camera_options">Mga opsyon sa kamera</string>
     <string name="edit_keep_copying">Kinokopya ang “%1$s” sa proyekto…</string>
     <string name="edit_keep_no_space">Kulang ang libreng storage para magtabi ng kopya ng “%1$s” sa proyekto. Ginagamit pa rin nito ang orihinal na file.</string>
+    <string name="edit_keep_failed">Hindi makopya ang “%1$s” sa proyekto. Ginagamit pa rin nito ang orihinal na file, kaya maaaring tumigil ito sa paggana kung ililipat o tatanggalin ang file na iyon.</string>
     <string name="edit_keep_this_file">ang file na ito</string>
     <string name="edit_beats_select_layer">Pumili ng audio o bidyo na layer</string>
     <string name="edit_beats_no_sound">Walang audio na mababasa</string>

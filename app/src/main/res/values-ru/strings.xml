@@ -427,6 +427,7 @@
     <string name="export_share_image">Поделиться изображением</string>
     <string name="export_share_xml">Поделиться XML проекта</string>
     <string name="export_share">Поделиться</string>
+    <string name="export_share_too_many">Слишком много изображений для отправки за один раз. Они сохранены в %1$s.</string>
     <string name="export_share_audio">Поделиться аудио</string>
     <string name="export_failed_title">Не удалось экспортировать</string>
     <string name="export_failed_empty">Экспортировать пока нечего. Добавьте слой или медиа и попробуйте снова.</string>
@@ -1397,6 +1398,7 @@
     <string name="edit_panel_camera_options">Параметры камеры</string>
     <string name="edit_keep_copying">Копирование «%1$s» в проект…</string>
     <string name="edit_keep_no_space">Недостаточно свободного места, чтобы сохранить копию «%1$s» в проекте. Пока используется исходный файл.</string>
+    <string name="edit_keep_failed">Не удалось скопировать «%1$s» в проект. Он всё ещё использует исходный файл, поэтому может перестать работать, если этот файл переместить или удалить.</string>
     <string name="edit_keep_this_file">этот файл</string>
     <string name="edit_beats_select_layer">Выберите аудио- или видеослой</string>
     <string name="edit_beats_no_sound">Нет звука для анализа</string>

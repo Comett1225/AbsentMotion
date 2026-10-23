@@ -412,6 +412,7 @@
     <string name="export_share_image">Share Image</string>
     <string name="export_share_xml">Share Project XML</string>
     <string name="export_share">Share</string>
+    <string name="export_share_too_many">There are too many pictures to send in one go. They are saved in %1$s.</string>
     <string name="export_share_audio">Share Audio</string>
 
     <string name="export_failed_title">Export Failed</string>
@@ -1373,6 +1374,7 @@
     <string name="edit_panel_camera_options">Camera Options</string>
     <string name="edit_keep_copying">Copying “%1$s” into the project…</string>
     <string name="edit_keep_no_space">Not enough free storage to keep a copy of “%1$s” in the project. It still uses the original file.</string>
+    <string name="edit_keep_failed">Could not copy “%1$s” into the project. It still uses the original file, so it may stop working if that file is moved or removed.</string>
     <string name="edit_keep_this_file">this file</string>
     <string name="edit_beats_select_layer">Select an audio or video layer</string>
     <string name="edit_beats_no_sound">There is no sound to read</string>

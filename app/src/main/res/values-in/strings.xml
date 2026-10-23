@@ -403,6 +403,7 @@
     <string name="export_share_image">Bagikan Gambar</string>
     <string name="export_share_xml">Bagikan XML Proyek</string>
     <string name="export_share">Bagikan</string>
+    <string name="export_share_too_many">Terlalu banyak gambar untuk dikirim sekaligus. Gambar disimpan di %1$s.</string>
     <string name="export_share_audio">Bagikan Audio</string>
     <string name="export_failed_title">Ekspor Gagal</string>
     <string name="export_failed_empty">Belum ada yang bisa diekspor. Tambahkan lapisan atau media, lalu coba lagi.</string>
@@ -1325,6 +1326,7 @@
     <string name="edit_panel_camera_options">Opsi Kamera</string>
     <string name="edit_keep_copying">Menyalin “%1$s” ke proyek…</string>
     <string name="edit_keep_no_space">Ruang penyimpanan tidak cukup untuk menyimpan salinan “%1$s” di proyek. File asli tetap digunakan.</string>
+    <string name="edit_keep_failed">Tidak dapat menyalin “%1$s” ke proyek. Proyek masih memakai file asli, jadi bisa berhenti berfungsi jika file itu dipindahkan atau dihapus.</string>
     <string name="edit_keep_this_file">file ini</string>
     <string name="edit_beats_select_layer">Pilih lapisan audio atau video</string>
     <string name="edit_beats_no_sound">Tidak ada suara untuk dibaca</string>
