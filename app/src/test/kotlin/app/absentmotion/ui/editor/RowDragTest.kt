@@ -193,4 +193,17 @@ class RowDragTest {
         assertEquals(0, RowDrag.target(1, -1000f, pitch, 4))
         for (held in 0 until 4) for (to in 0 until 4) assertEquals(to, RowDrag.target(held, RowDrag.follow((to - held) * pitch, 0f, held, 4, pitch), pitch, 4))
     }
+    @Test fun liftingARowNearAnEdgeScrollsOnlyAfterTheFingerMovesTowardThatEdge() {
+        val pitch = 43.5f
+        val viewport = 400f
+        for (row in 0..20) for (scroll in listOf(0f, 300f, 700f)) {
+            val anchor = viewport - pitch / 2 - (row * pitch - scroll)
+            val start = RowDrag.fingerY(-scroll, row, pitch, anchor)
+            assertEquals("row $row", 0f, RowDrag.liftedScroll(start, start, viewport, pitch), 0f)
+            assertTrue("row $row", RowDrag.liftedScroll(start + pitch / 2, start, viewport, pitch) > 0f)
+            val high = RowDrag.fingerY(-scroll, row, pitch, pitch / 2 - (row * pitch - scroll))
+            assertEquals("row $row", 0f, RowDrag.liftedScroll(high, high, viewport, pitch), 0f)
+            assertTrue("row $row", RowDrag.liftedScroll(high - pitch / 2, high, viewport, pitch) < 0f)
+        }
+    }
 }

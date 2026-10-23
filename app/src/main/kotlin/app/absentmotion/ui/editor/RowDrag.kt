@@ -30,6 +30,11 @@ internal object RowDrag {
     fun toward(speed: Float, y: Float, startY: Float, slop: Float): Float =
         if ((speed > 0f && y > startY + slop) || (speed < 0f && y < startY - slop)) speed else 0f
 
+    fun fingerY(top: Float, row: Int, pitch: Float, anchor: Float): Float = top + row * pitch + anchor
+
+    fun liftedScroll(y: Float, startY: Float, viewport: Float, pitch: Float): Float =
+        toward(edgeSpeed(y, 0f, viewport, pitch, pitch, pitch * 10f), y, startY, pitch / 4)
+
     fun fingerRow(y: Float, rowH: Float, viewTop: Float, viewBottom: Float, scroll: Float, count: Int): Int =
         floor((y.coerceIn(viewTop, max(viewTop, viewBottom - 1f)) - viewTop + scroll) / rowH).toInt().coerceIn(0, max(0, count - 1))
 
