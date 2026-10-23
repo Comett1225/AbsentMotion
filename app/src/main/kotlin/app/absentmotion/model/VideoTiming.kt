@@ -192,8 +192,9 @@ fun Scene.trimEndAt(layer: Layer, frame: Int): Layer? =
 fun Scene.splitAt(layer: Layer, frame: Int, newId: Long): Pair<Layer, Layer>? {
     val cut = frameStart(frame)
     if (cut <= layer.startTime || !showsAnyFrame(layer.startTime, cut - 1) || !showsAnyFrame(cut, layer.endTime)) return null
+    val second = layer.nested?.let { layer.copy(node = layer.node.withChild("scene", it.withCopiedLayerIds().node)) } ?: layer
     return layer.trimmedTo(layer.startTime, cut - 1).withoutMotionMarks(MotionSlot.Out) to
-        layer.withId(newId).trimmedTo(cut, layer.endTime).withoutMotionMarks(MotionSlot.In)
+        second.withId(newId).trimmedTo(cut, layer.endTime).withoutMotionMarks(MotionSlot.In)
 }
 
 fun Scene.withSplit(layer: Layer, frame: Int, newId: Long, nextId: () -> Long = Layer::newId): Scene? {
