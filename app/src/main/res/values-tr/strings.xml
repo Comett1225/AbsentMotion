@@ -1181,6 +1181,7 @@
     <string name="ai_sample_rate_changed">Çözme sırasında ses örnekleme hızı değişti</string>
     <string name="ai_recording_too_large">Bu kayıt WAV için çok büyük</string>
     <string name="ai_no_samples_decoded">Hiç ses örneği çözülemedi</string>
+    <string name="ai_sound_not_kept">Bu klibin sesi korunamadığı için hiçbir şey değiştirilmedi.</string>
     <string name="ai_mask_wrong_size">Arka plan kaldırma yanlış boyutta sonuç verdi. Tekrar deneyin.</string>
     <string name="ai_encoder_no_image">Video kodlayıcı bir giriş görüntüsü vermedi</string>
     <string name="ai_encoder_not_responding">Video kodlayıcı yanıt vermeyi durdurdu</string>
@@ -1417,7 +1418,6 @@
     <string name="smooth_nothing">Bu klip proje kare hızı için zaten yeterli kareye sahip. Hareket bulanıklığı seçin veya önce klibi yavaşlatın.</string>
     <string name="smooth_frame">Yumuşatılıyor: %2$s kareden %1$s…</string>
     <string name="smooth_saving">Yumuşak klip kaydediliyor…</string>
-    <string name="smooth_sound_format">Bu klibin sesi korunamayan bir biçim kullanıyor, bu yüzden klip yumuşatılmadı.</string>
     <string name="export_list_or">%1$s veya %2$s</string>
     <string name="export_list_and">%1$s ve %2$s</string>
     <string name="export_reason_container_codecs">%1$s için %2$s video gerekir; bu telefon bunu %3$s değerinde oluşturamaz.</string>

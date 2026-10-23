@@ -1181,6 +1181,7 @@
     <string name="ai_sample_rate_changed">डिकोडिंग के दौरान ऑडियो सैंपल रेट बदल गया</string>
     <string name="ai_recording_too_large">यह रिकॉर्डिंग WAV के लिए बहुत बड़ी है</string>
     <string name="ai_no_samples_decoded">कोई ऑडियो सैंपल डिकोड नहीं हुआ</string>
+    <string name="ai_sound_not_kept">इस क्लिप का साउंड नहीं रखा जा सका, इसलिए कुछ भी नहीं बदला गया।</string>
     <string name="ai_mask_wrong_size">बैकग्राउंड रिमूवल का परिणाम गलत साइज़ का आया। फिर से कोशिश करें।</string>
     <string name="ai_encoder_no_image">वीडियो एनकोडर ने कोई इनपुट इमेज नहीं दी</string>
     <string name="ai_encoder_not_responding">वीडियो एनकोडर ने जवाब देना बंद कर दिया</string>
@@ -1417,7 +1418,6 @@
     <string name="smooth_nothing">इस क्लिप में प्रोजेक्ट फ़्रेम रेट के लिए पर्याप्त फ़्रेम पहले से हैं। मोशन ब्लर चुनें, या पहले क्लिप की स्पीड धीमी करें।</string>
     <string name="smooth_frame">स्मूदिंग: %2$s में से फ़्रेम %1$s…</string>
     <string name="smooth_saving">स्मूद क्लिप सेव की जा रही है…</string>
-    <string name="smooth_sound_format">इस क्लिप की आवाज़ ऐसे फ़ॉर्मेट में है जिसे रखा नहीं जा सकता, इसलिए क्लिप स्मूद नहीं की गई।</string>
     <string name="export_list_or">%1$s या %2$s</string>
     <string name="export_list_and">%1$s और %2$s</string>
     <string name="export_reason_container_codecs">%1$s के लिए %2$s वीडियो चाहिए, जो यह फ़ोन %3$s पर नहीं बना सकता।</string>

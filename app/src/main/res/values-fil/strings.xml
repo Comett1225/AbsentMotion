@@ -1181,6 +1181,7 @@
     <string name="ai_sample_rate_changed">Nagbago ang sample rate ng audio habang nagde-decode</string>
     <string name="ai_recording_too_large">Masyadong malaki ang rekording na ito para sa WAV</string>
     <string name="ai_no_samples_decoded">Walang na-decode na audio sample</string>
+    <string name="ai_sound_not_kept">Hindi maingatan ang tunog ng clip na ito, kaya walang nabago.</string>
     <string name="ai_mask_wrong_size">Nagbigay ng resultang maling sukat ang pag-alis ng background. Subukan muli.</string>
     <string name="ai_encoder_no_image">Walang input image na ibinigay ang video encoder</string>
     <string name="ai_encoder_not_responding">Huminto ang pagtugon ng video encoder</string>
@@ -1417,7 +1418,6 @@
     <string name="smooth_nothing">Sapat na ang frame ng clip na ito para sa frame rate ng proyekto. Pumili ng Motion blur, o pabagalin muna ang clip.</string>
     <string name="smooth_frame">Smoothing: frame %1$s ng %2$s…</string>
     <string name="smooth_saving">Sini-save ang smooth na clip…</string>
-    <string name="smooth_sound_format">Gumagamit ang audio ng clip na ito ng format na hindi maaaring itago, kaya hindi na-smooth ang clip.</string>
     <string name="export_list_or">%1$s o %2$s</string>
     <string name="export_list_and">%1$s at %2$s</string>
     <string name="export_reason_container_codecs">Kailangan ng %1$s ng %2$s na bidyo, na hindi kayang gawin ng teleponong ito sa %3$s.</string>

@@ -51,7 +51,6 @@ import app.absentmotion.library.openableUri
 internal const val MAX_SMOOTH_FRAMES = 20_000
 private const val MAX_SMOOTH_STEPS = 8
 private const val MAX_SMOOTH_SIDE = 1080
-private val KeptSound = setOf(MediaFormat.MIMETYPE_AUDIO_AAC, MediaFormat.MIMETYPE_AUDIO_AMR_NB, MediaFormat.MIMETYPE_AUDIO_AMR_WB, MediaFormat.MIMETYPE_AUDIO_OPUS)
 
 internal data class SmoothPlan(val fps: Int, val frames: Int, val width: Int, val height: Int, val seconds: Double, val blurScale: Float) {
     val bitrate: Int get() = (width.toLong() * height * fps / 5).coerceIn(2_000_000, 120_000_000).toInt()
@@ -113,11 +112,13 @@ internal object ClipSmooth {
         check(file.parentFile!!.usableSpace >= plan.bytes * 2) { AppText.get(R.string.ai_not_enough_storage, (plan.bytes * 2 / 1_000_000).toString()) }
         val scene = smoothScene(fill, media, plan)
         val frames = minOf(plan.frames, frameCount(scene, plan.fps))
-        val sound = soundTrack(context, fill.uri)
         val spanUs = (plan.seconds * 1_000_000).roundToLong()
+        val kept = keepSound(context, fill.uri, media.duration)
+        var sound: Pair<MediaExtractor, Int>? = null
         var success = false
         try {
             progress(0f, AppText.get(R.string.ai_preparing))
+            sound = kept?.let { soundTrack(context, it.uri) }
             encode(engine, scene, plan, file.path, frames, fill.inTime * 1000L, spanUs, smoothing.copy(blurScale = plan.blurScale), sound) { done ->
                 progress(0.98f * done / frames, AppText.get(R.string.smooth_frame, done.toString(), frames.toString()))
             }
@@ -126,6 +127,7 @@ internal object ClipSmooth {
                 "duration" to "$spanUs", "fps" to fpsText(plan.fps.toFloat()))).also { success = true }
         } finally {
             sound?.first?.release()
+            kept?.close()
             if (!success) file.delete()
         }
     }
@@ -136,7 +138,6 @@ internal object ClipSmooth {
             extractor.setDataSource(context, openableUri(uri).toUri(), null)
             val track = (0 until extractor.trackCount).firstOrNull { extractor.getTrackFormat(it).getString(MediaFormat.KEY_MIME)?.startsWith("audio/") == true }
                 ?: return null.also { extractor.release() }
-            check(extractor.getTrackFormat(track).getString(MediaFormat.KEY_MIME) in KeptSound) { AppText.get(R.string.smooth_sound_format) }
             extractor.selectTrack(track)
             return extractor to track
         } catch (t: Throwable) {

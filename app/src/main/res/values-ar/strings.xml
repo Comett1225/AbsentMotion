@@ -1277,6 +1277,7 @@
     <string name="ai_sample_rate_changed">تغيّر معدل عينات الصوت أثناء فك الترميز</string>
     <string name="ai_recording_too_large">هذا التسجيل كبير جدًا لصيغة WAV</string>
     <string name="ai_no_samples_decoded">لم يتم فك ترميز أي عينات صوتية</string>
+    <string name="ai_sound_not_kept">تعذر الاحتفاظ بصوت هذا المقطع، لذا لم يتم تغيير أي شيء.</string>
     <string name="ai_mask_wrong_size">أعطت إزالة الخلفية نتيجة بحجم غير صحيح. حاول مرة أخرى.</string>
     <string name="ai_encoder_no_image">لم يوفر مُرمّز الفيديو صورة إدخال</string>
     <string name="ai_encoder_not_responding">توقف مُرمّز الفيديو عن الاستجابة</string>
@@ -1513,7 +1514,6 @@
     <string name="smooth_nothing">هذا المقطع لديه بالفعل إطارات كافية لمعدل إطارات المشروع. اختر ضبابية الحركة، أو أبطئ المقطع أولًا.</string>
     <string name="smooth_frame">التنعيم: الإطار %1$s من %2$s…</string>
     <string name="smooth_saving">جارٍ حفظ المقطع المنعّم…</string>
-    <string name="smooth_sound_format">يستخدم صوت هذا المقطع صيغة لا يمكن الاحتفاظ بها، لذا لم يتم تنعيم المقطع.</string>
     <string name="export_list_or">‏%1$s أو %2$s</string>
     <string name="export_list_and">‏%1$s و%2$s</string>
     <string name="export_reason_container_codecs">يحتاج %1$s إلى فيديو %2$s، وهذا الهاتف لا يستطيع إنتاجه بدقة %3$s.</string>

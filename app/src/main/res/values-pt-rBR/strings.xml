@@ -1205,6 +1205,7 @@
     <string name="ai_sample_rate_changed">A taxa de amostragem do áudio mudou durante a decodificação</string>
     <string name="ai_recording_too_large">Esta gravação é grande demais para WAV</string>
     <string name="ai_no_samples_decoded">Nenhuma amostra de áudio foi decodificada</string>
+    <string name="ai_sound_not_kept">Não foi possível manter o som deste clipe, então nada foi alterado.</string>
     <string name="ai_mask_wrong_size">A remoção de fundo retornou um resultado com tamanho errado. Tente de novo.</string>
     <string name="ai_encoder_no_image">O codificador de vídeo não forneceu imagem de entrada</string>
     <string name="ai_encoder_not_responding">O codificador de vídeo parou de responder</string>
@@ -1441,7 +1442,6 @@
     <string name="smooth_nothing">Este clipe já tem quadros suficientes para a taxa de quadros do projeto. Escolha Desfoque de movimento ou diminua a velocidade do clipe primeiro.</string>
     <string name="smooth_frame">Suavização: quadro %1$s de %2$s…</string>
     <string name="smooth_saving">Salvando o clipe suavizado…</string>
-    <string name="smooth_sound_format">O som deste clipe usa um formato que não pode ser mantido, então o clipe não foi suavizado.</string>
     <string name="export_list_or">%1$s ou %2$s</string>
     <string name="export_list_and">%1$s e %2$s</string>
     <string name="export_reason_container_codecs">%1$s precisa de vídeo %2$s, que este celular não consegue gerar em %3$s.</string>
