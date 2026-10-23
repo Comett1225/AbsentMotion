@@ -41,8 +41,9 @@ remaining-contract|python3 tools/remaining_contract_check.py|update the contract
 tool-regressions|python3 tools/bug_regression_check.py|the tool scripts regressed
 tier|python3 tools/compat/tier_check.py|gate the feature with Tier.has or Tier.choice (app/src/main/kotlin/app/absentmotion/Tier.kt)"
 
-printf '== Native audio effects: host build and tests\n'
+printf '== Native audio effects and text animation: host build and tests\n'
 sh tools/audio_dsp.sh --lib >"$dir/audio-dsp.log" 2>&1 || { tail -n 15 "$dir/audio-dsp.log" >&2; fail "the audio DSP host tests"; }
+sh tools/textanim.sh >"$dir/textanim.log" 2>&1 || { tail -n 15 "$dir/textanim.log" >&2; fail "the text animation host tests"; }
 
 printf '\n== Static checks (in parallel)\n'
 while IFS='|' read -r name command hint; do

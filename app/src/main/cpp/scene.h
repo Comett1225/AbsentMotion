@@ -9,6 +9,7 @@
 #include <memory>
 
 #include "easing.h"
+#include "frames.h"
 #include "xml.h"
 #include "include/core/SkM44.h"
 #include "include/core/SkBlendMode.h"
@@ -165,7 +166,7 @@ struct Layer {
         if (steps.empty() || endTime <= startTime) return timeMs;
         const float fps = steps.get(0, (float)((timeMs - startTime) / (endTime - startTime)), 0);
         if (!(fps > 0)) return timeMs;
-        return startTime + std::floor((timeMs - startTime) * fps / 1000 + 1e-4) * 1000 / fps;
+        return HeldMs(timeMs, startTime, fps);
     }
     float localTime(double timeMs) const {
         return endTime > startTime ? (float)((steppedMs(timeMs) - startTime) / (endTime - startTime)) : 0.0f;

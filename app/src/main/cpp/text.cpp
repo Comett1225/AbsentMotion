@@ -336,7 +336,9 @@ uint64_t Seed(const Layer& l, const LayerEffect& e, float t) {
 }
 
 std::string Shown(const Layer& l, float t, int fps, std::string text, bool* tabular) {
-    const double local = t * std::max(0, l.endTime - l.startTime) / 1000.0;
+    const double begin = textanim::FrameMs(l.startTime, fps);
+    const double now = textanim::FrameMs(l.startTime + (double)t * std::max(0, l.endTime - l.startTime), fps);
+    const double local = (now - (std::floor(begin) == l.startTime ? begin : l.startTime)) / 1000.0;
     for (const LayerEffect& e : l.effects) {
         if (e.hidden) continue;
         if (e.id == "absent.countupdown") {
@@ -344,7 +346,7 @@ std::string Shown(const Layer& l, float t, int fps, std::string text, bool* tabu
                                           Choice(e, "separator", t, 0, 3));
             *tabular = true;
         } else if (e.id == "absent.timecode") {
-            const double clock = Choice(e, "source", t, 0, 1) == 1 ? l.startTime / 1000.0 + local : local;
+            const double clock = Choice(e, "source", t, 0, 1) == 1 ? now / 1000.0 : local;
             text = textanim::FormatTimecode(clock * e.value("speed", t, 1) + e.value("offset", t, 0), fps, Choice(e, "format", t, 0, 5));
             *tabular = true;
         } else if (e.id == "absent.textrandomizer") {
@@ -517,10 +519,22 @@ void Apply(const Layer& l, float t, const textanim::Segments& seg, std::vector<G
     }
 }
 
+std::vector<int> WordBreaks(const std::string& text) {
+    std::vector<int> out;
+    const std::vector<uint32_t> points = textanim::CodePoints(text);
+    if (std::none_of(points.begin(), points.end(), textanim::Spaceless)) return out;
+    std::vector<SkUnicode::Position> found;
+    const sk_sp<SkUnicode> unicode = SkUnicodes::ICU::Make();
+    if (unicode && unicode->getUtf8Words(text.data(), (int)text.size(), "th", &found)) {
+        for (const SkUnicode::Position p : found) out.push_back((int)p);
+    }
+    return out;
+}
+
 std::vector<Glyph> Animate(const Layer& l, float t, int fps) {
     std::string shown;
     std::vector<Glyph> glyphs = Collect(Pieces(*l.text, l, t, fps, &shown));
-    Apply(l, t, textanim::Split(shown), &glyphs);
+    Apply(l, t, textanim::Split(shown, WordBreaks(shown)), &glyphs);
     return glyphs;
 }
 

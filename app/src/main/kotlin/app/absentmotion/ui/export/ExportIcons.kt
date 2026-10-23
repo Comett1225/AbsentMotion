@@ -34,8 +34,8 @@ internal object ExportIcons {
     val Pause = filled("Pause", 12f, 16f, "M8.5 0.35L11.05 0.35A0.85 0.85 0 0 1 11.9 1.2L11.9 14.8A0.85 0.85 0 0 1 11.05 15.65L8.5 15.65A0.85 0.85 0 0 1 7.65 14.8L7.65 1.2" +
             "A0.85 0.85 0 0 1 8.5 0.35ZM0.85 0.35L3.4 0.35A0.85 0.85 0 0 1 4.25 1.2L4.25 14.8A0.85 0.85 0 0 1 3.4 15.65L0.85 15.65A0.85 0.85 0 0 1 0 14.8L0 1.2" +
             "A0.85 0.85 0 0 1 0.85 0.35Z")
-    val Prev = stroked("Prev", 11f, 19f, 11f, 19f, "M9 2L2 9.5L9 17", 1.6f)
-    val Next = stroked("Next", 11f, 19f, 11f, 19f, "M2 2L9 9.5L2 17", 1.6f)
+    val Prev = stroked("Prev", 11f, 19f, 11f, 19f, "M9 2L2 9.5L9 17", 1.6f, mirror = true)
+    val Next = stroked("Next", 11f, 19f, 11f, 19f, "M2 2L9 9.5L2 17", 1.6f, mirror = true)
     val Share = stroked("Share", 20f, 20f, 24f, 24f, "M21 13L21 19A2 2 0 0 1 19 21L5 21A2 2 0 0 1 3 19L3 5A2 2 0 0 1 5 3L11 3M21 3L12 12M15 3L21 3L21 9", 1.8f)
 
     private fun filled(name: String, w: Float, h: Float, vararg paths: String): ImageVector =

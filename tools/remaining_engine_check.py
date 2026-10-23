@@ -70,6 +70,8 @@ def cases():
     grey = lambda effect: engine.scene(engine.rect(1, 100, 100, 100, 100, 0xff737373, extra=effect))
     yield 'dark glow leaves a grey brighter than its threshold alone', grey(fx('darkglow', blur=40, threshold=0.3, blend=0.25, alpha=0.75)), [((100, 100), (115, 115, 115))]
     yield 'light glow adds nothing to a grey darker than its threshold', grey(fx('lightglow', blur=24, threshold=0.6, intensity=1, opacity=1)), [((100, 100), (115, 115, 115))]
+    yield 'glitch keeps a small layer inside its box', engine.scene(engine.rect(1, 100, 100, 20, 20, 0xffff0000, extra=fx('glitch', intensity=1))), \
+        [((5, 100), engine.BLACK), ((195, 100), engine.BLACK), ((100, 5), engine.BLACK), ((100, 195), engine.BLACK)]
     flat = engine.rect(1, 100, 100, 100, 100, 0x94888888, extra=fx('unsharpmask', radius=2, amount=0.5, threshold=0.5))
     yield 'unsharp mask leaves a flat see-through grey alone', engine.scene(flat), [((100, 100), (79, 79, 79))]
     pushed = lambda edges: engine.scene(engine.rect(1, 175, 100, 25, 100, opacity=0.0) + engine.rect(2, 100, 100, 100, 100, 0xff00ff00, extra=(
@@ -194,6 +196,7 @@ def motion_cases():
     trail = [((130, 100), red), ((100, 100), red), ((70, 100), red), ((115, 100), black)]
     yield 'echo count', engine.scene(echo), trail, 24
     yield 'time quantization', engine.scene(keyed(1, 50, 150, fx('timequant', fps=2))), [((100, 100), red), ((117, 100), black)], 20
+    yield 'frame rate 15 holds each pose for two frames at 30 fps', engine.scene(keyed(1, 50, 150, fx('timequant', fps=15))), [((63, 100), red), ((43, 100), black)], 2
     cyan, green = (0, 255, 255), (0, 255, 0)
     family = lambda shared, own='': (engine.rect(5, 50, 100, 15, 15, 0xffff0000, extra=shared) + engine.rect(6, 100, 0, 15, 15, 0xffff0000, extra=own, attrs=' parent="5"')
                                      + engine.rect(7, 0, 50, 15, 15, 0xffff0000, attrs=' parent="6"'))
@@ -303,6 +306,17 @@ def main():
             ok = ok and abs(moved[0][1] - moved[0][0]) < 1
         print(('ok   ' if ok else 'FAIL ') + effect + ' is steady for a seed and changes with it: ' + str(moved), flush=True)
         failed += not ok
+    steps = [engine.still(f'jitter{frame}', engine.scene(engine.rect(1, 100, 100, 10, 10, 0xffff0000, extra=fx('randomjitter', angle=0, magnitude=40, frequency=30))), work, frame)
+             for frame in range(4)]
+    ok = all(not np.array_equal(steps[k], steps[k + 1]) for k in range(3))
+    print(('ok   ' if ok else 'FAIL ') + 'a 30 Hz random jitter moves on every frame at 30 fps', flush=True)
+    failed += not ok
+    noise = lambda frame: engine.still(f'static{frame}', engine.scene(engine.rect(1, 100, 100, 100, 100, 0xff808080, extra=fx('static', amount=1, grain=1))).replace(
+        'totalTime="1000"', 'totalTime="99000"').replace('endTime="1000"', 'endTime="99000"'), work, frame)[:, :, 0].astype(float)
+    rough = [np.abs(np.diff(noise(frame), axis=0)).mean() for frame in (30, 1800)]
+    ok = rough[1] > 0.8 * rough[0]
+    print(('ok   ' if ok else 'FAIL ') + f'static is still noise after a minute: row change {rough[1]:.1f} against {rough[0]:.1f} at 1 s', flush=True)
+    failed += not ok
     still = [engine.still(f'displace{frame}', engine.scene(engine.rect(1, 100, 100, 10, 10, 0xffff0000, extra=fx('randomdisplace', magnitude=60, evolution=0.4, speed=0))), work, frame) for frame in (3, 27)]
     roaming = [engine.still(f'roam{frame}', engine.scene(engine.rect(1, 100, 100, 10, 10, 0xffff0000, extra=fx('randomdisplace', magnitude=60, evolution=0.4))), work, frame) for frame in (3, 27)]
     keyed = '<effect id="absent.randomdisplace"><property name="magnitude" type="float" value="60"/><property name="evolution" type="float"><kf t="0" v="0"/><kf t="1" v="3"/></property></effect>'

@@ -54,7 +54,7 @@ float4 shade(float4 c, float3 n, float3 v) {
     float3 l = normalize(float3(cos(a), -sin(a), -1.2));
     float k = 1.0 - shading + shading * (0.3 + 0.85 * max(dot(n, l), 0.0));
     float s = shine * pow(max(dot(n, normalize(l + v)), 0.0), 40.0);
-    return float4(c.rgb * k + s * c.a, c.a);
+    return float4(min(c.rgb * k + s * c.a, float3(c.a)), c.a);
 }
 """
 
