@@ -16,6 +16,21 @@ class XmlNodeTest {
         ),
     ).toXml()
 
+    @Test fun editingAKeyframedValueKeepsEveryAttributeOfTheOtherKeyframes() {
+        val property = XmlNode.parse(
+            "<location lock=\"yes\"><kf t=\"0.000000\" v=\"1,2,3\" x-note=\"first\" e=\"linear\"/><kf t=\"1.000000\" v=\"4,5,6\" x-note=\"last\"/></location>",
+        )
+        val moved = property.withValueAt(1f, "7,8,9", 1f..1f)
+        assertEquals("yes", moved["lock"])
+        assertEquals(listOf("first", "last"), moved.children.map { it["x-note"] })
+        assertEquals("7,8,9", moved.keyframes.last().v)
+        assertEquals(mapOf("x-note" to "first"), moved.keyframes.first().extra)
+        assertEquals("linear", moved.keyframes.first().e)
+        val added = property.withValueAt(0.5f, "2,3,4", 0.5f..0.5f)
+        assertEquals(listOf("first", null, "last"), added.children.map { it["x-note"] })
+        assertEquals(listOf("first", "last"), property.withKeyframeToggled(0.5f, 0.5f..0.5f).children.map { it["x-note"] }.filterNotNull())
+    }
+
     @Test fun aCompleteDocumentParsesBackToTheSameTree() {
         assertEquals(document, XmlNode.parse(document).toXml())
     }
