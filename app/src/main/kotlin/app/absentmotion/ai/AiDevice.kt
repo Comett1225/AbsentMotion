@@ -82,17 +82,32 @@ private const val GPU_OK = "ok"
 private const val GPU_USE = "use"
 private const val GPU_FAILED = "failed"
 private const val GPU_RUNNING = "running"
+private const val GPU_AWAY = "~"
 
 internal class GpuMark(private val token: String, private val read: () -> String?, private val write: (String?) -> Unit) {
     private var open = 0
+    private var away = false
 
-    @Synchronized fun begin() { if (open++ == 0) write(token) }
+    private fun record() = if (away) token + GPU_AWAY else token
+
+    @Synchronized fun begin() { if (open++ == 0) write(record()) }
 
     @Synchronized fun end() { if (open > 0 && --open == 0) write(null) }
 
-    @Synchronized fun diedBefore(): String? = read()?.takeIf { it != token }
+    @Synchronized fun seen(foreground: Boolean) {
+        if (away == !foreground) return
+        away = !foreground
+        if (open > 0) write(record())
+    }
 
-    @Synchronized fun forgive() { if (read() != token) write(null) }
+    @Synchronized fun crashed() {
+        if (open > 0) write(null)
+        open = 0
+    }
+
+    @Synchronized fun diedBefore(): String? = read()?.takeIf { !it.startsWith(token) }
+
+    @Synchronized fun forgive() { if (read()?.startsWith(token) != true) write(null) }
 }
 
 private val BenignDeaths = setOf(
@@ -102,7 +117,11 @@ private val BenignDeaths = setOf(
     ApplicationExitInfo.REASON_PACKAGE_UPDATED,
 )
 
-internal fun gpuDeathBlamed(reason: Int?): Boolean = reason == null || reason !in BenignDeaths
+internal fun gpuDeathBlamed(reason: Int?, foreground: Boolean = true): Boolean = if (reason == null) foreground else reason !in BenignDeaths
+
+internal fun gpuRecordAway(record: String): Boolean = record.endsWith(GPU_AWAY)
+
+internal fun gpuRecordToken(record: String): String = record.removeSuffix(GPU_AWAY)
 
 internal object AiDevice {
     private val rates = ConcurrentHashMap<Pair<AiModel, Boolean>, Double>()
@@ -118,13 +137,26 @@ internal object AiDevice {
             GpuMark("${Process.myPid()}:${UUID.randomUUID()}", { prefs.getString(GPU_RUNNING, null) }) {
                 prefs.edit().apply { if (it == null) remove(GPU_RUNNING) else putString(GPU_RUNNING, it) }.commit()
             }
-        }.also { mark = it }
+        }.also { created ->
+            val previous = Thread.getDefaultUncaughtExceptionHandler()
+            Thread.setDefaultUncaughtExceptionHandler { thread, error ->
+                runCatching { created.crashed() }
+                previous?.uncaughtException(thread, error)
+            }
+            mark = created
+        }
     }
 
     fun recover(context: Context) {
         val mark = mark(context)
-        val died = mark.diedBefore() ?: return
-        if (gpuDeathBlamed(exitReason(context, died))) gpuFailed(context) else mark.forgive()
+        val record = mark.diedBefore() ?: return
+        if (gpuDeathBlamed(exitReason(context, gpuRecordToken(record)), !gpuRecordAway(record))) gpuFailed(context) else mark.forgive()
+    }
+
+    fun gpuAlive(context: Context) {
+        val info = ActivityManager.RunningAppProcessInfo()
+        ActivityManager.getMyMemoryState(info)
+        mark(context).seen(info.importance <= ActivityManager.RunningAppProcessInfo.IMPORTANCE_VISIBLE)
     }
 
     private fun exitReason(context: Context, token: String): Int? {

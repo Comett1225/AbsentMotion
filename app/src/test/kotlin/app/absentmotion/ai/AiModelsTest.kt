@@ -203,6 +203,62 @@ class AiModelsTest {
         assertEquals("1235:new", stored)
     }
 
+    @Test fun aJobLastSeenInTheBackgroundLeavesAnAwayMark() {
+        var stored: String? = null
+        val first = GpuMark("1:a", { stored }) { stored = it }
+        first.seen(false)
+        assertNull(stored)
+        first.begin()
+        assertEquals("1:a~", stored)
+        first.seen(true)
+        assertEquals("1:a", stored)
+        first.seen(false)
+        first.seen(false)
+        assertEquals("1:a~", stored)
+        val next = GpuMark("2:b", { stored }) { stored = it }
+        val record = next.diedBefore()!!
+        assertEquals("1:a~", record)
+        assertTrue(gpuRecordAway(record))
+        assertEquals("1:a", gpuRecordToken(record))
+        assertFalse(gpuRecordAway("1:a"))
+        assertEquals("1:a", gpuRecordToken("1:a"))
+        first.end()
+        assertNull(stored)
+    }
+
+    @Test fun theRunningProcessNeverTakesItsOwnMarkForADeath() {
+        var stored: String? = null
+        val mark = GpuMark("7:x", { stored }) { stored = it }
+        mark.begin()
+        mark.seen(false)
+        assertNull(mark.diedBefore())
+        mark.forgive()
+        assertEquals("7:x~", stored)
+    }
+
+    @Test fun aJavaCrashLeavesNoMarkForTheGpuToBeBlamed() {
+        var stored: String? = null
+        val mark = GpuMark("7:x", { stored }) { stored = it }
+        mark.begin()
+        mark.crashed()
+        assertNull(stored)
+        assertNull(GpuMark("8:y", { stored }) { stored = it }.diedBefore())
+        mark.end()
+        mark.begin()
+        assertEquals("7:x", stored)
+        stored = "6:old"
+        GpuMark("9:z", { stored }) { stored = it }.crashed()
+        assertEquals("6:old", stored)
+    }
+
+    @Test fun aDeathWithoutAReasonBlamesTheGpuOnlyWhenTheAppWasOnScreen() {
+        assertTrue(gpuDeathBlamed(null, true))
+        assertFalse(gpuDeathBlamed(null, false))
+        assertTrue(gpuDeathBlamed(ApplicationExitInfo.REASON_CRASH_NATIVE, false))
+        assertTrue(gpuDeathBlamed(ApplicationExitInfo.REASON_ANR, false))
+        assertFalse(gpuDeathBlamed(ApplicationExitInfo.REASON_LOW_MEMORY, true))
+    }
+
     @Test fun onlyADeathThatLooksLikeACrashBlamesTheGpu() {
         assertTrue(gpuDeathBlamed(null))
         for (reason in listOf(ApplicationExitInfo.REASON_CRASH_NATIVE, ApplicationExitInfo.REASON_CRASH, ApplicationExitInfo.REASON_ANR,
