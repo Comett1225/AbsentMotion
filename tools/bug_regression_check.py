@@ -98,6 +98,17 @@ class ToolRegressions(unittest.TestCase):
                 self.assertEqual(0, result.returncode, result.stderr)
                 self.assertIn('30 frames in 2.0 s', result.stdout)
 
+    def test_comment_check_fails_when_git_cannot_list_the_files(self):
+        with tempfile.TemporaryDirectory() as folder:
+            fake = Path(folder) / 'git'
+            env = dict(os.environ, PATH=folder + os.pathsep + os.environ['PATH'])
+            for script, message in [('#!/bin/sh\nexit 128\n', 'no file was checked'), ('#!/bin/sh\nexit 0\n', 'nothing was checked')]:
+                fake.write_text(script)
+                fake.chmod(0o755)
+                result = subprocess.run([sys.executable, str(ROOT / 'tools/comment_check.py')], env=env, capture_output=True, text=True)
+                self.assertNotEqual(0, result.returncode)
+                self.assertIn(message, result.stderr)
+
     def test_python_policy_rejects_docstrings_but_allows_data_strings(self):
         scanner = ROOT / 'tools/source_policy.py'
         self.assertTrue(scanner.exists())

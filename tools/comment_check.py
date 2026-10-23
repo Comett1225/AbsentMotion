@@ -13,10 +13,18 @@ HASH = {".sh", ".yml"}
 SKIP_DIRS = ("third_party/", "gradlew", "gradle/wrapper/", "app/src/main/assets/licenses.txt")
 
 
+def listed(*args):
+    run = subprocess.run(["git", "-C", str(ROOT), "ls-files", *args], capture_output=True, text=True)
+    if run.returncode:
+        sys.exit("comment_check: git ls-files " + " ".join(args) + " failed, so no file was checked: " + run.stderr.strip())
+    return run.stdout.split("\n")
+
+
 def tracked():
-    names = subprocess.run(["git", "-C", str(ROOT), "ls-files"], capture_output=True, text=True).stdout.split("\n")
-    others = subprocess.run(["git", "-C", str(ROOT), "ls-files", "--others", "--exclude-standard"], capture_output=True, text=True).stdout.split("\n")
-    return sorted({n for n in names + others if n and not n.startswith(SKIP_DIRS)})
+    found = sorted({n for n in listed() + listed("--others", "--exclude-standard") if n and not n.startswith(SKIP_DIRS)})
+    if not found:
+        sys.exit("comment_check: git listed no files, so nothing was checked")
+    return found
 
 
 def c_comments(text):
