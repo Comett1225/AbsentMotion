@@ -1,6 +1,9 @@
 package app.absentmotion.model
 
-fun copyLayers(layers: List<Layer>, startTime: Int? = null, preserveOutsideParents: Boolean = false, newId: () -> Long = Layer::newId): List<Layer> {
+fun copyLayers(
+    layers: List<Layer>, startTime: Int? = null, preserveOutsideParents: Boolean = false,
+    move: (Layer, Int) -> Layer = { layer, start -> layer.movedTo(start) }, newId: () -> Long = Layer::newId,
+): List<Layer> {
     val ids = mutableMapOf<Long, Long>()
     fun collect(node: XmlNode) {
         if (node.name in Scene.LAYER_TAGS) node["id"]?.toLongOrNull()?.let { ids.getOrPut(it, newId) }
@@ -17,7 +20,7 @@ fun copyLayers(layers: List<Layer>, startTime: Int? = null, preserveOutsideParen
         return result.copy(children = node.children.map(::remap))
     }
     val shift = if (startTime == null || layers.isEmpty()) 0 else startTime - layers.minOf { it.startTime }
-    return layers.map { Layer(remap(it.node)).movedTo(it.startTime + shift) }
+    return layers.map { move(Layer(remap(it.node)), it.startTime + shift) }
 }
 
 internal fun Scene.withCopiedLayerIds(): Scene {

@@ -786,7 +786,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
         showSnap(target.snap, target.snap ?: target.frame)
         moveSlide = if (target.snap != null || wanted <= 0f) 0f else (wanted - start) * pxPerMs
         val id = original.id
-        if (scene.layer(id)?.startTime != start) state.edit(MOVE_EDIT) { it.update(id) { l -> l.movedTo(start) } }
+        if (scene.layer(id)?.startTime != start) state.edit(MOVE_EDIT) { it.update(id) { _ -> it.movedClip(original, start) } }
     }
 
     private fun dropMove(commit: Boolean) {

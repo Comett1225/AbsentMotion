@@ -370,7 +370,7 @@ fun EditorState.alignClipTimes(mode: Int) {
             else -> first + (lastStart - first).toLong().times(index).div(layers.lastIndex).toInt()
         }
     }.toMap()
-    edit { s -> layers.fold(s) { acc, layer -> acc.update(layer.id) { it.movedTo(starts.getValue(layer.id)) } } }
+    edit { s -> layers.fold(s) { acc, layer -> acc.update(layer.id) { acc.movedClip(it, starts.getValue(layer.id), keepEnd = mode == 2) } } }
 }
 
 fun EditorState.moveClipEdges(end: Boolean, extend: Boolean) {
@@ -382,7 +382,7 @@ internal fun Scene.withClipEdgesAt(ids: List<Long>, frame: Int, end: Boolean, ex
     val target = if (end && extend) frameEnd(frame) else frameStart(frame)
     return ids.fold(this) { acc, id ->
         acc.update(id) {
-            if (!extend) it.movedTo(if (end) target - (it.endTime - it.startTime) else target)
+            if (!extend) movedClip(it, if (end) target - (it.endTime - it.startTime) else target, keepEnd = end)
             else if (end && target > it.endTime && showsAnyFrame(it.startTime, target)) it.trimmedTo(it.startTime, target, mediaLengthMs(it))
             else if (!end && target < it.startTime && showsAnyFrame(target, it.endTime)) it.trimmedTo(target, it.endTime, mediaLengthMs(it))
             else it

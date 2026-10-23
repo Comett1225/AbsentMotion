@@ -276,7 +276,7 @@ fun EditorState.deleteChosen() {
 }
 
 fun EditorState.pasteLayer() {
-    val copies = copyLayers(copiedLayers, timeMs)
+    val copies = copyLayers(copiedLayers, timeMs, move = scene::movedClip)
     if (copies.isEmpty()) return
     val wanted = copies.flatMap { it.node.mediaUris() }.toSet()
     edit { s -> copies.fold(copiedMedia.filter { it.uri in wanted }.fold(s) { acc, media -> acc.withMedia(media) }) { acc, layer -> acc.add(layer) } }

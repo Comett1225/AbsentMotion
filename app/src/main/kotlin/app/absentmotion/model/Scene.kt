@@ -66,6 +66,17 @@ value class Scene(val node: XmlNode) {
     fun showsAnyFrame(start: Int, end: Int): Boolean = firstShownFrame(start) <= lastShownFrame(end)
     val lastFrame: Int get() = frameAt(totalTime)
 
+    fun drawnFrames(start: Int, end: Int): Int = (frameAt(end) - frameAt(start - 1)).coerceAtLeast(0)
+
+    fun movedClip(layer: Layer, start: Int, keepEnd: Boolean = false): Layer {
+        val moved = layer.movedTo(start)
+        val count = drawnFrames(layer.startTime, layer.endTime)
+        if (count == 0 || minOf(start, layer.startTime) < 0 || drawnFrames(moved.startTime, moved.endTime) == count) return moved
+        val from = if (keepEnd) frameStart(frameAt(moved.endTime) - count + 1) else start
+        val to = if (keepEnd) moved.endTime else frameStart(frameAt(start - 1) + 1 + count) - 1
+        return if (from < 0) moved else moved.copy(node = moved.node.with("startTime", "$from").with("endTime", "$to"))
+    }
+
     fun withTitle(title: String) = Scene(node.with("title", title))
 
     fun withSettings(width: Int, height: Int, fps: Int, bgColor: Int) = Scene(
