@@ -239,6 +239,16 @@ void testDelay() {
     std::printf("PASS Delay integer/fractional impulse timing and ping-pong\n");
 }
 
+void testDelayWrap() {
+    dsp::detail::StereoBuffer buffer;
+    buffer.prepare(38402);
+    buffer.write(0.25, -0.75);
+    buffer.position = 200;
+    const double delay = std::nextafter(200.0, 300.0);
+    require(buffer.read(delay, 0) == 0.25 && buffer.read(delay, 1) == -0.75, "Delay read past the end of its buffer");
+    std::printf("PASS Delay read just behind the write position stays inside the buffer\n");
+}
+
 void testCompressor() {
     for (float ratio : {1.0f, 2.0f, 4.0f, 20.0f}) {
         dsp::Compressor compressor;
@@ -543,6 +553,7 @@ int main() {
         testFlatSlope();
         testReverb();
         testDelay();
+        testDelayWrap();
         testCompressor();
         testGate();
         testLimiter();
