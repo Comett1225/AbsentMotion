@@ -13,7 +13,7 @@ internal fun MutableMap<Long, LayerStream>.dropFailed() {
     values.removeAll { stream -> stream.failed.also { if (it) stream.close() } }
 }
 
-internal class LayerStream(val uri: String, startMs: Double, private val open: () -> PcmSource) {
+internal class LayerStream(val uri: String, startMs: Double, val loopMs: Double? = null, private val open: () -> PcmSource) {
     private val lock = ReentrantLock()
     private val changed = lock.newCondition()
     private var ring = ShortArray(0)
@@ -25,6 +25,9 @@ internal class LayerStream(val uri: String, startMs: Double, private val open: (
     private var eof = false
     private var seekGen = 1
     private var seekMs = startMs
+    private var head = ShortArray(0)
+    private var headStart = 0L
+    private var headEnd = 0L
 
     @Volatile var durationUs = -1L
         private set
@@ -43,6 +46,7 @@ internal class LayerStream(val uri: String, startMs: Double, private val open: (
         try {
             decoder = open()
             durationUs = decoder.durationUs
+            loopMs?.let { readHead(decoder, it) }
             var handled = 0
             var target = 0.0
             var placed = true
@@ -72,6 +76,27 @@ internal class LayerStream(val uri: String, startMs: Double, private val open: (
         } finally {
             decoder?.close()
         }
+    }
+
+    private fun readHead(decoder: PcmSource, loopMs: Double) {
+        val fromMs = maxOf(0.0, loopMs - LEAD_MS)
+        decoder.seek((fromMs * 1000).toLong())
+        var buf = ShortArray(0)
+        var start = -1L
+        var end = 0L
+        while (!closed) {
+            val c = decoder.next() ?: break
+            if (start < 0) { start = Math.round(fromMs * c.rate / 1000.0); end = start; buf = ShortArray(2 * c.rate * HEAD_MS / 1000) }
+            val capacity = start + buf.size / 2
+            val a = (c.ptsUs * c.rate + 500_000L) / 1_000_000L
+            if (a > end) end = minOf(a, capacity)
+            val skip = (end - a).coerceIn(0L, c.frames.toLong()).toInt()
+            val n = minOf(c.frames - skip, (capacity - end).toInt())
+            System.arraycopy(c.pcm, 2 * skip, buf, (2 * (end - start)).toInt(), 2 * n)
+            end += n
+            if (end >= capacity) break
+        }
+        if (start >= 0) lock.withLock { head = buf; headStart = start; headEnd = end }
     }
 
     private fun place(sourceRate: Int, targetMs: Double) {
@@ -133,11 +158,21 @@ internal class LayerStream(val uri: String, startMs: Double, private val open: (
         changed.signalAll()
     }
 
+    private fun holds(lo: Long, hi: Long): Boolean = (lo >= startAbs && (hi <= endAbs || eof)) || (lo >= headStart && hi <= headEnd)
+
     private fun covers(lo: Long, hi: Long): Boolean {
         val r = rate
-        if (r == 0 || !valid) return false
+        if (r == 0) return false
         val from = maxOf(lo, 0L)
-        if (from >= startAbs && (hi <= endAbs || eof)) return true
+        val ringEnd = if (eof) Long.MAX_VALUE else endAbs
+        if (valid && from >= startAbs && hi <= ringEnd) return true
+        if (from >= headStart && from < headEnd) {
+            val next = maxOf(headEnd - 256, 0L)
+            if (valid && startAbs <= next && hi <= ringEnd) return true
+            if (if (valid) startAbs > next || endAbs < next else seekMs != next * 1000.0 / r) request(next * 1000.0 / r)
+            return hi <= headEnd
+        }
+        if (!valid) return false
         if (from < startAbs || from > endAbs + r) request((from - 256) * 1000.0 / r)
         return false
     }
@@ -168,7 +203,7 @@ internal class LayerStream(val uri: String, startMs: Double, private val open: (
             changed.signalAll()
             if (!covers(voice.base, voice.last)) return@withLock false
             copyWindow(voice.base, voice.size, voice.win)
-            if (voice.jump && voice.ghostBase >= startAbs && voice.ghostBase + voice.ghostSize <= endAbs) {
+            if (voice.jump && holds(voice.ghostBase, voice.ghostBase + voice.ghostSize)) {
                 copyWindow(voice.ghostBase, voice.ghostSize, voice.ghostWindow())
                 voice.ghostOk = true
             }
@@ -182,10 +217,15 @@ internal class LayerStream(val uri: String, startMs: Double, private val open: (
     private fun copyWindow(base: Long, frames: Int, out: FloatArray) {
         for (i in 0 until frames) {
             val abs = base + i
-            if (abs < 0 || abs < startAbs || abs >= endAbs) { out[2 * i] = 0f; out[2 * i + 1] = 0f; continue }
-            val at = (abs % cap).toInt() * 2
-            out[2 * i] = ring[at] * INV
-            out[2 * i + 1] = ring[at + 1] * INV
+            if (abs >= 0 && abs >= startAbs && abs < endAbs) {
+                val at = (abs % cap).toInt() * 2
+                out[2 * i] = ring[at] * INV
+                out[2 * i + 1] = ring[at + 1] * INV
+            } else if (abs >= headStart && abs < headEnd) {
+                val at = (abs - headStart).toInt() * 2
+                out[2 * i] = head[at] * INV
+                out[2 * i + 1] = head[at + 1] * INV
+            } else { out[2 * i] = 0f; out[2 * i + 1] = 0f }
         }
     }
 
@@ -196,6 +236,7 @@ internal class LayerStream(val uri: String, startMs: Double, private val open: (
 
     companion object {
         const val LEAD_MS = 20.0
+        private const val HEAD_MS = 1000
         private const val KEEP = 64L
         private const val INV = 1f / 32768f
     }
