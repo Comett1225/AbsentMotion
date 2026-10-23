@@ -40,10 +40,10 @@ add_library(amengine SHARED preview.cpp camera.cpp drawing.cpp effects.cpp easin
 if(AM_COMPAT)
     target_sources(amengine PRIVATE encoder_copy.cpp)
 endif()
-target_include_directories(amengine PRIVATE ${SKIA_DIR} ${SKIA_DIR}/third_party/externals/expat/expat/lib)
+target_include_directories(amengine PRIVATE ${SKIA_DIR} ${SKIA_DIR}/third_party/externals/expat/expat/lib ${SKIA_DIR}/third_party/externals/icu/source/common)
 target_compile_definitions(amengine PRIVATE
     NDEBUG SK_GANESH SK_GRAPHITE SK_VULKAN SK_GL SK_ENABLE_PRECOMPILE SK_DISABLE_TRACING
-    VK_USE_PLATFORM_ANDROID_KHR XML_STATIC)
+    VK_USE_PLATFORM_ANDROID_KHR XML_STATIC U_DISABLE_RENAMING=1 U_STATIC_IMPLEMENTATION U_USING_ICU_NAMESPACE=0)
 target_compile_options(amengine PRIVATE -O2 -fno-rtti -fno-exceptions -fvisibility=hidden -Wall)
 
 set(SKIA_LIBS skparagraph skshaper skunicode_core skunicode_icu skia pathops skcms freetype2 harfbuzz icu png jpeg webp wuffs zlib expat cpu-features)
