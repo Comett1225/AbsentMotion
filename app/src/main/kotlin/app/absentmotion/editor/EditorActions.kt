@@ -10,6 +10,7 @@ import app.absentmotion.platform.Color
 import kotlin.math.roundToInt
 import app.absentmotion.model.Scene
 import app.absentmotion.model.copyLayers
+import app.absentmotion.model.isMask
 import app.absentmotion.model.withCameraFov
 import app.absentmotion.model.withSplit
 import app.absentmotion.model.trimEndAt
@@ -246,12 +247,18 @@ val EditorState.chosenLayers: List<Layer>
     else listOfNotNull(selectedId?.let { scene.layer(it) })
 
 fun EditorState.copySelected() {
-    val chosen = chosenLayers
-    val ids = chosen.map { it.id }.toSet()
-    val outsideParents = chosen.mapNotNull { it.node["parent"]?.toLongOrNull() }.filter { it !in ids }.toSet()
-    val flat = scene.unparentChildrenOf(outsideParents)
-    copiedLayers = chosen.mapNotNull { flat.layer(it.id) }
+    copiedLayers = scene.layersToCopy(chosenLayers.map { it.id }.toSet())
     copiedMedia = scene.media
+}
+
+internal fun Scene.layersToCopy(ids: Set<Long>): List<Layer> {
+    val outsideParents = layers.filter { it.id in ids }.mapNotNull { it.node["parent"]?.toLongOrNull() }.filter { it !in ids }.toSet()
+    val list = unparentChildrenOf(outsideParents).layers
+    return list.indices.filter { list[it].id in ids }.map { i ->
+        val layer = list[i]
+        val base = (i - 1 downTo 0).firstOrNull { !list.isMask(it) }
+        if (layer.node["clippingMask"] == "true" && (base == null || list[base].id !in ids)) layer.copy(node = layer.node.with("clippingMask", null)) else layer
+    }
 }
 
 fun EditorState.duplicateChosen() {
