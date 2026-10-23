@@ -23,5 +23,5 @@
    "step": 0.1
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float amount;\nuniform float grain;\nfloat hash(float2 p) { p = fract(p * float2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }\nhalf4 main(float2 coord) {\n    half4 c = unpremul(image.eval(coord));\n    half n = half(hash(floor(coord / max(grain, 0.5)) + floor(time * 30) * 17.0));\n    return half4(mix(c.rgb, half3(n), half(amount)) * c.a, c.a);\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float amount;\nuniform float grain;\nfloat hash(float3 p) { p = fract(p * 0.1031); p += dot(p, p.zyx + 31.32); return fract((p.x + p.y) * p.z); }\nhalf4 main(float2 coord) {\n    half4 c = unpremul(image.eval(coord));\n    float frame = mod(floor((time + 0.000999) * 30.0), 4096.0);\n    half n = half(hash(float3(floor(coord / max(grain, 0.5)), frame)));\n    return half4(mix(c.rgb, half3(n), half(amount)) * c.a, c.a);\n}\n"
 }
