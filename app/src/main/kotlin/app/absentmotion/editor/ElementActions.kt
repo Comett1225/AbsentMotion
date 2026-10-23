@@ -50,10 +50,11 @@ suspend fun EditorState.saveToMyElements(store: ProjectStore): Boolean {
     return true
 }
 
-private val PLAIN_GROUP_ATTRS = setOf("id", "label", "startTime", "endTime", "tag", "parent", "hidden")
+private val PLAIN_GROUP_ATTRS = setOf("id", "label", "startTime", "endTime", "tag", "parent")
 private val PLACEMENT = setOf("location", "scale", "rotation", "pivot")
 
-private fun Layer.flattensIntoAsset(): Boolean = nested?.retime == "off" && node.attrs.keys.all { it in PLAIN_GROUP_ATTRS } &&
+private fun Layer.flattensIntoAsset(): Boolean = nested?.let { inner -> inner.retime == "off" && inner.layers.all { it.endTime <= endTime - startTime } } == true &&
+    node.attrs.keys.all { it in PLAIN_GROUP_ATTRS } &&
     node.children.all { it.name == "scene" || it.name == "transform" && it.children.all { part -> part.name in PLACEMENT } }
 
 internal fun Scene.elementNodes(layer: Layer, bounds: FloatArray?): List<XmlNode> {
