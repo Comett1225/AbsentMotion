@@ -561,6 +561,7 @@ struct LayerCopy {
     SkMatrix scene;
     double timeMs;
     RepeatCopy look;
+    SkMatrix layer;
 };
 
 std::vector<LayerCopy> CopiesOf(const std::vector<Layer>& siblings, const Layer& l, double timeMs, int width, int height) {
@@ -600,7 +601,21 @@ std::vector<LayerCopy> CopiesOf(const std::vector<Layer>& siblings, const Layer&
             invertible = matrix.invert(&inverse);
         }
         if (!invertible) continue;
-        out.push_back({c.outer * matrix * c.local * inverse, when, c});
+        out.push_back({c.outer * matrix * c.local * inverse, when, c, matrix});
+    }
+    return out;
+}
+
+std::vector<std::pair<SkPath, float>> CopyOutlines(const Layer& l, const std::vector<LayerCopy>& copies,
+                                                  const std::function<SkPath(float, const SkMatrix&)>& outline) {
+    std::vector<std::pair<SkPath, float>> out;
+    double shown = NAN;
+    SkPath own;
+    for (const LayerCopy& c : copies) {
+        const float at = l.localTime(c.timeMs);
+        if (c.timeMs != shown) own = outline(at, c.layer);
+        shown = c.timeMs;
+        out.emplace_back(own.makeTransform(c.scene), at);
     }
     return out;
 }
@@ -749,7 +764,8 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
             keep.setBlendMode(SkBlendMode::kDstIn);
             canvas->saveLayer(nullptr, &keep);
             if (cutout) body(canvas);
-            else for (const LayerCopy& c : *copies) canvas->drawPath(scenePath.makeTransform(c.scene), mask);
+            else for (const auto& copy : CopyOutlines(l, *copies, [&](float at, const SkMatrix& placed) { return BodyPath(l, at).makeTransform(placed); }))
+                canvas->drawPath(copy.first, mask);
             canvas->restore();
         } else {
             SkPath outside = scenePath;
@@ -765,17 +781,20 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
         if (!early) DrawGroupBorders(canvas, l, t, true);
         return;
     }
-    if (copies) {
-        drawn.fill = l.kind == "drawing" ? !l.strokes.empty() : l.fillType == "color" ? ColorAt(l.fillColor, t, kWhite, alpha).fA > 0 : l.fillType == "media" || l.fillType == "gradient";
-        if (l.stroke.present && l.stroke.enabled) drawn.stroked = DrawStroke(nullptr, l, StrokeGeometry(l, path, t).makeTransform(m), t, alpha);
-    }
-    SkPath region = drawn.fill ? (l.text ? TextGlyphPath(l, t, Fps()).makeTransform(m) : l.kind == "drawing" ? DrawingOutline(l, t).makeTransform(m) : scenePath) : SkPath();
-    region = Union(region, drawn.stroked);
-    if (region.isEmpty()) return;
+    const auto regionAt = [&](float at, const SkMatrix& placed, const SkPath& shape, Drawn d) {
+        if (copies) {
+            d.fill = l.kind == "drawing" ? !l.strokes.empty() : l.fillType == "color" ? ColorAt(l.fillColor, at, kWhite, alpha).fA > 0 : l.fillType == "media" || l.fillType == "gradient";
+            if (l.stroke.present && l.stroke.enabled) d.stroked = DrawStroke(nullptr, l, StrokeGeometry(l, shape, at).makeTransform(placed), at, alpha);
+        }
+        return Union(d.fill ? (l.text ? TextGlyphPath(l, at, Fps()) : l.kind == "drawing" ? DrawingOutline(l, at) : shape).makeTransform(placed) : SkPath(), d.stroked);
+    };
+    const std::vector<std::pair<SkPath, float>> regions = copies
+        ? CopyOutlines(l, *copies, [&](float at, const SkMatrix& placed) { return regionAt(at, placed, BodyPath(l, at), drawn); })
+        : std::vector<std::pair<SkPath, float>>{{regionAt(t, m, path, drawn), t}};
     for (const Edge& e : l.borders) {
-        if (!ShaderBorder(l, e, t)) continue;
-        if (!copies) DrawBorder(canvas, region, e, t);
-        else for (const LayerCopy& c : *copies) DrawBorder(canvas, region.makeTransform(c.scene), e, t);
+        for (const auto& [region, at] : regions) {
+            if (ShaderBorder(l, e, at) && !region.isEmpty()) DrawBorder(canvas, region, e, at);
+        }
     }
 }
 
@@ -877,18 +896,21 @@ void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& 
     const bool overlaps = l.kind == "drawing" || l.kind == "model" || (l.stroke.present && l.stroke.enabled) || centred || repeated;
     auto centredBorders = [&](float alpha) {
         if (!centred) return;
-        const SkPath scenePath = ShapePath(l, t).makeTransform(SiblingMatrix(siblings, l, timeMs));
+        const std::vector<std::pair<SkPath, float>> outlines = repeated
+            ? CopyOutlines(l, copies, [&](float at, const SkMatrix& placed) { return ShapePath(l, at).makeTransform(placed); })
+            : std::vector<std::pair<SkPath, float>>{{ShapePath(l, t).makeTransform(SiblingMatrix(siblings, l, timeMs)), t}};
         for (const Edge& e : l.borders) {
             if (!e.enabled || e.direction != "centered") continue;
-            const float size = e.size.get(0, t, 4);
-            if (!(size > 0)) continue;
-            SkPaint paint = FillPaint(ColorAt(e.color, t, kWhite, alpha));
-            paint.setStyle(SkPaint::kStroke_Style);
-            paint.setStrokeWidth(size);
-            paint.setStrokeCap(SkPaint::kRound_Cap);
-            paint.setStrokeJoin(SkPaint::kBevel_Join);
-            if (!repeated) canvas->drawPath(scenePath, paint);
-            else for (const LayerCopy& c : copies) canvas->drawPath(scenePath.makeTransform(c.scene), paint);
+            for (const auto& [outline, at] : outlines) {
+                const float size = e.size.get(0, at, 4);
+                if (!(size > 0)) continue;
+                SkPaint paint = FillPaint(ColorAt(e.color, at, kWhite, alpha));
+                paint.setStyle(SkPaint::kStroke_Style);
+                paint.setStrokeWidth(size);
+                paint.setStrokeCap(SkPaint::kRound_Cap);
+                paint.setStrokeJoin(SkPaint::kBevel_Join);
+                canvas->drawPath(outline, paint);
+            }
         }
     };
     if (!group && !decorated && !blended && (opacity >= 1 || !overlaps)) {
