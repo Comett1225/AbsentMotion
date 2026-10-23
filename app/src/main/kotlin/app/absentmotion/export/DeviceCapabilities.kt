@@ -59,7 +59,7 @@ data class ProbeResult(val codec: Codec, val width: Int, val height: Int, val fr
 sealed interface Support {
     data object Supported : Support
     data class SlowSoftwareOnly(val reason: UiText) : Support
-    data class Unsupported(val reason: UiText, val suggestion: ExportSettings?) : Support
+    data class Unsupported(val reason: UiText, val suggestion: ExportSettings?, val sound: Boolean = false) : Support
 }
 
 data class DeviceReport(val key: String, val encoders: List<EncoderCaps>, val probe: ProbeResult? = null) {
@@ -82,6 +82,9 @@ data class DeviceReport(val key: String, val encoders: List<EncoderCaps>, val pr
         if (sized.isEmpty()) {
             return Support.Unsupported(txt(R.string.export_support_cannot_encode, s.codec.label, "${width}x$height"), alternative(s, width, height))
         }
+        if (hasAudio && encodersFor(s.audio.codec.mime).isEmpty()) {
+            return Support.Unsupported(txt(R.string.export_support_no_encoder, s.audio.codec.label), withAac(s), sound = true)
+        }
         if (sized.none { it.hardware }) {
             return Support.SlowSoftwareOnly(txt(R.string.export_support_software_only, s.codec.label))
         }
@@ -89,6 +92,11 @@ data class DeviceReport(val key: String, val encoders: List<EncoderCaps>, val pr
             return Support.SlowSoftwareOnly(txt(R.string.export_support_rated_below, s.codec.label, s.fps.toString(), "${width}x$height"))
         }
         return Support.Supported
+    }
+
+    private fun withAac(s: ExportSettings): ExportSettings {
+        val container = s.container.takeIf { AudioCodec.Aac in audioCodecsFor(it) } ?: containersFor(s.codec).first { AudioCodec.Aac in audioCodecsFor(it) }
+        return s.copy(container = container, audio = s.audio.copy(codec = AudioCodec.Aac))
     }
 
     private fun alternative(s: ExportSettings, width: Int, height: Int): ExportSettings? {

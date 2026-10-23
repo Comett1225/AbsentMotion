@@ -30,16 +30,23 @@ fun listed(items: List<String>, @StringRes join: Int): Any =
 private fun ExportSettings.fitAudio(): ExportSettings =
     if (audio.codec in audioCodecsFor(container)) this else copy(audio = audio.copy(codec = audioCodecsFor(container).first()))
 
-private fun unsupported(support: Support): UiText? = (support as? Support.Unsupported)?.reason
+private fun unsupported(support: Support): UiText? = (support as? Support.Unsupported)?.takeIf { !it.sound }?.reason
 
 fun containerChoices(s: ExportSettings, check: (ExportSettings) -> Support): List<Choice<Container>> = Container.entries.map { c ->
     val codecs = videoCodecsFor(c)
-    val possible = codecs.any { check(s.copy(container = c, codec = it).fitAudio()) !is Support.Unsupported }
-    Choice(c, if (possible) null else txt(R.string.export_reason_container_codecs, c.label, listed(codecs.map { it.shortName }, R.string.export_list_or), sizeLabel(s.shortSide)))
+    val results = codecs.flatMap { codec -> audioCodecsFor(c).map { check(s.copy(container = c, codec = codec, audio = s.audio.copy(codec = it))) } }
+    val noSound = results.firstNotNullOfOrNull { (it as? Support.Unsupported)?.takeIf { u -> u.sound }?.reason }
+    Choice(c, when {
+        results.any { it !is Support.Unsupported } -> null
+        noSound != null -> noSound
+        else -> txt(R.string.export_reason_container_codecs, c.label, listed(codecs.map { it.shortName }, R.string.export_list_or), sizeLabel(s.shortSide))
+    })
 }
 
 fun withContainer(s: ExportSettings, c: Container, check: (ExportSettings) -> Support): ExportSettings {
-    val options = (listOf(s.codec) + videoCodecsFor(c)).distinct().filter { it in videoCodecsFor(c) }.map { s.copy(container = c, codec = it).fitAudio() }
+    val sounds = (listOf(s.audio.codec) + audioCodecsFor(c)).distinct().filter { it in audioCodecsFor(c) }
+    val options = (listOf(s.codec) + videoCodecsFor(c)).distinct().filter { it in videoCodecsFor(c) }
+        .flatMap { codec -> sounds.map { s.copy(container = c, codec = codec, audio = s.audio.copy(codec = it)) } }
     return options.firstOrNull { check(it) is Support.Supported } ?: options.firstOrNull { check(it) !is Support.Unsupported } ?: options.first()
 }
 

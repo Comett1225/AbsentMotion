@@ -15,17 +15,25 @@ class ExportChoicesTest {
             ProbeSizes.filter { (w, h) -> w.toLong() * h <= maxPixels }.map { (w, h) -> SizePoint(w, h, rate / (w.toDouble() * h)) },
             1..100_000_000, listOf(1, 8))
 
+    private val aac = EncoderCaps("aac", "audio/mp4a-latm", false, bitrates = 8000..960000, sampleRates = listOf(44100, 48000), maxChannels = 6)
+
+    private val opus = EncoderCaps("opus", "audio/opus", false, bitrates = 6000..510000, sampleRates = listOf(48000), maxChannels = 2)
+
     private val report = DeviceReport(
         "k",
         listOf(
             video("video/avc", true),
             video("video/hevc", true, 3840L * 2160, 3840.0 * 2160 * 30),
             video("video/av01", false),
-            EncoderCaps("aac", "audio/mp4a-latm", false, bitrates = 8000..960000, sampleRates = listOf(44100, 48000), maxChannels = 6),
+            aac,
         ),
     )
 
+    private val withOpus = DeviceReport("k", report.encoders + opus)
+
     private val check: (ExportSettings) -> Support = { s -> report.check(s, s.shortSide, (s.shortSide * 16 / 9 + 1) and 1.inv()) }
+
+    private val checkWithOpus: (ExportSettings) -> Support = { s -> withOpus.check(s, s.shortSide, (s.shortSide * 16 / 9 + 1) and 1.inv()) }
 
     private val encoders: (String) -> Boolean = { mime -> report.encodersFor(mime).isNotEmpty() }
 
@@ -58,11 +66,11 @@ class ExportChoicesTest {
     }
 
     @Test fun containersNeedACodecThePhoneHas() {
-        val choices = containerChoices(ExportSettings(1080, 30), check).associate { it.value to it.reason }
+        val choices = containerChoices(ExportSettings(1080, 30), checkWithOpus).associate { it.value to it.reason }
         assertNull(choices[Container.Mp4])
         assertNull(choices[Container.Mkv])
         assertNull(choices[Container.WebM])
-        val noVp9OrAv1 = DeviceReport("k", listOf(video("video/avc", true)))
+        val noVp9OrAv1 = DeviceReport("k", listOf(video("video/avc", true), aac, opus))
         val webm = containerChoices(ExportSettings(1080, 30)) { noVp9OrAv1.check(it, 1080, 1920) }.first { it.value == Container.WebM }
         assertEquals(txt(R.string.export_reason_container_codecs, "WebM", txt(R.string.export_list_or, "VP9", "AV1"), "1080p"), webm.reason)
         val mkv = containerChoices(ExportSettings(1080, 30)) { Support.Unsupported(txt(R.string.export_block_unsupported), null) }.first { it.value == Container.Mkv }
@@ -72,11 +80,28 @@ class ExportChoicesTest {
 
     @Test fun switchingContainerKeepsOrReplacesTheCodecAndAudio() {
         val mp4 = ExportSettings(1080, 30, Codec.H264)
-        assertEquals(mp4.copy(container = Container.Mkv), withContainer(mp4, Container.Mkv, check))
-        val webm = withContainer(mp4, Container.WebM, check)
+        assertEquals(mp4.copy(container = Container.Mkv), withContainer(mp4, Container.Mkv, checkWithOpus))
+        val webm = withContainer(mp4, Container.WebM, checkWithOpus)
         assertEquals(Codec.Av1, webm.codec)
         assertEquals(AudioCodec.Opus, webm.audio.codec)
-        assertEquals(AudioCodec.Aac, withContainer(webm, Container.Mov, check).audio.codec)
+        assertEquals(AudioCodec.Aac, withContainer(webm, Container.Mov, checkWithOpus).audio.codec)
+    }
+
+    @Test fun aPhoneWithoutAnOpusEncoderCannotPickWebMOrKeepOpusInMkv() {
+        val mp4 = ExportSettings(1080, 30, Codec.H264)
+        val choices = containerChoices(mp4, check).associate { it.value to it.reason }
+        assertNull(choices[Container.Mp4])
+        assertNull(choices[Container.Mkv])
+        assertEquals(txt(R.string.export_support_no_encoder, "Opus"), choices[Container.WebM])
+        val opusMkv = mp4.copy(container = Container.Mkv, audio = AudioSettings(AudioCodec.Opus))
+        assertEquals(opusMkv.copy(audio = AudioSettings(AudioCodec.Aac)), withContainer(opusMkv, Container.Mkv, check))
+        val support = check(opusMkv)
+        assertTrue(support is Support.Unsupported)
+        assertEquals(opusMkv.copy(audio = AudioSettings(AudioCodec.Aac)), betterChoice(opusMkv, support, check))
+        assertEquals(txt(R.string.export_block_unsupported), exportBlock(StorageStatus.Enough, support))
+        val codecs = codecChoices(opusMkv, check).associate { it.value to it.enabled }
+        assertEquals(mapOf(Codec.H264 to true, Codec.Hevc to true, Codec.Av1 to true, Codec.Vp9 to false), codecs)
+        assertTrue(resolutionChoices(opusMkv, check).first { it.value.shortSide == 1080 }.enabled)
     }
 
     @Test fun audioOptionsExplainContainerAndPhoneLimits() {
