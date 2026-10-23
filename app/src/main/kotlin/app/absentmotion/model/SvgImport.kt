@@ -75,6 +75,7 @@ private val PartPattern = Regex("[.#][\\w-]+")
 private const val Kappa = 0.5522848f
 private const val MaxShapes = 1000
 private const val MaxVisits = 100_000
+private const val MaxRuleMatches = 5_000_000
 internal const val MaxSvgNodes = 200_000
 
 private fun withoutCssComments(css: String): String {
@@ -133,6 +134,7 @@ private class SvgReader(private val root: XmlNode) {
     val skipped = LinkedHashSet<UiText>()
     var shapeCount = 0
     private var visits = 0
+    private var ruleMatches = 0
     private val ids = HashMap<String, XmlNode>()
     private val rules = ArrayList<CssRule>()
     private val counters = HashMap<String, Int>()
@@ -233,11 +235,13 @@ private class SvgReader(private val root: XmlNode) {
         for (key in Styled) n.attrs[key]?.let { own[key] = it.trim() }
         val classes = n.attr("class")?.split(Regex("\\s+"))?.filter { it.isNotEmpty() }.orEmpty()
         val id = n.attr("id")
-        if (rules.isNotEmpty()) {
+        if (rules.isNotEmpty() && ruleMatches < MaxRuleMatches) {
             val candidates = ArrayList<CssRule>(anyTag)
             id?.let { byId[it]?.let(candidates::addAll) }
             for (c in classes.distinct()) byClass[c]?.let(candidates::addAll)
             byTag[n.local]?.let(candidates::addAll)
+            ruleMatches += candidates.size + 1
+            if (ruleMatches >= MaxRuleMatches) skipped += txt(R.string.model_svg_skipped_styles)
             candidates.filter { r -> (r.tag == null || r.tag == n.local) && (r.id == null || r.id == id) && classes.containsAll(r.classes) }
                 .sortedWith(compareBy({ it.specificity }, { it.order })).forEach { own.putAll(it.decls) }
         }

@@ -1299,6 +1299,7 @@
     <string name="model_svg_skipped_dashed">dashed strokes</string>
     <string name="model_svg_skipped_patterns">pattern fills</string>
     <string name="model_svg_skipped_gradient_colours">extra gradient colors (the first and last are used)</string>
+    <string name="model_svg_skipped_styles">some style rules (the file has too many to apply)</string>
     <string name="ai_no_audio_track">No audio track in %1$s</string>
     <string name="shape_name_circle">Circle</string>
     <string name="shape_name_rounded_rectangle">Rounded Rectangle</string>

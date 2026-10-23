@@ -1275,6 +1275,7 @@
     <string name="model_svg_skipped_dashed">mga putol-putol na stroke</string>
     <string name="model_svg_skipped_patterns">mga pattern fill</string>
     <string name="model_svg_skipped_gradient_colours">karagdagang kulay ng gradient (ang una at huli ang ginagamit)</string>
+    <string name="model_svg_skipped_styles">Ilang style rule (sobrang dami sa file para ilapat)</string>
     <string name="ai_no_audio_track">Walang audio track sa %1$s</string>
     <string name="shape_name_circle">Bilog</string>
     <string name="shape_name_rounded_rectangle">Bilugang parihaba</string>

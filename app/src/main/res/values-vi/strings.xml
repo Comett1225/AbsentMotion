@@ -1251,6 +1251,7 @@
     <string name="model_svg_skipped_dashed">nét đứt</string>
     <string name="model_svg_skipped_patterns">tô họa tiết</string>
     <string name="model_svg_skipped_gradient_colours">màu chuyển màu thừa (chỉ dùng màu đầu và màu cuối)</string>
+    <string name="model_svg_skipped_styles">một số quy tắc kiểu (tệp có quá nhiều để áp dụng)</string>
     <string name="ai_no_audio_track">Không có âm thanh trong %1$s</string>
     <string name="shape_name_circle">Hình tròn</string>
     <string name="shape_name_rounded_rectangle">Hình chữ nhật bo góc</string>

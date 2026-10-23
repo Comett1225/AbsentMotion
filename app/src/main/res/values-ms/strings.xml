@@ -1251,6 +1251,7 @@
     <string name="model_svg_skipped_dashed">lejang putus-putus</string>
     <string name="model_svg_skipped_patterns">isi corak</string>
     <string name="model_svg_skipped_gradient_colours">warna kecerunan tambahan (yang pertama dan terakhir digunakan)</string>
+    <string name="model_svg_skipped_styles">beberapa peraturan gaya (fail mempunyai terlalu banyak untuk digunakan)</string>
     <string name="ai_no_audio_track">Tiada trek audio dalam %1$s</string>
     <string name="shape_name_circle">Bulatan</string>
     <string name="shape_name_rounded_rectangle">Segi empat bulat</string>

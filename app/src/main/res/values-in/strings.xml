@@ -1251,6 +1251,7 @@
     <string name="model_svg_skipped_dashed">stroke putus-putus</string>
     <string name="model_svg_skipped_patterns">isi pola</string>
     <string name="model_svg_skipped_gradient_colours">warna gradien tambahan (yang pertama dan terakhir digunakan)</string>
+    <string name="model_svg_skipped_styles">beberapa aturan gaya (terlalu banyak di file untuk diterapkan)</string>
     <string name="ai_no_audio_track">Tidak ada trek audio di %1$s</string>
     <string name="shape_name_circle">Lingkaran</string>
     <string name="shape_name_rounded_rectangle">Persegi panjang membulat</string>

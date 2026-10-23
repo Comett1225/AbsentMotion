@@ -1275,6 +1275,7 @@
     <string name="model_svg_skipped_dashed">kesikli konturlar</string>
     <string name="model_svg_skipped_patterns">desen dolguları</string>
     <string name="model_svg_skipped_gradient_colours">ek gradyan renkleri (ilk ve son kullanılır)</string>
+    <string name="model_svg_skipped_styles">bazı stil kuralları (dosyada uygulanamayacak kadar çok)</string>
     <string name="ai_no_audio_track">%1$s içinde ses parçası yok</string>
     <string name="shape_name_circle">Daire</string>
     <string name="shape_name_rounded_rectangle">Yuvarlatılmış Dikdörtgen</string>

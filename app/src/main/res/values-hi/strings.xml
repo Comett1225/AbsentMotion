@@ -1275,6 +1275,7 @@
     <string name="model_svg_skipped_dashed">डैश्ड स्ट्रोक</string>
     <string name="model_svg_skipped_patterns">पैटर्न फ़िल</string>
     <string name="model_svg_skipped_gradient_colours">अतिरिक्त ग्रेडिएंट कलर (पहला और आखिरी इस्तेमाल होते हैं)</string>
+    <string name="model_svg_skipped_styles">कुछ स्टाइल नियम (फ़ाइल में लागू करने के लिए बहुत ज़्यादा हैं)</string>
     <string name="ai_no_audio_track">%1$s में कोई ऑडियो ट्रैक नहीं है</string>
     <string name="shape_name_circle">वृत्त</string>
     <string name="shape_name_rounded_rectangle">राउंडेड आयत</string>

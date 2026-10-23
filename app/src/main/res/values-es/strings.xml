@@ -1299,6 +1299,7 @@
     <string name="model_svg_skipped_dashed">trazos discontinuos</string>
     <string name="model_svg_skipped_patterns">rellenos con patrón</string>
     <string name="model_svg_skipped_gradient_colours">colores de degradado adicionales (se usan el primero y el último)</string>
+    <string name="model_svg_skipped_styles">algunas reglas de estilo (el archivo tiene demasiadas para aplicarlas)</string>
     <string name="ai_no_audio_track">No hay pista de audio en %1$s</string>
     <string name="shape_name_circle">Círculo</string>
     <string name="shape_name_rounded_rectangle">Rectángulo redondeado</string>

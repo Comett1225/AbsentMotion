@@ -362,6 +362,14 @@ class SvgImportTest {
         assertEquals(0xFFFF0000.toInt(), shapes(big.layer!!)[0].fillColor)
     }
 
+    @Test fun manyRulesForOneClassDoNotMultiplyWithManyElementsOfThatClass() {
+        val rules = ".a{fill:#00ff00}" + (0 until 30_000).joinToString("") { ".a{stroke:#ff0000;stroke-width:${it % 5 + 1}}" }
+        val parts = (0 until 30_000).joinToString("") { "<g class=\"a\"><rect width=\"1\" height=\"1\"/></g>" }
+        val result = importTimed("$open<style>$rules</style>$parts</svg>")
+        assertEquals(1000, result.shapes)
+        assertTrue(result.skipped.contains(txt(app.absentmotion.R.string.model_svg_skipped_styles)))
+    }
+
     @Test fun cssAtRulesDoNotSwallowOrOverrideTheRulesAroundThem() {
         val layer = import("""
             $open

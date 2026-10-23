@@ -1299,6 +1299,7 @@
     <string name="model_svg_skipped_dashed">contornos tracejados</string>
     <string name="model_svg_skipped_patterns">preenchimentos com padrão</string>
     <string name="model_svg_skipped_gradient_colours">cores extras do gradiente (a primeira e a última são usadas)</string>
+    <string name="model_svg_skipped_styles">algumas regras de estilo (o arquivo tem regras demais para aplicar)</string>
     <string name="ai_no_audio_track">Nenhuma faixa de áudio em %1$s</string>
     <string name="shape_name_circle">Círculo</string>
     <string name="shape_name_rounded_rectangle">Retângulo arredondado</string>

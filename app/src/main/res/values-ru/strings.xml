@@ -1323,6 +1323,7 @@
     <string name="model_svg_skipped_dashed">пунктирные обводки</string>
     <string name="model_svg_skipped_patterns">заливки узором</string>
     <string name="model_svg_skipped_gradient_colours">дополнительные цвета градиента (используются первый и последний)</string>
+    <string name="model_svg_skipped_styles">некоторые правила стилей (файл содержит их слишком много для применения)</string>
     <string name="ai_no_audio_track">Нет аудиодорожки в %1$s</string>
     <string name="shape_name_circle">Круг</string>
     <string name="shape_name_rounded_rectangle">Скруглённый прямоугольник</string>

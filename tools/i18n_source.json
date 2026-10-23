@@ -2876,6 +2876,7 @@
  "model_svg_skipped_masks": "masks",
  "model_svg_skipped_patterns": "pattern fills",
  "model_svg_skipped_shapes": "shapes after the first %1$s",
+ "model_svg_skipped_styles": "some style rules (the file has too many to apply)",
  "model_svg_skipped_text": "text",
  "model_too_large": "This model is too large to open",
  "model_unreadable": "This model could not be read: %1$s",

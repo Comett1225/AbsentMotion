@@ -1251,6 +1251,7 @@
     <string name="model_svg_skipped_dashed">เส้นขอบแบบเส้นประ</string>
     <string name="model_svg_skipped_patterns">การเติมแบบแพตเทิร์น</string>
     <string name="model_svg_skipped_gradient_colours">สีไล่ระดับเพิ่มเติม (ใช้สีแรกและสีสุดท้าย)</string>
+    <string name="model_svg_skipped_styles">กฎสไตล์บางรายการ (ไฟล์มีมากเกินกว่าจะนำไปใช้)</string>
     <string name="ai_no_audio_track">ไม่มีแทร็กเสียงใน %1$s</string>
     <string name="shape_name_circle">วงกลม</string>
     <string name="shape_name_rounded_rectangle">สี่เหลี่ยมมุมมน</string>

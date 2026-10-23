@@ -1371,6 +1371,7 @@
     <string name="model_svg_skipped_dashed">خطوط متقطعة</string>
     <string name="model_svg_skipped_patterns">تعبئات الأنماط</string>
     <string name="model_svg_skipped_gradient_colours">ألوان تدرج إضافية (يُستخدم الأول والأخير)</string>
+    <string name="model_svg_skipped_styles">بعض قواعد الأنماط (يحتوي الملف على عدد كبير جدًا من القواعد لتطبيقها)</string>
     <string name="ai_no_audio_track">لا يوجد مسار صوت في %1$s</string>
     <string name="shape_name_circle">دائرة</string>
     <string name="shape_name_rounded_rectangle">مستطيل مستدير الزوايا</string>
