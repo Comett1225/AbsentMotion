@@ -71,7 +71,8 @@ data class XmlNode(
                 when (parser.next()) {
                     XmlPullParser.START_TAG -> children += read(parser, depth + 1)
                     XmlPullParser.TEXT -> text.append(parser.text)
-                    XmlPullParser.END_TAG, XmlPullParser.END_DOCUMENT -> break
+                    XmlPullParser.END_TAG -> break
+                    XmlPullParser.END_DOCUMENT -> throw IllegalArgumentException("Unexpected end of document inside <$name>")
                 }
             }
             return XmlNode(name, attrs, children, if (children.isEmpty()) text.toString() else "")
@@ -87,7 +88,7 @@ data class XmlNode(
                     '\n' -> append("&#10;")
                     '\r' -> append("&#13;")
                     '\t' -> append("&#9;")
-                    else -> if (c >= ' ') append(c)
+                    else -> if (c >= ' ' && c != '\uFFFE' && c != '\uFFFF') append(c)
                 }
             }
         }
