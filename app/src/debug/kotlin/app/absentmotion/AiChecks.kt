@@ -3,13 +3,18 @@ package app.absentmotion
 import android.content.Context
 import android.os.SystemClock
 import android.util.Log
+import app.absentmotion.ai.AiAction
+import app.absentmotion.ai.AiKind
 import app.absentmotion.ai.AiModel
 import app.absentmotion.ai.AiNative
 import app.absentmotion.ai.AiNet
 import app.absentmotion.ai.AiSmooth
+import app.absentmotion.ai.AiTools
 import app.absentmotion.ai.model
 import app.absentmotion.ai.padding
+import app.absentmotion.export.FrameInterpolation
 import app.absentmotion.export.SmoothLevel
+import app.absentmotion.export.Smoothing
 import app.absentmotion.ai.aiMarks
 import app.absentmotion.ai.withoutAiMark
 import androidx.lifecycle.lifecycleScope
@@ -190,4 +195,42 @@ internal suspend fun checkDownload(context: Context, name: String, stopAfterMs: 
     model.verify(context)
     Log.i(TAG, "ok=${model.installed(context)} download $model stoppedAt=${"%.2f".format(java.util.Locale.US, reached)} kept=$parts resumedFrom=${"%.2f".format(java.util.Locale.US, first)} ms=${SystemClock.elapsedRealtime() - started} bytes=${model.onDisk(context)}")
     Log.i(TAG, "download done")
+}
+
+internal suspend fun checkSmoothTrim(activity: MainActivity, path: String, from: Int, to: Int) {
+    val declared = checkNotNull(app.absentmotion.media.videoDeclaration(activity, android.net.Uri.fromFile(java.io.File(path)))) { "cannot read $path" }
+    val uri = declared.uri
+    val span = to - from
+    val xml = """<scene width="640" height="360" fps="30" totalTime="$span"><shape id="1" label="clip" s=".rect" fillType="media" fillVideo="$uri" mediaFillMode="fit" inTime="$from" outTime="$to" startTime="0" endTime="${span - 1}"><transform><location value="320,180,0"/></transform><property name="size" type="vec2" value="640,360"/></shape></scene>"""
+    activity.store.save("test-smoothtrim", app.absentmotion.model.Scene.parse(xml).withMedia(declared))
+    val state = checkNotNull(activity.openNow("test-smoothtrim")) { "cannot open test-smoothtrim" }
+    val tools = AiTools(activity.applicationContext, state, activity.lifecycleScope)
+    state.selectedId = 1
+    tools.smoothing = Smoothing(FrameInterpolation.Flow, SmoothLevel.Low)
+    class Shown(val uri: String, val inTime: Int, val outTime: Int, val shift: Int?, val duration: Long?)
+    fun shown(): Shown {
+        val layer = checkNotNull(state.scene.layer(1))
+        val fill = checkNotNull(layer.mediaFill)
+        return Shown(fill.uri, fill.inTime, fill.outTime, layer.aiMarks.firstOrNull()?.shift, state.scene.media(fill.uri)?.duration)
+    }
+    suspend fun run(): Shown {
+        tools.apply(AiAction.Smooth, confirmed = true)
+        while (tools.running != null) kotlinx.coroutines.delay(250)
+        return shown()
+    }
+    val first = run()
+    val copy = java.io.File(activity.getExternalFilesDir(null), "smoothtrim.mp4")
+    activity.contentResolver.openInputStream(android.net.Uri.parse(first.uri))!!.use { input -> copy.outputStream().use { input.copyTo(it) } }
+    val audio = android.media.MediaExtractor().run {
+        setDataSource(copy.path)
+        (0 until trackCount).any { getTrackFormat(it).getString(android.media.MediaFormat.KEY_MIME)?.startsWith("audio/") == true }.also { release() }
+    }
+    val rebased = first.uri != uri && first.inTime == 0 && first.outTime == span && first.shift == from && first.duration == span * 1000L
+    state.edit { scene -> scene.update(1) { it.copy(node = it.node.with("inTime", "250").with("outTime", "${span / 2 + 250}")) } }
+    val again = run()
+    val rerun = again.uri != first.uri && again.inTime == 0 && again.outTime == span / 2 && again.shift == from + 250 && again.duration == span / 2 * 1000L
+    state.edit { it.withoutAiMark(1, AiKind.Smooth) }
+    val back = shown()
+    val restored = back.uri == uri && back.inTime == from + 250 && back.outTime == from + 250 + span / 2 && back.shift == null
+    Log.i(TAG, "ok=${rebased && rerun && restored && audio} smoothtrim rebased=$rebased rerun=$rerun restored=$restored audio=$audio message=${tools.message} first=${first.inTime}-${first.outTime}/${first.shift}/${first.duration} again=${again.inTime}-${again.outTime}/${again.shift}/${again.duration} back=${back.inTime}-${back.outTime} ${copy.path}")
 }
