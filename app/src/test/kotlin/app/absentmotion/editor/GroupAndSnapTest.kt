@@ -55,6 +55,23 @@ class GroupAndSnapTest {
         assertEquals(listOf(100), out.bookmarks)
     }
 
+    @Test fun groupingKeepsMasksClippingTheirLayerAndLeavesCamerasOutside() {
+        val s = scene(layer(1, 0, 999), layer(2, 0, 999, extra = mapOf("clippingMask" to "true")), layer(3, 0, 999, extra = mapOf("clippingMask" to "true")),
+            shapeNode("camera", id = 4, end = 999))
+        fun Scene.flags() = layers.map { it.id to (it.node["clippingMask"] == "true") }
+        val one = s.grouped(setOf(2), null, 9, "G")
+        assertEquals(listOf(1L to false, 9L to true, 3L to true, 4L to false), one.flags())
+        assertEquals(listOf(2L to false), one.group().nested!!.flags())
+        val both = s.grouped(setOf(2, 3), null, 9, "G")
+        assertEquals(listOf(1L to false, 9L to true, 4L to false), both.flags())
+        assertEquals(listOf(2L to false, 3L to false), both.group().nested!!.flags())
+        val withBase = s.grouped(setOf(1, 2), null, 9, "G")
+        assertEquals(listOf(9L to false, 3L to true, 4L to false), withBase.flags())
+        assertEquals(listOf(1L to false, 2L to true), withBase.group().nested!!.flags())
+        assertEquals(listOf(9L, 2L, 3L, 4L), s.grouped(setOf(1, 4), null, 9, "G").layers.map { it.id })
+        assertEquals(s, s.grouped(setOf(4), null, 9, "G"))
+    }
+
     @Test fun maskAndExcludeGoOnTheTopLayerInsideTheGroup() {
         for (mode in listOf("mask", "exclude")) {
             val nested = project.grouped(setOf(1, 3, 4), mode, 9, "G").group().nested!!

@@ -336,7 +336,7 @@ internal object TimelineMath {
         for (layer in scene.layers) if (layer.id != skip) {
             add(scene.firstShownFrame(layer.startTime))
             add(scene.lastShownFrame(layer.endTime) + 1)
-            layer.keyframeTimes().forEach { add(scene.firstShownFrame(it)) }
+            layer.keyframeTimes().forEach { add(scene.frameAt(it)) }
         }
     }
 }
@@ -594,6 +594,11 @@ private class TimelineView(val state: EditorState, density: Density, private val
         state.edit(KEY_MOVE) { s -> s.update(original.id) { original.withKeyframesMoved(keyFrom, frame, s, keyScope) } }
     }
 
+    private fun dropTrim(key: String) {
+        val base = trimBase ?: return
+        if (state.scene.layer(base.id)?.node == base.node) state.cancelGesture(key)
+    }
+
     private fun dropKey(commit: Boolean) {
         val original = keyLayer
         if (!commit || original == null || state.scene.layer(original.id)?.node == original.node) state.cancelGesture(KEY_MOVE)
@@ -684,6 +689,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
         if (drag == Drag.Lift) dropMove(lifted)
         if (drag == Drag.Select) endSelect()
         if (drag == Drag.Key) dropKey(lifted)
+        if (drag == Drag.TrimStart || drag == Drag.TrimEnd) dropTrim(if (drag == Drag.TrimStart) "trim-start" else "trim-end")
         if (drag?.edit == true) return state.endGesture()
         motion = scope.launch {
             if (drag == Drag.Scroll) launch { fling(velocity.y, ::scrollBy) }
@@ -751,10 +757,10 @@ private class TimelineView(val state: EditorState, density: Density, private val
         val edge = if (start) frame.coerceIn(0, scene.lastShownFrame(layer.endTime).coerceAtLeast(0)) else (frame - 1).coerceAtLeast(scene.firstShownFrame(layer.startTime)) + 1
         val time = if (start) {
             scene.frameStart(edge)
-                .also { time -> if (time != layer.startTime) state.edit("trim-start") { it.update(id) { base.trimmedTo(time, base.endTime, mediaMs) } } }
+                .also { time -> if (time != layer.startTime) state.edit("trim-start") { it.update(id) { if (time == base.startTime) base else base.trimmedTo(time, base.endTime, mediaMs) } } }
         } else {
             scene.frameEnd(edge - 1)
-                .also { time -> if (time != layer.endTime) state.edit("trim-end") { it.update(id) { base.trimmedTo(base.startTime, time, mediaMs) } } }
+                .also { time -> if (time != layer.endTime) state.edit("trim-end") { it.update(id) { if (time == base.endTime) base else base.trimmedTo(base.startTime, time, mediaMs) } } }
         }
         val hit = layer.trimHitsSourceLimit(start, time, mediaMs)
         if (hit && limitEdge == null) onTick()
@@ -786,7 +792,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
         showSnap(target.snap, target.snap ?: target.frame)
         moveSlide = if (target.snap != null || wanted <= 0f) 0f else (wanted - start) * pxPerMs
         val id = original.id
-        if (scene.layer(id)?.startTime != start) state.edit(MOVE_EDIT) { it.update(id) { l -> l.movedTo(start) } }
+        if (scene.layer(id)?.startTime != start) state.edit(MOVE_EDIT) { it.update(id) { _ -> it.movedClip(original, start) } }
     }
 
     private fun dropMove(commit: Boolean) {

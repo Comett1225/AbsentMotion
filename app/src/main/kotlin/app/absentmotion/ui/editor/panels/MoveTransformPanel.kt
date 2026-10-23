@@ -162,7 +162,8 @@ internal class Snap(val distance: Float, val guide: SnapGuide)
 internal fun Scene.snapAxesFor(layer: Layer, timeMs: Int, mine: FloatArray?, others: List<SnapOther>): Pair<SnapAxis, SnapAxis> {
     val world = place(layer, timeMs)
     val parent = chain(layer).getOrNull(1)?.let { place(it, timeMs) }
-    if (parent != null && parent.rot % 360f != 0f) return SnapAxis(emptyList()) to SnapAxis(emptyList())
+    val tilted = chain(layer).drop(1).any { up -> up.at(timeMs, fps).tilt.any { it % 360f != 0f } }
+    if (parent != null && (parent.rot % 360f != 0f || tilted)) return SnapAxis(emptyList()) to SnapAxis(emptyList())
     return snapAxes(width.toFloat(), height.toFloat(), floatArrayOf(world.x, world.y), mine, others, parent?.sx ?: 1f, parent?.sy ?: 1f)
 }
 

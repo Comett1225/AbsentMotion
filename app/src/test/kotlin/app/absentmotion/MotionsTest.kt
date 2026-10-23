@@ -18,6 +18,7 @@ import app.absentmotion.model.motion
 import app.absentmotion.model.withAnimation
 import app.absentmotion.model.withKeyframes
 import app.absentmotion.model.withTransition
+import app.absentmotion.model.withSplit
 import org.json.JSONArray
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
@@ -148,6 +149,29 @@ class MotionsTest {
         assertNotNull(done.note)
         assertEquals(txt(R.string.library_text_value, listOf(txt(R.string.transition_moved, "Clip 2", "0.5 s"))), done.note)
         assertEquals(start.node, done.scene.withTransition(1, 2, null, 0).scene.node)
+    }
+
+    @Test fun splittingAClipLeavesItsInTransitionOnTheFirstHalfAndItsOutTransitionOnTheSecond() {
+        val start = scene(media(1, 2100), media(2, 5000), media(3, 5000), video(1, 0, 2000, 0, 2000), video(2, 2000, 4000, 300, 2300), video(3, 4000, 6000, 300, 2300))
+        val ab = start.withTransition(1, 2, TransitionKind.PushLeft, 500).scene
+        val abc = ab.withTransition(2, 3, TransitionKind.DipBlack, 600).scene
+        val split = abc.withSplit(abc.layer(2)!!, 90, 99)!!
+        val first = split.layer(2)!!
+        val second = split.layer(99)!!
+        assertNotNull(first.motion(MotionSlot.In))
+        assertNull(first.motion(MotionSlot.Out))
+        assertTrue(first.made(MotionSlot.Out).isEmpty() && first.madeKeys(MotionSlot.Out).isEmpty())
+        assertNull(second.motion(MotionSlot.In))
+        assertEquals(3L, second.motion(MotionSlot.Out)!!.partner)
+        assertTrue(second.made(MotionSlot.In).isEmpty() && second.madeKeys(MotionSlot.In).isEmpty())
+        assertEquals(99L, split.layer(3)!!.motion(MotionSlot.In)!!.partner)
+        val noAb = split.withTransition(1, 2, null, 0).scene
+        assertTrue(noAb.layer(2)!!.endTime + 1 >= noAb.layer(99)!!.startTime)
+        assertEquals(second.node, noAb.layer(99)!!.node)
+        val noBc = split.withTransition(99, 3, null, 0).scene
+        assertEquals(ab.layer(3)!!.node, noBc.layer(3)!!.node)
+        assertEquals(ab.layer(2)!!.endTime, noBc.layer(99)!!.endTime)
+        assertEquals(first.node, noBc.layer(2)!!.node)
     }
 
     @Test fun mediaHandlesAreUsedBeforeAnythingMoves() {

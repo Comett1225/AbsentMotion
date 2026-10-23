@@ -1,6 +1,7 @@
 package app.absentmotion.model
 
 import java.util.Locale
+import java.util.concurrent.atomic.AtomicLong
 import kotlin.math.roundToInt
 import kotlin.random.Random
 
@@ -17,7 +18,7 @@ value class Scene(val node: XmlNode) {
 
     val precompose: String get() = node["precompose"] ?: "dynamicResolution"
 
-    val retime: String get() = node["retime"] ?: "freeze"
+    val retime: String get() = node["retime"] ?: "off"
 
     val retimeIn: Int get() = node["retimeIn"]?.toIntOrNull() ?: 0
     val retimeOut: Int get() = node["retimeOut"]?.toIntOrNull() ?: 0
@@ -57,7 +58,7 @@ value class Scene(val node: XmlNode) {
     fun layerAt(id: Long, timeMs: Int): Layer? = layer(id)?.at(timeMs, fps)
 
     fun frameStart(frame: Int): Int = (frame * 1000L / fps).toInt()
-    fun frameAt(timeMs: Int): Int = (((timeMs + 1L) * fps + 999) / 1000 - 1).toInt()
+    fun frameAt(timeMs: Int): Int = frameOfMs(timeMs.toLong(), fps).toInt()
     fun frameTime(frame: Int): Int = ((2 * frame + 1) * 500L / fps).toInt()
     fun frameEnd(frame: Int): Int = frameStart(frame + 1) - 1
     fun endTimeFor(frame: Int, durationMs: Int): Int = frameEnd(frameAt(frameStart(frame) + durationMs.coerceAtLeast(1) - 1))
@@ -65,6 +66,17 @@ value class Scene(val node: XmlNode) {
     fun lastShownFrame(end: Int): Int = frameAt(end).let { if (frameTime(it) > end) it - 1 else it }
     fun showsAnyFrame(start: Int, end: Int): Boolean = firstShownFrame(start) <= lastShownFrame(end)
     val lastFrame: Int get() = frameAt(totalTime)
+
+    fun drawnFrames(start: Int, end: Int): Int = (frameAt(end) - frameAt(start - 1)).coerceAtLeast(0)
+
+    fun movedClip(layer: Layer, start: Int, keepEnd: Boolean = false): Layer {
+        val moved = layer.movedTo(start)
+        val count = drawnFrames(layer.startTime, layer.endTime)
+        if (count == 0 || minOf(start, layer.startTime) < 0 || drawnFrames(moved.startTime, moved.endTime) == count) return moved
+        val from = if (keepEnd) frameStart(frameAt(moved.endTime) - count + 1) else start
+        val to = if (keepEnd) moved.endTime else frameStart(frameAt(start - 1) + 1 + count) - 1
+        return if (from < 0) moved else moved.copy(node = moved.node.with("startTime", "$from").with("endTime", "$to"))
+    }
 
     fun withTitle(title: String) = Scene(node.with("title", title))
 
@@ -86,7 +98,8 @@ value class Scene(val node: XmlNode) {
         layer.node.mediaUris().forEach { uri ->
             next = next.withMedia(MediaDeclaration(XmlNode("media", mapOf("uri" to uri))))
         }
-        return next.withChildren(next.node.children + layer.node)
+        val unique = if (this.layer(layer.id) == null) layer else layer.withId(generateSequence { Layer.newId() }.first { this.layer(it) == null })
+        return next.withChildren(next.node.children + unique.node)
     }
 
     fun remove(id: Long): Scene = withChildren(node.children.filterNot { it.name in LAYER_TAGS && Layer(it).id == id })
@@ -95,12 +108,41 @@ value class Scene(val node: XmlNode) {
         val moving = layer(id) ?: return this
         val others = layers.filterNot { it.id == id }.toMutableList()
         others.add(index.coerceIn(0, others.size), moving)
-        return withChildren(node.children.filterNot { it.name in LAYER_TAGS } + others.map { it.node })
+        return withLayers(others)
     }
 
+    internal fun withLayers(list: List<Layer>): Scene = withChildren(node.children.filterNot { it.name in LAYER_TAGS } + list.map { it.node })
+
     fun addAbove(layer: Layer, below: Long): Scene {
-        val index = layers.indexOfFirst { it.id == below }
-        return add(layer).let { if (index < 0) it else it.move(layer.id, index + 1) }
+        val list = layers
+        val index = list.indexOfFirst { it.id == below }
+        if (index < 0) return add(layer)
+        var end = index + 1
+        if (!list.isMask(index)) while (end < list.size && list[end].leansOnBelow) end++
+        return add(layer).move(layer.id, end)
+    }
+
+    fun withCopiesAbove(copies: Map<Long, Layer>): Scene {
+        val list = layers
+        val out = ArrayList<Layer>(list.size + copies.size)
+        var i = 0
+        while (i < list.size) {
+            var end = i
+            while (end < list.size && list[end].id in copies && list.isMask(end)) end++
+            if (end == i && list[i].id in copies) {
+                end = i + 1
+                while (end < list.size && (list[end].id in copies || list[end].leansOnBelow)) end++
+            }
+            if (end == i) {
+                out += list[i++]
+                continue
+            }
+            val block = list.subList(i, end)
+            out += block
+            out += block.filter { it.id in copies }.map { copies.getValue(it.id) }
+            i = end
+        }
+        return withLayers(out)
     }
 
     private fun withChildren(children: List<XmlNode>): Scene {
@@ -140,7 +182,16 @@ enum class LabelColour(val id: String, val start: Int, val end: Int) {
     Black("+black", 0xFF5B6070.toInt(), 0xFF2A2D38.toInt()),
 }
 
-data class Layer(val node: XmlNode, val t: Float = 0f, val snap: Float = 0f) {
+private val FOLLOWS_BELOW = setOf("absent.movealongpath", "absent.repeatalongpath")
+
+internal fun frameOfMs(timeMs: Long, fps: Int): Long = ((timeMs + 1) * fps + 999) / 1000 - 1
+
+internal fun List<Layer>.isMask(index: Int): Boolean = index > 0 && this[index].node["clippingMask"] == "true"
+
+internal val Layer.leansOnBelow: Boolean
+    get() = node["clippingMask"] == "true" || effects.any { it["hidden"] != "true" && it["id"] in FOLLOWS_BELOW }
+
+data class Layer(val node: XmlNode, val t: Float = 0f, val snap: ClosedFloatingPointRange<Float> = t..t) {
     val mediaFill: MediaFill? get() {
         if (fillType != "media") return null
         val uri = node["fillImage"] ?: node["fillVideo"] ?: return null
@@ -186,7 +237,9 @@ data class Layer(val node: XmlNode, val t: Float = 0f, val snap: Float = 0f) {
 
     fun at(timeMs: Int, fps: Int): Layer {
         val length = (endTime - startTime).coerceAtLeast(1).toFloat()
-        return copy(t = (timeMs - startTime) / length, snap = 500f / fps / length)
+        val frame = frameOfMs(timeMs.toLong(), fps)
+        fun edge(f: Long) = (f * 1000 / fps - startTime - 0.5f) / length
+        return copy(t = (timeMs - startTime) / length, snap = edge(frame)..edge(frame + 1))
     }
 
     fun timeOf(time: Float): Int = (startTime + time * (endTime - startTime)).roundToInt()
@@ -249,7 +302,7 @@ data class Layer(val node: XmlNode, val t: Float = 0f, val snap: Float = 0f) {
 
     fun keyframes(ref: PropRef): List<Keyframe> = element(ref)?.keyframes ?: emptyList()
 
-    fun onKeyframe(ref: PropRef): Boolean = (element(ref)?.keyframeAt(t, snap) ?: -1) >= 0
+    fun onKeyframe(ref: PropRef): Boolean = (element(ref)?.keyframeAt(snap) ?: -1) >= 0
 
     fun withKeyframeToggled(ref: PropRef, fallback: String): Layer {
         val element = element(ref) ?: XmlNode(ref.name, mapOf("value" to fallback))
@@ -258,13 +311,13 @@ data class Layer(val node: XmlNode, val t: Float = 0f, val snap: Float = 0f) {
 
     fun easing(ref: PropRef): Easing? {
         val element = element(ref) ?: return null
-        val index = element.stretchAt(t, snap)
+        val index = element.stretchAt(snap)
         return if (index < 0) null else Easing.parse(element.keyframes[index].e)
     }
 
     fun stretchProgress(ref: PropRef): Float? {
         val element = element(ref) ?: return null
-        val index = element.stretchAt(t, snap)
+        val index = element.stretchAt(snap)
         if (index < 0) return null
         val keys = element.keyframes
         return (t - keys[index - 1].t) / (keys[index].t - keys[index - 1].t)
@@ -272,7 +325,7 @@ data class Layer(val node: XmlNode, val t: Float = 0f, val snap: Float = 0f) {
 
     fun withEasing(ref: PropRef, easing: Easing): Layer {
         val element = element(ref) ?: return this
-        val index = element.stretchAt(t, snap)
+        val index = element.stretchAt(snap)
         if (index < 0) return this
         val text = easing.takeUnless { it.isLinear }?.toString()
         return withElement(ref, element.withKeyframes(element.keyframes.toMutableList().also { it[index] = it[index].copy(e = text) }))
@@ -300,7 +353,10 @@ data class Layer(val node: XmlNode, val t: Float = 0f, val snap: Float = 0f) {
     private fun scopeNode(scope: KeyScope): XmlNode? = if (scope.ref != null) element(scope.ref) else effects.getOrNull(scope.effectIndex)
 
     companion object {
-        fun newId(): Long = Random.nextLong(10_000_000, 99_999_999)
+        private val nextId = AtomicLong(Random.nextLong(ID_SPAN))
+        private const val ID_SPAN = 89_999_999L
+
+        fun newId(): Long = 10_000_000 + Math.floorMod(nextId.getAndIncrement(), ID_SPAN)
     }
 }
 

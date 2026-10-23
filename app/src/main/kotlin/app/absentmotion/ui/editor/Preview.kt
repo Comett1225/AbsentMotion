@@ -217,8 +217,11 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
                         } else if (moved && canvasGesture && event.changes.size > 1) {
                             val move = (pan + held) / currentScale
                             held = Offset.Zero
-                            state.canvasPan += move
-                            state.canvasZoom = (state.canvasZoom * zoom).coerceIn(0.01f, 64f)
+                            val next = (state.canvasZoom * zoom).coerceIn(0.01f, 64f)
+                            val centroid = event.calculateCentroid(useCurrent = false)
+                            val about = if (centroid.isSpecified) (centroid - currentOffset) / currentScale - Offset(state.scene.width / 2f, state.scene.height / 2f) else Offset.Zero
+                            state.canvasPan = pinchedPan(state.canvasPan + move, about, next / state.canvasZoom)
+                            state.canvasZoom = next
                             state.zoomShown++
                         } else if (moved && startLayer?.kind == "camera" && !(canvasGesture && fingers > 1)) {
                             gesture = HIDDEN
@@ -344,3 +347,5 @@ private const val IDLE = -10
 private const val HIDDEN = -11
 
 private fun handlesOf(corners: List<Offset>): List<Offset> = corners + List(4) { (corners[it] + corners[(it + 1) % 4]) / 2f }
+
+internal fun pinchedPan(pan: Offset, about: Offset, factor: Float): Offset = pan / factor + about * (1 / factor - 1)

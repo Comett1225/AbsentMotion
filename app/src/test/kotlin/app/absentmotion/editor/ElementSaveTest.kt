@@ -73,4 +73,12 @@ class ElementSaveTest {
         assertEquals(2f, child.at(1000, 30).scale[0], 1e-3f)
         assertEquals(295f, child.x(500), 1e-2f)
     }
+    @Test fun aTrimmedOrHiddenGroupIsSavedWholeSoItsCutAndVisibilityStay() {
+        val inner = listOf(layer("shape", 5, null, listOf(prop("location", 0f to "300,200,0"))))
+        val trimmed = group(prop("location", 0f to "200,200,0"), inner = inner).with("endTime", "499")
+        assertEquals("embedScene", sceneOf(trimmed).let { it.elementNodes(it.layer(9)!!, null).single().name })
+        val hidden = group(prop("location", 0f to "200,200,0"), inner = inner).with("hidden", "true")
+        assertEquals("true", sceneOf(hidden).let { it.elementNodes(it.layer(9)!!, null).single()["hidden"] })
+        assertEquals("shape", sceneOf(group(prop("location", 0f to "200,200,0"), inner = inner)).let { it.elementNodes(it.layer(9)!!, null).single().name })
+    }
 }

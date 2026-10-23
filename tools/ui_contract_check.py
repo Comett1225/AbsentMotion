@@ -255,7 +255,7 @@ class UiContracts(unittest.TestCase):
         self.assertIn('hit is Hit.Bar && view.lift(hit.id, finger, viewConfiguration.touchSlop, moves = true) -> drag = Drag.Lift', text)
         self.assertNotIn('Drag.Move', text)
         self.assertNotIn('state.selectedId && abs(moved.x)', text)
-        self.assertIn('state.edit(MOVE_EDIT) { it.update(id) { l -> l.movedTo(start) } }', text)
+        self.assertIn('state.edit(MOVE_EDIT) { it.update(id) { _ -> it.movedClip(original, start) } }', text)
         self.assertIn('state.edit(MOVE_EDIT) { it.move(id, layers.lastIndex - to) }', text)
         self.assertIn('if (!commit || state.scene == moveBase) state.cancelGesture(MOVE_EDIT)', text)
         self.assertIn('TimelineMath.moveTarget(wanted,', text)

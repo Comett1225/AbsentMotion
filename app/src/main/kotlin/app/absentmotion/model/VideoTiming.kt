@@ -6,6 +6,7 @@ import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.sqrt
 import kotlin.math.roundToInt
+import kotlin.math.roundToLong
 
 val SpeedRef = PropRef(PropRef.Kind.Child, "speedMap")
 
@@ -191,12 +192,34 @@ fun Scene.trimEndAt(layer: Layer, frame: Int): Layer? =
 fun Scene.splitAt(layer: Layer, frame: Int, newId: Long): Pair<Layer, Layer>? {
     val cut = frameStart(frame)
     if (cut <= layer.startTime || !showsAnyFrame(layer.startTime, cut - 1) || !showsAnyFrame(cut, layer.endTime)) return null
-    return layer.trimmedTo(layer.startTime, cut - 1) to layer.withId(newId).trimmedTo(cut, layer.endTime)
+    return layer.trimmedTo(layer.startTime, cut - 1).withoutMotionMarks(MotionSlot.Out) to
+        layer.withId(newId).trimmedTo(cut, layer.endTime).withoutMotionMarks(MotionSlot.In)
 }
 
-fun Scene.withSplit(layer: Layer, frame: Int, newId: Long): Scene? {
+fun Scene.withSplit(layer: Layer, frame: Int, newId: Long, nextId: () -> Long = Layer::newId): Scene? {
     val (first, second) = splitAt(layer, frame, newId) ?: return null
-    return update(first.id) { first }.addAbove(second, first.id)
+    val list = layers
+    val index = list.indexOfFirst { it.id == layer.id }
+    if (index < 0) return add(second)
+    var end = index + 1
+    if (!list.isMask(index)) while (end < list.size && list.isMask(end)) end++
+    val cut = frameStart(frame)
+    val lower = mutableListOf(first)
+    val upper = mutableListOf(second)
+    for (mask in list.subList(index + 1, end)) {
+        val halves = splitAt(mask, frame, nextId())
+        when {
+            halves != null -> { lower += halves.first; upper += halves.second }
+            mask.startTime >= cut || !showsAnyFrame(mask.startTime, cut - 1) -> upper += mask
+            else -> lower += mask
+        }
+    }
+    val split = withLayers(list.subList(0, index) + lower + upper + list.subList(end, list.size))
+    val out = layer.motion(MotionSlot.Out)?.takeIf { it.transition } ?: return split
+    return split.update(out.partner) { next ->
+        next.motion(MotionSlot.In)?.takeIf { it.transition && it.partner == layer.id }
+            ?.let { next.copy(node = next.node.with(MotionSlot.In.attr, it.copy(partner = newId).toString())) } ?: next
+    }
 }
 
 fun Layer.retimedVideo(start: Int, end: Int): Layer {
@@ -239,9 +262,13 @@ fun Layer.withVideoSpeedMap(map: XmlNode): Layer {
 
 fun Layer.atVideoTime(timeMs: Int, fps: Int): Layer {
     val timing = VideoTiming(this)
-    val local = (timeMs - startTime).toDouble()
-    return copy(t = (timing.mediaMs(local) * 1_000_000).toFloat(), snap = timing.speed(local) * 500_000_000f / fps)
+    val frame = frameOfMs(timeMs.toLong(), fps)
+    fun ns(ms: Double) = (timing.mediaMs(ms - startTime) * 1_000_000).toFloat()
+    return copy(t = ns(timeMs.toDouble()), snap = ns(frame * 1000 / fps - 0.5)..ns((frame + 1) * 1000 / fps - 0.5))
 }
+
+private fun Layer.speedKeyFrame(timing: VideoTiming, key: Keyframe, fps: Int): Long =
+    frameOfMs((startTime + timing.localMs(key.t.toDouble() / 1_000_000)).roundToLong(), fps)
 
 fun Layer.withSpeedKeyframeToggled(projectTime: Int, fps: Int): Layer {
     val local = (projectTime - startTime).toDouble()
@@ -249,7 +276,7 @@ fun Layer.withSpeedKeyframeToggled(projectTime: Int, fps: Int): Layer {
     val media = (timing.mediaMs(local) * 1_000_000).toFloat()
     val map = node.child("speedMap") ?: XmlNode("speedMap", mapOf("value" to (node["speed"] ?: "1")))
     val keys = map.keyframes
-    val here = keys.indexOfFirst { abs(timing.localMs(it.t.toDouble() / 1_000_000) - local) <= 500.0 / fps }
+    val here = keys.indexOfFirst { speedKeyFrame(timing, it, fps) == frameOfMs(projectTime.toLong(), fps) }
     val changed = if (here >= 0) {
         if (keys.size == 1) map.copy(children = map.children.filterNot { it.name == "kf" }).with("value", keys[0].v)
         else map.withKeyframes(keys.filterIndexed { index, _ -> index != here })
@@ -297,7 +324,7 @@ fun Layer.withFreezeFrame(projectTime: Int, holdMs: Int, fps: Int): Layer? {
     if (projectTime <= startTime || projectTime >= endTime || holdMs <= 0) return null
     val local = (projectTime - startTime).toDouble()
     val timing = VideoTiming(this)
-    val near = node.child("speedMap")?.keyframes.orEmpty().firstOrNull { abs(timing.localMs(it.t.toDouble() / 1_000_000) - local) <= 500.0 / fps }
+    val near = node.child("speedMap")?.keyframes.orEmpty().firstOrNull { speedKeyFrame(timing, it, fps) == frameOfMs(projectTime.toLong(), fps) }
     val keyed = if (near != null) this else withSpeedKeyframeToggled(projectTime, fps)
     val map = keyed.node.child("speedMap") ?: return null
     val keys = map.keyframes

@@ -96,7 +96,7 @@ class TurningTest {
         val keyed = shapeLayer().addEffect(effect("cube")).withEffect(0) { node ->
             val rotX = node.effectProperty("rotX")!!
             node.copy(children = node.children.map { if (it === rotX) XmlNode("property", rotX.attrs - "value", listOf(XmlNode("kf", mapOf("t" to "0.000000", "v" to "-20.000000")))) else it })
-        }.copy(t = 0.5f, snap = 0.01f)
+        }.copy(t = 0.5f, snap = 0.5f - 0.01f..0.5f + 0.01f)
         val turn = turnFor(keyed, catalog, ROTATE_TAB)!!
         val sideways = turn.turned(keyed, Offset(30f, 0f), 0f)
         assertEquals(1, sideways.effects[0].effectProperty("rotX")!!.children.size)

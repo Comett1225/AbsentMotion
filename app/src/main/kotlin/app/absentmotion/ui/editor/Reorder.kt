@@ -85,7 +85,7 @@ internal class Reorder(
         count = size
         grab = y
         anchor = y - scroll.value
-        start = finger()
+        start = RowDrag.fingerY(top, index, pitch, anchor)
         held = index
         target = index
         tick(HapticFeedbackType.GestureThresholdActivate)
@@ -120,7 +120,7 @@ internal class Reorder(
         }
     }
 
-    private fun finger() = top + held.coerceAtLeast(0) * pitch + anchor
+    private fun finger() = RowDrag.fingerY(top, held.coerceAtLeast(0), pitch, anchor)
 
     private fun update() {
         val to = RowDrag.target(held, offset, pitch, count)
@@ -135,8 +135,7 @@ internal class Reorder(
             val now = withFrameNanos { it }
             val step = ((now - last) / 1e9f).coerceAtMost(0.1f)
             last = now
-            val y = finger()
-            val speed = RowDrag.toward(RowDrag.edgeSpeed(y, 0f, scroll.viewportSize.toFloat(), pitch, pitch, pitch * 10f), y, start, pitch / 4)
+            val speed = RowDrag.liftedScroll(finger(), start, scroll.viewportSize.toFloat(), pitch)
             if (speed != 0f && scroll.dispatchRawDelta(speed * step) != 0f) update()
         }
     }

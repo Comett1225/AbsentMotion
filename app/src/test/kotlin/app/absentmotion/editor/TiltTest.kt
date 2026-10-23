@@ -25,13 +25,13 @@ class TiltTest {
 
     @Test fun tiltCanBeKeyframed() {
         val start = shapeLayer().withTilt(0f, 0f).withKeyframeToggled(PropRef.Tilt, "0,0")
-        val end = start.copy(t = 1f).withTilt(0f, 180f)
+        val end = start.copy(t = 1f, snap = 1f..1f).withTilt(0f, 180f)
         assertEquals(2, end.keyframes(PropRef.Tilt).size)
         assertArrayEquals(floatArrayOf(0f, 90f), end.copy(t = 0.5f).tilt, 1e-3f)
     }
 
     @Test fun aPresetCarriesAKeyframedTilt() {
-        val moving = shapeLayer().withTilt(0f, 0f).withKeyframeToggled(PropRef.Tilt, "0,0").copy(t = 1f).withTilt(60f, 0f)
+        val moving = shapeLayer().withTilt(0f, 0f).withKeyframeToggled(PropRef.Tilt, "0,0").copy(t = 1f, snap = 1f..1f).withTilt(60f, 0f)
         val applied = applyPreset(shapeLayer(), moving)
         assertEquals(moving.node.child("transform")?.child("tilt"), applied.node.child("transform")?.child("tilt"))
     }

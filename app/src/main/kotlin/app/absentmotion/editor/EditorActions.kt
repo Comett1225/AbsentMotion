@@ -10,6 +10,7 @@ import app.absentmotion.platform.Color
 import kotlin.math.roundToInt
 import app.absentmotion.model.Scene
 import app.absentmotion.model.copyLayers
+import app.absentmotion.model.isMask
 import app.absentmotion.model.withCameraFov
 import app.absentmotion.model.withSplit
 import app.absentmotion.model.trimEndAt
@@ -137,7 +138,7 @@ fun EditorState.skipForward() {
 fun EditorState.resetTransform(tabs: List<Int>) = editSelected { layer ->
     tabs.fold(layer) { l, tab ->
         when (tab) {
-            0 -> l.withTransform("location", scene.width / 2f, scene.height / 2f, if (l.kind == "camera") -scene.cameraZoom else 0f)
+            0 -> scene.centred(l, sampleMs)
             1 -> if (l.kind == "camera") l.withCameraFov(60f) else l.withTransform("scale", 1f, 1f)
             2 -> l.withRotation(0f)
             3 -> l.withTilt(0f, 0f)
@@ -182,8 +183,8 @@ private fun EditorState.stretchFrame(direction: Int): Int? {
     val layer = keyLayer ?: return null
     val element = layer.element(ref) ?: return null
     val keys = element.keyframes
-    val end = element.stretchAt(layer.t, layer.snap) + direction
-    if (end < 1 || end > keys.lastIndex || element.stretchAt(layer.t, layer.snap) < 0) return null
+    val end = element.stretchAt(layer.snap) + direction
+    if (end < 1 || end > keys.lastIndex || element.stretchAt(layer.snap) < 0) return null
     val middle = (keys[end - 1].t + keys[end].t) / 2
     val time = if (ref == SpeedRef) layer.startTime + VideoTiming(layer).localMs(middle.toDouble() / 1_000_000).roundToInt() else layer.timeOf(middle)
     return scene.frameAt(time)
@@ -207,10 +208,14 @@ fun EditorState.pasteCurveToAll() {
     editKeyValue { it.withEasingEverywhere(ref, curve) }
 }
 
-fun EditorState.flip(horizontal: Boolean) = editSelected {
-    val s = it.scale
-    if (horizontal) it.withTransform("scale", -s[0], s[1]) else it.withTransform("scale", s[0], -s[1])
+internal fun Scene.centred(layer: Layer, timeMs: Int): Layer {
+    val local = withWorldLocation(layer, timeMs) { _, _ -> width / 2f to height / 2f }.location
+    return layer.withTransform("location", local[0], local[1], if (layer.kind == "camera") -cameraZoom else 0f)
 }
+
+fun EditorState.flip(horizontal: Boolean) = editSelected { it.flipped(horizontal) }
+
+internal fun Layer.flipped(horizontal: Boolean): Layer = copy(node = node.mapTransform("scale") { v -> v[if (horizontal) 0 else 1] *= -1f })
 
 object EffectClipboard {
     var effects by mutableStateOf<List<XmlNode>>(emptyList())
@@ -246,12 +251,18 @@ val EditorState.chosenLayers: List<Layer>
     else listOfNotNull(selectedId?.let { scene.layer(it) })
 
 fun EditorState.copySelected() {
-    val chosen = chosenLayers
-    val ids = chosen.map { it.id }.toSet()
-    val outsideParents = chosen.mapNotNull { it.node["parent"]?.toLongOrNull() }.filter { it !in ids }.toSet()
-    val flat = scene.unparentChildrenOf(outsideParents)
-    copiedLayers = chosen.mapNotNull { flat.layer(it.id) }
+    copiedLayers = scene.layersToCopy(chosenLayers.map { it.id }.toSet())
     copiedMedia = scene.media
+}
+
+internal fun Scene.layersToCopy(ids: Set<Long>): List<Layer> {
+    val outsideParents = layers.filter { it.id in ids }.mapNotNull { it.node["parent"]?.toLongOrNull() }.filter { it !in ids }.toSet()
+    val list = unparentChildrenOf(outsideParents).layers
+    return list.indices.filter { list[it].id in ids }.map { i ->
+        val layer = list[i]
+        val base = (i - 1 downTo 0).firstOrNull { !list.isMask(it) }
+        if (layer.node["clippingMask"] == "true" && (base == null || list[base].id !in ids)) layer.copy(node = layer.node.with("clippingMask", null)) else layer
+    }
 }
 
 fun EditorState.duplicateChosen() {
@@ -259,10 +270,7 @@ fun EditorState.duplicateChosen() {
     val copies = chosenLayers.zip(copyLayers(chosenLayers, preserveOutsideParents = true))
         .associate { (source, copy) -> source.id to copy.withLabel(AppText.get(R.string.edit_layer_copy_name, source.label)) }
     if (copies.isEmpty()) return
-    edit { s -> Scene(s.node.copy(children = s.node.children.flatMap { node ->
-        val copy = if (node.name in Scene.LAYER_TAGS) node["id"]?.toLongOrNull()?.let { copies[it] } else null
-        if (copy == null) listOf(node) else listOf(node, copy.node)
-    })) }
+    edit { it.withCopiesAbove(copies) }
     MultiSelect.clear()
     deselectLayer()
 }
@@ -276,7 +284,7 @@ fun EditorState.deleteChosen() {
 }
 
 fun EditorState.pasteLayer() {
-    val copies = copyLayers(copiedLayers, timeMs)
+    val copies = copyLayers(copiedLayers, timeMs, move = scene::movedClip)
     if (copies.isEmpty()) return
     val wanted = copies.flatMap { it.node.mediaUris() }.toSet()
     edit { s -> copies.fold(copiedMedia.filter { it.uri in wanted }.fold(s) { acc, media -> acc.withMedia(media) }) { acc, layer -> acc.add(layer) } }

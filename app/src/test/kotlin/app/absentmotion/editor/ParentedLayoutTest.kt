@@ -2,6 +2,10 @@ package app.absentmotion.editor
 
 import app.absentmotion.model.Contour
 import app.absentmotion.model.Knot
+import app.absentmotion.model.Keyframe
+import app.absentmotion.model.Layer
+import app.absentmotion.model.PropRef
+import app.absentmotion.model.withKeyframes
 import app.absentmotion.model.Pt
 import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
@@ -79,5 +83,30 @@ class ParentedLayoutTest {
         val (tx, ty) = turned.snapAxesFor(turned.layerAt(2, 0)!!, 0, null, emptyList())
         assertEquals(10f, tx.map(10f), 1e-3f)
         assertEquals(10f, ty.map(10f), 1e-3f)
+        val tilted = scene(400, Layer(layer(1, null, "100,100,0")).withTilt(0f, 60f).node, layer(2, 1, "0,0,0"), layer(3, 2, "50,0,0"))
+        for ((id, pastCentre) in listOf(2L to 105f, 3L to 55f)) {
+            val (ax, ay) = tilted.snapAxesFor(tilted.layerAt(id, 0)!!, 0, null, emptyList())
+            assertEquals(pastCentre, ax.map(pastCentre), 1e-3f)
+            assertEquals(105f, ay.map(105f), 1e-3f)
+        }
+        val flat = scene(400, layer(1, null, "100,100,0"), layer(2, 1, "0,0,0"))
+        assertEquals(100f, flat.snapAxesFor(flat.layerAt(2, 0)!!, 0, null, emptyList()).first.map(105f), 1e-3f)
+    }
+    @Test fun resetPositionCentresAParentedLayerOnTheCanvas() {
+        val s = scene(1080, layer(1, null, "100,200,0", scale = "2,2", rotation = "30"), layer(2, 1, "50,0,0"))
+        val centred = s.update(2, 0) { s.centred(it, 0) }
+        assertEquals(540f, world(centred, 2).x, 1e-2f)
+        assertEquals(540f, world(centred, 2).y, 1e-2f)
+        val alone = scene(1080, layer(3, null, "10,20,5"))
+        assertEquals(listOf(540f, 540f, 0f), alone.centred(alone.layer(3)!!, 0).location.toList())
+    }
+
+    @Test fun flippingAKeyframedScaleFlipsEveryKey() {
+        val keyed = Layer(layer(1, null, "0,0,0")).copy(node = layer(1, null, "0,0,0").let { n ->
+            n.withChild("transform", n.child("transform")!!.withChild("scale", XmlNode("scale").withKeyframes(listOf(Keyframe(0f, "1,1"), Keyframe(1f, "2,3")))))
+        })
+        assertEquals(listOf("-1.000000,1.000000", "-2.000000,3.000000"), keyed.flipped(true).keyframes(PropRef.Scale).map { it.v })
+        assertEquals(listOf("1.000000,-1.000000", "2.000000,-3.000000"), keyed.flipped(false).keyframes(PropRef.Scale).map { it.v })
+        assertEquals(listOf(-1f, 1f), Layer(layer(2, null, "0,0,0")).flipped(true).scale.toList())
     }
 }
