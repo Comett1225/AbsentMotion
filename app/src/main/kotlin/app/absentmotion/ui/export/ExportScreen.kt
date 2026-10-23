@@ -332,7 +332,20 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
         better?.let { settings[ExportKind.Video] = it }
     }
 
+    var storageAsked by remember { mutableStateOf(false) }
+    var afterStorageAnswer by remember { mutableStateOf<(() -> Unit)?>(null) }
+    val storagePermission = app.absentmotion.platform.rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.RequestPermission()) {
+        afterStorageAnswer?.invoke()
+        afterStorageAnswer = null
+    }
+
     fun start(ignoreMissing: Boolean = false, aiReady: Boolean = false) {
+        if (android.os.Build.VERSION.SDK_INT < 29 && !storageAsked && context.checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            storageAsked = true
+            afterStorageAnswer = { start(ignoreMissing, aiReady) }
+            storagePermission.launch(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            return
+        }
         val s = settings.getValue(kind)
         val aiLevel = s.interpolationLevel.takeIf { s.interpolation == FrameInterpolation.Ai && kind in AiKinds }
         if (aiLevel != null && !aiReady && !AiSmooth.installed(context, aiLevel)) {
