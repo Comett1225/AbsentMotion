@@ -1227,6 +1227,7 @@
     <string name="ai_enhance_faces">Yüzleri keskinleştir</string>
     <string name="ai_enhance_faces_hint">Daha keskin yüzler, geri kalanı olduğu gibi kalır</string>
     <string name="ai_enhance_faces_help">Kameraya bakan yüzleri bulur ve yalnızca onları keskinleştirir, sonucu yumuşakça görüntüye harmanlar. Kimsenin görünümünü değiştirmez. Güncel üst seviye bir telefonda 10 saniyelik video için yaklaşık bir dakika; orta segment telefonlar birkaç kat daha uzun sürer.</string>
+    <string name="ai_enhance_no_faces">Bu klipte yüz bulunamadığı için hiçbir şey değiştirilmedi</string>
     <string name="ai_enhance_quick">Hızlı, AI olmadan</string>
     <string name="ai_enhance_quick_note">Klibe Keskinleştir efektini ekler. Efektler listesinden değiştirebilir veya kaldırabilirsiniz.</string>
     <string name="ai_enhance_cartoon">Çizgi film veya animasyon</string>

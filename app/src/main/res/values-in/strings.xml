@@ -1203,6 +1203,7 @@
     <string name="ai_enhance_faces">Pertajam wajah</string>
     <string name="ai_enhance_faces_hint">Wajah lebih tajam, sisanya tetap seperti semula</string>
     <string name="ai_enhance_faces_help">Menemukan wajah yang menghadap kamera dan hanya mempertajamnya, lalu memadukan hasilnya secara lembut ke dalam gambar. Tidak mengubah penampilan siapa pun. Sekitar satu menit untuk video 10 detik di ponsel terbaru kelas atas; ponsel kelas menengah membutuhkan beberapa kali lebih lama.</string>
+    <string name="ai_enhance_no_faces">Tidak ada wajah yang ditemukan di klip ini, jadi tidak ada yang diubah</string>
     <string name="ai_enhance_quick">Cepat, tanpa AI</string>
     <string name="ai_enhance_quick_note">Menambahkan efek Pertajam ke klip. Anda dapat mengubah atau menghapusnya di daftar efek.</string>
     <string name="ai_enhance_cartoon">Kartun atau animasi</string>

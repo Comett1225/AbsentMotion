@@ -1251,6 +1251,7 @@
     <string name="ai_enhance_faces">Realçar rostos</string>
     <string name="ai_enhance_faces_hint">Rostos mais nítidos, o resto fica como está</string>
     <string name="ai_enhance_faces_help">Encontra rostos olhando para a câmera e realça só eles, mesclando o resultado suavemente na imagem. Não muda a aparência de ninguém. Cerca de um minuto para 10 segundos de vídeo em um celular topo de linha recente; celulares intermediários levam algumas vezes mais.</string>
+    <string name="ai_enhance_no_faces">Nenhum rosto foi encontrado neste clipe, então nada foi alterado</string>
     <string name="ai_enhance_quick">Rápido, sem AI</string>
     <string name="ai_enhance_quick_note">Adiciona o efeito Realçar ao clipe. Você pode alterá-lo ou removê-lo na lista de efeitos.</string>
     <string name="ai_enhance_cartoon">Desenho ou animação</string>

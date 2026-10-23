@@ -1227,6 +1227,7 @@
     <string name="ai_enhance_faces">चेहरे शार्प करें</string>
     <string name="ai_enhance_faces_hint">चेहरे ज़्यादा शार्प, बाकी जैसा है वैसा</string>
     <string name="ai_enhance_faces_help">कैमरे की ओर देख रहे चेहरे ढूँढता है और सिर्फ़ उन्हें शार्प करता है, नतीजे को तस्वीर में नरमी से मिलाता है। इससे किसी का चेहरा बदलता नहीं। हाल के टॉप फ़ोन पर 10 सेकंड के वीडियो में लगभग एक मिनट; मिड-रेंज फ़ोन में कुछ गुना ज़्यादा समय लगता है।</string>
+    <string name="ai_enhance_no_faces">इस क्लिप में कोई चेहरा नहीं मिला, इसलिए कुछ भी नहीं बदला गया</string>
     <string name="ai_enhance_quick">क्विक, AI के बिना</string>
     <string name="ai_enhance_quick_note">क्लिप में शार्पन इफ़ेक्ट जोड़ता है। आप इसे इफ़ेक्ट सूची में बदल या हटा सकते हैं।</string>
     <string name="ai_enhance_cartoon">कार्टून या एनिमेशन</string>

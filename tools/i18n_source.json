@@ -96,6 +96,7 @@
  "ai_enhance_faces_help": "Finds faces looking at the camera and sharpens only them, blending the result softly into the picture. It does not change how anyone looks. About a minute for 10 seconds of video on a recent top phone; mid-range phones take a few times longer.",
  "ai_enhance_faces_hint": "Sharper faces, the rest stays as it is",
  "ai_enhance_grain": "Keep film grain",
+ "ai_enhance_no_faces": "No faces were found in this clip, so nothing was changed",
  "ai_enhance_quick": "Quick, without AI",
  "ai_enhance_quick_note": "Adds the Sharpen effect to the clip. You can change or remove it in the effects list.",
  "ai_enhance_sharpen": "Sharpen detail",

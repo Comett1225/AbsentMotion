@@ -1323,6 +1323,7 @@
     <string name="ai_enhance_faces">زيادة حدة الوجوه</string>
     <string name="ai_enhance_faces_hint">وجوه أكثر حدة، والباقي يبقى كما هو</string>
     <string name="ai_enhance_faces_help">يعثر على الوجوه الناظرة إلى الكاميرا ويزيد حدتها فقط، مع دمج النتيجة بسلاسة في الصورة. لا يغيّر مظهر أي شخص. نحو دقيقة لمدة 10 ثوانٍ من الفيديو على هاتف حديث رفيع المستوى؛ وتستغرق الهواتف المتوسطة أضعاف ذلك.</string>
+    <string name="ai_enhance_no_faces">لم يتم العثور على وجوه في هذا المقطع، لذا لم يتغير شيء</string>
     <string name="ai_enhance_quick">سريع، بدون AI</string>
     <string name="ai_enhance_quick_note">يضيف تأثير زيادة الحدة إلى المقطع. يمكنك تغييره أو إزالته من قائمة التأثيرات.</string>
     <string name="ai_enhance_cartoon">كارتون أو رسوم متحركة</string>

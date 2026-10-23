@@ -1203,6 +1203,7 @@
     <string name="ai_enhance_faces">เพิ่มความคมชัดใบหน้า</string>
     <string name="ai_enhance_faces_hint">ใบหน้าคมชัดขึ้น ส่วนที่เหลือคงเดิม</string>
     <string name="ai_enhance_faces_help">ค้นหาใบหน้าที่หันมองกล้องและเพิ่มความคมชัดเฉพาะส่วนนั้น โดยผสมผลลัพธ์เข้ากับภาพอย่างนุ่มนวล ไม่เปลี่ยนหน้าตาของใคร ประมาณหนึ่งนาทีสำหรับวิดีโอ 10 วินาที บนมือถือรุ่นท็อปใหม่ ๆ ส่วนมือถือระดับกลางจะใช้เวลานานกว่านั้นหลายเท่า</string>
+    <string name="ai_enhance_no_faces">ไม่พบใบหน้าในคลิปนี้ จึงไม่มีการเปลี่ยนแปลง</string>
     <string name="ai_enhance_quick">แบบเร็ว ไม่ใช้ AI</string>
     <string name="ai_enhance_quick_note">เพิ่มเอฟเฟกต์เพิ่มความคมชัดให้กับคลิป คุณเปลี่ยนหรือลบได้ในรายการเอฟเฟกต์</string>
     <string name="ai_enhance_cartoon">การ์ตูนหรือแอนิเมชัน</string>

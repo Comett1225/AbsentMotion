@@ -99,6 +99,7 @@ internal class FrameEncoder private constructor(
     private val info = MediaCodec.BufferInfo()
     private var track = -1
     private var finished = false
+    private var closed = false
 
     fun write(pts: Long, argb: IntArray) {
         check(argb.size >= stride * height) { AppText.get(R.string.ai_mask_wrong_size) }
@@ -155,6 +156,8 @@ internal class FrameEncoder private constructor(
     }
 
     override fun close() {
+        if (closed) return
+        closed = true
         runCatching { codec.stop() }
         runCatching { codec.release() }
         try {
@@ -189,8 +192,12 @@ internal class FrameEncoder private constructor(
                     codec.release()
                     continue
                 }
-                val muxer = MediaMuxer(file.path, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
-                muxer.setOrientationHint(((rotation % 360) + 360) % 360 / 90 * 90)
+                val muxer = try {
+                    MediaMuxer(file.path, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4).also { it.setOrientationHint(((rotation % 360) + 360) % 360 / 90 * 90) }
+                } catch (e: Exception) {
+                    codec.release()
+                    throw e
+                }
                 val audio = soundFrom?.let { runCatching { AudioCopy(context, it) }.getOrNull() }
                 return FrameEncoder(codec, muxer, audio, stride, width, height)
             }
@@ -255,9 +262,19 @@ internal suspend fun rewriteVideo(context: Context, job: VideoJob, progress: AiP
         val declared = checkNotNull(videoDeclaration(context, uri)) { AppText.get(R.string.ai_unable_to_process) }
         return AiMedia(file, declared).also { success = true }
     } finally {
+        releaseJob(encoder, thermal::stop) { if (!success) file.delete() }
+    }
+}
+
+internal inline fun releaseJob(encoder: Closeable?, stopThermal: () -> Unit, discard: () -> Unit) {
+    try {
         encoder?.close()
-        thermal.stop()
-        if (!success) file.delete()
+    } finally {
+        try {
+            stopThermal()
+        } finally {
+            discard()
+        }
     }
 }
 

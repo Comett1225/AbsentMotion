@@ -1227,6 +1227,7 @@
     <string name="ai_enhance_faces">I-sharpen ang mga mukha</string>
     <string name="ai_enhance_faces_hint">Mas sharp ang mga mukha, hindi binabago ang iba</string>
     <string name="ai_enhance_faces_help">Hinahanap ang mga mukhang nakatingin sa kamera at ang mga iyon lang ang ini-sharpen, at pinagsasama nang malumanay ang resulta sa larawan. Hindi nito binabago ang itsura ng sinuman. Mga isang minuto para sa 10 segundong bidyo sa bagong high-end na phone; mas matagal nang ilang beses sa mid-range na phone.</string>
+    <string name="ai_enhance_no_faces">Walang nakitang mukha sa clip na ito, kaya walang binago</string>
     <string name="ai_enhance_quick">Mabilis, walang AI</string>
     <string name="ai_enhance_quick_note">Nagdadagdag ng Sharpen na epekto sa clip. Puwede mo itong baguhin o alisin sa listahan ng mga epekto.</string>
     <string name="ai_enhance_cartoon">Cartoon o animation</string>

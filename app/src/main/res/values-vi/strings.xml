@@ -1203,6 +1203,7 @@
     <string name="ai_enhance_faces">Làm nét khuôn mặt</string>
     <string name="ai_enhance_faces_hint">Khuôn mặt nét hơn, phần còn lại giữ nguyên</string>
     <string name="ai_enhance_faces_help">Tìm khuôn mặt đang nhìn vào máy ảnh và chỉ làm nét chúng, hòa trộn kết quả một cách nhẹ nhàng vào hình ảnh. Nó không thay đổi diện mạo của bất kỳ ai. Khoảng một phút cho 10 giây video trên một chiếc điện thoại cao cấp gần đây; điện thoại tầm trung mất lâu hơn vài lần.</string>
+    <string name="ai_enhance_no_faces">Không tìm thấy khuôn mặt nào trong clip này nên không có gì thay đổi</string>
     <string name="ai_enhance_quick">Nhanh, không dùng AI</string>
     <string name="ai_enhance_quick_note">Thêm hiệu ứng làm nét vào clip. Bạn có thể thay đổi hoặc xóa trong danh sách hiệu ứng.</string>
     <string name="ai_enhance_cartoon">Hoạt hình hoặc animation</string>

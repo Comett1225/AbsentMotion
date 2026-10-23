@@ -2,6 +2,7 @@ package app.absentmotion.ai
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.Matrix
 import android.graphics.PointF
 import android.media.FaceDetector
 import androidx.annotation.StringRes
@@ -86,11 +87,25 @@ internal fun mixArgb(base: Int, top: Int, weight: Float): Int {
     return out
 }
 
-private class FaceWork(private val net: AiNet) : FrameWork {
+internal fun uprightToFrame(x: Float, y: Float, width: Float, height: Float, turn: Int): Pair<Float, Float> = when (turn) {
+    90 -> y to height - x
+    180 -> width - x to height - y
+    270 -> width - y to x
+    else -> x to y
+}
+
+internal fun displayTurn(orientation: Int): Int = ((orientation % 360) + 360) % 360 / 90 * 90
+
+private class FaceWork(private val net: AiNet, orientation: Int) : FrameWork {
     private val tracks = mutableListOf<FaceBox>()
+    private val turn = displayTurn(orientation)
+    var found = false
+        private set
 
     override suspend fun frame(pts: Long, argb: IntArray, width: Int, height: Int, emit: suspend (Long, IntArray) -> Unit) {
-        for (face in trackFaces(tracks, detect(argb, width, height))) {
+        val seen = detect(argb, width, height)
+        if (seen.isNotEmpty()) found = true
+        for (face in trackFaces(tracks, seen)) {
             val side = face.side.roundToInt().coerceIn(16, min(width, height))
             val x0 = (face.cx - side / 2f).roundToInt().coerceIn(0, width - side)
             val y0 = (face.cy - side / 2f).roundToInt().coerceIn(0, height - side)
@@ -107,18 +122,23 @@ private class FaceWork(private val net: AiNet) : FrameWork {
     private suspend fun detect(argb: IntArray, width: Int, height: Int): List<FaceBox> = withContext(Dispatchers.Default) {
         val k = min(1f, DETECT_SIDE / max(width, height).toFloat())
         val w = max(2, (width * k).toInt() and 1.inv())
-        val h = max(1, (height * k).toInt())
-        val small = Bitmap.createScaledBitmap(Bitmap.createBitmap(argb, width, height, Bitmap.Config.ARGB_8888), w, h, true)
-        val rgb = small.copy(Bitmap.Config.RGB_565, false)
-        small.recycle()
+        val h = max(2, (height * k).toInt() and 1.inv())
+        val full = Bitmap.createBitmap(argb, width, height, Bitmap.Config.ARGB_8888)
+        val scaled = Bitmap.createScaledBitmap(full, w, h, true)
+        if (scaled !== full) full.recycle()
+        val upright = if (turn == 0) scaled else Bitmap.createBitmap(scaled, 0, 0, w, h, Matrix().apply { postRotate(turn.toFloat()) }, true).also { scaled.recycle() }
+        val rgb = upright.copy(Bitmap.Config.RGB_565, false)
+        upright.recycle()
         try {
             val faces = arrayOfNulls<FaceDetector.Face>(MAX_FACES)
-            val count = FaceDetector(w, h, MAX_FACES).findFaces(rgb, faces)
+            val count = FaceDetector(rgb.width, rgb.height, MAX_FACES).findFaces(rgb, faces)
             val mid = PointF()
+            val toFrame = width.toFloat() / w
             faces.take(count).filterNotNull().filter { it.confidence() >= MIN_CONFIDENCE }.map { face ->
                 face.getMidPoint(mid)
-                val eyes = face.eyesDistance() / k
-                FaceBox(mid.x / k, mid.y / k + eyes * 0.25f, eyes * 3.2f)
+                val eyes = face.eyesDistance()
+                val (x, y) = uprightToFrame(mid.x, mid.y + eyes * 0.25f, w.toFloat(), h.toFloat(), turn)
+                FaceBox(x * toFrame, y * (height.toFloat() / h), eyes * toFrame * 3.2f)
             }
         } finally {
             rgb.recycle()
@@ -139,9 +159,14 @@ internal object AiEnhance {
         AiDevice.probeGpu(context, options.model)
         val net = withContext(Dispatchers.IO) { AiNet.open(context, options.model, options.blend, GRAIN_WEIGHT) }
         return net.use {
-            val work = if (options.mode == EnhanceMode.Faces) FaceWork(net)
-                else FrameWork { pts, argb, width, height, emit -> emit(pts, net.upscale(argb, width, height, options.mode.scale)) }
-            rewriteVideo(context, VideoJob(layer, media, options.mode.scale), progress, work)
+            val faces = if (options.mode == EnhanceMode.Faces) FaceWork(net, media.orientation) else null
+            val work = faces ?: FrameWork { pts, argb, width, height, emit -> emit(pts, net.upscale(argb, width, height, options.mode.scale)) }
+            rewriteVideo(context, VideoJob(layer, media, options.mode.scale), progress, work).also {
+                if (faces != null && !faces.found) {
+                    it.file.delete()
+                    error(AppText.get(R.string.ai_enhance_no_faces))
+                }
+            }
         }
     }
 
