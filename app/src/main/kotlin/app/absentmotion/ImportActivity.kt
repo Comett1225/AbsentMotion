@@ -13,6 +13,11 @@ object ImportHandOff {
     @Synchronized fun give(uris: List<String>) { waiting += uris }
 
     @Synchronized fun take(): List<String> = waiting.toList().also { waiting.clear() }
+
+    fun start(uris: List<String>, launch: (grant: Boolean) -> Unit) {
+        give(uris)
+        try { launch(true) } catch (e: SecurityException) { launch(false) }
+    }
 }
 
 class ImportActivity : Activity() {
@@ -25,13 +30,14 @@ class ImportActivity : Activity() {
             else -> emptyList()
         }.filterNot(::isOwnPrivateFile)
         if (uris.isNotEmpty()) {
-            ImportHandOff.give(uris.map { it.toString() })
             val clip = ClipData.newRawUri("import", uris.first()).apply { uris.drop(1).forEach { addItem(ClipData.Item(it)) } }
-            startActivity(
-                Intent(this, MainActivity::class.java)
-                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                    .apply { clipData = clip },
-            )
+            ImportHandOff.start(uris.map { it.toString() }) { grant ->
+                startActivity(
+                    Intent(this, MainActivity::class.java)
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                        .apply { if (grant) { addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); clipData = clip } },
+                )
+            }
         }
         finish()
     }
