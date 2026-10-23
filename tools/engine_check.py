@@ -122,6 +122,17 @@ CASES = {
         scene(cutout(CUT_STROKE)), [((100, 70), GREEN), ((100, 100), RED), ((52, 100), BLACK), ((55, 55), BLACK)]),
     "a border on a cut-out picture with Glow follows its visible pixels": (
         scene(cutout(CUT_GLOW)), [((100, 68), BLUE), ((100, 100), RED), ((52, 100), BLACK), ((55, 55), BLACK)]),
+    "a shutter blur on a still layer keeps its first frame at full strength": (
+        scene(rect(1, 100, 100, 50, 50, extra='<effect id="absent.shutterblur" hidden="false"><property name="shutter" type="float" value="180"/></effect>')),
+        [((100, 100), (255, 255, 255))]),
+    "a drawing made of one tap draws a dot": (
+        scene(f'<drawing id="1" label="d" startTime="0" endTime="1000">{transform()}<stroke color="#ffffffff" width="20" type="pen" points="100,100,1"/></drawing>'),
+        [((100, 100), (255, 255, 255)), ((100, 130), BLACK)]),
+    "a stroke on text follows the letters, not the text box": (
+        scene('<text id="1" label="t" fillType="color" startTime="0" endTime="1000" size="30" wrapWidth="190" align="center">'
+              f'{transform("100,100,0")}<content>Hi</content><fillColor value="#ffffffff"/>'
+              '<path-stroke><color value="#ff00ff00"/><size value="4"/></path-stroke></text>'),
+        [((5, 100), BLACK), ((195, 100), BLACK), ((64, 100), GREEN)]),
     "a backdrop effect moves the layers behind it and hides its own fill": (
         scene(rect(1, 50, 100, 50, 100, 0xffff0000) + rect(2, 150, 100, 50, 100, 0xff0000ff)
               + rect(3, 100, 100, 60, 60, extra='<effect id="absent.displacementmap" hidden="false">'
