@@ -29,7 +29,7 @@ internal object TestHooks {
     fun onboarding(intent: Intent): String? = intent.getStringExtra("onboarding")
 
     fun newIntent(activity: MainActivity, intent: Intent) {
-        if (intent.hasExtra("xml") || intent.hasExtra("aaccheck") || intent.hasExtra("devicecheck") || intent.hasExtra("capcheck") || intent.hasExtra("aicheck") || intent.hasExtra("enhancecheck") || intent.hasExtra("aismoothcheck") || intent.hasExtra("aidownload")) {
+        if (intent.hasExtra("xml") || intent.hasExtra("aaccheck") || intent.hasExtra("devicecheck") || intent.hasExtra("capcheck") || intent.hasExtra("aicheck") || intent.hasExtra("enhancecheck") || intent.hasExtra("aismoothcheck") || intent.hasExtra("aismoothtrim") || intent.hasExtra("aidownload")) {
             activity.setIntent(intent)
             start(activity)
             return
@@ -166,6 +166,13 @@ internal object TestHooks {
                 try { checkSmooth(activity, path, (intent.getStringExtra("levels") ?: "Low").split(',')) }
                 catch (e: kotlinx.coroutines.CancellationException) { throw e }
                 catch (e: Throwable) { Log.e("AMAi", "aismooth failed", e) }
+            }
+        }
+        intent.getStringExtra("aismoothtrim")?.let { path ->
+            scope.launch {
+                try { checkSmoothTrim(activity, path, intent.getIntExtra("from", 1000), intent.getIntExtra("to", 3000)) }
+                catch (e: kotlinx.coroutines.CancellationException) { throw e }
+                catch (e: Throwable) { Log.e("AMAi", "smoothtrim failed", e) }
             }
         }
         intent.getStringExtra("videocutcheck")?.let { path ->

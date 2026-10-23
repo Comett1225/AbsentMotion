@@ -15,6 +15,7 @@ import app.absentmotion.editor.EditorPanel
 import app.absentmotion.editor.EditorState
 import app.absentmotion.export.FrameInterpolation
 import app.absentmotion.export.Smoothing
+import app.absentmotion.export.holdingVideo
 import app.absentmotion.library.CrashLogs
 import app.absentmotion.model.Layer
 import app.absentmotion.model.MediaDeclaration
@@ -39,8 +40,15 @@ enum class AiAction(@StringRes val title: Int) {
     fun unavailable(layer: Layer?): UiText? = when (this) {
         Background -> if (layer?.mediaFill?.video == false) null else txt(R.string.ai_select_image_layer)
         Noise -> if (layer?.kind == "audio") null else txt(R.string.ai_select_audio_layer)
-        Enhance -> app.absentmotion.Tier.reason(app.absentmotion.Feature.AiEnhance) ?: if (layer?.mediaFill?.video == true) null else txt(R.string.ai_select_video_layer)
-        Video, Smooth -> if (layer?.mediaFill?.video == true) null else txt(R.string.ai_select_video_layer)
+        Enhance -> app.absentmotion.Tier.reason(app.absentmotion.Feature.AiEnhance) ?: videoReason(layer, AiKind.Enhance)
+        Smooth -> videoReason(layer, AiKind.Smooth)
+        Video -> videoReason(layer, null)
+    }
+
+    private fun videoReason(layer: Layer?, kind: AiKind?): UiText? = when {
+        layer?.mediaFill?.video != true -> txt(R.string.ai_select_video_layer)
+        kind != null && layer.aiBuried(kind) -> txt(R.string.ai_undo_newer_first)
+        else -> null
     }
 }
 
@@ -67,6 +75,9 @@ class AiTools(private val context: Context, private val state: EditorState, priv
     var enhanceSetup by mutableStateOf<Layer?>(null)
     var enhance by mutableStateOf(EnhanceOptions())
     private var job: Job? = null
+
+    private suspend fun <T> holdingPreview(action: AiAction, block: suspend () -> T): T =
+        if (action == AiAction.Noise || action == AiAction.Background) block() else holdingVideo(state.engine::holdVideo, state.engine::releaseVideo, block)
 
     fun cancel() { job?.cancel(); message = AppText.get(R.string.ai_cancelling) }
     fun dismiss() { message = ""; retry = null }
@@ -105,7 +116,7 @@ class AiTools(private val context: Context, private val state: EditorState, priv
         job = scope.launch {
             var result: AiMedia? = null
             var committed = false
-            try { CrashLogs.during("running AI ${action.name.lowercase()}") {
+            try { CrashLogs.during("running AI ${action.name.lowercase()}") { holdingPreview(action) {
                 val report: AiProgress = { fraction, text ->
                     withContext(Dispatchers.Main) { progress = fraction.coerceIn(0f, 1f); message = text }
                 }
@@ -136,7 +147,8 @@ class AiTools(private val context: Context, private val state: EditorState, priv
                     state.selectedId = groupId
                 } else if (action == AiAction.Smooth) {
                     val previous = layer.aiMarks.firstOrNull { it.kind == AiKind.Smooth }
-                    val source = previous?.original ?: layer.mediaFill!!.uri
+                    val base = layer.smoothSource(previous)
+                    val source = base.mediaFill!!.uri
                     val media = checkNotNull(previous?.media ?: state.scene.media(source)) { AppText.get(R.string.ai_video_missing) }
                     val chosen = smoothing
                     if (chosen.method == FrameInterpolation.Ai && !AiSmooth.installed(context, chosen.level)) {
@@ -144,14 +156,12 @@ class AiTools(private val context: Context, private val state: EditorState, priv
                         AiSmooth.download(context, chosen.level) { fraction -> progress = fraction.coerceIn(0f, 1f) }
                     }
                     val output = withContext(Dispatchers.IO) {
-                        ClipSmooth.run(context, state.engine, layer.copy(node = layer.node.with("fillVideo", source)), media, state.scene.fps, chosen, report).also { result = it }
+                        ClipSmooth.run(context, state.engine, base, media, state.scene.fps, chosen, report).also { result = it }
                     }
                     ensureActive()
                     check(state.scene.layer(layer.id) == layer) { AppText.get(R.string.ai_layer_changed) }
                     state.edit { scene ->
-                        scene.update(layer.id) {
-                            it.copy(node = it.node.with("fillVideo", output.declaration.uri)).withAiMark(AiKind.Smooth, source, output.declaration.uri, chosen.option, media)
-                        }.withMedia(output.declaration)
+                        scene.update(layer.id) { it.withSmoothed(output.declaration.uri, source, chosen.option, media, base) }.withMedia(output.declaration)
                     }
                 } else {
                     val original = state.scene.media(layer.node[if (action == AiAction.Noise) "src" else "fillImage"] ?: "")
@@ -178,7 +188,7 @@ class AiTools(private val context: Context, private val state: EditorState, priv
                 message = ""
                 state.panel = EditorPanel.Tools
                 state.effectBrowserOpen = false
-            } } catch (_: CancellationException) {
+            } } } catch (_: CancellationException) {
                 message = AppText.get(R.string.ai_cancelled)
             } catch (e: ModelNotReady) {
                 message = e.message ?: AppText.get(R.string.ai_model_not_ready_default); retry = action

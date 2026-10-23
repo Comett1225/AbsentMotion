@@ -137,7 +137,7 @@ internal class FrameEncoder private constructor(
             when {
                 index == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED -> {
                     track = muxer.addTrack(codec.outputFormat)
-                    audio?.format?.let { format -> audio.track = runCatching { muxer.addTrack(format) }.getOrDefault(-1) }
+                    audio?.format?.let { format -> audio.track = runCatching { muxer.addTrack(format) }.getOrElse { throw IllegalStateException(AppText.get(R.string.ai_sound_not_kept), it) } }
                     muxer.start()
                 }
                 index >= 0 -> {
@@ -199,7 +199,13 @@ internal class FrameEncoder private constructor(
                     codec.release()
                     throw e
                 }
-                val audio = soundFrom?.let { runCatching { AudioCopy(context, it) }.getOrNull() }
+                val audio = try {
+                    soundFrom?.let { AudioCopy(context, it) }
+                } catch (e: Exception) {
+                    codec.release()
+                    muxer.release()
+                    throw IllegalStateException(AppText.get(R.string.ai_sound_not_kept), e)
+                }
                 return FrameEncoder(codec, muxer, audio, stride, width, height)
             }
             error(AppText.get(R.string.ai_video_too_large_to_save, width.toString(), height.toString()))
@@ -223,6 +229,7 @@ internal suspend fun rewriteVideo(context: Context, job: VideoJob, progress: AiP
     val file = aiFile(context, "mp4")
     val needed = (videoBitrate(media.width * job.scale, media.height * job.scale, fps) / 8.0 * seconds).roundToLong() * 2 + 50_000_000L
     check(file.parentFile!!.usableSpace >= needed) { AppText.get(R.string.ai_not_enough_storage, (needed / 1_000_000).toString()) }
+    val sound = keepSound(context, fill.uri, if (fill.outTime == Int.MAX_VALUE) media.duration else fill.outTime * 1000L)
     val thermal = ThermalMonitor.of(context)
     thermal.start()
     var success = false
@@ -233,7 +240,7 @@ internal suspend fun rewriteVideo(context: Context, job: VideoJob, progress: AiP
             check(stamps.isNotEmpty()) { AppText.get(R.string.ai_no_video_frames) }
             var size = 0 to 0
             val emit: suspend (Long, IntArray) -> Unit = { pts, argb ->
-                val out = encoder ?: FrameEncoder.open(context, file, size.first * job.scale, size.second * job.scale, fps, media.orientation, fill.uri).also {
+                val out = encoder ?: FrameEncoder.open(context, file, size.first * job.scale, size.second * job.scale, fps, media.orientation, sound?.uri).also {
                     encoder = it
                     if (pts > 0) it.write(0L, argb)
                 }
@@ -241,7 +248,7 @@ internal suspend fun rewriteVideo(context: Context, job: VideoJob, progress: AiP
             }
             val started = System.nanoTime()
             var done = 0
-            for (batch in stamps.chunked(BATCH)) {
+            for (batch in stamps.chunked(enhanceBatch(media.width, media.height))) {
                 val frames = ArrayList<Pair<Long, IntArray>>(batch.size)
                 reader.read(batch) { pts, yuv ->
                     size = yuv.width to yuv.height
@@ -263,7 +270,7 @@ internal suspend fun rewriteVideo(context: Context, job: VideoJob, progress: AiP
         val declared = checkNotNull(videoDeclaration(context, uri)) { AppText.get(R.string.ai_unable_to_process) }
         return AiMedia(file, declared).also { success = true }
     } finally {
-        releaseJob(encoder, thermal::stop) { if (!success) file.delete() }
+        releaseJob(encoder, thermal::stop) { sound?.close(); if (!success) file.delete() }
     }
 }
 
@@ -294,5 +301,9 @@ internal fun frameStatus(done: Int, total: Int, elapsedNs: Long): String {
         else AppText.get(R.string.ai_frames_minutes_left, done.toString(), total.toString(), (left / 60).roundToInt().toString())
 }
 
-private const val BATCH = 8
+internal fun enhanceBatch(width: Int, height: Int, heapBytes: Long = Runtime.getRuntime().maxMemory()): Int =
+    (heapBytes / BATCH_HEAP_SHARE / (width.toLong().coerceAtLeast(1) * height.toLong().coerceAtLeast(1) * 4)).coerceIn(1L, MAX_BATCH.toLong()).toInt()
+
+private const val MAX_BATCH = 8
+private const val BATCH_HEAP_SHARE = 8
 private const val HOT_PAUSE_MS = 2_000L

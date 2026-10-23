@@ -1124,6 +1124,7 @@
     <string name="ai_select_image_layer">เลือกเลเยอร์รูปภาพ</string>
     <string name="ai_select_audio_layer">เลือกเลเยอร์เสียง</string>
     <string name="ai_select_video_layer">เลือกเลเยอร์วิดีโอ</string>
+    <string name="ai_undo_newer_first">เลิกทำ AI ที่ใหม่กว่าก่อน</string>
     <string name="ai_cancelling">กำลังยกเลิก…</string>
     <string name="ai_preparing">กำลังเตรียม…</string>
     <string name="ai_cancelled">ยกเลิกแล้ว</string>
@@ -1156,6 +1157,7 @@
     <string name="ai_sample_rate_changed">อัตราสุ่มตัวอย่างเสียงเปลี่ยนระหว่างการถอดรหัส</string>
     <string name="ai_recording_too_large">ไฟล์บันทึกเสียงนี้ใหญ่เกินไปสำหรับ WAV</string>
     <string name="ai_no_samples_decoded">ไม่มีแซมเพิลเสียงที่ถูกถอดรหัส</string>
+    <string name="ai_sound_not_kept">ไม่สามารถเก็บเสียงของคลิปนี้ไว้ได้ จึงไม่มีการเปลี่ยนแปลง</string>
     <string name="ai_mask_wrong_size">การลบพื้นหลังได้ผลลัพธ์ขนาดไม่ถูกต้อง ลองอีกครั้ง</string>
     <string name="ai_encoder_no_image">ตัวเข้ารหัสวิดีโอไม่มีภาพอินพุต</string>
     <string name="ai_encoder_not_responding">ตัวเข้ารหัสวิดีโอหยุดตอบสนอง</string>
@@ -1393,7 +1395,6 @@
     <string name="smooth_nothing">คลิปนี้มีเฟรมเพียงพอต่อเฟรมเรตของโปรเจกต์แล้ว เลือกโมชันเบลอ หรือลดความเร็วคลิปก่อน</string>
     <string name="smooth_frame">กำลังปรับให้ลื่น: เฟรม %1$s จาก %2$s…</string>
     <string name="smooth_saving">กำลังบันทึกคลิปที่ปรับให้ลื่น…</string>
-    <string name="smooth_sound_format">เสียงของคลิปนี้ใช้รูปแบบที่ไม่สามารถเก็บไว้ได้ คลิปจึงไม่ได้ถูกปรับให้ลื่น</string>
     <string name="export_list_or">%1$s หรือ %2$s</string>
     <string name="export_list_and">%1$s และ %2$s</string>
     <string name="export_reason_container_codecs">%1$s ต้องใช้วิดีโอ %2$s ซึ่งโทรศัพท์นี้สร้างที่ %3$s ไม่ได้</string>

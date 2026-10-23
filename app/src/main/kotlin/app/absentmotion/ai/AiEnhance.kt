@@ -47,6 +47,7 @@ data class EnhanceOptions(val mode: EnhanceMode = EnhanceMode.Upscale2, val cart
 }
 
 internal const val GRAIN_WEIGHT = 0.5f
+internal const val QUICK_SHARPEN = "absent.sharpen"
 internal const val TILE_OVERHEAD = 1.17
 internal const val FACE_MEGAPIXELS = 0.1
 

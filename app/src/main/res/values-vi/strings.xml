@@ -1124,6 +1124,7 @@
     <string name="ai_select_image_layer">Chọn một lớp hình ảnh</string>
     <string name="ai_select_audio_layer">Chọn một lớp âm thanh</string>
     <string name="ai_select_video_layer">Chọn một lớp video</string>
+    <string name="ai_undo_newer_first">Hoàn tác AI mới hơn trước</string>
     <string name="ai_cancelling">Đang hủy…</string>
     <string name="ai_preparing">Đang chuẩn bị…</string>
     <string name="ai_cancelled">Đã hủy</string>
@@ -1156,6 +1157,7 @@
     <string name="ai_sample_rate_changed">Tần số lấy mẫu âm thanh đã thay đổi trong khi giải mã</string>
     <string name="ai_recording_too_large">Bản ghi này quá lớn đối với WAV</string>
     <string name="ai_no_samples_decoded">Không có mẫu âm thanh nào được giải mã</string>
+    <string name="ai_sound_not_kept">Không thể giữ lại âm thanh của clip này, nên không có gì bị thay đổi.</string>
     <string name="ai_mask_wrong_size">Xóa nền cho ra kết quả sai kích thước. Hãy thử lại.</string>
     <string name="ai_encoder_no_image">Bộ mã hóa video không cung cấp hình ảnh đầu vào</string>
     <string name="ai_encoder_not_responding">Bộ mã hóa video ngừng phản hồi</string>
@@ -1393,7 +1395,6 @@
     <string name="smooth_nothing">Clip này đã có đủ khung hình cho tốc độ khung hình của dự án. Hãy chọn Nhòe chuyển động hoặc làm chậm clip trước.</string>
     <string name="smooth_frame">Đang làm mượt: khung hình %1$s / %2$s…</string>
     <string name="smooth_saving">Đang lưu clip mượt…</string>
-    <string name="smooth_sound_format">Âm thanh của clip này dùng định dạng không thể giữ lại, nên clip chưa được làm mượt.</string>
     <string name="export_list_or">%1$s hoặc %2$s</string>
     <string name="export_list_and">%1$s và %2$s</string>
     <string name="export_reason_container_codecs">%1$s cần video %2$s, mà điện thoại này không thể tạo ở %3$s.</string>

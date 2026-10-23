@@ -1172,6 +1172,7 @@
     <string name="ai_select_image_layer">Select an image layer</string>
     <string name="ai_select_audio_layer">Select an audio layer</string>
     <string name="ai_select_video_layer">Select a video layer</string>
+    <string name="ai_undo_newer_first">Undo newer AI first</string>
     <string name="ai_cancelling">Canceling…</string>
     <string name="ai_preparing">Preparing…</string>
     <string name="ai_cancelled">Canceled</string>
@@ -1204,6 +1205,7 @@
     <string name="ai_sample_rate_changed">Audio sample rate changed during decoding</string>
     <string name="ai_recording_too_large">This recording is too large for WAV</string>
     <string name="ai_no_samples_decoded">No audio samples were decoded</string>
+    <string name="ai_sound_not_kept">The sound of this clip could not be kept, so nothing was changed.</string>
     <string name="ai_mask_wrong_size">Background removal gave a result of the wrong size. Try again.</string>
     <string name="ai_encoder_no_image">The video encoder gave no input image</string>
     <string name="ai_encoder_not_responding">The video encoder stopped responding</string>
@@ -1441,7 +1443,6 @@
     <string name="smooth_nothing">This clip already has enough frames for the project frame rate. Choose Motion Blur, or slow the clip down first.</string>
     <string name="smooth_frame">Smoothing: frame %1$s of %2$s…</string>
     <string name="smooth_saving">Saving the smooth clip…</string>
-    <string name="smooth_sound_format">The sound of this clip uses a format that cannot be kept, so the clip was not smoothed.</string>
     <string name="export_list_or">%1$s or %2$s</string>
     <string name="export_list_and">%1$s and %2$s</string>
     <string name="export_reason_container_codecs">%1$s needs %2$s video, which this phone cannot make at %3$s.</string>

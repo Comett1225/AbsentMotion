@@ -72,6 +72,7 @@ internal class AiNet private constructor(private val handle: Long, private val g
     }
 
     private suspend fun <T> blocking(work: () -> T): T = withContext(Dispatchers.Default) {
+        gpuApp?.let(AiDevice::gpuAlive)
         coroutineScope {
             val stop = launch(start = CoroutineStart.UNDISPATCHED) { try { awaitCancellation() } finally { AiNative.nativeCancel(handle) } }
             try { work() } finally { withContext(NonCancellable) { stop.cancelAndJoin() } }

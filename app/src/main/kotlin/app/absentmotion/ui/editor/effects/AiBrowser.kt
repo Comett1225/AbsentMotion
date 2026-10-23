@@ -65,6 +65,7 @@ import app.absentmotion.ai.NoiseSource
 import app.absentmotion.ai.matteBytes
 import app.absentmotion.ai.matteSeconds
 import app.absentmotion.ai.matteSize
+import app.absentmotion.ai.smoothSource
 import app.absentmotion.model.Layer
 import app.absentmotion.model.Scene
 import kotlin.math.roundToInt
@@ -323,7 +324,7 @@ internal fun AiSmoothDialog(tools: AiTools, scene: Scene) {
     var help by remember { mutableStateOf(false) }
     val previous = layer.aiMarks.firstOrNull { it.kind == AiKind.Smooth }
     val media = previous?.media ?: layer.mediaFill?.uri?.let(scene::media)
-    val source = previous?.original?.let { layer.copy(node = layer.node.with("fillVideo", it)) } ?: layer
+    val source = layer.smoothSource(previous)
     val s = tools.smoothing
     val plan = media?.let { smoothPlan(source, it, scene.fps, s) }
     val tooLong = plan != null && (plan.seconds > MAX_MATTE_SECONDS || plan.frames > MAX_SMOOTH_FRAMES)

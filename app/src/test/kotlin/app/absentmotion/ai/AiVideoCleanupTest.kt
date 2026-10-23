@@ -38,6 +38,23 @@ class AiVideoCleanupTest {
         assertEquals(listOf("thermal", "discard"), log)
     }
 
+    @Test fun theFrameBatchShrinksWithTheFrameSizeAndTheHeap() {
+        val heap = 256L shl 20
+        assertEquals(1, enhanceBatch(3840, 2160, heap))
+        assertEquals(1, enhanceBatch(7680, 4320, heap))
+        assertEquals(4, enhanceBatch(1920, 1080, heap))
+        assertEquals(8, enhanceBatch(640, 360, heap))
+        assertEquals(2, enhanceBatch(3840, 2160, 512L shl 20))
+        assertEquals(8, enhanceBatch(3840, 2160, 2048L shl 20))
+        assertEquals(1, enhanceBatch(3840, 2160, 0L))
+        assertEquals(8, enhanceBatch(0, 0, heap))
+        for (side in listOf(360, 720, 1080, 2160)) {
+            val width = side * 16 / 9
+            val frames = enhanceBatch(width, side, heap)
+            assertTrue("$side p holds $frames frames", frames == 1 || frames.toLong() * width * side * 4 <= heap / 8)
+        }
+    }
+
     private fun forward(x: Float, y: Float, width: Float, height: Float, turn: Int) = when (turn) {
         90 -> (height - y) to x
         180 -> (width - x) to (height - y)

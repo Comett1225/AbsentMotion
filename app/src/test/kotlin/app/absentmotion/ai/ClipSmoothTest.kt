@@ -15,6 +15,7 @@ import app.absentmotion.model.XmlNode
 import app.absentmotion.model.exportFrameMs
 import app.absentmotion.model.layerTracks
 import app.absentmotion.model.videoTimeUs
+import app.absentmotion.videoLayer
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -78,6 +79,50 @@ class ClipSmoothTest {
                 }
                 assertTrue(case, imported.size > 1)
             }
+    }
+
+    @Test fun aSmoothedTrimmedClipPlaysFromTheStartOfItsOwnFileAndRestoresInTheOriginalsTime() {
+        val raw = videoLayer(0, 3000, inTime = 4000, outTime = 7000, uri = "raw.mp4")
+        val original = MediaDeclaration(XmlNode("media", mapOf("uri" to "raw.mp4")))
+        assertEquals(raw, raw.smoothSource(null))
+        val first = raw.withSmoothed("one.mp4", "raw.mp4", "Flow:Medium:Off", original, raw.smoothSource(null))
+        assertEquals(listOf("one.mp4", "0", "3000"), listOf(first.mediaFill!!.uri, "${first.mediaFill!!.inTime}", "${first.mediaFill!!.outTime}"))
+        assertEquals(4000, first.aiMarks.single().shift)
+        val tighter = first.copy(node = first.node.with("inTime", "500").with("outTime", "2500"))
+        val base = tighter.smoothSource(tighter.aiMarks.single())
+        assertEquals(listOf("raw.mp4", "4500", "6500"), listOf(base.mediaFill!!.uri, "${base.mediaFill!!.inTime}", "${base.mediaFill!!.outTime}"))
+        val second = tighter.withSmoothed("two.mp4", "raw.mp4", "Blend:High:Off", null, base)
+        assertEquals(listOf("two.mp4", "0", "2000"), listOf(second.mediaFill!!.uri, "${second.mediaFill!!.inTime}", "${second.mediaFill!!.outTime}"))
+        val mark = second.aiMarks.single()
+        assertEquals(4500, mark.shift)
+        assertEquals("raw.mp4", mark.original)
+        assertEquals(original, mark.media)
+        val back = second.withoutAiMark(AiKind.Smooth).mediaFill!!
+        assertEquals(listOf("raw.mp4", "4500", "6500"), listOf(back.uri, "${back.inTime}", "${back.outTime}"))
+    }
+
+    @Test fun restoringBelowASmoothedResultCountsEveryShiftOnTheWayDown() {
+        val raw = videoLayer(0, 3000, inTime = 4000, outTime = 7000, uri = "raw.mp4")
+        val enhanced = raw.copy(node = raw.node.with("fillVideo", "enhanced.mp4")).withAiMark(AiKind.Enhance, "raw.mp4", "enhanced.mp4", "upscale2")
+        val smoothed = enhanced.withSmoothed("smooth.mp4", "enhanced.mp4", "Flow:Medium:Off", null, enhanced.smoothSource(null))
+        assertEquals(listOf(0, 3000), smoothed.mediaFill!!.let { listOf(it.inTime, it.outTime) })
+        assertEquals(4000, smoothed.aiMarks.first { it.kind == AiKind.Smooth }.shift)
+        val everything = smoothed.withoutAiMark(AiKind.Enhance).mediaFill!!
+        assertEquals(listOf("raw.mp4", "4000", "7000"), listOf(everything.uri, "${everything.inTime}", "${everything.outTime}"))
+        val onlySmooth = smoothed.withoutAiMark(AiKind.Smooth).mediaFill!!
+        assertEquals(listOf("enhanced.mp4", "4000", "7000"), listOf(onlySmooth.uri, "${onlySmooth.inTime}", "${onlySmooth.outTime}"))
+        val smoothFirst = raw.withSmoothed("smooth.mp4", "raw.mp4", "Flow:Medium:Off", null, raw.smoothSource(null))
+        val onTop = smoothFirst.copy(node = smoothFirst.node.with("fillVideo", "enhanced.mp4")).withAiMark(AiKind.Enhance, "smooth.mp4", "enhanced.mp4", "upscale2")
+        val down = onTop.withoutAiMark(AiKind.Smooth).mediaFill!!
+        assertEquals(listOf("raw.mp4", "4000", "7000"), listOf(down.uri, "${down.inTime}", "${down.outTime}"))
+    }
+
+    @Test fun aSmoothedClipThatStartedAtZeroNeedsNoShift() {
+        val raw = videoLayer(0, 3000, inTime = 0, outTime = null, uri = "raw.mp4")
+        val smoothed = raw.withSmoothed("one.mp4", "raw.mp4", "Flow:Medium:Off", null, raw.smoothSource(null))
+        assertEquals(null, smoothed.aiMarks.single().node["shift"])
+        assertEquals(raw.node.with("fillVideo", "one.mp4"), smoothed.node.copy(children = smoothed.node.children.filterNot { it.name == "ai" }))
+        assertEquals(raw.node.with("fillVideo", "raw.mp4"), smoothed.withoutAiMark(AiKind.Smooth).node)
     }
 
     @Test fun theChosenSettingsAreStoredWithTheMark() {

@@ -1172,6 +1172,7 @@
     <string name="ai_select_image_layer">Selecciona una capa de imagen</string>
     <string name="ai_select_audio_layer">Selecciona una capa de audio</string>
     <string name="ai_select_video_layer">Selecciona una capa de video</string>
+    <string name="ai_undo_newer_first">Deshacer primero la IA más reciente</string>
     <string name="ai_cancelling">Cancelando…</string>
     <string name="ai_preparing">Preparando…</string>
     <string name="ai_cancelled">Cancelado</string>
@@ -1204,6 +1205,7 @@
     <string name="ai_sample_rate_changed">La frecuencia de muestreo del audio cambió durante la decodificación</string>
     <string name="ai_recording_too_large">Esta grabación es demasiado grande para WAV</string>
     <string name="ai_no_samples_decoded">No se decodificó ninguna muestra de audio</string>
+    <string name="ai_sound_not_kept">No se pudo conservar el sonido de este clip, así que no se cambió nada.</string>
     <string name="ai_mask_wrong_size">La eliminación del fondo dio un resultado con un tamaño incorrecto. Inténtalo de nuevo.</string>
     <string name="ai_encoder_no_image">El codificador de video no proporcionó ninguna imagen de entrada</string>
     <string name="ai_encoder_not_responding">El codificador de video dejó de responder</string>
@@ -1441,7 +1443,6 @@
     <string name="smooth_nothing">Este clip ya tiene suficientes fotogramas para la velocidad de fotogramas del proyecto. Elige Desenfoque de movimiento o ralentiza primero el clip.</string>
     <string name="smooth_frame">Suavizado: fotograma %1$s de %2$s…</string>
     <string name="smooth_saving">Guardando el clip suavizado…</string>
-    <string name="smooth_sound_format">El audio de este clip usa un formato que no se puede conservar, así que el clip no se suavizó.</string>
     <string name="export_list_or">%1$s o %2$s</string>
     <string name="export_list_and">%1$s y %2$s</string>
     <string name="export_reason_container_codecs">%1$s necesita video %2$s, que este teléfono no puede generar a %3$s.</string>

@@ -1124,6 +1124,7 @@
     <string name="ai_select_image_layer">Pilih lapisan imej</string>
     <string name="ai_select_audio_layer">Pilih lapisan audio</string>
     <string name="ai_select_video_layer">Pilih lapisan video</string>
+    <string name="ai_undo_newer_first">Buat asal AI lebih baharu dahulu</string>
     <string name="ai_cancelling">Membatalkan…</string>
     <string name="ai_preparing">Menyediakan…</string>
     <string name="ai_cancelled">Dibatalkan</string>
@@ -1156,6 +1157,7 @@
     <string name="ai_sample_rate_changed">Kadar sampel audio berubah semasa menyahkod</string>
     <string name="ai_recording_too_large">Rakaman ini terlalu besar untuk WAV</string>
     <string name="ai_no_samples_decoded">Tiada sampel audio dinyahkod</string>
+    <string name="ai_sound_not_kept">Audio klip ini tidak dapat dikekalkan, jadi tiada apa-apa diubah.</string>
     <string name="ai_mask_wrong_size">Pembuangan latar belakang memberikan hasil dengan saiz yang salah. Cuba lagi.</string>
     <string name="ai_encoder_no_image">Pengekod video tidak memberikan imej input</string>
     <string name="ai_encoder_not_responding">Pengekod video berhenti bertindak balas</string>
@@ -1393,7 +1395,6 @@
     <string name="smooth_nothing">Klip ini sudah mempunyai bingkai yang cukup untuk kadar bingkai projek. Pilih Kabur gerakan atau perlahankan klip terlebih dahulu.</string>
     <string name="smooth_frame">Pelembutan: bingkai %1$s daripada %2$s…</string>
     <string name="smooth_saving">Menyimpan klip licin…</string>
-    <string name="smooth_sound_format">Audio klip ini menggunakan format yang tidak dapat dikekalkan, jadi klip tidak dilembutkan.</string>
     <string name="export_list_or">%1$s atau %2$s</string>
     <string name="export_list_and">%1$s dan %2$s</string>
     <string name="export_reason_container_codecs">%1$s memerlukan video %2$s, yang telefon ini tidak dapat hasilkan pada %3$s.</string>
