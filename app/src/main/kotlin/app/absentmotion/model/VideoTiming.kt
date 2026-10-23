@@ -194,9 +194,25 @@ fun Scene.splitAt(layer: Layer, frame: Int, newId: Long): Pair<Layer, Layer>? {
     return layer.trimmedTo(layer.startTime, cut - 1) to layer.withId(newId).trimmedTo(cut, layer.endTime)
 }
 
-fun Scene.withSplit(layer: Layer, frame: Int, newId: Long): Scene? {
+fun Scene.withSplit(layer: Layer, frame: Int, newId: Long, nextId: () -> Long = Layer::newId): Scene? {
     val (first, second) = splitAt(layer, frame, newId) ?: return null
-    return update(first.id) { first }.addAbove(second, first.id)
+    val list = layers
+    val index = list.indexOfFirst { it.id == layer.id }
+    if (index < 0) return add(second)
+    var end = index + 1
+    if (!list.isMask(index)) while (end < list.size && list.isMask(end)) end++
+    val cut = frameStart(frame)
+    val lower = mutableListOf(first)
+    val upper = mutableListOf(second)
+    for (mask in list.subList(index + 1, end)) {
+        val halves = splitAt(mask, frame, nextId())
+        when {
+            halves != null -> { lower += halves.first; upper += halves.second }
+            mask.startTime >= cut || !showsAnyFrame(mask.startTime, cut - 1) -> upper += mask
+            else -> lower += mask
+        }
+    }
+    return withLayers(list.subList(0, index) + lower + upper + list.subList(end, list.size))
 }
 
 fun Layer.retimedVideo(start: Int, end: Int): Layer {

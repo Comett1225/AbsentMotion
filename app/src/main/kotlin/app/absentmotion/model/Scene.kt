@@ -106,12 +106,41 @@ value class Scene(val node: XmlNode) {
         val moving = layer(id) ?: return this
         val others = layers.filterNot { it.id == id }.toMutableList()
         others.add(index.coerceIn(0, others.size), moving)
-        return withChildren(node.children.filterNot { it.name in LAYER_TAGS } + others.map { it.node })
+        return withLayers(others)
     }
 
+    internal fun withLayers(list: List<Layer>): Scene = withChildren(node.children.filterNot { it.name in LAYER_TAGS } + list.map { it.node })
+
     fun addAbove(layer: Layer, below: Long): Scene {
-        val index = layers.indexOfFirst { it.id == below }
-        return add(layer).let { if (index < 0) it else it.move(layer.id, index + 1) }
+        val list = layers
+        val index = list.indexOfFirst { it.id == below }
+        if (index < 0) return add(layer)
+        var end = index + 1
+        if (!list.isMask(index)) while (end < list.size && list[end].leansOnBelow) end++
+        return add(layer).move(layer.id, end)
+    }
+
+    fun withCopiesAbove(copies: Map<Long, Layer>): Scene {
+        val list = layers
+        val out = ArrayList<Layer>(list.size + copies.size)
+        var i = 0
+        while (i < list.size) {
+            var end = i
+            while (end < list.size && list[end].id in copies && list.isMask(end)) end++
+            if (end == i && list[i].id in copies) {
+                end = i + 1
+                while (end < list.size && (list[end].id in copies || list[end].leansOnBelow)) end++
+            }
+            if (end == i) {
+                out += list[i++]
+                continue
+            }
+            val block = list.subList(i, end)
+            out += block
+            out += block.filter { it.id in copies }.map { copies.getValue(it.id) }
+            i = end
+        }
+        return withLayers(out)
     }
 
     private fun withChildren(children: List<XmlNode>): Scene {
@@ -150,6 +179,13 @@ enum class LabelColour(val id: String, val start: Int, val end: Int) {
     Magenta("+magenta", 0xFFEC5FC2.toInt(), 0xFFB5278F.toInt()), Gray("+gray", 0xFFD4D7DD.toInt(), 0xFF9096A0.toInt()),
     Black("+black", 0xFF5B6070.toInt(), 0xFF2A2D38.toInt()),
 }
+
+private val FOLLOWS_BELOW = setOf("absent.movealongpath", "absent.repeatalongpath")
+
+internal fun List<Layer>.isMask(index: Int): Boolean = index > 0 && this[index].node["clippingMask"] == "true"
+
+internal val Layer.leansOnBelow: Boolean
+    get() = node["clippingMask"] == "true" || effects.any { it["hidden"] != "true" && it["id"] in FOLLOWS_BELOW }
 
 data class Layer(val node: XmlNode, val t: Float = 0f, val snap: Float = 0f) {
     val mediaFill: MediaFill? get() {

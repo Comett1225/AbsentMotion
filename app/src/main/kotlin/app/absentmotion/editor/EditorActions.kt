@@ -259,10 +259,7 @@ fun EditorState.duplicateChosen() {
     val copies = chosenLayers.zip(copyLayers(chosenLayers, preserveOutsideParents = true))
         .associate { (source, copy) -> source.id to copy.withLabel(AppText.get(R.string.edit_layer_copy_name, source.label)) }
     if (copies.isEmpty()) return
-    edit { s -> Scene(s.node.copy(children = s.node.children.flatMap { node ->
-        val copy = if (node.name in Scene.LAYER_TAGS) node["id"]?.toLongOrNull()?.let { copies[it] } else null
-        if (copy == null) listOf(node) else listOf(node, copy.node)
-    })) }
+    edit { it.withCopiesAbove(copies) }
     MultiSelect.clear()
     deselectLayer()
 }
