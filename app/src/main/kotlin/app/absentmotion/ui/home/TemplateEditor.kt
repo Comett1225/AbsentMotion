@@ -79,6 +79,7 @@ import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
 import app.absentmotion.model.withPath
 import app.absentmotion.ui.editor.ChromeIcons
+import app.absentmotion.ui.export.ExportIcons
 import app.absentmotion.ui.editor.TimelineMath
 import app.absentmotion.ui.theme.Am
 import kotlinx.coroutines.Dispatchers
@@ -262,7 +263,7 @@ fun TemplateEditor(templateId: String, engine: EngineThread, settings: AppSettin
         Spacer(Modifier.height(16.dp))
         val clip = trimming
         if (clip == null) {
-            TopBar(stringResource(R.string.template_use_title), ChromeIcons.Back, stringResource(R.string.home_back), stringResource(R.string.template_next), { if (choices.isEmpty()) onClose() else asking = 1 }, { asking = 2 })
+            TopBar(stringResource(R.string.template_use_title), ExportIcons.Back, stringResource(R.string.home_back), stringResource(R.string.template_next), { if (choices.isEmpty()) onClose() else asking = 1 }, { asking = 2 })
         } else {
             TopBar(stringResource(R.string.template_drag_to_select), HomeIcons.Close, stringResource(R.string.action_close), stringResource(R.string.done), { trimming = null }, {
                 choose(clip.slot, clip.media, trimStart)
