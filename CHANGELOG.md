@@ -6,6 +6,29 @@ All notable changes to AbsentMotion are listed here, newest first. The format fo
 Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stands for the feature set as it stood on
 2026-10-12.
 
+## [3.3.1] - 2026-10-23
+
+### Changed
+
+- Cut-out **borders, strokes and shadows** follow the visible part of the picture, and tapping the **empty area around a cut-out** no longer selects it.
+- **Video cut-outs** move with the clip's effects, like shake and Random Displacement.
+- **AI Smooth exports** use far less memory.
+- **SVG imports** are more accurate (holes, fills, gradients) and big files import faster.
+- A **failed media copy** shows a message, and the **camera microphone notice** can be tapped to ask again or open Settings.
+- Android 9 asks for **storage permission** before the first export, and the **update check** ignores the AI models download.
+
+### Fixed
+
+- A **crash** and an **Android low-memory close** when exporting with AI Smooth.
+- A **crafted backup** erasing app data when restored and then deleted, and a restored backup leaving projects without their media.
+- **Cut-off project files** opening as half a project, and shared projects opening web addresses by themselves.
+- A cancelled export leaving video previews switched off, and leftover files from stopped exports and cancelled copies.
+- **Splitting a clip with a mask** losing the mask, moved clips gaining or losing a frame, and transitions leaving a gap after a split.
+- Pasting a mask on its own, Reset Position and Flip on parented or animated layers, keyframes missed on a layer's first frame, list reordering that scrolled by itself, and pinch zoom drifting.
+- Motion Blur looking dark on the first frames, drawings made of single taps disappearing, and text stroke outlining the text box.
+- The editor not recovering after the phone's graphics reset, sound that kept playing after a quick pause, and a rare sound crash in Reverb and Echo.
+- Mark beats running out of memory on very long clips, huge SVG files crashing the app, and AI Enhance leaving half-written files or missing faces in rotated clips.
+
 ## [3.3.0] - 2026-10-22
 
 ### Added

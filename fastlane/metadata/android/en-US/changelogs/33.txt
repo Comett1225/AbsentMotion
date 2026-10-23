@@ -1,0 +1,1 @@
+AbsentMotion 3.3.1: no more crashes or low-memory closes when exporting with AI Smooth, safer backups, cut-outs that follow the visible picture, and dozens of timeline, SVG and audio fixes.
