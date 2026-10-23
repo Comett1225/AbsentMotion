@@ -14,6 +14,8 @@ bool Indic(uint32_t c) { return Between(c, 0x0900, 0x0DFF); }
 
 bool Virama(uint32_t c) { return Indic(c) && (c & 0x7F) == 0x4D; }
 
+bool Consonant(uint32_t c) { return Indic(c) && (Between(c & 0x7F, 0x15, 0x39) || Between(c & 0x7F, 0x58, 0x5F)); }
+
 bool Extends(uint32_t c) {
     if (Indic(c)) {
         const uint32_t b = c & 0x7F;
@@ -120,7 +122,7 @@ Segments Split(const std::string& text) {
     bool inWord = false, wordHead = false;
     for (size_t i = 0; i < cps.size(); i++) {
         const uint32_t c = cps[i], previous = i ? cps[i - 1] : 0;
-        const bool joins = i > 0 && (Extends(c) || previous == 0x200D || Virama(previous) || (previous == '\r' && c == '\n') ||
+        const bool joins = i > 0 && (Extends(c) || previous == 0x200D || (Virama(previous) && Consonant(c)) || (previous == '\r' && c == '\n') ||
                                      (Regional(c) && regional % 2 == 1));
         regional = Regional(c) ? (joins ? regional + 1 : 1) : 0;
         if (!joins) {
@@ -181,9 +183,11 @@ float RangeWeight(int shape, int index, int count, float start, float end) {
 }
 
 std::string CountNumbers(const std::string& text, double add, double multiply, int decimals, int separator) {
+    const char point = separator == 2 ? ',' : '.';
+    const auto group = [&](char c) { return separator == 2 ? c == '.' : c == ',' || (separator == 3 && c == ' '); };
     std::string out;
     for (size_t i = 0; i < text.size();) {
-        const bool sign = text[i] == '-' && i + 1 < text.size() && Digit(text[i + 1]) && (i == 0 || (!Word(text[i - 1]) && text[i - 1] != '.'));
+        const bool sign = text[i] == '-' && i + 1 < text.size() && Digit(text[i + 1]) && (i == 0 || (!Word(text[i - 1]) && text[i - 1] != point));
         if (!Digit(text[i]) && !sign) {
             out += text[i++];
             continue;
@@ -191,15 +195,16 @@ std::string CountNumbers(const std::string& text, double add, double multiply, i
         size_t j = i + (sign ? 1 : 0), lead = j;
         std::string digits = sign ? "-" : "";
         while (j < text.size() && Digit(text[j])) digits += text[j++];
-        while (j - lead <= 3 && j + 3 < text.size() && text[j] == ',' && Digit(text[j + 1]) && Digit(text[j + 2]) && Digit(text[j + 3]) &&
+        while (j - lead <= 3 && j + 3 < text.size() && group(text[j]) && Digit(text[j + 1]) && Digit(text[j + 2]) && Digit(text[j + 3]) &&
                (j + 4 >= text.size() || !Digit(text[j + 4]))) {
             digits += text.substr(j + 1, 3);
             j += 4;
             lead = j - 3;
         }
         int places = 0;
-        if (j + 1 < text.size() && text[j] == '.' && Digit(text[j + 1])) {
-            digits += text[j++];
+        if (j + 1 < text.size() && text[j] == point && Digit(text[j + 1])) {
+            digits += '.';
+            j++;
             while (j < text.size() && Digit(text[j])) digits += text[j++], places++;
         }
         const double value = strtod(digits.c_str(), nullptr) * multiply + add;

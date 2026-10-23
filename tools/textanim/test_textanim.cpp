@@ -178,6 +178,20 @@ int main() {
         check(jitter, "a 30 Hz random jitter moves on every frame at 30 fps");
     }
     {
+        const Segments s = Split("क् ख");
+        check(s.words == 2 && s.characters == 3, "a word ending in a halant keeps the space after it");
+        check(Split("क्\nख").characters == 3, "a halant does not swallow a line break");
+        check(Scramble("क्\nख", 0, kFromStart, 1, 0, kCustom, "x", true) == "x\nx", "the line break after a halant stays when scrambling");
+        check(Split("க் க").words == 2, "a tamil word ending in a pulli ends at the space");
+        check(Split("क्ष").characters == 1 && Split("क्‍ष").characters == 1, "a halant still joins the next consonant");
+    }
+    {
+        check(CountNumbers("1.000,5", 0, 2, -1, 2) == "2.001,0", "a number typed as 1.000,5 counts in that style");
+        check(CountNumbers("Total 12.345.678,90", 0, 1, -1, 2) == "Total 12.345.678,90", "dot groups and a comma decimal read back as typed");
+        check(CountNumbers("1 000.5", 0, 2, -1, 3) == "2 001.0", "space groups read back");
+        check(CountNumbers("1,000.5", 0, 2, -1, 1) == "2,001.0", "comma groups still read in their own style");
+    }
+    {
         const std::string text = "Hi there\nyou";
         check(Scramble(text, 1, kFromStart, 1, 0, kLetters, "", true) == text, "settled text is the original");
         const std::string a = Scramble(text, 0, kFromStart, 1, 3, kNumbers, "", true);
