@@ -4,7 +4,10 @@ import app.absentmotion.platform.readInto
 import app.absentmotion.export.safeName
 import app.absentmotion.model.MediaDeclaration
 import app.absentmotion.model.Scene
+import app.absentmotion.model.XmlNode
+import app.absentmotion.model.mediaName
 import app.absentmotion.model.replaceMedia
+import app.absentmotion.model.storedMediaUris
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
@@ -69,7 +72,14 @@ class MediaKeeper(
         var result = scene
         var copied = 0
         var unreadable = 0
-        for (media in scene.media.filter { collectable(it.uri) }) {
+        val declared = LinkedHashMap<String, MediaDeclaration>()
+        fun declarations(node: XmlNode) {
+            if (node.name == "media") node["uri"]?.let { declared.putIfAbsent(it, MediaDeclaration(node)) }
+            node.children.forEach(::declarations)
+        }
+        declarations(scene.node)
+        for (uri in scene.node.storedMediaUris().filter(::collectable)) {
+            val media = declared[uri] ?: MediaDeclaration(XmlNode("media", mapOf("uri" to uri, "filename" to scene.mediaName(uri))))
             try {
                 result = result.replaceMedia(media.uri, keep(id, media, result))
                 copied++

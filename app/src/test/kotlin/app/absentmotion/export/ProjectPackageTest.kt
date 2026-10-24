@@ -1,5 +1,7 @@
 package app.absentmotion.export
 
+import app.absentmotion.ai.AiKind
+import app.absentmotion.ai.withoutAiMark
 import app.absentmotion.library.Importer
 import app.absentmotion.library.MediaAccess
 import app.absentmotion.library.ProjectStore
@@ -100,5 +102,22 @@ class ProjectPackageTest {
         }
         job.join()
         assertTrue(job.isCancelled)
+    }
+
+    @Test fun aPackagedClipCanRestoreItsOriginalAudioAfterImportOnAnotherDevice() = runBlocking {
+        val files = tmp.newFolder("source")
+        val original = File(files, "media/p1/voice.wav").apply { parentFile.mkdirs(); writeText("original audio") }.toURI().toString()
+        val cleaned = File(files, "media/p1/clean.wav").apply { writeText("clean audio") }.toURI().toString()
+        val scene = Scene.parse("""<scene width="10" height="10"><audio id="1" src="$cleaned"><ai type="noise" original="$original" result="$cleaned"><media uri="$original" filename="voice.wav"/></ai></audio></scene>""")
+        val out = ByteArrayOutputStream()
+        writeProjectPackage(scene, scene.toXml(), out, MediaAccess.forPhone(files), { File(URI(it)).inputStream() }, {})
+        val other = tmp.newFolder("target")
+        val store = ProjectStore(other)
+        val report = Importer(store, access = MediaAccess.forPhone(other)).import { out.toByteArray().inputStream() }.single()
+        val imported = store.load(report.id)!!
+        val restored = imported.withoutAiMark(1, AiKind.Noise).layer(1)!!.node["src"]!!
+        assertTrue(restored, MediaAccess.forPhone(other).allows(restored))
+        assertTrue(restored.startsWith(store.mediaDir(report.id).toURI().toString()))
+        assertEquals("original audio", File(URI(restored)).readText())
     }
 }

@@ -17,6 +17,7 @@ import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
 import app.absentmotion.model.mapMediaUris
 import app.absentmotion.model.mediaUris
+import app.absentmotion.model.storedMediaUris
 import org.json.JSONObject
 import java.io.File
 import java.io.IOException
@@ -118,7 +119,7 @@ class Importer(
                 val id = ids[i]
                 val root = check(text)
                 val declared = Scene(root).media.associateBy { it.uri }
-                val entries = root.mediaUris().mapNotNull { uri ->
+                val entries = root.storedMediaUris().mapNotNull { uri ->
                     val entry = links?.get(uri) ?: declared[uri]?.node?.get("sig")?.let { sigs?.get(it) }
                         ?: uri.substringAfter(':').takeIf { uri.startsWith("amproj:") || uri.startsWith("am-docs:") }
                     entry?.let { find(it, files) }?.let { uri to it }

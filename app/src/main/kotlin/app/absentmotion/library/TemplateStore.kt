@@ -8,7 +8,7 @@ import app.absentmotion.export.safeName
 import app.absentmotion.model.Scene
 import app.absentmotion.model.mapMediaUris
 import app.absentmotion.model.mediaName
-import app.absentmotion.model.mediaUris
+import app.absentmotion.model.storedMediaUris
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -80,7 +80,7 @@ class TemplateStore(private val root: File, private val open: (String) -> InputS
 
     fun localize(scene: Scene, dir: File): Scene {
         val moved = HashMap<String, String>()
-        for (uri in scene.node.mediaUris()) {
+        for (uri in scene.node.storedMediaUris()) {
             val folder = modelFolder(uri)
             val copied = if (folder != null) copyModel(folder, File(URI(uri)).canonicalFile.name, dir)
                 else runCatching { open(uri) }.getOrNull()?.use { input -> publish(dir, safeName(scene.mediaName(uri))) { input.copyTo(it) } }
@@ -125,4 +125,4 @@ class TemplateStore(private val root: File, private val open: (String) -> InputS
 }
 
 internal fun canReplaceProject(template: Scene?, projects: ProjectStore): Boolean =
-    template != null && template.node.mediaUris().none(projects::inMediaFolder)
+    template != null && template.node.storedMediaUris().none(projects::inMediaFolder)

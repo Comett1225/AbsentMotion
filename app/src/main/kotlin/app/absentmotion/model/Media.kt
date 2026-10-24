@@ -49,6 +49,14 @@ fun XmlNode.mediaUris(): Set<String> = buildSet {
     walk(this@mediaUris)
 }
 
+fun XmlNode.storedMediaUris(): Set<String> = mediaUris() + buildSet {
+    fun walk(node: XmlNode) {
+        if (node.name == "ai") listOf("original", "result").forEach { key -> node[key]?.let(::add) }
+        node.children.forEach(::walk)
+    }
+    walk(this@storedMediaUris)
+}
+
 fun XmlNode.imageUris(): Set<String> = buildSet {
     fun walk(n: XmlNode) {
         n["fillImage"]?.let { add(it) }

@@ -158,4 +158,17 @@ class MediaKeeperTest {
         assertTrue(two.readBytes().all { it == 'b'.code.toByte() })
         assertEquals(2, store.mediaDir("p1").listFiles()!!.size)
     }
+
+    @Test fun collectingMediaKeepsAnOriginalThatAnAiRestoreActionStillNeeds() {
+        val store = ProjectStore(tmp.newFolder())
+        val original = tmp.newFile("original.wav").apply { writeText("original audio") }
+        val result = store.mediaDir("p1").apply { mkdirs() }.resolve("clean.wav").apply { writeText("clean audio") }
+        val scene = Scene.parse("""<scene width="10" height="10"><media uri="${result.toURI()}"/><audio id="1" src="${result.toURI()}"><ai type="noise" original="${original.toURI()}" result="${result.toURI()}"><media uri="${original.toURI()}" filename="original.wav" size="${original.length()}"/></ai></audio></scene>""")
+        val keeper = MediaKeeper(store, { File(java.net.URI(it)).inputStream() })
+        val collected = keeper.collect("p1", scene)
+        assertEquals(1, collected.copied)
+        val restored = collected.scene.layer(1)!!.node.child("ai")!!["original"]!!
+        assertTrue(store.inMediaFolder(restored))
+        assertEquals("original audio", File(java.net.URI(restored)).readText())
+    }
 }

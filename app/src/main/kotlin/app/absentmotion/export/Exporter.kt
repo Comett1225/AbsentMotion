@@ -14,7 +14,7 @@ import app.absentmotion.library.MediaAccess
 import app.absentmotion.library.modelFolder
 import app.absentmotion.model.Scene
 import app.absentmotion.model.mediaName
-import app.absentmotion.model.mediaUris
+import app.absentmotion.model.storedMediaUris
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.currentCoroutineContext
@@ -203,7 +203,7 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
 internal suspend fun writeProjectPackage(
     scene: Scene, xml: String, out: OutputStream, access: MediaAccess, open: (String) -> InputStream?, progress: (Float) -> Unit,
 ) {
-    val uris = scene.node.mediaUris().toList()
+    val uris = scene.node.storedMediaUris().toList()
     val manifest = JSONObject().put("format", "absentmotion-package").put("version", 1)
         .put("title", scene.title).put("project", "project.xml")
     val media = JSONArray()

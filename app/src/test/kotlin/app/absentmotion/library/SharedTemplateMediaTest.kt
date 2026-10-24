@@ -74,4 +74,23 @@ class SharedTemplateMediaTest {
         assertTrue(source.resolve("skin.png").exists())
         assertFalse(project.walkTopDown().any { it.name.startsWith("copy-") })
     }
+
+    @Test fun templatesKeepBothTheProcessedMediaAndItsRestorableOriginal() {
+        val root = tmp.newFolder()
+        val source = File(root, "media/source").apply { mkdirs() }
+        val original = source.resolve("voice.wav").apply { writeText("original") }.toURI().toString()
+        val result = source.resolve("clean.wav").apply { writeText("clean") }.toURI().toString()
+        val scene = Scene.parse("""<scene width="10" height="10"><audio id="1" src="$result"><ai type="noise" original="$original" result="$result"/></audio></scene>""")
+        val store = ProjectStore(root)
+        val templates = TemplateStore(File(root, "templates"), ::opener)
+        val stored = templates.localize(scene, File(root, "templates/t1/media"))
+        val mark = stored.layer(1)!!.node.child("ai")!!
+        assertEquals("original", File(java.net.URI(mark["original"]!!)).readText())
+        assertTrue(mark["original"] != original)
+        assertEquals(stored.layer(1)!!.node["src"], mark["result"])
+        assertTrue(canReplaceProject(stored, store))
+        val unreadable = TemplateStore(File(root, "templates")) { uri -> if (uri == original) null else opener(uri) }
+            .localize(scene, File(root, "templates/t2/media"))
+        assertFalse(canReplaceProject(unreadable, store))
+    }
 }
