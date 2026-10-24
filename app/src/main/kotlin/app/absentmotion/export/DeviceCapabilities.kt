@@ -12,16 +12,26 @@ import app.absentmotion.engine.EngineThread
 import app.absentmotion.i18n.UiText
 import app.absentmotion.i18n.txt
 import app.absentmotion.model.Scene
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.runInterruptible
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ExecutionException
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
+import kotlin.concurrent.thread
 
 data class SizePoint(val width: Int, val height: Int, val maxFps: Double)
 
@@ -164,18 +174,23 @@ class DeviceCapabilities private constructor(context: Context) {
         "${Build.FINGERPRINT}|$version"
     }
 
-    suspend fun load(): DeviceReport = lock.withLock {
+    @Volatile private var listFailed = false
+
+    suspend fun load(): DeviceReport? = lock.withLock {
         state.value?.let { return it }
-        withContext(Dispatchers.Default) {
-            val stored = prefs.getString("report", null)?.let { runCatching { DeviceReport.fromJson(JSONObject(it)) }.getOrNull() }
-            (stored?.takeIf { it.key == key } ?: DeviceReport(key, analyseEncoders()).also(::store)).also { state.value = it }
-        }
+        val stored = withContext(Dispatchers.IO) { runCatching { prefs.getString("report", null)?.let { DeviceReport.fromJson(JSONObject(it)) } }.getOrNull() }
+        (stored?.takeIf { it.key == key } ?: encoders()?.let { DeviceReport(key, it).also(::store) })?.also { state.value = it }
+    }
+
+    private suspend fun encoders(): List<EncoderCaps>? {
+        if (listFailed) return null
+        return finishedWithin(ListLimitMs, "am-encoder-list") { analyseEncoders() }.also { if (it == null) listFailed = true }
     }
 
     suspend fun runCheckNow(engine: EngineThread?, progress: (Float) -> Unit = {}): DeviceReport {
-        val encoders = withContext(Dispatchers.Default) { analyseEncoders() }
+        val encoders = encoders() ?: state.value?.encoders ?: throw IllegalStateException("the encoder list is unavailable")
         progress(0.3f)
-        val probe = engine?.let { runCatching { probe(it) { p -> progress(0.3f + 0.7f * p) } }.onFailure { e -> if (e is kotlinx.coroutines.CancellationException) throw e }.getOrNull() }
+        val probe = engine?.let { probeWithin(ProbeLimitMs) { probe(it) { p -> progress(0.3f + 0.7f * p) } } }
         progress(1f)
         return lock.withLock { DeviceReport(key, encoders, probe ?: state.value?.probe).also { store(it); state.value = it } }
     }
@@ -187,7 +202,7 @@ class DeviceCapabilities private constructor(context: Context) {
         exportSize(scene, settings.shortSide, even = true).let { (w, h) -> check(settings, w, h, hasAudio) }
 
     private fun store(report: DeviceReport) {
-        prefs.edit().putString("report", report.toJson().toString()).apply()
+        runCatching { prefs.edit().putString("report", report.toJson().toString()).apply() }
     }
 
     suspend fun probe(engine: EngineThread, progress: (Float) -> Unit = {}): ProbeResult {
@@ -221,6 +236,35 @@ class DeviceCapabilities private constructor(context: Context) {
                     "<fillColor value=\"#ff${listOf("f24949", "49a0f2", "f2c849", "5ad17a", "c25af2", "f28c49")[i]}\"/>" +
                     "<property name=\"size\" type=\"vec2\" value=\"300,300\"/></shape>"
             } + "</scene>"
+    }
+}
+
+internal const val ListLimitMs = 5_000L
+internal const val ProbeLimitMs = 30_000L
+
+internal suspend fun <T> finishedWithin(limitMs: Long, name: String, work: () -> T): T? {
+    val result = CompletableFuture<T>()
+    thread(name = name, isDaemon = true) {
+        try { result.complete(work()) } catch (t: Throwable) { result.completeExceptionally(t) }
+    }
+    return try {
+        runInterruptible(Dispatchers.IO) { result.get(limitMs, TimeUnit.MILLISECONDS) }
+    } catch (e: TimeoutException) {
+        null
+    } catch (e: ExecutionException) {
+        null
+    }
+}
+
+internal suspend fun <T> probeWithin(limitMs: Long, work: suspend () -> T): T? {
+    val running = CoroutineScope(Dispatchers.Default).async { work() }
+    return try {
+        withTimeoutOrNull(limitMs) { running.await() }
+    } catch (t: Throwable) {
+        if (t is CancellationException && running.isActive) throw t
+        null
+    } finally {
+        running.cancel()
     }
 }
 

@@ -236,7 +236,7 @@ internal object AiDevice {
 
     suspend fun phone(context: Context): AiPhone {
         val ram = aiRam(context)
-        val speed = runCatching { phoneCheckResult(DeviceCapabilities.of(context).load(), if (Build.VERSION.SDK_INT >= 31) Build.VERSION.MEDIA_PERFORMANCE_CLASS else 0).speed }.getOrDefault(PhoneSpeed.Basic)
+        val speed = runCatching { DeviceCapabilities.of(context).load()?.let { phoneCheckResult(it, if (Build.VERSION.SDK_INT >= 31) Build.VERSION.MEDIA_PERFORMANCE_CLASS else 0).speed } }.getOrNull() ?: PhoneSpeed.Basic
         return withContext(Dispatchers.Default) { AiPhone(AiNative.loaded, AiNative.gpu, ram, speed, gpuOn(context)) }
     }
 

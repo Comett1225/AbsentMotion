@@ -15,11 +15,14 @@ import app.absentmotion.library.modelFolder
 import app.absentmotion.model.Scene
 import app.absentmotion.model.mediaName
 import app.absentmotion.model.storedMediaUris
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.async
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
@@ -45,15 +48,21 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
                     ExportKind.Video -> s.fixedFormat().let { f ->
                         val started = android.os.SystemClock.elapsedRealtime()
                         var paused = 0L
-                        val mix = ExportAudio.mixFor?.invoke(scene, f.audio.effectiveRate)
-                        val written = try {
-                            direct(saved, name, f.container.ext, f.container.mime, "Movies/$AppFolder") { fd ->
-                                cool { thermal ->
-                                    exportVideo(engine, scene, xml, f, fd, mix, thermal.hot, { thermal.pauseMs().also { paused += it } }, note, progress)
+                        var mix: AudioMix? = null
+                        val written = retryingEncoder(note) {
+                            progress(0f)
+                            mix = ExportAudio.mixFor?.invoke(scene, f.audio.effectiveRate)
+                            try {
+                                direct(saved, name, f.container.ext, f.container.mime, "Movies/$AppFolder") { fd ->
+                                    watched { alive ->
+                                        cool { thermal ->
+                                            exportVideo(engine, scene, xml, f, fd, mix, thermal.hot, { thermal.pauseMs().also { paused += it } }, note) { alive(); progress(it) }
+                                        }
+                                    }
                                 }
+                            } finally {
+                                (mix as? java.io.Closeable)?.close()
                             }
-                        } finally {
-                            (mix as? java.io.Closeable)?.close()
                         }
                         written.verified(kind, scene, f, mix != null).unreadable(mix, scene).also {
                             val (w, h) = exportSize(scene, f.shortSide, even = true)
@@ -65,14 +74,15 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
                         val mix = ExportAudio.mixFor?.invoke(scene, audioRate(s)) ?: throw ExportError(txt(R.string.export_error_no_sound))
                         try {
                             direct(saved, name, s.audioFormat.ext, s.audioFormat.mime, "Music/$AppFolder") { fd ->
-                                exportAudio(s, (scene.totalTime + 1) * 1000L, mix, fd, progress)
+                                watched { alive -> exportAudio(s, (scene.totalTime + 1) * 1000L, mix, fd) { alive(); progress(it) } }
                             }.verified(kind, scene, s, true).unreadable(mix, scene)
                         } finally {
                             (mix as? java.io.Closeable)?.close()
                         }
                     }
-                    ExportKind.Gif -> direct(saved, name, "gif", "image/gif", "Pictures/$AppFolder") { fd -> cool { gif(scene, xml, s, fdStream(fd), it::pauseMs, progress) } }
-                        .verified(kind, scene, s, false)
+                    ExportKind.Gif -> direct(saved, name, "gif", "image/gif", "Pictures/$AppFolder") { fd ->
+                        watched { alive -> cool { gif(scene, xml, s, fdStream(fd), it::pauseMs) { p -> alive(); progress(p) } } }
+                    }.verified(kind, scene, s, false)
                     ExportKind.Frame, ExportKind.FrameAs -> {
                         val shape = if (kind == ExportKind.Frame) s.copy(image = ImageKind.Png) else s
                         single(saved, name, shape.image.ext, shape.image.mime, "Pictures/$AppFolder") { out ->
@@ -83,14 +93,32 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
                         }.verified(kind, scene, shape, false)
                     }
                     ExportKind.Xml -> single(saved, name, "xml", "text/xml", "Documents/$AppFolder") { it.write(xml.toByteArray()) }
-                    ExportKind.Package -> direct(saved, name, "absproj", "application/octet-stream", "Documents/$AppFolder") { fd -> pack(scene, xml, fdStream(fd), progress) }
-                    ExportKind.Sequence -> sequence(saved, scene, xml, s, name, progress)
+                    ExportKind.Package -> direct(saved, name, "absproj", "application/octet-stream", "Documents/$AppFolder") { fd ->
+                        watched { alive -> pack(scene, xml, fdStream(fd)) { alive(); progress(it) } }
+                    }
+                    ExportKind.Sequence -> watched { alive -> sequence(saved, scene, xml, s, name) { alive(); progress(it) } }
                 }
             } }
         } catch (t: Throwable) {
             val full = storageFull(t)
             withContext(NonCancellable + Dispatchers.IO) { saved.forEach { runCatching { store.delete(it) } } }
             throw if (full) StorageFullException() else plainCodecError(t)
+        }
+    }
+
+    private suspend fun <T> retryingEncoder(note: (UiText) -> Unit, attempt: suspend () -> T): T = try {
+        attempt()
+    } catch (t: Throwable) {
+        if (!encoderTrouble(t)) throw t
+        EncoderTrouble.blameLast()
+        android.util.Log.w("AMExport", "the encoder failed, trying once more with another one", t)
+        note(txt(R.string.export_note_retry))
+        try {
+            attempt()
+        } catch (again: Throwable) {
+            if (again is kotlinx.coroutines.CancellationException) throw again
+            t.addSuppressed(again)
+            throw t
         }
     }
 
@@ -197,6 +225,36 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
 
     private fun encode(pixels: ByteArray, width: Int, height: Int, settings: ExportSettings, reuse: Bitmap?): ByteArray {
         return app.absentmotion.platform.encodeRgba(pixels, width, height, settings, reuse)
+    }
+}
+
+internal const val StallMs = 60_000L
+private const val StallGraceMs = 5_000L
+
+internal class ExportStalled : Exception()
+
+internal fun encoderTrouble(t: Throwable): Boolean =
+    generateSequence(t) { it.cause }.take(16).any { it is ExportStalled || it is android.media.MediaCodec.CodecException }
+
+internal suspend fun <T> watched(stallMs: Long = StallMs, block: suspend (alive: () -> Unit) -> T): T {
+    val last = java.util.concurrent.atomic.AtomicLong(System.nanoTime())
+    val work = CoroutineScope(Dispatchers.Default).async { block { last.set(System.nanoTime()) } }
+    try {
+        while (!work.isCompleted) {
+            withTimeoutOrNull(minOf(1_000L, stallMs)) { work.join() }
+            if (!work.isCompleted && System.nanoTime() - last.get() > stallMs * 1_000_000L) {
+                work.cancel()
+                withTimeoutOrNull(StallGraceMs) { work.join() }
+                throw ExportError(txt(R.string.export_error_stalled, (stallMs / 1000).toString()), ExportStalled())
+            }
+        }
+        return work.await()
+    } catch (e: kotlinx.coroutines.CancellationException) {
+        work.cancel()
+        withContext(NonCancellable) { withTimeoutOrNull(StallGraceMs) { work.join() } }
+        throw e
+    } finally {
+        work.cancel()
     }
 }
 

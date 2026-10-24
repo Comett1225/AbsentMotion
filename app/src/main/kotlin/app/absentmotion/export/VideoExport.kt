@@ -65,6 +65,7 @@ internal suspend fun exportVideo(
 ) {
     val (width, height) = exportSize(scene, s.shortSide, even = true)
     val frames = frameCount(scene, s.fps)
+    EncoderTrouble.last = null
     holdingVideo(engine::holdVideo, engine::releaseVideo) {
         encode(engine, scene, xml, s, out, audio, width, height, frames, hotAtStart, pauseMs, note, progress)
     }
@@ -82,11 +83,18 @@ internal suspend fun <T> holdingVideo(hold: () -> Job?, release: () -> Job?, blo
 
 private val HighRefused: MutableSet<String> = java.util.concurrent.ConcurrentHashMap.newKeySet()
 
+internal object EncoderTrouble {
+    val bad: MutableSet<String> = java.util.concurrent.ConcurrentHashMap.newKeySet()
+    @Volatile var last: String? = null
+
+    fun blameLast() { last?.let { bad += it } }
+}
+
 internal fun openVideoEncoder(s: ExportSettings, width: Int, height: Int, hot: Boolean, note: (UiText) -> Unit = {}, bitrate: Int? = null): MediaCodec {
     val mime = s.codec.mime
     val infos = MediaCodecList(MediaCodecList.REGULAR_CODECS).codecInfos
         .filter { it.isEncoder && !it.alias && mime in it.supportedTypes && it.getCapabilitiesForType(mime).videoCapabilities?.isSizeSupported(width, height) == true }
-        .sortedByDescending { it.hardware }
+        .sortedWith(compareBy<MediaCodecInfo> { it.name in EncoderTrouble.bad }.thenByDescending { it.hardware })
     if (infos.isEmpty()) throw ExportError(txt(R.string.export_error_cannot_encode, s.codec.label, "${width}x$height"))
     var last: Throwable? = null
     for (info in infos) {
@@ -106,7 +114,8 @@ internal fun openVideoEncoder(s: ExportSettings, width: Int, height: Int, hot: B
                 codec.configure(encoderFormat(info, caps, s, width, height, profile, bestEffort, hot, bitrate), null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
                 Log.i("AMExport", "encoding with ${info.name}${if (profile) " (High)" else ""}${if (bestEffort) " at best effort" else ""}; rated for ${rated.toInt()} fps at ${width}x$height")
                 if (highFailed && !profile) HighRefused += key
-                if (!info.hardware && infos.first().hardware) note(txt(R.string.export_note_software))
+                if (!info.hardware && infos.any { it.hardware }) note(txt(R.string.export_note_software))
+                EncoderTrouble.last = info.name
                 return codec
             } catch (e: Exception) {
                 last = e

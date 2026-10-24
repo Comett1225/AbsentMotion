@@ -586,6 +586,8 @@
     <string name="sounds_order_za">Z to A</string>
     <string name="sounds_order_newest">Newest first</string>
     <string name="sounds_order_oldest">Oldest first</string>
+    <string name="export_note_retry">The video encoder stopped working. Trying again with another encoder.</string>
+    <string name="export_error_stalled">The export made no progress for %1$s seconds, so it was stopped. A media file or the phone\'s video encoder stopped responding. Close other apps that use video and try again.</string>
     <string name="sounds_order_shortest">Shortest first</string>
     <string name="sounds_order_longest">Longest first</string>
     <string name="sounds_tab_songs">Songs</string>

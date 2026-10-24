@@ -355,7 +355,7 @@ internal object TestHooks {
         val job = activity.lifecycleScope.launch {
             try {
                 if (kind == ExportKind.Video) {
-                    val probe = app.absentmotion.export.DeviceCapabilities.of(activity.applicationContext).load().probe
+                    val probe = app.absentmotion.export.DeviceCapabilities.of(activity.applicationContext).load()?.probe
                     Log.i("AMExport", "estimate ms=${app.absentmotion.export.ExportTimes(activity.applicationContext).estimateMs(s.fixedFormat(), scene, probe)}")
                 }
                 if (kind == ExportKind.Gif) Log.i("AMExport", "estimate ms=" + app.absentmotion.export.gifTimeMs(
