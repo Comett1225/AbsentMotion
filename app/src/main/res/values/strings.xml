@@ -248,6 +248,10 @@
     <string name="theme_error_no_colours">No theme colors in this file</string>
     <string name="library_err_no_data">No data received.</string>
     <string name="library_err_unsupported_type">Unsupported file type</string>
+    <string name="import_gif_converting">Preparing the GIF…</string>
+    <string name="import_gif_too_large">This GIF is too large to import. GIFs up to 2048 × 2048 pixels, 3000 frames and 10 minutes are supported.</string>
+    <string name="import_gif_damaged">This GIF is damaged and cannot be imported.</string>
+    <string name="import_gif_failed">This GIF could not be turned into a clip on this phone.</string>
     <string name="library_err_missing_manifest">Project package missing manifest</string>
     <string name="library_err_package_project_missing">Malformed package: project file is missing</string>
     <string name="library_err_too_many_projects">The package holds too many projects (more than %1$s)</string>

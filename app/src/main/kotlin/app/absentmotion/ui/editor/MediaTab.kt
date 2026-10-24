@@ -93,11 +93,22 @@ internal suspend fun EditorState.addPicked(context: Context, uri: Uri, video: Bo
 }
 
 private suspend fun EditorState.addGif(context: Context, uri: Uri): Boolean {
-    android.widget.Toast.makeText(context, context.getString(R.string.import_gif_converting), android.widget.Toast.LENGTH_SHORT).show()
-    val gif = try { gifVideo(context, uri) } catch (e: GifError) {
-        android.widget.Toast.makeText(context, context.getString(if (e.problem == GifProblem.TooLarge) R.string.import_gif_too_large else R.string.import_gif_damaged), android.widget.Toast.LENGTH_LONG).show()
+    val preparing = android.widget.Toast.makeText(context, context.getString(R.string.import_gif_converting), android.widget.Toast.LENGTH_SHORT).also { it.show() }
+    fun fail(message: Int): Boolean {
+        preparing.cancel()
+        android.widget.Toast.makeText(context, context.getString(message), android.widget.Toast.LENGTH_LONG).show()
         return true
-    } ?: return false
+    }
+    val gif = try { gifVideo(context, uri) } catch (e: GifError) {
+        return fail(if (e.problem == GifProblem.TooLarge) R.string.import_gif_too_large else R.string.import_gif_damaged)
+    } catch (e: kotlinx.coroutines.CancellationException) {
+        throw e
+    } catch (_: OutOfMemoryError) {
+        return fail(R.string.import_gif_too_large)
+    } catch (_: Exception) {
+        return fail(R.string.import_gif_failed)
+    }
+    if (gif == null) { preparing.cancel(); return false }
     val media = keepCopy(context, gif.media)
     val matte = gif.matte?.let { keepCopy(context, it) }
     if (media.uri != gif.media.uri) gif.files.firstOrNull()?.delete()
