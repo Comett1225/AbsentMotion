@@ -91,6 +91,10 @@ class AppSettings(private val context: Context) {
         get() = keepMediaCopiesState
         set(value) { keepMediaCopiesState = value; prefs.edit().putBoolean("keepMediaCopies", value).apply() }
 
+    var soundView: app.absentmotion.audio.SoundView
+        get() = app.absentmotion.audio.SoundView.parse(prefs.getString("soundView", null))
+        set(value) { prefs.edit().putString("soundView", value.text).apply() }
+
     private var weeklyBackupState by mutableStateOf(prefs.getBoolean("weeklyBackup", false))
 
     var weeklyBackup: Boolean

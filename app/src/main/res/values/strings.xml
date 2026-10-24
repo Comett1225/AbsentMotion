@@ -572,6 +572,33 @@
     <string name="audiotab_add">Add</string>
 
     <string name="audiofx_unknown_effect">Unknown effect</string>
+    <string name="sounds_title">Sounds</string>
+    <string name="sounds_from_files">From Files</string>
+    <string name="sounds_choose_files">Choose audio from Files</string>
+    <string name="sounds_sort">Sort</string>
+    <string name="sounds_sort_name">Name</string>
+    <string name="sounds_sort_added">Date added</string>
+    <string name="sounds_sort_length">Duration</string>
+    <string name="sounds_order_az">A to Z</string>
+    <string name="sounds_order_za">Z to A</string>
+    <string name="sounds_order_newest">Newest first</string>
+    <string name="sounds_order_oldest">Oldest first</string>
+    <string name="sounds_order_shortest">Shortest first</string>
+    <string name="sounds_order_longest">Longest first</string>
+    <string name="sounds_tab_songs">Songs</string>
+    <string name="sounds_tab_albums">Albums</string>
+    <string name="sounds_tab_artists">Artists</string>
+    <string name="sounds_tab_folders">Folders</string>
+    <string name="sounds_unknown_album">Unknown album</string>
+    <string name="sounds_unknown_artist">Unknown artist</string>
+    <string name="sounds_unknown_folder">Other</string>
+    <plurals name="sounds_count">
+        <item quantity="one">%1$d sound</item>
+        <item quantity="other">%1$d sounds</item>
+    </plurals>
+    <string name="sounds_empty">No music or sounds were found on this device.</string>
+    <string name="sounds_permission_body">Allow access to music and audio to see your sounds here. From Files works without it.</string>
+    <string name="sounds_permission_allow">Allow Access</string>
     <string name="audiofx_turn_on">Turn on</string>
     <string name="audiofx_bypass">Bypass</string>
     <string name="audiofx_reorder">Reorder</string>
