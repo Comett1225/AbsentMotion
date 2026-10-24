@@ -59,6 +59,15 @@ class ExportTimeTest {
         )
         assertEquals(60400L, estimateExportMs(history, probe, Codec.H264, 1080, 1920, 30, 300, FrameInterpolation.Flow))
         assertEquals(6400L, estimateExportMs(history, probe, Codec.H264, 1080, 1920, 30, 300))
+        assertEquals(5100L, estimateExportMs(history.take(1), probe, Codec.H264, 1080, 1920, 30, 300, FrameInterpolation.Ai))
+        assertNull(estimateExportMs(history.take(1), null, Codec.H264, 1080, 1920, 30, 300, FrameInterpolation.Ai))
+    }
+
+    @Test fun smoothedFramesAreSampledWhenTheDrawingTimeIsMeasured() {
+        assertEquals(listOf(0, 0, 100, 200), drawSamples(300, FrameInterpolation.Off))
+        assertEquals(listOf(0, 1, 100, 101, 200, 201), drawSamples(300, FrameInterpolation.Ai))
+        assertEquals(listOf(0, 0, 0, 0), drawSamples(1, FrameInterpolation.Off))
+        assertEquals(listOf(0, 0, 0, 0, 0, 0), drawSamples(1, FrameInterpolation.Flow))
     }
 
     @Test fun encodersSlowerThanTheExportSetTheShortestTime() {

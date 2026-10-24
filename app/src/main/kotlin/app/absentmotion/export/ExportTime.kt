@@ -40,7 +40,7 @@ internal fun estimateExportMs(
     val pool = listOf<(ExportRecord) -> Boolean>(
         { it.codec == codec && it.interpolation == interpolation },
         { it.interpolation == interpolation },
-        { true },
+        { interpolation == FrameInterpolation.Off },
     ).map { test -> usable.filter(test) }.firstOrNull { it.isNotEmpty() }
     val overhead = probe?.setupMs?.takeIf { it > 0 } ?: DefaultSetupMs
     if (pool != null) {

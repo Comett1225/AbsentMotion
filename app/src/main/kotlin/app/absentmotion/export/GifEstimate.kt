@@ -37,6 +37,13 @@ internal fun gifTimeMs(frames: Int, sample: GifSample, renderMs: Long?): Long {
     return render + (frames * median(sample.encodeMs)).roundToLong()
 }
 
+internal fun drawSamples(frames: Int, interpolation: FrameInterpolation): List<Int> {
+    val last = (frames - 1).coerceAtLeast(0)
+    val picks = if (interpolation == FrameInterpolation.Off) listOf(0, 0, frames / 3, frames * 2 / 3)
+        else listOf(0, 1, frames / 3, frames / 3 + 1, frames * 2 / 3, frames * 2 / 3 + 1)
+    return picks.map { it.coerceIn(0, last) }
+}
+
 internal suspend fun measureVideoDraw(engine: EngineThread, scene: Scene, settings: ExportSettings): Double {
     val (width, height) = exportSize(scene, settings.shortSide, even = true)
     val frames = frameCount(scene, settings.fps)
@@ -44,11 +51,12 @@ internal suspend fun measureVideoDraw(engine: EngineThread, scene: Scene, settin
     try {
         return engine.exportSession(scene.toXml(), settings.smoothing, settings.fps) {
             try {
-                listOf(0, 0, frames / 3, frames * 2 / 3).map { index ->
+                val times = drawSamples(frames, settings.interpolation).map { index ->
                     val started = System.nanoTime()
                     check(renderInto(buffer, frameTimeMs(scene, settings.fps, index))) { "Cannot sample the drawing time" }
                     (System.nanoTime() - started) / 1e6
-                }.drop(1).sorted()[1]
+                }
+                if (settings.interpolation == FrameInterpolation.Off) times.drop(1).sorted()[1] else times.drop(2).average()
             } finally {
                 releaseBuffers()
             }
