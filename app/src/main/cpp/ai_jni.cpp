@@ -1,3 +1,4 @@
+#include <android/bitmap.h>
 #include <jni.h>
 
 #include <algorithm>
@@ -5,6 +6,7 @@
 #include <cmath>
 #include <cstdint>
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
 #include <mutex>
 #include <new>
@@ -12,6 +14,7 @@
 #include <vector>
 
 #include "cpu.h"
+#include "cutout.h"
 #include "datareader.h"
 #include "gpu.h"
 #include "net.h"
@@ -426,4 +429,51 @@ Java_app_absentmotion_ai_AiNative_nativeInterpolate(JNIEnv *env, jobject, jlong 
         }
     }
     return 0;
+}
+
+extern "C" JNIEXPORT jint JNICALL
+Java_app_absentmotion_ai_AiNative_nativeCutout(JNIEnv *env, jobject, jlong handle, jobject bitmap, jint size) {
+    Model *m = model(handle);
+    m->cancel = false;
+    AndroidBitmapInfo info;
+    if (size < 32 || AndroidBitmap_getInfo(env, bitmap, &info) != ANDROID_BITMAP_RESULT_SUCCESS || info.format != ANDROID_BITMAP_FORMAT_RGBA_8888 ||
+        info.width < 1 || info.height < 1 || m->net.input_names().empty() || m->net.output_names().empty()) return -1;
+    void *pixels = nullptr;
+    if (AndroidBitmap_lockPixels(env, bitmap, &pixels) != ANDROID_BITMAP_RESULT_SUCCESS || !pixels) return -2;
+    auto *rgba = static_cast<uint8_t *>(pixels);
+    const int width = static_cast<int>(info.width), height = static_cast<int>(info.height);
+    const size_t stride = info.stride;
+    int code = 0;
+    cutout::unpremultiply(rgba, stride, width, height);
+    const cutout::Letterbox box = cutout::letterbox(width, height, size);
+    float *alpha = static_cast<float *>(std::malloc(static_cast<size_t>(box.width) * box.height * sizeof(float)));
+    if (!alpha) code = -2;
+    if (code == 0) {
+        ncnn::Mat result;
+        {
+            ncnn::Mat in(size, size, 3);
+            if (in.empty()) code = -2;
+            else if (in.cstep != static_cast<size_t>(size) * size) code = -1;
+            if (code == 0) cutout::netInput(rgba, stride, width, height, size, box, static_cast<float *>(in.data));
+            if (code == 0 && m->cancel) code = 1;
+            if (code == 0) {
+                ncnn::Extractor ex = m->extractor();
+                if (ex.input(m->net.input_names()[0], in) != 0 || ex.extract(m->net.output_names()[0], result) != 0) code = -3;
+            }
+        }
+        if (m->blobVk) {
+            m->blobVk->clear();
+            m->stagingVk->clear();
+        }
+        if (code == 0 && (result.w != size || result.h != size || result.c < 1)) code = -3;
+        if (code == 0) {
+            const ncnn::Mat plane = result.channel(0);
+            for (int y = 0; y < box.height; y++) std::memcpy(alpha + static_cast<size_t>(y) * box.width, plane.row(box.top + y) + box.left, sizeof(float) * box.width);
+        }
+    }
+    if (code == 0 && m->cancel) code = 1;
+    if (code == 0) code = cutout::refine(rgba, stride, width, height, alpha, box.width, box.height, m->cancel);
+    std::free(alpha);
+    AndroidBitmap_unlockPixels(env, bitmap);
+    return code;
 }
