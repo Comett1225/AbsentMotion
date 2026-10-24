@@ -87,6 +87,7 @@ import app.absentmotion.library.ProjectStore
 import app.absentmotion.media.MAX_MODEL_BYTES
 import app.absentmotion.media.MODEL_TRIANGLE_BUDGET
 import app.absentmotion.media.modelFiles
+import app.absentmotion.media.modelFileName
 import app.absentmotion.media.parseModel
 import app.absentmotion.model.importSvg
 import java.io.File
@@ -184,8 +185,8 @@ private suspend fun importModel(context: Context, state: EditorState, picked: Li
     withContext(Dispatchers.IO) {
         val resolver = context.contentResolver
         val names = picked.map { uri ->
-            (resolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { c -> if (c.moveToFirst()) c.getString(0) else null }
-                ?: uri.lastPathSegment ?: "model").substringAfterLast('/').replace(Regex("[^A-Za-z0-9._ -]"), "_").trimStart('.').ifEmpty { "model" }
+            modelFileName(resolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { c -> if (c.moveToFirst()) c.getString(0) else null }
+                ?: uri.lastPathSegment ?: "model")
         }
         val main = names.indexOfFirst { it.substringAfterLast('.').lowercase() in setOf("obj", "glb", "gltf") }
         if (main < 0) return@withContext context.getString(R.string.model_choose_file)

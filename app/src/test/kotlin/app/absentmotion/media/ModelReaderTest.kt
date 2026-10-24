@@ -130,6 +130,27 @@ class ModelReaderTest {
         assertEquals(1, mesh.triangleCount)
     }
 
+    @Test fun aGltfPreservesLiteralPlusSignsInCompanionFileNames() {
+        for (name in listOf("tri+data.bin", "tri%2Bdata.bin")) {
+            val opened = ArrayList<String>()
+            val mesh = readModel("tri.gltf", gltf("""{"byteLength":${triangle.size},"uri":"$name"}""").toByteArray()) {
+                opened += it
+                if (it == "tri+data.bin") triangle else null
+            }
+            assertEquals(listOf("tri+data.bin"), opened)
+            assertEquals(1, mesh.triangleCount)
+        }
+    }
+
+    @Test fun pickedModelCompanionsKeepTheNamesThatTheModelReferences() {
+        for (name in listOf("tri+data.bin", "tri data.bin", "tri_数据.bin", ".mesh.bin")) {
+            assertEquals(name, modelFileName(name))
+        }
+        assertEquals("mesh.bin", modelFileName("folder/mesh.bin"))
+        assertEquals("mesh.bin", modelFileName("folder\\mesh.bin"))
+        assertEquals("model", modelFileName(".."))
+    }
+
     private fun timed(seconds: Long, work: () -> Unit) {
         val failure = arrayOfNulls<Throwable>(1)
         val worker = Thread { try { work() } catch (t: Throwable) { failure[0] = t } }.apply { isDaemon = true; start() }

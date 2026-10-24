@@ -28,6 +28,9 @@ const val MODEL_TRIANGLE_BUDGET = 50_000
 
 internal const val MODEL_WORK_LIMIT = 16_000_000L
 
+internal fun modelFileName(value: String): String = value.substringAfterLast('/').substringAfterLast('\\').replace('\u0000', '_')
+    .takeUnless { it.isBlank() || it == "." || it == ".." } ?: "model"
+
 fun parseModel(name: String, bytes: ByteArray, open: (String) -> ByteArray?): Mesh {
     val mesh = if (name.substringAfterLast('.').lowercase() == "obj") ObjReader.read(bytes.toString(Charsets.UTF_8), open) else GltfReader.read(bytes, open)
     require(mesh.triangleCount > 0) { "The model has no triangles" }
@@ -381,7 +384,7 @@ object GltfReader {
 
     private fun load(uri: String, open: (String) -> ByteArray?): ByteArray? =
         if (uri.startsWith("data:")) runCatching { Base64.getDecoder().decode(uri.substringAfter(',')) }.getOrNull()
-        else open(java.net.URLDecoder.decode(uri, "UTF-8"))
+        else open(java.net.URLDecoder.decode(uri.replace("+", "%2B"), "UTF-8"))
 
     private fun localMatrix(node: JSONObject): FloatArray {
         node.optJSONArray("matrix")?.takeIf { it.length() == 16 }?.let { m -> return FloatArray(16) { m.optDouble(it, 0.0).toFloat() } }
