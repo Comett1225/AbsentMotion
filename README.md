@@ -59,8 +59,8 @@ subscription, no account and no advertising, and your projects never leave your 
   protection when the phone is hot and a check of every finished video and audio file.
 - **Safe projects.** Automatic version history, crash recovery, crash logs that say in one sentence what happened,
   imported media copied into the project and one-tap backup of every project to a folder that survives reinstalling.
-- **12 languages.** English, Indonesian, Hindi, Portuguese (Brazil), Spanish, Filipino, Vietnamese, Thai, Malay,
-  Arabic, Turkish and Russian, chosen on first start.
+- **13 languages.** English, Indonesian, Hindi, Portuguese (Brazil), Spanish, Filipino, Vietnamese, Thai, Malay,
+  Arabic, Persian, Turkish and Russian, chosen on first start.
 
 ## Speed
 

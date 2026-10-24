@@ -25,6 +25,7 @@ enum class AppLanguage(val tag: String, val nativeName: String) {
     Thai("th", "ไทย"),
     Malay("ms", "Bahasa Melayu"),
     Arabic("ar", "العربية"),
+    Persian("fa", "فارسی"),
     Turkish("tr", "Türkçe"),
     Russian("ru", "Русский");
 
@@ -44,6 +45,7 @@ enum class AppLanguage(val tag: String, val nativeName: String) {
             "in" -> "id"
             "tl" -> "fil"
             "zsm" -> "ms"
+            "pes", "prs" -> "fa"
             else -> language
         }
     }

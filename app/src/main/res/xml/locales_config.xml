@@ -10,6 +10,7 @@
     <locale android:name="th" />
     <locale android:name="ms" />
     <locale android:name="ar" />
+    <locale android:name="fa" />
     <locale android:name="tr" />
     <locale android:name="ru" />
 </locale-config>

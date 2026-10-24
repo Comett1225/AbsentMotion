@@ -44,7 +44,7 @@ The color names are the editor and home screen colors: TopBar, PreviewBg, Timeli
 
 ## Language
 
-The **Language** row shows the current language and opens the list of the 12 languages. Picking one applies it at once.
+The **Language** row shows the current language and opens the list of the 13 languages. Picking one applies it at once.
 
 ## About, Help and other rows
 

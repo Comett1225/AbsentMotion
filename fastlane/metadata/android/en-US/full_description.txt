@@ -15,7 +15,7 @@ AbsentMotion is a free, open-source alternative to CapCut and Alight Motion: a m
 <li>Generate captions from speech, on the device. The speech model is downloaded the first time you use the feature, after the app shows its size.</li>
 <li>Export MP4, MOV, MKV or WebM video, audio only (WAV, FLAC, M4A, OGG, MP3), animated GIF, image sequences and single frames.</li>
 <li>Version history, crash recovery and backup of all projects.</li>
-<li>12 languages: English, Indonesian, Hindi, Portuguese (Brazil), Spanish, Filipino, Vietnamese, Thai, Malay, Arabic, Turkish and Russian.</li>
+<li>13 languages: English, Indonesian, Hindi, Portuguese (Brazil), Spanish, Filipino, Vietnamese, Thai, Malay, Arabic, Persian, Turkish and Russian.</li>
 </ul>
 
 AbsentMotion can open scene XML files and .amproj packages exported from Alight Motion, and it exports scene XML in the same format. Effects that AbsentMotion does not include are kept in the file and are not drawn. AbsentMotion saves its own packages as .absproj. AbsentMotion is an independent project. It is not affiliated with, endorsed by or sponsored by Alight Creative, Alight Motion, ByteDance or CapCut. Alight Motion and CapCut are trademarks of their owners.

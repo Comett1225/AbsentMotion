@@ -28,10 +28,10 @@ MAPS = {'mapOf', 'linkedMapOf', 'hashMapOf', 'mutableMapOf'}
 KEEP = {'AbsentMotion', 'Alight Motion', 'Roboto'}
 REWRITE_IMPORTS = ['import androidx.compose.ui.res.stringResource', 'import app.absentmotion.R']
 FOLDERS = {'en': 'values', 'id': 'values-in', 'hi': 'values-hi', 'pt-BR': 'values-pt-rBR', 'es': 'values-es', 'fil': 'values-fil',
-           'vi': 'values-vi', 'th': 'values-th', 'ms': 'values-ms', 'ar': 'values-ar', 'tr': 'values-tr', 'ru': 'values-ru'}
+           'vi': 'values-vi', 'th': 'values-th', 'ms': 'values-ms', 'ar': 'values-ar', 'fa': 'values-fa', 'tr': 'values-tr', 'ru': 'values-ru'}
 JAVA_WORDS = {'new', 'default', 'switch', 'case', 'do', 'final', 'private', 'public', 'static', 'void', 'int', 'char', 'this', 'super', 'throw', 'goto', 'const', 'package', 'native', 'long', 'short', 'byte', 'float', 'double', 'boolean', 'catch', 'enum', 'extends', 'implements', 'interface', 'instanceof', 'protected', 'synchronized', 'throws', 'transient', 'volatile', 'abstract', 'strictfp', 'null', 'true', 'false'}
 PLACEHOLDER = re.compile(r'%(\d+\$)?[sdf]')
-SEVERAL = {'values-fil': {'one'}, 'values-hi': {'one'}, 'values-pt-rBR': {'one'}, 'values-ru': {'one', 'few', 'many'}, 'values-ar': {'few', 'many'}}
+SEVERAL = {'values-fil': {'one'}, 'values-hi': {'one'}, 'values-pt-rBR': {'one'}, 'values-ru': {'one', 'few', 'many'}, 'values-fa': {'one'}, 'values-ar': {'few', 'many'}}
 LETTER = re.compile('[A-Za-z\u00c0-\uffff]')
 
 

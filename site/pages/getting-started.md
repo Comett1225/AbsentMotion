@@ -22,7 +22,7 @@ AbsentMotion is already installed on this phone. This page walks through a first
 
 The first time you open the app it shows two screens before the home screen.
 
-1. **Choose your language.** The app has 12 languages: English, Indonesian, Hindi, Portuguese (Brazil), Spanish, Filipino, Vietnamese, Thai, Malay, Arabic, Turkish and Russian. Your phone's own language is listed first when the app has it. You can change it later in [Settings](@settings).
+1. **Choose your language.** The app has 13 languages: English, Indonesian, Hindi, Portuguese (Brazil), Spanish, Filipino, Vietnamese, Thai, Malay, Arabic, Persian, Turkish and Russian. Your phone's own language is listed first when the app has it. You can change it later in [Settings](@settings).
 2. **Check what this device can do.** A quick test shows which video formats and sizes your phone can export and how fast it is (Fast, Good or Basic). It runs once, takes a few seconds, and everything stays on the phone. You can tap Skip. The same screen has a switch that lets the app ask GitHub, once each time it opens, for the newest version number. It starts on and sends nothing else.
 
 The app asks for no permission at the start. Photo, video, audio, camera and microphone access are asked for the first time you use a feature that needs them.

@@ -20,6 +20,9 @@ class AppLanguageTest {
         assertEquals(AppLanguage.Russian, pick("ru-RU"))
         assertEquals(AppLanguage.Arabic, pick("ar-EG"))
         assertEquals(AppLanguage.Arabic, pick("ar-SA-u-nu-latn"))
+        assertEquals(AppLanguage.Persian, pick("fa-IR"))
+        assertEquals(AppLanguage.Persian, pick("fa-AF"))
+        assertEquals(AppLanguage.Persian, pick("prs"))
     }
 
     @Test fun otherRegionsFallBackToTheLanguageWeHave() {
@@ -59,10 +62,11 @@ class AppLanguageTest {
         assertEquals(AppLanguage.entries, AppLanguage.suggestedOrder(AppLanguage.English))
     }
 
-    @Test fun twelveLanguagesEachKnowTheirOwnName() {
-        assertEquals(12, AppLanguage.entries.size)
-        assertEquals(12, AppLanguage.entries.map { it.nativeName }.toSet().size)
+    @Test fun thirteenLanguagesEachKnowTheirOwnName() {
+        assertEquals(13, AppLanguage.entries.size)
+        assertEquals(13, AppLanguage.entries.map { it.nativeName }.toSet().size)
         assertEquals("العربية", AppLanguage.Arabic.nativeName)
+        assertEquals("فارسی", AppLanguage.Persian.nativeName)
         assertEquals("हिन्दी", AppLanguage.Hindi.nativeName)
         assertEquals("Bahasa Indonesia", AppLanguage.Indonesian.nativeName)
         for (language in AppLanguage.entries) assertEquals(language, AppLanguage.match(listOf(language.tag)))

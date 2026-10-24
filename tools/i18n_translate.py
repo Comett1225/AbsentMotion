@@ -16,14 +16,15 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from i18n_extract import EFFECTS, FOLDERS, KOTLIN, PLACEHOLDER, RES, ROOT, xml_escape
 
 LANGUAGES = {'id': 'Indonesian', 'hi': 'Hindi', 'pt-BR': 'Brazilian Portuguese', 'es': 'Latin American Spanish', 'fil': 'Filipino (Tagalog)',
-             'vi': 'Vietnamese', 'th': 'Thai', 'ms': 'Malay (Malaysia)', 'ar': 'Arabic (Modern Standard)', 'tr': 'Turkish', 'ru': 'Russian'}
+             'vi': 'Vietnamese', 'th': 'Thai', 'ms': 'Malay (Malaysia)', 'ar': 'Arabic (Modern Standard)', 'fa': 'Persian (Farsi, Iran)', 'tr': 'Turkish', 'ru': 'Russian'}
 QUANTITIES = {'id': ['other'], 'vi': ['other'], 'th': ['other'], 'ms': ['other'], 'hi': ['one', 'other'], 'pt-BR': ['one', 'many', 'other'],
               'es': ['one', 'many', 'other'], 'fil': ['one', 'other'], 'tr': ['one', 'other'], 'ru': ['one', 'few', 'many', 'other'],
-              'ar': ['zero', 'one', 'two', 'few', 'many', 'other']}
+              'ar': ['zero', 'one', 'two', 'few', 'many', 'other'], 'fa': ['one', 'other']}
 STATE = ROOT / 'tools/i18n_source.json'
 GLOSSARY = ROOT / 'tools/i18n_glossary.json'
 NOTES = ROOT / 'tools/i18n_notes.json'
-RULES = {'ru': 'Write the count placeholder in every plural form, including "one" (it also covers 21, 31, 101 ...), unless the English text has none.',
+RULES = {'fa': 'Write in standard Iranian Persian (Farsi) with the Persian letters, not Arabic ones (use ی and ک, not ي and ك), and use ZWNJ (the half space) where Persian spelling needs it. Keep the Latin digits and placeholders as in the English. Write the count placeholder in every plural form, including "one" (it also covers 0), unless the English text has none.',
+         'ru': 'Write the count placeholder in every plural form, including "one" (it also covers 21, 31, 101 ...), unless the English text has none.',
          'hi': 'Write the count placeholder in every plural form, including "one" (it also covers 0), unless the English text has none.',
          'pt-BR': 'Write the count placeholder in every plural form, including "one" (it also covers 0), and give "many" the same wording as "other" (it covers millions).',
          'es': 'Give "many" the same wording as "other" (it covers millions).',
@@ -222,7 +223,7 @@ def problem(en, value, language):
 
 
 def fix_direction(value, language):
-    if language != 'ar':
+    if language not in ('ar', 'fa'):
         return value
     def one(v):
         v = v.lstrip(RLM)
@@ -345,7 +346,7 @@ def balance():
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Translate strings.xml and the effect texts into the 11 other app languages with DeepSeek; only missing or changed texts are sent.')
+    parser = argparse.ArgumentParser(description='Translate strings.xml and the effect texts into the 12 other app languages with DeepSeek; only missing or changed texts are sent.')
     parser.add_argument('--languages', default=','.join(LANGUAGES), help='comma-separated tags, e.g. id,ar')
     parser.add_argument('--only', choices=['strings', 'effects'], help='translate only app strings or only effect texts')
     parser.add_argument('--retranslate', default='', help='comma-separated keys to translate again even if present')
