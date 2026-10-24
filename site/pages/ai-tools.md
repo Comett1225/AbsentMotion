@@ -38,6 +38,15 @@ If there is no sound the app says "There is no sound to caption", and if no spee
 
 Select a photo layer and open **Effects**, **Add Effect**, **AI**, **Remove Background**. The app cuts out the main subject and replaces the picture with a version with a transparent background. The original file is kept: the effect list shows a **Remove Background** row with an AI badge, and its button (**Undo this AI change and bring back the original**) restores the original picture.
 
+### Standard or Best quality
+
+The first time you remove a background from a photo, the app asks which cut-out you want. The answer is kept, and you can change it any time in **Settings**, **Projects and media**, **Cut-out quality**.
+
+- **Standard** is built into the app. It is fast and works offline.
+- **Best quality** gives cleaner edges around hair and fine detail. It is downloaded once (about 65 MB) and works on photos only; videos always use Standard. It needs the Latest version of the app.
+
+If Best quality cannot be downloaded or cannot finish a photo, the app uses Standard for that photo and tells you. To free the space again, tap **Delete Best quality cut-out** under **Cut-out quality**; the app then goes back to Standard.
+
 ### Videos
 
 Select a video layer and choose **Remove Background (video)**. A dialog says "Every frame of this clip is processed on this phone. The result is a group with the video and a mask layer above it." You choose the size of the mask: **Small 360p**, **Medium 540p** (default) or **Large 720p**, and the dialog estimates the number of frames and the storage needed. Tap **Start**.
@@ -106,6 +115,7 @@ Each level has its own model, downloaded once (about 11 MB) after the app has sh
 | Background removal model, Play-services build | First use | Not shown by the app | Google Play services |
 | Noise reduction | Never: it is inside the app | | |
 | AI Enhance models | The first time you use Enhance, after you tap Download and start | about 2.4 MB (cartoon 1.3 MB, film grain 2.4 MB more) | this project's GitHub releases |
+| Best quality cut-out | The first time you remove a background with Best quality | about 65 MB | this project's GitHub releases |
 | AI Smooth models | The first time you use AI Smooth at a level | about 11 MB per level | GitHub (the rife-ncnn-vulkan project) |
 | Sharpen faces | Never: it uses Android's own face finder | | |
 

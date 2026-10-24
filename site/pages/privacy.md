@@ -21,6 +21,7 @@ The app asks for the internet permission for these things only:
 - **Fonts.** When you pick one of the downloadable fonts, the app downloads it from Google Fonts. Google receives the request for that font and your IP address, as for any web request.
 - **Auto captions.** The first time you generate captions, the app tells you the size of the speech model (about 57 MB) and downloads it from Hugging Face. Recognizing speech runs on the phone.
 - **AI Enhance and AI Smooth.** The first time you use one of them, the app tells you the size of the model it needs (about 1 to 11 MB) and downloads it from GitHub. The AI work itself runs on the phone.
+- **Best quality cut-out.** Only if you choose Best quality for removing backgrounds, the app downloads its model once (about 65 MB) from GitHub. The cut-out itself runs on the phone.
 - **Update check.** If you allow it (the app asks once; the switch is in Settings), the app makes one normal HTTPS request to GitHub each time it opens, to read the latest version number. Nothing else is sent. GitHub sees your IP address, as for any web request.
 
 Apart from the Play-services build described below, nothing else is sent anywhere. Text to speech uses the voices already on the phone and works offline.

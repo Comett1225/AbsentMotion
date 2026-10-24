@@ -15,7 +15,7 @@ dependency is added, removed or upgraded, update this file in the same change.
 **Contents**
 
 1. Engine libraries (C and C++): Skia and the libraries it links, whisper.cpp and ggml, RNNoise, ncnn, glslang, the RIFE warp layer, LAME
-2. Machine learning models: OpenAI Whisper weights, RIFE and Real-ESRGAN weights (all downloaded at run time), background removal model (`foss` build)
+2. Machine learning models: OpenAI Whisper weights, RIFE and Real-ESRGAN weights and the Best quality cut-out model (all downloaded at run time), background removal model (`foss` build)
 3. Kotlin and Compose libraries
 4. Google Play services (proprietary)
 5. Fonts, icons and effect thumbnails
@@ -244,6 +244,19 @@ together with Skia.
 - Used in: AI Enhance (Upscale, Sharpen detail, Sharpen faces). Downloaded on first use, after the app has shown the
   size, checked against its SHA-256, and removable in Settings. "Sharpen faces" finds faces with Android's own
   `android.media.FaceDetector`; no face model is downloaded.
+
+### Best quality cut-out model
+
+- Version: `absent-cutout.bin` with `absent-cutout-768.param` and `absent-cutout-1024.param` (ncnn, fp16), published as
+  assets of this repository's `ai-models-2` release.
+- Licence: Apache-2.0. The Apache-2.0 text is `LICENSE` in the root of this repository.
+- Copyright: The AbsentMotion authors.
+- Used in: "Remove Background" on images when Best quality is chosen (Latest version, `foss` and `play` builds).
+  Downloaded once after that choice, checked against its SHA-256, and removable in Settings.
+- Pretrained encoder: `timm/mobilenetv4_conv_large.e600_r384_in1k`, revision `b7cda911a1888a1b76857905874be4e27ac3b52a`,
+  Apache-2.0, by Ross Wightman and timm contributors (https://huggingface.co/timm/mobilenetv4_conv_large.e600_r384_in1k,
+  https://github.com/huggingface/pytorch-image-models); MobileNetV4: Qin et al., "MobileNetV4: Universal Models for the
+  Mobile Ecosystem" (https://arxiv.org/abs/2404.10518). ImageNet-pretrained encoder only; classifier discarded.
 
 ### Background removal model (`foss` build only)
 
