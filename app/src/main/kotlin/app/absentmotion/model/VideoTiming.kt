@@ -165,7 +165,7 @@ fun Layer.trimmedTo(start: Int, end: Int, mediaMs: Int = Int.MAX_VALUE): Layer {
     var to = end
     if (timing != null) {
         if (start < startTime) from = maxOf(start, startTime + minOf(0, timing.localMs(0.0).roundToInt()))
-        if (end > endTime && mediaMs != Int.MAX_VALUE) to = minOf(end, maxOf(endTime, startTime + timing.localMs(mediaMs.toDouble()).roundToInt()))
+        if (end > endTime && mediaMs != Int.MAX_VALUE && node["loop"] != "true") to =minOf(end, maxOf(endTime, startTime + timing.localMs(mediaMs.toDouble()).roundToInt()))
     }
     var trimmed = withTimes(from, to)
     if (nested != null && from != startTime) {
@@ -174,7 +174,7 @@ fun Layer.trimmedTo(start: Int, end: Int, mediaMs: Int = Int.MAX_VALUE): Layer {
     }
     if (timing != null) {
         if (from != startTime) trimmed = trimmed.copy(node = trimmed.node.with("inTime", "${timing.mediaMs((from - startTime).toDouble()).roundToInt().coerceAtLeast(0)}"))
-        if (to != endTime) trimmed = trimmed.copy(node = trimmed.node.with("outTime", "${timing.mediaMs((to - startTime).toDouble()).roundToInt().coerceAtMost(mediaMs)}"))
+        if (to != endTime && node["loop"] != "true") trimmed = trimmed.copy(node = trimmed.node.with("outTime", "${timing.mediaMs((to - startTime).toDouble()).roundToInt().coerceAtMost(mediaMs)}"))
     }
     return trimmed
 }

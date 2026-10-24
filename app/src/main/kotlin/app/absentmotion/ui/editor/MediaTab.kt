@@ -2,6 +2,18 @@ package app.absentmotion.ui.editor
 
 import app.absentmotion.editor.keepCopy
 import android.Manifest
+import android.content.Context
+import android.net.Uri
+import app.absentmotion.ai.withVideoMatte
+import app.absentmotion.audio.audioDeclaration
+import app.absentmotion.editor.EditorPanel
+import app.absentmotion.editor.addAudio
+import app.absentmotion.editor.videoLayer
+import app.absentmotion.media.GifError
+import app.absentmotion.media.GifProblem
+import app.absentmotion.media.gifVideo
+import app.absentmotion.media.isGif
+import app.absentmotion.model.Layer
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -66,6 +78,44 @@ private fun unsupportedPick(context: android.content.Context) {
     android.widget.Toast.makeText(context, context.getString(R.string.library_err_unsupported_type), android.widget.Toast.LENGTH_LONG).show()
 }
 
+private fun looksLikeGif(context: Context, uri: Uri): Boolean =
+    runCatching { context.contentResolver.openInputStream(uri)?.use { isGif(it.readNBytes(6)) } }.getOrNull() == true
+
+internal suspend fun EditorState.addPicked(context: Context, uri: Uri, video: Boolean? = null, svg: Boolean = false) {
+    val type = runCatching { context.contentResolver.getType(uri) }.getOrNull().orEmpty()
+    val name = uri.lastPathSegment.orEmpty()
+    when {
+        svg || type == "image/svg+xml" || name.endsWith(".svg", ignoreCase = true) -> importSvgFile(context, uri)
+        video == null && type.startsWith("audio/") -> audioDeclaration(context, uri)?.let { keepCopy(context, it) }?.takeIf { it.duration > 0 }?.let { addAudio(it) } ?: unsupportedPick(context)
+        video != true && !type.startsWith("video/") && looksLikeGif(context, uri) && addGif(context, uri) -> Unit
+        else -> mediaDeclaration(context, uri)?.let { keepCopy(context, it) }?.let { if (it.type.startsWith("video/")) addVideo(it) else addImage(it) } ?: unsupportedPick(context)
+    }
+}
+
+private suspend fun EditorState.addGif(context: Context, uri: Uri): Boolean {
+    android.widget.Toast.makeText(context, context.getString(R.string.import_gif_converting), android.widget.Toast.LENGTH_SHORT).show()
+    val gif = try { gifVideo(context, uri) } catch (e: GifError) {
+        android.widget.Toast.makeText(context, context.getString(if (e.problem == GifProblem.TooLarge) R.string.import_gif_too_large else R.string.import_gif_damaged), android.widget.Toast.LENGTH_LONG).show()
+        return true
+    } ?: return false
+    val media = keepCopy(context, gif.media)
+    val matte = gif.matte?.let { keepCopy(context, it) }
+    if (media.uri != gif.media.uri) gif.files.firstOrNull()?.delete()
+    if (matte != null && matte.uri != gif.matte.uri) gif.files.getOrNull(1)?.delete()
+    val placed = scene.videoLayer(media, frame) ?: return true
+    val length = maxOf(media.duration / 1000, settings.defaultLayerDuration * 1000L).toInt()
+    val layer = placed.copy(node = placed.node.with("loop", "true").with("endTime", "${scene.endTimeFor(frame, length)}"))
+    val groupId = Layer.newId()
+    edit { current ->
+        val added = current.add(layer, listOf(media))
+        matte?.let { added.withVideoMatte(layer, it, gif.width, gif.height, Layer.newId(), groupId)?.update(groupId) { g -> g.copy(node = g.node.with("label", media.title)) } } ?: added
+    }
+    selectedId = if (matte != null && scene.layer(groupId) != null) groupId else layer.id
+    panel = EditorPanel.Tools
+    addOpen = false
+    return true
+}
+
 @Composable
 internal fun MediaTab(state: EditorState, modifier: Modifier, library: AddLibrary) {
     val context = LocalContext.current
@@ -77,8 +127,8 @@ internal fun MediaTab(state: EditorState, modifier: Modifier, library: AddLibrar
     val focus = LocalFocusManager.current
     BackHandler(searching) { focus.clearFocus(); searching = false }
     val query = debounced(search)
-    val files = library.media
-    LaunchedEffect(files) { if (album != null && files.none { it.albumId == album }) album = null }
+    val media = library.media
+    LaunchedEffect(media) { if (album != null && media.none { it.albumId == album }) album = null }
     val permission = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
         library.mediaRevision++
         state.engine.refreshMedia()
@@ -88,8 +138,16 @@ internal fun MediaTab(state: EditorState, modifier: Modifier, library: AddLibrar
             runCatching { context.contentResolver.takePersistableUriPermission(uri, android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION) }
             scope.launch {
                 state.addingMedia = true
-                try { mediaDeclaration(context, uri)?.let { state.keepCopy(context, it) }?.let { if (it.type.startsWith("video/")) state.addVideo(it) else state.addImage(it) } ?: unsupportedPick(context) } finally { state.addingMedia = false }
+                try { state.addPicked(context, uri) } finally { state.addingMedia = false }
             }
+        }
+    }
+    val files = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
+        if (uris.isEmpty()) return@rememberLauncherForActivityResult
+        uris.forEach { runCatching { context.contentResolver.takePersistableUriPermission(it, android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION) } }
+        scope.launch {
+            state.addingMedia = true
+            try { uris.forEach { state.addPicked(context, it) } } finally { state.addingMedia = false }
         }
     }
     LaunchedEffect(Unit) {
@@ -107,7 +165,7 @@ internal fun MediaTab(state: EditorState, modifier: Modifier, library: AddLibrar
     }
     val viewAll = stringResource(R.string.view_all)
     val allLabel = stringResource(R.string.mediatab_all)
-    val shown = remember(files, album, query) { files.filter { (album == null || it.albumId == album) && matchesSearch(query, it.name, it.album) } }
+    val shown = remember(media, album, query) { media.filter { (album == null || it.albumId == album) && matchesSearch(query, it.name, it.album) } }
     Box(modifier.clipToBounds()) {
         LazyHorizontalGrid(AtLeastTwo(96.dp), Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(0.dp)) {
             item(key = "albums") {
@@ -117,13 +175,13 @@ internal fun MediaTab(state: EditorState, modifier: Modifier, library: AddLibrar
                         picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo))
                     }, Alignment.Center) { MediaGridIcon(Modifier.size(24.dp)) }
                     Box(Modifier.fillMaxWidth().weight(1f).background(Am.Well).clickable { albumsOpen = true }, Alignment.Center) {
-                        Text(files.firstOrNull { it.albumId == album }?.album ?: allLabel, color = Am.OnDark, fontSize = 16.sp, maxLines = 1)
+                        Text(media.firstOrNull { it.albumId == album }?.album ?: allLabel, color = Am.OnDark, fontSize = 16.sp, maxLines = 1)
                         MediaAlbumArrow(Modifier.align(Alignment.TopEnd).padding(3.dp).size(6.dp))
                         val cell = remember { CellDrop() }
                         Presence(albumsOpen) {
                             Popup(cell, onDismissRequest = { albumsOpen = false }, properties = PopupProperties(focusable = true)) {
                                 Column(Modifier.presence(scaleFrom = 0.85f, origin = cell.origin).width(220.dp).heightIn(max = 300.dp).background(Am.Field).verticalScroll(rememberScrollState())) {
-                                    val albums = listOf(null to allLabel) + files.distinctBy { it.albumId }.map { it.albumId to it.album }
+                                    val albums = listOf(null to allLabel) + media.distinctBy { it.albumId }.map { it.albumId to it.album }
                                     albums.forEach { (id, name) ->
                                         Box(Modifier.fillMaxWidth().height(44.dp).clickable { album = id; albumsOpen = false }.padding(horizontal = 16.dp), Alignment.CenterStart) {
                                             Text(name, color = Am.OnDark, fontSize = 15.sp, maxLines = 1)
@@ -141,6 +199,11 @@ internal fun MediaTab(state: EditorState, modifier: Modifier, library: AddLibrar
                     MediaSquare(TextIcons.Search, stringResource(R.string.search_hint), searching || search.isNotEmpty()) { searching = true }
                 }
             }
+            item(key = "files") {
+                Column(Modifier.width(97.dp).padding(6.dp)) {
+                    MediaSquare(TextIcons.Import, stringResource(R.string.sounds_from_files), false) { files.launch(arrayOf("image/*", "video/*", "audio/*")) }
+                }
+            }
             if (shown.isEmpty() && query.isNotBlank()) item(key = "none", span = { GridItemSpan(maxLineSpan) }) {
                 NoMatches(query, R.string.search_no_photos_or_videos, Modifier.width(200.dp).fillMaxHeight())
             }
@@ -151,8 +214,7 @@ internal fun MediaTab(state: EditorState, modifier: Modifier, library: AddLibrar
                     scope.launch {
                         state.addingMedia = true
                         try {
-                            if (file.svg) state.importSvgFile(context, file.uri)
-                            else mediaDeclaration(context, file.uri)?.let { state.keepCopy(context, it) }?.let { if (file.video) state.addVideo(it) else state.addImage(it) } ?: unsupportedPick(context)
+                            state.addPicked(context, file.uri, video = file.video, svg = file.svg)
                         } finally { state.addingMedia = false }
                     }
                 }) {

@@ -244,6 +244,9 @@
     <string name="home_back">Back</string>
     <string name="backup_restoring_title">Restoring a backup</string>
     <string name="backup_restore_stopped">Restore stopped. Projects restored before you stopped are kept; restoring the same backup again finishes the rest.</string>
+    <string name="import_gif_converting">Preparing the GIF…</string>
+    <string name="import_gif_too_large">This GIF is too large to import. GIFs up to 2048 × 2048 pixels, 3000 frames and 10 minutes are supported.</string>
+    <string name="import_gif_damaged">This GIF is damaged and cannot be imported.</string>
     <string name="backup_all_projects">Back up all projects</string>
     <string name="backup_backing_up_title">Backing up all projects</string>
     <string name="backup_result_title">Backup</string>
@@ -799,6 +802,15 @@
     <string name="preset_deleted">Preset deleted</string>
     <string name="preset_rename_failed">Could not rename the preset</string>
     <string name="search_hint">Search</string>
+    <string name="font_import_some_failed_title">Some fonts were not imported</string>
+    <string name="font_import_reasons_body">These files were not imported:\n\n%1$s</string>
+    <string name="font_import_reason_line">%1$s: %2$s</string>
+    <string name="font_reason_not_font">not a font file</string>
+    <string name="font_reason_unsupported">this font format is not supported. Use TTF, OTF, TTC or WOFF.</string>
+    <string name="font_reason_too_large">the file is larger than 32 MB</string>
+    <string name="font_reason_duplicate">this font is already imported</string>
+    <string name="font_reason_corrupted">the font file is damaged</string>
+    <string name="font_reason_unreadable">the file could not be opened</string>
     <string name="search_clear">Clear search</string>
     <string name="search_no_sounds">No sounds match “%1$s”</string>
     <string name="search_no_assets_or_projects">No assets or projects match “%1$s”</string>

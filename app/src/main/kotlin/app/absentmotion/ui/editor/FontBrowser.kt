@@ -69,8 +69,13 @@ internal fun FontBrowser(library: FontLibrary, onSelect: (String) -> Unit, onClo
     val importer = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
         scope.launch {
             val failures = mutableListOf<String>()
-            uris.forEach { uri -> runCatching { library.import(uri) }.onFailure { failures.add(runCatching { context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { if (it.moveToFirst()) it.getString(0) else null } }.getOrNull() ?: uri.lastPathSegment ?: "") } }
-            if (failures.isNotEmpty()) error = FontError(R.string.font_import_failed_title, R.string.font_import_failed_body, failures.joinToString("\n"))
+            uris.forEach { uri ->
+                val problem = try { library.import(uri); null } catch (e: kotlinx.coroutines.CancellationException) { throw e } catch (e: FontImportError) { e.problem } catch (_: Exception) { FontProblem.Corrupted }
+                if (problem != null) failures += context.getString(R.string.font_import_reason_line,
+                    runCatching { context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { if (it.moveToFirst()) it.getString(0) else null } }.getOrNull() ?: uri.lastPathSegment ?: "",
+                    context.getString(FontReasons.getValue(problem)))
+            }
+            if (failures.isNotEmpty()) error = FontError(if (failures.size == uris.size) R.string.font_import_failed_title else R.string.font_import_some_failed_title, R.string.font_import_reasons_body, failures.joinToString("\n"))
             revision++
         }
     }
@@ -184,6 +189,12 @@ internal fun FontBrowser(library: FontLibrary, onSelect: (String) -> Unit, onClo
 }
 
 private class FontError(@StringRes val title: Int, @StringRes val body: Int, val detail: String = "")
+
+private val FontReasons = mapOf(
+    FontProblem.NotFont to R.string.font_reason_not_font, FontProblem.Unsupported to R.string.font_reason_unsupported,
+    FontProblem.TooLarge to R.string.font_reason_too_large, FontProblem.AlreadyImported to R.string.font_reason_duplicate,
+    FontProblem.Corrupted to R.string.font_reason_corrupted, FontProblem.Unreadable to R.string.font_reason_unreadable,
+)
 
 private val AllCategories = setOf(1, 2, 3, 4, 5, 100, 110)
 private val TitledLanguages = setOf(22, 12, 16, 7, 1, 31, 20, 17)

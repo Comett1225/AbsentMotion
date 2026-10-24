@@ -16,6 +16,7 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.net.URL
 import java.security.MessageDigest
@@ -78,7 +79,7 @@ class FontLibrary(context: Context) {
             .putString("recent", JSONArray(read("recent") - name).toString()).apply()
         fontRevision.update { it + 1 }
     }
-    fun importedFonts(): List<FontName> = imported.listFiles()?.filter { it.extension.lowercase() in listOf("ttf", "otf") }
+    fun importedFonts(): List<FontName> = imported.listFiles()?.filter { it.extension.lowercase() in listOf("ttf", "otf", "ttc") }
         ?.sortedByDescending { it.lastModified() }?.map { FontName("imported", it.name) } ?: emptyList()
     private fun cachedFile(name: String): File = File(cache,
         MessageDigest.getInstance("SHA-256").digest(name.toByteArray()).joinToString("") { "%02x".format(it) } + ".ttf")
@@ -150,23 +151,24 @@ class FontLibrary(context: Context) {
         return (if (font.source == "imported" || variable) face else Typeface.create(face, font.weight, font.italic)).also { faces[name] = stamp to it }
     }
     suspend fun import(uri: Uri): FontName = withContext(Dispatchers.IO) {
-        val filename = context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use {
+        val filename = runCatching { context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use {
             if (it.moveToFirst()) it.getString(0) else null
-        } ?: uri.lastPathSegment ?: "font.ttf"
-        require(filename.substringAfterLast('.', "").lowercase() in listOf("ttf", "otf")) { "Select a .ttf or .otf font." }
-        val clean = File(filename).name.replace(Regex("[^\\p{L}\\p{N} ._-]"), "_")
-        var destination = File(imported, clean)
+        } }.getOrNull() ?: uri.lastPathSegment ?: "font"
+        val raw = try {
+            context.contentResolver.openInputStream(uri)?.use { input -> ByteArrayOutputStream().also { copyLimited(input, it) }.toByteArray() }
+        } catch (e: FontImportError) { throw e } catch (_: Exception) { null } ?: throw FontImportError(FontProblem.Unreadable)
+        val (bytes, kind) = checkedFont(raw)
+        imported.listFiles()?.firstOrNull { it.isFile && it.length() == bytes.size.toLong() && it.readBytes().contentEquals(bytes) }
+            ?.let { throw FontImportError(FontProblem.AlreadyImported) }
+        val clean = File(filename).name.substringBeforeLast('.').replace(Regex("[^\\p{L}\\p{N} ._-]"), "_").take(80).ifBlank { "font" }
+        var destination = File(imported, "$clean.${kind.extension}")
         var number = 1
-        while (destination.exists()) destination = File(imported, "${clean.substringBeforeLast('.')}-${number++}.${clean.substringAfterLast('.')}")
+        while (destination.exists()) destination = File(imported, "$clean-${number++}.${kind.extension}")
         val temporary = File.createTempFile("import-", ".font", cache)
         try {
-            context.contentResolver.openInputStream(uri)?.use { input -> temporary.outputStream().use { output ->
-                copyLimited(input, output)
-            } } ?: error("Cannot read font.")
-            checkFont(temporary)
-            imported.listFiles()?.firstOrNull { it.isFile && it.length() == temporary.length() && it.readBytes().contentEquals(temporary.readBytes()) }
-                ?.let { return@withContext FontName("imported", it.name) }
-            check(temporary.renameTo(destination)) { "Cannot save font." }
+            temporary.writeBytes(bytes)
+            if (Build.VERSION.SDK_INT >= 29) try { Font.Builder(temporary).build() } catch (_: Exception) { throw FontImportError(FontProblem.Corrupted) }
+            if (!temporary.renameTo(destination)) throw FontImportError(FontProblem.Unreadable)
             fontRevision.update { it + 1 }
             FontName("imported", destination.name)
         } finally { temporary.delete() }
@@ -211,7 +213,7 @@ class FontLibrary(context: Context) {
             val count = input.read(bytes)
             if (count < 0) break
             total += count
-            require(total <= 32 * 1024 * 1024) { "Font is too large." }
+            if (total > MAX_FONT_BYTES) throw FontImportError(FontProblem.TooLarge)
             output.write(bytes, 0, count)
         }
     }
