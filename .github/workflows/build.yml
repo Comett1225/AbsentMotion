@@ -126,5 +126,6 @@ jobs:
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platform-tools" "platforms;android-37.0" "build-tools;37.0.0" "cmake;3.31.6" "ndk;30.0.16248370"
       - name: Quick checks (static checks, foss compile, unit tests)
         run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
           echo 'org.gradle.java.home=/usr/lib/jvm/java-21-openjdk-amd64' >> gradle.properties
           sh tools/check.sh --quick
