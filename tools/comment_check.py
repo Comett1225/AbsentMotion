@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
-import io
 import json
 import re
+import source_policy
 import subprocess
 import sys
-import tokenize
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -71,14 +70,7 @@ def c_comments(text):
 
 
 def python_comments(text):
-    found = []
-    try:
-        for token in tokenize.generate_tokens(io.StringIO(text).readline):
-            if token.type == tokenize.COMMENT and not (token.start[0] == 1 and token.string.startswith("#!")):
-                found.append(token.start[0])
-    except (tokenize.TokenError, IndentationError):
-        pass
-    return found
+    return [line for line, _ in source_policy.violations(text)]
 
 
 def shell_comments(text):

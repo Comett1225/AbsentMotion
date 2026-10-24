@@ -27,12 +27,12 @@ def find_ndk():
 
 
 def nm(tool, args, path):
-    out = subprocess.run([str(tool), "-D", *args, "--just-symbol-name", str(path)], capture_output=True, text=True).stdout
+    out = subprocess.run([str(tool), "-D", *args, "--just-symbol-name", str(path)], capture_output=True, text=True, check=True).stdout
     return [line.split("@")[0].strip() for line in out.splitlines() if line.strip()]
 
 
 def undefined(tool, path):
-    out = subprocess.run([str(tool), "-D", "--undefined-only", str(path)], capture_output=True, text=True).stdout
+    out = subprocess.run([str(tool), "-D", "--undefined-only", str(path)], capture_output=True, text=True, check=True).stdout
     result = {}
     for line in out.splitlines():
         parts = line.split()

@@ -4,6 +4,7 @@ import importlib.util
 import os
 from pathlib import Path
 import re
+import shlex
 import subprocess
 import sys
 import tempfile
@@ -109,6 +110,32 @@ class ToolRegressions(unittest.TestCase):
                 self.assertNotEqual(0, result.returncode)
                 self.assertIn(message, result.stderr)
 
+    def test_comment_check_rejects_python_docstrings(self):
+        with tempfile.TemporaryDirectory() as folder:
+            folder = Path(folder)
+            source = folder / 'fixture.py'
+            source.write_text('"""A module description."""\nvalue = 1\n')
+            git = folder / 'git'
+            git.write_text('#!/bin/sh\nprintf "%s\\n" ' + shlex.quote(str(source)) + '\n')
+            git.chmod(0o755)
+            result = subprocess.run([sys.executable, str(ROOT / 'tools/comment_check.py')],
+                                    env=dict(os.environ, PATH=str(folder) + os.pathsep + os.environ['PATH']), capture_output=True, text=True)
+            self.assertNotEqual(0, result.returncode)
+            self.assertIn('fixture.py:1:', result.stdout)
+
+    @unittest.skipUnless((ROOT / 'tools/publish_forbidden.txt').exists(), 'tools/publish_forbidden.txt is private and not in this checkout')
+    def test_publish_check_fails_when_a_scanner_fails(self):
+        with tempfile.TemporaryDirectory() as folder:
+            folder = Path(folder)
+            python = folder / 'python3'
+            env = dict(os.environ, PATH=str(folder) + os.pathsep + os.environ['PATH'])
+            for scanner in ['tools/publish_scan.py', 'tools/comment_check.py']:
+                python.write_text('#!/bin/sh\nif [ "$1" = ' + shlex.quote(scanner) + ' ]; then exit 17; fi\nexec ' + shlex.quote(sys.executable) + ' "$@"\n')
+                python.chmod(0o755)
+                result = subprocess.run(['sh', str(ROOT / 'tools/publish_check.sh')], env=env, capture_output=True, text=True)
+                self.assertNotEqual(0, result.returncode, scanner + '\n' + result.stdout + result.stderr)
+                self.assertNotIn('publish_check: nothing found.', result.stdout)
+
     def test_site_tests_are_required_in_ci_and_optional_elsewhere(self):
         with tempfile.TemporaryDirectory() as folder:
             env = {k: v for k, v in os.environ.items() if k != 'CI'}
@@ -125,7 +152,7 @@ class ToolRegressions(unittest.TestCase):
         function = script[script.index('native_libs() {'):script.index('\n}\n', script.index('native_libs() {')) + 3]
         with tempfile.TemporaryDirectory() as folder:
             folder = Path(folder)
-            lib = folder / 'app/build/intermediates/merged_native_libs/fossRelease/mergeFossReleaseNativeLibs/out/lib/arm64-v8a/libengine.so'
+            lib = folder / 'app/build/intermediates/merged_native_libs/fossRelease/mergeFossReleaseNativeLibs/out/lib/arm64-v8a/libamengine.so'
             source = folder / 'app/src/main/cpp/engine.cpp'
             run = lambda: subprocess.run(['sh', '-c', 'fail() { echo "FAILED: $1"; }; ' + function + '\nnative_libs fossRelease mergeFossReleaseNativeLibs; echo "rc=$? libs=$libs"'],
                                          cwd=folder, capture_output=True, text=True).stdout
@@ -142,6 +169,23 @@ class ToolRegressions(unittest.TestCase):
             stale = run()
             self.assertIn('FAILED: the fossRelease native libraries are older than the native code', stale)
             self.assertIn('rc=1', stale)
+            fresh = lib.with_name('liblame_jni.so')
+            fresh.touch()
+            os.utime(fresh, (4000, 4000))
+            mixed = run()
+            self.assertIn('FAILED: the fossRelease native libraries are older than the native code', mixed)
+            self.assertIn('rc=1', mixed)
+            os.utime(lib, (5000, 5000))
+            os.utime(fresh, (1000, 1000))
+            self.assertIn('rc=0', run())
+            ai = lib.with_name('libabsent_ai.so')
+            ai.touch()
+            os.utime(ai, (2000, 2000))
+            dependency = folder / 'third_party/ncnn/src/net.cpp'
+            dependency.parent.mkdir(parents=True)
+            dependency.touch()
+            os.utime(dependency, (3000, 3000))
+            self.assertIn('rc=1', run())
 
     def test_python_policy_rejects_docstrings_but_allows_data_strings(self):
         scanner = ROOT / 'tools/source_policy.py'
@@ -154,6 +198,19 @@ class ToolRegressions(unittest.TestCase):
             self.assertTrue(module.violations(source))
         self.assertFalse(module.violations('data = ' + quote + 'payload' + quote))
         self.assertFalse(module.violations('#!/usr/bin/env python3\nvalue = 1\n'))
+
+    def test_api_floor_refuses_failed_native_symbol_reads(self):
+        tree = ast.parse((ROOT / 'tools/api_floor.py').read_text())
+        functions = [node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name in ('nm', 'undefined')]
+        scope = {'subprocess': subprocess}
+        exec(compile(ast.Module(body=functions, type_ignores=[]), 'api_floor.py', 'exec'), scope)
+        with tempfile.TemporaryDirectory() as folder:
+            tool = Path(folder) / 'nm'
+            tool.write_text('#!/bin/sh\necho "invalid library" >&2\nexit 1\n')
+            tool.chmod(0o755)
+            for function, args in [('nm', [tool, ['--defined-only'], Path('invalid.so')]), ('undefined', [tool, Path('invalid.so')])]:
+                with self.assertRaises(subprocess.CalledProcessError):
+                    scope[function](*args)
 
 if __name__ == '__main__':
     unittest.main()

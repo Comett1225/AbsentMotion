@@ -21,10 +21,25 @@ native_libs() {
         return 1
     fi
     libs=$(dirname "$newest")
-    if [ -n "$(find app/src/main/cpp third_party/rnnoise third_party/lame third_party/rife_warp -type f -newer "$newest" 2>/dev/null | head -n 1)" ]; then
-        fail "the $1 native libraries are older than the native code, so their API floor would describe an old build (./gradlew :app:$2 rebuilds them)"
-        return 1
-    fi
+    for library in "$libs"/*.so; do
+        case "${library##*/}" in
+            libamengine.so)
+                newer=$(find app/src/main/cpp third_party/rnnoise -type f ! -name ai_jni.cpp ! -name whisper_jni.cpp ! -name lame_jni.cpp -newer "$library" 2>/dev/null | head -n 1)
+                ;;
+            libabsent_ai.so) sources="app/src/main/cpp/ai_jni.cpp third_party/rife_warp third_party/ncnn/src third_party/ncnn/glslang" ;;
+            libwhisper_jni.so|libwhisper_jni_fast.so) sources="app/src/main/cpp/whisper_jni.cpp third_party/whisper.cpp/src third_party/whisper.cpp/include third_party/whisper.cpp/ggml" ;;
+            liblame_jni.so) sources="app/src/main/cpp/lame_jni.cpp third_party/lame/include" ;;
+            libmp3lame.so) sources="third_party/lame" ;;
+            *) continue ;;
+        esac
+        if [ "${library##*/}" != libamengine.so ]; then
+            newer=$(find app/src/main/cpp/CMakeLists.txt $sources -type f -newer "$library" 2>/dev/null | head -n 1)
+        fi
+        if [ -n "$newer" ]; then
+            fail "the $1 native libraries are older than the native code ($library), so their API floor would describe an old build (./gradlew :app:$2 rebuilds them)"
+            return 1
+        fi
+    done
 }
 start=$(date +%s)
 
