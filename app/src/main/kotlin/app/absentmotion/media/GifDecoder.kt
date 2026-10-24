@@ -40,7 +40,7 @@ class GifDecoder(stream: InputStream) {
 
     init {
         val head = ByteArray(6)
-        if (input.readNBytes(head, 0, 6) != 6 || !isGif(head)) throw GifError(GifProblem.NotGif)
+        if (fill(head, 6) != 6 || !isGif(head)) throw GifError(GifProblem.NotGif)
         width = short()
         height = short()
         val packed = byte()
@@ -160,7 +160,7 @@ class GifDecoder(stream: InputStream) {
                     if (left == 0) {
                         left = input.read()
                         if (left <= 0) { ended = true; left = 0; break@loop }
-                        if (input.readNBytes(block, 0, left) != left) break@loop
+                        if (fill(block, left) != left) break@loop
                         at = 0
                     }
                     datum = datum or ((block[at++].toInt() and 255) shl bits)
@@ -217,10 +217,20 @@ class GifDecoder(stream: InputStream) {
 
     private fun palette(size: Int): IntArray {
         val raw = ByteArray(size * 3)
-        if (input.readNBytes(raw, 0, raw.size) != raw.size) throw GifError(GifProblem.Damaged)
+        if (fill(raw, raw.size) != raw.size) throw GifError(GifProblem.Damaged)
         return IntArray(size) { i ->
             0xFF000000.toInt() or ((raw[i * 3].toInt() and 255) shl 16) or ((raw[i * 3 + 1].toInt() and 255) shl 8) or (raw[i * 3 + 2].toInt() and 255)
         }
+    }
+
+    private fun fill(into: ByteArray, count: Int): Int {
+        var done = 0
+        while (done < count) {
+            val n = input.read(into, done, count - done)
+            if (n < 0) break
+            done += n
+        }
+        return done
     }
 
     private fun skipBlocks() {

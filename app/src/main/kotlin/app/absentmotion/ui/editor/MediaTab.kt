@@ -14,6 +14,7 @@ import app.absentmotion.media.GifProblem
 import app.absentmotion.media.gifVideo
 import app.absentmotion.media.isGif
 import app.absentmotion.model.Layer
+import app.absentmotion.platform.readAtMost
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -79,7 +80,7 @@ private fun unsupportedPick(context: android.content.Context) {
 }
 
 private fun looksLikeGif(context: Context, uri: Uri): Boolean =
-    runCatching { context.contentResolver.openInputStream(uri)?.use { isGif(it.readNBytes(6)) } }.getOrNull() == true
+    runCatching { context.contentResolver.openInputStream(uri)?.use { isGif(it.readAtMost(6)) } }.getOrNull() == true
 
 internal suspend fun EditorState.addPicked(context: Context, uri: Uri, video: Boolean? = null, svg: Boolean = false) {
     val type = runCatching { context.contentResolver.getType(uri) }.getOrNull().orEmpty()
