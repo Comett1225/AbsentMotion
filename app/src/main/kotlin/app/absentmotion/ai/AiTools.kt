@@ -209,8 +209,10 @@ class AiTools(private val context: Context, private val state: EditorState, priv
                 }
                 committed = true
                 message = fallback?.let { AppText.get(it) } ?: ""
-                state.panel = EditorPanel.Tools
-                state.effectBrowserOpen = false
+                if (fallback == null) {
+                    state.panel = EditorPanel.Tools
+                    state.effectBrowserOpen = false
+                }
             } } } catch (_: CancellationException) {
                 message = AppText.get(R.string.ai_cancelled)
             } catch (e: ModelNotReady) {
