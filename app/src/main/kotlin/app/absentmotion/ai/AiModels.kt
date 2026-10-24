@@ -14,9 +14,13 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.util.concurrent.ConcurrentHashMap
 
+internal const val CUTOUT_PARAM_768 = "absent-cutout-768.param"
+internal const val CUTOUT_PARAM_1024 = "absent-cutout-1024.param"
+
 internal class ModelFile(val name: String, val url: String, val bytes: Long, val sha256: String)
 
 internal const val MODEL_RELEASE = "$HOME_PAGE/releases/download/ai-models-1/"
+internal const val MODEL_RELEASE_2 = "$HOME_PAGE/releases/download/ai-models-2/"
 private const val RIFE_SOURCE = "https://raw.githubusercontent.com/TNTwise/rife-ncnn-vulkan/13338e38debe2e400b3eeecf6792312d01a692f9/models/"
 
 private fun rife(folder: String, paramBytes: Long, paramSha: String, binBytes: Long, binSha: String) = listOf(
@@ -24,7 +28,7 @@ private fun rife(folder: String, paramBytes: Long, paramSha: String, binBytes: L
     ModelFile("flownet.bin", "$RIFE_SOURCE$folder/flownet.bin", binBytes, binSha),
 )
 
-private fun hosted(name: String, bytes: Long, sha: String) = ModelFile(name, MODEL_RELEASE + name, bytes, sha)
+private fun hosted(name: String, bytes: Long, sha: String, release: String = MODEL_RELEASE) = ModelFile(name, release + name, bytes, sha)
 
 internal enum class AiModel(val folder: String, @StringRes val title: Int, val licence: String, val gmacPerMegapixel: Double, val files: List<ModelFile>) {
     SmoothLow("rife-v4.25-lite", R.string.ai_model_smooth_low, "RIFE 4.25 lite (MIT)", 10.7, rife("rife-v4.25-lite",
@@ -43,7 +47,11 @@ internal enum class AiModel(val folder: String, @StringRes val title: Int, val l
         hosted("realesr-general-wdn-x4v3.bin", 2_435_272, "bdd5bdc7da2c83411ced54c37a6646aebfe1b3f780bb7e6f877dd8934fbd3cc5"))),
     Cartoon("realesr-animevideov3", R.string.ai_model_cartoon, "Real-ESRGAN animevideov3 (BSD-3-Clause)", 619.2, listOf(
         hosted("realesr-animevideov3-x4.param", 3_077, "850a248e7c14c27e5bd8cf7265113a9441036a7db63963bb8aa5169d788a435e"),
-        hosted("realesr-animevideov3-x4.bin", 1_247_368, "548a36f9c3f4ab8da56cd3b13badf23968bee207b396dad14d04b830e5f2ab2d")));
+        hosted("realesr-animevideov3-x4.bin", 1_247_368, "548a36f9c3f4ab8da56cd3b13badf23968bee207b396dad14d04b830e5f2ab2d"))),
+    Cutout("cutout-1", R.string.ai_model_cutout, "AbsentMotion cut-out (Apache-2.0)", 79.0, listOf(
+        hosted(CUTOUT_PARAM_768, 19_350, "f5f6b00c7d7e313590c4150252bce38d292b51a77cc46f887175afe2a8577c48", MODEL_RELEASE_2),
+        hosted(CUTOUT_PARAM_1024, 19_356, "12cbc7eb86afccbee2dbcd79bee799171ee4adcf4d59f1ff0e9278341885b262", MODEL_RELEASE_2),
+        hosted("absent-cutout.bin", 64_875_088, "c597b55b1a0c7013b0ece7a9917914016ef3462d3b832993678dfd339ed0c503", MODEL_RELEASE_2)));
 
     val bytes: Long get() = files.sumOf { it.bytes }
     val param: String? get() = files.firstOrNull { it.name.endsWith(".param") }?.name

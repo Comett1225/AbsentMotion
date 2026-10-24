@@ -1213,6 +1213,7 @@
     <string name="ai_model_detail">AI Enhance modeli</string>
     <string name="ai_model_grain">AI Enhance gren modeli</string>
     <string name="ai_model_cartoon">AI Enhance çizgi film modeli</string>
+    <string name="ai_model_cutout">En kaliteli kesim</string>
     <string name="ai_model_broken">Bir AI model dosyası hasarlıydı ve silindi. Tekrar indirin.</string>
     <string name="ai_model_download_failed">AI modeli indirilemedi. Bağlantıyı kontrol edip tekrar deneyin.</string>
     <string name="ai_model_download_wrong">İndirilen dosya AI modeli değildi</string>
@@ -1255,6 +1256,14 @@
     <string name="ai_video_too_large_to_save">Bu telefon %1$s × %2$s boyutunda bir video kaydedemez</string>
     <string name="ai_delete_model">%1$s sil</string>
     <string name="settings_ai_gpu">AI için grafik yongasını kullan</string>
+    <string name="settings_cutout_quality">Kesim kalitesi</string>
+    <string name="cutout_question">Görsellerde arka plan nasıl kaldırılsın? Bunu daha sonra Ayarlar\'dan değiştirebilirsiniz.</string>
+    <string name="cutout_standard">Standart</string>
+    <string name="cutout_standard_hint">Yerleşik, hızlı ve çevrimdışı çalışır.</string>
+    <string name="cutout_best">En iyi kalite</string>
+    <string name="cutout_best_hint">Saç ve ince ayrıntı çevresinde daha temiz kenarlar. %1$s bir kez indirilir. Yalnızca görseller.</string>
+    <string name="cutout_fallback_download">En iyi kalite indirilemedi, bu yüzden Standart kullanıldı. Bağlantıyı kontrol edip tekrar deneyin.</string>
+    <string name="cutout_fallback_failed">En iyi kalite bu görseli tamamlayamadı, bu yüzden Standart kullanıldı.</string>
     <string name="ai_gpu_warning">Bu, bazı telefonları dondurabilir. Telefon donarsa yeniden başlatın; AI tekrar işlemciyi kullanır.</string>
     <string name="ai_gpu_failed">Grafik yongasındaki AI işlemi tamamlanmadı, AI artık işlemciyi kullanıyor.</string>
     <string name="export_interpolation_ai">AI Yumuşatma</string>
@@ -1505,6 +1514,7 @@
     <string name="tier_needs_latest">Android 13 (Latest sürümü) gerekir</string>
     <string name="feature_flow_high">Optik akış High</string>
     <string name="feature_ai_enhance">AI İyileştirme</string>
+    <string name="feature_best_cutout">En kaliteli kesim</string>
     <string name="about_version_compatible">Sürüm %1$s Compatible</string>
     <string name="about_compatible_note">Bu, Android 9 ile 12 için Compatible sürümüdür. Dışarıda bırakılanlar: %1$s. Bunlar için Android 13 ve Latest sürümü gerekir.</string>
     <string name="low_memory_title">Düşük bellek</string>

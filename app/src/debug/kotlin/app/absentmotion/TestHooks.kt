@@ -29,7 +29,7 @@ internal object TestHooks {
     fun onboarding(intent: Intent): String? = intent.getStringExtra("onboarding")
 
     fun newIntent(activity: MainActivity, intent: Intent) {
-        if (intent.hasExtra("xml") || intent.hasExtra("aaccheck") || intent.hasExtra("devicecheck") || intent.hasExtra("capcheck") || intent.hasExtra("aicheck") || intent.hasExtra("enhancecheck") || intent.hasExtra("aismoothcheck") || intent.hasExtra("aismoothtrim") || intent.hasExtra("aidownload")) {
+        if (intent.hasExtra("xml") || intent.hasExtra("aaccheck") || intent.hasExtra("devicecheck") || intent.hasExtra("capcheck") || intent.hasExtra("aicheck") || intent.hasExtra("enhancecheck") || intent.hasExtra("aismoothcheck") || intent.hasExtra("aismoothtrim") || intent.hasExtra("aidownload") || intent.hasExtra("hqinstall") || intent.hasExtra("hqremove")) {
             activity.setIntent(intent)
             start(activity)
             return
@@ -193,6 +193,11 @@ internal object TestHooks {
             val runs = intent.getIntExtra("runs", 3).coerceAtLeast(1)
             scope.launch(Dispatchers.IO) { checkBackgroundRemoval(activity, asset, runs) }
         }
+        if (intent.hasExtra("hqinstall") || intent.hasExtra("hqremove")) scope.launch(Dispatchers.IO) {
+            intent.getStringExtra("hqinstall")?.let { installCutout(activity, File(it)) }
+            app.absentmotion.ai.BestCutout.sideOverride = intent.getIntExtra("hqside", 0).takeIf { it > 0 }
+            intent.getStringExtra("hqremove")?.let { checkBestCutout(activity, File(it)) }
+        }
         intent.getStringExtra("batch")?.let { list ->
             scope.launch {
                 for (line in File(list).readLines().filter { it.isNotBlank() }) {
@@ -273,6 +278,48 @@ internal object TestHooks {
         } catch (e: Throwable) {
             Log.e("AMTest", "bgremove failed", e)
         }
+    }
+
+    private fun installCutout(activity: MainActivity, source: File) {
+        try {
+            val model = app.absentmotion.ai.AiModel.Cutout
+            val files = source.listFiles().orEmpty()
+            val picks = mapOf(
+                app.absentmotion.ai.CUTOUT_PARAM_768 to files.first { it.name.endsWith(".param") && "768" in it.name },
+                app.absentmotion.ai.CUTOUT_PARAM_1024 to files.first { it.name.endsWith(".param") && "1024" in it.name },
+                model.bin to files.first { it.name.endsWith(".bin") },
+            )
+            model.dir(activity).mkdirs()
+            for ((name, file) in picks) file.copyTo(model.file(activity, name), overwrite = true)
+            model.verify(activity)
+            Log.i("AMTest", "hqinstall ok ${model.dir(activity)} installed=${model.installed(activity)}")
+        } catch (e: Throwable) {
+            Log.e("AMTest", "hqinstall failed", e)
+        }
+    }
+
+    private fun peakKb(): Long = File("/proc/self/status").readLines().firstOrNull { it.startsWith("VmHWM:") }?.filter(Char::isDigit)?.toLongOrNull() ?: -1L
+
+    private suspend fun checkBestCutout(activity: MainActivity, source: File) {
+        val inputs = if (source.isDirectory) source.listFiles().orEmpty().filter { it.isFile }.sortedBy { it.name } else listOf(source)
+        val out = File(activity.getExternalFilesDir(null), "hqremove").apply { mkdirs() }
+        for (input in inputs) {
+            try {
+                runCatching { File("/proc/self/clear_refs").writeText("5") }
+                val before = peakKb()
+                val start = SystemClock.elapsedRealtime()
+                val media = app.absentmotion.ai.BestCutout.run(activity.applicationContext, Uri.fromFile(input).toString(), null, activity.engine.maxPictureSize()) { _, _ -> }
+                val ms = SystemClock.elapsedRealtime() - start
+                val result = File(out, input.nameWithoutExtension + ".png")
+                media.file.copyTo(result, overwrite = true)
+                media.file.delete()
+                val size = BitmapFactory.Options().apply { inJustDecodeBounds = true }.also { BitmapFactory.decodeFile(result.path, it) }
+                Log.i("AMTest", "hqremove ${input.name} -> ${size.outWidth}x${size.outHeight} ms=$ms peakKb=${peakKb()} startKb=$before out=${result.path}")
+            } catch (e: Throwable) {
+                Log.e("AMTest", "hqremove ${input.name} failed", e)
+            }
+        }
+        Log.i("AMTest", "hqremove done")
     }
 
     private fun exportForTest(activity: MainActivity, kindName: String, scene: Scene, frame: Int) {

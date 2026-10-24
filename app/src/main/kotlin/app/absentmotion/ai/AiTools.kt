@@ -74,6 +74,8 @@ class AiTools(private val context: Context, private val state: EditorState, priv
     var videoSide by mutableIntStateOf(MatteSides[1])
     var enhanceSetup by mutableStateOf<Layer?>(null)
     var enhance by mutableStateOf(EnhanceOptions())
+    var cutoutSetup by mutableStateOf<Layer?>(null)
+    var cutoutQuality by mutableStateOf(CutoutQuality.Standard)
     private var job: Job? = null
 
     private suspend fun <T> holdingPreview(action: AiAction, block: suspend () -> T): T =
@@ -107,6 +109,14 @@ class AiTools(private val context: Context, private val state: EditorState, priv
             enhanceSetup = layer
             return
         }
+        if (action == AiAction.Background && !confirmed && CutoutChoice.of(context).asks(BestCutout.offered)) {
+            dismiss()
+            cutoutQuality = CutoutQuality.Standard
+            cutoutSetup = layer
+            return
+        }
+        if (action == AiAction.Background && cutoutSetup != null) CutoutChoice.of(context).choose(cutoutQuality)
+        cutoutSetup = null
         videoSetup = null
         noiseSetup = null
         smoothSetup = null
@@ -116,6 +126,7 @@ class AiTools(private val context: Context, private val state: EditorState, priv
         job = scope.launch {
             var result: AiMedia? = null
             var committed = false
+            var fallback: Int? = null
             try { CrashLogs.during("running AI ${action.name.lowercase()}") { holdingPreview(action) {
                 val report: AiProgress = { fraction, text ->
                     withContext(Dispatchers.Main) { progress = fraction.coerceIn(0f, 1f); message = text }
@@ -165,10 +176,21 @@ class AiTools(private val context: Context, private val state: EditorState, priv
                     }
                 } else {
                     val original = state.scene.media(layer.node[if (action == AiAction.Noise) "src" else "fillImage"] ?: "")
+                    var note: Int? = null
                     withContext(Dispatchers.IO) {
                         result = when (action) {
-                            AiAction.Background -> BackgroundRemoval.run(context, layer.node["fillImage"]!!, original,
-                                state.engine.maxPictureSize(), report)
+                            AiAction.Background -> {
+                                val limit = state.engine.maxPictureSize()
+                                val source = layer.node["fillImage"]!!
+                                bestOrStandard(CutoutChoice.of(context).quality(BestCutout.offered),
+                                    install = {
+                                        if (!AiModel.Cutout.installed(context)) report(0f, AppText.get(R.string.ai_downloading_model))
+                                        BestCutout.install(context) { fraction -> progress = fraction.coerceIn(0f, 1f) }
+                                    },
+                                    best = { BestCutout.run(context, source, original, limit, report) },
+                                    standard = { BackgroundRemoval.run(context, source, original, limit, report) },
+                                ).also { note = it.note }.value
+                            }
                             else -> NoiseReduction.run(context, layer.node["src"]!!, noiseSource, report)
                         }
                     }
@@ -183,9 +205,10 @@ class AiTools(private val context: Context, private val state: EditorState, priv
                                 .withAiMark(kind, it.node[kind.attribute], output.declaration.uri, if (kind == AiKind.Noise) used.xml else null, original)
                         }.withMedia(output.declaration)
                     }
+                    fallback = note
                 }
                 committed = true
-                message = ""
+                message = fallback?.let { AppText.get(it) } ?: ""
                 state.panel = EditorPanel.Tools
                 state.effectBrowserOpen = false
             } } } catch (_: CancellationException) {

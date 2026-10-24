@@ -1213,6 +1213,7 @@
     <string name="ai_model_detail">مدل بهبود AI</string>
     <string name="ai_model_grain">مدل بهبود دانه AI</string>
     <string name="ai_model_cartoon">مدل کارتون AI Enhance</string>
+    <string name="ai_model_cutout">برش با بهترین کیفیت</string>
     <string name="ai_model_broken">یک فایل مدل AI خراب شد و حذف شد. دوباره دانلودش کنید.</string>
     <string name="ai_model_download_failed">دانلود مدل AI ناموفق بود. اتصال را بررسی کنید و دوباره تلاش کنید.</string>
     <string name="ai_model_download_wrong">دانلودشده مدل AI نبود</string>
@@ -1255,6 +1256,14 @@
     <string name="ai_video_too_large_to_save">این گوشی نمی‌تواند ویدیوی %1$s × %2$s را ذخیره کند</string>
     <string name="ai_delete_model">حذف %1$s</string>
     <string name="settings_ai_gpu">استفاده از تراشه گرافیکی برای AI</string>
+    <string name="settings_cutout_quality">کیفیت برش</string>
+    <string name="cutout_question">پس‌زمینه تصاویر چگونه حذف شود؟ بعداً می‌توانید این را در تنظیمات تغییر دهید.</string>
+    <string name="cutout_standard">استاندارد</string>
+    <string name="cutout_standard_hint">داخلی، سریع و آفلاین کار می‌کند.</string>
+    <string name="cutout_best">بهترین کیفیت</string>
+    <string name="cutout_best_hint">لبه‌های تمیزتر دور مو و جزئیات ریز. %1$s یک‌بار دانلود می‌شود. فقط تصاویر.</string>
+    <string name="cutout_fallback_download">بهترین کیفیت دانلود نشد، بنابراین استاندارد استفاده شد. اتصال را بررسی کنید و دوباره امتحان کنید.</string>
+    <string name="cutout_fallback_failed">بهترین کیفیت نتوانست این تصویر را کامل کند، بنابراین استاندارد استفاده شد.</string>
     <string name="ai_gpu_warning">این کار می‌تواند برخی گوشی‌ها را فریز کند. اگر گوشی فریز شد، دوباره راه‌اندازی‌اش کنید تا AI دوباره از پردازنده استفاده کند.</string>
     <string name="ai_gpu_failed">کار AI روی تراشه گرافیکی تمام نشد، بنابراین AI اکنون از پردازنده استفاده می‌کند.</string>
     <string name="export_interpolation_ai">AI Smooth</string>
@@ -1505,6 +1514,7 @@
     <string name="tier_needs_latest">به اندروید 13 (Latest) نیاز دارد</string>
     <string name="feature_flow_high">جریان نوری بالا</string>
     <string name="feature_ai_enhance">بهسازی AI</string>
+    <string name="feature_best_cutout">برش با بهترین کیفیت</string>
     <string name="about_version_compatible">نسخه %1$s Compatible</string>
     <string name="about_compatible_note">این نسخه Compatible برای اندروید 9 تا 12 است. کنار گذاشته شده: %1$s. آن‌ها به اندروید 13 و نسخه Latest نیاز دارند.</string>
     <string name="low_memory_title">کمبود حافظه</string>

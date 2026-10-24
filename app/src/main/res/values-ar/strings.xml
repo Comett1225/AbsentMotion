@@ -1309,6 +1309,7 @@
     <string name="ai_model_detail">نموذج AI للتحسين</string>
     <string name="ai_model_grain">نموذج AI لتحسين حبيبات الفيلم</string>
     <string name="ai_model_cartoon">نموذج AI لتحسين الكارتون</string>
+    <string name="ai_model_cutout">إزالة الخلفية بأفضل جودة</string>
     <string name="ai_model_broken">تلف ملف نموذج AI وتم حذفه. نزّله مرة أخرى.</string>
     <string name="ai_model_download_failed">فشل تنزيل نموذج AI. تحقق من الاتصال وحاول مرة أخرى.</string>
     <string name="ai_model_download_wrong">الملف الذي تم تنزيله ليس نموذج AI</string>
@@ -1351,6 +1352,14 @@
     <string name="ai_video_too_large_to_save">لا يستطيع هذا الهاتف حفظ فيديو بدقة %1$s × %2$s</string>
     <string name="ai_delete_model">حذف %1$s</string>
     <string name="settings_ai_gpu">استخدام شريحة الرسومات للذكاء الاصطناعي</string>
+    <string name="settings_cutout_quality">جودة إزالة الخلفية</string>
+    <string name="cutout_question">كيف تريد إزالة الخلفيات من الصور؟ يمكنك تغيير ذلك لاحقًا من الإعدادات.</string>
+    <string name="cutout_standard">قياسي</string>
+    <string name="cutout_standard_hint">مدمج وسريع ويعمل دون اتصال.</string>
+    <string name="cutout_best">أفضل جودة</string>
+    <string name="cutout_best_hint">حواف أنظف حول الشعر والتفاصيل الدقيقة. يُنزِّل %1$s مرة واحدة. للصور فقط.</string>
+    <string name="cutout_fallback_download">تعذر تنزيل أفضل جودة، لذا استُخدم الوضع القياسي. تحقق من الاتصال وحاول مرة أخرى.</string>
+    <string name="cutout_fallback_failed">تعذر إكمال هذه الصورة بأفضل جودة، لذا استُخدم الوضع القياسي.</string>
     <string name="ai_gpu_warning">قد يؤدي هذا إلى تجميد بعض الهواتف. إذا تجمد الهاتف، أعد تشغيله وسيستخدم الذكاء الاصطناعي المعالج مجددًا.</string>
     <string name="ai_gpu_failed">لم تكتمل معالجة AI على شريحة الرسوميات، لذا أصبح AI يستخدم المعالج الآن.</string>
     <string name="export_interpolation_ai">تنعيم AI</string>
@@ -1601,6 +1610,7 @@
     <string name="tier_needs_latest">يتطلب Android 13 (إصدار Latest)</string>
     <string name="feature_flow_high">التدفق البصري عالي</string>
     <string name="feature_ai_enhance">تحسين بالذكاء الاصطناعي</string>
+    <string name="feature_best_cutout">إزالة الخلفية بأفضل جودة</string>
     <string name="about_version_compatible">الإصدار %1$s Compatible</string>
     <string name="about_compatible_note">هذه نسخة Compatible لنظام Android 9 إلى 12. تم استبعاد: %1$s. وهي تحتاج إلى Android 13 ونسخة Latest.</string>
     <string name="low_memory_title">ذاكرة منخفضة</string>

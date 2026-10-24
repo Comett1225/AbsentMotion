@@ -136,6 +136,7 @@ fun SettingsDrawer(settings: AppSettings, drawer: androidx.compose.material3.Dra
                 SwitchRow(stringResource(R.string.settings_keep_media_copies), settings.keepMediaCopies, enabled = true) { settings.keepMediaCopies = it }
                 if (settings.demoModeShown) SwitchRow(stringResource(R.string.settings_demo_mode), settings.demoMode, enabled = true) { settings.demoMode = it; demoNote = it }
                 CaptionModelRow()
+                CutoutRows()
                 AiModelRows()
                 AiGpuRow()
             }
@@ -224,12 +225,34 @@ private fun CaptionModelRow() {
 @Composable
 private fun AiModelRows() {
     val context = LocalContext.current
-    var models by remember { mutableStateOf(app.absentmotion.ai.AiModel.downloaded(context)) }
+    var models by remember { mutableStateOf(app.absentmotion.ai.AiModel.downloaded(context) - app.absentmotion.ai.AiModel.Cutout) }
     for (model in models) {
         ActionRow(stringResource(R.string.ai_delete_model, stringResource(model.title)), formatBytes(model.onDisk(context)), chevron = false) {
             model.delete(context)
-            models = app.absentmotion.ai.AiModel.downloaded(context)
+            models = app.absentmotion.ai.AiModel.downloaded(context) - app.absentmotion.ai.AiModel.Cutout
         }
+    }
+}
+
+@Composable
+private fun CutoutRows() {
+    if (!app.absentmotion.ai.BestCutout.offered) return
+    val context = LocalContext.current
+    val model = app.absentmotion.ai.AiModel.Cutout
+    val choice = remember { app.absentmotion.ai.CutoutChoice.of(context) }
+    var chosen by remember { mutableStateOf(choice.saved) }
+    var bytes by remember { mutableLongStateOf(model.onDisk(context)) }
+    val qualities = app.absentmotion.ai.CutoutQuality.entries
+    Divider(10.dp)
+    ChoicesBlock(R.string.settings_cutout_quality) {
+        Choices(qualities.map { it.title }, qualities.indexOf(chosen)) { choice.choose(qualities[it]); chosen = qualities[it] }
+    }
+    Divider(10.dp)
+    if (bytes > 0L) ActionRow(stringResource(R.string.ai_delete_model, stringResource(model.title)), formatBytes(bytes), chevron = false) {
+        model.delete(context)
+        bytes = model.onDisk(context)
+        choice.choose(app.absentmotion.ai.CutoutQuality.Standard)
+        chosen = app.absentmotion.ai.CutoutQuality.Standard
     }
 }
 

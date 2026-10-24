@@ -33,6 +33,7 @@ import app.absentmotion.ai.AiDevice
 import app.absentmotion.ai.AiEnhance
 import app.absentmotion.ai.AiSmooth
 import app.absentmotion.ai.AiTools
+import app.absentmotion.ai.CutoutQuality
 import app.absentmotion.ai.AiVerdict
 import app.absentmotion.ai.EnhanceMode
 import app.absentmotion.ai.aiEstimate
@@ -207,6 +208,35 @@ internal fun AiNoiseDialog(tools: AiTools) {
         },
         confirmButton = { TextButton({ tools.apply(AiAction.Noise, confirmed = true) }) { Text(stringResource(R.string.start), color = Am.Accent) } },
         dismissButton = { TextButton({ tools.noiseSetup = null }) { Text(stringResource(R.string.cancel), color = Am.Accent) } },
+        containerColor = Am.Field)
+}
+
+@Composable
+internal fun AiCutoutDialog(tools: AiTools) {
+    if (tools.cutoutSetup == null) return
+    val size = formatBytes(app.absentmotion.ai.AiModel.Cutout.bytes)
+    AlertDialog(onDismissRequest = { tools.cutoutSetup = null },
+        title = { Text(stringResource(R.string.settings_cutout_quality), color = Am.OnDark) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState())) {
+                Text(stringResource(R.string.cutout_question), color = Am.OnDark, fontSize = 14.sp)
+                Column(Modifier.padding(top = 12.dp).selectableGroup(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    for (quality in CutoutQuality.entries) {
+                        val on = quality == tools.cutoutQuality
+                        Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(6.dp)).background(if (on) Am.FieldHi else Am.PanelInset)
+                            .selectable(on, role = Role.RadioButton) { tools.cutoutQuality = quality }.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
+                            RadioButton(on, null, colors = RadioButtonDefaults.colors(selectedColor = Am.Accent, unselectedColor = Am.OnDark))
+                            Column(Modifier.padding(start = 10.dp)) {
+                                Text(stringResource(quality.title), color = if (on) Am.Accent else Am.OnDark, fontSize = 14.sp)
+                                Text(stringResource(quality.hint, size), color = Am.Caption, fontSize = 12.sp, lineHeight = 16.sp)
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = { TextButton({ tools.apply(AiAction.Background, confirmed = true) }) { Text(stringResource(R.string.start), color = Am.Accent) } },
+        dismissButton = { TextButton({ tools.cutoutSetup = null }) { Text(stringResource(R.string.cancel), color = Am.Accent) } },
         containerColor = Am.Field)
 }
 

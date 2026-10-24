@@ -1189,6 +1189,7 @@
     <string name="ai_model_detail">Model peningkatan AI</string>
     <string name="ai_model_grain">Model butiran film AI</string>
     <string name="ai_model_cartoon">Model kartun AI</string>
+    <string name="ai_model_cutout">Potongan kualitas terbaik</string>
     <string name="ai_model_broken">File model AI rusak dan telah dihapus. Unduh ulang.</string>
     <string name="ai_model_download_failed">Unduhan model AI gagal. Periksa koneksi dan coba lagi.</string>
     <string name="ai_model_download_wrong">Yang diunduh bukan model AI</string>
@@ -1231,6 +1232,14 @@
     <string name="ai_video_too_large_to_save">Ponsel ini tidak dapat menyimpan video %1$s × %2$s</string>
     <string name="ai_delete_model">Hapus %1$s</string>
     <string name="settings_ai_gpu">Gunakan chip grafis untuk AI</string>
+    <string name="settings_cutout_quality">Kualitas potongan</string>
+    <string name="cutout_question">Bagaimana cara menghapus latar belakang dari gambar? Anda dapat mengubahnya nanti di Pengaturan.</string>
+    <string name="cutout_standard">Standar</string>
+    <string name="cutout_standard_hint">Bawaan, cepat, dan berfungsi offline.</string>
+    <string name="cutout_best">Kualitas terbaik</string>
+    <string name="cutout_best_hint">Tepi lebih bersih di sekitar rambut dan detail halus. Mengunduh %1$s sekali. Hanya gambar.</string>
+    <string name="cutout_fallback_download">Kualitas terbaik tidak dapat diunduh, jadi Standar digunakan. Periksa koneksi dan coba lagi.</string>
+    <string name="cutout_fallback_failed">Kualitas terbaik tidak dapat memproses gambar ini, jadi Standar digunakan.</string>
     <string name="ai_gpu_warning">Ini dapat membuat beberapa ponsel macet. Jika ponsel macet, mulai ulang dan AI akan kembali menggunakan prosesor.</string>
     <string name="ai_gpu_failed">Pemrosesan AI di chip grafis tidak selesai, jadi AI kini memakai prosesor.</string>
     <string name="export_interpolation_ai">AI Smooth</string>
@@ -1481,6 +1490,7 @@
     <string name="tier_needs_latest">Butuh Android 13 (versi Latest)</string>
     <string name="feature_flow_high">Optical flow Tinggi</string>
     <string name="feature_ai_enhance">Peningkatan AI</string>
+    <string name="feature_best_cutout">Potongan kualitas terbaik</string>
     <string name="about_version_compatible">Versi %1$s Compatible</string>
     <string name="about_compatible_note">Ini versi Compatible untuk Android 9 hingga 12. Tidak disertakan: %1$s. Fitur itu butuh Android 13 dan versi Latest.</string>
     <string name="low_memory_title">Memori rendah</string>

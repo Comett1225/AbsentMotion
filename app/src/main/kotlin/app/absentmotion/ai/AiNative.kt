@@ -1,6 +1,7 @@
 package app.absentmotion.ai
 
 import android.content.Context
+import android.graphics.Bitmap
 import app.absentmotion.R
 import app.absentmotion.i18n.AppText
 import kotlinx.coroutines.CoroutineStart
@@ -47,6 +48,7 @@ internal object AiNative {
     external fun nativeCancel(handle: Long)
     external fun nativeClose(handle: Long)
     external fun nativeUpscale(handle: Long, input: IntArray, width: Int, height: Int, netScale: Int, outScale: Int, tile: Int, overlap: Int, output: IntArray): Int
+    external fun nativeCutout(handle: Long, bitmap: Bitmap, size: Int): Int
     external fun nativeInterpolate(handle: Long, first: IntArray, second: IntArray, width: Int, height: Int, t: Float, padding: Int, maxPixels: Int, output: IntArray): Int
 }
 
@@ -64,6 +66,8 @@ internal class AiNet private constructor(private val handle: Long, private val g
         checkResult(blocking { AiNative.nativeInterpolate(handle, first, second, width, height, t, padding, maxPixels, output) })
         return output
     }
+
+    suspend fun cutout(bitmap: Bitmap, size: Int) = checkResult(blocking { AiNative.nativeCutout(handle, bitmap, size) })
 
     private fun checkResult(code: Int) {
         check(code != 1) { AppText.get(R.string.ai_cancelled) }
@@ -91,11 +95,12 @@ internal class AiNet private constructor(private val handle: Long, private val g
 
         @Volatile var cpuOnly = false
 
-        fun open(context: Context, model: AiModel, blend: AiModel? = null, weight: Float = 1f, gpu: Boolean = AiDevice.gpuProven(context, model)): AiNet {
+        fun open(context: Context, model: AiModel, blend: AiModel? = null, weight: Float = 1f, gpu: Boolean = AiDevice.gpuProven(context, model),
+                 paramName: String? = model.param): AiNet {
             check(AiNative.loaded) { AppText.get(R.string.ai_runtime_unavailable) }
             model.verify(context)
             blend?.verify(context)
-            val param = model.file(context, checkNotNull(model.param)).path
+            val param = model.file(context, checkNotNull(paramName)).path
             val useGpu = gpu && !cpuOnly
             if (useGpu) AiDevice.gpuRunning(context, true)
             val bin = model.file(context, model.bin).path

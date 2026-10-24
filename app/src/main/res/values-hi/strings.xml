@@ -1213,6 +1213,7 @@
     <string name="ai_model_detail">AI एन्हांस मॉडल</string>
     <string name="ai_model_grain">AI एन्हांस ग्रेन मॉडल</string>
     <string name="ai_model_cartoon">AI एन्हांस कार्टून मॉडल</string>
+    <string name="ai_model_cutout">बेस्ट क्वालिटी कट-आउट</string>
     <string name="ai_model_broken">AI मॉडल फ़ाइल खराब हो गई थी और हटा दी गई है। इसे फिर से डाउनलोड करें।</string>
     <string name="ai_model_download_failed">AI मॉडल डाउनलोड नहीं हो सका। कनेक्शन जाँचें और फिर कोशिश करें।</string>
     <string name="ai_model_download_wrong">डाउनलोड की गई फ़ाइल AI मॉडल नहीं थी</string>
@@ -1255,6 +1256,14 @@
     <string name="ai_video_too_large_to_save">यह फ़ोन %1$s × %2$s वीडियो सेव नहीं कर सकता</string>
     <string name="ai_delete_model">%1$s हटाएँ</string>
     <string name="settings_ai_gpu">AI के लिए ग्राफ़िक्स चिप का इस्तेमाल करें</string>
+    <string name="settings_cutout_quality">कट-आउट क्वालिटी</string>
+    <string name="cutout_question">इमेज से बैकग्राउंड कैसे हटाए जाएं? आप इसे बाद में सेटिंग्स में बदल सकते हैं।</string>
+    <string name="cutout_standard">स्टैंडर्ड</string>
+    <string name="cutout_standard_hint">बिल्ट-इन, तेज़ और ऑफ़लाइन काम करता है।</string>
+    <string name="cutout_best">बेस्ट क्वालिटी</string>
+    <string name="cutout_best_hint">बालों और बारीक डिटेल के आसपास साफ़ किनारे। %1$s एक बार डाउनलोड होता है। सिर्फ़ इमेज के लिए।</string>
+    <string name="cutout_fallback_download">बेस्ट क्वालिटी डाउनलोड नहीं हो सकी, इसलिए स्टैंडर्ड इस्तेमाल किया गया। कनेक्शन जांचें और फिर कोशिश करें।</string>
+    <string name="cutout_fallback_failed">बेस्ट क्वालिटी इस इमेज को प्रोसेस नहीं कर सकी, इसलिए स्टैंडर्ड इस्तेमाल किया गया।</string>
     <string name="ai_gpu_warning">इससे कुछ फ़ोन हैंग हो सकते हैं। फ़ोन हैंग हो जाए तो उसे रीस्टार्ट करें, फिर AI प्रोसेसर का इस्तेमाल करेगा।</string>
     <string name="ai_gpu_failed">ग्राफ़िक्स चिप पर AI का काम पूरा नहीं हो सका, इसलिए अब AI प्रोसेसर का उपयोग करता है।</string>
     <string name="export_interpolation_ai">AI Smooth</string>
@@ -1505,6 +1514,7 @@
     <string name="tier_needs_latest">Android 13 (Latest वर्ज़न) चाहिए</string>
     <string name="feature_flow_high">ऑप्टिकल फ़्लो हाई</string>
     <string name="feature_ai_enhance">AI एन्हांस</string>
+    <string name="feature_best_cutout">बेस्ट क्वालिटी कट-आउट</string>
     <string name="about_version_compatible">वर्ज़न %1$s Compatible</string>
     <string name="about_compatible_note">यह Android 9 से 12 के लिए Compatible वर्ज़न है। छोड़े गए: %1$s। इनके लिए Android 13 और Latest वर्ज़न चाहिए।</string>
     <string name="low_memory_title">कम मेमरी</string>

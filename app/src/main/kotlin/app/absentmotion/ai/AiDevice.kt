@@ -3,6 +3,7 @@ package app.absentmotion.ai
 import android.app.ActivityManager
 import android.app.ApplicationExitInfo
 import android.content.Context
+import android.graphics.Bitmap
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
@@ -207,7 +208,13 @@ internal object AiDevice {
                     val smooth = SmoothLevel.entries.firstOrNull { it.model == model }
                     val side = smooth?.padding ?: PROBE_SIDE
                     val input = IntArray(side * side) { 0xFF808080.toInt() }
-                    if (smooth != null) net.interpolate(input, input, side, side, 0.5f, smooth.padding) else net.upscale(input, side, side, 1)
+                    when {
+                        model == AiModel.Cutout -> Bitmap.createBitmap(side, side, Bitmap.Config.ARGB_8888).let { probe ->
+                            try { probe.eraseColor(0xFF808080.toInt()); net.cutout(probe, CUTOUT_SIDE) } finally { probe.recycle() }
+                        }
+                        smooth != null -> net.interpolate(input, input, side, side, 0.5f, smooth.padding)
+                        else -> net.upscale(input, side, side, 1)
+                    }
                     net.onGpu
                 }
             } catch (e: CancellationException) {

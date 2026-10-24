@@ -1237,6 +1237,7 @@
     <string name="ai_model_detail">Modelo AI de mejora</string>
     <string name="ai_model_grain">Modelo AI de mejora de grano</string>
     <string name="ai_model_cartoon">Modelo AI de mejora para dibujos animados</string>
+    <string name="ai_model_cutout">Recorte de mejor calidad</string>
     <string name="ai_model_broken">Un archivo del modelo AI estaba dañado y se eliminó. Vuelve a descargarlo.</string>
     <string name="ai_model_download_failed">No se pudo descargar el modelo AI. Revisa la conexión e inténtalo de nuevo.</string>
     <string name="ai_model_download_wrong">Lo descargado no era el modelo AI</string>
@@ -1279,6 +1280,14 @@
     <string name="ai_video_too_large_to_save">Este teléfono no puede guardar un video de %1$s × %2$s</string>
     <string name="ai_delete_model">Eliminar %1$s</string>
     <string name="settings_ai_gpu">Usar el chip gráfico para la IA</string>
+    <string name="settings_cutout_quality">Calidad del recorte</string>
+    <string name="cutout_question">¿Cómo se deben eliminar los fondos de las imágenes? Puedes cambiarlo más tarde en Ajustes.</string>
+    <string name="cutout_standard">Estándar</string>
+    <string name="cutout_standard_hint">Integrado, rápido y funciona sin conexión.</string>
+    <string name="cutout_best">Mejor calidad</string>
+    <string name="cutout_best_hint">Bordes más limpios en el cabello y los detalles finos. Descarga %1$s una vez. Solo imágenes.</string>
+    <string name="cutout_fallback_download">No se pudo descargar la mejor calidad, así que se usó Estándar. Revisa la conexión e inténtalo de nuevo.</string>
+    <string name="cutout_fallback_failed">La mejor calidad no pudo procesar esta imagen, así que se usó Estándar.</string>
     <string name="ai_gpu_warning">Esto puede congelar algunos teléfonos. Si el teléfono se congela, reinícialo y la IA volverá a usar el procesador.</string>
     <string name="ai_gpu_failed">El trabajo de IA en el chip gráfico no terminó, así que la IA ahora usa el procesador.</string>
     <string name="export_interpolation_ai">Suavizado con IA</string>
@@ -1529,6 +1538,7 @@
     <string name="tier_needs_latest">Requiere Android 13 (versión Latest)</string>
     <string name="feature_flow_high">Flujo óptico alto</string>
     <string name="feature_ai_enhance">Mejora con IA</string>
+    <string name="feature_best_cutout">Recorte de mejor calidad</string>
     <string name="about_version_compatible">Versión %1$s Compatible</string>
     <string name="about_compatible_note">Esta es la versión Compatible para Android 9 a 12. Quedaron fuera: %1$s. Necesitan Android 13 y la versión Latest.</string>
     <string name="low_memory_title">Memoria baja</string>

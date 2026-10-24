@@ -1189,6 +1189,7 @@
     <string name="ai_model_detail">Model AI Enhance</string>
     <string name="ai_model_grain">Model butiran AI Enhance</string>
     <string name="ai_model_cartoon">Model kartun AI Enhance</string>
+    <string name="ai_model_cutout">Potongan kualiti terbaik</string>
     <string name="ai_model_broken">Fail model AI telah rosak dan telah dipadam. Muat turun semula.</string>
     <string name="ai_model_download_failed">Muat turun model AI gagal. Semak sambungan dan cuba lagi.</string>
     <string name="ai_model_download_wrong">Muat turun itu bukan model AI</string>
@@ -1231,6 +1232,14 @@
     <string name="ai_video_too_large_to_save">Telefon ini tidak dapat menyimpan video %1$s × %2$s</string>
     <string name="ai_delete_model">Padam %1$s</string>
     <string name="settings_ai_gpu">Gunakan cip grafik untuk AI</string>
+    <string name="settings_cutout_quality">Kualiti potongan</string>
+    <string name="cutout_question">Bagaimana latar belakang perlu dibuang daripada imej? Anda boleh ubah ini kemudian dalam Tetapan.</string>
+    <string name="cutout_standard">Standard</string>
+    <string name="cutout_standard_hint">Terbina dalam, pantas dan berfungsi di luar talian.</string>
+    <string name="cutout_best">Kualiti terbaik</string>
+    <string name="cutout_best_hint">Tepi lebih bersih di sekeliling rambut dan butiran halus. Memuat turun %1$s sekali. Imej sahaja.</string>
+    <string name="cutout_fallback_download">Kualiti terbaik tidak dapat dimuat turun, jadi Standard digunakan. Semak sambungan dan cuba lagi.</string>
+    <string name="cutout_fallback_failed">Kualiti terbaik gagal menyelesaikan imej ini, jadi Standard digunakan.</string>
     <string name="ai_gpu_warning">Ini boleh menyebabkan sesetengah telefon hang. Jika telefon hang, mulakan semula dan AI akan menggunakan pemproses semula.</string>
     <string name="ai_gpu_failed">Kerja AI pada cip grafik tidak selesai, jadi AI kini menggunakan pemproses.</string>
     <string name="export_interpolation_ai">AI Lancar</string>
@@ -1481,6 +1490,7 @@
     <string name="tier_needs_latest">Perlu Android 13 (Versi Latest)</string>
     <string name="feature_flow_high">Aliran optik Tinggi</string>
     <string name="feature_ai_enhance">Peningkatan AI</string>
+    <string name="feature_best_cutout">Potongan kualiti terbaik</string>
     <string name="about_version_compatible">Versi %1$s Compatible</string>
     <string name="about_compatible_note">Ini ialah versi Compatible untuk Android 9 hingga 12. Tidak disertakan: %1$s. Ia memerlukan Android 13 dan versi Latest.</string>
     <string name="low_memory_title">Memori rendah</string>

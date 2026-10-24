@@ -1213,6 +1213,7 @@
     <string name="ai_model_detail">AI Enhance na modelo</string>
     <string name="ai_model_grain">AI Enhance na modelo ng grain</string>
     <string name="ai_model_cartoon">AI Enhance na modelo ng cartoon</string>
+    <string name="ai_model_cutout">Pinakamahusay na kalidad ng cut-out</string>
     <string name="ai_model_broken">Nasira ang isang AI model file at na-delete. I-download muli.</string>
     <string name="ai_model_download_failed">Nabigo ang pag-download ng AI model. Suriin ang koneksyon at subukan muli.</string>
     <string name="ai_model_download_wrong">Hindi AI model ang na-download</string>
@@ -1255,6 +1256,14 @@
     <string name="ai_video_too_large_to_save">Hindi kayang i-save ng phone na ito ang %1$s × %2$s na bidyo</string>
     <string name="ai_delete_model">I-delete ang %1$s</string>
     <string name="settings_ai_gpu">Gamitin ang graphics chip para sa AI</string>
+    <string name="settings_cutout_quality">Kalidad ng cut-out</string>
+    <string name="cutout_question">Paano tanggalin ang background sa mga larawan? Mababago mo ito mamaya sa mga setting.</string>
+    <string name="cutout_standard">Standard</string>
+    <string name="cutout_standard_hint">Built-in, mabilis, at gumagana offline.</string>
+    <string name="cutout_best">Pinakamahusay na kalidad</string>
+    <string name="cutout_best_hint">Mas malinis ang mga gilid sa paligid ng buhok at pinong detalye. Magda-download ng %1$s nang isang beses. Mga larawan lang.</string>
+    <string name="cutout_fallback_download">Hindi na-download ang pinakamahusay na kalidad, kaya Standard ang ginamit. Tingnan ang koneksyon at subukan muli.</string>
+    <string name="cutout_fallback_failed">Hindi naproseso ng pinakamahusay na kalidad ang larawang ito, kaya Standard ang ginamit.</string>
     <string name="ai_gpu_warning">Puwedeng mag-freeze ang ilang telepono dahil dito. Kapag nag-freeze ang telepono, i-restart ito at gagamitin ulit ng AI ang processor.</string>
     <string name="ai_gpu_failed">Hindi natapos ang AI work sa graphics chip, kaya processor na ang gamit ng AI ngayon.</string>
     <string name="export_interpolation_ai">AI Smooth</string>
@@ -1505,6 +1514,7 @@
     <string name="tier_needs_latest">Kailangan ang Android 13 (Latest na bersyon)</string>
     <string name="feature_flow_high">Optical flow (Mataas)</string>
     <string name="feature_ai_enhance">Pagandahin gamit ang AI</string>
+    <string name="feature_best_cutout">Pinakamahusay na kalidad ng cut-out</string>
     <string name="about_version_compatible">Bersyon %1$s Compatible</string>
     <string name="about_compatible_note">Ito ang Compatible na bersyon para sa Android 9 hanggang 12. Hindi kasama: %1$s. Kailangan nila ang Android 13 at ang Latest na bersyon.</string>
     <string name="low_memory_title">Mababang memory</string>

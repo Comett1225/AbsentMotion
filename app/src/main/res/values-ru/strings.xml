@@ -1261,6 +1261,7 @@
     <string name="ai_model_detail">Модель AI Enhance</string>
     <string name="ai_model_grain">Модель AI Enhance для зерна</string>
     <string name="ai_model_cartoon">Модель AI Enhance для мультфильмов</string>
+    <string name="ai_model_cutout">Вырезание лучшего качества</string>
     <string name="ai_model_broken">Файл AI-модели повреждён и удалён. Скачайте его снова.</string>
     <string name="ai_model_download_failed">Не удалось скачать AI-модель. Проверьте подключение и повторите попытку.</string>
     <string name="ai_model_download_wrong">Скачанный файл — не AI-модель</string>
@@ -1303,6 +1304,14 @@
     <string name="ai_video_too_large_to_save">Этот телефон не может сохранить видео %1$s × %2$s</string>
     <string name="ai_delete_model">Удалить %1$s</string>
     <string name="settings_ai_gpu">Использовать графический чип для AI</string>
+    <string name="settings_cutout_quality">Качество вырезания</string>
+    <string name="cutout_question">Как удалять фон с изображений? Это можно изменить позже в настройках.</string>
+    <string name="cutout_standard">Стандартное</string>
+    <string name="cutout_standard_hint">Встроенное, быстрое и работает без интернета.</string>
+    <string name="cutout_best">Лучшее качество</string>
+    <string name="cutout_best_hint">Более аккуратные края вокруг волос и мелких деталей. Загрузит %1$s один раз. Только изображения.</string>
+    <string name="cutout_fallback_download">Не удалось загрузить лучшее качество, поэтому использовано стандартное. Проверьте подключение и повторите попытку.</string>
+    <string name="cutout_fallback_failed">Не удалось обработать это изображение в лучшем качестве, поэтому использовано стандартное.</string>
     <string name="ai_gpu_warning">На некоторых телефонах это может вызвать зависание. Если телефон зависнет, перезапустите его, и AI снова будет использовать процессор.</string>
     <string name="ai_gpu_failed">Работа ИИ на графическом чипе не завершилась, поэтому ИИ теперь использует процессор.</string>
     <string name="export_interpolation_ai">AI-сглаживание</string>
@@ -1553,6 +1562,7 @@
     <string name="tier_needs_latest">Нужен Android 13 (версия Latest)</string>
     <string name="feature_flow_high">Оптический поток High</string>
     <string name="feature_ai_enhance">AI-улучшение</string>
+    <string name="feature_best_cutout">Вырезание лучшего качества</string>
     <string name="about_version_compatible">Версия %1$s Compatible</string>
     <string name="about_compatible_note">Это версия Compatible для Android 9–12. Не включено: %1$s. Для них нужен Android 13 и версия Latest.</string>
     <string name="low_memory_title">Мало памяти</string>
