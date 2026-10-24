@@ -48,6 +48,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
 import app.absentmotion.ai.AiKind
@@ -215,7 +219,8 @@ internal fun AiNoiseDialog(tools: AiTools) {
 internal fun AiCutoutDialog(tools: AiTools) {
     if (tools.cutoutSetup == null) return
     val size = formatBytes(app.absentmotion.ai.AiModel.Cutout.bytes)
-    AlertDialog(onDismissRequest = { tools.cutoutSetup = null },
+    val rtl = LocalConfiguration.current.layoutDirection == android.view.View.LAYOUT_DIRECTION_RTL
+    CompositionLocalProvider(LocalLayoutDirection provides if (rtl) LayoutDirection.Rtl else LayoutDirection.Ltr) { AlertDialog(onDismissRequest = { tools.cutoutSetup = null },
         title = { Text(stringResource(R.string.settings_cutout_quality), color = Am.OnDark) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState())) {
@@ -237,7 +242,7 @@ internal fun AiCutoutDialog(tools: AiTools) {
         },
         confirmButton = { TextButton({ tools.apply(AiAction.Background, confirmed = true) }) { Text(stringResource(R.string.start), color = Am.Accent) } },
         dismissButton = { TextButton({ tools.cutoutSetup = null }) { Text(stringResource(R.string.cancel), color = Am.Accent) } },
-        containerColor = Am.Field)
+        containerColor = Am.Field) }
 }
 
 @Composable
