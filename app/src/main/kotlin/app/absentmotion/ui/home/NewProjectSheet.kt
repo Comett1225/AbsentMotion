@@ -217,7 +217,10 @@ fun NewProjectSheet(
                     scope.launch {
                         val id = try {
                             withContext(Dispatchers.IO) { store.create(scene) }
-                        } catch (e: java.io.IOException) {
+                        } catch (e: kotlinx.coroutines.CancellationException) {
+                            creating = false
+                            throw e
+                        } catch (e: Exception) {
                             Toast.makeText(context, context.getString(R.string.home_create_project_failed), Toast.LENGTH_LONG).show()
                             creating = false
                             return@launch
@@ -241,7 +244,9 @@ fun NewProjectSheet(
                         val kept = keepCopy(context, settings, store, id, media, scene)
                         if (kept != media) withContext(Dispatchers.IO) { runCatching { store.save(id, scene.replaceMedia(media.uri, kept)) } }
                     }
-                } catch (e: java.io.IOException) {
+                } catch (e: kotlinx.coroutines.CancellationException) {
+                    throw e
+                } catch (e: Exception) {
                     Toast.makeText(context, context.getString(R.string.newproject_camera_failed), Toast.LENGTH_LONG).show()
                     camera = false
                     return@launch

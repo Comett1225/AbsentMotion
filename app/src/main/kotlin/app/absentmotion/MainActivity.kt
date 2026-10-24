@@ -161,7 +161,10 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch { kotlinx.coroutines.delay(15_000); autoBackupIfDue(applicationContext, settings) }
         lifecycleScope.launch(Dispatchers.IO) { ShapeCatalog.load(applicationContext) }
         lifecycleScope.launch(Dispatchers.IO) { app.absentmotion.ai.AiDevice.recover(applicationContext) }
-        lifecycleScope.launch(Dispatchers.IO) { runCatching { app.absentmotion.export.MediaStoreExport(applicationContext).discardAbandoned() } }
+        lifecycleScope.launch(Dispatchers.IO) {
+            runCatching { app.absentmotion.export.MediaStoreExport(applicationContext).discardAbandoned() }
+            runCatching { app.absentmotion.library.sweepStaleTemps(filesDir, cacheDir) }
+        }
         val openElement: (String) -> Unit = { id ->
             editor?.let { it.playing = false; it.endGesture(); it.saver.snapshot(it.scene.toXml()) }
             MultiSelect.clear()
@@ -436,7 +439,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private suspend fun engineWorks(): Boolean {
-        val problem = engine.startProblem.await() ?: return true
+        val problem = (kotlinx.coroutines.withTimeoutOrNull(30_000) { engine.startProblem.await() ?: "" } ?: "engine start timed out").ifEmpty { return true }
         engineProblem = problem
         problemShown = true
         return false

@@ -114,6 +114,7 @@ class Importer(
             }
             if (scenes.isEmpty()) throw ImportFailed(txt(R.string.library_err_no_project))
             repeat(scenes.size) { ids += store.newId(ids) }
+            ids.forEach { File(store.mediaDir(it), ImportMarker).apply { parentFile?.mkdirs(); createNewFile() } }
             val copies = HashMap<String, MutableList<File>>()
             val moved = scenes.mapIndexed { i, text ->
                 val id = ids[i]
@@ -148,6 +149,7 @@ class Importer(
                 }
             }
             scenes.indices.mapTo(saved) { add(ids[it], check(scenes[it]), moved[it]) }
+            ids.forEach { File(store.mediaDir(it), ImportMarker).delete(); store.mediaDir(it).delete() }
             return if (ours) saved else saved.map { if (it.element) it else it.copy(template = true) }
         } catch (t: Throwable) {
             ids.forEach { store.mediaDir(it).deleteRecursively() }

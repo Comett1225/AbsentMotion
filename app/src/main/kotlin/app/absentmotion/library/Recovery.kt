@@ -42,6 +42,27 @@ class Recovery(private val dir: File) {
     }
 }
 
+internal const val StaleTempMs = 24 * 60 * 60 * 1000L
+internal const val ImportMarker = "importing.part"
+
+internal fun sweepStaleTemps(files: File, cache: File, now: Long = System.currentTimeMillis()): Int {
+    var removed = 0
+    fun old(f: File) = now - f.lastModified() > StaleTempMs
+    File(files, "media").listFiles { f -> f.isDirectory }.orEmpty().forEach { dir ->
+        val marker = File(dir, ImportMarker)
+        if (marker.isFile && old(marker)) {
+            if (File(files, "projects/${dir.name}.xml").exists()) marker.delete() else if (dir.deleteRecursively()) removed++
+        }
+    }
+    for (name in listOf("projects", "recovery", "media", "templates", "presets", "fonts/imported")) {
+        File(files, name).walkTopDown().maxDepth(4)
+            .filter { it.isFile && (it.name.endsWith(".tmp") || it.name.endsWith(".part")) && old(it) }
+            .forEach { if (it.delete()) removed++ }
+    }
+    cache.listFiles { f -> f.isFile && (f.name.startsWith("ai-") || f.name.startsWith("probe-")) && old(f) }.orEmpty().forEach { if (it.delete()) removed++ }
+    return removed
+}
+
 class RecoveryHandler private constructor(private val recovery: Recovery, private val previous: Thread.UncaughtExceptionHandler?) : Thread.UncaughtExceptionHandler {
     @Volatile var current: () -> Pair<String, String>? = { null }
 
