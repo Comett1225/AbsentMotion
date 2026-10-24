@@ -112,6 +112,7 @@ internal object TestHooks {
         DebugFrameInterpolation.alpha = intent.getFloatExtra("interpAlpha", 0.15f)
         DebugFrameInterpolation.fuse = intent.getIntExtra("interpFuse", 4)
         intent.getStringExtra("fakeversion")?.let { Updates.installedOverride = it }
+        intent.getFloatExtra("tutorialfont", 0f).takeIf { it > 0f }?.let { app.absentmotion.ui.tutorial.Tutorial.fontScale = it }
         intent.getStringExtra("crash")?.let { kind -> activity.window.decorView.postDelayed({ crash(activity, kind) }, 2000) }
         if (intent.getBooleanExtra("audiolog", false)) engine.audio?.log = true
         if (intent.hasExtra("previewCopies")) activity.settings.previewCopies = intent.getBooleanExtra("previewCopies", true)

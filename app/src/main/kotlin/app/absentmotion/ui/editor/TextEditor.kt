@@ -1,5 +1,6 @@
 package app.absentmotion.ui.editor
 
+import app.absentmotion.ui.tutorial.tutorialTarget
 import app.absentmotion.platform.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -95,7 +96,7 @@ internal fun TextEditor(state: EditorState) {
                     FontIconButton(TextIcons.Tick, stringResource(R.string.done), finish)
                 }
                 Preview(state, Modifier.fillMaxWidth().height(previewHeight))
-                TextContent(state, layer, Modifier.fillMaxWidth().height(60.dp))
+                TextContent(state, layer, Modifier.fillMaxWidth().height(60.dp).tutorialTarget("text_field"))
             }
             if (popup.isNotEmpty() && state.eyedropper == null) Box(Modifier.fillMaxSize().padding(top = 42.dp).clickable(interactionSource = null, indication = null) { popup = "" })
             Swap(popup, Modifier.fillMaxSize(), rise = (-8).dp) {

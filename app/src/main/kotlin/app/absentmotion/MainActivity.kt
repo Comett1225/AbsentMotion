@@ -194,7 +194,7 @@ class MainActivity : ComponentActivity() {
                 }
                 LaunchedEffect(screen) { CrashLogs.onScreen(screen) }
                 if (open == null && first != null) {
-                    Onboarding(settings, first, { engine }) { firstRun = null }
+                    Onboarding(settings, first, { engine }) { firstRun = null; app.absentmotion.ui.tutorial.Tutorial.firstRunFinished(settings) }
                 } else if (open == null) {
                     LaunchedEffect(settings.autoUpdateCheck) { if (settings.autoUpdateCheck) Updates.atStart(applicationContext, settings) }
                     val returning = remember { cameFromEditor }
@@ -270,6 +270,11 @@ class MainActivity : ComponentActivity() {
             }
         }
         Log.i("AMStart", "onCreate took ${SystemClock.elapsedRealtime() - started} ms")
+                app.absentmotion.ui.tutorial.TutorialHost(
+                    open, store, settings,
+                    homeFree = open == null && first == null && !opening && editingTemplate == null && exportingFromList == null && offer == null && crashed == null && !problemShown,
+                    onOpen = ::open, onCloseEditor = ::closeEditor, onChanged = { projectsChanged++ },
+                )
         androidx.core.view.OneShotPreDrawListener.add(window.decorView) { Log.i("AMStart", "first frame after ${SystemClock.elapsedRealtime() - started} ms") }
     }
 
@@ -567,6 +572,12 @@ class MainActivity : ComponentActivity() {
         super.onNewIntent(intent)
         importShared()
         TestHooks.newIntent(this, intent)
+    @Suppress("OVERRIDE_DEPRECATION", "DEPRECATION")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        app.absentmotion.ui.tutorial.Tutorial.pickerClosed(resultCode == RESULT_OK)
+    }
+
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

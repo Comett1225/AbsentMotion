@@ -34,6 +34,7 @@ import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Presence
 import app.absentmotion.ui.theme.enterFade
 import app.absentmotion.ui.theme.presence
+import app.absentmotion.ui.tutorial.tutorialTarget
 
 val LocalWide = compositionLocalOf { false }
 
@@ -57,20 +58,20 @@ internal fun WideEditorBody(state: EditorState, onExit: () -> Unit, addLibrary: 
         Column(Modifier.fillMaxSize()) {
             EditorTopBar(state, onExit, Modifier.fillMaxWidth().height(42.dp).enterFade())
             Box(Modifier.fillMaxWidth().weight(1f)) {
-                Preview(state, Modifier.fillMaxSize(), reserveEnd = reserve)
+                Preview(state, Modifier.fillMaxSize().tutorialTarget("preview"), reserveEnd = reserve)
                 Box(Modifier.fillMaxSize().padding(end = reserve)) {
                     Presence(state.previewPanelOpen) { PreviewModePanel(state, Modifier.align(Alignment.CenterEnd).presence(slideX = 0.4f)) }
-                    AnimateButton(state, Modifier.align(Alignment.BottomEnd))
+                    AnimateButton(state, Modifier.align(Alignment.BottomEnd).tutorialTarget("animate"))
                     HistoryNotes(state, Modifier.align(Alignment.BottomCenter))
                 }
                 if (side) SidePanels(state, addLibrary, Modifier.align(Alignment.CenterEnd))
             }
             Box(Modifier.fillMaxWidth().height(46.dp).background(Am.TimelineBg)) {
-                PlayBar(state, Modifier.align(Alignment.Center).widthIn(max = 560.dp).fillMaxSize())
-                if (state.selectedId == null && !state.addOpen && !MultiSelect.active) TransitionButton(state, Modifier.align(Alignment.CenterEnd).padding(end = 12.dp), compact = true)
+                PlayBar(state, Modifier.align(Alignment.Center).widthIn(max = 560.dp).fillMaxSize().tutorialTarget("playbar"))
+                if (state.selectedId == null && !state.addOpen && !MultiSelect.active) TransitionButton(state, Modifier.align(Alignment.CenterEnd).padding(end = 12.dp).tutorialTarget("transition"), compact = true)
                 LevelMeter(state, Modifier.align(Alignment.BottomStart).fillMaxWidth().height(2.1.dp))
             }
-            Box(Modifier.fillMaxWidth().height(timeline).background(Am.TimelineBg)) {
+            Box(Modifier.fillMaxWidth().height(timeline).background(Am.TimelineBg).tutorialTarget("timeline")) {
                 Timeline(state, Modifier.fillMaxSize())
                 if (!side) LowerPanels(state, addLibrary, transitionHere = false)
             }

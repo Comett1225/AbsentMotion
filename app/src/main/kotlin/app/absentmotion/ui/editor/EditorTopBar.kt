@@ -1,5 +1,6 @@
 package app.absentmotion.ui.editor
 
+import app.absentmotion.ui.tutorial.tutorialTarget
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.clickable
@@ -76,7 +77,7 @@ fun EditorTopBar(state: EditorState, onExit: () -> Unit, modifier: Modifier = Mo
     Row(modifier.animatedBackground(color), verticalAlignment = Alignment.CenterVertically) {
         BarButton(
             if (layer == null) ChromeIcons.Exit else ChromeIcons.Back,
-            stringResource(if (layer == null) R.string.topbar_exit_to_project_list else R.string.topbar_back), cell,
+            stringResource(if (layer == null) R.string.topbar_exit_to_project_list else R.string.topbar_back), cell.tutorialTarget(if (layer == null) null else "back"),
         ) {
             act { if (layer == null) onExit() else state.stepBack() }
         }
@@ -91,8 +92,8 @@ fun EditorTopBar(state: EditorState, onExit: () -> Unit, modifier: Modifier = Mo
             }
         }
         if (layer == null) {
-            BarButton(ChromeIcons.Gear, stringResource(R.string.topbar_project_settings), cell.enterFade()) { act { settingsOpen = true } }
-            BarButton(ChromeIcons.Share, stringResource(R.string.topbar_export_share), cell.enterFade()) { act { state.playing = false; state.exportOpen = true } }
+            BarButton(ChromeIcons.Gear, stringResource(R.string.topbar_project_settings), cell.enterFade().tutorialTarget("gear")) { act { settingsOpen = true } }
+            BarButton(ChromeIcons.Share, stringResource(R.string.topbar_export_share), cell.enterFade().tutorialTarget("export")) { act { state.playing = false; state.exportOpen = true } }
         } else if (!inPanel) {
             Spacer(Modifier.width(5.dp))
             Box(cell.enterFade().clickable { act { parentMenuOpen = true } }, contentAlignment = Alignment.Center) {

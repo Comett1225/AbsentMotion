@@ -1,5 +1,6 @@
 package app.absentmotion.ui.editor
 
+import app.absentmotion.ui.tutorial.tutorialTarget
 import app.absentmotion.model.finiteFloat
 import app.absentmotion.platform.BackHandler
 import androidx.annotation.StringRes
@@ -122,7 +123,7 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier, side: Boolean 
                 SmallTool(PanelIcons.TrimLeft, stringResource(if (before) R.string.a11y_extend_start else R.string.a11y_trim_start), Modifier.weight(1f), ToolShape.copy(topEnd = Square, bottomEnd = Square), enabled = !past) {
                     if (before) state.moveClipEdges(false, true) else state.trimStart()
                 }
-                SmallTool(if (past) ChromeIcons.SkipForward else if (before) ChromeIcons.SkipBack else PanelIcons.Split, stringResource(if (past || before) R.string.a11y_move_to_playhead else R.string.a11y_split), Modifier.weight(1f), RoundedCornerShape(0.dp)) {
+                SmallTool(if (past) ChromeIcons.SkipForward else if (before) ChromeIcons.SkipBack else PanelIcons.Split, stringResource(if (past || before) R.string.a11y_move_to_playhead else R.string.a11y_split), Modifier.weight(1f).tutorialTarget("tool_split"), RoundedCornerShape(0.dp)) {
                     if (past || before) state.moveClipEdges(past, false) else state.split()
                 }
                 SmallTool(PanelIcons.TrimRight, stringResource(if (past) R.string.a11y_extend_end else R.string.a11y_trim_end), Modifier.weight(1f), ToolShape.copy(topStart = Square, bottomStart = Square), enabled = !before) {
@@ -131,7 +132,7 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier, side: Boolean 
             }
             Spacer(Modifier.width(17.px))
             val sound = state.selected?.let { it.kind == "audio" || it.mediaFill?.video == true } == true
-            SmallTool(if (!sound || (state.selected?.gain ?: 1f) <= 0f) PanelIcons.AudioMuted else AudioIcons.Speaker, stringResource(R.string.volume_volume), Modifier.width(183.px), ToolShape, enabled = sound) { state.volumeOpen = true }
+            SmallTool(if (!sound || (state.selected?.gain ?: 1f) <= 0f) PanelIcons.AudioMuted else AudioIcons.Speaker, stringResource(R.string.volume_volume), Modifier.width(183.px).tutorialTarget("tool_volume"), ToolShape, enabled = sound) { state.volumeOpen = true }
         }
         Spacer(Modifier.height(28.px))
         val kind = state.selected?.kind
@@ -172,7 +173,7 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier, side: Boolean 
         shown.forEachIndexed { i, row ->
             if (i > 0) Spacer(Modifier.height(17.px))
             Row(Modifier.fillMaxWidth().height(160.px), Arrangement.spacedBy(17.px)) {
-                for (tile in row) if (tile == null) Spacer(Modifier.weight(1f)) else ToolButton(tile.tool, Modifier.weight(1f), tile.enabled, tile.onClick)
+                for (tile in row) if (tile == null) Spacer(Modifier.weight(1f)) else ToolButton(tile.tool, Modifier.weight(1f).tutorialTarget(if (tile.tool === MoveTransform) "tool_transform" else if (tile.tool === Effects) "tool_effects" else null), tile.enabled, tile.onClick)
                 if (side) repeat(2 - row.size) { Spacer(Modifier.weight(1f)) }
             }
         }
@@ -282,10 +283,10 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
                 FrameButton(PanelIcons.Easing, stringResource(R.string.a11y_easing), Modifier.weight(1f).fillMaxWidth().dimmed(), enabled = false)
             } else {
                 val onKeyframe = layer.onKeyframe(target.ref)
-                FrameButton(if (onKeyframe) PanelIcons.KeyframeRemove else PanelIcons.Keyframe, stringResource(if (onKeyframe) R.string.a11y_remove_keyframe else R.string.a11y_add_keyframe), Modifier.weight(1f).fillMaxWidth()) {
+                FrameButton(if (onKeyframe) PanelIcons.KeyframeRemove else PanelIcons.Keyframe, stringResource(if (onKeyframe) R.string.a11y_remove_keyframe else R.string.a11y_add_keyframe), Modifier.weight(1f).fillMaxWidth().tutorialTarget("keyframe")) {
                     state.toggleKeyframe()
                 }
-                FrameButton(PanelIcons.Easing, stringResource(R.string.a11y_easing), Modifier.weight(1f).fillMaxWidth()) { if (layer.easing(target.ref) != null) state.easingOpen = true else state.easingHint = true }
+                FrameButton(PanelIcons.Easing, stringResource(R.string.a11y_easing), Modifier.weight(1f).fillMaxWidth().tutorialTarget("easing")) { if (layer.easing(target.ref) != null) state.easingOpen = true else state.easingHint = true }
             }
             if (move) {
                 Box(Modifier.weight(1f).fillMaxWidth()) {

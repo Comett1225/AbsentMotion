@@ -177,6 +177,20 @@ class AppSettings(private val context: Context) {
 
     var newProject: NewProjectChoice
         get() = NewProjectChoice(
+    private var tutorialStepState by mutableStateOf(prefs.getString("tutorialStep", null))
+
+    var tutorialStep: String?
+        get() = tutorialStepState
+        set(value) { tutorialStepState = value; prefs.edit().putString("tutorialStep", value).apply() }
+
+    var tutorialProject: String?
+        get() = prefs.getString("tutorialProject", null)
+        set(value) { prefs.edit().putString("tutorialProject", value).apply() }
+
+    var tutorialAsk: Int
+        get() = prefs.getInt("tutorialAsk", 0)
+        set(value) { prefs.edit().putInt("tutorialAsk", value).apply() }
+
             prefs.getString("np.aspect", "1:1")!!, prefs.getInt("np.resolution", 1080),
             prefs.getInt("np.customWidth", 1280), prefs.getInt("np.customHeight", 720),
             prefs.getInt("np.fps", 60), prefs.getInt("np.background", 0),
