@@ -20,4 +20,10 @@ class StorageTest {
         assertTrue(storageStatus(100 * mb, 600 * mb) is StorageStatus.Low)
         assertEquals(StorageStatus.Enough, storageStatus(100 * mb, 4096 * mb))
     }
+
+    @Test fun hugeEstimatesCannotWrapIntoAnEnoughStorageResult() {
+        assertEquals(Long.MAX_VALUE, bytesNeeded(Long.MAX_VALUE))
+        assertEquals(Long.MAX_VALUE, bytesNeeded(Long.MAX_VALUE - MinFreeBytes))
+        assertTrue(storageStatus(Long.MAX_VALUE, 4096 * mb) is StorageStatus.NotEnough)
+    }
 }

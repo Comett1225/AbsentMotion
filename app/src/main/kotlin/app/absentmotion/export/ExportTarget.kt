@@ -42,7 +42,7 @@ sealed interface StorageStatus {
     data class NotEnough(val message: UiText) : StorageStatus
 }
 
-fun bytesNeeded(estimate: Long): Long = (estimate.coerceAtLeast(0) * 1.1).toLong() + MinFreeBytes
+fun bytesNeeded(estimate: Long): Long = (estimate.coerceAtLeast(0) * 1.1).toLong().coerceAtMost(Long.MAX_VALUE - MinFreeBytes) + MinFreeBytes
 
 fun storageStatus(estimate: Long, free: Long): StorageStatus {
     val needed = bytesNeeded(estimate)
