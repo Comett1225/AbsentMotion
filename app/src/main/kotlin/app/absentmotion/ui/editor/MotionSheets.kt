@@ -91,17 +91,17 @@ import app.absentmotion.i18n.text
 private val TileShape = RoundedCornerShape(6.dp)
 
 @Composable
-internal fun TransitionButton(state: EditorState, modifier: Modifier) {
+internal fun TransitionButton(state: EditorState, modifier: Modifier, compact: Boolean = false) {
     var open by remember { mutableStateOf<Pair<Long, Long>?>(null) }
     val cut = if (state.playing) null else state.scene.cutAt(state.timeMs)
     if (cut != null) {
         val press = remember { MutableInteractionSource() }
-        Box(modifier.size(73.dp).clickable(interactionSource = press, indication = null) { open = cut.first.id to cut.second.id }, contentAlignment = Alignment.Center) {
+        Box(modifier.size(if (compact) 46.dp else 73.dp).clickable(interactionSource = press, indication = null) { open = cut.first.id to cut.second.id }, contentAlignment = Alignment.Center) {
             Box(
-                Modifier.size(47.dp).pressScale(press).shadow(4.dp, CircleShape).background(Am.Panel, CircleShape).border(1.8.dp, Am.OnDark, CircleShape),
+                Modifier.size(if (compact) 38.dp else 47.dp).pressScale(press).shadow(4.dp, CircleShape).background(Am.Panel, CircleShape).border(1.8.dp, Am.OnDark, CircleShape),
                 contentAlignment = Alignment.Center,
             ) {
-                Icon(ChromeIcons.Transition, stringResource(R.string.transition_title), Modifier.size(22.dp), tint = Am.OnDark)
+                Icon(ChromeIcons.Transition, stringResource(R.string.transition_title), Modifier.size(if (compact) 18.dp else 22.dp), tint = Am.OnDark)
             }
         }
     }

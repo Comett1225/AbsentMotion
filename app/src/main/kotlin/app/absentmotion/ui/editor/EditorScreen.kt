@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -130,7 +131,7 @@ private fun EditorBody(state: EditorState, onExit: () -> Unit) {
 }
 
 @Composable
-internal fun LowerPanels(state: EditorState, addLibrary: AddLibrary, top: Boolean = false) {
+internal fun LowerPanels(state: EditorState, addLibrary: AddLibrary, top: Boolean = false, transitionHere: Boolean = true) {
     Swap(
         when {
             state.addOpen -> "add"
@@ -147,7 +148,7 @@ internal fun LowerPanels(state: EditorState, addLibrary: AddLibrary, top: Boolea
             state.addOpen -> AddPopup(state, lower.height(244.dp), addLibrary)
             MultiSelect.active -> MultiBar(state, lower.height(48.dp))
             state.selectedId == null -> {
-                TransitionButton(state, Modifier.align(Alignment.BottomStart))
+                if (transitionHere) TransitionButton(state, Modifier.align(Alignment.BottomStart).padding(start = HeaderWidth))
                 AddButton(state, Modifier.align(Alignment.BottomEnd))
             }
             state.volumeOpen && state.panel == EditorPanel.Tools -> key(state.selectedId) { VolumePanel(state, lower.height(PanelHeight)) }

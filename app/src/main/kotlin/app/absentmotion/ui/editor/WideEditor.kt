@@ -67,11 +67,12 @@ internal fun WideEditorBody(state: EditorState, onExit: () -> Unit, addLibrary: 
             }
             Box(Modifier.fillMaxWidth().height(46.dp).background(Am.TimelineBg)) {
                 PlayBar(state, Modifier.align(Alignment.Center).widthIn(max = 560.dp).fillMaxSize())
+                if (state.selectedId == null && !state.addOpen && !MultiSelect.active) TransitionButton(state, Modifier.align(Alignment.CenterEnd).padding(end = 12.dp), compact = true)
                 LevelMeter(state, Modifier.align(Alignment.BottomStart).fillMaxWidth().height(2.1.dp))
             }
             Box(Modifier.fillMaxWidth().height(timeline).background(Am.TimelineBg)) {
                 Timeline(state, Modifier.fillMaxSize())
-                if (!side) LowerPanels(state, addLibrary)
+                if (!side) LowerPanels(state, addLibrary, transitionHere = false)
             }
         }
     }

@@ -138,7 +138,7 @@ private val BookmarkFlagSide = 2.1.dp
 private val BookmarkPeakHalf = 2.5.dp
 private val PillOutline = 1.1.dp
 
-private val HeaderWidth = 62.dp
+internal val HeaderWidth = 62.dp
 private val HeaderInset = 1.dp
 private val TagStripWidth = 2.1.dp
 private val EyeZone = 36.dp
