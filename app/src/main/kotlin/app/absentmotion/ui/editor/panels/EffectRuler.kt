@@ -60,6 +60,7 @@ private class EffectRulerView(context: Context, private val scope: CoroutineScop
     private var fine = false
     private var fineX = 0f
     private var reset: Float? = null
+    private var tapUp = 0L
     private val interceptSlop = ViewConfiguration.get(context).scaledTouchSlop * 3 / 4
 
     private val detector = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
@@ -78,16 +79,6 @@ private class EffectRulerView(context: Context, private val scope: CoroutineScop
             begin()
             performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
             invalidate()
-        }
-
-        override fun onDoubleTap(e: MotionEvent): Boolean {
-            val value = reset ?: return false
-            stop()
-            start()
-            change(value.coerceIn(low * step, high * step))
-            end()
-            performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
-            return true
         }
 
         override fun onScroll(e1: MotionEvent?, e2: MotionEvent, dx: Float, dy: Float): Boolean {
@@ -176,6 +167,16 @@ private class EffectRulerView(context: Context, private val scope: CoroutineScop
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
         if (!isEnabled) return false
+        val value = reset
+        if (event.actionMasked == MotionEvent.ACTION_DOWN && value != null && event.eventTime - tapUp < ViewConfiguration.getDoubleTapTimeout()) {
+            tapUp = 0L
+            stop()
+            start()
+            change(value.coerceIn(low * step, high * step))
+            end()
+            performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+            return true
+        }
         if (event.actionMasked == MotionEvent.ACTION_MOVE && abs(event.rawX - downX) > interceptSlop &&
             abs(event.rawX - downX) > abs(event.rawY - downY)) parent?.requestDisallowInterceptTouchEvent(true)
         if (fine && event.actionMasked == MotionEvent.ACTION_MOVE) {
@@ -186,6 +187,7 @@ private class EffectRulerView(context: Context, private val scope: CoroutineScop
         if ((event.actionMasked == MotionEvent.ACTION_UP || event.actionMasked == MotionEvent.ACTION_CANCEL) && fling == null) {
             if (fine) { fine = false; invalidate() }
             val dragged = tracking
+            tapUp = if (!dragged && event.actionMasked == MotionEvent.ACTION_UP && event.eventTime - event.downTime < ViewConfiguration.getLongPressTimeout()) event.eventTime else 0L
             settle()
             finish()
             if (dragged) rulerTip(context)

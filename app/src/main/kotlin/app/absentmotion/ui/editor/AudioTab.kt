@@ -156,7 +156,7 @@ internal fun AudioTab(state: EditorState, modifier: Modifier, library: AddLibrar
             item(key = "files") { ActionTile(stringResource(R.string.sounds_from_files), { Icon(TextIcons.Import, null, Modifier.size(20.dp), tint = Am.OnDark) }, ::fromFiles) }
             item(key = "speech") { ActionTile(stringResource(R.string.text_to_speech), { Icon(ChromeIcons.Captions, null, Modifier.size(20.dp), tint = Am.OnDark) }) { speaking = true } }
             if (!allowed) item(key = "access", span = { GridItemSpan(maxLineSpan) }) {
-                AccessNotice(Modifier.width(220.dp).fillMaxHeight().padding(6.dp), blocked(), ::ask)
+                AccessNotice(Modifier.width(168.dp).fillMaxHeight().padding(6.dp), blocked(), ::ask)
             }
             if (shown.isEmpty() && query.isNotBlank()) item(key = "none", span = { GridItemSpan(maxLineSpan) }) {
                 NoMatches(query, R.string.search_no_sounds, Modifier.width(200.dp).fillMaxHeight())
@@ -210,7 +210,7 @@ private fun ActionTile(label: String, icon: @Composable () -> Unit, onClick: () 
 @Composable
 private fun AccessNotice(modifier: Modifier, blocked: Boolean, onAsk: () -> Unit) {
     Column(modifier.clip(RoundedCornerShape(4.dp)).background(Am.Well).padding(8.dp), verticalArrangement = Arrangement.SpaceBetween) {
-        Text(stringResource(R.string.sounds_permission_body), color = Am.OnDark, fontSize = 12.sp, lineHeight = 15.sp, maxLines = 5, overflow = TextOverflow.Ellipsis)
+        Text(stringResource(R.string.sounds_permission_body), color = Am.OnDark, fontSize = 11.sp, lineHeight = 13.sp, maxLines = 6, overflow = TextOverflow.Ellipsis)
         Box(Modifier.fillMaxWidth().height(32.dp).clip(RoundedCornerShape(16.dp)).background(Am.Accent).clickable(onClick = onAsk), Alignment.Center) {
             Text(stringResource(if (blocked) R.string.camera_open_settings else R.string.sounds_permission_allow), color = Am.OnAccent, fontSize = 13.sp, fontWeight = FontWeight.Medium, maxLines = 1)
         }

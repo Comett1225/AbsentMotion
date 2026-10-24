@@ -41,7 +41,29 @@ class SoundShelf(val key: String, val label: String, val sounds: List<DeviceAudi
 
 fun soundCollator(locale: Locale = Locale.getDefault()): Comparator<String> {
     val collator = Collator.getInstance(locale).apply { strength = Collator.SECONDARY }
-    return Comparator { a, b -> collator.compare(a, b) }
+    return Comparator { a, b -> naturalCompare(a, b) { x, y -> collator.compare(x, y) } }
+}
+
+fun naturalCompare(a: String, b: String, text: (String, String) -> Int): Int {
+    var i = 0
+    var j = 0
+    while (i < a.length && j < b.length) {
+        val digitsA = a[i].isDigit()
+        val digitsB = b[j].isDigit()
+        var endA = i
+        while (endA < a.length && a[endA].isDigit() == digitsA) endA++
+        var endB = j
+        while (endB < b.length && b[endB].isDigit() == digitsB) endB++
+        val result = if (digitsA && digitsB) {
+            val x = a.substring(i, endA).trimStart('0')
+            val y = b.substring(j, endB).trimStart('0')
+            if (x.length != y.length) x.length - y.length else x.compareTo(y)
+        } else text(a.substring(i, endA), b.substring(j, endB))
+        if (result != 0) return result
+        i = endA
+        j = endB
+    }
+    return (a.length - i) - (b.length - j)
 }
 
 fun List<DeviceAudio>.sortedSounds(view: SoundView, names: Comparator<String> = soundCollator()): List<DeviceAudio> {

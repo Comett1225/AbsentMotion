@@ -142,9 +142,9 @@ private class YuvEncoder(private val codec: MediaCodec, private val muxer: Media
 
     fun write(pts: Long, fill: (Image) -> Unit) {
         val index = input()
-        val image = checkNotNull(codec.getInputImage(index))
-        fill(image)
-        codec.queueInputBuffer(index, 0, codec.getInputBuffer(index)!!.capacity(), pts, 0)
+        val size = codec.getInputBuffer(index)!!.capacity()
+        fill(checkNotNull(codec.getInputImage(index)))
+        codec.queueInputBuffer(index, 0, size, pts, 0)
         drain(false)
     }
 

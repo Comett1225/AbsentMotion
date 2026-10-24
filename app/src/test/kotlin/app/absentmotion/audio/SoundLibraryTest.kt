@@ -25,6 +25,12 @@ class SoundLibraryTest {
         assertEquals(listOf("Éclair", "beta"), za.take(2))
     }
 
+    @Test fun numbersInNamesSortByValue() {
+        val tracks = listOf("Track 10", "track 2", "10-minutes", "2nd", "Track 1", "Track 02b").map { sound(it) }
+        assertEquals(listOf("2nd", "10-minutes", "Track 1", "track 2", "Track 02b", "Track 10"),
+            tracks.sortedSounds(SoundView(SoundSort.Name, false), names).map { it.title })
+    }
+
     @Test fun dateAndDurationSortBothWays() {
         assertEquals(listOf(4L, 3L, 2L, 1L), library.sortedSounds(SoundView(SoundSort.Added, true), names).map { it.date })
         assertEquals(listOf(1L, 2L, 3L, 4L), library.sortedSounds(SoundView(SoundSort.Added, false), names).map { it.date })
