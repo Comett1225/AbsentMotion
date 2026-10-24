@@ -1,5 +1,6 @@
 package app.absentmotion.ui.editor
 
+import app.absentmotion.ui.tutorial.tutorialTarget
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -116,7 +117,7 @@ internal fun AnimateButton(state: EditorState, modifier: Modifier) {
     Presence(shown) {
         val press = remember { MutableInteractionSource() }
         Box(
-            modifier.offset { IntOffset(-clear.value.roundToPx(), 0) }.padding(12.dp).presence(scaleFrom = 0.6f).size(48.dp).pressScale(press)
+            modifier.offset { IntOffset(-clear.value.roundToPx(), 0) }.padding(12.dp).presence(scaleFrom = 0.6f).size(48.dp).tutorialTarget("animate").pressScale(press)
                 .shadow(4.dp, CircleShape).background(Am.Panel, CircleShape).border(1.8.dp, Am.Accent, CircleShape)
                 .clickable(press, null) { state.selectedId?.let { state.playing = false; open = it } },
             contentAlignment = Alignment.Center,

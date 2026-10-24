@@ -61,7 +61,7 @@ internal fun WideEditorBody(state: EditorState, onExit: () -> Unit, addLibrary: 
                 Preview(state, Modifier.fillMaxSize().tutorialTarget("preview"), reserveEnd = reserve)
                 Box(Modifier.fillMaxSize().padding(end = reserve)) {
                     Presence(state.previewPanelOpen) { PreviewModePanel(state, Modifier.align(Alignment.CenterEnd).presence(slideX = 0.4f)) }
-                    AnimateButton(state, Modifier.align(Alignment.BottomEnd).tutorialTarget("animate"))
+                    AnimateButton(state, Modifier.align(Alignment.BottomEnd))
                     HistoryNotes(state, Modifier.align(Alignment.BottomCenter))
                 }
                 if (side) SidePanels(state, addLibrary, Modifier.align(Alignment.CenterEnd))
