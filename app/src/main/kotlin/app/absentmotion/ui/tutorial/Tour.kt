@@ -19,11 +19,13 @@ data class TourFacts(
     val keyframes: Int = 0,
     val eased: Int = 0,
     val effects: Int = 0,
+    val tune: Int = 0,
     val motions: Int = 0,
     val undoMark: Long = 0,
     val exporting: Boolean = false,
     val browsing: Boolean = false,
     val easing: Boolean = false,
+    val between: Boolean = false,
 ) {
     val visual: Int get() = media + texts
     val visualSelected: Boolean get() = selected != null && selected != AUDIO
@@ -51,12 +53,14 @@ class TourStep(
     val targets: (start: TourFacts, now: TourFacts) -> List<String> = { _, _ -> emptyList() },
     val hint: (start: TourFacts, now: TourFacts) -> Int? = { _, _ -> null },
     val done: ((start: TourFacts, now: TourFacts) -> Boolean)? = null,
+    val stage: ((start: TourFacts, now: TourFacts) -> Boolean)? = null,
     val doIt: List<TourAction> = emptyList(),
     val needs: (TourFacts) -> List<TourAction> = { emptyList() },
     val prepare: List<TourAction> = emptyList(),
     val sample: TourAction? = null,
     @StringRes val sampleNote: Int = 0,
     val centred: Boolean = false,
+    val union: Boolean = false,
 )
 
 class Tour(val steps: List<TourStep> = TourSteps.all, startAt: String? = null) {
@@ -67,9 +71,11 @@ class Tour(val steps: List<TourStep> = TourSteps.all, startAt: String? = null) {
     var finished: Boolean = false
         private set
     private var begun: TourFacts? = null
+    private var staged: TourFacts? = null
     private var last: TourFacts? = null
     private var prepared = false
     private var assisted = false
+    private var helped = false
     private var repairs = 0
 
     val step: TourStep get() = steps[index]
@@ -95,10 +101,19 @@ class Tour(val steps: List<TourStep> = TourSteps.all, startAt: String? = null) {
             if (repairs >= MAX_REPAIRS) return emptyList()
             repairs++
             begun = null
+            staged = null
             note = R.string.tutorial_note_restored
             return missing
         }
-        if (step.done?.invoke(start, facts) == true) {
+        val stage = step.stage
+        if (stage != null && staged == null && stage(start, facts)) staged = facts
+        val middle = staged
+        val complete = when {
+            stage == null -> step.done?.invoke(start, facts) == true
+            middle == null -> false
+            else -> helped || step.done?.invoke(middle, facts) == true
+        }
+        if (complete) {
             advance(if (assisted) note else R.string.tutorial_note_nice)
             return observe(facts)
         }
@@ -116,8 +131,9 @@ class Tour(val steps: List<TourStep> = TourSteps.all, startAt: String? = null) {
     fun doIt(): List<TourAction> {
         if (finished) return emptyList()
         assisted = true
+        helped = true
         note = null
-        return step.doIt
+        return if (staged != null) emptyList() else step.doIt
     }
 
     fun pickerClosed(picked: Boolean): List<TourAction> {
@@ -136,8 +152,10 @@ class Tour(val steps: List<TourStep> = TourSteps.all, startAt: String? = null) {
         }
         index++
         begun = null
+        staged = null
         prepared = false
         assisted = false
+        helped = false
         repairs = 0
     }
 
@@ -165,7 +183,7 @@ object TourSteps {
 
     val all: List<TourStep> = listOf(
         TourStep("welcome", R.string.tutorial_welcome_title, R.string.tutorial_welcome_body, 10, centred = true),
-        TourStep("screen", R.string.tutorial_screen_title, R.string.tutorial_screen_body, 10, targets = { _, _ -> listOf("timeline") }),
+        TourStep("screen", R.string.tutorial_screen_title, R.string.tutorial_screen_body, 10, targets = { _, _ -> listOf("playbar", "timeline") }, union = true),
         TourStep(
             "picture", R.string.tutorial_picture_title, R.string.tutorial_picture_body, 25,
             targets = { _, n -> pick(n, listOf("add_panel")) },
@@ -185,7 +203,8 @@ object TourSteps {
         ),
         TourStep(
             "timeline", R.string.tutorial_timeline_title, R.string.tutorial_timeline_body, 15,
-            targets = { _, _ -> listOf("timeline") },
+            targets = { _, _ -> listOf("playbar", "timeline") },
+            union = true,
             done = { s, n -> abs(n.frame - s.frame) >= 3 || n.playing },
             doIt = listOf(TourAction.Scrub),
             needs = { if (it.media == 0) listOf(TourAction.SamplePicture) else emptyList() },
@@ -239,7 +258,8 @@ object TourSteps {
             targets = { _, n ->
                 when {
                     !n.visualSelected -> listOf("timeline")
-                    n.panel == TourFacts.TRANSFORM -> listOf("easing")
+                    n.easing -> listOf("panel")
+                    n.panel == TourFacts.TRANSFORM -> if (n.between) listOf("easing") else listOf("timeline")
                     n.panel == TourFacts.TOOLS -> listOf("tool_transform", "tools")
                     else -> listOf("back")
                 }
@@ -247,7 +267,8 @@ object TourSteps {
             hint = { _, n ->
                 when {
                     !n.visualSelected -> R.string.tutorial_hint_select
-                    n.panel == TourFacts.TRANSFORM || n.panel == TourFacts.TOOLS -> null
+                    n.panel == TourFacts.TRANSFORM -> if (n.between || n.easing) null else R.string.tutorial_hint_between
+                    n.panel == TourFacts.TOOLS -> null
                     else -> R.string.tutorial_hint_tools
                 }
             },
@@ -266,15 +287,17 @@ object TourSteps {
                     else -> listOf("back")
                 }
             },
-            hint = { _, n ->
+            hint = { s, n ->
                 when {
                     n.browsing -> null
                     !n.visualSelected -> R.string.tutorial_hint_select
+                    n.effects > s.effects -> if (n.panel == TourFacts.EFFECTS) R.string.tutorial_hint_slider else R.string.tutorial_hint_effect_back
                     n.panel == TourFacts.EFFECTS || n.panel == TourFacts.TOOLS -> null
                     else -> R.string.tutorial_hint_tools
                 }
             },
-            done = { s, n -> n.effects > s.effects },
+            stage = { s, n -> n.effects > s.effects },
+            done = { s, n -> n.tune != s.tune },
             doIt = listOf(TourAction.Effect),
             needs = needsPicture,
         ),
@@ -298,7 +321,7 @@ object TourSteps {
         TourStep(
             "undo", R.string.tutorial_undo_title, R.string.tutorial_undo_body, 15,
             targets = { _, _ -> listOf("playbar") },
-            done = { s, n -> n.undoMark > s.undoMark },
+            done = { s, n -> n.undoMark >= s.undoMark + 2 },
         ),
         TourStep("preview", R.string.tutorial_preview_title, R.string.tutorial_preview_body, 10, targets = { _, _ -> listOf("render_preview", "playbar") }),
         TourStep(
@@ -310,8 +333,9 @@ object TourSteps {
         TourStep(
             "export", R.string.tutorial_export_title, R.string.tutorial_export_body, 15,
             targets = { _, n -> if (n.exporting) emptyList() else if (n.selected != null) listOf("back") else listOf("export") },
-            hint = { _, n -> if (!n.exporting && n.selected != null) R.string.tutorial_hint_unselect else null },
-            done = { _, n -> n.exporting },
+            hint = { _, n -> if (n.exporting) R.string.tutorial_hint_export_close else if (n.selected != null) R.string.tutorial_hint_unselect else null },
+            stage = { _, n -> n.exporting },
+            done = { _, n -> !n.exporting },
             doIt = listOf(TourAction.Export),
             prepare = listOf(TourAction.Unselect),
         ),

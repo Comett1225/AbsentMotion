@@ -96,6 +96,7 @@ fun TutorialHost(
     onChanged: () -> Unit,
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     val current by rememberUpdatedState(editor)
     val tour = Tutorial.tour
     var switchTo by remember { mutableStateOf<Boolean?>(null) }
@@ -120,18 +121,19 @@ fun TutorialHost(
         if (current?.projectId != id) onOpen(id)
     }
 
-    val request = Tutorial.request
-    LaunchedEffect(request) {
-        if (request == null) return@LaunchedEffect
-        Tutorial.request = null
-        val open = current
-        if (open != null && open.projectId != settings.tutorialProject) switchTo = request else begin(request)
+    LaunchedEffect(Unit) {
+        snapshotFlow { Tutorial.request }.collect { request ->
+            if (request == null) return@collect
+            Tutorial.request = null
+            val open = current
+            if (open != null && open.projectId != settings.tutorialProject) switchTo = request else begin(request)
+        }
     }
     LaunchedEffect(afterClose, editor == null) {
         val resume = afterClose ?: return@LaunchedEffect
         if (editor != null) return@LaunchedEffect
         afterClose = null
-        begin(resume)
+        scope.launch { begin(resume) }
     }
     LaunchedEffect(deleting, editor == null) {
         val id = deleting ?: return@LaunchedEffect
@@ -247,7 +249,7 @@ private class TourDriver(
         if (busy) return
         val actions = tour.doIt()
         settle()
-        run(actions)
+        if (actions.isEmpty()) feed() else run(actions)
     }
 
     fun pickerClosed(picked: Boolean) {
@@ -274,7 +276,8 @@ private fun TourRunner(tour: Tour, editor: EditorState, settings: AppSettings, o
         onDispose { if (Tutorial.listener === listener) Tutorial.listener = null }
     }
 
-    val hole = view.targets.firstNotNullOfOrNull { Tutorial.anchors[it] }
+    val found = view.targets.mapNotNull { Tutorial.anchors[it] }
+    val hole = if (view.step.union) found.reduceOrNull { a, b -> androidx.compose.ui.geometry.Rect(minOf(a.left, b.left), minOf(a.top, b.top), maxOf(a.right, b.right), maxOf(a.bottom, b.bottom)) } else found.firstOrNull()
     Spotlight(hole, dim = hole != null || view.step.centred, centred = view.step.centred) {
         ScaledFonts {
             if (collapsed) Pill(view) { collapsed = false }
@@ -345,7 +348,7 @@ private fun CoachCard(view: TourView, onCollapse: () -> Unit, onExit: () -> Unit
             Box(Modifier.fillMaxWidth().height(3.dp).clip(RoundedCornerShape(2.dp)).background(Am.Line)) {
                 Box(Modifier.fillMaxWidth(view.number.toFloat() / view.count).fillMaxHeight().background(Am.Accent))
             }
-            Column(Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState()).padding(top = 10.dp)) {
+            Column(Modifier.padding(top = 10.dp).weight(1f, fill = false).verticalScroll(rememberScrollState())) {
                 view.note?.let { Text(stringResource(it), Modifier.padding(bottom = 4.dp), color = Am.Accent, fontSize = 13.sp, lineHeight = 18.sp, fontWeight = FontWeight.Medium) }
                 Text(stringResource(step.title), Modifier.semantics { heading() }, color = Am.OnDark, fontSize = 17.sp, lineHeight = 22.sp, fontWeight = FontWeight.Bold)
                 Text(stringResource(step.body), Modifier.padding(top = 4.dp), color = Am.OnDark, fontSize = 15.sp, lineHeight = 21.sp)
@@ -399,7 +402,7 @@ private fun CardButton(label: String, filled: Boolean, modifier: Modifier, onCli
 
 @Composable
 private fun PausedBanner(onContinue: () -> Unit, onExit: () -> Unit) {
-    Box(Modifier.fillMaxSize().navigationBarsPadding().padding(start = 16.dp, end = 16.dp, bottom = 84.dp), Alignment.BottomCenter) {
+    Box(Modifier.fillMaxSize().navigationBarsPadding().padding(start = 16.dp, end = 16.dp, bottom = 104.dp), Alignment.BottomCenter) {
         ScaledFonts {
             val shape = RoundedCornerShape(14.dp)
             Row(
@@ -420,7 +423,7 @@ private fun OfferDialog(onStart: () -> Unit, onLater: () -> Unit, onNever: () ->
     Dialog(onLater) {
         ScaledFonts {
             val shape = RoundedCornerShape(18.dp)
-            Column(Modifier.widthIn(max = 420.dp).clip(shape).background(Am.Card).verticalScroll(rememberScrollState()).padding(20.dp)) {
+            Column(Modifier.padding(horizontal = 16.dp).widthIn(max = 420.dp).clip(shape).background(Am.Card).verticalScroll(rememberScrollState()).padding(20.dp)) {
                 Text(stringResource(R.string.tutorial_offer_title), Modifier.semantics { heading() }, color = Am.Navy, fontSize = 20.sp, lineHeight = 26.sp, fontWeight = FontWeight.Bold)
                 Text(stringResource(R.string.tutorial_offer_body), Modifier.padding(top = 8.dp, bottom = 18.dp), color = Am.HomeInk, fontSize = 15.sp, lineHeight = 21.sp)
                 Box(Modifier.fillMaxWidth().heightIn(min = 48.dp).clip(RoundedCornerShape(12.dp)).background(Am.Navy).clickable(role = Role.Button, onClick = onStart).padding(10.dp), Alignment.Center) {

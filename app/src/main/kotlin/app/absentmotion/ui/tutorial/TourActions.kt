@@ -40,6 +40,7 @@ internal fun sceneFacts(scene: Scene): TourFacts {
     var audio = 0
     var moves = 17
     var effects = 0
+    var tune = 17
     var motions = 0
     val keys = IntArray(2)
     for (layer in scene.layers) {
@@ -50,10 +51,12 @@ internal fun sceneFacts(scene: Scene): TourFacts {
         }
         if (layer.kind != "audio") moves = 31 * moves + (layer.node.child("transform")?.hashCode() ?: 0)
         if (MotionSlot.entries.any { layer.node[it.attr] != null }) motions++
-        effects += layer.effects.count { it["gen"] == null }
+        val own = layer.effects.filter { it["gen"] == null }
+        effects += own.size
+        tune = 31 * tune + own.hashCode()
         countKeys(layer.node, keys)
     }
-    return TourFacts(media = media, mediaMs = mediaMs, texts = texts, audio = audio, moves = moves, keyframes = keys[0], eased = keys[1], effects = effects, motions = motions)
+    return TourFacts(media = media, mediaMs = mediaMs, texts = texts, audio = audio, moves = moves, keyframes = keys[0], eased = keys[1], effects = effects, tune = tune, motions = motions)
 }
 
 private fun countKeys(node: XmlNode, out: IntArray) {
@@ -85,6 +88,7 @@ internal fun tourFacts(state: EditorState, editing: Boolean): TourFacts = sceneF
     exporting = state.exportOpen,
     browsing = state.effectBrowserOpen,
     easing = state.easingOpen,
+    between = state.selected?.let { layer -> TourHands.EASED.any { layer.easing(it) != null } } == true,
 )
 
 internal class TourHands(private val context: Context, private val state: EditorState) {
@@ -221,11 +225,11 @@ internal class TourHands(private val context: Context, private val state: Editor
         focus(layer, EditorPanel.Tools)
     }
 
-    private companion object {
-        const val WHITE = 0xFFFFFFFF.toInt()
-        const val SAMPLE_EFFECT = "absent.vignette"
-        const val SAMPLE_MOTION = "pop"
+    companion object {
+        private const val WHITE = 0xFFFFFFFF.toInt()
+        private const val SAMPLE_EFFECT = "absent.vignette"
+        private const val SAMPLE_MOTION = "pop"
         val EASED = listOf(PropRef.Location, PropRef.Scale, PropRef.Rotation)
-        val EASE_IN_OUT = Easing("cubicBezier", listOf(0.42f, 0f, 0.58f, 1f))
+        private val EASE_IN_OUT = Easing("cubicBezier", listOf(0.42f, 0f, 0.58f, 1f))
     }
 }

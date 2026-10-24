@@ -172,7 +172,63 @@ class TourTest {
         tour.observe(editing.copy(undoMark = 0))
         assertEquals("undo", tour.step.id)
         tour.observe(editing.copy(undoMark = 5))
+        assertEquals("undo", tour.step.id)
+        tour.observe(editing.copy(undoMark = 6))
         assertEquals("preview", tour.step.id)
+    }
+
+    @Test fun effectStepWaitsForASliderAfterTheEffectIsAdded() {
+        val tour = at("effect")
+        val start = editing.copy(media = 1, selected = TourFacts.MEDIA, panel = TourFacts.EFFECTS, tune = 1)
+        tour.observe(start)
+        assertEquals(listOf("panel"), tour.targets())
+        tour.observe(start.copy(browsing = true))
+        assertEquals(emptyList<String>(), tour.targets())
+        tour.observe(start.copy(effects = 1, tune = 5))
+        assertEquals("effect", tour.step.id)
+        assertEquals(R.string.tutorial_hint_slider, tour.hint())
+        tour.observe(start.copy(effects = 1, tune = 6))
+        assertEquals("motion", tour.step.id)
+    }
+
+    @Test fun doItAfterTheEffectWasPickedJustMovesOn() {
+        val tour = at("effect")
+        val start = editing.copy(media = 1, selected = TourFacts.MEDIA, panel = TourFacts.EFFECTS)
+        tour.observe(start)
+        tour.observe(start.copy(effects = 1, tune = 5))
+        assertEquals(emptyList<TourAction>(), tour.doIt())
+        tour.observe(start.copy(effects = 1, tune = 5))
+        assertEquals("motion", tour.step.id)
+    }
+
+    @Test fun exportStepWaitsUntilTheExportScreenIsClosedAgain() {
+        val tour = at("export")
+        tour.observe(editing)
+        tour.observe(editing)
+        assertEquals(listOf("export"), tour.targets())
+        tour.observe(editing.copy(exporting = true))
+        assertEquals("export", tour.step.id)
+        assertEquals(R.string.tutorial_hint_export_close, tour.hint())
+        tour.observe(editing.copy(exporting = false))
+        assertEquals("finish", tour.step.id)
+    }
+
+    @Test fun easingPointsAtTheTimelineUntilThePlayheadSitsBetweenKeyframes() {
+        val tour = at("easing")
+        val keyed = editing.copy(media = 1, keyframes = 2, selected = TourFacts.MEDIA, panel = TourFacts.TRANSFORM)
+        tour.observe(keyed)
+        assertEquals(listOf("timeline"), tour.targets())
+        assertEquals(R.string.tutorial_hint_between, tour.hint())
+        tour.observe(keyed.copy(between = true))
+        assertEquals(listOf("easing"), tour.targets())
+        tour.observe(keyed.copy(between = true, easing = true))
+        assertEquals("effect", tour.step.id)
+    }
+
+    @Test fun screenAndTimelineStepsLightUpThePlayBarToo() {
+        val screen = TourSteps.all.first { it.id == "screen" }
+        assertTrue(screen.union)
+        assertEquals(listOf("playbar", "timeline"), screen.targets(editing, editing))
     }
 
     @Test fun resumesFromTheSavedStep() {
