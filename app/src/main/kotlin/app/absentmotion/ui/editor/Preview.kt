@@ -24,6 +24,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.SideEffect
+import app.absentmotion.editor.PreviewCache
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableIntStateOf
@@ -119,8 +122,27 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
         solo = state.soloMode, soloIds = selection, camera = state.cameraMode, guides = state.snapGuides, refPx = refPx * quality,
         accurateBlur = state.settings.fullMotionBlur,
     ) else null
+    val cacheMatch by remember(state) { derivedStateOf { cacheMatches(state) } }
+    val cacheUsable = cacheMatch && app.absentmotion.editor.cacheFrameSize(scene.width, scene.height, scale, divisor).first <= (PreviewCache.player?.width ?: 0) * 1.25f
+    val usable = rememberUpdatedState(cacheUsable)
+    val cachedPlaying = remember(state) { derivedStateOf { usable.value && state.playing && PreviewCache.covers(state.frame) } }
+    val live = remember { LiveHandoff() }
+    SideEffect {
+        PreviewCache.fit = fit
+        PreviewCache.checkerCell = 25f * (if (refPx > 0f) refPx * quality else size.width * quality / 1080f)
+    }
     LaunchedEffect(baseView) {
-        if (baseView != null) snapshotFlow { state.timeMs }.collect { state.engine.setView(baseView.copy(timeMs = it)) }
+        if (baseView != null) {
+            var wasCached = false
+            snapshotFlow { state.timeMs to cachedPlaying.value }.collect { (timeMs, cached) ->
+                if (!cached) {
+                    val serial = state.engine.setView(baseView.copy(timeMs = timeMs))
+                    live.requested = serial
+                    if (wasCached) live.handoff = serial
+                }
+                wasCached = cached
+            }
+        }
     }
 
     var quad by remember { mutableStateOf<FloatArray?>(null) }
@@ -147,6 +169,7 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
 
     Box(modifier.background(Am.PreviewBg).onSizeChanged { size = it }) {
         app.absentmotion.platform.SceneSurface(state.engine, divisor, size, Modifier.fillMaxSize()) { state.previewSurface = it }
+        CachedFrame(state, cacheUsable, live, dx, dy, scene.width * scale, scene.height * scale)
         Box(
             Modifier.fillMaxSize().pointerInput(state) {
                 var lastTwoFingerTap = -1_000_000L
@@ -289,6 +312,7 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
         )
         Presence(hint) { SwipeHint(hintLabel, Modifier.align(Alignment.Center).presence()) }
         CanvasZoomHud(state, Modifier.align(Alignment.TopStart))
+        if (state.drawing == null && !editingText) RenderPreviewNotes(state, cachedPlaying, Modifier.align(Alignment.TopCenter))
         Presence(state.cameraTip && !LocalWide.current) { CameraTip(state, Modifier.align(Alignment.BottomEnd).presence()) }
         EyedropperLoupe(state, Modifier.fillMaxSize())
         GradientHandles(state, quad, scale, Offset(dx, dy))

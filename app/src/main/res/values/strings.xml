@@ -1665,4 +1665,19 @@
     <string name="about_compatible_note">This is the Compatible version for Android 9 to 12. Left out: %1$s. They need Android 13 and the Latest version.</string>
     <string name="low_memory_title">Low memory</string>
     <string name="low_memory_body">This phone has %1$s GB of memory. AbsentMotion works best with 3 GB or more: long projects, large videos and many effects can be slow or close the app.</string>
+    <string name="preview_cache_render">Render preview</string>
+    <string name="preview_cache_cancel_render">Stop rendering the preview</string>
+    <string name="preview_cache_state_ready">Rendered</string>
+    <string name="preview_cache_state_outdated">Outdated: the project changed after rendering</string>
+    <string name="preview_cache_rendering">Rendering preview %1$d%%</string>
+    <string name="preview_cache_partial">Rendered %1$s to %2$s. A longer part does not fit in memory.</string>
+    <string name="preview_cache_ready_range">Smooth preview ready from %1$s to %2$s. Touch and hold the button to remove it.</string>
+    <string name="preview_cache_removed">Rendered preview removed</string>
+    <string name="preview_cache_no_memory">Not enough memory for a rendered preview. It was removed.</string>
+    <string name="preview_cache_trimmed">The rendered preview was removed to free memory.</string>
+    <string name="preview_cache_failed">The preview could not be rendered.</string>
+    <string name="preview_cache_hint">Playback is choppy. Render a smooth preview?</string>
+    <string name="preview_cache_hint_action">Render</string>
+    <string name="preview_cache_close">Close</string>
+    <string name="preview_cache_hint_setting">Offer a smooth preview when playback is choppy</string>
 </resources>

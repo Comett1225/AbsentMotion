@@ -1,5 +1,7 @@
 package app.absentmotion.engine
 
+data class RenderedView(val serial: Long, val timeMs: Int)
+
 data class SnapGuide(val vertical: Boolean, val at: Float, val wide: Boolean)
 
 data class PreviewView(

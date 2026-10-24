@@ -121,8 +121,14 @@ class EngineThread(private val background: Int, context: Context? = null) {
     private var scene: String? = null
 
     private val pendingScene = PendingScene()
-    private val pendingView = AtomicReference<PreviewView?>(null)
+    private val pendingView = AtomicReference<Pair<PreviewView, Long>?>(null)
     private val renderPosted = AtomicBoolean(false)
+    private val viewSerial = java.util.concurrent.atomic.AtomicLong()
+    private var shownSerial = 0L
+    private val renderedView = MutableStateFlow(RenderedView(0L, -1))
+    val rendered = renderedView.asStateFlow()
+    @Volatile var renders = 0L
+        private set
 
     init {
         fonts?.let { library -> mediaScope.launch {
@@ -314,11 +320,13 @@ class EngineThread(private val background: Int, context: Context? = null) {
         engine().setPicture(uri, buffer, layerId, opaque).also { pictureRevision.value++; renderNow() }
     }
 
-    fun setView(view: PreviewView) {
+    fun setView(view: PreviewView): Long {
         requestedView = view
         mediaScene?.let { videos?.update(it, view.timeMs, playing) }
-        pendingView.set(view)
+        val serial = viewSerial.incrementAndGet()
+        pendingView.set(view to serial)
         requestRender()
+        return serial
     }
 
     private fun requestRender() {
@@ -331,7 +339,7 @@ class EngineThread(private val background: Int, context: Context? = null) {
 
     private fun applyPending() {
         if (closed || capturing) return
-        pendingView.getAndSet(null)?.let { view = it }
+        pendingView.getAndSet(null)?.let { (next, serial) -> view = next; shownSerial = serial }
         try {
             view?.let { engine().setCameraView(it.camera); engine().setAccurateBlur(it.accurateBlur) }
             pendingScene.take(scene)?.let { setEngineScene(it) }
@@ -377,6 +385,8 @@ class EngineThread(private val background: Int, context: Context? = null) {
                     Log.e("AMEngine", "preview rendering failed")
                 }
                 if (RenderStats.recording) RenderStats.add((System.nanoTime() - started) / 1e6, v.timeMs)
+                renders++
+                renderedView.value = RenderedView(shownSerial, v.timeMs)
             }
         } catch (e: Exception) {
             if (!closed) Log.e("AMEngine", "preview rendering failed", e)

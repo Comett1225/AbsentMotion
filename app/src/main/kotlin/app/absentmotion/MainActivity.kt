@@ -538,6 +538,7 @@ class MainActivity : ComponentActivity() {
         if (closingEditor) return
         closingEditor = true
         closing.playing = false
+        app.absentmotion.editor.PreviewCache.clear()
         closing.endGesture()
         val scene = closing.scene
         lifecycleScope.launch {
@@ -612,6 +613,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onTrimMemory(level: Int) {
         super.onTrimMemory(level)
+        app.absentmotion.editor.PreviewCache.trim(this, level)
         if (level < ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN) return
         dropThumbnails()
         dropVideoThumbnails()
