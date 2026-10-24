@@ -46,29 +46,37 @@ import app.absentmotion.R
 private val TextControl get() = Am.Button
 private val TextSizes = listOf(5, 6, 7, 8, 9, 10, 11, 12, 14, 16, 18, 20, 24, 28, 32, 36, 40, 48, 56, 64, 72, 80, 96, 112, 144)
 
+internal class TextEditUi {
+    var browser by mutableStateOf(false)
+}
+
 @Composable
-internal fun TextEditor(state: EditorState) {
+internal fun TextFontBrowser(state: EditorState, ui: TextEditUi) {
+    val context = LocalContext.current
+    val library = remember { state.engine.fonts ?: FontLibrary(context) }
+    FontBrowser(library, onSelect = { name ->
+        library.remember(name)
+        state.editSelected { it.withFont(name) }
+        ui.browser = false
+    }, onClose = { ui.browser = false })
+}
+
+@Composable
+internal fun TextEditor(state: EditorState, ui: TextEditUi = remember { TextEditUi() }, embedded: Boolean = false) {
     val layer = state.selected ?: return
     val context = LocalContext.current
     val library = remember { state.engine.fonts ?: FontLibrary(context) }
     val keyboard = LocalSoftwareKeyboardController.current
     var popup by remember { mutableStateOf("") }
-    var browser by remember { mutableStateOf(false) }
+    LaunchedEffect(ui.browser) { if (!ui.browser) popup = "" }
     val finish = { state.endGesture(); keyboard?.hide(); state.panel = EditorPanel.Tools }
     LaunchedEffect(layer.id) { state.playing = false }
     BackHandler { if (popup.isNotEmpty()) popup = "" else finish() }
     DisposableEffect(layer.id) { onDispose { state.endGesture() } }
-    BoxWithConstraints(Modifier.fillMaxSize().background(Am.TopBar).systemBarsPadding().imePadding()) {
-        if (browser) {
-            Box(Modifier.fillMaxSize().enterFade(rise = 12.dp)) {
-                FontBrowser(library, onSelect = { name ->
-                    library.remember(name)
-                    state.editSelected { it.withFont(name) }
-                    browser = false; popup = ""
-                }, onClose = { browser = false })
-            }
+    Box(if (embedded) Modifier.fillMaxSize().background(Am.Panel) else Modifier.fillMaxSize().background(Am.TopBar).systemBarsPadding().imePadding()) {
+        if (ui.browser && !embedded) {
+            Box(Modifier.fillMaxSize().enterFade(rise = 12.dp)) { TextFontBrowser(state, ui) }
         } else {
-            val previewHeight = minOf(400.dp, (maxHeight - 102.dp).coerceAtLeast(80.dp))
             Column(Modifier.fillMaxSize()) {
                 Row(Modifier.fillMaxWidth().height(42.dp).background(Am.Deepest), verticalAlignment = Alignment.CenterVertically) {
                     val alignIcon = when (layer.textAlign) { "center" -> TextIcons.Centre; "right" -> TextIcons.Right; "justify" -> TextIcons.Justify; else -> TextIcons.Left }
@@ -95,8 +103,8 @@ internal fun TextEditor(state: EditorState) {
                     }
                     FontIconButton(TextIcons.Tick, stringResource(R.string.done), finish)
                 }
-                Preview(state, Modifier.fillMaxWidth().height(previewHeight))
-                TextContent(state, layer, Modifier.fillMaxWidth().height(60.dp).tutorialTarget("text_field"))
+                if (!embedded) Preview(state, Modifier.fillMaxWidth().weight(1f))
+                TextContent(state, layer, Modifier.fillMaxWidth().height(if (embedded) 132.dp else 60.dp).tutorialTarget("text_field"))
             }
             if (popup.isNotEmpty() && state.eyedropper == null) Box(Modifier.fillMaxSize().padding(top = 42.dp).clickable(interactionSource = null, indication = null) { popup = "" })
             Swap(popup, Modifier.fillMaxSize(), rise = (-8).dp) {
@@ -118,7 +126,7 @@ internal fun TextEditor(state: EditorState) {
                     }
                     "font" -> FontStrip(library, layer.font, Modifier.padding(top = 42.dp),
                         onPick = { name -> library.remember(name); state.editSelected { it.withFont(name) } },
-                        onViewAll = { keyboard?.hide(); browser = true })
+                        onViewAll = { keyboard?.hide(); ui.browser = true })
                     "color" -> ColorPicker(state, layer, Modifier.align(Alignment.TopEnd).padding(top = 42.dp).size(304.dp, 128.dp).background(Am.Panel))
                 }
             }

@@ -76,7 +76,7 @@ private fun EditorBody(state: EditorState, onExit: () -> Unit) {
         lifecycle.addObserver(observer)
         onDispose { lifecycle.removeObserver(observer) }
     }
-    if (state.panel == EditorPanel.EditText && state.selected?.kind == "text") {
+    if (!wide && state.panel == EditorPanel.EditText && state.selected?.kind == "text") {
         PhoneScreen { TextEditor(state) }
         return
     }

@@ -19,6 +19,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.remember
+import app.absentmotion.editor.EditorPanel
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -53,7 +55,9 @@ private val SideWidth = 320.dp
 internal fun WideEditorBody(state: EditorState, onExit: () -> Unit, addLibrary: AddLibrary) {
     BoxWithConstraints(Modifier.fillMaxSize().background(Am.TopBar).systemBarsPadding().displayCutoutPadding()) {
         val timeline = (maxHeight - 88.dp - 260.dp).coerceIn(140.dp, 320.dp)
-        val side = state.selectedId != null && !state.addOpen && !MultiSelect.active
+        val textEdit = state.panel == EditorPanel.EditText && state.selected?.kind == "text"
+        val textUi = remember { TextEditUi() }
+        val side = textEdit || (state.selectedId != null && !state.addOpen && !MultiSelect.active)
         val reserve = if (side) SideWidth else 0.dp
         Column(Modifier.fillMaxSize()) {
             EditorTopBar(state, onExit, Modifier.fillMaxWidth().height(42.dp).enterFade())
@@ -64,7 +68,7 @@ internal fun WideEditorBody(state: EditorState, onExit: () -> Unit, addLibrary: 
                     AnimateButton(state, Modifier.align(Alignment.BottomEnd))
                     HistoryNotes(state, Modifier.align(Alignment.BottomCenter))
                 }
-                if (side) SidePanels(state, addLibrary, Modifier.align(Alignment.CenterEnd))
+                if (side) SidePanels(state, addLibrary, textEdit, textUi, Modifier.align(Alignment.CenterEnd))
             }
             Box(Modifier.fillMaxWidth().height(46.dp).background(Am.TimelineBg)) {
                 PlayBar(state, Modifier.align(Alignment.Center).widthIn(max = 560.dp).fillMaxSize().tutorialTarget("playbar"))
@@ -76,14 +80,16 @@ internal fun WideEditorBody(state: EditorState, onExit: () -> Unit, addLibrary: 
                 if (!side) LowerPanels(state, addLibrary, transitionHere = false)
             }
         }
+        if (textEdit && textUi.browser) PhoneScreen { Box(Modifier.fillMaxSize().enterFade(rise = 12.dp)) { TextFontBrowser(state, textUi) } }
     }
 }
 
 @Composable
-private fun SidePanels(state: EditorState, addLibrary: AddLibrary, modifier: Modifier) {
+private fun SidePanels(state: EditorState, addLibrary: AddLibrary, textEdit: Boolean, textUi: TextEditUi, modifier: Modifier) {
     val density = LocalDensity.current
     Box(modifier.width(SideWidth).fillMaxHeight().background(Am.Panel).pointerInput(Unit) {}) {
-        CompositionLocalProvider(LocalDensity provides Density(density.density * (SideWidth / PhoneWidth), density.fontScale)) {
+        if (textEdit) TextEditor(state, textUi, embedded = true)
+        else CompositionLocalProvider(LocalDensity provides Density(density.density * (SideWidth / PhoneWidth), density.fontScale)) {
             LowerPanels(state, addLibrary, top = true)
         }
     }
