@@ -191,7 +191,7 @@ private fun Scene.followMattes(): Scene {
     val matte = layers.getOrNull(1)?.takeIf { it.node.child("gain") != null && it.effects.any { e -> e["id"] == "absent.lumakey" } } ?: return this
     val original = layers[0].takeIf { it.kind == "shape" && it.mediaFill?.video == true } ?: return this
     val followed = matte.followingOriginal(original)
-    return if (followed == matte) this else update(matte.id) { followed }
+    return if (followed == matte) this else Scene(update(matte.id) { followed }.node.with("totalTime", node["totalTime"]))
 }
 
 private fun XmlNode.firstLayer(): XmlNode? = children.firstOrNull { it.name in Scene.LAYER_TAGS }
