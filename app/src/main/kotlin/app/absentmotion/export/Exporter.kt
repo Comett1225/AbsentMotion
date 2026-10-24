@@ -237,7 +237,7 @@ internal fun encoderTrouble(t: Throwable): Boolean =
     generateSequence(t) { it.cause }.take(16).any { it is ExportStalled || it is android.media.MediaCodec.CodecException }
 
 internal suspend fun <T> watched(stallMs: Long = StallMs, block: suspend (alive: () -> Unit) -> T): T {
-    val last = java.util.concurrent.atomic.AtomicLong(System.nanoTime())
+    val last = java.util.concurrent.atomic.AtomicLong(System.nanoTime() + 2 * stallMs * 1_000_000L)
     val work = CoroutineScope(Dispatchers.Default).async { block { last.set(System.nanoTime()) } }
     try {
         while (!work.isCompleted) {
