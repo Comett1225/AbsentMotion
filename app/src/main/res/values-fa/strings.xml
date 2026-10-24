@@ -176,6 +176,7 @@
     <string name="library_err_malformed_xml">‏XML معیوب: %1$s</string>
     <string name="library_err_scene_needs_size">صحنه معیوب: فایل به صحنه‌ای با عرض و ارتفاع نیاز دارد</string>
     <string name="library_err_scene_too_big">صحنه معیوب: اندازه از %1$s پیکسل بزرگ‌تر است</string>
+    <string name="library_err_scene_long">صحنه نامعتبر: طول آن بیش از %1$s ساعت است</string>
     <string name="library_err_scene_fps">صحنه معیوب: نرخ فریم باید از 1 تا %1$s باشد</string>
     <string name="library_err_package_large">بسته بیش از حد بزرگ است (بیشتر از %1$s MB پس از باز شدن)</string>
     <string name="library_err_too_many_files">بسته فایل‌های بیش از حد زیادی دارد (بیشتر از %1$s)</string>

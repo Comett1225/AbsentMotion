@@ -176,6 +176,7 @@
     <string name="library_err_malformed_xml">XML không hợp lệ: %1$s</string>
     <string name="library_err_scene_needs_size">Cảnh không hợp lệ: tệp cần một cảnh có chiều rộng và chiều cao</string>
     <string name="library_err_scene_too_big">Cảnh không hợp lệ: kích thước lớn hơn %1$s px</string>
+    <string name="library_err_scene_long">Cảnh không hợp lệ: thời lượng vượt quá %1$s giờ</string>
     <string name="library_err_scene_fps">Cảnh không hợp lệ: tốc độ khung hình phải từ 1 đến %1$s</string>
     <string name="library_err_package_large">Gói quá lớn (hơn %1$s MB sau khi giải nén)</string>
     <string name="library_err_too_many_files">Gói có quá nhiều tệp (nhiều hơn %1$s)</string>

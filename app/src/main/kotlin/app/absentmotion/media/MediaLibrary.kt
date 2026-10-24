@@ -21,6 +21,7 @@ import app.absentmotion.model.XmlNode
 import app.absentmotion.model.exifOrientation
 import app.absentmotion.model.imageUris
 import app.absentmotion.model.modelUris
+import app.absentmotion.platform.readAtMost
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
@@ -129,7 +130,7 @@ internal const val MAX_MODEL_BYTES = 256L shl 20
 
 internal fun modelFiles(resolver: ContentResolver, uri: String): Pair<ByteArray, (String) -> ByteArray?> {
     val parsed = Uri.parse(uri)
-    if (parsed.scheme != "file") return requireNotNull(resolver.openInputStream(parsed)?.use { it.readBytes() }) { "cannot open $uri" } to { _ -> null }
+    if (parsed.scheme != "file") return requireNotNull(resolver.openInputStream(parsed)?.use { it.readAtMost(MAX_MODEL_BYTES.toInt() + 1) }?.also { require(it.size <= MAX_MODEL_BYTES) { "the model file is too large" } }) { "cannot open $uri" } to { _ -> null }
     val file = java.io.File(requireNotNull(parsed.path))
     require(file.length() <= MAX_MODEL_BYTES) { "the model file is too large" }
     val folder = file.parentFile!!.canonicalFile

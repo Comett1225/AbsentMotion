@@ -176,6 +176,7 @@
     <string name="library_err_malformed_xml">Sirang XML: %1$s</string>
     <string name="library_err_scene_needs_size">Mali ang scene: kailangan ng file ng scene na may lapad at taas</string>
     <string name="library_err_scene_too_big">Mali ang scene: mas malaki ang sukat kaysa sa %1$s pixel</string>
+    <string name="library_err_scene_long">Sirang scene: mahigit %1$s oras ang tagal</string>
     <string name="library_err_scene_fps">Mali ang scene: dapat mula 1 hanggang %1$s ang frame rate</string>
     <string name="library_err_package_large">Masyadong malaki ang package (higit sa %1$s MB kapag na-unpack)</string>
     <string name="library_err_too_many_files">Sobra ang file sa package (higit sa %1$s)</string>

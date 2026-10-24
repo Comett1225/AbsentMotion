@@ -76,6 +76,7 @@ private const val Kappa = 0.5522848f
 private const val MaxShapes = 1000
 private const val MaxVisits = 100_000
 private const val MaxRuleMatches = 5_000_000
+private const val MaxCssRules = 20_000
 internal const val MaxSvgNodes = 200_000
 
 private fun withoutCssComments(css: String): String {
@@ -202,6 +203,7 @@ private class SvgReader(private val root: XmlNode) {
 
     private fun readCss(css: String) {
         for ((selectors, body) in cssBlocks(css)) {
+            if (rules.size >= MaxCssRules) return
             val decls = declarations(body)
             for (raw in selectors.split(',')) {
                 val selector = raw.trim()

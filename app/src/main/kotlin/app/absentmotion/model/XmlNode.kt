@@ -58,6 +58,8 @@ data class XmlNode(
             return read(parser, 1, intArrayOf(maxNodes))
         }
 
+        const val IMPORT_NODES = 500_000
+
         private const val MAX_DEPTH = 256
 
         private fun read(parser: XmlPullParser, depth: Int, budget: IntArray): XmlNode {

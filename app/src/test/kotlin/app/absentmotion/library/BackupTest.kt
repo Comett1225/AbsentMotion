@@ -374,4 +374,40 @@ class BackupTest {
         Backup.restore(store, root, ByteArrayInputStream(zipOf("projects/p1.xml" to scene.toXml().toByteArray())), MediaAccess.forPhone(root))
         assertEquals(setOf("blocked-https://example.com/a.png", "blocked-/etc/hosts", "blocked-rtsp://example.com/live", "content://media/external/audio/media/3"), store.load("p1")!!.node.mediaUris())
     }
+
+    @Test fun aSmallBackupThatUnpacksToAHugeFileIsStoppedAndLeavesNothing() {
+        val root = tmp.newFolder("root")
+        val store = ProjectStore(root)
+        val bytes = ByteArrayOutputStream().also { out ->
+            ZipOutputStream(out).use { zip ->
+                zip.putNextEntry(ZipEntry("absentmotion-backup.txt")); zip.write("AbsentMotion backup 1\nfile:/elsewhere/\n".toByteArray())
+                zip.putNextEntry(ZipEntry("media/p1/zeros.bin"))
+                val block = ByteArray(1 shl 20)
+                repeat(400) { zip.write(block) }
+            }
+        }.toByteArray()
+        assertTrue(bytes.size < 2 shl 20)
+        try {
+            Backup.restore(store, root, ByteArrayInputStream(bytes))
+            fail()
+        } catch (e: ImportFailed) {
+            assertTrue(root.walkTopDown().filter { it.isFile }.sumOf { it.length() } < 1 shl 20)
+        }
+    }
+
+    @Test fun aBackupWithTooManyEntriesIsRefused() {
+        val root = tmp.newFolder("root")
+        val bytes = ByteArrayOutputStream().also { out ->
+            ZipOutputStream(out).use { zip ->
+                zip.putNextEntry(ZipEntry("absentmotion-backup.txt")); zip.write("AbsentMotion backup 1\nfile:/elsewhere/\n".toByteArray())
+                repeat(100_001) { zip.putNextEntry(ZipEntry("unknown/$it.txt")) }
+            }
+        }.toByteArray()
+        try {
+            Backup.restore(ProjectStore(root), root, ByteArrayInputStream(bytes))
+            fail()
+        } catch (e: ImportFailed) {
+            assertEquals(txt(R.string.library_err_too_many_files, "100000"), e.text)
+        }
+    }
 }

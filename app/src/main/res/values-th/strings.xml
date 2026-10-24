@@ -176,6 +176,7 @@
     <string name="library_err_malformed_xml">XML ผิดรูปแบบ: %1$s</string>
     <string name="library_err_scene_needs_size">ฉากผิดรูปแบบ: ไฟล์ต้องมีฉากที่มีความกว้างและความสูง</string>
     <string name="library_err_scene_too_big">ฉากผิดรูปแบบ: ขนาดใหญ่กว่า %1$s พิกเซล</string>
+    <string name="library_err_scene_long">ฉากผิดรูปแบบ: ความยาวเกิน %1$s ชั่วโมง</string>
     <string name="library_err_scene_fps">ฉากผิดรูปแบบ: เฟรมเรตต้องอยู่ระหว่าง 1 ถึง %1$s</string>
     <string name="library_err_package_large">แพ็กเกจมีขนาดใหญ่เกินไป (เกิน %1$s MB เมื่อแตกไฟล์)</string>
     <string name="library_err_too_many_files">แพ็กเกจมีไฟล์มากเกินไป (เกิน %1$s)</string>

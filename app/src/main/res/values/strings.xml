@@ -176,6 +176,7 @@
     <string name="library_err_malformed_xml">Malformed XML: %1$s</string>
     <string name="library_err_scene_needs_size">Malformed scene: the file needs a scene with a width and height</string>
     <string name="library_err_scene_too_big">Malformed scene: the size is larger than %1$s pixels</string>
+    <string name="library_err_scene_long">Malformed scene: the length is more than %1$s hours</string>
     <string name="library_err_scene_fps">Malformed scene: the frame rate must be from 1 to %1$s</string>
     <string name="library_err_package_large">The package is too large (more than %1$s MB unpacked)</string>
     <string name="library_err_too_many_files">The package has too many files (more than %1$s)</string>

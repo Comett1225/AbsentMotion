@@ -176,6 +176,7 @@
     <string name="library_err_malformed_xml">Повреждённый XML: %1$s</string>
     <string name="library_err_scene_needs_size">Некорректная сцена: в файле должна быть сцена с шириной и высотой</string>
     <string name="library_err_scene_too_big">Некорректная сцена: размер больше %1$s пикселей</string>
+    <string name="library_err_scene_long">Некорректная сцена: длительность превышает %1$s ч</string>
     <string name="library_err_scene_fps">Некорректная сцена: частота кадров должна быть от 1 до %1$s</string>
     <string name="library_err_package_large">Пакет слишком большой (больше %1$s MB в распакованном виде)</string>
     <string name="library_err_too_many_files">В пакете слишком много файлов (больше %1$s)</string>

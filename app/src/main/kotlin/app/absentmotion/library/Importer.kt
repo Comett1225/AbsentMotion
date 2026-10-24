@@ -103,7 +103,7 @@ class Importer(
             eachEntry(open, limits) { name, input ->
                 if (name == declaredProject || declaredProject == null && name.endsWith(".xml", ignoreCase = true) && name !in mediaEntries) {
                     val text = readText(input, MaxXml)
-                    val isScene = declaredProject != null || runCatching { XmlNode.parse(text.removePrefix("\uFEFF")).name == "scene" }.getOrDefault(false)
+                    val isScene = declaredProject != null || runCatching { XmlNode.parse(text.removePrefix("\uFEFF"), XmlNode.IMPORT_NODES).name == "scene" }.getOrDefault(false)
                     if (isScene) {
                         if (scenes.size >= limits.scenes) throw ImportFailed(txt(R.string.library_err_too_many_projects, limits.scenes.toString()))
                         sceneText += text.length
@@ -158,7 +158,7 @@ class Importer(
     }
 
     private fun check(text: String): XmlNode {
-        val root = try { XmlNode.parse(text.removePrefix("\uFEFF")) } catch (e: Exception) { throw ImportFailed(txt(R.string.library_err_malformed_xml, e.message.toString())) }
+        val root = try { XmlNode.parse(text.removePrefix("\uFEFF"), XmlNode.IMPORT_NODES) } catch (e: Exception) { throw ImportFailed(txt(R.string.library_err_malformed_xml, e.message.toString())) }
         checkScene(root)?.let { throw ImportFailed(it) }
         return root
     }
@@ -203,6 +203,7 @@ class Importer(
         private const val MaxXml = 16 shl 20
         private const val MaxSide = 16384
         private const val MaxFps = 240
+        private const val MaxHours = 24
 
         internal fun checkScene(root: XmlNode): UiText? {
             val width = root["width"]?.toIntOrNull() ?: 0
@@ -211,6 +212,7 @@ class Importer(
                 root.name != "scene" || width <= 0 || height <= 0 -> txt(R.string.library_err_scene_needs_size)
                 width > MaxSide || height > MaxSide -> txt(R.string.library_err_scene_too_big, MaxSide.toString())
                 root["fps"]?.toIntOrNull()?.let { it !in 1..MaxFps } == true -> txt(R.string.library_err_scene_fps, MaxFps.toString())
+                root["totalTime"]?.toLongOrNull()?.let { it !in 0..MaxHours * 3_600_000L } == true -> txt(R.string.library_err_scene_long, MaxHours.toString())
                 else -> null
             }
         }

@@ -77,7 +77,7 @@ class ProjectStore(private val root: File) {
         val media = ArrayList<MediaDeclaration>()
         fun follow(layers: List<XmlNode>, open: Set<String>): List<XmlNode> = layers.map { layer ->
             val linked = layer["link"]?.let(::idOfLink)?.takeIf { it !in open }
-            val element = linked?.let(::read)?.withCopiedLayerIds()
+            val element = linked?.let(::read)?.takeIf { it.isElement }?.withCopiedLayerIds()
             when {
                 element != null -> {
                     media += element.media

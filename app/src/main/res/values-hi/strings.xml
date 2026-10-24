@@ -176,6 +176,7 @@
     <string name="library_err_malformed_xml">खराब XML: %1$s</string>
     <string name="library_err_scene_needs_size">गलत सीन: फ़ाइल में चौड़ाई और ऊँचाई वाला सीन होना चाहिए</string>
     <string name="library_err_scene_too_big">गलत सीन: साइज़ %1$s पिक्सेल से बड़ा है</string>
+    <string name="library_err_scene_long">अमान्य सीन: अवधि %1$s घंटे से अधिक है</string>
     <string name="library_err_scene_fps">गलत सीन: फ़्रेम रेट 1 से %1$s के बीच होना चाहिए</string>
     <string name="library_err_package_large">पैकेज बहुत बड़ा है (अनपैक करने पर %1$s MB से ज़्यादा)</string>
     <string name="library_err_too_many_files">पैकेज में बहुत ज़्यादा फ़ाइलें हैं (%1$s से ज़्यादा)</string>

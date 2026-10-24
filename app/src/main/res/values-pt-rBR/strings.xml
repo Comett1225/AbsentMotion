@@ -176,6 +176,7 @@
     <string name="library_err_malformed_xml">XML inválido: %1$s</string>
     <string name="library_err_scene_needs_size">Cena malformada: o arquivo precisa de uma cena com largura e altura</string>
     <string name="library_err_scene_too_big">Cena malformada: o tamanho é maior que %1$s pixels</string>
+    <string name="library_err_scene_long">Cena inválida: a duração é superior a %1$s horas</string>
     <string name="library_err_scene_fps">Cena malformada: a taxa de quadros deve ser de 1 a %1$s</string>
     <string name="library_err_package_large">O pacote é grande demais (mais de %1$s MB descompactado)</string>
     <string name="library_err_too_many_files">O pacote tem arquivos demais (mais de %1$s)</string>

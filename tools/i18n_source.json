@@ -2746,6 +2746,7 @@
  "library_err_package_project_missing": "Malformed package: project file is missing",
  "library_err_project_files_large": "The package's project files are too large",
  "library_err_scene_fps": "Malformed scene: the frame rate must be from 1 to %1$s",
+ "library_err_scene_long": "Malformed scene: the length is more than %1$s hours",
  "library_err_scene_needs_size": "Malformed scene: the file needs a scene with a width and height",
  "library_err_scene_too_big": "Malformed scene: the size is larger than %1$s pixels",
  "library_err_too_many_files": "The package has too many files (more than %1$s)",

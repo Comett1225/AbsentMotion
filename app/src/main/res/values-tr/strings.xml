@@ -176,6 +176,7 @@
     <string name="library_err_malformed_xml">Bozuk XML: %1$s</string>
     <string name="library_err_scene_needs_size">Bozuk sahne: dosyada genişlik ve yükseklik içeren bir sahne olmalı</string>
     <string name="library_err_scene_too_big">Bozuk sahne: boyut %1$s pikselden büyük</string>
+    <string name="library_err_scene_long">Hatalı sahne: uzunluk %1$s saatten fazla</string>
     <string name="library_err_scene_fps">Bozuk sahne: kare hızı 1 ile %1$s arasında olmalı</string>
     <string name="library_err_package_large">Paket çok büyük (açıldığında %1$s MB\'tan fazla)</string>
     <string name="library_err_too_many_files">Paket çok fazla dosya içeriyor (%1$s sınırından fazla)</string>

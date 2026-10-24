@@ -176,6 +176,7 @@
     <string name="library_err_malformed_xml">XML tidak valid: %1$s</string>
     <string name="library_err_scene_needs_size">Scene tidak valid: file harus memiliki scene dengan lebar dan tinggi</string>
     <string name="library_err_scene_too_big">Scene tidak valid: ukurannya melebihi %1$s piksel</string>
+    <string name="library_err_scene_long">Adegan tidak valid: durasinya lebih dari %1$s jam</string>
     <string name="library_err_scene_fps">Scene tidak valid: frame rate harus antara 1 sampai %1$s</string>
     <string name="library_err_package_large">Paket terlalu besar (lebih dari %1$s MB setelah diekstrak)</string>
     <string name="library_err_too_many_files">Paket memiliki terlalu banyak file (lebih dari %1$s)</string>

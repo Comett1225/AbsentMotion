@@ -176,6 +176,7 @@
     <string name="library_err_malformed_xml">XML dañado: %1$s</string>
     <string name="library_err_scene_needs_size">Escena con formato incorrecto: el archivo necesita una escena con ancho y alto</string>
     <string name="library_err_scene_too_big">Escena con formato incorrecto: el tamaño supera los %1$s píxeles</string>
+    <string name="library_err_scene_long">Escena con formato incorrecto: la duración supera %1$s horas</string>
     <string name="library_err_scene_fps">Escena con formato incorrecto: la velocidad de fotogramas debe ser de 1 a %1$s</string>
     <string name="library_err_package_large">El paquete es demasiado grande (más de %1$s MB descomprimido)</string>
     <string name="library_err_too_many_files">El paquete tiene demasiados archivos (más de %1$s)</string>

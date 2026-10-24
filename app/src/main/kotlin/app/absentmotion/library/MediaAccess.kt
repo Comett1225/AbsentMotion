@@ -28,7 +28,7 @@ class MediaAccess private constructor(private val filesDir: File?, private val o
 
     fun defused(uri: String): String = if (filesDir == null || uri.isEmpty() || uri.startsWith(BLOCKED) || allows(uri)) uri else BLOCKED + uri
 
-    fun imported(uri: String): String = if (filesDir != null && uri.startsWith("content:", ignoreCase = true)) BLOCKED + uri else defused(uri)
+    fun imported(uri: String): String = if (filesDir != null && (uri.startsWith("content:", ignoreCase = true) || uri.startsWith("file:", ignoreCase = true))) BLOCKED + uri else defused(uri)
 
     companion object {
         private const val BLOCKED = "blocked-"

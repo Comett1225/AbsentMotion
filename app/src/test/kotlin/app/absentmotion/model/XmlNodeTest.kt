@@ -61,4 +61,16 @@ class XmlNodeTest {
         assertEquals(node["title"], XmlNode.parse(node.toXml())["title"])
         assertTrue(node.toXml().contains("😀"))
     }
+
+    @Test fun entityDeclarationsAreNotExpanded() {
+        val laughs = buildString {
+            append("<!DOCTYPE scene [<!ENTITY a0 \"lol lol lol lol lol lol lol lol lol lol\">")
+            for (i in 1..12) append("<!ENTITY a$i \"" + "&a${i - 1};".repeat(10) + "\">")
+            append("]><scene title=\"&a12;\"/>")
+        }
+        val start = System.nanoTime()
+        val title = runCatching { XmlNode.parse(laughs)["title"].orEmpty() }.getOrDefault("")
+        assertTrue(title.length < 100)
+        assertTrue(System.nanoTime() - start < 2_000_000_000L)
+    }
 }

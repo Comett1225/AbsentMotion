@@ -3,6 +3,7 @@ package app.absentmotion.library
 import app.absentmotion.i18n.txt
 import app.absentmotion.i18n.UiText
 import app.absentmotion.R
+import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
 import app.absentmotion.model.mediaUris
 import org.json.JSONArray
@@ -59,10 +60,10 @@ class ImporterSecurityTest {
         val report = Importer(store, access = MediaAccess.forPhone(files)).import { xml.byteInputStream() }.single()
         val node = store.load(report.id)!!.node
         val uris = node.mediaUris()
-        assertEquals(setOf("blocked-$settings", "blocked-$project", own, "blocked-content://media/external/images/media/5", "blocked-file:///etc/hosts", "blocked-x://elsewhere", "blocked-https://example.com/a.mp4", "blocked-/etc/hosts"), uris)
+        assertEquals(setOf("blocked-$settings", "blocked-$project", "blocked-$own", "blocked-content://media/external/images/media/5", "blocked-file:///etc/hosts", "blocked-x://elsewhere", "blocked-https://example.com/a.mp4", "blocked-/etc/hosts"), uris)
         assertFalse(node.toXml().contains("\"$settings\"") || node.toXml().contains("\"$project\""))
         val missing = node.children.filter { it.name == "media" && it["missing"] == "true" }.map { it["uri"] }.toSet()
-        assertEquals(setOf("blocked-$settings", "blocked-$project", "blocked-content://media/external/images/media/5", "blocked-file:///etc/hosts", "blocked-x://elsewhere", "blocked-https://example.com/a.mp4", "blocked-/etc/hosts"), missing)
+        assertEquals(setOf("blocked-$settings", "blocked-$project", "blocked-$own", "blocked-content://media/external/images/media/5", "blocked-file:///etc/hosts", "blocked-x://elsewhere", "blocked-https://example.com/a.mp4", "blocked-/etc/hosts"), missing)
         assertEquals(listOf(reportText("settings.json")), report.sections.first { it.first == txt(R.string.library_report_media) }.second.filter { it == reportText("settings.json") })
     }
 
@@ -179,5 +180,31 @@ class ImporterSecurityTest {
         assertTrue(failure(importer(files), bytes).id in malformedScene)
         assertEquals(emptyList<ProjectInfo>(), ProjectStore(files).list())
         assertEquals(emptyList<String>(), File(files, "media").list().orEmpty().toList())
+    }
+
+    @Test fun aLinkOnlyPullsInAnElementNeverAnotherProject() {
+        val files = tmp.newFolder("files")
+        val store = ProjectStore(files)
+        val private = store.create(Scene(XmlNode("scene", linkedMapOf("width" to "10", "height" to "10", "title" to "Private"))))
+        val element = store.createElement(Scene(XmlNode("scene", linkedMapOf("width" to "10", "height" to "10", "title" to "Shared", "type" to "element"))))
+        fun embedded(id: String): String? {
+            val xml = scene("""<embedScene id="1" startTime="0" endTime="100" link="${store.linkOf(id)}"><scene width="10" height="10" title="Original"/></embedScene>""")
+            val report = Importer(store, access = MediaAccess.forPhone(files)).import { xml.byteInputStream() }.single()
+            return store.load(report.id)!!.layers.single().node.child("scene")?.get("title")
+        }
+        assertEquals("Original", embedded(private))
+        assertEquals("Shared", embedded(element))
+    }
+
+    @Test fun aSceneWithMoreElementsThanTheBudgetIsRefused() {
+        val files = tmp.newFolder("files")
+        val xml = scene("<bookmark/>".repeat(XmlNode.IMPORT_NODES))
+        assertEquals(txt(R.string.library_err_malformed_xml, "Too many elements"), failure(importer(files), xml.toByteArray()))
+    }
+
+    @Test fun aSceneLastingLongerThanADayIsRefused() {
+        val files = tmp.newFolder("files")
+        val xml = """<scene title="Long" width="10" height="10" totalTime="2000000000"/>"""
+        assertEquals(txt(R.string.library_err_scene_long, "24"), failure(importer(files), xml.toByteArray()))
     }
 }

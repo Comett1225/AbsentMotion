@@ -205,7 +205,7 @@ fun Contour.toSvg(): String {
 }
 
 fun parseSvgPath(d: String): List<Contour> {
-    val tokens = Regex("[MLHVCSQTAZmlhvcsqtaz]|-?\\d*\\.?\\d+(?:[eE][-+]?\\d+)?").findAll(d).map { it.value }.toMutableList()
+    val tokens = Regex("[MLHVCSQTAZmlhvcsqtaz]|-?\\d*\\.?\\d+(?:[eE][-+]?\\d+)?").findAll(d).map { it.value }.take(500_000).toMutableList()
     val out = ArrayList<Contour>()
     var knots = ArrayList<Knot>()
     var i = 0

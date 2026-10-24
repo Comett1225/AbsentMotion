@@ -28,7 +28,7 @@ typealias ViewConfiguration = android.view.ViewConfiguration
 val LocalContext get() = androidx.compose.ui.platform.LocalContext
 fun Bitmap.asImageBitmap() = this.androidImageBitmap()
 
-fun xmlParser() = android.util.Xml.newPullParser()
+fun xmlParser() = android.util.Xml.newPullParser().apply { runCatching { setFeature(org.xmlpull.v1.XmlPullParser.FEATURE_PROCESS_DOCDECL, false) } }
 @androidx.compose.runtime.Composable
 fun BackHandler(enabled: Boolean = true, onBack: () -> Unit) = androidx.activity.compose.BackHandler(enabled, onBack)
 object ActivityResultContracts {

@@ -176,6 +176,7 @@
     <string name="library_err_malformed_xml">XML tidak sah: %1$s</string>
     <string name="library_err_scene_needs_size">Babak tidak sah: fail memerlukan babak dengan lebar dan tinggi</string>
     <string name="library_err_scene_too_big">Babak tidak sah: saiz melebihi %1$s piksel</string>
+    <string name="library_err_scene_long">Adegan tidak sah: tempohnya melebihi %1$s jam</string>
     <string name="library_err_scene_fps">Babak tidak sah: kadar bingkai mesti antara 1 hingga %1$s</string>
     <string name="library_err_package_large">Pakej terlalu besar (lebih daripada %1$s MB selepas dibuka)</string>
     <string name="library_err_too_many_files">Pakej mempunyai terlalu banyak fail (lebih daripada %1$s)</string>

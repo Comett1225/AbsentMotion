@@ -20,6 +20,9 @@ object Backup {
     private const val MARKER = "absentmotion-backup.txt"
     private const val FORMAT = "AbsentMotion backup 1"
     private const val MAX_TEXT = 64 shl 20
+    private const val MAX_ENTRIES = 100_000
+    private const val UNPACKED_HEADROOM = 64L shl 20
+    private const val UNPACKED_RATIO = 200L
     private val VersionFile = Regex("[0-9]{1,19}\\.(?:xml|png|damaged)")
 
     data class Restored(val added: Int, val renamed: Int, val skipped: Int, val rejected: Int = 0)
@@ -140,15 +143,27 @@ object Backup {
                 val head = if (first?.name == MARKER) zip.readAtMost(4096).toString(Charsets.UTF_8).lines() else emptyList()
                 if (head.firstOrNull() != FORMAT) throw ImportFailed(txt(R.string.library_err_not_backup))
                 oldRoot = head.getOrNull(1).orEmpty().trim()
+                var unpacked = 0L
+                var entries = 0
+                fun charge(n: Int) {
+                    unpacked += n
+                    val allowed = UNPACKED_HEADROOM + UNPACKED_RATIO * read
+                    if (unpacked > allowed) throw ImportFailed(txt(R.string.library_err_package_large, (allowed shr 20).toString()))
+                }
+                val body = object : InputStream() {
+                    override fun read(): Int = zip.read().also { if (it >= 0) charge(1) }
+                    override fun read(b: ByteArray, off: Int, len: Int): Int = zip.read(b, off, len).also { if (it > 0) charge(it) }
+                }
                 while (true) {
                     val entry = zip.nextEntry ?: break
+                    if (++entries > MAX_ENTRIES) throw ImportFailed(txt(R.string.library_err_too_many_files, MAX_ENTRIES.toString()))
                     val parts = entry.name.replace('\\', '/').split('/')
                     if (entry.isDirectory || !parts.all(::safeSegment)) continue
                     val isScene = parts.size == 2 && parts[0] == "projects" && parts[1].endsWith(".xml")
                     if (isScene) {
                         val id = parts[1].removeSuffix(".xml")
-                        val text = readText(zip)
-                        if (!ProjectId.matches(id) || runCatching { XmlNode.parse(text.removePrefix("\uFEFF")) }.getOrNull()?.let(Importer::checkScene) != null) rejected += id
+                        val text = readText(body)
+                        if (!ProjectId.matches(id) || runCatching { XmlNode.parse(text.removePrefix("\uFEFF"), XmlNode.IMPORT_NODES) }.getOrNull()?.let(Importer::checkScene) != null) rejected += id
                         else {
                             waiting += id to text
                             if (entry.time > 0) stamps[id] = entry.time
@@ -174,11 +189,11 @@ object Backup {
                     val text = target.extension == "xml" && when (parts[0]) { "media" -> false; "templates" -> parts.size == 3; else -> true }
                     if (text) {
                         created += target
-                        writeAtomically(target, remap(readText(zip)))
+                        writeAtomically(target, remap(readText(body)))
                     } else {
                         val part = File(target.parentFile, target.name + ".part")
                         try {
-                            part.outputStream().use { zip.copyTo(it) }
+                            part.outputStream().use { body.copyTo(it) }
                             if (!part.renameTo(target)) throw java.io.IOException("Cannot restore ${target.name}")
                             created += target
                         } catch (t: Throwable) {
@@ -192,7 +207,7 @@ object Backup {
             }
         } catch (t: Throwable) {
             created.asReversed().forEach { it.delete() }
-            throw t
+            throw if (t is OutOfMemoryError) ImportFailed(txt(R.string.library_err_backup_project_large)) else t
         }
         return Restored(added, renamed.size, skipped.size, rejected.size)
     }

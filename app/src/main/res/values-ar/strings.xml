@@ -176,6 +176,7 @@
     <string name="library_err_malformed_xml">‏XML تالف: %1$s</string>
     <string name="library_err_scene_needs_size">مشهد غير صالح: يحتاج الملف إلى مشهد بعرض وارتفاع</string>
     <string name="library_err_scene_too_big">مشهد غير صالح: الحجم أكبر من %1$s بكسل</string>
+    <string name="library_err_scene_long">مشهد غير صالح: المدة تتجاوز %1$s ساعة</string>
     <string name="library_err_scene_fps">مشهد غير صالح: يجب أن يكون معدل الإطارات من 1 إلى %1$s</string>
     <string name="library_err_package_large">الحزمة كبيرة جدًا (أكثر من %1$s MB بعد فك الضغط)</string>
     <string name="library_err_too_many_files">تحتوي الحزمة على ملفات أكثر من اللازم (أكثر من %1$s)</string>

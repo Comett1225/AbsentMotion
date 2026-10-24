@@ -1,6 +1,7 @@
 package app.absentmotion
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.fail
 import org.junit.Test
 
 class ImportHandOffTest {
@@ -30,5 +31,15 @@ class ImportHandOffTest {
         ImportHandOff.start(listOf("content://a/2")) { launches += it }
         assertEquals(listOf(true), launches)
         assertEquals(listOf("content://a/2"), ImportHandOff.take())
+    }
+
+    @Test fun aFailedLaunchLeavesNothingQueuedForTheNextStart() {
+        ImportHandOff.take()
+        try {
+            ImportHandOff.start(listOf("content://a/3")) { throw IllegalStateException("no activity") }
+            fail()
+        } catch (e: IllegalStateException) {
+            assertEquals(emptyList<String>(), ImportHandOff.take())
+        }
     }
 }

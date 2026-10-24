@@ -16,7 +16,12 @@ object ImportHandOff {
 
     fun start(uris: List<String>, launch: (grant: Boolean) -> Unit) {
         give(uris)
-        try { launch(true) } catch (e: SecurityException) { launch(false) }
+        try {
+            try { launch(true) } catch (e: SecurityException) { launch(false) }
+        } catch (t: Throwable) {
+            take()
+            throw t
+        }
     }
 }
 
@@ -24,8 +29,8 @@ class ImportActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val uris = when (intent.action) {
-            Intent.ACTION_SEND -> listOfNotNull(streamExtra())
-            Intent.ACTION_SEND_MULTIPLE -> streamExtras()
+            Intent.ACTION_SEND -> listOfNotNull(streamExtra()).ifEmpty { clipUris().take(1) }
+            Intent.ACTION_SEND_MULTIPLE -> streamExtras().ifEmpty { clipUris() }
             Intent.ACTION_VIEW -> listOfNotNull(intent.data)
             else -> emptyList()
         }.filterNot(::isOwnPrivateFile)
@@ -41,6 +46,8 @@ class ImportActivity : Activity() {
         }
         finish()
     }
+
+    private fun clipUris(): List<Uri> = intent.clipData?.let { clip -> (0 until clip.itemCount).mapNotNull { clip.getItemAt(it).uri } }.orEmpty()
 
     @Suppress("DEPRECATION")
     private fun streamExtra(): Uri? =
