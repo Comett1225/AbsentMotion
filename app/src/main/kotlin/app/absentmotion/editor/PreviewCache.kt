@@ -250,7 +250,7 @@ object PreviewCache {
         val (width, height) = cacheFrameSize(scene.width, scene.height, fit, divisor)
         val manager = app.getSystemService(ActivityManager::class.java)
         val budget = previewCacheBudget(manager?.memoryClass ?: 128, manager?.isLowRamDevice == true, Tier.compatible)
-        val range = renderRange(scene.lastFrame, state.frame, framesThatFit(budget, width, height))
+        val range = renderRange(scene.lastFrame, state.frame, framesThatFit(budget, width, height)).first..maxOf(scene.lastFrame, 0)
         val next = keyOf(state)
         val cell = checkerCell
         clear()
@@ -276,7 +276,7 @@ object PreviewCache {
                 val per = built.count.coerceAtLeast(1)
                 Log.i(TAG, "render %s frames=%d of %d size=%dx%d bytes=%d avg=%d budget=%d ms=%.0f perFrame=%.1f still=%.1f encode=%.1f".format(
                     outcome, built.count, range.count(), width, height, built.bytes, built.bytes / per, budget, ms, ms / per, stillNs / 1e6 / per, encodeNs / 1e6 / per))
-                finish(app, next, built, width, height, outcome, range.count() < scene.lastFrame + 1, scene.fps)
+                finish(app, next, built, width, height, outcome, scene.lastFrame, scene.fps)
             } finally {
                 if (mine == generation && phase == Phase.Rendering) phase = Phase.Empty
             }
@@ -340,7 +340,7 @@ object PreviewCache {
         return runtime.maxMemory() - (runtime.totalMemory() - runtime.freeMemory()) > needed + 24 * MIB
     }
 
-    private fun finish(context: Context, next: CacheKey, built: FrameStore, width: Int, height: Int, outcome: Outcome, planShort: Boolean, fps: Int) {
+    private fun finish(context: Context, next: CacheKey, built: FrameStore, width: Int, height: Int, outcome: Outcome, lastFrame: Int, fps: Int) {
         if (outcome == Outcome.NoMemory) {
             clear()
             toast(context, context.getString(R.string.preview_cache_no_memory))
@@ -359,7 +359,7 @@ object PreviewCache {
         progress = 1f
         when {
             outcome == Outcome.Failed -> toast(context, context.getString(R.string.preview_cache_failed))
-            outcome == Outcome.Full || (outcome == Outcome.Done && planShort) ->
+            outcome != Outcome.Stopped && (built.first > 0 || built.last < lastFrame) ->
                 toast(context, context.getString(R.string.preview_cache_partial, timecode(built.first, fps), timecode(built.last + 1, fps)))
         }
     }
