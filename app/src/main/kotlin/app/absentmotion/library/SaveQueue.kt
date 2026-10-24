@@ -20,6 +20,7 @@ class SaveQueue(
 ) {
     private var pending: String? = null
     private var scheduled: ScheduledFuture<*>? = null
+    private var generation = 0L
 
     @Volatile var failing = false
         private set
@@ -29,7 +30,7 @@ class SaveQueue(
         if (scheduled == null) scheduled = executor.schedule(::run, delayMs, TimeUnit.MILLISECONDS)
     }
 
-    @Synchronized fun cancel() { pending = null }
+    @Synchronized fun cancel() { pending = null; generation++ }
 
     @Synchronized fun flush(): Future<*> {
         scheduled?.cancel(false)
@@ -38,12 +39,12 @@ class SaveQueue(
     }
 
     private fun run() {
-        val text = synchronized(this) { scheduled = null; pending.also { pending = null } } ?: return
+        val task = synchronized(this) { scheduled = null; pending?.let { it to generation }.also { pending = null } } ?: return
         try {
-            write(text)
+            write(task.first)
             failing = false
         } catch (e: Exception) {
-            synchronized(this) { if (pending == null) pending = text }
+            synchronized(this) { if (pending == null && generation == task.second) pending = task.first }
             if (!failing) {
                 failing = true
                 failed(e)

@@ -114,6 +114,37 @@ class BackupTest {
         assertEquals("New asset", shown("New project"))
     }
 
+    @Test fun anUnchangedProjectIsCopiedWhenItsLinkedElementWasChanged() {
+        val root = tmp.newFolder()
+        val store = ProjectStore(root)
+        val asset = store.createElement(Scene.parse("""<scene width="10" height="10" type="element" title="Old asset"><shape id="1"/></scene>"""))
+        val user = store.create(Scene.parse("""<scene width="10" height="10" title="Project"><embedScene id="5" link="${store.linkOf(asset)}"><scene width="10" height="10"/></embedScene></scene>"""))
+        val bytes = backup(root)
+        store.save(asset, store.load(asset)!!.withTitle("New asset"))
+        assertEquals(Backup.Restored(2, 2, 0), Backup.restore(store, root, ByteArrayInputStream(bytes)))
+        val copy = store.list().single { it.title == "Project" && it.id != user }.id
+        fun shown(id: String) = store.load(id)!!.layer(5)!!.node.child("scene")!!["title"]
+        assertEquals("New asset", shown(user))
+        assertEquals("Old asset", shown(copy))
+    }
+
+    @Test fun unchangedProjectsFollowRestoredMediaOwnersThroughOtherProjects() {
+        val root = tmp.newFolder()
+        val store = ProjectStore(root)
+        val owner = project(store, "Before", "old pixels")
+        val shared = store.create(store.load(owner)!!.withTitle("Shared"))
+        val linked = store.create(Scene.parse("""<scene width="10" height="10" title="Linked"><embedScene id="5" link="${store.linkOf(shared)}"><scene width="10" height="10"/></embedScene></scene>"""))
+        val bytes = backup(root)
+        store.save(owner, store.load(owner)!!.withTitle("After"))
+        store.mediaDir(owner).resolve("photo.png").writeText("new pixels")
+        assertEquals(Backup.Restored(3, 3, 0), Backup.restore(store, root, ByteArrayInputStream(bytes)))
+        val copy = store.list().single { it.title == "Shared" && it.id != shared }.id
+        assertEquals("new pixels", pictureOf(store, shared))
+        assertEquals("old pixels", pictureOf(store, copy))
+        val linkedCopy = store.list().single { it.title == "Linked" && it.id != linked }.id
+        assertEquals(store.linkOf(copy), store.load(linkedCopy)!!.layer(5)!!.node["link"])
+    }
+
     @Test fun restoringOnTheSamePhoneKeepsOwnLinksAndFindsEveryProjectAlreadyHere() {
         val root = tmp.newFolder("files")
         val external = tmp.newFolder("external")

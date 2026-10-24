@@ -82,11 +82,11 @@ object Backup {
             val id = it.groupValues[1]
             rootUri(root) + if (id.isEmpty()) "templates/" else "media/" + (renamed[id] ?: id) + "/"
         }
-        fun remap(text: String): String {
+        fun remap(text: String, defuse: Boolean = true): String {
             val moved = moved(text)
             val node = runCatching { Scene.parse(moved).node }.getOrNull() ?: return moved
             val links = renamed.entries.associate { (old, new) -> store.linkOf(old) to store.linkOf(new) }
-            val defused = node.mapMediaUris(access::defused).mapLinks { links[it] ?: it }
+            val defused = (if (defuse) node.mapMediaUris(access::defused) else node).mapLinks { links[it] ?: it }
             return if (defused == node) moved else Scene(defused).toXml()
         }
         fun freshId(id: String): String =
@@ -95,14 +95,28 @@ object Backup {
                 !File(projects, "$p.xml").exists() && p !in renamed.values && waiting.none { it.first == p } && ready.none { it.first == p }
             }
         fun settle() {
+            val same = ArrayList<Pair<String, String>>()
             for ((id, text) in waiting) {
                 val local = File(projects, "$id.xml")
                 if (local.exists()) {
-                    if (runCatching { sameScene(local.readText(), moved(text)) }.getOrDefault(false)) { skipped += id; continue }
+                    if (runCatching { sameScene(local.readText(), moved(text)) }.getOrDefault(false)) { same += id to text; continue }
                     renamed[id] = freshId(id)
                 }
                 ready += id to text
             }
+            do {
+                var changed = false
+                val iterator = same.iterator()
+                while (iterator.hasNext()) {
+                    val (id, text) = iterator.next()
+                    if (runCatching { sameScene(File(projects, "$id.xml").readText(), remap(text, defuse = false)) }.getOrDefault(false)) continue
+                    renamed[id] = freshId(id)
+                    ready += id to text
+                    iterator.remove()
+                    changed = true
+                }
+            } while (changed)
+            skipped += same.map { it.first }
             waiting.clear()
         }
         fun makeDirs(dir: File) {

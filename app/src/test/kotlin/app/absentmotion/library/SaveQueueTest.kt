@@ -69,6 +69,32 @@ class SaveQueueTest {
         assertEquals(2, reports)
     }
 
+    @Test fun cancellingAnInFlightFailedDraftDoesNotRestoreItForRetry() {
+        val entered = CountDownLatch(1)
+        val release = CountDownLatch(1)
+        var broken = true
+        val written = ArrayList<String>()
+        val queue = SaveQueue(executor, 0, {
+            if (broken) {
+                entered.countDown()
+                check(release.await(5, TimeUnit.SECONDS))
+                throw IOException("disk full")
+            }
+            written += it
+        })
+        queue.submit("old draft")
+        assertTrue(entered.await(5, TimeUnit.SECONDS))
+        queue.cancel()
+        release.countDown()
+        drain()
+        broken = false
+        queue.flush().get(5, TimeUnit.SECONDS)
+        assertTrue(written.isEmpty())
+        queue.submit("new draft")
+        queue.flush().get(5, TimeUnit.SECONDS)
+        assertEquals(listOf("new draft"), written)
+    }
+
     @Test fun projectSaverWritesTheFileWithoutTheCallerWaiting() {
         val root = tmp.newFolder()
         val store = ProjectStore(root)
