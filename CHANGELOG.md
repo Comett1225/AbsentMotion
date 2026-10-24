@@ -6,6 +6,27 @@ All notable changes to AbsentMotion are listed here, newest first. The format fo
 Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stands for the feature set as it stood on
 2026-10-12.
 
+## [3.3.2] - 2026-10-24
+
+### Changed
+
+- **Camera and 3D layers**: touch editing now follows the camera, and **tablets** get the wide Home layout with search.
+- **AI Smooth** works on trimmed clips, and **AI Enhance** and AI Smooth keep the clip's **sound** in more formats.
+- **Backup, weekly backup and the camera** ask for storage permission on Android 9, and **WebM and MKV** are greyed out on phones without an Opus encoder.
+- **Stroke** works on drawings and groups, and **Thai, Lao, Khmer and Burmese** text can animate by word.
+
+### Fixed
+
+- **Exports with sound** failing on Android 9 and 10, and a shared file without read access crashing the app.
+- **Deleting a project** removing AI results another project still used, and **version history** stopping after a wrong phone date.
+- **Static**, Flicker and Glitch turning to stripes after about 20 seconds, Glitch smearing a layer's edge across the frame, doubled **glows**, and **Film Grain** sliders doing nothing.
+- **Timecode** frame numbers, **Frame Rate** and **Random Jitter** timing, and Count Up/Down reading "1.000,5".
+- **Outside borders** showing through see-through fills and text, and **Repeat** borders staying in place.
+- **Splitting a group** breaking echo, reverb and voice effects in exports, **editing shape points** making open lines vanish, and **speed presets** on trimmed clips.
+- **Looping sound** clicking in the preview, **Quick sharpen** doing nothing, **Faces** failing on 4K and rotated clips, and AI Smooth showing a frozen frame or "encoder busy".
+- A stray keyframe from the **fill tab**, text layers renamed by opening a panel, the colour editor staying open after Undo, the Parent menu reopening, timeline zoom resetting, and the playhead stopping between frames.
+- Hindi and Tamil word endings swallowing spaces, wrong arrow direction in Arabic, Filipino plurals without the number, a double tap starting two exports, and the GPU AI switch turning off after unrelated crashes.
+
 ## [3.3.1] - 2026-10-23
 
 ### Changed
