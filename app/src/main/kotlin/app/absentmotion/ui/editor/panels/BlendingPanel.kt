@@ -75,7 +75,7 @@ internal fun BlendingPanel(state: EditorState, layer: Layer, modifier: Modifier 
         OpacitySlider(state, opacity, Modifier.offset(122.px, 14.px).size(560.px, 113.px))
         Box(
             Modifier.offset(734.px, 14.px).size(158.px, 113.px).clip(PanelShape).background(ValueFill)
-                .clickable { state.askNumber("", opacity * 100) { v -> state.setNumber(OpacityRef, (v / 100f).coerceIn(0f, 1f)) } },
+                .clickable { state.askNumber("", opacity * 100, "%", 0f, 100f) { v -> state.setNumber(OpacityRef, (v / 100f).coerceIn(0f, 1f)) } },
             contentAlignment = Alignment.Center,
         ) { Text("${Math.round(opacity * 100)}%", color = Am.OnDark, fontSize = 15.5.sp, maxLines = 1, softWrap = false) }
         Column(
@@ -135,19 +135,32 @@ private fun Chevron(open: Boolean) {
 
 @Composable
 private fun OpacitySlider(state: EditorState, value: Float, modifier: Modifier) {
+    val timing = remember { LongArray(2) }
+    val context = androidx.compose.ui.platform.LocalContext.current
     Box(
-        modifier.pointerInput(state) {
+        modifier.holdAndDoubleTap(timing) { state.setNumber(OpacityRef, 1f); state.endGesture() }.pointerInput(state) {
             awaitEachGesture {
                 val down = awaitFirstDown()
                 val knob = 17.px.toPx()
-                fun apply(x: Float) = state.setNumber(OpacityRef, ((x - knob) / (size.width - 2 * knob).coerceAtLeast(1f)).coerceIn(0f, 1f), "opacity")
+                val track = (size.width - 2 * knob).coerceAtLeast(1f)
+                fun set(v: Float) = state.setNumber(OpacityRef, v.coerceIn(0f, 1f), "opacity")
+                fun at(x: Float) = (x - knob) / track
                 down.consume()
-                apply(down.position.x)
+                var fine: Boolean? = null
+                var anchor = 0f
+                var base = 0f
                 drag(down.id) { change ->
                     change.consume()
-                    apply(change.position.x)
+                    if (fine == null && (change.position - down.position).getDistance() > viewConfiguration.touchSlop) {
+                        fine = timing.heldBeforeMoving(change.uptimeMillis, viewConfiguration.longPressTimeoutMillis)
+                        anchor = change.position.x
+                        base = state.selected?.opacity ?: 1f
+                    }
+                    if (fine == true) set(base + (change.position.x - anchor) / track * FINE_FACTOR) else if (fine == false) set(at(change.position.x))
                 }
+                if (fine == null) set(at(down.position.x))
                 state.endGesture()
+                if (fine != null) rulerTip(context)
             }
         },
     ) {

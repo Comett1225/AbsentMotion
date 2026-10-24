@@ -29,7 +29,7 @@ enum class EditorPanel(@StringRes val title: Int) {
 
 data class KeyTarget(val ref: PropRef, val default: String, val type: String = "float")
 
-data class KeypadField(val label: String, val value: Float)
+data class KeypadField(val label: String, val value: Float, val unit: String = "", val min: Float = -Float.MAX_VALUE, val max: Float = Float.MAX_VALUE)
 
 data class KeypadRequest(val fields: List<KeypadField>, val active: Int, val onDone: (List<Float>) -> Unit)
 

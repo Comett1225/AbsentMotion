@@ -76,6 +76,16 @@ import app.absentmotion.ui.editor.panels.ModelPanel
 import app.absentmotion.ui.editor.panels.MoveTransformPanel
 import app.absentmotion.ui.editor.panels.PanelDark
 import app.absentmotion.ui.editor.panels.PanelGreen
+import app.absentmotion.ui.editor.panels.keypadChar
+import app.absentmotion.ui.editor.panels.keypadOutside
+import app.absentmotion.ui.editor.panels.keypadRange
+import app.absentmotion.ui.editor.panels.keypadValue
+import androidx.compose.foundation.focusable
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
+import androidx.compose.ui.input.key.utf16CodePoint
 import app.absentmotion.ui.editor.panels.PanelIcon
 import app.absentmotion.ui.editor.panels.PanelShape
 import app.absentmotion.ui.editor.panels.dimmed
@@ -370,21 +380,37 @@ fun ValueKeypad(request: KeypadRequest, onClose: () -> Unit, modifier: Modifier 
         selected = false
     }
     fun done() {
-        request.onDone(fields.indices.map { texts[it].finiteFloat() ?: fields[it].value })
+        request.onDone(fields.indices.map { keypadValue(texts[it], fields[it].value, fields[it].min, fields[it].max) })
         onClose()
     }
 
     BackHandler(onBack = onClose)
     val silent = remember { MutableInteractionSource() }
-    Column(modifier) {
+    val keys = remember { androidx.compose.ui.focus.FocusRequester() }
+    androidx.compose.runtime.LaunchedEffect(Unit) { runCatching { keys.requestFocus() } }
+    Column(modifier.focusRequester(keys).focusable().onPreviewKeyEvent { event ->
+        if (event.type != androidx.compose.ui.input.key.KeyEventType.KeyDown) return@onPreviewKeyEvent false
+        when (event.key) {
+            androidx.compose.ui.input.key.Key.Backspace -> backspace()
+            androidx.compose.ui.input.key.Key.Enter, androidx.compose.ui.input.key.Key.NumPadEnter -> done()
+            androidx.compose.ui.input.key.Key.Tab -> { active = (active + 1) % fields.size; selected = true }
+            else -> when (val c = keypadChar(event.utf16CodePoint.toChar())) {
+                null -> return@onPreviewKeyEvent false
+                '-' -> flipSign()
+                else -> type(c)
+            }
+        }
+        true
+    }) {
         Box(Modifier.weight(1f).fillMaxWidth().background(Color.Black.copy(alpha = 0.8f)).clickable(silent, null, onClick = onClose))
         Column(Modifier.fillMaxWidth().height(247.dp).background(Am.TimelineBg).clickable(silent, null) {}.padding(horizontal = 6.dp)) {
             Spacer(Modifier.height(7.5.dp))
             Row(Modifier.height(40.dp), Arrangement.spacedBy(5.dp)) {
                 fields.forEachIndexed { i, field ->
                     KeypadBox(
-                        field.label, texts[i], KeypadLabels[i % KeypadLabels.size], i == active, selected,
-                        Modifier.weight(1f),
+                        listOfNotNull(field.label.ifEmpty { null }, keypadRange(field.min, field.max, field.unit).takeIf { fields.size <= 2 }).joinToString("  "),
+                        texts[i] + field.unit, KeypadLabels[i % KeypadLabels.size], i == active, selected,
+                        Modifier.weight(1f), keypadOutside(texts[i], field.min, field.max),
                     ) {
                         active = i
                         selected = true
@@ -402,7 +428,7 @@ private val KeypadLabels get() = listOf(PanelGreen, Am.OnDark, Am.Cool)
 private val KeyShape = RoundedCornerShape(4.dp)
 
 @Composable
-private fun KeypadBox(label: String, text: String, labelColor: Color, active: Boolean, selected: Boolean, modifier: Modifier, onClick: () -> Unit) {
+private fun KeypadBox(label: String, text: String, labelColor: Color, active: Boolean, selected: Boolean, modifier: Modifier, outside: Boolean, onClick: () -> Unit) {
     Box(
         modifier.fillMaxHeight().clip(KeyShape).background(if (active) PanelDark else Am.PanelInset)
             .then(if (active) Modifier.border(1.dp, PanelGreen, KeyShape) else Modifier)
@@ -413,7 +439,7 @@ private fun KeypadBox(label: String, text: String, labelColor: Color, active: Bo
             text,
             Modifier.align(Alignment.BottomEnd).padding(end = 7.dp, bottom = 1.dp)
                 .then(if (active && selected) Modifier.background(Am.CoolDeep) else Modifier),
-            color = Am.OnDark, fontSize = 17.5.sp, maxLines = 1, softWrap = false,
+            color = if (outside) Am.Gold else Am.OnDark, fontSize = 17.5.sp, maxLines = 1, softWrap = false,
         )
     }
 }

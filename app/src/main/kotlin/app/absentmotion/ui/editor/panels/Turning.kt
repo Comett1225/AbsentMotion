@@ -128,7 +128,7 @@ internal fun TurnTab(state: EditorState, layer: Layer, turn: Turn) {
     val labels = listOf(stringResource(R.string.tilt_x_rotation), stringResource(R.string.tilt_y_rotation), stringResource(R.string.tilt_z_rotation))
     fun openKeypad(which: Int) {
         axis = which
-        state.keypad = KeypadRequest(labels.mapIndexed { i, label -> KeypadField(label, values[i]) }, which) { v ->
+        state.keypad = KeypadRequest(labels.mapIndexed { i, label -> KeypadField(label, values[i], "\u00B0") }, which) { v ->
             state.editSelected { turn.withValues(it, v.toFloatArray()) }
         }
     }

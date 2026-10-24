@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.view.GestureDetector
+import android.view.HapticFeedbackConstants
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewConfiguration
@@ -27,12 +28,12 @@ import app.absentmotion.ui.theme.Am
 internal fun EffectRuler(
     value: Float, step: Float, min: Float, max: Float, enabled: Boolean,
     onStart: () -> Unit, onValue: (Float) -> Unit, onEnd: () -> Unit,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier, default: Float? = null,
 ) {
     val scope = rememberCoroutineScope()
     AndroidView(modifier = modifier, factory = { EffectRulerView(it, scope) },
         onRelease = { it.stop() },
-        update = { it.configure(value, step, min, max, enabled, onStart, onValue, onEnd) })
+        update = { it.configure(value, step, min, max, enabled, onStart, onValue, onEnd, default) })
 }
 
 private class EffectRulerView(context: Context, private val scope: CoroutineScope) : View(context) {
@@ -56,6 +57,9 @@ private class EffectRulerView(context: Context, private val scope: CoroutineScop
     private var end: () -> Unit = {}
     private var downX = 0f
     private var downY = 0f
+    private var fine = false
+    private var fineX = 0f
+    private var reset: Float? = null
     private val interceptSlop = ViewConfiguration.get(context).scaledTouchSlop * 3 / 4
 
     private val detector = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
@@ -64,6 +68,25 @@ private class EffectRulerView(context: Context, private val scope: CoroutineScop
             stop()
             downX = e.rawX
             downY = e.rawY
+            return true
+        }
+
+        override fun onLongPress(e: MotionEvent) {
+            if (!isEnabled) return
+            fine = true
+            fineX = e.x
+            begin()
+            performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+            invalidate()
+        }
+
+        override fun onDoubleTap(e: MotionEvent): Boolean {
+            val value = reset ?: return false
+            stop()
+            start()
+            change(value.coerceIn(low * step, high * step))
+            end()
+            performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
             return true
         }
 
@@ -96,11 +119,11 @@ private class EffectRulerView(context: Context, private val scope: CoroutineScop
             job.start()
             return true
         }
-    }).apply { setIsLongpressEnabled(false) }
+    })
 
     fun configure(value: Float, step: Float, min: Float, max: Float, enabled: Boolean,
-                  onStart: () -> Unit, onValue: (Float) -> Unit, onEnd: () -> Unit) {
-        start = onStart; change = onValue; end = onEnd
+                  onStart: () -> Unit, onValue: (Float) -> Unit, onEnd: () -> Unit, default: Float? = null) {
+        start = onStart; change = onValue; end = onEnd; reset = default
         this.step = step.takeIf { it > 0f } ?: 1f
         low = tick(min); high = tick(max)
         isEnabled = enabled
@@ -155,10 +178,17 @@ private class EffectRulerView(context: Context, private val scope: CoroutineScop
         if (!isEnabled) return false
         if (event.actionMasked == MotionEvent.ACTION_MOVE && abs(event.rawX - downX) > interceptSlop &&
             abs(event.rawX - downX) > abs(event.rawY - downY)) parent?.requestDisallowInterceptTouchEvent(true)
+        if (fine && event.actionMasked == MotionEvent.ACTION_MOVE) {
+            move(position + (fineX - event.x) * FINE_FACTOR)
+            fineX = event.x
+        }
         detector.onTouchEvent(event)
         if ((event.actionMasked == MotionEvent.ACTION_UP || event.actionMasked == MotionEvent.ACTION_CANCEL) && fling == null) {
+            if (fine) { fine = false; invalidate() }
+            val dragged = tracking
             settle()
             finish()
+            if (dragged) rulerTip(context)
         }
         return true
     }
@@ -180,8 +210,8 @@ private class EffectRulerView(context: Context, private val scope: CoroutineScop
             canvas.drawLine(x, inset, x, height - inset, paint)
         }
         val needle = centerTick * spacing - phase(spacing)
-        paint.color = Am.AccentGlow.toArgb()
-        paint.strokeWidth = needleWidth
+        paint.color = (if (fine) Am.Gold else Am.AccentGlow).toArgb()
+        paint.strokeWidth = if (fine) needleWidth * 2 else needleWidth
         canvas.drawLine(needle, 0f, needle, height.toFloat(), paint)
     }
 

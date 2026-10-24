@@ -35,6 +35,7 @@ import app.absentmotion.ui.editor.panels.ColorPicker
 import app.absentmotion.ui.editor.panels.ColourSwatch
 import app.absentmotion.ui.editor.panels.ThinSlider
 import app.absentmotion.ui.theme.Am
+import app.absentmotion.ui.editor.panels.askNumber
 import app.absentmotion.ui.theme.Swap
 import app.absentmotion.ui.theme.enterFade
 import kotlin.math.roundToInt
@@ -101,10 +102,18 @@ internal fun TextEditor(state: EditorState) {
                 when (popup) {
                     "size" -> {
                         val index = TextSizes.indexOfFirst { it >= layer.textSize.roundToInt() }.let { if (it < 0) TextSizes.lastIndex else it }
-                        ThinSlider(index.toFloat(), { value -> state.editSelected("text-size") { it.withTextSize(TextSizes[value.roundToInt()].toFloat()) } },
-                            Modifier.padding(top = 42.dp).fillMaxWidth().height(40.dp).background(TextControl).padding(horizontal = 9.dp),
-                            valueRange = 0f..TextSizes.lastIndex.toFloat(),
-                            onValueChangeFinished = { state.endGesture() })
+                        Row(Modifier.padding(top = 42.dp).fillMaxWidth().height(40.dp).background(TextControl), verticalAlignment = Alignment.CenterVertically) {
+                            Box(Modifier.padding(start = 6.dp).width(54.dp).height(30.dp).background(Am.Field, RoundedCornerShape(4.dp)).clickable {
+                                keyboard?.hide()
+                                state.askNumber("", layer.textSize, "", 1f, 1000f) { v -> state.editSelected { it.withTextSize(v) } }
+                            }, contentAlignment = Alignment.Center) {
+                                Text(app.absentmotion.ui.editor.panels.formatPlain(layer.textSize), color = Am.Accent, fontSize = 14.sp, maxLines = 1, softWrap = false)
+                            }
+                            ThinSlider(index.toFloat(), { value -> state.editSelected("text-size") { it.withTextSize(TextSizes[value.roundToInt()].toFloat()) } },
+                                Modifier.weight(1f).padding(horizontal = 9.dp),
+                                valueRange = 0f..TextSizes.lastIndex.toFloat(),
+                                onValueChangeFinished = { state.endGesture() })
+                        }
                     }
                     "font" -> FontStrip(library, layer.font, Modifier.padding(top = 42.dp),
                         onPick = { name -> library.remember(name); state.editSelected { it.withFont(name) } },
@@ -114,6 +123,7 @@ internal fun TextEditor(state: EditorState) {
             }
         }
     }
+        state.keypad?.let { ValueKeypad(it, onClose = { state.keypad = null }, Modifier.fillMaxSize()) }
 }
 
 @Composable

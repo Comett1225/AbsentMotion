@@ -1109,6 +1109,7 @@
     <string name="audio_param_threshold">Threshold</string>
     <string name="audio_param_ratio">Ratio</string>
     <string name="audio_param_attack">Attack</string>
+    <string name="ruler_tip">Tip: hold a ruler or pad for a moment before dragging to adjust in fine steps. Double-tap it to reset.</string>
     <string name="audio_param_release">Release</string>
     <string name="audio_param_knee">Knee</string>
     <string name="audio_param_makeup">Makeup</string>

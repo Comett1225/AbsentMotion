@@ -95,15 +95,19 @@ private fun PositionTab(state: EditorState, layer: Layer) {
     val now by rememberUpdatedState(layer)
     val tick = rememberHaptic(state)
     DisposableEffect(Unit) { onDispose { state.snapGuides = emptyList() } }
+    val timing = remember { LongArray(2) }
+    val context = androidx.compose.ui.platform.LocalContext.current
     Box(
-        Modifier.fillMaxSize().pointerInput(state) {
+        Modifier.fillMaxSize().holdAndDoubleTap(timing, null).pointerInput(state) {
             var axes = SnapAxis(emptyList()) to SnapAxis(emptyList())
             var origin = now.location
             var travel = Offset.Zero
             var shown = Offset.Zero
-            fun done() { state.snapGuides = emptyList(); state.endGesture() }
+            var scale = 1f
+            fun done() { state.snapGuides = emptyList(); state.endGesture(); rulerTip(context) }
             detectDragGestures(
                 onDragStart = {
+                    scale = if (timing.heldBeforeMoving(android.os.SystemClock.uptimeMillis(), viewConfiguration.longPressTimeoutMillis)) FINE_FACTOR else 1f
                     axes = start(); origin = now.location; travel = Offset.Zero; shown = Offset.Zero
                     state.snapGuides = if (deep) emptyList() else axes.first.guidesAt(0f) + axes.second.guidesAt(0f)
                 },
@@ -111,11 +115,11 @@ private fun PositionTab(state: EditorState, layer: Layer) {
             ) { change, drag ->
                 change.consume()
                 if (deep) {
-                    travel += drag
+                    travel += drag * scale
                     state.editSelected(key = "move-z") { l -> l.withTransform("location", origin[0], origin[1], origin[2] - travel.y) }
                     return@detectDragGestures
                 }
-                travel += drag / density
+                travel += drag / density * scale
                 val snapped = Offset(axes.first.map(travel.x), axes.second.map(travel.y))
                 val step = snapped - shown
                 shown = snapped
@@ -246,21 +250,27 @@ private fun DrawScope.corner(xPx: Float, yPx: Float, dx: Float, dy: Float) {
 @Composable
 private fun RotationTab(state: EditorState, layer: Layer) {
     val angle = layer.rotation
+    val timing = remember { LongArray(2) }
+    val context = androidx.compose.ui.platform.LocalContext.current
     Box(
-        Modifier.fillMaxSize().pointerInput(state) {
+        Modifier.fillMaxSize().holdAndDoubleTap(timing) { state.editSelected { it.withRotation(0f) } }.pointerInput(state) {
             awaitEachGesture {
                 val down = awaitFirstDown()
                 val centre = Offset(size.width / 2f, size.height / 2f)
                 var last = dialAngle(down.position - centre)
+                var fine: Boolean? = null
                 drag(down.id) { change ->
+                    if (fine == null && (change.position - down.position).getDistance() > viewConfiguration.touchSlop) fine = timing.heldBeforeMoving(change.uptimeMillis, viewConfiguration.longPressTimeoutMillis)
                     val now = dialAngle(change.position - centre)
                     var delta = now - last
                     if (delta > 180f) delta -= 360f else if (delta < -180f) delta += 360f
                     last = now
                     change.consume()
+                    if (fine == true) delta *= FINE_FACTOR
                     if (delta != 0f) state.editSelected(key = "rotate") { l -> l.withRotation(l.rotation + delta) }
                 }
                 state.endGesture()
+                if (fine != null) rulerTip(context)
             }
         },
     ) {
@@ -279,7 +289,7 @@ private fun RotationTab(state: EditorState, layer: Layer) {
         }
         Box(
             Modifier.align(Alignment.Center).size(267.px, 140.px).clip(PanelShape).background(Am.Field).clickable {
-                state.keypad = KeypadRequest(listOf(KeypadField(ROTATION_LABEL, angle)), 0) { v ->
+                state.keypad = KeypadRequest(listOf(KeypadField(ROTATION_LABEL, angle, "\u00B0")), 0) { v ->
                     state.editSelected { it.withRotation(v[0]) }
                 }
             },
@@ -380,6 +390,12 @@ private fun SizeTab(state: EditorState, layer: Layer) {
                         drag[2] = 0f
                     },
                     fling = false,
+                    onReset = {
+                        state.editSelected { l ->
+                            val s = l.scale
+                            l.withTransform("scale", if (linked || which == 0) 1f else s[0], if (linked || which == 1) 1f else s[1])
+                        }
+                    },
                 )
             }
         }
@@ -394,7 +410,7 @@ private fun SkewTab(state: EditorState, layer: Layer) {
     val ySkew = stringResource(R.string.transform_y_skew)
     fun openKeypad(which: Int) {
         active = which
-        val fields = listOf(KeypadField(xSkew, skew[0]), KeypadField(ySkew, skew[1]))
+        val fields = listOf(KeypadField(xSkew, skew[0], "\u00B0"), KeypadField(ySkew, skew[1], "\u00B0"))
         state.keypad = KeypadRequest(fields, which) { v -> state.editSelected { it.withSkew(v[0], v[1]) } }
     }
     fun colour(which: Int) = if (active == which) Am.Accent else Am.OnDark
@@ -425,6 +441,7 @@ private fun SkewTab(state: EditorState, layer: Layer) {
                 onEnd = { state.endGesture() },
                 modifier = Modifier.padding(top = (if (which == 0) 137 else 345).px).fillMaxWidth().height((if (which == 0) 194 else 193).px),
                 onStart = { active = which },
+                onReset = { state.editSelected { l -> l.skew.let { s -> l.withSkew(if (which == 0) 0f else s[0], if (which == 1) 0f else s[1]) } } },
             )
         }
     }
@@ -440,7 +457,7 @@ private fun TiltTab(state: EditorState, layer: Layer, turn: Turn?) {
     val labels = listOf(stringResource(R.string.tilt_x_rotation), stringResource(R.string.tilt_y_rotation))
     fun openKeypad(which: Int) {
         active = which
-        state.keypad = KeypadRequest(labels.mapIndexed { i, label -> KeypadField(label, tilt[i]) }, which) { v -> state.editSelected { it.withTilt(v[0], v[1]) } }
+        state.keypad = KeypadRequest(labels.mapIndexed { i, label -> KeypadField(label, tilt[i], "\u00B0") }, which) { v -> state.editSelected { it.withTilt(v[0], v[1]) } }
     }
     fun colour(which: Int) = if (active == which) Am.Accent else Am.OnDark
 
@@ -470,6 +487,7 @@ private fun TiltTab(state: EditorState, layer: Layer, turn: Turn?) {
                 onEnd = { state.endGesture() },
                 modifier = Modifier.padding(top = (if (which == 0) 137 else 345).px).fillMaxWidth().height((if (which == 0) 194 else 193).px),
                 onStart = { active = which },
+                onReset = { state.editSelected { l -> l.tilt.let { t -> l.withTilt(if (which == 0) 0f else t[0], if (which == 1) 0f else t[1]) } } },
             )
         }
     }

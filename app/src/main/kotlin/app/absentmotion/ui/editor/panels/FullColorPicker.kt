@@ -100,7 +100,7 @@ internal fun FullColorPicker(state: EditorState, request: FullColor, modifier: M
     fun setHsva(h: Hsva) { held = h; setArgb(h.toArgb(), true) }
     fun enterHex() {
         val shifts = intArrayOf(16, 8, 0, 24)
-        keypad = KeypadRequest(listOf("R", "G", "B", "A").mapIndexed { i, l -> KeypadField(l, ((argb ushr shifts[i]) and 255).toFloat()) }, 0) { v ->
+        keypad = KeypadRequest(listOf("R", "G", "B", "A").mapIndexed { i, l -> KeypadField(l, ((argb ushr shifts[i]) and 255).toFloat(), "", 0f, 255f) }, 0) { v ->
             setArgb(v.indices.fold(0) { out, i -> out or (v[i].roundToInt().coerceIn(0, 255) shl shifts[i]) }, false)
         }
     }

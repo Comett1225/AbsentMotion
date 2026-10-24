@@ -86,6 +86,7 @@ internal fun EffectNumbers(state: EditorState, param: EffectParam, raw: String, 
     val parsed = raw.split(',').map { it.trim().finiteFloat() ?: 0f }
     fun stored(v: List<Float>) = v.joinToString(",")
     val values = List(count) { parsed.getOrElse(it) { 0f } }
+    val defaults = param.default.split(',').map { it.trim().finiteFloat() }
     var component by remember(param.id) { mutableIntStateOf(0) }
     val latest by rememberUpdatedState(values)
     val percent = param.percent
@@ -98,7 +99,7 @@ internal fun EffectNumbers(state: EditorState, param: EffectParam, raw: String, 
     val decimals = param.step.toBigDecimal().stripTrailingZeros().scale().coerceAtLeast(0).let { if (percent) (it - 2).coerceAtLeast(0) else it }
     val unit = if (percent) "%" else if (param.kind == "angle") "°" else param.unit
     fun keypad(index: Int) {
-        state.keypad = KeypadRequest(values.mapIndexed { i, v -> KeypadField(if (count == 1) param.label else listOf("X", "Y")[i], v * factor) }, index) { next ->
+        state.keypad = KeypadRequest(values.mapIndexed { i, v -> KeypadField(if (count == 1) param.label else listOf("X", "Y")[i], v * factor, unit, param.min * factor, param.max * factor) }, index) { next ->
             set(stored(next.map { v -> (v/factor).coerceIn(param.min, param.max) }), false)
         }
     }
@@ -113,7 +114,7 @@ internal fun EffectNumbers(state: EditorState, param: EffectParam, raw: String, 
                 key(param.id) {
                     EffectRuler(values[0], param.step, param.min, param.max, enabled,
                         select, { adjust(it, true) }, state::endGesture,
-                        Modifier.matchParentSize().padding(end = 45.dp, top = .5.dp, bottom = .5.dp))
+                        Modifier.matchParentSize().padding(end = 45.dp, top = .5.dp, bottom = .5.dp), defaults.getOrNull(0))
                 }
                 ValueBox(formatFixed(values[0] * factor, decimals) + unit, false, false,
                     Modifier.align(Alignment.CenterEnd).padding(end = 2.dp).width(56.dp).height(45.dp), 8f, enabled) { tap(0) }
@@ -122,7 +123,7 @@ internal fun EffectNumbers(state: EditorState, param: EffectParam, raw: String, 
         }
         key(param.id, component) {
             EffectRuler(values[component], param.step, param.min, param.max, enabled,
-                select, { adjust(it, true) }, state::endGesture, Modifier.weight(1f).fillMaxHeight())
+                select, { adjust(it, true) }, state::endGesture, Modifier.weight(1f).fillMaxHeight(), defaults.getOrNull(component))
         }
         Column(Modifier.padding(horizontal = 2.dp, vertical = 4.dp).fillMaxHeight(), Arrangement.spacedBy(2.dp)) {
             values.forEachIndexed { i, value ->
@@ -183,7 +184,7 @@ private fun EffectColor(state: EditorState, param: EffectParam, raw: String, ena
             Box(Modifier.weight(1f).fillMaxHeight().padding(5.dp).clip(PanelShape).background(Color(color)).clickable(enabled = enabled) { select(); expanded = !expanded })
             Text(raw.uppercase(), Modifier.width(82.dp).clickable(enabled = enabled) {
                 select()
-                state.keypad = KeypadRequest(listOf("R", "G", "B", "A").mapIndexed { i, label -> KeypadField(label, ((color ushr intArrayOf(16,8,0,24)[i]) and 255).toFloat()) }, 0) { next ->
+                state.keypad = KeypadRequest(listOf("R", "G", "B", "A").mapIndexed { i, label -> KeypadField(label, ((color ushr intArrayOf(16,8,0,24)[i]) and 255).toFloat(), "", 0f, 255f) }, 0) { next ->
                     var out = 0
                     next.forEachIndexed { i, value -> out = out or (value.roundToInt().coerceIn(0,255) shl intArrayOf(16,8,0,24)[i]) }
                     set(formatColor(out))

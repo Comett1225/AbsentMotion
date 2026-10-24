@@ -67,8 +67,8 @@ internal fun EditorState.setNumber(ref: PropRef, value: Float, key: Any? = null)
 internal fun EditorState.setColour(ref: PropRef, argb: Int, key: Any? = null) =
     editSelected(key) { it.withValue(ref, String.format(Locale.US, "#%08x", argb)) }
 
-internal fun EditorState.askNumber(label: String, value: Float, onDone: (Float) -> Unit) {
-    keypad = KeypadRequest(listOf(KeypadField(label, value)), 0) { onDone(it[0]) }
+internal fun EditorState.askNumber(label: String, value: Float, unit: String = "", min: Float = -Float.MAX_VALUE, max: Float = Float.MAX_VALUE, onDone: (Float) -> Unit) {
+    keypad = KeypadRequest(listOf(KeypadField(label, value, unit, min, max)), 0) { onDone(it[0]) }
 }
 
 @Composable
