@@ -215,7 +215,7 @@ private fun StrokeTab(state: EditorState, layer: Layer) {
         }
         Box(Modifier.at(0, 119, 721, 160)) {
             EffectRuler(s.width, 0.1f, 0f, 10000f, on, { strokeField = 0 }, { state.setRow(StrokeSize, "$it", true) }, state::endGesture,
-                Modifier.fillMaxSize().padding(end = 104.px))
+                Modifier.fillMaxSize().padding(end = 104.px), vibrate = state.settings.vibration)
             ValueBox(formatFixed(s.width, 1), false, strokeField == 0, Modifier.align(Alignment.CenterEnd).size(155.px, 127.px), 8f, on) {
                 if (strokeField == 0) state.askNumber("", s.width, "", 0f, 10000f) { v -> state.setRow(StrokeSize, "${v.coerceAtLeast(0f)}", false) } else strokeField = 0
             }

@@ -148,9 +148,9 @@ fun SettingsDrawer(settings: AppSettings, drawer: androidx.compose.material3.Dra
             Spacer(Modifier.height(CardGap))
             LinkRow(stringResource(R.string.settings_help)) { help = true }
             Spacer(Modifier.height(CardGap))
-            LinkRow(stringResource(R.string.settings_about)) { about = true }
             app.absentmotion.ui.tutorial.TutorialRows(settings)
             Spacer(Modifier.height(CardGap))
+            LinkRow(stringResource(R.string.settings_about)) { about = true }
             Spacer(Modifier.height(CardGap))
             UpdateRows(settings) { crashLogs = true }
         }

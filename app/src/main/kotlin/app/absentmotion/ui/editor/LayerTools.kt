@@ -76,7 +76,6 @@ import app.absentmotion.ui.editor.panels.EditShapePanel
 import app.absentmotion.ui.editor.panels.ModelPanel
 import app.absentmotion.ui.editor.panels.MoveTransformPanel
 import app.absentmotion.ui.editor.panels.PanelDark
-import app.absentmotion.ui.editor.panels.PanelGreen
 import app.absentmotion.ui.editor.panels.keypadChar
 import app.absentmotion.ui.editor.panels.keypadOutside
 import app.absentmotion.ui.editor.panels.keypadRange
@@ -87,6 +86,7 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.key.utf16CodePoint
+import app.absentmotion.ui.editor.panels.PanelGreen
 import app.absentmotion.ui.editor.panels.PanelIcon
 import app.absentmotion.ui.editor.panels.PanelShape
 import app.absentmotion.ui.editor.panels.dimmed

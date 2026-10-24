@@ -114,7 +114,7 @@ internal fun EffectNumbers(state: EditorState, param: EffectParam, raw: String, 
                 key(param.id) {
                     EffectRuler(values[0], param.step, param.min, param.max, enabled,
                         select, { adjust(it, true) }, state::endGesture,
-                        Modifier.matchParentSize().padding(end = 45.dp, top = .5.dp, bottom = .5.dp), defaults.getOrNull(0))
+                        Modifier.matchParentSize().padding(end = 45.dp, top = .5.dp, bottom = .5.dp), defaults.getOrNull(0), state.settings.vibration)
                 }
                 ValueBox(formatFixed(values[0] * factor, decimals) + unit, false, false,
                     Modifier.align(Alignment.CenterEnd).padding(end = 2.dp).width(56.dp).height(45.dp), 8f, enabled) { tap(0) }
@@ -123,7 +123,7 @@ internal fun EffectNumbers(state: EditorState, param: EffectParam, raw: String, 
         }
         key(param.id, component) {
             EffectRuler(values[component], param.step, param.min, param.max, enabled,
-                select, { adjust(it, true) }, state::endGesture, Modifier.weight(1f).fillMaxHeight(), defaults.getOrNull(component))
+                select, { adjust(it, true) }, state::endGesture, Modifier.weight(1f).fillMaxHeight(), defaults.getOrNull(component), state.settings.vibration)
         }
         Column(Modifier.padding(horizontal = 2.dp, vertical = 4.dp).fillMaxHeight(), Arrangement.spacedBy(2.dp)) {
             values.forEachIndexed { i, value ->

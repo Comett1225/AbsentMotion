@@ -98,7 +98,7 @@ internal fun RenderPreviewButton(state: EditorState, modifier: Modifier) {
             onLongClick = {
                 if (phase == PreviewCache.Phase.Ready) {
                     PreviewCache.clear()
-                    Toast.makeText(context, context.getString(R.string.preview_cache_removed), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, app.absentmotion.i18n.AppText.get(R.string.preview_cache_removed), Toast.LENGTH_SHORT).show()
                 }
             },
             onClick = {

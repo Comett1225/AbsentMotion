@@ -591,6 +591,8 @@
     <string name="export_error_encoder_busy">This phone\'s video encoder is busy or cannot make this size. Try a lower resolution or frame rate.</string>
     <string name="export_error_codec_busy">The phone\'s video decoder or encoder stopped working. Close other apps that play or record video, then try again.</string>
     <string name="export_note_software">The phone\'s video encoder is busy, so this export uses the slower software encoder.</string>
+    <string name="export_note_retry">The video encoder stopped working. Trying again with another encoder.</string>
+    <string name="export_error_stalled">The export made no progress for %1$s seconds, so it was stopped. A media file or the phone\'s video encoder stopped responding. Close other apps that use video and try again.</string>
     <string name="export_error_draw_frame">Frame %1$s could not be drawn. Try exporting again.</string>
     <string name="export_error_draw_still">The engine could not draw the frame</string>
     <string name="export_error_no_sound">This project has no sound to export. Add music, a sound or a video with sound first.</string>
@@ -655,8 +657,6 @@
 
     <string name="audiotab_search_hint">Search music and sounds</string>
     <string name="audiotab_add">Add</string>
-
-    <string name="audiofx_unknown_effect">Unknown effect</string>
     <string name="sounds_title">Sounds</string>
     <string name="sounds_from_files">From Files</string>
     <string name="sounds_choose_files">Choose audio from Files</string>
@@ -668,8 +668,6 @@
     <string name="sounds_order_za">Z to A</string>
     <string name="sounds_order_newest">Newest first</string>
     <string name="sounds_order_oldest">Oldest first</string>
-    <string name="export_note_retry">The video encoder stopped working. Trying again with another encoder.</string>
-    <string name="export_error_stalled">The export made no progress for %1$s seconds, so it was stopped. A media file or the phone\'s video encoder stopped responding. Close other apps that use video and try again.</string>
     <string name="sounds_order_shortest">Shortest first</string>
     <string name="sounds_order_longest">Longest first</string>
     <string name="sounds_tab_songs">Songs</string>
@@ -686,6 +684,8 @@
     <string name="sounds_empty">No music or sounds were found on this device.</string>
     <string name="sounds_permission_body">Allow access to music and audio to see your sounds here. From Files works without it.</string>
     <string name="sounds_permission_allow">Allow Access</string>
+
+    <string name="audiofx_unknown_effect">Unknown effect</string>
     <string name="audiofx_turn_on">Turn on</string>
     <string name="audiofx_bypass">Bypass</string>
     <string name="audiofx_reorder">Reorder</string>
@@ -807,6 +807,15 @@
     <string name="menu_custom_aspect_ratio">Custom aspect ratio</string>
     <string name="font_import_failed_title">Import Failed</string>
     <string name="font_import_failed_body">The following fonts could not be imported.\n\nThis can happen if a file is not a font, or is a font format that your operating system does not support.\n\n%1$s</string>
+    <string name="font_import_some_failed_title">Some fonts were not imported</string>
+    <string name="font_import_reasons_body">These files were not imported:\n\n%1$s</string>
+    <string name="font_import_reason_line">%1$s: %2$s</string>
+    <string name="font_reason_not_font">not a font file</string>
+    <string name="font_reason_unsupported">this font format is not supported. Use TTF, OTF, TTC or WOFF.</string>
+    <string name="font_reason_too_large">the file is larger than 32 MB</string>
+    <string name="font_reason_duplicate">this font is already imported</string>
+    <string name="font_reason_corrupted">the font file is damaged</string>
+    <string name="font_reason_unreadable">the file could not be opened</string>
     <string name="font_load_failed_title">Could not load font</string>
     <string name="font_load_failed_body">That font couldn\'t be loaded. Check your internet connection and try again.</string>
     <string name="font_title_language">%1$s Fonts</string>
@@ -886,15 +895,6 @@
     <string name="preset_deleted">Preset deleted</string>
     <string name="preset_rename_failed">Could not rename the preset</string>
     <string name="search_hint">Search</string>
-    <string name="font_import_some_failed_title">Some fonts were not imported</string>
-    <string name="font_import_reasons_body">These files were not imported:\n\n%1$s</string>
-    <string name="font_import_reason_line">%1$s: %2$s</string>
-    <string name="font_reason_not_font">not a font file</string>
-    <string name="font_reason_unsupported">this font format is not supported. Use TTF, OTF, TTC or WOFF.</string>
-    <string name="font_reason_too_large">the file is larger than 32 MB</string>
-    <string name="font_reason_duplicate">this font is already imported</string>
-    <string name="font_reason_corrupted">the font file is damaged</string>
-    <string name="font_reason_unreadable">the file could not be opened</string>
     <string name="search_clear">Clear search</string>
     <string name="search_no_sounds">No sounds match “%1$s”</string>
     <string name="search_no_assets_or_projects">No assets or projects match “%1$s”</string>
@@ -1114,6 +1114,7 @@
     <string name="transform_width">Width</string>
     <string name="transform_height">Height</string>
     <string name="transform_x_skew">X SKEW</string>
+    <string name="ruler_tip">Tip: hold a ruler or pad for a moment before dragging to adjust in fine steps. Double-tap it to reset.</string>
     <string name="transform_y_skew">Y SKEW</string>
     <string name="aibrowser_retry">Retry</string>
     <string name="aibrowser_size_small">Small</string>
@@ -1193,7 +1194,6 @@
     <string name="audio_param_threshold">Threshold</string>
     <string name="audio_param_ratio">Ratio</string>
     <string name="audio_param_attack">Attack</string>
-    <string name="ruler_tip">Tip: hold a ruler or pad for a moment before dragging to adjust in fine steps. Double-tap it to reset.</string>
     <string name="audio_param_release">Release</string>
     <string name="audio_param_knee">Knee</string>
     <string name="audio_param_makeup">Makeup</string>

@@ -35,8 +35,8 @@ import app.absentmotion.model.*
 import app.absentmotion.ui.editor.panels.ColorPicker
 import app.absentmotion.ui.editor.panels.ColourSwatch
 import app.absentmotion.ui.editor.panels.ThinSlider
-import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.editor.panels.askNumber
+import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Swap
 import app.absentmotion.ui.theme.enterFade
 import kotlin.math.roundToInt
@@ -123,8 +123,8 @@ internal fun TextEditor(state: EditorState) {
                 }
             }
         }
-    }
         state.keypad?.let { ValueKeypad(it, onClose = { state.keypad = null }, Modifier.fillMaxSize()) }
+    }
 }
 
 @Composable

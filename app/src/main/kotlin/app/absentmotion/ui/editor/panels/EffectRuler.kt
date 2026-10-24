@@ -28,12 +28,12 @@ import app.absentmotion.ui.theme.Am
 internal fun EffectRuler(
     value: Float, step: Float, min: Float, max: Float, enabled: Boolean,
     onStart: () -> Unit, onValue: (Float) -> Unit, onEnd: () -> Unit,
-    modifier: Modifier = Modifier, default: Float? = null,
+    modifier: Modifier = Modifier, default: Float? = null, vibrate: Boolean = true,
 ) {
     val scope = rememberCoroutineScope()
     AndroidView(modifier = modifier, factory = { EffectRulerView(it, scope) },
         onRelease = { it.stop() },
-        update = { it.configure(value, step, min, max, enabled, onStart, onValue, onEnd, default) })
+        update = { it.configure(value, step, min, max, enabled, onStart, onValue, onEnd, default, vibrate) })
 }
 
 private class EffectRulerView(context: Context, private val scope: CoroutineScope) : View(context) {
@@ -60,6 +60,7 @@ private class EffectRulerView(context: Context, private val scope: CoroutineScop
     private var fine = false
     private var fineX = 0f
     private var reset: Float? = null
+    private var vibrate = true
     private var tapUp = 0L
     private val interceptSlop = ViewConfiguration.get(context).scaledTouchSlop * 3 / 4
 
@@ -77,7 +78,7 @@ private class EffectRulerView(context: Context, private val scope: CoroutineScop
             fine = true
             fineX = e.x
             begin()
-            performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+            if (vibrate) performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
             invalidate()
         }
 
@@ -113,7 +114,8 @@ private class EffectRulerView(context: Context, private val scope: CoroutineScop
     })
 
     fun configure(value: Float, step: Float, min: Float, max: Float, enabled: Boolean,
-                  onStart: () -> Unit, onValue: (Float) -> Unit, onEnd: () -> Unit, default: Float? = null) {
+                  onStart: () -> Unit, onValue: (Float) -> Unit, onEnd: () -> Unit, default: Float? = null, vibrate: Boolean = true) {
+        this.vibrate = vibrate
         start = onStart; change = onValue; end = onEnd; reset = default
         this.step = step.takeIf { it > 0f } ?: 1f
         low = tick(min); high = tick(max)
@@ -174,7 +176,7 @@ private class EffectRulerView(context: Context, private val scope: CoroutineScop
             start()
             change(value.coerceIn(low * step, high * step))
             end()
-            performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+            if (vibrate) performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
             return true
         }
         if (event.actionMasked == MotionEvent.ACTION_MOVE && abs(event.rawX - downX) > interceptSlop &&

@@ -111,6 +111,8 @@ internal object RulerMath {
     fun travel(tickShiftPx: Float, density: Float): Float = -tickShiftPx / density
 }
 
+internal val LocalVibration = androidx.compose.runtime.compositionLocalOf { true }
+
 @Composable
 internal fun RulerSpinner(
     lineColor: Color,
@@ -125,6 +127,7 @@ internal fun RulerSpinner(
 ) {
     val wheelDensity = androidx.compose.ui.platform.LocalDensity.current.density
     val haptics = androidx.compose.ui.platform.LocalHapticFeedback.current
+    val vibrate by rememberUpdatedState(LocalVibration.current)
     val context = androidx.compose.ui.platform.LocalContext.current
     var shift by remember { mutableFloatStateOf(0f) }
     var fine by remember { androidx.compose.runtime.mutableStateOf(false) }
@@ -151,7 +154,7 @@ internal fun RulerSpinner(
                     lastTap[0] = 0L
                     down.consume()
                     started(); undo(); ended()
-                    haptics.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
+                    if (vibrate) haptics.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
                     return@awaitEachGesture
                 }
                 val tracker = VelocityTracker().apply { addPointerInputChange(down) }
@@ -161,7 +164,7 @@ internal fun RulerSpinner(
                 }
                 if (waited) {
                     fine = true
-                    haptics.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+                    if (vibrate) haptics.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
                     if (!running[0]) { started(); running[0] = true }
                     horizontalDrag(down.id) { c ->
                         val dx = c.positionChange().x * FINE_FACTOR

@@ -128,7 +128,7 @@ internal fun AudioTab(state: EditorState, modifier: Modifier, library: AddLibrar
             try {
                 for (uri in uris) {
                     val media = audioDeclaration(context, uri)?.let { state.keepCopy(context, it) }
-                    if (media == null || media.duration <= 0) android.widget.Toast.makeText(context, context.getString(R.string.library_err_unsupported_type), android.widget.Toast.LENGTH_LONG).show()
+                    if (media == null || media.duration <= 0) android.widget.Toast.makeText(context, app.absentmotion.i18n.AppText.get(R.string.library_err_unsupported_type), android.widget.Toast.LENGTH_LONG).show()
                     else state.addAudio(media)
                 }
             } finally { state.addingMedia = false }

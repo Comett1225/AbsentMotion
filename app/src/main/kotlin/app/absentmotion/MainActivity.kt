@@ -223,7 +223,7 @@ class MainActivity : ComponentActivity() {
                         if (embed != null) TemplateEditor(embed, engine, settings, onClose = { endEmbed(open) }) { scene -> embedTemplate(open, scene) }
                         else {
                             val screen = LocalConfiguration.current
-                            CompositionLocalProvider(LocalWide provides wideEditor(screen.smallestScreenWidthDp, screen.screenWidthDp)) {
+                            CompositionLocalProvider(LocalWide provides wideEditor(screen.smallestScreenWidthDp, screen.screenWidthDp), app.absentmotion.ui.editor.panels.LocalVibration provides settings.vibration) {
                                 key(open) { Ltr { EditorScreen(open, onExit = ::closeEditor) } }
                             }
                         }
@@ -270,14 +270,14 @@ class MainActivity : ComponentActivity() {
                 ) else if (open == null && first == null && !opening && editingTemplate == null && exportingFromList == null) {
                     if (settings.updatesAsked) UpdateDialog() else UpdateAskDialog(settings)
                 }
-            }
-        }
-        Log.i("AMStart", "onCreate took ${SystemClock.elapsedRealtime() - started} ms")
                 app.absentmotion.ui.tutorial.TutorialHost(
                     open, store, settings,
                     homeFree = open == null && first == null && !opening && editingTemplate == null && exportingFromList == null && offer == null && crashed == null && !problemShown,
                     onOpen = ::open, onCloseEditor = ::closeEditor, onChanged = { projectsChanged++ },
                 )
+            }
+        }
+        Log.i("AMStart", "onCreate took ${SystemClock.elapsedRealtime() - started} ms")
         androidx.core.view.OneShotPreDrawListener.add(window.decorView) { Log.i("AMStart", "first frame after ${SystemClock.elapsedRealtime() - started} ms") }
     }
 
@@ -572,16 +572,16 @@ class MainActivity : ComponentActivity() {
         if (requestedOrientation != wanted) requestedOrientation = wanted
     }
 
-    override fun onNewIntent(intent: Intent) {
-        super.onNewIntent(intent)
-        importShared()
-        TestHooks.newIntent(this, intent)
     @Suppress("OVERRIDE_DEPRECATION", "DEPRECATION")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         app.absentmotion.ui.tutorial.Tutorial.pickerClosed(resultCode == RESULT_OK)
     }
 
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        importShared()
+        TestHooks.newIntent(this, intent)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

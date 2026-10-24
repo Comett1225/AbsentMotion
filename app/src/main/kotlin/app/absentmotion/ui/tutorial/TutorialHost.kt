@@ -108,10 +108,10 @@ fun TutorialHost(
     suspend fun begin(resume: Boolean) {
         val saved = settings.tutorialProject?.takeIf { resume && withContext(Dispatchers.IO) { store.exists(it) } }
         val id = saved ?: try {
-            withContext(Dispatchers.IO) { store.create(Scene.create(context.getString(R.string.tutorial_project_name), SIDE, SIDE, FPS, BLACK)) }
+            withContext(Dispatchers.IO) { store.create(Scene.create(app.absentmotion.i18n.AppText.get(R.string.tutorial_project_name), SIDE, SIDE, FPS, BLACK)) }
         } catch (e: java.io.IOException) {
             Log.w("AMTutorial", "cannot create the practice project", e)
-            Toast.makeText(context, context.getString(R.string.home_create_project_failed), Toast.LENGTH_LONG).show()
+            Toast.makeText(context, app.absentmotion.i18n.AppText.get(R.string.home_create_project_failed), Toast.LENGTH_LONG).show()
             return
         }
         settings.tutorialProject = id

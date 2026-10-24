@@ -50,7 +50,7 @@ class UiContracts(unittest.TestCase):
     def test_player_is_owned_before_data_source_can_throw(self):
         text = source('ui/editor/AudioTab.kt').split('private class SoundPreview', 1)[1]
         self.assertIn('player = nextPlayer', text)
-        self.assertLess(text.index('player = nextPlayer'), text.index('setDataSource(context, next)'))
+        self.assertLess(text.index('player = nextPlayer'), text.index('setDataSource(context, Uri.parse(next))'))
         self.assertIn('catch (_: Exception) { stop() }', text)
         self.assertIn('player?.release()', text)
 
@@ -159,7 +159,7 @@ class UiContracts(unittest.TestCase):
             path = str(p.relative_to(ROOT / 'app/src/main/kotlin/app/absentmotion'))
             for line in source(path).splitlines():
                 if 'performHapticFeedback(' in line:
-                    self.assertIn('state.settings.vibration', line, path)
+                    self.assertTrue('state.settings.vibration' in line or 'if (vibrate)' in line, path)
         self.assertIn('state.edit(MOVE_EDIT) { it.move(id, layers.lastIndex - to) }\n        onTick()', source('ui/editor/Timeline.kt'))
         self.assertIn('if (moved && value != null && value != detent) haptic(HapticFeedbackType.SegmentTick)', source('ui/editor/panels/SpeedPanel.kt'))
         self.assertIn('if (guides.any { it !in state.snapGuides }) tick(HapticFeedbackType.SegmentTick)', source('ui/editor/panels/MoveTransformPanel.kt'))
@@ -173,7 +173,7 @@ class UiContracts(unittest.TestCase):
         self.assertIn('1 -> if (layer.kind == "camera") CameraSizeTab(state, layer) else SizeTab(state, layer)', source('ui/editor/panels/MoveTransformPanel.kt'))
 
     def test_every_ruler_spinner_path_moves_the_value_like_a_tape_measure(self):
-        self.assertEqual(3, source('ui/editor/panels/PanelParts.kt').count('dragging(RulerMath.travel('))
+        self.assertEqual(4, source('ui/editor/panels/PanelParts.kt').count('dragging(RulerMath.travel('))
 
     def test_rotate_and_tilt_tabs_turn_three_d_objects_on_the_preview(self):
         text = source('ui/editor/Preview.kt')

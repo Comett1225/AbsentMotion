@@ -177,12 +177,6 @@ class AppSettings(private val context: Context) {
         get() = prefs.getInt("onboarding", 0)
         set(value) { prefs.edit().putInt("onboarding", value).apply() }
 
-    var sortBy: String
-        get() = sortByState
-        set(value) { sortByState = value; prefs.edit().putString("sortBy", value).apply() }
-
-    var newProject: NewProjectChoice
-        get() = NewProjectChoice(
     private var tutorialStepState by mutableStateOf(prefs.getString("tutorialStep", null))
 
     var tutorialStep: String?
@@ -197,6 +191,12 @@ class AppSettings(private val context: Context) {
         get() = prefs.getInt("tutorialAsk", 0)
         set(value) { prefs.edit().putInt("tutorialAsk", value).apply() }
 
+    var sortBy: String
+        get() = sortByState
+        set(value) { sortByState = value; prefs.edit().putString("sortBy", value).apply() }
+
+    var newProject: NewProjectChoice
+        get() = NewProjectChoice(
             prefs.getString("np.aspect", "1:1")!!, prefs.getInt("np.resolution", 1080),
             prefs.getInt("np.customWidth", 1280), prefs.getInt("np.customHeight", 720),
             prefs.getInt("np.fps", 60), prefs.getInt("np.background", 0),
