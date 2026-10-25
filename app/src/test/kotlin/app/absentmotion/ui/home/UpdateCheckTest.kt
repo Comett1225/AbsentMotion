@@ -56,6 +56,29 @@ class UpdateCheckTest {
         assertEquals(Release("3.1.0", latest), parseRelease("""{"tag_name":"v3.1.0"}"""))
     }
 
+    @Test fun downloadOpensTheApkOfTheInstalledVersion() {
+        val tag = "v3.4.0"
+        fun asset(name: String) = """{"name":"$name","browser_download_url":"$HOME_PAGE/releases/download/$tag/$name"}"""
+        val json = """{"tag_name":"$tag","html_url":"$HOME_PAGE/releases/tag/$tag","assets":[${asset("AbsentMotion-3.4.0-foss.apk")},""" +
+            """${asset("AbsentMotion-3.4.0-play.apk")},${asset("AbsentMotion-3.4.0-compatible.apk")},${asset("SHA256SUMS.txt")}]}"""
+        assertEquals("$HOME_PAGE/releases/download/$tag/AbsentMotion-3.4.0-foss.apk", parseRelease(json, "foss")?.download)
+        assertEquals("$HOME_PAGE/releases/download/$tag/AbsentMotion-3.4.0-play.apk", parseRelease(json, "play")?.download)
+        assertEquals("$HOME_PAGE/releases/download/$tag/AbsentMotion-3.4.0-compatible.apk", parseReleases("[$json]", "compat")?.download)
+        assertEquals("$HOME_PAGE/releases/tag/$tag", parseRelease(json, "foss")?.link)
+    }
+
+    @Test fun aMissingOrForeignApkFallsBackToTheReleasePage() {
+        val tag = "v3.4.0"
+        fun one(name: String, url: String) =
+            parseRelease("""{"tag_name":"$tag","html_url":"$HOME_PAGE/releases/tag/$tag","assets":[{"name":"$name","browser_download_url":"$url"}]}""", "foss")?.download
+        assertNull(one("AbsentMotion-3.4.0-play.apk", "$HOME_PAGE/releases/download/$tag/AbsentMotion-3.4.0-play.apk"))
+        assertNull(one("AbsentMotion-3.4.0-foss.apk", "https://example.com/AbsentMotion-3.4.0-foss.apk"))
+        assertNull(one("AbsentMotion-3.4.0-foss.apk", "$HOME_PAGE/releases/download/v3.3.0/AbsentMotion-3.4.0-foss.apk"))
+        assertNull(one("AbsentMotion-3.3.0-foss.apk", "$HOME_PAGE/releases/download/$tag/AbsentMotion-3.3.0-foss.apk"))
+        assertNull(one("AbsentMotion-3.4.0-foss.apk", "intent://scan#Intent;end"))
+        assertNull(parseRelease("""{"tag_name":"$tag","html_url":"$HOME_PAGE/releases/tag/$tag"}""", "foss")?.download)
+    }
+
     @Test fun errorsAndOddAnswersGiveNoRelease() {
         assertNull(parseRelease("""{"message":"Not Found","documentation_url":"https://docs.github.com"}"""))
         assertNull(parseRelease("""{"tag_name":"nightly"}"""))

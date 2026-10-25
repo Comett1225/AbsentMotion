@@ -34,7 +34,7 @@ import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URI
 
-internal data class Release(val version: String, val link: String)
+internal data class Release(val version: String, val link: String, val download: String? = null)
 
 internal sealed interface UpdateAnswer {
     data class Available(val release: Release) : UpdateAnswer
@@ -108,21 +108,29 @@ internal fun answerFor(release: Release?, current: String): UpdateAnswer {
     return if (newer) UpdateAnswer.Available(release) else UpdateAnswer.Latest
 }
 
-internal fun parseRelease(json: String): Release? = runCatching { JSONObject(json) }.getOrNull()?.let(::releaseOf)
+internal fun parseRelease(json: String, flavour: String = app.absentmotion.BuildConfig.FLAVOR): Release? = runCatching { JSONObject(json) }.getOrNull()?.let { releaseOf(it, flavour) }
 
-internal fun parseReleases(json: String): Release? {
+internal fun parseReleases(json: String, flavour: String = app.absentmotion.BuildConfig.FLAVOR): Release? {
     val list = runCatching { JSONArray(json) }.getOrNull() ?: return null
     return (0 until list.length()).mapNotNull { list.optJSONObject(it) }
         .filterNot { it.optBoolean("draft") || it.optBoolean("prerelease") }
-        .mapNotNull(::releaseOf)
+        .mapNotNull { releaseOf(it, flavour) }
         .maxWithOrNull(compareBy<Release> { Version.parse(it.version) })
 }
 
-private fun releaseOf(release: JSONObject): Release? {
+private fun releaseOf(release: JSONObject, flavour: String): Release? {
     val tag = release.optString("tag_name").trim()
     if (Version.parse(tag) == null) return null
     val page = release.optString("html_url").takeIf { it.startsWith("$HOME_PAGE/", ignoreCase = true) } ?: "$HOME_PAGE/releases/latest"
-    return Release(tag.removePrefix("v").removePrefix("V"), page)
+    val version = tag.removePrefix("v").removePrefix("V")
+    return Release(version, page, apkOf(release, tag, version, flavour))
+}
+
+private fun apkOf(release: JSONObject, tag: String, version: String, flavour: String): String? {
+    val name = "AbsentMotion-$version-${if (flavour == "compat") "compatible" else flavour}.apk"
+    val assets = release.optJSONArray("assets") ?: return null
+    return (0 until assets.length()).mapNotNull { assets.optJSONObject(it) }.firstOrNull { it.optString("name") == name }
+        ?.optString("browser_download_url")?.takeIf { it.equals("$HOME_PAGE/releases/download/$tag/$name", ignoreCase = true) }
 }
 
 internal fun isNewer(latest: String, current: String): Boolean? {
@@ -206,7 +214,11 @@ internal fun UpdateAskDialog(settings: AppSettings) {
 internal fun UpdateDialog() {
     val shown = Updates.answer ?: return
     val links = LocalUriHandler.current
+    val context = LocalContext.current
     val close = { Updates.answer = null }
+    fun open(link: String) = runCatching { links.openUri(link) }.onFailure {
+        android.widget.Toast.makeText(context, context.getString(R.string.update_open_failed), android.widget.Toast.LENGTH_LONG).show()
+    }
     val available = shown as? UpdateAnswer.Available
     AlertDialog(
         onDismissRequest = close,
@@ -221,7 +233,10 @@ internal fun UpdateDialog() {
         },
         confirmButton = {
             if (available == null) TextButton(close) { Text(stringResource(R.string.ok), color = Am.Navy) }
-            else TextButton({ close(); runCatching { links.openUri(available.release.link) } }) { Text(stringResource(R.string.update_download), color = Am.Navy) }
+            else androidx.compose.foundation.layout.Row {
+                TextButton({ open(available.release.link) }) { Text(stringResource(R.string.update_changelog), color = Am.Navy) }
+                TextButton({ close(); open(available.release.download ?: available.release.link) }) { Text(stringResource(R.string.update_download), color = Am.Navy) }
+            }
         },
         containerColor = Am.Card,
     )
