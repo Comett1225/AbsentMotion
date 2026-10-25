@@ -582,7 +582,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun followScreenSize(config: Configuration) {
-        val wanted = if (isTablet(config.smallestScreenWidthDp)) ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED else ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        val wanted = if (isInMultiWindowMode || isTablet(config.smallestScreenWidthDp)) ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED else ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         if (requestedOrientation != wanted) requestedOrientation = wanted
     }
 
