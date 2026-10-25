@@ -705,6 +705,56 @@ bool SelfOverlaps(const Layer& l) {
     return l.kind == "drawing" || l.kind == "embedScene" || l.kind == "model" || (l.stroke.present && l.stroke.enabled);
 }
 
+sk_sp<SkColorFilter> CopyTint(const RepeatCopy& look) {
+    static const sk_sp<SkRuntimeEffect> effect = SkRuntimeEffect::MakeForColorFilter(SkString(R"(
+layout(color) uniform half4 tint;
+uniform float amount;
+uniform float mode;
+float lum(float3 c) { return dot(c, float3(0.3, 0.59, 0.11)); }
+float3 withLum(float3 c, float l) {
+    c += l - lum(c);
+    float k = lum(c), n = min(min(c.r, c.g), c.b), x = max(max(c.r, c.g), c.b);
+    if (n < 0) c = k + (c - k) * k / (k - n);
+    if (x > 1) c = k + (c - k) * (1 - k) / (x - k);
+    return c;
+}
+half4 main(half4 color) {
+    float a = color.a;
+    if (a <= 0) return half4(0);
+    float3 u = float3(color.rgb) / a, s = float3(tint.rgb);
+    float4 blended = float4(s * tint.a, tint.a);
+    if (mode > 0.5) {
+        if (mode > 1.5) {
+            float n = min(min(s.r, s.g), s.b), x = max(max(s.r, s.g), s.b);
+            s = x > n ? (s - n) * (max(max(u.r, u.g), u.b) - min(min(u.r, u.g), u.b)) / (x - n) : float3(0);
+        }
+        blended = float4(mix(u, withLum(s, lum(u)), float(tint.a)), 1);
+    }
+    return half4(mix(float4(u, 1), blended, amount) * a);
+}
+)")).effect;
+    const bool known = look.tintMode == SkBlendMode::kSrcIn || look.tintMode == SkBlendMode::kColor || look.tintMode == SkBlendMode::kHue;
+    if (!effect || !known) return SkColorFilters::Lerp(look.tinted, nullptr, SkColorFilters::Blend(look.tint, nullptr, look.tintMode));
+    SkRuntimeColorFilterBuilder b(effect);
+    b.uniform("tint") = SkV4{look.tint.fR, look.tint.fG, look.tint.fB, look.tint.fA};
+    b.uniform("amount") = std::clamp(look.tinted, 0.0f, 1.0f);
+    b.uniform("mode") = look.tintMode == SkBlendMode::kSrcIn ? 0.0f : look.tintMode == SkBlendMode::kColor ? 1.0f : 2.0f;
+    return b.makeColorFilter();
+}
+
+void ReleaseLayers(SkCanvas* canvas) {
+    const SkIRect seen = canvas->getDeviceClipBounds();
+    if (seen.isEmpty()) return;
+    SkPaint same;
+    same.setBlendMode(SkBlendMode::kSrc);
+    const SkRect pixel = SkRect::Make(SkIRect::MakeXYWH(seen.left(), seen.top(), 1, 1));
+    canvas->save();
+    canvas->resetMatrix();
+    canvas->saveLayer(SkCanvas::SaveLayerRec(&pixel, &same, SkCanvas::kInitWithPrevious_SaveLayerFlag));
+    canvas->restore();
+    canvas->restore();
+}
+
 void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& l, double timeMs, float alpha,
                  bool decorate, const MediaPictures& pictures, const std::vector<LayerCopy>* copies) {
     const float t = l.localTime(timeMs);
@@ -722,26 +772,62 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
             return;
         }
         const float room = l.stroke.present && l.stroke.enabled ? l.stroke.size.get(0, t, 0) * std::max(l.stroke.endSize, 1.0f) * 3 + 2 : 2;
+        const bool single = !l.text && l.kind != "drawing" && l.kind != "embedScene" && l.kind != "model" && l.fillType == "color" &&
+                            !(l.stroke.present && l.stroke.enabled);
+        const SkIRect seen = canvas->getDeviceClipBounds();
+        const float frame = std::max(1.0f, (float)seen.width() * (float)seen.height());
+        const bool plainText = l.text && !TextAnimated(l);
+        float spent = 0;
         for (const LayerCopy& c : *copies) {
             const bool now = c.timeMs == timeMs;
             const float tc = now ? t : l.localTime(c.timeMs);
             const SkMatrix mc = now ? m : SiblingMatrix(siblings, l, c.timeMs);
             const SkPath pc = now ? path : BodyPath(l, tc);
             const bool tinted = c.look.tinted > 0;
-            const bool layered = tinted || c.look.mode != SkBlendMode::kSrcOver || (c.look.alpha < 1 && SelfOverlaps(l));
+            const bool styled = tinted || c.look.mode != SkBlendMode::kSrcOver;
+            if (styled && single) {
+                const SkColor4f fill = ColorAt(l.fillColor, tc, kWhite, alpha);
+                SkPaint paint = FillPaint({fill.fR, fill.fG, fill.fB, fill.fA * c.look.alpha});
+                paint.setBlendMode(c.look.mode);
+                if (tinted) paint.setColorFilter(CopyTint(c.look));
+                canvas->save();
+                canvas->concat(c.scene);
+                canvas->concat(mc);
+                canvas->drawPath(pc, paint);
+                canvas->restore();
+                if (now) {
+                    drawn = Drawn();
+                    drawn.fill = fill.fA > 0;
+                }
+                continue;
+            }
+            const bool layered = styled || (c.look.alpha < 1 && SelfOverlaps(l));
             canvas->save();
             canvas->concat(c.scene);
             if (layered) {
                 SkPaint paint;
                 paint.setAlphaf(c.look.alpha);
                 paint.setBlendMode(c.look.mode);
-                if (tinted) paint.setColorFilter(SkColorFilters::Lerp(c.look.tinted, nullptr, SkColorFilters::Blend(c.look.tint, nullptr, c.look.tintMode)));
-                const SkRect bounds = l.kind == "embedScene" || l.kind == "model" || l.text ? SkRect::MakeEmpty() : pc.makeTransform(mc).getBounds().makeOutset(room, room);
+                if (tinted) paint.setColorFilter(CopyTint(c.look));
+                SkRect bounds = SkRect::MakeEmpty();
+                if (plainText) {
+                    const float scale = canvas->getTotalMatrix().getMinScale(), edge = room + (scale > 0 ? 2 / scale : 2);
+                    bounds = mc.mapRect(TextInkBounds(l)).makeOutset(edge, edge);
+                } else if (!l.text && l.kind != "embedScene" && l.kind != "model") {
+                    bounds = pc.makeTransform(mc).getBounds().makeOutset(room, room);
+                }
+                SkRect device = SkRect::Make(seen);
+                if (!bounds.isEmpty() && !device.intersect(canvas->getTotalMatrix().mapRect(bounds))) device.setEmpty();
+                spent += device.width() * device.height();
                 canvas->saveLayer(bounds.isEmpty() ? nullptr : &bounds, &paint);
             }
             const Drawn d = DrawBody(canvas, l, c.timeMs, tc, mc, pc, layered ? alpha : alpha * c.look.alpha, pictures, false);
             if (layered) canvas->restore();
             canvas->restore();
+            if (spent >= 8 * frame) {
+                ReleaseLayers(canvas);
+                spent = 0;
+            }
             if (now) drawn = d;
         }
     };

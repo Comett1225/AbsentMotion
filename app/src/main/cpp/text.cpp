@@ -617,4 +617,9 @@ void DrawText(SkCanvas* canvas, const Layer& layer, float t, const SkPaint& pain
     }
     if (part != TextPart::kPlain) DrawRuns(canvas, text, true, paint);
 }
+SkRect TextInkBounds(const Layer& layer) {
+    auto& text = *layer.text;
+    layout(text);
+    return InkBounds(text);
+}
 }

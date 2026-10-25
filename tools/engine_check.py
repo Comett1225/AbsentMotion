@@ -181,6 +181,11 @@ CASES = {
               + rect(2, 150, 100, 50, 100, 0xff00ff00, extra='<effect id="absent.displacementmap" hidden="false">'
                      '<property name="offset" type="vec2" value="-50,0"/><property name="map" type="float" value="1"/></effect>')),
         [((75, 100), GREEN), ((25, 100), BLACK), ((150, 100), GREEN)]),
+    "tinted Scatter Field copies keep the space between them clear": (
+        scene(rect(1, 100, 100, 20, 20, extra='<effect id="absent.scatterfield" hidden="false">' + "".join(
+            f'<property name="{k}" type="float" value="{v}"/>' for k, v in
+            (("scale", 1), ("amount", 2), ("density", 1), ("slack", 0), ("fade", 0), ("sizeVariance", 0), ("coloring", 2))) + "</effect>")),
+        [((100, 100), BLACK), ((10, 100), BLACK), ((33, 33), HALF), ((167, 167), HALF)]),
 }
 
 HITS = {
