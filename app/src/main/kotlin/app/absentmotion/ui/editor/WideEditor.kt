@@ -49,7 +49,7 @@ val PhoneHeight = 832.dp
 
 val PanelHeight = 200.dp
 
-private val SideWidth = 320.dp
+private val SideWidth = PhoneWidth
 
 @Composable
 internal fun WideEditorBody(state: EditorState, onExit: () -> Unit, addLibrary: AddLibrary) {
@@ -86,12 +86,9 @@ internal fun WideEditorBody(state: EditorState, onExit: () -> Unit, addLibrary: 
 
 @Composable
 private fun SidePanels(state: EditorState, addLibrary: AddLibrary, textEdit: Boolean, textUi: TextEditUi, modifier: Modifier) {
-    val density = LocalDensity.current
     Box(modifier.width(SideWidth).fillMaxHeight().background(Am.Panel).pointerInput(Unit) {}) {
         if (textEdit) TextEditor(state, textUi, embedded = true)
-        else CompositionLocalProvider(LocalDensity provides Density(density.density * (SideWidth / PhoneWidth), density.fontScale)) {
-            LowerPanels(state, addLibrary, top = true)
-        }
+        else LowerPanels(state, addLibrary, top = true)
     }
 }
 

@@ -2,6 +2,7 @@ package app.absentmotion.ui.home
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -26,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -39,28 +41,34 @@ import app.absentmotion.ui.theme.Motion
 internal val WideCard = Modifier.widthIn(max = 420.dp)
 
 @Composable
-internal fun WideHeader(page: Int, tab: Int, onTab: (page: Int, tab: Int) -> Unit, onSettings: () -> Unit, onNew: () -> Unit, search: String?, onSearch: (String?) -> Unit) {
+internal fun WideHeader(page: Int, tab: Int, onTab: (page: Int, tab: Int) -> Unit, onSettings: () -> Unit, onNew: () -> Unit, search: String?, onSearch: (String?) -> Unit) = BoxWithConstraints(Modifier.fillMaxWidth()) {
+    val compact = maxWidth < FullHeaderWidth * LocalDensity.current.fontScale.coerceAtLeast(1f)
     Row(Modifier.fillMaxWidth().height(72.dp).padding(horizontal = 20.dp), Arrangement.spacedBy(12.dp), Alignment.CenterVertically) {
-        Text("AbsentMotion", color = Am.Navy, fontSize = 22.sp, fontWeight = FontWeight.Medium, maxLines = 1)
-        Spacer(Modifier.width(16.dp))
+        if (!compact) {
+            Text("AbsentMotion", color = Am.Navy, fontSize = 22.sp, fontWeight = FontWeight.Medium, maxLines = 1)
+            Spacer(Modifier.width(16.dp))
+        }
         Chip(stringResource(R.string.home_tab_projects), page == 0 && tab == 0) { onTab(0, 0) }
         Chip(stringResource(R.string.home_tab_assets), page == 0 && tab == 1) { onTab(0, 1) }
         Chip(stringResource(R.string.home_tab_templates), page == 1) { onTab(1, tab) }
         if (search == null) Spacer(Modifier.weight(1f)) else HomeSearchField(search, page == 1, onSearch, Modifier.weight(1f))
         SearchButton(search, onSearch)
-        HeaderButton(stringResource(R.string.home_new_project), HomeIcons.Plus, Am.Accent, Am.OnAccent, onNew)
-        HeaderButton(stringResource(R.string.settings), ChromeIcons.Gear, Am.Card, Am.Navy, onSettings)
+        HeaderButton(stringResource(R.string.home_new_project), HomeIcons.Plus, Am.Accent, Am.OnAccent, compact, onNew)
+        HeaderButton(stringResource(R.string.settings), ChromeIcons.Gear, Am.Card, Am.Navy, compact, onSettings)
     }
 }
 
+private val FullHeaderWidth = 1080.dp
+
 @Composable
-private fun HeaderButton(label: String, icon: ImageVector, background: Color, content: Color, onClick: () -> Unit) {
+private fun HeaderButton(label: String, icon: ImageVector, background: Color, content: Color, compact: Boolean, onClick: () -> Unit) {
     Button(
         onClick, Modifier.height(40.dp), shape = RoundedCornerShape(14.dp),
         colors = ButtonDefaults.buttonColors(containerColor = background, contentColor = content),
-        contentPadding = PaddingValues(horizontal = 16.dp),
+        contentPadding = PaddingValues(horizontal = if (compact) 10.dp else 16.dp),
     ) {
-        Icon(icon, null, Modifier.size(20.dp))
+        Icon(icon, if (compact) label else null, Modifier.size(20.dp))
+        if (compact) return@Button
         Spacer(Modifier.width(8.dp))
         Text(label, fontSize = 15.sp, fontWeight = FontWeight.Medium, maxLines = 1, softWrap = false)
     }
