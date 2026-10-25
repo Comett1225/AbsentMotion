@@ -13,11 +13,13 @@ for arg in "$@"; do
     esac
 done
 failed=0
+skipped=""
 fail() { printf 'check.sh: FAILED: %s\n' "$1" >&2; failed=$((failed + 1)); }
 native_libs() {
     newest=$(ls -t "app/build/intermediates/merged_native_libs/$1/"*/out/lib/arm64-v8a/*.so 2>/dev/null | head -n 1)
     if [ -z "$newest" ]; then
         printf 'skipped: the %s native libraries are not built (./gradlew :app:%s builds them)\n' "$1" "$2"
+        skipped="$skipped $1"
         return 1
     fi
     libs=$(dirname "$newest")
@@ -106,5 +108,9 @@ elapsed=$(( $(date +%s) - start ))
 if [ "$failed" -gt 0 ]; then
     printf '\ncheck.sh: %s check(s) failed after %ss.\n' "$failed" "$elapsed" >&2
     exit 1
+fi
+if [ -n "$skipped" ]; then
+    printf '\ncheck.sh: the full check is INCOMPLETE after %ss: the native API floor of%s was not checked, so it is not a release check (./gradlew :app:mergeFossReleaseNativeLibs :app:mergeCompatReleaseNativeLibs, then run it again).\n' "$elapsed" "$skipped" >&2
+    exit 3
 fi
 printf '\ncheck.sh: all %s checks passed in %ss; the app compiles and the tests pass.\n' "$mode" "$elapsed"

@@ -154,10 +154,11 @@ class ToolRegressions(unittest.TestCase):
             folder = Path(folder)
             lib = folder / 'app/build/intermediates/merged_native_libs/fossRelease/mergeFossReleaseNativeLibs/out/lib/arm64-v8a/libamengine.so'
             source = folder / 'app/src/main/cpp/engine.cpp'
-            run = lambda: subprocess.run(['sh', '-c', 'fail() { echo "FAILED: $1"; }; ' + function + '\nnative_libs fossRelease mergeFossReleaseNativeLibs; echo "rc=$? libs=$libs"'],
+            run = lambda: subprocess.run(['sh', '-c', 'fail() { echo "FAILED: $1"; }; ' + function + '\nnative_libs fossRelease mergeFossReleaseNativeLibs; echo "rc=$? libs=$libs skipped=$skipped"'],
                                          cwd=folder, capture_output=True, text=True).stdout
             self.assertIn('rc=1', run())
             self.assertIn('not built', run())
+            self.assertIn('skipped= fossRelease', run())
             lib.parent.mkdir(parents=True)
             lib.touch()
             source.parent.mkdir(parents=True)
