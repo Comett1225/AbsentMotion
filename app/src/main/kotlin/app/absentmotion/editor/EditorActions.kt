@@ -13,6 +13,8 @@ import app.absentmotion.model.copyLayers
 import app.absentmotion.model.isMask
 import app.absentmotion.model.withCameraFov
 import app.absentmotion.model.withSplit
+import app.absentmotion.model.pinnedPath
+import app.absentmotion.model.withPinnedClock
 import app.absentmotion.model.trimEndAt
 import app.absentmotion.model.trimStartAt
 import app.absentmotion.model.SpeedRef
@@ -97,7 +99,7 @@ fun EditorState.deleteSelected() {
 
 fun EditorState.duplicateSelected() {
     val layer = selected ?: return
-    val copy = copyLayers(listOf(layer), preserveOutsideParents = true).single().withLabel(AppText.get(R.string.edit_layer_copy_name, layer.label))
+    val copy = copyLayers(listOf(scene.pinnedPath(layer)), preserveOutsideParents = true).single().withLabel(AppText.get(R.string.edit_layer_copy_name, layer.label))
     edit { it.addAbove(copy, layer.id) }
     selectedId = copy.id
 }
@@ -115,7 +117,7 @@ fun EditorState.trimEnd() {
 }
 
 fun EditorState.split() {
-    val next = selected?.let { scene.withSplit(it, frame, Layer.newId()) } ?: return
+    val next = selected?.let { scene.withSplit(scene.pinnedPath(it).withPinnedClock(), frame, Layer.newId()) } ?: return
     edit { next }
     selectedId = null
 }

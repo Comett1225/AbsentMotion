@@ -288,6 +288,7 @@ bool ParseLayer(const XmlNode& node, int fps, Layer* out) {
         const float speed = ParseAnim(n->child("speedMap")).get(0, 0, fallbackSpeed);
         if (speed > 0 && std::isfinite(speed)) l.retiming.speed = speed;
         l.retiming.cut = std::max(0, IntAttr(*n, "inTime", 0));
+        l.retiming.clock = IntAttr(*n, "retimeLength", -1);
     }
     const char* id = n->attr("id");
     l.id = id ? strtoll(id, nullptr, 10) : 0;
@@ -408,7 +409,7 @@ double RetimedTime(const Retiming& r, int startTime, int endTime, double at) {
     if (r.method == "off") return local * r.speed;
     const double sceneEnd = ToLastFrameMiddle(std::max(0, r.length), r.fps);
     if (r.method == "blank") return local < sceneEnd ? std::round(local) : -1;
-    const double layerEnd = ToLastFrameMiddle(endTime - origin, r.hostFps);
+    const double layerEnd = ToLastFrameMiddle(r.clock >= 0 ? r.clock : endTime - origin, r.hostFps);
     const double in = std::clamp((double)r.in, 0.0, sceneEnd);
     const double out = r.out > 0 ? std::clamp((double)r.out, in, sceneEnd) : sceneEnd;
     const double outroStart = layerEnd - (sceneEnd - out);

@@ -109,7 +109,7 @@ struct PathContour {
 
 struct Retiming {
     std::string method = "off";
-    int length = 0, in = 0, out = 0, hostFps = 30, cut = 0;
+    int length = 0, in = 0, out = 0, hostFps = 30, cut = 0, clock = -1;
     double fps = 30;
     float speed = 1.0f;
 };
@@ -143,6 +143,7 @@ struct Layer {
     std::string blending;
     bool clippingMask = false;
     int64_t parent = 0;
+    int64_t pathLayer = 0;
     std::vector<Layer> children;
     int innerWidth = 0, innerHeight = 0;
     uint32_t innerBackground = 0;

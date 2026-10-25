@@ -221,6 +221,16 @@ constexpr int kMaxParentDepth = 16;
 SkMatrix MatrixOf(const Placement& p, const Layer& l, float t);
 int Fps();
 
+const Layer* PathSource(const std::vector<Layer>& siblings, const Layer& l) {
+    if (l.pathLayer != 0) {
+        for (const Layer& s : siblings) if (s.id == l.pathLayer && &s != &l) return &s;
+    }
+    for (size_t i = 1; i < siblings.size(); i++) {
+        if (&siblings[i] == &l || siblings[i].id == l.id) return &siblings[i - 1];
+    }
+    return nullptr;
+}
+
 Placement Effective(const std::vector<Layer>& siblings, const Layer& l, double timeMs, int depth) {
     Placement own = Own(l, timeMs);
     if (depth >= kMaxParentDepth) return own;
@@ -240,9 +250,9 @@ Placement Effective(const std::vector<Layer>& siblings, const Layer& l, double t
         own.z = p.z + offset.z;
     }
     if (!FollowsPath(l)) return own;
-    const auto at = std::find_if(siblings.begin(), siblings.end(), [&](const Layer& s) { return s.id == l.id; });
-    if (at == siblings.end() || at == siblings.begin()) return own;
-    const Layer& below = *(at - 1);
+    const Layer* source = PathSource(siblings, l);
+    if (!source) return own;
+    const Layer& below = *source;
     const float t = below.localTime(timeMs);
     const SkPath path = below.text ? TextGlyphPath(below, t, Fps()) : ShapePath(below, t);
     FollowPath(l, timeMs, path.makeTransform(MatrixOf(parent == &below ? p : Effective(siblings, below, timeMs, depth + 1), below, t)), &own);
@@ -578,10 +588,7 @@ std::vector<LayerCopy> CopiesOf(const std::vector<Layer>& siblings, const Layer&
     space.radius = std::max({std::fabs(box.left() - space.anchor.fX), std::fabs(box.right() - space.anchor.fX),
                              std::fabs(box.top() - space.anchor.fY), std::fabs(box.bottom() - space.anchor.fY)}) * 1.415f;
     if (RepeatsAlongPath(l)) {
-        const Layer* below = nullptr;
-        for (size_t i = 1; i < siblings.size(); i++) {
-            if (&siblings[i] == &l || siblings[i].id == l.id) { below = &siblings[i - 1]; break; }
-        }
+        const Layer* below = PathSource(siblings, l);
         if (below && below->kind != "nullobj" && below->kind != "camera") {
             const float tb = below->localTime(timeMs);
             space.below = (below->text ? TextGlyphPath(*below, tb, Fps()) : ShapePath(*below, tb)).makeTransform(SiblingMatrix(siblings, *below, timeMs));
@@ -982,6 +989,7 @@ void ParseStyle(const XmlNode& n, Layer* l) {
     l->blending = AttrOf(n, "blending");
     l->clippingMask = AttrOf(n, "clippingMask") == "true";
     l->parent = strtoll(AttrOf(n, "parent").c_str(), nullptr, 10);
+    l->pathLayer = strtoll(AttrOf(n, "pathLayer").c_str(), nullptr, 10);
     for (const auto& c : n.children) {
         if (c->name == "border" || c->name == "shadow") {
             Edge e;

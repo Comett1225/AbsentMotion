@@ -10,7 +10,9 @@
 #include "include/effects/SkImageFilters.h"
 
 #include <algorithm>
+#include <cctype>
 #include <cmath>
+#include <cstring>
 #include <optional>
 #include <string_view>
 #include <vector>
@@ -98,6 +100,43 @@ half4 main(float2 p) {
 }
 )";
 
+bool Pointwise(const std::string& sksl) {
+    if (sksl.find("inout") != std::string::npos || sksl.find(" out ") != std::string::npos) return false;
+    const size_t main = sksl.find("main(");
+    if (main == std::string::npos) return false;
+    size_t at = sksl.find_first_not_of(' ', main + 5);
+    if (at == std::string::npos || (sksl.compare(at, 7, "float2 ") != 0 && sksl.compare(at, 6, "half2 ") != 0)) return false;
+    at = sksl.find_first_not_of(' ', sksl.find(' ', at));
+    const size_t end = sksl.find_first_of(" )", at);
+    if (at == std::string::npos || end == std::string::npos) return false;
+    const std::string p = sksl.substr(at, end - at);
+    const auto word = [&](size_t i) { return i < sksl.size() && (std::isalnum((unsigned char)sksl[i]) || sksl[i] == '_'); };
+    for (size_t i = sksl.find(p, end); i != std::string::npos; i = sksl.find(p, i + 1)) {
+        if (word(i - 1) || word(i + p.size())) continue;
+        size_t k = i + p.size();
+        if (k < sksl.size() && sksl[k] == '.') while (word(++k)) {}
+        k = sksl.find_first_not_of(' ', k);
+        if (k == std::string::npos) break;
+        if (sksl[k] == '=' && (k + 1 >= sksl.size() || sksl[k + 1] != '=')) return false;
+        if (std::strchr("+-*/", sksl[k]) && k + 1 < sksl.size() && sksl[k + 1] == '=') return false;
+        if ((sksl[k] == '+' || sksl[k] == '-') && k + 1 < sksl.size() && sksl[k + 1] == sksl[k]) return false;
+    }
+    bool sampled = false;
+    for (size_t i = sksl.find(".eval("); i != std::string::npos; i = sksl.find(".eval(", i + 1)) {
+        int depth = 0;
+        size_t close = std::string::npos;
+        for (size_t k = i + 5; k < sksl.size(); k++) {
+            if (sksl[k] == '(') depth++;
+            else if (sksl[k] == ')' && --depth == 0) { close = k; break; }
+        }
+        if (close == std::string::npos) return false;
+        const size_t first = sksl.find_first_not_of(' ', i + 6), last = sksl.find_last_not_of(' ', close - 1);
+        if (first > last || sksl.compare(first, last - first + 1, p) != 0 || last - first + 1 != p.size()) return false;
+        sampled = true;
+    }
+    return sampled;
+}
+
 sk_sp<SkRuntimeEffect> Compiled(const char* sksl) {
     auto result = SkRuntimeEffect::MakeForShader(SkString(sksl));
     return result.effect;
@@ -180,6 +219,7 @@ std::string EffectRuntime::load(const std::string& xml) {
         d.blurred = d.brightPass || result.effect->findChild("blurred") != nullptr;
         d.backdrop = result.effect->findChild("backdrop") != nullptr;
         d.below = result.effect->findChild("below") != nullptr;
+        d.pointwise = Pointwise(sksl);
         d.shader = std::move(result.effect);
     }
     fDefinitions[id] = std::move(d);
@@ -292,8 +332,9 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
                 names.push_back("below");
                 inputs.push_back(below ? below : SkImageFilters::Empty());
             }
-            f = inputs.size() == 1 ? SkImageFilters::RuntimeShader(b, reach, "image", f)
-                                   : SkImageFilters::RuntimeShader(b, reach, names.data(), inputs.data(), (int)inputs.size());
+            const float radius = d->pointwise ? 0.0f : reach;
+            f = inputs.size() == 1 ? SkImageFilters::RuntimeShader(b, radius, "image", f)
+                                   : SkImageFilters::RuntimeShader(b, radius, names.data(), inputs.data(), (int)inputs.size());
         } else {
             continue;
         }

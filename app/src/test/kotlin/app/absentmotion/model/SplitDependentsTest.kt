@@ -83,4 +83,26 @@ class SplitDependentsTest {
         val drawn = dup(1, 2).drawn(1000)
         assertEquals(listOf("L1" to listOf("L2"), "L1c" to listOf("L2c"), "L3" to listOf("L4", "L5"), "L6" to emptyList<String>()), drawn)
     }
+
+    @Test fun bothHalvesAndACopyOfAPathFollowerKeepFollowingThePathLayer() {
+        val s = scene(layer(1), layer(2, effect = "absent.movealongpath"), layer(3))
+        val split = s.withSplit(s.pinnedPath(s.layer(2)!!), 45, 9, ::fresh)!!
+        assertEquals(listOf(1L, 2L, 9L, 3L), split.ids())
+        assertEquals(listOf("1", "1"), listOf(2L, 9L).map { split.layer(it)!!.node["pathLayer"] })
+        assertEquals(null, s.pinnedPath(s.layer(3)!!).node["pathLayer"])
+        val copies = copyLayers(listOf(s.layer(1)!!, s.pinnedPath(s.layer(2)!!)), newId = ::fresh)
+        assertEquals(copies[0].node["id"], copies[1].node["pathLayer"])
+        assertEquals("1", copyLayers(listOf(s.pinnedPath(s.layer(2)!!)), newId = ::fresh).single().node["pathLayer"])
+    }
+
+    @Test fun splittingAStretchedGroupWithAnOutroKeepsItsClock() {
+        val group = Scene.parse("""<scene width="100" height="100" fps="30"><embedScene id="1" startTime="1000" endTime="4999" inTime="200">
+            <scene width="100" height="100" fps="30" totalTime="2000" retime="stretch" retimeIn="300" retimeOut="1500"/></embedScene></scene>""")
+        val whole = group.layer(1)!!
+        val split = group.withSplit(whole.withPinnedClock(), 75, 9, ::fresh)!!
+        val first = split.layer(1)!!
+        val second = split.layer(9)!!
+        for (ms in 1000..2499 step 37) assertEquals("first half at $ms", whole.nestedTime(ms.toDouble(), 30).ms, first.nestedTime(ms.toDouble(), 30).ms, 0.0)
+        for (ms in 2500..4999 step 37) assertEquals("second half at $ms", whole.nestedTime(ms.toDouble(), 30).ms, second.nestedTime(ms.toDouble(), 30).ms, 0.0)
+    }
 }

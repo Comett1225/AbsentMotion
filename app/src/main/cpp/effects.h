@@ -26,6 +26,7 @@ private:
         bool brightPass = false;
         bool backdrop = false;
         bool below = false;
+        bool pointwise = false;
         std::map<std::string, Anim> defaults;
     };
     const Definition* find(const std::string& id) const;

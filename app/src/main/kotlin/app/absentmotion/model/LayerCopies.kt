@@ -16,6 +16,7 @@ fun copyLayers(
             node["id"]?.toLongOrNull()?.let { result = result.with("id", ids[it]?.toString()) }
             node["parent"]?.toLongOrNull()?.let { result = result.with("parent", ids[it]?.toString() ?: node["parent"].takeIf { preserveOutsideParents }) }
             node["noiseId"]?.toLongOrNull()?.let { ids[it]?.let { mapped -> result = result.with("noiseId", mapped.toString()) } }
+            node["pathLayer"]?.toLongOrNull()?.let { ids[it]?.let { mapped -> result = result.with("pathLayer", mapped.toString()) } }
             for (slot in MotionSlot.entries) MotionRecord.parse(node[slot.attr])?.takeIf { it.transition }?.let { record ->
                 ids[record.partner]?.let { mapped -> result = result.with(slot.attr, record.copy(partner = mapped).toString()) }
             }

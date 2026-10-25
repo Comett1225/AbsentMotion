@@ -51,6 +51,8 @@ static void DrawSelection(SkCanvas* canvas, const SkPoint q[4], int handles, flo
     }
 }
 
+static long FrameOf(double ms, int fps) { return ((std::lround(ms) + 1) * fps + 999) / 1000 - 1; }
+
 static void DrawMotionPath(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& layer, double timeMs, int fps,
                            const SkMatrix& toTarget, float px) {
     SkPaint paint;
@@ -64,7 +66,7 @@ static void DrawMotionPath(SkCanvas* canvas, const std::vector<Layer>& siblings,
     for (const Keyframe& k : layer.location.keys) {
         if (k.v.size() < 2) continue;
         const double keyMs = layer.startTime + (double)k.t * (layer.endTime - layer.startTime);
-        if (fabs(keyMs - timeMs) <= 500.0 / fps) here = (int)points.size();
+        if (FrameOf(keyMs, fps) == FrameOf(timeMs, fps)) here = (int)points.size();
         points.push_back(place(keyMs, {k.v[0], k.v[1]}));
     }
     if (points.empty()) points.push_back(place(timeMs, {layer.location.get(0, t, 0), layer.location.get(1, t, 0)}));

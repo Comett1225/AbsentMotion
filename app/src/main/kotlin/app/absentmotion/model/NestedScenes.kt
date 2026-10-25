@@ -17,7 +17,7 @@ private class NestedClock(private val layer: Layer, hostFps: Int) {
     private fun middle(length: Int, fps: Int) = floor((2 * floor(length.toDouble() * fps / 1000 + 1e-9) + 1) * 500 / fps)
     private val origin = layer.startTime - layer.nestedCut
     private val sceneEnd = middle(scene.totalTime.coerceAtLeast(0), scene.fps)
-    private val layerEnd = middle(layer.endTime - origin, hostFps)
+    private val layerEnd = middle(layer.node["retimeLength"]?.toIntOrNull()?.takeIf { it >= 0 } ?: (layer.endTime - origin), hostFps)
     private val intro = scene.retimeIn.toDouble().coerceIn(0.0, sceneEnd)
     private val outro = if (scene.retimeOut > 0) scene.retimeOut.toDouble().coerceIn(intro, sceneEnd) else sceneEnd
     private val outroStart = layerEnd - (sceneEnd - outro)

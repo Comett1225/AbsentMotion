@@ -191,6 +191,16 @@ internal fun List<Layer>.isMask(index: Int): Boolean = index > 0 && this[index].
 internal val Layer.leansOnBelow: Boolean
     get() = node["clippingMask"] == "true" || effects.any { it["hidden"] != "true" && it["id"] in FOLLOWS_BELOW }
 
+fun Scene.pinnedPath(layer: Layer): Layer {
+    if (layer.node["pathLayer"] != null || layer.effects.none { it["hidden"] != "true" && it["id"] in FOLLOWS_BELOW }) return layer
+    val list = layers
+    val below = list.getOrNull(list.indexOfFirst { it.id == layer.id } - 1) ?: return layer
+    return layer.copy(node = layer.node.with("pathLayer", "${below.id}"))
+}
+
+fun Layer.withPinnedClock(): Layer =
+    if (nested == null || node["retimeLength"] != null) this else copy(node = node.with("retimeLength", "${endTime - startTime + nestedCut}"))
+
 data class Layer(val node: XmlNode, val t: Float = 0f, val snap: ClosedFloatingPointRange<Float> = t..t) {
     val mediaFill: MediaFill? get() {
         if (fillType != "media") return null
