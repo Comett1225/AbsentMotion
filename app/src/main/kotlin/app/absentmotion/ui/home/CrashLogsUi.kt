@@ -125,7 +125,7 @@ private fun CrashList(onClose: () -> Unit, onOpen: (CrashEntry) -> Unit) {
 @Composable
 private fun CrashDetails(log: CrashEntry, onBack: () -> Unit) {
     val context = LocalContext.current
-    val detail by produceState("", log.file) { value = withContext(Dispatchers.IO) { runCatching { log.file.readText() }.getOrDefault("") } }
+    val detail by produceState("", log.file) { value = withContext(Dispatchers.IO) { CrashLogs.text(log) } }
     val sentence = stringResource(log.reason.sentence)
     val time = versionLabel(log.time).text()
     Column(Modifier.fillMaxSize().navigationBarsPadding()) {

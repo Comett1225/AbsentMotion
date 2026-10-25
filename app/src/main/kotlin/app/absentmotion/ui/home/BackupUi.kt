@@ -103,6 +103,9 @@ internal fun BackupRows(settings: AppSettings, onRestored: () -> Unit) {
             settings.weeklyBackup = it
             if (it) storage.ready {}
         }
+        if (settings.weeklyBackup && settings.autoBackupFailed) Text(
+            stringResource(R.string.backup_weekly_failed), Modifier.padding(start = 15.dp, end = 15.dp, bottom = 8.dp), color = Am.HomeMid, fontSize = 12.sp, lineHeight = 16.sp,
+        )
     }
     task?.let { current ->
         AlertDialog(
@@ -173,13 +176,17 @@ private fun restoreBackup(context: Context, uri: Uri, task: BackupTask): List<Ui
 suspend fun autoBackupIfDue(context: Context, settings: AppSettings) = withContext(Dispatchers.IO) {
     if (!settings.weeklyBackup || System.currentTimeMillis() - settings.lastAutoBackup < WEEK_MS) return@withContext
     try {
+        val needed = Backup.files(context.filesDir, includeMedia = false).sumOf { it.second.length() }
+        if (needed + (50L shl 20) > freeSpace()) throw java.io.IOException("not enough free storage for the weekly backup")
         val name = "$WEEKLY_PREFIX${stamp()}.${Backup.EXTENSION}"
         val saved = MediaStoreExport(context).save(null, name, "application/octet-stream") { Backup.write(context.filesDir, it, includeMedia = false) }
         settings.autoBackupUri?.takeIf { it != saved.toString() }?.let { old -> runCatching { if (isWeeklyBackupName(displayName(context, Uri.parse(old)))) context.contentResolver.delete(Uri.parse(old), null, null) } }
         settings.autoBackupUri = saved.toString()
         settings.lastAutoBackup = System.currentTimeMillis()
+        settings.autoBackupFailed = false
         Log.i("AMBackup", "weekly backup written: $name")
     } catch (e: Exception) {
+        settings.autoBackupFailed = true
         Log.w("AMBackup", "weekly backup failed", e)
     }
 }

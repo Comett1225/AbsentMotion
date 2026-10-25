@@ -9,11 +9,30 @@ import kotlinx.coroutines.yield
 import java.io.IOException
 import java.nio.file.Files
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class CrashLogsTest {
+    @Test fun copiedCrashTextHidesFileNamesAndPathsButKeepsTheCode() {
+        val text = """
+            java.io.FileNotFoundException: /storage/emulated/0/DCIM/Camera/Family trip.mp4: open failed: ENOENT (No such file or directory)
+            Caused by: java.io.IOException: /data/user/0/app.absentmotion/files/media/p1/My Song.mp3 (Permission denied)
+            uri content://com.android.externalstorage.documents/document/primary%3ADCIM%2FIMG_2041.jpg and file:/data/user/0/app.absentmotion/files/media/p1/A%20b.png
+            	at app.absentmotion.library.MediaKeeper.keep(MediaKeeper.kt:39)
+            #00 pc 0000 /data/app/~~x==/app.absentmotion-y==/lib/arm64/libengine.so (render+12)
+        """.trimIndent()
+        val hidden = redactPaths(text)
+        for (secret in listOf("Family", "trip", "My Song", "IMG_2041", "A%20b", "DCIM", "p1/")) assertFalse(secret, hidden.contains(secret))
+        assertTrue(hidden, hidden.contains("/storage/….mp4: open failed: ENOENT (No such file or directory)"))
+        assertTrue(hidden, hidden.contains("/data/user/0/….mp3 (Permission denied)"))
+        assertTrue(hidden, hidden.contains("content://com.android.externalstorage.documents/…"))
+        assertTrue(hidden, hidden.contains("file:….png"))
+        assertTrue(hidden, hidden.contains("at app.absentmotion.library.MediaKeeper.keep(MediaKeeper.kt:39)"))
+        assertTrue(hidden, hidden.contains("/lib/arm64/libengine.so (render+12)"))
+    }
+
     @Test fun exceptionsGetAPlainReason() {
         assertEquals(CrashReason.MemoryExport, crashReason(OutOfMemoryError("Failed to allocate"), "exporting gif"))
         assertEquals(CrashReason.Memory, crashReason(OutOfMemoryError(), "editing a project"))

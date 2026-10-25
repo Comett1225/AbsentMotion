@@ -12,7 +12,6 @@ import java.io.File
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
-import java.util.concurrent.ConcurrentHashMap
 
 internal const val CUTOUT_PARAM_768 = "absent-cutout-768.param"
 internal const val CUTOUT_PARAM_1024 = "absent-cutout-1024.param"
@@ -64,18 +63,19 @@ internal enum class AiModel(val folder: String, @StringRes val title: Int, val l
 
     fun delete(context: Context) {
         dir(context).deleteRecursively()
-        files.forEach { checked.remove(file(context, it.name).path) }
+        stamps(context).edit().apply { files.forEach { remove(file(context, it.name).path) } }.apply()
     }
 
     fun verify(context: Context) {
+        val known = stamps(context)
         for (f in files) {
             val target = file(context, f.name)
-            val stamp = target.length() to target.lastModified()
-            if (checked[target.path] == stamp) continue
+            val stamp = "${target.length()}:${target.lastModified()}"
+            if (known.getString(target.path, null) == stamp) continue
             val intact = target.length() == f.bytes && target.inputStream().use(CaptionModel::sha256) == f.sha256
             if (!intact) target.delete()
             check(intact) { AppText.get(R.string.ai_model_broken) }
-            checked[target.path] = stamp
+            known.edit().putString(target.path, stamp).apply()
         }
     }
 
@@ -100,7 +100,7 @@ internal enum class AiModel(val folder: String, @StringRes val title: Int, val l
     }
 
     companion object {
-        private val checked = ConcurrentHashMap<String, Pair<Long, Long>>()
+        private fun stamps(context: Context) = context.getSharedPreferences("ai_models", Context.MODE_PRIVATE)
 
         fun downloaded(context: Context) = entries.filter { it.onDisk(context) > 0 }
     }

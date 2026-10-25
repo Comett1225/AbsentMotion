@@ -208,6 +208,7 @@ fun HomeScreen(
                     onHistory = onHistory,
                     onCollect = onCollect,
                     wide = wide,
+                    usedBy = store::linkedBy,
                 )
                 Spacer(Modifier.height(if (wide) navInset else BarHeight + navInset))
             }
@@ -265,6 +266,7 @@ private fun ProjectsPane(
     onHistory: (ProjectInfo) -> Unit,
     onCollect: (String) -> Unit,
     wide: Boolean = false,
+    usedBy: (String) -> List<String> = { emptyList() },
 ) {
     val thumbs = remember {
         object : LinkedHashMap<String, ImageBitmap>(16, 0.75f, true) {
@@ -340,9 +342,11 @@ private fun ProjectsPane(
         }
     }
     deleting?.let { target ->
+        val users by produceState(emptyList<String>(), target.id) { if (target.isElement) value = withContext(Dispatchers.IO) { usedBy(target.id) } }
         AlertDialog(
             onDismissRequest = { deleting = null },
             title = { Text(stringResource(if (target.isElement) R.string.home_delete_asset_title else R.string.home_delete_project_title), color = Am.Navy) },
+            text = if (users.isEmpty()) null else { { Text(stringResource(R.string.home_delete_asset_used, users.joinToString(", ")), color = Am.Navy) } },
             dismissButton = { TextButton({ deleting = null }) { Text(stringResource(R.string.cancel), color = Am.Navy) } },
             confirmButton = { TextButton({ deleting = null; onDelete(target.id) }) { Text(stringResource(R.string.delete), color = Am.Navy) } },
             containerColor = Am.Card,

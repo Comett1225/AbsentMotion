@@ -159,7 +159,12 @@ class MainActivity : ComponentActivity() {
                 if (state.selected == null) state.selectedId = null
             }
         }
-        lifecycleScope.launch { kotlinx.coroutines.delay(15_000); autoBackupIfDue(applicationContext, settings) }
+        lifecycleScope.launch {
+            kotlinx.coroutines.delay(15_000)
+            while (editor != null || opening || editingTemplate != null || exportingFromList != null || firstRun != null || !lifecycle.currentState.isAtLeast(androidx.lifecycle.Lifecycle.State.RESUMED)) kotlinx.coroutines.delay(30_000)
+            autoBackupIfDue(applicationContext, settings)
+            app.absentmotion.library.sweepStorageDaily(applicationContext)
+        }
         lifecycleScope.launch(Dispatchers.IO) { ShapeCatalog.load(applicationContext) }
         lifecycleScope.launch(Dispatchers.IO) { app.absentmotion.ai.AiDevice.recover(applicationContext) }
         lifecycleScope.launch(Dispatchers.IO) {

@@ -140,6 +140,10 @@ class AppSettings(private val context: Context) {
         get() = prefs.getString("autoBackupUri", null)
         set(value) { prefs.edit().putString("autoBackupUri", value).apply() }
 
+    var autoBackupFailed: Boolean
+        get() = prefs.getBoolean("autoBackupFailed", false)
+        set(value) { prefs.edit().putBoolean("autoBackupFailed", value).apply() }
+
     var theme: String
         get() = themeState
         set(value) {

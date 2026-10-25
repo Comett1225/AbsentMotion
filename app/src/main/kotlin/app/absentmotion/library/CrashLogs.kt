@@ -77,6 +77,18 @@ internal fun readableStrings(bytes: ByteArray, maxChars: Int, shortest: Int = 5)
     return out.take(maxChars).toString()
 }
 
+private val ProviderAddress = Regex("""(content://[^/\s"'<>]+/)[^\s"'<>]+""")
+private val FileAddress = Regex("""(file:)/[^\s"'<>]+""")
+private val UserPath = Regex("""(/(?:storage|sdcard|mnt|data/user/\d+|data/data|data/media)/)[^\n"'<>]*?(?=: |\s\(|["'<>]|$)""", RegexOption.MULTILINE)
+
+internal fun redactPaths(text: String): String {
+    fun hidden(match: MatchResult): String {
+        val ext = match.value.substringAfterLast('/').substringAfterLast('.', "").takeIf { it.length in 1..5 && it.all(Char::isLetterOrDigit) }
+        return match.groupValues[1] + "…" + (ext?.let { ".$it" } ?: "")
+    }
+    return listOf(ProviderAddress, FileAddress, UserPath).fold(text) { acc, regex -> regex.replace(acc, ::hidden) }
+}
+
 internal fun crashEntries(folder: File): List<CrashEntry> = folder.listFiles { f -> f.isFile && f.name.endsWith(".txt") }.orEmpty().mapNotNull { file ->
     val parts = file.name.removeSuffix(".txt").split('_', limit = 2)
     val time = parts[0].toLongOrNull() ?: return@mapNotNull null
@@ -150,6 +162,8 @@ object CrashLogs {
     }
 
     fun list(context: Context): List<CrashEntry> = crashEntries(File(context.filesDir, "crashlogs"))
+
+    fun text(entry: CrashEntry): String = runCatching { redactPaths(entry.file.readText()) }.getOrDefault("")
 
     fun clear(context: Context) {
         crashEntries(File(context.filesDir, "crashlogs")).forEach { it.file.delete() }

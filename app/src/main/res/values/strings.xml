@@ -341,6 +341,7 @@
     <string name="backup_stopped">Backup stopped. No backup file was kept.</string>
     <string name="backup_restore">Restore from backup</string>
     <string name="backup_weekly">Weekly automatic backup (projects only)</string>
+    <string name="backup_weekly_failed">The last weekly backup could not be saved. Free some storage space; it is tried again the next time AbsentMotion starts.</string>
     <string name="backup_error_generic">Something went wrong: %1$s. Check the free storage and try again.</string>
     <string name="backup_no_space">Not enough free storage for the backup. It needs about %1$s.</string>
     <string name="backup_saved">Saved as Documents/AbsentMotion/%1$s. It stays on this phone even if AbsentMotion is uninstalled; copy it to a computer or cloud storage to keep it safe.</string>
@@ -638,6 +639,7 @@
     <string name="camera_resume_recording">Resume recording</string>
     <string name="camera_allow">Allow Camera</string>
     <string name="camera_open_settings">Open Settings</string>
+    <string name="storage_permission_explain">On this Android version AbsentMotion needs storage access to save backups, exports and camera shots in your folders. Try again and allow it, or turn on Storage for AbsentMotion in the app settings.</string>
     <string name="camera_permission_blocked">Camera access is turned off for AbsentMotion. Turn on Camera (and Microphone for sound) in the app settings to take photos and videos.</string>
     <string name="camera_permission_explain">AbsentMotion uses the camera to take photos and record videos for your project, and the microphone to record their sound. They are saved to your gallery in DCIM/AbsentMotion and stay on this device.</string>
     <string name="camera_error_save_photo">Could not save the photo.</string>
