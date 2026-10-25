@@ -109,7 +109,8 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
 
     private fun convertValue(text: String, c: Conversion, component: Int, shift: Float, dims: FloatArray): String {
         val t = text.trim()
-        if (t.startsWith("#") || t == "true" || t == "false") return t
+        if (t == "true" || t == "false") return c.values[t]?.let { formatFloats(floatArrayOf(it)) } ?: t
+        if (t.startsWith("#")) return t
         val parts = t.split(',')
         val picked = if (component >= 0) listOf(parts.getOrElse(component) { "0" }) else parts
         val numbers = picked.map { p ->

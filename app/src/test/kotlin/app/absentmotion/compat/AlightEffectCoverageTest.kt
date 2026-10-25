@@ -53,6 +53,17 @@ class AlightEffectCoverageTest {
         assertEquals("#FF3366CC", m.children.single { it["name"] == "color" }["value"])
     }
 
+    @Test fun switchesCanBecomeNumbers() {
+        fun invert(on: Boolean) = migrate("""<effect id="com.alightcreative.effects.invert"><property name="invertRed" type="bool" value="$on" /><property name="invertGreen" type="bool" value="true" /><property name="invertBlue" type="bool" value="true" /></effect>""")
+        assertEquals("absent.invert", invert(true)["id"])
+        assertEquals(1f, invert(true).floats("amount")[0], 1e-6f)
+        assertEquals(0f, invert(false).floats("amount")[0], 1e-6f)
+        val strips = migrate("""<effect id="com.alightcreative.effects.contourstrips"><property name="amount" type="float" value="12" /><property name="lineColor" type="color" value="#ff223355" /><property name="heightSource" type="int" value="0" /></effect>""")
+        assertEquals(12f, strips.floats("count")[0], 1e-6f)
+        assertEquals("#ff223355", strips.children.single { it["name"] == "edgeColor" }["value"])
+        assertEquals(0f, strips.floats("map")[0], 1e-6f)
+    }
+
     @Test fun commonAlightEffectsAllRun() {
         val common = listOf("zoomblur3", "spinblur2", "dblur", "swirl4", "pinchbulge2", "wavewarp2", "turbulentdisplace3", "pixelate2", "mosaic", "posterize",
             "vignette", "wipe2", "radialwipe", "kaleidoscope", "chromakey", "lumakey3", "halftonedots", "rays", "radialrays", "star", "stripes", "grid2",

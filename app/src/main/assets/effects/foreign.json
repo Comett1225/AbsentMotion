@@ -5730,5 +5730,102 @@
     "neutral": 1
    }
   }
+ },
+ "com.alightcreative.effects.contourstrips": {
+  "to": "contourstrips",
+  "params": {
+   "amount": {
+    "to": "count",
+    "min": 0.5,
+    "max": 200
+   },
+   "width": {
+    "to": "height",
+    "min": 0,
+    "max": 15
+   },
+   "angle": {
+    "to": "angle"
+   },
+   "thickness": {
+    "to": "thickness",
+    "min": 0,
+    "max": 1
+   },
+   "phase": {
+    "to": "phase"
+   },
+   "invert": {
+    "to": "invert"
+   },
+   "lineColor": {
+    "to": "edgeColor"
+   },
+   "color1": {
+    "to": "color1"
+   },
+   "color2": {
+    "to": "color2"
+   },
+   "lightColor": {
+    "to": "light"
+   },
+   "lightAngle": {
+    "to": "lightAngle"
+   },
+   "heightSource": {
+    "to": "map",
+    "values": {
+     "0": 0,
+     "1": 1
+    }
+   },
+   "maskToLayer": {
+    "to": "mask"
+   },
+   "strength": {
+    "neutral": 0.3
+   }
+  }
+ },
+ "com.alightcreative.effects.invert": {
+  "to": "invert",
+  "params": {
+   "invertRed": {
+    "to": "amount",
+    "values": {
+     "true": 1,
+     "false": 0
+    }
+   },
+   "invertGreen": {
+    "neutral": true
+   },
+   "invertBlue": {
+    "neutral": true
+   }
+  }
+ },
+ "com.alightcreative.effects.findedges": {
+  "to": "edgedetect",
+  "params": {
+   "smoothing": {
+    "neutral": 1
+   },
+   "threshold": {
+    "neutral": 0
+   },
+   "invert": {
+    "neutral": false
+   }
+  }
+ },
+ "com.alightcreative.effects.polar": {
+  "to": "polar",
+  "params": {},
+  "set": {
+   "amount": 1,
+   "direction": 0
+  }
  }
 }
