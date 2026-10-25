@@ -334,6 +334,7 @@ internal fun AiProgressDialog(tools: AiTools) {
     val view = LocalView.current
     DisposableEffect(action != null) { view.keepScreenOn = action != null; onDispose { view.keepScreenOn = false } }
     AlertDialog(onDismissRequest = { if (action != null) tools.cancel() else tools.dismiss() },
+        properties = androidx.compose.ui.window.DialogProperties(dismissOnClickOutside = action == null),
         title = { Text((action ?: tools.last)?.let { stringResource(it.title) } ?: stringResource(R.string.ai), color = Am.OnDark) },
         text = {
             Column {
