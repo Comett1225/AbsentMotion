@@ -21,6 +21,23 @@ class GroupedAudioTest {
         assertEquals(0.0, span.pos, 1e-6)
     }
 
+    @Test fun aSoundThatStartsLateInAGroupIsReadiedAtItsInPointNotBeforeIt() {
+        val late = Scene.parse("""
+            <scene width="100" height="100" fps="30"><embedScene id="1" startTime="0" endTime="19999">
+            <scene width="100" height="100" fps="30" totalTime="19999">
+            <audio id="2" src="tone" startTime="5000" endTime="9999" inTime="8000" outTime="13000"/>
+            </scene></embedScene></scene>""")
+        val clip = AudioClip.of(late).single()
+        assertEquals(8000.0 to true, clip.cue(0.0))
+        assertEquals(8000.0 to true, clip.cue(4900.0))
+        val (playing, early) = clip.cue(6000.0)
+        assertEquals(9000.0, playing, 1e-6)
+        assertFalse(early)
+        val top = AudioClip.of(Scene.parse("""<scene width="100" height="100" fps="30"><audio id="3" src="tone" startTime="5000" endTime="9999" inTime="8000" outTime="13000"/></scene>""")).single()
+        assertEquals(8000.0 to true, top.cue(1000.0))
+        assertEquals(8500.0 to false, top.cue(5500.0))
+    }
+
     @Test fun groupSpeedChangesTheSampleStep() {
         val clip = AudioClip.of(scene(speed = 2, childStart = 0)).single()
         assertEquals(500.0, clip.mediaAt(2250.0), 1e-6)

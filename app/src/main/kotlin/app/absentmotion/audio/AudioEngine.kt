@@ -241,12 +241,12 @@ class AudioEngine(context: Context) {
             for (clip in list) {
                 if (t0 + AHEAD_MS < clip.startMs || t0 > clip.endMs + BEHIND_MS) continue
                 wanted += clip.id
-                val pos = clip.wrap(clip.mediaAt(max(t0, clip.startMs.toDouble())))
+                val (pos, early) = clip.cue(t0)
                 val loopMs = clip.inMs.takeIf { clip.loop }
                 var s = streams[clip.id]
                 if (s != null && (s.uri != clip.uri || s.loopMs != loopMs)) { s.close(); s = null }
                 if (s == null) streams[clip.id] = LayerStream(clip.uri, pos - LayerStream.LEAD_MS, loopMs) { PcmDecoder(context, clip.uri) }
-                else if (t0 < clip.startMs) s.prepare(pos)
+                else if (early) s.prepare(pos)
             }
             streams.keys.filter { it !in wanted }.forEach { streams.remove(it)?.close() }
         }

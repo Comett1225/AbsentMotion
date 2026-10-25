@@ -46,6 +46,12 @@ internal class AudioClip(layer: Layer, val uri: String, private val track: Layer
 
     fun mediaAt(projectMs: Double): Double = timing.mediaMs((track?.timeAt(projectMs, false, false)?.ms ?: projectMs) - gainLayer.startTime)
 
+    fun cue(t0: Double): Pair<Double, Boolean> {
+        val at = maxOf(t0, startMs.toDouble())
+        val local = (track?.timeAt(at, false, false)?.ms ?: at) - gainLayer.startTime
+        return wrap(timing.mediaMs(maxOf(local, 0.0))) to (t0 < startMs || local < 0)
+    }
+
     fun wrap(media: Double): Double {
         if (!loop || outMs.isInfinite()) return media
         val span = (outMs - inMs).coerceAtLeast(1.0)
