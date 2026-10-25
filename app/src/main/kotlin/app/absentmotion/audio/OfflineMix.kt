@@ -121,7 +121,7 @@ internal class OfflineMix(
 
         fun audible(context: Context, scene: Scene): List<AudioClip> = AudioClip.of(scene).filter { hasSoundTrack(context, it.uri) }
 
-        private fun hasSoundTrack(context: Context, uri: String): Boolean {
+        fun hasSoundTrack(context: Context, uri: String): Boolean {
             val parsed = android.net.Uri.parse(uri)
             return soundTracks.getOrPut(uri + "\n" + app.absentmotion.media.fileVersion(context.contentResolver, parsed)) {
                 val extractor = android.media.MediaExtractor()

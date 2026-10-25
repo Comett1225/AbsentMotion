@@ -25,6 +25,7 @@ class AudioEngine(context: Context) {
     private val main = Handler(Looper.getMainLooper())
     @Volatile private var clips: List<AudioClip> = emptyList()
     private val streams = HashMap<Long, LayerStream>()
+    private val sounds = java.util.concurrent.ConcurrentHashMap<String, Boolean>()
     @Volatile private var session: Session? = null
     @Volatile private var closed = false
     @Volatile private var releasing = false
@@ -72,13 +73,16 @@ class AudioEngine(context: Context) {
     }
 
     fun setScene(scene: Scene) {
-        if (!closed) clips = AudioClip.of(scene)
+        if (closed) return
+        val next = AudioClip.of(scene)
+        clips = next
+        for (clip in next) if (sounds.putIfAbsent(clip.uri, true) == null) probe.execute { sounds[clip.uri] = OfflineMix.hasSoundTrack(context, clip.uri) }
     }
 
     fun play(startMs: Double): Boolean {
         val previous = session
         previous?.halt()
-        if (closed || clips.none { it.endMs > startMs }) { session = null; return false }
+        if (closed || !clips.audibleAfter(startMs, sounds::get)) { session = null; return false }
         if (manager?.requestAudioFocus(focus) == AudioManager.AUDIOFOCUS_REQUEST_FAILED) { session = null; return false }
         interrupted = false
         listen(true)
@@ -239,7 +243,7 @@ class AudioEngine(context: Context) {
         synchronized(streams) {
             val wanted = HashSet<Long>()
             for (clip in list) {
-                if (t0 + AHEAD_MS < clip.startMs || t0 > clip.endMs + BEHIND_MS) continue
+                if (t0 + AHEAD_MS < clip.startMs || t0 > clip.endMs + BEHIND_MS || sounds[clip.uri] == false) continue
                 wanted += clip.id
                 val (pos, early) = clip.cue(t0)
                 val loopMs = clip.inMs.takeIf { clip.loop }
@@ -257,9 +261,12 @@ class AudioEngine(context: Context) {
         const val AHEAD_MS = 1500.0
         const val BEHIND_MS = 300.0
         const val IDLE_MS = 8000L
+        val probe: java.util.concurrent.ExecutorService = java.util.concurrent.Executors.newSingleThreadExecutor { Thread(it, "am-audio-probe").apply { isDaemon = true } }
         val ATTRIBUTES: AudioAttributes = AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA).setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build()
     }
 }
+
+internal fun List<AudioClip>.audibleAfter(startMs: Double, sound: (String) -> Boolean?): Boolean = any { it.endMs > startMs && sound(it.uri) != false }
 
 internal fun mixStreams(
     clips: List<AudioClip>, out: FloatArray, frames: Int, t0: Double, rate: Int, quality: Int, rack: FxRack,

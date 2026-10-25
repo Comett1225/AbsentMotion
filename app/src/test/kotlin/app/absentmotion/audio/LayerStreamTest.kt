@@ -3,6 +3,7 @@ package app.absentmotion.audio
 import app.absentmotion.awaitCondition
 import app.absentmotion.sceneXml
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -51,6 +52,17 @@ class LayerStreamTest {
             stream.close()
         }
         assertEquals(3, wraps)
+    }
+
+    @Test fun onlyClipsThatCanStillSoundAskForAudioFocus() {
+        val clips = AudioClip.of(sceneXml(
+            """<shape id="1" startTime="0" endTime="999" fillType="media" fillVideo="early.mp4" s=".rect"/>""",
+            """<shape id="2" startTime="0" endTime="4999" fillType="media" fillVideo="silent.mp4" s=".rect"/>""",
+        ))
+        val known = mapOf("early.mp4" to true, "silent.mp4" to false)
+        assertTrue(clips.audibleAfter(0.0, known::get))
+        assertFalse(clips.audibleAfter(2000.0, known::get))
+        assertTrue(clips.audibleAfter(2000.0) { null })
     }
 
     @Test fun aGifClipMarkedSilentOpensNoSound() {
