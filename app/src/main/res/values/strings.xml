@@ -272,6 +272,7 @@
     <string name="library_err_not_backup">This file is not an AbsentMotion backup.</string>
     <string name="library_err_backup_project_large">A project in the backup is too large.</string>
     <string name="library_err_backup_changed">This backup file was changed after it was made, so it cannot be restored safely. Restore the original backup file.</string>
+    <string name="library_err_backup_damaged">This backup file is damaged, so it cannot be restored. Nothing in your library was changed.</string>
     <string name="library_imported_project">Imported Project</string>
     <string name="library_damaged_project">Damaged project</string>
     <string name="library_report_unknown">Not recognized, kept in the file</string>

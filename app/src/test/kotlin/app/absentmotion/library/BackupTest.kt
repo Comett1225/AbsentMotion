@@ -310,7 +310,8 @@ class BackupTest {
         try {
             Backup.restore(store, root, ByteArrayInputStream(bytes.copyOf(bytes.size - 100_000)))
             fail("should have failed")
-        } catch (e: java.io.IOException) {
+        } catch (e: ImportFailed) {
+            assertEquals(txt(R.string.library_err_backup_damaged), e.text)
         }
         assertEquals(before, everything(root))
         assertEquals(Backup.Restored(2, 0, 0), Backup.restore(store, root, ByteArrayInputStream(bytes)))

@@ -227,7 +227,11 @@ object Backup {
             }
         } catch (t: Throwable) {
             created.asReversed().forEach { it.delete() }
-            throw if (t is OutOfMemoryError) ImportFailed(txt(R.string.library_err_backup_project_large)) else t
+            throw when (t) {
+                is OutOfMemoryError -> ImportFailed(txt(R.string.library_err_backup_project_large))
+                is java.util.zip.ZipException, is java.io.EOFException -> ImportFailed(txt(R.string.library_err_backup_damaged))
+                else -> t
+            }
         } finally {
             staged.forEach { it.delete() }
         }
