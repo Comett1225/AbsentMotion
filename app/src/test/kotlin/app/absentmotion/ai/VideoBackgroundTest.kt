@@ -134,6 +134,12 @@ class VideoBackgroundTest {
         assertNull(scene.withVideoMatte(image, MediaDeclaration(XmlNode("media", mapOf("uri" to "m.mp4"))), 10, 10, 2, 3))
     }
 
+    @Test fun aTextWithAVideoFillIsRefusedBeforeAnyFrameIsMatted() {
+        val text = Layer(XmlNode("text", linkedMapOf("id" to "1", "fillType" to "media", "fillVideo" to "v.mp4")))
+        assertNotNull(AiAction.Video.unavailable(text))
+        assertNull(AiAction.Video.unavailable(Layer(XmlNode("shape", linkedMapOf("id" to "2", "fillType" to "media", "fillVideo" to "v.mp4", "s" to ".rect")))))
+    }
+
     @Test fun theMaskFollowsTheClipAfterLaterEdits() {
         val scene = Scene(Scene.create("t", 1080, 1920, 30, 0).node.copy(children = listOf(XmlNode("media", mapOf("uri" to "v.mp4")), video().node)))
         val grouped = scene.withVideoMatte(scene.layer(1)!!, MediaDeclaration(XmlNode("media", mapOf("uri" to "m.mp4"))), 200, 100, 2, 3)!!

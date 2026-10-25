@@ -42,7 +42,7 @@ enum class AiAction(@StringRes val title: Int) {
         Noise -> if (layer?.kind == "audio") null else txt(R.string.ai_select_audio_layer)
         Enhance -> app.absentmotion.Tier.reason(app.absentmotion.Feature.AiEnhance) ?: videoReason(layer, AiKind.Enhance)
         Smooth -> videoReason(layer, AiKind.Smooth)
-        Video -> videoReason(layer, null)
+        Video -> videoReason(layer, null) ?: if (layer?.shape.isNullOrEmpty()) txt(R.string.ai_select_video_layer) else null
     }
 
     private fun videoReason(layer: Layer?, kind: AiKind?): UiText? = when {

@@ -99,7 +99,7 @@ class AiMarkTest {
         assertFalse(scene.layer(1)!!.withAiMark(AiKind.Noise, "raw.wav", "clean.wav").aiBuried(AiKind.Noise))
         assertEquals(txt(R.string.ai_undo_newer_first), AiAction.Smooth.unavailable(smoothThenEnhance))
         assertNull(AiAction.Smooth.unavailable(enhanceThenSmooth))
-        assertNull(AiAction.Video.unavailable(smoothThenEnhance))
+        assertNull(AiAction.Video.unavailable(smoothThenEnhance.copy(node = smoothThenEnhance.node.with("s", ".rect"))))
         assertEquals(txt(R.string.ai_select_video_layer), AiAction.Smooth.unavailable(null))
     }
 
