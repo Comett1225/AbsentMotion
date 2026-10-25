@@ -108,6 +108,11 @@ import app.absentmotion.export.AudioFormat
 import app.absentmotion.export.Choice
 import app.absentmotion.export.DeviceCapabilities
 import app.absentmotion.export.ExportPrefs
+import app.absentmotion.export.ExportRun
+import app.absentmotion.export.NotifyAsk
+import app.absentmotion.export.imageProblem
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import app.absentmotion.export.ExportSizes
 import app.absentmotion.export.ExportTimes
 import app.absentmotion.export.StorageStatus
@@ -217,13 +222,15 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
     var kind by remember { mutableStateOf(ExportKind.Video) }
     val prefs = remember { ExportPrefs(context) }
     val settings = remember { mutableStateMapOf<ExportKind, ExportSettings>().apply { ExportKind.entries.forEach { put(it, prefs.load(it, scene)) } } }
+    val stored = remember { HashMap(settings.toMap()) }
+    val persist = { settings.forEach { (k, v) -> if (stored[k] != v) { prefs.save(k, v); stored[k] = v } } }
     LaunchedEffect(settings) {
-        var last = settings.toMap()
-        snapshotFlow { settings.toMap() }.collect { now ->
-            now.forEach { (k, v) -> if (last[k] != v) prefs.save(k, v) }
-            last = now
+        snapshotFlow { settings.toMap() }.collectLatest {
+            delay(SaveDelayMs)
+            persist()
         }
     }
+    DisposableEffect(settings) { onDispose { persist() } }
     var page by remember { mutableStateOf<ExportKind?>(null) }
     var lastPage by remember { mutableStateOf(ExportKind.Gif) }
     var audioPage by remember { mutableStateOf(false) }
@@ -252,7 +259,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
     val gifSample by produceState<GifSample?>(null, kind, scene, gifSettings, phase) {
         value = null
         if (kind == ExportKind.Gif && phase is Phase.Idle) {
-            try { value = measureGif(engine, scene, gifSettings) }
+            try { delay(MeasureDelayMs); value = measureGif(engine, scene, gifSettings) }
             catch (e: CancellationException) { throw e }
             catch (e: Exception) { Log.w("AMExport", "Cannot sample GIF size", e) }
         }
@@ -261,7 +268,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
     val drawMs by produceState<Double?>(null, kind, scene, videoSettings.shortSide, videoSettings.smoothing, phase is Phase.Idle) {
         value = null
         if (kind == ExportKind.Video && phase is Phase.Idle) {
-            try { value = measureVideoDraw(engine, scene, videoSettings) }
+            try { delay(MeasureDelayMs); value = measureVideoDraw(engine, scene, videoSettings) }
             catch (e: CancellationException) { throw e }
             catch (e: Exception) { Log.w("AMExport", "Cannot sample the drawing time", e) }
         }
@@ -269,17 +276,26 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
     var free by remember { mutableLongStateOf(freeSpace()) }
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     DisposableEffect(lifecycle) {
-        val observer = LifecycleEventObserver { _, event -> if (event == Lifecycle.Event.ON_RESUME) free = freeSpace() }
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) free = freeSpace()
+            if (event == Lifecycle.Event.ON_START) ExportRun.visible = true
+            if (event == Lifecycle.Event.ON_STOP) ExportRun.visible = false
+        }
         lifecycle.addObserver(observer)
-        onDispose { lifecycle.removeObserver(observer) }
+        onDispose { lifecycle.removeObserver(observer); ExportRun.visible = true }
     }
-    LaunchedEffect(phase) { free = freeSpace() }
+    var confirmStop by remember { mutableStateOf(false) }
+    LaunchedEffect(phase) { free = freeSpace(); confirmStop = false }
 
     val caps = remember { DeviceCapabilities.of(context) }
     val report by caps.report.collectAsState()
+    var checking by remember { mutableStateOf(false) }
+    var reportTried by remember { mutableStateOf(false) }
     LaunchedEffect(caps) {
         try { caps.load() } catch (e: CancellationException) { throw e } catch (e: Exception) { Log.w("AMExport", "Cannot read the encoders", e) }
     }
+    val videoSize = exportSize(scene, settings.getValue(ExportKind.Video).shortSide, even = true)
+    LaunchedEffect(report != null, videoSize) { if (report != null) caps.confirmSize(videoSize.first, videoSize.second) }
     val sizes = remember { ExportSizes(context) }
     val rawEstimate = if (kind == ExportKind.Gif) gifSample?.bytes ?: -1L else remember(kind, scene, settings.getValue(kind), hasAudio, report) {
         val s = settings.getValue(kind)
@@ -313,13 +329,19 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
         }
     }
     val storage = if (estimate < 0) StorageStatus.Enough else storageStatus(estimate, free)
-    val blocked = exportBlock(storage, if (kind == ExportKind.Video) support else Support.Supported)
+    val audioOnly = settings.getValue(ExportKind.Audio)
+    val audioProblem = remember(report, audioOnly) { caps.checkAudioOnly(audioOnly) }
+    val blocked = if (checking) txt(R.string.export_calculating) else exportBlock(storage, when {
+        kind == ExportKind.Video -> support
+        kind == ExportKind.Audio && audioProblem != null -> Support.Unsupported(audioProblem, null)
+        else -> Support.Supported
+    })
     val explain: (UiText) -> Unit = { failure = Failure(R.string.export_not_available, it) }
 
     app.absentmotion.platform.ExportBars(dark = false, running = phase is Phase.Running)
     BackHandler {
-        when (val p = phase) {
-            is Phase.Running -> p.job.cancel()
+        when (phase) {
+            is Phase.Running -> confirmStop = true
             is Phase.Done -> phase = Phase.Idle
             Phase.Idle -> when {
                 audioPage -> audioPage = false
@@ -334,9 +356,21 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
     }
 
     val storageAccess = rememberStorageAccess()
+    val notifyAsk = rememberNotifyAsk()
 
     fun start(ignoreMissing: Boolean = false, aiReady: Boolean = false) {
-        if (phase !is Phase.Idle || !storageAccess.ready { start(ignoreMissing, aiReady) }) return
+        if (phase !is Phase.Idle || checking || !storageAccess.ready { start(ignoreMissing, aiReady) }) return
+        if ((kind == ExportKind.Video || kind == ExportKind.Audio) && report == null && !reportTried) {
+            reportTried = true
+            checking = true
+            scope.launch {
+                try { caps.load() } catch (e: CancellationException) { throw e } catch (e: Exception) { Log.w("AMExport", "Cannot read the encoders", e) }
+                checking = false
+                start(ignoreMissing, aiReady)
+            }
+            return
+        }
+        if (kind in BackgroundKinds && !notifyAsk.ready { start(ignoreMissing, aiReady) }) return
         val s = settings.getValue(kind)
         val aiLevel = s.interpolationLevel.takeIf { s.interpolation == FrameInterpolation.Ai && kind in AiKinds }
         if (aiLevel != null && !aiReady && !AiSmooth.installed(context, aiLevel)) {
@@ -352,8 +386,15 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
             failure = Failure(R.string.export_nothing_title, NoSound)
             return
         }
-        if (kind == ExportKind.Video && support is Support.Unsupported) {
-            failure = Failure(R.string.export_not_supported_title, codecWarning(s, support) ?: txt(R.string.export_block_unsupported), better?.let { suggestionLabel(s, it) }, better?.let { ::useBetter })
+        val fresh = check(s)
+        if (kind == ExportKind.Video && fresh is Support.Unsupported) {
+            val fix = betterChoice(s, fresh, check)
+            failure = Failure(R.string.export_not_supported_title, codecWarning(s, fresh) ?: txt(R.string.export_block_unsupported), fix?.let { suggestionLabel(s, it) },
+                fix?.let { { settings[ExportKind.Video] = it } })
+            return
+        }
+        if (kind == ExportKind.Audio) caps.checkAudioOnly(s)?.let {
+            failure = Failure(R.string.export_not_supported_title, it)
             return
         }
         free = freeSpace()
@@ -368,7 +409,9 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
         val name = safeName(scene.title) + " " + SimpleDateFormat("yyyyMMdd_HHmmss", Locale.ENGLISH).format(Date())
         progress = 0f
         note = null
+        val background = chosen in BackgroundKinds
         val job = scope.launch {
+            var outcome: Boolean? = null
             try {
                 var exported = scene
                 if (chosen != ExportKind.Xml) {
@@ -397,7 +440,8 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
                     }
                 }
                 if (aiLevel != null && !AiSmooth.installed(context, aiLevel)) AiSmooth.download(context, aiLevel) { progress = it }
-                val result = exporter.export(chosen, exported, s, frame, name, { note = it }) { progress = it }
+                val result = exporter.export(chosen, exported, s, frame, name, { note = it }) { progress = it; ExportRun.progress = it }
+                outcome = true
                 phase = Phase.Done(chosen, result)
                 ExportSizes.key(chosen, s)?.let { key ->
                     withContext(Dispatchers.IO) {
@@ -420,11 +464,15 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
                 throw e
             } catch (e: Throwable) {
                 Log.e("AMExport", "export failed", e)
+                outcome = false
                 phase = Phase.Idle
                 failure = Failure(R.string.export_failed_title, txt(R.string.library_text_value, e.message ?: e.toString()), hint = true)
+            } finally {
+                if (background) ExportRun.end(outcome)
             }
         }
         phase = Phase.Running(chosen, System.nanoTime(), job)
+        if (background) ExportRun.begin(context, runningTitle(chosen)) { job.cancel() }
     }
 
     val info: @Composable () -> Unit = { InfoBlock(free, estimate, timeMs, heat.level, storage) }
@@ -489,7 +537,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
             val shown = lastPhase
             val background = animatedColor(if (shown is Phase.Done) Am.Navy else Scrim)
             Box(Modifier.fillMaxSize().presenceScrim(background).pointerInput(Unit) {}, contentAlignment = Alignment.Center) {
-                if (shown is Phase.Running) RunningPanel(shown, progress, heat.level, note) { shown.job.cancel() }
+                if (shown is Phase.Running) RunningPanel(shown, progress, heat.level, note) { confirmStop = true }
                 else if (shown is Phase.Done) DoneScreen(shown.kind, shown.result, { phase = Phase.Idle }) { share(context, shown) }
             }
         }
@@ -519,6 +567,16 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
             title = { Text(stringResource(R.string.export_interpolation), color = Navy) },
             text = { SmoothingHelp(Navy, Modifier.heightIn(max = 420.dp)) },
             confirmButton = { TextButton({ help = false }) { Text(stringResource(R.string.ok), color = Navy) } },
+            containerColor = Am.Card,
+        )
+    }
+    if (confirmStop) (phase as? Phase.Running)?.let { running ->
+        AlertDialog(
+            onDismissRequest = { confirmStop = false },
+            title = { Text(stringResource(R.string.export_stop_title), color = Navy) },
+            text = { Text(stringResource(R.string.export_stop_text), color = Navy) },
+            confirmButton = { TextButton({ confirmStop = false; running.job.cancel() }) { Text(stringResource(R.string.stop), color = Navy) } },
+            dismissButton = { TextButton({ confirmStop = false }) { Text(stringResource(R.string.export_keep_going), color = Navy) } },
             containerColor = Am.Card,
         )
     }
@@ -955,7 +1013,12 @@ private fun OptionsPage(kind: ExportKind, scene: Scene, s: ExportSettings, onRea
     val rates = (if (kind == ExportKind.Gif) GifFrameRates else (VideoFrameRates + scene.fps)).distinct().sorted()
     val images = kind == ExportKind.Sequence || kind == ExportKind.FrameAs
     if (images) {
-        Chips(stringResource(R.string.export_format), if (kind == ExportKind.FrameAs) "${scene.width}x${scene.height}" else null) { ImageKind.entries.forEach { Chip(stringResource(it.label), s.image == it) { onChange(s.copy(image = it)) } } }
+        Chips(stringResource(R.string.export_format), if (kind == ExportKind.FrameAs) "${scene.width}x${scene.height}" else null) {
+            ImageKind.entries.forEach { image ->
+                val reason = imageProblem(image, android.os.Build.VERSION.SDK_INT)
+                Chip(stringResource(image.label), s.image == image, reason == null) { reason?.let(onReason) ?: onChange(s.copy(image = image)) }
+            }
+        }
         Chips(stringResource(R.string.export_quality), reason = if (s.image.lossy) null else txt(R.string.export_reason_image_lossless, txt(s.image.label)), onReason = onReason) {
             ImageQualities.forEach { Chip("$it%", s.imageQuality == it) { onChange(s.copy(imageQuality = it)) } }
         }
@@ -1009,10 +1072,10 @@ private fun Chips(label: String, value: String? = null, reason: UiText? = null, 
 }
 
 @Composable
-private fun Chip(label: String, selected: Boolean, onClick: () -> Unit) {
+private fun Chip(label: String, selected: Boolean, enabled: Boolean = true, onClick: () -> Unit) {
     val fill = animatedColor(if (selected) Navy else Am.SheetBg)
     val text = animatedColor(if (selected) Am.OnNavyAccent else Navy)
-    Box(Modifier.height(34.dp).clip(RoundedCornerShape(17.dp)).background(fill).clickable(onClick = onClick).padding(horizontal = 14.dp), contentAlignment = Alignment.Center) {
+    Box(Modifier.height(34.dp).alpha(if (enabled) 1f else Dimmed).clip(RoundedCornerShape(17.dp)).background(fill).clickable(onClick = onClick).padding(horizontal = 14.dp), contentAlignment = Alignment.Center) {
         Text(label, color = text, fontSize = 15.sp, maxLines = 1, style = Mixed)
     }
 }
@@ -1022,16 +1085,7 @@ private fun BoxScope.RunningPanel(p: Phase.Running, progress: Float, heat: Therm
     val percent = (progress * 100).toInt().coerceIn(0, 100)
     val left = if (progress > 0.02f) ((System.nanoTime() - p.startNs) / 1e9 * (1 - progress) / progress).toInt() else null
     Column(Modifier.align(Alignment.Center).presence(), horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(
-            stringResource(when (p.kind) {
-                ExportKind.Video -> R.string.export_running_video
-                ExportKind.Audio -> R.string.export_running_audio
-                ExportKind.Gif -> R.string.export_running_gif
-                ExportKind.Sequence -> R.string.export_running_sequence
-                else -> R.string.export_running
-            }),
-            color = Am.OnScrim, fontSize = 18.sp, textAlign = TextAlign.Center,
-        )
+        Text(stringResource(runningTitle(p.kind)), color = Am.OnScrim, fontSize = 18.sp, textAlign = TextAlign.Center)
         Spacer(Modifier.height(15.dp))
         Box(Modifier.width(220.dp).height(7.dp).clip(RoundedCornerShape(5.dp)).background(Am.OnScrim.copy(alpha = 0.2f))) {
             Box(Modifier.fillMaxWidth(progress.coerceIn(0f, 1f)).fillMaxHeight().background(Am.OnNavyAccent))
@@ -1048,10 +1102,42 @@ private fun BoxScope.RunningPanel(p: Phase.Running, progress: Float, heat: Therm
         TextButton(onCancel) { Text(stringResource(R.string.cancel), color = Am.OnNavyAccent, fontSize = 17.sp) }
     }
     Text(
-        stringResource(R.string.keep_absentmotion_open_and_your_screen),
+        stringResource(if (p.kind in BackgroundKinds) R.string.export_running_leave else R.string.keep_absentmotion_open_and_your_screen),
         Modifier.align(Alignment.BottomCenter).navigationBarsPadding().padding(horizontal = 30.dp, vertical = 30.dp),
         color = Am.OnScrim, fontSize = 12.sp, textAlign = TextAlign.Center,
     )
+}
+
+@StringRes
+private fun runningTitle(kind: ExportKind): Int = when (kind) {
+    ExportKind.Video -> R.string.export_running_video
+    ExportKind.Audio -> R.string.export_running_audio
+    ExportKind.Gif -> R.string.export_running_gif
+    ExportKind.Sequence -> R.string.export_running_sequence
+    else -> R.string.export_running
+}
+
+private val BackgroundKinds = setOf(ExportKind.Video, ExportKind.Audio, ExportKind.Gif, ExportKind.Sequence, ExportKind.Package)
+
+private const val SaveDelayMs = 400L
+private const val MeasureDelayMs = 300L
+
+@Composable
+private fun rememberNotifyAsk(): NotifyAsk {
+    val context = LocalContext.current
+    val launcher = remember { arrayOfNulls<androidx.activity.result.ActivityResultLauncher<String>>(1) }
+    val ask = remember {
+        val prefs = context.getSharedPreferences("export_settings", android.content.Context.MODE_PRIVATE)
+        NotifyAsk(
+            android.os.Build.VERSION.SDK_INT,
+            { context.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) == android.content.pm.PackageManager.PERMISSION_GRANTED },
+            { prefs.getBoolean("notifyAsked", false) },
+            { prefs.edit().putBoolean("notifyAsked", true).apply() },
+            { launcher[0]?.launch(android.Manifest.permission.POST_NOTIFICATIONS) },
+        )
+    }
+    launcher[0] = androidx.activity.compose.rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.RequestPermission()) { ask.answered() }
+    return ask
 }
 
 private fun share(context: app.absentmotion.platform.Context, done: Phase.Done) {
