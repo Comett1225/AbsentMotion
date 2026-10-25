@@ -3,11 +3,14 @@ package app.absentmotion.ai
 import android.media.MediaFormat
 import app.absentmotion.audio.PcmChunk
 import app.absentmotion.audio.PcmSource
+import app.absentmotion.audio.ToneSource
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import kotlin.math.PI
+import kotlin.math.sin
 
 class AiSoundTest {
     private class Source(private val frames: List<Int>, private val rate: Int) : PcmSource {
@@ -95,5 +98,23 @@ class AiSoundTest {
         for (mime in listOf(MediaFormat.MIMETYPE_AUDIO_AAC, MediaFormat.MIMETYPE_AUDIO_AMR_NB, MediaFormat.MIMETYPE_AUDIO_AMR_WB)) assertTrue(mime, soundIsCopied(mime))
         for (mime in listOf(MediaFormat.MIMETYPE_AUDIO_MPEG, MediaFormat.MIMETYPE_AUDIO_VORBIS, MediaFormat.MIMETYPE_AUDIO_FLAC, MediaFormat.MIMETYPE_AUDIO_RAW,
             MediaFormat.MIMETYPE_AUDIO_OPUS, MediaFormat.MIMETYPE_AUDIO_AC3)) assertFalse(mime, soundIsCopied(mime))
+    }
+
+    @Test fun soundIsEncodedAtARateTheAacEncoderTakes() {
+        assertEquals(44_100, aacRate(88_200))
+        assertEquals(48_000, aacRate(96_000))
+        assertEquals(44_100, aacRate(176_400))
+        assertEquals(48_000, aacRate(192_000))
+        assertEquals(48_000, aacRate(64_000))
+        assertEquals(48_000, aacRate(48_000))
+        assertEquals(22_050, aacRate(22_050))
+    }
+
+    @Test fun soundAbove48kHzIsResampledInTimeAndInTune() {
+        val tone = ToneSource(1000.0, 96_000)
+        val feed = PcmFeed(tone, tone.next()!!, 96_000)
+        val out = Downsampled(feed::read, 96_000, 48_000).mix(0, 1_000_000)
+        assertEquals(2 * 48_000, out.size)
+        for (i in 64 until 48_000) assertEquals("frame $i", 0.5 * sin(2 * PI * 1000.0 * i / 48_000) * 32767, out[2 * i].toDouble(), 330.0)
     }
 }
