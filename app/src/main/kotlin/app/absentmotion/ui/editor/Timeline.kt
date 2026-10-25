@@ -275,9 +275,10 @@ private fun RowSemantics(view: TimelineView) {
         for (row in rows) {
             val layer = view.layerAt(row) ?: continue
             key(layer.id) {
+                val chosen = layer.id == view.state.selectedId || layer.id in MultiSelect.ids
                 Box(Modifier.offset { IntOffset(0, (view.rowTop(row) - view.rulerH).roundToInt()) }.fillMaxWidth().height(RowHeight).semantics {
                     contentDescription = layer.label.ifEmpty { layer.kind }
-                    selected = layer.id == view.state.selectedId || layer.id in MultiSelect.ids
+                    selected = chosen
                     if (layer.hidden) stateDescription = hidden
                     onClick(select) { view.tap(Hit.Header(layer.id)); true }
                     customActions = listOf(CustomAccessibilityAction(if (layer.hidden) show else hide) { view.state.toggleHidden(layer.id); true })

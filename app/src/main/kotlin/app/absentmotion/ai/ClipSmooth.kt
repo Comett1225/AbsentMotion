@@ -192,6 +192,7 @@ internal class SmoothKeeper(private val context: Context, private val state: Edi
         var made: AiMedia? = null
         var committed = false
         try {
+            try { state.engine.awaitVideoFrames(scene, state.timeMs) } catch (e: java.io.IOException) { android.util.Log.i("AMSmooth", "preview frame not ready: ${e.message}") }
             withContext(Dispatchers.IO) { made = ClipSmooth.run(context, state.engine, base, media, scene.fps, smoothing) { _, _ -> } }
             val output = made ?: return
             if (state.scene.node !== scene.node) return
