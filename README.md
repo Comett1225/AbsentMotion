@@ -5,15 +5,17 @@
 # AbsentMotion
 
 <p align="center">
-  <a href="https://comett1225.github.io/AbsentMotion/"><b>Download for your phone</b></a>
-  &nbsp;·&nbsp;
-  <a href="https://comett1225.github.io/AbsentMotion/guide.html"><b>Guide and docs</b></a>
-  &nbsp;·&nbsp;
-  <a href="https://comett1225.github.io/AbsentMotion/phone-checker.html">Will it run on my phone?</a>
-  &nbsp;·&nbsp;
-  <a href="https://comett1225.github.io/AbsentMotion/effects/index.html">All effects</a>
-  &nbsp;·&nbsp;
-  <a href="https://github.com/Comett1225/AbsentMotion/releases">All versions</a>
+  <a href="https://github.com/Comett1225/AbsentMotion/releases/latest"><img alt="Latest version" src="https://img.shields.io/github/v/release/Comett1225/AbsentMotion?label=latest%20version&style=for-the-badge&color=f07850"></a>
+  <a href="https://github.com/Comett1225/AbsentMotion/releases"><img alt="Downloads" src="https://img.shields.io/github/downloads/Comett1225/AbsentMotion/total?label=downloads&style=for-the-badge&color=2b2b33"></a>
+  <a href="LICENSE"><img alt="Licence: Apache 2.0" src="https://img.shields.io/badge/licence-Apache%202.0-2b2b33?style=for-the-badge"></a>
+  <a href="#requirements"><img alt="Android 9 and newer" src="https://img.shields.io/badge/Android-9%2B-3DDC84?style=for-the-badge&logo=android&logoColor=white"></a>
+</p>
+<p align="center">
+  <a href="https://comett1225.github.io/AbsentMotion/"><img alt="Download for your phone" src="https://img.shields.io/badge/Download-for%20your%20phone-f07850?style=for-the-badge"></a>
+  <a href="https://comett1225.github.io/AbsentMotion/guide.html"><img alt="Guide and docs" src="https://img.shields.io/badge/Guide-and%20docs-2b2b33?style=for-the-badge"></a>
+  <a href="https://comett1225.github.io/AbsentMotion/phone-checker.html"><img alt="Will it run on my phone?" src="https://img.shields.io/badge/Will%20it%20run-on%20my%20phone%3F-2b2b33?style=for-the-badge"></a>
+  <a href="https://comett1225.github.io/AbsentMotion/effects/index.html"><img alt="All effects" src="https://img.shields.io/badge/All-effects-2b2b33?style=for-the-badge"></a>
+  <a href="https://github.com/Comett1225/AbsentMotion/releases"><img alt="All versions" src="https://img.shields.io/badge/All-versions-2b2b33?style=for-the-badge"></a>
 </p>
 
 AbsentMotion is a free, open-source alternative to CapCut and Alight Motion: a motion graphics, animation and video
