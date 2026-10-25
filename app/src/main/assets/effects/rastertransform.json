@@ -1,0 +1,77 @@
+{
+ "id": "rastertransform",
+ "name": "Raster Transform",
+ "category": "move",
+ "since": "4.0.0",
+ "description": "Scales, turns and moves the finished picture of the layer, after the effects above it, so their result can be transformed too. Fill keeps some of the original underneath and Mask To Layer keeps the result inside the original shape.",
+ "params": [
+  {
+   "id": "scale",
+   "label": "Scale",
+   "type": "float",
+   "default": 1,
+   "min": 0.01,
+   "max": 50,
+   "step": 0.01
+  },
+  {
+   "id": "angle",
+   "label": "Angle",
+   "type": "angle",
+   "default": 0,
+   "min": -3600,
+   "max": 3600,
+   "step": 0.1
+  },
+  {
+   "id": "offset",
+   "label": "Offset",
+   "type": "point",
+   "default": [
+    0,
+    0
+   ],
+   "min": -5000,
+   "max": 5000,
+   "step": 1,
+   "pixels": true
+  },
+  {
+   "id": "mask",
+   "label": "Mask To Layer",
+   "type": "switch",
+   "default": false
+  },
+  {
+   "id": "alpha",
+   "label": "Alpha",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "percent": true
+  },
+  {
+   "id": "fill",
+   "label": "Fill",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "percent": true
+  },
+  {
+   "id": "sampling",
+   "label": "Sampling",
+   "type": "choice",
+   "default": 1,
+   "options": [
+    "Nearest",
+    "Linear"
+   ]
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float scale;\nuniform float angle;\nuniform float2 offset;\nuniform float mask;\nuniform float alpha;\nuniform float fill;\nuniform float sampling;\nhalf4 main(float2 coord) {\n    float2 c = size * 0.5;\n    float a = radians(angle);\n    float2 v = coord - c - offset;\n    float2 p = c + float2(cos(a) * v.x + sin(a) * v.y, cos(a) * v.y - sin(a) * v.x) / max(scale, 0.01);\n    if (sampling < 0.5) p = floor(p) + 0.5;\n    half4 own = image.eval(coord);\n    half4 moved = image.eval(p) * half(clamp(alpha, 0.0, 1.0));\n    half4 color = moved + own * half(clamp(fill, 0.0, 1.0)) * (1.0 - moved.a);\n    if (mask > 0.5) color *= own.a;\n    return color;\n}\n"
+}

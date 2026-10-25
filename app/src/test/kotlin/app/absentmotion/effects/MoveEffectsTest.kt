@@ -30,8 +30,8 @@ class MoveEffectsTest {
     @Test fun theMoveCategoryHoldsTheMotionEffects() {
         val moves = catalog.listed("move").map { it.key }.toSet()
         assertEquals(setOf("autoshake", "randomdisplace", "randomjitter", "oscillate", "swing", "spin", "pulsesize", "pulseopacity",
-            "stretchaxis", "offset", "movealongpath", "echo", "timequant", "shutterblur"), moves)
-        assertEquals(setOf("stretchaxis", "offset"), catalog.listed("move").filterNot { it.native && it.sksl == null }.map { it.key }.toSet())
+            "stretchaxis", "offset", "rastertransform", "movealongpath", "echo", "timequant", "shutterblur"), moves)
+        assertEquals(setOf("stretchaxis", "offset", "rastertransform"), catalog.listed("move").filterNot { it.native && it.sksl == null }.map { it.key }.toSet())
         assertEquals("Move", EffectCatalog.Categories["move"])
     }
 

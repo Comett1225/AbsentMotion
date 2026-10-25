@@ -96,7 +96,7 @@ class AlightEditImportTest {
         assertEquals(1f, tiles.value("zoom")!!.toFloat(), 1e-6f)
         assertEquals(0.25f, tiles.value("offset")!!.toFloat(), 1e-6f)
         assertEquals("true", tiles.value("mirror"))
-        assertEquals(0f, tiles.value("sizing")!!.toFloat(), 1e-6f)
+        assertEquals(1f, tiles.value("sizing")!!.toFloat(), 1e-6f)
         val noise = e.getValue("absent.noise")
         assertEquals(0.205f, noise.value("amount")!!.toFloat(), 1e-6f)
         assertEquals(listOf("true", "false", "true"), listOf("mono", "freeze", "extremes").map { noise.value(it) })

@@ -1,0 +1,26 @@
+{
+ "id": "smoothedges",
+ "name": "Smooth Edges",
+ "category": "key",
+ "since": "4.0.0",
+ "description": "Rounds and smooths the edges of the opaque parts of the layer without changing the colors inside. Mask To Layer only lets the edges move inward.",
+ "params": [
+  {
+   "id": "blur",
+   "label": "Strength",
+   "type": "float",
+   "default": 12,
+   "min": 0,
+   "max": 300,
+   "step": 0.1,
+   "pixels": true
+  },
+  {
+   "id": "mask",
+   "label": "Mask To Layer",
+   "type": "switch",
+   "default": false
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform shader blurred;\nuniform float2 size;\nuniform float time;\nuniform float blur;\nuniform float mask;\nhalf4 main(float2 coord) {\n    half4 c = image.eval(coord);\n    if (blur <= 0.0) return c;\n    half4 b = blurred.eval(coord);\n    float e = clamp(1.2 / max(blur, 1.0), 0.01, 0.5);\n    float a = smoothstep(0.5 - e, 0.5 + e, float(b.a));\n    if (mask > 0.5) a = min(a, float(c.a));\n    float3 rgb = c.a > 0.004 ? float3(c.rgb) / float(c.a) : b.a > 0.004 ? float3(b.rgb) / float(b.a) : float3(0.0);\n    return half4(half3(rgb * a), half(a));\n}\n"
+}
