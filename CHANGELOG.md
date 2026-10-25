@@ -6,7 +6,7 @@ All notable changes to AbsentMotion are listed here, newest first. The format fo
 Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stands for the feature set as it stood on
 2026-10-12.
 
-## [Unreleased]
+## [4.0.1] - 2026-10-25
 
 ### Changed
 
