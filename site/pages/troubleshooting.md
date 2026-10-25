@@ -45,7 +45,7 @@ If you export anyway, the layers that use missing files are left out.
 | The finished video shows a still picture with a play button | The phone could not play it right away. Tap the play button to try again; the file itself is saved. |
 | The exported video has no sound | A hidden layer, or a clip at 0 % volume, is silent. The line "Checked: ..." on the **Saved to storage** screen reports a missing sound track. |
 
-The export only runs while AbsentMotion is open and the screen is on. If you switch to another app, come back and check that it is still running.
+The export keeps running when you switch to another app, and a notification shows its progress. Closing AbsentMotion from the recent apps list stops it.
 
 ## Storage is full
 

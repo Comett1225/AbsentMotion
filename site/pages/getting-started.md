@@ -54,7 +54,7 @@ For quick results, select a layer and tap the round **Animate** button at the bo
 
 1. Tap the share icon in the top bar (named **Export & Share**).
 2. The **Video** card is selected. Tap **Export**.
-3. Wait for the progress bar to finish and keep AbsentMotion open with the screen on.
+3. Wait for the progress bar to finish. You can switch to another app meanwhile: a notification shows the progress.
 4. Tap **Share Video**, or find the file in Movies/AbsentMotion.
 
 All the options (formats, resolution, frame rate, GIF, audio only) are on the [Export](@export) page.
