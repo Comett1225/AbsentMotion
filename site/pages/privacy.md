@@ -12,6 +12,10 @@ Projects, imported pictures, videos and audio, and everything you export stay on
 
 The camera and microphone permissions are only used by the in-app camera, while it is open. Recordings are saved on the phone. Backups are written to Documents/AbsentMotion on the phone and stay there.
 
+While an export runs, the app shows its progress in a notification, so the export can continue when you switch to another app. On Android 13 and newer it asks for the notification permission at the first export; exports work the same if you say no.
+
+While an export runs, the app shows its progress in a notification, so the export can continue when you switch to another app. On Android 13 and newer it asks for the notification permission at the first export; exports work the same if you say no.
+
 If the app closes unexpectedly it keeps a crash log in its own storage: when it happened, the reason in one sentence, the app and Android versions, the phone model, what you were doing and the technical error. Only the last 20 are kept, they are not included in phone backups and they are never sent anywhere. You can read, copy or delete them in Settings.
 
 ## When the app uses the internet
