@@ -328,7 +328,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
     val better = remember(video, support, check) { betterChoice(video, support, check) }
     val warning = codecWarning(video, support)?.takeIf { it != acknowledged || support is Support.Unsupported }
     val current = settings.getValue(kind)
-    val timeMs = remember(kind, current, report, heat.level, estimate, phase is Phase.Idle, gifSample, drawMs, sequenceMs) {
+    val modelMs = remember(kind, current, report, heat.level, estimate, phase is Phase.Idle, gifSample, drawMs, sequenceMs) {
         when (kind) {
             ExportKind.Video -> times.estimateMs(current, scene, report?.probe, heat.level, report, drawMs)
             ExportKind.Gif -> gifSample?.let { gifTimeMs(frameCount(scene, current.fps), it, times.estimateMs(current, scene, report?.probe, heat.level)) }
@@ -338,6 +338,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
             else -> 0L
         }
     }
+    val timeMs = remember(modelMs, kind, phase is Phase.Idle) { modelMs?.let { m -> timeKey(kind)?.let { (m * sizes.ratio(it)).toLong() } ?: m } }
     val storage = if (estimate < 0) StorageStatus.Enough else storageStatus(estimate, free)
     val audioOnly = settings.getValue(ExportKind.Audio)
     val audioProblem = remember(report, audioOnly) { caps.checkAudioOnly(audioOnly) }
@@ -414,6 +415,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
         }
         val chosen = kind
         val estimated = rawEstimate
+        val modelled = modelMs
         prefs.save(chosen, s)
         val alsoTemplate = asTemplate
         val name = safeName(scene.title) + " " + SimpleDateFormat("yyyyMMdd_HHmmss", Locale.ENGLISH).format(Date())
@@ -451,9 +453,11 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
                     }
                 }
                 if (aiLevel != null && !AiSmooth.installed(context, aiLevel)) AiSmooth.download(context, aiLevel) { progress = it }
+                val began = System.nanoTime()
                 val result = exporter.export(chosen, exported, s, frame, name, { note = it }) { progress = it; ExportRun.progress = it }
                 outcome = true
                 phase = Phase.Done(chosen, result)
+                timeKey(chosen)?.let { key -> modelled?.let { sizes.record(key, it, (System.nanoTime() - began) / 1_000_000) } }
                 ExportSizes.key(chosen, s)?.let { key ->
                     withContext(Dispatchers.IO) {
                         val written = result.uris.sumOf { uri ->
@@ -1129,6 +1133,12 @@ private fun runningTitle(kind: ExportKind): Int = when (kind) {
 }
 
 private val BackgroundKinds = setOf(ExportKind.Video, ExportKind.Audio, ExportKind.Gif, ExportKind.Sequence, ExportKind.Package)
+
+private fun timeKey(kind: ExportKind): String? = when (kind) {
+    ExportKind.Gif -> "time.gif"
+    ExportKind.Sequence -> "time.sequence"
+    else -> null
+}
 
 private const val SaveDelayMs = 400L
 private const val MeasureDelayMs = 300L
