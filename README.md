@@ -64,32 +64,27 @@ subscription, no account and no advertising, and your projects never leave your 
 
 ## Speed
 
-AbsentMotion 4.0 and Alight Motion 5.0.273 on the same phone with the same heavy project: an edit made in Alight Motion
-and opened in AbsentMotion from Alight's XML export. It is 13.6 s long, 1080 x 1080 at 60 fps, with two videos cut into
-12 clips and 54 effects, among them Motion Blur, Soft Glow, Tiles and Auto-Shake on every clip. Both apps exported it
-at 1080 x 1080, 60 fps, H.264, about 20 Mbps. The time runs from tapping Export to the finished file; median of three
-runs.
+AbsentMotion 4.0 and Alight Motion 5.0.273 on the same phone, a Samsung Galaxy S26 Ultra (Android 17), with the same
+heavy project: an edit made in Alight Motion and opened in AbsentMotion from Alight's XML export. It is 13.6 s long,
+1080 x 1080 at 60 fps, with two videos cut into 12 clips and 54 effects, among them Motion Blur, Soft Glow, Tiles and
+Auto-Shake on every clip. Both apps exported it as H.264 at about 20 Mbps. Median of three runs, timed from screen
+recordings; the export runs from tapping Export to the finished file.
 
 | | Alight Motion 5.0.273 | AbsentMotion 4.0 |
 |---|---|---|
-| Samsung Galaxy S26 Ultra (Android 17) | 17.1 s | 13.1 s |
-| Lenovo Tab P11 (Android 11, Snapdragon 662), Compatible build | not tested | 5 min 2 s |
+| Start the app, until the home screen is drawn | 2.20 s | 0.44 s |
+| Open the project, until the preview is drawn | 0.86 s | 0.25 s |
+| Export the project (816 frames) | 18.3 s | 13.4 s |
 
-Alight Motion is not installed on the tablet, so only AbsentMotion was measured there. It is a 2021 mid-range tablet,
-and Motion Blur on every clip draws each clip and its effects up to 48 times per frame.
+### AbsentMotion 3.0 and 4.0
 
-<p align="center">
-  <img src="docs/speed-comparison.gif" alt="Alight Motion and AbsentMotion side by side with timers: starting the app, opening the same project and exporting it in 4K" width="560">
-</p>
+The same phone and project without its effects (3.0 cannot run most of them), both exported at 21 Mbps:
 
-An earlier measurement with AbsentMotion 3.0.0 on the same phone, with a lighter test project (one video, two text
-layers and three shapes), is in the GIF above:
-
-| | Alight Motion 5.0.273 | AbsentMotion 3.0.0 |
+| | AbsentMotion 3.0.0 | AbsentMotion 4.0 |
 |---|---|---|
-| Start the app, until the home screen is drawn | 1.94 s | 0.36 s |
-| Open a project, until the first preview frame | 0.39 s | 0.27 s |
-| Export 4K (2160 x 3840) 30 fps H.264 at the highest quality | 5.04 s | 4.35 s |
+| Start the app, until the home screen is drawn | 0.40 s | 0.39 s |
+| Open the project, until the preview is drawn | 0.19 s | 0.17 s |
+| Export the project (816 frames) | 3.63 s | 3.53 s |
 
 ## Requirements
 
