@@ -30,6 +30,13 @@
     "magnitude": {
      "label": "Lakas"
     },
+    "pattern": {
+     "label": "Pattern",
+     "options": [
+      "Klasiko",
+      "Standard"
+     ]
+    },
     "seed": {
      "label": "Seed"
     },
@@ -402,6 +409,9 @@
    "description": "Tinatanggal ang isang kulay, tulad ng green screen.",
    "name": "Chroma key",
    "params": {
+    "invert": {
+     "label": "I-invert"
+    },
     "key": {
      "label": "Kulay ng key"
     },
@@ -2132,6 +2142,9 @@
     "center": {
      "label": "Gitna"
     },
+    "mirror": {
+     "label": "Mirror"
+    },
     "segments": {
      "label": "Mga segment"
     }
@@ -2470,6 +2483,30 @@
     },
     "rotate": {
      "label": "Auto-rotate"
+    }
+   }
+  },
+  "noise": {
+   "description": "Tinatakpan ang layer ng pinong grain, isang grain bawat pixel, na nagbabago bawat frame. Ginagawang kulay-abo ng Monochrome ang grain, ginagawang ganap na maliwanag o madilim ng Extremes ang bawat grain, at pinapanatiling hindi gumagalaw ng Freeze ang pattern.",
+   "name": "Noise",
+   "params": {
+    "amount": {
+     "label": "Lakas"
+    },
+    "extremes": {
+     "label": "Extremes"
+    },
+    "freeze": {
+     "label": "Freeze"
+    },
+    "mono": {
+     "label": "Monochrome"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "overshoot": {
+     "label": "Overshoot"
     }
    }
   },
@@ -3176,6 +3213,37 @@
     }
    }
   },
+  "rastertransform": {
+   "description": "Ini-scale, iniikot, at ginagalaw ang tapos na larawan ng layer, pagkatapos ng mga epekto sa itaas nito, para ma-transform din ang resulta nila. Pinapanatili ng Fill ang ilang bahagi ng orihinal sa ilalim at pinapanatili ng Mask To Layer ang resulta sa loob ng orihinal na hugis.",
+   "name": "Raster Transform",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "angle": {
+     "label": "Anggulo"
+    },
+    "fill": {
+     "label": "Fill"
+    },
+    "mask": {
+     "label": "I-mask sa layer"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "sampling": {
+     "label": "Sampling",
+     "options": [
+      "Nearest",
+      "Linear"
+     ]
+    },
+    "scale": {
+     "label": "Scale"
+    }
+   }
+  },
   "rays": {
    "description": "Nagpapasikat ng mga sinag ng liwanag mula sa maliwanag na bahagi ng layer, palayo sa isang center point.",
    "name": "Mga Sinag",
@@ -3571,6 +3639,48 @@
     }
    }
   },
+  "simplestarfield": {
+   "description": "Nagkakalat ng maliliit na bituin sa mga layer ng lalim sa ibabaw ng opaque na bahagi ng layer. Ginagalaw ng Position ang field nang may parallax, lumilipad ang Depth dito, nagzo-zoom ang Scale dito, hinuhubog ng Size at Feather ang bawat bituin, at nagtatakda ang Amount kung ilan ang naroon.",
+   "name": "Simpleng Starfield",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "amount": {
+     "label": "Dami"
+    },
+    "blend": {
+     "label": "Blending mode",
+     "options": [
+      "Normal",
+      "Add",
+      "Screen",
+      "Multiply"
+     ]
+    },
+    "brightness": {
+     "label": "Liwanag"
+    },
+    "color": {
+     "label": "Kulay"
+    },
+    "depth": {
+     "label": "Lalim"
+    },
+    "feather": {
+     "label": "Feather"
+    },
+    "position": {
+     "label": "Posisyon"
+    },
+    "scale": {
+     "label": "Scale"
+    },
+    "starSize": {
+     "label": "Laki"
+    }
+   }
+  },
   "smear": {
    "description": "Pinapahaba ang layer sa isang direksyon nang fixed ang haba, na parang mabilis itong gumalaw.",
    "name": "Smear",
@@ -3607,10 +3717,25 @@
     }
    }
   },
+  "smoothedges": {
+   "description": "Binibilog at pinapakinis ang mga gilid ng opaque na bahagi ng layer nang hindi binabago ang mga kulay sa loob. Pinapayagan lang ng Mask To Layer na gumalaw papasok ang mga gilid.",
+   "name": "Makinis na gilid",
+   "params": {
+    "blur": {
+     "label": "Lakas"
+    },
+    "mask": {
+     "label": "I-mask sa layer"
+    }
+   }
+  },
   "softglow": {
    "description": "Nagsa-screen ng malambot at blurred na kopya ng larawan para sa dreamy glow, kadalasan mula sa highlights.",
    "name": "Malambot na Glow",
    "params": {
+    "blend": {
+     "label": "Blend"
+    },
     "blur": {
      "label": "Laki"
     },
@@ -3657,6 +3782,24 @@
     },
     "color": {
      "label": "Kulay"
+    }
+   }
+  },
+  "solidmatte": {
+   "description": "Naglalagay ng solid na kulay sa likod ng layer, pinupuno ang mga transparent na bahagi nito. Ipinapakita lang ng Punch Out ang kulay na may butas na hugis ng layer, at pinupuno ng Screen Space ang buong screen sa halip na ang kahon ng layer.",
+   "name": "Solid Matte",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "color": {
+     "label": "Kulay"
+    },
+    "punch": {
+     "label": "Punch Out"
+    },
+    "screenSpace": {
+     "label": "Screen Space"
     }
    }
   },

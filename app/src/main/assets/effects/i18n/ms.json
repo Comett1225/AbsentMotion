@@ -30,6 +30,13 @@
     "magnitude": {
      "label": "Magnitud"
     },
+    "pattern": {
+     "label": "Corak",
+     "options": [
+      "Klasik",
+      "Piawai"
+     ]
+    },
     "seed": {
      "label": "Biji"
     },
@@ -402,6 +409,9 @@
    "description": "Membuang satu warna, contohnya skrin hijau.",
    "name": "Kunci Kroma",
    "params": {
+    "invert": {
+     "label": "Songsang"
+    },
     "key": {
      "label": "Warna Kunci"
     },
@@ -2132,6 +2142,9 @@
     "center": {
      "label": "Pusat"
     },
+    "mirror": {
+     "label": "Cermin"
+    },
     "segments": {
      "label": "Segmen"
     }
@@ -2470,6 +2483,30 @@
     },
     "rotate": {
      "label": "Putar Automatik"
+    }
+   }
+  },
+  "noise": {
+   "description": "Menutup lapisan dengan butiran halus, satu butiran setiap piksel, yang berubah setiap bingkai. Monokrom menjadikan butiran kelabu, Ekstrem menjadikan setiap butiran cerah atau gelap sepenuhnya, dan Beku mengekalkan corak.",
+   "name": "Hingar",
+   "params": {
+    "amount": {
+     "label": "Kekuatan"
+    },
+    "extremes": {
+     "label": "Ekstrem"
+    },
+    "freeze": {
+     "label": "Beku"
+    },
+    "mono": {
+     "label": "Monokrom"
+    },
+    "offset": {
+     "label": "Ofset"
+    },
+    "overshoot": {
+     "label": "Lebihan"
     }
    }
   },
@@ -3176,6 +3213,37 @@
     }
    }
   },
+  "rastertransform": {
+   "description": "Menskalakan, memutar dan menggerakkan gambar siap lapisan, selepas kesan di atasnya, supaya hasilnya juga boleh diubah. Isi mengekalkan sebahagian asal di bawah dan Topeng Ke Lapisan mengekalkan hasil dalam bentuk asal.",
+   "name": "Transformasi Raster",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "angle": {
+     "label": "Sudut"
+    },
+    "fill": {
+     "label": "Isi"
+    },
+    "mask": {
+     "label": "Topeng Ke Lapisan"
+    },
+    "offset": {
+     "label": "Ofset"
+    },
+    "sampling": {
+     "label": "Persampelan",
+     "options": [
+      "Terdekat",
+      "Linear"
+     ]
+    },
+    "scale": {
+     "label": "Skala"
+    }
+   }
+  },
   "rays": {
    "description": "Memancarkan sinar cahaya keluar dari bahagian terang lapisan, menjauhi titik pusat.",
    "name": "Sinar",
@@ -3571,6 +3639,48 @@
     }
    }
   },
+  "simplestarfield": {
+   "description": "Menabur bintang kecil dalam lapisan kedalaman di atas bahagian legap lapisan. Kedudukan menggerakkan medan dengan paralaks, Kedalaman terbang melaluinya, Skala mengezumnya, Saiz dan Kelembutan membentuk setiap bintang dan Jumlah menetapkan bilangannya.",
+   "name": "Medan Bintang Ringkas",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "amount": {
+     "label": "Jumlah"
+    },
+    "blend": {
+     "label": "Mod Campuran",
+     "options": [
+      "Normal",
+      "Tambah",
+      "Skrin",
+      "Darab"
+     ]
+    },
+    "brightness": {
+     "label": "Kecerahan"
+    },
+    "color": {
+     "label": "Warna"
+    },
+    "depth": {
+     "label": "Kedalaman"
+    },
+    "feather": {
+     "label": "Kelembutan"
+    },
+    "position": {
+     "label": "Kedudukan"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "starSize": {
+     "label": "Saiz"
+    }
+   }
+  },
   "smear": {
    "description": "Calitkan lapisan dalam satu arah dengan panjang tetap, seolah-olah ia bergerak laju.",
    "name": "Calit",
@@ -3607,10 +3717,25 @@
     }
    }
   },
+  "smoothedges": {
+   "description": "Membulatkan dan melicinkan tepi bahagian legap lapisan tanpa mengubah warna di dalam. Topeng Ke Lapisan hanya membenarkan tepi bergerak ke dalam.",
+   "name": "Tepi Licin",
+   "params": {
+    "blur": {
+     "label": "Kekuatan"
+    },
+    "mask": {
+     "label": "Topeng Ke Lapisan"
+    }
+   }
+  },
   "softglow": {
    "description": "Menindih salinan gambar yang lembut dan kabur untuk cahaya bagaikan mimpi, kebanyakannya daripada sorotan.",
    "name": "Cahaya lembut",
    "params": {
+    "blend": {
+     "label": "Campuran"
+    },
     "blur": {
      "label": "Saiz"
     },
@@ -3657,6 +3782,24 @@
     },
     "color": {
      "label": "Warna"
+    }
+   }
+  },
+  "solidmatte": {
+   "description": "Meletakkan warna pejal di belakang lapisan, mengisi bahagian lutsinar. Tebuk Keluar menunjukkan hanya warna dengan bentuk lapisan dipotong daripadanya, dan Ruang Skrin mengisi seluruh skrin dan bukan kotak lapisan.",
+   "name": "Matte Pejal",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "color": {
+     "label": "Warna"
+    },
+    "punch": {
+     "label": "Tebuk Keluar"
+    },
+    "screenSpace": {
+     "label": "Ruang Skrin"
     }
    }
   },

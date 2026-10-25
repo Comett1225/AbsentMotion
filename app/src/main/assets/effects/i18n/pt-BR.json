@@ -30,6 +30,13 @@
     "magnitude": {
      "label": "Magnitude"
     },
+    "pattern": {
+     "label": "Padrão",
+     "options": [
+      "Clássico",
+      "Comum"
+     ]
+    },
     "seed": {
      "label": "Semente"
     },
@@ -402,6 +409,9 @@
    "description": "Remove uma cor, como uma tela verde.",
    "name": "Chroma key",
    "params": {
+    "invert": {
+     "label": "Inverter"
+    },
     "key": {
      "label": "Cor-chave"
     },
@@ -2132,6 +2142,9 @@
     "center": {
      "label": "Centro"
     },
+    "mirror": {
+     "label": "Espelhar"
+    },
     "segments": {
      "label": "Segmentos"
     }
@@ -2470,6 +2483,30 @@
     },
     "rotate": {
      "label": "Girar automaticamente"
+    }
+   }
+  },
+  "noise": {
+   "description": "Cobre a camada com granulação fina, um grão por pixel, que muda a cada quadro. Monocromático deixa o grão cinza, Extremos deixa cada grão totalmente claro ou escuro, e Congelar mantém o padrão parado.",
+   "name": "Ruído",
+   "params": {
+    "amount": {
+     "label": "Intensidade"
+    },
+    "extremes": {
+     "label": "Extremos"
+    },
+    "freeze": {
+     "label": "Congelar"
+    },
+    "mono": {
+     "label": "Monocromático"
+    },
+    "offset": {
+     "label": "Deslocamento"
+    },
+    "overshoot": {
+     "label": "Ultrapassagem"
     }
    }
   },
@@ -3176,6 +3213,37 @@
     }
    }
   },
+  "rastertransform": {
+   "description": "Escala, gira e move a imagem finalizada da camada, depois dos efeitos acima dela, para que o resultado deles também possa ser transformado. Preenchimento mantém parte do original por baixo e Mascarar para a camada mantém o resultado dentro da forma original.",
+   "name": "Transformação raster",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "angle": {
+     "label": "Ângulo"
+    },
+    "fill": {
+     "label": "Preenchimento"
+    },
+    "mask": {
+     "label": "Mascarar para a camada"
+    },
+    "offset": {
+     "label": "Deslocamento"
+    },
+    "sampling": {
+     "label": "Amostragem",
+     "options": [
+      "Mais próximo",
+      "Linear"
+     ]
+    },
+    "scale": {
+     "label": "Escala"
+    }
+   }
+  },
   "rays": {
    "description": "Emite raios de luz a partir das partes claras da camada, afastando-se de um ponto central.",
    "name": "Raios",
@@ -3571,6 +3639,48 @@
     }
    }
   },
+  "simplestarfield": {
+   "description": "Espalha pequenas estrelas em camadas de profundidade sobre as partes opacas da camada. Posição move o campo com paralaxe, Profundidade atravessa o campo, Escala dá zoom, Tamanho e Suavidade definem cada estrela e Quantidade define quantas são.",
+   "name": "Campo estelar simples",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "amount": {
+     "label": "Quantidade"
+    },
+    "blend": {
+     "label": "Modo de mesclagem",
+     "options": [
+      "Normal",
+      "Adicionar",
+      "Tela",
+      "Multiplicar"
+     ]
+    },
+    "brightness": {
+     "label": "Brilho"
+    },
+    "color": {
+     "label": "Cor"
+    },
+    "depth": {
+     "label": "Profundidade"
+    },
+    "feather": {
+     "label": "Suavidade"
+    },
+    "position": {
+     "label": "Posição"
+    },
+    "scale": {
+     "label": "Escala"
+    },
+    "starSize": {
+     "label": "Tamanho"
+    }
+   }
+  },
   "smear": {
    "description": "Arrasta a camada em uma direção por um comprimento fixo, como se ela se movesse rápido.",
    "name": "Rastro",
@@ -3607,10 +3717,25 @@
     }
    }
   },
+  "smoothedges": {
+   "description": "Arredonda e suaviza as bordas das partes opacas da camada sem alterar as cores internas. Mascarar para a camada só permite que as bordas se movam para dentro.",
+   "name": "Suavizar bordas",
+   "params": {
+    "blur": {
+     "label": "Intensidade"
+    },
+    "mask": {
+     "label": "Mascarar para a camada"
+    }
+   }
+  },
   "softglow": {
    "description": "Sobrepeia uma cópia desfocada da imagem para criar um brilho suave, vindo principalmente dos realces.",
    "name": "Brilho suave",
    "params": {
+    "blend": {
+     "label": "Mesclagem"
+    },
     "blur": {
      "label": "Tamanho"
     },
@@ -3657,6 +3782,24 @@
     },
     "color": {
      "label": "Cor"
+    }
+   }
+  },
+  "solidmatte": {
+   "description": "Coloca uma cor sólida atrás da camada, preenchendo suas partes transparentes. Recortar mostra apenas a cor com a forma da camada recortada, e Espaço de tela preenche a tela inteira em vez da caixa da camada.",
+   "name": "Matte sólido",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "color": {
+     "label": "Cor"
+    },
+    "punch": {
+     "label": "Recortar"
+    },
+    "screenSpace": {
+     "label": "Espaço de tela"
     }
    }
   },

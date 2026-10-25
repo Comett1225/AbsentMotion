@@ -30,6 +30,13 @@
     "magnitude": {
      "label": "Độ lớn"
     },
+    "pattern": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
+    },
     "seed": {
      "label": "Hạt giống"
     },
@@ -402,6 +409,9 @@
    "description": "Loại bỏ một màu, chẳng hạn phông xanh.",
    "name": "Chroma Key",
    "params": {
+    "invert": {
+     "label": "Đảo ngược"
+    },
     "key": {
      "label": "Màu khóa"
     },
@@ -2132,6 +2142,9 @@
     "center": {
      "label": "Tâm"
     },
+    "mirror": {
+     "label": "Lật gương"
+    },
     "segments": {
      "label": "Số đoạn"
     }
@@ -2470,6 +2483,30 @@
     },
     "rotate": {
      "label": "Tự động xoay"
+    }
+   }
+  },
+  "noise": {
+   "description": "Phủ lên lớp một lớp hạt mịn, mỗi pixel một hạt, thay đổi theo từng khung hình. Đơn sắc làm hạt thành màu xám, Cực trị làm mỗi hạt hoàn toàn sáng hoặc tối, và Đóng băng giữ yên hoa văn.",
+   "name": "Nhiễu",
+   "params": {
+    "amount": {
+     "label": "Độ mạnh"
+    },
+    "extremes": {
+     "label": "Cực trị"
+    },
+    "freeze": {
+     "label": "Đóng băng"
+    },
+    "mono": {
+     "label": "Đơn sắc"
+    },
+    "offset": {
+     "label": "Độ lệch"
+    },
+    "overshoot": {
+     "label": "Vượt ngưỡng"
     }
    }
   },
@@ -3176,6 +3213,37 @@
     }
    }
   },
+  "rastertransform": {
+   "description": "Thu phóng, xoay và di chuyển hình ảnh hoàn chỉnh của lớp, sau các hiệu ứng phía trên, để kết quả của chúng cũng được biến đổi. Tô giữ lại một phần bản gốc bên dưới và Mặt nạ theo lớp giữ kết quả trong hình dạng gốc.",
+   "name": "Biến đổi raster",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "angle": {
+     "label": "Góc"
+    },
+    "fill": {
+     "label": "Tô"
+    },
+    "mask": {
+     "label": "Mặt nạ theo lớp"
+    },
+    "offset": {
+     "label": "Độ lệch"
+    },
+    "sampling": {
+     "label": "Lấy mẫu",
+     "options": [
+      "Lân cận",
+      "Tuyến tính"
+     ]
+    },
+    "scale": {
+     "label": "Tỷ lệ"
+    }
+   }
+  },
   "rays": {
    "description": "Tỏa tia sáng ra từ các vùng sáng của lớp, hướng ra xa một điểm tâm.",
    "name": "Tia sáng",
@@ -3571,6 +3639,48 @@
     }
    }
   },
+  "simplestarfield": {
+   "description": "Rải các ngôi sao nhỏ theo các lớp độ sâu lên phần đục của lớp. Vị trí di chuyển trường sao theo thị sai, Độ sâu bay xuyên qua, Tỷ lệ thu phóng, Kích thước và Làm mềm tạo hình từng ngôi sao còn Số lượng quyết định có bao nhiêu sao.",
+   "name": "Trường sao đơn giản",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "amount": {
+     "label": "Số lượng"
+    },
+    "blend": {
+     "label": "Chế độ hòa trộn",
+     "options": [
+      "Thường",
+      "Cộng",
+      "Màn hình",
+      "Nhân"
+     ]
+    },
+    "brightness": {
+     "label": "Độ sáng"
+    },
+    "color": {
+     "label": "Màu"
+    },
+    "depth": {
+     "label": "Độ sâu"
+    },
+    "feather": {
+     "label": "Làm mềm"
+    },
+    "position": {
+     "label": "Vị trí"
+    },
+    "scale": {
+     "label": "Tỷ lệ"
+    },
+    "starSize": {
+     "label": "Kích thước"
+    }
+   }
+  },
   "smear": {
    "description": "Tạo vệt nhòe cho lớp theo một hướng với độ dài cố định, như thể lớp đang di chuyển nhanh.",
    "name": "Vệt nhòe",
@@ -3607,10 +3717,25 @@
     }
    }
   },
+  "smoothedges": {
+   "description": "Bo tròn và làm mịn viền của phần đục trên lớp mà không đổi màu bên trong. Mặt nạ theo lớp chỉ cho viền dịch vào trong.",
+   "name": "Làm mịn viền",
+   "params": {
+    "blur": {
+     "label": "Độ mạnh"
+    },
+    "mask": {
+     "label": "Mặt nạ theo lớp"
+    }
+   }
+  },
   "softglow": {
    "description": "Chồng một bản sao mờ, mềm lên hình để tạo ánh sáng mộng mơ, chủ yếu từ vùng sáng.",
    "name": "Phát sáng mềm",
    "params": {
+    "blend": {
+     "label": "Hòa trộn"
+    },
     "blur": {
      "label": "Kích thước"
     },
@@ -3657,6 +3782,24 @@
     },
     "color": {
      "label": "Màu"
+    }
+   }
+  },
+  "solidmatte": {
+   "description": "Đặt một màu đặc phía sau lớp, lấp đầy các phần trong suốt. Khoét chỉ hiện màu với hình dạng của lớp bị khoét ra, và Toàn màn hình lấp đầy cả màn hình thay vì khung của lớp.",
+   "name": "Nền đặc",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "color": {
+     "label": "Màu"
+    },
+    "punch": {
+     "label": "Khoét"
+    },
+    "screenSpace": {
+     "label": "Toàn màn hình"
     }
    }
   },

@@ -30,6 +30,13 @@
     "magnitude": {
      "label": "Şiddet"
     },
+    "pattern": {
+     "label": "Desen",
+     "options": [
+      "Klasik",
+      "Standart"
+     ]
+    },
     "seed": {
      "label": "Tohum"
     },
@@ -402,6 +409,9 @@
    "description": "Yeşil perde gibi tek bir rengi kaldırır.",
    "name": "Kroma Anahtarı",
    "params": {
+    "invert": {
+     "label": "Ters çevir"
+    },
     "key": {
      "label": "Anahtar Rengi"
     },
@@ -2132,6 +2142,9 @@
     "center": {
      "label": "Merkez"
     },
+    "mirror": {
+     "label": "Ayna"
+    },
     "segments": {
      "label": "Dilimler"
     }
@@ -2470,6 +2483,30 @@
     },
     "rotate": {
      "label": "Otomatik döndür"
+    }
+   }
+  },
+  "noise": {
+   "description": "Katmanı her karede değişen, piksel başına bir ince taneyle kaplar. Tek renk taneleri gri yapar, Uç değerler her taneyi tamamen açık ya da koyu yapar, Dondur ise deseni sabit tutar.",
+   "name": "Gürültü",
+   "params": {
+    "amount": {
+     "label": "Güç"
+    },
+    "extremes": {
+     "label": "Uç değerler"
+    },
+    "freeze": {
+     "label": "Dondur"
+    },
+    "mono": {
+     "label": "Tek renk"
+    },
+    "offset": {
+     "label": "Kaydırma"
+    },
+    "overshoot": {
+     "label": "Aşma"
     }
    }
   },
@@ -3176,6 +3213,37 @@
     }
    }
   },
+  "rastertransform": {
+   "description": "Üstündeki efektlerden sonra katmanın işlenmiş görüntüsünü ölçekler, döndürür ve taşır; böylece onların sonucu da dönüştürülebilir. Dolgu altta kalanın bir kısmını korur, Katmana maskele ise sonucu özgün şeklin içinde tutar.",
+   "name": "Raster Dönüşüm",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "angle": {
+     "label": "Açı"
+    },
+    "fill": {
+     "label": "Dolgu"
+    },
+    "mask": {
+     "label": "Katmana maskele"
+    },
+    "offset": {
+     "label": "Kaydırma"
+    },
+    "sampling": {
+     "label": "Örnekleme",
+     "options": [
+      "En yakın",
+      "Doğrusal"
+     ]
+    },
+    "scale": {
+     "label": "Ölçek"
+    }
+   }
+  },
   "rays": {
    "description": "Katmanın parlak kısımlarından bir merkez noktasından uzağa doğru ışık ışınları yayar.",
    "name": "Işınlar",
@@ -3571,6 +3639,48 @@
     }
    }
   },
+  "simplestarfield": {
+   "description": "Katmanın opak kısımları üzerine derinlik katmanları halinde küçük yıldızlar serper. Konum alanı paralaksla kaydırır, Derinlik içinden geçer, Ölçek yakınlaştırır, Boyut ve Kenar yumuşatma her yıldızı biçimlendirir, Miktar ise sayısını belirler.",
+   "name": "Basit Yıldız Alanı",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "amount": {
+     "label": "Miktar"
+    },
+    "blend": {
+     "label": "Karışım modu",
+     "options": [
+      "Normal",
+      "Ekle",
+      "Ekran",
+      "Çarp"
+     ]
+    },
+    "brightness": {
+     "label": "Parlaklık"
+    },
+    "color": {
+     "label": "Renk"
+    },
+    "depth": {
+     "label": "Derinlik"
+    },
+    "feather": {
+     "label": "Kenar yumuşatma"
+    },
+    "position": {
+     "label": "Konum"
+    },
+    "scale": {
+     "label": "Ölçek"
+    },
+    "starSize": {
+     "label": "Boyut"
+    }
+   }
+  },
   "smear": {
    "description": "Katmanı, hızlı hareket etmiş gibi sabit bir uzunlukta tek yönde bulaştırır.",
    "name": "Bulaşma",
@@ -3607,10 +3717,25 @@
     }
    }
   },
+  "smoothedges": {
+   "description": "Katmanın opak kısımlarının kenarlarını, içindeki renkleri değiştirmeden yuvarlar ve yumuşatır. Katmana maskele yalnızca kenarların içe doğru hareket etmesine izin verir.",
+   "name": "Kenarları Yumuşat",
+   "params": {
+    "blur": {
+     "label": "Güç"
+    },
+    "mask": {
+     "label": "Katmana maskele"
+    }
+   }
+  },
   "softglow": {
    "description": "Görüntünün bulanık ve yumuşak bir kopyasını çoğunlukla parlak alanlardan gelen rüya gibi bir parıltı için üzerine ekler.",
    "name": "Yumuşak Parıltı",
    "params": {
+    "blend": {
+     "label": "Karışım"
+    },
     "blur": {
      "label": "Boyut"
     },
@@ -3657,6 +3782,24 @@
     },
     "color": {
      "label": "Renk"
+    }
+   }
+  },
+  "solidmatte": {
+   "description": "Katmanın arkasına, saydam kısımlarını dolduran düz bir renk koyar. Oy yalnızca rengi, katmanın şekli kesilmiş halde gösterir; Ekran alanı ise katmanın kutusu yerine tüm ekranı doldurur.",
+   "name": "Düz Mat",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "color": {
+     "label": "Renk"
+    },
+    "punch": {
+     "label": "Oy"
+    },
+    "screenSpace": {
+     "label": "Ekran alanı"
     }
    }
   },

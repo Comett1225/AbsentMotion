@@ -30,6 +30,13 @@
     "magnitude": {
      "label": "Besaran"
     },
+    "pattern": {
+     "label": "Pola",
+     "options": [
+      "Klasik",
+      "Standar"
+     ]
+    },
     "seed": {
      "label": "Seed"
     },
@@ -402,6 +409,9 @@
    "description": "Menghapus satu warna, seperti layar hijau.",
    "name": "Chroma Key",
    "params": {
+    "invert": {
+     "label": "Inversi"
+    },
     "key": {
      "label": "Warna Kunci"
     },
@@ -2132,6 +2142,9 @@
     "center": {
      "label": "Pusat"
     },
+    "mirror": {
+     "label": "Cermin"
+    },
     "segments": {
      "label": "Segmen"
     }
@@ -2470,6 +2483,30 @@
     },
     "rotate": {
      "label": "Putar Otomatis"
+    }
+   }
+  },
+  "noise": {
+   "description": "Menutupi lapisan dengan butiran halus, satu butiran per piksel, yang berubah tiap frame. Monokrom membuat butiran abu-abu, Ekstrem membuat tiap butiran sepenuhnya terang atau gelap, dan Bekukan menjaga pola tetap diam.",
+   "name": "Noise",
+   "params": {
+    "amount": {
+     "label": "Kekuatan"
+    },
+    "extremes": {
+     "label": "Ekstrem"
+    },
+    "freeze": {
+     "label": "Bekukan"
+    },
+    "mono": {
+     "label": "Monokrom"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "overshoot": {
+     "label": "Overshoot"
     }
    }
   },
@@ -3176,6 +3213,37 @@
     }
    }
   },
+  "rastertransform": {
+   "description": "Menskalakan, memutar, dan menggeser gambar jadi dari lapisan, setelah efek di atasnya, sehingga hasilnya juga bisa ditransformasi. Isi menyisakan sebagian gambar asli di bawahnya dan Masker ke Lapisan menjaga hasil tetap di dalam bentuk aslinya.",
+   "name": "Transformasi Raster",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "angle": {
+     "label": "Sudut"
+    },
+    "fill": {
+     "label": "Isi"
+    },
+    "mask": {
+     "label": "Masker ke Lapisan"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "sampling": {
+     "label": "Sampling",
+     "options": [
+      "Terdekat",
+      "Linear"
+     ]
+    },
+    "scale": {
+     "label": "Skala"
+    }
+   }
+  },
   "rays": {
    "description": "Memancarkan sinar cahaya dari bagian terang lapisan, menjauhi titik pusat.",
    "name": "Sinar",
@@ -3571,6 +3639,48 @@
     }
    }
   },
+  "simplestarfield": {
+   "description": "Menyebarkan bintang kecil dalam lapisan kedalaman di atas bagian opak lapisan. Posisi menggeser medan dengan paralaks, Kedalaman terbang menembusnya, Skala memperbesar, Ukuran dan Pemudaran membentuk tiap bintang, dan Jumlah menentukan berapa banyak bintang.",
+   "name": "Starfield Sederhana",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "amount": {
+     "label": "Jumlah"
+    },
+    "blend": {
+     "label": "Mode Blending",
+     "options": [
+      "Normal",
+      "Tambah",
+      "Layar",
+      "Perkalian"
+     ]
+    },
+    "brightness": {
+     "label": "Kecerahan"
+    },
+    "color": {
+     "label": "Warna"
+    },
+    "depth": {
+     "label": "Kedalaman"
+    },
+    "feather": {
+     "label": "Pemudaran"
+    },
+    "position": {
+     "label": "Posisi"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "starSize": {
+     "label": "Ukuran"
+    }
+   }
+  },
   "smear": {
    "description": "Membuat lapisan memanjang ke satu arah dengan panjang tetap, seolah bergerak cepat.",
    "name": "Smear",
@@ -3607,10 +3717,25 @@
     }
    }
   },
+  "smoothedges": {
+   "description": "Membulatkan dan menghaluskan tepi bagian opak lapisan tanpa mengubah warna di dalamnya. Masker ke Lapisan hanya membiarkan tepi bergerak ke dalam.",
+   "name": "Tepi Halus",
+   "params": {
+    "blur": {
+     "label": "Kekuatan"
+    },
+    "mask": {
+     "label": "Masker ke Lapisan"
+    }
+   }
+  },
   "softglow": {
    "description": "Menimpa gambar dengan salinan lembut yang diburamkan untuk efek cahaya mempesona, terutama dari bagian terang.",
    "name": "Cahaya Lembut",
    "params": {
+    "blend": {
+     "label": "Blending"
+    },
     "blur": {
      "label": "Ukuran"
     },
@@ -3657,6 +3782,24 @@
     },
     "color": {
      "label": "Warna"
+    }
+   }
+  },
+  "solidmatte": {
+   "description": "Menaruh warna solid di belakang lapisan, mengisi bagian transparannya. Lubangi hanya menampilkan warna dengan bentuk lapisan dipotong darinya, dan Ruang Layar mengisi seluruh layar alih-alih kotak lapisan.",
+   "name": "Matte Solid",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "color": {
+     "label": "Warna"
+    },
+    "punch": {
+     "label": "Lubangi"
+    },
+    "screenSpace": {
+     "label": "Ruang Layar"
     }
    }
   },

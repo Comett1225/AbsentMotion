@@ -30,6 +30,13 @@
     "magnitude": {
      "label": "Magnitud"
     },
+    "pattern": {
+     "label": "Patrón",
+     "options": [
+      "Clásico",
+      "Estándar"
+     ]
+    },
     "seed": {
      "label": "Semilla"
     },
@@ -402,6 +409,9 @@
    "description": "Elimina un color, como un fondo verde.",
    "name": "Croma",
    "params": {
+    "invert": {
+     "label": "Invertir"
+    },
     "key": {
      "label": "Color clave"
     },
@@ -2132,6 +2142,9 @@
     "center": {
      "label": "Centro"
     },
+    "mirror": {
+     "label": "Espejo"
+    },
     "segments": {
      "label": "Segmentos"
     }
@@ -2470,6 +2483,30 @@
     },
     "rotate": {
      "label": "Rotar automáticamente"
+    }
+   }
+  },
+  "noise": {
+   "description": "Cubre la capa con grano fino, un grano por píxel, que cambia en cada fotograma. Monocromo hace que el grano sea gris, Extremos hace que cada grano sea totalmente claro u oscuro, y Congelar mantiene el patrón fijo.",
+   "name": "Ruido",
+   "params": {
+    "amount": {
+     "label": "Intensidad"
+    },
+    "extremes": {
+     "label": "Extremos"
+    },
+    "freeze": {
+     "label": "Congelar"
+    },
+    "mono": {
+     "label": "Monocromo"
+    },
+    "offset": {
+     "label": "Desplazamiento"
+    },
+    "overshoot": {
+     "label": "Sobrepaso"
     }
    }
   },
@@ -3176,6 +3213,37 @@
     }
    }
   },
+  "rastertransform": {
+   "description": "Escala, gira y mueve la imagen final de la capa, después de los efectos que tiene encima, para que su resultado también se pueda transformar. Relleno conserva parte del original debajo y Máscara a capa mantiene el resultado dentro de la forma original.",
+   "name": "Transformación de ráster",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "angle": {
+     "label": "Ángulo"
+    },
+    "fill": {
+     "label": "Relleno"
+    },
+    "mask": {
+     "label": "Máscara a capa"
+    },
+    "offset": {
+     "label": "Desplazamiento"
+    },
+    "sampling": {
+     "label": "Muestreo",
+     "options": [
+      "Más cercano",
+      "Lineal"
+     ]
+    },
+    "scale": {
+     "label": "Escala"
+    }
+   }
+  },
   "rays": {
    "description": "Emite rayos de luz desde las partes brillantes de la capa, alejándose de un punto central.",
    "name": "Rayos",
@@ -3571,6 +3639,48 @@
     }
    }
   },
+  "simplestarfield": {
+   "description": "Dispersa pequeñas estrellas en capas de profundidad sobre las partes opacas de la capa. Posición mueve el campo con paralaje, Profundidad lo atraviesa, Escala lo amplía, Tamaño y Suavizado dan forma a cada estrella y Cantidad define cuántas hay.",
+   "name": "Campo estelar simple",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "amount": {
+     "label": "Cantidad"
+    },
+    "blend": {
+     "label": "Modo de fusión",
+     "options": [
+      "Normal",
+      "Añadir",
+      "Trama",
+      "Multiplicar"
+     ]
+    },
+    "brightness": {
+     "label": "Brillo"
+    },
+    "color": {
+     "label": "Color"
+    },
+    "depth": {
+     "label": "Profundidad"
+    },
+    "feather": {
+     "label": "Suavizado"
+    },
+    "position": {
+     "label": "Posición"
+    },
+    "scale": {
+     "label": "Escala"
+    },
+    "starSize": {
+     "label": "Tamaño"
+    }
+   }
+  },
   "smear": {
    "description": "Arrastra la capa en una dirección con una longitud fija, como si se moviera rápido.",
    "name": "Arrastre",
@@ -3607,10 +3717,25 @@
     }
    }
   },
+  "smoothedges": {
+   "description": "Redondea y suaviza los bordes de las partes opacas de la capa sin cambiar los colores del interior. Máscara a capa solo permite que los bordes se muevan hacia dentro.",
+   "name": "Suavizar bordes",
+   "params": {
+    "blur": {
+     "label": "Intensidad"
+    },
+    "mask": {
+     "label": "Máscara a capa"
+    }
+   }
+  },
   "softglow": {
    "description": "Superpone en modo trama una copia suave y desenfocada de la imagen para lograr un brillo de ensueño, sobre todo a partir de las luces altas.",
    "name": "Brillo suave",
    "params": {
+    "blend": {
+     "label": "Fusión"
+    },
     "blur": {
      "label": "Tamaño"
     },
@@ -3657,6 +3782,24 @@
     },
     "color": {
      "label": "Color"
+    }
+   }
+  },
+  "solidmatte": {
+   "description": "Coloca un color sólido detrás de la capa y rellena sus partes transparentes. Perforar muestra solo el color con la forma de la capa recortada, y Espacio de pantalla rellena toda la pantalla en lugar del cuadro de la capa.",
+   "name": "Mate sólido",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "color": {
+     "label": "Color"
+    },
+    "punch": {
+     "label": "Perforar"
+    },
+    "screenSpace": {
+     "label": "Espacio de pantalla"
     }
    }
   },
