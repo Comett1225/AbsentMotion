@@ -41,9 +41,10 @@ object Waveforms {
 
     private fun load(context: Context, uri: String): AudioPeaks {
         val file = cacheFile(context, uri)
+        val version = runCatching { app.absentmotion.media.fileVersion(context.contentResolver, android.net.Uri.parse(uri)) }.getOrNull().orEmpty()
         runCatching {
             DataInputStream(file.inputStream().buffered()).use { input ->
-                if (input.readUTF() == uri) return AudioPeaks(ByteArray(input.readInt()).also { input.readFully(it) })
+                if (input.readUTF() == uri && input.readUTF() == version) return AudioPeaks(ByteArray(input.readInt()).also { input.readFully(it) })
             }
         }
         val peaks = runCatching { decode(context, uri) }.onFailure { Log.w("AMAudio", "No waveform for $uri", it) }.getOrDefault(AudioPeaks(ByteArray(0)))
@@ -51,6 +52,7 @@ object Waveforms {
             file.parentFile?.mkdirs()
             DataOutputStream(file.outputStream().buffered()).use { out ->
                 out.writeUTF(uri)
+                out.writeUTF(version)
                 out.writeInt(peaks.data.size)
                 out.write(peaks.data)
             }
