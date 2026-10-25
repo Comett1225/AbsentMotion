@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.key
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.staticCompositionLocalOf
@@ -110,26 +111,40 @@ private fun EditorBody(state: EditorState, onExit: () -> Unit) {
         WideEditorBody(state, onExit, addLibrary)
         return
     }
-    Column(Modifier.fillMaxSize().background(Am.TopBar).systemBarsPadding().imePadding()) {
-        EditorTopBar(state, onExit, Modifier.fillMaxWidth().height(42.dp).enterFade())
-        Box(Modifier.fillMaxWidth().weight(1f).tutorialTarget("preview")) {
-            Preview(state, Modifier.fillMaxSize())
-            Presence(state.previewPanelOpen) { PreviewModePanel(state, Modifier.align(Alignment.CenterEnd).presence(slideX = 0.4f)) }
-            AnimateButton(state, Modifier.align(Alignment.BottomEnd))
-            HistoryNotes(state, Modifier.align(Alignment.BottomCenter))
-        }
-        Box(Modifier.fillMaxWidth().height(46.dp).enterFade().tutorialTarget("playbar")) {
-            PlayBar(state, Modifier.fillMaxSize())
-            LevelMeter(state, Modifier.align(Alignment.BottomStart).fillMaxWidth().height(2.1.dp))
-        }
-        val screen = LocalConfiguration.current
-        val lower = if (isTablet(screen.smallestScreenWidthDp)) maxOf(280, screen.screenHeightDp * 2 / 5).dp else 280.dp
-        Box(Modifier.fillMaxWidth().height(lower).enterFade().background(Am.TimelineBg).tutorialTarget("timeline")) {
-            Timeline(state, Modifier.fillMaxSize())
-            LowerPanels(state, addLibrary)
+    androidx.compose.foundation.layout.BoxWithConstraints(Modifier.fillMaxSize().background(Am.TopBar).systemBarsPadding().imePadding()) {
+        val available = maxHeight
+        Column(Modifier.fillMaxSize()) {
+            EditorTopBar(state, onExit, Modifier.fillMaxWidth().height(42.dp).enterFade())
+            Box(Modifier.fillMaxWidth().weight(1f).tutorialTarget("preview")) {
+                Preview(state, Modifier.fillMaxSize())
+                Presence(state.previewPanelOpen) { PreviewModePanel(state, Modifier.align(Alignment.CenterEnd).presence(slideX = 0.4f)) }
+                AnimateButton(state, Modifier.align(Alignment.BottomEnd))
+                HistoryNotes(state, Modifier.align(Alignment.BottomCenter))
+            }
+            Box(Modifier.fillMaxWidth().height(46.dp).enterFade().tutorialTarget("playbar")) {
+                PlayBar(state, Modifier.fillMaxSize())
+                LevelMeter(state, Modifier.align(Alignment.BottomStart).fillMaxWidth().height(2.1.dp))
+            }
+            val screen = LocalConfiguration.current
+            val wanted = if (isTablet(screen.smallestScreenWidthDp)) maxOf(280, screen.screenHeightDp * 2 / 5).dp else 280.dp
+            val lower = lowerPanelHeight(available, wanted)
+            val scroll = androidx.compose.foundation.rememberScrollState()
+            LaunchedEffect(scroll) { androidx.compose.runtime.snapshotFlow { scroll.maxValue }.collect { scroll.scrollTo(it) } }
+            Box(Modifier.fillMaxWidth().height(lower).enterFade().background(Am.TimelineBg).tutorialTarget("timeline").verticalScroll(scroll, enabled = lower < wanted)) {
+                Box(Modifier.fillMaxWidth().height(wanted)) {
+                    Timeline(state, Modifier.fillMaxSize())
+                    LowerPanels(state, addLibrary)
+                }
+            }
         }
     }
 }
+
+internal fun lowerPanelHeight(available: Dp, wanted: Dp): Dp = minOf(wanted, maxOf(available - EditorBars - MinPreview, MinLower))
+
+private val EditorBars = 88.dp
+private val MinPreview = 120.dp
+private val MinLower = 140.dp
 
 @Composable
 internal fun LowerPanels(state: EditorState, addLibrary: AddLibrary, top: Boolean = false, transitionHere: Boolean = true) {
