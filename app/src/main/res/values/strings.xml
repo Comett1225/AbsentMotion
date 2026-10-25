@@ -1725,4 +1725,9 @@
     <string name="preview_cache_hint_action">Render</string>
     <string name="preview_cache_close">Close</string>
     <string name="preview_cache_hint_setting">Offer a smooth preview when playback is choppy</string>
+    <string name="export_filename">Filename</string>
+    <string name="export_filename_generated">Generated on export</string>
+    <string name="export_filename_random">Random numeric filename</string>
+    <string name="settings_transition_in_preview">Transition button in preview</string>
+    <string name="transition_hide">Hide transition button</string>
 </resources>

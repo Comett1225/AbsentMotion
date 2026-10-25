@@ -1799,4 +1799,9 @@
     <string name="preview_cache_hint_action">تصيير</string>
     <string name="preview_cache_close">إغلاق</string>
     <string name="preview_cache_hint_setting">اقتراح معاينة سلسة عند تقطع التشغيل</string>
+    <string name="export_filename">اسم الملف</string>
+    <string name="export_filename_generated">يُنشأ عند التصدير</string>
+    <string name="export_filename_random">اسم ملف بأرقام عشوائية</string>
+    <string name="settings_transition_in_preview">زر الانتقال في المعاينة</string>
+    <string name="transition_hide">إخفاء زر الانتقال</string>
 </resources>

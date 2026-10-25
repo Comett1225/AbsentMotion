@@ -1699,4 +1699,9 @@
     <string name="preview_cache_hint_action">رندر</string>
     <string name="preview_cache_close">بستن</string>
     <string name="preview_cache_hint_setting">در صورت روان نبودن پخش، پیش‌نمایش روان پیشنهاد شود</string>
+    <string name="export_filename">نام فایل</string>
+    <string name="export_filename_generated">هنگام خروجی گرفتن ساخته می‌شود</string>
+    <string name="export_filename_random">نام فایل با ارقام تصادفی</string>
+    <string name="settings_transition_in_preview">دکمهٔ گذار در پیش‌نمایش</string>
+    <string name="transition_hide">پنهان کردن دکمهٔ گذار</string>
 </resources>

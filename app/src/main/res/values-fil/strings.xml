@@ -1699,4 +1699,9 @@
     <string name="preview_cache_hint_action">I-render</string>
     <string name="preview_cache_close">Isara</string>
     <string name="preview_cache_hint_setting">Mag-alok ng smooth na preview kapag putol-putol ang playback</string>
+    <string name="export_filename">Filename</string>
+    <string name="export_filename_generated">Gagawin sa pag-export</string>
+    <string name="export_filename_random">Random na numerong filename</string>
+    <string name="settings_transition_in_preview">Transition button sa preview</string>
+    <string name="transition_hide">Itago ang transition button</string>
 </resources>

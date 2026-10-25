@@ -1674,4 +1674,9 @@
     <string name="preview_cache_hint_action">Kết xuất</string>
     <string name="preview_cache_close">Đóng</string>
     <string name="preview_cache_hint_setting">Đề nghị bản xem trước mượt khi phát lại bị giật</string>
+    <string name="export_filename">Tên tệp</string>
+    <string name="export_filename_generated">Tạo khi xuất</string>
+    <string name="export_filename_random">Tên tệp bằng số ngẫu nhiên</string>
+    <string name="settings_transition_in_preview">Nút chuyển cảnh trong bản xem trước</string>
+    <string name="transition_hide">Ẩn nút chuyển cảnh</string>
 </resources>

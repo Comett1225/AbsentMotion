@@ -1674,4 +1674,9 @@
     <string name="preview_cache_hint_action">เรนเดอร์</string>
     <string name="preview_cache_close">ปิด</string>
     <string name="preview_cache_hint_setting">เสนอตัวอย่างลื่นไหลเมื่อการเล่นไม่ลื่นไหล</string>
+    <string name="export_filename">ชื่อไฟล์</string>
+    <string name="export_filename_generated">สร้างเมื่อส่งออก</string>
+    <string name="export_filename_random">ชื่อไฟล์เป็นตัวเลขสุ่ม</string>
+    <string name="settings_transition_in_preview">ปุ่มเปลี่ยนฉากในตัวอย่าง</string>
+    <string name="transition_hide">ซ่อนปุ่มเปลี่ยนฉาก</string>
 </resources>

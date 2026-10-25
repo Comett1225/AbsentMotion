@@ -1699,4 +1699,9 @@
     <string name="preview_cache_hint_action">İşle</string>
     <string name="preview_cache_close">Kapat</string>
     <string name="preview_cache_hint_setting">Oynatma takıldığında akıcı önizleme öner</string>
+    <string name="export_filename">Dosya adı</string>
+    <string name="export_filename_generated">Dışa aktarılırken oluşturulur</string>
+    <string name="export_filename_random">Rastgele sayısal dosya adı</string>
+    <string name="settings_transition_in_preview">Önizlemede geçiş düğmesi</string>
+    <string name="transition_hide">Geçiş düğmesini gizle</string>
 </resources>

@@ -1699,4 +1699,9 @@
     <string name="preview_cache_hint_action">रेंडर करें</string>
     <string name="preview_cache_close">बंद करें</string>
     <string name="preview_cache_hint_setting">प्लेबैक रुक-रुक कर चलने पर स्मूद प्रीव्यू का सुझाव दें</string>
+    <string name="export_filename">फ़ाइल का नाम</string>
+    <string name="export_filename_generated">एक्सपोर्ट करते समय बनाया जाएगा</string>
+    <string name="export_filename_random">यादृच्छिक अंकों वाला फ़ाइल नाम</string>
+    <string name="settings_transition_in_preview">प्रीव्यू में ट्रांज़िशन बटन</string>
+    <string name="transition_hide">ट्रांज़िशन बटन छिपाएँ</string>
 </resources>

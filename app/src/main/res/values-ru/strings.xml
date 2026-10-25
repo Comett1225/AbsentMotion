@@ -1749,4 +1749,9 @@
     <string name="preview_cache_hint_action">Отрендерить</string>
     <string name="preview_cache_close">Закрыть</string>
     <string name="preview_cache_hint_setting">Предлагать плавный предпросмотр, если воспроизведение тормозит</string>
+    <string name="export_filename">Имя файла</string>
+    <string name="export_filename_generated">Создаётся при экспорте</string>
+    <string name="export_filename_random">Случайное числовое имя файла</string>
+    <string name="settings_transition_in_preview">Кнопка перехода в предпросмотре</string>
+    <string name="transition_hide">Скрыть кнопку перехода</string>
 </resources>

@@ -119,6 +119,7 @@ private fun EditorBody(state: EditorState, onExit: () -> Unit) {
                 Preview(state, Modifier.fillMaxSize())
                 Presence(state.previewPanelOpen) { PreviewModePanel(state, Modifier.align(Alignment.CenterEnd).presence(slideX = 0.4f)) }
                 AnimateButton(state, Modifier.align(Alignment.BottomEnd))
+                if (state.settings.transitionInPreview) TransitionButton(state, Modifier.align(Alignment.BottomStart).padding(12.dp).tutorialTarget("transition"))
                 HistoryNotes(state, Modifier.align(Alignment.BottomCenter))
             }
             Box(Modifier.fillMaxWidth().height(46.dp).enterFade().tutorialTarget("playbar")) {
@@ -164,7 +165,7 @@ internal fun LowerPanels(state: EditorState, addLibrary: AddLibrary, top: Boolea
             state.addOpen -> AddPopup(state, lower.height(244.dp).tutorialTarget("add_panel"), addLibrary)
             MultiSelect.active -> MultiBar(state, lower.height(48.dp))
             state.selectedId == null -> {
-                if (transitionHere) TransitionButton(state, Modifier.align(Alignment.BottomStart).padding(start = HeaderWidth).tutorialTarget("transition"))
+                if (transitionHere && !state.settings.transitionInPreview) TransitionButton(state, Modifier.align(Alignment.BottomStart).padding(start = HeaderWidth).tutorialTarget("transition"))
                 AddButton(state, Modifier.align(Alignment.BottomEnd).tutorialTarget("add"))
             }
             state.volumeOpen && state.panel == EditorPanel.Tools -> key(state.selectedId) { VolumePanel(state, lower.height(PanelHeight).tutorialTarget("panel")) }

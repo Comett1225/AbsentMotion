@@ -1674,4 +1674,9 @@
     <string name="preview_cache_hint_action">Render</string>
     <string name="preview_cache_close">Tutup</string>
     <string name="preview_cache_hint_setting">Tawarkan pratinjau lancar saat pemutaran tersendat</string>
+    <string name="export_filename">Nama file</string>
+    <string name="export_filename_generated">Dibuat saat ekspor</string>
+    <string name="export_filename_random">Nama file angka acak</string>
+    <string name="settings_transition_in_preview">Tombol transisi di pratinjau</string>
+    <string name="transition_hide">Sembunyikan tombol transisi</string>
 </resources>

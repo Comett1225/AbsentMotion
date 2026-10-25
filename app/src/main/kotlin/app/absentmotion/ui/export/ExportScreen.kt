@@ -44,6 +44,9 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -87,6 +90,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.lerp
@@ -100,6 +104,8 @@ import app.absentmotion.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -123,6 +129,8 @@ import app.absentmotion.export.ThermalMonitor
 import app.absentmotion.export.storageStatus
 import app.absentmotion.export.ExportAudio
 import app.absentmotion.export.ExportKind
+import app.absentmotion.export.ExportName
+import app.absentmotion.export.randomNameAllowed
 import app.absentmotion.export.ExportResult
 import app.absentmotion.export.ExportSettings
 import app.absentmotion.export.Exporter
@@ -160,11 +168,9 @@ import app.absentmotion.export.listed
 import app.absentmotion.export.optionNote
 import app.absentmotion.export.resolutionChoices
 import app.absentmotion.export.resolutionLabel
-import app.absentmotion.export.safeName
 import app.absentmotion.export.sampleRateChoices
 import app.absentmotion.export.shortName
 import app.absentmotion.export.suggestionLabel
-import app.absentmotion.export.thermalLabel
 import app.absentmotion.export.timeLabel
 import app.absentmotion.export.videoBitrate
 import app.absentmotion.export.withContainer
@@ -188,8 +194,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
 import kotlin.math.roundToInt
 
@@ -204,7 +208,7 @@ private val GroupGap = 18.dp
 private val FieldGap = 6.dp
 private const val Dimmed = 0.38f
 
-private val SheetKinds = setOf(ExportKind.Gif, ExportKind.Sequence, ExportKind.FrameAs)
+private val SheetKinds = setOf(ExportKind.Gif, ExportKind.Sequence, ExportKind.FrameAs, ExportKind.Frame)
 
 private sealed interface Phase {
     data object Idle : Phase
@@ -221,6 +225,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
     val exporter = remember { Exporter(context, engine, MediaStoreExport(context)) }
     val kinds = remember { listOf(ExportKind.Video, ExportKind.Audio, ExportKind.Package, ExportKind.Frame, ExportKind.FrameAs, ExportKind.Sequence, ExportKind.Gif) + if (fromProjectList) listOf(ExportKind.Xml) else emptyList() }
     var kind by remember { mutableStateOf(ExportKind.Video) }
+    val exportName = remember(scene.title) { ExportName(scene.title) }
     val prefs = remember { ExportPrefs(context) }
     val settings = remember { mutableStateMapOf<ExportKind, ExportSettings>().apply { ExportKind.entries.forEach { put(it, prefs.load(it, scene)) } } }
     val stored = remember { HashMap(settings.toMap()) }
@@ -420,7 +425,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
         val modelled = modelMs
         prefs.save(chosen, s)
         val alsoTemplate = asTemplate
-        val name = safeName(scene.title) + " " + SimpleDateFormat("yyyyMMdd_HHmmss", Locale.ENGLISH).format(Date())
+        val name = exportName.next(chosen)
         progress = 0f
         note = null
         val background = chosen in BackgroundKinds
@@ -492,7 +497,8 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
         if (background) ExportRun.begin(context, runningTitle(chosen)) { job.cancel() }
     }
 
-    val info: @Composable () -> Unit = { InfoBlock(free, estimate, timeMs, heat.level, storage) }
+    val info: @Composable () -> Unit = { InfoBlock(free, estimate, timeMs, storage) }
+    val naming: @Composable (ExportKind) -> Unit = { FileNameField(exportName, it) }
     val bar: @Composable () -> Unit = { ExportBar(enabled = phase == Phase.Idle, blocked = blocked, onClick = ::start) }
 
     Box(Modifier.fillMaxSize().background(Am.SheetBg).pointerInput(Unit) {}.enterFade(12.dp)) {
@@ -500,13 +506,14 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
             TitleBar(stringResource(R.string.export_title), ExportIcons.Close, stringResource(R.string.cancel), onClose)
             info()
             ScrollArea(Modifier.weight(1f), Am.SheetBg, PaddingValues(15.dp), 10.dp) {
+                FileNameField(exportName, kind, options = false)
                 kinds.forEachIndexed { i, k ->
                     val s = settings.getValue(k)
                     val silent = k == ExportKind.Audio && !hasAudio
                     OptionCard(
                         selected = kind == k, enabled = !silent, icon = k.icon(), title = stringResource(k.title()),
                         note = if (silent) stringResource(R.string.export_no_sound_short) else optionNote(k, scene, s)?.text(),
-                        right = when (k) { ExportKind.Package -> ExportIcons.Info; ExportKind.Video, ExportKind.Audio, ExportKind.FrameAs, ExportKind.Sequence, ExportKind.Gif -> ExportIcons.ChevronRight; else -> null },
+                        right = when (k) { ExportKind.Package -> ExportIcons.Info; ExportKind.Video, ExportKind.Audio, ExportKind.Frame, ExportKind.FrameAs, ExportKind.Sequence, ExportKind.Gif -> ExportIcons.ChevronRight; else -> null },
                         onSelect = { if (silent) explain(NoSound) else { kind = k; if (k == ExportKind.FrameAs) page = k } },
                         onRight = { if (k == ExportKind.Package) packageInfo = true else if (silent) explain(NoSound) else { kind = k; page = k } },
                         modifier = Modifier.enterFade(10.dp, minOf(i, 6) * 30),
@@ -520,7 +527,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
 
         Presence(page == ExportKind.Video) {
             VideoPage(
-                scene, video, hasAudio, check, info, bar,
+                scene, video, hasAudio, check, info, bar, { naming(ExportKind.Video) },
                 warning = warning, slow = support is Support.SlowSoftwareOnly, use = better?.let { suggestionLabel(video, it) },
                 onUse = ::useBetter, onContinue = { acknowledged = warning },
                 onChange = { settings[ExportKind.Video] = it }, onReason = explain, onAudio = { audioPage = true }, onHelp = { help = true },
@@ -544,6 +551,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
                 ) {
                     Text(stringResource(shown.title()), Modifier.padding(start = 15.dp, end = 15.dp, top = 18.dp, bottom = 4.dp), color = Navy, fontSize = 20.sp, fontWeight = FontWeight.Bold, maxLines = 1)
                     ScrollArea(Modifier.weight(1f, fill = false), Am.Card, PaddingValues(start = 15.dp, end = 15.dp, top = 10.dp, bottom = 18.dp), GroupGap) {
+                        naming(shown)
                         OptionsPage(shown, scene, settings.getValue(shown), explain, { help = true }) { settings[shown] = it }
                     }
                 }
@@ -659,7 +667,7 @@ private fun TitleBar(title: String, icon: ImageVector, description: String, onCl
 }
 
 @Composable
-private fun InfoBlock(free: Long, estimate: Long, timeMs: Long?, heat: ThermalLevel, storage: StorageStatus) {
+private fun InfoBlock(free: Long, estimate: Long, timeMs: Long?, storage: StorageStatus) {
     val space = when (storage) {
         StorageStatus.Enough -> null
         is StorageStatus.Low -> stringResource(R.string.export_space_low)
@@ -671,8 +679,6 @@ private fun InfoBlock(free: Long, estimate: Long, timeMs: Long?, heat: ThermalLe
         InfoRow(stringResource(R.string.export_estimated_size), if (estimate < 0) stringResource(R.string.export_calculating) else formatBytes(estimate), false)
         Divider()
         InfoRow(stringResource(R.string.export_estimated_time), timeMs?.let { timeLabel(it).text() } ?: stringResource(if (estimate < 0) R.string.export_calculating else R.string.export_time_unknown), false)
-        Divider()
-        InfoRow(stringResource(R.string.export_phone_temperature), thermalLabel(heat).text(), heat >= ThermalLevel.Hot)
     }
 }
 
@@ -818,7 +824,7 @@ private val SheetMaxWidth = 720.dp
 @Composable
 private fun VideoPage(
     scene: Scene, s: ExportSettings, hasAudio: Boolean, check: (ExportSettings) -> Support,
-    info: @Composable () -> Unit, bar: @Composable () -> Unit,
+    info: @Composable () -> Unit, bar: @Composable () -> Unit, naming: @Composable () -> Unit,
     warning: UiText?, slow: Boolean, use: UiText?, onUse: () -> Unit, onContinue: () -> Unit,
     onChange: (ExportSettings) -> Unit, onReason: (UiText) -> Unit, onAudio: () -> Unit, onHelp: () -> Unit, onBack: () -> Unit,
 ) {
@@ -827,6 +833,7 @@ private fun VideoPage(
     PageFrame(stringResource(R.string.export_kind_video), onBack) {
         info()
         ScrollArea(Modifier.weight(1f).fillMaxWidth(), Am.SheetBg, PaddingValues(start = 15.dp, end = 15.dp, top = 16.dp, bottom = 20.dp), GroupGap) {
+            naming()
             Field(stringResource(R.string.export_resolution_heading)) {
                 Box(Modifier.clip(RoundedCornerShape(4.dp)).background(Am.Card)) { ResolutionDropdown(s.shortSide, resolutionChoices(s, check), onReason) { onChange(s.copy(shortSide = it)) } }
             }
@@ -947,6 +954,32 @@ private fun Field(
 }
 
 @Composable
+private fun FileNameField(name: ExportName, kind: ExportKind, options: Boolean = true) {
+    val label = stringResource(R.string.export_filename)
+    val random = name.random && kind.randomNameAllowed
+    val keyboard = LocalSoftwareKeyboardController.current
+    Field(label) {
+        BasicTextField(
+            value = if (random) stringResource(R.string.export_filename_generated) else name.value,
+            onValueChange = { name.value = it.take(160) },
+            readOnly = random, singleLine = true,
+            textStyle = Mixed.copy(color = Navy, fontSize = 16.sp),
+            cursorBrush = SolidColor(Navy),
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(onDone = { keyboard?.hide() }),
+            modifier = Modifier.fillMaxWidth().semantics { contentDescription = label }
+                .clip(RoundedCornerShape(4.dp)).background(Am.Card).padding(horizontal = 12.dp, vertical = 13.dp),
+        )
+        if (options && kind.randomNameAllowed) {
+            Row(Modifier.fillMaxWidth().semantics(mergeDescendants = true) {}, verticalAlignment = Alignment.CenterVertically) {
+                Text(stringResource(R.string.export_filename_random), Modifier.weight(1f), color = Navy, fontSize = 15.sp)
+                Switch(name.random, { name.random = it; keyboard?.hide() }, colors = SwitchDefaults.colors(checkedTrackColor = Navy, checkedThumbColor = Am.OnNavy))
+            }
+        }
+    }
+}
+
+@Composable
 private fun Hint(text: String) {
     Text(text, color = NoteGrey, fontSize = 13.sp, lineHeight = 17.sp)
 }
@@ -1027,6 +1060,7 @@ private fun PointerInputScope.along(x: Float): Float {
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun OptionsPage(kind: ExportKind, scene: Scene, s: ExportSettings, onReason: (UiText) -> Unit, onHelp: () -> Unit, onChange: (ExportSettings) -> Unit) {
+    if (kind == ExportKind.Frame) return
     val rates = (if (kind == ExportKind.Gif) GifFrameRates else (VideoFrameRates + scene.fps)).distinct().sorted()
     val images = kind == ExportKind.Sequence || kind == ExportKind.FrameAs
     if (images) {

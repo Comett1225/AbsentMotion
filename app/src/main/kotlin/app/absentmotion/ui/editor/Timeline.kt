@@ -726,7 +726,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
 
     fun dragBy(drag: Drag, delta: Offset, at: Offset) {
         when (drag) {
-            Drag.Scrub -> scrubBy(delta.x)
+            Drag.Scrub -> { state.transitionButtonDismissed = false; scrubBy(delta.x) }
             Drag.Scroll -> scrollBy(delta.y)
             Drag.TrimStart, Drag.TrimEnd -> trimBy(delta.x, start = drag == Drag.TrimStart)
             Drag.Reorder -> reorderTo(at.y)

@@ -10,6 +10,10 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 
 ### Changed
 
+- Swipe the Transition button left to hide it until the next timeline scrub; Settings can move it into the preview area.
+- Transition and animation thumbnails use the existing bundled photo images, and their grids compose visible tiles as needed.
+- Export filenames start with the project title on each visit and can be edited. Image and video settings, including current-frame PNG, offer fresh random numeric names.
+- Export no longer shows the temperature stat or a successful playback-check message; thermal protection and verification warnings remain active.
 - Release tooling checks APK signatures across supported Android versions, native-library packaging and alignment, and matching app versions and certificates. The signing helper uses pinned build tools and each APK's minimum Android version.
 - The animated GIF decoder test generates its own ImageIO fixture instead of depending on a removed documentation image.
 

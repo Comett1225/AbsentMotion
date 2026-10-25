@@ -1724,4 +1724,9 @@
     <string name="preview_cache_hint_action">Renderizar</string>
     <string name="preview_cache_close">Fechar</string>
     <string name="preview_cache_hint_setting">Oferecer uma pré-visualização fluida quando a reprodução travar</string>
+    <string name="export_filename">Nome do arquivo</string>
+    <string name="export_filename_generated">Gerado ao exportar</string>
+    <string name="export_filename_random">Nome de arquivo numérico aleatório</string>
+    <string name="settings_transition_in_preview">Botão de transição na prévia</string>
+    <string name="transition_hide">Ocultar botão de transição</string>
 </resources>

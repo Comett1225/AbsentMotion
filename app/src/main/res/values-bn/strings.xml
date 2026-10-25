@@ -1699,4 +1699,9 @@
     <string name="preview_cache_hint_action">রেন্ডার</string>
     <string name="preview_cache_close">বন্ধ করুন</string>
     <string name="preview_cache_hint_setting">প্লেব্যাক আটকে আটকে চললে স্মুথ প্রিভিউয়ের প্রস্তাব দিন</string>
+    <string name="export_filename">ফাইলের নাম</string>
+    <string name="export_filename_generated">এক্সপোর্ট করার সময় তৈরি হবে</string>
+    <string name="export_filename_random">এলোমেলো সংখ্যার ফাইলের নাম</string>
+    <string name="settings_transition_in_preview">প্রিভিউতে ট্রানজিশন বোতাম</string>
+    <string name="transition_hide">ট্রানজিশন বোতাম লুকান</string>
 </resources>

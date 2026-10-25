@@ -63,6 +63,12 @@ class AppSettings(private val context: Context) {
         get() = vibrationState
         set(value) { vibrationState = value; prefs.edit().putBoolean("trimLimitVibration", value).apply() }
 
+    private var transitionInPreviewState by mutableStateOf(prefs.getBoolean("transitionInPreview", false))
+
+    var transitionInPreview: Boolean
+        get() = transitionInPreviewState
+        set(value) { transitionInPreviewState = value; prefs.edit().putBoolean("transitionInPreview", value).apply() }
+
     private var androidEmojiState by mutableStateOf(prefs.getBoolean(app.absentmotion.fonts.FontLibrary.ANDROID_EMOJI, false))
 
     var androidEmoji: Boolean

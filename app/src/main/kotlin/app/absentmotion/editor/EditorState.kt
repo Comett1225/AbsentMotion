@@ -112,6 +112,7 @@ class EditorState(
     var keypad by mutableStateOf<KeypadRequest?>(null)
 
     var previewPanelOpen by mutableStateOf(false)
+    var transitionButtonDismissed by mutableStateOf(false)
     var pixelMode by mutableStateOf(false)
     var gridMode by mutableStateOf(false)
 

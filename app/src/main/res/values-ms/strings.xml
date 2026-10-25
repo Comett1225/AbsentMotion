@@ -1674,4 +1674,9 @@
     <string name="preview_cache_hint_action">Render</string>
     <string name="preview_cache_close">Tutup</string>
     <string name="preview_cache_hint_setting">Tawarkan pratonton lancar apabila main balik tersekat-sekat</string>
+    <string name="export_filename">Nama fail</string>
+    <string name="export_filename_generated">Dijana semasa eksport</string>
+    <string name="export_filename_random">Nama fail nombor rawak</string>
+    <string name="settings_transition_in_preview">Butang peralihan dalam pratonton</string>
+    <string name="transition_hide">Sembunyikan butang peralihan</string>
 </resources>

@@ -34,10 +34,10 @@ fun DoneScreen(kind: ExportKind, result: ExportResult, onClose: () -> Unit, onSh
             Text(stringResource(R.string.saved_to_storage), color = Am.OnNavy, fontSize = 17.sp, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(4.dp))
             Text(result.where, color = Am.OnNavy.copy(alpha = 0.7f), fontSize = 13.sp, textAlign = TextAlign.Center)
-            result.verification?.let { v ->
+            result.verification?.takeUnless { it.ok }?.let { v ->
                 Text(
                     verificationLine(v, still = kind == ExportKind.Frame || kind == ExportKind.FrameAs).text(), Modifier.padding(top = 2.dp),
-                    color = if (v.ok) Am.OnNavy.copy(alpha = 0.7f) else Am.OnNavyAccent,
+                    color = Am.OnNavyAccent,
                     fontSize = 13.sp, textAlign = TextAlign.Center, maxLines = 3,
                 )
             }
