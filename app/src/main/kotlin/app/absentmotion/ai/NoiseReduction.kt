@@ -40,7 +40,12 @@ internal object NoiseReduction {
                     while (true) {
                         coroutineContext.ensureActive()
                         val chunk = decoder.next() ?: break
-                        if (rate == 0) { rate = chunk.rate; if (source.rumbleHz > 0) rumble = Rumble(rate, source.rumbleHz) }
+                        if (rate == 0) {
+                            rate = chunk.rate
+                            val needed = (decoder.durationUs / 1e6 * (rate * 6L + 48000 * 4L)).toLong() + 50_000_000L
+                            check(context.cacheDir.usableSpace >= needed) { AppText.get(R.string.ai_not_enough_storage, (needed / 1_000_000).toString()) }
+                            if (source.rumbleHz > 0) rumble = Rumble(rate, source.rumbleHz)
+                        }
                         check(rate > 0 && rate == chunk.rate) { AppText.get(R.string.ai_sample_rate_changed) }
                         for (i in 0 until chunk.frames) {
                             val sample = (chunk.pcm[2 * i].toInt() + chunk.pcm[2 * i + 1].toInt()) / 65536f
