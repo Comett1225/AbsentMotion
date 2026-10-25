@@ -62,12 +62,15 @@ fun woffToSfnt(bytes: ByteArray): ByteArray {
     val count = u16(bytes, 12)
     if (count < 1 || 44 + count * 20 > bytes.size || u32(bytes, 16) > MAX_FONT_BYTES) throw FontImportError(FontProblem.Corrupted)
     class Table(val tag: ByteArray, val checksum: Long, val data: ByteArray)
+    var unpacked = 0L
     val tables = (0 until count).map { i ->
         val entry = 44 + i * 20
         val offset = u32(bytes, entry + 4).toInt()
         val compressed = u32(bytes, entry + 8).toInt()
         val original = u32(bytes, entry + 12).toInt()
         if (offset < 0 || compressed < 0 || original < 0 || offset + compressed > bytes.size || compressed > original || original > MAX_FONT_BYTES) throw FontImportError(FontProblem.Corrupted)
+        unpacked += original
+        if (unpacked > MAX_FONT_BYTES) throw FontImportError(FontProblem.TooLarge)
         val data = if (compressed == original) bytes.copyOfRange(offset, offset + compressed) else inflate(bytes, offset, compressed, original)
         Table(bytes.copyOfRange(entry, entry + 4), u32(bytes, entry + 16), data)
     }.sortedBy { String(it.tag, Charsets.ISO_8859_1) }

@@ -92,6 +92,23 @@ class FontFileTest {
         assertEquals(FontProblem.TooLarge, problem(real.copyOf(MAX_FONT_BYTES + 1)))
     }
 
+    @Test fun aWoffThatUnpacksPastTheLimitIsRefusedBeforeItIsUnpacked() {
+        val zeros = ByteArray(20 shl 20)
+        val deflater = Deflater(9).apply { setInput(zeros); finish() }
+        val packed = ByteArrayOutputStream().also { out -> val chunk = ByteArray(65536); while (!deflater.finished()) out.write(chunk, 0, deflater.deflate(chunk)) }.toByteArray()
+        deflater.end()
+        val garbage = ByteArray(packed.size) { 0x55 }
+        val dataAt = 44 + 2 * 20
+        val total = dataAt + packed.size + garbage.size
+        val b = ByteBuffer.allocate(total)
+        b.put("wOFF".toByteArray()).put(byteArrayOf(0, 1, 0, 0)).putInt(total).putShort(2).putShort(0).putInt(1000)
+        b.putShort(1).putShort(0).putInt(0).putInt(0).putInt(0).putInt(0).putInt(0)
+        b.put("aaaa".toByteArray()).putInt(dataAt).putInt(packed.size).putInt(zeros.size).putInt(0)
+        b.put("bbbb".toByteArray()).putInt(dataAt + packed.size).putInt(garbage.size).putInt(zeros.size).putInt(0)
+        b.put(packed).put(garbage)
+        assertEquals(FontProblem.TooLarge, problem(b.array()))
+    }
+
     @Test fun damagedWoffDataIsCorrupted() {
         val broken = woff(real)
         val b = ByteBuffer.wrap(broken)
