@@ -262,18 +262,21 @@ internal const val SCALE_TOLERANCE = 0.001f
 internal fun Scene.withTrack(apply: TrackApply, motion: Map<Int, Sim>): Scene {
     val target = layer(apply.targetId) ?: return this
     val length = (target.endTime - target.startTime).coerceAtLeast(1)
-    val frames = motion.keys.sorted().filter { frameStart(it) in target.startTime..target.endTime }
-    if (frames.isEmpty()) return this
+    val tracked = motion.keys.sorted().filter { frameStart(it) in target.startTime..target.endTime }
+    if (tracked.isEmpty()) return this
     val parent = chain(target).getOrNull(1)
-    val turns = unwrapDegrees(frames.map { motion.getValue(it).degrees })
-    val local = frames.mapIndexed { i, f ->
+    val turns = unwrapDegrees(tracked.map { motion.getValue(it).degrees })
+    val placed = tracked.mapIndexedNotNull { i, f ->
         val s = motion.getValue(f)
         val o = apply.origin
         val at = s.map(Pt(o.x, o.y))
         val k = if (apply.rotateScale) s.scale.toFloat() else 1f
         val world = Place(at.x, at.y, o.px, o.py, o.sx * k, o.sy * k, if (apply.rotateScale) o.rot + turns[i].toFloat() else o.rot, o.z)
-        parent?.let { decompose(world, place(it, frameStart(f))) ?: world } ?: world
+        (if (parent == null) world else decompose(world, place(parent, frameStart(f))))?.let { f to it }
     }
+    if (placed.isEmpty()) return this
+    val frames = placed.map { it.first }
+    val local = placed.map { it.second }
     val times = FloatArray(frames.size) { (frameStart(frames[it]) - target.startTime).toFloat() / length }
     val parts = buildList {
         add(Triple("location", LOCATION_TOLERANCE, local.map { it.part("location") }))

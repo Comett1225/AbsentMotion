@@ -222,6 +222,23 @@ class MotionTrackTest {
         assertEquals("7", out.layer(8)!!.node["parent"])
     }
 
+    @Test fun framesWhereTheParentHasNoSizeAreLeftOutInsteadOfWritingScreenValues() {
+        val scale = { v: Float -> XmlNode("transform", children = listOf(XmlNode("location", mapOf("value" to formatFloats(floatArrayOf(100f, 50f, 0f)))),
+            XmlNode("scale", children = listOf(XmlNode("kf", linkedMapOf("t" to "0", "v" to "1,1")), XmlNode("kf", linkedMapOf("t" to "0.5", "v" to "$v,$v")),
+                XmlNode("kf", linkedMapOf("t" to "1", "v" to "1,1")))))) }
+        fun holder(v: Float) = XmlNode("nullobj", linkedMapOf("id" to "7", "startTime" to "0", "endTime" to "2000"), listOf(scale(v)))
+        val sticker = Layer(XmlNode("shape", linkedMapOf("id" to "8", "startTime" to "0", "endTime" to "2000", "parent" to "7", "s" to ".rect"))).node
+        val motion = (0..60).associateWith { Sim(tx = it.toDouble()) }
+        val apply = TrackApply(8, Place(500f, 300f, 0f, 0f, 1f, 1f, 0f), rotateScale = false)
+        val dips = scene(video(), holder(0f), sticker)
+        val keys = dips.withTrack(apply, motion).layer(8)!!.node.child("transform")!!.child("location")!!.keyframes
+        assertTrue(keys.isNotEmpty())
+        assertTrue(keys.none { abs(it.t - 0.5f) < 1e-4f })
+        val gone = scene(video(), XmlNode("nullobj", linkedMapOf("id" to "7", "startTime" to "0", "endTime" to "2000"), listOf(XmlNode("transform", children = listOf(
+            XmlNode("scale", mapOf("value" to "0,0")))))), sticker)
+        assertEquals(gone, gone.withTrack(apply, motion))
+    }
+
     @Test fun keysOutsideTheTrackedRangeAreKept() {
         val target = Layer(XmlNode("nullobj", linkedMapOf("id" to "3", "startTime" to "0", "endTime" to "2000"))).node
             .withChild("transform", XmlNode("transform", children = listOf(XmlNode("location", children = listOf(

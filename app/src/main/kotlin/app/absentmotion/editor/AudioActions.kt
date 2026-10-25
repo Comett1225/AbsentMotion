@@ -26,7 +26,7 @@ fun Layer.extractedAudio(id: Long): Layer? {
     val attrs = linkedMapOf("id" to "$id")
     for (key in listOf("label", "startTime", "endTime")) node[key]?.let { attrs[key] = it }
     attrs["src"] = fill.uri
-    for (key in listOf("inTime", "outTime", "loop", "speed")) node[key]?.let { attrs[key] = it }
+    for (key in listOf("inTime", "outTime", "loop", "loopIn", "speed")) node[key]?.let { attrs[key] = it }
     attrs["mediaFillMode"] = "fill"
     return Layer(XmlNode("audio", attrs, node.children.filter { it.name == "speedMap" || it.name == "gain" && !it.mutes || it.name == AUDIO_FX_TAG }))
 }

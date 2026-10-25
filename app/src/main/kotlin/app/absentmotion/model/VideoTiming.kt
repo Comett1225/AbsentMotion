@@ -89,13 +89,20 @@ fun Layer.steppedMs(timeMs: Double): Double {
 
 fun Layer.videoTimeUs(timeMs: Int, scene: Scene): Long {
     val fill = mediaFill ?: return 0
-    return (fill.bounded(mediaTimeMs(steppedMs(scene.frameTime(scene.frameAt(timeMs)).toDouble())), node["loop"] == "true") * 1000).toLong() - 500
+    return (bounded(fill, mediaTimeMs(steppedMs(scene.frameTime(scene.frameAt(timeMs)).toDouble()))) * 1000).toLong() - 500
 }
 
-private fun MediaFill.bounded(mapped: Double, loop: Boolean): Double {
-    val span = (outTime.toDouble() - inTime).coerceAtLeast(1.0)
-    return if (loop) inTime + ((mapped - inTime) % span + span) % span
-        else mapped.coerceIn(inTime.toDouble(), outTime.toDouble().coerceAtLeast(inTime.toDouble()))
+val Layer.loopStart: Int?
+    get() {
+        if (node["loop"] != "true") return null
+        val start = node["inTime"]?.toIntOrNull() ?: 0
+        return node["loopIn"]?.toIntOrNull()?.takeIf { it in 0..start } ?: start
+    }
+
+private fun Layer.bounded(fill: MediaFill, mapped: Double): Double {
+    val from = loopStart ?: return mapped.coerceIn(fill.inTime.toDouble(), fill.outTime.toDouble().coerceAtLeast(fill.inTime.toDouble()))
+    val span = (fill.outTime.toDouble() - from).coerceAtLeast(1.0)
+    return from + ((mapped - from) % span + span) % span
 }
 
 fun exportFrameMs(timeMs: Int, fps: Int): Double = ((((timeMs + 1L) * fps + 999) / 1000) - 1) * 1000.0 / fps
@@ -133,10 +140,10 @@ internal fun Layer.pairAround(timeMs: Double, scene: Scene, stamps: LongArray): 
     val fill = mediaFill ?: return null
     if (stamps.isEmpty()) return null
     val loop = node["loop"] == "true"
-    val first = fill.inTime * 1000.0 - 500
+    val first = (loopStart ?: fill.inTime) * 1000.0 - 500
     val last = fill.outTime * 1000.0 - 500
     val mapped = VideoTiming(this).mediaMs(localMs(steppedMs(timeMs), scene))
-    val us = if (!loop && mapped >= fill.outTime) last else fill.bounded(mapped, loop) * 1000
+    val us = if (!loop && mapped >= fill.outTime) last else bounded(fill, mapped) * 1000
     val i = stamps.atOrBefore(us)
     val gap = if (i + 1 < stamps.size) stamps[i + 1] - stamps[i] else if (i > 0) stamps[i] - stamps[i - 1] else 0
     fun held(at: Long) = Around(FramePair(at, at, 0f), gap)
@@ -173,7 +180,13 @@ fun Layer.trimmedTo(start: Int, end: Int, mediaMs: Int = Int.MAX_VALUE): Layer {
         trimmed = trimmed.copy(node = trimmed.node.with("inTime", cut.takeIf { it > 0 }?.toString()))
     }
     if (timing != null) {
-        if (from != startTime) trimmed = trimmed.copy(node = trimmed.node.with("inTime", "${timing.mediaMs((from - startTime).toDouble()).roundToInt().coerceAtLeast(0)}"))
+        val loopEnd = node["outTime"]?.toIntOrNull()
+        val window = loopStart?.takeIf { loopEnd != null }
+        if (from != startTime) {
+            val media = timing.mediaMs((from - startTime).toDouble()).roundToInt()
+            trimmed = trimmed.copy(node = if (window == null || loopEnd == null) trimmed.node.with("inTime", "${media.coerceAtLeast(0)}")
+                else trimmed.node.with("inTime", "${window + Math.floorMod(media - window, (loopEnd - window).coerceAtLeast(1))}").with("loopIn", "$window"))
+        }
         if (to != endTime && node["loop"] != "true") trimmed = trimmed.copy(node = trimmed.node.with("outTime", "${timing.mediaMs((to - startTime).toDouble()).roundToInt().coerceAtMost(mediaMs)}"))
     }
     return trimmed

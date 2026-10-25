@@ -8,6 +8,7 @@ import app.absentmotion.model.Scene
 import app.absentmotion.model.VideoTiming
 import app.absentmotion.model.XmlNode
 import app.absentmotion.model.isKeyframed
+import app.absentmotion.model.loopStart
 import app.absentmotion.model.valueAt
 import kotlin.math.ceil
 import kotlin.math.abs
@@ -28,7 +29,7 @@ internal class AudioClip(layer: Layer, val uri: String, private val track: Layer
     val id = layer.id
     val startMs = track?.startMs ?: layer.startTime
     val endMs = track?.endMs ?: (layer.endTime + 1)
-    val inMs = layer.node["inTime"]?.finiteDouble() ?: 0.0
+    val inMs = layer.loopStart?.toDouble() ?: layer.node["inTime"]?.finiteDouble() ?: 0.0
     private val declaredOutMs = layer.node["outTime"]?.finiteDouble()
     @Volatile private var sourceEndMs = durationMs
     val outMs: Double get() = declaredOutMs ?: sourceEndMs

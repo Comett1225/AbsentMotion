@@ -138,7 +138,7 @@ internal val MatteFollowedEffects = setOf(
     "absent.twirl", "absent.viewer360", "absent.wavewarp",
 )
 
-private val MatteTimeAttributes = listOf("startTime", "endTime", "inTime", "outTime", "speed", "loop", "parent")
+private val MatteTimeAttributes = listOf("startTime", "endTime", "inTime", "outTime", "speed", "loop", "loopIn", "parent")
 
 private fun lumaKey() = XmlNode("effect", linkedMapOf("id" to "absent.lumakey", "hidden" to "false"), listOf(
     XmlNode("property", linkedMapOf("name" to "threshold", "type" to "float", "value" to "0.03")),
