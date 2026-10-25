@@ -104,7 +104,7 @@ suspend fun deviceAudio(context: Context): List<DeviceAudio> = withContext(Dispa
             while (c.moveToNext()) {
                 val where = c.getString(7).orEmpty()
                 found += DeviceAudio(ContentUris.withAppendedId(collection, c.getLong(0)).toString(),
-                    c.getString(1) ?: c.getString(2) ?: "", c.getLong(3), c.getLong(4), c.getString(2) ?: "", known(c.getString(5)), known(c.getString(6)),
+                    c.getString(1)?.takeIf { it.isNotBlank() } ?: c.getString(2) ?: "", c.getLong(3), c.getLong(4), c.getString(2) ?: "", known(c.getString(5)), known(c.getString(6)),
                     if (Build.VERSION.SDK_INT >= 29) where.trimEnd('/') else where.substringBeforeLast('/', ""))
             }
         }

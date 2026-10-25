@@ -79,8 +79,9 @@ private fun unsupportedPick(context: android.content.Context) {
     android.widget.Toast.makeText(context, context.getString(R.string.library_err_unsupported_type), android.widget.Toast.LENGTH_LONG).show()
 }
 
-private fun looksLikeGif(context: Context, uri: Uri): Boolean =
+private suspend fun looksLikeGif(context: Context, uri: Uri): Boolean = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
     runCatching { context.contentResolver.openInputStream(uri)?.use { isGif(it.readAtMost(6)) } }.getOrNull() == true
+}
 
 internal suspend fun EditorState.addPicked(context: Context, uri: Uri, video: Boolean? = null, svg: Boolean = false) {
     val type = runCatching { context.contentResolver.getType(uri) }.getOrNull().orEmpty()
