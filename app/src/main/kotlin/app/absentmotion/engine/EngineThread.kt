@@ -518,6 +518,7 @@ class EngineThread(private val background: Int, context: Context? = null) {
         val document = Scene.parse(xml)
         fonts?.let { library -> document.fontNames().forEach { library.resolve(it) } }
         var shown: String? = null
+        withContext(dispatcher) { capturing = true }
         val held = videos?.hold()
         try {
             held?.join()
