@@ -223,7 +223,7 @@ class UiContracts(unittest.TestCase):
 
     def test_single_group_duplicate_remaps_children(self):
         text = source('editor/EditorActions.kt').split('fun EditorState.duplicateSelected()', 1)[1].split('fun EditorState.toggleHidden', 1)[0]
-        self.assertIn('copyLayers(listOf(layer), preserveOutsideParents = true)', text)
+        self.assertIn('copyLayers(listOf(scene.pinnedPath(layer)), preserveOutsideParents = true)', text)
 
     def test_share_labels_match_export_names(self):
         text = source('ui/export/ExportDone.kt')
