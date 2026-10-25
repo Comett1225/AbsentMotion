@@ -2535,15 +2535,6 @@
    },
    "centerPoint": {
     "neutral": "0,0"
-   },
-   "radius": {
-    "neutral": 0.85
-   },
-   "feather": {
-    "neutral": 0.325
-   },
-   "gaussian": {
-    "neutral": true
    }
   }
  },
@@ -2971,7 +2962,7 @@
     "wrap": 360
    },
    "mirror": {
-    "neutral": false
+    "to": "mirror"
    }
   }
  },
@@ -2995,7 +2986,7 @@
     "neutral": false
    },
    "invert": {
-    "neutral": false
+    "to": "invert"
    }
   }
  },
@@ -3019,7 +3010,7 @@
     "neutral": 1
    },
    "weighted": {
-    "neutral": false
+    "neutral": true
    }
   }
  },
@@ -3043,7 +3034,7 @@
     "neutral": 1
    },
    "weighted": {
-    "neutral": false
+    "neutral": true
    }
   }
  },
@@ -3078,18 +3069,6 @@
    "angle": {
     "to": "angle",
     "wrap": 360
-   },
-   "strength": {
-    "neutral": 0.5
-   },
-   "phase": {
-    "neutral": 0
-   },
-   "color1": {
-    "neutral": "#ff000000"
-   },
-   "color2": {
-    "neutral": "#ffffffff"
    }
   }
  },
@@ -3195,7 +3174,7 @@
     "neutral": 0.5
    },
    "blendMode": {
-    "neutral": 0
+    "neutral": 2
    }
   }
  },
@@ -3265,17 +3244,8 @@
    "color": {
     "to": "color"
    },
-   "shine": {
-    "neutral": 0.15
-   },
-   "pointCount": {
-    "neutral": 12
-   },
    "alpha": {
     "neutral": 1
-   },
-   "blendMode": {
-    "neutral": 0
    }
   }
  },

@@ -27,7 +27,13 @@
    "min": 0,
    "max": 1,
    "step": 0.01
+  },
+  {
+   "id": "invert",
+   "label": "Invert",
+   "type": "switch",
+   "default": false
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nlayout(color) uniform half4 key;\nuniform float tolerance;\nuniform float softness;\nfloat2 chroma(half3 c) { return float2(-0.1687 * c.r - 0.3313 * c.g + 0.5 * c.b, 0.5 * c.r - 0.4187 * c.g - 0.0813 * c.b); }\nhalf4 main(float2 coord) {\n    half4 c = image.eval(coord);\n    float d = distance(chroma(unpremul(c).rgb), chroma(key.rgb));\n    return c * half(smoothstep(tolerance, tolerance + softness + 0.0001, d));\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nlayout(color) uniform half4 key;\nuniform float tolerance;\nuniform float softness;\nuniform float invert;\nfloat2 chroma(half3 c) { return float2(-0.1687 * c.r - 0.3313 * c.g + 0.5 * c.b, 0.5 * c.r - 0.4187 * c.g - 0.0813 * c.b); }\nhalf4 main(float2 coord) {\n    half4 c = image.eval(coord);\n    float d = distance(chroma(unpremul(c).rgb), chroma(key.rgb));\n    float keep = smoothstep(tolerance, tolerance + softness + 0.0001, d);\n    return c * half(invert > 0.5 ? 1.0 - keep : keep);\n}\n"
 }
