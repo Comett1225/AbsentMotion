@@ -156,6 +156,20 @@ without Optical flow High, AI Smooth, AI Enhance and AI background removal 2.0.
 There are three builds: `play`, which has background removal through Google Play services, `foss` (for F-Droid),
 which contains no Google libraries at all, and `compat`, the Compatible build of `foss`.
 
+## Future Plans ( Roadmap )
+
+Possibly a PC version as I love the layout and also simplicity of it. Not sure if chromebooks automatically supported from this being an android app but most likely support will arrive to
+- Windows 10/11 (maybe 8/8.1)
+- MacOS 15 to 27
+- Linux
+- Chromebooks
+- Possibly releasing IPA versions of this app for iPhones and iPads
+This will all be decided later though, for the v5.0 update.
+
+## Updates to AbsentMotion
+
+There will be weekly updates at minimum, whether it's bug patches, improvement to the engine or new features.
+
 ## Limits / Problems
 
 AbsentMotion is a young project. Please know these before you rely on it:
