@@ -1666,7 +1666,7 @@
     <string name="preview_cache_state_outdated">Usang: projek berubah selepas dirender</string>
     <string name="preview_cache_rendering">Merender pratonton %1$d%%</string>
     <string name="preview_cache_partial">Dirender %1$s hingga %2$s. Bahagian lebih panjang tidak muat dalam memori.</string>
-    <string name="preview_cache_ready_range">Pratonton lancar tersedia dari %1$s hingga %2$s. Sentuh dan tahan butang untuk membuangnya.</string>
+    <string name="preview_cache_ready_range">Pratonton lancar tersedia dari %1$s hingga %2$s.</string>
     <string name="preview_cache_removed">Pratonton dirender dibuang</string>
     <string name="preview_cache_no_memory">Memori tidak mencukupi untuk pratonton dirender. Ia dibuang.</string>
     <string name="preview_cache_failed">Pratonton tidak dapat dirender.</string>

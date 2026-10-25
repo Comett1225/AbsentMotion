@@ -1716,7 +1716,7 @@
     <string name="preview_cache_state_outdated">Desactualizado: el proyecto cambió después de renderizar</string>
     <string name="preview_cache_rendering">Renderizando vista previa %1$d%%</string>
     <string name="preview_cache_partial">Se renderizó de %1$s a %2$s. Una parte más larga no cabe en la memoria.</string>
-    <string name="preview_cache_ready_range">Vista previa fluida lista de %1$s a %2$s. Mantén presionado el botón para quitarla.</string>
+    <string name="preview_cache_ready_range">Vista previa fluida lista de %1$s a %2$s.</string>
     <string name="preview_cache_removed">Se quitó la vista previa renderizada</string>
     <string name="preview_cache_no_memory">No hay suficiente memoria para una vista previa renderizada. Se quitó.</string>
     <string name="preview_cache_failed">No se pudo renderizar la vista previa.</string>

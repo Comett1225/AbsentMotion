@@ -1716,7 +1716,7 @@
     <string name="preview_cache_state_outdated">Desatualizada: o projeto mudou após a renderização</string>
     <string name="preview_cache_rendering">Renderizando pré-visualização %1$d%%</string>
     <string name="preview_cache_partial">Renderizado de %1$s a %2$s. Um trecho maior não cabe na memória.</string>
-    <string name="preview_cache_ready_range">Pré-visualização fluida pronta de %1$s a %2$s. Toque e segure o botão para removê-la.</string>
+    <string name="preview_cache_ready_range">Pré-visualização fluida pronta de %1$s a %2$s.</string>
     <string name="preview_cache_removed">Pré-visualização renderizada removida</string>
     <string name="preview_cache_no_memory">Memória insuficiente para uma pré-visualização renderizada. Ela foi removida.</string>
     <string name="preview_cache_failed">Não foi possível renderizar a pré-visualização.</string>

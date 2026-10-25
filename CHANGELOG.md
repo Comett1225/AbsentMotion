@@ -11,7 +11,7 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 ### Added
 
 - A **5-minute tutorial** in its own practice project, offered after the first start and in Settings.
-- **Render preview**: one tap renders the project so heavy projects play smoothly, in sync with the sound.
+- **Render preview**: when playback is choppy, the editor offers to render the project so it plays smoothly, in sync with the sound.
 - **AI background removal 2.0** for pictures, an optional download of about 62 MB, and **exports that keep going in the background** with a progress notification.
 - **Moving several clips at once**, and **Move to playhead** for several clips (the first press keeps their gaps, the second lines them up).
 - **Smoothing updates itself** after small trims and asks after big changes.
@@ -25,17 +25,17 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 - The app follows the phone's **font size**, Arabic and Persian read **right to left** in the editor, and **screen readers** can use the timeline.
 - **Tablets** edit text in a side panel and open full screen when started sideways; **portrait exports** on older tablets are about twice as fast.
 - A **stuck export** stops with a clear reason, the export check catches **black or frozen** pictures, and **time estimates** learn from each export.
-- **Render preview** keeps its frames on disk when memory is short, and **failed saves** keep the newest edits.
+- **Failed saves** keep the newest edits.
 
 ### Fixed
 
-- **Exports and Render preview freezing** on older devices with Motion Blur or Echo over heavy effects.
+- **Exports freezing** on older devices with Motion Blur or Echo over heavy effects.
 - **Backups made on Android 11** being damaged, **unsaved edits** lost after a crash, and **damaged projects** opening blank.
 - **Smooth** losing the clip's sound, **Scatter Field** using gigabytes of memory, long **MKV and WebM** exports running out of memory, and interrupted exports left behind as broken files.
 - **WAV exports over 4 GB**, **WebP lossless** on Android 9, **AV1** format details and custom **export sizes**.
 - Crafted **project, SVG and font files** crashing the app, and a shared project showing another project's pictures.
 - Sounds in groups cut off, **looped clips** freezing after a split, split **path followers** and **groups** losing their path or timing, and **Undo** losing a step.
-- The **number keypad** with Bengali, Hindi and Thai digits, **Render preview** showing old frames, **motion tracking** with size-less parents, 3D model names with accents, and the tutorial offer covering the Import complete window.
+- The **number keypad** with Bengali, Hindi and Thai digits, **motion tracking** with size-less parents, 3D model names with accents, and the tutorial offer covering the Import complete window.
 
 ## [3.3.2] - 2026-10-24
 

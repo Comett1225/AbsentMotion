@@ -1691,7 +1691,7 @@
     <string name="preview_cache_state_outdated">পুরনো: রেন্ডারের পরে প্রজেক্ট পরিবর্তন হয়েছে</string>
     <string name="preview_cache_rendering">প্রিভিউ রেন্ডার হচ্ছে %1$d%%</string>
     <string name="preview_cache_partial">%1$s থেকে %2$s পর্যন্ত রেন্ডার হয়েছে। এর চেয়ে বড় অংশ মেমোরিতে ধরে না।</string>
-    <string name="preview_cache_ready_range">%1$s থেকে %2$s পর্যন্ত স্মুথ প্রিভিউ প্রস্তুত। মুছতে বোতামটি চেপে ধরে রাখুন।</string>
+    <string name="preview_cache_ready_range">%1$s থেকে %2$s পর্যন্ত স্মুথ প্রিভিউ প্রস্তুত।</string>
     <string name="preview_cache_removed">রেন্ডার করা প্রিভিউ মুছে ফেলা হয়েছে</string>
     <string name="preview_cache_no_memory">রেন্ডার করা প্রিভিউয়ের জন্য যথেষ্ট মেমোরি নেই। এটি মুছে ফেলা হয়েছে।</string>
     <string name="preview_cache_failed">প্রিভিউ রেন্ডার করা যায়নি।</string>

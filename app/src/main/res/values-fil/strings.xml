@@ -1691,7 +1691,7 @@
     <string name="preview_cache_state_outdated">Hindi na updated: nagbago ang proyekto pagkatapos i-render</string>
     <string name="preview_cache_rendering">Nagre-render ng preview %1$d%%</string>
     <string name="preview_cache_partial">Na-render mula %1$s hanggang %2$s. Hindi kasya sa memory ang mas mahabang bahagi.</string>
-    <string name="preview_cache_ready_range">Handa na ang smooth na preview mula %1$s hanggang %2$s. Pindutin nang matagal ang button para alisin ito.</string>
+    <string name="preview_cache_ready_range">Handa na ang smooth na preview mula %1$s hanggang %2$s.</string>
     <string name="preview_cache_removed">Inalis ang na-render na preview</string>
     <string name="preview_cache_no_memory">Kulang ang memory para sa na-render na preview. Inalis ito.</string>
     <string name="preview_cache_failed">Hindi na-render ang preview.</string>

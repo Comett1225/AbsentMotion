@@ -1666,7 +1666,7 @@
     <string name="preview_cache_state_outdated">เก่า: โปรเจกต์เปลี่ยนหลังจากเรนเดอร์</string>
     <string name="preview_cache_rendering">กำลังเรนเดอร์ตัวอย่าง %1$d%%</string>
     <string name="preview_cache_partial">เรนเดอร์ %1$s ถึง %2$s แล้ว ช่วงที่ยาวกว่านี้ไม่พอดีกับหน่วยความจำ</string>
-    <string name="preview_cache_ready_range">ตัวอย่างลื่นไหลพร้อมใช้งานตั้งแต่ %1$s ถึง %2$s แตะค้างที่ปุ่มเพื่อลบ</string>
+    <string name="preview_cache_ready_range">ตัวอย่างลื่นไหลพร้อมใช้งานตั้งแต่ %1$s ถึง %2$s</string>
     <string name="preview_cache_removed">ลบตัวอย่างที่เรนเดอร์แล้ว</string>
     <string name="preview_cache_no_memory">หน่วยความจำไม่พอสำหรับตัวอย่างที่เรนเดอร์ จึงถูกลบ</string>
     <string name="preview_cache_failed">ไม่สามารถเรนเดอร์ตัวอย่างได้</string>

@@ -1691,7 +1691,7 @@
     <string name="preview_cache_state_outdated">पुराना: रेंडर करने के बाद प्रोजेक्ट बदल गया</string>
     <string name="preview_cache_rendering">प्रीव्यू रेंडर हो रहा है %1$d%%</string>
     <string name="preview_cache_partial">रेंडर किया: %1$s से %2$s तक। इससे लंबा हिस्सा मेमोरी में नहीं फिट होता।</string>
-    <string name="preview_cache_ready_range">%1$s से %2$s तक स्मूद प्रीव्यू तैयार है। इसे हटाने के लिए बटन को दबाकर रखें।</string>
+    <string name="preview_cache_ready_range">%1$s से %2$s तक स्मूद प्रीव्यू तैयार है।</string>
     <string name="preview_cache_removed">रेंडर किया गया प्रीव्यू हटा दिया गया</string>
     <string name="preview_cache_no_memory">रेंडर किए गए प्रीव्यू के लिए पर्याप्त मेमोरी नहीं है। इसे हटा दिया गया।</string>
     <string name="preview_cache_failed">प्रीव्यू रेंडर नहीं हो सका।</string>

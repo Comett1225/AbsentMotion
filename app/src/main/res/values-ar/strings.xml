@@ -1791,7 +1791,7 @@
     <string name="preview_cache_state_outdated">قديمة: تغيّر المشروع بعد التصيير</string>
     <string name="preview_cache_rendering">جارٍ تصيير المعاينة %1$d%%</string>
     <string name="preview_cache_partial">تم تصيير %1$s إلى %2$s. لا يتسع جزء أطول في الذاكرة.</string>
-    <string name="preview_cache_ready_range">المعاينة السلسة جاهزة من %1$s إلى %2$s. اضغط مطولًا على الزر لإزالتها.</string>
+    <string name="preview_cache_ready_range">المعاينة السلسة جاهزة من %1$s إلى %2$s.</string>
     <string name="preview_cache_removed">تمت إزالة المعاينة المصيّرة</string>
     <string name="preview_cache_no_memory">لا توجد ذاكرة كافية لمعاينة مصيّرة. تمت إزالتها.</string>
     <string name="preview_cache_failed">تعذر تصيير المعاينة.</string>

@@ -1666,7 +1666,7 @@
     <string name="preview_cache_state_outdated">Usang: proyek berubah setelah dirender</string>
     <string name="preview_cache_rendering">Merender pratinjau %1$d%%</string>
     <string name="preview_cache_partial">Dirender %1$s hingga %2$s. Bagian yang lebih panjang tidak muat di memori.</string>
-    <string name="preview_cache_ready_range">Pratinjau lancar siap dari %1$s hingga %2$s. Sentuh dan tahan tombol untuk menghapusnya.</string>
+    <string name="preview_cache_ready_range">Pratinjau lancar siap dari %1$s hingga %2$s.</string>
     <string name="preview_cache_removed">Pratinjau yang dirender dihapus</string>
     <string name="preview_cache_no_memory">Memori tidak cukup untuk pratinjau yang dirender. Pratinjau telah dihapus.</string>
     <string name="preview_cache_failed">Pratinjau tidak dapat dirender.</string>

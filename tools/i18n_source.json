@@ -3096,7 +3096,7 @@
  "preview_cache_hint_setting": "Offer a smooth preview when playback is choppy",
  "preview_cache_no_memory": "Not enough memory for a rendered preview. It was removed.",
  "preview_cache_partial": "Rendered %1$s to %2$s. A longer part does not fit in memory.",
- "preview_cache_ready_range": "Smooth preview ready from %1$s to %2$s. Touch and hold the button to remove it.",
+ "preview_cache_ready_range": "Smooth preview ready from %1$s to %2$s.",
  "preview_cache_removed": "Rendered preview removed",
  "preview_cache_render": "Render preview",
  "preview_cache_rendering": "Rendering preview %1$d%%",

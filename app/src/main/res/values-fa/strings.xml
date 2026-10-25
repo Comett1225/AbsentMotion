@@ -1691,7 +1691,7 @@
     <string name="preview_cache_state_outdated">قدیمی: پروژه پس از رندر تغییر کرده است</string>
     <string name="preview_cache_rendering">در حال رندر پیش‌نمایش %1$d%%</string>
     <string name="preview_cache_partial">‏%1$s تا %2$s رندر شد. بخش طولانی‌تر در حافظه جا نمی‌شود.</string>
-    <string name="preview_cache_ready_range">پیش‌نمایش روان از %1$s تا %2$s آماده است. برای حذف، دکمه را لمس کرده و نگه دارید.</string>
+    <string name="preview_cache_ready_range">پیش‌نمایش روان از %1$s تا %2$s آماده است.</string>
     <string name="preview_cache_removed">پیش‌نمایش رندرشده حذف شد</string>
     <string name="preview_cache_no_memory">حافظه کافی برای پیش‌نمایش رندرشده نیست. حذف شد.</string>
     <string name="preview_cache_failed">پیش‌نمایش رندر نشد.</string>

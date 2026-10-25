@@ -1741,7 +1741,7 @@
     <string name="preview_cache_state_outdated">Устарело: проект изменился после рендеринга</string>
     <string name="preview_cache_rendering">Рендеринг предпросмотра %1$d%%</string>
     <string name="preview_cache_partial">Отрендерено с %1$s по %2$s. Более длинный фрагмент не помещается в память.</string>
-    <string name="preview_cache_ready_range">Плавный предпросмотр готов с %1$s по %2$s. Удерживайте кнопку, чтобы удалить его.</string>
+    <string name="preview_cache_ready_range">Плавный предпросмотр готов с %1$s по %2$s.</string>
     <string name="preview_cache_removed">Отрендеренный предпросмотр удалён</string>
     <string name="preview_cache_no_memory">Недостаточно памяти для отрендеренного предпросмотра. Он удалён.</string>
     <string name="preview_cache_failed">Не удалось отрендерить предпросмотр.</string>

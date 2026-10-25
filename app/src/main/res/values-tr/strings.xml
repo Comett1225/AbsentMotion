@@ -1691,7 +1691,7 @@
     <string name="preview_cache_state_outdated">Güncel değil: proje işlendikten sonra değişti</string>
     <string name="preview_cache_rendering">Önizleme işleniyor %1$d%%</string>
     <string name="preview_cache_partial">%1$s ile %2$s arası işlendi. Daha uzun bir bölüm belleğe sığmıyor.</string>
-    <string name="preview_cache_ready_range">%1$s ile %2$s arası akıcı önizleme hazır. Kaldırmak için düğmeyi basılı tutun.</string>
+    <string name="preview_cache_ready_range">%1$s ile %2$s arası akıcı önizleme hazır.</string>
     <string name="preview_cache_removed">İşlenmiş önizleme kaldırıldı</string>
     <string name="preview_cache_no_memory">İşlenmiş önizleme için yeterli bellek yok. Kaldırıldı.</string>
     <string name="preview_cache_failed">Önizleme işlenemedi.</string>
