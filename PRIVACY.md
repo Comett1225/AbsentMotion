@@ -12,6 +12,9 @@ The camera and microphone permissions are used only by the in-app camera, while 
 videos you add to a project. Recordings are saved on the device. Backups of your projects are written to
 `Documents/AbsentMotion` on the device and stay there.
 
+While an export runs, the app shows its progress in a notification, so the export can continue when you switch to another app.
+On Android 13 and newer it asks for the notification permission at the first export; exports work the same if you say no.
+
 If the app closes unexpectedly, it keeps a crash log in its own storage on the device: when it happened, the reason in one sentence,
 the app and Android versions, the phone model, what you were doing and the technical error. Only the last 20 are kept, they are not
 included in phone backups and they are never sent anywhere; you can read or copy them in Settings under Crash logs.
