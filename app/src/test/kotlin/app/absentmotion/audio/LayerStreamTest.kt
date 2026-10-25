@@ -54,6 +54,35 @@ class LayerStreamTest {
         assertEquals(3, wraps)
     }
 
+    @Test fun aSoundInALoopingGroupPlaysOnAtEveryRepeatLikeTheExport() {
+        val rate = 48_000
+        val block = 1024
+        val dt = 1000.0 / rate
+        val scene = app.absentmotion.model.Scene.parse("""
+            <scene width="100" height="100" fps="30"><embedScene id="1" startTime="0" endTime="11999">
+            <scene width="100" height="100" fps="30" totalTime="4999" retime="loop">
+            <audio id="2" src="tone" startTime="0" endTime="4999" outTime="20000"/>
+            </scene></embedScene></scene>""")
+        val clip = AudioClip.of(scene).single()
+        val export = OfflineMix({ ToneSource(440.0) }, listOf(clip), Resampler.ULTRA, { _, _ -> null }, FakeFx(), rate).use { it.floats(0, 11_000_000) }
+        val stream = LayerStream("tone", clip.cue(0.0).first - LayerStream.LEAD_MS) { ToneSource(440.0) }
+        val rack = FxRack(rate) { _, _ -> null }
+        val out = FloatArray(2 * block)
+        var wraps = 0
+        try {
+            for (i in 0 until export.size / 2 / block) {
+                val t0 = i * block * dt
+                val wrapping = clip.span(t0, block, dt)!!.to < block
+                if (wrapping) wraps++ else awaitCondition("sound at $t0 ms") { stream.prepare(clip.mediaAt(t0)) }
+                mixStreams(listOf(clip), out, block, t0, rate, Resampler.ULTRA, rack) { stream }
+                for (k in 0 until 2 * block) assertEquals("block $i at ${t0.toInt()} ms", export[2 * i * block + k], out[k], 1e-4f)
+            }
+        } finally {
+            stream.close()
+        }
+        assertEquals(2, wraps)
+    }
+
     @Test fun onlyClipsThatCanStillSoundAskForAudioFocus() {
         val clips = AudioClip.of(sceneXml(
             """<shape id="1" startTime="0" endTime="999" fillType="media" fillVideo="early.mp4" s=".rect"/>""",

@@ -28,6 +28,8 @@ internal class LayerStream(val uri: String, startMs: Double, val loopMs: Double?
     private var head = ShortArray(0)
     private var headStart = 0L
     private var headEnd = 0L
+    private var learn = loopMs == null
+    private var capture = -1L
 
     @Volatile var durationUs = -1L
         private set
@@ -64,11 +66,11 @@ internal class LayerStream(val uri: String, startMs: Double, val loopMs: Double?
                 val chunk = decoder.next()
                 if (chunk == null) {
                     if (rate == 0) { failed = true; break }
-                    lock.withLock { if (seekGen == handled) { if (!placed) place(rate, target); placed = true; eof = true } }
+                    lock.withLock { if (seekGen == handled) { if (!placed) place(rate, target); placed = true; eof = true; keepHead(true) } }
                     continue
                 }
                 if (!placed) lock.withLock { if (seekGen == handled) { place(chunk.rate, target); placed = true } }
-                if (placed) append(chunk, handled)
+                if (placed && append(chunk, handled)) keepHead(false)
             }
         } catch (e: Exception) {
             Log.w("AMAudio", "Cannot decode $uri", e)
@@ -106,6 +108,25 @@ internal class LayerStream(val uri: String, startMs: Double, val loopMs: Double?
         endAbs = startAbs
         eof = false
         valid = true
+        capture = if (learn) startAbs else -1L
+    }
+
+    private fun keepHead(ended: Boolean) = lock.withLock {
+        val from = capture
+        val frames = rate.toLong() * HEAD_MS / 1000
+        if (from < 0 || !valid || (endAbs - from < frames && !ended)) return@withLock
+        capture = -1L
+        val n = minOf(frames, endAbs - from).toInt()
+        if (from < startAbs || n <= 0) return@withLock
+        val buf = ShortArray(2 * n)
+        for (i in 0 until n) {
+            val at = ((from + i) % cap).toInt() * 2
+            buf[2 * i] = ring[at]
+            buf[2 * i + 1] = ring[at + 1]
+        }
+        head = buf
+        headStart = from
+        headEnd = from + n
     }
 
     private fun append(c: PcmChunk, gen: Int): Boolean {
@@ -150,11 +171,12 @@ internal class LayerStream(val uri: String, startMs: Double, val loopMs: Double?
 
     private fun room(): Long = cap - (endAbs - keepFrom.coerceIn(startAbs, endAbs))
 
-    private fun request(ms: Double) {
+    private fun request(ms: Double, learn: Boolean = loopMs == null) {
         seekMs = maxOf(0.0, ms)
         seekGen++
         valid = false
         eof = false
+        this.learn = learn
         changed.signalAll()
     }
 
@@ -169,7 +191,7 @@ internal class LayerStream(val uri: String, startMs: Double, val loopMs: Double?
         if (from >= headStart && from < headEnd) {
             val next = maxOf(headEnd - 256, 0L)
             if (valid && startAbs <= next && hi <= ringEnd) return true
-            if (if (valid) startAbs > next || endAbs < next else seekMs != next * 1000.0 / r) request(next * 1000.0 / r)
+            if (if (valid) startAbs > next || endAbs < next else seekMs != next * 1000.0 / r) request(next * 1000.0 / r, false)
             return hi <= headEnd
         }
         if (!valid) return false
