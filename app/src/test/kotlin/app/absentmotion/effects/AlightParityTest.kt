@@ -186,7 +186,7 @@ class AlightParityTest {
         val seed = effects[0].children.single { it["name"] == "seed" }
         assertEquals(listOf(0f, 5f), seed.children.map { it["v"]!!.toFloat() })
         assertEquals("ease-out", seed.children.last()["e"])
-        assertEquals(0.8f, value(1, "softness").toFloat(), 1e-4f)
+        assertEquals(0.2f, value(1, "softness").toFloat(), 1e-4f)
         assertEquals(2f, value(1, "blend").toFloat(), 1e-4f)
         assertEquals("12.000000,34.000000", effects[2].children.single { it["name"] == "parallax" }.children.last()["v"])
         assertEquals(3.7f, value(2, "scale").toFloat(), 1e-4f)

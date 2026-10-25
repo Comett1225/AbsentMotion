@@ -13,6 +13,6 @@ Easing ParseEasing(const char* text);
 
 float Ease(const Easing& easing, float u);
 
-double SimplexNoise2(double x, double y);
+double SimplexNoise2(double x, double y, bool standard = false);
 
 }

@@ -70,6 +70,17 @@
    "min": 0,
    "max": 2000,
    "step": 1
+  },
+  {
+   "id": "pattern",
+   "label": "Pattern",
+   "type": "choice",
+   "default": 1,
+   "options": [
+    "Classic",
+    "Standard"
+   ],
+   "legacyDefault": 0
   }
  ]
 }

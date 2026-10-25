@@ -1,0 +1,59 @@
+{
+ "id": "noise",
+ "name": "Noise",
+ "category": "noise",
+ "since": "4.0.0",
+ "description": "Covers the layer with fine grain, one grain per pixel, that changes every frame. Monochrome makes the grain grey, Extremes makes every grain fully light or dark, and Freeze holds the pattern still.",
+ "params": [
+  {
+   "id": "amount",
+   "label": "Strength",
+   "type": "float",
+   "default": 0.25,
+   "min": 0,
+   "max": 1,
+   "step": 0.001
+  },
+  {
+   "id": "mono",
+   "label": "Monochrome",
+   "type": "switch",
+   "default": false
+  },
+  {
+   "id": "freeze",
+   "label": "Freeze",
+   "type": "switch",
+   "default": false
+  },
+  {
+   "id": "extremes",
+   "label": "Extremes",
+   "type": "switch",
+   "default": false
+  },
+  {
+   "id": "offset",
+   "label": "Offset",
+   "type": "point",
+   "default": [
+    0,
+    0
+   ],
+   "min": -5000,
+   "max": 5000,
+   "step": 1,
+   "pixels": true
+  },
+  {
+   "id": "overshoot",
+   "label": "Overshoot",
+   "type": "float",
+   "default": 2,
+   "min": 0.5,
+   "max": 2,
+   "step": 0.001
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float amount;\nuniform float mono;\nuniform float freeze;\nuniform float extremes;\nuniform float2 offset;\nuniform float overshoot;\nfloat hash13(float3 p) {\n    p = fract(p * 0.1031);\n    p += dot(p, p.zyx + 31.32);\n    return fract((p.x + p.y) * p.z);\n}\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return src;\n    float2 n = floor(coord - offset);\n    float frame = freeze > 0.5 ? 0.0 : mod(floor(time * 60.0 + 0.001), 4096.0);\n    float3 k = float3(n, frame);\n    float3 v = float3(hash13(k), hash13(k + 19.7), hash13(k + 41.3));\n    if (mono > 0.5) v = v.xxx;\n    if (extremes > 0.5) v = step(0.5, v);\n    float3 base = float3(src.rgb) / float(src.a);\n    float3 rgb = clamp(base * mix(float3(1.0), v * overshoot, clamp(amount, 0.0, 1.0)), 0.0, 1.0);\n    return half4(half3(rgb) * src.a, src.a);\n}\n"
+}

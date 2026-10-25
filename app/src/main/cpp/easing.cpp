@@ -171,7 +171,7 @@ float Ease(const Easing& easing, float time) {
     return (float)std::fmin(std::fmax(v, -FLT_MAX), FLT_MAX);
 }
 
-double SimplexNoise2(double x, double y) {
+double SimplexNoise2(double x, double y, bool standard) {
     if (!(std::fabs(x) < 1e9 && std::fabs(y) < 1e9)) return 0;
     static const unsigned char kTable[256] = {
         151, 160, 137, 91, 90, 15, 131, 13, 201, 95, 96, 53, 194, 233, 7, 225,
@@ -193,7 +193,7 @@ double SimplexNoise2(double x, double y) {
     };
     static const signed char kGrad[12][2] = {{1, 1}, {-1, 1}, {1, -1}, {-1, -1}, {1, 0}, {-1, 0},
                                              {1, 0}, {-1, 0}, {0, 1},  {0, -1},  {0, 1}, {0, -1}};
-    auto perm = [](int i) { return kTable[i % 255]; };
+    auto perm = [standard](int i) { return kTable[standard ? i & 255 : i % 255]; };
     const double F2 = 0.36602540378443864676;
     const double G2 = 0.21132486540518711775;
     const double skew = (x + y) * F2;

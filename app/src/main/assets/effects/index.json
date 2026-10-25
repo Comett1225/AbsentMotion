@@ -112,6 +112,7 @@
  "dissolve",
  "blockdissolve",
  "blocknoise",
+ "noise",
  "static",
  "blink",
  "fade",

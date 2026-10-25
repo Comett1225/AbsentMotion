@@ -86,7 +86,7 @@ uint64_t SeedOf(const Layer& l, const LayerEffect& e, float t, uint64_t channel)
 
 double Unit(uint64_t seed, int64_t k) { return (Mix(seed ^ Mix((uint64_t)k)) >> 11) * (1.0 / 9007199254740992.0); }
 
-double Noise(double x, double y) { return std::clamp(SimplexNoise2(x, y), -1.0, 1.0); }
+double Noise(double x, double y, bool standard = false) { return std::clamp(SimplexNoise2(x, y, standard), -1.0, 1.0); }
 
 double Plane(float seed, int channel) { return seed * 7.919 + channel * 101.37 + 0.5; }
 
@@ -415,8 +415,12 @@ void ApplyMotion(const Layer& l, double timeMs, Placement* p) {
         if (id == "autoshake") {
             const double x = Integral(e, "frequency", l, s, 2) + Param(e, "evolution", t, 0);
             const float seed = Param(e, "seed", t, 0), m = Param(e, "magnitude", t, 50), angle = Param(e, "angle", t, 45);
-            p->location += Toward(angle, m * Noise(x, Plane(seed, 0))) + Toward(angle + 90, m * Param(e, "slack", t, 0.25f) * Noise(x, Plane(seed, 1)));
-            p->z += (float)(Param(e, "zshake", t, 0) * Noise(x, Plane(seed, 2)));
+            const bool standard = Param(e, "pattern", t, 0) > 0.5f;
+            const double along = standard ? Noise(x, seed, true) : Noise(x, Plane(seed, 0));
+            const double across = standard ? Noise(x + 7.225, seed - 8.075, true) : Noise(x, Plane(seed, 1));
+            const double depth = standard ? Noise(x + 3.61, seed + 5.27, true) : Noise(x, Plane(seed, 2));
+            p->location += Toward(angle, m * along) + Toward(angle + 90, m * Param(e, "slack", t, 0.25f) * across);
+            p->z += (float)(Param(e, "zshake", t, 0) * depth);
         } else if (id == "randomdisplace") {
             if (!repeated) p->location += Displacement(e, t, Integral(e, "speed", l, s, 1), p->location);
         } else if (id == "randomjitter") {

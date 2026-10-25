@@ -45,7 +45,8 @@ class MoveEffectsTest {
         val wave = row("Wave", "choice", "0.000000", "Sine/Triangle")
         assertEquals(listOf(row("Magnitude", "float", "50.000000", "0.0..2000.0"), row("Frequency", "float", "2.000000", "0.0..16.0", "Hz"),
             row("Evolution", "float", "0.000000", "0.0..2000.0"), row("Seed", "float", "0.000000", "0.0..5.0"), row("Angle", "angle", "45.000000", "-3600.0..3600.0"),
-            row("Slack", "float", "0.250000", "0.0..1.0", "%"), row("Z Shake", "float", "0.000000", "0.0..2000.0")), params("autoshake"))
+            row("Slack", "float", "0.250000", "0.0..1.0", "%"), row("Z Shake", "float", "0.000000", "0.0..2000.0"),
+            row("Pattern", "choice", "1.000000", "Classic/Standard")), params("autoshake"))
         assertEquals(listOf(row("Magnitude", "float", "50.000000", "0.0..2000.0"), row("Evolution", "float", "0.000000", "0.0..2000.0"),
             row("Seed", "float", "0.000000", "0.0..5.0"), row("Scatter", "float", "0.500000", "0.0..2.0", "%"),
             row("Speed", "float", "1.000000", "0.0..50.0")), params("randomdisplace"))

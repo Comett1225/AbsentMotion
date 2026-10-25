@@ -311,7 +311,7 @@ class EffectMigrationTest {
             val definition = catalog.find(effect["id"]!!)!!
             for (p in effect.children) assertEquals("${definition.key}.${p["name"]}", definition.params.single { it.id == p["name"] }.type, p["type"])
         }
-        assertEquals(mapOf("magnitude" to 50f, "frequency" to 2f, "evolution" to 0f, "seed" to 0f, "angle" to 45f, "slack" to 0.25f, "zshake" to 0f), numbers("autoshake"))
+        assertEquals(mapOf("magnitude" to 50f, "frequency" to 2f, "evolution" to 0f, "seed" to 0f, "angle" to 45f, "slack" to 0.25f, "zshake" to 0f, "pattern" to 1f), numbers("autoshake"))
         assertEquals(mapOf("progress" to 0f, "orientation" to 0f, "inset" to 0f), numbers("movealongpath"))
         assertEquals("true", own("movealongpath").prop("rotate")["value"])
         assertEquals(mapOf("feather" to 0f), numbers("offset"))

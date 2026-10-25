@@ -301,7 +301,9 @@
     "max": 1
    },
    "blend": {
-    "neutral": 1
+    "to": "blend",
+    "min": 0,
+    "max": 1
    },
    "outsideAlpha": {
     "neutral": 0
@@ -376,6 +378,7 @@
    },
    "feather": {
     "to": "softness",
+    "scale": 0.25,
     "min": 0,
     "max": 1
    },
@@ -723,6 +726,9 @@
    "zshake": {
     "to": "zshake"
    }
+  },
+  "set": {
+   "pattern": 1
   }
  },
  "com.alightcreative.effects.randomdisplace": {
@@ -2139,6 +2145,141 @@
    },
    "sample": {
     "to": "sampling"
+   }
+  }
+ },
+ "com.alightcreative.effects.ominodiff": {
+  "to": "ominodiffusion",
+  "params": {
+   "angle": {
+    "to": "angle"
+   },
+   "strength": {
+    "to": "strength",
+    "min": 0.01,
+    "max": 1
+   },
+   "steps": {
+    "to": "steps",
+    "min": 1,
+    "max": 200
+   },
+   "errorWeight": {
+    "to": "weight",
+    "min": 0,
+    "max": 10
+   },
+   "errorFalloff": {
+    "to": "falloff",
+    "min": 0,
+    "max": 1
+   },
+   "palette": {
+    "to": "palette",
+    "min": 0,
+    "max": 14
+   },
+   "alpha": {
+    "to": "alpha",
+    "min": 0,
+    "max": 1
+   },
+   "blendMode": {
+    "to": "blend",
+    "values": {
+     "0": 0,
+     "1": 1,
+     "2": 2
+    }
+   },
+   "color1": {
+    "to": "color1"
+   },
+   "color2": {
+    "to": "color2"
+   },
+   "color3": {
+    "to": "color3"
+   },
+   "color4": {
+    "to": "color4"
+   },
+   "color5": {
+    "to": "color5"
+   },
+   "color6": {
+    "to": "color6"
+   }
+  }
+ },
+ "com.alightcreative.effects.tile": {
+  "to": "tiles",
+  "params": {
+   "scale": {
+    "to": "zoom",
+    "min": 0.005,
+    "max": 20
+   },
+   "phase": {
+    "to": "offset"
+   },
+   "mirror": {
+    "to": "mirror"
+   },
+   "vertoffs": {
+    "to": "vertical"
+   },
+   "angle": {
+    "to": "angle"
+   }
+  },
+  "set": {
+   "sizing": 0
+  }
+ },
+ "com.alightcreative.effects.motionblur4": {
+  "to": "motionblur",
+  "params": {
+   "tune": {
+    "to": "tune",
+    "min": 0,
+    "max": 4
+   },
+   "usePos": {
+    "to": "position"
+   },
+   "useScale": {
+    "to": "scale"
+   },
+   "useAngle": {
+    "to": "rotation"
+   }
+  }
+ },
+ "com.alightcreative.effects.noise3": {
+  "to": "noise",
+  "params": {
+   "amount": {
+    "to": "amount",
+    "min": 0,
+    "max": 1
+   },
+   "mono": {
+    "to": "mono"
+   },
+   "freeze": {
+    "to": "freeze"
+   },
+   "extremes": {
+    "to": "extremes"
+   },
+   "position": {
+    "to": "offset"
+   },
+   "overshoot": {
+    "to": "overshoot",
+    "min": 0.5,
+    "max": 2
    }
   }
  }

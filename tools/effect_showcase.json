@@ -161,6 +161,7 @@
     "hexagontilerotate": {"photo": "colour", "params": {"count": 1.6, "rotation": 90}},
     "hexagontileshift": {"photo": "colour", "params": {"count": 2.4, "strength": 0.06}},
     "blocknoise": {"photo": "landscape", "params": {"blockSize": 18}, "animate": 8},
+    "noise": {"photo": "portrait", "params": {"amount": 0.4, "mono": true}, "animate": 8},
     "bumpmap": {"photo": "detail", "params": {"height": 10}, "split": 0.4},
     "viewer360": {"photo": "landscape", "params": {"yaw": 20, "pitch": -10, "fov": 70}},
     "reorient360": {"photo": "landscape", "params": {"yaw": 90, "pitch": 25}},
