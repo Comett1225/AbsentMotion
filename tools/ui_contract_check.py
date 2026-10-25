@@ -98,7 +98,9 @@ class UiContracts(unittest.TestCase):
         self.assertIn('withContext(Dispatchers.IO)', load)
         self.assertIn('Log.i("AMStart", "onCreate took', text)
         self.assertNotIn('store.save(', source('editor/EditorState.kt'))
-        self.assertIn('if (save) saver.commit(xml) else saver.draft(xml)', source('editor/EditorState.kt'))
+        self.assertIn('saver.commit(xml)', source('editor/EditorState.kt'))
+        self.assertIn('saver.draft(xml)', source('editor/EditorState.kt'))
+        self.assertIn('Choreographer.getInstance().postFrameCallback(sendDraft)', source('editor/EditorState.kt'))
 
     def test_settings_scroll_to_the_last_control(self):
         text = source('ui/home/SettingsDrawer.kt')
@@ -202,7 +204,7 @@ class UiContracts(unittest.TestCase):
 
     def test_camera_view_refreshes_selection_quad(self):
         text = source('ui/editor/Preview.kt')
-        self.assertIn('LaunchedEffect(state.selectedId, scene, mediaRevision, state.cameraMode) {\n        snapshotFlow { state.timeMs }.collectLatest', text)
+        self.assertIn('LaunchedEffect(state.selectedId, scene, mediaRevision, state.cameraMode) {\n        snapshotFlow { state.timeMs.takeUnless { state.playing } }.collectLatest', text)
 
     def test_curve_menu_and_both_paste_paths_share_compatibility_rules(self):
         text = source('editor/EditorActions.kt')
@@ -238,7 +240,7 @@ class UiContracts(unittest.TestCase):
 
     def test_trim_limit_turns_the_grip_red_and_ticks_once_when_allowed(self):
         text = source('ui/editor/Timeline.kt')
-        self.assertIn('val hit = layer.trimHitsSourceLimit(start, time, mediaMs)', text)
+        self.assertIn('val hit = if (start) trimmed.startTime > time else trimmed.endTime < time', text)
         self.assertIn('if (hit && limitEdge == null) onTick()', text)
         self.assertIn('v.onTick = { if (state.settings.vibration) haptic.performHapticFeedback(HapticFeedbackType.SegmentFrequentTick) }', text)
         self.assertIn('drawPath(outline, if (limit) LimitColor else GripColor, alpha = appear)', text)
@@ -255,7 +257,8 @@ class UiContracts(unittest.TestCase):
         self.assertIn('hit is Hit.Bar && view.lift(hit.id, finger, viewConfiguration.touchSlop, moves = true) -> drag = Drag.Lift', text)
         self.assertNotIn('Drag.Move', text)
         self.assertNotIn('state.selectedId && abs(moved.x)', text)
-        self.assertIn('state.edit(MOVE_EDIT) { it.update(id) { _ -> it.movedClip(original, start) } }', text)
+        self.assertIn('state.edit(MOVE_EDIT) { TimelineMath.movedClips(it, original, group, target.frame) }', text)
+        self.assertIn('acc.update(layer.id) { acc.movedClip(layer, movedStart(acc, layer, acc.firstShownFrame(layer.startTime) + shift)) }', text)
         self.assertIn('state.edit(MOVE_EDIT) { it.move(id, layers.lastIndex - to) }', text)
         self.assertIn('if (!commit || state.scene == moveBase) state.cancelGesture(MOVE_EDIT)', text)
         self.assertIn('TimelineMath.moveTarget(wanted,', text)
