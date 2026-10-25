@@ -157,17 +157,17 @@ internal class SmoothKeeper(private val context: Context, private val state: Edi
     private val asked: MutableSet<XmlNode> = java.util.Collections.newSetFromMap(java.util.IdentityHashMap())
     private val failed: MutableSet<XmlNode> = java.util.Collections.newSetFromMap(java.util.IdentityHashMap())
 
-    private class Seen(val playing: Boolean, val scene: Scene, val frame: Int)
+    private class Seen(val busy: Boolean, val scene: Scene, val frame: Int)
 
     suspend fun watch() {
-        snapshotFlow { Seen(state.playing, state.scene, state.frame) }.collectLatest { seen ->
-            if (seen.playing) return@collectLatest
+        snapshotFlow { Seen(state.playing || state.exportOpen, state.scene, state.frame) }.collectLatest { seen ->
+            if (seen.busy) return@collectLatest
             delay(IDLE_MS)
-            while (state.gestureOpen || state.exportOpen || tools.running != null || asking != null) delay(WAIT_MS)
+            while (state.gestureOpen || tools.running != null || asking != null) delay(WAIT_MS)
             val scene = state.scene
             val change = scene.layers.asSequence().mapNotNull { scene.smoothChange(it) }.firstOrNull { it.node !in asked } ?: return@collectLatest
             if (change.small && change.node !in failed) update(scene, change)
-            else {
+            if (!change.small || change.node in failed) {
                 asked += change.node
                 asking = change
             }

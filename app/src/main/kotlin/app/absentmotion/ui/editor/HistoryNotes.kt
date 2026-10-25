@@ -98,7 +98,7 @@ private fun HistoryNoteRow(state: EditorState, note: HistoryNote) {
         Row(Modifier.widthIn(max = 280.dp).semantics { liveRegion = LiveRegionMode.Polite }.clip(RoundedCornerShape(18.dp)).background(Color(if (note.faint) 0x99222222 else 0xE6222222))
             .padding(horizontal = 14.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
             if (!note.faint) Icon(if (note.text.id == app.absentmotion.R.string.history_undid) ChromeIcons.Undo else ChromeIcons.Redo, null, Modifier.size(16.dp), tint = Am.OnDark)
-            Text(note.text.text(), Modifier.padding(start = if (note.faint) 0.dp else 8.dp), color = if (note.faint) Am.OnDarkDim else Am.OnDark, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(note.text.text(), Modifier.padding(start = if (note.faint) 0.dp else 8.dp), color = if (note.faint) Am.OnDarkDim else Am.OnDark, fontSize = 13.sp, maxLines = if (note.faint) 2 else 1, overflow = TextOverflow.Ellipsis)
         }
     }
 }
