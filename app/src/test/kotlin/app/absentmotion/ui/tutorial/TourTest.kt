@@ -174,7 +174,7 @@ class TourTest {
         tour.observe(editing.copy(undoMark = 5))
         assertEquals("undo", tour.step.id)
         tour.observe(editing.copy(undoMark = 6))
-        assertEquals("preview", tour.step.id)
+        assertEquals("safety", tour.step.id)
     }
 
     @Test fun effectStepWaitsForASliderAfterTheEffectIsAdded() {

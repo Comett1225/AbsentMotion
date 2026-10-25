@@ -1,6 +1,5 @@
 package app.absentmotion.ui.editor
 
-import app.absentmotion.ui.tutorial.tutorialTarget
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -40,7 +39,6 @@ fun PlayBar(state: EditorState, modifier: Modifier = Modifier) {
             onLongClick = if (state.playing) null else ({ settings.loopingPlay = !settings.loopingPlay }),
         ) { state.playing = !state.playing }
         BarButton(ChromeIcons.SkipForward, stringResource(R.string.play_skip_forward), cell) { state.skipForward() }
-        RenderPreviewButton(state, cell.tutorialTarget("render_preview"))
         BarButton(ChromeIcons.CopyPaste, stringResource(R.string.play_copy_paste), cell) { menuOpen = true }
         Box(cell) {
             BarButton(

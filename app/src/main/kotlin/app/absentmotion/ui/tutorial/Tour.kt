@@ -323,7 +323,6 @@ object TourSteps {
             targets = { _, _ -> listOf("playbar") },
             done = { s, n -> n.undoMark >= s.undoMark + 2 },
         ),
-        TourStep("preview", R.string.tutorial_preview_title, R.string.tutorial_preview_body, 10, targets = { _, _ -> listOf("render_preview", "playbar") }),
         TourStep(
             "safety", R.string.tutorial_safety_title, R.string.tutorial_safety_body, 12,
             targets = { _, n -> if (n.selected != null) listOf("back") else listOf("gear") },
