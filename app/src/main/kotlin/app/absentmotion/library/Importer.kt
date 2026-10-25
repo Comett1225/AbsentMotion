@@ -10,7 +10,10 @@ import app.absentmotion.platform.Context
 import app.absentmotion.platform.Uri
 import app.absentmotion.compat.EffectMigration
 import app.absentmotion.effects.EffectCatalog
+import app.absentmotion.fonts.FontImportError
 import app.absentmotion.fonts.FontLibrary
+import app.absentmotion.fonts.MAX_FONT_BYTES
+import app.absentmotion.fonts.checkedFont
 import app.absentmotion.model.Layer
 import app.absentmotion.model.MediaDeclaration
 import app.absentmotion.model.Scene
@@ -53,6 +56,7 @@ class Importer(
     private val migration: EffectMigration? = null,
     private val access: MediaAccess = MediaAccess.Unlimited,
     private val limits: ImportLimits = ImportLimits(),
+    private val fonts: File? = null,
 ) {
     fun import(open: () -> InputStream?): List<ImportReport> = try {
         fun stream() = open() ?: throw ImportFailed(txt(R.string.library_err_no_data))
@@ -73,6 +77,8 @@ class Importer(
         var sigs: Map<String, String>? = null
         var links: Map<String, String>? = null
         var companions: Map<String, List<String>> = emptyMap()
+        var packedFonts: Map<String, String> = emptyMap()
+        val fontFiles = ArrayList<File>()
         var projectEntry: String? = null
         var ours = false
         var sceneText = 0
@@ -94,6 +100,8 @@ class Importer(
                         companions = listed.filter { it.has("companions") }.associate { m ->
                             m.getString("uri") to m.getJSONArray("companions").let { c -> List(c.length()) { c.getString(it) } }
                         }
+                        packedFonts = manifest.optJSONArray("fonts")?.let { list -> (0 until list.length()).map { list.getJSONObject(it) } }.orEmpty()
+                            .filter { it.optString("font").startsWith("imported?") && it.has("entry") }.associate { it.getString("entry") to it.getString("font") }
                     }
                 }
             }
@@ -116,9 +124,11 @@ class Importer(
             repeat(scenes.size) { ids += store.newId(ids) }
             ids.forEach { File(store.mediaDir(it), ImportMarker).apply { parentFile?.mkdirs(); createNewFile() } }
             val copies = HashMap<String, MutableList<File>>()
+            val used = HashSet<String>()
             val moved = scenes.mapIndexed { i, text ->
                 val id = ids[i]
                 val root = check(text)
+                used += fontsOf(root)
                 val declared = Scene(root).media.associateBy { it.uri }
                 val entries = root.storedMediaUris().mapNotNull { uri ->
                     val entry = links?.get(uri) ?: declared[uri]?.node?.get("sig")?.let { sigs?.get(it) }
@@ -140,20 +150,25 @@ class Importer(
                 target.forEach { (path, file) -> copies.getOrPut(path) { ArrayList() } += file }
                 entries.mapValues { (_, entry) -> target.getValue(entry).toURI().toString() }
             }
-            if (copies.isNotEmpty()) {
+            val fontEntries = if (fonts == null) emptyMap() else packedFonts.mapNotNull { (entry, font) -> find(entry, files)?.takeIf { font in used }?.let { it to font } }.toMap()
+            val localFonts = HashMap<String, String>()
+            if (copies.isNotEmpty() || fontEntries.isNotEmpty()) {
                 copies.values.flatten().forEach { it.parentFile?.mkdirs() }
                 eachEntry(open, limits) { name, input ->
+                    fontEntries[name]?.let { font -> installFont(input, font, fonts!!, fontFiles)?.let { localFonts[font] = it } }
                     val targets = copies[name] ?: return@eachEntry
                     written -= copy(input, targets.first(), written)
                     for (other in targets.drop(1)) written -= targets.first().inputStream().use { copy(it, other, written) }
                 }
             }
-            scenes.indices.mapTo(saved) { add(ids[it], check(scenes[it]), moved[it]) }
+            val renamedFonts = localFonts.filter { (old, new) -> old != new }
+            scenes.indices.mapTo(saved) { add(ids[it], check(scenes[it]).let { root -> if (renamedFonts.isEmpty()) root else root.mapFonts(renamedFonts) }, moved[it]) }
             ids.forEach { File(store.mediaDir(it), ImportMarker).delete(); store.mediaDir(it).delete() }
             return if (ours) saved else saved.map { if (it.element) it else it.copy(template = true) }
         } catch (t: Throwable) {
             ids.forEach { store.mediaDir(it).deleteRecursively() }
             saved.forEach { store.delete(it.id) }
+            fontFiles.forEach { it.delete() }
             if (t is IOException) throw ImportFailed(txt(R.string.library_err_malformed_package, t.message.toString()))
             throw t
         }
@@ -255,6 +270,29 @@ class Importer(
         private fun allLayers(scene: XmlNode): Sequence<XmlNode> = scene.children.asSequence().filter { it.name in Scene.LAYER_TAGS }
             .flatMap { sequenceOf(it) + (it.child("scene")?.let(::allLayers) ?: emptySequence()) }
 
+        private fun fontsOf(root: XmlNode): Set<String> = allLayers(root).filter { it.name == "text" }.mapNotNull { it["font"] }.filter { it.startsWith("imported?") }.toSet()
+
+        private fun XmlNode.mapFonts(change: Map<String, String>): XmlNode =
+            (this["font"]?.let(change::get)?.let { with("font", it) } ?: this).let { it.copy(children = it.children.map { child -> child.mapFonts(change) }) }
+
+        private fun installFont(input: InputStream, font: String, dir: File, made: MutableList<File>): String? {
+            val bytes = input.readAtMost(MAX_FONT_BYTES + 1).takeIf { it.size <= MAX_FONT_BYTES } ?: return null
+            val (checked, kind) = try { checkedFont(bytes) } catch (e: FontImportError) { return null }
+            if (!dir.isDirectory && !dir.mkdirs()) return null
+            dir.listFiles()?.firstOrNull { it.isFile && it.length() == checked.size.toLong() && it.readBytes().contentEquals(checked) }?.let { return "imported?name=${it.name}" }
+            val clean = File(font.substringAfter("name=").substringBefore('&')).name.substringBeforeLast('.').replace(Regex("[^\\p{L}\\p{N} ._-]"), "_").take(80).ifBlank { "font" }
+            val target = (sequenceOf("$clean.${kind.extension}") + generateSequence(1) { it + 1 }.map { "$clean-$it.${kind.extension}" }).map { File(dir, it) }.first { !it.exists() }
+            val part = File(dir, target.name + ".part")
+            try {
+                part.outputStream().use { it.write(checked); it.fd.sync() }
+                if (!part.renameTo(target)) return null
+            } finally {
+                part.delete()
+            }
+            made += target
+            return "imported?name=${target.name}"
+        }
+
         private fun leaf(name: String): String? = name.substringAfterLast('/').substringAfterLast('\\').takeIf { it.isNotEmpty() && it != "." && it != ".." }
 
         private fun entryPath(name: String) = name.replace('\\', '/').trimStart('/')
@@ -304,6 +342,7 @@ class Importer(
                         if (total > allowed) throw ImportFailed(txt(R.string.library_err_media_large, (allowed shr 20).toString()))
                         out.write(buffer, 0, n)
                     }
+                    out.fd.sync()
                 }
             } catch (t: Throwable) {
                 target.delete()
@@ -323,6 +362,7 @@ class Importer(
                 hasFont = { fonts.localFile(it) != null },
                 relink = { MediaRelink.relink(context, it) },
                 migration = EffectMigration.read(context, catalog),
+                fonts = File(context.filesDir, "fonts/imported"),
             )
         }
     }

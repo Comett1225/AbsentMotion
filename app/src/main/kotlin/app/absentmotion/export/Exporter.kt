@@ -13,6 +13,7 @@ import app.absentmotion.library.crashReason
 import app.absentmotion.library.MediaAccess
 import app.absentmotion.library.modelFolder
 import app.absentmotion.model.Scene
+import app.absentmotion.model.fontNames
 import app.absentmotion.model.mediaName
 import app.absentmotion.model.storedMediaUris
 import kotlinx.coroutines.CoroutineScope
@@ -308,7 +309,18 @@ internal suspend fun writeProjectPackage(
             progress((i + 1f) / uris.size * 0.95f)
         }
         zip.setLevel(6)
-        zip.putNextEntry(ZipEntry("manifest.json")); zip.write(manifest.put("media", media).toString(1).toByteArray()); zip.closeEntry()
+        val fonts = JSONArray()
+        val packed = HashMap<File, String>()
+        for (font in scene.fontNames()) {
+            val file = access.importedFont(font) ?: continue
+            val entry = packed.getOrPut(file) {
+                "fonts/${packed.size + 1}_${safeName(file.name)}".also { entry ->
+                    zip.putNextEntry(ZipEntry(entry)); file.inputStream().use { it.copyTo(zip) }; zip.closeEntry()
+                }
+            }
+            fonts.put(JSONObject().put("font", font).put("entry", entry))
+        }
+        zip.putNextEntry(ZipEntry("manifest.json")); zip.write(manifest.put("media", media).put("fonts", fonts).toString(1).toByteArray()); zip.closeEntry()
     }
     progress(1f)
 }

@@ -395,6 +395,94 @@ class BackupTest {
         }
     }
 
+    @Test fun aHugeEntryTheRestoreSkipsStillCountsTowardsTheUnpackLimit() {
+        val root = tmp.newFolder("root")
+        val bytes = ByteArrayOutputStream().also { out ->
+            ZipOutputStream(out).use { zip ->
+                zip.putNextEntry(ZipEntry("absentmotion-backup.txt")); zip.write("AbsentMotion backup 1\nfile:/elsewhere/\n".toByteArray())
+                zip.putNextEntry(ZipEntry("unknown/zeros.bin"))
+                val block = ByteArray(1 shl 20)
+                repeat(300) { zip.write(block) }
+                zip.putNextEntry(ZipEntry("projects/p1.xml")); zip.write(Scene(XmlNode("scene", linkedMapOf("width" to "10", "height" to "10"))).toXml().toByteArray())
+            }
+        }.toByteArray()
+        assertTrue(bytes.size < 2 shl 20)
+        try {
+            Backup.restore(ProjectStore(root), root, ByteArrayInputStream(bytes))
+            fail()
+        } catch (e: ImportFailed) {
+            assertTrue(ProjectStore(root).list(includeDamaged = true).isEmpty())
+        }
+    }
+
+    @Test fun projectTextWaitsInTemporaryFilesThatAreAlwaysRemoved() {
+        val oldRoot = tmp.newFolder("old")
+        val old = ProjectStore(oldRoot)
+        project(old, "A", "p".repeat(300_000))
+        project(old, "B", "pixels of b")
+        val bytes = backup(oldRoot)
+        val root = tmp.newFolder("new")
+        val store = ProjectStore(root)
+        fun staged() = root.resolve("projects").listFiles { f -> f.name.endsWith(".part") }!!.size
+        var most = 0
+        Backup.restore(store, root, ByteArrayInputStream(bytes)) { most = maxOf(most, staged()) }
+        assertEquals(2, most)
+        assertEquals(0, staged())
+        try {
+            Backup.restore(ProjectStore(tmp.newFolder("cut")), tmp.root.resolve("cut"), ByteArrayInputStream(bytes)) { read -> if (read > bytes.size / 2) throw IllegalStateException("stopped") }
+            fail()
+        } catch (e: IllegalStateException) {
+        }
+        assertEquals(0, tmp.root.resolve("cut/projects").listFiles { f -> f.name.endsWith(".part") }!!.size)
+    }
+
+    @Test fun aBackupWithTheSameProjectTwiceIsRefusedAndLeavesNothing() {
+        val root = tmp.newFolder("root")
+        val store = ProjectStore(root)
+        val kept = project(store, "Kept", "kept pixels")
+        val before = everything(root)
+        val scene = { title: String -> Scene(XmlNode("scene", linkedMapOf("width" to "10", "height" to "10", "title" to title))).toXml().toByteArray() }
+        try {
+            Backup.restore(store, root, ByteArrayInputStream(zipOf("projects/p1.xml" to scene("one"), "media/p1/a.png" to "x".toByteArray(), "projects\\p1.xml" to scene("two"))))
+            fail()
+        } catch (e: ImportFailed) {
+            assertEquals(txt(R.string.library_err_backup_changed), e.text)
+        }
+        assertEquals(before, everything(root))
+        assertEquals(listOf(kept), store.list().map { it.id })
+    }
+
+    @Test fun aReorderedBackupRestoresWhereNothingClashesAndIsRefusedWhereItWouldMixMedia() {
+        val oldRoot = tmp.newFolder("old")
+        val old = ProjectStore(oldRoot)
+        val a = project(old, "Before", "old pixels")
+        val ordered = backup(oldRoot)
+        val entries = ArrayList<Pair<String, ByteArray>>()
+        java.util.zip.ZipInputStream(ByteArrayInputStream(ordered)).use { zip -> while (true) { val e = zip.nextEntry ?: break; entries += e.name to zip.readBytes() } }
+        val reordered = ByteArrayOutputStream().also { out ->
+            ZipOutputStream(out).use { zip -> for ((name, data) in entries.sortedBy { it.first }) { zip.putNextEntry(ZipEntry(name)); zip.write(data) } }
+        }.toByteArray()
+        val fresh = tmp.newFolder("fresh")
+        assertEquals(Backup.Restored(1, 0, 0), Backup.restore(ProjectStore(fresh), fresh, ByteArrayInputStream(reordered)))
+        assertEquals("old pixels", pictureOf(ProjectStore(fresh), a))
+        val root = tmp.newFolder("same")
+        val store = ProjectStore(root)
+        Backup.restore(store, root, ByteArrayInputStream(ordered))
+        store.save(a, store.load(a)!!.withTitle("After"))
+        store.mediaDir(a).resolve("photo.png").writeText("new pixels")
+        for (missing in listOf(false, true)) {
+            if (missing) store.mediaDir(a).resolve("photo.png").delete()
+            val before = everything(root)
+            try {
+                Backup.restore(store, root, ByteArrayInputStream(reordered))
+                fail()
+            } catch (e: ImportFailed) {
+                assertEquals(txt(R.string.library_err_backup_changed), e.text)
+            }
+            assertEquals(before, everything(root))
+        }
+    }
+
     @Test fun aBackupWithTooManyEntriesIsRefused() {
         val root = tmp.newFolder("root")
         val bytes = ByteArrayOutputStream().also { out ->

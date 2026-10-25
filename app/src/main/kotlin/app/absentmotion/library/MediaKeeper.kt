@@ -36,7 +36,12 @@ class MediaKeeper(
         if (free(dir) < needed) throw NoSpace(needed)
         val temp = File.createTempFile("keep-", ".part", dir)
         try {
-            (open(media.uri) ?: throw FileNotFoundException(media.uri)).use { input -> temp.outputStream().use { copy(input, it, cancelled) } }
+            (open(media.uri) ?: throw FileNotFoundException(media.uri)).use { input ->
+                temp.outputStream().use { out ->
+                    copy(input, out, cancelled) { if (free(dir) < RESERVE) throw NoSpace(needed) }
+                    out.fd.sync()
+                }
+            }
             if (media.size > 0 && temp.length() < media.size) throw IOException("Copied ${temp.length()} of ${media.size} bytes of $base")
             val target = synchronized(Naming) {
                 val name = (sequenceOf(base) + generateSequence(2) { it + 1 }.map { "${it}_$base" }).first { !File(dir, it).exists() }
@@ -58,13 +63,19 @@ class MediaKeeper(
             .sortedBy { it.name }.firstOrNull { same(media.uri, it.toURI().toString()) }
     }
 
-    private fun copy(input: InputStream, out: OutputStream, cancelled: () -> Boolean) {
+    private fun copy(input: InputStream, out: OutputStream, cancelled: () -> Boolean, checkSpace: () -> Unit) {
         val buffer = ByteArray(1 shl 16)
+        var unchecked = 0L
         while (true) {
             if (cancelled()) throw CancellationException("Copy cancelled")
             val n = input.read(buffer)
             if (n < 0) return
             out.write(buffer, 0, n)
+            unchecked += n
+            if (unchecked >= SPACE_CHECK_BYTES) {
+                unchecked = 0
+                checkSpace()
+            }
         }
     }
 
@@ -115,5 +126,6 @@ class MediaKeeper(
         private val Naming = Any()
 
         const val RESERVE = 200L shl 20
+        private const val SPACE_CHECK_BYTES = 16L shl 20
     }
 }

@@ -30,6 +30,12 @@ class MediaAccess private constructor(private val filesDir: File?, private val o
 
     fun imported(uri: String): String = if (filesDir != null && (uri.startsWith("content:", ignoreCase = true) || uri.startsWith("file:", ignoreCase = true))) BLOCKED + uri else defused(uri)
 
+    fun importedFont(font: String): File? {
+        if (filesDir == null || !font.startsWith("imported?")) return null
+        val name = File(font.substringAfter("name=", "").substringBefore('&')).name.takeIf(::safeSegment) ?: return null
+        return File(filesDir, "fonts/imported/$name").takeIf { it.isFile }
+    }
+
     companion object {
         private const val BLOCKED = "blocked-"
 
@@ -37,9 +43,7 @@ class MediaAccess private constructor(private val filesDir: File?, private val o
 
         fun forPhone(filesDir: File, vararg own: File?) = MediaAccess(filesDir, own.filterNotNull())
 
-        fun forApp(context: Context): MediaAccess = if (onPhone) forPhone(context.filesDir) else Unlimited
-
-        private val onPhone = System.getProperty("java.vm.name").orEmpty().contains("Dalvik", ignoreCase = true)
+        fun forApp(context: Context): MediaAccess = forPhone(context.filesDir)
 
         private fun inside(dir: File, uri: String): Boolean = try {
             val base = dir.canonicalFile.toPath()

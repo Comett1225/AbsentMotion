@@ -114,4 +114,14 @@ class MediaAccessTest {
         assertTrue(MediaAccess.Unlimited.allows("testdata/media/test-image.jpg"))
         assertEquals("file:///etc/hosts", MediaAccess.Unlimited.defused("file:///etc/hosts"))
     }
+
+    @Test fun onlyImportedFontsCanBePackedAndNothingAboveTheirFolder() {
+        val font = file("fonts/imported/My Font.ttf")
+        file("fonts/google/abc.ttf")
+        assertEquals(font, access.importedFont("imported?name=My Font.ttf"))
+        for (other in listOf("imported?name=../google/abc.ttf", "imported?name=..", "imported?name=", "imported?name=Gone.ttf", "googlefonts?name=Roboto&weight=400", "")) {
+            assertEquals(other, null, access.importedFont(other))
+        }
+        assertEquals(null, MediaAccess.Unlimited.importedFont("imported?name=My Font.ttf"))
+    }
 }

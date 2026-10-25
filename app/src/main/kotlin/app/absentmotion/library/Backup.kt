@@ -1,5 +1,6 @@
 package app.absentmotion.library
 
+import app.absentmotion.platform.drain
 import app.absentmotion.platform.readAtMost
 import app.absentmotion.R
 import app.absentmotion.i18n.txt
@@ -66,12 +67,15 @@ object Backup {
     }
 
     fun restore(store: ProjectStore, root: File, input: InputStream, access: MediaAccess = MediaAccess.forPhone(root), ai: File? = null, progress: (read: Long) -> Unit = {}): Restored {
-        val projects = File(root, "projects")
+        val projects = File(root, "projects").apply { mkdirs() }
         val renamed = HashMap<String, String>()
         val skipped = HashSet<String>()
         val rejected = HashSet<String>()
-        val waiting = ArrayList<Pair<String, String>>()
-        val ready = ArrayList<Pair<String, String>>()
+        val scenes = HashSet<String>()
+        val early = HashSet<String>()
+        val waiting = ArrayList<Pair<String, File>>()
+        val ready = ArrayList<Pair<String, File>>()
+        val staged = ArrayList<File>()
         val created = ArrayList<File>()
         val stamps = HashMap<String, Long>()
         var added = 0
@@ -97,13 +101,17 @@ object Backup {
             else generateSequence(System.currentTimeMillis()) { it + 1 }.map { "p$it" }.first { p ->
                 !File(projects, "$p.xml").exists() && p !in renamed.values && waiting.none { it.first == p } && ready.none { it.first == p }
             }
+        fun rename(id: String) {
+            if (id in early) throw ImportFailed(txt(R.string.library_err_backup_changed))
+            renamed[id] = freshId(id)
+        }
         fun settle() {
-            val same = ArrayList<Pair<String, String>>()
+            val same = ArrayList<Pair<String, File>>()
             for ((id, text) in waiting) {
                 val local = File(projects, "$id.xml")
                 if (local.exists()) {
-                    if (runCatching { sameScene(local.readText(), moved(text)) }.getOrDefault(false)) { same += id to text; continue }
-                    renamed[id] = freshId(id)
+                    if (runCatching { sameScene(local.readText(), moved(text.readText())) }.getOrDefault(false)) { same += id to text; continue }
+                    rename(id)
                 }
                 ready += id to text
             }
@@ -112,8 +120,8 @@ object Backup {
                 val iterator = same.iterator()
                 while (iterator.hasNext()) {
                     val (id, text) = iterator.next()
-                    if (runCatching { sameScene(File(projects, "$id.xml").readText(), remap(text, defuse = false)) }.getOrDefault(false)) continue
-                    renamed[id] = freshId(id)
+                    if (runCatching { sameScene(File(projects, "$id.xml").readText(), remap(text.readText(), defuse = false)) }.getOrDefault(false)) continue
+                    rename(id)
                     ready += id to text
                     iterator.remove()
                     changed = true
@@ -131,7 +139,7 @@ object Backup {
             for ((id, text) in ready) {
                 val target = renamed[id] ?: id
                 val file = File(projects, "$target.xml").also { created += it }
-                store.save(target, remap(text))
+                store.save(target, remap(text.readText()))
                 stamps[id]?.let { file.setLastModified(it) }
                 added++
             }
@@ -155,6 +163,7 @@ object Backup {
                     override fun read(b: ByteArray, off: Int, len: Int): Int = zip.read(b, off, len).also { if (it > 0) charge(it) }
                 }
                 while (true) {
+                    body.drain()
                     val entry = zip.nextEntry ?: break
                     if (++entries > MAX_ENTRIES) throw ImportFailed(txt(R.string.library_err_too_many_files, MAX_ENTRIES.toString()))
                     val parts = entry.name.replace('\\', '/').split('/')
@@ -162,10 +171,13 @@ object Backup {
                     val isScene = parts.size == 2 && parts[0] == "projects" && parts[1].endsWith(".xml")
                     if (isScene) {
                         val id = parts[1].removeSuffix(".xml")
+                        if (!scenes.add(id)) throw ImportFailed(txt(R.string.library_err_backup_changed))
                         val text = readText(body)
                         if (!ProjectId.matches(id) || runCatching { XmlNode.parse(text.removePrefix("\uFEFF"), XmlNode.IMPORT_NODES) }.getOrNull()?.let(Importer::checkScene) != null) rejected += id
                         else {
-                            waiting += id to text
+                            val file = File.createTempFile("restore-", ".part", projects).also { staged += it }
+                            file.writeText(text)
+                            waiting += id to file
                             if (entry.time > 0) stamps[id] = entry.time
                         }
                         continue
@@ -184,6 +196,12 @@ object Backup {
                         parts.size == 2 && parts[0] == "ai" -> ai?.let { File(it, parts[1]) }
                         else -> null
                     } ?: continue
+                    when {
+                        parts[0] == "media" -> parts[1]
+                        parts[0] == "projects" && parts[1] == "versions" -> parts[2]
+                        parts[0] == "projects" -> parts[1].removeSuffix(".png")
+                        else -> null
+                    }?.takeIf { it !in scenes }?.let(early::add)
                     if (target.exists()) continue
                     makeDirs(target.parentFile!!)
                     val text = target.extension == "xml" && when (parts[0]) { "media" -> false; "templates" -> parts.size == 3; else -> true }
@@ -193,7 +211,7 @@ object Backup {
                     } else {
                         val part = File(target.parentFile, target.name + ".part")
                         try {
-                            part.outputStream().use { body.copyTo(it) }
+                            part.outputStream().use { body.copyTo(it); it.fd.sync() }
                             if (!part.renameTo(target)) throw java.io.IOException("Cannot restore ${target.name}")
                             created += target
                         } catch (t: Throwable) {
@@ -208,6 +226,8 @@ object Backup {
         } catch (t: Throwable) {
             created.asReversed().forEach { it.delete() }
             throw if (t is OutOfMemoryError) ImportFailed(txt(R.string.library_err_backup_project_large)) else t
+        } finally {
+            staged.forEach { it.delete() }
         }
         return Restored(added, renamed.size, skipped.size, rejected.size)
     }

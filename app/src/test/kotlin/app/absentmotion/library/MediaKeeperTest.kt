@@ -67,6 +67,24 @@ class MediaKeeperTest {
         assertFalse(store.mediaDir("p1").listFiles().orEmpty().any { it.isFile })
     }
 
+    @Test fun aStreamOfUnknownSizeStopsBeforeTheStorageRunsOut() {
+        val store = ProjectStore(tmp.newFolder())
+        var copied = 0L
+        val endless = object : java.io.InputStream() {
+            override fun read(): Int = 0
+            override fun read(b: ByteArray, off: Int, len: Int): Int = if (copied >= 160L shl 20) -1 else len.also { copied += it }
+        }
+        val keeper = MediaKeeper(store, { endless }, free = { if (copied > 40L shl 20) MediaKeeper.RESERVE - 1 else Long.MAX_VALUE })
+        val unknown = MediaDeclaration(XmlNode("media", linkedMapOf("uri" to "content://media/external/video/media/7", "filename" to "clip.mp4")))
+        try {
+            keeper.keep("p1", unknown)
+            fail()
+        } catch (e: MediaKeeper.NoSpace) {
+        }
+        assertTrue(copied < 80L shl 20)
+        assertFalse(store.mediaDir("p1").listFiles().orEmpty().any { it.isFile })
+    }
+
     @Test fun collectCopiesEverythingItCanReadAndCountsTheRest() {
         val store = ProjectStore(tmp.newFolder())
         val a = tmp.newFile("a.png").apply { writeText("a") }

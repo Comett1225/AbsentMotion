@@ -93,7 +93,9 @@ class TemplateStore(private val root: File, private val open: (String) -> InputS
         dir.mkdirs()
         val temp = Files.createTempDirectory(dir.toPath(), "copy-").toFile()
         try {
-            folder.listFiles { f -> f.isFile }.orEmpty().forEach { it.copyTo(File(temp, it.name)) }
+            folder.listFiles { f -> f.isFile }.orEmpty().forEach { part ->
+                part.inputStream().use { input -> File(temp, part.name).outputStream().use { input.copyTo(it); it.fd.sync() } }
+            }
             val target = fresh(dir, folder.name)
             if (!temp.renameTo(target)) throw IOException("Cannot copy ${folder.name}")
             return File(target, main)
@@ -106,7 +108,7 @@ class TemplateStore(private val root: File, private val open: (String) -> InputS
         dir.mkdirs()
         val temp = File.createTempFile("copy-", ".part", dir)
         try {
-            temp.outputStream().use(write)
+            temp.outputStream().use { write(it); it.fd.sync() }
             val target = fresh(dir, name)
             if (!temp.renameTo(target)) throw IOException("Cannot copy $name")
             return target
