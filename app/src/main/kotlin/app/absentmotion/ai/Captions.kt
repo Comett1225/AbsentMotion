@@ -255,20 +255,19 @@ internal object CaptionModel {
     const val SHA256 = "422f1ae452ade6f30a004d7e5c6a43195e4433bc370bf23fac9cc591f01a8898"
     private const val SOURCE = "https://huggingface.co/ggerganov/whisper.cpp/resolve/5359861c739e955e79d9a303bcbc70fb988958b1/$NAME"
 
-    @Volatile private var checked: Pair<Long, Long>? = null
-
     fun file(context: Context) = File(context.filesDir, "models/$NAME")
     fun installed(context: Context) = file(context).length() == BYTES
     fun remove(context: Context) { file(context).delete() }
 
     fun verify(context: Context) {
         val file = file(context)
-        val stamp = file.length() to file.lastModified()
-        if (checked == stamp) return
+        val known = context.getSharedPreferences("ai_models", Context.MODE_PRIVATE)
+        val stamp = "${file.length()}:${file.lastModified()}"
+        if (known.getString(file.path, null) == stamp) return
         val intact = file.length() == BYTES && file.inputStream().use(::sha256) == SHA256
         if (!intact) file.delete()
         check(intact) { AppText.get(R.string.ai_caption_model_load_failed) }
-        checked = stamp
+        known.edit().putString(file.path, stamp).apply()
     }
 
     suspend fun download(context: Context, progress: (Float) -> Unit) = withContext(Dispatchers.IO) {
