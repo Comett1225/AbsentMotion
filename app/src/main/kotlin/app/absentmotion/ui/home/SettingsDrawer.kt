@@ -23,6 +23,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -107,7 +114,7 @@ fun SettingsDrawer(settings: AppSettings, drawer: androidx.compose.material3.Dra
     ) {
         Column(Modifier.fillMaxSize().background(Am.Card).statusBarsPadding().verticalScroll(rememberScrollState()).navigationBarsPadding().padding(bottom = 8.dp)) {
             Text(
-                stringResource(R.string.settings), Modifier.fillMaxWidth().height(50.dp).wrapContentHeight(Alignment.CenterVertically).padding(start = 11.dp),
+                stringResource(R.string.settings), Modifier.fillMaxWidth().heightIn(min = 50.dp).wrapContentHeight(Alignment.CenterVertically).padding(start = 11.dp),
                 color = Am.HomeInk, fontSize = 18.sp, fontWeight = FontWeight.Bold,
             )
             Category(R.string.settings_group_editor, HomeIcons.Pencil) {
@@ -174,9 +181,9 @@ private fun Category(@StringRes name: Int, icon: ImageVector, content: @Composab
     val turn by animateFloatAsState(if (open) 180f else 0f, Motion.enter())
     Column(Modifier.padding(horizontal = 6.dp).fillMaxWidth().clip(PanelShape).background(PanelColor)) {
         Row(
-            Modifier.fillMaxWidth().height(44.dp).clickable { open = !open }
+            Modifier.fillMaxWidth().heightIn(min = 44.dp).clickable { open = !open }
                 .semantics { if (open) collapse { open = false; true } else expand { open = true; true } }
-                .padding(start = 13.dp, end = 7.dp),
+                .padding(start = 13.dp, end = 7.dp, top = 4.dp, bottom = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(icon, null, Modifier.size(20.dp), tint = Am.HomeInk)
@@ -248,7 +255,9 @@ private fun CutoutRows() {
     val qualities = app.absentmotion.ai.CutoutQuality.entries
     Divider(10.dp)
     ChoicesBlock(R.string.settings_cutout_quality) {
-        Choices(qualities.map { it.title }, qualities.indexOf(chosen)) { choice.choose(qualities[it]); chosen = qualities[it] }
+        Column(Modifier.selectableGroup()) {
+            for (quality in qualities) OptionRow(stringResource(quality.title), quality == chosen) { choice.choose(quality); chosen = quality }
+        }
     }
     Divider(10.dp)
     if (bytes > 0L) ActionRow(stringResource(R.string.ai_delete_model, stringResource(model.title)), formatBytes(bytes), chevron = false) {
@@ -320,7 +329,7 @@ internal fun LinkRow(label: String, value: String? = null, onClick: () -> Unit) 
 @Composable
 internal fun ActionRow(label: String, value: String? = null, chevron: Boolean = true, busy: Boolean = false, onClick: () -> Unit) {
     Row(
-        Modifier.fillMaxWidth().height(44.dp).clickable(onClick = onClick).padding(start = 15.dp, end = if (chevron) 7.dp else 15.dp),
+        Modifier.fillMaxWidth().heightIn(min = 44.dp).clickable(onClick = onClick).padding(start = 15.dp, end = if (chevron) 7.dp else 15.dp, top = 4.dp, bottom = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(label, Modifier.weight(1f), color = Am.HomeInk, fontSize = 13.sp)
@@ -334,11 +343,12 @@ internal fun ActionRow(label: String, value: String? = null, chevron: Boolean = 
 @Composable
 internal fun SwitchRow(label: String, checked: Boolean, enabled: Boolean, onChange: (Boolean) -> Unit) {
     Row(
-        Modifier.fillMaxWidth().height(44.dp).alpha(if (enabled) 1f else 0.35f).padding(horizontal = 15.dp),
+        Modifier.fillMaxWidth().heightIn(min = 44.dp).alpha(if (enabled) 1f else 0.35f)
+            .toggleable(value = checked, enabled = enabled, role = androidx.compose.ui.semantics.Role.Switch, onValueChange = onChange).padding(horizontal = 15.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(label, Modifier.weight(1f), color = Am.HomeInk, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-        RefSwitch(checked, enabled, onChange)
+        ThinSwitch(checked, Modifier.clearAndSetSemantics {}, enabled = enabled, offTrack = Am.SwitchOff, onTrack = Am.HomeAccent.copy(alpha = 0.5f), onThumb = Am.HomeAccent, onChange = onChange)
     }
 }
 
@@ -350,7 +360,7 @@ internal fun RefSwitch(checked: Boolean, enabled: Boolean, onChange: (Boolean) -
 private fun DurationRow(settings: AppSettings) {
     var open by remember { mutableStateOf(false) }
     val shape = RoundedCornerShape(10.dp)
-    Row(Modifier.fillMaxWidth().height(44.dp).padding(horizontal = 15.dp), verticalAlignment = Alignment.CenterVertically) {
+    Row(Modifier.fillMaxWidth().heightIn(min = 44.dp).padding(horizontal = 15.dp), verticalAlignment = Alignment.CenterVertically) {
         Text(stringResource(R.string.new_layer_length), Modifier.weight(1f), color = Am.HomeInk, fontSize = 12.sp, fontWeight = FontWeight.Bold)
         Box(Modifier.size(90.dp, 37.dp)) {
             Row(
@@ -364,7 +374,7 @@ private fun DurationRow(settings: AppSettings) {
                 AppSettings.LAYER_DURATIONS.forEachIndexed { i, seconds ->
                     val chosen = seconds == settings.defaultLayerDuration
                     Box(
-                        Modifier.fillMaxWidth().height(40.dp).background(if (chosen) ChosenRow else Color.Transparent)
+                        Modifier.fillMaxWidth().heightIn(min = 40.dp).background(if (chosen) ChosenRow else Color.Transparent)
                             .clickable { settings.defaultLayerDuration = seconds; open = false }.padding(start = 14.dp),
                         contentAlignment = Alignment.CenterStart,
                     ) {
@@ -398,7 +408,7 @@ private fun ThemeRow(settings: AppSettings) {
             }
         }
     }
-    Row(Modifier.fillMaxWidth().height(44.dp).padding(horizontal = 15.dp), verticalAlignment = Alignment.CenterVertically) {
+    Row(Modifier.fillMaxWidth().heightIn(min = 44.dp).padding(horizontal = 15.dp), verticalAlignment = Alignment.CenterVertically) {
         Text(stringResource(R.string.theme), Modifier.weight(1f), color = Am.HomeInk, fontSize = 12.sp, fontWeight = FontWeight.Bold)
         Box(Modifier.size(150.dp, 37.dp)) {
             Row(
@@ -420,7 +430,7 @@ private fun ThemeRow(settings: AppSettings) {
 @Composable
 private fun ThemeItem(label: String, chosen: Boolean, onClick: () -> Unit) {
     Box(
-        Modifier.fillMaxWidth().height(40.dp).background(if (chosen) ChosenRow else Color.Transparent).clickable(onClick = onClick).padding(horizontal = 14.dp),
+        Modifier.fillMaxWidth().heightIn(min = 40.dp).background(if (chosen) ChosenRow else Color.Transparent).clickable(onClick = onClick).padding(horizontal = 14.dp),
         contentAlignment = Alignment.CenterStart,
     ) { Text(label, color = Am.OnNavy, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis) }
 }
@@ -430,6 +440,17 @@ private fun readThemeText(context: Context, uri: Uri): String {
     val bytes = stream?.use { it.readAtMost(Themes.MAX_BYTES + 1) } ?: throw ThemeError(txt(R.string.settings_theme_open_failed))
     if (bytes.size > Themes.MAX_BYTES) throw ThemeError(txt(R.string.settings_theme_not_theme_file))
     return String(bytes, Charsets.UTF_8)
+}
+
+@Composable
+private fun OptionRow(label: String, selected: Boolean, onClick: () -> Unit) {
+    Row(
+        Modifier.fillMaxWidth().heightIn(min = 44.dp).selectable(selected, role = androidx.compose.ui.semantics.Role.RadioButton, onClick = onClick).padding(horizontal = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        RadioButton(selected, null, colors = RadioButtonDefaults.colors(selectedColor = Am.HomeAccent, unselectedColor = Am.HomeMid))
+        Text(label, Modifier.padding(start = 6.dp), color = Am.HomeInk, fontSize = 13.sp)
+    }
 }
 
 @Composable

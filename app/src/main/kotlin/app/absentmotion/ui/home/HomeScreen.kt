@@ -430,8 +430,8 @@ internal fun Chip(text: String, selected: Boolean, onClick: () -> Unit) {
 @Composable
 private fun ListHeader(title: String?, byName: Boolean, onSort: (Boolean) -> Unit) {
     var open by remember { mutableStateOf(false) }
-    Row(Modifier.fillMaxWidth().height(48.dp).padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text(title.orEmpty(), Modifier.weight(1f), color = Am.Navy, fontSize = 19.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+    Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
+        Text(title.orEmpty(), Modifier.weight(1f), color = Am.Navy, fontSize = 19.sp, fontWeight = FontWeight.Bold, maxLines = 2)
         Box {
             Row(Modifier.height(48.dp).clickable { open = true }, verticalAlignment = Alignment.CenterVertically) {
                 Text(stringResource(if (byName) R.string.home_sort_by_name else R.string.home_sort_by_date), color = Am.Navy, fontSize = 15.sp)
@@ -474,12 +474,12 @@ private fun ProjectCard(
 ) {
     val coords = remember { arrayOfNulls<LayoutCoordinates>(1) }
     Box(
-        modifier.padding(bottom = 12.dp).fillMaxWidth().height(96.dp)
+        modifier.padding(bottom = 12.dp).fillMaxWidth().heightIn(min = 96.dp)
             .onGloballyPositioned { coords[0] = it }
             .clip(RoundedCornerShape(12.dp)).background(Am.Card).clickable(onClick = onOpen),
     ) {
         Thumbnail(info, version, thumbs, Modifier.padding(8.dp))
-        Column(Modifier.padding(start = 104.dp, top = 16.dp, end = 52.dp)) {
+        Column(Modifier.padding(start = 104.dp, top = 16.dp, end = 52.dp, bottom = 12.dp)) {
             Text(
                 info.title, color = Am.Navy, fontSize = 17.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold,
                 maxLines = 1, overflow = TextOverflow.Ellipsis,
@@ -524,7 +524,7 @@ private fun MenuRow(label: String, icon: ImageVector, onClick: () -> Unit) {
 
 @Composable
 private fun Fact(icon: ImageVector, text: String) {
-    Row(Modifier.widthIn(min = 85.dp).height(16.dp), verticalAlignment = Alignment.CenterVertically) {
+    Row(Modifier.widthIn(min = 85.dp).heightIn(min = 16.dp), verticalAlignment = Alignment.CenterVertically) {
         Icon(icon, null, Modifier.size(16.dp), tint = Grey)
         Spacer(Modifier.width(6.dp))
         Text(text, color = FactText, fontSize = 12.sp, maxLines = 1)
@@ -565,7 +565,8 @@ private fun Thumbnail(info: ProjectInfo, version: Int, cache: MutableMap<String,
         if (!info.damaged) Text(
             duration(info.durationMs),
             Modifier.align(Alignment.BottomStart).padding(4.dp).background(Am.Navy, RoundedCornerShape(4.dp)).padding(horizontal = 4.dp),
-            color = Am.OnNavy, fontSize = 13.sp, lineHeight = 16.sp, fontWeight = FontWeight.Medium,
+            color = Am.OnNavy, fontSize = 13.sp, lineHeight = 16.sp, fontWeight = FontWeight.Medium, maxLines = 1,
+            autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(8.sp, 13.sp),
         )
     }
 }
@@ -640,7 +641,7 @@ private fun BottomBar(onNew: () -> Unit, page: Int, onPage: (Int) -> Unit, modif
 
 @Composable
 private fun BarItem(label: String, icon: ImageVector, onClick: () -> Unit) {
-    Column(Modifier.width(78.dp).height(48.dp).clickable(onClick = onClick), horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(Modifier.widthIn(min = 78.dp).heightIn(min = 48.dp).clickable(onClick = onClick), horizontalAlignment = Alignment.CenterHorizontally) {
         Icon(icon, null, Modifier.size(24.dp), tint = Am.Navy)
         Spacer(Modifier.height(8.dp))
         Text(label, color = Am.Navy, fontSize = 12.sp, lineHeight = 16.sp, fontWeight = FontWeight.Medium, maxLines = 1)

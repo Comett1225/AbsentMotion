@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -192,17 +193,18 @@ private fun TemplateCard(
 ) {
     val scene = t.scene
     val ratio = aspectName(scene.width, scene.height)
-    Card(Modifier.height(96.dp), onOpen) {
+    Card(Modifier.heightIn(min = 96.dp), onOpen) {
         Box(Modifier.padding(8.dp).size(80.dp).clip(RoundedCornerShape(8.dp)).checkerboard(5.dp)) {
             rememberFileBitmap(t.thumbnail, t.modified)?.let { Image(it, null, Modifier.fillMaxSize(), contentScale = ContentScale.Fit) }
             val s = (scene.totalTime + 500) / 1000
             Text(
                 String.format(Locale.ROOT, "%02d:%02d:%02d", s / 3600, s / 60 % 60, s % 60),
                 Modifier.align(Alignment.BottomStart).padding(4.dp).background(Am.Navy, RoundedCornerShape(4.dp)).padding(horizontal = 4.dp),
-                color = Am.OnNavy, fontSize = 13.sp, lineHeight = 16.sp, fontWeight = FontWeight.Medium,
+                color = Am.OnNavy, fontSize = 13.sp, lineHeight = 16.sp, fontWeight = FontWeight.Medium, maxLines = 1,
+                autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(8.sp, 13.sp),
             )
         }
-        Column(Modifier.weight(1f).padding(start = 8.dp)) {
+        Column(Modifier.weight(1f).padding(start = 8.dp, top = 8.dp, bottom = 8.dp)) {
             Text(t.title, color = Am.Navy, fontSize = 17.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Spacer(Modifier.height(8.dp))
             Row {
@@ -223,7 +225,7 @@ private fun TemplateCard(
 
 @Composable
 private fun Fact(icon: ImageVector, text: String) {
-    Row(Modifier.widthIn(min = 85.dp).height(16.dp), verticalAlignment = Alignment.CenterVertically) {
+    Row(Modifier.widthIn(min = 85.dp).heightIn(min = 16.dp), verticalAlignment = Alignment.CenterVertically) {
         Icon(icon, null, Modifier.size(16.dp), tint = Grey)
         Spacer(Modifier.width(6.dp))
         Text(text, color = FactText, fontSize = 12.sp, maxLines = 1)

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -285,7 +286,7 @@ private fun LanguageRow(language: AppLanguage, chosen: Boolean, ui: Locale, onCl
     val shape = RoundedCornerShape(12.dp)
     val local = remember(language, ui) { Locale.forLanguageTag(language.tag).getDisplayName(ui).replaceFirstChar { it.titlecase(ui) } }
     Row(
-        Modifier.fillMaxWidth().height(62.dp).clip(shape).background(Am.Card)
+        Modifier.fillMaxWidth().heightIn(min = 62.dp).clip(shape).background(Am.Card)
             .border(2.dp, if (chosen) Am.Navy else Color.Transparent, shape)
             .selectable(chosen, role = Role.RadioButton, onClick = onClick).padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically,

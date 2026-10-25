@@ -1,6 +1,5 @@
 package app.absentmotion
 
-import android.content.ComponentCallbacks2
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
@@ -138,8 +137,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         val started = SystemClock.elapsedRealtime()
         enableEdgeToEdge()
-        app.absentmotion.i18n.keepLegacyLanguage(this)
         super.onCreate(savedInstanceState)
+        app.absentmotion.i18n.keepLegacyLanguage(this)
         app.absentmotion.i18n.AppText.install(this)
         followScreenSize(resources.configuration)
         store = ProjectStore(this)
@@ -191,9 +190,11 @@ class MainActivity : ComponentActivity() {
                 enableEdgeToEdge(if (light) SystemBarStyle.light(transparent, transparent) else SystemBarStyle.dark(transparent))
             }
             val density = LocalDensity.current.density
+            val fontScale = LocalDensity.current.fontScale
+            val dense = remember(density, fontScale) { Density(density, fontScale.coerceAtMost(EDITOR_FONT_LIMIT)) }
             val editorPress = remember(Am.PressEditor) { PressIndication(Am.PressEditor) }
             val homePress = remember(Am.PressHome) { PressIndication(Am.PressHome) }
-            CompositionLocalProvider(LocalIndication provides if (open == null) homePress else editorPress, LocalDensity provides remember(density) { Density(density, 1f) }) {
+            CompositionLocalProvider(LocalIndication provides if (open == null) homePress else editorPress, LocalDensity provides remember(density, fontScale) { Density(density, fontScale.coerceAtMost(UI_FONT_LIMIT)) }) {
                 val first = firstRun
                 val outdated = outdatedNow(settings)
                 val screen = when {
@@ -219,7 +220,7 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         editingTemplate?.let { id ->
-                            TemplateEditor(id, engine, settings, onClose = { editingTemplate = null }, onContinue = ::projectFromTemplate)
+                            CompositionLocalProvider(LocalDensity provides dense) { TemplateEditor(id, engine, settings, onClose = { editingTemplate = null }, onContinue = ::projectFromTemplate) }
                         }
                         exportingFromList?.let { ExportScreen(it, 0, engine, fromProjectList = true, outdated) { exportingFromList = null } }
                         LowMemoryNotice()
@@ -227,10 +228,10 @@ class MainActivity : ComponentActivity() {
                 } else {
                     Box(Modifier.fillMaxSize()) {
                         val embed = EmbedRequest.templateId
-                        if (embed != null) TemplateEditor(embed, engine, settings, onClose = { endEmbed(open) }) { scene -> embedTemplate(open, scene) }
+                        if (embed != null) CompositionLocalProvider(LocalDensity provides dense) { TemplateEditor(embed, engine, settings, onClose = { endEmbed(open) }) { scene -> embedTemplate(open, scene) } }
                         else {
                             val screen = LocalConfiguration.current
-                            CompositionLocalProvider(LocalWide provides wideEditor(screen.smallestScreenWidthDp, screen.screenWidthDp), app.absentmotion.ui.editor.panels.LocalVibration provides settings.vibration) {
+                            CompositionLocalProvider(LocalWide provides wideEditor(screen.smallestScreenWidthDp, screen.screenWidthDp), app.absentmotion.ui.editor.panels.LocalVibration provides settings.vibration, LocalDensity provides dense) {
                                 key(open) { Ltr { EditorScreen(open, onExit = ::closeEditor) } }
                             }
                         }
@@ -627,7 +628,7 @@ class MainActivity : ComponentActivity() {
     override fun onTrimMemory(level: Int) {
         super.onTrimMemory(level)
         app.absentmotion.editor.PreviewCache.trim(this, level)
-        if (level < ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN) return
+        if (level < TRIM_RUNNING_LOW) return
         dropThumbnails()
         dropVideoThumbnails()
         dropShapeIcons()
@@ -643,5 +644,8 @@ class MainActivity : ComponentActivity() {
         const val OPEN_PROJECT = "openProject"
         const val OPEN_FRAME = "openFrame"
         const val OPEN_LAYER = "openLayer"
+        const val UI_FONT_LIMIT = 2f
+        const val EDITOR_FONT_LIMIT = 1.3f
+        const val TRIM_RUNNING_LOW = 10
     }
 }
