@@ -120,6 +120,7 @@ class MainActivity : ComponentActivity() {
     private var openFailed by mutableStateOf<String?>(null)
     private var openJob: kotlinx.coroutines.Job? = null
     private var closeAnyway = false
+    private var saveFailed by mutableStateOf(false)
     private var historyFor by mutableStateOf<Triple<String, String, Boolean>?>(null)
     private var projectsChanged by mutableIntStateOf(0)
     private lateinit var recovery: Recovery
@@ -256,6 +257,13 @@ class MainActivity : ComponentActivity() {
                         containerColor = Am.Field, titleContentColor = Am.OnDark, textContentColor = Am.OnDark,
                     )
                 }
+                if (saveFailed && open != null) AlertDialog(
+                    onDismissRequest = { saveFailed = false },
+                    text = { Text(stringResource(R.string.home_close_save_failed)) },
+                    confirmButton = { TextButton({ saveFailed = false; closeEditor() }) { Text(stringResource(R.string.home_save_failed_retry), color = Am.Accent) } },
+                    dismissButton = { TextButton({ saveFailed = false; closeAnyway = true; closeEditor() }) { Text(stringResource(R.string.home_save_failed_leave), color = Am.Accent) } },
+                    containerColor = Am.Field, textContentColor = Am.OnDark,
+                )
                 if (open?.historyOpen == true) VersionHistory(store, open.projectId, open.scene.title, engine, onRestore = { restoreVersion(open.projectId, it) }) { open.historyOpen = false }
                 historyFor?.let { (id, title, damaged) ->
                     VersionHistory(store, id, title, engine, onRestore = { restoreVersion(id, it) }, onDelete = if (damaged) { { deleteDamaged(id) } } else null) { historyFor = null }
@@ -519,14 +527,14 @@ class MainActivity : ComponentActivity() {
         opening = true
         historyFor = null
         openJob = lifecycleScope.launch {
-            val restored = try {
+            val failure = try {
                 withContext(DiskThread.dispatcher) {
-                    runCatching { store.restore(id, version) }.onFailure { Log.e("AMStore", "cannot restore a version of $id", it) }.isSuccess
+                    runCatching { store.restore(id, version) }.onFailure { Log.e("AMStore", "cannot restore a version of $id", it) }.exceptionOrNull()
                 }
             } finally { opening = false }
             projectsChanged++
             when {
-                !restored -> Toast.makeText(this@MainActivity, getString(R.string.home_restore_version_failed), Toast.LENGTH_LONG).show()
+                failure != null -> Toast.makeText(this@MainActivity, getString(if (failure is ProjectStore.DamagedVersion) R.string.home_restore_version_damaged else R.string.home_restore_version_failed), Toast.LENGTH_LONG).show()
                 state != null && editor === state -> openNow(id)
                 else -> Toast.makeText(this@MainActivity, getString(R.string.home_version_restored), Toast.LENGTH_SHORT).show()
             }
@@ -544,9 +552,8 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch {
             withContext(Dispatchers.IO) { runCatching { closing.saver.flush().get() } }
             if (closing.saver.failing && !closeAnyway) {
-                closeAnyway = true
                 closingEditor = false
-                Toast.makeText(this@MainActivity, getString(R.string.home_close_save_failed), Toast.LENGTH_LONG).show()
+                saveFailed = true
                 return@launch
             }
             closeAnyway = false

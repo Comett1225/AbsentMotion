@@ -19,9 +19,20 @@ class Recovery(private val dir: File) {
     fun pending(store: ProjectStore): RecoveryOffer? {
         for (found in dir.listFiles { f -> f.extension == "xml" }.orEmpty().sortedByDescending { it.lastModified() }) {
             val id = found.nameWithoutExtension
-            val xml = runCatching { found.readText() }.getOrNull()
-            val scene = xml?.let { runCatching { Scene.parse(it) }.getOrNull() }
-            if (xml == null || scene == null || !store.exists(id) || store.text(id)?.let { sameScene(it, xml) } == true) {
+            if (!store.exists(id)) {
+                clear(id)
+                continue
+            }
+            val xml = try { found.readText() } catch (e: Exception) { continue } catch (e: OutOfMemoryError) { continue }
+            val scene = try {
+                Scene.parse(xml)
+            } catch (e: OutOfMemoryError) {
+                continue
+            } catch (e: Exception) {
+                if (runCatching { store.versions.keepDamaged(id, xml) }.isSuccess) clear(id)
+                continue
+            }
+            if (store.text(id)?.let { sameScene(it, xml) } == true) {
                 clear(id)
                 continue
             }

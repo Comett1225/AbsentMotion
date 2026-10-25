@@ -42,7 +42,7 @@ class ProjectStore(private val root: File) {
         val size = file.length()
         val info = listed[id]?.takeIf { it.modified == modified && it.sizeBytes == size } ?: run {
             val text = runCatching { file.readText() }.getOrNull()
-            val scene = text?.let { runCatching { Scene.parse(it) }.getOrNull() }
+            val scene = text?.let(::projectScene)
             if (scene == null) ProjectInfo(id, damagedTitle(text), 0, 0, 0, 0, size, modified, null, isElement = false, damaged = true)
             else ProjectInfo(
                 id = id, title = scene.title, width = scene.width, height = scene.height,
@@ -58,10 +58,13 @@ class ProjectStore(private val root: File) {
             ?.replace("&quot;", "\"")?.replace("&lt;", "<")?.replace("&gt;", ">")?.replace("&apos;", "'")?.replace("&amp;", "&")
             ?.takeIf { it.isNotBlank() } ?: AppText.get(R.string.library_damaged_project)
 
+    class DamagedVersion : java.io.IOException("The chosen version is damaged")
+
     fun restore(id: String, version: ProjectVersions.Version) {
         val chosen = version.file.readText()
+        if (projectScene(chosen) == null) throw DamagedVersion()
         val picture = version.thumbnail.takeIf { it.exists() }?.readBytes()
-        text(id)?.let { if (runCatching { Scene.parse(it) }.isSuccess) versions.snapshot(id, it) else versions.keepDamaged(id, it) }
+        text(id)?.let { if (projectScene(it) != null) versions.snapshot(id, it) else versions.keepDamaged(id, it) }
         save(id, chosen)
         if (picture != null) thumbnailFile(id).writeBytes(picture) else thumbnailFile(id).delete()
         recoveryFile(id).delete()
@@ -71,12 +74,13 @@ class ProjectStore(private val root: File) {
 
     fun load(id: String): Scene? = read(id)?.let { withLinkedElements(it, id) }
 
-    private fun read(id: String): Scene? = runCatching { Scene.parse(sceneFile(id).readText()) }.getOrNull()
+    private fun read(id: String): Scene? = text(id)?.let(::projectScene)
 
     private fun withLinkedElements(scene: Scene, id: String): Scene {
         val media = ArrayList<MediaDeclaration>()
+        val byLink by lazy { projectIds().associateBy(::linkOf) }
         fun follow(layers: List<XmlNode>, open: Set<String>): List<XmlNode> = layers.map { layer ->
-            val linked = layer["link"]?.let(::idOfLink)?.takeIf { it !in open }
+            val linked = layer["link"]?.let(byLink::get)?.takeIf { it !in open }
             val element = linked?.let(::read)?.takeIf { it.isElement }?.withCopiedLayerIds()
             when {
                 element != null -> {
@@ -94,8 +98,14 @@ class ProjectStore(private val root: File) {
 
     fun linkOf(id: String): String = runCatching { UUID.fromString(id).toString() }.getOrNull() ?: UUID.nameUUIDFromBytes(id.toByteArray()).toString()
 
-    fun idOfLink(link: String): String? =
-        dir.listFiles { f -> f.extension == "xml" }.orEmpty().map { it.nameWithoutExtension }.firstOrNull { linkOf(it) == link }
+    fun idOfLink(link: String): String? = projectIds().firstOrNull { linkOf(it) == link }
+
+    private fun projectIds() = dir.listFiles { f -> f.extension == "xml" }.orEmpty().map { it.nameWithoutExtension }
+
+    fun linkedBy(id: String): List<String> {
+        val link = "link=\"${linkOf(id)}\""
+        return list().filter { it.id != id && text(it.id)?.contains(link) == true }.map { it.title }
+    }
 
     fun save(id: String, scene: Scene) = save(id, scene.toXml())
 
@@ -190,7 +200,11 @@ class ProjectStore(private val root: File) {
     }
 }
 
-private fun XmlNode.keptUris(): Set<String> = mediaUris() + buildSet {
+internal fun projectScene(text: String): Scene? = runCatching { Scene.parse(text) }.getOrNull()?.takeIf { scene ->
+    scene.node.name == "scene" && (scene.node["width"]?.toIntOrNull() ?: 0) > 0 && (scene.node["height"]?.toIntOrNull() ?: 0) > 0
+}
+
+internal fun XmlNode.keptUris(): Set<String> = mediaUris() + buildSet {
     fun walk(n: XmlNode) {
         if (n.name == "ai") listOf("original", "result").forEach { key -> n[key]?.let { add(it) } }
         n.children.forEach(::walk)

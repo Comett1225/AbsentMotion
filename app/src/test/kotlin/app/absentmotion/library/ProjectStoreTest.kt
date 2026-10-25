@@ -377,6 +377,47 @@ class ProjectStoreTest {
         assertTrue(root.resolve("keep.txt").exists())
     }
 
+    @Test fun wellFormedXmlThatIsNotAProjectIsListedAsDamagedAndNeverOpened() {
+        val root = tmp.newFolder()
+        val store = ProjectStore(root)
+        val good = store.create(scene())
+        val bad = listOf("<foo width=\"10\" height=\"10\"/>", "<scene title=\"No size\"/>", "<scene width=\"0\" height=\"10\"/>", "<scene width=\"10\" height=\"x\"/>")
+            .map { text -> store.create(scene()).also { root.resolve("projects/$it.xml").writeText(text) } }
+        assertEquals(listOf(good), store.list().map { it.id })
+        val listed = store.list(includeDamaged = true).associateBy { it.id }
+        for (id in bad) {
+            assertTrue(id, listed.getValue(id).damaged)
+            assertEquals(null, store.load(id))
+        }
+        assertEquals("No size", listed.getValue(bad[1]).title)
+        assertFalse(listed.getValue(good).damaged)
+    }
+
+    @Test fun aDamagedVersionIsNotRestoredOverTheProject() {
+        val root = tmp.newFolder()
+        val store = ProjectStore(root)
+        val id = store.create(scene().withTitle("current"))
+        store.versions.snapshot(id, scene().withTitle("old").toXml())
+        val version = store.versions.list(id).single()
+        for (damaged in listOf("<scene width=\"100\" hei", "<notascene/>")) {
+            version.file.writeText(damaged)
+            try { store.restore(id, version); fail("restored $damaged") } catch (_: ProjectStore.DamagedVersion) {}
+            assertEquals("current", store.load(id)!!.title)
+            assertEquals(1, store.versions.list(id).size)
+        }
+    }
+
+    @Test fun anAssetNamesTheProjectsThatStillFollowIt() {
+        val store = ProjectStore(tmp.newFolder())
+        val element = store.createElement(Scene(scene().node.with("type", "element").with("title", "Logo")))
+        fun linking(title: String) = store.create(scene(XmlNode("embedScene", linkedMapOf("id" to "2", "link" to store.linkOf(element)), listOf(XmlNode("scene")))).withTitle(title))
+        linking("Intro")
+        linking("Outro")
+        store.create(scene().withTitle("Plain"))
+        assertEquals(setOf("Intro", "Outro"), store.linkedBy(element).toSet())
+        assertEquals(emptyList<String>(), store.linkedBy(store.createElement(Scene(scene().node.with("type", "element")))))
+    }
+
     @Test fun anUnsavedEditDraftOfTheDeletedProjectDoesNotKeepItsMediaAlive() {
         val root = tmp.newFolder()
         val store = ProjectStore(root)

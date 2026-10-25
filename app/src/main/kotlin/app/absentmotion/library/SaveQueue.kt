@@ -61,7 +61,12 @@ class ProjectSaver(
     private val executor: ScheduledExecutorService = DiskThread.executor,
 ) {
     private val project = SaveQueue(executor, SAVE_DELAY_MS, { xml ->
-        store.save(id, xml)
+        try {
+            store.save(id, xml)
+        } catch (e: Exception) {
+            runCatching { recovery.write(id, xml) }
+            throw e
+        }
         recovery.clear(id)
         runCatching { store.versions.snapshot(id, xml, SNAPSHOT_GAP_MS) }
     }, failed)

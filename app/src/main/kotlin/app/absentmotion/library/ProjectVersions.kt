@@ -23,7 +23,7 @@ class ProjectVersions(private val root: File, private val now: () -> Long = Syst
         val newest = list(id).firstOrNull()
         val time = now()
         val last = newest?.time?.takeIf { it <= time } ?: written[id]
-        if (newest != null && (last != null && time - last in 0 until minGapMs || sameScene(newest.file.readText(), xml))) return false
+        if (newest != null && (last != null && time - last in 0 until minGapMs || runCatching { sameScene(newest.file.readText(), xml) }.getOrDefault(false))) return false
         var name = maxOf(time, (newest?.time ?: 0) + 1)
         while (File(dir(id), "$name.xml").exists()) name++
         writeAtomically(File(dir(id), "$name.xml"), xml)

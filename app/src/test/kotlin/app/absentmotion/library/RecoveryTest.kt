@@ -108,6 +108,71 @@ class RecoveryTest {
         assertFalse(store.exists(id))
     }
 
+    @Test fun aDraftThatCannotBeReadNowIsKeptForTheNextStart() {
+        val (store, recovery, id) = setup()
+        recovery.write(id, xml("unsaved"))
+        val draft = recovery.file(id).apply { setReadable(false) }
+        org.junit.Assume.assumeFalse(draft.canRead())
+        assertNull(recovery.pending(store))
+        assertTrue(draft.exists())
+        draft.setReadable(true)
+        assertEquals("unsaved", recovery.pending(store)!!.title)
+    }
+
+    @Test fun aDamagedDraftIsSetAsideWithItsBytesNotDeleted() {
+        val (store, recovery, id) = setup()
+        recovery.write(id, "<scene title=\"half")
+        assertNull(recovery.pending(store))
+        assertFalse(recovery.file(id).exists())
+        assertEquals(listOf("<scene title=\"half"), store.versions.dir(id).listFiles { f -> f.extension == "damaged" }!!.map { it.readText() })
+    }
+
+    @Test fun aFailedProjectSaveLeavesTheLatestEditsAsAnUnsavedDraft() {
+        val (store, recovery, id) = setup()
+        val root = recovery.file(id).parentFile.parentFile
+        val project = root.resolve("projects/$id.xml")
+        val saved = project.readText()
+        project.delete()
+        project.resolve("blocker").apply { parentFile.mkdirs(); writeText("x") }
+        val executor = Executors.newSingleThreadScheduledExecutor()
+        try {
+            var failures = 0
+            val saver = ProjectSaver(id, store, recovery, failed = { failures++ }, executor = executor)
+            saver.commit(xml("latest edit"))
+            saver.flush().get(5, TimeUnit.SECONDS)
+            assertEquals(1, failures)
+            assertTrue(saver.failing)
+            assertEquals("latest edit", Scene.parse(recovery.file(id).readText()).title)
+            project.deleteRecursively()
+            project.writeText(saved)
+            assertEquals("latest edit", recovery.pending(store)!!.title)
+            saver.flush().get(5, TimeUnit.SECONDS)
+            assertFalse(saver.failing)
+            assertEquals("latest edit", store.load(id)!!.title)
+            assertFalse(recovery.file(id).exists())
+        } finally {
+            executor.shutdownNow()
+        }
+    }
+
+    @Test fun acceptingOrDiscardingWorksWhenTheNewestVersionCannotBeRead() {
+        val (store, recovery, id) = setup()
+        fun unreadableNewest() = store.versions.list(id).first().file.apply { setReadable(false) }
+        store.versions.snapshot(id, xml("older", 3))
+        val first = unreadableNewest()
+        org.junit.Assume.assumeFalse(first.canRead())
+        recovery.write(id, xml("unsaved"))
+        recovery.restore(store, recovery.pending(store)!!)
+        assertEquals("unsaved", store.load(id)!!.title)
+        val second = unreadableNewest()
+        recovery.write(id, xml("again"))
+        recovery.discard(store, recovery.pending(store)!!)
+        assertFalse(recovery.file(id).exists())
+        assertEquals("unsaved", store.load(id)!!.title)
+        first.setReadable(true)
+        second.setReadable(true)
+    }
+
     @Test fun restoringAnOlderVersionAlsoDropsUnsavedEditsOfTheNewerOne() {
         val (store, recovery, id) = setup()
         store.versions.snapshot(id, xml("old", 3))
