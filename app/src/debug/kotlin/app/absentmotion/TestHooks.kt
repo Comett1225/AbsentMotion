@@ -29,7 +29,22 @@ import java.io.File
 internal object TestHooks {
     fun onboarding(intent: Intent): String? = intent.getStringExtra("onboarding")
 
+    private fun keepShared(activity: MainActivity, intent: Intent) {
+        val clip = intent.clipData ?: return
+        val dir = File(activity.getExternalFilesDir(null), "shared").apply { mkdirs() }
+        for (i in 0 until clip.itemCount) {
+            val uri = clip.getItemAt(i).uri ?: continue
+            val name = runCatching {
+                activity.contentResolver.query(uri, arrayOf(android.provider.OpenableColumns.DISPLAY_NAME), null, null, null)?.use { c -> if (c.moveToFirst()) c.getString(0) else null }
+            }.getOrNull() ?: "shared-$i"
+            runCatching { activity.contentResolver.openInputStream(uri)?.use { input -> File(dir, File(name).name).outputStream().use { input.copyTo(it) } } }
+                .onSuccess { Log.i("AMTest", "kept shared $name") }
+                .onFailure { Log.e("AMTest", "cannot keep $uri", it) }
+        }
+    }
+
     fun newIntent(activity: MainActivity, intent: Intent) {
+        keepShared(activity, intent)
         if (intent.hasExtra("xml") || intent.hasExtra("aaccheck") || intent.hasExtra("devicecheck") || intent.hasExtra("capcheck") || intent.hasExtra("aicheck") || intent.hasExtra("enhancecheck") || intent.hasExtra("aismoothcheck") || intent.hasExtra("aismoothtrim") || intent.hasExtra("aidownload") || intent.hasExtra("hqinstall") || intent.hasExtra("hqremove")) {
             activity.setIntent(intent)
             start(activity)
@@ -100,6 +115,7 @@ internal object TestHooks {
 
     fun start(activity: MainActivity) {
         val intent = activity.intent
+        keepShared(activity, intent)
         intent.getStringExtra("failengine")?.let { app.absentmotion.engine.EngineDebug.failStart = it }
         app.absentmotion.export.ExportDebug.refuseHardware = intent.getBooleanExtra("refusehw", false)
         app.absentmotion.export.ExportDebug.failPlayers = intent.getIntExtra("failplayers", 0)
