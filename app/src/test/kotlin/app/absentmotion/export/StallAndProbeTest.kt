@@ -93,6 +93,38 @@ class StallAndProbeTest {
         assertTrue(elapsedMs(start) < 2_000)
     }
 
+    @Test fun anAudioExportWhoseCountersStopMovingIsStoppedByTheWatchdog() = runBlocking {
+        try {
+            watched(stallMs = 300) { alive ->
+                val beat = onChange { alive() }
+                repeat(200) { beat(7); delay(20) }
+            }
+            fail("an audio export without progress must not finish")
+        } catch (e: ExportError) {
+            assertTrue(encoderTrouble(e))
+        }
+        assertEquals("done", watched(stallMs = 300) { alive ->
+            val beat = onChange { alive() }
+            repeat(40) { beat(it.toLong()); delay(20) }
+            "done"
+        })
+    }
+
+    @Test fun aFailedEncoderListIsTriedAgainAndAHungOneIsNotStartedTwice() = runBlocking {
+        var calls = 0
+        val flaky = Attempt(1_000, "t") { if (++calls == 1) throw IllegalStateException("mediaserver died") else listOf(calls) }
+        assertNull(flaky.get())
+        assertEquals(listOf(2), flaky.get())
+        val release = CountDownLatch(1)
+        var started = 0
+        val hung = Attempt(200, "t") { started++; release.await(30, TimeUnit.SECONDS); "late" }
+        assertNull(hung.get())
+        assertNull(hung.get())
+        assertEquals(1, started)
+        release.countDown()
+        assertEquals("late", hung.get())
+    }
+
     @Test fun aProbeThatFailsOrHangsIsSkippedInsteadOfBlockingTheFirstStart() = runBlocking {
         assertEquals(5, probeWithin(1_000) { 5 })
         assertNull(probeWithin(1_000) { throw IllegalStateException("encoder crashed") })

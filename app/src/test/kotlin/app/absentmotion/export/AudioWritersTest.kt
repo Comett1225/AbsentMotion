@@ -2,6 +2,8 @@ package app.absentmotion.export
 
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -41,6 +43,16 @@ class AudioWritersTest {
         assertEquals(0xF1, out[8 + 13].toInt() and 0xFF)
         assertEquals(listOf(0x23, 0x45, 0x67, 0x89), (22..25).map { out[it].toInt() and 0xFF })
         assertEquals(0x42, out[8 + 12].toInt())
+        assertEquals(listOf(0x10, 0, 0x10, 0), (8..11).map { out[it].toInt() and 0xFF })
+    }
+
+    @Test fun longWavExportsAreRefusedBeforeTheyOverflowTheHeader() {
+        val limit = (0xFFFFFFFFL - 36) / 6
+        assertTrue(wavFits(limit, 2, 24))
+        assertFalse(wavFits(limit + 1, 2, 24))
+        assertFalse(wavFits(48_000L * (4 * 3600 + 8 * 60 + 34), 2, 24))
+        assertTrue(wavFits(48_000L * (4 * 3600 + 8 * 60 + 33), 2, 24))
+        assertTrue(wavFits(44_100L * 3 * 3600, 2, 16))
     }
 
     @Test fun audioOnlySizesFollowTheFormat() {

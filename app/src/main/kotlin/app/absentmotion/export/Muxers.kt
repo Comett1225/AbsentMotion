@@ -17,8 +17,46 @@ internal interface SampleSink {
     fun addTrack(format: MediaFormat): Int
     fun start()
     fun write(track: Int, data: ByteBuffer, info: MediaCodec.BufferInfo)
+    fun end(track: Int) {}
+    fun queued(track: Int): Long = 0
     fun stop()
     fun release()
+}
+
+internal class Interleaver(private val emit: (track: Int, data: ByteArray, timeUs: Long, key: Boolean) -> Unit) {
+    private class Sample(val data: ByteArray, val timeUs: Long, val key: Boolean)
+
+    private val queues = ArrayList<ArrayDeque<Sample>>()
+    private val ended = ArrayList<Boolean>()
+    private val bytes = ArrayList<Long>()
+
+    fun addTrack() {
+        queues += ArrayDeque<Sample>()
+        ended += false
+        bytes += 0L
+    }
+
+    fun add(track: Int, data: ByteArray, timeUs: Long, key: Boolean) {
+        queues[track].addLast(Sample(data, timeUs, key))
+        bytes[track] += data.size.toLong()
+        flush(all = false)
+    }
+
+    fun end(track: Int) {
+        ended[track] = true
+        flush(all = false)
+    }
+
+    fun queued(track: Int): Long = bytes[track]
+
+    fun flush(all: Boolean) {
+        while (all || queues.indices.none { queues[it].isEmpty() && !ended[it] }) {
+            val next = queues.indices.filter { queues[it].isNotEmpty() }.minByOrNull { queues[it].first().timeUs } ?: return
+            val sample = queues[next].removeFirst()
+            bytes[next] -= sample.data.size.toLong()
+            emit(next, sample.data, sample.timeUs, sample.key)
+        }
+    }
 }
 
 internal class MuxerSink(private val muxer: MediaMuxer) : SampleSink {
@@ -35,12 +73,10 @@ internal class MuxerSink(private val muxer: MediaMuxer) : SampleSink {
 }
 
 internal class MatroskaSink(fd: FileDescriptor, private val fps: Int, webm: Boolean = false, private val bt601: Boolean = false) : SampleSink {
-    private class Sample(val data: ByteArray, val timeUs: Long, val key: Boolean)
-
     private val writer = MatroskaWriter(FileOutputStream(fd).channel, if (webm) "webm" else "matroska")
     private val tracks = ArrayList<MatroskaWriter.Track>()
     private val mimes = ArrayList<String>()
-    private val queues = ArrayList<ArrayDeque<Sample>>()
+    private val queues = Interleaver(writer::write)
     private val shiftUs = ArrayList<Long>()
 
     override fun addTrack(format: MediaFormat): Int {
@@ -64,8 +100,8 @@ internal class MatroskaSink(fd: FileDescriptor, private val fps: Int, webm: Bool
             else -> error("MKV files cannot hold $mime")
         }
         mimes += mime
-        queues += ArrayDeque<Sample>()
-        shiftUs += if (mime == MediaFormat.MIMETYPE_AUDIO_AAC) primingFrames(format) * 1_000_000L / format.getInteger(MediaFormat.KEY_SAMPLE_RATE) else 0L
+        queues.addTrack()
+        shiftUs +=if (mime == MediaFormat.MIMETYPE_AUDIO_AAC) primingFrames(format) * 1_000_000L / format.getInteger(MediaFormat.KEY_SAMPLE_RATE) else 0L
         return tracks.size - 1
     }
 
@@ -81,20 +117,15 @@ internal class MatroskaSink(fd: FileDescriptor, private val fps: Int, webm: Bool
             else -> bytes
         }
         val key = !tracks[track].video || info.flags and MediaCodec.BUFFER_FLAG_KEY_FRAME != 0
-        queues[track].addLast(Sample(payload, info.presentationTimeUs + shiftUs[track], key))
-        flush(all = false)
+        queues.add(track, payload, info.presentationTimeUs + shiftUs[track], key)
     }
 
-    private fun flush(all: Boolean) {
-        while (all || queues.none { it.isEmpty() }) {
-            val next = queues.indices.filter { queues[it].isNotEmpty() }.minByOrNull { queues[it].first().timeUs } ?: return
-            val sample = queues[next].removeFirst()
-            writer.write(next, sample.data, sample.timeUs, sample.key)
-        }
-    }
+    override fun end(track: Int) = queues.end(track)
+
+    override fun queued(track: Int): Long = queues.queued(track)
 
     override fun stop() {
-        flush(all = true)
+        queues.flush(all = true)
         writer.finish()
     }
 
@@ -104,8 +135,63 @@ internal class MatroskaSink(fd: FileDescriptor, private val fps: Int, webm: Bool
 private fun primingFrames(format: MediaFormat): Long =
     if (format.containsKey(PrimingKey)) format.getInteger(PrimingKey).toLong() else 0L
 
-internal fun av1Config(csd: ByteArray): ByteArray =
-    if (csd.isNotEmpty() && csd[0].toInt() and 0xFF == 0x81) csd else byteArrayOf(0x81.toByte(), 0, 0x0C, 0) + csd
+internal fun av1Config(csd: ByteArray): ByteArray {
+    if (csd.isNotEmpty() && csd[0].toInt() and 0xFF == 0x81) return csd
+    val (profile, level, tier) = runCatching { av1Sequence(csd) }.getOrNull() ?: Triple(0, 31, 0)
+    val chroma = when (profile) { 1 -> 0x00; 2 -> 0x08; else -> 0x0C }
+    return byteArrayOf(0x81.toByte(), ((profile shl 5) or level).toByte(), ((tier shl 7) or chroma).toByte(), 0) + csd
+}
+
+private fun av1Sequence(obus: ByteArray): Triple<Int, Int, Int>? {
+    var at = 0
+    while (at < obus.size) {
+        val header = obus[at].toInt() and 0xFF
+        var body = at + 1 + ((header shr 2) and 1)
+        var size = obus.size - body
+        if (header and 2 != 0) {
+            size = 0
+            var shift = 0
+            while (true) {
+                val b = obus[body++].toInt() and 0xFF
+                size = size or ((b and 0x7F) shl shift)
+                shift += 7
+                if (b and 0x80 == 0 || shift > 28) break
+            }
+        }
+        if ((header shr 3) and 15 == 1) return av1Levels(obus, body)
+        at = body + size
+    }
+    return null
+}
+
+private fun av1Levels(data: ByteArray, start: Int): Triple<Int, Int, Int> {
+    var bit = start * 8L
+    fun read(count: Int): Int {
+        var value = 0
+        repeat(count) {
+            value = (value shl 1) or ((data[(bit ushr 3).toInt()].toInt() shr (7 - (bit and 7).toInt())) and 1)
+            bit++
+        }
+        return value
+    }
+    val profile = read(3)
+    read(1)
+    if (read(1) == 1) return Triple(profile, read(5), 0)
+    if (read(1) == 1) {
+        bit += 64
+        if (read(1) == 1) {
+            var zeros = 0
+            while (read(1) == 0) zeros++
+            bit += zeros
+        }
+        if (read(1) == 1) bit += 47
+    }
+    read(1)
+    read(5)
+    read(12)
+    val level = read(5)
+    return Triple(profile, level, if (level > 7) read(1) else 0)
+}
 
 internal fun openSink(container: Container, fd: FileDescriptor, fps: Int, bt601: Boolean = false): SampleSink = when (container) {
     Container.Mp4, Container.Mov -> MuxerSink(fd, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
@@ -132,7 +218,12 @@ internal fun markQuickTime(fd: FileDescriptor) {
     Os.pwrite(fd, patched, 0, patched.size, 0)
 }
 
-internal class Mux(private val sink: SampleSink, private val tracks: Int, private val onError: (Throwable) -> Unit) {
+internal const val MuxBudgetBytes = 8L shl 20
+
+internal class Mux(
+    private val sink: SampleSink, private val tracks: Int, private val budget: Long = Long.MAX_VALUE,
+    private val stopped: () -> Boolean = { false }, private val onError: (Throwable) -> Unit,
+) {
     val negativeTimes: Boolean get() = sink.negativeTimes
 
     private var added = 0
@@ -140,11 +231,16 @@ internal class Mux(private val sink: SampleSink, private val tracks: Int, privat
     private var broken = false
     private var released = false
     private val early = ArrayList<Triple<Int, ByteBuffer, MediaCodec.BufferInfo>>()
+    private val earlyBytes = HashMap<Int, Long>()
+    private val endedEarly = ArrayList<Int>()
 
     private inline fun <T> guarded(otherwise: T, op: () -> T): T {
         if (broken) return otherwise
         return try { op() } catch (t: Exception) { broken = true; onError(t); otherwise }
     }
+
+    @Synchronized private fun full(track: Int): Boolean =
+        !broken && !released && (if (started) sink.queued(track) else earlyBytes[track] ?: 0L) > budget
 
     @Synchronized fun addTrack(format: MediaFormat): Int = guarded(-1) {
         val id = sink.addTrack(format)
@@ -153,15 +249,27 @@ internal class Mux(private val sink: SampleSink, private val tracks: Int, privat
             started = true
             for ((track, data, info) in early) sink.write(track, data, info)
             early.clear()
+            earlyBytes.clear()
+            endedEarly.forEach(sink::end)
         }
         id
     }
 
-    @Synchronized fun write(track: Int, data: ByteBuffer, info: MediaCodec.BufferInfo) = guarded(Unit) {
+    fun write(track: Int, data: ByteBuffer, info: MediaCodec.BufferInfo) {
+        while (full(track) && !stopped()) Thread.sleep(5)
+        put(track, data, info)
+    }
+
+    @Synchronized private fun put(track: Int, data: ByteBuffer, info: MediaCodec.BufferInfo) = guarded(Unit) {
         if (started) return@guarded sink.write(track, data, info)
         val copy = ByteBuffer.allocate(info.size)
         copy.put(data.duplicate().apply { position(info.offset); limit(info.offset + info.size) }).flip()
-        early += Triple(track, copy, MediaCodec.BufferInfo().apply { set(0, info.size, info.presentationTimeUs, info.flags) })
+        early += Triple(track, copy, MediaCodec.BufferInfo().also { it.size = info.size; it.presentationTimeUs = info.presentationTimeUs; it.flags = info.flags })
+        earlyBytes[track] = (earlyBytes[track] ?: 0L) + info.size
+    }
+
+    @Synchronized fun end(track: Int) = guarded(Unit) {
+        if (started) sink.end(track) else endedEarly += track
     }
 
     @Synchronized fun finish() {

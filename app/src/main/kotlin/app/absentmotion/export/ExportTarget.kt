@@ -18,15 +18,15 @@ interface ExportStore {
     fun delete(uri: Uri)
 }
 
-class OpenExport(val uri: Uri, val fd: FileDescriptor, private val close: () -> Unit, private val finish: () -> Unit, private val remove: () -> Unit) {
-    fun publish() {
+class OpenExport(val fd: FileDescriptor, private val close: () -> Unit, private val finish: () -> Uri, private val remove: () -> Unit) {
+    fun publish(): Uri {
         close()
-        finish()
+        return finish()
     }
 
     fun discard() {
         runCatching(close)
-        remove()
+        runCatching(remove).onFailure { android.util.Log.w("AMExport", "the unfinished export is removed at the next start", it) }
     }
 }
 

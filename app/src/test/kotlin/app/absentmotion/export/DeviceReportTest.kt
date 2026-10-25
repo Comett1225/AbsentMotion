@@ -4,6 +4,7 @@ import app.absentmotion.R
 import app.absentmotion.i18n.txt
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -102,5 +103,62 @@ class DeviceReportTest {
     @Test fun jsonRoundTrip() {
         assertEquals(report, DeviceReport.fromJson(JSONObject(report.toJson().toString())))
         assertEquals(1080.0 * 1920 * 60, report.probe!!.pixelsPerSecond, 1.0)
+        val android13 = report.copy(sdk = 33)
+        assertEquals(android13, DeviceReport.fromJson(JSONObject(android13.toJson().toString())))
+    }
+
+    @Test fun aCustomSizeTheSparseProbesMissIsConfirmedExactly() {
+        val wide = EncoderCaps("enc.avc", "video/avc", true, 64..4096, 64..2160, 2, 2,
+            ProbeSizes.filter { (w, h) -> w <= 3840 && h <= 2160 }.map { (w, h) -> SizePoint(w, h, 30.0) }, 1..100_000_000)
+        val device = DeviceReport("k", listOf(wide, aac))
+        assertTrue(device.check(ExportSettings(720, 30), 4096, 720) is Support.Unsupported)
+        assertEquals(listOf(wide), device.unconfirmed(4096, 720))
+        assertEquals(emptyList<EncoderCaps>(), device.unconfirmed(1920, 1080))
+        assertEquals(emptyList<EncoderCaps>(), device.unconfirmed(5000, 720))
+        val confirmed = device.withSizes(mapOf("enc.avc video/avc" to SizePoint(4096, 720, 60.0)))
+        assertEquals(Support.Supported, confirmed.check(ExportSettings(720, 30), 4096, 720))
+        assertEquals(emptyList<EncoderCaps>(), confirmed.unconfirmed(4096, 720))
+    }
+
+    @Test fun soundSettingsTheEncoderRefusesAreCaughtWithAFix() {
+        val narrow = EncoderCaps("aac.hw", "audio/mp4a-latm", true, bitrates = 64_000..192_000, sampleRates = listOf(48000), maxChannels = 2)
+        val device = DeviceReport("k", listOf(video("video/avc", true), narrow))
+        val s = ExportSettings(1080, 30, audio = AudioSettings(AudioCodec.Aac, 320, 44100, 2))
+        val refused = device.check(s, 1080, 1920) as Support.Unsupported
+        assertTrue(refused.sound)
+        assertEquals(txt(R.string.export_support_audio_settings, "AAC"), refused.reason)
+        assertEquals(AudioSettings(AudioCodec.Aac, 192, 48000, 2), refused.suggestion?.audio)
+        assertEquals(Support.Supported, device.check(refused.suggestion!!, 1080, 1920))
+        assertEquals(Support.Supported, device.check(s, 1080, 1920, hasAudio = false))
+        assertEquals(Support.Supported, report.check(s, 1080, 1920))
+    }
+
+    @Test fun mp4WithAv1OrApvNeedsTheAndroidVersionWhoseMuxerWritesIt() {
+        val all = DeviceReport("k", listOf(video("video/avc", true), video("video/av01", true), video("video/apv", true), video("video/x-vnd.on2.vp9", true), aac, opus))
+        val av1 = ExportSettings(1080, 30, Codec.Av1)
+        assertEquals(Support.Supported, all.check(av1, 1080, 1920))
+        val old = all.copy(sdk = 33)
+        val refused = old.check(av1, 1080, 1920) as Support.Unsupported
+        assertEquals(txt(R.string.export_problem_android, "MP4", "AV1", "14"), refused.reason)
+        assertEquals(Container.WebM, refused.suggestion?.container)
+        assertEquals(Codec.Av1, refused.suggestion?.codec)
+        val apv = old.copy(sdk = 35).check(ExportSettings(1080, 30, Codec.Apv), 1080, 1920) as Support.Unsupported
+        assertEquals(txt(R.string.export_problem_android, "MP4", "APV", "16"), apv.reason)
+        assertEquals(Codec.H264, apv.suggestion?.codec)
+        assertEquals(Support.Supported, all.copy(sdk = 36).check(ExportSettings(1080, 30, Codec.Apv), 1080, 1920))
+        assertEquals(Support.Supported, old.check(av1.copy(container = Container.Mkv), 1080, 1920))
+    }
+
+    @Test fun audioOnlyFormatsAreCheckedAgainstTheEncodersAndTheAndroidVersion() {
+        val flac = EncoderCaps("flac", "audio/flac", false, bitrates = 1..21_000_000, sampleRates = listOf(44100, 48000), maxChannels = 2)
+        val device = DeviceReport("k", listOf(aac, opus, flac), sdk = 30)
+        assertNull(device.checkAudioOnly(ExportSettings(360, 30, audioFormat = AudioFormat.Flac)))
+        assertNull(device.checkAudioOnly(ExportSettings(360, 30, audioFormat = AudioFormat.Ogg)))
+        assertNull(device.checkAudioOnly(ExportSettings(360, 30, audioFormat = AudioFormat.Wav24)))
+        assertEquals(txt(R.string.export_problem_android, "Ogg", "Opus", "10"), device.copy(sdk = 28).checkAudioOnly(ExportSettings(360, 30, audioFormat = AudioFormat.Ogg)))
+        assertEquals(txt(R.string.export_support_no_encoder, "FLAC"), report.checkAudioOnly(ExportSettings(360, 30, audioFormat = AudioFormat.Flac)))
+        val mono = EncoderCaps("aac1", "audio/mp4a-latm", false, bitrates = 8000..960000, sampleRates = listOf(44100), maxChannels = 1)
+        assertEquals(txt(R.string.export_support_audio_settings, "AAC"),
+            DeviceReport("k", listOf(mono)).checkAudioOnly(ExportSettings(360, 30, audioFormat = AudioFormat.M4a)))
     }
 }

@@ -25,7 +25,6 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import org.json.JSONArray
 import org.json.JSONObject
-import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
@@ -47,16 +46,18 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
                 when (kind) {
                     ExportKind.Video -> s.fixedFormat().let { f ->
                         val started = android.os.SystemClock.elapsedRealtime()
+                        formatProblem(f, false, android.os.Build.VERSION.SDK_INT)?.let { throw ExportError(it) }
                         var paused = 0L
                         var mix: AudioMix? = null
                         val written = retryingEncoder(note) {
+                        var looks: FrameLooks? = null
                             progress(0f)
                             mix = ExportAudio.mixFor?.invoke(scene, f.audio.effectiveRate)
                             try {
                                 direct(saved, name, f.container.ext, f.container.mime, "Movies/$AppFolder") { fd ->
                                     watched { alive ->
                                         cool { thermal ->
-                                            exportVideo(engine, scene, xml, f, fd, mix, thermal.hot, { thermal.pauseMs().also { paused += it } }, note) { alive(); progress(it) }
+                                            exportVideo(engine, scene, xml, f, fd, mix, thermal.hot, { thermal.pauseMs().also { paused += it } }, note, { looks = it }) { alive(); progress(it) }
                                         }
                                     }
                                 }
@@ -64,7 +65,7 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
                                 (mix as? java.io.Closeable)?.close()
                             }
                         }
-                        written.verified(kind, scene, f, mix != null).unreadable(mix, scene).also {
+                        written.verified(kind, scene, f, mix != null, looks).unreadable(mix, scene).also {
                             val (w, h) = exportSize(scene, f.shortSide, even = true)
                             val ms = android.os.SystemClock.elapsedRealtime() - started - paused
                             ExportTimes(context).record(ExportRecord(f.codec, w, h, f.fps, frameCount(scene, f.fps), ms.coerceAtLeast(1), f.interpolation))
@@ -80,19 +81,24 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
                             (mix as? java.io.Closeable)?.close()
                         }
                     }
-                    ExportKind.Gif -> direct(saved, name, "gif", "image/gif", "Pictures/$AppFolder") { fd ->
-                        watched { alive -> cool { gif(scene, xml, s, fdStream(fd), it::pauseMs) { p -> alive(); progress(p) } } }
-                    }.verified(kind, scene, s, false)
+                    ExportKind.Gif -> {
+                        exportSize(scene, s.shortSide, even = false).let { (w, h) -> checkPicture(w, h) }
+                        direct(saved, name, "gif", "image/gif", "Pictures/$AppFolder") { fd ->
+                            watched { alive -> cool { gif(scene, xml, s, fdStream(fd), it::pauseMs) { p -> alive(); progress(p) } } }
+                        }.verified(kind, scene, s, false)
+                    }
                     ExportKind.Frame, ExportKind.FrameAs -> {
                         val shape = if (kind == ExportKind.Frame) s.copy(image = ImageKind.Png) else s
-                        single(saved, name, shape.image.ext, shape.image.mime, "Pictures/$AppFolder") { out ->
-                            engine.exportSession(xml) {
-                                val bytes = still(scene.frameStart(frame), scene.width, scene.height) ?: throw ExportError(txt(R.string.export_error_draw_still))
-                                out.write(encode(bytes, scene.width, scene.height, shape, reuse = null))
-                            }
-                        }.verified(kind, scene, shape, false)
+                        imageProblem(shape.image, android.os.Build.VERSION.SDK_INT)?.let { throw ExportError(it) }
+                        checkPicture(scene.width, scene.height)
+                        val pixels = engine.exportSession(xml) { still(scene.frameStart(frame), scene.width, scene.height) } ?: throw ExportError(txt(R.string.export_error_draw_still))
+                        save(saved, null, "$name.${shape.image.ext}", shape.image.mime) { encode(pixels, scene.width, scene.height, shape, null, it) }
+                        ExportResult(saved, shape.image.mime, store.location("Pictures/$AppFolder")).verified(kind, scene, shape, false)
                     }
-                    ExportKind.Xml -> single(saved, name, "xml", "text/xml", "Documents/$AppFolder") { it.write(xml.toByteArray()) }
+                    ExportKind.Xml -> {
+                        save(saved, null, "$name.xml", "text/xml") { it.write(xml.toByteArray()) }
+                        ExportResult(saved, "text/xml", store.location("Documents/$AppFolder"))
+                    }
                     ExportKind.Package -> direct(saved, name, "absproj", "application/octet-stream", "Documents/$AppFolder") { fd ->
                         watched { alive -> pack(scene, xml, fdStream(fd)) { alive(); progress(it) } }
                     }
@@ -135,16 +141,14 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
     private suspend fun save(saved: MutableList<Uri>, folder: String?, name: String, mime: String, write: (java.io.OutputStream) -> Unit) =
         withContext(Dispatchers.IO) { saved.add(store.save(folder, name, mime, write)) }
 
-    private suspend fun single(saved: MutableList<Uri>, name: String, ext: String, mime: String, where: String, write: suspend (java.io.OutputStream) -> Unit): ExportResult {
-        val buffer = ByteArrayOutputStream()
-        write(buffer)
-        save(saved, null, "$name.$ext", mime) { it.write(buffer.toByteArray()) }
-        return ExportResult(saved, mime, store.location(where))
+    private suspend fun checkPicture(width: Int, height: Int) {
+        val side = engine.maxPictureSize()
+        exportCheck(width <= side && height <= side && stillFits(width, height)) { txt(R.string.export_error_too_large, "${width}x$height") }
     }
 
     private suspend fun direct(saved: MutableList<Uri>, name: String, ext: String, mime: String, where: String, make: suspend (java.io.FileDescriptor) -> Unit): ExportResult {
         val file = withContext(Dispatchers.IO) { store.open(null, "$name.$ext", mime) }
-        try {
+        val uri = try {
             make(file.fd)
             withContext(Dispatchers.IO) { file.publish() }
         } catch (t: Throwable) {
@@ -152,12 +156,12 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
             withContext(NonCancellable + Dispatchers.IO) { file.discard() }
             throw if (full) StorageFullException() else t
         }
-        saved.add(file.uri)
+        saved.add(uri)
         return ExportResult(saved, mime, store.location(where))
     }
 
-    private suspend fun ExportResult.verified(kind: ExportKind, scene: Scene, s: ExportSettings, hasAudio: Boolean): ExportResult {
-        val check = expectationFor(kind, scene, s, hasAudio)?.let { verifyExport(context, uris.first(), it) }
+    private suspend fun ExportResult.verified(kind: ExportKind, scene: Scene, s: ExportSettings, hasAudio: Boolean, looks: FrameLooks? = null): ExportResult {
+        val check = expectationFor(kind, scene, s, hasAudio, looks)?.let { verifyExport(context, uris.first(), it) }
             ?: pictureExpectationFor(kind, scene, s)?.let { verifyPicture(context, uris.first(), it) }
         return if (check == null) this else ExportResult(uris, mime, where, check)
     }
@@ -189,7 +193,7 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
                 for (k in 0 until frames) {
                     currentCoroutineContext().ensureActive()
                     val pixels = still(frameTimeMs(scene, s.fps, k), width, height) ?: throw ExportError(txt(R.string.export_error_draw_frame, k.toString()))
-                    withContext(Dispatchers.Default) { writer.frame(ImageEncode.flatten(pixels, s.background), (k + 1) * 1000L / s.fps) }
+                    withContext(Dispatchers.Default) { writer.frame(ImageEncode.flatten(pixels, s.background, pixels), (k + 1) * 1000L / s.fps) }
                     progress((k + 1f) / frames)
                     if (k % 30 == 0) ensureStorage()
                     pauseMs().takeIf { it > 0 }?.let { kotlinx.coroutines.delay(it) }
@@ -203,13 +207,14 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
         val (width, height) = exportSize(scene, s.shortSide, even = false)
         val frames = frameCount(scene, s.fps)
         val bitmap = app.absentmotion.platform.makeBitmap(width, height)
+        imageProblem(s.image, android.os.Build.VERSION.SDK_INT)?.let { throw ExportError(it) }
+        checkPicture(width, height)
         try {
             engine.exportSession(xml, s.smoothing, s.fps) {
                 for (k in 0 until frames) {
                     currentCoroutineContext().ensureActive()
                     val pixels = still(frameTimeMs(scene, s.fps, k), width, height) ?: throw ExportError(txt(R.string.export_error_draw_frame, k.toString()))
-                    val bytes = withContext(Dispatchers.Default) { encode(pixels, width, height, s, bitmap) }
-                    save(saved, name, sequenceFrameName(k, s.image.ext), s.image.mime) { it.write(bytes) }
+                    save(saved, name, sequenceFrameName(k, s.image.ext), s.image.mime) { encode(pixels, width, height, s, bitmap, it) }
                     progress((k + 1f) / frames)
                 }
             }
@@ -223,8 +228,10 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
         writeProjectPackage(scene, xml, out, access, { uri -> runCatching { context.contentResolver.openInputStream(Uri.parse(uri)) }.getOrNull() }) { ensureStorage(); progress(it) }
     }
 
-    private fun encode(pixels: ByteArray, width: Int, height: Int, settings: ExportSettings, reuse: Bitmap?): ByteArray {
-        return app.absentmotion.platform.encodeRgba(pixels, width, height, settings, reuse)
+    private fun encode(pixels: ByteArray, width: Int, height: Int, settings: ExportSettings, reuse: Bitmap?, out: OutputStream) {
+        val buffered = out.buffered(1 shl 16)
+        app.absentmotion.platform.encodeRgba(pixels, width, height, settings, reuse, buffered)
+        buffered.flush()
     }
 }
 

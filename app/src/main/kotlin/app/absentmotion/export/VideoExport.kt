@@ -61,15 +61,17 @@ private const val OpusLookaheadFrames = 312
 
 internal suspend fun exportVideo(
     engine: EngineThread, scene: Scene, xml: String, s: ExportSettings, out: FileDescriptor, audio: AudioMix?,
-    hotAtStart: Boolean = false, pauseMs: () -> Long = { 0L }, note: (UiText) -> Unit = {}, progress: (Float) -> Unit,
+    hotAtStart: Boolean = false, pauseMs: () -> Long = { 0L }, note: (UiText) -> Unit = {}, looks: (FrameLooks) -> Unit = {}, progress: (Float) -> Unit,
 ) {
     val (width, height) = exportSize(scene, s.shortSide, even = true)
     val frames = frameCount(scene, s.fps)
     EncoderTrouble.last = null
     holdingVideo(engine::holdVideo, engine::releaseVideo) {
-        encode(engine, scene, xml, s, out, audio, width, height, frames, hotAtStart, pauseMs, note, progress)
+        encode(engine, scene, xml, s, out, audio, width, height, frames, hotAtStart, pauseMs, note, looks, progress)
     }
 }
+
+private const val LookSide = 32
 
 internal suspend fun <T> holdingVideo(hold: () -> Job?, release: () -> Job?, block: suspend () -> T): T {
     val held = hold()
@@ -146,13 +148,13 @@ private fun encoderFormat(info: MediaCodecInfo, caps: MediaCodecInfo.CodecCapabi
 
 private suspend fun encode(
     engine: EngineThread, scene: Scene, xml: String, s: ExportSettings, out: FileDescriptor, audio: AudioMix?, width: Int, height: Int, frames: Int,
-    hotAtStart: Boolean, pauseMs: () -> Long, note: (UiText) -> Unit, progress: (Float) -> Unit,
+    hotAtStart: Boolean, pauseMs: () -> Long, note: (UiText) -> Unit, looks: (FrameLooks) -> Unit, progress: (Float) -> Unit,
 ) {
     val encoder = openVideoEncoder(s, width, height, hotAtStart, note)
     val stop = AtomicBoolean()
     val failure = AtomicReference<Throwable>()
     fun fail(t: Throwable) { failure.compareAndSet(null, t); stop.set(true) }
-    val mux = try { Mux(openSink(s.container, out, s.fps, fixedBt601(encoder.codecInfo)), if (audio != null) 2 else 1, ::fail) } catch (t: Throwable) { encoder.release(); throw t }
+    val mux = try { Mux(openSink(s.container, out, s.fps, fixedBt601(encoder.codecInfo)), if (audio != null) 2 else 1, MuxBudgetBytes, stop::get, ::fail) } catch (t: Throwable) { encoder.release(); throw t }
     val videoDone = AtomicBoolean()
     val workers = ArrayList<Thread>()
     var surface: Surface? = null
@@ -173,6 +175,13 @@ private suspend fun encode(
             worker("audio-in") { feedAudio(coder, audio, totalUs, stop, delay, sound.effectiveRate, sound.channels) }
         }
         engine.exportSession(xml, s.smoothing, s.fps) {
+            var firstLook: FloatArray? = null
+            suspend fun look(k: Int) {
+                val rgba = runCatching { still(frameTimeMs(scene, s.fps, k), LookSide, LookSide) }.getOrNull() ?: return
+                val seen = rgbaLook(rgba, LookSide, LookSide)
+                if (k == 0) firstLook = seen
+                if (k == frames / 2) firstLook?.let { looks(FrameLooks(k * 1_000_000L / s.fps, it, seen)) }
+            }
             suspend fun eachFrame(flush: () -> Unit = {}, draw: suspend (k: Int, presentNs: Long) -> Unit) {
                 val started = System.nanoTime()
                 for (k in 0 until frames) {
@@ -181,6 +190,7 @@ private suspend fun encode(
                     val drawing = System.nanoTime()
                     draw(k, (BASE_US + k * 1_000_000L / s.fps) * 1000)
                     spent[0] += System.nanoTime() - drawing
+                    if (k == 0 || k == frames / 2) look(k)
                     progress((k + 1f) / frames * 0.98f)
                     if (k % 30 == 0) ensureStorage()
                     pauseMs().takeIf { it > 0 }?.let { delay(it) }
@@ -290,7 +300,10 @@ internal fun drain(codec: MediaCodec, mux: Mux, stop: AtomicBoolean, ptsShift: L
                     }
                 }
                 codec.releaseOutputBuffer(index, false)
-                if (info.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) return
+                if (info.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) {
+                    if (track >= 0) mux.end(track)
+                    return
+                }
             }
         }
     }
@@ -328,16 +341,29 @@ internal fun feedAudio(codec: MediaCodec, mix: AudioMix, totalUs: Long, stop: At
 internal fun toChannels(stereo: ShortArray, channels: Int): ShortArray =
     if (channels != 1) stereo else ShortArray(stereo.size / 2) { ((stereo[2 * it] + stereo[2 * it + 1]) / 2).toShort() }
 
-internal fun createAudioEncoder(a: AudioSettings): MediaCodec {
-    val codec = MediaCodec.createEncoderByType(a.codec.mime)
-    try {
-        codec.configure(MediaFormat.createAudioFormat(a.codec.mime, a.effectiveRate, a.channels).apply {
-            if (a.codec == AudioCodec.Aac) setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLC)
-            setInteger(MediaFormat.KEY_BIT_RATE, a.bitrateKbps * 1000)
-        }, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
-        codec.start()
-        return codec
-    } catch (t: Throwable) { codec.release(); throw t }
+internal fun createAudioEncoder(a: AudioSettings): MediaCodec =
+    startEncoder(MediaFormat.createAudioFormat(a.codec.mime, a.effectiveRate, a.channels).apply {
+        if (a.codec == AudioCodec.Aac) setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLC)
+        setInteger(MediaFormat.KEY_BIT_RATE, a.bitrateKbps * 1000)
+    }, a.codec.label)
+
+internal fun startEncoder(format: MediaFormat, label: String): MediaCodec {
+    val mime = format.getString(MediaFormat.KEY_MIME)!!
+    val names = MediaCodecList(MediaCodecList.REGULAR_CODECS).codecInfos
+        .filter { it.isEncoder && !it.alias && it.supportedTypes.any { type -> type.equals(mime, ignoreCase = true) } }.map { it.name }
+    if (names.isEmpty()) throw ExportError(txt(R.string.export_support_no_encoder, label))
+    for (name in names) {
+        val codec = try { MediaCodec.createByCodecName(name) } catch (e: Exception) { Log.w("AMExport", "cannot create $name", e); continue }
+        try {
+            codec.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
+            codec.start()
+            return codec
+        } catch (e: Exception) {
+            Log.w("AMExport", "$name refused $format", e)
+            codec.release()
+        }
+    }
+    throw ExportError(txt(R.string.export_error_audio_encoder, label))
 }
 
 internal fun exportAacForTest(file: File, totalUs: Long) {

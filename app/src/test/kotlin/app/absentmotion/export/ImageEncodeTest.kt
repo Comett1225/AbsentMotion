@@ -21,6 +21,14 @@ class ImageEncodeTest {
     }
 
     @Test
+    fun flattenCanReuseThePixelsOfAFrameItOwns() {
+        val pixels = px(200, 100, 50, 128) + px(1, 2, 3, 255)
+        val out = ImageEncode.flatten(pixels, BackgroundBlack, pixels)
+        assertTrue(out === pixels)
+        assertEquals(listOf(100, 50, 25, 255, 1, 2, 3, 255), out.map { it.toInt() and 255 })
+    }
+
+    @Test
     fun flattenOntoBlackDarkensHalfTransparentPixels() {
         val out = ImageEncode.flatten(px(200, 100, 50, 128), BackgroundBlack)
         assertEquals(listOf(100, 50, 25, 255), out.map { it.toInt() and 255 })
@@ -55,7 +63,7 @@ class ImageEncodeTest {
     @Test
     fun bmpHasTheRightHeaderRowPaddingAndBottomUpBgrRows() {
         val rgba = px(1, 2, 3, 255) + px(4, 5, 6, 255) + px(7, 8, 9, 255) + px(10, 11, 12, 255) + px(13, 14, 15, 255) + px(16, 17, 18, 255)
-        val bmp = ImageEncode.bmp(rgba, 3, 2)
+        val bmp = java.io.ByteArrayOutputStream().also { ImageEncode.bmp(rgba, 3, 2, it) }.toByteArray()
         val b = ByteBuffer.wrap(bmp).order(ByteOrder.LITTLE_ENDIAN)
         assertEquals("BM", String(bmp, 0, 2))
         assertEquals(bmp.size, b.getInt(2))

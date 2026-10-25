@@ -13,6 +13,7 @@ import app.absentmotion.i18n.AppText
 import app.absentmotion.i18n.UiText
 import app.absentmotion.i18n.txt
 import app.absentmotion.media.openDecoder
+import app.absentmotion.platform.intOr
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.DataInputStream
@@ -20,7 +21,9 @@ import java.io.EOFException
 import java.io.InputStream
 import kotlin.math.abs
 
-data class Expectation(val video: Boolean, val audio: Boolean, val durationUs: Long, val frameUs: Long)
+class FrameLooks(val middleUs: Long, val first: FloatArray, val middle: FloatArray)
+
+data class Expectation(val video: Boolean, val audio: Boolean, val durationUs: Long, val frameUs: Long, val looks: FrameLooks? = null)
 
 data class ProbedTrack(val mime: String, val durationUs: Long)
 
@@ -30,13 +33,48 @@ data class Verification(
     val firstFrame: Boolean?,
     val lastFrame: Boolean?,
     val ms: Long,
+    val middleFrame: Boolean? = null,
 ) {
     val ok: Boolean get() = problems.isEmpty()
 }
 
 internal const val AudioOverhangUs = 100_000L
 
-internal fun judge(tracks: List<ProbedTrack>, expect: Expectation, firstFrame: Boolean?, lastFrame: Boolean?): List<UiText> {
+internal const val LookCells = 8
+
+internal fun lookDistance(a: FloatArray, b: FloatArray): Float = a.indices.sumOf { kotlin.math.abs(a[it] - b[it]).toDouble() }.toFloat() / a.size.coerceAtLeast(1)
+
+internal fun middleLooksRight(drawn: FrameLooks, decodedFirst: FloatArray, decodedMiddle: FloatArray): Boolean {
+    if (lookDistance(drawn.middle, decodedMiddle) > 0.2f) return false
+    return !(lookDistance(decodedFirst, decodedMiddle) < 0.01f && lookDistance(drawn.first, drawn.middle) > 0.06f)
+}
+
+internal fun rgbaLook(rgba: ByteArray, width: Int, height: Int): FloatArray {
+    val sums = FloatArray(LookCells * LookCells)
+    val counts = IntArray(LookCells * LookCells)
+    for (y in 0 until height) for (x in 0 until width) {
+        val i = (y * width + x) * 4
+        val a = (rgba[i + 3].toInt() and 255) / 255f
+        val luma = (0.2126f * (rgba[i].toInt() and 255) + 0.7152f * (rgba[i + 1].toInt() and 255) + 0.0722f * (rgba[i + 2].toInt() and 255)) / 255f * a
+        val cell = y * LookCells / height * LookCells + x * LookCells / width
+        sums[cell] += luma
+        counts[cell]++
+    }
+    return FloatArray(sums.size) { sums[it] / counts[it].coerceAtLeast(1) }
+}
+
+internal fun yLook(plane: java.nio.ByteBuffer, rowStride: Int, pixelStride: Int, left: Int, top: Int, width: Int, height: Int): FloatArray =
+    FloatArray(LookCells * LookCells) { cell ->
+        var sum = 0f
+        for (sy in 0 until 4) for (sx in 0 until 4) {
+            val x = left + ((cell % LookCells) * 4 + sx) * width / (LookCells * 4) + width / (LookCells * 8)
+            val y = top + ((cell / LookCells) * 4 + sy) * height / (LookCells * 4) + height / (LookCells * 8)
+            sum += (((plane.get(y * rowStride + x * pixelStride).toInt() and 255) - 16) / 219f).coerceIn(0f, 1f)
+        }
+        sum / 16
+    }
+
+internal fun judge(tracks: List<ProbedTrack>, expect: Expectation, firstFrame: Boolean?, lastFrame: Boolean?, middleFrame: Boolean? = null): List<UiText> {
     val problems = ArrayList<UiText>()
     val video = tracks.filter { it.mime.startsWith("video/") }
     val audio = tracks.filter { it.mime.startsWith("audio/") }
@@ -51,6 +89,7 @@ internal fun judge(tracks: List<ProbedTrack>, expect: Expectation, firstFrame: B
     }
     if (expect.video && video.isNotEmpty()) {
         if (firstFrame == false) problems += txt(R.string.export_verify_first_frame)
+        if (middleFrame == false) problems += txt(R.string.export_verify_middle_frame)
         if (lastFrame == false) problems += txt(R.string.export_verify_last_frame)
     }
     return problems
@@ -66,8 +105,9 @@ suspend fun verifyExport(context: Context, uri: Uri, expect: Expectation): Verif
             ProbedTrack(f.getString(MediaFormat.KEY_MIME).orEmpty(), if (f.containsKey(MediaFormat.KEY_DURATION)) f.getLong(MediaFormat.KEY_DURATION) else 0L)
         }
         val videoIndex = tracks.indexOfFirst { it.mime.startsWith("video/") }
-        val (first, last) = if (videoIndex >= 0) decodeEnds(extractor, videoIndex, formats[videoIndex], start + DecodeBudgetMs) else null to null
-        Verification(judge(tracks, expect, first, last), tracks.maxOfOrNull { it.durationUs } ?: 0, first, last, SystemClock.elapsedRealtime() - start)
+        val frames = if (videoIndex >= 0) decodeFrames(extractor, videoIndex, formats[videoIndex], expect.looks) else Decoded()
+        Verification(judge(tracks, expect, frames.first, frames.last, frames.middle), tracks.maxOfOrNull { it.durationUs } ?: 0, frames.first, frames.last,
+            SystemClock.elapsedRealtime() - start, frames.middle)
     } catch (e: Exception) {
         Verification(listOf(txt(R.string.export_verify_unreadable, e.message ?: e.javaClass.simpleName)), 0, null, null, SystemClock.elapsedRealtime() - start)
     } finally {
@@ -75,15 +115,26 @@ suspend fun verifyExport(context: Context, uri: Uri, expect: Expectation): Verif
     }
 }
 
-private const val DecodeBudgetMs = 800L
+internal fun decodeBudgetMs(width: Int, height: Int): Long = (800L + width.toLong() * height / 5_000).coerceIn(800L, 5_000L)
 
-private fun decodeEnds(extractor: MediaExtractor, track: Int, format: MediaFormat, deadline: Long): Pair<Boolean?, Boolean?> {
-    val mime = format.getString(MediaFormat.KEY_MIME) ?: return null to null
-    val codec = try { openDecoder(format, null) } catch (e: Exception) { return null to null }
+private class Decoded(val first: Boolean? = null, val middle: Boolean? = null, val last: Boolean? = null)
+
+private class Frame(val pts: Long, val look: FloatArray?)
+
+private fun decodeFrames(extractor: MediaExtractor, track: Int, format: MediaFormat, looks: FrameLooks?): Decoded {
+    val budget = decodeBudgetMs(format.intOr(MediaFormat.KEY_WIDTH, 1920), format.intOr(MediaFormat.KEY_HEIGHT, 1080))
+    format.setInteger(MediaFormat.KEY_COLOR_FORMAT, android.media.MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Flexible)
+    val codec = try { openDecoder(format, null) } catch (e: Exception) { return Decoded() }
     try {
         extractor.selectTrack(track)
         extractor.seekTo(0, MediaExtractor.SEEK_TO_CLOSEST_SYNC)
-        val first = decode(codec, extractor, deadline, untilEnd = false)
+        val first = frameAt(codec, extractor, SystemClock.elapsedRealtime() + budget, 0, looks != null)
+        var middle: Boolean? = null
+        if (looks != null && first?.look != null) {
+            codec.flush()
+            extractor.seekTo(looks.middleUs, MediaExtractor.SEEK_TO_PREVIOUS_SYNC)
+            middle = frameAt(codec, extractor, SystemClock.elapsedRealtime() + budget, looks.middleUs, true)?.look?.let { middleLooksRight(looks, first.look, it) }
+        }
         var lastSample = 0L
         extractor.seekTo(if (format.containsKey(MediaFormat.KEY_DURATION)) format.getLong(MediaFormat.KEY_DURATION) else Long.MAX_VALUE / 2, MediaExtractor.SEEK_TO_PREVIOUS_SYNC)
         while (extractor.sampleTime >= 0) {
@@ -92,50 +143,73 @@ private fun decodeEnds(extractor: MediaExtractor, track: Int, format: MediaForma
         }
         codec.flush()
         extractor.seekTo(lastSample, MediaExtractor.SEEK_TO_PREVIOUS_SYNC)
-        val last = decode(codec, extractor, deadline, untilEnd = true)?.let { it >= 0 && lastSample - it <= 1_000 }
-        return first?.let { it >= 0 } to last
+        val last = decode(codec, extractor, SystemClock.elapsedRealtime() + budget)?.let { it >= 0 && lastSample - it <= 1_000 }
+        return Decoded(first?.let { it.pts >= 0 }, middle, last)
     } catch (e: MediaCodec.CodecException) {
-        return if (e.errorCode == MediaCodec.CodecException.ERROR_RECLAIMED) null to null else false to false
+        return if (e.errorCode == MediaCodec.CodecException.ERROR_RECLAIMED) Decoded() else Decoded(false, null, false)
     } catch (e: Exception) {
-        return false to false
+        return Decoded(false, null, false)
     } finally {
         runCatching { codec.stop() }
         codec.release()
     }
 }
 
-private fun decode(codec: MediaCodec, extractor: MediaExtractor, deadline: Long, untilEnd: Boolean): Long? {
+private fun feed(codec: MediaCodec, extractor: MediaExtractor): Boolean {
+    val index = codec.dequeueInputBuffer(5_000)
+    if (index < 0) return false
+    val size = extractor.readSampleData(codec.getInputBuffer(index)!!, 0)
+    if (size < 0) {
+        codec.queueInputBuffer(index, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM)
+        return true
+    }
+    codec.queueInputBuffer(index, 0, size, extractor.sampleTime, 0)
+    extractor.advance()
+    return false
+}
+
+private fun frameAt(codec: MediaCodec, extractor: MediaExtractor, deadline: Long, targetUs: Long, look: Boolean): Frame? {
+    val info = MediaCodec.BufferInfo()
+    var inputDone = false
+    while (SystemClock.elapsedRealtime() < deadline) {
+        if (!inputDone) inputDone = feed(codec, extractor)
+        val out = codec.dequeueOutputBuffer(info, 5_000)
+        if (out < 0) continue
+        val end = info.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0
+        val hit = info.size > 0 && info.presentationTimeUs >= targetUs - 1_000
+        val seen = if (hit && look) runCatching { codec.getOutputImage(out)?.use(::imageLook) }.getOrNull() else null
+        codec.releaseOutputBuffer(out, false)
+        if (hit) return Frame(info.presentationTimeUs, seen)
+        if (end) return Frame(-1, null)
+    }
+    return null
+}
+
+private fun imageLook(image: android.media.Image): FloatArray {
+    val plane = image.planes[0]
+    val crop = image.cropRect
+    return yLook(plane.buffer, plane.rowStride, plane.pixelStride, crop.left, crop.top, crop.width(), crop.height())
+}
+
+private fun decode(codec: MediaCodec, extractor: MediaExtractor, deadline: Long): Long? {
     val info = MediaCodec.BufferInfo()
     var inputDone = false
     var lastPts = -1L
     while (SystemClock.elapsedRealtime() < deadline) {
-        if (!inputDone) {
-            val index = codec.dequeueInputBuffer(5_000)
-            if (index >= 0) {
-                val size = extractor.readSampleData(codec.getInputBuffer(index)!!, 0)
-                if (size < 0) {
-                    codec.queueInputBuffer(index, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM)
-                    inputDone = true
-                } else {
-                    codec.queueInputBuffer(index, 0, size, extractor.sampleTime, 0)
-                    extractor.advance()
-                }
-            }
-        }
+        if (!inputDone) inputDone = feed(codec, extractor)
         val out = codec.dequeueOutputBuffer(info, 5_000)
         if (out >= 0) {
             val end = info.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0
             if (info.size > 0 || !end) lastPts = maxOf(lastPts, info.presentationTimeUs)
             codec.releaseOutputBuffer(out, false)
-            if (!untilEnd && lastPts >= 0) return lastPts
             if (end) return lastPts
         }
     }
     return null
 }
 
-internal fun expectationFor(kind: ExportKind, scene: app.absentmotion.model.Scene, s: ExportSettings, hasAudio: Boolean): Expectation? = when (kind) {
-    ExportKind.Video -> Expectation(true, hasAudio, frameCount(scene, s.fps) * 1_000_000L / s.fps, 1_000_000L / s.fps)
+internal fun expectationFor(kind: ExportKind, scene: app.absentmotion.model.Scene, s: ExportSettings, hasAudio: Boolean, looks: FrameLooks? = null): Expectation? = when (kind) {
+    ExportKind.Video -> Expectation(true, hasAudio, frameCount(scene, s.fps) * 1_000_000L / s.fps, 1_000_000L / s.fps, looks)
     ExportKind.Audio -> Expectation(false, true, (scene.totalTime + 1) * 1000L, 30_000)
     else -> null
 }

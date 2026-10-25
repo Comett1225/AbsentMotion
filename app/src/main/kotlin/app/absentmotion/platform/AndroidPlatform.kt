@@ -120,22 +120,25 @@ fun wheel(onScroll: (delta: androidx.compose.ui.geometry.Offset, at: androidx.co
 
 fun makeBitmap(width: Int, height: Int): Bitmap = android.graphics.Bitmap.createBitmap(width, height, android.graphics.Bitmap.Config.ARGB_8888)
 fun recycleBitmap(bitmap: Bitmap) = bitmap.recycle()
-fun encodeRgba(pixels: ByteArray, width: Int, height: Int, settings: app.absentmotion.export.ExportSettings, reuse: Bitmap?): ByteArray {
+fun encodeRgba(pixels: ByteArray, width: Int, height: Int, settings: app.absentmotion.export.ExportSettings, reuse: Bitmap?, out: java.io.OutputStream) {
     val kind = settings.image
-    val source = if (kind.alpha) pixels else app.absentmotion.export.ImageEncode.flatten(pixels, settings.background)
-    if (kind == app.absentmotion.export.ImageKind.Bmp) return app.absentmotion.export.ImageEncode.bmp(source, width, height)
+    val source = if (kind.alpha) pixels else app.absentmotion.export.ImageEncode.flatten(pixels, settings.background, pixels)
+    if (kind == app.absentmotion.export.ImageKind.Bmp) return app.absentmotion.export.ImageEncode.bmp(source, width, height, out)
     val bitmap = reuse ?: makeBitmap(width, height)
-    bitmap.isPremultiplied = false
-    bitmap.copyPixelsFromBuffer(java.nio.ByteBuffer.wrap(source))
-    val out = java.io.ByteArrayOutputStream(pixels.size / 4)
-    val format = when (kind) {
-        app.absentmotion.export.ImageKind.Jpeg -> android.graphics.Bitmap.CompressFormat.JPEG
-        app.absentmotion.export.ImageKind.Webp, app.absentmotion.export.ImageKind.WebpLossless -> webpFormat(kind == app.absentmotion.export.ImageKind.WebpLossless)
-        else -> android.graphics.Bitmap.CompressFormat.PNG
+    try {
+        bitmap.isPremultiplied = false
+        bitmap.copyPixelsFromBuffer(java.nio.ByteBuffer.wrap(source))
+        val format = when (kind) {
+            app.absentmotion.export.ImageKind.Jpeg -> android.graphics.Bitmap.CompressFormat.JPEG
+            app.absentmotion.export.ImageKind.Webp, app.absentmotion.export.ImageKind.WebpLossless -> webpFormat(kind == app.absentmotion.export.ImageKind.WebpLossless)
+            else -> android.graphics.Bitmap.CompressFormat.PNG
+        }
+        app.absentmotion.export.exportCheck(bitmap.compress(format, if (kind.lossy) settings.imageQuality else 100, out)) {
+            app.absentmotion.i18n.txt(R.string.export_error_encode_image, app.absentmotion.i18n.txt(kind.label))
+        }
+    } finally {
+        if (reuse == null) bitmap.recycle()
     }
-    bitmap.compress(format, if (kind.lossy) settings.imageQuality else 100, out)
-    if (reuse == null) bitmap.recycle()
-    return out.toByteArray()
 }
 @androidx.compose.runtime.Composable
 fun ExportBars(dark: Boolean, running: Boolean) {

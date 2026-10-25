@@ -53,8 +53,14 @@ data class EncoderCaps(
 
     private fun covering(width: Int, height: Int) = sizes.filter { it.width >= width && it.height >= height }
 
-    fun fitsSize(width: Int, height: Int): Boolean =
-        width in widths && height in heights && width % widthAlign == 0 && height % heightAlign == 0 && covering(width, height).isNotEmpty()
+    fun inRange(width: Int, height: Int): Boolean =
+        width in widths && height in heights && width % widthAlign.coerceAtLeast(1) == 0 && height % heightAlign.coerceAtLeast(1) == 0
+
+    fun fitsSize(width: Int, height: Int): Boolean = inRange(width, height) && covering(width, height).isNotEmpty()
+
+    fun takesAudio(rate: Int, channels: Int, bitsPerSecond: Int?): Boolean =
+        (sampleRates.isEmpty() || rate in sampleRates) && (maxChannels <= 0 || channels <= maxChannels) &&
+            (bitsPerSecond == null || bitrates.last <= 0 || bitsPerSecond in bitrates)
 
     fun fits(width: Int, height: Int, fps: Int): Boolean = fitsSize(width, height) &&
         covering(width, height).any { it.maxFps * it.width * it.height >= fps.toDouble() * width * height * 0.999 }
@@ -72,7 +78,7 @@ sealed interface Support {
     data class Unsupported(val reason: UiText, val suggestion: ExportSettings?, val sound: Boolean = false) : Support
 }
 
-data class DeviceReport(val key: String, val encoders: List<EncoderCaps>, val probe: ProbeResult? = null) {
+data class DeviceReport(val key: String, val encoders: List<EncoderCaps>, val probe: ProbeResult? = null, val sdk: Int = Int.MAX_VALUE) {
     fun encodersFor(mime: String): List<EncoderCaps> = encoders.filter { it.mime == mime }
 
     fun hardware(codec: Codec): Boolean = encodersFor(codec.mime).any { it.hardware }
@@ -82,8 +88,16 @@ data class DeviceReport(val key: String, val encoders: List<EncoderCaps>, val pr
 
     val videoCodecs: List<Codec> get() = Codec.entries.filter { encodersFor(it.mime).isNotEmpty() }
 
+    fun unconfirmed(width: Int, height: Int): List<EncoderCaps> = encoders.filter { it.video && it.inRange(width, height) && !it.fitsSize(width, height) }
+
+    fun withSizes(found: Map<String, SizePoint>): DeviceReport =
+        copy(encoders = encoders.map { e -> found["${e.name} ${e.mime}"]?.let { e.copy(sizes = e.sizes + it) } ?: e })
+
     fun check(s: ExportSettings, width: Int, height: Int, hasAudio: Boolean = true): Support {
-        formatProblem(s, hasAudio)?.let { return Support.Unsupported(it, s.fixedFormat()) }
+        formatProblem(s, hasAudio, sdk)?.let { reason ->
+            val fixed = s.fixedFormat(sdk)
+            return Support.Unsupported(reason, if (formatProblem(fixed, hasAudio, sdk) == null) fixed else alternative(s, width, height))
+        }
         val all = encodersFor(s.codec.mime)
         if (all.isEmpty()) {
             return Support.Unsupported(txt(R.string.export_support_no_encoder, s.codec.label), alternative(s, width, height))
@@ -95,6 +109,9 @@ data class DeviceReport(val key: String, val encoders: List<EncoderCaps>, val pr
         if (hasAudio && encodersFor(s.audio.codec.mime).isEmpty()) {
             return Support.Unsupported(txt(R.string.export_support_no_encoder, s.audio.codec.label), withAac(s), sound = true)
         }
+        if (hasAudio && !takes(s.audio)) {
+            return Support.Unsupported(txt(R.string.export_support_audio_settings, s.audio.codec.label), audioFix(s), sound = true)
+        }
         if (sized.none { it.hardware }) {
             return Support.SlowSoftwareOnly(txt(R.string.export_support_software_only, s.codec.label))
         }
@@ -104,8 +121,34 @@ data class DeviceReport(val key: String, val encoders: List<EncoderCaps>, val pr
         return Support.Supported
     }
 
+    fun checkAudioOnly(s: ExportSettings): UiText? {
+        audioFormatProblem(s.audioFormat, sdk)?.let { return it }
+        val (mime, label) = when (s.audioFormat) {
+            AudioFormat.Flac -> "audio/flac" to "FLAC"
+            AudioFormat.M4a -> AudioCodec.Aac.mime to AudioCodec.Aac.label
+            AudioFormat.Ogg -> AudioCodec.Opus.mime to AudioCodec.Opus.label
+            else -> return null
+        }
+        val found = encodersFor(mime)
+        if (found.isEmpty()) return txt(R.string.export_support_no_encoder, label)
+        val bits = if (s.audioFormat.lossless) null else s.audio.bitrateKbps * 1000
+        return if (found.any { it.takesAudio(audioRate(s), s.audio.channels, bits) }) null else txt(R.string.export_support_audio_settings, label)
+    }
+
+    private fun takes(a: AudioSettings): Boolean = encodersFor(a.codec.mime).any { it.takesAudio(a.effectiveRate, a.channels, a.bitrateKbps * 1000) }
+
+    private fun audioFix(s: ExportSettings): ExportSettings? {
+        val a = s.audio
+        val options = AudioSampleRates.sortedBy { it != a.sampleRate }.flatMap { rate ->
+            listOf(a.channels, 3 - a.channels).flatMap { channels ->
+                AudioBitratesKbps.sortedBy { kotlin.math.abs(it - a.bitrateKbps) }.map { a.copy(sampleRate = rate, channels = channels, bitrateKbps = it) }
+            }
+        }
+        return options.firstOrNull(::takes)?.let { s.copy(audio = it) } ?: withAac(s).takeIf { takes(it.audio) }
+    }
+
     private fun withAac(s: ExportSettings): ExportSettings {
-        val container = s.container.takeIf { AudioCodec.Aac in audioCodecsFor(it) } ?: containersFor(s.codec).first { AudioCodec.Aac in audioCodecsFor(it) }
+        val container = s.container.takeIf { AudioCodec.Aac in audioCodecsFor(it) } ?: containersFor(s.codec, sdk).firstOrNull { AudioCodec.Aac in audioCodecsFor(it) } ?: Container.Mp4
         return s.copy(container = container, audio = s.audio.copy(codec = AudioCodec.Aac))
     }
 
@@ -124,12 +167,13 @@ data class DeviceReport(val key: String, val encoders: List<EncoderCaps>, val pr
         val order = codecs.filter { it != s.codec }.map { it to s.shortSide } +
             sides.flatMap { side -> (listOf(s.codec) + codecs).distinct().map { it to side } }
         for (hardware in listOf(true, false)) {
-            order.firstOrNull { (codec, side) -> fit(codec, side, hardware) }?.let { (codec, side) -> return s.copy(codec = codec, shortSide = side).fixedFormat() }
+            order.firstOrNull { (codec, side) -> fit(codec, side, hardware) && formatProblem(s.copy(codec = codec).fixedFormat(sdk), false, sdk) == null }
+                ?.let { (codec, side) -> return s.copy(codec = codec, shortSide = side).fixedFormat(sdk) }
         }
         return null
     }
 
-    fun toJson(): JSONObject = JSONObject().put("key", key)
+    fun toJson(): JSONObject = JSONObject().put("key", key).put("sdk", sdk)
         .put("encoders", JSONArray().apply { encoders.forEach { put(it.toJson()) } })
         .apply { probe?.let { put("probe", JSONObject().put("codec", it.codec.name).put("width", it.width).put("height", it.height).put("frames", it.frames).put("ms", it.ms).put("setupMs", it.setupMs)) } }
 
@@ -140,6 +184,7 @@ data class DeviceReport(val key: String, val encoders: List<EncoderCaps>, val pr
             json.optJSONObject("probe")?.let { p ->
                 Codec.entries.firstOrNull { it.name == p.optString("codec") }?.let { ProbeResult(it, p.getInt("width"), p.getInt("height"), p.getInt("frames"), p.getLong("ms"), p.optLong("setupMs")) }
             },
+            json.optInt("sdk", Int.MAX_VALUE),
         )
     }
 }
@@ -174,32 +219,39 @@ class DeviceCapabilities private constructor(context: Context) {
         "${Build.FINGERPRINT}|$version"
     }
 
-    @Volatile private var listFailed = false
+    private val listing = Attempt(ListLimitMs, "am-encoder-list") { analyseEncoders() }
+    private val confirmed: MutableSet<String> = java.util.concurrent.ConcurrentHashMap.newKeySet()
 
     suspend fun load(): DeviceReport? = lock.withLock {
         state.value?.let { return it }
         val stored = withContext(Dispatchers.IO) { runCatching { prefs.getString("report", null)?.let { DeviceReport.fromJson(JSONObject(it)) } }.getOrNull() }
-        (stored?.takeIf { it.key == key } ?: encoders()?.let { DeviceReport(key, it).also(::store) })?.also { state.value = it }
-    }
-
-    private suspend fun encoders(): List<EncoderCaps>? {
-        if (listFailed) return null
-        return finishedWithin(ListLimitMs, "am-encoder-list") { analyseEncoders() }.also { if (it == null) listFailed = true }
+        (stored?.takeIf { it.key == key } ?: listing.get()?.let { DeviceReport(key, it, sdk = Build.VERSION.SDK_INT).also(::store) })?.also { state.value = it }
     }
 
     suspend fun runCheckNow(engine: EngineThread?, progress: (Float) -> Unit = {}): DeviceReport {
-        val encoders = encoders() ?: state.value?.encoders ?: throw IllegalStateException("the encoder list is unavailable")
+        val encoders = listing.get() ?: state.value?.encoders ?: throw IllegalStateException("the encoder list is unavailable")
         progress(0.3f)
         val probe = engine?.let { probeWithin(ProbeLimitMs) { probe(it) { p -> progress(0.3f + 0.7f * p) } } }
         progress(1f)
-        return lock.withLock { DeviceReport(key, encoders, probe ?: state.value?.probe).also { store(it); state.value = it } }
+        return lock.withLock { DeviceReport(key, encoders, probe ?: state.value?.probe, Build.VERSION.SDK_INT).also { store(it); state.value = it } }
+    }
+
+    suspend fun confirmSize(width: Int, height: Int) {
+        val open = state.value?.unconfirmed(width, height).orEmpty().filter { confirmed.add("${it.name} ${it.mime} ${width}x$height") }
+        if (open.isEmpty()) return
+        val found = finishedWithin(ListLimitMs, "am-encoder-size") { exactSizes(open, width, height) } ?: return
+        if (found.isNotEmpty()) lock.withLock { state.value?.let { state.value = it.withSizes(found) } }
     }
 
     fun check(settings: ExportSettings, width: Int, height: Int, hasAudio: Boolean = true): Support =
-        state.value?.check(settings, width, height, hasAudio) ?: formatProblem(settings, hasAudio)?.let { Support.Unsupported(it, settings.fixedFormat()) } ?: Support.Supported
+        state.value?.check(settings, width, height, hasAudio)
+            ?: formatProblem(settings, hasAudio, Build.VERSION.SDK_INT)?.let { Support.Unsupported(it, settings.fixedFormat(Build.VERSION.SDK_INT)) } ?: Support.Supported
 
     fun check(settings: ExportSettings, scene: Scene, hasAudio: Boolean = true): Support =
         exportSize(scene, settings.shortSide, even = true).let { (w, h) -> check(settings, w, h, hasAudio) }
+
+    fun checkAudioOnly(settings: ExportSettings): UiText? =
+        state.value?.checkAudioOnly(settings) ?: audioFormatProblem(settings.audioFormat, Build.VERSION.SDK_INT)
 
     private fun store(report: DeviceReport) {
         runCatching { prefs.edit().putString("report", report.toJson().toString()).apply() }
@@ -254,6 +306,35 @@ internal suspend fun <T> finishedWithin(limitMs: Long, name: String, work: () ->
     } catch (e: ExecutionException) {
         null
     }
+}
+
+internal class Attempt<T>(private val limitMs: Long, private val name: String, private val work: () -> T) {
+    private var running: CompletableFuture<T>? = null
+
+    suspend fun get(): T? {
+        val future = synchronized(this) {
+            running?.takeIf { !it.isDone } ?: CompletableFuture<T>().also { next ->
+                running = next
+                thread(name = name, isDaemon = true) { try { next.complete(work()) } catch (t: Throwable) { next.completeExceptionally(t) } }
+            }
+        }
+        return try {
+            runInterruptible(Dispatchers.IO) { future.get(limitMs, TimeUnit.MILLISECONDS) }
+        } catch (e: TimeoutException) {
+            null
+        } catch (e: ExecutionException) {
+            null
+        }
+    }
+}
+
+private fun exactSizes(open: List<EncoderCaps>, width: Int, height: Int): Map<String, SizePoint> {
+    val infos = MediaCodecList(MediaCodecList.REGULAR_CODECS).codecInfos.associateBy { it.name }
+    return open.mapNotNull { caps ->
+        val video = infos[caps.name]?.takeIf { it.isEncoder }?.let { runCatching { it.getCapabilitiesForType(caps.mime).videoCapabilities }.getOrNull() }
+        if (video == null || !video.isSizeSupported(width, height)) null
+        else "${caps.name} ${caps.mime}" to SizePoint(width, height, runCatching { video.getSupportedFrameRatesFor(width, height).upper }.getOrDefault(0.0))
+    }.toMap()
 }
 
 internal suspend fun <T> probeWithin(limitMs: Long, work: suspend () -> T): T? {

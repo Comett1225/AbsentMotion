@@ -129,11 +129,22 @@ internal class FlacSink(private val fd: FileDescriptor, private val totalSamples
     override fun release() {}
 }
 
+internal fun wavFits(frames: Long, channels: Int, bits: Int): Boolean = frames * channels * (bits / 8) <= 0xFFFFFFFFL - 36
+
+internal fun onChange(report: (Long) -> Unit): (Long) -> Unit {
+    var last = Long.MIN_VALUE
+    return { value -> if (value != last) { last = value; report(value) } }
+}
+
 internal suspend fun exportAudio(s: ExportSettings, totalUs: Long, mix: AudioMix, out: FileDescriptor, progress: (Float) -> Unit) =
     withContext(Dispatchers.IO) {
         val rate = audioRate(s)
         val channels = s.audio.channels
         val totalFrames = totalUs * rate / 1_000_000
+        audioFormatProblem(s.audioFormat, android.os.Build.VERSION.SDK_INT)?.let { throw ExportError(it) }
+        if (s.audioFormat == AudioFormat.Wav16 || s.audioFormat == AudioFormat.Wav24) {
+            exportCheck(wavFits(totalFrames, channels, if (s.audioFormat == AudioFormat.Wav24) 24 else 16)) { txt(R.string.export_error_wav_too_long) }
+        }
         when (s.audioFormat) {
             AudioFormat.Wav16, AudioFormat.Wav24 -> writeWav(s.audioFormat == AudioFormat.Wav24, rate, channels, totalFrames, mix, out, progress)
             AudioFormat.Mp3 -> writeMp3(rate, channels, s.audio.bitrateKbps, totalFrames, mix, out, progress)
@@ -197,19 +208,8 @@ private suspend fun writeMp3(rate: Int, channels: Int, kbps: Int, totalFrames: L
     }
 }
 
-private fun flacEncoder(rate: Int, channels: Int): MediaCodec {
-    val codec = MediaCodec.createEncoderByType(MediaFormat.MIMETYPE_AUDIO_FLAC)
-    try {
-        codec.configure(MediaFormat.createAudioFormat(MediaFormat.MIMETYPE_AUDIO_FLAC, rate, channels).apply {
-            setInteger(MediaFormat.KEY_FLAC_COMPRESSION_LEVEL, 5)
-        }, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
-        codec.start()
-        return codec
-    } catch (t: Throwable) {
-        codec.release()
-        throw t
-    }
-}
+private fun flacEncoder(rate: Int, channels: Int): MediaCodec =
+    startEncoder(MediaFormat.createAudioFormat(MediaFormat.MIMETYPE_AUDIO_FLAC, rate, channels).apply { setInteger(MediaFormat.KEY_FLAC_COMPRESSION_LEVEL, 5) }, "FLAC")
 
 private suspend fun encodeAudio(
     codec: MediaCodec, sink: SampleSink, primingFrames: Int?, totalUs: Long, rate: Int, channels: Int, zeroStart: Boolean,
@@ -218,7 +218,7 @@ private suspend fun encodeAudio(
     val stop = AtomicBoolean()
     val failure = AtomicReference<Throwable>()
     fun fail(t: Throwable) { failure.compareAndSet(null, t); stop.set(true) }
-    val mux = Mux(sink, 1, ::fail)
+    val mux = Mux(sink, 1, onError = ::fail)
     val extra = AtomicInteger(primingFrames ?: if (zeroStart) 312 else 0)
     val fed = AtomicLong()
     val total = aacInputFrames(totalUs, extra.get(), rate).coerceAtLeast(1)
@@ -230,10 +230,11 @@ private suspend fun encodeAudio(
             try { feedAudio(codec, mix, totalUs, stop, extra, rate, channels) { fed.set(it) } } catch (t: Throwable) { fail(t) }
         },
     )
+    val beat = onChange { progress(it.toFloat() / total * 0.99f) }
     try {
         while (workers.any { it.isAlive }) {
             currentCoroutineContext().ensureActive()
-            progress(fed.get().toFloat() / total * 0.99f)
+            beat(fed.get())
             ensureStorage()
             delay(50)
         }

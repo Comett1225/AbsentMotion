@@ -80,10 +80,20 @@ fun audioCodecsFor(container: Container): List<AudioCodec> = when (container) {
     Container.Mkv -> listOf(AudioCodec.Aac, AudioCodec.Opus)
 }
 
-fun containersFor(codec: Codec): List<Container> = Container.entries.filter { codec in videoCodecsFor(it) }
+fun platformAndroid(container: Container, codec: Codec): Int = when {
+    container != Container.Mp4 && container != Container.Mov -> 0
+    codec == Codec.Av1 -> 34
+    codec == Codec.Apv -> 36
+    else -> 0
+}
 
-fun formatProblem(s: ExportSettings, hasAudio: Boolean): UiText? = when {
+private fun androidName(sdk: Int): String = when (sdk) { 29 -> "10"; 34 -> "14"; 36 -> "16"; else -> sdk.toString() }
+
+fun containersFor(codec: Codec, sdk: Int = Int.MAX_VALUE): List<Container> = Container.entries.filter { codec in videoCodecsFor(it) && sdk >= platformAndroid(it, codec) }
+
+fun formatProblem(s: ExportSettings, hasAudio: Boolean, sdk: Int = Int.MAX_VALUE): UiText? = when {
     s.codec !in videoCodecsFor(s.container) -> txt(R.string.export_problem_container_video, s.container.label, s.codec.label)
+    sdk < platformAndroid(s.container, s.codec) -> txt(R.string.export_problem_android, s.container.label, s.codec.label, androidName(platformAndroid(s.container, s.codec)))
     hasAudio && s.audio.codec !in audioCodecsFor(s.container) -> txt(R.string.export_problem_container_audio, s.container.label, s.audio.codec.label)
     s.audio.bitrateKbps !in 32..512 -> txt(R.string.export_problem_audio_bitrate)
     s.audio.channels !in 1..2 -> txt(R.string.export_problem_audio_channels)
@@ -91,8 +101,16 @@ fun formatProblem(s: ExportSettings, hasAudio: Boolean): UiText? = when {
     else -> null
 }
 
-fun ExportSettings.fixedFormat(): ExportSettings {
-    val container = if (codec in videoCodecsFor(container)) container else containersFor(codec).firstOrNull() ?: Container.Mp4
+fun audioFormatProblem(format: AudioFormat, sdk: Int): UiText? =
+    if (format == AudioFormat.Ogg && sdk < 29) txt(R.string.export_problem_android, "Ogg", AudioCodec.Opus.label, androidName(29)) else null
+
+fun imageProblem(kind: ImageKind, sdk: Int): UiText? = if (kind == ImageKind.WebpLossless && sdk < 29) txt(R.string.export_reason_webp_lossless) else null
+
+internal fun stillFits(width: Int, height: Int, heapBytes: Long = Runtime.getRuntime().maxMemory()): Boolean =
+    width > 0 && height > 0 && width.toLong() * height * 4 <= heapBytes / 2
+
+fun ExportSettings.fixedFormat(sdk: Int = Int.MAX_VALUE): ExportSettings {
+    val container = if (codec in videoCodecsFor(container) && sdk >= platformAndroid(container, codec)) container else containersFor(codec, sdk).firstOrNull() ?: container.takeIf { codec in videoCodecsFor(it) } ?: Container.Mp4
     val audioCodec = if (audio.codec in audioCodecsFor(container)) audio.codec else audioCodecsFor(container).first()
     return copy(container = container, audio = audio.copy(codec = audioCodec))
 }

@@ -4,6 +4,7 @@ import app.absentmotion.R
 import app.absentmotion.i18n.UiText
 import app.absentmotion.i18n.txt
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -31,6 +32,44 @@ class VerifyTest {
         assertEquals(2, frames.size)
         assertEquals(txt(R.string.export_verify_first_frame), frames[0])
         assertEquals(emptyList<UiText>(), judge(good, video, null, null))
+    }
+
+    private fun flat(value: Float) = FloatArray(LookCells * LookCells) { value }
+
+    @Test fun aBlackOrFrozenMiddleIsReportedAndARealOneIsNot() {
+        val moving = FrameLooks(1_000_000, flat(0.2f), FloatArray(LookCells * LookCells) { if (it % 2 == 0) 0.9f else 0.3f })
+        assertTrue(middleLooksRight(moving, flat(0.21f), FloatArray(LookCells * LookCells) { if (it % 2 == 0) 0.85f else 0.33f }))
+        assertFalse(middleLooksRight(moving, flat(0.21f), flat(0f)))
+        assertFalse(middleLooksRight(moving, flat(0.6f), flat(0.6f)))
+        assertFalse(middleLooksRight(FrameLooks(1_000_000, flat(0.2f), flat(0.35f)), flat(0.2f), flat(0.2f)))
+        val still = FrameLooks(1_000_000, flat(0.5f), flat(0.5f))
+        assertTrue(middleLooksRight(still, flat(0.52f), flat(0.52f)))
+        val dark = FrameLooks(1_000_000, flat(0.02f), flat(0.03f))
+        assertTrue(middleLooksRight(dark, flat(0f), flat(0f)))
+        assertEquals(listOf(txt(R.string.export_verify_middle_frame)), judge(good, video, true, true, false))
+        assertEquals(emptyList<UiText>(), judge(good, video, true, true, null))
+    }
+
+    @Test fun drawnAndDecodedPicturesAreMeasuredTheSameWay() {
+        val rgba = ByteArray(16 * 16 * 4) { i -> if (i % 4 == 3) -1 else if ((i / 4) % 16 < 8) -1 else 0 }
+        val drawn = rgbaLook(rgba, 16, 16)
+        assertEquals(1f, drawn[0], 0.01f)
+        assertEquals(0f, drawn[LookCells - 1], 0.01f)
+        val transparent = rgbaLook(ByteArray(16 * 16 * 4) { i -> if (i % 4 == 3) 0 else -1 }, 16, 16)
+        assertEquals(0f, transparent.max(), 0.001f)
+        val y = java.nio.ByteBuffer.allocate(64 * 32)
+        for (row in 0 until 32) for (x in 0 until 64) y.put(row * 64 + x, (if (x < 32) 235 else 16).toByte())
+        val decoded = yLook(y, 64, 1, 0, 0, 64, 32)
+        assertEquals(1f, decoded[0], 0.01f)
+        assertEquals(0f, decoded[LookCells - 1], 0.01f)
+        assertTrue(lookDistance(drawn, decoded) < 0.01f)
+    }
+
+    @Test fun slowDevicesGetMoreTimeForBigVideos() {
+        assertEquals(800L + 1080L * 1920 / 5_000, decodeBudgetMs(1080, 1920))
+        assertTrue(decodeBudgetMs(3840, 2160) > decodeBudgetMs(1080, 1920))
+        assertTrue(decodeBudgetMs(256, 256) < 900L)
+        assertEquals(5_000L, decodeBudgetMs(8192, 8192))
     }
 
     @Test fun audioOnlyNeedsNoVideo() {

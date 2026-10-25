@@ -2,6 +2,7 @@ package app.absentmotion.export
 
 import org.json.JSONObject
 import org.junit.Assert.assertArrayEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -207,6 +208,35 @@ class ContainerTest {
         assertEquals(48000, fixed.audio.effectiveRate)
         assertEquals(ExportSettings(1080, 30), ExportSettings(1080, 30).fixedFormat())
         assertEquals(AudioSettings(AudioCodec.Aac, 128, 44100, 2), ExportSettings(1080, 30).audio)
+    }
+
+    @Test fun theMuxerOfOlderAndroidVersionsLimitsMp4() {
+        val av1 = ExportSettings(1080, 30, Codec.Av1)
+        assertNull(formatProblem(av1, hasAudio = true, sdk = 34))
+        assertEquals(txt(R.string.export_problem_android, "MP4", "AV1", "14"), formatProblem(av1, hasAudio = true, sdk = 33))
+        assertEquals(listOf(Container.WebM, Container.Mkv), containersFor(Codec.Av1, 33))
+        assertEquals(Container.WebM, av1.fixedFormat(33).container)
+        assertEquals(av1, av1.fixedFormat(34))
+        assertEquals(Container.Mp4, ExportSettings(1080, 30, Codec.Apv).fixedFormat(35).container)
+        assertEquals(txt(R.string.export_problem_android, "Ogg", "Opus", "10"), audioFormatProblem(AudioFormat.Ogg, 28))
+        assertNull(audioFormatProblem(AudioFormat.Ogg, 29))
+        assertNull(audioFormatProblem(AudioFormat.Flac, 28))
+    }
+
+    @Test fun losslessWebpIsOnlyOfferedWhereItIsReallyLossless() {
+        assertEquals(txt(R.string.export_reason_webp_lossless), imageProblem(ImageKind.WebpLossless, 28))
+        assertNull(imageProblem(ImageKind.WebpLossless, 29))
+        assertNull(imageProblem(ImageKind.Webp, 28))
+        assertNull(imageProblem(ImageKind.Png, 28))
+    }
+
+    @Test fun aPictureThatCannotFitInMemoryIsRefusedBeforeDrawing() {
+        val heap = 256L shl 20
+        assertTrue(stillFits(4096, 4096, heap))
+        assertTrue(stillFits(8192, 4096, heap))
+        assertFalse(stillFits(8192, 8192, heap))
+        assertFalse(stillFits(2160, 552_960, heap))
+        assertFalse(stillFits(0, 100, heap))
     }
 
     @Test fun settingsSurviveJsonAndBadValuesFallBack() {
