@@ -395,6 +395,25 @@ class BackupTest {
         }
     }
 
+    @Test fun theWriterNeverChangesTheCompressionOfAStreamItHasUsed() {
+        val root = tmp.newFolder()
+        val store = ProjectStore(root)
+        val id = project(store, "A", "pixels")
+        store.thumbnailFile(id).writeText("png")
+        store.versions.snapshot(id, store.text(id)!!)
+        val methods = LinkedHashMap<String, Int>()
+        java.util.zip.ZipInputStream(ByteArrayInputStream(backup(root))).use { zip ->
+            while (true) {
+                val entry = zip.nextEntry ?: break
+                val data = zip.readBytes()
+                methods[entry.name] = entry.method
+                if (entry.method == ZipEntry.STORED) assertEquals(entry.name, data.size.toLong(), entry.size)
+            }
+        }
+        for ((name, method) in methods) assertEquals(name, if (name.endsWith(".xml") || name == "absentmotion-backup.txt") ZipEntry.DEFLATED else ZipEntry.STORED, method)
+        assertTrue(methods.keys.any { it.endsWith(".png") })
+    }
+
     @Test fun aHugeEntryTheRestoreSkipsStillCountsTowardsTheUnpackLimit() {
         val root = tmp.newFolder("root")
         val bytes = ByteArrayOutputStream().also { out ->

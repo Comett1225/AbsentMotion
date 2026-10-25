@@ -274,8 +274,8 @@ internal suspend fun writeProjectPackage(
         .put("title", scene.title).put("project", "project.xml")
     val media = JSONArray()
     ZipOutputStream(out.buffered()).use { zip ->
-        zip.putNextEntry(ZipEntry("project.xml")); zip.write(xml.toByteArray()); zip.closeEntry()
         zip.setLevel(0)
+        zip.putNextEntry(ZipEntry("project.xml")); zip.write(xml.toByteArray()); zip.closeEntry()
         uris.forEachIndexed { i, uri ->
             currentCoroutineContext().ensureActive()
             val file = scene.mediaName(uri)
@@ -308,7 +308,6 @@ internal suspend fun writeProjectPackage(
             media.put(record)
             progress((i + 1f) / uris.size * 0.95f)
         }
-        zip.setLevel(6)
         val fonts = JSONArray()
         val packed = HashMap<File, String>()
         for (font in scene.fontNames()) {

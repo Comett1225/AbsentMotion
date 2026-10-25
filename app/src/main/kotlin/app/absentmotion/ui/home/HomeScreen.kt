@@ -346,7 +346,7 @@ private fun ProjectsPane(
         AlertDialog(
             onDismissRequest = { deleting = null },
             title = { Text(stringResource(if (target.isElement) R.string.home_delete_asset_title else R.string.home_delete_project_title), color = Am.Navy) },
-            text = if (users.isEmpty()) null else { { Text(stringResource(R.string.home_delete_asset_used, users.joinToString(", ")), color = Am.Navy) } },
+            text = if (users.isEmpty()) null else { { Text(stringResource(R.string.home_delete_asset_used, users.take(6).joinToString(", ") + if (users.size > 6) ", …" else ""), color = Am.Navy) } },
             dismissButton = { TextButton({ deleting = null }) { Text(stringResource(R.string.cancel), color = Am.Navy) } },
             confirmButton = { TextButton({ deleting = null; onDelete(target.id) }) { Text(stringResource(R.string.delete), color = Am.Navy) } },
             containerColor = Am.Card,

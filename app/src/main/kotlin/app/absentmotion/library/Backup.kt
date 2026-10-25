@@ -49,9 +49,11 @@ object Backup {
             zip.closeEntry()
             val buffer = ByteArray(64 * 1024)
             for ((name, file) in files) {
+                val entry = try {
+                    if (name.endsWith(".xml")) ZipEntry(name) else storedEntry(name, file.inputStream())
+                } catch (e: java.io.FileNotFoundException) { continue }
                 val source = try { file.inputStream() } catch (e: java.io.FileNotFoundException) { continue }
-                zip.setLevel(if (name.endsWith(".xml")) 6 else 0)
-                zip.putNextEntry(ZipEntry(name).apply { time = file.lastModified() })
+                zip.putNextEntry(entry.apply { time = file.lastModified() })
                 source.use { input ->
                     while (true) {
                         val n = input.read(buffer)
@@ -239,6 +241,21 @@ object Backup {
     }
 
     private fun rootUri(root: File) = root.toURI().toString().trimEnd('/') + "/"
+
+    private fun storedEntry(name: String, input: InputStream): ZipEntry {
+        val crc = java.util.zip.CRC32()
+        var size = 0L
+        input.use {
+            val buffer = ByteArray(64 * 1024)
+            while (true) {
+                val n = it.read(buffer)
+                if (n < 0) break
+                crc.update(buffer, 0, n)
+                size += n
+            }
+        }
+        return ZipEntry(name).apply { method = ZipEntry.STORED; this.size = size; compressedSize = size; this.crc = crc.value }
+    }
 
     private fun XmlNode.mapLinks(change: (String) -> String): XmlNode =
         (this["link"]?.let { with("link", change(it)) } ?: this).let { it.copy(children = it.children.map { child -> child.mapLinks(change) }) }

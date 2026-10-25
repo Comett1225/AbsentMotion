@@ -58,6 +58,11 @@ class PackageFontsTest {
         assertEquals(listOf("imported?name=Same.ttf", "imported?name=Same.ttf"), fontsIn(import(packed("imported?name=My Font.ttf"), fonts)))
     }
 
+    @Test fun everyPackageEntryIsWrittenAtOneCompressionLevel() {
+        val file = File(tmp.root, "p.absproj").apply { writeBytes(packed("imported?name=My Font.ttf")) }
+        java.util.zip.ZipFile(file).use { zip -> for (entry in zip.entries()) assertTrue(entry.name, entry.compressedSize >= entry.size) }
+    }
+
     @Test fun somethingThatIsNotAFontIsNeverInstalled() {
         val fonts = tmp.newFolder("fonts")
         val scene = import(packed("imported?name=My Font.ttf", "not a font at all".toByteArray()), fonts)
