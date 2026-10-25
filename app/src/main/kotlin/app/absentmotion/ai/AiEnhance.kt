@@ -158,7 +158,7 @@ internal object AiEnhance {
         check(options.mode.fits(media.width, media.height)) { capText(options.mode) }
         progress(0f, AppText.get(R.string.ai_loading_ai_model))
         AiDevice.probeGpu(context, options.model)
-        val net = withContext(Dispatchers.IO) { AiNet.open(context, options.model, options.blend, GRAIN_WEIGHT) }
+        val net = AiNet.open(context, options.model, options.blend, GRAIN_WEIGHT)
         return net.use {
             val faces = if (options.mode == EnhanceMode.Faces) FaceWork(net, media.orientation) else null
             val work = faces ?: FrameWork { pts, argb, width, height, emit -> emit(pts, net.upscale(argb, width, height, options.mode.scale)) }
