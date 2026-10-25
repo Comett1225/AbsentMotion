@@ -272,6 +272,7 @@
     <string name="library_err_not_backup">এই ফাইলটি AbsentMotion-এর ব্যাকআপ নয়।</string>
     <string name="library_err_backup_project_large">ব্যাকআপের একটি প্রজেক্ট খুব বড়।</string>
     <string name="library_err_backup_changed">তৈরি হওয়ার পর এই ব্যাকআপ ফাইলটি পরিবর্তিত হয়েছে, তাই এটি নিরাপদে রিস্টোর করা যাবে না। আসল ব্যাকআপ ফাইলটি রিস্টোর করুন।</string>
+    <string name="library_err_backup_damaged">এই ব্যাকআপ ফাইলটি ক্ষতিগ্রস্ত, তাই এটি পুনরুদ্ধার করা যাবে না। আপনার লাইব্রেরিতে কিছুই পরিবর্তন করা হয়নি।</string>
     <string name="library_imported_project">ইমপোর্ট করা প্রজেক্ট</string>
     <string name="library_damaged_project">নষ্ট প্রজেক্ট</string>
     <string name="library_report_unknown">চেনা যায়নি, ফাইলে রাখা হয়েছে</string>
@@ -305,7 +306,7 @@
     <string name="home_restore_version_failed">এই ভার্সন রিস্টোর করা যায়নি। কিছু স্টোরেজ খালি করুন।</string>
     <string name="home_restore_version_damaged">এই ভার্সনটি ক্ষতিগ্রস্ত, পুনরুদ্ধার করা যাবে না। অন্য একটি ভার্সন বেছে নিন।</string>
     <string name="home_version_restored">ভার্সন পুনরুদ্ধার হয়েছে</string>
-    <string name="home_close_save_failed">আপনার শেষ পরিবর্তনগুলো সংরক্ষণ করা যায়নি। কিছু স্টোরেজ খালি করুন, তারপর ‘আবার চেষ্টা করুন’-এ ট্যাপ করুন। সংরক্ষণ না করে বন্ধ করলে AbsentMotion পরেরবার চালু হওয়ার সময় এই পরিবর্তনগুলো আবার ব্যবহারের সুযোগ দেবে।</string>
+    <string name="home_close_save_failed">আপনার সর্বশেষ পরিবর্তনগুলো সেভ করা যায়নি। কিছু স্টোরেজ খালি করুন, তারপর আবার চেষ্টা করুন বাটনে ট্যাপ করুন। সেভ না করে বন্ধ করলে, পরেরবার AbsentMotion চালু হলে এই পরিবর্তনগুলো আবার দেখানো হবে।</string>
     <string name="home_save_failed_retry">আবার চেষ্টা করুন</string>
     <string name="home_save_failed_leave">সেভ না করে বন্ধ করুন</string>
     <string name="home_search_hint">প্রজেক্ট ও অ্যাসেট খুঁজুন</string>
@@ -1425,8 +1426,8 @@
     <string name="cutout_standard_hint">বিল্ট-ইন, দ্রুত এবং অফলাইনে কাজ করে।</string>
     <string name="cutout_best">AI ব্যাকগ্রাউন্ড রিমুভাল 2.0</string>
     <string name="cutout_best_hint">চুল ও সূক্ষ্ম অংশের চারপাশে পরিচ্ছন্ন প্রান্ত। একবার %1$s ডাউনলোড করে। শুধু ইমেজে।</string>
-    <string name="cutout_fallback_download">AI ব্যাকগ্রাউন্ড রিমুভাল 2.0 ডাউনলোড করা যায়নি, তাই স্ট্যান্ডার্ড ব্যবহার করা হয়েছে। সংযোগ পরীক্ষা করে আবার চেষ্টা করুন।</string>
-    <string name="cutout_fallback_failed">AI ব্যাকগ্রাউন্ড রিমুভাল 2.0 এই ইমেজটি প্রসেস করতে পারেনি, তাই স্ট্যান্ডার্ড ব্যবহার করা হয়েছে।</string>
+    <string name="cutout_fallback_download">AI ব্যাকগ্রাউন্ড রিমুভাল 2.0 ডাউনলোড করা যায়নি, তাই স্ট্যান্ডার্ড ব্যবহার করা হয়েছে। সংযোগ পরীক্ষা করুন এবং আবার চেষ্টা করুন।</string>
+    <string name="cutout_fallback_failed">AI ব্যাকগ্রাউন্ড রিমুভাল 2.0 এই ইমেজটি শেষ করতে পারেনি, তাই স্ট্যান্ডার্ড ব্যবহার করা হয়েছে।</string>
     <string name="ai_gpu_warning">এতে কিছু ফোন হ্যাং হতে পারে। ফোন হ্যাং হলে রিস্টার্ট করুন; AI আবার প্রসেসর ব্যবহার করবে।</string>
     <string name="ai_gpu_failed">গ্রাফিক্স চিপে AI কাজ সম্পন্ন হয়নি, তাই AI এখন প্রসেসর ব্যবহার করছে।</string>
     <string name="export_interpolation_ai">AI স্মুথ</string>
@@ -1450,6 +1451,8 @@
     <string name="model_svg_skipped_patterns">প্যাটার্ন ফিল</string>
     <string name="model_svg_skipped_gradient_colours">অতিরিক্ত গ্রেডিয়েন্ট কালার (প্রথম ও শেষটি ব্যবহার করা হয়)</string>
     <string name="model_svg_skipped_styles">কিছু স্টাইল রুল (ফাইলে প্রয়োগ করার জন্য অনেক বেশি আছে)</string>
+    <string name="model_svg_skipped_nested">অংশগুলো খুব গভীরে নেস্ট করা</string>
+    <string name="model_svg_skipped_repeated">অংশগুলো খুব বেশি বার পুনরাবৃত্ত</string>
     <string name="ai_no_audio_track">%1$s-এ কোনো অডিও ট্র্যাক নেই</string>
     <string name="shape_name_circle">বৃত্ত</string>
     <string name="shape_name_rounded_rectangle">গোলাকার আয়তক্ষেত্র</string>
