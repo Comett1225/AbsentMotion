@@ -138,6 +138,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         val started = SystemClock.elapsedRealtime()
         enableEdgeToEdge()
+        app.absentmotion.i18n.keepLegacyLanguage(this)
         super.onCreate(savedInstanceState)
         app.absentmotion.i18n.AppText.install(this)
         followScreenSize(resources.configuration)

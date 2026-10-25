@@ -275,7 +275,7 @@ internal fun RenamePresetDialog(title: String, onDone: (String) -> Unit, onDismi
         text = {
             BasicTextField(
                 text, { text = it }, Modifier.fillMaxWidth().clip(RoundedCornerShape(6.dp)).background(Am.Panel).padding(12.dp),
-                textStyle = TextStyle(color = Am.OnDark, fontSize = 16.sp), singleLine = true, cursorBrush = SolidColor(Am.Accent),
+                textStyle = TextStyle(color = Am.OnDark, fontSize = 16.sp, textDirection = androidx.compose.ui.text.style.TextDirection.Content), singleLine = true, cursorBrush = SolidColor(Am.Accent),
                 decorationBox = { field -> Box { if (text.isEmpty()) Text(title, color = Am.OnDarkDim, fontSize = 16.sp); field() } },
             )
         },

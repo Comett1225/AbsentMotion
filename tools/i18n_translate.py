@@ -13,17 +13,18 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from i18n_extract import EFFECTS, FOLDERS, KOTLIN, PLACEHOLDER, RES, ROOT, xml_escape
+from i18n_extract import EFFECTS, FOLDERS, KOTLIN, PLACEHOLDER, RES, ROOT, SEVERAL, xml_escape
 
 LANGUAGES = {'id': 'Indonesian', 'hi': 'Hindi', 'pt-BR': 'Brazilian Portuguese', 'es': 'Latin American Spanish', 'fil': 'Filipino (Tagalog)',
-             'vi': 'Vietnamese', 'th': 'Thai', 'ms': 'Malay (Malaysia)', 'ar': 'Arabic (Modern Standard)', 'fa': 'Persian (Farsi, Iran)', 'tr': 'Turkish', 'ru': 'Russian'}
+             'vi': 'Vietnamese', 'th': 'Thai', 'ms': 'Malay (Malaysia)', 'ar': 'Arabic (Modern Standard)', 'fa': 'Persian (Farsi, Iran)', 'tr': 'Turkish', 'ru': 'Russian', 'bn': 'Bengali (Bangla)'}
 QUANTITIES = {'id': ['other'], 'vi': ['other'], 'th': ['other'], 'ms': ['other'], 'hi': ['one', 'other'], 'pt-BR': ['one', 'many', 'other'],
               'es': ['one', 'many', 'other'], 'fil': ['one', 'other'], 'tr': ['one', 'other'], 'ru': ['one', 'few', 'many', 'other'],
-              'ar': ['zero', 'one', 'two', 'few', 'many', 'other'], 'fa': ['one', 'other']}
+              'ar': ['zero', 'one', 'two', 'few', 'many', 'other'], 'fa': ['one', 'other'], 'bn': ['one', 'other']}
 STATE = ROOT / 'tools/i18n_source.json'
 GLOSSARY = ROOT / 'tools/i18n_glossary.json'
 NOTES = ROOT / 'tools/i18n_notes.json'
-RULES = {'fa': 'Write in standard Iranian Persian (Farsi) with the Persian letters, not Arabic ones (use ی and ک, not ي and ك), and use ZWNJ (the half space) where Persian spelling needs it. Keep the Latin digits and placeholders as in the English. Write the count placeholder in every plural form, including "one" (it also covers 0), unless the English text has none.',
+RULES = {'bn': 'Write in standard Bengali (Bangla) with the Bengali script, as used in Bangladesh and India. Keep the Latin digits, units, version numbers and placeholders as in the English. Write the count placeholder in every plural form, including "one" (it also covers 0), unless the English text has none.',
+         'fa': 'Write in standard Iranian Persian (Farsi) with the Persian letters, not Arabic ones (use ی and ک, not ي and ك), and use ZWNJ (the half space) where Persian spelling needs it. Keep the Latin digits and placeholders as in the English. Write the count placeholder in every plural form, including "one" (it also covers 0), unless the English text has none.',
          'ru': 'Write the count placeholder in every plural form, including "one" (it also covers 21, 31, 101 ...), unless the English text has none.',
          'hi': 'Write the count placeholder in every plural form, including "one" (it also covers 0), unless the English text has none.',
          'pt-BR': 'Write the count placeholder in every plural form, including "one" (it also covers 0), and give "many" the same wording as "other" (it covers millions).',
@@ -203,6 +204,8 @@ def problem(en, value, language):
                 return f'empty {q} form'
             if not set(placeholders(v)) <= set(placeholders(en['other'])):
                 return f'placeholders in {q} form do not match'
+            if q in SEVERAL.get(FOLDERS[language], ()) and placeholders(v) != placeholders(en['other']):
+                return f'the "{q}" form covers more than one number, so it must contain every placeholder of the English "other" form'
         if placeholders(value['other']) != placeholders(en['other']):
             return 'placeholders in "other" form do not match the English'
         return None
@@ -216,7 +219,7 @@ def problem(en, value, language):
     if en.count('\n') and not value.count('\n'):
         return 'line breaks (\\n) were lost'
     plain = re.sub(r'%\d+\$s', '', en)
-    limit = max(len(plain) * (2.6 if language in ('th', 'hi') else 2.2), len(plain) + 18)
+    limit = max(len(plain) * (2.6 if language in ('th', 'hi', 'bn') else 2.2), len(plain) + 18)
     if len(re.sub(r'%\d+\$s', '', value)) > limit:
         return f'too long ({len(value)} characters for {len(en)} in English): use a shorter wording'
     return None
@@ -346,7 +349,7 @@ def balance():
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Translate strings.xml and the effect texts into the 12 other app languages with DeepSeek; only missing or changed texts are sent.')
+    parser = argparse.ArgumentParser(description='Translate strings.xml and the effect texts into the 13 other app languages with DeepSeek; only missing or changed texts are sent.')
     parser.add_argument('--languages', default=','.join(LANGUAGES), help='comma-separated tags, e.g. id,ar')
     parser.add_argument('--only', choices=['strings', 'effects'], help='translate only app strings or only effect texts')
     parser.add_argument('--retranslate', default='', help='comma-separated keys to translate again even if present')
@@ -417,7 +420,8 @@ def main():
         asset = effect_assets(units, values)
         (EFFECT_I18N / f'{language}.json').write_text(json.dumps(asset, ensure_ascii=False, indent=1, sort_keys=True) + '\n', encoding='utf-8')
 
-    known = {k: s['en'] for k, s in sources.items() if k not in failed}
+    every = set(languages) == set(LANGUAGES) and not args.limit
+    known = {k: s['en'] for k, s in sources.items() if k not in failed and (every or k not in state)}
     state = {k: v for k, v in state.items() if k in english or k in units}
     state.update(known)
     STATE.write_text(json.dumps(state, ensure_ascii=False, indent=1, sort_keys=True) + '\n', encoding='utf-8')

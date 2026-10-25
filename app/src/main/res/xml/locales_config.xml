@@ -13,4 +13,5 @@
     <locale android:name="fa" />
     <locale android:name="tr" />
     <locale android:name="ru" />
+    <locale android:name="bn" />
 </locale-config>

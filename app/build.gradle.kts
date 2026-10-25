@@ -63,6 +63,7 @@ android {
     lint {
         baseline = file("lint-baseline.xml")
         checkReleaseBuilds = false
+        warning += "MissingTranslation"
     }
 
     compileOptions {

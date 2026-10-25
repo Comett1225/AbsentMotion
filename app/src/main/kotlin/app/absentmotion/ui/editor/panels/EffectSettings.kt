@@ -170,7 +170,7 @@ private fun EffectText(param: EffectParam, raw: String, enabled: Boolean, end: (
         BasicTextField(raw, { if (enabled) set(it.replace('\n', ' ').take(200)) }, Modifier.weight(1f)
             .onFocusChanged { if (focused && !it.isFocused) end(); focused = it.isFocused }.clip(PanelShape).background(Color(0x33000000))
             .padding(horizontal = 10.dp, vertical = 6.dp), enabled = enabled, singleLine = true,
-            textStyle = TextStyle(color = Am.OnDark, fontSize = 14.sp), cursorBrush = SolidColor(Am.Accent))
+            textStyle = TextStyle(color = Am.OnDark, fontSize = 14.sp, textDirection = androidx.compose.ui.text.style.TextDirection.Content), cursorBrush = SolidColor(Am.Accent))
     }
 }
 

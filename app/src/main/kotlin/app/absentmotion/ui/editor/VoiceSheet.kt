@@ -110,7 +110,7 @@ internal fun VoiceSheet(state: EditorState, onClose: () -> Unit) {
                     Box(Modifier.fillMaxWidth().height(112.dp).clip(RoundedCorner).background(Am.Field).padding(10.dp)) {
                         BasicTextField(
                             text, { text = it.take(Speech.MAX_CHARS) }, Modifier.fillMaxSize(),
-                            textStyle = TextStyle(color = Am.OnDark, fontSize = 15.sp), cursorBrush = SolidColor(Am.Accent),
+                            textStyle = TextStyle(color = Am.OnDark, fontSize = 15.sp, textDirection = androidx.compose.ui.text.style.TextDirection.Content), cursorBrush = SolidColor(Am.Accent),
                         )
                         if (text.isEmpty()) Text(stringResource(R.string.type_what_the_voice_says), color = Am.OnDarkDim, fontSize = 15.sp)
                     }

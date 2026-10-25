@@ -84,7 +84,7 @@ internal fun SearchField(
         Icon(TextIcons.Search, null, Modifier.size(16.dp), tint = faint)
         BasicTextField(
             text, onChange, Modifier.weight(1f).padding(start = 6.dp).focusRequester(requester),
-            textStyle = TextStyle(color = content, fontSize = 14.sp), singleLine = true, cursorBrush = SolidColor(content),
+            textStyle = TextStyle(color = content, fontSize = 14.sp, textDirection = androidx.compose.ui.text.style.TextDirection.Content), singleLine = true, cursorBrush = SolidColor(content),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search), keyboardActions = KeyboardActions(onSearch = { focus.clearFocus() }),
             decorationBox = { inner ->
                 Box(contentAlignment = Alignment.CenterStart) {

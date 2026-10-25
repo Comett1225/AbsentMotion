@@ -137,7 +137,7 @@ private fun NameField(value: String, modifier: Modifier, onCommit: (String) -> U
                     if (focused && !it.isFocused) commit()
                     focused = it.isFocused
                 },
-            textStyle = TextStyle(color = Am.OnDark, fontSize = 15.sp),
+            textStyle = TextStyle(color = Am.OnDark, fontSize = 15.sp, textDirection = androidx.compose.ui.text.style.TextDirection.Content),
             singleLine = true,
             cursorBrush = SolidColor(Am.Accent),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),

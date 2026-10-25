@@ -209,7 +209,7 @@ private val LimitColor get() = Am.Warning
 private val SnapColor get() = Am.Accent
 
 private val TimecodeStyle get() = TextStyle(color = Am.OnDark, fontSize = 14.sp)
-private val LabelStyle get() = TextStyle(color = Am.OnBar, fontSize = 11.sp)
+private val LabelStyle get() = TextStyle(color = Am.OnBar, fontSize = 11.sp, textDirection = androidx.compose.ui.text.style.TextDirection.Content)
 
 @Composable
 fun Timeline(state: EditorState, modifier: Modifier = Modifier) {

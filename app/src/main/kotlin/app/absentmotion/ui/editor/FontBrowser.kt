@@ -114,7 +114,7 @@ internal fun FontBrowser(library: FontLibrary, onSelect: (String) -> Unit, onClo
                 FontIconButton(TextIcons.Menu, stringResource(R.string.font_menu)) { drawer = true }
                 if (search == null) Text(title, Modifier.weight(1f), color = Am.OnDark, fontSize = 16.sp,
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center)
-                else BasicTextField(search.orEmpty(), { search = it }, Modifier.weight(1f).focusRequester(searchFocus), textStyle = TextStyle(color = Favourite, fontSize = 16.sp),
+                else BasicTextField(search.orEmpty(), { search = it }, Modifier.weight(1f).focusRequester(searchFocus), textStyle = TextStyle(color = Favourite, fontSize = 16.sp, textDirection = androidx.compose.ui.text.style.TextDirection.Content),
                     singleLine = true, decorationBox = { inner -> if (search.isNullOrEmpty()) Text(stringResource(R.string.type_here_to_search), color = Am.OnDark.copy(alpha = .3f), fontSize = 16.sp); inner() })
                 FontIconButton(if (search == null) TextIcons.Search else TextIcons.Tick, if (search == null) stringResource(R.string.font_search) else stringResource(R.string.done)) {
                     search = if (search == null) "" else null
@@ -235,6 +235,6 @@ internal fun rememberFontFamily(library: FontLibrary, name: String, download: Bo
 internal fun FontPreview(library: FontLibrary, name: String, content: String, modifier: Modifier = Modifier) {
     Box(modifier, contentAlignment = Alignment.Center) {
         Text(content, fontFamily = rememberFontFamily(library, name, download = false), color = Am.OnDark, fontSize = 20.sp, maxLines = 1, softWrap = false,
-            style = TextStyle(platformStyle = app.absentmotion.platform.fontPreviewStyle()))
+            style = TextStyle(platformStyle = app.absentmotion.platform.fontPreviewStyle(), textDirection = androidx.compose.ui.text.style.TextDirection.Content))
     }
 }

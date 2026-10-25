@@ -11,6 +11,9 @@ import android.os.LocaleList
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 
@@ -27,7 +30,8 @@ enum class AppLanguage(val tag: String, val nativeName: String) {
     Arabic("ar", "العربية"),
     Persian("fa", "فارسی"),
     Turkish("tr", "Türkçe"),
-    Russian("ru", "Русский");
+    Russian("ru", "Русский"),
+    Bengali("bn", "বাংলা");
 
     val language: String get() = tag.substringBefore('-')
 
@@ -62,8 +66,20 @@ fun phoneLanguage(context: Context): AppLanguage = AppLanguage.preselect(
     (if (Build.VERSION.SDK_INT >= 33) context.locales().systemLocales else Resources.getSystem().configuration.locales).tags())
 
 fun currentLanguage(context: Context): AppLanguage = AppLanguage.match(
-    if (Build.VERSION.SDK_INT >= 33) context.locales().applicationLocales.tags() else listOfNotNull(context.chosen().getString("tag", null)))
+    chosenTags(if (Build.VERSION.SDK_INT >= 33) context.locales().applicationLocales.tags() else null, context.chosen().getString("tag", null)))
     ?: phoneLanguage(context)
+
+internal fun chosenTags(appLocales: List<String>?, legacy: String?): List<String> = appLocales?.ifEmpty { null } ?: listOfNotNull(legacy)
+
+internal fun legacyToMove(appLocales: List<String>, legacy: String?): String? = legacy?.takeIf { appLocales.isEmpty() }
+
+fun keepLegacyLanguage(context: Context) {
+    if (Build.VERSION.SDK_INT < 33) return
+    val legacy = context.chosen().getString("tag", null) ?: return
+    val manager = context.locales()
+    legacyToMove(manager.applicationLocales.tags(), legacy)?.let { manager.applicationLocales = LocaleList.forLanguageTags(it) }
+    context.chosen().edit().remove("tag").apply()
+}
 
 fun applyLanguage(context: Context, language: AppLanguage) {
     if (Build.VERSION.SDK_INT >= 33) {
@@ -83,4 +99,8 @@ fun Context.inAppLanguage(): Context {
 }
 
 @Composable
-fun Ltr(content: @Composable () -> Unit) = CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr, content = content)
+fun Ltr(content: @Composable () -> Unit) = CompositionLocalProvider(
+    LocalLayoutDirection provides LayoutDirection.Ltr,
+    LocalTextStyle provides LocalTextStyle.current.copy(textAlign = TextAlign.Left, textDirection = TextDirection.Content),
+    content = content,
+)

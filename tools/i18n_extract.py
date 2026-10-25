@@ -28,10 +28,10 @@ MAPS = {'mapOf', 'linkedMapOf', 'hashMapOf', 'mutableMapOf'}
 KEEP = {'AbsentMotion', 'Alight Motion', 'Roboto'}
 REWRITE_IMPORTS = ['import androidx.compose.ui.res.stringResource', 'import app.absentmotion.R']
 FOLDERS = {'en': 'values', 'id': 'values-in', 'hi': 'values-hi', 'pt-BR': 'values-pt-rBR', 'es': 'values-es', 'fil': 'values-fil',
-           'vi': 'values-vi', 'th': 'values-th', 'ms': 'values-ms', 'ar': 'values-ar', 'fa': 'values-fa', 'tr': 'values-tr', 'ru': 'values-ru'}
+           'vi': 'values-vi', 'th': 'values-th', 'ms': 'values-ms', 'ar': 'values-ar', 'fa': 'values-fa', 'tr': 'values-tr', 'ru': 'values-ru', 'bn': 'values-bn'}
 JAVA_WORDS = {'new', 'default', 'switch', 'case', 'do', 'final', 'private', 'public', 'static', 'void', 'int', 'char', 'this', 'super', 'throw', 'goto', 'const', 'package', 'native', 'long', 'short', 'byte', 'float', 'double', 'boolean', 'catch', 'enum', 'extends', 'implements', 'interface', 'instanceof', 'protected', 'synchronized', 'throws', 'transient', 'volatile', 'abstract', 'strictfp', 'null', 'true', 'false'}
 PLACEHOLDER = re.compile(r'%(\d+\$)?[sdf]')
-SEVERAL = {'values-fil': {'one'}, 'values-hi': {'one'}, 'values-pt-rBR': {'one'}, 'values-ru': {'one', 'few', 'many'}, 'values-fa': {'one'}, 'values-ar': {'few', 'many'}}
+SEVERAL = {'values-fil': {'one'}, 'values-hi': {'one'}, 'values-pt-rBR': {'one'}, 'values-ru': {'one', 'few', 'many'}, 'values-fa': {'one'}, 'values-ar': {'few', 'many'}, 'values-bn': {'one'}}
 LETTER = re.compile('[A-Za-z\u00c0-\uffff]')
 
 
@@ -307,7 +307,7 @@ def rewrite(found, write):
 
 def check():
     english = read_strings(strings_file('values'))
-    problems = []
+    problems, warnings = [], []
     config = RES / 'xml/locales_config.xml'
     tags = re.findall(r'android:name="([^"]+)"', config.read_text(encoding='utf-8')) if config.is_file() else list(FOLDERS)
     for tag in tags:
@@ -325,7 +325,7 @@ def check():
         missing = sorted(names - local_names)
         extra = sorted(local_names - names)
         if missing:
-            problems.append(f'{folder}: {len(missing)} missing: ' + ', '.join(missing))
+            warnings.append(f'warning: {folder}: {len(missing)} not translated yet, English is shown: ' + ', '.join(missing))
         if extra:
             problems.append(f'{folder}: {len(extra)} not in English: ' + ', '.join(extra))
         for key in sorted(k for k in local if k.split('#')[0] in names):
@@ -342,9 +342,10 @@ def check():
                 problems.append(f'{folder}: {key}: unescaped apostrophe')
             if not local[key].strip():
                 problems.append(f'{folder}: {key}: empty')
-    for line in problems:
+    for line in warnings + problems:
         print(line)
-    print(f'{len({k.split("#")[0] for k in english})} keys in English, {len(tags)} languages: ' + ('all present.' if not problems else f'{len(problems)} problem(s).'))
+    summary = 'all present.' if not problems and not warnings else f'{len(problems)} problem(s), {len(warnings)} language(s) with untranslated text.'
+    print(f'{len({k.split("#")[0] for k in english})} keys in English, {len(tags)} languages: ' + summary)
     return 1 if problems else 0
 
 

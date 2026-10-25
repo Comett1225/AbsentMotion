@@ -155,7 +155,7 @@ private fun TextContent(state: EditorState, layer: Layer, modifier: Modifier) {
             }
         },
             Modifier.fillMaxWidth().padding(horizontal = 6.dp, vertical = 2.dp).focusRequester(focus),
-            textStyle = TextStyle(color = Am.OnDark, fontSize = 18.sp), cursorBrush = SolidColor(Am.Accent),
+            textStyle = TextStyle(color = Am.OnDark, fontSize = 18.sp, textDirection = androidx.compose.ui.text.style.TextDirection.Content), cursorBrush = SolidColor(Am.Accent),
             decorationBox = { inner -> if (value.text.isEmpty()) Text(stringResource(R.string.enter_your_text_here), color = Am.OnDark.copy(alpha = .19f), fontSize = 18.sp); inner() })
     }
 }

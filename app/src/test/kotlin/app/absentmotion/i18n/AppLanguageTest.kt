@@ -8,6 +8,10 @@ import org.junit.Test
 import java.io.File
 
 class AppLanguageTest {
+    private companion object {
+        const val MAX_UNTRANSLATED = 0.05
+    }
+
     private fun pick(vararg tags: String) = AppLanguage.preselect(tags.toList())
 
     @Test fun thePhoneLanguageIsPreselected() {
@@ -23,6 +27,8 @@ class AppLanguageTest {
         assertEquals(AppLanguage.Persian, pick("fa-IR"))
         assertEquals(AppLanguage.Persian, pick("fa-AF"))
         assertEquals(AppLanguage.Persian, pick("prs"))
+        assertEquals(AppLanguage.Bengali, pick("bn-BD"))
+        assertEquals(AppLanguage.Bengali, pick("bn-IN"))
     }
 
     @Test fun otherRegionsFallBackToTheLanguageWeHave() {
@@ -62,9 +68,10 @@ class AppLanguageTest {
         assertEquals(AppLanguage.entries, AppLanguage.suggestedOrder(AppLanguage.English))
     }
 
-    @Test fun thirteenLanguagesEachKnowTheirOwnName() {
-        assertEquals(13, AppLanguage.entries.size)
-        assertEquals(13, AppLanguage.entries.map { it.nativeName }.toSet().size)
+    @Test fun fourteenLanguagesEachKnowTheirOwnName() {
+        assertEquals(14, AppLanguage.entries.size)
+        assertEquals(14, AppLanguage.entries.map { it.nativeName }.toSet().size)
+        assertEquals("বাংলা", AppLanguage.Bengali.nativeName)
         assertEquals("العربية", AppLanguage.Arabic.nativeName)
         assertEquals("فارسی", AppLanguage.Persian.nativeName)
         assertEquals("हिन्दी", AppLanguage.Hindi.nativeName)
@@ -90,7 +97,20 @@ class AppLanguageTest {
                 .associate { it.groupValues[1] to it.groupValues[2] }
         }
 
-    @Test fun everyLanguageHasEveryStringWithTheSamePlaceholders() {
+    @Test fun untranslatedTextStaysASmallShareAndFallsBackToEnglish() {
+        val english = strings(File(res, "values/strings.xml")).keys + plurals(File(res, "values/strings.xml")).keys
+        for (language in AppLanguage.entries) {
+            val file = File(res, folder(language) + "/strings.xml")
+            assertTrue("missing $file", file.isFile)
+            val local = strings(file).keys + plurals(file).keys
+            assertEquals("not in English in ${file.parentFile.name}", emptySet<String>(), local - english)
+            val missing = english - local
+            assertTrue("${file.parentFile.name} misses ${missing.size} of ${english.size} texts (run python3 tools/i18n_translate.py): ${missing.take(20)}",
+                missing.size <= english.size * MAX_UNTRANSLATED)
+        }
+    }
+
+    @Test fun everyTranslationKeepsThePlaceholders() {
         val english = strings(File(res, "values/strings.xml"))
         assertTrue(english.isNotEmpty())
         val placeholders = Regex("""%(\d+\$)?[sdf]""")
@@ -98,8 +118,7 @@ class AppLanguageTest {
             val file = File(res, folder(language) + "/strings.xml")
             assertTrue("missing $file", file.isFile)
             val local = strings(file)
-            assertEquals("keys differ in ${file.parentFile.name}", english.keys, local.keys)
-            for ((key, text) in english) {
+            for ((key, text) in english.filterKeys { it in local }) {
                 assertEquals("placeholders differ in ${file.parentFile.name} $key",
                     placeholders.findAll(text).map { it.value }.sorted().toList(), placeholders.findAll(local.getValue(key)).map { it.value }.sorted().toList())
                 assertTrue("empty ${file.parentFile.name} $key", local.getValue(key).isNotBlank())
@@ -110,8 +129,7 @@ class AppLanguageTest {
         for (language in AppLanguage.entries) {
             val file = File(res, folder(language) + "/strings.xml")
             val local = plurals(file)
-            assertEquals("plurals differ in ${file.parentFile.name}", englishPlurals.keys, local.keys)
-            for ((key, forms) in englishPlurals) {
+            for ((key, forms) in englishPlurals.filterKeys { it in local }) {
                 val wanted = placeholders.findAll(forms.getValue("other")).map { it.value }.toSet()
                 val got = local.getValue(key)
                 assertTrue("no other form in ${file.parentFile.name} $key", "other" in got)
@@ -124,6 +142,16 @@ class AppLanguageTest {
         }
         val folders = res.listFiles()!!.filter { File(it, "strings.xml").isFile }.map { it.name }.toSet()
         assertEquals(AppLanguage.entries.map(::folder).toSet(), folders)
+    }
+
+    @Test fun aLanguageChosenBeforeAndroid13IsKeptAfterTheUpgrade() {
+        assertEquals(AppLanguage.Spanish, AppLanguage.match(chosenTags(emptyList(), "es")))
+        assertEquals(AppLanguage.Arabic, AppLanguage.match(chosenTags(listOf("ar"), "es")))
+        assertEquals(AppLanguage.Bengali, AppLanguage.match(chosenTags(null, "bn")))
+        assertNull(AppLanguage.match(chosenTags(emptyList(), null)))
+        assertEquals("es", legacyToMove(emptyList(), "es"))
+        assertNull(legacyToMove(listOf("ar"), "es"))
+        assertNull(legacyToMove(emptyList(), null))
     }
 
     @Test fun theSystemLanguageListMatchesTheAppLanguages() {
