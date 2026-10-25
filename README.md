@@ -31,38 +31,96 @@ subscription, no account and no advertising, and your projects never leave your 
 
 ## What it does
 
-- **Layers and a timeline.** Shapes, text, images, video, audio, freehand drawings, groups, reusable elements, 3D models
-  and null objects, with trimming, splitting, moving clips by holding them, parenting, clipping masks, label colours,
-  bookmarks, slide-to-select and frame-accurate snapping.
-- **Keyframes with easing.** Any value (position, size, rotation, 3D tilt, skew, opacity, colour, shape and effect
-  parameters) can be keyframed. Easing is a cubic Bezier, bounce, elastic, cyclic, random or stepped curve, edited
-  with handles on a graph.
-- **181 effects.** Colour, blur, distort, stylize, noise, keying, Move (Auto-Shake, Oscillate, Swing, Spin, Random
-  Displacement, Random Jitter, Pulse, Echo, Offset, Move Along Path, true motion blur), Repeat (linear, radial, grid,
-  along a path, scatter), 3D objects (cube, sphere, torus, prisms, raster extrude and more), Text (typewriter reveal,
-  per-letter transforms, scramble, count up, timecode), VHS, Datamosh, Glass, Displacement Map and many more, with
-  animated previews and a "New" category.
-- **Transitions and animations.** One-tap transitions between clips and In / Out / Loop animations for any layer,
-  written as ordinary keyframes you can edit.
-- **Shapes and drawing.** Parametric shapes, vector paths with point editing and animated (rotoscoping) masks, SVG
-  import, freehand pen, brush, fill and eraser, borders, shadows, gradients and blend modes.
-- **Text.** Text layers with spacing and alignment, 50 fonts built in and 100 more to download from Google Fonts.
-- **Video tools.** Speed ramps with presets and freeze frames, motion tracking, background removal for photos and
-  videos, frame blending and optical-flow slow motion, preview copies for heavy 4K videos, and an in-app camera.
-- **Camera layers.** A 3D camera that works like Alight Motion's, showing the world around the frame, with perspective or
-  orthographic projection, depth ordering, focus blur, fog, motion blur and one-tap Camera Moves (push in, pull out,
-  orbit, pan, dolly zoom, handheld). 3D objects turn with your fingers.
-- **Audio.** Audio layers and the sound of video clips, a waveform view, volume, audio effects (EQ, filters, reverb,
-  echo, compressor, noise gate, limiter, with presets), beat detection (Mark Beats) and noise reduction.
-- **Offline text to speech** with the voices already on the device, and **auto captions** with on-device speech
-  recognition (whisper.cpp; the speech model is downloaded once, after the app tells you its size).
-- **Export.** MP4, MOV, MKV or WebM video (H.264, HEVC, AV1, VP9 or APV, as the phone supports), audio settings, audio only
-  (WAV, FLAC, M4A, OGG or MP3), animated GIF, image sequences and single frames, with a time estimate, a storage check,
-  protection when the phone is hot and a check of every finished video and audio file.
-- **Safe projects.** Automatic version history, crash recovery, crash logs that say in one sentence what happened,
-  imported media copied into the project and one-tap backup of every project to a folder that survives reinstalling.
-- **14 languages.** English, Indonesian, Hindi, Portuguese (Brazil), Spanish, Filipino, Vietnamese, Thai, Malay,
-  Arabic, Persian, Turkish, Russian and Bengali, chosen on first start.
+<details>
+<summary><strong>Layers and a timeline</strong></summary>
+
+Shapes, text, images, video, audio, freehand drawings, groups, reusable elements, 3D models and null objects, with trimming, splitting, moving clips by holding them, parenting, clipping masks, label colours, bookmarks, slide-to-select and frame-accurate snapping.
+
+</details>
+
+<details>
+<summary><strong>Keyframes with easing</strong></summary>
+
+Any value (position, size, rotation, 3D tilt, skew, opacity, colour, shape and effect parameters) can be keyframed. Easing is a cubic Bezier, bounce, elastic, cyclic, random or stepped curve, edited with handles on a graph.
+
+</details>
+
+<details>
+<summary><strong>181 effects</strong></summary>
+
+Colour, blur, distort, stylize, noise, keying, Move (Auto-Shake, Oscillate, Swing, Spin, Random Displacement, Random Jitter, Pulse, Echo, Offset, Move Along Path, true motion blur), Repeat (linear, radial, grid, along a path, scatter), 3D objects (cube, sphere, torus, prisms, raster extrude and more), Text (typewriter reveal, per-letter transforms, scramble, count up, timecode), VHS, Datamosh, Glass, Displacement Map and many more, with animated previews and a "New" category.
+
+</details>
+
+<details>
+<summary><strong>Transitions and animations</strong></summary>
+
+One-tap transitions between clips and In / Out / Loop animations for any layer, written as ordinary keyframes you can edit.
+
+</details>
+
+<details>
+<summary><strong>Shapes and drawing</strong></summary>
+
+Parametric shapes, vector paths with point editing and animated (rotoscoping) masks, SVG import, freehand pen, brush, fill and eraser, borders, shadows, gradients and blend modes.
+
+</details>
+
+<details>
+<summary><strong>Text</strong></summary>
+
+Text layers with spacing and alignment, 50 fonts built in and 100 more to download from Google Fonts.
+
+</details>
+
+<details>
+<summary><strong>Video tools</strong></summary>
+
+Speed ramps with presets and freeze frames, motion tracking, background removal for photos and videos, frame blending and optical-flow slow motion, preview copies for heavy 4K videos, and an in-app camera.
+
+</details>
+
+<details>
+<summary><strong>Camera layers</strong></summary>
+
+A 3D camera that works like Alight Motion's, showing the world around the frame, with perspective or orthographic projection, depth ordering, focus blur, fog, motion blur and one-tap Camera Moves (push in, pull out, orbit, pan, dolly zoom, handheld). 3D objects turn with your fingers.
+
+</details>
+
+<details>
+<summary><strong>Audio</strong></summary>
+
+Audio layers and the sound of video clips, a waveform view, volume, audio effects (EQ, filters, reverb, echo, compressor, noise gate, limiter, with presets), beat detection (Mark Beats) and noise reduction.
+
+</details>
+
+<details>
+<summary><strong>Offline text to speech and auto captions</strong></summary>
+
+**Offline text to speech** with the voices already on the device, and **auto captions** with on-device speech recognition (whisper.cpp; the speech model is downloaded once, after the app tells you its size).
+
+</details>
+
+<details>
+<summary><strong>Export</strong></summary>
+
+MP4, MOV, MKV or WebM video (H.264, HEVC, AV1, VP9 or APV, as the phone supports), audio settings, audio only (WAV, FLAC, M4A, OGG or MP3), animated GIF, image sequences and single frames, with a time estimate, a storage check, protection when the phone is hot and a check of every finished video and audio file.
+
+</details>
+
+<details>
+<summary><strong>Safe projects</strong></summary>
+
+Automatic version history, crash recovery, crash logs that say in one sentence what happened, imported media copied into the project and one-tap backup of every project to a folder that survives reinstalling.
+
+</details>
+
+<details>
+<summary><strong>14 languages</strong></summary>
+
+English, Indonesian, Hindi, Portuguese (Brazil), Spanish, Filipino, Vietnamese, Thai, Malay, Arabic, Persian, Turkish, Russian and Bengali, chosen on first start.
+
+</details>
 
 ## Speed
 
@@ -98,21 +156,22 @@ without Optical flow High, AI Smooth, AI Enhance and AI background removal 2.0.
 There are three builds: `play`, which has background removal through Google Play services, `foss` (for F-Droid),
 which contains no Google libraries at all, and `compat`, the Compatible build of `foss`.
 
-## Limits
+## Limits / Problems
 
 AbsentMotion is a young project. Please know these before you rely on it:
 
-- **Some Alight Motion effects are still missing.** AbsentMotion has 181 effects and converts most of Alight Motion's
-  when it opens a project, but some cannot be converted yet (mostly older versions of effects, the 3D solids and a few
-  rare ones). A project that uses one still opens, and the effect stays in the file, but it is not drawn.
+- **Some Alight Motion effects are still missing.** - Please if you're able to, make sure to make an issue for anything that isn't implemented correctly or is broken. 
 - **Only 64-bit ARM Android devices with Vulkan 1.1.** Android 13 or newer, or Android 9 to 12 with the Compatible
-  build. Tested on Android 11, 16 and 17 and on emulators from Android 13.
+  build.
 - **Background removal.** The `foss` build removes backgrounds with its own offline model. The `play` build uses
-  Google Play services instead, a proprietary Google library (listed in `THIRD_PARTY_NOTICES.md`) that downloads its
-  model when it is first needed and may send diagnostics to Google under Google's own policy, as it does for any app.
-- **Network use.** Nothing is needed online. The internet is only used when you choose one of the downloadable fonts, for
-  the speech model the first time you generate captions, and, only if you allow it when asked, to ask GitHub for the
-  newest version number when the app opens (the `play` build's Play services library aside, see above).
+  Google Play services instead.
+- **Network use.** You can completely use this offline, the only other features that would require internet is downloading fonts from the font library (You can upload your own if you have any), downloading the background removal model, captions model and checking for updates, all which are optional and not required for you to use the app.
+
+## Why?
+
+Why did I decide to create this when Alight Motion and CapCut already exist? Just in general I see those companies, specifically Alight Motion as very predatory towards their user base. Shoving ads into your face when you open or press any button for an editor is not something that should happen. Especially not an editor as good as Alight Motion. After, comes the subscriptions on both the CapCut side, and the Alight Motion, offering 'amazing features' if you pay a monthly or sometimes weekly fee. What happens when you can't pay any more or forget to pay, or you're unable to restore your subscription? your project is locked and you can't export it with those PREMIUM features. I do understand that only CapCut has some right to making a subscription as a lot of effects send your videos or images to their servers to process from there quicker, though Alight Motion has no excuse for doing this for some basic features, and even screen resolutions. Why spend money, or watch hundreds of ads, or be in pain from not being able to use a feature on those other platforms, when you're able to download an editor for mobile that contains NONE of those things. 
+
+Everything in this app is completely free, you will pay for NOTHING. You will have NO trackers, NO ads, no subscriptions, NO cloud services or anything. I might add a feature to let you add it to your own cloud storage system of your choice in the future, but for now It's kept just like this.
 
 ## File compatibility
 
