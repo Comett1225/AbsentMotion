@@ -6,6 +6,37 @@ All notable changes to AbsentMotion are listed here, newest first. The format fo
 Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stands for the feature set as it stood on
 2026-10-12.
 
+## [4.0.0] - 2026-10-25
+
+### Added
+
+- A **5-minute tutorial** in its own practice project, offered after the first start and in Settings.
+- **Render preview**: one tap renders the project so heavy projects play smoothly, in sync with the sound.
+- **AI background removal 2.0** for pictures, an optional download of about 62 MB, and **exports that keep going in the background** with a progress notification.
+- **Moving several clips at once**, and **Move to playhead** for several clips (the first press keeps their gaps, the second lines them up).
+- **Smoothing updates itself** after small trims and asks after big changes.
+- A **sound library** with search, sorting, albums, artists and folders, **From Files** for any folder, and **animated GIFs** as looping clips.
+- **Fonts** in TTF, OTF, TTC and WOFF, **typed values** with fine-tuning and double-tap reset, **mouse and trackpad** timeline scrolling and zoom.
+- **Bengali** and **Persian** (14 languages), and about 115 more **Alight Motion effects** on import, with new Noise, Raster Transform, Solid Matte, Smooth Edges and Simple Starfield effects.
+
+### Changed
+
+- **Exports with Motion Blur** are about twice as fast, **Glow** about ten times faster on older devices, and dragging layers in **big projects** does a third of the work.
+- The app follows the phone's **font size**, Arabic and Persian read **right to left** in the editor, and **screen readers** can use the timeline.
+- **Tablets** edit text in a side panel and open full screen when started sideways; **portrait exports** on older tablets are about twice as fast.
+- A **stuck export** stops with a clear reason, the export check catches **black or frozen** pictures, and **time estimates** learn from each export.
+- **Render preview** keeps its frames on disk when memory is short, and **failed saves** keep the newest edits.
+
+### Fixed
+
+- **Exports and Render preview freezing** on older devices with Motion Blur or Echo over heavy effects.
+- **Backups made on Android 11** being damaged, **unsaved edits** lost after a crash, and **damaged projects** opening blank.
+- **Smooth** losing the clip's sound, **Scatter Field** using gigabytes of memory, long **MKV and WebM** exports running out of memory, and interrupted exports left behind as broken files.
+- **WAV exports over 4 GB**, **WebP lossless** on Android 9, **AV1** format details and custom **export sizes**.
+- Crafted **project, SVG and font files** crashing the app, and a shared project showing another project's pictures.
+- Sounds in groups cut off, **looped clips** freezing after a split, split **path followers** and **groups** losing their path or timing, and **Undo** losing a step.
+- The **number keypad** with Bengali, Hindi and Thai digits, **Render preview** showing old frames, **motion tracking** with size-less parents, 3D model names with accents, and the tutorial offer covering the Import complete window.
+
 ## [3.3.2] - 2026-10-24
 
 ### Changed

@@ -35,7 +35,7 @@ subscription, no account and no advertising, and your projects never leave your 
 - **Keyframes with easing.** Any value (position, size, rotation, 3D tilt, skew, opacity, colour, shape and effect
   parameters) can be keyframed. Easing is a cubic Bezier, bounce, elastic, cyclic, random or stepped curve, edited
   with handles on a graph.
-- **176 effects.** Colour, blur, distort, stylize, noise, keying, Move (Auto-Shake, Oscillate, Swing, Spin, Random
+- **181 effects.** Colour, blur, distort, stylize, noise, keying, Move (Auto-Shake, Oscillate, Swing, Spin, Random
   Displacement, Random Jitter, Pulse, Echo, Offset, Move Along Path, true motion blur), Repeat (linear, radial, grid,
   along a path, scatter), 3D objects (cube, sphere, torus, prisms, raster extrude and more), Text (typewriter reveal,
   per-letter transforms, scramble, count up, timecode), VHS, Datamosh, Glass, Displacement Map and many more, with
@@ -64,37 +64,52 @@ subscription, no account and no advertising, and your projects never leave your 
 
 ## Speed
 
+AbsentMotion 4.0 and Alight Motion 5.0.273 on the same phone with the same heavy project: an edit made in Alight Motion
+and opened in AbsentMotion from Alight's XML export. It is 13.6 s long, 1080 x 1080 at 60 fps, with two videos cut into
+12 clips and 54 effects, among them Motion Blur, Soft Glow, Tiles and Auto-Shake on every clip. Both apps exported it
+at 1080 x 1080, 60 fps, H.264, about 20 Mbps. The time runs from tapping Export to the finished file; median of three
+runs.
+
+| | Alight Motion 5.0.273 | AbsentMotion 4.0 |
+|---|---|---|
+| Samsung Galaxy S26 Ultra (Android 17) | 17.1 s | 13.1 s |
+| Lenovo Tab P11 (Android 11, Snapdragon 662), Compatible build | not tested | 5 min 2 s |
+
+Alight Motion is not installed on the tablet, so only AbsentMotion was measured there. It is a 2021 mid-range tablet,
+and Motion Blur on every clip draws each clip and its effects up to 48 times per frame.
+
 <p align="center">
   <img src="docs/speed-comparison.gif" alt="Alight Motion and AbsentMotion side by side with timers: starting the app, opening the same project and exporting it in 4K" width="560">
 </p>
 
-Measured on a Samsung Galaxy S26 Ultra (Android 17) with the same project in both apps, imported from Alight Motion's
-XML export. Median of three runs, phone below 35 °C before each run.
+An earlier measurement with AbsentMotion 3.0.0 on the same phone, with a lighter test project (one video, two text
+layers and three shapes), is in the GIF above:
 
 | | Alight Motion 5.0.273 | AbsentMotion 3.0.0 |
 |---|---|---|
 | Start the app, until the home screen is drawn | 1.94 s | 0.36 s |
 | Open a project, until the first preview frame | 0.39 s | 0.27 s |
-| Export 4K (2160 x 3840) 30 fps H.264 at the highest quality: video, text, shapes, keyframes | 5.04 s | 4.35 s |
-| The same with blur and glow on two layers | 17.28 s | 6.70 s |
-
-Alight Motion draws blur and glow differently (heavier) than AbsentMotion, so the last row is not the same work; the row
-above it is the like-for-like export. The GIF shows that run, with the export part at double speed.
+| Export 4K (2160 x 3840) 30 fps H.264 at the highest quality | 5.04 s | 4.35 s |
 
 ## Requirements
 
 Android 13 (API level 33) or newer (tested on Android 16 and 17 and on emulators from Android 13), a 64-bit ARM device (`arm64-v8a`), Vulkan 1.1.
 
-There are two builds: `play`, which has background removal through Google Play services, and `foss` (for
-F-Droid), which contains no Google libraries at all.
+For Android 9 to 12 there is the **Compatible** build (`-compatible.apk`, tested on Android 11). It is the same app
+without Optical flow High, AI Smooth, AI Enhance and AI background removal 2.0.
+
+There are three builds: `play`, which has background removal through Google Play services, `foss` (for F-Droid),
+which contains no Google libraries at all, and `compat`, the Compatible build of `foss`.
 
 ## Limits
 
 AbsentMotion is a young project. Please know these before you rely on it:
 
-- **Some Alight Motion effects are still missing.** AbsentMotion has 176 effects, and about 17 of Alight Motion's
-  are not in it yet. A project that uses one still opens, and the effect stays in the file, but it is not drawn.
-- **Only 64-bit ARM Android devices on Android 13 or newer, with Vulkan 1.1.** Tested on Android 16 and 17 and on emulators from Android 13.
+- **Some Alight Motion effects are still missing.** AbsentMotion has 181 effects and converts most of Alight Motion's
+  when it opens a project, but some cannot be converted yet (mostly older versions of effects, the 3D solids and a few
+  rare ones). A project that uses one still opens, and the effect stays in the file, but it is not drawn.
+- **Only 64-bit ARM Android devices with Vulkan 1.1.** Android 13 or newer, or Android 9 to 12 with the Compatible
+  build. Tested on Android 11, 16 and 17 and on emulators from Android 13.
 - **Background removal.** The `foss` build removes backgrounds with its own offline model. The `play` build uses
   Google Play services instead, a proprietary Google library (listed in `THIRD_PARTY_NOTICES.md`) that downloads its
   model when it is first needed and may send diagnostics to Google under Google's own policy, as it does for any app.
