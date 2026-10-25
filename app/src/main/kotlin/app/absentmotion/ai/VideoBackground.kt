@@ -129,7 +129,7 @@ internal val MatteFollowedEffects = setOf(
     "absent.movealongpath", "absent.noisedisplace", "absent.octahedron", "absent.offset",
     "absent.ominoglass", "absent.oscillate", "absent.polar", "absent.polardisplacement",
     "absent.pulsesize", "absent.pyramid", "absent.radialrepeat",
-    "absent.randomdisplace", "absent.randomjitter", "absent.rasterextrude", "absent.reorient360",
+    "absent.randomdisplace", "absent.randomjitter", "absent.rasterextrude", "absent.rastertransform", "absent.reorient360",
     "absent.repeat", "absent.repeatalongpath", "absent.ripple", "absent.scatterfield",
     "absent.shutterblur", "absent.spherize", "absent.spin", "absent.squeeze",
     "absent.starpolyhedron", "absent.starprism", "absent.stretch", "absent.stretchaxis",
