@@ -13,50 +13,6 @@
     </issue>
 
     <issue
-        id="ExifInterface"
-        message="Avoid using `android.media.ExifInterface`; use `androidx.exifinterface.media.ExifInterface` instead"
-        errorLine1="import android.media.ExifInterface"
-        errorLine2="       ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/debug/kotlin/app/absentmotion/DeviceChecks.kt"
-            line="6"
-            column="8"/>
-    </issue>
-
-    <issue
-        id="ExifInterface"
-        message="Avoid using `android.media.ExifInterface`; use `androidx.exifinterface.media.ExifInterface` instead"
-        errorLine1="                ExifInterface(image).apply { setAttribute(ExifInterface.TAG_ORIENTATION, &quot;$tag&quot;); saveAttributes() }"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/debug/kotlin/app/absentmotion/DeviceChecks.kt"
-            line="31"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="ExifInterface"
-        message="Avoid using `android.media.ExifInterface`; use `androidx.exifinterface.media.ExifInterface` instead"
-        errorLine1="import android.media.ExifInterface"
-        errorLine2="       ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/app/absentmotion/media/MediaLibrary.kt"
-            line="10"
-            column="8"/>
-    </issue>
-
-    <issue
-        id="ExifInterface"
-        message="Avoid using `android.media.ExifInterface`; use `androidx.exifinterface.media.ExifInterface` instead"
-        errorLine1="    resolver.openInputStream(uri)?.use { ExifInterface(it).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL) }"
-        errorLine2="                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/app/absentmotion/media/MediaLibrary.kt"
-            line="164"
-            column="42"/>
-    </issue>
-
-    <issue
         id="InlinedApi"
         message="Field requires API level 34 (current min is 33): `android.Manifest.permission#READ_MEDIA_VISUAL_USER_SELECTED`"
         errorLine1="                Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED.takeIf { partial }).toTypedArray())"

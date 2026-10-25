@@ -15,7 +15,7 @@ dependency is added, removed or upgraded, update this file in the same change.
 **Contents**
 
 1. Engine libraries (C and C++): Skia and the libraries it links, whisper.cpp and ggml, RNNoise, ncnn, glslang, the RIFE warp layer, LAME
-2. Machine learning models: OpenAI Whisper weights, RIFE and Real-ESRGAN weights and the Best quality cut-out model (all downloaded at run time), background removal model (`foss` build)
+2. Machine learning models: OpenAI Whisper weights, RIFE and Real-ESRGAN weights and the AI background removal 2.0 model (all downloaded at run time), background removal model (`foss` build)
 3. Kotlin and Compose libraries
 4. Google Play services (proprietary)
 5. Fonts, icons and effect thumbnails
@@ -158,7 +158,8 @@ together with Skia.
 
 ### RNNoise
 
-- Version: the copy in `third_party/rnnoise` (upstream commit not recorded).
+- Version: the copy in `third_party/rnnoise` is upstream commit `6cbfd53eb348a8d394e0757b4025c6ded34eb2b6` (2024-03-22,
+  "use rnn_ prefix for non-exported symbols"), unchanged: all 36 files are identical to that commit's source archive.
 - Licence: BSD-3-Clause (text in appendix A.12).
 - Copyright: Copyright (c) 2017, Mozilla; Copyright (c) 2007-2017, Jean-Marc Valin; Copyright (c) 2005-2017,
   Xiph.Org Foundation; Copyright (c) 2003-2004, Mark Borgerding.
@@ -245,18 +246,15 @@ together with Skia.
   size, checked against its SHA-256, and removable in Settings. "Sharpen faces" finds faces with Android's own
   `android.media.FaceDetector`; no face model is downloaded.
 
-### Best quality cut-out model
+### AI background removal 2.0
 
 - Version: `absent-cutout.bin` with `absent-cutout-768.param` and `absent-cutout-1024.param` (ncnn, fp16), published as
   assets of this repository's `ai-models-2` release.
-- Licence: Apache-2.0. The Apache-2.0 text is `LICENSE` in the root of this repository.
+- Licence: Apache-2.0, including the pretrained weights it contains. The Apache-2.0 text is `LICENSE` in the root of
+  this repository.
 - Copyright: The AbsentMotion authors.
-- Used in: "Remove Background" on images when Best quality is chosen (Latest version, `foss` and `play` builds).
-  Downloaded once after that choice, checked against its SHA-256, and removable in Settings.
-- Pretrained encoder: `timm/mobilenetv4_conv_large.e600_r384_in1k`, revision `b7cda911a1888a1b76857905874be4e27ac3b52a`,
-  Apache-2.0, by Ross Wightman and timm contributors (https://huggingface.co/timm/mobilenetv4_conv_large.e600_r384_in1k,
-  https://github.com/huggingface/pytorch-image-models); MobileNetV4: Qin et al., "MobileNetV4: Universal Models for the
-  Mobile Ecosystem" (https://arxiv.org/abs/2404.10518). ImageNet-pretrained encoder only; classifier discarded.
+- Used in: "Remove Background" on images when AI background removal 2.0 is chosen (Latest version, `foss` and `play`
+  builds). Downloaded once after that choice, checked against its SHA-256, and removable in Settings.
 
 ### Background removal model (`foss` build only)
 
@@ -309,20 +307,27 @@ upstream"). The artifacts were not inspected for a `META-INF/NOTICE` file.
 
 ### CameraX and the AndroidX libraries it needs
 
-- Version: CameraX 1.5.3 (`androidx.camera:camera-camera2` and `camera-view`, which bring `camera-core`, `camera-lifecycle`,
-  `camera-video` and `androidx.camera.featurecombinationquery:featurecombinationquery` 1.5.3). CameraX also adds these AndroidX
-  libraries that the build did not contain before: `appcompat` and `appcompat-resources` 1.1.0, `fragment` 1.1.0,
-  `exifinterface` 1.4.2, `lifecycle-livedata` and `lifecycle-livedata-core-ktx` 2.9.4, `vectordrawable` and
-  `vectordrawable-animated` 1.1.0, `viewpager`, `loader`, `drawerlayout`, `cursoradapter` and `customview` 1.0.0,
-  `concurrent-futures-ktx` 1.1.0 and `tracing-ktx` 1.2.0, plus Google's `com.google.auto.value:auto-value-annotations` 1.6.3.
-- Licence: Apache-2.0 (all of them).
+- Version: CameraX 1.6.2 (`androidx.camera:camera-camera2` and `camera-view`, which bring `camera-core`, `camera-camera2-pipe`,
+  `camera-lifecycle`, `camera-video` and `androidx.camera.featurecombinationquery:featurecombinationquery` 1.6.2, and
+  `androidx.camera.viewfinder:viewfinder-core` 1.5.1). Only CameraX brings these libraries into the build: `appcompat` and
+  `appcompat-resources` 1.1.0, `fragment` 1.1.0, `exifinterface` 1.4.2 (the app also reads photo orientation with it),
+  `vectordrawable` and `vectordrawable-animated` 1.1.0, `viewpager`, `loader`, `drawerlayout`, `cursoradapter` and
+  `customview` 1.0.0, `concurrent-futures-ktx` 1.1.0, `core-backported-fixes` 1.0.0, `androidx.media3:media3-common`,
+  `media3-container` and `media3-muxer` 1.9.0, Google's `com.google.guava:guava` 33.3.1-android and `failureaccess` 1.0.2,
+  `com.google.dagger:dagger` 2.59, `com.google.auto.value:auto-value-annotations` 1.6.3,
+  `com.google.errorprone:error_prone_annotations` 2.28.0, `com.google.j2objc:j2objc-annotations` 3.0.0 and
+  `com.google.code.findbugs:jsr305` 3.0.2, `jakarta.inject:jakarta.inject-api` 2.0.1, `javax.inject:javax.inject` 1,
+  JetBrains' `org.jetbrains.kotlinx:atomicfu` 0.28.0 and the Checker Framework's `org.checkerframework:checker-qual` 3.43.0.
+  The list is the part of the resolved dependency tree (`./gradlew :app:dependencies --configuration fossReleaseRuntimeClasspath`)
+  that only CameraX reaches; release builds remove unused classes with R8.
+- Licence: Apache-2.0 (all of them except `checker-qual`, which is MIT; text in appendix A.20).
 - Copyright: see upstream.
 - URL: https://developer.android.com/jetpack/androidx/releases/camera and https://github.com/google/auto
 - Used in: the in-app camera (photo and video capture from the Add menu and from the new project sheet).
 
 ### kotlinx.coroutines
 
-- Version: 1.9.0 (`kotlinx-coroutines-core` and `kotlinx-coroutines-android`, dependencies of Compose).
+- Version: 1.9.0 (`kotlinx-coroutines-core` and `kotlinx-coroutines-android`, declared by the app at the version Compose resolves).
 - Licence: Apache-2.0.
 - Copyright: see upstream.
 - URL: https://github.com/Kotlin/kotlinx.coroutines
@@ -370,6 +375,10 @@ JUnit 4.13.2 (Eclipse Public License 1.0), kXML 2 2.3.0 (`net.sf.kxml:kxml2`, a 
 - Used in: the Android app. Intended to be confined to a Google Play build flavour, with a flavour without them for
   distribution channels that accept only free software.
 - The free Android build (the `foss` flavour) includes neither library; only the `play` build does.
+- Known risk: 16.0.0-beta1 is a beta release, which Google ships without a service-level or deprecation promise, so a
+  later Google Play services update may change or remove it. The version is pinned, the code that uses it is one file
+  (`app/src/play/kotlin/app/absentmotion/ai/BackgroundRemoval.kt`) behind the same interface as the `foss` remover, and
+  when the service fails the app says that background removal is not ready instead of crashing.
 
 ---
 
@@ -3599,4 +3608,31 @@ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
 CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+~~~~
+
+### A.20 Checker Framework qualifiers (MIT)
+
+~~~~text
+Checker Framework qualifiers
+Copyright 2004-present by the Checker Framework developers
+
+MIT License:
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
 ~~~~

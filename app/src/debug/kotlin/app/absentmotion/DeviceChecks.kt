@@ -3,7 +3,7 @@ package app.absentmotion
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color
-import android.media.ExifInterface
+import androidx.exifinterface.media.ExifInterface
 import android.net.Uri
 import android.util.Log
 import app.absentmotion.ai.BackgroundRemoval
