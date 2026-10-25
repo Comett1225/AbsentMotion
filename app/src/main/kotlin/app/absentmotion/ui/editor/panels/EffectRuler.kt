@@ -62,6 +62,7 @@ private class EffectRulerView(context: Context, private val scope: CoroutineScop
     private var reset: Float? = null
     private var vibrate = true
     private var tapUp = 0L
+    private var resetting = false
     private val interceptSlop = ViewConfiguration.get(context).scaledTouchSlop * 3 / 4
 
     private val detector = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
@@ -169,9 +170,15 @@ private class EffectRulerView(context: Context, private val scope: CoroutineScop
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
         if (!isEnabled) return false
+        if (event.actionMasked == MotionEvent.ACTION_DOWN) resetting = false
+        else if (resetting) {
+            if (event.actionMasked == MotionEvent.ACTION_UP || event.actionMasked == MotionEvent.ACTION_CANCEL) resetting = false
+            return true
+        }
         val value = reset
         if (event.actionMasked == MotionEvent.ACTION_DOWN && value != null && event.eventTime - tapUp < ViewConfiguration.getDoubleTapTimeout()) {
             tapUp = 0L
+            resetting = true
             stop()
             start()
             change(value.coerceIn(low * step, high * step))
