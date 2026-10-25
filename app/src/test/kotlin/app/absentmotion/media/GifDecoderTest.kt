@@ -102,6 +102,22 @@ class GifDecoderTest {
         assertEquals(GifProblem.TooLarge, problem(huge))
     }
 
+    @Test fun longOrCancelledGifsStopAsFramesArrive() {
+        val long = gif(4, 4, List(3) { Frame(ByteArray(16) { 1 }, 4, 4, delay = 40_000) })
+        var seen = 0
+        val problem = try { summarizeGif({ seen++ }) { ByteArrayInputStream(long) }; null } catch (e: GifError) { e.problem }
+        assertEquals(GifProblem.TooLarge, problem)
+        assertEquals(2, seen)
+        val frames = gif(4, 4, List(5) { Frame(ByteArray(16) { 1 }, 4, 4) })
+        var calls = 0
+        val stopped = try {
+            summarizeGif({ if (++calls == 2) throw java.util.concurrent.CancellationException() }) { ByteArrayInputStream(frames) }
+            false
+        } catch (_: java.util.concurrent.CancellationException) { true }
+        assertTrue(stopped)
+        assertEquals(2, calls)
+    }
+
     @Test fun realCompressedGifMatchesImageIo() {
         val image = BufferedImage(37, 23, BufferedImage.TYPE_BYTE_INDEXED, IndexColorModel(8, 4,
             palette.map { (it shr 16).toByte() }.toByteArray(), palette.map { (it shr 8).toByte() }.toByteArray(), palette.map { it.toByte() }.toByteArray()))

@@ -124,6 +124,12 @@ internal fun gpuRecordAway(record: String): Boolean = record.endsWith(GPU_AWAY)
 
 internal fun gpuRecordToken(record: String): String = record.removeSuffix(GPU_AWAY)
 
+internal suspend fun <T : Any> awaitProbe(work: Deferred<T>, timeoutMs: Long): T? {
+    val result = withTimeoutOrNull(timeoutMs) { work.await() }
+    if (result == null) work.cancel()
+    return result
+}
+
 internal object AiDevice {
     private val rates = ConcurrentHashMap<Pair<AiModel, Boolean>, Double>()
     private val running = ConcurrentHashMap<AiModel, Deferred<Boolean>>()
@@ -174,7 +180,9 @@ internal object AiDevice {
         return if (prefs.contains(GPU_USE)) prefs.getBoolean(GPU_USE, false) else null
     }
 
-    fun gpuOn(context: Context): Boolean = aiUsesGpu(AiNative.gpu, gpuChoice(context))
+    @Volatile private var quarantined = false
+
+    fun gpuOn(context: Context): Boolean = !quarantined && aiUsesGpu(AiNative.gpu, gpuChoice(context))
 
     fun gpuRisky(context: Context): Boolean = AiNative.gpu?.known != true || gpuPrefs(context).getBoolean(GPU_FAILED, false)
 
@@ -231,7 +239,12 @@ internal object AiDevice {
             running.remove(model)
             ok == true
         }.also { running[model] = it }
-        withTimeoutOrNull(PROBE_MS) { work.await() } ?: false
+        awaitProbe(work, PROBE_MS) ?: run {
+            Log.w("AMAi", "the GPU check did not finish in time, AI runs on the processor until the app restarts")
+            quarantined = true
+            running.remove(model, work)
+            false
+        }
     }
 
     suspend fun phone(context: Context): AiPhone {

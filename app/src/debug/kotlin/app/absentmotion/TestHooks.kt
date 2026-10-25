@@ -19,6 +19,7 @@ import app.absentmotion.library.CrashLogs
 import app.absentmotion.media.DebugFrameInterpolation
 import app.absentmotion.model.Scene
 import app.absentmotion.model.fontNames
+import app.absentmotion.ui.editor.addPicked
 import app.absentmotion.ui.home.Updates
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -245,6 +246,7 @@ internal object TestHooks {
                     if (xy.size == 2) Log.i("AMTest", "hit $point ${engine.hitTest(xy[0], xy[1], state.timeMs)}")
                 }
                 intent.getIntExtra("bench", 0).takeIf { it > 0 }?.let { runBench(activity, state, it, intent.getBooleanExtra("proxies", false)) }
+                intent.getStringExtra("gifimport")?.let { importGifForTest(activity, state, it, intent.getIntExtra("gifcancel", 0)) }
             } catch (e: kotlinx.coroutines.CancellationException) {
                 throw e
             } catch (e: IllegalStateException) {
@@ -252,6 +254,21 @@ internal object TestHooks {
                 Log.i("AMTest", "test capture stopped with the engine")
             }
         }
+    }
+
+    private suspend fun importGifForTest(activity: MainActivity, state: app.absentmotion.editor.EditorState, path: String, cancelMs: Int) = kotlinx.coroutines.coroutineScope {
+        val started = SystemClock.elapsedRealtime()
+        val before = state.scene.layers.size
+        val job = launch { state.addPicked(activity, Uri.fromFile(File(path))) }
+        var cancelled = started
+        if (cancelMs > 0) {
+            kotlinx.coroutines.delay(cancelMs.toLong())
+            cancelled = SystemClock.elapsedRealtime()
+            job.cancel()
+        }
+        job.join()
+        val files = File(activity.getExternalFilesDir(null), "ai").listFiles().orEmpty().filter { it.lastModified() >= System.currentTimeMillis() - 600_000 }.map { "${it.name}:${it.length()}" }
+        Log.i("AMTest", "gifimport cancelled=${job.isCancelled} ms=${SystemClock.elapsedRealtime() - started} stopMs=${if (cancelMs > 0) SystemClock.elapsedRealtime() - cancelled else 0} layers=$before->${state.scene.layers.size} files=$files")
     }
 
     private suspend fun checkBackgroundRemoval(activity: MainActivity, asset: String, runs: Int) {

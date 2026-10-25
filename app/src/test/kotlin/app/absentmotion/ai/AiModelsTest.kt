@@ -316,4 +316,11 @@ class AiModelsTest {
         assertEquals(16, lumaOf(0xFF000000.toInt()))
         assertEquals(235, lumaOf(0xFFFFFFFF.toInt()))
     }
+
+    @Test fun aHangingGpuCheckIsCancelledAndCountsAsNoAnswer() = kotlinx.coroutines.runBlocking {
+        val hanging = kotlinx.coroutines.CompletableDeferred<Boolean>()
+        assertNull(awaitProbe(hanging, 50))
+        assertTrue(hanging.isCancelled)
+        assertEquals(true, awaitProbe(kotlinx.coroutines.CompletableDeferred(true), 50))
+    }
 }

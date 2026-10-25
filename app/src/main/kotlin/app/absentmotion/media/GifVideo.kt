@@ -10,16 +10,17 @@ import android.media.MediaMuxer
 import android.net.Uri
 import android.provider.OpenableColumns
 import androidx.core.content.FileProvider
+import app.absentmotion.ai.aiFile
 import app.absentmotion.ai.matteLuma
 import app.absentmotion.model.MediaDeclaration
 import app.absentmotion.model.XmlNode
 import app.absentmotion.model.fpsText
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.job
 import kotlinx.coroutines.withContext
 import java.io.Closeable
 import java.io.File
-import java.util.UUID
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.coroutineContext
 import kotlin.math.roundToInt
@@ -36,19 +37,18 @@ fun gifFrameRate(summary: GifSummary): Int = (summary.frames * 1000.0 / summary.
 
 suspend fun gifVideo(context: Context, uri: Uri): GifVideo? = withContext(Dispatchers.IO) {
     val resolver = context.contentResolver
+    val job = coroutineContext.job
     fun open() = resolver.openInputStream(uri) ?: throw GifError(GifProblem.Damaged)
-    val summary = summarizeGif(::open)
+    val summary = summarizeGif({ job.ensureActive() }, ::open)
     if (summary.frames < 2) return@withContext null
     val fps = gifFrameRate(summary)
     val list = MediaCodecList(MediaCodecList.REGULAR_CODECS)
     val encoder = list.codecInfos.firstOrNull { it.isEncoder && MediaFormat.MIMETYPE_VIDEO_AVC in it.supportedTypes.map(String::lowercase) }
-        ?: throw GifError(GifProblem.TooLarge)
-    val caps = encoder.getCapabilitiesForType(MediaFormat.MIMETYPE_VIDEO_AVC).videoCapabilities ?: throw GifError(GifProblem.TooLarge)
-    val (width, height) = gifEncodeSize(summary.width, summary.height) { w, h -> caps.isSizeSupported(w, h) } ?: throw GifError(GifProblem.TooLarge)
-    val folder = File(checkNotNull(context.getExternalFilesDir(null)), "gif").apply { mkdirs() }
-    val name = UUID.randomUUID().toString()
-    val colourFile = File(folder, "$name.mp4")
-    val matteFile = File(folder, "$name-mask.mp4").takeIf { summary.transparent }
+        ?: error("no H.264 encoder")
+    val caps = encoder.getCapabilitiesForType(MediaFormat.MIMETYPE_VIDEO_AVC).videoCapabilities ?: error("no H.264 video encoder")
+    val (width, height) = gifEncodeSize(summary.width, summary.height) { w, h -> caps.isSizeSupported(w, h) } ?: error("no H.264 size for ${summary.width}x${summary.height}")
+    val colourFile = aiFile(context, "mp4")
+    val matteFile = File(colourFile.parentFile, colourFile.nameWithoutExtension + "-mask.mp4").takeIf { summary.transparent }
     val made = listOfNotNull(colourFile, matteFile)
     var success = false
     try {
@@ -61,6 +61,7 @@ suspend fun gifVideo(context: Context, uri: Uri): GifVideo? = withContext(Dispat
                 var index = 0
                 open().use { stream ->
                     GifDecoder(stream).read { canvas, _ ->
+                        job.ensureActive()
                         if (index < starts.size) {
                             val times = if (index == starts.size - 1) listOf(starts[index], (starts[index] + total) / 2) else listOf(starts[index])
                             for (pts in times) {
@@ -161,7 +162,7 @@ private class YuvEncoder(private val codec: MediaCodec, private val muxer: Media
             if (index >= 0) return index
             drain(false)
         }
-        throw GifError(GifProblem.Damaged)
+        error("the encoder stopped taking frames")
     }
 
     private fun drain(end: Boolean) {
@@ -179,7 +180,7 @@ private class YuvEncoder(private val codec: MediaCodec, private val muxer: Media
                     if (info.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) return
                 }
                 !end -> return
-                System.nanoTime() > deadline -> throw GifError(GifProblem.Damaged)
+                System.nanoTime() > deadline -> error("the encoder did not finish")
             }
         }
     }
@@ -205,7 +206,7 @@ private class YuvEncoder(private val codec: MediaCodec, private val muxer: Media
                 setInteger(MediaFormat.KEY_COLOR_STANDARD, MediaFormat.COLOR_STANDARD_BT709)
                 setInteger(MediaFormat.KEY_COLOR_TRANSFER, MediaFormat.COLOR_TRANSFER_SDR_VIDEO)
             }
-            val name = MediaCodecList(MediaCodecList.REGULAR_CODECS).findEncoderForFormat(format) ?: throw GifError(GifProblem.TooLarge)
+            val name = MediaCodecList(MediaCodecList.REGULAR_CODECS).findEncoderForFormat(format) ?: error("no H.264 encoder for ${width}x$height")
             val codec = MediaCodec.createByCodecName(name)
             try {
                 codec.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)

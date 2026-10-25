@@ -254,22 +254,27 @@ class GifDecoder(stream: InputStream) {
     private fun short(): Int = byte() or (byte() shl 8)
 }
 
-fun summarizeGif(open: () -> InputStream): GifSummary {
+fun summarizeGif(check: () -> Unit = {}, open: () -> InputStream): GifSummary {
     val delays = ArrayList<Int>()
     var transparent = false
     var width = 0
     var height = 0
+    var total = 0L
     try {
         open().use { stream ->
             val decoder = GifDecoder(stream)
             width = decoder.width
             height = decoder.height
             decoder.read { canvas, delay ->
+                check()
                 delays += delay
+                total += delay
+                if (delays.size.toLong() * width * height > GIF_MAX_WORK || total > GIF_MAX_MS) throw GifError(GifProblem.TooLarge)
                 if (!transparent) transparent = canvas.any { it ushr 24 != 255 }
             }
         }
     } catch (e: GifError) { throw e } catch (_: EOFException) { if (delays.isEmpty()) throw GifError(GifProblem.Damaged) }
-    if (delays.size.toLong() * width * height > GIF_MAX_WORK || delays.sum() > 10 * 60 * 1000) throw GifError(GifProblem.TooLarge)
     return GifSummary(width, height, delays.toIntArray(), transparent)
 }
+
+const val GIF_MAX_MS = 10 * 60 * 1000L
