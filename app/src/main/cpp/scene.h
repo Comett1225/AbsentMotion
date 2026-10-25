@@ -281,6 +281,7 @@ struct LayerEffects {
 void DrawScene(SkCanvas* canvas, const Scene& scene, double timeMs, const MediaPictures& pictures,
                const LayerEffects* effects = nullptr);
 void SetLayerEffects(const LayerEffects* effects, const Scene* scene, bool world = false);
+void SetLayerBreak(const std::function<void()>* each);
 bool WorldView();
 
 }

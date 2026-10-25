@@ -1,6 +1,7 @@
 #include "effects.h"
 
 #include "xml.h"
+#include "include/core/SkBBHFactory.h"
 #include "include/core/SkCanvas.h"
 #include "include/core/SkColorFilter.h"
 #include "include/core/SkM44.h"
@@ -64,7 +65,8 @@ half4 main(float2 p) {
     for (int j = -24; j <= 24; j++) {
         float dy = abs(float(j));
         if (dy < best) {
-            float h = float(image.eval(p + float2(0.0, float(j))).r) * n;
+            half4 s = image.eval(p + float2(0.0, float(j)));
+            float h = (float(s.r) + 1.0 - float(s.a)) * n;
             best = min(best, sqrt(h * h + dy * dy));
         }
     }
@@ -85,7 +87,8 @@ uniform float mode;
 uniform half4 tint;
 half4 main(float2 p) {
     half4 src = image.eval(p);
-    float r = float(field.eval(p).r);
+    half4 f = field.eval(p);
+    float r = float(f.r) + 1.0 - float(f.a);
     float d = max(r * reach - shift, 0.0);
     float g = r > 0.995 ? 0.0 : soft > 0.0 ? 1.0 - smoothstep(grow - soft, grow + soft, d) : (d <= grow ? 1.0 : 0.0);
     half k = half(g * amount) * tint.a;
@@ -140,6 +143,14 @@ bool Pointwise(const std::string& sksl) {
 sk_sp<SkRuntimeEffect> Compiled(const char* sksl) {
     auto result = SkRuntimeEffect::MakeForShader(SkString(sksl));
     return result.effect;
+}
+
+float GlowExtent(const std::function<float(const char*, int, float)>& v) {
+    const float reach = std::max(v("radius", 0, 100), 0.0f) * kGlowReach;
+    const float hard = std::clamp(v("hardness", 0, 0.5f), 0.0f, 1.0f);
+    const float edge = std::min(reach / 4, 1.0f), grow = hard * reach - 0.5f * edge, soft = (1 - hard) * reach + edge;
+    const float step = std::max(1.0f, (grow + soft + 1) / kGlowCells);
+    return grow + soft + 1 + 2 * step + 4;
 }
 
 sk_sp<SkImageFilter> GlowFilter(const std::function<float(const char*, int, float)>& v, sk_sp<SkImageFilter> input, bool behind) {
@@ -350,22 +361,47 @@ bool EffectRuntime::draw(SkCanvas* canvas, const Scene& scene, const Layer& laye
     const int lift = liftAt(layer);
     const SkRect at = area.isEmpty() ? bounds : area;
     const SkRect local = bounds.makeOffset(-at.left(), -at.top());
-    auto record = [&](const std::function<void(SkCanvas*)>& draw) {
+    auto record = [&](const std::function<void(SkCanvas*)>& draw, SkRect* bounded = nullptr) {
         SkPictureRecorder recorder;
-        SkCanvas* c = recorder.beginRecording(local);
+        SkRTreeFactory tight;
+        SkCanvas* c = recorder.beginRecording(local, &tight);
         c->translate(-at.left(), -at.top());
         draw(c);
-        return SkImageFilters::Picture(recorder.finishRecordingAsPicture(), local);
+        sk_sp<SkPicture> picture = recorder.finishRecordingAsPicture();
+        const SkRect drawn = picture->cullRect().makeOutset(2, 2);
+        if (bounded) *bounded = drawn.makeOffset(at.left(), at.top());
+        return SkImageFilters::Picture(std::move(picture), drawn);
     };
     const bool seesBehind = lift < 0 && behind(layer);
-    sk_sp<SkImageFilter> content = seesBehind ? record(source) : nullptr;
+    SkRect drawn = SkRect::MakeEmpty();
+    sk_sp<SkImageFilter> content = seesBehind ? record(source, &drawn) : nullptr;
     sk_sp<SkImageFilter> under = below && needs(layer, &Definition::below) ? record(below) : nullptr;
     sk_sp<SkImageFilter> filter = this->chain(scene, layer, timeMs, at, bounds, placed, std::move(content), std::move(under));
     if (!filter && lift < 0) return false;
     if (seesBehind) {
+        float reach = 0;
+        bool glowOnly = true;
+        const float t = layer.localTime(timeMs);
+        for (const LayerEffect& e : layer.effects) {
+            const Definition* d = find(e.id);
+            if (e.hidden || !(BuiltIn(e.id) || (d && d->shader))) continue;
+            if (e.id != "absent.glow") { glowOnly = false; break; }
+            reach += GlowExtent([&](const char* name, int i, float fallback) { return Value(e, d ? &d->defaults : nullptr, name, i, t, fallback); });
+        }
         SkPaint replace;
         replace.setBlendMode(SkBlendMode::kSrc);
+        canvas->save();
+        if (glowOnly && !drawn.isEmpty()) {
+            const SkRect region = drawn.makeOutset(reach, reach);
+            canvas->save();
+            canvas->clipRect(bounds);
+            canvas->clipRect(region, SkClipOp::kDifference);
+            canvas->drawColor(SK_ColorTRANSPARENT, SkBlendMode::kSrc);
+            canvas->restore();
+            canvas->clipRect(region);
+        }
         canvas->saveLayer(SkCanvas::SaveLayerRec(&bounds, &replace, filter.get(), 0));
+        canvas->restore();
         canvas->restore();
         return true;
     }

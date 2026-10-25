@@ -132,6 +132,7 @@ public:
     int renderBuffer(AHardwareBuffer* buffer, double timeMs, uint32_t background) override;
     void releaseBuffers() override;
     void trim() override;
+    void flushPartial();
     bool layerQuad(int64_t layerId, double timeMs, float xy[8]) override;
     bool layerMatrix(int64_t layerId, double timeMs, float m[18]) override;
     bool layerBounds(int64_t layerId, double timeMs, float ltrb[4]) override;
@@ -1062,8 +1063,12 @@ int EngineImpl::renderBuffer(AHardwareBuffer* buffer, double timeMs, uint32_t ba
         canvas->clear(background);
         canvas->scale((float)surface->width() / fScene.width, (float)surface->height() / fScene.height);
         const LayerEffects fx = this->layerEffects();
+        const std::function<void()> flush = [this] { this->flushPartial(); };
+        SetLayerBreak(&flush);
         DrawScene(canvas, fScene, timeMs, this->pictures(), &fx);
+        SetLayerBreak(nullptr);
     }
+    if (fGpuFailed) return -1000;
     auto foreign = skgpu::MutableTextureStates::MakeVulkan(VK_IMAGE_LAYOUT_GENERAL, VK_QUEUE_FAMILY_FOREIGN_EXT);
     std::unique_ptr<skgpu::graphite::Recording> recording = fRecorder->snap();
     skgpu::graphite::InsertRecordingInfo info;
@@ -1089,6 +1094,16 @@ void EngineImpl::releaseBuffers() {
     this->syncGpu();
     fBufferSurfaces.clear();
     this->syncGpu();
+}
+
+void EngineImpl::flushPartial() {
+    if (!fGraphite || fGpuFailed) return;
+    std::unique_ptr<skgpu::graphite::Recording> recording = fRecorder->snap();
+    if (!recording) return;
+    if (!fGraphite->insertRecording({recording.get()}) || !fGraphite->submit(skgpu::graphite::SyncToCpu::kNo)) {
+        LOGE("partial submit failed");
+        this->failGpu(nullptr);
+    }
 }
 
 void EngineImpl::trim() {
@@ -1201,7 +1216,11 @@ bool EngineImpl::offscreen(int width, int height, bool premultiplied,
     if (!surface) return false;
     SkCanvas* canvas = surface->getCanvas();
     canvas->clear(SK_ColorTRANSPARENT);
+    const std::function<void()> flush = [this] { this->flushPartial(); };
+    SetLayerBreak(fGraphite ? &flush : nullptr);
     paint(canvas);
+    SetLayerBreak(nullptr);
+    if (fGpuFailed) return false;
     rgba->resize((size_t)width * height * 4);
     if (fGanesh) return surface->readPixels(out, rgba->data(), (size_t)width * 4, 0, 0);
 

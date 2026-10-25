@@ -977,6 +977,10 @@ void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& 
 
 }
 
+thread_local const std::function<void()>* gBreak = nullptr;
+
+void SetLayerBreak(const std::function<void()>* each) { gBreak = each; }
+
 void SetLayerEffects(const LayerEffects* effects, const Scene* scene, bool world) {
     gEffects = effects;
     gScene = scene;
@@ -1195,6 +1199,7 @@ void DrawList(SkCanvas* canvas, const std::vector<Layer>& listed, int width, int
         while (end < layers.size() && layers[end].clippingMask) end++;
         if (end == i + 1) {
             DrawOne(canvas, layers, base, timeMs, pictures, Override());
+            if (top && gBreak && EffectsApply(layers, base)) (*gBreak)();
             continue;
         }
         if (!base.activeAt(timeMs)) continue;
