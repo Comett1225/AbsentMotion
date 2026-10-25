@@ -3,12 +3,9 @@ package app.absentmotion.ui.editor.panels
 private val Ignored = setOf('\u066C', '\u00A0', '\u202F', ' ', '\u200F', '\u200E', '\u061C')
 
 fun keypadChar(c: Char): Char? = when (c) {
-    in '0'..'9' -> c
-    in '\u0660'..'\u0669' -> '0' + (c - '\u0660')
-    in '\u06F0'..'\u06F9' -> '0' + (c - '\u06F0')
     '.', ',', '\u066B' -> '.'
     '-', '\u2212', '\u2012', '\u2013' -> '-'
-    else -> null
+    else -> c.digitToIntOrNull()?.let { '0' + it }
 }
 
 fun keypadNumber(text: String): Float? {

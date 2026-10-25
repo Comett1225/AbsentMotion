@@ -21,6 +21,14 @@ class NumberEntryTest {
         assertEquals(7f, keypadNumber("\u200F7\u00A0"))
     }
 
+    @Test fun bengaliDevanagariThaiAndFullWidthDigitsParse() {
+        assertEquals(12.5f, keypadNumber("\u09E7\u09E8.\u09EB"))
+        assertEquals(12.5f, keypadNumber("\u0967\u0968.\u096B"))
+        assertEquals(12.5f, keypadNumber("\u0E51\u0E52.\u0E55"))
+        assertEquals(12.5f, keypadNumber("\uFF11\uFF12.\uFF15"))
+        assertEquals('7', keypadChar('\u09ED'))
+    }
+
     @Test fun commaWorksAsTheDecimalPoint() {
         assertEquals(0.75f, keypadNumber("0,75"))
         assertEquals(-0.5f, keypadNumber("-,5"))
