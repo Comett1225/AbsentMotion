@@ -24,6 +24,9 @@
 #include "text.h"
 
 namespace am {
+
+thread_local const std::function<void()>* gBreak = nullptr;
+
 namespace {
 
 std::string AttrOf(const XmlNode& n, const char* key) {
@@ -979,6 +982,7 @@ void DrawShuttered(SkCanvas* canvas, const std::vector<Layer>& siblings, const L
         canvas->saveLayer(nullptr, &add);
         DrawOne(canvas, siblings, l, std::clamp(timeMs + open * ((i + 0.5) / samples - 0.5), (double)l.startTime, (double)l.endTime), pictures, sample);
         canvas->restore();
+        if (gBreak) (*gBreak)();
     }
     canvas->restore();
 }
@@ -996,6 +1000,7 @@ void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& 
             faded.alpha = ov.alpha * (1 + (echo.alpha - 1) * i / echo.count);
             const double at = std::clamp(timeMs - 1000.0 * echo.seconds * i / echo.count, (double)l.startTime, (double)l.endTime);
             DrawOne(canvas, siblings, l, at, pictures, faded);
+            if (gBreak) (*gBreak)();
         };
         if (!echo.atop) for (int i = echo.count; i >= 1; i--) past(i);
         DrawOne(canvas, siblings, l, timeMs, pictures, plain);
@@ -1062,8 +1067,6 @@ void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& 
 }
 
 }
-
-thread_local const std::function<void()>* gBreak = nullptr;
 
 void SetLayerBreak(const std::function<void()>* each) { gBreak = each; }
 

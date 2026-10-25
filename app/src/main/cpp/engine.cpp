@@ -75,6 +75,7 @@ struct Target {
     std::vector<VkSemaphore> renderDone;
     uint32_t nextPresentId = 1;
     std::vector<VkPastPresentationTimingGOOGLE> timings;
+    bool encoder = false;
 };
 
 namespace {
@@ -501,6 +502,7 @@ Target* EngineImpl::attach(ANativeWindow* window, bool forEncoder) {
     auto t = std::make_unique<Target>();
     ANativeWindow_acquire(window);
     t->window = window;
+    t->encoder = forEncoder;
     fTargets.push_back(std::move(t));
     Target* target = fTargets.back().get();
     auto fail = [&](const char* what, VkResult r) {
@@ -1313,7 +1315,18 @@ int EngineImpl::frame(Target* target, int64_t presentTimeNs, bool sync,
     if (fBackend == Backend::kGraphite) {
         {
             SkAutoCanvasRestore restore(surface->getCanvas(), true);
-            paint(surface->getCanvas());
+            sk_sp<SkSurface> layer = target->encoder ? SkSurfaces::RenderTarget(fRecorder.get(), surface->imageInfo()) : nullptr;
+            if (layer) {
+                const std::function<void()> flush = [this] { this->flushPartial(); };
+                SetLayerBreak(&flush);
+                paint(layer->getCanvas());
+                SetLayerBreak(nullptr);
+                SkPaint copy;
+                copy.setBlendMode(SkBlendMode::kSrc);
+                surface->getCanvas()->drawImage(SkSurfaces::AsImage(layer), 0, 0, SkSamplingOptions(), &copy);
+            } else {
+                paint(surface->getCanvas());
+            }
         }
         std::unique_ptr<skgpu::graphite::Recording> recording = fRecorder->snap();
         auto waitSem = skgpu::graphite::BackendSemaphores::MakeVulkan(acquired);
