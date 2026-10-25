@@ -1694,7 +1694,6 @@
     <string name="preview_cache_ready_range">%1$s থেকে %2$s পর্যন্ত স্মুথ প্রিভিউ প্রস্তুত। মুছতে বোতামটি চেপে ধরে রাখুন।</string>
     <string name="preview_cache_removed">রেন্ডার করা প্রিভিউ মুছে ফেলা হয়েছে</string>
     <string name="preview_cache_no_memory">রেন্ডার করা প্রিভিউয়ের জন্য যথেষ্ট মেমোরি নেই। এটি মুছে ফেলা হয়েছে।</string>
-    <string name="preview_cache_trimmed">মেমোরি খালি করতে রেন্ডার করা প্রিভিউ মুছে ফেলা হয়েছে।</string>
     <string name="preview_cache_failed">প্রিভিউ রেন্ডার করা যায়নি।</string>
     <string name="preview_cache_hint">প্লেব্যাক আটকে আটকে চলছে। একটি স্মুথ প্রিভিউ রেন্ডার করবেন?</string>
     <string name="preview_cache_hint_action">রেন্ডার</string>

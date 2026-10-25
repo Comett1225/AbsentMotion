@@ -33,6 +33,9 @@ import kotlinx.coroutines.withContext
 
 private const val MIB = 1L shl 20
 private const val MAX_BUDGET = 256 * MIB
+private const val MAX_DISK_BUDGET = 1024 * MIB
+private const val DISK_RESERVE = 1024 * MIB
+private const val CACHE_PREFIX = "preview-cache-"
 private const val MAX_SIDE = 1920
 private const val ESTIMATE_PER_MILLE = 150L
 private const val QUALITY = 85
@@ -85,24 +88,59 @@ fun flattenOnChecker(rgba: ByteArray, width: Int, height: Int, cell: Float): Boo
     return translucent
 }
 
-class FrameStore(val first: Int, private val budget: Long) {
+class FrameStore(val first: Int, private val budget: Long, private val file: java.io.File? = null) : java.io.Closeable {
     private val frames = ArrayList<ByteArray>()
+    private val offsets = ArrayList<Long>()
+    private val sizes = ArrayList<Int>()
+    private val disk = file?.let { java.io.RandomAccessFile(it, "rw").apply { setLength(0) } }
     var bytes = 0L
         private set
-    val count: Int get() = frames.size
-    val last: Int get() = first + frames.size - 1
+    @Volatile var count = 0
+        private set
+    val last: Int get() = first + count - 1
+    val onDisk: Boolean get() = disk != null
 
     fun add(frame: ByteArray): Boolean {
         if (bytes + frame.size > budget) return false
-        frames += frame
+        val target = disk
+        if (target == null) frames += frame
+        else synchronized(this) {
+            try {
+                target.seek(bytes)
+                target.write(frame)
+            } catch (e: java.io.IOException) {
+                return false
+            }
+            offsets += bytes
+            sizes += frame.size
+        }
         bytes += frame.size
+        count++
         return true
     }
 
-    operator fun contains(frame: Int): Boolean = frame >= first && frame - first < frames.size
+    operator fun contains(frame: Int): Boolean = frame >= first && frame - first < count
 
-    operator fun get(frame: Int): ByteArray? = if (frame in this) frames[frame - first] else null
+    operator fun get(frame: Int): ByteArray? {
+        if (frame !in this) return null
+        val source = disk ?: return frames[frame - first]
+        return synchronized(this) {
+            val index = frame - first
+            try {
+                ByteArray(sizes[index]).also { source.seek(offsets[index]); source.readFully(it) }
+            } catch (e: java.io.IOException) {
+                null
+            }
+        }
+    }
+
+    override fun close() {
+        synchronized(this) { runCatching { disk?.close() } }
+        file?.delete()
+    }
 }
+
+fun diskBudget(free: Long): Long = minOf(MAX_DISK_BUDGET, (free - DISK_RESERVE) / 4).coerceAtLeast(0L)
 
 data class CacheKey(val projectId: String, val scene: Scene, val divisor: Int, val androidEmoji: Boolean, val resources: Long = 0)
 
@@ -231,6 +269,8 @@ object PreviewCache {
         private set
     @Volatile private var store: FrameStore? = null
     @Volatile private var stopRequested = false
+    @Volatile private var memoryStopped = false
+    @Volatile private var building: FrameStore? = null
     private var job: Job? = null
     private var generation = 0
     @Volatile var fit = 0f
@@ -252,7 +292,10 @@ object PreviewCache {
         val divisor = state.settings.previewQuality.divisor
         val (width, height) = cacheFrameSize(scene.width, scene.height, fit, divisor)
         val manager = app.getSystemService(ActivityManager::class.java)
-        val budget = storeBudget(previewCacheBudget(manager?.memoryClass ?: 128, manager?.isLowRamDevice == true, Tier.compatible), width, height)
+        val memory = storeBudget(previewCacheBudget(manager?.memoryClass ?: 128, manager?.isLowRamDevice == true, Tier.compatible), width, height)
+        val folder = app.cacheDir
+        val onDisk = runCatching { diskBudget(folder.usableSpace) }.getOrDefault(0L)
+        val budget = maxOf(memory, onDisk)
         val range = renderRange(scene.lastFrame, state.frame, framesThatFit(budget, width, height)).first..maxOf(scene.lastFrame, 0)
         val next = keyOf(state)
         val cell = checkerCell
@@ -261,9 +304,15 @@ object PreviewCache {
         val mine = generation
         phase = Phase.Rendering
         job = scope.launch {
+            var made: FrameStore? = null
             try {
                 val started = System.nanoTime()
-                val built = FrameStore(range.first, budget)
+                val built = withContext(Dispatchers.IO) {
+                    folder.listFiles { f -> f.name.startsWith(CACHE_PREFIX) }?.forEach { it.delete() }
+                    if (onDisk > memory) runCatching { FrameStore(range.first, budget, java.io.File(folder, CACHE_PREFIX + System.nanoTime() + ".bin")) }.getOrNull() else null
+                } ?: FrameStore(range.first, memory)
+                made = built
+                building = built
                 var resources = next.resources
                 val outcome = try {
                     withContext(Dispatchers.Default) { renderFrames(state.engine, scene, range, width, height, cell, built) { resources = it } }
@@ -282,6 +331,8 @@ object PreviewCache {
                     outcome, built.count, range.count(), width, height, built.bytes, built.bytes / per, budget, ms, ms / per, stillNs / 1e6 / per, encodeNs / 1e6 / per))
                 finish(app, next.copy(resources = resources), built, width, height, outcome, scene.lastFrame, scene.fps)
             } finally {
+                if (building === made) building = null
+            made?.let { if (store !== it) it.close() }
                 if (mine == generation && phase == Phase.Rendering) phase = Phase.Empty
             }
         }
@@ -365,7 +416,7 @@ object PreviewCache {
         progress = 1f
         when {
             outcome == Outcome.Failed -> toast(context, context.getString(R.string.preview_cache_failed))
-            outcome != Outcome.Stopped && (built.first > 0 || built.last < lastFrame) ->
+            (outcome != Outcome.Stopped || memoryStopped) && (built.first > 0 || built.last < lastFrame) ->
                 toast(context, context.getString(R.string.preview_cache_partial, timecode(built.first, fps), timecode(built.last + 1, fps)))
         }
     }
@@ -382,8 +433,10 @@ object PreviewCache {
     fun clear() {
         generation++
         stopRequested = false
+        memoryStopped = false
         job?.cancel()
         job = null
+        store?.close()
         store = null
         key = null
         player?.close()
@@ -392,16 +445,22 @@ object PreviewCache {
         progress = 0f
     }
 
-    fun trim(context: Context, level: Int) {
-        val critical = level == RUNNING_LOW || level == RUNNING_CRITICAL
-        if (!critical && level < BACKGROUND) {
+    fun trim(level: Int) {
+        if (level == RUNNING_LOW || level == RUNNING_CRITICAL) {
+            if (phase == Phase.Rendering && building?.onDisk != true) {
+                memoryStopped = true
+                cancel()
+                Log.i(TAG, "rendering stopped early at trim level $level")
+            }
+            return
+        }
+        if (level < BACKGROUND) {
             if (level >= UI_HIDDEN) player?.drop()
             return
         }
         if (phase == Phase.Empty) return
         clear()
         Log.i(TAG, "cache freed at trim level $level")
-        if (critical) toast(context, context.getString(R.string.preview_cache_trimmed))
     }
 
     private fun toast(context: Context, text: String) = Toast.makeText(context, text, Toast.LENGTH_LONG).show()

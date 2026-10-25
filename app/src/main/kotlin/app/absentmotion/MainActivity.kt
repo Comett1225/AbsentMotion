@@ -627,7 +627,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onTrimMemory(level: Int) {
         super.onTrimMemory(level)
-        app.absentmotion.editor.PreviewCache.trim(this, level)
+        app.absentmotion.editor.PreviewCache.trim(level)
         if (level < TRIM_RUNNING_LOW) return
         dropThumbnails()
         dropVideoThumbnails()

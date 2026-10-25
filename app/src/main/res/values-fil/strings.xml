@@ -1694,7 +1694,6 @@
     <string name="preview_cache_ready_range">Handa na ang smooth na preview mula %1$s hanggang %2$s. Pindutin nang matagal ang button para alisin ito.</string>
     <string name="preview_cache_removed">Inalis ang na-render na preview</string>
     <string name="preview_cache_no_memory">Kulang ang memory para sa na-render na preview. Inalis ito.</string>
-    <string name="preview_cache_trimmed">Inalis ang na-render na preview para magbakante ng memory.</string>
     <string name="preview_cache_failed">Hindi na-render ang preview.</string>
     <string name="preview_cache_hint">Putol-putol ang playback. I-render ang smooth na preview?</string>
     <string name="preview_cache_hint_action">I-render</string>

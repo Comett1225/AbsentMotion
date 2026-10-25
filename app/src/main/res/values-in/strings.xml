@@ -1669,7 +1669,6 @@
     <string name="preview_cache_ready_range">Pratinjau lancar siap dari %1$s hingga %2$s. Sentuh dan tahan tombol untuk menghapusnya.</string>
     <string name="preview_cache_removed">Pratinjau yang dirender dihapus</string>
     <string name="preview_cache_no_memory">Memori tidak cukup untuk pratinjau yang dirender. Pratinjau telah dihapus.</string>
-    <string name="preview_cache_trimmed">Pratinjau yang dirender dihapus untuk mengosongkan memori.</string>
     <string name="preview_cache_failed">Pratinjau tidak dapat dirender.</string>
     <string name="preview_cache_hint">Pemutaran tersendat. Render pratinjau yang lancar?</string>
     <string name="preview_cache_hint_action">Render</string>

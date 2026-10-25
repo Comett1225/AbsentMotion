@@ -1720,7 +1720,6 @@
     <string name="preview_cache_ready_range">Smooth preview ready from %1$s to %2$s. Touch and hold the button to remove it.</string>
     <string name="preview_cache_removed">Rendered preview removed</string>
     <string name="preview_cache_no_memory">Not enough memory for a rendered preview. It was removed.</string>
-    <string name="preview_cache_trimmed">The rendered preview was removed to free memory.</string>
     <string name="preview_cache_failed">The preview could not be rendered.</string>
     <string name="preview_cache_hint">Playback is choppy. Render a smooth preview?</string>
     <string name="preview_cache_hint_action">Render</string>

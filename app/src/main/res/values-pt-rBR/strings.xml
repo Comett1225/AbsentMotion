@@ -1719,7 +1719,6 @@
     <string name="preview_cache_ready_range">Pré-visualização fluida pronta de %1$s a %2$s. Toque e segure o botão para removê-la.</string>
     <string name="preview_cache_removed">Pré-visualização renderizada removida</string>
     <string name="preview_cache_no_memory">Memória insuficiente para uma pré-visualização renderizada. Ela foi removida.</string>
-    <string name="preview_cache_trimmed">A pré-visualização renderizada foi removida para liberar memória.</string>
     <string name="preview_cache_failed">Não foi possível renderizar a pré-visualização.</string>
     <string name="preview_cache_hint">A reprodução está travando. Renderizar uma pré-visualização fluida?</string>
     <string name="preview_cache_hint_action">Renderizar</string>

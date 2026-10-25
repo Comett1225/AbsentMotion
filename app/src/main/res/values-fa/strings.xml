@@ -1694,7 +1694,6 @@
     <string name="preview_cache_ready_range">پیش‌نمایش روان از %1$s تا %2$s آماده است. برای حذف، دکمه را لمس کرده و نگه دارید.</string>
     <string name="preview_cache_removed">پیش‌نمایش رندرشده حذف شد</string>
     <string name="preview_cache_no_memory">حافظه کافی برای پیش‌نمایش رندرشده نیست. حذف شد.</string>
-    <string name="preview_cache_trimmed">پیش‌نمایش رندرشده برای آزاد کردن حافظه حذف شد.</string>
     <string name="preview_cache_failed">پیش‌نمایش رندر نشد.</string>
     <string name="preview_cache_hint">پخش روان نیست. پیش‌نمایش روان رندر شود؟</string>
     <string name="preview_cache_hint_action">رندر</string>

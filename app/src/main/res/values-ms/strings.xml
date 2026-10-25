@@ -1669,7 +1669,6 @@
     <string name="preview_cache_ready_range">Pratonton lancar tersedia dari %1$s hingga %2$s. Sentuh dan tahan butang untuk membuangnya.</string>
     <string name="preview_cache_removed">Pratonton dirender dibuang</string>
     <string name="preview_cache_no_memory">Memori tidak mencukupi untuk pratonton dirender. Ia dibuang.</string>
-    <string name="preview_cache_trimmed">Pratonton dirender dibuang untuk mengosongkan memori.</string>
     <string name="preview_cache_failed">Pratonton tidak dapat dirender.</string>
     <string name="preview_cache_hint">Main balik tersekat-sekat. Render pratonton lancar?</string>
     <string name="preview_cache_hint_action">Render</string>

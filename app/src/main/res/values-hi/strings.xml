@@ -1694,7 +1694,6 @@
     <string name="preview_cache_ready_range">%1$s से %2$s तक स्मूद प्रीव्यू तैयार है। इसे हटाने के लिए बटन को दबाकर रखें।</string>
     <string name="preview_cache_removed">रेंडर किया गया प्रीव्यू हटा दिया गया</string>
     <string name="preview_cache_no_memory">रेंडर किए गए प्रीव्यू के लिए पर्याप्त मेमोरी नहीं है। इसे हटा दिया गया।</string>
-    <string name="preview_cache_trimmed">मेमोरी खाली करने के लिए रेंडर किया गया प्रीव्यू हटा दिया गया।</string>
     <string name="preview_cache_failed">प्रीव्यू रेंडर नहीं हो सका।</string>
     <string name="preview_cache_hint">प्लेबैक रुक-रुक कर चल रहा है। स्मूद प्रीव्यू रेंडर करें?</string>
     <string name="preview_cache_hint_action">रेंडर करें</string>

@@ -144,4 +144,26 @@ class PreviewCacheTest {
         assertEquals((255 * 128 + 0xe5 * 127 + 127) / 255, half[0].toInt() and 0xff)
         assertEquals((0xe5 * 127 + 127) / 255, half[1].toInt() and 0xff)
     }
+
+    @Test fun framesStoredOnDiskComeBackIntactAndTheFileGoesAwayOnClose() {
+        val file = java.io.File.createTempFile("preview-cache-", ".bin")
+        val store = FrameStore(10, 10, file)
+        assertTrue(store.add(byteArrayOf(1, 2, 3)))
+        assertTrue(store.add(byteArrayOf(4, 5)))
+        assertFalse(store.add(byteArrayOf(6, 7, 8, 9, 10, 11)))
+        assertEquals(2, store.count)
+        assertEquals(11, store.last)
+        assertArrayEquals(byteArrayOf(1, 2, 3), store[10])
+        assertArrayEquals(byteArrayOf(4, 5), store[11])
+        assertNull(store[12])
+        store.close()
+        assertFalse(file.exists())
+    }
+
+    @Test fun diskBudgetKeepsAReserveFreeAndHasACap() {
+        val mib = 1L shl 20
+        assertEquals(0L, diskBudget(512 * mib))
+        assertEquals(256 * mib, diskBudget(2048 * mib))
+        assertEquals(1024 * mib, diskBudget(100_000 * mib))
+    }
 }

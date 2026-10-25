@@ -1744,7 +1744,6 @@
     <string name="preview_cache_ready_range">Плавный предпросмотр готов с %1$s по %2$s. Удерживайте кнопку, чтобы удалить его.</string>
     <string name="preview_cache_removed">Отрендеренный предпросмотр удалён</string>
     <string name="preview_cache_no_memory">Недостаточно памяти для отрендеренного предпросмотра. Он удалён.</string>
-    <string name="preview_cache_trimmed">Отрендеренный предпросмотр удалён для освобождения памяти.</string>
     <string name="preview_cache_failed">Не удалось отрендерить предпросмотр.</string>
     <string name="preview_cache_hint">Воспроизведение тормозит. Отрендерить плавный предпросмотр?</string>
     <string name="preview_cache_hint_action">Отрендерить</string>

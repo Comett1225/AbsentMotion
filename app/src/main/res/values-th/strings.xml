@@ -1669,7 +1669,6 @@
     <string name="preview_cache_ready_range">ตัวอย่างลื่นไหลพร้อมใช้งานตั้งแต่ %1$s ถึง %2$s แตะค้างที่ปุ่มเพื่อลบ</string>
     <string name="preview_cache_removed">ลบตัวอย่างที่เรนเดอร์แล้ว</string>
     <string name="preview_cache_no_memory">หน่วยความจำไม่พอสำหรับตัวอย่างที่เรนเดอร์ จึงถูกลบ</string>
-    <string name="preview_cache_trimmed">ตัวอย่างที่เรนเดอร์ถูกลบเพื่อคืนหน่วยความจำ</string>
     <string name="preview_cache_failed">ไม่สามารถเรนเดอร์ตัวอย่างได้</string>
     <string name="preview_cache_hint">การเล่นไม่ลื่นไหล เรนเดอร์ตัวอย่างให้ลื่นไหลหรือไม่</string>
     <string name="preview_cache_hint_action">เรนเดอร์</string>

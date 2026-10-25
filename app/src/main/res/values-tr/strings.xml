@@ -1694,7 +1694,6 @@
     <string name="preview_cache_ready_range">%1$s ile %2$s arası akıcı önizleme hazır. Kaldırmak için düğmeyi basılı tutun.</string>
     <string name="preview_cache_removed">İşlenmiş önizleme kaldırıldı</string>
     <string name="preview_cache_no_memory">İşlenmiş önizleme için yeterli bellek yok. Kaldırıldı.</string>
-    <string name="preview_cache_trimmed">Bellek boşaltmak için işlenmiş önizleme kaldırıldı.</string>
     <string name="preview_cache_failed">Önizleme işlenemedi.</string>
     <string name="preview_cache_hint">Oynatma takılıyor. Akıcı bir önizleme işlensin mi?</string>
     <string name="preview_cache_hint_action">İşle</string>

@@ -1669,7 +1669,6 @@
     <string name="preview_cache_ready_range">Bản xem trước mượt đã sẵn sàng từ %1$s đến %2$s. Nhấn giữ nút để xóa.</string>
     <string name="preview_cache_removed">Đã xóa bản xem trước đã kết xuất</string>
     <string name="preview_cache_no_memory">Không đủ bộ nhớ cho bản xem trước đã kết xuất. Bản này đã bị xóa.</string>
-    <string name="preview_cache_trimmed">Bản xem trước đã kết xuất đã bị xóa để giải phóng bộ nhớ.</string>
     <string name="preview_cache_failed">Không thể kết xuất bản xem trước.</string>
     <string name="preview_cache_hint">Phát lại bị giật. Kết xuất bản xem trước mượt?</string>
     <string name="preview_cache_hint_action">Kết xuất</string>

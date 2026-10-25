@@ -3102,7 +3102,6 @@
  "preview_cache_rendering": "Rendering preview %1$d%%",
  "preview_cache_state_outdated": "Outdated: the project changed after rendering",
  "preview_cache_state_ready": "Rendered",
- "preview_cache_trimmed": "The rendered preview was removed to free memory.",
  "preview_fast_blur": "Fast\nBlur",
  "preview_full_blur": "Full\nBlur",
  "preview_quality": "Preview Quality",

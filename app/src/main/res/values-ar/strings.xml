@@ -1794,7 +1794,6 @@
     <string name="preview_cache_ready_range">المعاينة السلسة جاهزة من %1$s إلى %2$s. اضغط مطولًا على الزر لإزالتها.</string>
     <string name="preview_cache_removed">تمت إزالة المعاينة المصيّرة</string>
     <string name="preview_cache_no_memory">لا توجد ذاكرة كافية لمعاينة مصيّرة. تمت إزالتها.</string>
-    <string name="preview_cache_trimmed">تمت إزالة المعاينة المصيّرة لتحرير الذاكرة.</string>
     <string name="preview_cache_failed">تعذر تصيير المعاينة.</string>
     <string name="preview_cache_hint">التشغيل متقطع. هل تريد تصيير معاينة سلسة؟</string>
     <string name="preview_cache_hint_action">تصيير</string>
