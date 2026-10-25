@@ -82,7 +82,7 @@ suspend fun gifVideo(context: Context, uri: Uri): GifVideo? = withContext(Dispat
         fun declare(file: File, label: String) = MediaDeclaration(XmlNode("media", linkedMapOf(
             "uri" to FileProvider.getUriForFile(context, "${context.packageName}.files", file).toString(), "filename" to file.name, "title" to label,
             "type" to "video/mp4", "size" to "${file.length()}", "orientation" to "0", "duration" to "$total", "fps" to fpsText(fps.toFloat()),
-            "width" to "$width", "height" to "$height", "infoUpdated" to "${System.currentTimeMillis()}",
+            "width" to "$width", "height" to "$height", "infoUpdated" to "${System.currentTimeMillis()}", "audio" to "none",
         )))
         GifVideo(declare(colourFile, title), matteFile?.let { declare(it, title) }, width, height, made).also { success = true }
     } finally {

@@ -52,4 +52,10 @@ class LayerStreamTest {
         }
         assertEquals(3, wraps)
     }
+
+    @Test fun aGifClipMarkedSilentOpensNoSound() {
+        val gif = """<media uri="gif.mp4" type="video/mp4" duration="2000000" audio="none"/><shape id="1" startTime="0" endTime="1999" fillType="media" fillVideo="gif.mp4" s=".rect"/>"""
+        assertTrue(AudioClip.of(sceneXml(gif)).isEmpty())
+        assertEquals(1, AudioClip.of(sceneXml(gif.replace(" audio=\"none\"", ""))).size)
+    }
 }

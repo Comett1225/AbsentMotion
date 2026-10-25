@@ -114,7 +114,9 @@ internal class AudioClip(layer: Layer, val uri: String, private val track: Layer
         fun of(scene: Scene): List<AudioClip> = scene.layerTracks().mapNotNull { track ->
             val layer = track.layer
             val uri = layer.soundUri
-            if (uri == null || layer.hidden || layer.element(GainRef)?.mutes == true) null else AudioClip(layer, uri, track.takeIf { it.parents.isNotEmpty() }, (scene.media(uri) ?: track.scene.media(uri))?.duration?.takeIf { it > 0 }?.div(1000.0) ?: Double.POSITIVE_INFINITY)
+            val media = uri?.let { scene.media(it) ?: track.scene.media(it) }
+            if (uri == null || layer.hidden || layer.element(GainRef)?.mutes == true || media?.node?.get("audio") == "none") null
+            else AudioClip(layer, uri, track.takeIf { it.parents.isNotEmpty() }, media?.duration?.takeIf { it > 0 }?.div(1000.0) ?: Double.POSITIVE_INFINITY)
         }
     }
 }

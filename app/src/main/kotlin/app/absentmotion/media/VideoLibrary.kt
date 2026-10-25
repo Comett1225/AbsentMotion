@@ -403,7 +403,7 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
         }
 
         private suspend fun aiFrame(file: String, a: Long, b: Long, t: Float, level: SmoothLevel, stamps: LongArray): Bitmap {
-            val smooth = aiSmooth?.takeIf { it.level == level } ?: withContext(Dispatchers.IO) { AiSmooth.open(context, level) }.also { aiSmooth?.close(); aiSmooth = it }
+            val smooth = aiSmooth?.takeIf { it.level == level } ?: AiSmooth.open(context, level).also { aiSmooth?.close(); aiSmooth = it }
             val reader = aiReader?.takeIf { it.first == file }?.second ?: FrameReader(context, file).also {
                 aiReader?.second?.close()
                 aiReader = file to it
