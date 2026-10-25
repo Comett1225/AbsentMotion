@@ -44,7 +44,7 @@ The color names are the editor and home screen colors: TopBar, PreviewBg, Timeli
 
 ## Language
 
-The **Language** row shows the current language and opens the list of the 13 languages. Picking one applies it at once.
+The **Language** row shows the current language and opens the list of the 14 languages. Picking one applies it at once.
 
 ## About, Help and other rows
 
@@ -52,4 +52,4 @@ The **Language** row shows the current language and opens the list of the 13 lan
 - **About** shows the version, the license (Apache License 2.0), a note that AbsentMotion is an independent project, **Open source licenses** (the full license text of every library the app uses) and the **Project home page** address.
 - **Crash logs** lists the crashes the app recorded. Tap one to read it and use **Copy** to copy it, for example to send with a bug report. See [Troubleshooting](@troubleshooting).
 - **Check for a new version each time the app opens.** The app asks you once whether it may do this. If it is on, the app makes one request to GitHub for the latest version number when it opens. It sends nothing else and never downloads or installs anything by itself.
-- **Check for Update** does the same check once, now. If a newer version exists, **Download** opens its page in your browser.
+- **Check for Update** does the same check once, now. If a newer version exists, **Changelog** opens its release notes and **Download** opens the download of the matching app file (Latest, Play services or Compatible version) in your browser; if that file cannot be found, it opens the release page.
