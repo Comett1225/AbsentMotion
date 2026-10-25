@@ -708,6 +708,9 @@
     <string name="sounds_empty">No music or sounds were found on this device.</string>
     <string name="sounds_permission_body">Allow access to music and audio to see your sounds here. From Files works without it.</string>
     <string name="sounds_permission_allow">Allow Access</string>
+    <string name="media_permission_body">Allow access to photos and videos to see them here. View All and From Files work without it.</string>
+    <string name="media_permission_partial">Only the photos and videos you picked are shown here.</string>
+    <string name="media_permission_more">Choose More</string>
 
     <string name="audiofx_unknown_effect">Unknown effect</string>
     <string name="audiofx_turn_on">Turn on</string>

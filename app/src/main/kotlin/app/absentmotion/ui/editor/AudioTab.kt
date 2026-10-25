@@ -38,6 +38,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
@@ -109,15 +110,17 @@ internal fun AudioTab(state: EditorState, modifier: Modifier, library: AddLibrar
     val prefs = remember { context.getSharedPreferences("media", Context.MODE_PRIVATE) }
     fun granted() = context.checkSelfPermission(AudioPermission) == PackageManager.PERMISSION_GRANTED
     var allowed by remember { mutableStateOf(granted()) }
+    var answers by remember { mutableIntStateOf(0) }
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { allowed = granted() }
     val permission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { ok ->
         allowed = ok
         if (!ok) prefs.edit().putBoolean("audioRefused", true).apply()
+        answers++
         library.audioRevision++
     }
-    fun blocked() = !allowed && prefs.getBoolean("audioRefused", false) && activity?.shouldShowRequestPermissionRationale(AudioPermission) != true
+    val blocked = remember(answers, allowed) { !allowed && prefs.getBoolean("audioRefused", false) && activity?.shouldShowRequestPermissionRationale(AudioPermission) != true }
     fun ask() {
-        if (blocked()) {
+        if (blocked) {
             context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", context.packageName, null)))
         } else permission.launch(AudioPermission)
     }
@@ -156,7 +159,7 @@ internal fun AudioTab(state: EditorState, modifier: Modifier, library: AddLibrar
             item(key = "files") { ActionTile(stringResource(R.string.sounds_from_files), { Icon(TextIcons.Import, null, Modifier.size(20.dp), tint = Am.OnDark) }, ::fromFiles) }
             item(key = "speech") { ActionTile(stringResource(R.string.text_to_speech), { Icon(ChromeIcons.Captions, null, Modifier.size(20.dp), tint = Am.OnDark) }) { speaking = true } }
             if (!allowed) item(key = "access", span = { GridItemSpan(maxLineSpan) }) {
-                AccessNotice(Modifier.width(168.dp).fillMaxHeight().padding(6.dp), blocked(), ::ask)
+                AccessNotice(Modifier.width(168.dp).fillMaxHeight().padding(6.dp), blocked, ::ask)
             }
             if (shown.isEmpty() && query.isNotBlank()) item(key = "none", span = { GridItemSpan(maxLineSpan) }) {
                 NoMatches(query, R.string.search_no_sounds, Modifier.width(200.dp).fillMaxHeight())
@@ -186,7 +189,7 @@ internal fun AudioTab(state: EditorState, modifier: Modifier, library: AddLibrar
     }
     if (speaking) VoiceSheet(state) { speaking = false }
     if (browsing) SoundLibrary(
-        library.audio, view, allowed, blocked(), preview, state.addingMedia,
+        library.audio, view, allowed, blocked, preview, state.addingMedia,
         onView = { view = it; state.settings.soundView = it }, onAsk = ::ask, onFiles = ::fromFiles,
         onAdd = { add(listOf(Uri.parse(it.uri))) },
     ) { preview.stop(); browsing = false }
@@ -208,11 +211,11 @@ private fun ActionTile(label: String, icon: @Composable () -> Unit, onClick: () 
 }
 
 @Composable
-private fun AccessNotice(modifier: Modifier, blocked: Boolean, onAsk: () -> Unit) {
+internal fun AccessNotice(modifier: Modifier, blocked: Boolean, onAsk: () -> Unit, body: Int = R.string.sounds_permission_body, allow: Int = R.string.sounds_permission_allow) {
     Column(modifier.clip(RoundedCornerShape(4.dp)).background(Am.Well).padding(8.dp), verticalArrangement = Arrangement.SpaceBetween) {
-        Text(stringResource(R.string.sounds_permission_body), color = Am.OnDark, fontSize = 11.sp, lineHeight = 13.sp, maxLines = 6, overflow = TextOverflow.Ellipsis)
+        Text(stringResource(body), color = Am.OnDark, fontSize = 11.sp, lineHeight = 13.sp, maxLines = 6, overflow = TextOverflow.Ellipsis)
         Box(Modifier.fillMaxWidth().height(32.dp).clip(RoundedCornerShape(16.dp)).background(Am.Accent).clickable(onClick = onAsk), Alignment.Center) {
-            Text(stringResource(if (blocked) R.string.camera_open_settings else R.string.sounds_permission_allow), color = Am.OnAccent, fontSize = 13.sp, fontWeight = FontWeight.Medium, maxLines = 1)
+            Text(stringResource(if (blocked) R.string.camera_open_settings else allow), color = Am.OnAccent, fontSize = 13.sp, fontWeight = FontWeight.Medium, maxLines = 1)
         }
     }
 }

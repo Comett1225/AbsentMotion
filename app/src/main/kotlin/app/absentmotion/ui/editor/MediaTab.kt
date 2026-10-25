@@ -142,9 +142,33 @@ internal fun MediaTab(state: EditorState, modifier: Modifier, library: AddLibrar
     val query = debounced(search)
     val media = library.media
     LaunchedEffect(media) { if (album != null && media.none { it.albumId == album }) album = null }
+    val activity = androidx.activity.compose.LocalActivity.current
+    val prefs = remember { context.getSharedPreferences("media", android.content.Context.MODE_PRIVATE) }
+    val partial = android.os.Build.VERSION.SDK_INT >= 34
+    val wanted = remember {
+        if (android.os.Build.VERSION.SDK_INT >= 33) listOf(Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.READ_MEDIA_VIDEO)
+        else listOfNotNull(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE.takeIf { android.os.Build.VERSION.SDK_INT < 29 })
+    }
+    fun granted(name: String) = context.checkSelfPermission(name) == PackageManager.PERMISSION_GRANTED
+    fun fullAccess() = wanted.all(::granted)
+    fun someAccess() = partial && granted(Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED)
+    var full by remember { mutableStateOf(fullAccess()) }
+    var some by remember { mutableStateOf(someAccess()) }
+    var answers by remember { mutableIntStateOf(0) }
+    androidx.lifecycle.compose.LifecycleEventEffect(androidx.lifecycle.Lifecycle.Event.ON_RESUME) { full = fullAccess(); some = someAccess() }
     val permission = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+        full = fullAccess()
+        some = someAccess()
+        if (!full && !some) prefs.edit().putBoolean("mediaRefused", true).apply()
+        answers++
         library.mediaRevision++
         state.engine.refreshMedia()
+    }
+    val request = (wanted + listOfNotNull(Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED.takeIf { partial })).toTypedArray()
+    val blocked = remember(answers, full, some) { !full && !some && prefs.getBoolean("mediaRefused", false) && wanted.none { activity?.shouldShowRequestPermissionRationale(it) == true } }
+    fun ask() {
+        if (blocked) context.startActivity(android.content.Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", context.packageName, null)))
+        else permission.launch(request)
     }
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         if (uri != null) {
@@ -164,16 +188,9 @@ internal fun MediaTab(state: EditorState, modifier: Modifier, library: AddLibrar
         }
     }
     LaunchedEffect(Unit) {
-        val prefs = context.getSharedPreferences("media", android.content.Context.MODE_PRIVATE)
-        fun granted(name: String) = context.checkSelfPermission(name) == PackageManager.PERMISSION_GRANTED
-        val partial = android.os.Build.VERSION.SDK_INT >= 34
-        val visible = partial && granted(Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED)
-        val wanted = if (android.os.Build.VERSION.SDK_INT >= 33) listOf(Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.READ_MEDIA_VIDEO)
-            else listOfNotNull(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE.takeIf { android.os.Build.VERSION.SDK_INT < 29 })
-        val full = wanted.all(::granted)
-        if (!prefs.getBoolean("asked", false) && !full && !visible) {
+        if (!prefs.getBoolean("asked", false) && !full && !some) {
             prefs.edit().putBoolean("asked", true).apply()
-            permission.launch((wanted + listOfNotNull(Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED.takeIf { partial })).toTypedArray())
+            permission.launch(request)
         }
     }
     val viewAll = stringResource(R.string.view_all)
@@ -216,6 +233,11 @@ internal fun MediaTab(state: EditorState, modifier: Modifier, library: AddLibrar
                 Column(Modifier.width(97.dp).padding(6.dp)) {
                     MediaSquare(TextIcons.Import, stringResource(R.string.sounds_from_files), false) { files.launch(arrayOf("image/*", "video/*", "audio/*")) }
                 }
+            }
+            if (!full) item(key = "access", span = { GridItemSpan(maxLineSpan) }) {
+                AccessNotice(Modifier.width(168.dp).fillMaxHeight().padding(6.dp), blocked, ::ask,
+                    body = if (some) R.string.media_permission_partial else R.string.media_permission_body,
+                    allow = if (some) R.string.media_permission_more else R.string.sounds_permission_allow)
             }
             if (shown.isEmpty() && query.isNotBlank()) item(key = "none", span = { GridItemSpan(maxLineSpan) }) {
                 NoMatches(query, R.string.search_no_photos_or_videos, Modifier.width(200.dp).fillMaxHeight())

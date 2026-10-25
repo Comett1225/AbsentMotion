@@ -692,6 +692,9 @@
     <string name="sounds_empty">এই ডিভাইসে কোনো মিউজিক বা সাউন্ড পাওয়া যায়নি।</string>
     <string name="sounds_permission_body">এখানে সাউন্ড দেখতে মিউজিক ও অডিওর অ্যাক্সেস দিন। ফাইল থেকে এটি ছাড়াই কাজ করে।</string>
     <string name="sounds_permission_allow">অ্যাক্সেস দিন</string>
+    <string name="media_permission_body">এখানে ছবি ও ভিডিও দেখতে সেগুলোতে অ্যাক্সেস দিন। সব দেখুন ও ফাইল থেকে এটি ছাড়াই কাজ করে।</string>
+    <string name="media_permission_partial">এখানে শুধু আপনি বেছে নেওয়া ছবি ও ভিডিও দেখানো হচ্ছে।</string>
+    <string name="media_permission_more">আরও বাছুন</string>
     <string name="audiofx_unknown_effect">অজানা ইফেক্ট</string>
     <string name="audiofx_turn_on">চালু করুন</string>
     <string name="audiofx_bypass">বাইপাস</string>
