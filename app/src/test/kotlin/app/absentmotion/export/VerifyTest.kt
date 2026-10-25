@@ -65,6 +65,16 @@ class VerifyTest {
         assertTrue(lookDistance(drawn, decoded) < 0.01f)
     }
 
+    @Test fun aFileTurnedAQuarterIsReadBackUpright() {
+        val upright = FloatArray(LookCells * LookCells) { it.toFloat() }
+        val stored = FloatArray(upright.size) { i -> val u = i % LookCells; val v = i / LookCells; upright[u * LookCells + (LookCells - 1 - v)] }
+        assertTrue(uprightLook(stored, 90).contentEquals(upright))
+        assertTrue(uprightLook(uprightLook(uprightLook(uprightLook(stored, 90), 90), 90), 90).contentEquals(stored))
+        assertTrue(uprightLook(uprightLook(stored, 90), 270).contentEquals(stored))
+        assertTrue(uprightLook(uprightLook(stored, 180), 180).contentEquals(stored))
+        assertTrue(uprightLook(stored, 0) === stored)
+    }
+
     @Test fun slowDevicesGetMoreTimeForBigVideos() {
         assertEquals(800L + 1080L * 1920 / 5_000, decodeBudgetMs(1080, 1920))
         assertTrue(decodeBudgetMs(3840, 2160) > decodeBudgetMs(1080, 1920))

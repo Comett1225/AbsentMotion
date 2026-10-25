@@ -149,6 +149,21 @@ class DeviceReportTest {
         assertEquals(Support.Supported, old.check(av1.copy(container = Container.Mkv), 1080, 1920))
     }
 
+    @Test fun aPortraitVideoTheHardwareOnlyTakesSidewaysIsEncodedTurnedInMp4() {
+        val landscapeOnly = EncoderCaps("qti.avc", "video/avc", true, 96..1920, 96..1088, 2, 2, listOf(SizePoint(1920, 1080, 60.0)), 1..100_000_000)
+        val software = EncoderCaps("android.avc", "video/avc", false, 2..2048, 2..2048, 2, 2, listOf(SizePoint(1080, 1920, 30.0), SizePoint(1920, 1080, 30.0)), 1..100_000_000)
+        val tablet = DeviceReport("k", listOf(landscapeOnly, software, aac), turns = true)
+        val mp4 = ExportSettings(1080, 30)
+        assertEquals(1920 to 1080, tablet.encodeSize(mp4, 1080, 1920))
+        assertEquals(Support.Supported, tablet.check(mp4, 1080, 1920))
+        val mkv = mp4.copy(container = Container.Mkv)
+        assertEquals(1080 to 1920, tablet.encodeSize(mkv, 1080, 1920))
+        assertTrue(tablet.check(mkv, 1080, 1920) is Support.SlowSoftwareOnly)
+        assertTrue(tablet.copy(turns = false).check(mp4, 1080, 1920) is Support.SlowSoftwareOnly)
+        assertEquals(1920 to 1080, tablet.encodeSize(mp4, 1920, 1080))
+        assertEquals(1080 to 1920, report.copy(turns = true).encodeSize(mp4, 1080, 1920))
+    }
+
     @Test fun audioOnlyFormatsAreCheckedAgainstTheEncodersAndTheAndroidVersion() {
         val flac = EncoderCaps("flac", "audio/flac", false, bitrates = 1..21_000_000, sampleRates = listOf(44100, 48000), maxChannels = 2)
         val device = DeviceReport("k", listOf(aac, opus, flac), sdk = 30)

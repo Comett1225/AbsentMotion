@@ -8,6 +8,7 @@ import android.media.MediaCodecList
 import android.os.Build
 import android.os.SystemClock
 import app.absentmotion.R
+import app.absentmotion.Tier
 import app.absentmotion.engine.EngineThread
 import app.absentmotion.i18n.UiText
 import app.absentmotion.i18n.txt
@@ -78,13 +79,21 @@ sealed interface Support {
     data class Unsupported(val reason: UiText, val suggestion: ExportSettings?, val sound: Boolean = false) : Support
 }
 
-data class DeviceReport(val key: String, val encoders: List<EncoderCaps>, val probe: ProbeResult? = null, val sdk: Int = Int.MAX_VALUE) {
+data class DeviceReport(
+    val key: String, val encoders: List<EncoderCaps>, val probe: ProbeResult? = null, val sdk: Int = Int.MAX_VALUE, val turns: Boolean = false,
+) {
     fun encodersFor(mime: String): List<EncoderCaps> = encoders.filter { it.mime == mime }
 
     fun hardware(codec: Codec): Boolean = encodersFor(codec.mime).any { it.hardware }
 
     fun encoderFor(codec: Codec, width: Int, height: Int): EncoderCaps? =
         encodersFor(codec.mime).sortedByDescending { it.hardware }.firstOrNull { it.fitsSize(width, height) }
+
+    fun encodeSize(s: ExportSettings, width: Int, height: Int): Pair<Int, Int> {
+        val hardware = encodersFor(s.codec.mime).filter { it.hardware }
+        val turned = turnsToLandscape(width, height, s.container, hardware.any { it.fitsSize(width, height) }, hardware.any { it.fitsSize(height, width) }, turns)
+        return if (turned) height to width else width to height
+    }
 
     val videoCodecs: List<Codec> get() = Codec.entries.filter { encodersFor(it.mime).isNotEmpty() }
 
@@ -102,7 +111,8 @@ data class DeviceReport(val key: String, val encoders: List<EncoderCaps>, val pr
         if (all.isEmpty()) {
             return Support.Unsupported(txt(R.string.export_support_no_encoder, s.codec.label), alternative(s, width, height))
         }
-        val sized = all.filter { it.fitsSize(width, height) }
+        val (encodeWidth, encodeHeight) = encodeSize(s, width, height)
+        val sized = all.filter { it.fitsSize(encodeWidth, encodeHeight) }
         if (sized.isEmpty()) {
             return Support.Unsupported(txt(R.string.export_support_cannot_encode, s.codec.label, "${width}x$height"), alternative(s, width, height))
         }
@@ -115,7 +125,7 @@ data class DeviceReport(val key: String, val encoders: List<EncoderCaps>, val pr
         if (sized.none { it.hardware }) {
             return Support.SlowSoftwareOnly(txt(R.string.export_support_software_only, s.codec.label))
         }
-        if (sized.none { it.hardware && it.fits(width, height, s.fps) }) {
+        if (sized.none { it.hardware && it.fits(encodeWidth, encodeHeight, s.fps) }) {
             return Support.SlowSoftwareOnly(txt(R.string.export_support_rated_below, s.codec.label, s.fps.toString(), "${width}x$height"))
         }
         return Support.Supported
@@ -225,7 +235,8 @@ class DeviceCapabilities private constructor(context: Context) {
     suspend fun load(): DeviceReport? = lock.withLock {
         state.value?.let { return it }
         val stored = withContext(Dispatchers.IO) { runCatching { prefs.getString("report", null)?.let { DeviceReport.fromJson(JSONObject(it)) } }.getOrNull() }
-        (stored?.takeIf { it.key == key } ?: listing.get()?.let { DeviceReport(key, it, sdk = Build.VERSION.SDK_INT).also(::store) })?.also { state.value = it }
+        (stored?.takeIf { it.key == key } ?: listing.get()?.let { DeviceReport(key, it, sdk = Build.VERSION.SDK_INT).also(::store) })
+            ?.copy(turns = Tier.compatible)?.also { state.value = it }
     }
 
     suspend fun runCheckNow(engine: EngineThread?, progress: (Float) -> Unit = {}): DeviceReport {
@@ -233,7 +244,7 @@ class DeviceCapabilities private constructor(context: Context) {
         progress(0.3f)
         val probe = engine?.let { probeWithin(ProbeLimitMs) { probe(it) { p -> progress(0.3f + 0.7f * p) } } }
         progress(1f)
-        return lock.withLock { DeviceReport(key, encoders, probe ?: state.value?.probe, Build.VERSION.SDK_INT).also { store(it); state.value = it } }
+        return lock.withLock { DeviceReport(key, encoders, probe ?: state.value?.probe, Build.VERSION.SDK_INT, Tier.compatible).also { store(it); state.value = it } }
     }
 
     suspend fun confirmSize(width: Int, height: Int) {

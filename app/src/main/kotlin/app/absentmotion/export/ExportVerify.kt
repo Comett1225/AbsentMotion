@@ -49,6 +49,16 @@ internal fun middleLooksRight(drawn: FrameLooks, decodedFirst: FloatArray, decod
     return !(lookDistance(decodedFirst, decodedMiddle) < 0.01f && lookDistance(drawn.first, drawn.middle) > 0.06f)
 }
 
+internal fun uprightLook(look: FloatArray, degrees: Int): FloatArray {
+    val n = LookCells - 1
+    return when ((degrees % 360 + 360) % 360) {
+        90 -> FloatArray(look.size) { i -> look[(n - i % LookCells) * LookCells + i / LookCells] }
+        180 -> FloatArray(look.size) { i -> look[(n - i / LookCells) * LookCells + n - i % LookCells] }
+        270 -> FloatArray(look.size) { i -> look[(i % LookCells) * LookCells + n - i / LookCells] }
+        else -> look
+    }
+}
+
 internal fun rgbaLook(rgba: ByteArray, width: Int, height: Int): FloatArray {
     val sums = FloatArray(LookCells * LookCells)
     val counts = IntArray(LookCells * LookCells)
@@ -128,12 +138,15 @@ private fun decodeFrames(extractor: MediaExtractor, track: Int, format: MediaFor
     try {
         extractor.selectTrack(track)
         extractor.seekTo(0, MediaExtractor.SEEK_TO_CLOSEST_SYNC)
+        val turned = format.intOr(MediaFormat.KEY_ROTATION, 0)
         val first = frameAt(codec, extractor, SystemClock.elapsedRealtime() + budget, 0, looks != null)
         var middle: Boolean? = null
-        if (looks != null && first?.look != null) {
+        val firstLook = first?.look?.let { uprightLook(it, turned) }
+        if (looks != null && firstLook != null) {
             codec.flush()
             extractor.seekTo(looks.middleUs, MediaExtractor.SEEK_TO_PREVIOUS_SYNC)
-            middle = frameAt(codec, extractor, SystemClock.elapsedRealtime() + budget, looks.middleUs, true)?.look?.let { middleLooksRight(looks, first.look, it) }
+            middle = frameAt(codec, extractor, SystemClock.elapsedRealtime() + budget, looks.middleUs, true)?.look
+                ?.let { middleLooksRight(looks, firstLook, uprightLook(it, turned)) }
         }
         var lastSample = 0L
         extractor.seekTo(if (format.containsKey(MediaFormat.KEY_DURATION)) format.getLong(MediaFormat.KEY_DURATION) else Long.MAX_VALUE / 2, MediaExtractor.SEEK_TO_PREVIOUS_SYNC)

@@ -5,8 +5,8 @@ import android.view.Surface
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
 
-internal class EncoderCopy(surface: Surface) : AutoCloseable {
-    private var handle = nativeOpen(surface).also { check(it != 0L) { "encoder copy set-up failed" } }
+internal class EncoderCopy(surface: Surface, turn: Boolean) : AutoCloseable {
+    private var handle = nativeOpen(surface, turn).also { check(it != 0L) { "encoder copy set-up failed" } }
 
     fun copy(buffer: HardwareBuffer, presentNs: Long): Boolean = nativeCopy(handle, buffer, presentNs)
 
@@ -16,16 +16,16 @@ internal class EncoderCopy(surface: Surface) : AutoCloseable {
     }
 
     private companion object {
-        @JvmStatic external fun nativeOpen(surface: Surface): Long
+        @JvmStatic external fun nativeOpen(surface: Surface, turn: Boolean): Long
         @JvmStatic external fun nativeCopy(handle: Long, buffer: HardwareBuffer, presentNs: Long): Boolean
         @JvmStatic external fun nativeClose(handle: Long)
     }
 }
 
-internal class EncoderFeed(input: Surface, width: Int, height: Int) : AutoCloseable {
+internal class EncoderFeed(input: Surface, width: Int, height: Int, turn: Boolean = false) : AutoCloseable {
     private val buffers = Array(2) { HardwareBuffer.create(width, height, HardwareBuffer.RGBA_8888, 1,
         HardwareBuffer.USAGE_GPU_COLOR_OUTPUT or HardwareBuffer.USAGE_GPU_SAMPLED_IMAGE) }
-    private val copy = try { EncoderCopy(input) } catch (t: Throwable) { buffers.forEach { it.close() }; throw t }
+    private val copy = try { EncoderCopy(input, turn) } catch (t: Throwable) { buffers.forEach { it.close() }; throw t }
     private val copier = Executors.newSingleThreadExecutor { Thread(it, "am-export-copy") }
     private val copies = arrayOfNulls<Future<Boolean>>(2)
     private var sent = 0

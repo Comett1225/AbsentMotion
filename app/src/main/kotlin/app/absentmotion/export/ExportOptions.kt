@@ -106,6 +106,9 @@ fun audioFormatProblem(format: AudioFormat, sdk: Int): UiText? =
 
 fun imageProblem(kind: ImageKind, sdk: Int): UiText? = if (kind == ImageKind.WebpLossless && sdk < 29) txt(R.string.export_reason_webp_lossless) else null
 
+internal fun turnsToLandscape(width: Int, height: Int, container: Container, hardwarePortrait: Boolean, hardwareLandscape: Boolean, canTurn: Boolean): Boolean =
+    canTurn && width < height && (container == Container.Mp4 || container == Container.Mov) && !hardwarePortrait && hardwareLandscape
+
 internal fun stillFits(width: Int, height: Int, heapBytes: Long = Runtime.getRuntime().maxMemory()): Boolean =
     width > 0 && height > 0 && width.toLong() * height * 4 <= heapBytes / 2
 

@@ -142,7 +142,7 @@ class ExportTimes(context: Context) {
         val history = history()
         val learned = estimateExportMs(history, probe, s.codec, w, h, s.fps, frames, s.interpolation)
         val proven = history.any { it.codec == s.codec && it.width == w && it.height == h && it.fps == s.fps && it.interpolation == s.interpolation }
-        val floor = encoders?.takeIf { !proven }?.let { encoderFloorMs(it.encoderFor(s.codec, w, h), w, h, s.fps, frames) }
+        val floor = encoders?.takeIf { !proven }?.let { report -> report.encodeSize(s, w, h).let { (ew, eh) -> encoderFloorMs(report.encoderFor(s.codec, ew, eh), ew, eh, s.fps, frames) } }
         val drawing = drawMs?.let { (DefaultSetupMs + frames * it).roundToLong() }
         return listOfNotNull(learned, floor, drawing).maxOrNull()?.let { it + pauseMs(thermal) * frames }
     }

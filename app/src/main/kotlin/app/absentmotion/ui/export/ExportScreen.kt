@@ -309,7 +309,9 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
     val sizes = remember { ExportSizes(context) }
     val rawEstimate = if (kind == ExportKind.Gif) gifSample?.bytes ?: -1L else remember(kind, scene, settings.getValue(kind), hasAudio, report) {
         val s = settings.getValue(kind)
-        val bitrates = if (kind == ExportKind.Video) exportSize(scene, s.shortSide, even = true).let { (w, h) -> report?.encoderFor(s.codec, w, h)?.bitrates } else null
+        val bitrates = if (kind == ExportKind.Video) exportSize(scene, s.shortSide, even = true).let { (w, h) ->
+            report?.let { r -> r.encodeSize(s, w, h).let { (ew, eh) -> r.encoderFor(s.codec, ew, eh)?.bitrates } }
+        } else null
         estimateBytes(kind, scene, s, hasAudio, bitrates)
     }
     val sizeKey = ExportSizes.key(kind, settings.getValue(kind))

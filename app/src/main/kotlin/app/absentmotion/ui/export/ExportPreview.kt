@@ -347,8 +347,11 @@ private fun videoFacts(context: Context, uri: Uri): VideoFacts {
     val reader = MediaMetadataRetriever()
     try {
         reader.setDataSource(context, uri)
-        val w = reader.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)?.toIntOrNull()?.takeIf { it > 0 } ?: return VideoFacts(0f, null)
-        val h = reader.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)?.toIntOrNull()?.takeIf { it > 0 } ?: return VideoFacts(0f, null)
+        val coded = reader.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)?.toIntOrNull()?.takeIf { it > 0 } ?: return VideoFacts(0f, null)
+        val codedHeight = reader.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)?.toIntOrNull()?.takeIf { it > 0 } ?: return VideoFacts(0f, null)
+        val sideways = (reader.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION)?.toIntOrNull() ?: 0) % 180 != 0
+        val w = if (sideways) codedHeight else coded
+        val h = if (sideways) coded else codedHeight
         val scale = minOf(1f, StillSide.toFloat() / maxOf(w, h))
         val still = runCatching { reader.getScaledFrameAtTime(0, MediaMetadataRetriever.OPTION_CLOSEST_SYNC, (w * scale).toInt().coerceAtLeast(1), (h * scale).toInt().coerceAtLeast(1)) }
             .onFailure { Log.w("AMExport", "cannot read a still of the export", it) }.getOrNull()

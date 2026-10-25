@@ -193,8 +193,11 @@ private fun av1Levels(data: ByteArray, start: Int): Triple<Int, Int, Int> {
     return Triple(profile, level, if (level > 7) read(1) else 0)
 }
 
-internal fun openSink(container: Container, fd: FileDescriptor, fps: Int, bt601: Boolean = false): SampleSink = when (container) {
-    Container.Mp4, Container.Mov -> MuxerSink(fd, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
+internal fun openSink(container: Container, fd: FileDescriptor, fps: Int, bt601: Boolean = false, rotation: Int = 0): SampleSink = when (container) {
+    Container.Mp4, Container.Mov -> MediaMuxer(fd, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4).let { muxer ->
+        if (rotation != 0) muxer.setOrientationHint(rotation)
+        MuxerSink(muxer)
+    }
     Container.WebM -> MatroskaSink(fd, fps, webm = true, bt601 = bt601)
     Container.Mkv -> MatroskaSink(fd, fps, bt601 = bt601)
 }

@@ -13,6 +13,7 @@ import android.os.Build
 import android.util.Log
 import android.view.Surface
 import app.absentmotion.R
+import app.absentmotion.Tier
 import app.absentmotion.engine.EngineThread
 import app.absentmotion.i18n.UiText
 import app.absentmotion.i18n.txt
@@ -146,15 +147,25 @@ private fun encoderFormat(info: MediaCodecInfo, caps: MediaCodecInfo.CodecCapabi
     if (hot) setInteger(MediaFormat.KEY_OPERATING_RATE, s.fps)
 }
 
+private fun hardwareEncodes(mime: String, width: Int, height: Int): Boolean = MediaCodecList(MediaCodecList.REGULAR_CODECS).codecInfos.any {
+    it.isEncoder && !it.alias && it.hardware && mime in it.supportedTypes && it.getCapabilitiesForType(mime).videoCapabilities?.isSizeSupported(width, height) == true
+}
+
+internal fun turnsForEncoder(s: ExportSettings, width: Int, height: Int): Boolean = Tier.compatible && width < height &&
+    turnsToLandscape(width, height, s.container, hardwareEncodes(s.codec.mime, width, height), hardwareEncodes(s.codec.mime, height, width), true)
+
 private suspend fun encode(
     engine: EngineThread, scene: Scene, xml: String, s: ExportSettings, out: FileDescriptor, audio: AudioMix?, width: Int, height: Int, frames: Int,
     hotAtStart: Boolean, pauseMs: () -> Long, note: (UiText) -> Unit, looks: (FrameLooks) -> Unit, progress: (Float) -> Unit,
 ) {
-    val encoder = openVideoEncoder(s, width, height, hotAtStart, note)
+    val turn = turnsForEncoder(s, width, height)
+    val encoder = if (turn) openVideoEncoder(s, height, width, hotAtStart, note) else openVideoEncoder(s, width, height, hotAtStart, note)
+    if (turn) Log.i("AMExport", "encoding ${width}x$height as ${height}x$width turned a quarter, shown upright by the file's rotation")
     val stop = AtomicBoolean()
     val failure = AtomicReference<Throwable>()
     fun fail(t: Throwable) { failure.compareAndSet(null, t); stop.set(true) }
-    val mux = try { Mux(openSink(s.container, out, s.fps, fixedBt601(encoder.codecInfo)), if (audio != null) 2 else 1, MuxBudgetBytes, stop::get, ::fail) } catch (t: Throwable) { encoder.release(); throw t }
+    val mux = try { Mux(openSink(s.container, out, s.fps, fixedBt601(encoder.codecInfo), if (turn) 90 else 0), if (audio != null) 2 else 1, MuxBudgetBytes, stop::get, ::fail) }
+        catch (t: Throwable) { encoder.release(); throw t }
     val videoDone = AtomicBoolean()
     val workers = ArrayList<Thread>()
     var surface: Surface? = null
@@ -201,9 +212,9 @@ private suspend fun encode(
                 fun perFrame(ns: Long) = "%.1f".format(java.util.Locale.ROOT, ns / 1e6 / frames.coerceAtLeast(1))
                 Log.i("AMExport", "$frames frames in ${spent[2] / 1_000_000} ms; per frame: ${perFrame(spent[2])} ms, drawing ${perFrame(spent[0] - spent[1])} ms, waiting for copies ${perFrame(spent[1])} ms")
             }
-            val buffers = ExportDebug.forceBuffers || Build.VERSION.SDK_INT < 33 || !stampsPresentTime()
+            val buffers = turn || ExportDebug.forceBuffers || Build.VERSION.SDK_INT < 33 || !stampsPresentTime()
             Log.i("AMExport", "rendering $frames frames at ${width}x$height through ${if (buffers) "encoder buffers" else "the swapchain"}")
-            if (buffers && Build.VERSION.SDK_INT >= 33) {
+            if (buffers && !turn && Build.VERSION.SDK_INT >= 33) {
                 val writer = ImageWriter.Builder(input).setMaxImages(2).setHardwareBufferFormat(HardwareBuffer.RGBA_8888)
                     .setUsage(HardwareBuffer.USAGE_GPU_COLOR_OUTPUT or HardwareBuffer.USAGE_GPU_SAMPLED_IMAGE).build()
                 try {
@@ -224,7 +235,7 @@ private suspend fun encode(
                     writer.close()
                 }
             } else if (buffers) {
-                val feed = EncoderFeed(input, width, height)
+                val feed = EncoderFeed(input, width, height, turn)
                 try {
                     eachFrame({ exportCheck(feed.flush().also { spent[1] = feed.waitedNs }) { txt(R.string.export_error_draw_frame, (frames - 1).toString()) } }) { k, presentNs ->
                         exportCheck(feed.ready().also { spent[1] = feed.waitedNs }) { txt(R.string.export_error_draw_frame, (k - 2).toString()) }

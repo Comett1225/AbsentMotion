@@ -15,8 +15,13 @@ namespace {
 
 const char* kVertex =
     "attribute vec2 p;\n"
+    "uniform float turn;\n"
     "varying vec2 uv;\n"
-    "void main() { uv = vec2(p.x * 0.5 + 0.5, 0.5 - p.y * 0.5); gl_Position = vec4(p, 0.0, 1.0); }\n";
+    "void main() {\n"
+    "  vec2 s = vec2(p.x * 0.5 + 0.5, 0.5 - p.y * 0.5);\n"
+    "  uv = mix(s, vec2(1.0 - s.y, s.x), turn);\n"
+    "  gl_Position = vec4(p, 0.0, 1.0);\n"
+    "}\n";
 
 const char* kFragment =
     "#extension GL_OES_EGL_image_external : require\n"
@@ -34,6 +39,7 @@ struct Copier {
     GLuint texture = 0;
     int width = 0;
     int height = 0;
+    bool turn = false;
     PFNEGLGETNATIVECLIENTBUFFERANDROIDPROC clientBuffer = nullptr;
     PFNEGLCREATEIMAGEKHRPROC createImage = nullptr;
     PFNEGLDESTROYIMAGEKHRPROC destroyImage = nullptr;
@@ -154,6 +160,7 @@ bool copy(Copier* c, AHardwareBuffer* buffer, int64_t presentNs) {
     glBindTexture(GL_TEXTURE_EXTERNAL_OES, c->texture);
     c->targetTexture(GL_TEXTURE_EXTERNAL_OES, (GLeglImageOES)image);
     glUniform1i(glGetUniformLocation(c->program, "frame"), 0);
+    glUniform1f(glGetUniformLocation(c->program, "turn"), c->turn ? 1.0f : 0.0f);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, quad);
     glEnableVertexAttribArray(0);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -169,8 +176,9 @@ bool copy(Copier* c, AHardwareBuffer* buffer, int64_t presentNs) {
 
 extern "C" {
 
-JNIEXPORT jlong JNICALL Java_app_absentmotion_export_EncoderCopy_nativeOpen(JNIEnv* env, jclass, jobject surface) {
+JNIEXPORT jlong JNICALL Java_app_absentmotion_export_EncoderCopy_nativeOpen(JNIEnv* env, jclass, jobject surface, jboolean turn) {
     auto* c = new Copier();
+    c->turn = turn == JNI_TRUE;
     c->window = ANativeWindow_fromSurface(env, surface);
     if (!c->window || !setUp(c)) {
         LOGE("encoder copy: EGL set-up failed (0x%x)", eglGetError());
