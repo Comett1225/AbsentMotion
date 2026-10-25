@@ -13,6 +13,9 @@ import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import kotlin.math.roundToInt
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.composed
+import androidx.compose.ui.input.pointer.isCtrlPressed
+import androidx.compose.ui.input.pointer.pointerInput
 import app.absentmotion.library.openableUri
 
 typealias Context = android.content.Context
@@ -116,7 +119,21 @@ fun rememberDocumentPicker(onResult: (Uri?) -> Unit): DocumentPicker {
     val launcher = androidx.activity.compose.rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.OpenDocument(), onResult)
     return DocumentPicker { launcher.launch(arrayOf("*/*")) }
 }
-fun wheel(onScroll: (delta: androidx.compose.ui.geometry.Offset, at: androidx.compose.ui.geometry.Offset, zoom: Boolean) -> Unit): androidx.compose.ui.Modifier = androidx.compose.ui.Modifier
+fun wheel(onScroll: (delta: androidx.compose.ui.geometry.Offset, at: androidx.compose.ui.geometry.Offset, zoom: Boolean) -> Unit): androidx.compose.ui.Modifier =
+    androidx.compose.ui.Modifier.composed {
+        val latest by androidx.compose.runtime.rememberUpdatedState(onScroll)
+        androidx.compose.ui.Modifier.pointerInput(Unit) {
+            awaitPointerEventScope {
+                while (true) {
+                    val event = awaitPointerEvent()
+                    if (event.type != androidx.compose.ui.input.pointer.PointerEventType.Scroll) continue
+                    val change = event.changes.firstOrNull() ?: continue
+                    latest(change.scrollDelta, change.position, event.keyboardModifiers.isCtrlPressed)
+                    change.consume()
+                }
+            }
+        }
+    }
 
 fun makeBitmap(width: Int, height: Int): Bitmap = android.graphics.Bitmap.createBitmap(width, height, android.graphics.Bitmap.Config.ARGB_8888)
 fun recycleBitmap(bitmap: Bitmap) = bitmap.recycle()
