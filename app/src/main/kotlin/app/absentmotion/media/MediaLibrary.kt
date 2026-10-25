@@ -59,7 +59,7 @@ class MediaLibrary(context: Context, private val engine: EngineThread) {
         val limit = pictureLimit(engine.maxPictureSize(), listOfNotNull(scene, pinned).maxOf { maxOf(it.width, it.height) })
         val generation = engine.generation to limit
         loadPictures(scene.node.imageUris(), loaded,
-            { uri -> Triple(scene.media(uri), withContext(Dispatchers.IO) { fileVersion(resolver, Uri.parse(uri)) }, generation) },
+            { uri -> Triple(scene.media(uri) ?: loaded[uri]?.first, withContext(Dispatchers.IO) { fileVersion(resolver, Uri.parse(uri)) }, generation) },
             { uri ->
                 withContext(Dispatchers.IO) { decodePicture(resolver, Uri.parse(uri), limit) }
                     .also { Log.i("AMMedia", "picture $uri ${it?.width}x${it?.height} limit $limit") }

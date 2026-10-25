@@ -122,7 +122,7 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
         solo = state.soloMode, soloIds = selection, camera = state.cameraMode, guides = state.snapGuides, refPx = refPx * quality,
         accurateBlur = state.settings.fullMotionBlur,
     ) else null
-    val cacheMatch by remember(state) { derivedStateOf { cacheMatches(state) } }
+    val cacheMatch by remember(state, mediaRevision) { derivedStateOf { cacheMatches(state, mediaRevision) } }
     val cacheUsable = cacheMatch && app.absentmotion.editor.cacheFrameSize(scene.width, scene.height, scale, divisor).first <= (PreviewCache.player?.width ?: 0) * 1.25f
     val usable = rememberUpdatedState(cacheUsable)
     val cachedPlaying = remember(state) { derivedStateOf { usable.value && state.playing && PreviewCache.covers(state.frame) } }

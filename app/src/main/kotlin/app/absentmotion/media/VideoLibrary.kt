@@ -130,6 +130,14 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
 
     fun resumePreview() { latest?.let { requests.trySend(it) } }
 
+    fun trim(): Job = scope.launch {
+        lock.withLock {
+            if (holds.get() > 0) return@withLock
+            val now = latest?.let { request -> request.scene.videoSamples(request.timeMs, request.playing, warm = false).map { it.layer.id }.toSet() }.orEmpty()
+            for ((id, session) in sessions.toMap()) if (id !in now) { sessions.remove(id); session.close() }
+        }
+    }
+
     fun hold(): Job {
         holds.incrementAndGet()
         VideoProxies.paused = true

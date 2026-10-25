@@ -98,6 +98,7 @@ public:
     virtual int renderBuffer(AHardwareBuffer* buffer, double timeMs, uint32_t background) = 0;
 
     virtual void releaseBuffers() = 0;
+    virtual void trim() = 0;
 
     virtual bool layerQuad(int64_t layerId, double timeMs, float xy[8]) = 0;
 

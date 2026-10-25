@@ -26,6 +26,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.delay
 import kotlin.coroutines.coroutineContext
 import kotlin.math.floor
 import app.absentmotion.library.openableUri
@@ -72,6 +73,11 @@ private suspend fun thumbnailsAt(context: Context, uri: String, tiles: List<Pair
         val source = VideoProxies.ready(context, uri, fileVersion(context.contentResolver, Uri.parse(uri))) ?: uri
         tiles.mapNotNull { (projectTime, timeUs) ->
             coroutineContext.ensureActive()
+            while (VideoProxies.paused) {
+                retriever?.release()
+                retriever = null
+                delay(250)
+            }
             val time = pts.ptsAt(timeUs)
             val key = uri to time
             val picture = synchronized(thumbnails) { thumbnails.get(key) } ?: (retriever ?: MediaMetadataRetriever().also {

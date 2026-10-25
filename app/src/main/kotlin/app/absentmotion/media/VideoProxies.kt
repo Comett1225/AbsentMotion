@@ -67,6 +67,16 @@ internal object ProxyRules {
 
     fun bitrate(width: Int, height: Int, fps: Int): Int = (width.toLong() * height * fps.coerceIn(1, 120) / 5).coerceIn(500_000, 8_000_000).toInt()
 
+    const val FREE_RESERVE = 1L shl 30
+    const val RETRY_NS = 60_000_000_000L
+
+    fun bytes(width: Int, height: Int, fps: Int, durationUs: Long): Long {
+        val (w, h) = size(width, height)
+        return bitrate(w, h, fps) / 8L * (durationUs.coerceAtLeast(0) / 1_000_000 + 2)
+    }
+
+    fun roomFor(freeBytes: Long, neededBytes: Long): Boolean = freeBytes >= neededBytes + FREE_RESERVE
+
     fun key(uri: String, version: String?): String? = version?.let {
         MessageDigest.getInstance("SHA-256").digest("$uri\n$it".toByteArray()).joinToString("") { b -> "%02x".format(b) }.take(32)
     }
@@ -81,6 +91,7 @@ object VideoProxies {
     private val scope = CoroutineScope(SupervisorJob() + Executors.newSingleThreadExecutor { Thread(it, "am-proxy").apply { priority = Thread.MIN_PRIORITY } }.asCoroutineDispatcher())
     private val queued = Collections.synchronizedSet(HashSet<String>())
     private val settled = Collections.synchronizedSet(HashSet<String>())
+    private val retryAt = java.util.concurrent.ConcurrentHashMap<String, Long>()
     private val making = MutableStateFlow<Map<String, Float>>(emptyMap())
     private val made = MutableStateFlow(0)
     @Volatile private var generation = 0
@@ -102,7 +113,7 @@ object VideoProxies {
     }
 
     internal fun request(context: Context, uri: String) {
-        if (uri in settled || paused || !enabled(context) || !queued.add(uri)) return
+        if (uri in settled || paused || !enabled(context) || (retryAt[uri] ?: 0L) - System.nanoTime() > 0 || !queued.add(uri)) return
         val app = context.applicationContext
         val started = generation
         scope.launch {
@@ -112,7 +123,10 @@ object VideoProxies {
         }
     }
 
-    internal fun forgetChecks() = settled.clear()
+    internal fun forgetChecks() {
+        settled.clear()
+        retryAt.clear()
+    }
 
     fun settingChanged() {
         settled.clear()
@@ -139,6 +153,13 @@ object VideoProxies {
         if (done.isFile || failures >= ProxyRules.MAX_TRIES) { settled += uri; return }
         val info = sourceInfo(context, uri)
         if (!ProxyRules.needed(info.width, info.height, VideoSources.syncGapUs(context, uri), info.hdr)) { settled += uri; return }
+        val needed = ProxyRules.bytes(info.width, info.height, info.fps, info.durationUs)
+        trim(folder, BUDGET_BYTES - needed)
+        if (!ProxyRules.roomFor(folder.usableSpace, needed)) {
+            Log.w("AMProxy", "no room for a preview copy of $uri: $needed bytes needed, ${folder.usableSpace} free")
+            settled += uri
+            return
+        }
         val part = File(folder, "$key.part")
         Log.i("AMProxy", "making a preview copy of $uri (${info.width}x${info.height})")
         val started = System.nanoTime()
@@ -164,20 +185,20 @@ object VideoProxies {
             made.update { it + 1 }
         } catch (e: Exception) {
             part.delete()
-            if (!cancelled()) { failed.writeText("${failures + 1}"); settled += uri }
+            if (!cancelled()) { failed.writeText("${failures + 1}"); retryAt[uri] = System.nanoTime() + ProxyRules.RETRY_NS }
             throw e
         }
     }
 
-    private fun trim(folder: File) {
+    private fun trim(folder: File, budget: Long = BUDGET_BYTES) {
         folder.listFiles { f -> f.extension == "part" }?.forEach { it.delete() }
         val copies = folder.listFiles { f -> f.extension == "mp4" }?.sortedByDescending { it.lastModified() } ?: return
         var total = 0L
-        for (f in copies) { total += f.length(); if (total > BUDGET_BYTES) f.delete() }
+        for (f in copies) { total += f.length(); if (total > budget) f.delete() }
     }
 }
 
-private class SourceInfo(val width: Int, val height: Int, val hdr: Boolean)
+private class SourceInfo(val width: Int, val height: Int, val hdr: Boolean, val fps: Int, val durationUs: Long)
 
 private fun sourceInfo(context: Context, uri: String): SourceInfo {
     val extractor = MediaExtractor()
@@ -185,7 +206,9 @@ private fun sourceInfo(context: Context, uri: String): SourceInfo {
         extractor.setDataSource(context, Uri.parse(openableUri(uri)), null)
         val format = videoTrack(extractor).second
         val (width, height) = visibleSize(format)
-        return SourceInfo(width, height, isHdrTransfer(format.intOr(MediaFormat.KEY_COLOR_TRANSFER, 0)))
+        val fps = (format.numberOf(MediaFormat.KEY_FRAME_RATE)?.toFloat() ?: 30f).roundToInt().coerceIn(1, 120)
+        val durationUs = if (format.containsKey(MediaFormat.KEY_DURATION)) format.getLong(MediaFormat.KEY_DURATION) else 0L
+        return SourceInfo(width, height, isHdrTransfer(format.intOr(MediaFormat.KEY_COLOR_TRANSFER, 0)), fps, durationUs)
     } finally { extractor.release() }
 }
 

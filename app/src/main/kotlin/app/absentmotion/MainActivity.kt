@@ -630,6 +630,7 @@ class MainActivity : ComponentActivity() {
         dropThumbnails()
         dropVideoThumbnails()
         dropShapeIcons()
+        engine.trimMemory()
     }
 
     override fun onResume() {

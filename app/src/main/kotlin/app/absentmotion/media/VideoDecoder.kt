@@ -46,25 +46,40 @@ internal fun openDecoder(format: MediaFormat, surface: android.view.Surface?): M
                 caps.videoCapabilities?.isSizeSupported(width, height) != false
         }
     }.sortedByDescending { it.hardware }.map { it.name }
+    val names = (listOfNotNull(list.findDecoderForFormat(format)) + others).distinct()
     var last: Exception? = null
-    for (name in (listOfNotNull(list.findDecoderForFormat(format)) + others).distinct()) {
-        val codec = try { MediaCodec.createByCodecName(name) } catch (e: Exception) {
-            last = e
-            Log.w("AMVideo", "cannot create $name", e)
-            continue
+    for (attempt in 0..DECODER_WAITS) {
+        if (attempt > 0) Thread.sleep(DECODER_WAIT_MS)
+        var busy = false
+        for (name in names) {
+            val codec = try { MediaCodec.createByCodecName(name) } catch (e: Exception) {
+                last = e
+                busy = busy || codecBusy(e)
+                Log.w("AMVideo", "cannot create $name", e)
+                continue
+            }
+            try {
+                codec.configureFitting(format, surface)
+                codec.start()
+                return codec
+            } catch (e: Exception) {
+                last = e
+                busy = busy || codecBusy(e)
+                Log.w("AMVideo", "$name cannot decode $mime ${width}x$height", e)
+                codec.release()
+            }
         }
-        try {
-            codec.configureFitting(format, surface)
-            codec.start()
-            return codec
-        } catch (e: Exception) {
-            last = e
-            Log.w("AMVideo", "$name cannot decode $mime ${width}x$height", e)
-            codec.release()
-        }
+        if (!busy) break
     }
     throw last ?: IllegalArgumentException("no decoder for $mime")
 }
+
+private const val MAX_IMAGES = 3
+private const val DECODER_WAITS = 10
+private const val DECODER_WAIT_MS = 300L
+
+internal fun codecBusy(e: Throwable): Boolean = e is MediaCodec.CodecException &&
+    (e.isTransient || e.errorCode == MediaCodec.CodecException.ERROR_INSUFFICIENT_RESOURCE || e.errorCode == MediaCodec.CodecException.ERROR_RECLAIMED)
 
 internal class VideoDecoder(private val context: Context, private val uri: String) : Closeable {
     private val extractor = MediaExtractor()
@@ -103,9 +118,11 @@ internal class VideoDecoder(private val context: Context, private val uri: Strin
             imageThread = HandlerThread("am-video-images").apply { start() }
             val width = format.getInteger(MediaFormat.KEY_WIDTH)
             val height = format.getInteger(MediaFormat.KEY_HEIGHT)
-            reader = (if (Build.VERSION.SDK_INT >= 29) ImageReader.newInstance(width, height, ImageFormat.PRIVATE, 4, HardwareBuffer.USAGE_GPU_SAMPLED_IMAGE)
-                else ImageReader.newInstance(width, height, ImageFormat.PRIVATE, 4)).apply {
-                setOnImageAvailableListener({ source -> source.acquireNextImage()?.let { images.offer(it) } }, Handler(imageThread!!.looper))
+            reader = (if (Build.VERSION.SDK_INT >= 29) ImageReader.newInstance(width, height, ImageFormat.PRIVATE, MAX_IMAGES, HardwareBuffer.USAGE_GPU_SAMPLED_IMAGE)
+                else ImageReader.newInstance(width, height, ImageFormat.PRIVATE, MAX_IMAGES)).apply {
+                setOnImageAvailableListener({ source ->
+                    while (true) images.offer((try { source.acquireNextImage() } catch (_: IllegalStateException) { null }) ?: break)
+                }, Handler(imageThread!!.looper))
             }
             format.setInteger(MediaFormat.KEY_ROTATION, 0)
             hdr = format.requestSdr()
@@ -197,7 +214,13 @@ internal class VideoDecoder(private val context: Context, private val uri: Strin
 
     private fun show(decoder: MediaCodec, index: Int, pts: Long, wanted: Long, exact: Boolean): Image? {
         decoder.releaseOutputBuffer(index, true)
-        val image = images.poll(2, TimeUnit.SECONDS) ?: run { positioned = false; return if (exact) null else current }
+        val deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(2)
+        var image: Image? = null
+        while (image == null) {
+            val next = images.poll(deadline - System.nanoTime(), TimeUnit.NANOSECONDS) ?: break
+            if (kotlin.math.abs(next.timestamp / 1000 - pts) <= 1000) image = next else next.close()
+        }
+        if (image == null) { positioned = false; return if (exact) null else current }
         current?.close()
         current = image
         currentPts = if (pts > wanted || pts < wanted && outputEnded) wanted else pts

@@ -76,8 +76,8 @@ internal class LiveHandoff {
     var handoff by mutableLongStateOf(0L)
 }
 
-internal fun cacheMatches(state: EditorState): Boolean =
-    PreviewCache.phase == PreviewCache.Phase.Ready && PreviewCache.key == PreviewCache.keyOf(state) && state.soloMode == 0 && !state.pixelMode &&
+internal fun cacheMatches(state: EditorState, resources: Long): Boolean =
+    PreviewCache.phase == PreviewCache.Phase.Ready && PreviewCache.key == PreviewCache.keyOf(state, resources) && state.soloMode == 0 && !state.pixelMode &&
         state.drawing == null && state.panel != EditorPanel.EditText && (state.cameraMode || state.scene.layers.none { it.kind == "camera" })
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -86,7 +86,8 @@ internal fun RenderPreviewButton(state: EditorState, modifier: Modifier) {
     val context = LocalContext.current
     val scope = LocalEditorScope.current
     val phase = PreviewCache.phase
-    val current by remember(state) { derivedStateOf { PreviewCache.key == PreviewCache.keyOf(state) } }
+    val resources by state.engine.mediaRevision.collectAsState()
+    val current by remember(state, resources) { derivedStateOf { PreviewCache.key == PreviewCache.keyOf(state, resources) } }
     val label = stringResource(if (phase == PreviewCache.Phase.Rendering) R.string.preview_cache_cancel_render else R.string.preview_cache_render)
     val status = when {
         phase != PreviewCache.Phase.Ready -> null

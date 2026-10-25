@@ -45,6 +45,8 @@ fun previewCacheBudget(memoryClassMb: Int, lowRam: Boolean, compatible: Boolean)
     return minOf(MAX_BUDGET, memoryClassMb.coerceAtLeast(16) * MIB * percent / 100)
 }
 
+fun storeBudget(budget: Long, width: Int, height: Int): Long = maxOf(budget / 4, budget - POOL * 4L * width * height)
+
 fun cacheFrameSize(sceneWidth: Int, sceneHeight: Int, fit: Float, divisor: Int): Pair<Int, Int> {
     val longest = maxOf(sceneWidth, sceneHeight, 1)
     val cap = minOf(1f, MAX_SIDE.toFloat() / longest)
@@ -102,7 +104,7 @@ class FrameStore(val first: Int, private val budget: Long) {
     operator fun get(frame: Int): ByteArray? = if (frame in this) frames[frame - first] else null
 }
 
-data class CacheKey(val projectId: String, val scene: Scene, val divisor: Int, val androidEmoji: Boolean)
+data class CacheKey(val projectId: String, val scene: Scene, val divisor: Int, val androidEmoji: Boolean, val resources: Long = 0)
 
 class ChoppyWatch(private val windowNs: Long = 1_000_000_000L, private val windows: Int = 3, private val ratio: Float = 0.75f, private val minAdvance: Int = 5) {
     private var startNs = -1L
@@ -240,7 +242,8 @@ object PreviewCache {
 
     fun covers(frame: Int): Boolean = store?.contains(frame) == true
 
-    fun keyOf(state: EditorState) = CacheKey(state.projectId, state.scene, state.settings.previewQuality.divisor, state.settings.androidEmoji)
+    fun keyOf(state: EditorState, resources: Long = state.engine.mediaRevision.value) =
+        CacheKey(state.projectId, state.scene, state.settings.previewQuality.divisor, state.settings.androidEmoji, resources)
 
     fun render(state: EditorState, context: Context, scope: CoroutineScope) {
         if (phase == Phase.Rendering) return
@@ -249,7 +252,7 @@ object PreviewCache {
         val divisor = state.settings.previewQuality.divisor
         val (width, height) = cacheFrameSize(scene.width, scene.height, fit, divisor)
         val manager = app.getSystemService(ActivityManager::class.java)
-        val budget = previewCacheBudget(manager?.memoryClass ?: 128, manager?.isLowRamDevice == true, Tier.compatible)
+        val budget = storeBudget(previewCacheBudget(manager?.memoryClass ?: 128, manager?.isLowRamDevice == true, Tier.compatible), width, height)
         val range = renderRange(scene.lastFrame, state.frame, framesThatFit(budget, width, height)).first..maxOf(scene.lastFrame, 0)
         val next = keyOf(state)
         val cell = checkerCell
@@ -261,8 +264,9 @@ object PreviewCache {
             try {
                 val started = System.nanoTime()
                 val built = FrameStore(range.first, budget)
+                var resources = next.resources
                 val outcome = try {
-                    withContext(Dispatchers.Default) { renderFrames(state.engine, scene, range, width, height, cell, built) }
+                    withContext(Dispatchers.Default) { renderFrames(state.engine, scene, range, width, height, cell, built) { resources = it } }
                 } catch (e: CancellationException) {
                     throw e
                 } catch (e: OutOfMemoryError) {
@@ -276,7 +280,7 @@ object PreviewCache {
                 val per = built.count.coerceAtLeast(1)
                 Log.i(TAG, "render %s frames=%d of %d size=%dx%d bytes=%d avg=%d budget=%d ms=%.0f perFrame=%.1f still=%.1f encode=%.1f".format(
                     outcome, built.count, range.count(), width, height, built.bytes, built.bytes / per, budget, ms, ms / per, stillNs / 1e6 / per, encodeNs / 1e6 / per))
-                finish(app, next, built, width, height, outcome, scene.lastFrame, scene.fps)
+                finish(app, next.copy(resources = resources), built, width, height, outcome, scene.lastFrame, scene.fps)
             } finally {
                 if (mine == generation && phase == Phase.Rendering) phase = Phase.Empty
             }
@@ -298,8 +302,10 @@ object PreviewCache {
     @Volatile private var stillNs = 0L
     @Volatile private var encodeNs = 0L
 
-    private suspend fun renderFrames(engine: EngineThread, scene: Scene, range: IntRange, width: Int, height: Int, cell: Float, built: FrameStore): Outcome =
+    private suspend fun renderFrames(engine: EngineThread, scene: Scene, range: IntRange, width: Int, height: Int, cell: Float, built: FrameStore,
+                                     ready: (Long) -> Unit): Outcome =
         engine.exportSession(scene.toXml(), Smoothing(), scene.fps) {
+            ready(engine.mediaRevision.value)
             stillNs = 0L
             encodeNs = 0L
             val encoders = arrayOf(Encoder(width, height), Encoder(width, height))

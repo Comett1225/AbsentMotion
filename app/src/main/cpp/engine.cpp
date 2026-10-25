@@ -131,6 +131,7 @@ public:
     int renderFrame(Target*, double timeMs, uint32_t background, int64_t presentTimeNs) override;
     int renderBuffer(AHardwareBuffer* buffer, double timeMs, uint32_t background) override;
     void releaseBuffers() override;
+    void trim() override;
     bool layerQuad(int64_t layerId, double timeMs, float xy[8]) override;
     bool layerMatrix(int64_t layerId, double timeMs, float m[18]) override;
     bool layerBounds(int64_t layerId, double timeMs, float ltrb[4]) override;
@@ -1088,6 +1089,13 @@ void EngineImpl::releaseBuffers() {
     this->syncGpu();
     fBufferSurfaces.clear();
     this->syncGpu();
+}
+
+void EngineImpl::trim() {
+    if (!fGraphite || fGpuFailed) return;
+    this->syncGpu();
+    if (fRecorder) fRecorder->freeGpuResources();
+    fGraphite->freeGpuResources();
 }
 
 bool EngineImpl::layerQuad(int64_t layerId, double timeMs, float xy[8]) {

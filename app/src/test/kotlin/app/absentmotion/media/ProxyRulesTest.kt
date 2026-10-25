@@ -51,10 +51,28 @@ class ProxyRulesTest {
     }
 
     @Test fun theLongestGopIncludesTheTail() {
-        assertEquals(1_000_000L, longestSyncGap(listOf(0L, 1_000_000L, 2_000_000L), 2_900_000L))
-        assertEquals(5_000_000L, longestSyncGap(listOf(0L), 5_000_000L))
-        assertEquals(3_000_000L, longestSyncGap(listOf(4_000_000L, 0L, 1_000_000L), 4_500_000L))
-        assertEquals(Long.MAX_VALUE, longestSyncGap(emptyList(), 1_000_000L))
+        fun gap(vararg syncs: Long, last: Long) = longestSyncGap(Stamps().apply { syncs.forEach(::add) }.sortedDistinct(), last)
+        assertEquals(1_000_000L, gap(0L, 1_000_000L, 2_000_000L, last = 2_900_000L))
+        assertEquals(5_000_000L, gap(0L, last = 5_000_000L))
+        assertEquals(3_000_000L, gap(4_000_000L, 0L, 1_000_000L, last = 4_500_000L))
+        assertEquals(Long.MAX_VALUE, gap(last = 1_000_000L))
+    }
+
+    @Test fun aCopyIsOnlyMadeWithRoomForItAndAReserve() {
+        val bytes = ProxyRules.bytes(3840, 2160, 30, 60_000_000)
+        assertEquals(24_105_600L, bytes)
+        assertTrue(ProxyRules.roomFor(bytes + ProxyRules.FREE_RESERVE, bytes))
+        assertFalse(ProxyRules.roomFor(bytes + ProxyRules.FREE_RESERVE - 1, bytes))
+    }
+
+    @Test fun sampleTimesAreSortedOnceWithoutDuplicatesInPrimitiveArrays() {
+        val stamps = Stamps()
+        val decodeOrder = longArrayOf(0, 100_000, 33_333, 66_667, 200_000, 133_333, 166_667, 166_667)
+        repeat(100) { block -> decodeOrder.forEach { stamps.add(it + block * 1_000_000L) } }
+        val sorted = stamps.sortedDistinct()
+        assertEquals(700, sorted.size)
+        assertTrue((1 until sorted.size).all { sorted[it] > sorted[it - 1] })
+        assertEquals(99_200_000L, sorted.last())
     }
 
     @Test fun errorMessagesNameTheSourceFrameNotItsMicroseconds() {

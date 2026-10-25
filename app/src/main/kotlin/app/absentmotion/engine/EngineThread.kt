@@ -266,6 +266,11 @@ class EngineThread(private val background: Int, context: Context? = null) {
 
     fun holdVideo(): Job? = videos?.hold()
 
+    fun trimMemory() {
+        videos?.trim()
+        handler.post { if (!closed && !capturing) runCatching { engine?.trim() } }
+    }
+
     fun releaseVideo(): Job? = videos?.release()
 
     fun setPlaying(value: Boolean) {
@@ -305,14 +310,14 @@ class EngineThread(private val background: Int, context: Context? = null) {
 
     suspend fun setPicture(uri: String, bitmap: Bitmap?, layerId: Long = 0): Boolean = withContext(dispatcher) {
         if (closed) return@withContext false
-        engine().setPicture(uri, bitmap, layerId).also { pictureRevision.value++; renderNow() }
+        engine().setPicture(uri, bitmap, layerId).also { if (bitmap != null) pictureRevision.value++; renderNow() }
     }
 
     suspend fun setModel(uri: String, mesh: Mesh?, textures: List<Bitmap?>): Boolean = withContext(dispatcher) {
         if (closed) return@withContext false
         val engine = engine()
         textures.forEachIndexed { k, bitmap -> engine.setPicture("$uri#$k", bitmap) }
-        engine.setModel(uri, mesh).also { pictureRevision.value++; renderNow() }
+        engine.setModel(uri, mesh).also { if (mesh != null) pictureRevision.value++; renderNow() }
     }
 
     suspend fun setPicture(uri: String, buffer: HardwareBuffer, layerId: Long = 0, opaque: Boolean = true): Boolean = withContext(dispatcher) {

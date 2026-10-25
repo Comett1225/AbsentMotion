@@ -168,6 +168,10 @@ JNIEXPORT void JNICALL JNI_FN(nativeReleaseBuffers)(JNIEnv*, jclass, jlong engin
     engineOf(engine)->releaseBuffers();
 }
 
+JNIEXPORT void JNICALL JNI_FN(nativeTrim)(JNIEnv*, jclass, jlong engine) {
+    engineOf(engine)->trim();
+}
+
 JNIEXPORT jint JNICALL JNI_FN(nativeRenderScene)(JNIEnv* env, jclass, jlong engine, jlong target, jdouble timeMs,
                                                  jfloat scale, jfloat dx, jfloat dy, jint background,
                                                  jlong selectedId, jint handles, jboolean pixels, jint pixelDivisor,

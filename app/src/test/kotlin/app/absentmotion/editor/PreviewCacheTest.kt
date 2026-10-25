@@ -79,6 +79,17 @@ class PreviewCacheTest {
         assertEquals(key, CacheKey("p", Scene(edited.node.copy(attrs = edited.node.attrs - "bgcolor")), 1, false))
     }
 
+    @Test fun aReplacedPictureOrNewFontOutdatesTheCache() {
+        val scene = Scene.parse("""<scene width="100" height="100" fps="30" totalTime="1000"><shape id="1" startTime="0" endTime="999" fillType="media" fillImage="file:///a.png"/></scene>""")
+        assertNotEquals(CacheKey("p", scene, 1, false, 3), CacheKey("p", scene, 1, false, 4))
+        assertEquals(CacheKey("p", scene, 1, false, 4), CacheKey("p", Scene(scene.node), 1, false, 4))
+    }
+
+    @Test fun decodedPlaybackFramesAreChargedToTheBudget() {
+        assertEquals(38 * mib - 5 * 4L * 1000 * 500, storeBudget(38 * mib, 1000, 500))
+        assertEquals(10 * mib / 4, storeBudget(10 * mib, 1920, 1080))
+    }
+
     private fun play(watch: ChoppyWatch, seconds: Int, framesPerSecond: Int, rendersPerSecond: Int, start: Triple<Long, Int, Long> = Triple(0L, 0, 0L)): Pair<Boolean, Triple<Long, Int, Long>> {
         var (now, frame, renders) = start
         var fired = false
