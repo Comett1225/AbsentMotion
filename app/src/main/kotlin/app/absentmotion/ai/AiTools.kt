@@ -84,9 +84,9 @@ class AiTools(private val context: Context, private val state: EditorState, priv
     fun cancel() { job?.cancel(); message = AppText.get(R.string.ai_cancelling) }
     fun dismiss() { message = ""; retry = null }
 
-    fun apply(action: AiAction, confirmed: Boolean = false) {
+    fun apply(action: AiAction, confirmed: Boolean = false, target: Long? = null) {
         if (running != null) return
-        val layer = state.selectedId?.let(state.scene::layer)
+        val layer = (target ?: state.selectedId)?.let(state.scene::layer)
         action.unavailable(layer)?.let { message = AppText.get(it); return }
         layer ?: return
         if (action == AiAction.Video && !confirmed) {
@@ -166,13 +166,15 @@ class AiTools(private val context: Context, private val state: EditorState, priv
                         report(0f, AppText.get(R.string.ai_downloading_model))
                         AiSmooth.download(context, chosen.level) { fraction -> progress = fraction.coerceIn(0f, 1f) }
                     }
+                    val fps = state.scene.fps
+                    val facts = smoothPlan(base, media, fps, chosen)?.let { smoothFacts(base, it, fps) }.orEmpty()
                     val output = withContext(Dispatchers.IO) {
-                        ClipSmooth.run(context, state.engine, base, media, state.scene.fps, chosen, report).also { result = it }
+                        ClipSmooth.run(context, state.engine, base, media, fps, chosen, report).also { result = it }
                     }
                     ensureActive()
                     check(state.scene.layer(layer.id) == layer) { AppText.get(R.string.ai_layer_changed) }
                     state.edit { scene ->
-                        scene.update(layer.id) { it.withSmoothed(output.declaration.uri, source, chosen.option, media, base) }.withMedia(output.declaration)
+                        scene.update(layer.id) { it.withSmoothed(output.declaration.uri, source, chosen.option, media, base, facts) }.withMedia(output.declaration)
                     }
                 } else {
                     val original = state.scene.media(layer.node[if (action == AiAction.Noise) "src" else "fillImage"] ?: "")

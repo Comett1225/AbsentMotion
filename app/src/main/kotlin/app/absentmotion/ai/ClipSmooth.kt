@@ -8,8 +8,13 @@ import android.media.MediaExtractor
 import android.media.MediaFormat
 import android.os.Build
 import android.view.Surface
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.core.net.toUri
 import app.absentmotion.R
+import app.absentmotion.editor.EditorState
 import app.absentmotion.engine.EngineThread
 import app.absentmotion.export.FrameInterpolation
 import app.absentmotion.export.MotionBlur
@@ -31,10 +36,15 @@ import app.absentmotion.model.Scene
 import app.absentmotion.model.VideoTiming
 import app.absentmotion.model.XmlNode
 import app.absentmotion.model.fpsText
+import app.absentmotion.model.mediaLengthMs
+import app.absentmotion.model.mediaUris
+import app.absentmotion.model.trimmedTo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.runInterruptible
 import kotlinx.coroutines.withContext
 import java.nio.ByteBuffer
@@ -70,8 +80,139 @@ internal fun smoothPlan(layer: Layer, media: MediaDeclaration, projectFps: Int, 
     val k = min(1.0, MAX_SMOOTH_SIDE.toDouble() / min(w, h))
     fun even(v: Double) = max(2, (v / 2).roundToInt() * 2)
     val seconds = layer.matteSeconds(media)
-    val mean = (timing.mediaMs(length.toDouble()) - timing.mediaMs(0.0)) / length
-    return SmoothPlan(fps, (seconds * fps).toInt() + 1, even(w * k), even(h * k), seconds, (mean * fps / projectFps).toFloat())
+    return SmoothPlan(fps, (seconds * fps).toInt() + 1, even(w * k), even(h * k), seconds, (layer.meanSpeed() * fps / projectFps).toFloat())
+}
+
+internal fun Layer.meanSpeed(): Double {
+    val timing = VideoTiming(this)
+    val length = (endTime - startTime).coerceAtLeast(1)
+    return (timing.mediaMs(length.toDouble()) - timing.mediaMs(0.0)) / length
+}
+
+internal fun Layer.speedSignature(projectFps: Int): Int = "${node["speed"]}|${node.child("speedMap")?.toXml()}|$projectFps".hashCode()
+
+internal fun smoothFacts(base: Layer, plan: SmoothPlan, projectFps: Int): Map<String, String> = linkedMapOf(
+    "from" to "${base.mediaFill?.inTime ?: 0}", "span" to "${(plan.seconds * 1000).toInt()}", "fps" to "${plan.fps}",
+    "blur" to "${plan.blurScale}", "mean" to "${base.meanSpeed()}", "sig" to "${base.speedSignature(projectFps)}",
+)
+
+internal class SmoothFacts(val from: Int, val span: Int, val fps: Int, val blur: Float, val mean: Double, val sig: Int)
+
+internal val AiMark.facts: SmoothFacts?
+    get() = SmoothFacts(
+        node["from"]?.toIntOrNull() ?: return null, node["span"]?.toIntOrNull() ?: return null, node["fps"]?.toIntOrNull() ?: return null,
+        node["blur"]?.toFloatOrNull() ?: return null, node["mean"]?.toDoubleOrNull()?.takeIf { it > 0 } ?: return null, node["sig"]?.toIntOrNull() ?: return null,
+    )
+
+internal class SmoothChange(val id: Long, val node: XmlNode, val amountMs: Double, val small: Boolean)
+
+internal fun Scene.smoothChange(layer: Layer): SmoothChange? {
+    val mark = layer.aiMarks.firstOrNull { it.kind == AiKind.Smooth } ?: return null
+    val fill = layer.mediaFill?.takeIf { it.video } ?: return null
+    val pending = fill.uri != mark.result && fill.uri == mark.original && mark.shift == 0
+    if (!pending && fill.uri != mark.result) return null
+    val facts = mark.facts
+    if (facts == null && !pending) return null
+    val base = layer.smoothSource(mark)
+    val media = mark.media ?: media(base.mediaFill?.uri ?: return null) ?: return null
+    val smoothing = smoothingOf(mark.node["option"]) ?: return null
+    val plan = smoothPlan(base, media, fps, smoothing) ?: return null
+    if (facts == null) return SmoothChange(layer.id, layer.node, Double.MAX_VALUE, false)
+    val length = (layer.endTime - layer.startTime).coerceAtLeast(1)
+    val timing = VideoTiming(base)
+    val start = timing.mediaMs(0.0)
+    val end = timing.mediaMs(length.toDouble()).let { if (layer.node["loop"] == "true") minOf(it, base.mediaFill!!.outTime.toDouble()) else it }
+    val mean = ((end - start) / length).coerceAtLeast(1e-6)
+    val uncovered = (maxOf(0.0, facts.from - start) + maxOf(0.0, end - (facts.from + facts.span))) / mean
+    val retimed = base.speedSignature(fps) != facts.sig
+    val blurMoved = smoothing.blur != MotionBlur.Off && kotlin.math.abs(plan.blurScale - facts.blur) > 0.05f * maxOf(facts.blur, 0.01f)
+    if (!pending && uncovered <= 1000.0 / fps && !(retimed && (plan.fps > facts.fps || blurMoved))) return null
+    val amount = maxOf(uncovered, if (retimed) length * kotlin.math.abs(1 - facts.mean / base.meanSpeed().coerceAtLeast(1e-6)) else 0.0)
+    val small = amount <= maxOf(1000.0 / fps, minOf(1000.0, length * 0.1)) && smoothing.method != FrameInterpolation.Ai
+    return SmoothChange(layer.id, layer.node, amount, small)
+}
+
+internal fun Scene.trimmedClip(layer: Layer, start: Int, end: Int): Layer {
+    if (start == layer.startTime && end == layer.endTime) return layer
+    val plain = layer.trimmedTo(start, end, mediaLengthMs(layer))
+    if (plain.startTime == start && plain.endTime == end) return plain
+    val mark = layer.aiMarks.firstOrNull { it.kind == AiKind.Smooth && it.result == layer.mediaFill?.uri && it.original != null } ?: return plain
+    val sourceMs = mark.media?.duration?.takeIf { it > 0 }?.let { (it / 1000).toInt() } ?: Int.MAX_VALUE
+    val wide = layer.smoothSource(mark).trimmedTo(start, end, sourceMs)
+    if (wide.startTime == plain.startTime && wide.endTime == plain.endTime) return plain
+    return wide.copy(node = wide.node.copy(children = wide.node.children.map { if (it.name == AI_TAG && it["type"] == AiKind.Smooth.xml) it.with("shift", null) else it }))
+}
+
+internal fun Scene.withClip(id: Long, layer: Layer, from: Scene = this): Scene {
+    val wanted = layer.node.mediaUris()
+    return (from.media + layer.aiMarks.mapNotNull { it.media }).filter { it.uri in wanted }.fold(update(id) { layer }) { scene, record -> scene.withMedia(record) }
+}
+
+internal fun AiMark.smoothing(): Smoothing = (smoothingOf(node["option"]) ?: Smoothing(FrameInterpolation.Flow)).let {
+    if (it.method == FrameInterpolation.Ai && !app.absentmotion.Tier.has(app.absentmotion.Feature.AiSmooth)) it.copy(method = FrameInterpolation.Flow) else it
+}
+
+internal class SmoothKeeper(private val context: Context, private val state: EditorState, private val tools: AiTools) {
+    var asking by mutableStateOf<SmoothChange?>(null)
+    private val asked: MutableSet<XmlNode> = java.util.Collections.newSetFromMap(java.util.IdentityHashMap())
+    private val failed: MutableSet<XmlNode> = java.util.Collections.newSetFromMap(java.util.IdentityHashMap())
+
+    private class Seen(val playing: Boolean, val scene: Scene, val frame: Int)
+
+    suspend fun watch() {
+        snapshotFlow { Seen(state.playing, state.scene, state.frame) }.collectLatest { seen ->
+            if (seen.playing) return@collectLatest
+            delay(IDLE_MS)
+            while (state.gestureOpen || state.exportOpen || tools.running != null || asking != null) delay(WAIT_MS)
+            val scene = state.scene
+            val change = scene.layers.asSequence().mapNotNull { scene.smoothChange(it) }.firstOrNull { it.node !in asked } ?: return@collectLatest
+            if (change.small && change.node !in failed) update(scene, change)
+            else {
+                asked += change.node
+                asking = change
+            }
+        }
+    }
+
+    fun redo(change: SmoothChange) {
+        val mark = state.scene.layer(change.id)?.aiMarks?.firstOrNull { it.kind == AiKind.Smooth } ?: return
+        tools.smoothing = mark.smoothing()
+        tools.apply(AiAction.Smooth, confirmed = true, target = change.id)
+    }
+
+    private suspend fun update(scene: Scene, change: SmoothChange) {
+        val layer = scene.layer(change.id) ?: return
+        val mark = layer.aiMarks.firstOrNull { it.kind == AiKind.Smooth } ?: return
+        val base = layer.smoothSource(mark)
+        val source = base.mediaFill?.uri ?: return
+        val media = mark.media ?: scene.media(source) ?: return
+        val smoothing = mark.smoothing()
+        val plan = smoothPlan(base, media, scene.fps, smoothing) ?: return
+        state.hint(R.string.smooth_updating)
+        var made: AiMedia? = null
+        var committed = false
+        try {
+            withContext(Dispatchers.IO) { made = ClipSmooth.run(context, state.engine, base, media, scene.fps, smoothing) { _, _ -> } }
+            val output = made ?: return
+            if (state.scene.node !== scene.node) return
+            state.amend(scene.update(change.id) { it.withSmoothed(output.declaration.uri, source, smoothing.option, media, base, smoothFacts(base, plan, scene.fps)) }
+                .withMedia(output.declaration))
+            committed = true
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            throw e
+        } catch (_: Exception) {
+            failed += change.node
+        } catch (_: OutOfMemoryError) {
+            failed += change.node
+        } finally {
+            if (!committed) made?.file?.delete()
+        }
+    }
+
+    private companion object {
+        const val IDLE_MS = 1500L
+        const val WAIT_MS = 250L
+    }
 }
 
 internal fun smoothScene(fill: MediaFill, media: MediaDeclaration, plan: SmoothPlan): Scene {
@@ -87,9 +228,9 @@ internal fun smoothScene(fill: MediaFill, media: MediaDeclaration, plan: SmoothP
 internal fun Layer.smoothSource(previous: AiMark?): Layer =
     previous?.original?.let { copy(node = node.with("fillVideo", it)).shiftedMedia(previous.shift) } ?: this
 
-internal fun Layer.withSmoothed(result: String, source: String, option: String, original: MediaDeclaration?, base: Layer): Layer =
+internal fun Layer.withSmoothed(result: String, source: String, option: String, original: MediaDeclaration?, base: Layer, facts: Map<String, String> = emptyMap()): Layer =
     copy(node = node.with("fillVideo", result)).shiftedMedia(-(mediaFill?.inTime ?: 0))
-        .withAiMark(AiKind.Smooth, source, result, option, original, base.mediaFill?.inTime ?: 0)
+        .withAiMark(AiKind.Smooth, source, result, option, original, base.mediaFill?.inTime ?: 0, facts)
 
 internal val Smoothing.option: String get() = "${method.name}:${level.name}:${blur.name}"
 

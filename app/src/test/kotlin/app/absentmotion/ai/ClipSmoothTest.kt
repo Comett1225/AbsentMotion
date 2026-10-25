@@ -1,5 +1,6 @@
 package app.absentmotion.ai
 
+import app.absentmotion.editor.withClipEdgesAt
 import app.absentmotion.export.FrameInterpolation
 import app.absentmotion.export.MotionBlur
 import app.absentmotion.export.SmoothLevel
@@ -14,9 +15,12 @@ import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
 import app.absentmotion.model.exportFrameMs
 import app.absentmotion.model.layerTracks
+import app.absentmotion.model.retimedVideo
+import app.absentmotion.model.trimmedTo
 import app.absentmotion.model.videoTimeUs
 import app.absentmotion.videoLayer
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -131,6 +135,83 @@ class ClipSmoothTest {
         }
         assertNull(smoothingOf("Flow:Huge:Off"))
         assertNull(smoothingOf(null))
+    }
+
+    private val raw = MediaDeclaration(XmlNode("media", linkedMapOf("uri" to "raw.mp4", "width" to "1920", "height" to "1080", "fps" to "30.00", "duration" to "10000000")))
+
+    private fun smoothed(option: String = "Flow:Medium:Off", facts: Boolean = true): Scene {
+        val scene = Scene.parse("""<scene width="100" height="100" fps="60"/>""").withMedia(raw)
+            .add(videoLayer(1000, 4999, inTime = 2000, outTime = 6000, uri = "raw.mp4", id = 1))
+        val base = scene.layer(1)!!
+        val plan = smoothPlan(base, raw, 60, smoothingOf(option)!!)!!
+        val result = MediaDeclaration(XmlNode("media", linkedMapOf("uri" to "one.mp4", "fps" to "${plan.fps}", "duration" to "${(plan.seconds * 1_000_000).toLong()}")))
+        return scene.update(1) { it.withSmoothed("one.mp4", "raw.mp4", option, raw, base, if (facts) smoothFacts(base, plan, 60) else emptyMap()) }.withMedia(result)
+    }
+
+    private fun Scene.trimmed(start: Int, end: Int): Scene = withClip(1, trimmedClip(layer(1)!!, start, end))
+
+    @Test fun aSmoothedClipIsOnlyOutOfDateWhenItNeedsFramesTheBakeDoesNotHave() {
+        val scene = smoothed()
+        val layer = scene.layer(1)!!
+        assertNull(scene.smoothChange(layer))
+        assertNull(scene.trimmed(2000, 4999).smoothChange(scene.trimmed(2000, 4999).layer(1)!!))
+        val half = scene.update(1) { it.trimmedTo(1000, 2999) }
+        assertNull(half.smoothChange(half.layer(1)!!))
+        val moved = scene.update(1) { it.movedTo(7000).withTransform("scale", 3f, 3f).withRotation(40f) }
+        assertNull(moved.smoothChange(moved.layer(1)!!))
+        val back = scene.trimmed(2000, 4999).trimmed(1000, 4999)
+        assertEquals("one.mp4", back.layer(1)!!.mediaFill!!.uri)
+        assertNull(back.smoothChange(back.layer(1)!!))
+    }
+
+    @Test fun draggingATrimPastTheBakeShowsTheOriginalUntilItIsSmoothedAgain() {
+        val scene = smoothed()
+        val longer = scene.trimmed(1000, 5299)
+        val layer = longer.layer(1)!!
+        assertEquals(listOf("raw.mp4", "2000", "6299"), layer.mediaFill!!.let { listOf(it.uri, "${it.inTime}", "${it.outTime}") })
+        assertEquals(raw, longer.media("raw.mp4"))
+        val mark = layer.aiMarks.single()
+        assertEquals(0, mark.shift)
+        assertEquals("one.mp4", mark.result)
+        assertEquals(layer, layer.smoothSource(mark))
+        val small = longer.smoothChange(layer)!!
+        assertEquals(300.0, small.amountMs, 1.0)
+        assertTrue(small.small)
+        val earlier = scene.trimmed(0, 4999)
+        assertEquals(1000, earlier.layer(1)!!.mediaFill!!.inTime)
+        val big = earlier.smoothChange(earlier.layer(1)!!)!!
+        assertEquals(1000.0, big.amountMs, 1.0)
+        assertFalse(big.small)
+        assertEquals("raw.mp4", earlier.withoutAiMark(1, AiKind.Smooth).layer(1)!!.mediaFill!!.uri)
+        assertTrue(earlier.withoutAiMark(1, AiKind.Smooth).layer(1)!!.aiMarks.isEmpty())
+        assertEquals(9000, scene.trimmedClip(scene.layer(1)!!, 1000, 20_000).endTime)
+        val again = longer.update(1) { it.withSmoothed("two.mp4", "raw.mp4", "Flow:Medium:Off", raw, layer) }.layer(1)!!
+        assertEquals(listOf("two.mp4", "0", "4299"), again.mediaFill!!.let { listOf(it.uri, "${it.inTime}", "${it.outTime}") })
+        assertEquals(2000, again.aiMarks.single().shift)
+        val edges = scene.withClipEdgesAt(listOf(1L), 330, end = true, extend = true)
+        assertEquals("raw.mp4", edges.layer(1)!!.mediaFill!!.uri)
+        assertEquals(scene.frameEnd(330), edges.layer(1)!!.endTime)
+    }
+
+    @Test fun slowingDownNeedsMoreFramesAndSpeedingUpOnlyMattersForMotionBlur() {
+        val scene = smoothed()
+        val slower = scene.update(1) { it.retimedVideo(1000, 1000 + 4210) }
+        val small = slower.smoothChange(slower.layer(1)!!)!!
+        assertTrue("${small.amountMs}", small.small)
+        val half = scene.update(1) { it.retimedVideo(1000, 8999) }
+        assertFalse(half.smoothChange(half.layer(1)!!)!!.small)
+        val faster = scene.update(1) { it.retimedVideo(1000, 2999) }
+        assertNull(faster.smoothChange(faster.layer(1)!!))
+        val blurred = smoothed("Off:Medium:Medium")
+        val quick = blurred.update(1) { it.retimedVideo(1000, 2999) }
+        assertTrue(quick.smoothChange(quick.layer(1)!!) != null)
+        val ai = smoothed("Ai:Low:Off").let { s -> s.update(1) { it.retimedVideo(1000, 1000 + 4210) } }
+        assertFalse(ai.smoothChange(ai.layer(1)!!)!!.small)
+        val old = smoothed(facts = false)
+        val oldSlower = old.update(1) { it.retimedVideo(1000, 8999) }
+        assertNull(oldSlower.smoothChange(oldSlower.layer(1)!!))
+        val oldLonger = old.trimmed(1000, 5299)
+        assertFalse(oldLonger.smoothChange(oldLonger.layer(1)!!)!!.small)
     }
 
     @Test fun restoringASmoothClipBringsBackTheOriginalAndItsMediaDetails() {

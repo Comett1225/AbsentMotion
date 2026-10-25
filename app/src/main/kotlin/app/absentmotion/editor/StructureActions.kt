@@ -11,6 +11,7 @@ import app.absentmotion.model.Scene
 import app.absentmotion.model.mediaUris
 import app.absentmotion.model.XmlNode
 import app.absentmotion.model.Keyframe
+import app.absentmotion.model.Easing
 import app.absentmotion.model.floats
 import app.absentmotion.model.formatFloats
 import app.absentmotion.model.isMask
@@ -18,8 +19,8 @@ import app.absentmotion.model.isKeyframed
 import app.absentmotion.model.keyframes
 import app.absentmotion.model.withKeyframes
 import app.absentmotion.model.withBlend
-import app.absentmotion.model.trimmedTo
-import app.absentmotion.model.mediaLengthMs
+import app.absentmotion.ai.trimmedClip
+import app.absentmotion.ai.withClip
 import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.max
@@ -29,7 +30,12 @@ import kotlin.math.sin
 
 object MultiSelect {
     var active by mutableStateOf(false)
-    var ids by mutableStateOf(setOf<Long>())
+    private var chosen by mutableStateOf(setOf<Long>())
+    var revision = 0L
+        private set
+    var ids: Set<Long>
+        get() = chosen
+        set(value) { if (value != chosen) { chosen = value; revision++ } }
 
     fun toggle(id: Long) {
         ids = if (id in ids) ids - id else ids + id
@@ -240,11 +246,38 @@ internal fun Layer.rebaked(changing: Boolean, outerTimes: List<Int>, fps: Int, c
     val marks = (listOf(startTime, endTime) + keyframeTimes() + outerTimes).filter { it in startTime..endTime }.toSortedSet().toList()
     val frames = generateSequence(((startTime.toLong() * fps) / 1000).toInt()) { it + 1 }
         .map { ((2L * it + 1) * 500 / fps).toInt() }.dropWhile { it < startTime }.takeWhile { it <= endTime }.toList()
-    val samples = (marks + frames).distinct().associateWith { ms -> convert(ownPlace(this, ms, fps), ms) ?: return null }
+    val samples = HashMap<Int, Place>()
+    for (ms in marks) samples[ms] = convert(ownPlace(this, ms, fps), ms) ?: return null
+    val keys = MOVED.associateWith { name -> element(name).keyframes.associateBy { timeOf(it.t) } }
+    fun curve(name: String, a: Int, b: Int): Boolean? {
+        val own = keys.getValue(name)
+        val before = own.keys.filter { it <= a }.maxOrNull() ?: return null
+        val after = own.keys.filter { it >= b }.minOrNull() ?: return null
+        if (Easing.parse(own.getValue(after).e).isLinear) return null
+        return before == a && after == b
+    }
+    val probes = listOf(Place(0f, 0f, 0f, 0f, 1f, 1f, 0f), Place(97f, -53f, 11f, 7f, 1.7f, 0.6f, 33f, 5f))
+    val pivotMoves = transform?.child("pivot")?.isKeyframed == true
+    val calm = marks.zipWithNext().associateWith { (a, b) ->
+        !pivotMoves && probes.all { p -> convert(p, a)?.let { ref -> (frames.filter { it > a && it < b } + b).all { convert(p, it) == ref } } == true }
+    }
+    for ((segment, quiet) in calm) {
+        val (a, b) = segment
+        if (quiet && MOVED.none { curve(it, a, b) == false }) continue
+        for (ms in frames) if (ms > a && ms < b && ms !in samples) samples[ms] = convert(ownPlace(this, ms, fps), ms) ?: return null
+    }
     for (name in MOVED) {
         fun v(ms: Int) = samples.getValue(ms).part(name)
+        val own = keys.getValue(name)
         val kept = marks.toMutableList()
-        for ((a, b) in marks.zipWithNext()) {
+        val eased = HashSet<Int>()
+        for ((segment, quiet) in calm) {
+            val (a, b) = segment
+            val clean = curve(name, a, b)
+            if (quiet && clean != false) {
+                if (clean == true) eased += b
+                continue
+            }
             val inside = frames.filter { it > a && it < b }
             val bent = inside.any { ms ->
                 val u = (ms - a).toFloat() / (b - a)
@@ -254,7 +287,10 @@ internal fun Layer.rebaked(changing: Boolean, outerTimes: List<Int>, fps: Int, c
         }
         val first = v(startTime)
         out = out.withMoved(name, if (kept.all { v(it).contentEquals(first) }) plain(name, first)
-            else element(name).withKeyframes(kept.sorted().map { Keyframe((it - startTime).toFloat() / length, formatFloats(v(it))) }))
+            else element(name).withKeyframes(kept.sorted().map { ms ->
+                val source = own[ms]
+                Keyframe((ms - startTime).toFloat() / length, formatFloats(v(ms)), source?.e?.takeIf { ms in eased }, source?.gen, source?.extra.orEmpty())
+            }))
     }
     return copy(node = out)
 }
@@ -297,9 +333,11 @@ fun EditorState.setParent(parentId: Long?) {
 }
 
 suspend fun EditorState.alignSelection(edge: Int) {
+    val document = scene
+    val at = sampleMs
     val layers = MultiSelect.ids.mapNotNull { scene.layer(it) }
-    val bounds = layers.mapNotNull { l -> engine.layerBounds(l.id, sampleMs)?.let { l to it } }
-    if (bounds.isEmpty()) return
+    val bounds = layers.mapNotNull { l -> engine.layerBounds(l.id, at)?.let { l to it } }
+    if (bounds.isEmpty() || scene.node !== document.node) return
     val horizontal = edge < 3
     val lo = if (bounds.size == 1) 0f else bounds.minOf { (_, b) -> if (horizontal) b[0] else b[1] }
     val hi = if (bounds.size == 1) (if (horizontal) scene.width else scene.height).toFloat() else bounds.maxOf { (_, b) -> if (horizontal) b[2] else b[3] }
@@ -308,7 +346,7 @@ suspend fun EditorState.alignSelection(edge: Int) {
         val to = if (horizontal) b[2] else b[3]
         l to when (edge % 3) { 0 -> lo - from; 1 -> (lo + hi) / 2 - (from + to) / 2; else -> hi - to }
     }
-    edit { it.shiftedInWorld(moves, horizontal, sampleMs) }
+    edit { it.shiftedInWorld(moves, horizontal, at) }
 }
 
 internal fun Scene.shiftedInWorld(moves: List<Pair<Layer, Float>>, horizontal: Boolean, timeMs: Int): Scene =
@@ -318,9 +356,11 @@ internal fun Scene.shiftedInWorld(moves: List<Pair<Layer, Float>>, horizontal: B
     }
 
 suspend fun EditorState.distributeSelection(horizontal: Boolean) {
-    val items = MultiSelect.ids.mapNotNull { scene.layer(it) }.mapNotNull { l -> engine.layerBounds(l.id, sampleMs)?.let { l to it } }
+    val document = scene
+    val at = sampleMs
+    val items = MultiSelect.ids.mapNotNull { scene.layer(it) }.mapNotNull { l -> engine.layerBounds(l.id, at)?.let { l to it } }
         .sortedBy { (_, b) -> if (horizontal) b[0] else b[1] }
-    if (items.size < 3) return
+    if (items.size < 3 || scene.node !== document.node) return
     fun from(b: FloatArray) = if (horizontal) b[0] else b[1]
     fun to(b: FloatArray) = if (horizontal) b[2] else b[3]
     val gap = (to(items.last().second) - from(items.first().second) - items.sumOf { (to(it.second) - from(it.second)).toDouble() }.toFloat()) / (items.size - 1)
@@ -330,7 +370,7 @@ suspend fun EditorState.distributeSelection(horizontal: Boolean) {
         cursor += to(b) - from(b) + gap
         l to d
     }
-    edit { it.shiftedInWorld(moves, horizontal, sampleMs) }
+    edit { it.shiftedInWorld(moves, horizontal, at) }
 }
 
 enum class StylePart { ColorFill, BorderShadow, Blending }
@@ -349,7 +389,7 @@ internal fun Scene.withPastedStyle(id: Long, timeMs: Int, from: Layer, media: Li
             for (a in attrs) node = node.with(a, from.node[a])
         }
         if (StylePart.ColorFill in parts) {
-            take(listOf("fillColor", "gradient", "speedMap", "gain"), listOf("fillType", "fillImage", "fillVideo", "mediaFillMode", "inTime", "outTime", "speed", "loop"))
+            take(listOf("fillColor", "gradient", "speedMap", "gain"), listOf("fillType", "fillImage", "fillVideo", "mediaFillMode", "inTime", "outTime", "speed", "loop", "loopIn"))
         }
         if (StylePart.BorderShadow in parts) take(listOf("border", "shadow", "path-stroke"), emptyList())
         if (StylePart.Blending in parts) {
@@ -379,19 +419,42 @@ fun EditorState.alignClipTimes(mode: Int) {
     edit { s -> layers.fold(s) { acc, layer -> acc.update(layer.id) { acc.movedClip(it, starts.getValue(layer.id), keepEnd = mode == 2) } } }
 }
 
+private class BlockMove(val scene: Scene, val end: Boolean, val frame: Int, val selection: Long)
+
+private var lastBlockMove: BlockMove? = null
+
 fun EditorState.moveClipEdges(end: Boolean, extend: Boolean) {
     val ids = chosenLayers.map { it.id }
-    edit { it.withClipEdgesAt(ids, frame, end, extend) }
+    val again = lastBlockMove?.let { it.scene.node === scene.node && it.end == end && it.frame == frame && it.selection == MultiSelect.revision } == true
+    lastBlockMove = null
+    if (extend || ids.size < 2 || again) {
+        edit { it.withClipEdgesAt(ids, frame, end, extend) }
+        return
+    }
+    val block = scene.withBlockAt(ids, frame, end)
+    val lined = scene.withClipEdgesAt(ids, frame, end, false)
+    edit { block }
+    if (block == lined) return
+    lastBlockMove = BlockMove(scene, end, frame, MultiSelect.revision)
+    hint(R.string.history_line_up_hint)
+}
+
+internal fun Scene.withBlockAt(ids: List<Long>, frame: Int, end: Boolean): Scene {
+    val chosen = layers.filter { it.id in ids }
+    if (chosen.isEmpty()) return this
+    val shift = frameStart(frame) - if (end) chosen.maxOf { it.endTime } else chosen.minOf { it.startTime }
+    return chosen.fold(this) { acc, layer -> acc.update(layer.id) { movedClip(layer, layer.startTime + shift, keepEnd = end) } }
 }
 
 internal fun Scene.withClipEdgesAt(ids: List<Long>, frame: Int, end: Boolean, extend: Boolean): Scene {
     val target = if (end && extend) frameEnd(frame) else frameStart(frame)
     return ids.fold(this) { acc, id ->
-        acc.update(id) {
-            if (!extend) movedClip(it, if (end) target - (it.endTime - it.startTime) else target, keepEnd = end)
-            else if (end && target > it.endTime && showsAnyFrame(it.startTime, target)) it.trimmedTo(it.startTime, target, mediaLengthMs(it))
-            else if (!end && target < it.startTime && showsAnyFrame(target, it.endTime)) it.trimmedTo(target, it.endTime, mediaLengthMs(it))
-            else it
+        val layer = acc.layer(id) ?: return@fold acc
+        when {
+            !extend -> acc.update(id) { movedClip(it, if (end) target - (it.endTime - it.startTime) else target, keepEnd = end) }
+            end && target > layer.endTime && showsAnyFrame(layer.startTime, target) -> acc.withClip(id, acc.trimmedClip(layer, layer.startTime, target))
+            !end && target < layer.startTime && showsAnyFrame(target, layer.endTime) -> acc.withClip(id, acc.trimmedClip(layer, target, layer.endTime))
+            else -> acc
         }
     }
 }

@@ -105,6 +105,43 @@ class EditHistoryTest {
         assertEquals("e4", scene.title)
     }
 
+    @Test fun cancellingAGestureAtTheLimitKeepsTheOldestStep() {
+        repeat(EditHistory.MAX_UNDO) { edit(null, "e$it") }
+        edit("drag", "dragging")
+        assertTrue(history.gesturing)
+        history.cancelGesture("drag")
+        assertFalse(history.gesturing)
+        assertEquals("e${EditHistory.MAX_UNDO - 1}", scene.title)
+        var steps = 0
+        while (history.undo() != null) steps++
+        assertEquals(EditHistory.MAX_UNDO, steps)
+        assertEquals("start", scene.title)
+    }
+
+    @Test fun theMultiSelectionCountsOnlyRealChanges() {
+        MultiSelect.clear()
+        val start = MultiSelect.revision
+        MultiSelect.ids = setOf(1L, 2L)
+        MultiSelect.ids = setOf(2L, 1L)
+        assertEquals(start + 1, MultiSelect.revision)
+        MultiSelect.clear()
+        MultiSelect.ids = setOf(1L, 2L)
+        assertEquals(start + 3, MultiSelect.revision)
+        MultiSelect.clear()
+    }
+
+    @Test fun amendingReplacesTheCurrentSceneWithoutANewStep() {
+        edit(null, "a")
+        history.amend(scene.withTitle("a2"))
+        assertEquals("a2" to true, shown.last())
+        assertEquals("start", history.undo()!!.title)
+        assertFalse(history.canUndo)
+        assertEquals("a2", history.redo()!!.title)
+        val count = shown.size
+        history.amend(scene)
+        assertEquals(count, shown.size)
+    }
+
     @Test fun forgettingAnUntouchedEditLeavesNoUndoStep() {
         edit(null, "a")
         val added = scene

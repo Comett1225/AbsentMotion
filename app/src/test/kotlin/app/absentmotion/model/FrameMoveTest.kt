@@ -1,5 +1,6 @@
 package app.absentmotion.model
 
+import app.absentmotion.editor.withBlockAt
 import app.absentmotion.editor.withClipEdgesAt
 import app.absentmotion.ui.editor.TimelineMath
 import org.junit.Assert.assertEquals
@@ -90,6 +91,31 @@ class FrameMoveTest {
                     s.assertSameFrames(layer, ends, "fps $fps end at $frame")
                     assertEquals(frame, s.drawn(ends).last())
                 }
+            }
+        }
+    }
+
+    @Test fun severalClipsMoveToThePlayheadAsABlockFirstAndLineUpSecond() {
+        val s = scene("30", clip(10_000, 14_999, 1), clip(15_000, 19_999, 2), clip(20_000, 24_999, 3), clip(0, 999, 4))
+        val ids = listOf(1L, 2L, 3L)
+        val block = s.withBlockAt(ids, 0, end = false)
+        assertEquals(listOf(0 to 4_999, 5_000 to 9_999, 10_000 to 14_999), ids.map { block.layer(it)!!.let { l -> l.startTime to l.endTime } })
+        assertEquals(s.layer(4), block.layer(4))
+        val lined = block.withClipEdgesAt(ids, 0, end = false, extend = false)
+        assertEquals(List(3) { 0 to 4_999 }, ids.map { lined.layer(it)!!.let { l -> l.startTime to l.endTime } })
+        val ends = s.withBlockAt(ids, 900, end = true)
+        assertEquals(30_000, ends.layer(3)!!.endTime)
+        assertEquals(listOf(5_001, 5_001, 5_001), ids.map { ends.layer(it)!!.startTime - s.layer(it)!!.startTime })
+        assertEquals(900, ends.drawn(ends.layer(3)!!).last())
+        val allEnds = ends.withClipEdgesAt(ids, 900, end = true, extend = false)
+        assertEquals(List(3) { 30_000 }, ids.map { allEnds.layer(it)!!.endTime })
+        for (fps in rates) {
+            val r = scene(fps, *scene(fps).clips().filterIndexed { i, _ -> i % 37 == 0 }.mapIndexed { i, c -> Layer(c.node.with("id", "${i + 1}")) }.toTypedArray())
+            val all = r.layers.map { it.id }
+            val past = r.frameAt(r.layers.maxOf { it.endTime }) + 1
+            for ((frame, end) in listOf(0 to false, 45 to false, 400 to false, past to true, past + 40 to true)) {
+                val moved = r.withBlockAt(all, frame, end)
+                for (layer in r.layers) r.assertSameFrames(layer, moved.layer(layer.id)!!, "fps $fps block at $frame end $end")
             }
         }
     }

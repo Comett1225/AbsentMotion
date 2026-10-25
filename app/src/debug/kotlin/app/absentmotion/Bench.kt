@@ -52,6 +52,7 @@ internal suspend fun runBench(activity: Activity, state: EditorState, seconds: I
             Log.i("AMBench", "preview copies ready after ${(System.nanoTime() - started) / 1_000_000} ms, ${VideoProxies.bytes(activity)} bytes")
             delay(1500)
         }
+        if (activity.intent.getBooleanExtra("benchselect", false)) state.selectedId = state.scene.layers.lastOrNull { it.kind != "audio" }?.id
         phase("play") {
             val start = state.frame
             state.playing = true
@@ -67,6 +68,24 @@ internal suspend fun runBench(activity: Activity, state: EditorState, seconds: I
                 state.frame = (i * 2) % last
                 delay(16)
             }
+            steps
+        }
+        delay(1000)
+        phase("drag") {
+            val id = state.selectedId ?: state.scene.layers.lastOrNull { it.kind != "audio" }?.id ?: return@phase 0
+            state.selectedId = id
+            var steps = 0
+            var spent = 0L
+            val until = System.nanoTime() + seconds * 1_000_000_000L
+            while (System.nanoTime() < until) {
+                val started = System.nanoTime()
+                repeat(2) { k -> state.editSelected("bench-drag") { it.withTransform("location", 100f + steps % 500, 200f + k, 0f) } }
+                spent += System.nanoTime() - started
+                steps++
+                delay(8)
+            }
+            state.endGesture()
+            Log.i("AMBench", "drag steps=$steps editMs=${"%.3f".format(java.util.Locale.US, spent / 1e6 / steps.coerceAtLeast(1))}")
             steps
         }
     } finally {

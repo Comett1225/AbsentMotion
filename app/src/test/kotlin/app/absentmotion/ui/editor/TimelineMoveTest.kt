@@ -111,6 +111,25 @@ class TimelineMoveTest {
         }
     }
 
+    @Test fun draggingOneOfSeveralSelectedClipsMovesThemAllByTheSameFrames() {
+        val a = Layer(XmlNode("shape", mapOf("id" to "1", "startTime" to "1000", "endTime" to "1999")))
+        val b = Layer(XmlNode("shape", mapOf("id" to "2", "startTime" to "2500", "endTime" to "3482")))
+        val c = Layer(XmlNode("shape", mapOf("id" to "3", "startTime" to "4000", "endTime" to "4999")))
+        val scene = Scene.create("t", 1080, 1080, fps, 0).let { Scene(it.node.copy(children = it.node.children + a.node + b.node + c.node)) }
+        val moved = TimelineMath.movedClips(scene, a, listOf(b), 60)
+        assertEquals(2000, moved.layer(1)!!.startTime)
+        assertEquals(scene.firstShownFrame(b.startTime) + 30, moved.firstShownFrame(moved.layer(2)!!.startTime))
+        assertEquals(b.endTime - b.startTime, moved.layer(2)!!.let { it.endTime - it.startTime })
+        assertEquals(c, moved.layer(3))
+        assertEquals(scene.layers, TimelineMath.movedClips(scene, a, listOf(b), scene.firstShownFrame(a.startTime)).layers)
+        val far = MoveTarget(0, 0)
+        assertEquals(MoveTarget(scene.firstShownFrame(b.startTime) - scene.firstShownFrame(a.startTime), null), TimelineMath.groupTarget(scene, b, listOf(a), far))
+        assertEquals(far, TimelineMath.groupTarget(scene, a, listOf(b), far))
+        assertEquals(far, TimelineMath.groupTarget(scene, b, emptyList(), far))
+        val targets = TimelineMath.snapTargets(scene, setOf(1L, 2L), 0)
+        assertEquals(setOf(0, scene.firstShownFrame(c.startTime), scene.lastShownFrame(c.endTime) + 1), targets)
+    }
+
     @Test fun aSpeedRampKeepsItsMediaPositionsWhenTheClipMoves() {
         val clip = Layer(XmlNode("shape", linkedMapOf("id" to "1", "startTime" to "1000", "endTime" to "4999",
             "fillType" to "media", "fillVideo" to "content://v", "inTime" to "500")))

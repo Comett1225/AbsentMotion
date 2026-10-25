@@ -14,6 +14,8 @@ import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -62,6 +64,15 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.input.pointer.util.addPointerInputChange
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.CustomAccessibilityAction
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.customActions
+import androidx.compose.ui.semantics.onClick
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
+import app.absentmotion.R
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import app.absentmotion.platform.SystemClock
@@ -90,9 +101,8 @@ import app.absentmotion.editor.clearSelection
 import app.absentmotion.media.VideoProxies
 import app.absentmotion.model.LabelColour
 import app.absentmotion.model.Layer
-import app.absentmotion.model.trimmedTo
-import app.absentmotion.model.trimHitsSourceLimit
-import app.absentmotion.model.mediaLengthMs
+import app.absentmotion.ai.trimmedClip
+import app.absentmotion.ai.withClip
 import app.absentmotion.model.KeyScope
 import app.absentmotion.model.withKeyframesMoved
 import app.absentmotion.ui.theme.Am
@@ -250,6 +260,30 @@ fun Timeline(state: EditorState, modifier: Modifier = Modifier) {
             .drawBehind { drawTimeline(view, measurer, eye, eyeOff, outline, mediaPictures, proxies, appear.value) },
     ) {
         HeaderPictures(view) { drawLifted(view, measurer, eye, eyeOff, outline, mediaPictures, appear.value) }
+        RowSemantics(view)
+    }
+}
+
+@Composable
+private fun RowSemantics(view: TimelineView) {
+    val rows by remember(view) { derivedStateOf { view.visibleRows() } }
+    val select = stringResource(R.string.a11y_select_layer)
+    val hide = stringResource(R.string.a11y_hide_layer)
+    val show = stringResource(R.string.a11y_show_layer)
+    val hidden = stringResource(R.string.a11y_layer_hidden)
+    Box(Modifier.fillMaxSize().padding(top = RulerHeight).clipToBounds()) {
+        for (row in rows) {
+            val layer = view.layerAt(row) ?: continue
+            key(layer.id) {
+                Box(Modifier.offset { IntOffset(0, (view.rowTop(row) - view.rulerH).roundToInt()) }.fillMaxWidth().height(RowHeight).semantics {
+                    contentDescription = layer.label.ifEmpty { layer.kind }
+                    selected = layer.id == view.state.selectedId || layer.id in MultiSelect.ids
+                    if (layer.hidden) stateDescription = hidden
+                    onClick(select) { view.tap(Hit.Header(layer.id)); true }
+                    customActions = listOf(CustomAccessibilityAction(if (layer.hidden) show else hide) { view.state.toggleHidden(layer.id); true })
+                })
+            }
+        }
     }
 }
 
@@ -329,13 +363,29 @@ internal object TimelineMath {
     fun movedStart(scene: Scene, layer: Layer, frame: Int): Int =
         if (frame == scene.firstShownFrame(layer.startTime)) layer.startTime else scene.frameStart(frame)
 
-    fun snapTargets(scene: Scene, skip: Long, playhead: Int): Set<Int> = buildSet {
+    fun snapTargets(scene: Scene, skip: Long, playhead: Int): Set<Int> = snapTargets(scene, setOf(skip), playhead)
+
+    fun snapTargets(scene: Scene, skip: Set<Long>, playhead: Int): Set<Int> = buildSet {
         add(playhead)
         scene.bookmarks.forEach { add(scene.firstShownFrame(it)) }
-        for (layer in scene.layers) if (layer.id != skip) {
+        for (layer in scene.layers) if (layer.id !in skip) {
             add(scene.firstShownFrame(layer.startTime))
             add(scene.lastShownFrame(layer.endTime) + 1)
             layer.keyframeTimes().forEach { add(scene.frameAt(it)) }
+        }
+    }
+
+    fun groupTarget(scene: Scene, grabbed: Layer, others: List<Layer>, found: MoveTarget): MoveTarget {
+        if (others.isEmpty()) return found
+        val first = scene.firstShownFrame(grabbed.startTime)
+        val lowest = minOf(first, others.minOf { scene.firstShownFrame(it.startTime) })
+        return if (found.frame - first >= -lowest) found else MoveTarget(first - lowest, null)
+    }
+
+    fun movedClips(scene: Scene, grabbed: Layer, others: List<Layer>, frame: Int): Scene {
+        val shift = frame - scene.firstShownFrame(grabbed.startTime)
+        return (listOf(grabbed) + others).fold(scene) { acc, layer ->
+            acc.update(layer.id) { acc.movedClip(layer, movedStart(acc, layer, acc.firstShownFrame(layer.startTime) + shift)) }
         }
     }
 }
@@ -393,6 +443,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
     private var dragId = 0L
     private var edgeMs = 0f
     private var trimBase: Layer? = null
+    private var trimScene: Scene? = null
     var limitEdge by mutableStateOf<Boolean?>(null)
         private set
     var onTick: () -> Unit = {}
@@ -443,6 +494,8 @@ private class TimelineView(val state: EditorState, density: Density, private val
     var moveSlide by mutableFloatStateOf(0f)
         private set
     private var moveLayer: Layer? = null
+    private var moveGroup: List<Layer> = emptyList()
+    private var moveGroupIds: Set<Long> = emptySet()
     private var moveBase: Scene? = null
     private var moveDx = 0f
     private var moveArmed = false
@@ -653,6 +706,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
                 val layer = layers.firstOrNull { it.id == hit.id }
                 dragId = hit.id
                 trimBase = layer
+                trimScene = state.scene
                 edgeMs = (if (hit.start) layer?.startTime else layer?.endTime?.plus(1))?.toFloat() ?: 0f
                 snapTargets = TimelineMath.snapTargets(state.scene, hit.id, state.frame)
                 if (hit.start) Drag.TrimStart else Drag.TrimEnd
@@ -748,19 +802,15 @@ private class TimelineView(val state: EditorState, density: Density, private val
         val scene = state.scene
         val layer = layers.firstOrNull { it.id == dragId } ?: return
         val base = trimBase ?: return
+        val from = trimScene ?: return
         val snap = snapNear(edgeMs)
         val frame = snap ?: TimelineMath.nearestFrame(edgeMs, fps)
         val id = dragId
-        val mediaMs = scene.mediaLengthMs(layer)
         val edge = if (start) frame.coerceIn(0, scene.lastShownFrame(layer.endTime).coerceAtLeast(0)) else (frame - 1).coerceAtLeast(scene.firstShownFrame(layer.startTime)) + 1
-        val time = if (start) {
-            scene.frameStart(edge)
-                .also { time -> if (time != layer.startTime) state.edit("trim-start") { it.update(id) { if (time == base.startTime) base else base.trimmedTo(time, base.endTime, mediaMs) } } }
-        } else {
-            scene.frameEnd(edge - 1)
-                .also { time -> if (time != layer.endTime) state.edit("trim-end") { it.update(id) { if (time == base.endTime) base else base.trimmedTo(base.startTime, time, mediaMs) } } }
-        }
-        val hit = layer.trimHitsSourceLimit(start, time, mediaMs)
+        val time = if (start) scene.frameStart(edge) else scene.frameEnd(edge - 1)
+        val trimmed = if (start) from.trimmedClip(base, time, base.endTime) else from.trimmedClip(base, base.startTime, time)
+        if (time != (if (start) layer.startTime else layer.endTime)) state.edit(if (start) "trim-start" else "trim-end") { it.withClip(id, trimmed, from) }
+        val hit = if (start) trimmed.startTime > time else trimmed.endTime < time
         if (hit && limitEdge == null) onTick()
         limitEdge = start.takeIf { hit }
         showSnap(snap.takeUnless { hit }, edge)
@@ -769,12 +819,14 @@ private class TimelineView(val state: EditorState, density: Density, private val
     private fun moveBegin(id: Long): Boolean {
         val layer = state.scene.layer(id) ?: return false
         moveLayer = layer
+        moveGroup = if (MultiSelect.active && id in MultiSelect.ids) state.scene.layers.filter { it.id in MultiSelect.ids && it.id != id } else emptyList()
+        moveGroupIds = moveGroup.map { it.id }.toSet()
         moveBase = state.scene
         moveId = id
         moveDx = 0f
         moveSlide = 0f
         moveArmed = false
-        snapTargets = TimelineMath.snapTargets(state.scene, id, state.frame)
+        snapTargets = TimelineMath.snapTargets(state.scene, moveGroupIds + id, state.frame)
         return true
     }
 
@@ -785,23 +837,26 @@ private class TimelineView(val state: EditorState, density: Density, private val
         val pxPerMs = timeScale().pxPerMs
         val wanted = original.startTime + moveDx / pxPerMs
         val spanFrames = scene.lastShownFrame(original.endTime) + 1 - scene.firstShownFrame(original.startTime)
-        val target = TimelineMath.moveTarget(wanted, (original.endTime + 1 - original.startTime).toFloat(), spanFrames, snapTargets, fps, SnapZone.px / pxPerMs)
+        val found = TimelineMath.moveTarget(wanted, (original.endTime + 1 - original.startTime).toFloat(), spanFrames, snapTargets, fps, SnapZone.px / pxPerMs)
+        val target = TimelineMath.groupTarget(scene, original, moveGroup, found)
         val start = TimelineMath.movedStart(scene, original, target.frame)
         showSnap(target.snap, target.snap ?: target.frame)
-        moveSlide = if (target.snap != null || wanted <= 0f) 0f else (wanted - start) * pxPerMs
-        val id = original.id
-        if (scene.layer(id)?.startTime != start) state.edit(MOVE_EDIT) { it.update(id) { _ -> it.movedClip(original, start) } }
+        moveSlide = if (target.snap != null || target != found || wanted <= 0f) 0f else (wanted - start) * pxPerMs
+        val group = moveGroup
+        if (scene.layer(original.id)?.startTime != start) state.edit(MOVE_EDIT) { TimelineMath.movedClips(it, original, group, target.frame) }
     }
 
     private fun dropMove(commit: Boolean) {
         if (!commit || state.scene == moveBase) state.cancelGesture(MOVE_EDIT)
         moveId = null
         moveLayer = null
+        moveGroup = emptyList()
+        moveGroupIds = emptySet()
         moveBase = null
         moveSlide = 0f
     }
 
-    fun timeFor(id: Long, time: TimeScale) = if (id == moveId) time.slid(moveSlide) else time
+    fun timeFor(id: Long, time: TimeScale) = if (id == moveId || id in moveGroupIds) time.slid(moveSlide) else time
 
     private fun reorderTo(y: Float) {
         val layers = layers

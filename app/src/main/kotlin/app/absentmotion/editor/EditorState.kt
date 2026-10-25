@@ -1,5 +1,6 @@
 package app.absentmotion.editor
 
+import android.view.Choreographer
 import androidx.annotation.StringRes
 import app.absentmotion.R
 import app.absentmotion.ai.withMattesFollowing
@@ -207,11 +208,38 @@ class EditorState(
     }
 
     fun endGesture() {
-        if (history.endGesture()) saver.commit(scene.toXml())
+        val pending = drafted != null
+        val ended = history.endGesture()
+        if (pending || ended) {
+            dropDraft()
+            val xml = scene.toXml()
+            if (pending) engine.setScene(scene, xml)
+            if (ended) saver.commit(xml) else saver.draft(xml)
+        }
         saver.flush()
     }
 
+    private var drafted: Scene? = null
+    private val sendDraft = Choreographer.FrameCallback {
+        drafted?.let { next ->
+            drafted = null
+            val xml = next.toXml()
+            engine.setScene(next, xml)
+            saver.draft(xml)
+        }
+    }
+
+    private fun dropDraft() {
+        if (drafted == null) return
+        drafted = null
+        Choreographer.getInstance().removeFrameCallback(sendDraft)
+    }
+
     fun cancelGesture(key: Any) = history.cancelGesture(key)
+
+    val gestureOpen: Boolean get() = history.gesturing
+
+    fun amend(next: Scene) = history.amend(next.withMattesFollowing(scene))
 
     internal fun forgetEdit(after: Scene?): Boolean = history.forget(after)
 
@@ -225,7 +253,13 @@ class EditorState(
 
     private fun note(undone: Boolean, change: Pair<Scene, Scene>) {
         val what = describeEdit(change.first, change.second)
-        historyNotes.add(HistoryNote(++historyNoteCount, txt(if (undone) R.string.history_undid else R.string.history_redid, what)))
+        showNote(HistoryNote(++historyNoteCount, txt(if (undone) R.string.history_undid else R.string.history_redid, what)))
+    }
+
+    fun hint(@StringRes text: Int) = showNote(HistoryNote(++historyNoteCount, txt(text), faint = true))
+
+    private fun showNote(note: HistoryNote) {
+        historyNotes.add(note)
         while (historyNotes.size > MAX_NOTES) historyNotes.removeAt(0)
     }
 
@@ -249,9 +283,15 @@ class EditorState(
         canRedo = history.canRedo
         if (selectedId != null && next.layer(selectedId!!) == null) selectedId = null
         frame = keptFrame(previous, next, frame)
+        if (!save) {
+            if (drafted == null) Choreographer.getInstance().postFrameCallback(sendDraft)
+            drafted = next
+            return
+        }
+        dropDraft()
         val xml = next.toXml()
         engine.setScene(next, xml)
-        if (save) saver.commit(xml) else saver.draft(xml)
+        saver.commit(xml)
     }
 
     private companion object {
@@ -268,16 +308,18 @@ internal class EditHistory(private val current: () -> Scene, private val show: (
     private val redoStack = ArrayDeque<Scene>()
     private var lastEditKey: Any? = null
     private var redoBeforeGesture: List<Scene> = emptyList()
+    private var droppedBeforeGesture: Scene? = null
 
     val canUndo: Boolean get() = undoStack.isNotEmpty()
     val canRedo: Boolean get() = redoStack.isNotEmpty()
+    val gesturing: Boolean get() = lastEditKey != null
 
     fun edit(key: Any?, next: Scene) {
         val scene = current()
         if (next == scene) return
         if (key == null || key != lastEditKey) {
             undoStack.addLast(scene)
-            if (undoStack.size > MAX_UNDO) undoStack.removeFirst()
+            droppedBeforeGesture = if (undoStack.size > MAX_UNDO) undoStack.removeFirst() else null
             redoBeforeGesture = redoStack.toList()
         }
         lastEditKey = key
@@ -291,9 +333,15 @@ internal class EditHistory(private val current: () -> Scene, private val show: (
         if (lastEditKey != key) return
         lastEditKey = null
         val previous = undoStack.removeLastOrNull() ?: return
+        droppedBeforeGesture?.let { undoStack.addFirst(it) }
+        droppedBeforeGesture = null
         redoStack.clear()
         redoStack.addAll(redoBeforeGesture)
         show(previous, false)
+    }
+
+    fun amend(next: Scene) {
+        if (next != current()) show(next, true)
     }
 
     fun forget(after: Scene?): Boolean {

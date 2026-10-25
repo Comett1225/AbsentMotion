@@ -54,6 +54,22 @@ class ParentDetachTest {
         assertEquals(listOf("100.000000,70.000000,0.000000", "100.000000,110.000000,0.000000"), keys.map { it.v })
     }
 
+    @Test fun easingAndAnimationMarksSurviveWhereTheAnimatedParentStandsStill() {
+        val curve = "cubicBezier 0.42 0.0 0.58 1.0"
+        val s = sceneOf(
+            layer(1, null, prop("location", 0f to "0,0,0", 0.25f to "100,0,0")),
+            layer(2, 1, XmlNode("location", children = listOf(
+                XmlNode("kf", linkedMapOf("t" to "0.5", "v" to "10,0,0", "gen" to "in")),
+                XmlNode("kf", linkedMapOf("t" to "1", "v" to "60,0,0", "e" to curve)),
+            ))),
+        )
+        val keys = s.unparentChildrenOf(setOf(1)).remove(1).layer(2)!!.node.child("transform")!!.child("location")!!.keyframes
+        assertEquals(listOf(0f, 0.25f, 0.5f, 1f), keys.map { it.t })
+        assertEquals(listOf("10.000000,0.000000,0.000000", "110.000000,0.000000,0.000000", "110.000000,0.000000,0.000000", "160.000000,0.000000,0.000000"), keys.map { it.v })
+        assertEquals(listOf(null, null, null, curve), keys.map { it.e })
+        assertEquals("in", keys[2].gen)
+    }
+
     @Test fun detachingFromAnAnimatedParentBakesTheCombinedMotion() {
         val s = sceneOf(
             layer(1, null, prop("location", 0f to "0,0,0", 1f to "100,0,0"), prop("rotation", 0f to "0", 1f to "90")),

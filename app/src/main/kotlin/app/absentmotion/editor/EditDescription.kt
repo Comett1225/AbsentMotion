@@ -10,7 +10,7 @@ import app.absentmotion.model.Layer
 import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
 
-data class HistoryNote(val id: Long, val text: UiText)
+data class HistoryNote(val id: Long, val text: UiText, val faint: Boolean = false)
 
 fun describeEdit(before: Scene, after: Scene): UiText {
     val old = before.layers

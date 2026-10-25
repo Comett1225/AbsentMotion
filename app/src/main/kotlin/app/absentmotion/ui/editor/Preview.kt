@@ -148,7 +148,8 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
     var quad by remember { mutableStateOf<FloatArray?>(null) }
     var plane by remember { mutableStateOf<FloatArray?>(null) }
     LaunchedEffect(state.selectedId, scene, mediaRevision, state.cameraMode) {
-        snapshotFlow { state.timeMs }.collectLatest { timeMs ->
+        snapshotFlow { state.timeMs.takeUnless { state.playing } }.collectLatest { timeMs ->
+            if (timeMs == null) return@collectLatest
             quad = state.selectedId?.let { state.engine.layerQuad(it, timeMs) }
             plane = state.selectedId?.let { state.engine.layerMatrix(it, timeMs) }?.copyOfRange(9, 18)
         }
@@ -180,7 +181,7 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
                     var drifted = false
                     val starts = HashMap<PointerId, Offset>()
                     val startLayer = state.selected
-                    val startQuad = quad?.let { q -> List(4) { Offset(q[2 * it], q[2 * it + 1]) * currentScale + currentOffset } }
+                    val startQuad = quad?.takeUnless { state.playing }?.let { q -> List(4) { Offset(q[2 * it], q[2 * it + 1]) * currentScale + currentOffset } }
                     val planeView = plane?.let { v -> Matrix().apply { setValues(v) } }
                     val adjusting = state.pointAdjust.takeIf { state.panel == EditorPanel.Effects }
                     val turning = state.turner
@@ -315,9 +316,9 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
         if (state.drawing == null && !editingText) RenderPreviewNotes(state, cachedPlaying, Modifier.align(Alignment.TopCenter))
         Presence(state.cameraTip && !LocalWide.current) { CameraTip(state, Modifier.align(Alignment.BottomEnd).presence()) }
         EyedropperLoupe(state, Modifier.fillMaxSize())
-        GradientHandles(state, quad, scale, Offset(dx, dy))
+        GradientHandles(state, quad.takeUnless { state.playing }, scale, Offset(dx, dy))
         if (editingText) Canvas(Modifier.fillMaxSize()) {
-            val q = quad ?: return@Canvas
+            val q = quad.takeUnless { state.playing } ?: return@Canvas
             val points = List(4) { Offset(q[2 * it] * scale + dx, q[2 * it + 1] * scale + dy) }
             for (i in 0..3) drawLine(Am.Accent, points[i], points[(i + 1) % 4], 1.dp.toPx())
             val handle = if (state.selected?.textAlign == "right") (points[0] + points[3]) / 2f else (points[1] + points[2]) / 2f

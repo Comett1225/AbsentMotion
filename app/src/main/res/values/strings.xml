@@ -1300,6 +1300,17 @@
     <string name="history_blend">Blending</string>
     <string name="history_visibility">Show or hide layer</string>
     <string name="history_mask">Clipping mask</string>
+    <string name="history_line_up_hint">Press again to line them all up</string>
+    <string name="smooth_updating">Updating smoothing…</string>
+    <string name="smooth_stale_title">Smoothing is out of date</string>
+    <string name="smooth_stale_body">This clip changed a lot after it was smoothed, so the smoothing no longer fits it.</string>
+    <string name="smooth_redo">Redo smoothing</string>
+    <string name="smooth_remove">Remove smoothing</string>
+    <string name="smooth_undo_change">Undo the change</string>
+    <string name="a11y_select_layer">Select layer</string>
+    <string name="a11y_hide_layer">Hide layer</string>
+    <string name="a11y_show_layer">Show layer</string>
+    <string name="a11y_layer_hidden">Hidden</string>
     <string name="ai_noise_question">What do you want to reduce the noise from?</string>
     <string name="ai_noise_voice">Voice recording</string>
     <string name="ai_noise_voice_hint">Removes the background noise behind speech</string>

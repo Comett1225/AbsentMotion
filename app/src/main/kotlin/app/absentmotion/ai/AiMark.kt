@@ -35,7 +35,8 @@ class AiMark(val node: XmlNode) {
 
 val Layer.aiMarks: List<AiMark> get() = node.children.filter { it.name == AI_TAG }.map(::AiMark)
 
-fun Layer.withAiMark(kind: AiKind, original: String?, result: String?, option: String? = null, media: MediaDeclaration? = null, shift: Int = 0): Layer {
+fun Layer.withAiMark(kind: AiKind, original: String?, result: String?, option: String? = null, media: MediaDeclaration? = null, shift: Int = 0,
+                     extra: Map<String, String> = emptyMap()): Layer {
     val previous = aiMarks.firstOrNull { it.kind == kind }
     val first = previous?.original ?: original
     val attrs = linkedMapOf("type" to kind.xml)
@@ -43,6 +44,7 @@ fun Layer.withAiMark(kind: AiKind, original: String?, result: String?, option: S
     result?.let { attrs["result"] = it }
     option?.let { attrs["option"] = it }
     if (shift != 0) attrs["shift"] = "$shift"
+    attrs.putAll(extra)
     val kept = (if (previous?.original != null) previous.media else media)?.takeIf { it.uri == first }
     return copy(node = node.copy(children = node.children.filterNot { it.name == AI_TAG && it["type"] == kind.xml } + XmlNode(AI_TAG, attrs, listOfNotNull(kept?.node))))
 }
