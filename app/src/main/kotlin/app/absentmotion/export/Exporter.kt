@@ -46,12 +46,12 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
                 val xml = scene.toXml()
                 when (kind) {
                     ExportKind.Video -> s.fixedFormat().let { f ->
-                        val started = android.os.SystemClock.elapsedRealtime()
                         formatProblem(f, false, android.os.Build.VERSION.SDK_INT)?.let { throw ExportError(it) }
+                        val started = android.os.SystemClock.elapsedRealtime()
                         var paused = 0L
                         var mix: AudioMix? = null
-                        val written = retryingEncoder(note) {
                         var looks: FrameLooks? = null
+                        val written = retryingEncoder(note) {
                             progress(0f)
                             mix = ExportAudio.mixFor?.invoke(scene, f.audio.effectiveRate)
                             try {
@@ -207,9 +207,9 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
     private suspend fun sequence(saved: MutableList<Uri>, scene: Scene, xml: String, s: ExportSettings, name: String, progress: (Float) -> Unit): ExportResult {
         val (width, height) = exportSize(scene, s.shortSide, even = false)
         val frames = frameCount(scene, s.fps)
-        val bitmap = app.absentmotion.platform.makeBitmap(width, height)
         imageProblem(s.image, android.os.Build.VERSION.SDK_INT)?.let { throw ExportError(it) }
         checkPicture(width, height)
+        val bitmap = app.absentmotion.platform.makeBitmap(width, height)
         try {
             engine.exportSession(xml, s.smoothing, s.fps) {
                 for (k in 0 until frames) {

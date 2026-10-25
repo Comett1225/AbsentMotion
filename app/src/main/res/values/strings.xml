@@ -609,14 +609,6 @@
     <string name="export_error_mp3_settings">The MP3 encoder cannot use %1$s Hz at %2$s kbps</string>
     <string name="export_error_mp3">The MP3 encoder failed</string>
     <string name="export_error_no_video">The encoder produced no video</string>
-
-    <string name="camera_off">Off</string>
-    <string name="camera_on">On</string>
-    <string name="camera_auto">Auto</string>
-    <string name="camera_flash">Flash</string>
-    <string name="camera_timer">Timer</string>
-    <string name="camera_grid">Grid</string>
-    <string name="camera_photo">PHOTO</string>
     <string name="export_error_wav_too_long">WAV files can hold at most 4 GB of sound. Choose FLAC for a sound this long.</string>
     <string name="export_error_too_large">%1$s is too large for this phone to export. Use a smaller size.</string>
     <string name="export_error_encode_image">The picture could not be saved as %1$s. Try PNG or a smaller size.</string>
@@ -632,6 +624,14 @@
     <string name="export_notify_channel">Exports</string>
     <string name="export_notify_done">Export finished</string>
     <string name="export_notify_failed">The export did not finish</string>
+
+    <string name="camera_off">Off</string>
+    <string name="camera_on">On</string>
+    <string name="camera_auto">Auto</string>
+    <string name="camera_flash">Flash</string>
+    <string name="camera_timer">Timer</string>
+    <string name="camera_grid">Grid</string>
+    <string name="camera_photo">PHOTO</string>
     <string name="camera_video">VIDEO</string>
     <string name="camera_close">Close camera</string>
     <string name="camera_take_photo">Take photo</string>
