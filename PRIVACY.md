@@ -29,8 +29,8 @@ The app asks for the internet permission for these things only:
   downloads it from Hugging Face (`huggingface.co`). Speech recognition itself runs on the device.
 - **AI Enhance and AI Smooth.** The first time you use one of them, the app tells you the size of the model it needs (about 1 to
   11 MB) and downloads it from GitHub (`github.com` and `raw.githubusercontent.com`). The AI work itself runs on the device.
-- **Best quality cut-out.** Only if you choose Best quality for removing backgrounds, the app downloads its model once (about
-  62 MB) from GitHub (`github.com`). The cut-out itself runs on the device.
+- **AI background removal 2.0.** Only if you choose AI background removal 2.0 for removing backgrounds, the app downloads its
+  model once (about 62 MB) from GitHub (`github.com`). The cut-out itself runs on the device.
 - **Update check.** While "Check for a new version each time the app opens" is on (the app asks you once, on its first screens or at the first start after an update, and the switch is also in Settings), and when you tap Check for Update, the app makes one normal HTTPS request to GitHub (`api.github.com`) to read the latest version number; nothing else is sent, and GitHub sees your IP address, as for any web request.
 
 Apart from the Google Play build described below, nothing else is sent anywhere. Text to speech uses the voices already installed on your device and works offline.

@@ -1400,7 +1400,7 @@
     <string name="ai_model_detail">AI Enhance model</string>
     <string name="ai_model_grain">AI Enhance grain model</string>
     <string name="ai_model_cartoon">AI Enhance cartoon model</string>
-    <string name="ai_model_cutout">Best quality cut-out</string>
+    <string name="ai_model_cutout">AI background removal 2.0</string>
     <string name="ai_model_broken">An AI model file was damaged and was deleted. Download it again.</string>
     <string name="ai_model_download_failed">The AI model download failed. Check the connection and try again.</string>
     <string name="ai_model_download_wrong">The download was not the AI model</string>
@@ -1447,10 +1447,10 @@
     <string name="cutout_question">How should backgrounds be removed from images? You can change this later in Settings.</string>
     <string name="cutout_standard">Standard</string>
     <string name="cutout_standard_hint">Built in, fast and works offline.</string>
-    <string name="cutout_best">Best quality</string>
+    <string name="cutout_best">AI background removal 2.0</string>
     <string name="cutout_best_hint">Cleaner edges around hair and fine detail. Downloads %1$s once. Images only.</string>
-    <string name="cutout_fallback_download">Best quality could not be downloaded, so Standard was used. Check the connection and try again.</string>
-    <string name="cutout_fallback_failed">Best quality could not finish this image, so Standard was used.</string>
+    <string name="cutout_fallback_download">AI background removal 2.0 could not be downloaded, so Standard was used. Check the connection and try again.</string>
+    <string name="cutout_fallback_failed">AI background removal 2.0 could not finish this image, so Standard was used.</string>
     <string name="ai_gpu_warning">This can freeze some phones. If the phone freezes, restart it and AI will use the processor again.</string>
     <string name="ai_gpu_failed">AI work on the graphics chip did not finish, so AI now uses the processor.</string>
     <string name="export_interpolation_ai">AI Smooth</string>
@@ -1705,7 +1705,7 @@
     <string name="tier_needs_latest">Needs Android 13 (Latest version)</string>
     <string name="feature_flow_high">Optical flow High</string>
     <string name="feature_ai_enhance">AI Enhance</string>
-    <string name="feature_best_cutout">Best quality cut-out</string>
+    <string name="feature_best_cutout">AI background removal 2.0</string>
     <string name="about_version_compatible">Version %1$s Compatible</string>
     <string name="about_compatible_note">This is the Compatible version for Android 9 to 12. Left out: %1$s. They need Android 13 and the Latest version.</string>
     <string name="low_memory_title">Low memory</string>
