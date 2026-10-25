@@ -33,8 +33,8 @@ internal fun gifSampleEstimate(width: Int, height: Int, frames: Int, samples: Li
 
 internal fun gifTimeMs(frames: Int, sample: GifSample, renderMs: Long?): Long {
     fun median(values: List<Double>) = values.sorted().let { if (it.isEmpty()) 0.0 else it[it.size / 2] }
-    val render = renderMs ?: (DefaultSetupMs + frames * median(sample.renderMs)).roundToLong()
-    return render + (frames * median(sample.encodeMs)).roundToLong()
+    val sampled = (DefaultSetupMs + frames * median(sample.renderMs)).roundToLong()
+    return maxOf(renderMs ?: 0L, sampled) + (frames * median(sample.encodeMs)).roundToLong()
 }
 
 internal fun drawSamples(frames: Int, interpolation: FrameInterpolation): List<Int> {
@@ -43,6 +43,9 @@ internal fun drawSamples(frames: Int, interpolation: FrameInterpolation): List<I
         else listOf(0, 1, frames / 3, frames / 3 + 1, frames * 2 / 3, frames * 2 / 3 + 1)
     return picks.map { it.coerceIn(0, last) }
 }
+
+internal fun drawingMs(times: List<Double>, interpolation: FrameInterpolation): Double =
+    if (interpolation == FrameInterpolation.Off) times.drop(1).sorted()[1] else times.drop(2).average()
 
 internal suspend fun measureVideoDraw(engine: EngineThread, scene: Scene, settings: ExportSettings): Double {
     val (width, height) = exportSize(scene, settings.shortSide, even = true)
@@ -56,13 +59,31 @@ internal suspend fun measureVideoDraw(engine: EngineThread, scene: Scene, settin
                     check(renderInto(buffer, frameTimeMs(scene, settings.fps, index))) { "Cannot sample the drawing time" }
                     (System.nanoTime() - started) / 1e6
                 }
-                if (settings.interpolation == FrameInterpolation.Off) times.drop(1).sorted()[1] else times.drop(2).average()
+                drawingMs(times, settings.interpolation)
             } finally {
                 releaseBuffers()
             }
         }
     } finally {
         buffer.close()
+    }
+}
+
+internal suspend fun measureSequenceFrame(engine: EngineThread, scene: Scene, settings: ExportSettings): Double {
+    val (width, height) = exportSize(scene, settings.shortSide, even = false)
+    val frames = frameCount(scene, settings.fps)
+    val discard = object : OutputStream() {
+        override fun write(value: Int) {}
+        override fun write(data: ByteArray, offset: Int, length: Int) {}
+    }
+    return engine.exportSession(scene.toXml(), settings.smoothing, settings.fps) {
+        val times = drawSamples(frames, settings.interpolation).map { index ->
+            val started = System.nanoTime()
+            val pixels = still(frameTimeMs(scene, settings.fps, index), width, height) ?: error("Cannot sample the drawing time")
+            withContext(Dispatchers.Default) { app.absentmotion.platform.encodeRgba(pixels, width, height, settings, null, discard) }
+            (System.nanoTime() - started) / 1e6
+        }
+        drawingMs(times, settings.interpolation)
     }
 }
 

@@ -68,6 +68,15 @@ class ExportTimeTest {
         assertEquals(listOf(0, 1, 100, 101, 200, 201), drawSamples(300, FrameInterpolation.Ai))
         assertEquals(listOf(0, 0, 0, 0), drawSamples(1, FrameInterpolation.Off))
         assertEquals(listOf(0, 0, 0, 0, 0, 0), drawSamples(1, FrameInterpolation.Flow))
+        assertEquals(63.0, drawingMs(listOf(400.0, 14.0, 63.0, 66.0), FrameInterpolation.Off), 0.0)
+        assertEquals(57.75, drawingMs(listOf(400.0, 40.0, 70.0, 45.0, 66.0, 50.0), FrameInterpolation.Flow), 1e-9)
+    }
+
+    @Test fun aGifOfAHeavyProjectIsNotEstimatedFromLighterExports() {
+        val sample = GifSample(1000, listOf(10.0, 12.0, 11.0), listOf(60.0, 55.0, 70.0, 58.0, 62.0))
+        assertEquals(300L + 204 * 60 + 204 * 11, gifTimeMs(204, sample, 3488))
+        assertEquals(50_000L + 204 * 11, gifTimeMs(204, sample, 50_000))
+        assertEquals(300L + 204 * 60 + 204 * 11, gifTimeMs(204, sample, null))
     }
 
     @Test fun encodersSlowerThanTheExportSetTheShortestTime() {

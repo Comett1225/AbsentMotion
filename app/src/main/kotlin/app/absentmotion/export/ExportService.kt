@@ -89,7 +89,8 @@ class ExportService : Service() {
         NotificationManagerCompat.from(this).createNotificationChannel(channel)
         shown = percent()
         try {
-            ServiceCompat.startForeground(this, NotificationId, progressNotification(shown), serviceType())
+            val notification = progressNotification(shown)
+            if (Build.VERSION.SDK_INT >= 29) startForeground(NotificationId, notification, serviceType()) else startForeground(NotificationId, notification)
         } catch (e: Exception) {
             android.util.Log.w("AMExport", "the export runs without its notification", e)
             stopSelf()
@@ -169,10 +170,7 @@ class ExportService : Service() {
         const val ActionCancel = "app.absentmotion.export.CANCEL"
         const val TickMs = 500L
 
-        fun serviceType(): Int = when {
-            Build.VERSION.SDK_INT >= 35 -> ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROCESSING
-            Build.VERSION.SDK_INT >= 29 -> ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
-            else -> 0
-        }
+        fun serviceType(): Int =
+            if (Build.VERSION.SDK_INT >= 35) ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROCESSING else ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
     }
 }

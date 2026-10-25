@@ -62,6 +62,7 @@ import app.absentmotion.export.GifSample
 import app.absentmotion.export.frameCount
 import app.absentmotion.export.gifTimeMs
 import app.absentmotion.export.measureGif
+import app.absentmotion.export.measureSequenceFrame
 import app.absentmotion.export.measureVideoDraw
 import app.absentmotion.export.withMissing
 import androidx.compose.runtime.LaunchedEffect
@@ -273,6 +274,15 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
             catch (e: Exception) { Log.w("AMExport", "Cannot sample the drawing time", e) }
         }
     }
+    val sequenceSettings = settings.getValue(ExportKind.Sequence)
+    val sequenceMs by produceState<Double?>(null, kind, scene, sequenceSettings.shortSide, sequenceSettings.smoothing, sequenceSettings.image, phase is Phase.Idle) {
+        value = null
+        if (kind == ExportKind.Sequence && phase is Phase.Idle) {
+            try { delay(MeasureDelayMs); value = measureSequenceFrame(engine, scene, sequenceSettings) }
+            catch (e: CancellationException) { throw e }
+            catch (e: Exception) { Log.w("AMExport", "Cannot sample the drawing time", e) }
+        }
+    }
     var free by remember { mutableLongStateOf(freeSpace()) }
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     DisposableEffect(lifecycle) {
@@ -318,11 +328,11 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
     val better = remember(video, support, check) { betterChoice(video, support, check) }
     val warning = codecWarning(video, support)?.takeIf { it != acknowledged || support is Support.Unsupported }
     val current = settings.getValue(kind)
-    val timeMs = remember(kind, current, report, heat.level, estimate, phase is Phase.Idle, gifSample, drawMs) {
+    val timeMs = remember(kind, current, report, heat.level, estimate, phase is Phase.Idle, gifSample, drawMs, sequenceMs) {
         when (kind) {
             ExportKind.Video -> times.estimateMs(current, scene, report?.probe, heat.level, report, drawMs)
             ExportKind.Gif -> gifSample?.let { gifTimeMs(frameCount(scene, current.fps), it, times.estimateMs(current, scene, report?.probe, heat.level)) }
-            ExportKind.Sequence -> times.estimateMs(current, scene, report?.probe, heat.level)
+            ExportKind.Sequence -> times.estimateMs(current, scene, report?.probe, heat.level, null, sequenceMs)
             ExportKind.Package -> estimate.coerceAtLeast(0) / 100_000
             ExportKind.Audio -> scene.totalTime / if (current.audioFormat.lossless) 20L else 14L
             else -> 0L
@@ -410,6 +420,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
         progress = 0f
         note = null
         val background = chosen in BackgroundKinds
+        Log.i("AMExport", "start ${chosen.name.lowercase()} estimated ${timeMs ?: -1} ms, drawing ${drawMs ?: -1.0} ms per frame")
         val job = scope.launch {
             var outcome: Boolean? = null
             try {

@@ -27,8 +27,9 @@ class GifEstimateTest {
 
     @Test fun gifTimeIsTheRenderTimePlusTheEncodingOfEveryFrame() {
         val sample = GifSample(1000, encodeMs = listOf(400.0, 40.0, 50.0, 45.0, 60.0), renderMs = listOf(900.0, 10.0, 12.0, 11.0, 9.0))
-        assertEquals(1_200L + 100 * 50, gifTimeMs(100, sample, renderMs = 1_200))
-        assertEquals(1_200L + 300 * 50, gifTimeMs(300, sample, renderMs = 1_200))
+        assertEquals(DefaultSetupMs + 100 * 11 + 100 * 50, gifTimeMs(100, sample, renderMs = 1_200))
+        assertEquals(DefaultSetupMs + 300 * 11 + 300 * 50, gifTimeMs(300, sample, renderMs = 1_200))
+        assertEquals(9_000L + 100 * 50, gifTimeMs(100, sample, renderMs = 9_000))
         assertEquals(DefaultSetupMs + 100 * 11 + 100 * 50, gifTimeMs(100, sample, renderMs = null))
     }
 
