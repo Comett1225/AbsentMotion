@@ -4,7 +4,6 @@ import android.os.Build
 import android.content.Context
 import android.graphics.Typeface
 import android.graphics.fonts.Font
-import android.graphics.fonts.SystemFonts
 import android.net.Uri
 import android.provider.OpenableColumns
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -83,17 +82,19 @@ class FontLibrary(context: Context) {
         ?.sortedByDescending { it.lastModified() }?.map { FontName("imported", it.name) } ?: emptyList()
     private fun cachedFile(name: String): File = File(cache,
         MessageDigest.getInstance("SHA-256").digest(name.toByteArray()).joinToString("") { "%02x".format(it) } + ".ttf")
-    private val systemFamilies: Map<String, List<Font>> by lazy {
-        if (Build.VERSION.SDK_INT < 29) emptyMap() else SystemFonts.getAvailableFonts().groupBy { font ->
-            familyKey(font.file?.nameWithoutExtension?.substringBefore('-') ?: "")
-        }
+    private val systemFiles: Map<String, List<File>> by lazy {
+        listOf(File("/system/fonts"), File("/product/fonts")).flatMap { it.listFiles()?.toList().orEmpty() }
+            .filter { it.isFile && it.extension.lowercase() in setOf("ttf", "otf", "ttc") }
+            .groupBy { familyKey(it.nameWithoutExtension.substringBefore('-')) }
     }
+    private val systemFamilies = ConcurrentHashMap<String, List<Font>>()
     private fun familyKey(value: String) = value.lowercase().filter { it.isLetterOrDigit() }
     fun systemFont(name: String): Font? {
         if (Build.VERSION.SDK_INT < 29) return null
         val wanted = FontName.parse(name)
         if (wanted.source != "googlefonts") return null
-        return systemFamilies[familyKey(wanted.family)]?.minByOrNull { font -> kotlin.math.abs(font.style.weight - wanted.weight) +
+        val key = familyKey(wanted.family)
+        return systemFamilies.getOrPut(key) { systemFiles[key].orEmpty().mapNotNull { runCatching { Font.Builder(it).build() }.getOrNull() } }.minByOrNull { font -> kotlin.math.abs(font.style.weight - wanted.weight) +
             if ((font.style.slant == 1) == wanted.italic) 0 else 1000 }
     }
     fun fontIndex(name: String): Int = if (Build.VERSION.SDK_INT < 29) 0 else systemFont(name)?.takeIf { it.file == localFile(name) }?.ttcIndex ?: 0
