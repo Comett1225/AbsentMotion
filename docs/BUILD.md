@@ -131,6 +131,8 @@ Outputs: `app/build/outputs/apk/<flavour>/<type>/app-<flavour>-<type>.apk`, for 
   `tools/smoke_check.py` and `tools/compat/export_smoke.py` (GIF and MP4) on it and deletes it again.
 - Install with `adb install -r <apk>`. Emulators work for development (arm64 image, Android 13 or newer; `tools/smoke_check.py` renders a still on whichever device `ANDROID_SERIAL` names).
 
+The signing helper uses each APK's manifest minimum Android version and build-tools 37.0.0. `python3 tools/apk_check.py <apk> [<apk> ...]` checks signatures at every supported API through 37, resource-table and native-library packaging, 16 KB ELF alignment, and matching app IDs, versions and certificates across the supplied APKs. Use `--unsigned` for unsigned CI output. This validates packaging; installation and runtime testing on emulators and real devices remain necessary.
+
 ## 7. Checking a change, and releases
 
 `tools/check.sh` compiles the Android flavours and runs the unit tests (`--full` also lints foss and compat and checks the native API floor of both).

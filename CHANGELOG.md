@@ -6,6 +6,13 @@ All notable changes to AbsentMotion are listed here, newest first. The format fo
 Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stands for the feature set as it stood on
 2026-10-12.
 
+## [Unreleased]
+
+### Changed
+
+- Release tooling checks APK signatures across supported Android versions, native-library packaging and alignment, and matching app versions and certificates. The signing helper uses pinned build tools and each APK's minimum Android version.
+- The animated GIF decoder test generates its own ImageIO fixture instead of depending on a removed documentation image.
+
 ## [4.0.0] - 2026-10-25
 
 ### Added

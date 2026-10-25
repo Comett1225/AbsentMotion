@@ -1,6 +1,5 @@
 package app.absentmotion.media
 
-import app.absentmotion.TestData
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -10,8 +9,9 @@ import java.awt.image.BufferedImage
 import java.awt.image.IndexColorModel
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
-import java.io.File
+import javax.imageio.IIOImage
 import javax.imageio.ImageIO
+import javax.imageio.ImageTypeSpecifier
 import javax.imageio.metadata.IIOMetadataNode
 
 class GifDecoderTest {
@@ -127,29 +127,44 @@ class GifDecoderTest {
         for (y in 0 until 23) for (x in 0 until 37) assertEquals("$x,$y", image.getRGB(x, y), canvas[y * 37 + x])
     }
 
-    @Test fun projectGifDecodesLikeImageIo() {
-        val file = File(TestData.project, "docs/speed-comparison.gif")
+    @Test fun animatedCompressedGifMatchesImageIo() {
+        val output = ByteArrayOutputStream()
+        val writer = ImageIO.getImageWritersByFormatName("gif").next()
+        ImageIO.createImageOutputStream(output).use { stream ->
+            writer.output = stream
+            writer.prepareWriteSequence(null)
+            repeat(3) { index ->
+                val image = BufferedImage(37, 23, BufferedImage.TYPE_INT_RGB)
+                for (y in 0 until image.height) for (x in 0 until image.width) image.setRGB(x, y, palette[((x / 3) xor (y / 2) xor index) % 4])
+                val metadata = writer.getDefaultImageMetadata(ImageTypeSpecifier.createFromRenderedImage(image), null)
+                val root = metadata.getAsTree("javax_imageio_gif_image_1.0") as IIOMetadataNode
+                (root.getElementsByTagName("GraphicControlExtension").item(0) as IIOMetadataNode).setAttribute("delayTime", ((index + 1) * 7).toString())
+                metadata.setFromTree("javax_imageio_gif_image_1.0", root)
+                writer.writeToSequence(IIOImage(image, null, metadata), null)
+            }
+            writer.endWriteSequence()
+        }
+        writer.dispose()
+        val bytes = output.toByteArray()
+        val frames = decode(bytes)
         val reader = ImageIO.getImageReadersByFormatName("gif").next()
-        val delays = ImageIO.createImageInputStream(file).use { stream ->
+        val delays = ImageIO.createImageInputStream(ByteArrayInputStream(bytes)).use { stream ->
             reader.input = stream
             val count = reader.getNumImages(true)
-            val first = reader.read(0)
-            val ours = GifDecoder(file.inputStream()).let { decoder ->
-                var firstFrame: IntArray? = null
-                decoder.read { canvas, _ -> if (firstFrame == null) firstFrame = canvas.copyOf() }
-                firstFrame!!
-            }
-            var same = 0
-            for (y in 0 until first.height) for (x in 0 until first.width) if (first.getRGB(x, y) == ours[y * first.width + x]) same++
-            assertEquals(first.width * first.height, same)
+            assertEquals(3, count)
+            assertEquals(count, frames.size)
             List(count) { i ->
+                val image = reader.read(i)
+                for (y in 0 until image.height) for (x in 0 until image.width) assertEquals("frame $i at $x,$y", image.getRGB(x, y), frames[i].first[y * image.width + x])
                 val root = reader.getImageMetadata(i).getAsTree("javax_imageio_gif_image_1.0") as IIOMetadataNode
                 gifDelayMs((root.getElementsByTagName("GraphicControlExtension").item(0) as IIOMetadataNode).getAttribute("delayTime").toInt())
             }
         }
-        val summary = summarizeGif { file.inputStream() }
+        reader.dispose()
+        val summary = summarizeGif { ByteArrayInputStream(bytes) }
         assertEquals(delays, summary.delaysMs.toList())
-        assertTrue(summary.frames > 1)
+        assertEquals(listOf(70, 140, 210), delays)
+        assertEquals(3, summary.frames)
     }
 
     @Test fun encodeSizeIsEvenAndFallsBackWhenTheEncoderRefuses() {

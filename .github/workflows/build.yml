@@ -51,6 +51,8 @@ jobs:
         run: tools/build_skia.sh
       - name: Build the foss APK
         run: ./gradlew :app:assembleFossRelease --no-daemon
+      - name: Check unsigned APK packaging
+        run: python3 tools/apk_check.py --unsigned app/build/outputs/apk/foss/release/*.apk
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: foss-apk
@@ -97,6 +99,8 @@ jobs:
         run: tools/build_skia.sh compat
       - name: Build the compat APK
         run: ./gradlew :app:assembleCompatRelease --no-daemon
+      - name: Check unsigned APK packaging
+        run: python3 tools/apk_check.py --unsigned app/build/outputs/apk/compat/release/*.apk
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: compat-apk

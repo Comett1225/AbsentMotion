@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 import re
 import shlex
+import struct
 import subprocess
 import sys
 import tempfile
@@ -212,6 +213,54 @@ class ToolRegressions(unittest.TestCase):
             for function, args in [('nm', [tool, ['--defined-only'], Path('invalid.so')]), ('undefined', [tool, Path('invalid.so')])]:
                 with self.assertRaises(subprocess.CalledProcessError):
                     scope[function](*args)
+
+    def test_apk_packaging_rejects_compression_and_alignment_mismatches(self):
+        spec = importlib.util.spec_from_file_location('apk_check', ROOT / 'tools/apk_check.py')
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        library = bytearray(128)
+        library[:6] = b'\x7fELF\x02\x01'
+        struct.pack_into('<H', library, 18, 183)
+        struct.pack_into('<Q', library, 32, 64)
+        struct.pack_into('<HH', library, 54, 56, 1)
+        struct.pack_into('<I', library, 64, 1)
+        struct.pack_into('<Q', library, 112, 16384)
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / 'fixture.apk'
+            for compression, aligned in [(zipfile.ZIP_STORED, True), (zipfile.ZIP_STORED, False), (zipfile.ZIP_DEFLATED, False)]:
+                with self.subTest(compression=compression, aligned=aligned):
+                    with zipfile.ZipFile(path, 'w') as archive:
+                        archive.writestr('resources.arsc', b'res!')
+                        entry = zipfile.ZipInfo('lib/arm64-v8a/libfixture.so')
+                        entry.compress_type = compression
+                        if aligned:
+                            padding = (-archive.fp.tell() - 30 - len(entry.filename)) % 16384
+                            entry.extra = struct.pack('<HH', 0xffff, padding - 4) + bytes(padding - 4)
+                        archive.writestr(entry, library)
+                    self.assertEqual(1, module.zip_packaging(path, True))
+                    if aligned:
+                        self.assertEqual(1, module.zip_packaging(path, False))
+                    else:
+                        with self.assertRaisesRegex(ValueError, 'direct loading'):
+                            module.zip_packaging(path, False)
+            with zipfile.ZipFile(path, 'w') as archive:
+                archive.writestr('resources.arsc', b'res!', compress_type=zipfile.ZIP_DEFLATED)
+                archive.writestr('lib/arm64-v8a/libfixture.so', library)
+            with self.assertRaisesRegex(ValueError, 'resources.arsc'):
+                module.zip_packaging(path, True)
+            with zipfile.ZipFile(path, 'w') as archive:
+                archive.writestr('resources.arsc', b'res!')
+                archive.writestr('lib/arm64-v8a/libfixture.so', library)
+            damaged = bytearray(path.read_bytes())
+            damaged[damaged.index(b'res!')] ^= 1
+            path.write_bytes(damaged)
+            with self.assertRaises((ValueError, zipfile.BadZipFile)):
+                module.zip_packaging(path, True)
+        struct.pack_into('<Q', library, 112, 4096)
+        with self.assertRaisesRegex(ValueError, '16 KB'):
+            module.elf_alignment(library, 'fixture.so')
+        with self.assertRaises(ValueError):
+            module.elf_alignment(library[:64], 'truncated.so')
 
 if __name__ == '__main__':
     unittest.main()

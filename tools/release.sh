@@ -36,6 +36,7 @@ mv app/build/outputs/apk/play/release/app-play-release.apk "build/release/Absent
 mv app/build/outputs/apk/foss/release/app-foss-release.apk "build/release/AbsentMotion-$version-foss.apk"
 mv app/build/outputs/apk/compat/release/app-compat-release.apk "build/release/AbsentMotion-$version-compatible.apk"
 python3 tools/api_floor.py "build/release/AbsentMotion-$version-compatible.apk" --min 28
+python3 tools/apk_check.py "build/release/AbsentMotion-$version.apk" "build/release/AbsentMotion-$version-foss.apk" "build/release/AbsentMotion-$version-compatible.apk"
 
 printf '\nReleased %s:\n  %s\n  %s\n  %s\n' "$version" "$PWD/build/release/AbsentMotion-$version.apk" "$PWD/build/release/AbsentMotion-$version-foss.apk" \
     "$PWD/build/release/AbsentMotion-$version-compatible.apk"
