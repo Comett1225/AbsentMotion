@@ -60,6 +60,7 @@ class CrashSafetyTest {
         val projects = File(root, "projects")
         assertTrue(projects.setWritable(false))
         try {
+            org.junit.Assume.assumeFalse(projects.canWrite())
             store.create(Scene.create("New", 100, 100, 30, 0))
             fail("creating must report the failure")
         } catch (e: IOException) {
