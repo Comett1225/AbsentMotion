@@ -359,8 +359,9 @@ internal object ClipSmooth {
         val info = MediaCodec.BufferInfo()
         if (fromUs > 0) extractor.seekTo(fromUs, MediaExtractor.SEEK_TO_PREVIOUS_SYNC)
         while (true) {
+            if (extractor.sampleTrackIndex < 0) return
             val time = extractor.sampleTime
-            if (time < 0 || time >= fromUs + spanUs) return
+            if (time >= fromUs + spanUs) return
             if (time >= fromUs) {
                 val size = extractor.readSampleData(buffer, 0)
                 if (size < 0) return
