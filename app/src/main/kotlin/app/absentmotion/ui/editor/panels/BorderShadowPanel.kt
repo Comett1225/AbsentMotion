@@ -107,14 +107,14 @@ private val ShadowRefs = listOf(ShadowColour, child("shadow/size"), child("shado
 private val ShadowTargets = listOf(KeyTarget(ShadowColour, "#ff000000", "color"), KeyTarget(ShadowRefs[1], "4.000000"),
     KeyTarget(ShadowRefs[2], "1.000000"), KeyTarget(ShadowRefs[3], "3.000000,3.000000", "vec2"))
 
-private fun spinner(id: String, label: String, step: String, max: String? = null, type: String? = null) =
-    EffectParam(id, label, "float", "0", 0f, max?.toFloat() ?: Float.MAX_VALUE, step.toFloat(), percent = type == "percent")
+private fun spinner(id: String, label: String, step: String, max: String? = null, type: String? = null, default: String = "0") =
+    EffectParam(id, label, "float", default, 0f, max?.toFloat() ?: Float.MAX_VALUE, step.toFloat(), percent = type == "percent")
 @Composable
-private fun sizeParam() = spinner("Size", stringResource(R.string.panel_size), "1")
+private fun sizeParam(default: String) = spinner("Size", stringResource(R.string.panel_size), "1", default = default)
 @Composable
-private fun alphaParam() = spinner("Alpha", stringResource(R.string.panel_alpha), "0.01", "1", "percent")
+private fun alphaParam() = spinner("Alpha", stringResource(R.string.panel_alpha), "0.01", "1", "percent", "1")
 @Composable
-private fun positionParam() = EffectParam("Position", stringResource(R.string.panel_position), "point", "0,0", step = 1f)
+private fun positionParam() = EffectParam("Position", stringResource(R.string.panel_position), "point", "3,3", step = 1f)
 
 private val CardBg get() = Am.Field
 private val ButtonBg get() = Am.PanelInset
@@ -215,7 +215,7 @@ private fun StrokeTab(state: EditorState, layer: Layer) {
         }
         Box(Modifier.at(0, 119, 721, 160)) {
             EffectRuler(s.width, 0.1f, 0f, 10000f, on, { strokeField = 0 }, { state.setRow(StrokeSize, "$it", true) }, state::endGesture,
-                Modifier.fillMaxSize().padding(end = 104.px), vibrate = state.settings.vibration)
+                Modifier.fillMaxSize().padding(end = 104.px), default = 4f, vibrate = state.settings.vibration)
             ValueBox(formatFixed(s.width, 1), false, strokeField == 0, Modifier.align(Alignment.CenterEnd).size(155.px, 127.px), 8f, on) {
                 if (strokeField == 0) state.askNumber("", s.width, "", 0f, 10000f) { v -> state.setRow(StrokeSize, "${v.coerceAtLeast(0f)}", false) } else strokeField = 0
             }
@@ -314,7 +314,7 @@ private fun EndPicker(state: EditorState, layer: Layer) {
             Box(Modifier.size(32.dp).clickable { endPicker = -1 }, contentAlignment = Alignment.Center) { PanelIcon(PanelIcons.Back, Am.OnDark, description = stringResource(R.string.topbar_back)) }
             Text(stringResource(if (which == 0) R.string.border_stroke_start else R.string.border_stroke_end), Modifier.padding(start = 8.dp).weight(1f), color = Am.OnDark, fontSize = 15.sp)
         }
-        EffectNumbers(state, spinner("Size", stringResource(R.string.panel_size), "0.1"), "${s.endSize}", true, true, {}) { text, gesture ->
+        EffectNumbers(state, spinner("Size", stringResource(R.string.panel_size), "0.1", default = "1"), "${s.endSize}", true, true, {}) { text, gesture ->
             state.editSelected(if (gesture) "end-size" else null) { it.withStrokeAttr("end-size", formatNumber((text.finiteFloat() ?: 1.5f).coerceAtLeast(0f))) }
         }
         Row(Modifier.fillMaxSize().horizontalScroll(rememberScrollState()).padding(8.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -362,7 +362,7 @@ private fun BorderTab(state: EditorState, layer: Layer) {
                 }
                 Spacer(Modifier.height(15.px))
                 ColourRow(open.color, borderField == 0, { borderField = 0 }) { editColour(open.colorRef, StyleColors.White) }
-                EffectNumbers(state, sizeParam(), "${open.size}", true, borderField == 1, { borderField = 1 }) { text, gesture -> state.setRow(open.sizeRef, text, gesture) }
+                EffectNumbers(state, sizeParam(if (open.direction == "centered") "4" else "6"), "${open.size}", true, borderField == 1, { borderField = 1 }) { text, gesture -> state.setRow(open.sizeRef, text, gesture) }
             }
             return@Column
         }
@@ -413,7 +413,7 @@ private fun ShadowTab(state: EditorState, layer: Layer) {
         Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).then(if (on) Modifier else Modifier.dimmed())) {
             fun select(i: Int) = { shadowField = i }
             ColourRow(s.color, shadowField == 0, select(0)) { if (on) editColour(ShadowColour, StyleColors.Black) }
-            EffectNumbers(state, sizeParam(), "${s.size}", on, shadowField == 1, select(1)) { text, g -> state.setRow(ShadowRefs[1], text, g) }
+            EffectNumbers(state, sizeParam("4"), "${s.size}", on, shadowField == 1, select(1)) { text, g -> state.setRow(ShadowRefs[1], text, g) }
             EffectNumbers(state, alphaParam(), "${s.opacity}", on, shadowField == 2, select(2)) { text, g -> state.setRow(ShadowRefs[2], text, g) }
             EffectNumbers(state, positionParam(), "${s.x},${s.y}", on, shadowField == 3, select(3)) { text, g -> state.setRow(ShadowRefs[3], text, g) }
         }
