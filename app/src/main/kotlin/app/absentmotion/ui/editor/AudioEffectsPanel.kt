@@ -194,7 +194,7 @@ private fun EffectDetail(state: EditorState, index: Int, fx: AudioFx, close: () 
             }
         }
         Column(Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState())) {
-            ParamSlider(state, stringResource(R.string.audiofx_mix), fx.mix, 0f, 1f, false, percent(fx.mix), { it * 100 }, { it / 100 }) { v ->
+            ParamSlider(state, stringResource(R.string.audiofx_mix), fx.mix, 0f, 1f, false, percent(fx.mix), { it * 100 }, { it / 100 }, "%") { v ->
                 state.editSelected("audiofx-$index-mix") { it.updateAudioEffect(index) { e -> e.withMix(v) } }
             }
             for (param in kind.params) {
@@ -203,7 +203,7 @@ private fun EffectDetail(state: EditorState, index: Int, fx: AudioFx, close: () 
                 else {
                     val scale = if (param.unit == "%") 100f else 1f
                     ParamSlider(state, stringResource(param.label), fx[param], param.min, param.max, param.log, display(param, fx[param]),
-                        { it * scale }, { it / scale }) { set(it, "audiofx-$index-${param.key}") }
+                        { it * scale }, { it / scale }, param.unit) { set(it, "audiofx-$index-${param.key}") }
                 }
             }
         }
@@ -213,7 +213,7 @@ private fun EffectDetail(state: EditorState, index: Int, fx: AudioFx, close: () 
 @Composable
 private fun ParamSlider(
     state: EditorState, label: String, value: Float, min: Float, max: Float, log: Boolean, text: String,
-    toTyped: (Float) -> Float, fromTyped: (Float) -> Float, set: (Float) -> Unit,
+    toTyped: (Float) -> Float, fromTyped: (Float) -> Float, unit: String = "", set: (Float) -> Unit,
 ) {
     val update by rememberUpdatedState(set)
     fun at(fraction: Float) = if (log) min * (max / min).pow(fraction) else min + (max - min) * fraction
@@ -244,7 +244,7 @@ private fun ParamSlider(
             drawCircle(Am.AccentLit, 6.dp.toPx(), Offset(x, y))
         }
         Box(Modifier.width(76.dp).height(30.dp).clip(RoundedCornerShape(4.dp)).background(Am.PanelInset).clickable {
-            state.keypad = KeypadRequest(listOf(KeypadField(label, toTyped(value))), 0) { values -> set(fromTyped(values[0]).coerceIn(min, max)); state.endGesture() }
+            state.keypad = KeypadRequest(listOf(KeypadField(label, toTyped(value), unit, toTyped(min), toTyped(max))), 0) { values -> set(fromTyped(values[0]).coerceIn(min, max)); state.endGesture() }
         }, Alignment.Center) {
             Text(text, color = Am.OnDark, fontSize = 12.sp, maxLines = 1, textAlign = TextAlign.Center)
         }

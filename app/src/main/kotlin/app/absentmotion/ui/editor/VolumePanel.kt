@@ -118,7 +118,7 @@ private fun VolumeMain(state: EditorState, layer: Layer, modifier: Modifier, ope
                 VolumeSlider(percent, state, Modifier.width(440.px).height(113.px))
                 Spacer(Modifier.width(23.px))
                 Box(Modifier.width(158.px).height(101.px).clip(RoundedCornerShape(4.dp)).background(ValueBox).clickable {
-                    state.keypad = KeypadRequest(listOf(KeypadField(volumeLabel, layer.gain * 100)), 0) { values ->
+                    state.keypad = KeypadRequest(listOf(KeypadField(volumeLabel, layer.gain * 100, "%", 0f, MAX_GAIN * 100)), 0) { values ->
                         state.setGain(values[0].coerceIn(0f, MAX_GAIN * 100) / 100f)
                     }
                 }, Alignment.Center) {

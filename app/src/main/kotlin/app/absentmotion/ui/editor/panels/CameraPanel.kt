@@ -133,10 +133,10 @@ internal fun CameraPanel(state: EditorState, layer: Layer, modifier: Modifier = 
                         val angleLabel = stringResource(Angle.label)
                         val zoomLabel = stringResource(Zoom.label)
                         NumberRow(angleLabel, formatFixed(angle, 1) + "º", active == 0, perspective, { d -> active = 0; write(Angle, true) { it + d * Angle.perDp } }, { state.endGesture() },
-                            { active = 0; state.askNumber(angleLabel, angle) { v -> write(Angle, false) { v } } })
+                            { active = 0; state.askNumber(angleLabel, angle, Angle.unit, Angle.min, Angle.max) { v -> write(Angle, false) { v } } })
                         val zoom = cameraZoomOf(angle, size)
                         NumberRow(zoomLabel, "${zoom.toInt()}", active == 1, perspective, { d -> active = 1; writeZoom(true) { it + d * size / 200f } }, { state.endGesture() },
-                            { active = 1; state.askNumber(zoomLabel, zoom.toInt().toFloat()) { v -> writeZoom(false) { v } } })
+                            { active = 1; state.askNumber(zoomLabel, zoom.toInt().toFloat(), "", cameraZoomOf(Angle.max, size), cameraZoomOf(Angle.min, size)) { v -> writeZoom(false) { v } } })
                     }
                     1 -> {
                         SwitchRow(stringResource(R.string.camerapanel_focus_blur), layer.blockOn("focus-blur")) { on -> state.editSelected { it.withBlock("focus-blur", on) } }
@@ -259,7 +259,7 @@ private fun FieldRows(
         val v = layer.number(f)
         val label = stringResource(f.label)
         NumberRow(label, formatFixed(v, f.decimals), active == i, on, { d -> select(i); write(f, true) { it + d * f.perDp } }, { state.endGesture() },
-            { select(i); state.askNumber(label, v) { typed -> write(f, false) { typed } } }, note(f))
+            { select(i); state.askNumber(label, v, f.unit, f.min, f.max) { typed -> write(f, false) { typed } } }, note(f))
     }
 }
 

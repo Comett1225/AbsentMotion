@@ -93,7 +93,9 @@ private class ShapeEdit(val state: EditorState, val layer: Layer, val param: Sha
 
     fun openKeypad(box: Int) {
         val pair = param.kind == Kind.Size || param.kind == Kind.Point
-        val fields = if (pair) listOf(KeypadField("X", values[0]), KeypadField("Y", values[1])) else listOf(KeypadField(label, values[0]))
+        val fields = if (pair) listOf(KeypadField("X", values[0]), KeypadField("Y", values[1]))
+            else if (param.kind == Kind.Count) listOf(KeypadField(label, values[0], "", MIN_COUNT.toFloat(), MAX_COUNT.toFloat()))
+            else listOf(KeypadField(label, values[0]))
         state.keypad = KeypadRequest(fields, if (pair) box else 0) { v ->
             val entered = FloatArray(v.size) { if (param.kind == Kind.Count) v[it].roundToInt().coerceAtLeast(MIN_COUNT).toFloat() else v[it] }
             state.editSelected { it.withProp(param.prop, param.kind.type, formatFloats(entered)) }
