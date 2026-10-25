@@ -287,7 +287,7 @@ class MainActivity : ComponentActivity() {
                 }
                 app.absentmotion.ui.tutorial.TutorialHost(
                     open, store, settings,
-                    homeFree = open == null && first == null && !opening && editingTemplate == null && exportingFromList == null && offer == null && crashed == null && !problemShown,
+                    homeFree = open == null && first == null && !opening && editingTemplate == null && exportingFromList == null && offer == null && crashed == null && !problemShown && imported.isEmpty(),
                     onOpen = ::open, onCloseEditor = ::closeEditor, onChanged = { projectsChanged++ },
                 )
             }
