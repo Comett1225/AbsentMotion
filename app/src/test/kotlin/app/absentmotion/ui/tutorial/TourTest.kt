@@ -346,6 +346,15 @@ class TourTest {
         assertEquals(1600f, CardPlacement.position(region, side, null, 600f, 400f, centred = false).second)
     }
 
+    @Test fun aTargetLeavingOnlyThinStripsGivesTheCardTheWholeArea() {
+        val area = Area(0f, 0f, 2400f, 1080f)
+        val (region, side) = CardPlacement.region(area, Area(40f, 60f, 2360f, 1020f), 10f, 600f, 300f)
+        assertEquals(CardSide.Free, side)
+        assertEquals(area, region)
+        val (_, y) = CardPlacement.position(region, side, null, 800f, 400f, centred = false)
+        assertEquals(680f, y)
+    }
+
     @Test fun aTargetCoveringEverythingStillLeavesRoomForTheCard() {
         val area = Area(0f, 0f, 1000f, 2000f)
         val (region, _) = CardPlacement.region(area, Area(-10f, -10f, 1010f, 2010f), 10f, 600f, 300f)

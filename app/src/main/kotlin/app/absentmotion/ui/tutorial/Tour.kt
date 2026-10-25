@@ -368,7 +368,7 @@ object CardPlacement {
         if (candidates.isEmpty()) return area to CardSide.Free
         val roomy = candidates.filter { it.first.width >= minWidth && it.first.height >= minHeight }
         val vertical = roomy.filter { it.second == CardSide.Above || it.second == CardSide.Below }
-        val pool = vertical.ifEmpty { roomy }.ifEmpty { candidates }
+        val pool = vertical.ifEmpty { roomy }.ifEmpty { return area to CardSide.Free }
         return pool.maxBy { it.first.width.coerceAtMost(minWidth * 2) * it.first.height }
     }
 
