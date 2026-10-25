@@ -5827,5 +5827,110 @@
    "amount": 1,
    "direction": 0
   }
+ },
+ "com.alightcreative.effects.simplestars2": {
+  "to": "simplestarfield",
+  "params": {
+   "starParallax": [
+    {
+     "to": "position",
+     "take": 2
+    },
+    {
+     "to": "depth",
+     "component": 2
+    }
+   ],
+   "scale": {
+    "to": "scale",
+    "min": 0.01,
+    "max": 50
+   },
+   "starSize": {
+    "to": "starSize",
+    "min": 0,
+    "max": 5
+   },
+   "starFeather": {
+    "to": "feather",
+    "min": 0,
+    "max": 20
+   },
+   "color": {
+    "to": "color"
+   },
+   "alpha": {
+    "to": "alpha",
+    "min": 0,
+    "max": 1
+   },
+   "starCount": {
+    "to": "amount",
+    "min": 0,
+    "max": 100
+   },
+   "brightness": {
+    "to": "brightness",
+    "min": 0,
+    "max": 5
+   },
+   "blendMode": {
+    "to": "blend",
+    "values": {
+     "0": 0,
+     "1": 1,
+     "2": 2,
+     "3": 3
+    }
+   }
+  }
+ },
+ "com.alightcreative.effects.simplestars": {
+  "to": "simplestarfield",
+  "params": {
+   "starParallax": {
+    "to": "position"
+   },
+   "starDepth": {
+    "to": "depth"
+   },
+   "starSize": {
+    "to": "starSize",
+    "min": 0,
+    "max": 5
+   },
+   "starFeather": {
+    "to": "feather",
+    "min": 0,
+    "max": 20
+   },
+   "color": {
+    "to": "color"
+   },
+   "alpha": {
+    "to": "alpha",
+    "min": 0,
+    "max": 1
+   },
+   "starCount": {
+    "to": "amount",
+    "min": 0,
+    "max": 100
+   },
+   "brightness": {
+    "to": "brightness",
+    "min": 0,
+    "max": 5
+   },
+   "blendMode": {
+    "to": "blend",
+    "values": {
+     "0": 0,
+     "1": 1,
+     "2": 2,
+     "3": 3
+    }
+   }
+  }
  }
 }

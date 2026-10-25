@@ -1,0 +1,105 @@
+{
+ "id": "simplestarfield",
+ "name": "Simple Starfield",
+ "category": "stylize",
+ "since": "4.0.0",
+ "description": "Scatters small stars in layers of depth over the opaque parts of the layer. Position moves the field with parallax, Depth flies through it, Scale zooms it, Size and Feather shape each star and Amount sets how many there are.",
+ "params": [
+  {
+   "id": "position",
+   "label": "Position",
+   "type": "point",
+   "default": [
+    0,
+    0
+   ],
+   "min": -100000,
+   "max": 100000,
+   "step": 1,
+   "pixels": true
+  },
+  {
+   "id": "depth",
+   "label": "Depth",
+   "type": "float",
+   "default": 0,
+   "min": -100000,
+   "max": 100000,
+   "step": 1
+  },
+  {
+   "id": "scale",
+   "label": "Scale",
+   "type": "float",
+   "default": 1,
+   "min": 0.01,
+   "max": 50,
+   "step": 0.01
+  },
+  {
+   "id": "starSize",
+   "label": "Size",
+   "type": "float",
+   "default": 0.5,
+   "min": 0,
+   "max": 5,
+   "step": 0.001
+  },
+  {
+   "id": "feather",
+   "label": "Feather",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 20,
+   "step": 0.1
+  },
+  {
+   "id": "color",
+   "label": "Color",
+   "type": "color",
+   "default": "#ffffff"
+  },
+  {
+   "id": "alpha",
+   "label": "Alpha",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "percent": true
+  },
+  {
+   "id": "amount",
+   "label": "Amount",
+   "type": "float",
+   "default": 25,
+   "min": 0,
+   "max": 100,
+   "step": 0.1
+  },
+  {
+   "id": "brightness",
+   "label": "Brightness",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 5,
+   "step": 0.001
+  },
+  {
+   "id": "blend",
+   "label": "Blending Mode",
+   "type": "choice",
+   "default": 2,
+   "options": [
+    "Normal",
+    "Add",
+    "Screen",
+    "Multiply"
+   ]
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float2 position;\nuniform float depth;\nuniform float scale;\nuniform float starSize;\nuniform float feather;\nlayout(color) uniform half4 color;\nuniform float alpha;\nuniform float amount;\nuniform float brightness;\nuniform float blend;\nfloat hash12(float2 p) {\n    float3 q = fract(float3(p.xyx) * 0.1031);\n    q += dot(q, q.yzx + 33.33);\n    return fract((q.x + q.y) * q.z);\n}\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return src;\n    float zoom = max(scale, 0.01);\n    float cell = 16.0 * zoom;\n    float density = clamp(amount / 100.0 * 0.7, 0.0, 1.0);\n    float glow = 0.0;\n    for (int k = 0; k < 6; k++) {\n        float layer = mod(float(k) - depth * 0.01, 6.0);\n        float d = 0.4 + layer * 0.6;\n        float fade = smoothstep(0.0, 0.6, layer) * smoothstep(6.0, 5.0, layer);\n        float id = floor(float(k) - depth * 0.01 - layer + 0.5) + float(k) * 13.0;\n        float2 p = (coord - size * 0.5 - position / d) * d / cell + id * 7.13;\n        float2 n = floor(p);\n        if (hash12(n + id * 3.7) > density) continue;\n        float2 at = float2(hash12(n + 1.3 + id), hash12(n + 5.9 - id)) * 0.8 + 0.1;\n        float r = starSize * 0.5 * zoom / d;\n        float amp = min(r * r * 4.0, 1.0);\n        float re = max(r, 0.5);\n        float soft = 0.5 + feather * 0.15 * zoom / d;\n        float dist = length((p - n - at) * cell / d);\n        glow += fade * amp * (1.0 - smoothstep(max(re - soft, 0.0), re + soft, dist));\n    }\n    float s = clamp(glow * brightness, 0.0, 1.0) * clamp(alpha, 0.0, 1.0) * float(color.a);\n    float3 base = float3(src.rgb) / float(src.a);\n    float3 c = float3(color.rgb);\n    float3 rgb = blend < 0.5 ? mix(base, c, s) : blend < 1.5 ? base + c * s : blend < 2.5 ? 1.0 - (1.0 - base) * (1.0 - c * s) : mix(base, base * c, s);\n    return half4(half3(clamp(rgb, 0.0, 1.0)) * src.a, src.a);\n}\n"
+}

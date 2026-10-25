@@ -64,6 +64,18 @@ class AlightEffectCoverageTest {
         assertEquals(0f, strips.floats("map")[0], 1e-6f)
     }
 
+    @Test fun aThreePartPointSplitsIntoPositionAndDepth() {
+        val stars = migrate("""<effect id="com.alightcreative.effects.simplestars2"><property name="starParallax" type="vec3" value="10.000000,20.000000,30.000000" /><property name="starCount" type="float" value="31.25" /></effect>""")
+        assertEquals("absent.simplestarfield", stars["id"])
+        assertEquals(listOf(10f, 20f), stars.floats("position"))
+        assertEquals(30f, stars.floats("depth")[0], 1e-6f)
+        assertEquals(31.25f, stars.floats("amount")[0], 1e-5f)
+        val older = migrate("""<effect id="com.alightcreative.effects.simplestars"><property name="starParallax" type="vec2" value="40.000000,-25.000000" /><property name="starDepth" type="float" value="249.75" /></effect>""")
+        assertEquals("absent.simplestarfield", older["id"])
+        assertEquals(listOf(40f, -25f), older.floats("position"))
+        assertEquals(249.75f, older.floats("depth")[0], 1e-4f)
+    }
+
     @Test fun commonAlightEffectsAllRun() {
         val common = listOf("zoomblur3", "spinblur2", "dblur", "swirl4", "pinchbulge2", "wavewarp2", "turbulentdisplace3", "pixelate2", "mosaic", "posterize",
             "vignette", "wipe2", "radialwipe", "kaleidoscope", "chromakey", "lumakey3", "halftonedots", "rays", "radialrays", "star", "stripes", "grid2",

@@ -124,6 +124,7 @@
     "squeeze": {"photo": "portrait", "params": {"strength": 1.2}},
     "star": {"photo": "landscape", "params": {"position": [0.62, 0.32], "radius": 0.6}},
     "starfield": {"photo": "colour", "params": {"brightness": 0.03}},
+    "simplestarfield": {"photo": "sunset", "params": {"scale": 3, "starSize": 2, "feather": 2, "amount": 64, "brightness": 1.5}},
     "feather": {"photo": "colour", "layout": "move", "params": {"blur": 40}},
     "fade": {"photo": "colour", "params": {"fadeIn": 0.45, "fadeOut": 0.45}, "animate": 16},
     "checker": {"photo": "portrait", "params": {"count": 3, "color": "#ffcc33"}},
