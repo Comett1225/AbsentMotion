@@ -69,12 +69,13 @@ private val Own = setOf("opacity", "display", "stop-color", "stop-opacity", "cli
 private val Styled = Inherited + Own
 
 private val NumberPattern = Regex("[-+]?(?:\\d+\\.?\\d*|\\.\\d+)(?:[eE][-+]?\\d+)?")
-private val TransformPattern = Regex("(matrix|translate|scale|rotate|skewX|skewY)\\s*\\(([^)]*)\\)")
+private val TransformPattern = Regex("(matrix|translate|scale|rotate|skewX|skewY)\\s*\\(([^()]*)\\)")
 private val SelectorPattern = Regex("^([a-zA-Z][\\w-]*|\\*)?((?:[.#][\\w-]+)*)$")
 private val PartPattern = Regex("[.#][\\w-]+")
 private const val Kappa = 0.5522848f
 private const val MaxShapes = 1000
 private const val MaxVisits = 100_000
+private const val MaxPathText = 16L shl 20
 private const val MaxRuleMatches = 5_000_000
 private const val MaxCssRules = 20_000
 internal const val MaxSvgNodes = 200_000
@@ -135,6 +136,7 @@ private class SvgReader(private val root: XmlNode) {
     val skipped = LinkedHashSet<UiText>()
     var shapeCount = 0
     private var visits = 0
+    private var pathText = 0L
     private var ruleMatches = 0
     private val ids = HashMap<String, XmlNode>()
     private val rules = ArrayList<CssRule>()
@@ -257,8 +259,8 @@ private class SvgReader(private val root: XmlNode) {
         n.children.mapNotNull { element(it, m, style, depth + 1) }
 
     private fun element(n: XmlNode, parent: Affine, inherited: Map<String, String>, depth: Int): SvgItem? {
-        if (depth > 64) { skipped += txt(R.string.library_text_value, "parts nested too deeply"); return null }
-        if (++visits > MaxVisits) { skipped += txt(R.string.library_text_value, "parts repeated too many times"); return null }
+        if (depth > 64) { skipped += txt(R.string.model_svg_skipped_nested); return null }
+        if (++visits > MaxVisits) { skipped += txt(R.string.model_svg_skipped_repeated); return null }
         val tag = n.local
         when (tag) {
             "defs", "symbol", "style", "title", "desc", "metadata", "linearGradient", "radialGradient", "clipPath", "mask",
@@ -325,6 +327,9 @@ private class SvgReader(private val root: XmlNode) {
     private fun shape(n: XmlNode, tag: String, m: Affine, style: Map<String, String>, opacity: Float): SvgItem? {
         if (style["visibility"].let { it == "hidden" || it == "collapse" }) return null
         if (shapeCount >= MaxShapes) { skipped += txt(R.string.model_svg_skipped_shapes, MaxShapes.toString()); return null }
+        val text = (n.attr("d")?.length ?: 0) + (n.attr("points")?.length ?: 0)
+        pathText += text
+        if (text > 0 && pathText > MaxPathText) { skipped += txt(R.string.model_svg_skipped_repeated); return null }
         val local = geometry(n, tag).filter { c -> c.knots.isNotEmpty() && c.knots.all { it.p.x.isFinite() && it.p.y.isFinite() } }
         if (local.isEmpty()) return null
         val placed = local.map { it.mapped(m) }
@@ -389,7 +394,7 @@ private class SvgReader(private val root: XmlNode) {
             if (target != null && (target.local == "linearGradient" || target.local == "radialGradient")) return gradient(target, alpha, local, m)
             if (target?.local == "pattern") skipped += txt(R.string.model_svg_skipped_patterns)
             val fallback = text.substringAfter(')').trim()
-            return if (fallback.isEmpty()) null else paint(fallback, style, opacityKey, local, m)
+            return if (fallback.isEmpty() || fallback.startsWith("url(")) null else paint(fallback, style, opacityKey, local, m)
         }
         val argb = when (text) {
             "none", "transparent" -> return null

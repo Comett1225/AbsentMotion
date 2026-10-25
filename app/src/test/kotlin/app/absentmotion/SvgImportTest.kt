@@ -262,7 +262,7 @@ class SvgImportTest {
         assertTrue("a ${svg.length}-byte SVG is still importing after 15 s", !worker.isAlive)
         assertEquals(1000, result!!.shapes)
         assertTrue(result!!.skipped.contains(txt(app.absentmotion.R.string.model_svg_skipped_shapes, "1000")))
-        assertTrue(result!!.skipped.contains(txt(app.absentmotion.R.string.library_text_value, "parts repeated too many times")))
+        assertTrue(result!!.skipped.contains(txt(app.absentmotion.R.string.model_svg_skipped_repeated)))
     }
 
     @Test fun anSvgWithTooManyElementsIsRefusedWhileParsing() {
@@ -411,7 +411,32 @@ class SvgImportTest {
         val deep = "<g>".repeat(70) + "<rect width=\"5\" height=\"5\"/>" + "</g>".repeat(70)
         val result = import("$open$deep<rect width=\"9\" height=\"9\"/></svg>")
         assertEquals(1, result.shapes)
-        assertTrue(result.skipped.contains(txt(R.string.library_text_value, "parts nested too deeply")))
+        assertTrue(result.skipped.contains(txt(R.string.model_svg_skipped_nested)))
+    }
+
+    @Test fun aLongChainOfMissingPaintReferencesDoesNotOverflowTheStack() {
+        var result: SvgImport? = null
+        var failure: Throwable? = null
+        val svg = "$open<rect width=\"10\" height=\"10\" stroke=\"black\" fill=\"${"url(#a)".repeat(6_000)}\"/></svg>"
+        Thread(null, { try { result = importSvg(svg, "t", host, 0, 1000) } catch (e: Throwable) { failure = e } }, "svg", 256L shl 10).apply { start(); join(30_000) }
+        failure?.let { throw it }
+        assertEquals(1, result!!.shapes)
+        assertEquals("none", result.layer!!.fillType)
+        val fallback = import("$open<rect width=\"10\" height=\"10\" fill=\"url(#missing) #ff0000\"/></svg>").layer!!
+        assertEquals(0xFFFF0000.toInt(), fallback.fillColor)
+    }
+
+    @Test fun anUnclosedTransformListDoesNotTakeQuadraticTime() {
+        val result = importTimed("$open<rect width=\"10\" height=\"10\" transform=\"${"scale(".repeat(100_000)}\"/></svg>")
+        assertEquals(1, result.shapes)
+    }
+
+    @Test fun aHeavyPathReusedManyTimesIsNotParsedForever() {
+        val d = "M0 0" + " L1 1".repeat(20_000)
+        val fan = (1..5).joinToString("") { level -> "<g id=\"g$level\">" + "<use href=\"#${if (level == 1) "p" else "g${level - 1}"}\"/>".repeat(10) + "</g>" }
+        val result = importTimed("$open<rect width=\"10\" height=\"10\"/><defs><path id=\"p\" fill=\"none\" stroke=\"none\" d=\"$d\"/>$fan</defs><use href=\"#g5\"/></svg>")
+        assertEquals(1, result.shapes)
+        assertTrue(result.skipped.contains(txt(R.string.model_svg_skipped_repeated)))
     }
 
     @Test fun aDiagonalUserSpaceGradientStaysPerpendicularOnAWideShape() {
