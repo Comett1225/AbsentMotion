@@ -3,17 +3,22 @@ package app.absentmotion.ui.editor.panels
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.os.Bundle
 import android.view.GestureDetector
 import android.view.HapticFeedbackConstants
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewConfiguration
+import android.view.accessibility.AccessibilityEvent
+import android.view.accessibility.AccessibilityNodeInfo
 import android.widget.OverScroller
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.viewinterop.AndroidView
 import app.absentmotion.editor.Glide
 import kotlinx.coroutines.CoroutineScope
@@ -31,9 +36,11 @@ internal fun EffectRuler(
     modifier: Modifier = Modifier, default: Float? = null, vibrate: Boolean = true,
 ) {
     val scope = rememberCoroutineScope()
-    AndroidView(modifier = modifier, factory = { EffectRulerView(it, scope) },
-        onRelease = { it.stop() },
-        update = { it.configure(value, step, min, max, enabled, onStart, onValue, onEnd, default, vibrate) })
+    key(LocalDensity.current.density) {
+        AndroidView(modifier = modifier, factory = { EffectRulerView(it, scope) },
+            onRelease = { it.stop() },
+            update = { it.configure(value, step, min, max, enabled, onStart, onValue, onEnd, default, vibrate) })
+    }
 }
 
 private class EffectRulerView(context: Context, private val scope: CoroutineScope) : View(context) {
@@ -168,6 +175,36 @@ private class EffectRulerView(context: Context, private val scope: CoroutineScop
 
     override fun onDetachedFromWindow() { stop(); super.onDetachedFromWindow() }
 
+    override fun getAccessibilityClassName(): CharSequence = android.widget.SeekBar::class.java.name
+
+    @Suppress("DEPRECATION")
+    override fun onInitializeAccessibilityNodeInfo(info: AccessibilityNodeInfo) {
+        super.onInitializeAccessibilityNodeInfo(info)
+        info.rangeInfo = AccessibilityNodeInfo.RangeInfo.obtain(AccessibilityNodeInfo.RangeInfo.RANGE_TYPE_FLOAT, low * step, high * step, lastTick * step)
+        if (!isEnabled) return
+        if (lastTick > low) info.addAction(AccessibilityNodeInfo.AccessibilityAction.ACTION_SCROLL_BACKWARD)
+        if (lastTick < high) info.addAction(AccessibilityNodeInfo.AccessibilityAction.ACTION_SCROLL_FORWARD)
+        info.addAction(AccessibilityNodeInfo.AccessibilityAction.ACTION_SET_PROGRESS)
+    }
+
+    override fun performAccessibilityAction(action: Int, arguments: Bundle?): Boolean {
+        val target = (if (!isEnabled) null else when (action) {
+            AccessibilityNodeInfo.ACTION_SCROLL_FORWARD -> rulerAccessibleTick(lastTick, low, high, 1)
+            AccessibilityNodeInfo.ACTION_SCROLL_BACKWARD -> rulerAccessibleTick(lastTick, low, high, -1)
+            android.R.id.accessibilityActionSetProgress -> arguments?.getFloat(AccessibilityNodeInfo.ACTION_ARGUMENT_PROGRESS_VALUE)?.let { tick(it).coerceIn(low, high) }
+            else -> null
+        }) ?: return super.performAccessibilityAction(action, arguments)
+        stop()
+        start()
+        position = target.toFloat() * spacing
+        lastTick = target
+        change(target * step)
+        end()
+        invalidate()
+        sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_SELECTED)
+        return true
+    }
+
     override fun onTouchEvent(event: MotionEvent): Boolean {
         if (!isEnabled) return false
         if (event.actionMasked == MotionEvent.ACTION_DOWN) resetting = false
@@ -231,6 +268,9 @@ private class EffectRulerView(context: Context, private val scope: CoroutineScop
         return if (offset < 0) offset + period else offset
     }
 }
+
+internal fun rulerAccessibleTick(tick: Int, low: Int, high: Int, direction: Int): Int =
+    (tick + direction * maxOf(1, (high - low) / 20)).coerceIn(low, high)
 
 internal fun rulerSnap(position: Float, spacing: Int): Float =
     (position / spacing).roundToInt() * spacing.toFloat()
