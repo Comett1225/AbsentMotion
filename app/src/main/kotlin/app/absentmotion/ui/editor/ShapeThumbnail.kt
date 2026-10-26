@@ -1,10 +1,10 @@
 package app.absentmotion.ui.editor
 
-import app.absentmotion.platform.LruCache
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
@@ -18,6 +18,8 @@ import app.absentmotion.model.Layer
 import app.absentmotion.model.Scene
 import app.absentmotion.model.ShapeDef
 import app.absentmotion.model.XmlNode
+import app.absentmotion.model.imageUris
+import kotlinx.coroutines.flow.MutableStateFlow
 import app.absentmotion.ui.theme.Am
 
 @Composable
@@ -43,19 +45,26 @@ private fun ShapeIcon(shape: XmlNode, color: Int, description: String, engine: E
     picture?.let { Image(it, contentDescription = description, modifier = modifier) } ?: Box(modifier)
 }
 
+internal data class IconKey(val shape: XmlNode, val color: Int, val sources: String?, val fonts: Long)
+
 @Composable
 private fun rememberShapePicture(shape: XmlNode, color: Int, engine: EngineThread): ImageBitmap? {
-    val revision by engine.mediaRevision.collectAsState()
-    val media = shape["fillType"] == "media" || shape.name == "text"
-    val key = shape to color
-    val picture by produceState(if (media) null else icons.get(key), key, if (media) revision else 0L) {
-        value = if (media) null else icons.get(key)
-        if (value == null) {
-            val scene = XmlNode("scene", mapOf("width" to "1", "height" to "1"), listOf(shape))
-            value = engine.shapeIcon(scene.toXml(), 96, color)?.asImageBitmap()?.also { if (!media) icons.put(key, it) }
-        }
+    val installed by engine.sources.collectAsState()
+    val fonts by remember(engine) { engine.fonts?.revision ?: MutableStateFlow(0L) }.collectAsState()
+    val uris = remember(shape) { shape.imageUris() }
+    val text = shape.name == "text"
+    val key = IconKey(shape, color, sourceIdentity(uris, installed), if (text) fonts else 0L)
+    val seed = remember(key) { key.takeIf { it.sources != null }?.let { icons[it] } }
+    val shown by produceState<Stamped<IconKey, ImageBitmap>?>(null, key) {
+        if (seed != null) return@produceState
+        val scene = XmlNode("scene", mapOf("width" to "1", "height" to "1"), listOf(shape))
+        val bitmap = engine.shapeIcon(scene.toXml(), 96, color)?.asImageBitmap()
+        val after = key.copy(sources = sourceIdentity(uris, engine.sources.value), fonts = if (text) engine.fonts?.revision?.value ?: 0L else 0L)
+        val steady = storableIdentity(key.sources, after.sources) != null && after.fonts == key.fonts
+        if (steady && bitmap != null) icons[after] = bitmap
+        value = Stamped(if (steady) after else key, bitmap)
     }
-    return picture
+    return seed ?: shown.of(key)
 }
 
 internal data class StripPicture(val bitmap: ImageBitmap, val offset: IntOffset, val size: IntSize, val frames: List<Pair<Int, ImageBitmap>> = emptyList())
@@ -79,6 +88,6 @@ internal fun mediaStripPicture(layer: Layer, scene: Scene, engine: EngineThread,
     return StripPicture(bitmap, IntOffset((bitmap.width - cropped.width) / 2, (bitmap.height - cropped.height) / 2), cropped)
 }
 
-private val icons = LruCache<Pair<XmlNode, Int>, ImageBitmap>(200)
+private val icons = BoundedCache<IconKey, ImageBitmap>(256)
 
-internal fun dropShapeIcons() = icons.evictAll()
+internal fun dropShapeIcons() = icons.clear()

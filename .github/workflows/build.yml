@@ -192,10 +192,13 @@ jobs:
               print(f"SLOW {t:.3f}s {name}")
           sys.exit(1 if failed else 0)
           PY
-      - name: Compat unit tests and lint of both builds
+      - name: Compat unit tests
         id: compat
         if: ${{ !cancelled() && (steps.quick.outcome == 'success' || (inputs.diagnostic && steps.quick.outcome == 'failure')) }}
-        run: ./gradlew :app:testCompatDebugUnitTest :app:lintFossDebug :app:lintCompatDebug -q --continue
+        run: ./gradlew :app:testCompatDebugUnitTest -q
+      - name: Lint of both builds
+        if: ${{ !cancelled() && (steps.compat.outcome == 'success' || steps.compat.outcome == 'failure') }}
+        run: ./gradlew :app:lintFossDebug :app:lintCompatDebug -q
       - name: Failed unit tests
         if: ${{ !cancelled() }}
         run: python3 /tmp/test_failures.py app/build/test-results
