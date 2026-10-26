@@ -138,7 +138,9 @@ jobs:
         with:
           ref: ${{ inputs.verify_ref || '' }}
       - name: Show the checked out source
-        run: git log -1 --format='%H %s'
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git log -1 --format='%H %s'
       - name: Install the Android SDK
         run: |
           mkdir -p "$ANDROID_HOME/cmdline-tools"
@@ -151,7 +153,6 @@ jobs:
       - name: Quick checks (static checks, foss compile, unit tests)
         id: quick
         run: |
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
           echo 'org.gradle.java.home=/usr/lib/jvm/java-21-openjdk-amd64' >> gradle.properties
           sh tools/check.sh --quick
       - name: Write the unit test report reader
@@ -193,13 +194,13 @@ jobs:
           PY
       - name: Compat unit tests and lint of both builds
         id: compat
-        if: ${{ !cancelled() && (inputs.diagnostic || steps.quick.outcome == 'success') }}
+        if: ${{ !cancelled() && (steps.quick.outcome == 'success' || (inputs.diagnostic && steps.quick.outcome == 'failure')) }}
         run: ./gradlew :app:testCompatDebugUnitTest :app:lintFossDebug :app:lintCompatDebug -q --continue
       - name: Failed unit tests
         if: ${{ !cancelled() }}
         run: python3 /tmp/test_failures.py app/build/test-results
       - name: Repeat the compat unit tests
-        if: ${{ !cancelled() && inputs.diagnostic }}
+        if: ${{ !cancelled() && inputs.diagnostic && (steps.compat.outcome == 'success' || steps.compat.outcome == 'failure') }}
         env:
           REPEAT: ${{ inputs.repeat || '0' }}
         run: |
