@@ -239,6 +239,18 @@ class TourTest {
         assertEquals(listOf("timeline", "play", "skip_back", "skip_forward"), timeline.allowed())
     }
 
+    @Test fun timelineStepShutsTheClipToolsAndAddButtonInsideTheTimeline() {
+        val timeline = at("timeline")
+        assertTrue(timeline.denied().containsAll(listOf("tools", "panel", "add", "add_panel", "transition")))
+        val window = Area(0f, 0f, 1080f, 2400f)
+        val lanes = Area(0f, 1600f, 1080f, 2400f)
+        val tools = Area(0f, 1850f, 1080f, 2400f)
+        val blocked = GateMath.blocked(window, listOf(lanes), listOf(tools))
+        assertTrue(GateMath.admits(blocked, 540f, 1700f))
+        assertFalse(GateMath.admits(blocked, 172f, 2257f))
+        assertFalse(GateMath.admits(blocked, 539f, 1901f))
+    }
+
     private fun states(): List<TourFacts> {
         val out = ArrayList<TourFacts>()
         for (selected in listOf(null, TourFacts.MEDIA, TourFacts.TEXT, TourFacts.AUDIO)) for (panel in listOf(TourFacts.TOOLS, TourFacts.TRANSFORM, TourFacts.EFFECTS, TourFacts.EDIT_TEXT, "ColorFill"))

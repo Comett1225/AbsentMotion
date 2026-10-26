@@ -42,6 +42,7 @@ class MediaLibrary(context: Context, private val engine: EngineThread) {
             withContext(NonCancellable) {
                 engine.setPicture(uri, null)
                 loaded.remove(uri)
+                engine.publishSource(uri, null)
             }
         }
         for (uri in models.keys - kept.flatMapTo(HashSet()) { it.node.modelUris() }) {
@@ -65,6 +66,7 @@ class MediaLibrary(context: Context, private val engine: EngineThread) {
                     .also { Log.i("AMMedia", "picture $uri ${it?.width}x${it?.height} limit $limit") }
             },
         ) { uri, bitmap -> try { engine.setPicture(uri, bitmap) } finally { bitmap.recycle() } }
+        for (uri in scene.node.imageUris()) engine.publishSource(uri, pictureIdentity(loaded[uri]?.second, loaded[uri]?.third?.first, engine.instance))
         for (uri in scene.node.modelUris()) {
             val version = withContext(Dispatchers.IO) { fileVersion(resolver, Uri.parse(uri)) }
             if (models[uri]?.let { it.first == version && it.second == generation } == true) continue
@@ -91,6 +93,8 @@ class MediaLibrary(context: Context, private val engine: EngineThread) {
 }
 
 internal const val MIN_PICTURE_LIMIT = 4096
+
+internal fun pictureIdentity(version: String?, generation: Int?, instance: Long): String? = if (version == null || generation == null) null else "$version@$instance.$generation"
 
 internal fun pictureLimit(maxTexture: Int, canvas: Int): Int = minOf(maxTexture, maxOf(MIN_PICTURE_LIMIT, 2 * canvas))
 

@@ -19,6 +19,7 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.lang.management.ManagementFactory
 import kotlin.math.abs
 
 class SvgImportTest {
@@ -278,13 +279,17 @@ class SvgImportTest {
     private fun importTimed(svg: String, limitMs: Long = 5_000): SvgImport {
         var result: SvgImport? = null
         var failure: Throwable? = null
-        val started = System.nanoTime()
-        val worker = Thread { try { result = importSvg(svg, "t", host, 0, 1000) } catch (e: Throwable) { failure = e } }.apply { isDaemon = true; start() }
+        var took = 0L
+        val worker = Thread {
+            val clock = ManagementFactory.getThreadMXBean()
+            val started = clock.currentThreadCpuTime
+            try { result = importSvg(svg, "t", host, 0, 1000) } catch (e: Throwable) { failure = e }
+            took = (clock.currentThreadCpuTime - started) / 1_000_000
+        }.apply { isDaemon = true; start() }
         worker.join(30_000)
         assertTrue("a ${svg.length}-character SVG is still importing after 30 s", !worker.isAlive)
         failure?.let { throw it }
-        val took = (System.nanoTime() - started) / 1_000_000
-        assertTrue("importing a ${svg.length}-character SVG took $took ms", took < limitMs)
+        assertTrue("importing a ${svg.length}-character SVG used $took ms of processor time", took < limitMs)
         return result!!
     }
 

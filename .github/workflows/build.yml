@@ -6,6 +6,16 @@ on:
       subdir:
         description: Directory to build in, relative to the workspace
         default: '.'
+      diagnostic:
+        description: Only run the verify job, keep going after failures and repeat the compat unit tests
+        type: boolean
+        default: false
+      verify_ref:
+        description: Branch, tag or commit for the verify job to check out (empty means the workflow ref)
+        default: ''
+      repeat:
+        description: Extra compat unit test runs in diagnostic mode
+        default: '3'
   pull_request:
   push:
     tags:
@@ -13,6 +23,7 @@ on:
 
 jobs:
   foss-apk:
+    if: ${{ !inputs.diagnostic }}
     runs-on: ubuntu-latest
     timeout-minutes: 170
     container: debian:trixie
@@ -61,6 +72,7 @@ jobs:
         run: python3 tools/api_floor.py app/build/outputs/apk/foss/release/*.apk
 
   compat-apk:
+    if: ${{ !inputs.diagnostic }}
     runs-on: ubuntu-latest
     timeout-minutes: 170
     container: debian:trixie
@@ -123,6 +135,12 @@ jobs:
           apt-get update
           apt-get install -y --no-install-recommends git ca-certificates curl unzip python3 python3-numpy python3-pil python3-fonttools nodejs clang openjdk-21-jdk-headless
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ inputs.verify_ref || '' }}
+      - name: Show the checked out source
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git log -1 --format='%H %s'
       - name: Install the Android SDK
         run: |
           mkdir -p "$ANDROID_HOME/cmdline-tools"
@@ -133,9 +151,81 @@ jobs:
           yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platform-tools" "platforms;android-37.0" "build-tools;37.0.0" "cmake;3.31.6" "ndk;30.0.16248370"
       - name: Quick checks (static checks, foss compile, unit tests)
+        id: quick
         run: |
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
           echo 'org.gradle.java.home=/usr/lib/jvm/java-21-openjdk-amd64' >> gradle.properties
           sh tools/check.sh --quick
-      - name: Compat unit tests and lint of both builds
-        run: ./gradlew :app:testCompatDebugUnitTest :app:lintFossDebug :app:lintCompatDebug -q
+      - name: Write the unit test report reader
+        if: ${{ !cancelled() }}
+        working-directory: /
+        run: |
+          cat > /tmp/test_failures.py <<'PY'
+          import pathlib
+          import sys
+          import xml.etree.ElementTree as ET
+
+          root = pathlib.Path(sys.argv[1])
+          cases = []
+          failed = []
+          skipped = []
+          for f in sorted(root.rglob("*.xml")):
+              try:
+                  tree = ET.parse(f)
+              except ET.ParseError:
+                  continue
+              for case in tree.iter("testcase"):
+                  name = case.get("classname", "") + "." + case.get("name", "")
+                  cases.append((float(case.get("time", "0") or 0), name, f))
+                  for kind in ("failure", "error"):
+                      for node in case.findall(kind):
+                          failed.append((name, kind, node.get("message", ""), node.text or "", f))
+                  if case.find("skipped") is not None:
+                      skipped.append(name)
+          print(f"{root}: {len(cases)} test cases, {len(failed)} failed, {len(skipped)} skipped")
+          for name in skipped:
+              print(f"SKIPPED {name}")
+          for name, kind, message, text, f in failed:
+              print(f"::error title=Unit test {kind}::{name}: {message[:300]}")
+              print(f"FAILED {name} ({kind}) in {f}")
+              print("\n".join(text.splitlines()[:80]))
+          for t, name, f in sorted(cases, reverse=True)[:15]:
+              print(f"SLOW {t:.3f}s {name}")
+          sys.exit(1 if failed else 0)
+          PY
+      - name: Compat unit tests
+        id: compat
+        if: ${{ !cancelled() && (steps.quick.outcome == 'success' || (inputs.diagnostic && steps.quick.outcome == 'failure')) }}
+        run: ./gradlew :app:testCompatDebugUnitTest -q
+      - name: Lint of both builds
+        if: ${{ !cancelled() && (steps.compat.outcome == 'success' || steps.compat.outcome == 'failure') }}
+        run: ./gradlew :app:lintFossDebug :app:lintCompatDebug -q
+      - name: Failed unit tests
+        if: ${{ !cancelled() }}
+        run: python3 /tmp/test_failures.py app/build/test-results
+      - name: Repeat the compat unit tests
+        if: ${{ !cancelled() && inputs.diagnostic && (steps.compat.outcome == 'success' || steps.compat.outcome == 'failure') }}
+        env:
+          REPEAT: ${{ inputs.repeat || '0' }}
+        run: |
+          mkdir -p build/test-repeats
+          cp -r app/build/test-results/testCompatDebugUnitTest build/test-repeats/run-0 2>/dev/null || true
+          status=0
+          i=1
+          while [ "$i" -le "$REPEAT" ]; do
+            ./gradlew :app:testCompatDebugUnitTest --rerun -q || status=1
+            cp -r app/build/test-results/testCompatDebugUnitTest "build/test-repeats/run-$i"
+            python3 /tmp/test_failures.py "build/test-repeats/run-$i" || true
+            i=$((i + 1))
+          done
+          python3 /tmp/test_failures.py build/test-repeats
+          exit $status
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: ${{ !cancelled() }}
+        with:
+          name: test-results
+          if-no-files-found: ignore
+          path: |
+            app/build/test-results
+            app/build/reports/tests
+            app/build/reports/lint-results-*.xml
+            build/test-repeats

@@ -6,6 +6,13 @@ All notable changes to AbsentMotion are listed here, newest first. The format fo
 Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stands for the feature set as it stood on
 2026-10-12.
 
+## [4.1.1] - 2026-10-26
+
+### Fixed
+
+- Photo and video thumbnails on the timeline no longer fall back to stripes for a moment when rows scroll back into view or another picture or font loads. A thumbnail is only reused while its file, the engine and the fonts are unchanged.
+- During the tutorial's play and scrub step, the clip tools and the add button can no longer be used.
+
 ## [4.1.0] - 2026-10-26
 
 ### Added

@@ -27,6 +27,8 @@ import app.absentmotion.media.dropThumbnails
 import app.absentmotion.ui.editor.LocalWide
 import app.absentmotion.ui.editor.dropShapeIcons
 import app.absentmotion.ui.editor.dropVideoThumbnails
+import app.absentmotion.ui.editor.distrustVideoThumbnails
+import app.absentmotion.ui.editor.recheckVideoThumbnails
 import app.absentmotion.ui.editor.isTablet
 import app.absentmotion.ui.editor.wideEditor
 import androidx.compose.ui.unit.Density
@@ -615,6 +617,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onPause() {
         super.onPause()
+        distrustVideoThumbnails()
         editor?.saver?.flush()
     }
 
@@ -644,6 +647,7 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         engine.refreshMedia()
+        lifecycleScope.launch { recheckVideoThumbnails(applicationContext) }
     }
 
     private companion object {

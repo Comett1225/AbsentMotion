@@ -21,6 +21,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import app.absentmotion.R
 import app.absentmotion.audio.AudioEngine
 import app.absentmotion.export.exportCheck
@@ -120,6 +121,18 @@ class EngineThread(private val background: Int, context: Context? = null) {
     @Volatile private var mediaScene: Scene? = null
     private val pictureRevision = MutableStateFlow(0L)
     val mediaRevision = pictureRevision.asStateFlow()
+    private val installedSources = MutableStateFlow<Map<String, String>>(emptyMap())
+    val sources = installedSources.asStateFlow()
+    val instance = instances.incrementAndGet()
+    private val refreshes = java.util.concurrent.atomic.AtomicLong()
+    @Volatile private var checkedRefresh = 0L
+    val sourcesChecked: Boolean get() = checkedRefresh == refreshes.get()
+
+    internal fun publishSource(uri: String, identity: String?) = installedSources.update {
+        if (it[uri] == identity) it else if (identity == null) it - uri else it + (uri to identity)
+    }
+
+    fun textIdentity(revision: Long): String = "$instance:$revision:${fonts?.androidEmoji() ?: false}"
 
     private var engine: NativeEngine? = null
     private var target = 0L
@@ -245,8 +258,9 @@ class EngineThread(private val background: Int, context: Context? = null) {
             audio?.setScene(next)
             videos?.update(next, requestedView?.timeMs ?: 0, playing)
             if (previous?.node?.imageUris() != next.node.imageUris() || previous.node.modelUris() != next.node.modelUris() || previous.media != next.media) {
+                val serial = refreshes.get()
                 mediaJob?.cancel()
-                mediaJob = mediaScope.launch { media.update(next) }.also { loading -> loading.invokeOnCompletion { requestRender() } }
+                mediaJob = mediaScope.launch { media.update(next); checked(serial) }.also { loading -> loading.invokeOnCompletion { requestRender() } }
             }
         }
         requestRender()
@@ -254,9 +268,12 @@ class EngineThread(private val background: Int, context: Context? = null) {
 
     fun refreshMedia() {
         val next = mediaScene ?: return
+        val serial = refreshes.incrementAndGet()
         mediaJob?.cancel()
-        mediaJob = mediaScope.launch { media?.update(next); videos?.retry() }.also { loading -> loading.invokeOnCompletion { requestRender() } }
+        mediaJob = mediaScope.launch { media?.update(next); checked(serial); videos?.retry() }.also { loading -> loading.invokeOnCompletion { requestRender() } }
     }
+
+    private fun checked(serial: Long) = synchronized(refreshes) { if (serial > checkedRefresh) checkedRefresh = serial }
 
     suspend fun awaitMedia() {
         do { val loading = mediaJob; loading?.join() } while (loading !== mediaJob)
@@ -637,6 +654,8 @@ class EngineThread(private val background: Int, context: Context? = null) {
         }
     }
 }
+
+private val instances = java.util.concurrent.atomic.AtomicLong()
 
 private val spacingEffects = Regex("<effect\\b[^>]*\"${Regex.escape(app.absentmotion.compat.ForeignEffectIds.TEXT_SPACING)}\"[^>]*?(/>|>.*?</effect>)", RegexOption.DOT_MATCHES_ALL)
 

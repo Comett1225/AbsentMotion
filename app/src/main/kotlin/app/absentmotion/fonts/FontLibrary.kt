@@ -137,8 +137,9 @@ class FontLibrary(context: Context) {
             .firstOrNull { it.isFile }
     }
     fun renderFile(name: String): File? = localFile(name) ?: bundledAsset(FontName.parse(name), exact = false)?.let { bundledFile(it) }
+    fun androidEmoji(): Boolean = context.getSharedPreferences("settings", Context.MODE_PRIVATE).getBoolean(ANDROID_EMOJI, false)
     fun emojiFile(flags: Boolean = false): File? =
-        if (context.getSharedPreferences("settings", Context.MODE_PRIVATE).getBoolean(ANDROID_EMOJI, false)) bundledFile(if (flags) EMOJI_FLAGS else EMOJI, "emoji") else null
+        if (androidEmoji()) bundledFile(if (flags) EMOJI_FLAGS else EMOJI, "emoji") else null
     private val faces = ConcurrentHashMap<String, Pair<String, Typeface>>()
     fun cachedTypeface(name: String): Typeface? = faces[name]?.second
     fun typeface(name: String): Typeface {

@@ -222,6 +222,7 @@ object TourSteps {
         TourStep(
             "timeline", R.string.tutorial_timeline_title, R.string.tutorial_timeline_body, 15,
             targets = { _, _ -> listOf("timeline", "play", "skip_back", "skip_forward") },
+            deny = listOf("tools", "panel", "add", "add_panel", "transition"),
             union = true,
             moving = true,
             done = { s, n -> abs(n.frame - s.frame) >= 3 || n.playing },
