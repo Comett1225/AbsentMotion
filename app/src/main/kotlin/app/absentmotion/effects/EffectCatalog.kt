@@ -43,6 +43,12 @@ data class EffectCatalog(
         return copy(definitions = definitions.map { it.copy(status = status.getValue(it.id)) })
     }
 
+    fun withRuntimeStatusFrom(previous: EffectCatalog): EffectCatalog {
+        if (message != null && previous.definitions.isNotEmpty()) return previous
+        val status = previous.definitions.associate { it.id to it.status }
+        return copy(definitions = definitions.map { it.copy(status = status[it.id] ?: it.status) })
+    }
+
     companion object {
         val Categories = linkedMapOf("color" to "Color", "blur" to "Blur", "distort" to "Distort", "stylize" to "Stylize",
             "noise" to "Noise", "repeat" to "Repeat", "key" to "Key", "move" to "Move", "3d" to "3D", "text" to "Text")

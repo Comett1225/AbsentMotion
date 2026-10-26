@@ -229,7 +229,7 @@ internal fun LayerMenu(state: EditorState, onDismiss: () -> Unit) {
                 } catch (e: CancellationException) {
                     throw e
                 } catch (e: Exception) {
-                    e.message ?: context.getString(R.string.menu_beats_not_found)
+                    app.absentmotion.i18n.failureText(context.getString(R.string.menu_beats_not_found), e)
                 }
                 Toast.makeText(context, note, Toast.LENGTH_SHORT).show()
                 onDismiss()

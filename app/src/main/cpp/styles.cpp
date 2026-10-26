@@ -944,6 +944,47 @@ float Reach(const std::vector<Layer>& siblings, const Layer& l, double timeMs, d
     return std::isfinite(most) ? most : 0;
 }
 
+bool Changing(const LayerEffect& e) {
+    if (e.hidden) return false;
+    if (e.id == "absent.shutterblur" || e.id == "absent.motionblur" || e.id == "absent.echo") return false;
+    return MotionEffect(e.id) || RepeatEffect(e.id) || TextEffect(e.id) || DrawingEffect(e.id);
+}
+
+bool SteadyPlacement(const std::vector<Layer>& siblings, const Layer& l, double from, double to, int depth) {
+    if (l.placed) {
+        const Sight& s = l.sight;
+        if (!s.layers || !s.layer || s.layer->placed) return false;
+        if (s.camera && (!s.camera->camera.fov.steady(s.camera->localTime(from), s.camera->localTime(to)) ||
+                         !SteadyPlacement(*s.layers, *s.camera, from, to, 0))) return false;
+        return SteadyPlacement(*s.layers, *s.layer, from, to, 0);
+    }
+    if (!l.steps.empty() || std::any_of(l.effects.begin(), l.effects.end(), Changing)) return false;
+    const float a = l.localTime(from), b = l.localTime(to);
+    for (const Anim* anim : {&l.location, &l.pivot, &l.scale, &l.rotation, &l.tilt}) {
+        if (!anim->steady(a, b)) return false;
+    }
+    if (l.parent == 0 || depth >= kMaxParentDepth) return true;
+    for (const Layer& s : siblings) {
+        if (s.id == l.parent && &s != &l) return SteadyPlacement(siblings, s, from, to, depth + 1);
+    }
+    return true;
+}
+
+bool Steady(const std::vector<Layer>& siblings, const Layer& l, double from, double to) {
+    if ((l.kind != "shape" && l.kind != "text") || l.keyedPoints || TextAnimated(l)) return false;
+    if (!SteadyPlacement(siblings, l, from, to, 0)) return false;
+    const float a = l.localTime(from), b = l.localTime(to);
+    const auto still = [&](const Anim& x) { return x.steady(a, b); };
+    const auto edge = [&](const Edge& e) { return still(e.color) && still(e.size) && still(e.opacity) && still(e.hardness) && still(e.offset); };
+    const auto props = [&](const std::vector<Property>& list) {
+        return std::all_of(list.begin(), list.end(), [&](const Property& p) { return still(p.anim); });
+    };
+    if (!still(l.skew) || !still(l.opacity) || !still(l.fillColor) || !still(l.stroke.color) || !still(l.stroke.size) ||
+        !edge(l.shadow) || !std::all_of(l.borders.begin(), l.borders.end(), edge) || !props(l.props) ||
+        !std::all_of(l.effects.begin(), l.effects.end(), [&](const LayerEffect& e) { return e.hidden || props(e.props); })) return false;
+    return !gEffects || (gEffects->steady && gEffects->steady(l, a, b));
+}
+
 void DrawShuttered(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& l, double timeMs,
                    const MediaPictures& pictures, const Override& ov, const ShutterBlur& shutter) {
     const double open = 1000.0 / std::max(gScene ? gScene->fps : 30, 1) * shutter.angle / 360;
@@ -973,16 +1014,22 @@ void DrawShuttered(SkCanvas* canvas, const std::vector<Layer>& siblings, const L
         return;
     }
     canvas->saveLayer(SkCanvas::SaveLayerRec(nullptr, &composite, SkCanvas::kF16ColorType));
+    const auto at = [&](double u) { return std::clamp(timeMs + open * (u - 0.5), (double)l.startTime, (double)l.endTime); };
+    const bool steady = Steady(siblings, l, at(0), at(1));
     int samples = shutter.samples;
-    if (shutter.adaptive) samples = std::clamp((int)std::ceil(Reach(siblings, l, timeMs, open) / 2), samples, 48);
+    if (shutter.adaptive && !steady) samples = std::clamp((int)std::ceil(Reach(siblings, l, timeMs, open) / 2), samples, 48);
     SkPaint add;
     add.setBlendMode(SkBlendMode::kPlus);
-    add.setAlphaf(1.0f / samples);
-    for (int i = 0; i < samples; i++) {
+    for (int i = 0; i < samples;) {
+        const double when = at((i + 0.5) / samples);
+        int same = 1;
+        while (i + same < samples && (steady || at((i + same + 0.5) / samples) == when)) same++;
+        add.setAlphaf((float)same / samples);
         canvas->saveLayer(nullptr, &add);
-        DrawOne(canvas, siblings, l, std::clamp(timeMs + open * ((i + 0.5) / samples - 0.5), (double)l.startTime, (double)l.endTime), pictures, sample);
+        DrawOne(canvas, siblings, l, when, pictures, sample);
         canvas->restore();
         if (gBreak) (*gBreak)();
+        i += same;
     }
     canvas->restore();
 }

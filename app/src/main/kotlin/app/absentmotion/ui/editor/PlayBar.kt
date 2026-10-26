@@ -23,22 +23,23 @@ import app.absentmotion.editor.skipBack
 import app.absentmotion.editor.skipForward
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Presence
+import app.absentmotion.ui.tutorial.tutorialTarget
 
 @Composable
 fun PlayBar(state: EditorState, modifier: Modifier = Modifier) {
     var menuOpen by remember { mutableStateOf(false) }
     Row(modifier.background(Am.TimelineBg)) {
         val cell = Modifier.weight(1f).fillMaxHeight()
-        BarButton(ChromeIcons.Undo, stringResource(R.string.play_undo), cell, enabled = state.canUndo) { state.undo() }
-        BarButton(ChromeIcons.Redo, stringResource(R.string.play_redo), cell, enabled = state.canRedo) { state.redo() }
-        BarButton(ChromeIcons.SkipBack, stringResource(R.string.play_skip_back), cell) { state.skipBack() }
+        BarButton(ChromeIcons.Undo, stringResource(R.string.play_undo), cell.tutorialTarget("undo"), enabled = state.canUndo) { state.undo() }
+        BarButton(ChromeIcons.Redo, stringResource(R.string.play_redo), cell.tutorialTarget("redo"), enabled = state.canRedo) { state.redo() }
+        BarButton(ChromeIcons.SkipBack, stringResource(R.string.play_skip_back), cell.tutorialTarget("skip_back")) { state.skipBack() }
         val settings = state.settings
         BarButton(
             if (state.playing) ChromeIcons.Pause else if (settings.loopingPlay) ChromeIcons.PlayRepeat else ChromeIcons.Play,
-            stringResource(if (state.playing) R.string.play_pause else R.string.play_play), cell,
+            stringResource(if (state.playing) R.string.play_pause else R.string.play_play), cell.tutorialTarget("play"),
             onLongClick = if (state.playing) null else ({ settings.loopingPlay = !settings.loopingPlay }),
         ) { state.playing = !state.playing }
-        BarButton(ChromeIcons.SkipForward, stringResource(R.string.play_skip_forward), cell) { state.skipForward() }
+        BarButton(ChromeIcons.SkipForward, stringResource(R.string.play_skip_forward), cell.tutorialTarget("skip_forward")) { state.skipForward() }
         BarButton(ChromeIcons.CopyPaste, stringResource(R.string.play_copy_paste), cell) { menuOpen = true }
         Box(cell) {
             BarButton(

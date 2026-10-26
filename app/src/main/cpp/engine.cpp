@@ -139,6 +139,7 @@ public:
     bool layerBounds(int64_t layerId, double timeMs, float ltrb[4]) override;
     int64_t hitTest(float x, float y, double timeMs) override;
     bool still(double timeMs, int width, int height, std::vector<uint8_t>* rgba) override;
+    bool previewStill(double timeMs, int width, int height, bool accurateBlur, std::vector<uint8_t>* rgba) override;
     bool shapeIcon(const std::string& xml, int size, uint32_t color, std::vector<uint8_t>* rgba) override;
     bool layerOutline(int64_t layerId, double timeMs, std::string* svg) override;
 
@@ -182,6 +183,7 @@ private:
         fx.active = [this](const Layer& layer) { return fEffects.active(layer); };
         fx.lifted = [this](const Layer& layer) { return fEffects.lifted(layer); };
         fx.behind = [this](const Layer& layer) { return fEffects.behind(layer); };
+        fx.steady = [this](const Layer& layer, float from, float to) { return fEffects.steady(layer, from, to); };
         fx.draw = [this](SkCanvas* canvas, const Scene& scene, const Layer& layer, double time, const SkRect& area, const SkMatrix& placed,
                          const std::function<void(SkCanvas*)>& source, const std::function<void(SkCanvas*)>& below) {
             return fEffects.draw(canvas, scene, layer, time, area, placed, source, below);
@@ -1170,6 +1172,20 @@ bool EngineImpl::still(double timeMs, int width, int height, std::vector<uint8_t
         const LayerEffects fx = this->layerEffects();
         DrawScene(canvas, fScene, timeMs, this->pictures(), &fx);
     }, rgba);
+}
+
+bool EngineImpl::previewStill(double timeMs, int width, int height, bool accurateBlur, std::vector<uint8_t>* rgba) {
+    if (fScene.width <= 0) return false;
+    SetCameraView(true);
+    const bool made = this->offscreen(width, height, false, [&](SkCanvas* canvas) {
+        canvas->scale((float)width / fScene.width, (float)height / fScene.height);
+        const LayerEffects fx = this->layerEffects();
+        SetFastShutterBlur(!accurateBlur);
+        DrawScene(canvas, fScene, timeMs, this->pictures(), &fx);
+        SetFastShutterBlur(false);
+    }, rgba);
+    SetFastShutterBlur(false);
+    return made;
 }
 
 bool EngineImpl::shapeIcon(const std::string& xml, int size, uint32_t color, std::vector<uint8_t>* rgba) {

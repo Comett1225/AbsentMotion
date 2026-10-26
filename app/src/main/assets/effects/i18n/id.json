@@ -325,7 +325,7 @@
    }
   },
   "channelremaphsv": {
-   "description": "Menyusun ulang hue, saturasi, value, dan alpha dari kanal lain pada lapisan.",
+   "description": "Menyusun ulang hue, saturasi, value, dan alfa dari kanal lain pada lapisan.",
    "name": "Channel Remap (HSV)",
    "params": {
     "a": {
@@ -379,7 +379,7 @@
    }
   },
   "checker": {
-   "description": "Menggambar papan catur di atas bagian opak lapisan, atau melubangi kotak-kotaknya.",
+   "description": "Menggambar papan catur di atas bagian opak lapisan, atau melubangi bagian tersebut.",
    "name": "Checker",
    "params": {
     "angle": {
@@ -395,7 +395,7 @@
      "label": "Offset"
     },
     "punch": {
-     "label": "Bolongkan"
+     "label": "Lubangi"
     },
     "screenSpace": {
      "label": "Ruang layar"
@@ -1050,7 +1050,7 @@
    }
   },
   "duotone": {
-   "description": "Terapkan peta gradien dua warna berdasarkan luminansi dengan kontrol kontras dan intensitas.",
+   "description": "Menerapkan peta gradien dua warna berdasarkan luminansi dengan kontrol kontras dan intensitas.",
    "name": "Duotone",
    "params": {
     "amount": {
@@ -1822,7 +1822,7 @@
    }
   },
   "heart": {
-   "description": "Memotong lapisan menjadi bentuk hati yang empuk.",
+   "description": "Memotong lapisan menjadi bentuk hati yang mengembung.",
    "name": "Hati",
    "params": {
     "depth": {
@@ -2702,8 +2702,8 @@
      "label": "Shading",
      "options": [
       "Tidak ada",
-      "Cahaya Titik",
-      "Cahaya Terarah"
+      "Cahaya titik",
+      "Cahaya terarah"
      ]
     },
     "shine": {
@@ -3965,7 +3965,7 @@
   },
   "squeeze": {
    "description": "Mencubit bagian tengah lapisan ke dalam dengan Kekuatan positif dan menggembungkannya ke luar dengan Kekuatan negatif. Legacy mempertahankan bentuk proyek lama.",
-   "name": "Himpit",
+   "name": "Cubit",
    "params": {
     "amount": {
      "label": "Kekuatan"
@@ -4417,7 +4417,7 @@
      "label": "Kehalusan"
     },
     "start": {
-     "label": "Mulai"
+     "label": "Awal"
     },
     "tint": {
      "label": "Pewarnaan"
@@ -4511,7 +4511,7 @@
    }
   },
   "tiles": {
-   "description": "Mengulang lapisan untuk memenuhi layar. Naikkan Pangkas agar petak lebih kecil, dengan opsi pencerminan, offset baris, dan rotasi. Skala Lama mempertahankan proyek lama.",
+   "description": "Mengulang lapisan untuk memenuhi layar. Naikkan Pangkas agar ubin lebih kecil, dengan opsi pencerminan, offset baris, dan rotasi. Skala Lama mempertahankan proyek lama.",
    "name": "Ubin",
    "params": {
     "angle": {
@@ -4563,7 +4563,7 @@
    }
   },
   "timecode": {
-   "description": "Mengganti teks lapisan dengan jam berjalan dari waktu lapisan atau proyek. Atur Mulai dari dan Kecepatan negatif untuk membuat hitung mundur.",
+   "description": "Mengganti teks lapisan dengan jam berjalan dari waktu lapisan atau proyek. Mulai dari dan Kecepatan negatif membuat hitung mundur.",
    "name": "Timecode",
    "params": {
     "format": {
@@ -4881,7 +4881,7 @@
    }
   },
   "vignette": {
-   "description": "Menggelapkan lapisan ke arah tepinya di luar bentuk bulat: Ukuran mengatur bentuknya, Kebulatan mengatur seberapa bulat, Kelembutan mengatur seberapa lembut tepinya, Kekuatan mengatur seberapa gelap, dan Rona mengatur seberapa banyak Warna yang diambil. Lubangi membuat tepinya menjadi transparan.",
+   "description": "Menggelapkan lapisan ke arah tepinya di luar bentuk bulat: Ukuran mengatur bentuknya, Kebulatan mengatur seberapa bulat, Kelembutan mengatur seberapa lembut tepinya, Kekuatan mengatur seberapa gelap, dan Rona mengatur seberapa banyak Warna yang diambil. Lubangi membuat tepinya transparan.",
    "name": "Vignette",
    "params": {
     "color": {

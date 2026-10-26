@@ -6,6 +6,26 @@ All notable changes to AbsentMotion are listed here, newest first. The format fo
 Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stands for the feature set as it stood on
 2026-10-12.
 
+## [4.1.0] - 2026-10-26
+
+### Added
+
+- The editor prepares preview frames by itself while it is idle, starting at the playhead. An edit only clears the frames it changes, and preparation pauses during playback, gestures, export, high temperature and while the app is in the background.
+- Captions open full screen with a choice of clip or whole project, a progress bar with the time left and a Cancel button, and Auto captions on video and audio clips. A more precise multilingual speech model (about 82 MB) is an optional download.
+- Voice filters are a category of the audio effects.
+
+### Changed
+
+- Motion Blur and Shutter Blur draw layers that do not change during the shutter once instead of once per sample; in host benchmarks of blur-heavy scenes, exports were 1.09 to 1.65 times faster.
+- Prepared preview frames follow the preview's Fast or Full motion blur choice, and exports keep the chosen quality.
+- The tutorial only lets the current step's control be used, marks it in red, and hides the other editor controls from screen readers.
+- Error messages, default layer names and effect names follow the app language and change right away after a language switch.
+- Offline Help is available in all 14 languages, and many translations were corrected.
+
+### Fixed
+
+- The preview no longer shows an empty picture while a video frame is still loading, or a frame from an older seek.
+
 ## [4.0.1] - 2026-10-25
 
 ### Changed

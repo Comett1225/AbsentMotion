@@ -110,6 +110,8 @@ public:
 
     virtual bool still(double timeMs, int width, int height, std::vector<uint8_t>* rgba) = 0;
 
+    virtual bool previewStill(double timeMs, int width, int height, bool accurateBlur, std::vector<uint8_t>* rgba) = 0;
+
     virtual bool shapeIcon(const std::string& xml, int size, uint32_t color, std::vector<uint8_t>* rgba) = 0;
 
     virtual bool layerOutline(int64_t layerId, double timeMs, std::string* svg) = 0;

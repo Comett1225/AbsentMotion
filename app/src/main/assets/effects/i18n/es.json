@@ -685,7 +685,7 @@
      "label": "Multiplicar"
     },
     "separator": {
-     "label": "Miles",
+     "label": "Separador de miles",
      "options": [
       "1000.5",
       "1,000.5",
@@ -1012,7 +1012,7 @@
      "label": "Densidad"
     },
     "feather": {
-     "label": "Pluma"
+     "label": "Difuminado"
     },
     "fill": {
      "label": "Relleno"
@@ -1726,7 +1726,7 @@
    }
   },
   "gridrepeat": {
-   "description": "Genera dinámicamente varias copias de la capa, ordenadas en una cuadrícula.",
+   "description": "Genera dinámicamente varias copias de la capa, dispuestas en una cuadrícula.",
    "name": "Repetición en cuadrícula",
    "params": {
     "count": {
@@ -2880,7 +2880,7 @@
    }
   },
   "posterize": {
-   "description": "Corta cada canal de color en un número de Pasos planos, de modo que los degradados suaves se conviertan en bandas; Desplazamiento mueve dónde caen los bordes de las bandas.",
+   "description": "Divide cada canal de color en un número de Pasos planos, de modo que los degradados suaves se conviertan en bandas. Desplazamiento mueve dónde caen los bordes de las bandas.",
    "name": "Posterizar",
    "params": {
     "levels": {
@@ -4368,7 +4368,7 @@
    }
   },
   "texttransform": {
-   "description": "Mueve, escala, gira, desvanece y tiñe letras, palabras o líneas dentro de un rango; el ancla define si el escalado y la rotación usan cada componente o el centro de la capa; mueve el rango con Desplazamiento para que el cambio recorra el texto.",
+   "description": "Mueve, escala, gira, desvanece y tiñe letras, palabras o líneas dentro de un rango. El ancla define si el escalado y la rotación usan cada componente o el centro de la capa. Mueve el rango con Desplazamiento para que el cambio recorra el texto.",
    "name": "Transformar texto",
    "params": {
     "anchor": {
@@ -4797,7 +4797,7 @@
    }
   },
   "twirl": {
-   "description": "Retuerce la capa alrededor del Centro como un remolino, con más fuerza en el medio y desvaneciéndose en el Radio (una parte del tamaño de la capa). Una Fuerza negativa la retuerce al otro lado.",
+   "description": "Retuerce la capa alrededor del Centro como un remolino, con más fuerza en el medio y desvaneciéndose en el Radio (una parte del tamaño de la capa). Una Fuerza negativa la retuerce en sentido contrario.",
    "name": "Remolino",
    "params": {
     "center": {

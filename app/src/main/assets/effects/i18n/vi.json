@@ -281,7 +281,7 @@
       "Lục",
       "Lam",
       "Alpha",
-      "Độ sáng",
+      "Độ chói",
       "Không",
       "Đầy đủ"
      ]
@@ -335,7 +335,7 @@
       "Độ bão hòa",
       "Giá trị",
       "Alpha",
-      "Độ sáng",
+      "Độ chói",
       "Không",
       "Đầy đủ"
      ]
@@ -539,28 +539,28 @@
      "label": "Mức Gain"
     },
     "gainHue": {
-     "label": "Sắc Gain"
+     "label": "Sắc độ Gain"
     },
     "gainLevel": {
-     "label": "Cấp Gain"
+     "label": "Mức Gain"
     },
     "gammaAmount": {
      "label": "Mức Gamma"
     },
     "gammaHue": {
-     "label": "Sắc Gamma"
+     "label": "Sắc độ Gamma"
     },
     "gammaLevel": {
-     "label": "Cấp Gamma"
+     "label": "Mức Gamma"
     },
     "liftAmount": {
      "label": "Mức Lift"
     },
     "liftHue": {
-     "label": "Sắc Lift"
+     "label": "Sắc độ Lift"
     },
     "liftLevel": {
-     "label": "Cấp Lift"
+     "label": "Mức Lift"
     }
    }
   },
@@ -590,7 +590,7 @@
   },
   "contourlines": {
    "description": "Vẽ các vòng viền quanh phần đục của lớp, để tạo viền sticker xếp lớp hoặc viền neon.",
-   "name": "Đường viền",
+   "name": "Đường đồng mức",
    "params": {
     "alpha": {
      "label": "Alpha"
@@ -703,7 +703,7 @@
    "name": "Chữ thập ba trục",
    "params": {
     "light": {
-     "label": "Góc sáng"
+     "label": "Góc ánh sáng"
     },
     "perspective": {
      "label": "Phối cảnh"
@@ -748,7 +748,7 @@
      "label": "Kích thước"
     },
     "light": {
-     "label": "Góc sáng"
+     "label": "Góc ánh sáng"
     },
     "perspective": {
      "label": "Phối cảnh"
@@ -816,7 +816,7 @@
      "label": "Chiều cao"
     },
     "light": {
-     "label": "Góc sáng"
+     "label": "Góc ánh sáng"
     },
     "perspective": {
      "label": "Phối cảnh"
@@ -888,7 +888,7 @@
      "label": "Kết thúc"
     },
     "glitch": {
-     "label": "Nhiễu"
+     "label": "Lỗi hình"
     },
     "intensity": {
      "label": "Cường độ"
@@ -933,8 +933,8 @@
      "label": "Mép",
      "options": [
       "Lặp lại",
-      "Gương",
-      "Trong suốt",
+      "Phản chiếu",
+      "Xóa",
       "Lát"
      ]
     },
@@ -1100,7 +1100,7 @@
   },
   "edgeglow": {
    "description": "Tìm các cạnh của lớp và làm chúng phát sáng như đèn neon trên hình ảnh bị tối đi.",
-   "name": "Viền phát sáng",
+   "name": "Cạnh phát sáng",
    "params": {
     "blend": {
      "label": "Hòa trộn"
@@ -1124,7 +1124,7 @@
   },
   "electricedges": {
    "description": "Vẽ đường viền phát sáng, nứt tóe quanh lớp, rung lên như điện khi bạn tạo hiệu ứng cho Hạt giống hoặc Tiến hóa, kèm các đường đồng mức tùy chọn bên trong.",
-   "name": "Viền điện",
+   "name": "Cạnh điện",
    "params": {
     "alpha": {
      "label": "Alpha"
@@ -1243,7 +1243,7 @@
    }
   },
   "exposure": {
-   "description": "Mô phỏng phơi sáng nhiếp ảnh với stops, độ lệch và hiệu chỉnh gamma.",
+   "description": "Mô phỏng phơi sáng nhiếp ảnh với số stop, độ lệch và hiệu chỉnh gamma.",
    "name": "Phơi sáng",
    "params": {
     "gamma": {
@@ -1253,7 +1253,7 @@
      "label": "Độ lệch"
     },
     "stops": {
-     "label": "Stops"
+     "label": "Số stop"
     }
    }
   },
@@ -1647,7 +1647,7 @@
      "label": "Đảo ngược"
     },
     "scaleBrightness": {
-     "label": "Tỷ lệ độ sáng"
+     "label": "Nhân độ sáng"
     }
    }
   },
@@ -1661,7 +1661,7 @@
     "blend": {
      "label": "Hòa trộn",
      "options": [
-      "Thường",
+      "Bình thường",
       "Nhân",
       "Màn hình",
       "Lớp phủ",
@@ -1699,7 +1699,7 @@
    }
   },
   "grid": {
-   "description": "Vẽ các đường lưới lên phần mờ đục của lớp hoặc cắt chúng ra khỏi lớp.",
+   "description": "Vẽ các đường lưới lên phần đục của lớp hoặc khoét chúng ra khỏi lớp.",
    "name": "Lưới",
    "params": {
     "angle": {
@@ -1778,7 +1778,7 @@
      "label": "Hạt ngẫu nhiên"
     },
     "stagger": {
-     "label": "Lệch nhau"
+     "label": "So le"
     }
    }
   },
@@ -2101,16 +2101,16 @@
     "blend": {
      "label": "Chế độ hòa trộn",
      "options": [
-      "Thường",
+      "Bình thường",
       "Nhân",
       "Màn hình",
-      "Phủ",
+      "Lớp phủ",
       "Sáng mềm",
       "Sáng cứng",
       "Cộng",
-      "Tối",
-      "Sáng",
-      "Sai lệch",
+      "Làm tối",
+      "Làm sáng",
+      "Khác biệt",
       "Chồng màu sáng",
       "Chồng màu tối"
      ]
@@ -2151,7 +2151,7 @@
    }
   },
   "lensblur": {
-   "description": "Nhòe xoay tròn để vùng quanh tâm vẫn nét và tăng dần về phía mép.",
+   "description": "Hiệu ứng nhòe xoay tròn, giữ vùng quanh tâm sắc nét và tăng dần về phía mép.",
    "name": "Làm mờ thấu kính",
    "params": {
     "center": {
@@ -2259,7 +2259,7 @@
    }
   },
   "linearrepeat": {
-   "description": "Tạo động nhiều bản sao của lớp, xếp dọc theo một đường thẳng.",
+   "description": "Tự động tạo nhiều bản sao của lớp, xếp dọc theo một đường thẳng.",
    "name": "Lặp tuyến tính",
    "params": {
     "count": {
@@ -3130,7 +3130,7 @@
    }
   },
   "randomdisplace": {
-   "description": "Tự động di chuyển lớp một cách mượt mà nhưng ngẫu nhiên theo thời gian. Seed chọn kiểu chuyển động khác, Tốc độ quyết định mức độ di chuyển nhanh chậm và Evolution thay đổi hoa văn.",
+   "description": "Tự động di chuyển lớp một cách mượt mà nhưng ngẫu nhiên theo thời gian. Hạt giống chọn kiểu chuyển động khác, Tốc độ quyết định mức độ di chuyển nhanh chậm và Evolution thay đổi hoa văn.",
    "name": "Dịch chuyển ngẫu nhiên",
    "params": {
     "evolution": {
@@ -3368,7 +3368,7 @@
    }
   },
   "replacecolor": {
-   "description": "Thay thế màu này bằng màu khác. Alpha điều khiển cường độ thay thế; Khóa độ sáng giữ ánh sáng và sắc độ của bản gốc.",
+   "description": "Thay thế màu này bằng màu khác. Alpha điều khiển cường độ thay thế; Khóa độ sáng giữ nguyên vùng sáng và vùng tối của bản gốc.",
    "name": "Thay màu",
    "params": {
     "alpha": {
@@ -3543,7 +3543,7 @@
       "Screen",
       "Nhân",
       "Làm sáng",
-      "Tối hơn",
+      "Làm tối",
       "Lớp phủ",
       "Sai khác"
      ]
@@ -3616,7 +3616,7 @@
    }
   },
   "sharpen": {
-   "description": "Áp dụng mặt nạ unsharp 3x3 để làm nổi chi tiết nhỏ.",
+   "description": "Áp dụng mặt nạ unsharp với vùng lân cận 3x3 để làm nổi chi tiết nhỏ.",
    "name": "Làm nét",
    "params": {
     "amount": {
@@ -3773,8 +3773,8 @@
       "Ánh sáng mềm",
       "Ánh sáng cứng",
       "Cộng",
-      "Tối hơn",
-      "Sáng hơn",
+      "Làm tối",
+      "Làm sáng",
       "Sai khác",
       "Làm sáng màu",
       "Đốt màu"
@@ -3989,7 +3989,7 @@
     "blend": {
      "label": "Chế độ hòa trộn",
      "options": [
-      "Thường",
+      "Bình thường",
       "Nhân",
       "Màn hình",
       "Phủ",
@@ -4311,7 +4311,7 @@
    }
   },
   "textrandomizer": {
-   "description": "Thay thế ngẫu nhiên Số lượng ký tự giữa Bắt đầu và Kết thúc. Tạo hiệu ứng cho Tiến hóa hoặc tăng Tốc độ để thay đổi các ký tự thay thế; Hiện dần đưa chúng trở lại văn bản gốc.",
+   "description": "Thay thế ngẫu nhiên Số lượng ký tự giữa Bắt đầu và Kết thúc. Tạo hiệu ứng cho Tiến hóa hoặc tăng Tốc độ để thay đổi các ký tự thay thế; Hiện dần đưa chúng trở về văn bản gốc.",
    "name": "Ngẫu nhiên hóa văn bản",
    "params": {
     "amount": {
@@ -4563,7 +4563,7 @@
    }
   },
   "timecode": {
-   "description": "Thay văn bản của lớp bằng đồng hồ chạy theo thời gian của lớp hoặc dự án. Bắt đầu tại cùng Tốc độ âm tạo ra đồng hồ đếm ngược.",
+   "description": "Thay văn bản của lớp bằng đồng hồ chạy theo thời gian của lớp hoặc dự án. Bắt đầu tại và Tốc độ âm tạo ra đồng hồ đếm ngược.",
    "name": "Mã thời gian",
    "params": {
     "format": {
@@ -4593,7 +4593,7 @@
    }
   },
   "timequant": {
-   "description": "Làm lớp này chuyển động ở tốc độ khung hình thấp hơn, giống như footage bị giật hoặc stop-motion.",
+   "description": "Làm lớp này chuyển động ở tốc độ khung hình thấp hơn, giống như cảnh quay bị giật hoặc stop-motion.",
    "name": "Tốc độ khung hình",
    "params": {
     "fps": {

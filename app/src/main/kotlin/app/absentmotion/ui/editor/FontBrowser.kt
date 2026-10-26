@@ -1,5 +1,7 @@
 package app.absentmotion.ui.editor
 
+import app.absentmotion.ui.tutorial.tutorialGuard
+
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Presence
 import app.absentmotion.ui.theme.presence
@@ -216,8 +218,8 @@ private val LanguageLabels = mapOf(
 )
 
 @Composable
-internal fun FontIconButton(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, onClick: () -> Unit) {
-    Box(Modifier.size(42.dp).clickable(onClick = onClick), contentAlignment = Alignment.Center) {
+internal fun FontIconButton(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
+    Box(modifier.size(42.dp).tutorialGuard().clickable(onClick = onClick), contentAlignment = Alignment.Center) {
         Icon(icon, label, Modifier.size(24.dp), tint = Am.OnDark)
     }
 }

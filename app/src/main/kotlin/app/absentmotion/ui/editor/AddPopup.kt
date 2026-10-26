@@ -71,6 +71,8 @@ import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Swap
 import app.absentmotion.ui.theme.TilePress
 import app.absentmotion.ui.theme.pressScale
+import app.absentmotion.ui.tutorial.tutorialTarget
+import app.absentmotion.ui.tutorial.tutorialGuard
 import androidx.compose.foundation.LocalIndication
 import androidx.annotation.StringRes
 import androidx.compose.ui.res.stringResource
@@ -83,7 +85,7 @@ private val Disc get() = Am.Panel
 @Composable
 fun AddButton(state: EditorState, modifier: Modifier = Modifier) {
     val press = remember { MutableInteractionSource() }
-    Box(modifier.size(73.dp).clickable(interactionSource = press, indication = null) { state.addOpen = true }, contentAlignment = Alignment.Center) {
+    Box(modifier.size(73.dp).tutorialGuard().clickable(interactionSource = press, indication = null) { state.addOpen = true }, contentAlignment = Alignment.Center) {
         Box(
             Modifier.size(47.dp).pressScale(press).shadow(4.dp, CircleShape).background(Disc, CircleShape).border(1.8.dp, Am.Accent, CircleShape),
             contentAlignment = Alignment.Center,
@@ -108,9 +110,9 @@ internal fun AddPopup(state: EditorState, modifier: Modifier = Modifier, library
     Row(modifier.clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)).background(PopupBar)) {
         Column((if (tablet) Modifier.weight(1f) else Modifier.width(326.dp)).fillMaxHeight()) {
             Row(Modifier.padding(start = 6.dp).height(58.dp)) {
-                Tabs.forEachIndexed { i, tab -> TabButton(tab, active = i == selectedTab, enabled = i <= 4) { selectedTab = i } }
+                Tabs.forEachIndexed { i, tab -> TabButton(tab, active = i == selectedTab, enabled = i <= 4, Modifier.tutorialTarget(if (i == 1) "add_tab_media" else if (i == 2) "add_tab_audio" else null)) { selectedTab = i } }
             }
-            val body = Modifier.weight(1f).fillMaxWidth().background(Am.Panel)
+            val body = Modifier.weight(1f).fillMaxWidth().background(Am.Panel).tutorialTarget(if (selectedTab == 1) "add_media" else if (selectedTab == 2) "add_audio" else null)
             Swap(selectedTab, body, rise = 0.dp) {
                 when (selectedTab) { 0 -> ShapePages(state, Modifier.fillMaxSize()); 1 -> MediaTab(state, Modifier.fillMaxSize(), library); 3 -> ObjectPage(state, Modifier.fillMaxSize()); 4 -> TemplatePage(state, Modifier.fillMaxSize()); else -> AudioTab(state, Modifier.fillMaxSize(), library) }
             }
@@ -120,10 +122,10 @@ internal fun AddPopup(state: EditorState, modifier: Modifier = Modifier, library
 }
 
 @Composable
-private fun TabButton(tab: Tab, active: Boolean, enabled: Boolean, onClick: () -> Unit) {
+private fun TabButton(tab: Tab, active: Boolean, enabled: Boolean, modifier: Modifier, onClick: () -> Unit) {
     val tint = if (active) Am.Accent else Am.OnDark
     Column(
-        Modifier.width(64.dp).fillMaxHeight().alpha(if (enabled) 1f else DimAlpha).clickable(enabled = enabled, onClick = onClick),
+        modifier.tutorialGuard().width(64.dp).fillMaxHeight().alpha(if (enabled) 1f else DimAlpha).clickable(enabled = enabled, onClick = onClick),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Spacer(Modifier.height(6.5.dp))
@@ -150,7 +152,7 @@ private fun ShapePages(state: EditorState, modifier: Modifier) = androidx.compos
                         for (def in row) {
                             val press = remember { MutableInteractionSource() }
                             Box(
-                                Modifier.size(50.84.dp, 61.dp).pressScale(press, TilePress).clickable(press, LocalIndication.current) {
+                                Modifier.size(50.84.dp, 61.dp).tutorialGuard().pressScale(press, TilePress).clickable(press, LocalIndication.current) {
                                     state.addShape(def)
                                     state.addOpen = false
                                 },
@@ -178,7 +180,7 @@ private fun TemplatePage(state: EditorState, modifier: Modifier) {
     LazyHorizontalGrid(AtLeastTwo(96.dp), modifier.clipToBounds()) {
         item(key = "all") {
             val press = remember { MutableInteractionSource() }
-            Column(Modifier.size(80.dp, 96.dp).pressScale(press, TilePress).clickable(press, LocalIndication.current) { all = true },
+            Column(Modifier.size(80.dp, 96.dp).tutorialGuard().pressScale(press, TilePress).clickable(press, LocalIndication.current) { all = true },
                 horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
                 MediaGridIcon(Modifier.size(24.dp))
                 Text(stringResource(R.string.view_all), color = Am.OnDark, fontSize = 16.sp, maxLines = 1)
@@ -191,7 +193,7 @@ private fun TemplatePage(state: EditorState, modifier: Modifier) {
             LazyVerticalGrid(GridCells.Fixed(3), Modifier.weight(1f)) {
                 items(saved, key = { it.id }) { t -> TemplateCell(t, Modifier.fillMaxWidth().height(140.dp)) { open(t) } }
             }
-            Box(Modifier.fillMaxWidth().height(48.dp).clickable { all = false }, Alignment.Center) { Text(stringResource(R.string.action_close), color = Am.Accent, fontSize = 18.sp) }
+            Box(Modifier.fillMaxWidth().height(48.dp).tutorialGuard().clickable { all = false }, Alignment.Center) { Text(stringResource(R.string.action_close), color = Am.Accent, fontSize = 18.sp) }
         }
     }
 }
@@ -199,7 +201,7 @@ private fun TemplatePage(state: EditorState, modifier: Modifier) {
 @Composable
 private fun TemplateCell(template: SavedTemplate, modifier: Modifier, onClick: () -> Unit) {
     val press = remember { MutableInteractionSource() }
-    Box(modifier.padding(horizontal = 2.5.dp, vertical = 10.dp).pressScale(press, TilePress).background(Color.Black).clickable(press, LocalIndication.current, onClick = onClick)) {
+    Box(modifier.tutorialGuard().padding(horizontal = 2.5.dp, vertical = 10.dp).pressScale(press, TilePress).background(Color.Black).clickable(press, LocalIndication.current, onClick = onClick)) {
         rememberFileBitmap(template.thumbnail, template.modified)?.let { Image(it, null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop) }
         Text(
             template.title, Modifier.align(Alignment.BottomCenter).fillMaxWidth().background(Color(0x66000000)).padding(horizontal = 3.dp),
@@ -214,7 +216,7 @@ private fun QuickBar(state: EditorState, modifier: Modifier) {
     Column(modifier) {
         QuickItem(R.string.add_quick_freehand_brush, ChromeIcons.Freehand, height = 61.dp, iconTop = 7.dp, labelTop = 35.dp, onClick = { state.startFreehand() })
         QuickItem(R.string.add_quick_pen_tool, ChromeIcons.VectorDrawing, height = 61.dp, iconTop = 6.5.dp, labelTop = 35.dp, onClick = { state.startVectorDrawing() })
-        QuickItem(R.string.add_quick_text, ChromeIcons.TextTool, height = 48.dp, iconTop = 4.dp, labelTop = 31.dp, onClick = { state.addText() })
+        QuickItem(R.string.add_quick_text, ChromeIcons.TextTool, height = 48.dp, iconTop = 4.dp, labelTop = 31.dp, target = "add_text", onClick = { state.addText() })
         QuickItem(R.string.add_quick_captions, ChromeIcons.Captions, height = 48.dp, iconTop = 4.dp, labelTop = 31.dp, onClick = { captions = true })
         BarButton(ChromeIcons.CloseThick, stringResource(R.string.action_close), Modifier.fillMaxWidth().weight(1f)) { state.addOpen = false }
     }
@@ -222,9 +224,9 @@ private fun QuickBar(state: EditorState, modifier: Modifier) {
 }
 
 @Composable
-private fun QuickItem(@StringRes label: Int, icon: ImageVector, height: Dp, iconTop: Dp, labelTop: Dp, onClick: () -> Unit) {
+private fun QuickItem(@StringRes label: Int, icon: ImageVector, height: Dp, iconTop: Dp, labelTop: Dp, target: String? = null, onClick: () -> Unit) {
     val press = remember { MutableInteractionSource() }
-    Column(Modifier.fillMaxWidth().height(height).pressScale(press, TilePress).clickable(press, LocalIndication.current, onClick = onClick), horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(Modifier.fillMaxWidth().height(height).tutorialTarget(target).tutorialGuard().pressScale(press, TilePress).clickable(press, LocalIndication.current, onClick = onClick), horizontalAlignment = Alignment.CenterHorizontally) {
         Spacer(Modifier.height(iconTop))
         Icon(icon, null, Modifier.size(24.dp), tint = Am.OnDark)
         Spacer(Modifier.height(labelTop - iconTop - 24.dp))

@@ -1,6 +1,7 @@
 package app.absentmotion.ui.editor
 
 import app.absentmotion.ui.tutorial.tutorialTarget
+import app.absentmotion.ui.tutorial.tutorialGuard
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -116,7 +117,7 @@ internal fun TransitionButton(state: EditorState, modifier: Modifier, compact: B
         var drag by remember { mutableFloatStateOf(0f) }
         val hide = stringResource(R.string.transition_hide)
         val press = remember { MutableInteractionSource() }
-        Box(modifier.size(if (compact) 46.dp else 73.dp)
+        Box(modifier.size(if (compact) 46.dp else 73.dp).tutorialGuard()
             .semantics { customActions = listOf(CustomAccessibilityAction(hide) { state.transitionButtonDismissed = true; true }) }
             .pointerInput(state) {
                 detectHorizontalDragGestures(
@@ -145,7 +146,7 @@ internal fun AnimateButton(state: EditorState, modifier: Modifier) {
     Presence(shown) {
         val press = remember { MutableInteractionSource() }
         Box(
-            modifier.offset { IntOffset(-clear.value.roundToPx(), 0) }.padding(12.dp).presence(scaleFrom = 0.6f).size(48.dp).tutorialTarget("animate").pressScale(press)
+            modifier.offset { IntOffset(-clear.value.roundToPx(), 0) }.padding(12.dp).presence(scaleFrom = 0.6f).size(48.dp).tutorialTarget("animate").tutorialGuard().pressScale(press)
                 .shadow(4.dp, CircleShape).background(Am.Panel, CircleShape).border(1.8.dp, Am.Accent, CircleShape)
                 .clickable(press, null) { state.selectedId?.let { state.playing = false; open = it } },
             contentAlignment = Alignment.Center,

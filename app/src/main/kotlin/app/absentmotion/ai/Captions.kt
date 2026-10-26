@@ -1,6 +1,5 @@
 package app.absentmotion.ai
 
-import app.absentmotion.platform.drain
 import app.absentmotion.R
 import app.absentmotion.i18n.AppText
 import app.absentmotion.platform.Context
@@ -55,7 +54,7 @@ enum class CaptionPosition { Top, Middle, Bottom }
 data class CaptionStyle(
     val font: String = FontName.Default.xml, val sizePercent: Int = 100, val color: Int = StyleColors.White,
     val outline: Boolean = true, val position: CaptionPosition = CaptionPosition.Bottom, val maxWords: Int = 4,
-    val english: Boolean = false,
+    val english: Boolean = false, val highPrecision: Boolean = false,
 )
 
 private const val MAX_CAPTION_MS = 3000
@@ -137,21 +136,20 @@ internal fun EditorState.addCaptions(chunks: List<Chunk>, style: CaptionStyle, f
 internal suspend fun recogniseCaptions(
     context: Context, scene: Scene, layerId: Long?, style: CaptionStyle, progress: (Float, String) -> Unit,
 ): List<Chunk> {
-    val layer = layerId?.let(scene::layer)?.takeIf { it.soundUri != null }
-    val source = if (layer == null) scene else Scene(scene.node.copy(children = scene.node.children.filter { it.name !in Scene.LAYER_TAGS } +
-        layer.node.with("hidden", null).let { it.copy(children = it.children.filterNot { c -> c.name == "gain" }) }))
-    val startMs = layer?.startTime ?: 0
-    val endMs = (layer?.endTime ?: scene.totalTime) + 1
+    val input = scene.captionInput(layerId)
+    val source = input.scene
+    val startMs = input.startMs
+    val endMs = input.endMs
     val mix = withContext(Dispatchers.IO) { OfflineMix.of(context, source, Resampler.ULTRA) } ?: error(AppText.get(R.string.ai_no_sound_to_caption))
     val windows = captionWindows(startMs, endMs)
     val words = ArrayList<Word>()
     try {
-        withContext(Dispatchers.IO) { CaptionModel.verify(context) }
+        withContext(Dispatchers.IO) { CaptionModel.verify(context, style.highPrecision) }
         windows.forEachIndexed { k, (keepFrom, keepTo) ->
             fun step(local: Float, label: Int) = progress((k + local) / windows.size, AppText.get(label))
             val from = maxOf(startMs, keepFrom - CAPTION_OVERLAP_MS)
             val pcm = withContext(Dispatchers.IO) { speechPcm(mix, from, keepTo) { step(0.15f * it, R.string.ai_reading_audio) } }
-            words += Whisper.transcribe(CaptionModel.file(context), pcm, style.english) { step(0.15f + 0.85f * it / 100f, R.string.ai_recognising_speech) }
+            words += Whisper.transcribe(CaptionModel.file(context, style.highPrecision), pcm, style.english) { step(0.15f + 0.85f * it / 100f, R.string.ai_recognising_speech) }
                 .filter { it.startMs + from >= keepFrom && (it.startMs + from < keepTo || k == windows.lastIndex) }
                 .map { Word(it.text, min(it.startMs + from, endMs - 1), min(it.endMs + from, endMs)) }
         }
@@ -159,6 +157,17 @@ internal suspend fun recogniseCaptions(
         (mix as? Closeable)?.close()
     }
     return chunkWords(words, style.maxWords).ifEmpty { error(AppText.get(R.string.ai_no_speech)) }
+}
+
+internal data class CaptionInput(val scene: Scene, val startMs: Int, val endMs: Int)
+
+internal fun Scene.captionInput(layerId: Long?): CaptionInput {
+    if (layerId == null) return CaptionInput(this, 0, totalTime + 1)
+    val layer = layer(layerId)?.takeIf { it.soundUri != null }
+        ?: error(AppText.get(R.string.ai_no_sound_to_caption))
+    val source = Scene(node.copy(children = node.children.filter { it.name !in Scene.LAYER_TAGS } +
+        layer.node.with("hidden", null).let { it.copy(children = it.children.filterNot { c -> c.name == "gain" }) }))
+    return CaptionInput(source, layer.startTime, layer.endTime + 1)
 }
 
 internal const val CAPTION_WINDOW_MS = 600_000
@@ -253,34 +262,42 @@ internal object CaptionModel {
 
     const val BYTES = app.absentmotion.platform.CAPTION_MODEL_BYTES
     const val SHA256 = "422f1ae452ade6f30a004d7e5c6a43195e4433bc370bf23fac9cc591f01a8898"
-    private const val SOURCE = "https://huggingface.co/ggerganov/whisper.cpp/resolve/5359861c739e955e79d9a303bcbc70fb988958b1/$NAME"
+    private const val RELEASE = "https://huggingface.co/ggerganov/whisper.cpp/resolve/5359861c739e955e79d9a303bcbc70fb988958b1"
+    private const val PRECISE_NAME = "ggml-base-q8_0.bin"
+    private const val PRECISE_BYTES = 81_768_585L
+    private const val PRECISE_SHA256 = "c577b9a86e7e048a0b7eada054f4dd79a56bbfa911fbdacf900ac5b567cbb7d9"
 
-    fun file(context: Context) = File(context.filesDir, "models/$NAME")
-    fun installed(context: Context) = file(context).length() == BYTES
-    fun remove(context: Context) { file(context).delete() }
+    fun name(highPrecision: Boolean) = if (highPrecision) PRECISE_NAME else NAME
+    fun bytes(highPrecision: Boolean) = if (highPrecision) PRECISE_BYTES else BYTES
+    private fun hash(highPrecision: Boolean) = if (highPrecision) PRECISE_SHA256 else SHA256
 
-    fun verify(context: Context) {
-        val file = file(context)
+    fun file(context: Context, highPrecision: Boolean = false) = File(context.filesDir, "models/${name(highPrecision)}")
+    fun installed(context: Context, highPrecision: Boolean = false) = file(context, highPrecision).length() == bytes(highPrecision)
+    fun storedBytes(context: Context) = file(context).length() + file(context, true).length()
+    fun remove(context: Context) { file(context).delete(); file(context, true).delete() }
+
+    fun verify(context: Context, highPrecision: Boolean = false) {
+        val file = file(context, highPrecision)
         val known = context.getSharedPreferences("ai_models", Context.MODE_PRIVATE)
         val stamp = "${file.length()}:${file.lastModified()}"
         if (known.getString(file.path, null) == stamp) return
-        val intact = file.length() == BYTES && file.inputStream().use(::sha256) == SHA256
+        val intact = file.length() == bytes(highPrecision) && file.inputStream().use(::sha256) == hash(highPrecision)
         if (!intact) file.delete()
         check(intact) { AppText.get(R.string.ai_caption_model_load_failed) }
         known.edit().putString(file.path, stamp).apply()
     }
 
-    suspend fun download(context: Context, progress: (Float) -> Unit) = withContext(Dispatchers.IO) {
-        val target = file(context)
+    suspend fun download(context: Context, highPrecision: Boolean = false, progress: (Float) -> Unit) = withContext(Dispatchers.IO) {
+        val target = file(context, highPrecision)
         val part = File(target.path + ".part")
         try {
             check(target.parentFile!!.let { it.isDirectory || it.mkdirs() }) { AppText.get(R.string.ai_cannot_create_model_storage) }
-            val connection = URL(SOURCE).openConnection() as HttpURLConnection
+            val connection = URL("$RELEASE/${name(highPrecision)}").openConnection() as HttpURLConnection
             try {
                 connection.connectTimeout = 15_000
                 connection.readTimeout = 30_000
                 check(connection.responseCode == HttpURLConnection.HTTP_OK) { AppText.get(R.string.ai_download_failed_http, connection.responseCode.toString()) }
-                connection.inputStream.use { input -> receive(input, part, target, BYTES, SHA256, { ensureActive() }, progress) }
+                connection.inputStream.use { input -> receive(input, part, target, bytes(highPrecision), hash(highPrecision), { ensureActive() }, progress) }
             } finally {
                 connection.disconnect()
             }

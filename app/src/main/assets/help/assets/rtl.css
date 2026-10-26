@@ -1,0 +1,8 @@
+[dir=rtl] th,[dir=rtl] td{text-align:right}
+[dir=rtl] blockquote{border-left:0;border-right:4px solid var(--line)}
+[dir=rtl] .callout{border-left:0;border-right:4px solid var(--link);border-radius:.6rem 0 0 .6rem}
+[dir=rtl] .callout.warn{border-right-color:var(--bad)}
+[dir=rtl] .callout.tip{border-right-color:var(--ok)}
+[dir=rtl] .toc ul{padding-left:0;padding-right:1.1rem}
+[dir=rtl] .sw{margin-right:0;margin-left:.4em}
+[dir=rtl] pre,[dir=rtl] code{direction:ltr;unicode-bidi:isolate}

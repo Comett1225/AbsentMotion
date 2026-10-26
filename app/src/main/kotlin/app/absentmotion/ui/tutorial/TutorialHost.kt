@@ -23,6 +23,11 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -31,6 +36,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -74,6 +80,7 @@ import app.absentmotion.editor.EditorState
 import app.absentmotion.library.AppSettings
 import app.absentmotion.library.ProjectStore
 import app.absentmotion.model.Scene
+import app.absentmotion.platform.BackHandler
 import app.absentmotion.platform.Log
 import app.absentmotion.ui.editor.ChromeIcons
 import app.absentmotion.ui.editor.TextIcons
@@ -83,6 +90,8 @@ import app.absentmotion.ui.theme.Am
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.math.PI
+import kotlin.math.cos
 import kotlin.math.roundToInt
 
 @Composable
@@ -189,12 +198,15 @@ private data class TourView(
     val note: Int?,
     val hint: Int?,
     val targets: List<String>,
+    val allowed: List<String>,
+    val denied: List<String>,
+    val free: Boolean,
     val canDoIt: Boolean,
 ) {
     val last: Boolean get() = number == count
 
     companion object {
-        fun of(tour: Tour) = TourView(tour.index + 1, tour.steps.size, tour.step, tour.note, tour.hint(), tour.targets(), tour.canDoIt)
+        fun of(tour: Tour) = TourView(tour.index + 1, tour.steps.size, tour.step, tour.note, tour.hint(), tour.targets(), tour.allowed(), tour.denied(), tour.free(), tour.canDoIt)
     }
 }
 
@@ -276,14 +288,38 @@ private fun TourRunner(tour: Tour, editor: EditorState, settings: AppSettings, o
         onDispose { if (Tutorial.listener === listener) Tutorial.listener = null }
     }
 
-    val found = view.targets.mapNotNull { Tutorial.anchors[it] }
-    val hole = if (view.step.union) found.reduceOrNull { a, b -> androidx.compose.ui.geometry.Rect(minOf(a.left, b.left), minOf(a.top, b.top), maxOf(a.right, b.right), maxOf(a.bottom, b.bottom)) } else found.firstOrNull()
-    Spotlight(hole, dim = hole != null || view.step.centred, centred = view.step.centred) {
-        ScaledFonts {
-            if (collapsed) Pill(view) { collapsed = false }
-            else CoachCard(view, onCollapse = { collapsed = true }, onExit = onExit, onNext = driver::next, onDoIt = driver::doIt)
+    val marks = if (view.free) emptyList() else view.targets.flatMap(Tutorial::bounds).map(::areaOf)
+    val allowed = if (view.free) emptyList() else view.allowed.flatMap(Tutorial::bounds).map(::areaOf)
+    val denied = view.denied.flatMap(Tutorial::bounds).map(::areaOf)
+    var frame by remember { mutableStateOf<Area?>(null) }
+    val blocked = if (view.free) emptyList() else frame?.let { GateMath.blocked(it, allowed, denied) }.orEmpty()
+    val shut = if (view.free) null else if (frame == null) listOf(Area(-1e9f, -1e9f, 1e9f, 1e9f)) else blocked
+    SideEffect { Tutorial.shut = shut }
+    DisposableEffect(driver) { onDispose { Tutorial.shut = null } }
+    val holes = (marks + allowed).distinct()
+    val cardHole = if (view.step.union) marks.reduceOrNull { a, b -> Area(minOf(a.left, b.left), minOf(a.top, b.top), maxOf(a.right, b.right), maxOf(a.bottom, b.bottom)) } else marks.firstOrNull()
+    val passBack = view.free || view.allowed.any { it == "back" || it.startsWith("add_") }
+    BackHandler(enabled = !passBack, onBack = onExit)
+    Box(Modifier.fillMaxSize().onGloballyPositioned { c -> c.positionInWindow().let { frame = Area(it.x, it.y, it.x + c.size.width, it.y + c.size.height) } }) {
+        if (!view.free) InputGate(frame, blocked)
+        Spotlight(
+            frame, holes, marks, denied, cardHole, dim = !view.free && (holes.isNotEmpty() || view.step.centred || view.targets.isNotEmpty()),
+            soft = holes.isEmpty() && !view.step.centred, centred = view.step.centred, reduced = rememberReducedMotion(),
+        ) {
+            ScaledFonts {
+                if (collapsed) Pill(view) { collapsed = false }
+                else CoachCard(view, onCollapse = { collapsed = true }, onExit = onExit, onNext = driver::next, onDoIt = driver::doIt)
+            }
         }
     }
+}
+
+private fun areaOf(r: androidx.compose.ui.geometry.Rect) = Area(r.left, r.top, r.right, r.bottom)
+
+@Composable
+private fun rememberReducedMotion(): Boolean {
+    val resolver = LocalContext.current.contentResolver
+    return remember(resolver) { android.provider.Settings.Global.getFloat(resolver, android.provider.Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f }
 }
 
 @Composable
@@ -294,26 +330,47 @@ private fun ScaledFonts(content: @Composable () -> Unit) {
 }
 
 @Composable
-private fun Spotlight(hole: androidx.compose.ui.geometry.Rect?, dim: Boolean, centred: Boolean, card: @Composable () -> Unit) {
-    var origin by remember { mutableStateOf(Offset.Zero) }
+private fun Spotlight(
+    frame: Area?, holes: List<Area>, marks: List<Area>, denied: List<Area>, cardHole: Area?,
+    dim: Boolean, soft: Boolean, centred: Boolean, reduced: Boolean, card: @Composable () -> Unit,
+) {
     val insets = WindowInsets.safeDrawing
     val accent = Am.Accent
-    val density = LocalDensity.current
-    val pad = with(density) { 6.dp.toPx() }
-    val local = hole?.let { Area(it.left - origin.x, it.top - origin.y, it.right - origin.x, it.bottom - origin.y).grown(pad) }
+    val phase = if (reduced) null else rememberInfiniteTransition(label = "tutorial-guide").animateFloat(0f, 1f, infiniteRepeatable(tween(PULSE_MS, easing = LinearEasing)), label = "pulse")
+    val ox = frame?.left ?: 0f
+    val oy = frame?.top ?: 0f
+    val local = cardHole?.let { Area(it.left - ox, it.top - oy, it.right - ox, it.bottom - oy) }
     Layout(
         content = card,
-        modifier = Modifier.fillMaxSize().onGloballyPositioned { origin = it.positionInWindow() }.drawBehind {
-            val corner = CornerRadius(10.dp.toPx())
-            if (local == null) {
-                if (dim) drawRect(SCRIM)
-                return@drawBehind
+        modifier = Modifier.fillMaxSize().drawBehind {
+            val corner = CornerRadius(6.dp.toPx())
+            fun rect(a: Area) = androidx.compose.ui.geometry.RoundRect(a.left - ox, a.top - oy, a.right - ox, a.bottom - oy, corner)
+            if (dim) {
+                val path = Path().apply { holes.forEach { addRoundRect(rect(it)) } }
+                clipPath(path, ClipOp.Difference) { drawRect(if (soft) SCRIM_SOFT else SCRIM) }
+                denied.forEach { drawRect(SCRIM, Offset(it.left - ox, it.top - oy), Size(it.width, it.height)) }
             }
-            val topLeft = Offset(local.left, local.top)
-            val size = Size(local.width, local.height)
-            val path = Path().apply { addRoundRect(androidx.compose.ui.geometry.RoundRect(local.left, local.top, local.right, local.bottom, corner)) }
-            if (dim) clipPath(path, ClipOp.Difference) { drawRect(SCRIM) }
-            drawRoundRect(accent, topLeft, size, corner, style = Stroke(2.5.dp.toPx()))
+            val t = phase?.value ?: 0f
+            val glow = if (phase == null) 0.16f else 0.05f + 0.2f * (0.5f - 0.5f * cos(2f * PI.toFloat() * t))
+            marks.forEachIndexed { i, a ->
+                val r = rect(a)
+                drawRoundRect(RED.copy(alpha = glow), Offset(r.left, r.top), Size(r.width, r.height), corner)
+                drawRoundRect(RED.copy(alpha = (glow * 2.5f).coerceAtMost(0.7f)), Offset(r.left, r.top), Size(r.width, r.height), corner, style = Stroke(1.5.dp.toPx()))
+                if (i == 0) drawRoundRect(accent, Offset(r.left, r.top), Size(r.width, r.height), corner, style = Stroke(2.5.dp.toPx()))
+            }
+            val first = marks.firstOrNull()
+            if (first != null && phase != null && first.width <= TAP_LIMIT.toPx() && first.height <= TAP_LIMIT.toPx()) {
+                val centre = Offset(first.centreX - ox, first.centreY - oy)
+                for (lag in floatArrayOf(0f, 0.5f)) {
+                    val u = (t + lag) % 1f
+                    val grow = 4.dp.toPx() + 16.dp.toPx() * u
+                    drawRoundRect(RED.copy(alpha = 0.9f * (1f - u)), Offset(first.left - ox - grow, first.top - oy - grow), Size(first.width + grow * 2, first.height + grow * 2), CornerRadius(8.dp.toPx() + grow), style = Stroke(3.dp.toPx()))
+                }
+                val press = (t * 1.5f) % 1f
+                drawCircle(Color.White.copy(alpha = 0.35f * (1f - press)), 8.dp.toPx() + 12.dp.toPx() * press, centre)
+                drawCircle(Color.White.copy(alpha = 0.8f * (1f - press)), 8.dp.toPx() + 12.dp.toPx() * press, centre, style = Stroke(2.dp.toPx()))
+                drawCircle(Color.White.copy(alpha = 0.9f), 5.dp.toPx(), centre)
+            }
         },
     ) { measurables, constraints ->
         val width = constraints.maxWidth.toFloat()
@@ -323,10 +380,11 @@ private fun Spotlight(hole: androidx.compose.ui.geometry.Rect?, dim: Boolean, ce
             insets.getLeft(this, layoutDirection) + margin, insets.getTop(this) + margin,
             width - insets.getRight(this, layoutDirection) - margin, height - insets.getBottom(this) - margin,
         )
-        val (region, side) = CardPlacement.region(area, local?.clampedTo(Area(0f, 0f, width, height)), 8.dp.toPx(), 260.dp.toPx(), 150.dp.toPx())
+        val hole = local?.grown(6.dp.toPx())?.clampedTo(Area(0f, 0f, width, height))
+        val (region, side) = CardPlacement.region(area, hole, 8.dp.toPx(), 260.dp.toPx(), 150.dp.toPx())
         val cardWidth = minOf(region.width, 420.dp.toPx()).roundToInt().coerceAtLeast(0)
         val placeable = measurables.first().measure(Constraints(maxWidth = cardWidth, maxHeight = region.height.roundToInt().coerceAtLeast(0)))
-        val (x, y) = CardPlacement.position(region, side, local, placeable.width.toFloat(), placeable.height.toFloat(), centred)
+        val (x, y) = CardPlacement.position(region, side, hole, placeable.width.toFloat(), placeable.height.toFloat(), centred)
         layout(constraints.maxWidth, constraints.maxHeight) { placeable.place(x.roundToInt(), y.roundToInt()) }
     }
 }
@@ -470,6 +528,10 @@ fun TutorialRows(settings: AppSettings) {
 }
 
 private val SCRIM = Color.Black.copy(alpha = 0.55f)
+private val SCRIM_SOFT = Color.Black.copy(alpha = 0.3f)
+private val RED = Color(0xFFFF3B30)
+private const val PULSE_MS = 1600
+private val TAP_LIMIT = 140.dp
 private const val SIDE = 1080
 private const val FPS = 30
 private const val BLACK = 0xFF000000.toInt()

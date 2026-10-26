@@ -138,10 +138,14 @@ class AudioFxTest {
         assertTrue(listOf(AudioFx.of(FxKind.Voice), AudioFx.of(FxKind.Voice)).fits(FxKind.Eq))
     }
 
-    @Test fun theAudioCategoryListsEveryEffectOnce() {
-        val shown = app.absentmotion.ui.editor.effects.AudioOrder
+    @Test fun audioAndVoiceCategoriesListEveryEffectExactlyOnce() {
+        val audio = app.absentmotion.ui.editor.effects.AudioOrder
+        val voice = app.absentmotion.ui.editor.effects.VoiceOrder
+        val shown = audio + voice
         assertEquals(FxKind.entries.toSet(), shown.toSet())
         assertEquals(shown.size, shown.distinct().size)
+        assertEquals(setOf(FxKind.HighPitch, FxKind.LowPitch, FxKind.Voice), voice.toSet())
+        assertTrue(audio.none { it in voice })
     }
 
     @Test fun everyPresetIsAValidChain() {

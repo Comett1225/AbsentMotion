@@ -18,7 +18,7 @@ class SvgImport(val layer: Layer?, val skipped: List<UiText>, val shapes: Int)
 
 fun importSvg(text: String, title: String, host: Scene, startTime: Int, endTime: Int): SvgImport {
     val root = XmlNode.parse(text, MaxSvgNodes)
-    require(root.local == "svg") { "This file is not an SVG image." }
+    require(root.local == "svg") { AppText.get(R.string.svg_err_invalid) }
     val reader = SvgReader(root)
     val items = reader.read()
     val built = reader.place(items, host.width.toFloat(), host.height.toFloat())

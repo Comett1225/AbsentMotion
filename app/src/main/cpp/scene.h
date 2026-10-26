@@ -39,6 +39,7 @@ struct Anim {
 
     bool empty() const { return value.empty() && keys.empty(); }
     float get(int i, float t, float fallback) const;
+    bool steady(float from, float to) const;
 };
 
 struct Property {
@@ -277,6 +278,7 @@ struct LayerEffects {
     std::function<bool(const Layer&)> behind;
     std::function<bool(SkCanvas*, const Scene&, const Layer&, double, const SkRect&, const SkMatrix&, const std::function<void(SkCanvas*)>&,
                        const std::function<void(SkCanvas*)>&)> draw;
+    std::function<bool(const Layer&, float, float)> steady;
 };
 void DrawScene(SkCanvas* canvas, const Scene& scene, double timeMs, const MediaPictures& pictures,
                const LayerEffects* effects = nullptr);

@@ -36,6 +36,7 @@ import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Presence
 import app.absentmotion.ui.theme.enterFade
 import app.absentmotion.ui.theme.presence
+import app.absentmotion.ui.tutorial.tutorialGuard
 import app.absentmotion.ui.tutorial.tutorialTarget
 
 val LocalWide = compositionLocalOf { false }
@@ -60,11 +61,11 @@ internal fun WideEditorBody(state: EditorState, onExit: () -> Unit, addLibrary: 
         val side = textEdit || (state.selectedId != null && !state.addOpen && !MultiSelect.active)
         val reserve = if (side) SideWidth else 0.dp
         Column(Modifier.fillMaxSize()) {
-            EditorTopBar(state, onExit, Modifier.fillMaxWidth().height(42.dp).enterFade())
+            EditorTopBar(state, onExit, Modifier.fillMaxWidth().height(42.dp).enterFade().tutorialGuard(any = true))
             Box(Modifier.fillMaxWidth().weight(1f)) {
                 Preview(state, Modifier.fillMaxSize().tutorialTarget("preview"), reserveEnd = reserve)
                 Box(Modifier.fillMaxSize().padding(end = reserve)) {
-                    Presence(state.previewPanelOpen) { PreviewModePanel(state, Modifier.align(Alignment.CenterEnd).presence(slideX = 0.4f)) }
+                    Presence(state.previewPanelOpen) { PreviewModePanel(state, Modifier.align(Alignment.CenterEnd).presence(slideX = 0.4f).tutorialGuard(any = true)) }
                     AnimateButton(state, Modifier.align(Alignment.BottomEnd))
                     if (state.settings.transitionInPreview) TransitionButton(state, Modifier.align(Alignment.BottomStart).padding(12.dp).tutorialTarget("transition"))
                     HistoryNotes(state, Modifier.align(Alignment.BottomCenter))
@@ -72,7 +73,7 @@ internal fun WideEditorBody(state: EditorState, onExit: () -> Unit, addLibrary: 
                 if (side) SidePanels(state, addLibrary, textEdit, textUi, Modifier.align(Alignment.CenterEnd))
             }
             Box(Modifier.fillMaxWidth().height(46.dp).background(Am.TimelineBg)) {
-                PlayBar(state, Modifier.align(Alignment.Center).widthIn(max = 560.dp).fillMaxSize().tutorialTarget("playbar"))
+                PlayBar(state, Modifier.align(Alignment.Center).widthIn(max = 560.dp).fillMaxSize().tutorialTarget("playbar").tutorialGuard(any = true))
                 if (!state.settings.transitionInPreview) TransitionButton(state, Modifier.align(Alignment.CenterEnd).padding(end = 12.dp).tutorialTarget("transition"), compact = true)
                 LevelMeter(state, Modifier.align(Alignment.BottomStart).fillMaxWidth().height(2.1.dp))
             }
@@ -87,7 +88,7 @@ internal fun WideEditorBody(state: EditorState, onExit: () -> Unit, addLibrary: 
 
 @Composable
 private fun SidePanels(state: EditorState, addLibrary: AddLibrary, textEdit: Boolean, textUi: TextEditUi, modifier: Modifier) {
-    Box(modifier.width(SideWidth).fillMaxHeight().background(Am.Panel).pointerInput(Unit) {}) {
+    Box(modifier.width(SideWidth).fillMaxHeight().background(Am.Panel).pointerInput(Unit) {}.tutorialTarget("side_panel")) {
         if (textEdit) TextEditor(state, textUi, embedded = true)
         else LowerPanels(state, addLibrary, top = true)
     }

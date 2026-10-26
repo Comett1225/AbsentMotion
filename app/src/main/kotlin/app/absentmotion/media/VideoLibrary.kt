@@ -61,6 +61,7 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
     private val requests = Channel<Request>(Channel.CONFLATED)
     private val lock = Mutex()
     private val sessions = mutableMapOf<Long, Session>()
+    private val installed = java.util.concurrent.ConcurrentHashMap<Long, PreviewVideoStamp>()
     @Volatile private var latest: Request? = null
     @Volatile private var paused = false
     @Volatile private var closed = false
@@ -118,6 +119,7 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
             val request = Request(scene, timeMs, false, smoothing, fps)
             reconcile(request)
             val wanted = visible(request)
+            wanted.forEach { installed.remove(it.layer.id) }
             if (wanted.isNotEmpty()) withContext(Dispatchers.IO) {
                 wanted.map { layer -> async { sessions.getValue(layer.layer.id).exact(request, layer) } }.awaitAll()
             }
@@ -127,6 +129,9 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
             latest?.let { requests.trySend(it) }
         }
     }
+
+    fun previewReady(scene: Scene, timeMs: Int, playing: Boolean): Boolean =
+        scene.videoSamples(timeMs, playing, warm = false).all { installed[it.layer.id]?.matches(scene, timeMs, playing) == true }
 
     fun resumePreview() { latest?.let { requests.trySend(it) } }
 
@@ -267,31 +272,48 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
                 proxy = VideoProxies.ready(context, uri, version)
             }
             val wanted = if (exact) uri else proxy ?: uri
-            if (this.source != wanted) { decoder?.close(); decoder = null }
+            if (this.source != wanted) { decoder?.close(); decoder = null; publishedPts = null; publishedMix = null; publishedMosh = null }
             val source = decoder ?: open(wanted).also { decoder = it }
+            fun ready() {
+                if (!exact && !obsolete()) {
+                    installed[id] = PreviewVideoStamp(request.scene, request.timeMs, request.playing)
+                    engine.videoFrameReady()
+                }
+            }
             val plan = layer.moshPlan(sample.timeMs, sample.scene)
-            if (plan != null && moshed(source, sample, plan, exact, ::abandoned)) return@withLock
+            if (plan != null && moshed(source, sample, plan, exact, ::abandoned)) {
+                if (publishedMosh != null) ready()
+                return@withLock
+            }
             if (exact && request.smoothing.active && mixed(source, request, sample)) return@withLock
             val ahead = if (request.playing) leadMs * (sample.track.timeAt(request.timeMs.toDouble(), false)?.rate ?: 1.0) else 0.0
             val time = layer.videoTimeUs((sample.timeMs + ahead).toInt(), sample.scene)
             val pts = source.wantedPts(time)
-            if (publishedPts == pts) return@withLock
+            if (publishedPts == pts) { ready(); return@withLock }
             val seeks = source.seeks
-            val image = source.frame(time, exact, ::abandoned) ?: (if (exact) source.frame(time, true, ::abandoned) else null) ?: run {
+            val image = source.frame(time, exact || !request.playing, ::obsolete) ?: (if (exact) source.frame(time, true, ::obsolete) else null) ?: run {
+                if (!exact && !obsolete()) {
+                    retryAt = System.nanoTime() + RETRY_NS
+                    if (++failures <= MAX_RETRIES) scope.launch {
+                        delay(RETRY_NS / 1_000_000 + 10)
+                        if (!stopped) latest?.let { requests.trySend(it) }
+                    }
+                }
                 exportCheck(!exact) { txt(R.string.media_error_decode_frame, source.timestamps.frameNumber(pts)) }
                 return@withLock
             }
-            if (abandoned()) return@withLock
+            if (obsolete()) return@withLock
             image.hardwareBuffer!!.use { buffer ->
-                val installed = engine.setVideoPicture(uri, buffer, id, exact, source.colorStandard, source.colorRange, image.cropRect) { !abandoned() }
-                if (exact) exportCheck(installed) { txt(R.string.media_error_import_frame, source.timestamps.frameNumber(pts), uri) }
-                if (installed) {
+                val accepted = engine.setVideoPicture(uri, buffer, id, exact, source.colorStandard, source.colorRange, image.cropRect) { !obsolete() }
+                if (exact) exportCheck(accepted) { txt(R.string.media_error_import_frame, source.timestamps.frameNumber(pts), uri) }
+                if (accepted) {
                     publishedPts = pts
                     publishedMix = null
                     publishedMosh = null
                     held.clear()
                     retryAt = 0L
                     failures = 0
+                    ready()
                     if (!exact && request.playing && source.seeks == seeks) leadMs = (leadMs * 0.8 + (System.nanoTime() - request.born) / 1e6 * 0.2).coerceIn(0.0, MAX_LEAD_MS)
                 }
             }
@@ -420,6 +442,7 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
 
         suspend fun close() {
             stopped = true
+            installed.remove(id)
             queue.close()
             worker.cancel(); worker.join()
             engine.setPicture(uri, null, id)

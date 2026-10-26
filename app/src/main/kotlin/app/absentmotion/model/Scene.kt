@@ -217,7 +217,7 @@ data class Layer(val node: XmlNode, val t: Float = 0f, val snap: ClosedFloatingP
     val link: String? get() = node["link"]
 
     val nested: Scene? get() = if (kind == "embedScene") node.child("scene")?.let(::Scene) else null
-    val label: String get() = node["label"] ?: if (kind == "text") content.ifEmpty { "Text" } else ""
+    val label: String get() = node["label"] ?: if (kind == "text") content else ""
     val shape: String get() = node["s"] ?: ""
     val startTime: Int get() = node["startTime"]?.toIntOrNull() ?: 0
     val endTime: Int get() = node["endTime"]?.toIntOrNull() ?: 0

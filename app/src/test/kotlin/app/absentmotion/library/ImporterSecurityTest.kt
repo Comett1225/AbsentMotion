@@ -1,5 +1,6 @@
 package app.absentmotion.library
 
+import app.absentmotion.i18n.AppText
 import app.absentmotion.i18n.txt
 import app.absentmotion.i18n.UiText
 import app.absentmotion.R
@@ -199,7 +200,7 @@ class ImporterSecurityTest {
     @Test fun aSceneWithMoreElementsThanTheBudgetIsRefused() {
         val files = tmp.newFolder("files")
         val xml = scene("<bookmark/>".repeat(XmlNode.IMPORT_NODES))
-        assertEquals(txt(R.string.library_err_malformed_xml, "Too many elements"), failure(importer(files), xml.toByteArray()))
+        assertEquals(txt(R.string.library_err_malformed_xml, AppText.get(R.string.xml_err_too_many)), failure(importer(files), xml.toByteArray()))
     }
 
     @Test fun aSceneLastingLongerThanADayIsRefused() {

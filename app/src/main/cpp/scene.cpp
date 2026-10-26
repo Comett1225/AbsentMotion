@@ -36,6 +36,27 @@ float Anim::get(int i, float t, float fallback) const {
     return at(a.v) + (at(b.v) - at(a.v)) * u;
 }
 
+bool Anim::steady(float from, float to) const {
+    if (keys.empty()) return true;
+    if (!std::isfinite(from) || !std::isfinite(to) || from > to) return false;
+    const auto same = [](const std::vector<float>& a, const std::vector<float>& b) {
+        return a.size() == b.size() && (a.empty() || std::memcmp(a.data(), b.data(), a.size() * sizeof(float)) == 0);
+    };
+    for (size_t k = 1; k < keys.size(); k++) {
+        if (!(keys[k - 1].t <= keys[k].t)) return false;
+    }
+    size_t first = 0, last = keys.size() - 1;
+    if (from > keys.front().t) {
+        while (first + 1 < keys.size() && keys[first + 1].t <= from) first++;
+    }
+    if (to <= keys.front().t) last = 0;
+    while (last > first && keys[last - 1].t > to) last--;
+    for (size_t k = first + 1; k <= last; k++) {
+        if (!same(keys[k].v, keys[first].v)) return false;
+    }
+    return !hasLead || from >= keys.front().t || same(lead.v, keys.front().v);
+}
+
 const Property* Layer::prop(const char* propName) const {
     for (const auto& p : props) {
         if (p.name == propName) return &p;

@@ -16,7 +16,7 @@ Tap a layer and a grid of tools opens at the bottom. The first row has five smal
 | Null | Like a shape, but nothing to draw |
 | Camera | Camera Options, Transform, Effects, Presets, Camera Moves |
 | 3D model | Model Options, Opacity & Blend Mode, Transform, Presets, Effects |
-| Audio | Presets, Effects, Voice filters, AI |
+| Audio | Presets, Effects (including Voice filters), AI (Reduce Noise and Auto captions) |
 
 A photo or video is a rectangle with a picture fill, so it has the same tools as a shape.
 

@@ -1,5 +1,7 @@
 package app.absentmotion.library
 
+import app.absentmotion.R
+import app.absentmotion.i18n.AppText
 import app.absentmotion.platform.readInto
 import app.absentmotion.export.safeName
 import app.absentmotion.model.MediaDeclaration
@@ -42,10 +44,10 @@ class MediaKeeper(
                     out.fd.sync()
                 }
             }
-            if (media.size > 0 && temp.length() < media.size) throw IOException("Copied ${temp.length()} of ${media.size} bytes of $base")
+            if (media.size > 0 && temp.length() < media.size) throw IOException(AppText.get(R.string.keep_err_incomplete, base, temp.length().toString(), media.size.toString()))
             val target = synchronized(Naming) {
                 val name = (sequenceOf(base) + generateSequence(2) { it + 1 }.map { "${it}_$base" }).first { !File(dir, it).exists() }
-                File(dir, name).also { if (!temp.renameTo(it)) throw IOException("Cannot keep $name") }
+                File(dir, name).also { if (!temp.renameTo(it)) throw IOException(AppText.get(R.string.keep_err_cannot_keep, name)) }
             }
             return MediaDeclaration(media.node.with("uri", target.toURI().toString()).with("missing", null))
         } catch (e: IOException) {

@@ -30,6 +30,7 @@ import app.absentmotion.editor.deleteChosen
 import app.absentmotion.editor.alignClipTimes
 import app.absentmotion.editor.moveClipEdges
 import app.absentmotion.model.cutBetween
+import app.absentmotion.model.shownName
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -354,7 +355,7 @@ internal fun ParentMenu(state: EditorState, onDismiss: () -> Unit) {
     val others = state.scene.layers.filter { it.id != layer.id }.reversed()
     val current = layer.node["parent"]?.toLongOrNull()
     ChoiceList(
-        listOf(stringResource(R.string.none)) + others.map { (if (it.id == current) "> " else "") + it.label.ifEmpty { it.kind } }, onDismiss,
+        listOf(stringResource(R.string.none)) + others.map { (if (it.id == current) "> " else "") + it.shownName() }, onDismiss,
     ) { i -> state.setParent(if (i == 0) null else others[i - 1].id) }
 }
 

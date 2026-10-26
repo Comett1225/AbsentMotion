@@ -144,7 +144,7 @@ fun EditorState.runTracking(context: Context, mode: TrackMode, scope: CoroutineS
         } catch (_: LinkageError) {
             mode.message = AppText.get(R.string.track_motion_unavailable)
         } catch (e: Exception) {
-            mode.message = e.message ?: AppText.get(R.string.track_motion_failed)
+            mode.message = app.absentmotion.i18n.failureText(AppText.get(R.string.track_motion_failed), e)
         } finally {
             mode.running = false
             mode.live = null

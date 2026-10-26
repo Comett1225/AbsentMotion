@@ -6,14 +6,14 @@ summary: Auto captions, background removal, noise reduction, AI Enhance and AI S
 ---
 Everything in this page **runs on your phone**. Your photos, videos and sound are never uploaded. The only downloads are listed in the table at the end.
 
-The AI tools are in three places: the **AI** category of the Effects Library (**Remove Background**, **Remove Background (video)**, **Reduce Noise** and **Enhance**), the **Captions** button of the Add menu, and **AI Smooth**, one of the smoothing methods in a clip's **Smooth** tool and on the Export screen. For a sound clip, the **AI** button in the tool grid opens the noise tool. A tool that does not fit the selected layer is grayed with a note such as "Select an image layer". One AI job runs at a time, with a progress bar and a **Cancel** button.
+The AI tools are in three places: the **AI** category of the Effects Library (**Remove Background**, **Remove Background (video)**, **Reduce Noise** and **Enhance**), the **Captions** button of the Add menu, and **AI Smooth**, one of the smoothing methods in a clip's **Smooth** tool and on the Export screen. For an audio or video clip, **AI > Auto captions** captions just that clip. Audio clips also have **AI > Reduce Noise**. A tool that does not fit the selected layer is grayed with a note such as "Select an image layer". One AI job runs at a time, with a progress bar and a **Cancel** button.
 
 ## Auto captions
 
 Auto captions turns speech into text layers that appear in time with the voice.
 
-1. Tap **+**, then **Captions**. The **Auto Captions** sheet opens.
-2. Choose the **Source**: the **Whole project** or one sound or video layer. It starts on the selected layer if that layer has sound.
+1. Select an audio or video clip, then tap **AI > Auto captions**. Video clips also have an **Auto captions** action. This works only on that clip, including its trims and speed changes.
+2. To caption the whole project instead, tap **+ > Captions** and choose **Whole project**. This entry also lets you choose one audio or video layer.
 3. Choose the settings below and tap **Generate**.
 
 | Setting | Choices |
@@ -26,9 +26,11 @@ Auto captions turns speech into text layers that appear in time with the voice.
 | **Position** | **Top**, **Middle** or **Bottom** (default) |
 | **Words per caption** | 1 to 10 (default 4) |
 
-The first time, the app tells you it needs a speech model: "Captions are recognized on your phone by a speech model, downloaded once", with its name and size, about 57 MB. Tap **Download** (or **Not now**). The model is the Whisper base model, downloaded from Hugging Face over a normal secure connection and checked before use. After that, recognition runs on the phone's processor with no internet. In **Settings**, **Remove caption model** deletes it again.
+The first time, the app asks before downloading a speech model. **Standard** is about 60 MB. The optional **Higher precision** model is about 82 MB. Both support multiple languages and stay below 100 MB. Downloads come from the Whisper model repository on Hugging Face and are checked before use. Recognition then runs offline on your device. **Settings > Remove caption model** removes downloaded caption models.
 
-While it works the sheet shows "Reading the audio..." and "Recognizing speech..." with a percentage. Long recordings are processed in ten-minute parts. The result is one text layer per caption, named "Caption 1", "Caption 2" and so on, centerd, in time with the speech and selected together so that you can restyle them all at once. A caption ends at a pause longer than half a second, at the end of a sentence, after three seconds or at the word limit.
+While captions are generated, the setup controls disappear. The centre shows the current stage, progress and estimated time remaining; **Cancel** is the only action. The estimate appears after enough work has completed and may change. Long recordings are processed in ten-minute parts.
+
+The result is one text layer per caption, in time with the speech and selected together so that you can restyle them. A caption ends at a long pause, sentence end, three seconds or the word limit. For a clip, caption timing follows its position in the project.
 
 If there is no sound the app says "There is no sound to caption", and if no speech is found, "No speech was found".
 
@@ -110,7 +112,7 @@ Each level has its own model, downloaded once (about 11 MB) after the app has sh
 
 | Item | When | Size | From |
 |---|---|---|---|
-| Speech model for captions | The first time you generate captions, after you tap Download | about 57 MB | Hugging Face |
+| Speech model for captions | After you confirm the download | about 60 MB Standard, or 82 MB Higher precision | Hugging Face |
 | Background removal model, standard build | Never: it is inside the app | about 3 MB | |
 | Background removal model, Play-services build | First use | Not shown by the app | Google Play services |
 | Noise reduction | Never: it is inside the app | | |

@@ -131,6 +131,7 @@ class MainActivity : ComponentActivity() {
     private var engineProblem by mutableStateOf<String?>(null)
     private var problemShown by mutableStateOf(false)
     private var elementNav: ((String) -> Unit)? = null
+    private var effectLanguage = ""
 
     override fun attachBaseContext(newBase: Context) = super.attachBaseContext(newBase.inAppLanguage())
 
@@ -140,6 +141,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         app.absentmotion.i18n.keepLegacyLanguage(this)
         app.absentmotion.i18n.AppText.install(this)
+        effectLanguage = app.absentmotion.i18n.currentLanguage(this).tag
         followScreenSize(resources.configuration)
         store = ProjectStore(this)
         settings = AppSettings(this)
@@ -578,6 +580,10 @@ class MainActivity : ComponentActivity() {
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
+        app.absentmotion.i18n.AppText.install(this)
+        val language = app.absentmotion.i18n.currentLanguage(this).tag
+        if (effectLanguage.isNotEmpty() && language != effectLanguage) engine.relabelEffects(this)
+        effectLanguage = language
         followScreenSize(newConfig)
     }
 

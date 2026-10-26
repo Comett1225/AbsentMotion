@@ -105,7 +105,7 @@
    }
   },
   "blockdissolve": {
-   "description": "Remove blocos aleatórios alinhados à grade da camada. Anima a Intensidade para tirar cada vez mais blocos.",
+   "description": "Remove blocos aleatórios alinhados à grade da camada. Anime a Intensidade para tirar cada vez mais blocos.",
    "name": "Dissolução em blocos",
    "params": {
     "blockSize": {
@@ -520,7 +520,7 @@
    }
   },
   "colorize": {
-   "description": "Colore toda a camada com um único tom, mantendo seus realces e sombras.",
+   "description": "Colore toda a camada com um único matiz, mantendo seus realces e sombras.",
    "name": "Colorir",
    "params": {
     "amount": {
@@ -2562,7 +2562,7 @@
    }
   },
   "offset": {
-   "description": "Move a imagem da camada, repetindo-a nas bordas da caixa da camada.",
+   "description": "Desloca a imagem da camada, repetindo-a nas bordas da caixa da camada.",
    "name": "Deslocamento",
    "params": {
     "feather": {
@@ -2880,7 +2880,7 @@
    }
   },
   "posterize": {
-   "description": "Divide cada canal de cor em um número de níveis planos, fazendo gradientes suaves virarem faixas. O deslocamento move onde ficam as bordas das faixas.",
+   "description": "Divide cada canal de cor em um número de níveis planos, fazendo gradientes suaves virarem faixas. O Deslocamento move onde ficam as bordas das faixas.",
    "name": "Posterizar",
    "params": {
     "levels": {
@@ -3014,7 +3014,7 @@
    }
   },
   "radialrepeat": {
-   "description": "Gera várias cópias da camada, organizadas em um padrão circular.",
+   "description": "Gera dinamicamente várias cópias da camada, organizadas em um padrão circular.",
    "name": "Repetição radial",
    "params": {
     "angle": {
@@ -3730,7 +3730,7 @@
    }
   },
   "softglow": {
-   "description": "Sobrepeia uma cópia desfocada da imagem para criar um brilho suave, vindo principalmente dos realces.",
+   "description": "Sobrepõe uma cópia suave e desfocada da imagem para criar um brilho suave, vindo principalmente dos realces.",
    "name": "Brilho suave",
    "params": {
     "blend": {
@@ -4511,7 +4511,7 @@
    }
   },
   "tiles": {
-   "description": "Repete a camada para preencher a tela. Aumente Corte para fazer blocos menores, com espelhamento, deslocamento de linha e rotação opcionais. Escala legada mantém projetos antigos.",
+   "description": "Repete a camada para preencher a tela. Aumente Corte para criar blocos menores, com espelhamento, deslocamento de linha e rotação opcionais. Escala legada mantém projetos antigos.",
    "name": "Blocos",
    "params": {
     "angle": {
@@ -4812,7 +4812,7 @@
    }
   },
   "unsharpmask": {
-   "description": "Aumenta a nitidez adicionando de volta a diferença entre a camada e uma cópia desfocada dela. Intensidade define o tamanho do desfoque, Quantidade quanto é adicionado de volta, e Limite acima de 50% ignora pequenas diferenças.",
+   "description": "Aumenta a nitidez adicionando de volta a diferença entre a camada e uma cópia desfocada dela. Intensidade define o tamanho do desfoque, Quantidade quanto é adicionado de volta, e Limiar acima de 50% ignora pequenas diferenças.",
    "name": "Máscara de nitidez",
    "params": {
     "amount": {

@@ -140,6 +140,15 @@ bool Pointwise(const std::string& sksl) {
     return sampled;
 }
 
+int Mentions(const std::string& sksl, const std::string& word) {
+    const auto part = [&](size_t i) { return i < sksl.size() && (std::isalnum((unsigned char)sksl[i]) || sksl[i] == '_'); };
+    int n = 0;
+    for (size_t i = sksl.find(word); i != std::string::npos; i = sksl.find(word, i + 1)) {
+        if (!part(i - 1) && !part(i + word.size())) n++;
+    }
+    return n;
+}
+
 sk_sp<SkRuntimeEffect> Compiled(const char* sksl) {
     auto result = SkRuntimeEffect::MakeForShader(SkString(sksl));
     return result.effect;
@@ -231,6 +240,7 @@ std::string EffectRuntime::load(const std::string& xml) {
         d.backdrop = result.effect->findChild("backdrop") != nullptr;
         d.below = result.effect->findChild("below") != nullptr;
         d.pointwise = Pointwise(sksl);
+        d.timed = result.effect->findUniform("time") && Mentions(sksl, "time") > 1;
         d.shader = std::move(result.effect);
     }
     fDefinitions[id] = std::move(d);
@@ -268,6 +278,17 @@ bool EffectRuntime::needs(const Layer& layer, bool Definition::*input) const {
 }
 
 bool EffectRuntime::behind(const Layer& layer) const { return needs(layer, &Definition::backdrop); }
+
+bool EffectRuntime::steady(const Layer& layer, float from, float to) const {
+    const auto still = [&](const Anim& a) { return a.steady(from, to); };
+    return std::all_of(layer.effects.begin(), layer.effects.end(), [&](const LayerEffect& e) {
+        if (e.hidden) return true;
+        const Definition* d = find(e.id);
+        if (d && (d->timed || d->below)) return false;
+        if (d && !std::all_of(d->defaults.begin(), d->defaults.end(), [&](const auto& k) { return still(k.second); })) return false;
+        return std::all_of(e.props.begin(), e.props.end(), [&](const Property& p) { return still(p.anim); });
+    });
+}
 
 sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer, double timeMs, const SkRect& area, const SkRect& seen,
                                           const SkMatrix& placed, sk_sp<SkImageFilter> content, sk_sp<SkImageFilter> below) const {

@@ -49,7 +49,7 @@
    }
   },
   "backdrop": {
-   "description": "Kinokopya ang iginuhit sa ilalim ng layer para mabago ito ng mga susunod na epekto. Nililimitahan ng Mask sa layer ang kopya sa opaque na bahagi ng layer. Ibinabalik ng Mix ang fill ng layer.",
+   "description": "Kinokopya ang iginuhit sa ilalim ng layer para mabago ito ng mga susunod na epekto. Nililimitahan ng Mask sa layer ang kopya sa opaque na bahagi ng layer. Ibinabalik ng Halo ang fill ng layer.",
    "name": "Adjustment layer",
    "params": {
     "mask": {
@@ -242,7 +242,7 @@
      "label": "Strength"
     },
     "center": {
-     "label": "Sentro"
+     "label": "Center"
     },
     "radius": {
      "label": "Radius"
@@ -379,7 +379,7 @@
    }
   },
   "checker": {
-   "description": "Nagdo-drawing ng checkerboard sa mga opaque na bahagi ng layer, o tinatanggal ang mga checker dito.",
+   "description": "Nagguguhit ng checkerboard sa mga opaque na bahagi ng layer, o tinatanggal ang mga checker dito.",
    "name": "Checker",
    "params": {
     "angle": {
@@ -565,7 +565,7 @@
    }
   },
   "contourgradient": {
-   "description": "Nagpipinta ng two-color gradient palabas mula sa mga gilid ng opaque na bahagi ng layer, parang malambot na kulay na halo.",
+   "description": "Nagpipinta ng gradient na may dalawang kulay palabas mula sa mga gilid ng opaque na bahagi ng layer, parang malambot na kulay na halo.",
    "name": "Gradient ng Contour",
    "params": {
     "alpha": {
@@ -973,7 +973,7 @@
    }
   },
   "dissolve": {
-   "description": "Nag-aalis ng random na pixel o bloke mula sa layer. I-animate ang Lakas para sa dissolve transition; pinipili ng Seed ang pattern at itinatakda ng Size ang laki ng bawat tuldok.",
+   "description": "Nag-aalis ng random na pixel o bloke mula sa layer. I-animate ang Strength para sa dissolve transition; pinipili ng Seed ang pattern at itinatakda ng Size ang laki ng bawat tuldok.",
    "name": "Pagkatunaw",
    "params": {
     "grain": {
@@ -988,7 +988,7 @@
    }
   },
   "dots": {
-   "description": "Nagdodrowing ng random pero pantay na pattern ng malalambot na tuldok sa layer, o ginagamit ang layer bilang mask lang para sa mga tuldok.",
+   "description": "Gumuguhit ng random pero pantay na pattern ng malalambot na tuldok sa layer, o ginagamit ang layer bilang mask lang para sa mga tuldok.",
    "name": "Mga Tuldok",
    "params": {
     "alpha": {
@@ -1068,7 +1068,7 @@
    }
   },
   "echo": {
-   "description": "Nagguguhit ng mga kopya ng layer gaya ng ilang sandali ang nakalipas, sumusunod sa animation nito.",
+   "description": "Gumuguhit ng mga kopya ng layer gaya ng ilang sandali ang nakalipas, sumusunod sa animation nito.",
    "name": "Echo na keyframe",
    "params": {
     "alpha": {
@@ -1270,7 +1270,7 @@
    }
   },
   "feather": {
-   "description": "Pinapalambot ang alpha na gilid ng layer. Ang Papasok ay nagfa-fade papasok sa kasalukuyang outline; ang Blur alpha ay nagpapalawak din ng pinapalambot na gilid sa labas nito.",
+   "description": "Pinapalambot ang alpha na gilid ng layer. Ang Inward ay nagfa-fade papasok sa kasalukuyang outline; ang Blur Alpha ay nagpapalawak din ng pinapalambot na gilid sa labas nito.",
    "name": "Feather",
    "params": {
     "blur": {
@@ -1373,7 +1373,7 @@
    }
   },
   "flip": {
-   "description": "Iniikot ang layer na parang card sa 3D, kung saan ang likod ay see-through, larawan, o kulay.",
+   "description": "Iniikot ang layer na parang card sa 3D, kung saan ang likod ay transparent, larawan, o kulay.",
    "name": "I-flip ang layer",
    "params": {
     "back": {
@@ -3395,7 +3395,7 @@
    }
   },
   "rgbsplit": {
-   "description": "Hinahati ang red, green at blue channels: nananatili ang Center channel at ang dalawa pa ay lumilipat sa magkasalungat na direksyon kasunod ng Angle. Idinadagdag ng Light ang mga inilipat na kulay, pinapanatiling solid ang Dark, pinapanatili ng Mask ang kung saan nag-overlap ang tatlo, at ginagawang ng Luma ang mga fringe na kasing-opaque ng kanilang kaliwanagan.",
+   "description": "Hinahati ang red, green at blue channels: nananatili ang Center channel at ang dalawa pa ay lumilipat sa magkasalungat na direksyon kasunod ng Angle. Idinadagdag ng Light ang mga inilipat na kulay, pinapanatiling solid ang Dark, pinapanatili ng Mask ang kung saan nag-overlap ang tatlo, at ginagawang kasing-opaque ng kanilang kaliwanagan ng Luma ang mga fringe.",
    "name": "RGB Split",
    "params": {
     "angle": {
@@ -3424,7 +3424,7 @@
    }
   },
   "ribbon": {
-   "description": "Gumuguhit ng pasukot-sukot na ribbon na nagbabago ang lapad sa mga opaque na bahagi ng layer; i-animate ang Phase para dumaloy ito, o i-punch out sa layer.",
+   "description": "Gumuguhit ng pasukot-sukot na ribbon na nagbabago ang lapad sa mga opaque na bahagi ng layer; i-animate ang Phase para dumaloy ito, o i-punch out ito mula sa layer.",
    "name": "Ribbon",
    "params": {
     "angle": {
@@ -3964,7 +3964,7 @@
    }
   },
   "squeeze": {
-   "description": "Pinipisil ang gitna ng layer papasok kapag positibo ang Lakas at pinauslog ito palabas kapag negatibo ang Lakas. Pinapanatili ng Legacy ang hugis ng mas lumang proyekto.",
+   "description": "Pinipisil ang gitna ng layer papasok kapag positibo ang Lakas at pinapauslog palabas kapag negatibo ang Lakas. Pinapanatili ng Legacy ang hugis ng mas lumang proyekto.",
    "name": "Pisil",
    "params": {
     "amount": {
@@ -4497,7 +4497,7 @@
      "label": "Offset"
     },
     "random": {
-     "label": "Randomize"
+     "label": "Random"
     },
     "rotation": {
      "label": "Pag-ikot"

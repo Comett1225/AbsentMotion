@@ -15,7 +15,7 @@ AbsentMotion has no built-in music or sound library: you use the audio files on 
 
 An audio layer is named after the file and starts at the playhead. The project's length always follows the end of the last layer, so a long sound makes the project and the export longer.
 
-On the timeline an audio layer is a violet bar with its waveform. The tools are **Speed**, trim and split, **Volume**, **Presets**, **Effects**, **Voice filters** and **AI**.
+On the timeline an audio layer is a violet bar with its waveform. The tools are **Speed**, trim and split, **Volume**, **Presets**, **Effects** and **AI**. Voice filters are inside **Effects**. **AI** contains **Reduce Noise** and **Auto captions** for the selected clip.
 
 ## Volume
 
@@ -53,7 +53,7 @@ Reverb and echo keep ringing after the clip ends, for up to ten seconds, and fad
 
 ### Voice filters
 
-**Voice filters** in the tool grid shows ten voices: **Helium**, **Deep**, **Bass Boost**, **Full Voice**, **Vocal Clarity**, **Echoey**, **Ethereal**, **Underwater**, **Cheap Mic** and **Telephone**. Picking one sets a single **Voice Filter** effect on the clip, which you can then fine tune in the audio effects. Picking another voice replaces it.
+Open **Effects > Voice filters** to see ten voices: **Helium**, **Deep**, **Bass Boost**, **Full Voice**, **Vocal Clarity**, **Echoey**, **Ethereal**, **Underwater**, **Cheap Mic** and **Telephone**. Picking one sets a single **Voice Filter** effect on the clip, which you can then fine tune in the audio effects. Picking another voice replaces it.
 
 ## Reduce noise
 

@@ -220,7 +220,7 @@ class AiTools(private val context: Context, private val state: EditorState, priv
             } catch (e: ModelNotReady) {
                 message = e.message ?: AppText.get(R.string.ai_model_not_ready_default); retry = action
             } catch (e: Exception) {
-                message = e.message ?: AppText.get(R.string.ai_unable_to_process); retry = action
+                message = app.absentmotion.i18n.failureText(AppText.get(R.string.ai_unable_to_process), e); retry = action
             } catch (_: OutOfMemoryError) {
                 message = AppText.get(if (action == AiAction.Background) R.string.ai_out_of_memory_image else R.string.ai_out_of_memory_media); retry = action
             } catch (_: LinkageError) {

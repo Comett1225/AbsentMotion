@@ -26,6 +26,7 @@ data class TourFacts(
     val browsing: Boolean = false,
     val easing: Boolean = false,
     val between: Boolean = false,
+    val keypad: Boolean = false,
 ) {
     val visual: Int get() = media + texts
     val visualSelected: Boolean get() = selected != null && selected != AUDIO
@@ -43,7 +44,7 @@ data class TourFacts(
     }
 }
 
-enum class TourAction { Unselect, SamplePicture, SampleText, SampleSound, Move, Scrub, Split, Keyframes, Ease, Effect, Animation, Export }
+enum class TourAction { Pause, Unselect, SamplePicture, SampleText, SampleSound, Move, Scrub, Split, Keyframes, Ease, Effect, Animation, Export }
 
 class TourStep(
     val id: String,
@@ -61,6 +62,11 @@ class TourStep(
     @StringRes val sampleNote: Int = 0,
     val centred: Boolean = false,
     val union: Boolean = false,
+    val look: Boolean = false,
+    val moving: Boolean = false,
+    val extra: (start: TourFacts, now: TourFacts) -> List<String> = { _, _ -> emptyList() },
+    val deny: List<String> = emptyList(),
+    val free: (start: TourFacts, now: TourFacts) -> Boolean = { _, _ -> false },
 )
 
 class Tour(val steps: List<TourStep> = TourSteps.all, startAt: String? = null) {
@@ -85,6 +91,12 @@ class Tour(val steps: List<TourStep> = TourSteps.all, startAt: String? = null) {
 
     fun targets(): List<String> = step.targets(start, now)
 
+    fun allowed(): List<String> = if (step.look) emptyList() else (step.targets(start, now) + step.extra(start, now)).distinct()
+
+    fun denied(): List<String> = step.deny
+
+    fun free(): Boolean = now.keypad || step.free(start, now)
+
     @StringRes fun hint(): Int? = step.hint(start, now)
 
     fun observe(facts: TourFacts): List<TourAction> {
@@ -96,6 +108,10 @@ class Tour(val steps: List<TourStep> = TourSteps.all, startAt: String? = null) {
             if (step.prepare.isNotEmpty()) return step.prepare
         }
         val start = begun ?: facts.also { begun = it }
+        if (facts.playing && !step.moving && repairs < MAX_REPAIRS) {
+            repairs++
+            return listOf(TourAction.Pause)
+        }
         val missing = step.needs(facts)
         if (missing.isNotEmpty()) {
             if (repairs >= MAX_REPAIRS) return emptyList()
@@ -183,10 +199,11 @@ object TourSteps {
 
     val all: List<TourStep> = listOf(
         TourStep("welcome", R.string.tutorial_welcome_title, R.string.tutorial_welcome_body, 10, centred = true),
-        TourStep("screen", R.string.tutorial_screen_title, R.string.tutorial_screen_body, 10, targets = { _, _ -> listOf("playbar", "timeline") }, union = true),
+        TourStep("screen", R.string.tutorial_screen_title, R.string.tutorial_screen_body, 10, targets = { _, _ -> listOf("playbar", "timeline") }, union = true, look = true),
         TourStep(
             "picture", R.string.tutorial_picture_title, R.string.tutorial_picture_body, 25,
-            targets = { _, n -> pick(n, listOf("add_panel")) },
+            targets = { _, n -> pick(n, listOf("add_tab_media", "add_media")) },
+            union = true,
             hint = { _, n -> unselectHint(n) },
             done = { s, n -> n.media > s.media },
             doIt = listOf(TourAction.SamplePicture),
@@ -195,7 +212,8 @@ object TourSteps {
         ),
         TourStep(
             "gestures", R.string.tutorial_gestures_title, R.string.tutorial_gestures_body, 20,
-            targets = { _, n -> if (n.selected == TourFacts.MEDIA) listOf("preview") else listOf("timeline") },
+            targets = { _, n -> if (n.selected == TourFacts.MEDIA) listOf("preview") else listOf("clip_media") },
+            deny = listOf("transition", "animate", "side_panel"),
             hint = { _, n -> if (n.selected != TourFacts.MEDIA) R.string.tutorial_hint_select else null },
             done = { s, n -> n.moves != s.moves && n.media > 0 },
             doIt = listOf(TourAction.Move),
@@ -203,8 +221,9 @@ object TourSteps {
         ),
         TourStep(
             "timeline", R.string.tutorial_timeline_title, R.string.tutorial_timeline_body, 15,
-            targets = { _, _ -> listOf("playbar", "timeline") },
+            targets = { _, _ -> listOf("timeline", "play", "skip_back", "skip_forward") },
             union = true,
+            moving = true,
             done = { s, n -> abs(n.frame - s.frame) >= 3 || n.playing },
             doIt = listOf(TourAction.Scrub),
             needs = { if (it.media == 0) listOf(TourAction.SamplePicture) else emptyList() },
@@ -213,19 +232,20 @@ object TourSteps {
             "split", R.string.tutorial_split_title, R.string.tutorial_split_body, 20,
             targets = { _, n ->
                 when {
-                    n.selected != TourFacts.MEDIA -> listOf("timeline")
+                    n.selected != TourFacts.MEDIA -> listOf("clip_media")
                     n.panel != TourFacts.TOOLS -> listOf("back")
-                    else -> listOf("tool_split", "tools")
+                    else -> listOf("tool_split")
                 }
             },
+            extra = { _, n -> if (n.selected == TourFacts.MEDIA && n.panel == TourFacts.TOOLS) listOf("ruler") else emptyList() },
             hint = { _, n -> if (n.selected != TourFacts.MEDIA) R.string.tutorial_hint_select else if (n.panel != TourFacts.TOOLS) R.string.tutorial_hint_tools else null },
-            done = { s, n -> n.media > s.media || n.mediaMs < s.mediaMs },
+            done = { s, n -> n.media > s.media },
             doIt = listOf(TourAction.Split),
             needs = { if (it.media == 0) listOf(TourAction.SamplePicture) else emptyList() },
         ),
         TourStep(
             "text", R.string.tutorial_text_title, R.string.tutorial_text_body, 25,
-            targets = { _, n -> if (n.textEditing) listOf("text_field") else pick(n, listOf("add_panel")) },
+            targets = { _, n -> if (n.textEditing) listOf("text_field", "text_done") else pick(n, listOf("add_text")) },
             hint = { _, n -> if (n.textEditing) null else unselectHint(n) },
             done = { s, n -> n.texts > s.texts && !n.textEditing },
             doIt = listOf(TourAction.SampleText),
@@ -235,9 +255,9 @@ object TourSteps {
             "keyframes", R.string.tutorial_keyframes_title, R.string.tutorial_keyframes_body, 30,
             targets = { s, n ->
                 when {
-                    !n.visualSelected -> listOf("timeline")
-                    n.panel == TourFacts.TRANSFORM -> if (n.keyframes > s.keyframes) listOf("timeline") else listOf("keyframe")
-                    n.panel == TourFacts.TOOLS -> listOf("tool_transform", "tools")
+                    !n.visualSelected -> listOf("clip")
+                    n.panel == TourFacts.TRANSFORM -> if (n.keyframes > s.keyframes) listOf("ruler", "pad") else listOf("keyframe")
+                    n.panel == TourFacts.TOOLS -> listOf("tool_transform")
                     else -> listOf("back")
                 }
             },
@@ -257,13 +277,14 @@ object TourSteps {
             "easing", R.string.tutorial_easing_title, R.string.tutorial_easing_body, 15,
             targets = { _, n ->
                 when {
-                    !n.visualSelected -> listOf("timeline")
+                    !n.visualSelected -> listOf("clip")
                     n.easing -> listOf("panel")
-                    n.panel == TourFacts.TRANSFORM -> if (n.between) listOf("easing") else listOf("timeline")
-                    n.panel == TourFacts.TOOLS -> listOf("tool_transform", "tools")
+                    n.panel == TourFacts.TRANSFORM -> if (n.between) listOf("easing") else listOf("ruler")
+                    n.panel == TourFacts.TOOLS -> listOf("tool_transform")
                     else -> listOf("back")
                 }
             },
+            extra = { _, n -> if (n.visualSelected && !n.easing && n.panel == TourFacts.TRANSFORM) listOf("ruler") else emptyList() },
             hint = { _, n ->
                 when {
                     !n.visualSelected -> R.string.tutorial_hint_select
@@ -281,12 +302,13 @@ object TourSteps {
             targets = { _, n ->
                 when {
                     n.browsing -> emptyList()
-                    !n.visualSelected -> listOf("timeline")
+                    !n.visualSelected -> listOf("clip")
                     n.panel == TourFacts.EFFECTS -> listOf("panel")
-                    n.panel == TourFacts.TOOLS -> listOf("tool_effects", "tools")
+                    n.panel == TourFacts.TOOLS -> listOf("tool_effects")
                     else -> listOf("back")
                 }
             },
+            free = { _, n -> n.browsing },
             hint = { s, n ->
                 when {
                     n.browsing -> null
@@ -303,7 +325,7 @@ object TourSteps {
         ),
         TourStep(
             "motion", R.string.tutorial_motion_title, R.string.tutorial_motion_body, 20,
-            targets = { _, n -> if (n.visualSelected && n.panel == TourFacts.TOOLS) listOf("animate") else if (n.visualSelected) listOf("back") else listOf("timeline") },
+            targets = { _, n -> if (n.visualSelected && n.panel == TourFacts.TOOLS) listOf("animate") else if (n.visualSelected) listOf("back") else listOf("clip") },
             hint = { _, n -> selectHint(n) },
             done = { s, n -> n.motions > s.motions },
             doIt = listOf(TourAction.Animation),
@@ -311,7 +333,8 @@ object TourSteps {
         ),
         TourStep(
             "sound", R.string.tutorial_sound_title, R.string.tutorial_sound_body, 20,
-            targets = { _, n -> pick(n, listOf("add_panel")) },
+            targets = { _, n -> pick(n, listOf("add_tab_audio", "add_audio")) },
+            union = true,
             hint = { _, n -> unselectHint(n) },
             done = { s, n -> n.audio > s.audio },
             doIt = listOf(TourAction.SampleSound),
@@ -320,18 +343,20 @@ object TourSteps {
         ),
         TourStep(
             "undo", R.string.tutorial_undo_title, R.string.tutorial_undo_body, 15,
-            targets = { _, _ -> listOf("playbar") },
+            targets = { _, _ -> listOf("undo", "redo") },
+            union = true,
             done = { s, n -> n.undoMark >= s.undoMark + 2 },
         ),
         TourStep(
             "safety", R.string.tutorial_safety_title, R.string.tutorial_safety_body, 12,
             targets = { _, n -> if (n.selected != null) listOf("back") else listOf("gear") },
-            hint = { _, n -> if (n.selected != null) R.string.tutorial_hint_unselect else null },
+            look = true,
             prepare = listOf(TourAction.Unselect),
         ),
         TourStep(
             "export", R.string.tutorial_export_title, R.string.tutorial_export_body, 15,
             targets = { _, n -> if (n.exporting) emptyList() else if (n.selected != null) listOf("back") else listOf("export") },
+            free = { _, n -> n.exporting },
             hint = { _, n -> if (n.exporting) R.string.tutorial_hint_export_close else if (n.selected != null) R.string.tutorial_hint_unselect else null },
             stage = { _, n -> n.exporting },
             done = { _, n -> !n.exporting },

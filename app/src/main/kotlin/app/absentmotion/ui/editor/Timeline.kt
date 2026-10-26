@@ -1,6 +1,8 @@
 package app.absentmotion.ui.editor
 
+import app.absentmotion.ui.tutorial.tutorialGuard
 import app.absentmotion.model.Scene
+import app.absentmotion.model.shownName
 import app.absentmotion.model.defaultCameraId
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.animation.core.Animatable
@@ -107,6 +109,9 @@ import app.absentmotion.model.KeyScope
 import app.absentmotion.model.withKeyframesMoved
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Motion
+import app.absentmotion.ui.tutorial.TourFacts
+import app.absentmotion.ui.tutorial.kindOf
+import app.absentmotion.ui.tutorial.tutorialRegion
 import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.floor
@@ -256,6 +261,9 @@ fun Timeline(state: EditorState, modifier: Modifier = Modifier) {
                 view.finishWheelScrub()
             })
             .onSizeChanged { view.size = it }
+            .tutorialRegion("ruler") { listOf(Rect(0f, 0f, view.size.width.toFloat(), view.rulerH)) }
+            .tutorialRegion("clip") { view.clipRows(media = false) }
+            .tutorialRegion("clip_media") { view.clipRows(media = true) }
             .pointerInput(view) { timelineGestures(view) { if (state.settings.vibration) haptic.performHapticFeedback(HapticFeedbackType.LongPress) } }
             .drawBehind { drawTimeline(view, measurer, eye, eyeOff, outline, mediaPictures, proxies, appear.value) },
     ) {
@@ -276,12 +284,12 @@ private fun RowSemantics(view: TimelineView) {
             val layer = view.layerAt(row) ?: continue
             key(layer.id) {
                 val chosen = layer.id == view.state.selectedId || layer.id in MultiSelect.ids
-                Box(Modifier.offset { IntOffset(0, (view.rowTop(row) - view.rulerH).roundToInt()) }.fillMaxWidth().height(RowHeight).semantics {
-                    contentDescription = layer.label.ifEmpty { layer.kind }
+                Box(Modifier.offset { IntOffset(0, (view.rowTop(row) - view.rulerH).roundToInt()) }.fillMaxWidth().height(RowHeight).tutorialGuard(any = true).semantics {
+                    contentDescription = layer.shownName()
                     selected = chosen
                     if (layer.hidden) stateDescription = hidden
                     onClick(select) { view.tap(Hit.Header(layer.id)); true }
-                    customActions = listOf(CustomAccessibilityAction(if (layer.hidden) show else hide) { view.state.toggleHidden(layer.id); true })
+                    customActions = if (app.absentmotion.ui.tutorial.Tutorial.running) emptyList() else listOf(CustomAccessibilityAction(if (layer.hidden) show else hide) { view.state.toggleHidden(layer.id); true })
                 })
             }
         }
@@ -532,6 +540,21 @@ private class TimelineView(val state: EditorState, density: Density, private val
     private fun rowAt(y: Float): Int = floor((y - rulerH + scroll) / rowH).toInt()
 
     fun visibleRows(): IntRange = TimelineMath.visibleRows(layers.size, rowH, rulerH, rowsBottom, scroll)
+
+    fun clipRows(media: Boolean): List<Rect> {
+        val time = timeScale()
+        val from = HeaderWidth.px
+        val to = size.width.toFloat()
+        return visibleRows().mapNotNull { row ->
+            val layer = layerAt(row) ?: return@mapNotNull null
+            val kind = kindOf(layer)
+            val top = maxOf(rowTop(row), rulerH)
+            val bottom = minOf(rowTop(row) + rowH, rowsBottom)
+            val left = maxOf(time.x(layer.startTime.toFloat()), from)
+            val right = minOf(time.x(layer.endTime + 1f), to)
+            if (bottom > top && right > left && (kind == TourFacts.MEDIA || !media && kind == TourFacts.TEXT)) Rect(left, top, right, bottom) else null
+        }
+    }
 
     fun stripWindow(): StripWindow {
         val time = timeScale()
@@ -1197,7 +1220,7 @@ private fun DrawScope.drawRow(
     if (layer.kind == "audio") drawAudioBar(outline, layer, left, right, barTop, barBottom, time.pxPerMs)
     else drawBar(outline, left, right, barTop, barBottom, stripe, picture, layer.startTime, time.pxPerMs, layer.kind == "text", layer.kind == "camera")
     layer.labelColour?.let { drawTagCorner(outline, left, barTop, (barBottom - barTop) / 2, Color(it.start)) }
-    drawLabel(layer.label, measurer, left, right, barTop, barBottom, if (layer.kind == "audio") LabelStyle.copy(color = Am.OnAudioBar) else LabelStyle)
+    drawLabel(layer.shownName(), measurer, left, right, barTop, barBottom, if (layer.kind == "audio") LabelStyle.copy(color = Am.OnAudioBar) else LabelStyle)
     drawKeyframes(keyFrames, scene, selected, frame, time, left, right, centre, outline, appear, held)
     if (selected) {
         drawGrip(outline, left, barTop, barBottom, start = true, appear, limit == true)

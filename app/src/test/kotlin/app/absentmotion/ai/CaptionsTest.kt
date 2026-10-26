@@ -1,5 +1,8 @@
 package app.absentmotion.ai
 
+import app.absentmotion.audio.AudioClip
+import app.absentmotion.model.Layer
+import app.absentmotion.model.XmlNode
 import app.absentmotion.model.Scene
 import app.absentmotion.model.StyleColors
 import app.absentmotion.model.borders
@@ -136,6 +139,45 @@ class CaptionsTest {
         assertTrue(scene.captionLayers(chunks, CaptionStyle(outline = false)) { _, s -> s }.all { it.borders.isEmpty() })
         val again = layers.fold(scene) { s, l -> s.add(l) }.captionLayers(chunks.take(1), CaptionStyle(), { "Caption $it" }) { _, s -> s }
         assertEquals("Caption 4", again.single().label)
+    }
+
+    @Test fun selectedClipKeepsItsTrimSpeedAndProjectPlacementWithoutOtherSound() {
+        val clip = Layer(XmlNode("audio", linkedMapOf("id" to "1", "src" to "voice.m4a", "startTime" to "5000", "endTime" to "7999",
+            "inTime" to "2000", "outTime" to "8000", "speed" to "2", "hidden" to "true"),
+            listOf(XmlNode("gain", mapOf("value" to "0")))))
+        val other = Layer(XmlNode("audio", linkedMapOf("id" to "2", "src" to "music.m4a", "startTime" to "0", "endTime" to "19999")))
+        val scene = Scene.create("captions", 1080, 1920, 30, 0).add(clip).add(other)
+        val selected = scene.captionInput(1)
+        assertEquals(5000, selected.startMs)
+        assertEquals(8000, selected.endMs)
+        assertEquals(listOf(1L), selected.scene.layers.map { it.id })
+        val source = selected.scene.layers.single()
+        assertTrue(!source.hidden)
+        assertEquals(null, source.node.child("gain"))
+        assertEquals("2000", source.node["inTime"])
+        assertEquals("8000", source.node["outTime"])
+        val expected = AudioClip(clip, "voice.m4a")
+        val actual = AudioClip(source, "voice.m4a")
+        for (ms in listOf(5000.0, 6000.0, 7999.0)) assertEquals(expected.mediaAt(ms), actual.mediaAt(ms), 0.0)
+        assertEquals(scene, scene.captionInput(null).scene)
+        assertTrue(runCatching { scene.captionInput(999) }.isFailure)
+        assertTrue(scene.layer(1)!!.hidden)
+    }
+
+    @Test fun captionTimeEstimateUsesSecondsAndWaitsForMeasuredProgress() {
+        assertEquals(null, app.absentmotion.ui.editor.captionRemainingSeconds(0, 0f))
+        assertEquals(null, app.absentmotion.ui.editor.captionRemainingSeconds(1000, 0.25f))
+        assertEquals(6L, app.absentmotion.ui.editor.captionRemainingSeconds(2000, 0.25f))
+        assertEquals(1L, app.absentmotion.ui.editor.captionRemainingSeconds(2000, 0.9f))
+        assertEquals(null, app.absentmotion.ui.editor.captionRemainingSeconds(2000, Float.NaN))
+        assertEquals(null, app.absentmotion.ui.editor.captionRemainingSeconds(2000, 1f))
+    }
+
+    @Test fun bothCaptionDownloadsStayBelowOneHundredMegabytes() {
+        assertTrue(CaptionModel.bytes(false) < 100_000_000)
+        assertTrue(CaptionModel.bytes(true) < 100_000_000)
+        assertTrue(CaptionModel.bytes(true) > CaptionModel.bytes(false))
+        assertEquals("ggml-base-q8_0.bin", CaptionModel.name(true))
     }
 
     @Test fun theCaptionModelIsKeptOnlyWhenItsSha256Matches() {

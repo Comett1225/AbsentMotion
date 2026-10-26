@@ -1,5 +1,7 @@
 package app.absentmotion.media
 
+import app.absentmotion.R
+import app.absentmotion.i18n.AppText
 import app.absentmotion.model.Scene
 import app.absentmotion.model.imageUris
 import app.absentmotion.model.mediaUris
@@ -179,14 +181,14 @@ class ModelReaderTest {
             GltfReader.read(gltf(buffer, nodes).toByteArray(), { null }, limit = 299)
             fail("read")
         } catch (e: IllegalArgumentException) {
-            assertEquals("The model is too complex", e.message)
+            assertEquals(AppText.get(R.string.model_err_too_complex), e.message)
         }
         val huge = gltf(buffer).replace(""""count":3,"type":"VEC3"""", """"count":2000000000,"type":"VEC3"""")
         try {
             GltfReader.read(huge.toByteArray(), { null })
             fail("read")
         } catch (e: IllegalArgumentException) {
-            assertEquals("The model is too complex", e.message)
+            assertEquals(AppText.get(R.string.model_err_too_complex), e.message)
         }
     }
 
@@ -258,7 +260,7 @@ class ModelReaderTest {
             ObjReader.read(cube, ::files, limit = 35)
             fail("read")
         } catch (e: IllegalArgumentException) {
-            assertEquals("The model is too complex", e.message)
+            assertEquals(AppText.get(R.string.model_err_too_complex), e.message)
         }
     }
 }

@@ -1,5 +1,6 @@
 package app.absentmotion.ui.editor
 
+import app.absentmotion.ui.tutorial.tutorialGuard
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
@@ -41,7 +42,7 @@ internal fun BarButton(
     onClick: () -> Unit = {},
 ) {
     Box(
-        modifier.alpha(if (enabled) 1f else DimAlpha).then(
+        modifier.tutorialGuard().alpha(if (enabled) 1f else DimAlpha).then(
             if (!enabled) Modifier else if (onLongClick == null) Modifier.clickable(onClick = onClick) else Modifier.combinedClickable(onLongClick = onLongClick, onClick = onClick),
         ),
         contentAlignment = Alignment.Center,

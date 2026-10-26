@@ -305,9 +305,46 @@ def rewrite(found, write):
         print('Dry run: nothing was changed. Run again with --write to apply, then translate the new keys and run check.')
 
 
+def coverage_problems(tags):
+    from i18n_translate import QUANTITIES, effect_units, flatten_effect_asset, read_resources
+    english, _ = read_resources(strings_file('values'))
+    units = effect_units()
+    sources = dict(english, **{key: value[0] for key, value in units.items()})
+    state_path = ROOT / 'tools/i18n_source.json'
+    state = json.loads(state_path.read_text(encoding='utf-8')) if state_path.is_file() else {}
+    problems = []
+    stale = sorted(key for key, value in sources.items() if key not in state or state[key] != value)
+    if stale:
+        problems.append(f'English source snapshot: {len(stale)} changed or unrecorded translation units: ' + ', '.join(stale))
+    for tag in tags:
+        folder = FOLDERS.get(tag)
+        if folder is None or folder == 'values':
+            continue
+        local, _ = read_resources(strings_file(folder))
+        for key, value in english.items():
+            if key not in local:
+                continue
+            translated = local[key]
+            if isinstance(value, dict):
+                if not isinstance(translated, dict):
+                    problems.append(f'{folder}: {key}: a plural resource is required')
+                    continue
+                missing = sorted(set(QUANTITIES.get(tag, ['other'])) - set(translated))
+                if missing:
+                    problems.append(f'{folder}: {key}: missing plural forms: ' + ', '.join(missing))
+            elif not isinstance(translated, str):
+                problems.append(f'{folder}: {key}: a string resource is required')
+        asset = EFFECTS / 'i18n' / f'{tag}.json'
+        effects = flatten_effect_asset(json.loads(asset.read_text(encoding='utf-8')), units) if asset.is_file() else {}
+        missing = sorted(key for key in units if not isinstance(effects.get(key), str) or not effects[key].strip())
+        if missing:
+            problems.append(f'{tag}: {len(missing)} missing effect translation units: ' + ', '.join(missing))
+    return problems
+
+
 def check():
     english = read_strings(strings_file('values'))
-    problems, warnings = [], []
+    problems = []
     config = RES / 'xml/locales_config.xml'
     tags = re.findall(r'android:name="([^"]+)"', config.read_text(encoding='utf-8')) if config.is_file() else list(FOLDERS)
     for tag in tags:
@@ -325,7 +362,7 @@ def check():
         missing = sorted(names - local_names)
         extra = sorted(local_names - names)
         if missing:
-            warnings.append(f'warning: {folder}: {len(missing)} not translated yet, English is shown: ' + ', '.join(missing))
+            problems.append(f'{folder}: {len(missing)} missing translations: ' + ', '.join(missing))
         if extra:
             problems.append(f'{folder}: {len(extra)} not in English: ' + ', '.join(extra))
         for key in sorted(k for k in local if k.split('#')[0] in names):
@@ -342,9 +379,13 @@ def check():
                 problems.append(f'{folder}: {key}: unescaped apostrophe')
             if not local[key].strip():
                 problems.append(f'{folder}: {key}: empty')
-    for line in warnings + problems:
+    try:
+        problems.extend(coverage_problems(tags))
+    except (OSError, ValueError, TypeError, KeyError, AttributeError) as failure:
+        problems.append(f'Translation coverage could not be checked: {failure}')
+    for line in problems:
         print(line)
-    summary = 'all present.' if not problems and not warnings else f'{len(problems)} problem(s), {len(warnings)} language(s) with untranslated text.'
+    summary = 'all present.' if not problems else f'{len(problems)} problem(s).' 
     print(f'{len({k.split("#")[0] for k in english})} keys in English, {len(tags)} languages: ' + summary)
     return 1 if problems else 0
 
@@ -361,6 +402,59 @@ def report(found, as_json):
         total += len(rows)
         auto += sum(r['rewrite'] for r in rows)
     print(f'\n{total} user-visible strings in {len(found)} files; {auto} marked * can be rewritten automatically (rewrite --write).')
+
+
+def coverage_selftest():
+    import contextlib
+    import io
+    import tempfile
+    from unittest.mock import patch
+    import i18n_translate
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory)
+        res = root / 'res'
+        effects = root / 'effects'
+        (res / 'values').mkdir(parents=True)
+        (res / 'values-in').mkdir()
+        (res / 'xml').mkdir()
+        (effects / 'i18n').mkdir(parents=True)
+        (root / 'tools').mkdir()
+        english = '<resources><string name="hello">Hello</string><plurals name="clips"><item quantity="other">%1$s clips</item></plurals></resources>'
+        translated = '<resources><string name="hello">Halo</string><plurals name="clips"><item quantity="other">%1$s klip</item></plurals></resources>'
+        (res / 'values/strings.xml').write_text(english, encoding='utf-8')
+        local = res / 'values-in/strings.xml'
+        local.write_text(translated, encoding='utf-8')
+        (res / 'xml/locales_config.xml').write_text('<locale-config><locale android:name="en"/><locale android:name="id"/></locale-config>', encoding='utf-8')
+        units = {'fx:test:name': ('Test', 'effect name'), 'fx:test:mode:option0': ('First', 'option')}
+        asset = effects / 'i18n/id.json'
+        good_effects = {'effects': {'test': {'name': 'Uji', 'params': {'mode': {'options': ['Pertama']}}}}}
+        asset.write_text(json.dumps(good_effects), encoding='utf-8')
+        snapshot = {'hello': 'Hello', 'clips': {'other': '%1$s clips'}, 'fx:test:name': 'Test', 'fx:test:mode:option0': 'First'}
+        state = root / 'tools/i18n_source.json'
+        state.write_text(json.dumps(snapshot), encoding='utf-8')
+        def result():
+            output = io.StringIO()
+            with contextlib.redirect_stdout(output):
+                code = check()
+            return code, output.getvalue()
+        with patch.dict(globals(), ROOT=root, RES=res, EFFECTS=effects), patch.object(i18n_translate, 'effect_units', return_value=units), patch('urllib.request.urlopen', side_effect=AssertionError('translation checks must remain offline')):
+            assert result()[0] == 0, result()
+            local.write_text(translated.replace('<string name="hello">Halo</string>', ''), encoding='utf-8')
+            code, output = result()
+            assert code == 1 and 'missing translations' in output and 'hello' in output, output
+            local.write_text(translated, encoding='utf-8')
+            state.write_text(json.dumps(dict(snapshot, hello='Old greeting')), encoding='utf-8')
+            code, output = result()
+            assert code == 1 and 'changed or unrecorded' in output and 'hello' in output, output
+            state.write_text(json.dumps(snapshot), encoding='utf-8')
+            asset.write_text(json.dumps({'effects': {'test': {'name': 'Uji'}}}), encoding='utf-8')
+            code, output = result()
+            assert code == 1 and 'missing effect translation units' in output and 'option0' in output, output
+            asset.write_text(json.dumps(good_effects), encoding='utf-8')
+            with patch.dict(i18n_translate.QUANTITIES, id=['one', 'other']):
+                code, output = result()
+                assert code == 1 and 'missing plural forms: one' in output, output
+            assert result()[0] == 0, result()
 
 
 def selftest():
@@ -387,6 +481,7 @@ def selftest():
     assert xml_unescape(xml_escape("It's 100% <ok>\nnext")) == "It's 100% <ok>\nnext"
     assert add_imports('package app.absentmotion.ui\n\nimport a.B\n\nfun x() {}') == \
         'package app.absentmotion.ui\n\nimport a.B\n' + '\n'.join(REWRITE_IMPORTS) + '\n\nfun x() {}'
+    coverage_selftest()
     print('selftest ok')
 
 

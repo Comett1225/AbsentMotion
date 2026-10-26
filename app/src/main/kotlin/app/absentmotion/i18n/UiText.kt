@@ -44,3 +44,8 @@ object AppText {
 
     fun get(text: UiText): String = context?.let(text::resolve) ?: "#${text.id}"
 }
+
+fun failureText(summary: String, failure: Throwable): String {
+    val detail = failure.message?.trim().orEmpty()
+    return if (detail.isEmpty() || detail == summary) summary else "$summary\n$detail"
+}

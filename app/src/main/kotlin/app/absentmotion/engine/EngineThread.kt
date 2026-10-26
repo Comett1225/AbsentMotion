@@ -60,6 +60,7 @@ class EngineThread(private val background: Int, context: Context? = null) {
     private val mediaScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     val fonts = context?.let { FontLibrary(it) }
     private var fontJob: Job? = null
+    private var effectLabelsJob: Job? = null
     private var fontNames = emptyList<String>()
     private val media = context?.let { MediaLibrary(it, this) }
     private val videos = context?.let { VideoLibrary(it, this) }
@@ -72,6 +73,16 @@ class EngineThread(private val background: Int, context: Context? = null) {
     @Volatile private var playing = false
     private val effectCatalog = MutableStateFlow(EffectCatalog(message = AppText.get(R.string.engine_loading_effects)))
     val effects = effectCatalog.asStateFlow()
+
+    fun relabelEffects(context: Context) {
+        effectLabelsJob?.cancel()
+        val local = context.createConfigurationContext(android.content.res.Configuration(context.resources.configuration))
+        effectLabelsJob = mediaScope.launch {
+            effectJob?.join()
+            val labels = EffectCatalog.read(local)
+            withContext(dispatcher) { if (!closed) effectCatalog.value = labels.withRuntimeStatusFrom(effectCatalog.value) }
+        }
+    }
 
     suspend fun effectCheck(directory: File) {
         effectJob?.join()
@@ -105,7 +116,7 @@ class EngineThread(private val background: Int, context: Context? = null) {
     }
 
     @Volatile private var closed = false
-    private var mediaJob: Job? = null
+    @Volatile private var mediaJob: Job? = null
     @Volatile private var mediaScene: Scene? = null
     private val pictureRevision = MutableStateFlow(0L)
     val mediaRevision = pictureRevision.asStateFlow()
@@ -235,7 +246,7 @@ class EngineThread(private val background: Int, context: Context? = null) {
             videos?.update(next, requestedView?.timeMs ?: 0, playing)
             if (previous?.node?.imageUris() != next.node.imageUris() || previous.node.modelUris() != next.node.modelUris() || previous.media != next.media) {
                 mediaJob?.cancel()
-                mediaJob = mediaScope.launch { media.update(next) }
+                mediaJob = mediaScope.launch { media.update(next) }.also { loading -> loading.invokeOnCompletion { requestRender() } }
             }
         }
         requestRender()
@@ -244,7 +255,7 @@ class EngineThread(private val background: Int, context: Context? = null) {
     fun refreshMedia() {
         val next = mediaScene ?: return
         mediaJob?.cancel()
-        mediaJob = mediaScope.launch { media?.update(next); videos?.retry() }
+        mediaJob = mediaScope.launch { media?.update(next); videos?.retry() }.also { loading -> loading.invokeOnCompletion { requestRender() } }
     }
 
     suspend fun awaitMedia() {
@@ -342,6 +353,8 @@ class EngineThread(private val background: Int, context: Context? = null) {
         }) renderPosted.set(false)
     }
 
+    internal fun videoFrameReady() = requestRender()
+
     private fun applyPending() {
         if (closed || capturing) return
         pendingView.getAndSet(null)?.let { (next, serial) -> view = next; shownSerial = serial }
@@ -379,10 +392,11 @@ class EngineThread(private val background: Int, context: Context? = null) {
     }
 
     private fun renderNow() {
-        if (closed || capturing) return
+        if (closed || capturing || mediaJob?.isActive == true) return
         try {
             applyPending()
             val v = view ?: return
+            if (mediaScene?.let { videos?.previewReady(it, v.timeMs, playing) == false } == true) return
             if (target != 0L) {
                 val native = engine()
                 val started = System.nanoTime()
@@ -395,6 +409,31 @@ class EngineThread(private val background: Int, context: Context? = null) {
             }
         } catch (e: Exception) {
             if (!closed) Log.e("AMEngine", "preview rendering failed", e)
+        }
+    }
+
+    suspend fun capturePreviewFrame(document: Scene, timeMs: Int, width: Int, height: Int, accurateBlur: Boolean,
+                                    accept: () -> Boolean): ByteArray? {
+        if (closed || playing || mediaJob?.isActive == true || fontJob?.isActive == true || effectJob?.isActive == true || !accept() || !captureLock.tryLock()) return null
+        try {
+            return withContext(dispatcher) {
+                if (closed || capturing || playing || target == 0L || mediaScene != document || !accept()) return@withContext null
+                applyPending()
+                if (videos?.previewReady(document, timeMs, false) == false) return@withContext null
+                capturing = true
+                try {
+                    prepareTextTime(timeMs)
+                    val started = System.nanoTime()
+                    engine().previewStill(timeMs.toDouble(), width, height, accurateBlur).also { lastStillMs = (System.nanoTime() - started) / 1e6 }
+                } finally {
+                    capturing = false
+                    prepareTextTime(requestedView?.timeMs ?: 0)
+                    renderNow()
+                }
+            }
+        } finally {
+            captureLock.unlock()
+            videos?.resumePreview()
         }
     }
 
@@ -489,6 +528,9 @@ class EngineThread(private val background: Int, context: Context? = null) {
     inner class ExportSession internal constructor(private val document: Scene, private val smoothing: Smoothing, private val fps: Int) {
         suspend fun still(timeMs: Int, width: Int, height: Int): ByteArray? =
             atFrame(document, timeMs, smoothing, fps) { engine().still(timeMs.toDouble(), width, height) }
+
+        suspend fun previewStill(timeMs: Int, width: Int, height: Int, accurateBlur: Boolean): ByteArray? =
+            atFrame(document, timeMs, smoothing, fps) { engine().previewStill(timeMs.toDouble(), width, height, accurateBlur) }
 
         suspend fun attach(surface: Surface): Long = withContext(dispatcher) { engine().attach(surface, forEncoder = true) }
 

@@ -520,7 +520,7 @@
    }
   },
   "colorize": {
-   "description": "Katmanın tamamını açık ve koyu tonlarını koruyarak tek bir renk tonuyla renklendirir.",
+   "description": "Katmanın tamamını, açık ve koyu tonlarını koruyarak tek bir renk tonuyla renklendirir.",
    "name": "Renklendir",
    "params": {
     "amount": {
@@ -532,7 +532,7 @@
    }
   },
   "colorwheels": {
-   "description": "Gölgeler (lift), orta tonlar (gamma) ve vurgular (gain) için renk tekerlekleri: bir renk tonu, itme miktarı ve seviye.",
+   "description": "Gölgeler (lift), orta tonlar (gama) ve vurgular (gain) için renk tekerlekleri: bir renk tonu, itme miktarı ve seviye.",
    "name": "Kaldır Gama Kazanç",
    "params": {
     "gainAmount": {
@@ -757,13 +757,13 @@
      "label": "Konum"
     },
     "rotX": {
-     "label": "X rotasyonu"
+     "label": "X Dönüşü"
     },
     "rotY": {
-     "label": "Y rotasyonu"
+     "label": "Y Dönüşü"
     },
     "rotZ": {
-     "label": "Z rotasyonu"
+     "label": "Z Dönüşü"
     },
     "scale": {
      "label": "Ölçek"
@@ -828,13 +828,13 @@
      "label": "Yarıçap"
     },
     "rotX": {
-     "label": "X rotasyonu"
+     "label": "X Dönüşü"
     },
     "rotY": {
-     "label": "Y rotasyonu"
+     "label": "Y Dönüşü"
     },
     "rotZ": {
-     "label": "Z rotasyonu"
+     "label": "Z Dönüşü"
     },
     "scale": {
      "label": "Ölçek"
@@ -872,7 +872,7 @@
    }
   },
   "datamosh": {
-   "description": "Başlangıç ve bitiş zamanları arasında, katmanın başından itibaren saniye cinsinden, görüntü yenilenmeyi durdurur ve sanki bir anahtar kare eksikmiş gibi ardından gelen hareketle sürüklenir. Video katmanları gerçek hareketleriyle bulanıklaşır, diğer katmanlar ise hareket eden bloklarla.",
+   "description": "Başlangıç ve bitiş zamanları arasında (katmanın başından itibaren saniye cinsinden) görüntü yenilenmeyi durdurur ve sanki bir anahtar kare eksikmiş gibi ardından gelen hareketle sürüklenir. Video katmanları gerçek hareketleriyle bulanıklaşır, diğer katmanlar ise hareket eden bloklarla.",
    "name": "Datamosh",
    "params": {
     "block": {
@@ -973,7 +973,7 @@
    }
   },
   "dissolve": {
-   "description": "Katmandan rastgele pikseller veya bloklar kaldırır. Çözünme geçişi için Güç'ü canlandırın; Tohum deseni seçer, Boyut ise her beneğin boyutunu ayarlar.",
+   "description": "Katmandan rastgele pikseller veya bloklar kaldırır. Çözünme geçişi için Güç'ü canlandırın; Tohum deseni seçer, Boyut ise her beneğin boyutunu belirler.",
    "name": "Dağılma",
    "params": {
     "grain": {
@@ -1662,7 +1662,7 @@
      "label": "Karışım",
      "options": [
       "Normal",
-      "Çoğalt",
+      "Çarpma",
       "Ekran",
       "Kaplama",
       "Yumuşak Işık",
@@ -2151,7 +2151,7 @@
    }
   },
   "lensblur": {
-   "description": "Merkezin etrafında keskin bir alan bırakan ve kenarlara doğru artan dönen bir bulanıklık.",
+   "description": "Merkezin çevresinde keskin bir alan bırakan ve kenarlara doğru artan dönen bir bulanıklık.",
    "name": "Lens Bulanıklığı",
    "params": {
     "center": {
@@ -2751,7 +2751,7 @@
    }
   },
   "palettemap": {
-   "description": "Her pikseli en fazla sekiz renkli bir paletteki en yakın renge eşler. Alfa, eşlenen renkleri orijinal katmanla karıştırır.",
+   "description": "Her pikseli en fazla sekiz renkli bir paletin en yakın rengine eşler. Alfa, eşlenen renkleri orijinal katmanla karıştırır.",
    "name": "Palet eşleme",
    "params": {
     "alpha": {
@@ -2790,7 +2790,7 @@
    }
   },
   "pixelate": {
-   "description": "Katmanı, her biri blok ortasından alınan tek renkten oluşan bloklara çevirir; ızgara katman (Ekran Alanı ile kare) merkezindedir. Uzatma, Ofset ve Açı ızgarayı şekillendirir, Vinyet her bloğu kenarlarına doğru karartır.",
+   "description": "Katmanı, her biri blok ortasından alınan tek renkten oluşan bloklara çevirir; ızgara katmanın (Ekran Alanı ile karenin) merkezindedir. Esnetme, Ofset ve Açı ızgarayı şekillendirir, Vinyet her bloğu kenarlarına doğru karartır.",
    "name": "Pikselleştir",
    "params": {
     "angle": {
@@ -2978,7 +2978,7 @@
    }
   },
   "radialblur": {
-   "description": "Bir merkez noktadan çıkan ışınlar boyunca örnekleri ortalamayla, ayarlanabilir güçte radyal yakınlaştırma bulanıklığı uygular.",
+   "description": "Bir merkez noktadan çıkan ışınlar boyunca örnekleri ortalayarak, ayarlanabilir güçte radyal yakınlaştırma bulanıklığı uygular.",
    "name": "Yakınlaştırma Bulanıklığı",
    "params": {
     "amount": {
@@ -3175,7 +3175,7 @@
    }
   },
   "rasterextrude": {
-   "description": "Katmanın görüntüsünü dolu bir bloğa dönüştürerek dışa iter; yan yüzler iç renk alır.",
+   "description": "Katmanın görüntüsünü dolu bir bloğa dönüştürerek dışa iter; yan yüzler iç rengi alır.",
    "name": "Raster ekstrüzyon",
    "params": {
     "depth": {
@@ -3245,7 +3245,7 @@
    }
   },
   "rays": {
-   "description": "Katmanın parlak kısımlarından bir merkez noktasından uzağa doğru ışık ışınları yayar.",
+   "description": "Katmanın parlak kısımlarından, bir merkez noktasından uzağa doğru ışık ışınları yayar.",
    "name": "Işınlar",
    "params": {
     "center": {
@@ -3368,7 +3368,7 @@
    }
   },
   "replacecolor": {
-   "description": "Bir rengi başka bir renkle değiştirir. Alfa değiştirme gücünü kontrol eder; Parlaklığı kilitle orijinalin ışık ve gölgesini korur.",
+   "description": "Bir rengi başka bir renkle değiştirir. Alfa, değiştirme gücünü kontrol eder; Parlaklığı kilitle, orijinalin ışık ve gölgesini korur.",
    "name": "Rengi değiştir",
    "params": {
     "alpha": {
@@ -3943,7 +3943,7 @@
    }
   },
   "spotcolor": {
-   "description": "Bir rengi korur ve katmandaki diğer tüm renklerin doygunluğunu alır.",
+   "description": "Bir rengi korur ve katmandaki diğer tüm renklerin doygunluğunu giderir.",
    "name": "Özel renk",
    "params": {
     "choke": {
@@ -3964,7 +3964,7 @@
    }
   },
   "squeeze": {
-   "description": "Pozitif Güç katmanın ortasını içe sıkıştırır, negatif Güç dışa şişirir. Eski sürüm eski projelerin şeklini korur.",
+   "description": "Pozitif Güç katmanın ortasını içe sıkıştırır, negatif Güç dışa şişirir. Eski sürüm, eski projelerin şeklini korur.",
    "name": "Sıkıştır",
    "params": {
     "amount": {
@@ -4042,7 +4042,7 @@
    }
   },
   "starpolyhedron": {
-   "description": "Katmanı, birbirine çapraz iki piramitten oluşan bir yıldızın üzerine yerleştirir.",
+   "description": "Katmanı, çapraz iki piramitten oluşan bir yıldızın üzerine yerleştirir.",
    "name": "Yıldız çokyüzlü",
    "params": {
     "light": {
@@ -4437,7 +4437,7 @@
    }
   },
   "threshold": {
-   "description": "Saf siyah beyaz, parlaklıkta bölünür.",
+   "description": "Saf siyah beyaz; bir parlaklık değerinde bölünür.",
    "name": "Eşik",
    "params": {
     "blend": {
@@ -4511,7 +4511,7 @@
    }
   },
   "tiles": {
-   "description": "Katmanı ekranı dolduracak şekilde tekrarlar. Daha küçük karolar için Kırp değerini artırın; yansıma, satır kaydırma ve döndürme isteğe bağlıdır. Eski Ölçek, eski projeleri korur.",
+   "description": "Katmanı ekranı dolduracak şekilde tekrarlar. Daha küçük döşemeler için Kırp değerini artırın; yansıma, satır kaydırma ve döndürme isteğe bağlıdır. Eski Ölçek, eski projeleri korur.",
    "name": "Döşemeler",
    "params": {
     "angle": {

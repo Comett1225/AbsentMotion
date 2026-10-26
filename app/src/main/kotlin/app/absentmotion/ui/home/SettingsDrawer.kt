@@ -227,10 +227,10 @@ private fun PreviewCopiesRow() {
 @Composable
 private fun CaptionModelRow() {
     val context = LocalContext.current
-    var bytes by remember { mutableLongStateOf(CaptionModel.file(context).length()) }
-    val downloaded = remember { bytes > 0L }
+    var bytes by remember { mutableLongStateOf(CaptionModel.storedBytes(context)) }
+    val downloaded = bytes > 0L
     if (!downloaded) return
-    ActionRow(stringResource(R.string.remove_caption_model), formatBytes(bytes), chevron = false) { CaptionModel.remove(context); bytes = CaptionModel.file(context).length() }
+    ActionRow(stringResource(R.string.remove_caption_model), formatBytes(bytes), chevron = false) { CaptionModel.remove(context); bytes = CaptionModel.storedBytes(context) }
 }
 
 @Composable

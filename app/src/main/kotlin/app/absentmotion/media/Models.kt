@@ -1,5 +1,7 @@
 package app.absentmotion.media
 
+import app.absentmotion.R
+import app.absentmotion.i18n.AppText
 import app.absentmotion.model.finiteFloat
 import org.json.JSONArray
 import org.json.JSONObject
@@ -33,7 +35,7 @@ internal fun modelFileName(value: String): String = value.substringAfterLast('/'
 
 fun parseModel(name: String, bytes: ByteArray, open: (String) -> ByteArray?): Mesh {
     val mesh = if (name.substringAfterLast('.').lowercase() == "obj") ObjReader.read(bytes.toString(Charsets.UTF_8), open) else GltfReader.read(bytes, open)
-    require(mesh.triangleCount > 0) { "The model has no triangles" }
+    require(mesh.triangleCount > 0) { AppText.get(R.string.model_err_no_triangles) }
     return mesh
 }
 
@@ -166,7 +168,7 @@ object ObjReader {
             val t = tokens(line)
             if (t[0] == "v" || t[0] == "vt" || t[0] == "vn" || t[0] == "f") {
                 work += if (t[0] == "f") t.size - 1L else 1L
-                require(work <= limit) { "The model is too complex" }
+                require(work <= limit) { AppText.get(R.string.model_err_too_complex) }
             }
             when (t[0]) {
                 "v" -> {
@@ -190,8 +192,8 @@ object ObjReader {
                         val v = resolve(parts[0].toIntOrNull() ?: 0, vs.size / 3)
                         val vt = parts.getOrNull(1)?.toIntOrNull()?.let { resolve(it, vts.size / 2) } ?: -1
                         val vn = parts.getOrNull(2)?.toIntOrNull()?.let { resolve(it, vns.size / 3) } ?: -1
-                        require(v in 0 until vs.size / 3) { "A face uses a vertex that does not exist" }
-                        require(v < LIMIT && vt < LIMIT && vn < LIMIT) { "The model is too large" }
+                        require(v in 0 until vs.size / 3) { AppText.get(R.string.model_err_missing_vertex) }
+                        require(v < LIMIT && vt < LIMIT && vn < LIMIT) { AppText.get(R.string.model_err_too_large) }
                         val key = (v.toLong() shl 42) or ((vt + 1).toLong() shl 21) or (vn + 1).toLong()
                         corners[k - 1] = seen.getOrPut(key) {
                             val c = material.color
@@ -240,7 +242,7 @@ object GltfReader {
                 val length = le(bytes, at)
                 val type = le(bytes, at + 4)
                 val start = at + 8
-                require(length >= 0 && start + length <= bytes.size) { "The model file is cut short" }
+                require(length >= 0 && start + length <= bytes.size) { AppText.get(R.string.model_err_truncated) }
                 if (type == JSON && text == null) text = String(bytes, start, length, Charsets.UTF_8)
                 else if (type == BIN && bin == null) bin = ByteBuffer.wrap(bytes, start, length).slice()
                 at = start + ((length + 3) and 3.inv())
@@ -265,14 +267,14 @@ object GltfReader {
             val data = buffers.getOrNull(view.optInt("buffer", -1)) ?: return null
             val offset = view.optInt("byteOffset", 0)
             val length = view.optInt("byteLength", 0)
-            require(offset >= 0 && length >= 0 && offset.toLong() + length <= data.capacity()) { "A buffer view lies outside its buffer" }
+            require(offset >= 0 && length >= 0 && offset.toLong() + length <= data.capacity()) { AppText.get(R.string.model_err_buffer_view) }
             return Triple(data.duplicate().apply { limit(offset + length) }.order(ByteOrder.LITTLE_ENDIAN), offset, view.optInt("byteStride", 0))
         }
 
         fun read(index: Int, normalizeInts: Boolean = true, expect: Int = -1): Pair<FloatArray, Int>? {
             val a = accessors.getOrNull(index) ?: return null
             val count = a.optInt("count", 0)
-            require(count <= limit) { "The model is too complex" }
+            require(count <= limit) { AppText.get(R.string.model_err_too_complex) }
             if (expect >= 0 && count != expect) return null
             val comps = when (a.optString("type")) { "SCALAR" -> 1; "VEC2" -> 2; "VEC3" -> 3; "VEC4" -> 4; else -> return null }
             val type = a.optInt("componentType")
@@ -282,7 +284,7 @@ object GltfReader {
             val stride = if (viewStride > 0) viewStride else comps * size
             val base = start + a.optInt("byteOffset", 0).toLong()
             val scaled = normalizeInts && (a.optBoolean("normalized") || type == 5121 || type == 5123)
-            require(count >= 0 && base >= 0 && (count == 0 || base + (count - 1L) * stride + comps * size <= buffer.limit())) { "An accessor reads past its buffer" }
+            require(count >= 0 && base >= 0 && (count == 0 || base + (count - 1L) * stride + comps * size <= buffer.limit())) { AppText.get(R.string.model_err_accessor) }
             val out = FloatArray(count * comps)
             for (e in 0 until count) for (c in 0 until comps) {
                 val at = (base + e.toLong() * stride + c * size).toInt()
@@ -315,7 +317,7 @@ object GltfReader {
         var work = 0L
         fun charge(accessor: Int) {
             work += accessors.getOrNull(accessor)?.optInt("count", 0)?.coerceAtLeast(0) ?: 0
-            require(work <= limit) { "The model is too complex" }
+            require(work <= limit) { AppText.get(R.string.model_err_too_complex) }
         }
 
         fun addMesh(meshIndex: Int, world: FloatArray) {

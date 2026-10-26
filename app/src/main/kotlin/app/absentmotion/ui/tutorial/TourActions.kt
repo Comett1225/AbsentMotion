@@ -85,6 +85,7 @@ internal fun tourFacts(state: EditorState, editing: Boolean): TourFacts = sceneF
     frame = state.frame,
     playing = state.playing,
     undoMark = state.historyNotes.lastOrNull()?.id ?: 0L,
+    keypad = state.keypad != null,
     exporting = state.exportOpen,
     browsing = state.effectBrowserOpen,
     easing = state.easingOpen,
@@ -94,6 +95,7 @@ internal fun tourFacts(state: EditorState, editing: Boolean): TourFacts = sceneF
 internal class TourHands(private val context: Context, private val state: EditorState) {
     suspend fun perform(action: TourAction) {
         when (action) {
+            TourAction.Pause -> state.playing = false
             TourAction.Unselect -> state.clearSelection()
             TourAction.SamplePicture -> samplePictures()
             TourAction.SampleText -> sampleText()

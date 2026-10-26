@@ -24,6 +24,7 @@ class TourTest {
     private fun at(id: String) = Tour(startAt = id)
 
     private fun apply(action: TourAction, f: TourFacts): TourFacts = when (action) {
+        TourAction.Pause -> f.copy(playing = false)
         TourAction.Unselect -> f.copy(selected = null, panel = TourFacts.TOOLS)
         TourAction.SamplePicture -> f.copy(media = f.media + 2, mediaMs = f.mediaMs + 4000, selected = TourFacts.MEDIA, adding = false, moves = f.moves + 1)
         TourAction.SampleText -> f.copy(texts = f.texts + 1, selected = TourFacts.TEXT, panel = TourFacts.TOOLS, adding = false)
@@ -79,7 +80,11 @@ class TourTest {
         assertEquals(emptyList<TourAction>(), tour.observe(editing))
         assertEquals(listOf("add"), tour.targets())
         tour.observe(editing.copy(adding = true))
-        assertEquals(listOf("add_panel"), tour.targets())
+        assertEquals(listOf("add_tab_media", "add_media"), tour.targets())
+        assertEquals(listOf("add_tab_media", "add_media"), tour.allowed())
+        assertFalse("add_panel" in tour.allowed())
+        assertFalse("add_tab_audio" in tour.allowed())
+        assertFalse("add_text" in tour.allowed())
         assertEquals(emptyList<TourAction>(), tour.pickerClosed(true))
         tour.observe(editing.copy(adding = false, media = 1, selected = TourFacts.MEDIA))
         assertEquals("gestures", tour.step.id)
@@ -148,7 +153,7 @@ class TourTest {
         tour.observe(start)
         assertEquals(listOf("keyframe"), tour.targets())
         tour.observe(start.copy(keyframes = 1))
-        assertEquals(listOf("timeline"), tour.targets())
+        assertEquals(listOf("ruler", "pad"), tour.targets())
         assertEquals(R.string.tutorial_hint_second_keyframe, tour.hint())
         tour.observe(start.copy(keyframes = 2))
         assertEquals("easing", tour.step.id)
@@ -158,11 +163,11 @@ class TourTest {
         val tour = at("effect")
         tour.observe(editing.copy(media = 1))
         assertEquals(R.string.tutorial_hint_select, tour.hint())
-        assertEquals(listOf("timeline"), tour.targets())
+        assertEquals(listOf("clip"), tour.targets())
         tour.observe(editing.copy(media = 1, selected = TourFacts.MEDIA, panel = "ColorFill"))
         assertEquals(R.string.tutorial_hint_tools, tour.hint())
         tour.observe(editing.copy(media = 1, selected = TourFacts.MEDIA))
-        assertEquals(listOf("tool_effects", "tools"), tour.targets())
+        assertEquals(listOf("tool_effects"), tour.targets())
         assertNull(tour.hint())
     }
 
@@ -217,7 +222,7 @@ class TourTest {
         val tour = at("easing")
         val keyed = editing.copy(media = 1, keyframes = 2, selected = TourFacts.MEDIA, panel = TourFacts.TRANSFORM)
         tour.observe(keyed)
-        assertEquals(listOf("timeline"), tour.targets())
+        assertEquals(listOf("ruler"), tour.targets())
         assertEquals(R.string.tutorial_hint_between, tour.hint())
         tour.observe(keyed.copy(between = true))
         assertEquals(listOf("easing"), tour.targets())
@@ -225,10 +230,144 @@ class TourTest {
         assertEquals("effect", tour.step.id)
     }
 
-    @Test fun screenAndTimelineStepsLightUpThePlayBarToo() {
-        val screen = TourSteps.all.first { it.id == "screen" }
-        assertTrue(screen.union)
-        assertEquals(listOf("playbar", "timeline"), screen.targets(editing, editing))
+    @Test fun screenStepOnlyLooksAndTimelineStepAllowsOnlyScrubbingControls() {
+        val screen = at("screen")
+        assertTrue(screen.step.union)
+        assertEquals(listOf("playbar", "timeline"), screen.targets())
+        assertEquals(emptyList<String>(), screen.allowed())
+        val timeline = at("timeline")
+        assertEquals(listOf("timeline", "play", "skip_back", "skip_forward"), timeline.allowed())
+    }
+
+    private fun states(): List<TourFacts> {
+        val out = ArrayList<TourFacts>()
+        for (selected in listOf(null, TourFacts.MEDIA, TourFacts.TEXT, TourFacts.AUDIO)) for (panel in listOf(TourFacts.TOOLS, TourFacts.TRANSFORM, TourFacts.EFFECTS, TourFacts.EDIT_TEXT, "ColorFill"))
+            for (flag in 0 until 8) out += editing.copy(
+                media = 1, selected = selected, panel = panel, adding = flag and 1 != 0, easing = flag and 2 != 0, between = flag and 4 != 0, keyframes = flag,
+            )
+        return out
+    }
+
+    @Test fun noStepEverAllowsABroadPlayBarOrToolsRegion() {
+        for (step in TourSteps.all) if (!step.look) for (facts in states()) {
+            val allowed = step.targets(facts, facts) + step.extra(facts, facts)
+            assertFalse(step.id, "playbar" in allowed)
+            assertFalse(step.id, "tools" in allowed)
+        }
+    }
+
+    @Test fun readingStepsAllowNothingAndInteractiveStepsAlwaysNameATarget() {
+        for (id in listOf("welcome", "screen", "safety", "finish")) {
+            val tour = at(id)
+            tour.observe(editing)
+            assertEquals(id, emptyList<String>(), tour.allowed())
+            assertFalse(id, tour.free())
+        }
+        for (step in TourSteps.all) if (step.done != null) for (facts in states()) {
+            if (step.free(facts, facts) || facts.keypad) continue
+            assertTrue("${step.id} ${facts}", step.targets(facts, facts).isNotEmpty())
+        }
+    }
+
+    @Test fun splitAllowsOnlySplitAndTheRulerAndOnlyAStrictSplitCounts() {
+        val tour = at("split")
+        val ready = editing.copy(media = 2, mediaMs = 8000, selected = TourFacts.MEDIA)
+        tour.observe(ready)
+        assertEquals(listOf("tool_split", "ruler"), tour.allowed())
+        tour.observe(ready.copy(mediaMs = 6000))
+        assertEquals("split", tour.step.id)
+        tour.observe(ready.copy(media = 3, mediaMs = 8000))
+        assertEquals("text", tour.step.id)
+    }
+
+    @Test fun selectingAClipOnlyAllowsTheClipRowsThenTheBackArrowThenTheTool() {
+        val tour = at("split")
+        tour.observe(editing.copy(media = 2))
+        assertEquals(listOf("clip_media"), tour.allowed())
+        tour.observe(editing.copy(media = 2, selected = TourFacts.MEDIA, panel = TourFacts.EFFECTS))
+        assertEquals(listOf("back"), tour.allowed())
+    }
+
+    @Test fun gesturesAllowThePreviewButNotItsOverlayButtons() {
+        val tour = at("gestures")
+        tour.observe(editing.copy(media = 1, selected = TourFacts.MEDIA))
+        assertEquals(listOf("preview"), tour.allowed())
+        assertEquals(listOf("transition", "animate", "side_panel"), tour.denied())
+        tour.observe(editing.copy(media = 1, selected = TourFacts.MEDIA, frame = 40))
+        assertEquals("gestures", tour.step.id)
+    }
+
+    @Test fun pictureAndSoundOnlyAllowTheirOwnAddTabs() {
+        val picture = at("picture")
+        picture.observe(editing)
+        picture.observe(editing.copy(adding = true))
+        assertEquals(listOf("add_tab_media", "add_media"), picture.allowed())
+        val sound = at("sound")
+        sound.observe(editing)
+        sound.observe(editing.copy(adding = true))
+        assertEquals(listOf("add_tab_audio", "add_audio"), sound.allowed())
+        val text = at("text")
+        text.observe(editing)
+        text.observe(editing.copy(adding = true))
+        assertEquals(listOf("add_text"), text.allowed())
+        text.observe(editing.copy(selected = TourFacts.TEXT, panel = TourFacts.EDIT_TEXT))
+        assertEquals(listOf("text_field", "text_done"), text.allowed())
+    }
+
+    @Test fun undoAllowsOnlyUndoAndRedo() {
+        val tour = at("undo")
+        tour.observe(editing)
+        assertEquals(listOf("undo", "redo"), tour.allowed())
+    }
+
+    @Test fun keyframesAreNotCountedFromTheTimelineOrOtherEdits() {
+        val tour = at("keyframes")
+        val start = editing.copy(media = 1, selected = TourFacts.MEDIA, panel = TourFacts.TRANSFORM)
+        tour.observe(start)
+        assertEquals(listOf("keyframe"), tour.allowed())
+        tour.observe(start.copy(frame = 20, moves = 9, effects = 3, tune = 8, undoMark = 5))
+        assertEquals("keyframes", tour.step.id)
+        tour.observe(start.copy(keyframes = 1))
+        assertEquals(listOf("ruler", "pad"), tour.allowed())
+        assertEquals("keyframes", tour.step.id)
+        tour.observe(start.copy(keyframes = 2))
+        assertEquals("easing", tour.step.id)
+    }
+
+    @Test fun easingAllowsTheRulerUntilTheButtonIsUsable() {
+        val tour = at("easing")
+        val keyed = editing.copy(media = 1, keyframes = 2, selected = TourFacts.MEDIA, panel = TourFacts.TRANSFORM)
+        tour.observe(keyed)
+        assertEquals(listOf("ruler"), tour.allowed())
+        tour.observe(keyed.copy(between = true))
+        assertEquals(listOf("easing", "ruler"), tour.allowed())
+    }
+
+    @Test fun browserExportAndKeypadOpenTheGate() {
+        val effect = at("effect")
+        val start = editing.copy(media = 1, selected = TourFacts.MEDIA, panel = TourFacts.EFFECTS)
+        effect.observe(start)
+        assertFalse(effect.free())
+        effect.observe(start.copy(browsing = true))
+        assertTrue(effect.free())
+        effect.observe(start.copy(keypad = true))
+        assertTrue(effect.free())
+        val export = at("export")
+        export.observe(editing)
+        assertFalse(export.free())
+        export.observe(editing.copy(exporting = true))
+        assertTrue(export.free())
+    }
+
+    @Test fun playbackIsPausedOutsideTheTimelineStepAtMostTwice() {
+        val tour = at("split")
+        val running = editing.copy(media = 2, selected = TourFacts.MEDIA, playing = true)
+        assertEquals(listOf(TourAction.Pause), tour.observe(running))
+        assertEquals(listOf(TourAction.Pause), tour.observe(running))
+        assertEquals(emptyList<TourAction>(), tour.observe(running))
+        val timeline = at("timeline")
+        assertEquals(listOf(TourAction.Pause), timeline.observe(editing.copy(media = 1, playing = true)))
+        assertEquals("split", timeline.step.id)
     }
 
     @Test fun resumesFromTheSavedStep() {

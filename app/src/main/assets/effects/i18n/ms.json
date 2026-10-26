@@ -934,7 +934,7 @@
      "options": [
       "Ulang",
       "Cermin",
-      "Kosong",
+      "Kosongkan",
       "Jubin"
      ]
     },
@@ -1270,7 +1270,7 @@
    }
   },
   "feather": {
-   "description": "Melembutkan tepi alfa lapisan; Ke dalam memudar ke garis luar sedia ada, manakala Kabur Alfa juga menyebarkan tepi lembut ke luarnya.",
+   "description": "Melembutkan tepi alfa lapisan. Ke dalam memudar ke garis luar sedia ada; Kabur Alfa juga menyebarkan tepi lembut ke luarnya.",
    "name": "Bulu",
    "params": {
     "blur": {
@@ -2030,10 +2030,10 @@
   },
   "huesaturation": {
    "description": "Memusingkan warna di sekeliling roda warna dan menjadikannya lebih kuat atau lemah; kecergasan menguatkan warna kusam paling banyak.",
-   "name": "Warna & Ketepuan",
+   "name": "Rona & Ketepuan",
    "params": {
     "hue": {
-     "label": "Warna"
+     "label": "Rona"
     },
     "lightness": {
      "label": "Kecerahan"
@@ -2566,7 +2566,7 @@
    "name": "Ofset",
    "params": {
     "feather": {
-     "label": "Lembut Tepi"
+     "label": "Kelembutan"
     },
     "mask": {
      "label": "Topeng Ke Lapisan"
@@ -2718,7 +2718,7 @@
    }
   },
   "oscillate": {
-   "description": "Menggerakkan lapisan ke depan dan belakang pada satu sudut, dalam kedalaman atau mengelilingi orbit.",
+   "description": "Menggerakkan lapisan ke depan dan belakang mengikut sudut, dalam kedalaman atau mengelilingi orbit.",
    "name": "Ayunan",
    "params": {
     "angle": {
@@ -3395,7 +3395,7 @@
    }
   },
   "rgbsplit": {
-   "description": "Memisahkan saluran merah, hijau dan biru: saluran Pusat kekal dan dua lagi beralih ke arah bertentangan mengikut Sudut. Cerah menambah warna yang beralih, Gelap mengekalkannya pejal, Topeng mengekalkan hanya tempat ketiga-tiganya bertindih dan Luma menjadikan pinggiran itu legap seperti kecerahan.",
+   "description": "Memisahkan saluran merah, hijau dan biru: saluran Pusat kekal dan dua lagi beralih ke arah bertentangan mengikut Sudut. Cerah menambah warna yang beralih, Gelap mengekalkannya pejal, Topeng mengekalkan hanya tempat ketiga-tiganya bertindih dan Luma menjadikan pinggiran itu legap mengikut kecerahannya.",
    "name": "Pisah RGB",
    "params": {
     "angle": {
@@ -3731,7 +3731,7 @@
   },
   "softglow": {
    "description": "Menindih salinan gambar yang lembut dan kabur untuk cahaya bagaikan mimpi, kebanyakannya daripada sorotan.",
-   "name": "Cahaya lembut",
+   "name": "Cahaya Lembut",
    "params": {
     "blend": {
      "label": "Campuran"
@@ -3758,13 +3758,13 @@
   },
   "solid": {
    "description": "Meletakkan satu warna di atas lapisan, mengekalkan bentuknya, dengan pilihan mod campuran.",
-   "name": "Warna pepejal",
+   "name": "Warna Pepejal",
    "params": {
     "amount": {
      "label": "Alfa"
     },
     "blend": {
-     "label": "Mod campuran",
+     "label": "Mod Campuran",
      "options": [
       "Normal",
       "Darab",
@@ -3871,7 +3871,7 @@
    }
   },
   "spinstreaks": {
-   "description": "Menghasilkan jalur berbentuk lengkok dengan memusingkan salinan lapisan mengelilingi satu titik dan mencampurkannya apabila bertindih; R, G, B dan A menentukan bagi setiap saluran sama ada salinan mengambil nilai terendah, tertinggi atau purata, atau membiarkan saluran itu tanpa perubahan.",
+   "description": "Menghasilkan jalur berbentuk lengkok dengan memusingkan salinan lapisan mengelilingi satu titik dan mencampurkannya apabila bertindih. R, G, B dan A menentukan bagi setiap saluran sama ada salinan mengambil nilai terendah, tertinggi atau purata, atau membiarkan saluran itu tanpa perubahan.",
    "name": "Jalur Putaran",
    "params": {
     "a": {
@@ -4145,7 +4145,7 @@
      "label": "Sudut"
     },
     "offset": {
-     "label": "Anjakan"
+     "label": "Ofset"
     },
     "spread": {
      "label": "Sebaran"
@@ -4163,7 +4163,7 @@
      "label": "Sudut"
     },
     "mask": {
-     "label": "Topeng ke lapisan"
+     "label": "Topeng pada lapisan"
     },
     "scale": {
      "label": "Skala"
@@ -4261,10 +4261,10 @@
      "options": [
       "Pop",
       "Malap",
-      "Gelongsor Atas",
-      "Gelongsor Bawah",
-      "Gelongsor Kiri",
-      "Gelongsor Kanan",
+      "Gelongsor ke Atas",
+      "Gelongsor ke Bawah",
+      "Gelongsor ke Kiri",
+      "Gelongsor ke Kanan",
       "Membesar",
       "Mengecil",
       "Kabur"
@@ -4311,11 +4311,11 @@
    }
   },
   "textrandomizer": {
-   "description": "Menggantikan jumlah aksara secara rawak antara Mula dan Tamat; animasikan Evolusi atau naikkan Kelajuan untuk menukar penggantian, dan Dedah menetapkannya kembali ke teks asal.",
+   "description": "Menggantikan sebilangan aksara secara rawak antara Mula dan Tamat. Animasikan Evolusi atau naikkan Kelajuan untuk menukar penggantian; Dedah menetapkannya kembali ke teks asal.",
    "name": "Rawak Teks",
    "params": {
     "amount": {
-     "label": "Jumlah"
+     "label": "Bilangan"
     },
     "characters": {
      "label": "Tersuai"
@@ -4506,12 +4506,12 @@
      "label": "Benih"
     },
     "stretch": {
-     "label": "Regang"
+     "label": "Regangan"
     }
    }
   },
   "tiles": {
-   "description": "Ulang lapisan untuk memenuhi skrin. Tingkatkan Potong untuk jubin lebih kecil, dengan pilihan cermin, offset baris dan putaran. Skala legasi mengekalkan projek lama.",
+   "description": "Mengulang lapisan untuk memenuhi skrin. Tingkatkan Potong untuk jubin lebih kecil, dengan pilihan cermin, anjakan baris dan putaran. Skala legasi mengekalkan projek lama.",
    "name": "Jubin",
    "params": {
     "angle": {
@@ -4531,7 +4531,7 @@
      ]
     },
     "vertical": {
-     "label": "Anjakan menegak"
+     "label": "Anjakan Menegak"
     },
     "zoom": {
      "label": "Potong"
@@ -4540,7 +4540,7 @@
   },
   "tileshift": {
    "description": "Membahagi lapisan kepada grid jubin dan menggelongsorkan gambar dalam setiap jubin ke arah rawak.",
-   "name": "Anjakan jubin",
+   "name": "Anjakan Jubin",
    "params": {
     "angle": {
      "label": "Sudut"
@@ -4609,10 +4609,10 @@
      "label": "Jumlah"
     },
     "highlightColor": {
-     "label": "Warna sorotan"
+     "label": "Warna Sorotan"
     },
     "shadowColor": {
-     "label": "Warna bayang"
+     "label": "Warna Bayang"
     }
    }
   },
@@ -4621,7 +4621,7 @@
    "name": "Torus",
    "params": {
     "light": {
-     "label": "Sudut cahaya"
+     "label": "Sudut Cahaya"
     },
     "perspective": {
      "label": "Perspektif"
@@ -4812,7 +4812,7 @@
    }
   },
   "unsharpmask": {
-   "description": "Menajamkan dengan menambah semula perbezaan antara lapisan dan salinan kabur; Kekuatan menetapkan lebar kabur, Jumlah berapa banyak ditambah semula, dan Ambang melebihi 50% membiarkan perbezaan kecil.",
+   "description": "Menajamkan dengan menambah semula perbezaan antara lapisan dan salinan kaburnya. Kekuatan menetapkan lebar kabur, Jumlah berapa banyak ditambah semula, dan Ambang melebihi 50% membiarkan perbezaan kecil.",
    "name": "Topeng Tidak Tajam",
    "params": {
     "amount": {
@@ -4918,7 +4918,7 @@
      "label": "Warna 2"
     },
     "lineColor": {
-     "label": "Warna garis"
+     "label": "Warna Garis"
     },
     "lineWidth": {
      "label": "Lebar Garis"
@@ -4977,7 +4977,7 @@
    }
   },
   "zoomstreaks": {
-   "description": "Menghasilkan jalur yang memancar keluar dari satu titik dengan menskalakan salinan lapisan di sekelilingnya dan mengekalkan piksel paling cerah; Purata menghasilkan kabur zum, manakala R, G, B dan A menentukan bagi setiap saluran sama ada salinan mengambil nilai terendah, tertinggi atau purata, atau membiarkan saluran itu tanpa perubahan.",
+   "description": "Menghasilkan jalur yang memancar keluar dari satu titik dengan menskalakan salinan lapisan di sekelilingnya dan mengekalkan piksel paling cerah. Purata menghasilkan kabur zum. R, G, B dan A menentukan bagi setiap saluran sama ada salinan mengambil nilai terendah, tertinggi atau purata, atau membiarkan saluran itu tanpa perubahan.",
    "name": "Jalur Zum",
    "params": {
     "a": {

@@ -257,6 +257,14 @@ internal object TestHooks {
                     val ok = engine.stillPng(scene.toXml(), state.timeMs, scene.width, scene.height, File(activity.getExternalFilesDir(null), "$name.png"))
                     Log.i("AMTest", "still $name ok=$ok")
                 }
+                intent.getStringExtra("previewstill")?.let { name ->
+                    val before = state.frame
+                    for (accurate in listOf(false, true)) {
+                        val pixels = engine.capturePreviewFrame(scene, state.timeMs, scene.width, scene.height, accurate) { true }
+                        if (pixels != null) File(activity.getExternalFilesDir(null), "$name-${if (accurate) "full" else "fast"}.rgba").writeBytes(pixels)
+                        Log.i("AMTest", "previewstill $name accurate=$accurate ok=${pixels != null} frame=${state.frame} before=$before")
+                    }
+                }
                 intent.getStringExtra("hit")?.split(';')?.forEach { point ->
                     val xy = point.split(',').mapNotNull { it.trim().toFloatOrNull() }
                     if (xy.size == 2) Log.i("AMTest", "hit $point ${engine.hitTest(xy[0], xy[1], state.timeMs)}")

@@ -13,7 +13,7 @@ class EffectTranslationTest {
     private val english = EffectCatalog.parse { File(pack, it).inputStream() }
     private fun shape(c: EffectCatalog) = c.definitions.map { d -> Triple(d.id, d.category, d.params.map { Triple(it.id, it.default, it.options.size) }) }
 
-    @Test fun everyLanguageTranslatesNearlyEveryEffectText() {
+    @Test fun everyLanguageTranslatesEveryEffectText() {
         for (language in AppLanguage.entries - AppLanguage.English) {
             val file = File(pack, "i18n/${language.tag}.json")
             val hint = "${language.tag}: run python3 tools/i18n_translate.py --only effects"
@@ -33,17 +33,32 @@ class EffectTranslationTest {
                 for (p in e.params) {
                     val tp = t?.optJSONObject("params")?.optJSONObject(p.id)
                     need(tp?.optString("label").orEmpty().isNotBlank(), "${e.key}.${p.id} label")
-                    if (p.options.isNotEmpty()) need(tp?.optJSONArray("options")?.length() == p.options.size, "${e.key}.${p.id} options")
+                    if (p.options.isNotEmpty()) {
+                        val choices = tp?.optJSONArray("options")
+                        need(choices != null && choices.length() == p.options.size && p.options.indices.all { choices.optString(it).isNotBlank() }, "${e.key}.${p.id} options")
+                    }
                 }
                 for (preset in e.presets) need(t?.optJSONObject("presets")?.optString(preset.slug).orEmpty().isNotBlank(), "${e.key} preset ${preset.slug}")
             }
             val names = json.getJSONObject("categories")
             for (key in EffectCatalog.Categories.keys + "new" + "ai") need(names.optString(key).isNotBlank(), "category $key")
-            assertTrue("${language.tag} misses ${missing.size} of $total effect texts ($hint): ${missing.take(20)}", missing.size <= total * 0.05)
+            assertTrue("${language.tag} misses ${missing.size} of $total effect texts ($hint): ${missing.take(20)}", missing.isEmpty())
             val local = EffectCatalog.parse(language.tag) { File(pack, it).inputStream() }
             assertEquals(shape(english), shape(local))
             assertEquals(english.categories.map { it.first }, local.categories.map { it.first })
         }
+    }
+
+    @Test fun relabellingPreservesRuntimeStatusWithoutReloadingEffects() {
+        val loaded = english.copy(definitions = english.definitions.mapIndexed { i, d -> d.copy(status = if (i == 0) "unsupported" else "ok") })
+        val translated = EffectCatalog.parse("id") { File(pack, it).inputStream() }
+        val relabelled = translated.withRuntimeStatusFrom(loaded)
+        assertEquals(translated.definitions.map { it.name }, relabelled.definitions.map { it.name })
+        assertEquals(translated.categories, relabelled.categories)
+        assertEquals(loaded.definitions.map { it.status }, relabelled.definitions.map { it.status })
+        assertEquals(shape(loaded), shape(relabelled))
+        assertNotEquals(loaded.definitions.map { it.name }, relabelled.definitions.map { it.name })
+        assertEquals(loaded, EffectCatalog(message = "unavailable").withRuntimeStatusFrom(loaded))
     }
 
     @Test fun missingTranslationsFallBackToEnglish() {

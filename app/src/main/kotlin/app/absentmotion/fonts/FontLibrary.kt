@@ -1,6 +1,8 @@
 package app.absentmotion.fonts
 
 import android.os.Build
+import app.absentmotion.R
+import app.absentmotion.i18n.AppText
 import android.content.Context
 import android.graphics.Typeface
 import android.graphics.fonts.Font
@@ -184,7 +186,7 @@ class FontLibrary(context: Context) {
             if (System.currentTimeMillis() - (failed[name] ?: 0L) < 60_000) return@withLock null
             runCatching {
                 val css = request("https://fonts.googleapis.com/css2?family=${Uri.encode(font.family)}:ital,wght@${if (font.italic) 1 else 0},${font.weight}") { it.reader().readText() }
-                val fontUrl = Regex("url\\((https://fonts\\.gstatic\\.com/[^)]+)\\)").find(css)?.groupValues?.get(1) ?: error("Font unavailable")
+                val fontUrl = Regex("url\\((https://fonts\\.gstatic\\.com/[^)]+)\\)").find(css)?.groupValues?.get(1) ?: error(AppText.get(R.string.font_err_unavailable))
                 val temporary = File.createTempFile("download-", ".font", cache)
                 try {
                     request(fontUrl) { input -> temporary.outputStream().use { copyLimited(input, it) } }

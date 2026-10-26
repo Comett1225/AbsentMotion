@@ -93,7 +93,7 @@ internal fun VoiceSheet(state: EditorState, onClose: () -> Unit) {
                 onClose()
             }
             catch (_: CancellationException) { message = context.getString(R.string.voice_cancelled) }
-            catch (e: Exception) { message = e.message ?: context.getString(R.string.voice_unable) }
+            catch (e: Exception) { message = app.absentmotion.i18n.failureText(context.getString(R.string.voice_unable), e) }
             finally { job = null }
         }
     }

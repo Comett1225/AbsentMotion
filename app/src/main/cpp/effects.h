@@ -16,6 +16,7 @@ public:
     bool active(const Layer& layer) const;
     bool lifted(const Layer& layer) const;
     bool behind(const Layer& layer) const;
+    bool steady(const Layer& layer, float from, float to) const;
     bool draw(SkCanvas* canvas, const Scene& scene, const Layer& layer, double timeMs, const SkRect& area, const SkMatrix& placed,
               const std::function<void(SkCanvas*)>& source, const std::function<void(SkCanvas*)>& below) const;
 
@@ -27,6 +28,7 @@ private:
         bool backdrop = false;
         bool below = false;
         bool pointwise = false;
+        bool timed = false;
         std::map<std::string, Anim> defaults;
     };
     const Definition* find(const std::string& id) const;

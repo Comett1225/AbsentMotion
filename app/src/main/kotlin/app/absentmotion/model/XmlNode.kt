@@ -1,5 +1,7 @@
 package app.absentmotion.model
 
+import app.absentmotion.R
+import app.absentmotion.i18n.AppText
 import app.absentmotion.platform.xmlParser
 import org.xmlpull.v1.XmlPullParser
 
@@ -52,7 +54,7 @@ data class XmlNode(
             val parser = xmlParser()
             parser.setInput(xml.reader())
             while (parser.eventType != XmlPullParser.START_TAG) {
-                if (parser.eventType == XmlPullParser.END_DOCUMENT) throw IllegalArgumentException("No root element")
+                if (parser.eventType == XmlPullParser.END_DOCUMENT) throw IllegalArgumentException(AppText.get(R.string.xml_err_empty))
                 parser.next()
             }
             return read(parser, 1, intArrayOf(maxNodes))
@@ -63,8 +65,8 @@ data class XmlNode(
         private const val MAX_DEPTH = 256
 
         private fun read(parser: XmlPullParser, depth: Int, budget: IntArray): XmlNode {
-            if (depth > MAX_DEPTH) throw IllegalArgumentException("Elements are nested more than $MAX_DEPTH deep")
-            if (--budget[0] < 0) throw IllegalArgumentException("Too many elements")
+            if (depth > MAX_DEPTH) throw IllegalArgumentException(AppText.get(R.string.xml_err_too_deep, MAX_DEPTH.toString()))
+            if (--budget[0] < 0) throw IllegalArgumentException(AppText.get(R.string.xml_err_too_many))
             val name = parser.name
             val attrs = LinkedHashMap<String, String>()
             for (i in 0 until parser.attributeCount) attrs[parser.getAttributeName(i)] = parser.getAttributeValue(i)
@@ -75,7 +77,7 @@ data class XmlNode(
                     XmlPullParser.START_TAG -> children += read(parser, depth + 1, budget)
                     XmlPullParser.TEXT -> text.append(parser.text)
                     XmlPullParser.END_TAG -> break
-                    XmlPullParser.END_DOCUMENT -> throw IllegalArgumentException("Unexpected end of document inside <$name>")
+                    XmlPullParser.END_DOCUMENT -> throw IllegalArgumentException(AppText.get(R.string.xml_err_unexpected_end, name))
                 }
             }
             return XmlNode(name, attrs, children, if (children.isEmpty()) text.toString() else "")

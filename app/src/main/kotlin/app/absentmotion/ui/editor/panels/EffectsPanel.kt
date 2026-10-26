@@ -1,5 +1,7 @@
 package app.absentmotion.ui.editor.panels
 
+import app.absentmotion.ui.tutorial.tutorialGuard
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -64,12 +66,13 @@ internal fun EffectsPanel(state: EditorState, modifier: Modifier) {
     LaunchedEffect(layer.id) { if (shownFor[0] != layer.id) { shownFor[0] = layer.id; state.effectIndex = -1 } }
     LaunchedEffect(instance == null) { if (instance == null && index >= 0) state.effectIndex = -1 }
     var active by remember(layer.id, index, definition?.id) { mutableStateOf(definition?.params?.firstOrNull { it.kind != "color" && it.kind != "switch" && it.kind != "choice" && it.kind != "text" }) }
+    LaunchedEffect(definition) { active = definition?.params?.firstOrNull { it.id == active?.id } }
     var menu by remember { mutableStateOf(false) }
     var choosing by remember { mutableStateOf(false) }
     val usable = instance != null && definition?.available == true
     val target = active?.takeIf { usable }?.let { KeyTarget(PropRef.effect(index, it.id), it.missingDefault, it.type) }
     val point = active?.takeIf { it.kind == "point" && usable }
-    val adjust = remember(layer.id, index, point?.id) {
+    val adjust = remember(layer.id, index, point?.id, point?.label) {
         point?.let { param ->
             PointAdjust(param.label) { dx, dy ->
                 state.editSelected("effect-$index-${param.id}") { current ->

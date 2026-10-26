@@ -59,6 +59,7 @@ import app.absentmotion.effects.EffectDefinition
 import app.absentmotion.effects.EffectPreset
 import app.absentmotion.model.addEffect
 import app.absentmotion.model.effects
+import app.absentmotion.ui.editor.CaptionsSheet
 import app.absentmotion.ui.editor.PanelIcons
 import app.absentmotion.ui.editor.matchesSearch
 import app.absentmotion.ui.export.ExportIcons
@@ -87,11 +88,13 @@ fun EffectBrowser(state: EditorState) {
     val layer = state.selected
     val audio = layer?.kind == "audio"
     val hasSound = audio || layer?.mediaFill?.video == true
-    var category by remember { mutableStateOf<String?>(if (audio) state.effectCategory ?: "audio" else null) }
+    var category by remember { mutableStateOf<String?>(state.effectCategory ?: if (audio) "audio" else null) }
     var searching by remember { mutableStateOf(false) }
     var helpPage by remember { mutableStateOf<String?>(null) }
+    var captionClip by remember { mutableStateOf<Long?>(null) }
     var query by remember { mutableStateOf("") }
     var detail by remember { mutableStateOf(state.effectDetail?.let(catalog::find)) }
+    LaunchedEffect(catalog) { detail = detail?.id?.let(catalog::find) }
     fun close() { state.effectDetail = null; state.effectCategory = null; state.effectBrowserOpen = false }
     var fromAudio by remember { mutableStateOf(false) }
     fun back() {
@@ -181,19 +184,25 @@ fun EffectBrowser(state: EditorState) {
         } else if (!searching && (category == "audio" || category == "voice")) {
             val effects = layer?.audioEffects.orEmpty()
             LazyVerticalGrid(GridCells.Fixed(3), Modifier.fillMaxSize(), contentPadding = PaddingValues(10.dp)) {
-                if (category == "audio") itemsIndexed(AudioOrder) { i, kind ->
-                    AudioTile(stringResource(kind.label), i, kind == FxKind.Voice || effects.fits(kind)) {
-                        if (kind == FxKind.Voice) { fromAudio = true; category = "voice" } else addAudio(kind)
+                if (category == "audio") {
+                    item(key = "voice-category") { AudioTile(voiceName, 2, true) { fromAudio = true; category = "voice" } }
+                    itemsIndexed(AudioOrder) { i, kind ->
+                        AudioTile(stringResource(kind.label), i, effects.fits(kind)) { addAudio(kind) }
                     }
+                } else {
+                    itemsIndexed(VoiceOrder.filterNot { it == FxKind.Voice }) { i, kind -> AudioTile(stringResource(kind.label), i, effects.fits(kind)) { addAudio(kind) } }
+                    itemsIndexed(VoicePresets) { i, preset -> AudioTile(stringResource(preset.name), i + 2, effects.any { it.kind == FxKind.Voice } || effects.fits(FxKind.Voice)) { applyVoice(preset) } }
                 }
-                else itemsIndexed(VoicePresets) { i, preset -> AudioTile(stringResource(preset.name), i, effects.any { it.kind == FxKind.Voice } || effects.fits(FxKind.Voice)) { applyVoice(preset) } }
             }
         } else if (searching || category != null) {
             val results = if (audio) emptyList() else if (searching) catalog.search(query) else catalog.listed(category).sortedBy { it.name.lowercase() }
-            val actions = if (searching || category == "ai") AiAction.entries.filter { it.offered && matchesSearch(query, stringResource(it.title)) } else emptyList()
+            val actions = if (searching || category == "ai") AiAction.entries.filter { it.offered && (!audio || it == AiAction.Noise) && matchesSearch(query, stringResource(it.title)) } else emptyList()
             val presets = if (audio) emptyList() else catalog.definitions.flatMap { d -> d.presets.map { d to it } }
                 .filter { (d, p) -> if (searching) query.isNotBlank() && matchesSearch(query, p.name) else d.category == category }
             LazyVerticalGrid(GridCells.Fixed(3), Modifier.fillMaxSize(), contentPadding = PaddingValues(10.dp)) {
+                if (hasSound && (category == "ai" || searching && matchesSearch(query, context.getString(R.string.auto_captions)))) {
+                    item(key = "ai-captions") { AudioTile(stringResource(R.string.auto_captions), 5, true) { state.playing = false; captionClip = layer.id } }
+                }
                 items(actions, key = { "ai-${it.name}" }) { action -> AiTile(action, state.selected, ai) }
                 items(presets, key = { (d, p) -> "preset-${d.id}-${p.slug}" }) { (d, p) -> PresetTile(catalog, d, p) { add(d, p) } }
                 items(results, key = { it.id }) { effect -> EffectTile(catalog, effect, 100f, { pick(effect) }, { detail = effect }, effect.id in favourites) }
@@ -255,9 +264,12 @@ fun EffectBrowser(state: EditorState) {
     AiCutoutDialog(ai)
     AiEnhanceDialog(ai, state.scene) { catalog.find(QUICK_SHARPEN)?.let(::pick) }
     AiProgressDialog(ai)
+    captionClip?.let { id -> CaptionsSheet(state, clipId = id) { captionClip = null; close() } }
 }
 
-internal val AudioOrder = listOf(FxKind.Reverb, FxKind.HighPitch, FxKind.LowPitch, FxKind.Echo, FxKind.Voice, FxKind.Eq, FxKind.LowPass, FxKind.HighPass, FxKind.Compressor, FxKind.Gate)
+internal val VoiceOrder = listOf(FxKind.HighPitch, FxKind.LowPitch, FxKind.Voice)
+
+internal val AudioOrder = listOf(FxKind.Reverb, FxKind.Echo, FxKind.Eq, FxKind.LowPass, FxKind.HighPass, FxKind.Compressor, FxKind.Gate)
 
 private val BrowserBg get() = Am.Field
 private val RecommendedBg get() = Am.PanelInset

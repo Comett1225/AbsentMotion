@@ -216,7 +216,7 @@ together with Skia.
 
 ### OpenAI Whisper model weights (ggml conversion)
 
-- Version: `ggml-base-q5_1.bin` (about 60 MB).
+- Versions: `ggml-base-q5_1.bin` (about 60 MB) and optional higher-precision `ggml-base-q8_0.bin` (about 82 MB).
 - Licence: MIT (the OpenAI Whisper release), converted to the ggml format by the whisper.cpp project.
 - Copyright: see upstream (https://github.com/openai/whisper).
 - URL: https://huggingface.co/ggerganov/whisper.cpp

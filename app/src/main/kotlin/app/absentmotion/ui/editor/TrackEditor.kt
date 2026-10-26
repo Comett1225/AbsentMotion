@@ -50,6 +50,7 @@ import app.absentmotion.editor.videoToScene
 import app.absentmotion.media.MotionTracker
 import app.absentmotion.media.trackFactor
 import app.absentmotion.model.Pt
+import app.absentmotion.model.shownName
 import app.absentmotion.platform.LocalContext
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Presence
@@ -185,11 +186,11 @@ private fun TargetChoice(state: EditorState, mode: TrackMode, enabled: Boolean) 
     Row(Modifier.fillMaxWidth().height(34.dp).alpha(if (enabled) 1f else DimAlpha), verticalAlignment = Alignment.CenterVertically) {
         Text(stringResource(R.string.apply_to), Modifier.width(72.dp), color = Am.Caption, fontSize = 12.sp, maxLines = 1)
         Box(Modifier.weight(1f).fillMaxHeight().clip(RoundedCornerShape(6.dp)).background(Am.PanelInset).clickable(enabled = enabled) { open = true }.padding(horizontal = 10.dp), Alignment.CenterStart) {
-            Text(chosen?.let { it.label.ifEmpty { it.kind } } ?: stringResource(R.string.track_new_null), color = Am.OnDark, fontSize = 12.sp, maxLines = 1)
+            Text(chosen?.shownName() ?: stringResource(R.string.track_new_null), color = Am.OnDark, fontSize = 12.sp, maxLines = 1)
             Presence(open) {
                 MenuPopup(DropOrRise, { open = false }) {
                     MenuRow(stringResource(R.string.track_new_null)) { mode.target = null; open = false }
-                    for (layer in targets) MenuRow(layer.label.ifEmpty { layer.kind }) { mode.target = layer.id; open = false }
+                    for (layer in targets) MenuRow(layer.shownName()) { mode.target = layer.id; open = false }
                 }
             }
         }
