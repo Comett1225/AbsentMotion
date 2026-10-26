@@ -31,7 +31,7 @@ import kotlinx.coroutines.sync.withLock
 class MediaLibrary(context: Context, private val engine: EngineThread) {
     private val resolver = context.applicationContext.contentResolver
     private val lock = Mutex()
-    private val loaded = java.util.concurrent.ConcurrentHashMap<String, Triple<MediaDeclaration?, String?, Pair<Int, Int>>>()
+    private val loaded = mutableMapOf<String, Triple<MediaDeclaration?, String?, Pair<Int, Int>>>()
     private val models = mutableMapOf<String, Triple<String?, Pair<Int, Int>, Int>>()
     @Volatile var pinned: Scene? = null
 
@@ -42,7 +42,6 @@ class MediaLibrary(context: Context, private val engine: EngineThread) {
             withContext(NonCancellable) {
                 engine.setPicture(uri, null)
                 loaded.remove(uri)
-                engine.publishSource(uri, null)
             }
         }
         for (uri in models.keys - kept.flatMapTo(HashSet()) { it.node.modelUris() }) {
@@ -66,7 +65,6 @@ class MediaLibrary(context: Context, private val engine: EngineThread) {
                     .also { Log.i("AMMedia", "picture $uri ${it?.width}x${it?.height} limit $limit") }
             },
         ) { uri, bitmap -> try { engine.setPicture(uri, bitmap) } finally { bitmap.recycle() } }
-        for (uri in scene.node.imageUris()) engine.publishSource(uri, pictureIdentity(loaded[uri]?.second, loaded[uri]?.third?.first))
         for (uri in scene.node.modelUris()) {
             val version = withContext(Dispatchers.IO) { fileVersion(resolver, Uri.parse(uri)) }
             if (models[uri]?.let { it.first == version && it.second == generation } == true) continue
@@ -93,8 +91,6 @@ class MediaLibrary(context: Context, private val engine: EngineThread) {
 }
 
 internal const val MIN_PICTURE_LIMIT = 4096
-
-internal fun pictureIdentity(version: String?, generation: Int?): String? = if (version == null || generation == null) null else "$version@$generation"
 
 internal fun pictureLimit(maxTexture: Int, canvas: Int): Int = minOf(maxTexture, maxOf(MIN_PICTURE_LIMIT, 2 * canvas))
 

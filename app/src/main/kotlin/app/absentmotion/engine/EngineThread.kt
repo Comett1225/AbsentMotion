@@ -21,7 +21,6 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import app.absentmotion.R
 import app.absentmotion.audio.AudioEngine
 import app.absentmotion.export.exportCheck
@@ -121,12 +120,6 @@ class EngineThread(private val background: Int, context: Context? = null) {
     @Volatile private var mediaScene: Scene? = null
     private val pictureRevision = MutableStateFlow(0L)
     val mediaRevision = pictureRevision.asStateFlow()
-    private val installedSources = MutableStateFlow<Map<String, String>>(emptyMap())
-    val sources = installedSources.asStateFlow()
-
-    fun publishSource(uri: String, identity: String?) = installedSources.update {
-        if (it[uri] == identity) it else if (identity == null) it - uri else it + (uri to identity)
-    }
 
     private var engine: NativeEngine? = null
     private var target = 0L
