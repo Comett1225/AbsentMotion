@@ -166,6 +166,8 @@ Possibly a PC version as I love the layout and also simplicity of it. Not sure i
 - Possibly releasing IPA versions of this app for iPhones and iPads
 This will all be decided later though, for the v5.0 update.
 
+In the future, foss and compatibility will be the only two available for android, as 'play' won't be required in the future.
+
 ## Updates to AbsentMotion
 
 There will be weekly updates at minimum, whether it's bug patches, improvement to the engine or new features.
