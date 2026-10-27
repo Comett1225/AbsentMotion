@@ -445,12 +445,10 @@ class EngineThread(private val background: Int, context: Context? = null) {
                 } finally {
                     capturing = false
                     prepareTextTime(requestedView?.timeMs ?: 0)
-                    renderNow()
                 }
             }
         } finally {
             captureLock.unlock()
-            videos?.resumePreview()
         }
     }
 
@@ -577,9 +575,11 @@ class EngineThread(private val background: Int, context: Context? = null) {
         val document = Scene.parse(xml)
         fonts?.let { library -> document.fontNames().forEach { library.resolve(it) } }
         var shown: String? = null
-        withContext(dispatcher) { capturing = true }
-        val held = videos?.hold()
+        var swapped = false
+        var held: Job? = null
         try {
+            withContext(dispatcher) { capturing = true }
+            held = videos?.hold()
             held?.join()
             media?.pinned = document
             media?.prepare(document)
@@ -589,16 +589,17 @@ class EngineThread(private val background: Int, context: Context? = null) {
                 applyPending()
                 shown = scene
                 capturing = true
+                swapped = true
                 setEngineScene(xml, 0)
             }
             ExportSession(document, smoothing, fps).block()
         } finally {
-            if (held != null) videos.release()
+            if (held != null) videos?.release()
             media?.pinned = null
             var noPreview = true
             try {
                 withContext(NonCancellable + dispatcher) {
-                    try { restoreScene(shown) }
+                    try { if (swapped) restoreScene(shown) }
                     finally { capturing = false; noPreview = target == 0L }
                 }
             } finally {

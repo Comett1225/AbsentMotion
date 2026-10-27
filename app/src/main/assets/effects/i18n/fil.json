@@ -3248,6 +3248,9 @@
    "description": "Nagpapasikat ng mga sinag ng liwanag mula sa maliwanag na bahagi ng layer, palayo sa isang center point.",
    "name": "Mga Sinag",
    "params": {
+    "blend": {
+     "label": "Blend"
+    },
     "center": {
      "label": "Gitna"
     },
@@ -3260,8 +3263,18 @@
     "reach": {
      "label": "Haba"
     },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
+    },
     "threshold": {
      "label": "Threshold"
+    },
+    "thresholdAdd": {
+     "label": "Dagdag na threshold"
     }
    }
   },

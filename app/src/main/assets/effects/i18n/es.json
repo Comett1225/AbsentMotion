@@ -3248,6 +3248,9 @@
    "description": "Emite rayos de luz desde las partes brillantes de la capa, alejándose de un punto central.",
    "name": "Rayos",
    "params": {
+    "blend": {
+     "label": "Mezcla"
+    },
     "center": {
      "label": "Centro"
     },
@@ -3260,8 +3263,18 @@
     "reach": {
      "label": "Longitud"
     },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Clásico",
+      "Estándar"
+     ]
+    },
     "threshold": {
      "label": "Umbral"
+    },
+    "thresholdAdd": {
+     "label": "Agregar umbral"
     }
    }
   },

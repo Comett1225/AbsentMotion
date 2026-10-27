@@ -13,6 +13,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.collapse
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.expand
 import androidx.compose.ui.semantics.semantics
 import app.absentmotion.ui.editor.ChromeIcons
@@ -317,6 +318,14 @@ private fun UpdateRows(settings: AppSettings, onCrashLogs: () -> Unit) {
         SwitchRow(stringResource(R.string.update_check_on_open), settings.autoUpdateCheck, enabled = true) { settings.chooseUpdates(it) }
         Divider(10.dp)
         ActionRow(stringResource(R.string.update_check_now), busy = Updates.checking) { Updates.check(context, settings, manual = true) }
+        val version = app.absentmotion.platform.appVersion().trim()
+        if (version.isNotEmpty()) {
+            val spoken = stringResource(R.string.about_version, version)
+            Text(
+                "V $version", Modifier.fillMaxWidth().padding(start = 15.dp, end = 15.dp, bottom = 8.dp).semantics { contentDescription = spoken },
+                color = Am.HomeMid, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
+            )
+        }
     }
 }
 

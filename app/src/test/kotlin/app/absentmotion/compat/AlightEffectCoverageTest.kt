@@ -37,6 +37,24 @@ class AlightEffectCoverageTest {
         assertEquals(listOf(0.5f, 0.5f), rays.floats("center"))
     }
 
+    @Test fun raysKeepThresholdAddAndBlendAndOnlyDropQualityWhenItIsNotTheDefault() {
+        val varied = migrate("""<effect id="com.alightcreative.effects.rays"><property name="centerPoint" type="vec2" value="40.000000,-25.000000" /><property name="strength" type="float" value="1.1125" />
+            <property name="intensity" type="float" value="2" /><property name="threshold" type="float" value="0.7" /><property name="thresholdColor" type="color" value="#FF3366CC" />
+            <property name="fillColor" type="color" value="#FF3366CC" /><property name="blend" type="float" value="0.25" /><property name="quality" type="float" value="150" /></effect>""")
+        assertEquals("absent.rays", varied["id"])
+        assertEquals(listOf(1.1125f, 2f, 0.7f, 0.25f), listOf("reach", "intensity", "threshold", "blend").map { varied.floats(it)[0] })
+        assertEquals(0.5f + 40f / 220f, varied.floats("center")[0], 1e-4f)
+        assertEquals("#FF3366CC", varied.children.single { it["name"] == "thresholdAdd" }["value"])
+        assertEquals("#FF3366CC", varied.children.single { it["name"] == "color" }["value"])
+        assertTrue(varied.children.none { it["name"] == "quality" })
+        assertEquals(1f, varied.floats("style")[0], 1e-6f)
+        val plain = migrate("""<effect id="com.alightcreative.effects.rays" />""")
+        assertEquals(0f, plain.floats("blend")[0], 1e-6f)
+        assertEquals(1f, plain.floats("style")[0], 1e-6f)
+        assertEquals(0.15f, plain.floats("reach")[0], 1e-6f)
+        assertTrue(plain.children.none { it["name"] == "thresholdAdd" })
+    }
+
     @Test fun sizesInLayerPixelsFollowTheLayer() {
         assertEquals(108f, migrate("""<effect id="com.alightcreative.effects.mosaic"><property name="size" type="float" value="10" /></effect>""", "540,540").floats("count")[0], 1e-3f)
         assertEquals(0.02f * 0.57f * 1080f, migrate("""<effect id="com.alightcreative.effects.smoothedges"><property name="strength" type="float" value="0.02" /></effect>""", "540,540").floats("blur")[0], 1e-3f)

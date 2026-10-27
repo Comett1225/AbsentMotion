@@ -78,6 +78,8 @@ import androidx.annotation.StringRes
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
 
+internal val AddPopupHeight = 244.dp
+
 private val PopupBar get() = Am.Button
 private val DotIdle get() = Am.Caption
 private val Disc get() = Am.Panel

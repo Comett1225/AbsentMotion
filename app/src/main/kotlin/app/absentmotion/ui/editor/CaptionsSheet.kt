@@ -5,19 +5,25 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -34,15 +40,18 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -65,7 +74,6 @@ import app.absentmotion.ui.editor.panels.buttonLabel
 import app.absentmotion.ui.editor.panels.colourText
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Presence
-import app.absentmotion.ui.theme.Swap
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -97,6 +105,20 @@ internal fun captionRemainingSeconds(elapsedMs: Long, progress: Float): Long? {
     val remaining = total - elapsedMs.toDouble()
     if (remaining <= 0.0) return 0L
     return kotlin.math.ceil(remaining / 1000.0).toLong()
+}
+
+internal fun captionSheetHeight(widthDp: Float, heightDp: Float, expanded: Boolean): Float {
+    if (!heightDp.isFinite() || heightDp <= 0f) return 0f
+    val portrait = !widthDp.isFinite() || widthDp <= heightDp
+    val fraction = when {
+        expanded -> 0.92f
+        portrait -> 0.7f
+        else -> 0.88f
+    }
+    val floor = minOf(heightDp, 320f)
+    val wanted = maxOf(heightDp * fraction, floor)
+    val capped = if (expanded) wanted else minOf(wanted, 640f)
+    return minOf(capped, heightDp)
 }
 
 private fun formatClock(seconds: Long): String {
@@ -175,29 +197,41 @@ internal fun CaptionsSheet(state: EditorState, clipId: Long? = null, onClose: ()
         when {
             running != null -> running.cancel()
             browsing -> browsing = false
+            sourceMenu -> sourceMenu = false
             else -> onClose()
         }
     }
 
-    Dialog(::dismiss, DialogProperties(usePlatformDefaultWidth = false, dismissOnClickOutside = false)) {
-        PhoneScreen { Swap(browsing, Modifier.fillMaxSize(), rise = 0.dp) {
-            if (browsing) Box(Modifier.fillMaxSize().background(Am.Panel).systemBarsPadding()) {
-                FontBrowser(fonts, onSelect = { name -> fonts.remember(name); update(style.copy(font = name)); browsing = false }, onClose = { browsing = false })
-            } else Box(Modifier.fillMaxSize().background(Am.Panel).systemBarsPadding()) {
-                when (phase) {
-                    Phase.Confirm -> ConfirmScreen(
+    val working = phase == Phase.Download || phase == Phase.Work
+    val scrimTap by rememberUpdatedState { if (!working && !browsing) dismiss() }
+    Dialog(::dismiss, DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false, dismissOnClickOutside = false)) {
+        BoxWithConstraints(
+            Modifier.fillMaxSize().pointerInput(Unit) { detectTapGestures { scrimTap() } }.windowInsetsPadding(WindowInsets.safeDrawing),
+            Alignment.BottomCenter,
+        ) {
+            val sheetMax = captionSheetHeight(maxWidth.value, maxHeight.value, browsing).dp
+            val sheetSize = if (browsing) Modifier.height(sheetMax) else Modifier.heightIn(max = sheetMax)
+            Column(
+                Modifier.widthIn(max = 560.dp).fillMaxWidth().then(sheetSize).clip(SheetShape).background(Am.Panel)
+                    .pointerInput(Unit) { detectTapGestures { } },
+            ) {
+                when {
+                    browsing -> FontBrowser(fonts, onSelect = { name -> fonts.remember(name); update(style.copy(font = name)); browsing = false }, onClose = { browsing = false })
+                    phase == Phase.Confirm -> ConfirmScreen(
                         highPrecision = style.highPrecision,
+                        minHeight = minOf(sheetMax, 300.dp),
                         onCancel = { phase = Phase.Choose },
                         onDownload = { download() },
                     )
-                    Phase.Download, Phase.Work -> WorkingScreen(
+                    working -> WorkingScreen(
                         phase = phase,
                         progress = progress,
                         status = status,
                         phaseStart = phaseStart,
+                        minHeight = minOf(sheetMax, 300.dp),
                         onCancel = { job?.cancel() },
                     )
-                    Phase.Choose -> SetupScreen(
+                    else -> SetupScreen(
                         state = state,
                         sources = sources,
                         locked = locked,
@@ -216,7 +250,7 @@ internal fun CaptionsSheet(state: EditorState, clipId: Long? = null, onClose: ()
                     )
                 }
             }
-        } }
+        }
     }
 }
 
@@ -238,12 +272,12 @@ private fun SetupScreen(
     onGenerate: () -> Unit,
     onClose: () -> Unit,
 ) {
-    Column(Modifier.fillMaxSize()) {
-        Row(Modifier.fillMaxWidth().height(56.dp).padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
+    Column(Modifier.fillMaxWidth()) {
+        Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(stringResource(R.string.auto_captions), Modifier.weight(1f), color = Am.OnDark, fontSize = 18.sp, fontWeight = FontWeight.Bold)
             BarButton(ChromeIcons.Close, stringResource(R.string.action_close), Modifier.size(40.dp), onClick = onClose)
         }
-        Column(Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp)) {
+        Column(Modifier.weight(1f, fill = false).fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp)) {
             Text(stringResource(if (locked) R.string.caption_scope_clip else R.string.caption_intro), Modifier.fillMaxWidth().padding(bottom = 16.dp), color = Am.OnDarkDim, fontSize = 13.sp, lineHeight = 18.sp)
             GroupTitle(stringResource(R.string.caption_source))
             if (locked) {
@@ -315,6 +349,14 @@ private fun SetupScreen(
 }
 
 @Composable
+private fun ColumnScope.CenteredPanel(minHeight: Dp, actions: @Composable () -> Unit, content: @Composable ColumnScope.() -> Unit) {
+    Column(Modifier.fillMaxWidth().weight(1f, fill = false).verticalScroll(rememberScrollState())) {
+        Column(Modifier.fillMaxWidth().heightIn(min = minHeight).padding(start = 24.dp, end = 24.dp, top = 24.dp), Arrangement.Center, Alignment.CenterHorizontally, content = content)
+    }
+    Box(Modifier.fillMaxWidth().padding(24.dp)) { actions() }
+}
+
+@Composable
 private fun GroupTitle(text: String) {
     Text(text, Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 4.dp), color = Am.OnDarkDim, fontSize = 12.sp, fontWeight = FontWeight.Bold)
 }
@@ -344,29 +386,30 @@ private fun PreviewSample(style: CaptionStyle, library: FontLibrary?) {
 }
 
 @Composable
-private fun ConfirmScreen(highPrecision: Boolean, onCancel: () -> Unit, onDownload: () -> Unit) {
+private fun ColumnScope.ConfirmScreen(highPrecision: Boolean, minHeight: Dp, onCancel: () -> Unit, onDownload: () -> Unit) {
     val context = LocalContext.current
-    Column(Modifier.fillMaxSize().padding(24.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+    CenteredPanel(minHeight, actions = {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            Action(stringResource(R.string.caption_not_now), Modifier.weight(1f), onClick = onCancel)
+            Action(stringResource(R.string.caption_download), Modifier.weight(1f), primary = true, onClick = onDownload)
+        }
+    }) {
         Text(stringResource(R.string.auto_captions), color = Am.OnDark, fontSize = 20.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
         Spacer(Modifier.height(16.dp))
         Text(
             app.absentmotion.platform.captionDownloadDescription(context, CaptionModel.name(highPrecision), CaptionModel.bytes(highPrecision)),
             Modifier.fillMaxWidth(), color = Am.OnDark, fontSize = 14.sp, lineHeight = 20.sp, textAlign = TextAlign.Center,
         )
-        Spacer(Modifier.height(24.dp))
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            Action(stringResource(R.string.caption_not_now), Modifier.weight(1f), onClick = onCancel)
-            Action(stringResource(R.string.caption_download), Modifier.weight(1f), primary = true, onClick = onDownload)
-        }
     }
 }
 
 @Composable
-private fun WorkingScreen(
+private fun ColumnScope.WorkingScreen(
     phase: Phase,
     progress: Float,
     status: String,
     phaseStart: Long,
+    minHeight: Dp,
     onCancel: () -> Unit,
 ) {
     var elapsed by remember { mutableLongStateOf(0L) }
@@ -379,7 +422,7 @@ private fun WorkingScreen(
     }
     val pct = (progress.coerceIn(0f, 1f) * 100f).roundToInt()
     val remaining = captionRemainingSeconds(elapsed, progress)
-    Column(Modifier.fillMaxSize().padding(24.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+    CenteredPanel(minHeight, actions = { Action(stringResource(R.string.cancel), Modifier.fillMaxWidth(), onClick = onCancel) }) {
         CircularProgressIndicator(color = Am.Accent)
         Spacer(Modifier.height(24.dp))
         Text(stringResource(R.string.caption_working), color = Am.OnDark, fontSize = 18.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
@@ -393,15 +436,13 @@ private fun WorkingScreen(
         Spacer(Modifier.height(12.dp))
         val eta = if (remaining == null) stringResource(R.string.caption_estimating) else stringResource(R.string.caption_remaining, formatClock(remaining))
         Text(eta, Modifier.fillMaxWidth(), color = Am.OnDarkDim, fontSize = 13.sp, textAlign = TextAlign.Center)
-        Spacer(Modifier.height(24.dp))
-        Action(stringResource(R.string.cancel), Modifier.fillMaxWidth(), onClick = onCancel)
     }
 }
 
 @Composable
 internal fun Line(label: String, modifier: Modifier = Modifier, control: @Composable RowScope.() -> Unit) {
-    Row(modifier.fillMaxWidth().height(44.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text(label, Modifier.weight(1f), color = Am.OnDark, fontSize = 14.sp, maxLines = 1)
+    Row(modifier.fillMaxWidth().heightIn(min = 44.dp), verticalAlignment = Alignment.CenterVertically) {
+        Text(label, Modifier.weight(1f), color = Am.OnDark, fontSize = 14.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
         control()
     }
 }
@@ -432,7 +473,7 @@ internal fun Steps(value: Int, range: IntRange, step: Int, text: String, onChang
 
 @Composable
 internal fun Action(label: String, modifier: Modifier, primary: Boolean = false, onClick: () -> Unit) {
-    Box(modifier.height(40.dp).clip(ChoiceShape).background(if (primary) Am.Accent else Am.Button).clickable(onClick = onClick), Alignment.Center) {
-        Text(label, color = if (primary) Am.OnAccent else Am.OnDark, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+    Box(modifier.heightIn(min = 40.dp).clip(ChoiceShape).background(if (primary) Am.Accent else Am.Button).clickable(onClick = onClick).padding(horizontal = 8.dp), Alignment.Center) {
+        Text(label, color = if (primary) Am.OnAccent else Am.OnDark, fontSize = 15.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
     }
 }

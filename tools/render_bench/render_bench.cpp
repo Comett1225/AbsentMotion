@@ -10,6 +10,7 @@
 #include "scene.h"
 #include "include/core/SkCanvas.h"
 #include "include/core/SkColorSpace.h"
+#include "include/core/SkData.h"
 #include "include/core/SkImage.h"
 #include "include/core/SkPaint.h"
 #include "include/core/SkSurface.h"
@@ -23,7 +24,20 @@ std::string ReadFile(const char* path) {
     return s.str();
 }
 
+sk_sp<SkImage> FilePicture() {
+    const char* path = std::getenv("RENDER_BENCH_PICTURE");
+    const char* width = std::getenv("RENDER_BENCH_PICTURE_WIDTH");
+    const char* height = std::getenv("RENDER_BENCH_PICTURE_HEIGHT");
+    if (!path || !width || !height) return nullptr;
+    const int w = std::atoi(width), h = std::atoi(height);
+    const std::string bytes = ReadFile(path);
+    if (w <= 0 || h <= 0 || bytes.size() != (size_t)w * h * 4) return nullptr;
+    return SkImages::RasterFromData(SkImageInfo::Make(w, h, kRGBA_8888_SkColorType, kPremul_SkAlphaType, SkColorSpace::MakeSRGB()),
+                                    SkData::MakeWithCopy(bytes.data(), bytes.size()), (size_t)w * 4);
+}
+
 sk_sp<SkImage> SyntheticPicture() {
+    if (sk_sp<SkImage> given = FilePicture()) return given;
     auto surface = SkSurfaces::Raster(SkImageInfo::MakeN32Premul(512, 384));
     SkCanvas* c = surface->getCanvas();
     SkPaint band;

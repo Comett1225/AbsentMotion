@@ -3248,6 +3248,9 @@
    "description": "Tỏa tia sáng ra từ các vùng sáng của lớp, hướng ra xa một điểm tâm.",
    "name": "Tia sáng",
    "params": {
+    "blend": {
+     "label": "Hòa trộn"
+    },
     "center": {
      "label": "Tâm"
     },
@@ -3260,8 +3263,18 @@
     "reach": {
      "label": "Độ dài"
     },
+    "style": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
+    },
     "threshold": {
      "label": "Ngưỡng"
+    },
+    "thresholdAdd": {
+     "label": "Ngưỡng cộng thêm"
     }
    }
   },

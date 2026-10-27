@@ -101,6 +101,12 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
     if (!name.contains("Test")) compilerOptions.allWarningsAsErrors.set(true)
 }
 
+tasks.withType<Test>().configureEach {
+    inputs.dir("src/main/assets").withPropertyName("mainAssets").withPathSensitivity(PathSensitivity.RELATIVE)
+    inputs.dir("src/main/res").withPropertyName("mainRes").withPathSensitivity(PathSensitivity.RELATIVE)
+    inputs.dir("../testdata").withPropertyName("testData").withPathSensitivity(PathSensitivity.RELATIVE)
+}
+
 dependencies {
     implementation(platform("androidx.compose:compose-bom:2026.09.00"))
     implementation("androidx.compose.ui:ui")

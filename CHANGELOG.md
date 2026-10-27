@@ -6,6 +6,24 @@ All notable changes to AbsentMotion are listed here, newest first. The format fo
 Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stands for the feature set as it stood on
 2026-10-12.
 
+## [4.1.2] - 2026-10-27
+
+### Changed
+
+- Auto captions open as a scrolling panel over the lower part of the editor instead of covering the whole screen. While captions are being made, the panel shows only the progress, the time left and Cancel.
+- The text editor keeps the keyboard open while you type, move or resize the text, and pick a size, a colour or a font from the strip. Only the tick, Back and the full font list close it; the number keypad and the full colour picker hide it and bring it back when closed, and it comes back only if it was open before. The tick uses the app's accent colour.
+- Tapping the timeline ruler just above the Add menu closes the menu. Dragging and scrubbing there still work.
+- Version History has square, app-coloured panels with clearer rows, buttons and confirmations.
+- In the tutorial, the Add button shows one red pulse with a white flash, the white pointer glides from one control to the next, and steps that ask for a drag or a scrub finish when you lift your finger.
+- Settings show the installed version under Check for update.
+- Rays is redone: rays use the layer's own colours, reach further from the Center and follow the bright parts more closely. It has new Threshold Add and Blend controls and a Style choice. Effects already saved in projects keep their old look (Classic); new effects use Standard. Imported Alight Motion Rays use Standard and now keep their Threshold colour and Blend.
+- In host benchmarks on a Mac GPU, the new Rays costs 1.12 to 1.17 times the old one per 1080 x 1080 frame; there are no phone numbers.
+
+### Fixed
+
+- A cancelled export or export-size estimate could leave the editor preview frozen until the project was closed.
+- Preparing preview frames in the background no longer redraws the unchanged preview after every frame it prepares.
+
 ## [4.1.1] - 2026-10-26
 
 ### Fixed

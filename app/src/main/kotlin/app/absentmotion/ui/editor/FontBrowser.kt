@@ -218,9 +218,9 @@ private val LanguageLabels = mapOf(
 )
 
 @Composable
-internal fun FontIconButton(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
+internal fun FontIconButton(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, modifier: Modifier = Modifier, tint: Color = Am.OnDark, onClick: () -> Unit) {
     Box(modifier.size(42.dp).tutorialGuard().clickable(onClick = onClick), contentAlignment = Alignment.Center) {
-        Icon(icon, label, Modifier.size(24.dp), tint = Am.OnDark)
+        Icon(icon, label, Modifier.size(24.dp), tint = tint)
     }
 }
 

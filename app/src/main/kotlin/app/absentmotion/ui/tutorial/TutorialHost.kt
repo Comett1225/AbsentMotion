@@ -1,5 +1,10 @@
 package app.absentmotion.ui.tutorial
 
+import android.content.ContentResolver
+import android.database.ContentObserver
+import android.os.Handler
+import android.os.Looper
+import android.provider.Settings
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -220,14 +225,19 @@ private class TourDriver(
 ) {
     var view by mutableStateOf(TourView.of(tour))
         private set
+    var held by mutableStateOf(false)
+        private set
+    val watch = GripWatch { held = it }
     private var busy = false
+
+    fun facts(): TourFacts = tourFacts(editor, true).copy(held = held)
 
     private fun settle() {
         view = TourView.of(tour)
         if (tour.finished) onFinished() else if (settings.tutorialStep != tour.step.id) settings.tutorialStep = tour.step.id
     }
 
-    fun feed(facts: TourFacts = tourFacts(editor, true)) {
+    fun feed(facts: TourFacts = facts()) {
         if (busy || Tutorial.tour !== tour) return
         val actions = tour.observe(facts)
         settle()
@@ -281,14 +291,22 @@ private fun TourRunner(tour: Tour, editor: EditorState, settings: AppSettings, o
     val view = driver.view
     var collapsed by remember(view.number) { mutableStateOf(false) }
 
-    LaunchedEffect(driver) { snapshotFlow { tourFacts(editor, true) }.collect { driver.feed(it) } }
+    LaunchedEffect(driver) { snapshotFlow { driver.facts() }.collect { driver.feed(it) } }
+    DisposableEffect(driver, context) {
+        val link = GripLink.activityOf(context)?.window?.let { GripLink.attach(it, driver.watch) }
+        onDispose {
+            link?.release()
+            driver.watch.interrupt()
+        }
+    }
     DisposableEffect(driver) {
         val listener: (Boolean) -> Unit = { driver.pickerClosed(it) }
         Tutorial.listener = listener
         onDispose { if (Tutorial.listener === listener) Tutorial.listener = null }
     }
 
-    val marks = if (view.free) emptyList() else view.targets.flatMap(Tutorial::bounds).map(::areaOf)
+    val marked = if (view.free) emptyList() else view.targets.flatMap { id -> Tutorial.bounds(id).map { Mark(id, areaOf(it)) } }
+    val marks = marked.map { it.area }
     val allowed = if (view.free) emptyList() else view.allowed.flatMap(Tutorial::bounds).map(::areaOf)
     val denied = view.denied.flatMap(Tutorial::bounds).map(::areaOf)
     var frame by remember { mutableStateOf<Area?>(null) }
@@ -303,7 +321,7 @@ private fun TourRunner(tour: Tour, editor: EditorState, settings: AppSettings, o
     Box(Modifier.fillMaxSize().onGloballyPositioned { c -> c.positionInWindow().let { frame = Area(it.x, it.y, it.x + c.size.width, it.y + c.size.height) } }) {
         if (!view.free) InputGate(frame, blocked)
         Spotlight(
-            frame, holes, marks, denied, cardHole, dim = !view.free && (holes.isNotEmpty() || view.step.centred || view.targets.isNotEmpty()),
+            frame, holes, marked, denied, cardHole, dim = !view.free && (holes.isNotEmpty() || view.step.centred || view.targets.isNotEmpty()),
             soft = holes.isEmpty() && !view.step.centred, centred = view.step.centred, reduced = rememberReducedMotion(),
         ) {
             ScaledFonts {
@@ -319,8 +337,20 @@ private fun areaOf(r: androidx.compose.ui.geometry.Rect) = Area(r.left, r.top, r
 @Composable
 private fun rememberReducedMotion(): Boolean {
     val resolver = LocalContext.current.contentResolver
-    return remember(resolver) { android.provider.Settings.Global.getFloat(resolver, android.provider.Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f }
+    var reduced by remember(resolver) { mutableStateOf(motionIsOff(resolver)) }
+    DisposableEffect(resolver) {
+        val observer = object : ContentObserver(Handler(Looper.getMainLooper())) {
+            override fun onChange(selfChange: Boolean) {
+                reduced = motionIsOff(resolver)
+            }
+        }
+        resolver.registerContentObserver(Settings.Global.getUriFor(Settings.Global.ANIMATOR_DURATION_SCALE), false, observer)
+        onDispose { resolver.unregisterContentObserver(observer) }
+    }
+    return reduced
 }
+
+private fun motionIsOff(resolver: ContentResolver) = Settings.Global.getFloat(resolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f
 
 @Composable
 private fun ScaledFonts(content: @Composable () -> Unit) {
@@ -331,11 +361,14 @@ private fun ScaledFonts(content: @Composable () -> Unit) {
 
 @Composable
 private fun Spotlight(
-    frame: Area?, holes: List<Area>, marks: List<Area>, denied: List<Area>, cardHole: Area?,
+    frame: Area?, holes: List<Area>, marks: List<Mark>, denied: List<Area>, cardHole: Area?,
     dim: Boolean, soft: Boolean, centred: Boolean, reduced: Boolean, card: @Composable () -> Unit,
 ) {
     val insets = WindowInsets.safeDrawing
     val accent = Am.Accent
+    val limit = with(LocalDensity.current) { TAP_LIMIT.toPx() }
+    val tap = Guide.tapTarget(marks, limit)
+    val flight = rememberPointerFlight(Guide.pointerAt(tap, frame != null), reduced)
     val phase = if (reduced) null else rememberInfiniteTransition(label = "tutorial-guide").animateFloat(0f, 1f, infiniteRepeatable(tween(PULSE_MS, easing = LinearEasing)), label = "pulse")
     val ox = frame?.left ?: 0f
     val oy = frame?.top ?: 0f
@@ -352,24 +385,29 @@ private fun Spotlight(
             }
             val t = phase?.value ?: 0f
             val glow = if (phase == null) 0.16f else 0.05f + 0.2f * (0.5f - 0.5f * cos(2f * PI.toFloat() * t))
-            marks.forEachIndexed { i, a ->
-                val r = rect(a)
+            marks.forEachIndexed { i, mark ->
+                val r = rect(mark.area)
                 drawRoundRect(RED.copy(alpha = glow), Offset(r.left, r.top), Size(r.width, r.height), corner)
                 drawRoundRect(RED.copy(alpha = (glow * 2.5f).coerceAtMost(0.7f)), Offset(r.left, r.top), Size(r.width, r.height), corner, style = Stroke(1.5.dp.toPx()))
-                if (i == 0) drawRoundRect(accent, Offset(r.left, r.top), Size(r.width, r.height), corner, style = Stroke(2.5.dp.toPx()))
+                if (Guide.accented(marks, i)) drawRoundRect(accent, Offset(r.left, r.top), Size(r.width, r.height), corner, style = Stroke(2.5.dp.toPx()))
             }
-            val first = marks.firstOrNull()
-            if (first != null && phase != null && first.width <= TAP_LIMIT.toPx() && first.height <= TAP_LIMIT.toPx()) {
-                val centre = Offset(first.centreX - ox, first.centreY - oy)
+            if (tap != null && phase != null && Guide.rings(tap)) {
+                val first = tap.area
                 for (lag in floatArrayOf(0f, 0.5f)) {
                     val u = (t + lag) % 1f
                     val grow = 4.dp.toPx() + 16.dp.toPx() * u
                     drawRoundRect(RED.copy(alpha = 0.9f * (1f - u)), Offset(first.left - ox - grow, first.top - oy - grow), Size(first.width + grow * 2, first.height + grow * 2), CornerRadius(8.dp.toPx() + grow), style = Stroke(3.dp.toPx()))
                 }
-                val press = (t * 1.5f) % 1f
-                drawCircle(Color.White.copy(alpha = 0.35f * (1f - press)), 8.dp.toPx() + 12.dp.toPx() * press, centre)
-                drawCircle(Color.White.copy(alpha = 0.8f * (1f - press)), 8.dp.toPx() + 12.dp.toPx() * press, centre, style = Stroke(2.dp.toPx()))
-                drawCircle(Color.White.copy(alpha = 0.9f), 5.dp.toPx(), centre)
+            }
+            val seen = flight.alpha.value
+            if (seen > 0.01f) {
+                val centre = Guide.inFrame(flight.position.value, frame)
+                if (phase != null) {
+                    val press = (t * 1.5f) % 1f
+                    drawCircle(Color.White.copy(alpha = 0.35f * (1f - press) * seen), 8.dp.toPx() + 12.dp.toPx() * press, centre)
+                    drawCircle(Color.White.copy(alpha = 0.8f * (1f - press) * seen), 8.dp.toPx() + 12.dp.toPx() * press, centre, style = Stroke(2.dp.toPx()))
+                }
+                drawCircle(Color.White.copy(alpha = 0.9f * seen), 5.dp.toPx(), centre)
             }
         },
     ) { measurables, constraints ->

@@ -1,0 +1,1 @@
+Captions open as a panel instead of full screen, the text editor keeps the keyboard open, the Add menu closes with a tap above it, a squarer Version History, a clearer tutorial, the installed version in Settings, and a reworked Rays effect that keeps its old look in saved projects.

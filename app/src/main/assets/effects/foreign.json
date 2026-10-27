@@ -3275,10 +3275,12 @@
     "to": "color"
    },
    "thresholdColor": {
-    "neutral": "#ff000000"
+    "to": "thresholdAdd"
    },
    "blend": {
-    "neutral": 0
+    "to": "blend",
+    "min": 0,
+    "max": 1
    },
    "quality": {
     "neutral": 150

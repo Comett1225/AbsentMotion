@@ -357,6 +357,8 @@ internal object TimelineMath {
 
     fun released(end: PointerInputChange?): Boolean = end == null || !end.isConsumed
 
+    fun aboveAddMenu(y: Float, height: Float, menu: Float, ruler: Float): Boolean = y >= 0f && y < minOf(height - menu, ruler)
+
     fun snapFrame(wantedMs: Float, targets: Collection<Int>, fps: Int, zoneMs: Float): Int? {
         val best = targets.minByOrNull { abs(frameTimeMs(it, fps) - wantedMs) } ?: return null
         return best.takeIf { abs(frameTimeMs(it, fps) - wantedMs) <= zoneMs }
@@ -589,6 +591,14 @@ private class TimelineView(val state: EditorState, density: Density, private val
     }
 
     fun isCovered(at: Offset): Boolean = (covered && at.y >= panelTop) || (MultiSelect.active && at.y >= size.height - MultiBarHeight.px)
+
+    fun dismissZone(at: Offset): Boolean = state.addOpen && TimelineMath.aboveAddMenu(at.y, size.height.toFloat(), AddPopupHeight.px, rulerH)
+
+    fun dismissAddMenu(): Boolean {
+        if (!state.addOpen) return false
+        state.addOpen = false
+        return true
+    }
 
     fun hitAt(at: Offset): Hit {
         if (at.y < rulerH) {
@@ -1032,7 +1042,8 @@ private suspend fun PointerInputScope.timelineGestures(view: TimelineView, onLon
     var last: PointerInputChange? = null
     var finger = down.position
     var second: PointerId? = null
-    val holdable = hit is Hit.Eye || hit is Hit.Header || hit is Hit.Row || hit is Hit.Key || hit is Hit.Bar
+    val dismissing = view.dismissZone(down.position)
+    val holdable = !dismissing && (hit is Hit.Eye || hit is Hit.Header || hit is Hit.Row || hit is Hit.Key || hit is Hit.Bar)
     val deadline = down.uptimeMillis + viewConfiguration.longPressTimeoutMillis
     try {
         while (true) {
@@ -1097,7 +1108,9 @@ private suspend fun PointerInputScope.timelineGestures(view: TimelineView, onLon
         }
         lifted = TimelineMath.released(last)
     } finally {
-        if (lifted && (drag == null && !held || drag == Drag.Lift && hit is Hit.Bar && !view.liftMoved)) view.tap(hit)
+        if (lifted && (drag == null && !held || drag == Drag.Lift && hit is Hit.Bar && !view.liftMoved)) {
+            if (dismissing) view.dismissAddMenu() else view.tap(hit)
+        }
         view.endDrag(drag, if (lifted) tracker.calculateVelocity() else Velocity.Zero, lifted)
     }
 }

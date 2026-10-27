@@ -26,7 +26,8 @@ class StylizeEffectsTest {
                 "color4" to ("#ff55ffff" to "#ff3cff6e"), "color5" to ("#ffff5555" to "#ff3c78ff"), "color6" to ("#ffff55ff" to "#ffffd23c")),
             "radialrays" to mapOf("count" to ("5.000000" to "12.000000"), "color" to ("#ff2d1ef6" to "#ffffcc33")),
             "radialshadow" to mapOf("reach" to ("0.250000" to "0.500000"), "alpha" to ("0.100000" to "0.600000"), "fade" to ("0.000000" to "0.500000")),
-            "rays" to mapOf("center" to ("0.500000,0.500000" to "0.500000,0.300000"), "reach" to ("0.150000" to "0.400000"), "color" to ("#ff2d1ef6" to "#fffff2d0")),
+            "rays" to mapOf("center" to ("0.500000,0.500000" to "0.500000,0.300000"), "reach" to ("0.150000" to "0.400000"), "color" to ("#ff2d1ef6" to "#fffff2d0"),
+                "blend" to ("0.000000" to "1.000000"), "thresholdAdd" to ("#ff000000" to "#ff000000"), "style" to ("1.000000" to "0.000000")),
             "roughenedges" to mapOf("octaves" to ("6.000000" to "4.000000")),
             "softglow" to mapOf("color" to ("#ffff5566" to "#ffffffff"), "opacity" to ("1.000000" to "0.800000")),
             "star" to mapOf("color" to ("#ff2d1ef6" to "#ffffffff"), "blend" to ("2.000000" to "6.000000")),
@@ -83,5 +84,37 @@ class StylizeEffectsTest {
         assertEquals("2.000000", values(effects[4], "name")["blend"])
         assertTrue(result.dropped.toString(), result.dropped.isEmpty())
         assertEquals(result.scene.node, migration.migrate(result.scene).scene.node)
+    }
+
+    @Test fun raysClassicIsTheShaderOfVersion411() {
+        val sksl = effect("rays").sksl!!
+        val start = sksl.indexOf("half4 classic(float2 coord) {")
+        val end = sksl.indexOf("\nhalf4 main")
+        assertTrue(start >= 0 && end > start)
+        assertEquals(CLASSIC_RAYS, sksl.substring(start, end))
+        assertTrue(sksl.contains("\nfloat luma(float3 c) { return dot(c, float3(0.2126, 0.7152, 0.0722)); }\n"))
+        assertTrue(sksl.contains("\nhalf4 main(float2 p) {\n    if (style < 0.5) return classic(p);\n"))
+    }
+
+    private companion object {
+        const val CLASSIC_RAYS = """half4 classic(float2 coord) {
+    half4 src = image.eval(coord);
+    float2 c = center * size;
+    float length_ = max(reach, 0.0);
+    float sum = 0.0;
+    for (int i = 0; i < 48; i++) {
+        float t = float(i) / 47.0;
+        half4 s = image.eval(c + (coord - c) * (1.0 - length_ * t / (1.0 + length_)));
+        float l = s.a > 0.0 ? luma(float3(s.rgb) / float(s.a)) * float(s.a) : 0.0;
+        sum += max(l - threshold, 0.0) / max(1.0 - threshold, 0.001) * (1.0 - t);
+    }
+    float g = clamp(sum / 24.0 * intensity * float(color.a), 0.0, 1.0);
+    float a = float(src.a);
+    float3 base = a > 0.0 ? float3(src.rgb) / a : float3(0.0);
+    float3 light = float3(color.rgb) * g;
+    float outA = max(a, g);
+    float3 rgb = outA > 0.0 ? (base * a + light - base * a * light) / outA : float3(0.0);
+    return half4(half3(clamp(rgb, 0.0, 1.0)) * half(outA), half(outA));
+}"""
     }
 }

@@ -3248,6 +3248,9 @@
    "description": "Katmanın parlak kısımlarından, bir merkez noktasından uzağa doğru ışık ışınları yayar.",
    "name": "Işınlar",
    "params": {
+    "blend": {
+     "label": "Karışım"
+    },
     "center": {
      "label": "Merkez"
     },
@@ -3260,8 +3263,18 @@
     "reach": {
      "label": "Uzunluk"
     },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Klasik",
+      "Standart"
+     ]
+    },
     "threshold": {
      "label": "Eşik"
+    },
+    "thresholdAdd": {
+     "label": "Eşik ekle"
     }
    }
   },

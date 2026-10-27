@@ -3248,6 +3248,9 @@
    "description": "Emite raios de luz a partir das partes claras da camada, afastando-se de um ponto central.",
    "name": "Raios",
    "params": {
+    "blend": {
+     "label": "Mistura"
+    },
     "center": {
      "label": "Centro"
     },
@@ -3260,8 +3263,18 @@
     "reach": {
      "label": "Comprimento"
     },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Clássico",
+      "Padrão"
+     ]
+    },
     "threshold": {
      "label": "Limite"
+    },
+    "thresholdAdd": {
+     "label": "Adicionar limite"
     }
    }
   },

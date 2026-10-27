@@ -41,6 +41,12 @@
    "step": 0.001
   },
   {
+   "id": "thresholdAdd",
+   "label": "Threshold Add",
+   "type": "color",
+   "default": "#000000"
+  },
+  {
    "id": "intensity",
    "label": "Intensity",
    "type": "float",
@@ -55,7 +61,29 @@
    "type": "color",
    "default": "#2d1ef6",
    "legacyDefault": "#fff2d0"
+  },
+  {
+   "id": "blend",
+   "label": "Blend",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "percent": true,
+   "legacyDefault": 1
+  },
+  {
+   "id": "style",
+   "label": "Style",
+   "type": "choice",
+   "default": 1,
+   "options": [
+    "Classic",
+    "Standard"
+   ],
+   "legacyDefault": 0
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float2 center;\nuniform float reach;\nuniform float threshold;\nuniform float intensity;\nlayout(color) uniform half4 color;\nfloat luma(float3 c) { return dot(c, float3(0.2126, 0.7152, 0.0722)); }\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    float2 c = center * size;\n    float length_ = max(reach, 0.0);\n    float sum = 0.0;\n    for (int i = 0; i < 48; i++) {\n        float t = float(i) / 47.0;\n        half4 s = image.eval(c + (coord - c) * (1.0 - length_ * t / (1.0 + length_)));\n        float l = s.a > 0.0 ? luma(float3(s.rgb) / float(s.a)) * float(s.a) : 0.0;\n        sum += max(l - threshold, 0.0) / max(1.0 - threshold, 0.001) * (1.0 - t);\n    }\n    float g = clamp(sum / 24.0 * intensity * float(color.a), 0.0, 1.0);\n    float a = float(src.a);\n    float3 base = a > 0.0 ? float3(src.rgb) / a : float3(0.0);\n    float3 light = float3(color.rgb) * g;\n    float outA = max(a, g);\n    float3 rgb = outA > 0.0 ? (base * a + light - base * a * light) / outA : float3(0.0);\n    return half4(half3(clamp(rgb, 0.0, 1.0)) * half(outA), half(outA));\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float2 center;\nuniform float reach;\nuniform float threshold;\nuniform float intensity;\nuniform float blend;\nuniform float style;\nlayout(color) uniform half4 thresholdAdd;\nlayout(color) uniform half4 color;\nfloat luma(float3 c) { return dot(c, float3(0.2126, 0.7152, 0.0722)); }\nhalf4 classic(float2 coord) {\n    half4 src = image.eval(coord);\n    float2 c = center * size;\n    float length_ = max(reach, 0.0);\n    float sum = 0.0;\n    for (int i = 0; i < 48; i++) {\n        float t = float(i) / 47.0;\n        half4 s = image.eval(c + (coord - c) * (1.0 - length_ * t / (1.0 + length_)));\n        float l = s.a > 0.0 ? luma(float3(s.rgb) / float(s.a)) * float(s.a) : 0.0;\n        sum += max(l - threshold, 0.0) / max(1.0 - threshold, 0.001) * (1.0 - t);\n    }\n    float g = clamp(sum / 24.0 * intensity * float(color.a), 0.0, 1.0);\n    float a = float(src.a);\n    float3 base = a > 0.0 ? float3(src.rgb) / a : float3(0.0);\n    float3 light = float3(color.rgb) * g;\n    float outA = max(a, g);\n    float3 rgb = outA > 0.0 ? (base * a + light - base * a * light) / outA : float3(0.0);\n    return half4(half3(clamp(rgb, 0.0, 1.0)) * half(outA), half(outA));\n}\nhalf4 main(float2 p) {\n    if (style < 0.5) return classic(p);\n    float4 src = float4(image.eval(p));\n    float len = clamp(reach, 0.0, 1000.0);\n    float gain = clamp(intensity, 0.0, 100.0) * clamp(float(color.a), 0.0, 1.0) * clamp(len * 100.0, 0.0, 1.0);\n    if (!(gain > 0.0)) return half4(src);\n    float2 c = clamp(center, float2(-8.0), float2(9.0)) * size;\n    float2 d = p - c;\n    float f = len / (len + 0.1);\n    float n = clamp(ceil(f * length(d) / 3.0), 1.0, 48.0);\n    float j = fract(dot(p, float2(0.7548777, 0.5698403)));\n    float thr = clamp(threshold + luma(float3(thresholdAdd.rgb)), 0.04, 2.0);\n    float knee = thr - 0.04;\n    float2 stride = d * (f / n);\n    float2 q = p - stride * j;\n    float w = n - j;\n    float4 acc = float4(0.0);\n    for (int i = 0; i < 48; i++) {\n        if (float(i) >= n) break;\n        float4 s = float4(image.eval(q));\n        float g = s.a > 0.0 ? smoothstep(knee, thr, luma(s.rgb) / max(s.a, 0.000001)) : 0.0;\n        acc += (w * g) * s;\n        q -= stride;\n        w -= 1.0;\n    }\n    acc.rgb = mix(acc.rgb, float3(color.rgb) * luma(acc.rgb), clamp(blend, 0.0, 1.0));\n    float4 o = src + acc * (gain * 0.5 / max(n * (n + 1.0) * 0.5 - n * j, 0.0001));\n    o.a = clamp(o.a, 0.0, 1.0);\n    o.rgb = clamp(o.rgb, float3(0.0), float3(o.a));\n    return half4(o);\n}\n"
 }

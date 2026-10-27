@@ -27,6 +27,7 @@ data class TourFacts(
     val easing: Boolean = false,
     val between: Boolean = false,
     val keypad: Boolean = false,
+    val held: Boolean = false,
 ) {
     val visual: Int get() = media + texts
     val visualSelected: Boolean get() = selected != null && selected != AUDIO
@@ -67,6 +68,7 @@ class TourStep(
     val extra: (start: TourFacts, now: TourFacts) -> List<String> = { _, _ -> emptyList() },
     val deny: List<String> = emptyList(),
     val free: (start: TourFacts, now: TourFacts) -> Boolean = { _, _ -> false },
+    val gesture: Boolean = false,
 )
 
 class Tour(val steps: List<TourStep> = TourSteps.all, startAt: String? = null) {
@@ -124,12 +126,12 @@ class Tour(val steps: List<TourStep> = TourSteps.all, startAt: String? = null) {
         val stage = step.stage
         if (stage != null && staged == null && stage(start, facts)) staged = facts
         val middle = staged
-        val complete = when {
+        val reached = when {
             stage == null -> step.done?.invoke(start, facts) == true
             middle == null -> false
             else -> helped || step.done?.invoke(middle, facts) == true
         }
-        if (complete) {
+        if (reached && !waitsForRelease(facts)) {
             advance(if (assisted) note else R.string.tutorial_note_nice)
             return observe(facts)
         }
@@ -141,6 +143,8 @@ class Tour(val steps: List<TourStep> = TourSteps.all, startAt: String? = null) {
         }
         return emptyList()
     }
+
+    private fun waitsForRelease(facts: TourFacts) = step.gesture && facts.held && !helped
 
     fun next() = advance(null)
 
@@ -216,6 +220,7 @@ object TourSteps {
             deny = listOf("transition", "animate", "side_panel"),
             hint = { _, n -> if (n.selected != TourFacts.MEDIA) R.string.tutorial_hint_select else null },
             done = { s, n -> n.moves != s.moves && n.media > 0 },
+            gesture = true,
             doIt = listOf(TourAction.Move),
             needs = { if (it.media == 0) listOf(TourAction.SamplePicture) else emptyList() },
         ),
@@ -226,6 +231,7 @@ object TourSteps {
             union = true,
             moving = true,
             done = { s, n -> abs(n.frame - s.frame) >= 3 || n.playing },
+            gesture = true,
             doIt = listOf(TourAction.Scrub),
             needs = { if (it.media == 0) listOf(TourAction.SamplePicture) else emptyList() },
         ),
@@ -271,6 +277,7 @@ object TourSteps {
                 }
             },
             done = { s, n -> n.keyframes >= s.keyframes + 2 },
+            gesture = true,
             doIt = listOf(TourAction.Keyframes),
             needs = needsPicture,
         ),
@@ -321,6 +328,7 @@ object TourSteps {
             },
             stage = { s, n -> n.effects > s.effects },
             done = { s, n -> n.tune != s.tune },
+            gesture = true,
             doIt = listOf(TourAction.Effect),
             needs = needsPicture,
         ),

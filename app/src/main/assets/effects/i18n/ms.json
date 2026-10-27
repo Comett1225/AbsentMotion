@@ -3248,6 +3248,9 @@
    "description": "Memancarkan sinar cahaya keluar dari bahagian terang lapisan, menjauhi titik pusat.",
    "name": "Sinar",
    "params": {
+    "blend": {
+     "label": "Campuran"
+    },
     "center": {
      "label": "Pusat"
     },
@@ -3260,8 +3263,18 @@
     "reach": {
      "label": "Panjang"
     },
+    "style": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
+    },
     "threshold": {
      "label": "Ambang"
+    },
+    "thresholdAdd": {
+     "label": "Tambah ambang"
     }
    }
   },
