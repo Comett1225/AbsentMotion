@@ -55,12 +55,16 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.sp
 import app.absentmotion.editor.EditorPanel
 import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.KeypadRequest
 import app.absentmotion.editor.editDrawing
 import app.absentmotion.editor.editPoints
+import app.absentmotion.editor.canCrop
+import app.absentmotion.editor.openCrop
 import app.absentmotion.editor.moveClipEdges
 import app.absentmotion.editor.split
 import app.absentmotion.editor.stepBack
@@ -95,6 +99,7 @@ import app.absentmotion.ui.editor.panels.formatPlain
 import app.absentmotion.ui.editor.panels.px
 import app.absentmotion.ui.editor.panels.turnFor
 import app.absentmotion.ui.theme.Am
+import app.absentmotion.ui.theme.animatedColor
 import app.absentmotion.ui.theme.Presence
 import app.absentmotion.ui.theme.Swap
 import app.absentmotion.ui.theme.TilePress
@@ -166,7 +171,7 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier, side: Boolean 
                     else -> Tile(EditShape) { state.panel = EditorPanel.EditShape }
                 }
                 listOf(
-                    listOf(Tile(ColorFill) { state.panel = EditorPanel.ColorFill }, Tile(BorderShadow) { state.panel = EditorPanel.BorderShadow }, blending),
+                    listOfNotNull(if (state.selected?.canCrop == true) Tile(Crop) { state.openCrop() } else null, Tile(ColorFill) { state.panel = EditorPanel.ColorFill }, Tile(BorderShadow) { state.panel = EditorPanel.BorderShadow }, blending),
                     listOfNotNull(transform, edit, presets, effects),
                     *if (state.selected?.mediaFill?.video == true) arrayOf(listOf(Tile(AiTools) { openEffectBrowser(state, "ai") }, Tile(CaptionTools) { state.playing = false; captions = true })) else emptyArray(),
                 )
@@ -216,6 +221,7 @@ private val CameraMoves = Tool(R.string.camera_moves, PanelIcons.Animate, 19.4f)
 private val ModelOptions = Tool(R.string.layer_tool_model_options, PanelIcons.TabTilt, 19.4f)
 private val Presets = Tool(R.string.presets, PanelIcons.Star, 19.4f)
 private val Effects = Tool(R.string.layer_tool_effects, PanelIcons.Effects, 19.6f)
+private val Crop = Tool(R.string.layer_tool_crop, PanelIcons.Crop, 18.1f)
 private val CaptionTools = Tool(R.string.auto_captions, ChromeIcons.Captions, 19.4f)
 private val AiTools = Tool(R.string.ai, PanelIcons.Bot, 19.4f)
 
@@ -256,6 +262,10 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
     val layer = if (panel == EditorPanel.Speed) selected.atVideoTime(state.sampleMs, state.scene.fps) else selected
     if (panel == EditorPanel.Effects) {
         app.absentmotion.ui.editor.panels.EffectsPanel(state, modifier)
+        return
+    }
+    if (panel == EditorPanel.Crop) {
+        app.absentmotion.ui.editor.panels.CropPanel(state, modifier)
         return
     }
     val move = panel == EditorPanel.MoveTransform
@@ -311,22 +321,31 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
                 EditorPanel.Blending -> BlendingPanel(state, layer, Modifier.fillMaxSize())
                 EditorPanel.Camera -> CameraPanel(state, layer, Modifier.fillMaxSize())
                 EditorPanel.Model -> ModelPanel(state, layer, Modifier.fillMaxSize())
-                EditorPanel.Tools, EditorPanel.EditText, EditorPanel.Effects -> {}
+                EditorPanel.Tools, EditorPanel.EditText, EditorPanel.Effects, EditorPanel.Crop -> {}
             }
             Box(Modifier.width(2.px).fillMaxHeight().background(PanelDark))
             if (move) Box(Modifier.align(Alignment.CenterEnd).width(2.px).fillMaxHeight().background(PanelDark))
         }
         if (move) {
             Column(Modifier.width(168.px).fillMaxHeight().tutorialGuard()) {
-                val names = listOf(R.string.a11y_tab_move, R.string.panel_size, R.string.a11y_tab_rotate, R.string.a11y_tab_tilt, R.string.a11y_tab_skew)
-                listOf(PanelIcons.TabMove, PanelIcons.TabSize, PanelIcons.TabRotate, PanelIcons.TabTilt, PanelIcons.TabSkew).forEachIndexed { i, icon ->
-                    val usable = i <= ROTATE_TAB || selected.kind != "camera"
-                    Box(Modifier.weight(1f).fillMaxWidth().then(if (usable) Modifier.clickable { tab = i } else Modifier.dimmed()).padding(start = 10.px, end = 11.px, top = 11.px, bottom = 11.px)) {
-                        Box(
+                val names = listOf(R.string.a11y_tab_move, R.string.a11y_tab_rotate, R.string.panel_size, R.string.a11y_tab_tilt, R.string.a11y_tab_skew, R.string.a11y_tab_pivot)
+                listOf(PanelIcons.TabMove, PanelIcons.TabRotate, PanelIcons.TabSize, PanelIcons.TabTilt, PanelIcons.TabSkew, PanelIcons.TabPivot).forEachIndexed { i, icon ->
+                    val usable = i <= SIZE_TAB || selected.kind != "camera"
+                    Box(
+                        Modifier.weight(1f).fillMaxWidth().then(if (usable) Modifier.clickable(role = androidx.compose.ui.semantics.Role.Tab) { tab = i } else Modifier.dimmed())
+                            .semantics(mergeDescendants = true) { this.selected = tab == i }.padding(start = 10.px, end = 11.px, top = 5.px, bottom = 5.px),
+                    ) {
+                        Column(
                             Modifier.fillMaxSize().clip(PanelShape).fadeBackground(tab == i, PanelDark),
-                            contentAlignment = Alignment.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center,
                         ) {
-                            PanelIcon(icon, if (tab == i) Am.Accent else Am.OnDark, description = stringResource(names[i]))
+                            val tint = if (tab == i) Am.Accent else Am.OnDark
+                            PanelIcon(icon, tint, size = 17.dp)
+                            Text(
+                                stringResource(names[i]), Modifier.fillMaxWidth().padding(horizontal = 2.dp), color = animatedColor(tint), maxLines = 1, softWrap = false,
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center, lineHeight = 9.sp,
+                                autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(6.sp, 9.sp, 0.5.sp),
+                            )
                         }
                     }
                 }
@@ -337,15 +356,18 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
 
 internal val TransformTargets = listOf(
     KeyTarget(PropRef.Location, "0.000000,0.000000,0.000000"),
-    KeyTarget(PropRef.Scale, "1.000000,1.000000"),
     KeyTarget(PropRef.Rotation, "0.000000"),
+    KeyTarget(PropRef.Scale, "1.000000,1.000000"),
     KeyTarget(PropRef.Tilt, "0.000000,0.000000"),
     KeyTarget(PropRef.Skew, "0.000000,0.000000"),
+    KeyTarget(PropRef.Pivot, "0.000000,0.000000,0.000000"),
 )
 
-internal const val SIZE_TAB = 1
-internal const val ROTATE_TAB = 2
+internal const val ROTATE_TAB = 1
+internal const val SIZE_TAB = 2
 internal const val TILT_TAB = 3
+internal const val SKEW_TAB = 4
+internal const val PIVOT_TAB = 5
 
 @Composable
 private fun FrameButton(icon: ImageVector, description: String, modifier: Modifier, enabled: Boolean = true, onClick: () -> Unit = {}) {

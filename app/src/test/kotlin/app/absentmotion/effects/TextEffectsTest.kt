@@ -15,8 +15,8 @@ class TextEffectsTest {
 
     @Test fun theTextCategoryHoldsTheTextAnimators() {
         assertEquals("Text", EffectCatalog.Categories["text"])
-        assertEquals(setOf("textprogress", "texttransform", "textrandomizer", "countupdown", "timecode"), catalog.listed("text").map { it.key }.toSet())
-        assertTrue(catalog.listed("text").all { it.native && it.sksl == null && it.since == "3.0.0" })
+        assertEquals(setOf("textprogress", "texttransform", "textrandomizer", "countupdown", "timecode", "textpath"), catalog.listed("text").map { it.key }.toSet())
+        assertTrue(catalog.listed("text").all { it.native && it.sksl == null && it.since == if (it.key == "textpath") "4.2.0" else "3.0.0" })
         assertTrue(listOf("absent.drawingprogress", "absent.stroketaper").all { catalog.find(it)?.native == true })
     }
 

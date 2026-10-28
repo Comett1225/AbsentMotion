@@ -28,16 +28,21 @@ Tap any number box to open the number pad. The first tap selects the whole value
 
 ### Transform
 
-Tabs on the right: **Move**, **Size**, **Rotate**, **Tilt**, **Skew**. A camera has only Move, Size and Rotate.
+Tabs on the right: **Move**, **Rotate**, **Size**, **Tilt**, **Skew**, **Pivot**. A camera has only Move, Rotate and Size.
 
 - **Move.** A trackpad ("Drag here to move the layer") and X and Y boxes. Tap **Z** to move the layer along the depth axis. Thin red guides show when the layer lines up with the canvas or another layer.
-- **Size.** Width and height boxes and a **link** button (on by default) that keeps the proportions. For a camera this tab changes the view angle.
 - **Rotate.** A dial: drag the knob around or tap the degrees to type. When the layer is tilted in 3D, this tab becomes a 3D trackpad: one finger tilts, two fingers twist.
+- **Size.** Width and height boxes and a **link** button (on by default) that keeps the proportions. For a camera this tab changes the view angle. The link is remembered for each layer and saved with the project, and the ruler keeps gliding after a flick.
 - **Tilt.** **X ROTATION** and **Y ROTATION** in degrees, for 3D tilt. See [Camera layers and 3D](@camera-3d).
 - **Skew.** **X SKEW** and **Y SKEW** in degrees.
-- **More** has **Reset Location**, **Reset Scale**, **Reset Rotation**, **Reset 3D Rotation**, **Reset Skew** and **Reset Transform** (all five).
+- **Pivot.** The point the layer turns and scales around, in pixels from the middle of the layer. Type **X** and **Y**, drag the trackpad, tap one of the nine squares for a corner, an edge or the center, or drag the marker on the canvas. The layer and its child layers stay where they are.
+- **More** has **Reset Location**, **Reset Rotation**, **Reset Scale**, **Reset 3D Rotation**, **Reset Skew**, **Reset Pivot** and **Reset Transform** (all six).
 
-Move is the position, with X, Y and Z animated together. Size, Rotate, Tilt and Skew each have their own keyframes.
+Move is the position, with X, Y and Z animated together. Rotate, Size, Tilt, Skew and Pivot each have their own keyframes; width and height share the Size keyframes.
+
+### Crop
+
+Photos and videos have a **Crop** button. It dims the part of the layer that will be cut off and shows a frame with eight handles: drag a corner or an edge to crop, or drag inside the frame to move it. Two fingers still zoom the canvas. **Free**, **1:1**, **4:5**, **3:4**, **16:9** and **9:16** fit the largest centered crop of that shape and keep the shape while you drag. Tap a side to type its value, **Reset** removes the crop and **Done** closes the panel. The keyframe button keys all four sides together. The crop is the **Crop** effect, so you can also change it in **Effects**, with **Roundness** and **Feather**; the layer stays where it is.
 
 ### Fill & Color
 

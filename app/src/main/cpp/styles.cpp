@@ -784,7 +784,7 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
         for (const LayerCopy& c : *copies) {
             const bool now = c.timeMs == timeMs;
             const float tc = now ? t : l.localTime(c.timeMs);
-            const SkMatrix mc = now ? m : SiblingMatrix(siblings, l, c.timeMs);
+            const SkMatrix& mc = c.layer;
             const SkPath pc = now ? path : BodyPath(l, tc);
             const bool tinted = c.look.tinted > 0;
             const bool styled = tinted || c.look.mode != SkBlendMode::kSrcOver;
@@ -1061,6 +1061,7 @@ void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& 
     }
     const float t = l.localTime(timeMs);
     const float opacity = std::clamp(ov.unitOpacity ? ov.alpha : l.opacity.get(0, t, 1) * MotionOpacity(l, timeMs) * ov.alpha, 0.0f, 1.0f);
+    if (!(opacity > 0)) return;
     const bool group = l.kind == "embedScene";
     bool decorated = false;
     const bool pixelEdged = PixelEdged(l, pictures);
@@ -1124,6 +1125,64 @@ void SetLayerEffects(const LayerEffects* effects, const Scene* scene, bool world
 }
 
 bool WorldView() { return gWorld; }
+
+bool EffectOwnerMatrix(int64_t owner, double timeMs, SkMatrix* matrix) {
+    if (!gEffectList) return false;
+    for (const Layer& l : *gEffectList) {
+        if (l.id == owner) {
+            *matrix = SiblingMatrix(*gEffectList, l, timeMs);
+            return true;
+        }
+    }
+    return false;
+}
+
+int ProjectFps() { return Fps(); }
+
+SceneScope::SceneScope(const Scene& scene) : fPrevious(gScene) {
+    if (!gScene) gScene = &scene;
+}
+
+SceneScope::~SceneScope() { gScene = fPrevious; }
+
+static const std::vector<Layer>* ListWith(const std::vector<Layer>& layers, int64_t id, const Layer** found) {
+    for (const Layer& l : layers) {
+        if (l.id == id) {
+            *found = &l;
+            return &layers;
+        }
+    }
+    for (const Layer& l : layers) {
+        if (const std::vector<Layer>* inside = ListWith(l.children, id, found)) return inside;
+    }
+    return nullptr;
+}
+
+bool TextGuideBelow(const Layer& layer, float t, SkPath* path) {
+    const Layer* self = nullptr;
+    const std::vector<Layer>* list = nullptr;
+    if (gEffectList) {
+        for (const Layer& s : *gEffectList) {
+            if (s.id == layer.id) self = &s;
+        }
+        if (self) list = gEffectList;
+    }
+    if (!list && gScene) list = ListWith(gScene->layers, layer.id, &self);
+    if (!list || !self) return false;
+    if (self->placed && self->sight.layers && self->sight.layer) {
+        list = self->sight.layers;
+        self = self->sight.layer;
+    }
+    const Layer* below = PathSource(*list, *self);
+    if (!below || below == self || below->kind == "nullobj" || below->kind == "camera" || below->kind == "audio") return false;
+    const double timeMs = layer.startTime + (double)t * std::max(0, layer.endTime - layer.startTime);
+    const float tb = below->localTime(timeMs);
+    SkMatrix inverse;
+    if (!SiblingMatrix(*list, *self, timeMs).invert(&inverse)) return false;
+    const SkPath outline = below->text ? TextGlyphPath(*below, tb, Fps()) : below->kind == "drawing" ? DrawingStrokes(*below) : ShapePath(*below, tb);
+    *path = outline.makeTransform(SkMatrix::Concat(inverse, SiblingMatrix(*list, *below, timeMs)));
+    return !path->isEmpty();
+}
 
 void ParseStyle(const XmlNode& n, Layer* l) {
     l->blending = AttrOf(n, "blending");
@@ -1221,7 +1280,7 @@ static bool ContainsOne(const std::vector<Layer>& siblings, const Layer& l, doub
     if (l.kind == "drawing") return DrawingContains(l, local);
     if (l.kind != "embedScene") {
         const float t = l.localTime(timeMs);
-        const SkPath path = ShapePath(l, t);
+        const SkPath path = l.text ? TextHitPath(l, t) : ShapePath(l, t);
         const sk_sp<SkImage> mask = ShapeKind(l) && !l.text && !l.video && l.fillType == "media" ? masks(l.mediaUri, l.id) : nullptr;
         if (mask) return CutoutContains(l, t, path, *mask, local, std::sqrt(std::fabs(matrix.getScaleX() * matrix.getScaleY() - matrix.getSkewX() * matrix.getSkewY())));
         if (l.fillType != "none" && path.contains(local.fX, local.fY)) return true;
@@ -1312,7 +1371,9 @@ bool InheritEffects(const std::vector<Layer>& layers, std::vector<Layer>* out) {
             auto parent = std::find_if(layers.begin(), layers.end(), [&](const Layer& p) { return p.id == up && p.id != l.id; });
             if (parent == layers.end()) break;
             for (const LayerEffect& e : parent->effects) {
-                if (Shared(e)) l.effects.push_back(e);
+                if (!Shared(e)) continue;
+                l.effects.push_back(e);
+                l.effects.back().owner = parent->id;
             }
             up = parent->parent;
         }

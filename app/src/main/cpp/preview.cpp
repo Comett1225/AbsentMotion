@@ -8,6 +8,7 @@
 #include <cmath>
 namespace am {
 static bool PreviewQuad(const Scene& scene, int64_t id, double time, float xy[8]) {
+    const SceneScope scope(scene);
     const Layer* layer=scene.layer(id);
     if(!layer || !layer->activeAt(time))return false;
     SkPoint q[4];SelectionBounds(*layer,time,SkMatrix::I()).toQuad(q);

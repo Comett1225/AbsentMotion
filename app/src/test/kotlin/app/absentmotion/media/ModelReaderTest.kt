@@ -116,6 +116,26 @@ class ModelReaderTest {
                       {"bufferView":2,"componentType":5123,"count":3,"type":"SCALAR"}]}
     """.trimIndent()
 
+    private fun gltfPrimitive(mode: Int): ByteArray {
+        val positions = floats(0f, 0f, 0f, 1f, 0f, 0f, 0f, 1f, 0f, 1f, 1f, 0f)
+        val indices = shorts(0, 1, 2, 3)
+        val data = positions + indices
+        val uri = "data:application/octet-stream;base64," + Base64.getEncoder().encodeToString(data)
+        return """
+            {"asset":{"version":"2.0"},"scene":0,"scenes":[{"nodes":[0]}],"nodes":[{"mesh":0}],
+             "meshes":[{"primitives":[{"attributes":{"POSITION":0},"indices":1,"mode":$mode}]}],
+             "buffers":[{"byteLength":${data.size},"uri":"$uri"}],
+             "bufferViews":[{"buffer":0,"byteOffset":0,"byteLength":48},{"buffer":0,"byteOffset":48,"byteLength":8}],
+             "accessors":[{"bufferView":0,"componentType":5126,"count":4,"type":"VEC3"},
+                          {"bufferView":1,"componentType":5123,"count":4,"type":"SCALAR"}]}
+        """.trimIndent().toByteArray()
+    }
+
+    @Test fun gltfTriangleStripsAndFansBecomeTriangles() {
+        assertEquals(2, readModel("strip.gltf", gltfPrimitive(5)) { null }.triangleCount)
+        assertEquals(2, readModel("fan.gltf", gltfPrimitive(6)) { null }.triangleCount)
+    }
+
     @Test fun aGltfWithAnEmbeddedBufferReadsGeometryMaterialAndUvs() {
         val uri = "data:application/octet-stream;base64," + Base64.getEncoder().encodeToString(triangle)
         val mesh = readModel("tri.gltf", gltf("""{"byteLength":${triangle.size},"uri":"$uri"}""").toByteArray()) { null }
@@ -252,6 +272,16 @@ class ModelReaderTest {
             .replace("""{"bufferView":2,"componentType":5123,"count":3,"type":"SCALAR"}""", """{"bufferView":2,"componentType":5123,"count":3,"type":"SCALAR"},$noData""")
             .replace(""""meshes":[{"primitives":[""", """"meshes":[{"primitives":[""" + List(40) { """{"attributes":{"POSITION":0,"NORMAL":3},"indices":2},""" }.joinToString(""))
         timed(5) { assertEquals(41, GltfReader.read(hugeNormals.toByteArray(), { null }).triangleCount) }
+    }
+
+    @Test fun anObjTextureNameKeepsItsSpaces() {
+        val obj = "mtllib stone.mtl\nv 0 0 0\nv 1 0 0\nv 0 1 0\nusemtl stone\nf 1 2 3\n"
+        val mtl = "newmtl stone\nmap_Kd marble stone.png\n"
+        fun spaced(name: String) = when (name) { "stone.mtl" -> mtl.toByteArray(); "marble stone.png" -> png; else -> null }
+        val mesh = readModel("stone.obj", obj.toByteArray(), ::spaced)
+        assertEquals(1, mesh.textures.size)
+        assertArrayEquals(png, mesh.textures[0])
+        assertEquals(listOf(0), mesh.slots.toList())
     }
 
     @Test fun anObjWithTooMuchWorkIsRefused() {

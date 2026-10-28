@@ -102,7 +102,7 @@ fun EditorTopBar(state: EditorState, onExit: () -> Unit, modifier: Modifier = Mo
             }
             Spacer(Modifier.width(6.dp))
             BarButton(ChromeIcons.Trash, stringResource(R.string.topbar_delete_layer), cell.enterFade()) { act { state.deleteSelected() } }
-            Spacer(Modifier.width(1.dp))
+            Spacer(Modifier.width(6.dp))
             BarButton(ChromeIcons.More, stringResource(R.string.topbar_layer_menu), cell.enterFade()) { act { layerMenuOpen = true } }
         }
         Presence(layer != null && !inPanel && layerMenuOpen) { LayerMenu(state) { layerMenuOpen = false } }

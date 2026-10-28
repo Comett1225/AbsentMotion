@@ -20,6 +20,7 @@ data class PropRef(val kind: Kind, val name: String, val effectIndex: Int = -1) 
     companion object {
         val Location = PropRef(Kind.Transform, "location")
         val Scale = PropRef(Kind.Transform, "scale")
+        val Pivot = PropRef(Kind.Transform, "pivot")
         val Rotation = PropRef(Kind.Transform, "rotation")
         val Skew = PropRef(Kind.Transform, "skew")
         val Tilt = PropRef(Kind.Transform, "tilt")
@@ -63,12 +64,14 @@ data class Easing(val type: String, val p: List<Float> = emptyList(), val prefix
     }
 }
 
+private fun XmlNode.keyTime(): Float? = (this["t"]?.toFloatOrNull() ?: 0f).takeIf { it.isFinite() }
+
 val XmlNode.keyframes: List<Keyframe>
     get() = children.filter { it.name == "kf" }.mapNotNull { n ->
-        (n["t"]?.toFloatOrNull() ?: 0f).takeIf { it.isFinite() }?.let { Keyframe(it, n["v"] ?: "", n["e"], n["gen"], n.attrs - KnownKeyAttributes) }
+        n.keyTime()?.let { Keyframe(it, n["v"] ?: "", n["e"], n["gen"], n.attrs - KnownKeyAttributes) }
     }.sortedBy { it.t }
 
-val XmlNode.isKeyframed: Boolean get() = children.any { it.name == "kf" }
+val XmlNode.isKeyframed: Boolean get() = children.any { it.name == "kf" && it.keyTime() != null }
 
 fun XmlNode.withKeyframes(keys: List<Keyframe>): XmlNode = copy(
     attrs = attrs - "value",

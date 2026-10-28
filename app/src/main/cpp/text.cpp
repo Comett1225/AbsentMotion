@@ -7,6 +7,8 @@
 #include <mutex>
 #include <string_view>
 #include "textanim.h"
+#include "warp.h"
+#include "include/core/SkContourMeasure.h"
 #include "include/core/SkCanvas.h"
 #include "include/core/SkColorFilter.h"
 #include "include/core/SkColorSpace.h"
@@ -246,9 +248,14 @@ std::shared_ptr<TextLayout> ParseText(const XmlNode& n) {
     }
     return text;
 }
-SkPath TextPath(const Layer& layer, float) {
+namespace {
+bool OnPathBounds(const Layer& layer, float t, SkRect* bounds);
+}
+SkPath TextPath(const Layer& layer, float t) {
     auto& text = *layer.text;
     layout(text);
+    SkRect placed;
+    if (OnPathBounds(layer, t, &placed)) return SkPath::Rect(placed);
     return SkPath::Rect(SkRect::MakeXYWH(-text.width / 2, -text.height / 2, text.width, text.height));
 }
 namespace {
@@ -308,7 +315,7 @@ const SkRect& InkBounds(TextLayout& text) {
 }
 namespace {
 const char* const kTextIds[] = {"absent.textprogress", "absent.texttransform", "absent.textrandomizer", "absent.countupdown",
-                                "absent.timecode"};
+                                "absent.timecode", "absent.textpath"};
 
 struct Piece {
     Paragraph* paragraph;
@@ -325,6 +332,7 @@ struct Glyph {
     SkMatrix matrix = SkMatrix::I();
     float alpha = 1, blur = 0;
     SkColor4f tint = {0, 0, 0, 0};
+    float advance = 0;
 };
 
 int Choice(const LayerEffect& e, const char* name, float t, int fallback, int last) {
@@ -405,11 +413,14 @@ std::vector<Glyph> Collect(const std::vector<Piece>& pieces) {
         piece.paragraph->visit([&](int line, const Paragraph::VisitorInfo* info) {
             if (!info) return;
             std::vector<SkRect> bounds(info->count);
+            std::vector<SkScalar> widths(info->count);
             info->font.getBounds({info->glyphs, (size_t)info->count}, bounds, nullptr);
+            info->font.getWidths({info->glyphs, (size_t)info->count}, widths);
             for (int i = 0; i < info->count; i++) {
                 const SkPoint at = {piece.x + info->origin.fX + info->positions[i].fX, piece.y + info->origin.fY + info->positions[i].fY};
                 glyphs.push_back({info->font, info->glyphs[i], at, bounds[i].makeOffset(at.fX, at.fY), piece.base + (int)info->utf8Starts[i],
                                   piece.line >= 0 ? piece.line : line});
+                glyphs.back().advance = widths[i];
             }
         });
     }
@@ -519,6 +530,125 @@ void Apply(const Layer& l, float t, const textanim::Segments& seg, std::vector<G
     }
 }
 
+const LayerEffect* PathEffect(const Layer& l) {
+    const LayerEffect* found = nullptr;
+    for (const LayerEffect& e : l.effects) {
+        if (!e.hidden && e.id == "absent.textpath") found = &e;
+    }
+    return found;
+}
+
+SkPoint PointOf(const LayerEffect& e, const char* name, float t, SkPoint fallback) {
+    const Property* p = e.prop(name);
+    return p ? SkPoint{p->anim.get(0, t, fallback.fX), p->anim.get(1, t, fallback.fY)} : fallback;
+}
+
+thread_local int gGuideDepth = 0;
+
+SkPath Guide(const Layer& l, const LayerEffect& e, float t) {
+    const int shape = Choice(e, "shape", t, 0, 2);
+    if (shape == 2) {
+        SkPath below;
+        if (gGuideDepth > 3) return below;
+        gGuideDepth++;
+        const bool found = TextGuideBelow(l, t, &below);
+        gGuideDepth--;
+        return found ? below : SkPath();
+    }
+    SkPathBuilder b;
+    if (shape == 1) {
+        const SkPoint c = PointOf(e, "center", t, {0, 0});
+        const float r = std::fabs(e.value("radius", t, 220));
+        if (!(r > 0) || !std::isfinite(r) || !c.isFinite()) return {};
+        const float w = SK_ScalarRoot2Over2;
+        b.moveTo(c.fX, c.fY - r);
+        b.conicTo({c.fX + r, c.fY - r}, {c.fX + r, c.fY}, w);
+        b.conicTo({c.fX + r, c.fY + r}, {c.fX, c.fY + r}, w);
+        b.conicTo({c.fX - r, c.fY + r}, {c.fX - r, c.fY}, w);
+        b.conicTo({c.fX - r, c.fY - r}, {c.fX, c.fY - r}, w);
+        b.close();
+        return b.detach();
+    }
+    b.moveTo(PointOf(e, "start", t, {-300, 80}));
+    b.cubicTo(PointOf(e, "control1", t, {-200, -120}), PointOf(e, "control2", t, {200, -120}), PointOf(e, "end", t, {300, 80}));
+    return b.detach();
+}
+
+void OnPath(const Layer& l, float t, std::vector<Glyph>* glyphs) {
+    const LayerEffect* e = PathEffect(l);
+    if (!e || glyphs->empty()) return;
+    const SkPath guide = Guide(l, *e, t);
+    if (guide.isEmpty() || !guide.isFinite()) return;
+    std::vector<sk_sp<SkContourMeasure>> parts;
+    float length = 0;
+    SkContourMeasureIter contours(guide, false, 4);
+    while (sk_sp<SkContourMeasure> contour = contours.next()) {
+        if (!(contour->length() > 0)) continue;
+        length += contour->length();
+        parts.push_back(std::move(contour));
+    }
+    if (parts.empty() || !std::isfinite(length)) return;
+    const bool closed = parts.size() == 1 && parts[0]->isClosed();
+    const bool reverse = e->value("reverse", t, 0) >= 0.5f, turn = e->value("rotate", t, 1) >= 0.5f;
+    warp::Start top;
+    if (closed) {
+        constexpr int kSamples = 256;
+        std::vector<float> xs(kSamples), ys(kSamples);
+        for (int i = 0; i < kSamples; i++) {
+            SkPoint p = {0, 0};
+            parts[0]->getPosTan(length * i / kSamples, &p, nullptr);
+            xs[i] = p.fX;
+            ys[i] = p.fY;
+        }
+        top = warp::TopStart(xs, ys, length);
+    }
+    const bool backward = closed ? top.flip != reverse : reverse;
+    auto place = [&](float d, SkPoint* at, SkVector* tangent) {
+        for (size_t i = 0; i < parts.size(); i++) {
+            const float part = parts[i]->length();
+            if (d <= part || i + 1 == parts.size()) return parts[i]->getPosTan(std::min(d, part), at, tangent);
+            d -= part;
+        }
+        return false;
+    };
+    const int align = Choice(*e, "align", t, 1, 2);
+    const float position = e->value("position", t, 0.5f) * length, shift = e->value("baseline", t, 0);
+    struct Extent {
+        float left = INFINITY, right = -INFINITY, base = 0;
+        bool seen = false;
+    };
+    std::map<int, Extent> lines;
+    std::map<std::pair<int, int>, Extent> clusters;
+    for (const Glyph& g : *glyphs) {
+        Extent& line = lines[g.line];
+        if (!line.seen) line.base = g.at.fY;
+        line.seen = true;
+        line.left = std::min(line.left, g.at.fX);
+        line.right = std::max(line.right, g.at.fX + g.advance);
+        Extent& cluster = clusters[{g.line, g.offset}];
+        cluster.left = std::min(cluster.left, g.at.fX);
+        cluster.right = std::max(cluster.right, g.at.fX + g.advance);
+    }
+    const float first = lines.begin()->second.base + (std::isfinite(shift) ? shift : 0);
+    for (Glyph& g : *glyphs) {
+        const Extent& line = lines[g.line];
+        const Extent& cluster = clusters[{g.line, g.offset}];
+        const float mid = (cluster.left + cluster.right) / 2;
+        const float along = position + mid - warp::Anchor(align, line.left, line.right);
+        const warp::Spot spot = closed ? warp::Along(top.at + (backward ? length / 2 - along : along - length / 2), length, true)
+                                       : warp::Along(along, length, false);
+        SkPoint at;
+        SkVector tangent;
+        if (!place(closed || !reverse ? spot.at : length - spot.at, &at, &tangent)) continue;
+        if (backward) tangent = -tangent;
+        at += tangent * spot.beyond;
+        if (!turn) tangent = {1, 0};
+        const SkVector normal = {-tangent.fY, tangent.fX};
+        g.matrix.postConcat(SkMatrix::MakeAll(tangent.fX, normal.fX, at.fX - tangent.fX * mid - normal.fX * first,
+                                              tangent.fY, normal.fY, at.fY - tangent.fY * mid - normal.fY * first, 0, 0, 1));
+    }
+}
+
 std::vector<int> WordBreaks(const std::string& text) {
     std::vector<int> out;
     const std::vector<uint32_t> points = textanim::CodePoints(text);
@@ -535,7 +665,21 @@ std::vector<Glyph> Animate(const Layer& l, float t, int fps) {
     std::string shown;
     std::vector<Glyph> glyphs = Collect(Pieces(*l.text, l, t, fps, &shown));
     Apply(l, t, textanim::Split(shown, WordBreaks(shown)), &glyphs);
+    OnPath(l, t, &glyphs);
     return glyphs;
+}
+
+bool OnPathBounds(const Layer& layer, float t, SkRect* bounds) {
+    if (!PathEffect(layer)) return false;
+    SkRect placed = SkRect::MakeEmpty();
+    for (const Glyph& g : Animate(layer, t, ProjectFps())) {
+        SkRect box;
+        g.font.getBounds({&g.id, 1}, {&box, 1}, nullptr);
+        placed.join(g.matrix.mapRect(box.makeOffset(g.at.fX, g.at.fY)));
+    }
+    if (placed.isEmpty() || !placed.isFinite()) return false;
+    *bounds = placed.makeOutset(2, 2);
+    return true;
 }
 
 void DrawGlyphs(SkCanvas* canvas, const std::vector<Glyph>& glyphs, SkColor4f color, TextPart part) {
@@ -594,6 +738,23 @@ SkPath TextGlyphPath(const Layer& layer, float t, int fps) {
         if (auto path = font.getPath(glyph)) b.addPath(*path, SkMatrix::Translate(x, y));
     });
     return b.detach();
+}
+SkPath TextHitPath(const Layer& layer, float t) {
+    layout(*layer.text);
+    if (!PathEffect(layer)) return TextPath(layer, t);
+    SkPathBuilder b;
+    for (const Glyph& g : Animate(layer, t, ProjectFps())) {
+        if (!(g.alpha > 0.002f)) continue;
+        SkFontMetrics metrics;
+        g.font.getMetrics(&metrics);
+        SkPoint q[4];
+        SkRect::MakeLTRB(g.at.fX, g.at.fY + metrics.fAscent, g.at.fX + g.advance, g.at.fY + metrics.fDescent).toQuad(q);
+        g.matrix.mapPoints(q);
+        if ((q[1] - q[0]).cross(q[2] - q[1]) < 0) std::swap(q[1], q[3]);
+        b.addPolygon({q, 4}, true);
+    }
+    SkPath path = b.detach();
+    return path.isEmpty() ? TextPath(layer, t) : path;
 }
 void DrawText(SkCanvas* canvas, const Layer& layer, float t, const SkPaint& paint, int fps, TextPart part) {
     auto& text = *layer.text;

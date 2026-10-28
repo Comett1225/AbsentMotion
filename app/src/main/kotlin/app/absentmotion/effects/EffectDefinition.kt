@@ -4,6 +4,7 @@ import app.absentmotion.model.Keyframe
 import app.absentmotion.model.XmlNode
 import app.absentmotion.model.withKeyframes
 import app.absentmotion.model.formatFloats
+import app.absentmotion.model.valueAt
 import org.json.JSONArray
 import org.json.JSONObject
 import java.util.Locale
@@ -23,6 +24,7 @@ data class EffectParam(
     val layerTime: Boolean = false,
     val after: String? = null,
     val legacyDefault: String? = null,
+    val showWhen: Pair<String, Set<Int>>? = null,
 ) {
     val type: String get() = when (kind) { "point" -> "vec2"; "color" -> "color"; "switch" -> "bool"; "text" -> "string"; else -> "float" }
     val missingDefault: String get() = legacyDefault ?: default
@@ -48,6 +50,9 @@ data class EffectParam(
             val d = json.opt("default")
             val default = format(id, kind, d)
             val legacyDefault = if (json.has("legacyDefault")) format(id, kind, json.get("legacyDefault")) else null
+            val showWhen = json.optJSONObject("when")?.let { o ->
+                o.keys().asSequence().firstOrNull()?.let { key -> key to o.getJSONArray(key).let { a -> List(a.length()) { a.getInt(it) }.toSet() } }
+            }
             if (kind == "choice") {
                 val options = json.getJSONArray("options").let { a -> List(a.length()) { a.getString(it) } }
                 require(options.isNotEmpty() && (d as Number).toInt() in options.indices) { "$id: choice $d" }
@@ -56,7 +61,8 @@ data class EffectParam(
             return EffectParam(id, json.optString("label", id), kind, default,
                 json.optDouble("min", -Float.MAX_VALUE.toDouble()).toFloat(), json.optDouble("max", Float.MAX_VALUE.toDouble()).toFloat(),
                 json.optDouble("step", 0.01).toFloat(), percent = json.optBoolean("percent"), pixels = json.optBoolean("pixels"), unit = json.optString("unit"),
-                layerTime = json.optBoolean("layerTime"), after = json.optString("after").takeIf { it.isNotEmpty() }, legacyDefault = legacyDefault)
+                layerTime = json.optBoolean("layerTime"), after = json.optString("after").takeIf { it.isNotEmpty() }, legacyDefault = legacyDefault,
+                showWhen = showWhen)
         }
     }
 }
@@ -111,6 +117,12 @@ data class EffectDefinition(
         val floor = params.firstOrNull { it.id == param.after }?.let { p -> bounded(p, seconds, value).let { b -> value(p).coerceIn(b.min, b.max) } }
         val lo = maxOf(param.min, floor ?: param.min)
         return param.copy(min = lo, max = maxOf(lo, if (param.layerTime) minOf(param.max, seconds) else param.max))
+    }
+
+    fun shown(param: EffectParam, instance: XmlNode, t: Float): Boolean {
+        val (id, values) = param.showWhen ?: return true
+        val raw = instance.children.firstOrNull { it.name == "property" && it["name"] == id }?.valueAt(t) ?: params.firstOrNull { it.id == id }?.missingDefault
+        return raw?.toFloatOrNull()?.let { kotlin.math.round(it).toInt() } in values
     }
 
     fun runtimeXml(): String = XmlNode("effect", listOfNotNull("id" to id, sksl?.let { "sksl" to it }).toMap(),

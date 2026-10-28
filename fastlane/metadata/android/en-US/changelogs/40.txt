@@ -1,0 +1,1 @@
+Updates now download inside the app with a progress bar, Cancel and Try again. Each download is checked against the release checksum and the app signing key, and Android asks you to confirm the install. If Android does not allow updates from AbsentMotion yet, the app asks for that before downloading.

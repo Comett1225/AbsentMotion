@@ -207,6 +207,33 @@ class BackupTest {
         assertEquals("font", File(newRoot, "fonts/imported/Mine.ttf").readText())
     }
 
+    @Test fun aBackedUpFontWithTheNameOfADifferentFontKeepsItsOwnFileAndEveryReference() {
+        val oldRoot = tmp.newFolder("old")
+        val old = ProjectStore(oldRoot)
+        val withFont = "imported?name=Mine.ttf"
+        val id = old.create(Scene(XmlNode("scene", linkedMapOf("width" to "10", "height" to "10", "title" to "Fonts"),
+            listOf(XmlNode("text", linkedMapOf("id" to "1", "font" to withFont))))))
+        old.versions.snapshot(id, old.text(id)!!)
+        File(oldRoot, "presets/p.xml").apply { parentFile.mkdirs(); writeText("""<scene width="10" height="10" type="preset"><text id="1" font="$withFont"/></scene>""") }
+        File(oldRoot, "fonts/imported/Mine.ttf").apply { parentFile.mkdirs(); writeText("backed up font") }
+        val bytes = backup(oldRoot)
+        val newRoot = tmp.newFolder("new")
+        File(newRoot, "fonts/imported/Mine.ttf").apply { parentFile.mkdirs(); writeText("another font") }
+        val fresh = ProjectStore(newRoot)
+        Backup.restore(fresh, newRoot, ByteArrayInputStream(bytes))
+        assertEquals("another font", File(newRoot, "fonts/imported/Mine.ttf").readText())
+        assertEquals("backed up font", File(newRoot, "fonts/imported/Mine-1.ttf").readText())
+        val renamed = "imported?name=Mine-1.ttf"
+        assertEquals(renamed, fresh.load(id)!!.layers.single().node["font"])
+        assertTrue(fresh.versions.list(id).single().file.readText().contains(renamed))
+        assertTrue(File(newRoot, "presets/p.xml").readText().contains(renamed))
+        val same = tmp.newFolder("same")
+        File(same, "fonts/imported/Mine.ttf").apply { parentFile.mkdirs(); writeText("backed up font") }
+        Backup.restore(ProjectStore(same), same, ByteArrayInputStream(bytes))
+        assertEquals(listOf("Mine.ttf"), File(same, "fonts/imported").list()!!.toList())
+        assertEquals(withFont, ProjectStore(same).load(id)!!.layers.single().node["font"])
+    }
+
     @Test fun rejectsOtherFilesAndPathsThatLeaveTheFolder() {
         val root = tmp.newFolder("root")
         val store = ProjectStore(root)
@@ -516,6 +543,114 @@ class BackupTest {
             fail()
         } catch (e: ImportFailed) {
             assertEquals(txt(R.string.library_err_too_many_files, "100000"), e.text)
+        }
+    }
+
+    private fun template(root: File, id: String, title: String, pixels: String): File {
+        val dir = File(root, "templates/$id")
+        val media = File(dir, "media/photo.png").apply { parentFile.mkdirs(); writeText(pixels) }
+        File(dir, "scene.xml").writeText(Scene(XmlNode("scene", linkedMapOf("width" to "10", "height" to "10", "title" to title),
+            listOf(XmlNode("shape", linkedMapOf("id" to "1", "fillImage" to media.toURI().toString()))))).toXml())
+        File(dir, "thumb.png").writeText("thumb of $title")
+        return dir
+    }
+
+    @Test fun aChangedTemplateWithTheSameIdComesBackAsASeparateCopyAndTheLocalOneIsUntouched() {
+        val oldRoot = tmp.newFolder("old")
+        template(oldRoot, "t1", "Old name", "old pixels")
+        val bytes = backup(oldRoot)
+        val newRoot = tmp.newFolder("new")
+        template(newRoot, "t1", "New name", "new pixels")
+        Backup.restore(ProjectStore(newRoot), newRoot, ByteArrayInputStream(bytes))
+        assertEquals("New name", Scene.parse(File(newRoot, "templates/t1/scene.xml").readText()).title)
+        assertEquals("new pixels", File(newRoot, "templates/t1/media/photo.png").readText())
+        val copy = File(newRoot, "templates").listFiles { f -> f.isDirectory && f.name != "t1" }.orEmpty().single()
+        assertEquals("Old name", Scene.parse(File(copy, "scene.xml").readText()).title)
+        assertEquals("old pixels", File(copy, "media/photo.png").readText())
+        assertEquals("thumb of Old name", File(copy, "thumb.png").readText())
+        val uri = Scene.parse(File(copy, "scene.xml").readText()).node.mediaUris().single()
+        assertEquals(File(copy, "media/photo.png").canonicalPath, File(java.net.URI(uri)).canonicalPath)
+        assertFalse(File(newRoot, "restore-staging").exists())
+    }
+
+    @Test fun aTemplateCopyFromABackupWithoutMediaStillPointsAtMediaThatExists() {
+        val oldRoot = tmp.newFolder("old")
+        template(oldRoot, "t1", "Old name", "old pixels")
+        val bytes = backup(oldRoot, media = false)
+        val newRoot = tmp.newFolder("new")
+        template(newRoot, "t1", "New name", "new pixels")
+        Backup.restore(ProjectStore(newRoot), newRoot, ByteArrayInputStream(bytes))
+        val copy = File(newRoot, "templates").listFiles { f -> f.isDirectory && f.name != "t1" }.orEmpty().single()
+        assertEquals("Old name", Scene.parse(File(copy, "scene.xml").readText()).title)
+        val uri = Scene.parse(File(copy, "scene.xml").readText()).node.mediaUris().single()
+        assertEquals(File(newRoot, "templates/t1/media/photo.png").canonicalPath, File(java.net.URI(uri)).canonicalPath)
+        assertTrue(File(java.net.URI(uri)).exists())
+    }
+
+    @Test fun anUnchangedTemplateStillGetsBackAFileThatWentMissingLocally() {
+        val oldRoot = tmp.newFolder("old")
+        template(oldRoot, "t1", "Same", "pixels")
+        val bytes = backup(oldRoot)
+        val newRoot = tmp.newFolder("new")
+        Backup.restore(ProjectStore(newRoot), newRoot, ByteArrayInputStream(bytes))
+        File(newRoot, "templates/t1/thumb.png").delete()
+        File(newRoot, "templates/t1/media/photo.png").delete()
+        Backup.restore(ProjectStore(newRoot), newRoot, ByteArrayInputStream(bytes))
+        assertEquals("thumb of Same", File(newRoot, "templates/t1/thumb.png").readText())
+        assertEquals("pixels", File(newRoot, "templates/t1/media/photo.png").readText())
+        assertEquals(listOf("t1"), File(newRoot, "templates").listFiles().orEmpty().map { it.name })
+        assertFalse(File(newRoot, "restore-staging").exists())
+    }
+
+    @Test fun aBackupAlsoFailsWhenAnXmlFileVanished() {
+        val root = tmp.newFolder("root")
+        val gone = File(root, "projects/gone.xml")
+        try {
+            Backup.writeFiles(root, listOf("projects/gone.xml" to gone), ByteArrayOutputStream())
+            fail("expected a failure")
+        } catch (e: java.io.FileNotFoundException) {
+            assertTrue(e.message, e.message!!.contains("gone.xml"))
+        }
+    }
+
+    @Test fun anUnchangedTemplateIsSkippedAndAnAbsentOneIsAddedUnderItsOwnId() {
+        val oldRoot = tmp.newFolder("old")
+        template(oldRoot, "t1", "Same", "pixels")
+        template(oldRoot, "t2", "Other", "other pixels")
+        val bytes = backup(oldRoot)
+        val newRoot = tmp.newFolder("new")
+        Backup.restore(ProjectStore(newRoot), newRoot, ByteArrayInputStream(bytes))
+        Backup.restore(ProjectStore(newRoot), newRoot, ByteArrayInputStream(bytes))
+        assertEquals(setOf("t1", "t2"), File(newRoot, "templates").listFiles().orEmpty().map { it.name }.toSet())
+        assertEquals("other pixels", File(newRoot, "templates/t2/media/photo.png").readText())
+    }
+
+    @Test fun aChangedPresetKeepsBothVersionsAndTheSameBackupDoesNotAddItTwice() {
+        val oldRoot = tmp.newFolder("old")
+        File(oldRoot, "presets/p.xml").apply { parentFile.mkdirs(); writeText("""<scene width="10" height="10" type="preset" title="Old"><shape id="1"/></scene>""") }
+        val bytes = backup(oldRoot)
+        val newRoot = tmp.newFolder("new")
+        File(newRoot, "presets/p.xml").apply { parentFile.mkdirs(); writeText("""<scene width="10" height="10" type="preset" title="New"><shape id="1"/></scene>""") }
+        repeat(2) { Backup.restore(ProjectStore(newRoot), newRoot, ByteArrayInputStream(bytes)) }
+        val files = File(newRoot, "presets").listFiles().orEmpty()
+        assertEquals(2, files.size)
+        assertTrue(File(newRoot, "presets/p.xml").readText().contains("New"))
+        assertTrue(files.single { it.name != "p.xml" }.readText().contains("Old"))
+        val same = tmp.newFolder("same")
+        File(same, "presets/p.xml").apply { parentFile.mkdirs(); writeText(File(oldRoot, "presets/p.xml").readText()) }
+        Backup.restore(ProjectStore(same), same, ByteArrayInputStream(bytes))
+        assertEquals(1, File(same, "presets").listFiles().orEmpty().size)
+    }
+
+    @Test fun aBackupFailsInsteadOfSilentlyOmittingAFileThatVanished() {
+        val root = tmp.newFolder("root")
+        val present = File(root, "projects/a.xml").apply { parentFile.mkdirs(); writeText("<scene/>") }
+        val gone = File(root, "media/a/gone.png")
+        try {
+            Backup.writeFiles(root, listOf("projects/a.xml" to present, "media/a/gone.png" to gone), ByteArrayOutputStream())
+            fail("expected a failure")
+        } catch (e: java.io.FileNotFoundException) {
+            assertTrue(e.message, e.message!!.contains("gone.png"))
         }
     }
 }

@@ -83,13 +83,20 @@ internal fun Scene.elementNodes(layer: Layer, bounds: FloatArray?): List<XmlNode
     }
 }
 
-private suspend fun EditorState.lifetimeBounds(layer: Layer): FloatArray? {
-    val times = (listOf(layer.startTime, (layer.startTime + layer.endTime) / 2, layer.endTime) + layer.keyframeTimes()).distinct()
-    val picked = times.filterIndexed { i, _ -> i % ((times.size + 23) / 24) == 0 }
-    return picked.mapNotNull { engine.layerBounds(layer.id, it) }.reduceOrNull { a, b ->
+internal fun boundsSampleTimes(start: Int, end: Int, fps: Int, keys: List<Int>, limit: Int = 240): List<Int> {
+    val frameMs = 1000.0 / fps.coerceAtLeast(1)
+    val frames = ((end - start) * fps.coerceAtLeast(1) / 1000.0).toInt().coerceAtLeast(1)
+    val step = (frames + limit - 1) / limit
+    val grid = (0..frames step step).map { start + (it * frameMs).roundToInt() }
+    val inside = keys.filter { it in start..end }.distinct().sorted()
+    val thinned = inside.filterIndexed { i, _ -> i % ((inside.size + limit - 1) / limit).coerceAtLeast(1) == 0 }
+    return (grid + listOf(start, (start + end) / 2, end) + thinned).distinct().sorted()
+}
+
+private suspend fun EditorState.lifetimeBounds(layer: Layer): FloatArray? =
+    boundsSampleTimes(layer.startTime, layer.endTime, scene.fps, layer.keyframeTimes()).mapNotNull { engine.layerBounds(layer.id, it) }.reduceOrNull { a, b ->
         floatArrayOf(min(a[0], b[0]), min(a[1], b[1]), maxOf(a[2], b[2]), maxOf(a[3], b[3]))
     }
-}
 
 suspend fun EditorState.addElement(store: ProjectStore, id: String, link: Boolean) {
     val element = withContext(Dispatchers.IO) { store.load(id)?.withCopiedLayerIds() } ?: return

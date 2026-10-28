@@ -131,11 +131,11 @@ Outputs: `app/build/outputs/apk/<flavour>/<type>/app-<flavour>-<type>.apk`, for 
   `tools/smoke_check.py` and `tools/compat/export_smoke.py` (GIF and MP4) on it and deletes it again.
 - Install with `adb install -r <apk>`. Emulators work for development (arm64 image, Android 13 or newer; `tools/smoke_check.py` renders a still on whichever device `ANDROID_SERIAL` names).
 
-The signing helper uses each APK's manifest minimum Android version and build-tools 37.0.0. `python3 tools/apk_check.py <apk> [<apk> ...]` checks signatures at every supported API through 37, resource-table and native-library packaging, 16 KB ELF alignment, and matching app IDs, versions and certificates across the supplied APKs. Use `--unsigned` for unsigned CI output. This validates packaging; installation and runtime testing on emulators and real devices remain necessary.
+The signing helper uses each APK's manifest minimum Android version and build-tools 37.0.0. `python3 tools/apk_check.py <apk> [<apk> ...]` checks signatures at every supported API through 37, resource-table and native-library packaging, 16 KB ELF alignment, and matching app IDs, versions and certificates across the supplied APKs. Use `--unsigned` for unsigned CI output and `--libraries <folder>` to check only the 16 KB alignment of built `.so` files. Signed APKs must carry the release certificate pinned as `RELEASE_SIGNER` in `UpdateSource.kt`, the key the in-app updater accepts. This validates packaging; installation and runtime testing on emulators and real devices remain necessary.
 
 ## 7. Checking a change, and releases
 
-`tools/check.sh` compiles the Android flavours and runs the unit tests (`--full` also lints foss and compat and checks the native API floor of both).
+`tools/check.sh` compiles the Android flavours and runs the unit tests (`--full` also lints foss and compat and checks the native API floor and 16 KB page alignment of both).
 
 `tools/release.sh [patch|minor|major]` bumps `version.properties` (with no argument it keeps the current version),
 runs `tools/check.sh`, and builds the release APKs of all three flavours (signed as described in section 6). Results:
@@ -157,4 +157,7 @@ source pins stable. The build disables VCS and dependency metadata and maps nati
 changes to those settings can break reproducibility. Release signing is a separate step.
 
 Device scripts use only the device named by `ANDROID_SERIAL` (default `emulator-5554`). They are optional for the
-build; use an emulator for development checks. RNNoise is still vendored and its upstream commit is not recorded.
+build; use an emulator for development checks. `python3 tools/device_matrix.py checks --serial emulator-5556 --apk <debug apk>` runs
+the smoke, memory-pressure, engine, device export, audio export, export and speed checks on one emulator and writes a JSON
+report outside the repository; `status`, `create`, `boot`, `run`, `stop` and `clean` manage a matrix of arm64 emulators (Android 9,
+13, 14, 16, a tablet and Android 17 with 16 KB memory pages). `create` stops when less than 15 GB would stay free. RNNoise is still vendored and its upstream commit is not recorded.

@@ -251,9 +251,8 @@ private fun AutomaticPreview(state: EditorState) {
     val context = LocalContext.current
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     val resources by state.engine.mediaRevision.collectAsState()
-    val rendered by state.engine.rendered.collectAsState()
     val thermal = remember(context) { app.absentmotion.export.ThermalMonitor.of(context) }
-    LaunchedEffect(state, lifecycle, resources, rendered) {
+    LaunchedEffect(state, lifecycle, resources) {
         lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
             thermal.start()
             try {

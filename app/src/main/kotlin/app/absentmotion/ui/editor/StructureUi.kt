@@ -236,14 +236,26 @@ internal fun MultiBar(state: EditorState, modifier: Modifier) {
     transition?.let { (a, b) -> TransitionSheet(state, a, b) { transition = null } }
     Row(modifier.padding(6.dp).clip(RoundedCornerShape(3.dp)).background(Am.PanelInset), verticalAlignment = Alignment.CenterVertically) {
         val end = layers.isNotEmpty() && state.timeMs >= layers.maxOf { it.endTime }
-        BarButton(if (end) PanelIcons.TrimRight else PanelIcons.TrimLeft, stringResource(if (end) R.string.structure_extend_ends else R.string.structure_extend_starts), Modifier.width(60.dp).fillMaxHeight(), layers.isNotEmpty()) {
-            state.moveClipEdges(end, true)
+        val context = LocalContext.current
+        val copied = EffectClipboard.effects
+        var effectsMenu by remember { mutableStateOf(false) }
+        Box(Modifier.width(60.dp).fillMaxHeight()) {
+            BarButton(PanelIcons.Effects, stringResource(R.string.layer_tool_effects), Modifier.fillMaxSize(), layers.isNotEmpty()) { effectsMenu = true }
+            Presence(effectsMenu) {
+                MenuPopup(AboveLeft, { effectsMenu = false }, TransformOrigin(0f, 1f)) {
+                    val note = if (copied.isEmpty()) stringResource(R.string.effects_none_copied)
+                        else pluralStringResource(R.plurals.effects_count, copied.size, copied.size.toString())
+                    MenuRow(stringResource(R.string.effects_paste_all), enabled = copied.isNotEmpty(), subText = note) {
+                        effectsMenu = false
+                        pasteEffectsOnSelection(state, context)
+                    }
+                }
+            }
         }
         BarButton(if (end) ChromeIcons.SkipForward else ChromeIcons.SkipBack, stringResource(if (end) R.string.structure_move_ends else R.string.structure_move_starts), Modifier.width(60.dp).fillMaxHeight(), layers.isNotEmpty()) {
             state.moveClipEdges(end, false)
         }
         Spacer(Modifier.weight(1f))
-        val context = LocalContext.current
         BarButton(ChromeIcons.Transition, stringResource(R.string.transition_add_between), Modifier.width(48.dp).fillMaxHeight().alpha(if (cut != null) 1f else DimAlpha)) {
             if (cut != null) { state.playing = false; transition = cut.first.id to cut.second.id }
             else Toast.makeText(context, context.getString(when {
@@ -273,7 +285,6 @@ private val PasteLabels = mapOf(
 internal fun MultiTopBar(state: EditorState, modifier: Modifier) {
     val ids = MultiSelect.ids
     val scope = rememberCoroutineScope()
-    val context = LocalContext.current
     var alignment by remember { mutableStateOf(false) }
     val tint = Am.OnAccent
     Row(modifier.background(Am.Accent), verticalAlignment = Alignment.CenterVertically) {
@@ -285,21 +296,6 @@ internal fun MultiTopBar(state: EditorState, modifier: Modifier) {
             SelectionButton(SelectionIcons.Group, stringResource(R.string.structure_group), cell, tint, ids.isNotEmpty()) { state.groupLayers(ids) }
             SelectionButton(SelectionIcons.Mask, stringResource(R.string.structure_group_mask), cell, tint, ids.size > 1) { state.groupLayers(ids, "mask") }
             SelectionButton(SelectionIcons.Exclude, stringResource(R.string.structure_group_exclude), cell, tint, ids.size > 1) { state.groupLayers(ids, "exclude") }
-            val copied = EffectClipboard.effects
-            var effectsMenu by remember { mutableStateOf(false) }
-            Box(cell) {
-                SelectionButton(PanelIcons.Effects, stringResource(R.string.layer_tool_effects), Modifier.fillMaxSize(), tint, ids.isNotEmpty()) { effectsMenu = true }
-                Presence(effectsMenu) {
-                    MenuPopup(DropOrRise, { effectsMenu = false }) {
-                        val note = if (copied.isEmpty()) stringResource(R.string.effects_none_copied)
-                            else pluralStringResource(R.plurals.effects_count, copied.size, copied.size.toString())
-                        MenuRow(stringResource(R.string.effects_paste_all), enabled = copied.isNotEmpty(), subText = note) {
-                            effectsMenu = false
-                            pasteEffectsOnSelection(state, context)
-                        }
-                    }
-                }
-            }
             SelectionButton(ChromeIcons.Trash, stringResource(R.string.structure_delete_selected), cell, tint, ids.isNotEmpty()) { state.deleteChosen() }
             SelectionButton(SelectionIcons.Next, stringResource(R.string.structure_alignment_options), cell, tint) { alignment = true }
         } else {

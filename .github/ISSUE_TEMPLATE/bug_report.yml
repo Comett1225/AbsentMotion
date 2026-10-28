@@ -1,0 +1,56 @@
+name: Bug report
+description: Something crashes, looks wrong, or doesn't work as expected
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. Security problems: please use the Security tab (*Report a vulnerability*), not a public issue.
+        Please don't attach code, screenshots or assets taken from another app.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you did, what you expected, and what happened instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Add a text layer
+        2. Apply the effect ...
+        3. ...
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: AbsentMotion version
+      placeholder: "e.g. 4.2.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: build
+    attributes:
+      label: Build
+      options:
+        - play
+        - foss
+        - compatible
+        - Not sure
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: Device and Android version
+      placeholder: "e.g. Pixel 8, Android 16"
+    validations:
+      required: true
+  - type: textarea
+    id: extra
+    attributes:
+      label: Crash log, screenshots or a small project file
+      description: Drag files here. If the app showed a crash log, paste it. A project that reproduces the problem helps a lot.

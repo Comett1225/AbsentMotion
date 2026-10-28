@@ -698,6 +698,30 @@
     "count-up": "Contagem crescente"
    }
   },
+  "crop": {
+   "description": "Corta as bordas da camada: Esquerda, Superior, Direita e Inferior dizem quanto da largura ou da altura da própria camada sai de cada lado, Arredondamento arredonda os cantos e Suavidade suaviza as bordas. A camada fica onde está.",
+   "name": "Cortar",
+   "params": {
+    "bottom": {
+     "label": "Inferior"
+    },
+    "feather": {
+     "label": "Suavidade"
+    },
+    "left": {
+     "label": "Esquerda"
+    },
+    "radius": {
+     "label": "Arredondamento"
+    },
+    "right": {
+     "label": "Direita"
+    },
+    "top": {
+     "label": "Superior"
+    }
+   }
+  },
   "cross": {
    "description": "Coloca a camada em três barras que se cruzam no meio.",
    "name": "Cruz de três eixos",
@@ -2938,6 +2962,15 @@
     }
    }
   },
+  "puppet": {
+   "description": "Dobra a camada como uma marionete: coloque pinos nela e depois arraste ou anime os pinos, e a imagem os acompanha suavemente.",
+   "name": "Pino de marionete",
+   "params": {
+    "falloff": {
+     "label": "Atenuação"
+    }
+   }
+  },
   "pyramid": {
    "description": "Coloca a camada nas faces de uma pirâmide de base quadrada.",
    "name": "Pirâmide",
@@ -4262,6 +4295,58 @@
     },
     "strength": {
      "label": "Força"
+    }
+   }
+  },
+  "textpath": {
+   "description": "Coloca o texto ao longo de um arco, de um círculo ou do contorno da camada logo abaixo, letra por letra, mantendo a forma das letras, as fontes e os emojis do texto.",
+   "name": "Texto ao longo do caminho",
+   "params": {
+    "align": {
+     "label": "Alinhar",
+     "options": [
+      "Esquerda",
+      "Centro",
+      "Direita"
+     ]
+    },
+    "baseline": {
+     "label": "Deslocamento da linha de base"
+    },
+    "center": {
+     "label": "Centro"
+    },
+    "control1": {
+     "label": "Controle 1"
+    },
+    "control2": {
+     "label": "Controle 2"
+    },
+    "end": {
+     "label": "Fim"
+    },
+    "position": {
+     "label": "Posição"
+    },
+    "radius": {
+     "label": "Raio"
+    },
+    "reverse": {
+     "label": "Inverter caminho"
+    },
+    "rotate": {
+     "label": "Girar letras"
+    },
+    "shape": {
+     "label": "Caminho",
+     "options": [
+      "Arco",
+      "Círculo",
+      "Camada abaixo"
+     ]
+    },
+    "start": {
+     "label": "Início"
     }
    }
   },

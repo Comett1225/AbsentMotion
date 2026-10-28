@@ -698,6 +698,30 @@
     "count-up": "Conteo ascendente"
    }
   },
+  "crop": {
+   "description": "Recorta los bordes de la capa: Izquierda, Arriba, Derecha y Abajo indican cuánto del ancho o el alto de la propia capa se quita de cada lado, Redondez redondea las esquinas y Difuminado suaviza los bordes. La capa se queda donde está.",
+   "name": "Recortar",
+   "params": {
+    "bottom": {
+     "label": "Abajo"
+    },
+    "feather": {
+     "label": "Difuminado"
+    },
+    "left": {
+     "label": "Izquierda"
+    },
+    "radius": {
+     "label": "Redondez"
+    },
+    "right": {
+     "label": "Derecha"
+    },
+    "top": {
+     "label": "Arriba"
+    }
+   }
+  },
   "cross": {
    "description": "Coloca la capa en tres barras que se cruzan en el centro.",
    "name": "Cruz de tres ejes",
@@ -2938,6 +2962,15 @@
     }
    }
   },
+  "puppet": {
+   "description": "Dobla la capa como una marioneta: coloca pines en ella y luego arrastra o anima los pines, y la imagen los sigue con suavidad.",
+   "name": "Pin de marioneta",
+   "params": {
+    "falloff": {
+     "label": "Atenuación"
+    }
+   }
+  },
   "pyramid": {
    "description": "Coloca la capa en las caras de una pirámide cuadrada.",
    "name": "Pirámide",
@@ -4262,6 +4295,58 @@
     },
     "strength": {
      "label": "Intensidad"
+    }
+   }
+  },
+  "textpath": {
+   "description": "Coloca el texto a lo largo de un arco, un círculo o el contorno de la capa que está justo debajo, letra por letra, conservando la forma de las letras, las fuentes y los emojis del texto.",
+   "name": "Texto por trazado",
+   "params": {
+    "align": {
+     "label": "Alinear",
+     "options": [
+      "Izquierda",
+      "Centro",
+      "Derecha"
+     ]
+    },
+    "baseline": {
+     "label": "Desplazamiento de línea base"
+    },
+    "center": {
+     "label": "Centro"
+    },
+    "control1": {
+     "label": "Control 1"
+    },
+    "control2": {
+     "label": "Control 2"
+    },
+    "end": {
+     "label": "Fin"
+    },
+    "position": {
+     "label": "Posición"
+    },
+    "radius": {
+     "label": "Radio"
+    },
+    "reverse": {
+     "label": "Invertir trazado"
+    },
+    "rotate": {
+     "label": "Rotar letras"
+    },
+    "shape": {
+     "label": "Trazado",
+     "options": [
+      "Arco",
+      "Círculo",
+      "Capa de abajo"
+     ]
+    },
+    "start": {
+     "label": "Inicio"
     }
    }
   },

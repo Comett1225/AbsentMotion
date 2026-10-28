@@ -126,22 +126,9 @@ internal fun AudioTab(state: EditorState, modifier: Modifier, library: AddLibrar
     }
     fun add(uris: List<Uri>) {
         if (uris.isEmpty() || state.addingMedia) return
-        scope.launch {
-            state.addingMedia = true
-            try {
-                for (uri in uris) {
-                    val media = audioDeclaration(context, uri)?.let { state.keepCopy(context, it) }
-                    if (media == null || media.duration <= 0) android.widget.Toast.makeText(context, app.absentmotion.i18n.AppText.get(R.string.library_err_unsupported_type), android.widget.Toast.LENGTH_LONG).show()
-                    else state.addAudio(media)
-                }
-            } finally { state.addingMedia = false }
-        }
+        scope.launch { state.addSounds(context, uris) }
     }
-    val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
-        uris.forEach { runCatching { context.contentResolver.takePersistableUriPermission(it, Intent.FLAG_GRANT_READ_URI_PERMISSION) } }
-        add(uris)
-    }
-    fun fromFiles() = picker.launch(arrayOf("audio/*", "application/ogg", "application/x-flac"))
+    fun fromFiles() = MediaPicks.openSounds()
     androidx.compose.runtime.LaunchedEffect(Unit) {
         if (!allowed && !prefs.getBoolean("askedAudio", false)) {
             prefs.edit().putBoolean("askedAudio", true).apply()

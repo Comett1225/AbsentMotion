@@ -58,6 +58,7 @@ The effects of the **Text** category animate text letter by letter.
 - **Text Transform** moves, rotates, scales and fades each letter in turn (presets: Wave and Spin Cascade).
 - **Text Randomizer** scrambles letters before they settle (preset: Scramble).
 - **Count Up/Down** and **Timecode** turn text into a counter or a clock.
+- **Text Along Path** sets the text along an arc, a circle or the shape just beneath it; animate **Position** to make it run along the path.
 
 See [Using effects](@effects-guide) for how to add them, and the [effects library](@effects) for every setting.
 

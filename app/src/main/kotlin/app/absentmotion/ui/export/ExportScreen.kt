@@ -208,7 +208,7 @@ private val GroupGap = 18.dp
 private val FieldGap = 6.dp
 private const val Dimmed = 0.38f
 
-private val SheetKinds = setOf(ExportKind.Gif, ExportKind.Sequence, ExportKind.FrameAs, ExportKind.Frame)
+private val SheetKinds = setOf(ExportKind.Gif, ExportKind.Sequence, ExportKind.FrameAs)
 
 private sealed interface Phase {
     data object Idle : Phase
@@ -513,7 +513,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
                     OptionCard(
                         selected = kind == k, enabled = !silent, icon = k.icon(), title = stringResource(k.title()),
                         note = if (silent) stringResource(R.string.export_no_sound_short) else optionNote(k, scene, s)?.text(),
-                        right = when (k) { ExportKind.Package -> ExportIcons.Info; ExportKind.Video, ExportKind.Audio, ExportKind.Frame, ExportKind.FrameAs, ExportKind.Sequence, ExportKind.Gif -> ExportIcons.ChevronRight; else -> null },
+                        right = when (k) { ExportKind.Package -> ExportIcons.Info; ExportKind.Video, ExportKind.Audio, ExportKind.FrameAs, ExportKind.Sequence, ExportKind.Gif -> ExportIcons.ChevronRight; else -> null },
                         onSelect = { if (silent) explain(NoSound) else { kind = k; if (k == ExportKind.FrameAs) page = k } },
                         onRight = { if (k == ExportKind.Package) packageInfo = true else if (silent) explain(NoSound) else { kind = k; page = k } },
                         modifier = Modifier.enterFade(10.dp, minOf(i, 6) * 30),
@@ -553,6 +553,9 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
                     ScrollArea(Modifier.weight(1f, fill = false), Am.Card, PaddingValues(start = 15.dp, end = 15.dp, top = 10.dp, bottom = 18.dp), GroupGap) {
                         naming(shown)
                         OptionsPage(shown, scene, settings.getValue(shown), explain, { help = true }) { settings[shown] = it }
+                    }
+                    Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp), horizontalArrangement = Arrangement.End) {
+                        TextButton({ page = null }) { Text(stringResource(R.string.ok), color = Am.Navy) }
                     }
                 }
             }
@@ -1134,7 +1137,31 @@ private fun Chip(label: String, selected: Boolean, enabled: Boolean = true, onCl
 @Composable
 private fun BoxScope.RunningPanel(p: Phase.Running, progress: Float, heat: ThermalLevel, note: UiText?, onCancel: () -> Unit) {
     val percent = (progress * 100).toInt().coerceIn(0, 100)
-    val left = if (progress > 0.02f) ((System.nanoTime() - p.startNs) / 1e9 * (1 - progress) / progress).toInt() else null
+    var lastProgress by remember { mutableFloatStateOf(0f) }
+    var lastNs by remember { mutableLongStateOf(System.nanoTime()) }
+    var rate by remember { mutableFloatStateOf(0f) }
+    LaunchedEffect(progress) {
+        val now = System.nanoTime()
+        if (progress < lastProgress) {
+            rate = 0f
+            lastProgress = progress
+            lastNs = now
+            return@LaunchedEffect
+        }
+        val dt = (now - lastNs) / 1e9f
+        if (dt > 0.2f) {
+            val dp = progress - lastProgress
+            if (dp > 0f) rate = if (rate == 0f) dp / dt else rate * 0.7f + (dp / dt) * 0.3f
+            lastProgress = progress
+            lastNs = now
+        }
+    }
+    val left = when {
+        progress >= 1f -> 0
+        rate > 0.00001f -> ((1f - progress) / rate).toInt().coerceAtLeast(0)
+        progress > 0.02f -> ((System.nanoTime() - p.startNs) / 1e9 * (1 - progress) / progress).toInt()
+        else -> null
+    }
     Column(Modifier.align(Alignment.Center).presence(), horizontalAlignment = Alignment.CenterHorizontally) {
         Text(stringResource(runningTitle(p.kind)), color = Am.OnScrim, fontSize = 18.sp, textAlign = TextAlign.Center)
         Spacer(Modifier.height(15.dp))

@@ -70,8 +70,13 @@ internal fun EffectsPanel(state: EditorState, modifier: Modifier) {
     var menu by remember { mutableStateOf(false) }
     var choosing by remember { mutableStateOf(false) }
     val usable = instance != null && definition?.available == true
-    val target = active?.takeIf { usable }?.let { KeyTarget(PropRef.effect(index, it.id), it.missingDefault, it.type) }
-    val point = active?.takeIf { it.kind == "point" && usable }
+    var pin by remember(layer.id, index) { mutableStateOf<String?>(null) }
+    var adding by remember(layer.id, index) { mutableStateOf(false) }
+    val puppet = usable && definition.id == PUPPET_ID && instance["hidden"] != "true"
+    val pathText = usable && definition.id == TEXT_PATH_ID
+    val pinTarget = if (puppet) pin?.let { name -> instance.effectProperty(name)?.let { KeyTarget(PropRef.effect(index, name), it.valueAt(layer.t) ?: "0,0", "vec2") } } else null
+    val target = pinTarget ?: active?.takeIf { usable && definition.shown(it, instance, layer.t) }?.let { KeyTarget(PropRef.effect(index, it.id), it.missingDefault, it.type) }
+    val point = active?.takeIf { it.kind == "point" && usable && !pathText }
     val adjust = remember(layer.id, index, point?.id, point?.label) {
         point?.let { param ->
             PointAdjust(param.label) { dx, dy ->
@@ -84,8 +89,14 @@ internal fun EffectsPanel(state: EditorState, modifier: Modifier) {
             }
         }
     }
-    SideEffect { state.keyTarget = target; state.pointAdjust = adjust }
-    DisposableEffect(Unit) { onDispose { state.pointAdjust = null } }
+    val full = rememberPinsFull()
+    val points = when {
+        puppet -> puppetPoints(state, layer, index, instance, pin, adding, { pin = it; if (it != null) active = null }, full)
+        pathText -> textPathPoints(state, layer, index, instance, definition, active) { active = it; pin = null }
+        else -> null
+    }
+    SideEffect { state.keyTarget = target; state.pointAdjust = adjust; state.layerPoints = points }
+    DisposableEffect(Unit) { onDispose { state.pointAdjust = null; state.layerPoints = null } }
     if (state.easingOpen) { EasingPanel(state, modifier); return }
     if (choosing) {
         CopyEffectsDialog(layer.effects.map { catalog.find(it["id"] ?: "")?.name ?: it["id"]?.substringAfterLast('.') ?: "" }, { choosing = false }) { ticked ->
@@ -141,8 +152,10 @@ internal fun EffectsPanel(state: EditorState, modifier: Modifier) {
                 Column(Modifier.fillMaxSize().padding(6.5.dp).clip(RowShape).background(Am.Field)) {
                     EffectHeader(state, index, instance, definition)
                     Column(Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState())) {
-                        if (definition != null) EffectSettings(state, layer, instance, definition, active, { active = it })
+                        if (definition != null) EffectSettings(state, layer, instance, definition, active, { active = it; pin = null })
                         else Text(instance["id"] ?: "", Modifier.padding(12.dp).dimmed(), color = Am.OnDark, fontSize = 12.sp)
+                        if (puppet) PuppetSection(state, layer, index, instance, pin, adding, { pin = it; if (it != null) active = null }) { adding = it }
+                        if (pathText) TextPathHint(state, layer, instance)
                     }
                 }
             }

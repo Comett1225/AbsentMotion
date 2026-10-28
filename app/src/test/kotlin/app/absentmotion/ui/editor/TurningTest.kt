@@ -46,13 +46,13 @@ class TurningTest {
         assertEquals(10f * TURN_PER_DP, upright[1], 1e-5f)
     }
 
-    @Test fun onlyThreeDObjectsTurnOnTheRotateTabButEveryLayerOnTheTiltTab() {
+    @Test fun onlyLayersWithAThreeDEffectTurnOnTheRotateTabButEveryLayerOnTheTiltTab() {
         assertNull(turnFor(shapeLayer(), catalog, ROTATE_TAB))
         assertEquals(-1, turnFor(shapeLayer(), catalog, TILT_TAB)!!.effect)
-        assertEquals(-1, turnFor(shapeLayer("model"), catalog, ROTATE_TAB)!!.effect)
-        assertEquals(-1, turnFor(shapeLayer().withTilt(0f, 15f), catalog, ROTATE_TAB)!!.effect)
+        assertNull(turnFor(shapeLayer("model"), catalog, ROTATE_TAB))
+        assertNull(turnFor(shapeLayer().withTilt(0f, 15f), catalog, ROTATE_TAB))
         assertNull(turnFor(shapeLayer(), catalog, 0))
-        assertNull(turnFor(shapeLayer("model"), catalog, 1))
+        assertNull(turnFor(shapeLayer("model"), catalog, SIZE_TAB))
         assertNull(turnFor(shapeLayer("camera").addEffect(effect("cube")), catalog, ROTATE_TAB))
     }
 
@@ -83,7 +83,7 @@ class TurningTest {
 
     @Test fun turningAModelWritesTiltAndRotation() {
         val model = shapeLayer("model")
-        val turn = turnFor(model, catalog, ROTATE_TAB)!!
+        val turn = turnFor(model, catalog, TILT_TAB)!!
         val turned = turn.turned(model, Offset(0f, 10f), 0f)
         assertArrayEquals(floatArrayOf(-10f * TURN_PER_DP, 0f), turned.tilt, 1e-4f)
         assertNull(turned.node.child("transform")?.child("rotation"))
@@ -97,7 +97,7 @@ class TurningTest {
             val rotX = node.effectProperty("rotX")!!
             node.copy(children = node.children.map { if (it === rotX) XmlNode("property", rotX.attrs - "value", listOf(XmlNode("kf", mapOf("t" to "0.000000", "v" to "-20.000000")))) else it })
         }.copy(t = 0.5f, snap = 0.5f - 0.01f..0.5f + 0.01f)
-        val turn = turnFor(keyed, catalog, ROTATE_TAB)!!
+        val turn = turnFor(keyed, catalog, TILT_TAB)!!
         val sideways = turn.turned(keyed, Offset(30f, 0f), 0f)
         assertEquals(1, sideways.effects[0].effectProperty("rotX")!!.children.size)
         assertFalse(sideways.effects[0].effectProperty("rotY")!!.isKeyframed)
@@ -109,7 +109,7 @@ class TurningTest {
     @Test fun theKeyframeButtonFollowsTheChosenAxis() {
         val turn = turnFor(shapeLayer().addEffect(effect("cube")), catalog, ROTATE_TAB)!!
         assertEquals(PropRef.effect(0, "rotY"), turn.target(1).ref)
-        val tilt = turnFor(shapeLayer("model"), catalog, ROTATE_TAB)!!
+        val tilt = turnFor(shapeLayer("model"), catalog, TILT_TAB)!!
         assertEquals(PropRef.Tilt, tilt.target(0).ref)
         assertEquals(PropRef.Tilt, tilt.target(1).ref)
         assertEquals(PropRef.Rotation, tilt.target(2).ref)

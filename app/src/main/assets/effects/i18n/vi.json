@@ -698,6 +698,30 @@
     "count-up": "Đếm lên"
    }
   },
+  "crop": {
+   "description": "Cắt bớt các cạnh của lớp: Trái, Trên, Phải và Dưới cho biết bỏ đi bao nhiêu phần chiều rộng hoặc chiều cao của chính lớp ở mỗi cạnh, Độ bo bo tròn các góc và Làm mềm làm mềm các cạnh. Lớp vẫn ở nguyên chỗ cũ.",
+   "name": "Cắt khung",
+   "params": {
+    "bottom": {
+     "label": "Dưới"
+    },
+    "feather": {
+     "label": "Làm mềm"
+    },
+    "left": {
+     "label": "Trái"
+    },
+    "radius": {
+     "label": "Độ bo"
+    },
+    "right": {
+     "label": "Phải"
+    },
+    "top": {
+     "label": "Trên"
+    }
+   }
+  },
   "cross": {
    "description": "Đặt lớp lên ba thanh cắt nhau ở giữa.",
    "name": "Chữ thập ba trục",
@@ -2938,6 +2962,15 @@
     }
    }
   },
+  "puppet": {
+   "description": "Uốn lớp như một con rối: đặt ghim lên lớp, rồi kéo hoặc tạo hoạt ảnh cho ghim và hình ảnh sẽ đi theo một cách mượt mà.",
+   "name": "Ghim rối",
+   "params": {
+    "falloff": {
+     "label": "Độ suy giảm"
+    }
+   }
+  },
   "pyramid": {
    "description": "Đặt lớp lên các mặt của một hình chóp tứ giác.",
    "name": "Kim tự tháp",
@@ -4262,6 +4295,58 @@
     },
     "strength": {
      "label": "Cường độ"
+    }
+   }
+  },
+  "textpath": {
+   "description": "Đặt chữ dọc theo một cung, một đường tròn hoặc đường viền của lớp ngay bên dưới, từng chữ một, vẫn giữ nguyên hình dạng chữ, phông chữ và emoji của văn bản.",
+   "name": "Chữ theo đường",
+   "params": {
+    "align": {
+     "label": "Căn",
+     "options": [
+      "Trái",
+      "Giữa",
+      "Phải"
+     ]
+    },
+    "baseline": {
+     "label": "Dịch đường cơ sở"
+    },
+    "center": {
+     "label": "Tâm"
+    },
+    "control1": {
+     "label": "Điểm điều khiển 1"
+    },
+    "control2": {
+     "label": "Điểm điều khiển 2"
+    },
+    "end": {
+     "label": "Cuối"
+    },
+    "position": {
+     "label": "Vị trí"
+    },
+    "radius": {
+     "label": "Bán kính"
+    },
+    "reverse": {
+     "label": "Đảo chiều đường"
+    },
+    "rotate": {
+     "label": "Xoay chữ"
+    },
+    "shape": {
+     "label": "Đường",
+     "options": [
+      "Cung",
+      "Đường tròn",
+      "Lớp bên dưới"
+     ]
+    },
+    "start": {
+     "label": "Đầu"
     }
    }
   },

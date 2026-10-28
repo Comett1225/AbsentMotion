@@ -44,7 +44,7 @@ If the layer is a parent of other layers, a switch **Apply to Children** appears
 
 ### Effects on many layers at once
 
-Copy the effects in one layer. Then select several layers (see [Layer menus and multi-select](@layer-menus)), tap **Effects** in the top bar and choose **Paste All Effects**. Sound, camera and null layers are skipped.
+Copy the effects in one layer. Then select several layers (see [Layer menus and multi-select](@layer-menus)), tap **Effects** in the bottom bar and choose **Paste All Effects**. Sound, camera and null layers are skipped.
 
 ## Animate an effect
 
@@ -65,6 +65,8 @@ These are different from the **Presets** tool of a layer, which keeps your own l
 - **Text** effects (Text Progress, Text Transform, Text Randomizer, Count Up/Down, Timecode) animate text letter by letter. See [Text and fonts](@text).
 - **Audio** effects work on sound: see [Audio](@audio).
 - **AI** tools (Remove Background, Reduce Noise) run on the phone: see [AI tools](@ai-tools).
+
+**Crop**, a Key effect, cuts the edges off a layer. Photos and videos also have a **Crop** button that shows the crop on the canvas: see [Layer tools](@layer-tools).
 
 ## Tips
 

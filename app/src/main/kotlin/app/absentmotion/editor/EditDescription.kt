@@ -28,6 +28,7 @@ fun describeEdit(before: Scene, after: Scene): UiText {
     val areas = new.filter { byId[it.id]?.node != it.node }.map { area(byId.getValue(it.id), it) }.distinct()
     return when {
         areas.size == 1 -> txt(areas.single())
+        areas.size > 1 && areas.all { it == R.string.history_transform || it == R.string.history_position } -> txt(R.string.history_transform)
         areas.size > 1 -> txt(R.string.history_edit_layers)
         newIds != oldIds -> txt(R.string.history_reorder)
         before.node.attrs != after.node.attrs -> txt(R.string.history_project)
@@ -59,7 +60,7 @@ private fun childArea(name: String, before: List<XmlNode>, after: List<XmlNode>)
     "transform" -> {
         val x = before.firstOrNull()
         val y = after.firstOrNull()
-        val changed = ((x?.children?.map { it.name }.orEmpty()) + (y?.children?.map { it.name }.orEmpty())).distinct()
+        val changed = if (x?.child("pivot") != y?.child("pivot")) "pivot" else ((x?.children?.map { it.name }.orEmpty()) + (y?.children?.map { it.name }.orEmpty())).distinct()
             .firstOrNull { part -> x?.child(part) != y?.child(part) }
         when (changed) {
             "location" -> R.string.history_position

@@ -256,11 +256,48 @@ class ToolRegressions(unittest.TestCase):
             path.write_bytes(damaged)
             with self.assertRaises((ValueError, zipfile.BadZipFile)):
                 module.zip_packaging(path, True)
-        struct.pack_into('<Q', library, 112, 4096)
+        with tempfile.TemporaryDirectory() as folder:
+            libs = Path(folder)
+            with self.assertRaisesRegex(ValueError, 'no native libraries'):
+                module.library_alignment([libs])
+            (libs / 'libgood.so').write_bytes(library)
+            (libs / 'notes.txt').write_text('not a library')
+            self.assertEqual(1, module.library_alignment([libs]))
+            self.assertEqual(2, module.library_alignment([libs, libs / 'libgood.so']))
+            struct.pack_into('<Q', library, 112, 4096)
+            (libs / 'libold.so').write_bytes(library)
+            with self.assertRaisesRegex(ValueError, 'libold.so: ELF load segment is not aligned for 16 KB pages'):
+                module.library_alignment([libs])
+            result = subprocess.run([sys.executable, str(ROOT / 'tools/apk_check.py'), '--libraries', str(libs)], capture_output=True, text=True)
+            self.assertEqual(1, result.returncode)
+            self.assertIn('libold.so', result.stderr)
+            (libs / 'libold.so').unlink()
+            result = subprocess.run([sys.executable, str(ROOT / 'tools/apk_check.py'), '--libraries', str(libs)], capture_output=True, text=True)
+            self.assertEqual(0, result.returncode, result.stderr)
+            self.assertIn('1 native libraries are aligned for 16 KB memory pages', result.stdout)
         with self.assertRaisesRegex(ValueError, '16 KB'):
             module.elf_alignment(library, 'fixture.so')
+        struct.pack_into('<Q', library, 112, 16384)
+        struct.pack_into('<Q', library, 72, 4096)
+        with self.assertRaisesRegex(ValueError, '16 KB'):
+            module.elf_alignment(library, 'shifted.so')
         with self.assertRaises(ValueError):
             module.elf_alignment(library[:64], 'truncated.so')
+
+    def test_release_key_pin_is_read_from_the_app_and_must_be_unique(self):
+        spec = importlib.util.spec_from_file_location('apk_check', ROOT / 'tools/apk_check.py')
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        self.assertRegex(module.release_signer(), r'^[0-9a-f]{64}$')
+        with tempfile.TemporaryDirectory() as folder:
+            source = Path(folder) / 'UpdateSource.kt'
+            line = 'internal const val RELEASE_SIGNER = "%s"\n'
+            for text in ['', line % ('a' * 63), line % ('a' * 64) + line % ('b' * 64), line % ('A' * 64)]:
+                source.write_text(text)
+                with self.assertRaisesRegex(ValueError, 'RELEASE_SIGNER'):
+                    module.release_signer(source)
+            source.write_text('package x\n' + line % ('c' * 64))
+            self.assertEqual('c' * 64, module.release_signer(source))
 
 if __name__ == '__main__':
     unittest.main()

@@ -39,8 +39,10 @@ object Backup {
         return scenes + rest + under("presets") + templates + media
     }
 
-    fun write(root: File, out: OutputStream, includeMedia: Boolean, ai: File? = null, progress: (done: Long, total: Long) -> Unit = { _, _ -> }) {
-        val files = files(root, includeMedia, ai)
+    fun write(root: File, out: OutputStream, includeMedia: Boolean, ai: File? = null, progress: (done: Long, total: Long) -> Unit = { _, _ -> }) =
+        writeFiles(root, files(root, includeMedia, ai), out, progress)
+
+    internal fun writeFiles(root: File, files: List<Pair<String, File>>, out: OutputStream, progress: (done: Long, total: Long) -> Unit = { _, _ -> }) {
         val total = files.sumOf { it.second.length() }.coerceAtLeast(1)
         var done = 0L
         ZipOutputStream(out.buffered()).use { zip ->
@@ -49,10 +51,8 @@ object Backup {
             zip.closeEntry()
             val buffer = ByteArray(64 * 1024)
             for ((name, file) in files) {
-                val entry = try {
-                    if (name.endsWith(".xml")) ZipEntry(name) else storedEntry(name, file.inputStream())
-                } catch (e: java.io.FileNotFoundException) { continue }
-                val source = try { file.inputStream() } catch (e: java.io.FileNotFoundException) { continue }
+                val entry = if (name.endsWith(".xml")) ZipEntry(name) else storedEntry(name, file.inputStream())
+                val source = file.inputStream()
                 zip.putNextEntry(entry.apply { time = file.lastModified() })
                 source.use { input ->
                     while (true) {
@@ -80,6 +80,10 @@ object Backup {
         val staged = ArrayList<File>()
         val created = ArrayList<File>()
         val stamps = HashMap<String, Long>()
+        val fonts = HashMap<String, String>()
+        val texts = ArrayList<File>()
+        val staging = File(root, "restore-staging").also { it.deleteRecursively() }
+        val held = HashMap<String, Boolean>()
         var added = 0
         var oldRoot = ""
         var read = 0L
@@ -95,7 +99,7 @@ object Backup {
             val moved = moved(text)
             val node = runCatching { Scene.parse(moved).node }.getOrNull() ?: return moved
             val links = renamed.entries.associate { (old, new) -> store.linkOf(old) to store.linkOf(new) }
-            val defused = (if (defuse) node.mapMediaUris(access::defused) else node).mapLinks { links[it] ?: it }
+            val defused = (if (defuse) node.mapMediaUris(access::defused) else node).mapLinks { links[it] ?: it }.mapFonts(fonts)
             return if (defused == node) moved else Scene(defused).toXml()
         }
         fun freshId(id: String): String =
@@ -192,7 +196,10 @@ object Backup {
                         parts.size == 4 && parts[0] == "projects" && parts[1] == "versions" && VersionFile.matches(parts[3]) ->
                             known(parts[2])?.let { File(projects, "versions/${renamed[it] ?: it}/${parts[3]}") }
                         parts.size >= 3 && parts[0] == "media" -> known(parts[1])?.let { File(root, "media/${renamed[it] ?: it}/" + parts.drop(2).joinToString("/")) }
-                        parts.size >= 3 && parts[0] == "templates" -> known(parts[1])?.let { File(root, parts.joinToString("/")) }
+                        parts.size >= 3 && parts[0] == "templates" -> known(parts[1])?.let { id ->
+                            if (held.getOrPut(id) { File(root, "templates/$id/scene.xml").exists() }) File(staging, parts.drop(1).joinToString("/"))
+                            else File(root, parts.joinToString("/"))
+                        }
                         parts.size == 2 && parts[0] == "presets" && parts[1].endsWith(".xml") -> File(root, "presets/${parts[1]}")
                         parts.size == 3 && parts[0] == "fonts" && parts[1] == "imported" -> File(root, "fonts/imported/${parts[2]}")
                         parts.size == 2 && parts[0] == "ai" -> ai?.let { File(it, parts[1]) }
@@ -204,18 +211,36 @@ object Backup {
                         parts[0] == "projects" -> parts[1].removeSuffix(".png")
                         else -> null
                     }?.takeIf { it !in scenes }?.let(early::add)
-                    if (target.exists()) continue
+                    val font = parts[0] == "fonts"
+                    val preset = parts[0] == "presets"
+                    if (target.exists() && !font && !preset) continue
                     makeDirs(target.parentFile!!)
                     val text = target.extension == "xml" && when (parts[0]) { "media" -> false; "templates" -> parts.size == 3; else -> true }
                     if (text) {
-                        created += target
-                        writeAtomically(target, remap(readText(body)))
+                        val content = remap(readText(body))
+                        var place = target
+                        if (preset && target.exists()) {
+                            if (target.parentFile!!.listFiles { f -> f.extension == "xml" }.orEmpty().any { f -> runCatching { sameScene(f.readText(), content) }.getOrDefault(false) }) continue
+                            place = generateSequence { File(target.parentFile, "${UUID.randomUUID()}.xml") }.first { !it.exists() }
+                        }
+                        created += place
+                        texts += place
+                        writeAtomically(place, content)
                     } else {
                         val part = File(target.parentFile, target.name + ".part")
                         try {
                             part.outputStream().use { body.copyTo(it); it.fd.sync() }
-                            if (!part.renameTo(target)) throw java.io.IOException("Cannot restore ${target.name}")
-                            created += target
+                            var place = target
+                            if (font && target.exists()) {
+                                if (target.length() == part.length() && target.readBytes().contentEquals(part.readBytes())) {
+                                    part.delete()
+                                    continue
+                                }
+                                place = generateSequence(1) { it + 1 }.map { File(target.parentFile, "${target.nameWithoutExtension}-$it.${target.extension}") }.first { !it.exists() }
+                                fonts["imported?name=${target.name}"] = "imported?name=${place.name}"
+                            }
+                            if (!part.renameTo(place)) throw java.io.IOException("Cannot restore ${place.name}")
+                            created += place
                         } catch (t: Throwable) {
                             part.delete()
                             throw t
@@ -223,6 +248,38 @@ object Backup {
                     }
                 }
                 if (waiting.isNotEmpty()) settle()
+                if (fonts.isNotEmpty()) for (file in texts) {
+                    val node = runCatching { Scene.parse(file.readText()).node }.getOrNull() ?: continue
+                    val changed = node.mapFonts(fonts)
+                    if (changed != node) writeAtomically(file, Scene(changed).toXml())
+                }
+                for ((id, aside) in held) if (aside) {
+                    val dir = File(staging, id)
+                    val incoming = File(dir, "scene.xml")
+                    if (!incoming.exists()) continue
+                    val local = File(root, "templates/$id")
+                    val files = dir.walkTopDown().filter { it.isFile && it != incoming }.toList()
+                    if (runCatching { sameScene(File(local, "scene.xml").readText(), incoming.readText()) }.getOrDefault(false)) {
+                        for (file in files) {
+                            val target = File(local, file.relativeTo(dir).path)
+                            if (target.exists()) continue
+                            makeDirs(target.parentFile!!)
+                            if (file.renameTo(target)) created += target
+                        }
+                        continue
+                    }
+                    val fresh = generateSequence(System.currentTimeMillis()) { it + 1 }.map { "t$it" }.first { !File(root, "templates/$it").exists() }
+                    val place = File(root, "templates/$fresh")
+                    var text = incoming.readText()
+                    for (file in files) {
+                        val rel = file.relativeTo(dir).invariantSeparatorsPath
+                        text = text.replace("\"" + File(root, "templates/$id/$rel").toURI() + "\"", "\"" + File(place, rel).toURI() + "\"")
+                    }
+                    writeAtomically(incoming, text)
+                    place.parentFile!!.mkdirs()
+                    if (!dir.renameTo(place)) throw java.io.IOException("Cannot restore template $id")
+                    place.walkTopDown().forEach { created += it }
+                }
                 publish()
             }
         } catch (t: Throwable) {
@@ -234,6 +291,7 @@ object Backup {
             }
         } finally {
             staged.forEach { it.delete() }
+            staging.deleteRecursively()
         }
         return Restored(added, renamed.size, skipped.size, rejected.size)
     }

@@ -35,7 +35,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
 import app.absentmotion.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.window.Dialog
@@ -108,9 +107,8 @@ private val Tabs = listOf(
 internal fun AddPopup(state: EditorState, modifier: Modifier = Modifier, library: AddLibrary) {
     var selectedTab by remember { mutableIntStateOf(0) }
     BackHandler { state.addOpen = false }
-    val tablet = isTablet(LocalConfiguration.current.smallestScreenWidthDp)
     Row(modifier.clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)).background(PopupBar)) {
-        Column((if (tablet) Modifier.weight(1f) else Modifier.width(326.dp)).fillMaxHeight()) {
+        Column(Modifier.weight(1f).fillMaxHeight()) {
             Row(Modifier.padding(start = 6.dp).height(58.dp)) {
                 Tabs.forEachIndexed { i, tab -> TabButton(tab, active = i == selectedTab, enabled = i <= 4, Modifier.tutorialTarget(if (i == 1) "add_tab_media" else if (i == 2) "add_tab_audio" else null)) { selectedTab = i } }
             }
@@ -119,7 +117,7 @@ internal fun AddPopup(state: EditorState, modifier: Modifier = Modifier, library
                 when (selectedTab) { 0 -> ShapePages(state, Modifier.fillMaxSize()); 1 -> MediaTab(state, Modifier.fillMaxSize(), library); 3 -> ObjectPage(state, Modifier.fillMaxSize()); 4 -> TemplatePage(state, Modifier.fillMaxSize()); else -> AudioTab(state, Modifier.fillMaxSize(), library) }
             }
         }
-        QuickBar(state, (if (tablet) Modifier.width(64.dp) else Modifier.weight(1f)).fillMaxHeight())
+        QuickBar(state, Modifier.width(64.dp).fillMaxHeight())
     }
 }
 

@@ -203,16 +203,17 @@ def adb(*args):
     return subprocess.run(ADB + [str(a) for a in args], capture_output=True, text=True).stdout
 
 
-def run(name, xml, work, hits=(), frame=0):
+def run(name, xml, work, hits=(), frame=0, bounds=()):
     local = work / f"{name}.xml"
     local.write_text(xml)
     remote = f"{DEVICE_DIR}/{name}.xml"
     adb("push", local, remote)
     adb("logcat", "-c")
     extras = ["--es", "hit", "'" + ";".join(f"{x},{y}" for x, y in hits) + "'"] if hits else []
+    extras += ["--es", "bounds", ";".join(str(b) for b in bounds)] if bounds else []
     adb("shell", "am", "start", "-n", f"{PKG}/.MainActivity", "--es", "xml", remote, "--es", "still", name, "--ei", "frame", frame, *extras)
     deadline, pid = time.time() + 120, None
-    while f"still {name} ok=" not in (log := adb("logcat", "-d", "-s", "AMTest")) or log.count(" hit ") < len(hits):
+    while f"still {name} ok=" not in (log := adb("logcat", "-d", "-s", "AMTest")) or log.count(" hit ") < len(hits) or log.count(" bounds ") < len(bounds):
         now = adb("shell", "pidof", PKG).strip()
         pid = pid or now
         if pid and now != pid:

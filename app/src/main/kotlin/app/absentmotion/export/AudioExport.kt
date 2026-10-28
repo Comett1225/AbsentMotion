@@ -232,9 +232,19 @@ private suspend fun encodeAudio(
     )
     val beat = onChange { progress(it.toFloat() / total * 0.99f) }
     try {
+        var lastFed = fed.get()
+        var lastChangeNs = System.nanoTime()
         while (workers.any { it.isAlive }) {
             currentCoroutineContext().ensureActive()
-            beat(fed.get())
+            val now = fed.get()
+            beat(now)
+            if (now != lastFed) {
+                lastFed = now
+                lastChangeNs = System.nanoTime()
+            } else if ((System.nanoTime() - lastChangeNs) / 1_000_000 > 60_000) {
+                fail(ExportError(txt(R.string.export_error_stalled, "60"), ExportStalled()))
+                break
+            }
             ensureStorage()
             delay(50)
         }

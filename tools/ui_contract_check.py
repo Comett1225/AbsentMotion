@@ -78,6 +78,15 @@ class UiContracts(unittest.TestCase):
         text = source('ui/editor/Preview.kt')
         self.assertIn('moved && state.selectedId != null && !(canvasGesture && fingers > 1)', text)
 
+    def test_crop_mode_owns_the_canvas_without_scale_handles(self):
+        text = source('ui/editor/Preview.kt')
+        self.assertIn('state.panel == EditorPanel.Crop -> HIDDEN', text)
+        self.assertIn('} else if (moved && state.panel == EditorPanel.Crop) {', text)
+        self.assertIn('state.panel != EditorPanel.EditText && state.panel != EditorPanel.Crop', text)
+        self.assertIn('"crop-drag"', text)
+        self.assertIn('state.openCrop()', source('ui/editor/LayerTools.kt'))
+        self.assertEqual('Crop', english('layer_tool_crop'))
+
     def test_favorite_header_wins_when_there_are_no_recents(self):
         text = source('ui/editor/TextEditor.kt')
         self.assertIn('index == 0 && recent.isNotEmpty() -> TextIcons.Recent', text)
@@ -162,17 +171,25 @@ class UiContracts(unittest.TestCase):
             for line in source(path).splitlines():
                 if 'performHapticFeedback(' in line:
                     self.assertTrue('state.settings.vibration' in line or 'if (vibrate)' in line, path)
-        self.assertIn('state.edit(MOVE_EDIT) { it.move(id, layers.lastIndex - to) }\n        onTick()', source('ui/editor/Timeline.kt'))
+        self.assertIn('state.edit(MOVE_EDIT) { it.reorder(id, layers.lastIndex - to) }\n        onTick()', source('ui/editor/Timeline.kt'))
         self.assertIn('if (moved && value != null && value != detent) haptic(HapticFeedbackType.SegmentTick)', source('ui/editor/panels/SpeedPanel.kt'))
         self.assertIn('if (guides.any { it !in state.snapGuides }) tick(HapticFeedbackType.SegmentTick)', source('ui/editor/panels/MoveTransformPanel.kt'))
 
-    def test_transform_tabs_put_size_above_rotate(self):
+    def test_transform_tabs_put_rotate_above_size_and_end_with_pivot(self):
         text = source('ui/editor/LayerTools.kt')
-        self.assertIn('listOf(PanelIcons.TabMove, PanelIcons.TabSize, PanelIcons.TabRotate, PanelIcons.TabTilt, PanelIcons.TabSkew)', text)
-        self.assertIn('KeyTarget(PropRef.Location, "0.000000,0.000000,0.000000"),\n    KeyTarget(PropRef.Scale, "1.000000,1.000000"),\n    KeyTarget(PropRef.Rotation, "0.000000"),\n    KeyTarget(PropRef.Tilt, "0.000000,0.000000"),', text)
-        self.assertIn('1 -> if (l.kind == "camera") l.withCameraFov(60f) else l.withTransform("scale", 1f, 1f)\n            2 -> l.withRotation(0f)\n            3 -> l.withTilt(0f, 0f)', source('editor/EditorActions.kt'))
-        self.assertIn('val usable = i <= ROTATE_TAB || selected.kind != "camera"', text)
-        self.assertIn('1 -> if (layer.kind == "camera") CameraSizeTab(state, layer) else SizeTab(state, layer)', source('ui/editor/panels/MoveTransformPanel.kt'))
+        self.assertIn('listOf(PanelIcons.TabMove, PanelIcons.TabRotate, PanelIcons.TabSize, PanelIcons.TabTilt, PanelIcons.TabSkew, PanelIcons.TabPivot)', text)
+        self.assertIn('KeyTarget(PropRef.Location, "0.000000,0.000000,0.000000"),\n    KeyTarget(PropRef.Rotation, "0.000000"),\n    KeyTarget(PropRef.Scale, "1.000000,1.000000"),\n    KeyTarget(PropRef.Tilt, "0.000000,0.000000"),', text)
+        self.assertIn('KeyTarget(PropRef.Pivot, "0.000000,0.000000,0.000000"),', text)
+        self.assertIn('1 -> l.withRotation(0f)\n                2 -> if (l.kind == "camera") l.withCameraFov(60f) else l.withTransform("scale", 1f, 1f)\n                3 -> l.withTilt(0f, 0f)', source('editor/EditorActions.kt'))
+        self.assertIn('val usable = i <= SIZE_TAB || selected.kind != "camera"', text)
+        self.assertIn('PanelIcon(icon, tint, size = 17.dp)\n                            Text(\n                                stringResource(names[i])', text)
+        self.assertIn('2 -> if (layer.kind == "camera") CameraSizeTab(state, layer) else SizeTab(state, layer)', source('ui/editor/panels/MoveTransformPanel.kt'))
+
+    def test_scale_link_is_saved_on_the_layer_and_the_ruler_glides(self):
+        text = source('ui/editor/panels/MoveTransformPanel.kt').split('private fun SizeTab', 1)[1].split('\n@Composable', 1)[0]
+        self.assertIn('val linked = layer.scaleLinked', text)
+        self.assertIn('state.editSelected { it.withScaleLinked(!it.scaleLinked) }', text)
+        self.assertNotIn('fling = false', text)
 
     def test_every_ruler_spinner_path_moves_the_value_like_a_tape_measure(self):
         self.assertEqual(4, source('ui/editor/panels/PanelParts.kt').count('dragging(RulerMath.travel('))
@@ -183,7 +200,7 @@ class UiContracts(unittest.TestCase):
         self.assertIn(turn, text)
         self.assertLess(text.index(turn), text.index('moved && state.selectedId != null && !(canvasGesture && fingers > 1)'))
         self.assertIn('if (turn != null) TurnHook(state, turn)', source('ui/editor/panels/MoveTransformPanel.kt'))
-        self.assertIn('2 -> if (turn != null) TurnTab(state, layer, turn) else RotationTab(state, layer)', source('ui/editor/panels/MoveTransformPanel.kt'))
+        self.assertIn('1 -> if (turn != null) TurnTab(state, layer, turn) else RotationTab(state, layer)', source('ui/editor/panels/MoveTransformPanel.kt'))
 
     def test_media_search_opens_from_a_square_over_the_grid(self):
         text = source('ui/editor/MediaTab.kt')
@@ -199,12 +216,17 @@ class UiContracts(unittest.TestCase):
 
     def test_scale_handles_guard_collapsed_axes(self):
         text = source('ui/editor/Preview.kt')
-        self.assertIn('if (grabbed.getDistanceSquared() < 1e-4f) continue', text)
-        self.assertLess(text.index('if (grabbed.getDistanceSquared() < 1e-4f) continue'), text.index('state.editSelected(key = "preview-handle")'))
+        guard = 'handleScale(handle, startQuad, pivot, position + handleGrab, startLayer.scale, 8.dp.toPx()) ?: continue'
+        self.assertIn(guard, text)
+        self.assertLess(text.index(guard), text.index('state.editSelected(key = "preview-handle")'))
+        self.assertIn('if (grabbed.getDistance() < reach) return null', text)
+        self.assertIn('if (abs(along) < reach) return null', text)
 
     def test_camera_view_refreshes_selection_quad(self):
         text = source('ui/editor/Preview.kt')
-        self.assertIn('LaunchedEffect(state.selectedId, scene, mediaRevision, state.cameraMode) {\n        snapshotFlow { state.timeMs.takeUnless { state.playing } }.collectLatest', text)
+        self.assertIn('LaunchedEffect(state.selectedId, scene, mediaRevision, state.cameraMode) {', text)
+        self.assertIn('if (quadFor != state.selectedId) {', text)
+        self.assertIn('snapshotFlow { state.timeMs.takeUnless { state.playing } }.collectLatest', text)
 
     def test_curve_menu_and_both_paste_paths_share_compatibility_rules(self):
         text = source('editor/EditorActions.kt')
@@ -259,15 +281,18 @@ class UiContracts(unittest.TestCase):
         self.assertNotIn('state.selectedId && abs(moved.x)', text)
         self.assertIn('state.edit(MOVE_EDIT) { TimelineMath.movedClips(it, original, group, target.frame) }', text)
         self.assertIn('acc.update(layer.id) { acc.movedClip(layer, movedStart(acc, layer, acc.firstShownFrame(layer.startTime) + shift)) }', text)
-        self.assertIn('state.edit(MOVE_EDIT) { it.move(id, layers.lastIndex - to) }', text)
+        self.assertIn('state.edit(MOVE_EDIT) { it.reorder(id, layers.lastIndex - to) }', text)
         self.assertIn('if (!commit || state.scene == moveBase) state.cancelGesture(MOVE_EDIT)', text)
         self.assertIn('TimelineMath.moveTarget(wanted,', text)
         self.assertIn('if (state.settings.vibration) haptic.performHapticFeedback(HapticFeedbackType.LongPress)', text)
 
     def test_selection_bar_pastes_copied_effects_in_one_edit_onto_visual_layers_only(self):
-        bar = source('ui/editor/StructureUi.kt').split('internal fun MultiTopBar', 1)[1]
-        self.assertIn('SelectionButton(PanelIcons.Effects, stringResource(R.string.layer_tool_effects)', bar)
-        self.assertIn('MenuPopup(DropOrRise, { effectsMenu = false })', bar)
+        text = source('ui/editor/StructureUi.kt')
+        bar = text.split('internal fun MultiBar', 1)[1].split('private val AlignNames', 1)[0]
+        self.assertNotIn('PanelIcons.Effects', text.split('internal fun MultiTopBar', 1)[1].split('private fun pasteEffectsOnSelection', 1)[0])
+        self.assertNotIn('structure_extend', text)
+        self.assertIn('BarButton(PanelIcons.Effects, stringResource(R.string.layer_tool_effects)', bar)
+        self.assertIn('MenuPopup(AboveLeft, { effectsMenu = false }, TransformOrigin(0f, 1f))', bar)
         self.assertIn('MenuRow(stringResource(R.string.effects_paste_all), enabled = copied.isNotEmpty()', bar)
         self.assertIn('pasteEffectsOnSelection(state, context)', bar)
         self.assertEqual('Paste All Effects', english('effects_paste_all'))

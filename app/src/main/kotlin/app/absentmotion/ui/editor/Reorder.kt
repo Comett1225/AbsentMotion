@@ -99,7 +99,7 @@ internal class Reorder(
         update()
     }
 
-    fun drop(commit: (Int, Int) -> Unit) {
+    fun drop(commit: (Int, Int) -> Unit, apply: Boolean = true) {
         if (held < 0 || settle != null) return
         job?.cancel()
         val from = held
@@ -111,7 +111,7 @@ internal class Reorder(
                 launch { lift.animateTo(0f, tween(DROP_MS, easing = Motion.EaseOut)) }
                 animate(at, (to - from) * pitch, animationSpec = tween(DROP_MS, easing = Motion.EaseOut)) { v, _ -> settle = v }
             } finally {
-                if (to != from) commit(from, to)
+                if (apply && to != from) commit(from, to)
                 held = -1
                 target = -1
                 settle = null
@@ -185,7 +185,7 @@ internal fun Modifier.reorderGrip(reorder: Reorder, index: Int, count: Int, comm
         detectDragGesturesAfterLongPress(
             onDragStart = { reorder.pick(at, it.y, size) },
             onDragEnd = { reorder.drop(moved) },
-            onDragCancel = { reorder.drop(moved) },
+            onDragCancel = { reorder.drop(moved, apply = false) },
         ) { change, _ ->
             change.consume()
             reorder.move(change.position.y)

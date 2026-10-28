@@ -3,7 +3,10 @@ package app.absentmotion
 import app.absentmotion.model.MediaDeclaration
 import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
+import app.absentmotion.editor.hasBookmarkNear
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class BookmarksTest {
@@ -30,5 +33,31 @@ class BookmarksTest {
     fun mediaAddedLaterStaysBeforeTheBookmarks() {
         val next = base.withBookmarkToggled(3).withMedia(MediaDeclaration(XmlNode("media", mapOf("uri" to "b"))))
         assertEquals(listOf("media", "media", "bookmark", "shape"), next.node.children.map { it.name })
+    }
+
+    @Test
+    fun aBeatNextToAnExistingMarkIsSkippedAndOneFurtherAwayIsKept() {
+        val marks = listOf(100, 500, 900)
+        assertTrue(hasBookmarkNear(marks, 500, 33.3))
+        assertTrue(hasBookmarkNear(marks, 520, 33.3))
+        assertTrue(hasBookmarkNear(marks, 480, 33.3))
+        assertFalse(hasBookmarkNear(marks, 540, 33.3))
+        assertFalse(hasBookmarkNear(marks, 40, 33.3))
+        assertTrue(hasBookmarkNear(marks, 930, 33.3))
+        assertFalse(hasBookmarkNear(emptyList(), 10, 33.3))
+    }
+
+    @Test
+    fun thousandsOfBeatsOnABusyTimelineAreAddedOnceEachAndFast() {
+        val busy = base.withBookmarks((0 until 3000).map { it * 40 })
+        val beats = (0 until 3000).map { it * 40 + 20 }
+        val start = System.nanoTime()
+        val next = busy.withBookmarks(beats)
+        val ms = (System.nanoTime() - start) / 1_000_000
+        assertEquals(6000, next.bookmarks.size)
+        val stored = next.node.children.filter { it.name == "bookmark" }.map { it["t"]!!.toInt() }
+        assertEquals(stored.sorted(), stored)
+        assertTrue("took $ms ms", ms < 1000)
+        assertEquals(6000, next.withBookmarks(beats).bookmarks.size)
     }
 }

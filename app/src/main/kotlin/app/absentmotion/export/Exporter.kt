@@ -66,6 +66,7 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
                                 (mix as? java.io.Closeable)?.close()
                             }
                         }
+                        note(txt(R.string.export_note_checking))
                         written.verified(kind, scene, f, mix != null, looks).unreadable(mix, scene).also {
                             val (w, h) = exportSize(scene, f.shortSide, even = true)
                             val ms = android.os.SystemClock.elapsedRealtime() - started - paused

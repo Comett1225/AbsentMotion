@@ -53,8 +53,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -138,6 +140,8 @@ private class CameraUi {
     var counting: Job? = null
     var busy by mutableStateOf(false)
     var closed = false
+    var askDiscard by mutableStateOf(false)
+    var discarding by mutableStateOf(false)
 }
 
 @Composable
@@ -146,7 +150,7 @@ fun CameraScreen(aspect: Float, onClose: () -> Unit, onCaptured: (Uri, Boolean) 
     fun back() {
         val counting = ui.counting
         when {
-            ui.recording != null -> ui.recording?.stop()
+            ui.recording != null -> ui.askDiscard = true
             counting != null -> counting.cancel()
             else -> onClose()
         }
@@ -337,8 +341,15 @@ private fun CameraBody(ui: CameraUi, aspect: Float, mic: Boolean, askMic: () -> 
                         ui.recording = null
                         ui.paused = false
                         ui.elapsedNs = 0
+                        ui.askDiscard = false
                         val uri = event.outputResults.outputUri
-                        if (uri != Uri.EMPTY && event.error in KeptVideo) { ui.busy = true; if (!ui.closed) onCaptured(uri, true) }
+                        val discard = ui.discarding
+                        ui.discarding = false
+                        if (discard) {
+                            if (uri != Uri.EMPTY) runCatching { context.contentResolver.delete(uri, null, null) }
+                            ui.busy = false
+                        }
+                        else if (uri != Uri.EMPTY && event.error in KeptVideo) { ui.busy = true; if (!ui.closed) onCaptured(uri, true) }
                         else {
                             Log.w("AMCamera", "video failed ${event.error}", event.cause)
                             failed(R.string.camera_error_save_video)
@@ -376,11 +387,26 @@ private fun CameraBody(ui: CameraUi, aspect: Float, mic: Boolean, askMic: () -> 
         }
     }
 
+    if (ui.askDiscard) AlertDialog(
+        onDismissRequest = { ui.askDiscard = false },
+        title = { Text(stringResource(R.string.camera_discard_title)) },
+        text = { Text(stringResource(R.string.camera_discard_text)) },
+        confirmButton = {
+            TextButton({
+                ui.askDiscard = false
+                ui.recording?.let { recording ->
+                    ui.discarding = true
+                    runCatching { recording.close() }
+                }
+            }) { Text(stringResource(R.string.discard)) }
+        },
+        dismissButton = { TextButton({ ui.askDiscard = false }) { Text(stringResource(R.string.camera_keep_recording)) } },
+    )
     val recording = ui.recording != null
     val locked = recording || ui.countdown > 0
     Column(Modifier.fillMaxSize().systemBarsPadding()) {
         Row(Modifier.fillMaxWidth().height(64.dp).padding(horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.size(56.dp).clickable { if (recording) ui.recording?.stop() else onClose() }, Alignment.Center) {
+            Box(Modifier.size(56.dp).clickable { if (recording) ui.askDiscard = true else onClose() }, Alignment.Center) {
                 Icon(ChromeIcons.CloseThick, stringResource(R.string.camera_close), Modifier.size(26.dp), tint = Color.White)
             }
             Box(Modifier.weight(1f), Alignment.Center) {

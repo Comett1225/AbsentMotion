@@ -564,15 +564,20 @@ private class TimelineView(val state: EditorState, density: Density, private val
             ceil(time.time(size.width.toFloat()) / STRIP_WINDOW_MS) * STRIP_WINDOW_MS)
     }
 
-    private var keyFramesOf: List<Layer>? = null
     private val keyFrames = HashMap<Pair<Long, KeyScope?>, List<Int>>()
+    private val keyFrameNodes = HashMap<Pair<Long, KeyScope?>, app.absentmotion.model.XmlNode>()
 
     private fun scopeOf(layer: Layer): KeyScope? = if (layer.id == state.selectedId) state.keyScope else null
 
     fun keyFrames(layer: Layer): List<Int> {
-        if (keyFramesOf !== layers) { keyFrames.clear(); keyFramesOf = layers }
         val scope = scopeOf(layer)
-        return keyFrames.getOrPut(layer.id to scope) { layer.keyframeTimes(scope).map { state.scene.frameAt(it) }.distinct() }
+        val key = layer.id to scope
+        val cached = keyFrames[key]
+        if (cached != null && keyFrameNodes[key] === layer.node) return cached
+        return layer.keyframeTimes(scope).map { state.scene.frameAt(it) }.distinct().also {
+            keyFrames[key] = it
+            keyFrameNodes[key] = layer.node
+        }
     }
 
     private var scrollBeforeSelect: Float? = null
@@ -614,9 +619,9 @@ private class TimelineView(val state: EditorState, density: Density, private val
         return when {
             at.x < EyeZone.px -> Hit.Eye(layer.id)
             at.x < HeaderWidth.px -> Hit.Header(layer.id)
+            key != null -> Hit.Key(layer.id, key)
             selected && at.x in left - GripZone.px..left -> Hit.Grip(layer.id, start = true)
             selected && at.x in right..right + GripZone.px -> Hit.Grip(layer.id, start = false)
-            key != null -> Hit.Key(layer.id, key)
             !selected && at.x >= size.width - HandleZone.px -> Hit.Handle(layer.id)
             at.x in left..right -> Hit.Bar(layer.id)
             else -> Hit.Row(layer.id)
@@ -897,7 +902,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
         if (layers.isEmpty()) return
         val index = layers.lastIndex - rowAt(y).coerceIn(0, layers.lastIndex)
         val id = dragId
-        if (layers[index].id != id) state.edit("reorder") { it.move(id, index) }
+        if (layers[index].id != id) state.edit("reorder") { it.reorder(id, index) }
     }
 
     fun rowOf(id: Long): Int? = layers.indexOfFirst { it.id == id }.takeIf { it >= 0 }?.let { layers.lastIndex - it }
@@ -983,7 +988,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
             val left = slides[layer.id]?.let { it.from * (1 - progress(now - it.at, SLIDE_MS)) } ?: 0f
             slides[layer.id] = Slide(left - shift, now)
         }
-        state.edit(MOVE_EDIT) { it.move(id, layers.lastIndex - to) }
+        state.edit(MOVE_EDIT) { it.reorder(id, layers.lastIndex - to) }
         onTick()
     }
 

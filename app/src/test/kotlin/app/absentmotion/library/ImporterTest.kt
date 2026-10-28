@@ -180,6 +180,26 @@ class ImporterTest {
         assertEquals("${inner[0].id}", inner[1].node["parent"])
     }
 
+    @Test fun renumberedLayersKeepEveryReferenceFromTheirSiblings() {
+        val xml = """<scene width="10" height="10">
+            <shape id="5" startTime="0" endTime="99" />
+            <embedScene id="7" startTime="0" endTime="99"><scene width="10" height="10">
+              <shape id="5" startTime="0" endTime="99" />
+              <shape id="6" parent="5" pathLayer="5" noiseId="5" genIn="t fade 100 0 0 5" startTime="0" endTime="99" />
+              <shape id="9" genOut="t fade 100 0 0 6" startTime="0" endTime="99" />
+            </scene></embedScene>
+        </scene>"""
+        val store = store()
+        val top = store.load(Importer(store).import { xml.byteInputStream() }.single().id)!!.layers
+        val inner = top[1].nested!!.layers
+        val moved = inner[0].id
+        assertTrue(moved != 5L)
+        assertEquals(5L, top[0].id)
+        assertEquals(listOf("$moved", "$moved", "$moved"), listOf("parent", "pathLayer", "noiseId").map { inner[1].node[it] })
+        assertEquals("t fade 100 0 0 $moved", inner[1].node["genIn"])
+        assertEquals("t fade 100 0 0 6", inner[2].node["genOut"])
+    }
+
     @Test fun aCopyOwnsItsMediaAndReplacingMediaSwapsEveryUse() {
         val scene = """<scene width="10" height="10"><shape id="1" fillType="media" fillImage="x://a" /><shape id="2" fillType="media" fillImage="x://a" /></scene>"""
         val bytes = zip(listOf("p.xml" to scene.toByteArray(), "a.jpg" to "jpg".toByteArray(),

@@ -45,7 +45,7 @@ The preview shows the canvas. A transparent background shows as a checkerboard.
 
 - **Select.** Tap a layer to select it (the top layer under your finger). Tap empty canvas to deselect.
 - **Move.** Drag anywhere on the preview to move the selected layer, not only on the layer itself.
-- **Scale.** The selected layer has a white outline with eight round handles. Dragging a corner scales the layer evenly; dragging a side stretches it in that direction. Pinching with two fingers also scales.
+- **Scale.** The selected layer has a white outline with eight round handles. Dragging a corner scales the layer evenly; dragging a side stretches it in that direction. Pinching with two fingers also scales. The handles scale around the pivot (**Transform**, **Pivot**), which stays still.
 - **Rotate.** There is no rotate handle and no two-finger twist for ordinary layers. Use **Transform**, **Rotate** (see [Layer tools](@layer-tools)).
 - **Camera layers.** Dragging pans the camera and pinching changes its view angle.
 - **Text.** In the text editor, the handle at the side of the text frame changes the wrap width.

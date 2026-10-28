@@ -143,6 +143,22 @@ private fun argb(r: Float, g: Float, b: Float, a: Float): Int {
 
 private fun tokens(line: String): List<String> = line.split(' ', '\t').filter { it.isNotEmpty() }
 
+private fun mapFileName(args: String): String? {
+    fun split(s: String): Pair<String, String> { val w = s.takeWhile { !it.isWhitespace() }; return w to s.substring(w.length).trimStart() }
+    var rest = args.trim()
+    while (rest.startsWith("-")) {
+        val (option, after) = split(rest)
+        rest = after
+        var count = when (option.lowercase()) { "-s", "-o", "-t" -> 3; "-mm" -> 2; else -> 1 }
+        while (count-- > 0) {
+            val (arg, tail) = split(rest)
+            if (arg.toFloatOrNull() == null && arg.lowercase() !in setOf("on", "off", "r", "g", "b", "m", "l", "z")) break
+            rest = tail
+        }
+    }
+    return rest.takeIf { it.isNotEmpty() }
+}
+
 object ObjReader {
     private const val LIMIT = (1 shl 21) - 1
 
@@ -222,7 +238,7 @@ object ObjReader {
                 "Kd" -> current?.let { m -> for (i in 0..2) m.color[i] = t.getOrNull(i + 1)?.finiteFloat() ?: 1f }
                 "d" -> current?.let { m -> m.color[3] = t.getOrNull(1)?.finiteFloat() ?: 1f }
                 "Tr" -> current?.let { m -> m.color[3] = 1f - (t.getOrNull(1)?.finiteFloat() ?: 0f) }
-                "map_Kd" -> current?.texture = t.last().takeIf { t.size > 1 }
+                "map_Kd" -> current?.texture = mapFileName(line.substring("map_Kd".length))
             }
         }
     }
@@ -309,8 +325,12 @@ object GltfReader {
         }
 
         fun indices(primitive: JSONObject, count: Int): IntArray {
-            if (accessors.getOrNull(primitive.optInt("indices", -1))?.has("bufferView") == false) return IntArray(0)
-            val (values, _) = (if (primitive.has("indices")) read(primitive.getInt("indices"), false) else null) ?: return IntArray(count) { it }
+            if (!primitive.has("indices")) return IntArray(count) { it }
+            val accessor = accessors.getOrNull(primitive.optInt("indices", -1))
+                ?: throw IllegalArgumentException(AppText.get(R.string.model_err_accessor))
+            if (!accessor.has("bufferView")) return IntArray(0)
+            val (values, _) = read(primitive.getInt("indices"), false)
+                ?: throw IllegalArgumentException(AppText.get(R.string.model_err_accessor))
             return IntArray(values.size) { values[it].toInt() }
         }
 
@@ -324,7 +344,8 @@ object GltfReader {
             val normalMatrix = normalMatrix(world)
             val flip = determinant(world) < 0
             for (primitive in meshes.getOrNull(meshIndex)?.optJSONArray("primitives").objects()) {
-                if (primitive.optInt("mode", 4) != 4) continue
+                val mode = primitive.optInt("mode", 4)
+                if (mode !in 4..6) continue
                 val attributes = primitive.optJSONObject("attributes") ?: continue
                 charge(attributes.optInt("POSITION", -1))
                 charge(primitive.optInt("indices", -1))
@@ -349,10 +370,16 @@ object GltfReader {
                         argb(factor[0] * c[0], factor[1] * c[1], factor[2] * c[2], factor[3] * c[3]))
                 }
                 val list = indices(primitive, count)
-                for (k in 0 until list.size - 2 step 3) {
-                    val a = list[k]; val b = list[k + 1]; val c = list[k + 2]
-                    if (a !in 0 until count || b !in 0 until count || c !in 0 until count) continue
+                fun emit(a: Int, b: Int, c: Int) {
+                    if (a !in 0 until count || b !in 0 until count || c !in 0 until count) return
                     if (flip) builder.triangle(first + a, first + c, first + b, slot) else builder.triangle(first + a, first + b, first + c, slot)
+                }
+                when (mode) {
+                    4 -> for (k in 0 until list.size - 2 step 3) emit(list[k], list[k + 1], list[k + 2])
+                    5 -> for (k in 0 until list.size - 2) {
+                        if (k % 2 == 0) emit(list[k], list[k + 1], list[k + 2]) else emit(list[k + 1], list[k], list[k + 2])
+                    }
+                    else -> for (k in 1 until list.size - 1) emit(list[0], list[k], list[k + 1])
                 }
             }
         }

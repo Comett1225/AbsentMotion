@@ -222,7 +222,16 @@ private fun PreviewCopiesRow() {
     val made by VideoProxies.revision.collectAsState()
     var bytes by remember { mutableLongStateOf(0L) }
     LaunchedEffect(made) { bytes = withContext(Dispatchers.IO) { VideoProxies.bytes(context) } }
-    ActionRow(stringResource(R.string.settings_clear_preview_copies), formatBytes(bytes), chevron = false) { VideoProxies.clear(context) }
+    var ask by remember { mutableStateOf(false) }
+    ActionRow(stringResource(R.string.settings_clear_preview_copies), formatBytes(bytes), chevron = false) { ask = true }
+    if (ask) AlertDialog(
+        onDismissRequest = { ask = false },
+        title = { Text(stringResource(R.string.settings_clear_preview_title), color = Am.Navy) },
+        text = { Text(stringResource(R.string.settings_clear_preview_text), color = Am.Navy) },
+        confirmButton = { TextButton({ ask = false; VideoProxies.clear(context) }) { Text(stringResource(R.string.settings_clear_preview_copies), color = Am.Navy) } },
+        dismissButton = { TextButton({ ask = false }) { Text(stringResource(R.string.cancel), color = Am.Navy) } },
+        containerColor = Am.Card,
+    )
 }
 
 @Composable
@@ -231,18 +240,43 @@ private fun CaptionModelRow() {
     var bytes by remember { mutableLongStateOf(CaptionModel.storedBytes(context)) }
     val downloaded = bytes > 0L
     if (!downloaded) return
-    ActionRow(stringResource(R.string.remove_caption_model), formatBytes(bytes), chevron = false) { CaptionModel.remove(context); bytes = CaptionModel.storedBytes(context) }
+    var ask by remember { mutableStateOf(false) }
+    ActionRow(stringResource(R.string.remove_caption_model), formatBytes(bytes), chevron = false) { ask = true }
+    if (ask) AlertDialog(
+        onDismissRequest = { ask = false },
+        title = { Text(stringResource(R.string.settings_delete_model_title, stringResource(R.string.caption_model)), color = Am.Navy) },
+        text = { Text(stringResource(R.string.settings_delete_model_text), color = Am.Navy) },
+        confirmButton = { TextButton({ ask = false; CaptionModel.remove(context); bytes = CaptionModel.storedBytes(context) }) { Text(stringResource(R.string.delete), color = Am.Navy) } },
+        dismissButton = { TextButton({ ask = false }) { Text(stringResource(R.string.cancel), color = Am.Navy) } },
+        containerColor = Am.Card,
+    )
 }
 
 @Composable
 private fun AiModelRows() {
     val context = LocalContext.current
     var models by remember { mutableStateOf(app.absentmotion.ai.AiModel.downloaded(context) - app.absentmotion.ai.AiModel.Cutout) }
+    var askFor by remember { mutableStateOf<app.absentmotion.ai.AiModel?>(null) }
     for (model in models) {
         ActionRow(stringResource(R.string.ai_delete_model, stringResource(model.title)), formatBytes(model.onDisk(context)), chevron = false) {
-            model.delete(context)
-            models = app.absentmotion.ai.AiModel.downloaded(context) - app.absentmotion.ai.AiModel.Cutout
+            askFor = model
         }
+    }
+    askFor?.let { target ->
+        AlertDialog(
+            onDismissRequest = { askFor = null },
+            title = { Text(stringResource(R.string.settings_delete_model_title, stringResource(target.title)), color = Am.Navy) },
+            text = { Text(stringResource(R.string.settings_delete_model_text), color = Am.Navy) },
+            confirmButton = {
+                TextButton({
+                    askFor = null
+                    target.delete(context)
+                    models = app.absentmotion.ai.AiModel.downloaded(context) - app.absentmotion.ai.AiModel.Cutout
+                }) { Text(stringResource(R.string.delete), color = Am.Navy) }
+            },
+            dismissButton = { TextButton({ askFor = null }) { Text(stringResource(R.string.cancel), color = Am.Navy) } },
+            containerColor = Am.Card,
+        )
     }
 }
 
@@ -262,12 +296,26 @@ private fun CutoutRows() {
         }
     }
     Divider(10.dp)
+    var ask by remember { mutableStateOf(false) }
     if (bytes > 0L) ActionRow(stringResource(R.string.ai_delete_model, stringResource(model.title)), formatBytes(bytes), chevron = false) {
-        model.delete(context)
-        bytes = model.onDisk(context)
-        choice.choose(app.absentmotion.ai.CutoutQuality.Standard)
-        chosen = app.absentmotion.ai.CutoutQuality.Standard
+        ask = true
     }
+    if (ask) AlertDialog(
+        onDismissRequest = { ask = false },
+        title = { Text(stringResource(R.string.settings_delete_model_title, stringResource(model.title)), color = Am.Navy) },
+        text = { Text(stringResource(R.string.settings_delete_model_text), color = Am.Navy) },
+        confirmButton = {
+            TextButton({
+                ask = false
+                model.delete(context)
+                bytes = model.onDisk(context)
+                choice.choose(app.absentmotion.ai.CutoutQuality.Standard)
+                chosen = app.absentmotion.ai.CutoutQuality.Standard
+            }) { Text(stringResource(R.string.delete), color = Am.Navy) }
+        },
+        dismissButton = { TextButton({ ask = false }) { Text(stringResource(R.string.cancel), color = Am.Navy) } },
+        containerColor = Am.Card,
+    )
 }
 
 @Composable

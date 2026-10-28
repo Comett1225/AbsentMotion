@@ -95,8 +95,7 @@ internal fun turnFor(layer: Layer, catalog: EffectCatalog, tab: Int): Turn? {
         val axes = TURN_AXES.map { id -> definition.params.firstOrNull { it.id == id } ?: return@firstNotNullOfOrNull null }
         Turn(i, axes)
     } ?: Turn()
-    val solid = turn.effect >= 0 || layer.kind == "model" || layer.tilt.any { it != 0f } || layer.keyframes(PropRef.Tilt).isNotEmpty()
-    return turn.takeIf { tab == TILT_TAB || solid }
+    return turn.takeIf { tab == TILT_TAB || turn.effect >= 0 }
 }
 
 private val TURN_AXES = listOf("rotX", "rotY", "rotZ")

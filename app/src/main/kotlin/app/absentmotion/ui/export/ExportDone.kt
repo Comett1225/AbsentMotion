@@ -41,6 +41,13 @@ fun DoneScreen(kind: ExportKind, result: ExportResult, onClose: () -> Unit, onSh
                     fontSize = 13.sp, textAlign = TextAlign.Center, maxLines = 3,
                 )
             }
+            result.verification?.takeIf { it.ok && it.unchecked }?.let {
+                Text(
+                    stringResource(R.string.export_checked_unavailable), Modifier.padding(top = 2.dp),
+                    color = Am.OnNavy.copy(alpha = 0.7f),
+                    fontSize = 13.sp, textAlign = TextAlign.Center, maxLines = 3,
+                )
+            }
         }
         Box(Modifier.weight(1f).fillMaxWidth().background(Am.Scrim)) {
             app.absentmotion.platform.ExportMediaPreview(kind, result.uris)

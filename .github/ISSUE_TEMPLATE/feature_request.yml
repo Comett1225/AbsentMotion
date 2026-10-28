@@ -1,0 +1,20 @@
+name: Feature or effect request
+description: Suggest an idea, or report an effect that is missing or behaves differently from what you expect
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What would you like?
+      description: Describe the result you want in your own words, and what you were trying to make.
+    validations:
+      required: true
+  - type: textarea
+    id: behaviour
+    attributes:
+      label: Expected behaviour (for effects)
+      description: What the effect should do, which settings it has, and how it differs from what AbsentMotion does now. Describe what you observed using your own files; please don't paste code, assets or screenshots from other apps.
+  - type: textarea
+    id: alt
+    attributes:
+      label: Workarounds you tried

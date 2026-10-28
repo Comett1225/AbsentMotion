@@ -154,9 +154,12 @@ class ExportService : Service() {
     }
 
     override fun onTimeout(startId: Int, fgsType: Int) {
+        if (ExportRun.running) {
+            ExportRun.cancel()
+            ExportRun.end(false)
+        }
         handler.removeCallbacks(tick)
-        ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
-        stopSelf()
+        finish()
     }
 
     override fun onDestroy() {

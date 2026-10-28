@@ -266,6 +266,100 @@ def text(content):
     return engine.scene('<text id="1" fillType="color" startTime="0" endTime="1000" size="40" wrapWidth="150" align="left">' + engine.transform('20,70,0') + '<content>' + content + '</content><fillColor value="#ffffffff"/></text>')
 
 
+def path_text(content, effect, at='200,200', id=2, size=12, wrap=150, colour='#ffff0000'):
+    return (f'<text id="{id}" label="p" fillType="color" startTime="0" endTime="1000" size="{size}" wrapWidth="{wrap}" align="center">' + engine.transform(at + ',0')
+            + f'<content>{content}</content><fillColor value="{colour}"/>' + effect + '</text>')
+
+
+def outline(id, body, shape='', at='0,0'):
+    return (f'<shape id="{id}" label="g" startTime="0" endTime="1000" fillType="none"{shape}>' + engine.transform(at + ',0') + body
+            + '<fillColor value="#ff0000ff"/><path-stroke><color value="#ff0000ff"/><size value="2"/></path-stroke></shape>')
+
+
+def ink(image):
+    return (image[:, :, 0] > 128) & (image[:, :, 2] < 100)
+
+
+def spread(mask):
+    ys, xs = np.nonzero(mask)
+    if not len(xs):
+        return None
+    third = (xs.max() - xs.min()) / 3
+    side = ys[(xs < xs.min() + third / 2) | (xs > xs.max() - third / 2)].mean()
+    centre = (xs.min() + xs.max()) / 2
+    middle = ys[np.abs(xs - centre) < third / 2]
+    return dict(x=round(float(xs.mean()), 1), y=round(float(ys.mean()), 1), mid=round(float(centre), 1),
+                bend=round(float(side - middle.mean()), 1) if len(middle) else None, mass=int((xs > centre).sum() - (xs < centre).sum()))
+
+
+def same_shape(a, b):
+    if not a.any() or not b.any():
+        return 0.0
+    ya, xa = np.nonzero(a)
+    yb, xb = np.nonzero(b)
+    moved = np.roll(np.roll(b, int(round(ya.mean() - yb.mean())), 0), int(round(xa.mean() - xb.mean())), 1)
+    return float((a & moved).sum() / (a | moved).sum())
+
+
+def text_path_checks(work):
+    failed = 0
+    sized = lambda body: engine.scene(body, 400, 400)
+
+    def report(ok, name, detail):
+        print(('ok   ' if ok else 'FAIL ') + name + ': ' + str(detail), flush=True)
+        return not ok
+
+    def shot(name, body):
+        return engine.still('textpath' + name, sized(body), work)
+
+    arc = spread(ink(shot('arc', path_text('ABCDEFG', fx('textpath')))))
+    failed += report(arc and arc['y'] < 170 and abs(arc['x'] - 200) < 8 and arc['bend'] > 2, 'text along the default arc lies over the top of it and curves down at both ends', arc)
+    circle = spread(ink(shot('circle', path_text('I&#160;&#160;&#160;&#160;&#160;&#160;III', fx('textpath', shape=1, radius=120)))))
+    failed += report(circle and circle['y'] < 100 and abs(circle['mid'] - 200) < 8 and circle['mass'] > 0,
+                     'a new circle puts the text on top, reading left to right', circle)
+    ring = '<property name="size" type="vec2" value="120,120"/>'
+    below = lambda name, shape, content='I&#160;&#160;&#160;&#160;&#160;&#160;III': spread(ink(shot(name, shape + path_text(content, fx('textpath', shape=2)))))
+    oval = outline(1, ring, ' s=".circle"', '200,200')
+    on_circle = below('belowcircle', oval)
+    failed += report(on_circle and on_circle['y'] < 100 and abs(on_circle['mid'] - 200) < 8 and on_circle['mass'] > 0,
+                     'layer below on a circle starts with the text on top, reading left to right', on_circle)
+    rect = outline(1, '<property name="size" type="vec2" value="150,100"/>', ' s=".rect"', '200,200')
+    on_box = below('belowrect', rect, 'ABCD')
+    failed += report(on_box and on_box['y'] < 100 and abs(on_box['x'] - 200) < 8 and abs(on_box['bend']) < 3,
+                     'layer below on a rectangle puts the text on the middle of its top edge', on_box)
+    parts = outline(1, '<path><contour d="M 20 300 L 120 300"/><contour d="M 280 100 L 380 100"/></path>')
+    on_parts = spread(ink(shot('belowparts', parts + path_text('II', fx('textpath', shape=2, position=0.75)))))
+    failed += report(on_parts and abs(on_parts['x'] - 330) < 10 and on_parts['y'] < 100, 'text runs on from one part of a path to the next', on_parts)
+    drawn = '<drawing id="1" label="d" startTime="0" endTime="1000">' + engine.transform() + '<stroke color="#ff0000ff" width="6" type="brush" points="50,350,1;350,250,1"/></drawing>'
+    on_stroke = spread(ink(shot('belowdrawing', drawn + path_text('ABCD', fx('textpath', shape=2)))))
+    failed += report(on_stroke and abs(on_stroke['x'] - 200) < 8 and 265 < on_stroke['y'] < 305,
+                     'text on a drawing follows the drawn stroke, not its bounding box', on_stroke)
+    long = 'ABCDEFGHIJKL'
+    wrapped = ink(shot('long', path_text(long, fx('textpath', shape=1, radius=120))))
+    ys, xs = np.nonzero(wrapped)
+    inner = int((np.hypot(xs - 200, ys - 200) < 112).sum()) if len(xs) else -1
+    failed += report(len(xs) and xs.max() - xs.min() > 180 and inner < 0.02 * len(xs), 'a caption wider than the text box runs around the circle instead of wrapping',
+                     dict(width=int(xs.max() - xs.min()) if len(xs) else 0, inside=inner))
+    straight = outline(1, '<path d="M 0 250 L 400 250"/>').replace('<path-stroke><color value="#ff0000ff"/><size value="2"/></path-stroke>', '')
+    for name, content in [('rtl', 'مرحبا بالعالم'), ('emoji', 'A😀B')]:
+        flat = shot(name + 'flat', path_text(content, '', at='200,150', wrap=400))
+        bent = shot(name + 'bent', straight + path_text(content, fx('textpath', shape=2), at='200,150'))
+        colour = lambda image: int(((image[:, :, 1] > 120) & (image[:, :, 0] > 120)).sum())
+        match = same_shape(flat.max(axis=2) > 100, bent.max(axis=2) > 100)
+        ok = match > 0.85 and (name != 'emoji' or min(colour(flat), colour(bent)) > 40)
+        failed += report(ok, f'{name} text laid on a straight path keeps the order and look of the flat text', dict(match=round(match, 3), colour=[colour(flat), colour(bent)]))
+    tap = oval.replace('fillType="none"', 'fillType="color"') + path_text('ABCDEFG', fx('textpath', shape=2))
+    log = engine.run('textpathhit', sized(tap), work, [(200, 62), (200, 200), (200, 300)], bounds=[2])
+    engine.adb('shell', 'rm', engine.DEVICE_DIR + '/textpathhit.png')
+    got = [row.split()[-1] for row in log.splitlines() if ' hit ' in row]
+    failed += report(got == ['2', '1', '1'], 'tapping text on the layer below finds the bent letters, not the flat text box', got)
+    found = [row.split(' bounds ')[1].split() for row in log.splitlines() if ' bounds ' in row]
+    box, shape = ([float(v) for v in found[0][1].split(',')], [float(v) for v in found[0][3].split(',')]) if found and 'none' not in found[0] else (None, None)
+    ok = box is not None and box[1] < 70 and box[3] < 130 and abs((box[0] + box[2]) / 2 - 200) < 10 and shape[3] < -80
+    failed += report(ok, 'the selection box and Convert to Outline use the bent text on the layer below', dict(bounds=box, outline=shape))
+    return failed
+
+
 def main():
     work = Path(sys.argv[1]) if len(sys.argv) > 1 else engine.ROOT / 'build/remaining-engine-check'
     work.mkdir(parents=True, exist_ok=True)
@@ -442,11 +536,12 @@ def main():
     failed += not same
     words = ('<text id="1" label="w" fillType="color" startTime="0" endTime="1000" size="90" wrapWidth="190" align="left">' + engine.transform('20,40,0')
              + '<content>O</content><fillColor value="#ff0000ff"/></text>')
-    spots = [centre(engine.still(f'textpath{k}', engine.scene(words + engine.rect(2, 0, 0, 3, 3, 0xffff0000, extra=effect)), work))
+    spots = [centre(engine.still(f'textoutline{k}', engine.scene(words + engine.rect(2, 0, 0, 3, 3, 0xffff0000, extra=effect)), work))
              for k, effect in enumerate([fx('movealongpath', progress=0, rotate=0), fx('repeatalongpath', count=1)])]
     ok = None not in spots[0] + spots[1] and np.hypot(spots[0][0] - spots[1][0], spots[0][1] - spots[1][1]) < 1.5
     print(('ok   ' if ok else 'FAIL ') + 'move along path and repeat along path both start on the letter outline of text: ' + str(spots), flush=True)
     failed += not ok
+    failed += text_path_checks(work)
     timed = text('A B C D E').replace('</text>', '<effect id="com.alightcreative.effects.textspacing"><property name="letterspacing" type="float"><kf t="0" v="0"/><kf t="1" v="0.3"/></property></effect></text>')
     child = timed[timed.index('<text'):timed.index('</text>') + len('</text>')]
     group = '<embedScene id="9" startTime="500" endTime="1499">' + engine.transform('100,100,0') + '<scene width="200" height="200" fps="24" totalTime="1000" retime="off">' + child + '</scene></embedScene>'

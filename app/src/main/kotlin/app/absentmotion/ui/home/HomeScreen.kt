@@ -161,10 +161,12 @@ fun HomeScreen(
     changes: Int = 0,
 ) {
     var projects by remember { mutableStateOf<List<ProjectInfo>>(emptyList()) }
+    var loaded by remember { mutableStateOf(false) }
     var version by remember { mutableIntStateOf(0) }
     var tab by rememberSaveable { mutableIntStateOf(0) }
     var page by rememberSaveable { mutableIntStateOf(0) }
     var creating by remember { mutableStateOf(false) }
+    var duplicating by remember { mutableStateOf(false) }
     var search by remember { mutableStateOf<String?>(null) }
     val query = app.absentmotion.ui.editor.debounced(search.orEmpty())
     val drawer = rememberDrawerState(DrawerValue.Closed)
@@ -175,7 +177,7 @@ fun HomeScreen(
 
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { version++ }
     app.absentmotion.platform.BackHandler(search != null) { search = null }
-    LaunchedEffect(version, changes) { projects = withContext(Dispatchers.IO) { store.list(includeDamaged = true) } }
+    LaunchedEffect(version, changes) { projects = withContext(Dispatchers.IO) { store.list(includeDamaged = true) }; loaded = true }
     val shown = remember(projects, tab, query) { projects.filter { it.isElement == (tab == 1) && matchesSearch(query, it.title) } }
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> if (uri != null) onImportFile(uri) }
     val toReport = imported.filter { it.sections.isNotEmpty() }
@@ -197,12 +199,16 @@ fun HomeScreen(
                 if (wide) WideHeader(page, tab, { p, t -> page = p; tab = t }, onSettings = { scope.launch { drawer.open() } }, onNew = { creating = true }, search, { search = it })
                 else TopBar(onMenu = { scope.launch { drawer.open() } }, search, page == 1, { search = it })
                 if (page == 1) TemplatesTab(version, onTemplate, onTemplateProject, Modifier.weight(1f).then(if (wide) Modifier.widthIn(max = 760.dp).align(Alignment.CenterHorizontally) else Modifier), query) else ProjectsPane(
-                    Modifier.weight(1f), shown, tab, { tab = it }, settings, version, onOpen, onExport, query,
+                    Modifier.weight(1f), shown, loaded, tab, { tab = it }, settings, version, onOpen, onExport, query,
                     onUpload = { picker.launch(arrayOf("text/xml", "application/xml", "application/zip", "application/octet-stream")) },
-                    onDuplicate = { id -> scope.launch {
-                        val copied = withContext(Dispatchers.IO) { runCatching { store.duplicate(id) }.onFailure { app.absentmotion.platform.Log.w("AMStore", "cannot duplicate $id", it) }.isSuccess }
-                        if (!copied) app.absentmotion.platform.Toast.makeText(context, context.getString(R.string.home_create_project_failed), app.absentmotion.platform.Toast.LENGTH_LONG).show()
-                        version++
+                    onDuplicate = { id -> if (!duplicating) {
+                        duplicating = true
+                        app.absentmotion.platform.Toast.makeText(context, context.getString(R.string.home_duplicating), app.absentmotion.platform.Toast.LENGTH_SHORT).show()
+                        scope.launch { try {
+                            val copied = withContext(Dispatchers.IO) { runCatching { store.duplicate(id) }.onFailure { app.absentmotion.platform.Log.w("AMStore", "cannot duplicate $id", it) }.isSuccess }
+                            if (!copied) app.absentmotion.platform.Toast.makeText(context, context.getString(R.string.home_create_project_failed), app.absentmotion.platform.Toast.LENGTH_LONG).show()
+                            version++
+                        } finally { duplicating = false } }
                     } },
                     onDelete = { id -> scope.launch { withContext(Dispatchers.IO) { store.delete(id, context.getExternalFilesDir(null)?.resolve("ai")) }; version++ } },
                     onHistory = onHistory,
@@ -253,6 +259,7 @@ internal fun SearchButton(search: String?, onSearch: (String?) -> Unit, modifier
 private fun ProjectsPane(
     modifier: Modifier,
     shown: List<ProjectInfo>,
+    loaded: Boolean,
     tab: Int,
     onTab: (Int) -> Unit,
     settings: AppSettings,
@@ -300,7 +307,7 @@ private fun ProjectsPane(
                 Spacer(Modifier.height(24.dp))
                 Chips(tab, onTab)
             }
-            if (shown.isEmpty() && tab == 0 && settings.xmlUpload && query.isBlank()) {
+            if (loaded && shown.isEmpty() && tab == 0 && settings.xmlUpload && query.isBlank()) {
                 Spacer(Modifier.height(13.dp))
                 Box(Modifier.padding(horizontal = 16.dp).then(if (wide) WideCard else Modifier)) { UploadCard(onUpload) }
             }
@@ -324,8 +331,8 @@ private fun ProjectsPane(
                 }
             }
         }
-        if (shown.isEmpty() && query.isNotBlank()) NoMatches(query, if (tab == 1) R.string.search_no_assets else R.string.search_no_projects, Modifier.fillMaxWidth().padding(top = 120.dp), Am.Navy, 17.sp)
-        else if (shown.isEmpty()) EmptyState(element = tab == 1, arrow = !wide)
+        if (loaded && shown.isEmpty() && query.isNotBlank()) NoMatches(query, if (tab == 1) R.string.search_no_assets else R.string.search_no_projects, Modifier.fillMaxWidth().padding(top = 120.dp), Am.Navy, 17.sp)
+        else if (loaded && shown.isEmpty()) EmptyState(element = tab == 1, arrow = !wide)
         menu?.let { open ->
             Box(
                 Modifier.fillMaxSize().enterFade()

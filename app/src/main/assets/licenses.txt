@@ -2750,7 +2750,7 @@ COUNTS
 
 - Lucide only - 167
 - Lucide shapes plus own parts - 8
-- Own drawing only - 41
+- Own drawing only - 42
 - Material Symbols - 0
 
 (An icon is one named member of an *Icons object, or one icon-drawing composable.)
@@ -2820,6 +2820,7 @@ ICONS
 - PaintBucket (Lucide paint-bucket) - ISC - ui/editor/PanelIcons.kt
 - BorderShadow (own drawing) - Apache-2.0 (own) - ui/editor/PanelIcons.kt
 - Blending (Lucide blend) - ISC - ui/editor/PanelIcons.kt
+- Crop (own drawing) - Apache-2.0 (own) - ui/editor/PanelIcons.kt
 - MoveTransform (Lucide move-3d) - ISC - ui/editor/PanelIcons.kt
 - EditShape (Lucide spline) - ISC - ui/editor/PanelIcons.kt
 - Star (Lucide star) - ISC - ui/editor/PanelIcons.kt

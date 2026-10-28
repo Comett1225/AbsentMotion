@@ -121,7 +121,7 @@ private fun channel(v: Float): Int = v.roundToInt().coerceIn(0, 255)
 internal val MatteFollowedEffects = setOf(
     "absent.autoshake", "absent.bend", "absent.box", "absent.bulge",
     "absent.circularripple", "absent.cross", "absent.cube", "absent.curl",
-    "absent.cylinder", "absent.displacementmap", "absent.echo", "absent.ellipsoid",
+    "absent.cylinder", "absent.puppet", "absent.displacementmap", "absent.echo", "absent.ellipsoid",
     "absent.flip", "absent.fractalwarp", "absent.glass", "absent.glitch",
     "absent.gridrepeat", "absent.heart", "absent.hexagontilerotate", "absent.hexagontileshift",
     "absent.hexagontiling", "absent.hexprism", "absent.hollowbox", "absent.innerbulge",

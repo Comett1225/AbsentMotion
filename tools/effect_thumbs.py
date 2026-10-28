@@ -45,7 +45,7 @@ def fetch(url):
 
 def download(title, path):
     query = urllib.parse.urlencode({"action": "query", "titles": title, "prop": "imageinfo", "iiprop": "url|extmetadata",
-                                    "iiurlwidth": 1024, "format": "json", "formatversion": 2})
+                                    "iiurlwidth": 960, "format": "json", "formatversion": 2})
     info = json.loads(fetch("https://commons.wikimedia.org/w/api.php?" + query))["query"]["pages"][0]["imageinfo"][0]
     licence = info["extmetadata"].get("License", {}).get("value", "")
     if licence not in FREE:
@@ -180,7 +180,9 @@ def scene(show, effect, preset=None):
         if unknown:
             sys.exit(f"{effect['id']}: no such parameter {', '.join(sorted(unknown))}")
         params.update(chosen)
-        fx = f'<effect id="absent.{effect["id"]}" hidden="false">' + "".join(prop(p, params[p["id"]]) for p in effect["params"]) + "</effect>"
+        pins = "".join(prop({"id": f"rest{k}", "type": "point"}, rest) + prop({"id": f"pin{k}", "type": "point"}, at)
+                       for k, (rest, at) in enumerate(show.get("pins", []), 1))
+        fx = f'<effect id="absent.{effect["id"]}" hidden="false">' + "".join(prop(p, params[p["id"]]) for p in effect["params"]) + pins + "</effect>"
     fps, total = (ANIM_FPS, round(show["animate"] * 1000 / ANIM_FPS)) if "animate" in show else (30, 1000)
     layers = [layer(1, name, end=total - 1) for name in backdrops(show)]
     if "path" in show:
@@ -278,10 +280,10 @@ def main():
     args.add_argument("keys", nargs="*", help="only these effects (default: every effect in index.json)")
     opts = args.parse_args()
     index = json.loads((PACK / "index.json").read_text())
-    missing = [k for k in index if k not in SHOWCASE["effects"]]
+    keys = opts.keys or index
+    missing = [k for k in keys if k not in SHOWCASE["effects"]]
     if missing:
         sys.exit("no showcase for " + " ".join(missing))
-    keys = opts.keys or index
     opts.work.mkdir(parents=True, exist_ok=True)
     adb("shell", "am", "force-stop", PKG)
     adb("shell", "run-as", PKG, "mkdir", "-p", APP_DIR)

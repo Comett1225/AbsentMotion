@@ -182,6 +182,16 @@ class SvgImportTest {
         assertEquals(2, stroked.contours!!.size)
     }
 
+    @Test fun rootOpacityAppliesToTheImportedLayer() {
+        val result = import("""
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 50" opacity=".25">
+              <rect width="100" height="50" fill="blue"/>
+            </svg>
+        """)
+        assertEquals(0.25f, result.layer!!.opacity, 1e-4f)
+        assertEquals(1, result.shapes)
+    }
+
     @Test fun opacityAndAspectRatioFollowTheSpec() {
         val result = import("""
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 50" width="100" height="100">

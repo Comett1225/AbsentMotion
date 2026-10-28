@@ -23,8 +23,10 @@ fun importSvg(text: String, title: String, host: Scene, startTime: Int, endTime:
     val items = reader.read()
     val built = reader.place(items, host.width.toFloat(), host.height.toFloat())
     val writer = LayerWriter(host, endTime - startTime)
+    val rootAlpha = reader.rootOpacity()
     val top = when {
         built.isEmpty() -> null
+        rootAlpha < 1f -> SvgGroup(title.ifBlank { AppText.get(R.string.model_layer_svg) }, built, rootAlpha)
         built.size == 1 -> built[0]
         else -> SvgGroup(title.ifBlank { AppText.get(R.string.model_layer_svg) }, built, 1f)
     }
@@ -146,6 +148,7 @@ private class SvgReader(private val root: XmlNode) {
     private var userW = 0f
     private var userH = 0f
     private var sized = true
+    private var rootAlpha = 1f
     private val byId = HashMap<String, MutableList<CssRule>>()
     private val byClass = HashMap<String, MutableList<CssRule>>()
     private val byTag = HashMap<String, MutableList<CssRule>>()
@@ -169,8 +172,11 @@ private class SvgReader(private val root: XmlNode) {
         userH = box?.get(3) ?: viewH
         val start = if (box != null && sized) viewBox(box, viewW, viewH, root.attr("preserveAspectRatio")) else Affine()
         val style = computed(emptyMap(), root)
+        rootAlpha = style["opacity"]?.let(::unit)?.coerceIn(0f, 1f) ?: 1f
         return children(root, start, style, 0)
     }
+
+    fun rootOpacity(): Float = rootAlpha
 
     fun place(items: List<SvgItem>, canvasW: Float, canvasH: Float): List<SvgItem> {
         val bounds = if (sized) floatArrayOf(0f, 0f, viewW, viewH) else bounds(items) ?: return items

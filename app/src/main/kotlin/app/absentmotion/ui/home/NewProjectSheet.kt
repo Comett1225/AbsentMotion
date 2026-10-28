@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
@@ -30,6 +31,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -344,7 +346,7 @@ private fun AspectRow(form: Form) {
     Row(Modifier.padding(start = 27.dp).height(56.dp)) {
         Aspects.forEach { a ->
             AspectButton(a.boxW, a.boxH, form.aspect == a.key, onClick = { form.aspect = a.key }) {
-                Text(a.key, color = if (form.aspect == a.key) Am.OnAccent else Am.Navy, fontSize = 10.sp, maxLines = 1)
+                Text(a.key, Modifier.wrapContentWidth(unbounded = true), color = if (form.aspect == a.key) Am.OnAccent else Am.Navy, fontSize = 10.sp, maxLines = 1, softWrap = false)
             }
         }
         val custom = form.aspect == CUSTOM
@@ -386,7 +388,7 @@ private fun Modifier.corners(color: Color): Modifier = drawBehind {
 
 @Composable
 private fun FormRow(label: String, details: List<String> = emptyList(), field: @Composable () -> Unit) {
-    Row(Modifier.padding(horizontal = 32.dp).fillMaxWidth().height(45.dp), verticalAlignment = Alignment.CenterVertically) {
+    Row(Modifier.padding(horizontal = 32.dp).fillMaxWidth().heightIn(min = 45.dp), verticalAlignment = Alignment.CenterVertically) {
         Column(
             Modifier.width(140.dp).align(if (details.isEmpty()) Alignment.CenterVertically else Alignment.Top)
                 .wrapContentHeight(Alignment.Top, unbounded = true),
@@ -394,7 +396,7 @@ private fun FormRow(label: String, details: List<String> = emptyList(), field: @
             Text(label, color = Am.Navy, fontSize = 16.sp, lineHeight = 22.sp)
             details.forEach { Text(it, color = DimText, fontSize = 10.sp, lineHeight = 13.sp) }
         }
-        Box(Modifier.width(180.dp).fillMaxHeight()) { field() }
+        Box(Modifier.width(180.dp).heightIn(min = 45.dp)) { field() }
     }
 }
 

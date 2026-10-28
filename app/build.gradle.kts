@@ -78,10 +78,17 @@ android {
 
     flavorDimensions += "distribution"
     productFlavors {
-        create("play") { dimension = "distribution" }
-        create("foss") { dimension = "distribution" }
+        create("play") {
+            dimension = "distribution"
+            manifestPlaceholders["variant"] = "play"
+        }
+        create("foss") {
+            dimension = "distribution"
+            manifestPlaceholders["variant"] = "foss"
+        }
         create("compat") {
             dimension = "distribution"
+            manifestPlaceholders["variant"] = "compat"
             minSdk = 28
             buildConfigField("boolean", "COMPATIBLE", "true")
             externalNativeBuild { cmake { arguments += "-DAM_COMPAT=ON" } }

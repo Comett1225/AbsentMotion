@@ -44,7 +44,7 @@ internal fun EffectSettings(state: EditorState, layer: Layer, instance: XmlNode,
             }
         }
     }
-    definition.params.forEach { param ->
+    definition.params.filter { definition.shown(it, instance, layer.t) }.forEach { param ->
         val raw = instance.effectProperty(param.id)?.valueAt(layer.t) ?: param.missingDefault
         fun set(text: String, gesture: Boolean = false) {
             select(param)

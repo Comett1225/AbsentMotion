@@ -27,7 +27,7 @@ The launcher icon is an own drawing, made by `tools/icon/make_icon.py` (source o
 | --- | --- |
 | Lucide only | 167 |
 | Lucide shapes plus own parts | 8 |
-| Own drawing only | 41 |
+| Own drawing only | 42 |
 | Material Symbols | 0 |
 
 (An icon is one named member of an `*Icons` object, or one icon-drawing composable.)
@@ -99,6 +99,7 @@ The launcher icon is an own drawing, made by `tools/icon/make_icon.py` (source o
 | `ui/editor/PanelIcons.kt` | `PaintBucket` | Lucide | `paint-bucket` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/paint-bucket.svg | - |
 | `ui/editor/PanelIcons.kt` | `BorderShadow` | own drawing | - | Apache-2.0 (own) | - | square with an offset L-shaped shadow; also the Shadow tab's icon |
 | `ui/editor/PanelIcons.kt` | `Blending` | Lucide | `blend` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/blend.svg | - |
+| `ui/editor/PanelIcons.kt` | `Crop` | own drawing | - | Apache-2.0 (own) | - | two crossing right angles, the crop tool |
 | `ui/editor/PanelIcons.kt` | `MoveTransform` | Lucide | `move-3d` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/move-3d.svg | - |
 | `ui/editor/PanelIcons.kt` | `EditShape` | Lucide | `spline` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/spline.svg | - |
 | `ui/editor/PanelIcons.kt` | `Star` | Lucide | `star` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/star.svg | - |

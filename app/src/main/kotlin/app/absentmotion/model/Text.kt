@@ -8,6 +8,7 @@ val Layer.font: String get() = node["font"] ?: ""
 val Layer.textSize: Float get() = node["size"]?.finiteFloat() ?: 18f
 val Layer.wrapWidth: Int get() = node["wrapWidth"]?.toIntOrNull() ?: 512
 val Layer.textAlign: String get() = node["align"] ?: "left"
+val Layer.onTextPath: Boolean get() = kind == "text" && effects.any { it["id"] == "absent.textpath" && it["hidden"] != "true" }
 fun Layer.withContent(value: String) = copy(node = node.withChild("content", XmlNode("content", text = value)))
 fun Layer.withFont(value: String) = copy(node = node.with("font", value))
 fun Layer.withTextSize(value: Float) = copy(node = node.with("size", formatFloats(floatArrayOf(value))))

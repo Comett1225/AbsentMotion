@@ -50,6 +50,7 @@ inline uint8_t byte(float v) { return static_cast<uint8_t>(std::clamp(std::nearb
 struct Weights {
     Buffer<int> start, count, k;
     int span;
+    bool ready = false;
 
     Weights(int in, int out) : start(out), count(out), k(static_cast<size_t>(out) * (static_cast<int>(std::ceil(0.5 * std::max(static_cast<double>(in) / out, 1.0))) * 2 + 1)),
                                span(static_cast<int>(std::ceil(0.5 * std::max(static_cast<double>(in) / out, 1.0))) * 2 + 1) {
@@ -71,9 +72,10 @@ struct Weights {
             count[o] = n;
             for (int x = 0; x < n; x++) k[static_cast<size_t>(o) * span + x] = static_cast<int>(0.5 + (sum != 0 ? w[x] / sum : w[x]) * (1 << Precision));
         }
+        ready = true;
     }
 
-    bool ok() const { return start.data && count.data && k.data; }
+    bool ok() const { return ready; }
 
     uint8_t apply(int o, const uint8_t *src, size_t step) const {
         int64_t s = 1 << (Precision - 1);
@@ -184,11 +186,11 @@ void unpremultiply(uint8_t *rgba, size_t stride, int width, int height) {
     }
 }
 
-void netInput(const uint8_t *rgba, size_t stride, int width, int height, int size, const Letterbox &box, float *planes) {
+bool netInput(const uint8_t *rgba, size_t stride, int width, int height, int size, const Letterbox &box, float *planes) {
     const size_t plane = static_cast<size_t>(size) * size;
     std::fill(planes, planes + 3 * plane, .5f);
     Taps ys(box.height, height, 0, box.height), xs(box.width, width, 0, box.width);
-    if (!ys.ok() || !xs.ok()) return;
+    if (!ys.ok() || !xs.ok()) return false;
     for (int y = 0; y < box.height; y++) {
         const uint8_t *r0 = rgba + ys.i0[y] * stride, *r1 = rgba + ys.i1[y] * stride;
         float fy = ys.f[y];
@@ -198,6 +200,70 @@ void netInput(const uint8_t *rgba, size_t stride, int width, int height, int siz
             float fx = xs.f[x];
             for (int c = 0; c < 3; c++)
                 planes[c * plane + at + x] = mix(r0[c0 + c] / 255.f, r0[c1 + c] / 255.f, r1[c0 + c] / 255.f, r1[c1 + c] / 255.f, fx, fy);
+        }
+    }
+    return true;
+}
+
+void clean(float *alpha, int w, int h) {
+    const size_t n = static_cast<size_t>(w) * h;
+    const int reach = std::max(2, static_cast<int>(std::lround(8.0 * std::max(w, h) / 1024.0)));
+    const size_t small = std::max<size_t>(16, static_cast<size_t>(n * 0.0003));
+    constexpr float Floor = .04f, Ceil = .12f, Core = .6f, Faint = .3f;
+    Buffer<int> label(n), queue(n);
+    Buffer<uint8_t> alive(n), near(n), grown(n);
+    if (!label.data || !queue.data || !alive.data || !near.data || !grown.data) return;
+    std::fill(label.data, label.data + n, -1);
+    std::fill(alive.data, alive.data + n, 0);
+    int found = 0;
+    for (size_t seed = 0; seed < n; seed++) {
+        if (alpha[seed] < Ceil || label[seed] >= 0) continue;
+        size_t head = 0, tail = 0, area = 0, core = 0;
+        float peak = 0;
+        queue[tail++] = static_cast<int>(seed);
+        label[seed] = 0;
+        while (head < tail) {
+            const int at = queue[head++];
+            area++;
+            if (alpha[at] >= Core) core++;
+            peak = std::max(peak, alpha[at]);
+            const int x = at % w, y = at / w;
+            const int next[4] = {x > 0 ? at - 1 : -1, x + 1 < w ? at + 1 : -1, y > 0 ? at - w : -1, y + 1 < h ? at + w : -1};
+            for (int to : next)
+                if (to >= 0 && label[to] < 0 && alpha[to] >= Ceil) {
+                    label[to] = 0;
+                    queue[tail++] = to;
+                }
+        }
+        const bool keep = core >= small || (peak >= Faint && area >= small * 8);
+        if (keep) found++;
+        for (size_t i = 0; i < tail; i++) alive[queue[i]] = keep ? 1 : 2;
+    }
+    if (found == 0) return;
+    for (size_t i = 0; i < n; i++) near[i] = alive[i] == 1;
+    for (int pass = 0; pass < 2; pass++) {
+        const bool rows = pass == 0;
+        const int length = rows ? w : h, lines = rows ? h : w;
+        for (int line = 0; line < lines; line++) {
+            for (int i = 0; i < length; i++) {
+                const size_t at = rows ? static_cast<size_t>(line) * w + i : static_cast<size_t>(i) * w + line;
+                uint8_t hit = 0;
+                const int lo = std::max(0, i - reach), hi = std::min(length - 1, i + reach);
+                for (int k = lo; k <= hi && !hit; k++) hit = near[rows ? static_cast<size_t>(line) * w + k : static_cast<size_t>(k) * w + line];
+                grown[at] = hit;
+            }
+        }
+        std::copy(grown.data, grown.data + n, near.data);
+    }
+    for (size_t i = 0; i < n; i++) {
+        if (alive[i] == 2) {
+            alpha[i] = 0;
+        } else if (alpha[i] < Ceil && !near[i]) {
+            if (alpha[i] <= Floor) alpha[i] = 0;
+            else {
+                const float t = (alpha[i] - Floor) / (Ceil - Floor);
+                alpha[i] *= t * t * (3 - 2 * t);
+            }
         }
     }
 }
@@ -261,7 +327,7 @@ int refine(uint8_t *rgba, size_t stride, int width, int height, const float *alp
                     for (int k = -Fine; k <= Fine; k++) s += p[std::clamp(ex0 + k, 0, width - 1) - c0];
                     for (int x = ex0; x <= ex1; x++) {
                         out[x - ex0] = static_cast<float>(s / (2 * Fine + 1));
-                        s += static_cast<double>(p[std::clamp(x + Fine + 1, 0, width - 1) - c0]) - p[std::clamp(x - Fine, 0, width - 1) - c0];
+                        s += static_cast<double>(p[std::clamp(x + Fine + 1, 0, c1) - c0]) - p[std::clamp(x - Fine, 0, width - 1) - c0];
                     }
                 }
             }

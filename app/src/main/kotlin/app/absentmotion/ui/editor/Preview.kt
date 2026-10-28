@@ -1,5 +1,7 @@
 package app.absentmotion.ui.editor
 
+import android.graphics.Rect
+import android.os.Build
 import app.absentmotion.platform.SystemClock
 import app.absentmotion.platform.ViewConfiguration
 import androidx.compose.animation.core.Animatable
@@ -25,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.SideEffect
 import app.absentmotion.editor.PreviewCache
 import androidx.compose.runtime.getValue
@@ -47,11 +50,14 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChanged
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.IntSize
@@ -62,7 +68,13 @@ import app.absentmotion.editor.clearSelection
 import app.absentmotion.editor.MultiSelect
 import app.absentmotion.editor.place
 import app.absentmotion.editor.withWorldLocation
+import app.absentmotion.editor.setCrop
+import app.absentmotion.model.cropBox
+import app.absentmotion.model.cropIndex
+import app.absentmotion.model.cropRatio
 import app.absentmotion.editor.inverseMap
+import app.absentmotion.editor.LayerPoints
+import app.absentmotion.editor.map
 import app.absentmotion.editor.unmapVector
 import app.absentmotion.model.Pt
 import app.absentmotion.platform.Matrix
@@ -74,6 +86,7 @@ import app.absentmotion.model.PropRef
 import app.absentmotion.model.textAlign
 import app.absentmotion.model.withResizedTextWrap
 import app.absentmotion.model.wrapWidth
+import app.absentmotion.model.onTextPath
 import app.absentmotion.ui.editor.panels.EyedropperLoupe
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.presence
@@ -107,8 +120,10 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
     val refPx = if (LocalWide.current) LocalDensity.current.density * PhoneWidth.value / 1080f else 0f
 
     var gesture by remember { mutableIntStateOf(IDLE) }
+    var tapGeneration by remember { mutableIntStateOf(0) }
     val handles = when {
         state.drawing != null -> state.drawing!!.handlesCode
+        state.panel == EditorPanel.Crop -> HIDDEN
         gesture != IDLE -> gesture
         state.panel == EditorPanel.MoveTransform && state.keyTarget?.ref == PropRef.Location -> -2
         state.panel == EditorPanel.Effects -> 8
@@ -147,11 +162,21 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
 
     var quad by remember { mutableStateOf<FloatArray?>(null) }
     var plane by remember { mutableStateOf<FloatArray?>(null) }
+    var world by remember { mutableStateOf<FloatArray?>(null) }
+    var quadFor by remember { mutableStateOf<Long?>(null) }
     LaunchedEffect(state.selectedId, scene, mediaRevision, state.cameraMode) {
+        if (quadFor != state.selectedId) {
+            quadFor = state.selectedId
+            quad = null
+            plane = null
+            world = null
+        }
         snapshotFlow { state.timeMs.takeUnless { state.playing } }.collectLatest { timeMs ->
             if (timeMs == null) return@collectLatest
             quad = state.selectedId?.let { state.engine.layerQuad(it, timeMs) }
-            plane = state.selectedId?.let { state.engine.layerMatrix(it, timeMs) }?.copyOfRange(9, 18)
+            val matrices = state.selectedId?.let { state.engine.layerMatrix(it, timeMs) }
+            plane = matrices?.copyOfRange(9, 18)
+            world = matrices?.copyOfRange(0, 9)
         }
     }
 
@@ -168,7 +193,22 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
     val currentScale by rememberUpdatedState(scale)
     val currentOffset by rememberUpdatedState(Offset(dx, dy))
 
-    Box(modifier.background(Am.PreviewBg).onSizeChanged { size = it }) {
+    val view = LocalView.current
+    val screenDensity = LocalDensity.current.density
+    var origin by remember { mutableStateOf(Offset.Zero) }
+    val edgeQuad = quad.takeUnless { state.playing }
+    val edgePoints = if (edgeQuad == null || state.selectedId == null) emptyList() else {
+        val corners = List(4) { Offset(edgeQuad[2 * it], edgeQuad[2 * it + 1]) * scale + Offset(dx, dy) }
+        if (state.panel == EditorPanel.Crop) state.selected?.takeIf { it.cropIndex >= 0 }?.let { cropHandles(corners, it.cropBox()) }.orEmpty() else handlesOf(corners)
+    }
+    DisposableEffect(view, edgePoints, origin) {
+        if (Build.VERSION.SDK_INT >= 29) {
+            view.systemGestureExclusionRects = GestureEdges.bands(edgePoints.map { it + origin }, view.width.toFloat(), screenDensity).map { Rect(it.left.toInt(), it.top.toInt(), it.right.toInt(), it.bottom.toInt()) }
+        }
+        onDispose { if (Build.VERSION.SDK_INT >= 29) view.systemGestureExclusionRects = emptyList() }
+    }
+
+    Box(modifier.background(Am.PreviewBg).onSizeChanged { size = it }.onGloballyPositioned { origin = it.positionInRoot() }) {
         app.absentmotion.platform.SceneSurface(state.engine, divisor, size, Modifier.fillMaxSize()) { state.previewSurface = it }
         CachedFrame(state, cacheUsable, live, dx, dy, scene.width * scale, scene.height * scale)
         Box(
@@ -176,7 +216,7 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
                 var lastTwoFingerTap = -1_000_000L
                 awaitEachGesture {
                     val down = awaitFirstDown()
-                    val canvasGesture = (state.selectedId == null && MultiSelect.ids.isEmpty()) || state.panZoomMode
+                    val canvasGesture = (state.selectedId == null && MultiSelect.ids.isEmpty()) || state.panZoomMode || state.panel == EditorPanel.Crop
                     var fingers = 1
                     var drifted = false
                     val starts = HashMap<PointerId, Offset>()
@@ -184,18 +224,30 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
                     val startQuad = quad?.takeUnless { state.playing }?.let { q -> List(4) { Offset(q[2 * it], q[2 * it + 1]) * currentScale + currentOffset } }
                     val planeView = plane?.let { v -> Matrix().apply { setValues(v) } }
                     val adjusting = state.pointAdjust.takeIf { state.panel == EditorPanel.Effects }
+                    val cropFrom = startLayer?.takeIf { state.panel == EditorPanel.Crop && startQuad != null && it.cropIndex >= 0 }?.cropBox()
+                    val cropGrab = if (cropFrom != null && startQuad != null) cropGrabAt(startQuad, cropFrom, down.position, density) else -1
+                    val cropLock = state.cropAspect?.let { r -> startQuad?.let { q -> cropRatio(r, (q[1] - q[0]).getDistance(), (q[3] - q[0]).getDistance()) } }
                     val turning = state.turner
-                    val handle = if (startLayer != null && startQuad != null && state.panel == EditorPanel.EditText) {
+                    val points = state.layerPoints.takeIf { startLayer != null && !state.playing && !state.panZoomMode }
+                    val worldView = world?.takeUnless { state.playing }?.let { v -> Matrix().apply { setValues(v) } }?.takeIf { it.invert(Matrix()) }
+                    fun onScreen(p: Pt): Offset? = worldView?.map(p)?.let { Offset(it.x, it.y) * currentScale + currentOffset }
+                    fun inLayer(at: Offset): Pt? = worldView?.inverseMap(((at - currentOffset) / currentScale).let { Pt(it.x, it.y) })
+                    val pointGrab = points?.points?.indices?.mapNotNull { i -> onScreen(points.points[i])?.let { i to (it - down.position).getDistance() } }
+                        ?.filter { it.second < 24.dp.toPx() }?.minByOrNull { it.second }?.first ?: -1
+                    val grabOffset = if (pointGrab >= 0) (onScreen(points!!.points[pointGrab]) ?: down.position) - down.position else Offset.Zero
+                    if (pointGrab >= 0) points?.pick?.invoke(pointGrab)
+                    val handle = if (pointGrab >= 0) -1 else if (startLayer != null && startQuad != null && state.panel == EditorPanel.EditText && !startLayer.onTextPath) {
                         val centre = if (startLayer.textAlign == "right") (startQuad[0] + startQuad[3]) / 2f else (startQuad[1] + startQuad[2]) / 2f
                         if ((centre - down.position).getDistance() < 24.dp.toPx()) 9 else -1
                     } else if (startLayer != null && startQuad != null && state.panel == EditorPanel.ColorFill && startLayer.fillType == "gradient") {
                         gradientHandleAt(startLayer, startQuad, down.position, 24.dp.toPx())
                     } else if (startLayer != null && startQuad != null && startLayer.kind != "camera" && (state.panel == EditorPanel.Tools || (state.panel == EditorPanel.Effects && adjusting == null))) {
-                        handlesOf(startQuad).indexOfFirst { (it - down.position).getDistance() < 20.dp.toPx() }
+                        HandleHit.at(handlesOf(startQuad), down.position, HandleHit.reach(startQuad, density))
                     } else {
                         -1
                     }
                     if (handle in 0..9) gesture = handle
+                    val handleGrab = if (handle in 0..7 && startQuad != null) handleGrab(handle, startQuad, down.position) else Offset.Zero
                     val grab = if (handle >= 10 && startLayer != null && startQuad != null) startLayer.gradient.let { g ->
                         boxPoint(startQuad, if (handle == 10) g.x0 else g.x1, if (handle == 10) g.y0 else g.y1) - down.position
                     } else Offset.Zero
@@ -212,7 +264,10 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
                             moved = event.changes.size > 1 || (position - down.position).getDistance() > viewConfiguration.touchSlop
                             if (!moved) held += pan
                         }
-                        if (moved && startLayer != null && handle >= 10 && startQuad != null) {
+                        if (moved && pointGrab >= 0 && points != null && fingers == 1) {
+                            gesture = HIDDEN
+                            inLayer(position + grabOffset)?.let { points.move(pointGrab, it) }
+                        } else if (moved && startLayer != null && handle >= 10 && startQuad != null) {
                             val (u, v) = boxFraction(startQuad, position + grab)
                             state.editSelected("gradient-handle") { l ->
                                 val g = l.gradient
@@ -227,26 +282,17 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
                             val width = (startLayer.wrapWidth + localX * factor).roundToInt().coerceAtLeast(50)
                             state.editSelected("text-wrap") { startLayer.withResizedTextWrap(width) }
                         } else if (moved && startLayer != null && handle >= 0 && startQuad != null) {
-                            val centre = (startQuad[0] + startQuad[2]) / 2f
-                            val grabbed = handlesOf(startQuad)[handle] - centre
-                            val now = position - centre
-                            val start = startLayer.scale
-                            if (grabbed.getDistanceSquared() < 1e-4f) continue
-                            state.editSelected(key = "preview-handle") { layer ->
-                                if (handle < 4) {
-                                    val factor = (now.getDistance() / grabbed.getDistance()).coerceAtLeast(0.01f)
-                                    layer.withTransform("scale", start[0] * factor, start[1] * factor)
-                                } else {
-                                    val factor = ((now.x * grabbed.x + now.y * grabbed.y) / grabbed.getDistanceSquared()).coerceAtLeast(0.01f)
-                                    if (handle % 2 == 0) layer.withTransform("scale", start[0], start[1] * factor)
-                                    else layer.withTransform("scale", start[0] * factor, start[1])
-                                }
-                            }
+                            val pivot = startLayer.pivot.let { onScreen(Pt(it[0], it[1])) } ?: ((startQuad[0] + startQuad[2]) / 2f)
+                            val scaled = handleScale(handle, startQuad, pivot, position + handleGrab, startLayer.scale, 8.dp.toPx()) ?: continue
+                            state.editSelected(key = "preview-handle") { it.withTransform("scale", scaled[0], scaled[1]) }
                         } else if (moved && adjusting != null) {
                             hint = false
                             val move = (pan + held) / currentScale
                             held = Offset.Zero
                             if (move != Offset.Zero) adjusting.move(move.x, move.y)
+                        } else if (moved && cropFrom != null && startQuad != null && cropGrab >= 0 && fingers == 1) {
+                            val d = boxFraction(startQuad, position) - boxFraction(startQuad, down.position)
+                            state.setCrop(if (cropGrab == CROP_INSIDE) cropFrom.moved(d.x, d.y) else cropFrom.dragged(cropGrab, d.x, d.y, cropLock), "crop-drag")
                         } else if (moved && canvasGesture && event.changes.size > 1) {
                             val move = (pan + held) / currentScale
                             held = Offset.Zero
@@ -256,6 +302,8 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
                             state.canvasPan = pinchedPan(state.canvasPan + move, about, next / state.canvasZoom)
                             state.canvasZoom = next
                             state.zoomShown++
+                        } else if (moved && state.panel == EditorPanel.Crop) {
+                            held = Offset.Zero
                         } else if (moved && startLayer?.kind == "camera" && !(canvasGesture && fingers > 1)) {
                             gesture = HIDDEN
                             val move = (pan + held) / currentScale
@@ -292,12 +340,21 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
                             lastTwoFingerTap = SystemClock.uptimeMillis()
                         }
                     }
+                    val tapped = if (!moved && pointGrab < 0 && fingers == 1 && points?.tap != null && startQuad != null) {
+                        inLayer(down.position)?.takeIf { v -> points.source(v).let(::onScreen)?.let { inside(startQuad, it) } == true }
+                    } else null
                     if (moved) {
                         state.endGesture()
-                    } else if (handle < 0 && state.panel != EditorPanel.EditText) {
+                    } else if (pointGrab >= 0) {
+                        state.endGesture()
+                    } else if (tapped != null) {
+                        points?.tap?.invoke(tapped)
+                    } else if (handle < 0 && state.panel != EditorPanel.EditText && state.panel != EditorPanel.Crop) {
                         val point = (down.position - currentOffset) / currentScale
+                        val generation = ++tapGeneration
                         scope.launch {
                             val hit = state.engine.hitTest(point.x, point.y, state.timeMs)
+                            if (generation != tapGeneration) return@launch
                             if (hit == 0L) {
                                 state.clearSelection()
                             } else if (MultiSelect.active) {
@@ -317,10 +374,13 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
         Presence(state.cameraTip && !LocalWide.current) { CameraTip(state, Modifier.align(Alignment.BottomEnd).presence()) }
         EyedropperLoupe(state, Modifier.fillMaxSize())
         GradientHandles(state, quad.takeUnless { state.playing }, scale, Offset(dx, dy))
+        CropOverlay(state, quad.takeUnless { state.playing }, scale, Offset(dx, dy))
+        state.layerPoints?.let { points -> world?.takeUnless { state.playing }?.let { LayerPointsOverlay(points, it, scale, Offset(dx, dy)) } }
         if (editingText) Canvas(Modifier.fillMaxSize()) {
             val q = quad.takeUnless { state.playing } ?: return@Canvas
             val points = List(4) { Offset(q[2 * it] * scale + dx, q[2 * it + 1] * scale + dy) }
             for (i in 0..3) drawLine(Am.Accent, points[i], points[(i + 1) % 4], 1.dp.toPx())
+            if (state.selected?.onTextPath == true) return@Canvas
             val handle = if (state.selected?.textAlign == "right") (points[0] + points[3]) / 2f else (points[1] + points[2]) / 2f
             drawCircle(Am.AccentDeep, 10.dp.toPx(), handle)
             drawCircle(Am.Accent, 9.dp.toPx(), handle)
@@ -383,4 +443,69 @@ private const val HIDDEN = -11
 
 private fun handlesOf(corners: List<Offset>): List<Offset> = corners + List(4) { (corners[it] + corners[(it + 1) % 4]) / 2f }
 
+internal fun handleGrab(handle: Int, corners: List<Offset>, down: Offset): Offset = handlesOf(corners)[handle] - down
+
+internal fun handleScale(handle: Int, corners: List<Offset>, pivot: Offset, now: Offset, start: FloatArray, reach: Float): FloatArray? {
+    val grabbed = handlesOf(corners)[handle] - pivot
+    if (handle < 4) {
+        if (grabbed.getDistance() < reach) return null
+        val factor = ((now - pivot).getDistance() / grabbed.getDistance()).coerceAtLeast(0.01f)
+        return floatArrayOf(start[0] * factor, start[1] * factor)
+    }
+    val axis = handlesOf(corners)[handle] - (corners[0] + corners[2]) / 2f
+    val length = axis.getDistance()
+    if (length < 1e-3f) return null
+    val along = (grabbed.x * axis.x + grabbed.y * axis.y) / length
+    if (abs(along) < reach) return null
+    val factor = (((now - pivot).x * axis.x + (now - pivot).y * axis.y) / length / along).coerceAtLeast(0.01f)
+    return if (handle % 2 == 0) floatArrayOf(start[0], start[1] * factor) else floatArrayOf(start[0] * factor, start[1])
+}
+
 internal fun pinchedPan(pan: Offset, about: Offset, factor: Float): Offset = pan / factor + about * (1 / factor - 1)
+
+private fun inside(quad: List<Offset>, at: Offset): Boolean {
+    var sign = 0
+    for (i in 0..3) {
+        val a = quad[i]
+        val b = quad[(i + 1) % 4]
+        val cross = (b.x - a.x) * (at.y - a.y) - (b.y - a.y) * (at.x - a.x)
+        val s = if (cross > 0) 1 else if (cross < 0) -1 else 0
+        if (s != 0) { if (sign != 0 && s != sign) return false; sign = s }
+    }
+    return true
+}
+
+@Composable
+private fun LayerPointsOverlay(points: LayerPoints, world: FloatArray, scale: Float, offset: Offset) {
+    val matrix = remember(world) { Matrix().apply { setValues(world) } }
+    Canvas(Modifier.fillMaxSize()) {
+        val shown = points.points.map { p -> matrix.map(p).let { Offset(it.x, it.y) * scale + offset } }
+        val line = 1.2.dp.toPx()
+        val guide = points.guide.map { p -> matrix.map(p).let { Offset(it.x, it.y) * scale + offset } }
+        for (i in 1 until guide.size) {
+            drawLine(Color.Black.copy(alpha = 0.35f), guide[i - 1], guide[i], line * 2.5f)
+            drawLine(Color.White.copy(alpha = 0.8f), guide[i - 1], guide[i], line)
+        }
+        for ((a, b) in points.lines) {
+            val from = shown.getOrNull(a) ?: continue
+            val to = shown.getOrNull(b) ?: continue
+            drawLine(Color.Black.copy(alpha = 0.5f), from, to, line * 2.5f)
+            drawLine(Am.Accent, from, to, line)
+        }
+        shown.forEachIndexed { i, at ->
+            val chosen = i == points.selected
+            if (points.pivot) {
+                val r = 9.dp.toPx()
+                drawCircle(Color.Black.copy(alpha = 0.5f), r + line, at, style = androidx.compose.ui.graphics.drawscope.Stroke(line * 3))
+                drawCircle(Color.White, r, at, style = androidx.compose.ui.graphics.drawscope.Stroke(line * 1.5f))
+                for (d in listOf(Offset(1f, 0f), Offset(-1f, 0f), Offset(0f, 1f), Offset(0f, -1f))) drawLine(Color.White, at + d * (r * 0.45f), at + d * (r * 1.6f), line * 1.5f)
+                drawCircle(Am.Accent, 2.5.dp.toPx(), at)
+            } else {
+                val r = (if (chosen) 8 else 6).dp.toPx()
+                drawCircle(Color.Black.copy(alpha = 0.55f), r + 1.5.dp.toPx(), at)
+                drawCircle(if (chosen) Am.Accent else Am.Gold, r, at)
+                drawCircle(Color.White, r * 0.35f, at)
+            }
+        }
+    }
+}

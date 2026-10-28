@@ -240,6 +240,40 @@
     <string name="update_outdated">This may be fixed in the newer version (installed %1$s, newest %2$s).</string>
     <string name="update_changelog">Changelog</string>
     <string name="update_open_failed">No app on this device can open the link.</string>
+    <string name="update_download_update">Download update</string>
+    <string name="update_installed">Installed version: %1$s</string>
+    <string name="update_size">Download size: %1$s</string>
+    <string name="update_downloading">Downloading the update</string>
+    <string name="update_progress">%1$s of %2$s</string>
+    <string name="update_checking_download">Checking the update</string>
+    <string name="update_permission_title">Allow updates from AbsentMotion</string>
+    <string name="update_permission_body">Android installs updates only from apps you allow. Tap Open Settings, turn on Allow from this source, then come back. Your projects stay as they are.</string>
+    <string name="update_permission_first">Android installs updates only from apps you allow, so this is asked before the download. Tap Open Settings, turn on Allow from this source, then come back and the download starts. Your projects stay as they are.</string>
+    <string name="update_permission_denied">Installing updates is still not allowed. Open Settings and turn on Allow from this source, or cancel.</string>
+    <string name="update_waiting">Waiting for Android to install the update</string>
+    <string name="update_install">Install</string>
+    <string name="update_not_installed">The update was not installed. You can install it now or later.</string>
+    <string name="update_stopped">The update stopped</string>
+    <string name="update_err_offline">You are offline. Connect to the internet and try again.</string>
+    <string name="update_err_connection">The connection was lost during the download. Try again to continue where it stopped.</string>
+    <string name="update_err_secure">A secure connection to GitHub could not be made. Check the network and try again.</string>
+    <string name="update_err_server">GitHub did not send the update (error %1$s). Try again later.</string>
+    <string name="update_err_storage">Not enough free space. The update needs about %1$s free.</string>
+    <string name="update_err_checksum">The download did not match the checksum published with the release, so it was deleted.</string>
+    <string name="update_err_no_checksum">The release lists no checksum for this file, so it was not downloaded.</string>
+    <string name="update_err_untrusted">The download was redirected to an address outside the AbsentMotion releases, so it was stopped.</string>
+    <string name="update_err_signature">This update is signed with a different key than the installed app, so it cannot replace it. Nothing was changed.</string>
+    <string name="update_err_wrong_app">The downloaded file is not the right AbsentMotion version for this app, so it was not installed.</string>
+    <string name="update_err_not_newer">The downloaded file is not newer than the installed app, so it was not installed.</string>
+    <string name="update_err_file">The update could not be saved on this device.</string>
+    <string name="update_err_install">Android could not install the update.</string>
+    <string name="update_err_no_installer">This device has no installer that can install the update.</string>
+    <string name="update_err_settings">This device cannot open the setting to allow installs. Allow AbsentMotion under Install unknown apps in the system settings.</string>
+    <string name="update_err_removed">The downloaded update is no longer available on this device, so nothing was installed. Try again to download it.</string>
+    <string name="update_err_interrupted">The update did not finish because AbsentMotion was closed. Try again to continue where it stopped.</string>
+    <string name="update_reconnecting">Connection lost. Trying again…</string>
+    <string name="update_external">This copy did not come from an AbsentMotion GitHub release, so it cannot update itself. Get the update from where you installed it.</string>
+    <string name="update_metered">This connection is metered, for example mobile data. The download may use up your data plan.</string>
     <string name="theme_absentmotion">AbsentMotion</string>
     <string name="theme_daylight">Daylight</string>
     <string name="theme_custom">Custom</string>
@@ -325,6 +359,7 @@
     <string name="home_more">More</string>
     <string name="home_duplicate_asset">Duplicate Asset</string>
     <string name="home_duplicate">Duplicate</string>
+    <string name="home_duplicating">Copying project…</string>
     <string name="home_collect_media">Collect media into project</string>
     <string name="home_delete_asset">Delete Asset</string>
     <string name="home_empty_assets">No assets saved yet</string>
@@ -572,6 +607,7 @@
     <string name="export_verify_no_audio">The file has no sound although the project has audio.</string>
     <string name="export_verify_duration">The file lasts %1$s s instead of %2$s s.</string>
     <string name="export_verify_first_frame">The first video frame does not decode.</string>
+    <string name="export_verify_first_look">The first video frame does not look like the project. It may be black or wrong.</string>
     <string name="export_verify_last_frame">The last video frame does not decode.</string>
     <string name="export_verify_unreadable">The file cannot be read back: %1$s</string>
     <string name="export_verify_picture">The picture in the file does not decode.</string>
@@ -598,6 +634,7 @@
     <string name="export_error_encoder_busy">This phone\'s video encoder is busy or cannot make this size. Try a lower resolution or frame rate.</string>
     <string name="export_error_codec_busy">The phone\'s video decoder or encoder stopped working. Close other apps that play or record video, then try again.</string>
     <string name="export_note_software">The phone\'s video encoder is busy, so this export uses the slower software encoder.</string>
+    <string name="export_note_checking">Checking the file…</string>
     <string name="export_note_retry">The video encoder stopped working. Trying again with another encoder.</string>
     <string name="export_error_stalled">The export made no progress for %1$s seconds, so it was stopped. A media file or the phone\'s video encoder stopped responding. Close other apps that use video and try again.</string>
     <string name="export_error_draw_frame">Frame %1$s could not be drawn. Try exporting again.</string>
@@ -647,9 +684,14 @@
     <string name="camera_error_photo">Could not take the photo.</string>
     <string name="camera_error_save_video">Could not save the video.</string>
     <string name="camera_error_start_recording">Could not start recording.</string>
+    <string name="camera_discard_title">Discard the recording?</string>
+    <string name="camera_discard_text">The take will be deleted.</string>
+    <string name="camera_keep_recording">Keep recording</string>
 
     <string name="media_error_no_decoder">This phone has no decoder for this video</string>
     <string name="media_error_decoder_stalled">The video decoder stopped responding</string>
+    <string name="media_error_too_many_frames">This video has too many frames to index</string>
+    <string name="project_too_many_linked">This project embeds too many linked elements.</string>
     <string name="media_error_read_frames">This phone cannot read the frames of this video</string>
     <string name="media_error_pixel_format">This video uses a pixel format that cannot be read</string>
     <string name="media_error_video_unavailable">Video is unavailable: %1$s</string>
@@ -950,6 +992,9 @@
     <string name="a11y_curved_point">Make the point curved</string>
     <string name="a11y_sharp_point">Make the point sharp</string>
     <string name="a11y_add_point">Add point</string>
+    <string name="a11y_point_number">Point %1$s</string>
+    <string name="a11y_point_handle_in">Incoming handle of point %1$s</string>
+    <string name="a11y_point_handle_out">Outgoing handle of point %1$s</string>
     <string name="a11y_delete_point">Delete point</string>
     <string name="a11y_pixel_preview">Pixel preview</string>
     <string name="a11y_solo">Solo the selected layers</string>
@@ -973,8 +1018,6 @@
         <item quantity="one">Imported %1$s shape. Left out: %2$s.</item>
         <item quantity="other">Imported %1$s shapes. Left out: %2$s.</item>
     </plurals>
-    <string name="structure_extend_ends">Extend clip ends to playhead</string>
-    <string name="structure_extend_starts">Extend clip starts to playhead</string>
     <string name="structure_move_ends">Move clip ends to playhead</string>
     <string name="structure_move_starts">Move clip starts to playhead</string>
     <string name="structure_align_starts">Align clip starts</string>
@@ -1639,6 +1682,7 @@
     <string name="export_checked_ok">Checked: plays correctly</string>
     <string name="export_checked_ok_still">Checked: opens correctly</string>
     <string name="export_checked_problems">Checked: %1$s</string>
+    <string name="export_checked_unavailable">Not checked: this device could not play the file back to check the picture.</string>
 
     <string name="transition_title">Transition</string>
     <string name="transition_add_between">Add a transition between the two clips</string>
@@ -1698,6 +1742,10 @@
     <string name="preview_fast_blur">Fast\nBlur</string>
     <string name="settings_preview_copies">Use preview copies of large videos</string>
     <string name="settings_clear_preview_copies">Clear preview copies</string>
+    <string name="settings_clear_preview_title">Clear preview copies?</string>
+    <string name="settings_clear_preview_text">Preview copies are rebuilt when a project needs them.</string>
+    <string name="settings_delete_model_title">Delete %1$s?</string>
+    <string name="settings_delete_model_text">It can be downloaded again later.</string>
     <string name="preset_numbered">Preset %1$s</string>
     <string name="recovery_your_project">your project</string>
     <string name="caption_layer_name">Caption %1$s</string>
@@ -1756,4 +1804,28 @@
     <string name="font_err_unavailable">This font is not available</string>
     <string name="model_layer_image">Image</string>
     <string name="model_layer_layer">Layer</string>
+    <string name="a11y_tab_pivot">Pivot</string>
+    <string name="menu_reset_pivot">Reset Pivot</string>
+    <string name="drag_here_to_move_the_pivot">Drag here to move the pivot</string>
+    <string name="a11y_pivot_top_left">Pivot: top left</string>
+    <string name="a11y_pivot_top">Pivot: top</string>
+    <string name="a11y_pivot_top_right">Pivot: top right</string>
+    <string name="a11y_pivot_left">Pivot: left</string>
+    <string name="a11y_pivot_center">Pivot: center</string>
+    <string name="a11y_pivot_right">Pivot: right</string>
+    <string name="a11y_pivot_bottom_left">Pivot: bottom left</string>
+    <string name="a11y_pivot_bottom">Pivot: bottom</string>
+    <string name="a11y_pivot_bottom_right">Pivot: bottom right</string>
+    <string name="puppet_add_pins">Add Pins</string>
+    <string name="puppet_pin_name">Pin %1$s</string>
+    <string name="puppet_pins_hint">Turn on Add Pins, then tap the layer where it should bend. Drag a pin to bend the layer; pins you do not move hold it in place.</string>
+    <string name="puppet_reset_pin">Put this pin back where it was placed</string>
+    <string name="puppet_delete_pin">Delete this pin</string>
+    <string name="puppet_pins_full">A layer can have up to %1$s pins.</string>
+    <string name="textpath_nothing_below">There is no layer beneath this text to follow. Put a shape, a pen path or a drawing just beneath it.</string>
+    <string name="layer_tool_crop">Crop</string>
+    <string name="crop_free">Free</string>
+    <string name="crop_reset">Reset</string>
+    <string name="a11y_crop_ratio">Aspect ratio %1$s</string>
+    <string name="a11y_crop_area">Crop area. Drag a corner or an edge to crop, or drag inside to move the crop.</string>
 </resources>

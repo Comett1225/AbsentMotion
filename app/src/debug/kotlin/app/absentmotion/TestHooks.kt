@@ -129,6 +129,8 @@ internal object TestHooks {
         DebugFrameInterpolation.alpha = intent.getFloatExtra("interpAlpha", 0.15f)
         DebugFrameInterpolation.fuse = intent.getIntExtra("interpFuse", 4)
         intent.getStringExtra("fakeversion")?.let { Updates.installedOverride = it }
+        intent.getStringExtra("updatefixture")?.let { Updates.source = UpdateFixture(it) }
+        if (intent.getBooleanExtra("updatecheck", false)) Updates.check(activity, activity.settings, manual = true)
         intent.getFloatExtra("tutorialfont", 0f).takeIf { it > 0f }?.let { app.absentmotion.ui.tutorial.Tutorial.fontScale = it }
         intent.getStringExtra("crash")?.let { kind -> activity.window.decorView.postDelayed({ crash(activity, kind) }, 2000) }
         if (intent.getBooleanExtra("audiolog", false)) engine.audio?.log = true
@@ -268,6 +270,12 @@ internal object TestHooks {
                 intent.getStringExtra("hit")?.split(';')?.forEach { point ->
                     val xy = point.split(',').mapNotNull { it.trim().toFloatOrNull() }
                     if (xy.size == 2) Log.i("AMTest", "hit $point ${engine.hitTest(xy[0], xy[1], state.timeMs)}")
+                }
+                intent.getStringExtra("bounds")?.split(';')?.mapNotNull { it.trim().toLongOrNull() }?.forEach { id ->
+                    val box = engine.layerBounds(id, state.timeMs)
+                    val knots = engine.layerOutline(id, state.timeMs)?.let { svg -> app.absentmotion.model.parseSvgPath(svg).flatMap { c -> c.knots.map { it.p } } }.orEmpty()
+                    val outline = if (knots.isEmpty()) "none" else listOf(knots.minOf { it.x }, knots.minOf { it.y }, knots.maxOf { it.x }, knots.maxOf { it.y }).joinToString(",")
+                    Log.i("AMTest", "bounds $id ${box?.joinToString(",") ?: "none"} outline $outline")
                 }
                 intent.getIntExtra("bench", 0).takeIf { it > 0 }?.let { runBench(activity, state, it, intent.getBooleanExtra("proxies", false)) }
                 intent.getStringExtra("gifimport")?.let { importGifForTest(activity, state, it, intent.getIntExtra("gifcancel", 0)) }

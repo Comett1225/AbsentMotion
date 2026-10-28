@@ -698,6 +698,30 @@
     "count-up": "Kira naik"
    }
   },
+  "crop": {
+   "description": "Memangkas tepi lapisan: Kiri, Atas, Kanan dan Bawah menentukan berapa banyak lebar atau tinggi lapisan itu sendiri dibuang dari setiap sisi, Kebulatan membulatkan sudut dan Lembut tepi melembutkan tepi. Lapisan kekal di tempatnya.",
+   "name": "Pangkas",
+   "params": {
+    "bottom": {
+     "label": "Bawah"
+    },
+    "feather": {
+     "label": "Lembut tepi"
+    },
+    "left": {
+     "label": "Kiri"
+    },
+    "radius": {
+     "label": "Kebulatan"
+    },
+    "right": {
+     "label": "Kanan"
+    },
+    "top": {
+     "label": "Atas"
+    }
+   }
+  },
   "cross": {
    "description": "Meletakkan lapisan pada tiga bar yang bersilang di tengah.",
    "name": "Salib Tiga Paksi",
@@ -2938,6 +2962,15 @@
     }
    }
   },
+  "puppet": {
+   "description": "Melenturkan lapisan seperti boneka: letakkan pin padanya, kemudian seret atau animasikan pin dan gambar mengikutnya dengan lancar.",
+   "name": "Pin Boneka",
+   "params": {
+    "falloff": {
+     "label": "Susutan"
+    }
+   }
+  },
   "pyramid": {
    "description": "Meletakkan lapisan pada muka piramid segi empat sama.",
    "name": "Piramid",
@@ -4262,6 +4295,58 @@
     },
     "strength": {
      "label": "Kekuatan"
+    }
+   }
+  },
+  "textpath": {
+   "description": "Meletakkan teks di sepanjang lengkok, bulatan atau garis luar lapisan betul-betul di bawahnya, huruf demi huruf, dengan bentuk huruf, fon dan emoji teks dikekalkan.",
+   "name": "Teks Ikut Laluan",
+   "params": {
+    "align": {
+     "label": "Jajar",
+     "options": [
+      "Kiri",
+      "Tengah",
+      "Kanan"
+     ]
+    },
+    "baseline": {
+     "label": "Anjakan Garis Dasar"
+    },
+    "center": {
+     "label": "Pusat"
+    },
+    "control1": {
+     "label": "Kawalan 1"
+    },
+    "control2": {
+     "label": "Kawalan 2"
+    },
+    "end": {
+     "label": "Tamat"
+    },
+    "position": {
+     "label": "Kedudukan"
+    },
+    "radius": {
+     "label": "Jejari"
+    },
+    "reverse": {
+     "label": "Terbalikkan Laluan"
+    },
+    "rotate": {
+     "label": "Putar Huruf"
+    },
+    "shape": {
+     "label": "Laluan",
+     "options": [
+      "Lengkok",
+      "Bulatan",
+      "Lapisan Bawah"
+     ]
+    },
+    "start": {
+     "label": "Mula"
     }
    }
   },

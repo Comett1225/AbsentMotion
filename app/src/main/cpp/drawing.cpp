@@ -284,6 +284,14 @@ SkPath DrawingBounds(const Layer& layer) {
     return any ? SkPath::Rect(all) : SkPath();
 }
 
+SkPath DrawingStrokes(const Layer& layer) {
+    SkPathBuilder b;
+    for (const FreehandStroke& s : layer.strokes) {
+        if (s.tool != kEraser && s.points.size() > 1) b.addPolygon({s.points.data(), s.points.size()}, s.tool == kFill);
+    }
+    return b.detach();
+}
+
 bool DrawingContains(const Layer& layer, SkPoint local) {
     for (auto it = layer.strokes.rbegin(); it != layer.strokes.rend(); ++it) {
         if (it->geometry.isEmpty() || (it->tool != kEraser && it->color[0] <= 0)) continue;

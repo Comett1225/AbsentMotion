@@ -309,6 +309,11 @@ Java_app_absentmotion_ai_AiNative_nativeCancel(JNIEnv *, jobject, jlong handle) 
 }
 
 extern "C" JNIEXPORT void JNICALL
+Java_app_absentmotion_ai_AiNative_nativeClearCancel(JNIEnv *, jobject, jlong handle) {
+    model(handle)->cancel = false;
+}
+
+extern "C" JNIEXPORT void JNICALL
 Java_app_absentmotion_ai_AiNative_nativeClose(JNIEnv *, jobject, jlong handle) {
     delete model(handle);
 }
@@ -317,7 +322,6 @@ extern "C" JNIEXPORT jint JNICALL
 Java_app_absentmotion_ai_AiNative_nativeUpscale(JNIEnv *env, jobject, jlong handle, jintArray input, jint width, jint height, jint netScale,
                                                 jint outScale, jint tile, jint overlap, jintArray output) {
     Model *m = model(handle);
-    m->cancel = false;
     if (width <= 0 || height <= 0 || netScale <= 0 || outScale <= 0 || netScale % outScale || tile <= 0 || overlap < 0) return -1;
     if (env->GetArrayLength(input) < width * height || env->GetArrayLength(output) < width * outScale * height * outScale) return -1;
     const int factor = netScale / outScale;
@@ -374,7 +378,6 @@ extern "C" JNIEXPORT jint JNICALL
 Java_app_absentmotion_ai_AiNative_nativeInterpolate(JNIEnv *env, jobject, jlong handle, jintArray first, jintArray second, jint width, jint height,
                                                     jfloat t, jint padding, jint maxPixels, jintArray output) {
     Model *m = model(handle);
-    m->cancel = false;
     if (width <= 0 || height <= 0 || padding <= 0 || maxPixels <= 0 || m->flow < 0 || m->mask < 0) return -1;
     jsize count = width * height;
     if (env->GetArrayLength(first) < count || env->GetArrayLength(second) < count || env->GetArrayLength(output) < count) return -1;
@@ -434,7 +437,6 @@ Java_app_absentmotion_ai_AiNative_nativeInterpolate(JNIEnv *env, jobject, jlong 
 extern "C" JNIEXPORT jint JNICALL
 Java_app_absentmotion_ai_AiNative_nativeCutout(JNIEnv *env, jobject, jlong handle, jobject bitmap, jint size) {
     Model *m = model(handle);
-    m->cancel = false;
     AndroidBitmapInfo info;
     if (size < 32 || AndroidBitmap_getInfo(env, bitmap, &info) != ANDROID_BITMAP_RESULT_SUCCESS || info.format != ANDROID_BITMAP_FORMAT_RGBA_8888 ||
         info.width < 1 || info.height < 1 || m->net.input_names().empty() || m->net.output_names().empty()) return -1;
@@ -454,7 +456,7 @@ Java_app_absentmotion_ai_AiNative_nativeCutout(JNIEnv *env, jobject, jlong handl
             ncnn::Mat in(size, size, 3);
             if (in.empty()) code = -2;
             else if (in.cstep != static_cast<size_t>(size) * size) code = -1;
-            if (code == 0) cutout::netInput(rgba, stride, width, height, size, box, static_cast<float *>(in.data));
+            if (code == 0 && !cutout::netInput(rgba, stride, width, height, size, box, static_cast<float *>(in.data))) code = -2;
             if (code == 0 && m->cancel) code = 1;
             if (code == 0) {
                 ncnn::Extractor ex = m->extractor();
@@ -472,6 +474,7 @@ Java_app_absentmotion_ai_AiNative_nativeCutout(JNIEnv *env, jobject, jlong handl
         }
     }
     if (code == 0 && m->cancel) code = 1;
+    if (code == 0) cutout::clean(alpha, box.width, box.height);
     if (code == 0) code = cutout::refine(rgba, stride, width, height, alpha, box.width, box.height, m->cancel);
     std::free(alpha);
     AndroidBitmap_unlockPixels(env, bitmap);

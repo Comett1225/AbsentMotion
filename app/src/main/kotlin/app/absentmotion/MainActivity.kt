@@ -99,12 +99,20 @@ import app.absentmotion.ui.home.VersionHistory
 import app.absentmotion.ui.theme.PressIndication
 import app.absentmotion.ui.theme.enterFade
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import app.absentmotion.ui.editor.MediaPicks
 import app.absentmotion.ui.theme.Am
 
 class MainActivity : ComponentActivity() {
+    private val visualPicker = registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia()) { uri ->
+        if (uri != null) MediaPicks.addPictures(listOf(uri))
+    }
+    private val filePicker = registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.OpenMultipleDocuments()) { MediaPicks.addPictures(it) }
+    private val soundPicker = registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.OpenMultipleDocuments()) { MediaPicks.addSounds(it) }
     internal lateinit var store: ProjectStore
     internal lateinit var settings: AppSettings
     private lateinit var templates: TemplateStore
@@ -118,6 +126,7 @@ class MainActivity : ComponentActivity() {
     private var editingTemplate by mutableStateOf<String?>(null)
     private var firstRun by mutableStateOf<FirstRun?>(null)
     private var opening by mutableStateOf(false)
+    private var openingProject by mutableStateOf(false)
     private var openFailed by mutableStateOf<String?>(null)
     private var openJob: kotlinx.coroutines.Job? = null
     private var closeAnyway = false
@@ -182,7 +191,23 @@ class MainActivity : ComponentActivity() {
         }
         elementNav = openElement
         app.absentmotion.editor.ElementNav.open = openElement
+        MediaPicks.install(
+            this,
+            { visualPicker.launch(androidx.activity.result.PickVisualMediaRequest(androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageAndVideo)) },
+            { filePicker.launch(arrayOf("image/*", "video/*", "audio/*")) },
+            { soundPicker.launch(arrayOf("audio/*", "application/ogg", "application/x-flac")) },
+        ) { editor?.projectId }
+        lifecycleScope.launch {
+            androidx.compose.runtime.snapshotFlow { editor }.collectLatest { state ->
+                if (state == null) return@collectLatest
+                while (true) {
+                    androidx.compose.runtime.snapshotFlow { MediaPicks.waiting }.first { it > 0 }
+                    MediaPicks.deliver(state, applicationContext)
+                }
+            }
+        }
         TestHooks.start(this)
+        app.absentmotion.ui.home.Updater.atLaunch(applicationContext)
         lifecycleScope.launch { engineWorks() }
         firstRun = FirstRun.of(settings, TestHooks.onboarding(intent).takeIf { savedInstanceState == null })
         importShared()
@@ -219,7 +244,7 @@ class MainActivity : ComponentActivity() {
                             HomeScreen(
                                 store, settings, onOpen = ::open, onExport = ::exportFromList,
                                 imported = imported, onImportShown = { imported = emptyList() }, onImportFile = { importUris(listOf(it)) },
-                                onTemplate = { id -> lifecycleScope.launch { if (engineWorks()) editingTemplate = id } }, onTemplateProject = ::projectFromTemplate,
+                                onTemplate = { id -> if (!opening && !openingProject) { openingProject = true; openJob = lifecycleScope.launch { try { if (engineWorks()) editingTemplate = id } finally { openingProject = false } } } }, onTemplateProject = ::projectFromTemplate,
                                 onHistory = { historyFor = Triple(it.id, it.title, it.damaged) }, onCollect = ::collectMedia, changes = projectsChanged,
                             )
                         }
@@ -242,7 +267,7 @@ class MainActivity : ComponentActivity() {
                         if (open.exportOpen) ExportScreen(open.scene, open.frame, engine, fromProjectList = false, outdated) { open.exportOpen = false }
                     }
                 }
-                if (opening) OpeningOverlay { openJob?.cancel() }
+                if (opening || openingProject) OpeningOverlay { openJob?.cancel() }
                 engineProblem?.takeIf { problemShown }?.let { UnsupportedPhone(it) { problemShown = false } }
                 openFailed?.let { id -> OpenFailedDialog({ openFailed = null; historyFor = Triple(id, "", false) }, outdated) { openFailed = null } }
                 importFailed?.let { reason ->
@@ -448,13 +473,15 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun exportFromList(id: String) {
-        if (opening) return
-        openJob = lifecycleScope.launch { if (engineWorks()) exportingFromList = loadInBackground(id) }
+        if (opening || openingProject) return
+        openingProject = true
+        openJob = lifecycleScope.launch { try { if (engineWorks()) exportingFromList = loadInBackground(id) } finally { openingProject = false } }
     }
 
     private fun open(id: String) {
-        if (opening) return
-        openJob = lifecycleScope.launch { openNow(id) }
+        if (opening || openingProject) return
+        openingProject = true
+        openJob = lifecycleScope.launch { try { openNow(id) } finally { openingProject = false } }
     }
 
     private suspend fun engineWorks(): Boolean {
@@ -630,6 +657,7 @@ class MainActivity : ComponentActivity() {
         super.onDestroy()
         if (app.absentmotion.editor.ElementNav.open === elementNav) app.absentmotion.editor.ElementNav.open = null
         elementNav = null
+        MediaPicks.release(this)
         RecoveryHandler.install(recovery) { null }
         engine.close()
     }
@@ -646,6 +674,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
+        app.absentmotion.ui.home.Updater.resumed(this)
         engine.refreshMedia()
         lifecycleScope.launch { recheckVideoThumbnails(applicationContext) }
     }

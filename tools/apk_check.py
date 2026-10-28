@@ -10,6 +10,15 @@ import zipfile
 
 from sdk import sdk_root
 
+UPDATE_SOURCE = Path(__file__).resolve().parent.parent / "app/src/main/kotlin/app/absentmotion/ui/home/UpdateSource.kt"
+
+
+def release_signer(source=UPDATE_SOURCE):
+    found = re.findall(r'^internal const val RELEASE_SIGNER = "([0-9a-f]{64})"$', source.read_text(), re.M)
+    if len(found) != 1:
+        raise ValueError(f"{source.name}: expected exactly one RELEASE_SIGNER")
+    return found[0]
+
 
 def run(*args):
     result = subprocess.run([str(arg) for arg in args], capture_output=True, text=True)
@@ -37,6 +46,17 @@ def elf_alignment(data, name):
             raise ValueError(f"{name}: ELF load segment is not aligned for 16 KB pages")
     if not loads:
         raise ValueError(f"{name}: no ELF load segments")
+
+
+def library_alignment(paths):
+    count = 0
+    for path in paths:
+        for library in sorted(path.glob("*.so")) if path.is_dir() else [path]:
+            elf_alignment(library.read_bytes(), library.name)
+            count += 1
+    if not count:
+        raise ValueError("no native libraries found")
+    return count
 
 
 def zip_packaging(path, extract):
@@ -75,7 +95,7 @@ def zip_packaging(path, extract):
     return libraries
 
 
-def check(path, build_tools, unsigned, max_api):
+def check(path, build_tools, unsigned, max_api, signer=None):
     badging = run(build_tools / "aapt2", "dump", "badging", path)
     package = re.search(r"^package: name='([^']+)' versionCode='(\d+)' versionName='([^']+)'", badging, re.M)
     minimum = re.search(r"^(?:sdkVersion|minSdkVersion):'(\d+)'", badging, re.M)
@@ -102,25 +122,38 @@ def check(path, build_tools, unsigned, max_api):
         if len(digests) != 1:
             raise ValueError("expected exactly one signing certificate")
         certificate = next(iter(digests))
+        if signer and certificate != signer:
+            raise ValueError(f"signed with certificate {certificate[:16]}..., not the release key {signer[:16]}... the installed app accepts")
     print(f"{path.name}: API {api}-{max_api}, {libraries} libraries, native extraction {'on' if extract else 'off'}: PASS")
     return package[1], package[2], package[3], certificate
 
 
 def main():
     parser = argparse.ArgumentParser(description="Check release APK identity, signatures, ZIP packaging and 16 KB ELF alignment")
-    parser.add_argument("apks", type=Path, nargs="+")
+    parser.add_argument("apks", type=Path, nargs="+", help="APKs, or with --libraries .so files and folders of them")
     parser.add_argument("--unsigned", action="store_true")
     parser.add_argument("--max-api", type=int, default=37)
+    parser.add_argument("--signer", help="expected signing certificate SHA-256 (default: RELEASE_SIGNER in UpdateSource.kt)")
+    parser.add_argument("--any-signer", action="store_true", help="accept any single signing certificate, for test keys")
+    parser.add_argument("--libraries", action="store_true", help="only check that native libraries are aligned for 16 KB memory pages")
     args = parser.parse_args()
+    if args.libraries:
+        try:
+            count = library_alignment(args.apks)
+        except (OSError, ValueError, struct.error) as error:
+            sys.exit(f"apk_check: {error}")
+        print(f"apk_check: {count} native libraries are aligned for 16 KB memory pages.")
+        return
     root = Path(os.environ["SDK_ROOT"]) if os.environ.get("SDK_ROOT") else sdk_root()
     if root is None:
         sys.exit("apk_check: Android SDK not found")
     build_tools = root / "build-tools/37.0.0"
     identities = []
     try:
+        signer = None if args.unsigned or args.any_signer else (args.signer or release_signer()).lower()
         for path in args.apks:
             try:
-                identities.append(check(path, build_tools, args.unsigned, args.max_api))
+                identities.append(check(path, build_tools, args.unsigned, args.max_api, signer))
             except (OSError, ValueError, zipfile.BadZipFile, struct.error) as error:
                 raise ValueError(f"{path.name}: {error}") from error
         if len(set(identities)) != 1:

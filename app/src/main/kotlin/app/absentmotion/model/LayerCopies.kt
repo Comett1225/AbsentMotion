@@ -15,11 +15,7 @@ fun copyLayers(
         if (node.name in Scene.LAYER_TAGS) {
             node["id"]?.toLongOrNull()?.let { result = result.with("id", ids[it]?.toString()) }
             node["parent"]?.toLongOrNull()?.let { result = result.with("parent", ids[it]?.toString() ?: node["parent"].takeIf { preserveOutsideParents }) }
-            node["noiseId"]?.toLongOrNull()?.let { ids[it]?.let { mapped -> result = result.with("noiseId", mapped.toString()) } }
-            node["pathLayer"]?.toLongOrNull()?.let { ids[it]?.let { mapped -> result = result.with("pathLayer", mapped.toString()) } }
-            for (slot in MotionSlot.entries) MotionRecord.parse(node[slot.attr])?.takeIf { it.transition }?.let { record ->
-                ids[record.partner]?.let { mapped -> result = result.with(slot.attr, record.copy(partner = mapped).toString()) }
-            }
+            result = result.withSiblingRefs(ids::get)
         }
         return result.copy(children = node.children.map(::remap))
     }
@@ -30,4 +26,13 @@ fun copyLayers(
 internal fun Scene.withCopiedLayerIds(): Scene {
     val copies = copyLayers(layers).iterator()
     return Scene(node.copy(children = node.children.map { if (it.name in Scene.LAYER_TAGS) copies.next().node else it }))
+}
+
+internal fun XmlNode.withSiblingRefs(map: (Long) -> Long?): XmlNode {
+    var result = this
+    for (name in listOf("noiseId", "pathLayer")) this[name]?.toLongOrNull()?.let(map)?.let { result = result.with(name, it.toString()) }
+    for (slot in MotionSlot.entries) MotionRecord.parse(this[slot.attr])?.takeIf { it.transition }?.let { record ->
+        map(record.partner)?.let { result = result.with(slot.attr, record.copy(partner = it).toString()) }
+    }
+    return result
 }

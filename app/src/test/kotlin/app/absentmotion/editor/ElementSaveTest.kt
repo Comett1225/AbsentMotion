@@ -81,4 +81,37 @@ class ElementSaveTest {
         assertEquals("true", sceneOf(hidden).let { it.elementNodes(it.layer(9)!!, null).single()["hidden"] })
         assertEquals("shape", sceneOf(group(prop("location", 0f to "200,200,0"), inner = inner)).let { it.elementNodes(it.layer(9)!!, null).single().name })
     }
+
+    @Test fun boundsAreSampledBetweenKeyframesSoALongRotatingBarIsNotCropped() {
+        val times = boundsSampleTimes(0, 2000, 30, listOf(0, 2000))
+        assertEquals(0, times.first())
+        assertEquals(2000, times.last())
+        assertEquals(61, times.size)
+        assertEquals(times.sorted(), times)
+        assertEquals(times.distinct(), times)
+        val quarter = times.minOf { kotlin.math.abs(it - 500) }
+        assertEquals(true, quarter <= 17)
+    }
+
+    @Test fun everyKeyframeTimeIsKeptEvenWithMoreThanTwentyFour() {
+        val keys = (0 until 100).map { it * 97 }
+        val times = boundsSampleTimes(0, 10_000, 60, keys)
+        assertEquals(true, times.containsAll(keys.filter { it <= 10_000 }))
+        assertEquals(true, times.contains(10_000))
+        assertEquals(true, times.size <= 240 + 3 + keys.size)
+    }
+
+    @Test fun aLayerWithAKeyframeOnEveryFrameDoesNotCostThousandsOfBoundsQueries() {
+        val keys = (0 until 3000).map { it * 16 }
+        val times = boundsSampleTimes(0, 48_000, 60, keys)
+        assertEquals(true, times.size <= 3 * 243)
+        assertEquals(true, times.containsAll(listOf(0, 48_000, 24_000)))
+    }
+
+    @Test fun veryLongLayersAreSampledWithinTheLimit() {
+        val times = boundsSampleTimes(0, 600_000, 60, emptyList())
+        assertEquals(true, times.size in 200..250)
+        assertEquals(600_000, times.last())
+        assertEquals(listOf(0, 500, 1000), boundsSampleTimes(0, 1000, 2, emptyList()))
+    }
 }

@@ -25,6 +25,7 @@ internal object PanelIcons {
             "A1.205 1.205 0 0 1 19.648 11.352L12.056 18.944A3.615 3.615 0 0 1 6.944 18.944L3.056 15.056A3.615 3.615 0 0 1 3.056 9.944L5.67 7.33")
     val BorderShadow = icon("BorderShadow", width = 1.7f, stroke = "M6.5 3.5L13 3.5A3 3 0 0 1 16 6.5L16 13A3 3 0 0 1 13 16L6.5 16A3 3 0 0 1 3.5 13L3.5 6.5A3 3 0 0 1 6.5 3.5ZM20 8.5L20 16.5A3.5 3.5 0 0 1 16.5 20L8.5 20")
     val Blending = icon("Blending", width = 1.7f, stroke = "M8 9A7 7 0 1 0 22 9A7 7 0 1 0 8 9ZM2 15A7 7 0 1 0 16 15A7 7 0 1 0 2 15Z")
+    val Crop = icon("Crop", width = 1.7f, stroke = "M7 2.5L7 17L21.5 17M2.5 7L17 7L17 21.5")
     val MoveTransform = icon("MoveTransform", width = 1.7f, stroke = "M5 3L5 19L21 19M5 19L11 13M2 6L5 3L8 6M18 16L21 19L18 22")
     val EditShape = icon("EditShape", width = 1.7f, stroke = "M17 5A2 2 0 1 0 21 5A2 2 0 1 0 17 5ZM3 19A2 2 0 1 0 7 19A2 2 0 1 0 3 19ZM5 17A12 12 0 0 1 17 5")
     val Star = icon("Star", width = 1.7f, stroke = "M11.525 2.295A0.53 0.53 0 0 1 12.475 2.295L14.785 6.974A2.123 2.123 0 0 0 16.38 8.134L21.546 8.89A0.53 0.53 0 0 1 21.84 9.794L18.104 13.432" +
@@ -53,6 +54,8 @@ internal object PanelIcons {
     val TabRotate = icon("TabRotate", stroke = "M21 12A9 9 0 1 1 12 3C14.52 3 16.93 4 18.74 5.74L21 8M21 3L21 8L16 8")
     val TabTilt = icon("TabTilt", stroke = "M8 3.5L17 6.5L17 14.5L8 17.5ZM3.5 18.5C6.5 21.5 17.5 21.5 20.5 18.5M20.5 18.5L17.6 18.4M20.5 18.5L20.2 15.7")
     val TabSize = icon("TabSize", stroke = "M12 3L5 3A2 2 0 0 0 3 5L3 19A2 2 0 0 0 5 21L19 21A2 2 0 0 0 21 19L21 12M14 15L9 15L9 10M16 3L21 3L21 8M21 3L9 15")
+    val TabPivot = icon("TabPivot", stroke = "M12 2.5L12 7.5M12 16.5L12 21.5M2.5 12L7.5 12M16.5 12L21.5 12M12 8.5A3.5 3.5 0 1 1 12 15.5A3.5 3.5 0 1 1 12 8.5Z")
+    val Pin = icon("Pin", stroke = "M12 21.5L12 13.5M12 3A5 5 0 1 1 12 13A5 5 0 1 1 12 3Z")
     val TabSkew = icon("TabSkew", stroke = "M9.5 6.5L20.5 6.5L14.5 17.5L3.5 17.5ZM3.5 6.5L3.5 8.1M3.5 9.5L3.5 11.1M3.5 12.5L3.5 14.1M3.5 15.5L3.5 17.1")
     val Link = icon("Link", stroke = "M9 17L7 17A5 5 0 0 1 7 7L9 7M15 7L17 7A5 5 0 1 1 17 17L15 17M8 12L16 12")
     val Unlink = icon("Unlink", stroke = "M9 17L7 17A5 5 0 0 1 7 7M15 7L17 7A5 5 0 0 1 21 15M8 12L12 12M2 2L22 22")

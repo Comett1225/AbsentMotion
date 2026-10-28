@@ -12,6 +12,8 @@ fun FontLibrary.prepareText(xml: String, timeMs: Int = 0): String {
     return prepareText(scene.node, scene.fps, timeMs).toXml()
 }
 
+private const val UNWRAPPED = 1 shl 24
+
 private fun hasText(scene: XmlNode): Boolean = scene.children.any { it.name == "text" || it.child("scene")?.let(::hasText) == true }
 
 private fun FontLibrary.prepareText(scene: XmlNode, fps: Int, timeMs: Int): XmlNode {
@@ -32,7 +34,7 @@ private fun FontLibrary.prepareText(scene: XmlNode, fps: Int, timeMs: Int): XmlN
             "right" -> Layout.Alignment.ALIGN_OPPOSITE
             else -> Layout.Alignment.ALIGN_NORMAL
         }
-        val layout = StaticLayout.Builder.obtain(layer.content, 0, layer.content.length, paint, layer.wrapWidth.coerceAtLeast(1))
+        val layout = StaticLayout.Builder.obtain(layer.content, 0, layer.content.length, paint, if (layer.onTextPath) UNWRAPPED else layer.wrapWidth.coerceAtLeast(1))
             .setAlignment(alignment).setIncludePad(true).setBreakStrategy(LineBreaker.BREAK_STRATEGY_SIMPLE)
             .setHyphenationFrequency(Layout.HYPHENATION_FREQUENCY_NONE)
             .setLineSpacing(0f, layer.textSpacing("linespacing", 1f)).build()

@@ -56,6 +56,21 @@ class Recovery(private val dir: File) {
 internal const val StaleTempMs = 24 * 60 * 60 * 1000L
 internal const val ImportMarker = "importing.part"
 
+private val TempTargets = setOf(
+    "xml", "mp4", "mov", "m4v", "mkv", "webm", "avi", "png", "jpg", "jpeg", "webp", "gif", "svg",
+    "glb", "gltf", "obj", "mtl", "ttf", "otf", "mp3", "m4a", "wav", "flac", "ogg", "aac", "json", "bin",
+)
+
+private fun appTemp(name: String): Boolean {
+    if (name.startsWith("keep-") || name.startsWith("copy-") || name.startsWith("restore-")) return true
+    val base = when {
+        name.endsWith(".part") -> name.dropLast("part".length + 1)
+        name.endsWith(".tmp") -> name.dropLast("tmp".length + 1)
+        else -> return false
+    }
+    return base.substringAfterLast('.', "").lowercase(java.util.Locale.ROOT) in TempTargets
+}
+
 internal fun sweepStaleTemps(files: File, cache: File, now: Long = System.currentTimeMillis()): Int {
     var removed = 0
     fun old(f: File) = now - f.lastModified() > StaleTempMs
@@ -67,9 +82,10 @@ internal fun sweepStaleTemps(files: File, cache: File, now: Long = System.curren
     }
     for (name in listOf("projects", "recovery", "media", "templates", "presets", "fonts/imported")) {
         File(files, name).walkTopDown().maxDepth(4)
-            .filter { it.isFile && (it.name.endsWith(".tmp") || it.name.endsWith(".part")) && old(it) }
+            .filter { it.isFile && (it.name.endsWith(".tmp") || it.name.endsWith(".part")) && appTemp(it.name) && old(it) }
             .forEach { if (it.delete()) removed++ }
     }
+    File(files, "restore-staging").takeIf { it.exists() && old(it) }?.let { if (it.deleteRecursively()) removed++ }
     cache.listFiles { f -> f.isFile && (f.name.startsWith("ai-") || f.name.startsWith("probe-")) && old(f) }.orEmpty().forEach { if (it.delete()) removed++ }
     return removed
 }

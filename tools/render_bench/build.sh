@@ -11,7 +11,7 @@ mkdir -p "$OUT/obj"
 FLAGS="-std=c++20 -O2 -fno-rtti -fno-exceptions -w -DNDEBUG -DSK_DISABLE_TRACING -DXML_STATIC -DU_DISABLE_RENAMING=1 -DU_STATIC_IMPLEMENTATION -DU_USING_ICU_NAMESPACE=0 $EXTRA
  -I$SRC -I$SKIA -I$SKIA/third_party/externals/expat/expat/lib -I$SKIA/third_party/externals/icu/source/common"
 export FLAGS SRC OUT
-for f in camera drawing easing effects model motion scene shapes styles text textanim xml; do echo "$f"; done | xargs -P 8 -n 1 sh -c '
+for f in camera drawing easing effects model motion scene shapes styles text textanim warp xml; do echo "$f"; done | xargs -P 8 -n 1 sh -c '
   clang++ $FLAGS -c "$SRC/$0.cpp" -o "$OUT/obj/$0.o"'
 link() {
   clang++ -o "$1" "$2" "$OUT"/obj/*.o \

@@ -1,0 +1,128 @@
+{
+ "id": "textpath",
+ "name": "Text Along Path",
+ "category": "text",
+ "since": "4.2.0",
+ "native": true,
+ "description": "Sets the text along an arc, a circle or the outline of the layer just beneath it, letter by letter, with the shaping, fonts and emoji of the text kept.",
+ "params": [
+  {
+   "id": "shape",
+   "label": "Path",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Arc",
+    "Circle",
+    "Layer Below"
+   ]
+  },
+  {
+   "id": "position",
+   "label": "Position",
+   "type": "float",
+   "default": 0.5,
+   "min": -5,
+   "max": 5,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "align",
+   "label": "Align",
+   "type": "choice",
+   "default": 1,
+   "options": [
+    "Left",
+    "Center",
+    "Right"
+   ]
+  },
+  {
+   "id": "baseline",
+   "label": "Baseline Shift",
+   "type": "float",
+   "default": 0,
+   "min": -2000,
+   "max": 2000,
+   "step": 1
+  },
+  {
+   "id": "rotate",
+   "label": "Rotate Letters",
+   "type": "switch",
+   "default": true
+  },
+  {
+   "id": "reverse",
+   "label": "Reverse Path",
+   "type": "switch",
+   "default": false
+  },
+  {
+   "id": "start",
+   "label": "Start",
+   "type": "point",
+   "default": [-300, 80],
+   "min": -20000,
+   "max": 20000,
+   "step": 1,
+   "pixels": true,
+   "when": {"shape": [0]}
+  },
+  {
+   "id": "control1",
+   "label": "Control 1",
+   "type": "point",
+   "default": [-200, -120],
+   "min": -20000,
+   "max": 20000,
+   "step": 1,
+   "pixels": true,
+   "when": {"shape": [0]}
+  },
+  {
+   "id": "control2",
+   "label": "Control 2",
+   "type": "point",
+   "default": [200, -120],
+   "min": -20000,
+   "max": 20000,
+   "step": 1,
+   "pixels": true,
+   "when": {"shape": [0]}
+  },
+  {
+   "id": "end",
+   "label": "End",
+   "type": "point",
+   "default": [300, 80],
+   "min": -20000,
+   "max": 20000,
+   "step": 1,
+   "pixels": true,
+   "when": {"shape": [0]}
+  },
+  {
+   "id": "center",
+   "label": "Center",
+   "type": "point",
+   "default": [0, 0],
+   "min": -20000,
+   "max": 20000,
+   "step": 1,
+   "pixels": true,
+   "when": {"shape": [1]}
+  },
+  {
+   "id": "radius",
+   "label": "Radius",
+   "type": "float",
+   "default": 220,
+   "min": 1,
+   "max": 20000,
+   "step": 1,
+   "when": {"shape": [1]}
+  }
+ ]
+}

@@ -27,7 +27,7 @@ class EffectPackTest {
         val declared = Regex("""(layout\s*\(\s*color\s*\)\s*)?uniform\s+(\w+)\s+(\w+)\s*;""")
         for (effect in catalog.definitions) {
             if (effect.native) {
-                assertTrue("${effect.key} is not a built-in", effect.category in setOf("move", "repeat", "text") || effect.id in setOf("absent.blur", "absent.glow", "absent.motionblur", "absent.smear", "absent.backdrop", "absent.drawingprogress", "absent.stroketaper"))
+                assertTrue("${effect.key} is not a built-in", effect.category in setOf("move", "repeat", "text") || effect.id in setOf("absent.blur", "absent.glow", "absent.motionblur", "absent.smear", "absent.backdrop", "absent.drawingprogress", "absent.stroketaper", "absent.puppet"))
                 assertNull(effect.sksl)
                 continue
             }
@@ -105,15 +105,16 @@ class EffectPackTest {
         assertEquals("0.000000", phase.default)
     }
 
-    @Test fun theNewCategoryShowsEffectsFromTheLastFiveReleases() {
+    @Test fun theNewCategoryShowsOnlyEffectsFromTheLastFiveReleases() {
         val releases = JSONArray(File(pack, "releases.json").readText()).let { a -> List(a.length()) { a.getString(it) } }
         val numbers = releases.map { r -> r.split('.').map { it.toInt() } }
         assertTrue("releases are listed oldest first", numbers.zipWithNext().all { (a, b) -> a.zip(b).firstOrNull { it.first != it.second }?.let { it.first < it.second } == true })
         assertTrue(catalog.definitions.all { it.since == null || it.since in releases })
         assertEquals(releases.takeLast(5).toSet(), catalog.newest)
         val fresh = catalog.listed("new").map { it.key }.toSet()
-        assertTrue(fresh.containsAll(listOf("vhs", "oscillate", "timequant", "unsharpmask", "flicker")))
-        assertTrue("blur" !in fresh && "glow" !in fresh)
+        assertTrue(fresh.containsAll(listOf("textpath", "puppet")))
+        assertTrue(listOf("blur", "glow", "vhs", "oscillate", "timequant").none { it in fresh })
+        assertEquals(File("../version.properties").readLines().first { it.startsWith("versionName=") }.removePrefix("versionName="), releases.last())
         assertEquals(listOf("new") + EffectCatalog.Categories.keys + "ai", catalog.categories.map { it.first })
         val old = EffectCatalog(catalog.definitions.map { it.copy(since = null) }, newest = catalog.newest)
         assertTrue(old.listed("new").isEmpty())

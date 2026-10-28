@@ -153,11 +153,12 @@ suspend fun EditorState.convertToOutline() {
     val parsed = parseSvgPath(svg)
     if (parsed.none { it.knots.isNotEmpty() }) return
     val contours = parsed.withHoles()
+    val catalog = engine.effects.value
     edit { s ->
         s.update(layer.id) { l ->
             val keep = l.node.children.filter { child ->
                 child.name != "path" && child.name != "content" && child.name != "property" &&
-                    !(child.name == "effect" && child.attrs["id"] == app.absentmotion.compat.ForeignEffectIds.TEXT_SPACING)
+                    !(child.name == "effect" && (child.attrs["id"] == app.absentmotion.compat.ForeignEffectIds.TEXT_SPACING || catalog.find(child.attrs["id"] ?: "")?.category == "text"))
             }
             val attrs = l.node.attrs - setOf("s", "size", "font", "wrapWidth", "align")
             l.copy(node = l.node.copy(name = "shape", attrs = if ("label" in attrs) attrs else attrs + ("label" to l.label), children = keep)).withContours(contours)

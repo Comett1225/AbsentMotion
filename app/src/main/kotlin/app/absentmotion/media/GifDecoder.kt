@@ -132,7 +132,9 @@ class GifDecoder(stream: InputStream) {
 
     private fun clear(left: Int, top: Int, w: Int, h: Int) {
         for (y in maxOf(0, top) until minOf(height, top + h)) {
-            canvas.fill(0, y * width + maxOf(0, left), y * width + minOf(width, left + w))
+            val from = (y * width + maxOf(0, left)).coerceAtMost(y * width + width)
+            val to = (y * width + minOf(width, left + w)).coerceAtMost(y * width + width)
+            if (to > from) canvas.fill(0, from, to)
         }
     }
 

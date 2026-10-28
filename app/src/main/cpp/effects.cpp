@@ -1,5 +1,6 @@
 #include "effects.h"
 
+#include "warp.h"
 #include "xml.h"
 #include "include/core/SkBBHFactory.h"
 #include "include/core/SkCanvas.h"
@@ -23,8 +24,125 @@ namespace {
 
 const char* const kLift = "absent.backdrop";
 
+const char* const kPuppet = "absent.puppet";
+
 bool BuiltIn(const std::string& id) {
-    return id == "absent.blur" || id == "absent.glow" || id == "absent.smear" || id == kLift;
+    return id == "absent.blur" || id == "absent.glow" || id == "absent.smear" || id == kLift || id == kPuppet;
+}
+
+const char* const kPuppetShader = R"(
+uniform shader image;
+uniform float3x3 toLocal;
+uniform float3x3 fromLocal;
+uniform float4 pins[32];
+uniform float4 similar;
+uniform float count;
+uniform float power;
+half4 main(float2 xy) {
+    float3 h = toLocal * float3(xy, 1.0);
+    if (abs(h.z) < 0.000001) return half4(0);
+    float2 v = h.xy / h.z;
+    float2 s = float2(similar.x * v.x - similar.y * v.y, similar.y * v.x + similar.x * v.y) + similar.zw;
+    for (int i = 0; i < 32; i++) {
+        if (float(i) >= count) break;
+        float2 d = pins[i].xy - v;
+        float r = dot(d, d);
+        s += pins[i].zw * (power == 0.75 ? sqrt(r * sqrt(r)) : pow(r, power));
+    }
+    float3 o = fromLocal * float3(s, 1.0);
+    if (abs(o.z) < 0.000001) return half4(0);
+    return image.eval(o.xy / o.z);
+}
+)";
+
+float Value(const LayerEffect& e, const std::map<std::string, Anim>* defaults, const std::string& name, int i, float t, float fallback);
+
+std::vector<warp::Pin> PuppetPins(const LayerEffect& e, float t) {
+    std::vector<warp::Pin> pins;
+    for (const Property& p : e.props) {
+        if (p.name.size() < 4 || p.name.size() > 12 || p.name.compare(0, 3, "pin") != 0 || p.name[3] == '0' ||
+            !std::all_of(p.name.begin() + 3, p.name.end(), [](char c) { return c >= '0' && c <= '9'; })) continue;
+        const Property* r = e.prop(("rest" + p.name.substr(3)).c_str());
+        if (!r) continue;
+        warp::Pin pin{p.anim.get(0, t, NAN), p.anim.get(1, t, NAN), r->anim.get(0, t, NAN), r->anim.get(1, t, NAN)};
+        if (!std::isfinite(pin.x) || !std::isfinite(pin.y) || !std::isfinite(pin.restX) || !std::isfinite(pin.restY)) continue;
+        pins.push_back(pin);
+        if ((int)pins.size() == warp::kMaxPins) break;
+    }
+    return pins;
+}
+
+bool Bent(const Layer& layer, float t) {
+    return std::any_of(layer.effects.begin(), layer.effects.end(), [&](const LayerEffect& e) {
+        if (e.hidden || e.id != kPuppet) return false;
+        const std::vector<warp::Pin> pins = PuppetPins(e, t);
+        return !pins.empty() && !warp::AtRest(pins);
+    });
+}
+
+float PuppetReach(const warp::Bend& bend, const SkMatrix& fromLocal, const SkMatrix& toLocal, const SkRect& seen, const SkRect& inside,
+                  float fallback) {
+    constexpr int kSteps = 24;
+    std::vector<SkPoint> moved((kSteps + 1) * (kSteps + 1)), source(moved.size());
+    for (int j = 0; j <= kSteps; j++) {
+        for (int i = 0; i <= kSteps; i++) {
+            const SkPoint xy = {seen.left() + seen.width() * i / kSteps, seen.top() + seen.height() * j / kSteps};
+            const SkPoint v = toLocal.mapPoint(xy);
+            double sx, sy;
+            warp::Source(bend, v.x(), v.y(), &sx, &sy);
+            const SkPoint o = fromLocal.mapPoint({(float)sx, (float)sy});
+            if (!o.isFinite()) return fallback;
+            source[j * (kSteps + 1) + i] = o;
+            moved[j * (kSteps + 1) + i] = o - xy;
+        }
+    }
+    float spread = 0;
+    for (int j = 0; j <= kSteps; j++) {
+        for (int i = 0; i <= kSteps; i++) {
+            const SkPoint d = moved[j * (kSteps + 1) + i];
+            if (i < kSteps) spread = std::max(spread, (d - moved[j * (kSteps + 1) + i + 1]).length());
+            if (j < kSteps) spread = std::max(spread, (d - moved[(j + 1) * (kSteps + 1) + i]).length());
+        }
+    }
+    const SkRect near = inside.makeOutset(2 * spread, 2 * spread);
+    float reach = 0;
+    for (size_t k = 0; k < moved.size(); k++) {
+        if (near.contains(source[k].x(), source[k].y())) reach = std::max(reach, moved[k].length());
+    }
+    return std::min(fallback, reach + 2 * spread + 2);
+}
+
+sk_sp<SkImageFilter> PuppetFilter(const LayerEffect& e, const std::map<std::string, Anim>* defaults, float t, double timeMs, const SkRect& area,
+                                  SkMatrix placed, const SkRect& seen, const SkRect& inside, float reach, sk_sp<SkImageFilter> input) {
+    static const sk_sp<SkRuntimeEffect> effect = SkRuntimeEffect::MakeForShader(SkString(kPuppetShader)).effect;
+    const std::vector<warp::Pin> pins = PuppetPins(e, t);
+    if (!effect || pins.empty() || warp::AtRest(pins)) return input;
+    if (e.owner && !EffectOwnerMatrix(e.owner, timeMs, &placed)) return input;
+    const warp::Bend bend = warp::Solve(pins, Value(e, defaults, "falloff", 0, t, 1));
+    const SkMatrix fromLocal = SkMatrix::Translate(-area.left(), -area.top()) * placed;
+    SkMatrix toLocal;
+    if (!fromLocal.invert(&toLocal)) return input;
+    const SkMatrix centered = fromLocal * SkMatrix::Translate((float)bend.centerX, (float)bend.centerY);
+    SkMatrix toCentered;
+    if (!centered.invert(&toCentered)) return input;
+    const auto columns = [](const SkMatrix& m) { return std::vector<float>{m[0], m[3], m[6], m[1], m[4], m[7], m[2], m[5], m[8]}; };
+    std::vector<float> packed(4 * warp::kMaxPins, 0.0f);
+    for (size_t i = 0; i < bend.cx.size(); i++) {
+        packed[4 * i] = (float)bend.x[i];
+        packed[4 * i + 1] = (float)bend.y[i];
+        packed[4 * i + 2] = (float)bend.cx[i];
+        packed[4 * i + 3] = (float)bend.cy[i];
+    }
+    SkRuntimeShaderBuilder b(effect);
+    const std::vector<float> to = columns(toCentered), from = columns(centered);
+    b.uniform("toLocal").set(to.data(), 9);
+    b.uniform("fromLocal").set(from.data(), 9);
+    b.uniform("pins").set(packed.data(), (int)packed.size());
+    b.uniform("similar") = SkV4{(float)bend.ar, (float)bend.ai, (float)bend.tx, (float)bend.ty};
+    b.uniform("count") = (float)bend.cx.size();
+    b.uniform("power") = (float)bend.power;
+    return SkImageFilters::RuntimeShader(b, PuppetReach(bend, fromLocal, toLocal, seen, inside, reach), "image",
+                                         SkImageFilters::Crop(inside, std::move(input)), true);
 }
 
 float Value(const LayerEffect& e, const std::map<std::string, Anim>* defaults, const std::string& name, int i, float t,
@@ -291,7 +409,8 @@ bool EffectRuntime::steady(const Layer& layer, float from, float to) const {
 }
 
 sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer, double timeMs, const SkRect& area, const SkRect& seen,
-                                          const SkMatrix& placed, sk_sp<SkImageFilter> content, sk_sp<SkImageFilter> below) const {
+                                          const SkRect& drawn, const SkMatrix& placed, sk_sp<SkImageFilter> content,
+                                          sk_sp<SkImageFilter> below) const {
     const float t = layer.localTime(timeMs), seconds = (float)((layer.steppedMs(timeMs) - layer.startTime) / 1000.0);
     const SkRect bounds = seen.makeOffset(-area.left(), -area.top());
     const float reach = std::max({(float)scene.width, (float)scene.height, seen.width(), seen.height()});
@@ -310,7 +429,10 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
         if (e.hidden || e.id == kLift || (layer.video && e.id == "absent.datamosh")) continue;
         const Definition* d = find(e.id);
         const auto* defaults = d ? &d->defaults : nullptr;
-        if (BuiltIn(e.id)) {
+        if (e.id == kPuppet) {
+            f = PuppetFilter(e, defaults, t, timeMs, area, placed, bounds, f ? f->computeFastBounds(drawn) : drawn, reach, f);
+            if (!f) continue;
+        } else if (BuiltIn(e.id)) {
             const auto value = [&](const char* name, int i, float fallback) { return Value(e, defaults, name, i, t, fallback); };
             f = e.id == "absent.glow" ? GlowFilter(value, f, withBackdrop) : BuiltInFilter(e.id, value, f);
         } else if (d && d->shader) {
@@ -397,7 +519,14 @@ bool EffectRuntime::draw(SkCanvas* canvas, const Scene& scene, const Layer& laye
     SkRect drawn = SkRect::MakeEmpty();
     sk_sp<SkImageFilter> content = seesBehind ? record(source, &drawn) : nullptr;
     sk_sp<SkImageFilter> under = below && needs(layer, &Definition::below) ? record(below) : nullptr;
-    sk_sp<SkImageFilter> filter = this->chain(scene, layer, timeMs, at, bounds, placed, std::move(content), std::move(under));
+    SkRect inside = local;
+    if (lift < 0 && !seesBehind && Bent(layer, layer.localTime(timeMs))) {
+        SkRect measured;
+        record(source, &measured);
+        const float scale = canvas->getTotalMatrix().getMinScale(), pad = scale > 0 ? 4 / scale : 4;
+        inside = measured.makeOffset(-at.left(), -at.top()).makeOutset(pad, pad);
+    }
+    sk_sp<SkImageFilter> filter = this->chain(scene, layer, timeMs, at, bounds, inside, placed, std::move(content), std::move(under));
     if (!filter && lift < 0) return false;
     if (seesBehind) {
         float reach = 0;

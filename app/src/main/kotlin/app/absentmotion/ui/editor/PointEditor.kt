@@ -1,5 +1,12 @@
 package app.absentmotion.ui.editor
 
+import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.ui.semantics.disabled
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.Role
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -251,9 +258,9 @@ private fun Trackpad(state: EditorState, mode: PointMode, contour: Contour?, mod
             LockButton(stringResource(R.string.point_distance), mode.distanceLock && mode.angleLock, bothHandles && mode.angleLock, true) { mode.distanceLock = !mode.distanceLock }
         }
         Row(Modifier.align(Alignment.BottomCenter).padding(bottom = 4.dp).fillMaxWidth().padding(horizontal = 30.dp), verticalAlignment = Alignment.CenterVertically) {
-            ContourArrow(DrawingIcons.Prev) { state.gotoContour(mode, -1) }
+            ContourArrow(DrawingIcons.Prev, stringResource(R.string.point_contour, mode.contour.toString()), mode.contour > 0) { state.gotoContour(mode, -1) }
             Text(stringResource(R.string.point_contour, (mode.contour + 1).toString()), Modifier.weight(1f), color = Guide, fontSize = 13.sp, textAlign = TextAlign.Center)
-            ContourArrow(DrawingIcons.Next) { state.gotoContour(mode, 1) }
+            ContourArrow(DrawingIcons.Next, stringResource(R.string.point_contour, (mode.contour + 2).toString()), true) { state.gotoContour(mode, 1) }
         }
     }
 }
@@ -283,8 +290,12 @@ private fun LockButton(label: String, on: Boolean, visible: Boolean, enabled: Bo
 }
 
 @Composable
-private fun ContourArrow(icon: androidx.compose.ui.graphics.vector.ImageVector, onClick: () -> Unit) {
-    Box(Modifier.size(35.dp, 30.dp).clip(RoundedCornerShape(5.dp)).background(Am.PanelInset).background(Am.OnDark.copy(alpha = 0.13f)).clickable(onClick = onClick), Alignment.Center) {
+private fun ContourArrow(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, enabled: Boolean, onClick: () -> Unit) {
+    Box(
+        Modifier.size(35.dp, 30.dp).clip(RoundedCornerShape(5.dp)).background(Am.PanelInset).background(Am.OnDark.copy(alpha = 0.13f)).alpha(if (enabled) 1f else 0.4f)
+            .clickable(role = Role.Button) { if (enabled) onClick() }.semantics { contentDescription = label; if (!enabled) disabled() },
+        Alignment.Center,
+    ) {
         Icon(icon, null, Modifier.size(22.dp), tint = Am.Faint)
     }
 }
@@ -292,18 +303,21 @@ private fun ContourArrow(icon: androidx.compose.ui.graphics.vector.ImageVector, 
 @Composable
 private fun PointList(state: EditorState, mode: PointMode, contour: Contour?, modifier: Modifier) {
     val knots = contour?.knots ?: emptyList()
-    LazyColumn(modifier.padding(horizontal = 4.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+    LazyColumn(modifier.padding(horizontal = 4.dp).selectableGroup(), horizontalAlignment = Alignment.CenterHorizontally) {
         if (knots.isEmpty()) item { PlusCell(mode.handle == Handle.Add) { state.selectAdd(mode, mode.contour, -1) } }
         itemsIndexed(knots) { i, k ->
             val here = i == mode.point
+            val number = (i + 1).toString()
+            val pointName = stringResource(R.string.a11y_point_number, number)
             Row(Modifier.fillMaxWidth().height(34.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
-                HandleChip(k.inHandle != null, here && mode.handle == Handle.In) { mode.point = i; mode.handle = Handle.In }
+                HandleChip(k.inHandle != null, here && mode.handle == Handle.In, stringResource(R.string.a11y_point_handle_in, number)) { mode.point = i; mode.handle = Handle.In }
                 Box(
                     Modifier.size(26.dp).clip(CircleShape).background(if (here && mode.handle == Handle.Main) Am.Accent else Am.Field)
-                        .clickable { mode.point = i; mode.handle = Handle.Main },
+                        .selectable(here && mode.handle == Handle.Main, role = Role.RadioButton) { mode.point = i; mode.handle = Handle.Main }
+                        .semantics { contentDescription = pointName },
                     Alignment.Center,
-                ) { Text("${i + 1}", color = if (here && mode.handle == Handle.Main) Am.OnAccent else Am.OnDark, fontSize = 11.sp, maxLines = 1) }
-                HandleChip(k.outHandle != null, here && mode.handle == Handle.Out) { mode.point = i; mode.handle = Handle.Out }
+                ) { Text(number, color = if (here && mode.handle == Handle.Main) Am.OnAccent else Am.OnDark, fontSize = 11.sp, maxLines = 1) }
+                HandleChip(k.outHandle != null, here && mode.handle == Handle.Out, stringResource(R.string.a11y_point_handle_out, number)) { mode.point = i; mode.handle = Handle.Out }
             }
             if (i < knots.lastIndex || contour?.closed == true || contour?.endsAt(i) == true) {
                 PlusCell(here && mode.handle == Handle.Add) { state.selectAdd(mode, mode.contour, i) }
@@ -313,13 +327,18 @@ private fun PointList(state: EditorState, mode: PointMode, contour: Contour?, mo
 }
 
 @Composable
-private fun HandleChip(present: Boolean, selected: Boolean, onClick: () -> Unit) {
-    Box(Modifier.size(12.dp).alpha(if (present) 1f else 0f).background(if (selected) Am.Accent else Am.Faint).clickable(enabled = present, onClick = onClick))
+private fun HandleChip(present: Boolean, selected: Boolean, label: String, onClick: () -> Unit) {
+    val strip = Modifier.size(12.dp, 34.dp).alpha(if (present) 1f else 0f)
+    Box(
+        if (present) strip.selectable(selected, role = Role.RadioButton, onClick = onClick).semantics { contentDescription = label } else strip.clearAndSetSemantics {},
+        Alignment.Center,
+    ) { Box(Modifier.size(12.dp).background(if (selected) Am.Accent else Am.Faint)) }
 }
 
 @Composable
 private fun PlusCell(selected: Boolean, onClick: () -> Unit) {
-    Box(Modifier.fillMaxWidth().height(26.dp).clickable(onClick = onClick), Alignment.Center) {
+    val add = stringResource(R.string.a11y_add_point)
+    Box(Modifier.fillMaxWidth().height(26.dp).clickable(role = Role.Button, onClick = onClick).semantics { contentDescription = add }, Alignment.Center) {
         Icon(DrawingIcons.AddPoint, null, Modifier.size(18.dp), tint = animatedColor(if (selected) Am.Accent else Am.Faint))
     }
 }

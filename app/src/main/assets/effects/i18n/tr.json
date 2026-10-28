@@ -698,6 +698,30 @@
     "count-up": "Yukarı sayma"
    }
   },
+  "crop": {
+   "description": "Katmanın kenarlarını keser: Sol, Üst, Sağ ve Alt, katmanın kendi genişliğinin veya yüksekliğinin her kenardan ne kadarının kesileceğini belirler; Yuvarlaklık köşeleri yuvarlar, Kenar yumuşatma kenarları yumuşatır. Katman yerinde kalır.",
+   "name": "Kırp",
+   "params": {
+    "bottom": {
+     "label": "Alt"
+    },
+    "feather": {
+     "label": "Kenar yumuşatma"
+    },
+    "left": {
+     "label": "Sol"
+    },
+    "radius": {
+     "label": "Yuvarlaklık"
+    },
+    "right": {
+     "label": "Sağ"
+    },
+    "top": {
+     "label": "Üst"
+    }
+   }
+  },
   "cross": {
    "description": "Katmanı ortada kesişen üç çubuğa yerleştirir.",
    "name": "Üç Eksenli Haç",
@@ -2938,6 +2962,15 @@
     }
    }
   },
+  "puppet": {
+   "description": "Katmanı bir kukla gibi büker: üzerine pinler koyun, sonra pinleri sürükleyin veya canlandırın, görüntü onları yumuşakça izler.",
+   "name": "Kukla Pini",
+   "params": {
+    "falloff": {
+     "label": "Azalma"
+    }
+   }
+  },
   "pyramid": {
    "description": "Katmanı kare bir piramidin yüzlerine yerleştirir.",
    "name": "Piramit",
@@ -4262,6 +4295,58 @@
     },
     "strength": {
      "label": "Güç"
+    }
+   }
+  },
+  "textpath": {
+   "description": "Metni bir yay, bir daire veya hemen altındaki katmanın dış çizgisi boyunca harf harf yerleştirir; metnin harf biçimleri, yazı tipleri ve emojileri korunur.",
+   "name": "Yol Boyunca Metin",
+   "params": {
+    "align": {
+     "label": "Hizala",
+     "options": [
+      "Sol",
+      "Orta",
+      "Sağ"
+     ]
+    },
+    "baseline": {
+     "label": "Taban Çizgisi Kaydırma"
+    },
+    "center": {
+     "label": "Merkez"
+    },
+    "control1": {
+     "label": "Kontrol 1"
+    },
+    "control2": {
+     "label": "Kontrol 2"
+    },
+    "end": {
+     "label": "Bitiş"
+    },
+    "position": {
+     "label": "Konum"
+    },
+    "radius": {
+     "label": "Yarıçap"
+    },
+    "reverse": {
+     "label": "Yolu Ters Çevir"
+    },
+    "rotate": {
+     "label": "Harfleri Döndür"
+    },
+    "shape": {
+     "label": "Yol",
+     "options": [
+      "Yay",
+      "Daire",
+      "Alttaki Katman"
+     ]
+    },
+    "start": {
+     "label": "Başlangıç"
     }
    }
   },

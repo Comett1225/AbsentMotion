@@ -14,7 +14,9 @@ Letterbox letterbox(int width, int height, int size);
 
 void unpremultiply(uint8_t *rgba, size_t stride, int width, int height);
 
-void netInput(const uint8_t *rgba, size_t stride, int width, int height, int size, const Letterbox &box, float *planes);
+bool netInput(const uint8_t *rgba, size_t stride, int width, int height, int size, const Letterbox &box, float *planes);
+
+void clean(float *alpha, int w, int h);
 
 int refine(uint8_t *rgba, size_t stride, int width, int height, const float *alpha, int w, int h, const std::atomic<bool> &cancel);
 

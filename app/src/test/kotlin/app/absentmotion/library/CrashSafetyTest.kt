@@ -41,6 +41,31 @@ class CrashSafetyTest {
         assertEquals("Kept", store.load(id)!!.title)
     }
 
+    @Test fun retainedMediaNamedPartOrTmpIsNotSweptButAppTempsAre() {
+        val root = tmp.newFolder()
+        val media = File(root, "media/p1/clip.part").written("data", age = 2 * day)
+        val scratch = File(root, "media/p1/clip.tmp").written("data", age = 2 * day)
+        val kept = File(root, "media/p1/keep-2.part").written(age = 2 * day)
+        val imported = File(root, "media/p1/video.mp4.part").written(age = 2 * day)
+        sweepStaleTemps(root, tmp.newFolder(), now)
+        assertTrue(media.exists())
+        assertTrue(scratch.exists())
+        assertFalse(kept.exists())
+        assertFalse(imported.exists())
+    }
+
+    @Test fun aRestoreStagingFolderLeftByAKilledRestoreIsSweptOnceItIsOld() {
+        val root = tmp.newFolder()
+        val old = File(root, "restore-staging/t1/media/a.png").written("pixels", age = 2 * day)
+        old.parentFile.setLastModified(now - 2 * day)
+        File(root, "restore-staging").setLastModified(now - 2 * day)
+        assertEquals(1, sweepStaleTemps(root, tmp.newFolder(), now))
+        assertTrue(!File(root, "restore-staging").exists())
+        val fresh = File(root, "restore-staging/t2/a.png").written("pixels")
+        sweepStaleTemps(root, tmp.newFolder(), now)
+        assertTrue(fresh.exists())
+    }
+
     @Test fun aFailedWriteNeverDamagesTheProjectOnDisk() {
         val root = tmp.newFolder()
         val store = ProjectStore(root)

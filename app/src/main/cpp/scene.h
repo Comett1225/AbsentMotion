@@ -83,6 +83,7 @@ struct Camera {
 struct LayerEffect {
     std::string id;
     bool hidden = false, locallyApplied = false, toChildren = false;
+    int64_t owner = 0;
     std::vector<Property> props;
 
     float value(const char* name, float t, float fallback) const;
@@ -205,6 +206,7 @@ void ApplyMotion(const Layer& layer, double timeMs, Placement* placement);
 float MotionOpacity(const Layer& layer, double timeMs);
 bool EchoOf(const Layer& layer, double timeMs, Echo* echo);
 bool FollowsPath(const Layer& layer);
+bool TextGuideBelow(const Layer& layer, float t, SkPath* path);
 void FollowPath(const Layer& layer, double timeMs, const SkPath& path, Placement* placement);
 void ParseSteps(Layer* layer);
 
@@ -283,7 +285,16 @@ struct LayerEffects {
 void DrawScene(SkCanvas* canvas, const Scene& scene, double timeMs, const MediaPictures& pictures,
                const LayerEffects* effects = nullptr);
 void SetLayerEffects(const LayerEffects* effects, const Scene* scene, bool world = false);
+int ProjectFps();
+class SceneScope {
+public:
+    explicit SceneScope(const Scene& scene);
+    ~SceneScope();
+private:
+    const Scene* fPrevious;
+};
 void SetLayerBreak(const std::function<void()>* each);
 bool WorldView();
+bool EffectOwnerMatrix(int64_t owner, double timeMs, SkMatrix* matrix);
 
 }

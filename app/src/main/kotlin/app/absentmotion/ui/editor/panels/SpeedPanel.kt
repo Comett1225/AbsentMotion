@@ -47,6 +47,9 @@ import app.absentmotion.ui.editor.PanelIcons
 import app.absentmotion.ui.editor.rememberHaptic
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import app.absentmotion.ui.theme.Am
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.Role
 import kotlin.math.roundToInt
 
 @Composable
@@ -66,8 +69,9 @@ fun SpeedPanel(state: EditorState, layer: Layer, modifier: Modifier = Modifier) 
                     3 -> RoundedCornerShape(topEnd = 4.dp, bottomEnd = 4.dp)
                     else -> RoundedCornerShape(0.dp)
                 }
+                val name = stringResource(RetimeNames[i])
                 Box(Modifier.weight(1f).fillMaxHeight().alpha(if (enabled[i]) 1f else 0.35f)
-                    .background(Am.Button, shape).clickable(enabled = enabled[i]) { state.retimeVideo(i < 2) }, Alignment.Center) {
+                    .background(Am.Button, shape).clickable(enabled = enabled[i], role = Role.Button) { state.retimeVideo(i < 2) }.semantics { contentDescription = name }, Alignment.Center) {
                     RetimeGlyph(i, Modifier.size(23.dp))
                 }
             }
@@ -100,6 +104,8 @@ private fun RampChip(label: String, enabled: Boolean, onClick: () -> Unit) {
         Text(label, color = Am.OnDark, fontSize = 12.sp, maxLines = 1, softWrap = false)
     }
 }
+
+private val RetimeNames = listOf(R.string.a11y_extend_start, R.string.a11y_trim_start, R.string.a11y_trim_end, R.string.a11y_extend_end)
 
 private val snaps = listOf(250, 500, 750, 1000, 2000, 3000)
 

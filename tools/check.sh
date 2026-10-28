@@ -60,7 +60,12 @@ tier|python3 tools/compat/tier_check.py|gate the feature with Tier.has or Tier.c
 
 printf '== Native audio effects and text animation: host build and tests\n'
 sh tools/audio_dsp.sh --lib >"$dir/audio-dsp.log" 2>&1 || { tail -n 15 "$dir/audio-dsp.log" >&2; fail "the audio DSP host tests"; }
+sh tools/cutout_clean.sh >"$dir/cutout-clean.log" 2>&1 || { tail -n 15 "$dir/cutout-clean.log" >&2; fail "the cut-out clean-up host test"; }
 sh tools/textanim.sh >"$dir/textanim.log" 2>&1 || { tail -n 15 "$dir/textanim.log" >&2; fail "the text animation host tests"; }
+sh tools/warp.sh >"$dir/warp.log" 2>&1 || { tail -n 15 "$dir/warp.log" >&2; fail "the path and puppet warp host tests"; }
+python3 tools/puppet_check.py >"$dir/puppet.log" 2>&1 || { tail -n 15 "$dir/puppet.log" >&2; fail "the Puppet Pin checks against the host engine"; }
+python3 tools/crop_check.py >"$dir/crop.log" 2>&1 || { tail -n 15 "$dir/crop.log" >&2; fail "the Crop checks against the host engine"; }
+sh tools/pivot.sh --lib >"$dir/pivot.log" 2>&1 || { tail -n 15 "$dir/pivot.log" >&2; fail "the host engine library for the pivot tests"; }
 
 printf '\n== Static checks (in parallel)\n'
 while IFS='|' read -r name command hint; do
@@ -77,15 +82,19 @@ else
     tasks=":app:compilePlayDebugKotlin :app:compileFossDebugKotlin :app:compileCompatDebugKotlin :app:testFossDebugUnitTest :app:testCompatDebugUnitTest"
     [ -f app/lint-baseline.xml ] && tasks="$tasks :app:lintFossDebug :app:lintCompatDebug"
     ./gradlew $tasks -q >"$dir/gradle.log" 2>&1 || { grep -E '^e: |FAILED|Test.*>|Error:|error:' "$dir/gradle.log" | sed 's|file://[^ ]*/app/src/main/kotlin/app/absentmotion/||' | head -40 >&2; fail "Android compile, unit tests or lint (full output: $dir/gradle.log)"; }
-    printf '\n== Native libraries: lowest Android version they need\n'
+    printf '\n== Native libraries: lowest Android version they need, 16 KB page alignment\n'
     if native_libs fossRelease mergeFossReleaseNativeLibs; then
         python3 tools/api_floor.py "$libs" >"$dir/api-floor.log" 2>&1 || { cat "$dir/api-floor.log" >&2; fail "a native library needs a newer Android than minSdk"; }
         tail -n 2 "$dir/api-floor.log"
+        python3 tools/apk_check.py --libraries "$libs" >"$dir/page-size.log" 2>&1 || { cat "$dir/page-size.log" >&2; fail "a native library is not aligned for 16 KB memory pages"; }
+        cat "$dir/page-size.log"
     fi
     printf '\n== Native libraries of the compat build: they must load on Android 9\n'
     if native_libs compatRelease mergeCompatReleaseNativeLibs; then
         python3 tools/api_floor.py "$libs" --min 28 >"$dir/api-floor-compat.log" 2>&1 || { cat "$dir/api-floor-compat.log" >&2; fail "a compat native library needs a newer Android than 9"; }
         tail -n 2 "$dir/api-floor-compat.log"
+        python3 tools/apk_check.py --libraries "$libs" >"$dir/page-size-compat.log" 2>&1 || { cat "$dir/page-size-compat.log" >&2; fail "a compat native library is not aligned for 16 KB memory pages"; }
+        cat "$dir/page-size-compat.log"
     fi
 fi
 

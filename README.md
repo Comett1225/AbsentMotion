@@ -12,7 +12,7 @@
 </p>
 <p align="center">
   <a href="https://comett1225.github.io/AbsentMotion/"><img alt="Download for your phone" src="https://img.shields.io/badge/Download-for%20your%20phone-f07850?style=for-the-badge"></a>
-  <a href="https://comett1225.github.io/AbsentMotion/roadmap.html"><img alt="Roadmap" src="https://img.shields.io/badge/Roadmap-what%27s%20next-2b2b33?style=for-the-badge"></a>
+  <a href="https://comett1225.github.io/AbsentMotion/roadmap.html"><img alt="Roadmap" src="https://img.shields.io/badge/Roadmap-what%27s%20next-7b61ff?style=for-the-badge"></a>
   <a href="https://comett1225.github.io/AbsentMotion/guide.html"><img alt="Guide and docs" src="https://img.shields.io/badge/Guide-and%20docs-2b2b33?style=for-the-badge"></a>
   <a href="https://comett1225.github.io/AbsentMotion/phone-checker.html"><img alt="Will it run on my phone?" src="https://img.shields.io/badge/Will%20it%20run-on%20my%20phone%3F-2b2b33?style=for-the-badge"></a>
   <a href="https://comett1225.github.io/AbsentMotion/effects/index.html"><img alt="All effects" src="https://img.shields.io/badge/All-effects-2b2b33?style=for-the-badge"></a>
@@ -158,6 +158,8 @@ There are three builds: `play`, which has background removal through Google Play
 which contains no Google libraries at all, and `compat`, the Compatible build of `foss`.
 
 ## Future Plans ( Roadmap )
+
+The full [roadmap](https://comett1225.github.io/AbsentMotion/roadmap.html) lists what each upcoming version will bring.
 
 Possibly a PC version as I love the layout and also simplicity of it. Not sure if chromebooks automatically supported from this being an android app but most likely support will arrive to
 - Windows 10/11 (maybe 8/8.1)

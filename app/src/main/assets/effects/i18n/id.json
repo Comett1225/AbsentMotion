@@ -698,6 +698,30 @@
     "count-up": "Hitung naik"
    }
   },
+  "crop": {
+   "description": "Memangkas tepi lapisan: Kiri, Atas, Kanan, dan Bawah menentukan seberapa banyak lebar atau tinggi lapisan itu sendiri yang dibuang dari tiap sisi, Kebulatan membulatkan sudut, dan Feather melembutkan tepi. Lapisan tetap di tempatnya.",
+   "name": "Pangkas",
+   "params": {
+    "bottom": {
+     "label": "Bawah"
+    },
+    "feather": {
+     "label": "Feather"
+    },
+    "left": {
+     "label": "Kiri"
+    },
+    "radius": {
+     "label": "Kebulatan"
+    },
+    "right": {
+     "label": "Kanan"
+    },
+    "top": {
+     "label": "Atas"
+    }
+   }
+  },
   "cross": {
    "description": "Menempatkan lapisan pada tiga batang yang bersilangan di tengah.",
    "name": "Silang tiga sumbu",
@@ -2938,6 +2962,15 @@
     }
    }
   },
+  "puppet": {
+   "description": "Melengkungkan lapisan seperti boneka: pasang pin, lalu seret atau animasikan pin dan gambar mengikutinya dengan halus.",
+   "name": "Pin Boneka",
+   "params": {
+    "falloff": {
+     "label": "Peluruhan"
+    }
+   }
+  },
   "pyramid": {
    "description": "Menempatkan lapisan pada sisi-sisi piramida persegi.",
    "name": "Piramida",
@@ -4262,6 +4295,58 @@
     },
     "strength": {
      "label": "Kekuatan"
+    }
+   }
+  },
+  "textpath": {
+   "description": "Menempatkan teks di sepanjang busur, lingkaran, atau garis luar lapisan tepat di bawahnya, huruf demi huruf, dengan bentuk huruf, font, dan emoji teks tetap terjaga.",
+   "name": "Teks Mengikuti Jalur",
+   "params": {
+    "align": {
+     "label": "Rata",
+     "options": [
+      "Kiri",
+      "Tengah",
+      "Kanan"
+     ]
+    },
+    "baseline": {
+     "label": "Geser Garis Dasar"
+    },
+    "center": {
+     "label": "Pusat"
+    },
+    "control1": {
+     "label": "Kontrol 1"
+    },
+    "control2": {
+     "label": "Kontrol 2"
+    },
+    "end": {
+     "label": "Akhir"
+    },
+    "position": {
+     "label": "Posisi"
+    },
+    "radius": {
+     "label": "Radius"
+    },
+    "reverse": {
+     "label": "Balik Jalur"
+    },
+    "rotate": {
+     "label": "Putar Huruf"
+    },
+    "shape": {
+     "label": "Jalur",
+     "options": [
+      "Busur",
+      "Lingkaran",
+      "Lapisan di Bawah"
+     ]
+    },
+    "start": {
+     "label": "Awal"
     }
    }
   },

@@ -36,7 +36,7 @@ add_library(motion_tracker OBJECT tracker/tracker.cpp tracker_jni.cpp)
 set_target_properties(motion_tracker PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_compile_options(motion_tracker PRIVATE -O3 -fvisibility=hidden)
 
-add_library(amengine SHARED preview.cpp camera.cpp drawing.cpp effects.cpp easing.cpp engine.cpp interpolation.cpp jni.cpp model.cpp motion.cpp scene.cpp shapes.cpp styles.cpp text.cpp textanim.cpp xml.cpp denoise_jni.cpp audio_dsp.cpp audio_fx_jni.cpp)
+add_library(amengine SHARED preview.cpp camera.cpp drawing.cpp effects.cpp easing.cpp engine.cpp interpolation.cpp jni.cpp model.cpp motion.cpp scene.cpp shapes.cpp styles.cpp text.cpp textanim.cpp warp.cpp xml.cpp denoise_jni.cpp audio_dsp.cpp audio_fx_jni.cpp)
 if(AM_COMPAT)
     target_sources(amengine PRIVATE encoder_copy.cpp)
 endif()

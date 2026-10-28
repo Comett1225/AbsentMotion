@@ -1,7 +1,9 @@
 package app.absentmotion.ui.home
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class UpdateCheckTest {
@@ -58,7 +60,7 @@ class UpdateCheckTest {
 
     @Test fun downloadOpensTheApkOfTheInstalledVersion() {
         val tag = "v3.4.0"
-        fun asset(name: String) = """{"name":"$name","browser_download_url":"$HOME_PAGE/releases/download/$tag/$name"}"""
+        fun asset(name: String) = """{"name":"$name","size":1000,"browser_download_url":"$HOME_PAGE/releases/download/$tag/$name"}"""
         val json = """{"tag_name":"$tag","html_url":"$HOME_PAGE/releases/tag/$tag","assets":[${asset("AbsentMotion-3.4.0-foss.apk")},""" +
             """${asset("AbsentMotion-3.4.0-play.apk")},${asset("AbsentMotion-3.4.0-compatible.apk")},${asset("SHA256SUMS.txt")}]}"""
         assertEquals("$HOME_PAGE/releases/download/$tag/AbsentMotion-3.4.0-foss.apk", parseRelease(json, "foss")?.download)
@@ -70,7 +72,7 @@ class UpdateCheckTest {
     @Test fun aMissingOrForeignApkFallsBackToTheReleasePage() {
         val tag = "v3.4.0"
         fun one(name: String, url: String) =
-            parseRelease("""{"tag_name":"$tag","html_url":"$HOME_PAGE/releases/tag/$tag","assets":[{"name":"$name","browser_download_url":"$url"}]}""", "foss")?.download
+            parseRelease("""{"tag_name":"$tag","html_url":"$HOME_PAGE/releases/tag/$tag","assets":[{"name":"$name","size":1000,"browser_download_url":"$url"}]}""", "foss")?.download
         assertNull(one("AbsentMotion-3.4.0-play.apk", "$HOME_PAGE/releases/download/$tag/AbsentMotion-3.4.0-play.apk"))
         assertNull(one("AbsentMotion-3.4.0-foss.apk", "https://example.com/AbsentMotion-3.4.0-foss.apk"))
         assertNull(one("AbsentMotion-3.4.0-foss.apk", "$HOME_PAGE/releases/download/v3.3.0/AbsentMotion-3.4.0-foss.apk"))
@@ -132,5 +134,56 @@ class UpdateCheckTest {
         assertEquals(UpdateAnswer.Latest, answerFor(Release("2.5.2", HOME_PAGE), "3.0.0"))
         assertEquals(UpdateAnswer.Failed, answerFor(null, "3.0.0"))
         assertEquals(UpdateAnswer.Failed, answerFor(newer, ""))
+    }
+
+    @Test fun theApkCarriesItsSizeChecksumAndChecksumList() {
+        val tag = "v4.1.4"
+        val sha = "ab".repeat(32)
+        fun asset(name: String, extra: String = "") = """{"name":"$name","size":104857600$extra,"browser_download_url":"$HOME_PAGE/releases/download/$tag/$name"}"""
+        val json = """{"tag_name":"$tag","html_url":"$HOME_PAGE/releases/tag/$tag","assets":[${asset("AbsentMotion-4.1.4-foss.apk", ""","digest":"sha256:$sha"""")},${asset("SHA256SUMS.txt")}]}"""
+        val apk = parseRelease(json, "foss")?.apk
+        assertEquals(ApkAsset("AbsentMotion-4.1.4-foss.apk", "$HOME_PAGE/releases/download/$tag/AbsentMotion-4.1.4-foss.apk", 104857600, sha, "$HOME_PAGE/releases/download/$tag/SHA256SUMS.txt"), apk)
+        val older = """{"tag_name":"$tag","assets":[${asset("AbsentMotion-4.1.4-foss.apk", ""","digest":null""")},{"name":"SHA256SUMS.txt","browser_download_url":"https://example.com/SHA256SUMS.txt"}]}"""
+        assertEquals(null, parseRelease(older, "foss")?.apk?.sha256)
+        assertEquals(null, parseRelease(older, "foss")?.apk?.sums)
+    }
+
+    @Test fun unsafeSizesVersionsAndFlavoursGiveNoApk() {
+        fun apk(tag: String, version: String, size: String, flavour: String = "foss"): ApkAsset? {
+            val name = "AbsentMotion-$version-${if (flavour == "compat") "compatible" else flavour}.apk"
+            return parseRelease("""{"tag_name":"$tag","assets":[{"name":"$name","size":$size,"browser_download_url":"$HOME_PAGE/releases/download/$tag/$name"}]}""", flavour)?.apk
+        }
+        assertEquals(1000L, apk("v4.1.4", "4.1.4", "1000")?.size)
+        assertEquals(1000L, apk("v4.1.4-test", "4.1.4-test", "1000")?.size)
+        assertNull(apk("v4.1.4", "4.1.4", "0"))
+        assertNull(apk("v4.1.4", "4.1.4", "-1"))
+        assertNull(apk("v4.1.4", "4.1.4", (MAX_APK_BYTES + 1).toString()))
+        assertNull(apk("v4.1.4", "4.1.4", "\"big\""))
+        assertNull(apk("v4.1.4-../../x", "4.1.4-../../x", "1000"))
+        assertNull(apk("v4.1.4-a/b", "4.1.4-a/b", "1000"))
+        assertNull(apk("v4.1.4", "4.1.4", "1000", "debug"))
+        assertEquals("AbsentMotion-4.1.4-compatible.apk", apk("v4.1.4", "4.1.4", "1000", "compat")?.name)
+    }
+
+    @Test fun aMeteredConnectionIsMentionedOnlyForDownloadsInTheApp() {
+        val apk = ApkAsset("AbsentMotion-9.9.9-foss.apk", "$HOME_PAGE/releases/download/v9.9.9/AbsentMotion-9.9.9-foss.apk", 10, "a".repeat(64), null)
+        val release = Release("9.9.9", "$HOME_PAGE/releases/tag/v9.9.9", apk)
+        assertTrue(warnMetered(UpdateAnswer.Available(release), true))
+        assertFalse(warnMetered(UpdateAnswer.Available(release), false))
+        assertFalse(warnMetered(UpdateAnswer.Available(release), null))
+        assertFalse(warnMetered(UpdateAnswer.Available(release.copy(apk = null)), true))
+        assertFalse(warnMetered(offerFor(UpdateAnswer.Available(release), inApp = false) as UpdateAnswer.Available, true))
+    }
+
+    @Test fun aCopyThatCannotUpdateItselfIsOnlyToldWhereUpdatesComeFrom() {
+        val apk = ApkAsset("AbsentMotion-9.9.9-foss.apk", "$HOME_PAGE/releases/download/v9.9.9/AbsentMotion-9.9.9-foss.apk", 10, "a".repeat(64), null)
+        val release = Release("9.9.9", "$HOME_PAGE/releases/tag/v9.9.9", apk)
+        val available = UpdateAnswer.Available(release)
+        assertEquals(available, offerFor(available, inApp = true))
+        assertEquals(UpdateAnswer.Available(release.copy(apk = null), external = true), offerFor(available, inApp = false))
+        val pageOnly = UpdateAnswer.Available(release.copy(apk = null))
+        assertEquals(pageOnly, offerFor(pageOnly, inApp = false))
+        assertEquals(UpdateAnswer.Latest, offerFor(UpdateAnswer.Latest, inApp = false))
+        assertEquals(UpdateAnswer.Failed, offerFor(UpdateAnswer.Failed, inApp = false))
     }
 }

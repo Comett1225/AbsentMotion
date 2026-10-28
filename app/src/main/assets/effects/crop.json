@@ -1,0 +1,69 @@
+{
+ "id": "crop",
+ "name": "Crop",
+ "category": "key",
+ "since": "4.2.0",
+ "description": "Cuts the edges off the layer: Left, Top, Right and Bottom say how much of the layer's own width or height goes on each side, Roundness rounds the corners and Feather softens the edges. The layer stays where it is.",
+ "params": [
+  {
+   "id": "left",
+   "label": "Left",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "top",
+   "label": "Top",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "right",
+   "label": "Right",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "bottom",
+   "label": "Bottom",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "radius",
+   "label": "Roundness",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "feather",
+   "label": "Feather",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 100,
+   "step": 0.1
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float2 layer;\nuniform float3x3 toLayer;\nuniform float left;\nuniform float top;\nuniform float right;\nuniform float bottom;\nuniform float radius;\nuniform float feather;\nhalf4 main(float2 coord) {\n    if (left <= 0.0 && top <= 0.0 && right <= 0.0 && bottom <= 0.0 && radius <= 0.0 && feather <= 0.0) return image.eval(coord);\n    float3 h = toLayer * float3(coord, 1.0);\n    float2 p = h.xy / h.z;\n    float2 lo = clamp(float2(left, top), 0.0, 0.999);\n    float2 hi = max(1.0 - clamp(float2(right, bottom), 0.0, 1.0), lo + 0.001);\n    float2 a = lo * layer;\n    float2 b = hi * layer;\n    float2 e = (b - a) * 0.5;\n    float r = clamp(radius, 0.0, 1.0) * min(e.x, e.y);\n    float2 q = abs(p - (a + b) * 0.5) - e + r;\n    float d = length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - r;\n    float m = clamp(0.5 - d / max(feather, 1.0), 0.0, 1.0);\n    return image.eval(coord) * half(m);\n}\n"
+}

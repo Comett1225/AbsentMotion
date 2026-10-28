@@ -87,4 +87,41 @@ class VerifyTest {
         assertEquals(emptyList<UiText>(), judge(listOf(ProbedTrack("audio/mpeg", 2_000_000)), audio, null, null))
         assertEquals(txt(R.string.export_verify_duration, "1.000", "2.000"), judge(listOf(ProbedTrack("audio/raw", 1_000_000)), audio, null, null).single())
     }
+
+    @Test fun eachExpectedTrackIsCheckedOnItsOwn() {
+        val shortAudio = listOf(ProbedTrack("video/avc", 2_000_000), ProbedTrack("audio/mp4a-latm", 900_000))
+        assertEquals(listOf(txt(R.string.export_verify_duration, "0.900", "2.000")), judge(shortAudio, video, true, true))
+        val shortVideo = listOf(ProbedTrack("video/avc", 900_000), ProbedTrack("audio/mp4a-latm", 2_020_000))
+        assertEquals(listOf(txt(R.string.export_verify_duration, "0.900", "2.000")), judge(shortVideo, video, true, true))
+        val bothShort = listOf(ProbedTrack("video/avc", 900_000), ProbedTrack("audio/mp4a-latm", 900_000))
+        assertEquals(2, judge(bothShort, video, true, true).size)
+        assertEquals(emptyList<UiText>(), judge(listOf(ProbedTrack("video/avc", 2_000_000), ProbedTrack("audio/mp4a-latm", 1_920_000)), video, true, true))
+        assertEquals(emptyList<UiText>(), judge(listOf(ProbedTrack("video/avc", 2_000_000), ProbedTrack("audio/mp4a-latm", 0)), video, true, true))
+        assertEquals(1, judge(listOf(ProbedTrack("video/avc", 0), ProbedTrack("audio/mp4a-latm", 0)), video, true, true).size)
+    }
+
+    @Test fun aFirstFrameThatDecodesButLooksWrongIsReported() {
+        val drawn = FrameLooks(1_000_000, flat(0.6f), flat(0.4f))
+        assertTrue(firstLooksRight(drawn, flat(0.62f)))
+        assertFalse(firstLooksRight(drawn, flat(0f)))
+        assertEquals(listOf(txt(R.string.export_verify_first_look)), judge(good, video, true, true, null, false))
+        assertEquals(listOf(txt(R.string.export_verify_first_frame)), judge(good, video, false, true, null, false))
+        assertEquals(emptyList<UiText>(), judge(good, video, true, true, null, true))
+        assertEquals(emptyList<UiText>(), judge(good, video, true, true, null, null))
+    }
+
+    @Test fun aReadbackThatCouldNotDecodeAnythingIsMarkedUncheckedButNotFailed() {
+        assertEquals(emptyList<UiText>(), judge(good, video, null, null, null, null))
+        assertTrue(isUnchecked(video, 0, null))
+        assertFalse(isUnchecked(video, 0, true))
+        assertFalse(isUnchecked(video, 0, false))
+        assertFalse(isUnchecked(video, -1, null))
+        assertFalse(isUnchecked(video.copy(video = false), 0, null))
+    }
+
+    @Test fun aContainerThatReportsOneDurationForEveryTrackDoesNotFlagAGoodVideoWithLongerAudio() {
+        val matroska = listOf(ProbedTrack("video/avc", 2_024_000), ProbedTrack("audio/mp4a-latm", 2_024_000))
+        assertEquals(emptyList<UiText>(), judge(matroska, video, true, true))
+        assertEquals(2, judge(listOf(ProbedTrack("video/avc", 2_300_000), ProbedTrack("audio/mp4a-latm", 2_300_000)), video, true, true).size)
+    }
 }

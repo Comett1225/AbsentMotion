@@ -14,6 +14,7 @@
 #include <chrono>
 #include <cinttypes>
 #include <cmath>
+#include <cstdlib>
 #include <cstring>
 #include <functional>
 #include <map>
@@ -1118,6 +1119,7 @@ void EngineImpl::trim() {
 }
 
 bool EngineImpl::layerQuad(int64_t layerId, double timeMs, float xy[8]) {
+    const SceneScope scope(fScene);
     SetCameraView(fCameraView);
     const Layer* layer = fScene.layer(layerId);
     if (!layer || !layer->activeAt(timeMs)) return false;
@@ -1141,6 +1143,7 @@ bool EngineImpl::layerMatrix(int64_t layerId, double timeMs, float m[18]) {
 }
 
 bool EngineImpl::layerBounds(int64_t layerId, double timeMs, float ltrb[4]) {
+    const SceneScope scope(fScene);
     SetCameraView(fCameraView);
     const Layer* layer = fScene.layer(layerId);
     if (!layer) return false;
@@ -1151,11 +1154,13 @@ bool EngineImpl::layerBounds(int64_t layerId, double timeMs, float ltrb[4]) {
 }
 
 int64_t EngineImpl::hitTest(float x, float y, double timeMs) {
+    const SceneScope scope(fScene);
     SetCameraView(fCameraView);
     return TopLayerAt(fScene, timeMs, x, y, this->masks());
 }
 
 bool EngineImpl::layerOutline(int64_t layerId, double timeMs, std::string* svg) {
+    const SceneScope scope(fScene);
     const Layer* layer = fScene.layer(layerId);
     if (!layer) return false;
     const SkPath path = layer->text ? TextGlyphPath(*layer, layer->localTime(timeMs), fScene.fps) : ShapePath(*layer, layer->localTime(timeMs));
@@ -1239,7 +1244,11 @@ bool EngineImpl::offscreen(int width, int height, bool premultiplied,
     paint(canvas);
     SetLayerBreak(nullptr);
     if (fGpuFailed) return false;
-    rgba->resize((size_t)width * height * 4);
+    const size_t bytes = (size_t)width * height * 4;
+    void* probe = std::malloc(bytes);
+    if (!probe) return false;
+    std::free(probe);
+    rgba->resize(bytes);
     if (fGanesh) return surface->readPixels(out, rgba->data(), (size_t)width * 4, 0, 0);
 
     auto recording = fRecorder->snap();

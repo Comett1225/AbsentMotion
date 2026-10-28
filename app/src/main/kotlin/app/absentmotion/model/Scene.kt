@@ -39,7 +39,8 @@ value class Scene(val node: XmlNode) {
     }
 
     fun withBookmarks(times: List<Int>): Scene {
-        val added = times.distinct().filter { it !in bookmarks }.sorted().map { XmlNode("bookmark", mapOf("t" to "$it")) }
+        val have = bookmarks.toHashSet()
+        val added = times.distinct().filter { it !in have }.sorted().map { XmlNode("bookmark", mapOf("t" to "$it")) }
         if (added.isEmpty()) return this
         val kept = node.children.filter { it.name != "bookmark" }
         val all = (node.children.filter { it.name == "bookmark" } + added).sortedBy { it["t"]?.toIntOrNull() ?: 0 }
@@ -103,6 +104,10 @@ value class Scene(val node: XmlNode) {
     }
 
     fun remove(id: Long): Scene = withChildren(node.children.filterNot { it.name in LAYER_TAGS && Layer(it).id == id })
+
+    fun reorder(id: Long, index: Int): Scene = move(id, index).let { moved ->
+        if (moved.layer(id)?.node?.get("pathLayer") == null) moved else moved.update(id) { it.copy(node = it.node.with("pathLayer", null)) }
+    }
 
     fun move(id: Long, index: Int): Scene {
         val moving = layer(id) ?: return this
@@ -188,11 +193,14 @@ internal fun frameOfMs(timeMs: Long, fps: Int): Long = ((timeMs + 1) * fps + 999
 
 internal fun List<Layer>.isMask(index: Int): Boolean = index > 0 && this[index].node["clippingMask"] == "true"
 
+internal fun XmlNode.followsBelow(text: Boolean): Boolean = this["hidden"] != "true" && (this["id"] in FOLLOWS_BELOW ||
+    (text && this["id"] == "absent.textpath" && effectProperty("shape")?.let { p -> (listOfNotNull(p["value"]) + p.keyframes.map { it.v }).any { it.finiteFloat()?.roundToInt() == 2 } } == true))
+
 internal val Layer.leansOnBelow: Boolean
-    get() = node["clippingMask"] == "true" || effects.any { it["hidden"] != "true" && it["id"] in FOLLOWS_BELOW }
+    get() = node["clippingMask"] == "true" || effects.any { it.followsBelow(kind == "text") }
 
 fun Scene.pinnedPath(layer: Layer): Layer {
-    if (layer.node["pathLayer"] != null || layer.effects.none { it["hidden"] != "true" && it["id"] in FOLLOWS_BELOW }) return layer
+    if (layer.node["pathLayer"] != null || layer.effects.none { it.followsBelow(layer.kind == "text") }) return layer
     val list = layers
     val below = list.getOrNull(list.indexOfFirst { it.id == layer.id } - 1) ?: return layer
     return layer.copy(node = layer.node.with("pathLayer", "${below.id}"))
@@ -278,6 +286,10 @@ data class Layer(val node: XmlNode, val t: Float = 0f, val snap: ClosedFloatingP
     fun withSkew(x: Float, y: Float) = withTransform("skew", Math.toRadians(x.toDouble()).toFloat(), Math.toRadians(y.toDouble()).toFloat())
 
     fun withTilt(x: Float, y: Float) = withTransform("tilt", x, y)
+
+    val scaleLinked: Boolean get() = node["scaleLinked"] != "false"
+
+    fun withScaleLinked(linked: Boolean) = copy(node = node.with("scaleLinked", if (linked) null else "false"))
 
     fun withProp(name: String, type: String, value: String): Layer {
         val ref = PropRef.shape(name)

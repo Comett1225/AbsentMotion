@@ -34,6 +34,8 @@ data class Verification(
     val lastFrame: Boolean?,
     val ms: Long,
     val middleFrame: Boolean? = null,
+    val firstLooks: Boolean? = null,
+    val unchecked: Boolean = false,
 ) {
     val ok: Boolean get() = problems.isEmpty()
 }
@@ -48,6 +50,10 @@ internal fun middleLooksRight(drawn: FrameLooks, decodedFirst: FloatArray, decod
     if (lookDistance(drawn.middle, decodedMiddle) > 0.2f) return false
     return !(lookDistance(decodedFirst, decodedMiddle) < 0.01f && lookDistance(drawn.first, drawn.middle) > 0.06f)
 }
+
+internal fun isUnchecked(expect: Expectation, videoIndex: Int, first: Boolean?): Boolean = expect.video && videoIndex >= 0 && first == null
+
+internal fun firstLooksRight(drawn: FrameLooks, decodedFirst: FloatArray): Boolean = lookDistance(drawn.first, decodedFirst) <= 0.2f
 
 internal fun uprightLook(look: FloatArray, degrees: Int): FloatArray {
     val n = LookCells - 1
@@ -84,21 +90,29 @@ internal fun yLook(plane: java.nio.ByteBuffer, rowStride: Int, pixelStride: Int,
         sum / 16
     }
 
-internal fun judge(tracks: List<ProbedTrack>, expect: Expectation, firstFrame: Boolean?, lastFrame: Boolean?, middleFrame: Boolean? = null): List<UiText> {
+internal fun judge(tracks: List<ProbedTrack>, expect: Expectation, firstFrame: Boolean?, lastFrame: Boolean?, middleFrame: Boolean? = null, firstLooks: Boolean? = null): List<UiText> {
     val problems = ArrayList<UiText>()
     val video = tracks.filter { it.mime.startsWith("video/") }
     val audio = tracks.filter { it.mime.startsWith("audio/") }
     if (tracks.isEmpty()) return listOf(txt(R.string.export_verify_empty))
     if (expect.video && video.isEmpty()) problems += txt(R.string.export_verify_no_video)
     if (expect.audio && audio.isEmpty()) problems += txt(R.string.export_verify_no_audio)
-    val duration = tracks.maxOf { it.durationUs }
     val slack = expect.frameUs + 1_000
-    val over = duration - expect.durationUs
-    if (over < -slack || over > slack + if (audio.isNotEmpty()) AudioOverhangUs else 0) {
-        problems += txt(R.string.export_verify_duration, "%.3f".format(java.util.Locale.ROOT, duration / 1e6), "%.3f".format(java.util.Locale.ROOT, expect.durationUs / 1e6))
+    fun lasts(durationUs: Long) = txt(R.string.export_verify_duration, "%.3f".format(java.util.Locale.ROOT, durationUs / 1e6), "%.3f".format(java.util.Locale.ROOT, expect.durationUs / 1e6))
+    fun check(of: List<ProbedTrack>, below: Long, above: Long) {
+        val duration = of.maxOfOrNull { it.durationUs }?.takeIf { it > 0 } ?: return
+        val over = duration - expect.durationUs
+        if (over < -below || over > above) problems += lasts(duration)
+    }
+    val longest = tracks.maxOf { it.durationUs }
+    if (longest <= 0) problems += lasts(longest)
+    else {
+        if (expect.video) check(video, slack, slack + if (expect.audio) AudioOverhangUs else 0)
+        if (expect.audio) check(audio, if (expect.video) slack + AudioOverhangUs else slack, slack + AudioOverhangUs)
     }
     if (expect.video && video.isNotEmpty()) {
         if (firstFrame == false) problems += txt(R.string.export_verify_first_frame)
+        else if (firstLooks == false) problems += txt(R.string.export_verify_first_look)
         if (middleFrame == false) problems += txt(R.string.export_verify_middle_frame)
         if (lastFrame == false) problems += txt(R.string.export_verify_last_frame)
     }
@@ -116,8 +130,8 @@ suspend fun verifyExport(context: Context, uri: Uri, expect: Expectation): Verif
         }
         val videoIndex = tracks.indexOfFirst { it.mime.startsWith("video/") }
         val frames = if (videoIndex >= 0) decodeFrames(extractor, videoIndex, formats[videoIndex], expect.looks) else Decoded()
-        Verification(judge(tracks, expect, frames.first, frames.last, frames.middle), tracks.maxOfOrNull { it.durationUs } ?: 0, frames.first, frames.last,
-            SystemClock.elapsedRealtime() - start, frames.middle)
+        Verification(judge(tracks, expect, frames.first, frames.last, frames.middle, frames.firstLooks), tracks.maxOfOrNull { it.durationUs } ?: 0, frames.first, frames.last,
+            SystemClock.elapsedRealtime() - start, frames.middle, frames.firstLooks, unchecked = isUnchecked(expect, videoIndex, frames.first))
     } catch (e: Exception) {
         Verification(listOf(txt(R.string.export_verify_unreadable, e.message ?: e.javaClass.simpleName)), 0, null, null, SystemClock.elapsedRealtime() - start)
     } finally {
@@ -127,7 +141,7 @@ suspend fun verifyExport(context: Context, uri: Uri, expect: Expectation): Verif
 
 internal fun decodeBudgetMs(width: Int, height: Int): Long = (800L + width.toLong() * height / 5_000).coerceIn(800L, 5_000L)
 
-private class Decoded(val first: Boolean? = null, val middle: Boolean? = null, val last: Boolean? = null)
+private class Decoded(val first: Boolean? = null, val middle: Boolean? = null, val last: Boolean? = null, val firstLooks: Boolean? = null)
 
 private class Frame(val pts: Long, val look: FloatArray?)
 
@@ -142,6 +156,7 @@ private fun decodeFrames(extractor: MediaExtractor, track: Int, format: MediaFor
         val first = frameAt(codec, extractor, SystemClock.elapsedRealtime() + budget, 0, looks != null)
         var middle: Boolean? = null
         val firstLook = first?.look?.let { uprightLook(it, turned) }
+        val firstLooks = if (looks != null && firstLook != null) firstLooksRight(looks, firstLook) else null
         if (looks != null && firstLook != null) {
             codec.flush()
             extractor.seekTo(looks.middleUs, MediaExtractor.SEEK_TO_PREVIOUS_SYNC)
@@ -157,7 +172,7 @@ private fun decodeFrames(extractor: MediaExtractor, track: Int, format: MediaFor
         codec.flush()
         extractor.seekTo(lastSample, MediaExtractor.SEEK_TO_PREVIOUS_SYNC)
         val last = decode(codec, extractor, SystemClock.elapsedRealtime() + budget)?.let { it >= 0 && lastSample - it <= 1_000 }
-        return Decoded(first?.let { it.pts >= 0 }, middle, last)
+        return Decoded(first?.let { it.pts >= 0 }, middle, last, firstLooks)
     } catch (e: MediaCodec.CodecException) {
         return if (e.errorCode == MediaCodec.CodecException.ERROR_RECLAIMED) Decoded() else Decoded(false, null, false)
     } catch (e: Exception) {
@@ -336,4 +351,4 @@ private fun decodedSize(context: Context, uri: Uri): Size? {
 }
 
 internal fun verificationSummary(v: Verification): String =
-    if (v.ok) "verified in ${v.ms} ms" else v.problems.joinToString(" ") { AppText.get(it) } + " (${v.ms} ms)"
+    if (v.ok) (if (v.unchecked) "written, picture not checked" else "verified") + " in ${v.ms} ms" else v.problems.joinToString(" ") { AppText.get(it) } + " (${v.ms} ms)"

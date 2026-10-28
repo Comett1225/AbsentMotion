@@ -32,12 +32,15 @@ import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
 import java.net.HttpURLConnection
-import java.net.URI
 
-internal data class Release(val version: String, val link: String, val download: String? = null)
+internal data class ApkAsset(val name: String, val url: String, val size: Long, val sha256: String?, val sums: String?)
+
+internal data class Release(val version: String, val link: String, val apk: ApkAsset? = null) {
+    val download: String? get() = apk?.url
+}
 
 internal sealed interface UpdateAnswer {
-    data class Available(val release: Release) : UpdateAnswer
+    data class Available(val release: Release, val external: Boolean = false) : UpdateAnswer
     data object Latest : UpdateAnswer
     data object Failed : UpdateAnswer
 }
@@ -47,6 +50,7 @@ internal object Updates {
         private set
     var answer by mutableStateOf<UpdateAnswer?>(null)
     var installedOverride: String? = null
+    var source: UpdateSource = GitHubSource
     private var checkedAtStart = false
     private var quiet = false
     private val scope = MainScope()
@@ -65,40 +69,34 @@ internal object Updates {
     }
 
     fun check(context: Context, settings: AppSettings, manual: Boolean) {
+        if (manual && Updater.reveal()) return
         if (manual && checking) return
         if (manual) checking = true
         val current = installed(context)
+        val from = source
+        val app = context.applicationContext
         scope.launch {
-            val release = withContext(Dispatchers.IO) {
-                try {
-                    fetchLatest()
+            val (release, inApp) = withContext(Dispatchers.IO) {
+                val release = try {
+                    fetchLatest(from)
                 } catch (e: Exception) {
                     Log.i("AMUpdate", "update check failed: $e")
                     null
                 }
+                release to (release?.apk == null || Updater.inApp(app, from))
             }
             release?.let { settings.rememberNewest(it.version, it.link) }
-            val result = answerFor(release, current)
+            val result = offerFor(answerFor(release, current), inApp)
             if (manual) checking = false
             if (manual || (result is UpdateAnswer.Available && !quiet)) answer = result
         }
     }
 
-    private fun fetchLatest(): Release? {
-        val connection = URI(RELEASES).toURL().openConnection() as HttpURLConnection
-        try {
-            connection.connectTimeout = TIMEOUT_MS
-            connection.readTimeout = TIMEOUT_MS
-            connection.setRequestProperty("Accept", "application/vnd.github+json")
-            connection.setRequestProperty("User-Agent", "AbsentMotion")
-            if (connection.responseCode != HttpURLConnection.HTTP_OK) return null
-            return parseReleases(connection.inputStream.use { it.readAtMost(MAX_BYTES) }.decodeToString())
-        } finally {
-            connection.disconnect()
-        }
+    private fun fetchLatest(from: UpdateSource): Release? = TrustedHttp(from, TIMEOUT_MS, TIMEOUT_MS).get(from.releases, mapOf("Accept" to "application/vnd.github+json")) { connection ->
+        if (connection.responseCode != HttpURLConnection.HTTP_OK) null
+        else parseReleases(connection.inputStream.use { it.readAtMost(MAX_BYTES) }.decodeToString(), source = from)
     }
 
-    private val RELEASES = "https://api.github.com/repos/" + HOME_PAGE.removePrefix("https://github.com/") + "/releases?per_page=30"
     private const val TIMEOUT_MS = 5_000
     private const val MAX_BYTES = 4 shl 20
 }
@@ -108,30 +106,47 @@ internal fun answerFor(release: Release?, current: String): UpdateAnswer {
     return if (newer) UpdateAnswer.Available(release) else UpdateAnswer.Latest
 }
 
-internal fun parseRelease(json: String, flavour: String = app.absentmotion.BuildConfig.FLAVOR): Release? = runCatching { JSONObject(json) }.getOrNull()?.let { releaseOf(it, flavour) }
+internal fun warnMetered(answer: UpdateAnswer.Available, metered: Boolean?) = metered == true && answer.release.apk != null
 
-internal fun parseReleases(json: String, flavour: String = app.absentmotion.BuildConfig.FLAVOR): Release? {
+internal fun offerFor(answer: UpdateAnswer, inApp: Boolean): UpdateAnswer =
+    if (answer is UpdateAnswer.Available && answer.release.apk != null && !inApp) UpdateAnswer.Available(answer.release.copy(apk = null), external = true) else answer
+
+internal fun parseRelease(json: String, flavour: String = app.absentmotion.BuildConfig.FLAVOR, source: UpdateSource = GitHubSource): Release? =
+    runCatching { JSONObject(json) }.getOrNull()?.let { releaseOf(it, flavour, source) }
+
+internal fun parseReleases(json: String, flavour: String = app.absentmotion.BuildConfig.FLAVOR, source: UpdateSource = GitHubSource): Release? {
     val list = runCatching { JSONArray(json) }.getOrNull() ?: return null
     return (0 until list.length()).mapNotNull { list.optJSONObject(it) }
         .filterNot { it.optBoolean("draft") || it.optBoolean("prerelease") }
-        .mapNotNull { releaseOf(it, flavour) }
+        .mapNotNull { releaseOf(it, flavour, source) }
         .maxWithOrNull(compareBy<Release> { Version.parse(it.version) })
 }
 
-private fun releaseOf(release: JSONObject, flavour: String): Release? {
+private fun releaseOf(release: JSONObject, flavour: String, source: UpdateSource): Release? {
     val tag = release.optString("tag_name").trim()
     if (Version.parse(tag) == null) return null
     val page = release.optString("html_url").takeIf { it.startsWith("$HOME_PAGE/", ignoreCase = true) } ?: "$HOME_PAGE/releases/latest"
     val version = tag.removePrefix("v").removePrefix("V")
-    return Release(version, page, apkOf(release, tag, version, flavour))
+    return Release(version, page, apkOf(release, tag, version, flavour, source))
 }
 
-private fun apkOf(release: JSONObject, tag: String, version: String, flavour: String): String? {
-    val name = "AbsentMotion-$version-${if (flavour == "compat") "compatible" else flavour}.apk"
+private val SAFE_VERSION = Regex("^[0-9]+(\\.[0-9]+)*(-[0-9A-Za-z.]+)?$")
+
+internal fun apkName(version: String, flavour: String) = "AbsentMotion-$version-${if (flavour == "compat") "compatible" else flavour}.apk"
+
+private fun apkOf(release: JSONObject, tag: String, version: String, flavour: String, source: UpdateSource): ApkAsset? {
+    if (flavour !in setOf("foss", "play", "compat") || !SAFE_VERSION.matches(version) || tag.trim() !in setOf("v$version", "V$version")) return null
+    val name = apkName(version, flavour)
     val assets = release.optJSONArray("assets") ?: return null
-    return (0 until assets.length()).mapNotNull { assets.optJSONObject(it) }.firstOrNull { it.optString("name") == name }
-        ?.optString("browser_download_url")?.takeIf { it.equals("$HOME_PAGE/releases/download/$tag/$name", ignoreCase = true) }
+    val list = (0 until assets.length()).mapNotNull { assets.optJSONObject(it) }
+    fun linkOf(file: String) = list.firstOrNull { it.optString("name") == file }?.takeIf { it.optString("browser_download_url").equals(source.asset(tag.trim(), file), ignoreCase = true) }
+    val asset = linkOf(name) ?: return null
+    val size = asset.optLong("size", -1L).takeIf { it in 1..MAX_APK_BYTES } ?: return null
+    val sums = linkOf(SUMS)?.let { source.asset(tag.trim(), SUMS) }
+    return ApkAsset(name, source.asset(tag.trim(), name), size, parseDigest(asset.optString("digest")), sums)
 }
+
+private const val SUMS = "SHA256SUMS.txt"
 
 internal fun isNewer(latest: String, current: String): Boolean? {
     val a = Version.parse(latest) ?: return null
@@ -206,38 +221,6 @@ internal fun UpdateAskDialog(settings: AppSettings) {
         },
         dismissButton = { TextButton({ settings.chooseUpdates(false) }) { Text(stringResource(R.string.update_not_now), color = Am.Navy) } },
         confirmButton = { TextButton({ settings.chooseUpdates(true) }) { Text(stringResource(R.string.update_turn_on), color = Am.Navy) } },
-        containerColor = Am.Card,
-    )
-}
-
-@Composable
-internal fun UpdateDialog() {
-    val shown = Updates.answer ?: return
-    val links = LocalUriHandler.current
-    val context = LocalContext.current
-    val close = { Updates.answer = null }
-    fun open(link: String) = runCatching { links.openUri(link) }.onFailure {
-        android.widget.Toast.makeText(context, context.getString(R.string.update_open_failed), android.widget.Toast.LENGTH_LONG).show()
-    }
-    val available = shown as? UpdateAnswer.Available
-    AlertDialog(
-        onDismissRequest = close,
-        title = if (available == null) null else {
-            { Text(stringResource(R.string.update_available, available.release.version), color = Am.Navy) }
-        },
-        text = if (available != null) null else {
-            { Text(stringResource(if (shown == UpdateAnswer.Latest) R.string.update_latest else R.string.update_failed), color = Am.Navy) }
-        },
-        dismissButton = if (available == null) null else {
-            { TextButton(close) { Text(stringResource(R.string.update_later), color = Am.Navy) } }
-        },
-        confirmButton = {
-            if (available == null) TextButton(close) { Text(stringResource(R.string.ok), color = Am.Navy) }
-            else androidx.compose.foundation.layout.Row {
-                TextButton({ open(available.release.link) }) { Text(stringResource(R.string.update_changelog), color = Am.Navy) }
-                TextButton({ close(); open(available.release.download ?: available.release.link) }) { Text(stringResource(R.string.update_download), color = Am.Navy) }
-            }
-        },
         containerColor = Am.Card,
     )
 }

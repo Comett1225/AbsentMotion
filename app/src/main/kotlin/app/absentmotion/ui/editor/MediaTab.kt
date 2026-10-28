@@ -17,7 +17,6 @@ import app.absentmotion.model.Layer
 import app.absentmotion.platform.readAtMost
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -170,23 +169,6 @@ internal fun MediaTab(state: EditorState, modifier: Modifier, library: AddLibrar
         if (blocked) context.startActivity(android.content.Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", context.packageName, null)))
         else permission.launch(request)
     }
-    val picker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
-        if (uri != null) {
-            runCatching { context.contentResolver.takePersistableUriPermission(uri, android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION) }
-            scope.launch {
-                state.addingMedia = true
-                try { state.addPicked(context, uri) } finally { state.addingMedia = false }
-            }
-        }
-    }
-    val files = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
-        if (uris.isEmpty()) return@rememberLauncherForActivityResult
-        uris.forEach { runCatching { context.contentResolver.takePersistableUriPermission(it, android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION) } }
-        scope.launch {
-            state.addingMedia = true
-            try { uris.forEach { state.addPicked(context, it) } } finally { state.addingMedia = false }
-        }
-    }
     LaunchedEffect(Unit) {
         if (!prefs.getBoolean("asked", false) && !full && !some) {
             prefs.edit().putBoolean("asked", true).apply()
@@ -202,7 +184,7 @@ internal fun MediaTab(state: EditorState, modifier: Modifier, library: AddLibrar
                 Column(Modifier.width(97.dp).padding(6.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
                     val press = remember { MutableInteractionSource() }
                     Box(Modifier.fillMaxWidth().weight(1f).pressScale(press, TilePress).background(Am.Well).semantics { contentDescription = viewAll }.clickable(press, LocalIndication.current) {
-                        picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo))
+                        MediaPicks.openVisual()
                     }, Alignment.Center) { MediaGridIcon(Modifier.size(24.dp)) }
                     Box(Modifier.fillMaxWidth().weight(1f).background(Am.Well).clickable { albumsOpen = true }, Alignment.Center) {
                         Text(media.firstOrNull { it.albumId == album }?.album ?: allLabel, color = Am.OnDark, fontSize = 16.sp, maxLines = 1)
@@ -231,7 +213,7 @@ internal fun MediaTab(state: EditorState, modifier: Modifier, library: AddLibrar
             }
             item(key = "files") {
                 Column(Modifier.width(97.dp).padding(6.dp)) {
-                    MediaSquare(TextIcons.Import, stringResource(R.string.sounds_from_files), false) { files.launch(arrayOf("image/*", "video/*", "audio/*")) }
+                    MediaSquare(TextIcons.Import, stringResource(R.string.sounds_from_files), false) { MediaPicks.openFiles() }
                 }
             }
             if (!full) item(key = "access", span = { GridItemSpan(maxLineSpan) }) {

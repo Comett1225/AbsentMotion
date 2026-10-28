@@ -23,7 +23,7 @@ class RepeatEffectsTest {
         assertEquals(listOf("Repeat", "Linear Repeat", "Radial Repeat", "Grid Repeat", "Repeat Along Path", "Scatter Field"), repeats.map { effect(it).name })
         for (key in repeats) {
             assertTrue(key, effect(key).native && effect(key).sksl == null && effect(key).since == "3.0.0")
-            assertTrue(key, catalog.isNew(effect(key)))
+            assertFalse(key, catalog.isNew(effect(key)))
         }
     }
 

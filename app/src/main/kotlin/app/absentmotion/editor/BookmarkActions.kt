@@ -18,6 +18,13 @@ import kotlin.math.roundToInt
 
 fun EditorState.toggleBookmark() = edit { it.withBookmarkToggled(frame) }
 
+internal fun hasBookmarkNear(sorted: List<Int>, time: Int, tolerance: Double): Boolean {
+    val at = sorted.binarySearch(time)
+    if (at >= 0) return true
+    val next = -at - 1
+    return next < sorted.size && abs(sorted[next] - time) <= tolerance || next > 0 && abs(sorted[next - 1] - time) <= tolerance
+}
+
 suspend fun EditorState.markBeats(context: Context): Int {
     val layer = selectedId?.let(scene::layer)?.takeIf { it.soundUri != null } ?: error(AppText.get(R.string.edit_beats_select_layer))
     val fps = scene.fps
@@ -37,7 +44,7 @@ suspend fun EditorState.markBeats(context: Context): Int {
     var added = 0
     edit { s ->
         val existing = s.bookmarks
-        val times = frames.map(s::frameStart).filter { t -> existing.none { abs(it - t) <= 1000.0 / fps } }
+        val times = frames.map(s::frameStart).filter { t -> !hasBookmarkNear(existing, t, 1000.0 / fps) }
         added = times.size
         s.withBookmarks(times)
     }

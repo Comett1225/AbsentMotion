@@ -40,13 +40,12 @@ The top bar changes color and shows:
 
 - **Cancel selection** (X) and the number of selected layers.
 - **Group** puts the layers into one group layer that lasts as long as its members. **Group & Mask** and **Group & Exclude** do the same and set the top layer's blend mode to Mask or Exclude.
-- **Effects** has **Paste All Effects**: it pastes the effects you copied in a layer's Effects panel onto every selected visual clip. Sound, camera and null layers are skipped, and a message tells you how many.
 - **Delete selected layers**.
 - **Alignment options** (an arrow) opens **Align left**, **Align center**, **Align right**, **Align top**, **Align middle**, **Align bottom**, **Distribute vertically** and **Distribute horizontally** (three or more layers). One layer aligns to the canvas; several align to the box around the selection.
 
 A second bar at the bottom of the screen works on timing:
 
-- **Extend clip starts to playhead** or **Extend clip ends to playhead**
+- **Effects** has **Paste All Effects**: it pastes the effects you copied in a layer's Effects panel onto every selected visual clip. Sound, camera and null layers are skipped, and a message tells you how many.
 - **Move clip starts to playhead** or **Move clip ends to playhead**
 - **Add a transition between the two clips** (exactly two visual clips that overlap or touch). See [Transitions and animations](@animations).
 - **Align clip starts**, **Align clip ends** and **Distribute clip starts** (three or more).

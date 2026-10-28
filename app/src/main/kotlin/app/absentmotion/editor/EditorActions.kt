@@ -137,14 +137,18 @@ fun EditorState.skipForward() {
     frame = stops().firstOrNull { it > frame } ?: frame
 }
 
-fun EditorState.resetTransform(tabs: List<Int>) = editSelected { layer ->
-    tabs.fold(layer) { l, tab ->
-        when (tab) {
-            0 -> scene.centred(l, sampleMs)
-            1 -> if (l.kind == "camera") l.withCameraFov(60f) else l.withTransform("scale", 1f, 1f)
-            2 -> l.withRotation(0f)
-            3 -> l.withTilt(0f, 0f)
-            else -> l.withSkew(0f, 0f)
+fun EditorState.resetTransform(tabs: List<Int>) {
+    if (tabs == listOf(5)) return resetPivot()
+    editSelected { layer ->
+        tabs.sortedDescending().fold(layer) { l, tab ->
+            when (tab) {
+                0 -> scene.centred(l, sampleMs)
+                1 -> l.withRotation(0f)
+                2 -> if (l.kind == "camera") l.withCameraFov(60f) else l.withTransform("scale", 1f, 1f)
+                3 -> l.withTilt(0f, 0f)
+                4 -> l.withSkew(0f, 0f)
+                else -> if (l.kind == "camera" || l.node.child("transform")?.child("pivot") == null) l else l.withTransform("pivot", 0f, 0f, 0f)
+            }
         }
     }
 }

@@ -46,10 +46,17 @@ internal object AiNative {
     external fun nativeOpen(param: String, bin: String, blendBin: String?, weight: Float, useGpu: Boolean): Long
     external fun nativeOnGpu(handle: Long): Boolean
     external fun nativeCancel(handle: Long)
+    external fun nativeClearCancel(handle: Long)
     external fun nativeClose(handle: Long)
     external fun nativeUpscale(handle: Long, input: IntArray, width: Int, height: Int, netScale: Int, outScale: Int, tile: Int, overlap: Int, output: IntArray): Int
     external fun nativeCutout(handle: Long, bitmap: Bitmap, size: Int): Int
     external fun nativeInterpolate(handle: Long, first: IntArray, second: IntArray, width: Int, height: Int, t: Float, padding: Int, maxPixels: Int, output: IntArray): Int
+}
+
+internal suspend fun <T> runCancellable(clear: () -> Unit, cancel: () -> Unit, work: () -> T): T = coroutineScope {
+    clear()
+    val stop = launch(start = CoroutineStart.UNDISPATCHED) { try { awaitCancellation() } finally { cancel() } }
+    try { work() } finally { withContext(NonCancellable) { stop.cancelAndJoin() } }
 }
 
 internal class AiNet private constructor(private val handle: Long, private val gpuApp: Context?) : Closeable {
@@ -77,10 +84,7 @@ internal class AiNet private constructor(private val handle: Long, private val g
 
     private suspend fun <T> blocking(work: () -> T): T = withContext(Dispatchers.Default) {
         gpuApp?.let(AiDevice::gpuAlive)
-        coroutineScope {
-            val stop = launch(start = CoroutineStart.UNDISPATCHED) { try { awaitCancellation() } finally { AiNative.nativeCancel(handle) } }
-            try { work() } finally { withContext(NonCancellable) { stop.cancelAndJoin() } }
-        }.also { ensureActive() }
+        runCancellable({ AiNative.nativeClearCancel(handle) }, { AiNative.nativeCancel(handle) }, work).also { ensureActive() }
     }
 
     override fun close() {

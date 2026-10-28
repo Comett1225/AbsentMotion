@@ -6,6 +6,64 @@ All notable changes to AbsentMotion are listed here, newest first. The format fo
 Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stands for the feature set as it stood on
 2026-10-12.
 
+## [4.2.0] - 2026-10-28 - Stability & Bugs
+
+### Added
+
+- GitHub: a bug report form that asks for the version, build, device and steps.
+- GitHub: a feature and effect request form, so requests arrive in a clear shape.
+- GitHub: an issue chooser that points to private security reporting and the guide, with blank issues turned off.
+- Text Along Path, in the Text effects, sets text along an arc, a circle or the outline of the layer just beneath it (draw any path with the pen and put the text above it). Position, alignment, baseline shift, letter rotation and direction are settings that can be animated, and the arc and circle have handles on the canvas. Each letter keeps its shaping, font and colour emoji; right-to-left text keeps its order.
+- Puppet Pin, in the Distort effects, bends a layer with pins. Turn on Add Pins and tap the layer, then drag a pin on the canvas or type its position; pins you do not move hold the layer in place. Each pin can be animated with keyframes, put back or deleted, up to 32 pins, with a Falloff setting: higher values keep the bend close to the pins you move, lower values spread it smoothly over the layer.
+- Photos and videos have a Crop button: drag the corners, the edges or the whole frame on the canvas, pick Free, 1:1, 4:5, 3:4, 16:9 or 9:16, or type each side. The crop is a new Crop effect (Key), so it can be animated, rounded and feathered, works on any layer and leaves the layer where it is.
+- Transform has a Pivot tab: X and Y boxes, a grid for the corners, edges and centre of the layer, a trackpad, and a marker on the canvas that can be dragged. Moving the pivot keeps the layer where it is, its child layers stay put, and the pivot can be animated. Reset Pivot is in More, and Reset Transform also resets the pivot.
+- Updates download inside the app. When a newer version is found, the update dialog shows its version and download size, and Download update fetches the matching Latest, Play services or Compatible app file from the GitHub release with a progress bar, Cancel and Try again, instead of opening a browser.
+- Before installing, the app checks the download against the SHA-256 published with the release and checks that it is the same app, the same version type, newer than the installed one and signed with the same key. Anything else is deleted and not installed.
+- Android always asks you to confirm the update. If installing updates from AbsentMotion is not allowed yet, the app explains why and opens the Allow from this source setting as soon as you choose Download update, before anything is downloaded; the download starts when you come back with it turned on, and the setting is checked again before the install. Devices that already allow it are not asked. Your projects and settings stay as they are.
+- An update download that loses its connection tries again by itself and continues where it stopped.
+- If AbsentMotion is closed during an update download, the next start offers to continue it.
+- The update dialog says when the connection is metered, for example mobile data.
+- `tools/device_matrix.py` runs the emulator checks on a chosen emulator, or boots a matrix of Android versions, including one with 16 KB memory pages.
+
+### Changed
+
+- The small dots around a selected picture or video have a bigger grab area, so they are easier to catch. On small layers the area stays smaller so the layer can still be moved.
+- The Rotate tab always shows the 360 degree dial for turning a layer in 2D, also on tilted layers; 3D turning stays on the Tilt tab.
+- The New category in Effects only lists effects from the last five updates, so older effects no longer carry the NEW tag.
+- The Curl effect thumbnail rolls up and back down instead of jumping back to the start.
+- The Transform tabs are now Move, Rotate, Size, Tilt, Skew and Pivot: Rotate comes before Size. Each tab shows its name under the icon.
+- The corner and side handles on the canvas scale a layer around its pivot, so the pivot stays still.
+- The Size ruler keeps gliding after a flick, like the Tilt and Skew rulers.
+- Whether width and height are linked is remembered for each layer, saved with the project and undone with Undo. With the link off, width and height keep their own values, also in keyframes.
+- Cut-outs now drop faint haze and stray specks away from the subject, so less of the old background shows as a ghost.
+- Updates check free space before downloading and before installing, and first remove leftover files of other or abandoned updates.
+- Copies installed from Google Play, or signed with another key, say where their updates come from instead of downloading one in the app.
+- Release checks refuse APKs that are not signed with the release key, and the full check also checks that the native libraries are aligned for 16 KB memory pages.
+
+### Fixed
+
+- Selection dots on a full-width picture can be grabbed at the screen edge; Android's back gesture no longer takes the touch.
+- A photo, video or sound picked in the file picker is no longer lost if Android closes the app while the picker is open.
+- Restoring a backup keeps a changed template or preset as a separate copy instead of skipping it silently, and no longer swaps in a different font of the same name.
+- A backup now fails, instead of saying "saved", when a file disappeared while it was being written.
+- Importing a scene keeps Move Along Path and other layer links when layer numbers have to change.
+- The export check compares the video and the sound separately, so a short track can no longer hide behind a long one, and it also compares the first frame.
+- When the phone cannot play an export back to check it, the done screen now says so.
+- Saving an animated layer to My Elements no longer crops it, for example a long bar that rotates.
+- Adding many beat markers no longer freezes the editor for a moment.
+- Cut-outs: a memory read past the end, a result made from a grey placeholder after a low-memory moment, and a cancel that was ignored are fixed.
+- Exporting a still or GIF on a low-memory phone can no longer close the app.
+- Cancelling and restarting an update download no longer deletes the new download.
+- The speed panel's four retime buttons and the point editor's controls have names for screen readers, and the point handles are easier to hit.
+- Camera: closing or going back offers to discard a recording instead of saving it.
+- Starting an export, or going back while an AI job runs, can no longer leave the app stuck; a stalled export is stopped with a clear notice.
+- Retained media with a name ending in .part or .tmp is no longer deleted when the app starts.
+- A cancelled layer reorder no longer commits, and the preview no longer restarts on every rendered frame.
+- The first keyframe is no longer a dead zone when trimming.
+- Importing: texture names with spaces in OBJ models are kept, project numbers are reserved safely, glTF triangle strips and fans are read, and root SVG opacity is applied.
+- Damaged or oversized project files and unreadable indexes no longer block cleanup or use up memory.
+- Large font sizes no longer cut off the new-project rows.
+
 ## [4.1.2] - 2026-10-27
 
 ### Changed

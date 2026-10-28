@@ -65,6 +65,7 @@ class MediaLibrary(context: Context, private val engine: EngineThread) {
                 withContext(Dispatchers.IO) { decodePicture(resolver, Uri.parse(uri), limit) }
                     .also { Log.i("AMMedia", "picture $uri ${it?.width}x${it?.height} limit $limit") }
             },
+            forget = { uri -> engine.setPicture(uri, null) },
         ) { uri, bitmap -> try { engine.setPicture(uri, bitmap) } finally { bitmap.recycle() } }
         for (uri in scene.node.imageUris()) engine.publishSource(uri, pictureIdentity(loaded[uri]?.second, loaded[uri]?.third?.first, engine.instance))
         for (uri in scene.node.modelUris()) {
@@ -81,11 +82,15 @@ class MediaLibrary(context: Context, private val engine: EngineThread) {
 
     internal companion object {
         suspend fun <K, P : Any> loadPictures(uris: Iterable<String>, loaded: MutableMap<String, K>, key: suspend (String) -> K,
-                                              decode: suspend (String) -> P?, install: suspend (String, P) -> Boolean) {
+                                              decode: suspend (String) -> P?, forget: suspend (String) -> Unit = {}, install: suspend (String, P) -> Boolean) {
             for (uri in uris) {
                 val version = key(uri)
                 if (loaded[uri] == version) continue
-                val picture = decode(uri) ?: continue
+                val picture = decode(uri)
+                if (picture == null) {
+                    if (loaded.remove(uri) != null) forget(uri)
+                    continue
+                }
                 withContext(NonCancellable) { if (install(uri, picture)) loaded[uri] = version }
             }
         }

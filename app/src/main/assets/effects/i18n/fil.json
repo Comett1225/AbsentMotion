@@ -698,6 +698,30 @@
     "count-up": "Bilang pataas"
    }
   },
+  "crop": {
+   "description": "Pinuputol ang mga gilid ng layer: sinasabi ng Kaliwa, Itaas, Kanan at Ibaba kung gaano kalaki ng sariling lapad o taas ng layer ang aalisin sa bawat panig, binibilog ng Pagkabilog ang mga sulok at pinalalambot ng Feather ang mga gilid. Nananatili ang layer kung nasaan ito.",
+   "name": "Crop",
+   "params": {
+    "bottom": {
+     "label": "Ibaba"
+    },
+    "feather": {
+     "label": "Feather"
+    },
+    "left": {
+     "label": "Kaliwa"
+    },
+    "radius": {
+     "label": "Pagkabilog"
+    },
+    "right": {
+     "label": "Kanan"
+    },
+    "top": {
+     "label": "Itaas"
+    }
+   }
+  },
   "cross": {
    "description": "Inilalagay ang layer sa tatlong bar na nagsasalubong sa gitna.",
    "name": "Krus na Tatlong Axis",
@@ -2938,6 +2962,15 @@
     }
    }
   },
+  "puppet": {
+   "description": "Binabaluktot ang layer na parang puppet: maglagay ng mga pin dito, tapos i-drag o i-animate ang mga pin at susundan sila ng larawan nang maayos.",
+   "name": "Puppet Pin",
+   "params": {
+    "falloff": {
+     "label": "Falloff"
+    }
+   }
+  },
   "pyramid": {
    "description": "Inilalagay ang layer sa mga gilid ng isang square pyramid.",
    "name": "Pyramid",
@@ -4262,6 +4295,58 @@
     },
     "strength": {
      "label": "Lakas"
+    }
+   }
+  },
+  "textpath": {
+   "description": "Inilalagay ang teksto sa kahabaan ng arko, bilog, o outline ng layer na nasa ilalim mismo nito, titik por titik, habang napapanatili ang hugis ng mga titik, font, at emoji ng teksto.",
+   "name": "Teksto sa Path",
+   "params": {
+    "align": {
+     "label": "Ihanay",
+     "options": [
+      "Kaliwa",
+      "Gitna",
+      "Kanan"
+     ]
+    },
+    "baseline": {
+     "label": "Usog ng Baseline"
+    },
+    "center": {
+     "label": "Gitna"
+    },
+    "control1": {
+     "label": "Kontrol 1"
+    },
+    "control2": {
+     "label": "Kontrol 2"
+    },
+    "end": {
+     "label": "Dulo"
+    },
+    "position": {
+     "label": "Posisyon"
+    },
+    "radius": {
+     "label": "Radius"
+    },
+    "reverse": {
+     "label": "Baligtarin ang Path"
+    },
+    "rotate": {
+     "label": "I-rotate ang mga Titik"
+    },
+    "shape": {
+     "label": "Path",
+     "options": [
+      "Arko",
+      "Bilog",
+      "Layer sa Ilalim"
+     ]
+    },
+    "start": {
+     "label": "Simula"
     }
    }
   },
