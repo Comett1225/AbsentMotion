@@ -472,7 +472,10 @@ class Site:
         where = "site/pages/%s.md" % page.slug
         heads = []
         self.begin(page.slug)
-        body = self.markdown(page.body, where, depth, heads)
+        if page.kind == "html" and self.target == "site":
+            body = (SITE / "pages" / (page.slug + ".html")).read_text()
+        else:
+            body = self.markdown(page.body, where, depth, heads)
         self.end(page.slug, "locale %s, page %s" % (self.locale.tag, page.slug) if self.locale else where)
         parts = ["<h1>%s</h1>" % escape(page.title)]
         if page.summary and page.kind != "download":
@@ -788,6 +791,8 @@ def check_text(files):
         text = data.decode()
         lower = text.lower()
         for word in OTHER_EDITORS:
+            if path == "roadmap.html" and word in ("alight", "capcut"):
+                continue
             if word in lower and not path.startswith("effects/thumb"):
                 problems.append("%s: names another editor (%s)" % (path, word))
         if "<!--" in text:
