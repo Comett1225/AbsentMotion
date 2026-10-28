@@ -47,7 +47,7 @@ Any value (position, size, rotation, 3D tilt, skew, opacity, colour, shape and e
 </details>
 
 <details>
-<summary><strong>181 effects</strong></summary>
+<summary><strong>184 effects</strong></summary>
 
 Colour, blur, distort, stylize, noise, keying, Move (Auto-Shake, Oscillate, Swing, Spin, Random Displacement, Random Jitter, Pulse, Echo, Offset, Move Along Path, true motion blur), Repeat (linear, radial, grid, along a path, scatter), 3D objects (cube, sphere, torus, prisms, raster extrude and more), Text (typewriter reveal, per-letter transforms, scramble, count up, timecode), VHS, Datamosh, Glass, Displacement Map and many more, with animated previews and a "New" category.
 
