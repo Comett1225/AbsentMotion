@@ -297,7 +297,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
             if (event == Lifecycle.Event.ON_STOP) ExportRun.visible = false
         }
         lifecycle.addObserver(observer)
-        onDispose { lifecycle.removeObserver(observer); ExportRun.visible = true }
+        onDispose { lifecycle.removeObserver(observer); if (!ExportRun.running) ExportRun.visible = true }
     }
     var confirmStop by remember { mutableStateOf(false) }
     LaunchedEffect(phase) { free = freeSpace(); confirmStop = false }

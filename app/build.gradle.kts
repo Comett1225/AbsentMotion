@@ -51,7 +51,7 @@ android {
             signingConfig = signingConfigs.findByName("release")
             vcsInfo.include = false
             isMinifyEnabled = true
-            proguardFiles(file("proguard-rules.pro"))
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), file("proguard-rules.pro"))
         }
     }
 

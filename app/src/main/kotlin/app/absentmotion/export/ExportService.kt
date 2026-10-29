@@ -25,12 +25,14 @@ object ExportRun {
     @Volatile internal var running = false
     @Volatile internal var outcome: Boolean? = null
     @Volatile private var stop: (() -> Unit)? = null
+    @Volatile private var stopped = false
 
     fun begin(context: Context, @StringRes title: Int, stop: () -> Unit) {
         this.title = title
         this.stop = stop
         progress = 0f
         outcome = null
+        stopped = false
         running = true
         try {
             ContextCompat.startForegroundService(context, Intent(context, ExportService::class.java))
@@ -40,12 +42,13 @@ object ExportRun {
     }
 
     fun end(done: Boolean?) {
-        outcome = done
+        outcome = done ?: if (stopped || visible) null else false
         stop = null
         running = false
     }
 
     internal fun cancel() {
+        stopped = true
         stop?.invoke()
     }
 }

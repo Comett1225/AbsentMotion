@@ -6,6 +6,14 @@ All notable changes to AbsentMotion are listed here, newest first. The format fo
 Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stands for the feature set as it stood on
 2026-10-12.
 
+## [4.2.1] - 2026-10-29
+
+### Fixed
+
+- The app no longer crashes on the home screen when you come back to it after Android closed it in the background.
+- Typing both Left and Right (or Top and Bottom) in the Crop keypad keeps both values; the first one was limited by the old value of the other side.
+- An export stopped because the app was swiped away from recent apps now says "The export did not finish" instead of disappearing without a word.
+
 ## [4.2.0] - 2026-10-28 - Stability & Bugs
 
 ### Added

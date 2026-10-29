@@ -18,6 +18,9 @@ data class CropBox(val left: Float = 0f, val top: Float = 0f, val right: Float =
         return when (i) { 0 -> copy(left = v); 1 -> copy(top = v); 2 -> copy(right = v); else -> copy(bottom = v) }
     }
 
+    fun typed(sides: Map<Int, Float>): CropBox =
+        (1..2).fold(this) { box, _ -> sides.entries.fold(box) { b, (i, v) -> b.withSide(i, v) } }
+
     fun moved(du: Float, dv: Float): CropBox {
         val dx = du.coerceIn(-left, right)
         val dy = dv.coerceIn(-top, bottom)

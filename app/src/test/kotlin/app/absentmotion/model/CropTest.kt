@@ -23,6 +23,14 @@ class CropTest {
         assertBox(CropBox(0f, 0f, 0f, 0.15f), CropBox().dragged(6, 0f, -0.15f))
     }
 
+    @Test fun typingBothOppositeSidesKeepsBothValues() {
+        assertBox(CropBox(0.6f, 0f, 0.1f, 0f), CropBox(0f, 0f, 0.5f, 0f).typed(mapOf(0 to 0.6f, 2 to 0.1f)))
+        assertBox(CropBox(0f, 0.7f, 0f, 0.2f), CropBox(0f, 0f, 0f, 0.6f).typed(mapOf(1 to 0.7f, 3 to 0.2f)))
+        assertBox(CropBox(0.3f, 0f, 0.2f, 0f), CropBox(0.1f, 0f, 0.2f, 0f).typed(mapOf(0 to 0.3f)))
+        val impossible = CropBox(0f, 0f, 0.5f, 0f).typed(mapOf(0 to 0.7f, 2 to 0.6f))
+        assertTrue(impossible.width >= CropBox.MIN - 1e-6f)
+    }
+
     @Test fun edgesNeverCrossSoTheCropIsNeverEmpty() {
         val box = CropBox().dragged(0, 2f, 2f)
         assertTrue(box.width >= CropBox.MIN - 1e-6f && box.height >= CropBox.MIN - 1e-6f)

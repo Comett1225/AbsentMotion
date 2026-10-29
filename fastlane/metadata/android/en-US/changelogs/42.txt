@@ -1,0 +1,1 @@
+Fixes a crash on the home screen when returning to the app after Android closed it in the background. Typing both opposite sides in the Crop keypad now keeps both values, and an export stopped by swiping the app away now says that it did not finish.

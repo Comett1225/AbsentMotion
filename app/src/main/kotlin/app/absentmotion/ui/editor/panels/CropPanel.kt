@@ -93,7 +93,7 @@ internal fun CropPanel(state: EditorState, modifier: Modifier) {
     fun keypad(active: Int) {
         val shown = List(4) { kotlin.math.round(box.side(it) * 1000f) / 10f }
         state.keypad = KeypadRequest(CropSides.mapIndexed { i, side -> KeypadField(labels[side] ?: side, shown[i], "%", 0f, 100f) }, active) { next ->
-            state.setCrop(next.foldIndexed(box) { i, b, v -> if (v == shown[i]) b else b.withSide(i, v / 100f) })
+            state.setCrop(box.typed(next.withIndex().filter { (i, v) -> v != shown[i] }.associate { (i, v) -> i to v / 100f }))
         }
     }
     Row(modifier.background(Am.Panel)) {
