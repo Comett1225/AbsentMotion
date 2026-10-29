@@ -2,7 +2,7 @@
 title: Creating a project
 group: Interface
 order: 2
-summary: Every setting of the new project sheet, and starting from the camera.
+summary: Every setting of the new project sheet.
 ---
 Tap the round **+** at the bottom of the home screen. A sheet slides up from the bottom. It opens with the values you used last time (shape, resolution, frame rate and background; the name is always new). Tap Back to close it without making anything.
 
@@ -47,17 +47,6 @@ The color behind your layers: **Black**, **White**, **Light Gray**, **Green**, *
 ## Buttons at the bottom
 
 - **CREATE PROJECT** (**CREATE ASSET** for an asset) makes the project and opens the editor on it.
-- **FROM CAMERA** opens the camera: see below.
-- The X below them closes the sheet.
+- The X below it closes the sheet.
 
 If there is not enough storage the app says so and does not create the project.
-
-## Starting from the camera
-
-**FROM CAMERA** opens the in-app camera with the shape you chose. You can take a photo or record a video, and the project is made around it: the capture becomes the first layer, and the canvas takes the size of the capture (shrunk if needed so its short side does not exceed the resolution you chose).
-
-- The top row has **Flash** (a torch for video), **Timer** (off, 3 s, 10 s) and **Grid**.
-- **PHOTO** and **VIDEO** switch the mode. Tap the big button to take a photo or start and stop recording. While recording you can pause and resume.
-- Tap the picture to focus, pinch to zoom, and use **Switch camera** to change between front and back cameras.
-- The first time, the app asks for camera access, and for the microphone if you want sound. Without the microphone, recording still works but has no sound.
-- Photos and videos are saved to your gallery in DCIM/AbsentMotion, and a copy is kept in the project.

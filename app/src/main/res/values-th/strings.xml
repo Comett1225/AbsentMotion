@@ -100,7 +100,6 @@
     <string name="import_complete">นำเข้าเสร็จสิ้น</string>
     <string name="choose_file">เลือกไฟล์</string>
     <string name="import_a_project_file">นำเข้าไฟล์โปรเจกต์</string>
-    <string name="from_camera">จากกล้อง</string>
     <string name="version_history">ประวัติเวอร์ชัน</string>
     <string name="the_project_file_is_missing_or">ไฟล์โปรเจกต์หายไปหรือเสียหาย จึงไม่มีการเปลี่ยนแปลงใด ๆ</string>
     <string name="could_not_open_this_project">เปิดโปรเจกต์นี้ไม่ได้</string>
@@ -457,7 +456,6 @@
     <string name="newproject_bg_transparent">โปร่งใส</string>
     <string name="newproject_default_project">โปรเจกต์ใหม่ %1$s</string>
     <string name="newproject_default_asset">แอสเซทใหม่</string>
-    <string name="newproject_camera_failed">ไม่สามารถสร้างโปรเจกต์จากกล้องได้</string>
     <string name="newproject_frame_rate">เฟรมเรต</string>
     <string name="newproject_background">พื้นหลัง</string>
     <string name="newproject_create_asset">สร้างแอสเซท</string>
@@ -799,6 +797,8 @@
     <string name="menu_reset_scale">รีเซ็ตขนาด</string>
     <string name="menu_reset_skew">รีเซ็ตความเอียง</string>
     <string name="menu_reset_transform">รีเซ็ตการแปลง</string>
+    <string name="transform_basic_controls">การควบคุมพื้นฐาน</string>
+    <string name="transform_advanced_controls">การควบคุมขั้นสูง</string>
     <string name="menu_select_all_layers">เลือกเลเยอร์ทั้งหมด</string>
     <plurals name="menu_duplicate_layers">
         <item quantity="other">ทำสำเนา %1$s เลเยอร์</item>

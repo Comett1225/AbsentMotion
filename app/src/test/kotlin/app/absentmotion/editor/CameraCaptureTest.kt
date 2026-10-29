@@ -25,17 +25,6 @@ class CameraCaptureTest {
         assertEquals(AspectRatio.RATIO_4_3, cameraRatio(9f / 16f, portrait = false))
     }
 
-    @Test fun aTurnedVideoBecomesAPortraitProjectAtTheChosenResolution() {
-        val scene = Scene.create("Clip", 1080, 1080, 30, 0).fromCapture(media(1920, 1080, 90, "video/mp4", 2_000_000), true, 720, 3)!!
-        assertEquals(720, scene.width)
-        assertEquals(1280, scene.height)
-        val layer = scene.layers.single()
-        assertEquals("content://media/external/1", layer.node["fillVideo"])
-        assertEquals(0, layer.startTime)
-        assertEquals(1999, layer.endTime)
-        assertEquals("content://media/external/1", scene.media.single().uri)
-    }
-
     @Test fun newClipsCoverTheirLengthWithoutAnExtraFrame() {
         for (fps in listOf(24, 25, 30, 60)) {
             val s = Scene.create("t", 100, 100, fps, 0)
@@ -45,17 +34,6 @@ class CameraCaptureTest {
         val clip = thirty.videoLayer(media(1920, 1080, 0, "video/mp4", 1_000_000), 15)!!
         assertEquals(500 to 1499, clip.startTime to clip.endTime)
         assertEquals(15, thirty.lastShownFrame(thirty.endTimeFor(15, 0)))
-    }
-
-    @Test fun aLargePhotoIsScaledToTheResolutionAndKeepsItsShape() {
-        val scene = Scene.create("Photo", 1080, 1920, 30, 0).fromCapture(media(4000, 3000, 0, "image/jpeg"), false, 1080, 3)!!
-        assertEquals(1440, scene.width)
-        assertEquals(1080, scene.height)
-        assertEquals("content://media/external/1", scene.layers.single().node["fillImage"])
-    }
-
-    @Test fun anEmptyCaptureMakesNoProject() {
-        assertEquals(null, Scene.create("x", 100, 100, 30, 0).fromCapture(media(0, 0, 0, "image/jpeg"), false, 1080, 3))
     }
 
     @Test fun onlyARefusalAfterAnEarlierOneSendsToSettings() {

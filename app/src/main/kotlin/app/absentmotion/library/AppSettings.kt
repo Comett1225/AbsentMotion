@@ -25,6 +25,7 @@ class AppSettings(private val context: Context) {
     private var loopingPlayState by mutableStateOf(prefs.getBoolean("loopingPlay", false))
     private var xmlUploadState by mutableStateOf(prefs.getBoolean("xmlUpload", false))
     private var vibrationState by mutableStateOf(prefs.getBoolean("trimLimitVibration", true))
+    private var basicTransformState by mutableStateOf(prefs.getBoolean("basicTransform", false))
 
     private var themeState by mutableStateOf(prefs.getString("theme", Themes.DEFAULT)!!)
     private var customThemeState by mutableStateOf(Themes.custom(context)?.let { it.name ?: "" })
@@ -58,6 +59,10 @@ class AppSettings(private val context: Context) {
     var xmlUpload: Boolean
         get() = xmlUploadState
         set(value) { xmlUploadState = value; prefs.edit().putBoolean("xmlUpload", value).apply() }
+
+    var basicTransform: Boolean
+        get() = basicTransformState
+        set(value) { basicTransformState = value; prefs.edit().putBoolean("basicTransform", value).apply() }
 
     var vibration: Boolean
         get() = vibrationState

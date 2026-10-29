@@ -100,7 +100,6 @@
     <string name="import_complete">Importación completada</string>
     <string name="choose_file">Elegir archivo</string>
     <string name="import_a_project_file">Importar un archivo de proyecto</string>
-    <string name="from_camera">DESDE LA CÁMARA</string>
     <string name="version_history">Historial de versiones</string>
     <string name="the_project_file_is_missing_or">El archivo del proyecto falta o está dañado, así que no se cambió nada.</string>
     <string name="could_not_open_this_project">No se pudo abrir este proyecto</string>
@@ -465,7 +464,6 @@
     <string name="newproject_bg_transparent">Transparente</string>
     <string name="newproject_default_project">Nuevo proyecto %1$s</string>
     <string name="newproject_default_asset">Nuevo recurso</string>
-    <string name="newproject_camera_failed">No se pudo crear el proyecto desde la cámara.</string>
     <string name="newproject_frame_rate">Velocidad de fotogramas</string>
     <string name="newproject_background">Fondo</string>
     <string name="newproject_create_asset">Crear recurso</string>
@@ -825,6 +823,8 @@
     <string name="menu_reset_scale">Restablecer escala</string>
     <string name="menu_reset_skew">Restablecer inclinación</string>
     <string name="menu_reset_transform">Restablecer transformación</string>
+    <string name="transform_basic_controls">Controles básicos</string>
+    <string name="transform_advanced_controls">Controles avanzados</string>
     <string name="menu_select_all_layers">Seleccionar todas las capas</string>
     <plurals name="menu_duplicate_layers">
         <item quantity="one">Duplicar capa</item>

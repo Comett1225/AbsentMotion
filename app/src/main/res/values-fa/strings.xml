@@ -100,7 +100,6 @@
     <string name="import_complete">ورود کامل شد</string>
     <string name="choose_file">انتخاب فایل</string>
     <string name="import_a_project_file">وارد کردن فایل پروژه</string>
-    <string name="from_camera">از دوربین</string>
     <string name="version_history">تاریخچه نسخه‌ها</string>
     <string name="the_project_file_is_missing_or">فایل پروژه گم شده یا خراب است، بنابراین هیچ تغییری اعمال نشد.</string>
     <string name="could_not_open_this_project">این پروژه باز نشد</string>
@@ -461,7 +460,6 @@
     <string name="newproject_bg_transparent">شفاف</string>
     <string name="newproject_default_project">پروژه جدید %1$s</string>
     <string name="newproject_default_asset">دارایی جدید</string>
-    <string name="newproject_camera_failed">ساخت پروژه با دوربین ممکن نشد.</string>
     <string name="newproject_frame_rate">نرخ فریم</string>
     <string name="newproject_background">پس‌زمینه</string>
     <string name="newproject_create_asset">ساخت دارایی</string>
@@ -812,6 +810,8 @@
     <string name="menu_reset_scale">بازنشانی مقیاس</string>
     <string name="menu_reset_skew">بازنشانی کج‌شدگی</string>
     <string name="menu_reset_transform">بازنشانی ترنسفورم</string>
+    <string name="transform_basic_controls">کنترل‌های پایه</string>
+    <string name="transform_advanced_controls">کنترل‌های پیشرفته</string>
     <string name="menu_select_all_layers">انتخاب همه لایه‌ها</string>
     <plurals name="menu_duplicate_layers">
         <item quantity="one">تکثیر %1$s لایه</item>

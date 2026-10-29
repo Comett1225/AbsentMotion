@@ -100,7 +100,6 @@
     <string name="import_complete">اكتمل الاستيراد</string>
     <string name="choose_file">اختيار ملف</string>
     <string name="import_a_project_file">استيراد ملف مشروع</string>
-    <string name="from_camera">من الكاميرا</string>
     <string name="version_history">سجل النسخ</string>
     <string name="the_project_file_is_missing_or">ملف المشروع مفقود أو تالف، لذا لم يتغير شيء.</string>
     <string name="could_not_open_this_project">تعذّر فتح هذا المشروع</string>
@@ -477,7 +476,6 @@
     <string name="newproject_bg_transparent">شفاف</string>
     <string name="newproject_default_project">مشروع جديد %1$s</string>
     <string name="newproject_default_asset">أصل جديد</string>
-    <string name="newproject_camera_failed">تعذّر إنشاء المشروع من الكاميرا.</string>
     <string name="newproject_frame_rate">معدل الإطارات</string>
     <string name="newproject_background">خلفية</string>
     <string name="newproject_create_asset">إنشاء أصل</string>
@@ -864,6 +862,8 @@
     <string name="menu_reset_scale">إعادة ضبط المقياس</string>
     <string name="menu_reset_skew">إعادة ضبط الإمالة</string>
     <string name="menu_reset_transform">إعادة ضبط التحويل</string>
+    <string name="transform_basic_controls">عناصر تحكم أساسية</string>
+    <string name="transform_advanced_controls">عناصر تحكم متقدمة</string>
     <string name="menu_select_all_layers">تحديد كل الطبقات</string>
     <plurals name="menu_duplicate_layers">
         <item quantity="zero">تكرار %1$s طبقات</item>

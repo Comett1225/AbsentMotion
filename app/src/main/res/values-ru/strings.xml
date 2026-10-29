@@ -100,7 +100,6 @@
     <string name="import_complete">Импорт завершён</string>
     <string name="choose_file">Выбрать файл</string>
     <string name="import_a_project_file">Импортировать файл проекта</string>
-    <string name="from_camera">ИЗ КАМЕРЫ</string>
     <string name="version_history">История версий</string>
     <string name="the_project_file_is_missing_or">Файл проекта отсутствует или повреждён, поэтому ничего не изменено.</string>
     <string name="could_not_open_this_project">Не удалось открыть этот проект</string>
@@ -469,7 +468,6 @@
     <string name="newproject_bg_transparent">Прозрачный</string>
     <string name="newproject_default_project">Новый проект %1$s</string>
     <string name="newproject_default_asset">Новый ресурс</string>
-    <string name="newproject_camera_failed">Не удалось создать проект с камеры.</string>
     <string name="newproject_frame_rate">Частота кадров</string>
     <string name="newproject_background">Фон</string>
     <string name="newproject_create_asset">Создать ресурс</string>
@@ -838,6 +836,8 @@
     <string name="menu_reset_scale">Сбросить масштаб</string>
     <string name="menu_reset_skew">Сбросить наклон</string>
     <string name="menu_reset_transform">Сбросить трансформацию</string>
+    <string name="transform_basic_controls">Базовые элементы</string>
+    <string name="transform_advanced_controls">Расширенные элементы</string>
     <string name="menu_select_all_layers">Выбрать все слои</string>
     <plurals name="menu_duplicate_layers">
         <item quantity="one">Дублировать %1$s слой</item>

@@ -100,7 +100,6 @@
     <string name="import_complete">Import selesai</string>
     <string name="choose_file">Pilih fail</string>
     <string name="import_a_project_file">Import fail projek</string>
-    <string name="from_camera">Dari kamera</string>
     <string name="version_history">Sejarah versi</string>
     <string name="the_project_file_is_missing_or">Fail projek tiada atau rosak, jadi tiada apa-apa yang diubah.</string>
     <string name="could_not_open_this_project">Tidak dapat membuka projek ini</string>
@@ -457,7 +456,6 @@
     <string name="newproject_bg_transparent">Telus</string>
     <string name="newproject_default_project">Projek baharu %1$s</string>
     <string name="newproject_default_asset">Aset baharu</string>
-    <string name="newproject_camera_failed">Tidak dapat mencipta projek daripada kamera.</string>
     <string name="newproject_frame_rate">Kadar bingkai</string>
     <string name="newproject_background">Latar belakang</string>
     <string name="newproject_create_asset">Cipta aset</string>
@@ -799,6 +797,8 @@
     <string name="menu_reset_scale">Set Semula Skala</string>
     <string name="menu_reset_skew">Set Semula Kecondongan</string>
     <string name="menu_reset_transform">Set Semula Transformasi</string>
+    <string name="transform_basic_controls">Kawalan Asas</string>
+    <string name="transform_advanced_controls">Kawalan Lanjutan</string>
     <string name="menu_select_all_layers">Pilih Semua Lapisan</string>
     <plurals name="menu_duplicate_layers">
         <item quantity="other">Gandakan %1$s lapisan</item>

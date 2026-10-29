@@ -69,19 +69,13 @@ import android.content.Context
 import android.widget.Toast
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
-import app.absentmotion.editor.fromCapture
-import app.absentmotion.editor.keepCopy
 import app.absentmotion.library.AppSettings
-import app.absentmotion.media.mediaDeclaration
-import app.absentmotion.ui.camera.CameraIcons
-import app.absentmotion.ui.camera.CameraScreen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import app.absentmotion.library.NewProjectChoice
 import app.absentmotion.library.ProjectStore
 import app.absentmotion.model.Scene
-import app.absentmotion.model.replaceMedia
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.presence
 import app.absentmotion.ui.theme.presenceScrim
@@ -204,14 +198,13 @@ fun NewProjectSheet(
     val context = LocalContext.current
     val form = remember { Form(settings.newProject, existingTitles, DefaultNames(context)) }
     val scope = rememberCoroutineScope()
-    var camera by remember { mutableStateOf(false) }
     var creating by remember { mutableStateOf(false) }
     Box(Modifier.fillMaxSize()) {
         Box(Modifier.fillMaxSize().presenceScrim(Color.Black.copy(alpha = 0.7f)).pointerInput(Unit) { detectTapGestures { } })
         BoxWithConstraints(Modifier.align(Alignment.BottomCenter).widthIn(max = 480.dp).presence(slide = 1f, fade = false)) {
             val density = LocalDensity.current
             CompositionLocalProvider(LocalDensity provides Density(density.density * minOf(1f, maxWidth / SheetWidth), density.fontScale)) {
-                SheetBody(form, onClose, onCamera = { camera = true }, onCreate = create@{
+                SheetBody(form, onClose, onCreate = create@{
                     if (creating) return@create
                     creating = true
                     settings.newProject = form.choice()
@@ -234,35 +227,10 @@ fun NewProjectSheet(
             }
         }
     }
-    if (camera) {
-        val (w, h) = form.size
-        CameraScreen(w.toFloat() / h, onClose = { camera = false }) { uri, video ->
-            scope.launch {
-                val id = try {
-                    val media = mediaDeclaration(context, uri) ?: throw java.io.IOException("unreadable capture")
-                    val scene = form.scene().fromCapture(media, video, form.resolution, settings.defaultLayerDuration) ?: throw java.io.IOException("empty capture")
-                    settings.newProject = form.choice()
-                    withContext(Dispatchers.IO) { store.create(scene) }.also { id ->
-                        val kept = keepCopy(context, settings, store, id, media, scene)
-                        if (kept != media) withContext(Dispatchers.IO) { runCatching { store.save(id, scene.replaceMedia(media.uri, kept)) } }
-                    }
-                } catch (e: kotlinx.coroutines.CancellationException) {
-                    throw e
-                } catch (e: Exception) {
-                    Toast.makeText(context, context.getString(R.string.newproject_camera_failed), Toast.LENGTH_LONG).show()
-                    camera = false
-                    return@launch
-                }
-                camera = false
-                onClose()
-                onOpen(id)
-            }
-        }
-    }
 }
 
 @Composable
-private fun SheetBody(form: Form, onClose: () -> Unit, onCamera: () -> Unit, onCreate: () -> Unit) {
+private fun SheetBody(form: Form, onClose: () -> Unit, onCreate: () -> Unit) {
     Column(
         Modifier.fillMaxWidth().clip(RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp)).background(Am.SheetBg)
             .windowInsetsPadding(WindowInsets.navigationBars.union(WindowInsets.ime)).verticalScroll(rememberScrollState()),
@@ -280,12 +248,7 @@ private fun SheetBody(form: Form, onClose: () -> Unit, onCamera: () -> Unit, onC
         Spacer(Modifier.height(16.dp))
         FormRow(stringResource(R.string.newproject_background)) { BackgroundField(form) }
         Spacer(Modifier.height(16.dp))
-        Row(Modifier.padding(horizontal = 32.dp).fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Row(Modifier.height(48.dp).clickable(onClick = onCamera), verticalAlignment = Alignment.CenterVertically) {
-                Icon(CameraIcons.Camera, null, Modifier.size(20.dp), tint = Ink)
-                Spacer(Modifier.width(8.dp))
-                Text(stringResource(R.string.from_camera), color = Ink, fontSize = 15.sp, fontWeight = FontWeight.Medium)
-            }
+        Row(Modifier.padding(horizontal = 32.dp).fillMaxWidth(), horizontalArrangement = Arrangement.End) {
             Box(Modifier.height(48.dp).clickable(onClick = onCreate), contentAlignment = Alignment.Center) {
                 Text(stringResource(if (form.element) R.string.newproject_create_asset else R.string.newproject_create_project), color = Ink, fontSize = 15.sp, fontWeight = FontWeight.Medium)
             }
@@ -396,7 +359,7 @@ private fun FormRow(label: String, details: List<String> = emptyList(), field: @
             Text(label, color = Am.Navy, fontSize = 16.sp, lineHeight = 22.sp)
             details.forEach { Text(it, color = DimText, fontSize = 10.sp, lineHeight = 13.sp) }
         }
-        Box(Modifier.width(180.dp).heightIn(min = 45.dp)) { field() }
+        Box(Modifier.width(180.dp).height(45.dp)) { field() }
     }
 }
 

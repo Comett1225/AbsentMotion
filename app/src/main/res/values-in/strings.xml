@@ -100,7 +100,6 @@
     <string name="import_complete">Impor selesai</string>
     <string name="choose_file">Pilih file</string>
     <string name="import_a_project_file">Impor file proyek</string>
-    <string name="from_camera">Dari kamera</string>
     <string name="version_history">Riwayat versi</string>
     <string name="the_project_file_is_missing_or">File proyek hilang atau rusak, jadi tidak ada yang diubah.</string>
     <string name="could_not_open_this_project">Tidak dapat membuka proyek ini</string>
@@ -457,7 +456,6 @@
     <string name="newproject_bg_transparent">Transparan</string>
     <string name="newproject_default_project">Proyek baru %1$s</string>
     <string name="newproject_default_asset">Aset baru</string>
-    <string name="newproject_camera_failed">Tidak dapat membuat proyek dari kamera.</string>
     <string name="newproject_frame_rate">Frame rate</string>
     <string name="newproject_background">Latar belakang</string>
     <string name="newproject_create_asset">Buat aset</string>
@@ -799,6 +797,8 @@
     <string name="menu_reset_scale">Reset skala</string>
     <string name="menu_reset_skew">Reset kemiringan</string>
     <string name="menu_reset_transform">Reset transformasi</string>
+    <string name="transform_basic_controls">Kontrol Dasar</string>
+    <string name="transform_advanced_controls">Kontrol Lanjutan</string>
     <string name="menu_select_all_layers">Pilih semua lapisan</string>
     <plurals name="menu_duplicate_layers">
         <item quantity="other">Duplikat %1$s lapisan</item>

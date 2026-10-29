@@ -262,6 +262,46 @@ class ModelReaderTest {
         assertTrue(big.triangleCount <= MODEL_TRIANGLE_BUDGET)
     }
 
+    @Test fun reducingAModelKeepsEachTexturePieceOnItsOwnPartOfThePicture() {
+        val rows = 160
+        val positions = ArrayList<Float>()
+        val uvs = ArrayList<Float>()
+        val triangles = ArrayList<Int>()
+        fun island(left: Boolean) {
+            val start = positions.size / 3
+            for (i in 0..rows) for (j in 0..rows) {
+                val x = (if (left) -0.7f else 0f) + 0.7f * i / rows
+                val y = -0.7f + 1.4f * j / rows
+                positions.add(x); positions.add(y); positions.add(0f)
+                uvs += if (left) (x + 0.7f) / 0.7f * 0.25f else 0.75f + x / 0.7f * 0.25f
+                uvs += (y + 0.7f) / 1.4f
+            }
+            for (i in 0 until rows) for (j in 0 until rows) {
+                val a = start + i * (rows + 1) + j
+                triangles += listOf(a, a + rows + 1, a + rows + 2, a, a + rows + 2, a + 1)
+            }
+        }
+        island(true)
+        island(false)
+        val count = positions.size / 3
+        val full = Mesh(positions.toFloatArray(), FloatArray(count * 3) { if (it % 3 == 2) 1f else 0f }, uvs.toFloatArray(), IntArray(count) { -1 },
+            triangles.toIntArray(), IntArray(triangles.size / 3), emptyList(), false)
+        val small = decimated(full, 2000)
+        assertTrue(small.triangleCount in 1..2000)
+        for (k in 0 until small.triangleCount) {
+            val corners = (0..2).map { small.triangles[k * 3 + it] }
+            val left = small.uvs[corners[0] * 2] < 0.5f
+            for (v in corners) {
+                val x = small.positions[v * 3]
+                val u = small.uvs[v * 2]
+                assertEquals("triangle $k mixes texture pieces", left, u < 0.5f)
+                val expected = if (left) (x + 0.7f) / 0.7f * 0.25f else 0.75f + x / 0.7f * 0.25f
+                assertEquals("triangle $k picture position", expected, u, 0.02f)
+                assertEquals((small.positions[v * 3 + 1] + 0.7f) / 1.4f, small.uvs[v * 2 + 1], 0.02f)
+            }
+        }
+    }
+
     @Test fun accessorsWithoutDataCannotMakeATinyFileAllocateHugeArrays() {
         val uri = "data:application/octet-stream;base64," + Base64.getEncoder().encodeToString(triangle)
         val buffer = """{"byteLength":${triangle.size},"uri":"$uri"}"""

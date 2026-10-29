@@ -100,7 +100,6 @@
     <string name="import_complete">Import complete</string>
     <string name="choose_file">Choose file</string>
     <string name="import_a_project_file">Import a project file</string>
-    <string name="from_camera">FROM CAMERA</string>
     <string name="version_history">Version history</string>
     <string name="the_project_file_is_missing_or">The project file is missing or damaged, so nothing was changed.</string>
     <string name="could_not_open_this_project">Could not open this project</string>
@@ -462,7 +461,6 @@
     <string name="newproject_bg_transparent">Transparent</string>
     <string name="newproject_default_project">New Project %1$s</string>
     <string name="newproject_default_asset">New Asset</string>
-    <string name="newproject_camera_failed">Could not create the project from the camera.</string>
     <string name="newproject_frame_rate">Frame Rate</string>
     <string name="newproject_background">Background</string>
     <string name="newproject_create_asset">CREATE ASSET</string>
@@ -841,6 +839,8 @@
     <string name="menu_reset_scale">Reset Scale</string>
     <string name="menu_reset_skew">Reset Skew</string>
     <string name="menu_reset_transform">Reset Transform</string>
+    <string name="transform_basic_controls">Basic Controls</string>
+    <string name="transform_advanced_controls">Advanced Controls</string>
     <string name="menu_select_all_layers">Select All Layers</string>
     <plurals name="menu_duplicate_layers">
         <item quantity="one">Duplicate Layer</item>

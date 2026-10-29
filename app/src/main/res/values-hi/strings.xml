@@ -100,7 +100,6 @@
     <string name="import_complete">इंपोर्ट पूरा हुआ</string>
     <string name="choose_file">फ़ाइल चुनें</string>
     <string name="import_a_project_file">प्रोजेक्ट फ़ाइल इंपोर्ट करें</string>
-    <string name="from_camera">कैमरा से</string>
     <string name="version_history">वर्ज़न हिस्ट्री</string>
     <string name="the_project_file_is_missing_or">प्रोजेक्ट फ़ाइल मौजूद नहीं है या खराब है, इसलिए कुछ नहीं बदला गया।</string>
     <string name="could_not_open_this_project">इस प्रोजेक्ट को खोला नहीं जा सका</string>
@@ -461,7 +460,6 @@
     <string name="newproject_bg_transparent">पारदर्शी</string>
     <string name="newproject_default_project">नया प्रोजेक्ट %1$s</string>
     <string name="newproject_default_asset">नया एसेट</string>
-    <string name="newproject_camera_failed">कैमरा से प्रोजेक्ट नहीं बनाया जा सका।</string>
     <string name="newproject_frame_rate">फ़्रेम रेट</string>
     <string name="newproject_background">बैकग्राउंड</string>
     <string name="newproject_create_asset">एसेट बनाएँ</string>
@@ -812,6 +810,8 @@
     <string name="menu_reset_scale">स्केल रीसेट करें</string>
     <string name="menu_reset_skew">स्क्यू रीसेट करें</string>
     <string name="menu_reset_transform">ट्रांसफ़ॉर्म रीसेट करें</string>
+    <string name="transform_basic_controls">बेसिक कंट्रोल</string>
+    <string name="transform_advanced_controls">एडवांस्ड कंट्रोल</string>
     <string name="menu_select_all_layers">सभी लेयर चुनें</string>
     <plurals name="menu_duplicate_layers">
         <item quantity="one">%1$s लेयर डुप्लिकेट करें</item>

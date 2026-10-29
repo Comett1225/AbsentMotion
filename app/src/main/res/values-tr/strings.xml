@@ -100,7 +100,6 @@
     <string name="import_complete">İçe aktarma tamamlandı</string>
     <string name="choose_file">Dosya seç</string>
     <string name="import_a_project_file">Proje dosyası içe aktar</string>
-    <string name="from_camera">Kameradan</string>
     <string name="version_history">Sürüm geçmişi</string>
     <string name="the_project_file_is_missing_or">Proje dosyası eksik veya hasarlı olduğu için hiçbir şey değiştirilmedi.</string>
     <string name="could_not_open_this_project">Bu proje açılamadı</string>
@@ -461,7 +460,6 @@
     <string name="newproject_bg_transparent">Saydam</string>
     <string name="newproject_default_project">Yeni proje %1$s</string>
     <string name="newproject_default_asset">Yeni varlık</string>
-    <string name="newproject_camera_failed">Kameradan proje oluşturulamadı.</string>
     <string name="newproject_frame_rate">Kare hızı</string>
     <string name="newproject_background">Arka plan</string>
     <string name="newproject_create_asset">VARLIK OLUŞTUR</string>
@@ -812,6 +810,8 @@
     <string name="menu_reset_scale">Ölçeği sıfırla</string>
     <string name="menu_reset_skew">Eğimi sıfırla</string>
     <string name="menu_reset_transform">Dönüşümü sıfırla</string>
+    <string name="transform_basic_controls">Temel Kontroller</string>
+    <string name="transform_advanced_controls">Gelişmiş Kontroller</string>
     <string name="menu_select_all_layers">Tüm katmanları seç</string>
     <plurals name="menu_duplicate_layers">
         <item quantity="one">Katmanı çoğalt</item>

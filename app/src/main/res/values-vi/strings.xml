@@ -100,7 +100,6 @@
     <string name="import_complete">Nhập xong</string>
     <string name="choose_file">Chọn tệp</string>
     <string name="import_a_project_file">Nhập tệp dự án</string>
-    <string name="from_camera">TỪ MÁY ẢNH</string>
     <string name="version_history">Lịch sử phiên bản</string>
     <string name="the_project_file_is_missing_or">Tệp dự án bị thiếu hoặc hỏng nên không có gì bị thay đổi.</string>
     <string name="could_not_open_this_project">Không thể mở dự án này</string>
@@ -457,7 +456,6 @@
     <string name="newproject_bg_transparent">Trong suốt</string>
     <string name="newproject_default_project">Dự án mới %1$s</string>
     <string name="newproject_default_asset">Tài nguyên mới</string>
-    <string name="newproject_camera_failed">Không thể tạo dự án từ máy ảnh.</string>
     <string name="newproject_frame_rate">Tốc độ khung hình</string>
     <string name="newproject_background">Nền</string>
     <string name="newproject_create_asset">TẠO TÀI NGUYÊN</string>
@@ -799,6 +797,8 @@
     <string name="menu_reset_scale">Đặt lại tỉ lệ</string>
     <string name="menu_reset_skew">Đặt lại độ nghiêng</string>
     <string name="menu_reset_transform">Đặt lại biến đổi</string>
+    <string name="transform_basic_controls">Điều khiển cơ bản</string>
+    <string name="transform_advanced_controls">Điều khiển nâng cao</string>
     <string name="menu_select_all_layers">Chọn tất cả lớp</string>
     <plurals name="menu_duplicate_layers">
         <item quantity="other">Nhân bản %1$s lớp</item>

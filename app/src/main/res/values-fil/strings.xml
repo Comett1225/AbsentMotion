@@ -100,7 +100,6 @@
     <string name="import_complete">Tapos na ang pag-import</string>
     <string name="choose_file">Pumili ng file</string>
     <string name="import_a_project_file">Mag-import ng file ng proyekto</string>
-    <string name="from_camera">MULA SA KAMERA</string>
     <string name="version_history">Kasaysayan ng bersyon</string>
     <string name="the_project_file_is_missing_or">Nawawala o may sira ang file ng proyekto, kaya walang nabago.</string>
     <string name="could_not_open_this_project">Hindi mabuksan ang proyektong ito</string>
@@ -461,7 +460,6 @@
     <string name="newproject_bg_transparent">Transparent</string>
     <string name="newproject_default_project">Bagong proyekto %1$s</string>
     <string name="newproject_default_asset">Bagong asset</string>
-    <string name="newproject_camera_failed">Hindi magawa ang proyekto mula sa kamera.</string>
     <string name="newproject_frame_rate">Frame rate</string>
     <string name="newproject_background">Background</string>
     <string name="newproject_create_asset">Gumawa ng asset</string>
@@ -812,6 +810,8 @@
     <string name="menu_reset_scale">I-reset ang scale</string>
     <string name="menu_reset_skew">I-reset ang skew</string>
     <string name="menu_reset_transform">I-reset ang transform</string>
+    <string name="transform_basic_controls">Mga Basic na Kontrol</string>
+    <string name="transform_advanced_controls">Mga Advanced na Kontrol</string>
     <string name="menu_select_all_layers">Piliin ang lahat ng layer</string>
     <plurals name="menu_duplicate_layers">
         <item quantity="one">I-duplicate ang %1$s layer</item>

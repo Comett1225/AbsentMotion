@@ -100,7 +100,6 @@
     <string name="import_complete">ইমপোর্ট সম্পন্ন</string>
     <string name="choose_file">ফাইল বাছুন</string>
     <string name="import_a_project_file">প্রজেক্ট ফাইল ইমপোর্ট করুন</string>
-    <string name="from_camera">ক্যামেরা থেকে</string>
     <string name="version_history">ভার্সন হিস্ট্রি</string>
     <string name="the_project_file_is_missing_or">প্রজেক্ট ফাইলটি অনুপস্থিত বা ক্ষতিগ্রস্ত, তাই কিছুই বদলানো হয়নি।</string>
     <string name="could_not_open_this_project">এই প্রজেক্ট খোলা যায়নি</string>
@@ -461,7 +460,6 @@
     <string name="newproject_bg_transparent">স্বচ্ছ</string>
     <string name="newproject_default_project">নতুন প্রজেক্ট %1$s</string>
     <string name="newproject_default_asset">নতুন অ্যাসেট</string>
-    <string name="newproject_camera_failed">ক্যামেরা থেকে প্রজেক্ট তৈরি করা যায়নি।</string>
     <string name="newproject_frame_rate">ফ্রেম রেট</string>
     <string name="newproject_background">ব্যাকগ্রাউন্ড</string>
     <string name="newproject_create_asset">অ্যাসেট তৈরি করুন</string>
@@ -812,6 +810,8 @@
     <string name="menu_reset_scale">স্কেল রিসেট করুন</string>
     <string name="menu_reset_skew">স্কিউ রিসেট করুন</string>
     <string name="menu_reset_transform">ট্রান্সফর্ম রিসেট করুন</string>
+    <string name="transform_basic_controls">বেসিক কন্ট্রোল</string>
+    <string name="transform_advanced_controls">অ্যাডভান্সড কন্ট্রোল</string>
     <string name="menu_select_all_layers">সব লেয়ার নির্বাচন করুন</string>
     <plurals name="menu_duplicate_layers">
         <item quantity="one">%1$sটি লেয়ার ডুপ্লিকেট করুন</item>

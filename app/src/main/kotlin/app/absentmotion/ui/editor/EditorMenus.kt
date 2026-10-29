@@ -269,6 +269,24 @@ internal fun TransformMenu(state: EditorState, tab: Int, turn: Turn?, onDismiss:
             state.resetTransform(listOf(0, 1, 2, 3, 4, 5))
             onDismiss()
         }
+        val basic = state.settings.basicTransform
+        MenuRow(stringResource(if (basic) R.string.transform_advanced_controls else R.string.transform_basic_controls), divider = true) {
+            state.settings.basicTransform = !basic
+            onDismiss()
+        }
+    }
+}
+
+@Composable
+internal fun TransformControlsMenu(state: EditorState, onDone: (Boolean?) -> Unit) {
+    MenuPopup(DropOrRise, { onDone(null) }) {
+        for (basic in listOf(true, false)) {
+            MenuRow(stringResource(if (basic) R.string.transform_basic_controls else R.string.transform_advanced_controls),
+                trailing = if (state.settings.basicTransform == basic) PanelIcons.Check else null, divider = !basic) {
+                state.settings.basicTransform = basic
+                onDone(basic)
+            }
+        }
     }
 }
 
