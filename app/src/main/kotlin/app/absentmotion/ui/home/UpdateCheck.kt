@@ -132,15 +132,16 @@ private fun releaseOf(release: JSONObject, flavour: String, source: UpdateSource
 
 private val SAFE_VERSION = Regex("^[0-9]+(\\.[0-9]+)*(-[0-9A-Za-z.]+)?$")
 
+internal fun apkFlavours(flavour: String) = if (flavour == "play") listOf("play", "foss") else listOf(flavour)
+
 internal fun apkName(version: String, flavour: String) = "AbsentMotion-$version-${when (flavour) { "compat" -> "compatible"; "compat32" -> "compatible-32bit"; else -> flavour }}.apk"
 
 private fun apkOf(release: JSONObject, tag: String, version: String, flavour: String, source: UpdateSource): ApkAsset? {
     if (flavour !in setOf("foss", "play", "compat", "compat32") || !SAFE_VERSION.matches(version) || tag.trim() !in setOf("v$version", "V$version")) return null
-    val name = apkName(version, flavour)
     val assets = release.optJSONArray("assets") ?: return null
     val list = (0 until assets.length()).mapNotNull { assets.optJSONObject(it) }
     fun linkOf(file: String) = list.firstOrNull { it.optString("name") == file }?.takeIf { it.optString("browser_download_url").equals(source.asset(tag.trim(), file), ignoreCase = true) }
-    val asset = linkOf(name) ?: return null
+    val (name, asset) = apkFlavours(flavour).firstNotNullOfOrNull { f -> apkName(version, f).let { n -> linkOf(n)?.let { n to it } } } ?: return null
     val size = asset.optLong("size", -1L).takeIf { it in 1..MAX_APK_BYTES } ?: return null
     val sums = linkOf(SUMS)?.let { source.asset(tag.trim(), SUMS) }
     return ApkAsset(name, source.asset(tag.trim(), name), size, parseDigest(asset.optString("digest")), sums)
@@ -221,6 +222,17 @@ internal fun UpdateAskDialog(settings: AppSettings) {
         },
         dismissButton = { TextButton({ settings.chooseUpdates(false) }) { Text(stringResource(R.string.update_not_now), color = Am.Navy) } },
         confirmButton = { TextButton({ settings.chooseUpdates(true) }) { Text(stringResource(R.string.update_turn_on), color = Am.Navy) } },
+        containerColor = Am.Card,
+    )
+}
+
+@Composable
+internal fun PlayEndingDialog(onClose: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onClose,
+        title = { Text(stringResource(R.string.play_ending_title), color = Am.Navy) },
+        text = { Text(stringResource(R.string.play_ending_body), color = Am.Navy, fontSize = 15.sp, lineHeight = 21.sp) },
+        confirmButton = { TextButton(onClose) { Text(stringResource(R.string.ok), color = Am.Navy) } },
         containerColor = Am.Card,
     )
 }

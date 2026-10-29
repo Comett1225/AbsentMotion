@@ -241,6 +241,8 @@
     <string name="update_failed">Could not check, try again when you are online</string>
     <string name="update_turn_on">Turn it on</string>
     <string name="update_not_now">Not now</string>
+    <string name="play_ending_title">No Play build in 5.0</string>
+    <string name="play_ending_body">From version 5.0 there will be no Play build of AbsentMotion. When 5.0 comes out, the update moves this app to the FOSS build automatically. Your projects and settings stay, and background removal uses the app\'s own offline model instead of Google Play services.</string>
     <string name="update_outdated">This may be fixed in the newer version (installed %1$s, newest %2$s).</string>
     <string name="update_changelog">Changelog</string>
     <string name="update_open_failed">No app on this device can open the link.</string>

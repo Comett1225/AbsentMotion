@@ -197,6 +197,10 @@ class AppSettings(private val context: Context) {
         get() = prefs.getInt("onboarding", 0)
         set(value) { prefs.edit().putInt("onboarding", value).apply() }
 
+    fun playNoticeDue(flavour: String) = flavour == "play" && prefs.getInt("playNotice", 0) < 2
+
+    fun playNoticeSeen() = prefs.edit().putInt("playNotice", prefs.getInt("playNotice", 0) + 1).apply()
+
     private var tutorialStepState by mutableStateOf(prefs.getString("tutorialStep", null))
 
     var tutorialStep: String?

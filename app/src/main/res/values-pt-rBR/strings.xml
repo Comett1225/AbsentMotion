@@ -241,6 +241,8 @@
     <string name="update_failed">Não foi possível verificar. Tente novamente quando estiver online.</string>
     <string name="update_turn_on">Ativar</string>
     <string name="update_not_now">Agora não</string>
+    <string name="play_ending_title">Sem versão do Play na 5.0</string>
+    <string name="play_ending_body">A partir da versão 5.0, não haverá mais versão do Play do AbsentMotion. Quando a 5.0 for lançada, a atualização move este app automaticamente para a versão FOSS. Seus projetos e configurações são mantidos, e a remoção de fundo passa a usar o modelo offline do próprio app em vez dos serviços do Google Play.</string>
     <string name="update_outdated">Isso pode ser corrigido na versão mais recente (instalada %1$s, mais recente %2$s).</string>
     <string name="update_changelog">Novidades</string>
     <string name="update_open_failed">Nenhum app neste dispositivo pode abrir o link.</string>
@@ -364,6 +366,7 @@
     <string name="home_more">Mais</string>
     <string name="home_duplicate_asset">Duplicar recurso</string>
     <string name="home_duplicate">Duplicar</string>
+    <string name="home_duplicating">Copiando o projeto…</string>
     <string name="home_collect_media">Reunir mídia no projeto</string>
     <string name="home_delete_asset">Excluir recurso</string>
     <string name="home_empty_assets">Nenhum recurso salvo ainda</string>
@@ -637,6 +640,7 @@
     <string name="export_error_encoder_busy">O codificador de vídeo deste telefone está ocupado ou não consegue gerar este tamanho. Tente uma resolução ou taxa de quadros menor.</string>
     <string name="export_error_codec_busy">O decodificador ou codificador de vídeo do telefone parou de funcionar. Feche outros apps que reproduzem ou gravam vídeo e tente de novo.</string>
     <string name="export_note_software">O codificador de vídeo do telefone está ocupado, então esta exportação usa o codificador por software, que é mais lento.</string>
+    <string name="export_note_checking">Verificando o arquivo…</string>
     <string name="export_note_retry">O codificador de vídeo parou de funcionar. Tentando novamente com outro codificador.</string>
     <string name="export_error_stalled">A exportação não fez progresso por %1$s segundos, então foi interrompida. Um arquivo de mídia ou o codificador de vídeo do celular parou de responder. Feche outros aplicativos que usam vídeo e tente novamente.</string>
     <string name="export_error_draw_frame">Não foi possível desenhar o quadro %1$s. Tente exportar de novo.</string>
@@ -685,8 +689,13 @@
     <string name="camera_error_photo">Não foi possível tirar a foto.</string>
     <string name="camera_error_save_video">Não foi possível salvar o vídeo.</string>
     <string name="camera_error_start_recording">Não foi possível iniciar a gravação.</string>
+    <string name="camera_discard_title">Descartar a gravação?</string>
+    <string name="camera_discard_text">A gravação será excluída.</string>
+    <string name="camera_keep_recording">Continuar gravando</string>
     <string name="media_error_no_decoder">Este celular não tem decodificador para este vídeo</string>
     <string name="media_error_decoder_stalled">O decodificador de vídeo parou de responder</string>
+    <string name="media_error_too_many_frames">Este vídeo tem quadros demais para ser indexado</string>
+    <string name="project_too_many_linked">Este projeto incorpora elementos vinculados demais.</string>
     <string name="media_error_read_frames">Este celular não consegue ler os quadros deste vídeo</string>
     <string name="media_error_pixel_format">Este vídeo usa um formato de pixel que não pode ser lido</string>
     <string name="media_error_video_unavailable">Vídeo indisponível: %1$s</string>
@@ -1740,6 +1749,10 @@
     <string name="preview_fast_blur">Desfoque\nrápido</string>
     <string name="settings_preview_copies">Usar cópias de pré-visualização de vídeos grandes</string>
     <string name="settings_clear_preview_copies">Limpar cópias de pré-visualização</string>
+    <string name="settings_clear_preview_title">Limpar as cópias de pré-visualização?</string>
+    <string name="settings_clear_preview_text">As cópias de pré-visualização são recriadas quando um projeto precisa delas.</string>
+    <string name="settings_delete_model_title">Excluir %1$s?</string>
+    <string name="settings_delete_model_text">Ele pode ser baixado novamente mais tarde.</string>
     <string name="preset_numbered">Predefinição %1$s</string>
     <string name="recovery_your_project">seu projeto</string>
     <string name="caption_layer_name">Legenda %1$s</string>
@@ -1823,15 +1836,4 @@
     <string name="crop_reset">Redefinir</string>
     <string name="a11y_crop_ratio">Proporção %1$s</string>
     <string name="a11y_crop_area">Área de corte. Arraste um canto ou uma borda para cortar, ou arraste por dentro para mover o corte.</string>
-    <string name="camera_discard_text">A gravação será excluída.</string>
-    <string name="camera_discard_title">Descartar a gravação?</string>
-    <string name="camera_keep_recording">Continuar gravando</string>
-    <string name="export_note_checking">Verificando o arquivo…</string>
-    <string name="home_duplicating">Copiando o projeto…</string>
-    <string name="media_error_too_many_frames">Este vídeo tem quadros demais para ser indexado</string>
-    <string name="project_too_many_linked">Este projeto incorpora elementos vinculados demais.</string>
-    <string name="settings_clear_preview_text">As cópias de pré-visualização são recriadas quando um projeto precisa delas.</string>
-    <string name="settings_clear_preview_title">Limpar as cópias de pré-visualização?</string>
-    <string name="settings_delete_model_text">Ele pode ser baixado novamente mais tarde.</string>
-    <string name="settings_delete_model_title">Excluir %1$s?</string>
 </resources>

@@ -25,6 +25,13 @@ class UpdateVerifyTest {
         assertNull(judgeApk(good.copy(variant = "compat"), installed.copy(variant = "compat"), "4.1.4"))
     }
 
+    @Test fun aPlayInstallTakesTheFossApkButNotTheOtherWayRound() {
+        assertNull(judgeApk(good.copy(variant = "foss"), installed.copy(variant = "play"), "4.1.4"))
+        assertNull(judgeApk(good.copy(variant = "play"), installed.copy(variant = "play"), "4.1.4"))
+        assertEquals(UpdateFailure.WrongApp, judgeApk(good.copy(variant = "compat"), installed.copy(variant = "play"), "4.1.4"))
+        assertEquals(UpdateFailure.WrongApp, judgeApk(good.copy(variant = "play"), installed.copy(variant = "foss"), "4.1.4"))
+    }
+
     @Test fun aDifferentSigningKeyIsRefused() {
         assertEquals(UpdateFailure.Signature, judgeApk(good.copy(signers = setOf(other), history = setOf(other)), installed, "4.1.4"))
         assertEquals(UpdateFailure.Signature, judgeApk(good.copy(signers = emptySet()), installed, "4.1.4"))

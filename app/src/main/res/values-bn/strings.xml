@@ -241,6 +241,8 @@
     <string name="update_failed">চেক করা যায়নি, অনলাইনে থাকলে আবার চেষ্টা করুন</string>
     <string name="update_turn_on">চালু করুন</string>
     <string name="update_not_now">এখন নয়</string>
+    <string name="play_ending_title">5.0-এ কোনো Play বিল্ড নেই</string>
+    <string name="play_ending_body">5.0 ভার্সন থেকে AbsentMotion-এর কোনো Play বিল্ড থাকবে না। 5.0 বের হলে, আপডেটটি এই অ্যাপকে স্বয়ংক্রিয়ভাবে FOSS বিল্ডে নিয়ে যাবে। আপনার প্রজেক্ট ও সেটিংস থাকবে, এবং ব্যাকগ্রাউন্ড রিমুভাল Google Play services-এর বদলে অ্যাপের নিজস্ব অফলাইন মডেল ব্যবহার করবে।</string>
     <string name="update_outdated">নতুন ভার্সনে এটি ঠিক হতে পারে (ইনস্টল করা %1$s, সর্বশেষ %2$s)।</string>
     <string name="update_changelog">চেঞ্জলগ</string>
     <string name="update_open_failed">এই ডিভাইসে কোনো অ্যাপ এই লিংক খুলতে পারে না।</string>
@@ -363,6 +365,7 @@
     <string name="home_more">আরও</string>
     <string name="home_duplicate_asset">অ্যাসেট ডুপ্লিকেট করুন</string>
     <string name="home_duplicate">ডুপ্লিকেট</string>
+    <string name="home_duplicating">প্রজেক্ট কপি হচ্ছে…</string>
     <string name="home_collect_media">মিডিয়া প্রজেক্টে সংগ্রহ করুন</string>
     <string name="home_delete_asset">অ্যাসেট মুছুন</string>
     <string name="home_empty_assets">এখনও কোনো অ্যাসেট সেভ করা হয়নি</string>
@@ -626,6 +629,7 @@
     <string name="export_error_encoder_busy">এই ফোনের ভিডিও এনকোডার ব্যস্ত বা এই সাইজ তৈরি করতে পারছে না। কম রেজোলিউশন বা ফ্রেম রেট চেষ্টা করুন।</string>
     <string name="export_error_codec_busy">ফোনের ভিডিও ডিকোডার বা এনকোডার কাজ করা বন্ধ করেছে। ভিডিও চালায় বা রেকর্ড করে এমন অন্য অ্যাপ বন্ধ করে আবার চেষ্টা করুন।</string>
     <string name="export_note_software">ফোনের ভিডিও এনকোডার ব্যস্ত, তাই এই এক্সপোর্টে ধীর সফটওয়্যার এনকোডার ব্যবহার হচ্ছে।</string>
+    <string name="export_note_checking">ফাইল যাচাই করা হচ্ছে…</string>
     <string name="export_note_retry">ভিডিও এনকোডার কাজ করা বন্ধ করেছে। অন্য এনকোডার দিয়ে আবার চেষ্টা করা হচ্ছে।</string>
     <string name="export_error_stalled">এক্সপোর্ট %1$s সেকেন্ড ধরে কোনো অগ্রগতি করেনি, তাই এটি থামানো হয়েছে। একটি মিডিয়া ফাইল বা ফোনের ভিডিও এনকোডার সাড়া দেওয়া বন্ধ করেছে। ভিডিও ব্যবহার করে এমন অন্য অ্যাপ বন্ধ করে আবার চেষ্টা করুন।</string>
     <string name="export_error_draw_frame">ফ্রেম %1$s আঁকা যায়নি। আবার এক্সপোর্ট করার চেষ্টা করুন।</string>
@@ -674,8 +678,13 @@
     <string name="camera_error_photo">ফটো তোলা যায়নি।</string>
     <string name="camera_error_save_video">ভিডিও সংরক্ষণ করা যায়নি।</string>
     <string name="camera_error_start_recording">রেকর্ডিং শুরু করা যায়নি।</string>
+    <string name="camera_discard_title">রেকর্ডিং বাতিল করবেন?</string>
+    <string name="camera_discard_text">টেকটি মুছে ফেলা হবে।</string>
+    <string name="camera_keep_recording">রেকর্ডিং চালিয়ে যান</string>
     <string name="media_error_no_decoder">এই ফোনে এই ভিডিওর জন্য কোনো ডিকোডার নেই</string>
     <string name="media_error_decoder_stalled">ভিডিও ডিকোডার সাড়া দেওয়া বন্ধ করেছে</string>
+    <string name="media_error_too_many_frames">ইনডেক্স করার জন্য এই ভিডিওতে ফ্রেম অনেক বেশি</string>
+    <string name="project_too_many_linked">এই প্রজেক্টে অনেক বেশি লিঙ্ক করা এলিমেন্ট এমবেড করা আছে।</string>
     <string name="media_error_read_frames">এই ফোন এই ভিডিওর ফ্রেম পড়তে পারে না</string>
     <string name="media_error_pixel_format">এই ভিডিওতে এমন পিক্সেল ফরম্যাট ব্যবহার হয়েছে যা পড়া যায় না</string>
     <string name="media_error_video_unavailable">ভিডিও পাওয়া যাচ্ছে না: %1$s</string>
@@ -1715,6 +1724,10 @@
     <string name="preview_fast_blur">ফাস্ট\nব্লার</string>
     <string name="settings_preview_copies">বড় ভিডিওর প্রিভিউ কপি ব্যবহার করুন</string>
     <string name="settings_clear_preview_copies">প্রিভিউ কপি মুছুন</string>
+    <string name="settings_clear_preview_title">প্রিভিউ কপি মুছবেন?</string>
+    <string name="settings_clear_preview_text">প্রজেক্টের প্রয়োজন হলে প্রিভিউ কপি আবার তৈরি হয়।</string>
+    <string name="settings_delete_model_title">%1$s মুছবেন?</string>
+    <string name="settings_delete_model_text">পরে এটি আবার ডাউনলোড করা যাবে।</string>
     <string name="preset_numbered">প্রিসেট %1$s</string>
     <string name="recovery_your_project">আপনার প্রজেক্ট</string>
     <string name="caption_layer_name">ক্যাপশন %1$s</string>
@@ -1798,15 +1811,4 @@
     <string name="crop_reset">রিসেট</string>
     <string name="a11y_crop_ratio">অ্যাসপেক্ট রেশিও %1$s</string>
     <string name="a11y_crop_area">ক্রপ এলাকা। ক্রপ করতে একটি কোণ বা কিনারা ড্র্যাগ করুন, অথবা ক্রপ সরাতে ভেতরে ড্র্যাগ করুন।</string>
-    <string name="camera_discard_text">টেকটি মুছে ফেলা হবে।</string>
-    <string name="camera_discard_title">রেকর্ডিং বাতিল করবেন?</string>
-    <string name="camera_keep_recording">রেকর্ডিং চালিয়ে যান</string>
-    <string name="export_note_checking">ফাইল যাচাই করা হচ্ছে…</string>
-    <string name="home_duplicating">প্রজেক্ট কপি হচ্ছে…</string>
-    <string name="media_error_too_many_frames">ইনডেক্স করার জন্য এই ভিডিওতে ফ্রেম অনেক বেশি</string>
-    <string name="project_too_many_linked">এই প্রজেক্টে অনেক বেশি লিঙ্ক করা এলিমেন্ট এমবেড করা আছে।</string>
-    <string name="settings_clear_preview_text">প্রজেক্টের প্রয়োজন হলে প্রিভিউ কপি আবার তৈরি হয়।</string>
-    <string name="settings_clear_preview_title">প্রিভিউ কপি মুছবেন?</string>
-    <string name="settings_delete_model_text">পরে এটি আবার ডাউনলোড করা যাবে।</string>
-    <string name="settings_delete_model_title">%1$s মুছবেন?</string>
 </resources>

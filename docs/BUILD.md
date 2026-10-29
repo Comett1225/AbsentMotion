@@ -144,7 +144,9 @@ Outputs: `app/build/outputs/apk/<flavour>/<type>/app-<flavour>-<type>.apk`, for 
 - **Drawing back ends:** the engine (`app/src/main/cpp/engine.cpp`) starts Skia's Graphite on Vulkan 1.1. When Vulkan cannot start, or when
   **Settings**, **Graphics** is set to **OpenGL**, it uses Skia's Ganesh on OpenGL ES 3.0 instead (`Backend::kGaneshGL`: an EGL context with a
   1 x 1 pbuffer, window surfaces for the preview and the encoder, `eglPresentationTimeANDROID` for export timestamps, and
-  `SkSurfaces::WrapAndroidHardwareBuffer` for encoder buffers). `EngineThread.startEngine` tries the preferred back end first and the other second, and
+  `SkSurfaces::WrapAndroidHardwareBuffer` for encoder buffers). Video frames on OpenGL go through `gl_yuv.cpp` when the driver has
+  `GL_EXT_YUV_target`: it samples the raw Y, Cb and Cr and converts them with the stream's own matrix and range, as the Vulkan path does, because some
+  drivers (Adreno 610) read full-range BT.709 as limited range; without the extension the driver converts the frame. `EngineThread.startEngine` tries the preferred back end first and the other second, and
   the setting restarts the engine through the same path as GPU-loss recovery. Optical flow, Smooth, motion blur and Datamosh take a `GpuContext`
   (`interpolation.h`) and run on either back end. On OpenGL `Tier.openGl` locks AI Smooth, AI Enhance, AI background removal 2.0 and Optical flow
   High ("Needs a phone with Vulkan graphics"), and the AI models run on the CPU. Debug builds take `--ez gl true` on the launch intent to force OpenGL
@@ -155,6 +157,8 @@ Outputs: `app/build/outputs/apk/<flavour>/<type>/app-<flavour>-<type>.apk`, for 
   (OpenGL: BT.709 decoded as BT.601; Vulkan on some images: swapped chroma), which `tools/video_color_check.py` shows.
 - Install with `adb install -r <apk>`. Emulators work for development (arm64 image, Android 13 or newer for the Latest build; the Compatible build also
   runs on Android 8 to 12 images, through OpenGL when the image has no working Vulkan; `tools/smoke_check.py` renders a still on whichever device `ANDROID_SERIAL` names).
+  `AM_PACKAGE=<app id>` points the device tools at a debug copy installed under another app id (an `applicationIdSuffix`), so a
+  device that has the real app can be tested without touching it.
 
 The signing helper uses each APK's manifest minimum Android version and build-tools 37.0.0. `python3 tools/apk_check.py <apk> [<apk> ...]` checks signatures at every supported API through 37, resource-table and native-library packaging, ELF alignment (16 KB pages on arm64, 4 KB on 32-bit ARM), and matching app IDs, versions and certificates across the supplied APKs. Use `--unsigned` for unsigned CI output and `--libraries <folder>` to check only the 16 KB alignment of built `.so` files. Signed APKs must carry the release certificate pinned as `RELEASE_SIGNER` in `UpdateSource.kt`, the key the in-app updater accepts. This validates packaging; installation and runtime testing on emulators and real devices remain necessary.
 
@@ -165,7 +169,7 @@ The signing helper uses each APK's manifest minimum Android version and build-to
 `tools/release.sh [patch|minor|major]` bumps `version.properties` (with no argument it keeps the current version),
 runs `tools/check.sh`, and builds the release APKs of every flavour (signed as described in section 6). Results:
 
-- `build/release/AbsentMotion-<version>.apk` (the `play` flavour)
+- `build/release/AbsentMotion-<version>-play.apk` (the `play` flavour, last made for 4.x: from 5.0 the in-app updater moves Play installs to the `foss` file)
 - `build/release/AbsentMotion-<version>-foss.apk` (the `foss` flavour)
 - `build/release/AbsentMotion-<version>-compatible.apk` (the `compat` flavour, Android 8 to 12)
 - `build/release/AbsentMotion-<version>-compatible-32bit.apk` (the `compat32` flavour, phones with a 32-bit system, Android 8 or newer)

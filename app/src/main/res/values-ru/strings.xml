@@ -241,6 +241,8 @@
     <string name="update_failed">Не удалось проверить. Повторите при подключении к интернету</string>
     <string name="update_turn_on">Включить</string>
     <string name="update_not_now">Не сейчас</string>
+    <string name="play_ending_title">В 5.0 не будет сборки для Play</string>
+    <string name="play_ending_body">Начиная с версии 5.0 AbsentMotion больше не будет выходить в сборке для Play. Когда выйдет 5.0, приложение автоматически обновится до FOSS-сборки. Проекты и настройки сохранятся, а удаление фона будет работать на собственной офлайн-модели приложения, а не через сервисы Google Play.</string>
     <string name="update_outdated">Возможно, это исправлено в новой версии (установлена %1$s, последняя %2$s).</string>
     <string name="update_changelog">Список изменений</string>
     <string name="update_open_failed">На этом устройстве нет приложения, которое может открыть ссылку.</string>
@@ -365,6 +367,7 @@
     <string name="home_more">Ещё</string>
     <string name="home_duplicate_asset">Дублировать ресурс</string>
     <string name="home_duplicate">Дублировать</string>
+    <string name="home_duplicating">Копирование проекта…</string>
     <string name="home_collect_media">Собрать медиа в проект</string>
     <string name="home_delete_asset">Удалить ресурс</string>
     <string name="home_empty_assets">Ресурсов пока нет</string>
@@ -648,6 +651,7 @@
     <string name="export_error_encoder_busy">Видеокодер телефона занят или не поддерживает такой размер. Попробуйте снизить разрешение или частоту кадров.</string>
     <string name="export_error_codec_busy">Видеодекодер или видеокодер телефона перестал работать. Закройте другие приложения, которые воспроизводят или записывают видео, и повторите попытку.</string>
     <string name="export_note_software">Видеокодер телефона занят, поэтому для экспорта используется более медленный программный кодировщик.</string>
+    <string name="export_note_checking">Проверка файла…</string>
     <string name="export_note_retry">Видеокодер перестал работать. Пробуем снова с другим кодером.</string>
     <string name="export_error_stalled">Экспорт не продвигался %1$s с, поэтому был остановлен. Медиафайл или видеокодер телефона перестал отвечать. Закройте другие приложения, использующие видео, и попробуйте снова.</string>
     <string name="export_error_draw_frame">Не удалось отрисовать кадр %1$s. Попробуйте экспортировать ещё раз.</string>
@@ -696,8 +700,13 @@
     <string name="camera_error_photo">Не удалось сделать фото.</string>
     <string name="camera_error_save_video">Не удалось сохранить видео.</string>
     <string name="camera_error_start_recording">Не удалось начать запись.</string>
+    <string name="camera_discard_title">Отменить запись?</string>
+    <string name="camera_discard_text">Дубль будет удалён.</string>
+    <string name="camera_keep_recording">Продолжить запись</string>
     <string name="media_error_no_decoder">На этом телефоне нет декодера для этого видео</string>
     <string name="media_error_decoder_stalled">Видеодекодер перестал отвечать</string>
+    <string name="media_error_too_many_frames">В этом видео слишком много кадров для индексации</string>
+    <string name="project_too_many_linked">В этом проекте встроено слишком много связанных элементов.</string>
     <string name="media_error_read_frames">Этот телефон не может прочитать кадры этого видео</string>
     <string name="media_error_pixel_format">В этом видео используется формат пикселей, который не удаётся прочитать</string>
     <string name="media_error_video_unavailable">Видео недоступно: %1$s</string>
@@ -1765,6 +1774,10 @@
     <string name="preview_fast_blur">Быстрое\nразмытие</string>
     <string name="settings_preview_copies">Использовать копии больших видео для предпросмотра</string>
     <string name="settings_clear_preview_copies">Очистить копии предпросмотра</string>
+    <string name="settings_clear_preview_title">Очистить копии для предпросмотра?</string>
+    <string name="settings_clear_preview_text">Копии для предпросмотра создаются заново, когда проекту они нужны.</string>
+    <string name="settings_delete_model_title">Удалить %1$s?</string>
+    <string name="settings_delete_model_text">Его можно будет скачать снова позже.</string>
     <string name="preset_numbered">Пресет %1$s</string>
     <string name="recovery_your_project">ваш проект</string>
     <string name="caption_layer_name">Субтитры %1$s</string>
@@ -1848,15 +1861,4 @@
     <string name="crop_reset">Сбросить</string>
     <string name="a11y_crop_ratio">Соотношение сторон %1$s</string>
     <string name="a11y_crop_area">Область обрезки. Перетащите угол или край, чтобы обрезать, или перетащите внутри, чтобы сдвинуть обрезку.</string>
-    <string name="camera_discard_text">Дубль будет удалён.</string>
-    <string name="camera_discard_title">Отменить запись?</string>
-    <string name="camera_keep_recording">Продолжить запись</string>
-    <string name="export_note_checking">Проверка файла…</string>
-    <string name="home_duplicating">Копирование проекта…</string>
-    <string name="media_error_too_many_frames">В этом видео слишком много кадров для индексации</string>
-    <string name="project_too_many_linked">В этом проекте встроено слишком много связанных элементов.</string>
-    <string name="settings_clear_preview_text">Копии для предпросмотра создаются заново, когда проекту они нужны.</string>
-    <string name="settings_clear_preview_title">Очистить копии для предпросмотра?</string>
-    <string name="settings_delete_model_text">Его можно будет скачать снова позже.</string>
-    <string name="settings_delete_model_title">Удалить %1$s?</string>
 </resources>

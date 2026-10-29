@@ -241,6 +241,8 @@
     <string name="update_failed">ตรวจสอบไม่สำเร็จ ลองอีกครั้งเมื่อออนไลน์</string>
     <string name="update_turn_on">เปิดใช้งาน</string>
     <string name="update_not_now">ไม่ใช่ตอนนี้</string>
+    <string name="play_ending_title">ไม่มีเวอร์ชัน Play ใน 5.0</string>
+    <string name="play_ending_body">ตั้งแต่เวอร์ชัน 5.0 จะไม่มี AbsentMotion เวอร์ชัน Play แล้ว เมื่อ 5.0 ออก การอัปเดตจะย้ายแอปนี้ไปเป็นเวอร์ชัน FOSS โดยอัตโนมัติ โปรเจกต์และการตั้งค่าของคุณยังอยู่ครบ และการลบพื้นหลังจะใช้โมเดลออฟไลน์ของแอปเองแทนบริการของ Google Play</string>
     <string name="update_outdated">อาจแก้ไขแล้วในเวอร์ชันใหม่ (ติดตั้ง %1$s, ล่าสุด %2$s)</string>
     <string name="update_changelog">บันทึกการอัปเดต</string>
     <string name="update_open_failed">ไม่มีแอปในเครื่องนี้ที่เปิดลิงก์ได้</string>
@@ -362,6 +364,7 @@
     <string name="home_more">เพิ่มเติม</string>
     <string name="home_duplicate_asset">ทำสำเนาแอสเซท</string>
     <string name="home_duplicate">ทำสำเนา</string>
+    <string name="home_duplicating">กำลังคัดลอกโปรเจกต์…</string>
     <string name="home_collect_media">เก็บสื่อไว้ในโปรเจกต์</string>
     <string name="home_delete_asset">ลบแอสเซท</string>
     <string name="home_empty_assets">ยังไม่มีแอสเซทที่บันทึกไว้</string>
@@ -615,6 +618,7 @@
     <string name="export_error_encoder_busy">ตัวเข้ารหัสวิดีโอของโทรศัพท์ไม่ว่างหรือสร้างขนาดนี้ไม่ได้ ลองใช้ความละเอียดหรือเฟรมเรตที่ต่ำลง</string>
     <string name="export_error_codec_busy">ตัวถอดรหัสหรือตัวเข้ารหัสวิดีโอของโทรศัพท์หยุดทำงาน ปิดแอปอื่นที่เล่นหรือบันทึกวิดีโอ แล้วลองอีกครั้ง</string>
     <string name="export_note_software">ตัวเข้ารหัสวิดีโอของโทรศัพท์ไม่ว่าง การส่งออกนี้จึงใช้ตัวเข้ารหัสซอฟต์แวร์ที่ช้ากว่า</string>
+    <string name="export_note_checking">กำลังตรวจสอบไฟล์…</string>
     <string name="export_note_retry">ตัวเข้ารหัสวิดีโอหยุดทำงาน กำลังลองใหม่ด้วยตัวเข้ารหัสอื่น</string>
     <string name="export_error_stalled">การส่งออกไม่มีความคืบหน้าเป็นเวลา %1$s วินาที จึงหยุดลง ไฟล์สื่อหรือตัวเข้ารหัสวิดีโอของโทรศัพท์ไม่ตอบสนอง ปิดแอปอื่นที่ใช้วิดีโอแล้วลองอีกครั้ง</string>
     <string name="export_error_draw_frame">วาดเฟรม %1$s ไม่ได้ ลองส่งออกอีกครั้ง</string>
@@ -663,8 +667,13 @@
     <string name="camera_error_photo">ถ่ายรูปไม่สำเร็จ</string>
     <string name="camera_error_save_video">บันทึกวิดีโอไม่สำเร็จ</string>
     <string name="camera_error_start_recording">เริ่มบันทึกไม่สำเร็จ</string>
+    <string name="camera_discard_title">ทิ้งการบันทึกหรือไม่?</string>
+    <string name="camera_discard_text">ฟุตเทจที่ถ่ายจะถูกลบ</string>
+    <string name="camera_keep_recording">บันทึกต่อ</string>
     <string name="media_error_no_decoder">เครื่องนี้ไม่มีตัวถอดรหัสสำหรับวิดีโอนี้</string>
     <string name="media_error_decoder_stalled">ตัวถอดรหัสวิดีโอไม่ตอบสนอง</string>
+    <string name="media_error_too_many_frames">วิดีโอนี้มีเฟรมมากเกินไปที่จะทำดัชนีได้</string>
+    <string name="project_too_many_linked">โปรเจกต์นี้ฝังองค์ประกอบที่เชื่อมโยงมากเกินไป</string>
     <string name="media_error_read_frames">เครื่องนี้อ่านเฟรมของวิดีโอนี้ไม่ได้</string>
     <string name="media_error_pixel_format">วิดีโอนี้ใช้รูปแบบพิกเซลที่อ่านไม่ได้</string>
     <string name="media_error_video_unavailable">วิดีโอไม่พร้อมใช้งาน: %1$s</string>
@@ -1690,6 +1699,10 @@
     <string name="preview_fast_blur">เบลอ\nเร็ว</string>
     <string name="settings_preview_copies">ใช้ไฟล์ตัวอย่างสำหรับวิดีโอขนาดใหญ่</string>
     <string name="settings_clear_preview_copies">ล้างไฟล์ตัวอย่าง</string>
+    <string name="settings_clear_preview_title">ล้างสำเนาตัวอย่างหรือไม่?</string>
+    <string name="settings_clear_preview_text">สำเนาตัวอย่างจะถูกสร้างใหม่เมื่อโปรเจกต์ต้องการ</string>
+    <string name="settings_delete_model_title">ลบ %1$s หรือไม่?</string>
+    <string name="settings_delete_model_text">สามารถดาวน์โหลดใหม่ได้ภายหลัง</string>
     <string name="preset_numbered">พรีเซ็ต %1$s</string>
     <string name="recovery_your_project">โปรเจกต์ของคุณ</string>
     <string name="caption_layer_name">คำบรรยาย %1$s</string>
@@ -1773,15 +1786,4 @@
     <string name="crop_reset">รีเซ็ต</string>
     <string name="a11y_crop_ratio">อัตราส่วนภาพ %1$s</string>
     <string name="a11y_crop_area">พื้นที่ครอบตัด ลากมุมหรือขอบเพื่อครอบตัด หรือลากด้านในเพื่อย้ายพื้นที่ครอบตัด</string>
-    <string name="camera_discard_text">ฟุตเทจที่ถ่ายจะถูกลบ</string>
-    <string name="camera_discard_title">ทิ้งการบันทึกหรือไม่?</string>
-    <string name="camera_keep_recording">บันทึกต่อ</string>
-    <string name="export_note_checking">กำลังตรวจสอบไฟล์…</string>
-    <string name="home_duplicating">กำลังคัดลอกโปรเจกต์…</string>
-    <string name="media_error_too_many_frames">วิดีโอนี้มีเฟรมมากเกินไปที่จะทำดัชนีได้</string>
-    <string name="project_too_many_linked">โปรเจกต์นี้ฝังองค์ประกอบที่เชื่อมโยงมากเกินไป</string>
-    <string name="settings_clear_preview_text">สำเนาตัวอย่างจะถูกสร้างใหม่เมื่อโปรเจกต์ต้องการ</string>
-    <string name="settings_clear_preview_title">ล้างสำเนาตัวอย่างหรือไม่?</string>
-    <string name="settings_delete_model_text">สามารถดาวน์โหลดใหม่ได้ภายหลัง</string>
-    <string name="settings_delete_model_title">ลบ %1$s หรือไม่?</string>
 </resources>

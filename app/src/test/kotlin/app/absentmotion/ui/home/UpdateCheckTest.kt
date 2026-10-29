@@ -69,6 +69,14 @@ class UpdateCheckTest {
         assertEquals("$HOME_PAGE/releases/tag/$tag", parseRelease(json, "foss")?.link)
     }
 
+    @Test fun aPlayInstallMovesToTheFossApkWhenThereIsNoPlayApk() {
+        val tag = "v5.0.0"
+        fun asset(name: String) = """{"name":"$name","size":1000,"browser_download_url":"$HOME_PAGE/releases/download/$tag/$name"}"""
+        val json = """{"tag_name":"$tag","assets":[${asset("AbsentMotion-5.0.0-foss.apk")},${asset("AbsentMotion-5.0.0-compatible.apk")}]}"""
+        assertEquals("AbsentMotion-5.0.0-foss.apk", parseRelease(json, "play")?.apk?.name)
+        assertNull(parseRelease("""{"tag_name":"$tag","assets":[${asset("AbsentMotion-5.0.0-play.apk")}]}""", "foss")?.download)
+    }
+
     @Test fun aMissingOrForeignApkFallsBackToTheReleasePage() {
         val tag = "v3.4.0"
         fun one(name: String, url: String) =

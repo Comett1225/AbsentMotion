@@ -3,7 +3,7 @@ import shutil
 import subprocess
 from pathlib import Path
 
-PACKAGE = "app.absentmotion"
+PACKAGE = os.environ.get("AM_PACKAGE") or "app.absentmotion"
 
 
 def sdk_root():

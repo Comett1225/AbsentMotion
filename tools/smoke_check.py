@@ -42,7 +42,7 @@ def main():
     sdk.adb("shell", "rm", "/data/local/tmp/am-smoke.xml")
     sdk.adb("logcat", "-c")
     internal = f"/data/data/{package}/files/smoke.xml"
-    sdk.adb("shell", "am", "start", "-n", f"{package}/.MainActivity", "--es", "xml", internal, "--es", "still", "smoke", "--ei", "frame", "0")
+    sdk.adb("shell", "am", "start", "-n", f"{package}/app.absentmotion.MainActivity", "--es", "xml", internal, "--es", "still", "smoke", "--ei", "frame", "0")
     deadline = time.time() + args.timeout
     log = ""
     while time.time() < deadline:

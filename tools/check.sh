@@ -78,8 +78,8 @@ if [ "$mode" = quick ]; then
     printf '\n== Android: compile and unit tests (foss)\n'
     ./gradlew :app:compileFossDebugKotlin :app:testFossDebugUnitTest -q >"$dir/gradle.log" 2>&1 || { grep -E '^e: |FAILED|Test.*>' "$dir/gradle.log" | sed 's|file://[^ ]*/app/src/main/kotlin/app/absentmotion/||' | head -40 >&2; fail "Android compile or unit tests (full output: $dir/gradle.log)"; }
 else
-    printf '\n== Android: compile (play, foss and compat), unit tests, lint\n'
-    tasks=":app:compilePlayDebugKotlin :app:compileFossDebugKotlin :app:compileCompatDebugKotlin :app:testFossDebugUnitTest :app:testCompatDebugUnitTest"
+    printf '\n== Android: compile (play, foss, compat and compat32), unit tests, lint\n'
+    tasks=":app:compilePlayDebugKotlin :app:compileFossDebugKotlin :app:compileCompatDebugKotlin :app:compileCompat32DebugKotlin :app:testFossDebugUnitTest :app:testCompatDebugUnitTest"
     [ -f app/lint-baseline.xml ] && tasks="$tasks :app:lintFossDebug :app:lintCompatDebug"
     ./gradlew $tasks -q >"$dir/gradle.log" 2>&1 || { grep -E '^e: |FAILED|Test.*>|Error:|error:' "$dir/gradle.log" | sed 's|file://[^ ]*/app/src/main/kotlin/app/absentmotion/||' | head -40 >&2; fail "Android compile, unit tests or lint (full output: $dir/gradle.log)"; }
     printf '\n== Native libraries: lowest Android version they need, 16 KB page alignment\n'

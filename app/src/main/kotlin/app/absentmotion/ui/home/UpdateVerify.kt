@@ -27,7 +27,7 @@ internal fun judgeApk(apk: ApkFacts?, installed: InstalledApp, version: String):
     apk ?: return UpdateFailure.WrongApp
     if (apk.packageName != installed.packageName) return UpdateFailure.WrongApp
     if (!signersMatch(installed.signers, apk.signers, apk.history)) return UpdateFailure.Signature
-    if (apk.variant != installed.variant) return UpdateFailure.WrongApp
+    if (apk.variant !in apkFlavours(installed.variant)) return UpdateFailure.WrongApp
     if (apk.versionName != version || apk.versionCode <= installed.versionCode || isNewer(version, installed.versionName) != true) return UpdateFailure.NotNewer
     return null
 }

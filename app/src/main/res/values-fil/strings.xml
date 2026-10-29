@@ -241,6 +241,8 @@
     <string name="update_failed">Hindi makapag-check, subukan ulit kapag online ka na</string>
     <string name="update_turn_on">I-on</string>
     <string name="update_not_now">Hindi muna</string>
+    <string name="play_ending_title">Walang Play build sa 5.0</string>
+    <string name="play_ending_body">Mula sa bersyon 5.0, wala nang Play build ang AbsentMotion. Kapag lumabas ang 5.0, awtomatikong ililipat ng update ang app na ito sa FOSS build. Mananatili ang mga proyekto at setting mo, at gagamitin ng background removal ang sariling offline na modelo ng app sa halip na Google Play services.</string>
     <string name="update_outdated">Maaaring naayos na ito sa mas bagong bersyon (naka-install %1$s, pinakabago %2$s).</string>
     <string name="update_changelog">Talaan ng mga pagbabago</string>
     <string name="update_open_failed">Walang app sa device na ito na makakabukas ng link.</string>
@@ -363,6 +365,7 @@
     <string name="home_more">Higit pa</string>
     <string name="home_duplicate_asset">Kopyahin ang asset</string>
     <string name="home_duplicate">I-duplicate</string>
+    <string name="home_duplicating">Kinokopya ang proyekto…</string>
     <string name="home_collect_media">Ipunin ang media sa proyekto</string>
     <string name="home_delete_asset">Tanggalin ang asset</string>
     <string name="home_empty_assets">Wala pang naka-save na asset</string>
@@ -626,6 +629,7 @@
     <string name="export_error_encoder_busy">Abala ang video encoder ng teleponong ito o hindi nito kayang gawin ang ganitong laki. Subukan ang mas mababang resolusyon o frame rate.</string>
     <string name="export_error_codec_busy">Huminto ang video decoder o encoder ng telepono. Isara ang iba pang app na nagpe-play o nagre-record ng bidyo, pagkatapos subukan muli.</string>
     <string name="export_note_software">Abala ang video encoder ng telepono, kaya gumagamit ang export na ito ng mas mabagal na software encoder.</string>
+    <string name="export_note_checking">Sinusuri ang file…</string>
     <string name="export_note_retry">Huminto ang video encoder. Susubukan muli gamit ang ibang encoder.</string>
     <string name="export_error_stalled">Walang progreso ang export sa loob ng %1$s segundo, kaya hininto ito. May media file o video encoder ng phone na hindi tumugon. Isara ang iba pang app na gumagamit ng video at subukan muli.</string>
     <string name="export_error_draw_frame">Hindi naiguhit ang frame %1$s. Subukang i-export muli.</string>
@@ -674,8 +678,13 @@
     <string name="camera_error_photo">Hindi nakuhanan ng litrato.</string>
     <string name="camera_error_save_video">Hindi na-save ang bidyo.</string>
     <string name="camera_error_start_recording">Hindi masimulan ang pag-record.</string>
+    <string name="camera_discard_title">I-discard ang recording?</string>
+    <string name="camera_discard_text">Made-delete ang take.</string>
+    <string name="camera_keep_recording">Ituloy ang pagre-record</string>
     <string name="media_error_no_decoder">Walang decoder ang phone na ito para sa bidyong ito</string>
     <string name="media_error_decoder_stalled">Hindi na tumutugon ang video decoder</string>
+    <string name="media_error_too_many_frames">Masyadong maraming frame ang video na ito para ma-index</string>
+    <string name="project_too_many_linked">Masyadong maraming naka-link na elemento ang naka-embed sa proyektong ito.</string>
     <string name="media_error_read_frames">Hindi kayang basahin ng phone na ito ang mga frame ng bidyong ito</string>
     <string name="media_error_pixel_format">Gumagamit ang bidyong ito ng pixel format na hindi mabasa</string>
     <string name="media_error_video_unavailable">Hindi available ang bidyo: %1$s</string>
@@ -1715,6 +1724,10 @@
     <string name="preview_fast_blur">Mabilis\nBlur</string>
     <string name="settings_preview_copies">Gamitin ang preview copies ng malalaking bidyo</string>
     <string name="settings_clear_preview_copies">Burahin ang preview copies</string>
+    <string name="settings_clear_preview_title">I-clear ang mga kopya ng preview?</string>
+    <string name="settings_clear_preview_text">Muling binubuo ang mga kopya ng preview kapag kailangan ng proyekto.</string>
+    <string name="settings_delete_model_title">I-delete ang %1$s?</string>
+    <string name="settings_delete_model_text">Maaari itong i-download ulit sa susunod.</string>
     <string name="preset_numbered">Preset %1$s</string>
     <string name="recovery_your_project">iyong proyekto</string>
     <string name="caption_layer_name">Kapsyon %1$s</string>
@@ -1798,15 +1811,4 @@
     <string name="crop_reset">I-reset</string>
     <string name="a11y_crop_ratio">Aspect ratio %1$s</string>
     <string name="a11y_crop_area">Crop area. I-drag ang isang sulok o gilid para mag-crop, o i-drag sa loob para ilipat ang crop.</string>
-    <string name="camera_discard_text">Made-delete ang take.</string>
-    <string name="camera_discard_title">I-discard ang recording?</string>
-    <string name="camera_keep_recording">Ituloy ang pagre-record</string>
-    <string name="export_note_checking">Sinusuri ang file…</string>
-    <string name="home_duplicating">Kinokopya ang proyekto…</string>
-    <string name="media_error_too_many_frames">Masyadong maraming frame ang video na ito para ma-index</string>
-    <string name="project_too_many_linked">Masyadong maraming naka-link na elemento ang naka-embed sa proyektong ito.</string>
-    <string name="settings_clear_preview_text">Muling binubuo ang mga kopya ng preview kapag kailangan ng proyekto.</string>
-    <string name="settings_clear_preview_title">I-clear ang mga kopya ng preview?</string>
-    <string name="settings_delete_model_text">Maaari itong i-download ulit sa susunod.</string>
-    <string name="settings_delete_model_title">I-delete ang %1$s?</string>
 </resources>

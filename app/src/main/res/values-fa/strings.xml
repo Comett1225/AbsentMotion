@@ -241,6 +241,8 @@
     <string name="update_failed">بررسی ممکن نشد؛ وقتی آنلاین بودید دوباره امتحان کنید</string>
     <string name="update_turn_on">روشنش کنید</string>
     <string name="update_not_now">الان نه</string>
+    <string name="play_ending_title">نسخه Play در 5.0 وجود ندارد</string>
+    <string name="play_ending_body">از نسخه 5.0 به بعد، AbsentMotion نسخه Play نخواهد داشت. با انتشار 5.0، به‌روزرسانی این اپ را به‌طور خودکار به نسخه FOSS منتقل می‌کند. پروژه‌ها و تنظیمات شما باقی می‌مانند و حذف پس‌زمینه به‌جای سرویس‌های Google Play از مدل آفلاین خود اپ استفاده می‌کند.</string>
     <string name="update_outdated">این مشکل ممکن است در نسخه جدیدتر برطرف شده باشد (نصب‌شده %1$s، جدیدترین %2$s).</string>
     <string name="update_changelog">تغییرات</string>
     <string name="update_open_failed">هیچ برنامه‌ای در این دستگاه نمی‌تواند این پیوند را باز کند.</string>
@@ -363,6 +365,7 @@
     <string name="home_more">بیشتر</string>
     <string name="home_duplicate_asset">تکثیر دارایی</string>
     <string name="home_duplicate">تکثیر</string>
+    <string name="home_duplicating">در حال کپی پروژه…</string>
     <string name="home_collect_media">جمع‌آوری رسانه‌ها در پروژه</string>
     <string name="home_delete_asset">حذف دارایی</string>
     <string name="home_empty_assets">هنوز دارایی‌ای ذخیره نشده</string>
@@ -626,6 +629,7 @@
     <string name="export_error_encoder_busy">انکودر ویدیوی این گوشی مشغول است یا نمی‌تواند این اندازه را بسازد. رزولوشن یا نرخ فریم پایین‌تر را امتحان کنید.</string>
     <string name="export_error_codec_busy">دیکودر یا انکودر ویدیوی گوشی از کار افتاد. برنامه‌های دیگر را که ویدیو پخش یا ضبط می‌کنند ببندید، سپس دوباره تلاش کنید.</string>
     <string name="export_note_software">انکودر ویدیوی گوشی مشغول است، بنابراین این خروجی از انکودر نرم‌افزاری کندتر استفاده می‌کند.</string>
+    <string name="export_note_checking">در حال بررسی فایل…</string>
     <string name="export_note_retry">انکودر ویدیو از کار افتاد. تلاش مجدد با انکودر دیگر.</string>
     <string name="export_error_stalled">خروجی برای %1$s ثانیه پیشرفتی نداشت، بنابراین متوقف شد. یک فایل رسانه یا انکودر ویدیوی گوشی پاسخ نمی‌داد. برنامه‌های دیگری را که از ویدیو استفاده می‌کنند ببندید و دوباره تلاش کنید.</string>
     <string name="export_error_draw_frame">فریم %1$s رسم نشد. دوباره خروجی بگیرید.</string>
@@ -674,8 +678,13 @@
     <string name="camera_error_photo">عکس گرفته نشد.</string>
     <string name="camera_error_save_video">ویدیو ذخیره نشد.</string>
     <string name="camera_error_start_recording">ضبط شروع نشد.</string>
+    <string name="camera_discard_title">ضبط دور انداخته شود؟</string>
+    <string name="camera_discard_text">این برداشت حذف می‌شود.</string>
+    <string name="camera_keep_recording">ادامه ضبط</string>
     <string name="media_error_no_decoder">این گوشی رمزگشای این ویدیو را ندارد</string>
     <string name="media_error_decoder_stalled">رمزگشای ویدیو دیگر پاسخ نمی‌دهد</string>
+    <string name="media_error_too_many_frames">این ویدیو فریم‌های بیش از حدی برای نمایه‌سازی دارد</string>
+    <string name="project_too_many_linked">این پروژه عناصر پیوندی بیش از حدی را جاسازی کرده است.</string>
     <string name="media_error_read_frames">این گوشی نمی‌تواند فریم‌های این ویدیو را بخواند</string>
     <string name="media_error_pixel_format">این ویدیو از قالب پیکسلی استفاده می‌کند که خوانده نمی‌شود</string>
     <string name="media_error_video_unavailable">ویدیو در دسترس نیست: %1$s</string>
@@ -1715,6 +1724,10 @@
     <string name="preview_fast_blur">بلور\nسریع</string>
     <string name="settings_preview_copies">استفاده از نسخه‌های پیش‌نمایش برای ویدیوهای بزرگ</string>
     <string name="settings_clear_preview_copies">پاک کردن نسخه‌های پیش‌نمایش</string>
+    <string name="settings_clear_preview_title">کپی‌های پیش‌نمایش پاک شوند؟</string>
+    <string name="settings_clear_preview_text">کپی‌های پیش‌نمایش هر زمان پروژه به آن‌ها نیاز داشته باشد دوباره ساخته می‌شوند.</string>
+    <string name="settings_delete_model_title">%1$s حذف شود؟</string>
+    <string name="settings_delete_model_text">بعداً می‌توان دوباره آن را دانلود کرد.</string>
     <string name="preset_numbered">پریست %1$s</string>
     <string name="recovery_your_project">پروژه شما</string>
     <string name="caption_layer_name">زیرنویس %1$s</string>
@@ -1798,15 +1811,4 @@
     <string name="crop_reset">بازنشانی</string>
     <string name="a11y_crop_ratio">نسبت ابعاد %1$s</string>
     <string name="a11y_crop_area">ناحیهٔ برش. برای برش، یک گوشه یا لبه را بکشید، یا درون آن را بکشید تا برش جابه‌جا شود.</string>
-    <string name="camera_discard_text">این برداشت حذف می‌شود.</string>
-    <string name="camera_discard_title">ضبط دور انداخته شود؟</string>
-    <string name="camera_keep_recording">ادامه ضبط</string>
-    <string name="export_note_checking">در حال بررسی فایل…</string>
-    <string name="home_duplicating">در حال کپی پروژه…</string>
-    <string name="media_error_too_many_frames">این ویدیو فریم‌های بیش از حدی برای نمایه‌سازی دارد</string>
-    <string name="project_too_many_linked">این پروژه عناصر پیوندی بیش از حدی را جاسازی کرده است.</string>
-    <string name="settings_clear_preview_text">کپی‌های پیش‌نمایش هر زمان پروژه به آن‌ها نیاز داشته باشد دوباره ساخته می‌شوند.</string>
-    <string name="settings_clear_preview_title">کپی‌های پیش‌نمایش پاک شوند؟</string>
-    <string name="settings_delete_model_text">بعداً می‌توان دوباره آن را دانلود کرد.</string>
-    <string name="settings_delete_model_title">%1$s حذف شود؟</string>
 </resources>

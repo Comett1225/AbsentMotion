@@ -24,7 +24,7 @@ def export(kind, extra, timeout):
     sdk.adb("shell", "am", "force-stop", sdk.PACKAGE)
     sdk.adb("shell", "rm", "-f", f"{FILES}/export.gif", f"{FILES}/export.mp4")
     sdk.adb("logcat", "-c")
-    sdk.adb("shell", "am", "start", "-n", f"{sdk.PACKAGE}/.MainActivity", "--es", "xml", f"/data/data/{sdk.PACKAGE}/files/export-smoke.xml",
+    sdk.adb("shell", "am", "start", "-n", f"{sdk.PACKAGE}/app.absentmotion.MainActivity", "--es", "xml", f"/data/data/{sdk.PACKAGE}/files/export-smoke.xml",
             "--es", "export", kind, "--ei", "fps", "30", *extra)
     deadline = time.time() + timeout
     while time.time() < deadline:

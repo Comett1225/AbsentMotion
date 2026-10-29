@@ -4,6 +4,7 @@
 #include "effects.h"
 #include "drawing.h"
 #include "interpolation.h"
+#include "gl_yuv.h"
 
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
@@ -223,6 +224,7 @@ private:
     EGLContext fContext = EGL_NO_CONTEXT;
     EGLSurface fPbuffer = EGL_NO_SURFACE;
     PFNEGLPRESENTATIONTIMEANDROIDPROC fPresentationTime = nullptr;
+    GlYuv fYuv;
 
     skgpu::VulkanPreferredFeatures fSkiaFeatures;
     VkPhysicalDeviceFeatures2 fFeatures = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2};
@@ -825,7 +827,10 @@ sk_sp<SkImage> EngineImpl::picture(const std::string& uri, int64_t layerId) cons
 sk_sp<SkImage> EngineImpl::copyFrame(AHardwareBuffer* buffer, bool opaque, int colorStandard, int colorRange, const FrameCrop& crop,
                                      const MediaKey* key, int maxSide) {
     bool rawYuv = false;
-    auto imported = this->importFrame(buffer, opaque, colorStandard, colorRange, &rawYuv, key);
+    sk_sp<SkImage> imported;
+    if (this->gl() && (colorStandard == 1 || colorStandard == 2 || colorStandard == 4 || colorStandard == 6))
+        imported = fYuv.convert(fGanesh.get(), buffer, colorStandard, colorRange, opaque ? kOpaque_SkAlphaType : kPremul_SkAlphaType);
+    if (!imported) imported = this->importFrame(buffer, opaque, colorStandard, colorRange, &rawYuv, key);
     if (!imported) return nullptr;
     auto bounds = SkIRect::MakeWH(imported->width(), imported->height());
     if (crop.right > crop.left && crop.bottom > crop.top &&

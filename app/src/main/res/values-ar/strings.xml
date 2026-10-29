@@ -241,6 +241,8 @@
     <string name="update_failed">تعذر التحقق، أعد المحاولة عند الاتصال بالإنترنت</string>
     <string name="update_turn_on">تشغيله</string>
     <string name="update_not_now">ليس الآن</string>
+    <string name="play_ending_title">لا إصدار Play في 5.0</string>
+    <string name="play_ending_body">بدءًا من الإصدار 5.0، لن يتوفر إصدار Play من AbsentMotion. عند صدور 5.0، سينقل التحديث هذا التطبيق تلقائيًا إلى إصدار FOSS. تبقى مشاريعك وإعداداتك كما هي، وتستخدم إزالة الخلفية النموذج المحلي الخاص بالتطبيق دون اتصال بدلًا من خدمات Google Play.</string>
     <string name="update_outdated">قد يُصلَح هذا في الإصدار الأحدث (المثبت %1$s، الأحدث %2$s).</string>
     <string name="update_changelog">سجل التغييرات</string>
     <string name="update_open_failed">لا يوجد تطبيق على هذا الجهاز يمكنه فتح الرابط.</string>
@@ -367,6 +369,7 @@
     <string name="home_more">المزيد</string>
     <string name="home_duplicate_asset">تكرار الأصل</string>
     <string name="home_duplicate">تكرار</string>
+    <string name="home_duplicating">جارٍ نسخ المشروع…</string>
     <string name="home_collect_media">تجميع الوسائط في المشروع</string>
     <string name="home_delete_asset">حذف الأصل</string>
     <string name="home_empty_assets">لا توجد أصول محفوظة بعد</string>
@@ -670,6 +673,7 @@
     <string name="export_error_encoder_busy">مُرمِّز الفيديو في هذا الهاتف مشغول أو لا يستطيع إنتاج هذا الحجم. جرّب دقة أو معدل إطارات أقل.</string>
     <string name="export_error_codec_busy">توقف مُفكِّك ترميز الفيديو أو مُرمِّزه في الهاتف عن العمل. أغلق التطبيقات الأخرى التي تشغّل الفيديو أو تسجله، ثم حاول مرة أخرى.</string>
     <string name="export_note_software">مُرمِّز الفيديو في الهاتف مشغول، لذا يستخدم هذا التصدير مُرمِّز البرمجيات الأبطأ.</string>
+    <string name="export_note_checking">جارٍ فحص الملف…</string>
     <string name="export_note_retry">توقف مُرمّز الفيديو عن العمل. تجري المحاولة مجددًا بمُرمّز آخر.</string>
     <string name="export_error_stalled">لم يُحرز التصدير أي تقدم لمدة %1$s ثانية، لذا تم إيقافه. توقف ملف وسائط أو مُرمّز الفيديو في الهاتف عن الاستجابة. أغلق التطبيقات الأخرى التي تستخدم الفيديو وحاول مجددًا.</string>
     <string name="export_error_draw_frame">تعذر رسم الإطار %1$s. حاول التصدير مرة أخرى.</string>
@@ -718,8 +722,13 @@
     <string name="camera_error_photo">تعذر التقاط الصورة.</string>
     <string name="camera_error_save_video">تعذر حفظ الفيديو.</string>
     <string name="camera_error_start_recording">تعذر بدء التسجيل.</string>
+    <string name="camera_discard_title">هل تريد تجاهل التسجيل؟</string>
+    <string name="camera_discard_text">سيتم حذف اللقطة.</string>
+    <string name="camera_keep_recording">متابعة التسجيل</string>
     <string name="media_error_no_decoder">لا يحتوي هذا الهاتف على فاك ترميز لهذا الفيديو</string>
     <string name="media_error_decoder_stalled">توقف فاك ترميز الفيديو عن الاستجابة</string>
+    <string name="media_error_too_many_frames">يحتوي هذا الفيديو على عدد كبير جدًا من الإطارات لفهرسته</string>
+    <string name="project_too_many_linked">يضم هذا المشروع عددًا كبيرًا جدًا من العناصر المرتبطة.</string>
     <string name="media_error_read_frames">لا يستطيع هذا الهاتف قراءة إطارات هذا الفيديو</string>
     <string name="media_error_pixel_format">يستخدم هذا الفيديو تنسيق بكسل غير قابل للقراءة</string>
     <string name="media_error_video_unavailable">الفيديو غير متاح: %1$s</string>
@@ -1815,6 +1824,10 @@
     <string name="preview_fast_blur">ضبابية\nسريعة</string>
     <string name="settings_preview_copies">استخدام نسخ معاينة للفيديوهات الكبيرة</string>
     <string name="settings_clear_preview_copies">مسح نسخ المعاينة</string>
+    <string name="settings_clear_preview_title">هل تريد مسح نسخ المعاينة؟</string>
+    <string name="settings_clear_preview_text">تُعاد إنشاء نسخ المعاينة عندما يحتاج إليها المشروع.</string>
+    <string name="settings_delete_model_title">هل تريد حذف %1$s؟</string>
+    <string name="settings_delete_model_text">يمكن تنزيله مرة أخرى لاحقًا.</string>
     <string name="preset_numbered">إعداد مسبق %1$s</string>
     <string name="recovery_your_project">مشروعك</string>
     <string name="caption_layer_name">تسمية توضيحية %1$s</string>
@@ -1898,15 +1911,4 @@
     <string name="crop_reset">إعادة ضبط</string>
     <string name="a11y_crop_ratio">نسبة العرض إلى الارتفاع %1$s</string>
     <string name="a11y_crop_area">منطقة الاقتصاص. اسحب زاوية أو حافة للاقتصاص، أو اسحب داخلها لتحريك منطقة الاقتصاص.</string>
-    <string name="camera_discard_text">سيتم حذف اللقطة.</string>
-    <string name="camera_discard_title">هل تريد تجاهل التسجيل؟</string>
-    <string name="camera_keep_recording">متابعة التسجيل</string>
-    <string name="export_note_checking">جارٍ فحص الملف…</string>
-    <string name="home_duplicating">جارٍ نسخ المشروع…</string>
-    <string name="media_error_too_many_frames">يحتوي هذا الفيديو على عدد كبير جدًا من الإطارات لفهرسته</string>
-    <string name="project_too_many_linked">يضم هذا المشروع عددًا كبيرًا جدًا من العناصر المرتبطة.</string>
-    <string name="settings_clear_preview_text">تُعاد إنشاء نسخ المعاينة عندما يحتاج إليها المشروع.</string>
-    <string name="settings_clear_preview_title">هل تريد مسح نسخ المعاينة؟</string>
-    <string name="settings_delete_model_text">يمكن تنزيله مرة أخرى لاحقًا.</string>
-    <string name="settings_delete_model_title">هل تريد حذف %1$s؟</string>
 </resources>

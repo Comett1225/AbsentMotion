@@ -241,6 +241,8 @@
     <string name="update_failed">Denetlenemedi, çevrimiçi olduğunuzda tekrar deneyin</string>
     <string name="update_turn_on">Aç</string>
     <string name="update_not_now">Şimdi değil</string>
+    <string name="play_ending_title">5.0\'te Play sürümü yok</string>
+    <string name="play_ending_body">5.0 sürümünden itibaren AbsentMotion\'ın Play sürümü olmayacak. 5.0 çıktığında güncelleme bu uygulamayı otomatik olarak FOSS sürümüne taşır. Projeleriniz ve ayarlarınız korunur; arka plan kaldırma, Google Play hizmetleri yerine uygulamanın kendi çevrimdışı modelini kullanır.</string>
     <string name="update_outdated">Bu, yeni sürümde düzeltilmiş olabilir (yüklü %1$s, en yeni %2$s).</string>
     <string name="update_changelog">Sürüm notları</string>
     <string name="update_open_failed">Bu cihazda bağlantıyı açabilecek bir uygulama yok.</string>
@@ -363,6 +365,7 @@
     <string name="home_more">Daha fazla</string>
     <string name="home_duplicate_asset">Varlığı çoğalt</string>
     <string name="home_duplicate">Çoğalt</string>
+    <string name="home_duplicating">Proje kopyalanıyor…</string>
     <string name="home_collect_media">Medyayı projeye topla</string>
     <string name="home_delete_asset">Varlığı sil</string>
     <string name="home_empty_assets">Henüz kaydedilmiş varlık yok</string>
@@ -626,6 +629,7 @@
     <string name="export_error_encoder_busy">Telefonun video kodlayıcısı meşgul veya bu boyutu oluşturamıyor. Daha düşük bir çözünürlük ya da kare hızı deneyin.</string>
     <string name="export_error_codec_busy">Telefonun video kod çözücüsü veya kodlayıcısı çalışmayı durdurdu. Video oynatan ya da kaydeden diğer uygulamaları kapatıp tekrar deneyin.</string>
     <string name="export_note_software">Telefonun video kodlayıcısı meşgul olduğu için bu dışa aktarma daha yavaş olan yazılım kodlayıcısını kullanıyor.</string>
+    <string name="export_note_checking">Dosya kontrol ediliyor…</string>
     <string name="export_note_retry">Video kodlayıcı çalışmayı durdurdu. Başka bir kodlayıcıyla yeniden deneniyor.</string>
     <string name="export_error_stalled">Dışa aktarma %1$s saniye boyunca ilerleme kaydetmediği için durduruldu. Bir medya dosyası veya telefonun video kodlayıcısı yanıt vermeyi durdurdu. Video kullanan diğer uygulamaları kapatıp tekrar deneyin.</string>
     <string name="export_error_draw_frame">Kare %1$s çizilemedi. Dışa aktarmayı yeniden deneyin.</string>
@@ -674,8 +678,13 @@
     <string name="camera_error_photo">Fotoğraf çekilemedi.</string>
     <string name="camera_error_save_video">Video kaydedilemedi.</string>
     <string name="camera_error_start_recording">Kayıt başlatılamadı.</string>
+    <string name="camera_discard_title">Kayıt silinsin mi?</string>
+    <string name="camera_discard_text">Çekim silinecek.</string>
+    <string name="camera_keep_recording">Kayda devam et</string>
     <string name="media_error_no_decoder">Bu telefonda bu video için kod çözücü yok</string>
     <string name="media_error_decoder_stalled">Video kod çözücü yanıt vermeyi durdurdu</string>
+    <string name="media_error_too_many_frames">Bu videonun dizinlenemeyecek kadar çok karesi var</string>
+    <string name="project_too_many_linked">Bu proje çok fazla bağlı öğe içeriyor.</string>
     <string name="media_error_read_frames">Bu telefon bu videonun karelerini okuyamıyor</string>
     <string name="media_error_pixel_format">Bu video okunamayan bir piksel biçimi kullanıyor</string>
     <string name="media_error_video_unavailable">Video kullanılamıyor: %1$s</string>
@@ -1715,6 +1724,10 @@
     <string name="preview_fast_blur">Hızlı\nBulanık</string>
     <string name="settings_preview_copies">Büyük videolar için önizleme kopyaları kullan</string>
     <string name="settings_clear_preview_copies">Önizleme kopyalarını temizle</string>
+    <string name="settings_clear_preview_title">Önizleme kopyaları temizlensin mi?</string>
+    <string name="settings_clear_preview_text">Önizleme kopyaları bir proje ihtiyaç duyduğunda yeniden oluşturulur.</string>
+    <string name="settings_delete_model_title">%1$s silinsin mi?</string>
+    <string name="settings_delete_model_text">Daha sonra yeniden indirilebilir.</string>
     <string name="preset_numbered">Ön ayar %1$s</string>
     <string name="recovery_your_project">projeniz</string>
     <string name="caption_layer_name">Altyazı %1$s</string>
@@ -1798,15 +1811,4 @@
     <string name="crop_reset">Sıfırla</string>
     <string name="a11y_crop_ratio">En boy oranı %1$s</string>
     <string name="a11y_crop_area">Kırpma alanı. Kırpmak için bir köşeyi veya kenarı sürükleyin ya da kırpmayı taşımak için içini sürükleyin.</string>
-    <string name="camera_discard_text">Çekim silinecek.</string>
-    <string name="camera_discard_title">Kayıt silinsin mi?</string>
-    <string name="camera_keep_recording">Kayda devam et</string>
-    <string name="export_note_checking">Dosya kontrol ediliyor…</string>
-    <string name="home_duplicating">Proje kopyalanıyor…</string>
-    <string name="media_error_too_many_frames">Bu videonun dizinlenemeyecek kadar çok karesi var</string>
-    <string name="project_too_many_linked">Bu proje çok fazla bağlı öğe içeriyor.</string>
-    <string name="settings_clear_preview_text">Önizleme kopyaları bir proje ihtiyaç duyduğunda yeniden oluşturulur.</string>
-    <string name="settings_clear_preview_title">Önizleme kopyaları temizlensin mi?</string>
-    <string name="settings_delete_model_text">Daha sonra yeniden indirilebilir.</string>
-    <string name="settings_delete_model_title">%1$s silinsin mi?</string>
 </resources>

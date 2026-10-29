@@ -91,6 +91,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import app.absentmotion.ui.home.UnsupportedPhone
+import app.absentmotion.ui.home.PlayEndingDialog
 import app.absentmotion.ui.home.UpdateAskDialog
 import app.absentmotion.ui.home.UpdateDialog
 import app.absentmotion.ui.home.Updates
@@ -126,6 +127,7 @@ class MainActivity : ComponentActivity() {
     private var imported by mutableStateOf<List<ImportReport>>(emptyList())
     private var editingTemplate by mutableStateOf<String?>(null)
     private var firstRun by mutableStateOf<FirstRun?>(null)
+    private var playNotice by mutableStateOf(false)
     private var opening by mutableStateOf(false)
     private var openingProject by mutableStateOf(false)
     private var openFailed by mutableStateOf<String?>(null)
@@ -212,6 +214,7 @@ class MainActivity : ComponentActivity() {
         app.absentmotion.ui.home.Updater.atLaunch(applicationContext)
         lifecycleScope.launch { engineWorks() }
         firstRun = FirstRun.of(settings, TestHooks.onboarding(intent).takeIf { savedInstanceState == null })
+        if (savedInstanceState == null) playNotice = settings.playNoticeDue(BuildConfig.FLAVOR)
         importShared()
         setContent {
             val open = editor
@@ -314,7 +317,8 @@ class MainActivity : ComponentActivity() {
                     onDiscard = { seenCrash(outdated != null); offer?.let { answerRecovery(it, false) } },
                     onClose = { seenCrash(outdated != null) },
                 ) else if (open == null && first == null && !opening && editingTemplate == null && exportingFromList == null) {
-                    if (settings.updatesAsked) UpdateDialog() else UpdateAskDialog(settings)
+                    if (playNotice) PlayEndingDialog { playNotice = false; settings.playNoticeSeen() }
+                    else if (settings.updatesAsked) UpdateDialog() else UpdateAskDialog(settings)
                 }
                 app.absentmotion.ui.tutorial.TutorialHost(
                     open, store, settings,
