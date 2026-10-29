@@ -257,7 +257,7 @@ Placement Effective(const std::vector<Layer>& siblings, const Layer& l, double t
     if (!source) return own;
     const Layer& below = *source;
     const float t = below.localTime(timeMs);
-    const SkPath path = below.text ? TextGlyphPath(below, t, Fps()) : ShapePath(below, t);
+    const SkPath path = below.text ? TextGlyphPath(below, t, Fps()) : Cropped(below, t, ShapePath(below, t));
     FollowPath(l, timeMs, path.makeTransform(MatrixOf(parent == &below ? p : Effective(siblings, below, timeMs, depth + 1), below, t)), &own);
     return own;
 }
@@ -594,7 +594,7 @@ std::vector<LayerCopy> CopiesOf(const std::vector<Layer>& siblings, const Layer&
         const Layer* below = PathSource(siblings, l);
         if (below && below->kind != "nullobj" && below->kind != "camera") {
             const float tb = below->localTime(timeMs);
-            space.below = (below->text ? TextGlyphPath(*below, tb, Fps()) : ShapePath(*below, tb)).makeTransform(SiblingMatrix(siblings, *below, timeMs));
+            space.below = (below->text ? TextGlyphPath(*below, tb, Fps()) : Cropped(*below, tb, ShapePath(*below, tb))).makeTransform(SiblingMatrix(siblings, *below, timeMs));
         }
     }
     std::vector<RepeatCopy> copies;
@@ -632,6 +632,8 @@ std::vector<std::pair<SkPath, float>> CopyOutlines(const Layer& l, const std::ve
 }
 
 SkPath BodyPath(const Layer& l, float t) { return ShapeKind(l) ? DrawingProgressPath(l, ShapePath(l, t), t) : ShapePath(l, t); }
+
+SkPath EdgePath(const Layer& l, float t) { return Cropped(l, t, BodyPath(l, t)); }
 
 SkPath StrokeGeometry(const Layer& l, const SkPath& body, float t) { return l.text ? TextGlyphPath(l, t, Fps()) : body; }
 
@@ -861,11 +863,11 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
             keep.setBlendMode(SkBlendMode::kDstIn);
             canvas->saveLayer(nullptr, &keep);
             if (pixelEdged) body(canvas);
-            else for (const auto& copy : CopyOutlines(l, *copies, [&](float at, const SkMatrix& placed) { return BodyPath(l, at).makeTransform(placed); }))
+            else for (const auto& copy : CopyOutlines(l, *copies, [&](float at, const SkMatrix& placed) { return EdgePath(l, at).makeTransform(placed); }))
                 canvas->drawPath(copy.first, mask);
             canvas->restore();
         } else {
-            SkPath outside = scenePath;
+            SkPath outside = Cropped(l, t, path).makeTransform(m);
             outside.toggleInverseFillType();
             mask.setBlendMode(SkBlendMode::kClear);
             canvas->drawPath(outside, mask);
@@ -886,8 +888,8 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
         return Union(d.fill ? (l.text ? TextGlyphPath(l, at, Fps()) : shape).makeTransform(placed) : SkPath(), d.stroked);
     };
     const std::vector<std::pair<SkPath, float>> regions = copies
-        ? CopyOutlines(l, *copies, [&](float at, const SkMatrix& placed) { return regionAt(at, placed, BodyPath(l, at), drawn); })
-        : std::vector<std::pair<SkPath, float>>{{regionAt(t, m, path, drawn), t}};
+        ? CopyOutlines(l, *copies, [&](float at, const SkMatrix& placed) { return regionAt(at, placed, EdgePath(l, at), drawn); })
+        : std::vector<std::pair<SkPath, float>>{{regionAt(t, m, Cropped(l, t, path), drawn), t}};
     const auto seeThrough = [&](float at) {
         const bool fill = l.fillType == "color" ? ColorAt(l.fillColor, at, kWhite, alpha).fA < 1
                         : l.fillType == "gradient" && std::min(l.gradient.startColor[0], l.gradient.endColor[0]) * alpha < 1;
@@ -1076,8 +1078,8 @@ void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& 
     auto centredBorders = [&](float alpha) {
         if (!centred) return;
         const std::vector<std::pair<SkPath, float>> outlines = repeated
-            ? CopyOutlines(l, copies, [&](float at, const SkMatrix& placed) { return ShapePath(l, at).makeTransform(placed); })
-            : std::vector<std::pair<SkPath, float>>{{ShapePath(l, t).makeTransform(SiblingMatrix(siblings, l, timeMs)), t}};
+            ? CopyOutlines(l, copies, [&](float at, const SkMatrix& placed) { return Cropped(l, at, ShapePath(l, at)).makeTransform(placed); })
+            : std::vector<std::pair<SkPath, float>>{{Cropped(l, t, ShapePath(l, t)).makeTransform(SiblingMatrix(siblings, l, timeMs)), t}};
         for (const Edge& e : l.borders) {
             if (!e.enabled || e.direction != "centered") continue;
             for (const auto& [outline, at] : outlines) {
@@ -1179,7 +1181,7 @@ bool TextGuideBelow(const Layer& layer, float t, SkPath* path) {
     const float tb = below->localTime(timeMs);
     SkMatrix inverse;
     if (!SiblingMatrix(*list, *self, timeMs).invert(&inverse)) return false;
-    const SkPath outline = below->text ? TextGlyphPath(*below, tb, Fps()) : below->kind == "drawing" ? DrawingStrokes(*below) : ShapePath(*below, tb);
+    const SkPath outline = below->text ? TextGlyphPath(*below, tb, Fps()) : below->kind == "drawing" ? DrawingStrokes(*below) : Cropped(*below, tb, ShapePath(*below, tb));
     *path = outline.makeTransform(SkMatrix::Concat(inverse, SiblingMatrix(*list, *below, timeMs)));
     return !path->isEmpty();
 }

@@ -258,6 +258,8 @@ SkRect SelectionBounds(const Layer& layer, double timeMs, const SkMatrix& matrix
 void DrawLayerList(SkCanvas* canvas, const Scene& scene, const std::vector<Layer>& layers, double timeMs, const MediaPictures& pictures);
 
 SkPath ShapePath(const Layer& layer, float t);
+SkRect CroppedBox(const Layer& layer, float t, size_t before);
+SkPath Cropped(const Layer& layer, float t, const SkPath& path, size_t before = SIZE_MAX);
 SkPath StrokePath(const Layer& layer, const SkPath& path, float t);
 SkPath OutlineAt(const Layer& layer, float t);
 SkMatrix LayerMatrix(const Layer& layer, float t);

@@ -415,8 +415,9 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
     const SkRect bounds = seen.makeOffset(-area.left(), -area.top());
     const float reach = std::max({(float)scene.width, (float)scene.height, seen.width(), seen.height()});
     std::optional<SkRect> shape;
+    size_t at = 0, shapeAt = 0;
     const auto own = [&]() -> const SkRect& {
-        if (!shape) shape = ShapePath(layer, t).getBounds();
+        if (!shape || shapeAt != at) shape = CroppedBox(layer, t, at), shapeAt = at;
         return *shape;
     };
     const auto fromLayer = [&] { return SkMatrix::Translate(-area.left(), -area.top()) * placed * SkMatrix::Translate(own().left(), own().top()); };
@@ -426,6 +427,7 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
     bool any = false;
     for (size_t k = (size_t)(liftAt(layer) + 1); k < layer.effects.size(); k++) {
         const LayerEffect& e = layer.effects[k];
+        at = k;
         if (e.hidden || e.id == kLift || (layer.video && e.id == "absent.datamosh")) continue;
         const Definition* d = find(e.id);
         const auto* defaults = d ? &d->defaults : nullptr;

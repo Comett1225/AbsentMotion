@@ -70,6 +70,19 @@ def run(binary, tmp):
     check("Roundness alone still cuts the corners", float(np.abs(round_only - plain).max()) > 50)
     feather_only = draw(blur, effect("absent.crop", feather=12))
     check("Feather alone still softens the edge", float(np.abs(feather_only - plain).max()) > 8)
+    twice = draw(effect("absent.crop", left=0.25), effect("absent.crop", left=0.5))[160, :, 3]
+    check("an effect after Crop sees the cropped picture as the whole layer", bool(twice[168] < 1 and twice[172] > 200), f"alpha {twice[160:176]}")
+    framed_twice = draw('<border direction="outside"><color value="#ff0000ff"/><size value="8"/></border>',
+                        effect("absent.crop", left=0.25), effect("absent.crop", left=0.5))[160]
+    check("a Border follows two Crops in a row", bool(framed_twice[168, :3].max() > 200 and framed_twice[168, :3].min() < 60 and framed_twice[150:164, 3].max() < 1))
+    for direction, inside in(("outside", False), ("inside", True), ("centered", False)):
+        border = f'<border direction="{direction}"><color value="#ff0000ff"/><size value="8"/></border>'
+        framed = draw(border, effect("absent.crop", left=0.25))
+        row = framed[160]
+        red = lambda x: row[x, :3].max() > 200 and row[x, :3].min() < 60 and row[x, 3] > 200
+        edge = 141 if inside else 138
+        check(f"a {direction} Border follows the cropped left edge", bool(red(edge)), f"pixel {row[edge]}")
+        check(f"a {direction} Border leaves the cut-off part empty", bool(row[118:134, 3].max() < 1), f"alpha {row[118:134, 3]}")
 
 
 def main():

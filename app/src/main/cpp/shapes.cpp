@@ -7,6 +7,7 @@
 #include "include/core/SkPathBuilder.h"
 #include "include/core/SkPathUtils.h"
 #include "include/core/SkRRect.h"
+#include "include/pathops/SkPathOps.h"
 #include "scene.h"
 #include "drawing.h"
 
@@ -193,6 +194,35 @@ SkPath Arrow(SkPoint start, SkPoint end, float half, float headHalf, float headL
                     neck - n * headHalf, neck - n * half, start - n * half});
 }
 
+}
+
+SkRect CroppedBox(const Layer& l, float t, size_t before) {
+    SkRect box = ShapePath(l, t).getBounds();
+    for (size_t k = 0; k < std::min(before, l.effects.size()); k++) {
+        const LayerEffect& e = l.effects[k];
+        if (e.hidden || e.id != "absent.crop") continue;
+        const float left = std::clamp(e.value("left", t, 0), 0.0f, 0.999f), top = std::clamp(e.value("top", t, 0), 0.0f, 0.999f);
+        const float right = std::max(1 - std::clamp(e.value("right", t, 0), 0.0f, 1.0f), left + 0.001f);
+        const float bottom = std::max(1 - std::clamp(e.value("bottom", t, 0), 0.0f, 1.0f), top + 0.001f);
+        box = SkRect::MakeLTRB(box.left() + left * box.width(), box.top() + top * box.height(),
+                               box.left() + right * box.width(), box.top() + bottom * box.height());
+    }
+    return box;
+}
+
+SkPath Cropped(const Layer& l, float t, const SkPath& path, size_t before) {
+    SkPath out = path;
+    for (size_t k = 0; k < std::min(before, l.effects.size()); k++) {
+        const LayerEffect& e = l.effects[k];
+        if (e.hidden || e.id != "absent.crop") continue;
+        const float radius = std::clamp(e.value("radius", t, 0), 0.0f, 1.0f);
+        if (e.value("left", t, 0) <= 0 && e.value("top", t, 0) <= 0 && e.value("right", t, 0) <= 0 && e.value("bottom", t, 0) <= 0 && radius <= 0) continue;
+        const SkRect box = CroppedBox(l, t, k + 1);
+        const float r = radius * std::min(box.width(), box.height()) / 2;
+        SkPath cut;
+        if (Op(out, SkPath::RRect(SkRRect::MakeRectXY(box, r, r)), kIntersect_SkPathOp, &cut)) out = cut;
+    }
+    return out;
 }
 
 SkPath ShapePath(const Layer& layer, float t) {
