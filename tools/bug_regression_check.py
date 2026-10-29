@@ -237,9 +237,9 @@ class ToolRegressions(unittest.TestCase):
                             padding = (-archive.fp.tell() - 30 - len(entry.filename)) % 16384
                             entry.extra = struct.pack('<HH', 0xffff, padding - 4) + bytes(padding - 4)
                         archive.writestr(entry, library)
-                    self.assertEqual(1, module.zip_packaging(path, True))
+                    self.assertEqual((1, 'arm64-v8a'), module.zip_packaging(path, True))
                     if aligned:
-                        self.assertEqual(1, module.zip_packaging(path, False))
+                        self.assertEqual((1, 'arm64-v8a'), module.zip_packaging(path, False))
                     else:
                         with self.assertRaisesRegex(ValueError, 'direct loading'):
                             module.zip_packaging(path, False)
@@ -256,14 +256,37 @@ class ToolRegressions(unittest.TestCase):
             path.write_bytes(damaged)
             with self.assertRaises((ValueError, zipfile.BadZipFile)):
                 module.zip_packaging(path, True)
+            narrow = bytearray(96)
+            narrow[:6] = b'\x7fELF\x01\x01'
+            struct.pack_into('<H', narrow, 18, 40)
+            struct.pack_into('<I', narrow, 28, 52)
+            struct.pack_into('<HH', narrow, 42, 32, 1)
+            struct.pack_into('<I', narrow, 52, 1)
+            struct.pack_into('<I', narrow, 80, 4096)
+            self.assertEqual(('armeabi-v7a', 4096), module.elf_alignment(narrow, 'narrow.so'))
+            for names, error in [(['lib/armeabi-v7a/libfixture.so'], None), (['lib/arm64-v8a/libfixture.so'], 'unexpected native ABI'), (['lib/armeabi-v7a/libfixture.so', 'lib/arm64-v8a/libother.so'], 'one native ABI')]:
+                with self.subTest(names=names):
+                    with zipfile.ZipFile(path, 'w') as archive:
+                        archive.writestr('resources.arsc', b'res!')
+                        archive.writestr(names[0], narrow)
+                        for name in names[1:]:
+                            archive.writestr(name, library)
+                    if error:
+                        with self.assertRaisesRegex(ValueError, error):
+                            module.zip_packaging(path, True)
+                    else:
+                        self.assertEqual((1, 'armeabi-v7a'), module.zip_packaging(path, True))
+            struct.pack_into('<I', narrow, 80, 1024)
+            with self.assertRaisesRegex(ValueError, '4 KB'):
+                module.elf_alignment(narrow, 'narrow.so')
         with tempfile.TemporaryDirectory() as folder:
             libs = Path(folder)
             with self.assertRaisesRegex(ValueError, 'no native libraries'):
                 module.library_alignment([libs])
             (libs / 'libgood.so').write_bytes(library)
             (libs / 'notes.txt').write_text('not a library')
-            self.assertEqual(1, module.library_alignment([libs]))
-            self.assertEqual(2, module.library_alignment([libs, libs / 'libgood.so']))
+            self.assertEqual((1, '16 KB'), module.library_alignment([libs]))
+            self.assertEqual((2, '16 KB'), module.library_alignment([libs, libs / 'libgood.so']))
             struct.pack_into('<Q', library, 112, 4096)
             (libs / 'libold.so').write_bytes(library)
             with self.assertRaisesRegex(ValueError, 'libold.so: ELF load segment is not aligned for 16 KB pages'):
@@ -283,6 +306,30 @@ class ToolRegressions(unittest.TestCase):
             module.elf_alignment(library, 'shifted.so')
         with self.assertRaises(ValueError):
             module.elf_alignment(library[:64], 'truncated.so')
+
+    def test_publish_scan_reads_library_data_but_not_machine_code(self):
+        def library(code, data, sections=True):
+            elf = bytearray(248)
+            elf[:6] = b'\x7fELF\x01\x01'
+            elf[64:64 + len(code)] = code
+            elf[96:96 + len(data)] = data
+            if sections:
+                struct.pack_into('<I', elf, 0x20, 128)
+                struct.pack_into('<HH', elf, 0x2E, 40, 3)
+                struct.pack_into('<IIIIII', elf, 168, 0, 1, 6, 0, 64, 32)
+                struct.pack_into('<IIIIII', elf, 208, 0, 1, 2, 0, 96, 32)
+            return bytes(elf)
+        with tempfile.TemporaryDirectory() as folder:
+            folder = Path(folder)
+            (folder / 'words.txt').write_text('fixtureword\n')
+            cases = {'code.so': (library(b'FIXTUREWORD', b''), False), 'data.so': (library(b'', b'fixtureword'), True),
+                     'bare.so': (library(b'fixtureword', b'', sections=False), True)}
+            for name, (data, found) in cases.items():
+                (folder / name).write_bytes(data)
+                result = subprocess.run([sys.executable, str(ROOT / 'tools/publish_scan.py'), str(folder / 'words.txt'), str(folder / 'none.txt'), ''],
+                                        input=str(folder / name), capture_output=True, text=True)
+                self.assertEqual(0, result.returncode, result.stderr)
+                self.assertEqual(found, 'PROBLEM' in result.stdout, name)
 
     def test_release_key_pin_is_read_from_the_app_and_must_be_unique(self):
         spec = importlib.util.spec_from_file_location('apk_check', ROOT / 'tools/apk_check.py')

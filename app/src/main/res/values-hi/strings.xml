@@ -115,6 +115,11 @@
     <string name="the_media_picker_lists_only_albums">मीडिया पिकर सिर्फ़ उन एल्बम और फ़ोल्डर दिखाता है जिनके नाम में Demo है।</string>
     <string name="demo_mode_is_on">डेमो मोड चालू है</string>
     <string name="preview_quality">प्रीव्यू क्वालिटी</string>
+    <string name="settings_graphics">ग्राफ़िक्स</string>
+    <string name="settings_graphics_auto">ऑटोमैटिक</string>
+    <string name="settings_graphics_opengl">OpenGL</string>
+    <string name="settings_graphics_note">अभी %1$s इस्तेमाल हो रहा है।</string>
+    <string name="settings_graphics_hint">अगर इस फ़ोन पर प्रीव्यू या एक्सपोर्ट गलत दिखें तो OpenGL चुनें।</string>
     <string name="playback_resampling">प्लेबैक रीसैंपलिंग</string>
     <string name="settings">सेटिंग्स</string>
     <string name="your_video_ended_early_so_its">आपका वीडियो जल्दी खत्म हो गया, इसलिए उसका आखिरी फ़्रेम रोका गया है।\nबेहतर नतीजे के लिए लंबी क्लिप डालें।</string>
@@ -605,6 +610,7 @@
     <string name="unsupported_title">यह फ़ोन एडिटर नहीं चला सकता</string>
     <string name="unsupported_old_vulkan">AbsentMotion प्रीव्यू और एक्सपोर्ट को ग्राफ़िक्स चिप के ज़रिए Vulkan 1.1 से बनाता है, और इस फ़ोन में सिर्फ़ पुराना Vulkan वर्ज़न है।</string>
     <string name="unsupported_no_vulkan">फ़ोन का ग्राफ़िक्स ड्राइवर Vulkan शुरू नहीं कर सका, जिसकी AbsentMotion को प्रीव्यू और एक्सपोर्ट बनाने के लिए ज़रूरत है।</string>
+    <string name="unsupported_no_opengl">AbsentMotion ने OpenGL ES 3.0 भी आज़माया, लेकिन वह भी शुरू नहीं हुआ।</string>
     <string name="unsupported_driver_features">फ़ोन के ग्राफ़िक्स ड्राइवर में AbsentMotion के प्रीव्यू और एक्सपोर्ट बनाने के लिए ज़रूरी फ़ीचर नहीं हैं।</string>
     <string name="unsupported_skia">AbsentMotion का ड्रॉइंग इंजन इस फ़ोन के ग्राफ़िक्स ड्राइवर के साथ काम नहीं करता।</string>
     <string name="unsupported_unknown">AbsentMotion का ड्रॉइंग इंजन इस फ़ोन पर शुरू नहीं हो सका।</string>
@@ -1713,11 +1719,12 @@
     <string name="recovery_your_project">आपका प्रोजेक्ट</string>
     <string name="caption_layer_name">कैप्शन %1$s</string>
     <string name="tier_needs_latest">Android 13 (Latest वर्ज़न) चाहिए</string>
+    <string name="tier_needs_vulkan">Vulkan ग्राफ़िक्स वाला फ़ोन चाहिए</string>
     <string name="feature_flow_high">ऑप्टिकल फ़्लो हाई</string>
     <string name="feature_ai_enhance">AI एन्हांस</string>
     <string name="feature_best_cutout">AI बैकग्राउंड रिमूवल 2.0</string>
     <string name="about_version_compatible">वर्ज़न %1$s Compatible</string>
-    <string name="about_compatible_note">यह Android 9 से 12 के लिए Compatible वर्ज़न है। छोड़े गए: %1$s। इनके लिए Android 13 और Latest वर्ज़न चाहिए।</string>
+    <string name="about_compatible_note">यह Android 8 से 12 के लिए Compatible वर्ज़न है। छोड़े गए: %1$s। इनके लिए Android 13 और Latest वर्ज़न चाहिए।</string>
     <string name="low_memory_title">कम मेमरी</string>
     <string name="low_memory_body">इस फ़ोन में %1$s GB मेमरी है। AbsentMotion 3 GB या ज़्यादा के साथ सबसे अच्छा काम करता है: लंबे प्रोजेक्ट, बड़े वीडियो और कई इफ़ेक्ट धीमे हो सकते हैं या ऐप बंद कर सकते हैं।</string>
     <string name="preview_cache_render">प्रीव्यू रेंडर करें</string>

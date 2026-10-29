@@ -171,7 +171,7 @@ private fun decodeBytes(bytes: ByteArray, limit: Int): Bitmap? = try {
 
 internal fun fileVersion(resolver: ContentResolver, uri: Uri): String? = try {
     resolver.openFileDescriptor(uri, "r")?.use { fd ->
-        Os.fstat(fd.fileDescriptor).run { "$st_dev:$st_ino:$st_size:${st_mtim.tv_sec}.${st_mtim.tv_nsec}" }
+        Os.fstat(fd.fileDescriptor).run { "$st_dev:$st_ino:$st_size:" + if (android.os.Build.VERSION.SDK_INT >= 27) "${st_mtim.tv_sec}.${st_mtim.tv_nsec}" else "$st_mtime" }
     }
 } catch (_: Exception) { null }
 

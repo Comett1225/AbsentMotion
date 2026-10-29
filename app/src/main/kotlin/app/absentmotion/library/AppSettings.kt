@@ -26,6 +26,7 @@ class AppSettings(private val context: Context) {
     private var xmlUploadState by mutableStateOf(prefs.getBoolean("xmlUpload", false))
     private var vibrationState by mutableStateOf(prefs.getBoolean("trimLimitVibration", true))
     private var basicTransformState by mutableStateOf(prefs.getBoolean("basicTransform", false))
+    private var openGlState by mutableStateOf(prefs.getBoolean("graphicsOpenGl", false))
 
     private var themeState by mutableStateOf(prefs.getString("theme", Themes.DEFAULT)!!)
     private var customThemeState by mutableStateOf(Themes.custom(context)?.let { it.name ?: "" })
@@ -63,6 +64,10 @@ class AppSettings(private val context: Context) {
     var basicTransform: Boolean
         get() = basicTransformState
         set(value) { basicTransformState = value; prefs.edit().putBoolean("basicTransform", value).apply() }
+
+    var openGl: Boolean
+        get() = openGlState
+        set(value) { openGlState = value; prefs.edit().putBoolean("graphicsOpenGl", value).apply() }
 
     var vibration: Boolean
         get() = vibrationState

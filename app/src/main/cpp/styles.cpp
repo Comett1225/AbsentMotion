@@ -1015,18 +1015,20 @@ void DrawShuttered(SkCanvas* canvas, const std::vector<Layer>& siblings, const L
         canvas->restore();
         return;
     }
-    canvas->saveLayer(SkCanvas::SaveLayerRec(nullptr, &composite, SkCanvas::kF16ColorType));
     const auto at = [&](double u) { return std::clamp(timeMs + open * (u - 0.5), (double)l.startTime, (double)l.endTime); };
     const bool steady = Steady(siblings, l, at(0), at(1));
     int samples = shutter.samples;
     if (shutter.adaptive && !steady) samples = std::clamp((int)std::ceil(Reach(siblings, l, timeMs, open) / 2), samples, 48);
+    canvas->saveLayer(SkCanvas::SaveLayerRec(nullptr, &composite, SkCanvas::kF16ColorType));
     SkPaint add;
     add.setBlendMode(SkBlendMode::kPlus);
     for (int i = 0; i < samples;) {
         const double when = at((i + 0.5) / samples);
         int same = 1;
         while (i + same < samples && (steady || at((i + same + 0.5) / samples) == when)) same++;
-        add.setAlphaf((float)same / samples);
+        const float weight = (float)same / samples;
+        const float scale[20] = {1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, weight, 0};
+        add.setColorFilter(SkColorFilters::Matrix(scale));
         canvas->saveLayer(nullptr, &add);
         DrawOne(canvas, siblings, l, when, pictures, sample);
         canvas->restore();

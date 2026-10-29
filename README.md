@@ -8,7 +8,7 @@
   <a href="https://github.com/Comett1225/AbsentMotion/releases/latest"><img alt="Latest version" src="https://img.shields.io/github/v/release/Comett1225/AbsentMotion?label=latest%20version&style=for-the-badge&color=f07850"></a>
   <a href="https://github.com/Comett1225/AbsentMotion/releases"><img alt="Downloads" src="https://img.shields.io/github/downloads/Comett1225/AbsentMotion/total?label=downloads&style=for-the-badge&color=2b2b33"></a>
   <a href="LICENSE"><img alt="Licence: Apache 2.0" src="https://img.shields.io/badge/licence-Apache%202.0-2b2b33?style=for-the-badge"></a>
-  <a href="#requirements"><img alt="Android 9 and newer" src="https://img.shields.io/badge/Android-9%2B-3DDC84?style=for-the-badge&logo=android&logoColor=white"></a>
+  <a href="#requirements"><img alt="Android 8 and newer" src="https://img.shields.io/badge/Android-8%2B-3DDC84?style=for-the-badge&logo=android&logoColor=white"></a>
 </p>
 <p align="center">
   <a href="https://comett1225.github.io/AbsentMotion/"><img alt="Download for your phone" src="https://img.shields.io/badge/Download-for%20your%20phone-f07850?style=for-the-badge"></a>
@@ -149,9 +149,9 @@ The same phone and project without its effects (3.0 cannot run most of them), bo
 
 ## Requirements
 
-Android 13 (API level 33) or newer (tested on Android 16 and 17 and on emulators from Android 13), a 64-bit ARM device (`arm64-v8a`), Vulkan 1.1.
+Android 13 (API level 33) or newer (tested on Android 16 and 17 and on emulators from Android 13), a 64-bit ARM device (`arm64-v8a`), Vulkan 1.1 or OpenGL ES 3.0 (with OpenGL the heaviest AI tools are left out). The Compatible build runs on Android 8 to 12, and its 32-bit file (`armeabi-v7a`) on phones with a 32-bit system from Android 8.
 
-For Android 9 to 12 there is the **Compatible** build (`-compatible.apk`, tested on Android 11). It is the same app
+For Android 8 to 12 there is the **Compatible** build (`-compatible.apk`, tested on Android 11). It is the same app
 without Optical flow High, AI Smooth, AI Enhance and AI background removal 2.0.
 
 There are three builds: `play`, which has background removal through Google Play services, `foss` (for F-Droid),
@@ -180,8 +180,8 @@ There will be weekly updates at minimum, whether it's bug patches, improvement t
 AbsentMotion is a young project. Please know these before you rely on it:
 
 - **Some Alight Motion effects are still missing.** - Please if you're able to, make sure to make an issue for anything that isn't implemented correctly or is broken. 
-- **Only 64-bit ARM Android devices with Vulkan 1.1.** Android 13 or newer, or Android 9 to 12 with the Compatible
-  build.
+- **ARM Android devices only.** Android 13 or newer, or Android 8 to 12 with the Compatible build; phones with a 32-bit system use the Compatible 32-bit build. Phones without
+  Vulkan 1.1 draw with OpenGL ES 3.0, which leaves out AI Smooth, AI Enhance, AI background removal 2.0 and Optical flow High.
 - **Background removal.** The `foss` build removes backgrounds with its own offline model. The `play` build uses
   Google Play services instead.
 - **Network use.** You can completely use this offline, the only other features that would require internet is downloading fonts from the font library (You can upload your own if you have any), downloading the background removal model, captions model and checking for updates, all which are optional and not required for you to use the app.

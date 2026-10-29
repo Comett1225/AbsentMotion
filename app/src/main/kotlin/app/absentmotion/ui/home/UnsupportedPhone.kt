@@ -60,6 +60,8 @@ internal fun engineProblemText(problem: String): Int = when {
     else -> R.string.unsupported_unknown
 }
 
+internal fun openGlAlsoFailed(problem: String): Boolean = problem.contains("; OpenGL: ")
+
 internal fun engineProblemDetails(version: String, facts: PhoneFacts, problem: String): String = listOf(
     "AbsentMotion $version (${if (Tier.compatible) "Compatible" else "Latest"})",
     "Device: ${facts.device}",
@@ -111,6 +113,10 @@ fun UnsupportedPhone(problem: String, onClose: () -> Unit) {
             Text(stringResource(R.string.unsupported_title), color = Am.Navy, fontSize = 24.sp, lineHeight = 30.sp, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(14.dp))
             Text(stringResource(engineProblemText(problem)), color = Am.HomeInk, fontSize = 16.sp, lineHeight = 23.sp)
+            if (openGlAlsoFailed(problem)) {
+                Spacer(Modifier.height(8.dp))
+                Text(stringResource(R.string.unsupported_no_opengl), color = Am.HomeInk, fontSize = 16.sp, lineHeight = 23.sp)
+            }
             Spacer(Modifier.height(10.dp))
             Text(stringResource(R.string.unsupported_still_usable), color = Am.HomeMid, fontSize = 15.sp, lineHeight = 21.sp)
             Spacer(Modifier.height(22.dp))

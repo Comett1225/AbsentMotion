@@ -150,7 +150,7 @@ class UpdateCheckTest {
 
     @Test fun unsafeSizesVersionsAndFlavoursGiveNoApk() {
         fun apk(tag: String, version: String, size: String, flavour: String = "foss"): ApkAsset? {
-            val name = "AbsentMotion-$version-${if (flavour == "compat") "compatible" else flavour}.apk"
+            val name = apkName(version, flavour)
             return parseRelease("""{"tag_name":"$tag","assets":[{"name":"$name","size":$size,"browser_download_url":"$HOME_PAGE/releases/download/$tag/$name"}]}""", flavour)?.apk
         }
         assertEquals(1000L, apk("v4.1.4", "4.1.4", "1000")?.size)
@@ -163,6 +163,7 @@ class UpdateCheckTest {
         assertNull(apk("v4.1.4-a/b", "4.1.4-a/b", "1000"))
         assertNull(apk("v4.1.4", "4.1.4", "1000", "debug"))
         assertEquals("AbsentMotion-4.1.4-compatible.apk", apk("v4.1.4", "4.1.4", "1000", "compat")?.name)
+        assertEquals("AbsentMotion-4.1.4-compatible-32bit.apk", apk("v4.1.4", "4.1.4", "1000", "compat32")?.name)
     }
 
     @Test fun aMeteredConnectionIsMentionedOnlyForDownloadsInTheApp() {

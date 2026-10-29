@@ -16,7 +16,7 @@ failed=0
 skipped=""
 fail() { printf 'check.sh: FAILED: %s\n' "$1" >&2; failed=$((failed + 1)); }
 native_libs() {
-    newest=$(ls -t "app/build/intermediates/merged_native_libs/$1/"*/out/lib/arm64-v8a/*.so 2>/dev/null | head -n 1)
+    newest=$(ls -t "app/build/intermediates/merged_native_libs/$1/"*/out/lib/"${3:-arm64-v8a}"/*.so 2>/dev/null | head -n 1)
     if [ -z "$newest" ]; then
         printf 'skipped: the %s native libraries are not built (./gradlew :app:%s builds them)\n' "$1" "$2"
         skipped="$skipped $1"
@@ -89,12 +89,19 @@ else
         python3 tools/apk_check.py --libraries "$libs" >"$dir/page-size.log" 2>&1 || { cat "$dir/page-size.log" >&2; fail "a native library is not aligned for 16 KB memory pages"; }
         cat "$dir/page-size.log"
     fi
-    printf '\n== Native libraries of the compat build: they must load on Android 9\n'
+    printf '\n== Native libraries of the compat build: they must load on Android 8\n'
     if native_libs compatRelease mergeCompatReleaseNativeLibs; then
-        python3 tools/api_floor.py "$libs" --min 28 >"$dir/api-floor-compat.log" 2>&1 || { cat "$dir/api-floor-compat.log" >&2; fail "a compat native library needs a newer Android than 9"; }
+        python3 tools/api_floor.py "$libs" --min 26 >"$dir/api-floor-compat.log" 2>&1 || { cat "$dir/api-floor-compat.log" >&2; fail "a compat native library needs a newer Android than 8"; }
         tail -n 2 "$dir/api-floor-compat.log"
         python3 tools/apk_check.py --libraries "$libs" >"$dir/page-size-compat.log" 2>&1 || { cat "$dir/page-size-compat.log" >&2; fail "a compat native library is not aligned for 16 KB memory pages"; }
         cat "$dir/page-size-compat.log"
+    fi
+    printf '\n== Native libraries of the 32-bit compat build: they must load on Android 8\n'
+    if native_libs compat32Release mergeCompat32ReleaseNativeLibs armeabi-v7a; then
+        python3 tools/api_floor.py "$libs" --abi armeabi-v7a --min 26 >"$dir/api-floor-compat32.log" 2>&1 || { cat "$dir/api-floor-compat32.log" >&2; fail "a 32-bit compat native library needs a newer Android than 8"; }
+        tail -n 2 "$dir/api-floor-compat32.log"
+        python3 tools/apk_check.py --libraries "$libs" >"$dir/page-size-compat32.log" 2>&1 || { cat "$dir/page-size-compat32.log" >&2; fail "a 32-bit compat native library is not aligned for its memory pages"; }
+        cat "$dir/page-size-compat32.log"
     fi
 fi
 

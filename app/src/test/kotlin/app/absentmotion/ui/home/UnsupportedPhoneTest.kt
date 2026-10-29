@@ -2,6 +2,7 @@ package app.absentmotion.ui.home
 
 import app.absentmotion.R
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -12,6 +13,9 @@ class UnsupportedPhoneTest {
         assertEquals(R.string.unsupported_driver_features, engineProblemText("required device extensions failed (-7)"))
         assertEquals(R.string.unsupported_skia, engineProblemText("Graphite context creation failed"))
         assertEquals(R.string.unsupported_unknown, engineProblemText("dlopen failed: library \"libamengine.so\" not found"))
+        assertEquals(R.string.unsupported_no_vulkan, engineProblemText("vkCreateInstance failed (-9); OpenGL: OpenGL ES 3 context failed (0x3005)"))
+        assertTrue(openGlAlsoFailed("vkCreateInstance failed (-9); OpenGL: OpenGL ES 3 context failed (0x3005)"))
+        assertFalse(openGlAlsoFailed("vkCreateInstance failed (-9)"))
     }
 
     @Test fun detailsNameThePhoneAndTheProblem() {

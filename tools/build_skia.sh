@@ -3,10 +3,12 @@ set -e
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 OUT=out/android-arm64
 API=
+CPU=
 case "${1:-}" in
     "") ;;
     compat) OUT=out/android-arm64-compat; API=28 ;;
-    *) echo "usage: tools/build_skia.sh [compat]" >&2; exit 2 ;;
+    compat32) OUT=out/android-arm-compat; API=26; CPU=arm ;;
+    *) echo "usage: tools/build_skia.sh [compat|compat32]" >&2; exit 2 ;;
 esac
 SKIA="$ROOT/third_party/skia"
 BRANCH=chrome/m156
@@ -51,7 +53,7 @@ done
 
 GN="$("$ROOT/tools/build_gn.sh" | tail -n 1)"
 mkdir -p "$OUT"
-{ echo "ndk = \"$NDK\""; sed "${API:+s/^ndk_api = .*/ndk_api = $API/}" "$ROOT/tools/skia-args.gn"; } > "$OUT/args.gn"
+{ echo "ndk = \"$NDK\""; sed -e "${API:+s/^ndk_api = .*/ndk_api = $API/}" -e "${CPU:+s/^target_cpu = .*/target_cpu = \"$CPU\"/}" "$ROOT/tools/skia-args.gn"; } > "$OUT/args.gn"
 "$GN" gen "$OUT"
 ninja -C "$OUT" skia pathops skparagraph skshaper skunicode_core skunicode_icu
 "$NDK/toolchains/llvm/prebuilt/$HOST/bin/llvm-ar" rcs "$OUT/libpathops.a" "$OUT"/obj/src/pathops/*.o

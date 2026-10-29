@@ -115,6 +115,11 @@
     <string name="the_media_picker_lists_only_albums">Trình chọn phương tiện chỉ liệt kê album và thư mục có tên chứa Demo.</string>
     <string name="demo_mode_is_on">Chế độ Demo đang bật</string>
     <string name="preview_quality">Chất lượng xem trước</string>
+    <string name="settings_graphics">Đồ họa</string>
+    <string name="settings_graphics_auto">Tự động</string>
+    <string name="settings_graphics_opengl">OpenGL</string>
+    <string name="settings_graphics_note">Hiện đang dùng %1$s.</string>
+    <string name="settings_graphics_hint">Chọn OpenGL nếu bản xem trước hoặc video xuất ra trông sai trên điện thoại này.</string>
     <string name="playback_resampling">Lấy mẫu lại khi phát</string>
     <string name="settings">Cài đặt</string>
     <string name="your_video_ended_early_so_its">Video của bạn kết thúc sớm nên khung hình cuối được giữ lại.\nThay bằng clip dài hơn để có kết quả đẹp hơn.</string>
@@ -594,6 +599,7 @@
     <string name="unsupported_title">Điện thoại này không chạy được trình chỉnh sửa</string>
     <string name="unsupported_old_vulkan">AbsentMotion dùng chip đồ họa để vẽ bản xem trước và xuất qua Vulkan 1.1, nhưng điện thoại này chỉ có phiên bản Vulkan cũ hơn.</string>
     <string name="unsupported_no_vulkan">Trình điều khiển đồ họa của điện thoại không khởi động được Vulkan, trong khi AbsentMotion cần Vulkan để vẽ bản xem trước và xuất.</string>
+    <string name="unsupported_no_opengl">AbsentMotion cũng đã thử OpenGL ES 3.0 nhưng cũng không khởi động được.</string>
     <string name="unsupported_driver_features">Trình điều khiển đồ họa của điện thoại thiếu các tính năng mà AbsentMotion cần để vẽ bản xem trước và xuất.</string>
     <string name="unsupported_skia">Bộ dựng hình của AbsentMotion không hoạt động với trình điều khiển đồ họa của điện thoại này.</string>
     <string name="unsupported_unknown">Bộ dựng hình của AbsentMotion không thể khởi động trên điện thoại này.</string>
@@ -1688,11 +1694,12 @@
     <string name="recovery_your_project">dự án của bạn</string>
     <string name="caption_layer_name">Phụ đề %1$s</string>
     <string name="tier_needs_latest">Cần Android 13 (bản Latest)</string>
+    <string name="tier_needs_vulkan">Cần điện thoại hỗ trợ đồ họa Vulkan</string>
     <string name="feature_flow_high">Optical flow cao</string>
     <string name="feature_ai_enhance">Nâng cấp bằng AI</string>
     <string name="feature_best_cutout">Xóa nền bằng AI 2.0</string>
     <string name="about_version_compatible">Phiên bản %1$s Compatible</string>
-    <string name="about_compatible_note">Đây là bản Compatible cho Android 9 đến 12. Không bao gồm: %1$s. Các tính năng này cần Android 13 và bản Latest.</string>
+    <string name="about_compatible_note">Đây là bản Compatible cho Android 8 đến 12. Không bao gồm: %1$s. Các tính năng này cần Android 13 và bản Latest.</string>
     <string name="low_memory_title">Bộ nhớ thấp</string>
     <string name="low_memory_body">Điện thoại này có %1$s GB bộ nhớ. AbsentMotion hoạt động tốt nhất với 3 GB trở lên: dự án dài, video lớn và nhiều hiệu ứng có thể bị chậm hoặc khiến ứng dụng thoát.</string>
     <string name="preview_cache_render">Kết xuất bản xem trước</string>

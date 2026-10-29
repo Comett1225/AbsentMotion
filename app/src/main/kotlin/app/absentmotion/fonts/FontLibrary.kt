@@ -152,7 +152,8 @@ class FontLibrary(context: Context) {
             Typeface.Builder(it).setTtcIndex(fontIndex(name)).apply { if (variable) setFontVariationSettings("'wght' ${font.weight}") }.build()
         }.getOrNull() }
             ?: Typeface.create(systemFamily(name) ?: font.family, Typeface.NORMAL)
-        return (if (font.source == "imported" || variable) face else Typeface.create(face, font.weight, font.italic)).also { faces[name] = stamp to it }
+        return (if (font.source == "imported" || variable) face else if (android.os.Build.VERSION.SDK_INT >= 28) Typeface.create(face, font.weight, font.italic)
+            else Typeface.create(face, when { font.weight >= 600 && font.italic -> Typeface.BOLD_ITALIC; font.weight >= 600 -> Typeface.BOLD; font.italic -> Typeface.ITALIC; else -> Typeface.NORMAL })).also { faces[name] = stamp to it }
     }
     suspend fun import(uri: Uri): FontName = withContext(Dispatchers.IO) {
         val filename = runCatching { context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use {

@@ -19,6 +19,8 @@
 #include "include/gpu/graphite/Recorder.h"
 #include "include/gpu/graphite/Recording.h"
 #include "include/gpu/graphite/Surface.h"
+#include "include/gpu/ganesh/GrDirectContext.h"
+#include "include/gpu/ganesh/SkSurfaceGanesh.h"
 
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, "AMInterp", __VA_ARGS__)
 
@@ -249,15 +251,14 @@ double Since(Clock::time_point start) { return std::chrono::duration<double, std
 
 class Gpu {
 public:
-    Gpu(skgpu::graphite::Context* context, skgpu::graphite::Recorder* recorder) : fContext(context), fRecorder(recorder) {}
+    explicit Gpu(const GpuContext& context) : fContext(context) {}
 
     sk_sp<SkSurface> field(int w, int h) {
-        return SkSurfaces::RenderTarget(fRecorder, SkImageInfo::Make(w, h, kRGBA_F16_SkColorType, kPremul_SkAlphaType, nullptr));
+        return this->surface(SkImageInfo::Make(w, h, kRGBA_F16_SkColorType, kPremul_SkAlphaType, nullptr));
     }
 
     sk_sp<SkSurface> picture(int w, int h) {
-        return SkSurfaces::RenderTarget(fRecorder, SkImageInfo::Make(w, h, kRGBA_8888_SkColorType, kPremul_SkAlphaType,
-                                                                     SkColorSpace::MakeSRGB()));
+        return this->surface(SkImageInfo::Make(w, h, kRGBA_8888_SkColorType, kPremul_SkAlphaType, SkColorSpace::MakeSRGB()));
     }
 
     sk_sp<SkImage> draw(const sk_sp<SkSurface>& target, const SkRuntimeShaderBuilder& builder) {
@@ -267,13 +268,19 @@ public:
         paint.setBlendMode(SkBlendMode::kSrc);
         target->getCanvas()->drawPaint(paint);
         fPasses++;
-        return SkSurfaces::AsImage(target);
+        return fContext.ganesh ? target->makeImageSnapshot() : SkSurfaces::AsImage(target);
     }
 
     bool submit() {
-        auto recording = fRecorder->snap();
-        if (!fFailed && (!recording || !fContext->insertRecording({recording.get()}) ||
-                         !fContext->submit(skgpu::graphite::SyncToCpu::kYes))) {
+        if (fFailed) return false;
+        if (fContext.ganesh) {
+            fContext.ganesh->flushAndSubmit(GrSyncCpu::kYes);
+            fFailed = fContext.ganesh->abandoned();
+            return !fFailed;
+        }
+        auto recording = fContext.recorder->snap();
+        if (!recording || !fContext.graphite->insertRecording({recording.get()}) ||
+            !fContext.graphite->submit(skgpu::graphite::SyncToCpu::kYes)) {
             fFailed = true;
         }
         return !fFailed;
@@ -283,8 +290,12 @@ public:
     int passes() const { return fPasses; }
 
 private:
-    skgpu::graphite::Context* fContext;
-    skgpu::graphite::Recorder* fRecorder;
+    sk_sp<SkSurface> surface(const SkImageInfo& info) {
+        return fContext.ganesh ? SkSurfaces::RenderTarget(fContext.ganesh, skgpu::Budgeted::kYes, info)
+                               : SkSurfaces::RenderTarget(fContext.recorder, info);
+    }
+
+    GpuContext fContext;
     bool fFailed = false;
     int fPasses = 0;
 };
@@ -316,13 +327,14 @@ int FusedIndex(int remaining, int most) {
 
 }
 
-sk_sp<SkImage> EstimateFlow(skgpu::graphite::Context* context, skgpu::graphite::Recorder* recorder, const sk_sp<SkImage>& a,
+sk_sp<SkImage> EstimateFlow(const GpuContext& context, const sk_sp<SkImage>& a,
                             const sk_sp<SkImage>& b, const InterpolationParams& params, FlowStats* stats) {
     const Effects& fx = Shaders();
     if (!fx.ok() || !a || !b) return nullptr;
-    context->submit(skgpu::graphite::SyncToCpu::kYes);
+    if (context.ganesh) context.ganesh->flushAndSubmit(GrSyncCpu::kYes);
+    else context.graphite->submit(skgpu::graphite::SyncToCpu::kYes);
     const auto start = Clock::now();
-    Gpu gpu(context, recorder);
+    Gpu gpu(context);
     const auto pyramid = Pyramid(gpu, fx, a, b, std::max(params.divisor, 1), std::max(params.levels, 1));
     sk_sp<SkImage> flow;
     for (int level = (int)pyramid.size() - 1; level >= 0 && !gpu.failed() && pyramid[level]; level--) {
@@ -365,7 +377,7 @@ sk_sp<SkImage> EstimateFlow(skgpu::graphite::Context* context, skgpu::graphite::
     return ok ? flow : nullptr;
 }
 
-sk_sp<SkImage> SynthesizeFrame(skgpu::graphite::Context* context, skgpu::graphite::Recorder* recorder, const sk_sp<SkImage>& a,
+sk_sp<SkImage> SynthesizeFrame(const GpuContext& context, const sk_sp<SkImage>& a,
                                const sk_sp<SkImage>& b, const sk_sp<SkImage>& flow, float t, int divisor, double* ms,
                                const sk_sp<SkImage>& before, const sk_sp<SkImage>& after) {
     static const sk_sp<SkRuntimeEffect> soft = Compile(kSoft);
@@ -374,7 +386,7 @@ sk_sp<SkImage> SynthesizeFrame(skgpu::graphite::Context* context, skgpu::graphit
     const bool four = !flow && before && after;
     if (four && !soft) return nullptr;
     const auto start = Clock::now();
-    Gpu gpu(context, recorder);
+    Gpu gpu(context);
     SkRuntimeShaderBuilder builder(four ? soft : flow ? fx.warp : fx.blend);
     builder.child("a") = Sample(a);
     builder.child("b") = Sample(b);
@@ -400,11 +412,11 @@ sk_sp<SkImage> SynthesizeFrame(skgpu::graphite::Context* context, skgpu::graphit
     return out;
 }
 
-sk_sp<SkImage> MotionBlur(skgpu::graphite::Context* context, skgpu::graphite::Recorder* recorder, const sk_sp<SkImage>& image,
+sk_sp<SkImage> MotionBlur(const GpuContext& context, const sk_sp<SkImage>& image,
                           const sk_sp<SkImage>& flow, float t, float length, int divisor) {
     static const sk_sp<SkRuntimeEffect> blur = Compile(kMotionBlur);
     if (!blur || !image || !flow) return nullptr;
-    Gpu gpu(context, recorder);
+    Gpu gpu(context);
     SkRuntimeShaderBuilder builder(blur);
     builder.child("image") = Sample(image);
     builder.child("flow") = Sample(flow);
@@ -420,7 +432,7 @@ sk_sp<SkImage> MotionBlur(skgpu::graphite::Context* context, skgpu::graphite::Re
     return out;
 }
 
-sk_sp<SkImage> MoshStep(skgpu::graphite::Context* context, skgpu::graphite::Recorder* recorder, const sk_sp<SkImage>& state,
+sk_sp<SkImage> MoshStep(const GpuContext& context, const sk_sp<SkImage>& state,
                         const sk_sp<SkImage>& prior, const sk_sp<SkImage>& frame, const sk_sp<SkImage>& flow, const MoshParams& params,
                         float salt, sk_sp<SkImage>* motion) {
     static const sk_sp<SkRuntimeEffect> moshMotion = Compile(kMoshMotion), moshImage = Compile(kMoshImage);
@@ -429,7 +441,7 @@ sk_sp<SkImage> MoshStep(skgpu::graphite::Context* context, skgpu::graphite::Reco
     const int fw = flow ? flow->width() : (frame->width() + divisor - 1) / divisor;
     const int fh = flow ? flow->height() : (frame->height() + divisor - 1) / divisor;
     const sk_sp<SkShader> none = SkShaders::Color(SK_ColorTRANSPARENT);
-    Gpu gpu(context, recorder);
+    Gpu gpu(context);
     SkRuntimeShaderBuilder field(moshMotion);
     field.child("flow") = flow ? Sample(flow) : none;
     field.child("prior") = prior ? Sample(prior, SkFilterMode::kNearest) : none;

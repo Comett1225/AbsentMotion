@@ -212,7 +212,7 @@ private suspend fun encode(
                 fun perFrame(ns: Long) = "%.1f".format(java.util.Locale.ROOT, ns / 1e6 / frames.coerceAtLeast(1))
                 Log.i("AMExport", "$frames frames in ${spent[2] / 1_000_000} ms; per frame: ${perFrame(spent[2])} ms, drawing ${perFrame(spent[0] - spent[1])} ms, waiting for copies ${perFrame(spent[1])} ms")
             }
-            val buffers = turn || ExportDebug.forceBuffers || Build.VERSION.SDK_INT < 33 || !stampsPresentTime()
+            val buffers = turn || ExportDebug.forceBuffers || (Build.VERSION.SDK_INT < 33 && !openGl()) || !stampsPresentTime()
             Log.i("AMExport", "rendering $frames frames at ${width}x$height through ${if (buffers) "encoder buffers" else "the swapchain"}")
             if (buffers && !turn && Build.VERSION.SDK_INT >= 33) {
                 val writer = ImageWriter.Builder(input).setMaxImages(2).setHardwareBufferFormat(HardwareBuffer.RGBA_8888)

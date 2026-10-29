@@ -5,6 +5,9 @@
 #include "drawing.h"
 #include "interpolation.h"
 
+#include <EGL/egl.h>
+#include <EGL/eglext.h>
+#include <GLES3/gl3.h>
 #include <android/hardware_buffer.h>
 #include <android/log.h>
 #include <android/native_window.h>
@@ -21,6 +24,7 @@
 #include <vector>
 
 #include "include/android/SkImageAndroid.h"
+#include "include/android/SkSurfaceAndroid.h"
 #include "include/android/vk/AndroidVulkanMemoryAllocator.h"
 #include "include/core/SkBitmap.h"
 #include "include/core/SkCanvas.h"
@@ -38,6 +42,10 @@
 #include "include/gpu/ganesh/GrBackendSurface.h"
 #include "include/gpu/ganesh/GrDirectContext.h"
 #include "include/gpu/ganesh/SkSurfaceGanesh.h"
+#include "include/gpu/ganesh/gl/GrGLBackendSurface.h"
+#include "include/gpu/ganesh/gl/GrGLDirectContext.h"
+#include "include/gpu/ganesh/gl/GrGLInterface.h"
+#include "include/gpu/ganesh/gl/egl/GrGLMakeEGLInterface.h"
 #include "include/gpu/ganesh/vk/GrVkBackendSemaphore.h"
 #include "include/gpu/ganesh/vk/GrVkBackendSurface.h"
 #include "include/gpu/ganesh/vk/GrVkDirectContext.h"
@@ -77,6 +85,7 @@ struct Target {
     uint32_t nextPresentId = 1;
     std::vector<VkPastPresentationTimingGOOGLE> timings;
     bool encoder = false;
+    EGLSurface eglSurface = EGL_NO_SURFACE;
 };
 
 namespace {
@@ -146,6 +155,10 @@ public:
 
 private:
     bool initVulkan(std::string* error);
+    bool initGl(std::string* error);
+    bool gl() const { return fBackend == Backend::kGaneshGL; }
+    GpuContext gpuContext() const { return {fGraphite.get(), fRecorder.get(), fGanesh.get()}; }
+    int glFrame(Target*, int64_t presentTimeNs, bool sync, const std::function<void(SkCanvas*)>& paint);
     sk_sp<SkSurface> wrapSwapchainImage(VkImage, VkFormat, VkImageUsageFlags, int w, int h);
     using MediaKey = std::pair<std::string, int64_t>;
     sk_sp<SkImage> importFrame(AHardwareBuffer*, bool opaque = true, int colorStandard = 0, int colorRange = 0, bool* rawYuv = nullptr,
@@ -205,6 +218,12 @@ private:
     PFN_vkGetPastPresentationTimingGOOGLE fGetPastPresentationTiming = nullptr;
     PFN_vkGetRefreshCycleDurationGOOGLE fGetRefreshCycleDuration = nullptr;
 
+    EGLDisplay fDisplay = EGL_NO_DISPLAY;
+    EGLConfig fConfig = nullptr;
+    EGLContext fContext = EGL_NO_CONTEXT;
+    EGLSurface fPbuffer = EGL_NO_SURFACE;
+    PFNEGLPRESENTATIONTIMEANDROIDPROC fPresentationTime = nullptr;
+
     skgpu::VulkanPreferredFeatures fSkiaFeatures;
     VkPhysicalDeviceFeatures2 fFeatures = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2};
     skgpu::VulkanExtensions fExtensions;
@@ -261,7 +280,7 @@ bool EngineImpl::initVulkan(std::string* error) {
     };
 
     uint32_t loaderVersion = VK_API_VERSION_1_0;
-    vkEnumerateInstanceVersion(&loaderVersion);
+    if (auto enumerateVersion = (PFN_vkEnumerateInstanceVersion)vkGetInstanceProcAddr(VK_NULL_HANDLE, "vkEnumerateInstanceVersion")) enumerateVersion(&loaderVersion);
     fApiVersion = std::min(loaderVersion, (uint32_t)VK_API_VERSION_1_4);
     fApiVersion = VK_MAKE_API_VERSION(0, VK_API_VERSION_MAJOR(fApiVersion),
                                       VK_API_VERSION_MINOR(fApiVersion), 0);
@@ -333,7 +352,9 @@ bool EngineImpl::initVulkan(std::string* error) {
     fDisplayTiming = want(VK_GOOGLE_DISPLAY_TIMING_EXTENSION_NAME);
 
     fSkiaFeatures.addFeaturesToQuery(deviceProps.data(), deviceProps.size(), fFeatures);
-    vkGetPhysicalDeviceFeatures2(fPhysicalDevice, &fFeatures);
+    auto features2 = (PFN_vkGetPhysicalDeviceFeatures2)vkGetInstanceProcAddr(fInstance, "vkGetPhysicalDeviceFeatures2");
+    if (!features2) return fail("vkGetPhysicalDeviceFeatures2 lookup", VK_ERROR_INCOMPATIBLE_DRIVER);
+    features2(fPhysicalDevice, &fFeatures);
     fFeatures.features.robustBufferAccess = VK_FALSE;
     fSkiaFeatures.addFeaturesToEnable(deviceExts, fFeatures);
     for (auto* p = (VkBaseOutStructure*)&fFeatures; p->pNext;) {
@@ -383,7 +404,52 @@ bool EngineImpl::initVulkan(std::string* error) {
     return true;
 }
 
+static std::string Printable(const char* text) {
+    std::string out = text ? text : "unknown";
+    std::replace_if(out.begin(), out.end(), [](char c) { return c == '"' || c == '\\' || (unsigned char)c < 0x20; }, ' ');
+    return out;
+}
+
+bool EngineImpl::initGl(std::string* error) {
+    auto fail = [&](const char* what) {
+        char code[16];
+        snprintf(code, sizeof(code), "0x%x", eglGetError());
+        *error = std::string(what) + " failed (" + code + ")";
+        LOGE("%s", error->c_str());
+        return false;
+    };
+    fDisplay = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+    if (fDisplay == EGL_NO_DISPLAY || !eglInitialize(fDisplay, nullptr, nullptr)) return fail("OpenGL eglInitialize");
+    EGLint wanted[] = {EGL_RENDERABLE_TYPE, EGL_OPENGL_ES3_BIT_KHR, EGL_SURFACE_TYPE, EGL_WINDOW_BIT | EGL_PBUFFER_BIT,
+                       EGL_RED_SIZE, 8, EGL_GREEN_SIZE, 8, EGL_BLUE_SIZE, 8, EGL_ALPHA_SIZE, 8, EGL_STENCIL_SIZE, 8,
+                       EGL_RECORDABLE_ANDROID, EGL_TRUE, EGL_NONE};
+    EGLint count = 0;
+    if (!eglChooseConfig(fDisplay, wanted, &fConfig, 1, &count) || count < 1) {
+        wanted[14] = EGL_NONE;
+        if (!eglChooseConfig(fDisplay, wanted, &fConfig, 1, &count) || count < 1) return fail("OpenGL ES 3 config");
+    }
+    const EGLint version[] = {EGL_CONTEXT_CLIENT_VERSION, 3, EGL_NONE};
+    fContext = eglCreateContext(fDisplay, fConfig, EGL_NO_CONTEXT, version);
+    if (fContext == EGL_NO_CONTEXT) return fail("OpenGL ES 3 context");
+    const EGLint size[] = {EGL_WIDTH, 1, EGL_HEIGHT, 1, EGL_NONE};
+    fPbuffer = eglCreatePbufferSurface(fDisplay, fConfig, size);
+    if (fPbuffer == EGL_NO_SURFACE) return fail("OpenGL pbuffer");
+    if (!eglMakeCurrent(fDisplay, fPbuffer, fPbuffer, fContext)) return fail("OpenGL eglMakeCurrent");
+    fPresentationTime = (PFNEGLPRESENTATIONTIMEANDROIDPROC)eglGetProcAddress("eglPresentationTimeANDROID");
+    sk_sp<const GrGLInterface> gl = GrGLInterfaces::MakeEGL();
+    if (!gl) { *error = "Ganesh OpenGL interface failed"; return false; }
+    fGanesh = GrDirectContexts::MakeGL(gl);
+    if (!fGanesh) { *error = "Ganesh OpenGL context creation failed"; return false; }
+    fInfo = std::string("{\"backend\":\"gl\",\"device\":\"") + Printable((const char*)glGetString(GL_RENDERER)) +
+            "\",\"vendor\":\"" + Printable((const char*)glGetString(GL_VENDOR)) + "\",\"api\":\"" +
+            Printable((const char*)glGetString(GL_VERSION)) + "\",\"displayTiming\":" + (fPresentationTime ? "true" : "false") +
+            ",\"deviceExtensions\":[]}";
+    LOGI("engine ready: %s", fInfo.c_str());
+    return true;
+}
+
 bool EngineImpl::init(std::string* error) {
+    if (this->gl()) return this->initGl(error);
     if (!this->initVulkan(error)) return false;
 
     skgpu::VulkanBackendContext bc;
@@ -458,6 +524,12 @@ EngineImpl::~EngineImpl() {
         vkDestroyDevice(fDevice, nullptr);
     }
     if (fInstance) vkDestroyInstance(fInstance, nullptr);
+    if (fDisplay != EGL_NO_DISPLAY) {
+        eglMakeCurrent(fDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+        if (fPbuffer != EGL_NO_SURFACE) eglDestroySurface(fDisplay, fPbuffer);
+        if (fContext != EGL_NO_CONTEXT) eglDestroyContext(fDisplay, fContext);
+        eglReleaseThread();
+    }
 }
 
 void EngineImpl::deleteDeadTextures(skgpu::graphite::Recorder* cleanup) {
@@ -513,6 +585,15 @@ Target* EngineImpl::attach(ANativeWindow* window, bool forEncoder) {
         this->detach(target);
         return nullptr;
     };
+    if (this->gl()) {
+        const EGLint none[] = {EGL_NONE};
+        target->eglSurface = eglCreateWindowSurface(fDisplay, fConfig, window, none);
+        if (target->eglSurface == EGL_NO_SURFACE) return fail("eglCreateWindowSurface", (VkResult)eglGetError());
+        eglQuerySurface(fDisplay, target->eglSurface, EGL_WIDTH, &target->width);
+        eglQuerySurface(fDisplay, target->eglSurface, EGL_HEIGHT, &target->height);
+        LOGI("attached %dx%d with OpenGL%s", target->width, target->height, forEncoder ? " for the encoder" : "");
+        return target;
+    }
 
     VkAndroidSurfaceCreateInfoKHR sci = {VK_STRUCTURE_TYPE_ANDROID_SURFACE_CREATE_INFO_KHR};
     sci.window = window;
@@ -599,6 +680,10 @@ void EngineImpl::detach(Target* target) {
     target->surfaces.clear();
     this->syncGpu();
     if (fDevice) vkDeviceWaitIdle(fDevice);
+    if (target->eglSurface != EGL_NO_SURFACE) {
+        eglMakeCurrent(fDisplay, fPbuffer, fPbuffer, fContext);
+        eglDestroySurface(fDisplay, target->eglSurface);
+    }
     for (VkSemaphore sem : target->renderDone) vkDestroySemaphore(fDevice, sem, nullptr);
     if (target->swapchain) vkDestroySwapchainKHR(fDevice, target->swapchain, nullptr);
     if (target->surface) vkDestroySurfaceKHR(fInstance, target->surface, nullptr);
@@ -607,6 +692,8 @@ void EngineImpl::detach(Target* target) {
     if (fTargets.empty() && fGraphite && !fGpuFailed) {
         if (fRecorder) fRecorder->freeGpuResources();
         fGraphite->freeGpuResources();
+    } else if (fTargets.empty() && fGanesh && !fGpuFailed) {
+        fGanesh->freeGpuResources();
     }
 }
 
@@ -665,7 +752,7 @@ sk_sp<SkImage> EngineImpl::importFrame(AHardwareBuffer* buffer, bool opaque, int
              desc.format, desc.usage);
     }
     const SkAlphaType alpha = opaque ? kOpaque_SkAlphaType : kPremul_SkAlphaType;
-    if (fBackend == Backend::kGanesh) {
+    if (fBackend != Backend::kGraphite) {
         return SkImages::DeferredFromAHardwareBuffer(buffer, alpha, SkColorSpace::MakeSRGB());
     }
     uint64_t id = 0;
@@ -843,14 +930,14 @@ sk_sp<SkImage> EngineImpl::flowFor(VideoFrames& video, int64_t a, int64_t b, con
     auto cached = video.flows.find({a, b});
     if (cached != video.flows.end()) return cached->second;
     FlowStats stats;
-    auto flow = EstimateFlow(fGraphite.get(), fRecorder.get(), video.frames[a], video.frames[b], params, &stats);
+    auto flow = EstimateFlow(this->gpuContext(), video.frames[a], video.frames[b], params, &stats);
     if (!flow) return nullptr;
     video.flows[{a, b}] = flow;
     __android_log_print(ANDROID_LOG_INFO, "AMInterp",
                         "flow a=%" PRId64 " b=%" PRId64 " size=%dx%d field=%dx%d levels=%d fuse=%d passes=%d recordings=1 estimate=%.2f "
                         "held=%.1fMB cache=%.1fMB",
                         a, b, video.frames[a]->width(), video.frames[a]->height(), flow->width(), flow->height(), stats.levels,
-                        params.fuse, stats.passes, stats.ms, this->heldMegabytes(), fRecorder->currentBudgetedBytes() / 1048576.0);
+                        params.fuse, stats.passes, stats.ms, this->heldMegabytes(), fRecorder ? fRecorder->currentBudgetedBytes() / 1048576.0 : 0.0);
     return flow;
 }
 
@@ -875,7 +962,7 @@ bool EngineImpl::interpolateVideo(const std::string& uri, int64_t layerId, const
     const bool flowMode = r.mode == SmoothMode::Flow;
     const bool flow = r.a != r.b && ((flowMode && r.t > 0) || r.blur > 0);
     if (mix || flow) {
-        if (!fGraphite || fGpuFailed) {
+        if ((!fGraphite && !fGanesh) || fGpuFailed) {
             LOGE("interpolation failed: GPU is unavailable");
             return false;
         }
@@ -892,9 +979,9 @@ bool EngineImpl::interpolateVideo(const std::string& uri, int64_t layerId, const
                 }
                 const SkImageInfo info = SkImageInfo::Make(r.width, r.height, kRGBA_8888_SkColorType, kPremul_SkAlphaType, SkColorSpace::MakeSRGB());
                 mixed = SkImages::RasterFromPixmapCopy(SkPixmap(info, r.pixels, r.rowBytes));
-                if (mixed) mixed = SkImages::TextureFromImage(fRecorder.get(), mixed.get(), {});
+                if (mixed && fRecorder) mixed = SkImages::TextureFromImage(fRecorder.get(), mixed.get(), {});
             } else {
-                mixed = SynthesizeFrame(fGraphite.get(), fRecorder.get(), first, second, flowMode ? field : nullptr, r.t, params.divisor, &ms,
+                mixed = SynthesizeFrame(this->gpuContext(), first, second, flowMode ? field : nullptr, r.t, params.divisor, &ms,
                                         r.soft ? (before ? before : first) : nullptr, r.soft ? (after ? after : second) : nullptr);
             }
             __android_log_print(ANDROID_LOG_INFO, "AMInterp", "frame a=%" PRId64 " b=%" PRId64 " t=%.4f mode=%s synthesis=%.2f",
@@ -903,7 +990,7 @@ bool EngineImpl::interpolateVideo(const std::string& uri, int64_t layerId, const
             image = std::move(mixed);
         }
         if (r.blur > 0) {
-            auto blurred = MotionBlur(fGraphite.get(), fRecorder.get(), image, field, r.t, r.blur, params.divisor);
+            auto blurred = MotionBlur(this->gpuContext(), image, field, r.t, r.blur, params.divisor);
             if (!blurred) return fail("motion blur returned no image");
             image = std::move(blurred);
         }
@@ -919,7 +1006,7 @@ bool EngineImpl::interpolateVideo(const std::string& uri, int64_t layerId, const
 }
 
 int EngineImpl::moshStart(const std::string& uri, int64_t layerId, const std::vector<int64_t>& pts, const MoshParams& params) {
-    if (!fGraphite || fGpuFailed || pts.empty()) return -1;
+    if ((!fGraphite && !fGanesh) || fGpuFailed || pts.empty()) return -1;
     const auto key = std::make_pair(uri, layerId);
     Mosh& m = fMosh[key];
     if (!(m.params == params)) m = Mosh{params};
@@ -975,13 +1062,13 @@ bool EngineImpl::moshFrame(const std::string& uri, int64_t layerId, int step, AH
         sk_sp<SkImage> flow;
         if (m.pts[step] != m.pts[step - 1] && frame->dimensions() == m.previous->dimensions()) {
             FlowStats stats;
-            flow = EstimateFlow(fGraphite.get(), fRecorder.get(), m.previous, frame, m.params.flow, &stats);
+            flow = EstimateFlow(this->gpuContext(), m.previous, frame, m.params.flow, &stats);
             if (!flow) return false;
             flowMs = stats.ms;
         }
         sk_sp<SkImage> motion;
         const float salt = (float)(((uint64_t)layerId * 131 + (uint64_t)step * 7919) % 997) + 0.5f;
-        auto next = MoshStep(fGraphite.get(), fRecorder.get(), m.state, m.motion, frame, flow, m.params, salt, &motion);
+        auto next = MoshStep(this->gpuContext(), m.state, m.motion, frame, flow, m.params, salt, &motion);
         if (!next) return false;
         m.state = next;
         m.motion = motion;
@@ -1028,6 +1115,17 @@ SkSurface* EngineImpl::bufferSurface(AHardwareBuffer* buffer) {
     if (found != fBufferSurfaces.end()) return found->second.get();
     AHardwareBuffer_Desc desc;
     AHardwareBuffer_describe(buffer, &desc);
+    if (!fGraphite) {
+        SkSurfaceProps props(0, kUnknown_SkPixelGeometry);
+        auto surface = SkSurfaces::WrapAndroidHardwareBuffer(fGanesh.get(), buffer, kTopLeft_GrSurfaceOrigin, SkColorSpace::MakeSRGB(), &props);
+        if (!surface) {
+            LOGE("encoder buffer %ux%u format 0x%x usage 0x%" PRIx64 " cannot be rendered to with Ganesh", desc.width, desc.height,
+                 desc.format, desc.usage);
+            return nullptr;
+        }
+        LOGI("encoder buffer %ux%u format 0x%x (Ganesh)", desc.width, desc.height, desc.format);
+        return (fBufferSurfaces[id] = std::move(surface)).get();
+    }
     auto tex = fRecorder->createBackendTexture(buffer, true, false, {(int)desc.width, (int)desc.height});
     if (!tex.isValid()) {
         LOGE("encoder buffer %ux%u format 0x%x usage 0x%" PRIx64 " cannot be rendered to", desc.width, desc.height,
@@ -1056,9 +1154,9 @@ SkSurface* EngineImpl::bufferSurface(AHardwareBuffer* buffer) {
 
 int EngineImpl::renderBuffer(AHardwareBuffer* buffer, double timeMs, uint32_t background) {
     if (fGpuFailed) return -1000;
-    if (!fGraphite) return -3;
+    if (!fGraphite && !fGanesh) return -3;
     if (fScene.width <= 0 || fScene.height <= 0) return -1;
-    this->deleteDeadTextures();
+    if (fGraphite) this->deleteDeadTextures();
     SkSurface* surface = this->bufferSurface(buffer);
     if (!surface) return -2;
     SetCameraView(true);
@@ -1074,6 +1172,10 @@ int EngineImpl::renderBuffer(AHardwareBuffer* buffer, double timeMs, uint32_t ba
         SetLayerBreak(nullptr);
     }
     if (fGpuFailed) return -1000;
+    if (!fGraphite) {
+        fGanesh->flushAndSubmit(surface, GrSyncCpu::kYes);
+        return fGanesh->abandoned() ? this->failGpu(nullptr) : 0;
+    }
     auto foreign = skgpu::MutableTextureStates::MakeVulkan(VK_IMAGE_LAYOUT_GENERAL, VK_QUEUE_FAMILY_FOREIGN_EXT);
     std::unique_ptr<skgpu::graphite::Recording> recording = fRecorder->snap();
     skgpu::graphite::InsertRecordingInfo info;
@@ -1112,6 +1214,10 @@ void EngineImpl::flushPartial() {
 }
 
 void EngineImpl::trim() {
+    if (fGanesh && !fGpuFailed) {
+        fGanesh->freeGpuResources();
+        return;
+    }
     if (!fGraphite || fGpuFailed) return;
     this->syncGpu();
     if (fRecorder) fRecorder->freeGpuResources();
@@ -1295,7 +1401,7 @@ bool EngineImpl::offscreen(int width, int height, bool premultiplied,
 
 int EngineImpl::failGpu(Target* target) {
     fGpuFailed = true;
-    vkDeviceWaitIdle(fDevice);
+    if (fDevice) vkDeviceWaitIdle(fDevice);
     if (target && target->swapchain) {
         target->surfaces.clear();
         vkDestroySwapchainKHR(fDevice, target->swapchain, nullptr);
@@ -1307,11 +1413,12 @@ int EngineImpl::failGpu(Target* target) {
 int EngineImpl::frame(Target* target, int64_t presentTimeNs, bool sync,
                       const std::function<void(SkCanvas*)>& paint) {
     if (fGpuFailed || !target || std::none_of(fTargets.begin(), fTargets.end(),
-            [&](const auto& t) { return t.get() == target; }) || !target->swapchain) return -1000;
-    if (presentTimeNs > 0 && !fDisplayTiming) {
-        LOGE("encoder timestamps require VK_GOOGLE_display_timing");
+            [&](const auto& t) { return t.get() == target; }) || (this->gl() ? target->eglSurface == EGL_NO_SURFACE : !target->swapchain)) return -1000;
+    if (presentTimeNs > 0 && !(this->gl() ? fPresentationTime != nullptr : fDisplayTiming)) {
+        LOGE("encoder timestamps require VK_GOOGLE_display_timing or eglPresentationTimeANDROID");
         return -1000;
     }
+    if (this->gl()) return this->glFrame(target, presentTimeNs, sync, paint);
     if (fGraphite) this->deleteDeadTextures();
 
     VkSemaphore acquired = VK_NULL_HANDLE;
@@ -1421,6 +1528,45 @@ int EngineImpl::frame(Target* target, int64_t presentTimeNs, bool sync,
         return r;
     }
     if (presentTimeNs <= 0 && target->nextPresentId % 4 == 0) this->collectTimings(target);
+    return 0;
+}
+
+int EngineImpl::glFrame(Target* target, int64_t presentTimeNs, bool sync, const std::function<void(SkCanvas*)>& paint) {
+    if (!eglMakeCurrent(fDisplay, target->eglSurface, target->eglSurface, fContext)) {
+        LOGE("eglMakeCurrent on the window failed (0x%x)", eglGetError());
+        eglMakeCurrent(fDisplay, fPbuffer, fPbuffer, fContext);
+        return -2;
+    }
+    eglQuerySurface(fDisplay, target->eglSurface, EGL_WIDTH, &target->width);
+    eglQuerySurface(fDisplay, target->eglSurface, EGL_HEIGHT, &target->height);
+    fGanesh->resetContext(kRenderTarget_GrGLBackendState);
+    GrGLFramebufferInfo framebuffer;
+    framebuffer.fFBOID = 0;
+    framebuffer.fFormat = GL_RGBA8;
+    SkSurfaceProps props(0, kUnknown_SkPixelGeometry);
+    sk_sp<SkSurface> surface = SkSurfaces::WrapBackendRenderTarget(
+            fGanesh.get(), GrBackendRenderTargets::MakeGL(target->width, target->height, 0, 8, framebuffer),
+            kBottomLeft_GrSurfaceOrigin, kRGBA_8888_SkColorType, SkColorSpace::MakeSRGB(), &props);
+    if (!surface) {
+        LOGE("the OpenGL window surface cannot be wrapped");
+        eglMakeCurrent(fDisplay, fPbuffer, fPbuffer, fContext);
+        return this->failGpu(target);
+    }
+    {
+        SkAutoCanvasRestore restore(surface->getCanvas(), true);
+        paint(surface->getCanvas());
+    }
+    fGanesh->flushAndSubmit(surface.get(), sync ? GrSyncCpu::kYes : GrSyncCpu::kNo);
+    surface.reset();
+    if (presentTimeNs > 0) fPresentationTime(fDisplay, target->eglSurface, presentTimeNs);
+    const bool swapped = eglSwapBuffers(fDisplay, target->eglSurface);
+    const EGLint swapError = swapped ? EGL_SUCCESS : eglGetError();
+    eglMakeCurrent(fDisplay, fPbuffer, fPbuffer, fContext);
+    if (fGanesh->abandoned()) return this->failGpu(target);
+    if (!swapped) {
+        LOGE("eglSwapBuffers failed (0x%x)", swapError);
+        return swapError == EGL_CONTEXT_LOST ? this->failGpu(target) : -2;
+    }
     return 0;
 }
 

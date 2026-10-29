@@ -5,7 +5,7 @@
 #include <fstream>
 #include <limits>
 #include <stdexcept>
-#if defined(__ARM_NEON)
+#if defined(__aarch64__)
 #include <arm_neon.h>
 #endif
 namespace absent {
@@ -75,7 +75,7 @@ static Tensor convolve(const Tensor& x,const Node& n) {
     if(x.c!=n.ci)throw std::runtime_error("Convolution channel mismatch");
     int h=(x.h+2*(n.k/2)-n.k)/n.s+1,w=(x.w+2*(n.k/2)-n.k)/n.s+1;
     Tensor out(n.co,h,w);int nc=n.ci/n.g,oc=n.co/n.g,pad=n.k/2;
-#if defined(__ARM_NEON)
+#if defined(__aarch64__)
     if(n.k==1&&n.s==1&&n.g==1) {
         int pixels=h*w,o=0;
         for(;o+3<n.co;o+=4) {
@@ -106,7 +106,7 @@ static Tensor convolve(const Tensor& x,const Node& n) {
                 float* row=dst+size_t(y)*w;const float* in=src+size_t(iy)*x.w;
                 int j=0;
                 while(j<w&&j*n.s+kx-pad<0)++j;
-#if defined(__ARM_NEON)
+#if defined(__aarch64__)
                 float32x4_t ww=vdupq_n_f32(weight);
                 for(;j+3<w&&(j+3)*n.s+kx-pad<x.w;++j) {
                     int ix=j*n.s+kx-pad;

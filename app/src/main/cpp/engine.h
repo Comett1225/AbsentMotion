@@ -10,7 +10,7 @@ struct AHardwareBuffer;
 
 namespace am {
 
-enum class Backend : int { kGraphite = 0, kGanesh = 1 };
+enum class Backend : int { kGraphite = 0, kGanesh = 1, kGaneshGL = 2 };
 
 struct SnapGuide {
     bool vertical;

@@ -117,6 +117,7 @@ internal object TestHooks {
         val intent = activity.intent
         keepShared(activity, intent)
         intent.getStringExtra("failengine")?.let { app.absentmotion.engine.EngineDebug.failStart = it }
+        app.absentmotion.engine.EngineDebug.forceGl = intent.getBooleanExtra("gl", false)
         app.absentmotion.export.ExportDebug.refuseHardware = intent.getBooleanExtra("refusehw", false)
         app.absentmotion.export.ExportDebug.failPlayers = intent.getIntExtra("failplayers", 0)
         intent.getStringExtra("holddecoder")?.let { holdDecoder(activity, it, intent.getLongExtra("holdafter", 0L), intent.getLongExtra("holdms", 20_000L)) }

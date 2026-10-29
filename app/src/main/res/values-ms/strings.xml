@@ -115,6 +115,11 @@
     <string name="the_media_picker_lists_only_albums">Pemilih media hanya menyenaraikan album dan folder yang namanya mengandungi Demo.</string>
     <string name="demo_mode_is_on">Mod demo dihidupkan</string>
     <string name="preview_quality">Kualiti pratonton</string>
+    <string name="settings_graphics">Grafik</string>
+    <string name="settings_graphics_auto">Automatik</string>
+    <string name="settings_graphics_opengl">OpenGL</string>
+    <string name="settings_graphics_note">Kini menggunakan %1$s.</string>
+    <string name="settings_graphics_hint">Pilih OpenGL jika pratonton atau eksport kelihatan salah pada telefon ini.</string>
     <string name="playback_resampling">Persampelan semula main balik</string>
     <string name="settings">Tetapan</string>
     <string name="your_video_ended_early_so_its">Video anda tamat lebih awal, jadi bingkai terakhirnya ditahan.\nTukar dengan klip lebih panjang untuk hasil yang lebih bersih.</string>
@@ -594,6 +599,7 @@
     <string name="unsupported_title">Telefon ini tidak boleh menjalankan editor</string>
     <string name="unsupported_old_vulkan">AbsentMotion melukis pratonton dan eksport dengan cip grafik melalui Vulkan 1.1, tetapi telefon ini hanya mempunyai versi Vulkan yang lebih lama.</string>
     <string name="unsupported_no_vulkan">Pemacu grafik telefon tidak dapat memulakan Vulkan, yang diperlukan oleh AbsentMotion untuk melukis pratonton dan eksport.</string>
+    <string name="unsupported_no_opengl">AbsentMotion juga mencuba OpenGL ES 3.0, dan ia juga tidak dapat dimulakan.</string>
     <string name="unsupported_driver_features">Pemacu grafik telefon kekurangan ciri yang diperlukan oleh AbsentMotion untuk melukis pratonton dan eksport.</string>
     <string name="unsupported_skia">Enjin lukisan AbsentMotion tidak berfungsi dengan pemacu grafik telefon ini.</string>
     <string name="unsupported_unknown">Enjin lukisan AbsentMotion tidak dapat dimulakan pada telefon ini.</string>
@@ -1688,11 +1694,12 @@
     <string name="recovery_your_project">projek anda</string>
     <string name="caption_layer_name">Kapsyen %1$s</string>
     <string name="tier_needs_latest">Perlu Android 13 (Versi Latest)</string>
+    <string name="tier_needs_vulkan">Perlu telefon dengan grafik Vulkan</string>
     <string name="feature_flow_high">Aliran optik Tinggi</string>
     <string name="feature_ai_enhance">Peningkatan AI</string>
     <string name="feature_best_cutout">Penyingkiran latar belakang AI 2.0</string>
     <string name="about_version_compatible">Versi %1$s Compatible</string>
-    <string name="about_compatible_note">Ini ialah versi Compatible untuk Android 9 hingga 12. Tidak disertakan: %1$s. Ia memerlukan Android 13 dan versi Latest.</string>
+    <string name="about_compatible_note">Ini ialah versi Compatible untuk Android 8 hingga 12. Tidak disertakan: %1$s. Ia memerlukan Android 13 dan versi Latest.</string>
     <string name="low_memory_title">Memori rendah</string>
     <string name="low_memory_body">Telefon ini mempunyai %1$s GB memori. AbsentMotion berfungsi paling baik dengan 3 GB atau lebih: projek panjang, video besar dan banyak kesan boleh menjadi perlahan atau menyebabkan aplikasi tertutup.</string>
     <string name="preview_cache_render">Render pratonton</string>

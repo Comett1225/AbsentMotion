@@ -115,6 +115,11 @@
     <string name="the_media_picker_lists_only_albums">O seletor de mídia lista apenas álbuns e pastas cujo nome contém Demo.</string>
     <string name="demo_mode_is_on">O modo demonstração está ativado</string>
     <string name="preview_quality">Qualidade da pré-visualização</string>
+    <string name="settings_graphics">Gráficos</string>
+    <string name="settings_graphics_auto">Automático</string>
+    <string name="settings_graphics_opengl">OpenGL</string>
+    <string name="settings_graphics_note">Usando %1$s agora.</string>
+    <string name="settings_graphics_hint">Escolha OpenGL se a prévia ou as exportações parecerem erradas neste celular.</string>
     <string name="playback_resampling">Reamostragem de reprodução</string>
     <string name="settings">Configurações</string>
     <string name="your_video_ended_early_so_its">Seu vídeo terminou antes do esperado, então seu último quadro é mantido.\nTroque por um clipe mais longo para um resultado mais limpo.</string>
@@ -616,6 +621,7 @@
     <string name="unsupported_title">Este telefone não consegue rodar o editor</string>
     <string name="unsupported_old_vulkan">O AbsentMotion desenha a pré-visualização e a exportação com a placa gráfica por meio do Vulkan 1.1, e este telefone só tem uma versão mais antiga do Vulkan.</string>
     <string name="unsupported_no_vulkan">O driver gráfico do telefone não iniciou o Vulkan, que o AbsentMotion precisa para desenhar a pré-visualização e a exportação.</string>
+    <string name="unsupported_no_opengl">O AbsentMotion também tentou o OpenGL ES 3.0, e ele também não iniciou.</string>
     <string name="unsupported_driver_features">O driver gráfico do telefone não tem recursos de que o AbsentMotion precisa para desenhar a pré-visualização e a exportação.</string>
     <string name="unsupported_skia">O mecanismo de desenho do AbsentMotion não funciona com o driver gráfico deste telefone.</string>
     <string name="unsupported_unknown">Não foi possível iniciar o mecanismo de desenho do AbsentMotion neste telefone.</string>
@@ -1738,11 +1744,12 @@
     <string name="recovery_your_project">seu projeto</string>
     <string name="caption_layer_name">Legenda %1$s</string>
     <string name="tier_needs_latest">Requer Android 13 (versão Latest)</string>
+    <string name="tier_needs_vulkan">Requer um celular com gráficos Vulkan</string>
     <string name="feature_flow_high">Fluxo óptico alto</string>
     <string name="feature_ai_enhance">Aprimorar com AI</string>
     <string name="feature_best_cutout">Remoção de fundo com IA 2.0</string>
     <string name="about_version_compatible">Versão %1$s Compatible</string>
-    <string name="about_compatible_note">Esta é a versão Compatible para Android 9 a 12. Ficaram de fora: %1$s. Eles precisam do Android 13 e da versão Latest.</string>
+    <string name="about_compatible_note">Esta é a versão Compatible para Android 8 a 12. Ficaram de fora: %1$s. Eles precisam do Android 13 e da versão Latest.</string>
     <string name="low_memory_title">Pouca memória</string>
     <string name="low_memory_body">Este celular tem %1$s GB de memória. O AbsentMotion funciona melhor com 3 GB ou mais: projetos longos, vídeos grandes e muitos efeitos podem ficar lentos ou fechar o app.</string>
     <string name="preview_cache_render">Renderizar pré-visualização</string>

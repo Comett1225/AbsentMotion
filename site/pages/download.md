@@ -23,8 +23,8 @@ Later versions install over the old one and keep your projects. More help: [Gett
 
 ## What your phone needs
 
-- **Latest version:** Android 13 or newer. **Compatible version:** Android 9 to 12.
-- A 64-bit ARM phone with Vulkan 1.1. Almost every phone sold since 2018 qualifies.
+- **Latest version:** Android 13 or newer. **Compatible version:** Android 8 to 12.
+- An ARM phone. Almost every phone sold in the last several years is 64-bit; phones with a 32-bit system use the Compatible 32-bit file. Phones without Vulkan 1.1 draw with OpenGL, with a few AI tools left out.
 - 4 GB of RAM or more is comfortable. Phones with less can run it but may close the app on large projects.
 
 Not sure? Use the [phone checker](@phone-checker), or read [Requirements and versions](@requirements).

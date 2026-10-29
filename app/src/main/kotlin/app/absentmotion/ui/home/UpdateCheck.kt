@@ -132,10 +132,10 @@ private fun releaseOf(release: JSONObject, flavour: String, source: UpdateSource
 
 private val SAFE_VERSION = Regex("^[0-9]+(\\.[0-9]+)*(-[0-9A-Za-z.]+)?$")
 
-internal fun apkName(version: String, flavour: String) = "AbsentMotion-$version-${if (flavour == "compat") "compatible" else flavour}.apk"
+internal fun apkName(version: String, flavour: String) = "AbsentMotion-$version-${when (flavour) { "compat" -> "compatible"; "compat32" -> "compatible-32bit"; else -> flavour }}.apk"
 
 private fun apkOf(release: JSONObject, tag: String, version: String, flavour: String, source: UpdateSource): ApkAsset? {
-    if (flavour !in setOf("foss", "play", "compat") || !SAFE_VERSION.matches(version) || tag.trim() !in setOf("v$version", "V$version")) return null
+    if (flavour !in setOf("foss", "play", "compat", "compat32") || !SAFE_VERSION.matches(version) || tag.trim() !in setOf("v$version", "V$version")) return null
     val name = apkName(version, flavour)
     val assets = release.optJSONArray("assets") ?: return null
     val list = (0 until assets.length()).mapNotNull { assets.optJSONObject(it) }

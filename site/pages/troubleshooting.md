@@ -18,7 +18,7 @@ Settings, **Crash logs** shows what happened in one sentence for each crash. **C
 
 ## This phone cannot run the editor
 
-AbsentMotion draws the preview and the export with the graphics chip through Vulkan 1.1. If the phone's graphics driver does not offer it, the app shows **This phone cannot run the editor** with the Android version and the graphics chip instead of closing. Your projects, settings, backups and crash logs still open. **Copy details** copies the facts so you can add them to a bug report on [GitHub](@issues). See [Requirements and versions](@requirements).
+AbsentMotion draws the preview and the export with the graphics chip through Vulkan 1.1 or, when the phone does not have it, through OpenGL ES 3.0. If neither starts, the app shows **This phone cannot run the editor** with the Android version and the graphics chip instead of closing. Your projects, settings, backups and crash logs still open. **Copy details** copies the facts so you can add them to a bug report on [GitHub](@issues). See [Requirements and versions](@requirements). If the editor opens but the preview or exports look wrong, choose **OpenGL** in **Settings**, **Graphics**.
 
 ## Missing media
 

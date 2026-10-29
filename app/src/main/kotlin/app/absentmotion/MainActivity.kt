@@ -100,6 +100,7 @@ import app.absentmotion.ui.theme.PressIndication
 import app.absentmotion.ui.theme.enterFade
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -116,7 +117,7 @@ class MainActivity : ComponentActivity() {
     internal lateinit var store: ProjectStore
     internal lateinit var settings: AppSettings
     private lateinit var templates: TemplateStore
-    internal val engine by lazy { EngineThread(background = Am.PreviewBg.toArgb(), context = applicationContext) }
+    internal val engine by lazy { EngineThread(background = Am.PreviewBg.toArgb(), context = applicationContext) { settings.openGl } }
     internal var editor by mutableStateOf<EditorState?>(null)
         private set
     private var closingEditor = false
@@ -207,6 +208,7 @@ class MainActivity : ComponentActivity() {
             }
         }
         TestHooks.start(this)
+        lifecycleScope.launch { androidx.compose.runtime.snapshotFlow { settings.openGl }.drop(1).collect { engine.restart() } }
         app.absentmotion.ui.home.Updater.atLaunch(applicationContext)
         lifecycleScope.launch { engineWorks() }
         firstRun = FirstRun.of(settings, TestHooks.onboarding(intent).takeIf { savedInstanceState == null })

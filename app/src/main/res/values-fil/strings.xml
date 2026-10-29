@@ -115,6 +115,11 @@
     <string name="the_media_picker_lists_only_albums">Ang media picker ay naglilista lamang ng mga album at folder na may \"Demo\" sa pangalan.</string>
     <string name="demo_mode_is_on">Naka-on ang Demo Mode</string>
     <string name="preview_quality">Kalidad ng preview</string>
+    <string name="settings_graphics">Graphics</string>
+    <string name="settings_graphics_auto">Awtomatiko</string>
+    <string name="settings_graphics_opengl">OpenGL</string>
+    <string name="settings_graphics_note">Gumagamit ngayon ng %1$s.</string>
+    <string name="settings_graphics_hint">Piliin ang OpenGL kung mali ang itsura ng preview o ng mga export sa phone na ito.</string>
     <string name="playback_resampling">Resampling ng playback</string>
     <string name="settings">Mga setting</string>
     <string name="your_video_ended_early_so_its">Maagang natapos ang bidyo mo, kaya hawak ang huling frame nito.\nPalitan ng mas mahabang clip para sa mas malinis na resulta.</string>
@@ -605,6 +610,7 @@
     <string name="unsupported_title">Hindi kayang patakbuhin ng teleponong ito ang editor</string>
     <string name="unsupported_old_vulkan">Ginagamit ng AbsentMotion ang graphics chip para iguhit ang preview at ang export sa pamamagitan ng Vulkan 1.1, at mas lumang bersyon lang ng Vulkan ang nasa teleponong ito.</string>
     <string name="unsupported_no_vulkan">Hindi nag-start ang graphics driver ng telepono sa Vulkan, na kailangan ng AbsentMotion para iguhit ang preview at ang export.</string>
+    <string name="unsupported_no_opengl">Sinubukan din ng AbsentMotion ang OpenGL ES 3.0, pero hindi rin ito gumana.</string>
     <string name="unsupported_driver_features">Kulang ang graphics driver ng telepono sa mga feature na kailangan ng AbsentMotion para iguhit ang preview at ang export.</string>
     <string name="unsupported_skia">Hindi gumagana ang drawing engine ng AbsentMotion sa graphics driver ng teleponong ito.</string>
     <string name="unsupported_unknown">Hindi nag-start ang drawing engine ng AbsentMotion sa teleponong ito.</string>
@@ -1713,11 +1719,12 @@
     <string name="recovery_your_project">iyong proyekto</string>
     <string name="caption_layer_name">Kapsyon %1$s</string>
     <string name="tier_needs_latest">Kailangan ang Android 13 (Latest na bersyon)</string>
+    <string name="tier_needs_vulkan">Kailangan ng phone na may Vulkan graphics</string>
     <string name="feature_flow_high">Optical flow (Mataas)</string>
     <string name="feature_ai_enhance">Pagandahin gamit ang AI</string>
     <string name="feature_best_cutout">AI pagtanggal ng background 2.0</string>
     <string name="about_version_compatible">Bersyon %1$s Compatible</string>
-    <string name="about_compatible_note">Ito ang Compatible na bersyon para sa Android 9 hanggang 12. Hindi kasama: %1$s. Kailangan nila ang Android 13 at ang Latest na bersyon.</string>
+    <string name="about_compatible_note">Ito ang Compatible na bersyon para sa Android 8 hanggang 12. Hindi kasama: %1$s. Kailangan nila ang Android 13 at ang Latest na bersyon.</string>
     <string name="low_memory_title">Mababang memory</string>
     <string name="low_memory_body">May %1$s GB na memory ang teleponong ito. Gumagana nang pinakamahusay ang AbsentMotion sa 3 GB o higit pa: sa mahahabang proyekto, malalaking bidyo, at maraming epekto, maaaring bumagal o magsara ang app.</string>
     <string name="preview_cache_render">I-render ang preview</string>

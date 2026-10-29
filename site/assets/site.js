@@ -2,7 +2,7 @@
   "use strict";
 
   var LATEST_FROM = 13;
-  var COMPATIBLE_FROM = 9;
+  var COMPATIBLE_FROM = 8;
 
   function norm(value) {
     return String(value == null ? "" : value)
@@ -137,41 +137,33 @@
     return names.join(" or ");
   }
 
-  function blockedReason(device) {
-    if (!device) return null;
-    if (device.arm64 === false) return "it has a 32-bit system, and AbsentMotion needs a 64-bit ARM phone";
-    if (device.vulkan11 === false) return "its graphics chip does not support Vulkan 1.1, which AbsentMotion needs";
-    return null;
-  }
-
   function recommend(env, device) {
     if (env.platform === "ios") return { kind: "ios" };
     if (env.platform !== "android") return { kind: "desktop" };
-    var blocked = blockedReason(device);
-    if (blocked) return { kind: "blocked", reason: blocked, device: device, android: env.android };
-    if (env.android == null) return { kind: "unknown", device: device };
-    if (env.android >= LATEST_FROM) return { kind: "latest", device: device, android: env.android };
-    if (env.android >= COMPATIBLE_FROM) return { kind: "compatible", device: device, android: env.android };
+    var bits = device && device.arm64 === false ? 32 : 64;
+    if (env.android == null) return bits === 32 && device.tier === "compatible" ? { kind: "compatible", device: device, android: null, bits: 32 } : { kind: "unknown", device: device };
+    if (env.android >= LATEST_FROM && bits === 64) return { kind: "latest", device: device, android: env.android };
+    if (env.android >= COMPATIBLE_FROM) return { kind: "compatible", device: device, android: env.android, bits: bits };
     return { kind: "old", device: device, android: env.android };
   }
 
   function verdict(device) {
-    var blocked = blockedReason(device);
-    var tier = blocked ? "unsupported" : device.tier;
+    var tier = device.tier;
     var launch = device.launchAndroid;
     var max = device.maxAndroid;
     var reason;
-    if (blocked) {
-      reason = "This phone cannot run AbsentMotion: " + blocked + ".";
+    if (tier === "compatible" && device.arm64 === false) {
+      reason = "It has a 32-bit system, so it needs the 32-bit Compatible version (Android 8 or newer). The other files need a 64-bit phone.";
     } else if (tier === "latest" && launch >= LATEST_FROM) {
       reason = "It came with Android " + launch + ", so it should run the Latest version.";
     } else if (tier === "latest") {
       reason = "It came with Android " + launch + " and can be updated to Android " + max + ". Once it runs Android 13 or newer it should run the Latest version. Until then, use the Compatible version.";
     } else if (tier === "compatible") {
-      reason = "Its newest Android version is " + max + ", so it should work with the Compatible version (Android 9 to 12). It cannot run the Latest version, which needs Android 13 or newer.";
+      reason = "Its newest Android version is " + max + ", so it should work with the Compatible version (Android 8 to 12). It cannot run the Latest version, which needs Android 13 or newer.";
     } else {
-      reason = "Its newest Android version is " + max + " and AbsentMotion needs Android 9 or newer, with a 64-bit ARM chip and Vulkan 1.1.";
+      reason = "Its newest Android version is " + max + " and AbsentMotion needs Android 8 or newer.";
     }
+    if (tier !== "unsupported" && device.vulkan11 === false) reason += " Its graphics chip has no Vulkan 1.1, so AbsentMotion draws with OpenGL there: everything works except AI Smooth, AI Enhance, AI background removal 2.0 and Optical flow High, and the preview is slower.";
     var ai = { great: "AI features (captions, background removal) should run fast.", good: "AI features should run at a reasonable speed.", slow: "AI features will probably be slow here; short clips are fine." }[device.aiClass];
     return { tier: tier, reason: reason, ai: tier === "unsupported" ? "" : ai };
   }
@@ -219,33 +211,31 @@
         if (verdictInfo && verdictInfo.ai) kids.push(el("p", { "class": "small", text: verdictInfo.ai }));
         break;
       case "compatible":
-        if (!link("dl-compatible")) {
+        var narrow = rec.bits === 32;
+        var file = narrow ? "dl-compatible32" : "dl-compatible";
+        var needs = narrow ? " This phone has a 32-bit system, so it needs the 32-bit Compatible version" : " Android 8 to 12 needs the Compatible version";
+        if (!link(file)) {
           heading = "The version for your phone is coming soon";
-          kids.push(el("p", { text: seen + " Android 9 to 12 needs the Compatible version, which comes with the next update. Check back here soon." }));
+          kids.push(el("p", { text: seen + needs + ", which comes with the next update. Check back here soon." }));
           kids.push(el("p", { "class": "small" }, [el("a", { href: "compatible.html", text: "What the Compatible version is" }), "."]));
           break;
         }
-        heading = "Get the Compatible version";
-        kids.push(el("p", { text: seen + " Android 9 to 12 uses the Compatible version." }));
-        actions.push(el("a", { "class": "btn big", href: link("dl-compatible") }, ["Download Compatible version", el("span", { "class": "sub", text: "Android 9 to 12, " + version })]));
+        heading = narrow ? "Get the 32-bit Compatible version" : "Get the Compatible version";
+        kids.push(el("p", { text: seen + needs + "." }));
+        actions.push(el("a", { "class": "btn big", href: link(file) }, [narrow ? "Download 32-bit Compatible version" : "Download Compatible version", el("span", { "class": "sub", text: (narrow ? "32-bit, Android 8 or newer, " : "Android 8 to 12, ") + version })]));
         kids.push(el("p", { "class": "small" }, ["Some features are left out of this version. ", el("a", { href: "compatible.html", text: "See which ones" }), ". If the phone is updated to Android 13 or newer later, the Latest version is the one to use."]));
         if (verdictInfo && verdictInfo.ai) kids.push(el("p", { "class": "small", text: verdictInfo.ai }));
         break;
       case "old":
         heading = "This phone is too old for AbsentMotion";
-        kids.push(el("p", { text: "Your phone runs Android " + env.android + ". AbsentMotion needs Android 9 or newer (Android 13 or newer for the Latest version)." }));
+        kids.push(el("p", { text: "Your phone runs Android " + env.android + ". AbsentMotion needs Android 8 or newer (Android 13 or newer for the Latest version)." }));
         kids.push(el("p", {}, ["If you have another phone, ", el("a", { href: "phone-checker.html", text: "type its model in the phone checker" }), " or pick a download from the list below."]));
-        break;
-      case "blocked":
-        heading = "This phone cannot run AbsentMotion";
-        kids.push(el("p", { text: (name ? name + ": " : "") + rec.reason.charAt(0).toUpperCase() + rec.reason.slice(1) + "." }));
-        kids.push(el("p", {}, ["Other phones: ", el("a", { href: "phone-checker.html", text: "phone checker" }), "."]));
         break;
       case "unknown":
         heading = "Which Android version do you have?";
         kids.push(el("p", { text: (name ? "We think this is a " + name + ", but " : "") + "your browser does not tell us the Android version. Open Settings, About phone, Android version." }));
         actions.push(el("a", { "class": "btn", href: link("dl-foss"), text: "Android 13 or newer: Latest" }));
-        if (link("dl-compatible")) actions.push(el("a", { "class": "btn alt", href: link("dl-compatible"), text: "Android 9 to 12: Compatible" }));
+        if (link("dl-compatible")) actions.push(el("a", { "class": "btn alt", href: link("dl-compatible"), text: "Android 8 to 12: Compatible" }));
         kids.push(el("p", { "class": "small" }, ["Not sure it will run? ", el("a", { href: "phone-checker.html", text: "Use the phone checker" }), "."]));
         break;
       case "ios":
@@ -318,8 +308,8 @@
     var generic = function () {
       box.appendChild(el("div", { "class": "card" }, [
         el("h3", { text: "We do not know this model yet" }),
-        el("p", { text: "Open Settings, About phone, Android version on your phone. Android 13 or newer: use the Latest version. Android 9 to 12: use the Compatible version. Android 8 or older cannot run AbsentMotion." }),
-        el("p", { text: "The phone also needs a 64-bit ARM chip and Vulkan 1.1. Budget phones sold as Android Go edition usually have a 32-bit system and cannot run it." })
+        el("p", { text: "Open Settings, About phone, Android version on your phone. Android 13 or newer: use the Latest version. Android 8 to 12: use the Compatible version. Android 8 or older cannot run AbsentMotion." }),
+        el("p", { text: "Budget phones sold as Android Go edition often have a 32-bit system. Those need the 32-bit Compatible version, whatever their Android version." })
       ]));
     };
     var run = function () {

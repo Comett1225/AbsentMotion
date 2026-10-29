@@ -25,11 +25,36 @@ def dex_strings(data):
     return b"\n".join(parts)
 
 
+def elf_sections(data):
+    wide = data[4] == 2
+    table = struct.unpack_from("<Q" if wide else "<I", data, 0x28 if wide else 0x20)[0]
+    size, count = struct.unpack_from("<HH", data, 0x3A if wide else 0x2E)
+    parts = []
+    for i in range(count):
+        at = table + size * i
+        if wide:
+            kind, flags = struct.unpack_from("<IQ", data, at + 4)
+            offset, length = struct.unpack_from("<QQ", data, at + 24)
+        else:
+            kind, flags = struct.unpack_from("<II", data, at + 4)
+            offset, length = struct.unpack_from("<II", data, at + 16)
+        if kind != 8 and not flags & 4:
+            parts.append(data[offset:offset + length])
+    if not parts:
+        raise ValueError("no sections")
+    return b"\n".join(parts)
+
+
 def content(path):
     data = open(path, "rb").read()
     if path.endswith(".dex") and data[:4] == b"dex\n":
         try:
             return dex_strings(data)
+        except (struct.error, IndexError, ValueError):
+            return data
+    if data[:4] == b"\x7fELF" and len(data) > 0x34 and data[4] in (1, 2):
+        try:
+            return elf_sections(data)
         except (struct.error, IndexError, ValueError):
             return data
     return data

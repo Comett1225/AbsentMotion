@@ -1,6 +1,9 @@
 package app.absentmotion
 
 import androidx.annotation.StringRes
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import app.absentmotion.export.Choice
 import app.absentmotion.i18n.UiText
 import app.absentmotion.i18n.txt
@@ -14,12 +17,13 @@ enum class Feature(@StringRes val label: Int, val inCompatible: Boolean) {
 
 object Tier {
     val compatible: Boolean = BuildConfig.COMPATIBLE
+    var openGl by mutableStateOf(false)
 
-    fun has(feature: Feature): Boolean = !compatible || feature.inCompatible
+    fun has(feature: Feature): Boolean = (!compatible && !openGl) || feature.inCompatible
 
     val leftOut: List<Feature> get() = Feature.entries.filterNot(::has)
 
-    fun reason(feature: Feature): UiText? = if (has(feature)) null else txt(R.string.tier_needs_latest)
+    fun reason(feature: Feature): UiText? = if (has(feature)) null else txt(if (compatible) R.string.tier_needs_latest else R.string.tier_needs_vulkan)
 
     fun <T> choice(value: T, feature: Feature): Choice<T> = Choice(value, reason(feature), locked = !has(feature))
 }
