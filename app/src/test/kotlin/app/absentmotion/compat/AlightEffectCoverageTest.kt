@@ -60,6 +60,15 @@ class AlightEffectCoverageTest {
         assertEquals(0.02f * 0.57f * 1080f, migrate("""<effect id="com.alightcreative.effects.smoothedges"><property name="strength" type="float" value="0.02" /></effect>""", "540,540").floats("blur")[0], 1e-3f)
     }
 
+    @Test fun drawingEffectsImportFromAlight() {
+        val d = migrate("""<effect id="com.alightcreative.effects.drawing.progress"><property name="start" type="float" value="25" /><property name="end" type="float" value="80" /></effect>""")
+        assertEquals("absent.drawingprogress", d["id"])
+        assertEquals(listOf(0.25f, 0.8f), listOf("start", "end").map { d.floats(it)[0] })
+        val t = migrate("""<effect id="com.alightcreative.effects.drawing.stroketaper"><property name="start" type="float" value="0.2" /><property name="end" type="float" value="0.9" /><property name="squeeze" type="float" value="40" /></effect>""")
+        assertEquals("absent.stroketaper", t["id"])
+        assertEquals(listOf(0.2f, 0.9f, 40f), listOf("start", "end", "squeeze").map { t.floats(it)[0] })
+    }
+
     @Test fun newEffectsImportFromAlight() {
         val t = migrate("""<effect id="com.alightcreative.effects.transform"><property name="scale" type="float" value="2.5" /><property name="angle" type="float" value="30" />
             <property name="maskToLayer" type="bool" value="true" /><property name="alpha" type="float" value="0.75" /><property name="fill" type="float" value="0.25" /><property name="sample" type="int" value="0" /></effect>""")
