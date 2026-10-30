@@ -131,6 +131,7 @@
     <string name="settings_emoji_android">اندروید</string>
     <string name="settings_keep_media_copies">نگه‌داشتن نسخه‌ای از رسانه‌های واردشده در پروژه</string>
     <string name="settings_about">درباره</string>
+    <string name="settings_report_issue">گزارش مشکل</string>
     <string name="settings_help">راهنما</string>
     <string name="tutorial_settings_start">شروع آموزش</string>
     <string name="tutorial_settings_continue">ادامه آموزش</string>

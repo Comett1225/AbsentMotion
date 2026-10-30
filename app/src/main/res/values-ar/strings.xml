@@ -131,6 +131,7 @@
     <string name="settings_emoji_android">Android</string>
     <string name="settings_keep_media_copies">الاحتفاظ بنسخة من الوسائط المستوردة في المشروع</string>
     <string name="settings_about">حول</string>
+    <string name="settings_report_issue">الإبلاغ عن مشكلة</string>
     <string name="settings_help">مساعدة</string>
     <string name="tutorial_settings_start">بدء البرنامج التعليمي</string>
     <string name="tutorial_settings_continue">متابعة البرنامج التعليمي</string>

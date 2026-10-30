@@ -131,6 +131,7 @@
     <string name="settings_emoji_android">Android</string>
     <string name="settings_keep_media_copies">İçe aktarılan medyanın bir kopyasını projede tut</string>
     <string name="settings_about">Hakkında</string>
+    <string name="settings_report_issue">Sorun bildir</string>
     <string name="settings_help">Yardım</string>
     <string name="tutorial_settings_start">Eğitimi başlat</string>
     <string name="tutorial_settings_continue">Eğitime devam et</string>

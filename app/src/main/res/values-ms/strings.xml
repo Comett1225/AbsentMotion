@@ -131,6 +131,7 @@
     <string name="settings_emoji_android">Android</string>
     <string name="settings_keep_media_copies">Simpan salinan media yang diimport dalam projek</string>
     <string name="settings_about">Perihal</string>
+    <string name="settings_report_issue">Laporkan masalah</string>
     <string name="settings_help">Bantuan</string>
     <string name="tutorial_settings_start">Mulakan tutorial</string>
     <string name="tutorial_settings_continue">Teruskan tutorial</string>

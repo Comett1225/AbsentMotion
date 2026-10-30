@@ -131,6 +131,7 @@
     <string name="settings_emoji_android">Android</string>
     <string name="settings_keep_media_copies">เก็บสำเนาสื่อที่นำเข้าไว้ในโปรเจกต์</string>
     <string name="settings_about">เกี่ยวกับ</string>
+    <string name="settings_report_issue">รายงานปัญหา</string>
     <string name="settings_help">ช่วยเหลือ</string>
     <string name="tutorial_settings_start">เริ่มบทแนะนำ</string>
     <string name="tutorial_settings_continue">ทำบทแนะนำต่อ</string>

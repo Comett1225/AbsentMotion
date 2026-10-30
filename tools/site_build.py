@@ -27,6 +27,7 @@ SHORT = {
     "repo": REPO,
     "releases": REPO + "/releases",
     "issues": REPO + "/issues",
+    "report-form": "https://forms.gle/6bY8KBPMKc2iUypV6",
     "privacy-file": REPO + "/blob/main/PRIVACY.md",
     "license-file": REPO + "/blob/main/LICENSE",
     "notices-file": REPO + "/blob/main/THIRD_PARTY_NOTICES.md",
@@ -440,8 +441,9 @@ class Site:
             side = '<input type="checkbox" id="menu" class="menu-box" aria-label="Show the page list"><label for="menu" class="menu-btn">Pages</label><nav class="side" aria-label="Pages">%s</nav>' % self.sidebar(current, depth)
         foot = (
             '<footer><p>AbsentMotion is free and open source under the Apache License 2.0. <a href="%s" rel="noopener">Source code</a> &middot; '
-            '<a href="%s" rel="noopener">Privacy</a> &middot; <a href="%s" rel="noopener">Report a problem</a></p></footer>'
-            % (REPO, SHORT["privacy-file"], SHORT["issues"])) if site else ""
+            '<a href="%s" rel="noopener">Privacy</a> &middot; <a href="%s" rel="noopener">Report a problem</a> &middot; '
+            '<a href="%s" rel="noopener">Bug report form</a></p></footer>'
+            % (REPO, SHORT["privacy-file"], SHORT["issues"], SHORT["report-form"])) if site else ""
         script = '<script src="%sassets/site.js" defer></script>' % base if site else ""
         shared = "../" * (depth + self.up)
         html = '<html lang="%s" dir="%s">' % (self.locale.tag, "rtl" if self.rtl else "ltr") if self.locale else '<html lang="en">'

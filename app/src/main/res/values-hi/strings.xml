@@ -131,6 +131,7 @@
     <string name="settings_emoji_android">Android</string>
     <string name="settings_keep_media_copies">इम्पोर्ट किए गए मीडिया की कॉपी प्रोजेक्ट में रखें</string>
     <string name="settings_about">परिचय</string>
+    <string name="settings_report_issue">समस्या की रिपोर्ट करें</string>
     <string name="settings_help">सहायता</string>
     <string name="tutorial_settings_start">ट्यूटोरियल शुरू करें</string>
     <string name="tutorial_settings_continue">ट्यूटोरियल जारी रखें</string>

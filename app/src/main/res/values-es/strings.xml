@@ -131,6 +131,7 @@
     <string name="settings_emoji_android">Android</string>
     <string name="settings_keep_media_copies">Guardar una copia de los medios importados en el proyecto</string>
     <string name="settings_about">Acerca de</string>
+    <string name="settings_report_issue">Informar de un problema</string>
     <string name="settings_help">Ayuda</string>
     <string name="tutorial_settings_start">Comenzar el tutorial</string>
     <string name="tutorial_settings_continue">Continuar el tutorial</string>

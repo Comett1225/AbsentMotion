@@ -179,7 +179,7 @@ There will be weekly updates at minimum, whether it's bug patches, improvement t
 
 AbsentMotion is a young project. Please know these before you rely on it:
 
-- **Some Alight Motion effects are still missing.** - Please if you're able to, make sure to make an issue for anything that isn't implemented correctly or is broken. 
+- **Some Alight Motion effects are still missing.** - Please if you're able to, make sure to make an issue for anything that isn't implemented correctly or is broken. If you can't or don't want to use GitHub issues, use the [bug report form](https://forms.gle/6bY8KBPMKc2iUypV6) instead.
 - **Only 64-bit ARM Android devices with Vulkan 1.1.** Android 13 or newer, or Android 9 to 12 with the Compatible
   build.
 - **Background removal.** The `foss` build removes backgrounds with its own offline model. The `play` build uses

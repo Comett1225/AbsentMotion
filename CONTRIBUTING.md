@@ -33,4 +33,4 @@ the unit tests. `tools/release.sh [patch|minor|major]` builds the release APKs.
 
 One change per pull request. Say how you checked it, and include before and after pictures for anything that draws
 differently. Commit with a name and address you are happy to see in public: git history is permanent.
-Bugs and ideas go in the issue tracker; security problems follow [`SECURITY.md`](SECURITY.md).
+Bugs and ideas go in the issue tracker, or the [bug report form](https://forms.gle/6bY8KBPMKc2iUypV6) if you can't or don't want to use GitHub; security problems follow [`SECURITY.md`](SECURITY.md).

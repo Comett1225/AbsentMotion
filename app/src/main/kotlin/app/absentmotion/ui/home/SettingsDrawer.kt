@@ -22,6 +22,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.heightIn
@@ -159,7 +161,12 @@ fun SettingsDrawer(settings: AppSettings, drawer: androidx.compose.material3.Dra
             app.absentmotion.ui.tutorial.TutorialRows(settings)
             Spacer(Modifier.height(CardGap))
             LinkRow(stringResource(R.string.settings_about)) { about = true }
-            Spacer(Modifier.height(CardGap))
+            val links = LocalUriHandler.current
+            Text(
+                stringResource(R.string.settings_report_issue),
+                Modifier.padding(horizontal = 6.dp).clickable { runCatching { links.openUri(REPORT_FORM) } }.padding(horizontal = 15.dp, vertical = 10.dp),
+                color = Am.HomeInk, fontSize = 13.sp, textDecoration = TextDecoration.Underline,
+            )
             UpdateRows(settings) { crashLogs = true }
         }
     }

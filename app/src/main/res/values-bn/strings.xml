@@ -131,6 +131,7 @@
     <string name="settings_emoji_android">Android</string>
     <string name="settings_keep_media_copies">প্রজেক্টে ইমপোর্ট করা মিডিয়ার কপি রাখুন</string>
     <string name="settings_about">সম্পর্কে</string>
+    <string name="settings_report_issue">সমস্যা জানান</string>
     <string name="settings_help">সহায়তা</string>
     <string name="tutorial_settings_start">টিউটোরিয়াল শুরু করুন</string>
     <string name="tutorial_settings_continue">টিউটোরিয়াল চালিয়ে যান</string>

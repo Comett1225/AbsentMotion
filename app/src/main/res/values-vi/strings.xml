@@ -131,6 +131,7 @@
     <string name="settings_emoji_android">Android</string>
     <string name="settings_keep_media_copies">Giữ bản sao phương tiện đã nhập trong dự án</string>
     <string name="settings_about">Giới thiệu</string>
+    <string name="settings_report_issue">Báo cáo sự cố</string>
     <string name="settings_help">Trợ giúp</string>
     <string name="tutorial_settings_start">Bắt đầu hướng dẫn</string>
     <string name="tutorial_settings_continue">Tiếp tục hướng dẫn</string>

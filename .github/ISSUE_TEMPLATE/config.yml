@@ -1,5 +1,8 @@
 blank_issues_enabled: false
 contact_links:
+  - name: Bug report form (no GitHub account needed)
+    url: https://forms.gle/6bY8KBPMKc2iUypV6
+    about: Send a bug report or other issue through a simple form if you can't or don't want to use GitHub issues.
   - name: Security vulnerability
     url: https://github.com/Comett1225/AbsentMotion/security/advisories/new
     about: Report privately, please don't open a public issue.

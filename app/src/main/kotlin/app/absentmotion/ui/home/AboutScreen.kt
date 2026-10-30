@@ -52,6 +52,7 @@ import app.absentmotion.R
 import app.absentmotion.Tier
 
 internal const val HOME_PAGE ="https://github.com/Comett1225/AbsentMotion"
+internal const val REPORT_FORM = "https://forms.gle/6bY8KBPMKc2iUypV6"
 
 internal const val LICENCES_ASSET = "licenses.txt"
 
