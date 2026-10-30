@@ -12,7 +12,7 @@ def main():
     work.mkdir(parents=True, exist_ok=True)
     for us in [1000, 32000, 100000, 1000000]:
         engine.adb('logcat', '-c')
-        engine.adb('shell', 'am', 'start', '-n', engine.PKG + '/.MainActivity', '--el', 'aaccheck', us)
+        engine.adb('shell', 'am', 'start', '-n', engine.PKG + '/app.absentmotion.MainActivity', '--el', 'aaccheck', us)
         deadline = time.monotonic() + 30
         while True:
             log = engine.adb('logcat', '-d', '-s', 'AMAac')

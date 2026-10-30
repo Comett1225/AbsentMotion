@@ -19,7 +19,7 @@ def main():
     local.write_text(xml)
     engine.adb('push', local, engine.DEVICE_DIR + '/flowcheck.xml')
     engine.adb('logcat', '-c')
-    engine.adb('shell', 'am', 'start', '-n', engine.PKG + '/.MainActivity', '--es', 'xml', engine.DEVICE_DIR + '/flowcheck.xml', '--es', 'export', 'gif', '--es', 'interp', 'flow', '--ei', 'fps', '15', '--ei', 'short', '256')
+    engine.adb('shell', 'am', 'start', '-n', engine.PKG + '/app.absentmotion.MainActivity', '--es', 'xml', engine.DEVICE_DIR + '/flowcheck.xml', '--es', 'export', 'gif', '--es', 'interp', 'flow', '--ei', 'fps', '15', '--ei', 'short', '256')
     deadline = time.monotonic() + 240
     backgrounded = False
     try:

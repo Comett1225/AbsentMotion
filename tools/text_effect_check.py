@@ -65,7 +65,7 @@ class Batch:
         engine.adb("push", self.work / "list.txt", f"{engine.DEVICE_DIR}/textlist.txt")
         engine.adb("shell", "am", "force-stop", engine.PKG)
         engine.adb("logcat", "-c")
-        engine.adb("shell", "am", "start", "-n", f"{engine.PKG}/.MainActivity", "--es", "batch", f"{engine.DEVICE_DIR}/textlist.txt")
+        engine.adb("shell", "am", "start", "-n", f"{engine.PKG}/app.absentmotion.MainActivity", "--es", "batch", f"{engine.DEVICE_DIR}/textlist.txt")
         deadline = time.time() + 60 + 10 * len(self.jobs)
         while "batch done" not in (log := engine.adb("logcat", "-d", "-s", "AMTest")):
             if time.time() > deadline:

@@ -200,7 +200,7 @@ def crashes(serial):
 
 def memory_check(serial):
     adb(serial, "logcat", "-c")
-    adb(serial, "shell", "am", "start", "-W", "-n", f"{sdk.PACKAGE}/.MainActivity", timeout=60)
+    adb(serial, "shell", "am", "start", "-W", "-n", f"{sdk.PACKAGE}/app.absentmotion.MainActivity", timeout=60)
     time.sleep(4)
     first = pid(serial)
     notes = []
@@ -216,7 +216,7 @@ def memory_check(serial):
         time.sleep(1)
     adb(serial, "shell", "am", "kill", sdk.PACKAGE, timeout=30)
     time.sleep(2)
-    adb(serial, "shell", "am", "start", "-W", "-n", f"{sdk.PACKAGE}/.MainActivity", timeout=60)
+    adb(serial, "shell", "am", "start", "-W", "-n", f"{sdk.PACKAGE}/app.absentmotion.MainActivity", timeout=60)
     time.sleep(6)
     if not pid(serial):
         notes.append("the app did not start again after a background kill")
@@ -235,7 +235,7 @@ def debuggable(apk):
 
 def launch_check(serial, seconds):
     adb(serial, "logcat", "-c")
-    adb(serial, "shell", "am", "start", "-W", "-n", f"{sdk.PACKAGE}/.MainActivity", timeout=60)
+    adb(serial, "shell", "am", "start", "-W", "-n", f"{sdk.PACKAGE}/app.absentmotion.MainActivity", timeout=60)
     time.sleep(seconds)
     alive = bool(adb(serial, "shell", "pidof", sdk.PACKAGE, timeout=20).strip())
     log = adb(serial, "logcat", "-d", "-s", "AndroidRuntime:E", "linker:*", "nativeloader:*", "AMEngine:*", timeout=60)

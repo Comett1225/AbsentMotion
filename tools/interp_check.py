@@ -187,7 +187,7 @@ def export(scene, height, fps, extra):
     adb("shell", "rm", "-rf", f"{DEVICE_DIR}/export.seq")
     adb("shell", "am", "force-stop", PKG)
     adb("logcat", "-c")
-    adb("shell", "am", "start", "-n", f"{PKG}/.MainActivity", "--es", "xml", scene, "--es", "export", "sequence",
+    adb("shell", "am", "start", "-n", f"{PKG}/app.absentmotion.MainActivity", "--es", "xml", scene, "--es", "export", "sequence",
         "--ei", "short", str(height), "--ei", "fps", str(fps), "--es", "format", "png", *extra)
     log = ""
     for _ in range(3600):

@@ -17,7 +17,7 @@ SECONDS = 2
 def export(work, name, extras):
     remote = engine.DEVICE_DIR + '/formatcheck.xml'
     engine.adb('logcat', '-c')
-    engine.adb('shell', 'am', 'start', '-n', engine.PKG + '/.MainActivity', '--es', 'xml', remote, '--es', 'export', 'video',
+    engine.adb('shell', 'am', 'start', '-n', engine.PKG + '/app.absentmotion.MainActivity', '--es', 'xml', remote, '--es', 'export', 'video',
                '--ei', 'fps', str(FPS), '--ei', 'short', '256', *extras)
     deadline = time.monotonic() + 180
     while True:

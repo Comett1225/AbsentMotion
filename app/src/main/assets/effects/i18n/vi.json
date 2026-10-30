@@ -591,11 +591,11 @@
     "liftLevel": {
      "label": "Mức Lift"
     },
-    "offsetHue": {
-     "label": "Sắc độ dịch"
-    },
     "offsetAmount": {
      "label": "Mức dịch"
+    },
+    "offsetHue": {
+     "label": "Sắc độ dịch"
     },
     "offsetLevel": {
      "label": "Cấp độ dịch"
@@ -1311,6 +1311,65 @@
     }
    }
   },
+  "energybeam": {
+   "description": "Vẽ một tia sáng rực với lõi sáng và quầng mềm nối hai điểm; tia có thể rung và dài ra dọc theo chiều dài.",
+   "name": "Tia năng lượng",
+   "params": {
+    "blend": {
+     "label": "Hòa trộn",
+     "options": [
+      "Add",
+      "Screen",
+      "Normal"
+     ]
+    },
+    "color": {
+     "label": "Màu phát sáng"
+    },
+    "dim": {
+     "label": "Làm tối nền"
+    },
+    "evolution": {
+     "label": "Tiến triển"
+    },
+    "frequency": {
+     "label": "Tần số"
+    },
+    "from": {
+     "label": "Điểm đầu"
+    },
+    "glow": {
+     "label": "Phát sáng"
+    },
+    "halo": {
+     "label": "Quầng"
+    },
+    "haloColor": {
+     "label": "Màu quầng"
+    },
+    "haloWidth": {
+     "label": "Độ rộng quầng"
+    },
+    "opacity": {
+     "label": "Độ mờ"
+    },
+    "progress": {
+     "label": "Tiến trình"
+    },
+    "span": {
+     "label": "Chiều dài"
+    },
+    "to": {
+     "label": "Điểm cuối"
+    },
+    "width": {
+     "label": "Độ rộng"
+    },
+    "wiggle": {
+     "label": "Rung"
+    }
+   }
+  },
   "exposure": {
    "description": "Mô phỏng phơi sáng nhiếp ảnh với số stop, độ lệch và hiệu chỉnh gamma. Làm sáng phần trong suốt cho phép các điểm ảnh trong suốt một phần, như mép bị làm mờ, sáng hơn cả màu trắng.",
    "name": "Phơi sáng",
@@ -1321,11 +1380,11 @@
     "offset": {
      "label": "Độ lệch"
     },
-    "stops": {
-     "label": "Số stop"
-    },
     "soft": {
      "label": "Làm sáng phần trong suốt"
+    },
+    "stops": {
+     "label": "Số stop"
     }
    }
   },
@@ -1455,6 +1514,9 @@
    "description": "Lật lớp như lật thẻ trong 3D; mặt sau có thể trong suốt, là hình ảnh hoặc màu.",
    "name": "Lật lớp",
    "params": {
+    "axis": {
+     "label": "Trục"
+    },
     "back": {
      "label": "Mặt sau",
      "options": [
@@ -1605,6 +1667,36 @@
     },
     "strength": {
      "label": "Cường độ"
+    }
+   }
+  },
+  "fringeclean": {
+   "description": "Loại bỏ màu khỏi các điểm ảnh dọc theo viền mặt nạ của lớp để quầng màu do chroma key để lại chuyển sang xám, trong khi tối đa ba màu được bảo vệ vẫn giữ nguyên.",
+   "name": "Viền mặt nạ",
+   "params": {
+    "blur": {
+     "label": "Độ dày"
+    },
+    "color1": {
+     "label": "Giữ màu 1"
+    },
+    "color2": {
+     "label": "Giữ màu 2"
+    },
+    "color3": {
+     "label": "Giữ màu 3"
+    },
+    "feather": {
+     "label": "Làm mềm"
+    },
+    "threshold1": {
+     "label": "Phạm vi 1"
+    },
+    "threshold2": {
+     "label": "Phạm vi 2"
+    },
+    "threshold3": {
+     "label": "Phạm vi 3"
     }
    }
   },
@@ -1871,6 +1963,36 @@
     }
    }
   },
+  "grunge": {
+   "description": "Làm lớp sờn cũ với hạt nhiễu, vết bẩn, mép cháy và phủ một lớp màu bụi.",
+   "name": "Grunge",
+   "params": {
+    "blotches": {
+     "label": "Vết bẩn"
+    },
+    "burn": {
+     "label": "Mép cháy"
+    },
+    "color": {
+     "label": "Màu phủ"
+    },
+    "grain": {
+     "label": "Hạt nhiễu"
+    },
+    "scale": {
+     "label": "Cỡ vết bẩn"
+    },
+    "seed": {
+     "label": "Hạt ngẫu nhiên"
+    },
+    "strength": {
+     "label": "Cường độ"
+    },
+    "tint": {
+     "label": "Độ phủ màu"
+    }
+   }
+  },
   "halftone": {
    "description": "Các điểm tram lớn dần ở nơi hình ảnh tối.",
    "name": "Halftone",
@@ -1883,6 +2005,19 @@
     },
     "colored": {
      "label": "Chấm màu"
+    },
+    "ink": {
+     "label": "Màu điểm"
+    },
+    "paper": {
+     "label": "Màu giấy"
+    },
+    "style": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Hai màu"
+     ]
     }
    }
   },
@@ -2009,6 +2144,67 @@
     },
     "scale": {
      "label": "Tỷ lệ"
+    }
+   }
+  },
+  "hexgrid": {
+   "description": "Phủ lên lớp một mạng lưới lục giác chứa từ một đến ba màu, với viền mềm và khoảng trống giữa các ô.",
+   "name": "Mảng lục giác",
+   "params": {
+    "angle": {
+     "label": "Góc"
+    },
+    "blend": {
+     "label": "Hòa trộn",
+     "options": [
+      "Thường",
+      "Nhân",
+      "Màn hình",
+      "Phủ",
+      "Sáng mềm",
+      "Sáng cứng",
+      "Cộng",
+      "Làm tối",
+      "Làm sáng",
+      "Khác biệt",
+      "Chặn màu",
+      "Đốt màu"
+     ]
+    },
+    "cell": {
+     "label": "Kích thước"
+    },
+    "color1": {
+     "label": "Màu 1"
+    },
+    "color2": {
+     "label": "Màu 2"
+    },
+    "color3": {
+     "label": "Màu 3"
+    },
+    "colors": {
+     "label": "Số màu",
+     "options": [
+      "Một",
+      "Hai",
+      "Ba"
+     ]
+    },
+    "feather": {
+     "label": "Làm mềm viền"
+    },
+    "gap": {
+     "label": "Khoảng cách"
+    },
+    "offset": {
+     "label": "Độ lệch"
+    },
+    "opacity": {
+     "label": "Độ mờ"
+    },
+    "stretch": {
+     "label": "Kéo giãn"
     }
    }
   },
@@ -2477,6 +2673,27 @@
     }
    }
   },
+  "lumastamp": {
+   "description": "Biến lớp thành một màu phẳng có độ mờ theo độ sáng của từng pixel, như con dấu hay khuôn tô.",
+   "name": "Đóng dấu độ sáng",
+   "params": {
+    "color": {
+     "label": "Màu"
+    },
+    "gamma": {
+     "label": "Gamma"
+    },
+    "high": {
+     "label": "Điểm trắng"
+    },
+    "invert": {
+     "label": "Đảo ngược"
+    },
+    "low": {
+     "label": "Điểm đen"
+    }
+   }
+  },
   "magnifybackground": {
    "description": "Biến lớp thành kính lúp: hình dạng của nó phóng to các lớp phía sau quanh tâm của nó.",
    "name": "Phóng đại nền",
@@ -2518,6 +2735,9 @@
     "blur": {
      "label": "Kích thước"
     },
+    "invert": {
+     "label": "Đảo ngược"
+    },
     "softness": {
      "label": "Độ mềm"
     }
@@ -2527,11 +2747,21 @@
    "description": "Phản chiếu một nửa hình ảnh qua đường trục xác định bởi góc và tâm.",
    "name": "Gương",
    "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
     "angle": {
      "label": "Góc"
     },
     "center": {
      "label": "Tâm"
+    },
+    "style": {
+     "label": "Kiểu",
+     "options": [
+      "Gấp",
+      "Lật"
+     ]
     }
    }
   },
@@ -4143,6 +4373,26 @@
     }
    }
   },
+  "spillclean": {
+   "description": "Loại bỏ ánh xanh lá hoặc xanh dương mà nền đã tách để lại quanh viền lớp, vẫn giữ độ sáng của các pixel.",
+   "name": "Lọc ánh màu phông xanh",
+   "params": {
+    "blur": {
+     "label": "Độ rộng viền"
+    },
+    "channel": {
+     "label": "Màu ánh",
+     "options": [
+      "Tự động",
+      "Xanh lá",
+      "Xanh dương"
+     ]
+    },
+    "strength": {
+     "label": "Cường độ"
+    }
+   }
+  },
   "spin": {
    "description": "Xoay lớp vòng tròn đều đặn; dưới 0 thì xoay theo chiều ngược lại.",
    "name": "Xoay",
@@ -4228,6 +4478,9 @@
     "highlightHue": {
      "label": "Tông vùng sáng"
     },
+    "highlightLevel": {
+     "label": "Cấp độ vùng sáng"
+    },
     "shadowAmount": {
      "label": "Mức vùng tối"
     },
@@ -4236,9 +4489,6 @@
     },
     "shadowLevel": {
      "label": "Cấp độ vùng tối"
-    },
-    "highlightLevel": {
-     "label": "Cấp độ vùng sáng"
     },
     "style": {
      "label": "Kiểu",

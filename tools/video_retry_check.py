@@ -53,7 +53,7 @@ def main():
     adb("push", work / "retry.xml", f"{DEVICE_DIR}/retry.xml")
     adb("shell", "am", "force-stop", PKG)
     adb("logcat", "-c")
-    adb("shell", "am", "start", "-n", f"{PKG}/.MainActivity", "--es", "xml", f"{DEVICE_DIR}/retry.xml", "--ei", "frame", "0")
+    adb("shell", "am", "start", "-n", f"{PKG}/app.absentmotion.MainActivity", "--es", "xml", f"{DEVICE_DIR}/retry.xml", "--ei", "frame", "0")
     deadline = time.time() + 60
     while "media ready" not in adb("logcat", "-d", "-s", "AMTest"):
         if time.time() > deadline:

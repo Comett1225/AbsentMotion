@@ -23,7 +23,7 @@ def main():
     adb("push", scene, remote)
     adb("shell", "am", "force-stop", PKG)
     adb("logcat", "-c")
-    adb("shell", "am", "start", "-n", f"{PKG}/.MainActivity", "--es", "xml", remote, "--es", "export", "video", *sys.argv[3:])
+    adb("shell", "am", "start", "-n", f"{PKG}/app.absentmotion.MainActivity", "--es", "xml", remote, "--es", "export", "video", *sys.argv[3:])
     for _ in range(240):
         time.sleep(0.5)
         log = adb("logcat", "-d", "-s", "AMExport").decode("utf-8", "replace")

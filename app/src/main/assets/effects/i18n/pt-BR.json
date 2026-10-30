@@ -591,11 +591,11 @@
     "liftLevel": {
      "label": "Nível do lift"
     },
-    "offsetHue": {
-     "label": "Matiz do deslocamento"
-    },
     "offsetAmount": {
      "label": "Quantidade do deslocamento"
+    },
+    "offsetHue": {
+     "label": "Matiz do deslocamento"
     },
     "offsetLevel": {
      "label": "Nível do deslocamento"
@@ -1311,6 +1311,65 @@
     }
    }
   },
+  "energybeam": {
+   "description": "Desenha um feixe de luz brilhante com um núcleo intenso e um halo suave entre dois pontos, podendo ondular e crescer ao longo do comprimento.",
+   "name": "Feixe de energia",
+   "params": {
+    "blend": {
+     "label": "Mesclagem",
+     "options": [
+      "Adicionar",
+      "Tela",
+      "Normal"
+     ]
+    },
+    "color": {
+     "label": "Cor do brilho"
+    },
+    "dim": {
+     "label": "Escurecer fundo"
+    },
+    "evolution": {
+     "label": "Evolução"
+    },
+    "frequency": {
+     "label": "Frequência"
+    },
+    "from": {
+     "label": "Início"
+    },
+    "glow": {
+     "label": "Brilho"
+    },
+    "halo": {
+     "label": "Halo"
+    },
+    "haloColor": {
+     "label": "Cor do halo"
+    },
+    "haloWidth": {
+     "label": "Largura do halo"
+    },
+    "opacity": {
+     "label": "Opacidade"
+    },
+    "progress": {
+     "label": "Progresso"
+    },
+    "span": {
+     "label": "Comprimento"
+    },
+    "to": {
+     "label": "Fim"
+    },
+    "width": {
+     "label": "Largura"
+    },
+    "wiggle": {
+     "label": "Ondulação"
+    }
+   }
+  },
   "exposure": {
    "description": "Simula a exposição fotográfica com stops, deslocamento e correção gama. Clarear partes transparentes permite que pixels parcialmente transparentes, como uma borda desfocada, fiquem mais claros além do branco.",
    "name": "Exposição",
@@ -1321,11 +1380,11 @@
     "offset": {
      "label": "Deslocamento"
     },
-    "stops": {
-     "label": "Stops"
-    },
     "soft": {
      "label": "Clarear partes transparentes"
+    },
+    "stops": {
+     "label": "Stops"
     }
    }
   },
@@ -1455,6 +1514,9 @@
    "description": "Vira a camada como um cartão em 3D, com o verso transparente, uma imagem ou uma cor.",
    "name": "Virar camada",
    "params": {
+    "axis": {
+     "label": "Eixo"
+    },
     "back": {
      "label": "Verso",
      "options": [
@@ -1605,6 +1667,36 @@
     },
     "strength": {
      "label": "Intensidade"
+    }
+   }
+  },
+  "fringeclean": {
+   "description": "Remove a cor dos pixels ao longo da borda do matte da camada, fazendo halos coloridos deixados por um chroma key ficarem cinza, enquanto até três cores protegidas permanecem intactas.",
+   "name": "Franja do matte",
+   "params": {
+    "blur": {
+     "label": "Espessura"
+    },
+    "color1": {
+     "label": "Manter cor 1"
+    },
+    "color2": {
+     "label": "Manter cor 2"
+    },
+    "color3": {
+     "label": "Manter cor 3"
+    },
+    "feather": {
+     "label": "Suavização de borda"
+    },
+    "threshold1": {
+     "label": "Intervalo 1"
+    },
+    "threshold2": {
+     "label": "Intervalo 2"
+    },
+    "threshold3": {
+     "label": "Intervalo 3"
     }
    }
   },
@@ -1871,6 +1963,36 @@
     }
    }
   },
+  "grunge": {
+   "description": "Desgasta a camada com granulação, manchas de sujeira, bordas queimadas e um tom empoeirado.",
+   "name": "Grunge",
+   "params": {
+    "blotches": {
+     "label": "Sujeira"
+    },
+    "burn": {
+     "label": "Bordas queimadas"
+    },
+    "color": {
+     "label": "Cor do tom"
+    },
+    "grain": {
+     "label": "Granulação"
+    },
+    "scale": {
+     "label": "Tamanho da sujeira"
+    },
+    "seed": {
+     "label": "Semente"
+    },
+    "strength": {
+     "label": "Intensidade"
+    },
+    "tint": {
+     "label": "Tom"
+    }
+   }
+  },
   "halftone": {
    "description": "Pontos de impressão que crescem onde a imagem é escura.",
    "name": "Meio-tom",
@@ -1883,6 +2005,19 @@
     },
     "colored": {
      "label": "Pontos coloridos"
+    },
+    "ink": {
+     "label": "Cor dos pontos"
+    },
+    "paper": {
+     "label": "Cor do papel"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Clássico",
+      "Duas cores"
+     ]
     }
    }
   },
@@ -2009,6 +2144,67 @@
     },
     "scale": {
      "label": "Escala"
+    }
+   }
+  },
+  "hexgrid": {
+   "description": "Cobre a camada com uma grade de hexágonos preenchidos com uma a três cores, com bordas suaves e espaços entre eles.",
+   "name": "Matriz de hexágonos",
+   "params": {
+    "angle": {
+     "label": "Ângulo"
+    },
+    "blend": {
+     "label": "Mistura",
+     "options": [
+      "Normal",
+      "Multiplicar",
+      "Tela",
+      "Sobrepor",
+      "Luz suave",
+      "Luz forte",
+      "Adicionar",
+      "Escurecer",
+      "Clarear",
+      "Diferença",
+      "Subexposição de cor",
+      "Superexposição de cor"
+     ]
+    },
+    "cell": {
+     "label": "Tamanho"
+    },
+    "color1": {
+     "label": "Cor 1"
+    },
+    "color2": {
+     "label": "Cor 2"
+    },
+    "color3": {
+     "label": "Cor 3"
+    },
+    "colors": {
+     "label": "Cores",
+     "options": [
+      "Uma",
+      "Duas",
+      "Três"
+     ]
+    },
+    "feather": {
+     "label": "Suavização"
+    },
+    "gap": {
+     "label": "Espaçamento"
+    },
+    "offset": {
+     "label": "Deslocamento"
+    },
+    "opacity": {
+     "label": "Opacidade"
+    },
+    "stretch": {
+     "label": "Alongamento"
     }
    }
   },
@@ -2477,6 +2673,27 @@
     }
    }
   },
+  "lumastamp": {
+   "description": "Transforma a camada em uma cor sólida cuja opacidade segue o brilho de cada pixel, como um carimbo ou estêncil.",
+   "name": "Carimbo de luma",
+   "params": {
+    "color": {
+     "label": "Cor"
+    },
+    "gamma": {
+     "label": "Gama"
+    },
+    "high": {
+     "label": "Ponto branco"
+    },
+    "invert": {
+     "label": "Inverter"
+    },
+    "low": {
+     "label": "Ponto preto"
+    }
+   }
+  },
   "magnifybackground": {
    "description": "Transforma a camada em uma lupa: sua forma mostra as camadas atrás ampliadas ao redor do centro.",
    "name": "Ampliar fundo",
@@ -2518,6 +2735,9 @@
     "blur": {
      "label": "Tamanho"
     },
+    "invert": {
+     "label": "Inverter"
+    },
     "softness": {
      "label": "Suavidade"
     }
@@ -2527,11 +2747,21 @@
    "description": "Reflete uma metade da imagem por uma linha de espelho definida por um ângulo e um ponto central.",
    "name": "Espelho",
    "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
     "angle": {
      "label": "Ângulo"
     },
     "center": {
      "label": "Centro"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Dobrar",
+      "Espelhar"
+     ]
     }
    }
   },
@@ -4143,6 +4373,26 @@
     }
    }
   },
+  "spillclean": {
+   "description": "Remove o brilho verde ou azul que um fundo com chroma key deixa perto das bordas da camada, mantendo o brilho dos pixels.",
+   "name": "Removedor de vazamento",
+   "params": {
+    "blur": {
+     "label": "Largura da borda"
+    },
+    "channel": {
+     "label": "Cor do vazamento",
+     "options": [
+      "Automático",
+      "Verde",
+      "Azul"
+     ]
+    },
+    "strength": {
+     "label": "Intensidade"
+    }
+   }
+  },
   "spin": {
    "description": "Gira a camada sem parar a uma velocidade constante; abaixo de zero, gira no sentido contrário.",
    "name": "Girar",
@@ -4228,6 +4478,9 @@
     "highlightHue": {
      "label": "Matiz dos realces"
     },
+    "highlightLevel": {
+     "label": "Nível dos realces"
+    },
     "shadowAmount": {
      "label": "Intensidade das sombras"
     },
@@ -4236,9 +4489,6 @@
     },
     "shadowLevel": {
      "label": "Nível das sombras"
-    },
-    "highlightLevel": {
-     "label": "Nível dos realces"
     },
     "style": {
      "label": "Estilo",

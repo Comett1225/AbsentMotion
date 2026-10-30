@@ -56,7 +56,7 @@ def open_scene(xml):
 def export(xml, spacing):
     remote = open_scene(xml)
     adb("logcat", "-c")
-    adb("shell", "am", "start", "-n", f"{PKG}/.MainActivity", "--es", "xml", remote, "--es", "export", "video", "--ei", "short", "360")
+    adb("shell", "am", "start", "-n", f"{PKG}/app.absentmotion.MainActivity", "--es", "xml", remote, "--es", "export", "video", "--ei", "short", "360")
     for _ in range(120):
         time.sleep(1)
         log = adb("logcat", "-d", "-s", "AMExport")
@@ -72,7 +72,7 @@ def export(xml, spacing):
 
 def play(xml, seconds, spacing):
     remote = open_scene(xml)
-    adb("shell", "am", "start", "-n", f"{PKG}/.MainActivity", "--es", "xml", remote)
+    adb("shell", "am", "start", "-n", f"{PKG}/app.absentmotion.MainActivity", "--es", "xml", remote)
     time.sleep(5)
     local = os.path.join(OUT, "sound-" + os.path.basename(xml)[:-4] + "-play.flac")
     if os.path.exists(local):

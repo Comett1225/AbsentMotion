@@ -35,7 +35,7 @@ def main():
     adb("shell", "rm", "-rf", f"{DEVICE_DIR}/export.seq")
     adb("shell", "am", "force-stop", PKG)
     adb("logcat", "-c")
-    adb("shell", "am", "start", "-n", f"{PKG}/.MainActivity", "--es", "xml", f"{DEVICE_DIR}/refresh.xml",
+    adb("shell", "am", "start", "-n", f"{PKG}/app.absentmotion.MainActivity", "--es", "xml", f"{DEVICE_DIR}/refresh.xml",
         "--es", "export", "sequence", "--ei", "short", "90", "--es", "format", "png")
     resumes, deadline = 0, time.time() + 300
     while "AMExport: done" not in (log := adb("logcat", "-d", "-s", "AMExport")) and "E AMExport" not in log:
@@ -43,7 +43,7 @@ def main():
             sys.exit("the export did not finish in 300 s")
         adb("shell", "input", "keyevent", "KEYCODE_HOME")
         time.sleep(0.4)
-        adb("shell", "am", "start", "-n", f"{PKG}/.MainActivity")
+        adb("shell", "am", "start", "-n", f"{PKG}/app.absentmotion.MainActivity")
         resumes += 1
         time.sleep(0.8)
     if "done" not in log:

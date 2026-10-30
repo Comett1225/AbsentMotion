@@ -143,7 +143,7 @@ def render(jobs, gl, out):
     et.push(jobs.work / "list.txt", "list.txt")
     et.adb("shell", "am", "force-stop", et.PKG)
     et.adb("logcat", "-c")
-    et.adb("shell", "am", "start", "-n", f"{et.PKG}/.MainActivity", "--es", "batch", f"{et.APP_PATH}/list.txt", "--ez", "gl", "true" if gl else "false")
+    et.adb("shell", "am", "start", "-n", f"{et.PKG}/app.absentmotion.MainActivity", "--es", "batch", f"{et.APP_PATH}/list.txt", "--ez", "gl", "true" if gl else "false")
     deadline = time.time() + 120 + 15 * len(jobs.lines)
     while "batch done" not in (log := et.adb("logcat", "-d", "-s", "AMTest")):
         if time.time() > deadline:

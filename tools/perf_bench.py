@@ -96,7 +96,7 @@ def run(work, seconds, label, videos, extras):
     adb("push", xml, f"{DEVICE_DIR}/perfbench.xml")
     adb("shell", "am", "force-stop", PKG)
     adb("logcat", "-c")
-    adb("shell", "am", "start", "-n", f"{PKG}/.MainActivity", "--es", "xml", f"{DEVICE_DIR}/perfbench.xml", "--ei", "bench", seconds, *extras)
+    adb("shell", "am", "start", "-n", f"{PKG}/app.absentmotion.MainActivity", "--es", "xml", f"{DEVICE_DIR}/perfbench.xml", "--ei", "bench", seconds, *extras)
     deadline = time.time() + 600 + 4 * seconds
     while not (log := adb("logcat", "-d", "-s", "AMBench")).rstrip().endswith("done"):
         if time.time() > deadline:

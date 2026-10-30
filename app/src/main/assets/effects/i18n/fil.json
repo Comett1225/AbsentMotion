@@ -591,11 +591,11 @@
     "liftLevel": {
      "label": "Antas ng lift"
     },
-    "offsetHue": {
-     "label": "Hue ng Offset"
-    },
     "offsetAmount": {
      "label": "Dami ng Offset"
+    },
+    "offsetHue": {
+     "label": "Hue ng Offset"
     },
     "offsetLevel": {
      "label": "Level ng Offset"
@@ -1311,6 +1311,65 @@
     }
    }
   },
+  "energybeam": {
+   "description": "Gumuguhit ng kumikinang na sinag na may maliwanag na ubod at malambot na halo sa pagitan ng dalawang punto, at maaaring umuuga at humaba.",
+   "name": "Sinag ng Enerhiya",
+   "params": {
+    "blend": {
+     "label": "Blend",
+     "options": [
+      "Add",
+      "Screen",
+      "Normal"
+     ]
+    },
+    "color": {
+     "label": "Kulay ng kinang"
+    },
+    "dim": {
+     "label": "I-dim ang background"
+    },
+    "evolution": {
+     "label": "Ebolusyon"
+    },
+    "frequency": {
+     "label": "Dalas"
+    },
+    "from": {
+     "label": "Simula"
+    },
+    "glow": {
+     "label": "Kinang"
+    },
+    "halo": {
+     "label": "Halo"
+    },
+    "haloColor": {
+     "label": "Kulay ng halo"
+    },
+    "haloWidth": {
+     "label": "Lapad ng halo"
+    },
+    "opacity": {
+     "label": "Opacity"
+    },
+    "progress": {
+     "label": "Pag-usad"
+    },
+    "span": {
+     "label": "Haba"
+    },
+    "to": {
+     "label": "Wakas"
+    },
+    "width": {
+     "label": "Lapad"
+    },
+    "wiggle": {
+     "label": "Uga"
+    }
+   }
+  },
   "exposure": {
    "description": "Ginagaya ang exposure ng litrato gamit ang stops, offset, at gamma correction. Pinapayagan ng Paliwanagin ang Malinaw na Bahagi na lumiwanag nang lampas sa puti ang mga bahagyang malinaw na pixel, gaya ng malabong gilid.",
    "name": "Exposure",
@@ -1321,11 +1380,11 @@
     "offset": {
      "label": "Offset"
     },
-    "stops": {
-     "label": "Stops"
-    },
     "soft": {
      "label": "Paliwanagin ang Malinaw na Bahagi"
+    },
+    "stops": {
+     "label": "Stops"
     }
    }
   },
@@ -1455,6 +1514,9 @@
    "description": "Iniikot ang layer na parang card sa 3D, kung saan ang likod ay transparent, larawan, o kulay.",
    "name": "I-flip ang layer",
    "params": {
+    "axis": {
+     "label": "Aksis"
+    },
     "back": {
      "label": "Likod",
      "options": [
@@ -1605,6 +1667,36 @@
     },
     "strength": {
      "label": "Lakas"
+    }
+   }
+  },
+  "fringeclean": {
+   "description": "Inaalis ang kulay mula sa mga pixel sa gilid ng matte ng layer, kaya ang mga may kulay na halo na naiwan ng key ay kumukupas sa grey, habang hanggang tatlong protektadong kulay ang nananatili.",
+   "name": "Fringe ng Matte",
+   "params": {
+    "blur": {
+     "label": "Kapal"
+    },
+    "color1": {
+     "label": "Panatilihin ang kulay 1"
+    },
+    "color2": {
+     "label": "Panatilihin ang kulay 2"
+    },
+    "color3": {
+     "label": "Panatilihin ang kulay 3"
+    },
+    "feather": {
+     "label": "Feather"
+    },
+    "threshold1": {
+     "label": "Saklaw 1"
+    },
+    "threshold2": {
+     "label": "Saklaw 2"
+    },
+    "threshold3": {
+     "label": "Saklaw 3"
     }
    }
   },
@@ -1871,6 +1963,36 @@
     }
    }
   },
+  "grunge": {
+   "description": "Nagbibigay ng pagkasira sa layer gamit ang grain, mga mantsa ng dumi, sunog na gilid at maalikabok na tint ng kulay.",
+   "name": "Grunge",
+   "params": {
+    "blotches": {
+     "label": "Dumi"
+    },
+    "burn": {
+     "label": "Sunog na gilid"
+    },
+    "color": {
+     "label": "Kulay ng tint"
+    },
+    "grain": {
+     "label": "Grain"
+    },
+    "scale": {
+     "label": "Laki ng dumi"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "strength": {
+     "label": "Lakas"
+    },
+    "tint": {
+     "label": "Tint"
+    }
+   }
+  },
   "halftone": {
    "description": "Mga naka-print na tuldok na lumalaki kung saan madilim ang larawan.",
    "name": "Halftone",
@@ -1883,6 +2005,19 @@
     },
     "colored": {
      "label": "May Kulay na Tuldok"
+    },
+    "ink": {
+     "label": "Kulay ng tuldok"
+    },
+    "paper": {
+     "label": "Kulay ng papel"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Klasik",
+      "Dalawang Kulay"
+     ]
     }
    }
   },
@@ -2009,6 +2144,67 @@
     },
     "scale": {
      "label": "Scale"
+    }
+   }
+  },
+  "hexgrid": {
+   "description": "Tinatakpan ang layer ng sala-sala ng mga hexagon na puno ng isa hanggang tatlong kulay, na may malambot na gilid at puwang sa pagitan ng mga ito.",
+   "name": "Hanay ng Hexagon",
+   "params": {
+    "angle": {
+     "label": "Anggulo"
+    },
+    "blend": {
+     "label": "Blend",
+     "options": [
+      "Normal",
+      "Multiply",
+      "Screen",
+      "Overlay",
+      "Soft Light",
+      "Hard Light",
+      "Add",
+      "Darken",
+      "Lighten",
+      "Difference",
+      "Color Dodge",
+      "Color Burn"
+     ]
+    },
+    "cell": {
+     "label": "Laki"
+    },
+    "color1": {
+     "label": "Kulay 1"
+    },
+    "color2": {
+     "label": "Kulay 2"
+    },
+    "color3": {
+     "label": "Kulay 3"
+    },
+    "colors": {
+     "label": "Mga Kulay",
+     "options": [
+      "Isa",
+      "Dalawa",
+      "Tatlo"
+     ]
+    },
+    "feather": {
+     "label": "Feather"
+    },
+    "gap": {
+     "label": "Puwang"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "opacity": {
+     "label": "Opacity"
+    },
+    "stretch": {
+     "label": "Inat"
     }
    }
   },
@@ -2477,6 +2673,27 @@
     }
    }
   },
+  "lumastamp": {
+   "description": "Ginagawang patag na kulay ang layer; sinusundan ng opacity ang ningning ng bawat pixel, tulad ng stamp o stencil.",
+   "name": "Luma Stamper",
+   "params": {
+    "color": {
+     "label": "Kulay"
+    },
+    "gamma": {
+     "label": "Gamma"
+    },
+    "high": {
+     "label": "White point"
+    },
+    "invert": {
+     "label": "I-invert"
+    },
+    "low": {
+     "label": "Black point"
+    }
+   }
+  },
   "magnifybackground": {
    "description": "Ginagawang magnifying glass ang layer: ipinapakita ng hugis nito ang mga layer sa likod nito, pinalaki sa paligid ng gitna.",
    "name": "Palakihin ang background",
@@ -2518,6 +2735,9 @@
     "blur": {
      "label": "Laki"
     },
+    "invert": {
+     "label": "I-invert"
+    },
     "softness": {
      "label": "Lambot"
     }
@@ -2527,11 +2747,21 @@
    "description": "Sinasalamin ang kalahati ng larawan sa linya ng salamin na tinutukoy ng anggulo at gitna.",
    "name": "Salamin",
    "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
     "angle": {
      "label": "Anggulo"
     },
     "center": {
      "label": "Gitna"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Tupi",
+      "Baliktad"
+     ]
     }
    }
   },
@@ -4143,6 +4373,26 @@
     }
    }
   },
+  "spillclean": {
+   "description": "Tinatanggal ang berde o asul na glow na naiiwan ng naka-key na background sa gilid ng layer, habang pinapanatili ang liwanag ng mga pixel.",
+   "name": "Tagalinis ng Key Spill",
+   "params": {
+    "blur": {
+     "label": "Lapad ng gilid"
+    },
+    "channel": {
+     "label": "Kulay ng spill",
+     "options": [
+      "Auto",
+      "Berde",
+      "Asul"
+     ]
+    },
+    "strength": {
+     "label": "Lakas"
+    }
+   }
+  },
   "spin": {
    "description": "Paulit-ulit na pinapaikot ang layer sa pare-parehong bilis; kapag mas mababa sa zero, kabaligtaran ang ikot.",
    "name": "Pag-ikot",
@@ -4228,6 +4478,9 @@
     "highlightHue": {
      "label": "Hue ng Highlight"
     },
+    "highlightLevel": {
+     "label": "Level ng Highlight"
+    },
     "shadowAmount": {
      "label": "Dami ng Anino"
     },
@@ -4236,9 +4489,6 @@
     },
     "shadowLevel": {
      "label": "Level ng Anino"
-    },
-    "highlightLevel": {
-     "label": "Level ng Highlight"
     },
     "style": {
      "label": "Estilo",

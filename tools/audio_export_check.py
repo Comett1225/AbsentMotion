@@ -14,7 +14,7 @@ CLICKS = (0.5, 1.5)
 
 def export(work, name, extras):
     engine.adb('logcat', '-c')
-    engine.adb('shell', 'am', 'start', '-n', engine.PKG + '/.MainActivity', '--es', 'xml', engine.DEVICE_DIR + '/audiocheck.xml',
+    engine.adb('shell', 'am', 'start', '-n', engine.PKG + '/app.absentmotion.MainActivity', '--es', 'xml', engine.DEVICE_DIR + '/audiocheck.xml',
                '--es', 'export', 'audio', *extras)
     deadline = time.monotonic() + 120
     while True:

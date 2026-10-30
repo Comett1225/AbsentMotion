@@ -53,7 +53,7 @@ def main():
     (work / "voice.xml").write_text('<scene title="voicecheck" width="360" height="360" fps="30" totalTime="999" bgcolor="#ff000000"></scene>')
     adb("push", work / "voice.xml", f"{DEVICE_DIR}/voice.xml")
     adb("shell", "am", "force-stop", PKG)
-    adb("shell", "am", "start", "-n", f"{PKG}/.MainActivity", "--es", "xml", f"{DEVICE_DIR}/voice.xml")
+    adb("shell", "am", "start", "-n", f"{PKG}/app.absentmotion.MainActivity", "--es", "xml", f"{DEVICE_DIR}/voice.xml")
     time.sleep(4)
     tap("Add layer")
     tap("Audio")

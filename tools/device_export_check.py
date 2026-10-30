@@ -14,7 +14,7 @@ def export(xml, work, name):
     remote = engine.DEVICE_DIR + '/' + name + '.xml'
     engine.adb('push', local, remote)
     engine.adb('logcat', '-c')
-    engine.adb('shell', 'am', 'start', '-n', engine.PKG + '/.MainActivity', '--es', 'xml', remote, '--es', 'export', 'video', '--ei', 'fps', '30', '--ei', 'short', '256')
+    engine.adb('shell', 'am', 'start', '-n', engine.PKG + '/app.absentmotion.MainActivity', '--es', 'xml', remote, '--es', 'export', 'video', '--ei', 'fps', '30', '--ei', 'short', '256')
     deadline = time.monotonic() + 120
     while True:
         log = engine.adb('logcat', '-d', '-s', 'AMExport', 'AMVideo')
@@ -78,7 +78,7 @@ def main():
     engine.adb('shell', 'rm', remote)
     print('ok 64-pixel-wide video decodes correctly on both halves', flush=True)
     engine.adb('logcat', '-c')
-    engine.adb('shell', 'am', 'start', '-n', engine.PKG + '/.MainActivity', '--ez', 'devicecheck', 'true')
+    engine.adb('shell', 'am', 'start', '-n', engine.PKG + '/app.absentmotion.MainActivity', '--ez', 'devicecheck', 'true')
     deadline = time.monotonic() + 45
     while True:
         log = engine.adb('logcat', '-d', '-s', 'AMDevice')

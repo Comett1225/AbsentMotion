@@ -591,11 +591,11 @@
     "liftLevel": {
      "label": "Kaldır Seviyesi"
     },
-    "offsetHue": {
-     "label": "Kaydırma Tonu"
-    },
     "offsetAmount": {
      "label": "Kaydırma Miktarı"
+    },
+    "offsetHue": {
+     "label": "Kaydırma Tonu"
     },
     "offsetLevel": {
      "label": "Kaydırma Seviyesi"
@@ -1311,6 +1311,65 @@
     }
    }
   },
+  "energybeam": {
+   "description": "İki nokta arasında parlak çekirdekli ve yumuşak haleli ışıldayan bir ışın çizer; ışın boyunca kıpırdayıp uzayabilir.",
+   "name": "Enerji Işını",
+   "params": {
+    "blend": {
+     "label": "Karışım",
+     "options": [
+      "Ekle",
+      "Ekran",
+      "Normal"
+     ]
+    },
+    "color": {
+     "label": "Parlama rengi"
+    },
+    "dim": {
+     "label": "Arka planı karart"
+    },
+    "evolution": {
+     "label": "Evrim"
+    },
+    "frequency": {
+     "label": "Frekans"
+    },
+    "from": {
+     "label": "Başlangıç"
+    },
+    "glow": {
+     "label": "Parlama"
+    },
+    "halo": {
+     "label": "Hale"
+    },
+    "haloColor": {
+     "label": "Hale rengi"
+    },
+    "haloWidth": {
+     "label": "Hale genişliği"
+    },
+    "opacity": {
+     "label": "Opaklık"
+    },
+    "progress": {
+     "label": "İlerleme"
+    },
+    "span": {
+     "label": "Uzunluk"
+    },
+    "to": {
+     "label": "Bitiş"
+    },
+    "width": {
+     "label": "Genişlik"
+    },
+    "wiggle": {
+     "label": "Kıpırdama"
+    }
+   }
+  },
   "exposure": {
    "description": "Durak, ofset ve gama düzeltmesiyle fotoğrafik pozlamayı simüle eder. Saydam Kısımları Aydınlat, bulanık bir kenar gibi kısmen saydam piksellerin beyazın ötesinde aydınlanmasını sağlar.",
    "name": "Pozlama",
@@ -1321,11 +1380,11 @@
     "offset": {
      "label": "Ofset"
     },
-    "stops": {
-     "label": "Durak"
-    },
     "soft": {
      "label": "Saydam Kısımları Aydınlat"
+    },
+    "stops": {
+     "label": "Durak"
     }
    }
   },
@@ -1455,6 +1514,9 @@
    "description": "Katmanı 3D'de bir kart gibi çevirir; arkası saydam, bir görsel veya bir renk olabilir.",
    "name": "Katmanı çevir",
    "params": {
+    "axis": {
+     "label": "Eksen"
+    },
     "back": {
      "label": "Arka",
      "options": [
@@ -1605,6 +1667,36 @@
     },
     "strength": {
      "label": "Güç"
+    }
+   }
+  },
+  "fringeclean": {
+   "description": "Katman maskesinin kenarındaki piksellerin rengini alır; anahtarlamadan kalan renkli haleler griye döner, en fazla üç korunan renk ise olduğu gibi kalır.",
+   "name": "Mat Kenar Temizliği",
+   "params": {
+    "blur": {
+     "label": "Kalınlık"
+    },
+    "color1": {
+     "label": "Renk 1'i koru"
+    },
+    "color2": {
+     "label": "Renk 2'yi koru"
+    },
+    "color3": {
+     "label": "Renk 3'ü koru"
+    },
+    "feather": {
+     "label": "Yumuşatma"
+    },
+    "threshold1": {
+     "label": "Aralık 1"
+    },
+    "threshold2": {
+     "label": "Aralık 2"
+    },
+    "threshold3": {
+     "label": "Aralık 3"
     }
    }
   },
@@ -1871,6 +1963,36 @@
     }
    }
   },
+  "grunge": {
+   "description": "Katmana gren, kir lekeleri, yanmış kenarlar ve tozlu bir renk tonu ekleyerek eskitir.",
+   "name": "Grunge",
+   "params": {
+    "blotches": {
+     "label": "Kir"
+    },
+    "burn": {
+     "label": "Yanmış kenarlar"
+    },
+    "color": {
+     "label": "Ton rengi"
+    },
+    "grain": {
+     "label": "Gren"
+    },
+    "scale": {
+     "label": "Kir boyutu"
+    },
+    "seed": {
+     "label": "Tohum"
+    },
+    "strength": {
+     "label": "Güç"
+    },
+    "tint": {
+     "label": "Ton"
+    }
+   }
+  },
   "halftone": {
    "description": "Görselin koyu olduğu yerlerde büyüyen baskı noktaları.",
    "name": "Yarım Ton",
@@ -1883,6 +2005,19 @@
     },
     "colored": {
      "label": "Renkli noktalar"
+    },
+    "ink": {
+     "label": "Nokta rengi"
+    },
+    "paper": {
+     "label": "Kağıt rengi"
+    },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Klasik",
+      "İki renk"
+     ]
     }
    }
   },
@@ -2009,6 +2144,67 @@
     },
     "scale": {
      "label": "Ölçek"
+    }
+   }
+  },
+  "hexgrid": {
+   "description": "Katmanı bir ila üç renkle doldurulmuş, yumuşak kenarlı ve aralarında boşluklar olan altıgenlerden oluşan bir örgüyle kaplar.",
+   "name": "Altıgen Dizisi",
+   "params": {
+    "angle": {
+     "label": "Açı"
+    },
+    "blend": {
+     "label": "Karışım",
+     "options": [
+      "Normal",
+      "Çarpma",
+      "Ekran",
+      "Kaplama",
+      "Yumuşak ışık",
+      "Sert ışık",
+      "Toplama",
+      "Koyulaştır",
+      "Açıklaştır",
+      "Fark",
+      "Renk soldurma",
+      "Renk yakma"
+     ]
+    },
+    "cell": {
+     "label": "Boyut"
+    },
+    "color1": {
+     "label": "Renk 1"
+    },
+    "color2": {
+     "label": "Renk 2"
+    },
+    "color3": {
+     "label": "Renk 3"
+    },
+    "colors": {
+     "label": "Renkler",
+     "options": [
+      "Bir",
+      "İki",
+      "Üç"
+     ]
+    },
+    "feather": {
+     "label": "Kenar yumuşatma"
+    },
+    "gap": {
+     "label": "Boşluk"
+    },
+    "offset": {
+     "label": "Kaydırma"
+    },
+    "opacity": {
+     "label": "Opaklık"
+    },
+    "stretch": {
+     "label": "Uzatma"
     }
    }
   },
@@ -2477,6 +2673,27 @@
     }
    }
   },
+  "lumastamp": {
+   "description": "Katmanı, her pikselin parlaklığına göre opaklığı değişen düz bir renge dönüştürür; damga veya şablon gibi.",
+   "name": "Luma Damgası",
+   "params": {
+    "color": {
+     "label": "Renk"
+    },
+    "gamma": {
+     "label": "Gama"
+    },
+    "high": {
+     "label": "Beyaz noktası"
+    },
+    "invert": {
+     "label": "Ters çevir"
+    },
+    "low": {
+     "label": "Siyah noktası"
+    }
+   }
+  },
   "magnifybackground": {
    "description": "Katmanı büyüteç haline getirir: şekli, arkasındaki katmanları merkezinin çevresinde büyütülmüş olarak gösterir.",
    "name": "Arka planı büyüt",
@@ -2518,6 +2735,9 @@
     "blur": {
      "label": "Boyut"
     },
+    "invert": {
+     "label": "Ters çevir"
+    },
     "softness": {
      "label": "Yumuşaklık"
     }
@@ -2527,11 +2747,21 @@
    "description": "Görselin bir yarısını açı ve merkez noktasıyla belirlenen ayna çizgisi boyunca yansıtır.",
    "name": "Ayna",
    "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
     "angle": {
      "label": "Açı"
     },
     "center": {
      "label": "Merkez"
+    },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Katla",
+      "Çevir"
+     ]
     }
    }
   },
@@ -4143,6 +4373,26 @@
     }
    }
   },
+  "spillclean": {
+   "description": "Anahtarlanmış bir arka planın katman kenarlarında bıraktığı yeşil veya mavi parlamayı, piksellerin parlaklığını koruyarak kaldırır.",
+   "name": "Kroma Taşması Temizleyici",
+   "params": {
+    "blur": {
+     "label": "Kenar genişliği"
+    },
+    "channel": {
+     "label": "Taşma rengi",
+     "options": [
+      "Otomatik",
+      "Yeşil",
+      "Mavi"
+     ]
+    },
+    "strength": {
+     "label": "Güç"
+    }
+   }
+  },
   "spin": {
    "description": "Katmanı sabit bir hızda sürekli döndürür; sıfırın altında ters yönde döner.",
    "name": "Döndür",
@@ -4228,6 +4478,9 @@
     "highlightHue": {
      "label": "Işık Tonu"
     },
+    "highlightLevel": {
+     "label": "Vurgu Seviyesi"
+    },
     "shadowAmount": {
      "label": "Gölge Miktarı"
     },
@@ -4236,9 +4489,6 @@
     },
     "shadowLevel": {
      "label": "Gölge Seviyesi"
-    },
-    "highlightLevel": {
-     "label": "Vurgu Seviyesi"
     },
     "style": {
      "label": "Stil",

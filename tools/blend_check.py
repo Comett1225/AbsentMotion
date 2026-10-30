@@ -143,7 +143,7 @@ def render(xml, work):
     remote = f"{DEVICE_DIR}/{NAME}.xml"
     adb("push", local, remote)
     adb("logcat", "-c")
-    adb("shell", "am", "start", "-n", f"{PKG}/.MainActivity", "--es", "xml", remote, "--es", "still", NAME, "--ei", "frame", "0")
+    adb("shell", "am", "start", "-n", f"{PKG}/app.absentmotion.MainActivity", "--es", "xml", remote, "--es", "still", NAME, "--ei", "frame", "0")
     deadline = time.time() + 120
     while f"still {NAME} ok=" not in (log := adb("logcat", "-d", "-s", "AMTest")):
         if time.time() > deadline:

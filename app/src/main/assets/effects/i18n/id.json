@@ -591,11 +591,11 @@
     "liftLevel": {
      "label": "Level Lift"
     },
-    "offsetHue": {
-     "label": "Rona Offset"
-    },
     "offsetAmount": {
      "label": "Jumlah Offset"
+    },
+    "offsetHue": {
+     "label": "Rona Offset"
     },
     "offsetLevel": {
      "label": "Level Offset"
@@ -1311,6 +1311,65 @@
     }
    }
   },
+  "energybeam": {
+   "description": "Menggambar sinar cahaya berpendar dengan inti terang dan halo lembut di antara dua titik, serta bisa bergoyang dan memanjang.",
+   "name": "Sinar Energi",
+   "params": {
+    "blend": {
+     "label": "Blending",
+     "options": [
+      "Tambah",
+      "Layar",
+      "Normal"
+     ]
+    },
+    "color": {
+     "label": "Warna pendar"
+    },
+    "dim": {
+     "label": "Redupkan latar belakang"
+    },
+    "evolution": {
+     "label": "Evolusi"
+    },
+    "frequency": {
+     "label": "Frekuensi"
+    },
+    "from": {
+     "label": "Awal"
+    },
+    "glow": {
+     "label": "Pendar"
+    },
+    "halo": {
+     "label": "Halo"
+    },
+    "haloColor": {
+     "label": "Warna halo"
+    },
+    "haloWidth": {
+     "label": "Lebar halo"
+    },
+    "opacity": {
+     "label": "Opasitas"
+    },
+    "progress": {
+     "label": "Progres"
+    },
+    "span": {
+     "label": "Panjang"
+    },
+    "to": {
+     "label": "Akhir"
+    },
+    "width": {
+     "label": "Lebar"
+    },
+    "wiggle": {
+     "label": "Goyangan"
+    }
+   }
+  },
   "exposure": {
    "description": "Mensimulasikan eksposur fotografi dengan stop, offset, dan koreksi gamma. Cerahkan Bagian Tembus Pandang membuat piksel yang sebagian transparan, seperti tepi yang buram, bisa lebih cerah dari putih.",
    "name": "Eksposur",
@@ -1321,11 +1380,11 @@
     "offset": {
      "label": "Offset"
     },
-    "stops": {
-     "label": "Stop"
-    },
     "soft": {
      "label": "Cerahkan Bagian Tembus Pandang"
+    },
+    "stops": {
+     "label": "Stop"
     }
    }
   },
@@ -1455,6 +1514,9 @@
    "description": "Membalik lapisan seperti kartu dalam 3D, dengan bagian belakang transparan, gambar, atau warna.",
    "name": "Balik Lapisan",
    "params": {
+    "axis": {
+     "label": "Sumbu"
+    },
     "back": {
      "label": "Belakang",
      "options": [
@@ -1605,6 +1667,36 @@
     },
     "strength": {
      "label": "Kekuatan"
+    }
+   }
+  },
+  "fringeclean": {
+   "description": "Menghilangkan warna dari piksel di sepanjang tepi matte lapisan, sehingga halo berwarna sisa key memudar jadi abu-abu, sementara hingga tiga warna yang dilindungi tetap utuh.",
+   "name": "Tepi Matte",
+   "params": {
+    "blur": {
+     "label": "Ketebalan"
+    },
+    "color1": {
+     "label": "Pertahankan warna 1"
+    },
+    "color2": {
+     "label": "Pertahankan warna 2"
+    },
+    "color3": {
+     "label": "Pertahankan warna 3"
+    },
+    "feather": {
+     "label": "Feather"
+    },
+    "threshold1": {
+     "label": "Rentang 1"
+    },
+    "threshold2": {
+     "label": "Rentang 2"
+    },
+    "threshold3": {
+     "label": "Rentang 3"
     }
    }
   },
@@ -1871,6 +1963,36 @@
     }
    }
   },
+  "grunge": {
+   "description": "Membuat lapisan tampak lusuh dengan grain, bercak kotoran, tepi terbakar, dan warna berdebu.",
+   "name": "Grunge",
+   "params": {
+    "blotches": {
+     "label": "Kotoran"
+    },
+    "burn": {
+     "label": "Tepi terbakar"
+    },
+    "color": {
+     "label": "Warna tint"
+    },
+    "grain": {
+     "label": "Grain"
+    },
+    "scale": {
+     "label": "Ukuran kotoran"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "strength": {
+     "label": "Kekuatan"
+    },
+    "tint": {
+     "label": "Tint"
+    }
+   }
+  },
   "halftone": {
    "description": "Titik-titik cetak yang membesar di area gelap gambar.",
    "name": "Halftone",
@@ -1883,6 +2005,19 @@
     },
     "colored": {
      "label": "Titik Warna"
+    },
+    "ink": {
+     "label": "Warna titik"
+    },
+    "paper": {
+     "label": "Warna kertas"
+    },
+    "style": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Dua warna"
+     ]
     }
    }
   },
@@ -2009,6 +2144,67 @@
     },
     "scale": {
      "label": "Skala"
+    }
+   }
+  },
+  "hexgrid": {
+   "description": "Menutupi lapisan dengan kisi heksagon berisi satu hingga tiga warna, dengan tepi lembut dan celah di antaranya.",
+   "name": "Susunan Heksagon",
+   "params": {
+    "angle": {
+     "label": "Sudut"
+    },
+    "blend": {
+     "label": "Blending",
+     "options": [
+      "Normal",
+      "Kalikan",
+      "Layar",
+      "Hamparan",
+      "Cahaya lembut",
+      "Cahaya keras",
+      "Tambah",
+      "Gelapkan",
+      "Cerahkan",
+      "Perbedaan",
+      "Dodge warna",
+      "Burn warna"
+     ]
+    },
+    "cell": {
+     "label": "Ukuran"
+    },
+    "color1": {
+     "label": "Warna 1"
+    },
+    "color2": {
+     "label": "Warna 2"
+    },
+    "color3": {
+     "label": "Warna 3"
+    },
+    "colors": {
+     "label": "Warna",
+     "options": [
+      "Satu",
+      "Dua",
+      "Tiga"
+     ]
+    },
+    "feather": {
+     "label": "Kelembutan"
+    },
+    "gap": {
+     "label": "Celah"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "opacity": {
+     "label": "Opasitas"
+    },
+    "stretch": {
+     "label": "Regang"
     }
    }
   },
@@ -2477,6 +2673,27 @@
     }
    }
   },
+  "lumastamp": {
+   "description": "Mengubah lapisan menjadi warna rata yang opasitasnya mengikuti tingkat kecerahan tiap piksel, seperti stempel atau stensil.",
+   "name": "Stempel Luma",
+   "params": {
+    "color": {
+     "label": "Warna"
+    },
+    "gamma": {
+     "label": "Gamma"
+    },
+    "high": {
+     "label": "Titik putih"
+    },
+    "invert": {
+     "label": "Inversi"
+    },
+    "low": {
+     "label": "Titik hitam"
+    }
+   }
+  },
   "magnifybackground": {
    "description": "Menjadikan lapisan sebagai kaca pembesar: bentuknya menampilkan lapisan di belakangnya yang diperbesar di sekitar pusatnya.",
    "name": "Perbesar Latar Belakang",
@@ -2518,6 +2735,9 @@
     "blur": {
      "label": "Ukuran"
     },
+    "invert": {
+     "label": "Inversi"
+    },
     "softness": {
      "label": "Kelembutan"
     }
@@ -2527,11 +2747,21 @@
    "description": "Memantulkan separuh gambar melintasi garis cermin yang ditentukan oleh sudut dan titik pusat.",
    "name": "Cermin",
    "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
     "angle": {
      "label": "Sudut"
     },
     "center": {
      "label": "Pusat"
+    },
+    "style": {
+     "label": "Gaya",
+     "options": [
+      "Lipat",
+      "Balik"
+     ]
     }
    }
   },
@@ -4143,6 +4373,26 @@
     }
    }
   },
+  "spillclean": {
+   "description": "Menghilangkan semburat hijau atau biru yang tertinggal dari latar belakang key di sekitar tepi lapisan, tanpa mengubah kecerahan piksel.",
+   "name": "Pembersih Spill",
+   "params": {
+    "blur": {
+     "label": "Lebar tepi"
+    },
+    "channel": {
+     "label": "Warna spill",
+     "options": [
+      "Otomatis",
+      "Hijau",
+      "Biru"
+     ]
+    },
+    "strength": {
+     "label": "Kekuatan"
+    }
+   }
+  },
   "spin": {
    "description": "Memutar lapisan terus-menerus dengan kecepatan tetap; di bawah nol putarannya ke arah sebaliknya.",
    "name": "Putar",
@@ -4228,6 +4478,9 @@
     "highlightHue": {
      "label": "Hue sorotan"
     },
+    "highlightLevel": {
+     "label": "Level Sorotan"
+    },
     "shadowAmount": {
      "label": "Jumlah bayangan"
     },
@@ -4236,9 +4489,6 @@
     },
     "shadowLevel": {
      "label": "Level Bayangan"
-    },
-    "highlightLevel": {
-     "label": "Level Sorotan"
     },
     "style": {
      "label": "Gaya",
