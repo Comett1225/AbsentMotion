@@ -388,6 +388,14 @@ int EffectRuntime::liftAt(const Layer& layer) const {
 
 bool EffectRuntime::lifted(const Layer& layer) const { return liftAt(layer) >= 0; }
 
+bool EffectRuntime::spills(const Layer& layer) const {
+    const int lift = liftAt(layer);
+    if (lift < 0) return false;
+    const LayerEffect& e = layer.effects[lift];
+    const Definition* d = find(e.id);
+    return Value(e, d ? &d->defaults : nullptr, "spill", 0, 0, 0) > 0.5f;
+}
+
 bool EffectRuntime::needs(const Layer& layer, bool Definition::*input) const {
     return std::any_of(layer.effects.begin(), layer.effects.end(), [&](const LayerEffect& e) {
         const Definition* d = e.hidden ? nullptr : find(e.id);
@@ -569,7 +577,8 @@ bool EffectRuntime::draw(SkCanvas* canvas, const Scene& scene, const Layer& laye
     const Definition* d = find(e.id);
     const float own = std::clamp(Value(e, d ? &d->defaults : nullptr, "mix", 0, layer.localTime(timeMs), 0), 0.0f, 1.0f);
     const bool masked = Value(e, d ? &d->defaults : nullptr, "mask", 0, layer.localTime(timeMs), 0) > 0.5f;
-    paint.setBlendMode(masked ? SkBlendMode::kSrcOver : SkBlendMode::kSrc);
+    const bool spill = Value(e, d ? &d->defaults : nullptr, "spill", 0, layer.localTime(timeMs), 0) > 0.5f;
+    paint.setBlendMode(masked && !spill ? SkBlendMode::kSrcOver : SkBlendMode::kSrc);
     canvas->saveLayer(SkCanvas::SaveLayerRec(&bounds, &paint, SkCanvas::kInitWithPrevious_SaveLayerFlag));
     if (own > 0) {
         canvas->saveLayerAlphaf(&bounds, own);

@@ -49,7 +49,7 @@
    }
   },
   "backdrop": {
-   "description": "Menyalin apa yang dilukis di bawah lapisan supaya kesan kemudian boleh mengubahnya; Topeng ke lapisan mengehadkan salinan kepada bahagian legap lapisan dan Campur mengembalikan isi lapisan.",
+   "description": "Menyalin apa yang dilukis di bawah lapisan supaya kesan seterusnya boleh mengubahnya. Topeng Ke Lapisan mengehadkan salinan kepada bahagian legap lapisan. Campur membawa isi lapisan kembali. Kesan Menjangkau Keluar membolehkan kesan seterusnya, seperti Regangan, membawa salinan melepasi tepi lapisan.",
    "name": "Lapisan Pelarasan",
    "params": {
     "mask": {
@@ -57,6 +57,9 @@
     },
     "mix": {
      "label": "Campur"
+    },
+    "spill": {
+     "label": "Kesan Menjangkau Keluar"
     }
    }
   },
@@ -231,6 +234,13 @@
     },
     "contrast": {
      "label": "Kontras"
+    },
+    "style": {
+     "label": "Gaya",
+     "options": [
+      "Setiap Saluran",
+      "Kekalkan Warna"
+     ]
     }
    }
   },
@@ -424,7 +434,7 @@
    }
   },
   "chromaticzoomblur": {
-   "description": "Kabur zum dari titik pusat yang menarik merah ke dalam dan biru ke luar, jadi tepi merebak menjadi jalur pelangi.",
+   "description": "Kabur zum dari titik tengah yang menarik biru ke dalam dan merah ke luar, jadi tepi merebak menjadi jalur pelangi.",
    "name": "Kabur Zum Kromatik",
    "params": {
     "amount": {
@@ -532,7 +542,7 @@
    }
   },
   "colorize": {
-   "description": "Mewarnakan seluruh lapisan dengan satu warna sambil mengekalkan cahaya dan bayangnya. Ketepuan menetapkan kekuatan warna itu; bawah 100% lapisan beralih ke arah kelabu.",
+   "description": "Memberi warna pada seluruh lapisan dengan satu rona. Cahaya dan Bayang memetakan kecerahan lapisan pada rona; Kekalkan Kecerahan mengekalkan kecerahan setiap piksel dan menukar warna rona.",
    "name": "Warnakan",
    "params": {
     "amount": {
@@ -541,8 +551,12 @@
     "hue": {
      "label": "Rona"
     },
-    "saturation": {
-     "label": "Ketepuan"
+    "style": {
+     "label": "Gaya",
+     "options": [
+      "Cahaya dan Bayang",
+      "Kekalkan Kecerahan"
+     ]
     }
    }
   },
@@ -1408,6 +1422,13 @@
     },
     "speed": {
      "label": "Kekerapan"
+    },
+    "style": {
+     "label": "Mod",
+     "options": [
+      "Kelip",
+      "Stabil"
+     ]
     }
    }
   },
@@ -1737,6 +1758,13 @@
       "Pantulan",
       "Sudut"
      ]
+    },
+    "style": {
+     "label": "Panjang",
+     "options": [
+      "Kotak",
+      "Bujur"
+     ]
     }
    }
   },
@@ -2016,6 +2044,13 @@
     },
     "shadows": {
      "label": "Bayang"
+    },
+    "style": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Kekalkan Warna"
+     ]
     }
    }
   },
@@ -2082,6 +2117,13 @@
     },
     "saturation": {
      "label": "Ketepuan"
+    },
+    "style": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Kekalkan Kecerahan"
+     ]
     },
     "vibrance": {
      "label": "Kesegaran"
@@ -4211,6 +4253,9 @@
     "offset": {
      "label": "Ofset"
     },
+    "relative": {
+     "label": "Ukur dalam Saiz Lapisan"
+    },
     "spread": {
      "label": "Sebaran"
     },
@@ -5018,6 +5063,13 @@
     "strength": {
      "label": "Kekuatan"
     },
+    "style": {
+     "label": "Gaya",
+     "options": [
+      "Bulat",
+      "Oval Lembut"
+     ]
+    },
     "tint": {
      "label": "Pewarnaan"
     }
@@ -5086,6 +5138,9 @@
     },
     "feather": {
      "label": "Lembut tepi"
+    },
+    "softness": {
+     "label": "Kelembutan"
     },
     "start": {
      "label": "Mula"

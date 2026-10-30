@@ -3,7 +3,7 @@
  "name": "Colorize",
  "category": "color",
  "since": "3.0.0",
- "description": "Tints the whole layer with one hue while keeping its light and shade. Saturation sets how strong the hue is; below 100% the layer turns towards grey.",
+ "description": "Tints the whole layer with one hue. Light and Shade maps the layer's brightness onto the hue; Keep Brightness keeps each pixel's brightness and swaps in the hue's colour.",
  "params": [
   {
    "id": "hue",
@@ -25,15 +25,15 @@
    "percent": true
   },
   {
-   "id": "saturation",
-   "label": "Saturation",
-   "type": "float",
-   "default": 1,
-   "min": 0,
-   "max": 1,
-   "step": 0.001,
-   "percent": true
+   "id": "style",
+   "label": "Style",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Light and Shade",
+    "Keep Brightness"
+   ]
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float hue;\nuniform float amount;\nuniform float saturation;\nfloat luma(float3 c) { return dot(c, float3(0.2126, 0.7152, 0.0722)); }\nfloat3 hue2rgb(float h) {\n    return clamp(abs(mod(h * 6.0 + float3(0.0, 4.0, 2.0), 6.0) - 3.0) - 1.0, 0.0, 1.0);\n}\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return src;\n    float3 rgb = float3(src.rgb) / float(src.a);\n    float l = luma(rgb);\n    float3 tint = hue2rgb(hue / 360.0);\n    float3 colored = l < 0.5 ? tint * l * 2.0 : mix(tint, float3(1.0), l * 2.0 - 1.0);\n    colored = mix(float3(l), colored, clamp(saturation, 0.0, 1.0));\n    return half4(half3(mix(rgb, colored, clamp(amount, 0.0, 1.0))) * src.a, src.a);\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float hue;\nuniform float amount;\nuniform float style;\nfloat luma(float3 c) { return dot(c, float3(0.2126, 0.7152, 0.0722)); }\nfloat3 hue2rgb(float h) {\n    return clamp(abs(mod(h * 6.0 + float3(0.0, 4.0, 2.0), 6.0) - 3.0) - 1.0, 0.0, 1.0);\n}\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return src;\n    float3 rgb = float3(src.rgb) / float(src.a);\n    float l = luma(rgb);\n    float3 tint = hue2rgb(hue / 360.0);\n    float3 colored = l < 0.5 ? tint * l * 2.0 : mix(tint, float3(1.0), l * 2.0 - 1.0);\n    if (style > 0.5) {\n        float3 k = float3(0.299, 0.587, 0.114);\n        colored = float3(dot(rgb, k)) + 0.5 * (tint - float3(dot(tint, k)));\n    }\n    return half4(half3(clamp(mix(rgb, colored, clamp(amount, 0.0, 1.0)), 0.0, 1.0)) * src.a, src.a);\n}\n"
 }

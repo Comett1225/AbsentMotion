@@ -183,6 +183,7 @@ private:
         LayerEffects fx;
         fx.active = [this](const Layer& layer) { return fEffects.active(layer); };
         fx.lifted = [this](const Layer& layer) { return fEffects.lifted(layer); };
+        fx.spills = [this](const Layer& layer) { return fEffects.spills(layer); };
         fx.behind = [this](const Layer& layer) { return fEffects.behind(layer); };
         fx.steady = [this](const Layer& layer, float from, float to) { return fEffects.steady(layer, from, to); };
         fx.draw = [this](SkCanvas* canvas, const Scene& scene, const Layer& layer, double time, const SkRect& area, const SkMatrix& placed,

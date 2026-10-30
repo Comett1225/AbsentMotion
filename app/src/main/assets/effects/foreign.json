@@ -9,7 +9,8 @@
    }
   },
   "set": {
-   "mask": true
+   "mask": true,
+   "spill": true
   }
  },
  "com.alightcreative.effects.gaussianblur": {
@@ -17,7 +18,7 @@
   "params": {
    "strength": {
     "to": "strength",
-    "scale": 120,
+    "scale": 210,
     "min": 0
    }
   }
@@ -48,8 +49,10 @@
    },
    "angle": {
     "to": "angle",
+    "scale": -1,
     "offset": 90,
-    "wrap": 360
+    "wrap": 360,
+    "turn": true
    },
    "scale": {
     "to": "scale",
@@ -71,12 +74,18 @@
     "values": {
      "0": 0,
      "1": 1,
-     "2": 2
+     "2": 2,
+     "3": 0,
+     "4": 0,
+     "5": 0
     }
    },
    "offset": {
     "to": "offset"
    }
+  },
+  "set": {
+   "style": 1
   }
  },
  "com.alightcreative.effects.exposure": {
@@ -336,7 +345,8 @@
    "hue": 0,
    "saturation": 1,
    "lightness": 0,
-   "vibrance": 0
+   "vibrance": 0,
+   "style": 1
   }
  },
  "com.alightcreative.effects.hueshift": {
@@ -344,14 +354,15 @@
   "params": {
    "hue": {
     "to": "hue",
-    "scale": 1
+    "scale": -1
    }
   },
   "set": {
    "hue": 0,
    "saturation": 1,
    "lightness": 0,
-   "vibrance": 0
+   "vibrance": 0,
+   "style": 1
   }
  },
  "com.alightcreative.effects.colortemperature": {
@@ -485,10 +496,12 @@
    },
    "stretch": {
     "to": "stretch",
+    "scale": 4,
     "min": 0
    },
    "offset": {
-    "to": "offset"
+    "to": "offset",
+    "scale": -1
    },
    "smooth": {
     "to": "spread",
@@ -496,7 +509,8 @@
    }
   },
   "set": {
-   "stretch": 10
+   "stretch": 10,
+   "relative": true
   }
  },
  "com.alightcreative.effects.unsharpmask": {
@@ -529,8 +543,11 @@
    "contrast": {
     "to": "contrast",
     "min": -1,
-    "max": 1
+    "max": 5
    }
+  },
+  "set": {
+   "style": 1
   }
  },
  "com.alightcreative.effects.denoise": {
@@ -568,6 +585,9 @@
     "min": 0,
     "max": 2
    }
+  },
+  "set": {
+   "style": 1
   }
  },
  "com.alightcreative.effects.flicker2": {
@@ -592,7 +612,8 @@
   "set": {
    "speed": 7,
    "intensity": 0.75,
-   "seed": 0
+   "seed": 0,
+   "style": 1
   }
  },
  "absent.autoshake": {
@@ -899,7 +920,9 @@
     "to": "mask"
    },
    "offset": {
-    "to": "offset"
+    "to": "offset",
+    "scale": 0.001,
+    "per": "spanWidth"
    }
   }
  },
@@ -2419,13 +2442,15 @@
   "params": {
    "strength": {
     "to": "blurLength",
-    "scale": 1500,
+    "power": 0.5,
+    "scale": 235,
     "min": 0,
     "max": 2000
    },
    "angle": {
     "to": "angle",
-    "wrap": 360
+    "wrap": 360,
+    "turn": true
    }
   }
  },
@@ -2866,6 +2891,9 @@
    "punchout": {
     "to": "punch"
    }
+  },
+  "set": {
+   "style": 1
   }
  },
  "com.alightcreative.effects.wipe2": {
@@ -2882,13 +2910,17 @@
     "max": 1.5
    },
    "angle": {
-    "to": "angle"
+    "to": "angle",
+    "turn": true
    },
    "feather": {
-    "to": "feather",
+    "to": "softness",
     "min": 0,
     "max": 100
    }
+  },
+  "set": {
+   "feather": 0
   }
  },
  "com.alightcreative.effects.wipe": {
@@ -5481,12 +5513,16 @@
    },
    "angle": {
     "to": "angle",
+    "scale": -1,
     "offset": 90,
-    "wrap": 360
+    "wrap": 360,
+    "turn": true
    },
    "scale": {
     "to": "scale",
-    "min": 0.05
+    "power": -1,
+    "min": 0.05,
+    "max": 10
    },
    "alpha": {
     "to": "opacity",
@@ -5504,12 +5540,18 @@
     "values": {
      "0": 0,
      "1": 1,
-     "2": 2
+     "2": 2,
+     "3": 0,
+     "4": 0,
+     "5": 0
     }
    },
    "offset": {
     "to": "offset"
    }
+  },
+  "set": {
+   "style": 1
   }
  },
  "com.alightcreative.effects.timecode": {
@@ -5947,22 +5989,20 @@
    "tint": [
     {
      "to": "hue",
-     "scale": -1,
-     "offset": 270,
      "wrap": 360
     },
     {
-     "to": "saturation",
+     "to": "amount",
      "min": 0,
      "max": 1
     },
     {
-     "neutral": "0"
+     "ignore": true
     }
    ]
   },
   "set": {
-   "amount": 1
+   "style": 1
   }
  },
  "com.alightcreative.effects.chromaticzoomblur": {
@@ -5970,7 +6010,7 @@
   "params": {
    "strength": {
     "to": "amount",
-    "scale": 5,
+    "scale": 0.562,
     "min": 0,
     "max": 1.9
    },

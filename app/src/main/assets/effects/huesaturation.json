@@ -39,7 +39,17 @@
    "min": -1,
    "max": 1,
    "step": 0.01
+  },
+  {
+   "id": "style",
+   "label": "Style",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Classic",
+    "Keep Brightness"
+   ]
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float hue;\nuniform float saturation;\nuniform float vibrance;\nuniform float lightness;\nhalf luma(half3 c) { return dot(c, half3(0.2126, 0.7152, 0.0722)); }\nhalf4 main(float2 coord) {\n    half4 c = unpremul(image.eval(coord));\n    float3 k = float3(0.57735);\n    float a = radians(hue);\n    float3 v = float3(c.rgb);\n    v = v * cos(a) + cross(k, v) * sin(a) + k * dot(k, v) * (1 - cos(a));\n    half3 rgb = half3(v);\n    rgb = mix(half3(luma(rgb)), rgb, half(saturation));\n    half chromaNow = max(rgb.r, max(rgb.g, rgb.b)) - min(rgb.r, min(rgb.g, rgb.b));\n    rgb = mix(half3(luma(rgb)), rgb, half(1.0 + vibrance * (1.0 - saturate(chromaNow)))) + half(lightness);\n    return half4(saturate(rgb) * c.a, c.a);\n}"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float hue;\nuniform float saturation;\nuniform float vibrance;\nuniform float lightness;\nuniform float style;\nhalf luma(half3 c) { return dot(c, half3(0.2126, 0.7152, 0.0722)); }\nhalf4 main(float2 coord) {\n    half4 c = unpremul(image.eval(coord));\n    float3 k = float3(0.57735);\n    float a = radians(hue);\n    float3 v = float3(c.rgb);\n    v = v * cos(a) + cross(k, v) * sin(a) + k * dot(k, v) * (1 - cos(a));\n    half3 rgb = half3(v);\n    if (style > 0.5) {\n        float3 f = float3(rgb);\n        float y = dot(f, float3(0.299, 0.587, 0.114));\n        float chroma = max(f.r, max(f.g, f.b)) - min(f.r, min(f.g, f.b));\n        f = float3(y) + (f - float3(y)) * saturation * (1.0 + vibrance * (0.644 - 0.917 * chroma));\n        return half4(half3(saturate(f + lightness)) * c.a, c.a);\n    }\n    rgb = mix(half3(luma(rgb)), rgb, half(saturation));\n    half chromaNow = max(rgb.r, max(rgb.g, rgb.b)) - min(rgb.r, min(rgb.g, rgb.b));\n    rgb = mix(half3(luma(rgb)), rgb, half(1.0 + vibrance * (1.0 - saturate(chromaNow)))) + half(lightness);\n    return half4(saturate(rgb) * c.a, c.a);\n}"
 }

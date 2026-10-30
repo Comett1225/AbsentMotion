@@ -41,7 +41,7 @@ class AlightParityTest {
         assertEquals(listOf("Progress", "angle", "45.000000", "0.0..360.0"), params("radialwipe").getValue("progress").row())
         assertEquals(listOf("Count", "float", "1.000000", "1.0..16.0"), params("radialwipe").getValue("count").row())
         assertEquals(listOf("Clockwise", "Counterclockwise", "Both"), params("radialwipe").getValue("direction").options)
-        assertEquals(listOf("Size", "Roundness", "Feather", "Strength", "Tint", "Color", "Punch Out"), catalog.find("absent.vignette")!!.params.map { it.label })
+        assertEquals(listOf("Size", "Roundness", "Feather", "Strength", "Tint", "Color", "Punch Out", "Style"), catalog.find("absent.vignette")!!.params.map { it.label })
         assertEquals(listOf("Strength", "float", "0.800000", "0.0..1.0"), params("vignette").getValue("strength").row())
         for (key in listOf("zoomstreaks", "spinstreaks")) {
             val streaks = catalog.find("absent.$key")!!.params.takeLast(4)
@@ -140,7 +140,7 @@ class AlightParityTest {
         assertEquals(listOf("blur", "mode"), catalog.find("absent.feather")!!.params.map { it.id })
         assertEquals("1.000000", params("feather").getValue("mode").default)
         assertEquals("0.000000", params("feather").getValue("mode").missingDefault)
-        assertEquals(listOf("mix", "mask"), catalog.find("absent.backdrop")!!.params.map { it.id })
+        assertEquals(listOf("mix", "mask", "spill"), catalog.find("absent.backdrop")!!.params.map { it.id })
         assertEquals("true", params("backdrop").getValue("mask").default)
         assertEquals("false", params("backdrop").getValue("mask").missingDefault)
         assertEquals("#ff2d1ef6", params("solid").getValue("color").default)

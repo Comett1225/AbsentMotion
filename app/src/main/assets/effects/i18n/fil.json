@@ -49,7 +49,7 @@
    }
   },
   "backdrop": {
-   "description": "Kinokopya ang iginuhit sa ilalim ng layer para mabago ito ng mga susunod na epekto. Nililimitahan ng Mask sa layer ang kopya sa opaque na bahagi ng layer. Ibinabalik ng Halo ang fill ng layer.",
+   "description": "Kinokopya ang iginuhit sa ilalim ng layer para mabago ito ng mga susunod na epekto. Nililimitahan ng Mask To Layer ang kopya sa opaque na bahagi ng layer. Ibinabalik ng Mix ang fill ng layer. Pinapayagan ng 'Umaabot sa labas ang mga epekto' ang mga susunod na epekto, gaya ng Stretch, na dalhin ang kopya lampas sa gilid ng layer.",
    "name": "Adjustment layer",
    "params": {
     "mask": {
@@ -57,6 +57,9 @@
     },
     "mix": {
      "label": "Halo"
+    },
+    "spill": {
+     "label": "Umaabot sa labas ang mga epekto"
     }
    }
   },
@@ -231,6 +234,13 @@
     },
     "contrast": {
      "label": "Kontrast"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Bawat channel",
+      "Panatilihin ang kulay"
+     ]
     }
    }
   },
@@ -424,7 +434,7 @@
    }
   },
   "chromaticzoomblur": {
-   "description": "Isang zoom blur mula sa sentro na humihila ng pula papasok at asul palabas, kaya nagiging bahaghari ang mga gilid.",
+   "description": "Isang zoom blur mula sa gitna na humihila ng asul papasok at pula palabas, kaya nagiging rainbow fringe ang mga gilid.",
    "name": "Chromatic Zoom Blur",
    "params": {
     "amount": {
@@ -532,7 +542,7 @@
    }
   },
   "colorize": {
-   "description": "Kinukulayan ang buong layer ng isang kulay habang pinapanatili ang liwanag at anino. Ang saturation ang nagtatakda kung gaano kalakas ang kulay; sa ilalim ng 100%, lumalapit ang layer sa grey.",
+   "description": "Kinukulayan ang buong layer ng isang hue. Ginagamit ng Light and Shade ang liwanag ng layer para sa hue; pinapanatili ng Keep Brightness ang liwanag ng bawat pixel at ipinapalit ang kulay ng hue.",
    "name": "Kulayan",
    "params": {
     "amount": {
@@ -541,8 +551,12 @@
     "hue": {
      "label": "Hue"
     },
-    "saturation": {
-     "label": "Saturation"
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Liwanag at Lilim",
+      "Panatilihin ang Liwanag"
+     ]
     }
    }
   },
@@ -1408,6 +1422,13 @@
     },
     "speed": {
      "label": "Dalas"
+    },
+    "style": {
+     "label": "Mode",
+     "options": [
+      "Kumurap",
+      "Tuloy-tuloy"
+     ]
     }
    }
   },
@@ -1737,6 +1758,13 @@
       "Reflected",
       "Angle"
      ]
+    },
+    "style": {
+     "label": "Haba",
+     "options": [
+      "Kahon",
+      "Oval"
+     ]
     }
    }
   },
@@ -2016,6 +2044,13 @@
     },
     "shadows": {
      "label": "Anino"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Panatilihin ang kulay"
+     ]
     }
    }
   },
@@ -2082,6 +2117,13 @@
     },
     "saturation": {
      "label": "Saturation"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Panatilihin ang liwanag"
+     ]
     },
     "vibrance": {
      "label": "Vibrance"
@@ -4211,6 +4253,9 @@
     "offset": {
      "label": "Offset"
     },
+    "relative": {
+     "label": "Sukatin sa Laki ng Layer"
+    },
     "spread": {
      "label": "Spread"
     },
@@ -5018,6 +5063,13 @@
     "strength": {
      "label": "Lakas"
     },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Bilugan",
+      "Malambot na oval"
+     ]
+    },
     "tint": {
      "label": "Tint"
     }
@@ -5086,6 +5138,9 @@
     },
     "feather": {
      "label": "Feather"
+    },
+    "softness": {
+     "label": "Lambot"
     },
     "start": {
      "label": "Simula"

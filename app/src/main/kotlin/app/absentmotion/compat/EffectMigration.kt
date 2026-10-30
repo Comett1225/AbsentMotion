@@ -31,6 +31,8 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
         val per: String? = null,
         val take: Int = 0,
         val gate: String? = null,
+        val ignore: Boolean = false,
+        val turn: Boolean = false,
     )
 
     class Rule(val to: String, val params: Map<String, List<Conversion?>>, val set: Map<String, String>, val onlyWith: String? = null)
@@ -51,12 +53,42 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
                 if (older) renamed = true else converted.merge("${node["id"]!!.substringAfterLast('.')} → ${own.name}", 1, Int::plus)
                 return convert(node, rule, own, older, dims) { dropped += "${own.name}: $it" }
             }
-            val inner = if (node.name in Scene.LAYER_TAGS) sizeOf(node) ?: dims else dims
+            val inner = if (node.name in Scene.LAYER_TAGS) layerDims(node, dims) else dims
             return if (node.children.isEmpty()) node else node.copy(children = node.children.map { visit(it, inner) })
         }
-        val root = visit(scene.node, floatArrayOf(scene.node["width"]?.finiteFloat()?.takeIf { it > 0f } ?: 1080f, scene.node["height"]?.finiteFloat()?.takeIf { it > 0f } ?: 1080f))
-        return Result(if (converted.isEmpty() && !renamed) scene else Scene(root), converted, dropped)
+        val w = scene.node["width"]?.finiteFloat()?.takeIf { it > 0f } ?: 1080f
+        val h = scene.node["height"]?.finiteFloat()?.takeIf { it > 0f } ?: 1080f
+        var root = visit(scene.node, floatArrayOf(w, h, 0f, w, h))
+        val foreign = root["am"]?.startsWith("com.alightcreative") == true
+        if (foreign) root = root.copy(attrs = root.attrs + ("am" to "app.absentmotion"), children = root.children.map(::squaredBlendOpacity))
+        return Result(if (converted.isEmpty() && !renamed && !foreign) scene else Scene(root), converted, dropped)
     }
+
+    private fun layerDims(layer: XmlNode, dims: FloatArray): FloatArray {
+        val size = sizeOf(layer)
+        val scale = transformOf(layer, "scale")?.split(',')?.mapNotNull { it.trim().finiteFloat() }.orEmpty()
+        val sx = abs(scale.getOrElse(0) { 1f }); val sy = abs(scale.getOrElse(1) { scale.getOrElse(0) { 1f } })
+        val w = size?.get(0) ?: dims[0]; val h = size?.get(1) ?: dims[1]
+        return floatArrayOf(w, h, dims.getOrElse(2) { 0f } + rotationOf(layer), (size?.get(0) ?: dims.getOrElse(3) { w }) * sx, (size?.get(1) ?: dims.getOrElse(4) { h }) * sy)
+    }
+
+    private fun transformOf(layer: XmlNode, name: String): String? =
+        layer.children.firstOrNull { it.name == "transform" }?.children?.firstOrNull { it.name == name }?.valueAt(0f)
+
+    private fun squaredBlendOpacity(layer: XmlNode): XmlNode {
+        if (layer.name !in Scene.LAYER_TAGS || layer["blending"] !in setOf("multiply", "subtract")) return layer
+        if (layer.children.any { it.name == "effect" && it["id"] in setOf(LIFT, "absent.backdrop") }) return layer
+        val square = { v: String -> v.trim().finiteFloat()?.let { formatFloats(floatArrayOf(it * it)) } ?: v }
+        return layer.copy(children = layer.children.map { t ->
+            if (t.name != "transform") t else t.copy(children = t.children.map { o ->
+                if (o.name != "opacity") o else o.copy(attrs = o.attrs.mapValues { (k, v) -> if (k == "value") square(v) else v },
+                    children = o.children.map { kf -> kf["v"]?.let { kf.with("v", square(it)) } ?: kf })
+            })
+        })
+    }
+
+    private fun rotationOf(layer: XmlNode): Float = layer.children.firstOrNull { it.name == "transform" }?.children
+        ?.firstOrNull { it.name == "rotation" }?.valueAt(0f)?.split(',')?.firstOrNull()?.trim()?.finiteFloat() ?: 0f
 
     private fun sizeOf(layer: XmlNode): FloatArray? = layer.children.firstOrNull { it.name == "property" && it["name"] == "size" }?.valueAt(0f)
         ?.split(',')?.mapNotNull { it.trim().finiteFloat() }?.takeIf { it.size >= 2 && it[0] > 0f && it[1] > 0f }?.let { floatArrayOf(2 * it[0], 2 * it[1]) }
@@ -77,6 +109,7 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
             val split = conversions.size > 1
             conversions.forEachIndexed { i, c ->
                 val param = c?.to?.let { to -> own.params.firstOrNull { it.id == to } }
+                if (c?.ignore == true) return@forEachIndexed
                 if (param != null) {
                     val shift = c.plus?.let { other -> effect.children.firstOrNull { it.name == "property" && it["name"] == other }?.valueAt(0f)?.finiteFloat() } ?: 0f
                     val off = c.gate?.let { gate -> effect.children.firstOrNull { it.name == "property" && it["name"] == gate }?.valueAt(0f)?.trim() != "true" } ?: false
@@ -123,17 +156,18 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
             val n = p.trim().finiteFloat() ?: return t
             c.values[n.toInt().toString()]?.takeIf { n % 1f == 0f } ?: n
         }
-        val size = when (c.per) { "width" -> dims[0]; "height" -> dims[1]; else -> 1f }
+        val size = when (c.per) { "width" -> dims[0]; "height" -> dims[1]; "spanWidth" -> dims.getOrElse(3) { dims[0] }; "spanHeight" -> dims.getOrElse(4) { dims[1] }; else -> 1f }
         return formatFloats(FloatArray(numbers.size) { i ->
             val base = if (c.relative) numbers[i] / dims[(if (component >= 0) component else i) % 2] + 0.5f else numbers[i]
             val raised = if (c.power == 1f) base else abs(base).pow(c.power).withSign(base)
-            val moved = raised * c.scale * size + c.offset + shift
+            val moved = raised * c.scale * size + c.offset + shift + if (c.turn) dims.getOrElse(2) { 0f } else 0f
             (if (c.wrap > 0f) moved.mod(c.wrap) else moved).coerceIn(c.min, c.max)
         })
     }
 
     companion object {
         const val ASSET = "effects/foreign.json"
+        private const val LIFT = "com.alightcreative.effects.lift"
 
         fun read(context: Context, catalog: EffectCatalog = EffectCatalog.read(context)): EffectMigration =
             parse(context.assets.open(ASSET).bufferedReader().use { it.readText() }, catalog)
@@ -175,6 +209,8 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
             json.optString("per").takeIf { it.isNotEmpty() },
             json.optInt("take", 0),
             json.optString("gate").takeIf { it.isNotEmpty() },
+            json.optBoolean("ignore"),
+            json.optBoolean("turn"),
         )
     }
 }

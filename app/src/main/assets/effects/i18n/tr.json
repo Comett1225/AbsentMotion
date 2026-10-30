@@ -49,7 +49,7 @@
    }
   },
   "backdrop": {
-   "description": "Katmanın altında çizilenleri kopyalar; böylece sonraki efektler bunları değiştirebilir. Katmana maskele kopyayı katmanın opak kısımlarıyla sınırlar; Karışım katman dolgusunu geri getirir.",
+   "description": "Katmanın altında çizilenleri kopyalar, böylece sonraki efektler bunları değiştirebilir. Katmana Maskele, kopyayı katmanın opak kısımlarıyla sınırlar. Karışım, katman dolgusunu geri getirir. Efektler Dışarı Taşsın, Uzat gibi sonraki efektlerin kopyayı katmanın kenarlarının dışına taşımasını sağlar.",
    "name": "Ayar Katmanı",
    "params": {
     "mask": {
@@ -57,6 +57,9 @@
     },
     "mix": {
      "label": "Karışım"
+    },
+    "spill": {
+     "label": "Efektler Dışarı Taşsın"
     }
    }
   },
@@ -231,6 +234,13 @@
     },
     "contrast": {
      "label": "Kontrast"
+    },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Kanal Başına",
+      "Rengi Koru"
+     ]
     }
    }
   },
@@ -424,7 +434,7 @@
    }
   },
   "chromaticzoomblur": {
-   "description": "Merkez noktadan kırmızıyı içe, maviyi dışa çeken bir yakınlaştırma bulanıklığı; kenarlar gökkuşağı saçaklarına yayılır.",
+   "description": "Merkez noktadan maviyi içe, kırmızıyı dışa çeken ve kenarların gökkuşağı saçaklarına yayılmasına neden olan bir yakınlaştırma bulanıklığı.",
    "name": "Kromatik Yakınlaştırma Bulanıklığı",
    "params": {
     "amount": {
@@ -532,7 +542,7 @@
    }
   },
   "colorize": {
-   "description": "Katmanın tamamını, ışığını ve gölgesini koruyarak tek bir tonla renklendirir. Doygunluk tonun gücünü belirler; %100'ün altında katman griye kayar.",
+   "description": "Tüm katmanı tek bir renk tonuyla renklendirir. Işık ve Gölge, katmanın parlaklığını renk tonuna eşler; Parlaklığı Koru, her pikselin parlaklığını koruyup renk tonunun rengini kullanır.",
    "name": "Renklendir",
    "params": {
     "amount": {
@@ -541,8 +551,12 @@
     "hue": {
      "label": "Renk tonu"
     },
-    "saturation": {
-     "label": "Doygunluk"
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Işık ve Gölge",
+      "Parlaklığı Koru"
+     ]
     }
    }
   },
@@ -1408,6 +1422,13 @@
     },
     "speed": {
      "label": "Frekans"
+    },
+    "style": {
+     "label": "Mod",
+     "options": [
+      "Yanıp Sönme",
+      "Sabit"
+     ]
     }
    }
   },
@@ -1737,6 +1758,13 @@
       "Yansımalı",
       "Açı"
      ]
+    },
+    "style": {
+     "label": "Uzunluk",
+     "options": [
+      "Kutu",
+      "Oval"
+     ]
     }
    }
   },
@@ -2016,6 +2044,13 @@
     },
     "shadows": {
      "label": "Gölgeler"
+    },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Klasik",
+      "Rengi Koru"
+     ]
     }
    }
   },
@@ -2082,6 +2117,13 @@
     },
     "saturation": {
      "label": "Doygunluk"
+    },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Klasik",
+      "Parlaklığı Koru"
+     ]
     },
     "vibrance": {
      "label": "Canlılık"
@@ -4211,6 +4253,9 @@
     "offset": {
      "label": "Ofset"
     },
+    "relative": {
+     "label": "Katman Boyutuna Göre Ölç"
+    },
     "spread": {
      "label": "Yayılım"
     },
@@ -5018,6 +5063,13 @@
     "strength": {
      "label": "Güç"
     },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Yuvarlatılmış",
+      "Yumuşak Oval"
+     ]
+    },
     "tint": {
      "label": "Renk tonu"
     }
@@ -5086,6 +5138,9 @@
     },
     "feather": {
      "label": "Kenar yumuşatma"
+    },
+    "softness": {
+     "label": "Yumuşaklık"
     },
     "start": {
      "label": "Başlangıç"

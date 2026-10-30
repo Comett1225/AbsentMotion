@@ -215,16 +215,37 @@ class EffectMigrationTest {
         val all = effects(result.scene.node)
         assertEquals(listOf("colorize", "chromaticzoomblur", "texttransform", "texttransform").map { "absent.$it" }, all.map { it["id"] })
         assertTrue(result.dropped.toString(), result.dropped.isEmpty())
-        close(89.29744f, all[0].number("hue"))
-        close(0.442514f, all[0].number("saturation"))
-        close(1f, all[0].number("amount"))
-        close(0.15f, all[1].number("amount"))
+        close(180.70256f, all[0].number("hue"))
+        close(0.442514f, all[0].number("amount"))
+        close(1f, all[0].number("style"))
+        close(0.01686f, all[1].number("amount"))
         assertEquals("#ffbebebe", all[2].prop("tint")["value"])
         close(1f, all[2].number("scale"))
         close(1f, all[2].number("opacity"))
         close(5f, all[2].number("shape"))
         assertEquals(2, all[2].prop("seed").keyframes.size)
         assertEquals("#00000000", all[3].prop("tint")["value"])
+    }
+
+    @Test fun alightFilesSquarePlainBlendOpacityOnceAndScaleOffsetsToTheLayer() {
+        val xml = """<scene width="1080" height="1350" fps="30" totalTime="1000" am="com.alightcreative.motion/5.0.273">
+            <shape id="1" startTime="0" endTime="1000" fillType="color" blending="subtract" s=".rect"><transform><opacity value="0.5" /></transform></shape>
+            <shape id="2" startTime="0" endTime="1000" fillType="color" blending="multiply" s=".rect"><transform><opacity><kf t="0" v="0.4" /><kf t="1" v="1" /></opacity></transform></shape>
+            <shape id="3" startTime="0" endTime="1000" fillType="color" blending="subtract" s=".rect"><transform><opacity value="0.5" /></transform>
+              <effect id="com.alightcreative.effects.lift"><property name="fill" type="float" value="0" /></effect></shape>
+            <shape id="4" startTime="0" endTime="1000" fillType="color" s=".rect"><transform><scale value="5.4,6.75" /></transform>
+              <effect id="com.alightcreative.effects.offset"><property name="offset" type="vec2" value="-239,0" /><property name="feather" type="float" value="1" /><property name="mask" type="bool" value="false" /></effect>
+              <property name="size" type="vec2" value="100,100" /></shape>
+          </scene>"""
+        val once = migration.migrate(Scene.parse(xml))
+        val layers = once.scene.node.children
+        assertEquals("app.absentmotion", once.scene.node["am"])
+        fun opacity(l: XmlNode) = l.children.single { it.name == "transform" }.children.single { it.name == "opacity" }
+        close(0.25f, opacity(layers[0])["value"]!!.toFloat())
+        assertEquals(listOf(0.16f, 1f), opacity(layers[1]).children.map { it["v"]!!.toFloat() })
+        close(0.5f, opacity(layers[2])["value"]!!.toFloat())
+        close(-258.12f, layers[3].children.single { it.name == "effect" }.prop("offset")["value"]!!.split(',')[0].toFloat())
+        assertEquals(once.scene.node, migration.migrate(once.scene).scene.node)
     }
 
     @Test fun valuesKeyframesEasingsAndFlagsAreConverted() {
@@ -384,7 +405,7 @@ class EffectMigrationTest {
             """<effect id="com.alightcreative.effects.flicker2" locallyApplied="true"><property name="freq" type="float" value="3.73" /><property name="basis" type="int" value="$basis" /></effect></shape></scene>"""))
         val time = flicker(0)
         assertTrue(time.dropped.isEmpty())
-        assertEquals(listOf("speed", "intensity", "seed"), time.scene.node.children.single().children.single().children.map { it["name"] })
+        assertEquals(listOf("speed", "intensity", "seed", "style"), time.scene.node.children.single().children.single().children.map { it["name"] })
         assertEquals(setOf("Flicker: basis"), flicker(1).dropped)
     }
 }

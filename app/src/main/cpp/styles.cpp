@@ -855,7 +855,7 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
         DrawOne(canvas, siblings, *under, timeMs, pictures, plain);
     };
     if (!effects || !gEffects->draw(canvas, *gScene, l, timeMs, scenePath.getBounds(), m, picture, below)) picture(canvas);
-    if (effects && gEffects->lifted(l) && !scenePath.isEmpty()) {
+    if (effects && gEffects->lifted(l) && !(gEffects->spills && gEffects->spills(l)) && !scenePath.isEmpty()) {
         SkPaint mask;
         mask.setAntiAlias(true);
         if (copies || pixelEdged) {
@@ -1094,7 +1094,8 @@ void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& 
             }
         }
     };
-    if (!group && !decorated && !blended && (opacity >= 1 || !overlaps)) {
+    const bool spilled = EffectsApply(siblings, l) && gEffects->spills && gEffects->spills(l);
+    if (!group && !decorated && !blended && !spilled && (opacity >= 1 || !overlaps)) {
         DrawContent(canvas, siblings, l, timeMs, opacity, false, pictures, repeated ? &copies : nullptr);
         centredBorders(opacity);
     } else {

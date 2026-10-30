@@ -49,7 +49,7 @@
    }
   },
   "backdrop": {
-   "description": "Menyalin apa yang digambar di bawah lapisan agar efek setelahnya bisa mengubahnya. Masker ke lapisan membatasi salinan ke bagian tak transparan lapisan. Campur mengembalikan isi lapisan.",
+   "description": "Menyalin apa yang digambar di bawah lapisan agar efek berikutnya dapat mengubahnya. Masker ke Lapisan membatasi salinan pada bagian buram lapisan. Campur mengembalikan isi lapisan. Efek Menjangkau Keluar memungkinkan efek berikutnya, seperti Regangkan, membawa salinan melewati tepi lapisan.",
    "name": "Lapisan Penyesuaian",
    "params": {
     "mask": {
@@ -57,6 +57,9 @@
     },
     "mix": {
      "label": "Campuran"
+    },
+    "spill": {
+     "label": "Efek Menjangkau Keluar"
     }
    }
   },
@@ -231,6 +234,13 @@
     },
     "contrast": {
      "label": "Kontras"
+    },
+    "style": {
+     "label": "Gaya",
+     "options": [
+      "Per Saluran",
+      "Pertahankan Warna"
+     ]
     }
    }
   },
@@ -424,7 +434,7 @@
    }
   },
   "chromaticzoomblur": {
-   "description": "Blur zoom dari titik tengah yang menarik merah ke dalam dan biru ke luar, sehingga tepinya menyebar jadi pinggiran warna pelangi.",
+   "description": "Zoom blur dari titik tengah yang menarik biru ke dalam dan merah ke luar, sehingga tepi menyebar menjadi pinggiran warna pelangi.",
    "name": "Blur Zoom Chromatic",
    "params": {
     "amount": {
@@ -532,7 +542,7 @@
    }
   },
   "colorize": {
-   "description": "Mewarnai seluruh lapisan dengan satu hue tanpa mengubah terang dan gelapnya. Saturasi mengatur seberapa kuat hue-nya; di bawah 100% lapisan mengarah ke abu-abu.",
+   "description": "Memberi warna pada seluruh lapisan dengan satu hue. Light and Shade memetakan kecerahan lapisan ke hue; Keep Brightness mempertahankan kecerahan tiap piksel dan mengganti warnanya dengan hue tersebut.",
    "name": "Warnai",
    "params": {
     "amount": {
@@ -541,8 +551,12 @@
     "hue": {
      "label": "Hue"
     },
-    "saturation": {
-     "label": "Saturasi"
+    "style": {
+     "label": "Gaya",
+     "options": [
+      "Light and Shade",
+      "Keep Brightness"
+     ]
     }
    }
   },
@@ -1408,6 +1422,13 @@
     },
     "speed": {
      "label": "Frekuensi"
+    },
+    "style": {
+     "label": "Mode",
+     "options": [
+      "Berkedip",
+      "Stabil"
+     ]
     }
    }
   },
@@ -1737,6 +1758,13 @@
       "Pantulan",
       "Sudut"
      ]
+    },
+    "style": {
+     "label": "Panjang",
+     "options": [
+      "Kotak",
+      "Oval"
+     ]
     }
    }
   },
@@ -2016,6 +2044,13 @@
     },
     "shadows": {
      "label": "Bayangan"
+    },
+    "style": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Pertahankan Warna"
+     ]
     }
    }
   },
@@ -2082,6 +2117,13 @@
     },
     "saturation": {
      "label": "Saturasi"
+    },
+    "style": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Pertahankan Kecerahan"
+     ]
     },
     "vibrance": {
      "label": "Vibrance"
@@ -4211,6 +4253,9 @@
     "offset": {
      "label": "Offset"
     },
+    "relative": {
+     "label": "Ukur dalam ukuran lapisan"
+    },
     "spread": {
      "label": "Sebaran"
     },
@@ -5018,6 +5063,13 @@
     "strength": {
      "label": "Kekuatan"
     },
+    "style": {
+     "label": "Gaya",
+     "options": [
+      "Membulat",
+      "Oval lembut"
+     ]
+    },
     "tint": {
      "label": "Rona"
     }
@@ -5086,6 +5138,9 @@
     },
     "feather": {
      "label": "Feather"
+    },
+    "softness": {
+     "label": "Kelembutan"
     },
     "start": {
      "label": "Mulai"

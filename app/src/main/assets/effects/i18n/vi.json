@@ -49,7 +49,7 @@
    }
   },
   "backdrop": {
-   "description": "Sao chép nội dung được vẽ bên dưới lớp để các hiệu ứng sau có thể thay đổi nội dung đó. Mặt nạ theo lớp giới hạn phần sao chép ở vùng đục của lớp. Trộn đưa phần tô của lớp trở lại.",
+   "description": "Sao chép nội dung được vẽ bên dưới lớp để các hiệu ứng sau có thể thay đổi nó; Mặt nạ vào lớp giới hạn bản sao trong phần mờ đục của lớp, Trộn đưa phần tô của lớp trở lại, còn Hiệu ứng lan ra ngoài cho phép các hiệu ứng sau như Giãn kéo bản sao vượt qua rìa lớp.",
    "name": "Lớp điều chỉnh",
    "params": {
     "mask": {
@@ -57,6 +57,9 @@
     },
     "mix": {
      "label": "Trộn"
+    },
+    "spill": {
+     "label": "Hiệu ứng lan ra ngoài"
     }
    }
   },
@@ -231,6 +234,13 @@
     },
     "contrast": {
      "label": "Độ tương phản"
+    },
+    "style": {
+     "label": "Kiểu",
+     "options": [
+      "Theo từng kênh",
+      "Giữ màu"
+     ]
     }
    }
   },
@@ -424,7 +434,7 @@
    }
   },
   "chromaticzoomblur": {
-   "description": "Nhòe thu phóng từ một điểm tâm, kéo màu đỏ vào trong và màu xanh lam ra ngoài, khiến các cạnh lan thành viền cầu vồng.",
+   "description": "Nhòe phóng to từ một điểm giữa, kéo màu xanh dương vào trong và màu đỏ ra ngoài, khiến các cạnh lan thành viền cầu vồng.",
    "name": "Nhòe thu phóng sắc màu",
    "params": {
     "amount": {
@@ -532,7 +542,7 @@
    }
   },
   "colorize": {
-   "description": "Nhuộm toàn bộ lớp bằng một tông màu mà vẫn giữ ánh sáng và bóng tối. Độ bão hòa quyết định độ mạnh của tông màu; dưới 100% lớp ngả dần sang xám.",
+   "description": "Nhuộm toàn bộ lớp bằng một tông màu. Sáng và tối ánh xạ độ sáng của lớp lên tông màu; Giữ độ sáng giữ nguyên độ sáng của từng điểm ảnh và thay bằng màu của tông màu.",
    "name": "Nhuộm màu",
    "params": {
     "amount": {
@@ -541,8 +551,12 @@
     "hue": {
      "label": "Tông màu"
     },
-    "saturation": {
-     "label": "Độ bão hòa"
+    "style": {
+     "label": "Kiểu",
+     "options": [
+      "Sáng và tối",
+      "Giữ độ sáng"
+     ]
     }
    }
   },
@@ -1408,6 +1422,13 @@
     },
     "speed": {
      "label": "Tần số"
+    },
+    "style": {
+     "label": "Chế độ",
+     "options": [
+      "Nháy",
+      "Ổn định"
+     ]
     }
    }
   },
@@ -1737,6 +1758,13 @@
       "Phản chiếu",
       "Góc"
      ]
+    },
+    "style": {
+     "label": "Độ dài",
+     "options": [
+      "Hộp",
+      "Bầu dục"
+     ]
     }
    }
   },
@@ -2016,6 +2044,13 @@
     },
     "shadows": {
      "label": "Vùng tối"
+    },
+    "style": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Giữ màu"
+     ]
     }
    }
   },
@@ -2082,6 +2117,13 @@
     },
     "saturation": {
      "label": "Độ bão hòa"
+    },
+    "style": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Giữ độ sáng"
+     ]
     },
     "vibrance": {
      "label": "Độ sống động"
@@ -4211,6 +4253,9 @@
     "offset": {
      "label": "Độ lệch"
     },
+    "relative": {
+     "label": "Đo theo kích thước lớp"
+    },
     "spread": {
      "label": "Độ lan"
     },
@@ -5018,6 +5063,13 @@
     "strength": {
      "label": "Cường độ"
     },
+    "style": {
+     "label": "Kiểu",
+     "options": [
+      "Bo tròn",
+      "Bầu dục mềm"
+     ]
+    },
     "tint": {
      "label": "Phủ màu"
     }
@@ -5086,6 +5138,9 @@
     },
     "feather": {
      "label": "Làm mềm"
+    },
+    "softness": {
+     "label": "Độ mềm"
     },
     "start": {
      "label": "Bắt đầu"

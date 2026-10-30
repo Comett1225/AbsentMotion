@@ -3,7 +3,7 @@
  "name": "Adjustment Layer",
  "category": "color",
  "native": true,
- "description": "Copies what is drawn beneath the layer so later effects can change it. Mask To Layer limits the copy to the opaque parts of the layer. Mix brings the layer fill back.",
+ "description": "Copies what is drawn beneath the layer so later effects can change it. Mask To Layer limits the copy to the opaque parts of the layer. Mix brings the layer fill back. Effects Reach Outside lets later effects, such as Stretch, carry the copy past the layer's edges.",
  "params": [
   {
    "id": "mix",
@@ -20,6 +20,12 @@
    "type": "switch",
    "default": true,
    "legacyDefault": false
+  },
+  {
+   "id": "spill",
+   "label": "Effects Reach Outside",
+   "type": "switch",
+   "default": false
   }
  ]
 }

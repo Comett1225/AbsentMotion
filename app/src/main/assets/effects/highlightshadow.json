@@ -22,7 +22,17 @@
    "min": 0.0,
    "max": 2.0,
    "step": 0.01
+  },
+  {
+   "id": "style",
+   "label": "Style",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Classic",
+    "Keep Colour"
+   ]
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float highlights;\nuniform float shadows;\nhalf4 main(float2 coord)\n{\n    half4 c = image.eval(coord);\n    if (c.a <= 0.001) return half4(0.0);\n    half3 col = c.rgb / c.a;\n    half l = saturate(dot(col, half3(0.2126, 0.7152, 0.0722)));\n    half hi = 1.89 * pow(l, 3.5) * (1.0 - l);\n    half lo = 1.89 * pow(1.0 - l, 3.5) * l;\n    half3 outc = clamp(col + (highlights - 1.0) * hi + (shadows - 1.0) * lo, 0.0, 1.0);\n    return half4(outc * c.a, c.a);\n}"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float highlights;\nuniform float shadows;\nuniform float style;\nhalf4 main(float2 coord)\n{\n    half4 c = image.eval(coord);\n    if (c.a <= 0.001) return half4(0.0);\n    half3 col = c.rgb / c.a;\n    half l = saturate(dot(col, half3(0.2126, 0.7152, 0.0722)));\n    half hi = 1.89 * pow(l, 3.5) * (1.0 - l);\n    half lo = 1.89 * pow(1.0 - l, 3.5) * l;\n    half3 outc = clamp(col + (highlights - 1.0) * hi + (shadows - 1.0) * lo, 0.0, 1.0);\n    if (style > 0.5) {\n        float y = dot(float3(col), float3(0.299, 0.587, 0.114));\n        float o = y + (highlights - 1.0) * 1.397 * smoothstep(0.5, 1.0, y) * (1.0 - y) - (1.0 - shadows) * 1.873 * (1.0 - smoothstep(0.0, 0.5, y)) * y;\n        outc = half3(clamp(float3(col) * max(o, 0.0) / max(y, 0.0001), 0.0, 1.0));\n    }\n    return half4(outc * c.a, c.a);\n}"
 }

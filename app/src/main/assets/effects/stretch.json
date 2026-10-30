@@ -39,7 +39,13 @@
    "min": 0,
    "max": 500,
    "step": 1
+  },
+  {
+   "id": "relative",
+   "label": "Measure In Layer Size",
+   "type": "switch",
+   "default": false
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float angle;\nuniform float stretch;\nuniform float offset;\nuniform float spread;\nhalf4 main(float2 coord) {\n    float r = radians(angle);\n    float2 dir = float2(cos(r), sin(r));\n    float d = dot(coord - 0.5 * size, dir) - offset;\n    float gap = 0.5 * max(stretch, 0.0);\n    float2 from = abs(d) <= gap ? coord - dir * d + dir * (d / max(gap, 0.001)) * spread : coord - dir * sign(d) * gap;\n    return image.eval(from);\n}"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float angle;\nuniform float stretch;\nuniform float offset;\nuniform float spread;\nuniform float relative;\nhalf4 main(float2 coord) {\n    float r = radians(angle);\n    float2 dir = float2(cos(r), sin(r));\n    float unit = relative > 0.5 ? (abs(size.x * dir.x) + abs(size.y * dir.y)) * 0.001 : 1.0;\n    float d = dot(coord - 0.5 * size, dir) - offset * unit;\n    float gap = 0.5 * max(stretch, 0.0) * unit;\n    float2 from = abs(d) <= gap ? coord - dir * d + dir * (d / max(gap, 0.001)) * spread : coord - dir * sign(d) * gap;\n    return image.eval(from);\n}"
 }

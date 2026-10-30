@@ -63,7 +63,17 @@
    "label": "Punch Out",
    "type": "switch",
    "default": false
+  },
+  {
+   "id": "style",
+   "label": "Style",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Rounded",
+    "Soft Oval"
+   ]
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float extent;\nuniform float strength;\nuniform float rounding;\nuniform float feather;\nuniform float tint;\nlayout(color) uniform half4 color;\nuniform float punch;\n\nhalf4 main(float2 coord) {\n    half4 c = image.eval(coord);\n    if (c.a <= 0.0001) return half4(0);\n    float2 n = abs((coord / max(size, float2(1.0)) - 0.5) * 2.0);\n    float p = max(rounding, 0.5);\n    float d = pow(pow(n.x, p) + pow(n.y, p), 1.0 / p);\n    float s = max(extent, 0.001);\n    float v = smoothstep(s * (1.0 - feather * 0.25), s * (1.0 + feather * 3.0) + 0.001, d) * clamp(strength, 0.0, 1.0);\n    if (punch > 0.5) return c * half(1.0 - v);\n    float3 rgb = float3(c.rgb / c.a);\n    rgb = mix(max(rgb - v * (1.0 - tint), 0.0), float3(color.rgb), tint * v);\n    return half4(half3(rgb) * c.a, c.a);\n}"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float extent;\nuniform float strength;\nuniform float rounding;\nuniform float feather;\nuniform float tint;\nlayout(color) uniform half4 color;\nuniform float punch;\nuniform float style;\n\nhalf4 main(float2 coord) {\n    half4 c = image.eval(coord);\n    if (c.a <= 0.0001) return half4(0);\n    float2 n = abs((coord / max(size, float2(1.0)) - 0.5) * 2.0);\n    float p = max(rounding, 0.5);\n    float d = pow(pow(n.x, p) + pow(n.y, p), 1.0 / p);\n    float s = max(extent, 0.001);\n    float v = smoothstep(s * (1.0 - feather * 0.25), s * (1.0 + feather * 3.0) + 0.001, d) * clamp(strength, 0.0, 1.0);\n    if (punch > 0.5) return c * half(1.0 - v);\n    float3 rgb = float3(c.rgb / c.a);\n    if (style > 0.5) {\n        float q = exp2(clamp(rounding, 0.0, 4.0));\n        float r = pow(pow(n.x, q) + pow(n.y, q), 1.0 / q);\n        float w = 0.287 * feather + 0.002;\n        float m = smoothstep(extent - 1.159 * w, extent + w, r) * clamp(strength, 0.0, 1.0);\n        if (punch > 0.5) return c * half(1.0 - m);\n        rgb = mix(max(rgb - 0.205 * m, 0.0), float3(color.rgb), clamp(0.931 * tint * m, 0.0, 1.0));\n        return half4(half3(rgb) * c.a, c.a);\n    }\n    rgb = mix(max(rgb - v * (1.0 - tint), 0.0), float3(color.rgb), tint * v);\n    return half4(half3(rgb) * c.a, c.a);\n}"
 }

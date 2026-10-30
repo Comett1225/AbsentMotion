@@ -49,7 +49,7 @@
    }
   },
   "backdrop": {
-   "description": "Copia lo que se dibuja debajo de la capa para que los efectos posteriores puedan modificarlo. Enmascarar a la capa limita la copia a las partes opacas de la capa. Mezcla recupera el relleno de la capa.",
+   "description": "Copia lo que se dibuja debajo de la capa para que los efectos posteriores puedan modificarlo. Máscara a capa limita la copia a las partes opacas de la capa. Mezcla devuelve el relleno de la capa. Efectos hacia afuera permite que efectos posteriores, como Estirar, lleven la copia más allá de los bordes de la capa.",
    "name": "Capa de ajuste",
    "params": {
     "mask": {
@@ -57,6 +57,9 @@
     },
     "mix": {
      "label": "Mezcla"
+    },
+    "spill": {
+     "label": "Efectos hacia afuera"
     }
    }
   },
@@ -231,6 +234,13 @@
     },
     "contrast": {
      "label": "Contraste"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Por canal",
+      "Conservar color"
+     ]
     }
    }
   },
@@ -424,7 +434,7 @@
    }
   },
   "chromaticzoomblur": {
-   "description": "Un desenfoque de zoom desde un punto central que atrae el rojo hacia adentro y el azul hacia afuera, así los bordes se abren en franjas de arcoíris.",
+   "description": "Un desenfoque de zoom desde un punto central que atrae el azul hacia adentro y el rojo hacia afuera, haciendo que los bordes se expandan en franjas de arcoíris.",
    "name": "Desenfoque de zoom cromático",
    "params": {
     "amount": {
@@ -532,7 +542,7 @@
    }
   },
   "colorize": {
-   "description": "Tiñe toda la capa con un solo tono y conserva su luz y su sombra. La saturación define qué tan fuerte es el tono; por debajo de 100% la capa tiende al gris.",
+   "description": "Tiñe toda la capa con un solo matiz. Luz y sombra asigna el brillo de la capa al matiz; Mantener brillo conserva el brillo de cada píxel y lo sustituye por el color del matiz.",
    "name": "Colorear",
    "params": {
     "amount": {
@@ -541,8 +551,12 @@
     "hue": {
      "label": "Matiz"
     },
-    "saturation": {
-     "label": "Saturación"
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Luz y sombra",
+      "Mantener brillo"
+     ]
     }
    }
   },
@@ -1408,6 +1422,13 @@
     },
     "speed": {
      "label": "Frecuencia"
+    },
+    "style": {
+     "label": "Modo",
+     "options": [
+      "Parpadeo",
+      "Constante"
+     ]
     }
    }
   },
@@ -1737,6 +1758,13 @@
       "Reflejado",
       "Ángulo"
      ]
+    },
+    "style": {
+     "label": "Longitud",
+     "options": [
+      "Caja",
+      "Óvalo"
+     ]
     }
    }
   },
@@ -2016,6 +2044,13 @@
     },
     "shadows": {
      "label": "Sombras"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Clásico",
+      "Conservar color"
+     ]
     }
    }
   },
@@ -2082,6 +2117,13 @@
     },
     "saturation": {
      "label": "Saturación"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Clásico",
+      "Conservar brillo"
+     ]
     },
     "vibrance": {
      "label": "Vibrancia"
@@ -4211,6 +4253,9 @@
     "offset": {
      "label": "Desplazamiento"
     },
+    "relative": {
+     "label": "Medir en tamaño de capa"
+    },
     "spread": {
      "label": "Dispersión"
     },
@@ -5018,6 +5063,13 @@
     "strength": {
      "label": "Intensidad"
     },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Redondeado",
+      "Óvalo suave"
+     ]
+    },
     "tint": {
      "label": "Tinte"
     }
@@ -5086,6 +5138,9 @@
     },
     "feather": {
      "label": "Difuminado"
+    },
+    "softness": {
+     "label": "Suavidad"
     },
     "start": {
      "label": "Inicio"

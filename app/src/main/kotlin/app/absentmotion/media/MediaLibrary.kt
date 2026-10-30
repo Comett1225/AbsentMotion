@@ -115,7 +115,6 @@ internal fun decodePicture(resolver: ContentResolver, uri: Uri, limit: Int, keep
     if (bounds.outWidth <= 0 || bounds.outHeight <= 0) null else {
         val options = BitmapFactory.Options().apply {
             inPreferredConfig = Bitmap.Config.ARGB_8888
-            inPreferredColorSpace = android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.SRGB)
             inScaled = false
             inSampleSize = pictureSample(maxOf(bounds.outWidth, bounds.outHeight), limit)
         }

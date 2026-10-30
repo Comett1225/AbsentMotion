@@ -15,6 +15,7 @@ public:
     std::string load(const std::string& xml);
     bool active(const Layer& layer) const;
     bool lifted(const Layer& layer) const;
+    bool spills(const Layer& layer) const;
     bool behind(const Layer& layer) const;
     bool steady(const Layer& layer, float from, float to) const;
     bool draw(SkCanvas* canvas, const Scene& scene, const Layer& layer, double timeMs, const SkRect& area, const SkMatrix& placed,

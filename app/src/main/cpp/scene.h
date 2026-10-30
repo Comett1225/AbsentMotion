@@ -279,6 +279,7 @@ void DrawModel(SkCanvas* canvas, const Layer& layer, double timeMs, float alpha,
 struct LayerEffects {
     std::function<bool(const Layer&)> active;
     std::function<bool(const Layer&)> lifted;
+    std::function<bool(const Layer&)> spills;
     std::function<bool(const Layer&)> behind;
     std::function<bool(SkCanvas*, const Scene&, const Layer&, double, const SkRect&, const SkMatrix&, const std::function<void(SkCanvas*)>&,
                        const std::function<void(SkCanvas*)>&)> draw;

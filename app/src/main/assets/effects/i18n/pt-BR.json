@@ -49,7 +49,7 @@
    }
   },
   "backdrop": {
-   "description": "Copia o que é desenhado sob a camada para que efeitos posteriores possam alterá-lo. Máscara para a camada limita a cópia às partes opacas da camada. Mistura restaura o preenchimento da camada.",
+   "description": "Copia o que é desenhado abaixo da camada para que efeitos posteriores possam alterá-lo. Máscara na camada limita a cópia às partes opacas da camada. Misturar traz de volta o preenchimento da camada. Efeitos se estendem para fora permite que efeitos seguintes, como Esticar, levem a cópia além das bordas da camada.",
    "name": "Camada de ajuste",
    "params": {
     "mask": {
@@ -57,6 +57,9 @@
     },
     "mix": {
      "label": "Mistura"
+    },
+    "spill": {
+     "label": "Efeitos se estendem para fora"
     }
    }
   },
@@ -231,6 +234,13 @@
     },
     "contrast": {
      "label": "Contraste"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Por canal",
+      "Manter cor"
+     ]
     }
    }
   },
@@ -424,7 +434,7 @@
    }
   },
   "chromaticzoomblur": {
-   "description": "Um desfoque de zoom a partir de um ponto central que puxa o vermelho para dentro e o azul para fora, espalhando as bordas em franjas de arco-íris.",
+   "description": "Desfoque de zoom a partir de um ponto central que puxa o azul para dentro e o vermelho para fora, espalhando as bordas em franjas de arco-íris.",
    "name": "Desfoque de zoom cromático",
    "params": {
     "amount": {
@@ -532,7 +542,7 @@
    }
   },
   "colorize": {
-   "description": "Colore toda a camada com um único matiz, mantendo seus tons claros e escuros. A saturação define a força do matiz; abaixo de 100% a camada tende ao cinza.",
+   "description": "Colore toda a camada com um único tom. Luz e sombra mapeia o brilho da camada no tom; Manter brilho preserva o brilho de cada pixel e troca a cor pelo tom.",
    "name": "Colorir",
    "params": {
     "amount": {
@@ -541,8 +551,12 @@
     "hue": {
      "label": "Matiz"
     },
-    "saturation": {
-     "label": "Saturação"
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Luz e sombra",
+      "Manter brilho"
+     ]
     }
    }
   },
@@ -1408,6 +1422,13 @@
     },
     "speed": {
      "label": "Frequência"
+    },
+    "style": {
+     "label": "Modo",
+     "options": [
+      "Piscar",
+      "Constante"
+     ]
     }
    }
   },
@@ -1737,6 +1758,13 @@
       "Refletido",
       "Angular"
      ]
+    },
+    "style": {
+     "label": "Comprimento",
+     "options": [
+      "Caixa",
+      "Oval"
+     ]
     }
    }
   },
@@ -2016,6 +2044,13 @@
     },
     "shadows": {
      "label": "Sombras"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Clássico",
+      "Manter cor"
+     ]
     }
    }
   },
@@ -2082,6 +2117,13 @@
     },
     "saturation": {
      "label": "Saturação"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Clássico",
+      "Manter brilho"
+     ]
     },
     "vibrance": {
      "label": "Vibração"
@@ -4211,6 +4253,9 @@
     "offset": {
      "label": "Deslocamento"
     },
+    "relative": {
+     "label": "Medir no tamanho da camada"
+    },
     "spread": {
      "label": "Expansão"
     },
@@ -5018,6 +5063,13 @@
     "strength": {
      "label": "Intensidade"
     },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Arredondada",
+      "Oval suave"
+     ]
+    },
     "tint": {
      "label": "Matiz"
     }
@@ -5085,6 +5137,9 @@
      "label": "Fim"
     },
     "feather": {
+     "label": "Suavidade"
+    },
+    "softness": {
      "label": "Suavidade"
     },
     "start": {
