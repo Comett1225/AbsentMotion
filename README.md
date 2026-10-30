@@ -209,6 +209,11 @@ The app is built with Gradle (`app/`) and has a C++ engine on top of Skia, which
 Read [`CONTRIBUTING.md`](CONTRIBUTING.md) before opening a pull request. To report a security problem, see
 [`SECURITY.md`](SECURITY.md).
 
+## Credits
+
+Thanks to [TrueMotion](https://github.com/Mushroom65/TrueMotion) by Mushroom65, a project based on AbsentMotion, for feature
+ideas, including the Particles effect planned for 4.4.
+
 ## Licence
 
 AbsentMotion is released under the [Apache License 2.0](LICENSE). See [`NOTICE`](NOTICE) and
