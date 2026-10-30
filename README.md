@@ -164,6 +164,8 @@ which build to download.
 
 The full [roadmap](https://comett1225.github.io/AbsentMotion/roadmap.html) lists what each upcoming version will bring.
 
+**4.4 is the last 4.x version.** If there is an effect or feature you would like, [request it](https://github.com/Comett1225/AbsentMotion/issues/new?template=feature_request.yml) now: from 5.0 on, new features will come more slowly and in smaller numbers than in the 4.x updates.
+
 Possibly a PC version as I love the layout and also simplicity of it. Not sure if chromebooks automatically supported from this being an android app but most likely support will arrive to
 - Windows 10/11 (maybe 8/8.1)
 - MacOS 15 to 27
