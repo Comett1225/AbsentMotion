@@ -159,7 +159,7 @@ private fun SpeedSlider(speed: Float, state: EditorState, modifier: Modifier) {
             drawLine(grey, Offset(x, cy - 15.dp.toPx()), Offset(x, cy - 10.dp.toPx()), 1.dp.toPx(), StrokeCap.Round)
             drawLine(grey, Offset(x, cy + 10.dp.toPx()), Offset(x, cy + 15.dp.toPx()), 1.dp.toPx(), StrokeCap.Round)
         }
-        drawCircle(Am.OnDark, thumb / 2, Offset(coord((speed * 1000).toInt().coerceIn(1, 4000), size.width, thumb, margin), cy))
+        drawCircle(Am.OnDark, thumb / 2, Offset(coord((speed * 1000 + 0.5f).toInt().coerceIn(1, 4000), size.width, thumb, margin), cy))
     }
 }
 

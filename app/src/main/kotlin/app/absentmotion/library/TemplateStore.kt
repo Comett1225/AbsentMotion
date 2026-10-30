@@ -39,7 +39,7 @@ class TemplateStore(private val root: File, private val open: (String) -> InputS
     }
 
     fun delete(id: String) {
-        File(root, id).deleteRecursively()
+        root.child(id).deleteRecursively()
     }
 
     suspend fun add(scene: Scene, timeMs: Int, engine: EngineThread): String = withContext(Dispatchers.IO) {

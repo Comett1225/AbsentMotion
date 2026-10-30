@@ -280,7 +280,7 @@ class DeviceCapabilities private constructor(context: Context) {
                 exportVideo(engine, scene, ProbeScene, s, file.fd, null, progress = { if (first == 0L && it > 0f) first = SystemClock.elapsedRealtime(); progress(it) })
             }
             val ms = SystemClock.elapsedRealtime() - start
-            return ProbeResult(s.codec, w, h, frameCount(scene, s.fps), ms, (first - start).coerceIn(0, ms - 1))
+            return ProbeResult(s.codec, w, h, frameCount(scene, s.fps), ms, (first - start).coerceIn(0, maxOf(ms - 1, 0)))
         } finally {
             out.delete()
         }

@@ -24,7 +24,7 @@ data class Stroke(val points: List<StrokePoint>, val color: Int, val tool: DrawT
     companion object {
         fun parse(node: XmlNode): Stroke = Stroke(
             node["points"].orEmpty().split(';').mapNotNull { group ->
-                val v = group.split(',').mapNotNull { it.trim().finiteFloat() }
+                val v = group.split(',').map { it.trim().finiteFloat() ?: return@mapNotNull null }
                 if (v.size >= 3) StrokePoint(v[0], v[1], v[2]) else null
             },
             parseColor(node["color"]) ?: 0xFF0000FF.toInt(),

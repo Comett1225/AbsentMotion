@@ -68,7 +68,7 @@ fun woffToSfnt(bytes: ByteArray): ByteArray {
         val offset = u32(bytes, entry + 4).toInt()
         val compressed = u32(bytes, entry + 8).toInt()
         val original = u32(bytes, entry + 12).toInt()
-        if (offset < 0 || compressed < 0 || original < 0 || offset + compressed > bytes.size || compressed > original || original > MAX_FONT_BYTES) throw FontImportError(FontProblem.Corrupted)
+        if (offset < 0 || compressed < 0 || original < 0 || offset.toLong() + compressed > bytes.size || compressed > original || original > MAX_FONT_BYTES) throw FontImportError(FontProblem.Corrupted)
         unpacked += original
         if (unpacked > MAX_FONT_BYTES) throw FontImportError(FontProblem.TooLarge)
         val data = if (compressed == original) bytes.copyOfRange(offset, offset + compressed) else inflate(bytes, offset, compressed, original)

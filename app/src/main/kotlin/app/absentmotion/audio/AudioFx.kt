@@ -99,8 +99,8 @@ value class AudioFx(val node: XmlNode) {
         return if (param.choices.isEmpty()) value else if (value >= (param.min + param.max) / 2) param.max else param.min
     }
 
-    fun with(param: FxParam, value: Float) = AudioFx(node.with(param.key, number(value.coerceIn(param.min, param.max))))
-    fun withMix(value: Float) = AudioFx(node.with("mix", number(value.coerceIn(0f, 1f))))
+    fun with(param: FxParam, value: Float) = if (value.isNaN()) this else AudioFx(node.with(param.key, number(value.coerceIn(param.min, param.max))))
+    fun withMix(value: Float) = if (value.isNaN()) this else AudioFx(node.with("mix", number(value.coerceIn(0f, 1f))))
     fun withBypass(value: Boolean) = AudioFx(node.with("bypass", if (value) "true" else null))
     fun reset(): AudioFx {
         val keys = kind?.params?.map { it.key }.orEmpty() + "mix"

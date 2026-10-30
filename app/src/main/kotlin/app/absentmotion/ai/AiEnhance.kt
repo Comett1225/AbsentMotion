@@ -56,8 +56,8 @@ internal class FaceBox(var cx: Float, var cy: Float, var side: Float, var missed
 internal fun trackFaces(tracks: MutableList<FaceBox>, found: List<FaceBox>, keep: Int = 8, follow: Float = 0.4f): List<FaceBox> {
     val unmatched = tracks.toMutableList()
     for (face in found) {
-        val near = unmatched.minByOrNull { abs(it.cx - face.cx) + abs(it.cy - face.cy) }
-            ?.takeIf { abs(it.cx - face.cx) + abs(it.cy - face.cy) < max(it.side, face.side) * 0.6f }
+        val near = unmatched.filter { abs(it.cx - face.cx) + abs(it.cy - face.cy) < max(it.side, face.side) * 0.6f }
+            .minByOrNull { abs(it.cx - face.cx) + abs(it.cy - face.cy) }
         if (near == null) { tracks += FaceBox(face.cx, face.cy, face.side); continue }
         unmatched -= near
         near.cx += (face.cx - near.cx) * follow
@@ -107,7 +107,7 @@ private class FaceWork(private val net: AiNet, orientation: Int) : FrameWork {
         val seen = detect(argb, width, height)
         if (seen.isNotEmpty()) found = true
         for (face in trackFaces(tracks, seen)) {
-            val side = face.side.roundToInt().coerceIn(16, min(width, height))
+            val side = face.side.roundToInt().coerceAtLeast(16).coerceAtMost(min(width, height))
             val x0 = (face.cx - side / 2f).roundToInt().coerceIn(0, width - side)
             val y0 = (face.cy - side / 2f).roundToInt().coerceIn(0, height - side)
             val crop = IntArray(side * side) { argb[(y0 + it / side) * width + x0 + it % side] }

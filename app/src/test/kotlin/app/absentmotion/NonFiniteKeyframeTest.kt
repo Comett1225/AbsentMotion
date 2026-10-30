@@ -3,6 +3,8 @@ package app.absentmotion
 import app.absentmotion.model.Layer
 import app.absentmotion.model.VideoTiming
 import app.absentmotion.model.XmlNode
+import app.absentmotion.model.floats
+import app.absentmotion.model.formatFloats
 import app.absentmotion.model.keyframes
 import app.absentmotion.model.valueAt
 import org.junit.Assert.assertEquals
@@ -35,5 +37,16 @@ class NonFiniteKeyframeTest {
         for (ms in listOf(0.0, 500.0, 1500.0, 2999.0, 5000.0)) assertTrue(timing.mediaMs(ms).isFinite())
         val constant = Layer(layer.node.copy(children = listOf(XmlNode("speedMap", linkedMapOf("value" to "NaN")))))
         assertEquals(1000.0, VideoTiming(constant).mediaMs(1000.0), 1e-6)
+    }
+
+    @Test fun invalidNumbersKeepTheirPlaceAndAreNeverWritten() {
+        assertEquals(listOf(7f, 5f, 0f), floats("NaN,5", floatArrayOf(7f, 8f, 0f)).toList())
+        assertEquals(listOf(1f, 0f, 3f), floats("1,x,3,", FloatArray(0)).toList())
+        assertEquals("0.000000,2.000000", formatFloats(floatArrayOf(Float.NaN, 2f)))
+    }
+
+    @Test fun aLayerEndingBeforeItStartsReadsAsZeroLength() {
+        val layer = Layer(XmlNode("shape", linkedMapOf("id" to "1", "startTime" to "500", "endTime" to "100")))
+        assertEquals(500, layer.endTime)
     }
 }

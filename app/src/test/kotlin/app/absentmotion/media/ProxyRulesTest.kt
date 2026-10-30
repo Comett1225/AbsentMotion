@@ -51,11 +51,12 @@ class ProxyRulesTest {
     }
 
     @Test fun theLongestGopIncludesTheTail() {
-        fun gap(vararg syncs: Long, last: Long) = longestSyncGap(Stamps().apply { syncs.forEach(::add) }.sortedDistinct(), last)
+        fun gap(vararg syncs: Long, last: Long, first: Long = 0L) = longestSyncGap(Stamps().apply { syncs.forEach(::add) }.sortedDistinct(), last, first)
         assertEquals(1_000_000L, gap(0L, 1_000_000L, 2_000_000L, last = 2_900_000L))
         assertEquals(5_000_000L, gap(0L, last = 5_000_000L))
         assertEquals(3_000_000L, gap(4_000_000L, 0L, 1_000_000L, last = 4_500_000L))
         assertEquals(Long.MAX_VALUE, gap(last = 1_000_000L))
+        assertEquals(3_000_000L, gap(3_000_000L, 4_000_000L, last = 4_500_000L))
     }
 
     @Test fun aCopyIsOnlyMadeWithRoomForItAndAReserve() {

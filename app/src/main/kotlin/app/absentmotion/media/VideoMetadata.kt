@@ -41,6 +41,6 @@ suspend fun videoDeclaration(context: Context, uri: Uri): MediaDeclaration? = wi
             "type" to (context.contentResolver.getType(uri) ?: "video/mp4"), "size" to "$size", "orientation" to "$rotation",
             "duration" to "$duration",
             fps?.let { "fps" to fpsText(it) }, "infoUpdated" to "${System.currentTimeMillis()}",
-            "width" to "${format.getInteger(MediaFormat.KEY_WIDTH)}", "height" to "${format.getInteger(MediaFormat.KEY_HEIGHT)}").toMap(LinkedHashMap())))
+            "width" to "${visibleSize(format).first}", "height" to "${visibleSize(format).second}").toMap(LinkedHashMap())))
     } catch (_: Exception) { null } finally { extractor.release() }
 }

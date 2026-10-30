@@ -179,10 +179,10 @@ private fun GifPreview(uri: Uri) {
 @Composable
 private fun FilePreview(uri: Uri) {
     val context = LocalContext.current
-    val name = remember(uri) {
-        runCatching {
-            context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { if (it.moveToFirst()) it.getString(0) else null }
-        }.getOrNull() ?: uri.lastPathSegment ?: ""
+    val name by androidx.compose.runtime.produceState(uri.lastPathSegment ?: "", uri) {
+        withContext(Dispatchers.IO) {
+            runCatching { context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { if (it.moveToFirst()) it.getString(0) else null } }.getOrNull()
+        }?.let { value = it }
     }
     Column(Modifier.fillMaxSize().padding(horizontal = 30.dp), Arrangement.Center, Alignment.CenterHorizontally) {
         Icon(ExportIcons.File, null, Modifier.size(72.dp), tint = Am.OnScrim)

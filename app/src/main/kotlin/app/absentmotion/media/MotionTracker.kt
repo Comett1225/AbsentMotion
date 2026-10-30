@@ -14,13 +14,13 @@ internal class MotionTracker(start: List<Pt>) : PointTracker {
     private var handle = nativeCreate(DoubleArray(count * 2) { (if (it % 2 == 0) start[it / 2].x else start[it / 2].y).toDouble() }, PATCH_RADIUS, SEARCH_RADIUS)
     private val out = DoubleArray(count * 3)
 
-    override fun track(luma: LumaFrame): TrackResult {
+    @Synchronized override fun track(luma: LumaFrame): TrackResult {
         check(handle != 0L) { "The tracker is closed" }
         val found = nativeTrack(handle, luma.pixels, luma.width, luma.height, out)
         return TrackResult(List(count) { Pt(out[3 * it].toFloat(), out[3 * it + 1].toFloat()) }, !found)
     }
 
-    override fun close() {
+    @Synchronized override fun close() {
         if (handle != 0L) nativeRelease(handle)
         handle = 0L
     }

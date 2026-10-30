@@ -27,7 +27,7 @@ private fun Scene.visualHeader(): XmlNode = node.copy(
 )
 
 private fun Layer.externalDependencies(): Boolean = kind == "camera" || kind == "embedScene" ||
-    node["parent"]?.let { it != "0" } == true || node["pathLayer"]?.let { it != "0" } == true ||
+    node["parent"]?.let { it != "0" } == true || node["pathLayer"]?.let { it != "0" } == true || node["clippingMask"] == "true" ||
     node.children.any { it.name == "effect" && it["hidden"] != "true" }
 
 internal fun previewDirtyRanges(before: Scene, after: Scene): List<IntRange> {

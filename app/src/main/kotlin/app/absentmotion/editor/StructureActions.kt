@@ -309,8 +309,9 @@ internal fun Scene.rebased(layer: Layer, parentId: Long?): Layer? {
 internal fun Scene.withWorldLocation(layer: Layer, timeMs: Int, change: (x: Float, y: Float) -> Pair<Float, Float>): Layer {
     val world = place(layer, timeMs)
     val (x, y) = change(world.x, world.y)
-    val local = chain(layer).getOrNull(1)?.let { decompose(world.copy(x = x, y = y), place(it, timeMs)) }
-    return layer.withTransform("location", local?.x ?: x, local?.y ?: y, layer.location[2])
+    val parent = chain(layer).getOrNull(1) ?: return layer.withTransform("location", x, y, layer.location[2])
+    val local = decompose(world.copy(x = x, y = y), place(parent, timeMs)) ?: return layer
+    return layer.withTransform("location", local.x, local.y, layer.location[2])
 }
 
 internal fun Scene.unparentChildrenOf(ids: Set<Long>): Scene =

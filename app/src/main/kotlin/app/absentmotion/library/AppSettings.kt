@@ -86,7 +86,7 @@ class AppSettings(private val context: Context) {
         get() = previewCopiesState
         set(value) {
             previewCopiesState = value
-            prefs.edit().putBoolean(app.absentmotion.media.VideoProxies.SETTING, value).commit()
+            prefs.edit().putBoolean(app.absentmotion.media.VideoProxies.SETTING, value).apply()
             app.absentmotion.media.VideoProxies.settingChanged()
         }
 

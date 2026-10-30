@@ -244,7 +244,9 @@ internal fun File.child(name: String): File {
     return File(this, name).also { require(it.canonicalFile.parentFile == canonicalFile) { "Unsafe file name" } }
 }
 
-internal fun writeAtomically(target: File, text: String, sync: Boolean = true) {
+private val atomicWrites = Any()
+
+internal fun writeAtomically(target: File, text: String, sync: Boolean = true) = synchronized(atomicWrites) {
     target.parentFile?.mkdirs()
     val temp = File(target.parentFile, target.name + ".tmp")
     try {

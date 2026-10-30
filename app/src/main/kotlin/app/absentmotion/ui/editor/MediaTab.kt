@@ -114,7 +114,7 @@ private suspend fun EditorState.addGif(context: Context, uri: Uri): Boolean {
     val matte = gif.matte?.let { keepCopy(context, it) }
     if (media.uri != gif.media.uri) gif.files.firstOrNull()?.delete()
     if (matte != null && matte.uri != gif.matte.uri) gif.files.getOrNull(1)?.delete()
-    val placed = scene.videoLayer(media, frame) ?: return true
+    val placed = scene.videoLayer(media, frame) ?: return fail(R.string.import_gif_failed)
     val length = maxOf(media.duration / 1000, settings.defaultLayerDuration * 1000L).toInt()
     val layer = placed.copy(node = placed.node.with("loop", "true").with("endTime", "${scene.endTimeFor(frame, length)}"))
     val groupId = Layer.newId()

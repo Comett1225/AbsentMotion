@@ -240,10 +240,10 @@ class Speech(context: Context) {
     init {
         tts.setOnUtteranceProgressListener(object : android.speech.tts.UtteranceProgressListener() {
             override fun onStart(id: String?) {}
-            override fun onDone(id: String?) { pending.remove(id)?.complete(true) }
-            @Deprecated("Deprecated in Java") override fun onError(id: String?) { pending.remove(id)?.complete(false) }
-            override fun onError(id: String?, code: Int) { pending.remove(id)?.complete(false) }
-            override fun onStop(id: String?, interrupted: Boolean) { pending.remove(id)?.complete(false) }
+            override fun onDone(id: String?) { id?.let { pending.remove(it) }?.complete(true) }
+            @Deprecated("Deprecated in Java") override fun onError(id: String?) { id?.let { pending.remove(it) }?.complete(false) }
+            override fun onError(id: String?, code: Int) { id?.let { pending.remove(it) }?.complete(false) }
+            override fun onStop(id: String?, interrupted: Boolean) { id?.let { pending.remove(it) }?.complete(false) }
         })
     }
 

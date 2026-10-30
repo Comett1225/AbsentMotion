@@ -228,7 +228,7 @@ data class Layer(val node: XmlNode, val t: Float = 0f, val snap: ClosedFloatingP
     val label: String get() = node["label"] ?: if (kind == "text") content else ""
     val shape: String get() = node["s"] ?: ""
     val startTime: Int get() = node["startTime"]?.toIntOrNull() ?: 0
-    val endTime: Int get() = node["endTime"]?.toIntOrNull() ?: 0
+    val endTime: Int get() = maxOf(startTime, node["endTime"]?.toIntOrNull() ?: 0)
     val hidden: Boolean get() = node["hidden"] == "true"
     val fillType: String get() = node["fillType"] ?: "none"
     val fillColor: Int get() = parseColor(element(PropRef.FillColor)?.valueAt(t)) ?: 0xFFFFFFFF.toInt()
@@ -383,11 +383,11 @@ data class Layer(val node: XmlNode, val t: Float = 0f, val snap: ClosedFloatingP
 }
 
 internal fun floats(text: String?, defaults: FloatArray): FloatArray {
-    val parsed = text?.split(',')?.mapNotNull { it.trim().finiteFloat() } ?: emptyList()
-    return FloatArray(maxOf(parsed.size, defaults.size)) { parsed.getOrNull(it) ?: defaults[it] }
+    val parsed = text?.split(',')?.map { it.trim().finiteFloat() }?.dropLastWhile { it == null } ?: emptyList()
+    return FloatArray(maxOf(parsed.size, defaults.size)) { parsed.getOrNull(it) ?: defaults.getOrElse(it) { 0f } }
 }
 
-fun formatFloats(values: FloatArray): String = values.joinToString(",") { String.format(Locale.US, "%.6f", it) }
+fun formatFloats(values: FloatArray): String = values.joinToString(",") { String.format(Locale.US, "%.6f", if (it.isFinite()) it else 0f) }
 
 fun parseColor(text: String?): Int? = text?.removePrefix("#")?.takeIf { it.length == 8 }?.toLongOrNull(16)?.toInt()
 

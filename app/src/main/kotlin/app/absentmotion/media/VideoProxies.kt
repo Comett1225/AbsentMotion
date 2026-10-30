@@ -92,6 +92,8 @@ object VideoProxies {
     private val queued = Collections.synchronizedSet(HashSet<String>())
     private val settled = Collections.synchronizedSet(HashSet<String>())
     private val retryAt = java.util.concurrent.ConcurrentHashMap<String, Long>()
+    private val owners = java.util.concurrent.ConcurrentHashMap<String, String>()
+    private val evicted = Collections.synchronizedSet(HashSet<String>())
     private val making = MutableStateFlow<Map<String, Float>>(emptyMap())
     private val made = MutableStateFlow(0)
     @Volatile private var generation = 0
@@ -109,7 +111,9 @@ object VideoProxies {
     internal fun ready(context: Context, uri: String, version: String?): String? {
         if (!enabled(context)) return null
         val file = File(dir(context), (ProxyRules.key(uri, version) ?: return null) + ".mp4")
-        return if (file.isFile) Uri.fromFile(file).toString() else null
+        if (!file.isFile) return null
+        file.setLastModified(System.currentTimeMillis())
+        return Uri.fromFile(file).toString()
     }
 
     internal fun request(context: Context, uri: String) {
@@ -118,7 +122,10 @@ object VideoProxies {
         val started = generation
         scope.launch {
             try { prepare(app, uri) { started != generation || paused || !enabled(app) } }
-            catch (e: Exception) { Log.w("AMProxy", "cannot make a preview copy of $uri", e) }
+            catch (e: Exception) {
+                retryAt[uri] = System.nanoTime() + ProxyRules.RETRY_NS
+                Log.w("AMProxy", "cannot make a preview copy of $uri", e)
+            }
             finally { queued.remove(uri); making.update { it - uri } }
         }
     }
@@ -150,10 +157,12 @@ object VideoProxies {
         val failed = File(folder, "$key.failed")
         if (cancelled()) return
         val failures = ProxyRules.failures(failed.takeIf { it.isFile }?.readText())
+        if (done.isFile) kept(key, uri)
         if (done.isFile || failures >= ProxyRules.MAX_TRIES) { settled += uri; return }
         val info = sourceInfo(context, uri)
         if (!ProxyRules.needed(info.width, info.height, VideoSources.syncGapUs(context, uri), info.hdr)) { settled += uri; return }
         val needed = ProxyRules.bytes(info.width, info.height, info.fps, info.durationUs)
+        if (needed > BUDGET_BYTES) { settled += uri; return }
         trim(folder, BUDGET_BYTES - needed)
         if (!ProxyRules.roomFor(folder.usableSpace, needed)) {
             Log.w("AMProxy", "no room for a preview copy of $uri: $needed bytes needed, ${folder.usableSpace} free")
@@ -179,13 +188,14 @@ object VideoProxies {
             }
             check(part.renameTo(done))
             failed.delete()
+            kept(key, uri)
             settled += uri
             Log.i("AMProxy", "preview copy of $uri ready in ${(System.nanoTime() - started) / 1_000_000} ms, ${done.length()} bytes")
             trim(folder)
             made.update { it + 1 }
         } catch (e: Exception) {
             part.delete()
-            if (!cancelled()) { failed.writeText("${failures + 1}"); retryAt[uri] = System.nanoTime() + ProxyRules.RETRY_NS }
+            if (!cancelled()) failed.writeText("${failures + 1}")
             throw e
         }
     }
@@ -194,8 +204,13 @@ object VideoProxies {
         folder.listFiles { f -> f.extension == "part" }?.forEach { it.delete() }
         val copies = folder.listFiles { f -> f.extension == "mp4" }?.sortedByDescending { it.lastModified() } ?: return
         var total = 0L
-        for (f in copies) { total += f.length(); if (total > budget) f.delete() }
+        for (f in copies) {
+            total += f.length()
+            if (total > budget && f.delete()) owners.remove(f.nameWithoutExtension)?.let { uri -> evicted += uri; settled -= uri }
+        }
     }
+
+    private fun kept(key: String, uri: String) { if (uri !in evicted) owners[key] = uri }
 }
 
 private class SourceInfo(val width: Int, val height: Int, val hdr: Boolean, val fps: Int, val durationUs: Long)
@@ -215,7 +230,7 @@ private fun sourceInfo(context: Context, uri: String): SourceInfo {
 private fun videoTrack(extractor: MediaExtractor): Pair<Int, MediaFormat> =
     (0 until extractor.trackCount).map { it to extractor.getTrackFormat(it) }.first { it.second.getString(MediaFormat.KEY_MIME)?.startsWith("video/") == true }
 
-private fun visibleSize(format: MediaFormat): Pair<Int, Int> {
+internal fun visibleSize(format: MediaFormat): Pair<Int, Int> {
     val width = format.getInteger(MediaFormat.KEY_WIDTH)
     val height = format.getInteger(MediaFormat.KEY_HEIGHT)
     if (!format.containsKey("crop-right") || !format.containsKey("crop-bottom")) return width to height
@@ -266,6 +281,7 @@ private fun transcode(context: Context, uri: String, out: File, cancelled: () ->
         var decodeDone = false
         var muxTrack = -1
         var encoded = false
+        var heard = System.nanoTime()
         fun drain(wait: Boolean): Boolean {
             var quiet = System.nanoTime()
             while (true) {
@@ -298,7 +314,9 @@ private fun transcode(context: Context, uri: String, out: File, cancelled: () ->
                 }
             }
             val index = decoder.dequeueOutputBuffer(info, 5_000)
-            if (index >= 0) {
+            if (index < 0) check(System.nanoTime() - heard < TimeUnit.SECONDS.toNanos(10)) { "the decoder stopped making the preview copy" }
+            else {
+                heard = System.nanoTime()
                 val pts = info.presentationTimeUs
                 val shown = info.size > 0
                 decodeDone = info.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0
@@ -400,6 +418,9 @@ private class ProxyGl(private val surface: Surface, private val width: Int, priv
             GLES20.glAttachShader(it, shader(GLES20.GL_VERTEX_SHADER, vertex))
             GLES20.glAttachShader(it, shader(GLES20.GL_FRAGMENT_SHADER, fragment))
             GLES20.glLinkProgram(it)
+            val ok = IntArray(1)
+            GLES20.glGetProgramiv(it, GLES20.GL_LINK_STATUS, ok, 0)
+            check(ok[0] != 0) { GLES20.glGetProgramInfoLog(it) }
         }
     }
 

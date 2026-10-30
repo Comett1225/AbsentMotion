@@ -688,9 +688,12 @@ sk_sp<SkImage> EngineImpl::importFrame(AHardwareBuffer* buffer, bool opaque, int
             if (!tex.isValid()) return nullptr;
             AHardwareBuffer_acquire(buffer);
             if (cache.size() >= kImportedPerMedia) {
-                cache.front().image.reset();
-                fDeadTextures.push_back(cache.front().held);
-                cache.erase(cache.begin());
+                auto oldest = std::min_element(cache.begin(), cache.end(), [](const ImportedTexture& a, const ImportedTexture& b) {
+                    return a.used < b.used;
+                });
+                oldest->image.reset();
+                fDeadTextures.push_back(oldest->held);
+                cache.erase(oldest);
             }
             cache.push_back({id, colorStandard, yuv, skgpu::graphite::BackendTextures::GetVkImageLayout(tex),
                              skgpu::graphite::BackendTextures::GetVkQueueFamilyIndex(tex), {tex, buffer}});

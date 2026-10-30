@@ -115,6 +115,15 @@ class ImporterSecurityTest {
         assertEquals(1, importer(files, ImportLimits(entries = 6)).import { ByteArrayInputStream(zip(entries)) }.size)
     }
 
+    @Test fun aBrokenManifestIsReportedAsADamagedPackage() {
+        val files = tmp.newFolder("files")
+        for (manifest in listOf("{", "{\"media\":[{\"entry\":\"a.jpg\"}]}")) {
+            val bytes = zip(listOf("project.xml" to scene().toByteArray(), "manifest.json" to manifest.toByteArray()))
+            assertEquals(R.string.library_err_malformed_package, failure(importer(files), bytes).id)
+        }
+        assertEquals(emptyList<ProjectInfo>(), ProjectStore(files).list())
+    }
+
     @Test fun aPackageWithTooManyScenesIsRefused() {
         val files = tmp.newFolder("files")
         val bytes = zip((1..3).map { "s$it.xml" to scene().toByteArray() } + ("manifest.json" to "{}".toByteArray()))

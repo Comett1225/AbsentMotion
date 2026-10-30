@@ -112,11 +112,11 @@ internal class FrameEncoder private constructor(
         drain(false)
     }
 
-    fun finish() {
+    fun finish(audioEndUs: Long) {
         codec.queueInputBuffer(input(), 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM)
         drain(true)
         check(track >= 0) { AppText.get(R.string.ai_encoder_not_finished) }
-        audio?.copyUntil(muxer, Long.MAX_VALUE)
+        audio?.copyUntil(muxer, audioEndUs)
         finished = true
     }
 
@@ -229,7 +229,8 @@ internal suspend fun rewriteVideo(context: Context, job: VideoJob, progress: AiP
     val file = aiFile(context, "mp4")
     val needed = (videoBitrate(media.width * job.scale, media.height * job.scale, fps) / 8.0 * seconds).roundToLong() * 2 + 50_000_000L
     check(file.parentFile!!.usableSpace >= needed) { AppText.get(R.string.ai_not_enough_storage, (needed / 1_000_000).toString()) }
-    val sound = keepSound(context, fill.uri, if (fill.outTime == Int.MAX_VALUE) media.duration else fill.outTime * 1000L)
+    val soundLimitUs = if (fill.outTime == Int.MAX_VALUE) media.duration else fill.outTime * 1000L
+    val sound = keepSound(context, fill.uri, soundLimitUs)
     val thermal = ThermalMonitor.of(context)
     thermal.start()
     var success = false
@@ -262,7 +263,7 @@ internal suspend fun rewriteVideo(context: Context, job: VideoJob, progress: AiP
                 }
             }
             progress(0.99f, AppText.get(R.string.ai_saving_video))
-            checkNotNull(encoder) { AppText.get(R.string.ai_no_video_frames) }.finish()
+            checkNotNull(encoder) { AppText.get(R.string.ai_no_video_frames) }.finish(soundEndUs(media.duration, soundLimitUs))
         }
         encoder?.close()
         encoder = null

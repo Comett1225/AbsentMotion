@@ -192,6 +192,7 @@ private suspend fun importModel(context: Context, state: EditorState, picked: Li
         val main = names.indexOfFirst { it.substringAfterLast('.').lowercase() in setOf("obj", "glb", "gltf") }
         if (main < 0) return@withContext context.getString(R.string.model_choose_file)
         val folder = File(ProjectStore(context).mediaDir(state.projectId), "model-${System.currentTimeMillis()}")
+        var added = false
         try {
             folder.mkdirs()
             var total = 0L
@@ -212,8 +213,11 @@ private suspend fun importModel(context: Context, state: EditorState, picked: Li
             val uri = File(folder, names[main]).toURI().toString()
             val (bytes, open) = modelFiles(resolver, uri)
             val count = parseModel(names[main], bytes, open).triangleCount
-            withContext(Dispatchers.Main) { state.addModel(uri, names[main]) }
+            withContext(Dispatchers.Main) { state.addModel(uri, names[main]); added = true }
             if (count > MODEL_TRIANGLE_BUDGET) context.getString(R.string.model_simplified, "$count", "$MODEL_TRIANGLE_BUDGET") else null
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            if (!added) folder.deleteRecursively()
+            throw e
         } catch (_: ModelTooLarge) {
             folder.deleteRecursively()
             context.getString(R.string.model_too_large)

@@ -19,6 +19,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.keepScreenOn
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
@@ -42,13 +43,11 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
 import app.absentmotion.ai.AiKind
 import app.absentmotion.ai.MAX_SMOOTH_FRAMES
@@ -326,13 +325,11 @@ private fun EnhanceSwitch(label: String, on: Boolean, onChange: (Boolean) -> Uni
 internal fun AiProgressDialog(tools: AiTools) {
     if (tools.message.isEmpty()) return
     val action = tools.running
-    val view = LocalView.current
-    DisposableEffect(action != null) { view.keepScreenOn = action != null; onDispose { view.keepScreenOn = false } }
     AlertDialog(onDismissRequest = { if (action == null) tools.dismiss() },
         properties = androidx.compose.ui.window.DialogProperties(dismissOnClickOutside = action == null),
         title = { Text((action ?: tools.last)?.let { stringResource(it.title) } ?: stringResource(R.string.ai), color = Am.OnDark) },
         text = {
-            Column {
+            Column(if (action != null) Modifier.keepScreenOn() else Modifier) {
                 Text(tools.message, color = Am.OnDark, fontSize = 14.sp)
                 if (action != null) {
                     Spacer(Modifier.height(16.dp))

@@ -131,7 +131,7 @@ fun TutorialHost(
         settings.tutorialProject = id
         settings.tutorialAsk = Tutorial.NEVER
         Tutorial.offerDismissed = true
-        Tutorial.tour = Tour(startAt = if (resume) settings.tutorialStep else null).also { settings.tutorialStep = it.step.id }
+        Tutorial.tour = Tour(startAt = if (saved != null) settings.tutorialStep else null).also { settings.tutorialStep = it.step.id }
         if (current?.projectId != id) onOpen(id)
     }
 

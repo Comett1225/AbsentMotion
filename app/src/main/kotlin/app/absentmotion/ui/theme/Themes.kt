@@ -22,7 +22,7 @@ object ThemeFile {
     }
 
     fun parse(text: String): Theme {
-        val json = try { JSONObject(text) } catch (e: Exception) { throw ThemeError(txt(R.string.settings_theme_not_theme_file)) }
+        val json = try { JSONObject(text.removePrefix("\uFEFF")) } catch (e: Exception) { throw ThemeError(txt(R.string.settings_theme_not_theme_file)) }
         val colours = HashMap<String, Color>()
         for (key in Palette.Names) {
             if (!json.has(key)) continue
@@ -52,8 +52,7 @@ object Themes {
     fun import(context: Context, text: String): Theme {
         val theme = ThemeFile.parse(text)
         val file = customFile(context)
-        file.parentFile?.mkdirs()
-        file.writeText(text)
+        app.absentmotion.library.writeAtomically(file, text, sync = false)
         return theme
     }
 }

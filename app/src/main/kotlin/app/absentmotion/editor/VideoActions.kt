@@ -40,7 +40,7 @@ fun EditorState.retimeVideo(start: Boolean) {
 }
 
 fun EditorState.setVideoSpeed(value: Float, mediaTimeNs: Float, original: Layer) {
-    if (selectedId != original.id) return
+    if (selectedId != original.id || value.isNaN()) return
     val layer = original
     val speed = value.coerceIn(0.001f, 4f)
     val map = layer.node.child("speedMap") ?: XmlNode("speedMap", mapOf("value" to (layer.node["speed"] ?: "1")))

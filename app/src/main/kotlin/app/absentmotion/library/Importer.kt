@@ -173,7 +173,7 @@ class Importer(
             ids.forEach { store.mediaDir(it).deleteRecursively() }
             saved.forEach { store.delete(it.id) }
             fontFiles.forEach { it.delete() }
-            if (t is IOException) throw ImportFailed(txt(R.string.library_err_malformed_package, t.message.toString()))
+            if (t is IOException || t is org.json.JSONException) throw ImportFailed(txt(R.string.library_err_malformed_package, t.message.toString()))
             throw t
         }
     }

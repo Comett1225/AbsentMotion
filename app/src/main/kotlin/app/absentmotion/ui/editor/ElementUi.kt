@@ -77,7 +77,9 @@ internal fun rememberSaveToMyElements(state: EditorState): (done: () -> Unit) ->
         scope.launch {
             try {
                 if (state.saveToMyElements(store)) Toast.makeText(context, context.getString(R.string.element_saved_to_my_assets), Toast.LENGTH_SHORT).show()
-            } catch (e: java.io.IOException) {
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
+            } catch (e: Exception) {
                 Toast.makeText(context, context.getString(R.string.element_save_failed), Toast.LENGTH_LONG).show()
             }
             done()
@@ -164,7 +166,7 @@ internal fun ElementProperties(state: EditorState, onBack: () -> Unit, modifier:
                 missing = false
                 val nested = layer.nested
                 scope.launch {
-                    val saved = withContext(Dispatchers.IO) { runCatching { nested?.let { store.save(store.linkOf(link), it) } }.isSuccess }
+                    val saved = withContext(Dispatchers.IO) { nested != null && runCatching { store.save(store.linkOf(link), nested) }.isSuccess }
                     Toast.makeText(context, context.getString(if (saved) R.string.element_saved_to_my_assets else R.string.element_save_failed), if (saved) Toast.LENGTH_SHORT else Toast.LENGTH_LONG).show()
                 }
             }) { Text(stringResource(R.string.rebuild_source_project), color = Am.Accent) }

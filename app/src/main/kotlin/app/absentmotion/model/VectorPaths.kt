@@ -99,7 +99,7 @@ private val XmlNode.isAnimatedPath: Boolean get() = sources().any { s -> s.child
 private fun XmlNode.vec(name: String, t: Float, exact: Boolean): Pt? {
     val part = child(name) ?: return null
     val text = if (exact) part.keyframes.firstOrNull { abs(it.t - t) <= KEY_EPSILON }?.v ?: part.valueAt(t) else part.valueAt(t)
-    return text?.split(',')?.mapNotNull { it.trim().finiteFloat() }?.takeIf { it.size >= 2 }?.let { Pt(it[0], it[1]) }
+    return text?.split(',')?.map { it.trim().finiteFloat() ?: return null }?.takeIf { it.size >= 2 }?.let { Pt(it[0], it[1]) }
 }
 
 private const val KEY_EPSILON = 1e-6f

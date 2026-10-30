@@ -74,7 +74,7 @@ internal fun FontBrowser(library: FontLibrary, onSelect: (String) -> Unit, onClo
             uris.forEach { uri ->
                 val problem = try { library.import(uri); null } catch (e: kotlinx.coroutines.CancellationException) { throw e } catch (e: FontImportError) { e.problem } catch (_: Exception) { FontProblem.Corrupted }
                 if (problem != null) failures += app.absentmotion.i18n.AppText.get(R.string.font_import_reason_line,
-                    runCatching { context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { if (it.moveToFirst()) it.getString(0) else null } }.getOrNull() ?: uri.lastPathSegment ?: "",
+                    withContext(Dispatchers.IO) { runCatching { context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { if (it.moveToFirst()) it.getString(0) else null } }.getOrNull() } ?: uri.lastPathSegment ?: "",
                     app.absentmotion.i18n.AppText.get(FontReasons.getValue(problem)))
             }
             if (failures.isNotEmpty()) error = FontError(if (failures.size == uris.size) R.string.font_import_failed_title else R.string.font_import_some_failed_title, R.string.font_import_reasons_body, failures.joinToString("\n"))

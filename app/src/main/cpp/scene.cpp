@@ -324,7 +324,7 @@ bool ParseLayer(const XmlNode& node, int fps, Layer* out) {
     l.video = l.fillType == "media" && StrAttr(*n, "fillImage").empty() && !l.mediaUri.empty();
     l.mediaFillMode = StrAttr(*n, "mediaFillMode");
     l.startTime = IntAttr(*n, "startTime", 0);
-    l.endTime = IntAttr(*n, "endTime", 0);
+    l.endTime = std::max(l.startTime, IntAttr(*n, "endTime", 0));
     l.hidden = StrAttr(*n, "hidden") == "true";
     if (const XmlNode* t = n->child("transform")) {
         l.location = ParseAnim(t->child("location"));

@@ -434,7 +434,7 @@ object GltfReader {
 
     private fun load(uri: String, open: (String) -> ByteArray?): ByteArray? =
         if (uri.startsWith("data:")) runCatching { Base64.getDecoder().decode(uri.substringAfter(',')) }.getOrNull()
-        else open(java.net.URLDecoder.decode(uri.replace("+", "%2B"), "UTF-8"))
+        else open(runCatching { java.net.URLDecoder.decode(uri.replace("+", "%2B"), "UTF-8") }.getOrDefault(uri))
 
     private fun localMatrix(node: JSONObject): FloatArray {
         node.optJSONArray("matrix")?.takeIf { it.length() == 16 }?.let { m -> return FloatArray(16) { m.optDouble(it, 0.0).toFloat() } }

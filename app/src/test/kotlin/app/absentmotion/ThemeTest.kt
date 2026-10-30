@@ -41,6 +41,10 @@ class ThemeTest {
         assertNull(theme.name)
     }
 
+    @Test fun aFileSavedWithAByteOrderMarkIsRead() {
+        assertEquals(Color(0xFF010203), ThemeFile.parse("\uFEFF{\"TopBar\":\"#010203\"}").palette.TopBar)
+    }
+
     @Test fun missingKeysTakeTheDefaultPalette() {
         val theme = ThemeFile.parse("""{"TopBar":"#010203","OnDark":"#040506"}""")
         assertEquals(Color(0xFF010203), theme.palette.TopBar)

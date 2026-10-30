@@ -20,7 +20,9 @@ internal object VideoSources {
 
     fun syncGapUs(context: Context, uri: String): Long = index(context, uri).syncGapUs
 
-    @Synchronized private fun index(context: Context, uri: String): Index {
+    private val locks = java.util.concurrent.ConcurrentHashMap<String, Any>()
+
+    private fun index(context: Context, uri: String): Index = synchronized(locks.getOrPut(uri) { Any() }) {
         val key = uri + "\n" + fileVersion(context.contentResolver, Uri.parse(uri))
         indices.get(key)?.let { return it }
         val extractor = MediaExtractor()
@@ -41,7 +43,7 @@ internal object VideoSources {
             }
             val stamps = samples.sortedDistinct()
             check(stamps.isNotEmpty())
-            return Index(stamps, longestSyncGap(syncs.sortedDistinct(), stamps.last())).also { indices.put(key, it) }
+            return Index(stamps, longestSyncGap(syncs.sortedDistinct(), stamps.last(), stamps.first())).also { indices.put(key, it) }
         } finally { extractor.release() }
     }
 
@@ -68,9 +70,9 @@ internal class Stamps {
     }
 }
 
-internal fun longestSyncGap(sorted: LongArray, lastUs: Long): Long {
+internal fun longestSyncGap(sorted: LongArray, lastUs: Long, firstUs: Long): Long {
     if (sorted.isEmpty()) return Long.MAX_VALUE
-    var longest = lastUs - sorted.last()
+    var longest = maxOf(lastUs - sorted.last(), sorted.first() - firstUs)
     for (i in 1 until sorted.size) longest = maxOf(longest, sorted[i] - sorted[i - 1])
     return longest
 }

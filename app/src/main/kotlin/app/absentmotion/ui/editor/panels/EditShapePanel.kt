@@ -298,7 +298,7 @@ internal fun step(kind: Kind, base: Float, travel: Float, decimals: Int): Float 
 private fun numbers(layer: Layer, param: ShapeParam): FloatArray {
     if (param.kind == Kind.Toggle) return FloatArray(0)
     val need = if (param.kind == Kind.Size || param.kind == Kind.Point) 2 else 1
-    fun parse(text: String) = text.split(',').mapNotNull { it.trim().finiteFloat() }.toFloatArray()
+    fun parse(text: String): FloatArray = text.split(',').map { it.trim().finiteFloat() ?: return FloatArray(0) }.toFloatArray()
     val found = parse(layer.propText(param.prop) ?: param.default)
     return (if (found.size >= need) found else parse(param.default)).copyOf(need)
 }

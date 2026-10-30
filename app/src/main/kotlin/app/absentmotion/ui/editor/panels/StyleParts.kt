@@ -103,7 +103,7 @@ internal fun ThinSlider(
     Canvas(modifier.height(32.dp).alpha(if (enabled) 1f else 0.35f).sliderSemantics(value, valueRange, enabled) { change(it); finish() }.pointerInput(enabled, valueRange) {
         if (!enabled) return@pointerInput
         val r = 6.4.dp.toPx()
-        fun at(x: Float) = valueRange.start + ((x - r) / (size.width - 2 * r)).coerceIn(0f, 1f) * span
+        fun at(x: Float) = valueRange.start + ((x - r) / (size.width - 2 * r).coerceAtLeast(1f)).coerceIn(0f, 1f) * span
         awaitEachGesture {
             val down = awaitFirstDown()
             down.consume()

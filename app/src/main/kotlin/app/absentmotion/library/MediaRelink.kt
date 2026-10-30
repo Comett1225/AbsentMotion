@@ -37,7 +37,7 @@ object MediaRelink {
     fun relink(context: Context, scene: Scene): Scene = scene.media.fold(scene) { s, m ->
         val uri = if (opens(context, m.uri)) m.uri else find(context, m)
         if (uri == null) s else {
-            val linked = if (uri == m.uri) s else s.replaceMedia(m.uri, MediaDeclaration(m.node.with("uri", uri).with("missing", null)))
+            val linked = if (uri == m.uri && !s.isMissing(uri)) s else s.replaceMedia(m.uri, MediaDeclaration(m.node.with("uri", uri).with("missing", null)))
             if (m.type.startsWith("image/") && m.orientation == 0) linked.withLegacyExifOrientation(uri, exifTag(context.contentResolver, Uri.parse(uri))) else linked
         }
     }

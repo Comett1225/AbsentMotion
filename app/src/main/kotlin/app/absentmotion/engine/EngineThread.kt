@@ -147,6 +147,7 @@ class EngineThread(private val background: Int, context: Context? = null) {
     private val pendingScene = PendingScene()
     private val pendingView = AtomicReference<Pair<PreviewView, Long>?>(null)
     private val renderPosted = AtomicBoolean(false)
+    private val retryRender = Runnable { requestRender() }
     private val viewSerial = java.util.concurrent.atomic.AtomicLong()
     private var shownSerial = 0L
     private val renderedView = MutableStateFlow(RenderedView(0L, -1))
@@ -157,7 +158,7 @@ class EngineThread(private val background: Int, context: Context? = null) {
     init {
         fonts?.let { library -> mediaScope.launch {
             library.revision.collect {
-                pendingScene.fontsChanged(); pictureRevision.value++; requestRender()
+                pendingScene.fontsChanged(); pictureRevision.update { it + 1 }; requestRender()
             }
         } }
     }
@@ -224,6 +225,7 @@ class EngineThread(private val background: Int, context: Context? = null) {
             renderNow()
         } catch (e: Exception) {
             Log.e("AMEngine", "preview attachment failed", e)
+            if (target == 0L) this.surface = surface
             if (retry) handler.postDelayed({ if (!closed && target == 0L && surface.isValid) attach(surface, retry = false) }, 250)
         }
     }
@@ -338,19 +340,19 @@ class EngineThread(private val background: Int, context: Context? = null) {
 
     suspend fun setPicture(uri: String, bitmap: Bitmap?, layerId: Long = 0): Boolean = withContext(dispatcher) {
         if (closed) return@withContext false
-        engine().setPicture(uri, bitmap, layerId).also { if (bitmap != null) pictureRevision.value++; renderNow() }
+        engine().setPicture(uri, bitmap, layerId).also { if (bitmap != null) pictureRevision.update { it + 1 }; renderNow() }
     }
 
     suspend fun setModel(uri: String, mesh: Mesh?, textures: List<Bitmap?>): Boolean = withContext(dispatcher) {
         if (closed) return@withContext false
         val engine = engine()
         textures.forEachIndexed { k, bitmap -> engine.setPicture("$uri#$k", bitmap) }
-        engine.setModel(uri, mesh).also { if (mesh != null) pictureRevision.value++; renderNow() }
+        engine.setModel(uri, mesh).also { if (mesh != null) pictureRevision.update { it + 1 }; renderNow() }
     }
 
     suspend fun setPicture(uri: String, buffer: HardwareBuffer, layerId: Long = 0, opaque: Boolean = true): Boolean = withContext(dispatcher) {
         if (closed) return@withContext false
-        engine().setPicture(uri, buffer, layerId, opaque).also { pictureRevision.value++; renderNow() }
+        engine().setPicture(uri, buffer, layerId, opaque).also { pictureRevision.update { it + 1 }; renderNow() }
     }
 
     fun setView(view: PreviewView): Long {
@@ -426,6 +428,10 @@ class EngineThread(private val background: Int, context: Context? = null) {
             }
         } catch (e: Exception) {
             if (!closed) Log.e("AMEngine", "preview rendering failed", e)
+        }
+        if (!closed && (lost || engine?.failed == true)) {
+            handler.removeCallbacks(retryRender)
+            handler.postDelayed(retryRender, GPU_RETRY_MS)
         }
     }
 
@@ -572,7 +578,7 @@ class EngineThread(private val background: Int, context: Context? = null) {
         awaitMedia()
         fontJob?.join()
         effectJob?.join()
-        val document = Scene.parse(xml)
+        val document = withContext(Dispatchers.Default) { Scene.parse(xml) }
         fonts?.let { library -> document.fontNames().forEach { library.resolve(it) } }
         var shown: String? = null
         var swapped = false
@@ -626,8 +632,10 @@ class EngineThread(private val background: Int, context: Context? = null) {
     private fun writePng(pixels: ByteArray, width: Int, height: Int, file: File): Boolean {
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         bitmap.isPremultiplied = false
-        bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(pixels))
-        return file.outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
+        try {
+            bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(pixels))
+            return file.outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
+        } finally { bitmap.recycle() }
     }
 
     suspend fun timing(): String = withContext(dispatcher) { if (!closed && target != 0L && engine?.failed != true) engine().timing(target) else "{}" }
@@ -657,6 +665,8 @@ class EngineThread(private val background: Int, context: Context? = null) {
 }
 
 private val instances = java.util.concurrent.atomic.AtomicLong()
+
+private const val GPU_RETRY_MS = 1000L
 
 private val spacingEffects = Regex("<effect\\b[^>]*\"${Regex.escape(app.absentmotion.compat.ForeignEffectIds.TEXT_SPACING)}\"[^>]*?(/>|>.*?</effect>)", RegexOption.DOT_MATCHES_ALL)
 

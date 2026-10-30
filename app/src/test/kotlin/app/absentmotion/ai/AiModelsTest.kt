@@ -288,6 +288,16 @@ class AiModelsTest {
         assertEquals(400f, tracks.single().cx, 1e-3f)
     }
 
+    @Test fun faceJoinsAFartherTrackThatMatchesWhenTheNearestDoesNot() {
+        val small = FaceBox(100f, 100f, 10f)
+        val large = FaceBox(130f, 100f, 100f)
+        val tracks = mutableListOf(small, large)
+        trackFaces(tracks, listOf(FaceBox(112f, 100f, 10f)))
+        assertEquals(2, tracks.size)
+        assertEquals(0, large.missed)
+        assertEquals(1, small.missed)
+    }
+
     @Test fun faceBlendIsSoftAtTheEdgesAndFullInTheMiddle() {
         assertEquals(1f, featherWeight(50, 50, 101, 101), 1e-6f)
         assertEquals(0f, featherWeight(0, 0, 101, 101), 1e-6f)

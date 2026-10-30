@@ -151,9 +151,10 @@ class MediaStoreExport(context: Context) : ExportStore {
             @Suppress("DEPRECATION")
             put(MediaStore.MediaColumns.DATA, target.path)
         }
-        val uri = resolver.insert(collection, values)
+        val uri = runCatching { resolver.insert(collection, values) }.getOrNull()
+            ?: run { target.delete(); throw ExportError(txt(R.string.export_error_create, target.name, root)) }
         MediaScannerConnection.scanFile(app, arrayOf(target.path), arrayOf(mime), null)
-        return uri ?: throw ExportError(txt(R.string.export_error_create, target.name, root))
+        return uri
     }
 
     override fun save(folder: String?, name: String, mime: String, write: (OutputStream) -> Unit): Uri {

@@ -25,7 +25,7 @@ fun XmlNode.withPath(path: String, element: XmlNode): XmlNode {
     return copy(children = if (positions.size > index) children.toMutableList().also { it[positions[index]] = updated } else children + updated)
 }
 
-private fun floatText(v: Float) = String.format(Locale.US, "%.6f", v)
+private fun floatText(v: Float) = String.format(Locale.US, "%.6f", if (v.isFinite()) v else 0f)
 
 data class Border(val index: Int, val enabled: Boolean, val direction: String, val color: Int, val size: Float) {
     val colorRef get() = PropRef(PropRef.Kind.Child, "border[$index]/color")
@@ -84,7 +84,7 @@ data class Shadow(val present: Boolean, val enabled: Boolean, val color: Int, va
 val Layer.shadow: Shadow
     get() {
         val s = node.child("shadow")
-        val offset = element(PropRef(PropRef.Kind.Child, "shadow/offset"))?.valueAt(t)?.split(',')?.mapNotNull { it.finiteFloat() }
+        val offset = element(PropRef(PropRef.Kind.Child, "shadow/offset"))?.valueAt(t)?.split(',')?.map { it.trim().finiteFloat() }
         return Shadow(s != null, s != null && s["enabled"] != "false", colour("shadow/color", StyleColors.Black), number("shadow/opacity", 1f),
             number("shadow/size", 4f), offset?.getOrNull(0) ?: 3f, offset?.getOrNull(1) ?: 3f)
     }
@@ -140,7 +140,7 @@ val Layer.gradient: GradientStyle
     get() {
         val g = node.child("gradient")
         fun point(key: String, dx: Float, dy: Float): Pair<Float, Float> {
-            val v = g?.get(key)?.split(',')?.mapNotNull { it.trim().finiteFloat() }
+            val v = g?.get(key)?.split(',')?.map { it.trim().finiteFloat() }
             return (v?.getOrNull(0) ?: dx) to (v?.getOrNull(1) ?: dy)
         }
         val a = point("start", 0f, 0f)

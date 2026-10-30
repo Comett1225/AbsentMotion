@@ -208,15 +208,15 @@ private fun TextContent(state: EditorState, layer: Layer, ui: TextEditUi, modifi
 
 @Composable
 private fun FontStrip(library: FontLibrary, current: String, modifier: Modifier, onPick: (String) -> Unit, onViewAll: () -> Unit) {
-    val strip = remember {
+    val built = remember { arrayOfNulls<Pair<List<String>, List<String>>>(1) }
+    val (recent, favourites) = built[0]?.takeIf { (r, f) -> current.isEmpty() || current in r || current in f } ?: run {
         val favourites = library.favourites.sortedBy { it.lowercase() }
         val dedupe = favourites.take(3)
         val recent = library.recent.filterNot { it in dedupe }
         val count = if (favourites.isEmpty()) recent.size else maxOf(6 - favourites.size, 3)
         val shown = recent.take(count).let { if (current.isEmpty() || current in it + dedupe) it else listOf(current) + recent.take((count - 1).coerceAtLeast(0)) }
-        shown to favourites
+        (shown to favourites).also { built[0] = it }
     }
-    val (recent, favourites) = strip
     Column(modifier.fillMaxWidth()) {
         LazyRow(Modifier.fillMaxWidth().height(68.dp).background(TextControl)) {
             itemsIndexed(recent + favourites) { index, name ->

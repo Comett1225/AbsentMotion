@@ -68,10 +68,13 @@ internal class PcmDecoder(context: Context, uri: String) : PcmSource {
 
     override fun next(): PcmChunk? {
         val decoder = codec ?: return null
+        var progress = System.nanoTime()
         while (!outputEnded) {
+            check(System.nanoTime() - progress < STALL_NS) { AppText.get(R.string.export_error_codec_busy) }
             if (!inputEnded) {
                 val index = decoder.dequeueInputBuffer(0)
                 if (index >= 0) {
+                    progress = System.nanoTime()
                     val size = extractor.readSampleData(decoder.getInputBuffer(index)!!, 0)
                     if (size < 0) {
                         decoder.queueInputBuffer(index, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM)
@@ -86,6 +89,7 @@ internal class PcmDecoder(context: Context, uri: String) : PcmSource {
             when {
                 index == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED -> readFormat(decoder.outputFormat)
                 index >= 0 -> {
+                    progress = System.nanoTime()
                     outputEnded = info.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0
                     if (chunk.rate == 0) readFormat(decoder.outputFormat)
                     val has = info.size > 0
@@ -160,6 +164,7 @@ internal class PcmDecoder(context: Context, uri: String) : PcmSource {
 }
 
 private const val SIDE = 0.7071f
+private const val STALL_NS = 10_000_000_000L
 
 internal fun downmixGains(channels: Int, mask: Int): FloatArray {
     val layout = mask.takeIf { Integer.bitCount(it) == channels } ?: when (channels) {
