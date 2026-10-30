@@ -430,16 +430,21 @@ half4 main(float2 coord) {
 }
 """
 
-FLIP_PARAMS = turns(0, 35) + [{"id": "back", "label": "Back", "type": "choice", "default": 0, "options": ["See-through", "Picture", "Color"]},
+FLIP_PARAMS = turns(0, 35) + [angle("axis", "Axis", 0), {"id": "back", "label": "Back", "type": "choice", "default": 0, "options": ["See-through", "Picture", "Color"]},
                               colour("backColor", "Back Color", "#ffffffff")] + PLACE + CAMERA + LIGHT
 FLIP = uniforms(FLIP_PARAMS) + COMMON + """
+float3x3 spin(float d) {
+    float a = radians(d);
+    return float3x3(cos(a), -sin(a), 0.0, sin(a), cos(a), 0.0, 0.0, 0.0, 1.0);
+}
+
 half4 main(float2 coord) {
     float side = min(size.x, size.y);
     float unit = max(side * 0.5 * scale, 0.5);
     float2 h = size / side;
     float dist = max(2.0 + 40.0 * pow(1.0 - clamp(perspective, 0.0, 1.0), 3.0), length(h) + 0.5);
     float3 rw = normalize(float3((coord - size * 0.5 - position) / unit, dist));
-    float3x3 m = orient * turn();
+    float3x3 m = orient * spin(axis) * turn() * spin(-axis);
     float3 ro = float3(0.0, 0.0, -dist) * m;
     float3 rd = rw * m;
     if (abs(rd.z) < 0.000001) return half4(0.0);

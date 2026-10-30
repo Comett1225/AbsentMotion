@@ -7012,5 +7012,2324 @@
   "set": {
    "amount": 0.97
   }
+ },
+ "com.alightcreative.effects.box": {
+  "to": "box",
+  "params": {
+   "rotate": [
+    {
+     "to": "rotX",
+     "scale": -1
+    },
+    {
+     "to": "rotY"
+    },
+    {
+     "to": "rotZ"
+    }
+   ],
+   "position": {
+    "to": "position",
+    "take": 2,
+    "per": "height",
+    "scale": 0.0016666666666666668,
+    "signs": [
+     1,
+     -1
+    ],
+    "pre": [
+     0,
+     100
+    ]
+   },
+   "scale": {
+    "to": "scale",
+    "min": 0.05,
+    "max": 10
+   },
+   "shadingType": {
+    "neutral": 1
+   },
+   "lightIntensity": {
+    "to": "shading",
+    "scale": 1,
+    "min": 0,
+    "max": 1
+   },
+   "shine": {
+    "to": "shine",
+    "min": 0,
+    "max": 1
+   },
+   "spec": {
+    "neutral": 30
+   },
+   "ambient": {
+    "neutral": 0.1
+   },
+   "lightColor": {
+    "neutral": "#ffffffff"
+   },
+   "lightDir": {
+    "neutral": "75,-75"
+   },
+   "lightDepth": {
+    "neutral": 100
+   },
+   "width": {
+    "to": "width",
+    "scale": 0.22,
+    "min": 0.02,
+    "max": 5
+   },
+   "height": {
+    "to": "height",
+    "scale": 0.29,
+    "min": 0.02,
+    "max": 5
+   },
+   "depth": {
+    "to": "depth",
+    "scale": 0.3,
+    "min": 0.01,
+    "max": 5
+   },
+   "smooth": {
+    "to": "smoothing",
+    "min": 0,
+    "max": 1
+   },
+   "mirror": {
+    "neutral": "false"
+   },
+   "texRepeatX": {
+    "neutral": 1
+   },
+   "texRepeatY": {
+    "neutral": 1
+   },
+   "texAngle": {
+    "neutral": 0
+   },
+   "texCrop": {
+    "neutral": 1
+   },
+   "texTwirl": {
+    "neutral": 0
+   },
+   "MAX_ITER": {
+    "neutral": 60
+   },
+   "texStretch": {
+    "neutral": "false"
+   }
+  },
+  "set": {
+   "rotX": 0,
+   "rotY": 0,
+   "rotZ": 0,
+   "position": "0,0",
+   "scale": 1,
+   "perspective": 1,
+   "shading": 1,
+   "shine": 0.8,
+   "light": 45,
+   "width": 0.22,
+   "height": 0.87,
+   "depth": 0.3,
+   "smoothing": 0
+  }
+ },
+ "com.alightcreative.effects.cube": {
+  "to": "cube",
+  "params": {
+   "width": {
+    "to": "edge",
+    "scale": 0.8,
+    "min": 0.05,
+    "max": 5
+   },
+   "height": {
+    "neutral": 1
+   },
+   "depth": {
+    "neutral": 1
+   },
+   "crop": {
+    "neutral": 1
+   },
+   "enableLight": {
+    "to": "shading",
+    "values": {
+     "false": 0,
+     "true": 1
+    }
+   },
+   "lightIntensity": {
+    "neutral": 1
+   },
+   "lightColor": {
+    "neutral": "#ffffffff"
+   },
+   "lightDepth": {
+    "neutral": 100
+   },
+   "light": {
+    "to": "light"
+   }
+  },
+  "set": {
+   "rotX": 0,
+   "rotY": 0,
+   "rotZ": 0,
+   "edge": 0.8,
+   "smoothing": 0,
+   "perspective": 1,
+   "scale": 1,
+   "shading": 0,
+   "shine": 0,
+   "position": "0,0"
+  }
+ },
+ "com.alightcreative.effects.cube2": {
+  "to": "cube",
+  "params": {
+   "rotate": [
+    {
+     "to": "rotX",
+     "scale": -1
+    },
+    {
+     "to": "rotY"
+    },
+    {
+     "to": "rotZ"
+    }
+   ],
+   "position": {
+    "to": "position",
+    "take": 2,
+    "per": "height",
+    "scale": 0.0016666666666666668,
+    "signs": [
+     1,
+     -1
+    ],
+    "pre": [
+     0,
+     100
+    ]
+   },
+   "scale": {
+    "to": "scale",
+    "min": 0.05,
+    "max": 10
+   },
+   "shadingType": {
+    "neutral": 1
+   },
+   "lightIntensity": {
+    "to": "shading",
+    "scale": 1,
+    "min": 0,
+    "max": 1
+   },
+   "shine": {
+    "to": "shine",
+    "min": 0,
+    "max": 1
+   },
+   "spec": {
+    "neutral": 30
+   },
+   "ambient": {
+    "neutral": 0.1
+   },
+   "lightColor": {
+    "neutral": "#ffffffff"
+   },
+   "lightDir": {
+    "neutral": "75,-75"
+   },
+   "lightDepth": {
+    "neutral": 100
+   },
+   "width": {
+    "to": "edge",
+    "scale": 0.29,
+    "min": 0.05,
+    "max": 5
+   },
+   "height": {
+    "neutral": 1
+   },
+   "depth": {
+    "neutral": 1
+   },
+   "texCrop": {
+    "neutral": 1
+   }
+  },
+  "set": {
+   "rotX": 0,
+   "rotY": 0,
+   "rotZ": 0,
+   "position": "0,0",
+   "scale": 1,
+   "perspective": 1,
+   "shading": 1,
+   "shine": 0.8,
+   "light": 45,
+   "edge": 0.28,
+   "smoothing": 0
+  }
+ },
+ "com.alightcreative.effects.cylinder": {
+  "to": "cylinder",
+  "params": {
+   "rotate": [
+    {
+     "to": "rotX",
+     "scale": -1
+    },
+    {
+     "to": "rotY"
+    },
+    {
+     "to": "rotZ"
+    }
+   ],
+   "position": {
+    "to": "position",
+    "take": 2,
+    "per": "height",
+    "scale": 0.0016666666666666668,
+    "signs": [
+     1,
+     -1
+    ],
+    "pre": [
+     0,
+     100
+    ]
+   },
+   "scale": {
+    "to": "scale",
+    "min": 0.05,
+    "max": 10
+   },
+   "shadingType": {
+    "neutral": 1
+   },
+   "lightIntensity": {
+    "to": "shading",
+    "scale": 1,
+    "min": 0,
+    "max": 1
+   },
+   "shine": {
+    "to": "shine",
+    "min": 0,
+    "max": 1
+   },
+   "spec": {
+    "neutral": 30
+   },
+   "ambient": {
+    "neutral": 0.1
+   },
+   "lightColor": {
+    "neutral": "#ffffffff"
+   },
+   "lightDir": {
+    "neutral": "75,-75"
+   },
+   "lightDepth": {
+    "neutral": 100
+   },
+   "radius": {
+    "to": "radius",
+    "scale": 0.58,
+    "min": 0.02,
+    "max": 5
+   },
+   "height": {
+    "to": "height",
+    "scale": 0.3,
+    "min": 0.02,
+    "max": 5
+   },
+   "smooth": {
+    "to": "smoothing",
+    "min": 0,
+    "max": 1
+   },
+   "mirror": {
+    "neutral": "false"
+   },
+   "texRepeatX": {
+    "neutral": 1
+   },
+   "texRepeatY": {
+    "neutral": 1
+   },
+   "texAngle": {
+    "neutral": 0
+   },
+   "texCrop": {
+    "neutral": 1
+   },
+   "texTwirl": {
+    "neutral": 0
+   },
+   "MAX_ITER": {
+    "neutral": 60
+   },
+   "texStretch": {
+    "neutral": "false"
+   }
+  },
+  "set": {
+   "rotX": 0,
+   "rotY": 0,
+   "rotZ": 0,
+   "position": "0,0",
+   "scale": 1,
+   "perspective": 1,
+   "shading": 1,
+   "shine": 0.8,
+   "light": 45,
+   "radius": 0.58,
+   "height": 0.9,
+   "smoothing": 0
+  }
+ },
+ "com.alightcreative.effects.ellipsoid": {
+  "to": "ellipsoid",
+  "params": {
+   "rotate": [
+    {
+     "to": "rotX",
+     "scale": -1
+    },
+    {
+     "to": "rotY"
+    },
+    {
+     "to": "rotZ"
+    }
+   ],
+   "position": {
+    "to": "position",
+    "take": 2,
+    "per": "height",
+    "scale": 0.0016666666666666668,
+    "signs": [
+     1,
+     -1
+    ],
+    "pre": [
+     0,
+     0
+    ]
+   },
+   "scale": {
+    "to": "scale",
+    "min": 0.05,
+    "max": 10
+   },
+   "shadingType": {
+    "neutral": 1
+   },
+   "lightIntensity": {
+    "to": "shading",
+    "scale": 1,
+    "min": 0,
+    "max": 1
+   },
+   "shine": {
+    "to": "shine",
+    "min": 0,
+    "max": 1
+   },
+   "spec": {
+    "neutral": 30
+   },
+   "ambient": {
+    "neutral": 0.1
+   },
+   "lightColor": {
+    "neutral": "#ffffffff"
+   },
+   "lightDir": {
+    "neutral": "75,-75"
+   },
+   "lightDepth": {
+    "neutral": 100
+   },
+   "radius": {
+    "to": "radius",
+    "scale": 0.3,
+    "min": 0.02,
+    "max": 5
+   },
+   "squeeze": {
+    "to": "squeezeRatio",
+    "min": 0.1,
+    "max": 1.9
+   },
+   "flatten": {
+    "to": "flattenRatio",
+    "min": 0.05,
+    "max": 1
+   },
+   "mirror": {
+    "neutral": "false"
+   },
+   "texRepeatX": {
+    "neutral": 1
+   },
+   "texRepeatY": {
+    "neutral": 1
+   },
+   "texAngle": {
+    "neutral": 0
+   },
+   "texCrop": {
+    "neutral": 1
+   },
+   "texTwirl": {
+    "neutral": 0
+   },
+   "MAX_ITER": {
+    "neutral": 60
+   },
+   "texStretch": {
+    "neutral": "false"
+   }
+  },
+  "set": {
+   "rotX": 0,
+   "rotY": 0,
+   "rotZ": 0,
+   "position": "0,5.5",
+   "scale": 1,
+   "perspective": 1,
+   "shading": 1,
+   "shine": 0.8,
+   "light": 45,
+   "radius": 0.75,
+   "squeezeRatio": 1,
+   "flattenRatio": 1
+  }
+ },
+ "com.alightcreative.effects.heart": {
+  "to": "heart",
+  "params": {
+   "rotate": [
+    {
+     "to": "rotX",
+     "scale": -1
+    },
+    {
+     "to": "rotY"
+    },
+    {
+     "to": "rotZ"
+    }
+   ],
+   "position": {
+    "to": "position",
+    "take": 2,
+    "per": "height",
+    "scale": 0.0016666666666666668,
+    "signs": [
+     1,
+     -1
+    ],
+    "pre": [
+     0,
+     0
+    ]
+   },
+   "scale": {
+    "to": "scale",
+    "min": 0.05,
+    "max": 10
+   },
+   "shadingType": {
+    "neutral": 1
+   },
+   "lightIntensity": {
+    "to": "shading",
+    "scale": 1,
+    "min": 0,
+    "max": 1
+   },
+   "shine": {
+    "to": "shine",
+    "min": 0,
+    "max": 1
+   },
+   "spec": {
+    "neutral": 30
+   },
+   "ambient": {
+    "neutral": 0.1
+   },
+   "lightColor": {
+    "neutral": "#ffffffff"
+   },
+   "lightDir": {
+    "neutral": "75,-75"
+   },
+   "lightDepth": {
+    "neutral": 100
+   },
+   "size": {
+    "to": "heartSize",
+    "scale": 0.52,
+    "min": 0.02,
+    "max": 5
+   },
+   "shape": {
+    "to": "smoothing",
+    "scale": 0.7,
+    "min": 0,
+    "max": 1
+   },
+   "texScale": {
+    "neutral": 1
+   },
+   "mirror": {
+    "neutral": "false"
+   },
+   "texRepeatX": {
+    "neutral": 1
+   },
+   "texRepeatY": {
+    "neutral": 1
+   },
+   "texAngle": {
+    "neutral": 0
+   },
+   "texCrop": {
+    "neutral": 1
+   },
+   "texTwirl": {
+    "neutral": 0
+   },
+   "MAX_ITER": {
+    "neutral": 60
+   },
+   "texStretch": {
+    "neutral": 1
+   }
+  },
+  "set": {
+   "rotX": 0,
+   "rotY": 0,
+   "rotZ": 0,
+   "position": "0,5.5",
+   "scale": 1,
+   "perspective": 1,
+   "shading": 1,
+   "shine": 0.8,
+   "light": 45,
+   "heartSize": 1.3,
+   "smoothing": 0.7,
+   "depth": 0.3
+  }
+ },
+ "com.alightcreative.effects.heart2": {
+  "to": "heart",
+  "params": {
+   "rotate": [
+    {
+     "to": "rotX",
+     "scale": -1
+    },
+    {
+     "to": "rotY"
+    },
+    {
+     "to": "rotZ"
+    }
+   ],
+   "position": {
+    "to": "position",
+    "take": 2,
+    "per": "height",
+    "scale": 0.0016666666666666668,
+    "signs": [
+     1,
+     -1
+    ],
+    "pre": [
+     0,
+     0
+    ]
+   },
+   "scale": {
+    "to": "scale",
+    "min": 0.05,
+    "max": 10
+   },
+   "shadingType": {
+    "neutral": 1
+   },
+   "lightIntensity": {
+    "to": "shading",
+    "scale": 1,
+    "min": 0,
+    "max": 1
+   },
+   "shine": {
+    "to": "shine",
+    "min": 0,
+    "max": 1
+   },
+   "spec": {
+    "neutral": 30
+   },
+   "ambient": {
+    "neutral": 0.1
+   },
+   "lightColor": {
+    "neutral": "#ffffffff"
+   },
+   "lightDir": {
+    "neutral": "75,-75"
+   },
+   "lightDepth": {
+    "neutral": 100
+   },
+   "size": {
+    "to": "heartSize",
+    "scale": 0.52,
+    "min": 0.02,
+    "max": 5
+   },
+   "shape": {
+    "to": "smoothing",
+    "scale": 0.7,
+    "min": 0,
+    "max": 1
+   },
+   "texScale": {
+    "neutral": 1
+   },
+   "texStretch": {
+    "neutral": "1,1"
+   },
+   "mirror": {
+    "neutral": "false"
+   },
+   "texRepeatX": {
+    "neutral": 1
+   },
+   "texRepeatY": {
+    "neutral": 1
+   },
+   "texAngle": {
+    "neutral": 0
+   },
+   "texCrop": {
+    "neutral": 1
+   },
+   "texTwirl": {
+    "neutral": 0
+   },
+   "MAX_ITER": {
+    "neutral": 60
+   }
+  },
+  "set": {
+   "rotX": 0,
+   "rotY": 0,
+   "rotZ": 0,
+   "position": "0,5.5",
+   "scale": 1,
+   "perspective": 1,
+   "shading": 1,
+   "shine": 0.8,
+   "light": 45,
+   "heartSize": 1.3,
+   "smoothing": 0.7,
+   "depth": 0.3
+  }
+ },
+ "com.alightcreative.effects.hexprism": {
+  "to": "hexprism",
+  "params": {
+   "rotate": [
+    {
+     "to": "rotX",
+     "scale": -1
+    },
+    {
+     "to": "rotY"
+    },
+    {
+     "to": "rotZ"
+    }
+   ],
+   "position": {
+    "to": "position",
+    "take": 2,
+    "per": "height",
+    "scale": 0.0016666666666666668,
+    "signs": [
+     1,
+     -1
+    ],
+    "pre": [
+     0,
+     55
+    ]
+   },
+   "scale": {
+    "to": "scale",
+    "min": 0.05,
+    "max": 10
+   },
+   "shadingType": {
+    "neutral": 1
+   },
+   "lightIntensity": {
+    "to": "shading",
+    "scale": 1,
+    "min": 0,
+    "max": 1
+   },
+   "shine": {
+    "to": "shine",
+    "min": 0,
+    "max": 1
+   },
+   "spec": {
+    "neutral": 30
+   },
+   "ambient": {
+    "neutral": 0.1
+   },
+   "lightColor": {
+    "neutral": "#ffffffff"
+   },
+   "lightDir": {
+    "neutral": "75,-75"
+   },
+   "lightDepth": {
+    "neutral": 100
+   },
+   "radius": {
+    "to": "radius",
+    "scale": 0.58,
+    "min": 0.02,
+    "max": 5
+   },
+   "height": {
+    "to": "depth",
+    "scale": 0.3,
+    "min": 0.01,
+    "max": 5
+   },
+   "smooth": {
+    "to": "smoothing",
+    "min": 0,
+    "max": 1
+   },
+   "mirror": {
+    "neutral": "false"
+   },
+   "texRepeatX": {
+    "neutral": 1
+   },
+   "texRepeatY": {
+    "neutral": 1
+   },
+   "texAngle": {
+    "neutral": 0
+   },
+   "texCrop": {
+    "neutral": 1
+   },
+   "texTwirl": {
+    "neutral": 0
+   },
+   "MAX_ITER": {
+    "neutral": 60
+   },
+   "texStretch": {
+    "neutral": "false"
+   }
+  },
+  "set": {
+   "rotX": 0,
+   "rotY": 0,
+   "rotZ": 0,
+   "position": "0,0",
+   "scale": 1,
+   "perspective": 1,
+   "shading": 1,
+   "shine": 0.8,
+   "light": 45,
+   "radius": 0.58,
+   "depth": 0.9,
+   "smoothing": 0
+  }
+ },
+ "com.alightcreative.effects.hollowbox": {
+  "to": "hollowbox",
+  "params": {
+   "rotate": [
+    {
+     "to": "rotX",
+     "scale": -1
+    },
+    {
+     "to": "rotY"
+    },
+    {
+     "to": "rotZ"
+    }
+   ],
+   "position": {
+    "to": "position",
+    "take": 2,
+    "per": "height",
+    "scale": 0.0016666666666666668,
+    "signs": [
+     1,
+     -1
+    ],
+    "pre": [
+     0,
+     100
+    ]
+   },
+   "scale": {
+    "to": "scale",
+    "min": 0.05,
+    "max": 10
+   },
+   "shadingType": {
+    "neutral": 1
+   },
+   "lightIntensity": {
+    "to": "shading",
+    "scale": 1,
+    "min": 0,
+    "max": 1
+   },
+   "shine": {
+    "to": "shine",
+    "min": 0,
+    "max": 1
+   },
+   "spec": {
+    "neutral": 30
+   },
+   "ambient": {
+    "neutral": 0.1
+   },
+   "lightColor": {
+    "neutral": "#ffffffff"
+   },
+   "lightDir": {
+    "neutral": "75,-75"
+   },
+   "lightDepth": {
+    "neutral": 100
+   },
+   "width": {
+    "to": "width",
+    "scale": 0.22,
+    "min": 0.02,
+    "max": 5
+   },
+   "height": {
+    "to": "height",
+    "scale": 0.29,
+    "min": 0.02,
+    "max": 5
+   },
+   "depth": {
+    "to": "depth",
+    "scale": 0.29,
+    "min": 0.02,
+    "max": 5
+   },
+   "thick": {
+    "to": "thickness",
+    "scale": 0.29,
+    "min": 0.005,
+    "max": 1
+   },
+   "outset": {
+    "neutral": 0
+   },
+   "smooth": {
+    "to": "smoothing",
+    "min": 0,
+    "max": 1
+   },
+   "frontMode": {
+    "neutral": 0
+   },
+   "frontAmount": {
+    "neutral": 0.5
+   },
+   "frontOutset": {
+    "neutral": 0.5
+   },
+   "topMode": {
+    "neutral": 0
+   },
+   "topAmount": {
+    "neutral": 0.5
+   },
+   "topOutset": {
+    "neutral": 0.5
+   },
+   "leftMode": {
+    "neutral": 0
+   },
+   "leftAmount": {
+    "neutral": 0.5
+   },
+   "leftOutset": {
+    "neutral": 0.5
+   },
+   "rightMode": {
+    "neutral": 0
+   },
+   "rightAmount": {
+    "neutral": 0.5
+   },
+   "rightOutset": {
+    "neutral": 0.5
+   },
+   "backMode": {
+    "neutral": 0
+   },
+   "backAmount": {
+    "neutral": 0.5
+   },
+   "backOutset": {
+    "neutral": 0.5
+   },
+   "bottomMode": {
+    "neutral": 0
+   },
+   "bottomAmount": {
+    "neutral": 0.5
+   },
+   "bottomOutset": {
+    "neutral": 0.5
+   },
+   "mirror": {
+    "neutral": "false"
+   },
+   "texRepeatX": {
+    "neutral": 1
+   },
+   "texRepeatY": {
+    "neutral": 1
+   },
+   "texAngle": {
+    "neutral": 0
+   },
+   "texCrop": {
+    "neutral": 1
+   },
+   "texTwirl": {
+    "neutral": 0
+   },
+   "MAX_ITER": {
+    "neutral": 30
+   },
+   "texStretch": {
+    "neutral": "false"
+   }
+  },
+  "set": {
+   "rotX": 0,
+   "rotY": 0,
+   "rotZ": 0,
+   "position": "0,0",
+   "scale": 1,
+   "perspective": 1,
+   "shading": 1,
+   "shine": 0.8,
+   "light": 45,
+   "width": 0.22,
+   "height": 0.29,
+   "depth": 0.29,
+   "thickness": 0.0145,
+   "smoothing": 0
+  }
+ },
+ "com.alightcreative.effects.octahedron": {
+  "to": "octahedron",
+  "params": {
+   "rotate": [
+    {
+     "to": "rotX",
+     "scale": -1
+    },
+    {
+     "to": "rotY"
+    },
+    {
+     "to": "rotZ"
+    }
+   ],
+   "position": {
+    "to": "position",
+    "take": 2,
+    "per": "height",
+    "scale": 0.0016666666666666668,
+    "signs": [
+     1,
+     -1
+    ],
+    "pre": [
+     0,
+     55
+    ]
+   },
+   "scale": {
+    "to": "scale",
+    "min": 0.05,
+    "max": 10
+   },
+   "shadingType": {
+    "neutral": 1
+   },
+   "lightIntensity": {
+    "to": "shading",
+    "scale": 1,
+    "min": 0,
+    "max": 1
+   },
+   "shine": {
+    "to": "shine",
+    "min": 0,
+    "max": 1
+   },
+   "spec": {
+    "neutral": 30
+   },
+   "ambient": {
+    "neutral": 0.1
+   },
+   "lightColor": {
+    "neutral": "#ffffffff"
+   },
+   "lightDir": {
+    "neutral": "75,-75"
+   },
+   "lightDepth": {
+    "neutral": 100
+   },
+   "size": {
+    "to": "radius",
+    "scale": 0.32,
+    "min": 0.02,
+    "max": 5
+   },
+   "height": {
+    "neutral": 1
+   },
+   "smooth": {
+    "neutral": 0
+   },
+   "texSqueeze": {
+    "neutral": 0
+   },
+   "mirror": {
+    "neutral": "false"
+   },
+   "texRepeatX": {
+    "neutral": 1
+   },
+   "texRepeatY": {
+    "neutral": 1
+   },
+   "texAngle": {
+    "neutral": 0
+   },
+   "texCrop": {
+    "neutral": 1
+   },
+   "texTwirl": {
+    "neutral": 0
+   },
+   "MAX_ITER": {
+    "neutral": 60
+   }
+  },
+  "set": {
+   "rotX": 0,
+   "rotY": 0,
+   "rotZ": 0,
+   "position": "0,0",
+   "scale": 1,
+   "perspective": 1,
+   "shading": 1,
+   "shine": 0.8,
+   "light": 45,
+   "radius": 0.95
+  }
+ },
+ "com.alightcreative.effects.pyramid": {
+  "to": "pyramid",
+  "params": {
+   "rotate": [
+    {
+     "to": "rotX",
+     "scale": -1
+    },
+    {
+     "to": "rotY"
+    },
+    {
+     "to": "rotZ"
+    }
+   ],
+   "position": {
+    "to": "position",
+    "take": 2,
+    "per": "height",
+    "scale": 0.0016666666666666668,
+    "signs": [
+     1,
+     -1
+    ],
+    "pre": [
+     0,
+     55
+    ]
+   },
+   "scale": {
+    "to": "scale",
+    "min": 0.05,
+    "max": 10
+   },
+   "shadingType": {
+    "neutral": 1
+   },
+   "lightIntensity": {
+    "to": "shading",
+    "scale": 1,
+    "min": 0,
+    "max": 1
+   },
+   "shine": {
+    "to": "shine",
+    "min": 0,
+    "max": 1
+   },
+   "spec": {
+    "neutral": 30
+   },
+   "ambient": {
+    "neutral": 0.1
+   },
+   "lightColor": {
+    "neutral": "#ffffffff"
+   },
+   "lightDir": {
+    "neutral": "75,-75"
+   },
+   "lightDepth": {
+    "neutral": 100
+   },
+   "size": {
+    "to": "base",
+    "scale": 0.25,
+    "min": 0.02,
+    "max": 5
+   },
+   "height": {
+    "to": "height",
+    "scale": 0.22,
+    "min": 0.02,
+    "max": 5
+   },
+   "smooth": {
+    "neutral": 0
+   },
+   "texSqueeze": {
+    "neutral": 0
+   },
+   "mirror": {
+    "neutral": "false"
+   },
+   "texRepeatX": {
+    "neutral": 1
+   },
+   "texRepeatY": {
+    "neutral": 1
+   },
+   "texAngle": {
+    "neutral": 0
+   },
+   "texCrop": {
+    "neutral": 1
+   },
+   "texTwirl": {
+    "neutral": 0
+   },
+   "MAX_ITER": {
+    "neutral": 60
+   }
+  },
+  "set": {
+   "rotX": 58,
+   "rotY": 0,
+   "rotZ": 0,
+   "position": "0,0",
+   "scale": 3,
+   "perspective": 1,
+   "shading": 1,
+   "shine": 0.8,
+   "light": 45,
+   "base": 0.25,
+   "height": 0.22
+  }
+ },
+ "com.alightcreative.effects.extrude": {
+  "to": "rasterextrude",
+  "params": {
+   "rotate": [
+    {
+     "to": "rotX",
+     "scale": -1
+    },
+    {
+     "to": "rotY"
+    },
+    {
+     "to": "rotZ"
+    }
+   ],
+   "position": {
+    "to": "position",
+    "take": 2,
+    "per": "height",
+    "scale": 0.0016666666666666668,
+    "signs": [
+     1,
+     -1
+    ],
+    "pre": [
+     0,
+     100
+    ]
+   },
+   "scale": {
+    "to": "scale",
+    "min": 0.05,
+    "max": 10
+   },
+   "shadingType": {
+    "neutral": 1
+   },
+   "lightIntensity": {
+    "to": "shading",
+    "scale": 1,
+    "min": 0,
+    "max": 1
+   },
+   "shine": {
+    "to": "shine",
+    "min": 0,
+    "max": 1
+   },
+   "spec": {
+    "neutral": 30
+   },
+   "ambient": {
+    "neutral": 0.1
+   },
+   "lightColor": {
+    "neutral": "#ffffffff"
+   },
+   "lightDir": {
+    "neutral": "75,-75"
+   },
+   "lightDepth": {
+    "neutral": 100
+   },
+   "depth": {
+    "to": "depth",
+    "scale": 0.3,
+    "min": 0.005,
+    "max": 5
+   },
+   "interiorColor": {
+    "to": "interior"
+   },
+   "widthRatio": {
+    "neutral": 1
+   },
+   "heightRatio": {
+    "neutral": 1
+   },
+   "strength": {
+    "neutral": 0.1
+   },
+   "interiorBlend": {
+    "neutral": 0
+   },
+   "fadeColor": {
+    "neutral": "#ffaa3366"
+   },
+   "fadeBlend": {
+    "neutral": 0
+   },
+   "MAX_ITER": {
+    "neutral": 200
+   }
+  },
+  "set": {
+   "rotX": 0,
+   "rotY": 0,
+   "rotZ": 0,
+   "position": "0,0",
+   "scale": 1,
+   "perspective": 1,
+   "shading": 1,
+   "shine": 0.8,
+   "light": 45,
+   "depth": 0.03,
+   "interior": "#ff3366aa"
+  }
+ },
+ "com.alightcreative.effects.starpoly": {
+  "to": "starpolyhedron",
+  "params": {
+   "rotate": [
+    {
+     "to": "rotX",
+     "scale": -1
+    },
+    {
+     "to": "rotY"
+    },
+    {
+     "to": "rotZ"
+    }
+   ],
+   "position": {
+    "to": "position",
+    "take": 2,
+    "per": "height",
+    "scale": 0.0016666666666666668,
+    "signs": [
+     1,
+     -1
+    ],
+    "pre": [
+     0,
+     100
+    ]
+   },
+   "scale": {
+    "to": "scale",
+    "min": 0.05,
+    "max": 10
+   },
+   "shadingType": {
+    "neutral": 1
+   },
+   "lightIntensity": {
+    "to": "shading",
+    "scale": 1,
+    "min": 0,
+    "max": 1
+   },
+   "shine": {
+    "to": "shine",
+    "min": 0,
+    "max": 1
+   },
+   "spec": {
+    "neutral": 30
+   },
+   "ambient": {
+    "neutral": 0.1
+   },
+   "lightColor": {
+    "neutral": "#ffffffff"
+   },
+   "lightDir": {
+    "neutral": "75,-75"
+   },
+   "lightDepth": {
+    "neutral": 100
+   },
+   "pointLength": {
+    "to": "radius",
+    "scale": 0.3,
+    "min": 0.02,
+    "max": 5
+   },
+   "size": {
+    "neutral": 0.5
+   },
+   "height": {
+    "neutral": 0.5
+   },
+   "pointCount": {
+    "neutral": 5
+   },
+   "smooth": {
+    "neutral": 0
+   },
+   "mirror": {
+    "neutral": "false"
+   },
+   "texRepeatX": {
+    "neutral": 1
+   },
+   "texRepeatY": {
+    "neutral": 1
+   },
+   "texAngle": {
+    "neutral": 0
+   },
+   "texCrop": {
+    "neutral": 1
+   },
+   "texTwirl": {
+    "neutral": 0
+   },
+   "MAX_ITER": {
+    "neutral": 60
+   }
+  },
+  "set": {
+   "rotX": 0,
+   "rotY": 0,
+   "rotZ": 0,
+   "position": "0,0",
+   "scale": 3,
+   "perspective": 1,
+   "shading": 1,
+   "shine": 0.8,
+   "light": 45,
+   "radius": 0.3
+  }
+ },
+ "com.alightcreative.effects.starprism": {
+  "to": "starprism",
+  "params": {
+   "rotate": [
+    {
+     "to": "rotX",
+     "scale": -1
+    },
+    {
+     "to": "rotY"
+    },
+    {
+     "to": "rotZ"
+    }
+   ],
+   "position": {
+    "to": "position",
+    "take": 2,
+    "per": "height",
+    "scale": 0.0016666666666666668,
+    "signs": [
+     1,
+     -1
+    ],
+    "pre": [
+     0,
+     100
+    ]
+   },
+   "scale": {
+    "to": "scale",
+    "min": 0.05,
+    "max": 10
+   },
+   "shadingType": {
+    "neutral": 1
+   },
+   "lightIntensity": {
+    "to": "shading",
+    "scale": 1,
+    "min": 0,
+    "max": 1
+   },
+   "shine": {
+    "to": "shine",
+    "min": 0,
+    "max": 1
+   },
+   "spec": {
+    "neutral": 30
+   },
+   "ambient": {
+    "neutral": 0.1
+   },
+   "lightColor": {
+    "neutral": "#ffffffff"
+   },
+   "lightDir": {
+    "neutral": "75,-75"
+   },
+   "lightDepth": {
+    "neutral": 100
+   },
+   "size": {
+    "to": "radius",
+    "scale": 0.85,
+    "min": 0.02,
+    "max": 5
+   },
+   "thickness": {
+    "to": "depth",
+    "scale": 0.85,
+    "min": 0.01,
+    "max": 5
+   },
+   "pointCount": {
+    "to": "points",
+    "min": 3,
+    "max": 12
+   },
+   "mirror": {
+    "neutral": "false"
+   },
+   "texRepeatX": {
+    "neutral": 1
+   },
+   "texRepeatY": {
+    "neutral": 1
+   },
+   "texAngle": {
+    "neutral": 0
+   },
+   "texCrop": {
+    "neutral": 1
+   },
+   "texTwirl": {
+    "neutral": 0
+   },
+   "MAX_ITER": {
+    "neutral": 60
+   },
+   "texStretch": {
+    "neutral": "true"
+   }
+  },
+  "set": {
+   "rotX": 0,
+   "rotY": 0,
+   "rotZ": 0,
+   "position": "0,0",
+   "scale": 1,
+   "perspective": 1,
+   "shading": 1,
+   "shine": 0.8,
+   "light": 45,
+   "radius": 0.85,
+   "depth": 0.17,
+   "points": 5
+  }
+ },
+ "com.alightcreative.effects.torus": {
+  "to": "torus",
+  "params": {
+   "rotate": [
+    {
+     "to": "rotX",
+     "scale": -1
+    },
+    {
+     "to": "rotY"
+    },
+    {
+     "to": "rotZ"
+    }
+   ],
+   "position": {
+    "to": "position",
+    "take": 2,
+    "per": "height",
+    "scale": 0.0016666666666666668,
+    "signs": [
+     1,
+     -1
+    ],
+    "pre": [
+     0,
+     100
+    ]
+   },
+   "scale": {
+    "to": "scale",
+    "min": 0.05,
+    "max": 10
+   },
+   "shadingType": {
+    "neutral": 1
+   },
+   "lightIntensity": {
+    "to": "shading",
+    "scale": 1,
+    "min": 0,
+    "max": 1
+   },
+   "shine": {
+    "to": "shine",
+    "min": 0,
+    "max": 1
+   },
+   "spec": {
+    "neutral": 30
+   },
+   "ambient": {
+    "neutral": 0.1
+   },
+   "lightColor": {
+    "neutral": "#ffffffff"
+   },
+   "lightDir": {
+    "neutral": "75,-75"
+   },
+   "lightDepth": {
+    "neutral": 100
+   },
+   "radius": {
+    "to": "radius",
+    "scale": 0.3,
+    "min": 0.02,
+    "max": 5
+   },
+   "thickness": {
+    "to": "thickness",
+    "scale": 0.3,
+    "min": 0.01,
+    "max": 3
+   },
+   "mirror": {
+    "neutral": "false"
+   },
+   "texRepeatX": {
+    "neutral": 1
+   },
+   "texRepeatY": {
+    "neutral": 1
+   },
+   "texAngle": {
+    "neutral": 0
+   },
+   "texCrop": {
+    "neutral": 1
+   },
+   "texTwirl": {
+    "neutral": 0
+   },
+   "MAX_ITER": {
+    "neutral": 60
+   }
+  },
+  "set": {
+   "rotX": 45,
+   "rotY": 0,
+   "rotZ": 0,
+   "position": "0,0",
+   "scale": 1,
+   "perspective": 1,
+   "shading": 1,
+   "shine": 0.8,
+   "light": 45,
+   "radius": 0.6,
+   "thickness": 0.3
+  }
+ },
+ "com.alightcreative.effects.plus": {
+  "to": "cross",
+  "params": {
+   "rotate": [
+    {
+     "to": "rotX",
+     "scale": -1
+    },
+    {
+     "to": "rotY"
+    },
+    {
+     "to": "rotZ"
+    }
+   ],
+   "position": {
+    "to": "position",
+    "take": 2,
+    "per": "height",
+    "scale": 0.0016666666666666668,
+    "signs": [
+     1,
+     -1
+    ],
+    "pre": [
+     0,
+     55
+    ]
+   },
+   "scale": {
+    "to": "scale",
+    "min": 0.05,
+    "max": 10
+   },
+   "shadingType": {
+    "neutral": 1
+   },
+   "lightIntensity": {
+    "to": "shading",
+    "scale": 1,
+    "min": 0,
+    "max": 1
+   },
+   "shine": {
+    "to": "shine",
+    "min": 0,
+    "max": 1
+   },
+   "spec": {
+    "neutral": 30
+   },
+   "ambient": {
+    "neutral": 0.1
+   },
+   "lightColor": {
+    "neutral": "#ffffffff"
+   },
+   "lightDir": {
+    "neutral": "75,-75"
+   },
+   "lightDepth": {
+    "neutral": 100
+   },
+   "size": {
+    "to": "reach",
+    "scale": 0.3,
+    "min": 0.02,
+    "max": 5
+   },
+   "ratio": {
+    "to": "thickness",
+    "scale": 0.3,
+    "min": 0.01,
+    "max": 2
+   },
+   "smooth": {
+    "to": "smoothing",
+    "min": 0,
+    "max": 1
+   },
+   "mirror": {
+    "neutral": "false"
+   },
+   "texRepeatX": {
+    "neutral": 1
+   },
+   "texRepeatY": {
+    "neutral": 1
+   },
+   "texAngle": {
+    "neutral": 0
+   },
+   "texCrop": {
+    "neutral": 1
+   },
+   "texTwirl": {
+    "neutral": 0
+   },
+   "MAX_ITER": {
+    "neutral": 60
+   },
+   "texStretch": {
+    "neutral": "false"
+   }
+  },
+  "set": {
+   "rotX": 0,
+   "rotY": 0,
+   "rotZ": 0,
+   "position": "0,0",
+   "scale": 1,
+   "perspective": 1,
+   "shading": 1,
+   "shine": 0.8,
+   "light": 45,
+   "reach": 0.3,
+   "thickness": 0.15,
+   "smoothing": 0
+  }
+ },
+ "com.alightcreative.effects.tunnel": {
+  "to": "tunnel",
+  "params": {
+   "phase": {
+    "to": "phase"
+   },
+   "fogColor": {
+    "to": "fogColor"
+   },
+   "fog": {
+    "to": "fog",
+    "scale": 0.4,
+    "min": 0,
+    "max": 1
+   },
+   "twirl": {
+    "to": "twist"
+   },
+   "wrap": {
+    "to": "repeat",
+    "min": 1,
+    "max": 16
+   },
+   "depth": {
+    "neutral": 0.3
+   },
+   "crop": {
+    "neutral": 0.995
+   },
+   "mirror": {
+    "neutral": "true"
+   }
+  },
+  "set": {
+   "rotX": 0,
+   "rotY": 0,
+   "rotZ": 0,
+   "speed": 0,
+   "repeat": 2,
+   "fog": 0.4,
+   "twist": 0,
+   "phase": 0,
+   "position": "0,0",
+   "scale": 1
+  }
+ },
+ "com.alightcreative.effects.flip": {
+  "to": "flip",
+  "params": {
+   "angle": {
+    "to": "rotY",
+    "scale": -1
+   },
+   "axis": {
+    "to": "axis"
+   },
+   "crop": {
+    "neutral": 1
+   },
+   "enableLight": {
+    "to": "shading",
+    "values": {
+     "false": 0,
+     "true": 1
+    }
+   },
+   "light": {
+    "to": "light"
+   }
+  },
+  "set": {
+   "rotX": 0,
+   "rotY": 0,
+   "rotZ": 0,
+   "axis": 0,
+   "back": 1,
+   "perspective": 0.6,
+   "scale": 1,
+   "shading": 0,
+   "shine": 0,
+   "position": "0,0"
+  }
+ },
+ "com.alightcreative.effects.flip2": {
+  "to": "flip",
+  "params": {
+   "angle": {
+    "to": "rotY",
+    "scale": -1
+   },
+   "axis": {
+    "to": "axis"
+   },
+   "crop": {
+    "neutral": 1
+   },
+   "enableLight": {
+    "to": "shading",
+    "values": {
+     "false": 0,
+     "true": 1
+    }
+   },
+   "light": {
+    "to": "light"
+   },
+   "solid": {
+    "to": "back",
+    "values": {
+     "false": 1,
+     "true": 2
+    }
+   },
+   "solidColor": {
+    "to": "backColor"
+   },
+   "thickness": {
+    "neutral": 1
+   }
+  },
+  "set": {
+   "rotX": 0,
+   "rotY": 0,
+   "rotZ": 0,
+   "axis": 0,
+   "back": 1,
+   "perspective": 0.6,
+   "scale": 1,
+   "shading": 0,
+   "shine": 0,
+   "position": "0,0"
+  }
+ },
+ "com.alightcreative.effects.flip3": {
+  "to": "flip",
+  "params": {
+   "angle": {
+    "to": "rotY",
+    "scale": -1
+   },
+   "axis": {
+    "to": "axis"
+   },
+   "crop": {
+    "neutral": 1
+   },
+   "zdist": {
+    "neutral": 0
+   },
+   "enableLight": {
+    "to": "shading",
+    "values": {
+     "false": 0,
+     "true": 1
+    }
+   },
+   "lightIntensity": {
+    "neutral": 1
+   },
+   "lightColor": {
+    "neutral": "#ffffffff"
+   },
+   "lightDepth": {
+    "neutral": -100
+   },
+   "light": {
+    "to": "light"
+   },
+   "solid": {
+    "to": "back",
+    "values": {
+     "false": 1,
+     "true": 2
+    }
+   },
+   "solidColor": {
+    "to": "backColor"
+   },
+   "thickness": {
+    "neutral": 1
+   },
+   "pivot": {
+    "neutral": "0,0"
+   },
+   "shine": {
+    "to": "shine",
+    "min": 0,
+    "max": 1
+   },
+   "spec": {
+    "neutral": 30
+   },
+   "ambient": {
+    "neutral": 0.1
+   },
+   "lightDir": {
+    "neutral": "75,-75"
+   }
+  },
+  "set": {
+   "rotX": 0,
+   "rotY": 0,
+   "rotZ": 0,
+   "axis": 0,
+   "back": 1,
+   "perspective": 0.6,
+   "scale": 1,
+   "shading": 0,
+   "shine": 0,
+   "position": "0,0"
+  }
+ },
+ "com.alightcreative.effects.spherize": {
+  "to": "spherize",
+  "params": {
+   "repeatx": {
+    "neutral": 1
+   },
+   "repeaty": {
+    "neutral": 1
+   },
+   "enableLight": {
+    "to": "shading",
+    "values": {
+     "false": 0,
+     "true": 1
+    }
+   },
+   "lightIntensity": {
+    "neutral": 1
+   },
+   "lightColor": {
+    "neutral": "#ffffffff"
+   },
+   "lightDir": {
+    "neutral": "75,-75"
+   },
+   "lightDepth": {
+    "neutral": 100
+   },
+   "mirror": {
+    "neutral": "false"
+   }
+  },
+  "set": {
+   "rotX": 0,
+   "rotY": 90,
+   "rotZ": 0,
+   "radius": 0.9,
+   "coverage": 0.7,
+   "projection": 1,
+   "perspective": 1,
+   "scale": 1,
+   "shading": 1,
+   "shine": 0,
+   "light": 45,
+   "position": "0,0"
+  }
+ },
+ "com.alightcreative.effects.spherize2": {
+  "to": "spherize",
+  "params": {
+   "rotate": [
+    {
+     "to": "rotX",
+     "scale": -1
+    },
+    {
+     "to": "rotY"
+    },
+    {
+     "to": "rotZ"
+    }
+   ],
+   "position": {
+    "to": "position",
+    "take": 2,
+    "per": "height",
+    "scale": 0.0016666666666666668,
+    "signs": [
+     1,
+     -1
+    ],
+    "pre": [
+     0,
+     0
+    ]
+   },
+   "scale": {
+    "to": "scale",
+    "min": 0.05,
+    "max": 10
+   },
+   "shadingType": {
+    "neutral": 1
+   },
+   "lightIntensity": {
+    "to": "shading",
+    "scale": 1,
+    "min": 0,
+    "max": 1
+   },
+   "shine": {
+    "to": "shine",
+    "min": 0,
+    "max": 1
+   },
+   "spec": {
+    "neutral": 30
+   },
+   "ambient": {
+    "neutral": 0.1
+   },
+   "lightColor": {
+    "neutral": "#ffffffff"
+   },
+   "lightDir": {
+    "neutral": "75,-75"
+   },
+   "lightDepth": {
+    "neutral": 100
+   },
+   "radius": {
+    "to": "radius",
+    "scale": 0.312,
+    "min": 0.02,
+    "max": 5
+   },
+   "texCrop": {
+    "neutral": 1
+   },
+   "texScale": {
+    "neutral": 1
+   },
+   "texStretch": {
+    "neutral": "1,1"
+   },
+   "texAngle": {
+    "neutral": 0
+   },
+   "texTwirl": {
+    "neutral": 0
+   },
+   "mirror": {
+    "neutral": "false"
+   },
+   "MAX_ITER": {
+    "neutral": 60
+   }
+  },
+  "set": {
+   "rotX": 0,
+   "rotY": 0,
+   "rotZ": 0,
+   "position": "0,5.5",
+   "scale": 1,
+   "perspective": 1,
+   "shading": 1,
+   "shine": 0.8,
+   "light": 45,
+   "radius": 0.78,
+   "coverage": 0.7,
+   "projection": 0
+  }
+ },
+ "com.alightcreative.effects.360-reorient-sphere": {
+  "to": "reorient360",
+  "params": {
+   "rotate": [
+    {
+     "to": "roll",
+     "scale": -1
+    },
+    {
+     "to": "pitch",
+     "scale": -1
+    },
+    {
+     "to": "yaw"
+    }
+   ]
+  },
+  "set": {
+   "yaw": 0,
+   "pitch": 0,
+   "roll": 0
+  }
+ },
+ "com.alightcreative.effects.vrplayer": {
+  "to": "viewer360",
+  "params": {
+   "rotate": [
+    {
+     "to": "roll",
+     "scale": -1
+    },
+    {
+     "to": "pitch",
+     "scale": -1
+    },
+    {
+     "to": "yaw"
+    }
+   ],
+   "dist": {
+    "neutral": 1
+   },
+   "aspectRatio": {
+    "neutral": 0
+   },
+   "scale": {
+    "neutral": 1
+   }
+  },
+  "set": {
+   "yaw": 0,
+   "pitch": 0,
+   "roll": 0,
+   "fov": 50
+  }
+ },
+ "com.alightcreative.effects.vrcombined": {
+  "to": "viewer360",
+  "params": {
+   "rotate": [
+    {
+     "to": "roll",
+     "scale": -1
+    },
+    {
+     "to": "pitch",
+     "scale": -1
+    },
+    {
+     "to": "yaw"
+    }
+   ],
+   "dist": {
+    "neutral": 1
+   },
+   "flatten": {
+    "neutral": "false"
+   },
+   "w": {
+    "neutral": 16
+   },
+   "h": {
+    "neutral": 9
+   }
+  },
+  "set": {
+   "yaw": 0,
+   "pitch": 0,
+   "roll": 0,
+   "fov": 50
+  }
  }
 }
