@@ -6,6 +6,37 @@ All notable changes to AbsentMotion are listed here, newest first. The format fo
 Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stands for the feature set as it stood on
 2026-10-12.
 
+## [4.3.0] - 2026-10-30 - Compatibility
+
+### Added
+
+- OpenGL ES 3.0 support: phones without Vulkan 1.1, or with a broken Vulkan driver, run AbsentMotion through OpenGL. It is used automatically when Vulkan cannot start, and Settings > Graphics can switch to it. Preview, export, motion blur, Smooth and Datamosh work on it; the heavy AI tools are locked on OpenGL.
+- The Compatible version runs from Android 8, and a new Compatible 32-bit file (`-compatible-32bit.apk`) covers phones with a 32-bit system.
+- Retro Dither and Pixel Tiles effects. Palette Map gets 17 preset palettes, palettes imported from pictures and from ASE, ACT, GPL, PAL, HEX and Paint.NET files, and 23 dither patterns including Floyd-Steinberg and Atkinson.
+- New effects that also open Alight Motion projects using them: Energy Beam, Grunge, Hexagon Array, Luma Stamper, Matte Fringe and Key Spill Cleaner.
+- Chromatic Zoom Blur effect. Color Wheels gains an Offset wheel and a By Brightness style; Split Tone gains shadow and highlight levels and a Gradient Map style. Halftone gains a Two Color style, Mirror a Flip style, Matte Choker an Invert switch, Flip Layer an Axis, Colorize a Saturation setting, Gradient Overlay an Offset and Exposure a Brighten See-Through Parts switch.
+- Link several selected layers to one parent at once.
+- 3D Extrude and 3D Shape follow the 3D rotation of their parent.
+- A Report issue link in the app menu for people without a GitHub account.
+
+### Changed
+
+- Alight Motion projects look much closer to Alight: photos keep their colour space, adjustment layers keep soft edges and reach past the layer, effect directions turn with rotated layers, and many colour, blur and distortion effects follow Alight's measured look. More than 30 more Alight effects import (44 effect ids), including the 3D shapes, Flip Layer, 360 Reorient, VR Player, Tunnel, Drawing Progress, Stroke Taper, Mirror, Matte Choke, Bump Map, Iridescence, Hex Tile, Colorize, Text Transform, Lift Gamma Gain and Split Tone.
+- The import report lists only what did not come over.
+- Borders in Frame & Shadow open and close smoothly, and a new border unfolds out of Add Border.
+- Export time left starts from the estimate, counts down smoothly and learns from past exports. The choppy playback prompt is gone.
+- Crop: borders, effects and Move Along Path use the cropped picture. Transform has Basic and Advanced controls. 3D models keep their textures when simplified.
+- Shutter Blur, Motion Blur, shadows, borders and blends use less memory; big photos shown small no longer shimmer; AI frame interpolation uses all fast CPU cores; dragging and sliders stay smoother on big projects.
+- The Play version stays through 4.x and ends in 5.0. A Play install shows a notice on its first two starts, and its updater moves to the foss file when a release has no Play file.
+
+### Fixed
+
+- 62 bugs, among them: a black preview after a graphics error; a broken project in a backup restored as if it were fine; deleting a project could delete media a damaged recovery still needed; replaced sped-up or looping template videos lost their length; AI video carried the whole clip's sound; decoders could hang on some files; preview copies could come out black; relinked clips stayed marked missing; a child layer jumped when its parent's scale went through zero; the Border tab went empty after its open border was removed.
+
+### Credits
+
+- Thanks to [TrueMotion](https://github.com/Mushroom65/TrueMotion) by Mushroom65, a project based on AbsentMotion, for feature ideas, including the Particles effect planned for 4.4.
+
 ## [4.2.1] - 2026-10-29
 
 ### Fixed
