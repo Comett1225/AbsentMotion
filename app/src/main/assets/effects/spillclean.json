@@ -1,0 +1,39 @@
+{
+ "id": "spillclean",
+ "name": "Key Spill Cleaner",
+ "category": "key",
+ "since": "4.3.0",
+ "description": "Removes the green or blue glow a keyed background leaves near the edges of the layer, keeping the brightness of the pixels.",
+ "params": [
+  {
+   "id": "strength",
+   "label": "Strength",
+   "type": "float",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  },
+  {
+   "id": "blur",
+   "label": "Edge width",
+   "type": "float",
+   "default": 50,
+   "min": 0,
+   "max": 300,
+   "step": 0.1
+  },
+  {
+   "id": "channel",
+   "label": "Spill color",
+   "type": "choice",
+   "options": [
+    "Auto",
+    "Green",
+    "Blue"
+   ],
+   "default": 0
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform shader blurred;\nuniform float strength;\nuniform float blur;\nuniform float channel;\nfloat edgeDistance(float2 coord) {\n    float b = clamp(float(blurred.eval(coord).a), 0.0005, 0.9995);\n    return blur / 3.0 * log(b / (1.0 - b)) / 1.702;\n}\nhalf4 main(float2 coord) {\n    half4 c = image.eval(coord);\n    if (c.a <= 0.0) return c;\n    float edge = max(1.0 - float(c.a), blur > 0.0 ? 1.0 - smoothstep(0.0, blur, edgeDistance(coord)) : 0.0);\n    float3 rgb = float3(unpremul(c).rgb);\n    float k = clamp(strength, 0.0, 1.0) * edge;\n    float greenSpill = max(rgb.g - max(rgb.r, rgb.b), 0.0);\n    float blueSpill = max(rgb.b - max(rgb.r, rgb.g), 0.0);\n    bool pickGreen = channel < 0.5 ? greenSpill >= blueSpill : channel < 1.5;\n    if (pickGreen) {\n        float d = greenSpill * k;\n        rgb += float3(0.85 * d * 0.587 / 0.299, -d, 0.15 * d * 0.587 / 0.114);\n    } else {\n        float d = blueSpill * k;\n        rgb += float3(0.5 * d * 0.114 / 0.299, 0.5 * d * 0.114 / 0.587, -d);\n    }\n    return half4(half3(clamp(rgb, 0.0, 1.0)) * c.a, c.a);\n}\n"
+}

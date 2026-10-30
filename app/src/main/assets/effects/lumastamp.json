@@ -1,0 +1,49 @@
+{
+ "id": "lumastamp",
+ "name": "Luma Stamper",
+ "category": "key",
+ "since": "4.3.0",
+ "description": "Turns the layer into a flat color whose opacity follows how bright each pixel is, like a stamp or stencil.",
+ "params": [
+  {
+   "id": "color",
+   "label": "Color",
+   "type": "color",
+   "default": "#ffff5566"
+  },
+  {
+   "id": "low",
+   "label": "Black point",
+   "type": "float",
+   "default": 0.1,
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  },
+  {
+   "id": "high",
+   "label": "White point",
+   "type": "float",
+   "default": 0.6,
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  },
+  {
+   "id": "gamma",
+   "label": "Gamma",
+   "type": "float",
+   "default": 1,
+   "min": 0.1,
+   "max": 10,
+   "step": 0.01
+  },
+  {
+   "id": "invert",
+   "label": "Invert",
+   "type": "switch",
+   "default": false
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nlayout(color) uniform half4 color;\nuniform float low;\nuniform float high;\nuniform float gamma;\nuniform float invert;\nhalf4 main(float2 coord) {\n    half4 c = image.eval(coord);\n    if (c.a <= 0.0) return c;\n    float luma = dot(float3(unpremul(c).rgb), float3(0.2126, 0.7152, 0.0722));\n    float g = clamp((pow(luma, 1.0 / max(gamma, 0.01)) - low) / max(high - low, 0.001), 0.0, 1.0);\n    float k = (invert > 0.5 ? 1.0 - g : g) * float(color.a) * float(c.a);\n    return half4(color.rgb * half(k), half(k));\n}\n"
+}

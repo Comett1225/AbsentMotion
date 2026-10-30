@@ -1,0 +1,79 @@
+{
+ "id": "grunge",
+ "name": "Grunge",
+ "category": "stylize",
+ "since": "4.3.0",
+ "description": "Distresses the layer with grain, dirt blotches, burnt edges and a dusty color tint.",
+ "params": [
+  {
+   "id": "strength",
+   "label": "Strength",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  },
+  {
+   "id": "grain",
+   "label": "Grain",
+   "type": "float",
+   "default": 0.6,
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  },
+  {
+   "id": "blotches",
+   "label": "Dirt",
+   "type": "float",
+   "default": 0.6,
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  },
+  {
+   "id": "scale",
+   "label": "Dirt size",
+   "type": "float",
+   "default": 60,
+   "min": 4,
+   "max": 1000,
+   "step": 1
+  },
+  {
+   "id": "burn",
+   "label": "Burnt edges",
+   "type": "float",
+   "default": 0.6,
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  },
+  {
+   "id": "color",
+   "label": "Tint color",
+   "type": "color",
+   "default": "#ffa8683a"
+  },
+  {
+   "id": "tint",
+   "label": "Tint",
+   "type": "float",
+   "default": 0.15,
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  },
+  {
+   "id": "seed",
+   "label": "Seed",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 100,
+   "step": 1
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float strength;\nuniform float grain;\nuniform float blotches;\nuniform float scale;\nuniform float burn;\nlayout(color) uniform half4 color;\nuniform float tint;\nuniform float seed;\nfloat hash11(float p) {\n    p = fract(p * 0.1031);\n    p *= p + 33.33;\n    p *= p + p;\n    return fract(p);\n}\nfloat hash21(float2 p) {\n    float3 q = fract(float3(p.xyx) * 0.1031);\n    q += dot(q, q.yzx + 33.33);\n    return fract((q.x + q.y) * q.z);\n}\nfloat vnoise(float2 p) {\n    float2 i = floor(p);\n    float2 f = fract(p);\n    f = f * f * (3.0 - 2.0 * f);\n    return mix(mix(hash21(i), hash21(i + float2(1, 0)), f.x), mix(hash21(i + float2(0, 1)), hash21(i + float2(1, 1)), f.x), f.y);\n}\nfloat fbm(float2 p) {\n    float s = 0.0;\n    float a = 0.5;\n    for (int i = 0; i < 5; i++) {\n        s += a * vnoise(p);\n        p = p * 2.03 + float2(17.1, 9.7);\n        a *= 0.5;\n    }\n    return s / 0.96875;\n}\nhalf4 main(float2 coord) {\n    half4 c = image.eval(coord);\n    if (c.a <= 0.0) return c;\n    float3 base = float3(unpremul(c).rgb);\n    float3 rgb = base;\n    float sc = max(scale, 4.0);\n    float blot = fbm(coord / sc + seed * 17.0);\n    float fine = fbm(coord / (sc * 0.3) + seed * 5.0 + 31.0);\n    float noise = hash21(floor(coord) + seed * 3.0);\n    float haze = smoothstep(0.3, 0.8, blot) * blotches * 0.6 + grain * (noise - 0.2) * 0.55;\n    rgb = 1.0 - (1.0 - rgb) * (1.0 - float3(1.0, 0.72, 0.66) * clamp(haze, 0.0, 1.0));\n    rgb *= 1.0 - blotches * 0.12 * smoothstep(0.55, 0.2, fine);\n    float2 e = min(coord, size - coord);\n    float reach = 0.12 * min(size.x, size.y);\n    float wall = min(e.x, e.y) + (fine - 0.5) * 0.5 * reach;\n    rgb = mix(rgb, rgb * float3(0.3, 0.2, 0.12), burn * (1.0 - smoothstep(0.0, reach, wall)));\n    rgb = mix(rgb, float3(color.rgb), tint * float(color.a));\n    rgb = mix(base, clamp(rgb, 0.0, 1.0), clamp(strength, 0.0, 1.0));\n    return half4(half3(rgb) * c.a, c.a);\n}\n"
+}

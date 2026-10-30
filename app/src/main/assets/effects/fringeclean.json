@@ -1,0 +1,73 @@
+{
+ "id": "fringeclean",
+ "name": "Matte Fringe",
+ "category": "key",
+ "since": "4.3.0",
+ "description": "Drains the color from the pixels along the edge of the layer's matte, so colored halos left by a key fade to grey, while up to three protected colors stay as they are.",
+ "params": [
+  {
+   "id": "blur",
+   "label": "Thickness",
+   "type": "float",
+   "default": 20,
+   "min": 0,
+   "max": 300,
+   "step": 0.1
+  },
+  {
+   "id": "feather",
+   "label": "Feather",
+   "type": "float",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  },
+  {
+   "id": "color1",
+   "label": "Keep color 1",
+   "type": "color",
+   "default": "#ff3366cc"
+  },
+  {
+   "id": "threshold1",
+   "label": "Range 1",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  },
+  {
+   "id": "color2",
+   "label": "Keep color 2",
+   "type": "color",
+   "default": "#ff3366cc"
+  },
+  {
+   "id": "threshold2",
+   "label": "Range 2",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  },
+  {
+   "id": "color3",
+   "label": "Keep color 3",
+   "type": "color",
+   "default": "#ff3366cc"
+  },
+  {
+   "id": "threshold3",
+   "label": "Range 3",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform shader blurred;\nuniform float blur;\nuniform float feather;\nlayout(color) uniform half4 color1;\nuniform float threshold1;\nlayout(color) uniform half4 color2;\nuniform float threshold2;\nlayout(color) uniform half4 color3;\nuniform float threshold3;\nfloat edgeDistance(float2 coord) {\n    float b = clamp(float(blurred.eval(coord).a), 0.0005, 0.9995);\n    return blur / 3.0 * log(b / (1.0 - b)) / 1.702;\n}\nfloat keep(float3 rgb, half4 k, float range) {\n    if (range <= 0.0) return 0.0;\n    return 1.0 - smoothstep(range * (1.0 - feather), range + 0.0001, distance(rgb, float3(k.rgb)));\n}\nhalf4 main(float2 coord) {\n    half4 c = image.eval(coord);\n    if (c.a <= 0.0 || blur <= 0.0) return c;\n    float w = 1.0 - smoothstep(blur * (1.0 - feather), blur + 0.0001, edgeDistance(coord));\n    float3 rgb = float3(unpremul(c).rgb);\n    w *= 1.0 - max(keep(rgb, color1, threshold1), max(keep(rgb, color2, threshold2), keep(rgb, color3, threshold3)));\n    float3 grey = float3(dot(rgb, float3(0.299, 0.587, 0.114))) + float3(-0.027, 0.004, 0.035);\n    return half4(half3(clamp(mix(rgb, grey, w), 0.0, 1.0)) * c.a, c.a);\n}\n"
+}
