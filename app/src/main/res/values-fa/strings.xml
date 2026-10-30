@@ -115,6 +115,11 @@
     <string name="the_media_picker_lists_only_albums">انتخابگر رسانه فقط آلبوم‌ها و پوشه‌هایی را نشان می‌دهد که نامشان شامل Demo است.</string>
     <string name="demo_mode_is_on">حالت دمو روشن است</string>
     <string name="preview_quality">کیفیت پیش‌نمایش</string>
+    <string name="settings_graphics">گرافیک</string>
+    <string name="settings_graphics_auto">خودکار</string>
+    <string name="settings_graphics_opengl">OpenGL</string>
+    <string name="settings_graphics_note">اکنون از %1$s استفاده می‌شود.</string>
+    <string name="settings_graphics_hint">اگر پیش‌نمایش یا خروجی‌ها در این گوشی درست به نظر نمی‌رسند، OpenGL را انتخاب کنید.</string>
     <string name="playback_resampling">بازنمونه‌برداری پخش</string>
     <string name="settings">تنظیمات</string>
     <string name="your_video_ended_early_so_its">ویدیوی شما زودتر تمام شد، بنابراین آخرین فریم آن نگه داشته می‌شود.\nبرای نتیجه بهتر یک کلیپ طولانی‌تر جایگزین کنید.</string>
@@ -237,6 +242,8 @@
     <string name="update_failed">بررسی ممکن نشد؛ وقتی آنلاین بودید دوباره امتحان کنید</string>
     <string name="update_turn_on">روشنش کنید</string>
     <string name="update_not_now">الان نه</string>
+    <string name="play_ending_title">نسخه Play در 5.0 وجود ندارد</string>
+    <string name="play_ending_body">از نسخه 5.0 به بعد، AbsentMotion نسخه Play نخواهد داشت. با انتشار 5.0، به‌روزرسانی این اپ را به‌طور خودکار به نسخه FOSS منتقل می‌کند. پروژه‌ها و تنظیمات شما باقی می‌مانند و حذف پس‌زمینه به‌جای سرویس‌های Google Play از مدل آفلاین خود اپ استفاده می‌کند.</string>
     <string name="update_outdated">این مشکل ممکن است در نسخه جدیدتر برطرف شده باشد (نصب‌شده %1$s، جدیدترین %2$s).</string>
     <string name="update_changelog">تغییرات</string>
     <string name="update_open_failed">هیچ برنامه‌ای در این دستگاه نمی‌تواند این پیوند را باز کند.</string>
@@ -602,6 +609,7 @@
     <string name="unsupported_title">این گوشی نمی‌تواند ویرایشگر را اجرا کند</string>
     <string name="unsupported_old_vulkan">‏AbsentMotion پیش‌نمایش و خروجی را با چیپ گرافیکی از طریق Vulkan 1.1 رسم می‌کند، و این گوشی فقط نسخه قدیمی‌تر Vulkan را دارد.</string>
     <string name="unsupported_no_vulkan">درایور گرافیک گوشی Vulkan را اجرا نکرد؛ AbsentMotion برای رسم پیش‌نمایش و خروجی به آن نیاز دارد.</string>
+    <string name="unsupported_no_opengl">AbsentMotion همچنین OpenGL ES 3.0 را امتحان کرد، اما آن هم اجرا نشد.</string>
     <string name="unsupported_driver_features">درایور گرافیک گوشی فاقد قابلیت‌هایی است که AbsentMotion برای رسم پیش‌نمایش و خروجی لازم دارد.</string>
     <string name="unsupported_skia">موتور رسم AbsentMotion با درایور گرافیک این گوشی کار نمی‌کند.</string>
     <string name="unsupported_unknown">موتور رسم AbsentMotion روی این گوشی اجرا نشد.</string>
@@ -1722,11 +1730,12 @@
     <string name="recovery_your_project">پروژه شما</string>
     <string name="caption_layer_name">زیرنویس %1$s</string>
     <string name="tier_needs_latest">به اندروید 13 (Latest) نیاز دارد</string>
+    <string name="tier_needs_vulkan">به گوشی با گرافیک Vulkan نیاز دارد</string>
     <string name="feature_flow_high">جریان نوری بالا</string>
     <string name="feature_ai_enhance">بهسازی AI</string>
     <string name="feature_best_cutout">حذف پس‌زمینه با AI 2.0</string>
     <string name="about_version_compatible">نسخه %1$s Compatible</string>
-    <string name="about_compatible_note">این نسخه Compatible برای اندروید 9 تا 12 است. کنار گذاشته شده: %1$s. آن‌ها به اندروید 13 و نسخه Latest نیاز دارند.</string>
+    <string name="about_compatible_note">این نسخه Compatible برای اندروید 8 تا 12 است. کنار گذاشته شده: %1$s. آن‌ها به اندروید 13 و نسخه Latest نیاز دارند.</string>
     <string name="low_memory_title">کمبود حافظه</string>
     <string name="low_memory_body">این گوشی %1$s GB حافظهٔ رم دارد. AbsentMotion با 3 GB یا بیشتر بهتر کار می‌کند: پروژه‌های طولانی، ویدیوهای بزرگ و افکت‌های زیاد می‌توانند کند شوند یا برنامه را ببندند.</string>
     <string name="preview_cache_render">رندر پیش‌نمایش</string>

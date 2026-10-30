@@ -1,5 +1,6 @@
 package app.absentmotion.ui.editor
 
+import app.absentmotion.platform.scaledFrame
 import android.content.Context
 import android.media.MediaMetadataRetriever
 import android.net.Uri
@@ -109,7 +110,7 @@ private suspend fun thumbnailsAt(context: Context, uri: String, version: String,
             val picture = thumbnails[key] ?: (retriever ?: MediaMetadataRetriever().also {
                 retriever = it
                 it.setDataSource(context, Uri.parse(openableUri(source)))
-            }).getScaledFrameAtTime(time, MediaMetadataRetriever.OPTION_CLOSEST, 160, 96)?.asImageBitmap()?.also { thumbnails[key] = it }
+            }).scaledFrame(time, MediaMetadataRetriever.OPTION_CLOSEST, 160, 96)?.asImageBitmap()?.also { thumbnails[key] = it }
             picture?.let { projectTime to it }
         }
     } catch (e: CancellationException) { throw e } catch (_: Exception) { emptyList() } finally { retriever?.release() }

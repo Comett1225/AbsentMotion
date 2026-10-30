@@ -115,6 +115,11 @@
     <string name="the_media_picker_lists_only_albums">Medya seçici yalnızca adında Demo geçen albümleri ve klasörleri listeler.</string>
     <string name="demo_mode_is_on">Demo Modu açık</string>
     <string name="preview_quality">Önizleme kalitesi</string>
+    <string name="settings_graphics">Grafik</string>
+    <string name="settings_graphics_auto">Otomatik</string>
+    <string name="settings_graphics_opengl">OpenGL</string>
+    <string name="settings_graphics_note">Şu anda %1$s kullanılıyor.</string>
+    <string name="settings_graphics_hint">Önizleme veya dışa aktarmalar bu telefonda yanlış görünüyorsa OpenGL\'i seçin.</string>
     <string name="playback_resampling">Oynatma yeniden örneklemesi</string>
     <string name="settings">Ayarlar</string>
     <string name="your_video_ended_early_so_its">Videonuz erken bittiği için son karesi sabit tutuluyor.\nDaha temiz bir sonuç için daha uzun bir klip kullanın.</string>
@@ -237,6 +242,8 @@
     <string name="update_failed">Denetlenemedi, çevrimiçi olduğunuzda tekrar deneyin</string>
     <string name="update_turn_on">Aç</string>
     <string name="update_not_now">Şimdi değil</string>
+    <string name="play_ending_title">5.0\'te Play sürümü yok</string>
+    <string name="play_ending_body">5.0 sürümünden itibaren AbsentMotion\'ın Play sürümü olmayacak. 5.0 çıktığında güncelleme bu uygulamayı otomatik olarak FOSS sürümüne taşır. Projeleriniz ve ayarlarınız korunur; arka plan kaldırma, Google Play hizmetleri yerine uygulamanın kendi çevrimdışı modelini kullanır.</string>
     <string name="update_outdated">Bu, yeni sürümde düzeltilmiş olabilir (yüklü %1$s, en yeni %2$s).</string>
     <string name="update_changelog">Sürüm notları</string>
     <string name="update_open_failed">Bu cihazda bağlantıyı açabilecek bir uygulama yok.</string>
@@ -602,6 +609,7 @@
     <string name="unsupported_title">Bu telefon düzenleyiciyi çalıştıramıyor</string>
     <string name="unsupported_old_vulkan">AbsentMotion önizlemeyi ve dışa aktarmayı grafik yongasıyla Vulkan 1.1 üzerinden çizer, ancak bu telefonda yalnızca daha eski bir Vulkan sürümü var.</string>
     <string name="unsupported_no_vulkan">Telefonun grafik sürücüsü Vulkan\'ı başlatamadı; AbsentMotion önizleme ve dışa aktarma için Vulkan\'a ihtiyaç duyar.</string>
+    <string name="unsupported_no_opengl">AbsentMotion OpenGL ES 3.0\'ı da denedi, ancak o da başlatılamadı.</string>
     <string name="unsupported_driver_features">Telefonun grafik sürücüsünde AbsentMotion\'ın önizleme ve dışa aktarma için gereken özellikler eksik.</string>
     <string name="unsupported_skia">AbsentMotion\'ın çizim motoru bu telefonun grafik sürücüsüyle çalışmıyor.</string>
     <string name="unsupported_unknown">AbsentMotion\'ın çizim motoru bu telefonda başlatılamadı.</string>
@@ -1722,11 +1730,12 @@
     <string name="recovery_your_project">projeniz</string>
     <string name="caption_layer_name">Altyazı %1$s</string>
     <string name="tier_needs_latest">Android 13 (Latest sürümü) gerekir</string>
+    <string name="tier_needs_vulkan">Vulkan grafik destekli bir telefon gerekir</string>
     <string name="feature_flow_high">Optik akış High</string>
     <string name="feature_ai_enhance">AI İyileştirme</string>
     <string name="feature_best_cutout">AI arka plan kaldırma 2.0</string>
     <string name="about_version_compatible">Sürüm %1$s Compatible</string>
-    <string name="about_compatible_note">Bu, Android 9 ile 12 için Compatible sürümüdür. Dışarıda bırakılanlar: %1$s. Bunlar için Android 13 ve Latest sürümü gerekir.</string>
+    <string name="about_compatible_note">Bu, Android 8 ile 12 için Compatible sürümüdür. Dışarıda bırakılanlar: %1$s. Bunlar için Android 13 ve Latest sürümü gerekir.</string>
     <string name="low_memory_title">Düşük bellek</string>
     <string name="low_memory_body">Bu telefonda %1$s GB bellek var. AbsentMotion en iyi 3 GB veya daha fazlasıyla çalışır: uzun projeler, büyük videolar ve çok sayıda efekt yavaşlayabilir veya uygulamayı kapatabilir.</string>
     <string name="preview_cache_render">Önizlemeyi işle</string>

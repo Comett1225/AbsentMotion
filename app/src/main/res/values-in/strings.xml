@@ -115,6 +115,11 @@
     <string name="the_media_picker_lists_only_albums">Pemilih media hanya menampilkan album dan folder yang namanya mengandung Demo.</string>
     <string name="demo_mode_is_on">Mode Demo aktif</string>
     <string name="preview_quality">Kualitas pratinjau</string>
+    <string name="settings_graphics">Grafis</string>
+    <string name="settings_graphics_auto">Otomatis</string>
+    <string name="settings_graphics_opengl">OpenGL</string>
+    <string name="settings_graphics_note">Sekarang memakai %1$s.</string>
+    <string name="settings_graphics_hint">Pilih OpenGL jika pratinjau atau hasil ekspor terlihat salah di ponsel ini.</string>
     <string name="playback_resampling">Resampling pemutaran</string>
     <string name="settings">Pengaturan</string>
     <string name="your_video_ended_early_so_its">Video Anda berakhir lebih awal, jadi frame terakhirnya ditahan.\nGanti dengan klip yang lebih panjang untuk hasil yang lebih rapi.</string>
@@ -237,6 +242,8 @@
     <string name="update_failed">Tidak dapat memeriksa, coba lagi saat online</string>
     <string name="update_turn_on">Aktifkan</string>
     <string name="update_not_now">Nanti saja</string>
+    <string name="play_ending_title">Tidak ada build Play di 5.0</string>
+    <string name="play_ending_body">Mulai versi 5.0 tidak akan ada build Play dari AbsentMotion. Saat 5.0 dirilis, pembaruan akan memindahkan aplikasi ini ke build FOSS secara otomatis. Proyek dan pengaturan Anda tetap tersimpan, dan penghapusan latar belakang memakai model offline milik aplikasi, bukan layanan Google Play.</string>
     <string name="update_outdated">Ini mungkin sudah diperbaiki di versi yang lebih baru (terpasang %1$s, terbaru %2$s).</string>
     <string name="update_changelog">Log perubahan</string>
     <string name="update_open_failed">Tidak ada aplikasi di perangkat ini yang dapat membuka tautan.</string>
@@ -592,6 +599,7 @@
     <string name="unsupported_title">Ponsel ini tidak dapat menjalankan editor</string>
     <string name="unsupported_old_vulkan">AbsentMotion menggambar pratinjau dan ekspor dengan chip grafis melalui Vulkan 1.1, sedangkan ponsel ini hanya memiliki versi Vulkan yang lebih lama.</string>
     <string name="unsupported_no_vulkan">Driver grafis ponsel tidak dapat menjalankan Vulkan, yang dibutuhkan AbsentMotion untuk menggambar pratinjau dan ekspor.</string>
+    <string name="unsupported_no_opengl">AbsentMotion juga mencoba OpenGL ES 3.0, dan itu juga tidak bisa dimulai.</string>
     <string name="unsupported_driver_features">Driver grafis ponsel tidak memiliki fitur yang dibutuhkan AbsentMotion untuk menggambar pratinjau dan ekspor.</string>
     <string name="unsupported_skia">Mesin gambar AbsentMotion tidak berfungsi dengan driver grafis ponsel ini.</string>
     <string name="unsupported_unknown">Mesin gambar AbsentMotion tidak dapat dijalankan di ponsel ini.</string>
@@ -1698,11 +1706,12 @@
     <string name="recovery_your_project">proyek Anda</string>
     <string name="caption_layer_name">Takarir %1$s</string>
     <string name="tier_needs_latest">Butuh Android 13 (versi Latest)</string>
+    <string name="tier_needs_vulkan">Butuh ponsel dengan grafis Vulkan</string>
     <string name="feature_flow_high">Optical flow Tinggi</string>
     <string name="feature_ai_enhance">Peningkatan AI</string>
     <string name="feature_best_cutout">Penghapusan latar belakang AI 2.0</string>
     <string name="about_version_compatible">Versi %1$s Compatible</string>
-    <string name="about_compatible_note">Ini versi Compatible untuk Android 9 hingga 12. Tidak disertakan: %1$s. Fitur itu butuh Android 13 dan versi Latest.</string>
+    <string name="about_compatible_note">Ini versi Compatible untuk Android 8 hingga 12. Tidak disertakan: %1$s. Fitur itu butuh Android 13 dan versi Latest.</string>
     <string name="low_memory_title">Memori rendah</string>
     <string name="low_memory_body">Ponsel ini punya memori %1$s GB. AbsentMotion paling lancar dengan 3 GB atau lebih: proyek panjang, video besar, dan banyak efek bisa membuat lambat atau menutup aplikasi.</string>
     <string name="preview_cache_render">Render pratinjau</string>

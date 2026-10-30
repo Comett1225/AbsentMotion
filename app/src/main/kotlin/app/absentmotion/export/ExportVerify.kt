@@ -1,5 +1,8 @@
 package app.absentmotion.export
 
+import android.os.Build
+import android.graphics.BitmapFactory
+import app.absentmotion.platform.sampledBitmap
 import android.content.Context
 import android.graphics.ImageDecoder
 import android.media.MediaCodec
@@ -336,6 +339,13 @@ suspend fun verifyPicture(context: Context, uri: Uri, expect: PictureExpectation
 }
 
 private fun decodedSize(context: Context, uri: Uri): Size? {
+    if (Build.VERSION.SDK_INT < 28) {
+        val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        context.contentResolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, bounds) }
+        if (bounds.outWidth <= 0 || bounds.outHeight <= 0) return null
+        sampledBitmap(512) { context.contentResolver.openInputStream(uri) }?.recycle() ?: return null
+        return Size(bounds.outWidth, bounds.outHeight)
+    }
     var size: Size? = null
     try {
         ImageDecoder.decodeBitmap(ImageDecoder.createSource(context.contentResolver, uri)) { decoder, info, _ ->

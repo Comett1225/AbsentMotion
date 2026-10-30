@@ -6,7 +6,7 @@ import android.graphics.Bitmap
 import android.view.Surface
 
 class NativeEngine(backend: Backend) : AutoCloseable {
-    enum class Backend { GRAPHITE, GANESH }
+    enum class Backend { GRAPHITE, GANESH, GL }
 
     private var handle = nativeCreate(backend.ordinal)
     val failed: Boolean get() = nativeFailed(handle)
@@ -69,6 +69,7 @@ class NativeEngine(backend: Backend) : AutoCloseable {
     fun trim() = nativeTrim(handle)
 
     val displayTiming: Boolean get() = org.json.JSONObject(info).optBoolean("displayTiming")
+    val openGl: Boolean get() = org.json.JSONObject(info).optString("backend") == "gl"
 
     fun layerQuad(layerId: Long, timeMs: Double): FloatArray? = nativeLayerQuad(handle, layerId, timeMs)
 

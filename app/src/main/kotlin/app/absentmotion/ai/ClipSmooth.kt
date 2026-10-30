@@ -316,7 +316,7 @@ internal object ClipSmooth {
                         if (writer == null) {
                             check(feed!!.ready() && renderInto(feed.next, frameTimeMs(scene, plan.fps, k))) { AppText.get(R.string.ai_unable_to_process) }
                             feed.send(pts * 1000)
-                        } else {
+                        } else if (Build.VERSION.SDK_INT >= 33) {
                             val image = writer.dequeueInputImage()
                             try {
                                 check(image.hardwareBuffer!!.use { renderInto(it, frameTimeMs(scene, plan.fps, k)) }) { AppText.get(R.string.ai_unable_to_process) }

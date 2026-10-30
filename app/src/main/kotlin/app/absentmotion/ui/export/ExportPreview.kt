@@ -1,5 +1,9 @@
 package app.absentmotion.ui.export
 
+import android.os.Build
+import android.graphics.drawable.BitmapDrawable
+import app.absentmotion.platform.sampledBitmap
+import app.absentmotion.platform.scaledFrame
 import app.absentmotion.R
 import app.absentmotion.i18n.Ltr
 import androidx.compose.ui.res.stringResource
@@ -125,9 +129,9 @@ private fun StillImage(uri: Uri, modifier: Modifier = Modifier) {
 
 private suspend fun loadImage(context: Context, uri: Uri): ImageBitmap? = withContext(Dispatchers.IO) {
     runCatching {
-        ImageDecoder.decodeBitmap(ImageDecoder.createSource(context.contentResolver, uri)) { decoder, info, _ ->
+        (if (Build.VERSION.SDK_INT >= 28) ImageDecoder.decodeBitmap(ImageDecoder.createSource(context.contentResolver, uri)) { decoder, info, _ ->
             decoder.setTargetSampleSize(maxOf(1, maxOf(info.size.width, info.size.height) / MaxSide))
-        }.asImageBitmap()
+        } else sampledBitmap(MaxSide) { context.contentResolver.openInputStream(uri) })?.asImageBitmap()
     }.getOrNull()
 }
 
@@ -157,12 +161,15 @@ private fun GifPreview(uri: Uri) {
     var drawable by remember { mutableStateOf<Drawable?>(null) }
     LaunchedEffect(uri) {
         drawable = withContext(Dispatchers.IO) {
-            runCatching { ImageDecoder.decodeDrawable(ImageDecoder.createSource(context.contentResolver, uri)) }.getOrNull()
+            runCatching {
+                if (Build.VERSION.SDK_INT >= 28) ImageDecoder.decodeDrawable(ImageDecoder.createSource(context.contentResolver, uri))
+                else sampledBitmap(MaxSide) { context.contentResolver.openInputStream(uri) }?.let { BitmapDrawable(context.resources, it) }
+            }.getOrNull()
         }
     }
     DisposableEffect(drawable) {
         val shown = drawable
-        onDispose { (shown as? AnimatedImageDrawable)?.stop() }
+        onDispose { if (Build.VERSION.SDK_INT >= 28) (shown as? AnimatedImageDrawable)?.stop() }
     }
     AndroidView(
         factory = { ImageView(it).apply { scaleType = ImageView.ScaleType.FIT_CENTER } },
@@ -170,7 +177,7 @@ private fun GifPreview(uri: Uri) {
         update = { v ->
             if (v.drawable !== drawable) {
                 v.setImageDrawable(drawable)
-                (drawable as? AnimatedImageDrawable)?.apply { repeatCount = AnimatedImageDrawable.REPEAT_INFINITE; start() }
+                if (Build.VERSION.SDK_INT >= 28) (drawable as? AnimatedImageDrawable)?.apply { repeatCount = AnimatedImageDrawable.REPEAT_INFINITE; start() }
             }
         },
     )
@@ -353,7 +360,7 @@ private fun videoFacts(context: Context, uri: Uri): VideoFacts {
         val w = if (sideways) codedHeight else coded
         val h = if (sideways) coded else codedHeight
         val scale = minOf(1f, StillSide.toFloat() / maxOf(w, h))
-        val still = runCatching { reader.getScaledFrameAtTime(0, MediaMetadataRetriever.OPTION_CLOSEST_SYNC, (w * scale).toInt().coerceAtLeast(1), (h * scale).toInt().coerceAtLeast(1)) }
+        val still = runCatching { reader.scaledFrame(0, MediaMetadataRetriever.OPTION_CLOSEST_SYNC, (w * scale).toInt().coerceAtLeast(1), (h * scale).toInt().coerceAtLeast(1)) }
             .onFailure { Log.w("AMExport", "cannot read a still of the export", it) }.getOrNull()
         return VideoFacts(w.toFloat() / h, still?.asImageBitmap())
     } catch (e: RuntimeException) {

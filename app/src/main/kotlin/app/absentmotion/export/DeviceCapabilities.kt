@@ -1,5 +1,6 @@
 package app.absentmotion.export
 
+import app.absentmotion.platform.versionCodeLong
 import app.absentmotion.platform.hardware
 import app.absentmotion.platform.alias
 import android.content.Context
@@ -225,7 +226,7 @@ class DeviceCapabilities private constructor(context: Context) {
     val report: StateFlow<DeviceReport?> = state.asStateFlow()
 
     val key: String by lazy {
-        val version = runCatching { app.packageManager.getPackageInfo(app.packageName, 0).longVersionCode }.getOrDefault(0L)
+        val version = runCatching { app.packageManager.getPackageInfo(app.packageName, 0).versionCodeLong }.getOrDefault(0L)
         "${Build.FINGERPRINT}|$version"
     }
 

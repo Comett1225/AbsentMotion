@@ -105,7 +105,7 @@ internal class AiNet private constructor(private val handle: Long, private val g
             model.verify(context)
             blend?.verify(context)
             val param = model.file(context, checkNotNull(paramName)).path
-            val useGpu = gpu && !cpuOnly
+            val useGpu = gpu && !cpuOnly && !app.absentmotion.Tier.openGl
             if (useGpu) AiDevice.gpuRunning(context, true)
             val bin = model.file(context, model.bin).path
             val other = blend?.let { it.file(context, it.bin).path }

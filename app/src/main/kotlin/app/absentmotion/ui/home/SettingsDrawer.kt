@@ -135,6 +135,14 @@ fun SettingsDrawer(settings: AppSettings, drawer: androidx.compose.material3.Dra
                     Choices(PreviewQuality.entries.map { it.label }, settings.previewQuality.ordinal) { settings.previewQuality = PreviewQuality.entries[it] }
                 }
                 Divider(10.dp)
+                ChoicesBlock(R.string.settings_graphics) {
+                    Choices(listOf(R.string.settings_graphics_auto, R.string.settings_graphics_opengl), if (settings.openGl) 1 else 0) { settings.openGl = it == 1 }
+                    Spacer(Modifier.height(8.dp))
+                    val now = stringResource(R.string.settings_graphics_note, if (app.absentmotion.Tier.openGl) "OpenGL" else "Vulkan")
+                    Text(if (settings.openGl) now else now + " " + stringResource(R.string.settings_graphics_hint), Modifier.padding(horizontal = 10.dp),
+                        color = Am.HomeMid, fontSize = 12.sp, lineHeight = 16.sp)
+                }
+                Divider(10.dp)
                 ChoicesBlock(R.string.playback_resampling) {
                     Choices(listOf(R.string.settings_level_low, R.string.settings_level_high, R.string.settings_level_ultra), settings.audioResampling) { settings.audioResampling = it }
                 }

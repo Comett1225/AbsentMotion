@@ -4,22 +4,14 @@ import app.absentmotion.platform.alias
 import app.absentmotion.platform.hardware
 import app.absentmotion.platform.intOr
 import android.content.Context
-import android.graphics.ImageFormat
-import android.media.Image
-import android.media.ImageReader
 import android.media.MediaCodec
 import android.media.MediaCodecInfo
 import android.media.MediaCodecList
 import android.media.MediaExtractor
 import android.media.MediaFormat
 import android.net.Uri
-import android.os.Build
-import android.os.Handler
-import android.os.HandlerThread
 import android.util.Log
-import android.hardware.HardwareBuffer
 import java.io.Closeable
-import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 import app.absentmotion.library.openableUri
 
@@ -84,13 +76,11 @@ internal fun codecBusy(e: Throwable): Boolean = e is MediaCodec.CodecException &
 internal class VideoDecoder(private val context: Context, private val uri: String) : Closeable {
     private val extractor = MediaExtractor()
     private var codec: MediaCodec? = null
-    private var reader: ImageReader? = null
-    private var imageThread: HandlerThread? = null
-    private val images = LinkedBlockingQueue<Image>()
+    private var frames: DecodedFrames? = null
     private val info = MediaCodec.BufferInfo()
     private var inputEnded = false
     private var outputEnded = false
-    private var current: Image? = null
+    private var current: DecodedFrame? = null
     private var currentPts = Long.MIN_VALUE
     private var positioned = false
     private var queued = false
@@ -115,24 +105,16 @@ internal class VideoDecoder(private val context: Context, private val uri: Strin
             extractor.selectTrack(track)
             timestamps = VideoSources.timestamps(context, uri)
             extractor.seekTo(0, MediaExtractor.SEEK_TO_PREVIOUS_SYNC)
-            imageThread = HandlerThread("am-video-images").apply { start() }
-            val width = format.getInteger(MediaFormat.KEY_WIDTH)
-            val height = format.getInteger(MediaFormat.KEY_HEIGHT)
-            reader = (if (Build.VERSION.SDK_INT >= 29) ImageReader.newInstance(width, height, ImageFormat.PRIVATE, MAX_IMAGES, HardwareBuffer.USAGE_GPU_SAMPLED_IMAGE)
-                else ImageReader.newInstance(width, height, ImageFormat.PRIVATE, MAX_IMAGES)).apply {
-                setOnImageAvailableListener({ source ->
-                    while (true) images.offer((try { source.acquireNextImage() } catch (_: IllegalStateException) { null }) ?: break)
-                }, Handler(imageThread!!.looper))
-            }
+            frames = decodedFrames(format.getInteger(MediaFormat.KEY_WIDTH), format.getInteger(MediaFormat.KEY_HEIGHT), MAX_IMAGES)
             format.setInteger(MediaFormat.KEY_ROTATION, 0)
             hdr = format.requestSdr()
-            codec = openDecoder(format, reader!!.surface)
+            codec = openDecoder(format, frames!!.surface)
         } catch (e: Exception) { close(); throw e }
     }
 
     fun wantedPts(timeUs: Long): Long = timestamps.ptsAt(timeUs)
 
-    fun frame(timeUs: Long, exact: Boolean, obsolete: () -> Boolean): Image? {
+    fun frame(timeUs: Long, exact: Boolean, obsolete: () -> Boolean): DecodedFrame? {
         val wanted = wantedPts(timeUs)
         if (wanted == currentPts) return current
         val decoder = codec ?: return current
@@ -203,7 +185,7 @@ internal class VideoDecoder(private val context: Context, private val uri: Strin
         if (queued && flushable) decoder.flush()
         else if (queued) {
             decoder.stop()
-            decoder.configure(format, reader!!.surface, null, 0)
+            decoder.configure(format, frames!!.surface, null, 0)
             decoder.start()
         }
         drainImages()
@@ -212,12 +194,12 @@ internal class VideoDecoder(private val context: Context, private val uri: Strin
         seeks++
     }
 
-    private fun show(decoder: MediaCodec, index: Int, pts: Long, wanted: Long, exact: Boolean): Image? {
+    private fun show(decoder: MediaCodec, index: Int, pts: Long, wanted: Long, exact: Boolean): DecodedFrame? {
         decoder.releaseOutputBuffer(index, true)
         val deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(2)
-        var image: Image? = null
+        var image: DecodedFrame? = null
         while (image == null) {
-            val next = images.poll(deadline - System.nanoTime(), TimeUnit.NANOSECONDS) ?: break
+            val next = frames?.poll(deadline - System.nanoTime()) ?: break
             if (kotlin.math.abs(next.timestamp / 1000 - pts) <= 1000) image = next else next.close()
         }
         if (image == null) { positioned = false; return if (exact) null else current }
@@ -227,15 +209,12 @@ internal class VideoDecoder(private val context: Context, private val uri: Strin
         return image
     }
 
-    private fun drainImages() { generateSequence { images.poll() }.forEach { it.close() } }
+    private fun drainImages() { frames?.drain() }
 
     override fun close() {
         current?.close(); current = null
         runCatching { codec?.stop() }; runCatching { codec?.release() }; codec = null
-        reader?.setOnImageAvailableListener(null, null)
-        reader?.close(); reader = null
-        imageThread?.quitSafely(); imageThread = null
-        drainImages()
+        frames?.close(); frames = null
         extractor.release()
     }
 }

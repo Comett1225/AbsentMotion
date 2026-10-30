@@ -35,7 +35,11 @@ data class EffectCatalog(
         ((if (definitions.any(::isNew)) listOf("new" to "New") else emptyList()) + EffectCategories).map { (k, v) -> k to (categoryNames[k] ?: v) }
 
     fun drawable(path: String?): Drawable? = path?.let { p ->
-        runCatching { open?.invoke(p)?.use { ImageDecoder.decodeDrawable(ImageDecoder.createSource(java.nio.ByteBuffer.wrap(it.readBytes()))) } }.getOrNull()
+        runCatching { open?.invoke(p)?.use { stream ->
+            val bytes = stream.readBytes()
+            if (android.os.Build.VERSION.SDK_INT >= 28) ImageDecoder.decodeDrawable(ImageDecoder.createSource(java.nio.ByteBuffer.wrap(bytes)))
+            else android.graphics.BitmapFactory.decodeByteArray(bytes, 0, bytes.size)?.let { android.graphics.drawable.BitmapDrawable(null, it) }
+        } }.getOrNull()
     }
 
     fun loadInto(load: (String) -> String): EffectCatalog {

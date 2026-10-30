@@ -2,7 +2,12 @@ package app.absentmotion.platform
 
 import android.media.MediaCodecInfo
 import android.media.MediaFormat
+import android.content.pm.PackageInfo
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.media.MediaMetadataRetriever
 import android.os.Build
+import androidx.core.content.pm.PackageInfoCompat
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 
@@ -49,3 +54,25 @@ internal val MediaCodecInfo.hardware: Boolean
 
 internal val MediaCodecInfo.alias: Boolean
     get() = Build.VERSION.SDK_INT >= 29 && isAlias
+
+internal val PackageInfo.versionCodeLong: Long get() = PackageInfoCompat.getLongVersionCode(this)
+
+internal fun MediaMetadataRetriever.scaledFrame(timeUs: Long, option: Int, width: Int, height: Int): Bitmap? =
+    if (Build.VERSION.SDK_INT >= 27) getScaledFrameAtTime(timeUs, option, width, height)
+    else getFrameAtTime(timeUs, option)?.let { fitBitmap(it, width, height) }
+
+internal fun fitBitmap(full: Bitmap, width: Int, height: Int): Bitmap {
+    val scale = minOf(width.toFloat() / full.width, height.toFloat() / full.height)
+    if (scale >= 1f) return full
+    val fitted = Bitmap.createScaledBitmap(full, maxOf(1, Math.round(full.width * scale)), maxOf(1, Math.round(full.height * scale)), true)
+    if (fitted !== full) full.recycle()
+    return fitted
+}
+
+internal fun sampledBitmap(maxSide: Int, open: () -> InputStream?): Bitmap? {
+    val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+    open()?.use { BitmapFactory.decodeStream(it, null, bounds) }
+    if (bounds.outWidth <= 0 || bounds.outHeight <= 0) return null
+    val options = BitmapFactory.Options().apply { inSampleSize = maxOf(1, maxOf(bounds.outWidth, bounds.outHeight) / maxSide) }
+    return open()?.use { BitmapFactory.decodeStream(it, null, options) }
+}

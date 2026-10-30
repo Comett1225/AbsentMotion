@@ -115,6 +115,11 @@
     <string name="the_media_picker_lists_only_albums">El selector de medios solo muestra álbumes y carpetas cuyo nombre contenga Demo.</string>
     <string name="demo_mode_is_on">El modo demo está activado</string>
     <string name="preview_quality">Calidad de vista previa</string>
+    <string name="settings_graphics">Gráficos</string>
+    <string name="settings_graphics_auto">Automático</string>
+    <string name="settings_graphics_opengl">OpenGL</string>
+    <string name="settings_graphics_note">Ahora se usa %1$s.</string>
+    <string name="settings_graphics_hint">Elige OpenGL si la vista previa o las exportaciones se ven mal en este teléfono.</string>
     <string name="playback_resampling">Remuestreo de reproducción</string>
     <string name="settings">Ajustes</string>
     <string name="your_video_ended_early_so_its">Tu video terminó antes, así que se mantiene el último fotograma.\nCambia a un clip más largo para un mejor resultado.</string>
@@ -237,6 +242,8 @@
     <string name="update_failed">No se pudo comprobar, inténtalo de nuevo cuando estés en línea</string>
     <string name="update_turn_on">Actívalo</string>
     <string name="update_not_now">Ahora no</string>
+    <string name="play_ending_title">Sin versión de Play en 5.0</string>
+    <string name="play_ending_body">A partir de la versión 5.0 no habrá una versión de Play de AbsentMotion. Cuando salga la 5.0, la actualización pasa esta app a la versión FOSS automáticamente. Tus proyectos y ajustes se mantienen, y la eliminación de fondo usa el modelo sin conexión de la propia app en lugar de los servicios de Google Play.</string>
     <string name="update_outdated">Puede que esto se haya corregido en la versión más nueva (instalada %1$s, más nueva %2$s).</string>
     <string name="update_changelog">Novedades</string>
     <string name="update_open_failed">Ninguna app de este dispositivo puede abrir el enlace.</string>
@@ -612,6 +619,7 @@
     <string name="unsupported_title">Este teléfono no puede ejecutar el editor</string>
     <string name="unsupported_old_vulkan">AbsentMotion dibuja la vista previa y la exportación con el chip gráfico mediante Vulkan 1.1, y este teléfono solo tiene una versión de Vulkan más antigua.</string>
     <string name="unsupported_no_vulkan">El controlador gráfico del teléfono no inició Vulkan, que AbsentMotion necesita para dibujar la vista previa y la exportación.</string>
+    <string name="unsupported_no_opengl">AbsentMotion también probó OpenGL ES 3.0, y tampoco se pudo iniciar.</string>
     <string name="unsupported_driver_features">Al controlador gráfico del teléfono le faltan funciones que AbsentMotion necesita para dibujar la vista previa y la exportación.</string>
     <string name="unsupported_skia">El motor de dibujo de AbsentMotion no funciona con el controlador gráfico de este teléfono.</string>
     <string name="unsupported_unknown">El motor de dibujo de AbsentMotion no pudo iniciarse en este teléfono.</string>
@@ -1746,11 +1754,12 @@
     <string name="recovery_your_project">tu proyecto</string>
     <string name="caption_layer_name">Subtítulo %1$s</string>
     <string name="tier_needs_latest">Requiere Android 13 (versión Latest)</string>
+    <string name="tier_needs_vulkan">Requiere un teléfono con gráficos Vulkan</string>
     <string name="feature_flow_high">Flujo óptico alto</string>
     <string name="feature_ai_enhance">Mejora con IA</string>
     <string name="feature_best_cutout">Eliminación de fondo con IA 2.0</string>
     <string name="about_version_compatible">Versión %1$s Compatible</string>
-    <string name="about_compatible_note">Esta es la versión Compatible para Android 9 a 12. Quedaron fuera: %1$s. Necesitan Android 13 y la versión Latest.</string>
+    <string name="about_compatible_note">Esta es la versión Compatible para Android 8 a 12. Quedaron fuera: %1$s. Necesitan Android 13 y la versión Latest.</string>
     <string name="low_memory_title">Memoria baja</string>
     <string name="low_memory_body">Este teléfono tiene %1$s GB de memoria. AbsentMotion funciona mejor con 3 GB o más: los proyectos largos, los videos grandes y muchos efectos pueden ir lento o cerrar la app.</string>
     <string name="preview_cache_render">Renderizar vista previa</string>

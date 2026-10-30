@@ -91,7 +91,7 @@ suspend fun slotPicture(context: Context, uri: String, video: Boolean): androidx
             val retriever = android.media.MediaMetadataRetriever()
             try {
                 retriever.setDataSource(context, Uri.parse(openableUri(uri)))
-                retriever.getScaledFrameAtTime(0, android.media.MediaMetadataRetriever.OPTION_CLOSEST_SYNC, 288, 288)
+                retriever.scaledFrame(0, android.media.MediaMetadataRetriever.OPTION_CLOSEST_SYNC, 288, 288)
             } finally { retriever.release() }
         } else {
             val resolver = context.contentResolver

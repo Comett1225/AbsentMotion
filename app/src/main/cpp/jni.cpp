@@ -204,8 +204,12 @@ JNIEXPORT void JNICALL JNI_FN(nativeSetAccurateBlur)(JNIEnv*, jclass, jlong engi
 }
 
 JNIEXPORT jboolean JNICALL JNI_FN(nativeFastCaptionCpu)(JNIEnv*, jclass) {
+#if defined(__aarch64__)
     const unsigned long need = HWCAP_ASIMDDP | HWCAP_ASIMDHP | HWCAP_FPHP | HWCAP_ATOMICS | HWCAP_ASIMDRDM | HWCAP_CRC32;
     return (getauxval(AT_HWCAP) & need) == need;
+#else
+    return false;
+#endif
 }
 
 JNIEXPORT jfloatArray JNICALL JNI_FN(nativeEase)(JNIEnv* env, jclass, jstring easing, jfloatArray us) {

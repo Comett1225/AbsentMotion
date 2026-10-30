@@ -26,6 +26,7 @@ The color names are the editor and home screen colors: TopBar, PreviewBg, Timeli
 ## Playback and preview
 
 - **Preview Quality.** **FULL**, **HALF** or **QUARTER** (default Full): how sharp the editor preview is. Lower is faster on a slow phone and does not change exports. The same switch is in the preview strip of the editor.
+- **Graphics.** **AUTOMATIC** or **OPENGL** (default Automatic): how the app draws the preview and the export. Automatic uses Vulkan and switches to OpenGL when Vulkan cannot start. Choose OpenGL if the preview or exports look wrong on this phone. The line under the switch says which one is in use. With OpenGL some AI tools are left out; see [Requirements and versions](@requirements).
 - **Playback Resampling.** **LOW**, **HIGH** or **ULTRA** (default Ultra): the quality of the sound resampling, when the editor plays and when the sound is mixed for an export.
 - **Use preview copies of large videos.** On by default. For videos bigger than 1920 x 1080, or with few keyframes, the app makes a small, light copy in the background and uses it for the preview. Exports always use the original file. The copies are kept in a cache of up to 2 GB.
 - **Clear preview copies** deletes them. The row shows the space they use.

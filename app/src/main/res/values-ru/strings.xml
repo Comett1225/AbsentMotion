@@ -115,6 +115,11 @@
     <string name="the_media_picker_lists_only_albums">Выбор медиа показывает только альбомы и папки, в названии которых есть Demo.</string>
     <string name="demo_mode_is_on">Демо-режим включён</string>
     <string name="preview_quality">Качество предпросмотра</string>
+    <string name="settings_graphics">Графика</string>
+    <string name="settings_graphics_auto">Автоматически</string>
+    <string name="settings_graphics_opengl">OpenGL</string>
+    <string name="settings_graphics_note">Сейчас используется %1$s.</string>
+    <string name="settings_graphics_hint">Выберите OpenGL, если предпросмотр или экспорт выглядят неправильно на этом телефоне.</string>
     <string name="playback_resampling">Ресемплинг при воспроизведении</string>
     <string name="settings">Настройки</string>
     <string name="your_video_ended_early_so_its">Видео закончилось раньше, поэтому его последний кадр удерживается.\nЗамените его более длинным клипом для лучшего результата.</string>
@@ -237,6 +242,8 @@
     <string name="update_failed">Не удалось проверить. Повторите при подключении к интернету</string>
     <string name="update_turn_on">Включить</string>
     <string name="update_not_now">Не сейчас</string>
+    <string name="play_ending_title">В 5.0 не будет сборки для Play</string>
+    <string name="play_ending_body">Начиная с версии 5.0 AbsentMotion больше не будет выходить в сборке для Play. Когда выйдет 5.0, приложение автоматически обновится до FOSS-сборки. Проекты и настройки сохранятся, а удаление фона будет работать на собственной офлайн-модели приложения, а не через сервисы Google Play.</string>
     <string name="update_outdated">Возможно, это исправлено в новой версии (установлена %1$s, последняя %2$s).</string>
     <string name="update_changelog">Список изменений</string>
     <string name="update_open_failed">На этом устройстве нет приложения, которое может открыть ссылку.</string>
@@ -622,6 +629,7 @@
     <string name="unsupported_title">На этом телефоне редактор не запустится</string>
     <string name="unsupported_old_vulkan">AbsentMotion отрисовывает предпросмотр и экспорт с помощью графического чипа через Vulkan 1.1, а на этом телефоне установлена только более старая версия Vulkan.</string>
     <string name="unsupported_no_vulkan">Графический драйвер телефона не смог запустить Vulkan, который нужен AbsentMotion для отрисовки предпросмотра и экспорта.</string>
+    <string name="unsupported_no_opengl">AbsentMotion также попробовал OpenGL ES 3.0, но он тоже не запустился.</string>
     <string name="unsupported_driver_features">В графическом драйвере телефона нет функций, необходимых AbsentMotion для отрисовки предпросмотра и экспорта.</string>
     <string name="unsupported_skia">Движок отрисовки AbsentMotion не работает с графическим драйвером этого телефона.</string>
     <string name="unsupported_unknown">Движок отрисовки AbsentMotion не смог запуститься на этом телефоне.</string>
@@ -1770,11 +1778,12 @@
     <string name="recovery_your_project">ваш проект</string>
     <string name="caption_layer_name">Субтитры %1$s</string>
     <string name="tier_needs_latest">Нужен Android 13 (версия Latest)</string>
+    <string name="tier_needs_vulkan">Нужен телефон с графикой Vulkan</string>
     <string name="feature_flow_high">Оптический поток High</string>
     <string name="feature_ai_enhance">AI-улучшение</string>
     <string name="feature_best_cutout">AI-удаление фона 2.0</string>
     <string name="about_version_compatible">Версия %1$s Compatible</string>
-    <string name="about_compatible_note">Это версия Compatible для Android 9–12. Не включено: %1$s. Для них нужен Android 13 и версия Latest.</string>
+    <string name="about_compatible_note">Это версия Compatible для Android 8–12. Не включено: %1$s. Для них нужен Android 13 и версия Latest.</string>
     <string name="low_memory_title">Мало памяти</string>
     <string name="low_memory_body">На этом телефоне %1$s ГБ памяти. AbsentMotion лучше работает при 3 ГБ и больше: длинные проекты, большие видео и множество эффектов могут тормозить или закрывать приложение.</string>
     <string name="preview_cache_render">Отрендерить предпросмотр</string>

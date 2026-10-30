@@ -115,6 +115,11 @@
     <string name="the_media_picker_lists_only_albums">মিডিয়া পিকার শুধু সেই অ্যালবাম ও ফোল্ডার দেখায় যাদের নামে Demo আছে।</string>
     <string name="demo_mode_is_on">ডেমো মোড চালু আছে</string>
     <string name="preview_quality">প্রিভিউ কোয়ালিটি</string>
+    <string name="settings_graphics">গ্রাফিক্স</string>
+    <string name="settings_graphics_auto">স্বয়ংক্রিয়</string>
+    <string name="settings_graphics_opengl">OpenGL</string>
+    <string name="settings_graphics_note">এখন %1$s ব্যবহার হচ্ছে।</string>
+    <string name="settings_graphics_hint">এই ফোনে প্রিভিউ বা এক্সপোর্ট ভুল দেখালে OpenGL বেছে নিন।</string>
     <string name="playback_resampling">প্লেব্যাক রিস্যাম্পলিং</string>
     <string name="settings">সেটিংস</string>
     <string name="your_video_ended_early_so_its">আপনার ভিডিও আগে শেষ হয়ে গেছে, তাই এর শেষ ফ্রেম ধরে রাখা হয়েছে।\nপরিষ্কার ফলাফলের জন্য একটি দীর্ঘ ক্লিপ দিন।</string>
@@ -237,6 +242,8 @@
     <string name="update_failed">চেক করা যায়নি, অনলাইনে থাকলে আবার চেষ্টা করুন</string>
     <string name="update_turn_on">চালু করুন</string>
     <string name="update_not_now">এখন নয়</string>
+    <string name="play_ending_title">5.0-এ কোনো Play বিল্ড নেই</string>
+    <string name="play_ending_body">5.0 ভার্সন থেকে AbsentMotion-এর কোনো Play বিল্ড থাকবে না। 5.0 বের হলে, আপডেটটি এই অ্যাপকে স্বয়ংক্রিয়ভাবে FOSS বিল্ডে নিয়ে যাবে। আপনার প্রজেক্ট ও সেটিংস থাকবে, এবং ব্যাকগ্রাউন্ড রিমুভাল Google Play services-এর বদলে অ্যাপের নিজস্ব অফলাইন মডেল ব্যবহার করবে।</string>
     <string name="update_outdated">নতুন ভার্সনে এটি ঠিক হতে পারে (ইনস্টল করা %1$s, সর্বশেষ %2$s)।</string>
     <string name="update_changelog">চেঞ্জলগ</string>
     <string name="update_open_failed">এই ডিভাইসে কোনো অ্যাপ এই লিংক খুলতে পারে না।</string>
@@ -602,6 +609,7 @@
     <string name="unsupported_title">এই ফোনে এডিটর চলবে না</string>
     <string name="unsupported_old_vulkan">AbsentMotion Vulkan 1.1-এর মাধ্যমে গ্রাফিক্স চিপ দিয়ে প্রিভিউ ও এক্সপোর্ট আঁকে, কিন্তু এই ফোনে আছে পুরোনো Vulkan সংস্করণ।</string>
     <string name="unsupported_no_vulkan">ফোনের গ্রাফিক্স ড্রাইভার Vulkan চালু করতে পারেনি, যা প্রিভিউ ও এক্সপোর্ট আঁকার জন্য AbsentMotion-এর প্রয়োজন।</string>
+    <string name="unsupported_no_opengl">AbsentMotion OpenGL ES 3.0-ও চেষ্টা করেছে, কিন্তু সেটিও চালু হয়নি।</string>
     <string name="unsupported_driver_features">ফোনের গ্রাফিক্স ড্রাইভারে AbsentMotion-এর প্রিভিউ ও এক্সপোর্ট আঁকার জন্য প্রয়োজনীয় ফিচার নেই।</string>
     <string name="unsupported_skia">AbsentMotion-এর ড্রয়িং ইঞ্জিন এই ফোনের গ্রাফিক্স ড্রাইভারের সাথে কাজ করে না।</string>
     <string name="unsupported_unknown">এই ফোনে AbsentMotion-এর ড্রয়িং ইঞ্জিন চালু করা যায়নি।</string>
@@ -1722,11 +1730,12 @@
     <string name="recovery_your_project">আপনার প্রজেক্ট</string>
     <string name="caption_layer_name">ক্যাপশন %1$s</string>
     <string name="tier_needs_latest">Android 13 প্রয়োজন (Latest ভার্সন)</string>
+    <string name="tier_needs_vulkan">Vulkan গ্রাফিক্স সমর্থিত ফোন প্রয়োজন</string>
     <string name="feature_flow_high">অপটিক্যাল ফ্লো হাই</string>
     <string name="feature_ai_enhance">AI এনহ্যান্স</string>
     <string name="feature_best_cutout">AI ব্যাকগ্রাউন্ড রিমুভাল 2.0</string>
     <string name="about_version_compatible">ভার্সন %1$s Compatible</string>
-    <string name="about_compatible_note">এটি Android 9 থেকে 12-এর জন্য Compatible ভার্সন। বাদ দেওয়া হয়েছে: %1$s। এগুলোর জন্য Android 13 এবং Latest ভার্সন প্রয়োজন।</string>
+    <string name="about_compatible_note">এটি Android 8 থেকে 12-এর জন্য Compatible ভার্সন। বাদ দেওয়া হয়েছে: %1$s। এগুলোর জন্য Android 13 এবং Latest ভার্সন প্রয়োজন।</string>
     <string name="low_memory_title">মেমোরি কম</string>
     <string name="low_memory_body">এই ফোনে %1$s GB মেমোরি আছে। AbsentMotion 3 GB বা তার বেশি মেমোরিতে সবচেয়ে ভালো কাজ করে: দীর্ঘ প্রজেক্ট, বড় ভিডিও ও অনেক ইফেক্টে অ্যাপ ধীর হতে পারে বা বন্ধ হয়ে যেতে পারে।</string>
     <string name="preview_cache_render">প্রিভিউ রেন্ডার করুন</string>

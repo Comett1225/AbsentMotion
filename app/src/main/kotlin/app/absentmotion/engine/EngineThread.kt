@@ -52,9 +52,10 @@ import java.util.concurrent.atomic.AtomicReference
 
 object EngineDebug {
     @Volatile var failStart: String? = null
+    @Volatile var forceGl = false
 }
 
-class EngineThread(private val background: Int, context: Context? = null) {
+class EngineThread(private val background: Int, context: Context? = null, private val preferOpenGl: () -> Boolean = { false }) {
     private val thread = HandlerThread("am-engine").apply { start() }
     private val handler = Handler(thread.looper)
     private val dispatcher = handler.asCoroutineDispatcher()
@@ -200,7 +201,19 @@ class EngineThread(private val background: Int, context: Context? = null) {
         startFailure?.let { throw IllegalStateException(it) }
         return try {
             EngineDebug.failStart?.let { throw IllegalStateException(it) }
-            NativeEngine(NativeEngine.Backend.GRAPHITE)
+            val glFirst = EngineDebug.forceGl || preferOpenGl()
+            val order = if (glFirst) listOf(NativeEngine.Backend.GL, NativeEngine.Backend.GRAPHITE) else listOf(NativeEngine.Backend.GRAPHITE, NativeEngine.Backend.GL)
+            val first = runCatching { NativeEngine(order[0]) }
+            (first.getOrNull() ?: run {
+                val failed = first.exceptionOrNull()
+                Log.w("AMEngine", "${order[0]} cannot start, trying ${order[1]}", failed)
+                try {
+                    NativeEngine(order[1])
+                } catch (second: Throwable) {
+                    val (vulkan, gl) = if (glFirst) second to failed else failed to second
+                    throw IllegalStateException("${vulkan?.message ?: vulkan}; OpenGL: ${gl?.message ?: gl}", second)
+                }
+            }).also { app.absentmotion.Tier.openGl = it.openGl }
         } catch (t: Throwable) {
             val reason = t.message ?: t.toString()
             Log.e("AMEngine", "the engine cannot start", t)
@@ -367,6 +380,15 @@ class EngineThread(private val background: Int, context: Context? = null) {
         pendingView.set(view to serial)
         requestRender()
         return serial
+    }
+
+    fun restart() {
+        handler.post {
+            if (closed) return@post
+            simulateGpuLoss = true
+            runCatching { engine() }.onFailure { Log.e("AMEngine", "the engine could not restart", it) }
+            renderNow()
+        }
     }
 
     private fun requestRender() {
@@ -566,6 +588,8 @@ class EngineThread(private val background: Int, context: Context? = null) {
             atFrame(document, timeMs, smoothing, fps) { engine().renderFrame(target, timeMs.toDouble(), 0xFF000000.toInt(), presentTimeNs) == 0 }
 
         suspend fun stampsPresentTime(): Boolean = withContext(dispatcher) { engine().displayTiming }
+
+        suspend fun openGl(): Boolean = withContext(dispatcher) { engine().openGl }
 
         suspend fun renderInto(buffer: HardwareBuffer, timeMs: Int): Boolean =
             atFrame(document, timeMs, smoothing, fps) { engine().renderBuffer(buffer, timeMs.toDouble(), 0xFF000000.toInt()) == 0 }

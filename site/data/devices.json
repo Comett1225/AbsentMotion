@@ -1743,7 +1743,7 @@
   ],
   "arm64": true,
   "vulkan11": false,
-  "tier": "unsupported",
+  "tier": "compatible",
   "aiClass": "slow",
   "notes": "PowerVR GE8320 is Vulkan 1.0 only and the build is 32-bit on many units.",
   "confidence": "low"
@@ -4944,7 +4944,7 @@
   ],
   "arm64": true,
   "vulkan11": false,
-  "tier": "unsupported",
+  "tier": "compatible",
   "aiClass": "slow",
   "notes": "PowerVR GE8320 is Vulkan 1.0 only.",
   "confidence": "low"
@@ -5095,7 +5095,7 @@
   ],
   "arm64": true,
   "vulkan11": false,
-  "tier": "unsupported",
+  "tier": "compatible",
   "aiClass": "slow",
   "notes": "Adreno 506 is Vulkan 1.0 only.",
   "confidence": "low"
@@ -5121,7 +5121,7 @@
   ],
   "arm64": true,
   "vulkan11": false,
-  "tier": "unsupported",
+  "tier": "compatible",
   "aiClass": "slow",
   "notes": "Adreno 506 is Vulkan 1.0 only.",
   "confidence": "low"
@@ -5146,7 +5146,7 @@
   ],
   "arm64": true,
   "vulkan11": false,
-  "tier": "unsupported",
+  "tier": "compatible",
   "aiClass": "slow",
   "notes": "Adreno 509 is Vulkan 1.0 only.",
   "confidence": "low"
@@ -5172,7 +5172,7 @@
   ],
   "arm64": true,
   "vulkan11": false,
-  "tier": "unsupported",
+  "tier": "compatible",
   "aiClass": "slow",
   "notes": "Adreno 506 is Vulkan 1.0 only.",
   "confidence": "low"
@@ -5349,7 +5349,7 @@
   ],
   "arm64": true,
   "vulkan11": false,
-  "tier": "unsupported",
+  "tier": "compatible",
   "aiClass": "slow",
   "notes": "Adreno 506 is Vulkan 1.0 only.",
   "confidence": "low"
@@ -5375,7 +5375,7 @@
   ],
   "arm64": true,
   "vulkan11": false,
-  "tier": "unsupported",
+  "tier": "compatible",
   "aiClass": "slow",
   "notes": "Adreno 508 is Vulkan 1.0 only.",
   "confidence": "low"
@@ -5403,7 +5403,7 @@
   ],
   "arm64": true,
   "vulkan11": false,
-  "tier": "unsupported",
+  "tier": "compatible",
   "aiClass": "slow",
   "notes": "GPU is Vulkan 1.0 only or has no Vulkan",
   "confidence": "high"
@@ -5431,7 +5431,7 @@
   ],
   "arm64": true,
   "vulkan11": false,
-  "tier": "unsupported",
+  "tier": "compatible",
   "aiClass": "slow",
   "notes": "GPU is Vulkan 1.0 only or has no Vulkan",
   "confidence": "high"
@@ -12009,7 +12009,7 @@
   ],
   "arm64": true,
   "vulkan11": false,
-  "tier": "unsupported",
+  "tier": "compatible",
   "aiClass": "slow",
   "notes": "PowerVR GE8320 is Vulkan 1.0 only and the build is 32-bit on many units.",
   "confidence": "low"
@@ -12087,7 +12087,7 @@
   ],
   "arm64": true,
   "vulkan11": false,
-  "tier": "unsupported",
+  "tier": "compatible",
   "aiClass": "slow",
   "notes": "Adreno 506 is Vulkan 1.0 only and the build is 32-bit on many units.",
   "confidence": "low"
@@ -12386,7 +12386,7 @@
   ],
   "arm64": true,
   "vulkan11": false,
-  "tier": "unsupported",
+  "tier": "compatible",
   "aiClass": "slow",
   "notes": "Mali-T830 has no Vulkan 1.1; likely 32-bit Android build.",
   "confidence": "low"
@@ -12725,7 +12725,7 @@
   ],
   "arm64": true,
   "vulkan11": false,
-  "tier": "unsupported",
+  "tier": "compatible",
   "aiClass": "slow",
   "notes": "Adreno 504 is Vulkan 1.0 only.",
   "confidence": "low"
@@ -12835,7 +12835,7 @@
   ],
   "arm64": true,
   "vulkan11": false,
-  "tier": "unsupported",
+  "tier": "compatible",
   "aiClass": "slow",
   "notes": "GPU is Vulkan 1.0 only or has no Vulkan",
   "confidence": "high"
@@ -12864,7 +12864,7 @@
   ],
   "arm64": true,
   "vulkan11": false,
-  "tier": "unsupported",
+  "tier": "compatible",
   "aiClass": "slow",
   "notes": "GPU is Vulkan 1.0 only or has no Vulkan",
   "confidence": "high"
@@ -12978,7 +12978,7 @@
   ],
   "arm64": true,
   "vulkan11": false,
-  "tier": "unsupported",
+  "tier": "compatible",
   "aiClass": "slow",
   "notes": "GPU is Vulkan 1.0 only or has no Vulkan",
   "confidence": "high"
@@ -13090,7 +13090,7 @@
   ],
   "arm64": true,
   "vulkan11": false,
-  "tier": "unsupported",
+  "tier": "compatible",
   "aiClass": "slow",
   "notes": "GPU is Vulkan 1.0 only or has no Vulkan",
   "confidence": "high"
@@ -17185,7 +17185,7 @@
   ],
   "arm64": true,
   "vulkan11": false,
-  "tier": "unsupported",
+  "tier": "compatible",
   "aiClass": "slow",
   "notes": "Adreno 512 is Vulkan 1.0 only.",
   "confidence": "low"
@@ -17328,7 +17328,7 @@
   ],
   "arm64": true,
   "vulkan11": false,
-  "tier": "unsupported",
+  "tier": "compatible",
   "aiClass": "slow",
   "notes": "Adreno 512 is Vulkan 1.0 only.",
   "confidence": "low"

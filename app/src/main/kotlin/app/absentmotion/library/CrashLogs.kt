@@ -1,5 +1,6 @@
 package app.absentmotion.library
 
+import app.absentmotion.platform.versionCodeLong
 import androidx.annotation.RequiresApi
 import android.content.SharedPreferences
 import app.absentmotion.platform.readAtMost
@@ -121,7 +122,7 @@ object CrashLogs {
         if (folder != null) return
         val app = context.applicationContext
         activities = app.getSystemService(ActivityManager::class.java)
-        val code = runCatching { app.packageManager.getPackageInfo(app.packageName, 0).longVersionCode }.getOrDefault(0L)
+        val code = runCatching { app.packageManager.getPackageInfo(app.packageName, 0).versionCodeLong }.getOrDefault(0L)
         about = "AbsentMotion ${versionName(app)} ($code)\nAndroid ${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT}), ${Build.MANUFACTURER} ${Build.MODEL}"
         folder = File(app.filesDir, "crashlogs")
         publish()

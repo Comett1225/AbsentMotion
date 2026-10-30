@@ -2,17 +2,17 @@
 title: The Compatible version
 group: Start
 order: 3
-summary: A version of AbsentMotion for phones with Android 9 to 12, and what it leaves out.
+summary: A version of AbsentMotion for phones with Android 8 to 12, and what it leaves out.
 ---
 ## Who it is for
 
-The Compatible version is made for phones that run Android 9, 10, 11 or 12 and cannot be updated to Android 13. The Latest version needs Android 13 or newer. Phones with Android 8 or older cannot run either version.
+The Compatible version is made for phones that run Android 8, 9, 10, 11 or 12 and cannot be updated to Android 13. The Latest version needs Android 13 or newer. Phones with Android 7 or older cannot run either version.
 
 You can find your Android version in Settings, About phone, Android version.
 
 ## What it leaves out
 
-- **Optical flow High.** Frame Interpolation and **Smooth** offer Optical flow at Low and Medium; High needs more graphics power than most phones from the Android 9 to 12 years have.
+- **Optical flow High.** Frame Interpolation and **Smooth** offer Optical flow at Low and Medium; High needs more graphics power than most phones from the Android 8 to 12 years have.
 - **AI Smooth** and **AI Enhance.** The AI models need a newer graphics chip and would take many minutes, often hours, per clip on these phones.
 - **AI background removal 2.0.** Its model needs more memory and a faster chip than most phones from these years have. Removing backgrounds still works, with the Standard cut-out.
 
@@ -29,7 +29,7 @@ In the app, a feature that the Compatible version leaves out is shown grayed out
 ## How to install it
 
 ::: site
-Open the [download page](@download) on your phone. A phone with Android 9 to 12 is offered the Compatible file automatically. You can also pick it from the list of all downloads.
+Open the [download page](@download) on your phone. A phone with Android 8 to 12 is offered the Compatible file automatically. You can also pick it from the list of all downloads.
 :::
 
 ::: app
@@ -38,4 +38,4 @@ The Compatible version is a separate file from the Latest version. Download it f
 
 ## Same requirements as the Latest version
 
-The phone still needs a 64-bit ARM chip and Vulkan 1.1. See [Requirements and versions](@requirements).
+The phone still needs Vulkan 1.1 or OpenGL ES 3.0. Phones with a 32-bit system, often sold as Android Go edition, use the **Compatible 32-bit** file, which has the same features. See [Requirements and versions](@requirements).

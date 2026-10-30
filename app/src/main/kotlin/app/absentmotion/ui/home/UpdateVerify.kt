@@ -1,5 +1,6 @@
 package app.absentmotion.ui.home
 
+import app.absentmotion.platform.versionCodeLong
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.pm.Signature
@@ -26,14 +27,14 @@ internal fun judgeApk(apk: ApkFacts?, installed: InstalledApp, version: String):
     apk ?: return UpdateFailure.WrongApp
     if (apk.packageName != installed.packageName) return UpdateFailure.WrongApp
     if (!signersMatch(installed.signers, apk.signers, apk.history)) return UpdateFailure.Signature
-    if (apk.variant != installed.variant) return UpdateFailure.WrongApp
+    if (apk.variant !in apkFlavours(installed.variant)) return UpdateFailure.WrongApp
     if (apk.versionName != version || apk.versionCode <= installed.versionCode || isNewer(version, installed.versionName) != true) return UpdateFailure.NotNewer
     return null
 }
 
 internal fun installedApp(context: Context, versionName: String): InstalledApp? = runCatching {
     val info = packageInfo(context.packageManager, context.packageName)
-    InstalledApp(context.packageName, info.longVersionCode, versionName, app.absentmotion.BuildConfig.FLAVOR, signers(info).first)
+    InstalledApp(context.packageName, info.versionCodeLong, versionName, app.absentmotion.BuildConfig.FLAVOR, signers(info).first)
 }.getOrNull()
 
 internal fun installedSigning(context: Context): Pair<Set<String>, Set<String>>? = runCatching {
@@ -51,12 +52,12 @@ private fun legacyInstaller(manager: PackageManager, name: String): String? = ma
 internal fun apkFacts(context: Context, file: File): ApkFacts? = runCatching {
     val info = archiveInfo(context.packageManager, file.path) ?: return null
     val (current, history) = signers(info)
-    ApkFacts(info.packageName, info.longVersionCode, info.versionName, info.applicationInfo?.metaData?.getString(VARIANT_KEY), current, history)
+    ApkFacts(info.packageName, info.versionCodeLong, info.versionName, info.applicationInfo?.metaData?.getString(VARIANT_KEY), current, history)
 }.getOrNull()
 
 private fun signers(info: PackageInfo): Pair<Set<String>, Set<String>> {
-    val signing = info.signingInfo
-    if (signing != null) {
+    val signing = if (Build.VERSION.SDK_INT >= 28) info.signingInfo else null
+    if (Build.VERSION.SDK_INT >= 28 && signing != null) {
         val current = signing.apkContentsSigners.orEmpty().map(::fingerprint).toSet()
         val history = if (signing.hasMultipleSigners()) emptySet() else signing.signingCertificateHistory.orEmpty().map(::fingerprint).toSet()
         if (current.isNotEmpty()) return current to history

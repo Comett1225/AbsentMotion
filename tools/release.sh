@@ -28,15 +28,19 @@ echo "AbsentMotion $version (versionCode $(sed -n 's/^versionCode=//p' version.p
 
 tools/check.sh
 
-printf '\n== Android: release APKs (play, the free build without Google libraries, and the Compatible build for Android 9 to 12)\n'
+printf '\n== Android: release APKs (play, the free build without Google libraries, and the Compatible builds for Android 8 to 12, 64-bit and 32-bit)\n'
 [ -f third_party/skia/out/android-arm64-compat/libskia.a ] || sh tools/build_skia.sh compat
-./gradlew :app:assemblePlayRelease :app:assembleFossRelease :app:assembleCompatRelease -q
+[ -f third_party/skia/out/android-arm-compat/libskia.a ] || sh tools/build_skia.sh compat32
+./gradlew :app:assemblePlayRelease :app:assembleFossRelease :app:assembleCompatRelease :app:assembleCompat32Release -q
 mkdir -p build/release
-mv app/build/outputs/apk/play/release/app-play-release.apk "build/release/AbsentMotion-$version.apk"
+mv app/build/outputs/apk/play/release/app-play-release.apk "build/release/AbsentMotion-$version-play.apk"
 mv app/build/outputs/apk/foss/release/app-foss-release.apk "build/release/AbsentMotion-$version-foss.apk"
 mv app/build/outputs/apk/compat/release/app-compat-release.apk "build/release/AbsentMotion-$version-compatible.apk"
-python3 tools/api_floor.py "build/release/AbsentMotion-$version-compatible.apk" --min 28
-python3 tools/apk_check.py "build/release/AbsentMotion-$version.apk" "build/release/AbsentMotion-$version-foss.apk" "build/release/AbsentMotion-$version-compatible.apk"
+mv app/build/outputs/apk/compat32/release/app-compat32-release.apk "build/release/AbsentMotion-$version-compatible-32bit.apk"
+python3 tools/api_floor.py "build/release/AbsentMotion-$version-compatible.apk" --min 26
+python3 tools/api_floor.py "build/release/AbsentMotion-$version-compatible-32bit.apk" --abi armeabi-v7a --min 26
+python3 tools/apk_check.py "build/release/AbsentMotion-$version-play.apk" "build/release/AbsentMotion-$version-foss.apk" "build/release/AbsentMotion-$version-compatible.apk" \
+    "build/release/AbsentMotion-$version-compatible-32bit.apk"
 
-printf '\nReleased %s:\n  %s\n  %s\n  %s\n' "$version" "$PWD/build/release/AbsentMotion-$version.apk" "$PWD/build/release/AbsentMotion-$version-foss.apk" \
-    "$PWD/build/release/AbsentMotion-$version-compatible.apk"
+printf '\nReleased %s:\n  %s\n  %s\n  %s\n  %s\n' "$version" "$PWD/build/release/AbsentMotion-$version-play.apk" "$PWD/build/release/AbsentMotion-$version-foss.apk" \
+    "$PWD/build/release/AbsentMotion-$version-compatible.apk" "$PWD/build/release/AbsentMotion-$version-compatible-32bit.apk"

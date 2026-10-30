@@ -29,7 +29,7 @@ async function main() {
   assert.strictEqual(r.rec.kind, "compatible");
   assert.ok(/lenovo/i.test(r.rec.device.brand) && /p11/i.test(r.rec.device.name), "TB-J606L is a Lenovo Tab P11");
 
-  r = await recommendation(android("8.1.0", "A6000"));
+  r = await recommendation(android("7.1.2", "A6000"));
   assert.strictEqual(r.rec.kind, "old");
 
   r = await recommendation(android("", ""));
@@ -39,9 +39,21 @@ async function main() {
   r = await recommendation(android("0.0.0", ""));
   assert.strictEqual(r.rec.kind, "unknown");
 
-  const blocked = devices.find((d) => (d.arm64 === false || d.vulkan11 === false) && d.modelCodes.some((c) => !c.endsWith("*")));
-  r = await recommendation(android("13.0.0", blocked.modelCodes.find((c) => !c.endsWith("*"))));
-  assert.strictEqual(r.rec.kind, "blocked", "a phone without 64-bit ARM or Vulkan 1.1 is never offered a download");
+  const thirtyTwo = Object.assign({}, devices[0], { arm64: false, tier: "compatible" });
+  for (const version of [8, 12, 14, null]) {
+    const rec = site.recommend({ platform: "android", android: version }, thirtyTwo);
+    assert.deepStrictEqual([rec.kind, rec.bits], ["compatible", 32], "a 32-bit phone on Android " + version + " gets the 32-bit Compatible file");
+  }
+  assert.strictEqual(site.recommend({ platform: "android", android: 7 }, thirtyTwo).kind, "old");
+  assert.strictEqual(site.recommend({ platform: "android", android: 14 }, devices[0]).bits, undefined);
+  assert.strictEqual(site.verdict(thirtyTwo).tier, "compatible");
+  assert.ok(/32-bit Compatible/.test(site.verdict(thirtyTwo).reason));
+
+  const noVulkan = devices.find((d) => d.arm64 === true && d.vulkan11 === false && d.maxAndroid >= 9 && d.modelCodes.some((c) => !c.endsWith("*")));
+  r = await recommendation(android(String(noVulkan.maxAndroid) + ".0.0", noVulkan.modelCodes.find((c) => !c.endsWith("*"))));
+  assert.ok(["latest", "compatible"].includes(r.rec.kind), "a 64-bit phone without Vulkan 1.1 runs with OpenGL");
+  assert.ok(/OpenGL/.test(site.verdict(noVulkan).reason), "the verdict says the phone draws with OpenGL");
+  assert.notStrictEqual(site.verdict(noVulkan).tier, "unsupported");
 
   const shared = {};
   devices.forEach((d) => d.modelCodes.filter((c) => !c.endsWith("*")).forEach((c) => { (shared[c] = shared[c] || []).push(d); }));

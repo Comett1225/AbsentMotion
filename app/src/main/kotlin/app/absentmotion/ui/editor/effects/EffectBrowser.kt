@@ -316,11 +316,12 @@ internal fun Thumbnail(catalog: EffectCatalog, path: String?, modifier: Modifier
     }
     DisposableEffect(drawable) {
         val shown = drawable
-        onDispose { (shown as? AnimatedImageDrawable)?.stop() }
+        onDispose { if (android.os.Build.VERSION.SDK_INT >= 28) (shown as? AnimatedImageDrawable)?.stop() }
     }
     Box(modifier.background(RecommendedBg)) {
-        when (val d = drawable) {
-            is AnimatedImageDrawable -> AndroidView({ ImageView(it) }, Modifier.fillMaxSize().clipToBounds(), update = { v ->
+        val d = drawable
+        when {
+            android.os.Build.VERSION.SDK_INT >= 28 && d is AnimatedImageDrawable -> AndroidView({ ImageView(it) }, Modifier.fillMaxSize().clipToBounds(), update = { v ->
                 v.scaleType = if (scale == ContentScale.Crop) ImageView.ScaleType.CENTER_CROP else ImageView.ScaleType.FIT_CENTER
                 if (v.drawable !== d) {
                     v.setImageDrawable(d)
@@ -328,7 +329,7 @@ internal fun Thumbnail(catalog: EffectCatalog, path: String?, modifier: Modifier
                     d.start()
                 }
             })
-            is BitmapDrawable -> Image(d.bitmap.asImageBitmap(), null, Modifier.fillMaxSize(), contentScale = scale)
+            d is BitmapDrawable -> Image(d.bitmap.asImageBitmap(), null, Modifier.fillMaxSize(), contentScale = scale)
             else -> {}
         }
     }

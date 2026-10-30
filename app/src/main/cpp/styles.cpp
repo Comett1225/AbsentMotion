@@ -1061,7 +1061,9 @@ void DrawShuttered(SkCanvas* canvas, const std::vector<Layer>& siblings, const L
             const double when = at((i + 0.5) / samples);
             int same = 1;
             while (i + same < samples && (steady || at((i + same + 0.5) / samples) == when)) same++;
-            add.setAlphaf((float)same / samples);
+            const float weight = (float)same / samples;
+            const float scale[20] = {1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, weight, 0};
+            add.setColorFilter(SkColorFilters::Matrix(scale));
             canvas->saveLayer(nullptr, &add);
             DrawOne(canvas, siblings, l, when, pictures, sample);
             canvas->restore();
@@ -1089,7 +1091,8 @@ void DrawShuttered(SkCanvas* canvas, const std::vector<Layer>& siblings, const L
     SkPaint add;
     add.setBlendMode(SkBlendMode::kPlus);
     for (const auto& [r, share] : taken) {
-        add.setAlphaf(share);
+        const float scale[20] = {1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, share, 0};
+        add.setColorFilter(SkColorFilters::Matrix(scale));
         canvas->saveLayer(bounded ? &r.bounds : nullptr, &add);
         PlayInDevice(canvas, r.picture.get());
         canvas->restore();

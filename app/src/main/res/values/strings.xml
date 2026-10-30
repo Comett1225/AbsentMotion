@@ -115,6 +115,11 @@
     <string name="the_media_picker_lists_only_albums">The media picker lists only albums and folders whose name contains Demo.</string>
     <string name="demo_mode_is_on">Demo Mode is on</string>
     <string name="preview_quality">Preview Quality</string>
+    <string name="settings_graphics">Graphics</string>
+    <string name="settings_graphics_auto">Automatic</string>
+    <string name="settings_graphics_opengl">OpenGL</string>
+    <string name="settings_graphics_note">Now using %1$s.</string>
+    <string name="settings_graphics_hint">Choose OpenGL if the preview or exports look wrong on this phone.</string>
     <string name="playback_resampling">Playback Resampling</string>
     <string name="settings">Settings</string>
     <string name="your_video_ended_early_so_its">Your video ended early, so its last frame is held.\nSwap in a longer clip for a cleaner result.</string>
@@ -237,6 +242,8 @@
     <string name="update_failed">Could not check, try again when you are online</string>
     <string name="update_turn_on">Turn it on</string>
     <string name="update_not_now">Not now</string>
+    <string name="play_ending_title">No Play build in 5.0</string>
+    <string name="play_ending_body">From version 5.0 there will be no Play build of AbsentMotion. When 5.0 comes out, the update moves this app to the FOSS build automatically. Your projects and settings stay, and background removal uses the app\'s own offline model instead of Google Play services.</string>
     <string name="update_outdated">This may be fixed in the newer version (installed %1$s, newest %2$s).</string>
     <string name="update_changelog">Changelog</string>
     <string name="update_open_failed">No app on this device can open the link.</string>
@@ -613,6 +620,7 @@
     <string name="unsupported_title">This phone cannot run the editor</string>
     <string name="unsupported_old_vulkan">AbsentMotion draws the preview and the export with the graphics chip through Vulkan 1.1, and this phone only has an older Vulkan version.</string>
     <string name="unsupported_no_vulkan">The phone\'s graphics driver would not start Vulkan, which AbsentMotion needs to draw the preview and the export.</string>
+    <string name="unsupported_no_opengl">AbsentMotion also tried OpenGL ES 3.0, and that would not start either.</string>
     <string name="unsupported_driver_features">The phone\'s graphics driver is missing features AbsentMotion needs to draw the preview and the export.</string>
     <string name="unsupported_skia">AbsentMotion\'s drawing engine does not work with this phone\'s graphics driver.</string>
     <string name="unsupported_unknown">AbsentMotion\'s drawing engine could not start on this phone.</string>
@@ -1748,11 +1756,12 @@
     <string name="recovery_your_project">your project</string>
     <string name="caption_layer_name">Caption %1$s</string>
     <string name="tier_needs_latest">Needs Android 13 (Latest version)</string>
+    <string name="tier_needs_vulkan">Needs a phone with Vulkan graphics</string>
     <string name="feature_flow_high">Optical flow High</string>
     <string name="feature_ai_enhance">AI Enhance</string>
     <string name="feature_best_cutout">AI background removal 2.0</string>
     <string name="about_version_compatible">Version %1$s Compatible</string>
-    <string name="about_compatible_note">This is the Compatible version for Android 9 to 12. Left out: %1$s. They need Android 13 and the Latest version.</string>
+    <string name="about_compatible_note">This is the Compatible version for Android 8 to 12. Left out: %1$s. They need Android 13 and the Latest version.</string>
     <string name="low_memory_title">Low memory</string>
     <string name="low_memory_body">This phone has %1$s GB of memory. AbsentMotion works best with 3 GB or more: long projects, large videos and many effects can be slow or close the app.</string>
     <string name="preview_cache_render">Render preview</string>

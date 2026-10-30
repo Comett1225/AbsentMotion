@@ -521,15 +521,15 @@ class Site:
     def download_links(self):
         v = self.version
         base = "%s/releases/download/v%s/AbsentMotion-%s-" % (REPO, v, v)
-        return {"foss": base + "foss.apk", "play": base + "play.apk", "compatible": base + "compatible.apk", "sums": "%s/releases/download/v%s/SHA256SUMS.txt" % (REPO, v)}
+        return {"foss": base + "foss.apk", "play": base + "play.apk", "compatible": base + "compatible.apk", "compatible32": base + "compatible-32bit.apk", "sums": "%s/releases/download/v%s/SHA256SUMS.txt" % (REPO, v)}
 
     def download_top(self, page, depth):
         return (
             '<section class="hero"><img class="hero-logo" src="assets/logo.png" width="96" height="96" alt="">'
             '<h1>AbsentMotion</h1><p class="lead">%s</p></section>'
             '<section id="rec" class="rec" aria-live="polite" data-version="%s"><p class="rec-wait">Looking at your phone&hellip;</p>'
-            '<noscript><p><strong>Choose the file that matches your Android version.</strong> Android 13 or newer: the first one. Android 9 to 12: the Compatible one. '
-            'To find your version open Settings, About phone, Android version.</p></noscript></section>'
+            '<noscript><p><strong>Choose the file that matches your Android version.</strong> Android 13 or newer: the first one. Android 8 to 12: the Compatible one. '
+            'Phones with a 32-bit system, often sold as Android Go edition: the Compatible 32-bit one. To find your version open Settings, About phone, Android version.</p></noscript></section>'
         ) % (self.inline(page.summary, "download", depth), self.version)
 
     def download_all(self, depth):
@@ -548,18 +548,24 @@ class Site:
 
     def compatible_item(self):
         v = self.version
-        if tuple(int(part) for part in v.split(".")[:3]) < (3, 3, 0):
-            return ('<li><span id="dl-compatible" class="btn alt" aria-disabled="true">Compatible</span><div><strong>Android 9 to 12.</strong> '
+        released = tuple(int(part) for part in v.split(".")[:3])
+        if released < (3, 3, 0):
+            return ('<li><span id="dl-compatible" class="btn alt" aria-disabled="true">Compatible</span><div><strong>Android 8 to 12.</strong> '
                     'Coming with the next update. <a href="compatible.html">What it is</a>.</div></li>')
-        return ('<li><a id="dl-compatible" class="btn alt" href="%s">Compatible</a><div><strong>Android 9 to 12.</strong> Some features are left out: '
+        item = ('<li><a id="dl-compatible" class="btn alt" href="%s">Compatible</a><div><strong>Android 8 to 12.</strong> Some features are left out: '
                 '<a href="compatible.html">see the list</a>. <code>AbsentMotion-%s-compatible.apk</code></div></li>') % (self.download_links()["compatible"], v)
+        if released < (4, 3, 0):
+            return item + ('<li><span id="dl-compatible32" class="btn alt" aria-disabled="true">Compatible 32-bit</span><div><strong>Phones with a 32-bit system.</strong> '
+                           'Coming with the next update.</div></li>')
+        return item + ('<li><a id="dl-compatible32" class="btn alt" href="%s">Compatible 32-bit</a><div><strong>Phones with a 32-bit system</strong>, often sold as Android Go edition, '
+                       'Android 8 or newer. The Compatible version built for 32-bit ARM. <code>AbsentMotion-%s-compatible-32bit.apk</code></div></li>') % (self.download_links()["compatible32"], v)
 
     def checker_box(self):
         return (
             '<section class="checker"><form id="checker-form" role="search" autocomplete="off"><label for="q">Type your phone model</label>'
             '<input id="q" type="search" inputmode="search" placeholder="for example Galaxy S21 Ultra, Pixel 7a, Redmi Note 12 or SM-G998B" autocapitalize="off" spellcheck="false"></form>'
             '<div id="results" class="results" aria-live="polite"><p class="muted">The check needs JavaScript. Without it, find your phone in the list of brands below, or open Settings, About phone, Android version: '
-            '13 or newer means Latest, 9 to 12 means Compatible.</p></div></section>'
+            '13 or newer means Latest, 8 to 12 means Compatible.</p></div></section>'
         )
 
     def brand_list(self):
@@ -743,8 +749,7 @@ def validate_devices(devices):
         if not isinstance(newest, (int, float)):
             problems.append("devices.json: %s has no numeric maxAndroid" % name)
             continue
-        capable = d.get("arm64") is True and d.get("vulkan11") is True
-        expected = "unsupported" if not capable or newest < 9 else "latest" if newest >= 13 else "compatible"
+        expected = "unsupported" if newest < 8 else "latest" if newest >= 13 and d.get("arm64") is True else "compatible"
         if d.get("tier") != expected:
             problems.append("devices.json: %s is %s but its data says %s" % (name, d.get("tier"), expected))
     return problems
