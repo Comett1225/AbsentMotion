@@ -308,7 +308,6 @@
     <string name="library_damaged_project">مشروع تالف</string>
     <string name="library_report_unknown">غير معروف، تم الاحتفاظ به في الملف</string>
     <string name="library_report_cannot_run">تأثيرات لا يمكن لهذا الإصدار تشغيلها</string>
-    <string name="library_report_converted">تأثيرات حُوّلت إلى تأثيرات التطبيق نفسه</string>
     <string name="library_report_dropped">إعدادات تأثيرات تعذّر نقلها</string>
     <string name="library_report_media">الوسائط غير موجودة</string>
     <string name="library_report_fonts">الخطوط غير مثبتة</string>
@@ -362,6 +361,7 @@
     <string name="home_more">المزيد</string>
     <string name="home_duplicate_asset">تكرار الأصل</string>
     <string name="home_duplicate">تكرار</string>
+    <string name="home_duplicating">جارٍ نسخ المشروع…</string>
     <string name="home_collect_media">تجميع الوسائط في المشروع</string>
     <string name="home_delete_asset">حذف الأصل</string>
     <string name="home_empty_assets">لا توجد أصول محفوظة بعد</string>
@@ -511,14 +511,6 @@
         <item quantity="many">‏%1$s (%2$s طبقة)</item>
         <item quantity="other">‏%1$s (%2$s طبقة)</item>
     </plurals>
-    <plurals name="library_report_converted_effects">
-        <item quantity="zero">‏%1$s (%2$s تأثيرات)</item>
-        <item quantity="one">‏%1$s (تأثير واحد)</item>
-        <item quantity="two">‏%1$s (تأثيران)</item>
-        <item quantity="few">‏%1$s (%2$s تأثيرات)</item>
-        <item quantity="many">‏%1$s (%2$s تأثير)</item>
-        <item quantity="other">‏%1$s (%2$s تأثير)</item>
-    </plurals>
     <string name="export_title">تصدير المشروع</string>
     <string name="export_back">رجوع</string>
     <string name="export_info">معلومات</string>
@@ -664,6 +656,7 @@
     <string name="export_error_encoder_busy">مُرمِّز الفيديو في هذا الهاتف مشغول أو لا يستطيع إنتاج هذا الحجم. جرّب دقة أو معدل إطارات أقل.</string>
     <string name="export_error_codec_busy">توقف مُفكِّك ترميز الفيديو أو مُرمِّزه في الهاتف عن العمل. أغلق التطبيقات الأخرى التي تشغّل الفيديو أو تسجله، ثم حاول مرة أخرى.</string>
     <string name="export_note_software">مُرمِّز الفيديو في الهاتف مشغول، لذا يستخدم هذا التصدير مُرمِّز البرمجيات الأبطأ.</string>
+    <string name="export_note_checking">جارٍ فحص الملف…</string>
     <string name="export_note_retry">توقف مُرمّز الفيديو عن العمل. تجري المحاولة مجددًا بمُرمّز آخر.</string>
     <string name="export_error_stalled">لم يُحرز التصدير أي تقدم لمدة %1$s ثانية، لذا تم إيقافه. توقف ملف وسائط أو مُرمّز الفيديو في الهاتف عن الاستجابة. أغلق التطبيقات الأخرى التي تستخدم الفيديو وحاول مجددًا.</string>
     <string name="export_error_draw_frame">تعذر رسم الإطار %1$s. حاول التصدير مرة أخرى.</string>
@@ -712,8 +705,13 @@
     <string name="camera_error_photo">تعذر التقاط الصورة.</string>
     <string name="camera_error_save_video">تعذر حفظ الفيديو.</string>
     <string name="camera_error_start_recording">تعذر بدء التسجيل.</string>
+    <string name="camera_discard_title">هل تريد تجاهل التسجيل؟</string>
+    <string name="camera_discard_text">سيتم حذف اللقطة.</string>
+    <string name="camera_keep_recording">متابعة التسجيل</string>
     <string name="media_error_no_decoder">لا يحتوي هذا الهاتف على فاك ترميز لهذا الفيديو</string>
     <string name="media_error_decoder_stalled">توقف فاك ترميز الفيديو عن الاستجابة</string>
+    <string name="media_error_too_many_frames">يحتوي هذا الفيديو على عدد كبير جدًا من الإطارات لفهرسته</string>
+    <string name="project_too_many_linked">يضم هذا المشروع عددًا كبيرًا جدًا من العناصر المرتبطة.</string>
     <string name="media_error_read_frames">لا يستطيع هذا الهاتف قراءة إطارات هذا الفيديو</string>
     <string name="media_error_pixel_format">يستخدم هذا الفيديو تنسيق بكسل غير قابل للقراءة</string>
     <string name="media_error_video_unavailable">الفيديو غير متاح: %1$s</string>
@@ -1809,6 +1807,10 @@
     <string name="preview_fast_blur">ضبابية\nسريعة</string>
     <string name="settings_preview_copies">استخدام نسخ معاينة للفيديوهات الكبيرة</string>
     <string name="settings_clear_preview_copies">مسح نسخ المعاينة</string>
+    <string name="settings_clear_preview_title">هل تريد مسح نسخ المعاينة؟</string>
+    <string name="settings_clear_preview_text">تُعاد إنشاء نسخ المعاينة عندما يحتاج إليها المشروع.</string>
+    <string name="settings_delete_model_title">هل تريد حذف %1$s؟</string>
+    <string name="settings_delete_model_text">يمكن تنزيله مرة أخرى لاحقًا.</string>
     <string name="preset_numbered">إعداد مسبق %1$s</string>
     <string name="recovery_your_project">مشروعك</string>
     <string name="caption_layer_name">تسمية توضيحية %1$s</string>
@@ -1891,15 +1893,4 @@
     <string name="crop_reset">إعادة ضبط</string>
     <string name="a11y_crop_ratio">نسبة العرض إلى الارتفاع %1$s</string>
     <string name="a11y_crop_area">منطقة الاقتصاص. اسحب زاوية أو حافة للاقتصاص، أو اسحب داخلها لتحريك منطقة الاقتصاص.</string>
-    <string name="camera_discard_text">سيتم حذف اللقطة.</string>
-    <string name="camera_discard_title">هل تريد تجاهل التسجيل؟</string>
-    <string name="camera_keep_recording">متابعة التسجيل</string>
-    <string name="export_note_checking">جارٍ فحص الملف…</string>
-    <string name="home_duplicating">جارٍ نسخ المشروع…</string>
-    <string name="media_error_too_many_frames">يحتوي هذا الفيديو على عدد كبير جدًا من الإطارات لفهرسته</string>
-    <string name="project_too_many_linked">يضم هذا المشروع عددًا كبيرًا جدًا من العناصر المرتبطة.</string>
-    <string name="settings_clear_preview_text">تُعاد إنشاء نسخ المعاينة عندما يحتاج إليها المشروع.</string>
-    <string name="settings_clear_preview_title">هل تريد مسح نسخ المعاينة؟</string>
-    <string name="settings_delete_model_text">يمكن تنزيله مرة أخرى لاحقًا.</string>
-    <string name="settings_delete_model_title">هل تريد حذف %1$s؟</string>
 </resources>

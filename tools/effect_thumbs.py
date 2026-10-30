@@ -12,13 +12,13 @@ import urllib.parse
 import urllib.request
 from pathlib import Path
 from PIL import Image, ImageChops, ImageDraw, ImageStat
-from sdk import adb_command
+from sdk import PACKAGE, adb_command
 
 ROOT = Path(__file__).resolve().parents[1]
 PACK = ROOT / "app/src/main/assets/effects"
 SHOWCASE = json.loads((ROOT / "tools/effect_showcase.json").read_text())
 ADB = adb_command()
-PKG = "app.absentmotion"
+PKG = PACKAGE
 APP_DIR = "files/effect-thumbs"
 APP_PATH = f"/data/user/0/{PKG}/{APP_DIR}"
 OUT_DIR = f"/sdcard/Android/data/{PKG}/files"
@@ -215,7 +215,7 @@ class Batch:
         (self.work / "list.txt").write_text("\n".join(self.jobs) + "\n")
         push(self.work / "list.txt", "list.txt")
         adb("logcat", "-c")
-        adb("shell", "am", "start", "-n", f"{PKG}/.MainActivity", "--es", "batch", f"{APP_PATH}/list.txt")
+        adb("shell", "am", "start", "-n", f"{PKG}/app.absentmotion.MainActivity", "--es", "batch", f"{APP_PATH}/list.txt")
         deadline = time.time() + 60 + 10 * len(self.jobs)
         while "batch done" not in (log := adb("logcat", "-d", "-s", "AMTest")):
             if time.time() > deadline:

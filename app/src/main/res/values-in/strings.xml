@@ -308,7 +308,6 @@
     <string name="library_damaged_project">Proyek rusak</string>
     <string name="library_report_unknown">Tidak dikenali, tetap disimpan di file</string>
     <string name="library_report_cannot_run">Efek yang tidak dapat dijalankan versi ini</string>
-    <string name="library_report_converted">Efek yang dikonversi menjadi efek aplikasi ini</string>
     <string name="library_report_dropped">Pengaturan efek yang tidak dapat dipertahankan</string>
     <string name="library_report_media">Media tidak ditemukan</string>
     <string name="library_report_fonts">Font tidak terpasang</string>
@@ -357,6 +356,7 @@
     <string name="home_more">Lainnya</string>
     <string name="home_duplicate_asset">Duplikat aset</string>
     <string name="home_duplicate">Duplikat</string>
+    <string name="home_duplicating">Menyalin proyek…</string>
     <string name="home_collect_media">Kumpulkan media ke proyek</string>
     <string name="home_delete_asset">Hapus aset</string>
     <string name="home_empty_assets">Belum ada aset tersimpan</string>
@@ -475,9 +475,6 @@
     </plurals>
     <plurals name="library_report_effect_layers">
         <item quantity="other">%1$s (%2$s lapisan)</item>
-    </plurals>
-    <plurals name="library_report_converted_effects">
-        <item quantity="other">%1$s (%2$s efek)</item>
     </plurals>
     <string name="export_title">Ekspor proyek</string>
     <string name="export_back">Kembali</string>
@@ -609,6 +606,7 @@
     <string name="export_error_encoder_busy">Encoder video ponsel ini sedang sibuk atau tidak dapat membuat ukuran ini. Coba resolusi atau frame rate yang lebih rendah.</string>
     <string name="export_error_codec_busy">Decoder atau encoder video ponsel berhenti bekerja. Tutup aplikasi lain yang memutar atau merekam video, lalu coba lagi.</string>
     <string name="export_note_software">Encoder video ponsel sedang sibuk, jadi ekspor ini memakai encoder perangkat lunak yang lebih lambat.</string>
+    <string name="export_note_checking">Memeriksa file…</string>
     <string name="export_note_retry">Encoder video berhenti bekerja. Mencoba lagi dengan encoder lain.</string>
     <string name="export_error_stalled">Ekspor tidak ada kemajuan selama %1$s detik, jadi dihentikan. Berkas media atau encoder video ponsel berhenti merespons. Tutup aplikasi lain yang memakai video dan coba lagi.</string>
     <string name="export_error_draw_frame">Frame %1$s gagal digambar. Coba ekspor lagi.</string>
@@ -657,8 +655,13 @@
     <string name="camera_error_photo">Foto tidak dapat diambil.</string>
     <string name="camera_error_save_video">Video tidak dapat disimpan.</string>
     <string name="camera_error_start_recording">Tidak dapat memulai perekaman.</string>
+    <string name="camera_discard_title">Buang rekaman?</string>
+    <string name="camera_discard_text">Rekaman ini akan dihapus.</string>
+    <string name="camera_keep_recording">Lanjutkan merekam</string>
     <string name="media_error_no_decoder">Ponsel ini tidak memiliki dekoder untuk video ini</string>
     <string name="media_error_decoder_stalled">Dekoder video berhenti merespons</string>
+    <string name="media_error_too_many_frames">Video ini memiliki terlalu banyak frame untuk diindeks</string>
+    <string name="project_too_many_linked">Proyek ini menyematkan terlalu banyak elemen tertaut.</string>
     <string name="media_error_read_frames">Ponsel ini tidak dapat membaca frame video ini</string>
     <string name="media_error_pixel_format">Video ini menggunakan format piksel yang tidak dapat dibaca</string>
     <string name="media_error_video_unavailable">Video tidak tersedia: %1$s</string>
@@ -1684,6 +1687,10 @@
     <string name="preview_fast_blur">Blur\nCepat</string>
     <string name="settings_preview_copies">Gunakan salinan pratinjau untuk video besar</string>
     <string name="settings_clear_preview_copies">Hapus salinan pratinjau</string>
+    <string name="settings_clear_preview_title">Hapus salinan pratinjau?</string>
+    <string name="settings_clear_preview_text">Salinan pratinjau dibuat ulang saat proyek membutuhkannya.</string>
+    <string name="settings_delete_model_title">Hapus %1$s?</string>
+    <string name="settings_delete_model_text">Bisa diunduh lagi nanti.</string>
     <string name="preset_numbered">Preset %1$s</string>
     <string name="recovery_your_project">proyek Anda</string>
     <string name="caption_layer_name">Takarir %1$s</string>
@@ -1766,15 +1773,4 @@
     <string name="crop_reset">Reset</string>
     <string name="a11y_crop_ratio">Rasio aspek %1$s</string>
     <string name="a11y_crop_area">Area pangkas. Seret sudut atau tepi untuk memangkas, atau seret di dalamnya untuk memindahkan area pangkas.</string>
-    <string name="camera_discard_text">Rekaman ini akan dihapus.</string>
-    <string name="camera_discard_title">Buang rekaman?</string>
-    <string name="camera_keep_recording">Lanjutkan merekam</string>
-    <string name="export_note_checking">Memeriksa file…</string>
-    <string name="home_duplicating">Menyalin proyek…</string>
-    <string name="media_error_too_many_frames">Video ini memiliki terlalu banyak frame untuk diindeks</string>
-    <string name="project_too_many_linked">Proyek ini menyematkan terlalu banyak elemen tertaut.</string>
-    <string name="settings_clear_preview_text">Salinan pratinjau dibuat ulang saat proyek membutuhkannya.</string>
-    <string name="settings_clear_preview_title">Hapus salinan pratinjau?</string>
-    <string name="settings_delete_model_text">Bisa diunduh lagi nanti.</string>
-    <string name="settings_delete_model_title">Hapus %1$s?</string>
 </resources>

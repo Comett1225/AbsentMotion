@@ -73,6 +73,9 @@
      "1": 1,
      "2": 2
     }
+   },
+   "offset": {
+    "to": "offset"
    }
   }
  },
@@ -894,6 +897,9 @@
    },
    "mask": {
     "to": "mask"
+   },
+   "offset": {
+    "to": "offset"
    }
   }
  },
@@ -5502,7 +5508,7 @@
     }
    },
    "offset": {
-    "neutral": "0,0"
+    "to": "offset"
    }
   }
  },
@@ -5932,6 +5938,119 @@
      "2": 2,
      "3": 3
     }
+   }
+  }
+ },
+ "com.alightcreative.effects.colorize": {
+  "to": "colorize",
+  "params": {
+   "tint": [
+    {
+     "to": "hue",
+     "scale": -1,
+     "offset": 270,
+     "wrap": 360
+    },
+    {
+     "to": "saturation",
+     "min": 0,
+     "max": 1
+    },
+    {
+     "neutral": "0"
+    }
+   ]
+  },
+  "set": {
+   "amount": 1
+  }
+ },
+ "com.alightcreative.effects.chromaticzoomblur": {
+  "to": "chromaticzoomblur",
+  "params": {
+   "strength": {
+    "to": "amount",
+    "scale": 5,
+    "min": 0,
+    "max": 1.9
+   },
+   "adaptive": {
+    "neutral": true
+   }
+  }
+ },
+ "com.alightcreative.effects.texttransform": {
+  "to": "texttransform",
+  "params": {
+   "start": {
+    "to": "start",
+    "min": 0,
+    "max": 1
+   },
+   "end": {
+    "to": "end",
+    "min": 0,
+    "max": 1
+   },
+   "phase": {
+    "to": "offset",
+    "min": -2,
+    "max": 2
+   },
+   "component": {
+    "neutral": "1"
+   },
+   "anchor": {
+    "to": "anchor",
+    "values": {
+     "0": 1,
+     "1": 0
+    }
+   },
+   "angle": {
+    "to": "rotation"
+   },
+   "scale": {
+    "to": "scale",
+    "offset": 1,
+    "min": 0,
+    "max": 10
+   },
+   "alpha": {
+    "to": "opacity",
+    "offset": 1,
+    "min": 0,
+    "max": 1
+   },
+   "stretch": {
+    "neutral": "0"
+   },
+   "easeIn": {
+    "neutral": "0"
+   },
+   "easeOut": {
+    "neutral": "0"
+   },
+   "overlap": {
+    "neutral": "0"
+   },
+   "shape": {
+    "to": "shape",
+    "values": {
+     "0": 0,
+     "1": 5,
+     "2": 3
+    }
+   },
+   "fillColor": {
+    "to": "tint",
+    "gate": "useFillColor"
+   },
+   "randomOrder": {
+    "to": "randomOrder"
+   },
+   "seed": {
+    "to": "seed"
    }
   }
  }

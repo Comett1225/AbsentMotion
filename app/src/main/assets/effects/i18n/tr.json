@@ -423,6 +423,18 @@
     }
    }
   },
+  "chromaticzoomblur": {
+   "description": "Merkez noktadan kırmızıyı içe, maviyi dışa çeken bir yakınlaştırma bulanıklığı; kenarlar gökkuşağı saçaklarına yayılır.",
+   "name": "Kromatik Yakınlaştırma Bulanıklığı",
+   "params": {
+    "amount": {
+     "label": "Güç"
+    },
+    "center": {
+     "label": "Merkez"
+    }
+   }
+  },
   "circularripple": {
    "description": "Suya düşen bir damla gibi bir noktadan dairesel dalgaların yayılmasını sağlar.",
    "name": "Dairesel Dalga",
@@ -520,7 +532,7 @@
    }
   },
   "colorize": {
-   "description": "Katmanın tamamını, açık ve koyu tonlarını koruyarak tek bir renk tonuyla renklendirir.",
+   "description": "Katmanın tamamını, ışığını ve gölgesini koruyarak tek bir tonla renklendirir. Doygunluk tonun gücünü belirler; %100'ün altında katman griye kayar.",
    "name": "Renklendir",
    "params": {
     "amount": {
@@ -528,6 +540,9 @@
     },
     "hue": {
      "label": "Renk tonu"
+    },
+    "saturation": {
+     "label": "Doygunluk"
     }
    }
   },
@@ -1704,6 +1719,9 @@
     },
     "color2": {
      "label": "Renk 2"
+    },
+    "offset": {
+     "label": "Kaydırma"
     },
     "opacity": {
      "label": "Opaklık"

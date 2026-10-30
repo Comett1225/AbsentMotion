@@ -308,7 +308,6 @@
     <string name="library_damaged_project">Projek rosak</string>
     <string name="library_report_unknown">Tidak dikenali, dikekalkan dalam fail</string>
     <string name="library_report_cannot_run">Kesan yang tidak dapat dijalankan oleh versi ini</string>
-    <string name="library_report_converted">Kesan ditukar kepada kesan asli aplikasi ini</string>
     <string name="library_report_dropped">Tetapan kesan yang tidak dapat dipindahkan</string>
     <string name="library_report_media">Media tidak ditemui</string>
     <string name="library_report_fonts">Fon tidak dipasang</string>
@@ -357,6 +356,7 @@
     <string name="home_more">Lagi</string>
     <string name="home_duplicate_asset">Pendua aset</string>
     <string name="home_duplicate">Gandakan</string>
+    <string name="home_duplicating">Menyalin projek…</string>
     <string name="home_collect_media">Kumpul media ke dalam projek</string>
     <string name="home_delete_asset">Padam aset</string>
     <string name="home_empty_assets">Belum ada aset disimpan</string>
@@ -475,9 +475,6 @@
     </plurals>
     <plurals name="library_report_effect_layers">
         <item quantity="other">%1$s (%2$s lapisan)</item>
-    </plurals>
-    <plurals name="library_report_converted_effects">
-        <item quantity="other">%1$s (%2$s kesan)</item>
     </plurals>
     <string name="export_title">Eksport projek</string>
     <string name="export_back">Kembali</string>
@@ -609,6 +606,7 @@
     <string name="export_error_encoder_busy">Pengekod video telefon ini sibuk atau tidak dapat menghasilkan saiz ini. Cuba resolusi atau kadar bingkai yang lebih rendah.</string>
     <string name="export_error_codec_busy">Penyahkod atau pengekod video telefon berhenti berfungsi. Tutup aplikasi lain yang memainkan atau merakam video, kemudian cuba lagi.</string>
     <string name="export_note_software">Pengekod video telefon sibuk, jadi eksport ini menggunakan pengekod perisian yang lebih perlahan.</string>
+    <string name="export_note_checking">Menyemak fail…</string>
     <string name="export_note_retry">Pengekod video berhenti berfungsi. Mencuba semula dengan pengekod lain.</string>
     <string name="export_error_stalled">Eksport tidak menunjukkan kemajuan selama %1$s saat, jadi ia dihentikan. Fail media atau pengekod video telefon berhenti memberi respons. Tutup aplikasi lain yang menggunakan video dan cuba lagi.</string>
     <string name="export_error_draw_frame">Bingkai %1$s tidak dapat dilukis. Cuba eksport semula.</string>
@@ -657,8 +655,13 @@
     <string name="camera_error_photo">Tidak dapat mengambil foto.</string>
     <string name="camera_error_save_video">Tidak dapat menyimpan video.</string>
     <string name="camera_error_start_recording">Tidak dapat memulakan rakaman.</string>
+    <string name="camera_discard_title">Buang rakaman?</string>
+    <string name="camera_discard_text">Rakaman ini akan dipadam.</string>
+    <string name="camera_keep_recording">Teruskan merakam</string>
     <string name="media_error_no_decoder">Telefon ini tiada penyahkod untuk video ini</string>
     <string name="media_error_decoder_stalled">Penyahkod video berhenti bertindak balas</string>
+    <string name="media_error_too_many_frames">Video ini mempunyai terlalu banyak bingkai untuk diindeks</string>
+    <string name="project_too_many_linked">Projek ini menyematkan terlalu banyak elemen berpaut.</string>
     <string name="media_error_read_frames">Telefon ini tidak dapat membaca bingkai video ini</string>
     <string name="media_error_pixel_format">Video ini menggunakan format piksel yang tidak dapat dibaca</string>
     <string name="media_error_video_unavailable">Video tidak tersedia: %1$s</string>
@@ -1684,6 +1687,10 @@
     <string name="preview_fast_blur">Kabur\nPantas</string>
     <string name="settings_preview_copies">Guna salinan pratonton untuk video besar</string>
     <string name="settings_clear_preview_copies">Kosongkan salinan pratonton</string>
+    <string name="settings_clear_preview_title">Kosongkan salinan pratonton?</string>
+    <string name="settings_clear_preview_text">Salinan pratonton dibina semula apabila projek memerlukannya.</string>
+    <string name="settings_delete_model_title">Padam %1$s?</string>
+    <string name="settings_delete_model_text">Ia boleh dimuat turun semula kemudian.</string>
     <string name="preset_numbered">Pratetap %1$s</string>
     <string name="recovery_your_project">projek anda</string>
     <string name="caption_layer_name">Kapsyen %1$s</string>
@@ -1766,15 +1773,4 @@
     <string name="crop_reset">Set semula</string>
     <string name="a11y_crop_ratio">Nisbah aspek %1$s</string>
     <string name="a11y_crop_area">Kawasan pangkas. Seret penjuru atau tepi untuk memangkas, atau seret di dalamnya untuk mengalihkan kawasan pangkas.</string>
-    <string name="camera_discard_text">Rakaman ini akan dipadam.</string>
-    <string name="camera_discard_title">Buang rakaman?</string>
-    <string name="camera_keep_recording">Teruskan merakam</string>
-    <string name="export_note_checking">Menyemak fail…</string>
-    <string name="home_duplicating">Menyalin projek…</string>
-    <string name="media_error_too_many_frames">Video ini mempunyai terlalu banyak bingkai untuk diindeks</string>
-    <string name="project_too_many_linked">Projek ini menyematkan terlalu banyak elemen berpaut.</string>
-    <string name="settings_clear_preview_text">Salinan pratonton dibina semula apabila projek memerlukannya.</string>
-    <string name="settings_clear_preview_title">Kosongkan salinan pratonton?</string>
-    <string name="settings_delete_model_text">Ia boleh dimuat turun semula kemudian.</string>
-    <string name="settings_delete_model_title">Padam %1$s?</string>
 </resources>

@@ -30,6 +30,7 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
         val relative: Boolean = false,
         val per: String? = null,
         val take: Int = 0,
+        val gate: String? = null,
     )
 
     class Rule(val to: String, val params: Map<String, List<Conversion?>>, val set: Map<String, String>, val onlyWith: String? = null)
@@ -63,9 +64,11 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
     private fun convert(effect: XmlNode, rule: Rule, own: EffectDefinition, keep: Boolean, dims: FloatArray, drop: (String) -> Unit): XmlNode {
         val made = linkedMapOf<String, XmlNode>()
         val others = ArrayList<XmlNode>()
+        val gates = rule.params.values.flatten().mapNotNull { it?.gate }.toSet()
         for (child in effect.children) {
             val name = child["name"]
             if (child.name != "property" || name == null) { others += child; continue }
+            if (name in gates) continue
             val conversions = rule.params[name]
             if (conversions == null) {
                 if (keep && own.params.any { it.id == name }) made.putIfAbsent(name, child) else drop(name)
@@ -76,7 +79,9 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
                 val param = c?.to?.let { to -> own.params.firstOrNull { it.id == to } }
                 if (param != null) {
                     val shift = c.plus?.let { other -> effect.children.firstOrNull { it.name == "property" && it["name"] == other }?.valueAt(0f)?.finiteFloat() } ?: 0f
-                    made[param.id] = property(child, param.id, param.type) { text -> convertValue(text, c, if (c.component >= 0) c.component else if (split && c.take == 0) i else -1, shift, dims) }
+                    val off = c.gate?.let { gate -> effect.children.firstOrNull { it.name == "property" && it["name"] == gate }?.valueAt(0f)?.trim() != "true" } ?: false
+                    made[param.id] = if (off) XmlNode("property", mapOf("name" to param.id, "type" to param.type, "value" to "#00000000"))
+                        else property(child, param.id, param.type) { text -> convertValue(text, c, if (c.component >= 0) c.component else if (split && c.take == 0) i else -1, shift, dims) }
                 } else if (c?.neutral == null || values(child).any { !same(if (split) it.split(',').getOrElse(i) { "" } else it, c.neutral) }) {
                     drop(if (split) "$name (${i + 1})" else name)
                 }
@@ -169,6 +174,7 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
             json.optBoolean("relative"),
             json.optString("per").takeIf { it.isNotEmpty() },
             json.optInt("take", 0),
+            json.optString("gate").takeIf { it.isNotEmpty() },
         )
     }
 }

@@ -8,11 +8,11 @@ from pathlib import Path
 
 import numpy as np
 from PIL import Image, ImageDraw
-from sdk import adb_command
+from sdk import PACKAGE, adb_command
 
 ROOT = Path(__file__).resolve().parents[1]
 ADB = adb_command()
-PKG = "app.absentmotion"
+PKG = PACKAGE
 DEVICE_DIR = f"/sdcard/Android/data/{PKG}/files"
 TOLERANCE = 2
 BLACK, RED, GREEN, BLUE, HALF = (0, 0, 0), (255, 0, 0), (0, 255, 0), (0, 0, 255), (128, 128, 128)
@@ -211,7 +211,7 @@ def run(name, xml, work, hits=(), frame=0, bounds=()):
     adb("logcat", "-c")
     extras = ["--es", "hit", "'" + ";".join(f"{x},{y}" for x, y in hits) + "'"] if hits else []
     extras += ["--es", "bounds", ";".join(str(b) for b in bounds)] if bounds else []
-    adb("shell", "am", "start", "-n", f"{PKG}/.MainActivity", "--es", "xml", remote, "--es", "still", name, "--ei", "frame", frame, *extras)
+    adb("shell", "am", "start", "-n", f"{PKG}/app.absentmotion.MainActivity", "--es", "xml", remote, "--es", "still", name, "--ei", "frame", frame, *extras)
     deadline, pid = time.time() + 120, None
     while f"still {name} ok=" not in (log := adb("logcat", "-d", "-s", "AMTest")) or log.count(" hit ") < len(hits) or log.count(" bounds ") < len(bounds):
         now = adb("shell", "pidof", PKG).strip()

@@ -423,6 +423,18 @@
     }
    }
   },
+  "chromaticzoomblur": {
+   "description": "Isang zoom blur mula sa sentro na humihila ng pula papasok at asul palabas, kaya nagiging bahaghari ang mga gilid.",
+   "name": "Chromatic Zoom Blur",
+   "params": {
+    "amount": {
+     "label": "Lakas"
+    },
+    "center": {
+     "label": "Sentro"
+    }
+   }
+  },
   "circularripple": {
    "description": "Nagpapalabas ng pabilog na ripple mula sa isang punto, parang patak na bumabagsak sa tubig.",
    "name": "Pabilog na Ripple",
@@ -520,7 +532,7 @@
    }
   },
   "colorize": {
-   "description": "Binibigyan ng isang hue ang buong layer habang pinapanatili ang liwanag at anino nito.",
+   "description": "Kinukulayan ang buong layer ng isang kulay habang pinapanatili ang liwanag at anino. Ang saturation ang nagtatakda kung gaano kalakas ang kulay; sa ilalim ng 100%, lumalapit ang layer sa grey.",
    "name": "Kulayan",
    "params": {
     "amount": {
@@ -528,6 +540,9 @@
     },
     "hue": {
      "label": "Hue"
+    },
+    "saturation": {
+     "label": "Saturation"
     }
    }
   },
@@ -1704,6 +1719,9 @@
     },
     "color2": {
      "label": "Kulay 2"
+    },
+    "offset": {
+     "label": "Offset"
     },
     "opacity": {
      "label": "Opacity"

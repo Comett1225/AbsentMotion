@@ -49,7 +49,7 @@ You can open a project file from another app (for example a file manager) with S
 | A project package from another editor (`.amproj`) | Each scene becomes a **template**, and any assets stay assets |
 | A plain scene XML file | A normal project. Media links are not followed for safety, so media shows as missing unless it can be found in the gallery. |
 
-Effects that AbsentMotion has are converted. Effects it does not have stay in the file but are not drawn. After an import, a report lists what happened: effects it cannot run, effects converted, settings that could not be carried over, media not found and fonts not installed. Backup files (`.absbackup`) are restored from Settings, not imported here.
+Effects that AbsentMotion has are converted. Effects it does not have stay in the file but are not drawn. After an import, a report lists only what did not come over: effects it cannot run, settings that could not be carried over, media not found and fonts not installed. When everything came over, no report is shown. Backup files (`.absbackup`) are restored from Settings, not imported here.
 
 There are limits to protect the phone. For example, a package can have at most 2000 files and 32 projects, be at most 2 GB unpacked, and a scene needs a size of at most 16384 pixels and a frame rate from 1 to 240. The app says which rule a file broke.
 

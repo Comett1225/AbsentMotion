@@ -423,6 +423,18 @@
     }
    }
   },
+  "chromaticzoomblur": {
+   "description": "Un desenfoque de zoom desde un punto central que atrae el rojo hacia adentro y el azul hacia afuera, así los bordes se abren en franjas de arcoíris.",
+   "name": "Desenfoque de zoom cromático",
+   "params": {
+    "amount": {
+     "label": "Intensidad"
+    },
+    "center": {
+     "label": "Centro"
+    }
+   }
+  },
   "circularripple": {
    "description": "Hace que ondas circulares se expandan desde un punto, como una gota al caer al agua.",
    "name": "Ondulación circular",
@@ -520,7 +532,7 @@
    }
   },
   "colorize": {
-   "description": "Tiñe toda la capa con un solo tono y conserva sus luces y sombras.",
+   "description": "Tiñe toda la capa con un solo tono y conserva su luz y su sombra. La saturación define qué tan fuerte es el tono; por debajo de 100% la capa tiende al gris.",
    "name": "Colorear",
    "params": {
     "amount": {
@@ -528,6 +540,9 @@
     },
     "hue": {
      "label": "Matiz"
+    },
+    "saturation": {
+     "label": "Saturación"
     }
    }
   },
@@ -1704,6 +1719,9 @@
     },
     "color2": {
      "label": "Color 2"
+    },
+    "offset": {
+     "label": "Desplazamiento"
     },
     "opacity": {
      "label": "Opacidad"

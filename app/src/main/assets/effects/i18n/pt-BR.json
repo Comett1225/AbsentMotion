@@ -423,6 +423,18 @@
     }
    }
   },
+  "chromaticzoomblur": {
+   "description": "Um desfoque de zoom a partir de um ponto central que puxa o vermelho para dentro e o azul para fora, espalhando as bordas em franjas de arco-íris.",
+   "name": "Desfoque de zoom cromático",
+   "params": {
+    "amount": {
+     "label": "Intensidade"
+    },
+    "center": {
+     "label": "Centro"
+    }
+   }
+  },
   "circularripple": {
    "description": "Faz ondulações circulares se espalharem a partir de um ponto, como uma gota caindo na água.",
    "name": "Ondulação circular",
@@ -520,7 +532,7 @@
    }
   },
   "colorize": {
-   "description": "Colore toda a camada com um único matiz, mantendo seus realces e sombras.",
+   "description": "Colore toda a camada com um único matiz, mantendo seus tons claros e escuros. A saturação define a força do matiz; abaixo de 100% a camada tende ao cinza.",
    "name": "Colorir",
    "params": {
     "amount": {
@@ -528,6 +540,9 @@
     },
     "hue": {
      "label": "Matiz"
+    },
+    "saturation": {
+     "label": "Saturação"
     }
    }
   },
@@ -1704,6 +1719,9 @@
     },
     "color2": {
      "label": "Cor 2"
+    },
+    "offset": {
+     "label": "Deslocamento"
     },
     "opacity": {
      "label": "Opacidade"

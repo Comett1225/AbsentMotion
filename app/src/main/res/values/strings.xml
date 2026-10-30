@@ -308,7 +308,6 @@
     <string name="library_damaged_project">Damaged project</string>
     <string name="library_report_unknown">Not recognized, kept in the file</string>
     <string name="library_report_cannot_run">Effects this version cannot run</string>
-    <string name="library_report_converted">Effects turned into this app\'s own</string>
     <string name="library_report_dropped">Effect settings that could not be carried over</string>
     <string name="library_report_media">Media not found</string>
     <string name="library_report_fonts">Fonts not installed</string>
@@ -484,10 +483,6 @@
     <plurals name="library_report_effect_layers">
         <item quantity="one">%1$s (%2$s layer)</item>
         <item quantity="other">%1$s (%2$s layers)</item>
-    </plurals>
-    <plurals name="library_report_converted_effects">
-        <item quantity="one">%1$s (%2$s effect)</item>
-        <item quantity="other">%1$s (%2$s effects)</item>
     </plurals>
     <string name="export_title">Export Project</string>
     <string name="export_back">Back</string>

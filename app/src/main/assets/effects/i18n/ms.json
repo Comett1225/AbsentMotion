@@ -423,6 +423,18 @@
     }
    }
   },
+  "chromaticzoomblur": {
+   "description": "Kabur zum dari titik pusat yang menarik merah ke dalam dan biru ke luar, jadi tepi merebak menjadi jalur pelangi.",
+   "name": "Kabur Zum Kromatik",
+   "params": {
+    "amount": {
+     "label": "Kekuatan"
+    },
+    "center": {
+     "label": "Pusat"
+    }
+   }
+  },
   "circularripple": {
    "description": "Menghasilkan riak bulat yang merebak dari satu titik, seperti titisan air jatuh ke dalam air.",
    "name": "Riak Bulat",
@@ -520,7 +532,7 @@
    }
   },
   "colorize": {
-   "description": "Mewarnakan seluruh lapisan dengan satu rona sambil mengekalkan cahaya dan bayangnya.",
+   "description": "Mewarnakan seluruh lapisan dengan satu warna sambil mengekalkan cahaya dan bayangnya. Ketepuan menetapkan kekuatan warna itu; bawah 100% lapisan beralih ke arah kelabu.",
    "name": "Warnakan",
    "params": {
     "amount": {
@@ -528,6 +540,9 @@
     },
     "hue": {
      "label": "Rona"
+    },
+    "saturation": {
+     "label": "Ketepuan"
     }
    }
   },
@@ -1704,6 +1719,9 @@
     },
     "color2": {
      "label": "Warna 2"
+    },
+    "offset": {
+     "label": "Anjakan"
     },
     "opacity": {
      "label": "Kelegapan"

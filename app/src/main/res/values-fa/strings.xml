@@ -308,7 +308,6 @@
     <string name="library_damaged_project">پروژه آسیب‌دیده</string>
     <string name="library_report_unknown">شناخته نشد؛ در فایل نگه داشته شد</string>
     <string name="library_report_cannot_run">افکت‌هایی که این نسخه نمی‌تواند اجرا کند</string>
-    <string name="library_report_converted">افکت‌هایی که به افکت‌های خود این برنامه تبدیل شدند</string>
     <string name="library_report_dropped">تنظیمات افکت که قابل انتقال نبودند</string>
     <string name="library_report_media">رسانه پیدا نشد</string>
     <string name="library_report_fonts">فونت‌ها نصب نشده‌اند</string>
@@ -358,6 +357,7 @@
     <string name="home_more">بیشتر</string>
     <string name="home_duplicate_asset">تکثیر دارایی</string>
     <string name="home_duplicate">تکثیر</string>
+    <string name="home_duplicating">در حال کپی پروژه…</string>
     <string name="home_collect_media">جمع‌آوری رسانه‌ها در پروژه</string>
     <string name="home_delete_asset">حذف دارایی</string>
     <string name="home_empty_assets">هنوز دارایی‌ای ذخیره نشده</string>
@@ -482,10 +482,6 @@
     <plurals name="library_report_effect_layers">
         <item quantity="one">‏%1$s (%2$s لایه)</item>
         <item quantity="other">‏%1$s (%2$s لایه)</item>
-    </plurals>
-    <plurals name="library_report_converted_effects">
-        <item quantity="one">‏%1$s (%2$s افکت)</item>
-        <item quantity="other">‏%1$s (%2$s افکت)</item>
     </plurals>
     <string name="export_title">خروجی پروژه</string>
     <string name="export_back">بازگشت</string>
@@ -620,6 +616,7 @@
     <string name="export_error_encoder_busy">انکودر ویدیوی این گوشی مشغول است یا نمی‌تواند این اندازه را بسازد. رزولوشن یا نرخ فریم پایین‌تر را امتحان کنید.</string>
     <string name="export_error_codec_busy">دیکودر یا انکودر ویدیوی گوشی از کار افتاد. برنامه‌های دیگر را که ویدیو پخش یا ضبط می‌کنند ببندید، سپس دوباره تلاش کنید.</string>
     <string name="export_note_software">انکودر ویدیوی گوشی مشغول است، بنابراین این خروجی از انکودر نرم‌افزاری کندتر استفاده می‌کند.</string>
+    <string name="export_note_checking">در حال بررسی فایل…</string>
     <string name="export_note_retry">انکودر ویدیو از کار افتاد. تلاش مجدد با انکودر دیگر.</string>
     <string name="export_error_stalled">خروجی برای %1$s ثانیه پیشرفتی نداشت، بنابراین متوقف شد. یک فایل رسانه یا انکودر ویدیوی گوشی پاسخ نمی‌داد. برنامه‌های دیگری را که از ویدیو استفاده می‌کنند ببندید و دوباره تلاش کنید.</string>
     <string name="export_error_draw_frame">فریم %1$s رسم نشد. دوباره خروجی بگیرید.</string>
@@ -668,8 +665,13 @@
     <string name="camera_error_photo">عکس گرفته نشد.</string>
     <string name="camera_error_save_video">ویدیو ذخیره نشد.</string>
     <string name="camera_error_start_recording">ضبط شروع نشد.</string>
+    <string name="camera_discard_title">ضبط دور انداخته شود؟</string>
+    <string name="camera_discard_text">این برداشت حذف می‌شود.</string>
+    <string name="camera_keep_recording">ادامه ضبط</string>
     <string name="media_error_no_decoder">این گوشی رمزگشای این ویدیو را ندارد</string>
     <string name="media_error_decoder_stalled">رمزگشای ویدیو دیگر پاسخ نمی‌دهد</string>
+    <string name="media_error_too_many_frames">این ویدیو فریم‌های بیش از حدی برای نمایه‌سازی دارد</string>
+    <string name="project_too_many_linked">این پروژه عناصر پیوندی بیش از حدی را جاسازی کرده است.</string>
     <string name="media_error_read_frames">این گوشی نمی‌تواند فریم‌های این ویدیو را بخواند</string>
     <string name="media_error_pixel_format">این ویدیو از قالب پیکسلی استفاده می‌کند که خوانده نمی‌شود</string>
     <string name="media_error_video_unavailable">ویدیو در دسترس نیست: %1$s</string>
@@ -1709,6 +1711,10 @@
     <string name="preview_fast_blur">بلور\nسریع</string>
     <string name="settings_preview_copies">استفاده از نسخه‌های پیش‌نمایش برای ویدیوهای بزرگ</string>
     <string name="settings_clear_preview_copies">پاک کردن نسخه‌های پیش‌نمایش</string>
+    <string name="settings_clear_preview_title">کپی‌های پیش‌نمایش پاک شوند؟</string>
+    <string name="settings_clear_preview_text">کپی‌های پیش‌نمایش هر زمان پروژه به آن‌ها نیاز داشته باشد دوباره ساخته می‌شوند.</string>
+    <string name="settings_delete_model_title">%1$s حذف شود؟</string>
+    <string name="settings_delete_model_text">بعداً می‌توان دوباره آن را دانلود کرد.</string>
     <string name="preset_numbered">پریست %1$s</string>
     <string name="recovery_your_project">پروژه شما</string>
     <string name="caption_layer_name">زیرنویس %1$s</string>
@@ -1791,15 +1797,4 @@
     <string name="crop_reset">بازنشانی</string>
     <string name="a11y_crop_ratio">نسبت ابعاد %1$s</string>
     <string name="a11y_crop_area">ناحیهٔ برش. برای برش، یک گوشه یا لبه را بکشید، یا درون آن را بکشید تا برش جابه‌جا شود.</string>
-    <string name="camera_discard_text">این برداشت حذف می‌شود.</string>
-    <string name="camera_discard_title">ضبط دور انداخته شود؟</string>
-    <string name="camera_keep_recording">ادامه ضبط</string>
-    <string name="export_note_checking">در حال بررسی فایل…</string>
-    <string name="home_duplicating">در حال کپی پروژه…</string>
-    <string name="media_error_too_many_frames">این ویدیو فریم‌های بیش از حدی برای نمایه‌سازی دارد</string>
-    <string name="project_too_many_linked">این پروژه عناصر پیوندی بیش از حدی را جاسازی کرده است.</string>
-    <string name="settings_clear_preview_text">کپی‌های پیش‌نمایش هر زمان پروژه به آن‌ها نیاز داشته باشد دوباره ساخته می‌شوند.</string>
-    <string name="settings_clear_preview_title">کپی‌های پیش‌نمایش پاک شوند؟</string>
-    <string name="settings_delete_model_text">بعداً می‌توان دوباره آن را دانلود کرد.</string>
-    <string name="settings_delete_model_title">%1$s حذف شود؟</string>
 </resources>

@@ -189,6 +189,44 @@ class EffectMigrationTest {
         }
     }
 
+    @Test fun colorizeTextTransformAndChromaticZoomBlurBecomeOwnEffects() {
+        val xml = """<scene width="1080" height="1350" fps="30" totalTime="2000">
+            <shape id="1" startTime="0" endTime="2000" fillType="color" s=".rect">
+              <effect id="com.alightcreative.effects.colorize"><property name="tint" type="vec3" value="-179.297440,0.442514,0.000000" /></effect>
+              <effect id="com.alightcreative.effects.chromaticzoomblur"><property name="strength" type="float" value="0.03" /><property name="adaptive" type="bool" value="true" /></effect>
+            </shape>
+            <text id="2" startTime="0" endTime="2000" size="112">
+              <effect id="com.alightcreative.effects.texttransform">
+                <property name="fillColor" type="color" value="#ffbebebe" /><property name="useFillColor" type="bool" value="true" />
+                <property name="randomOrder" type="bool" value="true" /><property name="seed" type="float"><kf t="0" v="0" /><kf t="1" v="0.018947" /></property>
+                <property name="shape" type="int" value="1" /><property name="start" type="float" value="0" /><property name="end" type="float" value="1" />
+                <property name="phase" type="float" value="0" /><property name="component" type="int" value="1" /><property name="anchor" type="int" value="0" />
+                <property name="angle" type="float" value="0" /><property name="scale" type="float" value="0" /><property name="stretch" type="float" value="0" />
+                <property name="alpha" type="float" value="0" /><property name="easeIn" type="float" value="0" /><property name="easeOut" type="float" value="0" />
+                <property name="overlap" type="float" value="0" />
+              </effect>
+              <effect id="com.alightcreative.effects.texttransform">
+                <property name="fillColor" type="color" value="#ffbebebe" /><property name="useFillColor" type="bool" value="false" />
+              </effect>
+              <content>A</content>
+            </text>
+          </scene>"""
+        val result = migration.migrate(Scene.parse(xml))
+        val all = effects(result.scene.node)
+        assertEquals(listOf("colorize", "chromaticzoomblur", "texttransform", "texttransform").map { "absent.$it" }, all.map { it["id"] })
+        assertTrue(result.dropped.toString(), result.dropped.isEmpty())
+        close(89.29744f, all[0].number("hue"))
+        close(0.442514f, all[0].number("saturation"))
+        close(1f, all[0].number("amount"))
+        close(0.15f, all[1].number("amount"))
+        assertEquals("#ffbebebe", all[2].prop("tint")["value"])
+        close(1f, all[2].number("scale"))
+        close(1f, all[2].number("opacity"))
+        close(5f, all[2].number("shape"))
+        assertEquals(2, all[2].prop("seed").keyframes.size)
+        assertEquals("#00000000", all[3].prop("tint")["value"])
+    }
+
     @Test fun valuesKeyframesEasingsAndFlagsAreConverted() {
         val all = effects(migration.migrate(Scene.parse(scene)).scene.node)
         fun own(key: String, nth: Int = 0) = all.filter { it["id"] == "absent.$key" }[nth]
@@ -284,12 +322,15 @@ class EffectMigrationTest {
         assertEquals(once.scene.node, migration.migrate(Scene.parse(once.scene.node.toXml())).scene.node)
     }
 
+    private val notImported = listOf(R.string.library_report_unknown, R.string.library_report_cannot_run, R.string.library_report_dropped,
+        R.string.library_report_media, R.string.library_report_fonts).map { txt(it) }.toSet()
+
     @Test fun theImporterConvertsAndReports() {
         val store = ProjectStore(tmp.newFolder())
         val report = Importer(store, migration = migration, canRun = { catalog.find(it) != null }).import { scene.byteInputStream() }.single()
         val sections = report.sections.toMap()
         assertEquals(listOf(UiText.plural(R.plurals.library_report_effect_layers, 1, "unknown", "1")), sections[txt(R.string.library_report_cannot_run)])
-        assertEquals(18, sections[txt(R.string.library_report_converted)]!!.size)
+        assertTrue(sections.keys.toString(), sections.keys.all { it in notImported })
         assertTrue(sections[txt(R.string.library_report_dropped)]!!.isNotEmpty())
         assertEquals(20, effects(store.load(report.id)!!.node).size)
     }
@@ -333,7 +374,7 @@ class EffectMigrationTest {
         val report = Importer(store, migration = migration, canRun = { catalog.find(it) != null }).import { alightMoves.byteInputStream() }.single()
         val sections = report.sections.toMap()
         assertEquals(setOf(UiText.plural(R.plurals.library_report_effect_layers, 1, "scaleassist", "1")), sections[txt(R.string.library_report_cannot_run)]!!.toSet())
-        assertEquals(12, sections[txt(R.string.library_report_converted)]!!.size)
+        assertTrue(sections.keys.toString(), sections.keys.all { it in notImported })
         assertNull(sections[txt(R.string.library_report_dropped)])
         assertEquals(13, effects(store.load(report.id)!!.node).size)
     }

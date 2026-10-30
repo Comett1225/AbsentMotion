@@ -215,7 +215,6 @@ class Importer(
         val names = missing.map { uri -> scene.media(uri)?.filename?.takeIf { it.isNotEmpty() } ?: uri.substringAfterLast('/') }
         return listOf(
             txt(R.string.library_report_unknown) to unknown.map(::reportText), txt(R.string.library_report_cannot_run) to effects,
-            txt(R.string.library_report_converted) to migrated?.converted?.map { (what, n) -> UiText.plural(R.plurals.library_report_converted_effects, n, what, n.toString()) }.orEmpty(),
             txt(R.string.library_report_dropped) to migrated?.dropped?.map(::reportText).orEmpty(),
             txt(R.string.library_report_media) to names.map(::reportText), txt(R.string.library_report_fonts) to fonts.map(::reportText),
         ).filter { it.second.isNotEmpty() }

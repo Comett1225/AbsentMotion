@@ -308,7 +308,6 @@
     <string name="library_damaged_project">खराब प्रोजेक्ट</string>
     <string name="library_report_unknown">पहचाना नहीं गया, फ़ाइल में रखा गया</string>
     <string name="library_report_cannot_run">वे इफ़ेक्ट जो यह वर्शन नहीं चला सकता</string>
-    <string name="library_report_converted">इफ़ेक्ट इस ऐप के अपने इफ़ेक्ट में बदले गए</string>
     <string name="library_report_dropped">इफ़ेक्ट सेटिंग्स जो लागू नहीं हो सकीं</string>
     <string name="library_report_media">मीडिया नहीं मिला</string>
     <string name="library_report_fonts">फ़ॉन्ट इंस्टॉल नहीं हैं</string>
@@ -358,6 +357,7 @@
     <string name="home_more">अधिक</string>
     <string name="home_duplicate_asset">एसेट डुप्लिकेट करें</string>
     <string name="home_duplicate">डुप्लिकेट करें</string>
+    <string name="home_duplicating">प्रोजेक्ट कॉपी हो रहा है…</string>
     <string name="home_collect_media">मीडिया प्रोजेक्ट में इकट्ठा करें</string>
     <string name="home_delete_asset">एसेट हटाएं</string>
     <string name="home_empty_assets">अभी कोई एसेट सेव नहीं है</string>
@@ -482,10 +482,6 @@
     <plurals name="library_report_effect_layers">
         <item quantity="one">%1$s (%2$s लेयर)</item>
         <item quantity="other">%1$s (%2$s लेयर्स)</item>
-    </plurals>
-    <plurals name="library_report_converted_effects">
-        <item quantity="one">%1$s (%2$s इफ़ेक्ट)</item>
-        <item quantity="other">%1$s (%2$s इफ़ेक्ट्स)</item>
     </plurals>
     <string name="export_title">प्रोजेक्ट एक्सपोर्ट करें</string>
     <string name="export_back">वापस</string>
@@ -620,6 +616,7 @@
     <string name="export_error_encoder_busy">इस फ़ोन का वीडियो एनकोडर व्यस्त है या यह साइज़ नहीं बना सकता। कम रेज़ोल्यूशन या फ़्रेम रेट आज़माएँ।</string>
     <string name="export_error_codec_busy">फ़ोन का वीडियो डिकोडर या एनकोडर काम करना बंद हो गया। वीडियो चलाने या रिकॉर्ड करने वाले दूसरे ऐप्स बंद करें, फिर दोबारा कोशिश करें।</string>
     <string name="export_note_software">फ़ोन का वीडियो एनकोडर व्यस्त है, इसलिए यह एक्सपोर्ट धीमे सॉफ़्टवेयर एनकोडर से हो रहा है।</string>
+    <string name="export_note_checking">फ़ाइल जाँची जा रही है…</string>
     <string name="export_note_retry">वीडियो एनकोडर ने काम करना बंद कर दिया। किसी दूसरे एनकोडर के साथ फिर कोशिश की जा रही है।</string>
     <string name="export_error_stalled">एक्सपोर्ट %1$s सेकंड तक आगे नहीं बढ़ा, इसलिए इसे रोक दिया गया। कोई मीडिया फ़ाइल या फ़ोन का वीडियो एनकोडर जवाब देना बंद कर रहा है। वीडियो इस्तेमाल करने वाले दूसरे ऐप्स बंद करें और फिर कोशिश करें।</string>
     <string name="export_error_draw_frame">फ़्रेम %1$s नहीं बनाया जा सका। फिर से एक्सपोर्ट करें।</string>
@@ -668,8 +665,13 @@
     <string name="camera_error_photo">फ़ोटो नहीं ली जा सकी।</string>
     <string name="camera_error_save_video">वीडियो सेव नहीं हो सका।</string>
     <string name="camera_error_start_recording">रिकॉर्डिंग शुरू नहीं हो सकी।</string>
+    <string name="camera_discard_title">रिकॉर्डिंग छोड़ दें?</string>
+    <string name="camera_discard_text">यह टेक हटा दिया जाएगा।</string>
+    <string name="camera_keep_recording">रिकॉर्डिंग जारी रखें</string>
     <string name="media_error_no_decoder">इस फ़ोन में इस वीडियो के लिए कोई डिकोडर नहीं है</string>
     <string name="media_error_decoder_stalled">वीडियो डिकोडर ने जवाब देना बंद कर दिया</string>
+    <string name="media_error_too_many_frames">इस वीडियो में इंडेक्स करने के लिए बहुत ज़्यादा फ़्रेम हैं</string>
+    <string name="project_too_many_linked">इस प्रोजेक्ट में बहुत ज़्यादा लिंक किए गए एलिमेंट जुड़े हैं।</string>
     <string name="media_error_read_frames">यह फ़ोन इस वीडियो के फ़्रेम नहीं पढ़ सकता</string>
     <string name="media_error_pixel_format">यह वीडियो ऐसा पिक्सल फ़ॉर्मेट इस्तेमाल करता है जिसे पढ़ा नहीं जा सकता</string>
     <string name="media_error_video_unavailable">वीडियो उपलब्ध नहीं है: %1$s</string>
@@ -1709,6 +1711,10 @@
     <string name="preview_fast_blur">फ़ास्ट\nब्लर</string>
     <string name="settings_preview_copies">बड़े वीडियो के लिए प्रीव्यू कॉपी इस्तेमाल करें</string>
     <string name="settings_clear_preview_copies">प्रीव्यू कॉपी हटाएँ</string>
+    <string name="settings_clear_preview_title">प्रीव्यू कॉपी साफ़ करें?</string>
+    <string name="settings_clear_preview_text">जब किसी प्रोजेक्ट को प्रीव्यू कॉपी की ज़रूरत होती है, तब वे दोबारा बनाई जाती हैं।</string>
+    <string name="settings_delete_model_title">%1$s हटाएँ?</string>
+    <string name="settings_delete_model_text">इसे बाद में दोबारा डाउनलोड किया जा सकता है।</string>
     <string name="preset_numbered">प्रीसेट %1$s</string>
     <string name="recovery_your_project">आपका प्रोजेक्ट</string>
     <string name="caption_layer_name">कैप्शन %1$s</string>
@@ -1791,15 +1797,4 @@
     <string name="crop_reset">रीसेट</string>
     <string name="a11y_crop_ratio">आस्पेक्ट रेशियो %1$s</string>
     <string name="a11y_crop_area">क्रॉप क्षेत्र। क्रॉप करने के लिए कोई कोना या किनारा खींचें, या क्रॉप को खिसकाने के लिए अंदर खींचें।</string>
-    <string name="camera_discard_text">यह टेक हटा दिया जाएगा।</string>
-    <string name="camera_discard_title">रिकॉर्डिंग छोड़ दें?</string>
-    <string name="camera_keep_recording">रिकॉर्डिंग जारी रखें</string>
-    <string name="export_note_checking">फ़ाइल जाँची जा रही है…</string>
-    <string name="home_duplicating">प्रोजेक्ट कॉपी हो रहा है…</string>
-    <string name="media_error_too_many_frames">इस वीडियो में इंडेक्स करने के लिए बहुत ज़्यादा फ़्रेम हैं</string>
-    <string name="project_too_many_linked">इस प्रोजेक्ट में बहुत ज़्यादा लिंक किए गए एलिमेंट जुड़े हैं।</string>
-    <string name="settings_clear_preview_text">जब किसी प्रोजेक्ट को प्रीव्यू कॉपी की ज़रूरत होती है, तब वे दोबारा बनाई जाती हैं।</string>
-    <string name="settings_clear_preview_title">प्रीव्यू कॉपी साफ़ करें?</string>
-    <string name="settings_delete_model_text">इसे बाद में दोबारा डाउनलोड किया जा सकता है।</string>
-    <string name="settings_delete_model_title">%1$s हटाएँ?</string>
 </resources>

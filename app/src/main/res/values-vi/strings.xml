@@ -308,7 +308,6 @@
     <string name="library_damaged_project">Dự án bị hỏng</string>
     <string name="library_report_unknown">Không nhận diện được, giữ nguyên trong tệp</string>
     <string name="library_report_cannot_run">Hiệu ứng phiên bản này không chạy được</string>
-    <string name="library_report_converted">Hiệu ứng đã chuyển sang định dạng riêng của ứng dụng</string>
     <string name="library_report_dropped">Cài đặt hiệu ứng không thể chuyển sang</string>
     <string name="library_report_media">Không tìm thấy phương tiện</string>
     <string name="library_report_fonts">Phông chữ chưa cài đặt</string>
@@ -357,6 +356,7 @@
     <string name="home_more">Thêm</string>
     <string name="home_duplicate_asset">Nhân bản tài nguyên</string>
     <string name="home_duplicate">Nhân bản</string>
+    <string name="home_duplicating">Đang sao chép dự án…</string>
     <string name="home_collect_media">Thu thập phương tiện vào dự án</string>
     <string name="home_delete_asset">Xóa tài nguyên</string>
     <string name="home_empty_assets">Chưa có tài nguyên nào được lưu</string>
@@ -475,9 +475,6 @@
     </plurals>
     <plurals name="library_report_effect_layers">
         <item quantity="other">%1$s (%2$s lớp)</item>
-    </plurals>
-    <plurals name="library_report_converted_effects">
-        <item quantity="other">%1$s (%2$s hiệu ứng)</item>
     </plurals>
     <string name="export_title">Xuất dự án</string>
     <string name="export_back">Quay lại</string>
@@ -609,6 +606,7 @@
     <string name="export_error_encoder_busy">Bộ mã hóa video của điện thoại đang bận hoặc không hỗ trợ kích thước này. Hãy thử độ phân giải hoặc tốc độ khung hình thấp hơn.</string>
     <string name="export_error_codec_busy">Bộ giải mã hoặc mã hóa video của điện thoại đã ngừng hoạt động. Hãy đóng các ứng dụng khác đang phát hoặc ghi video rồi thử lại.</string>
     <string name="export_note_software">Bộ mã hóa video của điện thoại đang bận, nên lần xuất này dùng bộ mã hóa phần mềm chậm hơn.</string>
+    <string name="export_note_checking">Đang kiểm tra tệp…</string>
     <string name="export_note_retry">Bộ mã hóa video đã ngừng hoạt động. Đang thử lại với bộ mã hóa khác.</string>
     <string name="export_error_stalled">Quá trình xuất không có tiến triển trong %1$s giây nên đã bị dừng. Một tệp phương tiện hoặc bộ mã hóa video của điện thoại không phản hồi. Hãy đóng các ứng dụng khác đang dùng video và thử lại.</string>
     <string name="export_error_draw_frame">Không thể vẽ khung hình %1$s. Hãy thử xuất lại.</string>
@@ -657,8 +655,13 @@
     <string name="camera_error_photo">Không thể chụp ảnh.</string>
     <string name="camera_error_save_video">Không thể lưu video.</string>
     <string name="camera_error_start_recording">Không thể bắt đầu quay.</string>
+    <string name="camera_discard_title">Hủy bản ghi?</string>
+    <string name="camera_discard_text">Đoạn quay sẽ bị xóa.</string>
+    <string name="camera_keep_recording">Tiếp tục ghi</string>
     <string name="media_error_no_decoder">Điện thoại này không có bộ giải mã cho video này</string>
     <string name="media_error_decoder_stalled">Bộ giải mã video ngừng phản hồi</string>
+    <string name="media_error_too_many_frames">Video này có quá nhiều khung hình để lập chỉ mục</string>
+    <string name="project_too_many_linked">Dự án này nhúng quá nhiều phần tử được liên kết.</string>
     <string name="media_error_read_frames">Điện thoại này không thể đọc khung hình của video này</string>
     <string name="media_error_pixel_format">Video này dùng định dạng pixel không thể đọc được</string>
     <string name="media_error_video_unavailable">Video không khả dụng: %1$s</string>
@@ -1684,6 +1687,10 @@
     <string name="preview_fast_blur">Nhòe\nnhanh</string>
     <string name="settings_preview_copies">Dùng bản xem trước cho video lớn</string>
     <string name="settings_clear_preview_copies">Xóa bản xem trước</string>
+    <string name="settings_clear_preview_title">Xóa các bản sao xem trước?</string>
+    <string name="settings_clear_preview_text">Bản sao xem trước được tạo lại khi dự án cần đến.</string>
+    <string name="settings_delete_model_title">Xóa %1$s?</string>
+    <string name="settings_delete_model_text">Có thể tải xuống lại sau.</string>
     <string name="preset_numbered">Preset %1$s</string>
     <string name="recovery_your_project">dự án của bạn</string>
     <string name="caption_layer_name">Phụ đề %1$s</string>
@@ -1766,15 +1773,4 @@
     <string name="crop_reset">Đặt lại</string>
     <string name="a11y_crop_ratio">Tỷ lệ khung hình %1$s</string>
     <string name="a11y_crop_area">Vùng cắt. Kéo một góc hoặc một cạnh để cắt, hoặc kéo bên trong để di chuyển vùng cắt.</string>
-    <string name="camera_discard_text">Đoạn quay sẽ bị xóa.</string>
-    <string name="camera_discard_title">Hủy bản ghi?</string>
-    <string name="camera_keep_recording">Tiếp tục ghi</string>
-    <string name="export_note_checking">Đang kiểm tra tệp…</string>
-    <string name="home_duplicating">Đang sao chép dự án…</string>
-    <string name="media_error_too_many_frames">Video này có quá nhiều khung hình để lập chỉ mục</string>
-    <string name="project_too_many_linked">Dự án này nhúng quá nhiều phần tử được liên kết.</string>
-    <string name="settings_clear_preview_text">Bản sao xem trước được tạo lại khi dự án cần đến.</string>
-    <string name="settings_clear_preview_title">Xóa các bản sao xem trước?</string>
-    <string name="settings_delete_model_text">Có thể tải xuống lại sau.</string>
-    <string name="settings_delete_model_title">Xóa %1$s?</string>
 </resources>

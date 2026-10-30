@@ -423,6 +423,18 @@
     }
    }
   },
+  "chromaticzoomblur": {
+   "description": "Nhòe thu phóng từ một điểm tâm, kéo màu đỏ vào trong và màu xanh lam ra ngoài, khiến các cạnh lan thành viền cầu vồng.",
+   "name": "Nhòe thu phóng sắc màu",
+   "params": {
+    "amount": {
+     "label": "Cường độ"
+    },
+    "center": {
+     "label": "Tâm"
+    }
+   }
+  },
   "circularripple": {
    "description": "Tạo gợn sóng tròn lan ra từ một điểm, như giọt nước rơi xuống mặt nước.",
    "name": "Gợn sóng tròn",
@@ -520,7 +532,7 @@
    }
   },
   "colorize": {
-   "description": "Nhuộm toàn bộ lớp bằng một tông màu trong khi vẫn giữ sáng tối.",
+   "description": "Nhuộm toàn bộ lớp bằng một tông màu mà vẫn giữ ánh sáng và bóng tối. Độ bão hòa quyết định độ mạnh của tông màu; dưới 100% lớp ngả dần sang xám.",
    "name": "Nhuộm màu",
    "params": {
     "amount": {
@@ -528,6 +540,9 @@
     },
     "hue": {
      "label": "Tông màu"
+    },
+    "saturation": {
+     "label": "Độ bão hòa"
     }
    }
   },
@@ -1704,6 +1719,9 @@
     },
     "color2": {
      "label": "Màu 2"
+    },
+    "offset": {
+     "label": "Độ lệch"
     },
     "opacity": {
      "label": "Độ mờ"

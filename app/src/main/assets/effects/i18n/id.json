@@ -423,6 +423,18 @@
     }
    }
   },
+  "chromaticzoomblur": {
+   "description": "Blur zoom dari titik tengah yang menarik merah ke dalam dan biru ke luar, sehingga tepinya menyebar jadi pinggiran warna pelangi.",
+   "name": "Blur Zoom Chromatic",
+   "params": {
+    "amount": {
+     "label": "Kekuatan"
+    },
+    "center": {
+     "label": "Pusat"
+    }
+   }
+  },
   "circularripple": {
    "description": "Membuat riak melingkar menyebar dari satu titik, seperti tetesan yang jatuh ke air.",
    "name": "Riak melingkar",
@@ -520,7 +532,7 @@
    }
   },
   "colorize": {
-   "description": "Memberi warna pada seluruh lapisan dengan satu hue sambil mempertahankan terang dan bayangannya.",
+   "description": "Mewarnai seluruh lapisan dengan satu hue tanpa mengubah terang dan gelapnya. Saturasi mengatur seberapa kuat hue-nya; di bawah 100% lapisan mengarah ke abu-abu.",
    "name": "Warnai",
    "params": {
     "amount": {
@@ -528,6 +540,9 @@
     },
     "hue": {
      "label": "Hue"
+    },
+    "saturation": {
+     "label": "Saturasi"
     }
    }
   },
@@ -1704,6 +1719,9 @@
     },
     "color2": {
      "label": "Warna 2"
+    },
+    "offset": {
+     "label": "Offset"
     },
     "opacity": {
      "label": "Opasitas"
