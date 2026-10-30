@@ -5,7 +5,9 @@
 #include <cstdlib>
 #include <map>
 #include <mutex>
+#include <string>
 #include <string_view>
+#include <sys/stat.h>
 #include "textanim.h"
 #include "warp.h"
 #include "include/core/SkContourMeasure.h"
@@ -77,6 +79,44 @@ sk_sp<SkTypeface> EmojiFace(const std::string& path) {
     sk_sp<SkTypeface> face = path.empty() ? systemFonts()->matchFamilyStyleCharacter(nullptr, SkFontStyle(), locale, 1, 0x1F600)
                                           : systemFonts()->makeFromFile(path.c_str());
     if (face) faces[path] = face;
+    return face;
+}
+sk_sp<SkTypeface> TextFace(const TextLayout& text, const sk_sp<SkFontMgr>& manager) {
+    struct stat info {};
+    const bool found = stat(text.path.c_str(), &info) == 0;
+#ifdef __APPLE__
+    const long nanos = (long)info.st_mtimespec.tv_nsec;
+#else
+    const long nanos = (long)info.st_mtim.tv_nsec;
+#endif
+    const std::string stamp = found ? std::to_string(info.st_size) + ":" + std::to_string(info.st_ino) + ":" + std::to_string(info.st_mtime) + "." + std::to_string(nanos) : "";
+    const std::string key = text.path + "\n" + std::to_string(text.index) + "\n" + std::to_string(text.weight) + "\n" + (text.imported ? "1" : "0") + "\n" + stamp;
+    static std::mutex lock;
+    static std::map<std::string, sk_sp<SkTypeface>> faces;
+    {
+        std::lock_guard<std::mutex> hold(lock);
+        if (auto found = faces.find(key); found != faces.end()) return found->second;
+    }
+    sk_sp<SkTypeface> face = manager->makeFromFile(text.path.c_str(), text.index);
+    if (face && !text.imported) {
+        const int count = face->getVariationDesignParameters({});
+        if (count > 0 && count <= 64) {
+            std::vector<SkFontParameters::Variation::Axis> axes(count);
+            face->getVariationDesignParameters(axes);
+            std::vector<SkFontArguments::VariationPosition::Coordinate> coordinates;
+            for (const auto& axis : axes) {
+                const float value = axis.tag == SkSetFourByteTag('w', 'g', 'h', 't') ? text.weight : axis.def;
+                coordinates.push_back({axis.tag, std::clamp(value, axis.min, axis.max)});
+            }
+            SkFontArguments arguments;
+            arguments.setVariationDesignPosition({coordinates.data(), (int)coordinates.size()});
+            if (auto instance = face->makeClone(arguments)) face = instance;
+        }
+    }
+    if (!face) return face;
+    std::lock_guard<std::mutex> hold(lock);
+    if (faces.size() >= 64) faces.clear();
+    faces[key] = face;
     return face;
 }
 class EmojiFonts : public TypefaceFontProvider {
@@ -169,23 +209,7 @@ void layout(TextLayout& text) {
         "sans-serif"
 #endif
     );
-    sk_sp<SkTypeface> face;
-    if (!text.path.empty()) face = manager->makeFromFile(text.path.c_str(), text.index);
-    if (face && !text.imported) {
-        const int count = face->getVariationDesignParameters({});
-        if (count > 0 && count <= 64) {
-            std::vector<SkFontParameters::Variation::Axis> axes(count);
-            face->getVariationDesignParameters(axes);
-            std::vector<SkFontArguments::VariationPosition::Coordinate> coordinates;
-            for (const auto& axis : axes) {
-                const float value = axis.tag == SkSetFourByteTag('w', 'g', 'h', 't') ? text.weight : axis.def;
-                coordinates.push_back({axis.tag, std::clamp(value, axis.min, axis.max)});
-            }
-            SkFontArguments arguments;
-            arguments.setVariationDesignPosition({coordinates.data(), (int)coordinates.size()});
-            if (auto instance = face->makeClone(arguments)) face = instance;
-        }
-    }
+    sk_sp<SkTypeface> face = text.path.empty() ? nullptr : TextFace(text, manager);
     const sk_sp<SkTypeface> emoji = EmojiFace(text.emoji), flags = text.flags.empty() ? nullptr : EmojiFace(text.flags);
     auto provider = sk_make_sp<EmojiFonts>(std::vector<sk_sp<SkTypeface>>{emoji, flags});
     if (face) {

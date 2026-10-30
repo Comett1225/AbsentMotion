@@ -42,6 +42,15 @@ class PreviewCacheTest {
         assertEquals(50..50, renderRange(899, 50, 0))
     }
 
+    @Test fun theRenderedRangeIsTheCappedOneSoProgressCountsOnlyTheFramesThatAreRendered() {
+        val budget = 38 * mib
+        val fit = framesThatFit(budget, 620, 1100)
+        val range = previewRange(7199, 1000, budget, 620, 1100)
+        assertEquals(1000 until 1000 + fit, range)
+        assertTrue(range.last < 7199)
+        assertEquals(0..299, previewRange(299, 120, budget, 620, 1100))
+    }
+
     @Test fun theFrameEstimateLeavesRoomForEveryFrame() {
         val budget = 38 * mib
         val frames = framesThatFit(budget, 620, 1100)

@@ -10,6 +10,7 @@
 #include <string>
 #include <string_view>
 
+#include "include/core/SkBBHFactory.h"
 #include "include/core/SkBlender.h"
 #include "include/core/SkCanvas.h"
 #include "include/core/SkColorFilter.h"
@@ -18,6 +19,8 @@
 #include "include/core/SkPathMeasure.h"
 #include "include/core/SkM44.h"
 #include "include/core/SkPathUtils.h"
+#include "include/core/SkPicture.h"
+#include "include/core/SkPictureRecorder.h"
 #include "include/core/SkSurface.h"
 #include "include/effects/SkImageFilters.h"
 #include "include/effects/SkRuntimeEffect.h"
@@ -990,6 +993,34 @@ bool Steady(const std::vector<Layer>& siblings, const Layer& l, double from, dou
     return !gEffects || (gEffects->steady && gEffects->steady(l, a, b));
 }
 
+struct Recorded {
+    sk_sp<SkPicture> picture;
+    SkRect bounds = SkRect::MakeEmpty();
+    bool bounded = false;
+};
+
+Recorded RecordInDevice(SkCanvas* canvas, const SkRect& area, const std::function<void(SkCanvas*)>& draw) {
+    SkPictureRecorder recorder;
+    SkRTreeFactory tight;
+    SkCanvas* c = recorder.beginRecording(area, &tight);
+    c->setMatrix(canvas->getLocalToDevice());
+    draw(c);
+    Recorded out;
+    out.picture = recorder.finishRecordingAsPicture();
+    const SkMatrix m = canvas->getTotalMatrix();
+    SkMatrix inverse;
+    out.bounded = !m.hasPerspective() && m.invert(&inverse);
+    if (out.bounded) out.bounds = inverse.mapRect(out.picture->cullRect().makeOutset(2, 2));
+    return out;
+}
+
+void PlayInDevice(SkCanvas* canvas, const SkPicture* picture) {
+    canvas->save();
+    canvas->resetMatrix();
+    canvas->drawPicture(picture);
+    canvas->restore();
+}
+
 void DrawShuttered(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& l, double timeMs,
                    const MediaPictures& pictures, const Override& ov, const ShutterBlur& shutter) {
     const double open = 1000.0 / std::max(gScene ? gScene->fps : 30, 1) * shutter.angle / 360;
@@ -1018,23 +1049,51 @@ void DrawShuttered(SkCanvas* canvas, const std::vector<Layer>& siblings, const L
         canvas->restore();
         return;
     }
-    canvas->saveLayer(SkCanvas::SaveLayerRec(nullptr, &composite, SkCanvas::kF16ColorType));
     const auto at = [&](double u) { return std::clamp(timeMs + open * (u - 0.5), (double)l.startTime, (double)l.endTime); };
     const bool steady = Steady(siblings, l, at(0), at(1));
     int samples = shutter.samples;
     if (shutter.adaptive && !steady) samples = std::clamp((int)std::ceil(Reach(siblings, l, timeMs, open) / 2), samples, 48);
-    SkPaint add;
-    add.setBlendMode(SkBlendMode::kPlus);
+    if (l.kind == "embedScene") {
+        canvas->saveLayer(SkCanvas::SaveLayerRec(nullptr, &composite, SkCanvas::kF16ColorType));
+        SkPaint add;
+        add.setBlendMode(SkBlendMode::kPlus);
+        for (int i = 0; i < samples;) {
+            const double when = at((i + 0.5) / samples);
+            int same = 1;
+            while (i + same < samples && (steady || at((i + same + 0.5) / samples) == when)) same++;
+            add.setAlphaf((float)same / samples);
+            canvas->saveLayer(nullptr, &add);
+            DrawOne(canvas, siblings, l, when, pictures, sample);
+            canvas->restore();
+            if (gBreak) (*gBreak)();
+            i += same;
+        }
+        canvas->restore();
+        return;
+    }
+    const SkRect area = SkRect::MakeLTRB(-1e6f, -1e6f, 1e6f, 1e6f);
+    std::vector<std::pair<Recorded, float>> taken;
+    SkRect all = SkRect::MakeEmpty();
+    bool bounded = true;
     for (int i = 0; i < samples;) {
         const double when = at((i + 0.5) / samples);
         int same = 1;
         while (i + same < samples && (steady || at((i + same + 0.5) / samples) == when)) same++;
-        add.setAlphaf((float)same / samples);
-        canvas->saveLayer(nullptr, &add);
-        DrawOne(canvas, siblings, l, when, pictures, sample);
+        Recorded r = RecordInDevice(canvas, area, [&](SkCanvas* c) { DrawOne(c, siblings, l, when, pictures, sample); });
+        bounded = bounded && r.bounded;
+        all.join(r.bounds);
+        taken.emplace_back(std::move(r), (float)same / samples);
+        i += same;
+    }
+    canvas->saveLayer(SkCanvas::SaveLayerRec(bounded ? &all : nullptr, &composite, SkCanvas::kF16ColorType));
+    SkPaint add;
+    add.setBlendMode(SkBlendMode::kPlus);
+    for (const auto& [r, share] : taken) {
+        add.setAlphaf(share);
+        canvas->saveLayer(bounded ? &r.bounds : nullptr, &add);
+        PlayInDevice(canvas, r.picture.get());
         canvas->restore();
         if (gBreak) (*gBreak)();
-        i += same;
     }
     canvas->restore();
 }
@@ -1078,7 +1137,7 @@ void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& 
     const bool repeated = HasRepeat(l);
     const std::vector<LayerCopy> copies = repeated ? CopiesOf(siblings, l, timeMs, gScene ? gScene->width : 0, gScene ? gScene->height : 0) : std::vector<LayerCopy>();
     const bool overlaps = l.kind == "drawing" || l.kind == "model" || (l.stroke.present && l.stroke.enabled) || centred || repeated;
-    auto centredBorders = [&](float alpha) {
+    auto centredBorders = [&](SkCanvas* canvas, float alpha) {
         if (!centred) return;
         const std::vector<std::pair<SkPath, float>> outlines = repeated
             ? CopyOutlines(l, copies, [&](float at, const SkMatrix& placed) { return Cropped(l, at, ShapePath(l, at)).makeTransform(placed); })
@@ -1100,7 +1159,7 @@ void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& 
     const bool spilled = EffectsApply(siblings, l) && gEffects->spills && gEffects->spills(l);
     if (!group && !decorated && !blended && !spilled && (opacity >= 1 || !overlaps)) {
         DrawContent(canvas, siblings, l, timeMs, opacity, false, pictures, repeated ? &copies : nullptr);
-        centredBorders(opacity);
+        centredBorders(canvas, opacity);
     } else {
         SkPaint layerPaint;
         layerPaint.setAlphaf(opacity);
@@ -1113,9 +1172,21 @@ void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& 
             layerPaint.setImageFilter(SkImageFilters::DropShadow(s.offset.get(0, t, 3), s.offset.get(1, t, 3), sigma, sigma,
                                                                  color, nullptr, nullptr));
         }
-        canvas->saveLayer(SkCanvas::SaveLayerRec(nullptr, &layerPaint, SeesPrevious(siblings, l) ? SkCanvas::kInitWithPrevious_SaveLayerFlag : 0));
+        const bool sees = SeesPrevious(siblings, l);
+        if (!group && !sees && !spilled && !repeated && !EffectsApply(siblings, l)) {
+            const SkRect area = SkRect::MakeLTRB(-1e6f, -1e6f, 1e6f, 1e6f);
+            const Recorded r = RecordInDevice(canvas, area, [&](SkCanvas* c) {
+                DrawContent(c, siblings, l, timeMs, 1, decorated, pictures, repeated ? &copies : nullptr);
+                centredBorders(c, 1);
+            });
+            canvas->saveLayer(r.bounded ? &r.bounds : nullptr, &layerPaint);
+            PlayInDevice(canvas, r.picture.get());
+            canvas->restore();
+            return;
+        }
+        canvas->saveLayer(SkCanvas::SaveLayerRec(nullptr, &layerPaint, sees ? SkCanvas::kInitWithPrevious_SaveLayerFlag : 0));
         DrawContent(canvas, siblings, l, timeMs, 1, decorated, pictures, repeated ? &copies : nullptr);
-        centredBorders(1);
+        centredBorders(canvas, 1);
         canvas->restore();
     }
 }

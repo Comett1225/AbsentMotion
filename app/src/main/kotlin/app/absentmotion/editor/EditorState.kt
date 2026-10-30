@@ -213,7 +213,7 @@ class EditorState(
             engine.setScene(value?.invoke(scene) ?: scene)
         }
 
-    private fun show(next: Scene, xml: String) {
+    private fun show(next: Scene, xml: Lazy<String>) {
         val change = previewChange
         if (change == null) engine.setScene(next, xml) else engine.setScene(change(next))
     }
@@ -242,7 +242,7 @@ class EditorState(
         if (pending || ended) {
             dropDraft()
             val xml = scene.toXml()
-            if (pending) show(scene, xml)
+            if (pending) show(scene, lazyOf(xml))
             if (ended) saver.commit(xml) else saver.draft(xml)
         }
         saver.flush()
@@ -252,7 +252,7 @@ class EditorState(
     private val sendDraft = Choreographer.FrameCallback {
         drafted?.let { next ->
             drafted = null
-            val xml = next.toXml()
+            val xml = lazy { next.toXml() }
             show(next, xml)
             saver.draft(xml)
         }
@@ -319,7 +319,7 @@ class EditorState(
         }
         dropDraft()
         val xml = next.toXml()
-        show(next, xml)
+        show(next, lazyOf(xml))
         saver.commit(xml)
     }
 

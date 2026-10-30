@@ -179,7 +179,7 @@ object Backup {
                         val id = parts[1].removeSuffix(".xml")
                         if (!scenes.add(id)) throw ImportFailed(txt(R.string.library_err_backup_changed))
                         val text = readText(body)
-                        if (!ProjectId.matches(id) || runCatching { XmlNode.parse(text.removePrefix("\uFEFF"), XmlNode.IMPORT_NODES) }.getOrNull()?.let(Importer::checkScene) != null) rejected += id
+                        if (!ProjectId.matches(id) || runCatching { XmlNode.parse(text.removePrefix("\uFEFF"), XmlNode.IMPORT_NODES) }.getOrNull().let { it == null || Importer.checkScene(it) != null }) rejected += id
                         else {
                             val file = File.createTempFile("restore-", ".part", projects).also { staged += it }
                             file.writeText(text)

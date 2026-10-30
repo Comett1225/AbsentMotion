@@ -184,11 +184,11 @@ class ProjectStore(private val root: File) {
         }
         for (file in projectFiles + templateFiles) if (!scanFile(file)) { unreadable = true; break }
         if (!unreadable) {
-            val versionsAndRecovery = File(dir, "versions").listFiles { f -> f.isDirectory }.orEmpty().flatMap { it.listFiles { f -> f.extension == "xml" }.orEmpty().toList() } +
+            val versionsAndRecovery = File(dir, "versions").listFiles { f -> f.isDirectory }.orEmpty().flatMap { it.listFiles { f -> f.extension == "xml" || f.extension == "damaged" }.orEmpty().toList() } +
                 File(root, "recovery").listFiles { f -> f.extension == "xml" }.orEmpty()
             for (file in versionsAndRecovery) {
                 val text = try { file.readText() } catch (e: Exception) { unreadable = true; break } catch (e: OutOfMemoryError) { unreadable = true; break }
-                if (folders.any(text::contains) || aiDir != null && text.contains("/ai/")) scan(text)
+                if (file.extension == "damaged" || folders.any(text::contains) || aiDir != null && text.contains("/ai/")) scan(text)
             }
         }
         if (unreadable) return

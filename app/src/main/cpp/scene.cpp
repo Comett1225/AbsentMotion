@@ -488,7 +488,9 @@ void DrawMedia(SkCanvas* canvas, const Layer& layer, const SkPath& path, float o
     paint.setAlphaf(std::clamp(opacity, 0.0f, 1.0f));
     canvas->save();
     canvas->clipPath(path, true);
-    canvas->drawImageRect(image, dst, SkSamplingOptions(SkFilterMode::kLinear), &paint);
+    const float density = canvas->getTotalMatrix().getMinScale() * dst.width() / std::max(image->width(), 1);
+    const bool minified = density > 0 && density < 0.5f && (image->hasMipmaps() || !image->isTextureBacked());
+    canvas->drawImageRect(image, dst, minified ? SkSamplingOptions(SkFilterMode::kLinear, SkMipmapMode::kLinear) : SkSamplingOptions(SkFilterMode::kLinear), &paint);
     canvas->restore();
 }
 

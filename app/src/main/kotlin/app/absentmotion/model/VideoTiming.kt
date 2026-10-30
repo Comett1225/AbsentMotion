@@ -87,9 +87,9 @@ fun Layer.steppedMs(timeMs: Double): Double {
     return startTime + kotlin.math.floor((timeMs - startTime) * fps / 1000 + 1e-4) * 1000 / fps
 }
 
-fun Layer.videoTimeUs(timeMs: Int, scene: Scene): Long {
+fun Layer.videoTimeUs(timeMs: Int, scene: Scene, timing: VideoTiming = VideoTiming(this)): Long {
     val fill = mediaFill ?: return 0
-    return (bounded(fill, mediaTimeMs(steppedMs(scene.frameTime(scene.frameAt(timeMs)).toDouble()))) * 1000).toLong() - 500
+    return (bounded(fill, timing.mediaMs(steppedMs(scene.frameTime(scene.frameAt(timeMs)).toDouble()) - startTime)) * 1000).toLong() - 500
 }
 
 val Layer.loopStart: Int?

@@ -126,6 +126,20 @@ class ProjectStoreTest {
         assertTrue(own.exists())
     }
 
+    @Test fun deleteKeepsMediaThatOnlyAPreservedDamagedRecoveryMentions() {
+        val root = tmp.newFolder()
+        val store = ProjectStore(root)
+        val a = store.create(scene())
+        store.mediaDir(a).mkdirs()
+        val kept = store.mediaDir(a).resolve("only in draft.png").apply { writeText("x") }
+        val unused = store.mediaDir(a).resolve("unused.png").apply { writeText("y") }
+        val b = store.create(scene())
+        store.versions.keepDamaged(b, "<scene fillImage=\"${kept.toURI()}\"")
+        store.delete(a)
+        assertTrue(kept.exists())
+        assertFalse(unused.exists())
+    }
+
     @Test fun aDamagedFileOrAHalfWrittenTemplateDoesNotStopTheMediaCleanUp() {
         val root = tmp.newFolder()
         val store = ProjectStore(root)

@@ -72,6 +72,7 @@ import app.absentmotion.library.AppSettings
 import app.absentmotion.library.TemplateStore
 import app.absentmotion.media.mediaDeclaration
 import app.absentmotion.model.Layer
+import app.absentmotion.model.loopStart
 import app.absentmotion.model.MediaDeclaration
 import app.absentmotion.model.MediaFillMode
 import app.absentmotion.model.PropRef
@@ -116,15 +117,20 @@ internal class Choice(val media: MediaDeclaration?, val trim: Int, val mode: Med
 
 private class Trimming(val slot: Slot, val media: MediaDeclaration)
 
+private fun XmlNode.span() = int("endTime", 0) - int("startTime", 0)
+
+private fun XmlNode.sourceEnd() = app.absentmotion.model.VideoTiming(Layer(this)).mediaMs(span().toDouble()).roundToInt()
+
+private fun XmlNode.sourceStart() = Layer(this).loopStart ?: int("inTime", 0)
+
 internal fun slotsOf(scene: Scene): List<Slot> =
     layersOf(scene.node).filter { it["fillType"] == "media" && (it["fillImage"] ?: it["fillVideo"]) != null }
         .sortedWith(compareBy({ it.int("startTime", 0) }, { it.int("endTime", 0) }))
         .groupBy { it["fillImage"] ?: it["fillVideo"]!! }
         .map { (uri, layers) ->
-            fun span(l: XmlNode) = l.int("endTime", 0) - l.int("startTime", 0)
             val video = layers.first()["fillImage"] == null
-            val length = if (video) layers.maxOf { minOf(it.int("outTime", Int.MAX_VALUE), app.absentmotion.model.VideoTiming(Layer(it)).mediaMs(span(it).toDouble()).roundToInt()) } - layers.minOf { it.int("inTime", 0) }
-                else layers.maxOf(::span)
+            val length = if (video) layers.maxOf { minOf(it.int("outTime", Int.MAX_VALUE), it.sourceEnd()) } - layers.minOf { it.sourceStart() }
+                else layers.maxOf { it.span() }
             Slot(uri, video, length, layers.minOf { it.int("startTime", 0) }, layers.maxOf { it.int("endTime", 0) },
                 MediaFillMode.entries.firstOrNull { it.xml == layers.first()["mediaFillMode"] } ?: MediaFillMode.Fill, video && layers.any { it["loop"] == "true" })
         }
@@ -134,7 +140,7 @@ internal fun applied(template: Scene, slots: List<Slot>, choices: Map<String, Ch
     for (slot in slots) {
         val choice = choices[slot.uri] ?: continue
         val old = template.media(slot.uri)
-        val minIn = layersOf(template.node).filter { (it["fillImage"] ?: it["fillVideo"]) == slot.uri }.minOf { it.int("inTime", 0) }
+        val minIn = layersOf(template.node).filter { (it["fillImage"] ?: it["fillVideo"]) == slot.uri }.minOf { it.sourceStart() }
         node = node.mapLayers { l -> if ((l["fillImage"] ?: l["fillVideo"]) == slot.uri) swap(l, slot, choice, old, minIn) else l }
         choice.media?.let { new ->
             node = Scene(node.copy(children = node.children.filterNot { it.name == "media" && it["uri"] == slot.uri })).withMedia(new).node
@@ -154,12 +160,15 @@ private fun swap(layer: XmlNode, slot: Slot, choice: Choice, old: MediaDeclarati
         val length = layer.int("endTime", 0) - layer.int("startTime", 0)
         val wasVideo = layer["fillVideo"] != null
         val from = if (wasVideo) layer.int("inTime", 0) - minIn else 0
-        val to = if (wasVideo) layer.int("outTime", layer.int("inTime", 0) + length) - minIn else length
+        val known = old?.let { (it.duration / 1000).toInt() }?.takeIf { it > 0 }
+        val used = layer.sourceEnd().let { end -> known?.let { min(end, it) } ?: end }.coerceAtLeast(layer.int("inTime", 0))
+        val to = if (wasVideo) layer.int("outTime", used) - minIn else length
         val duration = (media.duration / 1000).toInt()
         val start = if (duration < slot.length) min(from, duration) else from + choice.trim
         val end = if (duration < slot.length) min(to, duration) else to + choice.trim
         n = n.with("inTime", start.takeIf { it != 0 }?.toString()).with("outTime", "$end")
         n.child("speedMap")?.let { n = n.withChild("speedMap", it.keysShifted("t", (start - layer.int("inTime", 0)) * 1e6)) }
+        if (layer["loopIn"] != null) n = n.with("loopIn", (layer.int("loopIn", 0) + start - layer.int("inTime", 0)).coerceIn(0, start).toString())
     }
     return turned(n, media.orientation - (old?.orientation ?: 0))
 }

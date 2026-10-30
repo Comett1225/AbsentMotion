@@ -65,7 +65,7 @@ internal fun videoStripPicture(layer: Layer, scene: Scene, fromMs: Float, toMs: 
     val context = LocalContext.current.applicationContext
     val uri = layer.mediaFill?.uri ?: return null
     if (fromMs > layer.endTime || toMs < layer.startTime) return null
-    val tiles = thumbnailTimes(layer, scene, fromMs, toMs, tileMs)
+    val tiles = remember(layer.node, fromMs, toMs, tileMs, scene.fps) { thumbnailTimes(layer, scene, fromMs, toMs, tileMs) }
     val checked by versions.collectAsState()
     val request = StripRequest(uri, checked.versions[uri], tiles)
     val seed = remember(request, checked.trusted) { cachedFrames(uri, checked.seed(uri), tiles) }
@@ -85,9 +85,10 @@ internal fun thumbnailTimes(layer: Layer, scene: Scene, fromMs: Float, toMs: Flo
     val step = tileMs.coerceAtLeast(1f)
     val first = floor(((fromMs - layer.startTime).coerceAtLeast(0f)) / step).toInt()
     val last = floor(((toMs.coerceAtMost(layer.endTime.toFloat()) - layer.startTime).coerceAtLeast(0f)) / step).toInt().coerceAtLeast(first)
+    val timing = timingOf(layer)
     return (first..last).map { i ->
         val projectTime = (layer.startTime + i * step).toInt()
-        projectTime to layer.videoTimeUs(projectTime, scene)
+        projectTime to layer.videoTimeUs(projectTime, scene, timing)
     }
 }
 

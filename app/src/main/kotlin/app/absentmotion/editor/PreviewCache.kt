@@ -71,6 +71,9 @@ fun renderRange(lastFrame: Int, playhead: Int, maxFrames: Int): IntRange {
     return start until start + count
 }
 
+fun previewRange(lastFrame: Int, playhead: Int, budget: Long, width: Int, height: Int): IntRange =
+    renderRange(lastFrame, playhead, framesThatFit(budget, width, height))
+
 fun flattenOnChecker(rgba: ByteArray, width: Int, height: Int, cell: Float): Boolean {
     val size = cell.coerceAtLeast(1f)
     var translucent = false
@@ -91,7 +94,7 @@ fun flattenOnChecker(rgba: ByteArray, width: Int, height: Int, cell: Float): Boo
     return translucent
 }
 
-class FrameStore(val first: Int, private val budget: Long, private val file: java.io.File? = null) : java.io.Closeable {
+class FrameStore(val first: Int, val budget: Long, private val file: java.io.File? = null) : java.io.Closeable {
     private data class Record(val data: ByteArray?, val offset: Long, val size: Int)
     private val records = java.util.TreeMap<Int, Record>()
     private val disk = file?.let { java.io.RandomAccessFile(it, "rw").apply { setLength(0) } }
@@ -365,7 +368,8 @@ object PreviewCache {
         val folder = app.cacheDir
         val onDisk = runCatching { diskBudget(folder.usableSpace) }.getOrDefault(0L)
         val budget = maxOf(memory, onDisk)
-        val range = renderRange(scene.lastFrame, state.frame, framesThatFit(budget, width, height)).first..maxOf(scene.lastFrame, 0)
+        val expected = previewRange(scene.lastFrame, state.frame, budget, width, height)
+        val range = expected.first..maxOf(scene.lastFrame, 0)
         val next = keyOf(state)
         val cell = checkerCell
         clear()
@@ -384,7 +388,7 @@ object PreviewCache {
                 building = built
                 var resources = next.resources
                 val outcome = try {
-                    withContext(Dispatchers.Default) { renderFrames(state.engine, scene, range, width, height, cell, next.accurateBlur, built) { resources = it } }
+                    withContext(Dispatchers.Default) { renderFrames(state.engine, scene, range, expected.count(), width, height, cell, next.accurateBlur, built) { resources = it } }
                 } catch (e: CancellationException) {
                     throw e
                 } catch (e: OutOfMemoryError) {
@@ -422,7 +426,7 @@ object PreviewCache {
     @Volatile private var stillNs = 0L
     @Volatile private var encodeNs = 0L
 
-    private suspend fun renderFrames(engine: EngineThread, scene: Scene, range: IntRange, width: Int, height: Int, cell: Float, accurateBlur: Boolean, built: FrameStore,
+    private suspend fun renderFrames(engine: EngineThread, scene: Scene, range: IntRange, expected: Int, width: Int, height: Int, cell: Float, accurateBlur: Boolean, built: FrameStore,
                                      ready: (Long) -> Unit): Outcome =
         engine.exportSession(scene.toXml(), Smoothing(), scene.fps) {
             ready(engine.mediaRevision.value)
@@ -437,7 +441,8 @@ object PreviewCache {
                         pending = null
                         val bytes = previous.await() ?: return Outcome.Failed
                         if (!built.add(bytes)) return Outcome.Full
-                        progress = built.count.toFloat() / range.count()
+                        val fit = if (built.bytes > 0) (built.budget.toDouble() * built.count / built.bytes).toInt() else expected
+                        progress = (built.count.toFloat() / fit.coerceIn(1, range.count())).coerceAtMost(0.99f)
                         return null
                     }
                     for ((index, frame) in range.withIndex()) {

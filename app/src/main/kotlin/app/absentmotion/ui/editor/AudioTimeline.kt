@@ -35,7 +35,7 @@ internal fun LoadWaveforms(scene: Scene) {
 
 private val timings = HashMap<Long, Pair<XmlNode, VideoTiming>>()
 
-private fun timingOf(layer: Layer): VideoTiming {
+internal fun timingOf(layer: Layer): VideoTiming {
     val cached = timings[layer.id]
     if (cached != null && cached.first === layer.node) return cached.second
     return VideoTiming(layer).also { timings[layer.id] = layer.node to it }

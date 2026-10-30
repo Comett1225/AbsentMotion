@@ -811,7 +811,7 @@ bool EngineImpl::setPicture(const std::string& uri, int64_t layerId, AHardwareBu
                 opaque ? kOpaque_SkAlphaType : kPremul_SkAlphaType, SkColorSpace::MakeSRGB());
         const SkPixmap source(info, pixels, rowBytes);
         image = SkImages::RasterFromPixmapCopy(source);
-        if (image && fRecorder) image = SkImages::TextureFromImage(fRecorder.get(), image.get(), {});
+        if (image && fRecorder) image = SkImages::TextureFromImage(fRecorder.get(), image.get(), {uri.find('#') == std::string::npos});
         if (!opaque) mask = AlphaMask(source);
     }
     if (!image && buffer) return false;

@@ -18,14 +18,16 @@ class SaveQueue(
     private val write: (String) -> Unit,
     private val failed: (Exception) -> Unit = {},
 ) {
-    private var pending: String? = null
+    private var pending: Lazy<String>? = null
     private var scheduled: ScheduledFuture<*>? = null
     private var generation = 0L
 
     @Volatile var failing = false
         private set
 
-    @Synchronized fun submit(text: String) {
+    fun submit(text: String) = submit(lazyOf(text))
+
+    @Synchronized fun submit(text: Lazy<String>) {
         pending = text
         if (scheduled == null) scheduled = executor.schedule(::run, delayMs, TimeUnit.MILLISECONDS)
     }
@@ -41,7 +43,7 @@ class SaveQueue(
     private fun run() {
         val task = synchronized(this) { scheduled = null; pending?.let { it to generation }.also { pending = null } } ?: return
         try {
-            write(task.first)
+            write(task.first.value)
             failing = false
         } catch (e: Exception) {
             synchronized(this) { if (pending == null && generation == task.second) pending = task.first }
@@ -81,6 +83,8 @@ class ProjectSaver(
     }
 
     fun draft(xml: String) = drafts.submit(xml)
+
+    fun draft(xml: Lazy<String>) = drafts.submit(xml)
 
     fun flush(): Future<*> = project.flush().also { drafts.flush() }
 

@@ -266,12 +266,16 @@ class BackupTest {
         old.thumbnailFile(bad).writeText("png")
         val damaged = old.create(Scene(XmlNode("scene", linkedMapOf("width" to "10", "height" to "10"))))
         oldRoot.resolve("projects/$damaged.xml").writeText("<scene")
+        old.thumbnailFile(damaged).writeText("png")
+        old.mediaDir(damaged).apply { mkdirs() }.resolve("photo.png").writeText("pixels")
         val newRoot = tmp.newFolder("new")
         val fresh = ProjectStore(newRoot)
-        assertEquals(Backup.Restored(2, 0, 0, 1), Backup.restore(fresh, newRoot, ByteArrayInputStream(backup(oldRoot))))
+        assertEquals(Backup.Restored(1, 0, 0, 2), Backup.restore(fresh, newRoot, ByteArrayInputStream(backup(oldRoot))))
         assertEquals(listOf("Good"), fresh.list().map { it.title })
-        assertEquals(setOf(good, damaged), fresh.list(includeDamaged = true).map { it.id }.toSet())
+        assertEquals(setOf(good), fresh.list(includeDamaged = true).map { it.id }.toSet())
         assertFalse(fresh.thumbnailFile(bad).exists())
+        assertFalse(fresh.thumbnailFile(damaged).exists())
+        assertFalse(fresh.mediaDir(damaged).exists())
     }
 
     private fun zipOf(vararg entries: Pair<String, ByteArray>) = ByteArrayOutputStream().also { out ->

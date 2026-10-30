@@ -4,6 +4,8 @@ import app.absentmotion.model.Scene
 import app.absentmotion.model.videoTimeUs
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertNotSame
+import org.junit.Assert.assertSame
 import org.junit.Test
 
 class VideoThumbnailTimesTest {
@@ -21,6 +23,15 @@ class VideoThumbnailTimesTest {
         assertEquals(listOf(1000, 2000, 3000), tiles.map { it.first })
         assertEquals(tiles.map { layer.videoTimeUs(it.first, scene) }, tiles.map { it.second })
         assertEquals(listOf(3000, 4000), thumbnailTimes(layer, scene, 3200f, 4100f, 1000f).map { it.first })
+    }
+
+    @Test fun oneTimingIsReusedForAsLongAsTheLayerNodeIsTheSame() {
+        assertSame(timingOf(layer), timingOf(layer))
+        assertSame(timingOf(layer), timingOf(scene.update(layer.id) { it }.layers.single()))
+        val faster = layer.copy(node = layer.node.with("speed", "2.000000"))
+        assertNotSame(timingOf(layer), timingOf(faster))
+        val tiles = thumbnailTimes(faster, scene, 0f, 9999f, 400f)
+        assertEquals(tiles.map { faster.videoTimeUs(it.first, scene) }, tiles.map { it.second })
     }
 
     @Test fun movingTheLayerKeepsTheThumbnailsButRetimingChangesThem() {

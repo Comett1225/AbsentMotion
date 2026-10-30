@@ -145,6 +145,7 @@ class EngineThread(private val background: Int, context: Context? = null) {
     private var scene: String? = null
 
     private val pendingScene = PendingScene()
+    private var mediaKey: List<Any?>? = null
     private val pendingView = AtomicReference<Pair<PreviewView, Long>?>(null)
     private val renderPosted = AtomicBoolean(false)
     private val retryRender = Runnable { requestRender() }
@@ -245,7 +246,9 @@ class EngineThread(private val background: Int, context: Context? = null) {
         videos?.suspendPreview()
     }
 
-    fun setScene(next: Scene, xml: String = next.toXml()) {
+    fun setScene(next: Scene, xml: String) = setScene(next, lazyOf(xml))
+
+    fun setScene(next: Scene, xml: Lazy<String> = lazy { next.toXml() }) {
         pendingScene.set(xml)
         fonts?.let { library ->
             val names = next.fontNames()
@@ -259,7 +262,9 @@ class EngineThread(private val background: Int, context: Context? = null) {
             mediaScene = next
             audio?.setScene(next)
             videos?.update(next, requestedView?.timeMs ?: 0, playing)
-            if (previous?.node?.imageUris() != next.node.imageUris() || previous.node.modelUris() != next.node.modelUris() || previous.media != next.media) {
+            val key = listOf(next.node.imageUris(), next.node.modelUris(), next.media)
+            if (previous == null || key != mediaKey) {
+                mediaKey = key
                 val serial = refreshes.get()
                 mediaJob?.cancel()
                 mediaJob = mediaScope.launch { media.update(next); checked(serial) }.also { loading -> loading.invokeOnCompletion { requestRender() } }
@@ -674,15 +679,17 @@ internal fun animatesTextSpacing(xml: String): Boolean =
     xml.contains(app.absentmotion.compat.ForeignEffectIds.TEXT_SPACING) && spacingEffects.findAll(xml).any { it.value.contains("<kf") }
 
 internal class PendingScene {
-    private val next = AtomicReference<String?>(null)
+    private val next = AtomicReference<Lazy<String>?>(null)
     private val fonts = AtomicBoolean(false)
 
-    fun set(xml: String) = next.set(xml)
+    fun set(xml: String) = next.set(lazyOf(xml))
+
+    fun set(xml: Lazy<String>) = next.set(xml)
 
     fun fontsChanged() = fonts.set(true)
 
     fun take(shown: String?): String? {
         val again = fonts.getAndSet(false)
-        return next.getAndSet(null) ?: shown.takeIf { again }
+        return next.getAndSet(null)?.value ?: shown.takeIf { again }
     }
 }
