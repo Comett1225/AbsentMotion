@@ -1,0 +1,126 @@
+{
+ "id": "hexgrid",
+ "name": "Hexagon Array",
+ "category": "stylize",
+ "since": "4.3.0",
+ "description": "Covers the layer with a lattice of hexagons filled with one to three colors, with soft edges and gaps between them.",
+ "params": [
+  {
+   "id": "offset",
+   "label": "Offset",
+   "type": "point",
+   "default": [
+    0,
+    0
+   ],
+   "min": -4000,
+   "max": 4000,
+   "step": 0.01,
+   "pixels": true
+  },
+  {
+   "id": "cell",
+   "label": "Size",
+   "type": "float",
+   "default": 80,
+   "min": 4,
+   "max": 2000,
+   "step": 0.5
+  },
+  {
+   "id": "stretch",
+   "label": "Stretch",
+   "type": "float",
+   "default": 1,
+   "min": 0.1,
+   "max": 10,
+   "step": 0.01
+  },
+  {
+   "id": "angle",
+   "label": "Angle",
+   "type": "angle",
+   "default": 0,
+   "min": -3600,
+   "max": 3600,
+   "step": 0.1
+  },
+  {
+   "id": "colors",
+   "label": "Colors",
+   "type": "choice",
+   "options": [
+    "One",
+    "Two",
+    "Three"
+   ],
+   "default": 2
+  },
+  {
+   "id": "color1",
+   "label": "Color 1",
+   "type": "color",
+   "default": "#ffff3a6e"
+  },
+  {
+   "id": "color2",
+   "label": "Color 2",
+   "type": "color",
+   "default": "#ff35d0ff"
+  },
+  {
+   "id": "color3",
+   "label": "Color 3",
+   "type": "color",
+   "default": "#ffffd23f"
+  },
+  {
+   "id": "opacity",
+   "label": "Opacity",
+   "type": "float",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  },
+  {
+   "id": "blend",
+   "label": "Blend",
+   "type": "choice",
+   "options": [
+    "Normal",
+    "Multiply",
+    "Screen",
+    "Overlay",
+    "Soft Light",
+    "Hard Light",
+    "Add",
+    "Darken",
+    "Lighten",
+    "Difference",
+    "Color Dodge",
+    "Color Burn"
+   ],
+   "default": 0
+  },
+  {
+   "id": "gap",
+   "label": "Gap",
+   "type": "float",
+   "default": 0.1,
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  },
+  {
+   "id": "feather",
+   "label": "Feather",
+   "type": "float",
+   "default": 0.1,
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float2 offset;\nuniform float cell;\nuniform float stretch;\nuniform float angle;\nuniform float colors;\nlayout(color) uniform half4 color1;\nlayout(color) uniform half4 color2;\nlayout(color) uniform half4 color3;\nuniform float opacity;\nuniform float blend;\nuniform float gap;\nuniform float feather;\nfloat hash11(float p) {\n    p = fract(p * 0.1031);\n    p *= p + 33.33;\n    p *= p + p;\n    return fract(p);\n}\nfloat hash21(float2 p) {\n    float3 q = fract(float3(p.xyx) * 0.1031);\n    q += dot(q, q.yzx + 33.33);\n    return fract((q.x + q.y) * q.z);\n}\nfloat vnoise(float2 p) {\n    float2 i = floor(p);\n    float2 f = fract(p);\n    f = f * f * (3.0 - 2.0 * f);\n    return mix(mix(hash21(i), hash21(i + float2(1, 0)), f.x), mix(hash21(i + float2(0, 1)), hash21(i + float2(1, 1)), f.x), f.y);\n}\nfloat fbm(float2 p) {\n    float s = 0.0;\n    float a = 0.5;\n    for (int i = 0; i < 5; i++) {\n        s += a * vnoise(p);\n        p = p * 2.03 + float2(17.1, 9.7);\n        a *= 0.5;\n    }\n    return s / 0.96875;\n}\nfloat3 blendWith(float m, float3 b, float3 s) {\n    if (m < 0.5) return s;\n    if (m < 1.5) return b * s;\n    if (m < 2.5) return b + s - b * s;\n    if (m < 3.5) return mix(2.0 * b * s, 1.0 - 2.0 * (1.0 - b) * (1.0 - s), step(0.5, b));\n    if (m < 4.5) {\n        float3 d = mix(sqrt(b), ((16.0 * b - 12.0) * b + 4.0) * b, step(b, float3(0.25)));\n        return mix(b - (1.0 - 2.0 * s) * b * (1.0 - b), b + (2.0 * s - 1.0) * (d - b), step(0.5, s));\n    }\n    if (m < 5.5) return mix(2.0 * b * s, 1.0 - 2.0 * (1.0 - b) * (1.0 - s), step(0.5, s));\n    if (m < 6.5) return min(b + s, 1.0);\n    if (m < 7.5) return min(b, s);\n    if (m < 8.5) return max(b, s);\n    if (m < 9.5) return abs(b - s);\n    if (m < 10.5) return min(b / max(1.0 - s, 0.0001), 1.0);\n    return 1.0 - min((1.0 - b) / max(s, 0.0001), 1.0);\n}\nhalf4 main(float2 coord) {\n    half4 c = image.eval(coord);\n    if (c.a <= 0.0) return c;\n    float r = radians(angle);\n    float2 p = coord - 0.5 * size - offset;\n    p = float2(cos(r) * p.x + sin(r) * p.y, -sin(r) * p.x + cos(r) * p.y);\n    p = float2(p.x, p.y / max(stretch, 0.05)) / max(cell, 2.0);\n    float2 rr = float2(1.0, 1.7320508);\n    float2 a = mod(p, rr) - 0.5 * rr;\n    float2 b = mod(p - 0.5 * rr, rr) - 0.5 * rr;\n    float2 gv = dot(a, a) < dot(b, b) ? a : b;\n    float2 id = p - gv;\n    float2 q = abs(gv);\n    float dist = max(dot(q, float2(0.5, 0.8660254)), q.x);\n    float inner = 0.5 - 0.5 * gap;\n    float cover = 1.0 - smoothstep(inner - 0.5 * feather, inner, dist);\n    float pick = floor(hash21(float2(floor(id.x * 2.0 + 0.5), floor(id.y / 0.8660254 + 0.5))) * (colors + 1.0));\n    half4 s = pick < 0.5 ? color1 : (pick < 1.5 ? color2 : color3);\n    float3 base = float3(unpremul(c).rgb);\n    float3 rgb = mix(base, clamp(blendWith(blend, base, float3(s.rgb)), 0.0, 1.0), clamp(opacity, 0.0, 1.0) * cover * float(s.a));\n    return half4(half3(rgb) * c.a, c.a);\n}\n"
+}

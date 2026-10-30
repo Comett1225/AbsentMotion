@@ -6147,5 +6147,715 @@
     "max": 100
    }
   }
+ },
+ "com.alightcreative.effects.energybeam": {
+  "to": "energybeam",
+  "params": {
+   "start": {
+    "to": "from",
+    "scale": 0.1667
+   },
+   "end": {
+    "to": "to",
+    "scale": 0.1667
+   },
+   "color1": {
+    "to": "color"
+   },
+   "color2": {
+    "to": "haloColor"
+   },
+   "spread": {
+    "to": "width",
+    "scale": 0.15,
+    "min": 0.5,
+    "max": 100
+   },
+   "alpha": {
+    "to": "dim",
+    "min": 0,
+    "max": 1
+   },
+   "glowAlpha": {
+    "to": "glow",
+    "scale": 1.6,
+    "min": 0,
+    "max": 4
+   },
+   "haloAlpha": {
+    "to": "halo",
+    "min": 0,
+    "max": 4
+   },
+   "haloSpread": {
+    "to": "haloWidth",
+    "min": 1,
+    "max": 400
+   },
+   "progress": {
+    "to": "progress",
+    "min": 0,
+    "max": 1
+   },
+   "clip": {
+    "to": "span",
+    "min": 0,
+    "max": 1
+   },
+   "fstr": {
+    "to": "wiggle",
+    "min": 0,
+    "max": 2
+   },
+   "freq": {
+    "to": "frequency",
+    "scale": 0.3,
+    "min": 0.1,
+    "max": 100
+   },
+   "evolution": {
+    "to": "evolution"
+   },
+   "blendMode": {
+    "to": "blend",
+    "values": {
+     "0": 1,
+     "1": 0,
+     "2": 1
+    },
+    "min": 0,
+    "max": 2
+   }
+  }
+ },
+ "com.alightcreative.effects.lumastamper": {
+  "to": "lumastamp",
+  "params": {
+   "color": {
+    "to": "color"
+   },
+   "clipLow": {
+    "to": "low",
+    "min": 0,
+    "max": 1
+   },
+   "clipHigh": {
+    "to": "high",
+    "scale": -1,
+    "offset": 1,
+    "min": 0,
+    "max": 1
+   },
+   "gamma": {
+    "to": "gamma",
+    "power": 0.5,
+    "min": 0.1,
+    "max": 10
+   },
+   "invert": {
+    "to": "invert"
+   }
+  }
+ },
+ "com.alightcreative.effects.mattefringe": {
+  "to": "fringeclean",
+  "params": {
+   "thickness": {
+    "to": "blur",
+    "min": 0,
+    "max": 300
+   },
+   "feather": {
+    "to": "feather",
+    "min": 0,
+    "max": 1
+   },
+   "excludeColor1": {
+    "to": "color1"
+   },
+   "threshold1": {
+    "to": "threshold1",
+    "min": 0,
+    "max": 1
+   },
+   "excludeColor2": {
+    "to": "color2"
+   },
+   "threshold2": {
+    "to": "threshold2",
+    "min": 0,
+    "max": 1
+   },
+   "excludeColor3": {
+    "to": "color3"
+   },
+   "threshold3": {
+    "to": "threshold3",
+    "min": 0,
+    "max": 1
+   }
+  }
+ },
+ "com.alightcreative.effects.spill-cleanup": {
+  "to": "spillclean",
+  "params": {
+   "strength": {
+    "to": "strength",
+    "scale": 0.5,
+    "min": 0,
+    "max": 1
+   }
+  }
+ },
+ "com.alightcreative.effects.hexarray": {
+  "to": "hexgrid",
+  "params": {
+   "position": {
+    "to": "offset"
+   },
+   "size": {
+    "to": "cell",
+    "scale": 3,
+    "min": 4,
+    "max": 2000
+   },
+   "stretch": {
+    "to": "stretch",
+    "min": 0.1,
+    "max": 10
+   },
+   "angle": {
+    "to": "angle",
+    "wrap": 360
+   },
+   "colorMode": {
+    "to": "colors",
+    "min": 0,
+    "max": 2
+   },
+   "color1": {
+    "to": "color1"
+   },
+   "color2": {
+    "to": "color2"
+   },
+   "color3": {
+    "to": "color3"
+   },
+   "alpha": {
+    "to": "opacity",
+    "min": 0,
+    "max": 1
+   },
+   "blendMode": {
+    "to": "blend",
+    "values": {
+     "0": 0,
+     "1": 1,
+     "2": 2,
+     "3": 0,
+     "4": 0,
+     "5": 0
+    }
+   },
+   "lineWidth": {
+    "to": "gap",
+    "scale": 0.3,
+    "min": 0,
+    "max": 1
+   },
+   "feather": {
+    "to": "feather",
+    "min": 0,
+    "max": 1
+   }
+  }
+ },
+ "com.alightcreative.effects.grunge": {
+  "to": "grunge",
+  "params": {
+   "strength": {
+    "to": "strength",
+    "min": 0,
+    "max": 1
+   },
+   "fillColor": {
+    "to": "color",
+    "gate": "c1active"
+   },
+   "fillColorBlend": {
+    "to": "tint",
+    "min": 0,
+    "max": 1
+   },
+   "t1active": {
+    "ignore": true
+   },
+   "t1region": {
+    "ignore": true
+   },
+   "t1grain": {
+    "ignore": true
+   },
+   "t1scale": {
+    "ignore": true
+   },
+   "t1angle": {
+    "ignore": true
+   },
+   "t1offset": {
+    "ignore": true
+   },
+   "t1gamma": {
+    "ignore": true
+   },
+   "t1contrast": {
+    "ignore": true
+   },
+   "t1alpha": {
+    "ignore": true
+   },
+   "t1color": {
+    "ignore": true
+   },
+   "t1burn": {
+    "ignore": true
+   },
+   "t1spread": {
+    "ignore": true
+   },
+   "t1choke": {
+    "ignore": true
+   },
+   "t1invert": {
+    "ignore": true
+   },
+   "t1light": {
+    "ignore": true
+   },
+   "t1lightAngle": {
+    "ignore": true
+   },
+   "t1blendMode": {
+    "ignore": true
+   },
+   "t2active": {
+    "ignore": true
+   },
+   "t2region": {
+    "ignore": true
+   },
+   "t2grain": {
+    "ignore": true
+   },
+   "t2scale": {
+    "ignore": true
+   },
+   "t2angle": {
+    "ignore": true
+   },
+   "t2offset": {
+    "ignore": true
+   },
+   "t2gamma": {
+    "ignore": true
+   },
+   "t2contrast": {
+    "ignore": true
+   },
+   "t2alpha": {
+    "ignore": true
+   },
+   "t2color": {
+    "ignore": true
+   },
+   "t2burn": {
+    "ignore": true
+   },
+   "t2spread": {
+    "ignore": true
+   },
+   "t2choke": {
+    "ignore": true
+   },
+   "t2invert": {
+    "ignore": true
+   },
+   "t2light": {
+    "ignore": true
+   },
+   "t2lightAngle": {
+    "ignore": true
+   },
+   "t2blendMode": {
+    "ignore": true
+   },
+   "t3active": {
+    "ignore": true
+   },
+   "t3region": {
+    "ignore": true
+   },
+   "t3grain": {
+    "ignore": true
+   },
+   "t3scale": {
+    "ignore": true
+   },
+   "t3angle": {
+    "ignore": true
+   },
+   "t3offset": {
+    "ignore": true
+   },
+   "t3gamma": {
+    "ignore": true
+   },
+   "t3contrast": {
+    "ignore": true
+   },
+   "t3alpha": {
+    "ignore": true
+   },
+   "t3color": {
+    "ignore": true
+   },
+   "t3burn": {
+    "ignore": true
+   },
+   "t3spread": {
+    "ignore": true
+   },
+   "t3choke": {
+    "ignore": true
+   },
+   "t3invert": {
+    "ignore": true
+   },
+   "t3light": {
+    "ignore": true
+   },
+   "t3lightAngle": {
+    "ignore": true
+   },
+   "t3blendMode": {
+    "ignore": true
+   },
+   "t4active": {
+    "ignore": true
+   },
+   "t4region": {
+    "ignore": true
+   },
+   "t4grain": {
+    "ignore": true
+   },
+   "t4scale": {
+    "ignore": true
+   },
+   "t4angle": {
+    "ignore": true
+   },
+   "t4offset": {
+    "ignore": true
+   },
+   "t4gamma": {
+    "ignore": true
+   },
+   "t4contrast": {
+    "ignore": true
+   },
+   "t4alpha": {
+    "ignore": true
+   },
+   "t4color": {
+    "ignore": true
+   },
+   "t4burn": {
+    "ignore": true
+   },
+   "t4spread": {
+    "ignore": true
+   },
+   "t4choke": {
+    "ignore": true
+   },
+   "t4invert": {
+    "ignore": true
+   },
+   "t4light": {
+    "ignore": true
+   },
+   "t4lightAngle": {
+    "ignore": true
+   },
+   "t4blendMode": {
+    "ignore": true
+   },
+   "t5active": {
+    "ignore": true
+   },
+   "t5region": {
+    "ignore": true
+   },
+   "t5grain": {
+    "ignore": true
+   },
+   "t5scale": {
+    "ignore": true
+   },
+   "t5angle": {
+    "ignore": true
+   },
+   "t5offset": {
+    "ignore": true
+   },
+   "t5gamma": {
+    "ignore": true
+   },
+   "t5contrast": {
+    "ignore": true
+   },
+   "t5alpha": {
+    "ignore": true
+   },
+   "t5color": {
+    "ignore": true
+   },
+   "t5burn": {
+    "ignore": true
+   },
+   "t5spread": {
+    "ignore": true
+   },
+   "t5choke": {
+    "ignore": true
+   },
+   "t5invert": {
+    "ignore": true
+   },
+   "t5light": {
+    "ignore": true
+   },
+   "t5lightAngle": {
+    "ignore": true
+   },
+   "t5blendMode": {
+    "ignore": true
+   },
+   "t6active": {
+    "ignore": true
+   },
+   "t6region": {
+    "ignore": true
+   },
+   "t6grain": {
+    "ignore": true
+   },
+   "t6scale": {
+    "ignore": true
+   },
+   "t6angle": {
+    "ignore": true
+   },
+   "t6offset": {
+    "ignore": true
+   },
+   "t6gamma": {
+    "ignore": true
+   },
+   "t6contrast": {
+    "ignore": true
+   },
+   "t6alpha": {
+    "ignore": true
+   },
+   "t6color": {
+    "ignore": true
+   },
+   "t6burn": {
+    "ignore": true
+   },
+   "t6spread": {
+    "ignore": true
+   },
+   "t6choke": {
+    "ignore": true
+   },
+   "t6invert": {
+    "ignore": true
+   },
+   "t6light": {
+    "ignore": true
+   },
+   "t6lightAngle": {
+    "ignore": true
+   },
+   "t6blendMode": {
+    "ignore": true
+   },
+   "t7active": {
+    "ignore": true
+   },
+   "t7region": {
+    "ignore": true
+   },
+   "t7grain": {
+    "ignore": true
+   },
+   "t7scale": {
+    "ignore": true
+   },
+   "t7angle": {
+    "ignore": true
+   },
+   "t7offset": {
+    "ignore": true
+   },
+   "t7gamma": {
+    "ignore": true
+   },
+   "t7contrast": {
+    "ignore": true
+   },
+   "t7alpha": {
+    "ignore": true
+   },
+   "t7color": {
+    "ignore": true
+   },
+   "t7burn": {
+    "ignore": true
+   },
+   "t7spread": {
+    "ignore": true
+   },
+   "t7choke": {
+    "ignore": true
+   },
+   "t7invert": {
+    "ignore": true
+   },
+   "t7light": {
+    "ignore": true
+   },
+   "t7lightAngle": {
+    "ignore": true
+   },
+   "t7blendMode": {
+    "ignore": true
+   },
+   "t8active": {
+    "ignore": true
+   },
+   "t8region": {
+    "ignore": true
+   },
+   "t8grain": {
+    "ignore": true
+   },
+   "t8scale": {
+    "ignore": true
+   },
+   "t8angle": {
+    "ignore": true
+   },
+   "t8offset": {
+    "ignore": true
+   },
+   "t8gamma": {
+    "ignore": true
+   },
+   "t8contrast": {
+    "ignore": true
+   },
+   "t8alpha": {
+    "ignore": true
+   },
+   "t8color": {
+    "ignore": true
+   },
+   "t8burn": {
+    "ignore": true
+   },
+   "t8spread": {
+    "ignore": true
+   },
+   "t8choke": {
+    "ignore": true
+   },
+   "t8invert": {
+    "ignore": true
+   },
+   "t8light": {
+    "ignore": true
+   },
+   "t8lightAngle": {
+    "ignore": true
+   },
+   "t8blendMode": {
+    "ignore": true
+   },
+   "d1active": {
+    "ignore": true
+   },
+   "d1region": {
+    "ignore": true
+   },
+   "d1offset": {
+    "ignore": true
+   },
+   "d1fromctr": {
+    "ignore": true
+   },
+   "d1grain": {
+    "ignore": true
+   },
+   "d1scale": {
+    "ignore": true
+   },
+   "d1angle": {
+    "ignore": true
+   },
+   "d1toffset": {
+    "ignore": true
+   },
+   "d1gamma": {
+    "ignore": true
+   },
+   "d1contrast": {
+    "ignore": true
+   },
+   "d2active": {
+    "ignore": true
+   },
+   "d2region": {
+    "ignore": true
+   },
+   "d2offset": {
+    "ignore": true
+   },
+   "d2fromctr": {
+    "ignore": true
+   },
+   "d2grain": {
+    "ignore": true
+   },
+   "d2scale": {
+    "ignore": true
+   },
+   "d2angle": {
+    "ignore": true
+   },
+   "d2toffset": {
+    "ignore": true
+   },
+   "d2gamma": {
+    "ignore": true
+   },
+   "d2contrast": {
+    "ignore": true
+   }
+  }
  }
 }
