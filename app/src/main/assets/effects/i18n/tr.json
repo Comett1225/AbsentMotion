@@ -1296,7 +1296,7 @@
    }
   },
   "exposure": {
-   "description": "Durak, ofset ve gama düzeltmesiyle fotoğrafik pozlamayı simüle eder.",
+   "description": "Durak, ofset ve gama düzeltmesiyle fotoğrafik pozlamayı simüle eder. Saydam Kısımları Aydınlat, bulanık bir kenar gibi kısmen saydam piksellerin beyazın ötesinde aydınlanmasını sağlar.",
    "name": "Pozlama",
    "params": {
     "gamma": {
@@ -1307,6 +1307,9 @@
     },
     "stops": {
      "label": "Durak"
+    },
+    "soft": {
+     "label": "Saydam Kısımları Aydınlat"
     }
    }
   },

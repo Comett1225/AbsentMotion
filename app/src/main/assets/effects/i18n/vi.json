@@ -1296,7 +1296,7 @@
    }
   },
   "exposure": {
-   "description": "Mô phỏng phơi sáng nhiếp ảnh với số stop, độ lệch và hiệu chỉnh gamma.",
+   "description": "Mô phỏng phơi sáng nhiếp ảnh với số stop, độ lệch và hiệu chỉnh gamma. Làm sáng phần trong suốt cho phép các điểm ảnh trong suốt một phần, như mép bị làm mờ, sáng hơn cả màu trắng.",
    "name": "Phơi sáng",
    "params": {
     "gamma": {
@@ -1307,6 +1307,9 @@
     },
     "stops": {
      "label": "Số stop"
+    },
+    "soft": {
+     "label": "Làm sáng phần trong suốt"
     }
    }
   },

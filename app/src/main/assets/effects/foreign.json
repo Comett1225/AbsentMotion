@@ -102,6 +102,9 @@
    "offset": {
     "to": "offset"
    }
+  },
+  "set": {
+   "soft": true
   }
  },
  "com.alightcreative.effects.colorhot": {

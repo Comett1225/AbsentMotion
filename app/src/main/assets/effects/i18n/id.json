@@ -1296,7 +1296,7 @@
    }
   },
   "exposure": {
-   "description": "Mensimulasikan eksposur fotografi dengan stop, offset, dan koreksi gamma.",
+   "description": "Mensimulasikan eksposur fotografi dengan stop, offset, dan koreksi gamma. Cerahkan Bagian Tembus Pandang membuat piksel yang sebagian transparan, seperti tepi yang buram, bisa lebih cerah dari putih.",
    "name": "Eksposur",
    "params": {
     "gamma": {
@@ -1307,6 +1307,9 @@
     },
     "stops": {
      "label": "Stop"
+    },
+    "soft": {
+     "label": "Cerahkan Bagian Tembus Pandang"
     }
    }
   },

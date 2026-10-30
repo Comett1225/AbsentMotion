@@ -2,7 +2,7 @@
  "id": "exposure",
  "name": "Exposure",
  "category": "color",
- "description": "Simulates photographic exposure with stops, offset, and gamma correction.",
+ "description": "Simulates photographic exposure with stops, offset, and gamma correction. Brighten See-Through Parts lets partly transparent pixels, such as a blurred edge, brighten past white.",
  "params": [
   {
    "id": "stops",
@@ -30,7 +30,13 @@
    "min": 0.1,
    "max": 10.0,
    "step": 0.1
+  },
+  {
+   "id": "soft",
+   "label": "Brighten See-Through Parts",
+   "type": "switch",
+   "default": false
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float stops;\nuniform float offset;\nuniform float gamma;\nhalf4 main(float2 coord) {\n    half4 c = image.eval(coord);\n    float a = c.a;\n    if (a <= 0.0) return half4(0.0);\n    half3 rgb = c.rgb / a;\n    rgb = pow(max(rgb + offset, half3(0.0)), half3(1.0 / gamma)) * pow(2.0, stops);\n    rgb = clamp(rgb, 0.0, 1.0);\n    return half4(rgb * a, a);\n}"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float stops;\nuniform float offset;\nuniform float gamma;\nuniform float soft;\nhalf4 main(float2 coord) {\n    half4 c = image.eval(coord);\n    float a = c.a;\n    if (a <= 0.0) return half4(0.0);\n    half3 rgb = c.rgb / a;\n    rgb = pow(max(rgb + offset, half3(0.0)), half3(1.0 / gamma)) * pow(2.0, stops);\n    if (soft > 0.5) return half4(clamp(rgb * a, 0.0, 1.0), a);\n    rgb = clamp(rgb, 0.0, 1.0);\n    return half4(rgb * a, a);\n}"
 }

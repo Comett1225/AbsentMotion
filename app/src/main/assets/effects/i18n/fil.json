@@ -1296,7 +1296,7 @@
    }
   },
   "exposure": {
-   "description": "Ginagaya ang exposure ng litrato gamit ang stops, offset, at gamma correction.",
+   "description": "Ginagaya ang exposure ng litrato gamit ang stops, offset, at gamma correction. Pinapayagan ng Paliwanagin ang Malinaw na Bahagi na lumiwanag nang lampas sa puti ang mga bahagyang malinaw na pixel, gaya ng malabong gilid.",
    "name": "Exposure",
    "params": {
     "gamma": {
@@ -1307,6 +1307,9 @@
     },
     "stops": {
      "label": "Stops"
+    },
+    "soft": {
+     "label": "Paliwanagin ang Malinaw na Bahagi"
     }
    }
   },

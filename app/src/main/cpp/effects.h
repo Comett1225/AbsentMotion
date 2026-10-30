@@ -36,7 +36,8 @@ private:
     int liftAt(const Layer& layer) const;
     bool needs(const Layer& layer, bool Definition::*input) const;
     sk_sp<SkImageFilter> chain(const Scene& scene, const Layer& layer, double timeMs, const SkRect& area, const SkRect& seen,
-                               const SkRect& drawn, const SkMatrix& placed, sk_sp<SkImageFilter> content, sk_sp<SkImageFilter> below) const;
+                               const SkRect& drawn, const SkMatrix& placed, sk_sp<SkImageFilter> content, sk_sp<SkImageFilter> below,
+                               int before = -1) const;
     std::map<std::string, Definition> fDefinitions;
 };
 

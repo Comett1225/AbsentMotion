@@ -418,10 +418,10 @@ bool EffectRuntime::steady(const Layer& layer, float from, float to) const {
 
 sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer, double timeMs, const SkRect& area, const SkRect& seen,
                                           const SkRect& drawn, const SkMatrix& placed, sk_sp<SkImageFilter> content,
-                                          sk_sp<SkImageFilter> below) const {
+                                          sk_sp<SkImageFilter> below, int before) const {
     const float t = layer.localTime(timeMs), seconds = (float)((layer.steppedMs(timeMs) - layer.startTime) / 1000.0);
-    const SkRect bounds = seen.makeOffset(-area.left(), -area.top());
     const float reach = std::max({(float)scene.width, (float)scene.height, seen.width(), seen.height()});
+    const SkRect bounds = seen.makeOffset(-area.left(), -area.top()).makeOutset(before >= 0 ? reach : 0, before >= 0 ? reach : 0);
     std::optional<SkRect> shape;
     size_t at = 0, shapeAt = 0;
     const auto own = [&]() -> const SkRect& {
@@ -433,7 +433,8 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
     const bool withBackdrop = content != nullptr;
     sk_sp<SkImageFilter> f = std::move(content);
     bool any = false;
-    for (size_t k = (size_t)(liftAt(layer) + 1); k < layer.effects.size(); k++) {
+    const size_t end = before >= 0 ? std::min((size_t)before, layer.effects.size()) : layer.effects.size();
+    for (size_t k = before >= 0 ? 0 : (size_t)(liftAt(layer) + 1); k < end; k++) {
         const LayerEffect& e = layer.effects[k];
         at = k;
         if (e.hidden || e.id == kLift || (layer.video && e.id == "absent.datamosh")) continue;
@@ -514,10 +515,10 @@ bool EffectRuntime::draw(SkCanvas* canvas, const Scene& scene, const Layer& laye
     const int lift = liftAt(layer);
     const SkRect at = area.isEmpty() ? bounds : area;
     const SkRect local = bounds.makeOffset(-at.left(), -at.top());
-    auto record = [&](const std::function<void(SkCanvas*)>& draw, SkRect* bounded = nullptr) {
+    auto record = [&](const std::function<void(SkCanvas*)>& draw, SkRect* bounded = nullptr, float outset = 0) {
         SkPictureRecorder recorder;
         SkRTreeFactory tight;
-        SkCanvas* c = recorder.beginRecording(local, &tight);
+        SkCanvas* c = recorder.beginRecording(local.makeOutset(outset, outset), &tight);
         c->translate(-at.left(), -at.top());
         draw(c);
         sk_sp<SkPicture> picture = recorder.finishRecordingAsPicture();
@@ -575,6 +576,15 @@ bool EffectRuntime::draw(SkCanvas* canvas, const Scene& scene, const Layer& laye
     }
     const LayerEffect& e = layer.effects[lift];
     const Definition* d = find(e.id);
+    const float margin = std::max({(float)scene.width, (float)scene.height, bounds.width(), bounds.height()});
+    sk_sp<SkImageFilter> early = lift > 0 ? this->chain(scene, layer, timeMs, at, bounds, local, placed, record(source, nullptr, margin), nullptr, lift) : nullptr;
+    const auto shaped = [&](SkCanvas* c) {
+        if (!early) return source(c);
+        SkPaint p;
+        p.setImageFilter(early);
+        c->saveLayer(&bounds, &p);
+        c->restore();
+    };
     const float own = std::clamp(Value(e, d ? &d->defaults : nullptr, "mix", 0, layer.localTime(timeMs), 0), 0.0f, 1.0f);
     const bool masked = Value(e, d ? &d->defaults : nullptr, "mask", 0, layer.localTime(timeMs), 0) > 0.5f;
     const bool spill = Value(e, d ? &d->defaults : nullptr, "spill", 0, layer.localTime(timeMs), 0) > 0.5f;
@@ -582,14 +592,14 @@ bool EffectRuntime::draw(SkCanvas* canvas, const Scene& scene, const Layer& laye
     canvas->saveLayer(SkCanvas::SaveLayerRec(&bounds, &paint, SkCanvas::kInitWithPrevious_SaveLayerFlag));
     if (own > 0) {
         canvas->saveLayerAlphaf(&bounds, own);
-        source(canvas);
+        shaped(canvas);
         canvas->restore();
     }
     if (masked) {
         SkPaint mask;
         mask.setBlendMode(SkBlendMode::kDstIn);
         canvas->saveLayer(&bounds, &mask);
-        source(canvas);
+        shaped(canvas);
         canvas->restore();
     }
     canvas->restore();

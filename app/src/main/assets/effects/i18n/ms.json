@@ -1296,7 +1296,7 @@
    }
   },
   "exposure": {
-   "description": "Tiru pendedahan fotografi dengan stop, ofset dan pembetulan gama.",
+   "description": "Tiru pendedahan fotografi dengan stop, ofset dan pembetulan gama. Cerahkan Bahagian Lut Sinar membolehkan piksel separa lut sinar, seperti tepi yang kabur, menjadi lebih cerah melepasi putih.",
    "name": "Pendedahan",
    "params": {
     "gamma": {
@@ -1307,6 +1307,9 @@
     },
     "stops": {
      "label": "Stop"
+    },
+    "soft": {
+     "label": "Cerahkan Bahagian Lut Sinar"
     }
    }
   },

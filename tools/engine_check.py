@@ -176,6 +176,14 @@ CASES = {
                      '<property name="offset" type="vec2" value="-50,0"/></effect>')
               + rect(4, 150, 60, 10, 10, 0xff00ff00)),
         [((60, 100), BLUE), ((20, 100), RED), ((180, 100), BLUE), ((150, 60), GREEN), ((100, 60), BLUE)]),
+    "a blur before an adjustment layer softens its edge and exposure brightens the soft part": (
+        scene(rect(1, 100, 100, 200, 200, 0xff404040)
+              + rect(2, 100, 100, 40, 40, extra='<effect id="absent.blur" hidden="false"><property name="strength" type="float" value="30"/></effect>'
+                     '<effect id="absent.backdrop" hidden="false"><property name="mix" type="float" value="0"/>'
+                     '<property name="mask" type="bool" value="true"/><property name="spill" type="bool" value="true"/></effect>'
+                     '<effect id="absent.exposure" hidden="false"><property name="stops" type="float" value="2"/>'
+                     '<property name="soft" type="bool" value="true"/></effect>')),
+        [((100, 100), (255, 255, 255)), ((125, 100), (241, 241, 241)), ((150, 100), (94, 94, 94)), ((195, 100), (64, 64, 64))]),
     "an effect can read the layer below as a map, even at zero opacity": (
         scene(rect(1, 50, 100, 50, 100, opacity=0.0)
               + rect(2, 150, 100, 50, 100, 0xff00ff00, extra='<effect id="absent.displacementmap" hidden="false">'

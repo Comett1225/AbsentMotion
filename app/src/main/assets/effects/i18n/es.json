@@ -1296,7 +1296,7 @@
    }
   },
   "exposure": {
-   "description": "Simula la exposición fotográfica con pasos, desplazamiento y corrección de gamma.",
+   "description": "Simula la exposición fotográfica con pasos, desplazamiento y corrección de gamma. Aclarar partes transparentes permite que los píxeles parcialmente transparentes, como un borde desenfocado, se aclaren más allá del blanco.",
    "name": "Exposición",
    "params": {
     "gamma": {
@@ -1307,6 +1307,9 @@
     },
     "stops": {
      "label": "Pasos"
+    },
+    "soft": {
+     "label": "Aclarar partes transparentes"
     }
    }
   },

@@ -1296,7 +1296,7 @@
    }
   },
   "exposure": {
-   "description": "Simula a exposição fotográfica com stops, deslocamento e correção gama.",
+   "description": "Simula a exposição fotográfica com stops, deslocamento e correção gama. Clarear partes transparentes permite que pixels parcialmente transparentes, como uma borda desfocada, fiquem mais claros além do branco.",
    "name": "Exposição",
    "params": {
     "gamma": {
@@ -1307,6 +1307,9 @@
     },
     "stops": {
      "label": "Stops"
+    },
+    "soft": {
+     "label": "Clarear partes transparentes"
     }
    }
   },
