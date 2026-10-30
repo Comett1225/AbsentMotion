@@ -3117,14 +3117,23 @@
    "amount": {
     "to": "cell",
     "power": -1,
-    "scale": 1000,
+    "per": "height",
     "min": 2,
     "max": 200
    },
    "angle": {
     "to": "angle",
     "wrap": 360
+   },
+   "color1": {
+    "to": "ink"
+   },
+   "color2": {
+    "to": "paper"
    }
+  },
+  "set": {
+   "style": 1
   }
  },
  "com.alightcreative.effects.halftonelines": {
@@ -5426,7 +5435,7 @@
   "params": {
    "strength": {
     "to": "amount",
-    "scale": 0.7,
+    "scale": 0.76,
     "min": 0,
     "max": 1.9
    },
@@ -6856,6 +6865,152 @@
    "d2contrast": {
     "ignore": true
    }
+  }
+ },
+ "com.alightcreative.effects.bumpmap": {
+  "to": "bumpmap",
+  "params": {
+   "ambient": {
+    "to": "ambient",
+    "min": 0,
+    "max": 1
+   },
+   "shine": {
+    "to": "shine",
+    "min": 0,
+    "max": 1
+   },
+   "lightColor": {
+    "to": "light"
+   }
+  }
+ },
+ "com.alightcreative.effects.bumpmap2": {
+  "to": "bumpmap",
+  "params": {
+   "ambient": {
+    "to": "ambient",
+    "min": 0,
+    "max": 1
+   },
+   "shine": {
+    "to": "shine",
+    "min": 0,
+    "max": 1
+   },
+   "lightColor": {
+    "to": "light"
+   }
+  }
+ },
+ "com.alightcreative.effects.hextile": {
+  "to": "hexagontiling",
+  "params": {
+   "size": {
+    "to": "scale",
+    "scale": 0.04,
+    "min": 0.05,
+    "max": 10
+   },
+   "angle": {
+    "to": "angle"
+   }
+  }
+ },
+ "com.alightcreative.effects.mirror": {
+  "to": "mirror",
+  "params": {
+   "type": {
+    "to": "angle",
+    "values": {
+     "0": 90,
+     "1": 0
+    }
+   },
+   "alpha": {
+    "to": "alpha",
+    "min": 0,
+    "max": 1
+   }
+  },
+  "set": {
+   "style": 1
+  }
+ },
+ "com.alightcreative.effects.irridescence": {
+  "to": "iridescence",
+  "params": {
+   "FREQ": {
+    "to": "scale",
+    "power": -1,
+    "min": 0.01,
+    "max": 50
+   }
+  },
+  "set": {
+   "alpha": 1,
+   "saturation": 0.3
+  }
+ },
+ "com.alightcreative.effects.irridescence2": {
+  "to": "iridescence",
+  "params": {
+   "FREQ": {
+    "to": "scale",
+    "power": -1,
+    "min": 0.01,
+    "max": 50
+   }
+  },
+  "set": {
+   "alpha": 1,
+   "saturation": 0.3
+  }
+ },
+ "com.alightcreative.effects.mattechoke": {
+  "to": "mattechoker",
+  "params": {
+   "choke": {
+    "to": "blur",
+    "scale": 1.5,
+    "min": 0,
+    "max": 300
+   },
+   "feather": {
+    "to": "softness",
+    "scale": 0.18,
+    "min": 0.001,
+    "max": 0.5
+   },
+   "invert": {
+    "to": "invert"
+   }
+  },
+  "set": {
+   "amount": 0.97
+  }
+ },
+ "com.alightcreative.mattechoke": {
+  "to": "mattechoker",
+  "params": {
+   "choke": {
+    "to": "blur",
+    "scale": 1.5,
+    "min": 0,
+    "max": 300
+   },
+   "feather": {
+    "to": "softness",
+    "scale": 0.18,
+    "min": 0.001,
+    "max": 0.5
+   },
+   "invert": {
+    "to": "invert"
+   }
+  },
+  "set": {
+   "amount": 0.97
   }
  }
 }

@@ -24,7 +24,32 @@
    "min": 0,
    "max": 1,
    "step": 0.01
+  },
+  {
+   "id": "style",
+   "label": "Style",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Fold",
+    "Flip"
+   ]
+  },
+  {
+   "id": "alpha",
+   "label": "Alpha",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true,
+   "when": {
+    "style": [
+     1
+    ]
+   }
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float angle;\nuniform float2 center;\n\nhalf4 main(float2 coord) {\n    float theta = radians(angle);\n    float2 d = float2(cos(theta), sin(theta));\n    float2 normal = float2(-sin(theta), cos(theta));\n    float2 c = center * size;\n    float2 v = coord - c;\n    float side = dot(v, normal);\n    float2 sc = coord;\n    if (side < 0.0) {\n        sc = c + reflect(v, normal);\n    }\n    return image.eval(sc);\n}"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float angle;\nuniform float2 center;\nuniform float style;\nuniform float alpha;\n\nhalf4 main(float2 coord) {\n    float theta = radians(angle);\n    float2 d = float2(cos(theta), sin(theta));\n    float2 normal = float2(-sin(theta), cos(theta));\n    float2 c = center * size;\n    float2 v = coord - c;\n    if (style > 0.5) {\n        half4 copy = image.eval(c + reflect(v, normal)) * half(clamp(alpha, 0.0, 1.0));\n        return copy + image.eval(coord) * (1.0 - copy.a);\n    }\n    float side = dot(v, normal);\n    float2 sc = coord;\n    if (side < 0.0) {\n        sc = c + reflect(v, normal);\n    }\n    return image.eval(sc);\n}"
 }
