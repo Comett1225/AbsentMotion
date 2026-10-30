@@ -1760,10 +1760,6 @@
     <string name="preview_cache_removed">Se quitó la vista previa renderizada</string>
     <string name="preview_cache_no_memory">No hay suficiente memoria para una vista previa renderizada. Se quitó.</string>
     <string name="preview_cache_failed">No se pudo renderizar la vista previa.</string>
-    <string name="preview_cache_hint">La reproducción se entrecorta. ¿Renderizar una vista previa fluida?</string>
-    <string name="preview_cache_hint_action">Renderizar</string>
-    <string name="preview_cache_close">Cerrar</string>
-    <string name="preview_cache_hint_setting">Ofrecer una vista previa fluida cuando la reproducción se entrecorte</string>
     <string name="export_filename">Nombre del archivo</string>
     <string name="export_filename_generated">Se genera al exportar</string>
     <string name="export_filename_random">Nombre de archivo numérico aleatorio</string>

@@ -2,6 +2,17 @@ package app.absentmotion.ui.editor.panels
 
 import app.absentmotion.model.path
 import app.absentmotion.model.finiteFloat
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.runtime.remember
+import androidx.compose.ui.draw.rotate
+import app.absentmotion.ui.theme.Motion
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -337,65 +348,78 @@ private val DirectionLabels = listOf(R.string.border_inside, R.string.border_cen
 @Composable
 private fun BorderTab(state: EditorState, layer: Layer) {
     val borders = layer.borders
-    val open = borders.getOrNull(openBorder)
     val scroll = rememberScrollState()
     val reorder = rememberReorder(state, scroll, top = 18.px, pitch = 122.px)
     val reorderLabel = stringResource(R.string.effects_reorder)
-    Column(Modifier.fillMaxSize().verticalScroll(scroll).padding(18.px), verticalArrangement = Arrangement.spacedBy(18.px)) {
-        if (open != null) {
-            Column(Modifier.fillMaxWidth().clip(PanelShape).background(CardBg).padding(bottom = 8.px)) {
-                Row(Modifier.fillMaxWidth().height(104.px).clickable { openBorder = -1 }, verticalAlignment = Alignment.CenterVertically) {
-                    Canvas(Modifier.padding(start = 36.px).size(51.px)) { triangle(down = true) }
-                    Text(stringResource(R.string.border), Modifier.padding(start = 30.px).weight(1f), color = Am.OnDark, fontSize = 16.sp, maxLines = 1)
-                    Box(Modifier.size(101.px).clickable { state.editSelected { it.withBorderRemoved(open.index) }; openBorder = -1 }, contentAlignment = Alignment.Center) {
-                        PanelIcon(ChromeIcons.Trash, Am.OnDark, size = 28.dp, description = stringResource(R.string.delete))
-                    }
-                }
-                Row(Modifier.padding(start = 8.px, end = 8.px, top = 15.px).fillMaxWidth().height(77.px), Arrangement.spacedBy(3.px)) {
-                    Directions.forEachIndexed { i, d ->
-                        val chosen = open.direction == d
-                        Box(Modifier.weight(1f).fillMaxHeight().background(if (chosen) Am.Chosen else Am.FieldHi)
-                            .clickable { state.editSelected { it.withBorderDirection(open.index, d) } }, contentAlignment = Alignment.Center) {
-                            Text(stringResource(DirectionLabels[i]).uppercase(), color = if (chosen) Am.Accent else Am.OnDark, fontSize = 15.sp, fontWeight = FontWeight.Medium, maxLines = 1, softWrap = false)
+    Column(Modifier.fillMaxSize().verticalScroll(scroll).padding(start = 18.px, end = 18.px, top = 18.px)) {
+        key(reorder.generation) {
+            borders.forEach { b ->
+                val isOpen = openBorder == b.index
+                val shown = remember { MutableTransitionState(!isOpen) }.apply { targetState = openBorder < 0 || isOpen }
+                AnimatedVisibility(shown, enter = expandVertically(Motion.enter()) + fadeIn(Motion.enter()), exit = shrinkVertically(Motion.exit()) + fadeOut(Motion.exit())) {
+                    Column(
+                        Modifier.padding(bottom = 18.px).reorderSlot(reorder, b.index).fillMaxWidth().reorderLift(reorder, b.index, 4.dp).clip(PanelShape).background(CardBg),
+                    ) {
+                        val turn by animateFloatAsState(if (isOpen) 90f else 0f, Motion.fast(), label = "border")
+                        Row(Modifier.fillMaxWidth().height(104.px).clickable { openBorder = if (isOpen) -1 else b.index; borderField = 0 }, verticalAlignment = Alignment.CenterVertically) {
+                            Canvas(Modifier.padding(start = 36.px).size(51.px).rotate(turn)) { triangle(down = false) }
+                            Box(Modifier.weight(1f)) {
+                                Crossfade(isOpen, animationSpec = Motion.fast(), label = "border") { opened ->
+                                    if (opened) Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Text(stringResource(R.string.border), Modifier.padding(start = 30.px).weight(1f), color = Am.OnDark, fontSize = 16.sp, maxLines = 1)
+                                        Box(Modifier.size(101.px).clickable { state.editSelected { it.withBorderRemoved(b.index) }; openBorder = -1 }, contentAlignment = Alignment.Center) {
+                                            PanelIcon(ChromeIcons.Trash, Am.OnDark, size = 28.dp, description = stringResource(R.string.delete))
+                                        }
+                                    } else Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Text(formatPlain(b.size) + "px", Modifier.padding(start = 28.px).width(78.px), color = Am.OnDark, fontSize = 16.sp, maxLines = 1, softWrap = false)
+                                        ColourSwatch(b.color, 56.px, Modifier.padding(start = 28.px), round = true)
+                                        Text(stringResource(DirectionLabels[Directions.indexOf(b.direction).coerceAtLeast(0)]), Modifier.padding(start = 28.px).weight(1f), color = Am.OnDark, fontSize = 16.sp, maxLines = 1, softWrap = false)
+                                        Canvas(Modifier.size(84.px).semantics { contentDescription = reorderLabel }.reorderGrip(reorder, b.index, borders.size) { from, to ->
+                                            state.editSelected { it.withBorderMoved(from, to) }
+                                        }) {
+                                            val u = 1.px.toPx()
+                                            for (i in -1..1) drawLine(Am.Inactive, Offset(size.width / 2 - 22 * u, size.height / 2 + i * 9 * u), Offset(size.width / 2 + 22 * u, size.height / 2 + i * 9 * u), 2.5f * u)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        Folding(isOpen) {
+                            Column(Modifier.padding(bottom = 8.px)) {
+                                Row(Modifier.padding(start = 8.px, end = 8.px, top = 15.px).fillMaxWidth().height(77.px), Arrangement.spacedBy(3.px)) {
+                                    Directions.forEachIndexed { i, d ->
+                                        val chosen = b.direction == d
+                                        Box(Modifier.weight(1f).fillMaxHeight().background(if (chosen) Am.Chosen else Am.FieldHi)
+                                            .clickable { state.editSelected { it.withBorderDirection(b.index, d) } }, contentAlignment = Alignment.Center) {
+                                            Text(stringResource(DirectionLabels[i]).uppercase(), color = if (chosen) Am.Accent else Am.OnDark, fontSize = 15.sp, fontWeight = FontWeight.Medium, maxLines = 1, softWrap = false)
+                                        }
+                                    }
+                                }
+                                Spacer(Modifier.height(15.px))
+                                ColourRow(b.color, borderField == 0, { borderField = 0 }) { editColour(b.colorRef, StyleColors.White) }
+                                EffectNumbers(state, sizeParam(if (b.direction == "centered") "4" else "6"), "${b.size}", true, borderField == 1, { borderField = 1 }) { text, gesture -> state.setRow(b.sizeRef, text, gesture) }
+                            }
                         }
                     }
                 }
-                Spacer(Modifier.height(15.px))
-                ColourRow(open.color, borderField == 0, { borderField = 0 }) { editColour(open.colorRef, StyleColors.White) }
-                EffectNumbers(state, sizeParam(if (open.direction == "centered") "4" else "6"), "${open.size}", true, borderField == 1, { borderField = 1 }) { text, gesture -> state.setRow(open.sizeRef, text, gesture) }
-            }
-            return@Column
-        }
-        key(reorder.generation) {
-            borders.forEach { b ->
-                Row(
-                    Modifier.reorderSlot(reorder, b.index).fillMaxWidth().height(104.px).reorderLift(reorder, b.index, 4.dp).clip(PanelShape).background(CardBg)
-                        .clickable { openBorder = b.index; borderField = 0 },
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Canvas(Modifier.padding(start = 36.px).size(51.px)) { triangle(down = false) }
-                    Text(formatPlain(b.size) + "px", Modifier.padding(start = 28.px).width(78.px), color = Am.OnDark, fontSize = 16.sp, maxLines = 1, softWrap = false)
-                    ColourSwatch(b.color, 56.px, Modifier.padding(start = 28.px), round = true)
-                    Text(stringResource(DirectionLabels[Directions.indexOf(b.direction).coerceAtLeast(0)]), Modifier.padding(start = 28.px).weight(1f), color = Am.OnDark, fontSize = 16.sp, maxLines = 1, softWrap = false)
-                    Canvas(Modifier.size(84.px).semantics { contentDescription = reorderLabel }.reorderGrip(reorder, b.index, borders.size) { from, to ->
-                        state.editSelected { it.withBorderMoved(from, to) }
-                    }) {
-                        val u = 1.px.toPx()
-                        for (i in -1..1) drawLine(Am.Inactive, Offset(size.width / 2 - 22 * u, size.height / 2 + i * 9 * u), Offset(size.width / 2 + 22 * u, size.height / 2 + i * 9 * u), 2.5f * u)
-                    }
-                }
             }
         }
-        Row(
-            Modifier.fillMaxWidth().height(104.px).clip(PanelShape).background(ButtonBg)
-                .clickable { state.editSelected { it.withBorderAdded() }; openBorder = borders.size; borderField = 0 },
-            horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically,
-        ) {
-            PanelIcon(ChromeIcons.Plus, Am.OnDark, size = 16.dp)
-            Text(stringResource(R.string.add_border), Modifier.padding(start = 18.px), color = Am.OnDark, fontSize = 16.sp, maxLines = 1, softWrap = false)
+        Folding(openBorder < 0) {
+            Row(
+                Modifier.padding(bottom = 18.px).fillMaxWidth().height(104.px).clip(PanelShape).background(ButtonBg)
+                    .clickable { state.editSelected { it.withBorderAdded() }; openBorder = borders.size; borderField = 0 },
+                horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically,
+            ) {
+                PanelIcon(ChromeIcons.Plus, Am.OnDark, size = 16.dp)
+                Text(stringResource(R.string.add_border), Modifier.padding(start = 18.px), color = Am.OnDark, fontSize = 16.sp, maxLines = 1, softWrap = false)
+            }
         }
     }
 }
+
+@Composable
+private fun Folding(visible: Boolean, content: @Composable () -> Unit) =
+    AnimatedVisibility(visible, enter = expandVertically(Motion.enter()) + fadeIn(Motion.enter()), exit = shrinkVertically(Motion.exit()) + fadeOut(Motion.exit())) { content() }
 
 private fun DrawScope.triangle(down: Boolean) {
     val w = size.width

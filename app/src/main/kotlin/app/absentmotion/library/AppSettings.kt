@@ -96,11 +96,7 @@ class AppSettings(private val context: Context) {
         get() = fullMotionBlurState
         set(value) { fullMotionBlurState = value; prefs.edit().putBoolean("fullMotionBlur", value).apply() }
 
-    private var previewCacheHintState by mutableStateOf(prefs.getBoolean("previewCacheHint", true))
 
-    var previewCacheHint: Boolean
-        get() = previewCacheHintState
-        set(value) { previewCacheHintState = value; prefs.edit().putBoolean("previewCacheHint", value).apply() }
 
     private var keepMediaCopiesState by mutableStateOf(prefs.getBoolean("keepMediaCopies", true))
 

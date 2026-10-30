@@ -1712,10 +1712,6 @@
     <string name="preview_cache_removed">Pratinjau yang dirender dihapus</string>
     <string name="preview_cache_no_memory">Memori tidak cukup untuk pratinjau yang dirender. Pratinjau telah dihapus.</string>
     <string name="preview_cache_failed">Pratinjau tidak dapat dirender.</string>
-    <string name="preview_cache_hint">Pemutaran tersendat. Render pratinjau yang lancar?</string>
-    <string name="preview_cache_hint_action">Render</string>
-    <string name="preview_cache_close">Tutup</string>
-    <string name="preview_cache_hint_setting">Tawarkan pratinjau lancar saat pemutaran tersendat</string>
     <string name="export_filename">Nama file</string>
     <string name="export_filename_generated">Dibuat saat ekspor</string>
     <string name="export_filename_random">Nama file angka acak</string>

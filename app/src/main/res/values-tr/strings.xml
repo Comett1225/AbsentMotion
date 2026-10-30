@@ -1736,10 +1736,6 @@
     <string name="preview_cache_removed">İşlenmiş önizleme kaldırıldı</string>
     <string name="preview_cache_no_memory">İşlenmiş önizleme için yeterli bellek yok. Kaldırıldı.</string>
     <string name="preview_cache_failed">Önizleme işlenemedi.</string>
-    <string name="preview_cache_hint">Oynatma takılıyor. Akıcı bir önizleme işlensin mi?</string>
-    <string name="preview_cache_hint_action">İşle</string>
-    <string name="preview_cache_close">Kapat</string>
-    <string name="preview_cache_hint_setting">Oynatma takıldığında akıcı önizleme öner</string>
     <string name="export_filename">Dosya adı</string>
     <string name="export_filename_generated">Dışa aktarılırken oluşturulur</string>
     <string name="export_filename_random">Rastgele sayısal dosya adı</string>

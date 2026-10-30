@@ -1712,10 +1712,6 @@
     <string name="preview_cache_removed">Pratonton dirender dibuang</string>
     <string name="preview_cache_no_memory">Memori tidak mencukupi untuk pratonton dirender. Ia dibuang.</string>
     <string name="preview_cache_failed">Pratonton tidak dapat dirender.</string>
-    <string name="preview_cache_hint">Main balik tersekat-sekat. Render pratonton lancar?</string>
-    <string name="preview_cache_hint_action">Render</string>
-    <string name="preview_cache_close">Tutup</string>
-    <string name="preview_cache_hint_setting">Tawarkan pratonton lancar apabila main balik tersekat-sekat</string>
     <string name="export_filename">Nama fail</string>
     <string name="export_filename_generated">Dijana semasa eksport</string>
     <string name="export_filename_random">Nama fail nombor rawak</string>

@@ -1762,10 +1762,6 @@
     <string name="preview_cache_removed">Rendered preview removed</string>
     <string name="preview_cache_no_memory">Not enough memory for a rendered preview. It was removed.</string>
     <string name="preview_cache_failed">The preview could not be rendered.</string>
-    <string name="preview_cache_hint">Playback is choppy. Render a smooth preview?</string>
-    <string name="preview_cache_hint_action">Render</string>
-    <string name="preview_cache_close">Close</string>
-    <string name="preview_cache_hint_setting">Offer a smooth preview when playback is choppy</string>
     <string name="export_filename">Filename</string>
     <string name="export_filename_generated">Generated on export</string>
     <string name="export_filename_random">Random numeric filename</string>

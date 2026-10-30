@@ -1760,10 +1760,6 @@
     <string name="preview_cache_removed">Pré-visualização renderizada removida</string>
     <string name="preview_cache_no_memory">Memória insuficiente para uma pré-visualização renderizada. Ela foi removida.</string>
     <string name="preview_cache_failed">Não foi possível renderizar a pré-visualização.</string>
-    <string name="preview_cache_hint">A reprodução está travando. Renderizar uma pré-visualização fluida?</string>
-    <string name="preview_cache_hint_action">Renderizar</string>
-    <string name="preview_cache_close">Fechar</string>
-    <string name="preview_cache_hint_setting">Oferecer uma pré-visualização fluida quando a reprodução travar</string>
     <string name="export_filename">Nome do arquivo</string>
     <string name="export_filename_generated">Gerado ao exportar</string>
     <string name="export_filename_random">Nome de arquivo numérico aleatório</string>

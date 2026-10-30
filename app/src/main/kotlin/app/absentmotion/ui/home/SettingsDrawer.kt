@@ -123,7 +123,6 @@ fun SettingsDrawer(settings: AppSettings, drawer: androidx.compose.material3.Dra
                 DurationRow(settings)
                 SwitchRow(stringResource(R.string.settings_vibration), settings.vibration, enabled = true) { settings.vibration = it }
                 SwitchRow(stringResource(R.string.settings_transition_in_preview), settings.transitionInPreview, enabled = true) { settings.transitionInPreview = it }
-                SwitchRow(stringResource(R.string.preview_cache_hint_setting), settings.previewCacheHint, enabled = true) { settings.previewCacheHint = it }
                 Divider(10.dp)
                 ChoicesBlock(R.string.settings_emoji) {
                     Choices(listOf(R.string.settings_emoji_system, R.string.settings_emoji_android), if (settings.androidEmoji) 1 else 0) { settings.androidEmoji = it == 1 }

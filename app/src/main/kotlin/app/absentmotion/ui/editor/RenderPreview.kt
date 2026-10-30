@@ -61,7 +61,6 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.absentmotion.R
-import app.absentmotion.editor.ChoppyWatch
 import app.absentmotion.editor.EditorPanel
 import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.PreviewCache
@@ -177,14 +176,9 @@ internal fun CachedFrame(state: EditorState, usable: Boolean, live: LiveHandoff,
 
 @Composable
 internal fun RenderPreviewNotes(state: EditorState, cachedPlaying: State<Boolean>, modifier: Modifier) {
-    val context = LocalContext.current
-    val scope = LocalEditorScope.current
     AutomaticPreview(state)
-    var hint by remember { mutableStateOf(false) }
-    val session = System.identityHashCode(state)
     LaunchedEffect(state.playing) {
         if (!state.playing) return@LaunchedEffect
-        val watch = ChoppyWatch()
         val startNs = System.nanoTime()
         val startFrame = state.frame
         val startRenders = state.engine.renders
@@ -195,20 +189,12 @@ internal fun RenderPreviewNotes(state: EditorState, cachedPlaying: State<Boolean
                 delay(250)
                 val cached = cachedPlaying.value
                 cachedTime = cachedTime || cached
-                if (cached || PreviewCache.phase == PreviewCache.Phase.Rendering) { watch.reset(); continue }
-                if (watch.sample(System.nanoTime(), state.frame, state.engine.renders) && state.settings.previewCacheHint && PreviewCache.hinted != session) {
-                    PreviewCache.hinted = session
-                    hint = true
-                }
             }
         } finally {
             Log.i("AMCache", "play cached=%b frames=%d renders=%d cachedShows=%d ms=%d".format(
                 cachedTime, state.frame - startFrame, state.engine.renders - startRenders, (PreviewCache.player?.shows ?: 0L) - startShows,
                 (System.nanoTime() - startNs) / 1_000_000))
         }
-    }
-    LaunchedEffect(hint) {
-        if (hint) { delay(12_000); hint = false }
     }
     LaunchedEffect(state.exportOpen) {
         if (state.exportOpen) PreviewCache.cancel()
@@ -227,18 +213,6 @@ internal fun RenderPreviewNotes(state: EditorState, cachedPlaying: State<Boolean
                     }
                 }
                 TextButton({ PreviewCache.cancel() }) { Text(stringResource(R.string.cancel), color = Am.Accent, fontSize = 13.sp, maxLines = 1) }
-            }
-        }
-        Presence(hint && !rendering) {
-            Note(Modifier.presence(rise = (-8).dp)) {
-                Text(stringResource(R.string.preview_cache_hint), Modifier.weight(1f), color = Am.OnDark, fontSize = 13.sp, lineHeight = 16.sp, maxLines = 3)
-                TextButton({ hint = false; PreviewCache.render(state, context, scope) }) {
-                    Text(stringResource(R.string.preview_cache_hint_action), color = Am.Accent, fontSize = 13.sp, maxLines = 1)
-                }
-                Icon(
-                    ChromeIcons.Close, stringResource(R.string.preview_cache_close),
-                    Modifier.size(36.dp).clip(RoundedCornerShape(18.dp)).clickable { hint = false }.padding(10.dp), tint = Am.OnDarkDim,
-                )
             }
         }
     }

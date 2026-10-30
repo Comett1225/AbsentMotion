@@ -116,4 +116,12 @@ class ExportTimeTest {
             java.util.Locale.setDefault(locale)
         }
     }
+
+    @Test fun timeLeftStartsFromThePlanAndFollowsTheMeasuredPace() {
+        assertEquals(60, exportSecondsLeft(0.0, 0f, 60_000))
+        assertEquals(50, exportSecondsLeft(10.0, 0.005f, 60_000))
+        assertEquals(null, exportSecondsLeft(1.0, 0f, null))
+        assertEquals(30, exportSecondsLeft(30.0, 0.5f, 10_000))
+        assertEquals(0, exportSecondsLeft(5.0, 1f, 60_000))
+    }
 }

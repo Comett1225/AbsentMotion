@@ -171,6 +171,7 @@ import app.absentmotion.export.resolutionLabel
 import app.absentmotion.export.sampleRateChoices
 import app.absentmotion.export.shortName
 import app.absentmotion.export.suggestionLabel
+import app.absentmotion.export.exportSecondsLeft
 import app.absentmotion.export.timeLabel
 import app.absentmotion.export.videoBitrate
 import app.absentmotion.export.withContainer
@@ -212,7 +213,7 @@ private val SheetKinds = setOf(ExportKind.Gif, ExportKind.Sequence, ExportKind.F
 
 private sealed interface Phase {
     data object Idle : Phase
-    class Running(val kind: ExportKind, val startNs: Long, val job: Job) : Phase
+    class Running(val kind: ExportKind, val startNs: Long, val job: Job, val plannedMs: Long? = null) : Phase
     class Done(val kind: ExportKind, val result: ExportResult) : Phase
 }
 
@@ -493,7 +494,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
                 if (background) ExportRun.end(outcome)
             }
         }
-        phase = Phase.Running(chosen, System.nanoTime(), job)
+        phase = Phase.Running(chosen, System.nanoTime(), job, timeMs)
         if (background) ExportRun.begin(context, runningTitle(chosen)) { job.cancel() }
     }
 
@@ -1137,31 +1138,8 @@ private fun Chip(label: String, selected: Boolean, enabled: Boolean = true, onCl
 @Composable
 private fun BoxScope.RunningPanel(p: Phase.Running, progress: Float, heat: ThermalLevel, note: UiText?, onCancel: () -> Unit) {
     val percent = (progress * 100).toInt().coerceIn(0, 100)
-    var lastProgress by remember { mutableFloatStateOf(0f) }
-    var lastNs by remember { mutableLongStateOf(System.nanoTime()) }
-    var rate by remember { mutableFloatStateOf(0f) }
-    LaunchedEffect(progress) {
-        val now = System.nanoTime()
-        if (progress < lastProgress) {
-            rate = 0f
-            lastProgress = progress
-            lastNs = now
-            return@LaunchedEffect
-        }
-        val dt = (now - lastNs) / 1e9f
-        if (dt > 0.2f) {
-            val dp = progress - lastProgress
-            if (dp > 0f) rate = if (rate == 0f) dp / dt else rate * 0.7f + (dp / dt) * 0.3f
-            lastProgress = progress
-            lastNs = now
-        }
-    }
-    val left = when {
-        progress >= 1f -> 0
-        rate > 0.00001f -> ((1f - progress) / rate).toInt().coerceAtLeast(0)
-        progress > 0.02f -> ((System.nanoTime() - p.startNs) / 1e9 * (1 - progress) / progress).toInt()
-        else -> null
-    }
+    val now by produceState(System.nanoTime(), p) { while (true) { value = System.nanoTime(); delay(250) } }
+    val left = exportSecondsLeft((now - p.startNs) / 1e9, progress, p.plannedMs)
     Column(Modifier.align(Alignment.Center).presence(), horizontalAlignment = Alignment.CenterHorizontally) {
         Text(stringResource(runningTitle(p.kind)), color = Am.OnScrim, fontSize = 18.sp, textAlign = TextAlign.Center)
         Spacer(Modifier.height(15.dp))
@@ -1198,6 +1176,7 @@ private fun runningTitle(kind: ExportKind): Int = when (kind) {
 private val BackgroundKinds = setOf(ExportKind.Video, ExportKind.Audio, ExportKind.Gif, ExportKind.Sequence, ExportKind.Package)
 
 private fun timeKey(kind: ExportKind): String? = when (kind) {
+    ExportKind.Video -> "time.video"
     ExportKind.Gif -> "time.gif"
     ExportKind.Sequence -> "time.sequence"
     else -> null

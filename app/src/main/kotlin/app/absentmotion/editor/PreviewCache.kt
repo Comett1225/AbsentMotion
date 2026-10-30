@@ -169,34 +169,6 @@ fun diskBudget(free: Long): Long = minOf(MAX_DISK_BUDGET, (free - DISK_RESERVE) 
 
 data class CacheKey(val projectId: String, val scene: Scene, val divisor: Int, val androidEmoji: Boolean, val resources: Long = 0, val accurateBlur: Boolean = true)
 
-class ChoppyWatch(private val windowNs: Long = 1_000_000_000L, private val windows: Int = 3, private val ratio: Float = 0.75f, private val minAdvance: Int = 5) {
-    private var startNs = -1L
-    private var startFrame = 0
-    private var startRenders = 0L
-    private var warmed = false
-    private var bad = 0
-
-    fun reset() {
-        startNs = -1L
-        warmed = false
-        bad = 0
-    }
-
-    fun sample(nowNs: Long, frame: Int, renders: Long): Boolean {
-        if (startNs < 0 || frame < startFrame) {
-            startNs = nowNs; startFrame = frame; startRenders = renders
-            return false
-        }
-        if (nowNs - startNs < windowNs) return false
-        val advanced = frame - startFrame
-        val shown = renders - startRenders
-        if (!warmed) warmed = true
-        else bad = if (advanced >= minAdvance && shown < advanced * ratio) bad + 1 else 0
-        startNs = nowNs; startFrame = frame; startRenders = renders
-        return bad >= windows
-    }
-}
-
 class FramePlayer internal constructor(private val store: FrameStore, val width: Int, val height: Int) {
     class Shown(val frame: Int, val bitmap: Bitmap, val at: Long)
 
@@ -307,7 +279,6 @@ object PreviewCache {
     private var generation = 0
     var fit by mutableFloatStateOf(0f)
     var checkerCell by mutableFloatStateOf(25f)
-    var hinted = 0
     var automatic = false
         private set
     private var preparedCell = 0f

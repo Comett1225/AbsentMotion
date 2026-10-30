@@ -1784,10 +1784,6 @@
     <string name="preview_cache_removed">Отрендеренный предпросмотр удалён</string>
     <string name="preview_cache_no_memory">Недостаточно памяти для отрендеренного предпросмотра. Он удалён.</string>
     <string name="preview_cache_failed">Не удалось отрендерить предпросмотр.</string>
-    <string name="preview_cache_hint">Воспроизведение тормозит. Отрендерить плавный предпросмотр?</string>
-    <string name="preview_cache_hint_action">Отрендерить</string>
-    <string name="preview_cache_close">Закрыть</string>
-    <string name="preview_cache_hint_setting">Предлагать плавный предпросмотр, если воспроизведение тормозит</string>
     <string name="export_filename">Имя файла</string>
     <string name="export_filename_generated">Создаётся при экспорте</string>
     <string name="export_filename_random">Случайное числовое имя файла</string>

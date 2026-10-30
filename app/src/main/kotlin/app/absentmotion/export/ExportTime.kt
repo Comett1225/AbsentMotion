@@ -96,6 +96,18 @@ class ExportSizes(context: Context) {
     }
 }
 
+internal fun exportSecondsLeft(elapsedS: Double, progress: Float, plannedMs: Long?): Int? {
+    if (progress >= 1f) return 0
+    val planned = plannedMs?.takeIf { it > 0 }?.let { it / 1000.0 }
+    val measured = if (progress > 0.01f) elapsedS / progress else null
+    val trust = (progress / 0.25f).coerceIn(0f, 1f).toDouble()
+    val total = when {
+        planned != null && measured != null -> planned * (1 - trust) + measured * trust
+        else -> measured ?: planned ?: return null
+    }
+    return (total - elapsedS).coerceAtLeast(0.0).roundToLong().toInt()
+}
+
 fun timeLabel(ms: Long): UiText = when {
     ms < 10_000 -> txt(R.string.export_time_few_seconds)
     ms < 90_000 -> ((ms + 2_500) / 5_000 * 5).toInt().let { UiText.plural(R.plurals.export_time_seconds, it, it.toString()) }

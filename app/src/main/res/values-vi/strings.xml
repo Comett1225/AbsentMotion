@@ -1712,10 +1712,6 @@
     <string name="preview_cache_removed">Đã xóa bản xem trước đã kết xuất</string>
     <string name="preview_cache_no_memory">Không đủ bộ nhớ cho bản xem trước đã kết xuất. Bản này đã bị xóa.</string>
     <string name="preview_cache_failed">Không thể kết xuất bản xem trước.</string>
-    <string name="preview_cache_hint">Phát lại bị giật. Kết xuất bản xem trước mượt?</string>
-    <string name="preview_cache_hint_action">Kết xuất</string>
-    <string name="preview_cache_close">Đóng</string>
-    <string name="preview_cache_hint_setting">Đề nghị bản xem trước mượt khi phát lại bị giật</string>
     <string name="export_filename">Tên tệp</string>
     <string name="export_filename_generated">Tạo khi xuất</string>
     <string name="export_filename_random">Tên tệp bằng số ngẫu nhiên</string>

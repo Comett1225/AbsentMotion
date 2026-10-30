@@ -1736,10 +1736,6 @@
     <string name="preview_cache_removed">রেন্ডার করা প্রিভিউ মুছে ফেলা হয়েছে</string>
     <string name="preview_cache_no_memory">রেন্ডার করা প্রিভিউয়ের জন্য যথেষ্ট মেমোরি নেই। এটি মুছে ফেলা হয়েছে।</string>
     <string name="preview_cache_failed">প্রিভিউ রেন্ডার করা যায়নি।</string>
-    <string name="preview_cache_hint">প্লেব্যাক আটকে আটকে চলছে। একটি স্মুথ প্রিভিউ রেন্ডার করবেন?</string>
-    <string name="preview_cache_hint_action">রেন্ডার</string>
-    <string name="preview_cache_close">বন্ধ করুন</string>
-    <string name="preview_cache_hint_setting">প্লেব্যাক আটকে আটকে চললে স্মুথ প্রিভিউয়ের প্রস্তাব দিন</string>
     <string name="export_filename">ফাইলের নাম</string>
     <string name="export_filename_generated">এক্সপোর্ট করার সময় তৈরি হবে</string>
     <string name="export_filename_random">এলোমেলো সংখ্যার ফাইলের নাম</string>

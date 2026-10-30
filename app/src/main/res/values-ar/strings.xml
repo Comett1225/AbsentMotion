@@ -1832,10 +1832,6 @@
     <string name="preview_cache_removed">تمت إزالة المعاينة المصيّرة</string>
     <string name="preview_cache_no_memory">لا توجد ذاكرة كافية لمعاينة مصيّرة. تمت إزالتها.</string>
     <string name="preview_cache_failed">تعذر تصيير المعاينة.</string>
-    <string name="preview_cache_hint">التشغيل متقطع. هل تريد تصيير معاينة سلسة؟</string>
-    <string name="preview_cache_hint_action">تصيير</string>
-    <string name="preview_cache_close">إغلاق</string>
-    <string name="preview_cache_hint_setting">اقتراح معاينة سلسة عند تقطع التشغيل</string>
     <string name="export_filename">اسم الملف</string>
     <string name="export_filename_generated">يُنشأ عند التصدير</string>
     <string name="export_filename_random">اسم ملف بأرقام عشوائية</string>
