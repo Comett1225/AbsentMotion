@@ -1006,6 +1006,8 @@
     <string name="structure_group_mask">Grup ve maske</string>
     <string name="structure_group_exclude">Grup ve hariç tut</string>
     <string name="structure_delete_selected">Seçili katmanları sil</string>
+    <string name="structure_link_parent">Üst katmana bağla</string>
+    <string name="structure_link_parent_skipped">Bazı katmanlar bağlanmadı, çünkü seçilen üst katman onlara bağlı.</string>
     <string name="structure_alignment_options">Hizalama seçenekleri</string>
     <string name="structure_group_options">Grup seçenekleri</string>
     <string name="structure_align_left">Sola hizala</string>
@@ -1794,4 +1796,11 @@
     <string name="crop_reset">Sıfırla</string>
     <string name="a11y_crop_ratio">En boy oranı %1$s</string>
     <string name="a11y_crop_area">Kırpma alanı. Kırpmak için bir köşeyi veya kenarı sürükleyin ya da kırpmayı taşımak için içini sürükleyin.</string>
+    <string name="effect_palette_presets">Ön ayarlar</string>
+    <string name="effect_palette_import">İçe aktar</string>
+    <plurals name="effect_palette_colors">
+        <item quantity="one">%1$s renk</item>
+        <item quantity="other">%1$s renk</item>
+    </plurals>
+    <string name="effect_palette_unreadable">Bu dosyadan hiç renk okunamadı.</string>
 </resources>

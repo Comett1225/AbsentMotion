@@ -989,6 +989,8 @@
     <string name="structure_group_mask">Nhóm &amp; mặt nạ</string>
     <string name="structure_group_exclude">Nhóm &amp; loại trừ</string>
     <string name="structure_delete_selected">Xóa các lớp đã chọn</string>
+    <string name="structure_link_parent">Liên kết với lớp cha</string>
+    <string name="structure_link_parent_skipped">Một số lớp không được liên kết vì lớp cha đã chọn đang liên kết với chúng.</string>
     <string name="structure_alignment_options">Tùy chọn căn chỉnh</string>
     <string name="structure_group_options">Tùy chọn nhóm</string>
     <string name="structure_align_left">Căn trái</string>
@@ -1770,4 +1772,10 @@
     <string name="crop_reset">Đặt lại</string>
     <string name="a11y_crop_ratio">Tỷ lệ khung hình %1$s</string>
     <string name="a11y_crop_area">Vùng cắt. Kéo một góc hoặc một cạnh để cắt, hoặc kéo bên trong để di chuyển vùng cắt.</string>
+    <string name="effect_palette_presets">Preset</string>
+    <string name="effect_palette_import">Nhập</string>
+    <plurals name="effect_palette_colors">
+        <item quantity="other">%1$s màu</item>
+    </plurals>
+    <string name="effect_palette_unreadable">Không đọc được màu nào từ tệp này.</string>
 </resources>

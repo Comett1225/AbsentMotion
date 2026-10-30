@@ -25,6 +25,7 @@ data class EffectParam(
     val after: String? = null,
     val legacyDefault: String? = null,
     val showWhen: Pair<String, Set<Int>>? = null,
+    val palette: Boolean = false,
 ) {
     val type: String get() = when (kind) { "point" -> "vec2"; "color" -> "color"; "switch" -> "bool"; "text" -> "string"; else -> "float" }
     val missingDefault: String get() = legacyDefault ?: default
@@ -47,6 +48,8 @@ data class EffectParam(
             val id = json.getString("id")
             val kind = json.getString("type")
             require(kind in Kinds) { "$id: unknown type $kind" }
+            val palette = json.optBoolean("palette")
+            require(!palette || kind == "text") { "$id: palette needs type text" }
             val d = json.opt("default")
             val default = format(id, kind, d)
             val legacyDefault = if (json.has("legacyDefault")) format(id, kind, json.get("legacyDefault")) else null
@@ -62,7 +65,7 @@ data class EffectParam(
                 json.optDouble("min", -Float.MAX_VALUE.toDouble()).toFloat(), json.optDouble("max", Float.MAX_VALUE.toDouble()).toFloat(),
                 json.optDouble("step", 0.01).toFloat(), percent = json.optBoolean("percent"), pixels = json.optBoolean("pixels"), unit = json.optString("unit"),
                 layerTime = json.optBoolean("layerTime"), after = json.optString("after").takeIf { it.isNotEmpty() }, legacyDefault = legacyDefault,
-                showWhen = showWhen)
+                showWhen = showWhen, palette = palette)
         }
     }
 }
@@ -122,7 +125,8 @@ data class EffectDefinition(
     fun shown(param: EffectParam, instance: XmlNode, t: Float): Boolean {
         val (id, values) = param.showWhen ?: return true
         val raw = instance.children.firstOrNull { it.name == "property" && it["name"] == id }?.valueAt(t) ?: params.firstOrNull { it.id == id }?.missingDefault
-        return raw?.toFloatOrNull()?.let { kotlin.math.round(it).toInt() } in values
+        val number = when (raw) { "true" -> 1f; "false" -> 0f; else -> raw?.toFloatOrNull() }
+        return number?.let { kotlin.math.round(it).toInt() } in values
     }
 
     fun runtimeXml(): String = XmlNode("effect", listOfNotNull("id" to id, sksl?.let { "sksl" to it }).toMap(),

@@ -2854,7 +2854,7 @@
    }
   },
   "palettemap": {
-   "description": "Her pikseli en fazla sekiz renkli bir paletin en yakın rengine eşler. Alfa, eşlenen renkleri orijinal katmanla karıştırır.",
+   "description": "Her pikseli bir paletteki en yakın renge eşler: seçtiğiniz en fazla sekiz renk ya da bir hazır ayardan veya içe aktardığınız bir dosyadan en fazla 512 renklik bir palet. Titreşim desenleri komşu palet renklerini karıştırarak daha fazla ton gösterir. Alfa, eşlenen renkleri orijinal katmanla karıştırır.",
    "name": "Palet eşleme",
    "params": {
     "alpha": {
@@ -2889,6 +2889,44 @@
     },
     "dither": {
      "label": "Titreşim"
+    },
+    "palette": {
+     "label": "Palet"
+    },
+    "pattern": {
+     "label": "Titreşim Deseni",
+     "options": [
+      "Yok",
+      "Gürültü",
+      "Dama",
+      "Bayer 2x2",
+      "Bayer 3x3",
+      "Bayer 4x4",
+      "Bayer 8x8",
+      "Kümelenmiş Nokta 4x4",
+      "Kümelenmiş Nokta 8x8",
+      "Yatay Çizgiler",
+      "Dikey Çizgiler",
+      "Çapraz Çizgiler",
+      "Floyd-Steinberg",
+      "False Floyd-Steinberg",
+      "Sierra Lite",
+      "Fan",
+      "Shiau-Fan",
+      "Jarvis-Judice-Ninke",
+      "Stucki",
+      "Burkes",
+      "Sierra",
+      "Two-Row Sierra",
+      "Atkinson"
+     ]
+    },
+    "source": {
+     "label": "Renk Kaynağı",
+     "options": [
+      "Renkler",
+      "Palet"
+     ]
     }
    }
   },
@@ -2913,6 +2951,91 @@
     },
     "vignette": {
      "label": "Vinyet"
+    }
+   }
+  },
+  "pixeltiles": {
+   "description": "Katmanı küçük piksel desenli karolardan oluşan bir ızgarayla yeniden kurar. Her karo, deseninin ne kadarını çizeceğine altındaki parlaklığa bakarak karar verir; ASCII sanatı ile mozaiğin karışımı gibi. Kaos, ızgarayı rastgele karolarla bozar.",
+   "name": "Piksel Karolar",
+   "params": {
+    "alpha": {
+     "label": "Karışım"
+    },
+    "background": {
+     "label": "Arka Plan"
+    },
+    "brightness": {
+     "label": "Parlaklık"
+    },
+    "chaos": {
+     "label": "Kaos"
+    },
+    "chaosAmount": {
+     "label": "Kaos Miktarı"
+    },
+    "chaosSpeed": {
+     "label": "Kaos Hızı"
+    },
+    "contrast": {
+     "label": "Kontrast"
+    },
+    "detail": {
+     "label": "Ayrıntı"
+    },
+    "flip": {
+     "label": "Pikselleri Ters Çevir"
+    },
+    "foreground": {
+     "label": "Ön Plan"
+    },
+    "levels": {
+     "label": "Ton Sayısı"
+    },
+    "offset": {
+     "label": "Desen Ofseti"
+    },
+    "original": {
+     "label": "Orijinal Rengi Kullan"
+    },
+    "pattern": {
+     "label": "Desen",
+     "options": [
+      "Yüksek Ayrıntı",
+      "Rakamlar ve Harfler",
+      "Yatay Çizgiler",
+      "Noktalar",
+      "Dikey Çizgiler",
+      "Grunge",
+      "Halkalar",
+      "Düz",
+      "Sol Çapraz",
+      "Sağ Çapraz"
+     ]
+    },
+    "randomPattern": {
+     "label": "Rastgele Desenler"
+    },
+    "scramble": {
+     "label": "Karoları Karıştır"
+    },
+    "seed": {
+     "label": "Rastgele Tohum"
+    },
+    "tile": {
+     "label": "Karo Boyutu"
+    },
+    "tone": {
+     "label": "Ton Kaynağı",
+     "options": [
+      "Parlaklık",
+      "Ortalama",
+      "Kırmızı",
+      "Yeşil",
+      "Mavi"
+     ]
+    },
+    "transparent": {
+     "label": "Saydam Arka Plan"
     }
    }
   },
@@ -3516,6 +3639,52 @@
     },
     "threshold": {
      "label": "Eşik"
+    }
+   }
+  },
+  "retrodither": {
+   "description": "Katmanı retro piksel grafiğe dönüştürür: her piksel bloğu, eski bir konsolun ya da bilgisayarın paleti veya içe aktardığınız bir palet gibi bir paletten renk alır; titreşim deseni de palet renklerini karıştırarak daha fazla ton varmış gibi gösterir.",
+   "name": "Retro Titreşim",
+   "params": {
+    "alpha": {
+     "label": "Karışım"
+    },
+    "dither": {
+     "label": "Güç"
+    },
+    "palette": {
+     "label": "Palet"
+    },
+    "pattern": {
+     "label": "Titreşim",
+     "options": [
+      "Yok",
+      "Gürültü",
+      "Dama",
+      "Bayer 2x2",
+      "Bayer 3x3",
+      "Bayer 4x4",
+      "Bayer 8x8",
+      "Kümelenmiş Nokta 4x4",
+      "Kümelenmiş Nokta 8x8",
+      "Yatay Çizgiler",
+      "Dikey Çizgiler",
+      "Çapraz Çizgiler",
+      "Floyd-Steinberg",
+      "False Floyd-Steinberg",
+      "Sierra Lite",
+      "Fan",
+      "Shiau-Fan",
+      "Jarvis-Judice-Ninke",
+      "Stucki",
+      "Burkes",
+      "Sierra",
+      "Two-Row Sierra",
+      "Atkinson"
+     ]
+    },
+    "pixel": {
+     "label": "Piksel Boyutu"
     }
    }
   },

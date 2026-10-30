@@ -2854,7 +2854,7 @@
    }
   },
   "palettemap": {
-   "description": "Memetakan tiap piksel ke warna terdekat dalam palet berisi hingga delapan warna; Alpha memadukan warna hasilnya dengan lapisan asli.",
+   "description": "Mengubah setiap piksel menjadi warna terdekat dalam palet: hingga delapan warna yang Anda pilih, atau palet hingga 512 warna dari preset atau file yang Anda impor. Pola dither memadukan warna palet yang berdekatan agar terlihat lebih banyak nada. Alpha memadukan warna hasilnya dengan lapisan asli.",
    "name": "Peta Palet",
    "params": {
     "alpha": {
@@ -2889,6 +2889,44 @@
     },
     "dither": {
      "label": "Dither"
+    },
+    "palette": {
+     "label": "Palet"
+    },
+    "pattern": {
+     "label": "Pola Dither",
+     "options": [
+      "Tidak ada",
+      "Noise",
+      "Kotak-kotak",
+      "Bayer 2x2",
+      "Bayer 3x3",
+      "Bayer 4x4",
+      "Bayer 8x8",
+      "Titik Kelompok 4x4",
+      "Titik Kelompok 8x8",
+      "Garis Horizontal",
+      "Garis Vertikal",
+      "Garis Diagonal",
+      "Floyd-Steinberg",
+      "False Floyd-Steinberg",
+      "Sierra Lite",
+      "Fan",
+      "Shiau-Fan",
+      "Jarvis-Judice-Ninke",
+      "Stucki",
+      "Burkes",
+      "Sierra",
+      "Two-Row Sierra",
+      "Atkinson"
+     ]
+    },
+    "source": {
+     "label": "Sumber Warna",
+     "options": [
+      "Warna",
+      "Palet"
+     ]
     }
    }
   },
@@ -2913,6 +2951,91 @@
     },
     "vignette": {
      "label": "Vignette"
+    }
+   }
+  },
+  "pixeltiles": {
+   "description": "Membangun ulang lapisan dari kisi ubin kecil berpola piksel. Setiap ubin menentukan seberapa banyak polanya digambar dari kecerahan di bawahnya, seperti perpaduan seni ASCII dan mosaik. Kekacauan memecah kisi dengan ubin acak.",
+   "name": "Ubin Piksel",
+   "params": {
+    "alpha": {
+     "label": "Campuran"
+    },
+    "background": {
+     "label": "Latar Belakang"
+    },
+    "brightness": {
+     "label": "Kecerahan"
+    },
+    "chaos": {
+     "label": "Kekacauan"
+    },
+    "chaosAmount": {
+     "label": "Jumlah Kekacauan"
+    },
+    "chaosSpeed": {
+     "label": "Kecepatan Kekacauan"
+    },
+    "contrast": {
+     "label": "Kontras"
+    },
+    "detail": {
+     "label": "Detail"
+    },
+    "flip": {
+     "label": "Balik Piksel"
+    },
+    "foreground": {
+     "label": "Latar Depan"
+    },
+    "levels": {
+     "label": "Tingkat Nada"
+    },
+    "offset": {
+     "label": "Offset Pola"
+    },
+    "original": {
+     "label": "Gunakan Warna Asli"
+    },
+    "pattern": {
+     "label": "Pola",
+     "options": [
+      "Detail Tinggi",
+      "Angka & Huruf",
+      "Garis Horizontal",
+      "Titik",
+      "Garis Vertikal",
+      "Grunge",
+      "Cincin",
+      "Padat",
+      "Diagonal Kiri",
+      "Diagonal Kanan"
+     ]
+    },
+    "randomPattern": {
+     "label": "Pola Acak"
+    },
+    "scramble": {
+     "label": "Acak Ubin"
+    },
+    "seed": {
+     "label": "Seed Acak"
+    },
+    "tile": {
+     "label": "Ukuran Ubin"
+    },
+    "tone": {
+     "label": "Sumber Nada",
+     "options": [
+      "Luminans",
+      "Rata-rata",
+      "Merah",
+      "Hijau",
+      "Biru"
+     ]
+    },
+    "transparent": {
+     "label": "Latar Belakang Transparan"
     }
    }
   },
@@ -3516,6 +3639,52 @@
     },
     "threshold": {
      "label": "Ambang"
+    }
+   }
+  },
+  "retrodither": {
+   "description": "Mengubah lapisan menjadi grafis piksel retro: setiap blok piksel mengambil warna dari palet, seperti palet konsol atau komputer lama atau palet yang Anda impor, dan pola dither memadukan warna palet untuk memberi kesan lebih banyak nada.",
+   "name": "Dither Retro",
+   "params": {
+    "alpha": {
+     "label": "Campuran"
+    },
+    "dither": {
+     "label": "Kekuatan"
+    },
+    "palette": {
+     "label": "Palet"
+    },
+    "pattern": {
+     "label": "Dither",
+     "options": [
+      "Tidak ada",
+      "Noise",
+      "Kotak-kotak",
+      "Bayer 2x2",
+      "Bayer 3x3",
+      "Bayer 4x4",
+      "Bayer 8x8",
+      "Titik Kelompok 4x4",
+      "Titik Kelompok 8x8",
+      "Garis Horizontal",
+      "Garis Vertikal",
+      "Garis Diagonal",
+      "Floyd-Steinberg",
+      "False Floyd-Steinberg",
+      "Sierra Lite",
+      "Fan",
+      "Shiau-Fan",
+      "Jarvis-Judice-Ninke",
+      "Stucki",
+      "Burkes",
+      "Sierra",
+      "Two-Row Sierra",
+      "Atkinson"
+     ]
+    },
+    "pixel": {
+     "label": "Ukuran Piksel"
     }
    }
   },

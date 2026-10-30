@@ -2854,7 +2854,7 @@
    }
   },
   "palettemap": {
-   "description": "Mapeia cada pixel para a cor mais próxima em uma paleta de até oito cores. Alfa mistura as cores mapeadas com a camada original.",
+   "description": "Troca cada pixel pela cor mais próxima de uma paleta: até oito cores que você escolhe, ou uma paleta de até 512 cores de uma predefinição ou de um arquivo importado. Os padrões de dither misturam cores vizinhas da paleta para mostrar mais tons. Alfa mistura as cores mapeadas com a camada original.",
    "name": "Mapa de paleta",
    "params": {
     "alpha": {
@@ -2889,6 +2889,44 @@
     },
     "dither": {
      "label": "Dither"
+    },
+    "palette": {
+     "label": "Paleta"
+    },
+    "pattern": {
+     "label": "Padrão de dither",
+     "options": [
+      "Nenhum",
+      "Ruído",
+      "Xadrez",
+      "Bayer 2x2",
+      "Bayer 3x3",
+      "Bayer 4x4",
+      "Bayer 8x8",
+      "Pontos agrupados 4x4",
+      "Pontos agrupados 8x8",
+      "Linhas horizontais",
+      "Linhas verticais",
+      "Linhas diagonais",
+      "Floyd-Steinberg",
+      "False Floyd-Steinberg",
+      "Sierra Lite",
+      "Fan",
+      "Shiau-Fan",
+      "Jarvis-Judice-Ninke",
+      "Stucki",
+      "Burkes",
+      "Sierra",
+      "Two-Row Sierra",
+      "Atkinson"
+     ]
+    },
+    "source": {
+     "label": "Cores de",
+     "options": [
+      "Cores",
+      "Paleta"
+     ]
     }
    }
   },
@@ -2913,6 +2951,91 @@
     },
     "vignette": {
      "label": "Vinheta"
+    }
+   }
+  },
+  "pixeltiles": {
+   "description": "Reconstrói a camada com uma grade de pequenos blocos com padrões de pixels. Cada bloco decide quanto do seu padrão desenha pelo brilho embaixo dele, como uma mistura de arte ASCII e mosaico. O caos quebra a grade com blocos aleatórios.",
+   "name": "Blocos de pixels",
+   "params": {
+    "alpha": {
+     "label": "Mistura"
+    },
+    "background": {
+     "label": "Fundo"
+    },
+    "brightness": {
+     "label": "Brilho"
+    },
+    "chaos": {
+     "label": "Caos"
+    },
+    "chaosAmount": {
+     "label": "Quantidade de caos"
+    },
+    "chaosSpeed": {
+     "label": "Velocidade do caos"
+    },
+    "contrast": {
+     "label": "Contraste"
+    },
+    "detail": {
+     "label": "Detalhe"
+    },
+    "flip": {
+     "label": "Inverter pixels"
+    },
+    "foreground": {
+     "label": "Primeiro plano"
+    },
+    "levels": {
+     "label": "Tons"
+    },
+    "offset": {
+     "label": "Deslocamento do padrão"
+    },
+    "original": {
+     "label": "Usar cor original"
+    },
+    "pattern": {
+     "label": "Padrão",
+     "options": [
+      "Alto detalhe",
+      "Números e letras",
+      "Linhas horizontais",
+      "Pontos",
+      "Linhas verticais",
+      "Grunge",
+      "Anéis",
+      "Sólido",
+      "Diagonal esquerda",
+      "Diagonal direita"
+     ]
+    },
+    "randomPattern": {
+     "label": "Padrões aleatórios"
+    },
+    "scramble": {
+     "label": "Embaralhar blocos"
+    },
+    "seed": {
+     "label": "Semente aleatória"
+    },
+    "tile": {
+     "label": "Tamanho do bloco"
+    },
+    "tone": {
+     "label": "Tom de",
+     "options": [
+      "Luminância",
+      "Média",
+      "Vermelho",
+      "Verde",
+      "Azul"
+     ]
+    },
+    "transparent": {
+     "label": "Fundo transparente"
     }
    }
   },
@@ -3516,6 +3639,52 @@
     },
     "threshold": {
      "label": "Limite"
+    }
+   }
+  },
+  "retrodither": {
+   "description": "Transforma a camada em gráficos de pixel retrô: cada bloco de pixels pega uma cor de uma paleta, como a de um console ou computador antigo ou uma que você importar, e um padrão de dither mistura as cores da paleta para simular mais tons.",
+   "name": "Dither retrô",
+   "params": {
+    "alpha": {
+     "label": "Mistura"
+    },
+    "dither": {
+     "label": "Intensidade"
+    },
+    "palette": {
+     "label": "Paleta"
+    },
+    "pattern": {
+     "label": "Dither",
+     "options": [
+      "Nenhum",
+      "Ruído",
+      "Xadrez",
+      "Bayer 2x2",
+      "Bayer 3x3",
+      "Bayer 4x4",
+      "Bayer 8x8",
+      "Pontos agrupados 4x4",
+      "Pontos agrupados 8x8",
+      "Linhas horizontais",
+      "Linhas verticais",
+      "Linhas diagonais",
+      "Floyd-Steinberg",
+      "False Floyd-Steinberg",
+      "Sierra Lite",
+      "Fan",
+      "Shiau-Fan",
+      "Jarvis-Judice-Ninke",
+      "Stucki",
+      "Burkes",
+      "Sierra",
+      "Two-Row Sierra",
+      "Atkinson"
+     ]
+    },
+    "pixel": {
+     "label": "Tamanho do pixel"
     }
    }
   },

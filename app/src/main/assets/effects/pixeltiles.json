@@ -1,0 +1,217 @@
+{
+ "id": "pixeltiles",
+ "name": "Pixel Tiles",
+ "category": "stylize",
+ "since": "4.3.0",
+ "description": "Rebuilds the layer from a grid of small pixel-pattern tiles. Each tile picks how much of its pattern to draw from the brightness under it, like a mix of ASCII art and mosaic. Chaos breaks the grid up with random tiles.",
+ "params": [
+  {
+   "id": "pattern",
+   "label": "Pattern",
+   "type": "choice",
+   "options": [
+    "High Detail",
+    "Numbers & Letters",
+    "Horizontal Lines",
+    "Dots",
+    "Vertical Lines",
+    "Grunge",
+    "Rings",
+    "Solid",
+    "Diagonal Left",
+    "Diagonal Right"
+   ],
+   "default": 3
+  },
+  {
+   "id": "tone",
+   "label": "Tone From",
+   "type": "choice",
+   "options": [
+    "Luminance",
+    "Average",
+    "Red",
+    "Green",
+    "Blue"
+   ],
+   "default": 0
+  },
+  {
+   "id": "tile",
+   "label": "Tile Size",
+   "type": "float",
+   "default": 16,
+   "min": 2,
+   "max": 256,
+   "step": 1
+  },
+  {
+   "id": "detail",
+   "label": "Detail",
+   "type": "float",
+   "default": 8,
+   "min": 2,
+   "max": 16,
+   "step": 1
+  },
+  {
+   "id": "levels",
+   "label": "Shades",
+   "type": "float",
+   "default": 8,
+   "min": 2,
+   "max": 16,
+   "step": 1
+  },
+  {
+   "id": "brightness",
+   "label": "Brightness",
+   "type": "float",
+   "default": 0,
+   "min": -1,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "contrast",
+   "label": "Contrast",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 4,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "foreground",
+   "label": "Foreground",
+   "type": "color",
+   "default": "#ffffff"
+  },
+  {
+   "id": "background",
+   "label": "Background",
+   "type": "color",
+   "default": "#000000"
+  },
+  {
+   "id": "original",
+   "label": "Use Original Color",
+   "type": "switch",
+   "default": false
+  },
+  {
+   "id": "transparent",
+   "label": "Transparent Background",
+   "type": "switch",
+   "default": false
+  },
+  {
+   "id": "offset",
+   "label": "Pattern Offset",
+   "type": "point",
+   "default": [
+    0,
+    0
+   ],
+   "min": -5000,
+   "max": 5000,
+   "step": 1,
+   "pixels": true
+  },
+  {
+   "id": "chaos",
+   "label": "Chaos",
+   "type": "switch",
+   "default": false
+  },
+  {
+   "id": "chaosAmount",
+   "label": "Chaos Amount",
+   "type": "float",
+   "default": 0.25,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true,
+   "when": {
+    "chaos": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "seed",
+   "label": "Random Seed",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 9999,
+   "step": 1,
+   "when": {
+    "chaos": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "chaosSpeed",
+   "label": "Chaos Speed",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 30,
+   "step": 0.1,
+   "when": {
+    "chaos": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "randomPattern",
+   "label": "Random Patterns",
+   "type": "switch",
+   "default": true,
+   "when": {
+    "chaos": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "flip",
+   "label": "Flip Pixels",
+   "type": "switch",
+   "default": true,
+   "when": {
+    "chaos": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "scramble",
+   "label": "Scramble Tiles",
+   "type": "switch",
+   "default": false,
+   "when": {
+    "chaos": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "alpha",
+   "label": "Mix",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float pattern;\nuniform float tone;\nuniform float tile;\nuniform float detail;\nuniform float levels;\nuniform float brightness;\nuniform float contrast;\nlayout(color) uniform half4 foreground;\nlayout(color) uniform half4 background;\nuniform float original;\nuniform float transparent;\nuniform float2 offset;\nuniform float chaos;\nuniform float chaosAmount;\nuniform float seed;\nuniform float chaosSpeed;\nuniform float randomPattern;\nuniform float flip;\nuniform float scramble;\nuniform float alpha;\nfloat hash13(float3 p) {\n    p = fract(p * 0.1031);\n    p += dot(p, p.zyx + 31.32);\n    return fract((p.x + p.y) * p.z);\n}\nfloat glyph(float n) {\n    if (n < 0.5) return 11415.0;\n    if (n < 1.5) return 29330.0;\n    if (n < 2.5) return 18727.0;\n    if (n < 3.5) return 23213.0;\n    if (n < 4.5) return 23497.0;\n    if (n < 5.5) return 29671.0;\n    if (n < 6.5) return 23533.0;\n    if (n < 7.5) return 31183.0;\n    if (n < 8.5) return 31599.0;\n    return 31727.0;\n}\nhalf4 average(float2 o, float s) {\n    return (image.eval(o + s * float2(0.25, 0.25)) + image.eval(o + s * float2(0.75, 0.25)) + image.eval(o + s * float2(0.25, 0.75)) + image.eval(o + s * float2(0.75, 0.75))) * 0.25;\n}\nfloat ink(float kind, float v, float2 u, float2 cell, float d) {\n    float2 q = (floor(u * d) + 0.5) / d;\n    if (kind < 0.5) return v > fract(0.5 + floor(u.x * d) * 0.7548776662 + floor(u.y * d) * 0.56984029) ? 1.0 : 0.0;\n    if (kind < 1.5) {\n        float x = floor(u.x * 5.0) - 1.0, y = floor(u.y * 7.0) - 1.0;\n        if (v < 0.04 || x < 0.0 || x > 2.0 || y < 0.0 || y > 4.0) return 0.0;\n        float bit = 14.0 - (y * 3.0 + x);\n        return mod(floor(glyph(floor((v - 0.04) / 0.96 * 9.999)) / exp2(bit)), 2.0);\n    }\n    if (kind < 2.5) return abs(q.y - 0.5) * 2.0 < v ? 1.0 : 0.0;\n    if (kind < 3.5) return length(q - 0.5) < 0.7072 * sqrt(v) ? 1.0 : 0.0;\n    if (kind < 4.5) return abs(q.x - 0.5) * 2.0 < v ? 1.0 : 0.0;\n    if (kind < 5.5) return hash13(float3(floor(u * d) + cell * 17.0, seed)) < v ? 1.0 : 0.0;\n    if (kind < 6.5) return fract(length(q - 0.5) * 2.0) < v ? 1.0 : 0.0;\n    if (kind < 7.5) return v;\n    if (kind < 8.5) return abs(q.x - q.y) < v ? 1.0 : 0.0;\n    return abs(q.x + q.y - 1.0) < v ? 1.0 : 0.0;\n}\nhalf4 main(float2 coord) {\n    float s = max(tile, 1.0);\n    float d = clamp(floor(detail + 0.5), 1.0, 64.0);\n    float2 p = (coord - offset) / s;\n    float2 cell = floor(p);\n    float2 u = p - cell;\n    float kind = pattern;\n    float flipped = 0.0;\n    float2 from = cell;\n    if (chaos > 0.5) {\n        float phase = chaosSpeed > 0.0 ? floor(time * chaosSpeed) : 0.0;\n        float3 key = float3(cell, seed * 7.13 + phase * 3.17);\n        if (hash13(key) < chaosAmount) {\n            if (randomPattern > 0.5) kind = floor(hash13(key + 11.0) * 9.999);\n            if (flip > 0.5) flipped = 1.0;\n            if (scramble > 0.5) from = cell + floor((float2(hash13(key + 23.0), hash13(key + 37.0)) - 0.5) * 9.0);\n        }\n    }\n    half4 c = average(from * s + offset, s);\n    if (c.a <= 0.0) return mix(image.eval(coord), half4(0.0), half(clamp(alpha, 0.0, 1.0)));\n    float3 rgb = float3(c.rgb) / float(c.a);\n    float v = tone < 0.5 ? dot(rgb, float3(0.299, 0.587, 0.114)) : tone < 1.5 ? (rgb.r + rgb.g + rgb.b) / 3.0 : tone < 2.5 ? rgb.r : tone < 3.5 ? rgb.g : rgb.b;\n    v = clamp((v - 0.5) * contrast + 0.5 + brightness, 0.0, 1.0);\n    float n = max(floor(levels + 0.5), 2.0) - 1.0;\n    v = floor(v * n + 0.5) / n;\n    float k = ink(kind, v, u, cell, d);\n    if (flipped > 0.5) k = 1.0 - k;\n    half4 fg = original > 0.5 ? half4(half3(rgb), 1.0) : half4(foreground.rgb * foreground.a, foreground.a);\n    half4 bg = transparent > 0.5 ? half4(0.0) : half4(background.rgb * background.a, background.a);\n    half4 tiles = mix(bg, fg, half(k)) * c.a;\n    return mix(image.eval(coord), tiles, half(clamp(alpha, 0.0, 1.0)));\n}\n"
+}

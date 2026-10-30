@@ -3,8 +3,18 @@
  "name": "Palette Map",
  "category": "color",
  "since": "3.0.0",
- "description": "Maps each pixel to the nearest color in a palette of up to eight colors. Alpha blends the mapped colors with the original layer.",
+ "description": "Maps each pixel to the nearest color in a palette: up to eight colors you pick, or a palette of up to 512 colors from a preset or an imported file. Dither patterns mix neighbouring palette colors to show more shades. Alpha blends the mapped colors with the original layer.",
  "params": [
+  {
+   "id": "source",
+   "label": "Colors From",
+   "type": "choice",
+   "options": [
+    "Colors",
+    "Palette"
+   ],
+   "default": 0
+  },
   {
    "id": "colors",
    "label": "Colors",
@@ -12,65 +22,181 @@
    "default": 5,
    "min": 2,
    "max": 8,
-   "step": 1
+   "step": 1,
+   "when": {
+    "source": [
+     0
+    ]
+   }
   },
   {
    "id": "color1",
    "label": "Color 1",
    "type": "color",
-   "default": "#1d2b53"
+   "default": "#1d2b53",
+   "when": {
+    "source": [
+     0
+    ]
+   }
   },
   {
    "id": "color2",
    "label": "Color 2",
    "type": "color",
-   "default": "#7e2553"
+   "default": "#7e2553",
+   "when": {
+    "source": [
+     0
+    ]
+   }
   },
   {
    "id": "color3",
    "label": "Color 3",
    "type": "color",
-   "default": "#ff004d"
+   "default": "#ff004d",
+   "when": {
+    "source": [
+     0
+    ]
+   }
   },
   {
    "id": "color4",
    "label": "Color 4",
    "type": "color",
-   "default": "#ffa300"
+   "default": "#ffa300",
+   "when": {
+    "source": [
+     0
+    ]
+   }
   },
   {
    "id": "color5",
    "label": "Color 5",
    "type": "color",
-   "default": "#fff1e8"
+   "default": "#fff1e8",
+   "when": {
+    "source": [
+     0
+    ]
+   }
   },
   {
    "id": "color6",
    "label": "Color 6",
    "type": "color",
-   "default": "#ff55ff"
+   "default": "#ff55ff",
+   "when": {
+    "source": [
+     0
+    ]
+   }
   },
   {
    "id": "color7",
    "label": "Color 7",
    "type": "color",
-   "default": "#ffff55"
+   "default": "#ffff55",
+   "when": {
+    "source": [
+     0
+    ]
+   }
   },
   {
    "id": "color8",
    "label": "Color 8",
    "type": "color",
-   "default": "#ffffff"
+   "default": "#ffffff",
+   "when": {
+    "source": [
+     0
+    ]
+   }
+  },
+  {
+   "id": "palette",
+   "label": "Palette",
+   "type": "text",
+   "palette": true,
+   "default": "000000 1d2b53 7e2553 008751 ab5236 5f574f c2c3c7 fff1e8 ff004d ffa300 ffec27 00e436 29adff 83769c ff77a8 ffccaa",
+   "when": {
+    "source": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "pattern",
+   "label": "Dither Pattern",
+   "type": "choice",
+   "options": [
+    "None",
+    "Noise",
+    "Checker",
+    "Bayer 2x2",
+    "Bayer 3x3",
+    "Bayer 4x4",
+    "Bayer 8x8",
+    "Cluster Dot 4x4",
+    "Cluster Dot 8x8",
+    "Horizontal Lines",
+    "Vertical Lines",
+    "Diagonal Lines",
+    "Floyd-Steinberg",
+    "False Floyd-Steinberg",
+    "Sierra Lite",
+    "Fan",
+    "Shiau-Fan",
+    "Jarvis-Judice-Ninke",
+    "Stucki",
+    "Burkes",
+    "Sierra",
+    "Two-Row Sierra",
+    "Atkinson"
+   ],
+   "default": 0,
+   "legacyDefault": 1
   },
   {
    "id": "dither",
    "label": "Dither",
    "type": "float",
-   "default": 0,
+   "default": 1,
    "min": 0,
    "max": 1,
    "step": 0.001,
-   "percent": true
+   "percent": true,
+   "legacyDefault": 0,
+   "when": {
+    "pattern": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20,
+     21,
+     22
+    ]
+   }
   },
   {
    "id": "alpha",
@@ -83,5 +209,5 @@
    "percent": true
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float colors;\nlayout(color) uniform half4 color1;\nlayout(color) uniform half4 color2;\nlayout(color) uniform half4 color3;\nlayout(color) uniform half4 color4;\nlayout(color) uniform half4 color5;\nlayout(color) uniform half4 color6;\nlayout(color) uniform half4 color7;\nlayout(color) uniform half4 color8;\nuniform float dither;\nuniform float alpha;\nfloat hash12(float2 p) {\n    float3 q = fract(float3(p.xyx) * 0.1031);\n    q += dot(q, q.yzx + 33.33);\n    return fract((q.x + q.y) * q.z);\n}\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return src;\n    float3 rgb = float3(src.rgb) / float(src.a) + (hash12(floor(coord)) - 0.5) * dither * 0.3;\n    float3 best = float3(color1.rgb);\n    float bestD = distance(rgb, best);\n    float d = distance(rgb, float3(color2.rgb));\n    if (d < bestD) { bestD = d; best = float3(color2.rgb); }\n    if (colors > 2.5) { d = distance(rgb, float3(color3.rgb)); if (d < bestD) { bestD = d; best = float3(color3.rgb); } }\n    if (colors > 3.5) { d = distance(rgb, float3(color4.rgb)); if (d < bestD) { bestD = d; best = float3(color4.rgb); } }\n    if (colors > 4.5) { d = distance(rgb, float3(color5.rgb)); if (d < bestD) { bestD = d; best = float3(color5.rgb); } }\n    if (colors > 5.5) { d = distance(rgb, float3(color6.rgb)); if (d < bestD) { bestD = d; best = float3(color6.rgb); } }\n    if (colors > 6.5) { d = distance(rgb, float3(color7.rgb)); if (d < bestD) { bestD = d; best = float3(color7.rgb); } }\n    if (colors > 7.5) { d = distance(rgb, float3(color8.rgb)); if (d < bestD) { bestD = d; best = float3(color8.rgb); } }\n    float3 base = float3(src.rgb) / float(src.a);\n    return half4(half3(mix(base, best, clamp(alpha, 0.0, 1.0))) * src.a, src.a);\n}\n"
+ "sksl": "uniform shader image;\nuniform shader palette;\nuniform shader thresholds;\nuniform float2 size;\nuniform float time;\nuniform float source;\nuniform float colors;\nlayout(color) uniform half4 color1;\nlayout(color) uniform half4 color2;\nlayout(color) uniform half4 color3;\nlayout(color) uniform half4 color4;\nlayout(color) uniform half4 color5;\nlayout(color) uniform half4 color6;\nlayout(color) uniform half4 color7;\nlayout(color) uniform half4 color8;\nuniform float pattern;\nuniform float dither;\nuniform float alpha;\nuniform float paletteSize;\nuniform float paletteSpread;\nuniform half4 swatches[16];\nfloat hash12(float2 p) {\n    float3 q = fract(float3(p.xyx) * 0.1031);\n    q += dot(q, q.yzx + 33.33);\n    return fract((q.x + q.y) * q.z);\n}\nfloat3 lookup(float3 c) {\n    c = clamp(c, 0.0, 1.0);\n    if (paletteSize < 16.5) {\n        float3 best = float3(0.0);\n        float bestD = 100.0;\n        for (int i = 0; i < 16; i++) {\n            if (float(i) >= paletteSize) break;\n            float3 s = float3(swatches[i].rgb);\n            float d = dot(c - s, c - s);\n            if (d < bestD) { bestD = d; best = s; }\n        }\n        return best;\n    }\n    float3 q = floor(c * 31.0 + 0.5);\n    return float3(palette.eval(float2(mod(q.b, 8.0) * 32.0 + q.r + 0.5, floor(q.b / 8.0) * 32.0 + q.g + 0.5)).rgb);\n}\nfloat3 nearest(float3 rgb) {\n    float3 best = float3(color1.rgb);\n    float bestD = distance(rgb, best);\n    float d = distance(rgb, float3(color2.rgb));\n    if (d < bestD) { bestD = d; best = float3(color2.rgb); }\n    if (colors > 2.5) { d = distance(rgb, float3(color3.rgb)); if (d < bestD) { bestD = d; best = float3(color3.rgb); } }\n    if (colors > 3.5) { d = distance(rgb, float3(color4.rgb)); if (d < bestD) { bestD = d; best = float3(color4.rgb); } }\n    if (colors > 4.5) { d = distance(rgb, float3(color5.rgb)); if (d < bestD) { bestD = d; best = float3(color5.rgb); } }\n    if (colors > 5.5) { d = distance(rgb, float3(color6.rgb)); if (d < bestD) { bestD = d; best = float3(color6.rgb); } }\n    if (colors > 6.5) { d = distance(rgb, float3(color7.rgb)); if (d < bestD) { bestD = d; best = float3(color7.rgb); } }\n    if (colors > 7.5) { d = distance(rgb, float3(color8.rgb)); if (d < bestD) { bestD = d; best = float3(color8.rgb); } }\n    return best;\n}\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return src;\n    float3 base = float3(src.rgb) / float(src.a);\n    float3 rgb = base;\n    if (pattern > 0.5 && pattern < 1.5) rgb += (hash12(floor(coord)) - 0.5) * dither * 0.3;\n    else if (pattern > 1.5) rgb += (float(thresholds.eval(floor(coord) + 0.5).r) - 0.5) * dither * paletteSpread;\n    float3 best = source > 0.5 ? lookup(rgb) : nearest(rgb);\n    return half4(half3(mix(base, best, clamp(alpha, 0.0, 1.0))) * src.a, src.a);\n}\n"
 }

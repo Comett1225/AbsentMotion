@@ -5,16 +5,26 @@
 #include "include/core/SkBBHFactory.h"
 #include "include/core/SkCanvas.h"
 #include "include/core/SkColorFilter.h"
+#include "include/core/SkColorSpace.h"
+#include "include/core/SkData.h"
+#include "include/core/SkImage.h"
 #include "include/core/SkM44.h"
 #include "include/core/SkPaint.h"
 #include "include/core/SkPicture.h"
 #include "include/core/SkPictureRecorder.h"
 #include "include/effects/SkImageFilters.h"
+#include "src/core/SkCanvasPriv.h"
+#include "src/core/SkDevice.h"
+#include "src/core/SkSpecialImage.h"
 
 #include <algorithm>
+#include <array>
 #include <cctype>
+#include <climits>
 #include <cmath>
 #include <cstring>
+#include <memory>
+#include <mutex>
 #include <optional>
 #include <string_view>
 #include <vector>
@@ -244,6 +254,10 @@ bool Pointwise(const std::string& sksl) {
     }
     bool sampled = false;
     for (size_t i = sksl.find(".eval("); i != std::string::npos; i = sksl.find(".eval(", i + 1)) {
+        size_t name = i;
+        while (name > 0 && word(name - 1)) name--;
+        const std::string child = sksl.substr(name, i - name);
+        if (child == "palette" || child == "thresholds") continue;
         int depth = 0;
         size_t close = std::string::npos;
         for (size_t k = i + 5; k < sksl.size(); k++) {
@@ -317,6 +331,17 @@ sk_sp<SkImageFilter> GlowFilter(const std::function<float(const char*, int, floa
     return SkImageFilters::RuntimeShader(b, 0, names, inputs, 3);
 }
 
+SkM44 Orientation(const Layer& layer, double timeMs) {
+    Placement p;
+    if (!layer.sight.layers || !SeenPlacement(layer, timeMs, &p) || p.tilt == SkM44()) return SkM44();
+    const float r = p.rotation * 3.14159265f / 180;
+    return SkM44::Rotate({0, 0, 1}, r) * p.tilt * SkM44::Rotate({0, 0, 1}, -r);
+}
+
+std::vector<float> columns3(const SkM44& m) {
+    return {m.rc(0, 0), m.rc(1, 0), m.rc(2, 0), m.rc(0, 1), m.rc(1, 1), m.rc(2, 1), m.rc(0, 2), m.rc(1, 2), m.rc(2, 2)};
+}
+
 sk_sp<SkImageFilter> BuiltInFilter(const std::string& id, const std::function<float(const char*, int, float)>& v,
                                    sk_sp<SkImageFilter> input) {
     if (id == "absent.blur") {
@@ -331,6 +356,233 @@ sk_sp<SkImageFilter> BuiltInFilter(const std::string& id, const std::function<fl
     return SkImageFilters::MatrixTransform(SkMatrix::RotateDeg(angle), linear, blurred);
 }
 
+const int kDiffuse = 12, kMethods = 23, kExact = 4, kMaxColors = 512;
+
+thread_local Upload tUpload;
+
+sk_sp<SkImage> OnGpu(const sk_sp<SkImage>& image) {
+    return image && tUpload ? tUpload(image) : image;
+}
+
+sk_sp<SkImage> Rgba(int w, int h, const void* pixels, SkAlphaType alpha, sk_sp<SkColorSpace> space = nullptr) {
+    const SkImageInfo info = SkImageInfo::Make(w, h, kRGBA_8888_SkColorType, alpha, std::move(space));
+    return SkImages::RasterFromData(info, SkData::MakeWithCopy(pixels, (size_t)w * h * 4), (size_t)w * 4);
+}
+
+sk_sp<SkImage> Owned(std::vector<uint8_t>&& pixels, int w, int h) {
+    auto* held = new std::vector<uint8_t>(std::move(pixels));
+    sk_sp<SkData> data = SkData::MakeWithProc(held->data(), held->size(), [](const void*, void* context) { delete static_cast<std::vector<uint8_t>*>(context); }, held);
+    const SkImageInfo info = SkImageInfo::Make(w, h, kRGBA_8888_SkColorType, kUnpremul_SkAlphaType, SkColorSpace::MakeSRGB());
+    return SkImages::RasterFromData(info, std::move(data), (size_t)w * 4);
+}
+
+int Gap(uint32_t c, int r, int g, int b) {
+    const int dr = (int)(c >> 16 & 255) - r, dg = (int)(c >> 8 & 255) - g, db = (int)(c & 255) - b;
+    return dr * dr + dg * dg + db * db;
+}
+
+uint32_t Closest(const std::vector<uint32_t>& colors, int r, int g, int b, uint32_t* second = nullptr) {
+    int best = INT_MAX, next = INT_MAX;
+    uint32_t out = 0, after = 0;
+    for (uint32_t c : colors) {
+        const int d = Gap(c, r, g, b);
+        if (d < best) next = best, after = out, best = d, out = c;
+        else if (d < next) next = d, after = c;
+    }
+    if (second) *second = next == INT_MAX ? out : after;
+    return out;
+}
+
+}
+
+struct Palette {
+    std::vector<uint32_t> colors;
+    float spread = 1;
+    mutable std::once_flag built;
+    mutable std::vector<uint32_t> table;
+    mutable sk_sp<SkImage> lut;
+
+    void build() const;
+    sk_sp<SkImage> image() const {
+        build();
+        return lut;
+    }
+    uint32_t nearest(int r, int g, int b) const {
+        if (colors.size() <= (size_t)kExact) return Closest(colors, r, g, b);
+        build();
+        const auto level = [](int v) { return (v * 31 + 127) / 255; };
+        const size_t at = 2 * (size_t)((level(b) * 32 + level(g)) * 32 + level(r));
+        return Gap(table[at], r, g, b) <= Gap(table[at + 1], r, g, b) ? table[at] : table[at + 1];
+    }
+};
+
+void Palette::build() const {
+    std::call_once(built, [this] {
+        table.resize(2 * 32 * 32 * 32);
+        std::vector<uint32_t> pixels(256 * 128);
+        for (int b = 0; b < 32; b++) {
+            for (int g = 0; g < 32; g++) {
+                for (int r = 0; r < 32; r++) {
+                    uint32_t second = 0;
+                    const uint32_t c = Closest(colors, (r * 255 + 15) / 31, (g * 255 + 15) / 31, (b * 255 + 15) / 31, &second);
+                    table[2 * ((b * 32 + g) * 32 + r)] = c;
+                    table[2 * ((b * 32 + g) * 32 + r) + 1] = second;
+                    pixels[(b / 8 * 32 + g) * 256 + b % 8 * 32 + r] = 0xff000000u | (c >> 16 & 0xff) | (c & 0xff00) | (c & 0xff) << 16;
+                }
+            }
+        }
+        lut = Rgba(256, 128, pixels.data(), kOpaque_SkAlphaType);
+    });
+}
+
+namespace {
+
+std::vector<uint32_t> ParseColors(const std::string& text) {
+    std::vector<uint32_t> out;
+    uint32_t v = 0;
+    int digits = 0;
+    const auto end = [&] {
+        if (digits == 6 && out.size() < (size_t)kMaxColors && std::find(out.begin(), out.end(), v) == out.end()) out.push_back(v);
+        v = 0, digits = 0;
+    };
+    for (char c : text) {
+        const int h = c >= '0' && c <= '9' ? c - '0' : c >= 'a' && c <= 'f' ? c - 'a' + 10 : c >= 'A' && c <= 'F' ? c - 'A' + 10 : -1;
+        if (h < 0) end();
+        else if (++digits <= 6) v = v * 16 + (uint32_t)h;
+    }
+    end();
+    return out;
+}
+
+std::shared_ptr<const Palette> MakePalette(std::vector<uint32_t> colors) {
+    auto p = std::make_shared<Palette>();
+    p->colors = std::move(colors);
+    std::vector<int> gaps;
+    for (size_t i = 0; i < p->colors.size(); i++) {
+        int gap = 255;
+        for (size_t j = 0; j < p->colors.size(); j++) {
+            if (i == j) continue;
+            const uint32_t a = p->colors[i], b = p->colors[j];
+            gap = std::min(gap, std::max({std::abs((int)(a >> 16 & 255) - (int)(b >> 16 & 255)), std::abs((int)(a >> 8 & 255) - (int)(b >> 8 & 255)),
+                                          std::abs((int)(a & 255) - (int)(b & 255))}));
+        }
+        gaps.push_back(gap);
+    }
+    std::nth_element(gaps.begin(), gaps.begin() + gaps.size() / 2, gaps.end());
+    p->spread = std::clamp(gaps[gaps.size() / 2] / 255.0f, 1 / 255.0f, 1.0f);
+    return p;
+}
+
+std::shared_ptr<const Palette> PaletteFor(std::vector<uint32_t> colors) {
+    static std::mutex lock;
+    static std::map<std::vector<uint32_t>, std::shared_ptr<const Palette>> made;
+    if (colors.empty()) colors = {0x000000, 0xffffff};
+    std::lock_guard<std::mutex> hold(lock);
+    if (auto found = made.find(colors); found != made.end()) return found->second;
+    if (made.size() >= 24) made.clear();
+    auto p = MakePalette(colors);
+    made[std::move(colors)] = p;
+    return p;
+}
+
+int BayerRank(int x, int y, int n) {
+    if (n == 1) return 0;
+    const int h = n / 2, base[4] = {0, 2, 3, 1};
+    return 4 * BayerRank(x % h, y % h, h) + base[(y / h) % 2 * 2 + (x / h) % 2];
+}
+
+std::vector<uint8_t> Ranked(int w, int h, const std::vector<float>& key) {
+    std::vector<int> order(w * h);
+    for (int i = 0; i < w * h; i++) order[i] = i;
+    std::stable_sort(order.begin(), order.end(), [&](int a, int b) { return key[a] < key[b]; });
+    std::vector<uint8_t> out(w * h);
+    for (int r = 0; r < w * h; r++) out[order[r]] = (uint8_t)std::lround((r + 0.5f) / (w * h) * 255);
+    return out;
+}
+
+sk_sp<SkImage> MatrixFor(int method) {
+    static std::mutex lock;
+    static std::array<sk_sp<SkImage>, kMethods> made;
+    method = std::clamp(method, 0, kMethods - 1);
+    std::lock_guard<std::mutex> hold(lock);
+    if (made[method]) return made[method];
+    int w = 1, h = 1;
+    std::vector<float> key = {0};
+    const auto grid = [&](int gw, int gh, const std::function<float(int, int)>& f) {
+        w = gw, h = gh, key.assign(gw * gh, 0);
+        for (int y = 0; y < gh; y++) for (int x = 0; x < gw; x++) key[y * gw + x] = f(x, y);
+    };
+    const int lines[4] = {2, 0, 1, 3}, spread[4] = {0, 2, 1, 3};
+    switch (method) {
+        case 3: grid(2, 2, [](int x, int y) { return (float)BayerRank(x, y, 2); }); break;
+        case 4: grid(3, 3, [](int x, int y) { const int m[9] = {2, 6, 3, 5, 0, 8, 1, 7, 4}; return (float)m[y * 3 + x]; }); break;
+        case 5: grid(4, 4, [](int x, int y) { return (float)BayerRank(x, y, 4); }); break;
+        case 7: grid(4, 4, [](int x, int y) { return std::hypot(x - 1.5f, y - 1.5f) + std::atan2(y - 1.5f, x - 1.5f) * 0.001f; }); break;
+        case 8: grid(8, 8, [](int x, int y) { return std::hypot(x - 3.5f, y - 3.5f) + std::atan2(y - 3.5f, x - 3.5f) * 0.001f; }); break;
+        case 9: grid(4, 4, [&](int x, int y) { return (float)(lines[y] * 4 + spread[x]); }); break;
+        case 10: grid(4, 4, [&](int x, int y) { return (float)(lines[x] * 4 + spread[y]); }); break;
+        case 11: grid(4, 4, [&](int x, int y) { return (float)(lines[(x + y) % 4] * 4 + spread[x]); }); break;
+        default: if (method >= 5) grid(8, 8, [](int x, int y) { return (float)BayerRank(x, y, 8); }); break;
+    }
+    const std::vector<uint8_t> ranks = method < 2 ? std::vector<uint8_t>{128} : method == 2 ? std::vector<uint8_t>{64, 191, 191, 64} : Ranked(w, h, key);
+    if (method == 2) w = h = 2;
+    std::vector<uint32_t> pixels(w * h);
+    for (int i = 0; i < w * h; i++) pixels[i] = 0xff000000u | ranks[i] * 0x010101u;
+    made[method] = Rgba(w, h, pixels.data(), kOpaque_SkAlphaType);
+    return made[method];
+}
+
+struct Tap { int dx, dy, weight; };
+struct Kernel { int divisor; std::vector<Tap> taps; };
+
+const Kernel& KernelFor(int method) {
+    static const std::vector<Kernel> kernels = {
+        {16, {{1, 0, 7}, {-1, 1, 3}, {0, 1, 5}, {1, 1, 1}}},
+        {8, {{1, 0, 3}, {0, 1, 3}, {1, 1, 2}}},
+        {4, {{1, 0, 2}, {-1, 1, 1}, {0, 1, 1}}},
+        {16, {{1, 0, 7}, {-2, 1, 1}, {-1, 1, 3}, {0, 1, 5}}},
+        {16, {{1, 0, 8}, {-3, 1, 1}, {-2, 1, 1}, {-1, 1, 2}, {0, 1, 4}}},
+        {48, {{1, 0, 7}, {2, 0, 5}, {-2, 1, 3}, {-1, 1, 5}, {0, 1, 7}, {1, 1, 5}, {2, 1, 3}, {-2, 2, 1}, {-1, 2, 3}, {0, 2, 5}, {1, 2, 3}, {2, 2, 1}}},
+        {42, {{1, 0, 8}, {2, 0, 4}, {-2, 1, 2}, {-1, 1, 4}, {0, 1, 8}, {1, 1, 4}, {2, 1, 2}, {-2, 2, 1}, {-1, 2, 2}, {0, 2, 4}, {1, 2, 2}, {2, 2, 1}}},
+        {32, {{1, 0, 8}, {2, 0, 4}, {-2, 1, 2}, {-1, 1, 4}, {0, 1, 8}, {1, 1, 4}, {2, 1, 2}}},
+        {32, {{1, 0, 5}, {2, 0, 3}, {-2, 1, 2}, {-1, 1, 4}, {0, 1, 5}, {1, 1, 4}, {2, 1, 2}, {-1, 2, 2}, {0, 2, 3}, {1, 2, 2}}},
+        {16, {{1, 0, 4}, {2, 0, 3}, {-2, 1, 1}, {-1, 1, 2}, {0, 1, 3}, {1, 1, 2}, {2, 1, 1}}},
+        {8, {{1, 0, 1}, {2, 0, 1}, {-1, 1, 1}, {0, 1, 1}, {1, 1, 1}, {0, 2, 1}}},
+    };
+    return kernels[std::clamp(method - kDiffuse, 0, (int)kernels.size() - 1)];
+}
+
+void Diffuse(std::vector<uint8_t>* rgba, int w, int h, const Palette& palette, int method, float strength, float amount) {
+    const Kernel& kernel = KernelFor(method);
+    struct Share { int dx, dy; float k; };
+    std::vector<Share> shares;
+    for (const Tap& tap : kernel.taps) shares.push_back({tap.dx, tap.dy, strength * tap.weight / kernel.divisor});
+    const bool whole = amount >= 1;
+    std::vector<float> error((size_t)3 * w * 3, 0.0f);
+    for (int y = 0; y < h; y++) {
+        float* rows[3] = {&error[(size_t)(y % 3) * w * 3], &error[(size_t)((y + 1) % 3) * w * 3], &error[(size_t)((y + 2) % 3) * w * 3]};
+        std::fill(rows[2], rows[2] + (size_t)w * 3, 0.0f);
+        for (int x = 0; x < w; x++) {
+            uint8_t* px = rgba->data() + ((size_t)y * w + x) * 4;
+            if (px[3] == 0) continue;
+            float v[3], e[3];
+            for (int c = 0; c < 3; c++) v[c] = std::clamp(px[c] + rows[0][x * 3 + c], 0.0f, 255.0f);
+            const uint32_t q = palette.nearest((int)(v[0] + 0.5f), (int)(v[1] + 0.5f), (int)(v[2] + 0.5f));
+            const int out[3] = {(int)(q >> 16 & 255), (int)(q >> 8 & 255), (int)(q & 255)};
+            for (int c = 0; c < 3; c++) {
+                e[c] = v[c] - out[c];
+                px[c] = whole ? (uint8_t)out[c] : (uint8_t)(px[c] + (out[c] - px[c]) * amount + 0.5f);
+            }
+            for (const Share& share : shares) {
+                const int nx = x + share.dx;
+                if (nx < 0 || nx >= w || y + share.dy >= h) continue;
+                float* to = rows[share.dy] + nx * 3;
+                to[0] += e[0] * share.k, to[1] += e[1] * share.k, to[2] += e[2] * share.k;
+            }
+        }
+    }
+}
+
 }
 
 std::string EffectRuntime::load(const std::string& xml) {
@@ -339,7 +591,9 @@ std::string EffectRuntime::load(const std::string& xml) {
     if (!root || root->name != "effect" || !root->attr("id")) return "shader error: bad definition " + error;
     Definition d;
     for (const auto& c : root->children) {
-        if (c->name == "param" && c->attr("name")) d.defaults[c->attr("name")] = ParseAnimNode(c.get());
+        if (c->name != "param" || !c->attr("name")) continue;
+        d.defaults[c->attr("name")] = ParseAnimNode(c.get());
+        if (c->attr("value")) d.texts[c->attr("name")] = c->attr("value");
     }
     const std::string id = root->attr("id");
     const char* sksl = root->attr("sksl");
@@ -359,6 +613,9 @@ std::string EffectRuntime::load(const std::string& xml) {
         d.below = result.effect->findChild("below") != nullptr;
         d.pointwise = Pointwise(sksl);
         d.timed = result.effect->findUniform("time") && Mentions(sksl, "time") > 1;
+        if (result.effect->findUniform("orient")) NoteOrientedEffect(id);
+        d.palette = result.effect->findChild("palette") != nullptr;
+        d.matrix = result.effect->findChild("thresholds") != nullptr;
         d.shader = std::move(result.effect);
     }
     fDefinitions[id] = std::move(d);
@@ -368,6 +625,56 @@ std::string EffectRuntime::load(const std::string& xml) {
 const EffectRuntime::Definition* EffectRuntime::find(const std::string& id) const {
     auto d = fDefinitions.find(id);
     return d == fDefinitions.end() ? nullptr : &d->second;
+}
+
+int EffectRuntime::method(const LayerEffect& e, const Definition* d, float t) const {
+    return std::clamp((int)std::lround(Value(e, &d->defaults, "pattern", 0, t, 0)), 0, kMethods - 1);
+}
+
+std::shared_ptr<const Palette> EffectRuntime::palette(const LayerEffect& e, const Definition* d, float t) const {
+    std::vector<uint32_t> colors;
+    if (d->defaults.count("source") && Value(e, &d->defaults, "source", 0, t, 0) < 0.5f) {
+        const int n = std::clamp((int)std::lround(Value(e, &d->defaults, "colors", 0, t, 8)), 2, 8);
+        for (int i = 1; i <= n; i++) {
+            const std::string name = "color" + std::to_string(i);
+            uint32_t c = 0;
+            for (int k = 1; k <= 3; k++) c = c << 8 | (uint32_t)std::clamp((int)std::lround(Value(e, &d->defaults, name, k, t, 0) * 255), 0, 255);
+            colors.push_back(c);
+        }
+    } else {
+        const Property* p = e.prop("palette");
+        const auto fallback = d->texts.find("palette");
+        colors = ParseColors(p ? p->text : fallback == d->texts.end() ? std::string() : fallback->second);
+    }
+    return PaletteFor(std::move(colors));
+}
+
+int EffectRuntime::diffusing(const Layer& layer, int lift, float t) const {
+    for (size_t k = (size_t)(lift + 1); k < layer.effects.size(); k++) {
+        const LayerEffect& e = layer.effects[k];
+        const Definition* d = e.hidden ? nullptr : find(e.id);
+        if (d && d->shader && d->palette && d->matrix && method(e, d, t) >= kDiffuse) return (int)k;
+    }
+    return -1;
+}
+
+bool EffectRuntime::mayDiffuse(const LayerEffect& e, const Definition* d) const {
+    const auto high = [](const std::vector<float>& v) { return !v.empty() && std::lround(v[0]) >= kDiffuse; };
+    const auto any = [&](const Anim& a) {
+        return high(a.value) || (a.hasLead && high(a.lead.v)) || std::any_of(a.keys.begin(), a.keys.end(), [&](const Keyframe& k) { return high(k.v); });
+    };
+    if (const Property* p = e.prop("pattern")) return any(p->anim);
+    const auto fallback = d->defaults.find("pattern");
+    return fallback != d->defaults.end() && any(fallback->second);
+}
+
+bool EffectRuntime::grabs(const std::vector<Layer>& layers) const {
+    return std::any_of(layers.begin(), layers.end(), [&](const Layer& l) {
+        return std::any_of(l.effects.begin(), l.effects.end(), [&](const LayerEffect& e) {
+            const Definition* d = e.hidden ? nullptr : find(e.id);
+            return d && d->palette && d->matrix && mayDiffuse(e, d);
+        }) || grabs(l.children);
+    });
 }
 
 bool EffectRuntime::active(const Layer& layer) const {
@@ -418,7 +725,7 @@ bool EffectRuntime::steady(const Layer& layer, float from, float to) const {
 
 sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer, double timeMs, const SkRect& area, const SkRect& seen,
                                           const SkRect& drawn, const SkMatrix& placed, sk_sp<SkImageFilter> content,
-                                          sk_sp<SkImageFilter> below, int before) const {
+                                          sk_sp<SkImageFilter> below, int before, int from) const {
     const float t = layer.localTime(timeMs), seconds = (float)((layer.steppedMs(timeMs) - layer.startTime) / 1000.0);
     const float reach = std::max({(float)scene.width, (float)scene.height, seen.width(), seen.height()});
     const SkRect bounds = seen.makeOffset(-area.left(), -area.top()).makeOutset(before >= 0 ? reach : 0, before >= 0 ? reach : 0);
@@ -434,7 +741,7 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
     sk_sp<SkImageFilter> f = std::move(content);
     bool any = false;
     const size_t end = before >= 0 ? std::min((size_t)before, layer.effects.size()) : layer.effects.size();
-    for (size_t k = before >= 0 ? 0 : (size_t)(liftAt(layer) + 1); k < end; k++) {
+    for (size_t k = from >= 0 ? (size_t)from : before >= 0 ? 0 : (size_t)(liftAt(layer) + 1); k < end; k++) {
         const LayerEffect& e = layer.effects[k];
         at = k;
         if (e.hidden || e.id == kLift || (layer.video && e.id == "absent.datamosh")) continue;
@@ -448,6 +755,15 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
             f = e.id == "absent.glow" ? GlowFilter(value, f, withBackdrop) : BuiltInFilter(e.id, value, f);
         } else if (d && d->shader) {
             SkRuntimeShaderBuilder b(d->shader);
+            const std::shared_ptr<const Palette> colors = d->palette ? this->palette(e, d, t) : nullptr;
+            if (colors) {
+                static const uint32_t black = 0xff000000u;
+                static const sk_sp<SkImage> blank = Rgba(1, 1, &black, kOpaque_SkAlphaType);
+                if (sk_sp<SkImage> lut = OnGpu(colors->colors.size() > 16 ? colors->image() : blank)) b.child("palette") = lut->makeShader(SkSamplingOptions());
+            }
+            if (sk_sp<SkImage> tile = d->matrix ? OnGpu(MatrixFor(method(e, d, t))) : nullptr) {
+                b.child("thresholds") = tile->makeShader(SkTileMode::kRepeat, SkTileMode::kRepeat, SkSamplingOptions());
+            }
             for (const SkRuntimeEffect::Uniform& u : d->shader->uniforms()) {
                 const std::string name(u.name);
                 const int n = (int)(u.sizeInBytes() / 4);
@@ -462,6 +778,15 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
                     v = columns(fromLayer().invert(&inverse) ? inverse : SkMatrix::I());
                 }
                 else if (automatic && name == "duration") v = {(float)((layer.endTime - layer.startTime) / 1000.0)};
+                else if (automatic && name == "orient") v = columns3(Orientation(layer, timeMs));
+                else if (automatic && name == "paletteSize") v = {colors ? (float)colors->colors.size() : 0.0f};
+                else if (automatic && name == "paletteSpread") v = {colors ? colors->spread : 1.0f};
+                else if (automatic && name == "swatches" && colors) {
+                    for (size_t i = 0; i < colors->colors.size() && 4 * i + 3 < v.size(); i++) {
+                        const uint32_t c = colors->colors[i];
+                        v[4 * i] = (c >> 16 & 255) / 255.0f, v[4 * i + 1] = (c >> 8 & 255) / 255.0f, v[4 * i + 2] = (c & 255) / 255.0f, v[4 * i + 3] = 1;
+                    }
+                }
                 else if (automatic && name == "screen") v = {-area.left(), -area.top(), (float)scene.width, (float)scene.height};
                 else if (u.isColor() && n == 4) v = {Value(e, defaults, name, 1, t, 0), Value(e, defaults, name, 2, t, 0),
                                                      Value(e, defaults, name, 3, t, 0), Value(e, defaults, name, 0, t, 1)};
@@ -510,9 +835,12 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
 }
 
 bool EffectRuntime::draw(SkCanvas* canvas, const Scene& scene, const Layer& layer, double timeMs, const SkRect& area, const SkMatrix& placed,
-                         const std::function<void(SkCanvas*)>& source, const std::function<void(SkCanvas*)>& below) const {
+                         const std::function<void(SkCanvas*)>& source, const std::function<void(SkCanvas*)>& below, const Grab& grab,
+                         const Upload& upload) const {
+    tUpload = upload;
     const SkRect bounds = WorldView() ? canvas->getLocalClipBounds() : SkRect::MakeIWH(scene.width, scene.height);
     const int lift = liftAt(layer);
+    const float t = layer.localTime(timeMs);
     const SkRect at = area.isEmpty() ? bounds : area;
     const SkRect local = bounds.makeOffset(-at.left(), -at.top());
     auto record = [&](const std::function<void(SkCanvas*)>& draw, SkRect* bounded = nullptr, float outset = 0) {
@@ -530,8 +858,122 @@ bool EffectRuntime::draw(SkCanvas* canvas, const Scene& scene, const Layer& laye
     SkRect drawn = SkRect::MakeEmpty();
     sk_sp<SkImageFilter> content = seesBehind ? record(source, &drawn) : nullptr;
     sk_sp<SkImageFilter> under = below && needs(layer, &Definition::below) ? record(below) : nullptr;
+    const LayerEffect* adjustment = lift >= 0 ? &layer.effects[lift] : nullptr;
+    const Definition* adjustmentType = adjustment ? find(adjustment->id) : nullptr;
+    const auto setting = [&](const char* name) {
+        return adjustment ? Value(*adjustment, adjustmentType ? &adjustmentType->defaults : nullptr, name, 0, t, 0) : 0.0f;
+    };
+    const float own = std::clamp(setting("mix"), 0.0f, 1.0f);
+    const bool masked = setting("mask") > 0.5f, spill = setting("spill") > 0.5f;
+    sk_sp<SkImageFilter> early;
+    if (lift > 0) {
+        const float margin = std::max({(float)scene.width, (float)scene.height, bounds.width(), bounds.height()});
+        early = this->chain(scene, layer, timeMs, at, bounds, local, placed, record(source, nullptr, margin), nullptr, lift);
+    }
+    const auto shaped = [&](SkCanvas* c) {
+        if (!early) return source(c);
+        SkPaint p;
+        p.setImageFilter(early);
+        c->saveLayer(&bounds, &p);
+        c->restore();
+    };
+    const auto adjust = [&](SkCanvas* c) {
+        if (own > 0) {
+            c->saveLayerAlphaf(&bounds, own);
+            shaped(c);
+            c->restore();
+        }
+        if (masked) {
+            SkPaint mask;
+            mask.setBlendMode(SkBlendMode::kDstIn);
+            c->saveLayer(&bounds, &mask);
+            shaped(c);
+            c->restore();
+        }
+    };
+    if (!seesBehind && grab) {
+        sk_sp<SkImage> image;
+        sk_sp<SkSpecialImage> backdrop;
+        SkRect imageGrid = SkRect::MakeEmpty(), region = bounds;
+        SkMatrix fromDevice;
+        SkIRect taken = SkIRect::MakeEmpty();
+        int done = lift;
+        bool failed = false;
+        const auto bare = [&](int from, int to) {
+            for (int j = std::max(from, 0); j < to; j++) {
+                const Definition* dx = layer.effects[j].hidden ? nullptr : find(layer.effects[j].id);
+                if (dx && (dx->shader || BuiltIn(layer.effects[j].id))) return false;
+            }
+            return true;
+        };
+        const int first = diffusing(layer, lift, t);
+        if (first >= 0 && lift < 0 && bare(0, first)) {
+            SkRect measured;
+            record(source, &measured);
+            if (!region.intersect(measured)) region.setEmpty();
+        }
+        for (int k = first; k >= 0 && !failed; k = diffusing(layer, done, t)) {
+            if (image) region = bare(done + 1, k) ? imageGrid : bounds;
+            const LayerEffect& e = layer.effects[k];
+            const Definition* d = find(e.id);
+            const float cell = std::clamp(std::round(Value(e, &d->defaults, "pixel", 0, t, 1)), 1.0f, 256.0f);
+            const auto snap = [&](float v, float origin, bool up) { return origin + (up ? std::ceil((v - origin) / cell) : std::floor((v - origin) / cell)) * cell; };
+            const SkRect grid = SkRect::MakeLTRB(snap(region.left(), at.left(), false), snap(region.top(), at.top(), false),
+                                                 snap(region.right(), at.left(), true), snap(region.bottom(), at.top(), true));
+            const int gw = (int)std::lround(grid.width() / cell), gh = (int)std::lround(grid.height() / cell);
+            if (lift >= 0 && !image) {
+                SkDevice* device = SkCanvasPriv::TopDevice(canvas);
+                if (device && device->localToDevice().invert(&fromDevice)) {
+                    taken = device->localToDevice().mapRect(grid).roundOut();
+                    if (taken.intersect(SkIRect::MakeWH(device->width(), device->height()))) backdrop = device->snapSpecial(taken, true);
+                }
+            }
+            std::vector<uint8_t> pixels;
+            failed = gw <= 0 || gh <= 0 || (int64_t)gw * gh > 4096 * 4096 || (lift >= 0 && !image && !backdrop);
+            if (failed) break;
+            sk_sp<SkImageFilter> before = this->chain(scene, layer, timeMs, at, bounds, local, placed, nullptr, under, k, done + 1);
+            const bool read = grab(gw, gh, [&](SkCanvas* c) {
+                c->scale(1 / cell, 1 / cell);
+                c->translate(-grid.left(), -grid.top());
+                SkPaint p;
+                p.setImageFilter(before);
+                c->saveLayer(&grid, &p);
+                if (image) {
+                    c->drawImageRect(image, imageGrid, SkSamplingOptions(SkFilterMode::kLinear));
+                } else if (lift < 0) {
+                    source(c);
+                } else {
+                    c->save();
+                    c->concat(fromDevice);
+                    c->drawImageRect(backdrop->asImage(), SkRect::Make(backdrop->subset()), SkRect::Make(taken), SkSamplingOptions(SkFilterMode::kLinear),
+                                     nullptr, SkCanvas::kStrict_SrcRectConstraint);
+                    c->restore();
+                    adjust(c);
+                }
+                c->restore();
+            }, &pixels);
+            backdrop.reset();
+            failed = !read || pixels.size() != (size_t)gw * gh * 4;
+            if (failed) break;
+            Diffuse(&pixels, gw, gh, *palette(e, d, t), method(e, d, t), std::max(Value(e, &d->defaults, "dither", 0, t, 1), 0.0f),
+                    std::clamp(Value(e, &d->defaults, "alpha", 0, t, 1), 0.0f, 1.0f));
+            image = OnGpu(Owned(std::move(pixels), gw, gh));
+            imageGrid = grid;
+            done = k;
+            failed = !image;
+        }
+        if (image && !failed) {
+            SkPaint paint;
+            paint.setImageFilter(this->chain(scene, layer, timeMs, at, bounds, local, placed, nullptr, under, -1, done + 1));
+            if (lift >= 0) paint.setBlendMode(masked && !spill ? SkBlendMode::kSrcOver : SkBlendMode::kSrc);
+            canvas->saveLayer(&bounds, &paint);
+            canvas->drawImageRect(image, imageGrid, SkSamplingOptions(SkFilterMode::kNearest));
+            canvas->restore();
+            return true;
+        }
+    }
     SkRect inside = local;
-    if (lift < 0 && !seesBehind && Bent(layer, layer.localTime(timeMs))) {
+    if (lift < 0 && !seesBehind && Bent(layer, t)) {
         SkRect measured;
         record(source, &measured);
         const float scale = canvas->getTotalMatrix().getMinScale(), pad = scale > 0 ? 4 / scale : 4;
@@ -542,7 +984,6 @@ bool EffectRuntime::draw(SkCanvas* canvas, const Scene& scene, const Layer& laye
     if (seesBehind) {
         float reach = 0;
         bool glowOnly = true;
-        const float t = layer.localTime(timeMs);
         for (const LayerEffect& e : layer.effects) {
             const Definition* d = find(e.id);
             if (e.hidden || !(BuiltIn(e.id) || (d && d->shader))) continue;
@@ -574,34 +1015,9 @@ bool EffectRuntime::draw(SkCanvas* canvas, const Scene& scene, const Layer& laye
         canvas->restore();
         return true;
     }
-    const LayerEffect& e = layer.effects[lift];
-    const Definition* d = find(e.id);
-    const float margin = std::max({(float)scene.width, (float)scene.height, bounds.width(), bounds.height()});
-    sk_sp<SkImageFilter> early = lift > 0 ? this->chain(scene, layer, timeMs, at, bounds, local, placed, record(source, nullptr, margin), nullptr, lift) : nullptr;
-    const auto shaped = [&](SkCanvas* c) {
-        if (!early) return source(c);
-        SkPaint p;
-        p.setImageFilter(early);
-        c->saveLayer(&bounds, &p);
-        c->restore();
-    };
-    const float own = std::clamp(Value(e, d ? &d->defaults : nullptr, "mix", 0, layer.localTime(timeMs), 0), 0.0f, 1.0f);
-    const bool masked = Value(e, d ? &d->defaults : nullptr, "mask", 0, layer.localTime(timeMs), 0) > 0.5f;
-    const bool spill = Value(e, d ? &d->defaults : nullptr, "spill", 0, layer.localTime(timeMs), 0) > 0.5f;
     paint.setBlendMode(masked && !spill ? SkBlendMode::kSrcOver : SkBlendMode::kSrc);
     canvas->saveLayer(SkCanvas::SaveLayerRec(&bounds, &paint, SkCanvas::kInitWithPrevious_SaveLayerFlag));
-    if (own > 0) {
-        canvas->saveLayerAlphaf(&bounds, own);
-        shaped(canvas);
-        canvas->restore();
-    }
-    if (masked) {
-        SkPaint mask;
-        mask.setBlendMode(SkBlendMode::kDstIn);
-        canvas->saveLayer(&bounds, &mask);
-        shaped(canvas);
-        canvas->restore();
-    }
+    adjust(canvas);
     canvas->restore();
     return true;
 }

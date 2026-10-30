@@ -2854,7 +2854,7 @@
    }
   },
   "palettemap": {
-   "description": "Itinatapat ang bawat pixel sa pinakamalapit na kulay sa palette na may hanggang walong kulay. Hinahalo ng Alpha ang mga nakatapat na kulay sa orihinal na layer.",
+   "description": "Ginagawang pinakamalapit na kulay sa isang palette ang bawat pixel: hanggang walong kulay na pipiliin mo, o palette na hanggang 512 kulay mula sa isang preset o sa file na ii-import mo. Pinaghahalo ng mga dither pattern ang magkakatabing kulay ng palette para magpakita ng mas maraming shade. Hinahalo ng Alpha ang mga nakatapat na kulay sa orihinal na layer.",
    "name": "Mapa ng Palette",
    "params": {
     "alpha": {
@@ -2889,6 +2889,44 @@
     },
     "dither": {
      "label": "Dither"
+    },
+    "palette": {
+     "label": "Palette"
+    },
+    "pattern": {
+     "label": "Dither Pattern",
+     "options": [
+      "Wala",
+      "Ingay",
+      "Checker",
+      "Bayer 2x2",
+      "Bayer 3x3",
+      "Bayer 4x4",
+      "Bayer 8x8",
+      "Cluster Dot 4x4",
+      "Cluster Dot 8x8",
+      "Pahalang na Linya",
+      "Patayong Linya",
+      "Pahilis na Linya",
+      "Floyd-Steinberg",
+      "False Floyd-Steinberg",
+      "Sierra Lite",
+      "Fan",
+      "Shiau-Fan",
+      "Jarvis-Judice-Ninke",
+      "Stucki",
+      "Burkes",
+      "Sierra",
+      "Two-Row Sierra",
+      "Atkinson"
+     ]
+    },
+    "source": {
+     "label": "Pinagmulan ng Kulay",
+     "options": [
+      "Mga Kulay",
+      "Palette"
+     ]
     }
    }
   },
@@ -2913,6 +2951,91 @@
     },
     "vignette": {
      "label": "Vignette"
+    }
+   }
+  },
+  "pixeltiles": {
+   "description": "Binubuo muli ang layer mula sa grid ng maliliit na tile na may pixel pattern. Pinipili ng bawat tile kung gaano karami sa pattern nito ang iguguhit batay sa liwanag sa ilalim nito, parang halo ng ASCII art at mosaic. Sinisira ng Chaos ang grid gamit ang mga random na tile.",
+   "name": "Pixel Tiles",
+   "params": {
+    "alpha": {
+     "label": "Halo"
+    },
+    "background": {
+     "label": "Background"
+    },
+    "brightness": {
+     "label": "Liwanag"
+    },
+    "chaos": {
+     "label": "Chaos"
+    },
+    "chaosAmount": {
+     "label": "Dami ng Chaos"
+    },
+    "chaosSpeed": {
+     "label": "Bilis ng Chaos"
+    },
+    "contrast": {
+     "label": "Kontrast"
+    },
+    "detail": {
+     "label": "Detalye"
+    },
+    "flip": {
+     "label": "Baligtarin ang Pixel"
+    },
+    "foreground": {
+     "label": "Foreground"
+    },
+    "levels": {
+     "label": "Mga Shade"
+    },
+    "offset": {
+     "label": "Offset ng Pattern"
+    },
+    "original": {
+     "label": "Gamitin ang Orihinal na Kulay"
+    },
+    "pattern": {
+     "label": "Pattern",
+     "options": [
+      "Mataas na Detalye",
+      "Numero at Titik",
+      "Pahalang na Linya",
+      "Mga Tuldok",
+      "Patayong Linya",
+      "Grunge",
+      "Mga Singsing",
+      "Solid",
+      "Pahilis Pakaliwa",
+      "Pahilis Pakanan"
+     ]
+    },
+    "randomPattern": {
+     "label": "Random na Pattern"
+    },
+    "scramble": {
+     "label": "Haluin ang mga Tile"
+    },
+    "seed": {
+     "label": "Random Seed"
+    },
+    "tile": {
+     "label": "Laki ng Tile"
+    },
+    "tone": {
+     "label": "Pinagmulan ng Tono",
+     "options": [
+      "Luminance",
+      "Average",
+      "Pula",
+      "Berde",
+      "Asul"
+     ]
+    },
+    "transparent": {
+     "label": "Transparent na Background"
     }
    }
   },
@@ -3516,6 +3639,52 @@
     },
     "threshold": {
      "label": "Threshold"
+    }
+   }
+  },
+  "retrodither": {
+   "description": "Ginagawang retro pixel graphics ang layer: kumukuha ng kulay ang bawat bloke ng pixel mula sa isang palette, gaya ng palette ng lumang console o computer o isang palette na ii-import mo, at pinaghahalo ng dither pattern ang mga kulay ng palette para magmukhang mas marami ang shade.",
+   "name": "Retro Dither",
+   "params": {
+    "alpha": {
+     "label": "Halo"
+    },
+    "dither": {
+     "label": "Lakas"
+    },
+    "palette": {
+     "label": "Palette"
+    },
+    "pattern": {
+     "label": "Dither",
+     "options": [
+      "Wala",
+      "Ingay",
+      "Checker",
+      "Bayer 2x2",
+      "Bayer 3x3",
+      "Bayer 4x4",
+      "Bayer 8x8",
+      "Cluster Dot 4x4",
+      "Cluster Dot 8x8",
+      "Pahalang na Linya",
+      "Patayong Linya",
+      "Pahilis na Linya",
+      "Floyd-Steinberg",
+      "False Floyd-Steinberg",
+      "Sierra Lite",
+      "Fan",
+      "Shiau-Fan",
+      "Jarvis-Judice-Ninke",
+      "Stucki",
+      "Burkes",
+      "Sierra",
+      "Two-Row Sierra",
+      "Atkinson"
+     ]
+    },
+    "pixel": {
+     "label": "Laki ng Pixel"
     }
    }
   },

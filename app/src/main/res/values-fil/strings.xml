@@ -1006,6 +1006,8 @@
     <string name="structure_group_mask">Grupo at mask</string>
     <string name="structure_group_exclude">Grupo at ihiwalay</string>
     <string name="structure_delete_selected">Burahin ang mga napiling layer</string>
+    <string name="structure_link_parent">I-link sa parent</string>
+    <string name="structure_link_parent_skipped">May mga layer na hindi na-link dahil naka-link sa kanila ang napiling parent.</string>
     <string name="structure_alignment_options">Mga opsyon sa pagkakahanay</string>
     <string name="structure_group_options">Mga opsyon sa grupo</string>
     <string name="structure_align_left">Ihanay sa kaliwa</string>
@@ -1794,4 +1796,11 @@
     <string name="crop_reset">I-reset</string>
     <string name="a11y_crop_ratio">Aspect ratio %1$s</string>
     <string name="a11y_crop_area">Crop area. I-drag ang isang sulok o gilid para mag-crop, o i-drag sa loob para ilipat ang crop.</string>
+    <string name="effect_palette_presets">Mga preset</string>
+    <string name="effect_palette_import">I-import</string>
+    <plurals name="effect_palette_colors">
+        <item quantity="one">%1$s kulay</item>
+        <item quantity="other">%1$s kulay</item>
+    </plurals>
+    <string name="effect_palette_unreadable">Walang kulay na mabasa mula sa file na ito.</string>
 </resources>

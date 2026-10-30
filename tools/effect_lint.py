@@ -12,7 +12,7 @@ CATEGORIES = {"color", "blur", "distort", "stylize", "noise", "repeat", "key", "
 KINDS = {"float", "angle", "point", "color", "switch", "choice", "text"}
 UNIFORM = re.compile(r"^\s*(?:layout\([^)]*\)\s*)?uniform\s+(\w+)\s+(\w+)\s*;", re.M)
 UNIFORM_TYPES = {"float": {"float"}, "angle": {"float"}, "choice": {"float"}, "switch": {"float"}, "point": {"float2"}, "color": {"float4", "half4"}, "text": set()}
-RESERVED = {"image", "size", "time", "screen", "layer", "fromLayer", "toLayer", "duration"}
+RESERVED = {"image", "size", "time", "screen", "layer", "fromLayer", "toLayer", "duration", "orient", "paletteSize", "paletteSpread", "swatches"}
 
 
 def lint(path, problems, standard):

@@ -989,6 +989,8 @@
     <string name="structure_group_mask">กลุ่มและมาสก์</string>
     <string name="structure_group_exclude">กลุ่มและตัดออก</string>
     <string name="structure_delete_selected">ลบเลเยอร์ที่เลือก</string>
+    <string name="structure_link_parent">ลิงก์กับเลเยอร์แม่</string>
+    <string name="structure_link_parent_skipped">บางเลเยอร์ไม่ได้ลิงก์ เพราะเลเยอร์แม่ที่เลือกลิงก์อยู่กับเลเยอร์เหล่านั้น</string>
     <string name="structure_alignment_options">ตัวเลือกการจัดแนว</string>
     <string name="structure_group_options">ตัวเลือกกลุ่ม</string>
     <string name="structure_align_left">จัดชิดซ้าย</string>
@@ -1770,4 +1772,10 @@
     <string name="crop_reset">รีเซ็ต</string>
     <string name="a11y_crop_ratio">อัตราส่วนภาพ %1$s</string>
     <string name="a11y_crop_area">พื้นที่ครอบตัด ลากมุมหรือขอบเพื่อครอบตัด หรือลากด้านในเพื่อย้ายพื้นที่ครอบตัด</string>
+    <string name="effect_palette_presets">พรีเซ็ต</string>
+    <string name="effect_palette_import">นำเข้า</string>
+    <plurals name="effect_palette_colors">
+        <item quantity="other">%1$s สี</item>
+    </plurals>
+    <string name="effect_palette_unreadable">อ่านสีจากไฟล์นี้ไม่ได้</string>
 </resources>

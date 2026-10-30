@@ -40,8 +40,10 @@ class EffectPackTest {
                 listOf("backdrop", "below").filter { it in uniforms }.associateWith { "shader" to false } +
                 (if ("screen" in uniforms) mapOf("screen" to ("float4" to false)) else emptyMap()) +
                 (if ("layer" in uniforms) mapOf("layer" to ("float2" to false)) else emptyMap()) +
-                listOf("toLayer", "fromLayer").filter { it in uniforms }.associateWith { "float3x3" to false } +
-                effect.params.associate { p ->
+                listOf("toLayer", "fromLayer", "orient").filter { it in uniforms }.associateWith { "float3x3" to false } +
+                listOf("palette", "thresholds").filter { it in uniforms }.associateWith { "shader" to false } +
+                listOf("paletteSize", "paletteSpread").filter { it in uniforms }.associateWith { "float" to false } +
+                effect.params.filter { it.kind != "text" }.associate { p ->
                     p.id to when (p.kind) { "point" -> "float2" to false; "color" -> "half4" to true; else -> "float" to false }
                 }
             assertEquals(effect.key, expected, uniforms)
@@ -109,7 +111,10 @@ class EffectPackTest {
         val releases = JSONArray(File(pack, "releases.json").readText()).let { a -> List(a.length()) { a.getString(it) } }
         val numbers = releases.map { r -> r.split('.').map { it.toInt() } }
         assertTrue("releases are listed oldest first", numbers.zipWithNext().all { (a, b) -> a.zip(b).firstOrNull { it.first != it.second }?.let { it.first < it.second } == true })
-        assertTrue(catalog.definitions.all { it.since == null || it.since in releases })
+        val last = numbers.last()
+        assertTrue(catalog.definitions.all { d ->
+            d.since == null || d.since in releases || d.since.split('.').map { it.toInt() }.zip(last).firstOrNull { it.first != it.second }?.let { it.first > it.second } == true
+        })
         assertEquals(releases.takeLast(5).toSet(), catalog.newest)
         val fresh = catalog.listed("new").map { it.key }.toSet()
         assertTrue(fresh.containsAll(listOf("textpath", "puppet")))

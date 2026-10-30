@@ -3,6 +3,8 @@ package app.absentmotion.ui.editor
 import app.absentmotion.platform.readAtMost
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -59,6 +61,7 @@ import app.absentmotion.editor.distributeSelection
 import app.absentmotion.editor.groupLayers
 import app.absentmotion.editor.pasteStyle
 import app.absentmotion.editor.setParent
+import app.absentmotion.editor.setParentOfChosen
 import app.absentmotion.editor.unparentChildrenOf
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Swap
@@ -300,6 +303,16 @@ internal fun MultiTopBar(state: EditorState, modifier: Modifier) {
             SelectionButton(SelectionIcons.Group, stringResource(R.string.structure_group), cell, tint, ids.isNotEmpty()) { state.groupLayers(ids) }
             SelectionButton(SelectionIcons.Mask, stringResource(R.string.structure_group_mask), cell, tint, ids.size > 1) { state.groupLayers(ids, "mask") }
             SelectionButton(SelectionIcons.Exclude, stringResource(R.string.structure_group_exclude), cell, tint, ids.size > 1) { state.groupLayers(ids, "exclude") }
+            var parentMenu by remember { mutableStateOf(false) }
+            val linkLabel = stringResource(R.string.structure_link_parent)
+            Box(
+                cell.alpha(if (ids.isNotEmpty()) 1f else DimAlpha).semantics { contentDescription = linkLabel }
+                    .clickable(enabled = ids.isNotEmpty()) { parentMenu = true },
+                Alignment.Center,
+            ) {
+                LayerParentIcon(back = Am.Accent, ink = tint, dot = tint)
+                Presence(parentMenu) { MultiParentMenu(state) { parentMenu = false } }
+            }
             SelectionButton(ChromeIcons.Trash, stringResource(R.string.structure_delete_selected), cell, tint, ids.isNotEmpty()) { state.deleteChosen() }
             SelectionButton(SelectionIcons.Next, stringResource(R.string.structure_alignment_options), cell, tint) { alignment = true }
         } else {
@@ -357,6 +370,18 @@ internal fun ParentMenu(state: EditorState, onDismiss: () -> Unit) {
     ChoiceList(
         listOf(stringResource(R.string.none)) + others.map { (if (it.id == current) "> " else "") + it.shownName() }, onDismiss,
     ) { i -> state.setParent(if (i == 0) null else others[i - 1].id) }
+}
+
+@Composable
+internal fun MultiParentMenu(state: EditorState, onDismiss: () -> Unit) {
+    val context = LocalContext.current
+    val skippedText = stringResource(R.string.structure_link_parent_skipped)
+    val ids = MultiSelect.ids
+    val others = state.scene.layers.filter { it.id !in ids }.reversed()
+    ChoiceList(listOf(stringResource(R.string.none)) + others.map { it.shownName() }, onDismiss) { i ->
+        val skipped = state.setParentOfChosen(if (i == 0) null else others[i - 1].id)
+        if (skipped > 0) Toast.makeText(context, skippedText, Toast.LENGTH_LONG).show()
+    }
 }
 
 @Composable

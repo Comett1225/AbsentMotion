@@ -989,6 +989,8 @@
     <string name="structure_group_mask">Kumpulkan &amp; Topeng</string>
     <string name="structure_group_exclude">Kumpulkan &amp; Kecualikan</string>
     <string name="structure_delete_selected">Padam lapisan dipilih</string>
+    <string name="structure_link_parent">Pautkan kepada induk</string>
+    <string name="structure_link_parent_skipped">Sesetengah lapisan tidak dipautkan kerana induk yang dipilih dipautkan kepadanya.</string>
     <string name="structure_alignment_options">Pilihan penjajaran</string>
     <string name="structure_group_options">Pilihan kumpulan</string>
     <string name="structure_align_left">Jajarkan kiri</string>
@@ -1770,4 +1772,10 @@
     <string name="crop_reset">Set semula</string>
     <string name="a11y_crop_ratio">Nisbah aspek %1$s</string>
     <string name="a11y_crop_area">Kawasan pangkas. Seret penjuru atau tepi untuk memangkas, atau seret di dalamnya untuk mengalihkan kawasan pangkas.</string>
+    <string name="effect_palette_presets">Pratetap</string>
+    <string name="effect_palette_import">Import</string>
+    <plurals name="effect_palette_colors">
+        <item quantity="other">%1$s warna</item>
+    </plurals>
+    <string name="effect_palette_unreadable">Tiada warna yang dapat dibaca daripada fail ini.</string>
 </resources>

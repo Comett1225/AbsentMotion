@@ -14,7 +14,7 @@
   <a href="https://comett1225.github.io/AbsentMotion/"><img alt="Download for your phone" src="https://img.shields.io/badge/Download-for%20your%20phone-f07850?style=for-the-badge"></a>
   <a href="https://comett1225.github.io/AbsentMotion/roadmap.html"><img alt="Roadmap" src="https://img.shields.io/badge/Roadmap-what%27s%20next-7b61ff?style=for-the-badge"></a>
   <a href="https://comett1225.github.io/AbsentMotion/guide.html"><img alt="Guide and docs" src="https://img.shields.io/badge/Guide-and%20docs-2b2b33?style=for-the-badge"></a>
-  <a href="https://comett1225.github.io/AbsentMotion/phone-checker.html"><img alt="Will it run on my phone?" src="https://img.shields.io/badge/Will%20it%20run-on%20my%20phone%3F-2b2b33?style=for-the-badge"></a>
+  <a href="https://forms.gle/6bY8KBPMKc2iUypV6"><img alt="Send feedback" src="https://img.shields.io/badge/Send-feedback-2b2b33?style=for-the-badge"></a>
   <a href="https://comett1225.github.io/AbsentMotion/effects/index.html"><img alt="All effects" src="https://img.shields.io/badge/All-effects-2b2b33?style=for-the-badge"></a>
   <a href="https://github.com/Comett1225/AbsentMotion/releases"><img alt="All versions" src="https://img.shields.io/badge/All-versions-2b2b33?style=for-the-badge"></a>
 </p>
@@ -156,6 +156,9 @@ without Optical flow High, AI Smooth, AI Enhance and AI background removal 2.0.
 
 There are three builds: `play`, which has background removal through Google Play services, `foss` (for F-Droid),
 which contains no Google libraries at all, and `compat`, the Compatible build of `foss`.
+
+Not sure about your phone? The [phone checker](https://comett1225.github.io/AbsentMotion/phone-checker.html) tells you
+which build to download.
 
 ## Future Plans ( Roadmap )
 

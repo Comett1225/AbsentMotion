@@ -5,6 +5,9 @@
 #include <cstdlib>
 #include <cstring>
 #include <map>
+#include <mutex>
+#include <set>
+#include <string>
 #include <string_view>
 
 #include "include/core/SkBlender.h"
@@ -1330,8 +1333,28 @@ SkRect SelectionBounds(const Layer& layer, double timeMs, const SkMatrix& matrix
     return bounds;
 }
 
+static std::mutex gOrientedLock;
+static std::set<std::string> gOrientedIds;
+
+void NoteOrientedEffect(const std::string& id) {
+    std::lock_guard<std::mutex> hold(gOrientedLock);
+    gOrientedIds.insert(id);
+}
+
+static void FaceForward(std::vector<Layer>* seen) {
+    std::lock_guard<std::mutex> hold(gOrientedLock);
+    if (gOrientedIds.empty()) return;
+    for (Layer& l : *seen) {
+        if (l.projected && std::any_of(l.effects.begin(), l.effects.end(), [](const LayerEffect& e) { return !e.hidden && gOrientedIds.count(e.id); })) {
+            l.projected = false;
+        }
+    }
+}
+
 static const std::vector<Layer>& SeenProject(const Scene& scene, double timeMs, std::vector<Layer>* storage) {
-    return SeeLayers(scene.layers, scene.width, scene.height, true, scene.fps, timeMs, storage) ? *storage : scene.layers;
+    if (!SeeLayers(scene.layers, scene.width, scene.height, true, scene.fps, timeMs, storage)) return scene.layers;
+    FaceForward(storage);
+    return *storage;
 }
 
 int64_t TopLayerAt(const Scene& scene, double timeMs, float x, float y, const MediaPictures& masks) {
@@ -1388,8 +1411,9 @@ void DrawList(SkCanvas* canvas, const std::vector<Layer>& listed, int width, int
               const MediaPictures& pictures) {
     std::vector<Layer> inherited, storage;
     const std::vector<Layer>& source = InheritEffects(listed, &inherited) ? inherited : listed;
-    const std::vector<Layer>& layers =
-        SeeLayers(source, width, height, top, gScene ? gScene->fps : 30, timeMs, &storage) ? storage : source;
+    const bool seen = SeeLayers(source, width, height, top, gScene ? gScene->fps : 30, timeMs, &storage);
+    if (seen) FaceForward(&storage);
+    const std::vector<Layer>& layers = seen ? storage : source;
     const std::vector<Layer>* const outer = gEffectList;
     gEffectList = &layers;
     for (size_t i = 0; i < layers.size(); i++) {

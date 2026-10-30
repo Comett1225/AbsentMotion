@@ -1006,6 +1006,8 @@
     <string name="structure_group_mask">گروه و ماسک</string>
     <string name="structure_group_exclude">گروه و استثنا</string>
     <string name="structure_delete_selected">حذف لایه‌های انتخاب‌شده</string>
+    <string name="structure_link_parent">پیوند به والد</string>
+    <string name="structure_link_parent_skipped">برخی لایه‌ها پیوند داده نشدند، چون والد انتخاب‌شده به خود آن‌ها پیوند دارد.</string>
     <string name="structure_alignment_options">گزینه‌های هم‌ترازی</string>
     <string name="structure_group_options">گزینه‌های گروه</string>
     <string name="structure_align_left">هم‌تراز چپ</string>
@@ -1794,4 +1796,11 @@
     <string name="crop_reset">بازنشانی</string>
     <string name="a11y_crop_ratio">نسبت ابعاد %1$s</string>
     <string name="a11y_crop_area">ناحیهٔ برش. برای برش، یک گوشه یا لبه را بکشید، یا درون آن را بکشید تا برش جابه‌جا شود.</string>
+    <string name="effect_palette_presets">پریست‌ها</string>
+    <string name="effect_palette_import">وارد کردن</string>
+    <plurals name="effect_palette_colors">
+        <item quantity="one">‏%1$s رنگ</item>
+        <item quantity="other">‏%1$s رنگ</item>
+    </plurals>
+    <string name="effect_palette_unreadable">هیچ رنگی از این فایل خوانده نشد.</string>
 </resources>

@@ -31,6 +31,7 @@ Tap an effect in the list to open it. Its header has the effect name, a three-do
 - Each number has a ruler and a value box. Tap the name of a setting to make it the target of the keyframe button. Settings that are positions can be moved by dragging on the preview.
 - A color setting opens a row of quick swatches and a field for the exact color.
 - A switch turns an option on or off. A choice opens a list.
+- A palette setting (in Palette Map and Retro Dither) shows all of its colors. **Presets** lists old console and computer palettes such as PICO-8, Game Boy and Commodore 64. **Import** reads a palette file: a picture with up to 256 colors (bigger ones are reduced to 256), Photoshop .ase or .act, GIMP .gpl, .pal, .hex or Paint.NET .txt, like the palettes you can download from Lospec.
 - The three-dot menu has **Effect Info**, **Reset to Defaults**, **Duplicate**, **Copy Effect** and **Paste Effect Values** (when you copied one effect of the same kind).
 - The trash can removes the effect. Tap the header to close it.
 

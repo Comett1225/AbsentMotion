@@ -122,7 +122,7 @@ half4 main(float2 coord) {
     float b = dot(ow, rw);
     float disc = b * b - dot(ow, ow) + reach * reach;
     if (disc <= 0.0) return half4(0.0);
-    float3x3 m = turn();
+    float3x3 m = orient * turn();
     float3 ro = ow * m;
     float3 rd = rw * m;
     float far = -b + sqrt(disc);
@@ -165,8 +165,8 @@ half4 main(float2 coord) {
 """
 
 
-def uniforms(params):
-    lines = ["uniform shader image;", "uniform float2 size;", "uniform float time;"]
+def uniforms(params, oriented=True):
+    lines = ["uniform shader image;", "uniform float2 size;", "uniform float time;"] + (["uniform float3x3 orient;"] if oriented else [])
     for p in params:
         kind = p["type"]
         lines.append(f"uniform float2 {p['id']};" if kind == "point" else
@@ -377,7 +377,7 @@ half4 main(float2 coord) {
     float b = dot(ow, rw);
     float disc = b * b - dot(ow, ow) + rb * rb;
     if (disc <= 0.0) return half4(0.0);
-    float3x3 m = turn();
+    float3x3 m = orient * turn();
     float3 ro = ow * m;
     float3 rd = rw * m;
     float3 inv = 1.0 / max(abs(rd), float3(0.000001)) * sign(rd + 0.0000001);
@@ -439,7 +439,7 @@ half4 main(float2 coord) {
     float2 h = size / side;
     float dist = max(2.0 + 40.0 * pow(1.0 - clamp(perspective, 0.0, 1.0), 3.0), length(h) + 0.5);
     float3 rw = normalize(float3((coord - size * 0.5 - position) / unit, dist));
-    float3x3 m = turn();
+    float3x3 m = orient * turn();
     float3 ro = float3(0.0, 0.0, -dist) * m;
     float3 rd = rw * m;
     if (abs(rd.z) < 0.000001) return half4(0.0);
@@ -460,7 +460,7 @@ half4 main(float2 coord) {
 
 TUNNEL_PARAMS = turns(0, 0) + [number("phase", "Phase", 0, -1000, 1000), number("speed", "Speed", 1, -20, 20), number("twist", "Twist", 0, -360, 360, 0.1),
                                number("repeat", "Repeat", 3, 1, 16, 1), number("fog", "Fog", 0.4, 0, 1), colour("fogColor", "Fog Color", "#ff000000")] + PLACE
-TUNNEL = uniforms(TUNNEL_PARAMS) + COMMON.split("float4 shade")[0] + """
+TUNNEL = uniforms(TUNNEL_PARAMS, False) + COMMON.split("float4 shade")[0] + """
 half4 main(float2 coord) {
     float unit = max(min(size.x, size.y) * 0.5 * scale, 0.5);
     float3 rd = turn() * normalize(float3((coord - size * 0.5 - position) / unit, 1.4));

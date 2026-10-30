@@ -148,19 +148,19 @@ private fun icon(name: String, stroke: String? = null, fill: String? = null, wid
     }.build()
 
 @Composable
-internal fun LayerParentIcon(modifier: Modifier = Modifier) {
+internal fun LayerParentIcon(modifier: Modifier = Modifier, back: Color = Am.TopBar, ink: Color = Color.White, dot: Color = Am.Accent) {
     Canvas(modifier.size(40.dp, 42.dp)) {
         val d = density
         val line = 1.6f * d
         drawRoundRect(
-            Color.White, Offset(9f * d, 11.5f * d), Size(14f * d, 14f * d), CornerRadius(2.5f * d),
+            ink, Offset(9f * d, 11.5f * d), Size(14f * d, 14f * d), CornerRadius(2.5f * d),
             style = Stroke(line, cap = StrokeCap.Round, pathEffect = PathEffect.dashPathEffect(floatArrayOf(2.6f * d, 2.6f * d))),
         )
-        drawRoundRect(Am.TopBar, Offset(16.5f * d, 18.5f * d), Size(13.5f * d, 13.5f * d), CornerRadius(2.5f * d))
-        drawRoundRect(Color.White, Offset(16.5f * d, 18.5f * d), Size(13.5f * d, 13.5f * d), CornerRadius(2.5f * d), style = Stroke(line))
+        drawRoundRect(back, Offset(16.5f * d, 18.5f * d), Size(13.5f * d, 13.5f * d), CornerRadius(2.5f * d))
+        drawRoundRect(ink, Offset(16.5f * d, 18.5f * d), Size(13.5f * d, 13.5f * d), CornerRadius(2.5f * d), style = Stroke(line))
         val centre = Offset(32.5f * d, 11.5f * d)
-        drawCircle(Am.TopBar, 6f * d, centre)
-        drawCircle(Am.Accent, 6f * d, centre, style = Stroke(line))
-        drawCircle(Am.Accent, 2.2f * d, centre)
+        drawCircle(back, 6f * d, centre)
+        drawCircle(dot, 6f * d, centre, style = Stroke(line))
+        drawCircle(dot, 2.2f * d, centre)
     }
 }

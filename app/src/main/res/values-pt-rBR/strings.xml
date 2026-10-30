@@ -1023,6 +1023,8 @@
     <string name="structure_group_mask">Agrupar e mascarar</string>
     <string name="structure_group_exclude">Agrupar e excluir</string>
     <string name="structure_delete_selected">Excluir camadas selecionadas</string>
+    <string name="structure_link_parent">Vincular a um pai</string>
+    <string name="structure_link_parent_skipped">Algumas camadas não foram vinculadas porque o pai escolhido está vinculado a elas.</string>
     <string name="structure_alignment_options">Opções de alinhamento</string>
     <string name="structure_group_options">Opções de grupo</string>
     <string name="structure_align_left">Alinhar à esquerda</string>
@@ -1818,4 +1820,12 @@
     <string name="crop_reset">Redefinir</string>
     <string name="a11y_crop_ratio">Proporção %1$s</string>
     <string name="a11y_crop_area">Área de corte. Arraste um canto ou uma borda para cortar, ou arraste por dentro para mover o corte.</string>
+    <string name="effect_palette_presets">Predefinições</string>
+    <string name="effect_palette_import">Importar</string>
+    <plurals name="effect_palette_colors">
+        <item quantity="one">%1$s cor</item>
+        <item quantity="many">%1$s cores</item>
+        <item quantity="other">%1$s cores</item>
+    </plurals>
+    <string name="effect_palette_unreadable">Não foi possível ler nenhuma cor deste arquivo.</string>
 </resources>

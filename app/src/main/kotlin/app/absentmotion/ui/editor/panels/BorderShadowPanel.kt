@@ -352,10 +352,11 @@ private fun BorderTab(state: EditorState, layer: Layer) {
     val reorder = rememberReorder(state, scroll, top = 18.px, pitch = 122.px)
     val reorderLabel = stringResource(R.string.effects_reorder)
     Column(Modifier.fillMaxSize().verticalScroll(scroll).padding(start = 18.px, end = 18.px, top = 18.px)) {
+        val opened = openBorder.takeIf { it in borders.indices } ?: -1
         key(reorder.generation) {
             borders.forEach { b ->
-                val isOpen = openBorder == b.index
-                val shown = remember { MutableTransitionState(!isOpen) }.apply { targetState = openBorder < 0 || isOpen }
+                val isOpen = opened == b.index
+                val shown = remember { MutableTransitionState(!isOpen) }.apply { targetState = opened < 0 || isOpen }
                 AnimatedVisibility(shown, enter = expandVertically(Motion.enter()) + fadeIn(Motion.enter()), exit = shrinkVertically(Motion.exit()) + fadeOut(Motion.exit())) {
                     Column(
                         Modifier.padding(bottom = 18.px).reorderSlot(reorder, b.index).fillMaxWidth().reorderLift(reorder, b.index, 4.dp).clip(PanelShape).background(CardBg),
@@ -364,8 +365,8 @@ private fun BorderTab(state: EditorState, layer: Layer) {
                         Row(Modifier.fillMaxWidth().height(104.px).clickable { openBorder = if (isOpen) -1 else b.index; borderField = 0 }, verticalAlignment = Alignment.CenterVertically) {
                             Canvas(Modifier.padding(start = 36.px).size(51.px).rotate(turn)) { triangle(down = false) }
                             Box(Modifier.weight(1f)) {
-                                Crossfade(isOpen, animationSpec = Motion.fast(), label = "border") { opened ->
-                                    if (opened) Row(verticalAlignment = Alignment.CenterVertically) {
+                                Crossfade(isOpen, animationSpec = Motion.fast(), label = "border") { expanded ->
+                                    if (expanded) Row(verticalAlignment = Alignment.CenterVertically) {
                                         Text(stringResource(R.string.border), Modifier.padding(start = 30.px).weight(1f), color = Am.OnDark, fontSize = 16.sp, maxLines = 1)
                                         Box(Modifier.size(101.px).clickable { state.editSelected { it.withBorderRemoved(b.index) }; openBorder = -1 }, contentAlignment = Alignment.Center) {
                                             PanelIcon(ChromeIcons.Trash, Am.OnDark, size = 28.dp, description = stringResource(R.string.delete))
@@ -404,7 +405,7 @@ private fun BorderTab(state: EditorState, layer: Layer) {
                 }
             }
         }
-        Folding(openBorder < 0) {
+        Folding(opened < 0) {
             Row(
                 Modifier.padding(bottom = 18.px).fillMaxWidth().height(104.px).clip(PanelShape).background(ButtonBg)
                     .clickable { state.editSelected { it.withBorderAdded() }; openBorder = borders.size; borderField = 0 },

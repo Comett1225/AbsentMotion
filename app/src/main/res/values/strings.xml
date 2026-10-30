@@ -1028,6 +1028,8 @@
     <string name="structure_group_mask">Group &amp; Mask</string>
     <string name="structure_group_exclude">Group &amp; Exclude</string>
     <string name="structure_delete_selected">Delete selected layers</string>
+    <string name="structure_link_parent">Link to parent</string>
+    <string name="structure_link_parent_skipped">Some layers were not linked because the chosen parent is linked to them.</string>
     <string name="structure_alignment_options">Alignment options</string>
     <string name="structure_group_options">Group options</string>
     <string name="structure_align_left">Align left</string>
@@ -1820,4 +1822,11 @@
     <string name="crop_reset">Reset</string>
     <string name="a11y_crop_ratio">Aspect ratio %1$s</string>
     <string name="a11y_crop_area">Crop area. Drag a corner or an edge to crop, or drag inside to move the crop.</string>
+    <string name="effect_palette_presets">Presets</string>
+    <string name="effect_palette_import">Import</string>
+    <plurals name="effect_palette_colors">
+        <item quantity="one">%1$s color</item>
+        <item quantity="other">%1$s colors</item>
+    </plurals>
+    <string name="effect_palette_unreadable">No colors could be read from this file.</string>
 </resources>

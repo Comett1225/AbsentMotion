@@ -48,6 +48,7 @@ CHROME = [
     "Settings", "This effect has no settings.", "Setting", "Type", "Range", "Default", "More {category} effects",
     "Choice", "On or off", "On", "Off", "Color", "Text", "(empty)", "Point (X, Y)", "Angle", "Number",
     "{low} to {high}", "{range} (at most the layer\u2019s length)", "{color}, {percent}% opaque", ", ",
+    "Palette", "{count} colors",
 ]
 RTL_CSS = (
     "[dir=rtl] th,[dir=rtl] td{text-align:right}\n"
@@ -665,6 +666,9 @@ class Site:
             alpha = int(value[:2], 16) / 255 if len(value) == 8 else 1
             shown = "#" + rgb.upper() if alpha > 0.995 else t("{color}, {percent}% opaque", color="#" + rgb.upper(), percent=str(round(alpha * 100)))
             return t("Color"), "&ndash;", '<span><span class="sw" style="background:#%s"></span>%s</span>' % (rgb, shown)
+        if kind == "text" and p.get("palette"):
+            colors = re.findall(r"[0-9a-fA-F]{6}", str(default))
+            return t("Palette"), "&ndash;", t("{count} colors", count=str(len(colors)))
         if kind == "text":
             return t("Text"), "&ndash;", escape(str(default)) or t("(empty)")
         unit = ""

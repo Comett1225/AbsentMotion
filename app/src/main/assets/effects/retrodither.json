@@ -1,0 +1,103 @@
+{
+ "id": "retrodither",
+ "name": "Retro Dither",
+ "category": "color",
+ "since": "4.3.0",
+ "description": "Turns the layer into retro pixel graphics: every pixel block takes a color from a palette, such as an old console or computer palette or one you import, and a dither pattern mixes palette colors to fake more shades.",
+ "params": [
+  {
+   "id": "palette",
+   "label": "Palette",
+   "type": "text",
+   "palette": true,
+   "default": "000000 1d2b53 7e2553 008751 ab5236 5f574f c2c3c7 fff1e8 ff004d ffa300 ffec27 00e436 29adff 83769c ff77a8 ffccaa"
+  },
+  {
+   "id": "pattern",
+   "label": "Dither",
+   "type": "choice",
+   "options": [
+    "None",
+    "Noise",
+    "Checker",
+    "Bayer 2x2",
+    "Bayer 3x3",
+    "Bayer 4x4",
+    "Bayer 8x8",
+    "Cluster Dot 4x4",
+    "Cluster Dot 8x8",
+    "Horizontal Lines",
+    "Vertical Lines",
+    "Diagonal Lines",
+    "Floyd-Steinberg",
+    "False Floyd-Steinberg",
+    "Sierra Lite",
+    "Fan",
+    "Shiau-Fan",
+    "Jarvis-Judice-Ninke",
+    "Stucki",
+    "Burkes",
+    "Sierra",
+    "Two-Row Sierra",
+    "Atkinson"
+   ],
+   "default": 5
+  },
+  {
+   "id": "dither",
+   "label": "Strength",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 2,
+   "step": 0.001,
+   "percent": true,
+   "when": {
+    "pattern": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20,
+     21,
+     22
+    ]
+   }
+  },
+  {
+   "id": "pixel",
+   "label": "Pixel Size",
+   "type": "float",
+   "default": 2,
+   "min": 1,
+   "max": 64,
+   "step": 1
+  },
+  {
+   "id": "alpha",
+   "label": "Mix",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform shader palette;\nuniform shader thresholds;\nuniform float2 size;\nuniform float time;\nuniform float pattern;\nuniform float dither;\nuniform float pixel;\nuniform float alpha;\nuniform float paletteSize;\nuniform float paletteSpread;\nuniform half4 swatches[16];\nfloat hash12(float2 p) {\n    float3 q = fract(float3(p.xyx) * 0.1031);\n    q += dot(q, q.yzx + 33.33);\n    return fract((q.x + q.y) * q.z);\n}\nfloat3 lookup(float3 c) {\n    c = clamp(c, 0.0, 1.0);\n    if (paletteSize < 16.5) {\n        float3 best = float3(0.0);\n        float bestD = 100.0;\n        for (int i = 0; i < 16; i++) {\n            if (float(i) >= paletteSize) break;\n            float3 s = float3(swatches[i].rgb);\n            float d = dot(c - s, c - s);\n            if (d < bestD) { bestD = d; best = s; }\n        }\n        return best;\n    }\n    float3 q = floor(c * 31.0 + 0.5);\n    return float3(palette.eval(float2(mod(q.b, 8.0) * 32.0 + q.r + 0.5, floor(q.b / 8.0) * 32.0 + q.g + 0.5)).rgb);\n}\nhalf4 main(float2 coord) {\n    float p = max(floor(pixel + 0.5), 1.0);\n    float2 cell = floor(coord / p);\n    half4 src = image.eval(coord);\n    if (p > 1.5) {\n        float2 o = cell * p;\n        src = (image.eval(o + p * float2(0.25, 0.25)) + image.eval(o + p * float2(0.75, 0.25)) + image.eval(o + p * float2(0.25, 0.75)) + image.eval(o + p * float2(0.75, 0.75))) * 0.25;\n    }\n    if (src.a <= 0.0) return half4(0.0);\n    float3 base = float3(src.rgb) / float(src.a);\n    float3 rgb = base;\n    if (pattern > 0.5 && pattern < 1.5) rgb += (hash12(cell) - 0.5) * dither * paletteSpread;\n    else if (pattern > 1.5) rgb += (float(thresholds.eval(cell + 0.5).r) - 0.5) * dither * paletteSpread;\n    return half4(half3(mix(base, lookup(rgb), clamp(alpha, 0.0, 1.0))) * src.a, src.a);\n}\n"
+}

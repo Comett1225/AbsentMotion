@@ -989,6 +989,8 @@
     <string name="structure_group_mask">Grup &amp; Masker</string>
     <string name="structure_group_exclude">Grup &amp; Kecualikan</string>
     <string name="structure_delete_selected">Hapus lapisan terpilih</string>
+    <string name="structure_link_parent">Tautkan ke induk</string>
+    <string name="structure_link_parent_skipped">Beberapa lapisan tidak ditautkan karena induk yang dipilih tertaut ke lapisan itu.</string>
     <string name="structure_alignment_options">Opsi perataan</string>
     <string name="structure_group_options">Opsi grup</string>
     <string name="structure_align_left">Ratakan kiri</string>
@@ -1770,4 +1772,10 @@
     <string name="crop_reset">Reset</string>
     <string name="a11y_crop_ratio">Rasio aspek %1$s</string>
     <string name="a11y_crop_area">Area pangkas. Seret sudut atau tepi untuk memangkas, atau seret di dalamnya untuk memindahkan area pangkas.</string>
+    <string name="effect_palette_presets">Preset</string>
+    <string name="effect_palette_import">Impor</string>
+    <plurals name="effect_palette_colors">
+        <item quantity="other">%1$s warna</item>
+    </plurals>
+    <string name="effect_palette_unreadable">Tidak ada warna yang bisa dibaca dari file ini.</string>
 </resources>

@@ -2854,7 +2854,7 @@
    }
   },
   "palettemap": {
-   "description": "Asigna a cada píxel el color más cercano de una paleta de hasta ocho colores. Alfa mezcla los colores asignados con la capa original.",
+   "description": "Asigna a cada píxel el color más cercano de una paleta: hasta ocho colores que eliges, o una paleta de hasta 512 colores de un ajuste predefinido o de un archivo importado. Los patrones de tramado mezclan colores vecinos de la paleta para mostrar más tonos. Alfa mezcla los colores asignados con la capa original.",
    "name": "Mapa de paleta",
    "params": {
     "alpha": {
@@ -2889,6 +2889,44 @@
     },
     "dither": {
      "label": "Tramado"
+    },
+    "palette": {
+     "label": "Paleta"
+    },
+    "pattern": {
+     "label": "Patrón de tramado",
+     "options": [
+      "Ninguno",
+      "Ruido",
+      "Damero",
+      "Bayer 2x2",
+      "Bayer 3x3",
+      "Bayer 4x4",
+      "Bayer 8x8",
+      "Puntos agrupados 4x4",
+      "Puntos agrupados 8x8",
+      "Líneas horizontales",
+      "Líneas verticales",
+      "Líneas diagonales",
+      "Floyd-Steinberg",
+      "False Floyd-Steinberg",
+      "Sierra Lite",
+      "Fan",
+      "Shiau-Fan",
+      "Jarvis-Judice-Ninke",
+      "Stucki",
+      "Burkes",
+      "Sierra",
+      "Two-Row Sierra",
+      "Atkinson"
+     ]
+    },
+    "source": {
+     "label": "Colores de",
+     "options": [
+      "Colores",
+      "Paleta"
+     ]
     }
    }
   },
@@ -2913,6 +2951,91 @@
     },
     "vignette": {
      "label": "Viñeta"
+    }
+   }
+  },
+  "pixeltiles": {
+   "description": "Reconstruye la capa con una cuadrícula de pequeños mosaicos con patrones de píxeles. Cada mosaico decide cuánto de su patrón dibuja según el brillo que tiene debajo, como una mezcla de arte ASCII y mosaico. El caos rompe la cuadrícula con mosaicos aleatorios.",
+   "name": "Mosaicos de píxeles",
+   "params": {
+    "alpha": {
+     "label": "Mezcla"
+    },
+    "background": {
+     "label": "Fondo"
+    },
+    "brightness": {
+     "label": "Brillo"
+    },
+    "chaos": {
+     "label": "Caos"
+    },
+    "chaosAmount": {
+     "label": "Cantidad de caos"
+    },
+    "chaosSpeed": {
+     "label": "Velocidad del caos"
+    },
+    "contrast": {
+     "label": "Contraste"
+    },
+    "detail": {
+     "label": "Detalle"
+    },
+    "flip": {
+     "label": "Invertir píxeles"
+    },
+    "foreground": {
+     "label": "Primer plano"
+    },
+    "levels": {
+     "label": "Tonos"
+    },
+    "offset": {
+     "label": "Desplazamiento del patrón"
+    },
+    "original": {
+     "label": "Usar color original"
+    },
+    "pattern": {
+     "label": "Patrón",
+     "options": [
+      "Alto detalle",
+      "Números y letras",
+      "Líneas horizontales",
+      "Puntos",
+      "Líneas verticales",
+      "Grunge",
+      "Anillos",
+      "Sólido",
+      "Diagonal izquierda",
+      "Diagonal derecha"
+     ]
+    },
+    "randomPattern": {
+     "label": "Patrones aleatorios"
+    },
+    "scramble": {
+     "label": "Mezclar mosaicos"
+    },
+    "seed": {
+     "label": "Semilla aleatoria"
+    },
+    "tile": {
+     "label": "Tamaño de mosaico"
+    },
+    "tone": {
+     "label": "Tono de",
+     "options": [
+      "Luminancia",
+      "Promedio",
+      "Rojo",
+      "Verde",
+      "Azul"
+     ]
+    },
+    "transparent": {
+     "label": "Fondo transparente"
     }
    }
   },
@@ -3516,6 +3639,52 @@
     },
     "threshold": {
      "label": "Umbral"
+    }
+   }
+  },
+  "retrodither": {
+   "description": "Convierte la capa en gráficos de píxeles retro: cada bloque de píxeles toma un color de una paleta, como la de una consola u ordenador antiguo o una que importes, y un patrón de tramado mezcla colores de la paleta para simular más tonos.",
+   "name": "Tramado retro",
+   "params": {
+    "alpha": {
+     "label": "Mezcla"
+    },
+    "dither": {
+     "label": "Intensidad"
+    },
+    "palette": {
+     "label": "Paleta"
+    },
+    "pattern": {
+     "label": "Tramado",
+     "options": [
+      "Ninguno",
+      "Ruido",
+      "Damero",
+      "Bayer 2x2",
+      "Bayer 3x3",
+      "Bayer 4x4",
+      "Bayer 8x8",
+      "Puntos agrupados 4x4",
+      "Puntos agrupados 8x8",
+      "Líneas horizontales",
+      "Líneas verticales",
+      "Líneas diagonales",
+      "Floyd-Steinberg",
+      "False Floyd-Steinberg",
+      "Sierra Lite",
+      "Fan",
+      "Shiau-Fan",
+      "Jarvis-Judice-Ninke",
+      "Stucki",
+      "Burkes",
+      "Sierra",
+      "Two-Row Sierra",
+      "Atkinson"
+     ]
+    },
+    "pixel": {
+     "label": "Tamaño de píxel"
     }
    }
   },

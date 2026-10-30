@@ -1006,6 +1006,8 @@
     <string name="structure_group_mask">গ্রুপ ও মাস্ক</string>
     <string name="structure_group_exclude">গ্রুপ ও এক্সক্লুড</string>
     <string name="structure_delete_selected">নির্বাচিত লেয়ার মুছুন</string>
+    <string name="structure_link_parent">প্যারেন্টের সাথে যুক্ত করুন</string>
+    <string name="structure_link_parent_skipped">কিছু লেয়ার যুক্ত হয়নি, কারণ বেছে নেওয়া প্যারেন্ট সেগুলোর সাথেই যুক্ত।</string>
     <string name="structure_alignment_options">সারিবদ্ধ করার অপশন</string>
     <string name="structure_group_options">গ্রুপ অপশন</string>
     <string name="structure_align_left">বামে অ্যালাইন</string>
@@ -1794,4 +1796,11 @@
     <string name="crop_reset">রিসেট</string>
     <string name="a11y_crop_ratio">অ্যাসপেক্ট রেশিও %1$s</string>
     <string name="a11y_crop_area">ক্রপ এলাকা। ক্রপ করতে একটি কোণ বা কিনারা ড্র্যাগ করুন, অথবা ক্রপ সরাতে ভেতরে ড্র্যাগ করুন।</string>
+    <string name="effect_palette_presets">প্রিসেট</string>
+    <string name="effect_palette_import">ইমপোর্ট</string>
+    <plurals name="effect_palette_colors">
+        <item quantity="one">%1$sটি কালার</item>
+        <item quantity="other">%1$sটি কালার</item>
+    </plurals>
+    <string name="effect_palette_unreadable">এই ফাইল থেকে কোনো কালার পড়া যায়নি।</string>
 </resources>

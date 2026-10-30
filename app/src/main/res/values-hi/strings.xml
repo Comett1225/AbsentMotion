@@ -1006,6 +1006,8 @@
     <string name="structure_group_mask">ग्रुप और मास्क</string>
     <string name="structure_group_exclude">ग्रुप और एक्सक्लूड</string>
     <string name="structure_delete_selected">चयनित लेयर हटाएँ</string>
+    <string name="structure_link_parent">पैरेंट से जोड़ें</string>
+    <string name="structure_link_parent_skipped">कुछ लेयर नहीं जुड़ीं, क्योंकि चुना गया पैरेंट उन्हीं से जुड़ा है।</string>
     <string name="structure_alignment_options">अलाइनमेंट विकल्प</string>
     <string name="structure_group_options">ग्रुप विकल्प</string>
     <string name="structure_align_left">बाएँ अलाइन करें</string>
@@ -1794,4 +1796,11 @@
     <string name="crop_reset">रीसेट</string>
     <string name="a11y_crop_ratio">आस्पेक्ट रेशियो %1$s</string>
     <string name="a11y_crop_area">क्रॉप क्षेत्र। क्रॉप करने के लिए कोई कोना या किनारा खींचें, या क्रॉप को खिसकाने के लिए अंदर खींचें।</string>
+    <string name="effect_palette_presets">प्रीसेट</string>
+    <string name="effect_palette_import">इम्पोर्ट</string>
+    <plurals name="effect_palette_colors">
+        <item quantity="one">%1$s कलर</item>
+        <item quantity="other">%1$s कलर</item>
+    </plurals>
+    <string name="effect_palette_unreadable">इस फ़ाइल से कोई कलर नहीं पढ़ा जा सका।</string>
 </resources>

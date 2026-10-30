@@ -40,6 +40,7 @@ The top bar changes color and shows:
 
 - **Cancel selection** (X) and the number of selected layers.
 - **Group** puts the layers into one group layer that lasts as long as its members. **Group & Mask** and **Group & Exclude** do the same and set the top layer's blend mode to Mask or Exclude.
+- **Link to parent** links every selected layer to one layer you pick (or to none). Each layer stays where it is on screen. Layers that the chosen parent is already linked to are skipped.
 - **Delete selected layers**.
 - **Alignment options** (an arrow) opens **Align left**, **Align center**, **Align right**, **Align top**, **Align middle**, **Align bottom**, **Distribute vertically** and **Distribute horizontally** (three or more layers). One layer aligns to the canvas; several align to the box around the selection.
 

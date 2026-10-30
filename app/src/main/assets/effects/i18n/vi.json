@@ -2854,7 +2854,7 @@
    }
   },
   "palettemap": {
-   "description": "Ánh xạ từng điểm ảnh tới màu gần nhất trong bảng màu tối đa tám màu. Alpha hòa trộn các màu đã ánh xạ với lớp gốc.",
+   "description": "Đổi mỗi điểm ảnh thành màu gần nhất trong một bảng màu: tối đa tám màu do bạn chọn, hoặc bảng màu tối đa 512 màu từ một thiết lập sẵn hay một tệp bạn nhập. Các kiểu dither trộn những màu cạnh nhau trong bảng màu để hiện nhiều sắc độ hơn. Alpha hòa trộn các màu đã ánh xạ với lớp gốc.",
    "name": "Ánh xạ bảng màu",
    "params": {
     "alpha": {
@@ -2889,6 +2889,44 @@
     },
     "dither": {
      "label": "Dither"
+    },
+    "palette": {
+     "label": "Bảng màu"
+    },
+    "pattern": {
+     "label": "Kiểu dither",
+     "options": [
+      "Không",
+      "Nhiễu",
+      "Bàn cờ",
+      "Bayer 2x2",
+      "Bayer 3x3",
+      "Bayer 4x4",
+      "Bayer 8x8",
+      "Chấm cụm 4x4",
+      "Chấm cụm 8x8",
+      "Đường ngang",
+      "Đường dọc",
+      "Đường chéo",
+      "Floyd-Steinberg",
+      "False Floyd-Steinberg",
+      "Sierra Lite",
+      "Fan",
+      "Shiau-Fan",
+      "Jarvis-Judice-Ninke",
+      "Stucki",
+      "Burkes",
+      "Sierra",
+      "Two-Row Sierra",
+      "Atkinson"
+     ]
+    },
+    "source": {
+     "label": "Nguồn màu",
+     "options": [
+      "Màu sắc",
+      "Bảng màu"
+     ]
     }
    }
   },
@@ -2913,6 +2951,91 @@
     },
     "vignette": {
      "label": "Viền tối"
+    }
+   }
+  },
+  "pixeltiles": {
+   "description": "Dựng lại lớp từ một lưới ô nhỏ có hoa văn điểm ảnh. Mỗi ô quyết định vẽ bao nhiêu phần hoa văn dựa trên độ sáng bên dưới, giống sự pha trộn giữa nghệ thuật ASCII và tranh khảm. Hỗn loạn phá vỡ lưới bằng các ô ngẫu nhiên.",
+   "name": "Ô điểm ảnh",
+   "params": {
+    "alpha": {
+     "label": "Trộn"
+    },
+    "background": {
+     "label": "Màu nền"
+    },
+    "brightness": {
+     "label": "Độ sáng"
+    },
+    "chaos": {
+     "label": "Hỗn loạn"
+    },
+    "chaosAmount": {
+     "label": "Mức hỗn loạn"
+    },
+    "chaosSpeed": {
+     "label": "Tốc độ hỗn loạn"
+    },
+    "contrast": {
+     "label": "Độ tương phản"
+    },
+    "detail": {
+     "label": "Chi tiết"
+    },
+    "flip": {
+     "label": "Đảo điểm ảnh"
+    },
+    "foreground": {
+     "label": "Màu nền trước"
+    },
+    "levels": {
+     "label": "Số sắc độ"
+    },
+    "offset": {
+     "label": "Độ lệch hoa văn"
+    },
+    "original": {
+     "label": "Dùng màu gốc"
+    },
+    "pattern": {
+     "label": "Kiểu",
+     "options": [
+      "Chi tiết cao",
+      "Số và chữ",
+      "Đường ngang",
+      "Chấm",
+      "Đường dọc",
+      "Grunge",
+      "Vòng tròn",
+      "Đặc",
+      "Chéo trái",
+      "Chéo phải"
+     ]
+    },
+    "randomPattern": {
+     "label": "Kiểu ngẫu nhiên"
+    },
+    "scramble": {
+     "label": "Xáo trộn ô"
+    },
+    "seed": {
+     "label": "Hạt giống ngẫu nhiên"
+    },
+    "tile": {
+     "label": "Kích thước ô"
+    },
+    "tone": {
+     "label": "Nguồn tông",
+     "options": [
+      "Độ sáng",
+      "Trung bình",
+      "Đỏ",
+      "Lục",
+      "Lam"
+     ]
+    },
+    "transparent": {
+     "label": "Nền trong suốt"
     }
    }
   },
@@ -3516,6 +3639,52 @@
     },
     "threshold": {
      "label": "Ngưỡng"
+    }
+   }
+  },
+  "retrodither": {
+   "description": "Biến lớp thành đồ họa điểm ảnh cổ điển: mỗi khối điểm ảnh lấy một màu từ bảng màu, như bảng màu của máy chơi game hay máy tính cũ hoặc bảng màu bạn nhập, và kiểu dither trộn các màu trong bảng để tạo cảm giác có nhiều sắc độ hơn.",
+   "name": "Dither cổ điển",
+   "params": {
+    "alpha": {
+     "label": "Trộn"
+    },
+    "dither": {
+     "label": "Cường độ"
+    },
+    "palette": {
+     "label": "Bảng màu"
+    },
+    "pattern": {
+     "label": "Dither",
+     "options": [
+      "Không",
+      "Nhiễu",
+      "Bàn cờ",
+      "Bayer 2x2",
+      "Bayer 3x3",
+      "Bayer 4x4",
+      "Bayer 8x8",
+      "Chấm cụm 4x4",
+      "Chấm cụm 8x8",
+      "Đường ngang",
+      "Đường dọc",
+      "Đường chéo",
+      "Floyd-Steinberg",
+      "False Floyd-Steinberg",
+      "Sierra Lite",
+      "Fan",
+      "Shiau-Fan",
+      "Jarvis-Judice-Ninke",
+      "Stucki",
+      "Burkes",
+      "Sierra",
+      "Two-Row Sierra",
+      "Atkinson"
+     ]
+    },
+    "pixel": {
+     "label": "Kích thước điểm ảnh"
     }
    }
   },

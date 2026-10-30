@@ -166,6 +166,8 @@ private:
         };
     }
     int frame(Target*, int64_t presentTimeNs, bool sync, const std::function<void(SkCanvas*)>& paint);
+    bool grab(int width, int height, const std::function<void(SkCanvas*)>& paint, std::vector<uint8_t>* rgba);
+    bool readSurface(SkSurface* surface, const SkImageInfo& out, bool tidy, std::vector<uint8_t>* rgba);
     bool offscreen(int width, int height, bool premultiplied, const std::function<void(SkCanvas*)>& paint,
                    std::vector<uint8_t>* rgba);
     void collectTimings(Target*);
@@ -173,6 +175,7 @@ private:
     void deleteDeadTextures(skgpu::graphite::Recorder* cleanup = nullptr);
     int failGpu(Target* target);
     bool fGpuFailed = false;
+    bool fNoGrab = false;
     bool fCameraView = true;
     bool fAccurateBlur = false;
     std::vector<VkSemaphore> fFailedSemaphores;
@@ -188,7 +191,12 @@ private:
         fx.steady = [this](const Layer& layer, float from, float to) { return fEffects.steady(layer, from, to); };
         fx.draw = [this](SkCanvas* canvas, const Scene& scene, const Layer& layer, double time, const SkRect& area, const SkMatrix& placed,
                          const std::function<void(SkCanvas*)>& source, const std::function<void(SkCanvas*)>& below) {
-            return fEffects.draw(canvas, scene, layer, time, area, placed, source, below);
+            return fEffects.draw(canvas, scene, layer, time, area, placed, source, below,
+                                 [this](int w, int h, const std::function<void(SkCanvas*)>& paint, std::vector<uint8_t>* rgba) {
+                                     return this->grab(w, h, paint, rgba);
+                                 }, [this](const sk_sp<SkImage>& image) {
+                                     return fRecorder ? SkImages::TextureFromImage(fRecorder.get(), image.get(), {}) : image;
+                                 });
         };
         return fx;
     }
@@ -1247,7 +1255,23 @@ bool EngineImpl::offscreen(int width, int height, bool premultiplied,
     SetLayerBreak(fGraphite ? &flush : nullptr);
     paint(canvas);
     SetLayerBreak(nullptr);
+    return this->readSurface(surface.get(), out, true, rgba);
+}
+
+bool EngineImpl::grab(int width, int height, const std::function<void(SkCanvas*)>& paint, std::vector<uint8_t>* rgba) {
+    if (fGpuFailed || fNoGrab || width <= 0 || height <= 0) return false;
+    const SkImageInfo info = SkImageInfo::Make(width, height, kRGBA_8888_SkColorType, kPremul_SkAlphaType, SkColorSpace::MakeSRGB());
+    sk_sp<SkSurface> surface = fGraphite ? SkSurfaces::RenderTarget(fRecorder.get(), info)
+                                         : SkSurfaces::RenderTarget(fGanesh.get(), skgpu::Budgeted::kNo, info);
+    if (!surface) return false;
+    surface->getCanvas()->clear(SK_ColorTRANSPARENT);
+    paint(surface->getCanvas());
+    return this->readSurface(surface.get(), info.makeAlphaType(kUnpremul_SkAlphaType), false, rgba);
+}
+
+bool EngineImpl::readSurface(SkSurface* surface, const SkImageInfo& out, bool tidy, std::vector<uint8_t>* rgba) {
     if (fGpuFailed) return false;
+    const int width = out.width(), height = out.height();
     const size_t bytes = (size_t)width * height * 4;
     void* probe = std::malloc(bytes);
     if (!probe) return false;
@@ -1270,7 +1294,7 @@ bool EngineImpl::offscreen(int width, int height, bool premultiplied,
     };
     auto read = std::make_shared<Read>(Read{rgba, width, height});
     fGraphite->asyncRescaleAndReadPixels(
-            surface.get(), out, SkIRect::MakeWH(width, height), SkImage::RescaleGamma::kSrc,
+            surface, out, SkIRect::MakeWH(width, height), SkImage::RescaleGamma::kSrc,
             SkImage::RescaleMode::kNearest,
             [](void* context, std::unique_ptr<const SkImage::AsyncReadResult> result) {
                 std::unique_ptr<std::shared_ptr<Read>> holder(static_cast<std::shared_ptr<Read>*>(context));
@@ -1291,7 +1315,7 @@ bool EngineImpl::offscreen(int width, int height, bool premultiplied,
         this->failGpu(nullptr);
         return false;
     }
-    this->deleteDeadTextures();
+    if (tidy) this->deleteDeadTextures();
     fGraphite->checkAsyncWorkCompletion();
     read->rgba = nullptr;
     return read->done && read->ok;
@@ -1344,7 +1368,8 @@ int EngineImpl::frame(Target* target, int64_t presentTimeNs, bool sync,
     if (fBackend == Backend::kGraphite) {
         {
             SkAutoCanvasRestore restore(surface->getCanvas(), true);
-            sk_sp<SkSurface> layer = target->encoder ? SkSurfaces::RenderTarget(fRecorder.get(), surface->imageInfo()) : nullptr;
+            const bool grabbing = fEffects.grabs(fScene.layers);
+            sk_sp<SkSurface> layer = target->encoder || grabbing ? SkSurfaces::RenderTarget(fRecorder.get(), surface->imageInfo()) : nullptr;
             if (layer) {
                 const std::function<void()> flush = [this] { this->flushPartial(); };
                 SetLayerBreak(&flush);
@@ -1354,7 +1379,9 @@ int EngineImpl::frame(Target* target, int64_t presentTimeNs, bool sync,
                 copy.setBlendMode(SkBlendMode::kSrc);
                 surface->getCanvas()->drawImage(SkSurfaces::AsImage(layer), 0, 0, SkSamplingOptions(), &copy);
             } else {
+                fNoGrab = grabbing;
                 paint(surface->getCanvas());
+                fNoGrab = false;
             }
         }
         std::unique_ptr<skgpu::graphite::Recording> recording = fRecorder->snap();

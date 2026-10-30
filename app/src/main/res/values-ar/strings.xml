@@ -1074,6 +1074,8 @@
     <string name="structure_group_mask">تجميع وقناع</string>
     <string name="structure_group_exclude">تجميع واستبعاد</string>
     <string name="structure_delete_selected">حذف الطبقات المحددة</string>
+    <string name="structure_link_parent">ربط بطبقة أم</string>
+    <string name="structure_link_parent_skipped">لم تُربط بعض الطبقات لأن الطبقة الأم المختارة مرتبطة بها.</string>
     <string name="structure_alignment_options">خيارات المحاذاة</string>
     <string name="structure_group_options">خيارات التجميع</string>
     <string name="structure_align_left">محاذاة لليسار</string>
@@ -1890,4 +1892,15 @@
     <string name="crop_reset">إعادة ضبط</string>
     <string name="a11y_crop_ratio">نسبة العرض إلى الارتفاع %1$s</string>
     <string name="a11y_crop_area">منطقة الاقتصاص. اسحب زاوية أو حافة للاقتصاص، أو اسحب داخلها لتحريك منطقة الاقتصاص.</string>
+    <string name="effect_palette_presets">إعدادات مسبقة</string>
+    <string name="effect_palette_import">استيراد</string>
+    <plurals name="effect_palette_colors">
+        <item quantity="zero">لا ألوان</item>
+        <item quantity="one">لون واحد</item>
+        <item quantity="two">لونان</item>
+        <item quantity="few">%1$s ألوان</item>
+        <item quantity="many">%1$s لونًا</item>
+        <item quantity="other">%1$s لون</item>
+    </plurals>
+    <string name="effect_palette_unreadable">تعذّرت قراءة أي ألوان من هذا الملف.</string>
 </resources>

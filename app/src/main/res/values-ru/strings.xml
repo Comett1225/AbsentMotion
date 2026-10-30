@@ -1040,6 +1040,8 @@
     <string name="structure_group_mask">Группа и маска</string>
     <string name="structure_group_exclude">Группа и исключение</string>
     <string name="structure_delete_selected">Удалить выбранные слои</string>
+    <string name="structure_link_parent">Привязать к родителю</string>
+    <string name="structure_link_parent_skipped">Некоторые слои не привязаны: выбранный родитель сам привязан к ним.</string>
     <string name="structure_alignment_options">Параметры выравнивания</string>
     <string name="structure_group_options">Параметры группы</string>
     <string name="structure_align_left">Выровнять по левому краю</string>
@@ -1842,4 +1844,13 @@
     <string name="crop_reset">Сбросить</string>
     <string name="a11y_crop_ratio">Соотношение сторон %1$s</string>
     <string name="a11y_crop_area">Область обрезки. Перетащите угол или край, чтобы обрезать, или перетащите внутри, чтобы сдвинуть обрезку.</string>
+    <string name="effect_palette_presets">Пресеты</string>
+    <string name="effect_palette_import">Импорт</string>
+    <plurals name="effect_palette_colors">
+        <item quantity="one">%1$s цвет</item>
+        <item quantity="few">%1$s цвета</item>
+        <item quantity="many">%1$s цветов</item>
+        <item quantity="other">%1$s цвета</item>
+    </plurals>
+    <string name="effect_palette_unreadable">Не удалось прочитать цвета из этого файла.</string>
 </resources>

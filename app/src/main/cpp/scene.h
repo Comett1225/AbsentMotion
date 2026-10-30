@@ -297,6 +297,7 @@ private:
     const Scene* fPrevious;
 };
 void SetLayerBreak(const std::function<void()>* each);
+void NoteOrientedEffect(const std::string& id);
 bool WorldView();
 bool EffectOwnerMatrix(int64_t owner, double timeMs, SkMatrix* matrix);
 
