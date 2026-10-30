@@ -34,6 +34,8 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
         val ignore: Boolean = false,
         val turn: Boolean = false,
         val blank: String? = null,
+        val signs: List<Float> = emptyList(),
+        val pre: List<Float> = emptyList(),
     )
 
     class Rule(val to: String, val params: Map<String, List<Conversion?>>, val set: Map<String, String>, val onlyWith: String? = null)
@@ -159,7 +161,8 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
         }
         val size = when (c.per) { "width" -> dims[0]; "height" -> dims[1]; "spanWidth" -> dims.getOrElse(3) { dims[0] }; "spanHeight" -> dims.getOrElse(4) { dims[1] }; else -> 1f }
         return formatFloats(FloatArray(numbers.size) { i ->
-            val base = if (c.relative) numbers[i] / dims[(if (component >= 0) component else i) % 2] + 0.5f else numbers[i]
+            val shown = if (c.relative) numbers[i] / dims[(if (component >= 0) component else i) % 2] + 0.5f else numbers[i]
+            val base = shown * c.signs.getOrElse(i) { 1f } + c.pre.getOrElse(i) { 0f }
             val raised = if (c.power == 1f) base else abs(base).pow(c.power).withSign(base)
             val moved = raised * c.scale * size + c.offset + shift + if (c.turn) dims.getOrElse(2) { 0f } else 0f
             (if (c.wrap > 0f) moved.mod(c.wrap) else moved).coerceIn(c.min, c.max)
@@ -213,6 +216,8 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
             json.optBoolean("ignore"),
             json.optBoolean("turn"),
             json.optString("blank").takeIf { it.isNotEmpty() },
+            json.optJSONArray("signs")?.let { a -> List(a.length()) { a.getDouble(it).toFloat() } }.orEmpty(),
+            json.optJSONArray("pre")?.let { a -> List(a.length()) { a.getDouble(it).toFloat() } }.orEmpty(),
         )
     }
 }
