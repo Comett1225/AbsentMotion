@@ -561,7 +561,7 @@
    }
   },
   "colorwheels": {
-   "description": "Ruedas de color para las sombras (lift), los medios tonos (gamma) y las luces (gain): un tono, cuánto desplazarlo y un nivel.",
+   "description": "Ruedas de color para las sombras (lift), los medios tonos (gamma) y las luces (gain): un tono, cuánto desplazarlo y un nivel. Desplazamiento mueve todos los tonos. El estilo Según el brillo pondera cada rueda por el brillo del píxel.",
    "name": "Elevación, gamma y ganancia",
    "params": {
     "gainAmount": {
@@ -590,6 +590,22 @@
     },
     "liftLevel": {
      "label": "Nivel de elevación"
+    },
+    "offsetHue": {
+     "label": "Tono de desplazamiento"
+    },
+    "offsetAmount": {
+     "label": "Cantidad de desplazamiento"
+    },
+    "offsetLevel": {
+     "label": "Nivel de desplazamiento"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Clásico",
+      "Según el brillo"
+     ]
     }
    }
   },
@@ -4034,7 +4050,7 @@
    }
   },
   "splittone": {
-   "description": "Tiñe las sombras hacia un tono y las altas luces hacia otro, conservando el negro, el blanco y el brillo.",
+   "description": "Tiñe las sombras hacia un tono y las altas luces hacia otro, conservando el negro, el blanco y el brillo. Nivel de sombras curva el brillo y Nivel de altas luces mueve dónde empieza el color de las altas luces. El estilo Mapa de degradado da a cada píxel un color solo según su brillo.",
    "name": "Tono dividido",
    "params": {
     "highlightAmount": {
@@ -4048,6 +4064,19 @@
     },
     "shadowHue": {
      "label": "Tono de sombras"
+    },
+    "shadowLevel": {
+     "label": "Nivel de sombras"
+    },
+    "highlightLevel": {
+     "label": "Nivel de altas luces"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Tinte",
+      "Mapa de degradado"
+     ]
     }
    }
   },

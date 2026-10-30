@@ -561,7 +561,7 @@
    }
   },
   "colorwheels": {
-   "description": "Gölgeler (lift), orta tonlar (gama) ve vurgular (gain) için renk tekerlekleri: bir renk tonu, itme miktarı ve seviye.",
+   "description": "Gölgeler (lift), orta tonlar (gama) ve vurgular (gain) için renk tekerlekleri: bir renk tonu, itme miktarı ve seviye. Kaydırma tüm tonları kaydırır. Parlaklığa Göre stili her çarkı pikselin parlaklığına göre ağırlıklandırır.",
    "name": "Kaldır Gama Kazanç",
    "params": {
     "gainAmount": {
@@ -590,6 +590,22 @@
     },
     "liftLevel": {
      "label": "Kaldır Seviyesi"
+    },
+    "offsetHue": {
+     "label": "Kaydırma Tonu"
+    },
+    "offsetAmount": {
+     "label": "Kaydırma Miktarı"
+    },
+    "offsetLevel": {
+     "label": "Kaydırma Seviyesi"
+    },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Klasik",
+      "Parlaklığa Göre"
+     ]
     }
    }
   },
@@ -4034,7 +4050,7 @@
    }
   },
   "splittone": {
-   "description": "Gölgeleri bir renk tonuna, ışıkları başka bir tona doğru renklendirir; siyahı, beyazı ve parlaklığı korur.",
+   "description": "Gölgeleri bir renk tonuna, ışıkları başka bir tona doğru renklendirir; siyahı, beyazı ve parlaklığı korur. Gölge Seviyesi parlaklık eğrisini büker, Vurgu Seviyesi vurgu renginin başladığı yeri kaydırır. Gradyan Haritası stili her piksele yalnızca parlaklığından bir renk verir.",
    "name": "Bölünmüş Ton",
    "params": {
     "highlightAmount": {
@@ -4048,6 +4064,19 @@
     },
     "shadowHue": {
      "label": "Gölge Tonu"
+    },
+    "shadowLevel": {
+     "label": "Gölge Seviyesi"
+    },
+    "highlightLevel": {
+     "label": "Vurgu Seviyesi"
+    },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Renk Tonu",
+      "Gradyan Haritası"
+     ]
     }
    }
   },

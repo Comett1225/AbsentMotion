@@ -561,7 +561,7 @@
    }
   },
   "colorwheels": {
-   "description": "Rodas de cor para sombras (lift), meios-tons (gamma) e realces (gain): um matiz, o quanto puxar e um nível.",
+   "description": "Rodas de cor para sombras (lift), meios-tons (gamma) e realces (gain): um matiz, o quanto puxar e um nível. Deslocamento move todos os tons. O estilo Pelo brilho pondera cada roda pelo brilho do pixel.",
    "name": "Lift, gamma e gain",
    "params": {
     "gainAmount": {
@@ -590,6 +590,22 @@
     },
     "liftLevel": {
      "label": "Nível do lift"
+    },
+    "offsetHue": {
+     "label": "Matiz do deslocamento"
+    },
+    "offsetAmount": {
+     "label": "Quantidade do deslocamento"
+    },
+    "offsetLevel": {
+     "label": "Nível do deslocamento"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Clássico",
+      "Pelo brilho"
+     ]
     }
    }
   },
@@ -4034,7 +4050,7 @@
    }
   },
   "splittone": {
-   "description": "Colore as sombras com um tom e os realces com outro, mantendo preto, branco e brilho.",
+   "description": "Colore as sombras com um tom e os realces com outro, mantendo preto, branco e brilho. Nível das sombras curva o brilho e Nível dos realces move onde a cor dos realces começa. O estilo Mapa de gradiente dá a cada pixel uma cor só pelo seu brilho.",
    "name": "Tom dividido",
    "params": {
     "highlightAmount": {
@@ -4048,6 +4064,19 @@
     },
     "shadowHue": {
      "label": "Matiz das sombras"
+    },
+    "shadowLevel": {
+     "label": "Nível das sombras"
+    },
+    "highlightLevel": {
+     "label": "Nível dos realces"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Matiz",
+      "Mapa de gradiente"
+     ]
     }
    }
   },

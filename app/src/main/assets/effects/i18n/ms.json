@@ -561,7 +561,7 @@
    }
   },
   "colorwheels": {
-   "description": "Roda warna untuk bayang (lift), nada pertengahan (gamma) dan sorotan (gain): rona, sejauh mana hendak ditolak, dan tahap.",
+   "description": "Roda warna untuk bayang (lift), nada pertengahan (gamma) dan sorotan (gain): rona, sejauh mana hendak ditolak, dan tahap. Ofset mengalihkan semua ton. Gaya Ikut Kecerahan memberi pemberat setiap roda mengikut kecerahan piksel.",
    "name": "Lift Gamma Gain",
    "params": {
     "gainAmount": {
@@ -590,6 +590,22 @@
     },
     "liftLevel": {
      "label": "Tahap Lift"
+    },
+    "offsetHue": {
+     "label": "Rona Ofset"
+    },
+    "offsetAmount": {
+     "label": "Jumlah Ofset"
+    },
+    "offsetLevel": {
+     "label": "Tahap Ofset"
+    },
+    "style": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Ikut Kecerahan"
+     ]
     }
    }
   },
@@ -4034,7 +4050,7 @@
    }
   },
   "splittone": {
-   "description": "Mewarnakan bayang ke satu rona dan sorotan ke rona lain, sambil mengekalkan hitam, putih dan kecerahan.",
+   "description": "Mewarnakan bayang ke satu rona dan sorotan ke rona lain, sambil mengekalkan hitam, putih dan kecerahan. Tahap Bayang membengkokkan lengkung kecerahan dan Tahap Sorotan mengalihkan tempat warna sorotan bermula. Gaya Peta Gradien memberi setiap piksel warna daripada kecerahannya sahaja.",
    "name": "Tona Terpisah",
    "params": {
     "highlightAmount": {
@@ -4048,6 +4064,19 @@
     },
     "shadowHue": {
      "label": "Rona Bayang"
+    },
+    "shadowLevel": {
+     "label": "Tahap Bayang"
+    },
+    "highlightLevel": {
+     "label": "Tahap Sorotan"
+    },
+    "style": {
+     "label": "Gaya",
+     "options": [
+      "Tint",
+      "Peta Gradien"
+     ]
     }
    }
   },

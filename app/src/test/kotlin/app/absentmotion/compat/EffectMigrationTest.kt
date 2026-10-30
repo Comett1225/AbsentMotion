@@ -227,6 +227,41 @@ class EffectMigrationTest {
         assertEquals("#00000000", all[3].prop("tint")["value"])
     }
 
+    @Test fun liftGammaGainAndSplitToneTakeAlightsStyleOffsetAndDefaultColours() {
+        val xml = """<scene width="1080" height="1350" fps="30" totalTime="1000">
+            <shape id="1" startTime="0" endTime="1000" fillType="color" s=".rect">
+              <effect id="com.alightcreative.effects.colortune2">
+                <property name="gain" type="vec3" value="-127.693604,0.636898,0.000000" /><property name="gamma" type="vec3" value="0,0,0" />
+                <property name="lift" type="vec3" value="32.112518,0.999645,0.716700" /><property name="offset" type="vec3" value="-121.350021,0.755933,-0.536965" />
+              </effect>
+              <effect id="com.alightcreative.effects.colorhot">
+                <property name="color" type="vec3" value="0,0,0" /><property name="tint" type="vec3" value="252.364059,0.399437,-0.286586" />
+              </effect>
+              <effect id="com.alightcreative.effects.colorhot">
+                <property name="color" type="vec3" value="-127.094620,0.299229,-0.2" /><property name="tint" type="vec3" value="0,0,0" />
+              </effect>
+            </shape>
+          </scene>"""
+        val result = migration.migrate(Scene.parse(xml))
+        val all = effects(result.scene.node)
+        assertEquals(listOf("colorwheels", "splittone", "splittone").map { "absent.$it" }, all.map { it["id"] })
+        assertTrue(result.dropped.toString(), result.dropped.isEmpty())
+        close(1f, all[0].number("style"))
+        close(232.306396f, all[0].number("gainHue"))
+        close(238.649979f, all[0].number("offsetHue"))
+        close(0.755933f, all[0].number("offsetAmount"))
+        close(-0.536965f, all[0].number("offsetLevel"))
+        close(0.7167f, all[0].number("liftLevel"))
+        close(1f, all[1].number("style"))
+        close(0f, all[1].number("shadowHue"))
+        close(1f, all[1].number("shadowAmount"))
+        close(-0.286586f, all[1].number("highlightLevel"))
+        close(232.90538f, all[2].number("shadowHue"))
+        close(-0.2f, all[2].number("shadowLevel"))
+        close(60f, all[2].number("highlightHue"))
+        close(1f, all[2].number("highlightAmount"))
+    }
+
     @Test fun alightFilesSquarePlainBlendOpacityOnceAndScaleOffsetsToTheLayer() {
         val xml = """<scene width="1080" height="1350" fps="30" totalTime="1000" am="com.alightcreative.motion/5.0.273">
             <shape id="1" startTime="0" endTime="1000" fillType="color" blending="subtract" s=".rect"><transform><opacity value="0.5" /></transform></shape>

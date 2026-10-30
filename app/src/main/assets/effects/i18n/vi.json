@@ -561,7 +561,7 @@
    }
   },
   "colorwheels": {
-   "description": "Bánh xe màu cho vùng tối (lift), vùng trung gian (gamma) và vùng sáng (gain): tông màu, mức đẩy tông màu và độ mạnh.",
+   "description": "Bánh xe màu cho vùng tối (lift), vùng trung gian (gamma) và vùng sáng (gain): tông màu, mức đẩy tông màu và độ mạnh. Dịch chuyển mọi tông màu. Kiểu Theo độ sáng tính mỗi bánh xe theo độ sáng của điểm ảnh.",
    "name": "Lift Gamma Gain",
    "params": {
     "gainAmount": {
@@ -590,6 +590,22 @@
     },
     "liftLevel": {
      "label": "Mức Lift"
+    },
+    "offsetHue": {
+     "label": "Sắc độ dịch"
+    },
+    "offsetAmount": {
+     "label": "Mức dịch"
+    },
+    "offsetLevel": {
+     "label": "Cấp độ dịch"
+    },
+    "style": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Theo độ sáng"
+     ]
     }
    }
   },
@@ -4034,7 +4050,7 @@
    }
   },
   "splittone": {
-   "description": "Nhuộm vùng tối sang một tông màu và vùng sáng sang tông khác, giữ nguyên đen, trắng và độ sáng.",
+   "description": "Nhuộm vùng tối sang một tông màu và vùng sáng sang tông khác, giữ nguyên đen, trắng và độ sáng. Cấp độ vùng tối uốn đường cong độ sáng và Cấp độ vùng sáng dời điểm bắt đầu màu vùng sáng. Kiểu Bản đồ chuyển màu cho mỗi điểm ảnh một màu chỉ từ độ sáng của nó.",
    "name": "Tách tông",
    "params": {
     "highlightAmount": {
@@ -4048,6 +4064,19 @@
     },
     "shadowHue": {
      "label": "Tông vùng tối"
+    },
+    "shadowLevel": {
+     "label": "Cấp độ vùng tối"
+    },
+    "highlightLevel": {
+     "label": "Cấp độ vùng sáng"
+    },
+    "style": {
+     "label": "Kiểu",
+     "options": [
+      "Phủ màu",
+      "Bản đồ chuyển màu"
+     ]
     }
    }
   },

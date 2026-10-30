@@ -33,6 +33,7 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
         val gate: String? = null,
         val ignore: Boolean = false,
         val turn: Boolean = false,
+        val blank: String? = null,
     )
 
     class Rule(val to: String, val params: Map<String, List<Conversion?>>, val set: Map<String, String>, val onlyWith: String? = null)
@@ -147,7 +148,7 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
     }
 
     private fun convertValue(text: String, c: Conversion, component: Int, shift: Float, dims: FloatArray): String {
-        val t = text.trim()
+        val t = text.trim().let { s -> if (c.blank != null && s.split(',').all { it.trim().finiteFloat() == 0f }) c.blank else s }
         if (t == "true" || t == "false") return c.values[t]?.let { formatFloats(floatArrayOf(it)) } ?: t
         if (t.startsWith("#")) return t
         val parts = t.split(',')
@@ -211,6 +212,7 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
             json.optString("gate").takeIf { it.isNotEmpty() },
             json.optBoolean("ignore"),
             json.optBoolean("turn"),
+            json.optString("blank").takeIf { it.isNotEmpty() },
         )
     }
 }

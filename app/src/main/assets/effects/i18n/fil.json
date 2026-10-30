@@ -561,7 +561,7 @@
    }
   },
   "colorwheels": {
-   "description": "Mga color wheel para sa shadows (lift), midtones (gamma), at highlights (gain): isang hue, kung gaano kalayo itulak, at isang level.",
+   "description": "Mga color wheel para sa shadows (lift), midtones (gamma), at highlights (gain): isang hue, kung gaano kalayo itulak, at isang level. Inililipat ng Offset ang lahat ng tono. Sa estilong Ayon sa Liwanag, tinitimbang ang bawat gulong ayon sa liwanag ng pixel.",
    "name": "Lift gamma gain",
    "params": {
     "gainAmount": {
@@ -590,6 +590,22 @@
     },
     "liftLevel": {
      "label": "Antas ng lift"
+    },
+    "offsetHue": {
+     "label": "Hue ng Offset"
+    },
+    "offsetAmount": {
+     "label": "Dami ng Offset"
+    },
+    "offsetLevel": {
+     "label": "Level ng Offset"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Ayon sa Liwanag"
+     ]
     }
    }
   },
@@ -4034,7 +4050,7 @@
    }
   },
   "splittone": {
-   "description": "Kinukulayan ang mga anino at highlight sa magkaibang hue, pinapanatili ang itim, puti at liwanag.",
+   "description": "Kinukulayan ang mga anino at highlight sa magkaibang hue, pinapanatili ang itim, puti at liwanag. Binabaluktot ng Level ng Anino ang kurba ng liwanag at inililipat ng Level ng Highlight kung saan nagsisimula ang kulay ng highlight. Sa estilong Gradient Map, kulay mula sa liwanag lang ang ibinibigay sa bawat pixel.",
    "name": "Hatiin ang Tono",
    "params": {
     "highlightAmount": {
@@ -4048,6 +4064,19 @@
     },
     "shadowHue": {
      "label": "Hue ng Anino"
+    },
+    "shadowLevel": {
+     "label": "Level ng Anino"
+    },
+    "highlightLevel": {
+     "label": "Level ng Highlight"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Tint",
+      "Gradient Map"
+     ]
     }
    }
   },

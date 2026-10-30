@@ -112,36 +112,42 @@
   "params": {
    "color": [
     {
-     "to": "shadowHue"
+     "to": "shadowHue",
+     "wrap": 360,
+     "blank": "0,1,0"
     },
     {
      "to": "shadowAmount",
-     "scale": 1,
      "min": 0,
-     "max": 1
+     "blank": "0,1,0"
     },
     {
-     "neutral": 0
+     "to": "shadowLevel",
+     "blank": "0,1,0"
     }
    ],
    "tint": [
     {
-     "to": "highlightHue"
+     "to": "highlightHue",
+     "wrap": 360,
+     "blank": "60,1,0"
     },
     {
      "to": "highlightAmount",
-     "scale": 1,
      "min": 0,
-     "max": 1
+     "blank": "60,1,0"
     },
     {
-     "neutral": 0
+     "to": "highlightLevel",
+     "blank": "60,1,0"
     }
    ]
   },
   "set": {
-   "shadowAmount": 0,
-   "highlightAmount": 0
+   "shadowAmount": 1,
+   "highlightHue": 60,
+   "highlightAmount": 1,
+   "style": 1
   }
  },
  "com.alightcreative.fourcolorgradient": {
@@ -205,12 +211,10 @@
     },
     {
      "to": "liftAmount",
-     "min": 0,
-     "max": 1
+     "min": 0
     },
     {
-     "to": "liftLevel",
-     "scale": 1
+     "to": "liftLevel"
     }
    ],
    "gamma": [
@@ -220,12 +224,10 @@
     },
     {
      "to": "gammaAmount",
-     "min": 0,
-     "max": 1
+     "min": 0
     },
     {
-     "to": "gammaLevel",
-     "scale": 1
+     "to": "gammaLevel"
     }
    ],
    "gain": [
@@ -235,19 +237,31 @@
     },
     {
      "to": "gainAmount",
-     "min": 0,
-     "max": 1
+     "min": 0
     },
     {
-     "to": "gainLevel",
-     "scale": 1
+     "to": "gainLevel"
+    }
+   ],
+   "offset": [
+    {
+     "to": "offsetHue",
+     "wrap": 360
+    },
+    {
+     "to": "offsetAmount",
+     "min": 0
+    },
+    {
+     "to": "offsetLevel"
     }
    ]
   },
   "set": {
    "liftAmount": 0,
    "gammaAmount": 0,
-   "gainAmount": 0
+   "gainAmount": 0,
+   "style": 1
   }
  },
  "com.alightcreative.effects.lightglow": {
@@ -2896,6 +2910,7 @@
    }
   },
   "set": {
+   "extent": 1.1,
    "style": 1
   }
  },

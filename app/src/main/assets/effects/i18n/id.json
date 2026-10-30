@@ -561,7 +561,7 @@
    }
   },
   "colorwheels": {
-   "description": "Roda warna untuk bayangan (lift), nada tengah (gamma), dan sorotan (gain): hue, seberapa jauh digeser, dan level.",
+   "description": "Roda warna untuk bayangan (lift), nada tengah (gamma), dan sorotan (gain): hue, seberapa jauh digeser, dan level. Offset menggeser semua nada. Gaya Menurut Kecerahan memberi bobot tiap roda menurut kecerahan piksel.",
    "name": "Lift Gamma Gain",
    "params": {
     "gainAmount": {
@@ -590,6 +590,22 @@
     },
     "liftLevel": {
      "label": "Level Lift"
+    },
+    "offsetHue": {
+     "label": "Rona Offset"
+    },
+    "offsetAmount": {
+     "label": "Jumlah Offset"
+    },
+    "offsetLevel": {
+     "label": "Level Offset"
+    },
+    "style": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Menurut Kecerahan"
+     ]
     }
    }
   },
@@ -4034,7 +4050,7 @@
    }
   },
   "splittone": {
-   "description": "Memberi warna pada bayangan ke satu hue dan sorotan ke hue lain, sambil mempertahankan hitam, putih, dan kecerahan.",
+   "description": "Memberi warna pada bayangan ke satu hue dan sorotan ke hue lain, sambil mempertahankan hitam, putih, dan kecerahan. Level Bayangan membengkokkan kurva kecerahan dan Level Sorotan menggeser titik awal warna sorotan. Gaya Peta Gradien memberi tiap piksel warna dari kecerahannya saja.",
    "name": "Nada terpisah",
    "params": {
     "highlightAmount": {
@@ -4048,6 +4064,19 @@
     },
     "shadowHue": {
      "label": "Hue bayangan"
+    },
+    "shadowLevel": {
+     "label": "Level Bayangan"
+    },
+    "highlightLevel": {
+     "label": "Level Sorotan"
+    },
+    "style": {
+     "label": "Gaya",
+     "options": [
+      "Tint",
+      "Peta Gradien"
+     ]
     }
    }
   },
