@@ -23,11 +23,48 @@
    "step": 1
   },
   {
+   "id": "style",
+   "label": "Style",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Classic",
+    "Two Color"
+   ]
+  },
+  {
    "id": "colored",
    "label": "Color Dots",
    "type": "switch",
-   "default": true
+   "default": true,
+   "when": {
+    "style": [
+     0
+    ]
+   }
+  },
+  {
+   "id": "ink",
+   "label": "Dot Color",
+   "type": "color",
+   "default": "#103152",
+   "when": {
+    "style": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "paper",
+   "label": "Paper Color",
+   "type": "color",
+   "default": "#fcecda",
+   "when": {
+    "style": [
+     1
+    ]
+   }
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float cell;\nuniform float angle;\nuniform float colored;\nhalf luma(half3 c) { return dot(c, half3(0.2126, 0.7152, 0.0722)); }\nhalf4 main(float2 coord) {\n    float a = radians(angle), cs = cos(a), sn = sin(a);\n    float s = max(cell, 2);\n    float2 p = float2(cs * coord.x + sn * coord.y, -sn * coord.x + cs * coord.y);\n    float2 m = (floor(p / s) + 0.5) * s;\n    half4 c = image.eval(float2(cs * m.x - sn * m.y, sn * m.x + cs * m.y));\n    half4 u = unpremul(c);\n    float radius = 0.7071 * s * sqrt(max(1 - float(luma(u.rgb)), 0.0));\n    half ink = half(saturate(radius - distance(p, m) + 0.5));\n    half3 rgb = mix(half3(1), colored > 0.5 ? u.rgb : half3(0), ink);\n    return half4(rgb * c.a, c.a);\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float cell;\nuniform float angle;\nuniform float style;\nuniform float colored;\nlayout(color) uniform half4 ink;\nlayout(color) uniform half4 paper;\nhalf luma(half3 c) { return dot(c, half3(0.2126, 0.7152, 0.0722)); }\nhalf4 main(float2 coord) {\n    float a = radians(angle), cs = cos(a), sn = sin(a);\n    float s = max(cell, 2);\n    if (style > 0.5) {\n        float2 q = coord - size * 0.5;\n        float2 p = float2(cs * q.x + sn * q.y, -sn * q.x + cs * q.y);\n        float j0 = floor(p.y / s + 0.5);\n        float near = 1e9;\n        float2 hit = float2(0.0);\n        for (int k = -1; k <= 1; k++) {\n            float j = j0 + float(k);\n            float2 m = float2(j * s * 0.5 + floor((p.x - j * s * 0.5) / s + 0.5) * s, j * s);\n            float d = distance(p, m);\n            if (d < near) { near = d; hit = m; }\n        }\n        half4 c = unpremul(image.eval(float2(cs * hit.x - sn * hit.y, sn * hit.x + cs * hit.y) + size * 0.5));\n        half4 here = image.eval(coord);\n        half cover = half(saturate(s * (0.5 - luma(c.rgb)) - near + 0.5));\n        half3 rgb = mix(paper.rgb, ink.rgb, cover);\n        return half4(rgb * here.a, here.a);\n    }\n    float2 p = float2(cs * coord.x + sn * coord.y, -sn * coord.x + cs * coord.y);\n    float2 m = (floor(p / s) + 0.5) * s;\n    half4 c = image.eval(float2(cs * m.x - sn * m.y, sn * m.x + cs * m.y));\n    half4 u = unpremul(c);\n    float radius = 0.7071 * s * sqrt(max(1 - float(luma(u.rgb)), 0.0));\n    half ink2 = half(saturate(radius - distance(p, m) + 0.5));\n    half3 rgb = mix(half3(1), colored > 0.5 ? u.rgb : half3(0), ink2);\n    return half4(rgb * c.a, c.a);\n}\n"
 }
