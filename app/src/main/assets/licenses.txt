@@ -2749,7 +2749,7 @@ The launcher icon is an own drawing, made by tools/icon/make_icon.py (source of 
 COUNTS
 ------
 
-- Lucide only - 172
+- Lucide only - 173
 - Lucide shapes plus own parts - 8
 - Own drawing only - 43
 - Tabler - 2
@@ -2859,6 +2859,7 @@ ICONS
 - CheckCircle (Lucide circle-check) - ISC - ui/editor/PanelIcons.kt
 - Backspace (Lucide delete) - ISC - ui/editor/PanelIcons.kt
 - Check (Lucide check) - ISC and MIT (Feather) - ui/editor/PanelIcons.kt
+- Reverse (Lucide arrow-right-left) - ISC - ui/editor/PanelIcons.kt
 - Receive (Lucide download) - ISC and MIT (Feather) - ui/home/HomeIcons.kt
 - Menu (Lucide menu) - ISC - ui/home/HomeIcons.kt
 - ChevronDown (Lucide chevron-down) - ISC and MIT (Feather) - ui/home/HomeIcons.kt

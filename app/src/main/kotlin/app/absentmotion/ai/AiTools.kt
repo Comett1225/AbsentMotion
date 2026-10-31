@@ -226,7 +226,7 @@ class AiTools(private val context: Context, private val state: EditorState, priv
                 }
                 committed = true
                 message = fallback?.let { AppText.get(it) } ?: ""
-                if (fallback == null && action != AiAction.Reverse) {
+                if (fallback == null && action != AiAction.Reverse && state.panel != EditorPanel.Speed) {
                     state.panel = EditorPanel.Tools
                     state.effectBrowserOpen = false
                 }

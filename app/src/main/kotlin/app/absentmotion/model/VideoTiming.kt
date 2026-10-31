@@ -2,6 +2,7 @@ package app.absentmotion.model
 
 import androidx.annotation.StringRes
 import app.absentmotion.R
+import app.absentmotion.engine.NativeEngine
 import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.sqrt
@@ -31,9 +32,10 @@ class VideoTiming(layer: Layer) {
             for ((a, b) in keys.zipWithNext()) {
                 val easing = Easing.parse(b.e)
                 val count = if (easing.isLinear) 1 else ceil((b.t - a.t) / 50_000_000.0).toInt().coerceIn(1, 250)
+                val eased = if (easing.isLinear) null else NativeEngine.ease(easing.toString(), FloatArray(count) { (it + 1).toFloat() / count })
                 for (i in 1..count) {
                     val u = i.toFloat() / count
-                    val value = a.v.toDouble() + (b.v.toDouble() - a.v.toDouble()) * (if (easing.isLinear) u else easing.at(u))
+                    val value = a.v.toDouble() + (b.v.toDouble() - a.v.toDouble()) * (eased?.get(i - 1) ?: u)
                     samples += (a.t + (b.t - a.t) * u).toDouble() / 1_000_000 to value.coerceAtLeast(MIN_SPEED)
                 }
             }
@@ -324,16 +326,6 @@ enum class SpeedRamp(@StringRes val label: Int, val points: List<Pair<Float, Flo
 
 const val RAMP_EASE = "cubicBezier 0.42 0.0 0.58 1.0"
 
-fun speedRampKeys(ramp: SpeedRamp, fromNs: Float, toNs: Float, ease: String? = RAMP_EASE): List<Keyframe> =
-    ramp.points.mapIndexed { i, (u, speed) -> Keyframe(fromNs + (toNs - fromNs) * u, speed.toString(), ease.takeIf { i > 0 }) }
-
-fun Layer.withSpeedRamp(ramp: SpeedRamp, ease: String? = RAMP_EASE): Layer {
-    val timing = VideoTiming(this)
-    val from = (timing.mediaMs(0.0) * 1_000_000).toFloat()
-    val to = (timing.mediaMs((endTime - startTime).toDouble()) * 1_000_000).toFloat()
-    return withVideoSpeedMap(XmlNode("speedMap").withKeyframes(speedRampKeys(ramp, from, to, ease)))
-}
-
 private const val HOLD_RAMP_NS = 250_000f
 private const val HOLD_SPAN_NS = 500_000f
 
@@ -368,7 +360,7 @@ fun Layer.withKeyframesMoved(from: Int, to: Int, scene: Scene, scope: KeyScope? 
     val target = scene.frameTime(to).coerceIn(startTime, endTime)
     if (length <= 0 || scene.frameAt(target) == from) return this
     val timing = VideoTiming(this)
-    val map = node.child("speedMap").takeIf { scope == null || scope.ref == SpeedRef }
+    val map = node.child("speedMap").takeIf { scope?.ref == SpeedRef }
     fun keyAt(frame: Int) = { t: Float -> scene.frameAt(timeOf(t)) == frame }
     val speedMoves = { t: Float -> scene.frameAt(startTime + timing.localMs(t / 1e6).roundToInt()) == from }
     if (map == null || map.keyframes.none { speedMoves(it.t) }) {
@@ -386,8 +378,7 @@ fun Layer.withKeyframesMoved(from: Int, to: Int, scene: Scene, scope: KeyScope? 
     val after = shifted(media)
     fun landing(media: Double) = scene.frameAt(startTime + after.localMs(media).roundToInt())
     val landed = landing(media)
-    val keys = if (scope == null) node.allKeysMoved((timing.localMs(media) / length).toFloat(), keyAt(from)) { landing(timing.mediaMs(it.toDouble() * length)) == landed } else node
-    return copy(node = keys).withVideoSpeedMap(map.keysMoved((media * 1e6).toFloat(), speedMoves) { landing(it / 1e6) == landed })
+    return withVideoSpeedMap(map.keysMoved((media * 1e6).toFloat(), speedMoves) { landing(it / 1e6) == landed })
 }
 
 private fun Layer.withScopedKeys(scope: KeyScope?, change: (XmlNode) -> XmlNode): Layer = when {

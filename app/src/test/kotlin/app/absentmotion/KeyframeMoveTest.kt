@@ -63,7 +63,7 @@ class KeyframeMoveTest {
         assertSame(base, base.withKeyframesMoved(59, 80, scene))
     }
 
-    @Test fun speedAndEffectKeysMoveTogether() {
+    @Test fun theTimelineMovesEffectKeysAndLeavesTheSpeedCurveAlone() {
         val speed = XmlNode("speedMap", children = listOf(
             XmlNode("kf", mapOf("t" to "0", "v" to "1")),
             XmlNode("kf", mapOf("t" to "1000000000", "v" to "2")),
@@ -72,13 +72,11 @@ class KeyframeMoveTest {
         val local = VideoTiming(plain).localMs(1000.0)
         val base = layer(emptyList(), effect = listOf(kfAt((local / end).toFloat(), "s")), extra = listOf(speed))
         val from = scene.frameAt(local.roundToInt())
-        assertEquals(listOf(0, from), base.keyframeTimes().map { scene.frameAt(it) }.distinct())
+        assertEquals(listOf(from), base.keyframeTimes().map { scene.frameAt(it) }.distinct())
 
         val moved = base.withKeyframesMoved(from, 40, scene)
-        val timing = VideoTiming(moved)
-        val speedFrames = moved.node.child("speedMap")!!.keyframes.map { scene.frameAt(timing.localMs(it.t / 1e6).roundToInt()) to it.v }
-        assertEquals(listOf(0 to "1", 40 to "2"), speedFrames)
+        assertEquals(base.node.child("speedMap"), moved.node.child("speedMap"))
         assertEquals(listOf(40 to "s"), moved.keys(strength))
-        assertEquals(listOf(0, 40), moved.keyframeTimes().map { scene.frameAt(it) }.distinct())
+        assertEquals(listOf(40), moved.keyframeTimes().map { scene.frameAt(it) }.distinct())
     }
 }

@@ -1,11 +1,14 @@
 package app.absentmotion.ui.editor
 
+import app.absentmotion.model.KeyScope
 import app.absentmotion.model.Layer
 import app.absentmotion.model.Scene
 import app.absentmotion.model.SpeedRamp
+import app.absentmotion.model.SpeedRef
 import app.absentmotion.model.VideoTiming
 import app.absentmotion.model.XmlNode
-import app.absentmotion.model.withSpeedRamp
+import app.absentmotion.model.curve
+import app.absentmotion.model.withSpeedCurve
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -133,11 +136,13 @@ class TimelineMoveTest {
     @Test fun aSpeedRampKeepsItsMediaPositionsWhenTheClipMoves() {
         val clip = Layer(XmlNode("shape", linkedMapOf("id" to "1", "startTime" to "1000", "endTime" to "4999",
             "fillType" to "media", "fillVideo" to "content://v", "inTime" to "500")))
-        val scene = sceneWith(clip.withSpeedRamp(SpeedRamp.Hero, ease = null).node)
+        val scene = sceneWith(clip.withSpeedCurve(SpeedRamp.Hero.curve.map { it.copy(ease = null) }).node)
         val layer = scene.layers.single()
         val moved = layer.movedTo(TimelineMath.movedStart(scene, layer, 40))
         val shift = moved.startTime - layer.startTime
-        assertEquals(layer.keyframeTimes().map { it + shift }, moved.keyframeTimes())
+        val speed = KeyScope(SpeedRef)
+        assertEquals(4, layer.keyframeTimes(speed).size)
+        assertEquals(layer.keyframeTimes(speed).map { it + shift }, moved.keyframeTimes(speed))
         for (offset in listOf(0, 250, 1500, 3999)) {
             assertEquals(VideoTiming(layer).mediaMs(offset.toDouble()), VideoTiming(moved).mediaMs(offset.toDouble()), 1e-6)
         }

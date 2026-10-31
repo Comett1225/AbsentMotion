@@ -27,7 +27,7 @@ The launcher icon is an own drawing, made by `tools/icon/make_icon.py` (source o
 
 | Source | Icons |
 | --- | --- |
-| Lucide only | 172 |
+| Lucide only | 173 |
 | Lucide shapes plus own parts | 8 |
 | Own drawing only | 43 |
 | Tabler | 2 |
@@ -139,6 +139,7 @@ The launcher icon is an own drawing, made by `tools/icon/make_icon.py` (source o
 | `ui/editor/PanelIcons.kt` | `CheckCircle` | Lucide | `circle-check` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/circle-check.svg | - |
 | `ui/editor/PanelIcons.kt` | `Backspace` | Lucide | `delete` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/delete.svg | - |
 | `ui/editor/PanelIcons.kt` | `Check` | Lucide | `check` | ISC and MIT (Feather) | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/check.svg | - |
+| `ui/editor/PanelIcons.kt` | `Reverse` | Lucide | `arrow-right-left` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/arrow-right-left.svg | Reverse tile on the second tool page |
 | `ui/home/HomeIcons.kt` | `Receive` | Lucide | `download` | ISC and MIT (Feather) | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/download.svg | - |
 | `ui/home/HomeIcons.kt` | `Menu` | Lucide | `menu` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/menu.svg | menu scaled x1.1 |
 | `ui/home/HomeIcons.kt` | `ChevronDown` | Lucide | `chevron-down` | ISC and MIT (Feather) | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/chevron-down.svg | chevron-down scaled x1.15 |

@@ -53,6 +53,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.concurrent.thread
+import kotlin.math.ceil
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong
 
@@ -132,6 +133,17 @@ internal fun reversePieces(stamps: LongArray, syncs: LongArray, first: Int, last
     return pieces.asReversed()
 }
 
+internal fun reverseSecondsLeft(done: Int, total: Int, elapsedNs: Long): Int? {
+    if (done < 3 || elapsedNs < 1_000_000_000L) return null
+    return ceil(elapsedNs / 1e9 / done * (total - done)).toInt().coerceAtLeast(1)
+}
+
+private fun reverseStatus(left: Int?): String = AppText.get(R.string.speed_reversing) + "\n" + when {
+    left == null -> AppText.get(R.string.speed_reverse_estimating)
+    left < 60 -> AppText.get(R.string.speed_reverse_seconds_left, left.toString())
+    else -> AppText.get(R.string.speed_reverse_minutes_left, ceil(left / 60.0).toInt().toString())
+}
+
 private fun LongArray.atOrBefore(us: Long): Int = binarySearch(us).let { if (it >= 0) it else (-it - 2).coerceAtLeast(0) }
 
 private fun LongArray.atOrAfter(us: Long): Int = binarySearch(us).let { if (it >= 0) it else -it - 1 }
@@ -139,7 +151,7 @@ private fun LongArray.atOrAfter(us: Long): Int = binarySearch(us).let { if (it >
 internal object ClipReverse {
     suspend fun run(context: Context, layer: Layer, media: MediaDeclaration, progress: AiProgress): ReversedClip {
         val uri = checkNotNull(layer.mediaFill?.takeIf { it.video }) { AppText.get(R.string.ai_select_video_layer) }.uri
-        progress(0f, AppText.get(R.string.ai_preparing))
+        progress(0f, reverseStatus(null))
         val job = currentCoroutineContext().job
         val stamps = VideoSources.timestamps(context, uri)
         val (syncs, format) = syncTimes(context, uri)
@@ -175,13 +187,11 @@ internal object ClipReverse {
             check(minOf(file.parentFile!!.usableSpace, context.cacheDir.usableSpace) >= need) { AppText.get(R.string.ai_not_enough_storage, (need / 1_000_000).toString()) }
             val muxer = MediaMuxer(file.path, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4).apply { setOrientationHint(displayTurn(media.orientation)) }
             val output = Mux(MuxerSink(muxer), if (head != null) 2 else 1) { throw it }.also { mux = it }
-            if (head != null) {
-                progress(0f, AppText.get(R.string.speed_reverse_sound))
-                reverseSound(decoder, head, stamps[first], spanUs, pcmFile, output) { job.ensureActive() }
-            }
+            if (head != null) reverseSound(decoder, head, stamps[first], spanUs, pcmFile, output) { job.ensureActive() }
             decoder?.close()
             val total = last - first
             var done = 0
+            val began = System.nanoTime()
             RandomAccessFile(yuvFile, "rw").use { store ->
                 val channel = store.channel
                 val frame = ByteBuffer.allocateDirect(frameBytes)
@@ -206,7 +216,7 @@ internal object ClipReverse {
                                     ?: MediaFormat.COLOR_STANDARD_BT709).also { encoder = it }
                             video.write(mirror - if (k + 1 < last) stamps[k + 1] else mirror) { image -> frame.unpackInto(image, width, height) }
                             done++
-                            progress(0.05f + 0.93f * done / total, AppText.get(R.string.speed_reverse_frame, done.toString(), total.toString()))
+                            progress(0.05f + 0.93f * done / total, reverseStatus(reverseSecondsLeft(done, total, System.nanoTime() - began)))
                         }
                     }
                 }
