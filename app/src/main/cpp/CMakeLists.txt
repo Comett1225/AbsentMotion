@@ -71,6 +71,8 @@ target_link_libraries(mp3lame PRIVATE m)
 add_library(lame_jni SHARED lame_jni.cpp)
 target_compile_options(lame_jni PRIVATE -O2 -fvisibility=hidden -Wall)
 target_link_libraries(lame_jni PRIVATE mp3lame)
+add_library(ampy SHARED py_bridge.c)
+target_link_libraries(ampy PRIVATE log dl)
 
 set(WHISPER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../../third_party/whisper.cpp)
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)

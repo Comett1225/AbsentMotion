@@ -199,7 +199,7 @@ fun HomeScreen(
                 if (wide) WideHeader(page, tab, { p, t -> page = p; tab = t; if (p == 2) search = null }, onSettings = { scope.launch { drawer.open() } }, onNew = { creating = true }, search, { search = it })
                 else TopBar(onMenu = { scope.launch { drawer.open() } }, search, page, { search = it })
                 val narrow = Modifier.weight(1f).then(if (wide) Modifier.widthIn(max = 760.dp).align(Alignment.CenterHorizontally) else Modifier)
-                if (page == 2) ToolsTab(narrow)
+                if (page == 2) ToolsTab(narrow, store, settings) { id -> version++; onOpen(id) }
                 else if (page == 1) TemplatesTab(version, onTemplate, onTemplateProject, narrow, query) else ProjectsPane(
                     Modifier.weight(1f), shown, loaded, tab, { tab = it }, settings, version, onOpen, onExport, query,
                     onUpload = { picker.launch(arrayOf("text/xml", "application/xml", "application/zip", "application/octet-stream")) },

@@ -1,12 +1,17 @@
 package app.absentmotion.ui.home
 
 import android.content.ClipboardManager
+import android.net.Uri
+import android.os.Environment
+import androidx.annotation.StringRes
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,56 +29,97 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import app.absentmotion.R
+import app.absentmotion.editor.imageLayer
+import app.absentmotion.editor.keepCopy
+import app.absentmotion.editor.videoLayer
+import app.absentmotion.export.AppFolder
+import app.absentmotion.export.formatBytes
+import app.absentmotion.library.AppSettings
+import app.absentmotion.library.ProjectStore
+import app.absentmotion.media.mediaDeclaration
+import app.absentmotion.model.Scene
 import app.absentmotion.platform.DialogStatusBarIcons
 import app.absentmotion.platform.LocalContext
+import app.absentmotion.platform.Toast
 import app.absentmotion.platform.sheetDialogProperties
+import app.absentmotion.tools.DownloadProblem
+import app.absentmotion.tools.LinkInfo
 import app.absentmotion.tools.LinkKind
+import app.absentmotion.tools.LinkSite
+import app.absentmotion.tools.Quality
+import app.absentmotion.tools.SaveMode
+import app.absentmotion.tools.SavedMedia
+import app.absentmotion.tools.VideoDownloader
+import app.absentmotion.tools.defaultQuality
 import app.absentmotion.tools.findMediaLink
+import app.absentmotion.tools.qualities
+import app.absentmotion.tools.usualKbps
 import app.absentmotion.ui.editor.PhoneScreen
 import app.absentmotion.ui.export.ExportIcons
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.animatedColor
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.util.Locale
+import kotlin.math.roundToInt
 
 @Composable
-internal fun ToolsTab(modifier: Modifier) {
+internal fun ToolsTab(modifier: Modifier, store: ProjectStore, settings: AppSettings, onOpen: (String) -> Unit) {
     var open by rememberSaveable { mutableIntStateOf(0) }
+    var compressFrom by remember { mutableStateOf<Uri?>(null) }
     Column(modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp)) {
         Spacer(Modifier.height(24.dp))
-        ToolCard(HomeIcons.Compress, stringResource(R.string.tools_compress), stringResource(R.string.tools_compress_about)) { open = 1 }
+        ToolCard(HomeIcons.Compress, stringResource(R.string.tools_compress), stringResource(R.string.tools_compress_about)) { compressFrom = null; open = 1 }
         Spacer(Modifier.height(12.dp))
         ToolCard(HomeIcons.Download, stringResource(R.string.tools_downloader), stringResource(R.string.tools_downloader_about)) { open = 2 }
         Spacer(Modifier.height(28.dp))
     }
     when (open) {
-        1 -> CompressScreen { open = 0 }
-        2 -> DownloaderScreen { open = 0 }
+        1 -> CompressScreen(compressFrom) { open = 0; compressFrom = null }
+        2 -> DownloaderScreen(store, settings, onOpen = { id -> open = 0; onOpen(id) }, onCompress = { uri -> compressFrom = uri; open = 1 }) { open = 0 }
     }
 }
 
@@ -163,20 +209,153 @@ private fun LinkKind.label(): String = stringResource(when (this) {
     LinkKind.Photos -> R.string.downloader_kind_photos
 })
 
+private val SiteSupport: List<Pair<LinkSite, Int?>> = listOf(
+    LinkSite.YouTube to null,
+    LinkSite.Pinterest to null,
+    LinkSite.Twitch to null,
+    LinkSite.Dailymotion to null,
+    LinkSite.Instagram to R.string.downloader_partly_instagram,
+    LinkSite.TikTok to R.string.downloader_partly_tiktok,
+    LinkSite.X to R.string.downloader_partly_x,
+    LinkSite.Facebook to R.string.downloader_partly_facebook,
+    LinkSite.Bluesky to R.string.downloader_partly_bluesky,
+    LinkSite.Snapchat to R.string.downloader_partly_snapchat,
+)
+
+private sealed interface Engine {
+    data object Unavailable : Engine
+    data object Missing : Engine
+    data class Getting(val percent: Int) : Engine
+    data class Failed(@StringRes val text: Int) : Engine
+    data object Ready : Engine
+}
+
+private sealed interface Check {
+    data object Idle : Check
+    data object Checking : Check
+    data class Checked(val url: String, val info: LinkInfo) : Check
+    data class Failed(@StringRes val text: Int) : Check
+}
+
+private sealed interface Fetch {
+    data object Ready : Fetch
+    data class Running(val percent: Int) : Fetch
+    data class Done(val saved: List<SavedMedia>) : Fetch
+    data class Failed(@StringRes val text: Int) : Fetch
+}
+
+private fun problem(e: Exception): Int = (e as? DownloadProblem)?.text ?: R.string.downloader_error_unknown
+
 @Composable
-private fun DownloaderScreen(onClose: () -> Unit) {
+private fun DownloaderScreen(store: ProjectStore, settings: AppSettings, onOpen: (String) -> Unit, onCompress: (Uri) -> Unit, onClose: () -> Unit) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     var text by rememberSaveable { mutableStateOf("") }
     var pasteMissed by remember { mutableStateOf(false) }
     var save by rememberSaveable { mutableIntStateOf(0) }
-    var soon by remember { mutableStateOf(false) }
+    var choice by remember { mutableIntStateOf(-1) }
+    var engine by remember { mutableStateOf(if (!VideoDownloader.available) Engine.Unavailable else if (VideoDownloader.installed(context)) Engine.Ready else Engine.Missing) }
+    var check by remember { mutableStateOf<Check>(Check.Idle) }
+    var fetch by remember { mutableStateOf<Fetch>(Fetch.Ready) }
+    var work by remember { mutableStateOf<Job?>(null) }
+    var why by remember { mutableStateOf<Pair<LinkSite, Int>?>(null) }
     val link = remember(text) { findMediaLink(text) }
-    val pictures = link?.kind?.pictures == true
-    ToolSheet(stringResource(R.string.tools_downloader), onClose, bottom = {
-        Column(Modifier.fillMaxWidth().background(Am.Card).padding(16.dp)) {
-            BigButton(stringResource(R.string.downloader_download), Modifier.fillMaxWidth(), HomeIcons.Download, enabled = link != null) { soon = true }
-            Text(stringResource(R.string.downloader_rights), Modifier.fillMaxWidth().padding(top = 10.dp), color = Am.HomeDim, fontSize = 13.sp, lineHeight = 17.sp)
+    val ready = engine == Engine.Ready
+    val checked = check as? Check.Checked
+    val info = checked?.info
+    val single = info != null && info.items.size == 1
+    val pictures = link?.kind?.pictures == true && info == null || info?.pictures == true
+    val mode = SaveMode.entries[save]
+    val options = remember(info, mode) { if (info != null && single) qualities(info.items.first(), mode, VideoDownloader.av1Hardware) else emptyList() }
+    val running = fetch is Fetch.Running
+
+    LaunchedEffect(options) { choice = defaultQuality(options, mode) }
+    LaunchedEffect(ready) {
+        if (!ready) return@LaunchedEffect
+        VideoDownloader.warmUp(context)
+        VideoDownloader.updateIfDue(context)
+    }
+    LaunchedEffect(link?.url, ready) {
+        check = Check.Idle
+        fetch = Fetch.Ready
+        val url = link?.url ?: return@LaunchedEffect
+        if (!ready) return@LaunchedEffect
+        if (link.kind == LinkKind.Playlist) {
+            check = Check.Failed(R.string.downloader_error_playlist)
+            return@LaunchedEffect
         }
+        delay(350)
+        check = Check.Checking
+        check = try {
+            Check.Checked(url, VideoDownloader.check(context, url))
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Check.Failed(problem(e))
+        }
+    }
+
+    fun getEngine() {
+        engine = Engine.Getting(0)
+        scope.launch {
+            engine = try {
+                VideoDownloader.install(context) { fraction ->
+                    val percent = (fraction * 100).toInt().coerceIn(0, 100)
+                    if (engine != Engine.Getting(percent)) engine = Engine.Getting(percent)
+                }
+                Engine.Ready
+            } catch (e: CancellationException) {
+                engine = Engine.Missing
+                throw e
+            } catch (e: Exception) {
+                Engine.Failed(problem(e).takeIf { it != R.string.downloader_error_unknown } ?: R.string.downloader_engine_failed)
+            }
+        }
+    }
+
+    fun startDownload() {
+        val target = checked ?: return
+        fetch = Fetch.Running(0)
+        work = scope.launch {
+            fetch = try {
+                Fetch.Done(VideoDownloader.download(context, target.url, target.info, mode, choice) { fraction ->
+                    val percent = (fraction * 100).toInt().coerceIn(0, 100)
+                    if (fetch != Fetch.Running(percent)) fetch = Fetch.Running(percent)
+                })
+            } catch (e: CancellationException) {
+                fetch = Fetch.Ready
+                throw e
+            } catch (e: Exception) {
+                Fetch.Failed(problem(e))
+            }
+        }
+    }
+
+    fun change(block: () -> Unit) {
+        if (running) return
+        block()
+        if (fetch !is Fetch.Ready) fetch = Fetch.Ready
+    }
+
+    val back = { if (running) work?.cancel() ?: Unit else onClose() }
+    ToolSheet(stringResource(R.string.tools_downloader), back, bottom = {
+        val view = LocalView.current
+        DisposableEffect(running) {
+            view.keepScreenOn = running
+            onDispose { view.keepScreenOn = false }
+        }
+        DownloadBar(
+            fetch, enabled = ready && info != null && (pictures || !single || options.isNotEmpty()),
+            onStart = ::startDownload,
+            onCancel = { work?.cancel() },
+            onProject = { media ->
+                scope.launch {
+                    val id = try { projectFrom(context, store, settings, media) } catch (e: CancellationException) { throw e } catch (e: Exception) { null }
+                    if (id == null) Toast.makeText(context, context.getString(R.string.home_create_project_failed), Toast.LENGTH_LONG).show() else onOpen(id)
+                }
+            },
+            onCompress = { media -> onCompress(media.uri) },
+        )
     }) {
         Spacer(Modifier.height(20.dp))
         Row(
@@ -186,16 +365,16 @@ private fun DownloaderScreen(onClose: () -> Unit) {
             Box(Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
                 if (text.isEmpty()) Text(stringResource(R.string.downloader_hint), color = Am.HomeDim, fontSize = 16.sp, maxLines = 1)
                 BasicTextField(
-                    text, { text = it; pasteMissed = false }, Modifier.fillMaxWidth(), singleLine = true,
+                    text, { typed -> change { text = typed; pasteMissed = false } }, Modifier.fillMaxWidth(), singleLine = true, enabled = !running,
                     textStyle = TextStyle(color = Am.HomeInk, fontSize = 16.sp), cursorBrush = SolidColor(Am.Accent),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri, imeAction = ImeAction.Done),
                 )
             }
-            Box(Modifier.size(44.dp).alpha(if (text.isEmpty()) 0f else 1f).clickable(enabled = text.isNotEmpty()) { text = ""; pasteMissed = false }, contentAlignment = Alignment.Center) {
+            Box(Modifier.size(44.dp).alpha(if (text.isEmpty()) 0f else 1f).clickable(enabled = text.isNotEmpty() && !running) { text = ""; pasteMissed = false }, contentAlignment = Alignment.Center) {
                 Icon(HomeIcons.ClearCircle, stringResource(R.string.downloader_clear), Modifier.size(22.dp), tint = Am.HomeMid)
             }
             Box(
-                Modifier.height(44.dp).clip(RoundedCornerShape(10.dp)).background(Am.Navy).clickable {
+                Modifier.height(44.dp).clip(RoundedCornerShape(10.dp)).background(Am.Navy).clickable(enabled = !running) {
                     val clip = context.getSystemService(ClipboardManager::class.java)?.primaryClip
                     val copied = clip?.takeIf { it.itemCount > 0 }?.getItemAt(0)?.coerceToText(context)?.toString().orEmpty()
                     val found = findMediaLink(copied)
@@ -205,41 +384,23 @@ private fun DownloaderScreen(onClose: () -> Unit) {
             ) { Text(stringResource(R.string.downloader_paste), color = Am.OnNavy, fontSize = 16.sp, fontWeight = FontWeight.Bold) }
         }
         Text(
-            stringResource(if (pasteMissed) R.string.downloader_nothing_to_paste else R.string.downloader_sites),
+            if (pasteMissed) stringResource(R.string.downloader_nothing_to_paste) else "",
             Modifier.fillMaxWidth().height(42.dp).padding(top = 6.dp),
-            color = if (pasteMissed) Am.Accent else Am.HomeDim, fontSize = 13.sp, lineHeight = 17.sp, maxLines = 2,
+            color = Am.Accent, fontSize = 13.sp, lineHeight = 17.sp, maxLines = 2,
         )
-        Spacer(Modifier.height(8.dp))
-        Row(
-            Modifier.fillMaxWidth().height(72.dp).clip(RoundedCornerShape(12.dp)).background(Am.Card).padding(horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Icon(if (pictures) ExportIcons.Frame else if (link != null) ExportIcons.Video else HomeIcons.Link, null, Modifier.size(28.dp), tint = if (link != null) Am.Navy else Am.HomeDim)
-            Spacer(Modifier.width(14.dp))
-            Column(Modifier.weight(1f)) {
-                if (link != null) {
-                    Text(link.site.title, color = Am.Navy, fontSize = 18.sp, fontWeight = FontWeight.Bold, maxLines = 1)
-                    Text(link.kind.label(), color = Am.HomeMid, fontSize = 14.sp, maxLines = 1)
-                } else Text(
-                    stringResource(if (text.isBlank()) R.string.downloader_waiting else R.string.downloader_unknown),
-                    color = Am.HomeDim, fontSize = 15.sp, lineHeight = 19.sp, maxLines = 2,
-                )
-            }
+        LinkCard(link, check, if (engine == Engine.Unavailable) R.string.downloader_engine_unavailable else if (ready) null else R.string.downloader_get_engine_first, typed = text.isNotBlank())
+        if (engine != Engine.Ready) {
+            Spacer(Modifier.height(12.dp))
+            EngineCard(engine, ::getEngine)
         }
         SectionTitle(stringResource(R.string.downloader_what))
         Box {
             Column(Modifier.alpha(if (pictures) 0f else 1f)) {
                 listOf(R.string.downloader_video_audio, R.string.downloader_video_only, R.string.downloader_audio_only).forEachIndexed { i, label ->
-                    ChoiceRow(stringResource(label), null, save == i, enabled = !pictures) { save = i }
+                    ChoiceRow(stringResource(label), null, save == i, enabled = !pictures && !running && (info == null || single)) { change { save = i } }
                 }
                 SectionTitle(stringResource(R.string.downloader_quality))
-                Row(
-                    Modifier.fillMaxWidth().height(52.dp).alpha(0.6f).clip(RoundedCornerShape(12.dp)).background(Am.Card).padding(horizontal = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(stringResource(R.string.downloader_quality_later), Modifier.weight(1f), color = Am.HomeDim, fontSize = 15.sp, maxLines = 2)
-                    Icon(HomeIcons.ChevronDown, null, Modifier.size(24.dp), tint = Am.HomeDim)
-                }
+                QualityRow(check, single, options, choice, enabled = !running) { picked -> change { choice = picked } }
             }
             if (pictures) Text(
                 stringResource(R.string.downloader_pictures_note),
@@ -247,13 +408,229 @@ private fun DownloaderScreen(onClose: () -> Unit) {
                 color = Am.HomeInk, fontSize = 15.sp, lineHeight = 20.sp,
             )
         }
+        Spacer(Modifier.height(20.dp))
+        SupportBlock { site, reason -> why = site to reason }
         Spacer(Modifier.height(24.dp))
     }
-    if (soon) AlertDialog(
-        onDismissRequest = { soon = false },
-        title = { Text(stringResource(R.string.downloader_soon_title), color = Am.Navy) },
-        text = { Text(stringResource(R.string.downloader_soon), color = Am.Navy) },
-        confirmButton = { TextButton({ soon = false }) { Text(stringResource(R.string.ok), color = Am.Navy) } },
-        containerColor = Am.Card,
-    )
+    why?.let { (site, reason) ->
+        AlertDialog(
+            onDismissRequest = { why = null },
+            title = { Text(site.title, color = Am.Navy) },
+            text = { Text(stringResource(reason), color = Am.Navy) },
+            confirmButton = { TextButton({ why = null }) { Text(stringResource(R.string.ok), color = Am.Navy) } },
+            containerColor = Am.Card,
+        )
+    }
+}
+
+private fun duration(seconds: Double): String? {
+    if (seconds <= 0) return null
+    val total = seconds.roundToInt()
+    return if (total >= 3600) String.format(Locale.ROOT, "%d:%02d:%02d", total / 3600, total / 60 % 60, total % 60)
+    else String.format(Locale.ROOT, "%d:%02d", total / 60, total % 60)
+}
+
+@Composable
+private fun LinkCard(link: app.absentmotion.tools.MediaLink?, check: Check, @StringRes waiting: Int?, typed: Boolean) {
+    val info = (check as? Check.Checked)?.info
+    val thumb by produceState<ImageBitmap?>(null, info?.thumbnails) { value = info?.thumbnails?.let { VideoDownloader.thumbnail(it) } }
+    Row(
+        Modifier.fillMaxWidth().height(88.dp).clip(RoundedCornerShape(12.dp)).background(Am.Card).padding(horizontal = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(Modifier.size(64.dp).clip(RoundedCornerShape(8.dp)).background(if (link != null) Am.HomeLine else Am.Card), contentAlignment = Alignment.Center) {
+            val image = thumb
+            when {
+                check == Check.Checking -> CircularProgressIndicator(Modifier.size(26.dp), color = Am.Accent, strokeWidth = 2.5.dp)
+                image != null -> Image(image, null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
+                else -> Icon(
+                    if (link?.kind?.pictures == true || info?.pictures == true) ExportIcons.Frame else if (link != null) ExportIcons.Video else HomeIcons.Link, null,
+                    Modifier.size(28.dp), tint = if (link != null) Am.Navy else Am.HomeDim,
+                )
+            }
+        }
+        Spacer(Modifier.width(12.dp))
+        Column(Modifier.weight(1f)) {
+            if (link == null) {
+                Text(
+                    stringResource(if (typed) R.string.downloader_unknown else R.string.downloader_waiting),
+                    color = Am.HomeDim, fontSize = 15.sp, lineHeight = 19.sp, maxLines = 2,
+                )
+                return@Column
+            }
+            val title = info?.title?.takeIf { it.isNotBlank() } ?: link.site.title
+            Text(title, color = Am.Navy, fontSize = 16.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold, maxLines = if (info != null) 2 else 1, overflow = TextOverflow.Ellipsis)
+            val facts = when {
+                info != null -> listOfNotNull(
+                    link.site.title,
+                    if (info.items.size > 1) stringResource(R.string.downloader_items, info.items.size) else link.kind.label(),
+                    duration(info.first?.durationSeconds ?: 0.0).takeIf { info.items.size == 1 },
+                ).joinToString(" · ")
+                else -> link.kind.label()
+            }
+            val (status, warn) = when {
+                check is Check.Failed -> stringResource(check.text) to true
+                check == Check.Checking -> stringResource(R.string.downloader_checking) to false
+                waiting != null -> stringResource(waiting) to false
+                else -> facts to false
+            }
+            Text(status, color = if (warn) Am.Accent else Am.HomeMid, fontSize = 14.sp, lineHeight = 18.sp, maxLines = if (info != null) 1 else 2, overflow = TextOverflow.Ellipsis)
+        }
+    }
+}
+
+@Composable
+private fun EngineCard(engine: Engine, onGet: () -> Unit) {
+    Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Am.Card).padding(16.dp)) {
+        if (engine == Engine.Unavailable) {
+            Text(stringResource(R.string.downloader_engine_unavailable), color = Am.Navy, fontSize = 15.sp, lineHeight = 20.sp)
+            return@Column
+        }
+        Text(stringResource(R.string.downloader_engine_title), color = Am.Navy, fontSize = 17.sp, fontWeight = FontWeight.Bold)
+        Spacer(Modifier.height(4.dp))
+        Text(stringResource(R.string.downloader_engine_about, formatBytes(VideoDownloader.downloadBytes)), color = Am.HomeDim, fontSize = 14.sp, lineHeight = 18.sp)
+        Spacer(Modifier.height(12.dp))
+        Box(Modifier.fillMaxWidth().height(52.dp), contentAlignment = Alignment.CenterStart) {
+            if (engine is Engine.Getting) Column(Modifier.fillMaxWidth()) {
+                Text(stringResource(R.string.downloader_engine_getting, engine.percent), color = Am.Navy, fontSize = 15.sp, maxLines = 1)
+                LinearProgressIndicator(
+                    progress = { engine.percent / 100f }, Modifier.fillMaxWidth().padding(top = 10.dp).clip(RoundedCornerShape(4.dp)),
+                    color = Am.Accent, trackColor = Am.Navy.copy(alpha = 0.12f),
+                )
+            } else BigButton(stringResource(R.string.downloader_engine_get), Modifier.fillMaxWidth(), HomeIcons.Download, onClick = onGet)
+        }
+        if (engine is Engine.Failed) Text(stringResource(engine.text), Modifier.padding(top = 8.dp), color = Am.Accent, fontSize = 14.sp, lineHeight = 18.sp)
+    }
+}
+
+@Composable
+private fun Quality.label(): String {
+    val main = when {
+        side > 0 -> "${side}p" + if (fps > 0) "$fps" else ""
+        kbps > 0 -> stringResource(R.string.downloader_kbps, usualKbps(kbps))
+        else -> stringResource(R.string.downloader_quality_original)
+    }
+    val bytes = plan.bytes
+    return if (bytes > 0) main + " · " + stringResource(R.string.downloader_about_size, formatBytes(bytes)) else main
+}
+
+@Composable
+private fun QualityRow(check: Check, single: Boolean, options: List<Quality>, choice: Int, enabled: Boolean, onPick: (Int) -> Unit) {
+    var open by remember { mutableStateOf(false) }
+    val usable = single && options.isNotEmpty()
+    Box {
+        Row(
+            Modifier.fillMaxWidth().height(52.dp).alpha(if (usable && enabled) 1f else 0.6f).clip(RoundedCornerShape(12.dp)).background(Am.Card)
+                .clickable(enabled = usable && enabled) { open = true }.padding(horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            if (check == Check.Checking) {
+                CircularProgressIndicator(Modifier.size(20.dp), color = Am.Accent, strokeWidth = 2.dp)
+                Spacer(Modifier.weight(1f))
+            } else {
+                val label = when {
+                    usable -> options.getOrNull(choice)?.label() ?: options.first().label()
+                    check is Check.Checked && !single -> stringResource(R.string.downloader_quality_each)
+                    check is Check.Checked || check is Check.Failed -> stringResource(R.string.downloader_quality_none)
+                    else -> stringResource(R.string.downloader_quality_later)
+                }
+                Text(label, Modifier.weight(1f), color = if (usable) Am.Navy else Am.HomeDim, fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            }
+            Icon(HomeIcons.ChevronDown, null, Modifier.size(24.dp).alpha(if (usable) 1f else 0f), tint = Am.Navy)
+        }
+        DropdownMenu(open, { open = false }, containerColor = Am.Card) {
+            options.forEachIndexed { i, option ->
+                DropdownMenuItem(
+                    text = { Text(option.label(), color = Am.Navy, fontSize = 16.sp, fontWeight = if (i == choice) FontWeight.Bold else FontWeight.Normal) },
+                    onClick = { open = false; onPick(i) },
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun SupportBlock(onWhy: (LinkSite, Int) -> Unit) {
+    val full = SiteSupport.filter { it.second == null }.map { it.first }
+    val partial = SiteSupport.mapNotNull { (site, reason) -> reason?.let { site to it } }
+    if (full.isNotEmpty()) {
+        Text(
+            stringResource(R.string.downloader_supported) + " " + full.joinToString(", ") { it.title },
+            color = Am.HomeDim, fontSize = 13.sp, lineHeight = 18.sp,
+        )
+    }
+    if (partial.isNotEmpty()) {
+        Spacer(Modifier.height(8.dp))
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Text(stringResource(R.string.downloader_partly), Modifier.padding(vertical = 4.dp), color = Am.HomeDim, fontSize = 13.sp, lineHeight = 18.sp)
+            partial.forEachIndexed { i, (site, reason) ->
+                Text(
+                    site.title + if (i < partial.lastIndex) "," else "",
+                    Modifier.clip(RoundedCornerShape(4.dp)).clickable { onWhy(site, reason) }.padding(vertical = 4.dp, horizontal = 2.dp),
+                    color = Am.Navy, fontSize = 13.sp, lineHeight = 18.sp, textDecoration = TextDecoration.Underline,
+                )
+            }
+        }
+    }
+}
+
+private fun folderOf(media: SavedMedia): String = when {
+    media.mime.startsWith("image/") -> Environment.DIRECTORY_PICTURES
+    media.mime.startsWith("audio/") -> Environment.DIRECTORY_MUSIC
+    else -> Environment.DIRECTORY_MOVIES
+} + "/" + AppFolder
+
+@Composable
+private fun DownloadBar(fetch: Fetch, enabled: Boolean, onStart: () -> Unit, onCancel: () -> Unit, onProject: (SavedMedia) -> Unit, onCompress: (SavedMedia) -> Unit) {
+    Column(Modifier.fillMaxWidth().background(Am.Card).padding(16.dp)) {
+        Box(Modifier.fillMaxWidth().height(44.dp), contentAlignment = Alignment.CenterStart) {
+            when (fetch) {
+                is Fetch.Running -> Column(Modifier.fillMaxWidth()) {
+                    Text(stringResource(R.string.downloader_downloading, fetch.percent), color = Am.Navy, fontSize = 15.sp, maxLines = 1)
+                    LinearProgressIndicator(
+                        progress = { fetch.percent / 100f }, Modifier.fillMaxWidth().padding(top = 10.dp).clip(RoundedCornerShape(4.dp)),
+                        color = Am.Accent, trackColor = Am.Navy.copy(alpha = 0.12f),
+                    )
+                }
+                is Fetch.Done -> {
+                    val folders = fetch.saved.map(::folderOf).distinct().joinToString(" · ")
+                    val message = if (fetch.saved.size == 1) stringResource(R.string.compress_saved_to, folders) else stringResource(R.string.downloader_saved_many, fetch.saved.size, folders)
+                    Text(message, color = Am.Navy, fontSize = 14.sp, lineHeight = 18.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                }
+                is Fetch.Failed -> Text(stringResource(fetch.text), color = Am.Accent, fontSize = 14.sp, lineHeight = 18.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                Fetch.Ready -> Unit
+            }
+        }
+        Spacer(Modifier.height(8.dp))
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            val first = (fetch as? Fetch.Done)?.saved?.firstOrNull { !it.mime.startsWith("audio/") }
+            when {
+                fetch is Fetch.Running -> BigButton(stringResource(R.string.cancel), Modifier.weight(1f), primary = false, onClick = onCancel)
+                first != null -> {
+                    BigButton(stringResource(R.string.downloader_new_project), Modifier.weight(1f), HomeIcons.Plus) { onProject(first) }
+                    BigButton(stringResource(R.string.tools_compress), Modifier.weight(1f), HomeIcons.Compress, primary = false) { onCompress(first) }
+                }
+                else -> BigButton(stringResource(R.string.downloader_download), Modifier.weight(1f), HomeIcons.Download, enabled = enabled, onClick = onStart)
+            }
+        }
+        Text(stringResource(R.string.downloader_rights), Modifier.fillMaxWidth().padding(top = 10.dp), color = Am.HomeDim, fontSize = 13.sp, lineHeight = 17.sp)
+    }
+}
+
+private suspend fun projectFrom(context: android.content.Context, store: ProjectStore, settings: AppSettings, saved: SavedMedia): String {
+    val media = mediaDeclaration(context, saved.uri) ?: error("unreadable")
+    val id = withContext(Dispatchers.IO) { store.newId() }
+    val kept = keepCopy(context, settings, store, id, media, null)
+    val turned = kept.orientation % 180 != 0
+    val width = if (turned) kept.height else kept.width
+    val height = if (turned) kept.width else kept.height
+    check(width > 0 && height > 0)
+    val scale = minOf(1.0, 3840.0 / maxOf(width, height))
+    val w = ((width * scale).roundToInt() / 2 * 2).coerceAtLeast(32)
+    val h = ((height * scale).roundToInt() / 2 * 2).coerceAtLeast(32)
+    val fps = (kept.fps ?: 30f).roundToInt().coerceIn(12, 60)
+    val scene = Scene.create(saved.name.substringBeforeLast('.').take(60), w, h, fps, 0xFF000000.toInt())
+    val layer = (if (saved.video) scene.videoLayer(kept, 0) else scene.imageLayer(kept, 0, settings.defaultLayerDuration)) ?: error("no layer")
+    withContext(Dispatchers.IO) { store.save(id, scene.add(layer, listOf(kept))) }
+    return id
 }

@@ -163,7 +163,7 @@ private fun encodable(job: VideoJob): VideoJob {
     return job
 }
 
-private suspend fun encodeSound(context: Context, uri: String, durationUs: Long, kbps: Int, out: File, progress: (Float) -> Unit) {
+internal suspend fun encodeSound(context: Context, uri: String, durationUs: Long, kbps: Int, out: File, progress: (Float) -> Unit) {
     val ms = (durationUs / 1000).coerceAtLeast(1)
     val layer = Layer(XmlNode("audio", linkedMapOf("id" to "1", "startTime" to "0", "endTime" to "$ms", "src" to uri, "outTime" to "$ms", "mediaFillMode" to "fill")))
     OfflineMix({ PcmDecoder(context, it) }, listOf(AudioClip(layer, uri)), Resampler.ULTRA).use { mix ->
