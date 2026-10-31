@@ -112,8 +112,9 @@ class BestCutoutTest {
         assertEquals(listOf(CUTOUT_PARAM_768, CUTOUT_PARAM_1024, "absent-cutout.bin"), model.files.map { it.name })
         assertEquals(CUTOUT_PARAM_768, model.param)
         assertEquals("absent-cutout.bin", model.bin)
-        assertTrue(model.files.all { it.url == MODEL_RELEASE_2 + it.name })
-        assertTrue(MODEL_RELEASE_2.endsWith("/releases/download/ai-models-2/"))
+        assertTrue(model.files.all { it.url == MODEL_RELEASE_3 + it.name })
+        assertTrue(MODEL_RELEASE_3.endsWith("/releases/download/ai-models-3/"))
+        assertEquals("cutout-2", model.folder)
         assertEquals(19_350L + 19_356L + 64_875_088L, model.bytes)
     }
 }

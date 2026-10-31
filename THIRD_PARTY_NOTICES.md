@@ -292,7 +292,8 @@ can remove the add-on.
 ### AI background removal 2.0
 
 - Version: `absent-cutout.bin` with `absent-cutout-768.param` and `absent-cutout-1024.param` (ncnn, fp16), published as
-  assets of this repository's `ai-models-2` release.
+  assets of this repository's `ai-models-3` release (the fourth training round, used from AbsentMotion 4.4; earlier
+  versions download the previous round from `ai-models-2`).
 - Licence: Apache-2.0, including the pretrained weights it contains. The Apache-2.0 text is `LICENSE` in the root of
   this repository.
 - Copyright: The AbsentMotion authors.

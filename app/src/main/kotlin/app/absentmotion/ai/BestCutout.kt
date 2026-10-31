@@ -73,7 +73,10 @@ internal object BestCutout {
     @Volatile var sideOverride: Int? = null
 
     suspend fun install(context: Context, progress: (Float) -> Unit) {
-        if (!AiModel.Cutout.installed(context)) AiModel.Cutout.download(context, progress)
+        if (!AiModel.Cutout.installed(context)) {
+            AiModel.dropReplaced(context)
+            AiModel.Cutout.download(context, progress)
+        }
     }
 
     suspend fun run(context: Context, uri: String, original: MediaDeclaration?, limit: Int, cutout: Cutout = Cutout(), progress: AiProgress): AiMedia {
