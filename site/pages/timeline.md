@@ -50,12 +50,14 @@ Tap the time pill on the ruler to add a bookmark at the current frame. It shows 
 
 When a layer is selected, a grid of tools appears at the bottom. The first row has five small buttons.
 
-- **Speed** opens Time Remapping for video and audio clips.
+- **Speed** opens the Time Remapping panel for video and audio clips: see [Photos, video and speed](@media).
 - **Trim start** cuts the clip so that it starts at the playhead.
 - **Split** cuts the clip in two at the playhead. The second part becomes a new layer above the first.
 - **Trim end** cuts the clip so that it ends at the playhead.
 - **Volume** opens the volume panel for sound and for videos.
 
-If the playhead is outside the clip, the same buttons change meaning: **Extend the start to the playhead**, **Extend the end to the playhead**, or **Move the clip to the playhead** (the clip's start or end jumps to the playhead).
+![The first row of the tool grid: the five small buttons (1).](img/tl-tools.webp)
+
+If the playhead is outside the clip, the same buttons change meaning and the one that cannot be used is hidden. Before the clip the row shows **Extend the start to the playhead** and **Move the clip to the playhead**; after the clip it shows **Move the clip to the playhead** and **Extend the end to the playhead**. Moving the clip makes its start (or its end) jump to the playhead.
 
 The large buttons below are the [layer tools](@layer-tools).

@@ -2,7 +2,7 @@
 title: The home screen
 group: Interface
 order: 1
-summary: Your projects, assets and templates, and the buttons around them.
+summary: Your projects, assets and templates, the Compress and Video Downloader tools, and the buttons around them.
 ---
 The home screen is the first thing you see after the first start. It lists your projects and has the buttons for creating one, searching and changing settings.
 
@@ -16,7 +16,7 @@ The home screen is the first thing you see after the first start. It lists your 
 
 ## The bottom bar
 
-- **Projects** and **Templates** switch between the two pages of the home screen.
+- **Projects**, **Templates** and **Tools** switch between the three pages of the home screen.
 - The round **+** button between them creates a new project: see [Creating a project](@new-project).
 
 ## Projects and Assets
@@ -59,6 +59,59 @@ On the Projects and Assets lists, the header shows **Sort by Date** or **Sort by
 ## Templates
 
 The **Templates** page has two chips, **My Templates** and **My Presets**. They are described in [Assets, templates and presets](@assets-templates).
+
+## Tools
+
+The **Tools** page has two cards that work on files, outside any project: **Compress** and **Video Downloader**. Tap a card to open it.
+
+![The Tools page: Compress (1) and Video Downloader (2), and the Tools button of the bottom bar (3).](img/tools-tab.webp)
+
+### Compress
+
+**Compress** makes a smaller copy of a video or a picture, for example to send it in a chat. Your original is never changed.
+
+1. Tap **Choose a video or picture** and pick the file in the photo picker. **Change** picks another one.
+2. Under **How small?** choose **Low** (clearly smaller, looks almost the same), **Medium** (the default: small enough for chats and social apps), **High** (as small as it can go and still look fine), **Discord** or **Custom**. **Discord** fits under Discord's upload limit and asks which one: **Free** (20 MB), **Nitro Basic** (50 MB) or **Nitro** (1 GB).
+3. The line above the button gives the size to expect, for example "About 12 MB (now 80 MB)". It also says when the file is already small or too long to fit a size limit.
+4. Tap **Compress**. A bar shows the progress and **Cancel** stops it. The screen stays on while it works.
+
+![Compress with a video chosen: the file (1), the choices under How small? (2) and the size to expect, with the Compress button (3).](img/compress-choose.webp)
+
+**Custom** lets you choose everything yourself:
+
+| Setting | Choices |
+|---|---|
+| **Size** | A video: **Original**, 1080p, 720p or 480p. A picture: **Original**, 2048, 1280 or 800 px |
+| **Quality** | **Best**, **Good**, **Small** or **Smallest**; or **Aim for a file size**, then type the size in MB |
+| **Frame rate** | Videos only: **Original**, 60, 30 or 24 |
+| **Sound** | Videos only: **Off**, **Small**, **Good** or **Best** |
+| **Format** | Pictures only: **JPEG** or **WebP** |
+
+When it is done, the line above the buttons shows the old and the new size and how much smaller the file got, for example "17MB → 5.5MB (66% smaller)". If it did not get smaller, it says so and suggests keeping your original. Under **Result**, the chips **After** and **Before** switch the preview between the new file and the original, and the button at the top right of the preview opens a **Full screen** view with the same two chips. Tap **Save to gallery** to keep the new file (videos go to Movies/AbsentMotion, pictures to Pictures/AbsentMotion) or **Share** to send it to another app.
+
+![The result of Compress: After and Before (1), the preview with its Full screen button (2), the sizes (3), and Save to gallery and Share (4).](img/compress-result.webp)
+
+![The full-screen view of the result: After and Before (1), the close button (2) and the video (3).](img/compress-full.webp)
+
+### Video Downloader
+
+The **Video Downloader** saves a video from a link to your phone. It needs a free add-on, a one-time download that the screen shows the size of (about 25 MB). The add-on brings the open source tools Python and yt-dlp, and you can remove it again in [Settings](@settings) with **Delete Video downloader add-on**. It works on phones with a 64-bit processor.
+
+![The Video Downloader before the add-on is installed: the card that asks for it (1).](img/downloader-addon.webp)
+
+1. The first time, tap **Get the add-on** on the card that says "Downloads need an add-on".
+2. Copy the link of a video in another app, then tap **Paste** (or type the link in the field; the X clears it). The app checks the link and shows its title, a small picture and what it is, for example "YouTube · Video · 10:35".
+3. Under **What to save** choose **Video and audio**, **Video only** or **Audio only**.
+4. Under **Quality** pick one of the qualities the video has. Each shows its size, for example "1080p60 · about 255MB". A post with only pictures has nothing to choose: its pictures are saved as they are.
+5. Tap **Download**. When it is done the message says where the file is, for example "Saved to Movies/AbsentMotion", and two buttons appear: **New project** opens a new project with the video in it, and **Compress** opens the Compress tool with the file.
+
+![A checked link: the link field (1), the title and picture of the video (2), what to save (3), the quality (4) and Download (5).](img/downloader-link.webp)
+
+![After the download: the place where the file was saved (1), and New project and Compress (2).](img/downloader-saved.webp)
+
+Below the button, **Supported** lists the sites that work, and **Partially supported** the ones that work with limits. Tap a name there to read the limit, for example that Instagram stories and private posts need a signed-in account, so they cannot be downloaded. A link that cannot be downloaded shows the reason: a private or removed video, a post that needs a signed-in account, a playlist, a site that blocked the download or no connection.
+
+Only download what you have the right to use: the screen repeats this under the button.
 
 ## Importing a project file
 

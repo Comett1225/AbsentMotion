@@ -3391,6 +3391,63 @@
    }
   },
   {
+   "id": "anim-transition-button",
+   "page": "animations",
+   "section": "Transitions between two clips",
+   "block": 2,
+   "alt": {
+    "en": "The Transition button (1) above the Add layer button (2), where the playhead is at the cut between two clips.",
+    "ar": "زر انتقال (1) فوق زر إضافة طبقة (2)، حيث يقف رأس التشغيل عند القطع بين مقطعين.",
+    "bn": "বোতাম ট্রানজিশন (1) বোতাম লেয়ার যোগ করুন (2) এর ওপরে, যখন প্লেহেড দুটি ক্লিপের মাঝের কাটে থাকে।",
+    "es": "El botón Transición (1) sobre el botón Agregar capa (2), con el cabezal de reproducción en el corte entre dos clips.",
+    "fa": "دکمه ترنزیشن (1) بالای دکمه افزودن لایه (2)، جایی که پلی‌هد روی برش میان دو کلیپ است.",
+    "fil": "Ang button na Transition (1) sa itaas ng button na Magdagdag ng layer (2), kung saan nasa cut sa pagitan ng dalawang clip ang playhead.",
+    "hi": "बटन ट्रांज़िशन (1) बटन लेयर जोड़ें (2) के ऊपर, जब प्लेहेड दो क्लिप के बीच के कट पर हो।",
+    "id": "Tombol Transisi (1) di atas tombol Tambah lapisan (2), saat playhead berada di potongan antara dua klip.",
+    "ms": "Butang Peralihan (1) di atas butang Tambah lapisan (2), apabila kepala main berada pada potongan antara dua klip.",
+    "pt-BR": "O botão Transição (1) acima do botão Adicionar camada (2), com o cursor de reprodução no corte entre dois clipes.",
+    "ru": "Кнопка Переход (1) над кнопкой Добавить слой (2), когда курсор воспроизведения стоит на стыке двух клипов.",
+    "th": "ปุ่ม ทรานซิชัน (1) อยู่เหนือปุ่ม เพิ่มเลเยอร์ (2) เมื่อหัวอ่านอยู่ตรงรอยตัดระหว่างสองคลิป",
+    "tr": "Geçiş düğmesi (1), Katman ekle düğmesinin (2) üstünde; oynatma başlığı iki klip arasındaki kesimde duruyor.",
+    "vi": "Nút Chuyển cảnh (1) nằm phía trên nút Thêm lớp (2), khi đầu phát ở chỗ cắt giữa hai clip.",
+    "es-ES": "El botón Transición (1) encima del botón Añadir capa (2), con el cabezal de reproducción en el corte entre dos clips.",
+    "ur": "ٹرانزیشن بٹن (1) جو لیئر شامل کریں بٹن (2) کے اوپر ہے، جہاں پلے ہیڈ دو کلپس کے درمیان کٹ پر ہے۔",
+    "ja": "ボタン トランジション(1)は、ボタン レイヤーを追加(2)の上にあります。再生ヘッドが2つのクリップのつなぎ目にあるときです。"
+   },
+   "start": {
+    "scene": "clips",
+    "frame": 97
+   },
+   "steps": [
+    {
+     "expect": "Transition"
+    }
+   ],
+   "highlight": [
+    {
+     "select": "Transition",
+     "exact": true,
+     "pad": 24,
+     "n": 1,
+     "badge": "tl"
+    },
+    {
+     "select": "Add layer",
+     "exact": true,
+     "pad": 24,
+     "n": 2,
+     "badge": "bl"
+    }
+   ],
+   "crop": [
+    0,
+    1479,
+    1080,
+    2337
+   ],
+   "phase": 2
+  },
+  {
    "id": "anim-transition",
    "page": "animations",
    "section": "Transitions between two clips",
@@ -3937,9 +3994,25 @@
    "id": "lt-grid",
    "page": "layer-tools",
    "section": "",
-   "block": 1,
+   "block": 2,
    "alt": {
-    "en": "The tool grid of a selected layer: the small buttons (1), the large tool buttons (2) and the page dots (3)."
+    "en": "The tool grid of a selected layer: the small buttons (1), the large tool buttons (2) and the page dots (3).",
+    "ar": "شبكة أدوات الطبقة المحددة: الأزرار الصغيرة (1)، أزرار الأدوات الكبيرة (2) ونقاط الصفحات (3).",
+    "bn": "নির্বাচিত লেয়ারের টুল গ্রিড: ছোট বোতামগুলো (1), বড় টুল বোতামগুলো (2) এবং পেজের ডটগুলো (3)।",
+    "es": "La cuadrícula de herramientas de una capa seleccionada: los botones pequeños (1), los botones grandes de herramientas (2) y los puntos de página (3).",
+    "fa": "شبکه ابزار یک لایه انتخاب‌شده: دکمه‌های کوچک (1)، دکمه‌های بزرگ ابزار (2) و نقطه‌های صفحه (3).",
+    "fil": "Ang tool grid ng isang napiling layer: ang maliliit na button (1), ang malalaking tool button (2) at ang mga page dot (3).",
+    "hi": "चयनित लेयर का टूल ग्रिड: छोटे बटन (1), बड़े टूल बटन (2) और पेज के बिंदु (3)।",
+    "id": "Kisi alat sebuah lapisan yang dipilih: tombol kecil (1), tombol alat besar (2), dan titik halaman (3).",
+    "ms": "Grid alat bagi lapisan yang dipilih: butang kecil (1), butang alat besar (2) dan titik halaman (3).",
+    "pt-BR": "A grade de ferramentas de uma camada selecionada: os botões pequenos (1), os botões grandes de ferramentas (2) e os pontos de página (3).",
+    "ru": "Сетка инструментов выбранного слоя: маленькие кнопки (1), большие кнопки инструментов (2) и точки страниц (3).",
+    "th": "ตารางเครื่องมือของเลเยอร์ที่เลือก: ปุ่มเล็ก (1), ปุ่มเครื่องมือใหญ่ (2) และจุดบอกหน้า (3)",
+    "tr": "Seçili bir katmanın araç ızgarası: küçük düğmeler (1), büyük araç düğmeleri (2) ve sayfa noktaları (3).",
+    "vi": "Lưới công cụ của lớp được chọn: các nút nhỏ (1), các nút công cụ lớn (2) và các chấm trang (3).",
+    "es-ES": "La cuadrícula de herramientas de una capa seleccionada: los botones pequeños (1), los botones grandes de herramientas (2) y los puntos de página (3).",
+    "ur": "منتخب لیئر کا ٹول گرڈ: چھوٹے بٹن (1)، بڑے ٹول بٹن (2) اور صفحے کے نقطے (3)۔",
+    "ja": "選択したレイヤーのツールグリッド：小さいボタン(1)、大きいツールボタン(2)、ページドット(3)です。"
    },
    "start": {
     "scene": "demo",
@@ -3956,10 +4029,10 @@
    "highlight": [
     {
      "box": [
-      30,
-      1830,
-      1050,
-      1972
+      40,
+      1826,
+      1040,
+      1966
      ],
      "n": 1,
      "badge": "tl",
@@ -3968,9 +4041,9 @@
     {
      "box": [
       40,
-      1975,
+      1972,
       1040,
-      2300
+      2298
      ],
      "n": 2,
      "badge": "tl",
@@ -3978,10 +4051,10 @@
     },
     {
      "box": [
-      490,
-      2296,
-      600,
-      2337
+      495,
+      2292,
+      585,
+      2332
      ],
      "n": 3,
      "badge": "tr",
@@ -4000,9 +4073,25 @@
    "id": "lt-grid-2",
    "page": "layer-tools",
    "section": "",
-   "block": 1,
+   "block": 5,
    "alt": {
-    "en": "The second page of the tool grid for a video: the extra tools (1)."
+    "en": "The second page of a video's tool grid: Crop (1), AI (2), Auto Captions (3) and Reverse (4).",
+    "ar": "الصفحة الثانية من شبكة أدوات الفيديو: اقتصاص (1)، AI (2)، تسميات توضيحية تلقائية (3)، عكس (4).",
+    "bn": "ভিডিওর টুল গ্রিডের দ্বিতীয় পেজ: ক্রপ (1), AI (2), অটো ক্যাপশন (3) এবং রিভার্স (4)।",
+    "es": "La segunda página de la cuadrícula de herramientas de un video: Recortar (1), IA (2), Subtítulos automáticos (3), Invertir (4).",
+    "fa": "صفحه دوم شبکه ابزار ویدیو: برش (1)، AI (2)، زیرنویس خودکار (3)، معکوس (4).",
+    "fil": "Ang ikalawang page ng tool grid ng isang video: I-crop (1), AI (2), Awtomatikong kapsyon (3) at I-reverse (4).",
+    "hi": "वीडियो के टूल ग्रिड का दूसरा पेज: क्रॉप (1), AI (2), ऑटो कैप्शन (3) और रिवर्स (4)।",
+    "id": "Halaman kedua kisi alat video: Pangkas (1), AI (2), Takarir otomatis (3), dan Balikkan (4).",
+    "ms": "Halaman kedua grid alat video: Pangkas (1), AI (2), Kapsyen automatik (3) dan Songsang (4).",
+    "pt-BR": "A segunda página da grade de ferramentas de um vídeo: Cortar (1), IA (2), Legendas automáticas (3) e Inverter (4).",
+    "ru": "Вторая страница сетки инструментов видео: Обрезка (1), AI (2), Автосубтитры (3) и Реверс (4).",
+    "th": "หน้าที่สองของตารางเครื่องมือวิดีโอ: ครอบตัด (1), AI (2), คำบรรยายอัตโนมัติ (3) และ ย้อนกลับ (4)",
+    "tr": "Bir videonun araç ızgarasının ikinci sayfası: Kırp (1), AI (2), Otomatik altyazı (3), Tersine çevir (4).",
+    "vi": "Trang thứ hai của lưới công cụ video: Cắt khung (1), AI (2), Phụ đề tự động (3) và Đảo ngược (4).",
+    "es-ES": "La segunda página de la cuadrícula de herramientas de un vídeo: Recortar (1), AI (2), Subtítulos automáticos (3), Invertir (4).",
+    "ur": "ویڈیو کے ٹول گرڈ کا دوسرا صفحہ: کروپ (1)، AI (2)، خودکار کیپشنز (3)، ریورس (4)۔",
+    "ja": "動画のツールグリッドの2ページ目：クロップ(1)、AI(2)、自動キャプション(3)、逆再生(4)です。"
    },
    "start": {
     "scene": "video",
@@ -4027,15 +4116,28 @@
    ],
    "highlight": [
     {
-     "box": [
-      40,
-      1975,
-      1040,
-      2300
-     ],
+     "select": "Crop",
+     "pad": 4,
      "n": 1,
-     "badge": "tl",
-     "pad": 0
+     "badge": "tl"
+    },
+    {
+     "select": "AI",
+     "pad": 4,
+     "n": 2,
+     "badge": "tl"
+    },
+    {
+     "select": "Auto Captions",
+     "pad": 4,
+     "n": 3,
+     "badge": "tl"
+    },
+    {
+     "select": "Reverse",
+     "pad": 4,
+     "n": 4,
+     "badge": "tl"
     }
    ],
    "crop": [
@@ -4052,7 +4154,23 @@
    "section": "Crop",
    "block": 1,
    "alt": {
-    "en": "The Crop panel: the crop frame on the picture (1) and the buttons below (2)."
+    "en": "The Crop panel: the crop frame on the picture (1), the aspect buttons (2), the four sides (3) and Reset and Done (4).",
+    "ar": "لوحة اقتصاص: إطار القص على الصورة (1)، أزرار النسبة (2)، الجوانب الأربعة (3)، إعادة ضبط، تم (4).",
+    "bn": "প্যানেল ক্রপ: ছবির ওপর ক্রপ ফ্রেম (1), অনুপাতের বোতামগুলো (2), চারটি পাশ (3) এবং রিসেট ও সম্পন্ন (4)।",
+    "es": "El panel Recortar: el marco de recorte sobre la imagen (1), los botones de proporción (2), los cuatro lados (3) y los botones Restablecer y Listo (4).",
+    "fa": "پنل برش: قاب برش روی تصویر (1)، دکمه‌های نسبت (2)، چهار ضلع (3)، بازنشانی و انجام شد (4).",
+    "fil": "Ang panel na I-crop: ang crop frame sa larawan (1), ang mga aspect button (2), ang apat na gilid (3) at ang mga button na I-reset at Tapos (4).",
+    "hi": "पैनल क्रॉप: तस्वीर पर क्रॉप फ़्रेम (1), अनुपात के बटन (2), चारों किनारे (3) और रीसेट व हो गया (4)।",
+    "id": "Panel Pangkas: bingkai pemotongan pada gambar (1), tombol rasio (2), keempat sisi (3), serta Reset dan Selesai (4).",
+    "ms": "Panel Pangkas: bingkai pangkasan pada gambar (1), butang nisbah bidang (2), empat sisi (3) serta Set semula dan Selesai (4).",
+    "pt-BR": "O painel Cortar: a moldura de corte na imagem (1), os botões de proporção (2), os quatro lados (3) e os botões Redefinir e Concluído (4).",
+    "ru": "Панель Обрезка: рамка кадрирования на картинке (1), кнопки соотношения сторон (2), четыре стороны (3), а также Сбросить и Готово (4).",
+    "th": "แผงเครื่องมือ ครอบตัด: กรอบครอบตัดบนภาพ (1), ปุ่มสัดส่วน (2), ทั้งสี่ด้าน (3) และ รีเซ็ต กับ เสร็จสิ้น (4)",
+    "tr": "Kırp paneli: resim üzerindeki kırpma çerçevesi (1), oran düğmeleri (2), dört kenar (3), Sıfırla ve Bitti (4).",
+    "vi": "Bảng Cắt khung: khung cắt trên hình (1), các nút tỷ lệ (2), bốn cạnh (3) và Đặt lại cùng Xong (4).",
+    "es-ES": "El panel Recortar: el marco de recorte sobre la imagen (1), los botones de relación de aspecto (2), los cuatro lados (3) y los botones Restablecer y Hecho (4).",
+    "ur": "کروپ پینل: تصویر پر کراپ فریم (1)، تناسب کے بٹن (2)، چاروں اطراف (3)، ری سیٹ اور ہو گیا (4)۔",
+    "ja": "パネル クロップ：画像上のクロップ枠(1)、縦横比ボタン(2)、4つの辺(3)、リセット、完了(4)です。"
    },
    "start": {
     "scene": "demo",
@@ -4082,9 +4200,9 @@
     {
      "box": [
       0,
-      720,
+      548,
       1080,
-      1330
+      1170
      ],
      "n": 1,
      "badge": "tl",
@@ -4092,12 +4210,34 @@
     },
     {
      "box": [
-      0,
-      1812,
-      1080,
-      2337
+      170,
+      1846,
+      1075,
+      1988
      ],
      "n": 2,
+     "badge": "tl",
+     "pad": 0
+    },
+    {
+     "box": [
+      170,
+      2000,
+      1065,
+      2150
+     ],
+     "n": 3,
+     "badge": "tl",
+     "pad": 0
+    },
+    {
+     "box": [
+      170,
+      2160,
+      1065,
+      2300
+     ],
+     "n": 4,
      "badge": "tl",
      "pad": 0
     }
@@ -4111,12 +4251,28 @@
    "phase": 2
   },
   {
-   "id": "media-speed",
-   "page": "media",
-   "section": "Speed",
+   "id": "tl-tools",
+   "page": "timeline",
+   "section": "The tools under a selected layer",
    "block": 2,
    "alt": {
-    "en": "The Speed panel of a video clip."
+    "en": "The first row of the tool grid: the five small buttons (1).",
+    "ar": "الصف الأول من شبكة الأدوات: الأزرار الصغيرة الخمسة (1).",
+    "bn": "টুল গ্রিডের প্রথম সারি: পাঁচটি ছোট বোতাম (1)।",
+    "es": "La primera fila de la cuadrícula de herramientas: los cinco botones pequeños (1).",
+    "fa": "ردیف اول شبکه ابزار: پنج دکمه کوچک (1).",
+    "fil": "Ang unang row ng tool grid: ang limang maliliit na button (1).",
+    "hi": "टूल ग्रिड की पहली पंक्ति: पाँच छोटे बटन (1)।",
+    "id": "Baris pertama kisi alat: lima tombol kecil (1).",
+    "ms": "Baris pertama grid alat: lima butang kecil (1).",
+    "pt-BR": "A primeira linha da grade de ferramentas: os cinco botões pequenos (1).",
+    "ru": "Первый ряд сетки инструментов: пять маленьких кнопок (1).",
+    "th": "แถวแรกของตารางเครื่องมือ: ปุ่มเล็กทั้งห้า (1)",
+    "tr": "Araç ızgarasının ilk satırı: beş küçük düğme (1).",
+    "vi": "Hàng đầu của lưới công cụ: năm nút nhỏ (1).",
+    "es-ES": "La primera fila de la cuadrícula de herramientas: los cinco botones pequeños (1).",
+    "ur": "ٹول گرڈ کی پہلی قطار: پانچ چھوٹے بٹن (1)۔",
+    "ja": "ツールグリッドの1行目：5つの小さいボタン(1)です。"
    },
    "start": {
     "scene": "video",
@@ -4127,19 +4283,16 @@
      "tap": "Beach"
     },
     {
-     "tap": "Speed"
-    },
-    {
-     "wait": 1.5
+     "expect": "Trim start"
     }
    ],
    "highlight": [
     {
      "box": [
-      0,
-      1812,
-      1080,
-      2337
+      40,
+      1826,
+      1040,
+      1966
      ],
      "n": 1,
      "badge": "tl",
@@ -4155,12 +4308,28 @@
    "phase": 2
   },
   {
-   "id": "media-smooth",
+   "id": "media-speed",
    "page": "media",
-   "section": "Smooth a clip",
-   "block": 2,
+   "section": "Normal",
+   "block": 1,
    "alt": {
-    "en": "The Smooth sheet of a video clip."
+    "en": "The Time Remapping panel, Normal tab: the tabs (1), the buttons that set the start or the end (2), the ruler with the speed (3) and Smooth, Reverse and Freeze Frame (4).",
+    "ar": "لوحة إعادة تعيين الوقت، علامة التبويب Normal: علامات التبويب (1)، أزرار تحديد البداية أو النهاية (2)، المسطرة مع السرعة (3)، الأزرار تنعيم، عكس، تجميد الإطار (4).",
+    "bn": "প্যানেল টাইম রিম্যাপিং, ট্যাব Normal: ট্যাবগুলো (1), শুরু বা শেষ নির্ধারণের বোতাম (2), গতিসহ রুলার (3) এবং স্মুথ, রিভার্স ও ফ্রিজ ফ্রেম (4)।",
+    "es": "El panel Remapeo de tiempo, pestaña Normal: las pestañas (1), los botones que fijan el inicio o el final (2), la regla con la velocidad (3) y los botones Suavizar, Invertir, Congelar fotograma (4).",
+    "fa": "پنل بازنگاشت زمان، زبانه Normal: زبانه‌ها (1)، دکمه‌های تعیین شروع یا پایان (2)، خط‌کش همراه با سرعت (3)، دکمه‌های نرم‌سازی، معکوس، فریز فریم (4).",
+    "fil": "Ang panel na Time remapping, ang tab na Normal: ang mga tab (1), ang mga button na nagtatakda ng simula o ng wakas (2), ang ruler na may bilis (3) at ang mga button na I-smooth, I-reverse at I-freeze ang frame (4).",
+    "hi": "पैनल टाइम रीमैपिंग, टैब Normal: टैब (1), शुरुआत या अंत तय करने वाले बटन (2), स्पीड के साथ रूलर (3) और स्मूद, रिवर्स व फ़्रीज़ फ़्रेम (4)।",
+    "id": "Panel Pemetaan waktu, tab Normal: tab (1), tombol untuk mengatur awal atau akhir (2), penggaris dengan kecepatan (3), serta Haluskan, Balikkan, dan Bekukan frame (4).",
+    "ms": "Panel Pemetaan Semula Masa, tab Normal: tab (1), butang untuk menetapkan permulaan atau penghujung (2), pembaris dengan kelajuan (3) serta Licin, Songsang dan Bekukan Bingkai (4).",
+    "pt-BR": "O painel Remapeamento de tempo, aba Normal: as abas (1), os botões que definem o início ou o fim (2), a régua com a velocidade (3) e os botões Suavizar, Inverter e Congelar quadro (4).",
+    "ru": "Панель Ретайминг времени, вкладка Normal: вкладки (1), кнопки начала и конца (2), линейка со скоростью (3), а также Сгладить, Реверс и Стоп-кадр (4).",
+    "th": "แผง รีแมปเวลา แท็บ Normal: แท็บ (1), ปุ่มกำหนดจุดเริ่มหรือจุดจบ (2), ไม้บรรทัดพร้อมความเร็ว (3) และ ปรับให้ลื่น, ย้อนกลับ กับ ฟรีซเฟรม (4)",
+    "tr": "Zaman yeniden eşleme paneli, Normal sekmesi: sekmeler (1), başlangıcı veya sonu ayarlayan düğmeler (2), hızı gösteren cetvel (3), düğmeler Yumuşat, Tersine çevir, Kareyi dondur (4).",
+    "vi": "Bảng Ánh xạ thời gian, tab Normal: các tab (1), các nút đặt điểm bắt đầu hoặc kết thúc (2), thước với tốc độ (3) và Làm mượt, Đảo ngược cùng Đóng băng khung hình (4).",
+    "es-ES": "El panel Remapeo de tiempo, pestaña Normal: las pestañas (1), los botones para fijar el inicio o el final (2), la regla con la velocidad (3) y los botones Suavizar, Invertir, Congelar fotograma (4).",
+    "ur": "ٹائم ریمپنگ پینل، Normal ٹیب: ٹیبز (1)، آغاز یا اختتام مقرر کرنے والے بٹن (2)، رفتار کے ساتھ رولر (3)، بٹن اسموتھ، ریورس، فریز فریم (4)۔",
+    "ja": "パネル タイムリマッピング、タブ Normal：タブ(1)、開始または終了を設定するボタン(2)、速度のルーラー(3)、スムーズ、逆再生、フリーズフレーム(4)です。"
    },
    "start": {
     "scene": "video",
@@ -4174,7 +4343,23 @@
      "tap": "Speed"
     },
     {
-     "tap": "Smooth"
+     "tap": {
+      "text": "1.00x"
+     }
+    },
+    {
+     "tap": "0"
+    },
+    {
+     "tap": "."
+    },
+    {
+     "tap": "5"
+    },
+    {
+     "tap": {
+      "desc": "Done"
+     }
     },
     {
      "wait": 1.5
@@ -4183,10 +4368,293 @@
    "highlight": [
     {
      "box": [
-      0,
-      1160,
-      1080,
-      2337
+      372,
+      1810,
+      866,
+      1930
+     ],
+     "n": 1,
+     "badge": "tl",
+     "pad": 0
+    },
+    {
+     "box": [
+      190,
+      1915,
+      1046,
+      2037
+     ],
+     "n": 2,
+     "badge": "tl",
+     "pad": 0
+    },
+    {
+     "box": [
+      190,
+      2048,
+      1046,
+      2168
+     ],
+     "n": 3,
+     "badge": "tl",
+     "pad": 0
+    },
+    {
+     "union": [
+      "Smooth",
+      "Reverse",
+      "Freeze Frame"
+     ],
+     "pad": 4,
+     "n": 4,
+     "badge": "tl"
+    }
+   ],
+   "crop": [
+    0,
+    1479,
+    1080,
+    2337
+   ],
+   "phase": 2
+  },
+  {
+   "id": "media-curve",
+   "page": "media",
+   "section": "Curve",
+   "block": 2,
+   "alt": {
+    "en": "The Curve tab: the tabs (1), the curve tiles (2) and the hint under them (3).",
+    "ar": "علامة التبويب Curve: علامات التبويب (1)، بطاقات المنحنيات (2) والتلميح تحتها (3).",
+    "bn": "ট্যাব Curve: ট্যাবগুলো (1), কার্ভের টাইলগুলো (2) এবং নিচের ইঙ্গিত (3)।",
+    "es": "La pestaña Curve: las pestañas (1), las tarjetas de curvas (2) y el texto de ayuda debajo de ellas (3).",
+    "fa": "زبانه Curve: زبانه‌ها (1)، کاشی‌های منحنی (2) و راهنمای زیر آن‌ها (3).",
+    "fil": "Ang tab na Curve: ang mga tab (1), ang mga curve tile (2) at ang hint sa ilalim ng mga ito (3).",
+    "hi": "टैब Curve: टैब (1), कर्व की टाइलें (2) और उनके नीचे का सुझाव (3)।",
+    "id": "Tab Curve: tab (1), kotak kurva (2), dan petunjuk di bawahnya (3).",
+    "ms": "Tab Curve: tab (1), jubin lengkung (2) dan petunjuk di bawahnya (3).",
+    "pt-BR": "A aba Curve: as abas (1), os cartões de curvas (2) e a dica abaixo deles (3).",
+    "ru": "Вкладка Curve: вкладки (1), плитки кривых (2) и подсказка под ними (3).",
+    "th": "แท็บ Curve: แท็บ (1), ไทล์เส้นโค้ง (2) และคำแนะนำด้านล่าง (3)",
+    "tr": "Curve sekmesi: sekmeler (1), eğri kutucukları (2) ve altlarındaki ipucu (3).",
+    "vi": "Tab Curve: các tab (1), các ô đường cong (2) và gợi ý bên dưới (3).",
+    "es-ES": "La pestaña Curve: las pestañas (1), las fichas de curvas (2) y la pista de debajo (3).",
+    "ur": "Curve ٹیب: ٹیبز (1)، کرو کی ٹائلیں (2) اور ان کے نیچے ہدایت (3)۔",
+    "ja": "タブ Curve：タブ(1)、カーブのタイル(2)、その下のヒント(3)です。"
+   },
+   "start": {
+    "scene": "video",
+    "frame": 30
+   },
+   "steps": [
+    {
+     "tap": "Beach"
+    },
+    {
+     "tap": "Speed"
+    },
+    {
+     "tap": "Curve"
+    },
+    {
+     "tap": "Montage"
+    },
+    {
+     "wait": 1.5
+    }
+   ],
+   "highlight": [
+    {
+     "box": [
+      372,
+      1810,
+      866,
+      1930
+     ],
+     "n": 1,
+     "badge": "tl",
+     "pad": 0
+    },
+    {
+     "box": [
+      100,
+      1930,
+      1075,
+      2192
+     ],
+     "n": 2,
+     "badge": "tl",
+     "pad": 0
+    },
+    {
+     "box": [
+      150,
+      2198,
+      672,
+      2250
+     ],
+     "n": 3,
+     "badge": "tl",
+     "pad": 0
+    }
+   ],
+   "crop": [
+    0,
+    1479,
+    1080,
+    2337
+   ],
+   "phase": 2
+  },
+  {
+   "id": "media-curve-edit",
+   "page": "media",
+   "section": "Curve",
+   "block": 4,
+   "alt": {
+    "en": "The speed curve editor: the top bar with the name, the length and Reset (1), the curve (2) and the speed, Add point and Smooth (3).",
+    "ar": "محرر منحنى السرعة: الشريط العلوي مع الاسم والمدة والزر إعادة ضبط (1)، المنحنى (2)، السرعة والزرّان إضافة نقطة، تنعيم (3).",
+    "bn": "গতির কার্ভ এডিটর: নাম, দৈর্ঘ্য ও রিসেট সহ টপ বার (1), কার্ভ (2) এবং গতি, পয়েন্ট যোগ করুন ও স্মুথ (3)।",
+    "es": "El editor de la curva de velocidad: la barra superior con el nombre, la duración y el botón Restablecer (1), la curva (2) y la velocidad con los botones Agregar punto, Suavizar (3).",
+    "fa": "ویرایشگر منحنی سرعت: نوار بالا با نام، مدت و بازنشانی (1)، منحنی (2)، سرعت و دکمه‌های افزودن نقطه و نرم‌سازی (3).",
+    "fil": "Ang speed curve editor: ang top bar na may pangalan, haba at ang button na I-reset (1), ang curve (2) at ang bilis, pati ang mga button na Magdagdag ng punto at I-smooth (3).",
+    "hi": "स्पीड कर्व एडिटर: नाम, लंबाई और रीसेट वाला टॉप बार (1), कर्व (2) और स्पीड, बिंदु जोड़ें व स्मूद (3)।",
+    "id": "Editor kurva kecepatan: bilah atas dengan nama, durasi, dan Reset (1), kurva (2), serta kecepatan, Tambah titik, dan Haluskan (3).",
+    "ms": "Editor lengkung kelajuan: bar atas dengan nama, tempoh dan Set semula (1), lengkung (2) serta kelajuan, Tambah titik dan Licin (3).",
+    "pt-BR": "O editor da curva de velocidade: a barra superior com o nome, a duração e o botão Redefinir (1), a curva (2) e a velocidade, com os botões Adicionar ponto e Suavizar (3).",
+    "ru": "Редактор кривой скорости: верхняя панель с названием, длиной и Сбросить (1), кривая (2), а также скорость, Добавить точку и Сгладить (3).",
+    "th": "ตัวแก้ไขเส้นโค้งความเร็ว: แถบด้านบนที่มีชื่อ ความยาว และ รีเซ็ต (1), เส้นโค้ง (2) และความเร็ว, เพิ่มจุด กับ ปรับให้ลื่น (3)",
+    "tr": "Hız eğrisi düzenleyicisi: ad, uzunluk ve Sıfırla bulunan üst çubuk (1), eğri (2), hız ile Nokta ekle ve Yumuşat düğmeleri (3).",
+    "vi": "Trình chỉnh sửa đường cong tốc độ: thanh trên cùng với tên, độ dài và Đặt lại (1), đường cong (2) và tốc độ, Thêm điểm cùng Làm mượt (3).",
+    "es-ES": "El editor de la curva de velocidad: la barra superior con el nombre, la duración y el botón Restablecer (1), la curva (2) y la velocidad con los botones Añadir punto, Suavizar (3).",
+    "ur": "رفتار کے کرو کا ایڈیٹر: نام، لمبائی اور ری سیٹ کے ساتھ ٹاپ بار (1)، کرو (2)، رفتار اور بٹن پوائنٹ شامل کریں، اسموتھ (3)۔",
+    "ja": "速度カーブエディター：名前、長さ、リセットを含むトップバー(1)、カーブ(2)、速度、ポイントを追加、スムーズ(3)です。"
+   },
+   "start": {
+    "scene": "video",
+    "frame": 30
+   },
+   "steps": [
+    {
+     "tap": "Beach"
+    },
+    {
+     "tap": "Speed"
+    },
+    {
+     "tap": "Curve"
+    },
+    {
+     "tap": "Montage"
+    },
+    {
+     "wait": 1.5
+    },
+    {
+     "tap": "Montage"
+    },
+    {
+     "wait": 2
+    }
+   ],
+   "highlight": [
+    {
+     "box": [
+      168,
+      1802,
+      1060,
+      1932
+     ],
+     "n": 1,
+     "badge": "tl",
+     "pad": 0
+    },
+    {
+     "box": [
+      183,
+      1925,
+      1054,
+      2214
+     ],
+     "n": 2,
+     "badge": "tl",
+     "pad": 0
+    },
+    {
+     "box": [
+      178,
+      2218,
+      1060,
+      2336
+     ],
+     "n": 3,
+     "badge": "tl",
+     "pad": 0
+    }
+   ],
+   "crop": [
+    0,
+    1479,
+    1080,
+    2337
+   ],
+   "phase": 2
+  },
+  {
+   "id": "reverse-progress",
+   "page": "media",
+   "section": "Reverse",
+   "block": 1,
+   "alt": {
+    "en": "Reverse at work: the box with the time that is left and Cancel (1).",
+    "ar": "عكس الفيديو قيد التنفيذ: مربع الوقت المتبقي مع الزر إلغاء (1).",
+    "bn": "রিভার্স চলছে: বাকি সময় ও বাতিল সহ বক্স (1)।",
+    "es": "Invirtiendo el video: el cuadro con el tiempo restante y el botón Cancelar (1).",
+    "fa": "معکوس‌سازی در حال انجام: کادر زمان باقی‌مانده همراه با لغو (1).",
+    "fil": "Habang binabaligtad ang video: ang kahon na may natitirang oras at ang button na Kanselahin (1).",
+    "hi": "रिवर्स चल रहा है: बचे हुए समय और रद्द करें वाला बॉक्स (1)।",
+    "id": "Proses pembalikan sedang berjalan: kotak dengan sisa waktu dan Batal (1).",
+    "ms": "Proses songsang sedang berjalan: kotak dengan masa yang tinggal dan Batal (1).",
+    "pt-BR": "Invertendo o vídeo: a caixa com o tempo restante e o botão Cancelar (1).",
+    "ru": "Идёт реверс: окно с оставшимся временем и Отмена (1).",
+    "th": "ระหว่างย้อนวิดีโอ: กล่องที่แสดงเวลาที่เหลือและ ยกเลิก (1)",
+    "tr": "Ters çevirme sürüyor: kalan süreyi ve İptal düğmesini gösteren kutu (1).",
+    "vi": "Đang đảo ngược video: hộp hiện thời gian còn lại và Hủy (1).",
+    "es-ES": "Invirtiendo el vídeo: el cuadro con el tiempo restante y el botón Cancelar (1).",
+    "ur": "ریورس جاری ہے: باقی وقت کا باکس اور منسوخ کریں (1)۔",
+    "ja": "逆再生の処理中：残り時間と、キャンセルを表示するボックス(1)です。"
+   },
+   "start": {
+    "scene": "long",
+    "frame": 30
+   },
+   "steps": [
+    {
+     "tap": "Beach"
+    },
+    {
+     "swipe": [
+      900,
+      2100,
+      150,
+      2100,
+      300
+     ]
+    },
+    {
+     "tap": "Reverse"
+    },
+    {
+     "wait": 3
+    }
+   ],
+   "highlight": [
+    {
+     "box": [
+      120,
+      925,
+      960,
+      1535
      ],
      "n": 1,
      "badge": "tl",
@@ -4195,19 +4663,142 @@
    ],
    "crop": [
     0,
-    1100,
+    106,
     1080,
     2337
    ],
    "phase": 2
   },
   {
-   "id": "tools-downloader",
+   "id": "media-smooth",
+   "page": "media",
+   "section": "Smooth a clip",
+   "block": 2,
+   "alt": {
+    "en": "The Smooth sheet: the method and the level (1), Motion Blur (2) and Start (3).",
+    "ar": "ورقة تنعيم: الطريقة والمستوى (1)، ضبابية الحركة (2)، ابدأ (3).",
+    "bn": "শিট স্মুথ: পদ্ধতি ও লেভেল (1), মোশন ব্লার (2) এবং শুরু (3)।",
+    "es": "La hoja Suavizar: el método y el nivel (1), la opción Desenfoque de movimiento (2) y el botón Inicio (3).",
+    "fa": "برگه نرم‌سازی: روش و سطح (1)، موشن بلور (2)، شروع (3).",
+    "fil": "Ang sheet na I-smooth: ang paraan at ang antas (1), ang opsyon na Motion blur (2) at ang button na Simula (3).",
+    "hi": "शीट स्मूद: तरीका और लेवल (1), मोशन ब्लर (2) और शुरू (3)।",
+    "id": "Lembar Haluskan: metode dan tingkat (1), Blur gerak (2), dan Mulai (3).",
+    "ms": "Helaian Licin: kaedah dan tahap (1), Kabur gerakan (2) dan Mula (3).",
+    "pt-BR": "A folha Suavizar: o método e o nível (1), a opção Desfoque de movimento (2) e o botão Início (3).",
+    "ru": "Панель Сгладить: метод и уровень (1), Размытие в движении (2) и Начало (3).",
+    "th": "แผ่น ปรับให้ลื่น: วิธีการและระดับ (1), โมชันเบลอ (2) และ เริ่ม (3)",
+    "tr": "Yumuşat sayfası: yöntem ve düzey (1), Hareket bulanıklığı (2), Başlangıç (3).",
+    "vi": "Bảng Làm mượt: phương pháp và mức độ (1), Nhòe chuyển động (2) và Bắt đầu (3).",
+    "es-ES": "La hoja Suavizar: el método y el nivel (1), la opción Desenfoque de movimiento (2) y el botón Inicio (3).",
+    "ur": "اسموتھ شیٹ: طریقہ اور درجہ (1)، موشن بلر (2)، شروع (3)۔",
+    "ja": "シート スムーズ：方法とレベル(1)、モーションブラー(2)、開始(3)です。"
+   },
+   "start": {
+    "scene": "video",
+    "frame": 30
+   },
+   "steps": [
+    {
+     "tap": "Beach"
+    },
+    {
+     "tap": "Speed"
+    },
+    {
+     "tap": {
+      "text": "1.00x"
+     }
+    },
+    {
+     "tap": "0"
+    },
+    {
+     "tap": "."
+    },
+    {
+     "tap": "5"
+    },
+    {
+     "tap": {
+      "desc": "Done"
+     }
+    },
+    {
+     "wait": 1.5
+    },
+    {
+     "tap": "Smooth"
+    },
+    {
+     "wait": 2
+    }
+   ],
+   "highlight": [
+    {
+     "box": [
+      160,
+      1030,
+      915,
+      1332
+     ],
+     "n": 1,
+     "badge": "tl",
+     "pad": 0
+    },
+    {
+     "box": [
+      160,
+      1338,
+      915,
+      1527
+     ],
+     "n": 2,
+     "badge": "tl",
+     "pad": 0
+    },
+    {
+     "box": [
+      540,
+      1735,
+      905,
+      1870
+     ],
+     "n": 3,
+     "badge": "tl",
+     "pad": 0
+    }
+   ],
+   "crop": [
+    0,
+    106,
+    1080,
+    2337
+   ],
+   "phase": 2
+  },
+  {
+   "id": "tools-tab",
    "page": "home",
-   "section": "The bottom bar",
+   "section": "Tools",
    "block": 1,
    "alt": {
-    "en": "The Tools page with the Video Downloader."
+    "en": "The Tools page: Compress (1) and Video Downloader (2), and the Tools button of the bottom bar (3).",
+    "ar": "صفحة الأدوات: ضغط (1)، منزّل الفيديو (2)، وزر الأدوات في الشريط السفلي (3).",
+    "bn": "টুলস পেজ: কম্প্রেস (1) ও ভিডিও ডাউনলোডার (2), আর নিচের বারের বোতাম টুলস (3)।",
+    "es": "La página de herramientas: Comprimir (1), Descargador de videos (2) y el botón Herramientas de la barra inferior (3).",
+    "fa": "صفحه ابزارها: فشرده‌سازی (1)، دانلود ویدیو (2) و دکمه ابزارها در نوار پایین (3).",
+    "fil": "Ang page ng mga tool: I-compress (1) at Downloader ng bidyo (2), at ang button na Mga tool sa bottom bar (3).",
+    "hi": "टूल्स पेज: कंप्रेस (1) और वीडियो डाउनलोडर (2), और नीचे के बार का बटन टूल्स (3)।",
+    "id": "Halaman Alat: Kompres (1) dan Pengunduh Video (2), serta tombol Alat di bilah bawah (3).",
+    "ms": "Halaman Alat: Mampatkan (1) dan Pemuat turun video (2), serta butang Alat pada bar bawah (3).",
+    "pt-BR": "A página de ferramentas: Comprimir (1), Baixar vídeos (2) e o botão Ferramentas da barra inferior (3).",
+    "ru": "Страница «Инструменты»: Сжатие (1) и Загрузчик видео (2), а также кнопка Инструменты на нижней панели (3).",
+    "th": "หน้าเครื่องมือ: บีบอัด (1) และ ดาวน์โหลดวิดีโอ (2) รวมถึงปุ่ม เครื่องมือ ของแถบด้านล่าง (3)",
+    "tr": "Araçlar sayfası: Sıkıştır (1), Video indirici (2) ve alt çubuktaki Araçlar düğmesi (3).",
+    "vi": "Trang Công cụ: Nén (1) và Tải video (2), cùng nút Công cụ của thanh dưới cùng (3).",
+    "es-ES": "La página de herramientas: Comprimir (1), Descargador de vídeo (2) y el botón Herramientas de la barra inferior (3).",
+    "ur": "ٹولز کا صفحہ: کمپریس (1)، ویڈیو ڈاؤن لوڈر (2) اور نچلے بار کا ٹولز بٹن (3)۔",
+    "ja": "ツールページ：圧縮(1)、動画ダウンローダー(2)、下部バーのボタン ツール(3)です。"
    },
    "start": "home",
    "steps": [
@@ -4229,10 +4820,476 @@
    "highlight": [
     {
      "box": [
+      42,
+      341,
+      1038,
+      614
+     ],
+     "n": 1,
+     "badge": "tl",
+     "pad": 0
+    },
+    {
+     "box": [
+      42,
+      646,
+      1038,
+      919
+     ],
+     "n": 2,
+     "badge": "tl",
+     "pad": 0
+    },
+    {
+     "box": [
+      861,
+      2180,
+      1066,
+      2306
+     ],
+     "n": 3,
+     "badge": "tl",
+     "pad": 0
+    }
+   ],
+   "crop": [
+    0,
+    106,
+    1080,
+    2337
+   ],
+   "phase": 2
+  },
+  {
+   "id": "compress-choose",
+   "page": "home",
+   "section": "Compress",
+   "block": 2,
+   "alt": {
+    "en": "Compress with a video chosen: the file (1), the choices under How small? (2) and the size to expect, with the Compress button (3).",
+    "ar": "الضغط بعد اختيار فيديو: الملف (1)، الخيارات تحت ما مقدار التصغير؟ (2)، الحجم المتوقع مع زر ضغط (3).",
+    "bn": "ভিডিও বাছাই করা কমপ্রেস: ফাইল (1), কত ছোট? এর নিচের অপশনগুলো (2) এবং আনুমানিক সাইজ ও বোতাম কম্প্রেস (3)।",
+    "es": "La pantalla de compresión con un video elegido: el archivo (1), las opciones bajo la pregunta ¿Cuánto reducir? (2) y el tamaño esperado, con el botón Comprimir (3).",
+    "fa": "فشرده‌سازی پس از انتخاب ویدیو: فایل (1)، گزینه‌های زیر چقدر کوچک؟ (2)، اندازه مورد انتظار با دکمه فشرده‌سازی (3).",
+    "fil": "Ang compression screen na may napiling video: ang file (1), ang mga pagpipilian sa ilalim ng tanong na Gaano kaliit? (2) at ang inaasahang laki, kasama ang button na I-compress (3).",
+    "hi": "वीडियो चुनने के बाद कंप्रेस: फ़ाइल (1), कितना छोटा? के नीचे के विकल्प (2) और अनुमानित साइज़ व बटन कंप्रेस (3)।",
+    "id": "Kompres dengan video yang sudah dipilih: berkas (1), pilihan di bagian Seberapa kecil? (2), dan perkiraan ukuran beserta tombol Kompres (3).",
+    "ms": "Mampatkan dengan video yang dipilih: fail (1), pilihan di bahagian Berapa kecil? (2) dan anggaran saiz bersama butang Mampatkan (3).",
+    "pt-BR": "A tela de compressão com um vídeo escolhido: o arquivo (1), as opções sob a pergunta Qual tamanho? (2) e o tamanho esperado, com o botão Comprimir (3).",
+    "ru": "Сжатие с выбранным видео: файл (1), блок Насколько сжать? с вариантами (2) и ожидаемый размер с кнопкой Сжатие (3).",
+    "th": "การบีบอัดเมื่อเลือกวิดีโอแล้ว: ไฟล์ (1), ตัวเลือกใต้ ต้องการให้เล็กแค่ไหน? (2) และขนาดที่คาดไว้ พร้อมปุ่ม บีบอัด (3)",
+    "tr": "Video seçilmiş sıkıştırma ekranı: dosya (1), Ne kadar küçük? altındaki seçenekler (2), beklenen boyut ve Sıkıştır düğmesi (3).",
+    "vi": "Nén khi đã chọn video: tệp (1), các lựa chọn dưới Nén nhỏ đến đâu? (2) và dung lượng dự kiến, cùng nút Nén (3).",
+    "es-ES": "La pantalla de compresión con un vídeo elegido: el archivo (1), las opciones debajo de la pregunta ¿Cuánto quieres reducirlo? (2) y el tamaño esperado, con el botón Comprimir (3).",
+    "ur": "ویڈیو منتخب کرنے کے بعد کمپریس: فائل (1)، کتنا چھوٹا؟ کے نیچے انتخابات (2)، متوقع سائز اور کمپریس بٹن (3)۔",
+    "ja": "動画を選択した圧縮画面：ファイル(1)、選択肢 どれくらい小さくしますか？(2)、予想サイズとボタン 圧縮(3)です。"
+   },
+   "start": "home",
+   "steps": [
+    {
+     "tap": {
+      "text": "Tools",
+      "region": [
+       0,
+       2100,
+       1080,
+       2400
+      ]
+     }
+    },
+    {
+     "tap": "Compress"
+    },
+    {
+     "tap": "Choose a video or picture"
+    },
+    {
+     "wait": 2
+    },
+    {
+     "tap": {
+      "desc_re": "Video taken on .* with duration 00:10"
+     }
+    },
+    {
+     "wait": 3
+    }
+   ],
+   "highlight": [
+    {
+     "box": [
+      36,
+      306,
+      1044,
+      566
+     ],
+     "n": 1,
+     "badge": "tl",
+     "pad": 0
+    },
+    {
+     "box": [
+      36,
+      690,
+      1044,
+      1620
+     ],
+     "n": 2,
+     "badge": "tl",
+     "pad": 0
+    },
+    {
+     "box": [
+      30,
+      2018,
+      1050,
+      2300
+     ],
+     "n": 3,
+     "badge": "tl",
+     "pad": 0
+    }
+   ],
+   "crop": [
+    0,
+    106,
+    1080,
+    2337
+   ],
+   "phase": 2
+  },
+  {
+   "id": "compress-result",
+   "page": "home",
+   "section": "Compress",
+   "block": 5,
+   "alt": {
+    "en": "The result of Compress: After and Before (1), the preview with its Full screen button (2), the sizes (3), and Save to gallery and Share (4).",
+    "ar": "نتيجة الضغط: بعد، قبل (1)، المعاينة مع زر Full screen (2)، الأحجام (3)، حفظ في المعرض، مشاركة (4).",
+    "bn": "কমপ্রেসের ফলাফল: পরে ও আগে (1), বোতাম Full screen সহ প্রিভিউ (2), সাইজগুলো (3) এবং গ্যালারিতে সেভ করুন ও শেয়ার (4)।",
+    "es": "El resultado de la compresión: Después y Antes (1), la vista previa con su botón Full screen (2), los tamaños (3) y los botones Guardar en galería y Compartir (4).",
+    "fa": "نتیجه فشرده‌سازی: بعد و قبل (1)، پیش‌نمایش با دکمه Full screen (2)، اندازه‌ها (3)، ذخیره در گالری و اشتراک‌گذاری (4).",
+    "fil": "Ang resulta ng compression: Pagkatapos at Bago (1), ang preview na may button na Full screen (2), ang mga laki (3), at ang mga button na I-save sa gallery at I-share (4).",
+    "hi": "कंप्रेस का नतीजा: बाद में और पहले (1), बटन Full screen के साथ प्रीव्यू (2), साइज़ (3) और गैलरी में सेव करें व शेयर करें (4)।",
+    "id": "Hasil kompresi: Sesudah dan Sebelum (1), pratinjau dengan tombol Full screen (2), ukuran (3), serta Simpan ke galeri dan Bagikan (4).",
+    "ms": "Hasil pemampatan: Selepas dan Sebelum (1), pratonton dengan butang Full screen (2), saiz (3) serta Simpan ke galeri dan Kongsi (4).",
+    "pt-BR": "O resultado da compressão: Depois e Antes (1), a pré-visualização com o botão Full screen (2), os tamanhos (3) e os botões Salvar na galeria e Compartilhar (4).",
+    "ru": "Результат сжатия: После и До (1), просмотр с кнопкой Full screen (2), размеры (3), а также Сохранить в галерею и Поделиться (4).",
+    "th": "ผลของการบีบอัด: หลัง และ ก่อน (1), ตัวอย่างพร้อมปุ่ม Full screen (2), ขนาดไฟล์ (3) และ บันทึกไปยังแกลเลอรี กับ แชร์ (4)",
+    "tr": "Sıkıştırma sonucu: Sonra ve Önce (1), Full screen düğmeli önizleme (2), boyutlar (3), Galeriye kaydet ve Paylaş (4).",
+    "vi": "Kết quả nén: Sau và Trước (1), phần xem trước với nút Full screen (2), các dung lượng (3), và Lưu vào thư viện cùng Chia sẻ (4).",
+    "es-ES": "El resultado de la compresión: Después y Antes (1), la vista previa con su botón Full screen (2), los tamaños (3) y los botones Guardar en la galería y Compartir (4).",
+    "ur": "کمپریس کا نتیجہ: بعد اور پہلے (1)، Full screen بٹن کے ساتھ پریویو (2)، سائز (3)، گیلری میں محفوظ کریں اور شیئر کریں (4)۔",
+    "ja": "圧縮の結果：圧縮後、圧縮前(1)、プレビューとボタン Full screen(2)、サイズ(3)、ギャラリーに保存、共有(4)です。"
+   },
+   "start": "home",
+   "steps": [
+    {
+     "tap": {
+      "text": "Tools",
+      "region": [
+       0,
+       2100,
+       1080,
+       2400
+      ]
+     }
+    },
+    {
+     "tap": "Compress"
+    },
+    {
+     "tap": "Choose a video or picture"
+    },
+    {
+     "wait": 2
+    },
+    {
+     "tap": {
+      "desc_re": "Video taken on .* with duration 00:10"
+     }
+    },
+    {
+     "wait": 3
+    },
+    {
+     "tap": {
+      "text": "Compress",
+      "region": [
+       0,
+       2100,
+       1080,
+       2337
+      ]
+     }
+    },
+    {
+     "wait": 3
+    },
+    {
+     "absent": {
+      "text_re": "^Compressing"
+     },
+     "timeout": 400
+    },
+    {
+     "wait": 4
+    }
+   ],
+   "highlight": [
+    {
+     "box": [
+      36,
+      680,
+      442,
+      816
+     ],
+     "n": 1,
+     "badge": "tl",
+     "pad": 0
+    },
+    {
+     "box": [
+      36,
+      822,
+      1044,
+      1670
+     ],
+     "n": 2,
+     "badge": "tl",
+     "pad": 0
+    },
+    {
+     "box": [
+      18,
+      2034,
+      700,
+      2104
+     ],
+     "n": 3,
+     "badge": "tl",
+     "pad": 0
+    },
+    {
+     "box": [
+      36,
+      2150,
+      1044,
+      2300
+     ],
+     "n": 4,
+     "badge": "tl",
+     "pad": 0
+    }
+   ],
+   "crop": [
+    0,
+    106,
+    1080,
+    2337
+   ],
+   "phase": 2
+  },
+  {
+   "id": "compress-full",
+   "page": "home",
+   "section": "Compress",
+   "block": 5,
+   "alt": {
+    "en": "The full-screen view of the result: After and Before (1), the close button (2) and the video (3).",
+    "ar": "عرض النتيجة بملء الشاشة: بعد، قبل (1)، زر الإغلاق (2)، الفيديو (3).",
+    "bn": "ফলাফলের ফুল স্ক্রিন ভিউ: পরে ও আগে (1), বন্ধ করার বোতাম (2) এবং ভিডিও (3)।",
+    "es": "La vista a pantalla completa del resultado: Después y Antes (1), el botón de cerrar (2) y el video (3).",
+    "fa": "نمای تمام‌صفحه نتیجه: بعد و قبل (1)، دکمه بستن (2)، ویدیو (3).",
+    "fil": "Ang full-screen na view ng resulta: Pagkatapos at Bago (1), ang close button (2) at ang video (3).",
+    "hi": "नतीजे का फ़ुल स्क्रीन व्यू: बाद में और पहले (1), बंद करने का बटन (2) और वीडियो (3)।",
+    "id": "Tampilan layar penuh hasilnya: Sesudah dan Sebelum (1), tombol tutup (2), dan video (3).",
+    "ms": "Paparan skrin penuh hasilnya: Selepas dan Sebelum (1), butang tutup (2) dan video (3).",
+    "pt-BR": "A visualização em tela cheia do resultado: Depois e Antes (1), o botão de fechar (2) e o vídeo (3).",
+    "ru": "Полноэкранный вид результата: После и До (1), кнопка закрытия (2) и видео (3).",
+    "th": "มุมมองเต็มจอของผลลัพธ์: หลัง และ ก่อน (1), ปุ่มปิด (2) และวิดีโอ (3)",
+    "tr": "Sonucun tam ekran görünümü: Sonra ve Önce (1), kapatma düğmesi (2), video (3).",
+    "vi": "Chế độ toàn màn hình của kết quả: Sau và Trước (1), nút đóng (2) và video (3).",
+    "es-ES": "La vista a pantalla completa del resultado: Después y Antes (1), el botón de cerrar (2) y el vídeo (3).",
+    "ur": "نتیجے کا فل اسکرین منظر: بعد اور پہلے (1)، بند کرنے کا بٹن (2)، ویڈیو (3)۔",
+    "ja": "結果の全画面表示：圧縮後、圧縮前(1)、閉じるボタン(2)、動画(3)です。"
+   },
+   "start": "home",
+   "steps": [
+    {
+     "tap": {
+      "text": "Tools",
+      "region": [
+       0,
+       2100,
+       1080,
+       2400
+      ]
+     }
+    },
+    {
+     "tap": "Compress"
+    },
+    {
+     "tap": "Choose a video or picture"
+    },
+    {
+     "wait": 2
+    },
+    {
+     "tap": {
+      "desc_re": "Video taken on .* with duration 00:10"
+     }
+    },
+    {
+     "wait": 3
+    },
+    {
+     "tap": {
+      "text": "Compress",
+      "region": [
+       0,
+       2100,
+       1080,
+       2337
+      ]
+     }
+    },
+    {
+     "wait": 3
+    },
+    {
+     "absent": {
+      "text_re": "^Compressing"
+     },
+     "timeout": 400
+    },
+    {
+     "wait": 4
+    },
+    {
+     "tap": {
+      "desc": "Full screen"
+     }
+    },
+    {
+     "wait": 3
+    }
+   ],
+   "highlight": [
+    {
+     "box": [
       20,
-      300,
-      1060,
-      900
+      146,
+      495,
+      280
+     ],
+     "n": 1,
+     "badge": "tl",
+     "pad": 0
+    },
+    {
+     "box": [
+      920,
+      146,
+      1050,
+      278
+     ],
+     "n": 2,
+     "badge": "tl",
+     "pad": 0
+    },
+    {
+     "box": [
+      0,
+      893,
+      1080,
+      1510
+     ],
+     "n": 3,
+     "badge": "tl",
+     "pad": 0
+    }
+   ],
+   "crop": [
+    0,
+    106,
+    1080,
+    2337
+   ],
+   "phase": 2
+  },
+  {
+   "id": "downloader-addon",
+   "page": "home",
+   "section": "Video Downloader",
+   "block": 1,
+   "alt": {
+    "en": "The Video Downloader before the add-on is installed: the card that asks for it (1).",
+    "ar": "منزّل الفيديو قبل تثبيت الإضافة: البطاقة التي تطلبها (1).",
+    "bn": "অ্যাড-অন ইনস্টলের আগে ভিডিও ডাউনলোডার: অ্যাড-অন চাওয়া কার্ড (1)।",
+    "es": "La pantalla Descargador de videos antes de instalar el complemento: la tarjeta que lo solicita (1).",
+    "fa": "دانلود ویدیو پیش از نصب افزونه: کارتی که افزونه را می‌خواهد (1).",
+    "fil": "Ang screen na Downloader ng bidyo bago ma-install ang add-on: ang card na humihingi nito (1).",
+    "hi": "ऐड-ऑन इंस्टॉल होने से पहले वीडियो डाउनलोडर: ऐड-ऑन माँगने वाला कार्ड (1)।",
+    "id": "Pengunduh Video sebelum add-on dipasang: kartu yang memintanya (1).",
+    "ms": "Pemuat turun video sebelum add-on dipasang: kad yang memintanya (1).",
+    "pt-BR": "A tela Baixar vídeos antes de instalar o complemento: o cartão que o solicita (1).",
+    "ru": "Раздел Загрузчик видео до установки дополнения: карточка, которая его запрашивает (1).",
+    "th": "ดาวน์โหลดวิดีโอ ก่อนติดตั้งส่วนเสริม: การ์ดที่ขอให้ติดตั้ง (1)",
+    "tr": "Eklenti kurulmadan önce Video indirici: eklentiyi isteyen kart (1).",
+    "vi": "Tải video trước khi cài tiện ích bổ sung: thẻ yêu cầu cài đặt (1).",
+    "es-ES": "La pantalla Descargador de vídeo antes de instalar el complemento: la tarjeta que lo solicita (1).",
+    "ur": "ایڈ آن انسٹال ہونے سے پہلے ویڈیو ڈاؤن لوڈر: ایڈ آن مانگنے والا کارڈ (1)۔",
+    "ja": "アドオンをインストールする前の画面 動画ダウンローダー：アドオンを求めるカード(1)です。"
+   },
+   "start": "home",
+   "steps": [
+    {
+     "tap": {
+      "desc": "Settings"
+     }
+    },
+    {
+     "tap": "Projects and media"
+    },
+    {
+     "tap_if": "Delete Video downloader add-on"
+    },
+    {
+     "tap_if": "Delete"
+    },
+    {
+     "wait": 1
+    },
+    {
+     "back": 1
+    },
+    {
+     "tap": {
+      "text": "Tools",
+      "region": [
+       0,
+       2100,
+       1080,
+       2400
+      ]
+     }
+    },
+    {
+     "tap": "Video Downloader"
+    },
+    {
+     "expect": "Get the add-on"
+    }
+   ],
+   "highlight": [
+    {
+     "box": [
+      40,
+      826,
+      1040,
+      1292
      ],
      "n": 1,
      "badge": "tl",
@@ -4248,46 +5305,129 @@
    "phase": 2
   },
   {
-   "id": "reverse-progress",
-   "page": "media",
-   "section": "Speed",
+   "id": "downloader-link",
+   "page": "home",
+   "section": "Video Downloader",
    "block": 2,
    "alt": {
-    "en": "The progress of Reverse."
+    "en": "A checked link: the link field (1), the title and picture of the video (2), what to save (3), the quality (4) and Download (5).",
+    "ar": "رابط تم فحصه: حقل الرابط (1)، عنوان الفيديو وصورته (2)، ما سيُحفظ (3)، الجودة (4)، تنزيل (5).",
+    "bn": "যাচাই করা লিংক: লিংকের ঘর (1), ভিডিওর শিরোনাম ও ছবি (2), কী সেভ হবে (3), কোয়ালিটি (4) এবং ডাউনলোড (5)।",
+    "es": "Un enlace verificado: el campo del enlace (1), el título y la imagen del video (2), qué guardar (3), la calidad (4) y el botón Descargar (5).",
+    "fa": "یک پیوند بررسی‌شده: فیلد پیوند (1)، عنوان و تصویر ویدیو (2)، آنچه ذخیره می‌شود (3)، کیفیت (4)، دانلود (5).",
+    "fil": "Isang na-check na link: ang field ng link (1), ang pamagat at larawan ng video (2), kung ano ang ise-save (3), ang kalidad (4) at ang button na I-download (5).",
+    "hi": "जाँचा हुआ लिंक: लिंक का खाना (1), वीडियो का शीर्षक और तस्वीर (2), क्या सेव करना है (3), क्वालिटी (4) और डाउनलोड (5)।",
+    "id": "Tautan yang sudah dicek: kolom tautan (1), judul dan gambar video (2), yang akan disimpan (3), kualitas (4), dan Unduh (5).",
+    "ms": "Pautan yang telah disemak: medan pautan (1), tajuk dan gambar video (2), perkara yang hendak disimpan (3), kualiti (4) dan Muat turun (5).",
+    "pt-BR": "Um link verificado: o campo do link (1), o título e a imagem do vídeo (2), o que salvar (3), a qualidade (4) e o botão Baixar (5).",
+    "ru": "Проверенная ссылка: поле ссылки (1), название и картинка видео (2), что сохранить (3), качество (4) и Скачать (5).",
+    "th": "ลิงก์ที่ตรวจแล้ว: ช่องลิงก์ (1), ชื่อและภาพของวิดีโอ (2), สิ่งที่จะบันทึก (3), คุณภาพ (4) และ ดาวน์โหลด (5)",
+    "tr": "Kontrol edilmiş bir bağlantı: bağlantı alanı (1), videonun başlığı ve resmi (2), neyin kaydedileceği (3), kalite (4), İndir (5).",
+    "vi": "Một liên kết đã kiểm tra: ô liên kết (1), tiêu đề và hình của video (2), nội dung cần lưu (3), chất lượng (4) và Tải xuống (5).",
+    "es-ES": "Un enlace verificado: el campo del enlace (1), el título y la imagen del vídeo (2), qué guardar (3), la calidad (4) y el botón Descargar (5).",
+    "ur": "جانچا ہوا لنک: لنک کا خانہ (1)، ویڈیو کا عنوان اور تصویر (2)، کیا محفوظ کرنا ہے (3)، کوالٹی (4)، ڈاؤن لوڈ (5)۔",
+    "ja": "確認済みのリンク：リンク欄(1)、動画のタイトルと画像(2)、保存する内容(3)、画質(4)、ダウンロード(5)です。"
    },
-   "start": {
-    "scene": "video",
-    "frame": 30
-   },
+   "start": "home",
    "steps": [
     {
-     "tap": "Beach"
+     "tap": {
+      "text": "Tools",
+      "region": [
+       0,
+       2100,
+       1080,
+       2400
+      ]
+     }
     },
     {
-     "swipe": [
-      900,
-      2100,
-      150,
-      2100,
-      300
+     "tap": "Video Downloader"
+    },
+    {
+     "tap_if": "Get the add-on"
+    },
+    {
+     "absent": {
+      "text": "Downloads need an add-on"
+     },
+     "timeout": 150
+    },
+    {
+     "tap_xy": [
+      300,
+      384
      ]
     },
     {
-     "tap": "Reverse"
+     "type": "https://youtu.be/aqz-KE-bpKQ"
     },
     {
-     "wait": 2
+     "back": 1
+    },
+    {
+     "expect": {
+      "text_re": "about"
+     },
+     "timeout": 60
+    },
+    {
+     "wait": 1
     }
    ],
    "highlight": [
     {
      "box": [
-      20,
-      1000,
-      1060,
-      1500
+      30,
+      314,
+      1050,
+      456
      ],
      "n": 1,
+     "badge": "tl",
+     "pad": 0
+    },
+    {
+     "box": [
+      30,
+      560,
+      1050,
+      805
+     ],
+     "n": 2,
+     "badge": "tl",
+     "pad": 0
+    },
+    {
+     "box": [
+      30,
+      832,
+      1050,
+      1388
+     ],
+     "n": 3,
+     "badge": "tl",
+     "pad": 0
+    },
+    {
+     "box": [
+      30,
+      1438,
+      1050,
+      1680
+     ],
+     "n": 4,
+     "badge": "tl",
+     "pad": 0
+    },
+    {
+     "box": [
+      36,
+      2081,
+      1044,
+      2230
+     ],
+     "n": 5,
      "badge": "tl",
      "pad": 0
     }
@@ -4295,6 +5435,401 @@
    "crop": [
     0,
     106,
+    1080,
+    2337
+   ],
+   "phase": 2
+  },
+  {
+   "id": "downloader-saved",
+   "page": "home",
+   "section": "Video Downloader",
+   "block": 2,
+   "alt": {
+    "en": "After the download: the place where the file was saved (1), and New project and Compress (2).",
+    "ar": "بعد التنزيل: مكان حفظ الملف (1)، الزرّان مشروع جديد، ضغط (2).",
+    "bn": "ডাউনলোডের পরে: ফাইল সেভ হওয়ার জায়গা (1) এবং নতুন প্রজেক্ট ও কম্প্রেস (2)।",
+    "es": "Después de la descarga: el lugar donde se guardó el archivo (1) y los botones Nuevo proyecto y Comprimir (2).",
+    "fa": "پس از دانلود: محل ذخیره فایل (1) و دکمه‌های پروژه جدید و فشرده‌سازی (2).",
+    "fil": "Pagkatapos ng download: ang lugar kung saan na-save ang file (1), at ang mga button na Bagong proyekto at I-compress (2).",
+    "hi": "डाउनलोड के बाद: जहाँ फ़ाइल सेव हुई वह जगह (1) और नया प्रोजेक्ट व कंप्रेस (2)।",
+    "id": "Setelah unduhan selesai: lokasi penyimpanan berkas (1), serta Proyek baru dan Kompres (2).",
+    "ms": "Selepas muat turun: tempat fail disimpan (1) serta Projek baharu dan Mampatkan (2).",
+    "pt-BR": "Depois do download: o local onde o arquivo foi salvo (1) e os botões Novo projeto e Comprimir (2).",
+    "ru": "После загрузки: место, где сохранён файл (1), а также Новый проект и Сжатие (2).",
+    "th": "หลังดาวน์โหลด: ที่ที่บันทึกไฟล์ไว้ (1) และ โปรเจกต์ใหม่ กับ บีบอัด (2)",
+    "tr": "İndirmeden sonra: dosyanın kaydedildiği yer (1), düğmeler Yeni proje ve Sıkıştır (2).",
+    "vi": "Sau khi tải xuống: nơi tệp được lưu (1), và Dự án mới cùng Nén (2).",
+    "es-ES": "Tras la descarga: el lugar donde se guardó el archivo (1) y los botones Nuevo proyecto y Comprimir (2).",
+    "ur": "ڈاؤن لوڈ کے بعد: فائل محفوظ ہونے کی جگہ (1)، بٹن نیا پروجیکٹ اور کمپریس (2)۔",
+    "ja": "ダウンロード後：ファイルの保存先(1)、新規プロジェクト、圧縮(2)です。"
+   },
+   "start": "home",
+   "steps": [
+    {
+     "tap": {
+      "text": "Tools",
+      "region": [
+       0,
+       2100,
+       1080,
+       2400
+      ]
+     }
+    },
+    {
+     "tap": "Video Downloader"
+    },
+    {
+     "tap_if": "Get the add-on"
+    },
+    {
+     "absent": {
+      "text": "Downloads need an add-on"
+     },
+     "timeout": 150
+    },
+    {
+     "tap_xy": [
+      300,
+      384
+     ]
+    },
+    {
+     "type": "https://youtu.be/aqz-KE-bpKQ"
+    },
+    {
+     "back": 1
+    },
+    {
+     "expect": {
+      "text_re": "about"
+     },
+     "timeout": 60
+    },
+    {
+     "tap": {
+      "text_re": "1080p"
+     }
+    },
+    {
+     "tap": {
+      "text_re": "144p"
+     }
+    },
+    {
+     "tap": "Download"
+    },
+    {
+     "expect": {
+      "text_re": "^Saved to"
+     },
+     "timeout": 120
+    }
+   ],
+   "highlight": [
+    {
+     "box": [
+      30,
+      1966,
+      1050,
+      2050
+     ],
+     "n": 1,
+     "badge": "tl",
+     "pad": 0
+    },
+    {
+     "union": [
+      "New project",
+      "Compress"
+     ],
+     "pad": 4,
+     "n": 2,
+     "badge": "tl"
+    }
+   ],
+   "crop": [
+    0,
+    106,
+    1080,
+    2337
+   ],
+   "phase": 2
+  },
+  {
+   "id": "anim-transition-new",
+   "page": "animations",
+   "section": "Transitions between two clips",
+   "block": 3,
+   "alt": {
+    "en": "The transition list scrolled to the end, with the newer transitions Glow (1), Swirl (2), Pixelate (3) and Noise dissolve (4).",
+    "ar": "قائمة الانتقالات مُمرَّرة إلى النهاية مع الانتقالات الأحدث: Glow (1)، Swirl (2)، Pixelate (3)، Noise dissolve (4).",
+    "bn": "শেষ পর্যন্ত স্ক্রল করা ট্রানজিশনের তালিকা, নতুন ট্রানজিশন Glow (1), Swirl (2), Pixelate (3) এবং Noise dissolve (4) সহ।",
+    "es": "La lista de transiciones desplazada hasta el final, con las transiciones más nuevas: Glow (1), Swirl (2), Pixelate (3) y Noise dissolve (4).",
+    "fa": "فهرست انتقال‌ها تا انتها پیمایش شده، با انتقال‌های تازه‌تر: Glow (1)، Swirl (2)، Pixelate (3)، Noise dissolve (4).",
+    "fil": "Ang listahan ng mga transition na na-scroll hanggang sa dulo, kasama ang mga mas bagong transition: Glow (1), Swirl (2), Pixelate (3) at Noise dissolve (4).",
+    "hi": "अंत तक स्क्रोल की गई ट्रांज़िशन सूची, नए ट्रांज़िशन Glow (1), Swirl (2), Pixelate (3) और Noise dissolve (4) के साथ।",
+    "id": "Daftar transisi yang digulir sampai akhir, dengan transisi baru Glow (1), Swirl (2), Pixelate (3), dan Noise dissolve (4).",
+    "ms": "Senarai peralihan yang digulung ke hujung, dengan peralihan baharu Glow (1), Swirl (2), Pixelate (3) dan Noise dissolve (4).",
+    "pt-BR": "A lista de transições rolada até o fim, com as transições mais novas: Glow (1), Swirl (2), Pixelate (3) e Noise dissolve (4).",
+    "ru": "Список переходов, прокрученный до конца, с новыми переходами: Glow (1), Swirl (2), Pixelate (3) и Noise dissolve (4).",
+    "th": "รายการทรานซิชันที่เลื่อนไปจนสุด พร้อมทรานซิชันใหม่ Glow (1), Swirl (2), Pixelate (3) และ Noise dissolve (4)",
+    "tr": "Geçiş listesi sona kadar kaydırılmış, yeni geçişler: Glow (1), Swirl (2), Pixelate (3), Noise dissolve (4).",
+    "vi": "Danh sách chuyển cảnh đã cuộn đến cuối, với các chuyển cảnh mới Glow (1), Swirl (2), Pixelate (3) và Noise dissolve (4).",
+    "es-ES": "La lista de transiciones desplazada al final, con las transiciones más nuevas: Glow (1), Swirl (2), Pixelate (3) y Noise dissolve (4).",
+    "ur": "ٹرانزیشنز کی فہرست آخر تک اسکرول کی ہوئی، نئی ٹرانزیشنز کے ساتھ: Glow (1)، Swirl (2)، Pixelate (3)، Noise dissolve (4)۔",
+    "ja": "末尾までスクロールしたトランジションのリスト：新しいトランジション Glow(1)、Swirl(2)、Pixelate(3)、Noise dissolve(4)です。"
+   },
+   "start": {
+    "scene": "clips",
+    "frame": 97
+   },
+   "steps": [
+    {
+     "tap": "Transition"
+    },
+    {
+     "expect": "Duration"
+    },
+    {
+     "swipe": [
+      540,
+      2000,
+      540,
+      1300,
+      500
+     ]
+    },
+    {
+     "wait": 1
+    },
+    {
+     "swipe": [
+      540,
+      2000,
+      540,
+      1300,
+      500
+     ]
+    },
+    {
+     "wait": 1
+    }
+   ],
+   "highlight": [
+    {
+     "box": [
+      297,
+      1353,
+      530,
+      1600
+     ],
+     "n": 1,
+     "badge": "tl",
+     "pad": 0
+    },
+    {
+     "box": [
+      551,
+      1353,
+      784,
+      1600
+     ],
+     "n": 2,
+     "badge": "tl",
+     "pad": 0
+    },
+    {
+     "box": [
+      805,
+      1611,
+      1038,
+      1858
+     ],
+     "n": 3,
+     "badge": "tl",
+     "pad": 0
+    },
+    {
+     "box": [
+      42,
+      1869,
+      276,
+      2116
+     ],
+     "n": 4,
+     "badge": "tl",
+     "pad": 0
+    }
+   ],
+   "crop": [
+    0,
+    1100,
+    1080,
+    2337
+   ],
+   "phase": 2
+  },
+  {
+   "id": "lm-multi-effects",
+   "page": "layer-menus",
+   "section": "Selecting several layers",
+   "block": 5,
+   "alt": {
+    "en": "The Effects button of the bottom bar (1) opens a menu with Add an effect to all and Paste All Effects (2).",
+    "ar": "زر التأثيرات في الشريط السفلي (1) يفتح قائمة فيها Add an effect to all، لصق كل التأثيرات (2).",
+    "bn": "নিচের বারের বোতাম ইফেক্ট (1) একটি মেনু খোলে: Add an effect to all ও সব ইফেক্ট পেস্ট করুন (2)।",
+    "es": "El botón Efectos de la barra inferior (1) abre un menú con Add an effect to all y Pegar todos los efectos (2).",
+    "fa": "دکمه افکت‌ها در نوار پایین (1) منویی باز می‌کند با Add an effect to all و جای‌گذاری همه افکت‌ها (2).",
+    "fil": "Ang button na Mga epekto sa bottom bar (1) ay nagbubukas ng menu na may Add an effect to all at I-paste lahat ng epekto (2).",
+    "hi": "नीचे के बार का बटन इफ़ेक्ट्स (1) एक मेन्यू खोलता है: Add an effect to all और सभी इफ़ेक्ट पेस्ट करें (2)।",
+    "id": "Tombol Efek di bilah bawah (1) membuka menu berisi Add an effect to all dan Tempel semua efek (2).",
+    "ms": "Butang Kesan pada bar bawah (1) membuka menu dengan Add an effect to all dan Tampal Semua Kesan (2).",
+    "pt-BR": "O botão Efeitos da barra inferior (1) abre um menu com Add an effect to all e Colar todos os efeitos (2).",
+    "ru": "Кнопка Эффекты на нижней панели (1) открывает меню: Add an effect to all и Вставить все эффекты (2).",
+    "th": "ปุ่ม เอฟเฟกต์ ของแถบด้านล่าง (1) เปิดเมนูที่มี Add an effect to all และ วางเอฟเฟกต์ทั้งหมด (2)",
+    "tr": "Alt çubuktaki Efektler düğmesi (1), Add an effect to all ve Tüm efektleri yapıştır bulunan bir menü açar (2).",
+    "vi": "Nút Hiệu ứng của thanh dưới cùng (1) mở một menu có Add an effect to all và Dán tất cả hiệu ứng (2).",
+    "es-ES": "El botón Efectos de la barra inferior (1) abre un menú con Add an effect to all y Pegar todos los efectos (2).",
+    "ur": "نچلے بار کا ایفیکٹس بٹن (1) ایک مینو کھولتا ہے جس میں Add an effect to all اور تمام ایفیکٹس پیسٹ کریں ہیں (2)۔",
+    "ja": "下部バーのボタン エフェクト(1)でメニューが開き、Add an effect to all、すべてのエフェクトを貼り付け(2)があります。"
+   },
+   "start": {
+    "scene": "demo",
+    "frame": 45
+   },
+   "steps": [
+    {
+     "tap": "Copy and paste"
+    },
+    {
+     "tap": "Select All Layers"
+    },
+    {
+     "expect": "Group"
+    },
+    {
+     "tap": {
+      "desc": "Effects",
+      "region": [
+       0,
+       2150,
+       200,
+       2337
+      ]
+     }
+    },
+    {
+     "wait": 1
+    }
+   ],
+   "highlight": [
+    {
+     "box": [
+      40,
+      2220,
+      150,
+      2325
+     ],
+     "n": 1,
+     "badge": "r",
+     "pad": 0
+    },
+    {
+     "box": [
+      0,
+      2010,
+      660,
+      2240
+     ],
+     "n": 2,
+     "badge": "tl",
+     "pad": 0
+    }
+   ],
+   "crop": [
+    0,
+    1479,
+    1080,
+    2337
+   ],
+   "phase": 2
+  },
+  {
+   "id": "lm-multi-more",
+   "page": "layer-menus",
+   "section": "Selecting several layers",
+   "block": 5,
+   "alt": {
+    "en": "The More actions button of the bottom bar (1) opens a menu with the paste commands and Remove audio from all (2).",
+    "ar": "زر More actions في الشريط السفلي (1) يفتح قائمة فيها أوامر اللصق، Remove audio from all (2).",
+    "bn": "নিচের বারের বোতাম More actions (1) একটি মেনু খোলে: পেস্টের কমান্ড ও Remove audio from all (2)।",
+    "es": "El botón More actions de la barra inferior (1) abre un menú con los comandos de pegado y la opción Remove audio from all (2).",
+    "fa": "دکمه More actions در نوار پایین (1) منویی باز می‌کند با فرمان‌های چسباندن و Remove audio from all (2).",
+    "fil": "Ang button na More actions sa bottom bar (1) ay nagbubukas ng menu na may mga paste command at ang opsyon na Remove audio from all (2).",
+    "hi": "नीचे के बार का बटन More actions (1) एक मेन्यू खोलता है: पेस्ट कमांड और Remove audio from all (2)।",
+    "id": "Tombol More actions di bilah bawah (1) membuka menu berisi perintah tempel dan Remove audio from all (2).",
+    "ms": "Butang More actions pada bar bawah (1) membuka menu dengan arahan tampal dan Remove audio from all (2).",
+    "pt-BR": "O botão More actions da barra inferior (1) abre um menu com os comandos de colar e a opção Remove audio from all (2).",
+    "ru": "Кнопка More actions на нижней панели (1) открывает меню: команды вставки и Remove audio from all (2).",
+    "th": "ปุ่ม More actions ของแถบด้านล่าง (1) เปิดเมนูที่มีคำสั่งวางและ Remove audio from all (2)",
+    "tr": "Alt çubuktaki More actions düğmesi (1), yapıştırma komutlarının ve Remove audio from all seçeneğinin olduğu bir menü açar (2).",
+    "vi": "Nút More actions của thanh dưới cùng (1) mở một menu có các lệnh dán và Remove audio from all (2).",
+    "es-ES": "El botón More actions de la barra inferior (1) abre un menú con los comandos de pegado y la opción Remove audio from all (2).",
+    "ur": "نچلے بار کا More actions بٹن (1) ایک مینو کھولتا ہے جس میں پیسٹ کمانڈز اور Remove audio from all ہیں (2)۔",
+    "ja": "下部バーのボタン More actions(1)でメニューが開き、貼り付けコマンド、Remove audio from all(2)があります。"
+   },
+   "start": {
+    "scene": "demo",
+    "frame": 45
+   },
+   "steps": [
+    {
+     "tap": "Copy and paste"
+    },
+    {
+     "tap": "Select All Layers"
+    },
+    {
+     "expect": "Group"
+    },
+    {
+     "tap": {
+      "desc": "More actions"
+     }
+    },
+    {
+     "wait": 1
+    }
+   ],
+   "highlight": [
+    {
+     "box": [
+      182,
+      2220,
+      292,
+      2325
+     ],
+     "n": 1,
+     "badge": "r",
+     "pad": 0
+    },
+    {
+     "box": [
+      0,
+      1700,
+      660,
+      2232
+     ],
+     "n": 2,
+     "badge": "tl",
+     "pad": 0
+    }
+   ],
+   "crop": [
+    0,
+    1479,
     1080,
     2337
    ],
@@ -4306,7 +5841,23 @@
    "section": "The Effects Library",
    "block": 1,
    "alt": {
-    "en": "The Effects Library: search (1), the recommended effects (2), recent and favorite effects (3) and the categories (4)."
+    "en": "The Effects Library: search (1), the recommended effects (2), recent and favorite effects (3) and the categories (4).",
+    "ar": "مكتبة التأثيرات: البحث (1)، التأثيرات الموصى بها (2)، التأثيرات الأخيرة والمفضلة (3)، الفئات (4).",
+    "bn": "ইফেক্ট লাইব্রেরি: সার্চ (1), প্রস্তাবিত ইফেক্ট (2), সাম্প্রতিক ও প্রিয় ইফেক্ট (3) এবং ক্যাটাগরি (4)।",
+    "es": "La biblioteca de efectos: la búsqueda (1), los efectos recomendados (2), los efectos recientes y favoritos (3) y las categorías (4).",
+    "fa": "کتابخانه افکت‌ها: جستجو (1)، افکت‌های پیشنهادی (2)، افکت‌های اخیر و محبوب (3)، دسته‌ها (4).",
+    "fil": "Ang Effects Library: ang search (1), ang mga inirerekomendang effect (2), ang mga kamakailan at paboritong effect (3) at ang mga kategorya (4).",
+    "hi": "इफ़ेक्ट लाइब्रेरी: सर्च (1), सुझाए गए इफ़ेक्ट (2), हाल के और पसंदीदा इफ़ेक्ट (3) और कैटेगरी (4)।",
+    "id": "Pustaka Efek: pencarian (1), efek yang direkomendasikan (2), efek terbaru dan favorit (3), serta kategori (4).",
+    "ms": "Pustaka Kesan: carian (1), kesan yang disyorkan (2), kesan terkini dan kegemaran (3) serta kategori (4).",
+    "pt-BR": "A biblioteca de efeitos: a busca (1), os efeitos recomendados (2), os efeitos recentes e favoritos (3) e as categorias (4).",
+    "ru": "Библиотека эффектов: поиск (1), рекомендуемые эффекты (2), недавние и избранные эффекты (3) и категории (4).",
+    "th": "คลังเอฟเฟกต์: ช่องค้นหา (1), เอฟเฟกต์แนะนำ (2), เอฟเฟกต์ล่าสุดและรายการโปรด (3) และหมวดหมู่ (4)",
+    "tr": "Efekt kitaplığı: arama (1), önerilen efektler (2), son kullanılan ve favori efektler (3), kategoriler (4).",
+    "vi": "Thư viện hiệu ứng: tìm kiếm (1), hiệu ứng đề xuất (2), hiệu ứng gần đây và yêu thích (3) và các danh mục (4).",
+    "es-ES": "La biblioteca de efectos: la búsqueda (1), los efectos recomendados (2), los efectos recientes y favoritos (3) y las categorías (4).",
+    "ur": "ایفیکٹس لائبریری: سرچ (1)، تجویز کردہ ایفیکٹس (2)، حالیہ اور پسندیدہ ایفیکٹس (3)، کیٹیگریز (4)۔",
+    "ja": "エフェクトライブラリ：検索(1)、おすすめのエフェクト(2)、最近使ったエフェクトとお気に入り(3)、カテゴリ(4)です。"
    },
    "start": {
     "scene": "demo",
@@ -4361,9 +5912,83 @@
       0,
       1283,
       1080,
-      2329
+      1462
      ],
      "n": 4,
+     "badge": "tl",
+     "pad": 0
+    }
+   ],
+   "crop": [
+    0,
+    106,
+    1080,
+    1470
+   ],
+   "phase": 2
+  },
+  {
+   "id": "fx-dither",
+   "page": "effects-guide",
+   "section": "Settings of an effect",
+   "block": 2,
+   "alt": {
+    "en": "The Dither picker: every pattern has a small sample picture (1).",
+    "ar": "منتقي تنقيط: لكل نمط صورة عينة صغيرة (1).",
+    "bn": "বাছাইয়ের তালিকা ডিদার: প্রতিটি প্যাটার্নের একটি ছোট নমুনা ছবি আছে (1)।",
+    "es": "El selector Tramado: cada patrón tiene una pequeña imagen de muestra (1).",
+    "fa": "انتخابگر دیتر: هر الگو یک تصویر نمونه کوچک دارد (1).",
+    "fil": "Ang picker na Dither: bawat pattern ay may maliit na larawang sample (1).",
+    "hi": "चुनने की सूची डिदर: हर पैटर्न की एक छोटी नमूना तस्वीर है (1)।",
+    "id": "Pemilih Dither: setiap pola punya gambar contoh kecil (1).",
+    "ms": "Pemilih Dither: setiap corak mempunyai gambar contoh kecil (1).",
+    "pt-BR": "O seletor Dither: cada padrão tem uma pequena imagem de amostra (1).",
+    "ru": "Выбор Дизеринг: у каждого узора есть маленький образец (1).",
+    "th": "ตัวเลือก ดิเทอร์: ทุกลายมีภาพตัวอย่างเล็ก ๆ (1)",
+    "tr": "Titreşim seçici: her desenin küçük bir örnek resmi var (1).",
+    "vi": "Bộ chọn Dither: mỗi mẫu có một hình mẫu nhỏ (1).",
+    "es-ES": "El selector Tramado: cada patrón tiene una pequeña imagen de muestra (1).",
+    "ur": "ڈدرنگ سلیکٹر: ہر پیٹرن کی ایک چھوٹی نمونہ تصویر ہے (1)۔",
+    "ja": "ピッカー ディザ：パターンごとの小さなサンプル画像(1)です。"
+   },
+   "start": {
+    "scene": "demo",
+    "frame": 45
+   },
+   "steps": [
+    {
+     "tap": "Sun"
+    },
+    {
+     "tap": "Effects"
+    },
+    {
+     "tap": "Add Effect"
+    },
+    {
+     "expect": "Effects Library"
+    },
+    {
+     "tap": "Retro Dither"
+    },
+    {
+     "tap": {
+      "text_re": "Bayer 4x4"
+     }
+    },
+    {
+     "wait": 2
+    }
+   ],
+   "highlight": [
+    {
+     "box": [
+      30,
+      1530,
+      1050,
+      2310
+     ],
+     "n": 1,
      "badge": "tl",
      "pad": 0
     }
@@ -4377,41 +6002,80 @@
    "phase": 2
   },
   {
-   "id": "tl-tools",
-   "page": "timeline",
-   "section": "The tools under a selected layer",
-   "block": 2,
+   "id": "fx-particles",
+   "page": "effects-guide",
+   "section": "Particles",
+   "block": 1,
    "alt": {
-    "en": "The first row of the tool grid: the five small buttons (1)."
+    "en": "The Particles effect: the snow in the preview (1) and its first settings (2).",
+    "ar": "تأثير الجسيمات: الثلج في المعاينة (1) وأولى إعداداته (2).",
+    "bn": "পার্টিকলস ইফেক্ট: প্রিভিউতে তুষার (1) এবং এর প্রথম সেটিংস (2)।",
+    "es": "El efecto Partículas: la nieve en la vista previa (1) y sus primeros ajustes (2).",
+    "fa": "افکت ذرات: برف در پیش‌نمایش (1) و نخستین تنظیمات آن (2).",
+    "fil": "Ang effect na Particles: ang niyebe sa preview (1) at ang mga unang setting nito (2).",
+    "hi": "पार्टिकल्स इफ़ेक्ट: प्रीव्यू में बर्फ़ (1) और उसकी पहली सेटिंग (2)।",
+    "id": "Efek Partikel: salju di pratinjau (1) dan pengaturan pertamanya (2).",
+    "ms": "Kesan Zarah: salji dalam pratonton (1) dan tetapan pertamanya (2).",
+    "pt-BR": "O efeito Partículas: a neve na pré-visualização (1) e suas primeiras configurações (2).",
+    "ru": "Эффект «Частицы»: снег в предпросмотре (1) и его первые настройки (2).",
+    "th": "เอฟเฟกต์อนุภาค: หิมะในตัวอย่าง (1) และการตั้งค่าแรก ๆ (2)",
+    "tr": "Parçacık efekti: önizlemedeki kar (1) ve ilk ayarları (2).",
+    "vi": "Hiệu ứng hạt: tuyết trong phần xem trước (1) và các cài đặt đầu tiên của nó (2).",
+    "es-ES": "El efecto Partículas: la nieve en la vista previa (1) y sus primeras opciones (2).",
+    "ur": "پارٹیکلز ایفیکٹ: پریویو میں برف (1) اور اس کی پہلی سیٹنگز (2)۔",
+    "ja": "パーティクルエフェクト：プレビューの雪(1)、最初の設定(2)です。"
    },
    "start": {
-    "scene": "video",
-    "frame": 30
+    "scene": "demo",
+    "frame": 45
    },
    "steps": [
     {
-     "tap": "Beach"
+     "tap": "Lake"
     },
     {
-     "expect": "Trim start"
+     "tap": "Effects"
+    },
+    {
+     "tap": "Add Effect"
+    },
+    {
+     "expect": "Effects Library"
+    },
+    {
+     "tap": "Particles"
+    },
+    {
+     "wait": 3
     }
    ],
    "highlight": [
     {
      "box": [
-      30,
-      1830,
-      1050,
-      1972
+      0,
+      548,
+      1080,
+      1170
      ],
      "n": 1,
+     "badge": "tl",
+     "pad": 0
+    },
+    {
+     "box": [
+      178,
+      1905,
+      1060,
+      2240
+     ],
+     "n": 2,
      "badge": "tl",
      "pad": 0
     }
    ],
    "crop": [
     0,
-    1479,
+    106,
     1080,
     2337
    ],
@@ -4423,7 +6087,23 @@
    "section": "Getting sound into a project",
    "block": 4,
    "alt": {
-    "en": "An audio layer on the timeline and its tools."
+    "en": "An audio layer on the timeline and its tools: Presets, Effects and AI (1).",
+    "ar": "طبقة صوتية على الخط الزمني وأدواتها: إعدادات مسبقة، التأثيرات، AI (1).",
+    "bn": "টাইমলাইনে একটি অডিও লেয়ার ও তার টুল: প্রিসেট, ইফেক্ট ও AI (1)।",
+    "es": "Una capa de audio en la línea de tiempo y sus herramientas: los botones Preajustes, Efectos, IA (1).",
+    "fa": "یک لایه صوتی روی تایم‌لاین و ابزارهای آن: پریست‌ها، افکت‌ها، AI (1).",
+    "fil": "Isang audio layer sa timeline at ang mga tool nito: Mga preset, Mga epekto at AI (1).",
+    "hi": "टाइमलाइन पर एक ऑडियो लेयर और उसके टूल: प्रीसेट, इफ़ेक्ट्स और AI (1)।",
+    "id": "Lapisan audio di timeline beserta alatnya: Preset, Efek, dan AI (1).",
+    "ms": "Lapisan audio pada garis masa dan alatnya: Pratetap, Kesan dan AI (1).",
+    "pt-BR": "Uma camada de áudio na linha do tempo e suas ferramentas: os botões Predefinições, Efeitos e IA (1).",
+    "ru": "Аудиослой на таймлайне и его инструменты: Пресеты, Эффекты и AI (1).",
+    "th": "เลเยอร์เสียงบนไทม์ไลน์และเครื่องมือของมัน: พรีเซ็ต, เอฟเฟกต์ และ AI (1)",
+    "tr": "Zaman çizelgesinde bir ses katmanı ve araçları: Ön ayarlar, Efektler, AI (1).",
+    "vi": "Một lớp âm thanh trên dòng thời gian và các công cụ của nó: Preset, Hiệu ứng và AI (1).",
+    "es-ES": "Una capa de audio en la línea de tiempo y sus herramientas: los botones Preajustes, Efectos, AI (1).",
+    "ur": "ٹائم لائن پر ایک آڈیو لیئر اور اس کے ٹولز: پریسیٹس، ایفیکٹس، AI (1)۔",
+    "ja": "タイムライン上のオーディオレイヤーとそのツール：プリセット、エフェクト、AI(1)です。"
    },
    "start": {
     "scene": "demo",
@@ -4440,10 +6120,10 @@
    "highlight": [
     {
      "box": [
-      4,
-      1700,
-      1076,
-      1800
+      40,
+      1972,
+      1040,
+      2132
      ],
      "n": 1,
      "badge": "tl",
@@ -4452,7 +6132,7 @@
    ],
    "crop": [
     0,
-    1590,
+    1479,
     1080,
     2337
    ],

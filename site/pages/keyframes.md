@@ -4,7 +4,7 @@ group: Create
 order: 1
 summary: Animate any value over time, move and retime keyframes and shape the motion with easing curves.
 ---
-A **keyframe** stores the value of one property at one moment. Between two keyframes the app calculates the values in between, which makes the animation. Almost every value can be animated: position, size, rotation, tilt, skew, opacity, colors, stroke, border and shadow settings, shape parameters, camera and model settings, volume, speed, and the settings of effects.
+A **keyframe** stores the value of one property at one moment. Between two keyframes the app calculates the values in between, which makes the animation. Almost every value can be animated: position, size, rotation, tilt, skew, opacity, colors, stroke, border and shadow settings, shape parameters, camera and model settings, volume, and the settings of effects.
 
 ## Add and remove keyframes
 
@@ -28,7 +28,7 @@ Keyframes show as small diamonds on a layer's bar. On the selected layer they ar
 
 - **Jump between them.** **Skip back** and **Skip forward** in the play bar stop at the keyframes of the selected layer (only the open property's or effect's when one is open).
 - **Move a keyframe (retime).** Press and hold a diamond on the selected layer until it lifts, then drag sideways. It snaps to the playhead, bookmarks, other layers' ends and other keyframes, and stays inside the clip. One move is one undo step. If no property or effect is open, all of the layer's keyframes at that frame move together; if one is open, only its keyframes move. Adding a second finger cancels the move.
-- **Speed ramps** are keyframes of the clip's speed: see [Photos, video and speed](@media).
+- **Speed** has no keyframes of its own. Change it over time with a speed curve: see [Photos, video and speed](@media).
 
 There is no copy and paste for a single keyframe. To reuse keyframes, copy the whole layer (they travel with it), copy an effect, or save a [preset](@assets-templates).
 
@@ -55,8 +55,6 @@ Tap **Easing** (the curve button) in a panel. A graph opens for the segment that
 
 - **Reverse the curve** mirrors the curve (not available for Linear).
 - **More** has **Copy Curve** and **Paste Curve** (paste to the current segment), **Apply Curve to All Keyframes**, and **Enable Overshoot** or **Disable Overshoot** (Cubic Bezier only). Overshoot widens the graph so the handles can go past the start and end values, which makes the motion swing past its target and come back.
-
-Time remapping (speed) uses cubic Bezier curves limited to the range 0 to 1.
 
 ## Ready-made animation
 

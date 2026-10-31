@@ -22,6 +22,8 @@ To read about an effect first, press and hold its tile. A page opens with an ani
 - **Categories:** Color, Blur, Distort, Stylize, Noise, Repeat, Key, Move, Beat, 3D and Text. A **New** category appears for effects added in the latest versions. An **Audio** category appears for layers that have sound, and **AI** holds the AI tools.
 - An effect that cannot run on your phone is grayed out.
 
+![The Effects Library: search (1), the recommended effects (2), recent and favorite effects (3) and the categories (4).](img/fx-library.webp)
+
 ## Settings of an effect
 
 Tap an effect in the list to open it. Its header has the effect name, a three-dot menu and a trash can.
@@ -32,8 +34,11 @@ Tap an effect in the list to open it. Its header has the effect name, a three-do
 - A color setting opens a row of quick swatches and a field for the exact color.
 - A switch turns an option on or off. A choice opens a list.
 - A palette setting (in Palette Map and Retro Dither) shows all of its colors. **Presets** lists old console and computer palettes such as PICO-8, Game Boy and Commodore 64. **Import** reads a palette file: a picture with up to 256 colors (bigger ones are reduced to 256), Photoshop .ase or .act, GIMP .gpl, .pal, .hex or Paint.NET .txt, like the palettes you can download from Lospec.
+- The dither pattern of Retro Dither (**Dither**) and Palette Map (**Dither Pattern**) opens a sheet with a small sample picture of every pattern, so you can choose by how it looks. The chosen pattern has an orange frame. Swipe the grid up to see the rest.
 - The three-dot menu has **Effect Info**, **Reset to Defaults**, **Duplicate**, **Copy Effect** and **Paste Effect Values** (when you copied one effect of the same kind).
 - The trash can removes the effect. Tap the header to close it.
+
+![The Dither picker: every pattern has a small sample picture (1).](img/fx-dither.webp)
 
 If the layer is a parent of other layers, a switch **Apply to Children** appears at the top of the effect (not for Move or Repeat effects).
 
@@ -47,7 +52,7 @@ If the layer is a parent of other layers, a switch **Apply to Children** appears
 
 ### Effects on many layers at once
 
-Copy the effects in one layer. Then select several layers (see [Layer menus and multi-select](@layer-menus)), tap **Effects** in the bottom bar and choose **Paste All Effects**. Sound, camera and null layers are skipped.
+Select several layers (see [Layer menus and multi-select](@layer-menus)) and tap **Effects** in the bottom bar. **Add an effect to all** opens the Effects Library and puts the effect you pick on every selected layer. **Paste All Effects** puts on every selected layer the effects you copied in one layer. Sound, camera and null layers are skipped.
 
 ## Animate an effect
 
@@ -55,7 +60,7 @@ Every number, color and position in an effect can have keyframes. Open the effec
 
 ## Presets inside effects
 
-Four text effects come with ready-made presets: Text Progress (Typewriter, Fade In by Word, Slide Up by Letter, Pop In), Text Transform (Wave, Spin Cascade), Text Randomizer (Scramble) and Count Up/Down (Count Up). Press and hold the effect in the library and choose the preset under **PRESET**.
+Four text effects and Particles come with ready-made presets: Text Progress (Typewriter, Fade In by Word, Slide Up by Letter, Pop In), Text Transform (Wave, Spin Cascade), Text Randomizer (Scramble), Count Up/Down (Count Up) and Particles (Snow, Sparks, Confetti, Bubbles, Dust, Hearts, Twinkle, Petals, Layer Fountain, Beat Confetti). Press and hold the effect in the library and choose the preset under **PRESET**.
 
 These are different from the **Presets** tool of a layer, which keeps your own looks: see [Assets, templates and presets](@assets-templates).
 
@@ -64,12 +69,19 @@ These are different from the **Presets** tool of a layer, which keeps your own l
 - **Move** effects (Auto-Shake, Oscillate, Swing, Spin, Random Displacement, Random Jitter, Pulse, Echo, Offset, Move Along Path, True Motion Blur) animate a layer by themselves.
 - **Repeat** effects make copies in a line, a circle, a grid, along a path or scattered.
 - **3D** effects turn a layer into a cube, sphere, torus and other solids. The Rotate tab then controls the effect's rotation.
+- **Beat** effects (Beat Blur, Beat Flash, Beat Glitch, Beat Glow, Beat Pulse, Beat RGB Split, Beat Rotate, Beat Shake and Beat Zoom) hit on every beat of the music. Select the music clip and tap **Mark Beats** in its layer menu first; without beat marks they follow the **BPM** setting. See [Audio](@audio).
 - **Key** effects (Chroma Key, Luma Key) remove a color or the dark and bright parts of a layer, for example a green screen.
 - **Text** effects (Text Progress, Text Transform, Text Randomizer, Count Up/Down, Timecode) animate text letter by letter. See [Text and fonts](@text).
 - **Audio** effects work on sound: see [Audio](@audio).
 - **AI** tools (Remove Background, Reduce Noise) run on the phone: see [AI tools](@ai-tools).
 
-**Crop**, a Key effect, cuts the edges off a layer. Photos and videos also have a **Crop** button that shows the crop on the canvas: see [Layer tools](@layer-tools).
+**Crop**, a Key effect, cuts the edges off a layer. Layers also have a **Crop** button, on page 2 of the tool grid, that shows the crop on the canvas: see [Layer tools](@layer-tools).
+
+### Particles
+
+**Particles** (in Stylize) sends particles flying out of the layer. **Particle** picks what they are: Snow, Sparks, Confetti, Bubbles, Dust, Hearts, Stars, Petals or small copies of the **Layer** itself. **Emitter** is where they start: a **Point**, a **Line**, an **Area** or the **Outline** of the layer. **Emission** is when: **Continuous** (a **Rate** per second), **Burst** (a **Count** at the moment you choose) or **On Beats** (a burst on every beat of the music, which needs the beat marks described above). Further down are the **Lifetime**, **Speed** and **Direction** of the particles, the forces **Gravity**, **Wind** and **Swirl**, and their **Size** and **Color**. **More Settings** opens the fine controls. It has ten presets to start from (see **Presets inside effects** above).
+
+![The Particles effect: the snow in the preview (1) and its first settings (2).](img/fx-particles.webp)
 
 ## Tips
 

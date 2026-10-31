@@ -17,6 +17,8 @@ An audio layer is named after the file and starts at the playhead. The project's
 
 On the timeline an audio layer is a violet bar with its waveform. The tools are **Speed**, trim and split, **Volume**, **Presets**, **Effects** and **AI**. Voice filters are inside **Effects**. **AI** contains **Reduce Noise** and **Auto captions** for the selected clip.
 
+![An audio layer on the timeline and its tools: Presets, Effects and AI (1).](img/audio-tools.webp)
+
 ## Volume
 
 **Volume** (the speaker icon) opens the volume panel for sound clips and videos. The slider goes from 0 % to 150 % (default 100 %) and has a value box. It can be animated with the keyframe and easing buttons, which is how you make fade-ins and fade-outs. A clip at 0 % with no keyframes is muted, and the speaker icon shows it.

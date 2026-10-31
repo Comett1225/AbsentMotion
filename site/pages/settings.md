@@ -13,6 +13,7 @@ Tap the menu button at the top left of the home screen to open the Settings draw
 - **Theme.** **AbsentMotion** (the default: a dark editor and a warm light home screen), **Daylight** (light everywhere) or **Custom**. **Import theme file...** loads a theme from a small file (see below).
 - **New Layer Length.** How long new layers last: 1 to 10, 15, 20, 25, 30, 45 or 60 seconds. The default is 2.
 - **Vibration.** Small vibrations on the timeline for snaps, long presses and reordering. On by default.
+- **Transition button in preview.** Off by default. The round button that adds a transition normally sits at the bottom right of the timeline area. Turn this on to have it at the bottom left of the preview instead. See [Transitions and animations](@animations).
 - **Emoji Style.** **SYSTEM** (your phone's emoji, the default) or **ANDROID** (the emoji font that comes with the app, the same on every phone).
 
 ![The Editor group: Theme (1), New Layer Length (2), Vibration (3), the switch for the transition button (4) and Emoji Style (5).](img/settings-editor.webp)
@@ -39,8 +40,10 @@ The color names are the editor and home screen colors: TopBar, PreviewBg, Timeli
 
 - **Show the import card in the project list.** Off by default. Adds a card with **Choose file** at the top of the project list.
 - **Keep a copy of imported media in the project.** On by default. The photo, video or audio you add is copied inside the project, so it keeps working if the original is moved or deleted. Turn it off to save storage if you never move your files.
+- **Cut-out quality.** **Standard** or **AI background removal 2.0**: the kind of cut-out you get when you remove the background of a photo. See [AI tools](@ai-tools).
 - **Remove caption model.** Only shown after the speech model for captions has been downloaded. It shows the size of the file and deletes it; the app downloads it again if you use captions later.
 - **Delete AI ... model.** One row for each downloaded AI Enhance or AI Smooth model, with its size. Tapping it deletes the model; the app downloads it again the next time it is needed.
+- **Delete Video downloader add-on.** Only shown after the add-on has been downloaded. It shows the space the add-on uses and removes it; the Video Downloader asks for it again the next time you use it. See [The home screen](@home).
 - **Use the graphics chip for AI.** On by default only for newer graphics chips known to be safe for AI Smooth and AI Enhance; on other phones these run on the processor. Turning it on for another chip asks first, because it can freeze some phones. See [AI tools](@ai-tools).
 
 ## Backup
@@ -49,12 +52,14 @@ The color names are the editor and home screen colors: TopBar, PreviewBg, Timeli
 
 ## Language
 
-The **Language** row shows the current language and opens the list of the 14 languages. Picking one applies it at once.
+The **Language** row shows the current language and opens the list of the 17 languages: English, Indonesian, Hindi, Portuguese (Brazil), Spanish (Latin America), Spanish (Spain), Filipino, Vietnamese, Thai, Malay, Arabic, Persian, Urdu, Turkish, Russian, Bengali and Japanese. Picking one applies it at once.
 
 ## About, Help and other rows
 
 - **Help** opens this guide inside the app, without a connection.
+- **Start the tutorial** starts a 5-minute tour. You make a short animation in a practice project, so your own projects stay untouched. If you leave the tour half way, the row becomes **Continue the tutorial** and a second row, **Start the tutorial again**, appears. The home screen also offers the tour until you choose **Don't ask again**.
 - **About** shows the version, the license (Apache License 2.0), a note that AbsentMotion is an independent project, **Open source licenses** (the full license text of every library the app uses) and the **Project home page** address.
+- **Report issue** (the underlined link under **About**) opens the bug report form in your web browser.
 - **Crash logs** lists the crashes the app recorded. Tap one to read it and use **Copy** to copy it, for example to send with a bug report. See [Troubleshooting](@troubleshooting).
 - **Check for a new version each time the app opens.** The app asks you once whether it may do this. If it is on, the app makes one request to GitHub for the latest version number when it opens. It sends nothing else and never downloads or installs anything by itself.
 - **Check for Update** does the same check once, now. If a newer version exists, the dialog shows its version and download size. **Changelog** opens its release notes, and **Download update** downloads the matching app file (Latest, Play services or Compatible version) inside the app, with a progress bar and **Cancel**. Before anything is downloaded, the app asks you to turn on **Allow from this source** for AbsentMotion if Android does not allow it yet. The app checks the file against the checksum and signing key of the release, then Android asks you to confirm the install. If the matching file cannot be found, **Download** opens the release page.

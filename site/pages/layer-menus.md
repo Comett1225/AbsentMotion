@@ -10,6 +10,7 @@ Select one layer and tap the three dots at the right of the top bar (**Layer men
 
 - **Save to My Assets** saves the layer or group as an asset. See [Assets, templates and presets](@assets-templates).
 - **Flip Horizontally** and **Flip Vertically**.
+- **Crop** (photos and videos) opens the Crop panel. See [Layer tools](@layer-tools).
 - **Fit to Canvas** scales the layer evenly until it fits inside the canvas. **Fill the Canvas** scales it evenly until it covers the canvas. **Stretch to Canvas** stretches it to exactly the canvas.
 - **Create Clipping Mask** clips this layer to the shape of the layer directly below it. **Release Clipping Mask** undoes it.
 - **Convert to Outline** turns text or a parametric shape into an editable path. Text loses its text content and font settings.
@@ -50,11 +51,16 @@ The top bar changes color and shows:
 
 A second bar at the bottom of the screen works on timing:
 
-- **Effects** has **Paste All Effects**: it pastes the effects you copied in a layer's Effects panel onto every selected visual clip. Sound, camera and null layers are skipped, and a message tells you how many.
+- **Effects** opens a small menu. **Add an effect to all** opens the Effects Library and adds the effect you pick to every selected visual clip. **Paste All Effects** pastes the effects you copied in a layer's Effects panel onto every selected visual clip; it is grayed until you have copied some. Sound, camera and null layers are skipped, and a message tells you how many.
+- **More actions** (three dots) opens a second menu. **Paste Fill & Color**, **Paste Frame & Shadow**, **Paste Opacity & Blend Mode** and **Paste Style** put the look of the last copied layer onto every selected layer; they are grayed until you have used **Copy Layer**. **Remove audio from all** sets the volume of every selected video to zero.
 - **Move clip starts to playhead** or **Move clip ends to playhead**
 - **Add a transition between the two clips** (exactly two visual clips that overlap or touch). See [Transitions and animations](@animations).
 - **Align clip starts**, **Align clip ends** and **Distribute clip starts** (three or more).
 
 ![Several layers selected: the top bar (1), the checked layers (2) and the bottom bar with the timing commands (3).](img/lm-multi.webp)
+
+![The Effects button of the bottom bar (1) opens a menu with Add an effect to all and Paste All Effects (2).](img/lm-multi-effects.webp)
+
+![The More actions button of the bottom bar (1) opens a menu with the paste commands and Remove audio from all (2).](img/lm-multi-more.webp)
 
 Grouping from a multi-selection is the way to make a group. To change a group that was inserted from an asset, open the original asset.

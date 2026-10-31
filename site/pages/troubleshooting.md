@@ -79,7 +79,7 @@ The project uses a font that is not on this phone. Open the project and tap **Do
 
 **Is there a computer version?** No. AbsentMotion is made for Android phones.
 
-**Which languages are there?** English, Indonesian, Hindi, Portuguese (Brazil), Spanish, Filipino, Vietnamese, Thai, Malay, Arabic, Turkish and Russian. Change it in Settings.
+**Which languages are there?** English, Indonesian, Hindi, Portuguese (Brazil), Spanish (Latin America), Spanish (Spain), Filipino, Vietnamese, Thai, Malay, Arabic, Persian, Urdu, Turkish, Russian, Bengali and Japanese. Change it in Settings.
 
 **How do I report a problem or ask for a feature?** Open an issue on [GitHub](@issues). Please do not include private information in it.
 
