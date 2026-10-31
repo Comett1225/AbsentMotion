@@ -4,7 +4,7 @@ group: Create
 order: 2
 summary: Add, stack, reorder, hide, copy and animate effects, and find the right one in the effects library.
 ---
-An effect changes how a layer looks or moves: a blur, a glow, a color change, a shake. A layer can have as many effects as you like. AbsentMotion has {{effect_count}} effects in ten categories. The [effects library](@effects) on this website lists every effect with all of its settings.
+An effect changes how a layer looks or moves: a blur, a glow, a color change, a shake. A layer can have as many effects as you like. AbsentMotion has {{effect_count}} effects in eleven categories. The [effects library](@effects) on this website lists every effect with all of its settings.
 
 ## Add an effect
 
@@ -19,7 +19,7 @@ To read about an effect first, press and hold its tile. A page opens with an ani
 
 - The top has a search box ("Search") that matches names first, then descriptions, and also finds AI tools and presets.
 - A strip of recommended effects (Chroma Key, Blur and Glow), a grid of your **Recent** or **Favorite** effects (switch with the two small icons), then the categories.
-- **Categories:** Color, Blur, Distort, Stylize, Noise, Repeat, Key, Move, 3D and Text. A **New** category appears for effects added in the latest versions. An **Audio** category appears for layers that have sound, and **AI** holds the AI tools.
+- **Categories:** Color, Blur, Distort, Stylize, Noise, Repeat, Key, Move, Beat, 3D and Text. A **New** category appears for effects added in the latest versions. An **Audio** category appears for layers that have sound, and **AI** holds the AI tools.
 - An effect that cannot run on your phone is grayed out.
 
 ## Settings of an effect

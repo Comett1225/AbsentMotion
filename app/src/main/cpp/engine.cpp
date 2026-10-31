@@ -203,6 +203,9 @@ private:
         fx.spills = [this](const Layer& layer) { return fEffects.spills(layer); };
         fx.behind = [this](const Layer& layer) { return fEffects.behind(layer); };
         fx.steady = [this](const Layer& layer, float from, float to) { return fEffects.steady(layer, from, to); };
+        fx.upload = [this](const sk_sp<SkImage>& image, bool mipmapped) {
+            return fRecorder ? SkImages::TextureFromImage(fRecorder.get(), image.get(), {mipmapped}) : image;
+        };
         fx.draw = [this](SkCanvas* canvas, const Scene& scene, const Layer& layer, double time, const SkRect& area, const SkMatrix& placed,
                          const std::function<void(SkCanvas*)>& source, const std::function<void(SkCanvas*)>& below) {
             return fEffects.draw(canvas, scene, layer, time, area, placed, source, below,

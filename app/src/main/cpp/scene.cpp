@@ -392,9 +392,15 @@ bool ParseScene(const std::string& xml, Scene* scene, std::string* error) {
             next.mediaOrientation[StrAttr(*n, "uri")] = IntAttr(*n, "orientation", 0);
             continue;
         }
+        if (n->name == "bookmark") {
+            next.beats.push_back(IntAttr(*n, "t", 0) / 1000.0);
+            continue;
+        }
         Layer l;
         if (ParseLayer(*n, next.fps, &l)) next.layers.push_back(std::move(l));
     }
+    std::sort(next.beats.begin(), next.beats.end());
+    next.beats.erase(std::unique(next.beats.begin(), next.beats.end()), next.beats.end());
     *scene = std::move(next);
     return true;
 }

@@ -65,7 +65,7 @@ The **AI** tool for audio clips reduces background noise on the phone: see [AI t
 
 ## Mark Beats
 
-**Mark Beats** is in the layer menu of a clip with sound. It listens to that clip alone and adds a bookmark on every beat it finds (the tempo can be between 60 and 180 beats per minute and the beats must follow a steady grid). Then cut your video on the bookmarks: they are snap points on the timeline. It says "N beats marked", "No new beats found" or "Beats could not be found".
+**Mark Beats** is in the layer menu of a clip with sound. It listens to that clip alone and adds a bookmark on every beat it finds (the tempo can be between 60 and 180 beats per minute and the beats must follow a steady grid). Then cut your video on the bookmarks: they are snap points on the timeline. The **Beat** effects (Beat Zoom, Beat Shake, Beat Flash and the others) and **Particles** set to **On Beats** move on these bookmarks; without bookmarks they follow their BPM setting. It says "N beats marked", "No new beats found" or "Beats could not be found".
 
 ## Text to Speech
 

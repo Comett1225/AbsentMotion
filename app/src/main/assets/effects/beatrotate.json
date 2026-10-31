@@ -1,0 +1,71 @@
+{
+ "id": "beatrotate",
+ "name": "Beat Rotate",
+ "category": "beat",
+ "since": "4.4.0",
+ "description": "Tilts the layer on every beat, left and right in turn, and swings back. Select your music clip, open its menu and tap Mark Beats first; without beat marks it follows the BPM setting.",
+ "params": [
+  {
+   "id": "strength",
+   "label": "Strength",
+   "type": "angle",
+   "default": 6,
+   "min": -90,
+   "max": 90,
+   "step": 0.1
+  },
+  {
+   "id": "alternate",
+   "label": "Alternate",
+   "type": "switch",
+   "default": true
+  },
+  {
+   "id": "cover",
+   "label": "Fill Frame",
+   "type": "switch",
+   "default": true
+  },
+  {
+   "id": "decay",
+   "label": "Decay",
+   "type": "float",
+   "default": 0.4,
+   "min": 0.05,
+   "max": 2,
+   "step": 0.01,
+   "unit": "s"
+  },
+  {
+   "id": "beats",
+   "label": "Beats",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Every Beat",
+    "Every 2nd Beat",
+    "Every 4th Beat"
+   ]
+  },
+  {
+   "id": "offset",
+   "label": "Offset",
+   "type": "float",
+   "default": 0,
+   "min": -1,
+   "max": 1,
+   "step": 0.01,
+   "unit": "s"
+  },
+  {
+   "id": "bpm",
+   "label": "BPM",
+   "type": "float",
+   "default": 120,
+   "min": 20,
+   "max": 300,
+   "step": 1
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float beat;\nuniform float beatTime;\nuniform float beatIndex;\nuniform float strength;\nuniform float decay;\nuniform float beats;\nuniform float offset;\nuniform float bpm;\nuniform float alternate;\nuniform float cover;\nhalf4 main(float2 xy) {\n    float2 c = size * 0.5;\n    float turn = alternate > 0.5 && mod(beatIndex, 2.0) > 0.5 ? -1.0 : 1.0;\n    float a = radians(strength) * beat * turn;\n    float s = sin(a), k = cos(a);\n    float fill = cover > 0.5 ? abs(k) + abs(s) * max(size.x, size.y) / max(min(size.x, size.y), 1.0) : 1.0;\n    float2 p = (xy - c) / fill;\n    return image.eval(c + float2(k * p.x + s * p.y, k * p.y - s * p.x));\n}\n"
+}

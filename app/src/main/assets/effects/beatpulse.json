@@ -1,0 +1,59 @@
+{
+ "id": "beatpulse",
+ "name": "Beat Pulse",
+ "category": "beat",
+ "since": "4.4.0",
+ "description": "Brightens the layer on every beat like a flash of exposure; a negative strength darkens it. Select your music clip, open its menu and tap Mark Beats first; without beat marks it follows the BPM setting.",
+ "params": [
+  {
+   "id": "strength",
+   "label": "Strength",
+   "type": "float",
+   "default": 1,
+   "min": -4,
+   "max": 4,
+   "step": 0.01
+  },
+  {
+   "id": "decay",
+   "label": "Decay",
+   "type": "float",
+   "default": 0.4,
+   "min": 0.05,
+   "max": 2,
+   "step": 0.01,
+   "unit": "s"
+  },
+  {
+   "id": "beats",
+   "label": "Beats",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Every Beat",
+    "Every 2nd Beat",
+    "Every 4th Beat"
+   ]
+  },
+  {
+   "id": "offset",
+   "label": "Offset",
+   "type": "float",
+   "default": 0,
+   "min": -1,
+   "max": 1,
+   "step": 0.01,
+   "unit": "s"
+  },
+  {
+   "id": "bpm",
+   "label": "BPM",
+   "type": "float",
+   "default": 120,
+   "min": 20,
+   "max": 300,
+   "step": 1
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float beat;\nuniform float beatTime;\nuniform float beatIndex;\nuniform float strength;\nuniform float decay;\nuniform float beats;\nuniform float offset;\nuniform float bpm;\nhalf4 main(float2 xy) {\n    half4 c = image.eval(xy);\n    return half4(min(c.rgb * half(exp2(strength * beat)), half3(c.a)), c.a);\n}\n"
+}

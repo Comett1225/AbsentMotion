@@ -1,5 +1,6 @@
 #include "effects.h"
 
+#include "particles.h"
 #include "warp.h"
 #include "xml.h"
 #include "include/core/SkBBHFactory.h"
@@ -598,7 +599,7 @@ std::string EffectRuntime::load(const std::string& xml) {
     const std::string id = root->attr("id");
     const char* sksl = root->attr("sksl");
     if (!sksl || !*sksl) {
-        if (!BuiltIn(id) && !MotionEffect(id) && !RepeatEffect(id) && !TextEffect(id) && !DrawingEffect(id)) return "shader error: no shader and no built-in called " + id;
+        if (!BuiltIn(id) && !MotionEffect(id) && !RepeatEffect(id) && !TextEffect(id) && !DrawingEffect(id) && !ParticleEffect(id)) return "shader error: no shader and no built-in called " + id;
         d.backdrop = id == "absent.glow";
     } else {
         auto result = SkRuntimeEffect::MakeForShader(SkString(sksl));
@@ -612,7 +613,8 @@ std::string EffectRuntime::load(const std::string& xml) {
         d.backdrop = result.effect->findChild("backdrop") != nullptr;
         d.below = result.effect->findChild("below") != nullptr;
         d.pointwise = Pointwise(sksl);
-        d.timed = result.effect->findUniform("time") && Mentions(sksl, "time") > 1;
+        d.timed = (result.effect->findUniform("time") && Mentions(sksl, "time") > 1) || result.effect->findUniform("beat") ||
+                  result.effect->findUniform("beatTime") || result.effect->findUniform("beatIndex");
         if (result.effect->findUniform("orient")) NoteOrientedEffect(id);
         d.palette = result.effect->findChild("palette") != nullptr;
         d.matrix = result.effect->findChild("thresholds") != nullptr;
@@ -764,6 +766,12 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
             if (sk_sp<SkImage> tile = d->matrix ? OnGpu(MatrixFor(method(e, d, t))) : nullptr) {
                 b.child("thresholds") = tile->makeShader(SkTileMode::kRepeat, SkTileMode::kRepeat, SkSamplingOptions());
             }
+            std::optional<particles::Beat> beat;
+            const auto beatNow = [&]() -> const particles::Beat& {
+                if (!beat) beat = particles::LastBeat(scene.beats, timeMs / 1000.0, 1 << std::clamp((int)std::lround(Value(e, defaults, "beats", 0, t, 0)), 0, 2),
+                                                      Value(e, defaults, "offset", 0, t, 0), Value(e, defaults, "bpm", 0, t, 120));
+                return *beat;
+            };
             for (const SkRuntimeEffect::Uniform& u : d->shader->uniforms()) {
                 const std::string name(u.name);
                 const int n = (int)(u.sizeInBytes() / 4);
@@ -788,6 +796,9 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
                     }
                 }
                 else if (automatic && name == "screen") v = {-area.left(), -area.top(), (float)scene.width, (float)scene.height};
+                else if (automatic && name == "beat") v = {particles::Envelope(beatNow().since, Value(e, defaults, "decay", 0, t, 0.4f))};
+                else if (automatic && name == "beatTime") v = {(float)beatNow().since};
+                else if (automatic && name == "beatIndex") v = {(float)beatNow().index};
                 else if (u.isColor() && n == 4) v = {Value(e, defaults, name, 1, t, 0), Value(e, defaults, name, 2, t, 0),
                                                      Value(e, defaults, name, 3, t, 0), Value(e, defaults, name, 0, t, 1)};
                 else for (int i = 0; i < n; i++) v[i] = Value(e, defaults, name, i, t, 0);

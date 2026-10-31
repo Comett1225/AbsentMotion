@@ -25,6 +25,18 @@ class PreviewDependenciesTest {
         assertTrue(previewDirtyRanges(before, Scene.parse(xml)).isEmpty())
     }
 
+    @Test fun bookmarksInvalidateFramesOnlyWhenAnEffectFollowsTheBeat() {
+        fun marked(scene: Scene) = Scene.parse(scene.node.toXml().replace("</scene>", "<bookmark t=\"500\"/></scene>"))
+        val plain = scene()
+        assertTrue(previewDirtyRanges(plain, marked(plain)).isEmpty())
+        val beat = scene(first = "<effect id=\"absent.beatzoom\"/>")
+        assertEquals(listOf(0..beat.lastFrame), previewDirtyRanges(beat, marked(beat)))
+        val burst = scene(second = "<effect id=\"absent.particles\"/>")
+        assertEquals(listOf(0..burst.lastFrame), previewDirtyRanges(marked(burst), burst))
+        val hidden = scene(first = "<effect id=\"absent.beatzoom\" hidden=\"true\"/>")
+        assertTrue(previewDirtyRanges(hidden, marked(hidden)).isEmpty())
+    }
+
     @Test fun movingAClipInvalidatesBothItsFormerAndNewLocation() {
         val before = scene()
         val moved = Scene.parse(before.node.toXml().replace("startTime=\"4000\"", "startTime=\"2000\"").replace("endTime=\"5999\"", "endTime=\"3999\""))

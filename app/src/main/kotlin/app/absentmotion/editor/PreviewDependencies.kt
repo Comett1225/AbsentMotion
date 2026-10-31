@@ -30,9 +30,14 @@ private fun Layer.externalDependencies(): Boolean = kind == "camera" || kind == 
     node["parent"]?.let { it != "0" } == true || node["pathLayer"]?.let { it != "0" } == true || node["clippingMask"] == "true" ||
     node.children.any { it.name == "effect" && it["hidden"] != "true" }
 
+private fun XmlNode.followsBeats(): Boolean = children.any { c ->
+    c.name == "effect" && c["hidden"] != "true" && (c["id"] == "absent.particles" || c["id"]?.startsWith("absent.beat") == true) || c.followsBeats()
+}
+
 internal fun previewDirtyRanges(before: Scene, after: Scene): List<IntRange> {
     val whole = listOf(0..maxOf(before.lastFrame, after.lastFrame))
     if (before.visualHeader() != after.visualHeader()) return whole
+    if (before.bookmarks != after.bookmarks && (before.node.followsBeats() || after.node.followsBeats())) return whole
     val old = before.visualLayers()
     val next = after.visualLayers()
     if (old.map { it.node.visual() } == next.map { it.node.visual() }) return emptyList()

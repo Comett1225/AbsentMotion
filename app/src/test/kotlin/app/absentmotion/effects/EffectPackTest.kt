@@ -27,7 +27,7 @@ class EffectPackTest {
         val declared = Regex("""(layout\s*\(\s*color\s*\)\s*)?uniform\s+(\w+)\s+(\w+)\s*;""")
         for (effect in catalog.definitions) {
             if (effect.native) {
-                assertTrue("${effect.key} is not a built-in", effect.category in setOf("move", "repeat", "text") || effect.id in setOf("absent.blur", "absent.glow", "absent.motionblur", "absent.smear", "absent.backdrop", "absent.drawingprogress", "absent.stroketaper", "absent.puppet"))
+                assertTrue("${effect.key} is not a built-in", effect.category in setOf("move", "repeat", "text") || effect.id in setOf("absent.blur", "absent.glow", "absent.motionblur", "absent.smear", "absent.backdrop", "absent.drawingprogress", "absent.stroketaper", "absent.puppet", "absent.particles"))
                 assertNull(effect.sksl)
                 continue
             }
@@ -43,6 +43,7 @@ class EffectPackTest {
                 listOf("toLayer", "fromLayer", "orient").filter { it in uniforms }.associateWith { "float3x3" to false } +
                 listOf("palette", "thresholds").filter { it in uniforms }.associateWith { "shader" to false } +
                 listOf("paletteSize", "paletteSpread").filter { it in uniforms }.associateWith { "float" to false } +
+                listOf("beat", "beatTime", "beatIndex").filter { it in uniforms }.associateWith { "float" to false } +
                 effect.params.filter { it.kind != "text" }.associate { p ->
                     p.id to when (p.kind) { "point" -> "float2" to false; "color" -> "half4" to true; else -> "float" to false }
                 }
@@ -130,7 +131,8 @@ class EffectPackTest {
         val thumbs = File(pack, "thumb").listFiles()!!.filter { it.extension == "webp" }
         for (thumb in thumbs) assertTrue("${thumb.name} is ${thumb.length()} bytes", thumb.length() <= 150_000)
         val animated = thumbs.filter { String(it.readBytes().copyOf(64), Charsets.ISO_8859_1).contains("ANIM") }.map { it.nameWithoutExtension }.toSet()
-        val wanted = catalog.listed("move").map { it.key } + catalog.listed("3d").map { it.key } + catalog.listed("text").map { it.key } + listOf("vhs", "flicker", "blink", "glitch", "static")
+        val wanted = catalog.listed("move").map { it.key } + catalog.listed("3d").map { it.key } + catalog.listed("text").map { it.key } +
+            catalog.listed("beat").map { it.key } + listOf("vhs", "flicker", "blink", "glitch", "static", "particles")
         assertEquals("still pictures", emptyList<String>(), wanted.filter { it !in animated })
         assertTrue("blur is a still picture", "blur" !in animated)
     }
@@ -138,5 +140,27 @@ class EffectPackTest {
     @Test fun everyEffectHasAThumbnail() {
         assertTrue("thumb folder", File(pack, "thumb").isDirectory)
         for (effect in catalog.definitions) assertTrue(effect.thumbnail, File(pack, effect.thumbnail).isFile)
+    }
+
+    @Test fun particlesShowTheBasicSettingsFirst() {
+        val particles = catalog.find("absent.particles")!!
+        val plain = particles.instance()
+        assertEquals(listOf("kind", "emitter", "emission", "rate", "lifetime", "speed", "direction", "spread", "gravity", "wind", "swirl", "size", "color", "layer", "more"),
+            particles.params.filter { particles.shown(it, plain, 0f) }.map { it.id })
+        val more = plain.copy(children = plain.children.map { if (it["name"] == "more") it.with("value", "true") else it })
+        assertTrue(particles.params.filter { particles.shown(it, more, 0f) }.map { it.id }.containsAll(listOf("orientation", "colorMode", "blend", "seed")))
+        val beats = plain.copy(children = plain.children.map { if (it["name"] == "emission") it.with("value", "2") else it })
+        assertEquals(listOf("count", "beats", "bpm"), particles.params.filter { particles.shown(it, beats, 0f) && !particles.shown(it, plain, 0f) }.map { it.id })
+    }
+
+    @Test fun beatEffectsReadTheBeatAndExplainMarkBeats() {
+        val beat = catalog.listed("beat")
+        assertTrue(beat.size in 6..10)
+        for (effect in beat) {
+            assertTrue(effect.key, effect.key.startsWith("beat") && Regex("""uniform\s+float\s+beat\s*;""").containsMatchIn(effect.sksl ?: ""))
+            assertEquals(effect.key, listOf("strength", "decay", "beats", "offset", "bpm"), effect.params.map { it.id }.filter { it in setOf("strength", "decay", "beats", "offset", "bpm") })
+            assertTrue(effect.key, "Mark Beats" in effect.description)
+        }
+        assertTrue(catalog.definitions.filter { it.category != "beat" }.none { Regex("""uniform\s+float\s+beat(Time|Index)?\s*;""").containsMatchIn(it.sksl ?: "") })
     }
 }
