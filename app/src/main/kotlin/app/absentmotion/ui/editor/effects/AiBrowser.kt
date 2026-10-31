@@ -117,7 +117,7 @@ internal fun AiBackdrop(modifier: Modifier, action: AiAction? = null) {
                 drawRect(Color.White.copy(alpha = 0.85f), Offset(cx - unit * 0.22f, cy - unit * 0.22f), androidx.compose.ui.geometry.Size(unit * 0.44f, unit * 0.44f), style = stroke)
                 drawLine(Color.White.copy(alpha = 0.85f), Offset(cx + unit * 0.02f, cy - unit * 0.02f), Offset(cx + unit * 0.15f, cy - unit * 0.15f), unit * 0.025f, StrokeCap.Round)
             }
-            AiAction.Smooth, null -> Unit
+            AiAction.Smooth, AiAction.Reverse, null -> Unit
         }
     }
 }

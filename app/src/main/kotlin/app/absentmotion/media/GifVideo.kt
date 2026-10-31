@@ -6,12 +6,13 @@ import android.media.MediaCodec
 import android.media.MediaCodecInfo
 import android.media.MediaCodecList
 import android.media.MediaFormat
-import android.media.MediaMuxer
 import android.net.Uri
 import android.provider.OpenableColumns
 import androidx.core.content.FileProvider
 import app.absentmotion.ai.aiFile
 import app.absentmotion.ai.matteLuma
+import app.absentmotion.export.Mux
+import app.absentmotion.export.MuxerSink
 import app.absentmotion.model.MediaDeclaration
 import app.absentmotion.model.XmlNode
 import app.absentmotion.model.fpsText
@@ -136,7 +137,7 @@ private fun Image.fillMatte(canvas: IntArray, stride: Int, xs: IntArray, ys: Int
     }
 }
 
-private class YuvEncoder(private val codec: MediaCodec, private val muxer: MediaMuxer) : Closeable {
+internal class YuvEncoder(private val codec: MediaCodec, private val mux: Mux) : Closeable {
     private val info = MediaCodec.BufferInfo()
     private var track = -1
     private var finished = false
@@ -170,12 +171,9 @@ private class YuvEncoder(private val codec: MediaCodec, private val muxer: Media
         while (true) {
             val index = codec.dequeueOutputBuffer(info, if (end) 10_000 else 0)
             when {
-                index == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED -> {
-                    track = muxer.addTrack(codec.outputFormat)
-                    muxer.start()
-                }
+                index == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED -> track = mux.addTrack(codec.outputFormat)
                 index >= 0 -> {
-                    if (info.flags and MediaCodec.BUFFER_FLAG_CODEC_CONFIG == 0 && info.size > 0 && track >= 0) muxer.writeSampleData(track, codec.getOutputBuffer(index)!!, info)
+                    if (info.flags and MediaCodec.BUFFER_FLAG_CODEC_CONFIG == 0 && info.size > 0 && track >= 0) mux.write(track, codec.getOutputBuffer(index)!!, info)
                     codec.releaseOutputBuffer(index, false)
                     if (info.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) return
                 }
@@ -189,31 +187,37 @@ private class YuvEncoder(private val codec: MediaCodec, private val muxer: Media
         runCatching { codec.stop() }
         runCatching { codec.release() }
         try {
-            if (finished && track >= 0) muxer.stop()
+            if (finished && track >= 0) mux.finish()
         } finally {
-            runCatching { muxer.release() }
+            mux.release()
         }
     }
 
     companion object {
-        fun open(file: File, width: Int, height: Int, fps: Int, bitrate: Int): YuvEncoder {
+        fun open(file: File, width: Int, height: Int, fps: Int, bitrate: Int): YuvEncoder =
+            open(Mux(MuxerSink(file.path), 1) { throw it }, width, height, fps, bitrate)
+
+        fun open(mux: Mux, width: Int, height: Int, fps: Int, bitrate: Int, range: Int = MediaFormat.COLOR_RANGE_LIMITED,
+                 standard: Int = MediaFormat.COLOR_STANDARD_BT709): YuvEncoder {
             val format = MediaFormat.createVideoFormat(MediaFormat.MIMETYPE_VIDEO_AVC, width, height).apply {
                 setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Flexible)
                 setInteger(MediaFormat.KEY_BIT_RATE, bitrate)
                 setInteger(MediaFormat.KEY_FRAME_RATE, fps)
                 setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1)
-                setInteger(MediaFormat.KEY_COLOR_RANGE, MediaFormat.COLOR_RANGE_LIMITED)
-                setInteger(MediaFormat.KEY_COLOR_STANDARD, MediaFormat.COLOR_STANDARD_BT709)
+                setInteger(MediaFormat.KEY_COLOR_RANGE, range)
+                setInteger(MediaFormat.KEY_COLOR_STANDARD, standard)
                 setInteger(MediaFormat.KEY_COLOR_TRANSFER, MediaFormat.COLOR_TRANSFER_SDR_VIDEO)
             }
-            val name = MediaCodecList(MediaCodecList.REGULAR_CODECS).findEncoderForFormat(format) ?: error("no H.264 encoder for ${width}x$height")
-            val codec = MediaCodec.createByCodecName(name)
+            var codec: MediaCodec? = null
             try {
+                val name = MediaCodecList(MediaCodecList.REGULAR_CODECS).findEncoderForFormat(format) ?: error("no H.264 encoder for ${width}x$height")
+                codec = MediaCodec.createByCodecName(name)
                 codec.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
                 codec.start()
-                return YuvEncoder(codec, MediaMuxer(file.path, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4))
+                return YuvEncoder(codec, mux)
             } catch (e: Exception) {
-                codec.release()
+                codec?.release()
+                mux.release()
                 throw e
             }
         }

@@ -30,6 +30,7 @@ import androidx.compose.foundation.rememberScrollState
 import app.absentmotion.editor.EditorState
 import app.absentmotion.ai.AiAction
 import app.absentmotion.ai.AiTools
+import app.absentmotion.ai.reverseMark
 import app.absentmotion.ui.editor.effects.AiProgressDialog
 import app.absentmotion.ui.editor.effects.AiSmoothDialog
 import androidx.compose.ui.platform.LocalContext
@@ -84,6 +85,7 @@ fun SpeedPanel(state: EditorState, layer: Layer, modifier: Modifier = Modifier) 
         }
         Row(Modifier.offset(y = 153.dp).fillMaxWidth().height(34.dp).horizontalScroll(rememberScrollState()).padding(horizontal = 15.dp), Arrangement.spacedBy(6.dp)) {
             RampChip(stringResource(R.string.smooth_clip), layer.mediaFill?.video == true && ai.running == null) { state.playing = false; ai.apply(AiAction.Smooth) }
+            RampChip(stringResource(R.string.speed_reverse), layer.mediaFill?.video == true && ai.running == null, layer.reverseMark != null) { state.playing = false; ai.apply(AiAction.Reverse) }
             for (ramp in SpeedRamp.entries) RampChip(stringResource(ramp.label), true) { state.applySpeedRamp(ramp) }
             val secondsLabel = stringResource(R.string.speed_seconds)
             RampChip(stringResource(R.string.speed_freeze_frame), enabled[1]) { state.askNumber(secondsLabel, 2f, "", 0.1f, 30f) { state.freezeFrame(it) } }
@@ -98,8 +100,8 @@ fun SpeedPanel(state: EditorState, layer: Layer, modifier: Modifier = Modifier) 
 }
 
 @Composable
-private fun RampChip(label: String, enabled: Boolean, onClick: () -> Unit) {
-    Box(Modifier.fillMaxHeight().alpha(if (enabled) 1f else 0.35f).background(Am.Button, RoundedCornerShape(4.dp))
+private fun RampChip(label: String, enabled: Boolean, active: Boolean = false, onClick: () -> Unit) {
+    Box(Modifier.fillMaxHeight().alpha(if (enabled) 1f else 0.35f).background(if (active) Am.Accent else Am.Button, RoundedCornerShape(4.dp))
         .clickable(enabled = enabled, onClick = onClick).padding(horizontal = 12.dp), Alignment.Center) {
         Text(label, color = Am.OnDark, fontSize = 12.sp, maxLines = 1, softWrap = false)
     }
