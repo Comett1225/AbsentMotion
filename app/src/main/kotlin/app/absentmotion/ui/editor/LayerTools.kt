@@ -14,8 +14,6 @@ import app.absentmotion.editor.toggleKeyframe
 import app.absentmotion.audio.gain
 import app.absentmotion.model.PropRef
 import app.absentmotion.model.contours
-import app.absentmotion.model.SpeedRef
-import app.absentmotion.model.atVideoTime
 import app.absentmotion.ui.editor.panels.SpeedPanel
 import app.absentmotion.model.formatColor
 import app.absentmotion.ui.editor.panels.EasingPanel
@@ -59,6 +57,12 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.rememberCoroutineScope
+import app.absentmotion.ai.AiAction
+import app.absentmotion.ai.reverseMark
+import app.absentmotion.ui.editor.effects.AiProgressDialog
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.sp
@@ -121,6 +125,9 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier, side: Boolean 
     var moving by remember(state.selectedId) { mutableStateOf(false) }
     var captions by remember(state.selectedId) { mutableStateOf(false) }
     var controls by remember(state.selectedId) { mutableStateOf(false) }
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val ai = remember(state, context, scope) { app.absentmotion.ai.AiTools(context.applicationContext, state, scope) }
     if (captions) CaptionsSheet(state, clipId = state.selectedId) { captions = false }
     if (properties) {
         ElementProperties(state, { properties = false }, modifier)
@@ -147,7 +154,9 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier, side: Boolean 
             }
             Spacer(Modifier.width(17.px))
             val sound = state.selected?.let { it.kind == "audio" || it.mediaFill?.video == true } == true
-            SmallTool(if (!sound || (state.selected?.gain ?: 1f) <= 0f) PanelIcons.AudioMuted else AudioIcons.Speaker, stringResource(R.string.volume_volume), Modifier.width(183.px).tutorialTarget("tool_volume"), ToolShape, enabled = sound) { state.volumeOpen = true }
+            val muted = !sound || (state.selected?.gain ?: 1f) <= 0f
+            SmallTool(if (muted) PanelIcons.AudioMuted else AudioIcons.Speaker, stringResource(R.string.volume_volume), Modifier.width(183.px).tutorialTarget("tool_volume"), ToolShape,
+                enabled = sound, iconSize = if (muted) 24.dp else 32.dp) { state.volumeOpen = true }
         }
         Spacer(Modifier.height(28.px))
         val kind = state.selected?.kind
@@ -183,11 +192,16 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier, side: Boolean 
                 listOf(
                     listOf(Tile(ColorFill) { state.panel = EditorPanel.ColorFill }, Tile(BorderShadow) { state.panel = EditorPanel.BorderShadow }, blending),
                     listOfNotNull(transform, edit, presets, effects),
-                    *if (state.selected?.mediaFill?.video == true) arrayOf(listOf(Tile(AiTools) { openEffectBrowser(state, "ai") }, Tile(CaptionTools) { state.playing = false; captions = true })) else emptyArray(),
                 )
             }
         }
-        val more = listOfNotNull(if (state.selected?.canCrop == true) Tile(Crop) { state.openCrop() } else null)
+        val video = state.selected?.mediaFill?.video == true
+        val more = listOfNotNull(
+            if (state.selected?.canCrop == true) Tile(Crop) { state.openCrop() } else null,
+            if (video) Tile(AiTools) { openEffectBrowser(state, "ai") } else null,
+            if (video) Tile(CaptionTools) { state.playing = false; captions = true } else null,
+            if (video) Tile(ReverseTool, enabled = ai.running == null, active = state.selected?.reverseMark != null) { state.playing = false; ai.apply(AiAction.Reverse) } else null,
+        )
         if (side) TileRows((rows.flatten() + more).chunked(2), 2)
         else if (more.isEmpty()) TileRows(rows, null)
         else key(state.selectedId) {
@@ -195,13 +209,14 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier, side: Boolean 
             HorizontalPager(pager, Modifier.fillMaxWidth().height((rows.size * 160 + (rows.size - 1) * 17).px), pageSpacing = 17.px, verticalAlignment = Alignment.Top) { page ->
                 Column { TileRows(if (page == 0) rows else listOf(more), if (page == 0) null else 4) }
             }
-            Row(Modifier.fillMaxWidth().padding(top = 20.px, bottom = 20.px), Arrangement.Center) {
+            Row(Modifier.fillMaxWidth().padding(top = 14.px, bottom = 14.px), Arrangement.Center) {
                 repeat(2) { i ->
                     Box(Modifier.padding(horizontal = 4.dp).size(6.dp).clip(androidx.compose.foundation.shape.CircleShape).background(animatedColor(if (pager.currentPage == i) Am.OnDark else Am.OnDarkDim.copy(alpha = 0.4f))))
                 }
             }
         }
     }
+    AiProgressDialog(ai)
 }
 
 @Composable
@@ -209,7 +224,7 @@ private fun TileRows(rows: List<List<Tile>>, columns: Int?) {
     rows.forEachIndexed { i, row ->
         if (i > 0) Spacer(Modifier.height(17.px))
         Row(Modifier.fillMaxWidth().height(160.px), Arrangement.spacedBy(17.px)) {
-            for (tile in row) ToolButton(tile.tool, Modifier.weight(1f).tutorialTarget(if (tile.tool === MoveTransform) "tool_transform" else if (tile.tool === Effects) "tool_effects" else null), tile.enabled, tile.onLongClick, tile.menu, tile.onClick)
+            for (tile in row) ToolButton(tile.tool, Modifier.weight(1f).tutorialTarget(if (tile.tool === MoveTransform) "tool_transform" else if (tile.tool === Effects) "tool_effects" else null), tile.enabled, tile.active, tile.onLongClick, tile.menu, tile.onClick)
             if (columns != null) repeat(columns - row.size) { Spacer(Modifier.weight(1f)) }
         }
     }
@@ -232,7 +247,7 @@ private val ToolLabel get() = Am.OnDarkDim
 
 private class Tool(@StringRes val label: Int, val icon: ImageVector, val iconY: Float)
 
-private class Tile(val tool: Tool, val enabled: Boolean = true, val onLongClick: (() -> Unit)? = null, val menu: (@Composable () -> Unit)? = null, val onClick: () -> Unit)
+private class Tile(val tool: Tool, val enabled: Boolean = true, val active: Boolean = false, val onLongClick: (() -> Unit)? = null, val menu: (@Composable () -> Unit)? = null, val onClick: () -> Unit)
 
 private val ColorFill = Tool(R.string.layer_tool_fill_color, PanelIcons.PaintBucket, 18.1f)
 private val BorderShadow = Tool(R.string.layer_tool_frame_shadow, PanelIcons.BorderShadow, 18.1f)
@@ -252,28 +267,29 @@ private val Crop = Tool(R.string.layer_tool_crop, PanelIcons.Crop, 18.1f)
 private val CaptionTools = Tool(R.string.auto_captions, ChromeIcons.Captions, 19.4f)
 private val AiTools = Tool(R.string.ai, PanelIcons.Bot, 19.4f)
 private val CutoutEdge = Tool(R.string.cutout_edge, PanelIcons.TabBorder, 18.1f)
+private val ReverseTool = Tool(R.string.speed_reverse, PanelIcons.Reverse, 19.4f)
 
 @Composable
-private fun SmallTool(icon: ImageVector, description: String, modifier: Modifier, shape: RoundedCornerShape, enabled: Boolean = true, onClick: () -> Unit = {}) {
+private fun SmallTool(icon: ImageVector, description: String, modifier: Modifier, shape: RoundedCornerShape, enabled: Boolean = true, iconSize: Dp = 24.dp, onClick: () -> Unit = {}) {
     val press = remember { MutableInteractionSource() }
     Box(
         modifier.tutorialGuard().fillMaxHeight().pressScale(press, TilePress).then(if (enabled) Modifier else Modifier.dimmed()).clip(shape).background(Am.Button)
             .then(if (enabled) Modifier.clickable(press, LocalIndication.current, onClick = onClick) else Modifier),
         contentAlignment = Alignment.Center,
     ) {
-        PanelIcon(icon, Am.OnDark, description = description)
+        PanelIcon(icon, Am.OnDark, size = iconSize, description = description)
     }
 }
 
 @Composable
-private fun ToolButton(tool: Tool, modifier: Modifier, enabled: Boolean = true, onLongClick: (() -> Unit)? = null, menu: (@Composable () -> Unit)? = null, onClick: () -> Unit = {}) {
+private fun ToolButton(tool: Tool, modifier: Modifier, enabled: Boolean = true, active: Boolean = false, onLongClick: (() -> Unit)? = null, menu: (@Composable () -> Unit)? = null, onClick: () -> Unit = {}) {
     val press = remember { MutableInteractionSource() }
     Box(
         modifier.tutorialGuard().fillMaxHeight().pressScale(press, TilePress).then(if (enabled) Modifier else Modifier.dimmed()).clip(ToolShape).background(Am.Button)
             .then(if (enabled) Modifier.combinedClickable(press, LocalIndication.current, onLongClick = onLongClick, onClick = onClick) else Modifier),
     ) {
         menu?.invoke()
-        PanelIcon(tool.icon, Am.OnDark, Modifier.align(Alignment.TopCenter).offset(y = (tool.iconY - 12f).dp))
+        PanelIcon(tool.icon, if (active) Am.Accent else Am.OnDark, Modifier.align(Alignment.TopCenter).offset(y = (tool.iconY - 12f).dp))
         Text(
             stringResource(tool.label), Modifier.align(Alignment.TopCenter).offset(y = 32.dp).fillMaxWidth().height(24.dp).padding(horizontal = 4.dp)
                 .wrapContentHeight(Alignment.CenterVertically),
@@ -288,7 +304,7 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
     val selected = state.selected ?: return
     val panel = state.panel
     app.absentmotion.ui.editor.panels.BorderShadowLifetime(state, selected.id, panel)
-    val layer = if (panel == EditorPanel.Speed) selected.atVideoTime(state.sampleMs, state.scene.fps) else selected
+    val layer = selected
     if (panel == EditorPanel.Effects) {
         app.absentmotion.ui.editor.panels.EffectsPanel(state, modifier)
         return
@@ -307,7 +323,6 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
     val named = panel != EditorPanel.EditShape && panel != EditorPanel.Camera && panel != EditorPanel.Model && !(move && tab == ROTATE_TAB && turn != null)
     val known = if (!named) null else when {
         move -> if (selected.kind == "camera" && tab == SIZE_TAB) KeyTarget(app.absentmotion.model.CameraFov, "60.000000") else TransformTargets[tab]
-        panel == EditorPanel.Speed -> KeyTarget(SpeedRef, layer.node["speed"] ?: "1")
         panel == EditorPanel.ColorFill && layer.fillType == "color" -> KeyTarget(PropRef.FillColor, formatColor(layer.fillColor))
         panel == EditorPanel.BorderShadow -> borderShadowTarget(layer)
         panel == EditorPanel.Blending -> KeyTarget(OpacityRef, "1.000000")

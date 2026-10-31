@@ -52,6 +52,14 @@ class ClipReverseTest {
         assertEquals(ramp.keyframes.map { it.t to it.v }, again.node.child("speedMap")!!.keyframes.map { it.t to it.v })
     }
 
+    @Test fun timeLeftComesFromTheSpeedSoFar() {
+        assertNull(reverseSecondsLeft(2, 300, 5_000_000_000L))
+        assertNull(reverseSecondsLeft(30, 300, 500_000_000L))
+        assertEquals(45, reverseSecondsLeft(100, 400, 15_000_000_000L))
+        assertEquals(1, reverseSecondsLeft(300, 300, 9_000_000_000L))
+        assertEquals(200, reverseSecondsLeft(10, 1010, 2_000_000_000L))
+    }
+
     @Test fun piecesStayWithinTheHeldFramesAndRunBackwards() {
         val stamps = LongArray(100) { it * 33_333L }
         val syncs = longArrayOf(0, stamps[30], stamps[60], stamps[90])

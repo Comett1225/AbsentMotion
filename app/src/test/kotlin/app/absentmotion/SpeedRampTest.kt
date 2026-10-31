@@ -5,11 +5,11 @@ import app.absentmotion.model.RAMP_EASE
 import app.absentmotion.model.SpeedRamp
 import app.absentmotion.model.VideoTiming
 import app.absentmotion.model.XmlNode
+import app.absentmotion.model.curve
 import app.absentmotion.model.keyframes
 import app.absentmotion.model.retimedVideo
-import app.absentmotion.model.speedRampKeys
 import app.absentmotion.model.withFreezeFrame
-import app.absentmotion.model.withSpeedRamp
+import app.absentmotion.model.withSpeedCurve
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -22,15 +22,15 @@ class SpeedRampTest {
 
     private fun span(layer: Layer) = media(layer, layer.endTime) - media(layer, layer.startTime)
 
-    @Test fun everyPresetCoversTheClipWithEasedKeys() {
+    @Test fun everyPresetCoversTheClipWithEasedPoints() {
         for (ramp in SpeedRamp.entries) {
-            val keys = speedRampKeys(ramp, 500e6f, 4500e6f)
-            assertEquals(ramp.name, 500e6f, keys.first().t, 1f)
-            assertEquals(ramp.name, 4500e6f, keys.last().t, 1f)
-            assertTrue(ramp.name, keys.zipWithNext().all { (a, b) -> b.t > a.t })
-            assertNull(keys.first().e)
-            assertTrue(ramp.name, keys.drop(1).all { it.e == RAMP_EASE })
-            assertTrue(ramp.name, keys.all { it.v.toFloat() in 0.001f..4f })
+            val points = ramp.curve
+            assertEquals(ramp.name, 0f, points.first().u)
+            assertEquals(ramp.name, 1f, points.last().u)
+            assertTrue(ramp.name, points.zipWithNext().all { (a, b) -> b.u > a.u })
+            assertNull(points.first().ease)
+            assertTrue(ramp.name, points.drop(1).all { it.ease == RAMP_EASE })
+            assertTrue(ramp.name, points.all { it.speed in 0.001f..4f })
         }
     }
 
@@ -47,16 +47,18 @@ class SpeedRampTest {
         assertEquals(listOf("Montage", "Hero", "Bullet", "JumpCut", "FlashIn", "FlashOut"), SpeedRamp.entries.map { it.name })
     }
 
+    private fun Layer.ramped(ramp: SpeedRamp) = withSpeedCurve(ramp.curve.map { it.copy(ease = null) })
+
     @Test fun applyingAPresetKeepsTheMediaAndRetimesTheClip() {
         val layer = videoLayer(1000, 4999)
         for (ramp in SpeedRamp.entries) {
-            val ramped = layer.withSpeedRamp(ramp, ease = null)
+            val ramped = layer.ramped(ramp)
             assertEquals(ramp.name, span(layer), span(ramped), 2.0)
             assertEquals(ramp.name, ramp.points.size, ramped.node.child("speedMap")!!.keyframes.size)
             assertEquals(ramp.name, ramp.points.first().second.toDouble(), VideoTiming(ramped).speed(0.0).toDouble(), 1e-3)
         }
-        assertTrue(layer.withSpeedRamp(SpeedRamp.FlashOut, ease = null).endTime < layer.endTime)
-        assertTrue(layer.withSpeedRamp(SpeedRamp.Hero, ease = null).endTime > layer.endTime)
+        assertTrue(layer.ramped(SpeedRamp.FlashOut).endTime < layer.endTime)
+        assertTrue(layer.ramped(SpeedRamp.Hero).endTime > layer.endTime)
     }
 
     @Test fun freezeHoldsThePlayheadFrameForTheChosenTime() {

@@ -363,6 +363,7 @@ data class Layer(val node: XmlNode, val t: Float = 0f, val snap: ClosedFloatingP
         val out = sortedSetOf<Int>()
         fun walk(n: XmlNode) {
             if (n.name == "speedMap") {
+                if (scope?.ref != SpeedRef) return
                 val timing = VideoTiming(this)
                 n.keyframes.forEach { out.add(startTime + timing.localMs(it.t.toDouble() / 1_000_000).roundToInt()) }
             } else if (n.name == "kf") n["t"]?.finiteFloat()?.let { out.add(timeOf(it)) }

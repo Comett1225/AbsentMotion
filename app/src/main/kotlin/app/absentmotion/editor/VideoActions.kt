@@ -44,14 +44,20 @@ fun EditorState.retimeVideo(start: Boolean) {
     edit { it.update(layer.id) { current -> current.retimedVideo(newStart, newEnd) } }
 }
 
-fun EditorState.setVideoSpeed(value: Float, mediaTimeNs: Float, original: Layer) {
+fun EditorState.setVideoSpeed(value: Float, original: Layer) {
     if (selectedId != original.id || value.isNaN()) return
-    val layer = original
     val speed = value.coerceIn(SLOWEST_SPEED, FASTEST_SPEED)
-    val map = layer.node.child("speedMap") ?: XmlNode("speedMap", mapOf("value" to (layer.node["speed"] ?: "1")))
-    val snap = layer.atVideoTime(sampleMs, scene.fps).snap
-    val changed = map.withValueAt(mediaTimeNs, speed.toString(), snap)
-    edit("video-speed") { it.update(layer.id) { layer.withVideoSpeedMap(changed) } }
+    edit("video-speed") { it.update(original.id) { original.withNormalSpeed(speed) } }
+}
+
+fun EditorState.applySpeedCurve(points: List<CurvePoint>?) {
+    val layer = selected ?: return
+    val media = VideoTiming(layer).mediaMs((sampleMs - layer.startTime).toDouble())
+    val inside = sampleMs in layer.startTime..layer.endTime
+    edit { it.update(layer.id) { current -> current.withSpeedCurve(points) } }
+    val after = selected ?: return
+    if (inside) frame = scene.frameAt(after.startTime + VideoTiming(after).localMs(media).roundToInt())
+        .coerceIn(scene.frameAt(after.startTime), scene.frameAt(after.endTime))
 }
 
 val EditorState.keyLayer: Layer? get() = selected?.let {
@@ -66,18 +72,8 @@ internal fun EditorState.editKeyValue(key: Any? = null, change: (Layer) -> Layer
     }
 }
 
-fun EditorState.applySpeedRamp(ramp: SpeedRamp) {
-    val id = selected?.id ?: return
-    edit { it.update(id) { layer -> layer.withSpeedRamp(ramp) } }
-}
-
 fun EditorState.freezeFrame(seconds: Float) {
     val layer = selected ?: return
     val frozen = layer.withFreezeFrame(sampleMs, (seconds * 1000).toInt().coerceIn(100, 30_000), scene.fps) ?: return
     edit { it.update(layer.id) { frozen } }
-}
-
-fun EditorState.deleteSpeedKeyframes() {
-    val id = selected?.id ?: return
-    edit { it.update(id) { layer -> layer.withVideoSpeedMap(XmlNode("speedMap", mapOf("value" to "1"))) } }
 }

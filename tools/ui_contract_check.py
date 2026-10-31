@@ -172,7 +172,7 @@ class UiContracts(unittest.TestCase):
                 if 'performHapticFeedback(' in line:
                     self.assertTrue('state.settings.vibration' in line or 'if (vibrate)' in line, path)
         self.assertIn('state.edit(MOVE_EDIT) { it.reorder(id, layers.lastIndex - to) }\n        onTick()', source('ui/editor/Timeline.kt'))
-        self.assertIn('if (moved && value != null && value != detent) haptic(HapticFeedbackType.SegmentTick)', source('ui/editor/panels/SpeedPanel.kt'))
+        self.assertIn('if (speed == 1f && !snapped) haptic(HapticFeedbackType.SegmentTick)', source('ui/editor/panels/SpeedCurvePanel.kt'))
         self.assertIn('if (guides.any { it !in state.snapGuides }) tick(HapticFeedbackType.SegmentTick)', source('ui/editor/panels/MoveTransformPanel.kt'))
 
     def test_transform_tabs_put_rotate_above_size_and_end_with_pivot(self):
