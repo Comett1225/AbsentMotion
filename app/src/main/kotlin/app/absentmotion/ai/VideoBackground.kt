@@ -127,7 +127,7 @@ internal val MatteFollowedEffects = setOf(
     "absent.flip", "absent.fractalwarp", "absent.glass", "absent.glitch",
     "absent.gridrepeat", "absent.heart", "absent.hexagontilerotate", "absent.hexagontileshift",
     "absent.hexagontiling", "absent.hexprism", "absent.hollowbox", "absent.innerbulge",
-    "absent.kaleidoscope", "absent.linearrepeat", "absent.magnifybackground", "absent.mirror",
+    "absent.kaleidoscope", "absent.linearrepeat", "absent.liquidglass", "absent.magnifybackground", "absent.mirror",
     "absent.movealongpath", "absent.noisedisplace", "absent.octahedron", "absent.offset",
     "absent.ominoglass", "absent.oscillate", "absent.polar", "absent.polardisplacement",
     "absent.pulsesize", "absent.pyramid", "absent.radialrepeat",

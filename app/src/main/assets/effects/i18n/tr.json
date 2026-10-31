@@ -2899,6 +2899,36 @@
     }
    }
   },
+  "liquidglass": {
+   "description": "Katmanın şeklini, bir telefon düğmesi gibi berrak ve yuvarlak bir cama dönüştürür: arkadaki katmanlar en çok kenara yakın yerde bükülür, ışık gelen tarafta parlak, karşı tarafta daha yumuşak bir kenar olur. Buzlanma arkadakini bulanıklaştırır, Gökkuşağı kenarı ise kenardaki renkleri ayırır.",
+   "name": "Liquid Glass",
+   "params": {
+    "angle": {
+     "label": "Işık açısı"
+    },
+    "blur": {
+     "label": "Kenar"
+    },
+    "color": {
+     "label": "Renk"
+    },
+    "dispersion": {
+     "label": "Gökkuşağı kenarı"
+    },
+    "frost": {
+     "label": "Buzlanma"
+    },
+    "highlight": {
+     "label": "Vurgu"
+    },
+    "refraction": {
+     "label": "Bükülme"
+    },
+    "tint": {
+     "label": "Ton"
+    }
+   }
+  },
   "longshadow": {
    "description": "Katmanın opak kısımlarından uzun, paralel gölgeler düşürür.",
    "name": "Uzun gölge",
@@ -5213,7 +5243,7 @@
    }
   },
   "stroketaper": {
-   "description": "Serbest el çiziminin kalem ve fırça konturlarını bir noktaya doğru inceltir: hiç yoktan Başlangıç'a, Bitiş'ten de hiç yoka doğru. Sıkıştırma incelmeyi keskinleştirir.",
+   "description": "Konturları bir noktaya doğru inceltir: serbest el çiziminin kalem ve fırça konturları ile çizgilerin ve şekillerin Konturu (Kenarlık ve Gölge > Kontur). Hiç yoktan Başlangıç'a, Bitiş'ten de hiç yoka doğru. Sıkıştırma incelmeyi keskinleştirir.",
    "name": "Kontur incelmesi",
    "params": {
     "end": {

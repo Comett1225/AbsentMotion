@@ -108,7 +108,7 @@ def translate_one(language, glossary, pairs, kind, english):
         answer = tr.call(prompt, payload)
         problems = check(kind, english, answer)
         if not problems:
-            return {k: tr.fix_direction(v, language) for k, v in answer.items()}
+            return {k: v if k == "body" else tr.fix_direction(v, language) for k, v in answer.items()}
         note = problems[:12]
     print(f"  {language} {kind}: gave up ({'; '.join(note[:3])})", file=sys.stderr)
     return None

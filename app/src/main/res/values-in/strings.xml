@@ -1805,10 +1805,10 @@
     <string name="transition_swirl">Pusaran</string>
     <string name="transition_pixelate">Pikselasi</string>
     <string name="transition_noise_dissolve">Larut noise</string>
-    <string name="transition_push_left">Geser ke kiri</string>
-    <string name="transition_push_right">Geser ke kanan</string>
-    <string name="transition_push_up">Geser ke atas</string>
-    <string name="transition_push_down">Geser ke bawah</string>
+    <string name="transition_push_left">Dorong ke kiri</string>
+    <string name="transition_push_right">Dorong ke kanan</string>
+    <string name="transition_push_up">Dorong ke atas</string>
+    <string name="transition_push_down">Dorong ke bawah</string>
     <string name="transition_whip_pan">Whip pan</string>
     <string name="transition_glitch">Glitch</string>
     <string name="transition_flash">Kilat</string>

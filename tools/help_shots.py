@@ -884,7 +884,7 @@ def command_place(args):
     if problems:
         sys.exit("\n".join(problems))
     translations = {t: json.loads((TRANSLATIONS / (t + ".json")).read_text(encoding="utf-8")) for t in tags if t != "en"}
-    changed, errors, stale = [], [], []
+    changed, errors, stale, writes = [], [], [], []
     for path in sorted(PAGES.glob("*.md")):
         slug = path.stem
         items = placements(spec, slug, ready)
@@ -898,8 +898,7 @@ def command_place(args):
             continue
         if front + rewritten != path.read_text(encoding="utf-8"):
             changed.append(str(path.relative_to(ROOT)))
-            if not args.dry_run:
-                path.write_text(front + rewritten, encoding="utf-8")
+            writes.append((path, front + rewritten))
         for tag, data in translations.items():
             page = data["pages"].get(slug)
             if page is None:
@@ -915,6 +914,8 @@ def command_place(args):
     if errors or (stale and args.strict):
         sys.exit("help_shots place: nothing written, fix these first:\n" + "\n".join(errors + ["stale translation " + name for name in stale]))
     if not args.dry_run:
+        for path, text in writes:
+            path.write_text(text, encoding="utf-8")
         for tag, data in translations.items():
             (TRANSLATIONS / (tag + ".json")).write_text(json.dumps(data, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     print("help_shots place: %d page text(s) %s" % (len(changed), "would change" if args.dry_run else "updated"))

@@ -14,6 +14,7 @@ void DrawDrawing(SkCanvas* canvas, const Layer& layer, float opacity, float t);
 SkPath DrawingBounds(const Layer& layer);
 SkPath DrawingStrokes(const Layer& layer);
 SkPath DrawingProgressPath(const Layer& layer, const SkPath& path, float t);
+SkPath TaperedStroke(const Layer& layer, const SkPath& path, float width, float t);
 bool DrawingContains(const Layer& layer, SkPoint local);
 
 constexpr int kPointEdit = 1 << 28;

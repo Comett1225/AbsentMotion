@@ -2899,6 +2899,36 @@
     }
    }
   },
+  "liquidglass": {
+   "description": "Convierte la forma de la capa en un cristal transparente y redondeado, como un botón del móvil: las capas de detrás se curvan sobre todo cerca del borde, con un reflejo brillante en el lado iluminado y otro más suave en el opuesto. Esmerilado desenfoca lo que hay detrás y Borde arcoíris separa los colores en el borde.",
+   "name": "Liquid Glass",
+   "params": {
+    "angle": {
+     "label": "Ángulo de la luz"
+    },
+    "blur": {
+     "label": "Borde"
+    },
+    "color": {
+     "label": "Color"
+    },
+    "dispersion": {
+     "label": "Borde arcoíris"
+    },
+    "frost": {
+     "label": "Esmerilado"
+    },
+    "highlight": {
+     "label": "Brillo"
+    },
+    "refraction": {
+     "label": "Curvatura"
+    },
+    "tint": {
+     "label": "Tinte"
+    }
+   }
+  },
   "longshadow": {
    "description": "Proyecta sombras largas y paralelas desde las partes opacas de la capa.",
    "name": "Sombra larga",
@@ -5213,7 +5243,7 @@
    }
   },
   "stroketaper": {
-   "description": "Afina hasta una punta los trazos de lápiz y pincel de un dibujo a mano alzada: desde nada hasta Inicio y desde Fin hasta nada. Apretar hace la punta más afilada.",
+   "description": "Afina los trazos hasta una punta: los trazos de lápiz y pincel de un dibujo a mano alzada y el Trazo de líneas y formas (Borde y sombra > Trazo). Desde nada hasta Inicio y desde Fin hasta nada. Apretar hace la punta más afilada.",
    "name": "Trazo afilado",
    "params": {
     "end": {

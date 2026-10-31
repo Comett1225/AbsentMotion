@@ -343,7 +343,8 @@ SkPath DrawStroke(SkCanvas* canvas, const Layer& l, const SkPath& path, float t,
     const SkColor4f color = ColorAt(l.stroke.color, t, kBlack, alpha);
     SkPaint paint = StrokePaint(l, width, color);
     const bool ends = (l.stroke.start != "none" || l.stroke.end != "none") && l.stroke.endSize > 0;
-    SkPath area = outline ? skpathutils::FillPathWithPaint(path, paint) : SkPath();
+    const SkPath tapered = l.kind == "shape" && !l.text ? TaperedStroke(l, path, width, t) : SkPath();
+    SkPath area = !outline ? SkPath() : tapered.isEmpty() ? skpathutils::FillPathWithPaint(path, paint) : tapered;
     const auto add = [&](const SkPath& end) { if (outline) area = Union(area, end); };
     const bool layered = canvas && ends && color.fA < 1;
     if (layered) {
@@ -353,7 +354,12 @@ SkPath DrawStroke(SkCanvas* canvas, const Layer& l, const SkPath& path, float t,
         canvas->saveLayer(path.getBounds().makeOutset(room, room), &opacity);
         paint.setAlphaf(1);
     }
-    if (canvas) canvas->drawPath(path, paint);
+    if (canvas && tapered.isEmpty()) canvas->drawPath(path, paint);
+    if (canvas && !tapered.isEmpty()) {
+        SkPaint fill = paint;
+        fill.setStyle(SkPaint::kFill_Style);
+        canvas->drawPath(tapered, fill);
+    }
     if (ends) {
         const float r = width * l.stroke.endSize;
         SkPathMeasure contours(path, false);

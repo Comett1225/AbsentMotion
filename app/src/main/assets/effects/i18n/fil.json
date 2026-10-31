@@ -2899,6 +2899,36 @@
     }
    }
   },
+  "liquidglass": {
+   "description": "Ginagawang malinaw at bilog na salamin ang hugis ng layer, parang button ng phone: pinakamalakas ang baluktot ng mga layer sa likod malapit sa gilid, may maliwanag na gilid sa panig na tinatamaan ng ilaw at mas malambot na gilid sa kabila. Nilalabo ng Frost ang nasa likod, at pinaghihiwalay ng Gilid na Rainbow ang mga kulay sa gilid.",
+   "name": "Liquid Glass",
+   "params": {
+    "angle": {
+     "label": "Anggulo ng ilaw"
+    },
+    "blur": {
+     "label": "Gilid"
+    },
+    "color": {
+     "label": "Kulay"
+    },
+    "dispersion": {
+     "label": "Gilid na Rainbow"
+    },
+    "frost": {
+     "label": "Frost"
+    },
+    "highlight": {
+     "label": "Highlight"
+    },
+    "refraction": {
+     "label": "Baluktot"
+    },
+    "tint": {
+     "label": "Tint"
+    }
+   }
+  },
   "longshadow": {
    "description": "Naglalagay ng mahaba at parallel na anino mula sa mga opaque na bahagi ng layer.",
    "name": "Mahabang Anino",
@@ -5213,7 +5243,7 @@
    }
   },
   "stroketaper": {
-   "description": "Pinapanipis ang pen at brush strokes ng freehand drawing hanggang maging matulis: mula wala hanggang Start, at mula End pababa sa wala. Pinapatalas ng Squeeze ang taper.",
+   "description": "Pinapanipis ang mga stroke hanggang maging matulis: ang pen at brush strokes ng freehand drawing, at ang Stroke ng mga linya at hugis (Frame at Anino > Stroke). Mula wala hanggang Simula, at mula Wakas pababa sa wala. Pinapatalas ng Squeeze ang taper.",
    "name": "Pagnipis ng Stroke",
    "params": {
     "end": {

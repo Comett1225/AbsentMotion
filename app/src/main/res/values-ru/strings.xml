@@ -1868,10 +1868,10 @@
     <string name="transition_cross_dissolve">Перекрёстное растворение</string>
     <string name="transition_dip_black">Затемнение до чёрного</string>
     <string name="transition_dip_white">Осветление до белого</string>
-    <string name="transition_wipe_right">Сдвиг вправо</string>
-    <string name="transition_wipe_left">Сдвиг влево</string>
-    <string name="transition_wipe_up">Сдвиг вверх</string>
-    <string name="transition_wipe_down">Сдвиг вниз</string>
+    <string name="transition_wipe_right">Шторка вправо</string>
+    <string name="transition_wipe_left">Шторка влево</string>
+    <string name="transition_wipe_up">Шторка вверх</string>
+    <string name="transition_wipe_down">Шторка вниз</string>
     <string name="transition_clock_wipe">Круговое стирание</string>
     <string name="transition_glow">Свечение</string>
     <string name="transition_swirl">Закручивание</string>

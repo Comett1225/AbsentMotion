@@ -2899,6 +2899,36 @@
     }
    }
   },
+  "liquidglass": {
+   "description": "Menukar bentuk lapisan menjadi kaca jernih yang bulat seperti butang telefon: lapisan di belakangnya paling melengkung berhampiran tepi, dengan tepi terang di sisi yang disinari dan tepi yang lebih lembut di sisi bertentangan. Fros mengaburkan apa yang ada di belakangnya dan Tepi Pelangi memisahkan warna di tepi.",
+   "name": "Liquid Glass",
+   "params": {
+    "angle": {
+     "label": "Sudut Cahaya"
+    },
+    "blur": {
+     "label": "Tepi"
+    },
+    "color": {
+     "label": "Warna"
+    },
+    "dispersion": {
+     "label": "Tepi Pelangi"
+    },
+    "frost": {
+     "label": "Fros"
+    },
+    "highlight": {
+     "label": "Sorotan"
+    },
+    "refraction": {
+     "label": "Lengkungan"
+    },
+    "tint": {
+     "label": "Tona"
+    }
+   }
+  },
   "longshadow": {
    "description": "Menghasilkan bayang panjang selari daripada bahagian legap lapisan.",
    "name": "Bayang Panjang",
@@ -5213,7 +5243,7 @@
    }
   },
   "stroketaper": {
-   "description": "Menipiskan lejang pen dan berus lukisan bebas hingga ke satu titik: dari kosong hingga Mula, dan dari Tamat hingga kosong. Himpit menjadikan penirusan lebih tajam.",
+   "description": "Menipiskan lejang sehingga runcing: lejang pen dan berus lukisan bebas, serta Lejang pada garisan dan bentuk (Sempadan & Bayang > Lejang). Dari kosong hingga Mula, dan dari Tamat hingga kosong. Himpit menjadikan penirusan lebih tajam.",
    "name": "Lejang Menirus",
    "params": {
     "end": {

@@ -1,0 +1,85 @@
+{
+ "id": "liquidglass",
+ "name": "Liquid Glass",
+ "category": "distort",
+ "since": "4.4.0",
+ "description": "Turns the layer's shape into clear, rounded glass like a phone button: the layers behind bend most near the rim, with a bright edge on the lit side and a softer one opposite. Frost blurs what is behind it and Rainbow Edge splits the colors at the rim.",
+ "params": [
+  {
+   "id": "blur",
+   "label": "Edge",
+   "type": "float",
+   "default": 40,
+   "min": 0,
+   "max": 300,
+   "step": 0.1,
+   "pixels": true
+  },
+  {
+   "id": "refraction",
+   "label": "Bend",
+   "type": "float",
+   "default": 45,
+   "min": -300,
+   "max": 300,
+   "step": 0.1,
+   "pixels": true
+  },
+  {
+   "id": "frost",
+   "label": "Frost",
+   "type": "float",
+   "default": 3,
+   "min": 0,
+   "max": 40,
+   "step": 0.1,
+   "pixels": true
+  },
+  {
+   "id": "dispersion",
+   "label": "Rainbow Edge",
+   "type": "float",
+   "default": 0.3,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "angle",
+   "label": "Light Angle",
+   "type": "angle",
+   "default": 135,
+   "min": -3600,
+   "max": 3600,
+   "step": 0.5
+  },
+  {
+   "id": "highlight",
+   "label": "Highlight",
+   "type": "float",
+   "default": 0.8,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "color",
+   "label": "Color",
+   "type": "color",
+   "default": "#ffffff"
+  },
+  {
+   "id": "tint",
+   "label": "Tint",
+   "type": "float",
+   "default": 0.08,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform shader blurred;\nuniform shader backdrop;\nuniform float blur;\nuniform float refraction;\nuniform float frost;\nuniform float dispersion;\nuniform float angle;\nuniform float highlight;\nlayout(color) uniform half4 color;\nuniform float tint;\nfloat h(float2 p) { return float(blurred.eval(p).a); }\nfloat4 frosted(float2 p) {\n    float4 s = float4(backdrop.eval(p));\n    if (frost < 0.5) return s;\n    s *= 0.2;\n    for (int i = 0; i < 8; i++) {\n        float a = float(i) * 0.7853982;\n        float r = frost * (fract(float(i) * 0.5) < 0.25 ? 1.0 : 0.55);\n        s += float4(backdrop.eval(p + float2(cos(a), sin(a)) * r)) * 0.1;\n    }\n    return s;\n}\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return half4(0.0);\n    float e = max(blur * 0.15, 1.0);\n    float2 g = float2(h(coord + float2(e, 0.0)) - h(coord - float2(e, 0.0)), h(coord + float2(0.0, e)) - h(coord - float2(0.0, e))) / (2.0 * e);\n    float3 n = normalize(float3(-g * max(blur, 1.0), 1.0));\n    float edge = clamp(length(n.xy), 0.0, 1.0);\n    float2 bend = -n.xy * refraction * (0.35 + 0.65 * edge);\n    float k = clamp(dispersion, 0.0, 1.0) * 0.6 * edge;\n    float4 mid = frosted(coord + bend);\n    float4 bg = float4(frosted(coord + bend * (1.0 + k)).r, mid.g, frosted(coord + bend * (1.0 - k)).b, mid.a);\n    float3 rgb = bg.a > 0.0 ? clamp(bg.rgb / bg.a, 0.0, 1.0) : float3(color.rgb);\n    float amount = clamp(tint, 0.0, 1.0) * float(color.a);\n    rgb = mix(rgb, float3(color.rgb), amount);\n    float a = radians(angle);\n    float2 toward = float2(cos(a), -sin(a));\n    float3 l = normalize(float3(toward, 0.6));\n    float spec = pow(max(dot(reflect(-l, n), float3(0.0, 0.0, 1.0)), 0.0), 40.0);\n    float facing = edge > 0.001 ? dot(n.xy / edge, toward) : 0.0;\n    float rim = pow(edge, 3.0) * (0.9 * max(facing, 0.0) + 0.45 * max(-facing, 0.0));\n    float shine = clamp((spec * 0.6 + rim) * highlight, 0.0, 1.0);\n    float alpha = max(max(float(bg.a), shine), amount * 0.6);\n    rgb = clamp(rgb * max(float(bg.a), amount * 0.6) / max(alpha, 0.001) + shine, 0.0, 1.0);\n    return half4(half3(rgb * alpha), half(alpha)) * src.a;\n}\n"
+}

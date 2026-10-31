@@ -53,9 +53,11 @@ import java.util.concurrent.atomic.AtomicReference
 object EngineDebug {
     @Volatile var failStart: String? = null
     @Volatile var forceGl = false
+    @Volatile var failCheck: String? = null
 }
 
 class EngineThread(private val background: Int, context: Context? = null, private val preferOpenGl: () -> Boolean = { false }) {
+    private val gpuCheck = context?.let { GpuCheck(it.applicationContext) }
     private val thread = HandlerThread("am-engine").apply { start() }
     private val handler = Handler(thread.looper)
     private val dispatcher = handler.asCoroutineDispatcher()
@@ -197,11 +199,24 @@ class EngineThread(private val background: Int, context: Context? = null, privat
 
     @Volatile private var startFailure: String? = null
 
+    private fun checked(engine: NativeEngine): NativeEngine {
+        val check = gpuCheck ?: return engine
+        if (check.drawsRight(engine)) return engine
+        val other = runCatching { NativeEngine(if (engine.openGl) NativeEngine.Backend.GRAPHITE else NativeEngine.Backend.GL) }.getOrNull() ?: return engine
+        if (!check.drawsRight(other)) {
+            other.close()
+            return engine
+        }
+        Log.w("AMEngine", "switched to ${if (other.openGl) "OpenGL" else "Vulkan"} because the check picture came out wrong")
+        engine.close()
+        return other
+    }
+
     private fun startEngine(): NativeEngine {
         startFailure?.let { throw IllegalStateException(it) }
         return try {
             EngineDebug.failStart?.let { throw IllegalStateException(it) }
-            val glFirst = EngineDebug.forceGl || preferOpenGl()
+            val glFirst = EngineDebug.forceGl || preferOpenGl() || gpuCheck?.knownBad(gl = false) == true && !gpuCheck.knownBad(gl = true)
             val order = if (glFirst) listOf(NativeEngine.Backend.GL, NativeEngine.Backend.GRAPHITE) else listOf(NativeEngine.Backend.GRAPHITE, NativeEngine.Backend.GL)
             val first = runCatching { NativeEngine(order[0]) }
             (first.getOrNull() ?: run {
@@ -213,7 +228,7 @@ class EngineThread(private val background: Int, context: Context? = null, privat
                     val (vulkan, gl) = if (glFirst) second to failed else failed to second
                     throw IllegalStateException("${vulkan?.message ?: vulkan}; OpenGL: ${gl?.message ?: gl}", second)
                 }
-            }).also { app.absentmotion.Tier.openGl = it.openGl }
+            }).let(::checked).also { app.absentmotion.Tier.openGl = it.openGl }
         } catch (t: Throwable) {
             val reason = t.message ?: t.toString()
             Log.e("AMEngine", "the engine cannot start", t)

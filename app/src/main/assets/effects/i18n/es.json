@@ -2899,6 +2899,36 @@
     }
    }
   },
+  "liquidglass": {
+   "description": "Convierte la forma de la capa en un vidrio transparente y redondeado, como un botón de celular: las capas de atrás se curvan más cerca del borde, con un brillo intenso del lado iluminado y otro más suave del lado opuesto. Escarchado desenfoca lo que hay detrás y Borde arcoíris separa los colores en el borde.",
+   "name": "Liquid Glass",
+   "params": {
+    "angle": {
+     "label": "Ángulo de luz"
+    },
+    "blur": {
+     "label": "Borde"
+    },
+    "color": {
+     "label": "Color"
+    },
+    "dispersion": {
+     "label": "Borde arcoíris"
+    },
+    "frost": {
+     "label": "Escarchado"
+    },
+    "highlight": {
+     "label": "Reflejo"
+    },
+    "refraction": {
+     "label": "Curvatura"
+    },
+    "tint": {
+     "label": "Tinte"
+    }
+   }
+  },
   "longshadow": {
    "description": "Proyecta sombras largas y paralelas desde las partes opacas de la capa.",
    "name": "Sombra larga",
@@ -5213,7 +5243,7 @@
    }
   },
   "stroketaper": {
-   "description": "Adelgaza los trazos de lápiz y pincel de un dibujo a mano alzada hasta una punta: desde nada hasta Inicio, y de Fin a nada. Compresión hace la punta más afilada.",
+   "description": "Adelgaza los trazos hasta una punta: los trazos de lápiz y pincel de un dibujo a mano alzada y el Trazo de líneas y formas (Borde y sombra > Trazo). Desde nada hasta Inicio, y de Fin a nada. Compresión hace la punta más afilada.",
    "name": "Afinado del trazo",
    "params": {
     "end": {

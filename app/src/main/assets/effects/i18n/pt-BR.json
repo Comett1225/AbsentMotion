@@ -2899,6 +2899,36 @@
     }
    }
   },
+  "liquidglass": {
+   "description": "Transforma a forma da camada em um vidro transparente e arredondado, como um botão de celular: as camadas de trás se curvam mais perto da borda, com uma borda brilhante no lado iluminado e outra mais suave no lado oposto. Fosco desfoca o que está atrás e Borda arco-íris separa as cores na borda.",
+   "name": "Liquid Glass",
+   "params": {
+    "angle": {
+     "label": "Ângulo da luz"
+    },
+    "blur": {
+     "label": "Borda"
+    },
+    "color": {
+     "label": "Cor"
+    },
+    "dispersion": {
+     "label": "Borda arco-íris"
+    },
+    "frost": {
+     "label": "Fosco"
+    },
+    "highlight": {
+     "label": "Realce"
+    },
+    "refraction": {
+     "label": "Curvatura"
+    },
+    "tint": {
+     "label": "Tonalidade"
+    }
+   }
+  },
   "longshadow": {
    "description": "Projeta sombras longas e paralelas a partir das partes opacas da camada.",
    "name": "Sombra longa",
@@ -5213,7 +5243,7 @@
    }
   },
   "stroketaper": {
-   "description": "Afinar os traços de caneta e pincel de um desenho à mão livre até uma ponta: do nada até Início e de Fim até nada. Compressão deixa o afinamento mais acentuado.",
+   "description": "Afina os traços até uma ponta: os traços de caneta e pincel de um desenho à mão livre e o Contorno de linhas e formas (Borda e sombra > Contorno). Do nada até Início e de Fim até nada. Compressão deixa o afinamento mais acentuado.",
    "name": "Afinamento do traço",
    "params": {
     "end": {

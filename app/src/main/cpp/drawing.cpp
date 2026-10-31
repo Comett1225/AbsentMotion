@@ -248,6 +248,29 @@ SkPath DrawingProgressPath(const Layer& layer, const SkPath& path, float t) {
     return b.detach();
 }
 
+SkPath TaperedStroke(const Layer& layer, const SkPath& path, float width, float t) {
+    const Reveal r = RevealOf(layer, t);
+    if (!r.tapered || !(width > 0)) return SkPath();
+    SkPathBuilder out;
+    SkPathMeasure contours(path, false);
+    do {
+        const float length = contours.getLength();
+        if (!(length > 0)) continue;
+        const int pieces = std::clamp((int)std::ceil(length / std::max(width / 4, 1.5f)), 8, 600);
+        std::vector<SkPoint> pts;
+        std::vector<float> radius;
+        for (int i = 0; i <= pieces; i++) {
+            const float u = (float)i / pieces;
+            SkPoint p;
+            if (!contours.getPosTan(u * length, &p, nullptr)) continue;
+            pts.push_back(p);
+            radius.push_back(std::max(0.01f, width / 2 * Taper(r, u)));
+        }
+        if (!pts.empty()) out.addPath(Band(pts, radius));
+    } while (contours.nextContour());
+    return out.detach();
+}
+
 void DrawDrawing(SkCanvas* canvas, const Layer& layer, float opacity, float t) {
     bool erases = false;
     for (const FreehandStroke& s : layer.strokes) erases |= s.tool == kEraser;

@@ -56,7 +56,7 @@ class EffectPackTest {
     }
 
     @Test fun backgroundEffectsReadWhatIsBehindTheLayer() {
-        assertTrue(reads("backdrop").containsAll(listOf("magnifybackground", "maskblur", "glass", "ominoglass", "displacementmap", "polardisplacement")))
+        assertTrue(reads("backdrop").containsAll(listOf("magnifybackground", "maskblur", "glass", "ominoglass", "liquidglass", "displacementmap", "polardisplacement")))
         assertEquals(setOf("displacementmap"), reads("below"))
         assertTrue("fillbehind" !in reads("backdrop"))
     }

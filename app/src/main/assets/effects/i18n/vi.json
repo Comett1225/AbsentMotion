@@ -2899,6 +2899,36 @@
     }
    }
   },
+  "liquidglass": {
+   "description": "Biến hình dạng của lớp thành kính trong, bo tròn như nút bấm trên điện thoại: các lớp phía sau cong nhiều nhất gần viền, với viền sáng ở phía có ánh sáng và viền dịu hơn ở phía đối diện. Kính mờ làm nhòe những gì phía sau, còn Viền cầu vồng tách màu ở viền.",
+   "name": "Liquid Glass",
+   "params": {
+    "angle": {
+     "label": "Góc sáng"
+    },
+    "blur": {
+     "label": "Viền"
+    },
+    "color": {
+     "label": "Màu"
+    },
+    "dispersion": {
+     "label": "Viền cầu vồng"
+    },
+    "frost": {
+     "label": "Kính mờ"
+    },
+    "highlight": {
+     "label": "Điểm sáng"
+    },
+    "refraction": {
+     "label": "Độ cong"
+    },
+    "tint": {
+     "label": "Độ phủ màu"
+    }
+   }
+  },
   "longshadow": {
    "description": "Tạo bóng đổ dài, song song từ những phần đục của lớp.",
    "name": "Bóng đổ dài",
@@ -5213,7 +5243,7 @@
    }
   },
   "stroketaper": {
-   "description": "Làm mảnh dần nét bút và cọ của hình vẽ tay về một điểm: từ không có gì đến Điểm đầu, và từ Điểm cuối về không. Siết giúp phần thuôn nhọn hơn.",
+   "description": "Làm các nét thuôn dần thành một điểm: nét bút và cọ của hình vẽ tay, cùng Nét của đường và hình (Viền & bóng > Nét). Từ không có gì đến Bắt đầu, và từ Kết thúc về không. Siết giúp phần thuôn nhọn hơn.",
    "name": "Thuôn nét",
    "params": {
     "end": {

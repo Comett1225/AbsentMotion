@@ -1826,7 +1826,7 @@
     <string name="transition_wipe_down">وایپ به پایین</string>
     <string name="transition_clock_wipe">وایپ ساعتگرد</string>
     <string name="transition_glow">درخشش</string>
-    <string name="transition_swirl">چرخش</string>
+    <string name="transition_swirl">پیچش</string>
     <string name="transition_pixelate">پیکسلی</string>
     <string name="transition_noise_dissolve">محو نویزی</string>
     <string name="transition_push_left">هل به چپ</string>

@@ -203,6 +203,7 @@
     "fillbehind": {"photo": "portrait", "half": 110, "params": {"blur": 60, "edgeStrength": 0.6, "edgeColor": "#ffffff"}},
     "glass": {"photo": "colour", "under": "landscape", "half": 120, "shape": ".circle"},
     "ominoglass": {"photo": "colour", "under": "landscape", "half": 130, "shape": ".circle", "params": {"refraction": 20, "aberration": 12, "blur": 20}},
+    "liquidglass": {"photo": "colour", "under": "landscape", "half": 120, "shape": ".roundrect"},
     "displacementmap": {"photo": "colour", "under": "landscape", "half": 130, "params": {"offset": [40, 40], "fromCenter": true}},
     "polardisplacement": {"photo": "colour", "under": "landscape", "half": 150, "shape": ".circle", "params": {"angle": 40, "reach": 20}},
     "bend": {"photo": "colour", "layout": "move", "half": [40, 150], "params": {"amount": [0, 120, 0], "start": 0.1}, "animate": 16},

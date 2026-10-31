@@ -226,7 +226,7 @@ private fun ResultPreview(result: Compressed, original: android.net.Uri) {
         ) { Icon(app.absentmotion.ui.editor.ChromeIcons.Fullscreen, stringResource(R.string.compress_full_screen), Modifier.size(20.dp), tint = Color.White) }
     }
     if (full) androidx.compose.ui.window.Dialog({ full = false }, androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)) {
-        Column(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.94f)).systemBarsPadding()) {
+        Column(Modifier.fillMaxSize().background(Color.Black).systemBarsPadding()) {
             Row(Modifier.fillMaxWidth().height(64.dp).padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                 Row(Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     for ((i, label) in listOf(R.string.compress_after, R.string.compress_before).withIndex()) {

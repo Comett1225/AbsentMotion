@@ -2899,6 +2899,36 @@
     }
    }
   },
+  "liquidglass": {
+   "description": "Mengubah bentuk lapisan menjadi kaca bening yang membulat seperti tombol ponsel: lapisan di belakangnya paling melengkung di dekat tepi, dengan tepi terang di sisi yang kena cahaya dan tepi yang lebih lembut di sisi seberangnya. Buram mengaburkan apa yang ada di belakangnya, dan Tepi Pelangi memisahkan warna di tepi.",
+   "name": "Liquid Glass",
+   "params": {
+    "angle": {
+     "label": "Sudut Cahaya"
+    },
+    "blur": {
+     "label": "Tepi"
+    },
+    "color": {
+     "label": "Warna"
+    },
+    "dispersion": {
+     "label": "Tepi Pelangi"
+    },
+    "frost": {
+     "label": "Buram"
+    },
+    "highlight": {
+     "label": "Sorotan"
+    },
+    "refraction": {
+     "label": "Lengkung"
+    },
+    "tint": {
+     "label": "Tint"
+    }
+   }
+  },
   "longshadow": {
    "description": "Memberi bayangan panjang yang sejajar dari bagian lapisan yang tidak transparan.",
    "name": "Bayangan Panjang",
@@ -5213,7 +5243,7 @@
    }
   },
   "stroketaper": {
-   "description": "Menipiskan goresan pena dan kuas pada coretan tangan hingga runcing: dari nol sampai Awal, dan dari Akhir turun ke nol. Himpit membuat penyempitan lebih tajam.",
+   "description": "Menipiskan goresan hingga runcing: goresan pena dan kuas pada coretan tangan, serta Stroke pada garis dan bentuk (Bingkai & Bayangan > Stroke). Dari nol sampai Awal, dan dari Akhir turun ke nol. Himpit membuat penyempitan lebih tajam.",
    "name": "Penyempitan Stroke",
    "params": {
     "end": {
