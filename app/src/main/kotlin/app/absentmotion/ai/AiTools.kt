@@ -33,15 +33,16 @@ import kotlin.math.sqrt
 
 enum class AiAction(@StringRes val title: Int) {
     Background(R.string.ai_remove_background), Noise(R.string.ai_reduce_noise), Video(R.string.ai_remove_background_video), Smooth(R.string.smooth_clip),
-    Enhance(R.string.ai_enhance);
+    Enhance(R.string.ai_enhance), Reverse(R.string.speed_reverse);
 
-    val offered: Boolean get() = this == Noise || this == Enhance || this != Smooth && BackgroundRemoval.AVAILABLE
+    val offered: Boolean get() = this == Noise || this == Enhance || this != Smooth && this != Reverse && BackgroundRemoval.AVAILABLE
 
     fun unavailable(layer: Layer?): UiText? = when (this) {
         Background -> if (layer?.mediaFill?.video == false) null else txt(R.string.ai_select_image_layer)
         Noise -> if (layer?.kind == "audio") null else txt(R.string.ai_select_audio_layer)
         Enhance -> app.absentmotion.Tier.reason(app.absentmotion.Feature.AiEnhance) ?: videoReason(layer, AiKind.Enhance)
         Smooth -> videoReason(layer, AiKind.Smooth)
+        Reverse -> videoReason(layer, null) ?: if (layer?.aiMarks.orEmpty().any { it.kind == AiKind.Smooth || it.kind == AiKind.Enhance }) txt(R.string.speed_reverse_remove_ai) else null
         Video -> videoReason(layer, null) ?: if (layer?.shape.isNullOrEmpty()) txt(R.string.ai_select_video_layer) else null
     }
 
@@ -89,6 +90,12 @@ class AiTools(private val context: Context, private val state: EditorState, priv
         val layer = (target ?: state.selectedId)?.let(state.scene::layer)
         action.unavailable(layer)?.let { message = AppText.get(it); return }
         layer ?: return
+        if (action == AiAction.Reverse && layer.reverseMark != null) {
+            dismiss()
+            state.playing = false
+            state.edit { it.unreversed(layer.id) }
+            return
+        }
         if (action == AiAction.Video && !confirmed) {
             dismiss()
             videoSetup = layer
@@ -176,6 +183,14 @@ class AiTools(private val context: Context, private val state: EditorState, priv
                     state.edit { scene ->
                         scene.update(layer.id) { it.withSmoothed(output.declaration.uri, source, chosen.option, media, base, facts) }.withMedia(output.declaration)
                     }
+                } else if (action == AiAction.Reverse) {
+                    val media = checkNotNull(state.scene.media(layer.mediaFill!!.uri)) { AppText.get(R.string.ai_video_missing) }
+                    val output = withContext(Dispatchers.IO) { ClipReverse.run(context, layer, media, report).also { result = it.media } }
+                    ensureActive()
+                    check(state.scene.layer(layer.id) == layer) { AppText.get(R.string.ai_layer_changed) }
+                    state.edit { scene ->
+                        scene.update(layer.id) { it.reversedTo(output.media.declaration.uri, output.mirrorUs, media) }.withMedia(output.media.declaration)
+                    }
                 } else {
                     val original = state.scene.media(layer.node[if (action == AiAction.Noise) "src" else "fillImage"] ?: "")
                     var note: Int? = null
@@ -211,7 +226,7 @@ class AiTools(private val context: Context, private val state: EditorState, priv
                 }
                 committed = true
                 message = fallback?.let { AppText.get(it) } ?: ""
-                if (fallback == null) {
+                if (fallback == null && action != AiAction.Reverse) {
                     state.panel = EditorPanel.Tools
                     state.effectBrowserOpen = false
                 }
