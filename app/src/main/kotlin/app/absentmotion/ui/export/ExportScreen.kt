@@ -300,8 +300,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
         lifecycle.addObserver(observer)
         onDispose { lifecycle.removeObserver(observer); if (!ExportRun.running) ExportRun.visible = true }
     }
-    var confirmStop by remember { mutableStateOf(false) }
-    LaunchedEffect(phase) { free = freeSpace(); confirmStop = false }
+    LaunchedEffect(phase) { free = freeSpace() }
 
     val caps = remember { DeviceCapabilities.of(context) }
     val report by caps.report.collectAsState()
@@ -360,7 +359,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
     app.absentmotion.platform.ExportBars(dark = false, running = phase is Phase.Running)
     BackHandler {
         when (phase) {
-            is Phase.Running -> confirmStop = true
+            is Phase.Running -> (phase as? Phase.Running)?.job?.cancel()
             is Phase.Done -> phase = Phase.Idle
             Phase.Idle -> when {
                 audioPage -> audioPage = false
@@ -566,7 +565,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
             val shown = lastPhase
             val background = animatedColor(if (shown is Phase.Done) Am.Navy else Scrim)
             Box(Modifier.fillMaxSize().presenceScrim(background).pointerInput(Unit) {}, contentAlignment = Alignment.Center) {
-                if (shown is Phase.Running) RunningPanel(shown, progress, heat.level, note) { confirmStop = true }
+                if (shown is Phase.Running) RunningPanel(shown, progress, heat.level, note) { shown.job.cancel() }
                 else if (shown is Phase.Done) DoneScreen(shown.kind, shown.result, { phase = Phase.Idle }) { share(context, shown) }
             }
         }
@@ -596,16 +595,6 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
             title = { Text(stringResource(R.string.export_interpolation), color = Navy) },
             text = { SmoothingHelp(Navy, Modifier.heightIn(max = 420.dp)) },
             confirmButton = { TextButton({ help = false }) { Text(stringResource(R.string.ok), color = Navy) } },
-            containerColor = Am.Card,
-        )
-    }
-    if (confirmStop) (phase as? Phase.Running)?.let { running ->
-        AlertDialog(
-            onDismissRequest = { confirmStop = false },
-            title = { Text(stringResource(R.string.export_stop_title), color = Navy) },
-            text = { Text(stringResource(R.string.export_stop_text), color = Navy) },
-            confirmButton = { TextButton({ confirmStop = false; running.job.cancel() }) { Text(stringResource(R.string.stop), color = Navy) } },
-            dismissButton = { TextButton({ confirmStop = false }) { Text(stringResource(R.string.export_keep_going), color = Navy) } },
             containerColor = Am.Card,
         )
     }

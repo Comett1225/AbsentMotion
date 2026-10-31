@@ -1,6 +1,7 @@
 #include "effects.h"
 
 #include "particles.h"
+#include "pieces3d.h"
 #include "warp.h"
 #include "xml.h"
 #include "include/core/SkBBHFactory.h"
@@ -13,6 +14,7 @@
 #include "include/core/SkPaint.h"
 #include "include/core/SkPicture.h"
 #include "include/core/SkPictureRecorder.h"
+#include "include/core/SkSurface.h"
 #include "include/effects/SkImageFilters.h"
 #include "src/core/SkCanvasPriv.h"
 #include "src/core/SkDevice.h"
@@ -599,8 +601,9 @@ std::string EffectRuntime::load(const std::string& xml) {
     const std::string id = root->attr("id");
     const char* sksl = root->attr("sksl");
     if (!sksl || !*sksl) {
-        if (!BuiltIn(id) && !MotionEffect(id) && !RepeatEffect(id) && !TextEffect(id) && !DrawingEffect(id) && !ParticleEffect(id)) return "shader error: no shader and no built-in called " + id;
+        if (!BuiltIn(id) && !pieces3d::IsEffect(id) && !MotionEffect(id) && !RepeatEffect(id) && !TextEffect(id) && !DrawingEffect(id) && !ParticleEffect(id)) return "shader error: no shader and no built-in called " + id;
         d.backdrop = id == "absent.glow";
+        if (pieces3d::IsEffect(id)) NoteOrientedEffect(id);
     } else {
         auto result = SkRuntimeEffect::MakeForShader(SkString(sksl));
         if (!result.effect) {
@@ -674,7 +677,7 @@ bool EffectRuntime::grabs(const std::vector<Layer>& layers) const {
     return std::any_of(layers.begin(), layers.end(), [&](const Layer& l) {
         return std::any_of(l.effects.begin(), l.effects.end(), [&](const LayerEffect& e) {
             const Definition* d = e.hidden ? nullptr : find(e.id);
-            return d && d->palette && d->matrix && mayDiffuse(e, d);
+            return !e.hidden && (pieces3d::IsEffect(e.id) || (d && d->palette && d->matrix && mayDiffuse(e, d)));
         }) || grabs(l.children);
     });
 }
@@ -683,7 +686,7 @@ bool EffectRuntime::active(const Layer& layer) const {
     return std::any_of(layer.effects.begin(), layer.effects.end(), [&](const LayerEffect& e) {
         if (e.hidden) return false;
         const Definition* d = find(e.id);
-        return BuiltIn(e.id) || (d && d->shader);
+        return BuiltIn(e.id) || pieces3d::IsEffect(e.id) || (d && d->shader);
     });
 }
 
@@ -865,6 +868,67 @@ bool EffectRuntime::draw(SkCanvas* canvas, const Scene& scene, const Layer& laye
         if (bounded) *bounded = drawn.makeOffset(at.left(), at.top());
         return SkImageFilters::Picture(std::move(picture), drawn);
     };
+    if (lift < 0 && std::any_of(layer.effects.begin(), layer.effects.end(), [](const LayerEffect& e) { return !e.hidden && pieces3d::IsEffect(e.id); })) {
+        std::function<void(SkCanvas*)> current = source;
+        int from = 0;
+        for (int k = 0; k < (int)layer.effects.size(); k++) {
+            const LayerEffect& e = layer.effects[k];
+            if (e.hidden || !pieces3d::IsEffect(e.id)) continue;
+            const Definition* d = find(e.id);
+            if (e.id == "absent.fracture3d" && Value(e, d ? &d->defaults : nullptr, "progress", 0, t, 0) <= 0 && Orientation(layer, timeMs) == SkM44()) continue;
+            float step = std::max(1.0f, std::max(at.width(), at.height()) / 2048.0f);
+            if (e.id == "absent.scatter3d") {
+                const int depth = std::clamp((int)std::round(Value(e, d ? &d->defaults : nullptr, "depth", 0, t, 1)), 1, 16);
+                step = std::max({step, std::clamp(Value(e, d ? &d->defaults : nullptr, "spacing", 0, t, 24), 1.0f, 10000.0f),
+                                 std::sqrt(at.width() * at.height() * depth / (20000 * 0.85f))});
+                while ((int64_t)std::max(1, (int)std::ceil(at.width() / step)) * std::max(1, (int)std::ceil(at.height() / step)) * depth > 20000) step *= 1.05f;
+            }
+            const int width = std::max(1, (int)std::ceil(at.width() / step)), height = std::max(1, (int)std::ceil(at.height() / step));
+            sk_sp<SkImageFilter> before = chain(scene, layer, timeMs, at, bounds, local, placed, nullptr, nullptr, k, from);
+            std::vector<uint8_t> pixels;
+            const auto capture = [&](SkCanvas* c) {
+                c->scale((float)width / at.width(), (float)height / at.height());
+                c->translate(-at.left(), -at.top());
+                if (before) {
+                    SkPaint p;
+                    p.setImageFilter(before);
+                    c->saveLayer(&bounds, &p);
+                    current(c);
+                    c->restore();
+                } else current(c);
+            };
+            bool ok = grab && grab(width, height, capture, &pixels);
+            if (!grab) {
+                const SkImageInfo info = SkImageInfo::Make(width, height, kRGBA_8888_SkColorType, kPremul_SkAlphaType, SkColorSpace::MakeSRGB());
+                sk_sp<SkSurface> surface = SkSurfaces::Raster(info);
+                if (surface) {
+                    surface->getCanvas()->clear(SK_ColorTRANSPARENT);
+                    capture(surface->getCanvas());
+                    pixels.resize((size_t)width * height * 4);
+                    ok = surface->readPixels(info.makeAlphaType(kUnpremul_SkAlphaType), pixels.data(), (size_t)width * 4, 0, 0);
+                }
+            }
+            if (!ok || pixels.size() != (size_t)width * height * 4) return false;
+            sk_sp<SkImage> image;
+            if (e.id == "absent.fracture3d") {
+                image = OnGpu(Rgba(width, height, pixels.data(), kUnpremul_SkAlphaType, SkColorSpace::MakeSRGB()));
+                if (!image) return false;
+            }
+            const auto value = [&](const char* name, int i, float fallback) { return Value(e, d ? &d->defaults : nullptr, name, i, t, fallback); };
+            SkPictureRecorder recorder;
+            SkCanvas* out = recorder.beginRecording(bounds);
+            pieces3d::Draw(out, e.id, at, Orientation(layer, timeMs), value, pixels, width, height, image.get());
+            sk_sp<SkPicture> result = recorder.finishRecordingAsPicture();
+            current = [result](SkCanvas* c) { c->drawPicture(result); };
+            from = k + 1;
+        }
+        SkPaint paint;
+        paint.setImageFilter(chain(scene, layer, timeMs, at, bounds, local, placed, nullptr, nullptr, -1, from));
+        canvas->saveLayer(&bounds, &paint);
+        current(canvas);
+        canvas->restore();
+        return true;
+    }
     const bool seesBehind = lift < 0 && behind(layer);
     SkRect drawn = SkRect::MakeEmpty();
     sk_sp<SkImageFilter> content = seesBehind ? record(source, &drawn) : nullptr;

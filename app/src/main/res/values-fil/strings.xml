@@ -767,9 +767,6 @@
     <string name="export_problem_android">Ang %1$s na may %2$s ay nangangailangan ng Android %3$s o mas bago.</string>
     <string name="export_reason_webp_lossless">Ang lossless WebP ay nangangailangan ng Android 10 o mas bago. Pumili ng PNG para mapanatili ang bawat pixel.</string>
     <string name="export_verify_middle_frame">Hindi kamukha ng proyekto ang gitna ng bidyo. Maaaring ito ay itim o naka-freeze.</string>
-    <string name="export_stop_title">Itigil ang pag-export?</string>
-    <string name="export_stop_text">Buburahin ang hindi natapos na file.</string>
-    <string name="export_keep_going">Magpatuloy sa pag-export</string>
     <string name="export_running_leave">Maaari kang lumipat sa ibang app habang nag-e-export.</string>
     <string name="export_notify_channel">Mga export</string>
     <string name="export_notify_done">Tapos na ang export</string>
@@ -1987,4 +1984,24 @@
     <string name="prerender_playing">Naka-pre-render</string>
     <string name="prerender_outdated">Luma na ang pre-render.</string>
     <string name="prerender_again">Pre-render muli</string>
+    <string name="about_website">Website at gabay</string>
+    <string name="caption_outline_thickness">Kapal</string>
+    <string name="caption_outline_color">Kulay ng outline</string>
+    <string name="caption_custom_color">Custom</string>
+    <string name="multi_animation">I-animate lahat</string>
+    <string name="multi_presets">Ilapat ang preset</string>
+    <string name="multi_no_cut">Walang cut sa pagitan ng mga napiling layer</string>
+    <string name="layer_tool_screenshot">Screenshot</string>
+    <string name="screenshot_saved">Na-save sa gallery at naidagdag bilang bagong layer</string>
+    <string name="screenshot_failed">Hindi makuha ang screenshot</string>
+    <string name="screenshot_outside">Ilipat muna ang playhead sa clip</string>
+    <plurals name="multi_applied_count">
+        <item quantity="one">Inilapat sa %1$s layer</item>
+        <item quantity="other">Inilapat sa %1$s layer</item>
+    </plurals>
+    <plurals name="multi_transition_count">
+        <item quantity="one">%1$s cut</item>
+        <item quantity="other">%1$s cut</item>
+    </plurals>
+    <string name="structure_svg_importing">Ini-import ang SVG…</string>
 </resources>

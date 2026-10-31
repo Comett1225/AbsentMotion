@@ -767,9 +767,6 @@
     <string name="export_problem_android">%2$s ile %1$s, Android %3$s veya daha yenisini gerektirir.</string>
     <string name="export_reason_webp_lossless">Kayıpsız WebP, Android 10 veya daha yenisini gerektirir. Her pikseli korumak için PNG seçin.</string>
     <string name="export_verify_middle_frame">Videonun ortası projeyle aynı görünmüyor. Siyah veya donmuş olabilir.</string>
-    <string name="export_stop_title">Dışa aktarma durdurulsun mu?</string>
-    <string name="export_stop_text">Tamamlanmamış dosya silinecek.</string>
-    <string name="export_keep_going">Dışa aktarmaya devam et</string>
     <string name="export_running_leave">Dışa aktarma sürerken diğer uygulamalara geçebilirsiniz.</string>
     <string name="export_notify_channel">Dışa aktarmalar</string>
     <string name="export_notify_done">Dışa aktarma tamamlandı</string>
@@ -1987,4 +1984,24 @@
     <string name="prerender_playing">Önceden işlendi</string>
     <string name="prerender_outdated">Önceden işleme güncel değil.</string>
     <string name="prerender_again">Yeniden önceden işle</string>
+    <string name="about_website">Web sitesi ve rehber</string>
+    <string name="caption_outline_thickness">Kalınlık</string>
+    <string name="caption_outline_color">Anahat rengi</string>
+    <string name="caption_custom_color">Özel</string>
+    <string name="multi_animation">Tümünü canlandır</string>
+    <string name="multi_presets">Ön ayarı uygula</string>
+    <string name="multi_no_cut">Seçili katmanlar arasında kesme yok</string>
+    <string name="layer_tool_screenshot">Ekran görüntüsü</string>
+    <string name="screenshot_saved">Galeriye kaydedildi ve yeni katman olarak eklendi</string>
+    <string name="screenshot_failed">Ekran görüntüsü alınamadı</string>
+    <string name="screenshot_outside">Önce oynatma kafasını klibin üzerine taşıyın</string>
+    <plurals name="multi_applied_count">
+        <item quantity="one">%1$s katmana uygulandı</item>
+        <item quantity="other">%1$s katmana uygulandı</item>
+    </plurals>
+    <plurals name="multi_transition_count">
+        <item quantity="one">%1$s kesme</item>
+        <item quantity="other">%1$s kesme</item>
+    </plurals>
+    <string name="structure_svg_importing">SVG içe aktarılıyor…</string>
 </resources>

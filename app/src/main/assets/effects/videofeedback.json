@@ -1,0 +1,108 @@
+{
+ "id": "videofeedback",
+ "name": "Video Feedback",
+ "category": "repeat",
+ "since": "4.4.0",
+ "native": true,
+ "description": "Draws the layer inside itself again and again, like a camera pointed at its own screen. Move, scale or turn the layer to steer the tunnel.",
+ "params": [
+  {
+   "id": "copies",
+   "label": "Copies",
+   "type": "float",
+   "default": 24,
+   "min": 1,
+   "max": 64,
+   "step": 1
+  },
+  {
+   "id": "zoom",
+   "label": "Zoom",
+   "type": "float",
+   "default": 0.85,
+   "min": 0.1,
+   "max": 1.5,
+   "step": 0.01
+  },
+  {
+   "id": "rotation",
+   "label": "Rotation",
+   "type": "angle",
+   "default": 0,
+   "min": -180,
+   "max": 180,
+   "step": 1
+  },
+  {
+   "id": "offset",
+   "label": "Offset",
+   "type": "point",
+   "default": [
+    0,
+    0
+   ],
+   "min": -99999,
+   "max": 99999,
+   "step": 1,
+   "pixels": true
+  },
+  {
+   "id": "center",
+   "label": "Center",
+   "type": "point",
+   "default": [
+    0,
+    0
+   ],
+   "min": -99999,
+   "max": 99999,
+   "step": 1,
+   "pixels": true
+  },
+  {
+   "id": "useLayerTransform",
+   "label": "Use Layer Transform",
+   "type": "switch",
+   "default": true
+  },
+  {
+   "id": "fade",
+   "label": "Fade",
+   "type": "float",
+   "default": 0.9,
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  },
+  {
+   "id": "hueShift",
+   "label": "Hue Shift",
+   "type": "angle",
+   "default": 0,
+   "min": -180,
+   "max": 180,
+   "step": 1
+  },
+  {
+   "id": "delay",
+   "label": "Delay",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "unit": "s"
+  },
+  {
+   "id": "blend",
+   "label": "Blend",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Normal",
+    "Add",
+    "Screen"
+   ]
+  }
+ ]
+}

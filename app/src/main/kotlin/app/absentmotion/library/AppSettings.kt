@@ -25,7 +25,7 @@ class AppSettings(private val context: Context) {
     private var loopingPlayState by mutableStateOf(prefs.getBoolean("loopingPlay", false))
     private var xmlUploadState by mutableStateOf(prefs.getBoolean("xmlUpload", false))
     private var vibrationState by mutableStateOf(prefs.getBoolean("trimLimitVibration", true))
-    private var basicTransformState by mutableStateOf(prefs.getBoolean("basicTransform", false))
+    private var basicTransformState by mutableStateOf(prefs.getBoolean("basicTransform", true))
     private var openGlState by mutableStateOf(prefs.getBoolean("graphicsOpenGl", false))
 
     private var themeState by mutableStateOf(prefs.getString("theme", Themes.DEFAULT)!!)

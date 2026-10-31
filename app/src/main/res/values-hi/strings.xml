@@ -767,9 +767,6 @@
     <string name="export_problem_android">%1$s को %2$s के साथ इस्तेमाल करने के लिए Android %3$s या उससे नया चाहिए।</string>
     <string name="export_reason_webp_lossless">लॉसलेस WebP के लिए Android 10 या नया चाहिए। हर पिक्सल बनाए रखने के लिए PNG चुनें।</string>
     <string name="export_verify_middle_frame">वीडियो का बीच का हिस्सा प्रोजेक्ट जैसा नहीं दिखता। यह काला या फ़्रीज़ हो सकता है।</string>
-    <string name="export_stop_title">एक्सपोर्ट रोकें?</string>
-    <string name="export_stop_text">अधूरी फ़ाइल हटा दी जाएगी।</string>
-    <string name="export_keep_going">एक्सपोर्ट जारी रखें</string>
     <string name="export_running_leave">एक्सपोर्ट चलते समय आप दूसरे ऐप्स पर जा सकते हैं।</string>
     <string name="export_notify_channel">एक्सपोर्ट</string>
     <string name="export_notify_done">एक्सपोर्ट पूरा हुआ</string>
@@ -1987,4 +1984,24 @@
     <string name="prerender_playing">प्री-रेंडर</string>
     <string name="prerender_outdated">प्री-रेंडर पुराना हो गया है।</string>
     <string name="prerender_again">फिर से प्री-रेंडर करें</string>
+    <string name="about_website">वेबसाइट और गाइड</string>
+    <string name="caption_outline_thickness">मोटाई</string>
+    <string name="caption_outline_color">आउटलाइन का रंग</string>
+    <string name="caption_custom_color">कस्टम</string>
+    <string name="multi_animation">सभी को एनिमेट करें</string>
+    <string name="multi_presets">प्रीसेट लागू करें</string>
+    <string name="multi_no_cut">चुनी गई लेयर के बीच कोई कट नहीं है</string>
+    <string name="layer_tool_screenshot">स्क्रीनशॉट</string>
+    <string name="screenshot_saved">गैलरी में सेव किया गया और नई लेयर के रूप में जोड़ा गया</string>
+    <string name="screenshot_failed">स्क्रीनशॉट नहीं लिया जा सका</string>
+    <string name="screenshot_outside">पहले प्लेहेड को क्लिप पर ले जाएँ</string>
+    <plurals name="multi_applied_count">
+        <item quantity="one">%1$s लेयर पर लागू किया गया</item>
+        <item quantity="other">%1$s लेयर पर लागू किया गया</item>
+    </plurals>
+    <plurals name="multi_transition_count">
+        <item quantity="one">%1$s कट</item>
+        <item quantity="other">%1$s कट</item>
+    </plurals>
+    <string name="structure_svg_importing">SVG इंपोर्ट हो रहा है…</string>
 </resources>

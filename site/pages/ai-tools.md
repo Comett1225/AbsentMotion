@@ -27,9 +27,9 @@ Auto captions turns speech into text layers that appear in time with the voice.
 | **Appearance** | Folded at first. Tap it to show the five rows below |
 | **Font** | Opens the font browser |
 | **Size** | 50 to 200 % (default 100 %) |
-| **Color** | Eight swatches: white (default), yellow, orange, red, pink, green, blue and black |
+| **Color** | Eight swatches: white (default), yellow, orange, red, pink, green, blue and black, and **Custom** for any color |
 | **Position** | **Top**, **Middle** or **Bottom** (default) |
-| **Outline** | A black border around the letters, on by default |
+| **Outline** | A border around the letters, on by default. When it is on, **Thickness** (0 to 50, default 6) and **Outline color** (the same swatches and **Custom**, default black) appear |
 
 The sample caption in the middle of the sheet shows the look you choose, including its position.
 

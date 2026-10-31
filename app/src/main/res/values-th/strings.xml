@@ -757,9 +757,6 @@
     <string name="export_problem_android">%1$s กับ %2$s ต้องใช้ Android %3$s หรือใหม่กว่า</string>
     <string name="export_reason_webp_lossless">WebP แบบไม่สูญเสียข้อมูลต้องใช้ Android 10 หรือใหม่กว่า โปรดเลือก PNG เพื่อรักษาทุกพิกเซล</string>
     <string name="export_verify_middle_frame">ช่วงกลางของวิดีโอไม่ตรงกับโปรเจกต์ อาจเป็นภาพดำหรือภาพค้าง</string>
-    <string name="export_stop_title">หยุดการส่งออกหรือไม่</string>
-    <string name="export_stop_text">ไฟล์ที่ยังไม่เสร็จจะถูกลบ</string>
-    <string name="export_keep_going">ส่งออกต่อ</string>
     <string name="export_running_leave">คุณสลับไปใช้แอปอื่นได้ระหว่างการส่งออก</string>
     <string name="export_notify_channel">การส่งออก</string>
     <string name="export_notify_done">ส่งออกเสร็จแล้ว</string>
@@ -1960,4 +1957,22 @@
     <string name="prerender_playing">เรนเดอร์ล่วงหน้าแล้ว</string>
     <string name="prerender_outdated">การเรนเดอร์ล่วงหน้าล้าสมัยแล้ว</string>
     <string name="prerender_again">เรนเดอร์ล่วงหน้าอีกครั้ง</string>
+    <string name="about_website">เว็บไซต์และคู่มือ</string>
+    <string name="caption_outline_thickness">ความหนา</string>
+    <string name="caption_outline_color">สีเส้นขอบ</string>
+    <string name="caption_custom_color">กำหนดเอง</string>
+    <string name="multi_animation">สร้างภาพเคลื่อนไหวทั้งหมด</string>
+    <string name="multi_presets">ใช้ค่าที่ตั้งไว้</string>
+    <string name="multi_no_cut">ไม่มีจุดตัดระหว่างเลเยอร์ที่เลือก</string>
+    <string name="layer_tool_screenshot">ภาพหน้าจอ</string>
+    <string name="screenshot_saved">บันทึกในแกลเลอรีและเพิ่มเป็นเลเยอร์ใหม่แล้ว</string>
+    <string name="screenshot_failed">ไม่สามารถสร้างภาพหน้าจอได้</string>
+    <string name="screenshot_outside">เลื่อนหัวเล่นไปที่คลิปก่อน</string>
+    <plurals name="multi_applied_count">
+        <item quantity="other">ใช้กับ %1$s เลเยอร์แล้ว</item>
+    </plurals>
+    <plurals name="multi_transition_count">
+        <item quantity="other">%1$s จุดตัด</item>
+    </plurals>
+    <string name="structure_svg_importing">กำลังนำเข้า SVG…</string>
 </resources>

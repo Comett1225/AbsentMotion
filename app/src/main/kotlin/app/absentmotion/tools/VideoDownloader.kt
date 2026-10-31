@@ -38,6 +38,10 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.nio.ByteBuffer
 import java.util.zip.GZIPInputStream
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import androidx.exifinterface.media.ExifInterface
 import kotlin.coroutines.cancellation.CancellationException
 
 class DownloadProblem(@StringRes val text: Int, detail: String = "") : Exception(detail)
@@ -414,6 +418,7 @@ object VideoDownloader {
         return withContext(Dispatchers.IO) {
             val (mime, extension) = pictureType(target.inputStream().use { it.readAtMost(16) })
             val file = "$name.$extension"
+            freshDates(target)
             SavedMedia(MediaStoreExport(context).save(null, file, mime) { out -> target.inputStream().use { it.copyTo(out) } }, mime, file)
         }
     }
@@ -535,6 +540,24 @@ private fun readSample(extractor: MediaExtractor, track: Track): Int {
             if (track.buffer.capacity() >= 64 shl 20) throw e
             track.buffer = ByteBuffer.allocateDirect(track.buffer.capacity() * 2)
         }
+    }
+}
+
+private val DateTags = listOf(ExifInterface.TAG_DATETIME, ExifInterface.TAG_DATETIME_ORIGINAL, ExifInterface.TAG_DATETIME_DIGITIZED)
+private val ZoneTags = listOf(ExifInterface.TAG_OFFSET_TIME, ExifInterface.TAG_OFFSET_TIME_ORIGINAL, ExifInterface.TAG_OFFSET_TIME_DIGITIZED,
+    ExifInterface.TAG_SUBSEC_TIME, ExifInterface.TAG_SUBSEC_TIME_ORIGINAL, ExifInterface.TAG_SUBSEC_TIME_DIGITIZED,
+    ExifInterface.TAG_GPS_DATESTAMP, ExifInterface.TAG_GPS_TIMESTAMP)
+
+internal fun freshDates(file: File, now: Date = Date()) {
+    try {
+        val exif = ExifInterface(file)
+        if (DateTags.none { exif.getAttribute(it) != null } && ZoneTags.none { exif.getAttribute(it) != null }) return
+        val stamp = SimpleDateFormat("yyyy:MM:dd HH:mm:ss", Locale.US).format(now)
+        for (tag in DateTags) exif.setAttribute(tag, stamp)
+        for (tag in ZoneTags) exif.setAttribute(tag, null)
+        exif.saveAttributes()
+    } catch (e: Exception) {
+        Log.w(TAG, "cannot reset the picture's dates", e)
     }
 }
 

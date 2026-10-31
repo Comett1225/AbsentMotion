@@ -5,6 +5,12 @@ import app.absentmotion.i18n.AppText
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import app.absentmotion.model.MotionSlot
+import app.absentmotion.model.TransitionKind
+import app.absentmotion.model.canAnimate
+import app.absentmotion.model.cutBetween
+import app.absentmotion.model.withAnimation
+import app.absentmotion.model.withTransition
 import app.absentmotion.model.Layer
 import app.absentmotion.model.MediaDeclaration
 import app.absentmotion.model.Scene
@@ -481,3 +487,17 @@ internal fun Scene.withClipEdgesAt(ids: List<Long>, frame: Int, end: Boolean, ex
         }
     }
 }
+
+internal fun Scene.selectedCuts(ids: Set<Long>): List<Pair<Long, Long>> {
+    val chosen = layers.filter { it.id in ids }.sortedWith(compareBy<Layer> { it.startTime }.thenBy { it.endTime }.thenBy { it.id })
+    val near = (1000 / fps.coerceAtLeast(1)).coerceAtLeast(1)
+    return chosen.zipWithNext().mapNotNull { (a, b) ->
+        (a.id to b.id).takeIf { b.startTime.toLong() <= a.endTime.toLong() + near && cutBetween(a.id, b.id) != null }
+    }
+}
+
+internal fun Scene.animateLayers(ids: Set<Long>, slot: MotionSlot, motionId: String?, ms: Int): Scene =
+    layers.filter { it.id in ids && it.canAnimate }.fold(this) { scene, layer -> scene.withAnimation(layer.id, slot, motionId, ms) }
+
+internal fun Scene.transitionCuts(cuts: List<Pair<Long, Long>>, kind: TransitionKind?, ms: Int): Scene =
+    cuts.fold(this) { scene, (a, b) -> scene.withTransition(a, b, kind, ms).scene }

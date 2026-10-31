@@ -43,6 +43,7 @@ import app.absentmotion.fonts.prepareText
 import app.absentmotion.model.fontNames
 import app.absentmotion.model.font
 import app.absentmotion.model.Scene
+import app.absentmotion.model.matchValues
 import app.absentmotion.model.imageUris
 import java.io.File
 import java.nio.ByteBuffer
@@ -715,7 +716,7 @@ private const val GPU_RETRY_MS = 1000L
 private val spacingEffects = Regex("<effect\\b[^>]*\"${Regex.escape(app.absentmotion.compat.ForeignEffectIds.TEXT_SPACING)}\"[^>]*?(/>|>.*?</effect>)", RegexOption.DOT_MATCHES_ALL)
 
 internal fun animatesTextSpacing(xml: String): Boolean =
-    xml.contains(app.absentmotion.compat.ForeignEffectIds.TEXT_SPACING) && spacingEffects.findAll(xml).any { it.value.contains("<kf") }
+    xml.contains(app.absentmotion.compat.ForeignEffectIds.TEXT_SPACING) && spacingEffects.matchValues(xml).any { it.contains("<kf") }
 
 internal class PendingScene {
     private val next = AtomicReference<Lazy<String>?>(null)

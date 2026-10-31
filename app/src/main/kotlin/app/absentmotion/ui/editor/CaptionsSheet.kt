@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -65,6 +66,8 @@ import app.absentmotion.ai.recogniseCaptions
 import app.absentmotion.audio.soundUri
 import app.absentmotion.model.shownName
 import app.absentmotion.editor.EditorState
+import app.absentmotion.editor.FullColor
+import app.absentmotion.ui.editor.panels.FullColorPicker
 import app.absentmotion.fonts.FontLibrary
 import app.absentmotion.fonts.FontName
 import app.absentmotion.platform.LocalContext
@@ -252,6 +255,11 @@ internal fun CaptionsSheet(state: EditorState, clipId: Long? = null, onClose: ()
             }
         }
     }
+    state.fullColor?.let { request ->
+        Dialog({ state.fullColor = null }, DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)) {
+            PhoneScreen { FullColorPicker(state, request) }
+        }
+    }
 }
 
 @Composable
@@ -322,20 +330,21 @@ private fun SetupScreen(
             Line(stringResource(R.string.caption_size)) {
                 Steps(style.sizePercent, 50..200, 10, "${style.sizePercent}%") { onStyle(style.copy(sizePercent = it)) }
             }
-            Line(stringResource(R.string.color)) {
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    for (argb in Swatches) {
-                        val chosen = argb == style.color
-                        Box(Modifier.size(28.dp).clip(CircleShape).buttonLabel(colourText(argb)).clickable { onStyle(style.copy(color = argb)) }
-                            .border(2.dp, if (chosen) Am.Accent else Color.Transparent, CircleShape).padding(4.dp)
-                            .background(Color(argb), CircleShape).border(1.dp, Am.OnDarkDim, CircleShape))
-                    }
-                }
+            CaptionColours(stringResource(R.string.color), style.color, { onStyle(style.copy(color = it)) }) {
+                state.fullColor = FullColor(style.color) { color, _ -> onStyle(style.copy(color = color)) }
             }
             Line(stringResource(R.string.caption_position)) {
                 Choices(CaptionPosition.entries.map { stringResource(it.labelRes()) }, style.position.ordinal) { onStyle(style.copy(position = CaptionPosition.entries[it])) }
             }
             Line(stringResource(R.string.caption_outline)) { ThinSwitch(style.outline) { onStyle(style.copy(outline = it)) } }
+            if (style.outline) {
+                Line(stringResource(R.string.caption_outline_thickness)) {
+                    Steps(style.outlineThickness, 0..50, 1, "${style.outlineThickness}") { onStyle(style.copy(outlineThickness = it)) }
+                }
+                CaptionColours(stringResource(R.string.caption_outline_color), style.outlineColor, { onStyle(style.copy(outlineColor = it)) }) {
+                    state.fullColor = FullColor(style.outlineColor) { color, _ -> onStyle(style.copy(outlineColor = color)) }
+                }
+            }
             }
             Spacer(Modifier.height(16.dp))
         }
@@ -344,6 +353,23 @@ private fun SetupScreen(
                 Text(message, Modifier.fillMaxWidth().padding(bottom = 8.dp), color = Warning, fontSize = 13.sp, lineHeight = 17.sp, maxLines = 2)
             }
             Action(stringResource(R.string.caption_generate), Modifier.fillMaxWidth(), primary = true, onClick = onGenerate)
+        }
+    }
+}
+
+@Composable
+private fun CaptionColours(label: String, color: Int, onColor: (Int) -> Unit, onCustom: () -> Unit) {
+    Column(Modifier.fillMaxWidth().padding(vertical = 6.dp)) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Text(label, Modifier.weight(1f), color = Am.OnDark, fontSize = 14.sp)
+            Text(stringResource(R.string.caption_custom_color), Modifier.clickable(onClick = onCustom).padding(4.dp), color = Am.Accent, fontSize = 13.sp)
+        }
+        Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(top = 6.dp), horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
+            for (argb in Swatches) {
+                Box(Modifier.size(28.dp).clip(CircleShape).buttonLabel(colourText(argb)).clickable { onColor(argb) }
+                    .border(2.dp, if (argb == color) Am.Accent else Color.Transparent, CircleShape).padding(4.dp)
+                    .background(Color(argb), CircleShape).border(1.dp, Am.OnDarkDim, CircleShape))
+            }
         }
     }
 }
@@ -376,7 +402,7 @@ private fun PreviewSample(style: CaptionStyle, library: FontLibrary?) {
             color = Color(style.color),
             fontSize = (style.sizePercent / 100f * 16f).sp,
             fontFamily = app.absentmotion.platform.fontFamily(fonts, style.font),
-            style = androidx.compose.ui.text.TextStyle(shadow = if (style.outline) androidx.compose.ui.graphics.Shadow(Color.Black, blurRadius = 4f) else null),
+            style = androidx.compose.ui.text.TextStyle(shadow = if (style.outline) androidx.compose.ui.graphics.Shadow(Color(style.outlineColor), blurRadius = style.outlineThickness.toFloat()) else null),
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
             maxLines = 2,

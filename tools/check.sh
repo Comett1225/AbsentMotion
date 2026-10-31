@@ -65,6 +65,9 @@ sh tools/cutout_clean.sh >"$dir/cutout-clean.log" 2>&1 || { tail -n 15 "$dir/cut
 sh tools/textanim.sh >"$dir/textanim.log" 2>&1 || { tail -n 15 "$dir/textanim.log" >&2; fail "the text animation host tests"; }
 sh tools/particles.sh >"$dir/particles.log" 2>&1 || { tail -n 15 "$dir/particles.log" >&2; fail "the particle host tests"; }
 sh tools/warp.sh >"$dir/warp.log" 2>&1 || { tail -n 15 "$dir/warp.log" >&2; fail "the path and puppet warp host tests"; }
+if [ "$(uname -s)" = Darwin ] && [ "$(uname -m)" = arm64 ]; then
+    python3 tools/pieces3d_check.py >"$dir/pieces3d.log" 2>&1 || { tail -n 15 "$dir/pieces3d.log" >&2; fail "the 3D pieces host tests"; }
+fi
 python3 tools/puppet_check.py >"$dir/puppet.log" 2>&1 || { tail -n 15 "$dir/puppet.log" >&2; fail "the Puppet Pin checks against the host engine"; }
 python3 tools/crop_check.py >"$dir/crop.log" 2>&1 || { tail -n 15 "$dir/crop.log" >&2; fail "the Crop checks against the host engine"; }
 sh tools/pivot.sh --lib >"$dir/pivot.log" 2>&1 || { tail -n 15 "$dir/pivot.log" >&2; fail "the host engine library for the pivot tests"; }

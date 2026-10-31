@@ -1932,6 +1932,54 @@
     }
    }
   },
+  "fracture3d": {
+   "description": "レイヤーを動く3Dの破片に分割します。",
+   "name": "3Dフラクチャー",
+   "params": {
+    "depthPush": {
+     "label": "奥行きへの押し出し"
+    },
+    "direction": {
+     "label": "方向"
+    },
+    "fade": {
+     "label": "フェードアウト"
+    },
+    "force": {
+     "label": "力"
+    },
+    "gravity": {
+     "label": "重力"
+    },
+    "impact": {
+     "label": "衝突点"
+    },
+    "intensity": {
+     "label": "光の強さ"
+    },
+    "light": {
+     "label": "光の方向"
+    },
+    "pieces": {
+     "label": "破片数"
+    },
+    "progress": {
+     "label": "進行度"
+    },
+    "seed": {
+     "label": "シード"
+    },
+    "spin": {
+     "label": "スピン"
+    },
+    "spread": {
+     "label": "方向の広がり"
+    },
+    "thickness": {
+     "label": "厚さ"
+    }
+   }
+  },
   "fringeclean": {
    "description": "レイヤーのマット境界沿いのピクセルから色を抜き、キーで残った色付きハローをグレーへフェードさせます。保護した最大3色はそのまま残ります。",
    "name": "マットフリンジ",
@@ -3495,6 +3543,9 @@
     "count": {
      "label": "個数"
     },
+    "depth": {
+     "label": "奥行き"
+    },
     "direction": {
      "label": "方向"
     },
@@ -3574,6 +3625,9 @@
       "モーションに追従"
      ]
     },
+    "perspective": {
+     "label": "パースペクティブ"
+    },
     "position": {
      "label": "エミッター位置"
     },
@@ -3627,6 +3681,12 @@
     },
     "wind": {
      "label": "風"
+    },
+    "zSpeed": {
+     "label": "Z速度"
+    },
+    "zSpread": {
+     "label": "Z方向の広がり"
     }
    },
    "presets": {
@@ -4522,6 +4582,77 @@
     },
     "spacing": {
      "label": "線の間隔"
+    }
+   }
+  },
+  "scatter3d": {
+   "description": "レイヤーを散らばった3Dの小片のグリッドに変えます。",
+   "name": "3D散布",
+   "params": {
+    "axis": {
+     "label": "ねじれ軸",
+     "options": [
+      "X",
+      "Y",
+      "Z"
+     ]
+    },
+    "depth": {
+     "label": "グリッドの奥行き"
+    },
+    "depthSpacing": {
+     "label": "奥行きの間隔"
+    },
+    "intensity": {
+     "label": "光の強さ"
+    },
+    "light": {
+     "label": "光の方向"
+    },
+    "lightHeight": {
+     "label": "光の高さ"
+    },
+    "perspective": {
+     "label": "パースペクティブ"
+    },
+    "rotX": {
+     "label": "X回転"
+    },
+    "rotY": {
+     "label": "Y回転"
+    },
+    "rotZ": {
+     "label": "Z回転"
+    },
+    "scatter": {
+     "label": "散布"
+    },
+    "seed": {
+     "label": "シード"
+    },
+    "shading": {
+     "label": "陰影"
+    },
+    "shape": {
+     "label": "形状",
+     "options": [
+      "立方体",
+      "球",
+      "正方形",
+      "円"
+     ]
+    },
+    "size": {
+     "label": "小片の大きさ"
+    },
+    "spacing": {
+     "label": "グリッドの間隔"
+    },
+    "spin": {
+     "label": "散布の回転"
+    },
+    "twist": {
+     "label": "ねじれ角度"
     }
    }
   },
@@ -5953,6 +6084,47 @@
     },
     "wobble": {
      "label": "揺れ"
+    }
+   }
+  },
+  "videofeedback": {
+   "description": "カメラを自分の画面に向けたように、レイヤーを内側に繰り返し描画します。レイヤーを移動、拡大縮小、回転してトンネルを操作できます。",
+   "name": "ビデオフィードバック",
+   "params": {
+    "blend": {
+     "label": "ブレンド",
+     "options": [
+      "通常",
+      "加算",
+      "スクリーン"
+     ]
+    },
+    "center": {
+     "label": "中心"
+    },
+    "copies": {
+     "label": "コピー数"
+    },
+    "delay": {
+     "label": "遅延"
+    },
+    "fade": {
+     "label": "フェード"
+    },
+    "hueShift": {
+     "label": "色相シフト"
+    },
+    "offset": {
+     "label": "オフセット"
+    },
+    "rotation": {
+     "label": "回転"
+    },
+    "useLayerTransform": {
+     "label": "レイヤーの変形を使用"
+    },
+    "zoom": {
+     "label": "ズーム"
     }
    }
   },

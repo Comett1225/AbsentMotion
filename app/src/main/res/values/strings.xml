@@ -90,6 +90,7 @@
     <string name="one_absproj_package_with_the_project">One .absproj package with the project and the original media it uses, saved to Documents/AbsentMotion. Keep it as a backup or move the project to another phone.</string>
     <string name="project_bundle">Project Bundle</string>
     <string name="project_home_page">Project home page</string>
+    <string name="about_website">Website and guide</string>
     <string name="open_source_licences">Open source licenses</string>
     <string name="stop">Stop</string>
     <string name="damaged_restore_a_version">Damaged — restore a version</string>
@@ -778,9 +779,6 @@
     <string name="export_problem_android">%1$s with %2$s needs Android %3$s or newer.</string>
     <string name="export_reason_webp_lossless">Lossless WebP needs Android 10 or newer. Choose PNG to keep every pixel.</string>
     <string name="export_verify_middle_frame">The middle of the video does not look like the project. It may be black or frozen.</string>
-    <string name="export_stop_title">Stop the export?</string>
-    <string name="export_stop_text">The unfinished file will be deleted.</string>
-    <string name="export_keep_going">Keep exporting</string>
     <string name="export_running_leave">You can switch to other apps while the export runs.</string>
     <string name="export_notify_channel">Exports</string>
     <string name="export_notify_done">Export finished</string>
@@ -2013,4 +2011,23 @@
     <string name="prerender_playing">Pre-rendered</string>
     <string name="prerender_outdated">The pre-render is out of date.</string>
     <string name="prerender_again">Pre-render again</string>
+    <string name="caption_outline_thickness">Thickness</string>
+    <string name="caption_outline_color">Outline color</string>
+    <string name="caption_custom_color">Custom</string>
+    <string name="multi_animation">Animate all</string>
+    <string name="multi_presets">Apply preset</string>
+    <string name="multi_no_cut">No cuts between selected layers</string>
+    <plurals name="multi_applied_count">
+        <item quantity="one">Applied to %1$s layer</item>
+        <item quantity="other">Applied to %1$s layers</item>
+    </plurals>
+    <plurals name="multi_transition_count">
+        <item quantity="one">%1$s cut</item>
+        <item quantity="other">%1$s cuts</item>
+    </plurals>
+    <string name="layer_tool_screenshot">Screenshot</string>
+    <string name="structure_svg_importing">Importing the SVG…</string>
+    <string name="screenshot_saved">Saved to the gallery and added as a new layer</string>
+    <string name="screenshot_failed">The screenshot could not be made</string>
+    <string name="screenshot_outside">Move the playhead onto the clip first</string>
 </resources>

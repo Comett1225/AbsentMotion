@@ -149,4 +149,12 @@ class VectorPathsTest {
         assertEquals(moved.map { c -> c.knots.map { it.p } }, after.map { c -> c.knots.map { it.p } })
         assertEquals(4, icon.withContours(moved).node.child("path")!!.children.count { it.name == "contour" })
     }
+
+    @Test fun pathNumbersMatchFormattedText() {
+        fun old(v: Float) = String.format(java.util.Locale.US, "%.4f", v).trimEnd('0').trimEnd('.').let { if (it == "-0" || it.isEmpty()) "0" else it }
+        val random = java.util.Random(7)
+        val values = listOf(0f, -0f, 1f, -1f, 100f, 0.5f, -0.03125f, 0.03125f, 0.00005f, -0.00004f, 1234.5678f, 99999.99f, 1e-6f) +
+            List(200_000) { (random.nextFloat() - 0.5f) * listOf(1f, 10f, 1000f, 100000f)[it % 4] }
+        for (v in values) assertEquals("$v", old(v), app.absentmotion.model.num(v))
+    }
 }

@@ -83,6 +83,18 @@ These are different from the **Presets** tool of a layer, which keeps your own l
 
 ![The Particles effect: the snow in the preview (1) and its first settings (2).](img/fx-particles.webp)
 
+With **Depth** switched on, particles also fly toward or away from the camera: **Z Speed** moves them in depth, **Z Spread** gives them different starting depths and **Perspective** sets how much smaller far particles look. They then also follow the layer's 3D rotation.
+
+### 3D Scatter, 3D Fracture and Video Feedback
+
+**3D Scatter** (in 3D) turns the layer into a grid of small cubes, spheres, squares or circles that take the layer's colors. **Grid Spacing** and **Piece Size** set the grid, **Grid Depth** adds rows behind it, **Scatter** throws the pieces apart in 3D and **Twist Angle** turns the grid around the **Twist Axis**. The light settings shade the pieces.
+
+**3D Fracture** (in 3D) breaks the layer into glass shards. Animate **Progress** from 0 (whole) to 1 (broken); **Impact Point**, **Force**, **Gravity**, **Spin** and **Depth Push** decide how the shards fly.
+
+Both follow the layer's own 3D rotation, its parent's and the camera. Their pieces sit in front of and behind each other, but not in front of or behind other layers (that comes with real 3D in 5.0).
+
+**Video Feedback** (in Repeat) draws the layer inside itself again and again, like a camera pointed at its own screen. **Zoom**, **Rotation** and **Offset** set each step; with **Use Layer Transform** on, moving, scaling or turning the layer steers the tunnel. **Fade** and **Hue Shift** change each copy, and **Delay** makes the inner copies follow the layer's animation a moment later.
+
 ## Tips
 
 - If the preview gets slow with many effects, switch **Preview Quality** to Half or Quarter. The export is not affected.

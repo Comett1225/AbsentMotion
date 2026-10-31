@@ -58,7 +58,7 @@ The **Language** row shows the current language and opens the list of the 17 lan
 
 - **Help** opens this guide inside the app, without a connection.
 - **Start the tutorial** starts a 5-minute tour. You make a short animation in a practice project, so your own projects stay untouched. If you leave the tour half way, the row becomes **Continue the tutorial** and a second row, **Start the tutorial again**, appears. The home screen also offers the tour until you choose **Don't ask again**.
-- **About** shows the version, the license (Apache License 2.0), a note that AbsentMotion is an independent project, **Open source licenses** (the full license text of every library the app uses) and the **Project home page** address.
+- **About** shows the version, the license (Apache License 2.0), a note that AbsentMotion is an independent project, **Open source licenses** (the full license text of every library the app uses) and two links that open in your web browser: **Project home page** (the GitHub repository) and **Website and guide** (the AbsentMotion website with this guide).
 - **Report issue** (the underlined link under **About**) opens the bug report form in your web browser.
 - **Crash logs** lists the crashes the app recorded. Tap one to read it and use **Copy** to copy it, for example to send with a bug report. See [Troubleshooting](@troubleshooting).
 - **Check for a new version each time the app opens.** The app asks you once whether it may do this. If it is on, the app makes one request to GitHub for the latest version number when it opens. It sends nothing else and never downloads or installs anything by itself.

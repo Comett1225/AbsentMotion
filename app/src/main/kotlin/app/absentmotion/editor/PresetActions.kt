@@ -57,6 +57,9 @@ fun EditorState.applyPreset(preset: SavedPreset) {
     edit { s -> s.update(id) { applyPreset(it, from, preset.id) } }
 }
 
+internal fun Scene.applyPresetToLayers(ids: Set<Long>, preset: Layer, presetId: String? = null): Scene =
+    layers.filter { it.id in ids }.fold(this) { scene, layer -> scene.update(layer.id) { applyPreset(it, preset, presetId) } }
+
 fun applyPreset(target: Layer, preset: Layer, presetId: String? = null): Layer {
     val retimed = target.withPresetSpeed(preset)
     val p = preset.node

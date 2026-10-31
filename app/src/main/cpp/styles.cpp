@@ -548,6 +548,7 @@ struct Override {
     SkBlendMode mode = SkBlendMode::kSrcOver;
     bool unitOpacity = false;
     bool echoed = false;
+    bool feedback = false;
     bool shuttered = false;
     float alpha = 1;
 };
@@ -822,6 +823,10 @@ particles::Settings ParticleSettings(const LayerEffect& e, float t) {
     s.beatEvery = 1 << pick("beats", 2);
     s.follow = pick("orientation", 1) == 1;
     s.prewarm = v("prewarm", 1) >= 0.5f;
+    s.depth = v("depth", 0) >= 0.5f;
+    s.zSpeed = v("zSpeed", 0);
+    s.zSpread = v("zSpread", 0);
+    s.perspective = v("perspective", 1);
     s.rate = v("rate", 40);
     s.count = v("count", 100);
     s.start = v("start", 0);
@@ -1072,6 +1077,16 @@ void DrawParticles(SkCanvas* canvas, const std::vector<Layer>& siblings, const L
         *x = a.fX + (b.fX - a.fX) * w;
         *y = a.fY + (b.fY - a.fY) * w;
     };
+    std::unordered_map<int64_t, SkM44> orientations;
+    if (Setting(e, "depth", t, 0) >= 0.5f) field.orient = [&](double born, float* out) {
+        const int64_t k = (int64_t)std::floor(born / step);
+        auto found = orientations.find(k);
+        if (found == orientations.end()) {
+            const Placement p = Effective(siblings, l, l.startTime + k * step * 1000, 0);
+            found = orientations.emplace(k, Turn(p.rotation) * p.tilt * Turn(-p.rotation)).first;
+        }
+        for (int row = 0; row < 3; row++) for (int col = 0; col < 3; col++) out[row * 3 + col] = found->second.rc(row, col);
+    };
     std::vector<particles::Particle> list;
     particles::Simulate(field, std::max(0.0, (l.steppedMs(timeMs) - l.startTime) / 1000.0), &list);
     if (list.empty()) return;
@@ -1319,7 +1334,7 @@ float Reach(const std::vector<Layer>& siblings, const Layer& l, double timeMs, d
 
 bool Changing(const LayerEffect& e) {
     if (e.hidden) return false;
-    if (e.id == "absent.shutterblur" || e.id == "absent.motionblur" || e.id == "absent.echo") return false;
+    if (e.id == "absent.shutterblur" || e.id == "absent.motionblur" || e.id == "absent.echo" || e.id == "absent.videofeedback") return false;
     return MotionEffect(e.id) || RepeatEffect(e.id) || TextEffect(e.id) || DrawingEffect(e.id) || e.id == kParticles;
 }
 
@@ -1470,6 +1485,69 @@ void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& 
              const MediaPictures& pictures, const Override& ov) {
     if (!l.activeAt(timeMs) || l.kind == "nullobj" || l.kind == "camera") return;
     if (l.fillType == "media" && !pictures(l.mediaUri, l.id)) return;
+    if (!ov.feedback) for (const LayerEffect& e : l.effects) {
+        if (e.hidden || e.id != "absent.videofeedback") continue;
+        const float t = l.localTime(timeMs);
+        const int count = std::clamp((int)std::lround(Setting(e, "copies", t, 24)), 1, 64);
+        const float zoom = std::clamp(Setting(e, "zoom", t, 0.85f), 0.1f, 1.5f);
+        const float rotation = Setting(e, "rotation", t, 0);
+        const float fade = std::clamp(Setting(e, "fade", t, 0.9f), 0.0f, 1.0f);
+        const float hue = Setting(e, "hueShift", t, 0), delay = std::clamp(Setting(e, "delay", t, 0), 0.0f, 1.0f);
+        const int blend = std::clamp((int)std::lround(Setting(e, "blend", t, 0)), 0, 2);
+        const SkMatrix placed = SiblingMatrix(siblings, l, timeMs);
+        const SkPoint centre = placed.mapPoint({Setting(e, "center", t, 0, 0), Setting(e, "center", t, 0, 1)});
+        float sx = zoom, sy = zoom, turn = rotation;
+        SkVector offset = {Setting(e, "offset", t, 0, 0), Setting(e, "offset", t, 0, 1)};
+        if (Setting(e, "useLayerTransform", t, 1) >= 0.5f) {
+            const Placement p = Effective(siblings, l, timeMs, 0);
+            sx *= p.scale.fX;
+            sy *= p.scale.fY;
+            turn += p.rotation;
+            offset += p.location - SkPoint{gScene ? gScene->width / 2.0f : 0, gScene ? gScene->height / 2.0f : 0};
+        }
+        SkMatrix step = SkMatrix::Translate(centre.fX + offset.fX, centre.fY + offset.fY);
+        step.preRotate(turn);
+        step.preScale(sx, sy);
+        step.preTranslate(-centre.fX, -centre.fY);
+        std::vector<SkMatrix> matrices;
+        matrices.reserve(count);
+        SkMatrix current = SkMatrix::I();
+        float alpha = 1;
+        const SkRect bounds = BodyPath(l, t).getBounds();
+        const float extent = std::max(bounds.width(), bounds.height());
+        SkRect reach = placed.mapRect(bounds);
+        reach.outset(std::max(reach.width(), reach.height()) * 0.5f + 64, std::max(reach.width(), reach.height()) * 0.5f + 64);
+        const float shrink = std::max(std::fabs(sx), std::fabs(sy));
+        for (int i = 1; i <= count; i++) {
+            alpha *= fade;
+            if (alpha < 1.0f / 255 || (shrink < 1 && extent * std::pow(shrink, i) < 1)) break;
+            current = SkMatrix::Concat(step, current);
+            matrices.push_back(current);
+        }
+        Override plain = ov;
+        plain.feedback = true;
+        const bool inward = shrink < 1;
+        if (inward) DrawOne(canvas, siblings, l, timeMs, pictures, plain);
+        const int n = (int)matrices.size();
+        for (int k = 0; k < n; k++) {
+            const int i = inward ? k + 1 : n - k;
+            const float a = hue * i * kRadians, c = std::cos(a), s = std::sin(a) / std::sqrt(3.0f), q = (1 - c) / 3;
+            const float colors[20] = {c+q, q-s, q+s, 0, 0, q+s, c+q, q-s, 0, 0, q-s, q+s, c+q, 0, 0, 0, 0, 0, 1, 0};
+            SkPaint paint;
+            paint.setAlphaf(std::pow(fade, i));
+            if (hue != 0) paint.setColorFilter(SkColorFilters::Matrix(colors));
+            paint.setBlendMode(blend == 1 ? SkBlendMode::kPlus : blend == 2 ? SkBlendMode::kScreen : SkBlendMode::kSrcOver);
+            const SkRect area = matrices[i - 1].mapRect(reach);
+            canvas->saveLayer(&area, &paint);
+            canvas->concat(matrices[i - 1]);
+            const double at = std::clamp(timeMs - 1000.0 * delay * i, (double)l.startTime, (double)l.endTime);
+            DrawOne(canvas, siblings, l, at, pictures, plain);
+            canvas->restore();
+            if (gBreak) (*gBreak)();
+        }
+        if (!inward) DrawOne(canvas, siblings, l, timeMs, pictures, plain);
+        return;
+    }
     Echo echo;
     if (!ov.echoed && EchoOf(l, timeMs, &echo)) {
         Override plain = ov;

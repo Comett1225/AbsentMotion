@@ -38,7 +38,7 @@ static std::vector<Particle> at(const Field& f, double seconds) {
 static bool same(const std::vector<Particle>& a, const std::vector<Particle>& b) {
     if (a.size() != b.size()) return false;
     for (size_t i = 0; i < a.size(); i++) {
-        if (a[i].key != b[i].key || a[i].x != b[i].x || a[i].y != b[i].y || a[i].angle != b[i].angle || a[i].size != b[i].size ||
+        if (a[i].key != b[i].key || a[i].x != b[i].x || a[i].y != b[i].y || a[i].z != b[i].z || a[i].angle != b[i].angle || a[i].size != b[i].size ||
             a[i].alpha != b[i].alpha || a[i].r != b[i].r || a[i].frame != b[i].frame) return false;
     }
     return true;
@@ -159,6 +159,30 @@ int main() {
         check(at(b, 0.9).empty(), "beat particles wait for the beat in layer time");
         check(at(b, 1.2).size() == 20, "each beat sends its count");
         check(at(b, 2.1).empty(), "beat particles end with their lifetime");
+    }
+    {
+        Settings depth = snow;
+        depth.depth = true;
+        depth.zSpeed = 100;
+        depth.zSpread = 200;
+        depth.perspective = 1;
+        Field d = field(depth);
+        const auto first = at(d, 4.25);
+        at(d, 8);
+        check(!first.empty() && same(first, at(d, 4.25)), "depth is deterministic");
+        bool sorted = true, changed = false;
+        for (size_t i = 1; i < first.size(); i++) sorted &= first[i - 1].z >= first[i].z;
+        for (const Particle& p : first) changed |= p.z != 0 && p.size != 1;
+        check(sorted && changed, "depth projects particles and sorts far to near");
+        depth.perspective = 0;
+        const auto flat = at(field(depth), 4.25);
+        check(!same(first, flat), "perspective changes projected particles");
+        d.orient = [](double, float* m) { m[0] = 0; m[2] = 1; m[6] = -1; m[8] = 0; };
+        check(!same(first, at(d, 4.25)), "tilt rotates depth motion");
+        depth.depth = false;
+        d = field(depth);
+        d.orient = [](double, float* m) { m[0] = 0; m[2] = 1; m[6] = -1; m[8] = 0; };
+        check(same(at(d, 4.25), at(f, 4.25)), "depth off keeps the old simulation");
     }
     if (failures) {
         printf("%d particle checks failed\n", failures);

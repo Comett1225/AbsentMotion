@@ -1932,6 +1932,54 @@
     }
    }
   },
+  "fracture3d": {
+   "description": "لایه را به قطعات سه‌بعدی متحرک می‌شکند.",
+   "name": "شکست سه‌بعدی",
+   "params": {
+    "depthPush": {
+     "label": "رانش عمق"
+    },
+    "direction": {
+     "label": "جهت"
+    },
+    "fade": {
+     "label": "محو خروج"
+    },
+    "force": {
+     "label": "نیرو"
+    },
+    "gravity": {
+     "label": "گرانش"
+    },
+    "impact": {
+     "label": "نقطه برخورد"
+    },
+    "intensity": {
+     "label": "شدت نور"
+    },
+    "light": {
+     "label": "جهت نور"
+    },
+    "pieces": {
+     "label": "قطعات"
+    },
+    "progress": {
+     "label": "پیشرفت"
+    },
+    "seed": {
+     "label": "بذر"
+    },
+    "spin": {
+     "label": "چرخش"
+    },
+    "spread": {
+     "label": "پراکندگی جهت"
+    },
+    "thickness": {
+     "label": "ضخامت"
+    }
+   }
+  },
   "fringeclean": {
    "description": "رنگ پیکسل‌های لبه مات لایه را می‌زداید تا هاله‌های رنگی جا مانده از کروما کی خاکستری شوند و تا سه رنگ محافظت‌شده بدون تغییر بمانند.",
    "name": "لبه مات",
@@ -3495,6 +3543,9 @@
     "count": {
      "label": "تعداد"
     },
+    "depth": {
+     "label": "عمق"
+    },
     "direction": {
      "label": "جهت"
     },
@@ -3574,6 +3625,9 @@
       "پیروی از حرکت"
      ]
     },
+    "perspective": {
+     "label": "پرسپکتیو"
+    },
     "position": {
      "label": "موقعیت منبع انتشار"
     },
@@ -3627,6 +3681,12 @@
     },
     "wind": {
      "label": "باد"
+    },
+    "zSpeed": {
+     "label": "سرعت Z"
+    },
+    "zSpread": {
+     "label": "پراکندگی Z"
     }
    },
    "presets": {
@@ -4522,6 +4582,77 @@
     },
     "spacing": {
      "label": "فاصله خطوط"
+    }
+   }
+  },
+  "scatter3d": {
+   "description": "لایه را به شبکه‌ای از قطعات سه‌بعدی پراکنده تبدیل می‌کند.",
+   "name": "پراکندگی سه‌بعدی",
+   "params": {
+    "axis": {
+     "label": "محور پیچش",
+     "options": [
+      "X",
+      "Y",
+      "Z"
+     ]
+    },
+    "depth": {
+     "label": "عمق شبکه"
+    },
+    "depthSpacing": {
+     "label": "فاصله عمق"
+    },
+    "intensity": {
+     "label": "شدت نور"
+    },
+    "light": {
+     "label": "جهت نور"
+    },
+    "lightHeight": {
+     "label": "ارتفاع نور"
+    },
+    "perspective": {
+     "label": "پرسپکتیو"
+    },
+    "rotX": {
+     "label": "چرخش X"
+    },
+    "rotY": {
+     "label": "چرخش Y"
+    },
+    "rotZ": {
+     "label": "چرخش Z"
+    },
+    "scatter": {
+     "label": "پراکندگی"
+    },
+    "seed": {
+     "label": "بذر"
+    },
+    "shading": {
+     "label": "سایه‌زنی"
+    },
+    "shape": {
+     "label": "شکل",
+     "options": [
+      "مکعب",
+      "کره",
+      "مربع",
+      "دایره"
+     ]
+    },
+    "size": {
+     "label": "اندازه قطعه"
+    },
+    "spacing": {
+     "label": "فاصله شبکه"
+    },
+    "spin": {
+     "label": "چرخش پراکندگی"
+    },
+    "twist": {
+     "label": "زاویه پیچش"
     }
    }
   },
@@ -5953,6 +6084,47 @@
     },
     "wobble": {
      "label": "لرزش"
+    }
+   }
+  },
+  "videofeedback": {
+   "description": "لایه را بارها درون خودش رسم می‌کند، مانند دوربینی که به صفحه خودش نشانه رفته است. برای هدایت تونل، لایه را جابه‌جا کنید، تغییر اندازه دهید یا بچرخانید.",
+   "name": "بازخورد ویدیو",
+   "params": {
+    "blend": {
+     "label": "ترکیب",
+     "options": [
+      "عادی",
+      "افزودن",
+      "صفحه"
+     ]
+    },
+    "center": {
+     "label": "مرکز"
+    },
+    "copies": {
+     "label": "نسخه‌ها"
+    },
+    "delay": {
+     "label": "تأخیر"
+    },
+    "fade": {
+     "label": "محو"
+    },
+    "hueShift": {
+     "label": "جابه‌جایی هیو"
+    },
+    "offset": {
+     "label": "افست"
+    },
+    "rotation": {
+     "label": "چرخش"
+    },
+    "useLayerTransform": {
+     "label": "استفاده از تبدیل لایه"
+    },
+    "zoom": {
+     "label": "بزرگ‌نمایی"
     }
    }
   },

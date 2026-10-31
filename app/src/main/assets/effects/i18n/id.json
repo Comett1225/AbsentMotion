@@ -1932,6 +1932,54 @@
     }
    }
   },
+  "fracture3d": {
+   "description": "Memecah lapisan menjadi pecahan 3D yang bergerak.",
+   "name": "Pecahan 3D",
+   "params": {
+    "depthPush": {
+     "label": "Dorongan kedalaman"
+    },
+    "direction": {
+     "label": "Arah"
+    },
+    "fade": {
+     "label": "Fade Keluar"
+    },
+    "force": {
+     "label": "Gaya"
+    },
+    "gravity": {
+     "label": "Gravitasi"
+    },
+    "impact": {
+     "label": "Titik benturan"
+    },
+    "intensity": {
+     "label": "Intensitas cahaya"
+    },
+    "light": {
+     "label": "Arah cahaya"
+    },
+    "pieces": {
+     "label": "Pecahan"
+    },
+    "progress": {
+     "label": "Progres"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "spin": {
+     "label": "Putaran"
+    },
+    "spread": {
+     "label": "Sebaran arah"
+    },
+    "thickness": {
+     "label": "Ketebalan"
+    }
+   }
+  },
   "fringeclean": {
    "description": "Menghilangkan warna dari piksel di sepanjang tepi matte lapisan, sehingga halo berwarna sisa key memudar jadi abu-abu, sementara hingga tiga warna yang dilindungi tetap utuh.",
    "name": "Tepi Matte",
@@ -3495,6 +3543,9 @@
     "count": {
      "label": "Jumlah"
     },
+    "depth": {
+     "label": "Kedalaman"
+    },
     "direction": {
      "label": "Arah"
     },
@@ -3574,6 +3625,9 @@
       "Ikuti Gerakan"
      ]
     },
+    "perspective": {
+     "label": "Perspektif"
+    },
     "position": {
      "label": "Posisi Pemancar"
     },
@@ -3627,6 +3681,12 @@
     },
     "wind": {
      "label": "Angin"
+    },
+    "zSpeed": {
+     "label": "Kecepatan Z"
+    },
+    "zSpread": {
+     "label": "Sebaran Z"
     }
    },
    "presets": {
@@ -4522,6 +4582,77 @@
     },
     "spacing": {
      "label": "Jarak antargaris"
+    }
+   }
+  },
+  "scatter3d": {
+   "description": "Mengubah lapisan menjadi kisi kepingan 3D yang tersebar.",
+   "name": "Sebaran 3D",
+   "params": {
+    "axis": {
+     "label": "Sumbu putaran",
+     "options": [
+      "X",
+      "Y",
+      "Z"
+     ]
+    },
+    "depth": {
+     "label": "Kedalaman kisi"
+    },
+    "depthSpacing": {
+     "label": "Jarak kedalaman"
+    },
+    "intensity": {
+     "label": "Intensitas cahaya"
+    },
+    "light": {
+     "label": "Arah cahaya"
+    },
+    "lightHeight": {
+     "label": "Tinggi cahaya"
+    },
+    "perspective": {
+     "label": "Perspektif"
+    },
+    "rotX": {
+     "label": "Rotasi X"
+    },
+    "rotY": {
+     "label": "Rotasi Y"
+    },
+    "rotZ": {
+     "label": "Rotasi Z"
+    },
+    "scatter": {
+     "label": "Sebaran"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "shading": {
+     "label": "Pencahayaan"
+    },
+    "shape": {
+     "label": "Bentuk",
+     "options": [
+      "Kubus",
+      "Bola",
+      "Kotak",
+      "Lingkaran"
+     ]
+    },
+    "size": {
+     "label": "Ukuran kepingan"
+    },
+    "spacing": {
+     "label": "Jarak kisi"
+    },
+    "spin": {
+     "label": "Rotasi sebaran"
+    },
+    "twist": {
+     "label": "Sudut putaran"
     }
    }
   },
@@ -5953,6 +6084,47 @@
     },
     "wobble": {
      "label": "Goyangan"
+    }
+   }
+  },
+  "videofeedback": {
+   "description": "Menggambar lapisan di dalam dirinya berulang kali, seperti kamera yang diarahkan ke layarnya sendiri. Geser, ubah ukuran, atau putar lapisan untuk mengarahkan terowongan.",
+   "name": "Umpan balik video",
+   "params": {
+    "blend": {
+     "label": "Blending",
+     "options": [
+      "Normal",
+      "Tambah",
+      "Screen"
+     ]
+    },
+    "center": {
+     "label": "Pusat"
+    },
+    "copies": {
+     "label": "Salinan"
+    },
+    "delay": {
+     "label": "Jeda"
+    },
+    "fade": {
+     "label": "Pudar"
+    },
+    "hueShift": {
+     "label": "Pergeseran Hue"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "rotation": {
+     "label": "Rotasi"
+    },
+    "useLayerTransform": {
+     "label": "Gunakan transformasi lapisan"
+    },
+    "zoom": {
+     "label": "Zoom"
     }
    }
   },

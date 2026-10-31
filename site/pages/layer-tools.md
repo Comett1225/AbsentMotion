@@ -24,7 +24,7 @@ The large buttons come in two pages. Swipe the grid sideways to go from one page
 
 A photo or video is a rectangle with a picture fill, so it has the same tools as a shape.
 
-The table lists page 1. Page 2 holds **Crop** for every layer you can see except a 3D model: shapes, text, drawings, groups, photos and videos. A video clip has three more buttons there: **AI**, **Auto Captions** and **Reverse**. Audio, camera, null and 3D model layers have a single page.
+The table lists page 1. Page 2 holds **Crop** for every layer you can see except a 3D model: shapes, text, drawings, groups, photos and videos. A video clip has four more buttons there: **AI**, **Auto Captions**, **Reverse** and **Screenshot**. Audio, camera, null and 3D model layers have a single page.
 
 ![The second page of a video's tool grid: Crop (1), AI (2), Auto Captions (3) and Reverse (4).](img/lt-grid-2.webp)
 
@@ -36,7 +36,7 @@ Tap any number box to open the number pad. The first tap selects the whole value
 
 ### Transform
 
-Tabs on the right: **Move**, **Rotate**, **Size**, **Tilt**, **Skew**, **Pivot**. A camera has only Move, Rotate and Size. Hold **Transform** in the tools, or open **More**, to switch between **Basic Controls** (Move, Rotate, Size and Skew) and **Advanced Controls** (all six tabs, the default).
+Tabs on the right: **Move**, **Rotate**, **Size**, **Tilt**, **Skew**, **Pivot**. A camera has only Move, Rotate and Size. Hold **Transform** in the tools, or open **More**, to switch between **Basic Controls** (Move, Rotate, Size and Skew, the default) and **Advanced Controls** (all six tabs).
 
 - **Move.** A trackpad ("Drag here to move the layer") and X and Y boxes. Tap **Z** to move the layer along the depth axis. Thin red guides show when the layer lines up with the canvas or another layer.
 - **Rotate.** A dial: drag the knob around or tap the degrees to type. When the layer is tilted in 3D, this tab becomes a 3D trackpad: one finger tilts, two fingers twist.
@@ -96,9 +96,11 @@ See [Camera layers and 3D](@camera-3d).
 
 For sound and for videos. See [Audio](@audio).
 
-### AI, Auto Captions and Reverse
+### AI, Auto Captions, Reverse and Screenshot
 
-These three buttons are on page 2 of a video clip's grid. **AI** opens the AI category of the Effects Library (an audio layer has the same button on its only page). **Auto Captions** makes captions for this clip alone: see [AI tools](@ai-tools). **Reverse** plays the clip backwards: see [Media](@media).
+These four buttons are on page 2 of a video clip's grid (a GIF counts as a video). **AI** opens the AI category of the Effects Library (an audio layer has the same button on its only page). **Auto Captions** makes captions for this clip alone: see [AI tools](@ai-tools). **Reverse** plays the clip backwards: see [Media](@media).
+
+**Screenshot** saves the clip's frame under the playhead as a picture, at the clip's own full size. It is the plain footage: effects, crop, borders and the layer's position are left out, while trims, speed changes and Reverse are followed. The picture goes to the phone's gallery (Pictures/AbsentMotion) and is added to the project as a new layer above the clip. If you delete that new layer within 10 seconds, the picture is also removed from the gallery. The playhead must be on the clip.
 
 ### Effects and Presets
 

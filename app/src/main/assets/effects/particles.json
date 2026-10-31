@@ -256,6 +256,58 @@
    ]
   },
   {
+   "id": "depth",
+   "label": "Depth",
+   "type": "switch",
+   "default": false,
+   "legacyDefault": false
+  },
+  {
+   "id": "zSpeed",
+   "label": "Z Speed",
+   "type": "float",
+   "default": 0,
+   "legacyDefault": 0,
+   "min": -5000,
+   "max": 5000,
+   "step": 1,
+   "when": {
+    "depth": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "zSpread",
+   "label": "Z Spread",
+   "type": "float",
+   "default": 0,
+   "legacyDefault": 0,
+   "min": 0,
+   "max": 5000,
+   "step": 1,
+   "when": {
+    "depth": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "perspective",
+   "label": "Perspective",
+   "type": "float",
+   "default": 1,
+   "legacyDefault": 1,
+   "min": 0,
+   "max": 10,
+   "step": 0.01,
+   "when": {
+    "depth": [
+     1
+    ]
+   }
+  },
+  {
    "id": "more",
    "label": "More Settings",
    "type": "switch",

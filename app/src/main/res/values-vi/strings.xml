@@ -757,9 +757,6 @@
     <string name="export_problem_android">%1$s với %2$s cần Android %3$s trở lên.</string>
     <string name="export_reason_webp_lossless">WebP không mất dữ liệu cần Android 10 trở lên. Hãy chọn PNG để giữ mọi điểm ảnh.</string>
     <string name="export_verify_middle_frame">Phần giữa của video trông không giống dự án. Có thể là màu đen hoặc bị đứng hình.</string>
-    <string name="export_stop_title">Dừng xuất?</string>
-    <string name="export_stop_text">Tệp chưa hoàn tất sẽ bị xóa.</string>
-    <string name="export_keep_going">Tiếp tục xuất</string>
     <string name="export_running_leave">Bạn có thể chuyển sang ứng dụng khác trong khi xuất.</string>
     <string name="export_notify_channel">Xuất</string>
     <string name="export_notify_done">Xuất hoàn tất</string>
@@ -1960,4 +1957,22 @@
     <string name="prerender_playing">Đã kết xuất trước</string>
     <string name="prerender_outdated">Bản kết xuất trước đã lỗi thời.</string>
     <string name="prerender_again">Kết xuất trước lại</string>
+    <string name="about_website">Trang web và hướng dẫn</string>
+    <string name="caption_outline_thickness">Độ dày</string>
+    <string name="caption_outline_color">Màu viền</string>
+    <string name="caption_custom_color">Tùy chỉnh</string>
+    <string name="multi_animation">Tạo chuyển động cho tất cả</string>
+    <string name="multi_presets">Áp dụng cài đặt sẵn</string>
+    <string name="multi_no_cut">Không có điểm cắt giữa các lớp đã chọn</string>
+    <string name="layer_tool_screenshot">Ảnh chụp màn hình</string>
+    <string name="screenshot_saved">Đã lưu vào thư viện và thêm làm lớp mới</string>
+    <string name="screenshot_failed">Không thể chụp ảnh màn hình</string>
+    <string name="screenshot_outside">Trước tiên hãy di chuyển đầu phát đến đoạn clip</string>
+    <plurals name="multi_applied_count">
+        <item quantity="other">Đã áp dụng cho %1$s lớp</item>
+    </plurals>
+    <plurals name="multi_transition_count">
+        <item quantity="other">%1$s điểm cắt</item>
+    </plurals>
+    <string name="structure_svg_importing">Đang nhập SVG…</string>
 </resources>

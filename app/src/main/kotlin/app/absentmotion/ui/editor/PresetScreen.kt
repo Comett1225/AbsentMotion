@@ -64,6 +64,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.applyPreset
+import app.absentmotion.editor.applyPresetToLayers
+import app.absentmotion.editor.MultiSelect
 import app.absentmotion.engine.PreviewView
 import app.absentmotion.library.PresetStore
 import app.absentmotion.library.SavedPreset
@@ -98,7 +100,8 @@ fun PresetScreen(state: EditorState) {
     var playing by remember { mutableStateOf(false) }
     var pos by remember { mutableIntStateOf(0) }
     var box by remember { mutableStateOf(IntSize.Zero) }
-    val base = remember { state.selectedId?.let { state.scene.layer(it) } }
+    val targets = remember { if (MultiSelect.active) MultiSelect.ids.toSet() else emptySet() }
+    val base = remember { (if (targets.isNotEmpty()) targets.firstOrNull() else state.selectedId)?.let { state.scene.layer(it) } }
     BackHandler { state.presetsOpen = false }
     if (base == null) {
         SideEffect { state.presetsOpen = false }
@@ -143,9 +146,13 @@ fun PresetScreen(state: EditorState) {
             Box(
                 Modifier.align(Alignment.CenterEnd).height(48.dp).width(52.dp).alpha(if (current == null) DimAlpha else 1f)
                     .then(if (current == null) Modifier else Modifier.clickable {
-                        state.applyPreset(current)
+                        if (targets.isEmpty()) state.applyPreset(current) else current.layer?.let { preset ->
+                            state.edit { it.applyPresetToLayers(targets, preset, current.id) }
+                        }
                         state.presetsOpen = false
-                        Toast.makeText(context, context.getString(R.string.preset_applied), Toast.LENGTH_SHORT).show()
+                        val message = if (targets.isEmpty()) context.getString(R.string.preset_applied)
+                            else state.scene.layers.count { it.id in targets }.let { context.resources.getQuantityString(R.plurals.multi_applied_count, it, it.toString()) }
+                        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
                     }),
                 Alignment.Center,
             ) { Text(stringResource(R.string.apply), color = Am.OnDark, fontSize = 18.sp, maxLines = 1) }

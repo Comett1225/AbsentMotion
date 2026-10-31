@@ -2,6 +2,8 @@ package app.absentmotion.ui.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -18,7 +20,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -52,6 +53,7 @@ import app.absentmotion.R
 import app.absentmotion.Tier
 
 internal const val HOME_PAGE ="https://github.com/Comett1225/AbsentMotion"
+private const val WEBSITE = "https://comett1225.github.io/AbsentMotion/"
 internal const val REPORT_FORM = "https://forms.gle/6bY8KBPMKc2iUypV6"
 
 internal const val LICENCES_ASSET = "licenses.txt"
@@ -99,14 +101,24 @@ private fun AboutPage(onClose: () -> Unit, onLicences: () -> Unit) {
                 Icon(HomeIcons.ChevronRight, null, Modifier.size(24.dp), tint = Am.HomeMid)
             }
             Spacer(Modifier.height(24.dp))
-            Text(stringResource(R.string.project_home_page), color = Am.HomeMid, fontSize = 12.sp)
-            SelectionContainer { Text(HOME_PAGE, Modifier.padding(top = 2.dp), color = Am.HomeInk, fontSize = 14.sp) }
+            Link(stringResource(R.string.project_home_page), HOME_PAGE)
+            Spacer(Modifier.height(16.dp))
+            Link(stringResource(R.string.about_website), WEBSITE)
             Spacer(Modifier.height(24.dp))
         }
     }
 }
 
 private val RowShape = RoundedCornerShape(7.dp)
+
+@Composable
+private fun Link(label: String, url: String) {
+    val links = LocalUriHandler.current
+    Column(Modifier.fillMaxWidth().clip(RowShape).clickable { runCatching { links.openUri(url) } }.padding(vertical = 4.dp)) {
+        Text(label, color = Am.HomeMid, fontSize = 12.sp)
+        Text(url, Modifier.padding(top = 2.dp), color = Am.Accent, fontSize = 14.sp, textDecoration = TextDecoration.Underline)
+    }
+}
 
 @Composable
 private fun Body(text: String) = Text(text, color = Am.HomeInk, fontSize = 14.sp, lineHeight = 20.sp)

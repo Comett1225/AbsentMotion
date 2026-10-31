@@ -1932,6 +1932,54 @@
     }
    }
   },
+  "fracture3d": {
+   "description": "Katmanı hareketli 3D parçalara ayırır.",
+   "name": "3D Parçalama",
+   "params": {
+    "depthPush": {
+     "label": "Derinlik itmesi"
+    },
+    "direction": {
+     "label": "Yön"
+    },
+    "fade": {
+     "label": "Solma"
+    },
+    "force": {
+     "label": "Kuvvet"
+    },
+    "gravity": {
+     "label": "Yerçekimi"
+    },
+    "impact": {
+     "label": "Çarpma noktası"
+    },
+    "intensity": {
+     "label": "Işık yoğunluğu"
+    },
+    "light": {
+     "label": "Işık yönü"
+    },
+    "pieces": {
+     "label": "Parçalar"
+    },
+    "progress": {
+     "label": "İlerleme"
+    },
+    "seed": {
+     "label": "Tohum"
+    },
+    "spin": {
+     "label": "Dönüş"
+    },
+    "spread": {
+     "label": "Yön yayılımı"
+    },
+    "thickness": {
+     "label": "Kalınlık"
+    }
+   }
+  },
   "fringeclean": {
    "description": "Katman maskesinin kenarındaki piksellerin rengini alır; anahtarlamadan kalan renkli haleler griye döner, en fazla üç korunan renk ise olduğu gibi kalır.",
    "name": "Mat Kenar Temizliği",
@@ -3495,6 +3543,9 @@
     "count": {
      "label": "Adet"
     },
+    "depth": {
+     "label": "Derinlik"
+    },
     "direction": {
      "label": "Yön"
     },
@@ -3574,6 +3625,9 @@
       "Hareketi takip et"
      ]
     },
+    "perspective": {
+     "label": "Perspektif"
+    },
     "position": {
      "label": "Yayıcı konumu"
     },
@@ -3627,6 +3681,12 @@
     },
     "wind": {
      "label": "Rüzgar"
+    },
+    "zSpeed": {
+     "label": "Z hızı"
+    },
+    "zSpread": {
+     "label": "Z yayılımı"
     }
    },
    "presets": {
@@ -4522,6 +4582,77 @@
     },
     "spacing": {
      "label": "Çizgi aralığı"
+    }
+   }
+  },
+  "scatter3d": {
+   "description": "Katmanı dağılmış 3D parçalardan oluşan bir ızgaraya dönüştürür.",
+   "name": "3D Dağıtma",
+   "params": {
+    "axis": {
+     "label": "Burma ekseni",
+     "options": [
+      "X",
+      "Y",
+      "Z"
+     ]
+    },
+    "depth": {
+     "label": "Izgara derinliği"
+    },
+    "depthSpacing": {
+     "label": "Derinlik aralığı"
+    },
+    "intensity": {
+     "label": "Işık yoğunluğu"
+    },
+    "light": {
+     "label": "Işık yönü"
+    },
+    "lightHeight": {
+     "label": "Işık yüksekliği"
+    },
+    "perspective": {
+     "label": "Perspektif"
+    },
+    "rotX": {
+     "label": "X dönüşü"
+    },
+    "rotY": {
+     "label": "Y dönüşü"
+    },
+    "rotZ": {
+     "label": "Z dönüşü"
+    },
+    "scatter": {
+     "label": "Dağıtma"
+    },
+    "seed": {
+     "label": "Tohum"
+    },
+    "shading": {
+     "label": "Gölgelendirme"
+    },
+    "shape": {
+     "label": "Şekil",
+     "options": [
+      "Küp",
+      "Küre",
+      "Kare",
+      "Daire"
+     ]
+    },
+    "size": {
+     "label": "Parça boyutu"
+    },
+    "spacing": {
+     "label": "Izgara aralığı"
+    },
+    "spin": {
+     "label": "Dağılım dönüşü"
+    },
+    "twist": {
+     "label": "Burma açısı"
     }
    }
   },
@@ -5953,6 +6084,47 @@
     },
     "wobble": {
      "label": "Sallanma"
+    }
+   }
+  },
+  "videofeedback": {
+   "description": "Kendi ekranına yöneltilmiş bir kamera gibi katmanı kendi içinde tekrar tekrar çizer. Tüneli yönlendirmek için katmanı taşıyın, ölçekleyin veya döndürün.",
+   "name": "Video Geri Besleme",
+   "params": {
+    "blend": {
+     "label": "Karışım",
+     "options": [
+      "Normal",
+      "Ekle",
+      "Ekran"
+     ]
+    },
+    "center": {
+     "label": "Merkez"
+    },
+    "copies": {
+     "label": "Kopyalar"
+    },
+    "delay": {
+     "label": "Gecikme"
+    },
+    "fade": {
+     "label": "Solma"
+    },
+    "hueShift": {
+     "label": "Ton kayması"
+    },
+    "offset": {
+     "label": "Ofset"
+    },
+    "rotation": {
+     "label": "Döndürme"
+    },
+    "useLayerTransform": {
+     "label": "Katman dönüşümünü kullan"
+    },
+    "zoom": {
+     "label": "Yakınlaştırma"
     }
    }
   },

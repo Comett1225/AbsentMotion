@@ -767,9 +767,6 @@
     <string name="export_problem_android">%2$s দিয়ে %1$s ব্যবহার করতে Android %3$s বা তার পরের ভার্সন প্রয়োজন।</string>
     <string name="export_reason_webp_lossless">লসলেস WebP-এর জন্য Android 10 বা তার পরের ভার্সন প্রয়োজন। প্রতিটি পিক্সেল ধরে রাখতে PNG বেছে নিন।</string>
     <string name="export_verify_middle_frame">ভিডিওর মাঝের অংশ প্রজেক্টের মতো দেখাচ্ছে না। এটি কালো বা স্থির হতে পারে।</string>
-    <string name="export_stop_title">এক্সপোর্ট থামাবেন?</string>
-    <string name="export_stop_text">অসম্পূর্ণ ফাইলটি মুছে ফেলা হবে।</string>
-    <string name="export_keep_going">এক্সপোর্ট চালিয়ে যান</string>
     <string name="export_running_leave">এক্সপোর্ট চলার সময় আপনি অন্য অ্যাপে যেতে পারেন।</string>
     <string name="export_notify_channel">এক্সপোর্ট</string>
     <string name="export_notify_done">এক্সপোর্ট সম্পন্ন হয়েছে</string>
@@ -1987,4 +1984,24 @@
     <string name="prerender_playing">প্রি-রেন্ডার করা</string>
     <string name="prerender_outdated">প্রি-রেন্ডারটি পুরোনো হয়ে গেছে।</string>
     <string name="prerender_again">আবার প্রি-রেন্ডার</string>
+    <string name="about_website">ওয়েবসাইট ও নির্দেশিকা</string>
+    <string name="caption_outline_thickness">পুরুত্ব</string>
+    <string name="caption_outline_color">আউটলাইনের রং</string>
+    <string name="caption_custom_color">কাস্টম</string>
+    <string name="multi_animation">সব অ্যানিমেট করুন</string>
+    <string name="multi_presets">প্রিসেট প্রয়োগ করুন</string>
+    <string name="multi_no_cut">নির্বাচিত লেয়ারগুলির মধ্যে কোনো কাট নেই</string>
+    <string name="layer_tool_screenshot">স্ক্রিনশট</string>
+    <string name="screenshot_saved">গ্যালারিতে সংরক্ষিত এবং নতুন লেয়ার হিসেবে যোগ করা হয়েছে</string>
+    <string name="screenshot_failed">স্ক্রিনশট নেওয়া যায়নি</string>
+    <string name="screenshot_outside">প্রথমে প্লেহেডটি ক্লিপের উপর আনুন</string>
+    <plurals name="multi_applied_count">
+        <item quantity="one">%1$sটি লেয়ারে প্রয়োগ করা হয়েছে</item>
+        <item quantity="other">%1$sটি লেয়ারে প্রয়োগ করা হয়েছে</item>
+    </plurals>
+    <plurals name="multi_transition_count">
+        <item quantity="one">%1$sটি কাট</item>
+        <item quantity="other">%1$sটি কাট</item>
+    </plurals>
+    <string name="structure_svg_importing">SVG ইমপোর্ট করা হচ্ছে…</string>
 </resources>

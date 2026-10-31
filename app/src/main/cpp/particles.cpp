@@ -189,6 +189,22 @@ void Simulate(const Field& f, double t, std::vector<Particle>* out) {
         }
         if (!std::isfinite(x) || !std::isfinite(y)) continue;
         Particle p;
+        if (now.depth) {
+            const double z = (std::isfinite(s.zSpread) ? s.zSpread : 0) * f.unit * (2 * Unit(key, 21) - 1) +
+                             (std::isfinite(s.zSpeed) ? s.zSpeed : 0) * f.unit * f1;
+            float m[9] = {1, 0, 0, 0, 1, 0, 0, 0, 1};
+            if (f.orient) f.orient(b, m);
+            const double ox = x - ex, oy = y - ey;
+            const double rx = m[0] * ox + m[1] * oy + m[2] * z;
+            const double ry = m[3] * ox + m[4] * oy + m[5] * z;
+            const double rz = m[6] * ox + m[7] * oy + m[8] * z;
+            const double perspective = std::clamp(std::isfinite(now.perspective) ? (double)now.perspective : 1.0, 0.0, 10.0);
+            const double scale = std::clamp(1.0 / std::max(0.1, 1.0 + rz * perspective / std::max(1.0, 1080.0 * f.unit)), 0.1, 10.0);
+            x = ex + rx * scale;
+            y = ey + ry * scale;
+            p.z = (float)rz;
+            p.size = (float)scale;
+        }
         p.key = key;
         p.x = (float)x;
         p.y = (float)y;
@@ -199,7 +215,7 @@ void Simulate(const Field& f, double t, std::vector<Particle>* out) {
             const double spin = s.spin * (1 + spread * (2 * Unit(key, 11) - 1)) * (Unit(key, 12) < 0.5 * spread ? -1 : 1);
             p.angle = (float)(std::fmod(Clamp01(s.randomRotation) * (Unit(key, 13) - 0.5) * kTau + spin * age * kTau / 360, kTau));
         }
-        p.size = s.size * std::max(0.0f, 1 + Clamp01(s.sizeVariation) * (float)(2 * Unit(key, 14) - 1)) * (1 + (endSize - 1) * u);
+        p.size *= s.size * std::max(0.0f, 1 + Clamp01(s.sizeVariation) * (float)(2 * Unit(key, 14) - 1)) * (1 + (endSize - 1) * u);
         if (!(p.size > 0) || !std::isfinite(p.size)) continue;
         p.alpha = (fadeIn > 0 ? Smooth(u / fadeIn) : 1.0f) * (fadeOut > 0 ? Smooth((1 - u) / fadeOut) : 1.0f);
         if (twinkle > 0) p.alpha *= 1 - twinkle * (float)(0.5 + 0.5 * std::sin(kTau * ((1.5 + 2.5 * Unit(key, 15)) * age + Unit(key, 16))));
@@ -218,6 +234,7 @@ void Simulate(const Field& f, double t, std::vector<Particle>* out) {
         out->push_back(p);
     }
     if (out->size() > cap) out->erase(out->begin(), out->begin() + (std::ptrdiff_t)(out->size() - cap));
+    if (now.depth) std::stable_sort(out->begin(), out->end(), [](const Particle& a, const Particle& b) { return a.z > b.z; });
 }
 
 }

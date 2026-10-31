@@ -187,7 +187,24 @@ private fun Knot.toNode() = XmlNode("knot", children = listOfNotNull(vecNode("p"
 
 private fun vecNode(name: String, v: Pt) = XmlNode(name, mapOf("value" to formatFloats(floatArrayOf(v.x, v.y))))
 
-private fun num(v: Float): String = String.format(Locale.US, "%.4f", v).trimEnd('0').trimEnd('.').let { if (it == "-0" || it.isEmpty()) "0" else it }
+internal fun num(v: Float): String {
+    if (!v.isFinite() || abs(v) >= 1e14f) return String.format(Locale.US, "%.4f", v).trimEnd('0').trimEnd('.').let { if (it == "-0" || it.isEmpty()) "0" else it }
+    val r = Math.round(abs(v.toDouble()) * 10000.0)
+    if (r == 0L) return "0"
+    val sb = StringBuilder(12)
+    if (v < 0) sb.append('-')
+    sb.append(r / 10000)
+    var frac = (r % 10000).toInt()
+    if (frac != 0) {
+        var digits = 4
+        while (frac % 10 == 0) { frac /= 10; digits-- }
+        sb.append('.')
+        val text = frac.toString()
+        repeat(digits - text.length) { sb.append('0') }
+        sb.append(text)
+    }
+    return sb.toString()
+}
 private fun Pt.svg() = "${num(x)} ${num(y)}"
 
 fun Contour.toSvg(): String {
@@ -204,8 +221,15 @@ fun Contour.toSvg(): String {
     return sb.toString()
 }
 
+fun Regex.matchValues(text: CharSequence): Sequence<String> = sequence {
+    val matcher = toPattern().matcher(text)
+    while (matcher.find()) yield(matcher.group())
+}
+
+private val PathToken = Regex("[MLHVCSQTAZmlhvcsqtaz]|-?\\d*\\.?\\d+(?:[eE][-+]?\\d+)?")
+
 fun parseSvgPath(d: String): List<Contour> {
-    val tokens = Regex("[MLHVCSQTAZmlhvcsqtaz]|-?\\d*\\.?\\d+(?:[eE][-+]?\\d+)?").findAll(d).map { it.value }.take(500_000).toMutableList()
+    val tokens = PathToken.matchValues(d).take(500_000).toMutableList()
     val out = ArrayList<Contour>()
     var knots = ArrayList<Knot>()
     var i = 0

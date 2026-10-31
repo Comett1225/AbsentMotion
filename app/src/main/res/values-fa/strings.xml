@@ -767,9 +767,6 @@
     <string name="export_problem_android">‏%1$s با %2$s به Android %3$s یا جدیدتر نیاز دارد.</string>
     <string name="export_reason_webp_lossless">‏WebP بدون اتلاف به Android 10 یا جدیدتر نیاز دارد. برای نگه‌داشتن همهٔ پیکسل‌ها PNG را انتخاب کنید.</string>
     <string name="export_verify_middle_frame">وسط ویدیو شبیه پروژه نیست. ممکن است سیاه یا فریز شده باشد.</string>
-    <string name="export_stop_title">خروجی متوقف شود؟</string>
-    <string name="export_stop_text">فایل ناتمام حذف می‌شود.</string>
-    <string name="export_keep_going">ادامهٔ خروجی</string>
     <string name="export_running_leave">می‌توانید هنگام اجرای خروجی به برنامه‌های دیگر بروید.</string>
     <string name="export_notify_channel">خروجی‌ها</string>
     <string name="export_notify_done">خروجی تمام شد</string>
@@ -1987,4 +1984,24 @@
     <string name="prerender_playing">پیش‌رندر شده</string>
     <string name="prerender_outdated">پیش‌رندر قدیمی شده است.</string>
     <string name="prerender_again">پیش‌رندر دوباره</string>
+    <string name="about_website">وب‌سایت و راهنما</string>
+    <string name="caption_outline_thickness">ضخامت</string>
+    <string name="caption_outline_color">رنگ حاشیه</string>
+    <string name="caption_custom_color">سفارشی</string>
+    <string name="multi_animation">متحرک‌سازی همه</string>
+    <string name="multi_presets">اعمال پیش‌تنظیم</string>
+    <string name="multi_no_cut">بین لایه‌های انتخاب‌شده برشی وجود ندارد</string>
+    <string name="layer_tool_screenshot">عکس صفحه</string>
+    <string name="screenshot_saved">در گالری ذخیره و به‌عنوان لایه‌ای جدید اضافه شد</string>
+    <string name="screenshot_failed">گرفتن عکس صفحه ممکن نشد</string>
+    <string name="screenshot_outside">ابتدا نشانگر پخش را روی کلیپ ببرید</string>
+    <plurals name="multi_applied_count">
+        <item quantity="one">روی %1$s لایه اعمال شد</item>
+        <item quantity="other">روی %1$s لایه اعمال شد</item>
+    </plurals>
+    <plurals name="multi_transition_count">
+        <item quantity="one">%1$s برش</item>
+        <item quantity="other">%1$s برش</item>
+    </plurals>
+    <string name="structure_svg_importing">در حال واردکردن SVG…</string>
 </resources>

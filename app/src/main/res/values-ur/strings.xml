@@ -767,9 +767,6 @@
     <string name="export_problem_android">%1$s بمعہ %2$s کے لیے Android %3$s یا اس سے نیا درکار ہے۔</string>
     <string name="export_reason_webp_lossless">لاس لیس WebP کے لیے Android 10 یا نیا درکار ہے۔ ہر پکسل برقرار رکھنے کے لیے PNG منتخب کریں۔</string>
     <string name="export_verify_middle_frame">ویڈیو کا درمیانی حصہ پروجیکٹ جیسا نہیں لگتا۔ ممکن ہے یہ کالا یا رکا ہوا ہو۔</string>
-    <string name="export_stop_title">ایکسپورٹ روکیں؟</string>
-    <string name="export_stop_text">نامکمل فائل حذف کر دی جائے گی۔</string>
-    <string name="export_keep_going">ایکسپورٹ جاری رکھیں</string>
     <string name="export_running_leave">ایکسپورٹ چلتے وقت آپ دوسری ایپس پر جا سکتے ہیں۔</string>
     <string name="export_notify_channel">ایکسپورٹس</string>
     <string name="export_notify_done">ایکسپورٹ مکمل ہو گیا</string>
@@ -1987,4 +1984,24 @@
     <string name="prerender_playing">پری رینڈر شدہ</string>
     <string name="prerender_outdated">پری رینڈر پرانا ہو گیا ہے۔</string>
     <string name="prerender_again">دوبارہ پری رینڈر</string>
+    <string name="about_website">ویب سائٹ اور رہنما</string>
+    <string name="caption_outline_thickness">موٹائی</string>
+    <string name="caption_outline_color">خاکہ کا رنگ</string>
+    <string name="caption_custom_color">حسب ضرورت</string>
+    <string name="multi_animation">سب کو متحرک کریں</string>
+    <string name="multi_presets">پری سیٹ لگائیں</string>
+    <string name="multi_no_cut">منتخب لیئرز کے درمیان کوئی کٹ نہیں</string>
+    <string name="layer_tool_screenshot">اسکرین شاٹ</string>
+    <string name="screenshot_saved">گیلری میں محفوظ اور نئی لیئر کے طور پر شامل کر دیا گیا</string>
+    <string name="screenshot_failed">اسکرین شاٹ نہیں لیا جا سکا</string>
+    <string name="screenshot_outside">پہلے پلے ہیڈ کو کلپ پر لے جائیں</string>
+    <plurals name="multi_applied_count">
+        <item quantity="one">%1$s لیئر پر لاگو کیا گیا</item>
+        <item quantity="other">%1$s لیئرز پر لاگو کیا گیا</item>
+    </plurals>
+    <plurals name="multi_transition_count">
+        <item quantity="one">%1$s کٹ</item>
+        <item quantity="other">%1$s کٹس</item>
+    </plurals>
+    <string name="structure_svg_importing">SVG درآمد ہو رہا ہے…</string>
 </resources>

@@ -27,7 +27,7 @@ class EffectPackTest {
         val declared = Regex("""(layout\s*\(\s*color\s*\)\s*)?uniform\s+(\w+)\s+(\w+)\s*;""")
         for (effect in catalog.definitions) {
             if (effect.native) {
-                assertTrue("${effect.key} is not a built-in", effect.category in setOf("move", "repeat", "text") || effect.id in setOf("absent.blur", "absent.glow", "absent.motionblur", "absent.smear", "absent.backdrop", "absent.drawingprogress", "absent.stroketaper", "absent.puppet", "absent.particles"))
+                assertTrue("${effect.key} is not a built-in", effect.category in setOf("move", "repeat", "text") || effect.id in setOf("absent.blur", "absent.glow", "absent.motionblur", "absent.smear", "absent.backdrop", "absent.drawingprogress", "absent.stroketaper", "absent.puppet", "absent.particles", "absent.scatter3d", "absent.fracture3d"))
                 assertNull(effect.sksl)
                 continue
             }
@@ -53,6 +53,19 @@ class EffectPackTest {
             assertTrue("${effect.key} declares 'pos', the name the GPU backend gives main's argument",
                 !Regex("""\b(float2|half2|float|half)\s+pos\b""").containsMatchIn(effect.sksl))
         }
+    }
+
+    @Test fun threeDimensionalPiecesExposeTheirControls() {
+        val scatter = catalog.find("absent.scatter3d")!!
+        val fracture = catalog.find("absent.fracture3d")!!
+        assertEquals("3d", scatter.category)
+        assertEquals("3d", fracture.category)
+        assertEquals(listOf("Cube", "Sphere", "Square", "Circle"), scatter.params.first { it.id == "shape" }.options)
+        assertEquals(24f, scatter.params.first { it.id == "spacing" }.default.toFloat(), 0f)
+        assertEquals(1f, scatter.params.first { it.id == "depth" }.default.toFloat(), 0f)
+        assertEquals(0f, fracture.params.first { it.id == "progress" }.default.toFloat(), 0f)
+        assertEquals(40f, fracture.params.first { it.id == "pieces" }.default.toFloat(), 0f)
+        assertTrue(fracture.params.any { it.id == "impact" && it.kind == "point" })
     }
 
     @Test fun backgroundEffectsReadWhatIsBehindTheLayer() {
@@ -145,8 +158,10 @@ class EffectPackTest {
     @Test fun particlesShowTheBasicSettingsFirst() {
         val particles = catalog.find("absent.particles")!!
         val plain = particles.instance()
-        assertEquals(listOf("kind", "emitter", "emission", "rate", "lifetime", "speed", "direction", "spread", "gravity", "wind", "swirl", "size", "color", "layer", "more"),
+        assertEquals(listOf("kind", "emitter", "emission", "rate", "lifetime", "speed", "direction", "spread", "gravity", "wind", "swirl", "size", "color", "layer", "depth", "more"),
             particles.params.filter { particles.shown(it, plain, 0f) }.map { it.id })
+        val depth = plain.copy(children = plain.children.map { if (it["name"] == "depth") it.with("value", "true") else it })
+        assertTrue(particles.params.filter { particles.shown(it, depth, 0f) }.map { it.id }.containsAll(listOf("zSpeed", "zSpread", "perspective")))
         val more = plain.copy(children = plain.children.map { if (it["name"] == "more") it.with("value", "true") else it })
         assertTrue(particles.params.filter { particles.shown(it, more, 0f) }.map { it.id }.containsAll(listOf("orientation", "colorMode", "blend", "seed")))
         val beats = plain.copy(children = plain.children.map { if (it["name"] == "emission") it.with("value", "2") else it })

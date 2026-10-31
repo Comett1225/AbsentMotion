@@ -757,9 +757,6 @@
     <string name="export_problem_android">%1$s dengan %2$s memerlukan Android %3$s atau lebih baharu.</string>
     <string name="export_reason_webp_lossless">WebP tanpa kehilangan memerlukan Android 10 atau lebih baharu. Pilih PNG untuk mengekalkan setiap piksel.</string>
     <string name="export_verify_middle_frame">Bahagian tengah video tidak kelihatan seperti projek. Ia mungkin hitam atau beku.</string>
-    <string name="export_stop_title">Hentikan eksport?</string>
-    <string name="export_stop_text">Fail yang belum siap akan dipadamkan.</string>
-    <string name="export_keep_going">Teruskan eksport</string>
     <string name="export_running_leave">Anda boleh bertukar ke aplikasi lain semasa eksport berjalan.</string>
     <string name="export_notify_channel">Eksport</string>
     <string name="export_notify_done">Eksport selesai</string>
@@ -1960,4 +1957,22 @@
     <string name="prerender_playing">Telah dipra-render</string>
     <string name="prerender_outdated">Pra-render sudah lapuk.</string>
     <string name="prerender_again">Pra-render semula</string>
+    <string name="about_website">Laman web dan panduan</string>
+    <string name="caption_outline_thickness">Ketebalan</string>
+    <string name="caption_outline_color">Warna garis luar</string>
+    <string name="caption_custom_color">Tersuai</string>
+    <string name="multi_animation">Animasikan semua</string>
+    <string name="multi_presets">Gunakan pratetap</string>
+    <string name="multi_no_cut">Tiada potongan antara lapisan yang dipilih</string>
+    <string name="layer_tool_screenshot">Tangkapan skrin</string>
+    <string name="screenshot_saved">Disimpan ke galeri dan ditambah sebagai lapisan baharu</string>
+    <string name="screenshot_failed">Tangkapan skrin tidak dapat dibuat</string>
+    <string name="screenshot_outside">Alihkan kepala main ke klip dahulu</string>
+    <plurals name="multi_applied_count">
+        <item quantity="other">Digunakan pada %1$s lapisan</item>
+    </plurals>
+    <plurals name="multi_transition_count">
+        <item quantity="other">%1$s potongan</item>
+    </plurals>
+    <string name="structure_svg_importing">Mengimport SVG…</string>
 </resources>

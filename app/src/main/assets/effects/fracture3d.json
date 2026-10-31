@@ -1,0 +1,144 @@
+{
+ "id": "fracture3d",
+ "name": "3D Fracture",
+ "category": "3d",
+ "since": "4.4.0",
+ "native": true,
+ "description": "Breaks the layer into moving 3D shards.",
+ "params": [
+  {
+   "id": "progress",
+   "label": "Progress",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  },
+  {
+   "id": "pieces",
+   "label": "Pieces",
+   "type": "float",
+   "default": 40,
+   "min": 1,
+   "max": 128,
+   "step": 1
+  },
+  {
+   "id": "seed",
+   "label": "Seed",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 10000,
+   "step": 1
+  },
+  {
+   "id": "impact",
+   "label": "Impact Point",
+   "type": "point",
+   "default": [
+    0,
+    0
+   ],
+   "min": -5000,
+   "max": 5000,
+   "step": 1,
+   "pixels": true
+  },
+  {
+   "id": "force",
+   "label": "Force",
+   "type": "float",
+   "default": 300,
+   "min": 0,
+   "max": 2000,
+   "step": 1,
+   "pixels": true
+  },
+  {
+   "id": "spread",
+   "label": "Direction Spread",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  },
+  {
+   "id": "direction",
+   "label": "Direction",
+   "type": "angle",
+   "default": 0,
+   "min": -3600,
+   "max": 3600,
+   "step": 0.1
+  },
+  {
+   "id": "gravity",
+   "label": "Gravity",
+   "type": "float",
+   "default": 100,
+   "min": -2000,
+   "max": 2000,
+   "step": 1,
+   "pixels": true
+  },
+  {
+   "id": "spin",
+   "label": "Spin",
+   "type": "float",
+   "default": 180,
+   "min": 0,
+   "max": 3600,
+   "step": 1
+  },
+  {
+   "id": "depthPush",
+   "label": "Depth Push",
+   "type": "float",
+   "default": 150,
+   "min": -2000,
+   "max": 2000,
+   "step": 1,
+   "pixels": true
+  },
+  {
+   "id": "thickness",
+   "label": "Thickness",
+   "type": "float",
+   "default": 4,
+   "min": 0,
+   "max": 100,
+   "step": 1,
+   "pixels": true
+  },
+  {
+   "id": "light",
+   "label": "Light Direction",
+   "type": "angle",
+   "default": 135,
+   "min": -3600,
+   "max": 3600,
+   "step": 0.1
+  },
+  {
+   "id": "intensity",
+   "label": "Light Intensity",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 2,
+   "step": 0.01
+  },
+  {
+   "id": "fade",
+   "label": "Fade Out",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  }
+ ]
+}

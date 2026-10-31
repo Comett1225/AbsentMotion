@@ -150,21 +150,21 @@ which contains no Google libraries at all, and `compat`, the Compatible build of
 Not sure about your phone? The [phone checker](https://comett1225.github.io/AbsentMotion/phone-checker.html) tells you
 which build to download.
 
-## Future Plans ( Roadmap )
-
-The full [roadmap](https://comett1225.github.io/AbsentMotion/roadmap.html) lists what each upcoming version will bring.
+## Roadmap
 
 **4.4 is the last 4.x version.** If there is an effect or feature you would like, [request it](https://github.com/Comett1225/AbsentMotion/issues/new?template=feature_request.yml) now: from 5.0 on, new features will come more slowly and in smaller numbers than in the 4.x updates.
 
-Possibly a PC version as I love the layout and also simplicity of it. Not sure if chromebooks automatically supported from this being an android app but most likely support will arrive to
-- Windows 10/11 (maybe 8/8.1)
-- MacOS 15 to 27
-- Linux
-- Chromebooks
-- Possibly releasing IPA versions of this app for iPhones and iPads
-This will all be decided later though, for the v5.0 update.
+[Go here for the full roadmap.](https://comett1225.github.io/AbsentMotion/roadmap.html)
 
-In the future, foss and compatibility will be the only two available for android, as 'play' won't be required in the future.
+### 5.0
+
+- PC support for Windows, Linux, macOS and Chromebook/ChromeOS, including Chromebooks with Intel or AMD chips.
+- Possibly an IPA file for sideloading on iPhones and iPads.
+- No more Play build. Phones with the Play build move to the FOSS build automatically when they update to 5.0; projects and settings stay.
+- Real 3D: layers, particles and the pieces of 3D effects sit in front of and behind each other in depth, with a camera, lights and 3D models.
+- Motion graphics tools: different offsets for each repeated copy, and linking one value to another.
+- More from Alight Motion projects: Parenting Helper, Scale Assist and 3D orientation.
+- During 5.0 and after, there won't be many major patches or features; most updates will focus on stability for the PC version and the new iOS file.
 
 ## Updates to AbsentMotion
 

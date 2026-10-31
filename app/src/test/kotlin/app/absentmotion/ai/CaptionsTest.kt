@@ -136,6 +136,10 @@ class CaptionsTest {
         assertEquals(0xFFFFE14D.toInt(), layers[0].fillColor)
         assertEquals(listOf("outside"), layers[0].borders.map { it.direction })
         assertEquals(StyleColors.Black, layers[0].borders[0].color)
+        assertEquals(6f, layers[0].borders[0].size, 0f)
+        val styled = scene.captionLayers(chunks.take(1), CaptionStyle(outlineColor = 0xFF123456.toInt(), outlineThickness = 13)) { _, s -> s }.single()
+        assertEquals(0xFF123456.toInt(), styled.borders.single().color)
+        assertEquals(13f, styled.borders.single().size, 0f)
         assertTrue(scene.captionLayers(chunks, CaptionStyle(outline = false)) { _, s -> s }.all { it.borders.isEmpty() })
         val again = layers.fold(scene) { s, l -> s.add(l) }.captionLayers(chunks.take(1), CaptionStyle(), { "Caption $it" }) { _, s -> s }
         assertEquals("Caption 4", again.single().label)

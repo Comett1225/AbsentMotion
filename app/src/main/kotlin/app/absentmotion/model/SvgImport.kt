@@ -132,7 +132,7 @@ private fun cssBlocks(css: String): List<Pair<String, String>> {
     return out
 }
 
-private fun numbers(text: String?): List<Float> = text?.let { NumberPattern.findAll(it).mapNotNull { m -> m.value.finiteFloat() }.toList() } ?: emptyList()
+private fun numbers(text: String?): List<Float> = text?.let { NumberPattern.matchValues(it).mapNotNull { v -> v.finiteFloat() }.toList() } ?: emptyList()
 
 private class SvgReader(private val root: XmlNode) {
     val skipped = LinkedHashSet<UiText>()

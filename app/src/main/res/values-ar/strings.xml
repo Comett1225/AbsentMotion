@@ -807,9 +807,6 @@
     <string name="export_problem_android">‏%1$s مع %2$s يتطلب Android %3$s أو أحدث.</string>
     <string name="export_reason_webp_lossless">يتطلب WebP دون فقدان Android 10 أو أحدث. اختر PNG للحفاظ على كل بكسل.</string>
     <string name="export_verify_middle_frame">لا يبدو منتصف الفيديو مطابقًا للمشروع. قد يكون أسود أو متجمدًا.</string>
-    <string name="export_stop_title">إيقاف التصدير؟</string>
-    <string name="export_stop_text">سيتم حذف الملف غير المكتمل.</string>
-    <string name="export_keep_going">متابعة التصدير</string>
     <string name="export_running_leave">يمكنك التبديل إلى تطبيقات أخرى أثناء تشغيل التصدير.</string>
     <string name="export_notify_channel">عمليات التصدير</string>
     <string name="export_notify_done">اكتمل التصدير</string>
@@ -2095,4 +2092,32 @@
     <string name="prerender_playing">مصيّر مسبقًا</string>
     <string name="prerender_outdated">التصيير المسبق قديم.</string>
     <string name="prerender_again">إعادة التصيير المسبق</string>
+    <string name="about_website">الموقع والدليل</string>
+    <string name="caption_outline_thickness">السُمك</string>
+    <string name="caption_outline_color">لون المخطط</string>
+    <string name="caption_custom_color">مخصص</string>
+    <string name="multi_animation">تحريك الكل</string>
+    <string name="multi_presets">تطبيق إعداد مسبق</string>
+    <string name="multi_no_cut">لا توجد نقاط قطع بين الطبقات المحددة</string>
+    <string name="layer_tool_screenshot">لقطة شاشة</string>
+    <string name="screenshot_saved">تم الحفظ في المعرض والإضافة كطبقة جديدة</string>
+    <string name="screenshot_failed">تعذر التقاط لقطة الشاشة</string>
+    <string name="screenshot_outside">انقل رأس التشغيل إلى المقطع أولاً</string>
+    <plurals name="multi_applied_count">
+        <item quantity="zero">طُبّق على %1$s طبقة</item>
+        <item quantity="one">طُبّق على طبقة واحدة (%1$s)</item>
+        <item quantity="two">طُبّق على طبقتين (%1$s)</item>
+        <item quantity="few">طُبّق على %1$s طبقات</item>
+        <item quantity="many">طُبّق على %1$s طبقة</item>
+        <item quantity="other">طُبّق على %1$s طبقة</item>
+    </plurals>
+    <plurals name="multi_transition_count">
+        <item quantity="zero">%1$s قطع</item>
+        <item quantity="one">قطع واحد (%1$s)</item>
+        <item quantity="two">قطعان (%1$s)</item>
+        <item quantity="few">%1$s قطوع</item>
+        <item quantity="many">%1$s قطعًا</item>
+        <item quantity="other">%1$s قطع</item>
+    </plurals>
+    <string name="structure_svg_importing">جارٍ استيراد SVG…</string>
 </resources>

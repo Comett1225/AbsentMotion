@@ -757,9 +757,6 @@
     <string name="export_problem_android">%2$sの%1$sにはAndroid %3$s以降が必要です。</string>
     <string name="export_reason_webp_lossless">可逆WebPにはAndroid 10以降が必要です。すべてのピクセルを保持するにはPNGを選んでください。</string>
     <string name="export_verify_middle_frame">動画の中央がプロジェクトと一致しません。黒くなっているか、フリーズしている可能性があります。</string>
-    <string name="export_stop_title">書き出しを停止しますか？</string>
-    <string name="export_stop_text">未完成のファイルは削除されます。</string>
-    <string name="export_keep_going">書き出しを続ける</string>
     <string name="export_running_leave">書き出し中は他のアプリに切り替えられます。</string>
     <string name="export_notify_channel">書き出し</string>
     <string name="export_notify_done">書き出しが完了しました</string>
@@ -1960,4 +1957,22 @@
     <string name="prerender_playing">事前レンダリング済み</string>
     <string name="prerender_outdated">事前レンダリングが古くなっています。</string>
     <string name="prerender_again">もう一度事前レンダリング</string>
+    <string name="about_website">ウェブサイトとガイド</string>
+    <string name="caption_outline_thickness">太さ</string>
+    <string name="caption_outline_color">縁取りの色</string>
+    <string name="caption_custom_color">カスタム</string>
+    <string name="multi_animation">すべてをアニメーション</string>
+    <string name="multi_presets">プリセットを適用</string>
+    <string name="multi_no_cut">選択したレイヤー間にカットがありません</string>
+    <string name="layer_tool_screenshot">スクリーンショット</string>
+    <string name="screenshot_saved">ギャラリーに保存し、新しいレイヤーとして追加しました</string>
+    <string name="screenshot_failed">スクリーンショットを作成できませんでした</string>
+    <string name="screenshot_outside">先に再生ヘッドをクリップに移動してください</string>
+    <plurals name="multi_applied_count">
+        <item quantity="other">%1$s個のレイヤーに適用しました</item>
+    </plurals>
+    <plurals name="multi_transition_count">
+        <item quantity="other">%1$sカット</item>
+    </plurals>
+    <string name="structure_svg_importing">SVGを読み込み中…</string>
 </resources>

@@ -94,7 +94,9 @@ fun applyLanguage(context: Context, language: AppLanguage) {
         context.locales().applicationLocales = LocaleList.forLanguageTags(language.tag)
         return
     }
+    val shown = currentLanguage(context)
     context.chosen().edit().putString("tag", language.tag).commit()
+    if (shown == language) return
     var c: Context? = context
     while (c is ContextWrapper && c !is Activity) c = c.baseContext
     (c as? Activity)?.recreate()

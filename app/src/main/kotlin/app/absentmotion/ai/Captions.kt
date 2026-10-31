@@ -55,6 +55,7 @@ data class CaptionStyle(
     val font: String = FontName.Default.xml, val sizePercent: Int = 100, val color: Int = StyleColors.White,
     val outline: Boolean = true, val position: CaptionPosition = CaptionPosition.Bottom, val maxWords: Int = 4,
     val english: Boolean = false, val highPrecision: Boolean = false,
+    val outlineColor: Int = StyleColors.Black, val outlineThickness: Int = 6,
 )
 
 private const val MAX_CAPTION_MS = 3000
@@ -118,7 +119,10 @@ internal fun Scene.captionLayers(
             "font" to style.font, "wrapWidth" to "$wrap", "align" to "center")))
             .withTransform("location", width / 2f, captionY(width, height, style.position, tall), 0f)
             .withFill("color", style.color).withContent(chunk.text)
-        if (!style.outline) layer else layer.withBorderAdded().let { it.withValue(it.borders.last().colorRef, formatColor(StyleColors.Black)) }
+        if (!style.outline) layer else layer.withBorderAdded().let {
+            val border = it.borders.last()
+            it.withValue(border.colorRef, formatColor(style.outlineColor)).withValue(border.sizeRef, style.outlineThickness.coerceIn(0, 50).toString())
+        }
     }
 }
 

@@ -757,9 +757,6 @@
     <string name="export_problem_android">%1$s dengan %2$s memerlukan Android %3$s atau lebih baru.</string>
     <string name="export_reason_webp_lossless">WebP lossless memerlukan Android 10 atau lebih baru. Pilih PNG untuk mempertahankan setiap piksel.</string>
     <string name="export_verify_middle_frame">Bagian tengah video tidak sesuai dengan proyek. Mungkin hitam atau membeku.</string>
-    <string name="export_stop_title">Hentikan ekspor?</string>
-    <string name="export_stop_text">File yang belum selesai akan dihapus.</string>
-    <string name="export_keep_going">Lanjutkan ekspor</string>
     <string name="export_running_leave">Anda dapat beralih ke aplikasi lain saat ekspor berjalan.</string>
     <string name="export_notify_channel">Ekspor</string>
     <string name="export_notify_done">Ekspor selesai</string>
@@ -1960,4 +1957,22 @@
     <string name="prerender_playing">Pra-render selesai</string>
     <string name="prerender_outdated">Hasil pra-render sudah usang.</string>
     <string name="prerender_again">Pra-render lagi</string>
+    <string name="about_website">Situs web dan panduan</string>
+    <string name="caption_outline_thickness">Ketebalan</string>
+    <string name="caption_outline_color">Warna garis tepi</string>
+    <string name="caption_custom_color">Kustom</string>
+    <string name="multi_animation">Animasikan semua</string>
+    <string name="multi_presets">Terapkan preset</string>
+    <string name="multi_no_cut">Tidak ada potongan di antara lapisan yang dipilih</string>
+    <string name="layer_tool_screenshot">Tangkapan layar</string>
+    <string name="screenshot_saved">Disimpan ke galeri dan ditambahkan sebagai lapisan baru</string>
+    <string name="screenshot_failed">Tangkapan layar tidak dapat dibuat</string>
+    <string name="screenshot_outside">Pindahkan playhead ke klip terlebih dahulu</string>
+    <plurals name="multi_applied_count">
+        <item quantity="other">Diterapkan ke %1$s lapisan</item>
+    </plurals>
+    <plurals name="multi_transition_count">
+        <item quantity="other">%1$s potongan</item>
+    </plurals>
+    <string name="structure_svg_importing">Mengimpor SVG…</string>
 </resources>

@@ -27,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.Icon
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import app.absentmotion.editor.selectedCuts
 import app.absentmotion.editor.chosenLayers
 import app.absentmotion.editor.deleteChosen
 import app.absentmotion.editor.alignClipTimes
@@ -131,7 +132,12 @@ internal fun ObjectPage(state: EditorState, modifier: Modifier) {
             note?.let { Toast.makeText(context, it, Toast.LENGTH_LONG).show() }
         }
     }
-    val svg = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> if (uri != null) scope.launch { state.importSvgFile(context, uri) } }
+    val svg = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) scope.launch {
+            reading = true
+            try { state.importSvgFile(context, uri) } finally { reading = false }
+        }
+    }
     Swap(picking, modifier, rise = 0.dp) { if (picking) ElementPicker(state, Modifier.fillMaxSize()) else ObjectTiles(state, reading, { picking = true }, { svg.launch(arrayOf("image/svg+xml")) }) { models.launch(arrayOf("*/*")) } }
 }
 
@@ -145,7 +151,7 @@ private fun ObjectTiles(state: EditorState, reading: Boolean, pick: () -> Unit, 
             ObjectTile(stringResource(R.string.structure_asset_project), ChromeIcons.AssetProject, Modifier.size(70.dp, 80.dp), onClick = pick)
         }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            ObjectTile(stringResource(R.string.structure_import_svg), ChromeIcons.ImportSvg, Modifier.size(70.dp, 80.dp), onClick = importSvg)
+            ObjectTile(stringResource(R.string.structure_import_svg), ChromeIcons.ImportSvg, Modifier.size(70.dp, 80.dp), enabled = !reading, onClick = importSvg)
             ObjectTile(stringResource(R.string.structure_3d_model), ChromeIcons.Model3d, Modifier.size(70.dp, 80.dp), enabled = !reading, onClick = importModel)
         }
     }
@@ -158,6 +164,7 @@ internal suspend fun EditorState.importSvgFile(context: Context, uri: Uri) {
     val start = host.frameStart(frame)
     val end = host.endTimeFor(frame, settings.defaultLayerDuration * 1000)
     fun say(text: String) = Toast.makeText(context, text, Toast.LENGTH_LONG).show()
+    val working = Toast.makeText(context, context.getString(R.string.structure_svg_importing), Toast.LENGTH_LONG).also { it.show() }
     val result = try {
         withContext(Dispatchers.IO) {
             val name = context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { c ->
@@ -178,6 +185,8 @@ internal suspend fun EditorState.importSvgFile(context: Context, uri: Uri) {
         Log.w("AMSvg", "too large to import $uri", e)
         say(context.getString(R.string.structure_svg_unreadable))
         return
+    } finally {
+        working.cancel()
     }
     val layer = result.layer
     if (layer == null) {
@@ -242,8 +251,11 @@ private class ModelTooLarge : Exception()
 internal fun MultiBar(state: EditorState, modifier: Modifier) {
     val layers = state.chosenLayers
     val cut = layers.takeIf { it.size == 2 }?.let { state.scene.cutBetween(it[0].id, it[1].id) }
-    var transition by remember { mutableStateOf<Pair<Long, Long>?>(null) }
-    transition?.let { (a, b) -> TransitionSheet(state, a, b) { transition = null } }
+    val cuts = if (layers.size == 2) listOfNotNull(cut?.let { it.first.id to it.second.id }) else state.scene.selectedCuts(layers.map { it.id }.toSet())
+    var transition by remember { mutableStateOf<List<Pair<Long, Long>>?>(null) }
+    var animation by remember { mutableStateOf<Set<Long>?>(null) }
+    transition?.let { TransitionSheet(state, it) { transition = null } }
+    animation?.let { AnimationSheet(state, it) { animation = null } }
     Row(modifier.padding(6.dp).clip(RoundedCornerShape(3.dp)).background(Am.PanelInset), verticalAlignment = Alignment.CenterVertically) {
         val end = layers.isNotEmpty() && state.timeMs >= layers.maxOf { it.endTime }
         val context = LocalContext.current
@@ -274,6 +286,18 @@ internal fun MultiBar(state: EditorState, modifier: Modifier) {
             BarButton(PanelIcons.More, stringResource(R.string.structure_more_actions), Modifier.fillMaxSize(), layers.isNotEmpty()) { moreMenu = true }
             Presence(moreMenu) {
                 MenuPopup(AboveLeft, { moreMenu = false }, TransformOrigin(0f, 1f)) {
+                    MenuRow(stringResource(R.string.multi_animation)) {
+                        moreMenu = false
+                        state.playing = false
+                        val ids = layers.map { it.id }.toSet()
+                        if (layers.any { it.canAnimate }) animation = ids
+                        else Toast.makeText(context, context.resources.getQuantityString(R.plurals.multi_applied_count, 0, "0"), Toast.LENGTH_SHORT).show()
+                    }
+                    MenuRow(stringResource(R.string.multi_presets)) {
+                        moreMenu = false
+                        state.playing = false
+                        state.presetsOpen = true
+                    }
                     val style = copiedLayerForStyle != null
                     for (part in StylePart.entries) MenuRow(stringResource(PasteLabels.getValue(part)), enabled = style) {
                         moreMenu = false
@@ -295,9 +319,10 @@ internal fun MultiBar(state: EditorState, modifier: Modifier) {
             state.moveClipEdges(end, false)
         }
         Spacer(Modifier.weight(1f))
-        BarButton(ChromeIcons.Transition, stringResource(R.string.transition_add_between), Modifier.width(48.dp).fillMaxHeight().alpha(if (cut != null) 1f else DimAlpha)) {
-            if (cut != null) { state.playing = false; transition = cut.first.id to cut.second.id }
+        BarButton(ChromeIcons.Transition, stringResource(R.string.transition_add_between), Modifier.width(48.dp).fillMaxHeight().alpha(if (cuts.isNotEmpty()) 1f else DimAlpha)) {
+            if (cuts.isNotEmpty()) { state.playing = false; transition = cuts }
             else Toast.makeText(context, context.getString(when {
+                layers.size > 2 -> R.string.multi_no_cut
                 layers.size != 2 -> R.string.transition_needs_two
                 layers.any { !it.canAnimate } -> R.string.transition_needs_visual
                 else -> R.string.transition_needs_order

@@ -1932,6 +1932,54 @@
     }
    }
   },
+  "fracture3d": {
+   "description": "Quebra a camada em fragmentos 3D em movimento.",
+   "name": "Fratura 3D",
+   "params": {
+    "depthPush": {
+     "label": "Impulso em profundidade"
+    },
+    "direction": {
+     "label": "Direção"
+    },
+    "fade": {
+     "label": "Saída gradual"
+    },
+    "force": {
+     "label": "Força"
+    },
+    "gravity": {
+     "label": "Gravidade"
+    },
+    "impact": {
+     "label": "Ponto de impacto"
+    },
+    "intensity": {
+     "label": "Intensidade da luz"
+    },
+    "light": {
+     "label": "Direção da luz"
+    },
+    "pieces": {
+     "label": "Fragmentos"
+    },
+    "progress": {
+     "label": "Progresso"
+    },
+    "seed": {
+     "label": "Semente"
+    },
+    "spin": {
+     "label": "Giro"
+    },
+    "spread": {
+     "label": "Dispersão da direção"
+    },
+    "thickness": {
+     "label": "Espessura"
+    }
+   }
+  },
   "fringeclean": {
    "description": "Remove a cor dos pixels ao longo da borda do matte da camada, fazendo halos coloridos deixados por um chroma key ficarem cinza, enquanto até três cores protegidas permanecem intactas.",
    "name": "Franja do matte",
@@ -3495,6 +3543,9 @@
     "count": {
      "label": "Quantidade"
     },
+    "depth": {
+     "label": "Profundidade"
+    },
     "direction": {
      "label": "Direção"
     },
@@ -3574,6 +3625,9 @@
       "Seguir movimento"
      ]
     },
+    "perspective": {
+     "label": "Perspectiva"
+    },
     "position": {
      "label": "Posição do emissor"
     },
@@ -3627,6 +3681,12 @@
     },
     "wind": {
      "label": "Vento"
+    },
+    "zSpeed": {
+     "label": "Velocidade Z"
+    },
+    "zSpread": {
+     "label": "Dispersão Z"
     }
    },
    "presets": {
@@ -4522,6 +4582,77 @@
     },
     "spacing": {
      "label": "Espaçamento das linhas"
+    }
+   }
+  },
+  "scatter3d": {
+   "description": "Transforma a camada em uma grade de peças 3D dispersas.",
+   "name": "Dispersão 3D",
+   "params": {
+    "axis": {
+     "label": "Eixo de torção",
+     "options": [
+      "X",
+      "Y",
+      "Z"
+     ]
+    },
+    "depth": {
+     "label": "Profundidade da grade"
+    },
+    "depthSpacing": {
+     "label": "Espaçamento em profundidade"
+    },
+    "intensity": {
+     "label": "Intensidade da luz"
+    },
+    "light": {
+     "label": "Direção da luz"
+    },
+    "lightHeight": {
+     "label": "Altura da luz"
+    },
+    "perspective": {
+     "label": "Perspectiva"
+    },
+    "rotX": {
+     "label": "Rotação X"
+    },
+    "rotY": {
+     "label": "Rotação Y"
+    },
+    "rotZ": {
+     "label": "Rotação Z"
+    },
+    "scatter": {
+     "label": "Dispersão"
+    },
+    "seed": {
+     "label": "Semente"
+    },
+    "shading": {
+     "label": "Sombreamento"
+    },
+    "shape": {
+     "label": "Forma",
+     "options": [
+      "Cubo",
+      "Esfera",
+      "Quadrado",
+      "Círculo"
+     ]
+    },
+    "size": {
+     "label": "Tamanho da peça"
+    },
+    "spacing": {
+     "label": "Espaçamento da grade"
+    },
+    "spin": {
+     "label": "Rotação da dispersão"
+    },
+    "twist": {
+     "label": "Ângulo de torção"
     }
    }
   },
@@ -5953,6 +6084,47 @@
     },
     "wobble": {
      "label": "Oscilação"
+    }
+   }
+  },
+  "videofeedback": {
+   "description": "Desenha a camada dentro dela mesma repetidamente, como uma câmera apontada para a própria tela. Mova, redimensione ou gire a camada para direcionar o túnel.",
+   "name": "Realimentação de vídeo",
+   "params": {
+    "blend": {
+     "label": "Mesclagem",
+     "options": [
+      "Normal",
+      "Adicionar",
+      "Tela"
+     ]
+    },
+    "center": {
+     "label": "Centro"
+    },
+    "copies": {
+     "label": "Cópias"
+    },
+    "delay": {
+     "label": "Atraso"
+    },
+    "fade": {
+     "label": "Desvanecer"
+    },
+    "hueShift": {
+     "label": "Deslocamento de matiz"
+    },
+    "offset": {
+     "label": "Deslocamento"
+    },
+    "rotation": {
+     "label": "Rotação"
+    },
+    "useLayerTransform": {
+     "label": "Usar transformação da camada"
+    },
+    "zoom": {
+     "label": "Zoom"
     }
    }
   },

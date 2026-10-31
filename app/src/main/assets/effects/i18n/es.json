@@ -1932,6 +1932,54 @@
     }
    }
   },
+  "fracture3d": {
+   "description": "Rompe la capa en fragmentos 3D en movimiento.",
+   "name": "Fractura 3D",
+   "params": {
+    "depthPush": {
+     "label": "Impulso en profundidad"
+    },
+    "direction": {
+     "label": "Dirección"
+    },
+    "fade": {
+     "label": "Fundido de salida"
+    },
+    "force": {
+     "label": "Fuerza"
+    },
+    "gravity": {
+     "label": "Gravedad"
+    },
+    "impact": {
+     "label": "Punto de impacto"
+    },
+    "intensity": {
+     "label": "Intensidad de la luz"
+    },
+    "light": {
+     "label": "Dirección de la luz"
+    },
+    "pieces": {
+     "label": "Fragmentos"
+    },
+    "progress": {
+     "label": "Progreso"
+    },
+    "seed": {
+     "label": "Semilla"
+    },
+    "spin": {
+     "label": "Giro"
+    },
+    "spread": {
+     "label": "Dispersión de dirección"
+    },
+    "thickness": {
+     "label": "Grosor"
+    }
+   }
+  },
   "fringeclean": {
    "description": "Quita el color de los píxeles en el borde de la máscara de la capa, así los halos de color que deja un croma se vuelven grises, mientras que hasta tres colores protegidos se conservan.",
    "name": "Fleco de máscara",
@@ -3495,6 +3543,9 @@
     "count": {
      "label": "Cantidad"
     },
+    "depth": {
+     "label": "Profundidad"
+    },
     "direction": {
      "label": "Dirección"
     },
@@ -3574,6 +3625,9 @@
       "Seguir movimiento"
      ]
     },
+    "perspective": {
+     "label": "Perspectiva"
+    },
     "position": {
      "label": "Posición del emisor"
     },
@@ -3627,6 +3681,12 @@
     },
     "wind": {
      "label": "Viento"
+    },
+    "zSpeed": {
+     "label": "Velocidad Z"
+    },
+    "zSpread": {
+     "label": "Dispersión Z"
     }
    },
    "presets": {
@@ -4522,6 +4582,77 @@
     },
     "spacing": {
      "label": "Espaciado de líneas"
+    }
+   }
+  },
+  "scatter3d": {
+   "description": "Convierte la capa en una cuadrícula de piezas 3D dispersas.",
+   "name": "Dispersión 3D",
+   "params": {
+    "axis": {
+     "label": "Eje de torsión",
+     "options": [
+      "X",
+      "Y",
+      "Z"
+     ]
+    },
+    "depth": {
+     "label": "Profundidad de cuadrícula"
+    },
+    "depthSpacing": {
+     "label": "Espaciado en profundidad"
+    },
+    "intensity": {
+     "label": "Intensidad de la luz"
+    },
+    "light": {
+     "label": "Dirección de la luz"
+    },
+    "lightHeight": {
+     "label": "Altura de la luz"
+    },
+    "perspective": {
+     "label": "Perspectiva"
+    },
+    "rotX": {
+     "label": "Rotación X"
+    },
+    "rotY": {
+     "label": "Rotación Y"
+    },
+    "rotZ": {
+     "label": "Rotación Z"
+    },
+    "scatter": {
+     "label": "Dispersión"
+    },
+    "seed": {
+     "label": "Semilla"
+    },
+    "shading": {
+     "label": "Sombreado"
+    },
+    "shape": {
+     "label": "Forma",
+     "options": [
+      "Cubo",
+      "Esfera",
+      "Cuadrado",
+      "Círculo"
+     ]
+    },
+    "size": {
+     "label": "Tamaño de pieza"
+    },
+    "spacing": {
+     "label": "Espaciado de cuadrícula"
+    },
+    "spin": {
+     "label": "Rotación de dispersión"
+    },
+    "twist": {
+     "label": "Ángulo de torsión"
     }
    }
   },
@@ -5953,6 +6084,47 @@
     },
     "wobble": {
      "label": "Ondulación"
+    }
+   }
+  },
+  "videofeedback": {
+   "description": "Dibuja la capa dentro de sí misma repetidamente, como una cámara apuntada a su propia pantalla. Mueve, escala o gira la capa para dirigir el túnel.",
+   "name": "Retroalimentación de video",
+   "params": {
+    "blend": {
+     "label": "Fusión",
+     "options": [
+      "Normal",
+      "Sumar",
+      "Trama"
+     ]
+    },
+    "center": {
+     "label": "Centro"
+    },
+    "copies": {
+     "label": "Copias"
+    },
+    "delay": {
+     "label": "Retraso"
+    },
+    "fade": {
+     "label": "Desvanecimiento"
+    },
+    "hueShift": {
+     "label": "Cambio de tono"
+    },
+    "offset": {
+     "label": "Desplazamiento"
+    },
+    "rotation": {
+     "label": "Rotación"
+    },
+    "useLayerTransform": {
+     "label": "Usar transformación de capa"
+    },
+    "zoom": {
+     "label": "Zoom"
     }
    }
   },

@@ -89,6 +89,7 @@ internal object PanelIcons {
     val Check = icon("Check", width = 1.8f, stroke = "M20 6L9 17L4 12")
     val Mic = icon("Mic", width = 1.7f, stroke = "M12 2A3 3 0 0 1 15 5L15 12A3 3 0 0 1 9 12L9 5A3 3 0 0 1 12 2ZM19 10L19 12A7 7 0 0 1 5 12L5 10M12 19L12 22")
     val Bot = icon("Bot", width = 1.7f, stroke = "M12 8L12 4L8 4M6 8L18 8A2 2 0 0 1 20 10L20 18A2 2 0 0 1 18 20L6 20A2 2 0 0 1 4 18L4 10A2 2 0 0 1 6 8ZM2 14L4 14M20 14L22 14M15 13L15 15M9 13L9 15")
+    val Screenshot = icon("Screenshot", width = 1.7f, stroke = "M14.5 4L9.5 4L7 7L4 7A2 2 0 0 0 2 9L2 18A2 2 0 0 0 4 20L20 20A2 2 0 0 0 22 18L22 9A2 2 0 0 0 20 7L17 7ZM9 13A3 3 0 1 0 15 13A3 3 0 1 0 9 13Z")
     val Reverse = icon("Reverse", width = 1.7f, stroke = "M16 3L20 7L16 11M20 7L4 7M8 21L4 17L8 13M4 17L20 17")
 }
 

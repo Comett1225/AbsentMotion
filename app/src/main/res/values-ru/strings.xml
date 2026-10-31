@@ -787,9 +787,6 @@
     <string name="export_problem_android">%1$s с %2$s требует Android %3$s или новее.</string>
     <string name="export_reason_webp_lossless">WebP без потерь требует Android 10 или новее. Выберите PNG, чтобы сохранить все пиксели.</string>
     <string name="export_verify_middle_frame">Середина видео не совпадает с проектом. Возможно, там чёрный кадр или видео зависло.</string>
-    <string name="export_stop_title">Остановить экспорт?</string>
-    <string name="export_stop_text">Незавершённый файл будет удалён.</string>
-    <string name="export_keep_going">Продолжить экспорт</string>
     <string name="export_running_leave">Можно переключаться на другие приложения, пока идёт экспорт.</string>
     <string name="export_notify_channel">Экспорт</string>
     <string name="export_notify_done">Экспорт завершён</string>
@@ -2041,4 +2038,28 @@
     <string name="prerender_playing">Предрендер готов</string>
     <string name="prerender_outdated">Предрендер устарел.</string>
     <string name="prerender_again">Предрендерить снова</string>
+    <string name="about_website">Сайт и руководство</string>
+    <string name="caption_outline_thickness">Толщина</string>
+    <string name="caption_outline_color">Цвет обводки</string>
+    <string name="caption_custom_color">Свой цвет</string>
+    <string name="multi_animation">Анимировать все</string>
+    <string name="multi_presets">Применить пресет</string>
+    <string name="multi_no_cut">Между выбранными слоями нет склеек</string>
+    <string name="layer_tool_screenshot">Снимок экрана</string>
+    <string name="screenshot_saved">Сохранено в галерее и добавлено как новый слой</string>
+    <string name="screenshot_failed">Не удалось сделать снимок экрана</string>
+    <string name="screenshot_outside">Сначала переместите указатель воспроизведения на клип</string>
+    <plurals name="multi_applied_count">
+        <item quantity="one">Применено к %1$s слою</item>
+        <item quantity="few">Применено к %1$s слоям</item>
+        <item quantity="many">Применено к %1$s слоям</item>
+        <item quantity="other">Применено к %1$s слоям</item>
+    </plurals>
+    <plurals name="multi_transition_count">
+        <item quantity="one">%1$s склейка</item>
+        <item quantity="few">%1$s склейки</item>
+        <item quantity="many">%1$s склеек</item>
+        <item quantity="other">%1$s склейки</item>
+    </plurals>
+    <string name="structure_svg_importing">Импорт SVG…</string>
 </resources>

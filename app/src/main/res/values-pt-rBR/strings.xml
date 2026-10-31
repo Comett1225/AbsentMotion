@@ -777,9 +777,6 @@
     <string name="export_problem_android">%1$s com %2$s requer Android %3$s ou mais recente.</string>
     <string name="export_reason_webp_lossless">WebP sem perdas requer Android 10 ou mais recente. Escolha PNG para manter cada pixel.</string>
     <string name="export_verify_middle_frame">O meio do vídeo não se parece com o projeto. Pode estar preto ou congelado.</string>
-    <string name="export_stop_title">Parar a exportação?</string>
-    <string name="export_stop_text">O arquivo inacabado será excluído.</string>
-    <string name="export_keep_going">Continuar exportando</string>
     <string name="export_running_leave">Você pode alternar para outros apps enquanto a exportação acontece.</string>
     <string name="export_notify_channel">Exportações</string>
     <string name="export_notify_done">Exportação concluída</string>
@@ -2014,4 +2011,26 @@
     <string name="prerender_playing">Pré-renderizado</string>
     <string name="prerender_outdated">A pré-renderização está desatualizada.</string>
     <string name="prerender_again">Pré-renderizar novamente</string>
+    <string name="about_website">Site e guia</string>
+    <string name="caption_outline_thickness">Espessura</string>
+    <string name="caption_outline_color">Cor do contorno</string>
+    <string name="caption_custom_color">Personalizado</string>
+    <string name="multi_animation">Animar tudo</string>
+    <string name="multi_presets">Aplicar predefinição</string>
+    <string name="multi_no_cut">Não há cortes entre as camadas selecionadas</string>
+    <string name="layer_tool_screenshot">Captura de tela</string>
+    <string name="screenshot_saved">Salva na galeria e adicionada como nova camada</string>
+    <string name="screenshot_failed">Não foi possível fazer a captura de tela</string>
+    <string name="screenshot_outside">Primeiro mova o indicador de reprodução para o clipe</string>
+    <plurals name="multi_applied_count">
+        <item quantity="one">Aplicado a %1$s camada</item>
+        <item quantity="many">Aplicado a %1$s camadas</item>
+        <item quantity="other">Aplicado a %1$s camadas</item>
+    </plurals>
+    <plurals name="multi_transition_count">
+        <item quantity="one">%1$s corte</item>
+        <item quantity="many">%1$s cortes</item>
+        <item quantity="other">%1$s cortes</item>
+    </plurals>
+    <string name="structure_svg_importing">Importando o SVG…</string>
 </resources>

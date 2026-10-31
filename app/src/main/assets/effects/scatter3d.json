@@ -1,0 +1,181 @@
+{
+ "id": "scatter3d",
+ "name": "3D Scatter",
+ "category": "3d",
+ "since": "4.4.0",
+ "native": true,
+ "description": "Turns the layer into a grid of scattered 3D pieces.",
+ "params": [
+  {
+   "id": "shape",
+   "label": "Shape",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Cube",
+    "Sphere",
+    "Square",
+    "Circle"
+   ]
+  },
+  {
+   "id": "spacing",
+   "label": "Grid Spacing",
+   "type": "float",
+   "default": 24,
+   "min": 1,
+   "max": 500,
+   "step": 1,
+   "pixels": true
+  },
+  {
+   "id": "size",
+   "label": "Piece Size",
+   "type": "float",
+   "default": 0.8,
+   "min": 0,
+   "max": 2,
+   "step": 0.01,
+   "percent": true
+  },
+  {
+   "id": "depth",
+   "label": "Grid Depth",
+   "type": "float",
+   "default": 1,
+   "min": 1,
+   "max": 16,
+   "step": 1
+  },
+  {
+   "id": "depthSpacing",
+   "label": "Depth Spacing",
+   "type": "float",
+   "default": 24,
+   "min": 0,
+   "max": 500,
+   "step": 1,
+   "pixels": true
+  },
+  {
+   "id": "scatter",
+   "label": "Scatter",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 2000,
+   "step": 1,
+   "pixels": true
+  },
+  {
+   "id": "seed",
+   "label": "Seed",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 10000,
+   "step": 1
+  },
+  {
+   "id": "spin",
+   "label": "Scatter Rotation",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 3600,
+   "step": 1
+  },
+  {
+   "id": "rotX",
+   "label": "Rotation X",
+   "type": "angle",
+   "default": 0,
+   "min": -3600,
+   "max": 3600,
+   "step": 0.1
+  },
+  {
+   "id": "rotY",
+   "label": "Rotation Y",
+   "type": "angle",
+   "default": 0,
+   "min": -3600,
+   "max": 3600,
+   "step": 0.1
+  },
+  {
+   "id": "rotZ",
+   "label": "Rotation Z",
+   "type": "angle",
+   "default": 0,
+   "min": -3600,
+   "max": 3600,
+   "step": 0.1
+  },
+  {
+   "id": "axis",
+   "label": "Twist Axis",
+   "type": "choice",
+   "default": 1,
+   "options": [
+    "X",
+    "Y",
+    "Z"
+   ]
+  },
+  {
+   "id": "twist",
+   "label": "Twist Angle",
+   "type": "angle",
+   "default": 0,
+   "min": -3600,
+   "max": 3600,
+   "step": 0.1
+  },
+  {
+   "id": "perspective",
+   "label": "Perspective",
+   "type": "float",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  },
+  {
+   "id": "light",
+   "label": "Light Direction",
+   "type": "angle",
+   "default": 135,
+   "min": -3600,
+   "max": 3600,
+   "step": 0.1
+  },
+  {
+   "id": "lightHeight",
+   "label": "Light Height",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 4,
+   "step": 0.01
+  },
+  {
+   "id": "intensity",
+   "label": "Light Intensity",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 2,
+   "step": 0.01
+  },
+  {
+   "id": "shading",
+   "label": "Shading",
+   "type": "float",
+   "default": 0.6,
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  }
+ ]
+}

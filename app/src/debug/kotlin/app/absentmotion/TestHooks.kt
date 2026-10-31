@@ -20,6 +20,7 @@ import app.absentmotion.media.DebugFrameInterpolation
 import app.absentmotion.model.Scene
 import app.absentmotion.model.fontNames
 import app.absentmotion.ui.editor.addPicked
+import app.absentmotion.ui.editor.importSvgFile
 import app.absentmotion.ui.home.Updates
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -251,6 +252,19 @@ internal object TestHooks {
             app.absentmotion.ai.BestCutout.sideOverride = intent.getIntExtra("hqside", 0).takeIf { it > 0 }
             intent.getStringExtra("hqremove")?.let { checkBestCutout(activity, File(it)) }
         }
+        intent.getStringExtra("exifcheck")?.let { path ->
+            scope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                val copy = File(activity.cacheDir, "exifcheck.jpg")
+                File(path).copyTo(copy, overwrite = true)
+                fun read() = androidx.exifinterface.media.ExifInterface(copy).let { e ->
+                    listOf(androidx.exifinterface.media.ExifInterface.TAG_DATETIME_ORIGINAL, androidx.exifinterface.media.ExifInterface.TAG_DATETIME,
+                        androidx.exifinterface.media.ExifInterface.TAG_OFFSET_TIME_ORIGINAL).joinToString(" | ") { e.getAttribute(it).toString() }
+                }
+                val before = read()
+                app.absentmotion.tools.freshDates(copy)
+                Log.i("AMTest", "exifcheck before=$before after=${read()} size=${copy.length()}")
+            }
+        }
         intent.getStringExtra("batch")?.let { list ->
             scope.launch {
                 for (line in File(list).readLines().filter { it.isNotBlank() }) {
@@ -274,6 +288,27 @@ internal object TestHooks {
             state.frame = intent.getIntExtra("frame", 0).coerceIn(0, scene.lastFrame)
             if (intent.getBooleanExtra("openexport", false)) state.exportOpen = true
             intent.getStringExtra("clipsmooth")?.let { method -> launch { checkClipSmooth(activity, state, method, intent.getStringExtra("smoothlevel"), intent.getStringExtra("smoothblur")) } }
+            intent.getStringExtra("svgimport")?.let { svg ->
+                launch {
+                    val t0 = android.os.SystemClock.elapsedRealtime()
+                    val sampler = Thread {
+                        try {
+                            while (true) {
+                                Thread.sleep(3000)
+                                for ((thread, stack) in Thread.getAllStackTraces()) if (thread.state == Thread.State.RUNNABLE && thread.name.startsWith("DefaultDispatcher"))
+                                    Log.i("AMTest", "svgstack " + thread.name + " " + stack.take(14).joinToString(" <- "))
+                            }
+                        } catch (_: InterruptedException) {}
+                    }.also { it.start() }
+                    try { state.importSvgFile(activity, Uri.fromFile(File(svg))) } finally { sampler.interrupt() }
+                    val t1 = android.os.SystemClock.elapsedRealtime()
+                    val xml = state.scene.toXml()
+                    val t2 = android.os.SystemClock.elapsedRealtime()
+                    val pixels = engine.capturePreviewFrame(state.scene, state.timeMs, state.scene.width / 2, state.scene.height / 2, false) { true }
+                    val t3 = android.os.SystemClock.elapsedRealtime()
+                    Log.i("AMTest", "svgimport ${File(svg).name} import=${t1 - t0}ms toXml=${t2 - t1}ms chars=${xml.length} preview=${t3 - t2}ms ok=${pixels != null} layers=${state.scene.layers.size}")
+                }
+            }
             val stillName = intent.getStringExtra("still")
             intent.getStringExtra("export")?.let { exportForTest(activity, it, scene, state.frame) }
             intent.getStringExtra("verify")?.let { file ->

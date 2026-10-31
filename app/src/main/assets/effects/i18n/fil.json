@@ -1932,6 +1932,54 @@
     }
    }
   },
+  "fracture3d": {
+   "description": "Binabasag ang layer sa gumagalaw na mga 3D na piraso.",
+   "name": "3D na pagkabasag",
+   "params": {
+    "depthPush": {
+     "label": "Tulak sa lalim"
+    },
+    "direction": {
+     "label": "Direksyon"
+    },
+    "fade": {
+     "label": "Fade out"
+    },
+    "force": {
+     "label": "Lakas"
+    },
+    "gravity": {
+     "label": "Grabidad"
+    },
+    "impact": {
+     "label": "Punto ng tama"
+    },
+    "intensity": {
+     "label": "Lakas ng ilaw"
+    },
+    "light": {
+     "label": "Direksyon ng ilaw"
+    },
+    "pieces": {
+     "label": "Mga piraso"
+    },
+    "progress": {
+     "label": "Progreso"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "spin": {
+     "label": "Ikot"
+    },
+    "spread": {
+     "label": "Kalat ng direksyon"
+    },
+    "thickness": {
+     "label": "Kapal"
+    }
+   }
+  },
   "fringeclean": {
    "description": "Inaalis ang kulay mula sa mga pixel sa gilid ng matte ng layer, kaya ang mga may kulay na halo na naiwan ng key ay kumukupas sa grey, habang hanggang tatlong protektadong kulay ang nananatili.",
    "name": "Fringe ng Matte",
@@ -3495,6 +3543,9 @@
     "count": {
      "label": "Bilang"
     },
+    "depth": {
+     "label": "Lalim"
+    },
     "direction": {
      "label": "Direksyon"
     },
@@ -3574,6 +3625,9 @@
       "Sumunod sa galaw"
      ]
     },
+    "perspective": {
+     "label": "Perspektibo"
+    },
     "position": {
      "label": "Posisyon ng emitter"
     },
@@ -3627,6 +3681,12 @@
     },
     "wind": {
      "label": "Hangin"
+    },
+    "zSpeed": {
+     "label": "Bilis sa Z"
+    },
+    "zSpread": {
+     "label": "Kalat sa Z"
     }
    },
    "presets": {
@@ -4522,6 +4582,77 @@
     },
     "spacing": {
      "label": "Espasyo ng linya"
+    }
+   }
+  },
+  "scatter3d": {
+   "description": "Ginagawang grid ng nagkalat na 3D na piraso ang layer.",
+   "name": "3D na pagkakalat",
+   "params": {
+    "axis": {
+     "label": "Axis ng pihit",
+     "options": [
+      "X",
+      "Y",
+      "Z"
+     ]
+    },
+    "depth": {
+     "label": "Lalim ng grid"
+    },
+    "depthSpacing": {
+     "label": "Agwat sa lalim"
+    },
+    "intensity": {
+     "label": "Lakas ng ilaw"
+    },
+    "light": {
+     "label": "Direksyon ng ilaw"
+    },
+    "lightHeight": {
+     "label": "Taas ng ilaw"
+    },
+    "perspective": {
+     "label": "Perspektibo"
+    },
+    "rotX": {
+     "label": "Pag-ikot X"
+    },
+    "rotY": {
+     "label": "Pag-ikot Y"
+    },
+    "rotZ": {
+     "label": "Pag-ikot Z"
+    },
+    "scatter": {
+     "label": "Kalat"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "shading": {
+     "label": "Paglilim"
+    },
+    "shape": {
+     "label": "Hugis",
+     "options": [
+      "Kubo",
+      "Bola",
+      "Kuwadrado",
+      "Bilog"
+     ]
+    },
+    "size": {
+     "label": "Laki ng piraso"
+    },
+    "spacing": {
+     "label": "Agwat ng grid"
+    },
+    "spin": {
+     "label": "Ikot ng kalat"
+    },
+    "twist": {
+     "label": "Anggulo ng pihit"
     }
    }
   },
@@ -5953,6 +6084,47 @@
     },
     "wobble": {
      "label": "Pag-indayog"
+    }
+   }
+  },
+  "videofeedback": {
+   "description": "Paulit-ulit na iginuguhit ang layer sa loob ng sarili nito, tulad ng kamerang nakatutok sa sarili nitong screen. Igalaw, baguhin ang laki o ikutin ang layer para idirekta ang tunnel.",
+   "name": "Feedback ng bidyo",
+   "params": {
+    "blend": {
+     "label": "Blending",
+     "options": [
+      "Normal",
+      "Add",
+      "Screen"
+     ]
+    },
+    "center": {
+     "label": "Gitna"
+    },
+    "copies": {
+     "label": "Mga kopya"
+    },
+    "delay": {
+     "label": "Antala"
+    },
+    "fade": {
+     "label": "Fade"
+    },
+    "hueShift": {
+     "label": "Pagbabago ng hue"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "rotation": {
+     "label": "Pag-ikot"
+    },
+    "useLayerTransform": {
+     "label": "Gamitin ang transform ng layer"
+    },
+    "zoom": {
+     "label": "Zoom"
     }
    }
   },

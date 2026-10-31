@@ -1932,6 +1932,54 @@
     }
    }
   },
+  "fracture3d": {
+   "description": "Phá lớp thành các mảnh 3D chuyển động.",
+   "name": "Phân mảnh 3D",
+   "params": {
+    "depthPush": {
+     "label": "Đẩy theo chiều sâu"
+    },
+    "direction": {
+     "label": "Hướng"
+    },
+    "fade": {
+     "label": "Mờ dần"
+    },
+    "force": {
+     "label": "Lực"
+    },
+    "gravity": {
+     "label": "Trọng lực"
+    },
+    "impact": {
+     "label": "Điểm va chạm"
+    },
+    "intensity": {
+     "label": "Cường độ sáng"
+    },
+    "light": {
+     "label": "Hướng ánh sáng"
+    },
+    "pieces": {
+     "label": "Số mảnh"
+    },
+    "progress": {
+     "label": "Tiến độ"
+    },
+    "seed": {
+     "label": "Hạt giống"
+    },
+    "spin": {
+     "label": "Quay"
+    },
+    "spread": {
+     "label": "Độ lan hướng"
+    },
+    "thickness": {
+     "label": "Độ dày"
+    }
+   }
+  },
   "fringeclean": {
    "description": "Loại bỏ màu khỏi các điểm ảnh dọc theo viền mặt nạ của lớp để quầng màu do chroma key để lại chuyển sang xám, trong khi tối đa ba màu được bảo vệ vẫn giữ nguyên.",
    "name": "Viền mặt nạ",
@@ -3495,6 +3543,9 @@
     "count": {
      "label": "Số lượng"
     },
+    "depth": {
+     "label": "Chiều sâu"
+    },
     "direction": {
      "label": "Hướng"
     },
@@ -3574,6 +3625,9 @@
       "Theo chuyển động"
      ]
     },
+    "perspective": {
+     "label": "Phối cảnh"
+    },
     "position": {
      "label": "Vị trí bộ phát"
     },
@@ -3627,6 +3681,12 @@
     },
     "wind": {
      "label": "Gió"
+    },
+    "zSpeed": {
+     "label": "Tốc độ Z"
+    },
+    "zSpread": {
+     "label": "Độ lan Z"
     }
    },
    "presets": {
@@ -4522,6 +4582,77 @@
     },
     "spacing": {
      "label": "Khoảng cách dòng"
+    }
+   }
+  },
+  "scatter3d": {
+   "description": "Biến lớp thành lưới các mảnh 3D phân tán.",
+   "name": "Phân tán 3D",
+   "params": {
+    "axis": {
+     "label": "Trục xoắn",
+     "options": [
+      "X",
+      "Y",
+      "Z"
+     ]
+    },
+    "depth": {
+     "label": "Chiều sâu lưới"
+    },
+    "depthSpacing": {
+     "label": "Khoảng cách chiều sâu"
+    },
+    "intensity": {
+     "label": "Cường độ sáng"
+    },
+    "light": {
+     "label": "Hướng ánh sáng"
+    },
+    "lightHeight": {
+     "label": "Độ cao ánh sáng"
+    },
+    "perspective": {
+     "label": "Phối cảnh"
+    },
+    "rotX": {
+     "label": "Xoay X"
+    },
+    "rotY": {
+     "label": "Xoay Y"
+    },
+    "rotZ": {
+     "label": "Xoay Z"
+    },
+    "scatter": {
+     "label": "Phân tán"
+    },
+    "seed": {
+     "label": "Hạt giống"
+    },
+    "shading": {
+     "label": "Đổ bóng"
+    },
+    "shape": {
+     "label": "Hình dạng",
+     "options": [
+      "Khối lập phương",
+      "Khối cầu",
+      "Hình vuông",
+      "Hình tròn"
+     ]
+    },
+    "size": {
+     "label": "Kích thước mảnh"
+    },
+    "spacing": {
+     "label": "Khoảng cách lưới"
+    },
+    "spin": {
+     "label": "Xoay phân tán"
+    },
+    "twist": {
+     "label": "Góc xoắn"
     }
    }
   },
@@ -5953,6 +6084,47 @@
     },
     "wobble": {
      "label": "Rung lắc"
+    }
+   }
+  },
+  "videofeedback": {
+   "description": "Vẽ lớp lặp lại bên trong chính nó, như máy quay hướng vào màn hình của mình. Di chuyển, đổi kích thước hoặc xoay lớp để điều khiển đường hầm.",
+   "name": "Phản hồi video",
+   "params": {
+    "blend": {
+     "label": "Hòa trộn",
+     "options": [
+      "Thường",
+      "Cộng",
+      "Màn hình"
+     ]
+    },
+    "center": {
+     "label": "Tâm"
+    },
+    "copies": {
+     "label": "Số bản sao"
+    },
+    "delay": {
+     "label": "Độ trễ"
+    },
+    "fade": {
+     "label": "Làm mờ"
+    },
+    "hueShift": {
+     "label": "Dịch sắc độ"
+    },
+    "offset": {
+     "label": "Độ lệch"
+    },
+    "rotation": {
+     "label": "Xoay"
+    },
+    "useLayerTransform": {
+     "label": "Dùng biến đổi lớp"
+    },
+    "zoom": {
+     "label": "Thu phóng"
     }
    }
   },

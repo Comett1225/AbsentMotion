@@ -61,6 +61,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import app.absentmotion.editor.EditorState
+import app.absentmotion.editor.animateLayers
+import app.absentmotion.editor.transitionCuts
+import android.widget.Toast
 import app.absentmotion.model.Animations
 import app.absentmotion.model.LOOP_MAX_MS
 import app.absentmotion.model.LOOP_MIN_MS
@@ -104,6 +107,7 @@ import kotlin.math.max
 import kotlin.math.roundToInt
 import kotlin.math.sin
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.pluralStringResource
 import app.absentmotion.R
 import app.absentmotion.i18n.UiText
 import app.absentmotion.i18n.text
@@ -161,7 +165,12 @@ internal fun AnimateButton(state: EditorState, modifier: Modifier) {
 private val PreviewPanelWidth = 55.dp
 
 @Composable
-internal fun TransitionSheet(state: EditorState, aId: Long, bId: Long, onClose: () -> Unit) {
+internal fun TransitionSheet(state: EditorState, aId: Long, bId: Long, onClose: () -> Unit) =
+    TransitionSheet(state, listOf(aId to bId), onClose)
+
+@Composable
+internal fun TransitionSheet(state: EditorState, cuts: List<Pair<Long, Long>>, onClose: () -> Unit) {
+    val (aId, bId) = cuts.first()
     val record = state.scene.layer(bId)?.motion(MotionSlot.In)?.takeIf { it.transition && it.partner == aId }
     val current = TransitionKind.of(record?.id)
     var ms by remember { mutableIntStateOf(record?.ms ?: 500) }
@@ -170,13 +179,16 @@ internal fun TransitionSheet(state: EditorState, aId: Long, bId: Long, onClose: 
     val pictures = rememberMotionPictures()
     fun apply(kind: TransitionKind?, key: Any? = null) {
         var told: UiText? = null
-        state.edit(key) { s -> s.withTransition(aId, bId, kind, ms).also { told = it.note }.scene }
+        state.edit(key) { s ->
+            if (cuts.size == 1) s.withTransition(aId, bId, kind, ms).also { told = it.note }.scene
+            else s.transitionCuts(cuts, kind, ms)
+        }
         note = told
     }
     val clip = stringResource(R.string.transition_clip)
     val names = listOf(aId, bId).map { id -> state.scene.layer(id)?.label?.ifEmpty { null } ?: clip }
     MotionSheet(stringResource(R.string.transition_title), onClose) {
-        Text("${names[0]}  →  ${names[1]}", Modifier.fillMaxWidth().height(24.dp), color = Am.OnDarkDim, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Text(if (cuts.size == 1) "${names[0]}  →  ${names[1]}" else pluralStringResource(R.plurals.multi_transition_count, cuts.size, cuts.size.toString()), Modifier.fillMaxWidth().height(24.dp), color = Am.OnDarkDim, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
         TileGrid(listOf<TransitionKind?>(null) + TransitionKind.entries) { kind, modifier ->
             if (kind == null) Tile(stringResource(R.string.none), current == null, modifier, { apply(null) }, null)
             else Tile(stringResource(kind.label), kind == current, modifier, { apply(kind) }) { drawTransition(kind, clock.value, pictures) }
@@ -187,7 +199,13 @@ internal fun TransitionSheet(state: EditorState, aId: Long, bId: Long, onClose: 
 }
 
 @Composable
-internal fun AnimationSheet(state: EditorState, id: Long, onClose: () -> Unit) {
+internal fun AnimationSheet(state: EditorState, id: Long, onClose: () -> Unit) =
+    AnimationSheet(state, setOf(id), onClose)
+
+@Composable
+internal fun AnimationSheet(state: EditorState, ids: Set<Long>, onClose: () -> Unit) {
+    val context = LocalContext.current
+    val id = ids.firstOrNull { state.scene.layer(it)?.canAnimate == true } ?: return
     var tab by remember { mutableIntStateOf(0) }
     val slot = MotionSlot.entries[tab]
     val layer = state.scene.layer(id)
@@ -197,7 +215,11 @@ internal fun AnimationSheet(state: EditorState, id: Long, onClose: () -> Unit) {
     var ms by remember(tab) { mutableIntStateOf(record?.takeUnless { it.transition }?.ms ?: if (loop) 1000 else 500) }
     val clock = rememberClock()
     val picture = rememberMotionPictures().firstOrNull()
-    fun apply(motionId: String?, key: Any? = null) = state.edit(key) { it.withAnimation(id, slot, motionId, ms) }
+    fun apply(motionId: String?, key: Any? = null) {
+        val count = state.scene.layers.count { it.id in ids && it.canAnimate }
+        state.edit(key) { it.animateLayers(ids, slot, motionId, ms) }
+        if (ids.size > 1 && key == null) Toast.makeText(context, context.resources.getQuantityString(R.plurals.multi_applied_count, count, count.toString()), Toast.LENGTH_SHORT).show()
+    }
     MotionSheet(stringResource(R.string.animation_title), onClose) {
         Row(Modifier.fillMaxWidth().height(40.dp), verticalAlignment = Alignment.CenterVertically) {
             Choices(listOf(stringResource(R.string.animation_in), stringResource(R.string.animation_out), stringResource(R.string.animation_loop)), tab) { tab = it }

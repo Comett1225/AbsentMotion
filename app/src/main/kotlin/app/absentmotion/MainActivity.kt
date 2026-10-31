@@ -186,6 +186,7 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch(Dispatchers.IO) {
             runCatching { app.absentmotion.export.MediaStoreExport(applicationContext).discardAbandoned() }
             runCatching { app.absentmotion.library.sweepStaleTemps(filesDir, cacheDir) }
+            runCatching { app.absentmotion.ai.AiModel.dropReplaced(applicationContext) }
         }
         val openElement: (String) -> Unit = { id ->
             editor?.let { it.playing = false; it.endGesture(); it.saver.snapshot(it.scene.toXml()) }
@@ -214,6 +215,7 @@ class MainActivity : ComponentActivity() {
         app.absentmotion.ui.home.Updater.atLaunch(applicationContext)
         lifecycleScope.launch { engineWorks() }
         firstRun = FirstRun.of(settings, TestHooks.onboarding(intent).takeIf { savedInstanceState == null })
+        window.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(Am.HomeBg.toArgb()))
         if (savedInstanceState == null) playNotice = settings.playNoticeDue(BuildConfig.FLAVOR)
         importShared()
         setContent {
