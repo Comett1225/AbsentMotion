@@ -429,6 +429,7 @@
     <string name="compress_saved_to">บันทึกไปยัง %1$s</string>
     <string name="compress_share">แชร์</string>
     <string name="compress_failed">บีบอัดไม่สำเร็จ: %1$s</string>
+    <string name="compress_too_big">ภาพนี้ใหญ่เกินไปสำหรับโทรศัพท์เครื่องนี้</string>
     <string name="compress_save_failed">บันทึกไม่สำเร็จ: %1$s</string>
     <string name="downloader_hint">วางลิงก์วิดีโอ</string>
     <string name="downloader_paste">วาง</string>
@@ -461,6 +462,7 @@
     <string name="downloader_engine_failed">ดาวน์โหลดส่วนเสริมไม่สำเร็จ ตรวจสอบการเชื่อมต่อแล้วลองอีกครั้ง</string>
     <string name="downloader_engine_missing">ติดตั้งส่วนเสริมก่อน</string>
     <string name="downloader_engine_broken">ส่วนเสริมไม่สามารถเริ่มทำงานได้ ลบในการตั้งค่าแล้วติดตั้งใหม่</string>
+    <string name="downloader_restart">ปิด AbsentMotion แล้วเปิดใหม่เพื่อตั้งค่าส่วนเสริมให้เสร็จ</string>
     <string name="downloader_engine_unavailable">การดาวน์โหลดวิดีโอต้องใช้โทรศัพท์ที่มีโปรเซสเซอร์ 64 บิต</string>
     <string name="downloader_engine_name">ส่วนเสริมดาวน์โหลดวิดีโอ</string>
     <string name="downloader_get_engine_first">ติดตั้งส่วนเสริมเพื่อดูว่าลิงก์นี้มีอะไร</string>

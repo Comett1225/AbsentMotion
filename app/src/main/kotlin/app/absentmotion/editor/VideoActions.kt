@@ -47,13 +47,17 @@ fun EditorState.retimeVideo(start: Boolean) {
 fun EditorState.setVideoSpeed(value: Float, original: Layer) {
     if (selectedId != original.id || value.isNaN()) return
     val speed = value.coerceIn(SLOWEST_SPEED, FASTEST_SPEED)
-    edit("video-speed") { it.update(original.id) { original.withNormalSpeed(speed) } }
+    val changed = original.withNormalSpeed(speed)
+    if (!scene.showsAnyFrame(changed.startTime, changed.endTime)) return
+    edit("video-speed") { it.update(original.id) { changed } }
 }
 
 fun EditorState.applySpeedCurve(points: List<CurvePoint>?) {
     val layer = selected ?: return
     val media = VideoTiming(layer).mediaMs((sampleMs - layer.startTime).toDouble())
     val inside = sampleMs in layer.startTime..layer.endTime
+    val changed = layer.withSpeedCurve(points)
+    if (!scene.showsAnyFrame(changed.startTime, changed.endTime)) return
     edit { it.update(layer.id) { current -> current.withSpeedCurve(points) } }
     val after = selected ?: return
     if (inside) frame = scene.frameAt(after.startTime + VideoTiming(after).localMs(media).roundToInt())

@@ -141,6 +141,7 @@ void Simulate(const Field& f, double t, std::vector<Particle>* out) {
         size_t room = cap;
         for (auto it = beats.rbegin(); it != beats.rend() && room > 0; ++it) {
             const double b = std::min(t, it->first - f.origin);
+            if (!now.prewarm && b < 0) continue;
             const size_t n = amount(b, room);
             room -= n;
             for (size_t m = 0; m < n; m++) births.push_back({b, Mix(f.seed ^ Mix((uint64_t)it->second * 0x100000001b3ull + m) ^ 0xbeull)});

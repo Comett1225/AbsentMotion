@@ -430,6 +430,7 @@
     <string name="compress_saved_to">در %1$s ذخیره شد</string>
     <string name="compress_share">اشتراک‌گذاری</string>
     <string name="compress_failed">فشرده‌سازی نشد: %1$s</string>
+    <string name="compress_too_big">این تصویر برای این گوشی خیلی بزرگ است.</string>
     <string name="compress_save_failed">ذخیره نشد: %1$s</string>
     <string name="downloader_hint">لینک ویدیو را جای‌گذاری کنید</string>
     <string name="downloader_paste">جای‌گذاری</string>
@@ -462,6 +463,7 @@
     <string name="downloader_engine_failed">افزونه دانلود نشد. اتصال را بررسی کنید و دوباره تلاش کنید.</string>
     <string name="downloader_engine_missing">اول افزونه را دریافت کنید.</string>
     <string name="downloader_engine_broken">افزونه شروع نشد. آن را در تنظیمات حذف کنید و دوباره دریافت کنید.</string>
+    <string name="downloader_restart">AbsentMotion را ببندید و دوباره باز کنید تا راه‌اندازی افزونه تمام شود.</string>
     <string name="downloader_engine_unavailable">دانلود ویدیو به گوشی با پردازنده 64 بیتی نیاز دارد.</string>
     <string name="downloader_engine_name">افزونه دانلود ویدیو</string>
     <string name="downloader_get_engine_first">برای دیدن محتوای این لینک، افزونه را دریافت کنید.</string>

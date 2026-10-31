@@ -431,6 +431,7 @@
     <string name="compress_saved_to">Salvo em %1$s</string>
     <string name="compress_share">Compartilhar</string>
     <string name="compress_failed">Não foi possível comprimir: %1$s</string>
+    <string name="compress_too_big">Esta imagem é grande demais para este celular.</string>
     <string name="compress_save_failed">Não foi possível salvar: %1$s</string>
     <string name="downloader_hint">Cole um link de vídeo</string>
     <string name="downloader_paste">Colar</string>
@@ -463,6 +464,7 @@
     <string name="downloader_engine_failed">Não foi possível baixar o complemento. Verifique a conexão e tente novamente.</string>
     <string name="downloader_engine_missing">Obtenha o complemento primeiro.</string>
     <string name="downloader_engine_broken">O complemento não iniciou. Remova-o nas Configurações e obtenha-o novamente.</string>
+    <string name="downloader_restart">Feche o AbsentMotion e abra de novo para terminar de configurar o complemento.</string>
     <string name="downloader_engine_unavailable">Downloads de vídeo exigem um celular com processador de 64 bits.</string>
     <string name="downloader_engine_name">Complemento de download de vídeo</string>
     <string name="downloader_get_engine_first">Obtenha o complemento para ver o que este link contém.</string>

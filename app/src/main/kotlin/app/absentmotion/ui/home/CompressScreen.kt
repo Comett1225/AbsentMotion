@@ -157,6 +157,8 @@ internal fun CompressScreen(initial: android.net.Uri? = null, onClose: () -> Uni
                 throw e
             } catch (e: Exception) {
                 step = Step.Failed(e.message ?: e.javaClass.simpleName)
+            } catch (e: OutOfMemoryError) {
+                step = Step.Failed(context.getString(R.string.compress_too_big))
             }
         }
     }

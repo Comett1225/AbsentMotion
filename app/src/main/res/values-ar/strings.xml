@@ -434,6 +434,7 @@
     <string name="compress_saved_to">حُفظ في %1$s</string>
     <string name="compress_share">مشاركة</string>
     <string name="compress_failed">تعذر الضغط: %1$s</string>
+    <string name="compress_too_big">هذه الصورة كبيرة جدًا على هذا الهاتف.</string>
     <string name="compress_save_failed">تعذر الحفظ: %1$s</string>
     <string name="downloader_hint">الصق رابط فيديو</string>
     <string name="downloader_paste">لصق</string>
@@ -466,6 +467,7 @@
     <string name="downloader_engine_failed">تعذر تنزيل الإضافة. تحقق من الاتصال وحاول مرة أخرى.</string>
     <string name="downloader_engine_missing">نزّل الإضافة أولاً.</string>
     <string name="downloader_engine_broken">لم تعمل الإضافة. أزلها من الإعدادات ثم نزّلها مجددًا.</string>
+    <string name="downloader_restart">أغلق AbsentMotion ثم افتحه مجددًا لإكمال إعداد الإضافة.</string>
     <string name="downloader_engine_unavailable">يتطلب تنزيل الفيديو هاتفًا بمعالج 64 بت.</string>
     <string name="downloader_engine_name">إضافة تنزيل الفيديو</string>
     <string name="downloader_get_engine_first">نزّل الإضافة لترى ما يحتويه هذا الرابط.</string>

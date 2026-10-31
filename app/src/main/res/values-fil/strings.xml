@@ -430,6 +430,7 @@
     <string name="compress_saved_to">Na-save sa %1$s</string>
     <string name="compress_share">I-share</string>
     <string name="compress_failed">Hindi ma-compress: %1$s</string>
+    <string name="compress_too_big">Masyadong malaki ang larawang ito para sa phone na ito.</string>
     <string name="compress_save_failed">Hindi ma-save: %1$s</string>
     <string name="downloader_hint">I-paste ang link ng bidyo</string>
     <string name="downloader_paste">I-paste</string>
@@ -462,6 +463,7 @@
     <string name="downloader_engine_failed">Hindi ma-download ang add-on. Tingnan ang koneksyon at subukang muli.</string>
     <string name="downloader_engine_missing">Kunin muna ang add-on.</string>
     <string name="downloader_engine_broken">Hindi nag-start ang add-on. Alisin ito sa mga setting at kunin muli.</string>
+    <string name="downloader_restart">Isara ang AbsentMotion at buksan muli para matapos ang pag-set up ng add-on.</string>
     <string name="downloader_engine_unavailable">Kailangan ng phone na may 64-bit na processor para sa pag-download ng bidyo.</string>
     <string name="downloader_engine_name">Add-on para sa pag-download ng bidyo</string>
     <string name="downloader_get_engine_first">Kunin ang add-on para makita ang nasa link na ito.</string>

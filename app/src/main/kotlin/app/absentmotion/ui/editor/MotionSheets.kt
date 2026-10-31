@@ -52,6 +52,7 @@ import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.text.font.FontWeight
@@ -274,7 +275,7 @@ internal fun rememberClock(): State<Float> = rememberInfiniteTransition(label = 
 
 private class Pose(var dx: Float = 0f, var dy: Float = 0f, var scale: Float = 1f, var turn: Float = 0f, var alpha: Float = 1f,
                    var tint: Color = Color.Transparent, var smear: Float = 0f, var split: Float = 0f, var shake: Float = 0f,
-                   var wipe: Float = 0f, var wipeAngle: Float = 90f)
+                   var wipe: Float = 0f, var wipeAngle: Float = 90f, var clock: Boolean = false, var clockFrom: Float = 0f)
 
 @Composable
 private fun rememberMotionPictures(): List<ImageBitmap> {
@@ -312,9 +313,14 @@ private fun Motion.pose(u: Float, inSide: Boolean, w: Float, h: Float): Pose {
             "absent.glitch", "absent.rgbsplit" -> pose.split = max(pose.split, amount)
             "absent.autoshake" -> pose.shake = max(pose.shake, amount)
             "absent.directionalblur", "absent.radialblur", "absent.spinblur" -> pose.smear = max(pose.smear, amount)
-            "absent.wipe", "absent.radialwipe" -> {
+            "absent.wipe" -> {
                 pose.wipe = max(pose.wipe, amount)
                 pose.wipeAngle = effect.fixed["angle"]?.toFloatOrNull() ?: 90f
+            }
+            "absent.radialwipe" -> {
+                pose.wipe = max(pose.wipe, amount)
+                pose.clock = true
+                pose.clockFrom = if (effect.fixed["direction"] == "1") 1f else 0f
             }
             "absent.dissolve" -> pose.alpha *= 1 - amount
             "absent.pixelate" -> pose.split = max(pose.split, amount)
@@ -354,7 +360,18 @@ private fun DrawScope.drawPose(pose: Pose, color: Color, clip: Boolean, clock: F
             photo(at + Offset(i * trail, 0f), 0.15f * alpha)
             photo(at + Offset(-i * trail, 0f), 0.15f * alpha)
         }
-        if (pose.wipe > 0f) {
+        if (pose.wipe > 0f && pose.clock) {
+            val v = 1f - pose.wipe.coerceIn(0f, 1f)
+            val start = if (pose.clockFrom > 0f) -90f else -90f + 360f * (1f - v)
+            val wedge = androidx.compose.ui.graphics.Path().apply {
+                val c = Offset(at.x + box.width / 2, at.y + box.height / 2)
+                val r = max(box.width, box.height)
+                moveTo(c.x, c.y)
+                arcTo(androidx.compose.ui.geometry.Rect(c.x - r, c.y - r, c.x + r, c.y + r), start, 360f * v, false)
+                close()
+            }
+            clipPath(wedge) { photo(at) }
+        } else if (pose.wipe > 0f) {
             val v = 1f - pose.wipe.coerceIn(0f, 1f)
             val horizontal = pose.wipeAngle == 0f || pose.wipeAngle == 180f
             val forward = pose.wipeAngle == 0f || pose.wipeAngle == 90f

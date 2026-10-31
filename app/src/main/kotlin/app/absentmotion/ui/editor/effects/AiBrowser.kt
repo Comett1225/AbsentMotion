@@ -184,10 +184,12 @@ private suspend fun pickFrame(context: Context, uri: String, timeUs: Long): Imag
 }
 
 private suspend fun pickPicture(context: Context, uri: String, turn: Int): ImageBitmap? = withContext(Dispatchers.IO) {
-    val picture = decodePicture(context.contentResolver, Uri.parse(uri), PICK_SIDE) ?: return@withContext null
+    val picture = runCatching { decodePicture(context.contentResolver, Uri.parse(openableUri(uri)), PICK_SIDE) }.getOrNull() ?: return@withContext null
     if (Math.floorMod(turn, 360) == 0) return@withContext picture.asImageBitmap()
-    Bitmap.createBitmap(picture, 0, 0, picture.width, picture.height, Matrix().apply { postRotate(turn.toFloat()) }, true)
-        .also { if (it !== picture) picture.recycle() }.asImageBitmap()
+    runCatching {
+        Bitmap.createBitmap(picture, 0, 0, picture.width, picture.height, Matrix().apply { postRotate(turn.toFloat()) }, true)
+            .also { if (it !== picture) picture.recycle() }.asImageBitmap()
+    }.getOrElse { picture.asImageBitmap() }
 }
 
 private fun fitted(picture: ImageBitmap, width: Float, height: Float): Rect {

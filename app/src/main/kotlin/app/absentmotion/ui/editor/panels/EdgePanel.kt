@@ -29,9 +29,11 @@ import kotlin.math.roundToInt
 
 @Composable
 internal fun EdgeSlider(label: String, value: Int, range: IntRange, onDone: () -> Unit = {}, onChange: (Int) -> Unit) {
+    val sent = androidx.compose.runtime.remember { intArrayOf(value) }
+    androidx.compose.runtime.SideEffect { sent[0] = value }
     Row(Modifier.fillMaxWidth().height(44.dp), verticalAlignment = Alignment.CenterVertically) {
         Text(label, Modifier.width(96.dp), color = Am.OnDark, fontSize = 14.sp, lineHeight = 16.sp, maxLines = 2)
-        ThinSlider(value.toFloat(), { v -> v.roundToInt().coerceIn(range).let { if (it != value) onChange(it) } }, Modifier.weight(1f),
+        ThinSlider(value.toFloat(), { v -> v.roundToInt().coerceIn(range).let { if (it != sent[0]) { sent[0] = it; onChange(it) } } }, Modifier.weight(1f),
             valueRange = range.first.toFloat()..range.last.toFloat(), onValueChangeFinished = onDone)
         Text(if (value > 0 && range.first < 0) "+$value" else "$value", Modifier.width(36.dp), color = Am.OnDark, fontSize = 14.sp, textAlign = TextAlign.End, maxLines = 1)
     }

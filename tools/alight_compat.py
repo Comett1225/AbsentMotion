@@ -24,10 +24,15 @@ def build():
     foreign = json.loads(FOREIGN.read_text(encoding="utf-8"))
     by_id = {}
     for full, rule in foreign.items():
-        by_id.setdefault(full.rsplit(".", 1)[-1], rule["to"])
+        for prefix in ("com.alightcreative.effects.", "com.alightcreative."):
+            if full.startswith(prefix):
+                by_id.setdefault(full[len(prefix):], rule["to"])
+                break
     seen = set()
     table = []
     for row in rows:
+        if row["id"] in seen:
+            continue
         target = by_id.get(row["id"])
         seen.add(row["id"])
         status = row["measured"] if target else "none"

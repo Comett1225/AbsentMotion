@@ -429,6 +429,7 @@
     <string name="compress_saved_to">%1$sに保存しました</string>
     <string name="compress_share">共有</string>
     <string name="compress_failed">圧縮できませんでした：%1$s</string>
+    <string name="compress_too_big">この画像はこのスマートフォンには大きすぎます。</string>
     <string name="compress_save_failed">保存できませんでした：%1$s</string>
     <string name="downloader_hint">動画リンクを貼り付け</string>
     <string name="downloader_paste">貼り付け</string>
@@ -461,6 +462,7 @@
     <string name="downloader_engine_failed">アドオンをダウンロードできませんでした。接続を確認して、もう一度お試しください。</string>
     <string name="downloader_engine_missing">先にアドオンを取得してください。</string>
     <string name="downloader_engine_broken">アドオンが起動しませんでした。設定から削除して、もう一度取得してください。</string>
+    <string name="downloader_restart">アドオンの設定を完了するには、AbsentMotion を閉じてもう一度開いてください。</string>
     <string name="downloader_engine_unavailable">動画のダウンロードには64ビットプロセッサのスマートフォンが必要です。</string>
     <string name="downloader_engine_name">動画ダウンローダーアドオン</string>
     <string name="downloader_get_engine_first">このリンクの内容を見るにはアドオンを取得してください。</string>

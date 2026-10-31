@@ -429,6 +429,7 @@
     <string name="compress_saved_to">Đã lưu vào %1$s</string>
     <string name="compress_share">Chia sẻ</string>
     <string name="compress_failed">Không nén được: %1$s</string>
+    <string name="compress_too_big">Ảnh này quá lớn đối với điện thoại này.</string>
     <string name="compress_save_failed">Không lưu được: %1$s</string>
     <string name="downloader_hint">Dán liên kết video</string>
     <string name="downloader_paste">Dán</string>
@@ -461,6 +462,7 @@
     <string name="downloader_engine_failed">Không thể tải tiện ích. Kiểm tra kết nối và thử lại.</string>
     <string name="downloader_engine_missing">Hãy tải tiện ích trước.</string>
     <string name="downloader_engine_broken">Tiện ích không khởi động được. Gỡ nó trong Cài đặt rồi tải lại.</string>
+    <string name="downloader_restart">Hãy đóng AbsentMotion rồi mở lại để hoàn tất cài đặt tiện ích.</string>
     <string name="downloader_engine_unavailable">Tải video cần điện thoại có bộ xử lý 64-bit.</string>
     <string name="downloader_engine_name">Tiện ích tải video</string>
     <string name="downloader_get_engine_first">Tải tiện ích để xem liên kết này có gì.</string>

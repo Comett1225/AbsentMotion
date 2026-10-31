@@ -429,6 +429,7 @@
     <string name="compress_saved_to">Disimpan ke %1$s</string>
     <string name="compress_share">Kongsi</string>
     <string name="compress_failed">Tidak dapat memampatkan: %1$s</string>
+    <string name="compress_too_big">Gambar ini terlalu besar untuk telefon ini.</string>
     <string name="compress_save_failed">Tidak dapat menyimpan: %1$s</string>
     <string name="downloader_hint">Tampal pautan video</string>
     <string name="downloader_paste">Tampal</string>
@@ -461,6 +462,7 @@
     <string name="downloader_engine_failed">Alat tambah tidak dapat dimuat turun. Semak sambungan dan cuba lagi.</string>
     <string name="downloader_engine_missing">Dapatkan alat tambah dahulu.</string>
     <string name="downloader_engine_broken">Alat tambah tidak bermula. Buangnya dalam Tetapan dan dapatkannya semula.</string>
+    <string name="downloader_restart">Tutup AbsentMotion dan buka semula untuk selesai menyediakan alat tambah.</string>
     <string name="downloader_engine_unavailable">Muat turun video memerlukan telefon dengan pemproses 64-bit.</string>
     <string name="downloader_engine_name">Alat tambah muat turun video</string>
     <string name="downloader_get_engine_first">Dapatkan alat tambah untuk melihat kandungan pautan ini.</string>

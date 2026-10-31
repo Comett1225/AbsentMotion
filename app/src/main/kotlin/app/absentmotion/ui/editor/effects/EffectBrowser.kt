@@ -116,7 +116,8 @@ fun EffectBrowser(state: EditorState) {
         if (!effect.available) return
         val targets = state.effectTargets
         if (targets != null) {
-            state.addEffectToChosen(targets) { layer: app.absentmotion.model.Layer -> effect.instance(preset, layer.endTime - layer.startTime) }
+            val added = state.addEffectToChosen(targets) { layer: app.absentmotion.model.Layer -> effect.instance(preset, layer.endTime - layer.startTime) }
+            if (added == 0) app.absentmotion.platform.Toast.makeText(context, context.getString(R.string.effects_paste_no_target), app.absentmotion.platform.Toast.LENGTH_LONG).show()
             recent = (listOf(effect.id) + recent.filterNot { it == effect.id }).take(40)
             history.edit().putString("recent", recent.joinToString("|")).apply()
             close()

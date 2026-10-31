@@ -1035,8 +1035,6 @@ void DrawParticles(SkCanvas* canvas, const std::vector<Layer>& siblings, const L
             if (walk.getPosTan(std::clamp(d - done, 0.0f, span), &p, nullptr)) rim.push_back(p);
         }
     }
-    SkMatrix inverse;
-    const bool turned = m.invert(&inverse);
     const double step = std::max(1.0 / std::max(field.fps, 1.0), field.lifeMost / 240.0);
     std::unordered_map<int64_t, SkMatrix> placed;
     const auto placedAt = [&](int64_t k) -> const SkMatrix& {
@@ -1052,6 +1050,8 @@ void DrawParticles(SkCanvas* canvas, const std::vector<Layer>& siblings, const L
             p = rim[std::min(rim.size() - 1, (size_t)(u * rim.size()))];
         } else if (emitter == particles::kLine) {
             const float a = direction * kRadians;
+            SkMatrix inverse;
+            const bool turned = placedAt((int64_t)std::floor(born / step)).invert(&inverse);
             SkVector d = turned ? inverse.mapVector(std::cos(a), std::sin(a)) : SkVector{std::cos(a), std::sin(a)};
             if (!d.normalize()) d = {0, 1};
             const SkVector across = {-d.fY, d.fX};

@@ -430,6 +430,7 @@
     <string name="compress_saved_to">Saved to %1$s</string>
     <string name="compress_share">Share</string>
     <string name="compress_failed">Could not compress: %1$s</string>
+    <string name="compress_too_big">This picture is too big for this phone.</string>
     <string name="compress_save_failed">Could not save: %1$s</string>
     <string name="downloader_hint">Paste a video link</string>
     <string name="downloader_paste">Paste</string>
@@ -462,6 +463,7 @@
     <string name="downloader_engine_failed">The add-on could not be downloaded. Check the connection and try again.</string>
     <string name="downloader_engine_missing">Get the add-on first.</string>
     <string name="downloader_engine_broken">The add-on did not start. Remove it in Settings and get it again.</string>
+    <string name="downloader_restart">Close AbsentMotion and open it again to finish setting up the add-on.</string>
     <string name="downloader_engine_unavailable">Video downloads need a phone with a 64-bit processor.</string>
     <string name="downloader_engine_name">Video downloader add-on</string>
     <string name="downloader_get_engine_first">Get the add-on to see what this link has.</string>

@@ -423,3 +423,20 @@ private fun splitSpeedBezier(curve: Easing, x: Float): Pair<Easing, Easing> {
         unit((c.x - point.x) / (1 - point.x)), unit((c.y - point.y) / (1 - point.y).coerceAtLeast(1e-6f))))
     return left to right
 }
+
+fun Layer.withSlowestSpeed(): Layer {
+    val map = node.child("speedMap")
+    if (map?.isKeyframed == true) return this
+    val raw = (map?.get("value") ?: node["speed"])?.toDoubleOrNull()?.takeIf { it.isFinite() && it > 0 } ?: return this
+    if (raw >= SLOWEST_SPEED - 1e-6) return this
+    val length = (endTime - startTime).toLong()
+    val shorter = (length * raw / SLOWEST_SPEED).roundToLong().coerceIn(1L, length.coerceAtLeast(1L))
+    var n = node.with("endTime", "${startTime + shorter}")
+    n = if (map != null) n.withChild("speedMap", map.with("value", SLOWEST_SPEED.toString())) else n.with("speed", SLOWEST_SPEED.toString())
+    return copy(node = n)
+}
+
+fun Scene.withSlowestSpeeds(): Scene = layers.fold(this) { scene, layer ->
+    val fixed = layer.withSlowestSpeed()
+    if (fixed === layer) scene else scene.update(layer.id) { fixed }
+}

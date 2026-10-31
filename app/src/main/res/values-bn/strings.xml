@@ -430,6 +430,7 @@
     <string name="compress_saved_to">%1$s-এ সেভ হয়েছে</string>
     <string name="compress_share">শেয়ার</string>
     <string name="compress_failed">কম্প্রেস করা যায়নি: %1$s</string>
+    <string name="compress_too_big">এই ছবিটি এই ফোনের জন্য খুব বড়।</string>
     <string name="compress_save_failed">সেভ করা যায়নি: %1$s</string>
     <string name="downloader_hint">ভিডিও লিংক পেস্ট করুন</string>
     <string name="downloader_paste">পেস্ট</string>
@@ -462,6 +463,7 @@
     <string name="downloader_engine_failed">অ্যাড-অন ডাউনলোড করা যায়নি। সংযোগ পরীক্ষা করে আবার চেষ্টা করুন।</string>
     <string name="downloader_engine_missing">আগে অ্যাড-অন নিন।</string>
     <string name="downloader_engine_broken">অ্যাড-অন চালু হয়নি। সেটিংস থেকে সরিয়ে আবার নিন।</string>
+    <string name="downloader_restart">অ্যাড-অন সেট আপ শেষ করতে AbsentMotion বন্ধ করে আবার খুলুন।</string>
     <string name="downloader_engine_unavailable">ভিডিও ডাউনলোডের জন্য 64-বিট প্রসেসরের ফোন দরকার।</string>
     <string name="downloader_engine_name">ভিডিও ডাউনলোডার অ্যাড-অন</string>
     <string name="downloader_get_engine_first">এই লিঙ্কে কী আছে দেখতে অ্যাড-অন নিন।</string>

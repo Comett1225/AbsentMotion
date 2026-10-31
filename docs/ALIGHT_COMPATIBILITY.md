@@ -10,8 +10,8 @@ Export the project from Alight Motion as XML and open it in AbsentMotion. After 
 
 - **63** Alight effects look the same and **29** are very close.
 - **78** are converted to a similar effect that does not look identical.
-- **68** are converted but have not been compared side by side yet.
-- **52** are not converted yet (mostly very old effect versions, VR and some 3D solids).
+- **53** are converted but have not been compared side by side yet.
+- **49** are not converted yet (mostly very old effect versions, VR and some 3D solids).
 - **Blending modes:** all of Alight's blending modes come across. Multiply and Subtract get their opacity converted so they look the same.
 
 Something imports wrong? [Send the project as an Import problem](https://github.com/Comett1225/AbsentMotion/issues/new?template=import_problem.yml): the XML and a screenshot of the same moment in Alight Motion. That is the fastest way to get it fixed.
@@ -45,7 +45,7 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | Magnify Background | Magnify Background | Same look |
 | Mask Blur | Mask Blur | Same look |
 | Motion Blur | Motion Blur | Same look |
-| motionblur | Smear | Same look |
+| motionblur | Motion Blur | Same look |
 | motionblur2 | Motion Blur | Same look |
 | motionblur3 | Motion Blur | Same look |
 | Oscillate | Oscillate | Same look |
@@ -91,7 +91,7 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | Four-color Gradient | Four-Color Gradient | Very close |
 | Gaussian Blur | Blur | Very close |
 | Grid | Grid | Very close |
-| grid | Grid Repeat | Very close |
+| grid | Grid | Very close |
 | Highlights and Shadows | Highlights & Shadows | Very close |
 | Inner Pinch/Bulge | Inner Pinch/Bulge | Very close |
 | Light Glow | Light Glow | Very close |
@@ -191,10 +191,7 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | Wave Warp | Wave Warp | Similar, not identical |
 | Zoom Streaks | Zoom Streaks | Similar, not identical |
 | 360-reorient-sphere | 360° Reorient Sphere | Converted, not compared yet |
-| autoshake | Auto-Shake | Converted, not compared yet |
-| bend | Bend | Converted, not compared yet |
 | Box | Box | Converted, not compared yet |
-| bulge | Pinch/Bulge | Converted, not compared yet |
 | bumpmap | Bump Map | Converted, not compared yet |
 | bumpmap2 | Bump Map | Converted, not compared yet |
 | chromaticzoomblur | Chromatic Zoom Blur | Converted, not compared yet |
@@ -202,15 +199,17 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | Cube | Cube | Converted, not compared yet |
 | cube | Cube | Converted, not compared yet |
 | Cylinder | Cylinder | Converted, not compared yet |
-| datamosh | Datamosh | Converted, not compared yet |
 | Denoise | Denoise | Converted, not compared yet |
-| echokf | Echo Keyframes | Converted, not compared yet |
+| drawing.progress | Drawing Progress | Converted, not compared yet |
+| drawing.stroketaper | Stroke Taper | Converted, not compared yet |
+| Echo Keyframes | Echo Keyframes | Converted, not compared yet |
+| effect.movealongpath3 | Move Along Path | Converted, not compared yet |
 | Ellipsoid | Ellipsoid | Converted, not compared yet |
 | energybeam | Energy Beam | Converted, not compared yet |
 | flip | Flip Layer | Converted, not compared yet |
 | Flip Layer | Flip Layer | Converted, not compared yet |
 | flip2 | Flip Layer | Converted, not compared yet |
-| Glow | Glow | Converted, not compared yet |
+| Grid Repeat | Grid Repeat | Converted, not compared yet |
 | grunge | Grunge | Converted, not compared yet |
 | Heart | Heart | Converted, not compared yet |
 | heart | Heart | Converted, not compared yet |
@@ -220,44 +219,30 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | Hollow Box | Hollow Box | Converted, not compared yet |
 | irridescence | Iridescence | Converted, not compared yet |
 | irridescence2 | Iridescence | Converted, not compared yet |
-| line | Linear Repeat | Converted, not compared yet |
+| Linear Repeat | Linear Repeat | Converted, not compared yet |
 | lumastamper | Luma Stamper | Converted, not compared yet |
-| mattechoke | Matte Choker | Converted, not compared yet |
 | mattechoke | Matte Choker | Converted, not compared yet |
 | mattefringe | Matte Fringe | Converted, not compared yet |
 | mirror | Mirror | Converted, not compared yet |
-| Move Along Path | Move Along Path | Converted, not compared yet |
 | Octahedron | Octahedron | Converted, not compared yet |
-| path | Repeat Along Path | Converted, not compared yet |
-| progress | Drawing Progress | Converted, not compared yet |
-| pulsesize | Pulse Size | Converted, not compared yet |
 | Pyramid | Pyramid | Converted, not compared yet |
-| radial | Radial Repeat | Converted, not compared yet |
-| radialblur | Zoom Blur | Converted, not compared yet |
-| randomjitter | Random Jitter | Converted, not compared yet |
+| Radial Repeat | Radial Repeat | Converted, not compared yet |
 | Raster Extrude | Raster Extrude | Converted, not compared yet |
 | Repeat | Repeat | Converted, not compared yet |
-| rgbsplit | RGB Split | Converted, not compared yet |
+| Repeat Along Path | Repeat Along Path | Converted, not compared yet |
 | Scatter Field | Scatter Field | Converted, not compared yet |
 | Spherize | Spherize | Converted, not compared yet |
 | spherize | Spherize | Converted, not compared yet |
 | spill-cleanup | Key Spill Cleaner | Converted, not compared yet |
-| spinstreaks | Spin Streaks | Converted, not compared yet |
 | Star Polyhedron | Star Polyhedron | Converted, not compared yet |
 | Star Prism | Star Prism | Converted, not compared yet |
-| stretchaxis | Stretch Axis | Converted, not compared yet |
-| stroketaper | Stroke Taper | Converted, not compared yet |
 | texttransform | Text Transform | Converted, not compared yet |
 | Three-axis Cross | Three-axis Cross | Converted, not compared yet |
-| tiles | Tiles | Converted, not compared yet |
 | Time Quantization | Frame Rate | Converted, not compared yet |
 | Torus | Torus | Converted, not compared yet |
 | Tunnel | Tunnel | Converted, not compared yet |
-| twirl | Swirl | Converted, not compared yet |
 | vrcombined | 360° Viewer | Converted, not compared yet |
 | vrplayer | 360° Viewer | Converted, not compared yet |
-| wavewarp | Wave Warp | Converted, not compared yet |
-| zoomstreaks | Zoom Streaks | Converted, not compared yet |
 | boxblur | - | Not converted yet |
 | boxblur2 | - | Not converted yet |
 | brightcont | - | Not converted yet |
@@ -274,7 +259,6 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | diff | - | Not converted yet |
 | differencematte | - | Not converted yet |
 | displacemap | - | Not converted yet |
-| Echo Keyframes | - | Not converted yet |
 | facemotion | - | Not converted yet |
 | findedges-edgeglow | - | Not converted yet |
 | fractalwarp | - | Not converted yet |
@@ -284,10 +268,9 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | glowscan | - | Not converted yet |
 | gradientdisplace | - | Not converted yet |
 | gradientmap | - | Not converted yet |
-| Grid Repeat | - | Not converted yet |
 | lensblur | - | Not converted yet |
 | lensblur2 | - | Not converted yet |
-| Linear Repeat | - | Not converted yet |
+| Move Along Path | - | Not converted yet |
 | oscillate | - | Not converted yet |
 | outline | - | Not converted yet |
 | outlinebad | - | Not converted yet |
@@ -295,8 +278,6 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | Page Curl | - | Not converted yet |
 | Parenting Helper | - | Not converted yet |
 | perlindisplace | - | Not converted yet |
-| Radial Repeat | - | Not converted yet |
-| Repeat Along Path | - | Not converted yet |
 | rgb-gamma | - | Not converted yet |
 | rgb-mixer | - | Not converted yet |
 | Ring | - | Not converted yet |
@@ -310,3 +291,4 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | volumetricclouds | - | Not converted yet |
 | vortexblur | - | Not converted yet |
 | warpblur | - | Not converted yet |
+| wavewarp | - | Not converted yet |

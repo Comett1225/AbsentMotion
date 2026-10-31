@@ -363,7 +363,7 @@ def main():
         if diff < SAME or (moving is not None and moving < SAME):
             unchanged.append(key)
     adb("shell", "run-as", PKG, "rm", "-r", APP_DIR)
-    if not opts.keys:
+    if not opts.keys and not opts.only_options:
         for stale in (PACK / "thumb").iterdir():
             if stale.name not in {entry[4].name for entry in planned} | {target.name for _, target in options}:
                 stale.unlink()

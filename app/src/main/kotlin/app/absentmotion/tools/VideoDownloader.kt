@@ -62,6 +62,7 @@ object VideoDownloader {
     )
     private val lock = Mutex()
     @Volatile private var running = false
+    @Volatile private var restartNeeded = false
 
     val downloadBytes: Long get() = python.bytes + ENGINE_ESTIMATE
 
@@ -81,6 +82,7 @@ object VideoDownloader {
     fun remove(context: Context) {
         folder(context).deleteRecursively()
         prefs(context).edit().clear().apply()
+        if (running) restartNeeded = true
     }
 
     suspend fun install(context: Context, progress: (Float) -> Unit) = withContext(Dispatchers.IO) {
@@ -118,7 +120,7 @@ object VideoDownloader {
         try {
             val (tag, sha) = latestEngine()
             prefs.edit().putLong("checked", now).apply()
-            if (tag == prefs.getString("engine", null) || tag == prefs.getString("pending", null)) return@withContext
+            if (tag == prefs.getString("engine", null) || tag == prefs.getString("pending", null) || tag == prefs.getString("bad", null)) return@withContext
             downloadEngine(tag, sha, nextEngine(context)) {}
             prefs.edit().putString("pending", tag).apply()
             Log.i(TAG, "engine $tag is ready for the next start")
@@ -218,10 +220,17 @@ object VideoDownloader {
         val prefs = prefs(context)
         val next = nextEngine(context)
         val pending = prefs.getString("pending", null)
+        val previous = File(dir, "yt-dlp.prev")
+        var swapped: String? = null
         if (pending != null) {
-            val swapped = next.isFile && next.renameTo(engine(context))
+            val current = engine(context)
+            previous.delete()
+            val kept = !current.isFile || current.renameTo(previous)
+            val moved = kept && next.isFile && next.renameTo(current)
+            if (!moved && previous.isFile && !current.isFile) previous.renameTo(current)
             next.delete()
-            prefs.edit().apply { if (swapped) putString("engine", pending) }.remove("pending").apply()
+            prefs.edit().apply { if (moved) putString("previous", prefs.getString("engine", null)).putString("engine", pending) }.remove("pending").apply()
+            if (moved) swapped = pending
         }
         val glue = context.assets.open("downloader/am_dl.py").use { it.readBytes() }
         File(dir, "am_dl.py").let { if (!it.isFile || !it.readBytes().contentEquals(glue)) it.writeBytes(glue) }
@@ -235,15 +244,29 @@ object VideoDownloader {
         val lib = File(home, "lib")
         val paths = listOf(engine(context).path, dir.path).joinToString(", ") { path -> "bytes.fromhex('${path.toByteArray().joinToString("") { "%02x".format(it) }}').decode()" }
         val boot = "import sys\nsys.path[0:0] = [$paths]\nimport am_dl\n"
-        PyEngine.start(listOf("libcrypto_python.so", "libssl_python.so", PYTHON_LIB).map { File(lib, it).path }, home.path, boot)
+        try {
+            PyEngine.start(listOf("libcrypto_python.so", "libssl_python.so", PYTHON_LIB).map { File(lib, it).path }, home.path, boot)
+        } catch (e: Exception) {
+            if (swapped == null || !previous.isFile) throw e
+            Log.w(TAG, "engine $swapped did not start, going back to the previous one", e)
+            engine(context).delete()
+            previous.renameTo(engine(context))
+            prefs.edit().putString("engine", prefs.getString("previous", null)).putString("bad", swapped).apply()
+            restartNeeded = true
+            throw DownloadProblem(R.string.downloader_restart)
+        }
+        previous.delete()
         running = true
     }
 
     private suspend fun python(context: Context, request: JSONObject, progress: ((Long, Long) -> Unit)? = null): JSONObject = lock.withLock {
         withContext(Dispatchers.IO) {
+            if (restartNeeded) throw DownloadProblem(R.string.downloader_restart)
             if (!installed(context)) throw DownloadProblem(R.string.downloader_engine_missing)
             try {
                 start(context)
+            } catch (e: DownloadProblem) {
+                throw e
             } catch (e: Exception) {
                 Log.w(TAG, "the downloader did not start", e)
                 throw DownloadProblem(R.string.downloader_engine_broken, e.message.orEmpty())

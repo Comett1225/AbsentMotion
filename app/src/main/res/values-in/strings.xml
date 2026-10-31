@@ -429,6 +429,7 @@
     <string name="compress_saved_to">Tersimpan ke %1$s</string>
     <string name="compress_share">Bagikan</string>
     <string name="compress_failed">Gagal mengompres: %1$s</string>
+    <string name="compress_too_big">Gambar ini terlalu besar untuk ponsel ini.</string>
     <string name="compress_save_failed">Gagal menyimpan: %1$s</string>
     <string name="downloader_hint">Tempel tautan video</string>
     <string name="downloader_paste">Tempel</string>
@@ -461,6 +462,7 @@
     <string name="downloader_engine_failed">Add-on gagal diunduh. Periksa koneksi lalu coba lagi.</string>
     <string name="downloader_engine_missing">Dapatkan add-on terlebih dahulu.</string>
     <string name="downloader_engine_broken">Add-on tidak berhasil dimulai. Hapus di Pengaturan dan dapatkan kembali.</string>
+    <string name="downloader_restart">Tutup AbsentMotion lalu buka lagi untuk menyelesaikan penyiapan add-on.</string>
     <string name="downloader_engine_unavailable">Unduhan video memerlukan ponsel dengan prosesor 64-bit.</string>
     <string name="downloader_engine_name">Add-on pengunduh video</string>
     <string name="downloader_get_engine_first">Dapatkan add-on untuk melihat isi tautan ini.</string>

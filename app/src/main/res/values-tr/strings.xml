@@ -430,6 +430,7 @@
     <string name="compress_saved_to">%1$s konumuna kaydedildi</string>
     <string name="compress_share">Paylaş</string>
     <string name="compress_failed">Sıkıştırılamadı: %1$s</string>
+    <string name="compress_too_big">Bu resim bu telefon için çok büyük.</string>
     <string name="compress_save_failed">Kaydedilemedi: %1$s</string>
     <string name="downloader_hint">Bir video bağlantısı yapıştırın</string>
     <string name="downloader_paste">Yapıştır</string>
@@ -462,6 +463,7 @@
     <string name="downloader_engine_failed">Eklenti indirilemedi. Bağlantıyı kontrol edip tekrar deneyin.</string>
     <string name="downloader_engine_missing">Önce eklentiyi indirin.</string>
     <string name="downloader_engine_broken">Eklenti başlatılamadı. Ayarlar\'dan kaldırıp yeniden indirin.</string>
+    <string name="downloader_restart">Eklentinin kurulumunu bitirmek için AbsentMotion\'ı kapatıp yeniden açın.</string>
     <string name="downloader_engine_unavailable">Video indirmeler için 64 bit işlemcili bir telefon gerekir.</string>
     <string name="downloader_engine_name">Video indirici eklentisi</string>
     <string name="downloader_get_engine_first">Bu bağlantıda neler olduğunu görmek için eklentiyi indirin.</string>

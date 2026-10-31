@@ -432,6 +432,7 @@
     <string name="compress_saved_to">Сохранено в %1$s</string>
     <string name="compress_share">Поделиться</string>
     <string name="compress_failed">Не удалось сжать: %1$s</string>
+    <string name="compress_too_big">Это изображение слишком большое для этого телефона.</string>
     <string name="compress_save_failed">Не удалось сохранить: %1$s</string>
     <string name="downloader_hint">Вставьте ссылку на видео</string>
     <string name="downloader_paste">Вставить</string>
@@ -464,6 +465,7 @@
     <string name="downloader_engine_failed">Не удалось скачать дополнение. Проверьте подключение и повторите попытку.</string>
     <string name="downloader_engine_missing">Сначала скачайте дополнение.</string>
     <string name="downloader_engine_broken">Дополнение не запустилось. Удалите его в настройках и скачайте снова.</string>
+    <string name="downloader_restart">Закройте AbsentMotion и откройте снова, чтобы закончить настройку дополнения.</string>
     <string name="downloader_engine_unavailable">Для загрузки видео нужен телефон с 64-битным процессором.</string>
     <string name="downloader_engine_name">Дополнение для загрузки видео</string>
     <string name="downloader_get_engine_first">Скачайте дополнение, чтобы увидеть, что есть по ссылке.</string>

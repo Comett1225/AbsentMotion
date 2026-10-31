@@ -173,8 +173,8 @@ internal object ClipReverse {
             ?: (width.toLong() * height * fps / 5).toInt()).coerceIn(1_000_000, 100_000_000)
         val frameBytes = width * height * 3 / 2
         val held = (HELD_BYTES / frameBytes).toInt().coerceIn(1, MAX_HELD_FRAMES).coerceAtMost(last - first)
-        val decoder = runCatching { PcmDecoder(context, uri) }.getOrNull()
         val file = aiFile(context, "mp4")
+        val decoder = runCatching { PcmDecoder(context, uri) }.getOrNull()
         val yuvFile = File(context.cacheDir, "reverse-${UUID.randomUUID()}.yuv")
         val pcmFile = File(context.cacheDir, "reverse-${UUID.randomUUID()}.pcm")
         var encoder: YuvEncoder? = null
