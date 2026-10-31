@@ -19,6 +19,13 @@ STATE = ROOT / "tools/help_i18n_source.json"
 RES = ROOT / "app/src/main/res"
 
 
+PICTURE = re.compile(r"^!\[[^\]]*\]\(img/[^)\s]+\)\s*$", re.M)
+
+
+def plain(text):
+    return re.sub(r"\n{3,}", "\n\n", PICTURE.sub("", text)).strip()
+
+
 def digest(value):
     return hashlib.sha256(json.dumps(value, ensure_ascii=False, sort_keys=True).encode()).hexdigest()[:16]
 
@@ -109,9 +116,9 @@ def translate_one(language, glossary, pairs, kind, english):
 
 def sources():
     english = sb.Site("app")
-    pages = {slug: {k: v for k, v in (("title", p.title), ("summary", p.summary), ("body", p.body)) if v} for slug, p in english.pages.items()}
+    pages = {slug: {k: v for k, v in (("title", p.title), ("summary", p.summary), ("body", plain(p.body))) if v} for slug, p in english.pages.items()}
     wanted = {e["id"] for e in english.effects if (sb.SITE / "effects" / (e["id"] + ".md")).is_file()}
-    effects = {key: (sb.SITE / "effects" / (key + ".md")).read_text() for key in sorted(wanted)}
+    effects = {key: plain((sb.SITE / "effects" / (key + ".md")).read_text()) for key in sorted(wanted)}
     return pages, effects, list(sb.CHROME)
 
 

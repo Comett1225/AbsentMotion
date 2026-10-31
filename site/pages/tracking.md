@@ -15,6 +15,8 @@ Motion tracking follows a detail of a video, such as a corner of a sign or a fac
 5. Tap **Track**. A progress bar shows "Tracking... 40%". Tap **Cancel** to stop; frames already tracked keep their keyframes.
 6. When it finishes, the app says "Tracked N frames. The keyframes are on ...". Tap **Done**.
 
+![Track Motion: the box on the detail (1), Track (2), Direction (3), Apply to (4) and the track button (5).](img/track-panel.webp)
+
 ### The options
 
 | Option | Choices |

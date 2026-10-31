@@ -6,7 +6,7 @@ summary: The top bar, the preview, the play bar and how the pieces fit together.
 ---
 The editor has four parts, from top to bottom: the **top bar**, the **preview**, the **play bar** and the **timeline** with its tools. On a wide tablet held sideways the preview keeps the whole width, and the tools of a selected clip open in a narrow column on the right edge.
 
-![The editor: a photo with a title, and the timeline with keyframe diamonds](img/editor.webp)
+![The four parts of the editor: the top bar (1), the preview (2), the play bar (3) and the timeline with its tools (4).](img/editor.webp)
 
 Changes are saved automatically a moment after each edit. A version of the project is also kept every two minutes while you edit (see [Projects, backup and import](@projects)). The top layer in the timeline is the front layer, and new layers are added at the front.
 
@@ -31,11 +31,15 @@ What the top bar shows depends on what is selected.
 - **Delete layer** (the trash can) deletes at once, with no question. Undo brings it back. Children of the layer are released.
 - **Layer menu** (three dots): see [Layer menus and multi-select](@layer-menus).
 
+![The top bar with a layer selected: Back (1), the layer name (2), the parent button (3), Delete layer (4) and Layer menu (5).](img/editor-top-bar.webp)
+
 **A panel open.** The top bar shows a back arrow and the panel's name, such as Transform, Fill & Color or Effects.
 
 ### Project settings
 
 The gear opens a sheet with the same options as the new project sheet: the shape (16:9, 9:16, 4:5, 1:1, 4:3 or a custom ratio), **Resolution**, **Frame Rate** and **Background**. Changing them only changes the canvas; your layers are not rescaled. The change can be undone. The **Version history** row has an **Earlier versions** button.
+
+![Project settings: the shape (1), Resolution (2), Frame Rate (3), Background (4) and Earlier versions (5).](img/editor-project-settings.webp)
 
 For an Asset project the sheet also has **Precompose** and **Re-timing**: see [Assets, templates and presets](@assets-templates).
 
@@ -67,6 +71,8 @@ The last button of the play bar (**Preview mode**) opens a narrow strip at the r
 6. **Fast Blur** or **Full Blur**: how the motion blur effects are previewed. Fast is an approximation; Full is accurate and slower. Exports are always accurate.
 7. **Zoom**: plus and minus buttons and the current percentage.
 
+![The preview strip: Pixel preview (1), Grid (2), Solo the selected layers (3), Camera View (4), the preview quality (5), the blur mode (6) and zoom (7).](img/editor-preview-strip.webp)
+
 **Pre-render**, between **Fast Blur** and **Zoom**, renders the project ahead from the playhead to the end (or as much as fits in memory and storage), so a heavy project plays smoothly. A note at the top of the preview shows the progress with a **Cancel** button. While playback uses the pre-rendered frames, a small **Pre-rendered** label shows at the top right of the preview. Any change to the project makes the pre-render out of date: the **Pre-render** button in the strip changes color and a note offers **Pre-render again**. When it is ready, tap **Pre-render** to see the time it covers, or press and hold it to remove it.
 
 ### Other things on the preview
@@ -83,6 +89,8 @@ Seven buttons, left to right.
 4. **Play** / **Pause**. Press and hold Play while stopped to turn looping on or off. Playing from the end starts again at the beginning.
 6. **Copy and paste** opens a menu for duplicating, copying, pasting and saving presets: see [Layer menus and multi-select](@layer-menus).
 7. **Preview mode** opens the preview strip.
+
+![The play bar: Undo (1), Redo (2), Skip back (3), Play (4), Skip forward (5), Copy and paste (6) and Preview mode (7).](img/editor-play-bar.webp)
 
 The thin line under the bar is a live level meter while the project plays: green, then yellow, then red as the sound gets louder. The whole line flashes red if the sound clips.
 

@@ -36,6 +36,10 @@ The app asks for no permission at the start. Photo, video, audio, camera and mic
 5. Drag left or right on the timeline to move through time. To move a layer in time, press and hold its bar, then drag. To trim it, select it and drag the round grips at its ends.
 6. Press the play button to watch it.
 
+![On the home screen, tap the round + button (1) to start a project.](img/start-plus.webp)
+
+![In the editor, tap the round + button (1) to add a shape, a photo or text.](img/start-add.webp)
+
 There is no Save button. The project is saved a moment after every change.
 
 ## Animate something
@@ -48,6 +52,8 @@ Animation in AbsentMotion is made of keyframes: a keyframe stores a value (a pos
 4. Move the playhead to a later time and drag the layer to a new place. Because the property already has a keyframe, a second one is created for you.
 5. Play. Tap the easing button (the curve) to make the movement speed up, slow down or bounce. See [Keyframes and easing](@keyframes).
 
+![In a panel: the keyframe button (1), a keyframe diamond on the layer bar (2) and Easing (3).](img/kf-panel.webp)
+
 For quick results, select a layer and tap the round **Animate** button at the bottom right of the preview to pick an In, Out or Loop animation, or open **Effects** and try one of the Move effects.
 
 ## Export
@@ -56,6 +62,8 @@ For quick results, select a layer and tap the round **Animate** button at the bo
 2. The **Video** card is selected. Tap **Export**.
 3. Wait for the progress bar to finish. You can switch to another app meanwhile: a notification shows the progress.
 4. Tap **Share Video**, or find the file in Movies/AbsentMotion.
+
+![Tap the share icon in the top bar (1), then Export.](img/start-export.webp)
 
 All the options (formats, resolution, frame rate, GIF, audio only) are on the [Export](@export) page.
 

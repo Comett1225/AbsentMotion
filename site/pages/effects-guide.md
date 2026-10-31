@@ -15,8 +15,6 @@ An effect changes how a layer looks or moves: a blur, a glow, a color change, a 
 
 To read about an effect first, press and hold its tile. A page opens with an animated preview, a description, a star to mark it as a favorite, **+ Standard Settings** and, for a few effects, ready-made presets.
 
-![The Effects panel of a layer: the Light Glow effect with its settings](img/effects.webp)
-
 ## The Effects Library
 
 - The top has a search box ("Search") that matches names first, then descriptions, and also finds AI tools and presets.
@@ -27,6 +25,8 @@ To read about an effect first, press and hold its tile. A page opens with an ani
 ## Settings of an effect
 
 Tap an effect in the list to open it. Its header has the effect name, a three-dot menu and a trash can.
+
+![An open effect: its header (1) and a setting with its ruler and value (2).](img/effects.webp)
 
 - Each number has a ruler and a value box. Tap the name of a setting to make it the target of the keyframe button. Settings that are positions can be moved by dragging on the preview.
 - A color setting opens a row of quick swatches and a field for the exact color.
@@ -42,6 +42,8 @@ If the layer is a parent of other layers, a switch **Apply to Children** appears
 - The order matters: effects at the top are applied first. Drag the grip (**Reorder**) of a row to change the order.
 - The eye (**Visibility**) hides an effect without deleting it.
 - **More** in the left column has **Copy Effects** (you tick which ones) and **Paste Effect** or **Paste Effects**, which adds the copied effects at the end of the list of the selected layer.
+
+![The effect list: Reorder (1), Visibility (2), More (3) and Add Effect (4).](img/fx-list.webp)
 
 ### Effects on many layers at once
 

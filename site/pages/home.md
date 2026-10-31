@@ -6,6 +6,8 @@ summary: Your projects, assets and templates, and the buttons around them.
 ---
 The home screen is the first thing you see after the first start. It lists your projects and has the buttons for creating one, searching and changing settings.
 
+![The home screen: menu (1), search (2), Projects and Assets (3), a project card (4), the card menu button (5) and New project (6).](img/home-screen.webp)
+
 ## The top bar
 
 - **Menu button** (top left, three lines). Opens the [Settings](@settings) drawer.
@@ -41,6 +43,8 @@ The three-dot button on a card (named **More**) has these entries.
 - **Collect media into project** copies every file the project uses from outside its own folder into the project, so it no longer depends on your gallery. See [Projects, backup and import](@projects).
 - **Version history** shows earlier versions of the project and lets you go back to one.
 - **Delete** (**Delete Asset**) asks for confirmation and then deletes the project, its versions and the media copies nobody else uses. There is no trash: a deleted project cannot be brought back, so make a backup first if you are unsure.
+
+![The card menu button (1) opens the card menu (2): Export, Duplicate, Collect media into project, Version history and Delete.](img/home-card-menu.webp)
 
 A project whose file is damaged shows **Damaged — restore a version** instead of its facts. Tap it to restore an earlier version, or delete it.
 

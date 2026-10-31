@@ -19,6 +19,8 @@ AbsentMotion has three ways to reuse work. They differ in what they keep.
 - In the editor, select a layer or group and choose **Save to My Assets** in the layer menu. A message says "Saved to My Assets".
 - On the home screen, choose **ASSET** in the new project sheet and build the animation in its own project. An asset project has a transparent background.
 
+![In the layer menu, choose Save to My Assets (1).](img/assets-save.webp)
+
 Assets appear under the **Assets** chip of the home screen.
 
 ### Use an asset
@@ -65,6 +67,8 @@ A preset keeps the look of a layer so you can put it on another one.
 ### Save a preset
 
 Select the layer and choose **Save Preset** in the copy and paste menu (the sixth button of the play bar). It is only available when the layer has something to keep: a stroke, border or shadow, effects, a blend mode other than Normal, a changed opacity, animated position or size, a changed volume or speed, or a changed font. After saving, you can **Name it**.
+
+![In the copy and paste menu, choose Save Preset (1).](img/presets-save.webp)
 
 ### Use a preset
 

@@ -23,6 +23,8 @@ On the timeline an audio layer is a violet bar with its waveform. The tools are 
 
 The first button of the panel, **Audio Effects**, opens the effects of the clip.
 
+![The volume panel: Audio Effects (1), the volume slider (2), its value (3) and the keyframe button (4).](img/audio-volume.webp)
+
 The sound of a clip follows its speed (see [Photos, video and speed](@media)). Sources with more than two channels are mixed down to stereo.
 
 ## Audio effects
@@ -33,6 +35,8 @@ For a sound clip, **Effects** opens the effects library already on the **Audio**
 - Each row has a name, an eye (**Bypass** that effect) and a grip (**Reorder**: the order is the processing order).
 - **Add Audio Effect** offers the ten effects below. A clip can hold up to 16 units: every effect costs 1, **Voice Filter** costs 7.
 - The buttons in the left column **Bypass** all effects at once or **Delete all**.
+
+![Audio effects: the preset chips (1), Bypass (2) and Reorder (3) for each effect, bypass all (4) and Delete all (5).](img/audio-fx.webp)
 
 Each effect has a **Mix** slider (0 to 100 %) and its own sliders. Tap a value to type it.
 

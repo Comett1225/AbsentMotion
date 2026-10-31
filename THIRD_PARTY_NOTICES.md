@@ -523,6 +523,11 @@ small thumbnails ship; the photographs are not in the repository or the app. Whi
 and the effect settings are in `tools/effect_showcase.json`. The green and black backgrounds of the Chroma Key and Luma
 Key thumbnails are drawn by the script.
 
+The pictures of the help (`site/assets/img/*.webp`) are annotated screenshots of the app, made by `tools/help_shots.py`.
+They show four of the photographs below ("Ruby Mountain refected in Diablo Lake", "Sunset rolling waves", "Ara ararauna
+portrait Rhodes" and "Fleabane With Black Background"), downloaded and checked by the same code as the thumbnails, and a
+short video made from the sunset photograph. They are CC0 as well, so no credit is required.
+
 - "Fishmonger smiling" by Wilfredor, own work, CC0 1.0, https://commons.wikimedia.org/wiki/File:Fishmonger_smiling.jpg
   (the page records the subject's consent and carries a personality rights notice).
 - "Ruby Mountain refected in Diablo Lake" by Ron Clausen, own work, CC0 1.0,

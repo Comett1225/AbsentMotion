@@ -10,6 +10,8 @@ Tap **Export & Share** (the share icon) in the editor's top bar, or **Export** i
 
 At the top, four lines of information: **Available space**, **Estimated file size**, **Estimated export time** and **Phone temperature**. Under them are cards for each kind of export; tap a card to select it and tap its arrow to see its options. At the bottom are the switch **Also keep a copy as a Template** and the big **Export** button.
 
+![The Export Project screen: the information lines (1), the Video card (2), its options arrow (3), the Template switch (4) and the Export button (5).](img/export-screen.webp)
+
 The button turns gray with a reason when the export cannot run: **Not enough storage** or **Not supported on this phone**. A choice that this phone cannot do is dimmed, and tapping it explains why. The app remembers the settings of each kind, except that a video export starts at the project's own frame rate.
 
 | Card | Result | Saved in |
@@ -40,6 +42,8 @@ The files are named after the project with the date and time, for example `My pr
 
 A codec is only offered if your phone has an encoder for it (for example "This phone has no AV1 encoder."). H.264 is the default and plays everywhere. H.265 makes smaller files for the same quality but some older players cannot open it. AV1, VP9 and APV depend on the phone. Switching the format keeps the codec if it fits, otherwise the app picks one that does.
 
+![Video options: Export Resolution (1), Format (2) and Codec (3).](img/export-video.webp)
+
 **Frame Rate.** A slider with stops at 10, 15, 24, 25, 30, 48, 50 and 60 fps, plus the project's own frame rate. The default is the project's frame rate.
 
 **Frame Interpolation.** Pick a method, then a level, with a help button that explains each one and how well your phone should handle it. It matters when a video clip has a lower frame rate than the export, for example a 30 fps clip in a 60 fps export:
@@ -66,6 +70,8 @@ It only acts on video clips whose frame rate (counting the clip's speed) is lowe
 
 **Audio.** A row such as "AAC · 128 kbps · 44.1 kHz · Stereo" opens the audio settings of the video:
 
+![More video options: Motion Blur (1), Quality (2) and Audio (3).](img/export-video-more.webp)
+
 - **Codec:** AAC (MP4, MOV, MKV) or Opus (WebM, MKV). The other one is dimmed with the reason.
 - **Bit Rate:** 64, 96, 128 (default), 160, 192, 256 or 320 kbps.
 - **Sample Rate:** 44.1 kHz (default) or 48 kHz. Opus always uses 48 kHz.
@@ -80,6 +86,8 @@ A project with no sound makes a video without an audio track.
 ### Warnings
 
 When the phone has only a software encoder for your choice, or its hardware encoder is rated slower than your frame rate, a card says **Slow export** and offers **Continue anyway** and a suggestion such as **Use H.264 · 1080p**. If the settings cannot be exported at all, the card says **Not supported**, with a button to switch to settings that work.
+
+![The Slow export card (1) with its Continue anyway button (2).](img/export-warning.webp)
 
 ## Audio Only
 

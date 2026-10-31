@@ -19,6 +19,8 @@ Select one layer and tap the three dots at the right of the top bar (**Layer men
 - **Media Info** (photos and videos) shows name, dimensions, frame rate, duration, format and size. **Swap media file** replaces that file in every layer that uses it.
 - A row of **label colors** at the bottom.
 
+![The layer menu button (1) opens the layer menu (2).](img/lm-layer-menu.webp)
+
 Audio layers have a shorter menu. Entries that do not apply to the layer are grayed out.
 
 ## The copy and paste menu
@@ -31,6 +33,8 @@ The sixth button of the play bar.
 - **Copy Layer** (with its style) copies the layer, its effects and keyframes. The clipboard lives in memory only and is empty again after you close the app.
 - **Paste Layer** pastes at the playhead. With several layers, the earliest one starts at the playhead and the others keep their distance.
 - **Paste Style** has four entries: **Paste Fill & Color**, **Paste Frame & Shadow**, **Paste Opacity & Blend Mode** and **Paste Style** (all three) from the last copied layer onto the selected layer.
+
+![The copy and paste button (1) opens this menu (2).](img/lm-copy-paste.webp)
 
 ## Selecting several layers
 
@@ -50,5 +54,7 @@ A second bar at the bottom of the screen works on timing:
 - **Move clip starts to playhead** or **Move clip ends to playhead**
 - **Add a transition between the two clips** (exactly two visual clips that overlap or touch). See [Transitions and animations](@animations).
 - **Align clip starts**, **Align clip ends** and **Distribute clip starts** (three or more).
+
+![Several layers selected: the top bar (1), the checked layers (2) and the bottom bar with the timing commands (3).](img/lm-multi.webp)
 
 Grouping from a multi-selection is the way to make a group. To change a group that was inserted from an asset, open the original asset.

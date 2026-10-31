@@ -13,6 +13,10 @@ Both write ordinary keyframes and effects that you can edit afterwards, so you c
 3. Choose **In**, **Out** or **Loop** at the top, then a tile. **None** is first in the grid.
 4. Set the **Duration**.
 
+![The round Animate button (1) at the bottom right of the preview.](img/anim-button.webp)
+
+![The animations sheet: In, Out and Loop (1), the animations (2) and Duration (3).](img/anim-sheet.webp)
+
 | | Animations | Duration |
 |---|---|---|
 | **In** and **Out** | Fade, Slide left, Slide right, Slide up, Slide down, Zoom in, Zoom out, Pop, Bounce, Spin, Blur | 0.1 to 2 seconds (default 0.5) |
@@ -27,6 +31,8 @@ A transition blends one clip into the next. They need two visual clips where the
 1. Place the two clips so they touch or overlap. With nothing selected, a round **Transition** button appears at the bottom left of the timeline when the playhead is at the cut. Or select the two clips and tap **Add a transition between the two clips** in the bar at the bottom.
 2. The **Transition** sheet shows "Clip A to Clip B" and a grid of transitions with **None** first.
 3. Pick one and set the **Duration** (0.1 to 2 seconds, default 0.5).
+
+![The transition sheet: the two clips (1), the transitions (2) and Duration (3).](img/anim-transition.webp)
 
 Available transitions: Cross dissolve, Dip to black, Dip to white, Slide left, Slide right, Slide up, Slide down, Push left, Push right, Push up, Push down, Zoom in, Zoom out, Spin, Blur, Whip pan, Glitch, Flash and Shake.
 
