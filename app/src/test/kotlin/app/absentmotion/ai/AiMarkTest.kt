@@ -35,6 +35,18 @@ class AiMarkTest {
         assertEquals(NoiseSource.Mixed, twice.aiMarks.single().source)
     }
 
+    @Test fun aCutOutStartsAgainFromTheOriginalOnlyWhileThePictureIsStillItsResult() {
+        val cut = scene.layer(2)!!.withAiMark(AiKind.Background, "photo.jpg", "cut.png", Cutout(listOf(0.5f to 0.5f), MatteEdge(2, 1)).option)
+        assertEquals("photo.jpg", cut.backgroundMark?.original)
+        assertEquals(MatteEdge(2, 1), Cutout.parse(cut.backgroundMark?.node?.get("option")).edge)
+        val again = cut.copy(node = cut.node.with("fillImage", "cut2.png")).withAiMark(AiKind.Background, "cut.png", "cut2.png", null)
+        assertEquals("photo.jpg", again.backgroundMark?.original)
+        assertTrue(Cutout.parse(again.backgroundMark?.node?.get("option")).plain)
+        val replaced = cut.copy(node = cut.node.with("fillImage", "other.jpg"))
+        assertNull(replaced.backgroundMark)
+        assertNull(scene.layer(2)!!.backgroundMark)
+    }
+
     @Test fun removingAMarkBringsBackTheOriginalMedia() {
         val noise = scene.layer(1)!!.withAiMark(AiKind.Noise, "raw.wav", "clean.wav", "voice")
         val restored = noise.withoutAiMark(AiKind.Noise)

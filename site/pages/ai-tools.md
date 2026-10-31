@@ -40,6 +40,8 @@ If there is no sound the app says "There is no sound to caption", and if no spee
 
 Select a photo layer and open **Effects**, **Add Effect**, **AI**, **Remove Background**. The app cuts out the main subject and replaces the picture with a version with a transparent background. The original file is kept: the effect list shows a **Remove Background** row with an AI badge, and its button (**Undo this AI change and bring back the original**) restores the original picture.
 
+Before it starts, a dialog shows the photo. **Keep everything** (the default) keeps every subject the app finds. To keep only one person or thing, tap it; tap more places to keep more, and tap a dot again to remove it. **Softness** feathers the edge of the cut-out and **Grow / Shrink** moves the edge out or in by a few pixels. They are applied when the cut-out is made. To change them, choose **Remove Background** again on the same layer: the dialog remembers your taps and settings, and the app starts again from the original photo.
+
 ### Standard or AI background removal 2.0
 
 The first time you remove a background from a photo, the app asks which cut-out you want. The answer is kept, and you can change it any time in **Settings**, **Projects and media**, **Cut-out quality**.
@@ -53,9 +55,11 @@ If AI background removal 2.0 cannot be downloaded or cannot finish a photo, the 
 
 Select a video layer and choose **Remove Background (video)**. A dialog says "Every frame of this clip is processed on this phone. The result is a group with the video and a mask layer above it." You choose the size of the mask: **Small 360p**, **Medium 540p** (default) or **Large 720p**, and the dialog estimates the number of frames and the storage needed. Tap **Start**.
 
+The dialog also shows the first frame of the clip. **Keep everything** is the default. To keep only one person or thing, tap it on that frame: the app keeps the parts you tapped and follows them from frame to frame, together with anything that touches them, and leaves out everything else. The subject has to be visible on the first frame, so trim the clip to start where it is.
+
 - A clip can be up to five minutes. For longer clips, trim or split it first.
 - The app needs free storage for the mask video and warns if there is not enough.
-- The result is a group called "name cut out" holding the original clip and a mask layer. To undo it, delete or ungroup the group; this tool has no restore button.
+- The result is a group called "name cut out" holding the original clip and a mask layer. To undo it, delete or ungroup the group; this tool has no restore button. Select the group and tap **Cut-out Edge** to change the **Softness** and **Grow / Shrink** of the edge while you watch the preview; **Reset** goes back to the edge as it was made.
 
 ### Which build?
 

@@ -77,6 +77,8 @@ class AiTools(private val context: Context, private val state: EditorState, priv
     var enhance by mutableStateOf(EnhanceOptions())
     var cutoutSetup by mutableStateOf<Layer?>(null)
     var cutoutQuality by mutableStateOf(CutoutQuality.Standard)
+    internal var subject by mutableStateOf<List<Tap>>(emptyList())
+    internal var edge by mutableStateOf(MatteEdge())
     private var job: Job? = null
 
     private suspend fun <T> holdingPreview(action: AiAction, block: suspend () -> T): T =
@@ -97,6 +99,7 @@ class AiTools(private val context: Context, private val state: EditorState, priv
             return
         }
         if (action == AiAction.Video && !confirmed) {
+            if (retry != action) subject = emptyList()
             dismiss()
             videoSetup = layer
             return
@@ -116,13 +119,14 @@ class AiTools(private val context: Context, private val state: EditorState, priv
             enhanceSetup = layer
             return
         }
-        if (action == AiAction.Background && !confirmed && CutoutChoice.of(context).asks(BestCutout.offered)) {
+        if (action == AiAction.Background && !confirmed) {
+            if (retry != action) Cutout.parse(layer.backgroundMark?.node?.get("option")).let { subject = it.keep; edge = it.edge }
             dismiss()
             cutoutQuality = CutoutQuality.Standard
             cutoutSetup = layer
             return
         }
-        if (action == AiAction.Background && cutoutSetup != null) CutoutChoice.of(context).choose(cutoutQuality)
+        if (action == AiAction.Background && cutoutSetup != null && CutoutChoice.of(context).asks(BestCutout.offered)) CutoutChoice.of(context).choose(cutoutQuality)
         cutoutSetup = null
         videoSetup = null
         noiseSetup = null
@@ -156,7 +160,8 @@ class AiTools(private val context: Context, private val state: EditorState, priv
                     }
                 } else if (action == AiAction.Video) {
                     val media = checkNotNull(state.scene.media(layer.mediaFill!!.uri)) { AppText.get(R.string.ai_video_missing) }
-                    val matte = withContext(Dispatchers.IO) { VideoBackground.run(context, layer, media, videoSide, report).also { result = it.media } }
+                    val keep = subject
+                    val matte = withContext(Dispatchers.IO) { VideoBackground.run(context, layer, media, videoSide, keep, report).also { result = it.media } }
                     ensureActive()
                     check(state.scene.layer(layer.id) == layer) { AppText.get(R.string.ai_layer_changed) }
                     val groupId = Layer.newId()
@@ -192,23 +197,25 @@ class AiTools(private val context: Context, private val state: EditorState, priv
                         scene.update(layer.id) { it.reversedTo(output.media.declaration.uri, output.mirrorUs, media) }.withMedia(output.media.declaration)
                     }
                 } else {
-                    val original = state.scene.media(layer.node[if (action == AiAction.Noise) "src" else "fillImage"] ?: "")
+                    val mark = layer.backgroundMark?.takeIf { action == AiAction.Background }
+                    val source = if (action == AiAction.Noise) layer.node["src"]!! else mark?.original ?: layer.node["fillImage"]!!
+                    val original = state.scene.media(source) ?: mark?.media
+                    val cutout = Cutout(subject, edge)
                     var note: Int? = null
                     withContext(Dispatchers.IO) {
                         result = when (action) {
                             AiAction.Background -> {
                                 val limit = state.engine.maxPictureSize()
-                                val source = layer.node["fillImage"]!!
                                 bestOrStandard(CutoutChoice.of(context).quality(BestCutout.offered),
                                     install = {
                                         if (!AiModel.Cutout.installed(context)) report(0f, AppText.get(R.string.ai_downloading_model))
                                         BestCutout.install(context) { fraction -> progress = fraction.coerceIn(0f, 1f) }
                                     },
-                                    best = { BestCutout.run(context, source, original, limit, report) },
-                                    standard = { BackgroundRemoval.run(context, source, original, limit, report) },
+                                    best = { BestCutout.run(context, source, original, limit, cutout, report) },
+                                    standard = { BackgroundRemoval.run(context, source, original, limit, cutout, report) },
                                 ).also { note = it.note }.value
                             }
-                            else -> NoiseReduction.run(context, layer.node["src"]!!, noiseSource, report)
+                            else -> NoiseReduction.run(context, source, noiseSource, report)
                         }
                     }
                     ensureActive()
@@ -217,9 +224,10 @@ class AiTools(private val context: Context, private val state: EditorState, priv
                     val kind = if (action == AiAction.Noise) AiKind.Noise else AiKind.Background
                     val used = noiseSource
                     state.edit { scene ->
-                        scene.update(layer.id) {
-                            it.copy(node = it.node.with(kind.attribute!!, output.declaration.uri))
-                                .withAiMark(kind, it.node[kind.attribute], output.declaration.uri, if (kind == AiKind.Noise) used.xml else null, original)
+                        scene.update(layer.id) { current ->
+                            val base = if (kind == AiKind.Background && mark == null) current.withoutAiMark(kind) else current
+                            base.copy(node = base.node.with(kind.attribute!!, output.declaration.uri))
+                                .withAiMark(kind, base.node[kind.attribute], output.declaration.uri, if (kind == AiKind.Noise) used.xml else cutout.option, original)
                         }.withMedia(output.declaration)
                     }
                     fallback = note

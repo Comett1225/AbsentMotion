@@ -176,7 +176,7 @@ class VideoBackgroundTest {
 
     @Test fun theMasksOwnOpacityEffectsAndKeySettingsSurviveTheSync() {
         val tuned = cutOut().tunedMask()
-        assertEquals("0.03", cutOut().matte().keyThreshold())
+        assertEquals("0.416667", cutOut().matte().keyThreshold())
         val synced = tuned.withMattesFollowing()
         assertEquals(tuned, synced)
         val mask = synced.matte()
@@ -212,6 +212,33 @@ class VideoBackgroundTest {
         assertEquals(groupOnly, groupOnly.withMattesFollowing(grouped))
         assertEquals(listOf(300f, 400f, 0f), drifted.withMattesFollowing().matte().transform("location", 0f).toList())
         assertEquals(listOf(300f, 400f, 0f), drifted.withMattesFollowing(Scene(Scene.create("t", 1080, 1920, 30, 0).node)).matte().transform("location", 0f).toList())
+    }
+
+    @Test fun theCutOutEdgeTunesOnlyTheMasksKey() {
+        val grouped = cutOut()
+        val group = grouped.layer(3)!!
+        assertEquals(MatteEdge(), group.cutoutEdge)
+        val tuned = grouped.update(3) { it.withCutoutEdge(MatteEdge(4, -3)) }
+        assertEquals(MatteEdge(4, -3), tuned.layer(3)!!.cutoutEdge)
+        val (threshold, softness) = MatteEdge(4, -3).key()
+        val key = tuned.matte().effects.first { it["id"] == "absent.lumakey" }
+        assertEquals(threshold, key.children.first { it["name"] == "threshold" }["value"]!!.toFloat(), 1e-5f)
+        assertEquals(softness, key.children.first { it["name"] == "softness" }["value"]!!.toFloat(), 1e-5f)
+        assertEquals(grouped.matte().effects.map { it["id"] }, tuned.matte().effects.map { it["id"] })
+        assertEquals(grouped.layer(3)!!.nested!!.layer(1), tuned.layer(3)!!.nested!!.layer(1))
+        assertEquals(tuned, tuned.withMattesFollowing(grouped))
+        val moved = tuned.inside { inner -> inner.update(1) { it.withTransform("location", 50f, 60f, 0f) } }.withMattesFollowing(tuned)
+        assertEquals(MatteEdge(4, -3), moved.layer(3)!!.cutoutEdge)
+        assertEquals(MatteEdge(), tuned.update(3) { it.withCutoutEdge(MatteEdge()) }.layer(3)!!.cutoutEdge)
+    }
+
+    @Test fun olderCutOutsAndOtherGroupsHaveNoEdgeTool() {
+        val older = cutOut().inside { inner -> inner.update(2) { it.copy(node = it.node.with("matteEdge", null)) } }
+        assertNull(older.layer(3)!!.cutoutEdge)
+        assertEquals(older, older.update(3) { it.withCutoutEdge(MatteEdge(5, 5)) })
+        val unmarked = cutOut().update(3) { it.withoutAiMark(AiKind.Video) }
+        assertNull(unmarked.layer(3)!!.cutoutEdge)
+        assertNull(video().cutoutEdge)
     }
 
     @Test fun everyMotionAndDistortionEffectIsFollowed() {

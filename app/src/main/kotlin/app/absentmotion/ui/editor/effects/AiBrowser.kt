@@ -69,6 +69,35 @@ import app.absentmotion.ai.smoothSource
 import app.absentmotion.model.Layer
 import app.absentmotion.model.Scene
 import kotlin.math.roundToInt
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Matrix
+import android.media.MediaMetadataRetriever
+import android.net.Uri
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
+import app.absentmotion.ai.BestCutout
+import app.absentmotion.ai.CutoutChoice
+import app.absentmotion.ai.MAX_TAPS
+import app.absentmotion.ai.MatteEdge
+import app.absentmotion.ai.backgroundMark
+import app.absentmotion.ai.Tap
+import app.absentmotion.ai.frameToView
+import app.absentmotion.ai.viewToFrame
+import app.absentmotion.library.openableUri
+import app.absentmotion.media.decodePicture
+import app.absentmotion.platform.scaledFrame
+import app.absentmotion.ui.editor.panels.EdgeSlider
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.TilePress
 import app.absentmotion.ui.theme.pressScale
@@ -138,10 +167,82 @@ internal fun AiTile(action: AiAction, layer: Layer?, tools: AiTools) {
     }
 }
 
+private const val PICK_SIDE = 640
+
+private suspend fun pickFrame(context: Context, uri: String, timeUs: Long): ImageBitmap? = withContext(Dispatchers.IO) {
+    val retriever = MediaMetadataRetriever()
+    try {
+        retriever.setDataSource(context, Uri.parse(openableUri(uri)))
+        retriever.scaledFrame(timeUs, MediaMetadataRetriever.OPTION_CLOSEST, PICK_SIDE, PICK_SIDE)?.asImageBitmap()
+    } catch (e: CancellationException) {
+        throw e
+    } catch (_: Exception) {
+        null
+    } finally {
+        runCatching { retriever.release() }
+    }
+}
+
+private suspend fun pickPicture(context: Context, uri: String, turn: Int): ImageBitmap? = withContext(Dispatchers.IO) {
+    val picture = decodePicture(context.contentResolver, Uri.parse(uri), PICK_SIDE) ?: return@withContext null
+    if (Math.floorMod(turn, 360) == 0) return@withContext picture.asImageBitmap()
+    Bitmap.createBitmap(picture, 0, 0, picture.width, picture.height, Matrix().apply { postRotate(turn.toFloat()) }, true)
+        .also { if (it !== picture) picture.recycle() }.asImageBitmap()
+}
+
+private fun fitted(picture: ImageBitmap, width: Float, height: Float): Rect {
+    val scale = minOf(width / picture.width, height / picture.height)
+    val w = picture.width * scale
+    val h = picture.height * scale
+    return Rect((width - w) / 2, (height - h) / 2, (width + w) / 2, (height + h) / 2)
+}
+
+@Composable
+private fun SubjectPicker(picture: ImageBitmap?, turn: Int, taps: List<Tap>, hint: String, onTaps: (List<Tap>) -> Unit) {
+    val latest by rememberUpdatedState(taps)
+    Box(Modifier.padding(top = 12.dp).fillMaxWidth().height(180.dp).clip(RoundedCornerShape(6.dp)).background(Am.PanelInset), Alignment.Center) {
+        if (picture == null) Text(stringResource(R.string.about_loading), color = Am.Caption, fontSize = 12.sp)
+        else Canvas(Modifier.fillMaxSize().pointerInput(picture, turn) {
+            detectTapGestures { at ->
+                val box = fitted(picture, size.width.toFloat(), size.height.toFloat())
+                if (!box.contains(at)) return@detectTapGestures
+                val near = latest.indexOfFirst { (u, v) ->
+                    val (x, y) = frameToView(u, v, turn)
+                    (Offset(box.left + x * box.width, box.top + y * box.height) - at).getDistance() < 24.dp.toPx()
+                }
+                onTaps(if (near >= 0) latest.filterIndexed { i, _ -> i != near }
+                    else (latest + viewToFrame((at.x - box.left) / box.width, (at.y - box.top) / box.height, turn)).takeLast(MAX_TAPS))
+            }
+        }) {
+            val box = fitted(picture, size.width, size.height)
+            drawImage(picture, dstOffset = IntOffset(box.left.roundToInt(), box.top.roundToInt()),
+                dstSize = IntSize(box.width.roundToInt().coerceAtLeast(1), box.height.roundToInt().coerceAtLeast(1)))
+            for ((u, v) in taps) {
+                val (x, y) = frameToView(u, v, turn)
+                val at = Offset(box.left + x * box.width, box.top + y * box.height)
+                drawCircle(Color.Black.copy(alpha = 0.55f), 10.5.dp.toPx(), at)
+                drawCircle(Am.Accent, 9.dp.toPx(), at)
+                drawCircle(Color.White, 3.dp.toPx(), at)
+            }
+        }
+        val all = taps.isEmpty()
+        Box(Modifier.align(Alignment.TopStart).padding(6.dp).height(30.dp).clip(RoundedCornerShape(15.dp)).background(if (all) Am.Accent else Color.Black.copy(alpha = 0.6f))
+            .clickable { onTaps(emptyList()) }.padding(horizontal = 12.dp), Alignment.Center) {
+            Text(stringResource(R.string.subject_keep_all), color = if (all) Am.OnAccent else Color.White, fontSize = 13.sp, maxLines = 1)
+        }
+    }
+    Text(if (taps.isEmpty()) hint else stringResource(R.string.subject_chosen), Modifier.padding(top = 6.dp).fillMaxWidth().height(48.dp),
+        color = Am.Caption, fontSize = 12.sp, lineHeight = 16.sp, maxLines = 3)
+}
+
 @Composable
 internal fun AiVideoDialog(tools: AiTools, scene: Scene) {
     val layer = tools.videoSetup ?: return
     val media = layer.mediaFill?.uri?.let(scene::media)
+    val context = LocalContext.current
+    val frame by produceState<ImageBitmap?>(null, layer.mediaFill?.uri, layer.mediaFill?.inTime) {
+        value = layer.mediaFill?.let { pickFrame(context, it.uri, it.inTime * 1000L) }
+    }
     val seconds = media?.let(layer::matteSeconds) ?: 0.0
     val frames = (seconds * (media?.fps ?: 30f)).roundToInt()
     val size = media?.let { matteSize(it.width, it.height, tools.videoSide) }
@@ -150,7 +251,7 @@ internal fun AiVideoDialog(tools: AiTools, scene: Scene) {
     AlertDialog(onDismissRequest = { tools.videoSetup = null },
         title = { Text(stringResource(AiAction.Video.title), color = Am.OnDark) },
         text = {
-            Column {
+            Column(Modifier.verticalScroll(rememberScrollState())) {
                 Text(stringResource(R.string.every_frame_of_this_clip_is),
                     color = Am.OnDark, fontSize = 14.sp)
                 Row(Modifier.padding(top = 14.dp).fillMaxWidth().height(36.dp).clip(RoundedCornerShape(6.dp)).background(Am.PanelInset)) {
@@ -162,6 +263,7 @@ internal fun AiVideoDialog(tools: AiTools, scene: Scene) {
                         }
                     }
                 }
+                SubjectPicker(frame, media?.orientation ?: 0, tools.subject, stringResource(R.string.subject_hint_video)) { tools.subject = it }
                 Text(
                     when {
                         tooLong -> pluralStringResource(R.plurals.aibrowser_too_long, MAX_MATTE_SECONDS / 60, (MAX_MATTE_SECONDS / 60).toString())
@@ -211,32 +313,48 @@ internal fun AiNoiseDialog(tools: AiTools) {
 }
 
 @Composable
-internal fun AiCutoutDialog(tools: AiTools) {
-    if (tools.cutoutSetup == null) return
+internal fun AiCutoutDialog(tools: AiTools, scene: Scene) {
+    val layer = tools.cutoutSetup ?: return
+    val context = LocalContext.current
     val size = formatBytes(app.absentmotion.ai.AiModel.Cutout.bytes)
+    val mark = layer.backgroundMark
+    val source = mark?.original ?: layer.node["fillImage"]
+    val turn = (source?.let(scene::media) ?: mark?.media)?.orientation ?: 0
+    val picture by produceState<ImageBitmap?>(null, source, turn) { value = source?.let { pickPicture(context, it, turn) } }
+    val asks = remember(layer.id) { CutoutChoice.of(context).asks(BestCutout.offered) }
     AlertDialog(onDismissRequest = { tools.cutoutSetup = null },
-        title = { Text(stringResource(R.string.settings_cutout_quality), color = Am.OnDark) },
+        title = { Text(stringResource(R.string.ai_remove_background), color = Am.OnDark) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState())) {
-                Text(stringResource(R.string.cutout_question), color = Am.OnDark, fontSize = 14.sp)
-                Column(Modifier.padding(top = 12.dp).selectableGroup(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    for (quality in CutoutQuality.entries) {
-                        val on = quality == tools.cutoutQuality
-                        Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(6.dp)).background(if (on) Am.FieldHi else Am.PanelInset)
-                            .selectable(on, role = Role.RadioButton) { tools.cutoutQuality = quality }.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
-                            RadioButton(on, null, colors = RadioButtonDefaults.colors(selectedColor = Am.Accent, unselectedColor = Am.OnDark))
-                            Column(Modifier.padding(start = 10.dp)) {
-                                Text(stringResource(quality.title), color = if (on) Am.Accent else Am.OnDark, fontSize = 14.sp)
-                                Text(stringResource(quality.hint, size), color = Am.Caption, fontSize = 12.sp, lineHeight = 16.sp)
-                            }
-                        }
-                    }
-                }
+                SubjectPicker(picture, turn, tools.subject, stringResource(R.string.subject_hint_photo)) { tools.subject = it }
+                EdgeSlider(stringResource(R.string.cutout_softness), tools.edge.softness, 0..MatteEdge.MAX_SOFTNESS) { tools.edge = tools.edge.copy(softness = it) }
+                EdgeSlider(stringResource(R.string.cutout_grow_shrink), tools.edge.grow, -MatteEdge.MAX_GROW..MatteEdge.MAX_GROW) { tools.edge = tools.edge.copy(grow = it) }
+                Text(stringResource(R.string.cutout_edge_photo), Modifier.padding(top = 4.dp), color = Am.Caption, fontSize = 12.sp, lineHeight = 16.sp)
+                if (asks) CutoutQualityChoice(tools, size)
             }
         },
         confirmButton = { TextButton({ tools.apply(AiAction.Background, confirmed = true) }) { Text(stringResource(R.string.start), color = Am.Accent) } },
         dismissButton = { TextButton({ tools.cutoutSetup = null }) { Text(stringResource(R.string.cancel), color = Am.Accent) } },
         containerColor = Am.Field)
+}
+
+@Composable
+private fun CutoutQualityChoice(tools: AiTools, size: String) {
+    Text(stringResource(R.string.settings_cutout_quality), Modifier.padding(top = 14.dp), color = Am.OnDark, fontSize = 14.sp)
+    Text(stringResource(R.string.cutout_question), Modifier.padding(top = 4.dp), color = Am.Caption, fontSize = 12.sp, lineHeight = 16.sp)
+    Column(Modifier.padding(top = 8.dp).selectableGroup(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        for (quality in CutoutQuality.entries) {
+            val on = quality == tools.cutoutQuality
+            Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(6.dp)).background(if (on) Am.FieldHi else Am.PanelInset)
+                .selectable(on, role = Role.RadioButton) { tools.cutoutQuality = quality }.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
+                RadioButton(on, null, colors = RadioButtonDefaults.colors(selectedColor = Am.Accent, unselectedColor = Am.OnDark))
+                Column(Modifier.padding(start = 10.dp)) {
+                    Text(stringResource(quality.title), color = if (on) Am.Accent else Am.OnDark, fontSize = 14.sp)
+                    Text(stringResource(quality.hint, size), color = Am.Caption, fontSize = 12.sp, lineHeight = 16.sp)
+                }
+            }
+        }
+    }
 }
 
 @Composable

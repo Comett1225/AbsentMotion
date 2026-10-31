@@ -76,7 +76,7 @@ internal object BestCutout {
         if (!AiModel.Cutout.installed(context)) AiModel.Cutout.download(context, progress)
     }
 
-    suspend fun run(context: Context, uri: String, original: MediaDeclaration?, limit: Int, progress: AiProgress): AiMedia {
+    suspend fun run(context: Context, uri: String, original: MediaDeclaration?, limit: Int, cutout: Cutout = Cutout(), progress: AiProgress): AiMedia {
         val model = AiModel.Cutout
         var bitmap: Bitmap? = null
         var file: File? = null
@@ -93,6 +93,7 @@ internal object BestCutout {
             AiNet.open(context, model, paramName = if (side == CUTOUT_LARGE_SIDE) CUTOUT_PARAM_1024 else CUTOUT_PARAM_768).use { it.cutout(picture, side) }
             picture.setHasAlpha(true)
             picture.isPremultiplied = false
+            if (!cutout.plain) picture.refineAlpha(cutout)
             progress(0.9f, AppText.get(R.string.ai_saving_transparent))
             file.outputStream().use { check(picture.compress(Bitmap.CompressFormat.PNG, 100, it)) { AppText.get(R.string.ai_cannot_save_image) } }
             coroutineContext.ensureActive()
@@ -101,6 +102,21 @@ internal object BestCutout {
         } finally {
             bitmap?.recycle()
             if (!success) file?.delete()
+        }
+    }
+
+    private fun Bitmap.refineAlpha(cutout: Cutout) {
+        val row = IntArray(width)
+        val alpha = ByteArray(width * height)
+        for (y in 0 until height) {
+            getPixels(row, 0, width, 0, y, width, 1)
+            for (x in 0 until width) alpha[y * width + x] = (row[x] ushr 24).toByte()
+        }
+        val refined = cutout.refine(alpha, width, height)
+        for (y in 0 until height) {
+            getPixels(row, 0, width, 0, y, width, 1)
+            for (x in 0 until width) row[x] = (row[x] and 0x00FFFFFF) or ((refined[y * width + x].toInt() and 0xFF) shl 24)
+            setPixels(row, 0, width, 0, y, width, 1)
         }
     }
 

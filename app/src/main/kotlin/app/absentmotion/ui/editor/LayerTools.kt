@@ -97,6 +97,7 @@ import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.key.utf16CodePoint
 import app.absentmotion.ui.editor.panels.PanelGreen
 import app.absentmotion.ui.editor.panels.PanelIcon
+import app.absentmotion.ai.cutoutEdge
 import app.absentmotion.ui.editor.panels.PanelShape
 import app.absentmotion.ui.editor.panels.dimmed
 import app.absentmotion.ui.editor.panels.formatPlain
@@ -173,7 +174,8 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier, side: Boolean 
             else -> {
                 val edit = when {
                     kind == "text" -> Tile(EditText) { state.panel = EditorPanel.EditText }
-                    kind == "embedScene" -> if (state.selected?.link != null) Tile(ElementPropsButton) { properties = true } else null
+                    kind == "embedScene" -> if (state.selected?.link != null) Tile(ElementPropsButton) { properties = true }
+                        else if (state.selected?.cutoutEdge != null) Tile(CutoutEdge) { state.panel = EditorPanel.Edge } else null
                     kind == "drawing" -> Tile(EditDrawing) { state.editDrawing() }
                     drawn -> Tile(EditPoints, enabled = state.selected?.contours != null) { state.editPoints() }
                     else -> Tile(EditShape) { state.panel = EditorPanel.EditShape }
@@ -249,6 +251,7 @@ private val Effects = Tool(R.string.layer_tool_effects, PanelIcons.Effects, 19.6
 private val Crop = Tool(R.string.layer_tool_crop, PanelIcons.Crop, 18.1f)
 private val CaptionTools = Tool(R.string.auto_captions, ChromeIcons.Captions, 19.4f)
 private val AiTools = Tool(R.string.ai, PanelIcons.Bot, 19.4f)
+private val CutoutEdge = Tool(R.string.cutout_edge, PanelIcons.TabBorder, 18.1f)
 
 @Composable
 private fun SmallTool(icon: ImageVector, description: String, modifier: Modifier, shape: RoundedCornerShape, enabled: Boolean = true, onClick: () -> Unit = {}) {
@@ -349,6 +352,7 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
                 EditorPanel.Blending -> BlendingPanel(state, layer, Modifier.fillMaxSize())
                 EditorPanel.Camera -> CameraPanel(state, layer, Modifier.fillMaxSize())
                 EditorPanel.Model -> ModelPanel(state, layer, Modifier.fillMaxSize())
+                EditorPanel.Edge -> app.absentmotion.ui.editor.panels.EdgePanel(state, layer, Modifier.fillMaxSize())
                 EditorPanel.Tools, EditorPanel.EditText, EditorPanel.Effects, EditorPanel.Crop -> {}
             }
             Box(Modifier.width(2.px).fillMaxHeight().background(PanelDark))

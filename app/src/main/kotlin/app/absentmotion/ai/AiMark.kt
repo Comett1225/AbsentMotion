@@ -67,6 +67,8 @@ internal fun Layer.aiStack(kind: AiKind): List<AiMark> {
 
 internal fun Layer.aiBuried(kind: AiKind): Boolean = aiStack(kind).size > 1
 
+internal val Layer.backgroundMark: AiMark? get() = aiMarks.firstOrNull { it.kind == AiKind.Background }?.takeIf { aiStack(AiKind.Background).isNotEmpty() }
+
 internal fun Layer.shiftedMedia(by: Int): Layer {
     val fill = mediaFill
     if (by == 0 || fill == null) return this

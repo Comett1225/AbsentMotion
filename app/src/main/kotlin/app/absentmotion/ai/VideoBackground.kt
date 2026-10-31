@@ -18,7 +18,9 @@ import app.absentmotion.model.MediaDeclaration
 import app.absentmotion.model.MediaFillMode
 import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
+import app.absentmotion.model.effectProperty
 import app.absentmotion.model.effects
+import app.absentmotion.model.withEffect
 import app.absentmotion.model.floats
 import app.absentmotion.model.formatFloats
 import app.absentmotion.model.fpsText
@@ -140,10 +142,35 @@ internal val MatteFollowedEffects = setOf(
 
 private val MatteTimeAttributes = listOf("startTime", "endTime", "inTime", "outTime", "speed", "loop", "loopIn", "parent")
 
-private fun lumaKey() = XmlNode("effect", linkedMapOf("id" to "absent.lumakey", "hidden" to "false"), listOf(
-    XmlNode("property", linkedMapOf("name" to "threshold", "type" to "float", "value" to "0.03")),
-    XmlNode("property", linkedMapOf("name" to "softness", "type" to "float", "value" to "0.94")),
-))
+private const val MATTE_EDGE = "matteEdge"
+private const val LUMA_KEY = "absent.lumakey"
+
+private fun keyNumber(name: String, value: String) = XmlNode("property", linkedMapOf("name" to name, "type" to "float", "value" to value))
+
+private fun lumaKey(edge: Boolean) = XmlNode("effect", linkedMapOf("id" to LUMA_KEY, "hidden" to "false"), MatteEdge().key().let { (threshold, softness) ->
+    listOf(keyNumber("threshold", if (edge) formatFloats(floatArrayOf(threshold)) else "0.03"), keyNumber("softness", if (edge) formatFloats(floatArrayOf(softness)) else "0.94"))
+})
+
+internal val Layer.cutoutMatte: Layer?
+    get() = nested?.layers?.getOrNull(1)?.takeIf { matte -> matte.node[MATTE_EDGE] != null && matte.effects.any { it["id"] == LUMA_KEY } && aiMarks.any { it.kind == AiKind.Video } }
+
+internal val Layer.cutoutEdge: MatteEdge?
+    get() = cutoutMatte?.effects?.first { it["id"] == LUMA_KEY }?.let { key ->
+        fun number(name: String, fallback: Float) = key.effectProperty(name)?.get("value")?.toFloatOrNull() ?: fallback
+        MatteEdge.of(number("threshold", 0f), number("softness", 1f))
+    }
+
+internal fun Layer.withCutoutEdge(edge: MatteEdge): Layer {
+    val inner = nested ?: return this
+    val matte = cutoutMatte ?: return this
+    val (threshold, softness) = edge.key()
+    val values = mapOf("threshold" to formatFloats(floatArrayOf(threshold)), "softness" to formatFloats(floatArrayOf(softness)))
+    val tuned = matte.withEffect(matte.effects.indexOfFirst { it["id"] == LUMA_KEY }) { key ->
+        val kept = key.children.filterNot { it.name == "property" && it["name"] in values }
+        key.copy(children = kept + values.map { (name, value) -> keyNumber(name, value) })
+    }
+    return copy(node = node.withChild("scene", inner.update(matte.id) { tuned }.node))
+}
 
 private fun Layer.matteSize(frameWidth: Int, frameHeight: Int): XmlNode {
     val mode = mediaFill?.mode ?: MediaFillMode.Fill
@@ -170,7 +197,7 @@ internal fun Layer.followingOriginal(original: Layer): Layer {
     val placement = original.node.child("transform")?.let { it.copy(children = it.children.filterNot { c -> c.name == "opacity" }) }
     val transform = if (opacity == null) placement else (placement ?: XmlNode("transform")).let { it.copy(children = it.children + opacity) }
     val moving = original.effects.filter { it.isFollowedEffect() }
-    val key = effects.firstOrNull { it["id"] == "absent.lumakey" } ?: lumaKey()
+    val key = effects.firstOrNull { it["id"] == LUMA_KEY } ?: lumaKey(node[MATTE_EDGE] != null)
     val own = effects.filter { it !== key && !it.isFollowedEffect() }
     val kept = node.children.filterNot { it.name in MatteFollowedChildren || it.isMatteSize() }
     val attrs = MatteTimeAttributes.fold(node) { acc, name -> acc.with(name, original.node[name]) }.with("noiseId", "${original.id}")
@@ -180,7 +207,7 @@ internal fun Layer.followingOriginal(original: Layer): Layer {
 internal fun Scene.withVideoMatte(original: Layer, matte: MediaDeclaration, frameWidth: Int, frameHeight: Int, matteId: Long, groupId: Long): Scene? {
     if (original.shape.isEmpty() || original.mediaFill?.video != true || layer(original.id) == null) return null
     val attrs = linkedMapOf("id" to "$matteId", "label" to AppText.get(R.string.ai_video_mask_name, original.label.ifEmpty { AppText.get(R.string.model_layer_video) }))
-    attrs += listOf("s" to ".rect", "fillType" to "media", "fillVideo" to matte.uri, "mediaFillMode" to "stretch", "matteFrame" to "$frameWidth,$frameHeight")
+    attrs += listOf("s" to ".rect", "fillType" to "media", "fillVideo" to matte.uri, "mediaFillMode" to "stretch", "matteFrame" to "$frameWidth,$frameHeight", MATTE_EDGE to "1")
     val node = Layer(XmlNode("shape", attrs, listOf(XmlNode("gain", linkedMapOf("value" to "0"))))).followingOriginal(original).node
     val children = this.node.children.flatMap { if (it.name in Scene.LAYER_TAGS && Layer(it).id == original.id) listOf(it, node) else listOf(it) }
     val withMatte = Scene(this.node.copy(children = children)).withMedia(matte)
@@ -188,7 +215,7 @@ internal fun Scene.withVideoMatte(original: Layer, matte: MediaDeclaration, fram
 }
 
 private fun Scene.followMattes(): Scene {
-    val matte = layers.getOrNull(1)?.takeIf { it.node.child("gain") != null && it.effects.any { e -> e["id"] == "absent.lumakey" } } ?: return this
+    val matte = layers.getOrNull(1)?.takeIf { it.node.child("gain") != null && it.effects.any { e -> e["id"] == LUMA_KEY } } ?: return this
     val original = layers[0].takeIf { it.kind == "shape" && it.mediaFill?.video == true } ?: return this
     val followed = matte.followingOriginal(original)
     return if (followed == matte) this else Scene(update(matte.id) { followed }.node.with("totalTime", node["totalTime"]))
@@ -319,7 +346,7 @@ internal class MatteEncoder private constructor(private val codec: MediaCodec, p
 internal class VideoMatte(val media: AiMedia, val frameWidth: Int, val frameHeight: Int)
 
 internal object VideoBackground {
-    suspend fun run(context: Context, layer: Layer, media: MediaDeclaration, side: Int, progress: AiProgress): VideoMatte {
+    suspend fun run(context: Context, layer: Layer, media: MediaDeclaration, side: Int, keep: List<Tap>, progress: AiProgress): VideoMatte {
         val fill = checkNotNull(layer.mediaFill?.takeIf { it.video }) { AppText.get(R.string.ai_select_video_layer) }
         check(media.width > 0 && media.height > 0) { AppText.get(R.string.ai_video_no_size) }
         val seconds = layer.matteSeconds(media)
@@ -339,22 +366,25 @@ internal object VideoBackground {
                     check(stamps.isNotEmpty()) { AppText.get(R.string.ai_no_video_frames) }
                     var frame = media.width to media.height
                     MatteEncoder.open(file, width, height, fps).use { encoder ->
-                        encoded = encoder.width to encoder.height
-                        if (stamps.first() > 0) encoder.write(0L, ByteArray(encoder.width * encoder.height))
+                        val w = encoder.width
+                        val h = encoder.height
+                        encoded = w to h
+                        if (stamps.first() > 0) encoder.write(0L, ByteArray(w * h))
                         val smoother = MatteSmoother()
+                        val follower = if (keep.isEmpty()) null else PartFollower(keep)
                         val started = System.nanoTime()
                         var done = 0
                         for (batch in stamps.chunked(BATCH)) {
                             reader.read(batch) { pts, yuv ->
                                 frame = yuv.width to yuv.height
-                                val alpha = matte(yuv.argb(encoder.width, encoder.height, reader.colorStandard, reader.fullRange), encoder.width, encoder.height)
-                                check(alpha.size == encoder.width * encoder.height) { AppText.get(R.string.ai_mask_unexpected_size) }
-                                smoother.push(pts, alpha)?.let { (p, m) -> encoder.write(p, m) }
+                                val alpha = matte(yuv.argb(w, h, reader.colorStandard, reader.fullRange), w, h)
+                                check(alpha.size == w * h) { AppText.get(R.string.ai_mask_unexpected_size) }
+                                smoother.push(pts, follower?.next(alpha, w, h) ?: alpha)?.let { (p, m) -> encoder.write(p, encodeMatte(m, w, h)) }
                                 done++
                                 progress(0.02f + 0.96f * done / stamps.size, status(done, stamps.size, System.nanoTime() - started))
                             }
                         }
-                        smoother.flush()?.let { (p, m) -> encoder.write(p, m) }
+                        smoother.flush()?.let { (p, m) -> encoder.write(p, encodeMatte(m, w, h)) }
                         progress(0.99f, AppText.get(R.string.ai_saving_mask_video))
                         encoder.finish()
                     }

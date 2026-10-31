@@ -1949,4 +1949,14 @@
         <item quantity="one">Pasted onto %1$s layer</item>
         <item quantity="other">Pasted onto %1$s layers</item>
     </plurals>
+    <string name="subject_keep_all">Keep everything</string>
+    <string name="subject_hint_photo">To keep only one person or thing, tap it.</string>
+    <string name="subject_hint_video">To keep only one person or thing, tap it on this first frame. The app follows it through the clip.</string>
+    <string name="subject_chosen">Only what you tapped is kept. Tap a dot to remove it.</string>
+    <string name="cutout_edge">Cut-out Edge</string>
+    <string name="cutout_softness">Softness</string>
+    <string name="cutout_grow_shrink">Grow / Shrink</string>
+    <string name="cutout_edge_hint">Soften the edge of the cut-out, or move it out or in. The preview changes as you drag.</string>
+    <string name="cutout_edge_reset">Reset</string>
+    <string name="cutout_edge_photo">The edge is set when the cut-out is made. To change it, run Remove Background again: it starts again from the original photo.</string>
 </resources>

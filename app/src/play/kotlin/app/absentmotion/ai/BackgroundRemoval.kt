@@ -21,14 +21,13 @@ import kotlin.coroutines.coroutineContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
-import kotlin.math.roundToInt
 
 internal class ModelNotReady : Exception(AppText.get(R.string.ai_model_not_ready_play))
 
 internal object BackgroundRemoval {
     const val AVAILABLE = true
 
-    suspend fun run(context: Context, uri: String, original: MediaDeclaration?, limit: Int, progress: AiProgress): AiMedia {
+    suspend fun run(context: Context, uri: String, original: MediaDeclaration?, limit: Int, cutout: Cutout = Cutout(), progress: AiProgress): AiMedia {
         val client = SubjectSegmentation.getClient(SubjectSegmenterOptions.Builder().enableForegroundConfidenceMask().build())
         var bitmap: Bitmap? = null
         var file: java.io.File? = null
@@ -48,17 +47,18 @@ internal object BackgroundRemoval {
             coroutineContext.ensureActive()
             val mask = checkNotNull(result.foregroundConfidenceMask) { AppText.get(R.string.ai_no_foreground_mask) }
             mask.rewind()
-            val pixels = IntArray(bitmap.width * bitmap.height)
-            bitmap.getPixels(pixels, 0, bitmap.width, 0, 0, bitmap.width, bitmap.height)
-            check(mask.remaining() == pixels.size) { AppText.get(R.string.ai_mask_unexpected_size) }
-            for (i in pixels.indices) {
-                if (i % bitmap.width == 0) coroutineContext.ensureActive()
-                val confidence = mask.get().let { if (it.isFinite()) it.coerceIn(0f, 1f) else 0f }
-                val alpha = ((pixels[i] ushr 24) * confidence).roundToInt()
-                pixels[i] = (pixels[i] and 0x00FFFFFF) or (alpha shl 24)
-            }
+            val width = bitmap.width
+            val height = bitmap.height
+            check(mask.remaining() == width * height) { AppText.get(R.string.ai_mask_unexpected_size) }
+            val alpha = cutout.refine(ByteArray(width * height) { (mask.get().let { if (it.isFinite()) it.coerceIn(0f, 1f) else 0f } * 255 + 0.5f).toInt().toByte() }, width, height)
+            val row = IntArray(width)
             bitmap.setHasAlpha(true)
-            bitmap.setPixels(pixels, 0, bitmap.width, 0, 0, bitmap.width, bitmap.height)
+            for (y in 0 until height) {
+                coroutineContext.ensureActive()
+                bitmap.getPixels(row, 0, width, 0, y, width, 1)
+                for (x in 0 until width) row[x] = withMatte(row[x], alpha[y * width + x])
+                bitmap.setPixels(row, 0, width, 0, y, width, 1)
+            }
             progress(0.9f, AppText.get(R.string.ai_saving_transparent))
             file.outputStream().use { check(bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)) { AppText.get(R.string.ai_cannot_save_image) } }
             coroutineContext.ensureActive()

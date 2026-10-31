@@ -18,9 +18,6 @@ internal const val MODEL_ASSET = "absent_bg.abg"
 internal fun needsCopy(target: File, stamp: File, version: String): Boolean =
     !target.isFile || !stamp.isFile || stamp.readText() != version
 
-internal fun withMatte(argb: Int, matte: Byte): Int =
-    (argb and 0x00FFFFFF) or ((((argb ushr 24) * (matte.toInt() and 0xFF) + 127) / 255) shl 24)
-
 internal object BackgroundRemoval {
     val AVAILABLE: Boolean by lazy {
         runCatching { System.loadLibrary("amengine") }.isSuccess &&
@@ -32,7 +29,7 @@ internal object BackgroundRemoval {
     private external fun nativeMatte(handle: Long, rgb: ByteArray, width: Int, height: Int): ByteArray
     private external fun nativeRelease(handle: Long)
 
-    suspend fun run(context: Context, uri: String, original: MediaDeclaration?, limit: Int, progress: AiProgress): AiMedia {
+    suspend fun run(context: Context, uri: String, original: MediaDeclaration?, limit: Int, cutout: Cutout = Cutout(), progress: AiProgress): AiMedia {
         if (!AVAILABLE) throw ModelNotReady()
         var bitmap: Bitmap? = null
         var file: File? = null
@@ -46,7 +43,7 @@ internal object BackgroundRemoval {
             val width = bitmap.width
             val height = bitmap.height
             progress(0.2f, AppText.get(R.string.ai_removing_background))
-            val alpha = matte(context, bitmap)
+            val alpha = cutout.refine(matte(context, bitmap), width, height)
             coroutineContext.ensureActive()
             check(alpha.size == width * height) { AppText.get(R.string.ai_mask_unexpected_size) }
             val row = IntArray(width)

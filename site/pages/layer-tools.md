@@ -12,7 +12,7 @@ Tap a layer and a grid of tools opens at the bottom. The first row has five smal
 | Path shape (pen, SVG, many shapes) | The same, with **Edit Points** instead of Shape Options |
 | Text | The same, with **Edit Text** instead of Shape Options |
 | Drawing | The same, with **Edit Drawing** instead of Shape Options |
-| Group | Transform, Presets, Effects. A group linked to an asset also has **Asset Properties**. |
+| Group | Transform, Presets, Effects. A group linked to an asset also has **Asset Properties**; a video cut-out made by **Remove Background (video)** also has **Cut-out Edge**. |
 | Null | Like a shape, but nothing to draw |
 | Camera | Camera Options, Transform, Effects, Presets, Camera Moves |
 | 3D model | Model Options, Opacity, Transform, Presets, Effects |

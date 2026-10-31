@@ -270,7 +270,7 @@ fun EffectBrowser(state: EditorState) {
     }
     AiVideoDialog(ai, state.scene)
     AiNoiseDialog(ai)
-    AiCutoutDialog(ai)
+    AiCutoutDialog(ai, state.scene)
     AiEnhanceDialog(ai, state.scene) { catalog.find(QUICK_SHARPEN)?.let(::pick) }
     AiProgressDialog(ai)
     captionClip?.let { id -> CaptionsSheet(state, clipId = id) { captionClip = null; close() } }
