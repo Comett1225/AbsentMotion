@@ -843,7 +843,7 @@ sk_sp<SkImage> EngineImpl::copyFrame(AHardwareBuffer* buffer, bool opaque, int c
                                      const MediaKey* key, int maxSide) {
     bool rawYuv = false;
     sk_sp<SkImage> imported;
-    if (this->gl() && (colorStandard == 1 || colorStandard == 2 || colorStandard == 4 || colorStandard == 6))
+    if (this->gl())
         imported = fYuv.convert(fGanesh.get(), buffer, colorStandard, colorRange, opaque ? kOpaque_SkAlphaType : kPremul_SkAlphaType);
     if (!imported) imported = this->importFrame(buffer, opaque, colorStandard, colorRange, &rawYuv, key);
     if (!imported) return nullptr;

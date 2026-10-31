@@ -17,6 +17,7 @@ public:
 private:
     bool setUp();
     int fState = 0;
+    bool fDriver = false;
     GLuint fProgram = 0;
     GLuint fExternal = 0;
     GLuint fFramebuffer = 0;

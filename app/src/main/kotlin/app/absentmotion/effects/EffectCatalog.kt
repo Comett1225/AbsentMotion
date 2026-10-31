@@ -27,7 +27,7 @@ data class EffectCatalog(
         definitions.filter { category == null || it.category == category || (category == "new" && isNew(it)) }
 
     fun search(query: String): List<EffectDefinition> {
-        val byName = definitions.filter { matchesSearch(query, it.name) }.sortedBy { it.name.lowercase() }
+        val byName = definitions.filter { matchesSearch(query, it.name) }.sortedWith(compareBy({ searchRank(query, it.name) }, { it.name.lowercase() }))
         return byName + definitions.filter { it !in byName && matchesSearch(query, it.name, it.description) }.sortedBy { it.name.lowercase() }
     }
 
@@ -98,4 +98,16 @@ private fun EffectDefinition.translated(json: JSONObject): EffectDefinition {
         },
         presets = presets.map { it.copy(name = presetNames.optString(it.slug).ifBlank { it.name }) },
     )
+}
+
+internal fun searchRank(query: String, name: String): Int {
+    val q = query.trim().lowercase()
+    val n = name.trim().lowercase()
+    return when {
+        q.isEmpty() -> 3
+        n == q -> 0
+        n.startsWith(q) -> 1
+        n.split(' ', '-', '/', '(').any { it.startsWith(q) } -> 2
+        else -> 3
+    }
 }

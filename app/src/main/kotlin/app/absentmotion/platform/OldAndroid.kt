@@ -58,6 +58,10 @@ internal val MediaCodecInfo.alias: Boolean
 internal val PackageInfo.versionCodeLong: Long get() = PackageInfoCompat.getLongVersionCode(this)
 
 internal fun MediaMetadataRetriever.scaledFrame(timeUs: Long, option: Int, width: Int, height: Int): Bitmap? =
+    grab(timeUs, option, width, height)
+        ?: if (option == MediaMetadataRetriever.OPTION_CLOSEST) grab(timeUs, MediaMetadataRetriever.OPTION_CLOSEST_SYNC, width, height) else null
+
+private fun MediaMetadataRetriever.grab(timeUs: Long, option: Int, width: Int, height: Int): Bitmap? =
     if (Build.VERSION.SDK_INT >= 27) getScaledFrameAtTime(timeUs, option, width, height)
     else getFrameAtTime(timeUs, option)?.let { fitBitmap(it, width, height) }
 

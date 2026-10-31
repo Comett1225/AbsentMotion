@@ -35,6 +35,21 @@ const char* kFragment =
     "out vec4 color;\n"
     "void main() { color = vec4(clamp(m * (texture(frame, uv).xyz - o), 0.0, 1.0), 1.0); }\n";
 
+const char* kOldVertex =
+    "attribute vec2 p;\n"
+    "varying vec2 uv;\n"
+    "void main() {\n"
+    "  uv = p * 0.5 + 0.5;\n"
+    "  gl_Position = vec4(p, 0.0, 1.0);\n"
+    "}\n";
+
+const char* kOldFragment =
+    "#extension GL_OES_EGL_image_external : require\n"
+    "precision mediump float;\n"
+    "uniform samplerExternalOES frame;\n"
+    "varying vec2 uv;\n"
+    "void main() { gl_FragColor = vec4(texture2D(frame, uv).rgb, 1.0); }\n";
+
 GLuint Compile(GLenum kind, const char* source) {
     GLuint shader = glCreateShader(kind);
     glShaderSource(shader, 1, &source, nullptr);
@@ -70,17 +85,21 @@ bool IsRgb(uint32_t format) {
 
 bool GlYuv::setUp() {
     const char* extensions = (const char*)glGetString(GL_EXTENSIONS);
-    if (!extensions || !strstr(extensions, "GL_EXT_YUV_target")) {
-        LOGI("OpenGL video frames: the driver converts YUV (no GL_EXT_YUV_target)");
-        return false;
+    if (!extensions) return false;
+    if (!strstr(extensions, "GL_EXT_YUV_target")) {
+        fDriver = strstr(extensions, "GL_OES_EGL_image_external") && !strstr(extensions, "GL_OES_EGL_image_external_essl3");
+        if (!fDriver) {
+            LOGI("OpenGL video frames: the driver converts YUV (no GL_EXT_YUV_target)");
+            return false;
+        }
     }
     fClientBuffer = (PFNEGLGETNATIVECLIENTBUFFERANDROIDPROC)eglGetProcAddress("eglGetNativeClientBufferANDROID");
     fCreateImage = (PFNEGLCREATEIMAGEKHRPROC)eglGetProcAddress("eglCreateImageKHR");
     fDestroyImage = (PFNEGLDESTROYIMAGEKHRPROC)eglGetProcAddress("eglDestroyImageKHR");
     fTargetTexture = (PFNGLEGLIMAGETARGETTEXTURE2DOESPROC)eglGetProcAddress("glEGLImageTargetTexture2DOES");
     if (!fClientBuffer || !fCreateImage || !fDestroyImage || !fTargetTexture) return false;
-    GLuint vertex = Compile(GL_VERTEX_SHADER, kVertex);
-    GLuint fragment = Compile(GL_FRAGMENT_SHADER, kFragment);
+    GLuint vertex = Compile(GL_VERTEX_SHADER, fDriver ? kOldVertex : kVertex);
+    GLuint fragment = Compile(GL_FRAGMENT_SHADER, fDriver ? kOldFragment : kFragment);
     if (!vertex || !fragment) return false;
     fProgram = glCreateProgram();
     glAttachShader(fProgram, vertex);
@@ -99,13 +118,15 @@ bool GlYuv::setUp() {
     fOffset = glGetUniformLocation(fProgram, "o");
     glGenTextures(1, &fExternal);
     glGenFramebuffers(1, &fFramebuffer);
-    LOGI("OpenGL video frames: converted with the stream's own colour matrix");
+    LOGI(fDriver ? "OpenGL video frames: drawn by the driver with an ES 2 shader (no GL_OES_EGL_image_external_essl3)"
+                 : "OpenGL video frames: converted with the stream's own colour matrix");
     return true;
 }
 
 sk_sp<SkImage> GlYuv::convert(GrDirectContext* context, AHardwareBuffer* buffer, int colorStandard, int colorRange, SkAlphaType alpha) {
     if (fState == 0) fState = this->setUp() ? 1 : -1;
     if (fState < 0) return nullptr;
+    if (!fDriver && colorStandard != 1 && colorStandard != 2 && colorStandard != 4 && colorStandard != 6) return nullptr;
     AHardwareBuffer_Desc desc;
     AHardwareBuffer_describe(buffer, &desc);
     if (IsRgb(desc.format)) return nullptr;
@@ -145,8 +166,10 @@ sk_sp<SkImage> GlYuv::convert(GrDirectContext* context, AHardwareBuffer* buffer,
         glBindTexture(GL_TEXTURE_EXTERNAL_OES, fExternal);
         fTargetTexture(GL_TEXTURE_EXTERNAL_OES, (GLeglImageOES)image);
         glUniform1i(glGetUniformLocation(fProgram, "frame"), 0);
-        glUniformMatrix3fv(fMatrix, 1, GL_FALSE, matrix);
-        glUniform3f(fOffset, limited ? 16.f / 255 : 0.f, 128.f / 255, 128.f / 255);
+        if (!fDriver) {
+            glUniformMatrix3fv(fMatrix, 1, GL_FALSE, matrix);
+            glUniform3f(fOffset, limited ? 16.f / 255 : 0.f, 128.f / 255, 128.f / 255);
+        }
         glBindVertexArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, quad);

@@ -183,8 +183,8 @@ internal fun ChoiceRow(title: String, about: String?, selected: Boolean, enabled
 @Composable
 internal fun BigButton(label: String, modifier: Modifier = Modifier, icon: ImageVector? = null, primary: Boolean = true, enabled: Boolean = true, onClick: () -> Unit) {
     Row(
-        modifier.height(52.dp).alpha(if (enabled) 1f else 0.45f).clip(RoundedCornerShape(14.dp)).background(if (primary) Am.Accent else Am.HomeLine)
-            .clickable(enabled = enabled, onClick = onClick).padding(horizontal = 12.dp),
+        modifier.heightIn(min = 52.dp).alpha(if (enabled) 1f else 0.45f).clip(RoundedCornerShape(14.dp)).background(if (primary) Am.Accent else Am.HomeLine)
+            .clickable(enabled = enabled, onClick = onClick).padding(horizontal = 12.dp, vertical = 4.dp),
         horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically,
     ) {
         val tint = if (primary) Am.OnAccent else Am.Navy
@@ -192,7 +192,8 @@ internal fun BigButton(label: String, modifier: Modifier = Modifier, icon: Image
             Icon(icon, null, Modifier.size(20.dp), tint = tint)
             Spacer(Modifier.width(8.dp))
         }
-        Text(label, color = tint, fontSize = 17.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Text(label, color = tint, fontSize = 17.sp, lineHeight = 19.sp, fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center)
     }
 }
 

@@ -96,12 +96,15 @@ fun EffectBrowser(state: EditorState) {
     var query by remember { mutableStateOf("") }
     var detail by remember { mutableStateOf(state.effectDetail?.let(catalog::find)) }
     LaunchedEffect(catalog) { detail = detail?.id?.let(catalog::find) }
-    fun close() { state.effectDetail = null; state.effectCategory = null; state.effectTargets = null; state.effectBrowserOpen = false }
+    val keyboard = androidx.compose.ui.platform.LocalSoftwareKeyboardController.current
+    val focusManager = androidx.compose.ui.platform.LocalFocusManager.current
+    fun hideKeyboard() { focusManager.clearFocus(force = true); keyboard?.hide() }
+    fun close() { hideKeyboard(); state.effectDetail = null; state.effectCategory = null; state.effectTargets = null; state.effectBrowserOpen = false }
     var fromAudio by remember { mutableStateOf(false) }
     fun back() {
         when {
             detail != null -> if (state.effectDetail != null) close() else detail = null
-            searching -> { searching = false; query = "" }
+            searching -> { hideKeyboard(); searching = false; query = "" }
             fromAudio -> { fromAudio = false; category = "audio" }
             category != null && !audio -> category = null
             else -> close()

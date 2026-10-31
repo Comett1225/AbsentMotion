@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -324,12 +325,12 @@ private fun CompressBar(
             }
         }
         Spacer(Modifier.height(10.dp))
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        Row(Modifier.fillMaxWidth().height(androidx.compose.foundation.layout.IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             when (step) {
                 is Step.Running -> BigButton(stringResource(R.string.cancel), Modifier.weight(1f), primary = false, onClick = onCancel)
                 is Step.Done -> {
-                    BigButton(stringResource(if (step.saved) R.string.compress_saved else R.string.compress_save), Modifier.weight(1f), HomeIcons.Download, enabled = !step.saved) { onSave(step) }
-                    BigButton(stringResource(R.string.compress_share), Modifier.weight(1f), ExportIcons.Share, primary = false) { onShare(step) }
+                    BigButton(stringResource(if (step.saved) R.string.compress_saved else R.string.compress_save), Modifier.weight(1f).fillMaxHeight(), HomeIcons.Download, enabled = !step.saved) { onSave(step) }
+                    BigButton(stringResource(R.string.compress_share), Modifier.weight(1f).fillMaxHeight(), ExportIcons.Share, primary = false) { onShare(step) }
                 }
                 else -> BigButton(stringResource(R.string.compress_start), Modifier.weight(1f), HomeIcons.Compress, enabled = picked != null && estimate != null, onClick = onStart)
             }
