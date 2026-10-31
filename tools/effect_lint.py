@@ -8,11 +8,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 PACK = ROOT / "app/src/main/assets/effects"
 SKIP = {"index.json", "releases.json", "foreign.json"}
-CATEGORIES = {"color", "blur", "distort", "stylize", "noise", "repeat", "key", "move", "3d", "text"}
+CATEGORIES = {"color", "blur", "distort", "stylize", "noise", "repeat", "key", "move", "beat", "3d", "text"}
 KINDS = {"float", "angle", "point", "color", "switch", "choice", "text"}
 UNIFORM = re.compile(r"^\s*(?:layout\([^)]*\)\s*)?uniform\s+(\w+)\s+(\w+)\s*;", re.M)
 UNIFORM_TYPES = {"float": {"float"}, "angle": {"float"}, "choice": {"float"}, "switch": {"float"}, "point": {"float2"}, "color": {"float4", "half4"}, "text": set()}
-RESERVED = {"image", "size", "time", "screen", "layer", "fromLayer", "toLayer", "duration", "orient", "paletteSize", "paletteSpread", "swatches"}
+RESERVED = {"image", "size", "time", "screen", "layer", "fromLayer", "toLayer", "duration", "orient", "paletteSize", "paletteSpread", "swatches",
+            "beat", "beatTime", "beatIndex"}
 
 
 def lint(path, problems, standard):

@@ -59,7 +59,7 @@ data class EffectParam(
             if (kind == "choice") {
                 val options = json.getJSONArray("options").let { a -> List(a.length()) { a.getString(it) } }
                 require(options.isNotEmpty() && (d as Number).toInt() in options.indices) { "$id: choice $d" }
-                return EffectParam(id, json.optString("label", id), kind, default, 0f, options.size - 1f, 1f, options = options, legacyDefault = legacyDefault)
+                return EffectParam(id, json.optString("label", id), kind, default, 0f, options.size - 1f, 1f, options = options, legacyDefault = legacyDefault, showWhen = showWhen)
             }
             return EffectParam(id, json.optString("label", id), kind, default,
                 json.optDouble("min", -Float.MAX_VALUE.toDouble()).toFloat(), json.optDouble("max", Float.MAX_VALUE.toDouble()).toFloat(),

@@ -175,7 +175,7 @@ def scene(show, effect, preset=None):
     fx = ""
     if effect:
         params = {p["id"]: p["default"] for p in effect["params"]}
-        chosen = preset_params(preset, show["animate"] / ANIM_FPS) if preset else show.get("params", {})
+        chosen = {**preset_params(preset, show["animate"] / ANIM_FPS), **show.get("params", {})} if preset else show.get("params", {})
         unknown = set(chosen) - set(params)
         if unknown:
             sys.exit(f"{effect['id']}: no such parameter {', '.join(sorted(unknown))}")
@@ -289,14 +289,16 @@ def main():
     adb("shell", "run-as", PKG, "mkdir", "-p", APP_DIR)
     made, pushed, plain, thumbs, unchanged = {}, set(), {}, [], []
     batch, planned = Batch(opts.work), []
-    for key in keys:
-        show = SHOWCASE["effects"][key]
-        names = ([show["photo"]] if "photo" in show else []) + backdrops(show)
-        for name in names:
+    def need(show):
+        for name in ([show["photo"]] if "photo" in show else []) + backdrops(show):
             if name not in pushed:
                 photo(name, opts.work, made).save(opts.work / f"{name}.png")
                 push(opts.work / f"{name}.png", f"{name}.png")
                 pushed.add(name)
+
+    for key in keys:
+        show = SHOWCASE["effects"][key]
+        need(show)
         if "split" in show:
             name = f'{show["photo"]}-before{round(show["split"] * 100)}'
             if name not in pushed:
@@ -313,9 +315,13 @@ def main():
         planned.append((key, show, base, batch.add(key, scene(show, effect), frames), PACK / "thumb" / f"{key}.webp"))
         for preset in effect.get("presets", []):
             name = f'{key}.{slug(preset["name"])}'
-            sample = {"layout": show["layout"], "text": show.get("presets", {}).get(slug(preset["name"]), preset["name"]), "animate": PRESET_FRAMES}
+            custom = show.get("presets", {}).get(slug(preset["name"]), preset["name"])
+            sample = {k: show[k] for k in ("layout", "photo", "half", "shape", "under") if k in show}
+            sample.update(custom if isinstance(custom, dict) else {"text": custom})
+            sample["animate"] = PRESET_FRAMES
+            need(sample)
             frames = list(range(PRESET_FRAMES))
-            base = ("preset", sample["layout"], sample["text"])
+            base = ("preset", json.dumps(sample, sort_keys=True))
             if base not in plain:
                 plain[base] = batch.add(f"plain{len(plain)}", scene(sample, None), frames)
             planned.append((name, sample, base, batch.add(name, scene(sample, effect, preset), frames), PACK / "thumb" / f"{name}.webp"))

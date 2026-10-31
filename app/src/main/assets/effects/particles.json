@@ -1,0 +1,785 @@
+{
+ "id": "particles",
+ "name": "Particles",
+ "category": "stylize",
+ "since": "4.4.0",
+ "native": true,
+ "description": "Sends particles flying out of the layer: snow, sparks, confetti, bubbles, dust, hearts, stars, petals or small copies of the layer itself, moved by gravity, wind and swirl. Start from a preset, then change the emitter, the amount and the forces. On Beats sends a burst on every beat: select your music, open its menu and tap Mark Beats first.",
+ "params": [
+  {
+   "id": "kind",
+   "label": "Particle",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Snow",
+    "Sparks",
+    "Confetti",
+    "Bubbles",
+    "Dust",
+    "Hearts",
+    "Stars",
+    "Petals",
+    "Layer"
+   ]
+  },
+  {
+   "id": "emitter",
+   "label": "Emitter",
+   "type": "choice",
+   "default": 1,
+   "options": [
+    "Point",
+    "Line",
+    "Area",
+    "Outline"
+   ]
+  },
+  {
+   "id": "emission",
+   "label": "Emission",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Continuous",
+    "Burst",
+    "On Beats"
+   ]
+  },
+  {
+   "id": "rate",
+   "label": "Rate",
+   "type": "float",
+   "default": 40,
+   "min": 0,
+   "max": 500,
+   "step": 1,
+   "unit": "/s",
+   "when": {
+    "emission": [
+     0
+    ]
+   }
+  },
+  {
+   "id": "count",
+   "label": "Count",
+   "type": "float",
+   "default": 100,
+   "min": 0,
+   "max": 1000,
+   "step": 1,
+   "when": {
+    "emission": [
+     1,
+     2
+    ]
+   }
+  },
+  {
+   "id": "start",
+   "label": "Burst Time",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 3600,
+   "step": 0.01,
+   "unit": "s",
+   "layerTime": true,
+   "when": {
+    "emission": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "every",
+   "label": "Repeat Every",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 60,
+   "step": 0.01,
+   "unit": "s",
+   "when": {
+    "emission": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "beats",
+   "label": "Beats",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Every Beat",
+    "Every 2nd Beat",
+    "Every 4th Beat"
+   ],
+   "when": {
+    "emission": [
+     2
+    ]
+   }
+  },
+  {
+   "id": "bpm",
+   "label": "BPM",
+   "type": "float",
+   "default": 120,
+   "min": 20,
+   "max": 300,
+   "step": 1,
+   "when": {
+    "emission": [
+     2
+    ]
+   }
+  },
+  {
+   "id": "lifetime",
+   "label": "Lifetime",
+   "type": "float",
+   "default": 10,
+   "min": 0.1,
+   "max": 30,
+   "step": 0.1,
+   "unit": "s"
+  },
+  {
+   "id": "speed",
+   "label": "Speed",
+   "type": "float",
+   "default": 30,
+   "min": 0,
+   "max": 5000,
+   "step": 1
+  },
+  {
+   "id": "direction",
+   "label": "Direction",
+   "type": "angle",
+   "default": 90,
+   "min": -3600,
+   "max": 3600,
+   "step": 1
+  },
+  {
+   "id": "spread",
+   "label": "Spread",
+   "type": "angle",
+   "default": 40,
+   "min": 0,
+   "max": 360,
+   "step": 1
+  },
+  {
+   "id": "gravity",
+   "label": "Gravity",
+   "type": "float",
+   "default": 300,
+   "min": -5000,
+   "max": 5000,
+   "step": 1
+  },
+  {
+   "id": "wind",
+   "label": "Wind",
+   "type": "float",
+   "default": 0,
+   "min": -5000,
+   "max": 5000,
+   "step": 1
+  },
+  {
+   "id": "swirl",
+   "label": "Swirl",
+   "type": "float",
+   "default": 18,
+   "min": 0,
+   "max": 500,
+   "step": 1
+  },
+  {
+   "id": "size",
+   "label": "Size",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 10,
+   "step": 0.01,
+   "percent": true
+  },
+  {
+   "id": "color",
+   "label": "Color",
+   "type": "color",
+   "default": "#ffffff"
+  },
+  {
+   "id": "color2",
+   "label": "Color 2",
+   "type": "color",
+   "default": "#8fd3ff",
+   "when": {
+    "colorMode": [
+     1,
+     2
+    ]
+   }
+  },
+  {
+   "id": "tint",
+   "label": "Tint",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "percent": true,
+   "when": {
+    "kind": [
+     8
+    ]
+   }
+  },
+  {
+   "id": "layer",
+   "label": "Layer",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Under Particles",
+    "Over Particles",
+    "Hidden"
+   ]
+  },
+  {
+   "id": "more",
+   "label": "More Settings",
+   "type": "switch",
+   "default": false
+  },
+  {
+   "id": "emitterSize",
+   "label": "Emitter Size",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 10,
+   "step": 0.01,
+   "percent": true,
+   "when": {
+    "more": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "position",
+   "label": "Emitter Position",
+   "type": "point",
+   "default": [
+    0,
+    0
+   ],
+   "min": -99999,
+   "max": 99999,
+   "step": 1,
+   "pixels": true,
+   "when": {
+    "more": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "prewarm",
+   "label": "Start Full",
+   "type": "switch",
+   "default": true,
+   "when": {
+    "more": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "lifeVariation",
+   "label": "Lifetime Variation",
+   "type": "float",
+   "default": 0.2,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "percent": true,
+   "when": {
+    "more": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "speedVariation",
+   "label": "Speed Variation",
+   "type": "float",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "percent": true,
+   "when": {
+    "more": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "drag",
+   "label": "Air Resistance",
+   "type": "float",
+   "default": 1.2,
+   "min": 0,
+   "max": 20,
+   "step": 0.01,
+   "when": {
+    "more": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "swirlSpeed",
+   "label": "Swirl Speed",
+   "type": "float",
+   "default": 0.25,
+   "min": 0,
+   "max": 10,
+   "step": 0.01,
+   "when": {
+    "more": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "sizeVariation",
+   "label": "Size Variation",
+   "type": "float",
+   "default": 0.6,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "percent": true,
+   "when": {
+    "more": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "endSize",
+   "label": "End Size",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 10,
+   "step": 0.01,
+   "percent": true,
+   "when": {
+    "more": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "orientation",
+   "label": "Orientation",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Free",
+    "Follow Motion"
+   ],
+   "when": {
+    "more": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "randomRotation",
+   "label": "Random Rotation",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "percent": true,
+   "when": {
+    "more": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "spin",
+   "label": "Spin",
+   "type": "float",
+   "default": 0,
+   "min": -3600,
+   "max": 3600,
+   "step": 1,
+   "unit": "°/s",
+   "when": {
+    "more": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "spinVariation",
+   "label": "Spin Variation",
+   "type": "float",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "percent": true,
+   "when": {
+    "more": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "fadeIn",
+   "label": "Fade In",
+   "type": "float",
+   "default": 0.05,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "percent": true,
+   "when": {
+    "more": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "fadeOut",
+   "label": "Fade Out",
+   "type": "float",
+   "default": 0.15,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "percent": true,
+   "when": {
+    "more": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "twinkle",
+   "label": "Twinkle",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "percent": true,
+   "when": {
+    "more": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "colorMode",
+   "label": "Color Mode",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Single Color",
+    "Random Mix",
+    "Over Lifetime"
+   ],
+   "when": {
+    "more": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "colorVariation",
+   "label": "Color Variation",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "percent": true,
+   "when": {
+    "more": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "blend",
+   "label": "Blending",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Normal",
+    "Add",
+    "Screen"
+   ],
+   "when": {
+    "more": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "seed",
+   "label": "Seed",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 9999,
+   "step": 1,
+   "when": {
+    "more": [
+     1
+    ]
+   }
+  }
+ ],
+ "presets": [
+  {
+   "name": "Snow",
+   "params": {
+    "kind": 0
+   }
+  },
+  {
+   "name": "Sparks",
+   "params": {
+    "kind": 1,
+    "emitter": 0,
+    "rate": 150,
+    "lifetime": 1,
+    "lifeVariation": 0.5,
+    "speed": 950,
+    "speedVariation": 0.6,
+    "direction": -90,
+    "spread": 80,
+    "gravity": 1400,
+    "size": 1.2,
+    "drag": 0.8,
+    "swirl": 0,
+    "sizeVariation": 0.5,
+    "endSize": 0.2,
+    "orientation": 1,
+    "colorMode": 2,
+    "color": "#fff6c8",
+    "color2": "#ff5a14",
+    "blend": 1,
+    "fadeIn": 0,
+    "fadeOut": 0.3,
+    "twinkle": 0.25
+   }
+  },
+  {
+   "name": "Confetti",
+   "params": {
+    "kind": 2,
+    "emission": 1,
+    "count": 220,
+    "lifetime": 5,
+    "lifeVariation": 0.3,
+    "speed": 3000,
+    "size": 1.3,
+    "speedVariation": 0.45,
+    "direction": -90,
+    "spread": 50,
+    "gravity": 900,
+    "drag": 2.4,
+    "swirl": 30,
+    "swirlSpeed": 1.2,
+    "sizeVariation": 0.4,
+    "spin": 400,
+    "spinVariation": 1,
+    "color": "#ff4f7b",
+    "colorVariation": 1,
+    "fadeIn": 0,
+    "emitterSize": 0.8
+   }
+  },
+  {
+   "name": "Bubbles",
+   "params": {
+    "kind": 3,
+    "rate": 6,
+    "lifetime": 11,
+    "speed": 80,
+    "speedVariation": 0.4,
+    "direction": -90,
+    "spread": 20,
+    "gravity": -120,
+    "drag": 0.6,
+    "swirl": 30,
+    "swirlSpeed": 0.3,
+    "color": "#cfefff",
+    "randomRotation": 0,
+    "fadeOut": 0.1
+   }
+  },
+  {
+   "name": "Dust",
+   "params": {
+    "kind": 4,
+    "emitter": 2,
+    "rate": 40,
+    "size": 1.2,
+    "lifetime": 5,
+    "lifeVariation": 0.4,
+    "speed": 12,
+    "speedVariation": 1,
+    "direction": -90,
+    "spread": 360,
+    "gravity": -8,
+    "drag": 0.5,
+    "swirl": 40,
+    "swirlSpeed": 0.12,
+    "sizeVariation": 0.7,
+    "color": "#ffe6b0",
+    "fadeIn": 0.3,
+    "fadeOut": 0.35,
+    "twinkle": 0.5,
+    "blend": 1
+   }
+  },
+  {
+   "name": "Hearts",
+   "params": {
+    "kind": 5,
+    "rate": 4,
+    "lifetime": 6,
+    "speed": 150,
+    "speedVariation": 0.3,
+    "direction": -90,
+    "spread": 25,
+    "gravity": -60,
+    "drag": 0.4,
+    "swirl": 30,
+    "swirlSpeed": 0.4,
+    "size": 1.2,
+    "sizeVariation": 0.5,
+    "randomRotation": 0.15,
+    "color": "#ff4d8b",
+    "colorVariation": 0.06,
+    "fadeOut": 0.35
+   }
+  },
+  {
+   "name": "Twinkle",
+   "params": {
+    "kind": 6,
+    "emitter": 2,
+    "rate": 8,
+    "lifetime": 3,
+    "lifeVariation": 0.4,
+    "speed": 10,
+    "spread": 360,
+    "gravity": 0,
+    "drag": 0,
+    "swirl": 0,
+    "size": 0.8,
+    "spin": 40,
+    "spinVariation": 1,
+    "color": "#ffe27a",
+    "fadeIn": 0.3,
+    "fadeOut": 0.4,
+    "twinkle": 0.7,
+    "blend": 1
+   }
+  },
+  {
+   "name": "Petals",
+   "params": {
+    "kind": 7,
+    "rate": 10,
+    "lifetime": 11,
+    "speed": 40,
+    "direction": 100,
+    "spread": 30,
+    "gravity": 250,
+    "wind": 80,
+    "drag": 1.2,
+    "swirl": 40,
+    "swirlSpeed": 0.35,
+    "sizeVariation": 0.4,
+    "spin": 90,
+    "spinVariation": 1,
+    "color": "#ffb7c9",
+    "colorVariation": 0.04,
+    "emitterSize": 2
+   }
+  },
+  {
+   "name": "Layer Fountain",
+   "params": {
+    "kind": 8,
+    "emitter": 0,
+    "rate": 10,
+    "lifetime": 2.5,
+    "lifeVariation": 0.3,
+    "speed": 650,
+    "speedVariation": 0.35,
+    "direction": -90,
+    "spread": 50,
+    "gravity": 900,
+    "drag": 0.3,
+    "swirl": 0,
+    "size": 0.3,
+    "sizeVariation": 0.4,
+    "spin": 160,
+    "spinVariation": 1,
+    "randomRotation": 0.25,
+    "fadeIn": 0,
+    "fadeOut": 0.3
+   }
+  },
+  {
+   "name": "Beat Confetti",
+   "params": {
+    "kind": 2,
+    "emission": 2,
+    "count": 50,
+    "lifetime": 3,
+    "speed": 2600,
+    "size": 1.3,
+    "speedVariation": 0.45,
+    "direction": -90,
+    "spread": 40,
+    "gravity": 900,
+    "drag": 2.4,
+    "swirl": 30,
+    "swirlSpeed": 1.2,
+    "spin": 400,
+    "spinVariation": 1,
+    "color": "#ff4f7b",
+    "colorVariation": 1,
+    "fadeIn": 0,
+    "fadeOut": 0.2,
+    "prewarm": false
+   }
+  }
+ ]
+}
