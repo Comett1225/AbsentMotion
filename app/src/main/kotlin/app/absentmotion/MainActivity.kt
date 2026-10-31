@@ -590,7 +590,7 @@ class MainActivity : ComponentActivity() {
         if (closingEditor) return
         closingEditor = true
         closing.playing = false
-        app.absentmotion.editor.PreviewCache.clear()
+        app.absentmotion.editor.PreviewCache.remove()
         closing.endGesture()
         val scene = closing.scene
         lifecycleScope.launch {

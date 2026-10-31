@@ -370,7 +370,10 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
         )
         Presence(hint) { SwipeHint(hintLabel, Modifier.align(Alignment.Center).presence()) }
         CanvasZoomHud(state, Modifier.align(Alignment.TopStart))
-        if (state.drawing == null && !editingText) RenderPreviewNotes(state, cachedPlaying, Modifier.align(Alignment.TopCenter))
+        if (state.drawing == null && !editingText) {
+            RenderPreviewNotes(state, cachedPlaying, Modifier.align(Alignment.TopCenter))
+            PreRenderBadge(cachedPlaying, Modifier.align(Alignment.TopEnd))
+        }
         Presence(state.cameraTip && !LocalWide.current) { CameraTip(state, Modifier.align(Alignment.BottomEnd).presence()) }
         EyedropperLoupe(state, Modifier.fillMaxSize())
         GradientHandles(state, quad.takeUnless { state.playing }, scale, Offset(dx, dy))

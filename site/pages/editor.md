@@ -67,6 +67,8 @@ The last button of the play bar (**Preview mode**) opens a narrow strip at the r
 6. **Fast Blur** or **Full Blur**: how the motion blur effects are previewed. Fast is an approximation; Full is accurate and slower. Exports are always accurate.
 7. **Zoom**: plus and minus buttons and the current percentage.
 
+**Pre-render**, between **Fast Blur** and **Zoom**, renders the project ahead from the playhead to the end (or as much as fits in memory and storage), so a heavy project plays smoothly. A note at the top of the preview shows the progress with a **Cancel** button. While playback uses the pre-rendered frames, a small **Pre-rendered** label shows at the top right of the preview. Any change to the project makes the pre-render out of date: the **Pre-render** button in the strip changes color and a note offers **Pre-render again**. When it is ready, tap **Pre-render** to see the time it covers, or press and hold it to remove it.
+
 ### Other things on the preview
 
 - The round **Animate** button at the bottom right appears when a visual layer is selected: it opens In, Out and Loop animations. See [Transitions and animations](@animations).

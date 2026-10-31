@@ -67,6 +67,7 @@ internal fun PreviewModePanel(state: EditorState, modifier: Modifier = Modifier)
             Text(stringResource(if (fullBlur) R.string.preview_full_blur else R.string.preview_fast_blur), color = if (fullBlur) Am.Accent else Color.White, fontSize = 10.sp,
                 lineHeight = 11.sp, maxLines = 2, textAlign = TextAlign.Center)
         }
+        PreRenderCell(state, cell)
         ZoomBlock(state)
     }
 }

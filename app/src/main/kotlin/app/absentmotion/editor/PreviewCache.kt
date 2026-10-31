@@ -264,6 +264,7 @@ class FramePlayer internal constructor(private val store: FrameStore, val width:
 
 object PreviewCache {
     enum class Phase { Empty, Rendering, Ready }
+    enum class PreRender { None, Rendering, Ready, Outdated }
     private enum class Outcome { Done, Full, Stopped, Failed, NoMemory }
 
     var phase by mutableStateOf(Phase.Empty)
@@ -274,6 +275,7 @@ object PreviewCache {
         private set
     var player by mutableStateOf<FramePlayer?>(null)
         private set
+    private var rendered by mutableStateOf<CacheKey?>(null)
     @Volatile private var store: FrameStore? = null
     @Volatile private var stopRequested = false
     @Volatile private var memoryStopped = false
@@ -353,6 +355,13 @@ object PreviewCache {
     val last: Int get() = store?.last ?: -1
 
     fun covers(frame: Int): Boolean = store?.contains(frame) == true
+
+    fun preRender(state: EditorState, resources: Long = state.engine.mediaRevision.value): PreRender = when {
+        phase == Phase.Rendering -> PreRender.Rendering
+        phase == Phase.Ready && !automatic && key == keyOf(state, resources) -> PreRender.Ready
+        rendered?.projectId == state.projectId -> PreRender.Outdated
+        else -> PreRender.None
+    }
 
     fun keyOf(state: EditorState, resources: Long = state.engine.mediaRevision.value) =
         CacheKey(state.projectId, state.scene, state.settings.previewQuality.divisor, state.settings.androidEmoji, resources, state.settings.fullMotionBlur)
@@ -485,6 +494,7 @@ object PreviewCache {
         }
         store = built
         key = next
+        rendered = next
         player = FramePlayer(built, width, height)
         phase = Phase.Ready
         progress = 1f
@@ -502,6 +512,11 @@ object PreviewCache {
 
     fun cancel() {
         if (phase == Phase.Rendering) stopRequested = true
+    }
+
+    fun remove() {
+        clear()
+        rendered = null
     }
 
     fun clear() {

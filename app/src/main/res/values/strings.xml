@@ -1959,4 +1959,9 @@
     <string name="cutout_edge_hint">Soften the edge of the cut-out, or move it out or in. The preview changes as you drag.</string>
     <string name="cutout_edge_reset">Reset</string>
     <string name="cutout_edge_photo">The edge is set when the cut-out is made. To change it, run Remove Background again: it starts again from the original photo.</string>
+    <string name="prerender">Pre-render</string>
+    <string name="prerender_progress">Pre-rendering %1$d%%</string>
+    <string name="prerender_playing">Pre-rendered</string>
+    <string name="prerender_outdated">The pre-render is out of date.</string>
+    <string name="prerender_again">Pre-render again</string>
 </resources>

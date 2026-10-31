@@ -1,12 +1,10 @@
 package app.absentmotion.ui.editor
 
-import app.absentmotion.ui.tutorial.tutorialGuard
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,8 +15,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -38,15 +37,10 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -85,66 +79,56 @@ internal fun cacheMatches(state: EditorState, resources: Long): Boolean =
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-internal fun RenderPreviewButton(state: EditorState, modifier: Modifier) {
+internal fun PreRenderCell(state: EditorState, modifier: Modifier) {
     val context = LocalContext.current
     val scope = LocalEditorScope.current
-    val phase = PreviewCache.phase
     val resources by state.engine.mediaRevision.collectAsState()
-    val current by remember(state, resources) { derivedStateOf { PreviewCache.key == PreviewCache.keyOf(state, resources) } }
-    val label = stringResource(if (phase == PreviewCache.Phase.Rendering) R.string.preview_cache_cancel_render else R.string.preview_cache_render)
-    val status = when {
-        phase != PreviewCache.Phase.Ready -> null
-        current -> stringResource(R.string.preview_cache_state_ready)
-        else -> stringResource(R.string.preview_cache_state_outdated)
+    val status by remember(state, resources) { derivedStateOf { PreviewCache.preRender(state, resources) } }
+    val label = stringResource(if (status == PreviewCache.PreRender.Rendering) R.string.preview_cache_cancel_render else R.string.prerender)
+    val described = when (status) {
+        PreviewCache.PreRender.Ready -> stringResource(R.string.preview_cache_state_ready)
+        PreviewCache.PreRender.Outdated -> stringResource(R.string.preview_cache_state_outdated)
+        else -> null
     }
     Box(
-        modifier.testTag(RENDER_PREVIEW_TAG).tutorialGuard(any = true).semantics { contentDescription = label; if (status != null) stateDescription = status }.combinedClickable(
+        modifier.fillMaxWidth().testTag(RENDER_PREVIEW_TAG).semantics { contentDescription = label; if (described != null) stateDescription = described }.combinedClickable(
             onLongClick = {
-                if (phase == PreviewCache.Phase.Ready) {
-                    PreviewCache.clear()
+                if (status == PreviewCache.PreRender.Ready) {
+                    PreviewCache.remove()
                     Toast.makeText(context, app.absentmotion.i18n.AppText.get(R.string.preview_cache_removed), Toast.LENGTH_SHORT).show()
                 }
             },
             onClick = {
-                when {
-                    phase == PreviewCache.Phase.Rendering -> PreviewCache.cancel()
-                    phase == PreviewCache.Phase.Ready && current -> Toast.makeText(context, PreviewCache.rangeLabel(context, state.scene.fps), Toast.LENGTH_LONG).show()
+                when (status) {
+                    PreviewCache.PreRender.Rendering -> PreviewCache.cancel()
+                    PreviewCache.PreRender.Ready -> Toast.makeText(context, PreviewCache.rangeLabel(context, state.scene.fps), Toast.LENGTH_LONG).show()
                     else -> PreviewCache.render(state, context, scope)
                 }
             },
         ),
         Alignment.Center,
-    ) { RenderPreviewIcon(phase, current, PreviewCache.progress) }
+    ) {
+        Text(
+            if (status == PreviewCache.PreRender.Rendering) "${(PreviewCache.progress * 100).roundToInt()}%" else stringResource(R.string.prerender),
+            color = when (status) {
+                PreviewCache.PreRender.Rendering, PreviewCache.PreRender.Ready -> Am.Accent
+                PreviewCache.PreRender.Outdated -> Am.Warning
+                PreviewCache.PreRender.None -> Color.White
+            },
+            fontSize = 10.sp, lineHeight = 11.sp, maxLines = 2, textAlign = TextAlign.Center,
+        )
+    }
 }
 
 @Composable
-private fun RenderPreviewIcon(phase: PreviewCache.Phase, current: Boolean, progress: Float) {
-    val dot = when {
-        phase != PreviewCache.Phase.Ready -> null
-        current -> Am.Accent
-        else -> Am.Warning
-    }
-    val ink = Am.OnDark
-    val ring = Am.TimelineBg
-    val accent = Am.Accent
-    Canvas(Modifier.size(26.dp, 24.dp)) {
-        val u = size.height / 24f
-        drawRoundRect(ink, Offset(2.5f * u, 5f * u), Size(19f * u, 14f * u), CornerRadius(2.5f * u), style = Stroke(1.6f * u))
-        if (phase == PreviewCache.Phase.Rendering) {
-            drawRect(ink, Offset(9.5f * u, 8f * u), Size(5f * u, 5f * u))
-            drawLine(ink.copy(alpha = 0.3f), Offset(6f * u, 16f * u), Offset(18f * u, 16f * u), 1.6f * u, StrokeCap.Round)
-            drawLine(accent, Offset(6f * u, 16f * u), Offset((6f + 12f * progress.coerceIn(0f, 1f)) * u, 16f * u), 1.6f * u, StrokeCap.Round)
-        } else {
-            val arrows = Path().apply {
-                moveTo(7.5f * u, 8.5f * u); lineTo(11.5f * u, 12f * u); lineTo(7.5f * u, 15.5f * u); close()
-                moveTo(12f * u, 8.5f * u); lineTo(16f * u, 12f * u); lineTo(12f * u, 15.5f * u); close()
-            }
-            drawPath(arrows, ink)
-        }
-        if (dot != null) {
-            drawCircle(ring, 4.4f * u, Offset(21.5f * u, 5.5f * u))
-            if (current) drawCircle(dot, 3.1f * u, Offset(21.5f * u, 5.5f * u))
-            else drawCircle(dot, 2.4f * u, Offset(21.5f * u, 5.5f * u), style = Stroke(1.4f * u))
+internal fun PreRenderBadge(cachedPlaying: State<Boolean>, modifier: Modifier) {
+    Presence(cachedPlaying.value && !PreviewCache.automatic) {
+        Row(
+            modifier.presence().padding(10.dp).clip(RoundedCornerShape(10.dp)).background(Color(0xB3222222)).padding(horizontal = 8.dp, vertical = 3.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Box(Modifier.size(6.dp).clip(CircleShape).background(Am.Accent))
+            Text(stringResource(R.string.prerender_playing), Modifier.padding(start = 5.dp), color = Am.OnDark, fontSize = 11.sp, maxLines = 1)
         }
     }
 }
@@ -199,13 +183,33 @@ internal fun RenderPreviewNotes(state: EditorState, cachedPlaying: State<Boolean
     LaunchedEffect(state.exportOpen) {
         if (state.exportOpen) PreviewCache.cancel()
     }
+    val context = LocalContext.current
+    val scope = LocalEditorScope.current
+    val resources by state.engine.mediaRevision.collectAsState()
+    val outdated by remember(state, resources) { derivedStateOf { PreviewCache.preRender(state, resources) == PreviewCache.PreRender.Outdated } }
+    var stale by remember { mutableStateOf(false) }
+    LaunchedEffect(outdated, state.playing) {
+        stale = outdated
+        if (outdated) {
+            delay(STALE_NOTE_MS)
+            stale = false
+        }
+    }
     val rendering = PreviewCache.phase == PreviewCache.Phase.Rendering
     Box(modifier.padding(top = 10.dp)) {
+        Presence(stale && !rendering) {
+            Note(Modifier.presence(rise = (-8).dp)) {
+                Text(stringResource(R.string.prerender_outdated), Modifier.weight(1f), color = Am.OnDark, fontSize = 13.sp, lineHeight = 16.sp, maxLines = 2)
+                TextButton({ stale = false; PreviewCache.render(state, context, scope) }) {
+                    Text(stringResource(R.string.prerender_again), color = Am.Accent, fontSize = 13.sp, maxLines = 1)
+                }
+            }
+        }
         Presence(rendering) {
             Note(Modifier.presence(rise = (-8).dp)) {
                 Column(Modifier.weight(1f)) {
                     Text(
-                        stringResource(R.string.preview_cache_rendering, (PreviewCache.progress * 100).roundToInt()), color = Am.OnDark, fontSize = 13.sp,
+                        stringResource(R.string.prerender_progress, (PreviewCache.progress * 100).roundToInt()), color = Am.OnDark, fontSize = 13.sp,
                         maxLines = 1, overflow = TextOverflow.Ellipsis,
                     )
                     Box(Modifier.padding(top = 6.dp).fillMaxWidth().height(3.dp).clip(RoundedCornerShape(2.dp)).background(Am.OnDark.copy(alpha = 0.2f))) {
@@ -217,6 +221,8 @@ internal fun RenderPreviewNotes(state: EditorState, cachedPlaying: State<Boolean
         }
     }
 }
+
+private const val STALE_NOTE_MS = 5_000L
 
 private data class PreparationRequest(val key: app.absentmotion.editor.CacheKey, val frame: Int, val eligible: Boolean, val fit: Float, val cell: Float)
 
