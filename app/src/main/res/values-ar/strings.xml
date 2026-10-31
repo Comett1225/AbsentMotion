@@ -964,7 +964,7 @@
     <string name="font_language_vietnamese">الفيتنامية</string>
     <string name="layer_tool_fill_color">التعبئة واللون</string>
     <string name="layer_tool_frame_shadow">الإطار والظل</string>
-    <string name="layer_tool_opacity_blend">العتامة ووضع الدمج</string>
+    <string name="layer_tool_opacity_blend">العتامة</string>
     <string name="layer_tool_transform">تحويل</string>
     <string name="layer_tool_shape_options">خيارات الشكل</string>
     <string name="layer_tool_edit_text">تحرير النص</string>
@@ -1667,7 +1667,7 @@
     <string name="edit_panel_shape_options">خيارات الشكل</string>
     <string name="edit_panel_edit_text">تحرير النص</string>
     <string name="edit_panel_frame_shadow">الإطار والظل</string>
-    <string name="edit_panel_opacity_blend">العتامة ووضع الدمج</string>
+    <string name="edit_panel_opacity_blend">العتامة</string>
     <string name="edit_panel_effects">التأثيرات</string>
     <string name="edit_panel_camera_options">خيارات الكاميرا</string>
     <string name="edit_keep_copying">جارٍ نسخ «%1$s» إلى المشروع…</string>

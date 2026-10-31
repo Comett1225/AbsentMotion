@@ -8,14 +8,14 @@ Tap a layer and a grid of tools opens at the bottom. The first row has five smal
 
 | Layer | Tools |
 |---|---|
-| Shape, photo, video | Fill & Color, Frame & Shadow, Opacity & Blend Mode, Transform, Shape Options, Presets, Effects |
+| Shape, photo, video | Fill & Color, Frame & Shadow, Opacity, Transform, Shape Options, Presets, Effects |
 | Path shape (pen, SVG, many shapes) | The same, with **Edit Points** instead of Shape Options |
 | Text | The same, with **Edit Text** instead of Shape Options |
 | Drawing | The same, with **Edit Drawing** instead of Shape Options |
 | Group | Transform, Presets, Effects. A group linked to an asset also has **Asset Properties**. |
 | Null | Like a shape, but nothing to draw |
 | Camera | Camera Options, Transform, Effects, Presets, Camera Moves |
-| 3D model | Model Options, Opacity & Blend Mode, Transform, Presets, Effects |
+| 3D model | Model Options, Opacity, Transform, Presets, Effects |
 | Audio | Presets, Effects (including Voice filters), AI (Reduce Noise and Auto captions) |
 
 A photo or video is a rectangle with a picture fill, so it has the same tools as a shape.
@@ -62,7 +62,7 @@ Three tabs: **Stroke**, **Border** and **Shadow**.
 - **Border** lets you stack any number of borders. Each border has a size, a color and a position (**INSIDE**, **CENTER**, **OUTSIDE**). Drag the grip to change their order. **Add Border** adds one.
 - **Shadow** has a switch, **Color**, **Size**, **Alpha** and **Position** (X and Y).
 
-### Opacity & Blend Mode
+### Opacity
 
 An **opacity** slider with a percentage box, and 28 blend modes in seven groups: Normal; Darken (Multiply, Darken, Darker Color, Color Burn, Linear Burn); Lighten (Screen, Lighten, Lighter Color, Color Dodge, Linear Dodge); Contrast (Overlay, Soft Light, Hard Light, Soft Overlay, Vivid Light, Linear Light, Pin Light); Difference (Difference, Exclusion, Subtract, Divide); Color (Hue, Saturation, Color, Luminance); and Mask (Mask, Exclude). Tap a group to open it and tap a mode to apply it. **Mask** keeps what is below only where this layer is; **Exclude** removes what is below where this layer is.
 

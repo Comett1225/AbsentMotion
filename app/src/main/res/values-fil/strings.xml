@@ -904,7 +904,7 @@
     <string name="font_language_vietnamese">Biyetnames</string>
     <string name="layer_tool_fill_color">Fill at Kulay</string>
     <string name="layer_tool_frame_shadow">Frame at Anino</string>
-    <string name="layer_tool_opacity_blend">Opacity at Blending Mode</string>
+    <string name="layer_tool_opacity_blend">Opacity</string>
     <string name="layer_tool_transform">Transform</string>
     <string name="layer_tool_shape_options">Mga opsyon sa hugis</string>
     <string name="layer_tool_edit_text">I-edit ang teksto</string>
@@ -1571,7 +1571,7 @@
     <string name="edit_panel_shape_options">Mga opsyon sa hugis</string>
     <string name="edit_panel_edit_text">I-edit ang teksto</string>
     <string name="edit_panel_frame_shadow">Frame at Anino</string>
-    <string name="edit_panel_opacity_blend">Opacity at Blending Mode</string>
+    <string name="edit_panel_opacity_blend">Opacity</string>
     <string name="edit_panel_effects">Mga epekto</string>
     <string name="edit_panel_camera_options">Mga opsyon sa kamera</string>
     <string name="edit_keep_copying">Kinokopya ang “%1$s” sa proyekto…</string>

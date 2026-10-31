@@ -904,7 +904,7 @@
     <string name="font_language_vietnamese">Vietnamca</string>
     <string name="layer_tool_fill_color">Dolgu ve Renk</string>
     <string name="layer_tool_frame_shadow">Kenarlık ve Gölge</string>
-    <string name="layer_tool_opacity_blend">Opaklık ve Karışım Modu</string>
+    <string name="layer_tool_opacity_blend">Opaklık</string>
     <string name="layer_tool_transform">Dönüştür</string>
     <string name="layer_tool_shape_options">Şekil Seçenekleri</string>
     <string name="layer_tool_edit_text">Metni düzenle</string>
@@ -1571,7 +1571,7 @@
     <string name="edit_panel_shape_options">Şekil Seçenekleri</string>
     <string name="edit_panel_edit_text">Metni düzenle</string>
     <string name="edit_panel_frame_shadow">Kenarlık ve Gölge</string>
-    <string name="edit_panel_opacity_blend">Opaklık ve Karışım Modu</string>
+    <string name="edit_panel_opacity_blend">Opaklık</string>
     <string name="edit_panel_effects">Efektler</string>
     <string name="edit_panel_camera_options">Kamera seçenekleri</string>
     <string name="edit_keep_copying">“%1$s” projeye kopyalanıyor…</string>

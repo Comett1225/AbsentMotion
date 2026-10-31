@@ -889,7 +889,7 @@
     <string name="font_language_vietnamese">Vietnam</string>
     <string name="layer_tool_fill_color">Isi &amp; Warna</string>
     <string name="layer_tool_frame_shadow">Bingkai &amp; Bayangan</string>
-    <string name="layer_tool_opacity_blend">Opasitas &amp; Mode Blending</string>
+    <string name="layer_tool_opacity_blend">Opasitas</string>
     <string name="layer_tool_transform">Transformasi</string>
     <string name="layer_tool_shape_options">Opsi Bentuk</string>
     <string name="layer_tool_edit_text">Edit Teks</string>
@@ -1547,7 +1547,7 @@
     <string name="edit_panel_shape_options">Opsi Bentuk</string>
     <string name="edit_panel_edit_text">Edit Teks</string>
     <string name="edit_panel_frame_shadow">Bingkai &amp; Bayangan</string>
-    <string name="edit_panel_opacity_blend">Opasitas &amp; Mode Blending</string>
+    <string name="edit_panel_opacity_blend">Opasitas</string>
     <string name="edit_panel_effects">Efek</string>
     <string name="edit_panel_camera_options">Opsi Kamera</string>
     <string name="edit_keep_copying">Menyalin “%1$s” ke proyek…</string>

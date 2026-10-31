@@ -11,7 +11,9 @@ import app.absentmotion.model.withCropBox
 import app.absentmotion.model.withCropKeyframes
 import app.absentmotion.model.withEffect
 
-val Layer.canCrop: Boolean get() = mediaFill != null
+val Layer.canCrop: Boolean get() = kind !in Uncroppable
+
+private val Uncroppable = setOf("audio", "camera", "nullobj", "model")
 
 fun EditorState.openCrop() {
     val layer = selected ?: return

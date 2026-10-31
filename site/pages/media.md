@@ -8,7 +8,7 @@ summary: Add photos and videos, change speed, make speed ramps and freeze frames
 
 Open the **Media** tab of the [Add menu](@add-menu) and tap a picture or video. It is added at the playhead and sized to fit the canvas, with the file's rotation respected. A video lasts as long as the file. You can also use **Camera** in the same tab to shoot something new.
 
-Photos and videos are rectangles with a picture fill, so all shape tools work on them: **Transform**, **Frame & Shadow**, **Opacity & Blend Mode**, effects and so on.
+Photos and videos are rectangles with a picture fill, so all shape tools work on them: **Transform**, **Frame & Shadow**, **Opacity**, effects and so on.
 
 By default the app keeps a copy of added media inside the project (the setting **Keep a copy of imported media in the project**). Files over 32 MB show "Copying ... into the project..." while the copy is made. If there is not enough free space the project keeps using the original file instead.
 

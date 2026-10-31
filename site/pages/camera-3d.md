@@ -44,4 +44,4 @@ The effects in the **3D** category turn a layer into a solid: Cube, Box, Hollow 
 
 **Add**, **Object / Asset**, **3D Model** loads an `.obj`, `.glb` or `.gltf` file. If the model has material and picture files, pick them together with the model. The files can total up to 256 MB, and a model with more than 50,000 triangles is shown in a simplified form (the app tells you).
 
-**Model Options** has **Size**, **Auto-rotate**, **Light Angle**, **Ambient Light** and **Light Intensity**, all animatable. A model also has **Transform** (including 3D rotation), **Opacity & Blend Mode**, **Effects** and **Presets**.
+**Model Options** has **Size**, **Auto-rotate**, **Light Angle**, **Ambient Light** and **Light Intensity**, all animatable. A model also has **Transform** (including 3D rotation), **Opacity**, **Effects** and **Presets**.

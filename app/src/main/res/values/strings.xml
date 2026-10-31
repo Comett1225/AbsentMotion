@@ -926,7 +926,7 @@
     <string name="font_language_vietnamese">Vietnamese</string>
     <string name="layer_tool_fill_color">Fill &amp; Color</string>
     <string name="layer_tool_frame_shadow">Frame &amp; Shadow</string>
-    <string name="layer_tool_opacity_blend">Opacity &amp; Blend Mode</string>
+    <string name="layer_tool_opacity_blend">Opacity</string>
     <string name="layer_tool_transform">Transform</string>
     <string name="layer_tool_shape_options">Shape Options</string>
     <string name="layer_tool_edit_text">Edit Text</string>
@@ -1595,7 +1595,7 @@
     <string name="edit_panel_shape_options">Shape Options</string>
     <string name="edit_panel_edit_text">Edit Text</string>
     <string name="edit_panel_frame_shadow">Frame &amp; Shadow</string>
-    <string name="edit_panel_opacity_blend">Opacity &amp; Blend Mode</string>
+    <string name="edit_panel_opacity_blend">Opacity</string>
     <string name="edit_panel_effects">Effects</string>
     <string name="edit_panel_camera_options">Camera Options</string>
     <string name="edit_keep_copying">Copying “%1$s” into the project…</string>

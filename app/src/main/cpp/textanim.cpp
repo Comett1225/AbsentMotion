@@ -112,7 +112,10 @@ bool Space(uint32_t c) {
            c == 0x1680 || Between(c, 0x2000, 0x200A) || c == 0x2028 || c == 0x2029 || c == 0x202F || c == 0x205F || c == 0x3000;
 }
 
-bool Spaceless(uint32_t c) { return Between(c, 0x0E00, 0x0EFF) || Between(c, 0x1000, 0x109F) || Between(c, 0x1780, 0x17FF); }
+bool Spaceless(uint32_t c) {
+    return Between(c, 0x0E00, 0x0EFF) || Between(c, 0x1000, 0x109F) || Between(c, 0x1780, 0x17FF) || Between(c, 0x3040, 0x30FF) ||
+           Between(c, 0x3400, 0x4DBF) || Between(c, 0x4E00, 0x9FFF) || Between(c, 0xF900, 0xFAFF) || Between(c, 0xFF66, 0xFF9F);
+}
 
 Segments Split(const std::string& text, const std::vector<int>& breaks) {
     Segments s;

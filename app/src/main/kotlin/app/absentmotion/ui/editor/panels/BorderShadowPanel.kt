@@ -6,6 +6,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -362,7 +363,7 @@ private fun BorderTab(state: EditorState, layer: Layer) {
                         Modifier.padding(bottom = 18.px).reorderSlot(reorder, b.index).fillMaxWidth().reorderLift(reorder, b.index, 4.dp).clip(PanelShape).background(CardBg),
                     ) {
                         val turn by animateFloatAsState(if (isOpen) 90f else 0f, Motion.fast(), label = "border")
-                        Row(Modifier.fillMaxWidth().height(104.px).clickable { openBorder = if (isOpen) -1 else b.index; borderField = 0 }, verticalAlignment = Alignment.CenterVertically) {
+                        Row(Modifier.fillMaxWidth().height(104.px).background(animateColorAsState(if (isOpen) Am.CardHeader else CardBg, Motion.fast(), label = "header").value).clickable { openBorder = if (isOpen) -1 else b.index; borderField = 0 }, verticalAlignment = Alignment.CenterVertically) {
                             Canvas(Modifier.padding(start = 36.px).size(51.px).rotate(turn)) { triangle(down = false) }
                             Box(Modifier.weight(1f)) {
                                 Crossfade(isOpen, animationSpec = Motion.fast(), label = "border") { expanded ->

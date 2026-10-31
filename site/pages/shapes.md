@@ -50,7 +50,7 @@ Drawings have no keyframes. To animate a drawing, use effects such as Drawing Pr
 ## Masks and clipping
 
 - **Create Clipping Mask** (layer menu) clips a layer to the shape of the layer directly below it. **Release Clipping Mask** undoes it.
-- **Group & Mask** and **Group & Exclude** (multi-select) group layers and set the top layer's blend mode to Mask or Exclude. You can also set the blend mode **Mask** or **Exclude** on any layer in **Opacity & Blend Mode**. **Mask** keeps the content below only where the layer is; **Exclude** cuts it away.
+- **Group & Mask** and **Group & Exclude** (multi-select) group layers and set the top layer's blend mode to Mask or Exclude. You can also set the blend mode **Mask** or **Exclude** on any layer in **Opacity**. **Mask** keeps the content below only where the layer is; **Exclude** cuts it away.
 - Animated masks come from shape keyframes (above).
 - **Remove Background** for photos and videos is described in [AI tools](@ai-tools).
 

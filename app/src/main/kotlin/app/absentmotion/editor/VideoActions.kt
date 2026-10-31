@@ -32,8 +32,13 @@ fun Scene.videoLayer(media: MediaDeclaration, frame: Int): Layer? {
 
 fun EditorState.retimeVideo(start: Boolean) {
     val layer = selected ?: return
-    val newStart = if (start) timeMs else layer.startTime
-    val newEnd = if (start) layer.endTime else scene.frameEnd(frame)
+    var newStart = if (start) timeMs else layer.startTime
+    var newEnd = if (start) layer.endTime else scene.frameEnd(frame)
+    if (layer.node.child("speedMap")?.isKeyframed != true) {
+        val timing = VideoTiming(layer)
+        val longest = ((timing.mediaMs((layer.endTime - layer.startTime).toDouble()) - timing.mediaMs(0.0)) / SLOWEST_SPEED).toInt()
+        if (newEnd - newStart > longest) { if (start) newStart = newEnd - longest else newEnd = newStart + longest }
+    }
     val duration = newEnd - newStart
     if (duration < 1 || !scene.showsAnyFrame(newStart, newEnd)) return
     edit { it.update(layer.id) { current -> current.retimedVideo(newStart, newEnd) } }
@@ -42,7 +47,7 @@ fun EditorState.retimeVideo(start: Boolean) {
 fun EditorState.setVideoSpeed(value: Float, mediaTimeNs: Float, original: Layer) {
     if (selectedId != original.id || value.isNaN()) return
     val layer = original
-    val speed = value.coerceIn(0.001f, 4f)
+    val speed = value.coerceIn(SLOWEST_SPEED, FASTEST_SPEED)
     val map = layer.node.child("speedMap") ?: XmlNode("speedMap", mapOf("value" to (layer.node["speed"] ?: "1")))
     val snap = layer.atVideoTime(sampleMs, scene.fps).snap
     val changed = map.withValueAt(mediaTimeNs, speed.toString(), snap)

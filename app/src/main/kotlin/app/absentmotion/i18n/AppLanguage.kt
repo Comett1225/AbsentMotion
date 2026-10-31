@@ -22,23 +22,31 @@ enum class AppLanguage(val tag: String, val nativeName: String) {
     Indonesian("id", "Bahasa Indonesia"),
     Hindi("hi", "हिन्दी"),
     Portuguese("pt-BR", "Português (Brasil)"),
-    Spanish("es", "Español"),
+    Spanish("es", "Español (Latinoamérica)"),
+    SpanishSpain("es-ES", "Español (España)"),
     Filipino("fil", "Filipino"),
     Vietnamese("vi", "Tiếng Việt"),
     Thai("th", "ไทย"),
     Malay("ms", "Bahasa Melayu"),
     Arabic("ar", "العربية"),
     Persian("fa", "فارسی"),
+    Urdu("ur", "اردو"),
     Turkish("tr", "Türkçe"),
     Russian("ru", "Русский"),
-    Bengali("bn", "বাংলা");
+    Bengali("bn", "বাংলা"),
+    Japanese("ja", "日本語");
 
     val language: String get() = tag.substringBefore('-')
+    val region: String? get() = tag.substringAfter('-', "").ifEmpty { null }
 
     companion object {
         fun match(tags: List<String>): AppLanguage? = tags.firstNotNullOfOrNull { tag ->
-            val language = canonical(tag.trim().substringBefore('-').substringBefore('_').lowercase())
-            entries.firstOrNull { it.language == language }
+            val parts = tag.trim().replace('_', '-').split('-')
+            val language = canonical(parts[0].lowercase())
+            val region = parts.drop(1).firstOrNull { it.length == 2 && it.all(Char::isLetter) }?.uppercase()
+            entries.firstOrNull { it.language == language && it.region != null && it.region == region }
+                ?: entries.firstOrNull { it.language == language && it.region == null }
+                ?: entries.firstOrNull { it.language == language }
         }
 
         fun preselect(phoneTags: List<String>): AppLanguage = match(phoneTags) ?: English

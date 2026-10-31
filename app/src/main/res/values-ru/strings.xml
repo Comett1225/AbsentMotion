@@ -934,7 +934,7 @@
     <string name="font_language_vietnamese">Вьетнамский</string>
     <string name="layer_tool_fill_color">Заливка и цвет</string>
     <string name="layer_tool_frame_shadow">Рамка и тень</string>
-    <string name="layer_tool_opacity_blend">Прозрачность и наложение</string>
+    <string name="layer_tool_opacity_blend">Прозрачность</string>
     <string name="layer_tool_transform">Трансформация</string>
     <string name="layer_tool_shape_options">Параметры фигуры</string>
     <string name="layer_tool_edit_text">Редактировать текст</string>
@@ -1619,7 +1619,7 @@
     <string name="edit_panel_shape_options">Параметры фигуры</string>
     <string name="edit_panel_edit_text">Редактировать текст</string>
     <string name="edit_panel_frame_shadow">Рамка и тень</string>
-    <string name="edit_panel_opacity_blend">Прозрачность и наложение</string>
+    <string name="edit_panel_opacity_blend">Прозрачность</string>
     <string name="edit_panel_effects">Эффекты</string>
     <string name="edit_panel_camera_options">Параметры камеры</string>
     <string name="edit_keep_copying">Копирование «%1$s» в проект…</string>

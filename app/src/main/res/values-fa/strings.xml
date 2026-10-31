@@ -904,7 +904,7 @@
     <string name="font_language_vietnamese">ویتنامی</string>
     <string name="layer_tool_fill_color">پرشدگی و رنگ</string>
     <string name="layer_tool_frame_shadow">قاب و سایه</string>
-    <string name="layer_tool_opacity_blend">شفافیت و حالت ترکیب</string>
+    <string name="layer_tool_opacity_blend">شفافیت</string>
     <string name="layer_tool_transform">ترنسفورم</string>
     <string name="layer_tool_shape_options">گزینه‌های شکل</string>
     <string name="layer_tool_edit_text">ویرایش متن</string>
@@ -1571,7 +1571,7 @@
     <string name="edit_panel_shape_options">تنظیمات شکل</string>
     <string name="edit_panel_edit_text">ویرایش متن</string>
     <string name="edit_panel_frame_shadow">حاشیه و سایه</string>
-    <string name="edit_panel_opacity_blend">شفافیت و حالت ترکیب</string>
+    <string name="edit_panel_opacity_blend">شفافیت</string>
     <string name="edit_panel_effects">افکت‌ها</string>
     <string name="edit_panel_camera_options">تنظیمات دوربین</string>
     <string name="edit_keep_copying">در حال کپی «%1$s» به پروژه…</string>

@@ -11,6 +11,9 @@ import kotlin.math.roundToLong
 val SpeedRef = PropRef(PropRef.Kind.Child, "speedMap")
 
 private const val MIN_SPEED = 0.00001
+const val SLOWEST_SPEED = 0.05f
+const val FASTEST_SPEED = 100f
+const val SPEED_STEP = 0.05f
 
 class VideoTiming(layer: Layer) {
     private data class Point(val media: Double, val speed: Double, val item: Double)
@@ -22,7 +25,7 @@ class VideoTiming(layer: Layer) {
         val keys = map?.keyframes.orEmpty().distinctBy { it.t }.filter { it.v.toDoubleOrNull()?.isFinite() == true }
         val samples = mutableListOf<Pair<Double, Double>>()
         if (keys.isEmpty()) {
-            samples += 0.0 to ((map?.get("value")?.toDoubleOrNull()?.takeIf { it.isFinite() } ?: layer.node["speed"]?.toDoubleOrNull()?.takeIf { it.isFinite() } ?: 1.0).coerceAtLeast(0.001))
+            samples += 0.0 to ((map?.get("value")?.toDoubleOrNull()?.takeIf { it.isFinite() } ?: layer.node["speed"]?.toDoubleOrNull()?.takeIf { it.isFinite() } ?: 1.0).coerceAtLeast(SLOWEST_SPEED.toDouble()))
         } else {
             samples += keys.first().t.toDouble() / 1_000_000 to keys.first().v.toDouble().coerceAtLeast(MIN_SPEED)
             for ((a, b) in keys.zipWithNext()) {

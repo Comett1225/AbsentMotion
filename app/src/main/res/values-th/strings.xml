@@ -889,7 +889,7 @@
     <string name="font_language_vietnamese">เวียดนาม</string>
     <string name="layer_tool_fill_color">เติมและสี</string>
     <string name="layer_tool_frame_shadow">กรอบและเงา</string>
-    <string name="layer_tool_opacity_blend">ความทึบและโหมดผสม</string>
+    <string name="layer_tool_opacity_blend">ความทึบ</string>
     <string name="layer_tool_transform">แปลง</string>
     <string name="layer_tool_shape_options">ตัวเลือกรูปร่าง</string>
     <string name="layer_tool_edit_text">แก้ไขข้อความ</string>
@@ -1547,7 +1547,7 @@
     <string name="edit_panel_shape_options">ตัวเลือกรูปร่าง</string>
     <string name="edit_panel_edit_text">แก้ไขข้อความ</string>
     <string name="edit_panel_frame_shadow">กรอบและเงา</string>
-    <string name="edit_panel_opacity_blend">ความทึบและโหมดผสม</string>
+    <string name="edit_panel_opacity_blend">ความทึบ</string>
     <string name="edit_panel_effects">เอฟเฟกต์</string>
     <string name="edit_panel_camera_options">ตัวเลือกกล้อง</string>
     <string name="edit_keep_copying">กำลังคัดลอก “%1$s” ไปยังโปรเจกต์…</string>

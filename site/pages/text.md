@@ -26,7 +26,7 @@ The other tools work on text as on any layer.
 
 - **Fill & Color** gives the letters a color, a gradient or a picture or video (**Media**).
 - **Frame & Shadow**: **Stroke** is the outline of the letters. **Border** and **Shadow** add more.
-- **Opacity & Blend Mode**, **Transform** and **Effects** work as for shapes.
+- **Opacity**, **Transform** and **Effects** work as for shapes.
 - **Convert to Outline** (layer menu) turns text into a shape you can edit point by point. It cannot be turned back into text.
 
 Emoji follow the **Emoji Style** setting: your phone's emoji or the set that comes with the app. See [Settings](@settings).

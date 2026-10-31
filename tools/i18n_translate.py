@@ -16,10 +16,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from i18n_extract import EFFECTS, FOLDERS, KOTLIN, PLACEHOLDER, RES, ROOT, SEVERAL, xml_escape
 
 LANGUAGES = {'id': 'Indonesian', 'hi': 'Hindi', 'pt-BR': 'Brazilian Portuguese', 'es': 'Latin American Spanish', 'fil': 'Filipino (Tagalog)',
-             'vi': 'Vietnamese', 'th': 'Thai', 'ms': 'Malay (Malaysia)', 'ar': 'Arabic (Modern Standard)', 'fa': 'Persian (Farsi, Iran)', 'tr': 'Turkish', 'ru': 'Russian', 'bn': 'Bengali (Bangla)'}
+             'vi': 'Vietnamese', 'th': 'Thai', 'ms': 'Malay (Malaysia)', 'ar': 'Arabic (Modern Standard)', 'fa': 'Persian (Farsi, Iran)', 'tr': 'Turkish', 'ru': 'Russian', 'bn': 'Bengali (Bangla)',
+             'es-ES': 'Spanish (Spain)', 'ur': 'Urdu (Pakistan)', 'ja': 'Japanese'}
 QUANTITIES = {'id': ['other'], 'vi': ['other'], 'th': ['other'], 'ms': ['other'], 'hi': ['one', 'other'], 'pt-BR': ['one', 'many', 'other'],
               'es': ['one', 'many', 'other'], 'fil': ['one', 'other'], 'tr': ['one', 'other'], 'ru': ['one', 'few', 'many', 'other'],
-              'ar': ['zero', 'one', 'two', 'few', 'many', 'other'], 'fa': ['one', 'other'], 'bn': ['one', 'other']}
+              'ar': ['zero', 'one', 'two', 'few', 'many', 'other'], 'fa': ['one', 'other'], 'bn': ['one', 'other'],
+              'es-ES': ['one', 'many', 'other'], 'ur': ['one', 'other'], 'ja': ['other']}
 STATE = ROOT / 'tools/i18n_source.json'
 GLOSSARY = ROOT / 'tools/i18n_glossary.json'
 NOTES = ROOT / 'tools/i18n_notes.json'
@@ -29,6 +31,9 @@ RULES = {'bn': 'Write in standard Bengali (Bangla) with the Bengali script, as u
          'hi': 'Write the count placeholder in every plural form, including "one" (it also covers 0), unless the English text has none.',
          'pt-BR': 'Write the count placeholder in every plural form, including "one" (it also covers 0), and give "many" the same wording as "other" (it covers millions).',
          'es': 'Give "many" the same wording as "other" (it covers millions).',
+         'es-ES': 'Write the Spanish used in Spain, not Latin American Spanish: vosotros for the plural "you", ordenador, móvil, vídeo, archivo, guardar, pulsar or tocar. Give "many" the same wording as "other" (it covers millions).',
+         'ur': 'Write in standard Urdu as used in Pakistan, in the Urdu (Nastaliq) script, not Hindi or Arabic. Video apps in Urdu keep common English editing terms (layer, keyframe, preset, export) written in Urdu letters where people say them that way. Keep the Latin digits, units, version numbers and placeholders as in the English.',
+         'ja': 'Write natural Japanese for an app interface: short labels, polite but not stiff sentences (です/ます in messages), katakana for common editing terms (レイヤー, キーフレーム, エフェクト, プリセット, エクスポート), full-width Japanese punctuation, and no spaces between words. Keep the Latin digits, units, version numbers and placeholders as in the English.',
          'ar': 'In the Arabic plural forms "one" and "two" leave out the count placeholder when the singular or dual noun already says the number '
                '(write "طبقتان", not "%1$s طبقتين"); keep every other placeholder.',
          'fil': 'Filipino video apps keep many English editing terms (layer, keyframe, preset, export, template); use them as the glossary says. '

@@ -8,7 +8,7 @@ A **keyframe** stores the value of one property at one moment. Between two keyfr
 
 ## Add and remove keyframes
 
-1. Select a layer and open a panel, for example **Transform**, **Opacity & Blend Mode** or **Effects**.
+1. Select a layer and open a panel, for example **Transform**, **Opacity** or **Effects**.
 2. Put the playhead at the time you want.
 3. Tap the **Add keyframe** button (a diamond) in the left column of the panel. It turns into **Remove keyframe** while the playhead sits on a keyframe.
 

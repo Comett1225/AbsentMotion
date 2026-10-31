@@ -408,6 +408,7 @@ object Am {
     val Button: Color get() = palette.Button
     val Field: Color get() = palette.Field
     val FieldHi: Color get() = palette.FieldHi
+    val CardHeader: Color get() = androidx.compose.ui.graphics.lerp(palette.Field, Color.Black, 0.22f)
     val Chosen: Color get() = palette.Chosen
     val Well: Color get() = palette.Well
     val Deepest: Color get() = palette.Deepest

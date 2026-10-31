@@ -889,7 +889,7 @@
     <string name="font_language_vietnamese">Tiếng Việt</string>
     <string name="layer_tool_fill_color">Tô &amp; màu</string>
     <string name="layer_tool_frame_shadow">Viền &amp; bóng</string>
-    <string name="layer_tool_opacity_blend">Độ mờ &amp; chế độ hòa trộn</string>
+    <string name="layer_tool_opacity_blend">Độ mờ</string>
     <string name="layer_tool_transform">Biến đổi</string>
     <string name="layer_tool_shape_options">Tùy chọn hình dạng</string>
     <string name="layer_tool_edit_text">Sửa văn bản</string>
@@ -1547,7 +1547,7 @@
     <string name="edit_panel_shape_options">Tùy chọn hình dạng</string>
     <string name="edit_panel_edit_text">Sửa văn bản</string>
     <string name="edit_panel_frame_shadow">Viền &amp; bóng</string>
-    <string name="edit_panel_opacity_blend">Độ mờ &amp; chế độ hòa trộn</string>
+    <string name="edit_panel_opacity_blend">Độ mờ</string>
     <string name="edit_panel_effects">Hiệu ứng</string>
     <string name="edit_panel_camera_options">Tùy chọn máy ảnh</string>
     <string name="edit_keep_copying">Đang sao chép “%1$s” vào dự án…</string>

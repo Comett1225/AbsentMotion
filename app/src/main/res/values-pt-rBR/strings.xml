@@ -919,7 +919,7 @@
     <string name="font_language_vietnamese">Vietnamita</string>
     <string name="layer_tool_fill_color">Preenchimento e cor</string>
     <string name="layer_tool_frame_shadow">Borda e sombra</string>
-    <string name="layer_tool_opacity_blend">Opacidade e mesclagem</string>
+    <string name="layer_tool_opacity_blend">Opacidade</string>
     <string name="layer_tool_transform">Transformação</string>
     <string name="layer_tool_shape_options">Opções da forma</string>
     <string name="layer_tool_edit_text">Editar texto</string>
@@ -1595,7 +1595,7 @@
     <string name="edit_panel_shape_options">Opções da forma</string>
     <string name="edit_panel_edit_text">Editar texto</string>
     <string name="edit_panel_frame_shadow">Borda e sombra</string>
-    <string name="edit_panel_opacity_blend">Opacidade e mesclagem</string>
+    <string name="edit_panel_opacity_blend">Opacidade</string>
     <string name="edit_panel_effects">Efeitos</string>
     <string name="edit_panel_camera_options">Opções da câmera</string>
     <string name="edit_keep_copying">Copiando “%1$s” para o projeto…</string>

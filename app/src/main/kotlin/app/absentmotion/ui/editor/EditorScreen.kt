@@ -174,7 +174,7 @@ internal fun LowerPanels(state: EditorState, addLibrary: AddLibrary, top: Boolea
             state.addOpen -> AddPopup(state, lower.height(AddPopupHeight).tutorialTarget("add_panel"), addLibrary)
             MultiSelect.active -> MultiBar(state, lower.height(48.dp))
             state.selectedId == null -> {
-                if (transitionHere && !state.settings.transitionInPreview) TransitionButton(state, Modifier.align(Alignment.BottomStart).padding(start = HeaderWidth).tutorialTarget("transition"))
+                if (transitionHere && !state.settings.transitionInPreview) TransitionButton(state, Modifier.align(Alignment.BottomEnd).padding(bottom = 58.dp).tutorialTarget("transition"), fromEnd = true)
                 AddButton(state, Modifier.align(Alignment.BottomEnd).tutorialTarget("add"))
             }
             state.volumeOpen && state.panel == EditorPanel.Tools -> key(state.selectedId) { VolumePanel(state, lower.height(PanelHeight).tutorialTarget("panel")) }

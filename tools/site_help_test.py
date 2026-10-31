@@ -195,9 +195,9 @@ class HelpLocaleTest(unittest.TestCase):
     def test_supported_tags_match_the_app(self):
         tags = sb.supported_tags()
         self.assertEqual(tags[0], "en")
-        self.assertEqual(len(tags), 14)
+        self.assertEqual(len(tags), 17)
         self.assertTrue({"ar", "fa"} <= set(tags))
-        self.assertEqual(sb.RTL, {"ar", "fa"})
+        self.assertEqual(sb.RTL, {"ar", "fa", "ur"})
 
     def test_chrome_keys_are_what_the_generator_uses(self):
         files, _ = self.build("ar")

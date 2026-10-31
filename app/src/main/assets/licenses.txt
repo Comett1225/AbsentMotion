@@ -2737,6 +2737,7 @@ ICON SOURCES
 Every icon in AbsentMotion is either taken from an open icon set whose licence allows redistribution, or drawn for this project. Nothing is copied or traced from another app. This file is the single list of where each icon comes from; the third-party notices file is generated from it.
 
 - Lucide (https://lucide.dev, https://github.com/lucide-icons/lucide), ISC licence, version 1.59.0 (SVG files at https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/<name>.svg, pages at https://lucide.dev/icons/<name>). Lucide's licence file marks a few icons as derived from Feather (https://github.com/feathericons/feather); those are also under the MIT licence below, so both notices apply to them. The Licence column says "ISC and MIT (Feather)" for those.
+- Tabler Icons (https://tabler.io/icons, https://github.com/tabler/tabler-icons), MIT licence, version 3.31.0 (SVG files at https://cdn.jsdelivr.net/npm/@tabler/icons@3.31.0/icons/outline/<name>.svg). Used the same way as the Lucide shapes.
 - Material Symbols (https://github.com/google/material-design-icons, Apache-2.0): none are used.
 - Own drawing: made for AbsentMotion from circles, lines, rectangles and arcs; Apache-2.0 like the rest of the code.
 - Effect thumbnails are not icons: they are small renders of six CC0 photographs, listed in THIRD_PARTY_NOTICES.md (section 5, "Effect thumbnail photos").
@@ -2748,9 +2749,10 @@ The launcher icon is an own drawing, made by tools/icon/make_icon.py (source of 
 COUNTS
 ------
 
-- Lucide only - 167
+- Lucide only - 168
 - Lucide shapes plus own parts - 8
-- Own drawing only - 42
+- Own drawing only - 43
+- Tabler - 2
 - Material Symbols - 0
 
 (An icon is one named member of an *Icons object, or one icon-drawing composable.)
@@ -2817,6 +2819,10 @@ ICONS
 - AudioMuted (Lucide volume-x) - ISC - ui/editor/PanelIcons.kt
 - Turtle (Lucide turtle) - ISC - ui/editor/PanelIcons.kt
 - Rabbit (Lucide rabbit) - ISC - ui/editor/PanelIcons.kt
+- Snail (Lucide snail) - ISC - ui/editor/PanelIcons.kt
+- Walk (Tabler walk) - MIT - ui/editor/PanelIcons.kt
+- Horse (Tabler horse) - MIT - ui/editor/PanelIcons.kt
+- Cheetah (own drawing) - Apache-2.0 (own) - ui/editor/PanelIcons.kt
 - PaintBucket (Lucide paint-bucket) - ISC - ui/editor/PanelIcons.kt
 - BorderShadow (own drawing) - Apache-2.0 (own) - ui/editor/PanelIcons.kt
 - Blending (Lucide blend) - ISC - ui/editor/PanelIcons.kt
@@ -3013,6 +3019,31 @@ The Lucide licence file lists the Feather-derived icons and reproduces this text
 The MIT License (MIT) (for the icons listed above)
 
 Copyright (c) 2013-present Cole Bemis
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+Tabler Icons (MIT), https://github.com/tabler/tabler-icons/blob/main/LICENSE
+----------------------------------------------------------------------------
+
+MIT License
+
+Copyright (c) 2020-2024 Paweł Kuna
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

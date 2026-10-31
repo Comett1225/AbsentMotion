@@ -192,6 +192,9 @@ int main() {
         check(Split("Hi " + thai, {0, 2, 3, 21, 33}).words == 3, "thai words after a latin word");
         check(Split("abcd ef", {0, 2, 4, 5, 7}).words == 2, "breaks inside words of spaced scripts are ignored");
         check(Split(thai).words == 1, "without breaks thai text stays one word");
+        const std::string japanese = "こんにちは世界";
+        const Segments j = Split(japanese, {0, 15, 21});
+        check(j.words == 2 && pieces(japanese, j.word)[1] == "世界", "japanese words split where the dictionary breaks them");
     }
     {
         check(CountNumbers("1.000,5", 0, 2, -1, 2) == "2.001,0", "a number typed as 1.000,5 counts in that style");

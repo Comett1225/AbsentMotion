@@ -35,7 +35,11 @@ class AppLanguageTest {
         assertEquals(AppLanguage.Portuguese, pick("pt-PT"))
         assertEquals(AppLanguage.Portuguese, pick("pt-BR"))
         assertEquals(AppLanguage.Portuguese, pick("pt"))
-        assertEquals(AppLanguage.Spanish, pick("es-ES"))
+        assertEquals(AppLanguage.SpanishSpain, pick("es-ES"))
+        assertEquals(AppLanguage.SpanishSpain, pick("es_ES"))
+        assertEquals(AppLanguage.Spanish, pick("es"))
+        assertEquals(AppLanguage.Urdu, pick("ur-PK"))
+        assertEquals(AppLanguage.Japanese, pick("ja-JP"))
         assertEquals(AppLanguage.Spanish, pick("es-419"))
         assertEquals(AppLanguage.Spanish, pick("es_MX"))
         assertEquals(AppLanguage.Malay, pick("ms-SG"))
@@ -69,8 +73,8 @@ class AppLanguageTest {
     }
 
     @Test fun fourteenLanguagesEachKnowTheirOwnName() {
-        assertEquals(14, AppLanguage.entries.size)
-        assertEquals(14, AppLanguage.entries.map { it.nativeName }.toSet().size)
+        assertEquals(17, AppLanguage.entries.size)
+        assertEquals(17, AppLanguage.entries.map { it.nativeName }.toSet().size)
         assertEquals("বাংলা", AppLanguage.Bengali.nativeName)
         assertEquals("العربية", AppLanguage.Arabic.nativeName)
         assertEquals("فارسی", AppLanguage.Persian.nativeName)

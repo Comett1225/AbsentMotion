@@ -26,6 +26,7 @@ data class EffectParam(
     val legacyDefault: String? = null,
     val showWhen: Pair<String, Set<Int>>? = null,
     val palette: Boolean = false,
+    val slow: Int = 1,
 ) {
     val type: String get() = when (kind) { "point" -> "vec2"; "color" -> "color"; "switch" -> "bool"; "text" -> "string"; else -> "float" }
     val missingDefault: String get() = legacyDefault ?: default
@@ -65,7 +66,7 @@ data class EffectParam(
                 json.optDouble("min", -Float.MAX_VALUE.toDouble()).toFloat(), json.optDouble("max", Float.MAX_VALUE.toDouble()).toFloat(),
                 json.optDouble("step", 0.01).toFloat(), percent = json.optBoolean("percent"), pixels = json.optBoolean("pixels"), unit = json.optString("unit"),
                 layerTime = json.optBoolean("layerTime"), after = json.optString("after").takeIf { it.isNotEmpty() }, legacyDefault = legacyDefault,
-                showWhen = showWhen, palette = palette)
+                showWhen = showWhen, palette = palette, slow = json.optInt("slow", 1).coerceIn(1, 20))
         }
     }
 }

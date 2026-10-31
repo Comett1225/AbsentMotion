@@ -904,7 +904,7 @@
     <string name="font_language_vietnamese">वियतनामी</string>
     <string name="layer_tool_fill_color">फ़िल और कलर</string>
     <string name="layer_tool_frame_shadow">फ़्रेम और शैडो</string>
-    <string name="layer_tool_opacity_blend">ओपेसिटी और ब्लेंडिंग मोड</string>
+    <string name="layer_tool_opacity_blend">ओपेसिटी</string>
     <string name="layer_tool_transform">ट्रांसफ़ॉर्म</string>
     <string name="layer_tool_shape_options">शेप विकल्प</string>
     <string name="layer_tool_edit_text">टेक्स्ट एडिट</string>
@@ -1571,7 +1571,7 @@
     <string name="edit_panel_shape_options">शेप विकल्प</string>
     <string name="edit_panel_edit_text">टेक्स्ट एडिट</string>
     <string name="edit_panel_frame_shadow">फ़्रेम और शैडो</string>
-    <string name="edit_panel_opacity_blend">ओपेसिटी और ब्लेंडिंग मोड</string>
+    <string name="edit_panel_opacity_blend">ओपेसिटी</string>
     <string name="edit_panel_effects">इफ़ेक्ट्स</string>
     <string name="edit_panel_camera_options">कैमरा विकल्प</string>
     <string name="edit_keep_copying">“%1$s” को प्रोजेक्ट में कॉपी किया जा रहा है…</string>

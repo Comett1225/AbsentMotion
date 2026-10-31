@@ -110,7 +110,7 @@ import app.absentmotion.i18n.text
 private val TileShape = RoundedCornerShape(6.dp)
 
 @Composable
-internal fun TransitionButton(state: EditorState, modifier: Modifier, compact: Boolean = false) {
+internal fun TransitionButton(state: EditorState, modifier: Modifier, compact: Boolean = false, fromEnd: Boolean = false) {
     var open by remember { mutableStateOf<Pair<Long, Long>?>(null) }
     val cut = if (state.playing || state.transitionButtonDismissed || state.selectedId != null || state.addOpen || MultiSelect.active) null else state.scene.cutAt(state.timeMs)
     if (cut != null) {
@@ -122,10 +122,10 @@ internal fun TransitionButton(state: EditorState, modifier: Modifier, compact: B
             .pointerInput(state) {
                 detectHorizontalDragGestures(
                     onDragStart = { drag = 0f }, onDragCancel = { drag = 0f },
-                    onDragEnd = { if (drag <= -24.dp.toPx()) state.transitionButtonDismissed = true; drag = 0f },
+                    onDragEnd = { if ((if (fromEnd) drag else -drag) >= 24.dp.toPx()) state.transitionButtonDismissed = true; drag = 0f },
                 ) { change, amount -> change.consume(); drag += amount }
             }
-            .graphicsLayer { translationX = drag.coerceAtMost(0f) }
+            .graphicsLayer { translationX = if (fromEnd) drag.coerceAtLeast(0f) else drag.coerceAtMost(0f) }
             .clickable(interactionSource = press, indication = null) { open = cut.first.id to cut.second.id }, contentAlignment = Alignment.Center) {
             Box(
                 Modifier.size(if (compact) 38.dp else 47.dp).pressScale(press).shadow(4.dp, CircleShape).background(Am.Panel, CircleShape).border(1.8.dp, Am.OnDark, CircleShape),

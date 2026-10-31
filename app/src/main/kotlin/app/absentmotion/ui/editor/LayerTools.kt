@@ -6,6 +6,9 @@ import app.absentmotion.model.finiteFloat
 import app.absentmotion.platform.BackHandler
 import androidx.annotation.StringRes
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.key
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import app.absentmotion.editor.KeyTarget
 import app.absentmotion.editor.toggleKeyframe
 import app.absentmotion.audio.gain
@@ -130,13 +133,14 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier, side: Boolean 
                 val clip = state.selected
                 val past = clip != null && state.sampleMs > clip.endTime
                 val before = clip != null && state.timeMs < clip.startTime
-                SmallTool(PanelIcons.TrimLeft, stringResource(if (before) R.string.a11y_extend_start else R.string.a11y_trim_start), Modifier.weight(1f), ToolShape.copy(topEnd = Square, bottomEnd = Square), enabled = !past) {
+                if (!past) SmallTool(PanelIcons.TrimLeft, stringResource(if (before) R.string.a11y_extend_start else R.string.a11y_trim_start), Modifier.weight(1f), ToolShape.copy(topEnd = Square, bottomEnd = Square)) {
                     if (before) state.moveClipEdges(false, true) else state.trimStart()
                 }
-                SmallTool(if (past) ChromeIcons.SkipForward else if (before) ChromeIcons.SkipBack else PanelIcons.Split, stringResource(if (past || before) R.string.a11y_move_to_playhead else R.string.a11y_split), Modifier.weight(1f).tutorialTarget("tool_split"), RoundedCornerShape(0.dp)) {
+                val middle = when { past -> ToolShape.copy(topEnd = Square, bottomEnd = Square); before -> ToolShape.copy(topStart = Square, bottomStart = Square); else -> RoundedCornerShape(0.dp) }
+                SmallTool(if (past) ChromeIcons.SkipForward else if (before) ChromeIcons.SkipBack else PanelIcons.Split, stringResource(if (past || before) R.string.a11y_move_to_playhead else R.string.a11y_split), Modifier.weight(1f).tutorialTarget("tool_split"), middle) {
                     if (past || before) state.moveClipEdges(past, false) else state.split()
                 }
-                SmallTool(PanelIcons.TrimRight, stringResource(if (past) R.string.a11y_extend_end else R.string.a11y_trim_end), Modifier.weight(1f), ToolShape.copy(topStart = Square, bottomStart = Square), enabled = !before) {
+                if (!before) SmallTool(PanelIcons.TrimRight, stringResource(if (past) R.string.a11y_extend_end else R.string.a11y_trim_end), Modifier.weight(1f), ToolShape.copy(topStart = Square, bottomStart = Square)) {
                     if (past) state.moveClipEdges(true, true) else state.trimEnd()
                 }
             }
@@ -175,19 +179,36 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier, side: Boolean 
                     else -> Tile(EditShape) { state.panel = EditorPanel.EditShape }
                 }
                 listOf(
-                    listOfNotNull(if (state.selected?.canCrop == true) Tile(Crop) { state.openCrop() } else null, Tile(ColorFill) { state.panel = EditorPanel.ColorFill }, Tile(BorderShadow) { state.panel = EditorPanel.BorderShadow }, blending),
+                    listOf(Tile(ColorFill) { state.panel = EditorPanel.ColorFill }, Tile(BorderShadow) { state.panel = EditorPanel.BorderShadow }, blending),
                     listOfNotNull(transform, edit, presets, effects),
                     *if (state.selected?.mediaFill?.video == true) arrayOf(listOf(Tile(AiTools) { openEffectBrowser(state, "ai") }, Tile(CaptionTools) { state.playing = false; captions = true })) else emptyArray(),
                 )
             }
         }
-        val shown = if (side) rows.flatten().chunked(2) else rows
-        shown.forEachIndexed { i, row ->
-            if (i > 0) Spacer(Modifier.height(17.px))
-            Row(Modifier.fillMaxWidth().height(160.px), Arrangement.spacedBy(17.px)) {
-                for (tile in row) ToolButton(tile.tool, Modifier.weight(1f).tutorialTarget(if (tile.tool === MoveTransform) "tool_transform" else if (tile.tool === Effects) "tool_effects" else null), tile.enabled, tile.onLongClick, tile.menu, tile.onClick)
-                if (side) repeat(2 - row.size) { Spacer(Modifier.weight(1f)) }
+        val more = listOfNotNull(if (state.selected?.canCrop == true) Tile(Crop) { state.openCrop() } else null)
+        if (side) TileRows((rows.flatten() + more).chunked(2), 2)
+        else if (more.isEmpty()) TileRows(rows, null)
+        else key(state.selectedId) {
+            val pager = rememberPagerState { 2 }
+            HorizontalPager(pager, Modifier.fillMaxWidth().height((rows.size * 160 + (rows.size - 1) * 17).px), pageSpacing = 17.px, verticalAlignment = Alignment.Top) { page ->
+                Column { TileRows(if (page == 0) rows else listOf(more), if (page == 0) null else 4) }
             }
+            Row(Modifier.fillMaxWidth().padding(top = 20.px, bottom = 20.px), Arrangement.Center) {
+                repeat(2) { i ->
+                    Box(Modifier.padding(horizontal = 4.dp).size(6.dp).clip(androidx.compose.foundation.shape.CircleShape).background(animatedColor(if (pager.currentPage == i) Am.OnDark else Am.OnDarkDim.copy(alpha = 0.4f))))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun TileRows(rows: List<List<Tile>>, columns: Int?) {
+    rows.forEachIndexed { i, row ->
+        if (i > 0) Spacer(Modifier.height(17.px))
+        Row(Modifier.fillMaxWidth().height(160.px), Arrangement.spacedBy(17.px)) {
+            for (tile in row) ToolButton(tile.tool, Modifier.weight(1f).tutorialTarget(if (tile.tool === MoveTransform) "tool_transform" else if (tile.tool === Effects) "tool_effects" else null), tile.enabled, tile.onLongClick, tile.menu, tile.onClick)
+            if (columns != null) repeat(columns - row.size) { Spacer(Modifier.weight(1f)) }
         }
     }
 }
