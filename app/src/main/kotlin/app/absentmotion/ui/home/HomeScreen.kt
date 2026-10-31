@@ -196,9 +196,11 @@ fun HomeScreen(
     ) {
         Box(Modifier.fillMaxSize().background(Am.HomeBg)) {
             Column(Modifier.fillMaxSize().statusBarsPadding()) {
-                if (wide) WideHeader(page, tab, { p, t -> page = p; tab = t }, onSettings = { scope.launch { drawer.open() } }, onNew = { creating = true }, search, { search = it })
-                else TopBar(onMenu = { scope.launch { drawer.open() } }, search, page == 1, { search = it })
-                if (page == 1) TemplatesTab(version, onTemplate, onTemplateProject, Modifier.weight(1f).then(if (wide) Modifier.widthIn(max = 760.dp).align(Alignment.CenterHorizontally) else Modifier), query) else ProjectsPane(
+                if (wide) WideHeader(page, tab, { p, t -> page = p; tab = t; if (p == 2) search = null }, onSettings = { scope.launch { drawer.open() } }, onNew = { creating = true }, search, { search = it })
+                else TopBar(onMenu = { scope.launch { drawer.open() } }, search, page, { search = it })
+                val narrow = Modifier.weight(1f).then(if (wide) Modifier.widthIn(max = 760.dp).align(Alignment.CenterHorizontally) else Modifier)
+                if (page == 2) ToolsTab(narrow)
+                else if (page == 1) TemplatesTab(version, onTemplate, onTemplateProject, narrow, query) else ProjectsPane(
                     Modifier.weight(1f), shown, loaded, tab, { tab = it }, settings, version, onOpen, onExport, query,
                     onUpload = { picker.launch(arrayOf("text/xml", "application/xml", "application/zip", "application/octet-stream")) },
                     onDuplicate = { id -> if (!duplicating) {
@@ -218,7 +220,7 @@ fun HomeScreen(
                 )
                 Spacer(Modifier.height(if (wide) navInset else BarHeight + navInset))
             }
-            if (!wide) BottomBar(onNew = { creating = true }, page, { page = it }, Modifier.align(Alignment.BottomCenter), navInset)
+            if (!wide) BottomBar(onNew = { creating = true }, page, { page = it; if (it == 2) search = null }, Modifier.align(Alignment.BottomCenter), navInset)
             if (toReport.isNotEmpty()) ImportDialog(toReport, onDismiss = onImportShown, onOpen = { onImportShown(); toReport.first().let { if (it.template) onTemplate(it.id) else onOpen(it.id) } })
             Presence(creating) {
                 NewProjectSheet(
@@ -231,14 +233,14 @@ fun HomeScreen(
 }
 
 @Composable
-private fun TopBar(onMenu: () -> Unit, search: String?, templates: Boolean, onSearch: (String?) -> Unit) {
+private fun TopBar(onMenu: () -> Unit, search: String?, page: Int, onSearch: (String?) -> Unit) {
     Box(Modifier.fillMaxWidth().height(57.dp)) {
         Box(Modifier.align(Alignment.CenterStart).size(50.dp).clickable(onClick = onMenu), contentAlignment = Alignment.Center) {
             Icon(HomeIcons.Menu, stringResource(R.string.settings), Modifier.size(24.dp), tint = Am.Navy)
         }
         if (search == null) Text("AbsentMotion", Modifier.align(Alignment.Center), color = Am.Navy, fontSize = 22.sp, fontWeight = FontWeight.Medium)
-        else HomeSearchField(search, templates, onSearch, Modifier.align(Alignment.Center).padding(horizontal = 56.dp).fillMaxWidth())
-        SearchButton(search, onSearch, Modifier.align(Alignment.CenterEnd))
+        else HomeSearchField(search, page == 1, onSearch, Modifier.align(Alignment.Center).padding(horizontal = 56.dp).fillMaxWidth())
+        if (page != 2) SearchButton(search, onSearch, Modifier.align(Alignment.CenterEnd))
     }
 }
 
@@ -626,12 +628,15 @@ private fun BottomBar(onNew: () -> Unit, page: Int, onPage: (Int) -> Unit, modif
             Modifier.align(Alignment.BottomCenter).fillMaxWidth().height(BarHeight + navInset)
                 .shadow(8.dp).background(Am.Card).padding(top = 12.dp),
         ) {
-            Box(Modifier.weight(1f), contentAlignment = Alignment.TopCenter) {
+            Box(Modifier.weight(2f), contentAlignment = Alignment.TopCenter) {
                 BarItem(stringResource(R.string.home_tab_projects), if (page == 0) HomeIcons.ProjectsTab else HomeIcons.ProjectsTabOff) { onPage(0) }
             }
             Spacer(Modifier.width(56.dp))
             Box(Modifier.weight(1f), contentAlignment = Alignment.TopCenter) {
                 BarItem(stringResource(R.string.home_tab_templates), if (page == 1) HomeIcons.TemplatesTabOn else HomeIcons.TemplatesTab) { onPage(1) }
+            }
+            Box(Modifier.weight(1f), contentAlignment = Alignment.TopCenter) {
+                BarItem(stringResource(R.string.home_tab_tools), if (page == 2) HomeIcons.ToolsTabOn else HomeIcons.ToolsTab) { onPage(2) }
             }
         }
         val press = remember { MutableInteractionSource() }

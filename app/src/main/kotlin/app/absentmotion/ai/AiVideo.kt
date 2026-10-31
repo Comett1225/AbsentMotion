@@ -59,7 +59,7 @@ internal fun writeYuv(argb: IntArray, stride: Int, width: Int, height: Int, imag
 
 internal fun lumaOf(p: Int): Int = ((47 * ((p shr 16) and 0xFF) + 157 * ((p shr 8) and 0xFF) + 16 * (p and 0xFF) + 128) shr 8) + 16
 
-private class AudioCopy(context: Context, uri: String) : Closeable {
+internal class AudioCopy(context: Context, uri: String) : Closeable {
     private val extractor = MediaExtractor()
     val format: MediaFormat?
     var track = -1

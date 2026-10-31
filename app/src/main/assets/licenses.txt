@@ -2749,7 +2749,7 @@ The launcher icon is an own drawing, made by tools/icon/make_icon.py (source of 
 COUNTS
 ------
 
-- Lucide only - 168
+- Lucide only - 172
 - Lucide shapes plus own parts - 8
 - Own drawing only - 43
 - Tabler - 2
@@ -2887,6 +2887,10 @@ ICONS
 - ProjectsTabOff (Lucide square-play) - ISC - ui/home/HomeIcons.kt
 - TemplatesTabOn (Lucide + own drawing layout-template) - ISC; own part Apache-2.0 - ui/home/HomeIcons.kt
 - TemplatesTab (Lucide layout-template) - ISC - ui/home/HomeIcons.kt
+- ToolsTab (Lucide wrench) - ISC - ui/home/HomeIcons.kt
+- ToolsTabOn (Lucide wrench) - ISC - ui/home/HomeIcons.kt
+- Compress (Lucide shrink) - ISC - ui/home/HomeIcons.kt
+- Download (Lucide download) - ISC and MIT (Feather) - ui/home/HomeIcons.kt
 - Close (Lucide x) - ISC and MIT (Feather) - ui/export/ExportIcons.kt
 - Back (Lucide arrow-left) - ISC and MIT (Feather) - ui/export/ExportIcons.kt
 - ChevronRight (Lucide chevron-right) - ISC and MIT (Feather) - ui/export/ExportIcons.kt

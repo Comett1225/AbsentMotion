@@ -27,7 +27,7 @@ The launcher icon is an own drawing, made by `tools/icon/make_icon.py` (source o
 
 | Source | Icons |
 | --- | --- |
-| Lucide only | 168 |
+| Lucide only | 172 |
 | Lucide shapes plus own parts | 8 |
 | Own drawing only | 43 |
 | Tabler | 2 |
@@ -167,6 +167,10 @@ The launcher icon is an own drawing, made by `tools/icon/make_icon.py` (source o
 | `ui/home/HomeIcons.kt` | `ProjectsTabOff` | Lucide | `square-play` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/square-play.svg | - |
 | `ui/home/HomeIcons.kt` | `TemplatesTabOn` | Lucide + own drawing | `layout-template` | ISC; own part Apache-2.0 | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/layout-template.svg | header band filled |
 | `ui/home/HomeIcons.kt` | `TemplatesTab` | Lucide | `layout-template` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/layout-template.svg | - |
+| `ui/home/HomeIcons.kt` | `ToolsTab` | Lucide | `wrench` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/wrench.svg | - |
+| `ui/home/HomeIcons.kt` | `ToolsTabOn` | Lucide | `wrench` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/wrench.svg | also filled |
+| `ui/home/HomeIcons.kt` | `Compress` | Lucide | `shrink` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/shrink.svg | - |
+| `ui/home/HomeIcons.kt` | `Download` | Lucide | `download` | ISC and MIT (Feather) | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/download.svg | - |
 | `ui/export/ExportIcons.kt` | `Close` | Lucide | `x` | ISC and MIT (Feather) | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/x.svg | x scaled x1.2 |
 | `ui/export/ExportIcons.kt` | `Back` | Lucide | `arrow-left` | ISC and MIT (Feather) | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/arrow-left.svg | - |
 | `ui/export/ExportIcons.kt` | `ChevronRight` | Lucide | `chevron-right` | ISC and MIT (Feather) | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/chevron-right.svg | chevron-right scaled x1.1 |
