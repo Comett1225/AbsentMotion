@@ -219,7 +219,35 @@ class Device:
 
     def start(self, *extras):
         self.shell("am", "force-stop", self.package)
+        self.shell("input", "keyevent", "KEYCODE_HOME")
+        time.sleep(0.6)
         self.shell("am", "start", "-n", "%s/%s" % (self.package, ACTIVITY), *extras)
+
+    def publish(self, local, path):
+        self.run("push", str(local), "/sdcard/" + path)
+        self.shell("am", "broadcast", "-a", "android.intent.action.MEDIA_SCANNER_SCAN_FILE", "-d", "file:///sdcard/" + path)
+
+    def ancestor(self, nodes, node):
+        current = node
+        while current["parent"] >= 0:
+            current = nodes[current["parent"]]
+            if current["clickable"]:
+                return current
+        return node
+
+    def demo_mode(self):
+        self.home()
+        apply_step(self, {"tap": {"desc": "Settings"}})
+        apply_step(self, {"tap": "Projects and media"})
+        nodes = self.tree()
+        label = find(nodes, "Demo Mode")
+        if label is None:
+            raise Failure("the Demo Mode switch was not found; only a debug build has it")
+        row = self.ancestor(nodes, label)
+        if not row["checked"]:
+            self.tap(*center(row["box"]))
+            apply_step(self, {"tap": "OK"})
+        self.shell("input", "keyevent", "KEYCODE_BACK")
 
     def dismiss(self):
         for label in ("Don't ask again", "Not now", "Later"):
@@ -301,7 +329,7 @@ def apply_step(device, step):
     elif "expect" in step:
         device.wait(step["expect"], step.get("timeout", 12))
     elif "absent" in step:
-        device.vanish(step["absent"])
+        device.vanish(step["absent"], step.get("timeout", 8.0))
     else:
         raise Failure("unknown step " + describe(step))
     if not step.get("quick"):
@@ -477,12 +505,33 @@ def beach_clip():
         "-t", "5", "-filter_complex", graph, "-map", "[v]", "-c:v", "libx264", "-preset", "veryfast", "-crf", "24", "-an"])
 
 
+def long_clip():
+    sunset = commons_photo("sunset")
+    graph = ("[0:v]scale=1920:-2,zoompan=z='1.0+0.0002*on':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s=1280x720:fps=30[bg];"
+             "[bg][1:v]overlay=x='320+20*t':y='440+30*sin(t*0.6)':shortest=1,format=yuv420p[v]")
+    return make_media("long.mp4", "test-video.mp4", [
+        "-loop", "1", "-framerate", "30", "-i", str(sunset), "-f", "lavfi", "-i",
+        "color=c=0xFF5A36:s=64x64:r=30,format=rgba,drawbox=x=12:y=12:w=40:h=40:color=white:t=fill",
+        "-t", "45", "-filter_complex", graph, "-map", "[v]", "-c:v", "libx264", "-preset", "veryfast", "-crf", "26", "-g", "30", "-an"])
+
+
 def media_uri(package, name):
     return "file:///data/user/0/%s/files/media/%s" % (package, name)
 
 
 def record(package, name, kind, path, extra=""):
     return '<media uri="%s" filename="%s" title="%s" type="%s" size="%d" orientation="0"%s/>' % (media_uri(package, name), name, name, kind, Path(path).stat().st_size, extra)
+
+
+def hd_clip():
+    sunset = commons_photo("sunset")
+    graph = ("[0:v]scale=2400:-2,zoompan=z='1.0+0.0006*on':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s=1920x1080:fps=30,noise=alls=14:allf=t[bg];"
+             "[bg][1:v]overlay=x='360+180*t':y='560+40*sin(t*2)':shortest=1,format=yuv420p[v]")
+    return make_media("sunset-hd.mp4", "test-video.mp4", [
+        "-loop", "1", "-framerate", "30", "-i", str(sunset), "-f", "lavfi", "-i",
+        "color=c=0xFF5A36:s=96x96:r=30,format=rgba,drawbox=x=18:y=18:w=60:h=60:color=white:t=fill",
+        "-t", "10", "-filter_complex", graph, "-map", "[v]", "-c:v", "libx264", "-preset", "veryfast",
+        "-b:v", "14M", "-maxrate", "14M", "-bufsize", "28M", "-g", "30", "-an"])
 
 
 def photo_record(package, name, path):
@@ -543,6 +592,14 @@ def video_scene(package):
     return scene_wrap("Beach Clip", 1920, 1080, 4999, body), {"demo-beach.mp4": clip, "demo-sunset.jpg": sunset}
 
 
+def long_scene(package):
+    clip = long_clip()
+    body = (record(package, "demo-long.mp4", "video/mp4", clip, ' width="1280" height="720" duration="45000000" fps="30.00"')
+            + '<shape id="1" label="Beach" startTime="0" endTime="44999" fillType="media" mediaFillMode="fill" s=".rect" fillVideo="%s" inTime="0" outTime="45000" speed="1.000000">'
+            '<transform><location value="960,540,0"/></transform><property name="size" type="vec2" value="960,540"/><gain value="1.000000"/></shape>' % media_uri(package, "demo-long.mp4"))
+    return scene_wrap("Long Clip", 1920, 1080, 44999, body), {"demo-long.mp4": clip}
+
+
 def heart_scene(package):
     lake = commons_photo("landscape")
     heart = ('<shape id="2" label="Heart" startTime="0" endTime="5999" fillType="color" mediaFillMode="fill"><transform><location value="960,500,0"/>'
@@ -551,7 +608,7 @@ def heart_scene(package):
     return scene_wrap("Heart Shape", 1920, 1080, 5999, body), {"demo-lake.jpg": lake}
 
 
-SCENES = {"demo": demo_scene, "clips": clips_scene, "video": video_scene, "heart": heart_scene}
+SCENES = {"demo": demo_scene, "clips": clips_scene, "video": video_scene, "heart": heart_scene, "long": long_scene}
 
 
 def load_spec():
@@ -597,10 +654,10 @@ def prepare(device, shots, fresh):
     install_scenes(device, names)
     device.shell("mkdir", "-p", "/sdcard/Pictures/Demo", "/sdcard/Movies/Demo")
     for label, local in (("Lake", commons_photo("landscape")), ("Sunset", commons_photo("sunset")), ("Macaw", commons_photo("colour")), ("Flower", commons_photo("flower"))):
-        device.run("push", str(local), "/sdcard/Pictures/Demo/%s.jpg" % label)
-        device.shell("am", "broadcast", "-a", "android.intent.action.MEDIA_SCANNER_SCAN_FILE", "-d", "file:///sdcard/Pictures/Demo/%s.jpg" % label)
-    device.run("push", str(beach_clip()), "/sdcard/Movies/Demo/Beach.mp4")
-    device.shell("am", "broadcast", "-a", "android.intent.action.MEDIA_SCANNER_SCAN_FILE", "-d", "file:///sdcard/Movies/Demo/Beach.mp4")
+        device.publish(local, "Pictures/Demo/%s.jpg" % label)
+    device.publish(beach_clip(), "Movies/Demo/Beach.mp4")
+    device.publish(hd_clip(), "Movies/Demo/Sunset-HD.mp4")
+    device.demo_mode()
     if fresh or any(starts_of(s).get("home") for s in shots):
         for name in names:
             device.scene(name, 45)
@@ -827,7 +884,7 @@ def command_place(args):
     if problems:
         sys.exit("\n".join(problems))
     translations = {t: json.loads((TRANSLATIONS / (t + ".json")).read_text(encoding="utf-8")) for t in tags if t != "en"}
-    changed, errors = [], []
+    changed, errors, stale = [], [], []
     for path in sorted(PAGES.glob("*.md")):
         slug = path.stem
         items = placements(spec, slug, ready)
@@ -850,17 +907,19 @@ def command_place(args):
             try:
                 body = place_in(english, page["body"], slug, tag, items, all_ids)
             except Failure as error:
-                errors.append(str(error))
+                stale.append("%s/%s" % (tag, slug))
                 continue
             if body != page["body"]:
                 page["body"] = body
                 changed.append("%s/%s" % (tag, slug))
-    if errors:
-        sys.exit("help_shots place: nothing written, fix these first:\n" + "\n".join(errors))
+    if errors or (stale and args.strict):
+        sys.exit("help_shots place: nothing written, fix these first:\n" + "\n".join(errors + ["stale translation " + name for name in stale]))
     if not args.dry_run:
         for tag, data in translations.items():
             (TRANSLATIONS / (tag + ".json")).write_text(json.dumps(data, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     print("help_shots place: %d page text(s) %s" % (len(changed), "would change" if args.dry_run else "updated"))
+    if stale:
+        print("help_shots place: skipped %d translated page(s) whose blocks no longer match the English (re-translate them, then run place again): %s" % (len(stale), ", ".join(stale)))
 
 
 def command_check(args):
@@ -939,6 +998,7 @@ def main():
     dump.add_argument("step", nargs="*")
     place = commands.add_parser("place", help="write the picture lines into the pages and every translation")
     place.add_argument("--dry-run", action="store_true")
+    place.add_argument("--strict", action="store_true", help="fail instead of skipping translated pages that no longer match the English")
     check = commands.add_parser("check", help="check the spec")
     check.add_argument("--strict", action="store_true")
     commands.add_parser("list", help="list the shots")

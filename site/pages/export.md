@@ -8,7 +8,7 @@ Tap **Export & Share** (the share icon) in the editor's top bar, or **Export** i
 
 ## The screen
 
-At the top, four lines of information: **Available space**, **Estimated file size**, **Estimated export time** and **Phone temperature**. Under them are cards for each kind of export; tap a card to select it and tap its arrow to see its options. At the bottom are the switch **Also keep a copy as a Template** and the big **Export** button.
+At the top, three lines of information: **Available space**, **Estimated file size** and **Estimated export time**. Under them is the **Filename** field, then cards for each kind of export; tap a card to select it and tap its arrow to see its options. At the bottom are the switch **Also keep a copy as a Template** and the big **Export** button.
 
 ![The Export Project screen: the information lines (1), the Video card (2), its options arrow (3), the Template switch (4) and the Export button (5).](img/export-screen.webp)
 
@@ -25,7 +25,7 @@ The button turns gray with a reason when the export cannot run: **Not enough sto
 | **GIF** | An animated GIF | Pictures/AbsentMotion |
 | **XML** | The project file only, for other tools (only from the project list) | Documents/AbsentMotion |
 
-The files are named after the project with the date and time, for example `My project 20261022_143005.mp4`. They are saved through Android's normal media storage, so other apps and the Gallery can see them. If an export fails or you cancel, the half-written file is removed.
+The **Filename** field starts as the project name and you can change it; letters, digits and the signs space, dot, dash, underscore, comma and plus are kept. In the options of Video, Current Frame, GIF and Image Sequence the switch **Random numeric filename** gives each export a random 16-digit name instead, and the field then says "Generated on export". The files are saved through Android's normal media storage, so other apps and the Gallery can see them. If an export fails or you cancel, the half-written file is removed.
 
 ## Video
 
@@ -103,7 +103,7 @@ Choices: **Transparent areas become** White (default) or Black, **Size** (720p, 
 
 ## Image Sequence
 
-One image per frame, saved in a folder named after the project as `frame_00001.png`, `frame_00002.png` and so on. Choices: **Format** (PNG, JPEG, WebP, WebP lossless, BMP), **Quality** (50 %, 70 %, 85 %, 95 % by default, 100 %, for JPEG and WebP), **Transparent areas become** (White or Black, for JPEG and BMP only), **Resolution**, **Frame Rate** (10 to 60) and **Frame Interpolation**. PNG and WebP lossless keep transparency.
+One image per frame, saved in a folder named like the **Filename** (the project name unless you change it) as `frame_00001.png`, `frame_00002.png` and so on. Choices: **Format** (PNG, JPEG, WebP, WebP lossless, BMP), **Quality** (50 %, 70 %, 85 %, 95 % by default, 100 %, for JPEG and WebP), **Transparent areas become** (White or Black, for JPEG and BMP only), **Resolution**, **Frame Rate** (10 to 60) and **Frame Interpolation**. PNG and WebP lossless keep transparency.
 
 ## Current Frame
 
@@ -120,7 +120,7 @@ One image per frame, saved in a folder named after the project as `frame_00001.p
 - **Estimates.** The size and time estimates improve as you export: the app learns from your last exports. Before that, it uses the speed measured by the check on first start. The time estimate also draws a few frames of your project at the chosen size (for GIFs and image sequences it also encodes them), so heavy effects such as VHS or blurs and big videos make it longer.
 - **Busy encoder.** If the phone's hardware video encoder is busy (for example another app holds it) or refuses the size and frame rate, the export first asks it to work at its own pace, then uses the slower software encoder and says so while it runs. Only if every encoder refuses does it stop, with "This phone's video encoder is busy or cannot make this size".
 - **Missing media.** If a project uses files that are not on the phone, the app lists them first ("Media Missing"). **Export Anyway** leaves those layers out.
-- **Heat.** If the phone gets warm, the export slows down on purpose by pausing a little after each frame, and the info line and a message say so. When it is very hot, it pauses between frames until it cools down.
+- **Heat.** If the phone gets warm, the export slows down on purpose by pausing a little after each frame, and a message says so. When it is very hot, it pauses between frames until it cools down.
 - **Leaving the app.** A video, audio, GIF, image sequence or project bundle export keeps going when you switch to another app: a notification shows its progress and has a **Cancel** button, and when the export finishes while you are away it says so. On Android 13 and newer the app asks once, at the first export, whether it may show notifications; if you say no, the export still continues, only the notification is not shown. Closing AbsentMotion from the recent apps list stops the export. While the app is open the screen stays on. There is no pause button; **Cancel** (or the Back button) first asks "Stop the export?", because the unfinished file is deleted.
 - **Check afterwards.** Finished video and audio files are opened again and checked: tracks present, length right, first and last frame readable, and a picture from the middle compared with what the project shows there, so a black or frozen video is caught. The result shows as "Checked: plays correctly". Pictures and GIFs are checked too. If something is wrong, it tells you what.
 

@@ -529,6 +529,12 @@ They show four of the photographs below ("Ruby Mountain refected in Diablo Lake"
 portrait Rhodes" and "Fleabane With Black Background"), downloaded and checked by the same code as the thumbnails, and a
 short video made from the sunset photograph. They are CC0 as well, so no credit is required.
 
+Two pictures of the help (the Video Downloader with a checked link) show the title and a small thumbnail of the film "Big
+Buck Bunny" from its YouTube page, used as the example link. The film is licensed under Creative Commons Attribution 3.0
+(https://creativecommons.org/licenses/by/3.0/): "Big Buck Bunny", (c) copyright 2008, Blender Foundation,
+www.bigbuckbunny.org. Nothing of the film is in the repository or the app; only the small thumbnail appears inside those
+two screenshots.
+
 - "Fishmonger smiling" by Wilfredor, own work, CC0 1.0, https://commons.wikimedia.org/wiki/File:Fishmonger_smiling.jpg
   (the page records the subject's consent and carries a personality rights notice).
 - "Ruby Mountain refected in Diablo Lake" by Ron Clausen, own work, CC0 1.0,

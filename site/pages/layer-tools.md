@@ -4,7 +4,11 @@ group: Interface
 order: 6
 summary: The grid of tools that appears when you select a layer, and every panel behind it.
 ---
-Tap a layer and a grid of tools opens at the bottom. The first row has five small buttons (Speed, trim and split, Volume), described in [The timeline](@timeline). Under them are large buttons whose set depends on the kind of layer.
+Tap a layer and a grid of tools opens at the bottom. The first row has five small buttons (Speed, trim and split, Volume), described in [The timeline](@timeline). A trim or extend button that cannot be used where the playhead is does not show at all. Under them are large buttons whose set depends on the kind of layer.
+
+The large buttons come in two pages. Swipe the grid sideways to go from one page to the other; two dots under it show which page you are on. A layer with only one page has no dots.
+
+![The tool grid of a selected layer: the small buttons (1), the large tool buttons (2) and the page dots (3).](img/lt-grid.webp)
 
 | Layer | Tools |
 |---|---|
@@ -12,13 +16,17 @@ Tap a layer and a grid of tools opens at the bottom. The first row has five smal
 | Path shape (pen, SVG, many shapes) | The same, with **Edit Points** instead of Shape Options |
 | Text | The same, with **Edit Text** instead of Shape Options |
 | Drawing | The same, with **Edit Drawing** instead of Shape Options |
-| Group | Transform, Presets, Effects. A group linked to an asset also has **Asset Properties**; a video cut-out made by **Remove Background (video)** also has **Cut-out Edge**. |
-| Null | Like a shape, but nothing to draw |
+| Group | Fill & Color, Frame & Shadow, Opacity, Transform, Presets, Effects. A group linked to an asset also has **Asset Properties**; a video cut-out made by **Remove Background (video)** also has **Cut-out Edge** |
+| Null | Transform, Presets, Effects |
 | Camera | Camera Options, Transform, Effects, Presets, Camera Moves |
 | 3D model | Model Options, Opacity, Transform, Presets, Effects |
 | Audio | Presets, Effects (including Voice filters), AI (Reduce Noise and Auto captions) |
 
 A photo or video is a rectangle with a picture fill, so it has the same tools as a shape.
+
+The table lists page 1. Page 2 holds **Crop** for every layer you can see except a 3D model: shapes, text, drawings, groups, photos and videos. A video clip has three more buttons there: **AI**, **Auto Captions** and **Reverse**. Audio, camera, null and 3D model layers have a single page.
+
+![The second page of a video's tool grid: Crop (1), AI (2), Auto Captions (3) and Reverse (4).](img/lt-grid-2.webp)
 
 ## Every panel
 
@@ -44,7 +52,9 @@ Move is the position, with X, Y and Z animated together. Rotate, Size, Tilt, Ske
 
 ### Crop
 
-Photos and videos have a **Crop** button. It dims the part of the layer that will be cut off and shows a frame with eight handles: drag a corner or an edge to crop, or drag inside the frame to move it. Two fingers still zoom the canvas. **Free**, **1:1**, **4:5**, **3:4**, **16:9** and **9:16** fit the largest centered crop of that shape and keep the shape while you drag. Tap a side to type its value, **Reset** removes the crop and **Done** closes the panel. The keyframe button keys all four sides together. The crop is the **Crop** effect, so you can also change it in **Effects**, with **Roundness** and **Feather**; the layer stays where it is.
+Photos, videos and the other visible layers have a **Crop** button on page 2 of the tool grid. It dims the part of the layer that will be cut off and shows a frame with eight handles: drag a corner or an edge to crop, or drag inside the frame to move it. Two fingers still zoom the canvas. **Free**, **1:1**, **4:5**, **3:4**, **16:9** and **9:16** fit the largest centered crop of that shape and keep the shape while you drag. Tap a side to type its value, **Reset** removes the crop and **Done** closes the panel. The keyframe button keys all four sides together. The crop is the **Crop** effect, so you can also change it in **Effects**, with **Roundness** and **Feather**; the layer stays where it is.
+
+![The Crop panel: the crop frame on the picture (1), the aspect buttons (2), the four sides (3) and Reset and Done (4).](img/lt-crop.webp)
 
 ### Fill & Color
 
@@ -85,6 +95,10 @@ See [Camera layers and 3D](@camera-3d).
 ### Volume
 
 For sound and for videos. See [Audio](@audio).
+
+### AI, Auto Captions and Reverse
+
+These three buttons are on page 2 of a video clip's grid. **AI** opens the AI category of the Effects Library (an audio layer has the same button on its only page). **Auto Captions** makes captions for this clip alone: see [AI tools](@ai-tools). **Reverse** plays the clip backwards: see [Media](@media).
 
 ### Effects and Presets
 

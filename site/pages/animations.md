@@ -28,15 +28,21 @@ An In animation is placed at the start of the clip, an Out animation at its end,
 
 A transition blends one clip into the next. They need two visual clips where the second starts and ends later than the first.
 
-1. Place the two clips so they touch or overlap. With nothing selected, a round **Transition** button appears at the bottom left of the timeline when the playhead is at the cut. Or select the two clips and tap **Add a transition between the two clips** in the bar at the bottom.
+1. Place the two clips so they touch or overlap. With nothing selected, a round **Transition** button appears at the bottom right of the timeline area, just above the **+** button, when the playhead is at the cut. Or select the two clips and tap **Add a transition between the two clips** in the bar at the bottom.
 2. The **Transition** sheet shows "Clip A to Clip B" and a grid of transitions with **None** first.
 3. Pick one and set the **Duration** (0.1 to 2 seconds, default 0.5).
 
+![The Transition button (1) above the Add layer button (2), where the playhead is at the cut between two clips.](img/anim-transition-button.webp)
+
 ![The transition sheet: the two clips (1), the transitions (2) and Duration (3).](img/anim-transition.webp)
 
-Available transitions: Cross dissolve, Dip to black, Dip to white, Slide left, Slide right, Slide up, Slide down, Push left, Push right, Push up, Push down, Zoom in, Zoom out, Spin, Blur, Whip pan, Glitch, Flash and Shake.
+Available transitions: Cross dissolve, Dip to black, Dip to white, Slide left, Slide right, Slide up, Slide down, Push left, Push right, Push up, Push down, Wipe right, Wipe left, Wipe up, Wipe down, Clock wipe, Zoom in, Zoom out, Spin, Blur, Glow, Swirl, Whip pan, Glitch, Flash, Shake, Pixelate and Noise dissolve. Push, Zoom in, Zoom out and Spin have motion blur. The grid scrolls: swipe it up to see the last ones.
+
+![The transition list scrolled to the end, with the newer transitions Glow (1), Swirl (2), Pixelate (3) and Noise dissolve (4).](img/anim-transition-new.webp)
 
 If the clips do not overlap enough, the app moves or shortens them and tells you, for example "Moved ... earlier so the clips overlap." and "Shortened to 0.5 s to fit the clips." Sound, camera and null layers cannot have transitions.
+
+To get the **Transition** button out of the way, swipe it sideways towards the edge of the screen; it comes back when you move the playhead. **Settings > Editor > Transition button in preview** moves it to the bottom left of the preview.
 
 ## Make your own
 
