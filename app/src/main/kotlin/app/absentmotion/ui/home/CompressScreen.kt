@@ -179,6 +179,8 @@ internal fun CompressScreen(onClose: () -> Unit) {
     }) {
         Spacer(Modifier.height(20.dp))
         PickCard(picked, unreadable, !running) { picker.launch() }
+        val done = step as? Step.Done
+        if (done != null && picked != null) ResultPreview(done.result, picked!!.uri)
         SectionTitle(stringResource(R.string.compress_how_small))
         for ((value, title, about) in Levels) {
             ChoiceRow(stringResource(title), stringResource(about), level == value, enabled = !running) { change { level = value } }
@@ -189,6 +191,22 @@ internal fun CompressScreen(onClose: () -> Unit) {
         }
         if (level == CompressLevel.Custom) CustomPanel(source?.video != false, custom, !running) { next -> change { custom = next } }
         Spacer(Modifier.height(24.dp))
+    }
+}
+
+@Composable
+private fun ResultPreview(result: Compressed, original: android.net.Uri) {
+    var before by remember(result) { mutableStateOf(false) }
+    SectionTitle(stringResource(R.string.compress_result))
+    Chips(listOf(stringResource(R.string.compress_after), stringResource(R.string.compress_before)), if (before) 1 else 0, true) { before = it == 1 }
+    Spacer(Modifier.height(8.dp))
+    Box(Modifier.fillMaxWidth().height(320.dp).clip(RoundedCornerShape(12.dp)).background(Am.Scrim)) {
+        androidx.compose.runtime.key(before) {
+            app.absentmotion.platform.ExportMediaPreview(
+                if (result.video) app.absentmotion.export.ExportKind.Video else app.absentmotion.export.ExportKind.Frame,
+                listOf(if (before) original else android.net.Uri.fromFile(result.file)),
+            )
+        }
     }
 }
 

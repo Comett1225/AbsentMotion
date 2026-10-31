@@ -177,10 +177,9 @@ class FrameInterpolationTest {
         val layer = clip(speed = "0.001")
         assertTrue(layer.needsAt(project, 0, stamps, 30))
         assertPair(stamps[0], stamps[0], 0f, layer.pairAt(project, 0, stamps))
-        assertPair(stamps[0], stamps[0], 0f, layer.pairAt(project, 4, stamps))
-        assertPair(stamps[0], stamps[1], 0.5f, layer.pairAt(project, 500, stamps))
-        assertPair(stamps[1], stamps[1], 0f, layer.pairAt(project, 1000, stamps))
-        assertPair(stamps[1], stamps[2], 0.25f, layer.pairAt(project, 1250, stamps))
+        assertPair(stamps[0], stamps[1], 0.5f, layer.pairAt(project, 10, stamps))
+        assertPair(stamps[1], stamps[1], 0f, layer.pairAt(project, 20, stamps))
+        assertPair(stamps[1], stamps[2], 0.25f, layer.pairAt(project, 25, stamps))
     }
 
     @Test fun aSpeedRampIsInterpolatedOnlyWhereItSlowsBelowTheExportRate() {

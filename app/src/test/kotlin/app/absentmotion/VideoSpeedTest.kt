@@ -39,6 +39,6 @@ class VideoSpeedTest {
     @Test fun aLongClipAtTheLowestSpeedDoesNotWrapItsEnd() {
         val slowed = videoLayer(1000, 1000 + 40 * 60_000).withVideoSpeedMap(XmlNode("speedMap", mapOf("value" to "0.001")))
         assertTrue(slowed.endTime > slowed.startTime)
-        assertEquals(Int.MAX_VALUE, slowed.endTime)
+        assertEquals((1000 + 40 * 60_000 * 20).toDouble(), slowed.endTime.toDouble(), 2.0)
     }
 }

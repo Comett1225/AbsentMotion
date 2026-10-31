@@ -55,7 +55,8 @@ class AppLanguageTest {
 
     @Test fun unsupportedLanguagesFallBackToTheNextPhoneLanguageThenEnglish() {
         assertEquals(AppLanguage.English, pick("zh-CN"))
-        assertEquals(AppLanguage.English, pick("zh-Hant-TW", "ja-JP"))
+        assertEquals(AppLanguage.English, pick("zh-Hant-TW", "ko-KR"))
+        assertEquals(AppLanguage.Japanese, pick("zh-Hant-TW", "ja-JP"))
         assertEquals(AppLanguage.Russian, pick("zh-CN", "ru-RU", "en-US"))
         assertEquals(AppLanguage.English, pick())
         assertEquals(AppLanguage.English, pick(""))

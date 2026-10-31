@@ -1,0 +1,5656 @@
+{
+ "categories": {
+  "3d": "3D",
+  "ai": "AI",
+  "blur": "ブラー",
+  "color": "カラー",
+  "distort": "歪み",
+  "key": "キー",
+  "move": "移動",
+  "new": "新着",
+  "noise": "ノイズ",
+  "repeat": "繰り返し",
+  "stylize": "スタイライズ",
+  "text": "テキスト"
+ },
+ "effects": {
+  "autoshake": {
+   "description": "設定した範囲内でレイヤーを時間経過に沿ってランダムに動かします。",
+   "name": "オートシェイク",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "evolution": {
+     "label": "変化"
+    },
+    "frequency": {
+     "label": "頻度"
+    },
+    "magnitude": {
+     "label": "強さ"
+    },
+    "pattern": {
+     "label": "パターン",
+     "options": [
+      "クラシック",
+      "標準"
+     ]
+    },
+    "seed": {
+     "label": "シード"
+    },
+    "slack": {
+     "label": "ゆるみ"
+    },
+    "zshake": {
+     "label": "Zシェイク"
+    }
+   }
+  },
+  "backdrop": {
+   "description": "レイヤーの下に描画された内容をコピーし、後続のエフェクトで変更できるようにします。レイヤーにマスクすると、コピーはレイヤーの不透明な部分だけに限定されます。ミックスでレイヤーの塗りを戻します。エフェクトを外側に広げると、ストレッチなどの後続エフェクトでコピーをレイヤーの端の外まで広げられます。",
+   "name": "調整レイヤー",
+   "params": {
+    "mask": {
+     "label": "レイヤーにマスク"
+    },
+    "mix": {
+     "label": "ミックス"
+    },
+    "spill": {
+     "label": "エフェクトを外側に広げる"
+    }
+   }
+  },
+  "bend": {
+   "description": "レイヤーを円弧に沿って曲げます。原点側は固定され、反対側は設定した角度まで回転します（正の角度は左方向）。長く細いレイヤーに最適です。",
+   "name": "ベンド",
+   "params": {
+    "amount": {
+     "label": "角度"
+    },
+    "before": {
+     "label": "開始前",
+     "options": [
+      "固定",
+      "同じ側に曲げる",
+      "反対側に曲げる"
+     ]
+    },
+    "origin": {
+     "label": "原点",
+     "options": [
+      "左",
+      "右",
+      "上",
+      "下"
+     ]
+    },
+    "start": {
+     "label": "開始"
+    },
+    "tuneHead": {
+     "label": "先端を調整"
+    },
+    "tuneTail": {
+     "label": "末端を調整"
+    }
+   }
+  },
+  "blink": {
+   "description": "レイヤーを1秒間に指定した回数だけ表示・非表示に切り替えます。",
+   "name": "点滅",
+   "params": {
+    "frequency": {
+     "label": "頻度"
+    }
+   }
+  },
+  "blockdissolve": {
+   "description": "レイヤーからランダムなグリッド状のブロックを消します。強さをアニメーションすると、消えるブロックが増えていきます。",
+   "name": "ブロックディゾルブ",
+   "params": {
+    "blockSize": {
+     "label": "サイズ"
+    },
+    "fade": {
+     "label": "フェード"
+    },
+    "offset": {
+     "label": "オフセット"
+    },
+    "seed": {
+     "label": "シード"
+    },
+    "strength": {
+     "label": "強さ"
+    },
+    "stretch": {
+     "label": "ストレッチ"
+    }
+   }
+  },
+  "blocknoise": {
+   "description": "レイヤー上にランダムなブロック状のノイズをちらつかせます。乗算は既存の色を変調し、加算は色にノイズを加えます。固定するとパターンが静止します。",
+   "name": "ブロックノイズ",
+   "params": {
+    "blending": {
+     "label": "ブレンドモード",
+     "options": [
+      "加算",
+      "乗算"
+     ]
+    },
+    "blockSize": {
+     "label": "サイズ"
+    },
+    "extremes": {
+     "label": "極端"
+    },
+    "freeze": {
+     "label": "固定"
+    },
+    "mono": {
+     "label": "モノクロ"
+    },
+    "offset": {
+     "label": "オフセット"
+    },
+    "overshoot": {
+     "label": "オーバーシュート"
+    },
+    "seed": {
+     "label": "シード"
+    },
+    "strength": {
+     "label": "強さ"
+    },
+    "stretch": {
+     "label": "ストレッチ"
+    }
+   }
+  },
+  "blur": {
+   "description": "滑らかで均一なぼかしです。",
+   "name": "ぼかし",
+   "params": {
+    "strength": {
+     "label": "強さ"
+    }
+   }
+  },
+  "box": {
+   "description": "レイヤーを、指定した幅・高さ・奥行きのボックスに巻き付けます。",
+   "name": "ボックス",
+   "params": {
+    "depth": {
+     "label": "奥行き"
+    },
+    "height": {
+     "label": "高さ"
+    },
+    "light": {
+     "label": "光の角度"
+    },
+    "perspective": {
+     "label": "遠近感"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "rotX": {
+     "label": "回転X"
+    },
+    "rotY": {
+     "label": "Y軸回転"
+    },
+    "rotZ": {
+     "label": "Z軸回転"
+    },
+    "scale": {
+     "label": "スケール"
+    },
+    "shading": {
+     "label": "シェーディング"
+    },
+    "shine": {
+     "label": "光沢"
+    },
+    "smoothing": {
+     "label": "スムージング"
+    },
+    "width": {
+     "label": "幅"
+    }
+   }
+  },
+  "brightnesscontrast": {
+   "description": "画像の明るさとコントラストを調整します。",
+   "name": "明るさとコントラスト",
+   "params": {
+    "brightness": {
+     "label": "明るさ"
+    },
+    "contrast": {
+     "label": "コントラスト"
+    },
+    "style": {
+     "label": "スタイル",
+     "options": [
+      "チャンネルごと",
+      "色を保持"
+     ]
+    }
+   }
+  },
+  "bulge": {
+   "description": "レイヤーをレンズのように膨らませ（正の強さ）、または半径内で中心に向かってピンチします（負、半径はレイヤーサイズに対する割合）。",
+   "name": "ピンチ/バルジ",
+   "params": {
+    "amount": {
+     "label": "強さ"
+    },
+    "center": {
+     "label": "中心"
+    },
+    "radius": {
+     "label": "半径"
+    }
+   }
+  },
+  "bumpmap": {
+   "description": "レイヤーの明るさを隆起した表面としてライティングし、色を保ったままエンボス風の質感にします。",
+   "name": "バンプマップ",
+   "params": {
+    "ambient": {
+     "label": "環境光"
+    },
+    "angle": {
+     "label": "光の角度"
+    },
+    "height": {
+     "label": "高さ"
+    },
+    "light": {
+     "label": "光の色"
+    },
+    "shine": {
+     "label": "光沢"
+    }
+   }
+  },
+  "channelremap": {
+   "description": "各カラーチャンネルをレイヤーの別チャンネルから再構築し、フォルスカラーや輝度をアルファへ移動するのに使います。",
+   "name": "チャンネルリマップ（RGB）",
+   "params": {
+    "a": {
+     "label": "A",
+     "options": [
+      "赤",
+      "緑",
+      "青",
+      "アルファ",
+      "輝度",
+      "ゼロ",
+      "フル"
+     ]
+    },
+    "b": {
+     "label": "B",
+     "options": [
+      "赤",
+      "緑",
+      "青",
+      "アルファ",
+      "輝度",
+      "ゼロ",
+      "フル"
+     ]
+    },
+    "g": {
+     "label": "G",
+     "options": [
+      "赤",
+      "緑",
+      "青",
+      "アルファ",
+      "輝度",
+      "ゼロ",
+      "フル"
+     ]
+    },
+    "r": {
+     "label": "R",
+     "options": [
+      "赤",
+      "緑",
+      "青",
+      "アルファ",
+      "輝度",
+      "ゼロ",
+      "フル"
+     ]
+    }
+   }
+  },
+  "channelremaphsv": {
+   "description": "レイヤーの他のチャンネルから色相・彩度・明度・アルファを再構築します。",
+   "name": "チャンネルリマップ（HSV）",
+   "params": {
+    "a": {
+     "label": "A",
+     "options": [
+      "色相",
+      "彩度",
+      "明度",
+      "アルファ",
+      "輝度",
+      "ゼロ",
+      "フル"
+     ]
+    },
+    "h": {
+     "label": "H",
+     "options": [
+      "色相",
+      "彩度",
+      "明度",
+      "アルファ",
+      "輝度",
+      "ゼロ",
+      "フル"
+     ]
+    },
+    "s": {
+     "label": "S",
+     "options": [
+      "色相",
+      "彩度",
+      "明度",
+      "アルファ",
+      "輝度",
+      "ゼロ",
+      "フル"
+     ]
+    },
+    "v": {
+     "label": "V",
+     "options": [
+      "色相",
+      "彩度",
+      "明度",
+      "アルファ",
+      "輝度",
+      "ゼロ",
+      "フル"
+     ]
+    }
+   }
+  },
+  "checker": {
+   "description": "レイヤーの不透明部分にチェッカーボードを描画、またはチェッカーでくり抜きます。",
+   "name": "チェッカー",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "color": {
+     "label": "色"
+    },
+    "count": {
+     "label": "数"
+    },
+    "offset": {
+     "label": "オフセット"
+    },
+    "punch": {
+     "label": "くり抜き"
+    },
+    "screenSpace": {
+     "label": "スクリーン空間"
+    },
+    "stretch": {
+     "label": "ストレッチ"
+    }
+   }
+  },
+  "chromakey": {
+   "description": "グリーンスクリーンなど、1色を除去します。",
+   "name": "クロマキー",
+   "params": {
+    "invert": {
+     "label": "反転"
+    },
+    "key": {
+     "label": "キーカラー"
+    },
+    "softness": {
+     "label": "ぼかし"
+    },
+    "tolerance": {
+     "label": "許容値"
+    }
+   }
+  },
+  "chromaticzoomblur": {
+   "description": "中心点から青を内側、赤を外側に引くズームブラーで、エッジが虹色の縞に広がります。",
+   "name": "色収差ズームブラー",
+   "params": {
+    "amount": {
+     "label": "強さ"
+    },
+    "center": {
+     "label": "中心"
+    }
+   }
+  },
+  "circularripple": {
+   "description": "水滴が落ちたように、点から円形の波紋を広げます。",
+   "name": "円形リップル",
+   "params": {
+    "center": {
+     "label": "中心"
+    },
+    "feather": {
+     "label": "ぼかし"
+    },
+    "frequency": {
+     "label": "周波数"
+    },
+    "phase": {
+     "label": "位相"
+    },
+    "radius": {
+     "label": "半径"
+    },
+    "strength": {
+     "label": "強さ"
+    }
+   }
+  },
+  "clouds": {
+   "description": "レイヤーの不透明部分を柔らかな雲模様で覆います。ノイズ源としても便利です。",
+   "name": "雲",
+   "params": {
+    "color1": {
+     "label": "色1"
+    },
+    "color2": {
+     "label": "色2"
+    },
+    "intensity": {
+     "label": "強度"
+    },
+    "octaves": {
+     "label": "オクターブ"
+    },
+    "offset": {
+     "label": "オフセット"
+    },
+    "parallax": {
+     "label": "視差"
+    },
+    "scale": {
+     "label": "スケール"
+    },
+    "seed": {
+     "label": "シード"
+    },
+    "stretch": {
+     "label": "ストレッチ"
+    }
+   }
+  },
+  "cmykhalftone": {
+   "description": "レイヤーを雑誌印刷風に再描画します。シアン、マゼンタ、イエロー、ブラックのドットを4つの回転スクリーンで表現します。",
+   "name": "CMYKハーフトーンドット",
+   "params": {
+    "amount": {
+     "label": "量"
+    },
+    "angle": {
+     "label": "角度"
+    },
+    "black": {
+     "label": "黒"
+    },
+    "phase": {
+     "label": "位相"
+    },
+    "strength": {
+     "label": "強さ"
+    }
+   }
+  },
+  "colorbalance": {
+   "description": "シャドウ、ミッドトーン、ハイライトをそれぞれの色に寄せます（グレーは変化しません）。",
+   "name": "カラーバランス",
+   "params": {
+    "amount": {
+     "label": "量"
+    },
+    "highlights": {
+     "label": "ハイライト"
+    },
+    "midtones": {
+     "label": "ミッドトーン"
+    },
+    "shadows": {
+     "label": "シャドウ"
+    }
+   }
+  },
+  "colorize": {
+   "description": "レイヤー全体を1つの色相で着色します。「明暗」はレイヤーの明るさを色相に割り当て、「明るさを保持」は各ピクセルの明るさを保ったまま色相の色に置き換えます。",
+   "name": "カラーライズ",
+   "params": {
+    "amount": {
+     "label": "量"
+    },
+    "hue": {
+     "label": "色相"
+    },
+    "style": {
+     "label": "スタイル",
+     "options": [
+      "明暗",
+      "明るさを保持"
+     ]
+    }
+   }
+  },
+  "colorwheels": {
+   "description": "シャドウ（リフト）、ミッドトーン（ガンマ）、ハイライト（ゲイン）のカラーホイールです。色相、寄せる量、レベルを設定します。オフセットはすべての階調をシフトします。「明るさで重み付け」スタイルは各ホイールをピクセルの明るさで重み付けします。",
+   "name": "リフトガンマゲイン",
+   "params": {
+    "gainAmount": {
+     "label": "ゲイン量"
+    },
+    "gainHue": {
+     "label": "ゲイン色相"
+    },
+    "gainLevel": {
+     "label": "ゲインレベル"
+    },
+    "gammaAmount": {
+     "label": "ガンマ量"
+    },
+    "gammaHue": {
+     "label": "ガンマ色相"
+    },
+    "gammaLevel": {
+     "label": "ガンマレベル"
+    },
+    "liftAmount": {
+     "label": "リフト量"
+    },
+    "liftHue": {
+     "label": "リフト色相"
+    },
+    "liftLevel": {
+     "label": "リフトレベル"
+    },
+    "offsetAmount": {
+     "label": "オフセット量"
+    },
+    "offsetHue": {
+     "label": "オフセット色相"
+    },
+    "offsetLevel": {
+     "label": "オフセットレベル"
+    },
+    "style": {
+     "label": "スタイル",
+     "options": [
+      "クラシック",
+      "明るさで重み付け"
+     ]
+    }
+   }
+  },
+  "contourgradient": {
+   "description": "レイヤーの不透明部分の縁から外側へ、柔らかな色のハローのように2色グラデーションを描きます。",
+   "name": "輪郭グラデーション",
+   "params": {
+    "alpha": {
+     "label": "アルファ"
+    },
+    "blur": {
+     "label": "幅"
+    },
+    "color1": {
+     "label": "色1"
+    },
+    "color2": {
+     "label": "色2"
+    },
+    "fade": {
+     "label": "フェード"
+    },
+    "fill": {
+     "label": "塗り"
+    }
+   }
+  },
+  "contourlines": {
+   "description": "レイヤーの不透明部分の周囲に輪郭のリングを描画し、重ねたステッカーやネオンの縁取りに使えます。",
+   "name": "コンターライン",
+   "params": {
+    "alpha": {
+     "label": "アルファ"
+    },
+    "blur": {
+     "label": "外側"
+    },
+    "color": {
+     "label": "色"
+    },
+    "count": {
+     "label": "本数"
+    },
+    "fill": {
+     "label": "塗り"
+    },
+    "phase": {
+     "label": "位相"
+    },
+    "width": {
+     "label": "幅"
+    }
+   }
+  },
+  "contourstrips": {
+   "description": "レイヤーの明るさや不透明度に合わせて高さが変わる紙の帯を重ねて描画し、稜線のような風景を作れます。",
+   "name": "コンターストリップ",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "color1": {
+     "label": "色1"
+    },
+    "color2": {
+     "label": "色2"
+    },
+    "count": {
+     "label": "本数"
+    },
+    "edgeColor": {
+     "label": "縁の色"
+    },
+    "height": {
+     "label": "高さ"
+    },
+    "invert": {
+     "label": "反転"
+    },
+    "light": {
+     "label": "ライトの色"
+    },
+    "lightAngle": {
+     "label": "ライトの角度"
+    },
+    "map": {
+     "label": "高さマップ",
+     "options": [
+      "アルファ",
+      "輝度"
+     ]
+    },
+    "mask": {
+     "label": "レイヤーにマスク"
+    },
+    "phase": {
+     "label": "位相"
+    },
+    "thickness": {
+     "label": "太さ"
+    }
+   }
+  },
+  "countupdown": {
+   "description": "テキストレイヤー内の数値をまとめて変化させます。乗算を0%から100%へキーフレーム設定すると入力した数値までカウントアップし、数値以外の文字はそのまま残ります。",
+   "name": "カウントアップ/ダウン",
+   "params": {
+    "add": {
+     "label": "加算"
+    },
+    "decimals": {
+     "label": "小数点以下の桁数",
+     "options": [
+      "入力どおり",
+      "0",
+      "1",
+      "2",
+      "3"
+     ]
+    },
+    "multiply": {
+     "label": "乗算"
+    },
+    "separator": {
+     "label": "桁区切り",
+     "options": [
+      "1000.5",
+      "1,000.5",
+      "1.000,5",
+      "1 000.5"
+     ]
+    }
+   },
+   "presets": {
+    "count-up": "カウントアップ"
+   }
+  },
+  "crop": {
+   "description": "レイヤーの端を切り取ります。左・上・右・下はレイヤー自体の幅または高さに対して各辺をどれだけ切り取るかを指定し、角丸は角を丸め、フェザーは縁をぼかします。レイヤーの位置は変わりません。",
+   "name": "クロップ",
+   "params": {
+    "bottom": {
+     "label": "下"
+    },
+    "feather": {
+     "label": "フェザー"
+    },
+    "left": {
+     "label": "左"
+    },
+    "radius": {
+     "label": "角丸"
+    },
+    "right": {
+     "label": "右"
+    },
+    "top": {
+     "label": "上"
+    }
+   }
+  },
+  "cross": {
+   "description": "レイヤーを中央で交差する3本のバーに配置します。",
+   "name": "3軸クロス",
+   "params": {
+    "light": {
+     "label": "光の角度"
+    },
+    "perspective": {
+     "label": "パースペクティブ"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "reach": {
+     "label": "長さ"
+    },
+    "rotX": {
+     "label": "X回転"
+    },
+    "rotY": {
+     "label": "Y回転"
+    },
+    "rotZ": {
+     "label": "Z回転"
+    },
+    "scale": {
+     "label": "スケール"
+    },
+    "shading": {
+     "label": "シェーディング"
+    },
+    "shine": {
+     "label": "光沢"
+    },
+    "smoothing": {
+     "label": "スムージング"
+    },
+    "thickness": {
+     "label": "太さ"
+    }
+   }
+  },
+  "cube": {
+   "description": "レイヤーを丸みのある回転キューブの各面に貼り付け、ライティングを加えます。",
+   "name": "キューブ",
+   "params": {
+    "edge": {
+     "label": "サイズ"
+    },
+    "light": {
+     "label": "光の角度"
+    },
+    "perspective": {
+     "label": "パースペクティブ"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "rotX": {
+     "label": "X回転"
+    },
+    "rotY": {
+     "label": "Y回転"
+    },
+    "rotZ": {
+     "label": "Z回転"
+    },
+    "scale": {
+     "label": "スケール"
+    },
+    "shading": {
+     "label": "シェーディング"
+    },
+    "shine": {
+     "label": "光沢"
+    },
+    "smoothing": {
+     "label": "スムージング"
+    }
+   }
+  },
+  "curl": {
+   "description": "レイヤーの片端を円形に巻き、もう片端は平らなままにします。オフセットをアニメーションして巻いたりほどいたりできます。横長で薄いレイヤーに最適です。",
+   "name": "カール",
+   "params": {
+    "curlFrom": {
+     "label": "カール開始",
+     "options": [
+      "左",
+      "右"
+     ]
+    },
+    "direction": {
+     "label": "方向",
+     "options": [
+      "上",
+      "下"
+     ]
+    },
+    "offset": {
+     "label": "オフセット"
+    },
+    "radius": {
+     "label": "半径"
+    },
+    "stretch": {
+     "label": "ストレッチ"
+    }
+   }
+  },
+  "cylinder": {
+   "description": "レイヤーをシリンダーの側面と丸い両端に巻き付けます。",
+   "name": "シリンダー",
+   "params": {
+    "height": {
+     "label": "高さ"
+    },
+    "light": {
+     "label": "光の角度"
+    },
+    "perspective": {
+     "label": "パースペクティブ"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "radius": {
+     "label": "半径"
+    },
+    "rotX": {
+     "label": "X回転"
+    },
+    "rotY": {
+     "label": "Y回転"
+    },
+    "rotZ": {
+     "label": "Z回転"
+    },
+    "scale": {
+     "label": "スケール"
+    },
+    "shading": {
+     "label": "シェーディング"
+    },
+    "shine": {
+     "label": "光沢"
+    },
+    "smoothing": {
+     "label": "スムージング"
+    }
+   }
+  },
+  "darkglow": {
+   "description": "影のグローのように、レイヤーの暗い部分を明るい部分へ広げます。",
+   "name": "ダークグロー",
+   "params": {
+    "alpha": {
+     "label": "アルファ"
+    },
+    "blend": {
+     "label": "ブレンド"
+    },
+    "blur": {
+     "label": "拡散"
+    },
+    "color": {
+     "label": "色"
+    },
+    "threshold": {
+     "label": "しきい値"
+    }
+   }
+  },
+  "datamosh": {
+   "description": "レイヤー先頭からの秒数で指定した開始から終了までの間、映像の更新を止め、続く動きに引きずられるようにします。キーフレームが抜けたような見た目になります。動画レイヤーは実際の動きで、それ以外のレイヤーは動くブロックでにじませます。",
+   "name": "Datamosh",
+   "params": {
+    "block": {
+     "label": "ブロックサイズ"
+    },
+    "bloom": {
+     "label": "ブルーム"
+    },
+    "decay": {
+     "label": "減衰"
+    },
+    "end": {
+     "label": "終了"
+    },
+    "glitch": {
+     "label": "グリッチ"
+    },
+    "intensity": {
+     "label": "強さ"
+    },
+    "start": {
+     "label": "開始"
+    }
+   }
+  },
+  "denoise": {
+   "description": "色が近いピクセルだけを平均するエッジ保持バイラテラルフィルタで、画像のノイズを除去します。",
+   "name": "ノイズ除去",
+   "params": {
+    "detail": {
+     "label": "ディテール"
+    },
+    "radius": {
+     "label": "半径"
+    },
+    "strength": {
+     "label": "強さ"
+    }
+   }
+  },
+  "directionalblur": {
+   "description": "指定した角度に沿ってサンプルを平均し、モーションブラーをかけます。",
+   "name": "方向ブラー",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "blurLength": {
+     "label": "長さ"
+    }
+   }
+  },
+  "displacementmap": {
+   "description": "レイヤーの色で後ろのレイヤーを押し出して自身は非表示になります。マップを「下のレイヤー」にすると、下のレイヤーでこのレイヤーを押し出します。",
+   "name": "変位マップ",
+   "params": {
+    "edges": {
+     "label": "端の処理",
+     "options": [
+      "繰り返し",
+      "ミラー",
+      "透明",
+      "タイル"
+     ]
+    },
+    "fromCenter": {
+     "label": "中心から"
+    },
+    "invert": {
+     "label": "反転"
+    },
+    "map": {
+     "label": "マップ",
+     "options": [
+      "このレイヤー",
+      "下のレイヤー"
+     ]
+    },
+    "offset": {
+     "label": "オフセット"
+    },
+    "xchannel": {
+     "label": "X",
+     "options": [
+      "R",
+      "G",
+      "B"
+     ]
+    },
+    "ychannel": {
+     "label": "Y",
+     "options": [
+      "R",
+      "G",
+      "B"
+     ]
+    }
+   }
+  },
+  "dissolve": {
+   "description": "レイヤーからランダムにピクセルやブロックを消します。強さをアニメーションさせるとディゾルブ遷移になり、シードでパターン、サイズで粒の大きさを決められます。",
+   "name": "ディゾルブ",
+   "params": {
+    "grain": {
+     "label": "サイズ"
+    },
+    "progress": {
+     "label": "強さ"
+    },
+    "seed": {
+     "label": "シード"
+    }
+   }
+  },
+  "dots": {
+   "description": "レイヤー上にランダムで均一な柔らかいドットのパターンを描画します。レイヤーをドットのマスクとしてのみ使うこともできます。",
+   "name": "ドット",
+   "params": {
+    "alpha": {
+     "label": "アルファ"
+    },
+    "blend": {
+     "label": "ブレンドモード",
+     "options": [
+      "通常",
+      "乗算",
+      "スクリーン"
+     ]
+    },
+    "color1": {
+     "label": "カラー1"
+    },
+    "color2": {
+     "label": "カラー2"
+    },
+    "density": {
+     "label": "密度"
+    },
+    "feather": {
+     "label": "フェザー"
+    },
+    "fill": {
+     "label": "塗り"
+    },
+    "offset": {
+     "label": "オフセット"
+    },
+    "phase": {
+     "label": "フェーズ"
+    },
+    "radius": {
+     "label": "半径"
+    },
+    "scale": {
+     "label": "スケール"
+    },
+    "seed": {
+     "label": "シード"
+    },
+    "slack": {
+     "label": "ゆらぎ"
+    }
+   }
+  },
+  "drawingprogress": {
+   "description": "フリーハンドの線や図形の輪郭を、開始から終了まで順に描画します。終了を0%から100%へキーフレームすると描かれる様子を確認できます。塗りをオフにしてストロークを設定した図形で最適に動作します。",
+   "name": "描画の進行",
+   "params": {
+    "end": {
+     "label": "終了"
+    },
+    "start": {
+     "label": "開始"
+    }
+   }
+  },
+  "duotone": {
+   "description": "輝度に基づく2色のグラデーションマップを適用します。コントラストと量で調整できます。",
+   "name": "デュオトーン",
+   "params": {
+    "amount": {
+     "label": "適用量"
+    },
+    "color1": {
+     "label": "影の色"
+    },
+    "color2": {
+     "label": "ハイライトの色"
+    },
+    "contrast": {
+     "label": "コントラスト"
+    }
+   }
+  },
+  "echo": {
+   "description": "少し前の状態のレイヤーを、アニメーションに沿って複製して描画します。",
+   "name": "エコーキーフレーム",
+   "params": {
+    "alpha": {
+     "label": "アルファ"
+    },
+    "composite": {
+     "label": "合成",
+     "options": [
+      "背面",
+      "前面"
+     ]
+    },
+    "count": {
+     "label": "回数"
+    },
+    "seconds": {
+     "label": "秒"
+    }
+   }
+  },
+  "edgedetect": {
+   "description": "画像が変化する部分を明るい線で、それ以外を暗く描画します。",
+   "name": "エッジ検出",
+   "params": {
+    "strength": {
+     "label": "強さ"
+    }
+   }
+  },
+  "edgeglow": {
+   "description": "レイヤーのエッジを検出し、暗くした画像の上でネオンのように光らせます。",
+   "name": "エッジグロー",
+   "params": {
+    "blend": {
+     "label": "ブレンド"
+    },
+    "blur": {
+     "label": "ぼかし"
+    },
+    "color": {
+     "label": "色"
+    },
+    "invert": {
+     "label": "反転"
+    },
+    "spread": {
+     "label": "広がり"
+    },
+    "threshold": {
+     "label": "しきい値"
+    }
+   }
+  },
+  "electricedges": {
+   "description": "レイヤーの周囲に光る輪郭を描画します。SeedやEvolutionをアニメーションすると電気のように揺れ、内側に等高線も表示できます。",
+   "name": "エレクトリックエッジ",
+   "params": {
+    "alpha": {
+     "label": "アルファ"
+    },
+    "blur": {
+     "label": "距離"
+    },
+    "color": {
+     "label": "色"
+    },
+    "contourAngle": {
+     "label": "等高線の角度"
+    },
+    "contours": {
+     "label": "等高線を描画"
+    },
+    "count": {
+     "label": "等高線の数"
+    },
+    "detail": {
+     "label": "詳細"
+    },
+    "distortion": {
+     "label": "ひずみ"
+    },
+    "evolution": {
+     "label": "エボリューション"
+    },
+    "fill": {
+     "label": "塗り"
+    },
+    "glow": {
+     "label": "グロー"
+    },
+    "glowColor": {
+     "label": "グローの色"
+    },
+    "maskColor": {
+     "label": "マスクの色"
+    },
+    "maskEvolution": {
+     "label": "マスクのエボリューション"
+    },
+    "maskScale": {
+     "label": "マスクのスケール"
+    },
+    "maskSeed": {
+     "label": "マスクのシード"
+    },
+    "maskStrength": {
+     "label": "マスクの強さ"
+    },
+    "phase": {
+     "label": "等高線の位相"
+    },
+    "seed": {
+     "label": "シード"
+    },
+    "thickness": {
+     "label": "太さ"
+    }
+   }
+  },
+  "ellipsoid": {
+   "description": "レイヤーを球体に巻き付け、押しつぶしたり平らにしたりできます。",
+   "name": "楕円体",
+   "params": {
+    "flattenRatio": {
+     "label": "平坦化"
+    },
+    "light": {
+     "label": "光源の角度"
+    },
+    "perspective": {
+     "label": "パースペクティブ"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "radius": {
+     "label": "半径"
+    },
+    "rotX": {
+     "label": "回転X"
+    },
+    "rotY": {
+     "label": "回転Y"
+    },
+    "rotZ": {
+     "label": "回転Z"
+    },
+    "scale": {
+     "label": "スケール"
+    },
+    "shading": {
+     "label": "シェーディング"
+    },
+    "shine": {
+     "label": "光沢"
+    },
+    "squeezeRatio": {
+     "label": "圧縮"
+    }
+   }
+  },
+  "emboss": {
+   "description": "指定した光源の角度に沿った輝度のグラデーションでエンボス効果を適用します。",
+   "name": "エンボス",
+   "params": {
+    "angle": {
+     "label": "光の角度"
+    },
+    "strength": {
+     "label": "強さ"
+    }
+   }
+  },
+  "energybeam": {
+   "description": "2点間に、明るいコアと柔らかなハローを持つ光のビームを描画します。長さ方向に揺らしたり伸ばしたりできます。",
+   "name": "エネルギービーム",
+   "params": {
+    "blend": {
+     "label": "ブレンド",
+     "options": [
+      "加算",
+      "スクリーン",
+      "通常"
+     ]
+    },
+    "color": {
+     "label": "グローの色"
+    },
+    "dim": {
+     "label": "背景を暗く"
+    },
+    "evolution": {
+     "label": "変化"
+    },
+    "frequency": {
+     "label": "周波数"
+    },
+    "from": {
+     "label": "開始点"
+    },
+    "glow": {
+     "label": "グロー"
+    },
+    "halo": {
+     "label": "ハロー"
+    },
+    "haloColor": {
+     "label": "ハローの色"
+    },
+    "haloWidth": {
+     "label": "ハローの幅"
+    },
+    "opacity": {
+     "label": "不透明度"
+    },
+    "progress": {
+     "label": "進行度"
+    },
+    "span": {
+     "label": "長さ"
+    },
+    "to": {
+     "label": "終了点"
+    },
+    "width": {
+     "label": "幅"
+    },
+    "wiggle": {
+     "label": "揺れ"
+    }
+   }
+  },
+  "exposure": {
+   "description": "ストップ、オフセット、ガンマ補正で写真の露出を再現します。半透明部分を明るくすると、ぼかした輪郭などの半透明のピクセルを白より明るくできます。",
+   "name": "露出",
+   "params": {
+    "gamma": {
+     "label": "ガンマ"
+    },
+    "offset": {
+     "label": "オフセット"
+    },
+    "soft": {
+     "label": "半透明部分を明るく"
+    },
+    "stops": {
+     "label": "ストップ"
+    }
+   }
+  },
+  "fade": {
+   "description": "レイヤーの開始時にフェードインし、終了時にフェードアウトします。時間は設定できます。",
+   "name": "フェードイン/アウト",
+   "params": {
+    "fadeIn": {
+     "label": "イン"
+    },
+    "fadeOut": {
+     "label": "アウト"
+    }
+   }
+  },
+  "feather": {
+   "description": "レイヤーのアルファの輪郭を柔らかくします。「内側」は既存の輪郭の内側に向かってフェードし、「アルファをぼかす」は柔らかくなった輪郭を外側にも広げます。",
+   "name": "フェザー",
+   "params": {
+    "blur": {
+     "label": "強さ"
+    },
+    "mode": {
+     "label": "エッジ",
+     "options": [
+      "内側",
+      "アルファをぼかす"
+     ]
+    }
+   }
+  },
+  "fillbehind": {
+   "description": "レイヤーの背面に、ぼかして拡大した自身のコピーでフレームを埋めます。横長プロジェクトで縦長動画を使うときの定番の補正です。",
+   "name": "背面フィル",
+   "params": {
+    "bgAlpha": {
+     "label": "背景の不透明度"
+    },
+    "bgOffset": {
+     "label": "背景のオフセット"
+    },
+    "bgScale": {
+     "label": "背景のスケール"
+    },
+    "blur": {
+     "label": "強さ"
+    },
+    "brightness": {
+     "label": "明るさ"
+    },
+    "edgeColor": {
+     "label": "エッジの色"
+    },
+    "edgeStrength": {
+     "label": "エッジの強さ"
+    },
+    "feather": {
+     "label": "フェザー"
+    },
+    "fgAlpha": {
+     "label": "前景の不透明度"
+    },
+    "fgOffset": {
+     "label": "前景のオフセット"
+    },
+    "fgScale": {
+     "label": "前景のスケール"
+    },
+    "gamma": {
+     "label": "ガンマ"
+    },
+    "saturation": {
+     "label": "彩度"
+    },
+    "scanCount": {
+     "label": "走査線の本数"
+    },
+    "scanStrength": {
+     "label": "走査線の強さ"
+    },
+    "tint": {
+     "label": "ティント"
+    },
+    "tintColor": {
+     "label": "ティントの色"
+    }
+   }
+  },
+  "filmgrain": {
+   "description": "粒子の量、粒子サイズ、アニメーション速度を調整できる、動くモノクロのフィルムグレインです。",
+   "name": "フィルムグレイン",
+   "params": {
+    "amount": {
+     "label": "量"
+    },
+    "grainSize": {
+     "label": "粒子サイズ"
+    },
+    "speed": {
+     "label": "速度"
+    }
+   }
+  },
+  "flicker": {
+   "description": "レイヤーの不透明度をランダムにちらつかせます。",
+   "name": "フリッカー",
+   "params": {
+    "intensity": {
+     "label": "強さ"
+    },
+    "seed": {
+     "label": "シード"
+    },
+    "speed": {
+     "label": "頻度"
+    },
+    "style": {
+     "label": "モード",
+     "options": [
+      "点滅",
+      "安定"
+     ]
+    }
+   }
+  },
+  "flip": {
+   "description": "レイヤーを3Dでカードのように回転させ、背面を透明・画像・色にできます。",
+   "name": "レイヤーフリップ",
+   "params": {
+    "axis": {
+     "label": "軸"
+    },
+    "back": {
+     "label": "背面",
+     "options": [
+      "透明",
+      "画像",
+      "色"
+     ]
+    },
+    "backColor": {
+     "label": "背面の色"
+    },
+    "light": {
+     "label": "光源の角度"
+    },
+    "perspective": {
+     "label": "遠近感"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "rotX": {
+     "label": "回転X"
+    },
+    "rotY": {
+     "label": "回転Y"
+    },
+    "rotZ": {
+     "label": "回転Z"
+    },
+    "scale": {
+     "label": "スケール"
+    },
+    "shading": {
+     "label": "シェーディング"
+    },
+    "shine": {
+     "label": "光沢"
+    }
+   }
+  },
+  "fourcolor": {
+   "description": "レイヤー上に、4点（レイヤー中心からのピクセル位置）の色をブレンドして重ねます。",
+   "name": "4色グラデーション",
+   "params": {
+    "blend": {
+     "label": "ブレンド",
+     "options": [
+      "通常",
+      "乗算",
+      "スクリーン",
+      "オーバーレイ",
+      "ソフトライト",
+      "ハードライト",
+      "加算",
+      "暗く",
+      "明るく",
+      "差分",
+      "覆い焼き",
+      "焼き込み"
+     ]
+    },
+    "color1": {
+     "label": "色1"
+    },
+    "color2": {
+     "label": "色2"
+    },
+    "color3": {
+     "label": "色3"
+    },
+    "color4": {
+     "label": "色4"
+    },
+    "corner": {
+     "label": "コーナーオフセット"
+    },
+    "opacity": {
+     "label": "不透明度"
+    },
+    "point1": {
+     "label": "ポイント1"
+    },
+    "point2": {
+     "label": "ポイント2"
+    },
+    "point3": {
+     "label": "ポイント3"
+    },
+    "point4": {
+     "label": "ポイント4"
+    },
+    "softness": {
+     "label": "ぼかし"
+    }
+   }
+  },
+  "fractalridges": {
+   "description": "レイヤーの不透明部分を、鋭く乱れたフラクタルノイズの隆起で埋めます。",
+   "name": "フラクタルリッジ",
+   "params": {
+    "alpha": {
+     "label": "アルファ"
+    },
+    "color1": {
+     "label": "色1"
+    },
+    "color2": {
+     "label": "色2"
+    },
+    "evolution": {
+     "label": "変化"
+    },
+    "intensity": {
+     "label": "強度"
+    },
+    "octaves": {
+     "label": "オクターブ"
+    },
+    "offset": {
+     "label": "オフセット"
+    },
+    "scale": {
+     "label": "スケール"
+    },
+    "seed": {
+     "label": "シード"
+    },
+    "stretch": {
+     "label": "ストレッチ"
+    }
+   }
+  },
+  "fractalwarp": {
+   "description": "折り畳みフラクタルノイズでレイヤーを歪ませ、炎や水、陽炎の表現に使えます。",
+   "name": "フラクタルワープ",
+   "params": {
+    "complexity": {
+     "label": "複雑さ"
+    },
+    "evolution": {
+     "label": "変化"
+    },
+    "scale": {
+     "label": "スケール"
+    },
+    "seed": {
+     "label": "シード"
+    },
+    "strength": {
+     "label": "強さ"
+    }
+   }
+  },
+  "fringeclean": {
+   "description": "レイヤーのマット境界沿いのピクセルから色を抜き、キーで残った色付きハローをグレーへフェードさせます。保護した最大3色はそのまま残ります。",
+   "name": "マットフリンジ",
+   "params": {
+    "blur": {
+     "label": "太さ"
+    },
+    "color1": {
+     "label": "保持色1"
+    },
+    "color2": {
+     "label": "保持色2"
+    },
+    "color3": {
+     "label": "保持色3"
+    },
+    "feather": {
+     "label": "フェザー"
+    },
+    "threshold1": {
+     "label": "範囲1"
+    },
+    "threshold2": {
+     "label": "範囲2"
+    },
+    "threshold3": {
+     "label": "範囲3"
+    }
+   }
+  },
+  "glass": {
+   "description": "レイヤーの形状をベベル付きガラスに変え、背後のレイヤーを屈折させ、縁にハイライトを加えます。",
+   "name": "ガラス",
+   "params": {
+    "angle": {
+     "label": "光の角度"
+    },
+    "blur": {
+     "label": "ベベル"
+    },
+    "color": {
+     "label": "色"
+    },
+    "highlight": {
+     "label": "ハイライト"
+    },
+    "refraction": {
+     "label": "屈折"
+    },
+    "tint": {
+     "label": "色合い"
+    }
+   }
+  },
+  "glitch": {
+   "description": "ランダムな横方向のブロックずれと色チャンネルのオフセットを、1秒に数回変化させます。",
+   "name": "グリッチ",
+   "params": {
+    "blockHeight": {
+     "label": "ブロックの高さ"
+    },
+    "intensity": {
+     "label": "強度"
+    },
+    "seed": {
+     "label": "シード"
+    }
+   }
+  },
+  "glow": {
+   "description": "レイヤーの形状の外側に単色のハローを付けます。硬さを上げると、柔らかなフェードからくっきりした輪郭に変わります。",
+   "name": "グロー",
+   "params": {
+    "alpha": {
+     "label": "アルファ"
+    },
+    "blendMode": {
+     "label": "ブレンドモード",
+     "options": [
+      "通常",
+      "乗算",
+      "スクリーン"
+     ]
+    },
+    "color": {
+     "label": "色"
+    },
+    "hardness": {
+     "label": "硬さ"
+    },
+    "radius": {
+     "label": "半径"
+    }
+   }
+  },
+  "glowscan": {
+   "description": "レイヤーのうち明るさが特定の帯に入る部分だけをぼかして発光させます。位置をアニメーションすると、グローがシャドウからハイライトへ移動します。",
+   "name": "グロースキャン",
+   "params": {
+    "blur": {
+     "label": "ぼかし"
+    },
+    "color": {
+     "label": "グローの色"
+    },
+    "intensity": {
+     "label": "強度"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "show": {
+     "label": "帯のみ表示"
+    },
+    "softness": {
+     "label": "やわらかさ"
+    },
+    "width": {
+     "label": "幅"
+    }
+   }
+  },
+  "gradientmap": {
+   "description": "明るさに応じて3色で画像を再着色します。繰り返しと位相を指定でき、明るさスケールは結果に画像本来の明るさを掛けます。",
+   "name": "グラデーションマップ",
+   "params": {
+    "color1": {
+     "label": "シャドウ"
+    },
+    "color2": {
+     "label": "中間色"
+    },
+    "color3": {
+     "label": "ハイライト"
+    },
+    "opacity": {
+     "label": "不透明度"
+    },
+    "phase": {
+     "label": "位相"
+    },
+    "repeat": {
+     "label": "繰り返し"
+    },
+    "reverse": {
+     "label": "反転"
+    },
+    "scaleBrightness": {
+     "label": "明るさスケール"
+    }
+   }
+  },
+  "gradientoverlay": {
+   "description": "2色のグラデーションをレイヤーに重ねます。形状とブレンドモードを選べます。",
+   "name": "グラデーションオーバーレイ",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "blend": {
+     "label": "ブレンド",
+     "options": [
+      "通常",
+      "乗算",
+      "スクリーン",
+      "オーバーレイ",
+      "ソフトライト",
+      "ハードライト",
+      "加算",
+      "比較(暗)",
+      "比較(明)",
+      "差の絶対値",
+      "覆い焼きカラー",
+      "焼き込みカラー"
+     ]
+    },
+    "color1": {
+     "label": "色1"
+    },
+    "color2": {
+     "label": "色2"
+    },
+    "offset": {
+     "label": "オフセット"
+    },
+    "opacity": {
+     "label": "不透明度"
+    },
+    "scale": {
+     "label": "スケール"
+    },
+    "shape": {
+     "label": "形状",
+     "options": [
+      "リニア",
+      "放射状",
+      "反射",
+      "角度"
+     ]
+    },
+    "style": {
+     "label": "長さ",
+     "options": [
+      "ボックス",
+      "楕円"
+     ]
+    }
+   }
+  },
+  "grid": {
+   "description": "レイヤーの不透明部分にグリッド線を描画します。くり抜くこともできます。",
+   "name": "グリッド",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "color": {
+     "label": "色"
+    },
+    "count": {
+     "label": "カウント"
+    },
+    "offset": {
+     "label": "オフセット"
+    },
+    "punch": {
+     "label": "くり抜き"
+    },
+    "stretch": {
+     "label": "ストレッチ"
+    },
+    "width": {
+     "label": "幅"
+    }
+   }
+  },
+  "gridrepeat": {
+   "description": "レイヤーのコピーをグリッド状に複数生成します。",
+   "name": "グリッドリピート",
+   "params": {
+    "count": {
+     "label": "カウント"
+    },
+    "easing": {
+     "label": "イージング",
+     "options": [
+      "リニア",
+      "イーズイン",
+      "イーズアウト",
+      "イーズインアウト"
+     ]
+    },
+    "fillAmount": {
+     "label": "塗りの量"
+    },
+    "fillColor": {
+     "label": "塗りの色"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "randomOrder": {
+     "label": "ランダム順"
+    },
+    "rangeEnd": {
+     "label": "範囲終了"
+    },
+    "rangeOffset": {
+     "label": "範囲オフセット"
+    },
+    "rangeOpacity": {
+     "label": "範囲不透明度"
+    },
+    "rangePosition": {
+     "label": "範囲位置"
+    },
+    "rangeRotation": {
+     "label": "範囲回転"
+    },
+    "rangeScale": {
+     "label": "範囲スケール"
+    },
+    "rangeStart": {
+     "label": "範囲開始"
+    },
+    "seed": {
+     "label": "シード"
+    },
+    "stagger": {
+     "label": "スタッガー"
+    }
+   }
+  },
+  "grunge": {
+   "description": "粒子や汚れ、焼け跡、くすんだ色味でレイヤーを古びた質感にします。",
+   "name": "グランジ",
+   "params": {
+    "blotches": {
+     "label": "汚れ"
+    },
+    "burn": {
+     "label": "焼け跡"
+    },
+    "color": {
+     "label": "色味"
+    },
+    "grain": {
+     "label": "粒子"
+    },
+    "scale": {
+     "label": "汚れのサイズ"
+    },
+    "seed": {
+     "label": "シード"
+    },
+    "strength": {
+     "label": "強さ"
+    },
+    "tint": {
+     "label": "色付け"
+    }
+   }
+  },
+  "halftone": {
+   "description": "暗い部分ほど大きくなる印刷ドットで表現します。",
+   "name": "ハーフトーン",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "cell": {
+     "label": "サイズ"
+    },
+    "colored": {
+     "label": "カラードット"
+    },
+    "ink": {
+     "label": "ドットの色"
+    },
+    "paper": {
+     "label": "用紙の色"
+    },
+    "style": {
+     "label": "スタイル",
+     "options": [
+      "クラシック",
+      "2色"
+     ]
+    }
+   }
+  },
+  "halftonelines": {
+   "description": "暗い部分ほど太く、明るい部分ほど細くなる印刷線でレイヤーを描き直します。",
+   "name": "ハーフトーンライン",
+   "params": {
+    "amount": {
+     "label": "量"
+    },
+    "angle": {
+     "label": "角度"
+    },
+    "color1": {
+     "label": "カラー1"
+    },
+    "color2": {
+     "label": "カラー2"
+    },
+    "phase": {
+     "label": "フェーズ"
+    },
+    "strength": {
+     "label": "強さ"
+    }
+   }
+  },
+  "heart": {
+   "description": "レイヤーをふっくらとしたハート形に切り抜きます。",
+   "name": "ハート",
+   "params": {
+    "depth": {
+     "label": "奥行き"
+    },
+    "heartSize": {
+     "label": "サイズ"
+    },
+    "light": {
+     "label": "光の角度"
+    },
+    "perspective": {
+     "label": "パースペクティブ"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "rotX": {
+     "label": "X回転"
+    },
+    "rotY": {
+     "label": "Y回転"
+    },
+    "rotZ": {
+     "label": "Z回転"
+    },
+    "scale": {
+     "label": "スケール"
+    },
+    "shading": {
+     "label": "シェーディング"
+    },
+    "shine": {
+     "label": "光沢"
+    },
+    "smoothing": {
+     "label": "スムージング"
+    }
+   }
+  },
+  "hexagontilerotate": {
+   "description": "レイヤーを六角形のタイルに分割し、各タイル内の画像を個別に回転させます。",
+   "name": "六角タイル回転",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "count": {
+     "label": "数"
+    },
+    "offset": {
+     "label": "オフセット"
+    },
+    "random": {
+     "label": "ランダム化"
+    },
+    "rotation": {
+     "label": "回転"
+    },
+    "seed": {
+     "label": "シード"
+    }
+   }
+  },
+  "hexagontileshift": {
+   "description": "レイヤーを六角形のタイルに分割し、各タイル内の画像をランダムな方向にずらします。",
+   "name": "六角タイルシフト",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "count": {
+     "label": "数"
+    },
+    "offset": {
+     "label": "オフセット"
+    },
+    "seed": {
+     "label": "シード"
+    },
+    "strength": {
+     "label": "強さ"
+    }
+   }
+  },
+  "hexagontiling": {
+   "description": "レイヤーの中央部分を六角形タイルで繰り返し、画面全体を埋めます。",
+   "name": "六角形タイル",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "mirror": {
+     "label": "ミラー"
+    },
+    "scale": {
+     "label": "スケール"
+    }
+   }
+  },
+  "hexgrid": {
+   "description": "レイヤーを1〜3色の六角形の格子で覆い、角を柔らかくして隙間を空けます。",
+   "name": "六角形アレイ",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "blend": {
+     "label": "ブレンド",
+     "options": [
+      "通常",
+      "乗算",
+      "スクリーン",
+      "オーバーレイ",
+      "ソフトライト",
+      "ハードライト",
+      "加算",
+      "暗く",
+      "明るく",
+      "差",
+      "覆い焼き",
+      "焼き込み"
+     ]
+    },
+    "cell": {
+     "label": "サイズ"
+    },
+    "color1": {
+     "label": "色1"
+    },
+    "color2": {
+     "label": "色2"
+    },
+    "color3": {
+     "label": "色3"
+    },
+    "colors": {
+     "label": "色数",
+     "options": [
+      "1色",
+      "2色",
+      "3色"
+     ]
+    },
+    "feather": {
+     "label": "フェザー"
+    },
+    "gap": {
+     "label": "隙間"
+    },
+    "offset": {
+     "label": "オフセット"
+    },
+    "opacity": {
+     "label": "不透明度"
+    },
+    "stretch": {
+     "label": "ストレッチ"
+    }
+   }
+  },
+  "hexprism": {
+   "description": "レイヤーを六角柱の表と裏に貼り付けます。",
+   "name": "六角柱",
+   "params": {
+    "depth": {
+     "label": "奥行き"
+    },
+    "light": {
+     "label": "光源角度"
+    },
+    "perspective": {
+     "label": "パースペクティブ"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "radius": {
+     "label": "半径"
+    },
+    "rotX": {
+     "label": "X回転"
+    },
+    "rotY": {
+     "label": "Y回転"
+    },
+    "rotZ": {
+     "label": "Z回転"
+    },
+    "scale": {
+     "label": "スケール"
+    },
+    "shading": {
+     "label": "シェーディング"
+    },
+    "shine": {
+     "label": "光沢"
+    },
+    "smoothing": {
+     "label": "スムージング"
+    }
+   }
+  },
+  "highlightshadow": {
+   "description": "ピクセルの明るさに応じて、明るいハイライトを復元・強調し、暗いシャドウを持ち上げたり深くしたりします。",
+   "name": "ハイライトとシャドウ",
+   "params": {
+    "highlights": {
+     "label": "ハイライト"
+    },
+    "shadows": {
+     "label": "シャドウ"
+    },
+    "style": {
+     "label": "スタイル",
+     "options": [
+      "クラシック",
+      "色を保持"
+     ]
+    }
+   }
+  },
+  "hollowbox": {
+   "description": "上下が開いた箱で、レイヤーが外側を覆い、内側は内部の色で塗られます。",
+   "name": "中空ボックス",
+   "params": {
+    "depth": {
+     "label": "奥行き"
+    },
+    "height": {
+     "label": "高さ"
+    },
+    "interior": {
+     "label": "内側の色"
+    },
+    "light": {
+     "label": "光源の角度"
+    },
+    "perspective": {
+     "label": "パースペクティブ"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "rotX": {
+     "label": "X回転"
+    },
+    "rotY": {
+     "label": "Y回転"
+    },
+    "rotZ": {
+     "label": "Z回転"
+    },
+    "scale": {
+     "label": "スケール"
+    },
+    "shading": {
+     "label": "シェーディング"
+    },
+    "shine": {
+     "label": "光沢"
+    },
+    "smoothing": {
+     "label": "スムージング"
+    },
+    "thickness": {
+     "label": "厚さ"
+    },
+    "width": {
+     "label": "幅"
+    }
+   }
+  },
+  "huesaturation": {
+   "description": "色相環上で色を回転させ、鮮やかさを強めたり弱めたりします。バイブランスは淡い色ほど大きく強調します。",
+   "name": "色相と彩度",
+   "params": {
+    "hue": {
+     "label": "色相"
+    },
+    "lightness": {
+     "label": "明度"
+    },
+    "saturation": {
+     "label": "彩度"
+    },
+    "style": {
+     "label": "スタイル",
+     "options": [
+      "クラシック",
+      "明るさを保持"
+     ]
+    },
+    "vibrance": {
+     "label": "バイブランス"
+    }
+   }
+  },
+  "innerblur": {
+   "description": "レイヤーの輪郭をシャープに保ったまま、内側をぼかします。",
+   "name": "内側ブラー",
+   "params": {
+    "blur": {
+     "label": "強さ"
+    }
+   }
+  },
+  "innerbulge": {
+   "description": "レイヤーの端を固定したまま、中央を膨らませたり縮めたりします。",
+   "name": "内側ピンチ/バルジ",
+   "params": {
+    "strength": {
+     "label": "強さ"
+    }
+   }
+  },
+  "innerglow": {
+   "description": "レイヤーの不透明部分の内側の縁に光を加えます。",
+   "name": "内側グロー",
+   "params": {
+    "blur": {
+     "label": "サイズ"
+    },
+    "color": {
+     "label": "色"
+    },
+    "intensity": {
+     "label": "強度"
+    }
+   }
+  },
+  "invert": {
+   "description": "ブレンド量と任意のアルファ反転で、画像の色チャンネルを反転します。",
+   "name": "反転",
+   "params": {
+    "amount": {
+     "label": "適用量"
+    },
+    "invert_alpha": {
+     "label": "アルファを反転"
+    }
+   }
+  },
+  "iridescence": {
+   "description": "レイヤーの不透明部分を、油膜やシャボン玉のような流れる虹色の光沢で覆います。",
+   "name": "イリデッセンス",
+   "params": {
+    "alpha": {
+     "label": "アルファ"
+    },
+    "blend": {
+     "label": "ブレンドモード",
+     "options": [
+      "通常",
+      "乗算",
+      "スクリーン",
+      "オーバーレイ",
+      "ソフトライト",
+      "ハードライト",
+      "加算",
+      "暗く",
+      "明るく",
+      "差分",
+      "覆い焼き",
+      "焼き込み"
+     ]
+    },
+    "evolution": {
+     "label": "変化"
+    },
+    "saturation": {
+     "label": "彩度"
+    },
+    "scale": {
+     "label": "スケール"
+    },
+    "seed": {
+     "label": "シード"
+    },
+    "shift": {
+     "label": "色相シフト"
+    }
+   }
+  },
+  "kaleidoscope": {
+   "description": "点を中心に鏡映した断片を並べます。",
+   "name": "万華鏡",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "center": {
+     "label": "中心"
+    },
+    "mirror": {
+     "label": "ミラー"
+    },
+    "segments": {
+     "label": "セグメント"
+    }
+   }
+  },
+  "lensblur": {
+   "description": "中心付近はシャープなまま、外側に向かって強くなる回転ブラーです。",
+   "name": "レンズブラー",
+   "params": {
+    "center": {
+     "label": "中心"
+    },
+    "feather": {
+     "label": "フェザー"
+    },
+    "radius": {
+     "label": "半径"
+    },
+    "sweep": {
+     "label": "角度"
+    }
+   }
+  },
+  "lensflare": {
+   "description": "光の輪を伴う明るい光を画像に重ねます。",
+   "name": "ライトフレア",
+   "params": {
+    "brightness": {
+     "label": "明るさ"
+    },
+    "center": {
+     "label": "中心"
+    },
+    "color": {
+     "label": "色"
+    },
+    "radius": {
+     "label": "半径"
+    }
+   }
+  },
+  "levels": {
+   "description": "入力の黒点・白点、ガンマ、出力の黒点・白点で画像のレベルを調整します。",
+   "name": "レベル補正",
+   "params": {
+    "gamma": {
+     "label": "ガンマ"
+    },
+    "inBlack": {
+     "label": "入力ブラック"
+    },
+    "inWhite": {
+     "label": "入力ホワイト"
+    },
+    "outBlack": {
+     "label": "出力ブラック"
+    },
+    "outWhite": {
+     "label": "出力ホワイト"
+    }
+   }
+  },
+  "lightglow": {
+   "description": "しきい値より明るい部分の周囲に色付きのグローを加えます。",
+   "name": "ライトグロー",
+   "params": {
+    "blur": {
+     "label": "サイズ"
+    },
+    "color": {
+     "label": "色"
+    },
+    "intensity": {
+     "label": "強さ"
+    },
+    "opacity": {
+     "label": "不透明度"
+    },
+    "threshold": {
+     "label": "しきい値"
+    }
+   }
+  },
+  "lightning": {
+   "description": "レイヤー上の2点間に枝分かれした稲妻を描画します。",
+   "name": "稲妻",
+   "params": {
+    "color": {
+     "label": "色"
+    },
+    "evolution": {
+     "label": "変化"
+    },
+    "from": {
+     "label": "開始点"
+    },
+    "glow": {
+     "label": "グロー"
+    },
+    "jag": {
+     "label": "細かさ"
+    },
+    "seed": {
+     "label": "シード"
+    },
+    "to": {
+     "label": "終了点"
+    },
+    "width": {
+     "label": "幅"
+    }
+   }
+  },
+  "linearrepeat": {
+   "description": "レイヤーの複製を線上に並べて動的に生成します。",
+   "name": "リニアリピート",
+   "params": {
+    "count": {
+     "label": "数"
+    },
+    "easing": {
+     "label": "イージング",
+     "options": [
+      "リニア",
+      "イーズイン",
+      "イーズアウト",
+      "イーズインアウト"
+     ]
+    },
+    "fillAmount": {
+     "label": "塗りの量"
+    },
+    "fillColor": {
+     "label": "塗りの色"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "randomOrder": {
+     "label": "ランダム順"
+    },
+    "rangeEnd": {
+     "label": "範囲の終了"
+    },
+    "rangeOffset": {
+     "label": "範囲のオフセット"
+    },
+    "rangeOpacity": {
+     "label": "範囲の不透明度"
+    },
+    "rangePosition": {
+     "label": "範囲の位置"
+    },
+    "rangeRotation": {
+     "label": "範囲の回転"
+    },
+    "rangeScale": {
+     "label": "範囲のスケール"
+    },
+    "rangeStart": {
+     "label": "範囲の開始"
+    },
+    "seed": {
+     "label": "シード"
+    }
+   }
+  },
+  "linearstreaks": {
+   "description": "レイヤーの複製を角度に沿ってスライドさせながら重ね、重なった部分をブレンドして直線の筋を作ります。",
+   "name": "リニアストリーク",
+   "params": {
+    "alpha": {
+     "label": "アルファ"
+    },
+    "angle": {
+     "label": "角度"
+    },
+    "bias": {
+     "label": "バイアス"
+    },
+    "mode": {
+     "label": "ブレンド",
+     "options": [
+      "明るく",
+      "平均",
+      "暗く"
+     ]
+    },
+    "reach": {
+     "label": "長さ"
+    }
+   }
+  },
+  "longshadow": {
+   "description": "レイヤーの不透明な部分から、長く平行な影を落とします。",
+   "name": "ロングシャドウ",
+   "params": {
+    "alpha": {
+     "label": "アルファ"
+    },
+    "angle": {
+     "label": "角度"
+    },
+    "color": {
+     "label": "色"
+    },
+    "fade": {
+     "label": "フェード"
+    },
+    "reach": {
+     "label": "長さ"
+    }
+   }
+  },
+  "lumakey": {
+   "description": "レイヤーの暗い部分（または明るい部分）を消します。",
+   "name": "ルマキー",
+   "params": {
+    "invert": {
+     "label": "反転"
+    },
+    "softness": {
+     "label": "ぼかし"
+    },
+    "threshold": {
+     "label": "しきい値"
+    }
+   }
+  },
+  "lumastamp": {
+   "description": "レイヤーを単色に置き換え、各ピクセルの明るさに応じて不透明度を変える、スタンプのようなエフェクトです。",
+   "name": "ルマスタンパー",
+   "params": {
+    "color": {
+     "label": "色"
+    },
+    "gamma": {
+     "label": "ガンマ"
+    },
+    "high": {
+     "label": "白レベル"
+    },
+    "invert": {
+     "label": "反転"
+    },
+    "low": {
+     "label": "黒レベル"
+    }
+   }
+  },
+  "magnifybackground": {
+   "description": "レイヤーを虫めがねのように使い、図形の中に背後のレイヤーを中心から拡大して表示します。",
+   "name": "背景拡大",
+   "params": {
+    "magnify": {
+     "label": "レイヤーを拡大"
+    },
+    "sampling": {
+     "label": "サンプリング",
+     "options": [
+      "ニアレスト",
+      "リニア"
+     ]
+    },
+    "scale": {
+     "label": "スケール"
+    }
+   }
+  },
+  "maskblur": {
+   "description": "このレイヤーの図形の内側で背後のレイヤーをぼかします。明るい部分ほど強くぼけるため、グラデーションでチルトシフトを作れます。",
+   "name": "マスクブラー",
+   "params": {
+    "invert": {
+     "label": "反転"
+    },
+    "strength": {
+     "label": "強さ"
+    }
+   }
+  },
+  "mattechoker": {
+   "description": "レイヤーの不透明な部分の輪郭を内側から削って縮小します。",
+   "name": "マットチョーカー",
+   "params": {
+    "amount": {
+     "label": "チョーク"
+    },
+    "blur": {
+     "label": "サイズ"
+    },
+    "invert": {
+     "label": "反転"
+    },
+    "softness": {
+     "label": "ぼかし"
+    }
+   }
+  },
+  "mirror": {
+   "description": "角度と中心点で決まる鏡の線を境に、画像の半分を反転して映します。",
+   "name": "ミラー",
+   "params": {
+    "alpha": {
+     "label": "アルファ"
+    },
+    "angle": {
+     "label": "角度"
+    },
+    "center": {
+     "label": "中心"
+    },
+    "style": {
+     "label": "スタイル",
+     "options": [
+      "折り返し",
+      "フリップ"
+     ]
+    }
+   }
+  },
+  "mosaic": {
+   "description": "レイヤーを四角形に分割し、それぞれを平均色で塗りつぶします。",
+   "name": "モザイク",
+   "params": {
+    "count": {
+     "label": "数"
+    },
+    "offset": {
+     "label": "オフセット"
+    },
+    "stretch": {
+     "label": "ストレッチ"
+    }
+   }
+  },
+  "motionblur": {
+   "description": "キーフレームや自動シェイク・振動などのモーションエフェクトに合わせて、レイヤーが移動・回転・拡大する方向へぼかします。チューンでぼかしの量を調整できます。フルブラーがオフのときは、プレビューでは軽いぼかしで表示されます。",
+   "name": "モーションブラー",
+   "params": {
+    "position": {
+     "label": "位置"
+    },
+    "rotation": {
+     "label": "角度"
+    },
+    "scale": {
+     "label": "スケール"
+    },
+    "tune": {
+     "label": "調整"
+    }
+   }
+  },
+  "movealongpath": {
+   "description": "レイヤーを、すぐ下にあるレイヤーの輪郭に沿って途中まで配置します。",
+   "name": "パスに沿って移動",
+   "params": {
+    "inset": {
+     "label": "インセット/アウトセット"
+    },
+    "offset": {
+     "label": "オフセット"
+    },
+    "orientation": {
+     "label": "向き"
+    },
+    "progress": {
+     "label": "進行度"
+    },
+    "rotate": {
+     "label": "自動回転"
+    }
+   }
+  },
+  "noise": {
+   "description": "レイヤーを1ピクセルごとの細かい粒で覆います。粒はフレームごとに変化します。モノクロにすると粒がグレーになり、極端にすると粒が完全に明るいか暗いかになり、フリーズで模様を静止させます。",
+   "name": "ノイズ",
+   "params": {
+    "amount": {
+     "label": "強さ"
+    },
+    "extremes": {
+     "label": "極端"
+    },
+    "freeze": {
+     "label": "フリーズ"
+    },
+    "mono": {
+     "label": "モノクロ"
+    },
+    "offset": {
+     "label": "オフセット"
+    },
+    "overshoot": {
+     "label": "オーバーシュート"
+    }
+   }
+  },
+  "noisedisplace": {
+   "description": "時間とともに変化する滑らかなバリューノイズでピクセルを変位させます。",
+   "name": "ノイズ変位",
+   "params": {
+    "amount": {
+     "label": "量"
+    },
+    "scale": {
+     "label": "ノイズスケール"
+    },
+    "speed": {
+     "label": "アニメーション速度"
+    }
+   }
+  },
+  "octahedron": {
+   "description": "レイヤーを八面体の8つの面に配置します。",
+   "name": "八面体",
+   "params": {
+    "light": {
+     "label": "光源の角度"
+    },
+    "perspective": {
+     "label": "パースペクティブ"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "radius": {
+     "label": "半径"
+    },
+    "rotX": {
+     "label": "X回転"
+    },
+    "rotY": {
+     "label": "Y回転"
+    },
+    "rotZ": {
+     "label": "Z回転"
+    },
+    "scale": {
+     "label": "スケール"
+    },
+    "shading": {
+     "label": "シェーディング"
+    },
+    "shine": {
+     "label": "光沢"
+    }
+   }
+  },
+  "offset": {
+   "description": "レイヤーの画像をずらし、レイヤーの枠の端で折り返します。",
+   "name": "オフセット",
+   "params": {
+    "feather": {
+     "label": "フェザー"
+    },
+    "mask": {
+     "label": "レイヤーでマスク"
+    },
+    "offset": {
+     "label": "オフセット"
+    }
+   }
+  },
+  "ominodiffusion": {
+   "description": "レイヤーを少ない色数で描き直し、丸め誤差を一定方向へ流すことで、動かすと生き生きとしたグリッチなディザ表現になります。",
+   "name": "Omino Diffusion+",
+   "params": {
+    "alpha": {
+     "label": "アルファ"
+    },
+    "angle": {
+     "label": "角度"
+    },
+    "blend": {
+     "label": "ブレンドモード",
+     "options": [
+      "通常",
+      "乗算",
+      "スクリーン"
+     ]
+    },
+    "color1": {
+     "label": "色1"
+    },
+    "color2": {
+     "label": "色2"
+    },
+    "color3": {
+     "label": "色3"
+    },
+    "color4": {
+     "label": "色4"
+    },
+    "color5": {
+     "label": "色5"
+    },
+    "color6": {
+     "label": "色6"
+    },
+    "falloff": {
+     "label": "重みの減衰"
+    },
+    "palette": {
+     "label": "パレット",
+     "options": [
+      "白黒",
+      "RGBポスタライズ（2階調）",
+      "RGBポスタライズ（3階調）",
+      "RGBポスタライズ（4階調）",
+      "グレー（3階調）",
+      "グレー（4階調）",
+      "CGA 緑/赤/黄",
+      "CGA シアン/マゼンタ/白",
+      "CGA 青/シアン/マゼンタ/白",
+      "彩度＋ポスタライズ",
+      "カスタム2色",
+      "カスタム3色",
+      "カスタム4色",
+      "カスタム5色",
+      "カスタム6色"
+     ]
+    },
+    "steps": {
+     "label": "ステップ"
+    },
+    "strength": {
+     "label": "強さ"
+    },
+    "weight": {
+     "label": "誤差の重み"
+    }
+   }
+  },
+  "ominoglass": {
+   "description": "レイヤーの明るさからガラスを作り、背後を虹色の縁で屈折させ、レンズのように表面を照らします。",
+   "name": "Omino Glass",
+   "params": {
+    "aberration": {
+     "label": "色収差"
+    },
+    "ambient": {
+     "label": "環境光"
+    },
+    "amount": {
+     "label": "粗さ"
+    },
+    "blend": {
+     "label": "ブレンド"
+    },
+    "blur": {
+     "label": "ベベル"
+    },
+    "color": {
+     "label": "色"
+    },
+    "direction": {
+     "label": "方向"
+    },
+    "elevation": {
+     "label": "仰角"
+    },
+    "evolution": {
+     "label": "変化"
+    },
+    "feature": {
+     "label": "フィーチャーサイズ"
+    },
+    "intensity": {
+     "label": "強度"
+    },
+    "light": {
+     "label": "ライトの色"
+    },
+    "refraction": {
+     "label": "屈折"
+    },
+    "samples": {
+     "label": "スムージングサンプル"
+    },
+    "scale": {
+     "label": "粗さのスケール"
+    },
+    "seed": {
+     "label": "シード"
+    },
+    "shading": {
+     "label": "シェーディング",
+     "options": [
+      "なし",
+      "ポイントライト",
+      "ディレクショナルライト"
+     ]
+    },
+    "shine": {
+     "label": "光沢"
+    },
+    "specularity": {
+     "label": "スペキュラ"
+    },
+    "useLuma": {
+     "label": "レイヤーの輝度を使用"
+    }
+   }
+  },
+  "oscillate": {
+   "description": "レイヤーを角度方向・奥行き方向・軌道上で往復させます。",
+   "name": "オシレート",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "direction": {
+     "label": "方向",
+     "options": [
+      "角度",
+      "奥行き",
+      "軌道"
+     ]
+    },
+    "frequency": {
+     "label": "頻度"
+    },
+    "magnitude": {
+     "label": "振幅"
+    },
+    "phase": {
+     "label": "位相"
+    },
+    "wave": {
+     "label": "波形",
+     "options": [
+      "サイン",
+      "三角"
+     ]
+    }
+   }
+  },
+  "palettemap": {
+   "description": "各ピクセルをパレット内の最も近い色にマッピングします。選んだ最大8色、またはプリセットや読み込んだファイルから最大512色のパレットを使用できます。ディザーパターンは隣接するパレット色を混ぜてより多くの階調を表現します。アルファはマッピングした色を元のレイヤーとブレンドします。",
+   "name": "パレットマップ",
+   "params": {
+    "alpha": {
+     "label": "アルファ"
+    },
+    "color1": {
+     "label": "色1"
+    },
+    "color2": {
+     "label": "色2"
+    },
+    "color3": {
+     "label": "色3"
+    },
+    "color4": {
+     "label": "色4"
+    },
+    "color5": {
+     "label": "色5"
+    },
+    "color6": {
+     "label": "色6"
+    },
+    "color7": {
+     "label": "色7"
+    },
+    "color8": {
+     "label": "色8"
+    },
+    "colors": {
+     "label": "色"
+    },
+    "dither": {
+     "label": "ディザ"
+    },
+    "palette": {
+     "label": "パレット"
+    },
+    "pattern": {
+     "label": "ディザパターン",
+     "options": [
+      "なし",
+      "ノイズ",
+      "チェッカー",
+      "Bayer 2x2",
+      "Bayer 3x3",
+      "Bayer 4x4",
+      "Bayer 8x8",
+      "クラスタードット 4x4",
+      "クラスタードット 8x8",
+      "横線",
+      "縦線",
+      "斜線",
+      "Floyd-Steinberg",
+      "False Floyd-Steinberg",
+      "Sierra Lite",
+      "Fan",
+      "Shiau-Fan",
+      "Jarvis-Judice-Ninke",
+      "Stucki",
+      "Burkes",
+      "Sierra",
+      "Two-Row Sierra",
+      "Atkinson"
+     ]
+    },
+    "source": {
+     "label": "色の取得元",
+     "options": [
+      "色",
+      "パレット"
+     ]
+    }
+   }
+  },
+  "pixelate": {
+   "description": "レイヤーをブロックごとに1色（ブロック中央の色）で塗りつぶします。グリッドはレイヤー中央（スクリーンスペースではフレーム中央）が基準です。伸縮・オフセット・角度でグリッドを調整でき、ビネットで各ブロックの縁を暗くできます。",
+   "name": "ピクセレート",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "blockSize": {
+     "label": "サイズ"
+    },
+    "offset": {
+     "label": "オフセット"
+    },
+    "screenSpace": {
+     "label": "スクリーンスペース"
+    },
+    "stretch": {
+     "label": "伸縮"
+    },
+    "vignette": {
+     "label": "ビネット"
+    }
+   }
+  },
+  "pixeltiles": {
+   "description": "小さなピクセルパターンのタイルでレイヤーを再構築します。各タイルは下の明るさに応じてパターンの描画量が変わり、ASCIIアートとモザイクを合わせたような仕上がりになります。カオスを上げるとランダムなタイルでグリッドが崩れます。",
+   "name": "ピクセルタイル",
+   "params": {
+    "alpha": {
+     "label": "ミックス"
+    },
+    "background": {
+     "label": "背景"
+    },
+    "brightness": {
+     "label": "明るさ"
+    },
+    "chaos": {
+     "label": "カオス"
+    },
+    "chaosAmount": {
+     "label": "カオス量"
+    },
+    "chaosSpeed": {
+     "label": "カオス速度"
+    },
+    "contrast": {
+     "label": "コントラスト"
+    },
+    "detail": {
+     "label": "ディテール"
+    },
+    "flip": {
+     "label": "ピクセルを反転"
+    },
+    "foreground": {
+     "label": "前景"
+    },
+    "levels": {
+     "label": "階調"
+    },
+    "offset": {
+     "label": "パターンのオフセット"
+    },
+    "original": {
+     "label": "元の色を使用"
+    },
+    "pattern": {
+     "label": "パターン",
+     "options": [
+      "高精細",
+      "数字と文字",
+      "横線",
+      "ドット",
+      "縦線",
+      "グランジ",
+      "リング",
+      "単色",
+      "斜め左",
+      "斜め右"
+     ]
+    },
+    "randomPattern": {
+     "label": "ランダムパターン"
+    },
+    "scramble": {
+     "label": "タイルをシャッフル"
+    },
+    "seed": {
+     "label": "ランダムシード"
+    },
+    "tile": {
+     "label": "タイルサイズ"
+    },
+    "tone": {
+     "label": "階調の取得元",
+     "options": [
+      "輝度",
+      "平均",
+      "赤",
+      "グリーン",
+      "ブルー"
+     ]
+    },
+    "transparent": {
+     "label": "背景を透明に"
+    }
+   }
+  },
+  "polar": {
+   "description": "レイヤーを中心を軸に曲げ、直線を円に、円を直線に変換します。",
+   "name": "極座標",
+   "params": {
+    "amount": {
+     "label": "補間"
+    },
+    "direction": {
+     "label": "種類",
+     "options": [
+      "直交座標から極座標",
+      "極座標から直交座標"
+     ]
+    }
+   }
+  },
+  "polardisplacement": {
+   "description": "このレイヤーの色を使って下のレイヤーを中心点の周りで回転・移動させ、その後このレイヤーを非表示にします。",
+   "name": "極座標ディスプレイスメントマップ",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "angleChannel": {
+     "label": "角度の取得元",
+     "options": [
+      "R",
+      "G",
+      "B",
+      "輝度",
+      "アルファ"
+     ]
+    },
+    "center": {
+     "label": "中心"
+    },
+    "distanceChannel": {
+     "label": "距離の取得元",
+     "options": [
+      "R",
+      "G",
+      "B",
+      "輝度",
+      "アルファ"
+     ]
+    },
+    "edges": {
+     "label": "端の処理",
+     "options": [
+      "繰り返し",
+      "ミラー",
+      "クリア",
+      "タイル"
+     ]
+    },
+    "fromCenter": {
+     "label": "中心から"
+    },
+    "invert": {
+     "label": "反転"
+    },
+    "reach": {
+     "label": "インセット/アウセット"
+    }
+   }
+  },
+  "posterize": {
+   "description": "各色チャンネルを一定数の階調に区切り、滑らかなグラデーションを帯状に変えます。オフセットで帯の境界位置を移動できます。",
+   "name": "ポスタリゼーション",
+   "params": {
+    "levels": {
+     "label": "階調数"
+    },
+    "offset": {
+     "label": "オフセット"
+    }
+   }
+  },
+  "pulseopacity": {
+   "description": "レイヤーをサイン波または三角波で繰り返しフェードアウト・フェードインさせます。",
+   "name": "不透明度パルス",
+   "params": {
+    "frequency": {
+     "label": "頻度"
+    },
+    "phase": {
+     "label": "開始位相"
+    },
+    "strength": {
+     "label": "強さ"
+    },
+    "wave": {
+     "label": "波形",
+     "options": [
+      "サイン波",
+      "三角波"
+     ]
+    }
+   }
+  },
+  "pulsesize": {
+   "description": "サイン波または三角波で、レイヤーを繰り返し拡大・縮小します。",
+   "name": "パルスサイズ",
+   "params": {
+    "frequency": {
+     "label": "頻度"
+    },
+    "grow": {
+     "label": "拡大"
+    },
+    "phase": {
+     "label": "開始位相"
+    },
+    "shrink": {
+     "label": "縮小"
+    },
+    "wave": {
+     "label": "波形",
+     "options": [
+      "サイン波",
+      "三角波"
+     ]
+    }
+   }
+  },
+  "puppet": {
+   "description": "レイヤーをパペットのように曲げます。ピンを置いてドラッグやアニメーションを行うと、画像がピンに滑らかに追従します。",
+   "name": "パペットピン",
+   "params": {
+    "falloff": {
+     "label": "減衰"
+    }
+   }
+  },
+  "pyramid": {
+   "description": "レイヤーを四角錐の各面に貼り付けます。",
+   "name": "ピラミッド",
+   "params": {
+    "base": {
+     "label": "底面"
+    },
+    "height": {
+     "label": "高さ"
+    },
+    "light": {
+     "label": "光の角度"
+    },
+    "perspective": {
+     "label": "遠近感"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "rotX": {
+     "label": "回転X"
+    },
+    "rotY": {
+     "label": "回転Y"
+    },
+    "rotZ": {
+     "label": "回転Z"
+    },
+    "scale": {
+     "label": "スケール"
+    },
+    "shading": {
+     "label": "シェーディング"
+    },
+    "shine": {
+     "label": "光沢"
+    }
+   }
+  },
+  "radialblur": {
+   "description": "中心点から放射状にサンプルを平均化し、強さを調整できる放射状のズームブラーをかけます。",
+   "name": "ズームブラー",
+   "params": {
+    "amount": {
+     "label": "強さ"
+    },
+    "center": {
+     "label": "中心"
+    }
+   }
+  },
+  "radialrays": {
+   "description": "レイヤーの不透明部分に、一点から広がる単色の放射状レイを描画します。",
+   "name": "放射状レイ",
+   "params": {
+    "alpha": {
+     "label": "アルファ"
+    },
+    "angle": {
+     "label": "角度"
+    },
+    "center": {
+     "label": "中心"
+    },
+    "color": {
+     "label": "色"
+    },
+    "count": {
+     "label": "本数"
+    },
+    "width": {
+     "label": "幅"
+    }
+   }
+  },
+  "radialrepeat": {
+   "description": "レイヤーの複数のコピーを円形に配置して動的に生成します。",
+   "name": "放射状リピート",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "count": {
+     "label": "個数"
+    },
+    "easing": {
+     "label": "イージング",
+     "options": [
+      "リニア",
+      "イーズイン",
+      "イーズアウト",
+      "イーズインアウト"
+     ]
+    },
+    "fillAmount": {
+     "label": "塗りの量"
+    },
+    "fillColor": {
+     "label": "塗りの色"
+    },
+    "orientation": {
+     "label": "向き"
+    },
+    "radius": {
+     "label": "半径"
+    },
+    "randomOrder": {
+     "label": "ランダム順"
+    },
+    "rangeEnd": {
+     "label": "範囲の終了"
+    },
+    "rangeOffset": {
+     "label": "範囲のオフセット"
+    },
+    "rangeOpacity": {
+     "label": "範囲の不透明度"
+    },
+    "rangePosition": {
+     "label": "範囲の位置"
+    },
+    "rangeRotation": {
+     "label": "範囲の回転"
+    },
+    "rangeScale": {
+     "label": "範囲のスケール"
+    },
+    "rangeStart": {
+     "label": "範囲の開始"
+    },
+    "scale": {
+     "label": "スケール"
+    },
+    "seed": {
+     "label": "シード"
+    },
+    "sweep": {
+     "label": "スイープ"
+    }
+   }
+  },
+  "radialshadow": {
+   "description": "レイヤーの不透明な部分から、光源を中心に長い影を放射状に落とします。",
+   "name": "放射状シャドウ",
+   "params": {
+    "alpha": {
+     "label": "アルファ"
+    },
+    "color": {
+     "label": "色"
+    },
+    "fade": {
+     "label": "フェード"
+    },
+    "light": {
+     "label": "光源"
+    },
+    "reach": {
+     "label": "長さ"
+    }
+   }
+  },
+  "radialwipe": {
+   "description": "中心から開始角度まで、時計の針のように扇形にレイヤーを隠します。進行度は掃引する角度、回数は扇形の繰り返し、両方向は左右への掃引です。進行度をアニメーションするとトランジションになります。",
+   "name": "放射ワイプ",
+   "params": {
+    "center": {
+     "label": "中心"
+    },
+    "count": {
+     "label": "回数"
+    },
+    "direction": {
+     "label": "方向",
+     "options": [
+      "時計回り",
+      "反時計回り",
+      "両方向"
+     ]
+    },
+    "feather": {
+     "label": "ぼかし"
+    },
+    "progress": {
+     "label": "進行度"
+    },
+    "start": {
+     "label": "開始角度"
+    }
+   }
+  },
+  "randomdisplace": {
+   "description": "レイヤーを時間の経過とともに滑らかにランダム移動させます。シードで動きの種類、速度で移動の速さ、変化でパターンのずれを設定します。",
+   "name": "ランダム変位",
+   "params": {
+    "evolution": {
+     "label": "変化"
+    },
+    "magnitude": {
+     "label": "大きさ"
+    },
+    "scatter": {
+     "label": "ばらつき"
+    },
+    "seed": {
+     "label": "シード"
+    },
+    "speed": {
+     "label": "速度"
+    }
+   }
+  },
+  "randomjitter": {
+   "description": "レイヤーを指定した角度の方向にランダムに往復させます。",
+   "name": "ランダムジッター",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "frequency": {
+     "label": "頻度"
+    },
+    "magnitude": {
+     "label": "大きさ"
+    },
+    "seed": {
+     "label": "シード"
+    },
+    "slack": {
+     "label": "スラック"
+    },
+    "zjitter": {
+     "label": "Zジッター"
+    }
+   }
+  },
+  "rasterextrude": {
+   "description": "レイヤーの画像を押し出して立体ブロックにします。側面は内部色になります。",
+   "name": "ラスター押し出し",
+   "params": {
+    "depth": {
+     "label": "深さ"
+    },
+    "interior": {
+     "label": "内部色"
+    },
+    "light": {
+     "label": "光源角度"
+    },
+    "perspective": {
+     "label": "パース"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "rotX": {
+     "label": "X回転"
+    },
+    "rotY": {
+     "label": "Y回転"
+    },
+    "rotZ": {
+     "label": "Z回転"
+    },
+    "scale": {
+     "label": "スケール"
+    },
+    "shading": {
+     "label": "シェーディング"
+    },
+    "shine": {
+     "label": "光沢"
+    }
+   }
+  },
+  "rastertransform": {
+   "description": "上のエフェクトを適用した後のレイヤーの仕上がり画像を、拡大縮小・回転・移動します。塗りは元の画像を下に残し、レイヤーにマスクは結果を元の形状内に収めます。",
+   "name": "ラスター変換",
+   "params": {
+    "alpha": {
+     "label": "アルファ"
+    },
+    "angle": {
+     "label": "角度"
+    },
+    "fill": {
+     "label": "塗り"
+    },
+    "mask": {
+     "label": "レイヤーにマスク"
+    },
+    "offset": {
+     "label": "オフセット"
+    },
+    "sampling": {
+     "label": "サンプリング",
+     "options": [
+      "ニアレスト",
+      "リニア"
+     ]
+    },
+    "scale": {
+     "label": "スケール"
+    }
+   }
+  },
+  "rays": {
+   "description": "レイヤーの明るい部分から中心点を基準に光線を放射します。",
+   "name": "光線",
+   "params": {
+    "blend": {
+     "label": "ブレンド"
+    },
+    "center": {
+     "label": "中心"
+    },
+    "color": {
+     "label": "色"
+    },
+    "intensity": {
+     "label": "強度"
+    },
+    "reach": {
+     "label": "長さ"
+    },
+    "style": {
+     "label": "スタイル",
+     "options": [
+      "クラシック",
+      "標準"
+     ]
+    },
+    "threshold": {
+     "label": "しきい値"
+    },
+    "thresholdAdd": {
+     "label": "しきい値の加算"
+    }
+   }
+  },
+  "reorient360": {
+   "description": "360°パノラマレイヤーを球体内で回転させ、地平線を水平にしたり正面の向きを変えたりします。",
+   "name": "360°球体の向き調整",
+   "params": {
+    "pitch": {
+     "label": "ピッチ"
+    },
+    "roll": {
+     "label": "ロール"
+    },
+    "yaw": {
+     "label": "ヨー"
+    }
+   }
+  },
+  "repeat": {
+   "description": "レイヤーの複数のコピーを動的に生成します。",
+   "name": "リピート",
+   "params": {
+    "alpha": {
+     "label": "アルファ"
+    },
+    "angle": {
+     "label": "角度"
+    },
+    "count": {
+     "label": "コピー数"
+    },
+    "offset": {
+     "label": "オフセット"
+    },
+    "scale": {
+     "label": "スケール"
+    },
+    "time": {
+     "label": "時間"
+    }
+   }
+  },
+  "repeatalongpath": {
+   "description": "直下のレイヤーの輪郭パスに沿って、レイヤーの複数のコピーを動的に生成します。",
+   "name": "パスに沿ってリピート",
+   "params": {
+    "count": {
+     "label": "コピー数"
+    },
+    "easing": {
+     "label": "イージング",
+     "options": [
+      "リニア",
+      "イーズイン",
+      "イーズアウト",
+      "イーズインアウト"
+     ]
+    },
+    "end": {
+     "label": "終了"
+    },
+    "fillAmount": {
+     "label": "塗りの量"
+    },
+    "fillColor": {
+     "label": "塗りの色"
+    },
+    "phase": {
+     "label": "フェーズ"
+    },
+    "randomOrder": {
+     "label": "ランダム順"
+    },
+    "rangeEnd": {
+     "label": "範囲終了"
+    },
+    "rangeOffset": {
+     "label": "範囲オフセット"
+    },
+    "rangeOpacity": {
+     "label": "範囲不透明度"
+    },
+    "rangePosition": {
+     "label": "範囲位置"
+    },
+    "rangeRotation": {
+     "label": "範囲回転"
+    },
+    "rangeScale": {
+     "label": "範囲スケール"
+    },
+    "rangeStart": {
+     "label": "範囲開始"
+    },
+    "seed": {
+     "label": "シード"
+    },
+    "start": {
+     "label": "開始"
+    },
+    "tangent": {
+     "label": "接線"
+    }
+   }
+  },
+  "replacecolor": {
+   "description": "ある色を別の色に置き換え、アルファで置き換えの強さを、輝度のロックで元の明暗を調整できます。",
+   "name": "色の置き換え",
+   "params": {
+    "alpha": {
+     "label": "アルファ"
+    },
+    "choke": {
+     "label": "チョーク"
+    },
+    "feather": {
+     "label": "フェザー"
+    },
+    "lockLuminance": {
+     "label": "輝度をロック"
+    },
+    "source": {
+     "label": "置き換える色"
+    },
+    "target": {
+     "label": "新しい色"
+    },
+    "threshold": {
+     "label": "しきい値"
+    }
+   }
+  },
+  "retrodither": {
+   "description": "レイヤーをレトロなピクセルグラフィックに変換します。各ピクセルブロックは、古いゲーム機やPCのパレット、または読み込んだパレットから色を取得し、ディザパターンでパレットの色を混ぜてより多くの階調を表現します。",
+   "name": "レトロディザー",
+   "params": {
+    "alpha": {
+     "label": "ミックス"
+    },
+    "dither": {
+     "label": "強さ"
+    },
+    "palette": {
+     "label": "パレット"
+    },
+    "pattern": {
+     "label": "ディザ",
+     "options": [
+      "なし",
+      "ノイズ",
+      "チェッカー",
+      "Bayer 2x2",
+      "Bayer 3x3",
+      "Bayer 4x4",
+      "Bayer 8x8",
+      "クラスタードット4x4",
+      "クラスタードット8x8",
+      "横線",
+      "縦線",
+      "斜線",
+      "Floyd-Steinberg",
+      "False Floyd-Steinberg",
+      "Sierra Lite",
+      "Fan",
+      "Shiau-Fan",
+      "Jarvis-Judice-Ninke",
+      "Stucki",
+      "Burkes",
+      "Sierra",
+      "Two-Row Sierra",
+      "Atkinson"
+     ]
+    },
+    "pixel": {
+     "label": "ピクセルサイズ"
+    }
+   }
+  },
+  "rgbsplit": {
+   "description": "赤・緑・青のチャンネルを分離します。Centerで選んだチャンネルはそのままに、残り2つが角度に沿って逆方向へずれます。Lightはずれた色を加算し、Darkはそのまま重ね、Maskは3つすべてが重なる部分だけを残し、Lumaはフリンジを明るさに応じて半透明にします。",
+   "name": "RGB分離",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "center": {
+     "label": "中心",
+     "options": [
+      "R",
+      "G",
+      "B"
+     ]
+    },
+    "mode": {
+     "label": "モード",
+     "options": [
+      "Light",
+      "Dark",
+      "マスク",
+      "Luma"
+     ]
+    },
+    "strength": {
+     "label": "強さ"
+    }
+   }
+  },
+  "ribbon": {
+   "description": "レイヤーの不透明な部分に、幅が変化するねじれたリボンを描画します。位相をアニメーションさせて流れるように動かしたり、レイヤーからくり抜いたりできます。",
+   "name": "リボン",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "color": {
+     "label": "色"
+    },
+    "frequency": {
+     "label": "周波数"
+    },
+    "magnitude": {
+     "label": "振幅"
+    },
+    "offset": {
+     "label": "オフセット"
+    },
+    "phase": {
+     "label": "位相"
+    },
+    "punch": {
+     "label": "くり抜き"
+    },
+    "smoothing": {
+     "label": "スムージング"
+    },
+    "tint": {
+     "label": "着色"
+    },
+    "tintAmount": {
+     "label": "着色量"
+    },
+    "width": {
+     "label": "幅"
+    }
+   }
+  },
+  "ripple": {
+   "description": "中心点から広がる同心円状の波紋を作ります。振幅・波長・速度を調整できます。",
+   "name": "リップル",
+   "params": {
+    "amplitude": {
+     "label": "振幅"
+    },
+    "center": {
+     "label": "中心"
+    },
+    "speed": {
+     "label": "速度"
+    },
+    "wavelength": {
+     "label": "波長"
+    }
+   }
+  },
+  "roughenedges": {
+   "description": "不透明な部分の輪郭をノイズで削り、破れたり摩耗・焼け焦げたような輪郭にします。",
+   "name": "エッジを粗く",
+   "params": {
+    "blur": {
+     "label": "境界"
+    },
+    "evolution": {
+     "label": "エボリューション"
+    },
+    "octaves": {
+     "label": "オクターブ"
+    },
+    "roughness": {
+     "label": "粗さ"
+    },
+    "scale": {
+     "label": "スケール"
+    },
+    "seed": {
+     "label": "シード"
+    }
+   }
+  },
+  "scanlines": {
+   "description": "水平な走査線を加えてCRTモニター風の効果を作り、縦方向の流れも追加できます。",
+   "name": "走査線",
+   "params": {
+    "darkness": {
+     "label": "暗さ"
+    },
+    "roll_speed": {
+     "label": "流れる速度"
+    },
+    "spacing": {
+     "label": "線の間隔"
+    }
+   }
+  },
+  "scatterfield": {
+   "description": "レイヤーのコピーを無限の3Dフィールド内に散布して元のレイヤーを隠し、キーフレームアニメーションで3次元の動きをシミュレートできます。",
+   "name": "散布フィールド",
+   "params": {
+    "alpha": {
+     "label": "アルファ"
+    },
+    "amount": {
+     "label": "量"
+    },
+    "angle": {
+     "label": "角度"
+    },
+    "angleVariance": {
+     "label": "角度のばらつき"
+    },
+    "blending": {
+     "label": "ブレンドモード",
+     "options": [
+      "通常",
+      "加算",
+      "スクリーン",
+      "乗算",
+      "比較(明)",
+      "比較(暗)",
+      "オーバーレイ",
+      "差の絶対値"
+     ]
+    },
+    "color1": {
+     "label": "色1"
+    },
+    "color2": {
+     "label": "色2"
+    },
+    "color3": {
+     "label": "色3"
+    },
+    "coloring": {
+     "label": "着色",
+     "options": [
+      "なし",
+      "ランダム",
+      "深度"
+     ]
+    },
+    "density": {
+     "label": "密度"
+    },
+    "evolution": {
+     "label": "エボリューション"
+    },
+    "fade": {
+     "label": "フェード"
+    },
+    "interpolateHue": {
+     "label": "色相を補間"
+    },
+    "lockLuminance": {
+     "label": "輝度を固定"
+    },
+    "lockSaturation": {
+     "label": "彩度を固定"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "scale": {
+     "label": "スケール"
+    },
+    "seed": {
+     "label": "シード"
+    },
+    "size": {
+     "label": "サイズ"
+    },
+    "sizeVariance": {
+     "label": "サイズのばらつき"
+    },
+    "slack": {
+     "label": "余裕"
+    },
+    "z": {
+     "label": "Z位置"
+    }
+   }
+  },
+  "sepia": {
+   "description": "古い写真のような温かい茶色の色合いにします。",
+   "name": "セピア",
+   "params": {
+    "amount": {
+     "label": "量"
+    }
+   }
+  },
+  "sharpen": {
+   "description": "3x3の近傍を使ったアンシャープマスクで細部を強調します。",
+   "name": "シャープ",
+   "params": {
+    "amount": {
+     "label": "強さ"
+    },
+    "radius": {
+     "label": "半径"
+    }
+   }
+  },
+  "shutterblur": {
+   "description": "カメラのシャッターのように、レイヤーが実際に移動・回転・拡大した方向へぼかします。シャッター角を広げると残像が長くなり、サンプル数を増やすと滑らかになります。フルブラーがオフのときは、プレビューが軽いぼかしで表示されます。",
+   "name": "リアルモーションブラー",
+   "params": {
+    "samples": {
+     "label": "サンプル数"
+    },
+    "shutter": {
+     "label": "シャッター角"
+    }
+   }
+  },
+  "simplestarfield": {
+   "description": "レイヤーの不透明な部分に、奥行きの層を持つ小さな星を散りばめます。位置で視差を付けながらフィールドを動かし、深度で奥へ進み、スケールでズーム、サイズとフェザーで星の形、量で星の数を設定できます。",
+   "name": "シンプルスターフィールド",
+   "params": {
+    "alpha": {
+     "label": "アルファ"
+    },
+    "amount": {
+     "label": "量"
+    },
+    "blend": {
+     "label": "ブレンドモード",
+     "options": [
+      "通常",
+      "加算",
+      "スクリーン",
+      "乗算"
+     ]
+    },
+    "brightness": {
+     "label": "明るさ"
+    },
+    "color": {
+     "label": "色"
+    },
+    "depth": {
+     "label": "奥行き"
+    },
+    "feather": {
+     "label": "フェザー"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "scale": {
+     "label": "スケール"
+    },
+    "starSize": {
+     "label": "サイズ"
+    }
+   }
+  },
+  "smear": {
+   "description": "レイヤーを一定方向へ一定の長さで引き伸ばし、高速で動いたように見せます。",
+   "name": "スミア",
+   "params": {
+    "angle": {
+     "label": "方向"
+    },
+    "length": {
+     "label": "長さ"
+    }
+   }
+  },
+  "smoothbevel": {
+   "description": "レイヤーの不透明部分に、片側から光が当たったような滑らかな丸みのあるベベルを付けます。",
+   "name": "スムーズベベル",
+   "params": {
+    "angle": {
+     "label": "光の角度"
+    },
+    "blur": {
+     "label": "サイズ"
+    },
+    "depth": {
+     "label": "奥行き"
+    },
+    "highlight": {
+     "label": "ハイライト"
+    },
+    "intensity": {
+     "label": "強さ"
+    },
+    "shadow": {
+     "label": "影"
+    }
+   }
+  },
+  "smoothedges": {
+   "description": "レイヤーの不透明部分のエッジを、内側の色を変えずに丸く滑らかにします。レイヤーにマスクを適用すると、エッジは内側にのみ移動します。",
+   "name": "スムーズエッジ",
+   "params": {
+    "blur": {
+     "label": "強さ"
+    },
+    "mask": {
+     "label": "レイヤーにマスク"
+    }
+   }
+  },
+  "softglow": {
+   "description": "画像の柔らかくぼかしたコピーをスクリーン合成し、主にハイライトから夢のような輝きを加えます。",
+   "name": "ソフトグロー",
+   "params": {
+    "blend": {
+     "label": "ブレンド"
+    },
+    "blur": {
+     "label": "サイズ"
+    },
+    "brightness": {
+     "label": "明るさ"
+    },
+    "color": {
+     "label": "色"
+    },
+    "contrast": {
+     "label": "コントラスト"
+    },
+    "highlights": {
+     "label": "ハイライト"
+    },
+    "opacity": {
+     "label": "不透明度"
+    }
+   }
+  },
+  "solid": {
+   "description": "レイヤーの形状を保ったまま上から1色を重ね、ブレンドモードを選択できます。",
+   "name": "単色",
+   "params": {
+    "amount": {
+     "label": "アルファ"
+    },
+    "blend": {
+     "label": "ブレンドモード",
+     "options": [
+      "通常",
+      "乗算",
+      "スクリーン",
+      "オーバーレイ",
+      "ソフトライト",
+      "ハードライト",
+      "加算",
+      "比較（暗）",
+      "比較（明）",
+      "差の絶対値",
+      "覆い焼き（カラー）",
+      "焼き込み（カラー）"
+     ]
+    },
+    "color": {
+     "label": "色"
+    }
+   }
+  },
+  "solidmatte": {
+   "description": "レイヤーの背後に単色を配置して透明部分を埋めます。切り抜きではレイヤーの形状を切り抜いた色だけを表示し、スクリーンスペースではレイヤーの枠ではなく画面全体を埋めます。",
+   "name": "ソリッドマット",
+   "params": {
+    "alpha": {
+     "label": "アルファ"
+    },
+    "color": {
+     "label": "色"
+    },
+    "punch": {
+     "label": "パンチアウト"
+    },
+    "screenSpace": {
+     "label": "スクリーン空間"
+    }
+   }
+  },
+  "spherize": {
+   "description": "レイヤーを前面投影または正距円筒テクスチャで球体に巻き付けます。",
+   "name": "球面化",
+   "params": {
+    "coverage": {
+     "label": "範囲"
+    },
+    "light": {
+     "label": "光源角度"
+    },
+    "perspective": {
+     "label": "パースペクティブ"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "projection": {
+     "label": "投影",
+     "options": [
+      "正面",
+      "正距円筒"
+     ]
+    },
+    "radius": {
+     "label": "半径"
+    },
+    "rotX": {
+     "label": "回転X"
+    },
+    "rotY": {
+     "label": "回転Y"
+    },
+    "rotZ": {
+     "label": "回転Z"
+    },
+    "scale": {
+     "label": "スケール"
+    },
+    "shading": {
+     "label": "シェーディング"
+    },
+    "shine": {
+     "label": "光沢"
+    }
+   }
+  },
+  "spillclean": {
+   "description": "キーイングした背景がレイヤーの縁に残す緑や青の光を、ピクセルの明るさを保ったまま除去します。",
+   "name": "キースピル除去",
+   "params": {
+    "blur": {
+     "label": "エッジ幅"
+    },
+    "channel": {
+     "label": "スピル色",
+     "options": [
+      "自動",
+      "緑",
+      "青"
+     ]
+    },
+    "strength": {
+     "label": "強さ"
+    }
+   }
+  },
+  "spin": {
+   "description": "レイヤーを一定速度で回転させます。0未満では逆方向に回転します。",
+   "name": "スピン",
+   "params": {
+    "rpm": {
+     "label": "RPM"
+    }
+   }
+  },
+  "spinblur": {
+   "description": "レイヤーを中心点の周りに円状にぼかし、回転しているように見せます。",
+   "name": "スピンブラー",
+   "params": {
+    "center": {
+     "label": "中心"
+    },
+    "sweep": {
+     "label": "角度"
+    }
+   }
+  },
+  "spinstreaks": {
+   "description": "レイヤーのコピーを点の周りで回転させ、重なる部分をブレンドして弧状の筋を作ります。R、G、B、Aはチャンネルごとに、コピーの最小値・最大値・平均値を使うか、そのチャンネルを変更しないかを選びます。",
+   "name": "スピンストリーク",
+   "params": {
+    "a": {
+     "label": "A",
+     "options": [
+      "最小",
+      "最大",
+      "平均",
+      "オフ"
+     ]
+    },
+    "alpha": {
+     "label": "アルファ"
+    },
+    "b": {
+     "label": "B",
+     "options": [
+      "最小",
+      "最大",
+      "平均",
+      "オフ"
+     ]
+    },
+    "bias": {
+     "label": "バイアス"
+    },
+    "center": {
+     "label": "中心"
+    },
+    "g": {
+     "label": "G",
+     "options": [
+      "最小",
+      "最大",
+      "平均",
+      "オフ"
+     ]
+    },
+    "r": {
+     "label": "R",
+     "options": [
+      "最小",
+      "最大",
+      "平均",
+      "オフ"
+     ]
+    },
+    "sweep": {
+     "label": "スイープ"
+    }
+   }
+  },
+  "splittone": {
+   "description": "シャドウを一方の色相に、ハイライトをもう一方の色相に寄せ、黒・白・明るさは保ちます。シャドウレベルは明るさのカーブを曲げ、ハイライトレベルはハイライト色の開始位置を動かします。グラデーションマップスタイルでは、各ピクセルの明るさだけから色を決めます。",
+   "name": "スプリットトーン",
+   "params": {
+    "highlightAmount": {
+     "label": "ハイライト量"
+    },
+    "highlightHue": {
+     "label": "ハイライト色相"
+    },
+    "highlightLevel": {
+     "label": "ハイライトレベル"
+    },
+    "shadowAmount": {
+     "label": "シャドウ量"
+    },
+    "shadowHue": {
+     "label": "シャドウ色相"
+    },
+    "shadowLevel": {
+     "label": "シャドウレベル"
+    },
+    "style": {
+     "label": "スタイル",
+     "options": [
+      "色付け",
+      "グラデーションマップ"
+     ]
+    }
+   }
+  },
+  "spotcolor": {
+   "description": "1つの色だけを残し、レイヤー内のほかの色の彩度を下げます。",
+   "name": "スポットカラー",
+   "params": {
+    "choke": {
+     "label": "チョーク"
+    },
+    "color": {
+     "label": "色"
+    },
+    "feather": {
+     "label": "フェザー"
+    },
+    "saturation": {
+     "label": "彩度"
+    },
+    "threshold": {
+     "label": "しきい値"
+    }
+   }
+  },
+  "squeeze": {
+   "description": "正の強さでレイヤー中央を内側につまみ、負の強さで外側に膨らませます。レガシーは古いプロジェクトの形状を保ちます。",
+   "name": "スクイーズ",
+   "params": {
+    "amount": {
+     "label": "強さ"
+    },
+    "shape": {
+     "label": "形状",
+     "options": [
+      "つまみ/膨らみ",
+      "レガシー"
+     ]
+    }
+   }
+  },
+  "star": {
+   "description": "レイヤー上に輝く星を1つ描画します。",
+   "name": "スター",
+   "params": {
+    "alpha": {
+     "label": "アルファ"
+    },
+    "blend": {
+     "label": "ブレンドモード",
+     "options": [
+      "通常",
+      "乗算",
+      "スクリーン",
+      "オーバーレイ",
+      "ソフトライト",
+      "ハードライト",
+      "加算",
+      "暗く",
+      "明るく",
+      "差",
+      "覆い焼き",
+      "焼き込み"
+     ]
+    },
+    "brightness": {
+     "label": "明るさ"
+    },
+    "color": {
+     "label": "色"
+    },
+    "points": {
+     "label": "頂点数"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "radius": {
+     "label": "半径"
+    },
+    "shine": {
+     "label": "輝き"
+    }
+   }
+  },
+  "starfield": {
+   "description": "レイヤーの不透明な部分を奥行きのある星空で埋めます。オフセットで星の間を移動し、近くの星ほど遠くの星より大きく動きます。",
+   "name": "スターフィールド",
+   "params": {
+    "brightness": {
+     "label": "明るさ"
+    },
+    "darkMatter": {
+     "label": "ダークマター"
+    },
+    "offset": {
+     "label": "オフセット"
+    },
+    "scale": {
+     "label": "スケール"
+    }
+   }
+  },
+  "starpolyhedron": {
+   "description": "レイヤーを、交差した2つのピラミッドからなる星に貼り付けます。",
+   "name": "星形多面体",
+   "params": {
+    "light": {
+     "label": "光の角度"
+    },
+    "perspective": {
+     "label": "パース"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "radius": {
+     "label": "半径"
+    },
+    "rotX": {
+     "label": "X回転"
+    },
+    "rotY": {
+     "label": "Y回転"
+    },
+    "rotZ": {
+     "label": "Z回転"
+    },
+    "scale": {
+     "label": "スケール"
+    },
+    "shading": {
+     "label": "シェーディング"
+    },
+    "shine": {
+     "label": "光沢"
+    }
+   }
+  },
+  "starprism": {
+   "description": "レイヤーを星形に切り抜き、奥行きを加えます。",
+   "name": "スタープリズム",
+   "params": {
+    "depth": {
+     "label": "奥行き"
+    },
+    "inner": {
+     "label": "内側の半径"
+    },
+    "light": {
+     "label": "光の角度"
+    },
+    "perspective": {
+     "label": "パースペクティブ"
+    },
+    "points": {
+     "label": "頂点数"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "radius": {
+     "label": "半径"
+    },
+    "rotX": {
+     "label": "X軸回転"
+    },
+    "rotY": {
+     "label": "Y軸回転"
+    },
+    "rotZ": {
+     "label": "Z軸回転"
+    },
+    "scale": {
+     "label": "スケール"
+    },
+    "shading": {
+     "label": "シェーディング"
+    },
+    "shine": {
+     "label": "光沢"
+    },
+    "smoothing": {
+     "label": "スムージング"
+    }
+   }
+  },
+  "static": {
+   "description": "信号のないテレビのような、ちらつくグレーのノイズ。",
+   "name": "スタティック",
+   "params": {
+    "amount": {
+     "label": "強さ"
+    },
+    "grain": {
+     "label": "サイズ"
+    }
+   }
+  },
+  "stretch": {
+   "description": "レイヤーを線に沿って切り、両側を引き離して、線上のピクセルを隙間へ引き伸ばします。",
+   "name": "セグメントストレッチ",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "offset": {
+     "label": "オフセット"
+    },
+    "relative": {
+     "label": "レイヤーサイズで計測"
+    },
+    "spread": {
+     "label": "広がり"
+    },
+    "stretch": {
+     "label": "引き伸ばし"
+    }
+   }
+  },
+  "stretchaxis": {
+   "description": "レイヤーを任意の方向に引き伸ばします。",
+   "name": "ストレッチ軸",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "mask": {
+     "label": "レイヤーにマスク"
+    },
+    "scale": {
+     "label": "スケール"
+    }
+   }
+  },
+  "stripes": {
+   "description": "レイヤーの不透明な部分にストライプの模様を描画するか、ストライプの形にくり抜きます。",
+   "name": "ストライプ",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "color": {
+     "label": "色"
+    },
+    "count": {
+     "label": "本数"
+    },
+    "phase": {
+     "label": "位相"
+    },
+    "punch": {
+     "label": "くり抜き"
+    },
+    "screenSpace": {
+     "label": "スクリーン空間"
+    },
+    "smoothing": {
+     "label": "スムージング"
+    },
+    "width": {
+     "label": "幅"
+    }
+   }
+  },
+  "stroketaper": {
+   "description": "フリーハンド描画のペンやブラシのストロークを先細りにします。始点はなしから開始値まで、終点は終了値からなしまで、絞りを強めるとテーパーが鋭くなります。",
+   "name": "ストロークテーパー",
+   "params": {
+    "end": {
+     "label": "終了"
+    },
+    "squeeze": {
+     "label": "絞り"
+    },
+    "start": {
+     "label": "開始"
+    }
+   }
+  },
+  "swing": {
+   "description": "レイヤーを2つの角度の間で往復させます。",
+   "name": "スイング",
+   "params": {
+    "angle1": {
+     "label": "角度1"
+    },
+    "angle2": {
+     "label": "角度2"
+    },
+    "frequency": {
+     "label": "周波数"
+    },
+    "phase": {
+     "label": "位相"
+    },
+    "wave": {
+     "label": "波形",
+     "options": [
+      "サイン",
+      "三角"
+     ]
+    }
+   }
+  },
+  "temperature": {
+   "description": "ケルビン単位の色温度の光のように映像を暖かく、または冷たくします。6500 Kでは変化しません。",
+   "name": "色温度",
+   "params": {
+    "kelvin": {
+     "label": "色温度"
+    },
+    "strength": {
+     "label": "強さ"
+    }
+   }
+  },
+  "textpath": {
+   "description": "テキストを円弧、円、またはすぐ下のレイヤーの輪郭に沿って1文字ずつ配置します。シェイピング、フォント、絵文字はそのまま保たれます。",
+   "name": "パスに沿ったテキスト",
+   "params": {
+    "align": {
+     "label": "揃え",
+     "options": [
+      "左",
+      "中央",
+      "右"
+     ]
+    },
+    "baseline": {
+     "label": "ベースラインシフト"
+    },
+    "center": {
+     "label": "中心"
+    },
+    "control1": {
+     "label": "コントロール1"
+    },
+    "control2": {
+     "label": "コントロール2"
+    },
+    "end": {
+     "label": "終了"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "radius": {
+     "label": "半径"
+    },
+    "reverse": {
+     "label": "パスを反転"
+    },
+    "rotate": {
+     "label": "文字を回転"
+    },
+    "shape": {
+     "label": "パス",
+     "options": [
+      "円弧",
+      "円",
+      "下のレイヤー"
+     ]
+    },
+    "start": {
+     "label": "開始"
+    }
+   }
+  },
+  "textprogress": {
+   "description": "開始から終了までのテキストを文字、単語、行単位で表示します。フェード、スライド、拡大縮小、ぼかしも設定できます。",
+   "name": "テキストプログレス",
+   "params": {
+    "appearance": {
+     "label": "表示方法",
+     "options": [
+      "ポップ",
+      "フェード",
+      "上にスライド",
+      "下にスライド",
+      "左にスライド",
+      "右にスライド",
+      "拡大",
+      "縮小",
+      "ぼかし"
+     ]
+    },
+    "direction": {
+     "label": "方向",
+     "options": [
+      "先頭から",
+      "末尾から",
+      "中央から",
+      "ランダム"
+     ]
+    },
+    "distance": {
+     "label": "距離"
+    },
+    "progress": {
+     "label": "終了"
+    },
+    "seed": {
+     "label": "シード"
+    },
+    "softness": {
+     "label": "柔らかさ"
+    },
+    "start": {
+     "label": "開始"
+    },
+    "unit": {
+     "label": "基準",
+     "options": [
+      "文字",
+      "単語",
+      "行"
+     ]
+    }
+   },
+   "presets": {
+    "fade-in-by-word": "単語ごとにフェードイン",
+    "pop-in": "ポップイン",
+    "slide-up-by-letter": "文字ごとに上へスライド",
+    "typewriter": "タイプライター"
+   }
+  },
+  "textrandomizer": {
+   "description": "開始から終了までの文字を量の分だけランダムに置き換えます。エボリューションをアニメーションするか速度を上げると置き換わり、リビールで元のテキストに戻ります。",
+   "name": "テキストランダマイザー",
+   "params": {
+    "amount": {
+     "label": "量"
+    },
+    "characters": {
+     "label": "カスタム"
+    },
+    "charset": {
+     "label": "文字",
+     "options": [
+      "英字",
+      "大文字",
+      "小文字",
+      "数字",
+      "英数字",
+      "記号",
+      "カスタム"
+     ]
+    },
+    "direction": {
+     "label": "方向",
+     "options": [
+      "先頭から",
+      "末尾から",
+      "中央から",
+      "ランダム"
+     ]
+    },
+    "end": {
+     "label": "終了"
+    },
+    "evolution": {
+     "label": "エボリューション"
+    },
+    "keepSpaces": {
+     "label": "スペースを保持"
+    },
+    "progress": {
+     "label": "リビール"
+    },
+    "seed": {
+     "label": "シード"
+    },
+    "speed": {
+     "label": "速度"
+    },
+    "start": {
+     "label": "開始"
+    }
+   },
+   "presets": {
+    "scramble": "スクランブル"
+   }
+  },
+  "texttransform": {
+   "description": "範囲内の文字・単語・行を移動、拡大縮小、回転、フェード、着色します。アンカーは拡大縮小と回転の基準を各コンポーネントかレイヤー中央から選べます。オフセットで範囲を動かすと変化がテキスト内を移動します。",
+   "name": "テキストトランスフォーム",
+   "params": {
+    "anchor": {
+     "label": "アンカー",
+     "options": [
+      "コンポーネント",
+      "レイヤー"
+     ]
+    },
+    "end": {
+     "label": "終了"
+    },
+    "offset": {
+     "label": "オフセット"
+    },
+    "opacity": {
+     "label": "不透明度"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "randomOrder": {
+     "label": "ランダム順"
+    },
+    "rotation": {
+     "label": "回転"
+    },
+    "scale": {
+     "label": "スケール"
+    },
+    "seed": {
+     "label": "シード"
+    },
+    "shape": {
+     "label": "形状",
+     "options": [
+      "四角",
+      "ランプアップ",
+      "ランプダウン",
+      "三角",
+      "丸",
+      "スムーズ"
+     ]
+    },
+    "smoothness": {
+     "label": "滑らかさ"
+    },
+    "start": {
+     "label": "開始"
+    },
+    "tint": {
+     "label": "色合い"
+    },
+    "unit": {
+     "label": "基準",
+     "options": [
+      "文字",
+      "単語",
+      "行"
+     ]
+    }
+   },
+   "presets": {
+    "spin-cascade": "スピンカスケード",
+    "wave": "ウェーブ"
+   }
+  },
+  "threshold": {
+   "description": "明るさを境に白黒2階調にします。",
+   "name": "しきい値",
+   "params": {
+    "blend": {
+     "label": "ブレンドモード",
+     "options": [
+      "通常",
+      "乗算",
+      "スクリーン",
+      "オーバーレイ",
+      "ソフトライト",
+      "ハードライト",
+      "加算",
+      "比較（暗）",
+      "比較（明）",
+      "差の絶対値",
+      "覆い焼きカラー",
+      "焼き込みカラー"
+     ]
+    },
+    "invert": {
+     "label": "反転"
+    },
+    "level": {
+     "label": "しきい値"
+    },
+    "softness": {
+     "label": "ぼかし"
+    }
+   }
+  },
+  "tile": {
+   "description": "画像をグリッド状に繰り返します。",
+   "name": "タイル",
+   "params": {
+    "mirror": {
+     "label": "ミラー"
+    },
+    "offset": {
+     "label": "オフセット"
+    },
+    "scale": {
+     "label": "スケール"
+    }
+   }
+  },
+  "tilerotate": {
+   "description": "レイヤーをタイルのグリッドに分割し、各タイル内の画像を個別に回転させます。",
+   "name": "タイル回転",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "count": {
+     "label": "数"
+    },
+    "offset": {
+     "label": "オフセット"
+    },
+    "random": {
+     "label": "ランダム化"
+    },
+    "rotation": {
+     "label": "回転"
+    },
+    "seed": {
+     "label": "シード"
+    },
+    "stretch": {
+     "label": "ストレッチ"
+    }
+   }
+  },
+  "tiles": {
+   "description": "レイヤーを繰り返して画面を埋めます。クロップを上げるとタイルが小さくなり、ミラー、行オフセット、回転も設定できます。レガシースケールは古いプロジェクトを保持します。",
+   "name": "タイル",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "mirror": {
+     "label": "ミラー"
+    },
+    "offset": {
+     "label": "オフセット"
+    },
+    "sizing": {
+     "label": "サイズ設定",
+     "options": [
+      "クロップ",
+      "レガシースケール"
+     ]
+    },
+    "vertical": {
+     "label": "垂直オフセット"
+    },
+    "zoom": {
+     "label": "クロップ"
+    }
+   }
+  },
+  "tileshift": {
+   "description": "レイヤーをタイルのグリッドに分割し、各タイル内の画像をランダムな方向にスライドさせます。",
+   "name": "タイルシフト",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "count": {
+     "label": "数"
+    },
+    "offset": {
+     "label": "オフセット"
+    },
+    "seed": {
+     "label": "シード"
+    },
+    "strength": {
+     "label": "強さ"
+    },
+    "stretch": {
+     "label": "ストレッチ"
+    }
+   }
+  },
+  "timecode": {
+   "description": "レイヤーのテキストを、レイヤーまたはプロジェクトの時間を刻む時計に置き換えます。開始位置と負の速度でカウントダウンになります。",
+   "name": "タイムコード",
+   "params": {
+    "format": {
+     "label": "形式",
+     "options": [
+      "HH:MM:SS:FF",
+      "HH:MM:SS",
+      "MM:SS",
+      "MM:SS.hh",
+      "SS.hh",
+      "フレーム"
+     ]
+    },
+    "offset": {
+     "label": "開始位置"
+    },
+    "source": {
+     "label": "時間",
+     "options": [
+      "レイヤー",
+      "プロジェクト"
+     ]
+    },
+    "speed": {
+     "label": "速度"
+    }
+   }
+  },
+  "timequant": {
+   "description": "このレイヤーを低いフレームレートで動かし、カクついた映像やストップモーション風にします。",
+   "name": "フレームレート",
+   "params": {
+    "fps": {
+     "label": "フレーム/秒"
+    }
+   }
+  },
+  "tint": {
+   "description": "画像の輝度を、ブレンド量を加えてシャドウ色とハイライト色の間にマッピングします。",
+   "name": "着色",
+   "params": {
+    "amount": {
+     "label": "量"
+    },
+    "highlightColor": {
+     "label": "ハイライト色"
+    },
+    "shadowColor": {
+     "label": "シャドウ色"
+    }
+   }
+  },
+  "torus": {
+   "description": "レイヤーをリング状に巻き付けます。",
+   "name": "トーラス",
+   "params": {
+    "light": {
+     "label": "光源の角度"
+    },
+    "perspective": {
+     "label": "パースペクティブ"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "radius": {
+     "label": "半径"
+    },
+    "rotX": {
+     "label": "回転X"
+    },
+    "rotY": {
+     "label": "回転Y"
+    },
+    "rotZ": {
+     "label": "回転Z"
+    },
+    "scale": {
+     "label": "スケール"
+    },
+    "shading": {
+     "label": "シェーディング"
+    },
+    "shine": {
+     "label": "光沢"
+    },
+    "thickness": {
+     "label": "太さ"
+    }
+   }
+  },
+  "tunnel": {
+   "description": "レイヤーで無限に続くトンネルを作り、その中を進みます。位相を変えるとテクスチャが奥行き方向にずれます。",
+   "name": "トンネル",
+   "params": {
+    "fog": {
+     "label": "フォグ"
+    },
+    "fogColor": {
+     "label": "フォグの色"
+    },
+    "phase": {
+     "label": "位相"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "repeat": {
+     "label": "繰り返し"
+    },
+    "rotX": {
+     "label": "回転X"
+    },
+    "rotY": {
+     "label": "回転Y"
+    },
+    "rotZ": {
+     "label": "回転Z"
+    },
+    "scale": {
+     "label": "スケール"
+    },
+    "speed": {
+     "label": "速度"
+    },
+    "twist": {
+     "label": "ねじれ"
+    }
+   }
+  },
+  "turbulence": {
+   "description": "レイヤーの不透明な部分を滑らかなフラクタルノイズで埋めます。雲や煙、明るさマップなどに使えます。",
+   "name": "タービュランス",
+   "params": {
+    "alpha": {
+     "label": "アルファ"
+    },
+    "bias": {
+     "label": "バイアス"
+    },
+    "blend": {
+     "label": "ブレンドモード",
+     "options": [
+      "通常",
+      "乗算",
+      "スクリーン",
+      "オーバーレイ",
+      "ソフトライト",
+      "ハードライト",
+      "加算",
+      "暗く",
+      "明るく",
+      "差分",
+      "覆い焼きカラー",
+      "焼き込みカラー"
+     ]
+    },
+    "color1": {
+     "label": "カラー1"
+    },
+    "color2": {
+     "label": "カラー2"
+    },
+    "evolution": {
+     "label": "変化"
+    },
+    "intensity": {
+     "label": "強度"
+    },
+    "octaves": {
+     "label": "オクターブ"
+    },
+    "offset": {
+     "label": "オフセット"
+    },
+    "parallax": {
+     "label": "視差"
+    },
+    "scale": {
+     "label": "スケール"
+    },
+    "seed": {
+     "label": "シード"
+    },
+    "stretch": {
+     "label": "ストレッチ"
+    }
+   }
+  },
+  "turbulentdisplace": {
+   "description": "滑らかなフラクタルノイズでレイヤーを押し動かします。炎や水、陽炎、ざらついた自然な輪郭に使えます。",
+   "name": "タービュラントディスプレイス",
+   "params": {
+    "bias": {
+     "label": "バイアス"
+    },
+    "direction": {
+     "label": "方向",
+     "options": [
+      "両方",
+      "水平",
+      "垂直",
+      "放射状",
+      "ねじれ"
+     ]
+    },
+    "evolution": {
+     "label": "変化"
+    },
+    "octaves": {
+     "label": "オクターブ"
+    },
+    "offset": {
+     "label": "オフセット"
+    },
+    "parallax": {
+     "label": "視差"
+    },
+    "scale": {
+     "label": "スケール"
+    },
+    "seed": {
+     "label": "シード"
+    },
+    "strength": {
+     "label": "強さ"
+    },
+    "stretch": {
+     "label": "ストレッチ"
+    }
+   }
+  },
+  "twirl": {
+   "description": "レイヤーを中心の周りで渦のようにねじり、中心で最も強く、半径（レイヤーサイズに対する割合）に向かって弱まります。強さを負にすると逆方向にねじれます。",
+   "name": "スワール",
+   "params": {
+    "center": {
+     "label": "中心"
+    },
+    "radius": {
+     "label": "半径"
+    },
+    "strength": {
+     "label": "強さ"
+    }
+   }
+  },
+  "unsharpmask": {
+   "description": "レイヤーとぼかしたコピーとの差を加えてシャープにします。強さはぼかしの広さ、量は加える差の大きさ、しきい値が50%を超えると小さな差は無視されます。",
+   "name": "アンシャープマスク",
+   "params": {
+    "amount": {
+     "label": "量"
+    },
+    "radius": {
+     "label": "強さ"
+    },
+    "showMask": {
+     "label": "マスクを表示"
+    },
+    "threshold": {
+     "label": "しきい値"
+    }
+   }
+  },
+  "vhs": {
+   "description": "古いビデオテープのような見た目：色のにじみ、横に伸びた線、走査線、テープノイズ、揺れるトラッキング帯。",
+   "name": "VHS",
+   "params": {
+    "chroma": {
+     "label": "色にじみ"
+    },
+    "headSwitch": {
+     "label": "ヘッドスイッチング"
+    },
+    "noise": {
+     "label": "ノイズ"
+    },
+    "saturation": {
+     "label": "彩度"
+    },
+    "scanlines": {
+     "label": "走査線"
+    },
+    "seed": {
+     "label": "シード"
+    },
+    "smear": {
+     "label": "スミア"
+    },
+    "tracking": {
+     "label": "トラッキング"
+    },
+    "wobble": {
+     "label": "揺れ"
+    }
+   }
+  },
+  "viewer360": {
+   "description": "360°パノラマレイヤーを、回転とズームができる仮想カメラで表示します。",
+   "name": "360°ビューアー",
+   "params": {
+    "fov": {
+     "label": "視野角"
+    },
+    "pitch": {
+     "label": "ピッチ"
+    },
+    "roll": {
+     "label": "ロール"
+    },
+    "yaw": {
+     "label": "ヨー"
+    }
+   }
+  },
+  "vignette": {
+   "description": "レイヤーの端に向かって、角丸の形状の外側を暗くします。サイズは形状、丸みは角の丸さ、ぼかしは境界の柔らかさ、強さは暗さ、色味は色の反映度を設定します。パンチアウトをオンにすると端が透明になります。",
+   "name": "ビネット",
+   "params": {
+    "color": {
+     "label": "色"
+    },
+    "extent": {
+     "label": "サイズ"
+    },
+    "feather": {
+     "label": "ぼかし"
+    },
+    "punch": {
+     "label": "パンチアウト"
+    },
+    "rounding": {
+     "label": "丸み"
+    },
+    "strength": {
+     "label": "強さ"
+    },
+    "style": {
+     "label": "スタイル",
+     "options": [
+      "角丸",
+      "柔らかい楕円"
+     ]
+    },
+    "tint": {
+     "label": "色味"
+    }
+   }
+  },
+  "voronoicells": {
+   "description": "ランダムに配置された点の周りにセル状のパターンで、レイヤーの不透明な部分を塗りつぶします。",
+   "name": "ボロノイセル",
+   "params": {
+    "color1": {
+     "label": "色1"
+    },
+    "color2": {
+     "label": "色2"
+    },
+    "lineColor": {
+     "label": "線の色"
+    },
+    "lineWidth": {
+     "label": "線の太さ"
+    },
+    "phase": {
+     "label": "位相"
+    },
+    "scale": {
+     "label": "スケール"
+    },
+    "seed": {
+     "label": "シード"
+    }
+   }
+  },
+  "wavewarp": {
+   "description": "レイヤーをサイン波で曲げます。間隔は波の数、振幅は押し出す量、角度は波の向き、ワープ角度は押し出す向きを設定します。",
+   "name": "ウェーブワープ",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "magnitude": {
+     "label": "振幅"
+    },
+    "phase": {
+     "label": "位相"
+    },
+    "spacing": {
+     "label": "間隔"
+    },
+    "speed": {
+     "label": "速度"
+    },
+    "warpAngle": {
+     "label": "ワープ角度"
+    }
+   }
+  },
+  "wipe": {
+   "description": "レイヤーを両側から隠します。開始または終了をアニメーションするとワイプトランジションになります。",
+   "name": "ワイプ",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "end": {
+     "label": "終了"
+    },
+    "feather": {
+     "label": "フェザー"
+    },
+    "softness": {
+     "label": "柔らかさ"
+    },
+    "start": {
+     "label": "開始"
+    }
+   }
+  },
+  "zoomstreaks": {
+   "description": "レイヤーのコピーを中心から拡大し、最も明るいピクセルを残して、点から放射状に伸びるストリークを作ります。平均にするとズームブラーになります。R、G、B、Aはチャンネルごとに、コピーが最小・最大・平均のどれを残すか、またはそのチャンネルを変更しないかを選びます。",
+   "name": "ズームストリーク",
+   "params": {
+    "a": {
+     "label": "A",
+     "options": [
+      "最小",
+      "最大",
+      "平均",
+      "オフ"
+     ]
+    },
+    "alpha": {
+     "label": "アルファ"
+    },
+    "b": {
+     "label": "B",
+     "options": [
+      "最小",
+      "最大",
+      "平均",
+      "オフ"
+     ]
+    },
+    "bias": {
+     "label": "バイアス"
+    },
+    "center": {
+     "label": "中心"
+    },
+    "g": {
+     "label": "G",
+     "options": [
+      "最小",
+      "最大",
+      "平均",
+      "オフ"
+     ]
+    },
+    "r": {
+     "label": "R",
+     "options": [
+      "最小",
+      "最大",
+      "平均",
+      "オフ"
+     ]
+    },
+    "strength": {
+     "label": "強さ"
+    }
+   }
+  }
+ }
+}

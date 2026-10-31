@@ -424,6 +424,9 @@
     <string name="compress_not_smaller">%1$s. It did not get smaller, so keep your original.</string>
     <string name="compress_save">Save to gallery</string>
     <string name="compress_saved">Saved</string>
+    <string name="compress_result">Result</string>
+    <string name="compress_after">After</string>
+    <string name="compress_before">Before</string>
     <string name="compress_saved_to">Saved to %1$s</string>
     <string name="compress_share">Share</string>
     <string name="compress_failed">Could not compress: %1$s</string>
