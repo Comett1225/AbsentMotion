@@ -14,6 +14,8 @@ The app keeps earlier versions of every project. A version is stored when you op
 
 Open it from the project card's menu (**Version history**) or in the editor's project settings (**Earlier versions**). Each row has a thumbnail, the time ("Today at 14:05", "Yesterday at 09:30") and **Restore**. Restoring asks first: "The project goes back to how it was ... The current state is kept in Version history, so nothing is lost."
 
+![Version history: each version has a thumbnail, a time and a size (1), and a Restore button (2).](img/projects-versions.webp)
+
 ## Crash recovery
 
 If the app stops unexpectedly while a project is open, the next start shows **AbsentMotion closed unexpectedly** with the reason in one sentence, such as "It ran out of memory while exporting." If there were unsaved edits it asks "Restore your last edits to ...?" with **Restore** and **Discard**. A discarded draft stays in the project's version history.
@@ -38,6 +40,8 @@ In [Settings](@settings), group **Backup**:
 - **Back up all projects** makes one file, `AbsentMotion-backup-` followed by the date and time, ending in `.absbackup`, in Documents/AbsentMotion. It contains all projects with their version history, templates with their media, presets, imported fonts, AI results and all kept media. It needs free space about the size of the content plus 50 MB. The file stays on the phone even if you uninstall AbsentMotion; copy it to a computer or a cloud service to keep it safe.
 - **Weekly automatic backup (projects only)** is off by default. When on, a few seconds after the app opens, if seven days passed since the last backup, it writes `AbsentMotion-weekly-...absbackup` with the projects only (no media) and deletes the previous weekly file. Manual backups are never deleted by the app.
 - **Restore from backup** asks you to pick a backup file. A project that is already here and the same is left alone; a project with the same name but different content is restored as a separate copy. Nothing that exists is overwritten. The restore can be stopped and run again later.
+
+![The Backup group: Back up all projects (1), Restore from backup (2) and Weekly automatic backup (projects only) (3).](img/projects-backup.webp)
 
 ## Importing project files
 

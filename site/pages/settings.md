@@ -6,12 +6,16 @@ summary: Every setting in the drawer on the home screen, with its default.
 ---
 Tap the menu button at the top left of the home screen to open the Settings drawer. It has four groups that start closed (tap a group to open it) and a few more rows below them.
 
+![The Settings drawer: the four groups (1) and the rows below them (2).](img/settings-drawer.webp)
+
 ## Editor
 
 - **Theme.** **AbsentMotion** (the default: a dark editor and a warm light home screen), **Daylight** (light everywhere) or **Custom**. **Import theme file...** loads a theme from a small file (see below).
 - **New Layer Length.** How long new layers last: 1 to 10, 15, 20, 25, 30, 45 or 60 seconds. The default is 2.
 - **Vibration.** Small vibrations on the timeline for snaps, long presses and reordering. On by default.
 - **Emoji Style.** **SYSTEM** (your phone's emoji, the default) or **ANDROID** (the emoji font that comes with the app, the same on every phone).
+
+![The Editor group: Theme (1), New Layer Length (2), Vibration (3), the switch for the transition button (4) and Emoji Style (5).](img/settings-editor.webp)
 
 ### Custom themes
 

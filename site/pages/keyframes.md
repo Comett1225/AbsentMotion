@@ -12,6 +12,8 @@ A **keyframe** stores the value of one property at one moment. Between two keyfr
 2. Put the playhead at the time you want.
 3. Tap the **Add keyframe** button (a diamond) in the left column of the panel. It turns into **Remove keyframe** while the playhead sits on a keyframe.
 
+![In a panel: the keyframe button (1), a keyframe diamond on the layer bar (2) and Easing (3).](img/kf-panel.webp)
+
 Good to know:
 
 - Once a property has a keyframe, changing it at a time with no keyframe makes one there for you. You only need to add the first one by hand.
@@ -35,6 +37,8 @@ There is no copy and paste for a single keyframe. To reuse keyframes, copy the w
 By default a value moves in a straight line from one keyframe to the next. Easing changes how fast it moves in between.
 
 Tap **Easing** (the curve button) in a panel. A graph opens for the segment that ends at the next keyframe. The playhead has to be between two keyframes of the property; otherwise the app asks you to add keyframes first.
+
+![The easing graph: the curve handles (1), the ready-made curves (2), the kinds of curve (3), Reverse the curve (4) and More (5).](img/kf-easing.webp)
 
 - Drag the handles on the graph to change the curve. A dashed line shows where the playhead is inside the segment, and the arrows under the graph move to the previous or next segment.
 - Pick a kind of curve:

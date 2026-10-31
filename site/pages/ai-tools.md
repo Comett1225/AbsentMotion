@@ -16,6 +16,8 @@ Auto captions turns speech into text layers that appear in time with the voice.
 2. To caption the whole project instead, tap **+ > Captions** and choose **Whole project**. This entry also lets you choose one audio or video layer.
 3. Choose the settings below and tap **Generate**.
 
+![The Auto Captions sheet: Source (1), the sample (2), Language (3), Words per caption (4), the speech model (5), Appearance (6) and Generate (7).](img/ai-captions.webp)
+
 | Setting | Choices |
 |---|---|
 | **Language** | **Auto** (the speech decides the language) or **English** |

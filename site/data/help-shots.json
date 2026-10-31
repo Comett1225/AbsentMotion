@@ -1,0 +1,1788 @@
+{
+ "style": {},
+ "shots": [
+  {
+   "id": "home-screen",
+   "page": "home",
+   "section": "",
+   "block": 1,
+   "alt": {
+    "en": "The home screen: menu (1), search (2), Projects and Assets (3), a project card (4), the card menu button (5) and New project (6).",
+    "ar": "الشاشة الرئيسية: القائمة (1)، البحث (2)، المشاريع والأصول (3)، بطاقة مشروع (4)، زر قائمة البطاقة (5) ومشروع جديد (6).",
+    "bn": "হোম স্ক্রিন: মেনু (1), সার্চ (2), প্রজেক্ট ও অ্যাসেট (3), একটি প্রজেক্ট কার্ড (4), কার্ড মেনু বোতাম (5) এবং নতুন প্রজেক্ট (6)।",
+    "es": "La pantalla de inicio: el menú (1), la búsqueda (2), Proyectos y Recursos (3), una tarjeta de proyecto (4), el botón del menú de la tarjeta (5) y Nuevo proyecto (6).",
+    "fa": "صفحه اصلی: منو (1)، جستجو (2)، پروژه‌ها و دارایی‌ها (3)، یک کارت پروژه (4)، دکمه منوی کارت (5) و پروژه جدید (6).",
+    "fil": "Ang home screen: menu (1), search (2), Mga proyekto at Mga asset (3), isang project card (4), ang card menu button (5) at Bagong proyekto (6).",
+    "hi": "होम स्क्रीन: मेन्यू (1), खोज (2), प्रोजेक्ट और एसेट (3), एक प्रोजेक्ट कार्ड (4), कार्ड मेन्यू बटन (5) और नया प्रोजेक्ट (6)।",
+    "id": "Layar beranda: menu (1), pencarian (2), Proyek dan Aset (3), sebuah kartu proyek (4), tombol menu kartu (5), dan Proyek baru (6).",
+    "ms": "Skrin utama: menu (1), carian (2), Projek dan Aset (3), satu kad projek (4), butang menu kad (5) dan Projek baharu (6).",
+    "pt-BR": "A tela inicial: o menu (1), a pesquisa (2), Projetos e Recursos (3), um cartão de projeto (4), o botão de menu do cartão (5) e Novo projeto (6).",
+    "ru": "Главный экран: меню (1), поиск (2), Проекты и Ресурсы (3), карточка проекта (4), кнопка меню карточки (5) и Новый проект (6).",
+    "th": "หน้าจอหลัก: เมนู (1), ค้นหา (2), โปรเจกต์ และ แอสเซท (3), การ์ดโปรเจกต์ (4), ปุ่มเมนูการ์ด (5) และ โปรเจกต์ใหม่ (6)",
+    "tr": "Ana ekran: menü (1), arama (2), Projeler ve Varlıklar (3), bir proje kartı (4), kart menüsü düğmesi (5) ve Yeni proje (6).",
+    "vi": "Màn hình chính: menu (1), tìm kiếm (2), Dự án và Tài nguyên (3), một thẻ dự án (4), nút menu thẻ (5) và Dự án mới (6)."
+   },
+   "start": {"scene": "demo", "frame": 45},
+   "steps": [
+    {"tap": "Exit to project list"},
+    {"expect": "New project"},
+    {"wait": 1.5}
+   ],
+   "highlight": [
+    {"select": "Settings", "exact": true, "pad": 14, "n": 1, "badge": "br"},
+    {"select": "Search", "exact": true, "pad": 14, "n": 2, "badge": "bl"},
+    {"union": [{"text": "Projects", "region": [0, 300, 1080, 500]}, "Assets"], "n": 3, "badge": "tl"},
+    {"select": "Mountain Lake", "n": 4, "badge": "tl"},
+    {"select": "More", "n": 5, "badge": "bl"},
+    {"select": "New project", "n": 6, "badge": "tl"}
+   ]
+  },
+  {
+   "id": "home-card-menu",
+   "page": "home",
+   "section": "The card menu",
+   "block": 2,
+   "alt": {
+    "en": "The card menu button (1) opens the card menu (2): Export, Duplicate, Collect media into project, Version history and Delete.",
+    "ar": "يفتح زر قائمة البطاقة (1) قائمة البطاقة (2): تصدير، تكرار، تجميع الوسائط في المشروع، سجل النسخ وحذف.",
+    "bn": "কার্ড মেনু বোতাম (1) কার্ড মেনু (2) খোলে: এক্সপোর্ট, ডুপ্লিকেট, মিডিয়া প্রজেক্টে সংগ্রহ করুন, ভার্সন হিস্ট্রি এবং মুছুন।",
+    "es": "El botón del menú de la tarjeta (1) abre el menú de la tarjeta (2): Exportar, Duplicar, Recopilar medios en el proyecto, Historial de versiones y Eliminar.",
+    "fa": "دکمه منوی کارت (1) منوی کارت (2) را باز می‌کند: خروجی، تکثیر، جمع‌آوری رسانه‌ها در پروژه، تاریخچه نسخه‌ها و حذف.",
+    "fil": "Binubuksan ng card menu button (1) ang card menu (2): I-export, I-duplicate, Ipunin ang media sa proyekto, Kasaysayan ng bersyon at Burahin.",
+    "hi": "कार्ड मेन्यू बटन (1) कार्ड मेन्यू (2) खोलता है: एक्सपोर्ट, डुप्लिकेट करें, मीडिया प्रोजेक्ट में इकट्ठा करें, वर्ज़न हिस्ट्री और हटाएँ।",
+    "id": "Tombol menu kartu (1) membuka menu kartu (2): Ekspor, Duplikat, Kumpulkan media ke proyek, Riwayat versi, dan Hapus.",
+    "ms": "Butang menu kad (1) membuka menu kad (2): Eksport, Gandakan, Kumpul media ke dalam projek, Sejarah versi dan Padam.",
+    "pt-BR": "O botão de menu do cartão (1) abre o menu do cartão (2): Exportar, Duplicar, Reunir mídia no projeto, Histórico de versões e Excluir.",
+    "ru": "Кнопка меню карточки (1) открывает меню карточки (2): Экспорт, Дублировать, Собрать медиа в проект, История версий и Удалить.",
+    "th": "ปุ่มเมนูการ์ด (1) เปิดเมนูการ์ด (2): ส่งออก, ทำสำเนา, เก็บสื่อไว้ในโปรเจกต์, ประวัติเวอร์ชัน และ ลบ",
+    "tr": "Kart menüsü düğmesi (1) kart menüsünü (2) açar: Dışa aktar, Çoğalt, Medyayı projeye topla, Sürüm geçmişi ve Sil.",
+    "vi": "Nút menu thẻ (1) mở menu thẻ (2): Xuất, Nhân bản, Thu thập phương tiện vào dự án, Lịch sử phiên bản và Xóa."
+   },
+   "start": "home",
+   "steps": [
+    {"tap": "More"},
+    {"expect": "Version history"}
+   ],
+   "highlight": [
+    {"box": [944, 815, 1007, 878], "pad": 14, "n": 1, "badge": "bl"},
+    {"box": [329, 993, 1038, 1623], "n": 2, "badge": "tl"}
+   ],
+   "crop": [0, 700, 1080, 1700]
+  },
+  {
+   "id": "new-sheet",
+   "page": "new-project",
+   "section": "",
+   "block": 1,
+   "alt": {
+    "en": "The new project sheet: PROJECT or ASSET (1), the name (2), the shape (3), Resolution (4), Frame Rate (5), Background (6) and CREATE PROJECT (7).",
+    "ar": "ورقة المشروع الجديد: مشروع أو أصل (1)، الاسم (2)، الشكل (3)، الدقة (4)، معدل الإطارات (5)، خلفية (6) وإنشاء مشروع (7).",
+    "bn": "নতুন প্রজেক্ট শিট: প্রজেক্ট বা অ্যাসেট (1), নাম (2), আকৃতি (3), রেজোলিউশন (4), ফ্রেম রেট (5), ব্যাকগ্রাউন্ড (6) এবং প্রজেক্ট তৈরি করুন (7)।",
+    "es": "La hoja de nuevo proyecto: Proyecto o Recurso (1), el nombre (2), la forma (3), Resolución (4), Velocidad de fotogramas (5), Fondo (6) y Crear proyecto (7).",
+    "fa": "برگه پروژه جدید: پروژه یا دارایی (1)، نام (2)، شکل (3)، رزولوشن (4)، نرخ فریم (5)، پس‌زمینه (6) و ساخت پروژه (7).",
+    "fil": "Ang new project sheet: Proyekto o Asset (1), ang pangalan (2), ang hugis (3), Resolusyon (4), Frame rate (5), Background (6) at Gumawa ng proyekto (7).",
+    "hi": "नया प्रोजेक्ट शीट: प्रोजेक्ट या एसेट (1), नाम (2), शेप (3), रेज़ोल्यूशन (4), फ़्रेम रेट (5), बैकग्राउंड (6) और प्रोजेक्ट बनाएँ (7)।",
+    "id": "Lembar proyek baru: Proyek atau Aset (1), nama (2), bentuk (3), Resolusi (4), Frame rate (5), Latar belakang (6), dan Buat proyek (7).",
+    "ms": "Helaian projek baharu: Projek atau Aset (1), nama (2), bentuk (3), Resolusi (4), Kadar bingkai (5), Latar belakang (6) dan Cipta projek (7).",
+    "pt-BR": "A folha de novo projeto: PROJETO ou RECURSO (1), o nome (2), a forma (3), Resolução (4), Taxa de quadros (5), Fundo (6) e CRIAR PROJETO (7).",
+    "ru": "Панель нового проекта: Проект или Ресурс (1), имя (2), форма (3), Разрешение (4), Частота кадров (5), Фон (6) и Создать проект (7).",
+    "th": "แผ่นโปรเจกต์ใหม่: โปรเจกต์ หรือ แอสเซท (1), ชื่อ (2), รูปร่าง (3), ความละเอียด (4), เฟรมเรต (5), พื้นหลัง (6) และ สร้างโปรเจกต์ (7)",
+    "tr": "Yeni proje sayfası: PROJE veya VARLIK (1), ad (2), şekil (3), Çözünürlük (4), Kare hızı (5), Arka plan (6) ve PROJE OLUŞTUR (7).",
+    "vi": "Bảng dự án mới: DỰ ÁN hoặc TÀI NGUYÊN (1), tên (2), hình dạng (3), Độ phân giải (4), Tốc độ khung hình (5), Nền (6) và TẠO DỰ ÁN (7)."
+   },
+   "start": "home",
+   "steps": [
+    {"tap": "New project"},
+    {"expect": "CREATE PROJECT"}
+   ],
+   "highlight": [
+    {"union": ["PROJECT", "ASSET"], "n": 1, "badge": "tl", "pad": 6},
+    {"select": {"text_re": "^New Project \\d+"}, "n": 2, "badge": "tl", "pad": 4},
+    {"box": [71, 1236, 935, 1383], "n": 3, "badge": "tl", "pad": 4},
+    {"union": ["Resolution", {"text": "1080p (FHD)"}], "n": 4, "badge": "tl", "pad": 4},
+    {"union": ["Frame Rate", {"text": "60 fps"}], "n": 5, "badge": "tl", "pad": 4},
+    {"union": ["Background", {"text": "Transparent"}], "n": 6, "badge": "tl", "pad": 4},
+    {"select": "CREATE PROJECT", "n": 7, "badge": "tl", "pad": 6}
+   ],
+   "crop": [0, 800, 1080, 2080]
+  },
+  {
+   "id": "start-plus",
+   "page": "getting-started",
+   "section": "Make your first project",
+   "block": 1,
+   "alt": {
+    "en": "On the home screen, tap the round + button (1) to start a project.",
+    "ar": "في الشاشة الرئيسية، اضغط على زر + الدائري (1) لبدء مشروع.",
+    "bn": "প্রজেক্ট শুরু করতে হোম স্ক্রিনে গোল + বোতামে (1) ট্যাপ করুন।",
+    "es": "En la pantalla de inicio, toca el botón redondo + (1) para empezar un proyecto.",
+    "fa": "در صفحه اصلی، دکمه گرد + (1) را بزنید تا یک پروژه شروع کنید.",
+    "fil": "Sa home screen, i-tap ang bilog na + button (1) para magsimula ng proyekto.",
+    "hi": "प्रोजेक्ट शुरू करने के लिए होम स्क्रीन पर गोल + बटन (1) पर टैप करें।",
+    "id": "Di layar beranda, ketuk tombol bulat + (1) untuk memulai proyek.",
+    "ms": "Pada skrin utama, ketik butang bulat + (1) untuk memulakan projek.",
+    "pt-BR": "Na tela inicial, toque no botão redondo + (1) para iniciar um projeto.",
+    "ru": "На главном экране нажмите круглую кнопку + (1), чтобы создать проект.",
+    "th": "บนหน้าจอหลัก แตะปุ่มกลม + (1) เพื่อเริ่มโปรเจกต์",
+    "tr": "Ana ekranda, bir proje başlatmak için yuvarlak + düğmesine (1) dokunun.",
+    "vi": "Trên màn hình chính, nhấn vào nút tròn + (1) để bắt đầu một dự án."
+   },
+   "start": "home",
+   "highlight": [{"select": "New project", "n": 1, "badge": "tl"}],
+   "crop": [0, 1980, 1080, 2337]
+  },
+  {
+   "id": "start-add",
+   "page": "getting-started",
+   "section": "Make your first project",
+   "block": 1,
+   "alt": {
+    "en": "In the editor, tap the round + button (1) to add a shape, a photo or text.",
+    "ar": "في المحرر، اضغط على زر + الدائري (1) لإضافة شكل أو صورة أو نص.",
+    "bn": "এডিটরে একটি শেপ, একটি ছবি বা টেক্সট যোগ করতে গোল + বোতামে (1) ট্যাপ করুন।",
+    "es": "En el editor, toca el botón redondo + (1) para agregar una forma, una foto o texto.",
+    "fa": "در ویرایشگر، دکمه گرد + (1) را بزنید تا یک شکل، یک عکس یا متن اضافه کنید.",
+    "fil": "Sa editor, i-tap ang bilog na + button (1) para magdagdag ng hugis, larawan o teksto.",
+    "hi": "शेप, फ़ोटो या टेक्स्ट जोड़ने के लिए एडिटर में गोल + बटन (1) पर टैप करें।",
+    "id": "Di editor, ketuk tombol bulat + (1) untuk menambahkan bentuk, foto, atau teks.",
+    "ms": "Dalam editor, ketik butang bulat + (1) untuk menambah bentuk, foto atau teks.",
+    "pt-BR": "No editor, toque no botão redondo + (1) para adicionar uma forma, uma foto ou texto.",
+    "ru": "В редакторе нажмите круглую кнопку + (1), чтобы добавить фигуру, фото или текст.",
+    "th": "ในตัวแก้ไข แตะปุ่มกลม + (1) เพื่อเพิ่มรูปร่าง รูปภาพ หรือข้อความ",
+    "tr": "Düzenleyicide, bir şekil, fotoğraf veya metin eklemek için yuvarlak + düğmesine (1) dokunun.",
+    "vi": "Trong trình chỉnh sửa, nhấn vào nút tròn + (1) để thêm hình dạng, ảnh hoặc văn bản."
+   },
+   "start": {"scene": "demo", "frame": 45},
+   "highlight": [{"select": "Add layer", "exact": true, "pad": 22, "n": 1, "badge": "tl"}],
+   "crop": [0, 1600, 1080, 2337]
+  },
+  {
+   "id": "start-export",
+   "page": "getting-started",
+   "section": "Export",
+   "block": 1,
+   "alt": {
+    "en": "Tap the share icon in the top bar (1), then Export.",
+    "ar": "اضغط على أيقونة المشاركة في الشريط العلوي (1)، ثم على تصدير.",
+    "bn": "টপ বারের শেয়ার আইকনে (1) ট্যাপ করুন, তারপর এক্সপোর্ট।",
+    "es": "Toca el ícono de compartir en la barra superior (1) y luego Exportar.",
+    "fa": "روی آیکون اشتراک‌گذاری در نوار بالا (1) بزنید، سپس روی خروجی بزنید.",
+    "fil": "I-tap ang share icon sa top bar (1), at pagkatapos ay ang I-export.",
+    "hi": "टॉप बार के शेयर आइकन (1) पर टैप करें, फिर एक्सपोर्ट।",
+    "id": "Ketuk ikon bagikan di bilah atas (1), lalu ketuk Ekspor.",
+    "ms": "Ketik ikon kongsi di bar atas (1), kemudian Eksport.",
+    "pt-BR": "Toque no ícone de compartilhar na barra superior (1) e depois em Exportar.",
+    "ru": "Нажмите значок «Поделиться» на верхней панели (1), затем «Экспорт».",
+    "th": "แตะไอคอนแชร์ในแถบด้านบน (1) แล้วแตะ ส่งออก",
+    "tr": "Üst çubuktaki paylaş simgesine (1) dokunun, ardından Dışa aktar öğesine dokunun.",
+    "vi": "Nhấn vào biểu tượng chia sẻ trên thanh trên cùng (1), rồi nhấn Xuất."
+   },
+   "start": {"scene": "demo", "frame": 45},
+   "highlight": [{"select": "Export & Share", "exact": true, "pad": 16, "n": 1, "badge": "bl"}],
+   "crop": [0, 104, 1080, 330]
+  },
+  {
+   "id": "editor",
+   "page": "editor",
+   "section": "",
+   "block": 1,
+   "alt": {
+    "en": "The four parts of the editor: the top bar (1), the preview (2), the play bar (3) and the timeline with its tools (4).",
+    "ar": "أجزاء المحرر الأربعة: الشريط العلوي (1)، المعاينة (2)، شريط التشغيل (3) والخط الزمني مع أدواته (4).",
+    "bn": "এডিটরের চারটি অংশ: টপ বার (1), প্রিভিউ (2), প্লে বার (3) এবং টুলসহ টাইমলাইন (4)।",
+    "es": "Las cuatro partes del editor: la barra superior (1), la vista previa (2), la barra de reproducción (3) y la línea de tiempo con sus herramientas (4).",
+    "fa": "چهار بخش ویرایشگر: نوار بالا (1)، پیش‌نمایش (2)، نوار پخش (3) و تایم‌لاین با ابزارهایش (4).",
+    "fil": "Ang apat na bahagi ng editor: ang top bar (1), ang preview (2), ang play bar (3) at ang timeline kasama ang mga tool nito (4).",
+    "hi": "एडिटर के चार हिस्से: टॉप बार (1), प्रीव्यू (2), प्ले बार (3) और अपने टूल्स के साथ टाइमलाइन (4)।",
+    "id": "Empat bagian editor: bilah atas (1), pratinjau (2), bilah pemutaran (3), dan timeline beserta alat-alatnya (4).",
+    "ms": "Empat bahagian editor: bar atas (1), pratonton (2), bar main (3) dan garis masa berserta alatnya (4).",
+    "pt-BR": "As quatro partes do editor: a barra superior (1), a pré-visualização (2), a barra de reprodução (3) e a linha do tempo com suas ferramentas (4).",
+    "ru": "Четыре части редактора: верхняя панель (1), предпросмотр (2), панель воспроизведения (3) и таймлайн с инструментами (4).",
+    "th": "สี่ส่วนของตัวแก้ไข: แถบด้านบน (1), ตัวอย่าง (2), แถบเล่น (3) และไทม์ไลน์พร้อมเครื่องมือ (4)",
+    "tr": "Düzenleyicinin dört bölümü: üst çubuk (1), önizleme (2), oynatma çubuğu (3) ve araçlarıyla birlikte zaman çizelgesi (4).",
+    "vi": "Bốn phần của trình chỉnh sửa: thanh trên cùng (1), phần xem trước (2), thanh phát (3) và dòng thời gian cùng các công cụ của nó (4)."
+   },
+   "start": {"scene": "demo", "frame": 45},
+   "style": {"tint": 0},
+   "highlight": [
+    {"box": [4, 122, 1076, 236], "pad": 0, "radius": 10, "n": 1, "badge_at": [34, 142]},
+    {"box": [4, 244, 1076, 1470], "pad": 0, "radius": 10, "n": 2, "badge_at": [34, 262]},
+    {"box": [4, 1480, 1076, 1600], "pad": 0, "radius": 10, "n": 3, "badge_at": [34, 1498]},
+    {"box": [4, 1608, 1076, 2334], "pad": 0, "radius": 10, "n": 4, "badge_at": [34, 1626]}
+   ],
+   "crop": [0, 108, 1080, 2337]
+  },
+  {
+   "id": "editor-top-bar",
+   "page": "editor",
+   "section": "The top bar",
+   "block": 5,
+   "alt": {
+    "en": "The top bar with a layer selected: Back (1), the layer name (2), the parent button (3), Delete layer (4) and Layer menu (5).",
+    "ar": "الشريط العلوي عند تحديد طبقة: رجوع (1)، اسم الطبقة (2)، زر الأصل (3)، حذف الطبقة (4) وقائمة الطبقة (5).",
+    "bn": "লেয়ার নির্বাচিত থাকলে টপ বার: ফিরে যান (1), লেয়ারের নাম (2), প্যারেন্ট বোতাম (3), লেয়ার ডিলিট করুন (4) এবং লেয়ার মেনু (5)।",
+    "es": "La barra superior con una capa seleccionada: Atrás (1), el nombre de la capa (2), el botón principal (3), Eliminar capa (4) y Menú de la capa (5).",
+    "fa": "نوار بالا با یک لایه انتخاب‌شده: بازگشت (1)، نام لایه (2)، دکمه والد (3)، حذف لایه (4) و منوی لایه (5).",
+    "fil": "Ang top bar kapag may napiling layer: Bumalik (1), ang pangalan ng layer (2), ang parent button (3), Burahin ang layer (4) at Menu ng layer (5).",
+    "hi": "लेयर चयनित होने पर टॉप बार: वापस (1), लेयर का नाम (2), पैरेंट बटन (3), लेयर हटाएं (4) और लेयर मेन्यू (5)।",
+    "id": "Bilah atas saat sebuah lapisan dipilih: Kembali (1), nama lapisan (2), tombol induk (3), Hapus lapisan (4), dan Menu lapisan (5).",
+    "ms": "Bar atas dengan satu lapisan dipilih: Kembali (1), nama lapisan (2), butang induk (3), Padam lapisan (4) dan Menu lapisan (5).",
+    "pt-BR": "A barra superior com uma camada selecionada: Voltar (1), o nome da camada (2), o botão pai (3), Excluir camada (4) e Menu da camada (5).",
+    "ru": "Верхняя панель при выбранном слое: Назад (1), название слоя (2), кнопка родителя (3), Удалить слой (4) и Меню слоя (5).",
+    "th": "แถบด้านบนเมื่อเลือกเลเยอร์อยู่: กลับ (1), ชื่อเลเยอร์ (2), ปุ่มเลเยอร์แม่ (3), ลบเลเยอร์ (4) และ เมนูเลเยอร์ (5)",
+    "tr": "Bir katman seçiliyken üst çubuk: Geri (1), katman adı (2), ebeveyn düğmesi (3), Katmanı sil (4) ve Katman menüsü (5).",
+    "vi": "Thanh trên cùng khi một lớp được chọn: Quay lại (1), tên lớp (2), nút lớp cha (3), Xóa lớp (4) và Menu lớp (5)."
+   },
+   "start": {"scene": "demo", "frame": 45},
+   "steps": [
+    {"tap": "Summer Trip"},
+    {"expect": "Layer menu"}
+   ],
+   "highlight": [
+    {"select": "Back", "exact": true, "pad": 12, "n": 1, "badge": "b"},
+    {"box": [116, 130, 709, 232], "pad": 0, "n": 2, "badge": "b"},
+    {"box": [733, 138, 834, 222], "pad": 0, "n": 3, "badge": "b"},
+    {"select": "Delete layer", "exact": true, "pad": 12, "n": 4, "badge": "b"},
+    {"select": "Layer menu", "exact": true, "pad": 12, "n": 5, "badge": "b"}
+   ],
+   "crop": [0, 104, 1080, 380]
+  },
+  {
+   "id": "editor-project-settings",
+   "page": "editor",
+   "section": "Project settings",
+   "block": 1,
+   "alt": {
+    "en": "Project settings: the shape (1), Resolution (2), Frame Rate (3), Background (4) and Earlier versions (5).",
+    "ar": "إعدادات المشروع: الشكل (1)، الدقة (2)، معدل الإطارات (3)، الخلفية (4) والإصدارات السابقة (5).",
+    "bn": "প্রজেক্ট সেটিংস: আকৃতি (1), রেজোলিউশন (2), ফ্রেম রেট (3), ব্যাকগ্রাউন্ড (4) এবং আগের ভার্সনগুলো (5)।",
+    "es": "Ajustes del proyecto: la forma (1), Resolución (2), Velocidad de fotogramas (3), Fondo (4) y Versiones anteriores (5).",
+    "fa": "تنظیمات پروژه: شکل (1)، رزولوشن (2)، نرخ فریم (3)، پس‌زمینه (4) و نسخه‌های قبلی (5).",
+    "fil": "Project settings: ang hugis (1), Resolusyon (2), Frame rate (3), Background (4) at Mga nakaraang bersyon (5).",
+    "hi": "प्रोजेक्ट सेटिंग्स: आकार (1), रेज़ोल्यूशन (2), फ़्रेम रेट (3), बैकग्राउंड (4) और पिछले वर्शन (5)।",
+    "id": "Pengaturan proyek: bentuk (1), Resolusi (2), Frame rate (3), Latar belakang (4), dan Versi sebelumnya (5).",
+    "ms": "Tetapan projek: bentuk (1), Resolusi (2), Kadar Bingkai (3), Latar Belakang (4) dan Versi terdahulu (5).",
+    "pt-BR": "Configurações do projeto: a forma (1), Resolução (2), Taxa de quadros (3), Fundo (4) e Versões anteriores (5).",
+    "ru": "Настройки проекта: форма (1), Разрешение (2), Частота кадров (3), Фон (4) и Предыдущие версии (5).",
+    "th": "การตั้งค่าโปรเจกต์: รูปร่าง (1), ความละเอียด (2), เฟรมเรต (3), พื้นหลัง (4) และ เวอร์ชันก่อนหน้า (5)",
+    "tr": "Proje ayarları: şekil (1), Çözünürlük (2), Kare hızı (3), Arka plan (4) ve Önceki sürümler (5).",
+    "vi": "Cài đặt dự án: hình dạng (1), Độ phân giải (2), Tốc độ khung hình (3), Nền (4) và Phiên bản trước (5)."
+   },
+   "start": {"scene": "demo", "frame": 45},
+   "steps": [
+    {"tap": "Project settings"},
+    {"expect": "Earlier versions"}
+   ],
+   "highlight": [
+    {"box": [58, 1452, 946, 1599], "n": 1, "badge": "tl", "pad": 4},
+    {"union": ["Resolution", {"text": "1080p"}], "n": 2, "badge": "tl", "pad": 4},
+    {"union": ["Frame Rate", {"text": "30 fps"}], "n": 3, "badge": "tl", "pad": 4},
+    {"union": ["Background", {"text": "Black"}], "n": 4, "badge": "tl", "pad": 4},
+    {"union": ["Version history", {"text": "Earlier versions"}], "n": 5, "badge": "tl", "pad": 4}
+   ],
+   "crop": [0, 1330, 1080, 2140]
+  },
+  {
+   "id": "editor-preview-strip",
+   "page": "editor",
+   "section": "The preview strip",
+   "block": 2,
+   "alt": {
+    "en": "The preview strip: Pixel preview (1), Grid (2), Solo the selected layers (3), Camera View (4), the preview quality (5), the blur mode (6) and zoom (7).",
+    "ar": "شريط المعاينة: معاينة البكسل (1)، شبكة (2)، عزل الطبقات المحددة (3)، عرض الكاميرا (4)، جودة المعاينة (5)، وضع الضبابية (6) والتكبير (7).",
+    "bn": "প্রিভিউ স্ট্রিপ: পিক্সেল প্রিভিউ (1), গ্রিড (2), নির্বাচিত লেয়ারগুলো সোলো করুন (3), ক্যামেরা ভিউ (4), প্রিভিউ কোয়ালিটি (5), ব্লার মোড (6) এবং জুম (7)।",
+    "es": "La tira de vista previa: Vista previa de píxeles (1), Cuadrícula (2), Aislar las capas seleccionadas (3), Vista de cámara (4), la calidad de la vista previa (5), el modo de desenfoque (6) y el zoom (7).",
+    "fa": "نوار پیش‌نمایش: پیش‌نمایش پیکسلی (1)، شبکه (2)، تنهاکردن لایه‌های انتخاب‌شده (3)، نمای دوربین (4)، کیفیت پیش‌نمایش (5)، حالت بلور (6) و بزرگ‌نمایی (7).",
+    "fil": "Ang preview strip: Pixel preview (1), Grid (2), I-solo ang mga napiling layer (3), Tanaw ng kamera (4), ang kalidad ng preview (5), ang blur mode (6) at ang zoom (7).",
+    "hi": "प्रीव्यू स्ट्रिप: पिक्सेल प्रीव्यू (1), ग्रिड (2), चयनित लेयर को सोलो करें (3), कैमरा व्यू (4), प्रीव्यू क्वालिटी (5), ब्लर मोड (6) और ज़ूम (7)।",
+    "id": "Strip pratinjau: Pratinjau piksel (1), Grid (2), Solo lapisan yang dipilih (3), Tampilan kamera (4), kualitas pratinjau (5), mode blur (6), dan zoom (7).",
+    "ms": "Jalur pratonton: Pratonton piksel (1), Grid (2), Solo lapisan dipilih (3), Paparan Kamera (4), kualiti pratonton (5), mod kabur (6) dan zum (7).",
+    "pt-BR": "A faixa de pré-visualização: Pré-visualização de pixels (1), Grade (2), Isolar as camadas selecionadas (3), Visão da câmera (4), a qualidade da pré-visualização (5), o modo de desfoque (6) e o zoom (7).",
+    "ru": "Полоса предпросмотра: Пиксельный предпросмотр (1), Сетка (2), Изолировать выбранные слои (3), Вид камеры (4), качество предпросмотра (5), режим размытия (6) и масштаб (7).",
+    "th": "แถบตัวอย่าง: ตัวอย่างแบบพิกเซล (1), ตาราง (2), แสดงเฉพาะเลเยอร์ที่เลือก (3), มุมมองกล้อง (4), คุณภาพตัวอย่าง (5), โหมดเบลอ (6) และซูม (7)",
+    "tr": "Önizleme şeridi: Piksel önizleme (1), Izgara (2), Seçili katmanları tek başına göster (3), Kamera görünümü (4), önizleme kalitesi (5), bulanıklık modu (6) ve yakınlaştırma (7).",
+    "vi": "Dải xem trước: Xem trước pixel (1), Lưới (2), Chỉ hiển thị các lớp đã chọn (3), Khung nhìn máy ảnh (4), chất lượng xem trước (5), chế độ nhòe (6) và thu phóng (7)."
+   },
+   "start": {"scene": "demo", "frame": 45},
+   "steps": [
+    {"tap": "Preview mode"},
+    {"expect": "Pixel preview"}
+   ],
+   "highlight": [
+    {"box": [936, 238, 1080, 1468], "radius": 12, "pad": 0},
+    {"box": [936, 238, 1080, 389], "ring": false, "n": 1, "badge": "l"},
+    {"box": [936, 389, 1080, 540], "ring": false, "n": 2, "badge": "l"},
+    {"box": [936, 540, 1080, 692], "ring": false, "n": 3, "badge": "l"},
+    {"box": [936, 692, 1080, 844], "ring": false, "n": 4, "badge": "l"},
+    {"box": [936, 844, 1080, 996], "ring": false, "n": 5, "badge": "l"},
+    {"box": [936, 996, 1080, 1148], "ring": false, "n": 6, "badge": "l"},
+    {"box": [936, 1161, 1080, 1468], "ring": false, "n": 7, "badge": "l"}
+   ],
+   "crop": [0, 120, 1080, 1500]
+  },
+  {
+   "id": "editor-play-bar",
+   "page": "editor",
+   "section": "The play bar",
+   "block": 2,
+   "alt": {
+    "en": "The play bar: Undo (1), Redo (2), Skip back (3), Play (4), Skip forward (5), Copy and paste (6) and Preview mode (7).",
+    "ar": "شريط التشغيل: تراجع (1)، إعادة (2)، رجوع (3)، تشغيل (4)، تقدّم (5)، نسخ ولصق (6) ووضع المعاينة (7).",
+    "bn": "প্লে বার: আনডু (1), রিডু (2), পিছিয়ে যান (3), প্লে (4), সামনে যান (5), কপি ও পেস্ট (6) এবং প্রিভিউ মোড (7)।",
+    "es": "La barra de reproducción: Deshacer (1), Rehacer (2), Retroceder (3), Reproducir (4), Avanzar (5), Copiar y pegar (6) y Modo de vista previa (7).",
+    "fa": "نوار پخش: واگرد (1)، ازنو (2)، عقب رفتن (3)، پخش (4)، جلو رفتن (5)، کپی و جای‌گذاری (6) و حالت پیش‌نمایش (7).",
+    "fil": "Ang play bar: I-undo (1), I-redo (2), Lumaktaw pabalik (3), I-play (4), Lumaktaw pasulong (5), Kopyahin at i-paste (6) at Preview mode (7).",
+    "hi": "प्ले बार: अनडू (1), रीडू (2), पीछे स्किप करें (3), चलाएँ (4), आगे स्किप करें (5), कॉपी और पेस्ट (6) और प्रीव्यू मोड (7)।",
+    "id": "Bilah pemutaran: Urungkan (1), Ulangi (2), Mundur (3), Putar (4), Maju (5), Salin dan tempel (6), dan Mode pratinjau (7).",
+    "ms": "Bar main: Buat asal (1), Buat semula (2), Lompat ke belakang (3), Main (4), Lompat ke hadapan (5), Salin dan tampal (6) dan Mod pratonton (7).",
+    "pt-BR": "A barra de reprodução: Desfazer (1), Refazer (2), Voltar (3), Reproduzir (4), Avançar (5), Copiar e colar (6) e Modo de pré-visualização (7).",
+    "ru": "Панель воспроизведения: Отменить (1), Повторить (2), Назад (3), Воспроизвести (4), Вперёд (5), Копировать и вставить (6) и Режим предпросмотра (7).",
+    "th": "แถบเล่น: เลิกทำ (1), ทำซ้ำ (2), ย้อนกลับ (3), เล่น (4), เดินหน้า (5), คัดลอกและวาง (6) และ โหมดตัวอย่าง (7)",
+    "tr": "Oynatma çubuğu: Geri al (1), Yinele (2), Geri atla (3), Oynat (4), İleri atla (5), Kopyala ve yapıştır (6) ve Önizleme modu (7).",
+    "vi": "Thanh phát: Hoàn tác (1), Làm lại (2), Lùi lại (3), Phát (4), Tiến tới (5), Sao chép và dán (6) và Chế độ xem trước (7)."
+   },
+   "start": {"scene": "demo", "frame": 45},
+   "highlight": [
+    {"select": "Undo", "exact": true, "pad": 14, "n": 1, "badge": "t"},
+    {"select": "Redo", "exact": true, "pad": 14, "n": 2, "badge": "t"},
+    {"select": "Skip back", "exact": true, "pad": 14, "n": 3, "badge": "t"},
+    {"select": "Play", "exact": true, "pad": 14, "n": 4, "badge": "t"},
+    {"select": "Skip forward", "exact": true, "pad": 14, "n": 5, "badge": "t"},
+    {"select": "Copy and paste", "exact": true, "pad": 14, "n": 6, "badge": "t"},
+    {"select": "Preview mode", "exact": true, "pad": 10, "n": 7, "badge": "t"}
+   ],
+   "crop": [0, 1405, 1080, 1612]
+  },
+  {
+   "id": "timeline-rows",
+   "page": "timeline",
+   "section": "Reading the timeline",
+   "block": 1,
+   "alt": {
+    "en": "The timeline: the playhead and the time (1), the ruler (2), the eye of a layer (3), the layer bars (4) and a keyframe diamond (5).",
+    "ar": "الخط الزمني: رأس التشغيل والوقت (1)، المسطرة (2)، عين طبقة (3)، أشرطة الطبقات (4) ومعيّن إطار مفتاحي (5).",
+    "bn": "টাইমলাইন: প্লেহেড ও সময় (1), রুলার (2), একটি লেয়ারের চোখ (3), লেয়ার বার (4) এবং একটি কীফ্রেম ডায়মন্ড (5)।",
+    "es": "La línea de tiempo: el cabezal de reproducción y el tiempo (1), la regla (2), el ojo de una capa (3), las barras de las capas (4) y un rombo de fotograma clave (5).",
+    "fa": "تایم‌لاین: پلی‌هد و زمان (1)، خط‌کش (2)، چشم یک لایه (3)، نوارهای لایه (4) و یک لوزی کی‌فریم (5).",
+    "fil": "Ang timeline: ang playhead at ang oras (1), ang ruler (2), ang mata ng isang layer (3), ang mga layer bar (4) at isang keyframe diamond (5).",
+    "hi": "टाइमलाइन: प्लेहेड और समय (1), रूलर (2), किसी लेयर की आँख (3), लेयर बार (4) और एक कीफ़्रेम हीरा (5)।",
+    "id": "Timeline: playhead dan waktu (1), penggaris (2), ikon mata sebuah lapisan (3), bar lapisan (4), dan sebuah diamond keyframe (5).",
+    "ms": "Garis masa: kepala main dan masa (1), pembaris (2), mata sesuatu lapisan (3), bar lapisan (4) dan satu berlian bingkai kunci (5).",
+    "pt-BR": "A linha do tempo: o cursor de reprodução e o tempo (1), a régua (2), o olho de uma camada (3), as barras das camadas (4) e um losango de quadro-chave (5).",
+    "ru": "Таймлайн: курсор воспроизведения и время (1), линейка (2), глаз слоя (3), полосы слоёв (4) и ромб ключевого кадра (5).",
+    "th": "ไทม์ไลน์: หัวอ่านและเวลา (1), ไม้บรรทัด (2), ไอคอนตาของเลเยอร์ (3), แถบเลเยอร์ (4) และเพชรคีย์เฟรม (5)",
+    "tr": "Zaman çizelgesi: oynatma başlığı ve zaman (1), cetvel (2), bir katmanın gözü (3), katman çubukları (4) ve bir anahtar kare elması (5).",
+    "vi": "Dòng thời gian: đầu phát và thời gian (1), thước (2), biểu tượng con mắt của một lớp (3), các thanh lớp (4) và một hình thoi keyframe (5)."
+   },
+   "start": {"scene": "demo", "frame": 45},
+   "highlight": [
+    {"box": [440, 1598, 640, 1700], "radius": 14, "pad": 0, "n": 1, "badge": "tl"},
+    {"box": [150, 1596, 1080, 1646], "radius": 10, "pad": 0, "n": 2, "badge": "tr"},
+    {"box": [6, 1716, 160, 1782], "radius": 24, "pad": 0, "n": 3, "badge": "bl"},
+    {"box": [162, 1714, 1080, 2150], "radius": 14, "pad": 0, "n": 4, "badge": "br"},
+    {"box": [900, 1716, 964, 1780], "radius": 32, "pad": 0, "n": 5, "badge": "tl"}
+   ],
+   "crop": [0, 1570, 1080, 2337]
+  },
+  {
+   "id": "kf-panel",
+   "page": "keyframes",
+   "section": "Add and remove keyframes",
+   "block": 1,
+   "also": [{"page": "getting-started", "section": "Animate something", "block": 2}],
+   "alt": {
+    "en": "In a panel: the keyframe button (1), a keyframe diamond on the layer bar (2) and Easing (3).",
+    "ar": "في لوحة: زر الإطار المفتاحي (1)، معيّن إطار مفتاحي على شريط الطبقة (2) وتخفيف (3).",
+    "bn": "প্যানেলে: কীফ্রেম বোতাম (1), লেয়ার বারে একটি কীফ্রেম ডায়মন্ড (2) এবং ইজিং (3)।",
+    "es": "En un panel: el botón de fotograma clave (1), un rombo de fotograma clave en la barra de la capa (2) y Suavizado (3).",
+    "fa": "در یک پنل: دکمه کی‌فریم (1)، یک لوزی کی‌فریم روی نوار لایه (2) و ایزینگ (3).",
+    "fil": "Sa isang panel: ang keyframe button (1), isang keyframe diamond sa layer bar (2) at Easing (3).",
+    "hi": "किसी पैनल में: कीफ़्रेम बटन (1), लेयर बार पर एक कीफ़्रेम डायमंड (2) और ईज़िंग (3)।",
+    "id": "Di dalam sebuah panel: tombol keyframe (1), sebuah diamond keyframe pada bar lapisan (2), dan Easing (3).",
+    "ms": "Dalam sesuatu panel: butang bingkai kunci (1), satu berlian bingkai kunci pada bar lapisan (2) dan Pelembutan (3).",
+    "pt-BR": "Em um painel: o botão de quadro-chave (1), um losango de quadro-chave na barra da camada (2) e Suavização (3).",
+    "ru": "В панели: кнопка ключевого кадра (1), ромб ключевого кадра на полосе слоя (2) и Сглаживание (3).",
+    "th": "ในแผง: ปุ่มคีย์เฟรม (1), เพชรคีย์เฟรมบนแถบเลเยอร์ (2) และ อีสซิ่ง (3)",
+    "tr": "Bir panelde: anahtar kare düğmesi (1), katman çubuğundaki bir anahtar kare elması (2) ve Yumuşatma (3).",
+    "vi": "Trong một bảng: nút keyframe (1), một hình thoi keyframe trên thanh lớp (2) và Làm mượt (3)."
+   },
+   "start": {"scene": "demo", "frame": 45},
+   "steps": [
+    {"tap": "Sun"},
+    {"tap": "Transform"},
+    {"expect": "Add keyframe"}
+   ],
+   "highlight": [
+    {"select": "Add keyframe", "exact": true, "pad": 16, "n": 1, "badge": "tr"},
+    {"box": [901, 1714, 965, 1778], "radius": 32, "pad": 0, "n": 2, "badge": "tl"},
+    {"select": "Easing", "exact": true, "pad": 16, "n": 3, "badge": "tr"}
+   ],
+   "crop": [0, 1590, 1080, 2337]
+  },
+  {
+   "id": "kf-easing",
+   "page": "keyframes",
+   "section": "Easing: the shape of the motion",
+   "block": 2,
+   "alt": {
+    "en": "The easing graph: the curve handles (1), the ready-made curves (2), the kinds of curve (3), Reverse the curve (4) and More (5).",
+    "ar": "الرسم البياني للتخفيف: مقابض المنحنى (1)، المنحنيات الجاهزة (2)، أنواع المنحنى (3)، عكس المنحنى (4) والمزيد (5).",
+    "bn": "ইজিং গ্রাফ: কার্ভ হ্যান্ডেল (1), রেডিমেড কার্ভ (2), কার্ভের ধরন (3), কার্ভটি উল্টান (4) এবং আরও (5)।",
+    "es": "El gráfico de suavizado: los manejadores de la curva (1), las curvas predefinidas (2), los tipos de curva (3), Invertir la curva (4) y Más (5).",
+    "fa": "نمودار ایزینگ: دستگیره‌های منحنی (1)، منحنی‌های آماده (2)، انواع منحنی (3)، معکوس‌کردن منحنی (4) و بیشتر (5).",
+    "fil": "Ang easing graph: ang mga handle ng curve (1), ang mga ready-made na curve (2), ang mga uri ng curve (3), Baliktarin ang curve (4) at Higit pa (5).",
+    "hi": "ईज़िंग ग्राफ़: कर्व हैंडल (1), तैयार कर्व (2), कर्व के प्रकार (3), कर्व को उलटें (4) और और (5)।",
+    "id": "Grafik easing: handle kurva (1), kurva siap pakai (2), jenis kurva (3), Balikkan kurva (4), dan Lainnya (5).",
+    "ms": "Graf pelembutan: pemegang lengkung (1), lengkung siap sedia (2), jenis lengkung (3), Songsangkan lengkung (4) dan Lagi (5).",
+    "pt-BR": "O gráfico de suavização: as alças da curva (1), as curvas prontas (2), os tipos de curva (3), Inverter a curva (4) e Mais (5).",
+    "ru": "График сглаживания: маркеры кривой (1), готовые кривые (2), типы кривых (3), Обратить кривую (4) и Ещё (5).",
+    "th": "กราฟอีสซิ่ง: จุดจับเส้นโค้ง (1), เส้นโค้งสำเร็จรูป (2), ชนิดของเส้นโค้ง (3), กลับทิศเส้นโค้ง (4) และ เพิ่มเติม (5)",
+    "tr": "Yumuşatma grafiği: eğri tutamaçları (1), hazır eğriler (2), eğri türleri (3), Eğriyi tersine çevir (4) ve Diğer (5).",
+    "vi": "Đồ thị làm mượt: các tay cầm đường cong (1), các đường cong có sẵn (2), các loại đường cong (3), Đảo ngược đường cong (4) và Thêm (5)."
+   },
+   "start": {"scene": "demo", "frame": 45},
+   "steps": [
+    {"tap": "Sun"},
+    {"tap": "Transform"},
+    {"tap": "Easing"},
+    {"expect": "Reverse the curve"}
+   ],
+   "highlight": [
+    {"box": [190, 1830, 735, 2330], "n": 1, "badge": "tl", "pad": 0},
+    {"box": [743, 1812, 912, 2337], "n": 2, "badge": "tl", "pad": 0},
+    {"box": [912, 1812, 1078, 2337], "n": 3, "badge": "tl", "pad": 0},
+    {"select": "Reverse the curve", "exact": true, "pad": 14, "n": 4, "badge": "tr"},
+    {"select": "More", "exact": true, "pad": 14, "n": 5, "badge": "tr"}
+   ],
+   "crop": [0, 1700, 1080, 2337]
+  },
+  {
+   "id": "add-shape",
+   "page": "add-menu",
+   "section": "",
+   "block": 3,
+   "alt": {
+    "en": "The Add menu: the five tabs (1) and the four quick buttons (2).",
+    "ar": "قائمة الإضافة: علامات التبويب الخمس (1) والأزرار السريعة الأربعة (2).",
+    "bn": "অ্যাড মেনু: পাঁচটি ট্যাব (1) এবং চারটি কুইক বোতাম (2)।",
+    "es": "El menú Agregar: las cinco pestañas (1) y los cuatro botones rápidos (2).",
+    "fa": "منوی افزودن: پنج زبانه (1) و چهار دکمه سریع (2).",
+    "fil": "Ang Add menu: ang limang tab (1) at ang apat na quick button (2).",
+    "hi": "एड मेन्यू: पाँच टैब (1) और चार क्विक बटन (2)।",
+    "id": "Menu Tambah: lima tab (1) dan empat tombol cepat (2).",
+    "ms": "Menu Tambah: lima tab (1) dan empat butang pantas (2).",
+    "pt-BR": "O menu Adicionar: as cinco abas (1) e os quatro botões rápidos (2).",
+    "ru": "Меню добавления: пять вкладок (1) и четыре быстрые кнопки (2).",
+    "th": "เมนูเพิ่ม: แท็บทั้งห้า (1) และปุ่มลัดทั้งสี่ (2)",
+    "tr": "Ekle menüsü: beş sekme (1) ve dört hızlı düğme (2).",
+    "vi": "Menu Thêm: năm tab (1) và bốn nút nhanh (2)."
+   },
+   "start": {"scene": "demo", "frame": 45},
+   "steps": [
+    {"tap": "Add layer"},
+    {"expect": "Freehand Brush"}
+   ],
+   "highlight": [
+    {"box": [16, 1696, 856, 1848], "n": 1, "badge": "tl", "pad": 2},
+    {"box": [908, 1696, 1078, 2252], "n": 2, "badge": "tl", "pad": 2}
+   ],
+   "crop": [0, 1660, 1080, 2337]
+  },
+  {
+   "id": "fx-list",
+   "page": "effects-guide",
+   "section": "The effect list",
+   "block": 1,
+   "alt": {
+    "en": "The effect list: Reorder (1), Visibility (2), More (3) and Add Effect (4).",
+    "ar": "قائمة التأثيرات: إعادة الترتيب (1)، الظهور (2)، المزيد (3) وإضافة تأثير (4).",
+    "bn": "ইফেক্ট তালিকা: পুনরায় সাজান (1), দৃশ্যমানতা (2), আরও (3) এবং ইফেক্ট যোগ করুন (4)।",
+    "es": "La lista de efectos: Reordenar (1), Visibilidad (2), Más (3) y Agregar efecto (4).",
+    "fa": "فهرست افکت‌ها: تغییر ترتیب (1)، نمایش (2)، بیشتر (3) و افزودن افکت (4).",
+    "fil": "Ang listahan ng epekto: I-reorder (1), Pagpapakita (2), Higit pa (3) at Magdagdag ng epekto (4).",
+    "hi": "इफ़ेक्ट सूची: रीऑर्डर (1), विज़िबिलिटी (2), और (3) और इफ़ेक्ट जोड़ें (4)।",
+    "id": "Daftar efek: Susun ulang (1), Visibilitas (2), Lainnya (3), dan Tambahkan efek (4).",
+    "ms": "Senarai kesan: Susun Semula (1), Keterlihatan (2), Lagi (3) dan Tambah kesan (4).",
+    "pt-BR": "A lista de efeitos: Reordenar (1), Visibilidade (2), Mais (3) e Adicionar efeito (4).",
+    "ru": "Список эффектов: Изменить порядок (1), Видимость (2), Ещё (3) и Добавить эффект (4).",
+    "th": "รายการเอฟเฟกต์: จัดลำดับ (1), การมองเห็น (2), เพิ่มเติม (3) และ เพิ่มเอฟเฟกต์ (4)",
+    "tr": "Efekt listesi: Yeniden sırala (1), Görünürlük (2), Diğer (3) ve Efekt ekle (4).",
+    "vi": "Danh sách hiệu ứng: Sắp xếp lại (1), Hiển thị (2), Thêm (3) và Thêm hiệu ứng (4)."
+   },
+   "start": {"scene": "demo", "frame": 45},
+   "steps": [
+    {"tap": "Sun"},
+    {"tap": "Effects"},
+    {"expect": "Add Effect"}
+   ],
+   "highlight": [
+    {"box": [990, 1842, 1056, 1902], "pad": 4, "n": 1, "badge": "tl"},
+    {"box": [895, 1842, 970, 1902], "pad": 4, "n": 2, "badge": "tl"},
+    {"select": "More", "exact": true, "pad": 16, "n": 3, "badge": "tr"},
+    {"select": "Add Effect", "n": 4, "badge": "tl"}
+   ],
+   "crop": [0, 1479, 1080, 2337]
+  },
+  {
+   "id": "effects",
+   "page": "effects-guide",
+   "section": "Settings of an effect",
+   "block": 1,
+   "alt": {
+    "en": "An open effect: its header (1) and a setting with its ruler and value (2).",
+    "ar": "تأثير مفتوح: رأسه (1) وإعداد مع مسطرته وقيمته (2).",
+    "bn": "একটি খোলা ইফেক্ট: এর হেডার (1) এবং রুলার ও মানসহ একটি সেটিং (2)।",
+    "es": "Un efecto abierto: su encabezado (1) y un ajuste con su regla y su valor (2).",
+    "fa": "یک افکت باز: سرصفحه آن (1) و یک تنظیم با خط‌کش و مقدارش (2).",
+    "fil": "Isang bukas na epekto: ang header nito (1) at isang setting kasama ang ruler at value nito (2).",
+    "hi": "एक खुला इफ़ेक्ट: उसका हेडर (1) और रूलर और मान वाली एक सेटिंग (2)।",
+    "id": "Efek yang terbuka: headernya (1) dan sebuah pengaturan dengan penggaris dan kotak nilainya (2).",
+    "ms": "Satu kesan yang dibuka: pengepalanya (1) dan satu tetapan dengan pembaris dan nilainya (2).",
+    "pt-BR": "Um efeito aberto: seu cabeçalho (1) e uma configuração com sua régua e seu valor (2).",
+    "ru": "Открытый эффект: его заголовок (1) и настройка с линейкой и значением (2).",
+    "th": "เอฟเฟกต์ที่เปิดอยู่: ส่วนหัว (1) และการตั้งค่าหนึ่งรายการพร้อมไม้บรรทัดและช่องค่า (2)",
+    "tr": "Açık bir efekt: başlığı (1) ve cetveli ile değeri olan bir ayar (2).",
+    "vi": "Một hiệu ứng đang mở: phần đầu của nó (1) và một cài đặt với thước và ô giá trị của nó (2)."
+   },
+   "start": {"scene": "demo", "frame": 45},
+   "steps": [
+    {"tap": "Sun"},
+    {"tap": "Effects"},
+    {"tap": "Glow"},
+    {"expect": "Radius"}
+   ],
+   "highlight": [
+    {"box": [174, 1815, 1063, 1926], "n": 1, "badge": "tl", "pad": 2},
+    {"box": [174, 1938, 1063, 2064], "n": 2, "badge": "tl", "pad": 2}
+   ],
+   "crop": [0, 1479, 1080, 2337]
+  },
+  {
+   "id": "text-editor",
+   "page": "text",
+   "section": "Add text",
+   "block": 3,
+   "alt": {
+    "en": "The text editor: Alignment (1), the font (2), the size (3), the color (4) and Done (5).",
+    "ar": "محرر النص: المحاذاة (1)، الخط (2)، الحجم (3)، اللون (4) وتم (5).",
+    "bn": "টেক্সট এডিটর: অ্যালাইনমেন্ট (1), ফন্ট (2), সাইজ (3), কালার (4) এবং সম্পন্ন (5)।",
+    "es": "El editor de texto: Alineación (1), la fuente (2), el tamaño (3), el color (4) y Listo (5).",
+    "fa": "ویرایشگر متن: ترازبندی (1)، فونت (2)، اندازه (3)، رنگ (4) و انجام شد (5).",
+    "fil": "Ang text editor: Pagkakahanay (1), ang font (2), ang size (3), ang kulay (4) at Tapos (5).",
+    "hi": "टेक्स्ट एडिटर: अलाइनमेंट (1), फ़ॉन्ट (2), साइज़ (3), कलर (4) और हो गया (5)।",
+    "id": "Editor teks: Perataan (1), font (2), ukuran (3), warna (4), dan Selesai (5).",
+    "ms": "Editor teks: Penjajaran (1), fon (2), saiz (3), warna (4) dan Selesai (5).",
+    "pt-BR": "O editor de texto: Alinhamento (1), a fonte (2), o tamanho (3), a cor (4) e Concluído (5).",
+    "ru": "Редактор текста: Выравнивание (1), шрифт (2), размер (3), цвет (4) и Готово (5).",
+    "th": "ตัวแก้ไขข้อความ: การจัดแนว (1), ฟอนต์ (2), ขนาด (3), สี (4) และ เสร็จสิ้น (5)",
+    "tr": "Metin düzenleyici: Hizalama (1), yazı tipi (2), boyut (3), renk (4) ve Bitti (5).",
+    "vi": "Trình soạn thảo văn bản: Căn chỉnh (1), phông chữ (2), cỡ chữ (3), màu (4) và Xong (5)."
+   },
+   "start": {"scene": "demo", "frame": 45},
+   "steps": [
+    {"tap": "Summer Trip"},
+    {"tap": "Edit Text"},
+    {"expect": "Done"},
+    {"wait": 1.0}
+   ],
+   "highlight": [
+    {"select": "Alignment", "exact": true, "pad": 12, "n": 1, "badge": "b"},
+    {"select": {"text": "Roboto Bold"}, "pad": 2, "n": 2, "badge": "b"},
+    {"select": {"text": "40pt"}, "pad": 2, "n": 3, "badge": "b"},
+    {"box": [868, 135, 947, 222], "pad": 4, "n": 4, "badge": "b"},
+    {"select": "Done", "exact": true, "pad": 12, "n": 5, "badge": "b"}
+   ],
+   "crop": [0, 104, 1080, 1512]
+  },
+  {
+   "id": "lt-transform",
+   "page": "layer-tools",
+   "section": "Transform",
+   "block": 2,
+   "alt": {
+    "en": "The Transform panel: the tabs (1), the trackpad (2) and the X, Y and Z boxes (3).",
+    "ar": "لوحة تحويل: التبويبات (1)، لوحة التتبع (2) وحقول X وY وZ (3).",
+    "bn": "ট্রান্সফর্ম প্যানেল: ট্যাব (1), ট্র্যাকপ্যাড (2) এবং X, Y ও Z বক্স (3)।",
+    "es": "El panel Transformar: las pestañas (1), el panel táctil (2) y los campos X, Y y Z (3).",
+    "fa": "پنل ترنسفورم: تب‌ها (1)، ترک‌پد (2) و جعبه‌های X، Y و Z (3).",
+    "fil": "Ang Transform panel: ang mga tab (1), ang trackpad (2) at ang mga box para sa X, Y at Z (3).",
+    "hi": "ट्रांसफ़ॉर्म पैनल: टैब (1), ट्रैकपैड (2) और X, Y और Z बॉक्स (3)।",
+    "id": "Panel Transformasi: tab (1), trackpad (2), serta kotak X, Y, dan Z (3).",
+    "ms": "Panel Transformasi: tab (1), pad sentuh (2) dan kotak X, Y dan Z (3).",
+    "pt-BR": "O painel Transformação: as abas (1), o trackpad (2) e as caixas X, Y e Z (3).",
+    "ru": "Панель «Трансформация»: вкладки (1), тачпад (2) и поля X, Y и Z (3).",
+    "th": "แผง แปลง: แท็บ (1), แทร็กแพด (2) และกล่อง X, Y และ Z (3)",
+    "tr": "Dönüştür paneli: sekmeler (1), izleme yüzeyi (2) ve X, Y ve Z kutuları (3).",
+    "vi": "Bảng Biến đổi: các tab (1), bàn di chuột (2) và các ô X, Y và Z (3)."
+   },
+   "start": {"scene": "demo", "frame": 45},
+   "steps": [
+    {"tap": "Sun"},
+    {"tap": "Transform"},
+    {"expect": "Drag here to move the layer"}
+   ],
+   "highlight": [
+    {"box": [918, 1850, 1078, 2337], "n": 1, "badge": "tl", "pad": 0},
+    {"box": [172, 2030, 910, 2330], "n": 2, "badge": "tl", "pad": 0},
+    {"box": [270, 1790, 810, 1930], "n": 3, "badge": "tl", "pad": 0}
+   ],
+   "crop": [0, 1479, 1080, 2337]
+  },
+  {
+   "id": "lt-fill",
+   "page": "layer-tools",
+   "section": "Fill & Color",
+   "block": 2,
+   "alt": {
+    "en": "Fill & Color: the tabs (1), the color bar (2), the swatches (3) and Eyedropper, Color sliders and Full color picker (4).",
+    "ar": "التعبئة واللون: التبويبات (1)، شريط اللون (2)، العينات (3) وقطارة، منزلقات اللون ومنتقي الألوان الكامل (4).",
+    "bn": "ফিল ও কালার: ট্যাব (1), কালার বার (2), সোয়াচ (3) এবং আইড্রপার, কালার স্লাইডার ও সম্পূর্ণ কালার পিকার (4)।",
+    "es": "Relleno y color: las pestañas (1), la barra de color (2), las muestras (3) y Cuentagotas, Deslizadores de color y Selector de color completo (4).",
+    "fa": "پرشدگی و رنگ: تب‌ها (1)، نوار رنگ (2)، نمونه‌های رنگ (3) و قطره‌چکان، اسلایدرهای رنگ و انتخابگر رنگ کامل (4).",
+    "fil": "Fill at Kulay: ang mga tab (1), ang color bar (2), ang mga swatch (3) at Eyedropper, Mga slider ng kulay at Buong color picker (4).",
+    "hi": "फ़िल और कलर: टैब (1), कलर बार (2), स्वैच (3) और आईड्रॉपर, कलर स्लाइडर और फ़ुल कलर पिकर (4)।",
+    "id": "Isi & Warna: tab (1), bar warna (2), swatch (3), serta Pipet warna, Penggeser warna, dan Pemilih warna lengkap (4).",
+    "ms": "Isi & Warna: tab (1), bar warna (2), swatch (3) dan Penitis warna, Peluncur warna dan Pemilih warna penuh (4).",
+    "pt-BR": "Preenchimento e cor: as abas (1), a barra de cor (2), as amostras (3) e Conta-gotas, Controles de cor e Seletor de cor completo (4).",
+    "ru": "Заливка и цвет: вкладки (1), полоса цвета (2), образцы (3) и Пипетка, Ползунки цвета и Полный выбор цвета (4).",
+    "th": "เติมและสี: แท็บ (1), แถบสี (2), สีสำเร็จรูป (3) และ ตัวดูดสี, แถบเลื่อนสี และ ตัวเลือกสีแบบเต็ม (4)",
+    "tr": "Dolgu ve Renk: sekmeler (1), renk çubuğu (2), renk örnekleri (3) ve Damlalık, Renk kaydırıcıları ve Tam renk seçici (4).",
+    "vi": "Tô & màu: các tab (1), thanh màu (2), các mẫu màu (3) và Ống hút màu, Thanh trượt màu và Bảng chọn màu đầy đủ (4)."
+   },
+   "start": {"scene": "demo", "frame": 45},
+   "steps": [
+    {"tap": "Sun"},
+    {"tap": "Fill & Color"},
+    {"expect": "Eyedropper"}
+   ],
+   "highlight": [
+    {"box": [183, 1823, 982, 1949], "n": 1, "badge": "tl", "pad": 0},
+    {"box": [182, 1962, 814, 2030], "n": 2, "badge": "tl", "pad": 0},
+    {"box": [182, 2043, 814, 2295], "n": 3, "badge": "bl", "pad": 0},
+    {"box": [814, 1955, 982, 2306], "n": 4, "badge": "tr", "pad": 0}
+   ],
+   "crop": [0, 1479, 1080, 2337]
+  },
+  {
+   "id": "lm-layer-menu",
+   "page": "layer-menus",
+   "section": "The layer menu",
+   "block": 2,
+   "alt": {
+    "en": "The layer menu button (1) opens the layer menu (2).",
+    "ar": "يفتح زر قائمة الطبقة (1) قائمة الطبقة (2).",
+    "bn": "লেয়ার মেনু বাটন (1) লেয়ার মেনু (2) খোলে।",
+    "es": "El botón del menú de capas (1) abre el menú de capas (2).",
+    "fa": "دکمه منوی لایه (1) منوی لایه (2) را باز می‌کند.",
+    "fil": "Binubuksan ng layer menu button (1) ang layer menu (2).",
+    "hi": "लेयर मेन्यू बटन (1) लेयर मेन्यू (2) खोलता है।",
+    "id": "Tombol menu lapisan (1) membuka menu lapisan (2).",
+    "ms": "Butang menu lapisan (1) membuka menu lapisan (2).",
+    "pt-BR": "O botão do menu de camada (1) abre o menu de camada (2).",
+    "ru": "Кнопка меню слоя (1) открывает меню слоя (2).",
+    "th": "ปุ่มเมนูเลเยอร์ (1) เปิดเมนูเลเยอร์ (2)",
+    "tr": "Katman menüsü düğmesi (1) katman menüsünü (2) açar.",
+    "vi": "Nút menu lớp (1) mở menu lớp (2)."
+   },
+   "start": {"scene": "demo", "frame": 45},
+   "steps": [
+    {"tap": "Summer Trip"},
+    {"tap": "Layer menu"},
+    {"expect": "Save to My Assets"}
+   ],
+   "highlight": [
+    {"box": [996, 152, 1059, 215], "pad": 14, "n": 1, "badge": "bl"},
+    {"box": [424, 238, 1080, 1183], "n": 2, "badge": "tl", "pad": 0}
+   ],
+   "crop": [0, 104, 1080, 1230]
+  },
+  {
+   "id": "lm-copy-paste",
+   "page": "layer-menus",
+   "section": "The copy and paste menu",
+   "block": 2,
+   "alt": {
+    "en": "The copy and paste button (1) opens this menu (2).",
+    "ar": "يفتح زر النسخ واللصق (1) هذه القائمة (2).",
+    "bn": "কপি ও পেস্ট বাটন (1) এই মেনুটি (2) খোলে।",
+    "es": "El botón de copiar y pegar (1) abre este menú (2).",
+    "fa": "دکمه کپی و جای‌گذاری (1) این منو (2) را باز می‌کند.",
+    "fil": "Binubuksan ng copy at paste button (1) ang menu na ito (2).",
+    "hi": "कॉपी और पेस्ट बटन (1) यह मेन्यू (2) खोलता है।",
+    "id": "Tombol salin dan tempel (1) membuka menu ini (2).",
+    "ms": "Butang salin dan tampal (1) membuka menu ini (2).",
+    "pt-BR": "O botão de copiar e colar (1) abre este menu (2).",
+    "ru": "Кнопка копирования и вставки (1) открывает это меню (2).",
+    "th": "ปุ่มคัดลอกและวาง (1) เปิดเมนูนี้ (2)",
+    "tr": "Kopyala ve yapıştır düğmesi (1) bu menüyü (2) açar.",
+    "vi": "Nút sao chép và dán (1) mở menu này (2)."
+   },
+   "start": {"scene": "demo", "frame": 45},
+   "steps": [
+    {"tap": "Summer Trip"},
+    {"tap": "Copy and paste"},
+    {"expect": "Select All Layers"}
+   ],
+   "highlight": [
+    {"box": [818, 1510, 881, 1573], "pad": 14, "n": 1, "badge": "tl"},
+    {"box": [424, 1568, 1080, 2192], "n": 2, "badge": "tl", "pad": 0}
+   ],
+   "crop": [0, 1440, 1080, 2337]
+  },
+  {
+   "id": "anim-button",
+   "page": "animations",
+   "section": "In, Out and Loop animations",
+   "block": 1,
+   "alt": {
+    "en": "The round Animate button (1) at the bottom right of the preview.",
+    "ar": "الزر الدائري تحريك (1) في أسفل يمين المعاينة.",
+    "bn": "প্রিভিউয়ের নিচে ডানদিকে গোলাকার অ্যানিমেট বোতাম (1)।",
+    "es": "El botón redondo Animar (1) en la esquina inferior derecha de la vista previa.",
+    "fa": "دکمه گرد انیمیت (1) در پایین سمت راست پیش‌نمایش.",
+    "fil": "Ang bilog na I-animate na button (1) sa kanang ibaba ng preview.",
+    "hi": "प्रीव्यू के नीचे दाईं ओर गोल एनिमेट करें बटन (1)।",
+    "id": "Tombol bulat Animasi (1) di kanan bawah pratinjau.",
+    "ms": "Butang bulat Animasi (1) di bahagian bawah kanan pratonton.",
+    "pt-BR": "O botão redondo Animar (1) no canto inferior direito da pré-visualização.",
+    "ru": "Круглая кнопка «Анимировать» (1) в правом нижнем углу предпросмотра.",
+    "th": "ปุ่มกลม แอนิเมท (1) ที่มุมขวาล่างของตัวอย่าง",
+    "tr": "Önizlemenin sağ altındaki yuvarlak Animasyon düğmesi (1).",
+    "vi": "Nút tròn Tạo chuyển động (1) ở góc dưới bên phải của phần xem trước."
+   },
+   "start": {"scene": "demo", "frame": 45},
+   "steps": [
+    {"tap": "Summer Trip"},
+    {"expect": "Animate"}
+   ],
+   "highlight": [{"select": "Animate", "exact": true, "pad": 24, "n": 1, "badge": "tl"}],
+   "crop": [0, 600, 1080, 1470]
+  },
+  {
+   "id": "anim-sheet",
+   "page": "animations",
+   "section": "In, Out and Loop animations",
+   "block": 1,
+   "alt": {
+    "en": "The animations sheet: In, Out and Loop (1), the animations (2) and Duration (3).",
+    "ar": "ورقة الحركات: دخول، خروج وتكرار (1)، الحركات (2) والمدة (3).",
+    "bn": "অ্যানিমেশন শিট: ইন, আউট ও লুপ (1), অ্যানিমেশনগুলো (2) এবং ডিউরেশন (3)।",
+    "es": "La hoja de animaciones: Entrada, Salida y Bucle (1), las animaciones (2) y Duración (3).",
+    "fa": "شیت انیمیشن‌ها: ورود، خروج و حلقه (1)، انیمیشن‌ها (2) و مدت (3).",
+    "fil": "Ang animations sheet: Pumasok, Lumabas at Loop (1), ang mga animation (2) at Tagal (3).",
+    "hi": "एनिमेशन शीट: इन, आउट और लूप (1), एनिमेशन (2) और अवधि (3)।",
+    "id": "Lembar animasi: Masuk, Keluar, dan Loop (1), animasi (2), dan Durasi (3).",
+    "ms": "Helaian animasi: Masuk, Keluar dan Gelung (1), animasi (2) dan Tempoh (3).",
+    "pt-BR": "A folha de animações: Entrada, Saída e Repetição (1), as animações (2) e Duração (3).",
+    "ru": "Панель анимаций: Вход, Выход и Цикл (1), анимации (2) и Длительность (3).",
+    "th": "แผ่นแอนิเมชัน: เข้า, ออก และ วนซ้ำ (1), แอนิเมชัน (2) และ ระยะเวลา (3)",
+    "tr": "Animasyonlar sayfası: Giriş, Çıkış ve Döngü (1), animasyonlar (2) ve Süre (3).",
+    "vi": "Bảng hoạt ảnh: Vào, Ra và Lặp (1), các hoạt ảnh (2) và Thời lượng (3)."
+   },
+   "start": {"scene": "demo", "frame": 45},
+   "steps": [
+    {"tap": "Summer Trip"},
+    {"tap": "Animate"},
+    {"expect": "Duration"}
+   ],
+   "highlight": [
+    {"box": [24, 1234, 359, 1360], "n": 1, "badge": "tl", "pad": 4},
+    {"box": [42, 1349, 1038, 2112], "n": 2, "badge": "tl", "pad": 0},
+    {"box": [30, 2130, 1050, 2222], "n": 3, "badge": "tl", "pad": 0}
+   ],
+   "crop": [0, 1100, 1080, 2337]
+  },
+  {
+   "id": "audio-volume",
+   "page": "audio",
+   "section": "Volume",
+   "block": 2,
+   "alt": {
+    "en": "The volume panel: Audio Effects (1), the volume slider (2), its value (3) and the keyframe button (4).",
+    "ar": "لوحة مستوى الصوت: مؤثرات صوتية (1)، شريط تمرير مستوى الصوت (2)، قيمته (3) وزر الإطار المفتاحي (4).",
+    "bn": "ভলিউম প্যানেল: অডিও ইফেক্ট (1), ভলিউম স্লাইডার (2), এর মান (3) এবং কীফ্রেম বোতাম (4)।",
+    "es": "El panel de volumen: Efectos de audio (1), el control deslizante de volumen (2), su valor (3) y el botón de fotograma clave (4).",
+    "fa": "پنل ولوم: افکت‌های صدا (1)، اسلایدر ولوم (2)، مقدار آن (3) و دکمه کی‌فریم (4).",
+    "fil": "Ang volume panel: Mga epekto sa audio (1), ang volume slider (2), ang value nito (3) at ang keyframe button (4).",
+    "hi": "वॉल्यूम पैनल: ऑडियो इफ़ेक्ट्स (1), वॉल्यूम स्लाइडर (2), उसका मान (3) और कीफ़्रेम बटन (4)।",
+    "id": "Panel volume: Efek audio (1), penggeser volume (2), kotak nilainya (3), dan tombol keyframe (4).",
+    "ms": "Panel kelantangan: Kesan audio (1), penggelangsar kelantangan (2), nilainya (3) dan butang bingkai kunci (4).",
+    "pt-BR": "O painel de volume: Efeitos de áudio (1), o controle deslizante de volume (2), seu valor (3) e o botão de quadro-chave (4).",
+    "ru": "Панель громкости: Аудиоэффекты (1), ползунок громкости (2), его значение (3) и кнопка ключевого кадра (4).",
+    "th": "แผงระดับเสียง: เอฟเฟกต์เสียง (1), แถบเลื่อนระดับเสียง (2), ช่องกรอกค่า (3) และปุ่มคีย์เฟรม (4)",
+    "tr": "Ses düzeyi paneli: Ses efektleri (1), ses düzeyi kaydırıcısı (2), değeri (3) ve anahtar kare düğmesi (4).",
+    "vi": "Bảng âm lượng: Hiệu ứng âm thanh (1), thanh trượt âm lượng (2), hộp giá trị của nó (3) và nút keyframe (4)."
+   },
+   "start": {"scene": "demo", "frame": 45},
+   "steps": [
+    {"tap": "Music"},
+    {"tap": "Volume"},
+    {"expect": "Audio Effects"}
+   ],
+   "highlight": [
+    {"select": "Audio Effects", "n": 1, "badge": "tl", "pad": 2},
+    {"box": [250, 2090, 730, 2160], "n": 2, "badge": "tl", "pad": 0},
+    {"select": {"text": "80"}, "n": 3, "badge": "tl", "pad": 4},
+    {"select": "Add keyframe", "exact": true, "pad": 14, "n": 4, "badge": "tr"}
+   ],
+   "crop": [0, 1479, 1080, 2337]
+  },
+  {
+   "id": "audio-fx",
+   "page": "audio",
+   "section": "Audio effects",
+   "block": 2,
+   "alt": {
+    "en": "Audio effects: the preset chips (1), Bypass (2) and Reorder (3) for each effect, bypass all (4) and Delete all (5).",
+    "ar": "تأثيرات الصوت: رقائق الإعداد المسبق (1)، تجاوز (2) وإعادة ترتيب (3) لكل تأثير، تجاوز الكل (4) وحذف الكل (5).",
+    "bn": "অডিও ইফেক্ট: প্রিসেট চিপ (1), প্রতিটি ইফেক্টের বাইপাস (2) ও পুনরায় সাজান (3), সব ইফেক্ট বাইপাস (4) এবং সব মুছুন (5)।",
+    "es": "Efectos de audio: los chips de preajuste (1), Omitir (2) y Reordenar (3) para cada efecto, omitir todos (4) y Eliminar todo (5).",
+    "fa": "افکت‌های صوتی: چیپ‌های پریست (1)، بای‌پس (2) و بازچینش (3) برای هر افکت، دور زدن همه (4) و حذف همه (5).",
+    "fil": "Mga audio effect: ang mga preset chip (1), Bypass (2) at Muling ayusin (3) para sa bawat effect, bypass sa lahat (4) at Burahin lahat (5).",
+    "hi": "ऑडियो इफ़ेक्ट: प्रीसेट चिप्स (1), हर इफ़ेक्ट के बायपास (2) और रीऑर्डर (3), सभी इफ़ेक्ट बायपास करने का बटन (4) और सभी हटाएँ (5)।",
+    "id": "Efek audio: chip preset (1), Lewati (2) serta Susun ulang (3) untuk setiap efek, lewati semua (4), dan Hapus semua (5).",
+    "ms": "Kesan audio: cip pratetap (1), Langkau (2) dan Susun semula (3) bagi setiap kesan, bypass semua (4) dan Padam semua (5).",
+    "pt-BR": "Efeitos de áudio: os chips de predefinição (1), Desativar (2) e Reordenar (3) para cada efeito, desativar todos (4) e Excluir tudo (5).",
+    "ru": "Аудиоэффекты: чипы пресетов (1), Обход (2) и Изменить порядок (3) у каждого эффекта, обход всех эффектов (4) и Удалить все (5).",
+    "th": "เอฟเฟกต์เสียง: ชิปพรีเซ็ต (1), บายพาส (2) และ จัดลำดับ (3) ของแต่ละเอฟเฟกต์, บายพาสทั้งหมด (4) และ ลบทั้งหมด (5)",
+    "tr": "Ses efektleri: ön ayar çipleri (1), her efekt için Atla (2) ve Yeniden sırala (3), tümünü atla (4) ve Tümünü sil (5).",
+    "vi": "Hiệu ứng âm thanh: các chip preset (1), Bỏ qua (2) và Sắp xếp lại (3) cho mỗi hiệu ứng, bỏ qua tất cả (4) và Xóa tất cả (5)."
+   },
+   "start": {"scene": "demo", "frame": 45},
+   "steps": [
+    {"tap": "Music"},
+    {"tap": "Volume"},
+    {"tap": "Audio Effects"},
+    {"tap": "Radio"},
+    {"expect": "High-pass"}
+   ],
+   "highlight": [
+    {"box": [174, 1815, 1080, 1929], "n": 1, "badge": "tl", "pad": 0},
+    {"select": {"desc": "Bypass", "index": 1}, "exact": true, "pad": 4, "n": 2, "badge": "tl"},
+    {"select": {"desc": "Reorder", "index": 0}, "exact": true, "pad": 6, "n": 3, "badge": "tl"},
+    {"box": [0, 1987, 157, 2162], "n": 4, "badge": "tr", "pad": 0},
+    {"box": [0, 2162, 157, 2337], "n": 5, "badge": "tr", "pad": 0}
+   ],
+   "crop": [0, 1479, 1080, 2337]
+  },
+  {
+   "id": "ai-captions",
+   "page": "ai-tools",
+   "section": "Auto captions",
+   "block": 2,
+   "alt": {
+    "en": "The Auto Captions sheet: Source (1), the sample (2), Language (3), Words per caption (4), the speech model (5), Appearance (6) and Generate (7).",
+    "ar": "ورقة التسميات التوضيحية التلقائية: المصدر (1)، العينة (2)، اللغة (3)، الكلمات لكل تسمية توضيحية (4)، نموذج الكلام (5)، المظهر (6) وإنشاء (7).",
+    "bn": "অটো ক্যাপশন শিট: সোর্স (1), নমুনা (2), ভাষা (3), প্রতি ক্যাপশনে শব্দ (4), স্পিচ মডেল (5), চেহারা (6) এবং জেনারেট (7)।",
+    "es": "La hoja de Subtítulos automáticos: Origen (1), la muestra (2), Idioma (3), Palabras por subtítulo (4), el modelo de voz (5), Apariencia (6) y Generar (7).",
+    "fa": "برگه زیرنویس خودکار: منبع (1)، نمونه (2)، زبان (3)، کلمات هر زیرنویس (4)، مدل گفتار (5)، ظاهر (6) و تولید (7).",
+    "fil": "Ang Auto Captions sheet: Pinagmulan (1), ang sample (2), Wika (3), Mga salita kada kapsyon (4), ang speech model (5), Hitsura (6) at Gumawa (7).",
+    "hi": "ऑटो कैप्शन शीट: सोर्स (1), नमूना (2), भाषा (3), प्रति कैप्शन शब्द (4), स्पीच मॉडल (5), दिखावट (6) और जनरेट करें (7)।",
+    "id": "Lembar Takarir Otomatis: Sumber (1), contoh teks (2), Bahasa (3), Kata per takarir (4), model ucapan (5), Tampilan (6), dan Buat (7).",
+    "ms": "Helaian Kapsyen Automatik: Sumber (1), contoh (2), Bahasa (3), Perkataan setiap kapsyen (4), model pertuturan (5), Penampilan (6) dan Jana (7).",
+    "pt-BR": "A folha de Legendas automáticas: Origem (1), a amostra (2), Idioma (3), Palavras por legenda (4), o modelo de fala (5), Aparência (6) e Gerar (7).",
+    "ru": "Панель автосубтитров: Источник (1), образец (2), Язык (3), Слов в субтитре (4), модель речи (5), Внешний вид (6) и Создать (7).",
+    "th": "แผ่นคำบรรยายอัตโนมัติ: แหล่งที่มา (1), ข้อความตัวอย่าง (2), ภาษา (3), จำนวนคำต่อคำบรรยาย (4), โมเดลเสียงพูด (5), รูปลักษณ์ (6) และ สร้าง (7)",
+    "tr": "Otomatik Altyazılar sayfası: Kaynak (1), örnek (2), Dil (3), Altyazı başına kelime (4), konuşma modeli (5), Görünüm (6) ve Oluştur (7).",
+    "vi": "Bảng Phụ đề tự động: Nguồn (1), văn bản mẫu (2), Ngôn ngữ (3), Số từ mỗi phụ đề (4), mô hình giọng nói (5), Giao diện (6) và Tạo (7)."
+   },
+   "start": {"scene": "demo", "frame": 45},
+   "steps": [
+    {"tap": "Add layer"},
+    {"tap": "Captions"},
+    {"expect": "Generate"}
+   ],
+   "highlight": [
+    {"box": [20, 1174, 1060, 1300], "n": 1, "badge": "tl", "pad": 0},
+    {"box": [20, 1316, 1060, 1566], "n": 2, "badge": "tl", "pad": 0},
+    {"box": [20, 1563, 1060, 1689], "n": 3, "badge": "tl", "pad": 0},
+    {"box": [20, 1700, 1060, 1785], "n": 4, "badge": "tl", "pad": 0},
+    {"box": [20, 1810, 1060, 1990], "n": 5, "badge": "tl", "pad": 0},
+    {"box": [20, 1995, 1060, 2105], "n": 6, "badge": "tl", "pad": 0},
+    {"select": "Generate", "n": 7, "badge": "tl", "pad": 4}
+   ],
+   "crop": [0, 880, 1080, 2337]
+  },
+  {
+   "id": "export-screen",
+   "page": "export",
+   "section": "The screen",
+   "block": 1,
+   "alt": {
+    "en": "The Export Project screen: the information lines (1), the Video card (2), its options arrow (3), the Template switch (4) and the Export button (5).",
+    "ar": "شاشة تصدير المشروع: أسطر المعلومات (1)، بطاقة الفيديو (2)، سهم خياراتها (3)، مفتاح القالب (4) وزر تصدير (5).",
+    "bn": "প্রজেক্ট এক্সপোর্ট স্ক্রিন: তথ্যের লাইন (1), ভিডিও কার্ড (2), এর অপশনের তীর (3), টেমপ্লেট সুইচ (4) এবং এক্সপোর্ট বাটন (5)।",
+    "es": "La pantalla Exportar proyecto: las líneas de información (1), la tarjeta Video (2), su flecha de opciones (3), el interruptor Plantilla (4) y el botón Exportar (5).",
+    "fa": "صفحه خروجی پروژه: خطوط اطلاعات (1)، کارت ویدیو (2)، فلش گزینه‌های آن (3)، کلید قالب (4) و دکمه خروجی (5).",
+    "fil": "Ang screen na I-export ang Proyekto: ang mga linya ng impormasyon (1), ang card na Bidyo (2), ang arrow ng mga opsyon nito (3), ang switch na Template (4) at ang I-export na button (5).",
+    "hi": "प्रोजेक्ट एक्सपोर्ट स्क्रीन: जानकारी की पंक्तियाँ (1), वीडियो कार्ड (2), उसके विकल्पों का तीर (3), टेम्पलेट स्विच (4) और एक्सपोर्ट बटन (5)।",
+    "id": "Layar Ekspor Proyek: baris informasi (1), kartu Video (2), panah opsinya (3), sakelar Template (4), dan tombol Ekspor (5).",
+    "ms": "Skrin Eksport Projek: baris maklumat (1), kad Video (2), anak panah pilihannya (3), suis Templat (4) dan butang Eksport (5).",
+    "pt-BR": "A tela Exportar projeto: as linhas de informação (1), o cartão Vídeo (2), sua seta de opções (3), o interruptor Modelo (4) e o botão Exportar (5).",
+    "ru": "Экран «Экспорт проекта»: строки информации (1), карточка «Видео» (2), её стрелка параметров (3), переключатель шаблона (4) и кнопка «Экспорт» (5).",
+    "th": "หน้าจอส่งออกโปรเจกต์: บรรทัดข้อมูล (1), การ์ดวิดีโอ (2), ลูกศรตัวเลือกของการ์ด (3), สวิตช์เทมเพลต (4) และปุ่ม ส่งออก (5)",
+    "tr": "Projeyi Dışa Aktar ekranı: bilgi satırları (1), Video kartı (2), kartın seçenekler oku (3), Şablon anahtarı (4) ve Dışa aktar düğmesi (5).",
+    "vi": "Màn hình Xuất dự án: các dòng thông tin (1), thẻ Video (2), mũi tên tùy chọn của nó (3), công tắc Mẫu (4) và nút Xuất (5)."
+   },
+   "start": {"scene": "demo", "frame": 45},
+   "steps": [
+    {"tap": "Export & Share"},
+    {"expect": "Export Project"}
+   ],
+   "highlight": [
+    {"box": [20, 262, 1060, 512], "n": 1, "badge": "tl", "pad": 0},
+    {"box": [39, 794, 928, 978], "n": 2, "badge": "tl", "pad": 0},
+    {"box": [930, 840, 1050, 930], "n": 3, "badge": "tl", "pad": 0},
+    {"box": [20, 2000, 1060, 2134], "n": 4, "badge": "tl", "pad": 0},
+    {"select": "Export", "n": 5, "badge": "tl", "pad": 4}
+   ],
+   "crop": [0, 120, 1080, 2337]
+  },
+  {
+   "id": "projects-versions",
+   "page": "projects",
+   "section": "Version history",
+   "block": 2,
+   "alt": {
+    "en": "Version history: each version has a thumbnail, a time and a size (1), and a Restore button (2).",
+    "ar": "سجل الإصدارات: لكل إصدار صورة مصغرة ووقت وحجم (1)، وزر استعادة (2).",
+    "bn": "ভার্সন হিস্ট্রি: প্রতিটি ভার্সনের থাম্বনেইল, সময় ও সাইজ (1) এবং একটি পুনরুদ্ধার বোতাম (2)।",
+    "es": "Historial de versiones: cada versión tiene una miniatura, una hora y un tamaño (1), y un botón Restaurar (2).",
+    "fa": "تاریخچه نسخه‌ها: هر نسخه یک تصویر بندانگشتی، یک زمان و یک حجم دارد (1) و یک دکمه بازیابی (2).",
+    "fil": "Version history: ang bawat version ay may thumbnail, oras at laki (1), at isang I-restore na button (2).",
+    "hi": "वर्शन इतिहास: हर वर्शन का थंबनेल, समय और साइज़ (1) और रिस्टोर करें बटन (2)।",
+    "id": "Riwayat versi: setiap versi memiliki thumbnail, waktu, dan ukuran (1), serta tombol Pulihkan (2).",
+    "ms": "Sejarah versi: setiap versi mempunyai lakaran kecil, masa dan saiz (1), dan satu butang Pulihkan (2).",
+    "pt-BR": "Histórico de versões: cada versão tem uma miniatura, um horário e um tamanho (1), e um botão Restaurar (2).",
+    "ru": "История версий: миниатюра, время и размер каждой версии (1) и кнопка «Восстановить» (2).",
+    "th": "ประวัติเวอร์ชัน: แต่ละเวอร์ชันมีภาพขนาดย่อ เวลา และขนาด (1) พร้อมปุ่ม กู้คืน (2)",
+    "tr": "Sürüm geçmişi: her sürümde bir küçük resim, bir saat ve bir boyut (1) ile bir Geri yükle düğmesi (2) bulunur.",
+    "vi": "Lịch sử phiên bản: mỗi phiên bản có một hình thu nhỏ, thời gian và kích thước (1), cùng một nút Khôi phục (2)."
+   },
+   "start": "home",
+   "steps": [
+    {"tap": "More"},
+    {"tap": "Version history"},
+    {"expect": "Restore"}
+   ],
+   "highlight": [
+    {"union": [{"text_re": "^Today at", "index": 0}, {"text_re": "KB$", "index": 0}], "grow": [-210, -30, 20, 40], "n": 1, "badge": "tl", "pad": 0},
+    {"select": {"text": "Restore", "index": 0}, "n": 2, "badge": "tl", "pad": 4}
+   ],
+   "crop": [0, 400, 1080, 2000]
+  },
+  {
+   "id": "assets-save",
+   "page": "assets-templates",
+   "section": "Make an asset",
+   "block": 1,
+   "alt": {
+    "en": "In the layer menu, choose Save to My Assets (1).",
+    "ar": "في قائمة الطبقة، اختر حفظ في أصولي (1).",
+    "bn": "লেয়ার মেনুতে আমার অ্যাসেটস-এ সেভ করুন (1) বেছে নিন।",
+    "es": "En el menú de capas, elige Guardar en Mis recursos (1).",
+    "fa": "در منوی لایه، ذخیره در دارایی‌های من (1) را انتخاب کنید.",
+    "fil": "Sa layer menu, piliin ang I-save sa Aking mga Asset (1).",
+    "hi": "लेयर मेन्यू में मेरे एसेट में सेव करें (1) चुनें।",
+    "id": "Di menu lapisan, pilih Simpan ke Aset Saya (1).",
+    "ms": "Dalam menu lapisan, pilih Simpan ke Aset Saya (1).",
+    "pt-BR": "No menu de camada, escolha Salvar em Meus recursos (1).",
+    "ru": "В меню слоя выберите «Сохранить в «Мои ресурсы»» (1).",
+    "th": "ในเมนูเลเยอร์ เลือก บันทึกไปยังแอสเซทของฉัน (1)",
+    "tr": "Katman menüsünde Varlıklarıma kaydet (1) öğesini seçin.",
+    "vi": "Trong menu lớp, chọn Lưu vào Tài nguyên của tôi (1)."
+   },
+   "start": {"scene": "demo", "frame": 45},
+   "steps": [
+    {"tap": "Summer Trip"},
+    {"tap": "Layer menu"},
+    {"expect": "Save to My Assets"}
+   ],
+   "highlight": [{"select": "Save to My Assets", "n": 1, "badge": "tl", "pad": 8}],
+   "crop": [0, 104, 1080, 700]
+  },
+  {
+   "id": "presets-save",
+   "page": "assets-templates",
+   "section": "Save a preset",
+   "block": 1,
+   "alt": {
+    "en": "In the copy and paste menu, choose Save Preset (1).",
+    "ar": "في قائمة النسخ واللصق، اختر حفظ إعداد مسبق (1).",
+    "bn": "কপি ও পেস্ট মেনুতে প্রিসেট সেভ করুন (1) বেছে নিন।",
+    "es": "En el menú de copiar y pegar, elige Guardar preajuste (1).",
+    "fa": "در منوی کپی و جای‌گذاری، ذخیره پریست (1) را انتخاب کنید.",
+    "fil": "Sa copy at paste menu, piliin ang I-save ang preset (1).",
+    "hi": "कॉपी और पेस्ट मेन्यू में प्रीसेट सेव करें (1) चुनें।",
+    "id": "Di menu salin dan tempel, pilih Simpan preset (1).",
+    "ms": "Dalam menu salin dan tampal, pilih Simpan Pratetap (1).",
+    "pt-BR": "No menu de copiar e colar, escolha Salvar predefinição (1).",
+    "ru": "В меню копирования и вставки выберите «Сохранить пресет» (1).",
+    "th": "ในเมนูคัดลอกและวาง เลือก บันทึกพรีเซ็ต (1)",
+    "tr": "Kopyala ve yapıştır menüsünde Ön ayarı kaydet (1) öğesini seçin.",
+    "vi": "Trong menu sao chép và dán, chọn Lưu preset (1)."
+   },
+   "start": {"scene": "demo", "frame": 45},
+   "steps": [
+    {"tap": "Summer Trip"},
+    {"tap": "Copy and paste"},
+    {"expect": "Save Preset"}
+   ],
+   "highlight": [{"select": "Save Preset", "n": 1, "badge": "tl", "pad": 8}],
+   "crop": [0, 1440, 1080, 2337]
+  },
+  {
+   "id": "settings-drawer",
+   "page": "settings",
+   "section": "",
+   "block": 1,
+   "alt": {
+    "en": "The Settings drawer: the four groups (1) and the rows below them (2).",
+    "ar": "درج الإعدادات: المجموعات الأربع (1) والصفوف الموجودة أسفلها (2).",
+    "bn": "সেটিংস ড্রয়ার: চারটি গ্রুপ (1) এবং তাদের নিচের সারিগুলো (2)।",
+    "es": "El panel de Ajustes: los cuatro grupos (1) y las filas debajo de ellos (2).",
+    "fa": "کشوی تنظیمات: چهار گروه (1) و ردیف‌های زیر آن‌ها (2).",
+    "fil": "Ang Settings drawer: ang apat na grupo (1) at ang mga row sa ilalim ng mga ito (2).",
+    "hi": "सेटिंग्स ड्रॉअर: चार ग्रुप (1) और उनके नीचे की पंक्तियाँ (2)।",
+    "id": "Drawer Pengaturan: empat grup (1) dan baris di bawahnya (2).",
+    "ms": "Laci Tetapan: empat kumpulan (1) dan baris di bawahnya (2).",
+    "pt-BR": "A gaveta de Configurações: os quatro grupos (1) e as linhas abaixo deles (2).",
+    "ru": "Панель настроек: четыре группы (1) и строки под ними (2).",
+    "th": "ลิ้นชักการตั้งค่า: สี่กลุ่ม (1) และแถวด้านล่างกลุ่มเหล่านี้ (2)",
+    "tr": "Ayarlar çekmecesi: dört grup (1) ve altlarındaki satırlar (2).",
+    "vi": "Ngăn kéo Cài đặt: bốn nhóm (1) và các hàng bên dưới chúng (2)."
+   },
+   "start": "home",
+   "steps": [
+    {"tap": "Settings"},
+    {"expect": "Start the tutorial"}
+   ],
+   "highlight": [
+    {"box": [16, 254, 719, 806], "n": 1, "badge": "tl", "pad": 0},
+    {"box": [16, 822, 719, 1700], "n": 2, "badge": "tl", "pad": 0}
+   ],
+   "crop": [0, 106, 735, 1700]
+  },
+  {
+   "id": "settings-editor",
+   "page": "settings",
+   "section": "Editor",
+   "block": 1,
+   "alt": {
+    "en": "The Editor group: Theme (1), New Layer Length (2), Vibration (3), the switch for the transition button (4) and Emoji Style (5).",
+    "ar": "مجموعة المحرر: المظهر (1)، طول الطبقة الجديدة (2)، الاهتزاز (3)، مفتاح زر الانتقال (4) ونمط الإيموجي (5).",
+    "bn": "এডিটর গ্রুপ: থিম (1), নতুন লেয়ারের দৈর্ঘ্য (2), ভাইব্রেশন (3), ট্রানজিশন বোতামের সুইচ (4) এবং ইমোজি স্টাইল (5)।",
+    "es": "El grupo Editor: Tema (1), Duración de capa nueva (2), Vibración (3), el interruptor del botón de transición (4) y Estilo de emoji (5).",
+    "fa": "گروه ویرایشگر: پوسته (1)، مدت لایه جدید (2)، لرزش (3)، کلید دکمه انتقال (4) و سبک ایموجی (5).",
+    "fil": "Ang grupong Editor: Tema (1), Tagal ng bagong layer (2), Vibration (3), ang switch para sa transition button (4) at Estilo ng emoji (5).",
+    "hi": "एडिटर ग्रुप: थीम (1), नई लेयर की लंबाई (2), वाइब्रेशन (3), ट्रांज़िशन बटन का स्विच (4) और इमोजी स्टाइल (5)।",
+    "id": "Grup Editor: Tema (1), Durasi lapisan baru (2), Getaran (3), sakelar untuk tombol transisi (4), dan Gaya Emoji (5).",
+    "ms": "Kumpulan Editor: Tema (1), Panjang lapisan baharu (2), Getaran (3), suis untuk butang peralihan (4) dan Gaya Emoji (5).",
+    "pt-BR": "O grupo Editor: Tema (1), Duração da nova camada (2), Vibração (3), o interruptor do botão de transição (4) e Estilo de emoji (5).",
+    "ru": "Группа «Редактор»: Тема (1), Длительность нового слоя (2), Вибрация (3), переключатель кнопки перехода (4) и Стиль эмодзи (5).",
+    "th": "กลุ่ม ตัวแก้ไข: ธีม (1), ความยาวของเลเยอร์ใหม่ (2), การสั่น (3), สวิตช์ของปุ่มทรานซิชัน (4) และ สไตล์อีโมจิ (5)",
+    "tr": "Editör grubu: Tema (1), Yeni katman uzunluğu (2), Titreşim (3), geçiş düğmesinin anahtarı (4) ve Emoji stili (5).",
+    "vi": "Nhóm Trình chỉnh sửa: Giao diện (1), Độ dài lớp mới (2), Rung (3), công tắc cho nút chuyển cảnh (4) và Kiểu emoji (5)."
+   },
+   "start": "home",
+   "steps": [
+    {"tap": "Settings"},
+    {"tap": "Editor"},
+    {"expect": "Emoji Style"}
+   ],
+   "highlight": [
+    {"box": [24, 364, 700, 510], "n": 1, "badge": "tl", "pad": 0},
+    {"box": [24, 520, 700, 612], "n": 2, "badge": "tl", "pad": 0},
+    {"box": [16, 612, 719, 716], "n": 3, "badge": "tl", "pad": 0},
+    {"box": [16, 722, 719, 850], "n": 4, "badge": "tl", "pad": 0},
+    {"box": [24, 860, 700, 1070], "n": 5, "badge": "tl", "pad": 0}
+   ],
+   "crop": [0, 106, 735, 1200]
+  },
+  {
+   "id": "lm-multi",
+   "page": "layer-menus",
+   "section": "Selecting several layers",
+   "block": 5,
+   "start": {"scene": "demo", "frame": 45},
+   "steps": [
+    {"tap": "Copy and paste"},
+    {"tap": "Select All Layers"},
+    {"expect": "Group"}
+   ],
+   "highlight": [
+    {"box": [4, 122, 1076, 236], "pad": 0, "radius": 10, "n": 1, "badge_at": [1040, 268]},
+    {"box": [4, 1700, 1076, 2160], "pad": 0, "radius": 10, "n": 2, "badge_at": [1040, 1690]},
+    {"box": [10, 2205, 1070, 2335], "pad": 0, "radius": 10, "n": 3, "badge_at": [1040, 2196]}
+   ],
+   "crop": [0, 104, 1080, 2337],
+   "alt": {
+    "en": "Several layers selected: the top bar (1), the checked layers (2) and the bottom bar with the timing commands (3).",
+    "ar": "عدة طبقات محددة: الشريط العلوي (1)، الطبقات المعلَّمة (2) والشريط السفلي مع أوامر التوقيت (3).",
+    "bn": "একাধিক লেয়ার নির্বাচিত: টপ বার (1), টিক দেওয়া লেয়ারগুলো (2) এবং টাইমিং কমান্ডসহ নিচের বার (3)।",
+    "es": "Varias capas seleccionadas: la barra superior (1), las capas marcadas (2) y la barra inferior con los comandos de tiempo (3).",
+    "fa": "چند لایه انتخاب‌شده: نوار بالا (1)، لایه‌های تیک‌خورده (2) و نوار پایین با فرمان‌های زمان‌بندی (3).",
+    "fil": "Ilang layer ang napili: ang top bar (1), ang mga naka-check na layer (2) at ang bottom bar na may mga utos sa timing (3).",
+    "hi": "कई लेयर चयनित: टॉप बार (1), टिक की गई लेयर (2) और टाइमिंग कमांड वाला नीचे का बार (3)।",
+    "id": "Saat beberapa lapisan dipilih: bilah atas (1), lapisan yang dicentang (2), dan bilah bawah dengan perintah waktu (3).",
+    "ms": "Beberapa lapisan dipilih: bar atas (1), lapisan yang ditandakan (2) dan bar bawah dengan arahan pemasaan (3).",
+    "pt-BR": "Várias camadas selecionadas: a barra superior (1), as camadas marcadas (2) e a barra inferior com os comandos de tempo (3).",
+    "ru": "Выбрано несколько слоёв: верхняя панель (1), отмеченные слои (2) и нижняя панель с командами времени (3).",
+    "th": "เมื่อเลือกหลายเลเยอร์: แถบด้านบน (1), เลเยอร์ที่มีเครื่องหมายถูก (2) และแถบด้านล่างพร้อมคำสั่งเกี่ยวกับเวลา (3)",
+    "tr": "Birkaç katman seçili: üst çubuk (1), işaretli katmanlar (2) ve zamanlama komutlarının bulunduğu alt çubuk (3).",
+    "vi": "Khi nhiều lớp được chọn: thanh trên cùng (1), các lớp có dấu tích (2) và thanh dưới cùng với các lệnh thời gian (3)."
+   }
+  },
+  {
+   "id": "add-media",
+   "page": "add-menu",
+   "section": "Media",
+   "block": 2,
+   "start": {"scene": "demo", "frame": 45},
+   "steps": [
+    {"tap": "Add layer"},
+    {"tap": "Media"},
+    {"wait": 3},
+    {"expect": "Camera"}
+   ],
+   "highlight": [
+    {"select": "View All", "n": 1, "badge": "tr", "pad": 0},
+    {"select": {"text": "All"}, "n": 2, "badge": "tr", "pad": 0},
+    {"select": {"text": "Camera"}, "n": 3, "badge": "tr", "pad": 0},
+    {"select": {"text": "Search"}, "n": 4, "badge": "tr", "pad": 0}
+   ],
+   "crop": [0, 1660, 1080, 2337],
+   "alt": {
+    "en": "The Media tab: View All (1), the album list (2), Camera (3) and Search (4).",
+    "ar": "تبويب وسائط: عرض الكل (1)، قائمة الألبومات (2)، كاميرا (3) وبحث (4).",
+    "bn": "মিডিয়া ট্যাব: সব দেখুন (1), অ্যালবাম তালিকা (2), ক্যামেরা (3) এবং খুঁজুন (4)।",
+    "es": "La pestaña Medios: Ver todo (1), la lista de álbumes (2), Cámara (3) y Buscar (4).",
+    "fa": "زبانه رسانه: مشاهده همه (1)، فهرست آلبوم (2)، دوربین (3) و جستجو (4).",
+    "fil": "Ang Media tab: Tingnan lahat (1), ang album list (2), Kamera (3) at Maghanap (4).",
+    "hi": "मीडिया टैब: सभी देखें (1), एल्बम सूची (2), कैमरा (3) और खोजें (4)।",
+    "id": "Tab Media: Lihat semua (1), daftar album (2), Kamera (3), dan Cari (4).",
+    "ms": "Tab Media: Lihat semua (1), senarai album (2), Kamera (3) dan Cari (4).",
+    "pt-BR": "A aba Mídia: Ver tudo (1), a lista de álbuns (2), Câmera (3) e Pesquisar (4).",
+    "ru": "Вкладка «Медиа»: Показать все (1), список альбомов (2), Камера (3) и Поиск (4).",
+    "th": "แท็บ สื่อ: ดูทั้งหมด (1), รายการอัลบั้ม (2), กล้อง (3) และ ค้นหา (4)",
+    "tr": "Medya sekmesi: Tümünü gör (1), albüm listesi (2), Kamera (3) ve Ara (4).",
+    "vi": "Tab Phương tiện: Xem tất cả (1), danh sách album (2), Máy ảnh (3) và Tìm kiếm (4)."
+   }
+  },
+  {
+   "id": "add-object",
+   "page": "add-menu",
+   "section": "Object / Asset",
+   "block": 2,
+   "start": {"scene": "demo", "frame": 45},
+   "steps": [
+    {"tap": "Add layer"},
+    {"tap": "Object / Asset"},
+    {"expect": "3D Model"}
+   ],
+   "highlight": [{"box": [20, 1874, 830, 2316], "n": 1, "badge": "tl", "pad": 0}],
+   "crop": [0, 1660, 1080, 2337],
+   "alt": {
+    "en": "The Object / Asset tab: Camera, Null, Empty Group, Asset / Project, Import SVG and 3D Model (1).",
+    "ar": "تبويب كائن / أصل: كاميرا، فارغ، مجموعة فارغة، أصل / مشروع، استيراد SVG ونموذج 3D (1).",
+    "bn": "অবজেক্ট / অ্যাসেট ট্যাব: ক্যামেরা, নাল, খালি গ্রুপ, অ্যাসেট / প্রজেক্ট, SVG ইমপোর্ট করুন এবং 3D মডেল (1)।",
+    "es": "La pestaña Objeto / recurso: Cámara, Nulo, Grupo vacío, Recurso / Proyecto, Importar SVG y Modelo 3D (1).",
+    "fa": "زبانه شیء / دارایی: دوربین، پوچ، گروه خالی، دارایی / پروژه، واردکردن SVG و مدل سه‌بعدی (1).",
+    "fil": "Ang Object / Asset tab: Kamera, Null, Walang laman na grupo, Asset / Proyekto, I-import ang SVG at 3D na modelo (1).",
+    "hi": "ऑब्जेक्ट / एसेट टैब: कैमरा, नल, खाली ग्रुप, एसेट / प्रोजेक्ट, SVG इंपोर्ट करें और 3D मॉडल (1)।",
+    "id": "Tab Objek / Aset: Kamera, Null, Grup kosong, Aset / Proyek, Impor SVG, dan Model 3D (1).",
+    "ms": "Tab Objek / aset: Kamera, Nol, Kumpulan kosong, Aset / Projek, Import SVG dan Model 3D (1).",
+    "pt-BR": "A aba Objeto / Recurso: Câmera, Nulo, Grupo vazio, Recurso / Projeto, Importar SVG e Modelo 3D (1).",
+    "ru": "Вкладка «Объект / ресурс»: Камера, Нулевой, Пустая группа, Ресурс / проект, Импорт SVG и 3D-модель (1).",
+    "th": "แท็บ ออบเจ็กต์ / แอสเซท: กล้อง, ว่าง, กลุ่มว่าง, แอสเซท / โปรเจกต์, นำเข้า SVG และ โมเดล 3D (1)",
+    "tr": "Nesne / Varlık sekmesi: Kamera, Boş, Boş grup, Varlık / Proje, SVG içe aktar ve 3D model (1).",
+    "vi": "Tab Đối tượng / Tài nguyên: Máy ảnh, Rỗng, Nhóm rỗng, Tài nguyên / Dự án, Nhập SVG và Mô hình 3D (1)."
+   }
+  },
+  {
+   "id": "media-layer-menu",
+   "page": "media",
+   "section": "Add photos and videos",
+   "block": 4,
+   "start": {"scene": "video", "frame": 30},
+   "steps": [
+    {"tap": "Beach"},
+    {"tap": "Layer menu"},
+    {"expect": "Track Motion"}
+   ],
+   "highlight": [
+    {"box": [424, 648, 1080, 984], "n": 1, "badge": "tl", "pad": 0},
+    {"box": [424, 1488, 1080, 1603], "n": 2, "badge": "tl", "pad": 0}
+   ],
+   "crop": [0, 104, 1080, 1720],
+   "alt": {
+    "en": "The layer menu of a video: Fit to Canvas, Fill the Canvas and Stretch to Canvas (1), and Media Info (2).",
+    "ar": "قائمة الطبقة لفيديو: ملاءمة اللوحة، ملء اللوحة وتمديد إلى اللوحة (1)، ومعلومات الوسائط (2).",
+    "bn": "একটি ভিডিওর লেয়ার মেনু: ক্যানভাসে ফিট করুন, ক্যানভাস ফিল করুন এবং ক্যানভাসে স্ট্রেচ করুন (1), আর মিডিয়া তথ্য (2)।",
+    "es": "El menú de capas de un video: Ajustar al lienzo, Rellenar el lienzo y Estirar al lienzo (1), y también Información de medios (2).",
+    "fa": "منوی لایه یک ویدیو: تناسب با بوم، پر کردن بوم و کشش تا بوم (1) و اطلاعات رسانه (2).",
+    "fil": "Ang layer menu ng isang bidyo: I-fit sa canvas, I-fill ang canvas at I-stretch sa canvas (1), at Impormasyon ng media (2).",
+    "hi": "किसी वीडियो का लेयर मेन्यू: कैनवास में फ़िट करें, कैनवास भरें और कैनवास में स्ट्रेच करें (1), तथा मीडिया जानकारी (2)।",
+    "id": "Menu lapisan sebuah video: Muat ke kanvas, Isi kanvas, dan Regangkan ke kanvas (1), serta Info media (2).",
+    "ms": "Menu lapisan bagi video: Muat ke kanvas, Isi kanvas dan Regang ke kanvas (1), dan Maklumat media (2).",
+    "pt-BR": "O menu de camada de um vídeo: Ajustar à tela, Preencher a tela e Esticar até a tela (1), e Informações da mídia (2).",
+    "ru": "Меню слоя видео: Вписать в холст, Заполнить холст и Растянуть по холсту (1), а также Информация о медиа (2).",
+    "th": "เมนูเลเยอร์ของวิดีโอ: พอดีกับแคนวาส, เติมเต็มแคนวาส และ ยืดให้เต็มแคนวาส (1) และ ข้อมูลสื่อ (2)",
+    "tr": "Bir videonun katman menüsü: Tuvale sığdır, Tuvali doldur ve Tuvale uzat (1) ile Medya bilgisi (2).",
+    "vi": "Menu lớp của một video: Vừa khung vẽ, Lấp đầy khung vẽ và Kéo giãn vừa khung vẽ (1), cùng Thông tin phương tiện (2)."
+   }
+  },
+  {
+   "id": "shapes-points",
+   "page": "shapes",
+   "section": "The pen tool and Edit Points",
+   "block": 3,
+   "start": {"scene": "heart", "frame": 45},
+   "steps": [
+    {"tap": "Heart"},
+    {"tap": "Edit Points"},
+    {"expect": "Contour 1"}
+   ],
+   "highlight": [
+    {"box": [0, 722, 1080, 1328], "clear": true, "ring": false, "pad": 0},
+    {"box": [0, 1944, 158, 2075], "n": 1, "badge": "tr", "pad": 0},
+    {"box": [0, 2075, 158, 2206], "n": 2, "badge": "tr", "pad": 0},
+    {"box": [0, 2206, 158, 2337], "n": 3, "badge": "tr", "pad": 0},
+    {"box": [172, 1830, 880, 2200], "n": 4, "badge": "tl", "pad": 0},
+    {"box": [223, 2224, 860, 2337], "n": 5, "badge": "tl", "pad": 0},
+    {"box": [884, 1790, 1076, 2200], "n": 6, "badge": "tl", "pad": 0}
+   ],
+   "crop": [0, 640, 1080, 2337],
+   "alt": {
+    "en": "The point editor: Open the path (1), Make the point sharp (2), Delete point (3), the trackpad (4), the contour arrows (5) and the list of points (6).",
+    "ar": "محرر النقاط: فتح المسار (1)، جعل النقطة حادة (2)، حذف نقطة (3)، لوحة التتبع (4)، أسهم الكنتور (5) وقائمة النقاط (6).",
+    "bn": "পয়েন্ট এডিটর: পাথ খুলুন (1), পয়েন্টটি শার্প করুন (2), পয়েন্ট মুছুন (3), ট্র্যাকপ্যাড (4), কনটুরের তীর (5) এবং পয়েন্টের তালিকা (6)।",
+    "es": "El editor de puntos: Abrir la ruta (1), Convertir el punto en angular (2), Eliminar punto (3), el trackpad (4), las flechas de contorno (5) y la lista de puntos (6).",
+    "fa": "ویرایشگر نقاط: باز کردن مسیر (1)، تیزکردن نقطه (2)، حذف نقطه (3)، ترک‌پد (4)، فلش‌های کانتور (5) و فهرست نقاط (6).",
+    "fil": "Ang point editor: Buksan ang path (1), Gawing matalim ang punto (2), Alisin ang punto (3), ang trackpad (4), ang mga arrow ng contour (5) at ang listahan ng mga point (6).",
+    "hi": "पॉइंट एडिटर: पाथ खोलें (1), बिंदु को नुकीला बनाएँ (2), बिंदु हटाएँ (3), ट्रैकपैड (4), कंटूर के तीर (5) और पॉइंट्स की सूची (6)।",
+    "id": "Editor titik: Buka jalur (1), Buat titik tajam (2), Hapus titik (3), trackpad (4), panah kontur (5), dan daftar titik (6).",
+    "ms": "Editor titik: Buka laluan (1), Jadikan titik tajam (2), Padam titik (3), pad sentuh (4), anak panah kontur (5) dan senarai titik (6).",
+    "pt-BR": "O editor de pontos: Abrir o caminho (1), Deixar o ponto nítido (2), Excluir ponto (3), o trackpad (4), as setas de contorno (5) e a lista de pontos (6).",
+    "ru": "Редактор точек: Разомкнуть контур (1), Сделать точку острой (2), Удалить точку (3), тачпад (4), стрелки контура (5) и список точек (6).",
+    "th": "ตัวแก้ไขจุด: เปิดพาธ (1), ทำให้จุดเป็นเหลี่ยม (2), ลบจุด (3), แทร็กแพด (4), ลูกศรคอนทัวร์ (5) และรายการจุด (6)",
+    "tr": "Nokta düzenleyicisi: Yolu aç (1), Noktayı keskin yap (2), Noktayı sil (3), izleme yüzeyi (4), kontur okları (5) ve noktaların listesi (6).",
+    "vi": "Trình chỉnh sửa điểm: Mở đường (1), Làm điểm nhọn (2), Xóa điểm (3), bàn di chuột (4), các mũi tên đường viền (5) và danh sách điểm (6)."
+   }
+  },
+  {
+   "id": "shapes-draw",
+   "page": "shapes",
+   "section": "Freehand drawing",
+   "block": 2,
+   "start": {"scene": "demo", "frame": 45},
+   "steps": [
+    {"tap": "Add layer"},
+    {"tap": "Freehand Brush"},
+    {"expect": "Eraser"},
+    {"swipe": [420, 1000, 500, 1100, 300]},
+    {"swipe": [500, 1100, 680, 860, 300]}
+   ],
+   "highlight": [
+    {"box": [0, 722, 1080, 1328], "clear": true, "ring": false, "pad": 0},
+    {"box": [925, 1812, 1076, 2337], "n": 1, "badge": "tl", "pad": 0},
+    {"box": [16, 1830, 900, 1900], "n": 2, "badge": "tl", "pad": 0},
+    {"box": [10, 1960, 1070, 2310], "n": 3, "badge": "tl", "pad": 0}
+   ],
+   "crop": [0, 722, 1080, 2337],
+   "alt": {
+    "en": "The drawing editor: the four tools (1), the size slider (2) and the color picker (3).",
+    "ar": "محرر الرسم: الأدوات الأربع (1)، شريط تمرير الحجم (2) ومنتقي اللون (3).",
+    "bn": "ড্রয়িং এডিটর: চারটি টুল (1), সাইজ স্লাইডার (2) এবং কালার পিকার (3)।",
+    "es": "El editor de dibujo: las cuatro herramientas (1), el control deslizante de tamaño (2) y el selector de color (3).",
+    "fa": "ویرایشگر رسم: چهار ابزار (1)، لغزنده اندازه (2) و انتخابگر رنگ (3).",
+    "fil": "Ang drawing editor: ang apat na tool (1), ang size slider (2) at ang color picker (3).",
+    "hi": "ड्रॉइंग एडिटर: चार टूल (1), साइज़ स्लाइडर (2) और कलर पिकर (3)।",
+    "id": "Editor gambar: empat alat (1), penggeser ukuran (2), dan pemilih warna (3).",
+    "ms": "Editor lukisan: empat alat (1), penggelangsar saiz (2) dan pemilih warna (3).",
+    "pt-BR": "O editor de desenho: as quatro ferramentas (1), o controle deslizante de tamanho (2) e o seletor de cor (3).",
+    "ru": "Редактор рисования: четыре инструмента (1), ползунок размера (2) и выбор цвета (3).",
+    "th": "ตัวแก้ไขการวาด: เครื่องมือทั้งสี่ (1), แถบเลื่อนขนาด (2) และตัวเลือกสี (3)",
+    "tr": "Çizim düzenleyicisi: dört araç (1), boyut kaydırıcısı (2) ve renk seçici (3).",
+    "vi": "Trình chỉnh sửa bản vẽ: bốn công cụ (1), thanh trượt kích thước (2) và bộ chọn màu (3)."
+   }
+  },
+  {
+   "id": "cam-options",
+   "page": "camera-3d",
+   "section": "Camera Options",
+   "block": 2,
+   "start": {"scene": "demo", "frame": 45},
+   "steps": [
+    {"tap": "Add layer"},
+    {"tap": "Object / Asset"},
+    {"tap": "Camera"},
+    {"tap": "Camera Options"},
+    {"expect": "View Angle"}
+   ],
+   "highlight": [
+    {"box": [157, 1794, 1080, 1920], "n": 1, "badge": "tl", "pad": 0},
+    {"box": [170, 1930, 650, 2110], "n": 2, "badge": "tl", "pad": 0},
+    {"box": [665, 1893, 1070, 2119], "n": 3, "badge": "tl", "pad": 0},
+    {"box": [170, 2101, 1070, 2335], "n": 4, "badge": "tl", "pad": 0}
+   ],
+   "crop": [0, 1479, 1080, 2337],
+   "alt": {
+    "en": "Camera Options: the tabs (1), the view cone (2), Perspective and Orthographic (3), View Angle and Zoom (4).",
+    "ar": "خيارات الكاميرا: التبويبات (1)، مخروط الرؤية (2)، منظور ومتعامد (3)، زاوية العرض وتكبير (4).",
+    "bn": "ক্যামেরা অপশন: ট্যাব (1), ভিউ কোন (2), পার্সপেক্টিভ ও অর্থোগ্রাফিক (3), ভিউ অ্যাঙ্গেল ও জুম (4)।",
+    "es": "Opciones de cámara: las pestañas (1), el cono de visión (2), Perspectiva y Ortográfica (3), Ángulo de visión y Zoom (4).",
+    "fa": "گزینه‌های دوربین: زبانه‌ها (1)، مخروط دید (2)، پرسپکتیو و اورتوگرافیک (3)، زاویه دید و بزرگ‌نمایی (4).",
+    "fil": "Mga opsyon sa kamera: ang mga tab (1), ang view cone (2), Perspektibo at Orthographic (3), Anggulo ng tanaw at Zoom (4).",
+    "hi": "कैमरा विकल्प: टैब (1), व्यू कोन (2), पर्सपेक्टिव और ऑर्थोग्राफ़िक (3), व्यू एंगल और ज़ूम (4)।",
+    "id": "Opsi Kamera: tab (1), kerucut pandang (2), Perspektif dan Ortografis (3), Sudut pandang dan Zoom (4).",
+    "ms": "Pilihan Kamera: tab (1), kon pandangan (2), Perspektif dan Ortografik (3), Sudut Pandangan dan Zum (4).",
+    "pt-BR": "Opções da câmera: as abas (1), o cone de visão (2), Perspectiva e Ortográfica (3), Ângulo de visão e Zoom (4).",
+    "ru": "Параметры камеры: вкладки (1), конус обзора (2), Перспектива и Ортографическая (3), Угол обзора и Масштаб (4).",
+    "th": "ตัวเลือกกล้อง: แท็บ (1), กรวยมุมมอง (2), เปอร์สเปกทีฟ และ ออร์โธกราฟิก (3), มุมมอง และ ซูม (4)",
+    "tr": "Kamera seçenekleri: sekmeler (1), görüş konisi (2), Perspektif ve Ortografik (3), Görüş açısı ve Yakınlaştırma (4).",
+    "vi": "Tùy chọn máy ảnh: các tab (1), hình nón nhìn (2), Phối cảnh và Trực giao (3), Góc nhìn và Thu phóng (4)."
+   }
+  },
+  {
+   "id": "cam-moves",
+   "page": "camera-3d",
+   "section": "Camera Moves",
+   "block": 1,
+   "start": {"scene": "demo", "frame": 45},
+   "steps": [
+    {"tap": "Add layer"},
+    {"tap": "Object / Asset"},
+    {"tap": "Camera"},
+    {"tap": "Camera Moves"},
+    {"expect": "Dolly Zoom"}
+   ],
+   "highlight": [
+    {"box": [30, 1349, 1050, 1854], "n": 1, "badge": "tl", "pad": 0},
+    {"box": [30, 2130, 1050, 2222], "n": 2, "badge": "tl", "pad": 0}
+   ],
+   "crop": [0, 1100, 1080, 2337],
+   "alt": {
+    "en": "Camera Moves: the six moves (1) and Duration (2).",
+    "ar": "حركات الكاميرا: الحركات الست (1) والمدة (2).",
+    "bn": "ক্যামেরা মুভস: ছয়টি মুভমেন্ট (1) এবং ডিউরেশন (2)।",
+    "es": "Movimientos de cámara: los seis movimientos (1) y Duración (2).",
+    "fa": "حرکات دوربین: شش حرکت (1) و مدت (2).",
+    "fil": "Mga galaw ng kamera: ang anim na galaw (1) at Tagal (2).",
+    "hi": "कैमरा मूव्स: छह गतियाँ (1) और अवधि (2)।",
+    "id": "Gerakan kamera: enam gerakan (1) dan Durasi (2).",
+    "ms": "Gerakan Kamera: enam pergerakan (1) dan Tempoh (2).",
+    "pt-BR": "Movimentos de câmera: os seis movimentos (1) e Duração (2).",
+    "ru": "Движения камеры: шесть движений (1) и Длительность (2).",
+    "th": "การเคลื่อนกล้อง: การเคลื่อนไหวทั้งหกแบบ (1) และ ระยะเวลา (2)",
+    "tr": "Kamera hareketleri: altı hareket (1) ve Süre (2).",
+    "vi": "Chuyển động máy ảnh: sáu chuyển động (1) và Thời lượng (2)."
+   }
+  },
+  {
+   "id": "anim-transition",
+   "page": "animations",
+   "section": "Transitions between two clips",
+   "block": 2,
+   "start": {"scene": "clips", "frame": 97},
+   "steps": [
+    {"tap": "Transition"},
+    {"expect": "Duration"}
+   ],
+   "highlight": [
+    {"box": [30, 1286, 1050, 1349], "n": 1, "badge": "tl", "pad": 0},
+    {"box": [42, 1349, 1038, 2112], "n": 2, "badge": "tl", "pad": 0},
+    {"box": [30, 2130, 1050, 2222], "n": 3, "badge": "tl", "pad": 0}
+   ],
+   "crop": [0, 1100, 1080, 2337],
+   "alt": {
+    "en": "The transition sheet: the two clips (1), the transitions (2) and Duration (3).",
+    "ar": "ورقة الانتقال: المقطعان (1)، الانتقالات (2) والمدة (3).",
+    "bn": "ট্রানজিশন শিট: দুটি ক্লিপ (1), ট্রানজিশনগুলো (2) এবং ডিউরেশন (3)।",
+    "es": "La hoja de transición: los dos clips (1), las transiciones (2) y Duración (3).",
+    "fa": "شیت انتقال: دو کلیپ (1)، انتقال‌ها (2) و مدت (3).",
+    "fil": "Ang transition sheet: ang dalawang clip (1), ang mga transition (2) at Tagal (3).",
+    "hi": "ट्रांज़िशन शीट: दो क्लिप (1), ट्रांज़िशन (2) और अवधि (3)।",
+    "id": "Lembar transisi: kedua klip (1), transisi (2), dan Durasi (3).",
+    "ms": "Helaian peralihan: kedua-dua klip (1), peralihan (2) dan Tempoh (3).",
+    "pt-BR": "A folha de transição: os dois clipes (1), as transições (2) e Duração (3).",
+    "ru": "Панель переходов: два клипа (1), переходы (2) и Длительность (3).",
+    "th": "แผ่นทรานซิชัน: คลิปทั้งสอง (1), ทรานซิชัน (2) และ ระยะเวลา (3)",
+    "tr": "Geçiş sayfası: iki klip (1), geçişler (2) ve Süre (3).",
+    "vi": "Bảng chuyển cảnh: hai clip (1), các chuyển cảnh (2) và Thời lượng (3)."
+   }
+  },
+  {
+   "id": "track-panel",
+   "page": "tracking",
+   "section": "How to track",
+   "block": 1,
+   "start": {"scene": "video", "frame": 30},
+   "steps": [
+    {"tap": "Beach"},
+    {"tap": "Layer menu"},
+    {"tap": "Track Motion"},
+    {"expect": "Direction"},
+    {"swipe": [540, 972, 398, 1087, 500]}
+   ],
+   "highlight": [
+    {"box": [0, 722, 1080, 1328], "clear": true, "ring": false, "pad": 0},
+    {"box": [338, 1027, 458, 1147], "radius": 60, "n": 1, "badge": "tl", "pad": 0},
+    {"box": [14, 1815, 1066, 1915], "n": 2, "badge": "tl", "pad": 0},
+    {"box": [14, 1925, 1066, 2020], "n": 3, "badge": "tl", "pad": 0},
+    {"box": [14, 2030, 1066, 2146], "n": 4, "badge": "tl", "pad": 0},
+    {"box": [585, 2170, 806, 2296], "n": 5, "badge": "tl", "pad": 0}
+   ],
+   "crop": [0, 640, 1080, 2337],
+   "alt": {
+    "en": "Track Motion: the box on the detail (1), Track (2), Direction (3), Apply to (4) and the track button (5).",
+    "ar": "تتبع الحركة: المربع على التفصيل (1)، تتبع (2)، الاتجاه (3)، تطبيق على (4) وزر التتبع (5).",
+    "bn": "মোশন ট্র্যাক করুন: বিবরণের উপর বক্স (1), ট্র্যাক (2), দিক (3), প্রয়োগের লক্ষ্য (4) এবং ট্র্যাক বাটন (5)।",
+    "es": "Seguir movimiento: el recuadro sobre el detalle (1), Seguimiento (2), Dirección (3), Aplicar a (4) y el botón de seguimiento (5).",
+    "fa": "ردیابی حرکت: کادر روی جزئیات (1)، ردیابی (2)، جهت (3)، اعمال به (4) و دکمه ردیابی (5).",
+    "fil": "I-track ang motion: ang kahon sa detalye (1), Track (2), Direksyon (3), Ilapat sa (4) at ang track button (5).",
+    "hi": "मोशन ट्रैक करें: विवरण पर बॉक्स (1), ट्रैक (2), दिशा (3), इस पर लागू करें (4) और ट्रैक बटन (5)।",
+    "id": "Lacak gerak: kotak pada detail (1), Lacak (2), Arah (3), Terapkan ke (4), dan tombol lacak (5).",
+    "ms": "Jejak Gerakan: kotak pada butiran (1), Jejak (2), Arah (3), Guna pada (4) dan butang jejak (5).",
+    "pt-BR": "Rastrear movimento: a caixa sobre o detalhe (1), Rastrear (2), Direção (3), Aplicar a (4) e o botão de rastreamento (5).",
+    "ru": "Отслеживание движения: рамка на детали (1), Отслеживание (2), Направление (3), Применить к (4) и кнопка отслеживания (5).",
+    "th": "ติดตามการเคลื่อนไหว: กล่องบนรายละเอียด (1), แทร็ก (2), ทิศทาง (3), ใช้กับ (4) และปุ่มติดตาม (5)",
+    "tr": "Hareketi takip et: ayrıntının üzerindeki kutu (1), Takip (2), Yön (3), Şuna uygula (4) ve takip düğmesi (5).",
+    "vi": "Theo dõi chuyển động: ô vuông trên chi tiết (1), Theo dõi (2), Hướng (3), Áp dụng cho (4) và nút theo dõi (5)."
+   }
+  },
+  {
+   "id": "projects-backup",
+   "page": "projects",
+   "section": "Backup and restore",
+   "block": 2,
+   "start": "home",
+   "steps": [
+    {"tap": "Settings"},
+    {"tap": "Backup"},
+    {"expect": "Restore from backup"}
+   ],
+   "highlight": [
+    {"box": [16, 799, 719, 915], "n": 1, "badge": "tl", "pad": 0},
+    {"box": [16, 915, 719, 1031], "n": 2, "badge": "tl", "pad": 0},
+    {"box": [16, 1031, 719, 1157], "n": 3, "badge": "tl", "pad": 0}
+   ],
+   "crop": [0, 106, 735, 1250],
+   "alt": {
+    "en": "The Backup group: Back up all projects (1), Restore from backup (2) and Weekly automatic backup (projects only) (3).",
+    "ar": "مجموعة النسخ الاحتياطي: نسخ احتياطي لكل المشاريع (1)، استعادة من نسخة احتياطية (2) ونسخ احتياطي أسبوعي تلقائي (المشاريع فقط) (3).",
+    "bn": "ব্যাকআপ গ্রুপ: সব প্রজেক্ট ব্যাকআপ করুন (1), ব্যাকআপ থেকে পুনরুদ্ধার করুন (2) এবং সাপ্তাহিক স্বয়ংক্রিয় ব্যাকআপ (শুধু প্রজেক্ট) (3)।",
+    "es": "El grupo Copia de seguridad: Respaldar todos los proyectos (1), Restaurar desde copia de seguridad (2) y Copia de seguridad automática semanal (solo proyectos) (3).",
+    "fa": "گروه پشتیبان‌گیری: پشتیبان‌گیری از همه پروژه‌ها (1)، بازیابی از پشتیبان (2) و پشتیبان‌گیری خودکار هفتگی (فقط پروژه‌ها) (3).",
+    "fil": "Ang grupong Backup: I-backup ang lahat ng proyekto (1), I-restore mula sa backup (2) at Lingguhang awtomatikong backup (mga proyekto lang) (3).",
+    "hi": "बैकअप ग्रुप: सभी प्रोजेक्ट का बैकअप लें (1), बैकअप से बहाल करें (2) और साप्ताहिक स्वचालित बैकअप (केवल प्रोजेक्ट) (3)।",
+    "id": "Grup Cadangan: Cadangkan semua proyek (1), Pulihkan dari cadangan (2), dan Pencadangan otomatis mingguan (hanya proyek) (3).",
+    "ms": "Kumpulan Sandaran: Sandarkan semua projek (1), Pulihkan daripada sandaran (2) dan Sandaran automatik mingguan (projek sahaja) (3).",
+    "pt-BR": "O grupo Backup: Fazer backup de todos os projetos (1), Restaurar de backup (2) e Backup automático semanal (apenas projetos) (3).",
+    "ru": "Группа «Резервные копии»: Резервная копия всех проектов (1), Восстановить из копии (2) и Еженедельная автоматическая копия (только проекты) (3).",
+    "th": "กลุ่ม สำรองข้อมูล: สำรองข้อมูลโปรเจกต์ทั้งหมด (1), กู้คืนจากข้อมูลสำรอง (2) และ สำรองข้อมูลอัตโนมัติทุกสัปดาห์ (เฉพาะโปรเจกต์) (3)",
+    "tr": "Yedekleme grubu: Tüm projeleri yedekle (1), Yedekten geri yükle (2) ve Haftalık otomatik yedekleme (yalnızca projeler) (3).",
+    "vi": "Nhóm Sao lưu: Sao lưu tất cả dự án (1), Khôi phục từ bản sao lưu (2) và Tự động sao lưu hàng tuần (chỉ dự án) (3)."
+   }
+  },
+  {
+   "id": "export-video",
+   "page": "export",
+   "section": "Video",
+   "block": 4,
+   "start": {"scene": "demo", "frame": 45},
+   "steps": [
+    {"tap": "Export & Share"},
+    {"expect": "Export Project"},
+    {"tap_xy": [990, 886]},
+    {"expect": "Export Resolution"}
+   ],
+   "highlight": [
+    {"box": [14, 960, 1066, 1180], "n": 1, "badge": "tl", "pad": 0},
+    {"box": [14, 1210, 1066, 1425], "n": 2, "badge": "tl", "pad": 0},
+    {"box": [14, 1458, 1066, 1672], "n": 3, "badge": "tl", "pad": 0}
+   ],
+   "crop": [0, 106, 1080, 1700],
+   "alt": {
+    "en": "Video options: Export Resolution (1), Format (2) and Codec (3).",
+    "ar": "خيارات الفيديو: دقة التصدير (1)، الصيغة (2) والترميز (3).",
+    "bn": "ভিডিও অপশন: এক্সপোর্ট রেজোলিউশন (1), ফরম্যাট (2) এবং কোডেক (3)।",
+    "es": "Opciones de video: Resolución de exportación (1), Formato (2) y Códec (3).",
+    "fa": "گزینه‌های ویدیو: رزولوشن خروجی (1)، فرمت (2) و کدک (3).",
+    "fil": "Mga opsyon sa bidyo: Resolusyon ng export (1), Format (2) at Codec (3).",
+    "hi": "वीडियो विकल्प: एक्सपोर्ट रेज़ोल्यूशन (1), फ़ॉर्मेट (2) और कोडेक (3)।",
+    "id": "Opsi video: Resolusi ekspor (1), Format (2), dan Codec (3).",
+    "ms": "Pilihan video: Resolusi eksport (1), Format (2) dan Kodek (3).",
+    "pt-BR": "Opções de vídeo: Resolução de exportação (1), Formato (2) e Codec (3).",
+    "ru": "Параметры видео: Разрешение экспорта (1), Формат (2) и Кодек (3).",
+    "th": "ตัวเลือกวิดีโอ: ความละเอียดการส่งออก (1), รูปแบบ (2) และ ตัวเข้ารหัส (3)",
+    "tr": "Video seçenekleri: Dışa aktarma çözünürlüğü (1), Biçim (2) ve Kodek (3).",
+    "vi": "Tùy chọn video: Độ phân giải xuất (1), Định dạng (2) và Codec (3)."
+   }
+  },
+  {
+   "id": "export-video-more",
+   "page": "export",
+   "section": "Video",
+   "block": 11,
+   "start": {"scene": "demo", "frame": 45},
+   "steps": [
+    {"tap": "Export & Share"},
+    {"expect": "Export Project"},
+    {"tap_xy": [990, 886]},
+    {"expect": "Export Resolution"},
+    {"swipe": [540, 1700, 540, 500, 500]},
+    {"wait": 1},
+    {"expect": "Quality"}
+   ],
+   "highlight": [
+    {"box": [14, 860, 1066, 1190], "n": 1, "badge": "tl", "pad": 0},
+    {"box": [14, 1220, 1066, 1480], "n": 2, "badge": "tl", "pad": 0},
+    {"box": [14, 1510, 1066, 1740], "n": 3, "badge": "tl", "pad": 0}
+   ],
+   "crop": [0, 106, 1080, 1760],
+   "alt": {
+    "en": "More video options: Motion Blur (1), Quality (2) and Audio (3).",
+    "ar": "المزيد من خيارات الفيديو: ضبابية الحركة (1)، الجودة (2) وصوت (3).",
+    "bn": "আরও ভিডিও অপশন: মোশন ব্লার (1), কোয়ালিটি (2) এবং অডিও (3)।",
+    "es": "Más opciones de video: Desenfoque de movimiento (1), Calidad (2) y Audio (3).",
+    "fa": "گزینه‌های بیشتر ویدیو: موشن بلور (1)، کیفیت (2) و صدا (3).",
+    "fil": "Higit pang mga opsyon sa bidyo: Motion blur (1), Kalidad (2) at Audio (3).",
+    "hi": "अधिक वीडियो विकल्प: मोशन ब्लर (1), क्वालिटी (2) और ऑडियो (3)।",
+    "id": "Opsi video lainnya: Blur gerak (1), Kualitas (2), dan Audio (3).",
+    "ms": "Lebih banyak pilihan video: Kabur gerakan (1), Kualiti (2) dan Audio (3).",
+    "pt-BR": "Mais opções de vídeo: Desfoque de movimento (1), Qualidade (2) e Áudio (3).",
+    "ru": "Дополнительные параметры видео: Размытие в движении (1), Качество (2) и Аудио (3).",
+    "th": "ตัวเลือกวิดีโอเพิ่มเติม: โมชันเบลอ (1), คุณภาพ (2) และ เสียง (3)",
+    "tr": "Daha fazla video seçeneği: Hareket bulanıklığı (1), Kalite (2) ve Ses (3).",
+    "vi": "Các tùy chọn video khác: Nhòe chuyển động (1), Chất lượng (2) và Âm thanh (3)."
+   }
+  },
+  {
+   "id": "export-warning",
+   "page": "export",
+   "section": "Warnings",
+   "block": 1,
+   "start": {"scene": "demo", "frame": 45},
+   "steps": [
+    {"tap": "Export & Share"},
+    {"expect": "Export Project"},
+    {"tap_xy": [990, 886]},
+    {"expect": "Slow export"}
+   ],
+   "highlight": [
+    {"box": [20, 1800, 1060, 2150], "n": 1, "badge": "tl", "pad": 0},
+    {"select": "Continue anyway", "n": 2, "badge": "tl", "pad": 6}
+   ],
+   "crop": [0, 1740, 1080, 2337],
+   "alt": {
+    "en": "The Slow export card (1) with its Continue anyway button (2).",
+    "ar": "بطاقة تصدير بطيء (1) مع زر المتابعة على أي حال (2).",
+    "bn": "ধীর এক্সপোর্ট কার্ড (1) এবং তার তবুও চালিয়ে যান বাটন (2)।",
+    "es": "La tarjeta Exportación lenta (1) con su botón Continuar de todos modos (2).",
+    "fa": "کارت خروجی کند (1) و دکمه به هر حال ادامه بده (2) روی آن.",
+    "fil": "Ang Mabagal ang pag-export na card (1) kasama ang Magpatuloy pa rin na button nito (2).",
+    "hi": "धीमा एक्सपोर्ट कार्ड (1) और उसका फिर भी जारी रखें बटन (2)।",
+    "id": "Kartu Ekspor lambat (1) dengan tombol Lanjutkan saja (2).",
+    "ms": "Kad Eksport perlahan (1) dengan butang Teruskan juga (2).",
+    "pt-BR": "O cartão Exportação lenta (1) com seu botão Continuar mesmo assim (2).",
+    "ru": "Карточка «Медленный экспорт» (1) с кнопкой «Всё равно продолжить» (2).",
+    "th": "การ์ด การส่งออกช้า (1) พร้อมปุ่ม ดำเนินการต่อ (2)",
+    "tr": "Yavaş dışa aktarma kartı (1) ve üzerindeki Yine de devam et düğmesi (2).",
+    "vi": "Thẻ Xuất chậm (1) với nút Vẫn tiếp tục (2)."
+   }
+  },
+  {
+   "id": "lt-grid",
+   "page": "layer-tools",
+   "section": "",
+   "block": 1,
+   "alt": {
+    "en": "The tool grid of a selected layer: the small buttons (1), the large tool buttons (2) and the page dots (3)."
+   },
+   "start": {"scene": "demo", "frame": 45},
+   "steps": [
+    {"tap": "Lake"},
+    {"expect": "Fill & Color"}
+   ],
+   "highlight": [
+    {"box": [30, 1830, 1050, 1972], "n": 1, "badge": "tl", "pad": 0},
+    {"box": [40, 1975, 1040, 2300], "n": 2, "badge": "tl", "pad": 0},
+    {"box": [490, 2296, 600, 2337], "n": 3, "badge": "tr", "pad": 0}
+   ],
+   "crop": [0, 1479, 1080, 2337],
+   "phase": 2
+  },
+  {
+   "id": "lt-grid-2",
+   "page": "layer-tools",
+   "section": "",
+   "block": 1,
+   "alt": {
+    "en": "The second page of the tool grid for a video: the extra tools (1)."
+   },
+   "start": {"scene": "video", "frame": 30},
+   "steps": [
+    {"tap": "Beach"},
+    {"swipe": [900, 2100, 150, 2100, 300]},
+    {"wait": 1}
+   ],
+   "highlight": [{"box": [40, 1975, 1040, 2300], "n": 1, "badge": "tl", "pad": 0}],
+   "crop": [0, 1479, 1080, 2337],
+   "phase": 2
+  },
+  {
+   "id": "lt-crop",
+   "page": "layer-tools",
+   "section": "Crop",
+   "block": 1,
+   "alt": {
+    "en": "The Crop panel: the crop frame on the picture (1) and the buttons below (2)."
+   },
+   "start": {"scene": "demo", "frame": 45},
+   "steps": [
+    {"tap": "Lake"},
+    {"swipe": [900, 2100, 150, 2100, 300]},
+    {"tap": "Crop"},
+    {"wait": 1.5}
+   ],
+   "highlight": [
+    {"box": [0, 720, 1080, 1330], "n": 1, "badge": "tl", "pad": 0},
+    {"box": [0, 1812, 1080, 2337], "n": 2, "badge": "tl", "pad": 0}
+   ],
+   "crop": [0, 106, 1080, 2337],
+   "phase": 2
+  },
+  {
+   "id": "media-speed",
+   "page": "media",
+   "section": "Speed",
+   "block": 2,
+   "alt": {
+    "en": "The Speed panel of a video clip."
+   },
+   "start": {"scene": "video", "frame": 30},
+   "steps": [
+    {"tap": "Beach"},
+    {"tap": "Speed"},
+    {"wait": 1.5}
+   ],
+   "highlight": [{"box": [0, 1812, 1080, 2337], "n": 1, "badge": "tl", "pad": 0}],
+   "crop": [0, 1479, 1080, 2337],
+   "phase": 2
+  },
+  {
+   "id": "media-smooth",
+   "page": "media",
+   "section": "Smooth a clip",
+   "block": 2,
+   "alt": {
+    "en": "The Smooth sheet of a video clip."
+   },
+   "start": {"scene": "video", "frame": 30},
+   "steps": [
+    {"tap": "Beach"},
+    {"tap": "Speed"},
+    {"tap": "Smooth"},
+    {"wait": 1.5}
+   ],
+   "highlight": [{"box": [0, 1160, 1080, 2337], "n": 1, "badge": "tl", "pad": 0}],
+   "crop": [0, 1100, 1080, 2337],
+   "phase": 2
+  },
+  {
+   "id": "tools-downloader",
+   "page": "home",
+   "section": "The bottom bar",
+   "block": 1,
+   "alt": {
+    "en": "The Tools page with the Video Downloader."
+   },
+   "start": "home",
+   "steps": [
+    {"tap": {"text": "Tools", "region": [0, 2100, 1080, 2400]}},
+    {"wait": 1.5}
+   ],
+   "highlight": [{"box": [20, 300, 1060, 900], "n": 1, "badge": "tl", "pad": 0}],
+   "crop": [0, 106, 1080, 2337],
+   "phase": 2
+  },
+  {
+   "id": "reverse-progress",
+   "page": "media",
+   "section": "Speed",
+   "block": 2,
+   "alt": {
+    "en": "The progress of Reverse."
+   },
+   "start": {"scene": "video", "frame": 30},
+   "steps": [
+    {"tap": "Beach"},
+    {"swipe": [900, 2100, 150, 2100, 300]},
+    {"tap": "Reverse"},
+    {"wait": 2}
+   ],
+   "highlight": [{"box": [20, 1000, 1060, 1500], "n": 1, "badge": "tl", "pad": 0}],
+   "crop": [0, 106, 1080, 2337],
+   "phase": 2
+  },
+  {
+   "id": "fx-library",
+   "page": "effects-guide",
+   "section": "The Effects Library",
+   "block": 1,
+   "alt": {
+    "en": "The Effects Library: search (1), the recommended effects (2), recent and favorite effects (3) and the categories (4)."
+   },
+   "start": {"scene": "demo", "frame": 45},
+   "steps": [
+    {"tap": "Sun"},
+    {"tap": "Effects"},
+    {"tap": "Add Effect"},
+    {"expect": "Effects Library"}
+   ],
+   "highlight": [
+    {"select": "Search", "exact": true, "pad": 14, "n": 1, "badge": "bl"},
+    {"box": [10, 270, 1070, 680], "n": 2, "badge": "tl", "pad": 0},
+    {"box": [400, 1180, 680, 1325], "n": 3, "badge": "tl", "pad": 0},
+    {"box": [0, 1283, 1080, 2329], "n": 4, "badge": "tl", "pad": 0}
+   ],
+   "crop": [0, 106, 1080, 2337],
+   "phase": 2
+  },
+  {
+   "id": "tl-tools",
+   "page": "timeline",
+   "section": "The tools under a selected layer",
+   "block": 2,
+   "alt": {
+    "en": "The first row of the tool grid: the five small buttons (1)."
+   },
+   "start": {"scene": "video", "frame": 30},
+   "steps": [
+    {"tap": "Beach"},
+    {"expect": "Trim start"}
+   ],
+   "highlight": [{"box": [30, 1830, 1050, 1972], "n": 1, "badge": "tl", "pad": 0}],
+   "crop": [0, 1479, 1080, 2337],
+   "phase": 2
+  },
+  {
+   "id": "audio-tools",
+   "page": "audio",
+   "section": "Getting sound into a project",
+   "block": 4,
+   "alt": {
+    "en": "An audio layer on the timeline and its tools."
+   },
+   "start": {"scene": "demo", "frame": 45},
+   "steps": [
+    {"tap": "Music"},
+    {"expect": "Presets"}
+   ],
+   "highlight": [{"box": [4, 1700, 1076, 1800], "n": 1, "badge": "tl", "pad": 0}],
+   "crop": [0, 1590, 1080, 2337],
+   "phase": 2
+  }
+ ]
+}

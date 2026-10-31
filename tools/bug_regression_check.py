@@ -346,5 +346,29 @@ class ToolRegressions(unittest.TestCase):
             source.write_text('package x\n' + line % ('c' * 64))
             self.assertEqual('c' * 64, module.release_signer(source))
 
+    def test_help_pictures_land_at_the_same_block_in_every_language_and_can_be_replaced(self):
+        spec = importlib.util.spec_from_file_location('help_shots', ROOT / 'tools/help_shots.py')
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        english = '\n\n'.join(['Intro.', '## One', 'First.', '- a\n- b', '## Two', 'Last.']) + '\n'
+        translated = english.replace('Intro.', 'Texto.').replace('First.', 'Primero.')
+        shot = {'id': 'demo', 'alt': {'en': 'English (1).', 'es': 'Espanol (1).'}}
+        place = {'section': 'One', 'block': 2}
+        for text, tag in ((english, 'en'), (translated, 'es')):
+            body = module.place_in(english, text, 'page', tag, [(shot, place)], ['demo'])
+            self.assertIn('- a\n- b\n\n![%s](img/demo.webp)\n\n## Two' % shot['alt'][tag], body)
+            self.assertEqual(body, module.place_in(english, body, 'page', tag, [(shot, place)], ['demo']))
+            self.assertEqual(text, module.strip_pictures(body, ['demo']))
+        with self.assertRaises(module.Failure):
+            module.place_in(english, translated.replace('- a\n- b', 'x'), 'page', 'es', [(shot, place)], ['demo'])
+        from PIL import Image
+        plain = Image.new('RGB', (200, 200), (200, 200, 200))
+        marked = module.annotate(plain.copy(), [((20, 20, 100, 100), 12, True)], [((40, 40), 1)], module.STYLE)
+        self.assertEqual(plain.size, marked.size)
+        self.assertNotEqual(plain.tobytes(), marked.tobytes())
+        tile = {'box': (20, 20, 100, 100), 'parent': -1, 'clickable': True}
+        self.assertEqual(tile['box'], module.hit_box([tile], {'box': (30, 30, 50, 50), 'parent': 0}, False))
+        self.assertEqual((30, 30, 50, 50), module.hit_box([tile], {'box': (30, 30, 50, 50), 'parent': 0}, True))
+
 if __name__ == '__main__':
     unittest.main()

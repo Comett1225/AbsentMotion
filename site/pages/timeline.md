@@ -15,6 +15,8 @@ The timeline is the area under the play bar. Each layer is a row with a bar show
 - **Label colors.** The layer menu can mark a layer with one of eleven label colors, shown as a small colored corner on the bar.
 - **Keyframe diamonds.** Small diamonds on a bar are keyframes. They are bigger on the selected layer. While a property or effect is open, only its keyframes show. See [Keyframes and easing](@keyframes).
 
+![The timeline: the playhead and the time (1), the ruler (2), the eye of a layer (3), the layer bars (4) and a keyframe diamond (5).](img/timeline-rows.webp)
+
 ## Gestures
 
 | To | Do this |

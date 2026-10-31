@@ -14,6 +14,8 @@ By default the app keeps a copy of added media inside the project (the setting *
 
 To fit a picture to the canvas, use the layer menu: **Fit to Canvas** shows the whole picture, **Fill the Canvas** covers the canvas and crops the edges, **Stretch to Canvas** distorts it to fit exactly. See [Layer menus and multi-select](@layer-menus).
 
+![The layer menu of a video: Fit to Canvas, Fill the Canvas and Stretch to Canvas (1), and Media Info (2).](img/media-layer-menu.webp)
+
 ### Media Info and swapping a file
 
 **Media Info** in the layer menu shows the file's name, dimensions, frame rate, duration, format and size. **Swap media file** opens the photo picker and replaces that file in every layer of the project that uses it. This is how to fix a layer whose file went missing.

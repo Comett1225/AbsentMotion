@@ -6,6 +6,8 @@ summary: Every setting of the new project sheet.
 ---
 Tap the round **+** at the bottom of the home screen. A sheet slides up from the bottom. It opens with the values you used last time (shape, resolution, frame rate and background; the name is always new). Tap Back to close it without making anything.
 
+![The new project sheet: PROJECT or ASSET (1), the name (2), the shape (3), Resolution (4), Frame Rate (5), Background (6) and CREATE PROJECT (7).](img/new-sheet.webp)
+
 ## Project or asset
 
 The switch at the top has two choices, **PROJECT** (the default) and **ASSET**. An asset is a reusable piece with a transparent background: its background setting is locked to Transparent. See [Assets, templates and presets](@assets-templates).

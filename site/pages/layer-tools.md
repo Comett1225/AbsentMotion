@@ -38,6 +38,8 @@ Tabs on the right: **Move**, **Rotate**, **Size**, **Tilt**, **Skew**, **Pivot**
 - **Pivot.** The point the layer turns and scales around, in pixels from the middle of the layer. Type **X** and **Y**, drag the trackpad, tap one of the nine squares for a corner, an edge or the center, or drag the marker on the canvas. The layer and its child layers stay where they are.
 - **More** has **Reset Location**, **Reset Rotation**, **Reset Scale**, **Reset 3D Rotation**, **Reset Skew**, **Reset Pivot** and **Reset Transform** (all six).
 
+![The Transform panel: the tabs (1), the trackpad (2) and the X, Y and Z boxes (3).](img/lt-transform.webp)
+
 Move is the position, with X, Y and Z animated together. Rotate, Size, Tilt, Skew and Pivot each have their own keyframes; width and height share the Size keyframes.
 
 ### Crop
@@ -51,6 +53,8 @@ Tabs at the top: **None**, **Color**, **Gradient**, **Media**.
 - **Color.** Fourteen swatches, then your saved colors. The bar at the top shows the color as #RRGGBB and its opacity; the **+** on it saves the current color. Three buttons: **Eyedropper** (touch the preview to sample a color), **Color sliders** and **Full color picker** (a color wheel or HSV and RGB sliders with a hex field).
 - **Gradient.** Pick linear, radial or sweep, then a start and an end color. Two handles on the preview move the gradient. A gradient has exactly two colors.
 - **Media.** Fills the shape with a photo or video. It is active when the layer already has a media fill or is a text layer; for text, tapping it opens the picker to fill the letters with a picture or video.
+
+![Fill & Color: the tabs (1), the color bar (2), the swatches (3) and Eyedropper, Color sliders and Full color picker (4).](img/lt-fill.webp)
 
 Only the color in the Color tab can be keyframed.
 

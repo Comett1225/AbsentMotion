@@ -24,11 +24,15 @@ Three tabs:
 - **Focus Blur.** A switch, then **Focus Distance** (with the focus plane shown as "at Z ..."), **Depth of Field** and **Blur Strength**.
 - **Fog.** A switch, a **Color** and the **Near** and **Far** distances.
 
+![Camera Options: the tabs (1), the view cone (2), Perspective and Orthographic (3), View Angle and Zoom (4).](img/cam-options.webp)
+
 Each row can be animated with the keyframe button.
 
 ### Camera Moves
 
 **Camera Moves** in the tool grid adds a ready-made movement: **Push In**, **Pull Out**, **Orbit**, **Pan**, **Dolly Zoom** or **Handheld**. Each tile has an animated preview. Set the **Duration** from 0.5 to 10 seconds. The move starts at the playhead and is shortened if the camera layer ends first. Picking another tile or changing the duration updates it, and the result is ordinary keyframes you can edit.
+
+![Camera Moves: the six moves (1) and Duration (2).](img/cam-moves.webp)
 
 ## Tilt a layer in 3D
 
