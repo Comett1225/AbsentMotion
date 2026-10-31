@@ -51,14 +51,15 @@ internal fun WideHeader(page: Int, tab: Int, onTab: (page: Int, tab: Int) -> Uni
         Chip(stringResource(R.string.home_tab_projects), page == 0 && tab == 0) { onTab(0, 0) }
         Chip(stringResource(R.string.home_tab_assets), page == 0 && tab == 1) { onTab(0, 1) }
         Chip(stringResource(R.string.home_tab_templates), page == 1) { onTab(1, tab) }
+        Chip(stringResource(R.string.home_tab_tools), page == 2) { onTab(2, tab) }
         if (search == null) Spacer(Modifier.weight(1f)) else HomeSearchField(search, page == 1, onSearch, Modifier.weight(1f))
-        SearchButton(search, onSearch)
+        if (page == 2) Spacer(Modifier.size(50.dp)) else SearchButton(search, onSearch)
         HeaderButton(stringResource(R.string.home_new_project), HomeIcons.Plus, Am.Accent, Am.OnAccent, compact, onNew)
         HeaderButton(stringResource(R.string.settings), ChromeIcons.Gear, Am.Card, Am.Navy, compact, onSettings)
     }
 }
 
-private val FullHeaderWidth = 1080.dp
+private val FullHeaderWidth = 1180.dp
 
 @Composable
 private fun HeaderButton(label: String, icon: ImageVector, background: Color, content: Color, compact: Boolean, onClick: () -> Unit) {

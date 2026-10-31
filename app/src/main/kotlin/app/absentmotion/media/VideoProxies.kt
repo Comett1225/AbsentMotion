@@ -41,6 +41,7 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
 import app.absentmotion.library.openableUri
+import app.absentmotion.ai.AudioCopy
 
 internal object ProxyRules {
     const val MAX_LONG_SIDE = 1920
@@ -237,7 +238,32 @@ internal fun visibleSize(format: MediaFormat): Pair<Int, Int> {
     return (format.getInteger("crop-right") - format.intOr("crop-left", 0) + 1) to (format.getInteger("crop-bottom") - format.intOr("crop-top", 0) + 1)
 }
 
-private fun transcode(context: Context, uri: String, out: File, cancelled: () -> Boolean, progress: (Float) -> Unit): Boolean {
+internal class VideoPlan(val width: Int, val height: Int, val fps: Int, val open: () -> MediaCodec)
+
+private fun proxyPlan(visibleWidth: Int, visibleHeight: Int, fps: Int): VideoPlan {
+    val (width, height) = ProxyRules.size(visibleWidth, visibleHeight)
+    return VideoPlan(width, height, fps) {
+        val format = MediaFormat.createVideoFormat(MediaFormat.MIMETYPE_VIDEO_AVC, width, height).apply {
+            setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface)
+            setInteger(MediaFormat.KEY_BIT_RATE, ProxyRules.bitrate(width, height, fps))
+            setInteger(MediaFormat.KEY_FRAME_RATE, fps)
+            setFloat(MediaFormat.KEY_I_FRAME_INTERVAL, 0.25f)
+            setInteger(MediaFormat.KEY_COLOR_STANDARD, MediaFormat.COLOR_STANDARD_BT709)
+            setInteger(MediaFormat.KEY_COLOR_RANGE, MediaFormat.COLOR_RANGE_LIMITED)
+            setInteger(MediaFormat.KEY_COLOR_TRANSFER, MediaFormat.COLOR_TRANSFER_SDR_VIDEO)
+        }
+        val codec = MediaCodec.createByCodecName(MediaCodecList(MediaCodecList.REGULAR_CODECS).findEncoderForFormat(format)
+            ?: error("no encoder for a ${width}x$height preview copy"))
+        try { codec.configureFitting(format, null, MediaCodec.CONFIGURE_FLAG_ENCODE) } catch (t: Throwable) { codec.release(); throw t }
+        codec
+    }
+}
+
+internal fun transcode(
+    context: Context, uri: String, out: File, cancelled: () -> Boolean,
+    plan: (visibleWidth: Int, visibleHeight: Int, fps: Int) -> VideoPlan = ::proxyPlan, rotation: Int = 0, sound: AudioCopy? = null,
+    progress: (Float) -> Unit,
+): Boolean {
     val extractor = MediaExtractor()
     var decoder: MediaCodec? = null
     var encoder: MediaCodec? = null
@@ -251,30 +277,22 @@ private fun transcode(context: Context, uri: String, out: File, cancelled: () ->
         val (track, format) = videoTrack(extractor)
         extractor.selectTrack(track)
         val (visibleWidth, visibleHeight) = visibleSize(format)
-        val (width, height) = ProxyRules.size(visibleWidth, visibleHeight)
         val fps = (if (format.containsKey(MediaFormat.KEY_FRAME_RATE)) format.numberOf(MediaFormat.KEY_FRAME_RATE)?.toFloat() ?: 30f else 30f).roundToInt().coerceIn(1, 120)
         val durationUs = if (format.containsKey(MediaFormat.KEY_DURATION)) format.getLong(MediaFormat.KEY_DURATION) else 0L
-        val mime = MediaFormat.MIMETYPE_VIDEO_AVC
-        val encoderFormat = MediaFormat.createVideoFormat(mime, width, height).apply {
-            setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface)
-            setInteger(MediaFormat.KEY_BIT_RATE, ProxyRules.bitrate(width, height, fps))
-            setInteger(MediaFormat.KEY_FRAME_RATE, fps)
-            setFloat(MediaFormat.KEY_I_FRAME_INTERVAL, 0.25f)
-            setInteger(MediaFormat.KEY_COLOR_STANDARD, MediaFormat.COLOR_STANDARD_BT709)
-            setInteger(MediaFormat.KEY_COLOR_RANGE, MediaFormat.COLOR_RANGE_LIMITED)
-            setInteger(MediaFormat.KEY_COLOR_TRANSFER, MediaFormat.COLOR_TRANSFER_SDR_VIDEO)
-        }
-        encoder = MediaCodec.createByCodecName(MediaCodecList(MediaCodecList.REGULAR_CODECS).findEncoderForFormat(encoderFormat)
-            ?: error("no encoder for a ${width}x$height preview copy"))
-        encoder.configureFitting(encoderFormat, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
-        gl = ProxyGl(encoder.createInputSurface(), width, height)
+        val target = plan(visibleWidth, visibleHeight, fps)
+        val gapUs = if (target.fps < fps) 1_000_000L / target.fps else 0L
+        encoder = target.open()
+        gl = ProxyGl(encoder.createInputSurface(), target.width, target.height)
         val available = Semaphore(0)
         frames = SurfaceTexture(gl.texture).apply { setOnFrameAvailableListener({ available.release() }, Handler(thread.looper)) }
         decoderSurface = Surface(frames)
         format.setInteger(MediaFormat.KEY_ROTATION, 0)
+        format.requestSdr()
         decoder = openDecoder(format, decoderSurface)
         encoder.start()
         muxer = MediaMuxer(out.path, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
+        if (rotation != 0) muxer.setOrientationHint(rotation)
+        var nextUs = Long.MIN_VALUE / 2
         val info = MediaCodec.BufferInfo()
         val matrix = FloatArray(16)
         var inputDone = false
@@ -287,11 +305,17 @@ private fun transcode(context: Context, uri: String, out: File, cancelled: () ->
             while (true) {
                 val index = encoder.dequeueOutputBuffer(info, if (wait) 10_000 else 0)
                 when {
-                    index == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED -> { muxTrack = muxer.addTrack(encoder.outputFormat); muxer.start(); quiet = System.nanoTime() }
+                    index == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED -> {
+                        muxTrack = muxer.addTrack(encoder.outputFormat)
+                        sound?.format?.let { sound.track = muxer.addTrack(it) }
+                        muxer.start()
+                        quiet = System.nanoTime()
+                    }
                     index >= 0 -> {
                         quiet = System.nanoTime()
                         if (info.size > 0 && info.flags and MediaCodec.BUFFER_FLAG_CODEC_CONFIG == 0 && muxTrack >= 0) {
                             muxer.writeSampleData(muxTrack, encoder.getOutputBuffer(index)!!, info)
+                            sound?.copyUntil(muxer, info.presentationTimeUs)
                         }
                         encoder.releaseOutputBuffer(index, false)
                         if (info.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) { encoded = true; return true }
@@ -318,7 +342,8 @@ private fun transcode(context: Context, uri: String, out: File, cancelled: () ->
             else {
                 heard = System.nanoTime()
                 val pts = info.presentationTimeUs
-                val shown = info.size > 0
+                val shown = info.size > 0 && (gapUs == 0L || pts + 2_000 >= nextUs)
+                if (shown && gapUs > 0) nextUs = if (pts - nextUs > gapUs) pts + gapUs else nextUs + gapUs
                 decodeDone = info.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0
                 decoder.releaseOutputBuffer(index, shown)
                 if (shown) {
@@ -333,6 +358,7 @@ private fun transcode(context: Context, uri: String, out: File, cancelled: () ->
             drain(false)
         }
         if (!encoded && !drain(true)) return false
+        if (muxTrack >= 0) sound?.copyUntil(muxer, Long.MAX_VALUE)
         muxer.stop()
         return true
     } finally {

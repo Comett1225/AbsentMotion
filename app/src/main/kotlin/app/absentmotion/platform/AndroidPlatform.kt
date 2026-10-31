@@ -305,7 +305,7 @@ fun DialogStatusBarIcons(darkIcons: Boolean) {
 fun sheetDialogProperties() = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)
 
 @Suppress("DEPRECATION")
-private fun webpFormat(lossless: Boolean) = when {
+internal fun webpFormat(lossless: Boolean) = when {
     Build.VERSION.SDK_INT < 30 -> android.graphics.Bitmap.CompressFormat.WEBP
     lossless -> android.graphics.Bitmap.CompressFormat.WEBP_LOSSLESS
     else -> android.graphics.Bitmap.CompressFormat.WEBP_LOSSY

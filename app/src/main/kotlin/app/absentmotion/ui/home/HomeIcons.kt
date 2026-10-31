@@ -50,9 +50,17 @@ internal object HomeIcons {
             "A1 1 0 0 1 15.514 12.859L10.517 15.856A1 1 0 0 1 9 14.996Z", width = 1.8f)
     val TemplatesTabOn = icon("TemplatesTabOn", stroke = "M4 3L20 3A1 1 0 0 1 21 4L21 9A1 1 0 0 1 20 10L4 10A1 1 0 0 1 3 9L3 4A1 1 0 0 1 4 3ZM4 14L11 14A1 1 0 0 1 12 15L12 20A1 1 0 0 1 11 21L4 21" +
             "A1 1 0 0 1 3 20L3 15A1 1 0 0 1 4 14ZM17 14L20 14A1 1 0 0 1 21 15L21 20A1 1 0 0 1 20 21L17 21A1 1 0 0 1 16 20L16 15A1 1 0 0 1 17 14Z", fill = "M4 3L20 3A1 1 0 0 1 21 4L21 9A1 1 0 0 1 20 10L4 10A1 1 0 0 1 3 9L3 4A1 1 0 0 1 4 3Z", width = 1.8f)
-    val TemplatesTab = icon("TemplatesTab", stroke = "M4 3L20 3A1 1 0 0 1 21 4L21 9A1 1 0 0 1 20 10L4 10A1 1 0 0 1 3 9L3 4A1 1 0 0 1 4 3ZM4 14L11 14A1 1 0 0 1 12 15L12 20A1 1 0 0 1 11 21L4 21" +
+    val ToolsTab = icon("ToolsTab", stroke = WRENCH, width = 1.8f)
+    val ToolsTabOn = icon("ToolsTabOn", stroke = WRENCH, fill = WRENCH, width = 1.8f)
+    val Compress = icon("Compress", stroke = "M15 15L21 21M15 15L15 19.8M15 15L19.8 15M9 19.8L9 15M9 15L4.2 15M9 15L3 21M15 4.2L15 9M15 9L19.8 9M15 9L21 3M9 4.2L9 9M9 9L4.2 9" +
+            "M9 9L3 3", width = 1.8f)
+    val Download = icon("Download", stroke = "M12 15L12 3M21 15L21 19A2 2 0 0 1 19 21L5 21A2 2 0 0 1 3 19L3 15M7 10L12 15L17 10", width = 1.8f)
+    val TemplatesTab = icon("TemplatesTab", stroke ="M4 3L20 3A1 1 0 0 1 21 4L21 9A1 1 0 0 1 20 10L4 10A1 1 0 0 1 3 9L3 4A1 1 0 0 1 4 3ZM4 14L11 14A1 1 0 0 1 12 15L12 20A1 1 0 0 1 11 21L4 21" +
             "A1 1 0 0 1 3 20L3 15A1 1 0 0 1 4 14ZM17 14L20 14A1 1 0 0 1 21 15L21 20A1 1 0 0 1 20 21L17 21A1 1 0 0 1 16 20L16 15A1 1 0 0 1 17 14Z", width = 1.8f)
 }
+
+private const val WRENCH = "M14.7 6.3A1 1 0 0 0 14.7 7.7L16.3 9.3A1 1 0 0 0 17.7 9.3L20.806 6.195C21.126 5.873 21.669 5.975 21.789 6.413A6 6 0 0 1 13.53 13.47L5.62 21.38" +
+    "A1 1 0 0 1 2.621 18.38L10.531 10.47A6 6 0 0 1 17.588 2.211C18.026 2.331 18.128 2.873 17.807 3.195Z"
 
 private fun icon(name: String, stroke: String? = null, fill: String? = null, width: Float = 1.6f, mirror: Boolean = false): ImageVector =
     ImageVector.Builder(name, 24.dp, 24.dp, 24f, 24f, autoMirror = mirror).apply {
