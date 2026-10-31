@@ -1,0 +1,1352 @@
+[
+ {
+  "name": "blink",
+  "id": "blink",
+  "measured": "same"
+ },
+ {
+  "name": "Blink",
+  "id": "blink2",
+  "measured": "same"
+ },
+ {
+  "name": "Channel Remap (HSV)",
+  "id": "channelmaphsv",
+  "measured": "same"
+ },
+ {
+  "name": "Channel Remap (RGB)",
+  "id": "channelmap",
+  "measured": "same"
+ },
+ {
+  "name": "Clouds",
+  "id": "clouds3",
+  "measured": "same"
+ },
+ {
+  "name": "clouds2",
+  "id": "clouds2",
+  "measured": "same"
+ },
+ {
+  "name": "Color Temperature",
+  "id": "colortemperature",
+  "measured": "same"
+ },
+ {
+  "name": "Color Tune",
+  "id": "colortune2",
+  "measured": "same"
+ },
+ {
+  "name": "Copy Background",
+  "id": "lift",
+  "measured": "same"
+ },
+ {
+  "name": "Count Up/Down",
+  "id": "counter",
+  "measured": "same"
+ },
+ {
+  "name": "displacemap2",
+  "id": "displacemap2",
+  "measured": "same"
+ },
+ {
+  "name": "Displacement Map",
+  "id": "displacemap3",
+  "measured": "same"
+ },
+ {
+  "name": "Exposure / Gamma",
+  "id": "exposure",
+  "measured": "same"
+ },
+ {
+  "name": "Fade In/Out",
+  "id": "fade",
+  "measured": "same"
+ },
+ {
+  "name": "flicker",
+  "id": "flicker",
+  "measured": "same"
+ },
+ {
+  "name": "Fractal Ridges",
+  "id": "ridges2",
+  "measured": "same"
+ },
+ {
+  "name": "Glow",
+  "id": "glow",
+  "measured": "same"
+ },
+ {
+  "name": "Gradient Overlay",
+  "id": "gradientoverlay2",
+  "measured": "same"
+ },
+ {
+  "name": "gradientoverlay",
+  "id": "gradientoverlay",
+  "measured": "same"
+ },
+ {
+  "name": "Halftone Lines",
+  "id": "halftonelines",
+  "measured": "same"
+ },
+ {
+  "name": "Inner Blur",
+  "id": "innerblur",
+  "measured": "same"
+ },
+ {
+  "name": "invert",
+  "id": "invert",
+  "measured": "same"
+ },
+ {
+  "name": "Magnify Background",
+  "id": "magnifybg",
+  "measured": "same"
+ },
+ {
+  "name": "Mask Blur",
+  "id": "maskblur",
+  "measured": "same"
+ },
+ {
+  "name": "Motion Blur",
+  "id": "motionblur4",
+  "measured": "same"
+ },
+ {
+  "name": "motionblur",
+  "id": "motionblur",
+  "measured": "same"
+ },
+ {
+  "name": "motionblur2",
+  "id": "motionblur2",
+  "measured": "same"
+ },
+ {
+  "name": "motionblur3",
+  "id": "motionblur3",
+  "measured": "same"
+ },
+ {
+  "name": "Oscillate",
+  "id": "oscillate3",
+  "measured": "same"
+ },
+ {
+  "name": "oscillate2",
+  "id": "oscillate2",
+  "measured": "same"
+ },
+ {
+  "name": "Pinch/Bulge",
+  "id": "pinchbulge2",
+  "measured": "same"
+ },
+ {
+  "name": "pinchbulge",
+  "id": "pinchbulge",
+  "measured": "same"
+ },
+ {
+  "name": "Pixelate",
+  "id": "pixelate2",
+  "measured": "same"
+ },
+ {
+  "name": "Polar Displacement Map",
+  "id": "displacemaprad",
+  "measured": "same"
+ },
+ {
+  "name": "Posterize",
+  "id": "posterize",
+  "measured": "same"
+ },
+ {
+  "name": "pulsate",
+  "id": "pulsate",
+  "measured": "same"
+ },
+ {
+  "name": "Pulse Opacity",
+  "id": "pulseopacity2",
+  "measured": "same"
+ },
+ {
+  "name": "Pulse Size",
+  "id": "pulsate2",
+  "measured": "same"
+ },
+ {
+  "name": "pulseopacity",
+  "id": "pulseopacity",
+  "measured": "same"
+ },
+ {
+  "name": "Random Jitter",
+  "id": "jitter",
+  "measured": "same"
+ },
+ {
+  "name": "Raster Transform",
+  "id": "transform",
+  "measured": "same"
+ },
+ {
+  "name": "ridges",
+  "id": "ridges",
+  "measured": "same"
+ },
+ {
+  "name": "Roughen Edges",
+  "id": "roughenedges",
+  "measured": "same"
+ },
+ {
+  "name": "Saturation / Vibrance",
+  "id": "satvib",
+  "measured": "same"
+ },
+ {
+  "name": "Simple Starfield",
+  "id": "simplestars2",
+  "measured": "same"
+ },
+ {
+  "name": "simplestars",
+  "id": "simplestars",
+  "measured": "same"
+ },
+ {
+  "name": "Smooth Edges",
+  "id": "smoothedges",
+  "measured": "same"
+ },
+ {
+  "name": "Solid Color",
+  "id": "solidcolor",
+  "measured": "same"
+ },
+ {
+  "name": "Solid Matte",
+  "id": "solidmatte",
+  "measured": "same"
+ },
+ {
+  "name": "Spin",
+  "id": "spin",
+  "measured": "same"
+ },
+ {
+  "name": "stretch",
+  "id": "stretch",
+  "measured": "same"
+ },
+ {
+  "name": "Stretch Axis",
+  "id": "stretch2",
+  "measured": "same"
+ },
+ {
+  "name": "swing",
+  "id": "swing",
+  "measured": "same"
+ },
+ {
+  "name": "Swing",
+  "id": "swing2",
+  "measured": "same"
+ },
+ {
+  "name": "Text Progress",
+  "id": "textprogress",
+  "measured": "same"
+ },
+ {
+  "name": "Text Randomizer",
+  "id": "textrand",
+  "measured": "same"
+ },
+ {
+  "name": "Threshold",
+  "id": "threshold",
+  "measured": "same"
+ },
+ {
+  "name": "Timecode",
+  "id": "timecode",
+  "measured": "same"
+ },
+ {
+  "name": "turbulence",
+  "id": "turbulence",
+  "measured": "same"
+ },
+ {
+  "name": "Turbulence",
+  "id": "turbulence2",
+  "measured": "same"
+ },
+ {
+  "name": "Vignette",
+  "id": "vignette",
+  "measured": "same"
+ },
+ {
+  "name": "voronoi",
+  "id": "voronoi",
+  "measured": "same"
+ },
+ {
+  "name": "Voronoi Cells",
+  "id": "voronoi2",
+  "measured": "same"
+ },
+ {
+  "name": "Bend",
+  "id": "bendwarp",
+  "measured": "close"
+ },
+ {
+  "name": "Box Blur",
+  "id": "boxblur3",
+  "measured": "close"
+ },
+ {
+  "name": "Chroma Key",
+  "id": "chromakey",
+  "measured": "close"
+ },
+ {
+  "name": "Contour Lines",
+  "id": "contour",
+  "measured": "close"
+ },
+ {
+  "name": "Flicker",
+  "id": "flicker2",
+  "measured": "close"
+ },
+ {
+  "name": "Four-color Gradient",
+  "id": "fourcolorgradient",
+  "measured": "close"
+ },
+ {
+  "name": "Gaussian Blur",
+  "id": "gaussianblur",
+  "measured": "close"
+ },
+ {
+  "name": "grid",
+  "id": "grid",
+  "measured": "close"
+ },
+ {
+  "name": "Grid",
+  "id": "grid2",
+  "measured": "close"
+ },
+ {
+  "name": "Highlights and Shadows",
+  "id": "highlightshadow",
+  "measured": "close"
+ },
+ {
+  "name": "Inner Pinch/Bulge",
+  "id": "pinchbulgeinside",
+  "measured": "close"
+ },
+ {
+  "name": "Light Glow",
+  "id": "lightglow",
+  "measured": "close"
+ },
+ {
+  "name": "Luma Key",
+  "id": "lumakey3",
+  "measured": "close"
+ },
+ {
+  "name": "lumakey2",
+  "id": "lumakey2",
+  "measured": "close"
+ },
+ {
+  "name": "Random Displacement",
+  "id": "randomdisplace",
+  "measured": "close"
+ },
+ {
+  "name": "Rays",
+  "id": "rays",
+  "measured": "close"
+ },
+ {
+  "name": "Replace Color",
+  "id": "replacecolor",
+  "measured": "close"
+ },
+ {
+  "name": "Ribbon",
+  "id": "ribbon",
+  "measured": "close"
+ },
+ {
+  "name": "Soft Glow",
+  "id": "softglow",
+  "measured": "close"
+ },
+ {
+  "name": "Spin Blur",
+  "id": "spinblur2",
+  "measured": "close"
+ },
+ {
+  "name": "Spin Streaks",
+  "id": "streaks-spin",
+  "measured": "close"
+ },
+ {
+  "name": "spinblur",
+  "id": "spinblur",
+  "measured": "close"
+ },
+ {
+  "name": "spotcolor",
+  "id": "spotcolor",
+  "measured": "close"
+ },
+ {
+  "name": "Squeeze",
+  "id": "squeeze",
+  "measured": "close"
+ },
+ {
+  "name": "wipe",
+  "id": "wipe",
+  "measured": "close"
+ },
+ {
+  "name": "Wipe",
+  "id": "wipe2",
+  "measured": "close"
+ },
+ {
+  "name": "Zoom Blur",
+  "id": "zoomblur3",
+  "measured": "close"
+ },
+ {
+  "name": "zoomblur",
+  "id": "zoomblur",
+  "measured": "close"
+ },
+ {
+  "name": "zoomblur2",
+  "id": "zoomblur2",
+  "measured": "close"
+ },
+ {
+  "name": "Auto-Shake",
+  "id": "shake2",
+  "measured": "similar"
+ },
+ {
+  "name": "Block Dissolve",
+  "id": "checkerdissolve2",
+  "measured": "similar"
+ },
+ {
+  "name": "Block Noise",
+  "id": "blocknoise2",
+  "measured": "similar"
+ },
+ {
+  "name": "blocknoise",
+  "id": "blocknoise",
+  "measured": "similar"
+ },
+ {
+  "name": "Brightness / Contrast",
+  "id": "brightcont2",
+  "measured": "similar"
+ },
+ {
+  "name": "checker",
+  "id": "checker",
+  "measured": "similar"
+ },
+ {
+  "name": "Checker",
+  "id": "checker2",
+  "measured": "similar"
+ },
+ {
+  "name": "Circular Ripple",
+  "id": "circularripple2",
+  "measured": "similar"
+ },
+ {
+  "name": "circularripple",
+  "id": "circularripple",
+  "measured": "similar"
+ },
+ {
+  "name": "CMYK Halftone Dots",
+  "id": "halftonedotscmyk",
+  "measured": "similar"
+ },
+ {
+  "name": "Contour Gradient",
+  "id": "contourgrad",
+  "measured": "similar"
+ },
+ {
+  "name": "Contour Strips",
+  "id": "contourstrips",
+  "measured": "similar"
+ },
+ {
+  "name": "Curl",
+  "id": "curl",
+  "measured": "similar"
+ },
+ {
+  "name": "Dark Glow",
+  "id": "darkglow",
+  "measured": "similar"
+ },
+ {
+  "name": "Directional Blur",
+  "id": "dblur",
+  "measured": "similar"
+ },
+ {
+  "name": "Dissolve",
+  "id": "dissolve",
+  "measured": "similar"
+ },
+ {
+  "name": "dots",
+  "id": "dots",
+  "measured": "similar"
+ },
+ {
+  "name": "Dots",
+  "id": "dots2",
+  "measured": "similar"
+ },
+ {
+  "name": "Edge Glow",
+  "id": "edgeglow",
+  "measured": "similar"
+ },
+ {
+  "name": "Electric Edges",
+  "id": "electricedges",
+  "measured": "similar"
+ },
+ {
+  "name": "Feather",
+  "id": "feather",
+  "measured": "similar"
+ },
+ {
+  "name": "Fill Behind",
+  "id": "fillbehind",
+  "measured": "similar"
+ },
+ {
+  "name": "findedges",
+  "id": "findedges",
+  "measured": "similar"
+ },
+ {
+  "name": "Fractal Warp",
+  "id": "fractalwarp4",
+  "measured": "similar"
+ },
+ {
+  "name": "fractalwarp3",
+  "id": "fractalwarp3",
+  "measured": "similar"
+ },
+ {
+  "name": "Halftone Dots",
+  "id": "halftonedots",
+  "measured": "similar"
+ },
+ {
+  "name": "Hexagon Tile Rotate",
+  "id": "hexrotate",
+  "measured": "similar"
+ },
+ {
+  "name": "Hexagon Tile Shift",
+  "id": "hexshift",
+  "measured": "similar"
+ },
+ {
+  "name": "Hot Color",
+  "id": "colorhot",
+  "measured": "similar"
+ },
+ {
+  "name": "Hue Shift",
+  "id": "hueshift",
+  "measured": "similar"
+ },
+ {
+  "name": "Inner Glow",
+  "id": "inner-glow",
+  "measured": "similar"
+ },
+ {
+  "name": "Kaleidoscope",
+  "id": "kaleidoscope",
+  "measured": "similar"
+ },
+ {
+  "name": "Lens Flare",
+  "id": "lensflare",
+  "measured": "similar"
+ },
+ {
+  "name": "Lightning",
+  "id": "lightning",
+  "measured": "similar"
+ },
+ {
+  "name": "Linear Streaks",
+  "id": "streaks",
+  "measured": "similar"
+ },
+ {
+  "name": "Long Shadow",
+  "id": "longshadow2",
+  "measured": "similar"
+ },
+ {
+  "name": "longshadow",
+  "id": "longshadow",
+  "measured": "similar"
+ },
+ {
+  "name": "lumakey",
+  "id": "lumakey",
+  "measured": "similar"
+ },
+ {
+  "name": "Mosaic",
+  "id": "mosaic",
+  "measured": "similar"
+ },
+ {
+  "name": "noise",
+  "id": "noise",
+  "measured": "similar"
+ },
+ {
+  "name": "Noise",
+  "id": "noise3",
+  "measured": "similar"
+ },
+ {
+  "name": "noise2",
+  "id": "noise2",
+  "measured": "similar"
+ },
+ {
+  "name": "Offset",
+  "id": "offset",
+  "measured": "similar"
+ },
+ {
+  "name": "Omino Diffusion+",
+  "id": "ominodiff",
+  "measured": "similar"
+ },
+ {
+  "name": "Omino Glass",
+  "id": "ominoglass",
+  "measured": "similar"
+ },
+ {
+  "name": "Palette Map",
+  "id": "palettemap",
+  "measured": "similar"
+ },
+ {
+  "name": "pixelate",
+  "id": "pixelate",
+  "measured": "similar"
+ },
+ {
+  "name": "polar",
+  "id": "polar",
+  "measured": "similar"
+ },
+ {
+  "name": "Precise/Fast Box Blur",
+  "id": "fastboxblur",
+  "measured": "similar"
+ },
+ {
+  "name": "Radial Rays",
+  "id": "radialrays",
+  "measured": "similar"
+ },
+ {
+  "name": "Radial Shadow",
+  "id": "radialshadow2",
+  "measured": "similar"
+ },
+ {
+  "name": "Radial Wipe",
+  "id": "radialwipe",
+  "measured": "similar"
+ },
+ {
+  "name": "radialshadow",
+  "id": "radialshadow",
+  "measured": "similar"
+ },
+ {
+  "name": "RGB Split",
+  "id": "rgbsep",
+  "measured": "similar"
+ },
+ {
+  "name": "shake",
+  "id": "shake",
+  "measured": "similar"
+ },
+ {
+  "name": "Sharpen",
+  "id": "sharpen",
+  "measured": "similar"
+ },
+ {
+  "name": "Spectral Map",
+  "id": "spectralmap",
+  "measured": "similar"
+ },
+ {
+  "name": "Spot Color",
+  "id": "spotcolor2",
+  "measured": "similar"
+ },
+ {
+  "name": "Star",
+  "id": "star",
+  "measured": "similar"
+ },
+ {
+  "name": "Starfield",
+  "id": "starfield3",
+  "measured": "similar"
+ },
+ {
+  "name": "starfield2",
+  "id": "starfield2",
+  "measured": "similar"
+ },
+ {
+  "name": "Stretch Segment",
+  "id": "stretchsegment",
+  "measured": "similar"
+ },
+ {
+  "name": "Stripes",
+  "id": "stripes",
+  "measured": "similar"
+ },
+ {
+  "name": "swirl",
+  "id": "swirl",
+  "measured": "similar"
+ },
+ {
+  "name": "Swirl",
+  "id": "swirl4",
+  "measured": "similar"
+ },
+ {
+  "name": "swirl2",
+  "id": "swirl2",
+  "measured": "similar"
+ },
+ {
+  "name": "swirl3",
+  "id": "swirl3",
+  "measured": "similar"
+ },
+ {
+  "name": "Tile Rotate",
+  "id": "tilerotate2",
+  "measured": "similar"
+ },
+ {
+  "name": "Tile Shift",
+  "id": "tileshift2",
+  "measured": "similar"
+ },
+ {
+  "name": "tilerotate",
+  "id": "tilerotate",
+  "measured": "similar"
+ },
+ {
+  "name": "Tiles",
+  "id": "tile",
+  "measured": "similar"
+ },
+ {
+  "name": "tileshift",
+  "id": "tileshift",
+  "measured": "similar"
+ },
+ {
+  "name": "Turbulent Displace",
+  "id": "turbulentdisplace3",
+  "measured": "similar"
+ },
+ {
+  "name": "turbulentdisplace",
+  "id": "turbulentdisplace",
+  "measured": "similar"
+ },
+ {
+  "name": "turbulentdisplace2",
+  "id": "turbulentdisplace2",
+  "measured": "similar"
+ },
+ {
+  "name": "Unsharp Mask",
+  "id": "unsharpmask",
+  "measured": "similar"
+ },
+ {
+  "name": "Wave Warp",
+  "id": "wavewarp2",
+  "measured": "similar"
+ },
+ {
+  "name": "Zoom Streaks",
+  "id": "streaks-zoom",
+  "measured": "similar"
+ },
+ {
+  "name": "Denoise",
+  "id": "denoise",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "Echo Keyframes",
+  "id": "repeat.echokf",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "Grid Repeat",
+  "id": "repeat.grid",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "Linear Repeat",
+  "id": "repeat.line",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "Move Along Path",
+  "id": "movealongpath3",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "Radial Repeat",
+  "id": "repeat.radial",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "Repeat",
+  "id": "repeat",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "Repeat Along Path",
+  "id": "repeat.path",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "Scatter Field",
+  "id": "shapefield",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "Time Quantization",
+  "id": "timequant",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "360-reorient-sphere",
+  "id": "360-reorient-sphere",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "Box",
+  "id": "box",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "boxblur",
+  "id": "boxblur",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "boxblur2",
+  "id": "boxblur2",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "brightcont",
+  "id": "brightcont",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "bumpmap",
+  "id": "bumpmap",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "bumpmap2",
+  "id": "bumpmap2",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "cartoon",
+  "id": "cartoon",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "checkerdissolve",
+  "id": "checkerdissolve",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "chromakey-adv",
+  "id": "chromakey-adv",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "chromaticvortexblur",
+  "id": "chromaticvortexblur",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "chromaticzoomblur",
+  "id": "chromaticzoomblur",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "clouds",
+  "id": "clouds",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "coloradj",
+  "id": "coloradj",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "colorbalance",
+  "id": "colorbalance",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "colorhot2",
+  "id": "colorhot2",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "colorize",
+  "id": "colorize",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "colortint",
+  "id": "colortint",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "colortune",
+  "id": "colortune",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "cube",
+  "id": "cube",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "Cube",
+  "id": "cube2",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "Cylinder",
+  "id": "cylinder",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "diff",
+  "id": "diff",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "differencematte",
+  "id": "differencematte",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "displacemap",
+  "id": "displacemap",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "Ellipsoid",
+  "id": "ellipsoid",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "energybeam",
+  "id": "energybeam",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "facemotion",
+  "id": "facemotion",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "findedges-edgeglow",
+  "id": "findedges-edgeglow",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "flip",
+  "id": "flip",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "Flip Layer",
+  "id": "flip3",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "flip2",
+  "id": "flip2",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "fractalwarp",
+  "id": "fractalwarp",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "fractalwarp2",
+  "id": "fractalwarp2",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "glass",
+  "id": "glass",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "glass2",
+  "id": "glass2",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "Glow",
+  "id": "glow",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "glowscan",
+  "id": "glowscan",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "gradientdisplace",
+  "id": "gradientdisplace",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "gradientmap",
+  "id": "gradientmap",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "grunge",
+  "id": "grunge",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "heart",
+  "id": "heart",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "Heart",
+  "id": "heart2",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "Hexagonal Prism",
+  "id": "hexprism",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "hexarray",
+  "id": "hexarray",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "hextile",
+  "id": "hextile",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "Hollow Box",
+  "id": "hollowbox",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "irridescence",
+  "id": "irridescence",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "irridescence2",
+  "id": "irridescence2",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "lensblur",
+  "id": "lensblur",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "lensblur2",
+  "id": "lensblur2",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "lumastamper",
+  "id": "lumastamper",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "mattechoke",
+  "id": "mattechoke",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "mattechoke",
+  "id": "mattechoke",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "mattefringe",
+  "id": "mattefringe",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "mirror",
+  "id": "mirror",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "Octahedron",
+  "id": "octahedron",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "oscillate",
+  "id": "oscillate",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "outline",
+  "id": "outline",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "outlinebad",
+  "id": "outlinebad",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "outlinebasic",
+  "id": "outlinebasic",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "Page Curl",
+  "id": "pagecurl",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "Parenting Helper",
+  "id": "parenthelper",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "perlindisplace",
+  "id": "perlindisplace",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "Pyramid",
+  "id": "pyramid",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "Raster Extrude",
+  "id": "extrude",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "rgb-gamma",
+  "id": "rgb-gamma",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "rgb-mixer",
+  "id": "rgb-mixer",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "Ring",
+  "id": "ring",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "Scale Assist",
+  "id": "scaleassist",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "Scatter Repeat",
+  "id": "repeat.scatter",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "shadow",
+  "id": "shadow",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "spherize",
+  "id": "spherize",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "Spherize",
+  "id": "spherize2",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "spill-cleanup",
+  "id": "spill-cleanup",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "Star Polyhedron",
+  "id": "starpoly",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "Star Prism",
+  "id": "starprism",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "starfield",
+  "id": "starfield",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "streakstrips",
+  "id": "streakstrips",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "Three-axis Cross",
+  "id": "plus",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "Torus",
+  "id": "torus",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "triprism",
+  "id": "triprism",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "triprism2",
+  "id": "triprism2",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "Tunnel",
+  "id": "tunnel",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "volumetricclouds",
+  "id": "volumetricclouds",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "vortexblur",
+  "id": "vortexblur",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "vrcombined",
+  "id": "vrcombined",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "vrplayer",
+  "id": "vrplayer",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "warpblur",
+  "id": "warpblur",
+  "measured": "unmeasured"
+ },
+ {
+  "name": "wavewarp",
+  "id": "wavewarp",
+  "measured": "unmeasured"
+ }
+]

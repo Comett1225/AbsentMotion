@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="ja" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ホーム画面 | AbsentMotion</title><meta name="description" content="プロジェクト、アセット、テンプレートと、その周りにあるボタンについて説明します。"><meta name="color-scheme" content="light dark"><link rel="stylesheet" href="../assets/site.css"></head><body class="app" data-page="guide"><header class="top appbar"><nav class="main" aria-label="ヘルプ"><a href="index.html">目次</a><a href="effects/index.html">エフェクト</a></nav></header><div class="wrap"><main id="main"><h1>ホーム画面</h1><p class="lead">プロジェクト、アセット、テンプレートと、その周りにあるボタンについて説明します。</p><details class="toc"><summary>このページ</summary><ul><li><a href="#the-top-bar">上部バー</a></li><li><a href="#the-bottom-bar">下部バー</a></li><li><a href="#projects-and-assets">プロジェクトとアセット</a></li><li><a href="#search">検索</a></li><li><a href="#sorting">並べ替え</a></li><li><a href="#templates">テンプレート</a></li><li><a href="#importing-a-project-file">プロジェクトファイルの読み込み</a></li><li><a href="#when-something-is-wrong">問題が起きたとき</a></li></ul></details><p>ホーム画面は、初回起動後に最初に表示される画面です。プロジェクトの一覧が表示され、プロジェクトの作成、検索、設定の変更を行うボタンがあります。</p>
+<h2 id="the-top-bar">上部バー</h2>
+<ul><li><strong>メニューボタン</strong>（左上の三本線）。<a href="settings.html">設定</a>ドロワーを開きます。</li><li>中央に<strong>AbsentMotion</strong>。</li><li><strong>検索</strong>（右側の虫めがね）。検索欄を開きます。検索中は同じ場所に閉じるためのXが表示され、戻るボタンでも閉じられます。</li></ul>
+<h2 id="the-bottom-bar">下部バー</h2>
+<ul><li><strong>プロジェクト</strong>と<strong>テンプレート</strong>で、ホーム画面の2つのページを切り替えます。</li><li>その間にある丸い<strong>+</strong>ボタンで新しいプロジェクトを作成します。<a href="new-project.html">プロジェクトの作成</a>を参照してください。</li></ul>
+<h2 id="projects-and-assets">プロジェクトとアセット</h2>
+<p>プロジェクトページの上部には、<strong>プロジェクト</strong>と<strong>アセット</strong>の2つのチップがあります。</p>
+<ul><li><strong>プロジェクト</strong>は動画やアニメーションです。カードをタップするとエディターで開きます。</li><li><strong>アセット</strong>は、プロジェクトから保存したもの、または新規プロジェクトシートの<strong>アセット</strong>オプションで作成した再利用可能なパーツです。エディターから他のプロジェクトに追加できます。<a href="assets-templates.html">アセット、テンプレート、プリセット</a>を参照してください。</li></ul>
+<p>プロジェクトとアセットは同じ方法で保存され、一覧で別々に表示されるだけです。</p>
+<h3 id="what-a-card-shows">カードに表示される内容</h3>
+<p>各カードには、隅にプロジェクトの長さが表示されたサムネイル、名前、2行の情報があります。1行目はアスペクト比（16:9など）と解像度（1080pなど）、2行目はファイルサイズとフレームレートです。ファイルサイズはプロジェクトファイル自体のサイズです。プロジェクトで使用する写真、動画、音声は含まれないため、何時間もの動画を使うプロジェクトでも数キロバイトと表示されることがあります。</p>
+<p>サムネイルは、エディターを閉じたときに再生ヘッドがあった位置の静止画です。エディターで一度も開いたことのないプロジェクトでは、空のサムネイルが表示されることがあります。</p>
+<h3 id="the-card-menu">カードのメニュー</h3>
+<p>カードの三点ボタン（<strong>その他</strong>）には次の項目があります。</p>
+<ul><li><strong>書き出し</strong>を選ぶと、一覧から直接書き出し画面が開きます。「現在のフレーム」オプションは最初のフレームを使用します。<strong>XML</strong>書き出しを選べるのはここだけです。<a href="export.html">書き出し</a>を参照してください。</li><li><strong>複製</strong>（アセットの場合は<strong>アセットを複製</strong>）は、メディアも含めて元の名前に「Copy」を付けた名前のコピーを作成します。</li><li><strong>メディアをプロジェクトにまとめる</strong>は、プロジェクトが使用するすべてのファイルをプロジェクト外からプロジェクト内にコピーし、ギャラリーに依存しないようにします。<a href="projects.html">プロジェクト、バックアップ、読み込み</a>を参照してください。</li><li><strong>バージョン履歴</strong>はプロジェクトの以前のバージョンを表示し、そのうちの1つに戻せるようにします。</li><li><strong>削除</strong>（アセットの場合は<strong>アセットを削除</strong>）は確認を求めてから、プロジェクト、そのバージョン、ほかで使われていないメディアのコピーを削除します。ゴミ箱はありません。削除したプロジェクトは元に戻せないので、不安な場合は先にバックアップしてください。</li></ul>
+<p>ファイルが破損したプロジェクトでは、情報の代わりに<strong>破損 — バージョンを復元</strong>と表示されます。タップすると以前のバージョンを復元できます。削除することもできます。</p>
+<h2 id="search">検索</h2>
+<p>検索ボックスはホーム画面全体で1つです。プロジェクトページではプロジェクトとアセットの名前（「プロジェクトとアセットを検索」）を、テンプレートページではテンプレートとプリセットを検索します。大文字小文字やアクセント記号は区別せず、入力した単語はすべて、順序を問わず名前に含まれている必要があります。</p>
+<h2 id="sorting">並べ替え</h2>
+<p>プロジェクトとアセットの一覧では、ヘッダーに<strong>日付で並べ替え</strong>または<strong>名前で並べ替え</strong>と表示されます。タップすると切り替わります。日付では新しい順に、日付見出しでグループ化されて表示されます。名前ではAからZの順に並びます。アプリは選択を記憶します。</p>
+<h2 id="templates">テンプレート</h2>
+<p><strong>テンプレート</strong>ページには、<strong>マイテンプレート</strong>と<strong>マイプリセット</strong>の2つのチップがあります。詳しくは<a href="assets-templates.html">アセット、テンプレート、プリセット</a>で説明しています。</p>
+<h2 id="importing-a-project-file">プロジェクトファイルの読み込み</h2>
+<p>初期状態では、ホーム画面に読み込みボタンはありません。ファイルマネージャーやメッセージなど別のアプリから、共有または「アプリで開く」を使ってプロジェクトファイルを開くと、AbsentMotionが受け取ります。ボタンを使いたい場合は、設定で<strong>プロジェクト一覧に読み込みカードを表示</strong>をオンにします。すると、<strong>ファイルを選択</strong>ボタンの付いたカードがプロジェクト一覧の上部に表示されます。<a href="projects.html">プロジェクト、バックアップ、読み込み</a>を参照してください。</p>
+<h2 id="when-something-is-wrong">問題が起きたとき</h2>
+<ul><li>アプリが予期せず終了した場合、次回起動時に<strong>AbsentMotionが予期せず終了しました</strong>と理由が表示され、未保存の編集がある場合は復元するかどうか尋ねられます。</li><li>クラッシュログは設定の<strong>クラッシュログ</strong>にあります。</li><li>古いバージョンを使っていると、新しいバージョンがあることをアプリが知らせます。詳しくは<a href="settings.html">設定</a>を参照してください。</li></ul><nav class="pager" aria-label="前後のページ"><a rel="prev" href="compatible.html">&larr; 互換版</a><a rel="next" href="new-project.html">プロジェクトの作成 &rarr;</a></nav></main></div></body></html>

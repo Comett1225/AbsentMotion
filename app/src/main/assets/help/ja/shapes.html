@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="ja" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>図形、描画、マスク | AbsentMotion</title><meta name="description" content="図形、ペンツール、フリーハンド描画、SVG読み込み、クリッピングマスク、グループ、アニメーションする図形マスク。"><meta name="color-scheme" content="light dark"><link rel="stylesheet" href="../assets/site.css"></head><body class="app" data-page="guide"><header class="top appbar"><nav class="main" aria-label="ヘルプ"><a href="index.html">目次</a><a href="effects/index.html">エフェクト</a></nav></header><div class="wrap"><main id="main"><h1>図形、描画、マスク</h1><p class="lead">図形、ペンツール、フリーハンド描画、SVG読み込み、クリッピングマスク、グループ、アニメーションする図形マスク。</p><details class="toc"><summary>このページ</summary><ul><li><a href="#shapes">図形</a></li><li><a href="#the-pen-tool-and-edit-points">ペンツールとポイントを編集</a></li><li><a href="#freehand-drawing">フリーハンド描画</a></li><li><a href="#svg-files">SVGファイル</a></li><li><a href="#masks-and-clipping">マスクとクリッピング</a></li><li><a href="#groups-and-parents">グループと親</a></li></ul></details><h2 id="shapes">図形</h2>
+<p><a href="add-menu.html">追加メニュー</a>の<strong>図形</strong>タブから既製の図形を追加できます。種類は2つです。</p>
+<ul><li><strong>パラメトリック図形</strong>（円、長方形、星、多角形など）は<strong>図形オプション</strong>で編集します。サイズ、半径、ポイント数などを設定でき、アニメーションも可能です。</li><li><strong>パス図形</strong>（ハート、雲、歯車など）は<strong>ポイントを編集</strong>で編集します。</li></ul>
+<p>色と輪郭は<strong>塗りと色</strong>と<strong>枠線と影</strong>で設定します。<a href="layer-tools.html">レイヤーツール</a>を参照してください。</p>
+<h2 id="the-pen-tool-and-edit-points">ペンツールとポイントを編集</h2>
+<p>追加メニューの<strong>ペンツール</strong>は新しい図形レイヤーを作成し、ポイントエディターを開きます。ツールグリッドの<strong>ポイントを編集</strong>は、既存のパス図形に対して開きます。プレビューでタップしてポイントを置き、押したままドラッグするとカーブハンドルを引き出せます。ゴーストポイントは次にポイントが置かれる位置を示します。何も描かずに離れると、新しいレイヤーは削除されます。</p>
+<p>エディターの下部：</p>
+<ul><li><strong>パスを閉じる</strong>または<strong>パスを開く</strong>（2つ以上のポイントが必要）。</li><li><strong>ポイントを曲線にする</strong>または<strong>ポイントを角にする</strong>。</li><li><strong>ポイントを追加</strong>と<strong>ポイントを削除</strong>。</li><li>選択中のポイントを動かすトラックパッド（「ドラッグしてポイントを移動」）と、スムーズポイントのハンドルを編集するときに角度または長さを固定する<strong>角度</strong>と<strong>距離</strong>のトグル。</li><li><strong>コンター</strong>と矢印で、図形の別々のサブパス間を移動します。</li><li>右側のポイント一覧。ポイントの間に小さな「+」セルがあり、ポイントを挿入できます。</li></ul>
+<p>上部には<strong>元に戻す</strong>、<strong>やり直す</strong>、<strong>戻る</strong>があります。</p>
+<h3 id="animated-shapes-shape-keyframes">アニメーションする図形（図形キーフレーム）</h3>
+<p>ポイントエディターでは、タイムバーに<strong>前の図形キーフレーム</strong>、<strong>次の図形キーフレーム</strong>、<strong>図形キーフレームを追加</strong>、<strong>図形キーフレームを削除</strong>があります。図形キーフレームは再生ヘッド位置の図形全体を保存します。別の時間に移動してポイントを変更し、さらにキーフレームを追加すると、それらの間で図形がアニメーションします。前のキーフレームは薄い破線の輪郭で表示され、位置合わせの助けになります。これはロトスコープ用のアニメーションマスクを作る方法です。動画内の何かの周囲をなぞり、動画の動きに合わせて変更します。</p>
+<h2 id="freehand-drawing">フリーハンド描画</h2>
+<p>追加メニューの<strong>フリーハンドブラシ</strong>は描画レイヤーを作成し、描画エディターを開きます。</p>
+<ul><li><strong>ペン</strong>は均一な線を描き、<strong>ブラシ</strong>は筆圧で線幅を変え、<strong>塗り</strong>は描いたループを塗りつぶし図形にし、<strong>消しゴム</strong>は一部を消します。</li><li>サイズスライダー（1〜300）と、色相ストリップと不透明度ストリップ付きのカラーピッカー。</li><li>上部に<strong>元に戻す</strong>と<strong>やり直す</strong>。指を離すたびに各ストロークが保持されます。</li><li>ツール、サイズ、色は記憶されます。何も描かずに離れると、新しいレイヤーは削除されます。</li></ul>
+<p>描画にはキーフレームがありません。描画をアニメーションするには、Drawing Progressなどのエフェクトを使います。<a href="effects/index.html">エフェクトライブラリ</a>を参照してください。</p>
+<h2 id="svg-files">SVGファイル</h2>
+<p>追加メニューの<strong>SVGを読み込み</strong>はベクター画像を図形に変換します。何が保持されるかは<a href="add-menu.html">追加メニュー</a>を参照してください。</p>
+<h2 id="masks-and-clipping">マスクとクリッピング</h2>
+<ul><li><strong>クリッピングマスクを作成</strong>（レイヤーメニュー）は、レイヤーをすぐ下のレイヤーの形にクリップします。<strong>クリッピングマスクを解除</strong>で元に戻ります。</li><li><strong>グループとマスク</strong>と<strong>グループと除外</strong>（複数選択）はレイヤーをグループ化し、最上レイヤーのブレンドモードをマスクまたは除外に設定します。<strong>不透明度</strong>で任意のレイヤーにブレンドモード<strong>マスク</strong>または<strong>除外</strong>を設定することもできます。<strong>マスク</strong>はレイヤーがある場所だけ下の内容を残し、<strong>除外</strong>はその部分を切り抜きます。</li><li>アニメーションマスクは図形キーフレーム（上記）から作ります。</li><li>写真と動画の<strong>背景を削除</strong>については<a href="ai-tools.html">AIツール</a>で説明しています。</li></ul>
+<h2 id="groups-and-parents">グループと親</h2>
+<ul><li><strong>グループ</strong>（複数選択）はレイヤーを1つのグループレイヤーに入れます。グループを1つとして移動、拡大縮小、フェード、エフェクト追加ができます。<a href="layer-menus.html">レイヤーメニューと複数選択</a>を参照してください。</li><li><strong>親</strong>（トップバーの親ボタン）は、グループ化せずに1つのレイヤーを別のレイヤーに追従させます。</li><li><strong>ヌル</strong>レイヤー（追加、オブジェクト/アセット）は表示されません。他のレイヤーの親にしてまとめて動かしたり、<a href="tracking.html">モーショントラッキング</a>で動かしたりできます。</li></ul><nav class="pager" aria-label="前後のページ"><a rel="prev" href="text.html">&larr; テキストとフォント</a><a rel="next" href="media.html">写真、動画、速度 &rarr;</a></nav></main></div></body></html>

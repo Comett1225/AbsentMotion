@@ -32,6 +32,8 @@ subscription, no account and no advertising, and your projects never leave your 
 
 ## What it does
 
+**Faster than Alight Motion:** with the same heavy project on the same phone, AbsentMotion 4.0 started about 5 times faster, opened the project about 3 times faster and exported it in about a quarter less time.
+
 <details>
 <summary><strong>Layers and a timeline</strong></summary>
 
@@ -49,7 +51,7 @@ Any value (position, size, rotation, 3D tilt, skew, opacity, colour, shape and e
 <details>
 <summary><strong>184 effects</strong></summary>
 
-Colour, blur, distort, stylize, noise, keying, Move (Auto-Shake, Oscillate, Swing, Spin, Random Displacement, Random Jitter, Pulse, Echo, Offset, Move Along Path, true motion blur), Repeat (linear, radial, grid, along a path, scatter), 3D objects (cube, sphere, torus, prisms, raster extrude and more), Text (typewriter reveal, per-letter transforms, scramble, count up, timecode), VHS, Datamosh, Glass, Displacement Map and many more, with animated previews and a "New" category.
+Colour, blur, distort, stylize, noise, keying, Move (Auto-Shake, Oscillate, Swing, Spin, Random Displacement, Random Jitter, Pulse, Echo, Offset, Move Along Path, true motion blur), Repeat (linear, radial, grid, along a path, scatter), 3D objects (cube, sphere, torus, prisms, raster extrude and more), Text (typewriter reveal, per-letter transforms, scramble, count up, timecode), VHS, Datamosh, Glass, Displacement Map and many more, with animated previews and a "New" category. [Check out all the effects](https://comett1225.github.io/AbsentMotion/effects/index.html).
 
 </details>
 
@@ -110,6 +112,13 @@ MP4, MOV, MKV or WebM video (H.264, HEVC, AV1, VP9 or APV, as the phone supports
 </details>
 
 <details>
+<summary><strong>Tools: Compress and Video Downloader</strong></summary>
+
+**Compress** makes videos and pictures smaller (Low, Medium, High, Custom, or a Discord size), shows the size before and after, and lets you watch the result before saving. **Video Downloader** saves videos, sounds and pictures from links (YouTube, Instagram, TikTok and more) straight to your gallery or into a project.
+
+</details>
+
+<details>
 <summary><strong>Safe projects</strong></summary>
 
 Automatic version history, crash recovery, crash logs that say in one sentence what happened, imported media copied into the project and one-tap backup of every project to a folder that survives reinstalling.
@@ -117,35 +126,16 @@ Automatic version history, crash recovery, crash logs that say in one sentence w
 </details>
 
 <details>
-<summary><strong>14 languages</strong></summary>
+<summary><strong>17 languages</strong></summary>
 
-English, Indonesian, Hindi, Portuguese (Brazil), Spanish, Filipino, Vietnamese, Thai, Malay, Arabic, Persian, Turkish, Russian and Bengali, chosen on first start.
+English, Indonesian, Hindi, Portuguese (Brazil), Spanish (Latin America), Spanish (Spain), Filipino, Vietnamese, Thai, Malay, Arabic, Persian, Urdu, Turkish, Russian, Bengali and Japanese, chosen on first start.
 
 </details>
 
-## Speed
 
-AbsentMotion 4.0 and Alight Motion 5.0.273 on the same phone, a Samsung Galaxy S26 Ultra (Android 17), with the same
-heavy project: an edit made in Alight Motion and opened in AbsentMotion from Alight's XML export. It is 13.6 s long,
-1080 x 1080 at 60 fps, with two videos cut into 12 clips and 54 effects, among them Motion Blur, Soft Glow, Tiles and
-Auto-Shake on every clip. Both apps exported it as H.264 at about 20 Mbps. Median of three runs, timed from screen
-recordings; the export runs from tapping Export to the finished file.
+## Offline use
 
-| | Alight Motion 5.0.273 | AbsentMotion 4.0 |
-|---|---|---|
-| Start the app, until the home screen is drawn | 2.20 s | 0.44 s |
-| Open the project, until the preview is drawn | 0.86 s | 0.25 s |
-| Export the project (816 frames) | 18.3 s | 13.4 s |
-
-### AbsentMotion 3.0 and 4.0
-
-The same phone and project without its effects (3.0 cannot run most of them), both exported at 21 Mbps:
-
-| | AbsentMotion 3.0.0 | AbsentMotion 4.0 |
-|---|---|---|
-| Start the app, until the home screen is drawn | 0.40 s | 0.39 s |
-| Open the project, until the preview is drawn | 0.19 s | 0.17 s |
-| Export the project (816 frames) | 3.63 s | 3.53 s |
+AbsentMotion works fully offline and nothing in it depends on the internet. It only goes online for optional things you choose: the font library (you can also add your own fonts), downloading the background removal and captions models, checking for updates, and the Video Downloader.
 
 ## Requirements
 
@@ -185,11 +175,7 @@ There will be weekly updates at minimum, whether it's bug patches, improvement t
 AbsentMotion is a young project. Please know these before you rely on it:
 
 - **Some Alight Motion effects are still missing.** - Please if you're able to, make sure to make an issue for anything that isn't implemented correctly or is broken. If you can't or don't want to use GitHub issues, use the [bug report form](https://forms.gle/6bY8KBPMKc2iUypV6) instead.
-- **ARM Android devices only.** Android 13 or newer, or Android 8 to 12 with the Compatible build; phones with a 32-bit system use the Compatible 32-bit build. Phones without
-  Vulkan 1.1 draw with OpenGL ES 3.0, which leaves out AI Smooth, AI Enhance, AI background removal 2.0 and Optical flow High.
-- **Background removal.** The `foss` build removes backgrounds with its own offline model. The `play` build uses
-  Google Play services instead.
-- **Network use.** You can completely use this offline, the only other features that would require internet is downloading fonts from the font library (You can upload your own if you have any), downloading the background removal model, captions model and checking for updates, all which are optional and not required for you to use the app.
+- **It's a new project, so it needs lots of feedback.** Tell us what breaks, what is confusing and what is missing: [GitHub issues](https://github.com/Comett1225/AbsentMotion/issues) or the [feedback form](https://forms.gle/6bY8KBPMKc2iUypV6).
 
 ## Why?
 
@@ -199,7 +185,7 @@ Everything in this app is completely free, you will pay for NOTHING. You will ha
 
 ## File compatibility
 
-AbsentMotion can open scene XML files and `.amproj` packages exported from Alight Motion, and it exports scene XML in the same format. Effects that AbsentMotion does not include are kept in the file and are not drawn. AbsentMotion saves its own packages as `.absproj`. AbsentMotion is an independent project. It is not affiliated with, endorsed by or sponsored by Alight Creative, Alight Motion, ByteDance or CapCut. Alight Motion and CapCut are trademarks of their owners.
+AbsentMotion can open scene XML files and `.amproj` packages exported from Alight Motion, and it exports scene XML in the same format. Effects that AbsentMotion does not include are kept in the file and are not drawn. AbsentMotion saves its own packages as `.absproj`. AbsentMotion is an independent project. It is not affiliated with, endorsed by or sponsored by Alight Creative, Alight Motion, ByteDance or CapCut. Alight Motion and CapCut are trademarks of their owners. [Alight Motion compatibility](docs/ALIGHT_COMPATIBILITY.md) lists every Alight effect and how it comes across.
 
 ## Building
 

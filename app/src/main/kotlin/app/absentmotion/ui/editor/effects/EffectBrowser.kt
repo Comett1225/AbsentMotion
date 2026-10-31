@@ -1,5 +1,6 @@
 package app.absentmotion.ui.editor.effects
 
+import app.absentmotion.editor.addEffectToChosen
 import android.graphics.drawable.AnimatedImageDrawable
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
@@ -95,7 +96,7 @@ fun EffectBrowser(state: EditorState) {
     var query by remember { mutableStateOf("") }
     var detail by remember { mutableStateOf(state.effectDetail?.let(catalog::find)) }
     LaunchedEffect(catalog) { detail = detail?.id?.let(catalog::find) }
-    fun close() { state.effectDetail = null; state.effectCategory = null; state.effectBrowserOpen = false }
+    fun close() { state.effectDetail = null; state.effectCategory = null; state.effectTargets = null; state.effectBrowserOpen = false }
     var fromAudio by remember { mutableStateOf(false) }
     fun back() {
         when {
@@ -113,6 +114,14 @@ fun EffectBrowser(state: EditorState) {
     }
     fun add(effect: EffectDefinition, preset: EffectPreset? = null) {
         if (!effect.available) return
+        val targets = state.effectTargets
+        if (targets != null) {
+            state.addEffectToChosen(targets) { layer: app.absentmotion.model.Layer -> effect.instance(preset, layer.endTime - layer.startTime) }
+            recent = (listOf(effect.id) + recent.filterNot { it == effect.id }).take(40)
+            history.edit().putString("recent", recent.joinToString("|")).apply()
+            close()
+            return
+        }
         state.editSelected { layer -> layer.addEffect(effect.instance(preset, layer.endTime - layer.startTime)) }
         recent = (listOf(effect.id) + recent.filterNot { it == effect.id }).take(40)
         history.edit().putString("recent", recent.joinToString("|")).apply()

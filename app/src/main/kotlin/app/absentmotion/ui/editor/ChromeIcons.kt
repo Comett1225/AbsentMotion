@@ -113,6 +113,7 @@ internal object ChromeIcons {
             "L2 10A2 2 0 0 1 2.971 8.285L12.971 2.285A2 2 0 0 1 15.109 2.335L21.109 6.335A2 2 0 0 1 22 8Z")
 
     val Close = icon("Close", stroke = "M18.9 5.1L5.1 18.9M5.1 5.1L18.9 18.9")
+    val Fullscreen = icon("Fullscreen", stroke = "M8 3L5 3A2 2 0 0 0 3 5L3 8M21 8L21 5A2 2 0 0 0 19 3L16 3M3 16L3 19A2 2 0 0 0 5 21L8 21M16 21L19 21A2 2 0 0 0 21 19L21 16")
     val ChevronDown = icon("ChevronDown", stroke = "M6 9L12 15L18 9")
     val Pencil = icon("Pencil", stroke = "M21.174 6.812A1 1 0 0 0 17.188 2.825L3.842 16.174A2 2 0 0 0 3.342 17.004L2.021 21.356A0.5 0.5 0 0 0 2.644 21.978L6.997 20.658A2 2 0 0 0 7.827 20.161Z" +
             "M15 5L19 9")

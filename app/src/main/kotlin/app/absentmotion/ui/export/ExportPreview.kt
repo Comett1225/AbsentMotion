@@ -101,9 +101,9 @@ private val Track get() = Am.OnScrim.copy(alpha = 0.3f)
 private const val MaxSide = 2048
 
 @Composable
-internal fun ExportMediaPreview(kind: ExportKind, uris: List<Uri>) {
+internal fun ExportMediaPreview(kind: ExportKind, uris: List<Uri>, large: Boolean = false, onTap: (() -> Unit)? = null) {
     when(kind) {
-        ExportKind.Video -> VideoPreview(uris.first())
+        ExportKind.Video -> VideoPreview(uris.first(), large, onTap)
         ExportKind.Gif -> GifPreview(uris.first())
         ExportKind.Frame, ExportKind.FrameAs -> StillImage(uris.first())
         ExportKind.Sequence -> SequencePreview(uris)
@@ -199,7 +199,7 @@ private fun FilePreview(uri: Uri) {
 }
 
 @Composable
-private fun VideoPreview(uri: Uri) {
+private fun VideoPreview(uri: Uri, large: Boolean = false, onTap: (() -> Unit)? = null) {
     val context = LocalContext.current
     var facts by remember { mutableStateOf<VideoFacts?>(null) }
     var ready by remember { mutableStateOf(false) }
@@ -287,7 +287,7 @@ private fun VideoPreview(uri: Uri) {
 
     Column(Modifier.fillMaxSize()) {
         Box(
-            Modifier.weight(1f).fillMaxWidth().clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) { toggle() },
+            Modifier.weight(1f).fillMaxWidth().clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) { onTap?.invoke() ?: toggle() },
             contentAlignment = Alignment.Center,
         ) {
             val shown = facts
@@ -323,10 +323,11 @@ private fun VideoPreview(uri: Uri) {
                 }
             }
         }
-        Ltr { Row(Modifier.fillMaxWidth().height(62.dp).fadeInWhen(ready || failed, from = 0.35f), verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.size(62.dp).clickable(enabled = ready || failed, onClick = ::toggle), contentAlignment = Alignment.Center) {
+        val bar = if (large) 88.dp else 62.dp
+        Ltr { Row(Modifier.fillMaxWidth().height(bar).fadeInWhen(ready || failed, from = 0.35f), verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.size(bar).clickable(enabled = ready || failed, onClick = ::toggle), contentAlignment = Alignment.Center) {
                 Crossfade(playing, animationSpec = Motion.fast(), label = "play") {
-                    Icon(if (it) ExportIcons.Pause else ExportIcons.Play, stringResource(if (it) R.string.export_pause else R.string.export_play), tint = Am.OnScrim)
+                    Icon(if (it) ExportIcons.Pause else ExportIcons.Play, stringResource(if (it) R.string.export_pause else R.string.export_play), Modifier.size(if (large) 38.dp else 24.dp), tint = Am.OnScrim)
                 }
             }
             SeekBar(
@@ -340,8 +341,9 @@ private fun VideoPreview(uri: Uri) {
                 },
                 onDone = { scrubbing = false },
                 Modifier.weight(1f).fillMaxHeight(),
+                large,
             )
-            Text("${time(positionMs)} / ${time(durationMs)}", Modifier.width(92.dp), color = Am.OnScrim, fontSize = 13.sp, textAlign = TextAlign.Center, maxLines = 1)
+            Text("${time(positionMs)} / ${time(durationMs)}", Modifier.width(if (large) 132.dp else 92.dp), color = Am.OnScrim, fontSize = if (large) 18.sp else 13.sp, textAlign = TextAlign.Center, maxLines = 1)
         } }
     }
 }
@@ -375,7 +377,7 @@ private const val StillSide = 1280
 private const val RetryMs = 1000L
 
 @Composable
-private fun SeekBar(fraction: Float, onSeek: (Float) -> Unit, onDone: () -> Unit, modifier: Modifier) {
+private fun SeekBar(fraction: Float, onSeek: (Float) -> Unit, onDone: () -> Unit, modifier: Modifier, large: Boolean = false) {
     val seek by rememberUpdatedState(onSeek)
     val done by rememberUpdatedState(onDone)
     Canvas(
@@ -391,11 +393,11 @@ private fun SeekBar(fraction: Float, onSeek: (Float) -> Unit, onDone: () -> Unit
         },
     ) {
         val pad = 8.dp.toPx()
-        val thick = 4.dp.toPx()
+        val thick = (if (large) 6.dp else 4.dp).toPx()
         val top = (size.height - thick) / 2
         val x = pad + fraction.coerceIn(0f, 1f) * (size.width - 2 * pad)
         drawRoundRect(Track, Offset(pad, top), Size(size.width - 2 * pad, thick), CornerRadius(thick / 2))
         drawRoundRect(Am.OnNavyAccent, Offset(pad, top), Size(x - pad, thick), CornerRadius(thick / 2))
-        drawCircle(Am.OnNavyAccent, 7.dp.toPx(), Offset(x, size.height / 2))
+        drawCircle(Am.OnNavyAccent, (if (large) 10.dp else 7.dp).toPx(), Offset(x, size.height / 2))
     }
 }

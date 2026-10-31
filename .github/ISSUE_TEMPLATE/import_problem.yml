@@ -1,0 +1,47 @@
+name: Import problem
+description: An Alight Motion project (XML) opens in AbsentMotion but looks or moves differently
+labels: ["import"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks! A project that imports wrong is the most useful thing you can send, because it can be reproduced and fixed.
+        Only send your own project and pictures of your own project. Please leave out photos, videos, fonts or music you don't have the right to share (a project without its media still helps).
+  - type: textarea
+    id: xml
+    attributes:
+      label: The project XML
+      description: In Alight Motion, export the project as XML and drag the file (or a zip of it) here.
+    validations:
+      required: true
+  - type: textarea
+    id: original
+    attributes:
+      label: How it should look
+      description: A screenshot or short screen recording of the same moment of your project in Alight Motion.
+    validations:
+      required: true
+  - type: textarea
+    id: absent
+    attributes:
+      label: How it looks in AbsentMotion
+      description: A screenshot or short screen recording of the same moment in AbsentMotion, and what is different (an effect, a blending mode, a keyframe, text ...).
+    validations:
+      required: true
+  - type: textarea
+    id: report
+    attributes:
+      label: The import report
+      description: If AbsentMotion showed an import report listing effects it cannot run, copy that list here.
+  - type: input
+    id: version
+    attributes:
+      label: AbsentMotion version
+      placeholder: "e.g. 4.4.0"
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: Device and Android version
+      placeholder: "e.g. Pixel 8, Android 16"

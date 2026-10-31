@@ -273,7 +273,8 @@ internal fun rememberClock(): State<Float> = rememberInfiniteTransition(label = 
     .animateFloat(0f, 1f, infiniteRepeatable(tween(2000, easing = LinearEasing)), label = "clock")
 
 private class Pose(var dx: Float = 0f, var dy: Float = 0f, var scale: Float = 1f, var turn: Float = 0f, var alpha: Float = 1f,
-                   var tint: Color = Color.Transparent, var smear: Float = 0f, var split: Float = 0f, var shake: Float = 0f)
+                   var tint: Color = Color.Transparent, var smear: Float = 0f, var split: Float = 0f, var shake: Float = 0f,
+                   var wipe: Float = 0f, var wipeAngle: Float = 90f)
 
 @Composable
 private fun rememberMotionPictures(): List<ImageBitmap> {
@@ -310,6 +311,15 @@ private fun Motion.pose(u: Float, inSide: Boolean, w: Float, h: Float): Pose {
             "absent.blur", "absent.smear" -> pose.smear = max(pose.smear, amount)
             "absent.glitch", "absent.rgbsplit" -> pose.split = max(pose.split, amount)
             "absent.autoshake" -> pose.shake = max(pose.shake, amount)
+            "absent.directionalblur", "absent.radialblur", "absent.spinblur" -> pose.smear = max(pose.smear, amount)
+            "absent.wipe", "absent.radialwipe" -> {
+                pose.wipe = max(pose.wipe, amount)
+                pose.wipeAngle = effect.fixed["angle"]?.toFloatOrNull() ?: 90f
+            }
+            "absent.dissolve" -> pose.alpha *= 1 - amount
+            "absent.pixelate" -> pose.split = max(pose.split, amount)
+            "absent.twirl" -> pose.turn += 40f * amount
+            "absent.lightglow" -> pose.tint = Color.White.copy(alpha = 0.7f * amount)
         }
     }
     return pose
@@ -344,7 +354,14 @@ private fun DrawScope.drawPose(pose: Pose, color: Color, clip: Boolean, clock: F
             photo(at + Offset(i * trail, 0f), 0.15f * alpha)
             photo(at + Offset(-i * trail, 0f), 0.15f * alpha)
         }
-        if (side > 0f) {
+        if (pose.wipe > 0f) {
+            val v = 1f - pose.wipe.coerceIn(0f, 1f)
+            val horizontal = pose.wipeAngle == 0f || pose.wipeAngle == 180f
+            val forward = pose.wipeAngle == 0f || pose.wipeAngle == 90f
+            val a = if (forward) 1f - v else 0f
+            if (horizontal) clipRect(at.x + box.width * a, at.y, at.x + box.width * (a + v), at.y + box.height) { photo(at) }
+            else clipRect(at.x, at.y + box.height * a, at.x + box.width, at.y + box.height * (a + v)) { photo(at) }
+        } else if (side > 0f) {
             val band = box.height / 4
             for (i in 0 until 4) {
                 val shift = (if (i % 2 == 0) 1 else -1) * side * (0.5f + 0.5f * sin(clock * 97f + i))

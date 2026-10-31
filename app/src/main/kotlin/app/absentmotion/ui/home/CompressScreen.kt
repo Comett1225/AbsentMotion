@@ -37,6 +37,8 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
@@ -197,15 +199,43 @@ internal fun CompressScreen(onClose: () -> Unit) {
 @Composable
 private fun ResultPreview(result: Compressed, original: android.net.Uri) {
     var before by remember(result) { mutableStateOf(false) }
+    var full by remember(result) { mutableStateOf(false) }
+    val kind = if (result.video) app.absentmotion.export.ExportKind.Video else app.absentmotion.export.ExportKind.Frame
+    val shown = if (before) original else android.net.Uri.fromFile(result.file)
     SectionTitle(stringResource(R.string.compress_result))
     Chips(listOf(stringResource(R.string.compress_after), stringResource(R.string.compress_before)), if (before) 1 else 0, true) { before = it == 1 }
     Spacer(Modifier.height(8.dp))
     Box(Modifier.fillMaxWidth().height(320.dp).clip(RoundedCornerShape(12.dp)).background(Am.Scrim)) {
-        androidx.compose.runtime.key(before) {
-            app.absentmotion.platform.ExportMediaPreview(
-                if (result.video) app.absentmotion.export.ExportKind.Video else app.absentmotion.export.ExportKind.Frame,
-                listOf(if (before) original else android.net.Uri.fromFile(result.file)),
-            )
+        if (!full) androidx.compose.runtime.key(before) {
+            Box(Modifier.fillMaxSize().then(if (result.video) Modifier else Modifier.clickable { full = true })) {
+                app.absentmotion.platform.ExportMediaPreview(kind, listOf(shown), onTap = { full = true })
+            }
+        }
+        Box(
+            Modifier.align(Alignment.TopEnd).padding(10.dp).size(40.dp).clip(RoundedCornerShape(20.dp)).background(Color.Black.copy(alpha = 0.55f)).clickable { full = true },
+            contentAlignment = Alignment.Center,
+        ) { Icon(app.absentmotion.ui.editor.ChromeIcons.Fullscreen, stringResource(R.string.compress_full_screen), Modifier.size(20.dp), tint = Color.White) }
+    }
+    if (full) androidx.compose.ui.window.Dialog({ full = false }, androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)) {
+        Column(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.94f)).systemBarsPadding()) {
+            Row(Modifier.fillMaxWidth().height(64.dp).padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                Row(Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    for ((i, label) in listOf(R.string.compress_after, R.string.compress_before).withIndex()) {
+                        val chosen = (i == 1) == before
+                        Box(
+                            Modifier.height(40.dp).clip(RoundedCornerShape(20.dp)).background(if (chosen) Am.Accent else Color.White.copy(alpha = 0.14f))
+                                .clickable { before = i == 1 }.padding(horizontal = 20.dp),
+                            contentAlignment = Alignment.Center,
+                        ) { Text(stringResource(label), color = if (chosen) Am.OnAccent else Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold, maxLines = 1) }
+                    }
+                }
+                Box(Modifier.size(48.dp).clip(RoundedCornerShape(24.dp)).clickable { full = false }, contentAlignment = Alignment.Center) {
+                    Icon(app.absentmotion.ui.editor.ChromeIcons.Close, stringResource(R.string.action_close), Modifier.size(26.dp), tint = Color.White)
+                }
+            }
+            Box(Modifier.weight(1f).fillMaxWidth()) {
+                androidx.compose.runtime.key(before) { app.absentmotion.platform.ExportMediaPreview(kind, listOf(shown), large = true) }
+            }
         }
     }
 }

@@ -2749,7 +2749,7 @@ The launcher icon is an own drawing, made by tools/icon/make_icon.py (source of 
 COUNTS
 ------
 
-- Lucide only - 172
+- Lucide only - 173
 - Lucide shapes plus own parts - 8
 - Own drawing only - 43
 - Tabler - 2
@@ -2771,6 +2771,7 @@ ICONS
 - Back (Lucide arrow-left) - ISC and MIT (Feather) - ui/editor/ChromeIcons.kt
 - Gear (Lucide settings) - ISC - ui/editor/ChromeIcons.kt
 - Share (Lucide square-arrow-out-up-right) - ISC - ui/editor/ChromeIcons.kt
+- Fullscreen (Lucide maximize) - ISC - ui/editor/ChromeIcons.kt
 - Trash (Lucide trash-2) - ISC and MIT (Feather) - ui/editor/ChromeIcons.kt
 - More (Lucide + own drawing circle) - ISC and MIT (Feather); own part Apache-2.0 - ui/editor/ChromeIcons.kt
 - Undo (Lucide undo-2) - ISC - ui/editor/ChromeIcons.kt

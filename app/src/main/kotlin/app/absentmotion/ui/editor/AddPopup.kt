@@ -190,7 +190,10 @@ private fun TemplatePage(state: EditorState, modifier: Modifier) {
     }
     if (all) Dialog({ all = false }, DialogProperties(usePlatformDefaultWidth = false)) {
         Column(Modifier.fillMaxSize().background(Am.Panel).systemBarsPadding().padding(8.dp)) {
-            LazyVerticalGrid(GridCells.Fixed(3), Modifier.weight(1f)) {
+            if (saved.isEmpty()) Column(Modifier.weight(1f).fillMaxWidth().padding(horizontal = 32.dp), Arrangement.Center, Alignment.CenterHorizontally) {
+                Text(stringResource(R.string.templates_nothing_here), color = Am.OnDark, fontSize = 20.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+                Text(stringResource(R.string.templates_nothing_here_hint), Modifier.padding(top = 8.dp), color = Am.OnDarkDim, fontSize = 15.sp, lineHeight = 20.sp, textAlign = TextAlign.Center)
+            } else LazyVerticalGrid(GridCells.Fixed(3), Modifier.weight(1f)) {
                 items(saved, key = { it.id }) { t -> TemplateCell(t, Modifier.fillMaxWidth().height(140.dp)) { open(t) } }
             }
             Box(Modifier.fillMaxWidth().height(48.dp).tutorialGuard().clickable { all = false }, Alignment.Center) { Text(stringResource(R.string.action_close), color = Am.Accent, fontSize = 18.sp) }

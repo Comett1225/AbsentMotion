@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="ja" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>写真、動画、速度 | AbsentMotion</title><meta name="description" content="写真や動画を追加して速度を変えたり、スピードランプやフリーズフレームを作ったり、大きな動画を滑らかに保つ方法をまとめました。"><meta name="color-scheme" content="light dark"><link rel="stylesheet" href="../assets/site.css"></head><body class="app" data-page="guide"><header class="top appbar"><nav class="main" aria-label="ヘルプ"><a href="index.html">目次</a><a href="effects/index.html">エフェクト</a></nav></header><div class="wrap"><main id="main"><h1>写真、動画、速度</h1><p class="lead">写真や動画を追加して速度を変えたり、スピードランプやフリーズフレームを作ったり、大きな動画を滑らかに保つ方法をまとめました。</p><details class="toc"><summary>このページ</summary><ul><li><a href="#add-photos-and-videos">写真と動画を追加する</a></li><li><a href="#speed">速度</a></li><li><a href="#big-videos-and-the-preview">大きな動画とプレビュー</a></li><li><a href="#take-the-sound-out-of-a-video">動画から音声を取り出す</a></li><li><a href="#remove-the-background">背景を削除する</a></li><li><a href="#smooth-a-clip">クリップを滑らかにする</a></li><li><a href="#smoother-motion-when-you-export">書き出し時のより滑らかな動き</a></li></ul></details><h2 id="add-photos-and-videos">写真と動画を追加する</h2>
+<p><a href="add-menu.html">追加メニュー</a>の<strong>メディア</strong>タブを開き、写真か動画をタップします。再生ヘッドの位置に追加され、ファイルの回転を反映したうえでキャンバスに収まるサイズになります。動画の長さはファイルと同じです。同じタブの<strong>カメラ</strong>で新しく撮影することもできます。</p>
+<p>写真と動画は画像の塗りを持つ矩形なので、図形のツールがすべて使えます:<strong>トランスフォーム</strong>、<strong>枠線と影</strong>、<strong>不透明度</strong>、エフェクトなどです。</p>
+<p>デフォルトでは、追加したメディアのコピーがプロジェクト内に保存されます(設定<strong>読み込んだメディアのコピーをプロジェクトに保存する</strong>)。32 MBを超えるファイルは、コピーの作成中に「プロジェクトにコピーしています...」と表示されます。空き容量が足りない場合は、元のファイルをそのまま使い続けます。</p>
+<p>画像をキャンバスに合わせるには、レイヤーメニューを使います:<strong>キャンバスに合わせる</strong>は画像全体を表示し、<strong>キャンバスを埋める</strong>はキャンバスを覆って端を切り取ります。<strong>キャンバスに引き伸ばす</strong>はぴったり合うように歪めます。<a href="layer-menus.html">レイヤーメニューと複数選択</a>も参照してください。</p>
+<h3 id="media-info-and-swapping-a-file">メディア情報とファイルの差し替え</h3>
+<p>レイヤーメニューの<strong>メディア情報</strong>に、ファイル名、縦横のサイズ、フレームレート、長さ、形式、ファイルサイズが表示されます。<strong>メディアファイルを差し替え</strong>をタップすると写真選択画面が開き、そのファイルを使っているプロジェクト内のすべてのレイヤーでファイルが置き換わります。ファイルが見つからなくなったレイヤーを直すにはこの方法を使います。</p>
+<h2 id="speed">速度</h2>
+<p>動画か音声のクリップを選択して<strong>速度</strong>(ツールグリッドの最初の小さなボタン)をタップします。<strong>タイムリマッピング</strong>パネルが開きます。</p>
+<ul><li>上部の4つのボタンは、動画をトリム<strong>せずに</strong>、クリップの開始位置または終了位置を再生ヘッドに設定します。動画の同じ部分が新しい長さに収まるように速度が変わります。内容は、開始を延ばす、開始をトリム、終了をトリム、終了を延ばす、の4つです。</li><li>表示(「1.00x」)と、亀とウサギの間のスライダーで、再生ヘッドでの速度を0.001x〜4xで設定します。スライダーは0.25x、0.5x、0.75x、1x、2x、3xでカチッと止まります。</li><li>速度キーフレームがない場合、スライダーはクリップ全体の速度を1つ設定します。</li><li>キーフレームを追加し、<strong>イージング</strong>を使って時間とともに速度を変えます。これがスピードランプです。</li></ul>
+<h3 id="speed-ramp-presets">スピードランプのプリセット</h3>
+<p>スライダーの下のチップを使うと、クリップ全体にまたがるランプを設定できます。</p>
+<div class="table-wrap"><table><thead><tr><th>プリセット</th><th>内容</th></tr></thead><tbody><tr><td data-label="プリセット"><strong>モンタージュ</strong></td><td data-label="内容">1x、2.5x、0.6x、2.5x、1x</td></tr><tr><td data-label="プリセット"><strong>ヒーロー</strong>と<strong>バレット</strong></td><td data-label="内容">途中でスローになる</td></tr><tr><td data-label="プリセット"><strong>ジャンプカット</strong></td><td data-label="内容">途中で4xまで跳ね上がる</td></tr><tr><td data-label="プリセット"><strong>フラッシュイン</strong></td><td data-label="内容">4xで始まり1xへイージングする</td></tr><tr><td data-label="プリセット"><strong>フラッシュアウト</strong></td><td data-label="内容">4xで終わる</td></tr></tbody></table></div>
+<p><strong>フリーズフレーム</strong>(再生ヘッドがクリップ内にあるとき)は、静止させる<strong>秒</strong>数(0.1〜30)を尋ね、再生ヘッドのフレームを静止させます。<strong>キーフレームを削除</strong>は、確認のうえでクリップを一定の1xに戻します。</p>
+<p>クリップの音声は速度に追従するので、ピッチも変わります。</p>
+<h2 id="big-videos-and-the-preview">大きな動画とプレビュー</h2>
+<p>1920 x 1080より大きい動画や、内部のキーフレームの間隔が2秒を超える動画は、スクラブが遅くなります。AbsentMotionはデフォルトでバックグラウンドで小さなコピーを作成し(バーに沿った細い線が進捗を示します)、プレビューとサムネイルに使います。書き出しでは常に元のファイルを読み込みます。この機能は<a href="settings.html">設定</a>でオフにしたり、コピーを消去したりできます。</p>
+<h2 id="take-the-sound-out-of-a-video">動画から音声を取り出す</h2>
+<p>レイヤーメニューの<strong>音声を抽出</strong>で、動画の音声から音声レイヤーを作成し、動画をミュートします。新しいレイヤーは動画のタイミング、速度、音量、音声エフェクトを引き継ぎます。<a href="audio.html">音声</a>も参照してください。</p>
+<h2 id="remove-the-background">背景を削除する</h2>
+<p><strong>AI</strong>ツールで写真や動画の背景を切り抜いたり、録音のノイズを減らしたりできます。これらはスマートフォン上で動作します。<a href="ai-tools.html">AIツール</a>も参照してください。</p>
+<h2 id="smooth-a-clip">クリップを滑らかにする</h2>
+<p><strong>スムーズ</strong>は動画クリップの<strong>速度</strong>ツールにある最初のボタンです。そのクリップの間のフレームを一度だけ生成してプロジェクトと一緒に保存するので、プレビューとすべての書き出しで滑らかなバージョンが表示されます。スローモーションを滑らかに見せるのに最適な方法です。30 fpsのクリップを半分の速度にすると、各フレームを2回表示する代わりに、実際のフレームの間に新しいフレームが入ります。</p>
+<ol><li>動画クリップを選択して<strong>速度</strong>を開きます。</li><li><strong>スムーズ</strong>をタップし、<strong>フレームブレンディング</strong>、<strong>オプティカルフロー</strong>、<strong>AIスムーズ</strong>から選んでレベル(<strong>低</strong>、<strong>ミディアム</strong>、<strong>高</strong>)を決め、必要に応じて<strong>モーションブラー</strong>もオンにします。AIスムーズは初回にモデルをダウンロードし、このスマートフォンでの所要時間の目安を表示します(<a href="ai-tools.html">AIツール</a>を参照)。</li><li>完了するまで待ちます。いつでもキャンセルでき、その場合は何も変わりません。</li></ol>
+<p>元のクリップは保持されます。クリップには<strong>スムーズ</strong>の行と元に戻すボタンが表示され、元のクリップに戻せます。<strong>元に戻す</strong>も機能します。もう一度スムーズをかけ直すときは、常に元のクリップから始まります。処理されるのはクリップのトリムされた部分だけです。クリップの音声はそのまま残ります。</p>
+<h2 id="smoother-motion-when-you-export">書き出し時のより滑らかな動き</h2>
+<p>動画クリップのフレームレートが書き出し先より低い場合、書き出し画面で動画全体の間のフレームとモーションブラーを追加できます。<a href="export.html">書き出し</a>ページの<strong>フレーム補間</strong>と<strong>モーションブラー</strong>を参照してください。</p><nav class="pager" aria-label="前後のページ"><a rel="prev" href="shapes.html">&larr; 図形、描画、マスク</a><a rel="next" href="camera-3d.html">カメラレイヤーと3D &rarr;</a></nav></main></div></body></html>

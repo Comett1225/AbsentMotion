@@ -187,7 +187,7 @@ fun shareExport(context: Context, result: app.absentmotion.export.ExportResult) 
     }
 }
 @androidx.compose.runtime.Composable
-fun ExportMediaPreview(kind: app.absentmotion.export.ExportKind, uris: List<Uri>) = app.absentmotion.ui.export.ExportMediaPreview(kind, uris)
+fun ExportMediaPreview(kind: app.absentmotion.export.ExportKind, uris: List<Uri>, large: Boolean = false, onTap: (() -> Unit)? = null) = app.absentmotion.ui.export.ExportMediaPreview(kind, uris, large, onTap)
 
 fun effectsMessageOnHome() = false
 

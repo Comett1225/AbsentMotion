@@ -52,6 +52,9 @@ import app.absentmotion.editor.EffectClipboard
 import app.absentmotion.editor.pasteEffectsOnChosen
 import app.absentmotion.editor.MultiSelect
 import app.absentmotion.editor.StylePart
+import app.absentmotion.editor.copiedLayerForStyle
+import app.absentmotion.editor.pasteStyleOnChosen
+import app.absentmotion.editor.removeAudioOfChosen
 import app.absentmotion.editor.addCamera
 import app.absentmotion.editor.addEmptyGroup
 import app.absentmotion.editor.addModel
@@ -252,9 +255,38 @@ internal fun MultiBar(state: EditorState, modifier: Modifier) {
                 MenuPopup(AboveLeft, { effectsMenu = false }, TransformOrigin(0f, 1f)) {
                     val note = if (copied.isEmpty()) stringResource(R.string.effects_none_copied)
                         else pluralStringResource(R.plurals.effects_count, copied.size, copied.size.toString())
+                    MenuRow(stringResource(R.string.effects_add_to_all)) {
+                        effectsMenu = false
+                        state.playing = false
+                        state.effectCategory = null
+                        state.effectTargets = layers.map { it.id }.toSet()
+                        state.effectBrowserOpen = true
+                    }
                     MenuRow(stringResource(R.string.effects_paste_all), enabled = copied.isNotEmpty(), subText = note) {
                         effectsMenu = false
                         pasteEffectsOnSelection(state, context)
+                    }
+                }
+            }
+        }
+        var moreMenu by remember { mutableStateOf(false) }
+        Box(Modifier.width(48.dp).fillMaxHeight()) {
+            BarButton(PanelIcons.More, stringResource(R.string.structure_more_actions), Modifier.fillMaxSize(), layers.isNotEmpty()) { moreMenu = true }
+            Presence(moreMenu) {
+                MenuPopup(AboveLeft, { moreMenu = false }, TransformOrigin(0f, 1f)) {
+                    val style = copiedLayerForStyle != null
+                    for (part in StylePart.entries) MenuRow(stringResource(PasteLabels.getValue(part)), enabled = style) {
+                        moreMenu = false
+                        styleToast(context, state.pasteStyleOnChosen(setOf(part)))
+                    }
+                    MenuRow(stringResource(R.string.structure_paste_style), enabled = style) {
+                        moreMenu = false
+                        styleToast(context, state.pasteStyleOnChosen(StylePart.entries.toSet()))
+                    }
+                    MenuRow(stringResource(R.string.structure_remove_audio_all), enabled = layers.any { it.mediaFill?.video == true }) {
+                        moreMenu = false
+                        val n = state.removeAudioOfChosen()
+                        Toast.makeText(context, context.resources.getQuantityString(R.plurals.structure_audio_removed, n, n.toString()), Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -325,6 +357,10 @@ internal fun MultiTopBar(state: EditorState, modifier: Modifier) {
             SelectionButton(SelectionIcons.DistributeHorizontal, stringResource(R.string.structure_distribute_horizontal), cell, tint, ids.size > 2) { scope.launch { state.distributeSelection(true) } }
         }
     }
+}
+
+private fun styleToast(context: Context, n: Int) {
+    Toast.makeText(context, context.resources.getQuantityString(R.plurals.structure_style_pasted, n, n.toString()), Toast.LENGTH_SHORT).show()
 }
 
 private fun pasteEffectsOnSelection(state: EditorState, context: Context) {

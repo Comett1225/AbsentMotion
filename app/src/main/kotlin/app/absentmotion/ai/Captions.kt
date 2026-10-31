@@ -232,6 +232,71 @@ internal suspend fun speechChunks(mix: AudioMix, startMs: Int, endMs: Int, progr
     if (held > 0) sink(chunk, held)
 }
 
+internal data class RawWord(val text: String, val t0: Int, val t1: Int, val dtw: Int)
+
+internal data class SpeechEdges(val onsets: List<Int>, val offsets: List<Int>)
+
+internal fun speechEdges(pcm: FloatArray, rate: Int, frameMs: Int = 10, pauseMs: Int = 250): SpeechEdges {
+    val frame = (rate * frameMs / 1000).coerceAtLeast(1)
+    val levels = FloatArray(pcm.size / frame) { f ->
+        var sum = 0.0
+        for (i in f * frame until (f + 1) * frame) sum += pcm[i] * pcm[i]
+        kotlin.math.sqrt(sum / frame).toFloat()
+    }
+    if (levels.isEmpty()) return SpeechEdges(emptyList(), emptyList())
+    val loud = levels.sorted()[(levels.size * 0.95).toInt().coerceAtMost(levels.size - 1)]
+    if (loud <= 1e-4f) return SpeechEdges(emptyList(), emptyList())
+    val quiet = loud * 0.08f
+    val needed = pauseMs / frameMs
+    val onsets = ArrayList<Int>()
+    val offsets = ArrayList<Int>()
+    var silent = needed
+    var lastLoud = -1
+    for ((f, level) in levels.withIndex()) {
+        if (level < quiet) {
+            silent++
+            if (silent == needed && lastLoud >= 0) offsets += (lastLoud + 1) * frameMs
+        } else {
+            if (silent >= needed) onsets += f * frameMs
+            silent = 0
+            lastLoud = f
+        }
+    }
+    return SpeechEdges(onsets, offsets)
+}
+
+internal fun alignWords(raw: List<RawWord>, edges: SpeechEdges): List<Word> {
+    if (raw.isEmpty()) return emptyList()
+    val starts = IntArray(raw.size) { i -> raw[i].let { if (it.dtw >= 0) maxOf(0, it.dtw - DTW_LEAD_MS) else it.t0 } }
+    for (i in 1 until starts.size) starts[i] = maxOf(starts[i], starts[i - 1] + MIN_WORD_GAP_MS)
+    for (onset in edges.onsets) {
+        val quietFrom = edges.offsets.lastOrNull { it < onset } ?: Int.MIN_VALUE
+        val best = starts.indices.filter { starts[it] in maxOf(onset - SNAP_BEFORE_MS, quietFrom)..onset + SNAP_AFTER_MS }
+            .minByOrNull { kotlin.math.abs(starts[it] - onset - SNAP_CENTER_MS) } ?: continue
+        val after = if (best > 0) starts[best - 1] + MIN_WORD_GAP_MS else 0
+        val before = if (best < starts.lastIndex) starts[best + 1] - MIN_WORD_GAP_MS else Int.MAX_VALUE
+        if (onset in after..before) starts[best] = onset
+    }
+    return raw.indices.map { i ->
+        val start = starts[i]
+        val next = starts.getOrNull(i + 1)
+        val pause = edges.offsets.firstOrNull { it > start && (next == null || it <= next) }
+        val end = when {
+            pause != null -> pause
+            next != null -> next
+            else -> start + maxOf(LAST_WORD_MS, raw[i].t1 - raw[i].t0)
+        }
+        Word(raw[i].text, start, maxOf(end, start + 1))
+    }
+}
+
+private const val DTW_LEAD_MS = 180
+private const val MIN_WORD_GAP_MS = 40
+private const val SNAP_BEFORE_MS = 300
+private const val SNAP_AFTER_MS = 750
+private const val SNAP_CENTER_MS = 30
+private const val LAST_WORD_MS = 300
+
 internal object Whisper {
     init { loadCaptionLibrary() }
     private external fun nativeOpen(path: String): Long
@@ -246,11 +311,12 @@ internal object Whisper {
             val stop = launch(start = CoroutineStart.UNDISPATCHED) { try { awaitCancellation() } finally { nativeCancel(handle) } }
             val text = try { nativeRun(handle, pcm, english) { progress(it) } } finally { withContext(NonCancellable) { stop.cancelAndJoin() } }
             ensureActive()
-            checkNotNull(text) { AppText.get(R.string.ai_speech_failed) }.toString(Charsets.UTF_8).lineSequence().mapNotNull { line ->
-                val parts = line.split('\t', limit = 3)
-                val word = parts.getOrNull(2)?.trim().orEmpty()
-                if (word.isEmpty()) null else Word(word, parts[0].toInt(), parts[1].toInt())
+            val raw = checkNotNull(text) { AppText.get(R.string.ai_speech_failed) }.toString(Charsets.UTF_8).lineSequence().mapNotNull { line ->
+                val parts = line.split('\t', limit = 4)
+                val word = parts.getOrNull(3)?.trim().orEmpty()
+                if (word.isEmpty()) null else RawWord(word, parts[0].toInt(), parts[1].toInt(), parts[2].toLongOrNull()?.toInt() ?: -1)
             }.toList()
+            alignWords(raw, speechEdges(pcm, SPEECH_RATE))
         } finally {
             nativeClose(handle)
         }

@@ -33,6 +33,9 @@ Java_app_absentmotion_ai_Whisper_nativeOpen(JNIEnv *env, jobject, jstring path) 
     const char *chars = path ? env->GetStringUTFChars(path, nullptr) : nullptr;
     if (!chars) return 0;
     whisper_context_params params = whisper_context_default_params();
+    params.flash_attn = false;
+    params.dtw_token_timestamps = true;
+    params.dtw_aheads_preset = WHISPER_AHEADS_BASE;
 #ifdef __APPLE__
     params.use_gpu = true;
 #else
@@ -94,9 +97,16 @@ Java_app_absentmotion_ai_Whisper_nativeRun(JNIEnv *env, jobject, jlong handle, j
         std::vector<float> samples(env->GetArrayLength(pcm));
         env->GetFloatArrayRegion(pcm, 0, static_cast<jsize>(samples.size()), samples.data());
         if (whisper_full(j->ctx, p, samples.data(), static_cast<int>(samples.size())) != 0 || j->cancel) return nullptr;
+        const whisper_token eot = whisper_token_eot(j->ctx);
         for (int i = 0, n = whisper_full_n_segments(j->ctx); i < n; i++) {
+            int64_t dtw = -1;
+            for (int k = 0, m = whisper_full_n_tokens(j->ctx, i); k < m; k++) {
+                const whisper_token_data token = whisper_full_get_token_data(j->ctx, i, k);
+                if (token.id < eot && token.t_dtw >= 0) { dtw = token.t_dtw * 10; break; }
+            }
             out += std::to_string(whisper_full_get_segment_t0(j->ctx, i) * 10) + '\t' +
                    std::to_string(whisper_full_get_segment_t1(j->ctx, i) * 10) + '\t' +
+                   std::to_string(dtw) + '\t' +
                    whisper_full_get_segment_text(j->ctx, i) + '\n';
         }
     } catch (const std::exception &) {

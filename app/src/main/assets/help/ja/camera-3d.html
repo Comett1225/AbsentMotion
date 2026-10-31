@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="ja" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>カメラレイヤーと3D | AbsentMotion</title><meta name="description" content="レイヤーの中をバーチャルカメラで飛び回り、レイヤーを3Dで傾け、3Dモデルを追加できます。"><meta name="color-scheme" content="light dark"><link rel="stylesheet" href="../assets/site.css"></head><body class="app" data-page="guide"><header class="top appbar"><nav class="main" aria-label="ヘルプ"><a href="index.html">目次</a><a href="effects/index.html">エフェクト</a></nav></header><div class="wrap"><main id="main"><h1>カメラレイヤーと3D</h1><p class="lead">レイヤーの中をバーチャルカメラで飛び回り、レイヤーを3Dで傾け、3Dモデルを追加できます。</p><details class="toc"><summary>このページ</summary><ul><li><a href="#camera-layers">カメラレイヤー</a></li><li><a href="#tilt-a-layer-in-3d">レイヤーを3Dで傾ける</a></li><li><a href="#3d-effects">3Dエフェクト</a></li><li><a href="#3d-models">3Dモデル</a></li></ul></details><h2 id="camera-layers">カメラレイヤー</h2>
+<p><strong>カメラレイヤー</strong>を使うとプロジェクトが3次元になります。レイヤーには奥行き（Z）があり、カメラが何を見せるかを決めます。<strong>追加</strong>、<strong>オブジェクト／アセット</strong>、<strong>カメラ</strong>から追加します。プロジェクト全体にわたって存在し、画角60度のパースペクティブを使い、フォーカスぼかしとフォグはオフになっています。</p>
+<p>初めてカメラを追加すると、「カメラを通して見るには、このパネルを開いてカメラビューをオンにしてください」というヒントが表示されます。<strong>カメラビュー</strong>ボタンはプレビューストリップにあります（<a href="editor.html">エディター画面</a>を参照）。これをオンにすると、カメラを通してプロジェクトが見えます。オフのときは、カメラはプレビュー内に暗い長方形の枠として表示されます。</p>
+<p>カメラが複数ある場合は、再生ヘッドの位置で有効な中で一番上のカメラが使われます。</p>
+<h3 id="moving-the-camera">カメラを移動する</h3>
+<p>カメラレイヤーを選択します。プレビューでドラッグしてパンし、ピンチで画角を変更します。<strong>トランスフォーム</strong>には<strong>移動</strong>、<strong>サイズ</strong>、<strong>回転</strong>があり、<strong>サイズ</strong>で画角が変わります。</p>
+<h3 id="camera-options">カメラオプション</h3>
+<p>3つのタブがあります。</p>
+<ul><li><strong>カメラビュー</strong>。ビューコーンの図、<strong>パースペクティブ</strong>と<strong>正投影</strong>のボタン、<strong>画角</strong>（0.1〜179.9度）、画角に連動する<strong>ズーム</strong>があります。</li><li><strong>フォーカスぼかし</strong>。スイッチ、<strong>フォーカス距離</strong>（フォーカス面は「Z ... の位置」と表示）、<strong>被写界深度</strong>、<strong>ぼかしの強さ</strong>があります。</li><li><strong>フォグ</strong>。スイッチ、<strong>色</strong>、<strong>近距離</strong>と<strong>遠距離</strong>があります。</li></ul>
+<p>各行はキーフレームボタンでアニメーションできます。</p>
+<h3 id="camera-moves">カメラモーション</h3>
+<p>ツールグリッドの<strong>カメラモーション</strong>では、すぐに使える動きを追加できます。<strong>プッシュイン</strong>、<strong>プルアウト</strong>、<strong>オービット</strong>、<strong>パン</strong>、<strong>ドリーズーム</strong>、<strong>ハンドヘルド</strong>です。各タイルにはアニメーション付きのプレビューがあります。<strong>長さ</strong>を0.5〜10秒で設定します。モーションは再生ヘッドから始まり、カメラレイヤーが先に終わる場合は短くなります。別のタイルを選ぶか長さを変更すると更新され、結果は編集できる通常のキーフレームになります。</p>
+<h2 id="tilt-a-layer-in-3d">レイヤーを3Dで傾ける</h2>
+<p>どのレイヤーもX軸とY軸を中心に傾けられます。<strong>トランスフォーム</strong>を開き、<strong>傾き</strong>タブを選びます。ここには度単位の<strong>X軸回転</strong>と<strong>Y軸回転</strong>があります。<strong>回転</strong>または<strong>傾き</strong>を開いた状態でプレビュー上をドラッグしても、レイヤーを傾けられます。</p>
+<p>レイヤーが傾いている、傾きにアニメーションがある、3Dモデルである、または3Dエフェクトを持つ場合、<strong>回転</strong>タブは3Dトラックパッド（「ここをドラッグして3Dで回転」）に変わり、<strong>X</strong>、<strong>Y</strong>、<strong>Z軸回転</strong>のボックスがあります。1本指でレイヤーを傾け、2本指でひねります。<strong>その他</strong>メニューの<strong>3D回転をリセット</strong>で元に戻ります。</p>
+<h2 id="3d-effects">3Dエフェクト</h2>
+<p><strong>3D</strong>カテゴリのエフェクトはレイヤーを立体に変えます。キューブ、ボックス、中空ボックス、シリンダー、エリプソイド、トーラス、ピラミッド、八面体、六角柱、スタープリズム、星形多面体、ハート、3軸クロス、ラスター押し出し、レイヤー反転、球面化、トンネルがあります。これらがある場合、回転と傾きのコントロールはそのエフェクトの回転を変更します。<a href="effects/index.html">エフェクトライブラリ</a>をご覧ください。</p>
+<h2 id="3d-models">3Dモデル</h2>
+<p><strong>追加</strong>、<strong>オブジェクト／アセット</strong>、<strong>3Dモデル</strong>で<code>.obj</code>、<code>.glb</code>、<code>.gltf</code>ファイルを読み込みます。モデルにマテリアルと画像ファイルがある場合は、モデルと一緒に選択します。ファイルは合計256 MBまでで、三角形が50,000を超えるモデルは簡略化された形で表示されます（アプリが通知します）。</p>
+<p><strong>モデルオプション</strong>には<strong>サイズ</strong>、<strong>自動回転</strong>、<strong>ライトの角度</strong>、<strong>環境光</strong>、<strong>光の強さ</strong>があり、すべてアニメーションできます。モデルには<strong>トランスフォーム</strong>（3D回転を含む）、<strong>不透明度</strong>、<strong>エフェクト</strong>、<strong>プリセット</strong>もあります。</p><nav class="pager" aria-label="前後のページ"><a rel="prev" href="media.html">&larr; 写真、動画、速度</a><a rel="next" href="tracking.html">モーショントラッキング &rarr;</a></nav></main></div></body></html>

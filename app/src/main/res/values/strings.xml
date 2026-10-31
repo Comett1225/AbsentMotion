@@ -427,6 +427,7 @@
     <string name="compress_result">Result</string>
     <string name="compress_after">After</string>
     <string name="compress_before">Before</string>
+    <string name="compress_full_screen">Full screen</string>
     <string name="compress_saved_to">Saved to %1$s</string>
     <string name="compress_share">Share</string>
     <string name="compress_failed">Could not compress: %1$s</string>
@@ -513,6 +514,8 @@
     <string name="template_my_templates">My Templates</string>
     <string name="template_my_presets">My Presets</string>
     <string name="template_none">No templates</string>
+    <string name="templates_nothing_here">There\'s nothing here</string>
+    <string name="templates_nothing_here_hint">Projects you save as templates show up here.</string>
     <string name="template_no_presets">No presets</string>
     <string name="template_delete_template">Delete this template?</string>
     <string name="template_delete_all_presets">Delete all presets?</string>
@@ -1258,6 +1261,9 @@
     <string name="effects_paste_effect">Paste Effect</string>
     <string name="effects_paste_effects">Paste Effects</string>
     <string name="effects_paste_all">Paste All Effects</string>
+    <string name="effects_add_to_all">Add an effect to all</string>
+    <string name="structure_more_actions">More actions</string>
+    <string name="structure_remove_audio_all">Remove audio from all</string>
     <string name="effects_none_copied">Copy effects in a clip\'s Effects panel first</string>
     <string name="effects_more">More</string>
     <string name="effects_effect_info">Effect Info</string>
@@ -1790,6 +1796,15 @@
     <string name="transition_cross_dissolve">Cross dissolve</string>
     <string name="transition_dip_black">Dip to black</string>
     <string name="transition_dip_white">Dip to white</string>
+    <string name="transition_wipe_right">Wipe right</string>
+    <string name="transition_wipe_left">Wipe left</string>
+    <string name="transition_wipe_up">Wipe up</string>
+    <string name="transition_wipe_down">Wipe down</string>
+    <string name="transition_clock_wipe">Clock wipe</string>
+    <string name="transition_glow">Glow</string>
+    <string name="transition_swirl">Swirl</string>
+    <string name="transition_pixelate">Pixelate</string>
+    <string name="transition_noise_dissolve">Noise dissolve</string>
     <string name="transition_push_left">Push left</string>
     <string name="transition_push_right">Push right</string>
     <string name="transition_push_up">Push up</string>
@@ -1926,4 +1941,12 @@
         <item quantity="other">%1$s colors</item>
     </plurals>
     <string name="effect_palette_unreadable">No colors could be read from this file.</string>
+    <plurals name="structure_audio_removed">
+        <item quantity="one">Removed the sound from %1$s clip</item>
+        <item quantity="other">Removed the sound from %1$s clips</item>
+    </plurals>
+    <plurals name="structure_style_pasted">
+        <item quantity="one">Pasted onto %1$s layer</item>
+        <item quantity="other">Pasted onto %1$s layers</item>
+    </plurals>
 </resources>

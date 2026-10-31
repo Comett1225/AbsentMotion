@@ -24,6 +24,7 @@ import app.absentmotion.model.Easing
 import app.absentmotion.model.MediaDeclaration
 import app.absentmotion.model.KeyScope
 import app.absentmotion.model.Layer
+import app.absentmotion.model.addEffect
 import app.absentmotion.model.PropRef
 import app.absentmotion.model.mediaUris
 import app.absentmotion.model.withEffect
@@ -233,6 +234,25 @@ object EffectClipboard {
     }
 
     fun copyOne(effect: XmlNode) { effects = listOf(effect) }
+}
+
+fun EditorState.addEffectToChosen(ids: Set<Long>, make: (Layer) -> XmlNode): Int {
+    val targets = scene.effectTargets(ids)
+    if (targets.isNotEmpty()) edit { s -> targets.fold(s) { acc, target -> acc.update(target.id) { it.addEffect(make(it)) } } }
+    return targets.size
+}
+
+fun EditorState.removeAudioOfChosen(): Int {
+    val ids = chosenLayers.filter { it.mediaFill?.video == true }.map { it.id }
+    if (ids.isNotEmpty()) edit { s -> ids.fold(s) { acc, id -> acc.update(id) { it.copy(node = it.node.withChild("gain", XmlNode("gain", mapOf("value" to formatFloats(floatArrayOf(0f)))))) } } }
+    return ids.size
+}
+
+fun EditorState.pasteStyleOnChosen(parts: Set<StylePart>): Int {
+    val from = copiedLayerForStyle ?: return 0
+    val ids = chosenLayers.map { it.id }
+    if (ids.isNotEmpty()) edit { s -> ids.fold(s) { acc, id -> acc.withPastedStyle(id, sampleMs, from, copiedMediaForStyle, parts) } }
+    return ids.size
 }
 
 fun EditorState.pasteEffectsOnChosen(): Pair<Int, Int> {

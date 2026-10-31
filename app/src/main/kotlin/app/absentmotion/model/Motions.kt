@@ -54,6 +54,7 @@ private val Drop = Look("location") { r, _, h, _ -> r.copyOf().also { it[1] -= 0
 private fun number(v: Float) = formatFloats(floatArrayOf(v))
 private fun overlay(color: String) = Fx("absent.solid", mapOf("amount" to (0f to 1f)), mapOf("color" to color, "blend" to number(0f)))
 private val BlurFx = Fx("absent.blur", mapOf("strength" to (0f to 60f)))
+private val ZoomBlurFx = Fx("absent.radialblur", mapOf("amount" to (0f to 0.3f)))
 
 object Animations {
     val InOut: List<Motion> = listOf(
@@ -95,10 +96,14 @@ enum class TransitionKind(val id: String, @StringRes val label: Int, val overlap
     SlideUp("slide-up", R.string.motion_slide_up, true, Dir.Up), SlideDown("slide-down", R.string.motion_slide_down, true, Dir.Down),
     PushLeft("push-left", R.string.transition_push_left, true, Dir.Left), PushRight("push-right", R.string.transition_push_right, true, Dir.Right),
     PushUp("push-up", R.string.transition_push_up, true, Dir.Up), PushDown("push-down", R.string.transition_push_down, true, Dir.Down),
+    WipeRight("wipe-right", R.string.transition_wipe_right, true, Dir.Right), WipeLeft("wipe-left", R.string.transition_wipe_left, true, Dir.Left),
+    WipeUp("wipe-up", R.string.transition_wipe_up, true, Dir.Up), WipeDown("wipe-down", R.string.transition_wipe_down, true, Dir.Down),
+    ClockWipe("clock-wipe", R.string.transition_clock_wipe, true),
     ZoomIn("zoom-in", R.string.motion_zoom_in, true), ZoomOut("zoom-out", R.string.motion_zoom_out, true), Spin("spin", R.string.motion_spin, true),
-    Blur("blur", R.string.motion_blur, true),
+    Blur("blur", R.string.motion_blur, true), Glow("glow", R.string.transition_glow, true), Swirl("swirl", R.string.transition_swirl, false),
     WhipPan("whip-pan", R.string.transition_whip_pan, true), Glitch("glitch", R.string.transition_glitch, false), Flash("flash", R.string.transition_flash, false),
-    Shake("shake", R.string.transition_shake, false);
+    Shake("shake", R.string.transition_shake, false), Pixelate("pixelate", R.string.transition_pixelate, false),
+    NoiseDissolve("noise-dissolve", R.string.transition_noise_dissolve, true);
 
     fun sides(bOnTop: Boolean, bothFade: Boolean): Pair<Motion, Motion> {
         val fadeA = if (!bOnTop || bothFade) listOf(Fade) else emptyList()
@@ -111,10 +116,28 @@ enum class TransitionKind(val id: String, @StringRes val label: Int, val overlap
             DipWhite -> pair(EaseInOut, emptyList(), fx = listOf(overlay(formatColor(0xFFFFFFFF.toInt()))))
             SlideLeft, SlideRight, SlideUp, SlideDown ->
                 if (bOnTop) pair(EaseInOut, emptyList(), listOf(slide(dir))) else pair(EaseInOut, listOf(slide(dir)), emptyList())
-            PushLeft, PushRight, PushUp, PushDown -> pair(EaseInOut, listOf(slide(dir)))
-            ZoomIn -> pair(EaseInOut, listOf(scaled(0.5f, 2f)) + fadeA, listOf(scaled(0.5f, 2f)) + fadeB)
-            ZoomOut -> pair(EaseInOut, listOf(scaled(2f, 0.5f)) + fadeA, listOf(scaled(2f, 0.5f)) + fadeB)
-            Spin -> pair(EaseInOut, listOf(turn(180f), scaled(0.5f, 0.5f)) + fadeA, listOf(turn(180f), scaled(0.5f, 0.5f)) + fadeB)
+            PushLeft, PushRight, PushUp, PushDown -> pair(EaseInOut, listOf(slide(dir)),
+                fx = listOf(Fx("absent.directionalblur", mapOf("blurLength" to (0f to 60f)), mapOf("angle" to number(if (dir.x != 0f) 0f else 90f)))))
+            ZoomIn -> pair(EaseInOut, listOf(scaled(0.5f, 2f)) + fadeA, listOf(scaled(0.5f, 2f)) + fadeB, listOf(ZoomBlurFx))
+            ZoomOut -> pair(EaseInOut, listOf(scaled(2f, 0.5f)) + fadeA, listOf(scaled(2f, 0.5f)) + fadeB, listOf(ZoomBlurFx))
+            Spin -> pair(EaseInOut, listOf(turn(180f), scaled(0.5f, 0.5f)) + fadeA, listOf(turn(180f), scaled(0.5f, 0.5f)) + fadeB,
+                listOf(Fx("absent.spinblur", mapOf("sweep" to (0f to 25f)))))
+            WipeRight, WipeLeft, WipeUp, WipeDown -> {
+                fun wipe(angle: Float) = Fx("absent.wipe", mapOf("start" to (0f to 1f)), mapOf("angle" to number(angle), "feather" to number(30f)))
+                topOnly(bOnTop, wipe(wipeAngle(dir)), wipe((wipeAngle(dir) + 180f) % 360f))
+            }
+            ClockWipe -> {
+                fun clock(direction: Float) = Fx("absent.radialwipe", mapOf("progress" to (0f to 360f)),
+                    mapOf("direction" to number(direction), "start" to number(0f), "count" to number(1f), "feather" to number(3f)))
+                topOnly(bOnTop, clock(0f), clock(1f))
+            }
+            NoiseDissolve -> {
+                val dissolve = Fx("absent.dissolve", mapOf("progress" to (0f to 1f)), mapOf("grain" to number(4f), "seed" to number(1f)))
+                topOnly(bOnTop, dissolve, dissolve)
+            }
+            Glow -> pair(EaseInOut, fadeA, fadeB, listOf(Fx("absent.lightglow", mapOf("intensity" to (0f to 6f)), mapOf("threshold" to number(0.25f), "blur" to number(120f)))))
+            Swirl -> pair(EaseInOut, emptyList(), fx = listOf(Fx("absent.twirl", mapOf("strength" to (0f to 0.5f)), mapOf("radius" to number(1.5f)))))
+            Pixelate -> pair(EaseInOut, emptyList(), fx = listOf(Fx("absent.pixelate", mapOf("blockSize" to (1f to 60f)))))
             Blur -> pair(EaseInOut, fadeA, fadeB, listOf(BlurFx))
             WhipPan -> pair(Whip, listOf(slide(dir)), fx = listOf(Fx("absent.smear", mapOf("length" to (0f to 300f)), mapOf("angle" to number(0f)))))
             Glitch -> pair(EaseOut, emptyList(), fx = listOf(Fx("absent.glitch", mapOf("intensity" to (0f to 1f))), Fx("absent.rgbsplit", mapOf("strength" to (0f to 0.3f)))))
@@ -123,10 +146,16 @@ enum class TransitionKind(val id: String, @StringRes val label: Int, val overlap
         }
     }
 
+    private fun topOnly(bOnTop: Boolean, out: Fx, into: Fx): Pair<Motion, Motion> =
+        if (bOnTop) Motion(id, label, EaseInOut) to Motion(id, label, EaseInOut, fx = listOf(into))
+        else Motion(id, label, EaseInOut, fx = listOf(out)) to Motion(id, label, EaseInOut)
+
     companion object {
         fun of(id: String?): TransitionKind? = entries.firstOrNull { it.id == id }
     }
 }
+
+internal fun wipeAngle(dir: Dir): Float = when (dir) { Dir.Right -> 0f; Dir.Down -> 90f; Dir.Left -> 180f; Dir.Up -> 270f }
 
 const val MOTION_MIN_MS = 100
 const val MOTION_MAX_MS = 2000

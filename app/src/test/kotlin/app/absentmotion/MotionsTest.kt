@@ -78,7 +78,7 @@ class MotionsTest {
             assertEquals(2, keys.size)
             assertEquals(from, layer.ms(keys[0].t), 1.5f)
             assertEquals(to, layer.ms(keys[1].t), 1.5f)
-            assertEquals(0f, (if (inSide) keys[1] else keys[0]).v.toFloat(), 0f)
+            assertEquals(property["name"], if (property["name"] == "blockSize") 1f else 0f, (if (inSide) keys[1] else keys[0]).v.toFloat(), 0f)
             assertEquals(curve, keys[1].e)
         }
     }

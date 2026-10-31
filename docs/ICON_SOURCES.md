@@ -27,7 +27,7 @@ The launcher icon is an own drawing, made by `tools/icon/make_icon.py` (source o
 
 | Source | Icons |
 | --- | --- |
-| Lucide only | 172 |
+| Lucide only | 173 |
 | Lucide shapes plus own parts | 8 |
 | Own drawing only | 43 |
 | Tabler | 2 |
@@ -51,6 +51,7 @@ The launcher icon is an own drawing, made by `tools/icon/make_icon.py` (source o
 | `ui/editor/ChromeIcons.kt` | `Back` | Lucide | `arrow-left` | ISC and MIT (Feather) | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/arrow-left.svg | - |
 | `ui/editor/ChromeIcons.kt` | `Gear` | Lucide | `settings` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/settings.svg | - |
 | `ui/editor/ChromeIcons.kt` | `Share` | Lucide | `square-arrow-out-up-right` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/square-arrow-out-up-right.svg | - |
+| `ui/editor/ChromeIcons.kt` | `Fullscreen` | Lucide | `maximize` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/maximize.svg | full-screen button of the Compress result |
 | `ui/editor/ChromeIcons.kt` | `Trash` | Lucide | `trash-2` | ISC and MIT (Feather) | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/trash-2.svg | - |
 | `ui/editor/ChromeIcons.kt` | `More` | Lucide + own drawing | `circle` | ISC and MIT (Feather); own part Apache-2.0 | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/circle.svg | three dots |
 | `ui/editor/ChromeIcons.kt` | `Undo` | Lucide | `undo-2` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/undo-2.svg | - |

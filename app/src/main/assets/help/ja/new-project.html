@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="ja" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>プロジェクトの作成 | AbsentMotion</title><meta name="description" content="新規プロジェクトシートのすべての設定。"><meta name="color-scheme" content="light dark"><link rel="stylesheet" href="../assets/site.css"></head><body class="app" data-page="guide"><header class="top appbar"><nav class="main" aria-label="ヘルプ"><a href="index.html">目次</a><a href="effects/index.html">エフェクト</a></nav></header><div class="wrap"><main id="main"><h1>プロジェクトの作成</h1><p class="lead">新規プロジェクトシートのすべての設定。</p><details class="toc"><summary>このページ</summary><ul><li><a href="#project-or-asset">プロジェクトまたはアセット</a></li><li><a href="#name">名前</a></li><li><a href="#shape-of-the-picture-aspect-ratio">画面の形状（アスペクト比）</a></li><li><a href="#resolution">解像度</a></li><li><a href="#frame-rate">フレームレート</a></li><li><a href="#background">背景</a></li><li><a href="#buttons-at-the-bottom">下部のボタン</a></li></ul></details><p>ホーム画面の下部にある丸い<strong>+</strong>をタップします。下からシートがせり上がります。前回使った値（形状、解像度、フレームレート、背景。名前は毎回新しくなります）で開きます。何も作成せずに閉じるには、戻るをタップします。</p>
+<h2 id="project-or-asset">プロジェクトまたはアセット</h2>
+<p>上部のスイッチには2つの選択肢があります。<strong>プロジェクト</strong>（デフォルト）と<strong>アセット</strong>です。アセットは透明な背景を持つ再利用可能なパーツです。背景設定は透明に固定されます。<a href="assets-templates.html">アセット、テンプレート、プリセット</a>を参照してください。</p>
+<h2 id="name">名前</h2>
+<p>名前は最初「新規プロジェクト1」「新規プロジェクト2」などのようになります（アセットでは「新規アセット」から始まります）。フィールドのXをタップすると消去できます。名前が空の場合はデフォルトに戻ります。</p>
+<h2 id="shape-of-the-picture-aspect-ratio">画面の形状（アスペクト比）</h2>
+<p><strong>16:9</strong>、<strong>9:16</strong>、<strong>4:5</strong>、<strong>1:1</strong>、<strong>4:3</strong>のボタンと、<strong>カスタムアスペクト比</strong>用の鉛筆ボタンがあります。デフォルトは1:1です。スマートフォンの動画には9:16、横長動画には16:9を選びます。</p>
+<h2 id="resolution">解像度</h2>
+<p><strong>解像度</strong>の行には、1920 x 1080のようなキャンバスサイズが表示されます。5つの形状では、短辺のリストになります。</p>
+<div class="table-wrap"><table><thead><tr><th>選択肢</th><th>短辺</th></tr></thead><tbody><tr><td data-label="選択肢">2160p (4k)</td><td data-label="短辺">2160</td></tr><tr><td data-label="選択肢">1440p (QHD)</td><td data-label="短辺">1440</td></tr><tr><td data-label="選択肢">1080p (FHD)、デフォルト</td><td data-label="短辺">1080</td></tr><tr><td data-label="選択肢">720p (HD)</td><td data-label="短辺">720</td></tr><tr><td data-label="選択肢">540p (SD)、360p、270p、180p</td><td data-label="短辺">名前のとおり</td></tr></tbody></table></div>
+<p>長辺は形状に合わせて決まります。16:9の1080pプロジェクトは1920 x 1080、4:5のプロジェクトは1080 x 1350、4:3のプロジェクトは1440 x 1080になります。</p>
+<p><strong>カスタムアスペクト比</strong>では、リストが幅と高さの2つの数値フィールドに変わり、その間に丸い<strong>リンク</strong>ボタンがあります。リンクがオンのとき、片側を変更しても、リンクをオンにした時点の2つのフィールドの形状が保たれます。各辺は32～4096ピクセルの範囲で設定できます。フィールドから離れると、アプリが値を補正します。</p>
+<p>キャンバスが大きいほどくっきり見えますが、メモリをより多く使い、書き出しに時間がかかります。ほとんどのプロジェクトには1080pがおすすめです。解像度は後からエディターのプロジェクト設定で変更できますが、レイヤーは拡大縮小されません。</p>
+<h2 id="frame-rate">フレームレート</h2>
+<p>12、15、18、20、24、25、30、48、50、60フレーム/秒から選びます。デフォルトは60です。フィルム風の見た目と小さいファイルには24または30、滑らかな速い動きには60を使います。エディターと書き出しがフレームを描画する頻度を設定します。動画クリップはそれぞれのフレームレートを保ちます。フレーム補間オプションは<a href="export.html">書き出し</a>ページを見てください。</p>
+<h2 id="background">背景</h2>
+<p>レイヤーの後ろの色です。<strong>ブラック</strong>、<strong>白</strong>、<strong>ライトグレー</strong>、<strong>緑</strong>、<strong>青</strong>、<strong>透明</strong>（チェッカー模様で表示）から選びます。新規インストール時は透明です。書き出した動画の透明部分は黒になります。GIFと画像の書き出しでは透明部分を何にするか選べますが、PNGでは透明のまま保持されます。</p>
+<h2 id="buttons-at-the-bottom">下部のボタン</h2>
+<ul><li><strong>プロジェクトを作成</strong>（アセットの場合は<strong>アセットを作成</strong>）でプロジェクトを作成し、そのプロジェクトでエディターを開きます。</li><li>その下のXでシートを閉じます。</li></ul>
+<p>ストレージが足りない場合は、その旨が表示され、プロジェクトは作成されません。</p><nav class="pager" aria-label="前後のページ"><a rel="prev" href="home.html">&larr; ホーム画面</a><a rel="next" href="editor.html">エディター画面 &rarr;</a></nav></main></div></body></html>

@@ -108,6 +108,7 @@ class EditorState(
     var effectIndex by mutableIntStateOf(-1)
 
     var effectDetail by mutableStateOf<String?>(null)
+    var effectTargets by mutableStateOf<Set<Long>?>(null)
 
     var addOpen by mutableStateOf(false)
 
