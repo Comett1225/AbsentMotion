@@ -2,6 +2,7 @@
  "categories": {
   "3d": "3D",
   "ai": "AI",
+  "beat": "Ritim",
   "blur": "Bulanıklaştırma",
   "color": "Renk",
   "distort": "Bozulma",
@@ -60,6 +61,267 @@
     },
     "spill": {
      "label": "Efektler Dışarı Taşsın"
+    }
+   }
+  },
+  "beatblur": {
+   "description": "Her vuruşta, vuruş sönerken geçen bir yakınlaştırma bulanıklığı uygular. Önce müzik klibini seç, menüsünden Vuruşları işaretle'ye dokun; vuruş işareti yoksa BPM ayarını izler.",
+   "name": "Vuruş bulanıklığı",
+   "params": {
+    "beats": {
+     "label": "Vuruşlar",
+     "options": [
+      "Her vuruş",
+      "Her 2. vuruş",
+      "Her 4. vuruş"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Sönüm"
+    },
+    "offset": {
+     "label": "Ofset"
+    },
+    "strength": {
+     "label": "Güç"
+    }
+   }
+  },
+  "beatflash": {
+   "description": "Her vuruşta katmanı bir renkle patlatır. Önce müzik klibini seç, menüsünden Vuruşları işaretle'ye dokun; vuruş işareti yoksa BPM ayarını izler.",
+   "name": "Vuruş flaşı",
+   "params": {
+    "beats": {
+     "label": "Vuruşlar",
+     "options": [
+      "Her vuruş",
+      "Her 2. vuruş",
+      "Her 4. vuruş"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "color": {
+     "label": "Renk"
+    },
+    "decay": {
+     "label": "Sönüm"
+    },
+    "offset": {
+     "label": "Ofset"
+    },
+    "strength": {
+     "label": "Güç"
+    }
+   }
+  },
+  "beatglitch": {
+   "description": "Her vuruşta katmanı kaydırılmış dilimlere bölüp renkleri ayrıştırır. Önce müzik klibini seç, menüsünden Vuruşları işaretle'ye dokun; vuruş işareti yoksa BPM ayarını izler.",
+   "name": "Vuruş bozulması",
+   "params": {
+    "beats": {
+     "label": "Vuruşlar",
+     "options": [
+      "Her vuruş",
+      "Her 2. vuruş",
+      "Her 4. vuruş"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Sönüm"
+    },
+    "offset": {
+     "label": "Ofset"
+    },
+    "slices": {
+     "label": "Dilimler"
+    },
+    "strength": {
+     "label": "Güç"
+    }
+   }
+  },
+  "beatglow": {
+   "description": "Her vuruşta katmanın parlak kısımlarını ışıtır. Önce müzik klibini seç, menüsünden Vuruşları işaretle'ye dokun; vuruş işareti yoksa BPM ayarını izler.",
+   "name": "Vuruş parıltısı",
+   "params": {
+    "beats": {
+     "label": "Vuruşlar",
+     "options": [
+      "Her vuruş",
+      "Her 2. vuruş",
+      "Her 4. vuruş"
+     ]
+    },
+    "blur": {
+     "label": "Yarıçap"
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "color": {
+     "label": "Renk"
+    },
+    "decay": {
+     "label": "Sönüm"
+    },
+    "offset": {
+     "label": "Ofset"
+    },
+    "strength": {
+     "label": "Güç"
+    },
+    "threshold": {
+     "label": "Eşik"
+    }
+   }
+  },
+  "beatpulse": {
+   "description": "Her vuruşta katmanı bir pozlama parlaması gibi aydınlatır; negatif güç karartır. Önce müzik klibinizi seçin, menüsünü açın ve Vuruşları işaretle'ye dokunun; vuruş işareti yoksa BPM ayarını izler.",
+   "name": "Ritim Nabzı",
+   "params": {
+    "beats": {
+     "label": "Vuruşlar",
+     "options": [
+      "Her vuruş",
+      "Her 2. vuruş",
+      "Her 4. vuruş"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Sönüm"
+    },
+    "offset": {
+     "label": "Ofset"
+    },
+    "strength": {
+     "label": "Güç"
+    }
+   }
+  },
+  "beatrgbsplit": {
+   "description": "Her vuruşta kırmızı ve mavi kanalları birbirinden ayırır. Önce müzik klibinizi seçin, menüsünü açın ve Vuruşları işaretle'ye dokunun; vuruş işareti yoksa BPM ayarını izler.",
+   "name": "Ritim RGB Ayırma",
+   "params": {
+    "angle": {
+     "label": "Açı"
+    },
+    "beats": {
+     "label": "Vuruşlar",
+     "options": [
+      "Her vuruş",
+      "Her 2. vuruş",
+      "Her 4. vuruş"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Sönüm"
+    },
+    "offset": {
+     "label": "Ofset"
+    },
+    "strength": {
+     "label": "Güç"
+    }
+   }
+  },
+  "beatrotate": {
+   "description": "Her vuruşta katmanı sırayla sola ve sağa yatırır, sonra geri salınır. Önce müzik klibinizi seçin, menüsünü açın ve Vuruşları işaretle'ye dokunun; vuruş işareti yoksa BPM ayarını izler.",
+   "name": "Ritim Döndürme",
+   "params": {
+    "alternate": {
+     "label": "Sırayla"
+    },
+    "beats": {
+     "label": "Vuruşlar",
+     "options": [
+      "Her vuruş",
+      "Her 2. vuruş",
+      "Her 4. vuruş"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "cover": {
+     "label": "Çerçeveyi doldur"
+    },
+    "decay": {
+     "label": "Sönüm"
+    },
+    "offset": {
+     "label": "Ofset"
+    },
+    "strength": {
+     "label": "Güç"
+    }
+   }
+  },
+  "beatshake": {
+   "description": "Her vuruşta katmanı yeni bir yönde sarsar ve bir sonrakinden önce durulur. Önce müzik klibinizi seçin, menüsünü açın ve Vuruşları işaretle'ye dokunun; vuruş işareti yoksa BPM ayarını izler.",
+   "name": "Ritim Sarsıntısı",
+   "params": {
+    "beats": {
+     "label": "Vuruşlar",
+     "options": [
+      "Her vuruş",
+      "Her 2. vuruş",
+      "Her 4. vuruş"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Sönüm"
+    },
+    "frequency": {
+     "label": "Frekans"
+    },
+    "offset": {
+     "label": "Ofset"
+    },
+    "strength": {
+     "label": "Güç"
+    }
+   }
+  },
+  "beatzoom": {
+   "description": "Her vuruşta yakınlaştırır ve yumuşakça geri uzaklaştırır. Önce müzik klibinizi seçin, menüsünü açın ve Vuruşları işaretle'ye dokunun; vuruş işareti yoksa BPM ayarını izler.",
+   "name": "Ritim Yakınlaştırma",
+   "params": {
+    "beats": {
+     "label": "Vuruşlar",
+     "options": [
+      "Her vuruşta",
+      "Her 2. vuruşta",
+      "Her 4. vuruşta"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Sönüm"
+    },
+    "offset": {
+     "label": "Ofset"
+    },
+    "strength": {
+     "label": "Güç"
     }
    }
   },
@@ -3158,6 +3420,196 @@
       "Palet"
      ]
     }
+   }
+  },
+  "particles": {
+   "description": "Katmandan parçacık saçar: kar, kıvılcım, konfeti, baloncuk, toz, kalp, yıldız, taç yaprağı ya da katmanın küçük kopyaları; yerçekimi, rüzgar ve girdap ile hareket eder. Bir ön ayarla başla, ardından yayıcıyı, miktarı ve kuvvetleri değiştir. Vuruşlarda her vuruşta bir patlama gönderir: müziğini seç, menüsünü aç ve önce Vuruşları işaretle'ye dokun.",
+   "name": "Parçacıklar",
+   "params": {
+    "beats": {
+     "label": "Vuruşlar",
+     "options": [
+      "Her vuruşta",
+      "Her 2. vuruşta",
+      "Her 4. vuruşta"
+     ]
+    },
+    "blend": {
+     "label": "Karışım",
+     "options": [
+      "Normal",
+      "Ekle",
+      "Ekran"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "color": {
+     "label": "Renk"
+    },
+    "color2": {
+     "label": "Renk 2"
+    },
+    "colorMode": {
+     "label": "Renk modu",
+     "options": [
+      "Tek renk",
+      "Rastgele karışım",
+      "Ömür boyunca"
+     ]
+    },
+    "colorVariation": {
+     "label": "Renk çeşitliliği"
+    },
+    "count": {
+     "label": "Adet"
+    },
+    "direction": {
+     "label": "Yön"
+    },
+    "drag": {
+     "label": "Hava direnci"
+    },
+    "emission": {
+     "label": "Yayım",
+     "options": [
+      "Sürekli",
+      "Patlama",
+      "Vuruşlarda"
+     ]
+    },
+    "emitter": {
+     "label": "Yayıcı",
+     "options": [
+      "Nokta",
+      "Çizgi",
+      "Alan",
+      "Ana hat"
+     ]
+    },
+    "emitterSize": {
+     "label": "Yayıcı boyutu"
+    },
+    "endSize": {
+     "label": "Bitiş boyutu"
+    },
+    "every": {
+     "label": "Tekrar aralığı"
+    },
+    "fadeIn": {
+     "label": "Belirme"
+    },
+    "fadeOut": {
+     "label": "Sönme"
+    },
+    "gravity": {
+     "label": "Yerçekimi"
+    },
+    "kind": {
+     "label": "Parçacık",
+     "options": [
+      "Kar",
+      "Kıvılcım",
+      "Konfeti",
+      "Baloncuk",
+      "Toz",
+      "Kalpler",
+      "Yıldızlar",
+      "Taç yaprakları",
+      "Katman"
+     ]
+    },
+    "layer": {
+     "label": "Katman",
+     "options": [
+      "Parçacıkların altında",
+      "Parçacıkların üstünde",
+      "Gizli"
+     ]
+    },
+    "lifeVariation": {
+     "label": "Ömür değişimi"
+    },
+    "lifetime": {
+     "label": "Ömür"
+    },
+    "more": {
+     "label": "Diğer ayarlar"
+    },
+    "orientation": {
+     "label": "Yön",
+     "options": [
+      "Serbest",
+      "Hareketi takip et"
+     ]
+    },
+    "position": {
+     "label": "Yayıcı konumu"
+    },
+    "prewarm": {
+     "label": "Dolu başlat"
+    },
+    "randomRotation": {
+     "label": "Rastgele döndürme"
+    },
+    "rate": {
+     "label": "Oran"
+    },
+    "seed": {
+     "label": "Tohum"
+    },
+    "size": {
+     "label": "Boyut"
+    },
+    "sizeVariation": {
+     "label": "Boyut değişimi"
+    },
+    "speed": {
+     "label": "Hız"
+    },
+    "speedVariation": {
+     "label": "Hız değişimi"
+    },
+    "spin": {
+     "label": "Dönüş"
+    },
+    "spinVariation": {
+     "label": "Dönüş çeşitliliği"
+    },
+    "spread": {
+     "label": "Yayılım"
+    },
+    "start": {
+     "label": "Patlama zamanı"
+    },
+    "swirl": {
+     "label": "Girdap"
+    },
+    "swirlSpeed": {
+     "label": "Girdap hızı"
+    },
+    "tint": {
+     "label": "Ton"
+    },
+    "twinkle": {
+     "label": "Pırıldama"
+    },
+    "wind": {
+     "label": "Rüzgar"
+    }
+   },
+   "presets": {
+    "beat-confetti": "Ritim konfeti",
+    "bubbles": "Baloncuklar",
+    "confetti": "Konfeti",
+    "dust": "Toz",
+    "hearts": "Kalpler",
+    "layer-fountain": "Katman fıskiyesi",
+    "petals": "Yapraklar",
+    "snow": "Kar",
+    "sparks": "Kıvılcımlar",
+    "twinkle": "Pırıltı"
    }
   },
   "pixelate": {

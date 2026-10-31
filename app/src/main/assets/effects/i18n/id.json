@@ -2,6 +2,7 @@
  "categories": {
   "3d": "3D",
   "ai": "AI",
+  "beat": "Beat",
   "blur": "Blur",
   "color": "Warna",
   "distort": "Distorsi",
@@ -60,6 +61,267 @@
     },
     "spill": {
      "label": "Efek Menjangkau Keluar"
+    }
+   }
+  },
+  "beatblur": {
+   "description": "Setiap ketukan memicu blur zoom yang mereda seiring ketukan memudar. Pilih klip musik Anda, buka menunya, dan ketuk Tandai Ketukan terlebih dahulu; tanpa tanda ketukan, efek mengikuti pengaturan BPM.",
+   "name": "Blur Ketukan",
+   "params": {
+    "beats": {
+     "label": "Ketukan",
+     "options": [
+      "Setiap Ketukan",
+      "Setiap Ketukan ke-2",
+      "Setiap Ketukan ke-4"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Peredaman"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "strength": {
+     "label": "Kekuatan"
+    }
+   }
+  },
+  "beatflash": {
+   "description": "Membuat lapisan berkedip dengan warna pada setiap ketukan. Pilih klip musik Anda, buka menunya, dan ketuk Tandai Ketukan terlebih dahulu; tanpa tanda ketukan, efek mengikuti pengaturan BPM.",
+   "name": "Kedip Ketukan",
+   "params": {
+    "beats": {
+     "label": "Ketukan",
+     "options": [
+      "Setiap Ketukan",
+      "Setiap Ketukan ke-2",
+      "Setiap Ketukan ke-4"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "color": {
+     "label": "Warna"
+    },
+    "decay": {
+     "label": "Peredaman"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "strength": {
+     "label": "Kekuatan"
+    }
+   }
+  },
+  "beatglitch": {
+   "description": "Memecah lapisan menjadi irisan bergeser dengan warna terpisah pada setiap ketukan. Pilih klip musik Anda, buka menunya, dan ketuk Tandai Ketukan terlebih dahulu; tanpa tanda ketukan, efek mengikuti pengaturan BPM.",
+   "name": "Glitch Ketukan",
+   "params": {
+    "beats": {
+     "label": "Ketukan",
+     "options": [
+      "Setiap Ketukan",
+      "Setiap Ketukan ke-2",
+      "Setiap Ketukan ke-4"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Peredaman"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "slices": {
+     "label": "Irisan"
+    },
+    "strength": {
+     "label": "Kekuatan"
+    }
+   }
+  },
+  "beatglow": {
+   "description": "Membuat bagian terang pada lapisan bersinar pada setiap ketukan. Pilih klip musik Anda, buka menunya, dan ketuk Tandai Ketukan terlebih dahulu; tanpa tanda ketukan, efek mengikuti pengaturan BPM.",
+   "name": "Glow Ketukan",
+   "params": {
+    "beats": {
+     "label": "Ketukan",
+     "options": [
+      "Setiap ketukan",
+      "Setiap ketukan ke-2",
+      "Setiap ketukan ke-4"
+     ]
+    },
+    "blur": {
+     "label": "Radius"
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "color": {
+     "label": "Warna"
+    },
+    "decay": {
+     "label": "Peluruhan"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "strength": {
+     "label": "Kekuatan"
+    },
+    "threshold": {
+     "label": "Ambang"
+    }
+   }
+  },
+  "beatpulse": {
+   "description": "Mencerahkan lapisan pada setiap ketukan seperti kilatan eksposur; kekuatan negatif membuatnya lebih gelap. Pilih klip musik Anda, buka menunya, lalu ketuk Tandai Ketukan terlebih dahulu; tanpa tanda ketukan, efek mengikuti pengaturan BPM.",
+   "name": "Denyut Ketukan",
+   "params": {
+    "beats": {
+     "label": "Ketukan",
+     "options": [
+      "Setiap ketukan",
+      "Setiap ketukan ke-2",
+      "Setiap ketukan ke-4"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Peluruhan"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "strength": {
+     "label": "Kekuatan"
+    }
+   }
+  },
+  "beatrgbsplit": {
+   "description": "Memisahkan kanal merah dan biru pada setiap ketukan. Pilih klip musik Anda, buka menunya, lalu ketuk Tandai Ketukan terlebih dahulu; tanpa tanda ketukan, efek mengikuti pengaturan BPM.",
+   "name": "Pisah RGB Ketukan",
+   "params": {
+    "angle": {
+     "label": "Sudut"
+    },
+    "beats": {
+     "label": "Ketukan",
+     "options": [
+      "Setiap ketukan",
+      "Setiap ketukan ke-2",
+      "Setiap ketukan ke-4"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Peluruhan"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "strength": {
+     "label": "Kekuatan"
+    }
+   }
+  },
+  "beatrotate": {
+   "description": "Memiringkan lapisan pada setiap ketukan, bergantian ke kiri dan ke kanan, lalu kembali. Pilih klip musik Anda, buka menunya, lalu ketuk Tandai Ketukan terlebih dahulu; tanpa tanda ketukan, efek mengikuti pengaturan BPM.",
+   "name": "Putar Ketukan",
+   "params": {
+    "alternate": {
+     "label": "Bergantian"
+    },
+    "beats": {
+     "label": "Ketukan",
+     "options": [
+      "Setiap ketukan",
+      "Setiap ketukan ke-2",
+      "Setiap ketukan ke-4"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "cover": {
+     "label": "Isi Bingkai"
+    },
+    "decay": {
+     "label": "Peluruhan"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "strength": {
+     "label": "Kekuatan"
+    }
+   }
+  },
+  "beatshake": {
+   "description": "Mengguncang lapisan pada setiap ketukan ke arah yang baru, lalu mereda sebelum ketukan berikutnya. Pilih klip musik Anda, buka menunya, lalu ketuk Tandai Ketukan terlebih dahulu; tanpa tanda ketukan, efek mengikuti pengaturan BPM.",
+   "name": "Guncang Ketukan",
+   "params": {
+    "beats": {
+     "label": "Ketukan",
+     "options": [
+      "Setiap ketukan",
+      "Setiap ketukan ke-2",
+      "Setiap ketukan ke-4"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Peluruhan"
+    },
+    "frequency": {
+     "label": "Frekuensi"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "strength": {
+     "label": "Kekuatan"
+    }
+   }
+  },
+  "beatzoom": {
+   "description": "Memperbesar tampilan pada setiap ketukan lalu kembali dengan halus. Pilih klip musik Anda, buka menunya, lalu ketuk Tandai Ketukan terlebih dahulu; tanpa tanda ketukan, efek mengikuti pengaturan BPM.",
+   "name": "Zoom Ketukan",
+   "params": {
+    "beats": {
+     "label": "Ketukan",
+     "options": [
+      "Setiap Ketukan",
+      "Setiap Ketukan ke-2",
+      "Setiap Ketukan ke-4"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Peluruhan"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "strength": {
+     "label": "Kekuatan"
     }
    }
   },
@@ -3158,6 +3420,196 @@
       "Palet"
      ]
     }
+   }
+  },
+  "particles": {
+   "description": "Memancarkan partikel dari lapisan: salju, percikan, konfeti, gelembung, debu, hati, bintang, kelopak, atau salinan kecil lapisan itu sendiri, yang digerakkan oleh gravitasi, angin, dan pusaran. Mulai dari preset, lalu ubah pemancar, jumlah, dan gayanya. Pada Ketukan akan memancarkan ledakan di setiap ketukan: pilih musik Anda, buka menunya, lalu ketuk Markah Ketukan terlebih dahulu.",
+   "name": "Partikel",
+   "params": {
+    "beats": {
+     "label": "Ketukan",
+     "options": [
+      "Setiap Ketukan",
+      "Setiap Ketukan ke-2",
+      "Setiap Ketukan ke-4"
+     ]
+    },
+    "blend": {
+     "label": "Blending",
+     "options": [
+      "Normal",
+      "Tambah",
+      "Screen"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "color": {
+     "label": "Warna"
+    },
+    "color2": {
+     "label": "Warna 2"
+    },
+    "colorMode": {
+     "label": "Mode Warna",
+     "options": [
+      "Warna Tunggal",
+      "Campuran Acak",
+      "Sepanjang Usia"
+     ]
+    },
+    "colorVariation": {
+     "label": "Variasi Warna"
+    },
+    "count": {
+     "label": "Jumlah"
+    },
+    "direction": {
+     "label": "Arah"
+    },
+    "drag": {
+     "label": "Hambatan Udara"
+    },
+    "emission": {
+     "label": "Emisi",
+     "options": [
+      "Berkelanjutan",
+      "Ledakan",
+      "Pada Ketukan"
+     ]
+    },
+    "emitter": {
+     "label": "Pemancar",
+     "options": [
+      "Titik",
+      "Garis",
+      "Area",
+      "Garis luar"
+     ]
+    },
+    "emitterSize": {
+     "label": "Ukuran Pemancar"
+    },
+    "endSize": {
+     "label": "Ukuran Akhir"
+    },
+    "every": {
+     "label": "Ulangi Setiap"
+    },
+    "fadeIn": {
+     "label": "Fade Masuk"
+    },
+    "fadeOut": {
+     "label": "Fade Keluar"
+    },
+    "gravity": {
+     "label": "Gravitasi"
+    },
+    "kind": {
+     "label": "Partikel",
+     "options": [
+      "Salju",
+      "Percikan",
+      "Konfeti",
+      "Gelembung",
+      "Debu",
+      "Hati",
+      "Bintang",
+      "Kelopak",
+      "Lapisan"
+     ]
+    },
+    "layer": {
+     "label": "Lapisan",
+     "options": [
+      "Di Bawah Partikel",
+      "Di Atas Partikel",
+      "Tersembunyi"
+     ]
+    },
+    "lifeVariation": {
+     "label": "Variasi Masa Hidup"
+    },
+    "lifetime": {
+     "label": "Masa hidup"
+    },
+    "more": {
+     "label": "Pengaturan Lainnya"
+    },
+    "orientation": {
+     "label": "Orientasi",
+     "options": [
+      "Bebas",
+      "Ikuti Gerakan"
+     ]
+    },
+    "position": {
+     "label": "Posisi Pemancar"
+    },
+    "prewarm": {
+     "label": "Mulai Penuh"
+    },
+    "randomRotation": {
+     "label": "Rotasi Acak"
+    },
+    "rate": {
+     "label": "Laju"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "size": {
+     "label": "Ukuran"
+    },
+    "sizeVariation": {
+     "label": "Variasi Ukuran"
+    },
+    "speed": {
+     "label": "Kecepatan"
+    },
+    "speedVariation": {
+     "label": "Variasi Kecepatan"
+    },
+    "spin": {
+     "label": "Putaran"
+    },
+    "spinVariation": {
+     "label": "Variasi Putaran"
+    },
+    "spread": {
+     "label": "Sebaran"
+    },
+    "start": {
+     "label": "Waktu Ledakan"
+    },
+    "swirl": {
+     "label": "Pusaran"
+    },
+    "swirlSpeed": {
+     "label": "Kecepatan Pusaran"
+    },
+    "tint": {
+     "label": "Pewarnaan"
+    },
+    "twinkle": {
+     "label": "Kelip"
+    },
+    "wind": {
+     "label": "Angin"
+    }
+   },
+   "presets": {
+    "beat-confetti": "Konfeti Beat",
+    "bubbles": "Gelembung",
+    "confetti": "Konfeti",
+    "dust": "Debu",
+    "hearts": "Hati",
+    "layer-fountain": "Pancuran Lapisan",
+    "petals": "Kelopak",
+    "snow": "Salju",
+    "sparks": "Percikan",
+    "twinkle": "Kelip"
    }
   },
   "pixelate": {

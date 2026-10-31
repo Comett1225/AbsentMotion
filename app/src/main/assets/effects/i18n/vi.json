@@ -2,6 +2,7 @@
  "categories": {
   "3d": "3D",
   "ai": "AI",
+  "beat": "Nhịp",
   "blur": "Làm mờ",
   "color": "Màu",
   "distort": "Biến dạng",
@@ -60,6 +61,267 @@
     },
     "spill": {
      "label": "Hiệu ứng lan ra ngoài"
+    }
+   }
+  },
+  "beatblur": {
+   "description": "Mỗi nhịp tạo một đợt nhòe phóng to rồi tan dần khi nhịp tắt. Hãy chọn clip nhạc, mở menu của nó và nhấn Đánh dấu nhịp trước; nếu chưa có dấu nhịp, hiệu ứng sẽ theo cài đặt BPM.",
+   "name": "Nhòe theo nhịp",
+   "params": {
+    "beats": {
+     "label": "Nhịp",
+     "options": [
+      "Mỗi nhịp",
+      "Mỗi 2 nhịp",
+      "Mỗi 4 nhịp"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Độ tắt dần"
+    },
+    "offset": {
+     "label": "Độ lệch"
+    },
+    "strength": {
+     "label": "Cường độ"
+    }
+   }
+  },
+  "beatflash": {
+   "description": "Mỗi nhịp làm lớp chớp lên một màu. Hãy chọn clip nhạc, mở menu của nó và nhấn Đánh dấu nhịp trước; nếu chưa có dấu nhịp, hiệu ứng sẽ theo cài đặt BPM.",
+   "name": "Chớp theo nhịp",
+   "params": {
+    "beats": {
+     "label": "Nhịp",
+     "options": [
+      "Mỗi nhịp",
+      "Mỗi 2 nhịp",
+      "Mỗi 4 nhịp"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "color": {
+     "label": "Màu"
+    },
+    "decay": {
+     "label": "Độ tắt dần"
+    },
+    "offset": {
+     "label": "Độ lệch"
+    },
+    "strength": {
+     "label": "Cường độ"
+    }
+   }
+  },
+  "beatglitch": {
+   "description": "Mỗi nhịp cắt lớp thành những lát bị dịch chuyển với màu tách rời. Hãy chọn clip nhạc, mở menu của nó và nhấn Đánh dấu nhịp trước; nếu chưa có dấu nhịp, hiệu ứng sẽ theo cài đặt BPM.",
+   "name": "Glitch theo nhịp",
+   "params": {
+    "beats": {
+     "label": "Nhịp",
+     "options": [
+      "Mỗi nhịp",
+      "Mỗi 2 nhịp",
+      "Mỗi 4 nhịp"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Độ tắt dần"
+    },
+    "offset": {
+     "label": "Độ lệch"
+    },
+    "slices": {
+     "label": "Số lát"
+    },
+    "strength": {
+     "label": "Cường độ"
+    }
+   }
+  },
+  "beatglow": {
+   "description": "Mỗi nhịp làm phần sáng của lớp phát sáng. Hãy chọn clip nhạc, mở menu của nó và nhấn Đánh dấu nhịp trước; nếu chưa có dấu nhịp, hiệu ứng sẽ theo cài đặt BPM.",
+   "name": "Phát sáng theo nhịp",
+   "params": {
+    "beats": {
+     "label": "Nhịp",
+     "options": [
+      "Mỗi nhịp",
+      "Mỗi 2 nhịp",
+      "Mỗi 4 nhịp"
+     ]
+    },
+    "blur": {
+     "label": "Bán kính"
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "color": {
+     "label": "Màu"
+    },
+    "decay": {
+     "label": "Giảm dần"
+    },
+    "offset": {
+     "label": "Độ lệch"
+    },
+    "strength": {
+     "label": "Độ mạnh"
+    },
+    "threshold": {
+     "label": "Ngưỡng"
+    }
+   }
+  },
+  "beatpulse": {
+   "description": "Làm sáng lớp theo từng nhịp như một nhịp phơi sáng; độ mạnh âm sẽ làm tối đi. Chọn clip nhạc, mở menu của clip và nhấn Đánh dấu nhịp trước; nếu chưa có dấu nhịp, hiệu ứng sẽ chạy theo cài đặt BPM.",
+   "name": "Nhịp đập",
+   "params": {
+    "beats": {
+     "label": "Nhịp",
+     "options": [
+      "Mỗi nhịp",
+      "Mỗi 2 nhịp",
+      "Mỗi 4 nhịp"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Giảm dần"
+    },
+    "offset": {
+     "label": "Độ lệch"
+    },
+    "strength": {
+     "label": "Độ mạnh"
+    }
+   }
+  },
+  "beatrgbsplit": {
+   "description": "Tách kênh đỏ và xanh lam ra xa nhau theo từng nhịp. Chọn clip nhạc, mở menu của clip và nhấn Đánh dấu nhịp trước; nếu chưa có dấu nhịp, hiệu ứng sẽ chạy theo cài đặt BPM.",
+   "name": "Tách RGB theo nhịp",
+   "params": {
+    "angle": {
+     "label": "Góc"
+    },
+    "beats": {
+     "label": "Nhịp",
+     "options": [
+      "Mỗi nhịp",
+      "Mỗi 2 nhịp",
+      "Mỗi 4 nhịp"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Giảm dần"
+    },
+    "offset": {
+     "label": "Độ lệch"
+    },
+    "strength": {
+     "label": "Độ mạnh"
+    }
+   }
+  },
+  "beatrotate": {
+   "description": "Nghiêng lớp theo từng nhịp, lần lượt sang trái rồi sang phải, sau đó trở lại. Chọn clip nhạc, mở menu của clip và nhấn Đánh dấu nhịp trước; nếu chưa có dấu nhịp, hiệu ứng sẽ chạy theo cài đặt BPM.",
+   "name": "Xoay theo nhịp",
+   "params": {
+    "alternate": {
+     "label": "Xen kẽ"
+    },
+    "beats": {
+     "label": "Nhịp",
+     "options": [
+      "Mỗi nhịp",
+      "Mỗi 2 nhịp",
+      "Mỗi 4 nhịp"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "cover": {
+     "label": "Lấp đầy khung"
+    },
+    "decay": {
+     "label": "Giảm dần"
+    },
+    "offset": {
+     "label": "Độ lệch"
+    },
+    "strength": {
+     "label": "Độ mạnh"
+    }
+   }
+  },
+  "beatshake": {
+   "description": "Rung lớp theo từng nhịp, mỗi lần theo một hướng mới, rồi ổn định trước nhịp tiếp theo. Chọn clip nhạc, mở menu của clip và nhấn Đánh dấu nhịp trước; nếu chưa có dấu nhịp, hiệu ứng sẽ chạy theo cài đặt BPM.",
+   "name": "Rung theo nhịp",
+   "params": {
+    "beats": {
+     "label": "Nhịp",
+     "options": [
+      "Mỗi nhịp",
+      "Mỗi 2 nhịp",
+      "Mỗi 4 nhịp"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Giảm dần"
+    },
+    "frequency": {
+     "label": "Tần số"
+    },
+    "offset": {
+     "label": "Độ lệch"
+    },
+    "strength": {
+     "label": "Độ mạnh"
+    }
+   }
+  },
+  "beatzoom": {
+   "description": "Thu phóng vào theo từng nhịp rồi làm mượt trở ra. Chọn clip nhạc, mở menu của clip và nhấn Đánh dấu nhịp trước; nếu chưa có dấu nhịp, hiệu ứng sẽ chạy theo cài đặt BPM.",
+   "name": "Thu phóng theo nhịp",
+   "params": {
+    "beats": {
+     "label": "Nhịp",
+     "options": [
+      "Mỗi nhịp",
+      "Mỗi 2 nhịp",
+      "Mỗi 4 nhịp"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Giảm dần"
+    },
+    "offset": {
+     "label": "Độ lệch"
+    },
+    "strength": {
+     "label": "Độ mạnh"
     }
    }
   },
@@ -3158,6 +3420,196 @@
       "Bảng màu"
      ]
     }
+   }
+  },
+  "particles": {
+   "description": "Bắn các hạt bay ra khỏi lớp: tuyết, tia lửa, pháo giấy, bong bóng, bụi, trái tim, ngôi sao, cánh hoa hoặc bản sao nhỏ của chính lớp, chịu tác động của trọng lực, gió và xoáy. Bắt đầu từ preset, rồi thay đổi bộ phát, số lượng và các lực. Chế độ Theo nhịp sẽ bắn một loạt ở mỗi nhịp: chọn nhạc của bạn, mở menu của nhạc và nhấn Đánh dấu nhịp trước.",
+   "name": "Hạt",
+   "params": {
+    "beats": {
+     "label": "Nhịp",
+     "options": [
+      "Mỗi nhịp",
+      "Mỗi 2 nhịp",
+      "Mỗi 4 nhịp"
+     ]
+    },
+    "blend": {
+     "label": "Hòa trộn",
+     "options": [
+      "Thường",
+      "Cộng",
+      "Sáng"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "color": {
+     "label": "Màu"
+    },
+    "color2": {
+     "label": "Màu 2"
+    },
+    "colorMode": {
+     "label": "Chế độ màu",
+     "options": [
+      "Một màu",
+      "Trộn ngẫu nhiên",
+      "Theo vòng đời"
+     ]
+    },
+    "colorVariation": {
+     "label": "Biến thiên màu"
+    },
+    "count": {
+     "label": "Số lượng"
+    },
+    "direction": {
+     "label": "Hướng"
+    },
+    "drag": {
+     "label": "Lực cản không khí"
+    },
+    "emission": {
+     "label": "Phát",
+     "options": [
+      "Liên tục",
+      "Loạt",
+      "Theo nhịp"
+     ]
+    },
+    "emitter": {
+     "label": "Bộ phát",
+     "options": [
+      "Điểm",
+      "Đường",
+      "Vùng",
+      "Đường viền"
+     ]
+    },
+    "emitterSize": {
+     "label": "Kích thước bộ phát"
+    },
+    "endSize": {
+     "label": "Kích thước cuối"
+    },
+    "every": {
+     "label": "Lặp lại mỗi"
+    },
+    "fadeIn": {
+     "label": "Hiện dần"
+    },
+    "fadeOut": {
+     "label": "Mờ dần"
+    },
+    "gravity": {
+     "label": "Trọng lực"
+    },
+    "kind": {
+     "label": "Hạt",
+     "options": [
+      "Tuyết",
+      "Tia lửa",
+      "Pháo giấy",
+      "Bong bóng",
+      "Bụi",
+      "Trái tim",
+      "Ngôi sao",
+      "Cánh hoa",
+      "Lớp"
+     ]
+    },
+    "layer": {
+     "label": "Lớp",
+     "options": [
+      "Dưới hạt",
+      "Trên hạt",
+      "Ẩn"
+     ]
+    },
+    "lifeVariation": {
+     "label": "Biến thiên tuổi thọ"
+    },
+    "lifetime": {
+     "label": "Tuổi thọ"
+    },
+    "more": {
+     "label": "Cài đặt khác"
+    },
+    "orientation": {
+     "label": "Hướng",
+     "options": [
+      "Tự do",
+      "Theo chuyển động"
+     ]
+    },
+    "position": {
+     "label": "Vị trí bộ phát"
+    },
+    "prewarm": {
+     "label": "Bắt đầu đầy"
+    },
+    "randomRotation": {
+     "label": "Xoay ngẫu nhiên"
+    },
+    "rate": {
+     "label": "Tần suất"
+    },
+    "seed": {
+     "label": "Hạt giống"
+    },
+    "size": {
+     "label": "Kích thước"
+    },
+    "sizeVariation": {
+     "label": "Biến thiên kích thước"
+    },
+    "speed": {
+     "label": "Tốc độ"
+    },
+    "speedVariation": {
+     "label": "Biến thiên tốc độ"
+    },
+    "spin": {
+     "label": "Quay"
+    },
+    "spinVariation": {
+     "label": "Biến thiên khi quay"
+    },
+    "spread": {
+     "label": "Độ lan"
+    },
+    "start": {
+     "label": "Thời điểm bắn"
+    },
+    "swirl": {
+     "label": "Xoáy"
+    },
+    "swirlSpeed": {
+     "label": "Tốc độ xoáy"
+    },
+    "tint": {
+     "label": "Màu phủ"
+    },
+    "twinkle": {
+     "label": "Lấp lánh"
+    },
+    "wind": {
+     "label": "Gió"
+    }
+   },
+   "presets": {
+    "beat-confetti": "Pháo giấy theo nhịp",
+    "bubbles": "Bong bóng",
+    "confetti": "Pháo giấy",
+    "dust": "Bụi",
+    "hearts": "Trái tim",
+    "layer-fountain": "Suối lớp",
+    "petals": "Cánh hoa",
+    "snow": "Tuyết",
+    "sparks": "Tia lửa",
+    "twinkle": "Lấp lánh"
    }
   },
   "pixelate": {

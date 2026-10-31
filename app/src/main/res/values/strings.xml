@@ -49,7 +49,6 @@
     <string name="sorting">Sorting</string>
     <string name="type_here_to_search">Type here to search</string>
     <string name="delete">Delete</string>
-    <string name="remove_every_keyframe">Remove every keyframe?</string>
     <string name="ai">AI</string>
     <string name="presets">Presets</string>
     <string name="swap_media_file">Swap media file</string>
@@ -436,7 +435,6 @@
     <string name="downloader_paste">Paste</string>
     <string name="downloader_clear">Clear the link</string>
     <string name="downloader_nothing_to_paste">No video link was copied. Copy a link first, then tap Paste.</string>
-    <string name="downloader_sites">Works with YouTube, Instagram, TikTok, X, Facebook, Reddit and more.</string>
     <string name="downloader_waiting">Paste a link to see what it is.</string>
     <string name="downloader_unknown">This link is not one we know yet.</string>
     <string name="downloader_kind_video">Video</string>
@@ -456,8 +454,6 @@
     <string name="downloader_quality">Quality</string>
     <string name="downloader_quality_later">Shown after the link is checked</string>
     <string name="downloader_download">Download</string>
-    <string name="downloader_soon_title">Coming soon</string>
-    <string name="downloader_soon">Downloading arrives in a later test build. For now this screen shows how it will work.</string>
     <string name="downloader_rights">Only download what you have the right to use.</string>
     <string name="downloader_engine_title">Downloads need an add-on</string>
     <string name="downloader_engine_about">A one-time download of %1$s. It brings Python and yt-dlp, the free tools that do the downloading. You can remove it in Settings.</string>
@@ -1313,11 +1309,8 @@
     <string name="effects_reorder">Reorder</string>
     <string name="speed_freeze_frame">Freeze Frame</string>
     <string name="speed_reverse">Reverse</string>
-    <string name="speed_reverse_sound">Reversing the sound…</string>
-    <string name="speed_reverse_frame">Reversing: frame %1$s of %2$s…</string>
     <string name="speed_reverse_remove_ai">Remove Smooth and Enhance from this clip before reversing it</string>
     <string name="speed_seconds">Seconds</string>
-    <string name="speed_remove_keyframes">Remove Keyframes</string>
     <string name="speed_reversing">Reversing</string>
     <string name="speed_reverse_estimating">Working out the time left…</string>
     <string name="speed_reverse_seconds_left">About %1$s s left</string>

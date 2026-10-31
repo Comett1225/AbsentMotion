@@ -2,6 +2,7 @@
  "categories": {
   "3d": "3D",
   "ai": "AI",
+  "beat": "Beat",
   "blur": "Blur",
   "color": "Kulay",
   "distort": "Distort",
@@ -60,6 +61,267 @@
     },
     "spill": {
      "label": "Umaabot sa labas ang mga epekto"
+    }
+   }
+  },
+  "beatblur": {
+   "description": "May zoom blur sa bawat beat na nawawala habang kumukupas ang beat. Piliin ang music clip, buksan ang menu nito at i-tap muna ang Mark Beats; kung walang beat marks, susunod ito sa BPM setting.",
+   "name": "Blur sa Beat",
+   "params": {
+    "beats": {
+     "label": "Beats",
+     "options": [
+      "Bawat Beat",
+      "Bawat Ika-2 Beat",
+      "Bawat Ika-4 Beat"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Decay"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "strength": {
+     "label": "Lakas"
+    }
+   }
+  },
+  "beatflash": {
+   "description": "Nagfa-flash ng kulay sa layer sa bawat beat. Piliin ang music clip, buksan ang menu nito at i-tap muna ang Mark Beats; kung walang beat marks, susunod ito sa BPM setting.",
+   "name": "Flash sa Beat",
+   "params": {
+    "beats": {
+     "label": "Beats",
+     "options": [
+      "Bawat Beat",
+      "Bawat Ika-2 Beat",
+      "Bawat Ika-4 Beat"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "color": {
+     "label": "Kulay"
+    },
+    "decay": {
+     "label": "Decay"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "strength": {
+     "label": "Lakas"
+    }
+   }
+  },
+  "beatglitch": {
+   "description": "Hinahati ang layer sa mga naka-shift na slice na may split na kulay sa bawat beat. Piliin ang music clip, buksan ang menu nito at i-tap muna ang Mark Beats; kung walang beat marks, susunod ito sa BPM setting.",
+   "name": "Glitch sa Beat",
+   "params": {
+    "beats": {
+     "label": "Beats",
+     "options": [
+      "Bawat Beat",
+      "Bawat Ika-2 Beat",
+      "Bawat Ika-4 Beat"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Decay"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "slices": {
+     "label": "Mga slice"
+    },
+    "strength": {
+     "label": "Lakas"
+    }
+   }
+  },
+  "beatglow": {
+   "description": "Pinapakislap ang maliwanag na bahagi ng layer sa bawat beat. Piliin ang music clip, buksan ang menu nito at i-tap muna ang Mark Beats; kung walang beat marks, susunod ito sa BPM setting.",
+   "name": "Glow sa Beat",
+   "params": {
+    "beats": {
+     "label": "Beats",
+     "options": [
+      "Bawat Beat",
+      "Bawat Ika-2 Beat",
+      "Bawat Ika-4 na Beat"
+     ]
+    },
+    "blur": {
+     "label": "Radius"
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "color": {
+     "label": "Kulay"
+    },
+    "decay": {
+     "label": "Decay"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "strength": {
+     "label": "Lakas"
+    },
+    "threshold": {
+     "label": "Threshold"
+    }
+   }
+  },
+  "beatpulse": {
+   "description": "Pinapaliwanag ang layer sa bawat beat na parang flash ng exposure; ang negatibong lakas ay nagpapadilim dito. Piliin muna ang music clip, buksan ang menu nito at i-tap ang Mark Beats; kung walang beat marks, susunod ito sa BPM setting.",
+   "name": "Beat Pulse",
+   "params": {
+    "beats": {
+     "label": "Beats",
+     "options": [
+      "Bawat Beat",
+      "Bawat Ika-2 Beat",
+      "Bawat Ika-4 na Beat"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Decay"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "strength": {
+     "label": "Lakas"
+    }
+   }
+  },
+  "beatrgbsplit": {
+   "description": "Binubukod ang pula at asul na channel sa bawat beat. Piliin muna ang music clip, buksan ang menu nito at i-tap ang Mark Beats; kung walang beat marks, susunod ito sa BPM setting.",
+   "name": "Beat RGB Split",
+   "params": {
+    "angle": {
+     "label": "Angle"
+    },
+    "beats": {
+     "label": "Beats",
+     "options": [
+      "Bawat Beat",
+      "Bawat Ika-2 Beat",
+      "Bawat Ika-4 na Beat"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Decay"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "strength": {
+     "label": "Lakas"
+    }
+   }
+  },
+  "beatrotate": {
+   "description": "Itinatagilid ang layer sa bawat beat, pakaliwa at pakanan nang salitan, at bumabalik sa dati. Piliin muna ang music clip, buksan ang menu nito at i-tap ang Mark Beats; kung walang beat marks, susunod ito sa BPM setting.",
+   "name": "Beat Rotate",
+   "params": {
+    "alternate": {
+     "label": "Salitan"
+    },
+    "beats": {
+     "label": "Beats",
+     "options": [
+      "Bawat Beat",
+      "Bawat Ika-2 Beat",
+      "Bawat Ika-4 na Beat"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "cover": {
+     "label": "Fill ang frame"
+    },
+    "decay": {
+     "label": "Decay"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "strength": {
+     "label": "Lakas"
+    }
+   }
+  },
+  "beatshake": {
+   "description": "Iniuuga ang layer sa bawat beat, sa bagong direksyon tuwing may beat, at kumakalma bago ang susunod. Piliin muna ang music clip, buksan ang menu nito at i-tap ang Mark Beats; kung walang beat marks, susunod ito sa BPM setting.",
+   "name": "Beat Shake",
+   "params": {
+    "beats": {
+     "label": "Beats",
+     "options": [
+      "Bawat Beat",
+      "Bawat Ika-2 Beat",
+      "Bawat Ika-4 na Beat"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Decay"
+    },
+    "frequency": {
+     "label": "Dalas"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "strength": {
+     "label": "Lakas"
+    }
+   }
+  },
+  "beatzoom": {
+   "description": "Nagzo-zoom in sa bawat beat at dahan-dahang bumabalik sa dati. Piliin muna ang music clip, buksan ang menu nito at i-tap ang Mark Beats; kung walang beat marks, susunod ito sa BPM setting.",
+   "name": "Beat Zoom",
+   "params": {
+    "beats": {
+     "label": "Beats",
+     "options": [
+      "Bawat Beat",
+      "Bawat Ikalawang Beat",
+      "Bawat Ikaapat na Beat"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Decay"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "strength": {
+     "label": "Lakas"
     }
    }
   },
@@ -3158,6 +3420,196 @@
       "Palette"
      ]
     }
+   }
+  },
+  "particles": {
+   "description": "Nagpapasabog ng mga particle mula sa layer: niyebe, kislap, confetti, bula, alikabok, puso, bituin, talulot o maliliit na kopya ng layer mismo, na ginagalaw ng gravity, hangin at swirl. Magsimula sa preset, pagkatapos palitan ang emitter, dami at forces. Sa Beats, nagpapadala ng burst sa bawat beat: piliin ang musika, buksan ang menu nito at i-tap muna ang Markahan ang Beats.",
+   "name": "Mga particle",
+   "params": {
+    "beats": {
+     "label": "Beats",
+     "options": [
+      "Bawat Beat",
+      "Bawat Ikalawang Beat",
+      "Bawat Ikaapat na Beat"
+     ]
+    },
+    "blend": {
+     "label": "Blending",
+     "options": [
+      "Normal",
+      "Add",
+      "Screen"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "color": {
+     "label": "Kulay"
+    },
+    "color2": {
+     "label": "Kulay 2"
+    },
+    "colorMode": {
+     "label": "Mode ng kulay",
+     "options": [
+      "Isang kulay",
+      "Random na halo",
+      "Sa buong buhay"
+     ]
+    },
+    "colorVariation": {
+     "label": "Baryasyon ng kulay"
+    },
+    "count": {
+     "label": "Bilang"
+    },
+    "direction": {
+     "label": "Direksyon"
+    },
+    "drag": {
+     "label": "Resistensya sa hangin"
+    },
+    "emission": {
+     "label": "Paglabas",
+     "options": [
+      "Tuloy-tuloy",
+      "Sabog",
+      "Sa Beat"
+     ]
+    },
+    "emitter": {
+     "label": "Emitter",
+     "options": [
+      "Punto",
+      "Linya",
+      "Lugar",
+      "Balangkas"
+     ]
+    },
+    "emitterSize": {
+     "label": "Laki ng emitter"
+    },
+    "endSize": {
+     "label": "Laki sa dulo"
+    },
+    "every": {
+     "label": "Ulitin bawat"
+    },
+    "fadeIn": {
+     "label": "Fade in"
+    },
+    "fadeOut": {
+     "label": "Fade out"
+    },
+    "gravity": {
+     "label": "Grabidad"
+    },
+    "kind": {
+     "label": "Particle",
+     "options": [
+      "Niyebe",
+      "Kislap",
+      "Confetti",
+      "Bula",
+      "Alikabok",
+      "Puso",
+      "Bituin",
+      "Talulot",
+      "Layer"
+     ]
+    },
+    "layer": {
+     "label": "Layer",
+     "options": [
+      "Sa ilalim ng mga particle",
+      "Sa ibabaw ng mga particle",
+      "Nakatago"
+     ]
+    },
+    "lifeVariation": {
+     "label": "Pagbabago ng tagal"
+    },
+    "lifetime": {
+     "label": "Tagal"
+    },
+    "more": {
+     "label": "Iba pang mga setting"
+    },
+    "orientation": {
+     "label": "Orientasyon",
+     "options": [
+      "Malaya",
+      "Sumunod sa galaw"
+     ]
+    },
+    "position": {
+     "label": "Posisyon ng emitter"
+    },
+    "prewarm": {
+     "label": "Puno sa simula"
+    },
+    "randomRotation": {
+     "label": "Random na pag-ikot"
+    },
+    "rate": {
+     "label": "Rate"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "size": {
+     "label": "Laki"
+    },
+    "sizeVariation": {
+     "label": "Pagbabago ng laki"
+    },
+    "speed": {
+     "label": "Bilis"
+    },
+    "speedVariation": {
+     "label": "Pagbabago ng bilis"
+    },
+    "spin": {
+     "label": "Pag-ikot"
+    },
+    "spinVariation": {
+     "label": "Baryasyon ng pag-ikot"
+    },
+    "spread": {
+     "label": "Kalat"
+    },
+    "start": {
+     "label": "Oras ng sabog"
+    },
+    "swirl": {
+     "label": "Swirl"
+    },
+    "swirlSpeed": {
+     "label": "Bilis ng swirl"
+    },
+    "tint": {
+     "label": "Tint"
+    },
+    "twinkle": {
+     "label": "Kislap"
+    },
+    "wind": {
+     "label": "Hangin"
+    }
+   },
+   "presets": {
+    "beat-confetti": "Confetti sa beat",
+    "bubbles": "Bula",
+    "confetti": "Confetti",
+    "dust": "Alikabok",
+    "hearts": "Puso",
+    "layer-fountain": "Fountain ng layer",
+    "petals": "Mga petalo",
+    "snow": "Niyebe",
+    "sparks": "Siklab",
+    "twinkle": "Kislap"
    }
   },
   "pixelate": {

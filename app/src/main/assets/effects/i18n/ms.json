@@ -2,6 +2,7 @@
  "categories": {
   "3d": "3D",
   "ai": "AI",
+  "beat": "Rentak",
   "blur": "Kabur",
   "color": "Warna",
   "distort": "Herotan",
@@ -60,6 +61,267 @@
     },
     "spill": {
      "label": "Kesan Menjangkau Keluar"
+    }
+   }
+  },
+  "beatblur": {
+   "description": "Setiap rentak memicu kabur zum yang hilang apabila rentak pudar. Pilih klip muzik anda, buka menunya dan ketik Tandakan Rentak dahulu; tanpa tanda rentak ia mengikut tetapan BPM.",
+   "name": "Kabur Rentak",
+   "params": {
+    "beats": {
+     "label": "Rentak",
+     "options": [
+      "Setiap Rentak",
+      "Setiap Rentak ke-2",
+      "Setiap Rentak ke-4"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Pereputan"
+    },
+    "offset": {
+     "label": "Ofset"
+    },
+    "strength": {
+     "label": "Kekuatan"
+    }
+   }
+  },
+  "beatflash": {
+   "description": "Lapisan berkelip dengan warna pada setiap rentak. Pilih klip muzik anda, buka menunya dan ketik Tandakan Rentak dahulu; tanpa tanda rentak ia mengikut tetapan BPM.",
+   "name": "Kilat Rentak",
+   "params": {
+    "beats": {
+     "label": "Rentak",
+     "options": [
+      "Setiap Rentak",
+      "Setiap Rentak ke-2",
+      "Setiap Rentak ke-4"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "color": {
+     "label": "Warna"
+    },
+    "decay": {
+     "label": "Pereputan"
+    },
+    "offset": {
+     "label": "Ofset"
+    },
+    "strength": {
+     "label": "Kekuatan"
+    }
+   }
+  },
+  "beatglitch": {
+   "description": "Memecahkan lapisan kepada hirisan beralih dengan warna berbelah pada setiap rentak. Pilih klip muzik anda, buka menunya dan ketik Tandakan Rentak dahulu; tanpa tanda rentak ia mengikut tetapan BPM.",
+   "name": "Glitch Rentak",
+   "params": {
+    "beats": {
+     "label": "Rentak",
+     "options": [
+      "Setiap Rentak",
+      "Setiap Rentak ke-2",
+      "Setiap Rentak ke-4"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Pereputan"
+    },
+    "offset": {
+     "label": "Ofset"
+    },
+    "slices": {
+     "label": "Hirisan"
+    },
+    "strength": {
+     "label": "Kekuatan"
+    }
+   }
+  },
+  "beatglow": {
+   "description": "Menjadikan bahagian cerah lapisan bersinar pada setiap rentak. Pilih klip muzik anda, buka menunya dan ketik Tandakan Rentak dahulu; tanpa tanda rentak ia mengikut tetapan BPM.",
+   "name": "Cahaya Rentak",
+   "params": {
+    "beats": {
+     "label": "Rentak",
+     "options": [
+      "Setiap rentak",
+      "Setiap rentak ke-2",
+      "Setiap rentak ke-4"
+     ]
+    },
+    "blur": {
+     "label": "Jejari"
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "color": {
+     "label": "Warna"
+    },
+    "decay": {
+     "label": "Reputan"
+    },
+    "offset": {
+     "label": "Anjakan"
+    },
+    "strength": {
+     "label": "Kekuatan"
+    },
+    "threshold": {
+     "label": "Ambang"
+    }
+   }
+  },
+  "beatpulse": {
+   "description": "Mencerahkan lapisan pada setiap rentak seperti kilatan pendedahan; kekuatan negatif menggelapkannya. Pilih klip muzik anda, buka menunya dan ketuk Tanda rentak dahulu; tanpa tanda rentak ia mengikut tetapan BPM.",
+   "name": "Denyut rentak",
+   "params": {
+    "beats": {
+     "label": "Rentak",
+     "options": [
+      "Setiap rentak",
+      "Setiap rentak ke-2",
+      "Setiap rentak ke-4"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Reputan"
+    },
+    "offset": {
+     "label": "Anjakan"
+    },
+    "strength": {
+     "label": "Kekuatan"
+    }
+   }
+  },
+  "beatrgbsplit": {
+   "description": "Memisahkan saluran merah dan biru pada setiap rentak. Pilih klip muzik anda, buka menunya dan ketuk Tanda rentak dahulu; tanpa tanda rentak ia mengikut tetapan BPM.",
+   "name": "Pisah RGB rentak",
+   "params": {
+    "angle": {
+     "label": "Sudut"
+    },
+    "beats": {
+     "label": "Rentak",
+     "options": [
+      "Setiap rentak",
+      "Setiap rentak ke-2",
+      "Setiap rentak ke-4"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Reputan"
+    },
+    "offset": {
+     "label": "Anjakan"
+    },
+    "strength": {
+     "label": "Kekuatan"
+    }
+   }
+  },
+  "beatrotate": {
+   "description": "Mencondongkan lapisan pada setiap rentak, kiri dan kanan secara bergilir, dan berayun kembali. Pilih klip muzik anda, buka menunya dan ketuk Tanda rentak dahulu; tanpa tanda rentak ia mengikut tetapan BPM.",
+   "name": "Putar rentak",
+   "params": {
+    "alternate": {
+     "label": "Bergilir"
+    },
+    "beats": {
+     "label": "Rentak",
+     "options": [
+      "Setiap rentak",
+      "Setiap rentak ke-2",
+      "Setiap rentak ke-4"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "cover": {
+     "label": "Isi bingkai"
+    },
+    "decay": {
+     "label": "Reputan"
+    },
+    "offset": {
+     "label": "Anjakan"
+    },
+    "strength": {
+     "label": "Kekuatan"
+    }
+   }
+  },
+  "beatshake": {
+   "description": "Menggoncang lapisan pada setiap rentak, dalam arah baharu setiap kali, dan reda sebelum rentak seterusnya. Pilih klip muzik anda, buka menunya dan ketuk Tanda rentak dahulu; tanpa tanda rentak ia mengikut tetapan BPM.",
+   "name": "Gegar rentak",
+   "params": {
+    "beats": {
+     "label": "Rentak",
+     "options": [
+      "Setiap rentak",
+      "Setiap rentak ke-2",
+      "Setiap rentak ke-4"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Reputan"
+    },
+    "frequency": {
+     "label": "Frekuensi"
+    },
+    "offset": {
+     "label": "Anjakan"
+    },
+    "strength": {
+     "label": "Kekuatan"
+    }
+   }
+  },
+  "beatzoom": {
+   "description": "Zum masuk pada setiap rentak dan perlahan-lahan zum keluar. Pilih klip muzik anda, buka menunya dan ketuk Tanda rentak dahulu; tanpa tanda rentak ia mengikut tetapan BPM.",
+   "name": "Zum rentak",
+   "params": {
+    "beats": {
+     "label": "Rentak",
+     "options": [
+      "Setiap rentak",
+      "Setiap rentak ke-2",
+      "Setiap rentak ke-4"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Reputan"
+    },
+    "offset": {
+     "label": "Anjakan"
+    },
+    "strength": {
+     "label": "Kekuatan"
     }
    }
   },
@@ -3158,6 +3420,196 @@
       "Palet"
      ]
     }
+   }
+  },
+  "particles": {
+   "description": "Melepaskan zarah terbang keluar dari lapisan: salji, percikan, konfeti, gelembung, habuk, hati, bintang, kelopak atau salinan kecil lapisan itu sendiri, digerakkan oleh graviti, angin dan pusaran. Mulakan dengan pratetap, kemudian ubah pemancar, jumlah dan daya. Mod Pada rentak melepaskan letusan pada setiap rentak: pilih muzik anda, buka menunya dan ketik Tandakan rentak dahulu.",
+   "name": "Zarah",
+   "params": {
+    "beats": {
+     "label": "Rentak",
+     "options": [
+      "Setiap rentak",
+      "Setiap rentak ke-2",
+      "Setiap rentak ke-4"
+     ]
+    },
+    "blend": {
+     "label": "Campuran",
+     "options": [
+      "Biasa",
+      "Tambah",
+      "Skrin"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "color": {
+     "label": "Warna"
+    },
+    "color2": {
+     "label": "Warna 2"
+    },
+    "colorMode": {
+     "label": "Mod Warna",
+     "options": [
+      "Warna Tunggal",
+      "Campuran Rawak",
+      "Sepanjang Hayat"
+     ]
+    },
+    "colorVariation": {
+     "label": "Variasi Warna"
+    },
+    "count": {
+     "label": "Bilangan"
+    },
+    "direction": {
+     "label": "Arah"
+    },
+    "drag": {
+     "label": "Rintangan udara"
+    },
+    "emission": {
+     "label": "Pancaran",
+     "options": [
+      "Berterusan",
+      "Letusan",
+      "Pada rentak"
+     ]
+    },
+    "emitter": {
+     "label": "Pemancar",
+     "options": [
+      "Titik",
+      "Garis",
+      "Kawasan",
+      "Garis luar"
+     ]
+    },
+    "emitterSize": {
+     "label": "Saiz pemancar"
+    },
+    "endSize": {
+     "label": "Saiz akhir"
+    },
+    "every": {
+     "label": "Ulang setiap"
+    },
+    "fadeIn": {
+     "label": "Pudar Masuk"
+    },
+    "fadeOut": {
+     "label": "Pudar Keluar"
+    },
+    "gravity": {
+     "label": "Graviti"
+    },
+    "kind": {
+     "label": "Zarah",
+     "options": [
+      "Salji",
+      "Percikan",
+      "Konfeti",
+      "Gelembung",
+      "Habuk",
+      "Hati",
+      "Bintang",
+      "Kelopak",
+      "Lapisan"
+     ]
+    },
+    "layer": {
+     "label": "Lapisan",
+     "options": [
+      "Bawah zarah",
+      "Atas zarah",
+      "Tersembunyi"
+     ]
+    },
+    "lifeVariation": {
+     "label": "Variasi jangka hayat"
+    },
+    "lifetime": {
+     "label": "Jangka hayat"
+    },
+    "more": {
+     "label": "Tetapan lain"
+    },
+    "orientation": {
+     "label": "Orientasi",
+     "options": [
+      "Bebas",
+      "Ikut Gerakan"
+     ]
+    },
+    "position": {
+     "label": "Kedudukan pemancar"
+    },
+    "prewarm": {
+     "label": "Mula penuh"
+    },
+    "randomRotation": {
+     "label": "Putaran Rawak"
+    },
+    "rate": {
+     "label": "Kadar"
+    },
+    "seed": {
+     "label": "Benih"
+    },
+    "size": {
+     "label": "Saiz"
+    },
+    "sizeVariation": {
+     "label": "Variasi saiz"
+    },
+    "speed": {
+     "label": "Kelajuan"
+    },
+    "speedVariation": {
+     "label": "Variasi kelajuan"
+    },
+    "spin": {
+     "label": "Putaran"
+    },
+    "spinVariation": {
+     "label": "Variasi Putaran"
+    },
+    "spread": {
+     "label": "Sebaran"
+    },
+    "start": {
+     "label": "Masa letusan"
+    },
+    "swirl": {
+     "label": "Pusaran"
+    },
+    "swirlSpeed": {
+     "label": "Kelajuan pusaran"
+    },
+    "tint": {
+     "label": "Warna ton"
+    },
+    "twinkle": {
+     "label": "Berkelip"
+    },
+    "wind": {
+     "label": "Angin"
+    }
+   },
+   "presets": {
+    "beat-confetti": "Konfeti Rentak",
+    "bubbles": "Gelembung",
+    "confetti": "Konfeti",
+    "dust": "Debu",
+    "hearts": "Hati",
+    "layer-fountain": "Pancutan Lapisan",
+    "petals": "Kelopak",
+    "snow": "Salji",
+    "sparks": "Percikan",
+    "twinkle": "Berkelip"
    }
   },
   "pixelate": {

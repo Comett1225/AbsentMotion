@@ -2,6 +2,7 @@
  "categories": {
   "3d": "3D",
   "ai": "AI",
+  "beat": "Ritmo",
   "blur": "Desfoque",
   "color": "Cor",
   "distort": "Distorção",
@@ -60,6 +61,267 @@
     },
     "spill": {
      "label": "Efeitos se estendem para fora"
+    }
+   }
+  },
+  "beatblur": {
+   "description": "Aplica um desfoque de zoom a cada batida, que se dissipa conforme a batida passa. Selecione o clipe de música, abra o menu dele e toque em Marcar batidas primeiro; sem marcas de batida, ele segue o BPM definido.",
+   "name": "Desfoque no Beat",
+   "params": {
+    "beats": {
+     "label": "Batidas",
+     "options": [
+      "Cada batida",
+      "A cada 2 batidas",
+      "A cada 4 batidas"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Decaimento"
+    },
+    "offset": {
+     "label": "Deslocamento"
+    },
+    "strength": {
+     "label": "Intensidade"
+    }
+   }
+  },
+  "beatflash": {
+   "description": "Pisca a camada com uma cor a cada batida. Selecione o clipe de música, abra o menu dele e toque em Marcar batidas primeiro; sem marcas de batida, ele segue o BPM definido.",
+   "name": "Flash no Beat",
+   "params": {
+    "beats": {
+     "label": "Batidas",
+     "options": [
+      "Cada batida",
+      "A cada 2 batidas",
+      "A cada 4 batidas"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "color": {
+     "label": "Cor"
+    },
+    "decay": {
+     "label": "Decaimento"
+    },
+    "offset": {
+     "label": "Deslocamento"
+    },
+    "strength": {
+     "label": "Intensidade"
+    }
+   }
+  },
+  "beatglitch": {
+   "description": "Divide a camada em fatias deslocadas com cores separadas a cada batida. Selecione o clipe de música, abra o menu dele e toque em Marcar batidas primeiro; sem marcas de batida, ele segue o BPM definido.",
+   "name": "Glitch no Beat",
+   "params": {
+    "beats": {
+     "label": "Batidas",
+     "options": [
+      "Cada batida",
+      "A cada 2 batidas",
+      "A cada 4 batidas"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Decaimento"
+    },
+    "offset": {
+     "label": "Deslocamento"
+    },
+    "slices": {
+     "label": "Fatias"
+    },
+    "strength": {
+     "label": "Intensidade"
+    }
+   }
+  },
+  "beatglow": {
+   "description": "Faz as partes claras da camada brilharem a cada batida. Selecione o clipe de música, abra o menu dele e toque em Marcar batidas primeiro; sem marcas de batida, ele segue o BPM definido.",
+   "name": "Brilho no Beat",
+   "params": {
+    "beats": {
+     "label": "Batidas",
+     "options": [
+      "A cada batida",
+      "A cada 2 batidas",
+      "A cada 4 batidas"
+     ]
+    },
+    "blur": {
+     "label": "Raio"
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "color": {
+     "label": "Cor"
+    },
+    "decay": {
+     "label": "Decaimento"
+    },
+    "offset": {
+     "label": "Deslocamento"
+    },
+    "strength": {
+     "label": "Intensidade"
+    },
+    "threshold": {
+     "label": "Limiar"
+    }
+   }
+  },
+  "beatpulse": {
+   "description": "Clareia a camada a cada batida como um flash de exposição; uma intensidade negativa escurece. Selecione o clipe de música, abra o menu dele e toque em Marcar batidas primeiro; sem marcações, ele segue o BPM definido.",
+   "name": "Pulso do Beat",
+   "params": {
+    "beats": {
+     "label": "Batidas",
+     "options": [
+      "A cada batida",
+      "A cada 2 batidas",
+      "A cada 4 batidas"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Decaimento"
+    },
+    "offset": {
+     "label": "Deslocamento"
+    },
+    "strength": {
+     "label": "Intensidade"
+    }
+   }
+  },
+  "beatrgbsplit": {
+   "description": "Separa os canais vermelho e azul a cada batida. Selecione o clipe de música, abra o menu dele e toque em Marcar batidas primeiro; sem marcações, ele segue o BPM definido.",
+   "name": "Separação RGB do Beat",
+   "params": {
+    "angle": {
+     "label": "Ângulo"
+    },
+    "beats": {
+     "label": "Batidas",
+     "options": [
+      "A cada batida",
+      "A cada 2 batidas",
+      "A cada 4 batidas"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Decaimento"
+    },
+    "offset": {
+     "label": "Deslocamento"
+    },
+    "strength": {
+     "label": "Intensidade"
+    }
+   }
+  },
+  "beatrotate": {
+   "description": "Inclina a camada a cada batida, alternando para a esquerda e para a direita, e volta ao normal. Selecione o clipe de música, abra o menu dele e toque em Marcar batidas primeiro; sem marcações, ele segue o BPM definido.",
+   "name": "Rotação do Beat",
+   "params": {
+    "alternate": {
+     "label": "Alternar"
+    },
+    "beats": {
+     "label": "Batidas",
+     "options": [
+      "A cada batida",
+      "A cada 2 batidas",
+      "A cada 4 batidas"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "cover": {
+     "label": "Preencher quadro"
+    },
+    "decay": {
+     "label": "Decaimento"
+    },
+    "offset": {
+     "label": "Deslocamento"
+    },
+    "strength": {
+     "label": "Intensidade"
+    }
+   }
+  },
+  "beatshake": {
+   "description": "Trema a camada a cada batida, em uma direção nova a cada vez, e se acomoda antes da próxima. Selecione o clipe de música, abra o menu dele e toque em Marcar batidas primeiro; sem marcações, ele segue o BPM definido.",
+   "name": "Tremor do Beat",
+   "params": {
+    "beats": {
+     "label": "Batidas",
+     "options": [
+      "A cada batida",
+      "A cada 2 batidas",
+      "A cada 4 batidas"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Decaimento"
+    },
+    "frequency": {
+     "label": "Frequência"
+    },
+    "offset": {
+     "label": "Deslocamento"
+    },
+    "strength": {
+     "label": "Intensidade"
+    }
+   }
+  },
+  "beatzoom": {
+   "description": "Aproxima a cada batida e volta suavemente. Selecione o clipe de música, abra o menu dele e toque em Marcar batidas primeiro; sem marcações, ele segue o BPM definido.",
+   "name": "Zoom do Beat",
+   "params": {
+    "beats": {
+     "label": "Batidas",
+     "options": [
+      "A cada batida",
+      "A cada 2 batidas",
+      "A cada 4 batidas"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Decaimento"
+    },
+    "offset": {
+     "label": "Deslocamento"
+    },
+    "strength": {
+     "label": "Intensidade"
     }
    }
   },
@@ -3158,6 +3420,196 @@
       "Paleta"
      ]
     }
+   }
+  },
+  "particles": {
+   "description": "Lança partículas para fora da camada: neve, faíscas, confete, bolhas, poeira, corações, estrelas, pétalas ou pequenas cópias da própria camada, movidas por gravidade, vento e turbilhão. Comece por uma predefinição e ajuste o emissor, a quantidade e as forças. Em Batidas, dispara uma rajada a cada batida: selecione sua música, abra o menu dela e toque em Marcar batidas primeiro.",
+   "name": "Partículas",
+   "params": {
+    "beats": {
+     "label": "Batidas",
+     "options": [
+      "A cada batida",
+      "A cada 2 batidas",
+      "A cada 4 batidas"
+     ]
+    },
+    "blend": {
+     "label": "Mesclagem",
+     "options": [
+      "Normal",
+      "Adicionar",
+      "Tela"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "color": {
+     "label": "Cor"
+    },
+    "color2": {
+     "label": "Cor 2"
+    },
+    "colorMode": {
+     "label": "Modo de cor",
+     "options": [
+      "Cor única",
+      "Mistura aleatória",
+      "Ao longo da vida"
+     ]
+    },
+    "colorVariation": {
+     "label": "Variação de cor"
+    },
+    "count": {
+     "label": "Quantidade"
+    },
+    "direction": {
+     "label": "Direção"
+    },
+    "drag": {
+     "label": "Resistência do ar"
+    },
+    "emission": {
+     "label": "Emissão",
+     "options": [
+      "Contínua",
+      "Rajada",
+      "Em Batidas"
+     ]
+    },
+    "emitter": {
+     "label": "Emissor",
+     "options": [
+      "Ponto",
+      "Linha",
+      "Área",
+      "Contorno"
+     ]
+    },
+    "emitterSize": {
+     "label": "Tamanho do emissor"
+    },
+    "endSize": {
+     "label": "Tamanho final"
+    },
+    "every": {
+     "label": "Repetir a cada"
+    },
+    "fadeIn": {
+     "label": "Entrada gradual"
+    },
+    "fadeOut": {
+     "label": "Saída gradual"
+    },
+    "gravity": {
+     "label": "Gravidade"
+    },
+    "kind": {
+     "label": "Partícula",
+     "options": [
+      "Neve",
+      "Faíscas",
+      "Confete",
+      "Bolhas",
+      "Poeira",
+      "Corações",
+      "Estrelas",
+      "Pétalas",
+      "Camada"
+     ]
+    },
+    "layer": {
+     "label": "Camada",
+     "options": [
+      "Abaixo das partículas",
+      "Acima das partículas",
+      "Oculta"
+     ]
+    },
+    "lifeVariation": {
+     "label": "Variação do tempo de vida"
+    },
+    "lifetime": {
+     "label": "Tempo de vida"
+    },
+    "more": {
+     "label": "Mais configurações"
+    },
+    "orientation": {
+     "label": "Orientação",
+     "options": [
+      "Livre",
+      "Seguir movimento"
+     ]
+    },
+    "position": {
+     "label": "Posição do emissor"
+    },
+    "prewarm": {
+     "label": "Iniciar preenchido"
+    },
+    "randomRotation": {
+     "label": "Rotação aleatória"
+    },
+    "rate": {
+     "label": "Taxa"
+    },
+    "seed": {
+     "label": "Semente"
+    },
+    "size": {
+     "label": "Tamanho"
+    },
+    "sizeVariation": {
+     "label": "Variação do tamanho"
+    },
+    "speed": {
+     "label": "Velocidade"
+    },
+    "speedVariation": {
+     "label": "Variação da velocidade"
+    },
+    "spin": {
+     "label": "Giro"
+    },
+    "spinVariation": {
+     "label": "Variação do giro"
+    },
+    "spread": {
+     "label": "Dispersão"
+    },
+    "start": {
+     "label": "Tempo da rajada"
+    },
+    "swirl": {
+     "label": "Turbilhão"
+    },
+    "swirlSpeed": {
+     "label": "Velocidade do turbilhão"
+    },
+    "tint": {
+     "label": "Tonalidade"
+    },
+    "twinkle": {
+     "label": "Cintilar"
+    },
+    "wind": {
+     "label": "Vento"
+    }
+   },
+   "presets": {
+    "beat-confetti": "Confete no ritmo",
+    "bubbles": "Bolhas",
+    "confetti": "Confete",
+    "dust": "Poeira",
+    "hearts": "Corações",
+    "layer-fountain": "Fonte de camada",
+    "petals": "Pétalas",
+    "snow": "Neve",
+    "sparks": "Faíscas",
+    "twinkle": "Cintilar"
    }
   },
   "pixelate": {

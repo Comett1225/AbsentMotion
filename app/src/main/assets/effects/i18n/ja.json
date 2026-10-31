@@ -2,6 +2,7 @@
  "categories": {
   "3d": "3D",
   "ai": "AI",
+  "beat": "ビート",
   "blur": "ブラー",
   "color": "カラー",
   "distort": "歪み",
@@ -60,6 +61,267 @@
     },
     "spill": {
      "label": "エフェクトを外側に広げる"
+    }
+   }
+  },
+  "beatblur": {
+   "description": "ビートごとにズームブラーがかかり、ビートが減衰すると消えます。音楽クリップを選択してメニューを開き、先に「ビートをマーク」をタップしてください。ビートマークがない場合はBPM設定に従います。",
+   "name": "ビートブラー",
+   "params": {
+    "beats": {
+     "label": "ビート",
+     "options": [
+      "毎ビート",
+      "2ビートごと",
+      "4ビートごと"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "減衰"
+    },
+    "offset": {
+     "label": "オフセット"
+    },
+    "strength": {
+     "label": "強さ"
+    }
+   }
+  },
+  "beatflash": {
+   "description": "ビートごとにレイヤーを色でフラッシュさせます。音楽クリップを選択してメニューを開き、先に「ビートをマーク」をタップしてください。ビートマークがない場合はBPM設定に従います。",
+   "name": "ビートフラッシュ",
+   "params": {
+    "beats": {
+     "label": "ビート",
+     "options": [
+      "毎ビート",
+      "2ビートごと",
+      "4ビートごと"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "color": {
+     "label": "色"
+    },
+    "decay": {
+     "label": "減衰"
+    },
+    "offset": {
+     "label": "オフセット"
+    },
+    "strength": {
+     "label": "強さ"
+    }
+   }
+  },
+  "beatglitch": {
+   "description": "ビートごとにレイヤーをずらしたスライスに分割し、色をずらして表示します。音楽クリップを選択してメニューを開き、先に「ビートをマーク」をタップしてください。ビートマークがない場合はBPM設定に従います。",
+   "name": "ビートグリッチ",
+   "params": {
+    "beats": {
+     "label": "ビート",
+     "options": [
+      "毎ビート",
+      "2ビートごと",
+      "4ビートごと"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "減衰"
+    },
+    "offset": {
+     "label": "オフセット"
+    },
+    "slices": {
+     "label": "スライス"
+    },
+    "strength": {
+     "label": "強さ"
+    }
+   }
+  },
+  "beatglow": {
+   "description": "ビートごとにレイヤーの明るい部分を光らせます。音楽クリップを選択してメニューを開き、先に「ビートをマーク」をタップしてください。ビートマークがない場合はBPM設定に従います。",
+   "name": "ビートグロー",
+   "params": {
+    "beats": {
+     "label": "ビート",
+     "options": [
+      "毎ビート",
+      "2ビートごと",
+      "4ビートごと"
+     ]
+    },
+    "blur": {
+     "label": "半径"
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "color": {
+     "label": "色"
+    },
+    "decay": {
+     "label": "減衰"
+    },
+    "offset": {
+     "label": "オフセット"
+    },
+    "strength": {
+     "label": "強さ"
+    },
+    "threshold": {
+     "label": "しきい値"
+    }
+   }
+  },
+  "beatpulse": {
+   "description": "ビートごとに露光が光るようにレイヤーを明るくします。強さをマイナスにすると暗くなります。先に音楽クリップを選択してメニューを開き、ビートをマークしてください。ビートマークがない場合はBPM設定に従います。",
+   "name": "ビートパルス",
+   "params": {
+    "beats": {
+     "label": "ビート",
+     "options": [
+      "毎ビート",
+      "2ビートごと",
+      "4ビートごと"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "減衰"
+    },
+    "offset": {
+     "label": "オフセット"
+    },
+    "strength": {
+     "label": "強さ"
+    }
+   }
+  },
+  "beatrgbsplit": {
+   "description": "ビートごとに赤と青のチャンネルをずらします。先に音楽クリップを選択してメニューを開き、ビートをマークしてください。ビートマークがない場合はBPM設定に従います。",
+   "name": "ビートRGB分離",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "beats": {
+     "label": "ビート",
+     "options": [
+      "毎ビート",
+      "2ビートごと",
+      "4ビートごと"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "減衰"
+    },
+    "offset": {
+     "label": "オフセット"
+    },
+    "strength": {
+     "label": "強さ"
+    }
+   }
+  },
+  "beatrotate": {
+   "description": "ビートごとにレイヤーを左右交互に傾けて、元に戻します。先に音楽クリップを選択してメニューを開き、ビートをマークしてください。ビートマークがない場合はBPM設定に従います。",
+   "name": "ビート回転",
+   "params": {
+    "alternate": {
+     "label": "交互"
+    },
+    "beats": {
+     "label": "ビート",
+     "options": [
+      "毎ビート",
+      "2ビートごと",
+      "4ビートごと"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "cover": {
+     "label": "フレームを埋める"
+    },
+    "decay": {
+     "label": "減衰"
+    },
+    "offset": {
+     "label": "オフセット"
+    },
+    "strength": {
+     "label": "強さ"
+    }
+   }
+  },
+  "beatshake": {
+   "description": "ビートごとに毎回違う方向へレイヤーを揺らし、次のビートまでに収まります。先に音楽クリップを選択してメニューを開き、ビートをマークしてください。ビートマークがない場合はBPM設定に従います。",
+   "name": "ビートシェイク",
+   "params": {
+    "beats": {
+     "label": "ビート",
+     "options": [
+      "毎ビート",
+      "2ビートごと",
+      "4ビートごと"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "減衰"
+    },
+    "frequency": {
+     "label": "周波数"
+    },
+    "offset": {
+     "label": "オフセット"
+    },
+    "strength": {
+     "label": "強さ"
+    }
+   }
+  },
+  "beatzoom": {
+   "description": "ビートごとにズームインし、ゆっくり戻ります。先に音楽クリップを選択してメニューを開き、ビートをマークしてください。ビートマークがない場合はBPM設定に従います。",
+   "name": "ビートズーム",
+   "params": {
+    "beats": {
+     "label": "ビート",
+     "options": [
+      "毎拍",
+      "2拍ごと",
+      "4拍ごと"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "減衰"
+    },
+    "offset": {
+     "label": "オフセット"
+    },
+    "strength": {
+     "label": "強さ"
     }
    }
   },
@@ -3158,6 +3420,196 @@
       "パレット"
      ]
     }
+   }
+  },
+  "particles": {
+   "description": "レイヤーからパーティクルを飛ばします。雪、火花、紙吹雪、泡、塵、ハート、星、花びら、またはレイヤー自身の小さなコピーを、重力・風・渦で動かせます。プリセットから始めて、エミッターや量、力を調整してください。拍に合わせて飛ばす場合は、先に音楽を選択してメニューから拍をマークしてください。",
+   "name": "パーティクル",
+   "params": {
+    "beats": {
+     "label": "拍",
+     "options": [
+      "毎拍",
+      "2拍ごと",
+      "4拍ごと"
+     ]
+    },
+    "blend": {
+     "label": "ブレンド",
+     "options": [
+      "通常",
+      "加算",
+      "スクリーン"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "color": {
+     "label": "色"
+    },
+    "color2": {
+     "label": "色2"
+    },
+    "colorMode": {
+     "label": "カラーモード",
+     "options": [
+      "単色",
+      "ランダムミックス",
+      "ライフタイムで変化"
+     ]
+    },
+    "colorVariation": {
+     "label": "色のばらつき"
+    },
+    "count": {
+     "label": "個数"
+    },
+    "direction": {
+     "label": "方向"
+    },
+    "drag": {
+     "label": "空気抵抗"
+    },
+    "emission": {
+     "label": "放出",
+     "options": [
+      "連続",
+      "バースト",
+      "拍に合わせて"
+     ]
+    },
+    "emitter": {
+     "label": "エミッター",
+     "options": [
+      "点",
+      "線",
+      "範囲",
+      "輪郭"
+     ]
+    },
+    "emitterSize": {
+     "label": "エミッターサイズ"
+    },
+    "endSize": {
+     "label": "終了時の大きさ"
+    },
+    "every": {
+     "label": "繰り返し間隔"
+    },
+    "fadeIn": {
+     "label": "フェードイン"
+    },
+    "fadeOut": {
+     "label": "フェードアウト"
+    },
+    "gravity": {
+     "label": "重力"
+    },
+    "kind": {
+     "label": "パーティクル",
+     "options": [
+      "雪",
+      "火花",
+      "紙吹雪",
+      "泡",
+      "塵",
+      "ハート",
+      "星",
+      "花びら",
+      "レイヤー"
+     ]
+    },
+    "layer": {
+     "label": "レイヤー",
+     "options": [
+      "パーティクルの下",
+      "パーティクルの上",
+      "非表示"
+     ]
+    },
+    "lifeVariation": {
+     "label": "寿命のばらつき"
+    },
+    "lifetime": {
+     "label": "寿命"
+    },
+    "more": {
+     "label": "詳細設定"
+    },
+    "orientation": {
+     "label": "方向",
+     "options": [
+      "自由",
+      "モーションに追従"
+     ]
+    },
+    "position": {
+     "label": "エミッター位置"
+    },
+    "prewarm": {
+     "label": "最初から充填"
+    },
+    "randomRotation": {
+     "label": "ランダム回転"
+    },
+    "rate": {
+     "label": "発生レート"
+    },
+    "seed": {
+     "label": "シード"
+    },
+    "size": {
+     "label": "大きさ"
+    },
+    "sizeVariation": {
+     "label": "大きさのばらつき"
+    },
+    "speed": {
+     "label": "速度"
+    },
+    "speedVariation": {
+     "label": "速度のばらつき"
+    },
+    "spin": {
+     "label": "スピン"
+    },
+    "spinVariation": {
+     "label": "スピンのばらつき"
+    },
+    "spread": {
+     "label": "広がり"
+    },
+    "start": {
+     "label": "バースト時間"
+    },
+    "swirl": {
+     "label": "渦"
+    },
+    "swirlSpeed": {
+     "label": "渦の速さ"
+    },
+    "tint": {
+     "label": "着色"
+    },
+    "twinkle": {
+     "label": "きらめき"
+    },
+    "wind": {
+     "label": "風"
+    }
+   },
+   "presets": {
+    "beat-confetti": "ビート紙吹雪",
+    "bubbles": "泡",
+    "confetti": "紙吹雪",
+    "dust": "ほこり",
+    "hearts": "ハート",
+    "layer-fountain": "レイヤーファウンテン",
+    "petals": "花びら",
+    "snow": "雪",
+    "sparks": "火花",
+    "twinkle": "きらめき"
    }
   },
   "pixelate": {
