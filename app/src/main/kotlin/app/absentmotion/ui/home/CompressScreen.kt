@@ -102,11 +102,17 @@ private val Levels = listOf(
 private val DiscordNames = listOf(R.string.compress_discord_free, R.string.compress_discord_basic, R.string.compress_discord_nitro)
 
 @Composable
-internal fun CompressScreen(onClose: () -> Unit) {
+internal fun CompressScreen(initial: android.net.Uri? = null, onClose: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var picked by remember { mutableStateOf<PickedMedia?>(null) }
     var unreadable by remember { mutableStateOf(false) }
+    LaunchedEffect(initial) {
+        if (initial != null) {
+            picked = readPicked(context, initial)
+            unreadable = picked == null
+        }
+    }
     var level by rememberSaveable { mutableStateOf(CompressLevel.Medium) }
     var discord by rememberSaveable { mutableStateOf(DiscordLimit.Free) }
     var custom by remember { mutableStateOf(CustomChoice()) }

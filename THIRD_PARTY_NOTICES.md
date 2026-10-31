@@ -14,7 +14,7 @@ dependency is added, removed or upgraded, update this file in the same change.
 
 **Contents**
 
-1. Engine libraries (C and C++): Skia and the libraries it links, whisper.cpp and ggml, RNNoise, ncnn, glslang, the RIFE warp layer, LAME
+1. Engine libraries (C and C++): Skia and the libraries it links, whisper.cpp and ggml, RNNoise, ncnn, glslang, the RIFE warp layer, LAME, and the video downloader add-on (CPython and yt-dlp, downloaded at run time)
 2. Machine learning models: OpenAI Whisper weights, RIFE and Real-ESRGAN weights and the AI background removal 2.0 model (all downloaded at run time), background removal model (`foss` build)
 3. Kotlin and Compose libraries
 4. Google Play services (proprietary)
@@ -209,6 +209,49 @@ together with Skia.
 - URL: https://lame.sourceforge.io/
 - Used in: MP3 audio export. LAME is built as its own shared library, `libmp3lame.so`, and loaded through a small
   separate library, `liblame_jni.so`, so it can be replaced with another build of LAME.
+
+### Video downloader add-on (downloaded on request, not part of the app)
+
+The Video Downloader in Tools needs an add-on that the user downloads once, after the app has shown its size. Nothing
+of it is in the APK except AbsentMotion's own small bridge library, `libampy.so` (Apache-2.0, The AbsentMotion authors),
+which loads the downloaded Python at run time, and the Python glue `assets/downloader/am_dl.py` (Apache-2.0). Settings
+can remove the add-on.
+
+#### CPython
+
+- Version: 3.14.10, the official Android package `python-3.14.10-aarch64-linux-android.tar.gz` from python.org
+  (SHA-256 `423c80b957330cf0ebb92b9b20f2294c292144a441bdb0ceb8c69d14928e569b`), downloaded from
+  https://www.python.org/ftp/python/3.14.10/ and checked against that hash. Only the run-time parts are unpacked
+  (`libpython3.14.so`, the standard library, its extension modules and the OpenSSL libraries); tests, IDLE, Tk, the
+  SQLite module and the headers are left out.
+- Licence: Python Software Foundation License Version 2 (PSF-2.0); the full text and the history of the licence ship
+  in the package as `lib/python3.14/LICENSE.txt`. Components inside the package keep their own licences: OpenSSL 3.5
+  (Apache-2.0, in `libcrypto_python.so` and `libssl_python.so`), libffi (MIT, inside the `_ctypes` module), zlib (zlib
+  licence), bzip2 (bzip2 licence), XZ Utils (0BSD), Zstandard (BSD-3-Clause), mpdecimal (BSD-2-Clause), Expat (MIT) and
+  HACL* (MIT); see https://docs.python.org/3.14/license.html.
+- Copyright: Copyright (c) 2001 Python Software Foundation; All Rights Reserved.
+- URL: https://www.python.org/downloads/android/
+- Used in: the Video Downloader, which runs yt-dlp inside the app's own process through `libampy.so`.
+
+#### yt-dlp
+
+- Version: the latest release of yt-dlp's official `yt-dlp` file (a zip of the Python sources), downloaded from
+  https://github.com/yt-dlp/yt-dlp/releases and checked against the `SHA2-256SUMS` file of the same release. The app
+  checks for a newer release at most once a day and uses it from the next start.
+- Licence: The Unlicense (public domain dedication).
+- Copyright: none claimed (public domain); see https://github.com/yt-dlp/yt-dlp/blob/master/LICENSE.
+- URL: https://github.com/yt-dlp/yt-dlp
+- Used in: the Video Downloader (reading links, finding the qualities a link has and downloading them). Video and
+  sound files are joined with Android's own `MediaMuxer`; no FFmpeg is used.
+
+#### yt-dlp-ejs (inside the yt-dlp file)
+
+- Version: the one pinned by each yt-dlp release (0.8.0 with yt-dlp 2026.10.26).
+- Licence: The Unlicense. Its solver script bundles meriyah (ISC, Copyright (c) 2019 and later, KFlash and others) and
+  astring (MIT, Copyright (c) 2015, David Bonnet); the licence texts are in the header of the bundled script.
+- URL: https://github.com/yt-dlp/ejs
+- Used in: YouTube links. The script runs in the phone's own Android System WebView, so no JavaScript runtime is
+  downloaded or bundled.
 
 ---
 
