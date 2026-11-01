@@ -1,0 +1,9 @@
+#!/bin/sh
+set -eu
+HERE="$(CDPATH= cd -- "$(dirname "$0")" && pwd)"
+if [ "$(uname -s)" = "Darwin" ]; then
+    JDK21="$(/usr/libexec/java_home -v 21 2>/dev/null || true)"
+    if [ -z "$JDK21" ] && [ -x /opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home/bin/java ]; then JDK21=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home; fi
+    if [ -n "$JDK21" ]; then export JAVA_HOME="$JDK21"; fi
+fi
+exec "$HERE/../gradlew" -p "$HERE" "$@"

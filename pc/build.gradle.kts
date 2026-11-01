@@ -1,0 +1,77 @@
+plugins {
+    kotlin("jvm") version "2.4.21"
+    id("org.jetbrains.kotlin.plugin.compose") version "2.4.21"
+    id("org.jetbrains.compose") version "1.10.3"
+}
+
+kotlin {
+    jvmToolchain(21)
+    sourceSets.main {
+        kotlin.srcDir("src/shared-shims")
+        kotlin.srcDir("../app/src/main/kotlin")
+        kotlin.include("app/absentmotion/pc/**", "app/absentmotion/model/**", "app/absentmotion/compat/ForeignEffectIds.kt", "app/absentmotion/effects/EffectDefinition.kt", "desktop_shims/**")
+    }
+}
+
+dependencies {
+    implementation(compose.desktop.currentOs)
+    implementation("org.json:json:20250517")
+    implementation("net.sf.kxml:kxml2:2.3.0")
+}
+
+val nativeBuild by tasks.registering(Exec::class) {
+    commandLine("sh", "native/build_mac.sh")
+}
+
+tasks.withType<JavaExec>().matching { it.name == "run" }.configureEach {
+    dependsOn(nativeBuild)
+    systemProperty("am.assets", file("../app/src/main/assets").absolutePath)
+    systemProperty("am.native", file("build/native/libamdesktop.dylib").absolutePath)
+    systemProperty("am.repo", file("..").absolutePath)
+    systemProperty("skiko.data.path", file("build/skiko").absolutePath)
+}
+
+compose.desktop {
+    application {
+        mainClass = "app.absentmotion.pc.MainKt"
+        nativeDistributions {
+            targetFormats(org.jetbrains.compose.desktop.application.dsl.TargetFormat.Dmg)
+            packageName = "AbsentMotion"
+            packageVersion = "5.0.0"
+            macOS { bundleID = "app.absentmotion.desktop" }
+            appResourcesRootDir.set(project.layout.buildDirectory.dir("app-resources"))
+        }
+    }
+}
+
+val prepareResources by tasks.registering(Sync::class) {
+    dependsOn(nativeBuild)
+    into(layout.buildDirectory.dir("app-resources/common"))
+    from("../app/src/main/assets") { into("assets") }
+    from("build/native/libamdesktop.dylib")
+}
+tasks.matching { it.name == "createDistributable" || it.name.startsWith("prepareAppResources") }.configureEach { dependsOn(prepareResources) }
+
+val renderCheck by tasks.registering(JavaExec::class) {
+    dependsOn(nativeBuild, tasks.named("classes"))
+    classpath = sourceSets.main.get().runtimeClasspath
+    mainClass = "app.absentmotion.pc.MainKt"
+    args("--render-check")
+    systemProperty("java.awt.headless", "true")
+    systemProperty("am.assets", file("../app/src/main/assets").absolutePath)
+    systemProperty("am.native", file("build/native/libamdesktop.dylib").absolutePath)
+    systemProperty("am.repo", file("..").absolutePath)
+    systemProperty("am.output", file("build").absolutePath)
+}
+
+val sceneCheck by tasks.registering(JavaExec::class) {
+    dependsOn(nativeBuild, tasks.named("classes"))
+    classpath = sourceSets.main.get().runtimeClasspath
+    mainClass = "app.absentmotion.pc.MainKt"
+    args("--scene-check")
+    systemProperty("java.awt.headless", "true")
+    systemProperty("am.assets", file("../app/src/main/assets").absolutePath)
+    systemProperty("am.native", file("build/native/libamdesktop.dylib").absolutePath)
+    systemProperty("am.repo", file("..").absolutePath)
+    systemProperty("am.output", file("build").absolutePath)
+}
