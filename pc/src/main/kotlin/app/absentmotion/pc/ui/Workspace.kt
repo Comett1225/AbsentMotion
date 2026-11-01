@@ -199,6 +199,8 @@ fun FrameWindowScope.Workspace(window: Window, quit: () -> Unit, startFile: File
             } else if (event.type != KeyEventType.KeyDown || event.isMetaPressed || event.isCtrlPressed) false else when (event.key) {
                 Key.DirectionLeft -> { state.playing = false; state.step(if (event.isShiftPressed) -10 else -1); true }
                 Key.DirectionRight -> { state.playing = false; state.step(if (event.isShiftPressed) 10 else 1); true }
+                Key.Plus, Key.Equals -> { zoom = (zoom * 1.5f).coerceAtMost(15f); true }
+                Key.Minus -> { zoom = (zoom / 1.5f).coerceAtLeast(.5f); true }
                 Key.MoveHome -> { state.playing = false; state.time = 0; true }
                 Key.MoveEnd -> { state.playing = false; state.time = state.scene.frameStart(state.scene.lastFrame); true }
                 else -> false
