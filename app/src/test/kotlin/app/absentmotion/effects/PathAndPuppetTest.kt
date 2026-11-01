@@ -45,7 +45,7 @@ class PathAndPuppetTest {
     @Test fun bothEffectsAreNativeNewAndListed() {
         assertTrue(path.native && path.category == "text" && path.since == "4.2.0")
         assertTrue(puppet.native && puppet.category == "distort" && puppet.since == "4.2.0")
-        assertTrue(catalog.isNew(path) && catalog.isNew(puppet))
+        assertTrue(!catalog.isNew(path) && !catalog.isNew(puppet))
         assertEquals(listOf("Arc", "Circle", "Layer Below"), path.params.first { it.id == "shape" }.options)
         assertEquals("1.000000", puppet.params.single().default)
     }

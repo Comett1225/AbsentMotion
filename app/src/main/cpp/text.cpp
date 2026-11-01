@@ -545,12 +545,13 @@ void Apply(const Layer& l, float t, float seconds, const std::string& shown, con
         const int shape = Choice(e, "shape", t, 0, 5), style = Choice(e, "style", t, 1, 4);
         const uint64_t seed = Seed(l, e, t);
         const float speed = e.value("speed", t, 24), cycles = e.value("cycles", t, 1), spread = e.value("spread", t, 30);
-        const float size = e.value("amount", t, 4), turn = e.value("rotation", t, 0);
+        const float size = e.value("amount", t, 4), turn = e.value("rotation", t, 0), letters = e.value("letters", t, 1), every = e.value("every", t, 0.6f);
         std::vector<Look> looks(count);
         std::vector<SkMatrix> matrices(count);
         for (int u = 0; u < count; u++) {
             if (shake) {
-                const float w = textanim::RangeWeight(textanim::kSquare, u, count, start, end);
+                const float w = textanim::RangeWeight(textanim::kSquare, u, count, start, end) *
+                                (textanim::Picked(u, seed, seconds, letters, every) ? 1.0f : 0.0f);
                 const textanim::Wiggle g = textanim::Shake(style, u, seed, seconds, speed, cycles, spread, size, turn);
                 looks[u].move = {g.x * w, g.y * w};
                 looks[u].rotation = g.angle * w;

@@ -35,7 +35,7 @@ SHORT = {
 }
 GROUPS = ["Start", "Interface", "Create", "Sound and AI", "Export and projects", "Help"]
 CATEGORIES = [("color", "Color"), ("blur", "Blur"), ("distort", "Distort"), ("stylize", "Stylize"), ("noise", "Noise"),
-              ("repeat", "Repeat"), ("key", "Key"), ("move", "Move"), ("beat", "Beat"), ("3d", "3D"), ("text", "Text")]
+              ("repeat", "Repeat"), ("key", "Key"), ("move", "Move"), ("beat", "Beat"), ("3d", "3D"), ("text", "Text"), ("other", "Other")]
 TIERS = {"latest", "compatible", "unsupported"}
 AI_CLASSES = {"great", "good", "slow"}
 DEVICE_KEYS = ["brand", "name", "aliases", "modelCodes", "year", "launchAndroid", "maxAndroid", "chip", "ramGB", "arm64",

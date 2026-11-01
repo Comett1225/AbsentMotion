@@ -232,15 +232,16 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
                     val worldView = world?.takeUnless { state.playing }?.let { v -> Matrix().apply { setValues(v) } }?.takeIf { it.invert(Matrix()) }
                     fun onScreen(p: Pt): Offset? = worldView?.map(p)?.let { Offset(it.x, it.y) * currentScale + currentOffset }
                     fun inLayer(at: Offset): Pt? = worldView?.inverseMap(((at - currentOffset) / currentScale).let { Pt(it.x, it.y) })
-                    val pointGrab = points?.points?.indices?.mapNotNull { i -> onScreen(points.points[i])?.let { i to (it - down.position).getDistance() } }
+                    val gradientMode = startLayer != null && startQuad != null && state.panel == EditorPanel.ColorFill && startLayer.fillType == "gradient"
+                    val pointGrab = if (gradientMode) -1 else points?.points?.indices?.mapNotNull { i -> onScreen(points.points[i])?.let { i to (it - down.position).getDistance() } }
                         ?.filter { it.second < 24.dp.toPx() }?.minByOrNull { it.second }?.first ?: -1
                     val grabOffset = if (pointGrab >= 0) (onScreen(points!!.points[pointGrab]) ?: down.position) - down.position else Offset.Zero
                     if (pointGrab >= 0) points?.pick?.invoke(pointGrab)
                     val handle = if (pointGrab >= 0) -1 else if (startLayer != null && startQuad != null && state.panel == EditorPanel.EditText && !startLayer.onTextPath) {
                         val centre = if (startLayer.textAlign == "right") (startQuad[0] + startQuad[3]) / 2f else (startQuad[1] + startQuad[2]) / 2f
                         if ((centre - down.position).getDistance() < 24.dp.toPx()) 9 else -1
-                    } else if (startLayer != null && startQuad != null && state.panel == EditorPanel.ColorFill && startLayer.fillType == "gradient") {
-                        gradientHandleAt(startLayer, startQuad, down.position, 24.dp.toPx())
+                    } else if (gradientMode) {
+                        nearestGradientHandle(startLayer, startQuad, down.position)
                     } else if (startLayer != null && startQuad != null && startLayer.kind != "camera" && (state.panel == EditorPanel.Tools || (state.panel == EditorPanel.Effects && adjusting == null))) {
                         HandleHit.at(handlesOf(startQuad), down.position, HandleHit.reach(startQuad, density))
                     } else {

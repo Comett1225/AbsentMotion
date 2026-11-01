@@ -1,5 +1,8 @@
 package app.absentmotion.ui.editor.panels
 
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.runtime.collectAsState
+import app.absentmotion.ui.editor.effects.Thumbnail
 import app.absentmotion.ui.tutorial.tutorialGuard
 
 import androidx.compose.foundation.background
@@ -196,9 +199,31 @@ private fun CopyEffectsDialog(names: List<String>, onDismiss: () -> Unit, onCopy
 private fun EffectHeader(state: EditorState, index: Int, effect: XmlNode, definition: EffectDefinition?) {
     var menu by remember { mutableStateOf(false) }
     var help by remember { mutableStateOf(false) }
+    var presets by remember { mutableStateOf(false) }
     Row(Modifier.fillMaxWidth().height(37.dp).background(Am.CardHeader).clickable { state.effectIndex = -1 }.padding(start = 3.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
         Icon(EffectIcons.Expanded, null, Modifier.padding(start = 8.dp).size(18.dp).alpha(0.9f), tint = Am.OnDark)
         Text(definition?.name ?: effect["id"]?.substringAfterLast('.') ?: "", Modifier.weight(1f).padding(start = 6.dp, end = 4.dp), color = Am.OnDark, fontSize = 14.sp, maxLines = 1)
+        if (definition != null && definition.presets.isNotEmpty()) Box {
+            Text(stringResource(R.string.presets), Modifier.clip(RowShape).background(Color(0x33000000)).clickable { presets = true }.padding(horizontal = 9.dp, vertical = 5.dp),
+                color = Am.OnDark, fontSize = 13.sp, maxLines = 1)
+            Presence(presets) {
+                MenuPopup(DropOrRise, { presets = false }) {
+                    val catalog by state.engine.effects.collectAsState()
+                    Column(Modifier.heightIn(max = 360.dp).verticalScroll(rememberScrollState())) {
+                        definition.presets.forEach { preset ->
+                            Row(Modifier.fillMaxWidth().height(52.dp).clickable {
+                                val length = state.selected?.let { it.endTime - it.startTime } ?: 1000
+                                state.editSelected { it.withEffect(index) { old -> old.copy(children = definition.instance(preset, length).children) } }
+                                presets = false
+                            }.padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Thumbnail(catalog, definition.thumbnail(preset), Modifier.size(40.dp).clip(RowShape))
+                                Text(preset.name, Modifier.padding(start = 12.dp), color = Am.OnDark, fontSize = 15.sp, maxLines = 1)
+                            }
+                        }
+                    }
+                }
+            }
+        }
         if (definition != null) Box(Modifier.size(36.dp).clickable { help = true }, contentAlignment = Alignment.Center) {
             Icon(ExportIcons.Help, stringResource(R.string.effect_help), Modifier.size(22.dp), tint = Am.OnDark)
         }

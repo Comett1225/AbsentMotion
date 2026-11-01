@@ -37,6 +37,7 @@ std::string Scramble(const std::string& text, float progress, int direction, uin
 
 std::vector<float> TypeTimes(const std::string& text, float speed, float pause);
 std::vector<float> BlipTimes(const std::string& text, float speed, float pause, int every);
+bool Picked(int index, uint64_t seed, float seconds, float fraction, float every);
 Wiggle Shake(int style, int index, uint64_t seed, float seconds, float speed, float cycles, float spread, float amount, float turn);
 
 }

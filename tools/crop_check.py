@@ -28,6 +28,13 @@ def crop_definition():
     return f"<effect id=\"absent.crop\" sksl={quoteattr(effect['sksl'])}>{params}</effect>"
 
 
+def ascii_definition():
+    effect = json.loads((ROOT / "app/src/main/assets/effects/ascii.json").read_text())
+    value = lambda p: "1" if p["default"] is True else "0" if p["default"] is False else "#ff" + p["default"][1:] if p["type"] == "color" else str(p["default"])
+    params = "".join(f'<param name="{p["id"]}" value={quoteattr(value(p))}/>' for p in effect["params"])
+    return f"<effect id=\"absent.ascii\" sksl={quoteattr(effect['sksl'])}>{params}</effect>"
+
+
 def effect(id, **values):
     props = "".join(f'<property name="{k}" type="float" value="{v:.6f}"/>' for k, v in values.items())
     return f'<effect id="{id}" hidden="false">{props}</effect>'
@@ -41,13 +48,20 @@ def scene(*effects):
 
 def render(binary, work, xml):
     work.mkdir(exist_ok=True)
-    (work / "effects.txt").write_text(crop_definition() + '\n<effect id="absent.blur"><param name="strength" value="10.000000"/></effect>\n')
+    (work / "effects.txt").write_text(crop_definition() + '\n<effect id="absent.blur"><param name="strength" value="10.000000"/></effect>\n' + ascii_definition() + "\n")
     (work / "scene.xml").write_text(xml)
     r = subprocess.run([str(binary), str(work / "effects.txt"), str(work / "scene.xml"), "1", "0", str(work), "0"], capture_output=True, text=True)
     if r.returncode != 0 or "effect:" in r.stderr or "scene:" in r.stderr:
         raise RuntimeError(r.stderr)
     last = json.loads(r.stdout.strip().splitlines()[-1])
     return np.fromfile(work / "frame0.rgba", dtype=np.uint8).reshape(last["height"], last["width"], 4).astype(float)
+
+
+def ascii_covers(binary, tmp):
+    for n, (cell, scale, half, y) in enumerate([(6.5, 1, 160, 160), (30.5, 1, 160, 160), (4, 2.042, 90, 170), (30.5, 2.042, 90, 170)]):
+        xml = scene(effect("absent.ascii", cell=cell)).replace('<location value="160,160,0"/>', f'<location value="160,{y},0"/><scale value="{scale},{scale}"/>')
+        alpha = render(binary, tmp / f"ascii{n}", xml.replace('value="40,40"', f'value="{half},{half}"').replace('fillType="color"', 'fillType="media" fillImage="x.jpg"'))[..., 3]
+        check(f"ASCII at Size {cell} on a layer scaled {scale} fills the whole canvas without a cut edge", bool(alpha.min() > 250), f"min alpha {alpha.min()}")
 
 
 def run(binary, tmp):
@@ -95,6 +109,7 @@ def main():
             print(build.stdout[-2000:], build.stderr[-2000:])
             return 1
         run(Path(tmp) / "bin/render_bench", Path(tmp))
+        ascii_covers(Path(tmp) / "bin/render_bench", Path(tmp))
     print(f"crop_check: {CHECKS[0]} checks, {len(FAILURES)} failed")
     return 1 if FAILURES else 0
 

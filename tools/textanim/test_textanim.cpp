@@ -249,6 +249,17 @@ int main() {
         const Wiggle r = Shake(3, 0, 7, 0, 0, 1, 0, 5, 0);
         check(near(r.x, 5) && near(r.y, 0), "circle starts on the right");
         check(near(Shake(4, 0, 7, 0.25f, 0, 1, 0, 0, 20).angle, 20), "wobble turns by the rotation");
+        int picked = 0, kept = 0, moved = 0;
+        for (int i = 0; i < 1000; i++) {
+            const bool now = Picked(i, 7, 0.1f, 0.2f, 0.5f);
+            picked += now;
+            kept += now == Picked(i, 7, 0.4f, 0.2f, 0.5f);
+            moved += now != Picked(i, 7, 0.6f, 0.2f, 0.5f);
+        }
+        check(picked > 150 && picked < 250, "about a fifth of the letters shake");
+        check(kept == 1000, "the same letters keep shaking until the next pick");
+        check(moved > 200, "a new set of letters is picked after the interval");
+        check(Picked(3, 7, 0, 1, 0.5f) && !Picked(3, 7, 0, 0, 0.5f), "all or none at the ends");
         const Wiggle other = Shake(1, 4, 7, 0.10f, 10, 1, 30, 4, 0);
         check(!near(a.x, other.x) || !near(a.y, other.y), "letters shake apart from each other");
     }

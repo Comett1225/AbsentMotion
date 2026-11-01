@@ -4,7 +4,7 @@
  "category": "text",
  "since": "5.0.0",
  "native": true,
- "description": "Shakes each letter on its own, like nervous dialogue in a game. Shake drifts between spots, Jitter jumps to a new spot at each step, Wave bobs the letters up and down, Circle moves them in small loops and Wobble tilts them back and forth.",
+ "description": "Shakes each letter on its own, like nervous dialogue in a game. Shake drifts between spots, Jitter jumps to a new spot at each step, Wave bobs the letters up and down, Circle moves them in small loops and Wobble tilts them back and forth. Lower Letters Shaking to shake only some letters, picked at random again every few moments.",
  "params": [
   {
    "id": "style",
@@ -88,6 +88,26 @@
    "step": 0.1
   },
   {
+   "id": "letters",
+   "label": "Letters Shaking",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "percent": true
+  },
+  {
+   "id": "every",
+   "label": "New Letters Every",
+   "type": "float",
+   "default": 0.6,
+   "min": 0.05,
+   "max": 10,
+   "step": 0.01,
+   "unit": "s"
+  },
+  {
    "id": "unit",
    "label": "Based On",
    "type": "choice",
@@ -144,6 +164,16 @@
     "amount": 8,
     "speed": 30,
     "rotation": 8
+   }
+  },
+  {
+   "name": "Uneasy",
+   "params": {
+    "style": 1,
+    "amount": 2.5,
+    "speed": 30,
+    "letters": 0.2,
+    "every": 0.5
    }
   },
   {

@@ -39,6 +39,7 @@ class EffectPackTest {
                 (if ("duration" in uniforms) mapOf("duration" to ("float" to false)) else emptyMap()) +
                 listOf("backdrop", "below").filter { it in uniforms }.associateWith { "shader" to false } +
                 (if ("screen" in uniforms) mapOf("screen" to ("float4" to false)) else emptyMap()) +
+                (if ("visible" in uniforms) mapOf("visible" to ("float4" to false)) else emptyMap()) +
                 (if ("layer" in uniforms) mapOf("layer" to ("float2" to false)) else emptyMap()) +
                 listOf("toLayer", "fromLayer", "orient").filter { it in uniforms }.associateWith { "float3x3" to false } +
                 listOf("palette", "thresholds", "glyphs").filter { it in uniforms }.associateWith { "shader" to false } +
@@ -131,9 +132,11 @@ class EffectPackTest {
         assertTrue(catalog.definitions.all { d ->
             d.since == null || d.since in releases || d.since.split('.').map { it.toInt() }.zip(last).firstOrNull { it.first != it.second }?.let { it.first > it.second } == true
         })
-        assertEquals(releases.takeLast(5).toSet(), catalog.newest)
+        val major = (releases + catalog.definitions.mapNotNull { it.since }).maxOf { it.substringBefore('.').toInt() }
+        assertTrue(catalog.newest.isNotEmpty() && catalog.newest.all { it.substringBefore('.').toInt() == major })
         val fresh = catalog.listed("new").map { it.key }.toSet()
-        assertTrue(fresh.containsAll(listOf("textpath", "puppet")))
+        assertEquals(catalog.definitions.filter { it.since?.substringBefore('.')?.toInt() == major }.map { it.key }.toSet(), fresh)
+        assertTrue(fresh.none { it in listOf("textpath", "puppet") })
         assertTrue(listOf("blur", "glow", "vhs", "oscillate", "timequant").none { it in fresh })
         assertEquals(File("../version.properties").readLines().first { it.startsWith("versionName=") }.removePrefix("versionName="), releases.last())
         assertEquals(listOf("new") + EffectCatalog.Categories.keys + "ai", catalog.categories.map { it.first })

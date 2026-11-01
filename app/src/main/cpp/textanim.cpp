@@ -351,6 +351,13 @@ std::vector<float> BlipTimes(const std::string& text, float speed, float pause, 
     return out;
 }
 
+bool Picked(int index, uint64_t seed, float seconds, float fraction, float every) {
+    if (!(fraction < 1)) return true;
+    if (!(fraction > 0)) return false;
+    const int64_t round = every > 0 && std::isfinite(seconds) ? (int64_t)std::floor((double)seconds / every) : 0;
+    return (Signed(Mix(seed ^ 0x5DEECE66Dull ^ Mix((uint64_t)index * 0x9E3779B97F4A7C15ull ^ Mix((uint64_t)round)))) + 1) * 0.5f < fraction;
+}
+
 Wiggle Shake(int style, int index, uint64_t seed, float seconds, float speed, float cycles, float spread, float amount, float turn) {
     Wiggle w;
     if (!std::isfinite(seconds)) return w;

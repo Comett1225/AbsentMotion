@@ -208,16 +208,14 @@ fun EffectBrowser(state: EditorState) {
                 }
             }
         } else if (searching || category != null) {
-            val results = if (audio) emptyList() else if (searching) catalog.search(query) else catalog.listed(category).sortedBy { it.name.lowercase() }
+            val results = if (audio) emptyList() else if (searching) (catalog.search(query) + catalog.definitions.filter { d -> query.isNotBlank() && d.presets.any { matchesSearch(query, it.name) } }).distinct()
+                else catalog.listed(category).sortedBy { it.name.lowercase() }
             val actions = if (searching || category == "ai") AiAction.entries.filter { it.offered && (!audio || it == AiAction.Noise) && matchesSearch(query, stringResource(it.title)) } else emptyList()
-            val presets = if (audio) emptyList() else catalog.definitions.flatMap { d -> d.presets.map { d to it } }
-                .filter { (d, p) -> if (searching) query.isNotBlank() && matchesSearch(query, p.name) else d.category == category }
             LazyVerticalGrid(GridCells.Fixed(3), Modifier.fillMaxSize(), contentPadding = PaddingValues(10.dp)) {
                 if (hasSound && (category == "ai" || searching && matchesSearch(query, context.getString(R.string.auto_captions)))) {
                     item(key = "ai-captions") { AudioTile(stringResource(R.string.auto_captions), 5, true) { state.playing = false; captionClip = layer.id } }
                 }
                 items(actions, key = { "ai-${it.name}" }) { action -> AiTile(action, state.selected, ai) }
-                items(presets, key = { (d, p) -> "preset-${d.id}-${p.slug}" }) { (d, p) -> PresetTile(catalog, d, p) { add(d, p) } }
                 items(results, key = { it.id }) { effect -> EffectTile(catalog, effect, 100f, { pick(effect) }, { detail = effect }, effect.id in favourites) }
             }
         } else {
@@ -307,18 +305,6 @@ private fun EffectTile(catalog: EffectCatalog, effect: EffectDefinition, width: 
         }
         Text(effect.name, Modifier.fillMaxWidth().padding(top = 4.dp), color = Am.OnDark, fontSize = if (width > 100) 10.sp else 8.sp,
             lineHeight = 9.sp, textAlign = TextAlign.Center, maxLines = 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
-    }
-}
-
-@Composable
-private fun PresetTile(catalog: EffectCatalog, effect: EffectDefinition, preset: EffectPreset, onClick: () -> Unit) {
-    val press = remember { MutableInteractionSource() }
-    Column(Modifier.width(100.dp).pressScale(press, TilePress).alpha(if (effect.available) 1f else 0.35f)
-        .clickable(press, LocalIndication.current, enabled = effect.available, onClick = onClick).padding(5.dp),
-        horizontalAlignment = Alignment.CenterHorizontally) {
-        Thumbnail(catalog, effect.thumbnail(preset), Modifier.size(93.dp).clip(RoundedCornerShape(5.dp)))
-        Text(preset.name, Modifier.fillMaxWidth().padding(top = 4.dp), color = Am.Accent, fontSize = 10.sp, lineHeight = 9.sp,
-            textAlign = TextAlign.Center, maxLines = 2)
     }
 }
 

@@ -869,7 +869,13 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
             if (sk_sp<SkImage> tile = d->matrix ? OnGpu(MatrixFor(method(e, d, t))) : nullptr) {
                 b.child("thresholds") = tile->makeShader(SkTileMode::kRepeat, SkTileMode::kRepeat, SkSamplingOptions());
             }
-            const std::shared_ptr<const GlyphAtlas> letters = d->glyphs ? AtlasFor(Characters(e, defaults, d->texts, t), Value(e, defaults, "cell", 0, t, 12)) : nullptr;
+            float zoom = 1;
+            if (d->glyphs) {
+                const SkMatrix m = fromLayer();
+                zoom = std::sqrt(std::fabs(m.getScaleX() * m.getScaleY() - m.getSkewX() * m.getSkewY()));
+                if (!std::isfinite(zoom) || zoom < 0.01f) zoom = 1;
+            }
+            const std::shared_ptr<const GlyphAtlas> letters = d->glyphs ? AtlasFor(Characters(e, defaults, d->texts, t), Value(e, defaults, "cell", 0, t, 12) * zoom) : nullptr;
             if (sk_sp<SkImage> sheet = letters ? OnGpu(letters->image) : nullptr) b.child("glyphs") = sheet->makeShader(SkSamplingOptions(SkFilterMode::kLinear));
             std::optional<particles::Beat> beat;
             const auto beatNow = [&]() -> const particles::Beat& {
@@ -903,6 +909,10 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
                 else if (automatic && name == "glyphCount") v = {letters ? (float)letters->count : 1.0f};
                 else if (automatic && name == "glyphColumns") v = {letters ? (float)letters->columns : 1.0f};
                 else if (automatic && name == "glyphCell") v = {letters ? letters->width : 1.0f, letters ? letters->height : 1.0f};
+                else if (automatic && name == "visible") {
+                    const SkRect r = seen.makeOffset(-area.left(), -area.top());
+                    v = {r.left(), r.top(), r.right(), r.bottom()};
+                }
                 else if (automatic && name == "screen") v = {-area.left(), -area.top(), (float)scene.width, (float)scene.height};
                 else if (automatic && name == "beat") v = {particles::Envelope(beatNow().since, Value(e, defaults, "decay", 0, t, 0.4f))};
                 else if (automatic && name == "beatTime") v = {(float)beatNow().since};

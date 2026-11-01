@@ -55,7 +55,7 @@ data class EffectCatalog(
 
     companion object {
         val Categories = linkedMapOf("color" to "Color", "blur" to "Blur", "distort" to "Distort", "stylize" to "Stylize",
-            "noise" to "Noise", "repeat" to "Repeat", "key" to "Key", "move" to "Move", "beat" to "Beat", "3d" to "3D", "text" to "Text")
+            "noise" to "Noise", "repeat" to "Repeat", "key" to "Key", "move" to "Move", "beat" to "Beat", "3d" to "3D", "text" to "Text", "other" to "Other")
 
         fun read(context: Context): EffectCatalog = parse(currentLanguage(context).tag) { context.assets.open("effects/$it") }
             .let { if (it.message != null) it.copy(message = context.getString(R.string.effects_not_loaded)) else it }
@@ -67,7 +67,9 @@ data class EffectCatalog(
                 runCatching { EffectDefinition.parse(JSONObject(text("$key.json"))) }.getOrNull()
             }
             val releases = runCatching { JSONArray(text("releases.json")).let { a -> List(a.length()) { a.getString(it) } } }.getOrDefault(emptyList())
-            val catalog = EffectCatalog(definitions, open = open, newest = releases.takeLast(5).toSet())
+            val versions = releases + definitions.mapNotNull { it.since }
+            val major = versions.mapNotNull { it.substringBefore('.').toIntOrNull() }.maxOrNull()
+            val catalog = EffectCatalog(definitions, open = open, newest = versions.filter { it.substringBefore('.').toIntOrNull() == major }.toSet())
             if (language == "en") catalog else runCatching { catalog.translated(JSONObject(text("i18n/$language.json"))) }.getOrDefault(catalog)
         }.getOrElse { EffectCatalog(message = "The effects could not be loaded") }
     }
