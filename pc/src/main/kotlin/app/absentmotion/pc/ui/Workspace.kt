@@ -59,6 +59,8 @@ fun FrameWindowScope.Workspace(window: Window, quit: () -> Unit, startFile: File
     var rightWidth by remember { mutableFloatStateOf(prefs.getFloat("rightWidth", 300f)) }
     var timelineHeight by remember { mutableFloatStateOf(prefs.getFloat("timelineHeight", 245f)) }
     var scaleMode by remember { mutableStateOf("Fit") }
+    var spaceDown by remember { mutableStateOf(false) }
+    var spacePanned by remember { mutableStateOf(false) }
     var tab by remember { mutableStateOf("Media") }
     var zoom by remember { mutableFloatStateOf(1f) }
     var resolution by remember { mutableIntStateOf(1) }
@@ -142,7 +144,7 @@ fun FrameWindowScope.Workspace(window: Window, quit: () -> Unit, startFile: File
     LaunchedEffect(Unit) {
         snapshotFlow { RenderRequest(state.scene, state.time, viewport, state.selected, scaleMode, state.playing, resolution, state.file?.parentFile) }.conflate().collect { request ->
             val fit = minOf(request.viewport.width.coerceAtLeast(1).toFloat() / request.scene.width.coerceAtLeast(1), request.viewport.height.coerceAtLeast(1).toFloat() / request.scene.height.coerceAtLeast(1))
-            val target = when (request.scaleMode) { "50%" -> 0.5f; "100%" -> 1f; "200%" -> 2f; else -> fit }
+            val target = if (request.scaleMode == "Fit") fit else request.scaleMode.removeSuffix("%").toFloatOrNull()?.div(100f) ?: fit
             val renderScale = minOf(target, 1f, 1600f / maxOf(request.scene.width, request.scene.height).coerceAtLeast(1)) / if (request.playing) request.resolution else 1
             val w = (request.scene.width * renderScale).roundToInt().coerceIn(1, 1600)
             val h = (request.scene.height * renderScale).roundToInt().coerceIn(1, 1600)
@@ -151,9 +153,10 @@ fun FrameWindowScope.Workspace(window: Window, quit: () -> Unit, startFile: File
                     if (renderedScene[0] != request.scene || renderedBase[0] != request.base) { engine.setScene(request.scene, request.base); renderedScene[0] = request.scene; renderedBase[0] = request.base }
                     engine.render(request.time, w, h).toComposeImageBitmap() to if (request.selected != 0L) engine.quad(request.selected, request.time) else null
                 }
-            } }.onSuccess { result -> if (state.scene == request.scene) { image = result.first; outline = result.second } }.onFailure { status = it.message ?: "Render failed" }
+            } }.onSuccess { result -> if (state.scene == request.scene && state.time == request.time && state.selected == request.selected) { image = result.first; outline = result.second } }.onFailure { status = it.message ?: "Render failed" }
         }
     }
+    LaunchedEffect(state.selected) { outline = null }
     DisposableEffect(Unit) { onDispose { synchronized(lock) { engine.close() } } }
     MenuBar {
         Menu("File") {
@@ -189,8 +192,11 @@ fun FrameWindowScope.Workspace(window: Window, quit: () -> Unit, startFile: File
     MaterialTheme(colors = darkColors(primary = accent, surface = panel, background = preview)) {
         CompositionLocalProvider(LocalContentColor provides Color.White) {
         Column(Modifier.fillMaxSize().background(preview).onKeyEvent { event ->
-            if (event.type != KeyEventType.KeyDown || event.isMetaPressed || event.isCtrlPressed) false else when (event.key) {
-                Key.Spacebar -> { state.playing = !state.playing; true }
+            if (event.key == Key.Spacebar && !event.isMetaPressed && !event.isCtrlPressed) {
+                if (event.type == KeyEventType.KeyDown && !spaceDown) { spaceDown = true; spacePanned = false }
+                if (event.type == KeyEventType.KeyUp && spaceDown) { spaceDown = false; if (!spacePanned) state.playing = !state.playing }
+                true
+            } else if (event.type != KeyEventType.KeyDown || event.isMetaPressed || event.isCtrlPressed) false else when (event.key) {
                 Key.DirectionLeft -> { state.playing = false; state.step(if (event.isShiftPressed) -10 else -1); true }
                 Key.DirectionRight -> { state.playing = false; state.step(if (event.isShiftPressed) 10 else 1); true }
                 Key.MoveHome -> { state.playing = false; state.time = 0; true }
@@ -224,47 +230,11 @@ fun FrameWindowScope.Workspace(window: Window, quit: () -> Unit, startFile: File
                 DividerDrag(true) { leftWidth = (leftWidth + it).coerceIn(160f, 430f); prefs.putFloat("leftWidth", leftWidth) }
                 Column(Modifier.weight(1f).fillMaxHeight()) {
                     val scene = state.scene
-                    Box(Modifier.weight(1f).fillMaxWidth().clipToBounds().onSizeChanged { viewport = it }.pointerInput(scene, state.time, scaleMode) {
-                        detectTapGestures { p ->
-                            val fit = when (scaleMode) { "50%" -> 0.5f; "100%" -> 1f; "200%" -> 2f; else -> minOf(size.width.toFloat() / scene.width, size.height.toFloat() / scene.height) }
-                            val x = (p.x - (size.width - scene.width * fit) / 2) / fit
-                            val y = (p.y - (size.height - scene.height * fit) / 2) / fit
-                            scope.launch { val selected = withContext(Dispatchers.Default) { synchronized(lock) { engine.hitTest(x, y, state.time) } }; state.selected = selected }
-                        }
-                    }.pointerInput(state.selected, state.time, scaleMode) {
-                        var active = false
-                        var dx = 0f
-                        var dy = 0f
-                        var fit = 1f
-                        var location = floatArrayOf(0f, 0f, 0f)
-                        detectDragGestures(onDragStart = { point ->
-                            val q = currentOutline
-                            val scene = state.scene
-                            val layer = scene.layerAt(state.selected, state.time)
-                            fit = when (scaleMode) { "50%" -> 0.5f; "100%" -> 1f; "200%" -> 2f; else -> minOf(size.width.toFloat() / scene.width, size.height.toFloat() / scene.height) }.coerceAtLeast(0.001f)
-                            val ox = (size.width - scene.width * fit) / 2; val oy = (size.height - scene.height * fit) / 2
-                            val x = (point.x - ox) / fit; val y = (point.y - oy) / fit
-                            active = q != null && layer != null && x in minOf(q[0], q[2], q[4], q[6])..maxOf(q[0], q[2], q[4], q[6]) && y in minOf(q[1], q[3], q[5], q[7])..maxOf(q[1], q[3], q[5], q[7])
-                            if (active && layer != null) { location = layer.location; dx = 0f; dy = 0f; state.beginGesture() }
-                        }, onDragEnd = { if (active) state.endGesture(); active = false }, onDragCancel = { if (active) state.cancelGesture(); active = false }) { change, amount ->
-                            if (active) {
-                                change.consume(); dx += amount.x / fit; dy += amount.y / fit
-                                state.gesture { start -> start.update(state.selected, state.time) { it.withTransform("location", location[0] + dx, location[1] + dy, location.getOrElse(2) { 0f }) } }
-                            }
-                        }
-                    }, contentAlignment = Alignment.Center) {
-                        image?.let { bitmap ->
-                            val base = minOf(viewport.width.toFloat() / scene.width, viewport.height.toFloat() / scene.height).coerceAtLeast(0.001f)
-                            val actual = when (scaleMode) { "50%" -> 0.5f; "100%" -> 1f; "200%" -> 2f; else -> base }
-                            Image(bitmap, null, Modifier.fillMaxSize().graphicsLayer { scaleX = actual / base; scaleY = actual / base }, contentScale = ContentScale.Fit)
-                        }
-                        Canvas(Modifier.fillMaxSize()) {
-                            outline?.let { q ->
-                                val fit = when (scaleMode) { "50%" -> 0.5f; "100%" -> 1f; "200%" -> 2f; else -> minOf(size.width / scene.width, size.height / scene.height) }
-                                val ox = (size.width - scene.width * fit) / 2; val oy = (size.height - scene.height * fit) / 2
-                                val path = Path().apply { moveTo(ox + q[0] * fit, oy + q[1] * fit); for (i in 1..3) lineTo(ox + q[i*2] * fit, oy + q[i*2+1] * fit); close() }
-                                drawPath(path, accent, style = androidx.compose.ui.graphics.drawscope.Stroke(2f))
-                                for (i in 0..3) drawCircle(accent, 4f, Offset(ox + q[i*2] * fit, oy + q[i*2+1] * fit))
+                    Box(Modifier.weight(1f).fillMaxWidth()) {
+                        Viewer(state, image, outline, scaleMode, { scaleMode = it }, spaceDown, { spacePanned = true }, { viewport = it }) { x, y ->
+                            scope.launch {
+                                val selected = withContext(Dispatchers.Default) { synchronized(lock) { engine.hitTest(x, y, state.time) } }
+                                state.selected = selected
                             }
                         }
                     }
