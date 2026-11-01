@@ -193,12 +193,18 @@ fun ExportMediaPreview(kind: app.absentmotion.export.ExportKind, uris: List<Uri>
 fun effectsMessageOnHome() = false
 
 object PlatformFeatures {
+    const val desktop = false
     const val ai = true
     const val camera = true
     const val tools = true
     const val userFiles = false
     const val linkFolders = false
 }
+
+fun androidx.compose.ui.Modifier.resizeCursor(horizontal: Boolean = true): androidx.compose.ui.Modifier = this
+
+@androidx.compose.runtime.Composable
+fun Hint(text: String, content: @androidx.compose.runtime.Composable () -> Unit) = content()
 
 fun linkFolderLabel(): String = ""
 

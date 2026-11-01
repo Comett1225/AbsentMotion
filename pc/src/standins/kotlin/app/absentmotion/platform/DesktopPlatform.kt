@@ -17,6 +17,10 @@ import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.isCtrlPressed
 import androidx.compose.ui.input.pointer.isMetaPressed
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.pointerHoverIcon
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.IntSize
 import app.absentmotion.desk.DeskFiles
@@ -168,12 +172,26 @@ fun ExportMediaPreview(kind: app.absentmotion.export.ExportKind, uris: List<Uri>
 fun effectsMessageOnHome() = false
 
 object PlatformFeatures {
+    const val desktop = true
     const val ai = false
     const val camera = false
     const val tools = false
     const val userFiles = true
     const val linkFolders = true
 }
+
+fun Modifier.resizeCursor(horizontal: Boolean = true): Modifier =
+    pointerHoverIcon(androidx.compose.ui.input.pointer.PointerIcon(java.awt.Cursor(if (horizontal) java.awt.Cursor.E_RESIZE_CURSOR else java.awt.Cursor.N_RESIZE_CURSOR)))
+
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
+@Composable
+fun Hint(text: String, content: @Composable () -> Unit) = androidx.compose.foundation.TooltipArea(
+    tooltip = {
+        androidx.compose.material3.Text(text, color = app.absentmotion.ui.theme.Am.OnDark, fontSize = androidx.compose.ui.unit.TextUnit(12f, androidx.compose.ui.unit.TextUnitType.Sp),
+            modifier = Modifier.background(app.absentmotion.ui.theme.Am.Field, androidx.compose.foundation.shape.RoundedCornerShape(6.dp)).padding(horizontal = 8.dp, vertical = 4.dp))
+    },
+    delayMillis = 450,
+) { content() }
 
 fun linkFolderLabel(): String = "Link folder"
 
