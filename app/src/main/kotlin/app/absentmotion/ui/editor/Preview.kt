@@ -232,7 +232,7 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
                     val worldView = world?.takeUnless { state.playing }?.let { v -> Matrix().apply { setValues(v) } }?.takeIf { it.invert(Matrix()) }
                     fun onScreen(p: Pt): Offset? = worldView?.map(p)?.let { Offset(it.x, it.y) * currentScale + currentOffset }
                     fun inLayer(at: Offset): Pt? = worldView?.inverseMap(((at - currentOffset) / currentScale).let { Pt(it.x, it.y) })
-                    val gradientMode = startLayer != null && startQuad != null && state.panel == EditorPanel.ColorFill && startLayer.fillType == "gradient"
+                    val gradientMode = startLayer != null && startQuad != null && !state.panZoomMode && state.panel == EditorPanel.ColorFill && startLayer.fillType == "gradient"
                     val pointGrab = if (gradientMode) -1 else points?.points?.indices?.mapNotNull { i -> onScreen(points.points[i])?.let { i to (it - down.position).getDistance() } }
                         ?.filter { it.second < 24.dp.toPx() }?.minByOrNull { it.second }?.first ?: -1
                     val grabOffset = if (pointGrab >= 0) (onScreen(points!!.points[pointGrab]) ?: down.position) - down.position else Offset.Zero
@@ -269,10 +269,12 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
                             gesture = HIDDEN
                             inLayer(position + grabOffset)?.let { points.move(pointGrab, it) }
                         } else if (moved && startLayer != null && handle >= 10 && startQuad != null) {
-                            val (u, v) = boxFraction(startQuad, position + grab)
-                            state.editSelected("gradient-handle") { l ->
-                                val g = l.gradient
-                                l.withGradient(if (handle == 10) g.copy(x0 = u, y0 = v) else g.copy(x1 = u, y1 = v))
+                            if (fingers == 1) {
+                                val (u, v) = boxFraction(startQuad, position + grab)
+                                state.editSelected("gradient-handle") { l ->
+                                    val g = l.gradient
+                                    l.withGradient(if (handle == 10) g.copy(x0 = u, y0 = v) else g.copy(x1 = u, y1 = v))
+                                }
                             }
                         } else if (moved && startLayer != null && handle == 9 && startQuad != null) {
                             val axis = startQuad[1] - startQuad[0]
@@ -333,6 +335,7 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
                         if (moved) event.changes.forEach { if (it.positionChanged()) it.consume() }
                     } while (event.changes.any { it.pressed })
                     gesture = IDLE
+                    val farFromDots = gradientMode && gradientHandleDistance(startLayer, startQuad, down.position) > 24.dp.toPx()
                     if (canvasGesture && fingers == 2 && !drifted) {
                         if (down.uptimeMillis - lastTwoFingerTap < viewConfiguration.doubleTapTimeoutMillis) {
                             state.resetCanvasView()
@@ -350,7 +353,7 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
                         state.endGesture()
                     } else if (tapped != null) {
                         points?.tap?.invoke(tapped)
-                    } else if (handle < 0 && state.panel != EditorPanel.EditText && state.panel != EditorPanel.Crop) {
+                    } else if ((handle < 0 || farFromDots) && state.panel != EditorPanel.EditText && state.panel != EditorPanel.Crop) {
                         val point = (down.position - currentOffset) / currentScale
                         val generation = ++tapGeneration
                         scope.launch {

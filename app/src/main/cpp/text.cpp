@@ -552,7 +552,7 @@ void Apply(const Layer& l, float t, float seconds, const std::string& shown, con
             if (shake) {
                 const float w = textanim::RangeWeight(textanim::kSquare, u, count, start, end) *
                                 (textanim::Picked(u, seed, seconds, letters, every) ? 1.0f : 0.0f);
-                const textanim::Wiggle g = textanim::Shake(style, u, seed, seconds, speed, cycles, spread, size, turn);
+                const textanim::Wiggle g = textanim::Shake(style, u, seed, seconds, speed, cycles, spread, size, style == 4 ? e.value("tilt", t, 15) : turn);
                 looks[u].move = {g.x * w, g.y * w};
                 looks[u].rotation = g.angle * w;
             } else {
@@ -838,6 +838,7 @@ sk_sp<SkTypeface> MonoFace(int32_t character) {
     static std::mutex lock;
     static std::map<int32_t, sk_sp<SkTypeface>> fallbacks;
     std::lock_guard<std::mutex> hold(lock);
+    if (fallbacks.size() >= 1024) fallbacks.clear();
     auto [entry, fresh] = fallbacks.try_emplace(character, mono);
     if (fresh) {
         if (sk_sp<SkTypeface> face = systemFonts()->matchFamilyStyleCharacter("monospace", SkFontStyle(), nullptr, 0, character)) entry->second = face;

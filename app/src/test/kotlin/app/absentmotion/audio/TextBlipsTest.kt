@@ -1,9 +1,13 @@
 package app.absentmotion.audio
 
+import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 import kotlin.math.abs
+import kotlin.math.roundToInt
 
 class TextBlipsTest {
     private val rate = TextBlips.RATE
@@ -26,9 +30,31 @@ class TextBlipsTest {
 
     @Test
     fun wavHasAHeaderAndTwoBytesPerSample() {
-        val bytes = TextBlips.wav(FloatArray(10))
+        val times = listOf(0.99f, 1.5f, 2.99f)
+        val bytes = TextBlips.wav(times, 6, 0.8f, 0f, 2f, 3)
+        val all = TextBlips.render(times, 6, 0.8f, 0f, 2f, 3)
+        val buffer = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN)
         assertEquals("RIFF", String(bytes, 0, 4))
         assertEquals("WAVE", String(bytes, 8, 4))
-        assertEquals(64, bytes.size)
+        assertEquals(44 + all.size * 2, bytes.size)
+        assertEquals(36 + all.size * 2, buffer.getInt(4))
+        assertEquals(all.size * 2, buffer.getInt(40))
+        for (i in all.indices) assertEquals(i.toString(), (all[i] * 32767f).roundToInt().toShort(), buffer.getShort(44 + 2 * i))
+    }
+
+    @Test
+    fun blocksSoundTheSameAsOneRender() {
+        val times = listOf(0f, 0.0113f, 0.3f, 0.5f)
+        for (voice in 0..7) {
+            val all = TextBlips.render(times, voice, 1f, 2f, 3f, 5)
+            val joined = FloatArray(all.size)
+            var from = 0
+            while (from < all.size) {
+                val part = TextBlips.render(times, voice, 1f, 2f, 3f, 5, from, minOf(333, all.size - from))
+                part.copyInto(joined, from)
+                from += part.size
+            }
+            assertArrayEquals("voice $voice", all, joined, 0f)
+        }
     }
 }

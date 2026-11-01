@@ -500,7 +500,9 @@ struct GlyphAtlas {
 };
 
 std::shared_ptr<const GlyphAtlas> AtlasFor(const std::string& characters, float cell) {
-    const int w = std::clamp((int)std::lround(std::isfinite(cell) ? cell : 12.0f), 4, 128), h = (int)std::lround(w * 1.6f);
+    static const int ladder[] = {4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 28, 32, 36, 40, 44, 48, 56, 64, 72, 80, 96, 112, 128};
+    const int wanted = std::clamp((int)std::lround(std::isfinite(cell) ? cell : 12.0f), 4, 128);
+    const int w = *std::lower_bound(std::begin(ladder), std::end(ladder), wanted), h = (int)std::lround(w * 1.6f);
     const std::string key = std::to_string(w) + "\n" + characters;
     static std::mutex lock;
     static std::map<std::string, std::shared_ptr<const GlyphAtlas>> made;
@@ -548,6 +550,7 @@ std::shared_ptr<const GlyphAtlas> AtlasFor(const std::string& characters, float 
     };
     std::vector<std::pair<double, uint32_t>> order;
     sk_sp<SkSurface> one = SkSurfaces::Raster(SkImageInfo::MakeA8(w, h));
+    if (!one) return nullptr;
     SkPixmap pixels;
     for (uint32_t ch : ramp) {
         one->getCanvas()->clear(SK_ColorTRANSPARENT);
@@ -567,11 +570,12 @@ std::shared_ptr<const GlyphAtlas> AtlasFor(const std::string& characters, float 
     atlas->height = (float)h;
     const int rows = ((int)order.size() + atlas->columns - 1) / atlas->columns;
     sk_sp<SkSurface> sheet = SkSurfaces::Raster(SkImageInfo::MakeN32Premul(atlas->columns * w, rows * h));
+    if (!sheet) return nullptr;
     sheet->getCanvas()->clear(SK_ColorTRANSPARENT);
     for (size_t i = 0; i < order.size(); i++) draw(sheet->getCanvas(), order[i].second, (float)(i % atlas->columns * w), (float)(i / atlas->columns * h));
     atlas->image = sheet->makeImageSnapshot();
     std::lock_guard<std::mutex> hold(lock);
-    if (made.size() >= 16) made.clear();
+    if (made.size() >= 48) made.clear();
     made[key] = atlas;
     return atlas;
 }

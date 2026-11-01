@@ -248,7 +248,7 @@ int main() {
         check(near(Shake(2, 0, 7, 0.25f, 0, 1, 0, 5, 0).y, 5), "wave peaks at a quarter cycle");
         const Wiggle r = Shake(3, 0, 7, 0, 0, 1, 0, 5, 0);
         check(near(r.x, 5) && near(r.y, 0), "circle starts on the right");
-        check(near(Shake(4, 0, 7, 0.25f, 0, 1, 0, 0, 20).angle, 20), "wobble turns by the rotation");
+        check(near(Shake(4, 0, 7, 0.25f, 0, 1, 0, 0, 20).angle, 20), "wobble turns by the tilt");
         int picked = 0, kept = 0, moved = 0;
         for (int i = 0; i < 1000; i++) {
             const bool now = Picked(i, 7, 0.1f, 0.2f, 0.5f);

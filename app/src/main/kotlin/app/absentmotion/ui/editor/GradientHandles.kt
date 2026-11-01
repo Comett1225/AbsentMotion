@@ -49,6 +49,11 @@ internal fun boxFraction(q: List<Offset>, p: Offset): Offset {
     return Offset((d.x * ey.y - d.y * ey.x) / det, (ex.x * d.y - ex.y * d.x) / det)
 }
 
+internal fun gradientHandleDistance(layer: app.absentmotion.model.Layer, q: List<Offset>, at: Offset): Float {
+    val g = layer.gradient
+    return minOf((boxPoint(q, g.x0, g.y0) - at).getDistance(), (boxPoint(q, g.x1, g.y1) - at).getDistance())
+}
+
 internal fun nearestGradientHandle(layer: app.absentmotion.model.Layer, q: List<Offset>, at: Offset): Int {
     val g = layer.gradient
     return if ((boxPoint(q, g.x0, g.y0) - at).getDistance() <= (boxPoint(q, g.x1, g.y1) - at).getDistance()) 10 else 11

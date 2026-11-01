@@ -27,7 +27,15 @@
    "min": 0,
    "max": 200,
    "step": 0.1,
-   "pixels": true
+   "pixels": true,
+   "when": {
+    "style": [
+     0,
+     1,
+     2,
+     3
+    ]
+   }
   },
   {
    "id": "speed",
@@ -85,7 +93,27 @@
    "default": 0,
    "min": -180,
    "max": 180,
-   "step": 0.1
+   "step": 0.1,
+   "when": {
+    "style": [
+     0,
+     1
+    ]
+   }
+  },
+  {
+   "id": "tilt",
+   "label": "Tilt",
+   "type": "angle",
+   "default": 15,
+   "min": -180,
+   "max": 180,
+   "step": 0.1,
+   "when": {
+    "style": [
+     4
+    ]
+   }
   },
   {
    "id": "letters",
@@ -206,7 +234,7 @@
    "name": "Wobbly",
    "params": {
     "style": 4,
-    "rotation": 15,
+    "tilt": 15,
     "cycles": 2,
     "spread": 40
    }

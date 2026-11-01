@@ -218,8 +218,7 @@ private fun EffectHeader(state: EditorState, index: Int, effect: XmlNode, defini
                         definition.presets.forEach { preset ->
                             Row(Modifier.fillMaxWidth().height(52.dp), verticalAlignment = Alignment.CenterVertically) {
                                 Row(Modifier.weight(1f).fillMaxHeight().clickable {
-                                    val length = state.selected?.let { it.endTime - it.startTime } ?: 1000
-                                    state.editSelected { it.withEffect(index) { old -> old.copy(children = definition.instance(preset, length).children) } }
+                                    state.editSelected { layer -> layer.withEffect(index) { old -> old.copy(children = definition.instance(preset, layer.endTime - layer.startTime).children) } }
                                     presets = false
                                 }.padding(start = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                                     Thumbnail(catalog, definition.thumbnail(preset), Modifier.size(40.dp).clip(RowShape))
