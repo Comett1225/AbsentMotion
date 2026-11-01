@@ -343,3 +343,23 @@ fun EffectPicture(catalog: app.absentmotion.effects.EffectCatalog, path: String?
         else -> {}
     }
 }
+
+private fun known(value: String?): String = value?.takeUnless { it == android.provider.MediaStore.UNKNOWN_STRING }.orEmpty()
+
+internal fun deviceSounds(context: Context): List<app.absentmotion.audio.DeviceAudio> {
+    val found = mutableListOf<app.absentmotion.audio.DeviceAudio>()
+    val collection = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+    val place = if (Build.VERSION.SDK_INT >= 29) "relative_path" else "_data"
+    try {
+        context.contentResolver.query(collection, arrayOf("_id", "title", "_display_name", "duration", "date_added", "album", "artist", place),
+            "duration > 0", null, "date_added DESC, _id DESC")?.use { c ->
+            while (c.moveToNext()) {
+                val where = c.getString(7).orEmpty()
+                found += app.absentmotion.audio.DeviceAudio(android.content.ContentUris.withAppendedId(collection, c.getLong(0)).toString(),
+                    c.getString(1)?.takeIf { it.isNotBlank() } ?: c.getString(2) ?: "", c.getLong(3), c.getLong(4), c.getString(2) ?: "", known(c.getString(5)), known(c.getString(6)),
+                    if (Build.VERSION.SDK_INT >= 29) where.trimEnd('/') else where.substringBeforeLast('/', ""))
+            }
+        }
+    } catch (_: Exception) { }
+    return found
+}

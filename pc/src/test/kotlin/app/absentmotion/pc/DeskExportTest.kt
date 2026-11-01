@@ -57,18 +57,6 @@ class DeskExportTest {
         System.setProperty("am.exports", out.resolve("home").path)
         System.setProperty("am.data", out.resolve("data").path)
         val engine = EngineThread(0xff000000.toInt(), Desk.context)
-        ExportAudio.mixFor = { scene, rate ->
-            if (app.absentmotion.audio.AudioClip.of(scene).isEmpty()) null else {
-                val mixer = AudioMixer(scene, null, repo)
-                val mix: (Long, Long) -> ShortArray = { from, to ->
-                    val count = (to * rate / 1_000_000 - from * rate / 1_000_000).toInt()
-                    val first = from * AudioMixer.RATE / 1_000_000
-                    val f = mixer.mix(first, (count.toLong() * AudioMixer.RATE / rate + 1).toInt())
-                    ShortArray(count * 2) { i -> (f[(i / 2).toLong().times(AudioMixer.RATE).div(rate).toInt() * 2 + i % 2] * 32767f).toInt().coerceIn(-32768, 32767).toShort() }
-                }
-                mix
-            }
-        }
         val exporter = Exporter(Desk.context, engine, MediaStoreExport(Desk.context))
         val report = StringBuilder()
         suspend fun export(kind: ExportKind, scene: Scene, s: ExportSettings, name: String): ExportResult {

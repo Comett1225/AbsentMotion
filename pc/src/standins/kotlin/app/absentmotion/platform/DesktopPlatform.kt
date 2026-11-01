@@ -254,3 +254,5 @@ internal class StorageAccess {
 
 @Composable
 internal fun rememberStorageAccess(): StorageAccess = remember { StorageAccess() }
+
+internal fun deviceSounds(context: Context): List<app.absentmotion.audio.DeviceAudio> = app.absentmotion.desk.DeskSounds.list(context)
