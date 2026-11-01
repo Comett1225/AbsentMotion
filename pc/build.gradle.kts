@@ -14,7 +14,7 @@ val phoneOnly = listOf(
     "app/absentmotion/i18n/AppLanguage.kt", "app/absentmotion/i18n/UiText.kt",
     "app/absentmotion/ui/home/UpdateDialog.kt", "app/absentmotion/media/VideoLibrary.kt",
     "app/absentmotion/ui/home/Updater.kt", "app/absentmotion/ui/home/UpdateVerify.kt", "app/absentmotion/ui/home/UnsupportedPhone.kt",
-    "app/absentmotion/export/ExportService.kt", "app/absentmotion/ui/tutorial/Grip.kt", "app/absentmotion/ui/editor/panels/EffectRuler.kt",
+    "app/absentmotion/export/ExportService.kt", "app/absentmotion/ui/tutorial/Grip.kt", "app/absentmotion/ui/home/HelpScreen.kt", "app/absentmotion/ui/editor/panels/EffectRuler.kt",
 )
 
 val androidJar = (System.getenv("ANDROID_HOME") ?: System.getenv("ANDROID_SDK_ROOT") ?: rootDir.resolve("../local.properties").takeIf { it.isFile }?.readLines()?.firstOrNull { it.startsWith("sdk.dir=") }?.substringAfter("=") ?: "${System.getProperty("user.home")}/Library/Android/sdk")
@@ -25,7 +25,7 @@ val androidApiJar = tasks.register<Jar>("androidApiJar") {
     archiveFileName.set("android-api.jar")
     if (androidJar != null) from(zipTree(androidJar)) { include("android/**") }
 }
-val androidApi = files(layout.buildDirectory.file("android-api/android-api.jar")).builtBy(androidApiJar)
+val androidApi = System.getenv("AM_ANDROID_API")?.let { files(it) } ?: files(layout.buildDirectory.file("android-api/android-api.jar")).builtBy(androidApiJar)
 
 kotlin {
     jvmToolchain(21)
@@ -77,7 +77,7 @@ dependencies {
     implementation("org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose:2.9.6")
     implementation("org.json:json:20250517")
     implementation("net.sf.kxml:kxml2:2.3.0")
-    if (androidJar != null) compileOnly(files(androidApi))
+    if (androidJar != null || System.getenv("AM_ANDROID_API") != null) compileOnly(androidApi)
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.jetbrains.compose.ui:ui-test-junit4-desktop:1.10.3")
 }
@@ -96,6 +96,7 @@ tasks.withType<JavaExec>().matching { it.name == "run" }.configureEach {
     systemProperty("am.native", file("build/native/$nativeName").absolutePath)
     systemProperty("am.repo", file("..").absolutePath)
     systemProperty("skiko.data.path", file("build/skiko").absolutePath)
+    systemProperty("apple.awt.application.name", "AbsentMotion")
     System.getenv("AM_DATA")?.let { systemProperty("am.data", it) }
     System.getenv("AM_LOG")?.let { systemProperty("am.log", it) }
 }
@@ -117,6 +118,7 @@ val prepareResources = tasks.register<Sync>("prepareResources") {
     dependsOn(nativeBuild)
     into(layout.buildDirectory.dir("app-resources/common"))
     from("../app/src/main/assets") { into("assets") }
+    from("../app/src/main/res") { into("res"); include("values*/strings.xml") }
     from("build/native/$nativeName")
     if (isWindows) from("build/native/icudtl.dat")
 }

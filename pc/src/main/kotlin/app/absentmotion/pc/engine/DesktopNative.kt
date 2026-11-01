@@ -17,7 +17,7 @@ object DesktopNative {
     external fun render(handle: Long, timeMs: Double, width: Int, height: Int, output: ByteBuffer): Boolean
     external fun hitTest(handle: Long, x: Float, y: Float, timeMs: Double): Long
     external fun layerQuad(handle: Long, id: Long, timeMs: Double): FloatArray?
-    external fun renderPreview(handle: Long, timeMs: Double, width: Int, height: Int, output: ByteBuffer, scale: Float, dx: Float, dy: Float, background: Int,
+    external fun renderPreview(handle: Long, timeMs: Double, width: Int, height: Int, address: Long, rowBytes: Long, scale: Float, dx: Float, dy: Float, background: Int,
         selectedId: Long, handles: Int, pixels: Boolean, pixelDivisor: Int, gridSpacing: Float, solo: Int, soloIds: LongArray?, guides: FloatArray, refPx: Float): Boolean
     external fun still(handle: Long, timeMs: Double, width: Int, height: Int, accurate: Boolean): ByteArray?
     external fun setPixels(handle: Long, uri: String, width: Int, height: Int, argb: IntArray): Boolean

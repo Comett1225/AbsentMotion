@@ -640,7 +640,7 @@ private fun BottomBar(onNew: () -> Unit, page: Int, onPage: (Int) -> Unit, modif
                 BarItem(stringResource(R.string.home_tab_templates), if (page == 1) HomeIcons.TemplatesTabOn else HomeIcons.TemplatesTab) { onPage(1) }
             }
             Box(Modifier.weight(1f), contentAlignment = Alignment.TopCenter) {
-                BarItem(stringResource(R.string.home_tab_tools), if (page == 2) HomeIcons.ToolsTabOn else HomeIcons.ToolsTab) { onPage(2) }
+                if (app.absentmotion.platform.PlatformFeatures.tools) BarItem(stringResource(R.string.home_tab_tools), if (page == 2) HomeIcons.ToolsTabOn else HomeIcons.ToolsTab) { onPage(2) }
             }
         }
         val press = remember { MutableInteractionSource() }

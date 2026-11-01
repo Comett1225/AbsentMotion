@@ -10,7 +10,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.InputStream
 
-val EffectCategories: List<Pair<String, String>> = EffectCatalog.Categories.toList() + ("ai" to "AI")
+val EffectCategories: List<Pair<String, String>> = EffectCatalog.Categories.toList() + (if (app.absentmotion.platform.PlatformFeatures.ai) listOf("ai" to "AI") else emptyList())
 
 data class EffectCatalog(
     val definitions: List<EffectDefinition> = emptyList(),

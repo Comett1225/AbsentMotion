@@ -9,7 +9,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.toComposeImageBitmap
+import androidx.compose.ui.graphics.asComposeImageBitmap
 import androidx.compose.ui.unit.IntSize
 import app.absentmotion.R
 import app.absentmotion.audio.AudioEngine
@@ -95,8 +95,9 @@ class EngineThread(private val background: Int, context: Context? = null, privat
     private val serials = AtomicLong()
     private var outSize = IntSize.Zero
     private var outDivisor = 1
-    private var pixels = IntArray(0)
-    private var image: BufferedImage? = null
+    private val targets = arrayOfNulls<org.jetbrains.skia.Bitmap>(3)
+    private var nextTarget = 0
+    @Volatile private var shownTarget: org.jetbrains.skia.Bitmap? = null
     private val renderPosted = AtomicBoolean(false)
     @Volatile private var capturing = false
 
@@ -263,11 +264,17 @@ class EngineThread(private val background: Int, context: Context? = null, privat
             val native = engine()
             native.setCameraView(v.camera)
             native.setAccurateBlur(v.accurateBlur)
-            if (pixels.size != w * h) pixels = IntArray(w * h)
-            if (native.renderPreview(w, h, v.timeMs.toDouble(), v.scale, v.dx, v.dy, background, v.selectedId, v.handles, v, pixels)) {
-                val img = image?.takeIf { it.width == w && it.height == h } ?: BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB_PRE).also { image = it }
-                img.raster.setDataElements(0, 0, w, h, pixels)
-                val shown = img.toComposeImageBitmap()
+            val target = targets[nextTarget]?.takeIf { it.width == w && it.height == h } ?: org.jetbrains.skia.Bitmap().also {
+                it.allocPixels(org.jetbrains.skia.ImageInfo(w, h, org.jetbrains.skia.ColorType.BGRA_8888, org.jetbrains.skia.ColorAlphaType.PREMUL, org.jetbrains.skia.ColorSpace.sRGB))
+                targets[nextTarget]?.close()
+                targets[nextTarget] = it
+            }
+            val started = System.nanoTime()
+            if (native.renderPreview(target, v.timeMs.toDouble(), v.scale, v.dx, v.dy, background, v.selectedId, v.handles, v)) {
+                lastRenderMs = (System.nanoTime() - started) / 1e6
+                nextTarget = (nextTarget + 1) % targets.size
+                shownTarget = target
+                val shown = target.asComposeImageBitmap()
                 javax.swing.SwingUtilities.invokeLater { frame = shown }
                 renders++
                 renderedView.value = RenderedView(serial, v.timeMs)
@@ -377,11 +384,11 @@ class EngineThread(private val background: Int, context: Context? = null, privat
         return file.outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
     }
 
+    @Volatile var lastRenderMs = 0.0
+
     fun pixelAt(x: Float, y: Float): Int? {
-        val img = image ?: return null
-        val px = (x * img.width).toInt().coerceIn(0, img.width - 1)
-        val py = (y * img.height).toInt().coerceIn(0, img.height - 1)
-        return img.getRGB(px, py)
+        val img = shownTarget ?: return null
+        return img.getColor((x * img.width).toInt().coerceIn(0, img.width - 1), (y * img.height).toInt().coerceIn(0, img.height - 1))
     }
 
     suspend fun timing(): String = "{}"
@@ -395,10 +402,8 @@ class EngineThread(private val background: Int, context: Context? = null, privat
             try { videos.values.forEach { it.close() }; videos.clear() }
             finally { engine?.close(); engine = null; executor.shutdown() }
         }
-        mediaScope.launch { }.invokeOnCompletion { }
     }
 }
 
 private val instances = AtomicLong()
 
-internal fun animatesTextSpacing(xml: String): Boolean = xml.contains(app.absentmotion.compat.ForeignEffectIds.TEXT_SPACING)

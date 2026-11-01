@@ -147,11 +147,11 @@ JNIEXPORT jboolean JNICALL JNI(render)(JNIEnv* e, jobject, jlong h, jdouble time
     am::SetFastShutterBlur(false);
     return surface->readPixels(info, e->GetDirectBufferAddress(buffer), (size_t)w * 4, 0, 0);
 }
-JNIEXPORT jboolean JNICALL JNI(renderPreview)(JNIEnv* e, jobject, jlong h, jdouble time, jint w, jint height, jobject buffer,
+JNIEXPORT jboolean JNICALL JNI(renderPreview)(JNIEnv* e, jobject, jlong h, jdouble time, jint w, jint height, jlong address, jlong rowBytes,
         jfloat scale, jfloat dx, jfloat dy, jint background, jlong selectedId, jint handles, jboolean pixels, jint pixelDivisor,
         jfloat gridSpacing, jint solo, jlongArray soloIds, jfloatArray guides, jfloat refPx) {
     Desktop* d = ptr(h);
-    if (!d || w <= 0 || height <= 0 || e->GetDirectBufferCapacity(buffer) < (jlong)w * height * 4) return false;
+    if (!d || w <= 0 || height <= 0 || address == 0 || rowBytes < (jlong)w * 4) return false;
     am::PreviewOptions view;
     view.pixels = pixels;
     view.pixelDivisor = pixelDivisor;
@@ -173,7 +173,7 @@ JNIEXPORT jboolean JNICALL JNI(renderPreview)(JNIEnv* e, jobject, jlong h, jdoub
     am::SetFastShutterBlur(!d->accurateBlur);
     am::RenderPreview(surface->getCanvas(), w, height, d->scene, time, scale, dx, dy, (uint32_t)background, selectedId, handles, view, d->cameraView, d->media(), fx);
     am::SetFastShutterBlur(false);
-    return surface->readPixels(info, e->GetDirectBufferAddress(buffer), (size_t)w * 4, 0, 0);
+    return surface->readPixels(info, reinterpret_cast<void*>(address), (size_t)rowBytes, 0, 0);
 }
 JNIEXPORT jbyteArray JNICALL JNI(still)(JNIEnv* e, jobject, jlong h, jdouble time, jint w, jint height, jboolean accurate) {
     Desktop* d = ptr(h);

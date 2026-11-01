@@ -10,7 +10,7 @@ import androidx.compose.ui.graphics.toComposeImageBitmap
 import java.io.File
 
 object DeskInfo {
-    val version: String by lazy { System.getProperty("am.version") ?: DeskInfo::class.java.`package`?.implementationVersion ?: "5.0.0" }
+    val version: String by lazy { System.getProperty("am.version") ?: app.absentmotion.BuildConfig.VERSION_NAME }
     val stamp: Long by lazy { runCatching { java.io.File(DeskInfo::class.java.protectionDomain.codeSource.location.toURI()).lastModified() }.getOrDefault(0L) }
 }
 

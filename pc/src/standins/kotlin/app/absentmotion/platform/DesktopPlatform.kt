@@ -161,6 +161,12 @@ fun ExportMediaPreview(kind: app.absentmotion.export.ExportKind, uris: List<Uri>
 
 fun effectsMessageOnHome() = false
 
+object PlatformFeatures {
+    const val ai = false
+    const val camera = false
+    const val tools = false
+}
+
 internal const val CAPTION_MODEL_NAME = "ggml-base-q5_1.bin"
 internal const val CAPTION_MODEL_BYTES = 59_707_625L
 internal fun loadCaptionLibrary() { throw UnsupportedOperationException("Auto captions are not available on this computer yet") }

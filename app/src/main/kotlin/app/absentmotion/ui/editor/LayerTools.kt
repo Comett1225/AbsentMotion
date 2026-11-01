@@ -176,7 +176,7 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier, side: Boolean 
         val blending = Tile(Blending) { state.panel = EditorPanel.Blending }
         val rows = when (kind) {
             "audio" -> listOf(
-                listOf(presets, Tile(Effects) { openEffectBrowser(state, "audio") }, Tile(AiTools) { openEffectBrowser(state, "ai") }),
+                listOfNotNull(presets, Tile(Effects) { openEffectBrowser(state, "audio") }, if (app.absentmotion.platform.PlatformFeatures.ai) Tile(AiTools) { openEffectBrowser(state, "ai") } else null),
             )
             "camera" -> listOf(
                 listOf(Tile(CameraOptions) { state.panel = EditorPanel.Camera }, transform, effects),
@@ -211,9 +211,9 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier, side: Boolean 
         val failed = stringResource(R.string.screenshot_failed)
         val more = listOfNotNull(
             if (state.selected?.canCrop == true) Tile(Crop) { state.openCrop() } else null,
-            if (state.selected?.mediaFill != null) Tile(AiTools) { openEffectBrowser(state, "ai") } else null,
-            if (video) Tile(CaptionTools) { state.playing = false; captions = true } else null,
-            if (video) Tile(ReverseTool, enabled = ai.running == null, active = state.selected?.reverseMark != null) { state.playing = false; ai.apply(AiAction.Reverse) } else null,
+            if (app.absentmotion.platform.PlatformFeatures.ai && state.selected?.mediaFill != null) Tile(AiTools) { openEffectBrowser(state, "ai") } else null,
+            if (app.absentmotion.platform.PlatformFeatures.ai && video) Tile(CaptionTools) { state.playing = false; captions = true } else null,
+            if (app.absentmotion.platform.PlatformFeatures.ai && video) Tile(ReverseTool, enabled = ai.running == null, active = state.selected?.reverseMark != null) { state.playing = false; ai.apply(AiAction.Reverse) } else null,
             if (video) Tile(ScreenshotTool, enabled = !shooting) {
                 state.playing = false
                 fun shoot() {

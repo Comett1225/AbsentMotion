@@ -15,7 +15,20 @@ object Strings {
         ?: System.getProperty("am.assets")?.let { File(it).parentFile.resolve("res") }
         ?: File(System.getProperty("compose.application.resources.dir") ?: ".", "res")
 
-    init { load(resDir().resolve("values/strings.xml")) }
+    init {
+        load(resDir().resolve("values/strings.xml"))
+        val tag = runCatching { android.content.SharedPreferences.named("language").getString("tag", null) }.getOrNull()
+            ?: java.util.Locale.getDefault().toLanguageTag()
+        folderFor(tag)?.let { load(resDir().resolve("$it/strings.xml")) }
+    }
+
+    private fun folderFor(tag: String): String? {
+        val parts = tag.replace('_', '-').split('-')
+        val language = when (parts[0].lowercase()) { "id" -> "in"; "tl" -> "fil"; else -> parts[0].lowercase() }
+        if (language == "en") return null
+        val region = parts.drop(1).firstOrNull { it.length == 2 }?.uppercase()
+        return listOfNotNull(region?.let { "values-$language-r$it" }, "values-$language").firstOrNull { resDir().resolve("$it/strings.xml").isFile }
+    }
 
     private fun load(file: File) {
         if (!file.isFile) return
