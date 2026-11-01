@@ -93,7 +93,7 @@ JNIEXPORT jboolean JNICALL JNI(setFrame)(JNIEnv* e, jobject, jlong h, jstring ur
 JNIEXPORT jboolean JNICALL JNI(render)(JNIEnv* e, jobject, jlong h, jdouble time, jint w, jint height, jobject buffer) {
     Desktop* d = ptr(h);
     if (!d || w <= 0 || height <= 0 || d->scene.width <= 0 || d->scene.height <= 0 || e->GetDirectBufferCapacity(buffer) < (jlong)w * height * 4) return false;
-    auto info = SkImageInfo::Make(w, height, kRGBA_8888_SkColorType, kPremul_SkAlphaType, SkColorSpace::MakeSRGB());
+    auto info = SkImageInfo::Make(w, height, kBGRA_8888_SkColorType, kPremul_SkAlphaType, SkColorSpace::MakeSRGB());
     auto surface = d->gpu ? SkSurfaces::RenderTarget(d->gpu.get(), skgpu::Budgeted::kNo, info) : nullptr;
     if (!surface) surface = SkSurfaces::Raster(info);
     if (!surface) return false;

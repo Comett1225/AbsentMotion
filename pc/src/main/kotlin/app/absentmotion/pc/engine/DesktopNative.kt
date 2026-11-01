@@ -1,13 +1,11 @@
 package app.absentmotion.pc.engine
 
-import java.io.File
+import app.absentmotion.pc.platform.DesktopPlatform
 import java.nio.ByteBuffer
 
 object DesktopNative {
     init {
-        val resources = System.getProperty("compose.application.resources.dir")
-        val library = System.getProperty("am.native") ?: File(resources, "libamdesktop.dylib").absolutePath
-        System.load(library)
+        System.load(DesktopPlatform.nativeLibrary())
     }
 
     external fun create(): Long

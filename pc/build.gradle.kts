@@ -17,6 +17,8 @@ dependencies {
     implementation(compose.desktop.currentOs)
     implementation("org.json:json:20250517")
     implementation("net.sf.kxml:kxml2:2.3.0")
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.jetbrains.compose.ui:ui-test-junit4-desktop:1.10.3")
 }
 
 val nativeBuild by tasks.registering(Exec::class) {
@@ -74,4 +76,12 @@ val sceneCheck by tasks.registering(JavaExec::class) {
     systemProperty("am.native", file("build/native/libamdesktop.dylib").absolutePath)
     systemProperty("am.repo", file("..").absolutePath)
     systemProperty("am.output", file("build").absolutePath)
+}
+
+tasks.test {
+    dependsOn(nativeBuild)
+    systemProperty("am.native", layout.buildDirectory.file("native/libamdesktop.dylib").get().asFile.absolutePath)
+    systemProperty("skiko.data.path", layout.buildDirectory.dir("skiko").get().asFile.absolutePath)
+    systemProperty("java.awt.headless", "true")
+    systemProperty("skiko.renderApi", "SOFTWARE")
 }

@@ -1,6 +1,7 @@
 package app.absentmotion.pc.engine
 
 import app.absentmotion.effects.EffectDefinition
+import app.absentmotion.pc.platform.DesktopPlatform
 import app.absentmotion.model.Layer
 import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
@@ -13,6 +14,7 @@ import java.awt.image.BufferedImage
 import java.io.File
 import java.net.URI
 import java.nio.ByteBuffer
+import java.nio.ByteOrder
 
 class DesktopEngine(val assets: File, private val repo: File?) : AutoCloseable {
     private val handle = DesktopNative.create()
@@ -50,8 +52,8 @@ class DesktopEngine(val assets: File, private val repo: File?) : AutoCloseable {
         (used + declared).forEach { (uri, video) ->
             val file = resolve(uri, base) ?: return@forEach
             if (video) {
-                val ffmpeg = System.getProperty("am.ffmpeg") ?: System.getenv("AM_FFMPEG") ?: "/opt/homebrew/bin/ffmpeg"
-                val ffprobe = System.getProperty("am.ffprobe") ?: System.getenv("AM_FFPROBE") ?: "/opt/homebrew/bin/ffprobe"
+                val ffmpeg = DesktopPlatform.executable("ffmpeg")
+                val ffprobe = DesktopPlatform.executable("ffprobe")
                 runCatching { videos[uri] = FfmpegVideoSource(file, ffmpeg, ffprobe) }
             } else DesktopNative.setPicture(handle, uri, file.absolutePath)
         }
@@ -100,13 +102,7 @@ class DesktopEngine(val assets: File, private val repo: File?) : AutoCloseable {
         val image = frameImage?.takeIf { it.width == width && it.height == height }
             ?: BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB_PRE).also { frameImage = it }
         val pixels = (image.raster.dataBuffer as java.awt.image.DataBufferInt).data
-        for (i in pixels.indices) {
-            val r = output.get().toInt() and 255
-            val g = output.get().toInt() and 255
-            val b = output.get().toInt() and 255
-            val a = output.get().toInt() and 255
-            pixels[i] = (a shl 24) or (r shl 16) or (g shl 8) or b
-        }
+        output.order(ByteOrder.LITTLE_ENDIAN).asIntBuffer().get(pixels)
         return image
     }
 
