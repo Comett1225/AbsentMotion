@@ -9,7 +9,7 @@ kotlin {
     sourceSets.main {
         kotlin.srcDir("src/shared-shims")
         kotlin.srcDir("../app/src/main/kotlin")
-        kotlin.include("app/absentmotion/pc/**", "app/absentmotion/model/**", "app/absentmotion/compat/ForeignEffectIds.kt", "app/absentmotion/effects/EffectDefinition.kt", "desktop_shims/**")
+        kotlin.include("app/absentmotion/pc/**", "app/absentmotion/model/**", "app/absentmotion/compat/ForeignEffectIds.kt", "app/absentmotion/effects/EffectDefinition.kt", "app/absentmotion/ui/editor/PanelIcons.kt", "app/absentmotion/ui/editor/effects/EffectIcons.kt", "app/absentmotion/ui/home/HomeIcons.kt", "app/absentmotion/ui/export/ExportIcons.kt", "desktop_shims/**")
     }
 }
 
