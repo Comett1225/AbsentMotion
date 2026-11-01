@@ -31,6 +31,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.absentmotion.editor.*
 import app.absentmotion.effects.EffectDefinition
+import app.absentmotion.effects.PresetFavouriteStore
+import app.absentmotion.platform.LocalContext
+import app.absentmotion.ui.editor.effects.PresetStar
 import app.absentmotion.model.*
 import app.absentmotion.ui.editor.AboveLeft
 import app.absentmotion.ui.editor.ChromeIcons
@@ -209,15 +212,20 @@ private fun EffectHeader(state: EditorState, index: Int, effect: XmlNode, defini
             Presence(presets) {
                 MenuPopup(DropOrRise, { presets = false }) {
                     val catalog by state.engine.effects.collectAsState()
+                    val context = LocalContext.current
+                    val presetFavourites = remember { PresetFavouriteStore.get(context) }
                     Column(Modifier.heightIn(max = 360.dp).verticalScroll(rememberScrollState())) {
                         definition.presets.forEach { preset ->
-                            Row(Modifier.fillMaxWidth().height(52.dp).clickable {
-                                val length = state.selected?.let { it.endTime - it.startTime } ?: 1000
-                                state.editSelected { it.withEffect(index) { old -> old.copy(children = definition.instance(preset, length).children) } }
-                                presets = false
-                            }.padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                                Thumbnail(catalog, definition.thumbnail(preset), Modifier.size(40.dp).clip(RowShape))
-                                Text(preset.name, Modifier.padding(start = 12.dp), color = Am.OnDark, fontSize = 15.sp, maxLines = 1)
+                            Row(Modifier.fillMaxWidth().height(52.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Row(Modifier.weight(1f).fillMaxHeight().clickable {
+                                    val length = state.selected?.let { it.endTime - it.startTime } ?: 1000
+                                    state.editSelected { it.withEffect(index) { old -> old.copy(children = definition.instance(preset, length).children) } }
+                                    presets = false
+                                }.padding(start = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                                    Thumbnail(catalog, definition.thumbnail(preset), Modifier.size(40.dp).clip(RowShape))
+                                    Text(preset.name, Modifier.weight(1f).padding(start = 12.dp), color = Am.OnDark, fontSize = 15.sp, maxLines = 1)
+                                }
+                                PresetStar(presetFavourites.contains(definition, preset)) { presetFavourites.toggle(definition, preset) }
                             }
                         }
                     }

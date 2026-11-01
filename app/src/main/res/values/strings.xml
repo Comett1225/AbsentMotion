@@ -2039,4 +2039,6 @@
     <string name="tools_suggestions">Got any tool suggestions? Leave it on %1$s, or %2$s!</string>
     <string name="tools_github">GitHub</string>
     <string name="tools_form">the Form</string>
+    <string name="effectbrowser_favorite_preset">Favorite preset</string>
+    <string name="effectbrowser_favorite_empty">Favorites appear here</string>
 </resources>

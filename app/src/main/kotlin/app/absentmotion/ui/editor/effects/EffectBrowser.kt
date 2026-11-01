@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
@@ -36,6 +37,7 @@ import app.absentmotion.platform.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import app.absentmotion.platform.LocalContext
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -58,6 +60,7 @@ import app.absentmotion.editor.EditorState
 import app.absentmotion.effects.EffectCatalog
 import app.absentmotion.effects.EffectDefinition
 import app.absentmotion.effects.EffectPreset
+import app.absentmotion.effects.PresetFavouriteStore
 import app.absentmotion.model.addEffect
 import app.absentmotion.model.effects
 import app.absentmotion.ui.editor.CaptionsSheet
@@ -85,6 +88,7 @@ fun EffectBrowser(state: EditorState) {
     val history = remember { context.getSharedPreferences("effects", 0) }
     var recent by remember { mutableStateOf(history.getString("recent", "")!!.split('|').filter { it.isNotEmpty() }) }
     var favourites by remember { mutableStateOf(history.getStringSet("favourites", emptySet())!!.toSet()) }
+    val presetFavourites = remember { PresetFavouriteStore.get(context) }
     var favPage by remember { mutableStateOf(false) }
     val layer = state.selected
     val audio = layer?.kind == "audio"
@@ -184,13 +188,16 @@ fun EffectBrowser(state: EditorState) {
                 if (state.effectDetail == null) Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     Text(stringResource(R.string.standard_settings), Modifier.weight(1f).height(48.dp).alpha(if (effect.available) 1f else 0.35f)
                         .clickable(enabled = effect.available) { add(effect) }.padding(12.dp), color = Am.OnDark, fontSize = 15.sp)
-                    Icon(PanelIcons.Star, stringResource(R.string.effectbrowser_favorite), Modifier.size(32.dp).clickable { favourite(effect) }, tint = if (effect.id in favourites) Am.Accent else Am.OnDark)
+                    Icon(PanelIcons.Star, stringResource(R.string.effectbrowser_favorite), Modifier.size(48.dp).clickable { favourite(effect) }.padding(12.dp), tint = if (effect.id in favourites) Am.Accent else Am.OnDark)
                 }
                 if (state.effectDetail == null) effect.presets.forEach { preset ->
-                    Column(Modifier.fillMaxWidth().height(56.dp).alpha(if (effect.available) 1f else 0.35f)
-                        .clickable(enabled = effect.available) { add(effect, preset) }.padding(horizontal = 12.dp), verticalArrangement = Arrangement.Center) {
-                        Text(stringResource(R.string.effectbrowser_preset), color = Am.OnDarkDim, fontSize = 10.sp, maxLines = 1)
-                        Text("+ ${preset.name}", color = Am.OnDark, fontSize = 15.sp, maxLines = 1)
+                    Row(Modifier.fillMaxWidth().height(72.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Row(Modifier.weight(1f).fillMaxHeight().alpha(if (effect.available) 1f else 0.35f)
+                            .clickable(enabled = effect.available) { add(effect, preset) }.padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Thumbnail(catalog, effect.thumbnail(preset), Modifier.size(56.dp).clip(RoundedCornerShape(5.dp)))
+                            Text(preset.name, Modifier.weight(1f).padding(start = 12.dp), color = Am.OnDark, fontSize = 15.sp, maxLines = 1)
+                        }
+                        PresetStar(presetFavourites.contains(effect, preset)) { presetFavourites.toggle(effect, preset) }
                     }
                 }
             }
@@ -225,21 +232,36 @@ fun EffectBrowser(state: EditorState) {
                     recommended.forEach { effect -> EffectTile(catalog, effect, 121f, { pick(effect) }, { detail = effect }, effect.id in favourites) }
                 }
                 Box(Modifier.fillMaxWidth().height(210.dp)) {
-                    val ids = if (favPage) favourites.toList() else recent
-                    val shown = ids.mapNotNull(catalog::find).distinct().take(10)
-                    Column(Modifier.padding(horizontal = 10.dp, vertical = 5.dp)) {
+                    val shown = if (favPage) presetFavourites.resolve(catalog.definitions).map { it.first to it.second } +
+                        favourites.mapNotNull(catalog::find).map { it to null } else recent.mapNotNull(catalog::find).distinct().take(10).map { it to null }
+                    if (favPage) Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 10.dp, vertical = 5.dp)) {
+                        shown.chunked(2).forEach { column ->
+                            Column(Modifier.width(68.dp)) {
+                                repeat(2) { row ->
+                                    Box(Modifier.height(100.dp)) {
+                                        column.getOrNull(row)?.let { (effect, preset) ->
+                                            EffectTile(catalog, effect, 62f, { if (preset == null) pick(effect) else if (effect.available) add(effect, preset) else detail = effect },
+                                                { detail = effect }, true, preset)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } else Column(Modifier.padding(horizontal = 10.dp, vertical = 5.dp)) {
                         repeat(2) { row ->
                             Row(Modifier.fillMaxWidth().height(100.dp)) {
                                 repeat(5) { col ->
                                     Box(Modifier.weight(1f)) {
-                                        shown.getOrNull(row * 5 + col)?.let { effect -> EffectTile(catalog, effect, 62f, { pick(effect) }, { detail = effect }, effect.id in favourites) }
+                                        shown.getOrNull(row * 5 + col)?.first?.let { effect ->
+                                            EffectTile(catalog, effect, 62f, { pick(effect) }, { detail = effect }, effect.id in favourites)
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                    if (shown.isEmpty() && !favPage) Text(stringResource(R.string.effectbrowser_recent_empty), Modifier.align(Alignment.Center).padding(horizontal = 24.dp),
-                        color = Am.OnDarkDim, fontSize = 13.sp, textAlign = TextAlign.Center)
+                    if (shown.isEmpty()) Text(stringResource(if (favPage) R.string.effectbrowser_favorite_empty else R.string.effectbrowser_recent_empty),
+                        Modifier.align(Alignment.Center).padding(horizontal = 24.dp), color = Am.OnDarkDim, fontSize = 13.sp, textAlign = TextAlign.Center)
                     Row(Modifier.align(Alignment.BottomCenter)) {
                         Box(Modifier.size(40.dp, 22.dp).clickable { favPage = false }, Alignment.CenterEnd) {
                             Icon(EffectIcons.Recent, stringResource(R.string.effectbrowser_recent), Modifier.size(12.dp), tint = if (!favPage) Am.Accent else Am.OnDarkDim)
@@ -293,18 +315,25 @@ private fun BrowserButton(icon: ImageVector, description: String, onClick: () ->
 }
 
 @Composable
-private fun EffectTile(catalog: EffectCatalog, effect: EffectDefinition, width: Float, onClick: () -> Unit, onLongClick: () -> Unit, favourite: Boolean) {
+private fun EffectTile(catalog: EffectCatalog, effect: EffectDefinition, width: Float, onClick: () -> Unit, onLongClick: () -> Unit, favourite: Boolean, preset: EffectPreset? = null) {
     val press = remember { MutableInteractionSource() }
     Column(Modifier.width(width.dp).pressScale(press, TilePress).alpha(if (effect.available) 1f else 0.35f)
         .combinedClickable(press, LocalIndication.current, onClick = onClick, onLongClick = onLongClick).padding(5.dp), horizontalAlignment = Alignment.CenterHorizontally) {
         Box {
-            Thumbnail(catalog, effect.thumbnail, Modifier.size((width - 7).dp).clip(RoundedCornerShape(5.dp)))
+            Thumbnail(catalog, preset?.let(effect::thumbnail) ?: effect.thumbnail, Modifier.size((width - 7).dp).clip(RoundedCornerShape(5.dp)))
             if (favourite) Icon(PanelIcons.Star, null, Modifier.align(Alignment.TopEnd).size(14.dp), tint = Am.Accent)
-            if (catalog.isNew(effect)) Text(stringResource(R.string.t_new), Modifier.align(Alignment.TopStart).padding(3.dp).clip(RoundedCornerShape(3.dp)).background(Am.Accent)
+            if (preset == null && catalog.isNew(effect)) Text(stringResource(R.string.t_new), Modifier.align(Alignment.TopStart).padding(3.dp).clip(RoundedCornerShape(3.dp)).background(Am.Accent)
                 .padding(horizontal = 3.dp), color = Color.White, fontSize = 7.sp, lineHeight = 9.sp, fontWeight = FontWeight.Bold, maxLines = 1)
         }
-        Text(effect.name, Modifier.fillMaxWidth().padding(top = 4.dp), color = Am.OnDark, fontSize = if (width > 100) 10.sp else 8.sp,
+        Text(preset?.name ?: effect.name, Modifier.fillMaxWidth().padding(top = 4.dp), color = Am.OnDark, fontSize = if (width > 100) 10.sp else 8.sp,
             lineHeight = 9.sp, textAlign = TextAlign.Center, maxLines = 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+    }
+}
+
+@Composable
+internal fun PresetStar(favourite: Boolean, onToggle: () -> Unit) {
+    Box(Modifier.size(48.dp).toggleable(favourite, role = Role.Checkbox) { onToggle() }, contentAlignment = Alignment.Center) {
+        Icon(PanelIcons.Star, stringResource(R.string.effectbrowser_favorite_preset), Modifier.size(24.dp), tint = if (favourite) Am.Accent else Am.OnDark)
     }
 }
 
